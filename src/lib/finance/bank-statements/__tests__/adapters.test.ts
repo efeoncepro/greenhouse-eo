@@ -185,3 +185,33 @@ describe('parseGlobal66Xls', () => {
     })
   })
 })
+
+describe('parseBancoChileCuentaVistaText', () => {
+  const TEXT = `
+                                                                           Estado de Cuenta
+                                                 00030852600520260831       CUENTA VISTA
+EMPRESA SpA
+                                                                            N° DE CUENTA : 308526005
+                                                                            MONEDA          : PESOS
+SUCURSAL                  :   OFICINA                     CARTOLA N°           : 8
+TELEFONO                  :   0                           DESDE                : 31/07/2026            HASTA          : 31/08/2026
+FECHA             DETALLE DE TRANSACCION                     SUCURSAL        N° DOCTO       MONTO CARGOS            MONTO DEPOSITOS           SALDO
+31/07      SALDO INICIAL                                                                                                                  10.600
+05/08      APP-TRASPASO A:Empresa Spa                       INTERNET                                          600                          10.000
+14/08      TRASPASO DE:Empresa SpA                          INTERNET                                                        300.000       310.000
+19/08      TRASPASO DE:Empresa SpA                          INTERNET                                                      3.350.000             0
+31/08      SALDO FINAL                                                                                                                 3.660.000
+`
+
+  it('deriva el signo por la glosa y no confía en un saldo impreso inconsistente', async () => {
+    const { parseBancoChileCuentaVistaText } = await import('../bancochile-cuenta-vista-text')
+    const parsed = parseBancoChileCuentaVistaText(TEXT)
+
+    expect(parsed.rows.map(r => [r.transactionDate, r.amount, r.balance, r.description])).toEqual([
+      ['2026-08-05', -600, 10000, 'APP-TRASPASO A:Empresa Spa'],
+      ['2026-08-14', 300000, 310000, 'TRASPASO DE:Empresa SpA'],
+      ['2026-08-19', 3350000, 3660000, 'TRASPASO DE:Empresa SpA']
+    ])
+    expect(parsed.meta).toMatchObject({ accountNumber: '308526005', periodFrom: '2026-07-31', periodTo: '2026-08-31', openingBalance: 10600, closingBalance: 3660000 })
+  })
+})

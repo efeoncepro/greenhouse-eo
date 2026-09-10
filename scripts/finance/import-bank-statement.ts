@@ -102,7 +102,7 @@ const main = async () => {
 
   const parsed = parseBankStatementFile(
     isPdf
-      ? { content: extractPdfText(file, str(args, 'pdf-password')), format: str(args, 'format') ?? 'santander_tc_estado_cuenta_text' }
+      ? { content: extractPdfText(file, str(args, 'pdf-password')), format: str(args, 'format') }
       : { content: readFileSync(file), fileName: path.basename(file), format: str(args, 'format') }
   )
 

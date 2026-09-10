@@ -102,6 +102,8 @@ type PlanAction =
     }
   /** Vincula la fila a un pago ya registrado por otro dominio (ej. orden de pago contractor pagada con `paidAt` del banco). */
   | { type: 'link_existing_payment'; expenseId: string; paymentId?: string }
+  /** Vincula la fila a una pata de settlement ya creada (traspaso interno registrado desde la otra cuenta). */
+  | { type: 'link_existing_leg'; direction: 'incoming' | 'outgoing'; dateTolerance?: number }
   | { type: 'skip'; reason: string }
 
 interface PlanEntry {
@@ -697,6 +699,28 @@ const applyEntry = async (entry: PlanEntry, ctx: Ctx): Promise<void> => {
 
       await linkRow(row, { kind: 'expense', expenseId: a.expenseId, paymentId: paymentRow.payment_id }, ctx.actor)
       ctx.log(`    ✓ vinculado pago existente ${paymentRow.payment_id} (${a.expenseId})`)
+
+      return
+    }
+
+    case 'link_existing_leg': {
+      const legs = await runGreenhousePostgresQuery<{ settlement_leg_id: string; settlement_group_id: string; transaction_date: string | Date; amount: string }>(
+        `SELECT settlement_leg_id, settlement_group_id, transaction_date, amount::text
+         FROM greenhouse_finance.settlement_legs
+         WHERE instrument_id = $1 AND direction = $2 AND reconciliation_row_id IS NULL
+           AND superseded_at IS NULL AND superseded_by_otb_id IS NULL
+           AND ABS(amount - $3::numeric) <= 1
+           AND ABS(transaction_date - $4::date) <= $5
+         ORDER BY ABS(transaction_date - $4::date), created_at`,
+        [account, a.direction, abs(amount), date, a.dateTolerance ?? 3]
+      )
+
+      const leg = legs[0]
+
+      if (!leg) throw new Error(`link_existing_leg: sin pata ${a.direction} de ${fmt(abs(amount))} en ${account} cerca de ${date}`)
+
+      await linkRow(row, { kind: 'settlement', settlementLegId: leg.settlement_leg_id, settlementGroupId: leg.settlement_group_id }, ctx.actor)
+      ctx.log(`    ✓ vinculada pata existente ${leg.settlement_leg_id}`)
 
       return
     }

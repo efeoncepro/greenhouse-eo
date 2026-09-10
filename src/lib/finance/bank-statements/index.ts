@@ -2,6 +2,7 @@ import 'server-only'
 
 import { FinanceValidationError } from '@/lib/finance/shared'
 
+import { detectBancoChileCuentaVistaText, parseBancoChileCuentaVistaText } from './bancochile-cuenta-vista-text'
 import { detectGlobal66Xls, parseGlobal66Xls } from './global66-xls'
 import { detectSantanderCartolaXlsx, parseSantanderCartolaXlsx } from './santander-cartola-xlsx'
 import { detectSantanderTcEstadoCuentaText, parseSantanderTcEstadoCuentaText } from './santander-tc-estado-cuenta-text'
@@ -13,7 +14,9 @@ export * from './types'
 
 const SPREADSHEET_EXTENSION = /\.(xlsx?|xlsm)$/i
 
-const isSpreadsheetFormat = (format: BankStatementSourceFormat): boolean => format !== 'santander_tc_estado_cuenta_text'
+const TEXT_FORMATS: BankStatementSourceFormat[] = ['santander_tc_estado_cuenta_text', 'bancochile_cuenta_vista_text']
+
+const isSpreadsheetFormat = (format: BankStatementSourceFormat): boolean => !TEXT_FORMATS.includes(format)
 
 const detectSpreadsheetFormat = (sheets: WorkbookGrid[]): BankStatementSourceFormat | null => {
   if (detectSantanderCartolaXlsx(sheets)) return 'santander_cartola_xlsx'
@@ -65,15 +68,19 @@ export const parseBankStatementFile = (input: ParseBankStatementFileInput): Pars
   const explicitFormat = input.format ? assertBankStatementSourceFormat(input.format) : null
 
   if (typeof input.content === 'string') {
-    const format = explicitFormat ?? (detectSantanderTcEstadoCuentaText(input.content) ? 'santander_tc_estado_cuenta_text' : null)
+    const format = explicitFormat
+      ?? (detectSantanderTcEstadoCuentaText(input.content)
+        ? 'santander_tc_estado_cuenta_text'
+        : detectBancoChileCuentaVistaText(input.content)
+          ? 'bancochile_cuenta_vista_text'
+          : null)
 
-    if (format !== 'santander_tc_estado_cuenta_text') {
-      throw new FinanceValidationError(
-        'No se reconoce el texto pegado como un extracto soportado. Para planillas XLS/XLSX adjunta el archivo.'
-      )
-    }
+    if (format === 'santander_tc_estado_cuenta_text') return parseSantanderTcEstadoCuentaText(input.content)
+    if (format === 'bancochile_cuenta_vista_text') return parseBancoChileCuentaVistaText(input.content)
 
-    return parseSantanderTcEstadoCuentaText(input.content)
+    throw new FinanceValidationError(
+      'No se reconoce el texto pegado como un extracto soportado. Para planillas XLS/XLSX adjunta el archivo.'
+    )
   }
 
   if (explicitFormat && !isSpreadsheetFormat(explicitFormat)) {

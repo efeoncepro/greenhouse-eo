@@ -1,0 +1,12 @@
+[
+  {
+    "accountId": "banco-chile-clp",
+    "genesisDate": "2026-08-01",
+    "openingBalance": 10600,
+    "declarationReason": "Ancla inicial Cuenta Vista FAN Emprende Banco de Chile 308526005 (cuenta nueva agosto 2026). SALDO INICIAL del estado de cuenta N°8 (31/07/2026–31/08/2026) = $10.600 (depósito de apertura); saldo al SOD 01/08 = EOD 31/07. Bank-authoritative. Movimientos del período: 05/08 −600 (traspaso a Santander), 14/08 +300.000 y 19/08 +3.350.000 (traspasos desde Global66); saldo final 3.660.000.",
+    "auditStatus": "reconciled",
+    "evidenceRefs": [
+      { "type": "cartola_pdf", "ref": "data/bank/Banco-de-Chile-Agosto-CartolaEmitida.pdf", "period": "2026-07-31..2026-08-31", "description": "Estado de Cuenta Cuenta Vista N°8 Banco de Chile 308526005 (clave: 4 últimos dígitos del RUT sin DV). Saldo inicial 10.600 / final 3.660.000." }
+    ]
+  }
+]

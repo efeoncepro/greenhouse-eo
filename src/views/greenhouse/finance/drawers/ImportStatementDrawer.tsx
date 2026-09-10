@@ -74,7 +74,8 @@ const FILE_SOURCE_FORMATS: Array<{ value: FileSourceFormat; label: string }> = [
   ...BANK_STATEMENT_SOURCE_FORMATS.map(value => ({ value, label: BANK_STATEMENT_SOURCE_FORMAT_LABELS[value] }))
 ]
 
-const TEXT_SOURCE_FORMAT: BankStatementSourceFormat = 'santander_tc_estado_cuenta_text'
+const TEXT_SOURCE_FORMATS: BankStatementSourceFormat[] = ['santander_tc_estado_cuenta_text', 'bancochile_cuenta_vista_text']
+const isTextSourceFormat = (value: FileSourceFormat) => value !== 'auto' && TEXT_SOURCE_FORMATS.includes(value)
 
 const readFileAsBase64 = (file: File) =>
   new Promise<string>((resolve, reject) => {
@@ -153,7 +154,7 @@ const ImportStatementDrawer = ({ open, periodId, onClose, onSuccess }: Props) =>
     let body: Record<string, unknown>
 
     if (mode === 'file') {
-      if (sourceFormat === TEXT_SOURCE_FORMAT) {
+      if (isTextSourceFormat(sourceFormat)) {
         if (!statementText.trim()) {
           setError('Pega el texto del estado de cuenta.')
 
@@ -304,7 +305,7 @@ const ImportStatementDrawer = ({ open, periodId, onClose, onSuccess }: Props) =>
                 ))}
               </CustomTextField>
 
-              {sourceFormat === TEXT_SOURCE_FORMAT ? (
+              {isTextSourceFormat(sourceFormat) ? (
                 <CustomTextField
                   fullWidth
                   size='small'

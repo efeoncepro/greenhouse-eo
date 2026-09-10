@@ -15,19 +15,22 @@ export type BankStatementSourceFormat =
   | 'santander_tc_movimientos_xlsx'
   | 'santander_tc_estado_cuenta_text'
   | 'global66_xls'
+  | 'bancochile_cuenta_vista_text'
 
 export const BANK_STATEMENT_SOURCE_FORMATS: BankStatementSourceFormat[] = [
   'santander_cartola_xlsx',
   'santander_tc_movimientos_xlsx',
   'santander_tc_estado_cuenta_text',
-  'global66_xls'
+  'global66_xls',
+  'bancochile_cuenta_vista_text'
 ]
 
 export const BANK_STATEMENT_SOURCE_FORMAT_LABELS: Record<BankStatementSourceFormat, string> = {
   santander_cartola_xlsx: 'Santander — cartola cuenta corriente (XLSX Office Banking)',
   santander_tc_movimientos_xlsx: 'Santander — últimos movimientos tarjeta de crédito (XLSX)',
   santander_tc_estado_cuenta_text: 'Santander — estado de cuenta tarjeta de crédito (texto del PDF)',
-  global66_xls: 'Global66 — movimientos de cuenta (XLS)'
+  global66_xls: 'Global66 — movimientos de cuenta (XLS)',
+  bancochile_cuenta_vista_text: 'Banco de Chile — estado de cuenta Cuenta Vista (texto del PDF)'
 }
 
 export interface ParsedStatementRow {

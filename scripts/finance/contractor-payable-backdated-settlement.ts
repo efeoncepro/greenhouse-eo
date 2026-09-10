@@ -30,6 +30,7 @@ import { createPaymentOrderFromObligations } from '@/lib/finance/payment-orders/
 import { markPaymentOrderPaidAtomic } from '@/lib/finance/payment-orders/mark-paid-atomic'
 import { submitPaymentOrder } from '@/lib/finance/payment-orders/submit-order'
 import { createPrivatePendingAsset } from '@/lib/storage/greenhouse-assets'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 const DEFAULT_ACTOR = 'user-efeonce-admin-julio-reyes'
 
@@ -146,6 +147,25 @@ const main = async () => {
     if (!sourceAccountId || !paidAt) throw new Error('--source-account y --paid-at son obligatorios con --pay')
 
     let orderId = payable.paymentOrderId
+
+    if (!orderId) {
+      // La orden puede existir aunque el payable aún no la refleje (el
+      // back-link `payment_order_id` lo escribe la cascada reactiva). Se busca
+      // por la línea de la obligación antes de crear otra.
+      const existingOrder = await runGreenhousePostgresQuery<{ order_id: string; state: string }>(
+        `SELECT o.order_id, o.state
+         FROM greenhouse_finance.payment_order_lines l
+         JOIN greenhouse_finance.payment_orders o ON o.order_id = l.order_id
+         WHERE l.obligation_id = $1 AND o.state NOT IN ('cancelled')
+         ORDER BY o.created_at DESC LIMIT 1`,
+        [obligation.obligationId]
+      )
+
+      if (existingOrder[0]) {
+        orderId = existingOrder[0].order_id
+        console.log(`[order] existente ${orderId} state=${existingOrder[0].state}`)
+      }
+    }
 
     if (!orderId) {
       const created = await createPaymentOrderFromObligations({

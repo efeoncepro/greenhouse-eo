@@ -560,8 +560,8 @@
         "description": "20\\.557\\.199"
       },
       "action": {
-        "type": "skip",
-        "reason": "Transferencia a Valentina Hoyos 174.194 (07/09): concepto por confirmar (finiquito/bono) — punto 7"
+        "type": "link_existing_payment",
+        "expenseId": "EXP-202609-001"
       }
     },
     {
@@ -1249,6 +1249,39 @@
         "supplierName": "Metricool",
         "toolCatalogId": null,
         "description": "Metricool — cargo TC Master Empresa *2505 2026-09-08 (no facturado)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "banco-chile-clp_2026_08",
+        "date": "2026-08-05",
+        "amount": -600
+      },
+      "action": {
+        "type": "link_existing_leg",
+        "direction": "outgoing"
+      }
+    },
+    {
+      "row": {
+        "periodId": "banco-chile-clp_2026_08",
+        "date": "2026-08-14",
+        "amount": 300000
+      },
+      "action": {
+        "type": "link_existing_leg",
+        "direction": "incoming"
+      }
+    },
+    {
+      "row": {
+        "periodId": "banco-chile-clp_2026_08",
+        "date": "2026-08-19",
+        "amount": 3350000
+      },
+      "action": {
+        "type": "link_existing_leg",
+        "direction": "incoming"
       }
     }
   ]
