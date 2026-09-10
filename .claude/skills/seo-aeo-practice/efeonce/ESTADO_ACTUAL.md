@@ -101,6 +101,21 @@ que el presupuesto asumía** — 🔴 **y eso hace del squad blueprint un prerre
 → tabla de sensibilidad completa en `modules/04_PRICING.md` § 1. ⚠️ **Y ahora sabemos que el alcance real
 (12 art/mes + PR + quincenal) está en la parte ALTA de esa tabla, no en la baja.**
 
+### Delta 2026-09-10 — primera oportunidad de ASO: la app de Berel
+
+- **Workspace:** [`docs/commercial/tenders/berel-app-movil/`](../../../../docs/commercial/tenders/berel-app-movil/README.md)
+  (creado 2026-09-03). Deal HubSpot `64591709456` en `qualifiedtobuy`, tipo `existingbusiness`.
+- **Estado:** Proposal Studio `workshop_only`. **No hay oferta económica, cotización ni presupuesto.**
+  El siguiente paso es la conversación con el cliente para pedir build, fecha por sistema operativo,
+  objetivo y presupuesto.
+- **Dirección:** entrada por ASO, conectada con medición y performance móvil, alrededor del lanzamiento
+  de una nueva versión de la app de color de Berel.
+- 🔴 **Casos citables de ASO: cero.** Tampoco hay acceso confirmado a App Store Connect ni a Play Console,
+  así que no existe línea base.
+- 🎯 **Lo que enseña:** el ASO entra como **expansión de un cliente SEO existente por superficie**, no
+  como adquisición en frío. Método: `seo-aeo/modules/10_ASO_APP_DISCOVERY.md`; oferta:
+  `modules/14_ASO_COMPLEMENTARIO.md`.
+
 ---
 
 ## 2. 🔴 Cero casos citables — **pero no partimos de cero**

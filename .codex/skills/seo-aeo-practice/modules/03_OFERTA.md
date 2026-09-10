@@ -191,7 +191,7 @@ es el moat.**
 | ✅ **+ mercado** *(Berel MX → CO)* | 🔴 **+ artículos** |
 | ✅ **+ idioma** | |
 | ✅ **+ marca / submarca** | |
-| ✅ **+ superficie** *(Google → +IA → +Reddit/YouTube)* | |
+| ✅ **+ superficie** *(Google → +IA → +Reddit/YouTube → + tiendas de apps si el cliente tiene app: `14_ASO_COMPLEMENTARIO.md`)* | |
 
 🎯 **Expandir por superficie es lo que convierte "SEO" en "visibilidad" — y lo que justifica el precio de
 enterprise.**

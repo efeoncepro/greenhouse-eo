@@ -108,6 +108,8 @@ familias de servicio.
 
 La composición propuesta [`Search + Social Visibility`](../business-models/search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md) conecta Search Visibility 360 con Social Media sin fusionar ownership, pricing o accountability.
 
+La extensión propuesta [`Search & App Visibility`](../business-models/search-visibility-360/SEARCH_APP_VISIBILITY_EXTENSION_V1.md) (`Proposed`, 2026-09-10) lleva Search Visibility 360 a las tiendas de apps y al descubrimiento de apps por IA para clientes con app. Es expansión por superficie, no una familia nueva: Apple Ads y App campaigns siguen en Reach, los creativos en Globe y la instrumentación en Measurement & Analytics.
+
 ### Delivery models de Wave
 
 Las familias anteriores son product services; el modelo de delivery se cotiza y gobierna por separado. Wave puede

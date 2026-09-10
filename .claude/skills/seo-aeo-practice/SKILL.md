@@ -13,7 +13,8 @@ description: >-
   cobramos", "retainer", "margen", "piso", "cotizar SEO", "propuesta de SEO",
   "descuento", "prospección SEO", "outbound de SEO", "canales para vender SEO",
   "objeción SEO", "el cliente dice que es caro", "competimos con un freelancer",
-  "AI Visibility Grader como venta", "licitación de contenido".
+  "AI Visibility Grader como venta", "licitación de contenido", "vender ASO",
+  "ASO para un cliente con app", "servicios complementarios de ASO".
 ---
 
 # SEO/AEO Practice — el negocio, no el oficio
@@ -199,6 +200,7 @@ mueve, y este es el orden"* sí.
 
 | 🔴 **Lo que NUNCA se hace** *(+ los bugs vivos de Efeonce marcados 🩸)* | **`ANTIPATTERNS.md`** |
 | **El vocabulario de la práctica** *(loaded cost, piso, la cuña, la cicatriz, el puente…)* | **`GLOSSARY.md`** |
+| 🎯 **ASO complementario** — cuándo se vende a un cliente con app, las líneas de servicio, qué NO se vende, cómo se prueba sin atribuir a IA *(el oficio vive en `seo-aeo/modules/10_ASO_APP_DISCOVERY.md`)* | **`modules/14_ASO_COMPLEMENTARIO.md`** |
 
 **Artefactos listos:** `templates/hoja-de-cuenta.md` *(se llena ANTES de tocar la puerta)* ·
 `templates/secuencia-outbound.md` · `templates/guion-reunion-grader.md` ·
