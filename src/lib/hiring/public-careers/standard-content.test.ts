@@ -8,7 +8,16 @@ import {
 
 describe('contenido estándar público de Careers', () => {
   it('mantiene un contexto corporativo factual y un baseline de beneficios sin aporte de equipo', () => {
+    // Formulación base de PDR-012 (Accepted): las cinco capabilities y el mecanismo van completos.
+    // `medios` y `software propio` estuvieron ausentes en la v1 del bloque; el test existe para eso.
     expect(EFEONCE_CAREERS_COMPANY_CONTEXT).toContain('plataforma de servicios de marketing y crecimiento')
+    expect(EFEONCE_CAREERS_COMPANY_CONTEXT).toContain('medios')
+    expect(EFEONCE_CAREERS_COMPANY_CONTEXT).toContain('software propio')
+    expect(EFEONCE_CAREERS_COMPANY_CONTEXT).toContain('trabajando como una sola operación')
+    // Why canónico (SSOT `docs/context/09_marca-agencia.md` §WHY), no una paráfrasis.
+    expect(EFEONCE_CAREERS_COMPANY_CONTEXT).toContain('más capaz de sostenerlo')
+    // Disciplina anti-humo: `tecnología` suelta reemplazando a `software propio` es el drift a evitar.
+    expect(EFEONCE_CAREERS_COMPANY_CONTEXT).not.toContain('creatividad, tecnología')
     expect(EFEONCE_CAREERS_STANDARD_BENEFITS).toHaveLength(6)
     expect(EFEONCE_CAREERS_STANDARD_BENEFITS.join(' ')).toContain('US$50')
     expect(EFEONCE_CAREERS_STANDARD_BENEFITS.join(' ')).not.toContain('US$400')

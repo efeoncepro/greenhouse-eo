@@ -5,10 +5,24 @@
  * versionan aquí, se muestran en HTML y se incorporan al JobPosting desde la misma fuente.
  * La autoridad del bloque de beneficios es el Efeonce Candidate Benefits Charter.
  */
-export const EFEONCE_CAREERS_STANDARD_CONTENT_VERSION = 1 as const
+export const EFEONCE_CAREERS_STANDARD_CONTENT_VERSION = 2 as const
 
+/**
+ * Contexto de compañía publicado en el bloque «Efeonce en breve» de toda vacante.
+ *
+ * La formulación base es LITERAL de `docs/public-site/decisions/PDR-012-growth-operating-system-
+ * global-positioning.md` (Accepted 2026-07-09), y la creencia viene del SSOT del Golden Circle
+ * (`docs/context/09_marca-agencia.md` §WHY). Ninguna de las dos se parafrasea aquí: el careers
+ * es una superficie pública más, y una versión propia del posicionamiento es drift de marca.
+ *
+ * La v1 decía «estrategia, creatividad, tecnología, datos y operación»: se comía **medios** —una
+ * capability completa— y degradaba **software propio** —la prueba diferenciadora, Greenhouse/
+ * Kortex/Verk— a «tecnología», que es exactamente el claim sin mecanismo que la disciplina
+ * anti-humo de §09 prohíbe. También omitía el Why, que es lo único de este bloque que le habla
+ * a un candidato.
+ */
 export const EFEONCE_CAREERS_COMPANY_CONTEXT =
-  'Efeonce es una plataforma de servicios de marketing y crecimiento habilitada por IA. Integramos estrategia, creatividad, tecnología, datos y operación para construir crecimiento con nuestros clientes y convertir cada aprendizaje en sistemas reutilizables.'
+  'Efeonce es una plataforma de servicios de marketing y crecimiento habilitada por IA: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación. No entregamos crecimiento: lo construimos con cada cliente y lo dejamos más capaz de sostenerlo. Eso se sostiene en método (Loop Marketing), medición que el cliente ve en vivo (ICO) y plataformas propias donde cada aprendizaje queda como memoria reutilizable.'
 
 /**
  * Calificador OBLIGATORIO del bloque de beneficios (Efeonce Candidate Benefits Charter,
