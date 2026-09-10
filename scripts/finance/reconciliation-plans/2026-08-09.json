@@ -1283,6 +1283,64 @@
         "type": "link_existing_leg",
         "direction": "incoming"
       }
+    },
+    {
+      "row": {
+        "periodId": "global66-clp_2026_09",
+        "date": "2026-09-03",
+        "amount": -800730,
+        "description": "Andres"
+      },
+      "action": {
+        "type": "pay_expense",
+        "expenseId": "EXP-202608-001",
+        "exchangeRateOverride": 882.337385,
+        "notes": "Nómina agosto Andres Carlosama pagada vía Global66 03/09 (Pago Nomina): 800.730 CLP = USD 907,51 al tipo de cambio realizado 882,34. Reemplaza el registro payroll_system del 04/09 (superseded).",
+        "amount": 907.51,
+        "currency": "USD"
+      }
+    },
+    {
+      "row": {
+        "periodId": "global66-clp_2026_09",
+        "date": "2026-09-03",
+        "amount": -1114423,
+        "description": "Daniela"
+      },
+      "action": {
+        "type": "pay_expense",
+        "expenseId": "EXP-202608-002",
+        "exchangeRateOverride": 891.5384,
+        "notes": "Nómina agosto Daniela Ferreira pagada vía Global66 03/09 (Pago Nomina): 1.114.423 CLP = USD 1.250 al tipo de cambio realizado 891,54. Reemplaza el registro payroll_system del 04/09 (superseded).",
+        "amount": 1250,
+        "currency": "USD"
+      }
+    },
+    {
+      "row": {
+        "periodId": "global66-clp_2026_09",
+        "date": "2026-09-03",
+        "amount": -34233,
+        "description": "Costo"
+      },
+      "action": {
+        "type": "bank_fee",
+        "description": "FX fee Global66 → CO nómina agosto Andres Carlosama (entry 2026-08_andres-carlosama, envío 40355617)",
+        "miscellaneousCategory": "fx_fee"
+      }
+    },
+    {
+      "row": {
+        "periodId": "global66-clp_2026_09",
+        "date": "2026-09-03",
+        "amount": -35652,
+        "description": "Costo"
+      },
+      "action": {
+        "type": "bank_fee",
+        "description": "FX fee Global66 → ES nómina agosto Daniela Ferreira (entry 2026-08_daniela-ferreira, envío 40355006)",
+        "miscellaneousCategory": "fx_fee"
+      }
     }
   ]
 }

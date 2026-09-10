@@ -52,7 +52,12 @@ interface RowSelector {
 
 type PlanAction =
   | { type: 'internal_transfer'; sourceAccountId: string; destinationAccountId: string; paymentDate?: string; destinationDate?: string; counterpart?: RowSelector; notes?: string }
-  | { type: 'pay_expense'; expenseId: string; notes?: string }
+  /**
+   * `amount`/`currency`: cuando el expense está en otra moneda (nómina en USD pagada en CLP),
+   * el ledger exige el pago en la moneda del expense; se paga el monto del expense y
+   * `exchangeRateOverride` fija el CLP real de la fila (amount × rate = fila).
+   */
+  | { type: 'pay_expense'; expenseId: string; notes?: string; exchangeRateOverride?: number; amount?: number; currency?: 'CLP' | 'USD' | 'MXN' }
   | { type: 'loan_installment'; loanAccountId: string; installmentLabel?: string }
   | { type: 'tax'; taxType: string; taxPeriod: string; taxFormNumber?: string; description?: string }
   | { type: 'bank_fee'; description: string; miscellaneousCategory?: string }
@@ -310,14 +315,15 @@ const applyEntry = async (entry: PlanEntry, ctx: Ctx): Promise<void> => {
       const r = await recordExpensePayment({
         expenseId: a.expenseId,
         paymentDate: date,
-        amount: abs(amount),
-        currency: await accountCurrency(account),
+        amount: a.amount ?? abs(amount),
+        currency: a.currency ?? await accountCurrency(account),
         reference: ref(row),
         paymentMethod: 'bank_transfer',
         paymentAccountId: account,
         paymentSource: 'bank_statement',
         notes: a.notes ?? `Conciliado desde cartola: ${row.description}`,
-        actorUserId: ctx.actor
+        actorUserId: ctx.actor,
+        exchangeRateOverride: a.exchangeRateOverride ?? null
       })
 
       await linkRow(row, { kind: 'expense', expenseId: a.expenseId, paymentId: r.payment.paymentId }, ctx.actor)
