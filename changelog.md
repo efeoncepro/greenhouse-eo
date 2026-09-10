@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — Finance: segunda pasada de conciliación (honorarios brutos, Deel al CCA, payable backdated, Banco de Chile)
+
+El plan de conciliación suma `honorarios_gross_paid`, `income_receipt`, `link_existing_payment` y
+`link_existing_leg`; nacen `finance:record-deel-receipts` (recibos Deel con tarjeta personal → cuenta corriente
+accionista) y `finance:contractor-settle` (boleta on-behalf → readiness → obligación reactiva → orden pagada con
+la fecha del banco), más el adapter `bancochile_cuenta_vista_text`. Datos: Humberly julio/agosto como brutos sin
+retención; Deel REC-2026-11/12/13; Valentina EO-CPAY-0002 pagado el 07/09; comisión HubSpot Q2 2026 como
+ingreso; Banco de Chile FAN Emprende anclado e importado. Seis períodos `reconciled`. Pendiente de despliegue:
+el ops-worker recomputa saldos con el código previo a ISSUE-169.
+
 ## 2026-09-10 — Finance: recuperación de conciliación agosto–septiembre 2026
 
 Cuatro meses sin cartola se resolvieron re-anclando cada instrumento con una OTB bank-authoritative al inicio de

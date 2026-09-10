@@ -6,8 +6,17 @@ re-anclaje OTB al 01/08 por cuenta (Global66 al 31/07, TC al cierre 06/08), `ban
 (`src/lib/finance/bank-statements/`) y 77 filas conciliadas con `scripts/finance/reconciliation-plans/2026-08-09.json`.
 Períodos `reconciled`: global66-clp 2026-07/08, santander-corp-clp 2026-08 (ciclo 06/08–07/09). Saldos vs banco:
 Global66 exacto; Santander CLP +450.000 (ago) / +692.819 (sep) explicados fila por fila; TC exacto.
-**Pendiente con el operador (punto 7):** Humberly 450.000 (03/08 y 03/09) vs payroll 254.250/381.375; Valentina
-174.194 (07/09); nómina agosto Andres/Daniela pagada 03/09 (1.985.038 banco vs 2.020.120 registrado por payroll en
+**Segunda pasada 2026-09-10 (tarde):** Humberly = honorarios brutos sin retención (neto sobre la nómina +
+remanente anclado al entry, 195.750 jul / 68.625 ago); Deel REC-2026-11/12/13 con tarjeta personal *1879 → CCA
+(`finance:record-deel-receipts`); Valentina = boleta N°47 adjuntada al payable EO-CPAY-0002, orden
+`por-68676079` pagada con `paidAt=2026-09-07` (`finance:contractor-settle`), fila vinculada; comisión HubSpot
+Q2 2026 = ingreso `INC-HS-COMM-2026Q2` USD 378 con cobro 335,15; Banco de Chile FAN Emprende anclado (10.600 al
+01/08) e importado con el adapter `bancochile_cuenta_vista_text`. Períodos `reconciled` ahora: Santander CLP
+ago, Santander USD ago, Banco de Chile ago, Global66 jul/ago, TC ago. Santander CLP sep difiere 0,45 (redondeo
+Valentina). **⚠️ Rollout:** el fix ISSUE-169 vive sólo en `develop` local; el ops-worker (Cloud Run) sigue con el
+código viejo y al recomputar saldos por eventos reescribe cuentas USD/MXN en CLP (pasó con el cobro HubSpot;
+se rematerializó local). Hasta desplegar, revisar `santander-usd-usd`/`global-66-mxn-mxn` tras cada evento.
+**Pendiente con el operador (punto 7):** nómina agosto Andres/Daniela pagada 03/09 (1.985.038 banco vs 2.020.120 registrado por payroll en
 USD, 4 filas Global66 sin calce); Melkin 788,86 USD (registrado en `santander-usd-usd`, no aparece en banco);
 cobro Berel MXN 104.000 (13/08) sin factura asociada; recepción USD 335,15 (13/08); cartola Banco de Chile
 (PDF cifrado, clave no coincide con los 4 últimos dígitos del RUT de la empresa) → OTB pendiente; estado de cuenta

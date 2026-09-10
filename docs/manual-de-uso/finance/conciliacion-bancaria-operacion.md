@@ -1,9 +1,9 @@
 # Conciliacion bancaria operativa
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-15 por Codex
-> **Ultima actualizacion:** 2026-06-15 por Codex
+> **Ultima actualizacion:** 2026-09-10 por Claude (recuperación conciliación ago–sep 2026: import por archivo, CLI de cartolas, plan de conciliación, Deel/CCA y payables pagados antes de la boleta)
 > **Modulo:** Finance
 > **Rutas en portal:** `/finance/reconciliation`, `/finance/reconciliation/[periodId]`
 > **Documentacion relacionada:** [Operacion Finance end-to-end](../../documentation/finance/operacion-finance-end-to-end.md), [Conciliacion bancaria](../../documentation/finance/conciliacion-bancaria.md), [Sugerencias asistidas de conciliacion](sugerencias-asistidas-conciliacion.md), [Caja, cobros, pagos y liquidaciones](caja-cobros-pagos-y-liquidaciones.md)
@@ -62,20 +62,49 @@ El sistema crea un `reconciliation_period` con ID estable basado en cuenta, año
 
 1. Abre el detalle del periodo.
 2. Usa **Importar cartola**.
-3. Elige formato bancario si usas CSV.
-4. Pega o carga contenido CSV, o usa modo manual.
-5. Revisa preview y errores.
-6. Confirma.
+3. Elige la pestaña según lo que tengas:
+   - **Archivo del banco** (recomendado): adjunta el export tal cual lo entrega el banco. Greenhouse detecta el
+     layout solo; si prefieres, elige el origen en el selector. Para los estados de cuenta en PDF (tarjeta
+     Santander, Cuenta Vista Banco de Chile) abre el PDF, selecciona todo el texto y pégalo.
+   - **Pegar CSV**: pega el contenido y elige el formato (`santander`, `bci`, `bancochile`, `scotiabank`).
+   - **Ingreso manual**: fila por fila.
+4. Confirma. Verás cuántas filas entraron y cuántas se omitieron por estar repetidas.
 
-Formatos soportados por UI/API:
+Orígenes soportados en la pestaña **Archivo del banco**:
 
-- `bci`;
-- `banco_estado`;
-- `santander`;
-- `scotiabank`;
-- `generic`.
+| Origen | Cómo obtenerlo | Qué trae |
+|---|---|---|
+| Santander — cartola cuenta corriente (XLSX) | Office Banking → Cuentas → Cartolas históricas o Cartola provisoria → Exportar Excel. Sirve para CLP y USD. | Movimientos del período, N° documento, saldo inicial y final |
+| Santander — últimos movimientos tarjeta (XLSX) | Office Banking → Tarjetas → Últimos movimientos → Exportar Excel | Cargos no facturados desde el último cierre de ciclo |
+| Santander — estado de cuenta tarjeta (texto del PDF) | PDF mensual (clave: RUT sin DV) → seleccionar todo → pegar | Cargos y pagos del ciclo, cupo utilizado |
+| Global66 — movimientos de cuenta (XLS) | empresas.global66.com → Cuenta CLP/MXN → Movimientos → Descargar | Todos los movimientos del rango; el fee de tipo de cambio viene como fila aparte |
+| Banco de Chile — estado de cuenta Cuenta Vista (texto del PDF) | Correo mensual «Cartola Cuenta Vista Mensual» (clave: 4 últimos dígitos del RUT del titular sin DV) → seleccionar todo → pegar | Movimientos con saldo running, saldo inicial y final |
 
-El endpoint valida fecha, descripcion y monto. El limite operativo del import es 500 filas por request. Las filas quedan en `bank_statement_rows` con fingerprint/import batch para evitar duplicidad.
+Reglas:
+
+- El monto siempre va con signo de caja: abono positivo, cargo negativo. En tarjetas de crédito un cargo es
+  negativo y un pago a la tarjeta (`MONTO CANCELADO`) es positivo.
+- Dos movimientos idénticos el mismo día se conservan los dos (son dos movimientos reales). Reimportar el mismo
+  archivo no duplica nada.
+- Límite operativo: 500 filas por import y 5 MB por archivo.
+- El período de una tarjeta de crédito es el ciclo de facturación (ej. 06/08–07/09), no el mes calendario.
+
+### Importar desde la terminal (agentes y recuperaciones)
+
+Cuando hay varias cuentas o meses seguidos, el camino canónico es la CLI, que usa los mismos commands que el
+portal:
+
+```bash
+pnpm finance:import-statement --account santander-clp --year 2026 --month 8 \
+  --file data/bank/Santander-CLP-Agosto-CartolaHistCtaCte-000092044661-0030-20260910.xlsx \
+  --create-period --auto-match
+```
+
+- `--dry-run` muestra las filas parseadas y los saldos del origen sin escribir nada. Úsalo siempre la primera vez.
+- `--from/--to` recorta un export largo (Global66 entrega todo el histórico) al mes del período.
+- `--file …pdf` extrae el texto con `pdftotext` (Poppler); `--pdf-password` recibe la clave del PDF.
+- `--create-period` crea el período si no existe; el saldo inicial sale de la OTB o del cierre anterior.
+- Los archivos viven en `data/bank/` (ignorado por git): no los subas al repositorio.
 
 ## Revisar candidatos
 
@@ -143,6 +172,61 @@ El operador debe:
 4. Rechazar si hay duda o si falta soporte.
 
 La tabla runtime es `greenhouse_finance.reconciliation_ai_suggestions`. Si el ambiente no tiene sugerencias, Nexa debe decir que la capacidad existe pero no inventar resultados.
+
+## Conciliar con un plan (filas que el auto-match no resuelve)
+
+Cuando una fila no tiene contraparte en Greenhouse (transferencia entre cuentas propias, cuota de crédito,
+impuesto, cargo de tarjeta a un proveedor sin factura, desembolso de un crédito, nómina internacional vía
+Global66, honorarios pagados brutos, un cobro sin ingreso registrado), el objeto canónico se crea con un plan
+declarativo:
+
+```bash
+pnpm finance:reconcile-rows --plan scripts/finance/reconciliation-plans/2026-08-09.json          # reporte
+pnpm finance:reconcile-rows --plan scripts/finance/reconciliation-plans/2026-08-09.json --apply  # escribe
+```
+
+Cada entrada del plan identifica la fila (período, fecha, monto, glosa) y declara qué es:
+`internal_transfer`, `pay_expense` (paga una factura ya registrada), `honorarios_gross_paid` (honorarios
+pagados brutos sin retener: neto sobre la nómina + remanente anclado al entry), `income_receipt` (cobro; crea el
+ingreso si no existe, ej. comisiones), `loan_installment`, `tax`, `bank_fee`, `card_expense`,
+`factoring_inflow`, `international_payroll`, `fx_conversion`, `loan_disbursement`, `link_existing_payment`,
+`link_existing_leg` (la contraparte ya existe) o `skip` con la razón. El CLI crea el objeto con el mismo
+command que usa el portal y deja la fila como `manual_matched`.
+
+- Reejecutar el plan es seguro: sólo trabaja sobre filas sin calce.
+- Si un monto bancario no coincide con lo que registró Payroll, no lo fuerces: `skip` con razón y escala.
+- Después de aplicar, rematerializa saldos y compara con el saldo final de la cartola:
+  `pnpm finance:rematerialize-balances --account <cuenta>`.
+
+## Recibos de Deel pagados con tarjeta personal del accionista
+
+Cuando Deel se paga con la tarjeta personal (*1879) y no con un instrumento de la empresa, el registro va a la
+cuenta corriente accionista: `pnpm finance:record-deel-receipts --plan scripts/finance/reconciliation-plans/deel-<periodo>.json --apply`.
+Cada recibo paga el expense de nómina del entry (en USD, método `shareholder_personal_card`) y deja las fees de
+Deel como gasto aparte anclado a la herramienta. Los recibos salen del zip «Payment Statement REC-…» de Deel.
+
+## Honorarios pagados antes de que llegara la boleta
+
+Si la transferencia ya salió del banco y el payable del contractor quedó en `pending_readiness` por
+`invoice_asset_missing`, no se crea nada nuevo: `pnpm finance:contractor-settle --payable <cpay-…> --attach <boleta.pdf> --folio N --issued AAAA-MM-DD --ready`,
+esperar unos minutos a que el ops-worker cree la obligación, y luego
+`--pay --source-account <cuenta> --paid-at <fecha del banco> --approver <otro usuario>` (maker-checker). La fila
+bancaria se vincula después con `link_existing_payment` en el plan.
+
+## Recuperar un mes sin cartola (re-anclaje)
+
+Si pasaron meses sin conciliar, no reconstruyas: declara una OTB con el saldo real del banco al inicio del primer
+mes que sí vas a conciliar y sigue desde ahí.
+
+```bash
+pnpm finance:declare-otbs --file scripts/finance/otb-declarations/2026-08-reanchor.json --declared-by <userId>
+pnpm finance:rematerialize-balances --account santander-clp
+```
+
+- El saldo de la OTB es el **saldo inicial** de la cartola del mes (saldo al inicio del día genesis). Para
+  tarjetas de crédito usa el cupo utilizado al cierre de ciclo y el día del cierre como genesis.
+- Todo lo anterior al genesis queda superseded automáticamente; los documentos (facturas, nómina) no se borran.
+- Registra la evidencia (`evidenceRefs`) apuntando al archivo de `data/bank/` que respalda el saldo.
 
 ## Marcar periodo como reconciliado
 
