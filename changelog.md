@@ -33,6 +33,18 @@ incremento de venta. **No** autoriza precios, claims, cobertura ni contratación
 Router: la fila quedó en `AGENTS.md` y en `agent-context-router.json`; **no** en `CLAUDE.md`, que está en su techo
 de presupuesto (34.973/35.000) y requiere liberar espacio primero — registrado como pendiente en el ADR.
 
+## 2026-09-10 — Product Design 360 canonizado: ADR propuesto, índice y enrutamiento de agentes
+
+Se crea `docs/architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md` en estado **`Proposed`** —capability única
+con dos ofertas por comprador, siete lanes, invariantes duros, condición de aceptación y alternativas rechazadas—,
+indexado en `DECISIONS_INDEX.md` bajo decisiones propuestas. Enrutamiento: dominio `product-design-360` en
+`docs/operations/agent-context-router.json` con **triggers específicos** (`Design Velocity`, `capacidad de diseño`,
+`equipo de diseño in-house`…) para no robarle enrutamiento al dominio `ui-platform`, cuyos triggers son genéricos;
+fila en el router de `AGENTS.md`. `CLAUDE.md` no se toca, siguiendo el precedente de Channel & Commerce del mismo
+día. **Canonizar no aprueba la oferta**: la vuelve fuente única, descubrible y enrutada; el estado sigue `Proposed`
+y el ADR declara qué lo haría `Accepted` (G1, Legal, piso de margen con loaded cost local, marco chileno de
+accesibilidad).
+
 ## 2026-09-10 — Product Design 360: investigación de mercado, re-corte de lanes y corrección de doctrina
 
 Fan-out de cuatro investigaciones (dolor de equipos de producto, dolor de equipos de sitio público, oferta
@@ -1023,15 +1035,3 @@ Release `5ec4cf769977` (run `33698245254`): readers/lane/MCP sirven `etvMethodol
 readback del selector en `/health` del ops-worker, selectores `legacy_static_v1` explícitos en Vercel y worker,
 gateway sincronizado. Canary de contrato en producción verde. Contract de schema parqueado con condición de 7 días
 (precondición de `TASK-1806`). Improved ETV no activado.
-
-## 2026-09-02 — TASK-1805: la fórmula detrás de `etv` pasa a ser identidad del hecho (foundation, todavía legacy)
-
-DataForSEO cambia el cálculo de `etv` bajo el mismo campo y corta legacy el `2026-11-01T00:00:00Z` sin exponer
-versión. Greenhouse deja de depender del default: una policy pura endpoint-aware construye `use_improved_etv`
-explícito por request (falla cerrado ante familia ignorada/no habilitada, config inválida o legacy desde el
-corte), las tres tablas ETV ganan versión + evidencia + instante UTC + policy (expand aplicado; filas previas
-`legacy_static_v1` por contrato, nunca por fecha; guard de corte en la base), los siete caminos consumidores la
-persisten, readers/API/MCP sirven UNA fórmula con `etvMethodology` y `not_available_for_method`, la señal
-`seo.etv_methodology.drift` compara configurado vs solicitado en Vercel y ops-worker, y un evaluador
-dry-run/replay compara valor, membresía del top-N, traffic cost y prospecto sin gastar. Contract de schema
-parqueado hasta el release. Estado: code complete, rollout pendiente; Improved ETV NO activado (`TASK-1806`).

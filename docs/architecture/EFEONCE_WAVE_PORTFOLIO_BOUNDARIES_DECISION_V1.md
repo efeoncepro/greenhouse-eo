@@ -142,5 +142,7 @@ Design 360 diseña la interfaz y el sistema con el que alguien opera algo. *Un b
 **Condición de resolución.** El gate G1 del modelo económico —demanda externa verificada— decide si la sexta
 familia se acepta en un ADR V2 o si se repliega a capability dentro de Web Experience 360.
 
+**Decisión propia:** [`EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`](EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md) (`Proposed`) — capability, dos ofertas, lanes e invariantes.
+
 **Fuentes:** [`Product Design 360 — Business Model V1`](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) ·
 [`Ficha de servicio`](../services/wave/product-design-360.md)
