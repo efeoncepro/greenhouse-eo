@@ -5,9 +5,9 @@ V1.1 + ficha `docs/services/wave/product-design-360.md` + ADR `EFEONCE_PRODUCT_D
 oficio con dos ofertas por comprador (producto → Product Design 360 · sitio público → Web Experience 360), siete lanes
 con accesibilidad primero; se venden lanes, nunca horas ni pantallas. `creative-practice` corregido: Superside mínimo
 USD 15.000/mes (decía ~5.000, error 3×). Landing `TASK-1859` creada (to-do, UI ready no; no se indexa hasta
-`Commercially approved`). **Colisión de ID sin resolver:** otra sesión tiene docs UI sin commitear nombrados
-`TASK-1859-landing-trade-marketing-btl-*` + `PDR-021`; `TASK-1859` quedó registrada para Product Design 360 — decide el
-operador quién pasa a `TASK-1860`. Pendientes con dueño: G1 demanda (Commercial) · D7 loaded cost chileno de un
+`Commercially approved`). **Colisión de ID resuelta:** la landing de Trade Marketing & BTL, que usó `TASK-1859` en
+paralelo, se registró como `TASK-1860` (`a2081e4f1`); `TASK-1859` es la landing de Product Design 360 y no
+cambió. Pendientes con dueño: G1 demanda (Commercial) · D7 loaded cost chileno de un
 senior product designer y piso de margen por lane (Finance) · IP del design system, datos de research y marco chileno
 de accesibilidad (Legal) · nombre público D1 (Strategy) · Calculadora de Capacidad (wedge, sin task).
 
