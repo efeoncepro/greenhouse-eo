@@ -1177,9 +1177,16 @@ export const rematerializeAccountBalancesFromDate = async ({
   client?: QueryableClient
   force?: boolean
 }) => {
-  const startDate = assertDateString(fromDate, 'fromDate')
+  const requestedStartDate = assertDateString(fromDate, 'fromDate')
   const finalDate = assertDateString(toDate || getTodayInSantiago(), 'toDate')
   const balances: AccountBalanceRecord[] = []
+
+  // Genesis floor (TASK-938) también en el camino reactivo: un evento fechado
+  // antes de la OTB activa (ej. cobro Berel MXN del 17/07 con genesis 01/08)
+  // no debe materializar filas pre-genesis; el ops-worker las creaba y
+  // arrastraba un opening inventado hacia adelante (2026-09-10).
+  const activeOtb = await getActiveOpeningTrialBalance(accountId)
+  const startDate = activeOtb && requestedStartDate < activeOtb.genesisDate ? activeOtb.genesisDate : requestedStartDate
 
   if (startDate > finalDate) {
     return balances

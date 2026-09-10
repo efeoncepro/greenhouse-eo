@@ -30,6 +30,10 @@ superseded; nómina agosto pagada al valor real de Global66; `amount_clp` fijado
 el ledger redondea la tasa a 2 decimales) → Global66 sep `reconciled` (16.468). `TASK-1858` creada y
 registrada (rollout ISSUE-169 + fx_drift no-CLP + rutina mensual + regularizaciones Payroll + OTB CCA +
 crédito 420051383906). CCA cierra en −125.194 al 10/09 (reembolsos ≈ Deel; ancla formal en TASK-1858).
+**⚠️ 2026-09-10 tarde:** el ops-worker (rev `00675`, código viejo) volvió a corromper USD/MXN al procesar los
+cobros HubSpot/Berel y creó filas pre-genesis en MXN; se agregó el genesis floor al camino reactivo
+(`rematerializeAccountBalancesFromDate`) y se rematerializó local. Mientras no se despliegue el worker (push
+a develop → `ops-worker-deploy.yml`), cada evento en cuentas USD/MXN vuelve a romper el saldo.
 **Pendiente con el operador (punto 7):** nómina agosto Andres/Daniela pagada 03/09 (1.985.038 banco vs 2.020.120 registrado por payroll en
 USD, 4 filas Global66 sin calce); Melkin 788,86 USD (registrado en `santander-usd-usd`, no aparece en banco);
 cobro Berel MXN 104.000 (13/08) sin factura asociada; recepción USD 335,15 (13/08); cartola Banco de Chile

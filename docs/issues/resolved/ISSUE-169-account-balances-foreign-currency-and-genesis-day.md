@@ -48,6 +48,16 @@ Global66 CLP 31/08 = 16.468 exacto; Santander USD = 1,29 + 335,15 (fila pendient
 1.481.293 tras el ancla 06/08. Tests focales `src/lib/finance/__tests__/account-balance-evidence-guard.test.ts`
 y `bank-statements/__tests__/adapters.test.ts` en verde.
 
+## Delta 2026-09-10 (tarde) — recurrencia desde el ops-worker
+
+Con el fix sólo en `develop` local, el `ops-worker` (revisión `ops-worker-00675-jrv`, código previo) recomputó
+`santander-usd-usd` y `global-66-mxn-mxn` al recibir los eventos de cobro (HubSpot USD 335,15 y Berel MXN) y
+volvió a sumar CLP: USD 310.665 y MXN 5.638.360 en `/finance/bank`. Además creó filas pre-genesis en MXN
+(17/07…31/07) porque `rematerializeAccountBalancesFromDate` (camino reactivo) no aplicaba el genesis floor.
+Corrección adicional: clamp al genesis de la OTB activa en ese camino. Se rematerializó local (USD 336,44;
+MXN 10). **La corrección definitiva exige desplegar el ops-worker** (push a `develop` dispara
+`ops-worker-deploy.yml` por `src/lib/**`).
+
 ## Estado
 
 resolved (2026-09-10). Pendiente de follow-up: extender `finance.account_balances.fx_drift` a cuentas no-CLP
