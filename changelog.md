@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — Finance: nómina agosto al valor real de Global66 y TASK-1858
+
+Con autorización del operador, los dos pagos de nómina de agosto que Payroll había registrado en USD con tasa
+estimada quedaron superseded y reemplazados por lo que salió de Global66 el 03/09 (800.730 y 1.114.423 más las
+comisiones de cambio), pagados en la moneda del expense al tipo de cambio realizado; Global66 septiembre queda
+`reconciled`. Se crea `TASK-1858` como cierre formal de la recuperación.
+
 ## 2026-09-10 — Finance: tercera pasada (sueldo accionista, Berel MXN, fee HubSpot, Deel mayo–julio)
 
 Nace `finance:ledger-adjust` (cobros en moneda nativa con vínculo a fila, comisiones, pagos directos a un member y
