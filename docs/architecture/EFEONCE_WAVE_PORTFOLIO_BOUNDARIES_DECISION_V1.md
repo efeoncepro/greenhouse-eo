@@ -125,6 +125,14 @@ extienden a ese equipo —feature delivery, research, design system, accesibilid
 contrato anti-desplazamiento explícito y la distinción dura Managed Squad ≠ Staff Augmentation. El diseño integral de
 producto queda como motion secundario, para clientes sin equipo.
 
+**Relación con Web Experience 360 (delta 2026-09-10): capability única, dos ofertas.** El oficio de diseño es el
+mismo para un producto y para un sitio público; lo que cambia es el comprador. Product Design 360 posee la
+**capability** —método, gente, quality gates, práctica de design system, telemetría— y vende la **superficie de
+producto** (Head of Design → CPO/CTO). **Web Experience 360 conserva la superficie de sitio público** (CMO → Head
+of Digital) y consume esta capability dentro de su oferta. Accesibilidad y design system/tokens son lanes
+compartidas: se contratan una sola vez por cliente. **NUNCA dos ofertas de Efeonce compitiendo por la capacidad de
+diseño de la misma cuenta**: una sola propuesta, con owner declarado por lane.
+
 **Frontera con Globe, sin cambios de ownership.** Globe conserva contenido, marca y producción creativa. Product
 Design 360 diseña la interfaz y el sistema con el que alguien opera algo. *Un brandbook no es un design system.*
 

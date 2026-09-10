@@ -33,6 +33,38 @@ incremento de venta. **No** autoriza precios, claims, cobertura ni contratación
 Router: la fila quedó en `AGENTS.md` y en `agent-context-router.json`; **no** en `CLAUDE.md`, que está en su techo
 de presupuesto (34.973/35.000) y requiere liberar espacio primero — registrado como pendiente en el ADR.
 
+## 2026-09-10 — Product Design 360: investigación de mercado, re-corte de lanes y corrección de doctrina
+
+Fan-out de cuatro investigaciones (dolor de equipos de producto, dolor de equipos de sitio público, oferta
+existente y huecos, efecto de la IA). Tres consecuencias.
+
+**Corrección de doctrina en `creative-practice`.** El comparable Superside decía ~USD 5.000/mes, tomado de un blog
+de tercero. Su propia página fija **mínimo USD 15.000/mes**, `Dedicated` desde USD 30.000/mes a 12 meses, +USD 1.000
+de software y compromiso anual — **error de 3×**. La afirmación "estamos en el mismo rango que Superside" era falsa:
+estamos muy por debajo, y eso pasa a ser pregunta abierta para Finance sobre si subvaloramos la capacidad. Corregido
+en `SKILL.md`, `modules/09_DISPLACEMENT.md` y `SOURCES.md` + espejo Codex, con comparables de product design que
+faltaban (Eleken USD 4.599–11.999/mes por diseñador dedicado, Awesomic, Penji, ManyPixels) y la señal de que Design
+Pickle retiró su precio público. **Regla derivada: todo comparable de precio se verifica en la página del proveedor.**
+
+**Arquitectura: capability única, dos ofertas, dos superficies.** El oficio de diseño es uno; los compradores son
+dos. Product Design 360 posee la capability y vende la superficie de producto (Head of Design → CPO/CTO); **Web
+Experience 360 conserva la superficie de sitio público** (CMO → Head of Digital) consumiendo la misma capability.
+Accesibilidad y design system/tokens son lanes **compartidas**, contratadas una sola vez por cliente. Regla
+anti-conflicto de canal: nunca dos ofertas de Efeonce por la capacidad de diseño de una misma cuenta.
+
+**Lanes re-priorizadas por evidencia, no por intuición.** Accesibilidad sube de 4ª a 1ª —único dolor con ley,
+medición independiente y tendencia empeorando: WebAIM Million verificado en fuente primaria, 95,9% de home pages
+fallando, 56,1 errores/página, +10,1% interanual revirtiendo seis años de mejora, con ARIA promediando 59,1 errores
+vs 42 sin ARIA—. Entrega de diseño baja de 1ª a 4ª por comoditización. Design system se re-corta: no es
+construirlo (buy-in 42%→32%, 7% de adopción completa, 5% mide ROI) sino **hacerlo adoptado y demostrable**. Se
+agrega L7, endurecer lo generado con IA, con evidencia de earnings de Upwork.
+
+**Y el moat se degrada a hipótesis.** La investigación no encontró a ningún comprador articulando que no pudo medir
+el cumplimiento de su proveedor: el hueco de accountability es de **oferta**, no demanda demostrada. Queda escrito
+como hipótesis a validar en G1, con la evidencia indirecta que sí existe (reclamos por opacidad) y su límite (casi
+toda de diseño de marketing, no de producto). Límites declarados de toda la investigación: cero mid-market, cero
+LATAM, y ninguna encuesta del sector sin un proveedor financiándola.
+
 ## 2026-09-10 — Product Design 360 modelado como sexta familia propuesta de Wave
 
 UI/UX y product design no estaban modelados en ninguna parte: cero fichas en `docs/services/`, cero modelos en
@@ -1003,31 +1035,3 @@ persisten, readers/API/MCP sirven UNA fórmula con `etvMethodology` y `not_avail
 `seo.etv_methodology.drift` compara configurado vs solicitado en Vercel y ops-worker, y un evaluador
 dry-run/replay compara valor, membresía del top-N, traffic cost y prospecto sin gastar. Contract de schema
 parqueado hasta el release. Estado: code complete, rollout pendiente; Improved ETV NO activado (`TASK-1806`).
-
-## 2026-09-02 — DCR deprecado en MCP `2026-07-28`: el shim del gateway se queda, pero deja de ser el futuro
-
-La revisión Current del protocolo marcó Dynamic Client Registration como `Deprecated` (PR #2858),
-migración a Client ID Metadata Documents, retiro más temprano en la primera revisión publicada en o
-después de 2027-07-28. El shim se mantiene porque la excepción está redactada para nuestro caso exacto:
-DCR se retiene _"for backwards compatibility with authorization servers that do not support Client ID
-Metadata Documents"_, y Entra no soporta ninguno de los dos — su única vía oficial es el pre-registro,
-que es justo lo que `POST /register` devuelve.
-
-Lo que cierra la pregunta de fondo: **CIMD no es implementable en la capa del shim.** Es capacidad del
-authorization server, el AS es Entra, y el gateway espeja `authorize`/`token` en lugar de proxearlos;
-soportarlo exige emitir los tokens, o sea el broker que `TASK-1631` ya está eligiendo con CIMD entre sus
-requisitos. No hay task paralela que abrir.
-
-En el camino aparecieron tres cosas que la evaluación no buscaba. La misma revisión agregó texto que no
-existía en `2025-11-25` —el `issuer` de la metadata debe ser idéntico al identificador con que se
-construyó la well-known URL— y los nuestros difieren desde que el shim existe; funciona sólo porque los
-clientes todavía no lo aplican. El `client_id` estático compartido, con `http://localhost` sin puerto
-entre sus redirect URIs y el consentimiento cacheado por Entra, reproduce la forma del confused deputy
-aunque la letra del `MUST` no ate: lo acota que ese cliente no lleve scopes de escritura, una regla
-escrita por otra razón que resulta ser la que limita el daño a lectura. Y esa misma aplicación se llama
-"Local Canary Client" cuando es el cliente compartido de producción, de modo que quien la audite por el
-nombre concluirá lo contrario de lo que debe.
-
-El horizonte del shim no lo fija el calendario de la spec sino el día que un cliente endurezca
-cualquiera de las dos validaciones. Para ese día queda declarado un plan B de pre-registro puro que no
-toca Entra ni el modelo de tokens.

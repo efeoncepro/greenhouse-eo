@@ -79,45 +79,75 @@ problemas: menos presupuesto, más fricción, más política. **El mejor cliente
 su equipo alcanza a diseñar**. Esa señal es pública y anticipable — ronda levantada, expansión de mercado,
 contratación fuerte de ingeniería, línea de producto nueva, adquisición. **Se llega antes del dolor, no después.**
 
-## Las seis lanes
+## Una capability, dos ofertas, dos superficies
 
-### L1 · Feature Delivery
-Overflow de diseño de features del roadmap: flujos, estados, UI, handoff.
-**Por qué la sueltan:** el ratio diseñador:ingeniero se rompió y hay sprints bloqueados esperando pantallas.
-🔴 **Nunca se vende sola a un cliente nuevo con equipo in-house.** Sola se percibe como sustitución y arranca la
-guerra política. Va siempre acompañada de al menos una lane especializada.
+**El oficio es uno. Los compradores son dos.** Investigación, UI, UX, design system, accesibilidad y design ops son
+la misma disciplina y la misma gente, se apliquen a un producto o a un sitio público. Lo que cambia es **quién
+compra y con qué presupuesto**.
 
-### L2 · Research & Validation
+| Superficie | Quién vende y responde | Comprador |
+|---|---|---|
+| **Producto** — app, portal de cliente, SaaS, herramienta interna | **Product Design 360** | Head of Design → CPO / CTO |
+| **Sitio público** — marca, campaña, landings | **Web Experience 360**, consumiendo esta capability | CMO → Head of Digital |
+
+🔴 **Nunca dos ofertas de Efeonce compitiendo por la capacidad de diseño de la misma cuenta.** Una sola propuesta,
+con owner declarado por lane. Si el cliente compra las dos superficies, es **un** contrato con dos lanes de entrega.
+
+## Las siete lanes
+
+Orden por evidencia de mercado, no por intuición *(re-priorizado 2026-09-10; fuentes en el modelo económico)*.
+
+### L1 · Accesibilidad · **compartida entre superficies**
+Auditoría contra criterio y nivel declarados, remediación priorizada, y criterios incorporados al sistema para que
+lo nuevo nazca accesible.
+🎯 **Es la lane más fuerte y no por poco.** Único dolor con ley, fecha, medición independiente y **tendencia
+empeorando**: 95,9% de las home pages del top 1M falla WCAG, con 56,1 errores por página, un 10,1% más que el año
+anterior, revirtiendo seis años de mejora. Aparece primero o segundo en las listas de **los dos** compradores.
+**El argumento que casi nadie conoce:** las páginas *con* ARIA promedian **59,1 errores contra 42 sin ARIA**.
+Componentizar no paga accesibilidad sola — al revés.
+⚠️ El marco legal citable es de EE.UU. y la UE. Para un cliente chileno aplica si vende a esos mercados; el marco
+local está sin verificar.
+
+### L2 · Design system y tokens · **compartida entre superficies**
+Construcción o rescate, versionado, revisión de contribuciones, detección de drift contra producción, y **evidencia
+de adopción**.
+🔴 **Ojo con cómo se vende.** Ya lo construyeron y les duele: la satisfacción con el buy-in cayó de 42% a 32%, sólo
+7% reporta adopción completa y **sólo 5% mide su ROI**. El intento interno no falla por capacidad técnica — falla
+porque **no pueden demostrar que sirvió**. La lane no es "te lo construimos": es **hacerlo adoptado y demostrable**.
+
+### L3 · Research y validación
 Entrevistas, usability testing, validación de prototipo, benchmark de experiencia, medición post-lanzamiento.
-**Por qué la sueltan:** la mayoría de los equipos tiene cero o un investigador. Es un gap estructural, no de volumen.
-**Requisitos duros:** DPA, base de licitud, consentimiento informado y retención declarada **antes de reclutar**.
-Sin usuarios reales del cliente no se emite ninguna afirmación de "validado". Paneles e incentivos van como
-pass-through declarado.
+Se contrae mientras se le pide más: 21% de las empresas despidió investigadores y 54% no mide su impacto. Y el
+research sintético no lo reemplaza — al contrastarlo contra estudios reales aparece superficialidad, mala
+predicción de conducta y **sicofancia**: elogia conceptos que los humanos rechazan.
+**Requisitos duros:** DPA, base de licitud, consentimiento y retención declarada **antes de reclutar**.
 
-### L3 · Design System
-Construcción, mantención, versionado, revisión de contribuciones del equipo del cliente, detección de drift contra
-producción, evolución.
-**Por qué la sueltan:** un backlog de 6+ meses de solicitudes de componentes es el síntoma clásico.
-**Portabilidad como obligación:** el sistema queda con el cliente en formato operable y no propietario. Un cliente
-que no puede llevarse su propio design system está retenido por opacidad, y eso el modelo lo prohíbe.
-**Capability demostrable:** AXIS, el design system multi-marca de Efeonce, con tokens gobernados, drift-guard y
-gates que bloquean el merge cuando una superficie se desvía del sistema.
+### L4 · Entrega de diseño (UI/UX) · *cambia el owner comercial según superficie*
+Flujos, estados, UI, microcopy de interfaz, handoff. En producto lo vende Product Design 360; en sitio público, Web
+Experience 360.
+🔴 **Es la lane que se está comoditizando.** La ejecución se abarata mientras la coordinación se encarece. **Nunca
+se vende sola a un cliente con equipo in-house**: sola se lee como sustitución. Va siempre acompañada de L1, L2, L3
+o L7.
 
-### L4 · Accessibility
-Auditoría contra criterio y nivel declarados (WCAG 2.2 AA como piso de referencia), remediación priorizada,
-criterios incorporados al sistema para que la próxima superficie nazca accesible.
-**Por qué la sueltan:** suele haber un accessibility owner nominal y sobrecargado; y a veces hay un deadline
-regulatorio que nadie puede mover.
-🔴 Nunca se afirma cumplimiento sin auditoría.
-
-### L5 · Design Debt & Consistency
+### L5 · Deuda de diseño y consistencia
 La deuda que necesita 10–20% de la capacidad de sprint sostenida y que el feature work siempre desplaza.
-**Por qué la sueltan:** es la lane que el equipo interno nunca protege. **La mejor candidata a externalizar,
-porque no le quita nada a nadie** — es trabajo que hoy no se está haciendo.
+**La mejor candidata a externalizar, porque no le quita nada a nadie** — es trabajo que hoy no se está haciendo.
 
-### L6 · Design Ops
-Intake, priorización, quality gates, QA visual de lo construido, handoff, memoria de decisiones consultable.
-**Por qué la sueltan:** sólo los equipos enterprise grandes tienen design ops propio.
+### L6 · Design ops
+Intake, priorización, quality gates, QA visual, handoff, memoria de decisiones.
+**La coordinación es el nuevo cuello de botella, no la ejecución**: 65% de los diseñadores está haciendo trabajo de
+PM o ingeniería, 34% reporta colaboración más desordenada y un 20% reporta *menos* colaboración — cuatro veces más
+que el año pasado.
+
+### L7 · Endurecer lo generado con IA
+Saneamiento de lo ya generado y gate sobre lo que se genere de aquí en adelante: consistencia con el sistema,
+accesibilidad, estados faltantes, deuda introducida.
+**El mercado ya paga por esto**: crece el volumen de clientes que contratan para terminar o arreglar proyectos
+empezados con IA. Es puerta de entrada natural hacia capacidad gobernada.
+
+🎯 **L1 y L2 se contratan UNA sola vez por cliente, aunque compre las dos superficies.** No hay dos accesibilidades
+ni dos sistemas de tokens: hay uno. Es un argumento económico honesto para el cliente y **nuestra ruta de expansión
+más natural** — quien entra por una superficie ya tiene media compra hecha para la otra.
 
 ## Los dos tiempos de una lane — y de dónde sale el retainer
 

@@ -197,14 +197,54 @@ cálculo es otro y todavía no está verificado *(ver decisión abierta D7)*.
 **No se venden diseñadores. Se venden lanes.** Cada lane tiene outcome, QA propio, telemetría y un límite
 declarado. El cliente elige cuáles conserva su equipo; Efeonce toma las que suelta.
 
-| Lane | Qué absorbe | Por qué el in-house no la cubre |
+### Capability única, dos ofertas, dos superficies
+
+**El oficio es uno. Los compradores son dos.** Investigación, UI, UX, design system, accesibilidad y design ops son
+la misma disciplina, la misma gente y el mismo método, se apliquen a un producto o a un sitio público. Lo que cambia
+no es el trabajo: es **quién lo compra y con qué presupuesto**.
+
+Por eso Product Design 360 se modela como **capability**, no como una familia que compite por el mismo trabajo:
+
+| Plano | Quién | Qué posee |
 |---|---|---|
-| **L1 · Feature Delivery** | Overflow de diseño de features del roadmap | Es la lane más obvia y la más commoditizable. Se vende, pero no es el moat |
-| **L2 · Research & Validation** | Entrevistas, usability testing, validación de prototipo, medición post-lanzamiento | La mayoría de los equipos tiene 0 o 1 investigador. Gap estructural, no de volumen |
-| **L3 · Design System** | Construcción, mantención, versionado, revisión de contribuciones, drift | El backlog de componentes de 6+ meses es el síntoma clásico |
-| **L4 · Accessibility** | Auditoría, remediación priorizada, criterios incorporados al sistema | Suele haber un "accessibility owner" nominal y sobrecargado; y a veces hay deadline regulatorio |
-| **L5 · Design Debt & Consistency** | La deuda que necesita 10–20% del sprint sostenido y que el feature work siempre desplaza | **Es la lane que el equipo interno nunca protege.** La mejor candidata a externalizar: no le quita nada a nadie |
-| **L6 · Design Ops** | Intake, priorización, QA visual, handoff, memoria de decisiones | Sólo los equipos enterprise grandes tienen design ops propio |
+| **Capability** | **Product Design 360** | El oficio: método, gente, quality gates, práctica de design system, telemetría. **Siempre, en las dos superficies** |
+| **Oferta — superficie producto** *(app, portal, SaaS, herramienta interna)* | **Product Design 360** | Vende y responde por el outcome. Comprador: Head of Design → CPO/CTO |
+| **Oferta — superficie sitio público** *(marca, campaña, landings)* | **Web Experience 360** | Vende y responde por el outcome; **consume esta capability** dentro de su oferta. Comprador: CMO → Head of Digital |
+
+No inventa gramática nueva: en la cartera de Wave las familias **son** capabilities base y las ofertas se componen
+sobre ellas. Web Experience 360 componiendo Product Design 360 es el patrón que el ADR ya autoriza.
+
+🔴 **Regla anti-conflicto de canal:** **NUNCA** dos ofertas de Efeonce compitiendo por la capacidad de diseño de la
+misma cuenta. Una sola propuesta, con owner declarado por lane. Si el cliente compra las dos superficies, hay **un**
+contrato con dos lanes de entrega, no dos contratos.
+
+### Las lanes, y en qué superficie viven
+
+Re-priorizadas 2026-09-10 contra la investigación de mercado (§15). **El orden no es el que tenía V1.1: la evidencia
+lo invirtió.**
+
+| Lane | Superficie | Por qué está donde está |
+|---|---|---|
+| **L1 · Accesibilidad** | **Ambas — compartida** | 🎯 **La más fuerte.** Único dolor con ley, fecha, medición independiente y tendencia **empeorando**. No se comoditiza porque lo empuja la regulación, no el gusto. Aparece primero o segundo en las listas de **los dos** compradores |
+| **L2 · Design system y tokens** | **Ambas — compartida** | El sitio consume el sistema que gobierna producto. Segunda costura real entre superficies |
+| **L3 · Research y validación** | Ambas | Se contrae mientras se le pide más; el research sintético no lo reemplaza |
+| **L4 · Entrega de diseño (UI/UX)** | **Ambas — cambia el owner comercial** | Mismo oficio; en producto lo vende Product Design 360, en sitio público lo vende Web Experience 360. **Es la lane que se está comoditizando: nunca se vende sola** |
+| **L5 · Deuda de diseño y consistencia** | Ambas | La lane que el equipo interno nunca protege |
+| **L6 · Design ops** | Ambas | La coordinación es el nuevo cuello de botella, no la ejecución |
+| **L7 · Endurecer lo generado con IA** | Ambas | **Lane nueva.** El mercado ya paga por terminar o arreglar lo que se empezó con IA |
+
+🎯 **L1 y L2 se contratan UNA sola vez por cliente, aunque compre las dos superficies.** No hay dos accesibilidades
+ni dos sistemas de tokens: hay uno. Es un argumento económico honesto para el cliente y **la ruta de expansión más
+natural que tenemos** — quien entra por una superficie ya tiene media compra hecha para la otra.
+
+### Delta de re-priorización — qué cambió y por qué
+
+| Cambio | Evidencia (detalle y fuentes en §15) |
+|---|---|
+| **Accesibilidad sube de 4ª a 1ª** | WebAIM Million 2026: 95,9% de home pages fallando, 56,1 errores/página, **+10,1% interanual, revirtiendo seis años de mejora**. WebAIM atribuye parte del deterioro al desarrollo asistido por IA. Único dolor con serie temporal medida por un tercero sin interés comercial |
+| **Entrega de diseño baja de 1ª a 4ª** | Es lo que se está comoditizando: la ejecución se abarata mientras la coordinación se encarece |
+| **Design system se re-corta** | Ya lo construyeron y les duele: buy-in 42%→32%, sólo 7% con adopción completa, **sólo 5% mide ROI**. La lane no es construirlo — **es hacerlo adoptado y demostrable** |
+| **Se agrega L7** | Upwork Q2-2026: crece el volumen de clientes contratando para terminar o arreglar proyectos empezados con IA |
 
 ### Los dos tiempos de una lane — arreglar y sostener
 
@@ -235,12 +275,13 @@ proyecto con cuota mensual.** El arreglo termina, y con él termina el ingreso.
 
 | Lane | Arreglar *(entrada)* | Sostener *(retainer)* | Qué lo regenera |
 |---|---|---|---|
-| **L1 · Feature Delivery** | — *(sin fase de arreglo)* | **Run puro** | El roadmap no termina nunca. **Es la lane más recurrente de todas** |
-| **L2 · Research** | Un estudio puntual | **Cadencia de discovery** por release o por trimestre | Cada decisión nueva necesita evidencia nueva |
-| **L3 · Design System** | Build del sistema | Versionado, revisión de contribuciones, drift, evolución | El producto crece y el sistema tiene que crecer con él |
-| **L4 · Accessibility** | Auditoría + remediación | **Gate sobre todo lo nuevo** | Cada superficie nueva nace sin auditar; y la norma no se detiene |
-| **L5 · Design Debt** | Sprint de reducción | **Contención sostenida** (10–20% de capacidad) | La deuda es una tasa, no un stock |
-| **L6 · Design Ops** | — *(sin fase de arreglo)* | **Run puro** | Intake, priorización y QA ocurren cada sprint |
+| **L1 · Accesibilidad** | Auditoría + remediación | **Gate sobre todo lo nuevo** | Cada superficie nueva nace sin auditar, la norma no se detiene, y **el promedio de la web empeora mientras el output sube** |
+| **L2 · Design system y tokens** | Build, o rescate de uno existente | Versionado, contribuciones, drift, **evidencia de adopción** | El producto crece y el sistema debe crecer con él; y sin evidencia de adopción, el buy-in se cae |
+| **L3 · Research** | Un estudio puntual | **Cadencia de discovery** por release o trimestre | Cada decisión nueva necesita evidencia nueva |
+| **L4 · Entrega de diseño (UI/UX)** | — *(sin fase de arreglo)* | **Run puro** | El roadmap y el calendario de campañas no terminan nunca |
+| **L5 · Deuda de diseño** | Sprint de reducción | **Contención sostenida** (10–20% de capacidad) | La deuda es una tasa, no un stock |
+| **L6 · Design ops** | — *(sin fase de arreglo)* | **Run puro** | Intake, priorización y QA ocurren cada sprint |
+| **L7 · Endurecer lo generado con IA** | Saneamiento de lo ya generado | **Gate sobre lo que se genera de aquí en adelante** | Mientras el equipo siga generando con IA, sigue habiendo qué endurecer |
 
 🎯 **L1 y L6 son retainer desde el día uno.** Pero L1 no puede ser la entrada —sola se lee como sustitución—, así
 que **no es la puerta: es el destino.** Se llega a ella después de haber probado el método en una lane
@@ -249,8 +290,8 @@ especializada.
 **Reglas de la arquitectura de lanes:**
 
 - Una lane se contrata **completa o no se contrata**. Media lane es staff augmentation con otro nombre.
-- **L1 nunca se vende sola a un cliente nuevo con equipo in-house.** Sola, es sustitución percibida y arranca la
-  guerra política. Se vende acompañada de al menos una lane especializada (L2–L5), que es la que el equipo interno
+- **L4 (entrega de diseño) nunca se vende sola a un cliente nuevo con equipo in-house.** Sola, es sustitución percibida y arranca la
+  guerra política. Se vende acompañada de al menos una lane especializada (L1, L2, L3 o L7), que es la que el equipo interno
   reconoce como ayuda y no como amenaza.
 - El cliente puede recuperar una lane con aviso. La reversibilidad es parte del contrato, no una concesión.
 - 🔴 **Todo SOW de arreglo declara el sostener que le sigue** — disparador, alcance y banda de precio. No como
@@ -328,12 +369,29 @@ bloquean el merge cuando una superficie se desvía del sistema; **GVC** para ver
 disciplina con método y gobierno. **No demuestra resultado en un cliente externo, ni demanda.** Hasta cerrar G1, se
 presenta como capability demostrable, nunca como caso de éxito de cliente.
 
-### 🎯 El moat: accountability medida
+### El moat: accountability medida — **hipótesis, no diferenciador probado**
 
 Podemos mostrarle al cliente, en su propio login, **si cumplimos**: OTD, FTR, RpA, cycle time, first-time-right del
 handoff y drift diseño↔runtime. Y el sistema declara cuándo un número no es confiable en vez de pintarlo bonito.
 
-Ninguna suscripción de diseño hace esto. Superside no lo hace.
+**El espacio está libre en la oferta.** Ningún proveedor de diseño revisado publica un SLA con consecuencia. Design
+Pickle lo **desmiente explícitamente** en su propio centro de ayuda: el turnaround es *"a general estimate, not a
+guarantee"*. Las métricas de entrega existen en el mercado como **software que el comprador compra para vigilar a su
+proveedor**, nunca como compromiso que el proveedor asume.
+
+🔴 **Pero ausencia de oferta NO es evidencia de demanda.** La investigación no encontró a **ningún comprador
+articulando** "no pude medir si el proveedor cumplió". Que nadie lo venda puede significar que nadie lo pide. Tratar
+este hueco como diferenciador probado es el error más caro que podríamos cometer con este modelo.
+
+**Lo que sí está articulado** son las consecuencias de no poder medir, en forma de reclamo verificable: una
+estimación de 100 horas para trabajo que tomó 2; un proyecto de 4 semanas que terminó en 5 meses y pasó de
+USD 15.000 a USD 33.000; *"lack of time tracking transparency"*. Eso es demanda de accountability en forma de daño
+sufrido, no de requisito pedido. ⚠️ **Y casi toda esa evidencia es de diseño de marketing, no de product design** —
+no transfiere limpio a nuestro comprador.
+
+**Estado honesto: hipótesis con evidencia indirecta.** Es lo primero que debe validar el gate G1 o la calculadora.
+Un dato del mercado adyacente sugiere el mecanismo real: en accesibilidad **sí** se compra medición y certificación
+—Level Access la vende— pero se compra **porque la regulación la obliga**, no porque el proveedor la ofrezca.
 
 🔴 **Es un arma de doble filo:** si comprometes un número y no lo cumples, el cliente lo ve antes que tú. **Qué se
 firma como SLA y qué se muestra como telemetría es una decisión comercial, no técnica.**
@@ -392,12 +450,12 @@ solo.** Cada lane tiene un disparador observable, y el SOW del arreglo lo declar
 
 | Lane | Disparador de conversión — el momento exacto |
 |---|---|
-| **L3 · Design System** | Llega la primera contribución del equipo del cliente y hay que revisarla; aparece el primer drift contra producción |
-| **L4 · Accessibility** | El siguiente release saca superficies nuevas sin auditar; o entra una fecha de cumplimiento |
-| **L5 · Design Debt** | Termina el sprint de reducción y la tasa de acumulación vuelve a correr — medible desde el ciclo siguiente |
-| **L2 · Research** | Se cierra el estudio y la siguiente decisión de producto queda otra vez sin evidencia. **Se vende cadencia, no estudios** |
-| **L1 · Feature Delivery** | No convierte: **nace recurrente**. Se llega a ella tras probar el método en otra lane |
-| **L6 · Design Ops** | No convierte: **nace recurrente** |
+| **L2 · Design system** | Llega la primera contribución del equipo del cliente y hay que revisarla; aparece el primer drift contra producción |
+| **L1 · Accesibilidad** | El siguiente release saca superficies nuevas sin auditar; o entra una fecha de cumplimiento |
+| **L5 · Deuda de diseño** | Termina el sprint de reducción y la tasa de acumulación vuelve a correr — medible desde el ciclo siguiente |
+| **L3 · Research** | Se cierra el estudio y la siguiente decisión de producto queda otra vez sin evidencia. **Se vende cadencia, no estudios** |
+| **L4 · Entrega de diseño** | No convierte: **nace recurrente**. Se llega a ella tras probar el método en otra lane |
+| **L6 · Design ops** | No convierte: **nace recurrente** |
 
 **La métrica que sostiene la conversación de renovación es el drift.** Si podemos mostrar el número subiendo
 cuando el gobierno se detiene, el retainer se defiende con evidencia y no con argumento. Si el drift no sube
@@ -693,6 +751,56 @@ Finance.
 caro. Direccionalmente útiles; **no neutrales**. Antes de una propuesta hay que rehacer el cálculo con el loaded
 cost del mercado del comprador *(D7)*. Los rangos son de EE.UU.; **nunca mezclar monedas ni mercados en la misma
 lámina**.
+
+### Investigación de mercado 2026-09-10 — dolor, oferta y huecos
+
+Fan-out de cuatro investigaciones. **Cada fila declara si la fuente vende la solución.**
+
+| Hallazgo | Dato | Fuente + as-of | Sesgo | Confianza |
+|---|---|---|---|---|
+| **Accesibilidad empeorando** | 95,9% de home pages con fallas WCAG (94,8% en 2025); **56,1 errores/página, +10,1%**; revierte 6 años de mejora; elementos por página +22,5%; **páginas con ARIA promedian 59,1 errores vs 42 sin ARIA**. WebAIM atribuye parte del deterioro al desarrollo asistido por IA | [WebAIM Million](https://webaim.org/projects/million/) · **verificado en fuente primaria 2026-09-10** | **Ninguno** — nonprofit, censo automatizado | **Alta** |
+| Litigio y regulación | >5.000 demandas de accesibilidad digital en EE.UU. en 2025; EAA exigible desde 2025-06-28 | [UsableNet](https://blog.usablenet.com/inside-the-2026-midyear-numbers-where-digital-accessibility-litigation-is-going) · [DWT](https://www.dwt.com/insights/2025/07/european-accessibility-act-digital-products) | ⚠️ UsableNet vende remediación (aunque cuenta expedientes reales) | Media |
+| **Design system: el buy-in se cae** | Satisfacción con buy-in 42%→32%; insatisfacción 23%→40%; **7% adopción completa; 5% mide ROI**; 56% nombra falta de staffing | [zeroheight Design Systems Report 2026](https://report.zeroheight.com/), n=147 | ⚠️ Vende plataforma de design systems | Media (n bajo, 90% NA+EU) |
+| **La coordinación es el nuevo cuello** | 65% de diseñadores hace trabajo de PM/ingeniería; 34% dice que la colaboración se volvió más desordenada; 20% reporta *menos* colaboración (4× vs 2025) | [AI in Design Report 2026](https://stateofaidesign.com/chapters/teams) | ⚠️ VCs con interés en que la IA se vea inevitable — **sus datos negativos son los más creíbles** | Media |
+| Headcount: más output, no recorte | 32% mantiene planta subiendo output · 28% crece · 10% reduce | ídem | ídem | Media |
+| **El mercado paga por arreglar lo generado con IA** | Crece el volumen de clientes contratando para terminar o arreglar proyectos empezados con IA; AI Strategy & Consulting **+50%** GSV interanual | [Upwork Q2-2026](https://investors.upwork.com/news-releases/news-release-details/upwork-reports-second-quarter-2026-financial-results) | Dato de plataforma en earnings | Media-alta |
+| Research sintético no reemplaza al real | NN/g comparó usuarios sintéticos contra 3 estudios propios: superficialidad, mala predicción de conducta y **sicofancia** | [NN/g vía UXLift](https://www.uxlift.org/articles/synthetic-users-if-when-and-how-to-use-ai-generated-research/) | Ninguno relevante | Media-alta |
+| Research se contrae | 21% de empresas despidió researchers; 54% no mide impacto cuantitativamente | [User Interviews, State of UX Research](https://www.userinterviews.com/state-of-user-research-report), n=485 | ⚠️ Vende reclutamiento de participantes | Media |
+| **Sitio público = comprador distinto** | El martech (22,4% del presupuesto) lo asigna el CMO; **agencias cayeron a 20,7%, por debajo del personal in-house 21,9%; 39% de CMOs planeaba recortar agencia** | [Gartner CMO Spend Survey 2025](https://www.gartner.com/en/newsroom/press-releases/2025-05-12-gartner-2025-cmo-spend-survey-reveals-marketing-budgets-have-flatlined-at-seven-percent-of-overall-company-revenue) | Analista independiente | Media-alta |
+| Replatform no resuelve el cuello | 89% con DXP sigue restringido vs 95% con CMS tradicional — 6 puntos por un replatform de 6 cifras | [Webflow State of the Website](https://webflow.com/resources/report/2025-state-of-the-website) (panel Vanson Bourne) | ⚠️ Vende la cura | Media |
+| Dependencia de ingeniería para publicar | 93% de líderes de marketing depende de devs o agencias para actualizar el sitio | [Webflow 2026](https://webflow.com/resources/report/2026-state-of-the-website/collaboration-crisis) | ⚠️ Vende la cura · **el informe original no se pudo abrir: verificar contra el PDF antes de uso comercial** | **Baja para citar** |
+
+### Comparables de precio — verificados en la página del proveedor (2026-09-10)
+
+| Proveedor | Precio publicado | Fuente |
+|---|---|---|
+| **Superside** | **Mínimo USD 15.000/mes**; `Dedicated` desde **USD 30.000/mes a 12 meses**; +USD 1.000/mes software; compromiso anual. **UI/UX incluido** | [superside.com/pricing](https://www.superside.com/pricing) — **verificado en fuente primaria** |
+| **Eleken** *(el comparable real de product design)* | **USD 4.599 / 6.599 / 11.999 al mes** por diseñador dedicado, mínimo 2 meses | [eleken.co/pricing](https://www.eleken.co/pricing) |
+| **Awesomic** | USD 200 / 1.490 / 2.995 al mes (1 tarea activa concurrente) | [awesomic.com/pricing](https://awesomic.com/pricing) |
+| **Penji** · **ManyPixels** | USD 995–4.500 · USD 699–2.599 al mes | [penji.co](https://penji.co/pricing/) · [manypixels.co](https://www.manypixels.co/pricing) |
+| **Design Pickle** | **Retiró su precio público** — señal de que la categoría dejó de competir por precio de lista | [designpickle.com/pricing](https://www.designpickle.com/pricing/) |
+
+🔴 **Esto corrigió un error de 3× en nuestra propia doctrina:** `creative-practice` citaba Superside a ~USD 5.000/mes
+desde un blog de tercero. Corregido 2026-09-10 en los tres archivos. **Regla derivada: todo comparable de precio se
+verifica en la página del propio proveedor.**
+
+### El hueco de oferta — y su límite
+
+**Nadie vende capacidad de *producto*; todos venden producción.** Design Pickle la excluye; Penji y ManyPixels
+llegan hasta landing pages; Superside la incluye como *specialist production* dentro de creative ops y **no tiene
+página de servicio de product design**; A.Team y Andela pivotearon a ingeniería. El único que la vende como tal es
+Eleken, y la vende **por persona**, no como capacidad gobernada.
+
+**La queja #1 de compradores es la discontinuidad de personas** (*"too many cooks in the kitchen"*) — y es
+precisamente lo que rompe el trabajo de producto, que necesita contexto acumulado. Es demanda articulada y
+verificable, y le pega a nuestro modelo de pod con nombres y memoria.
+
+⚠️ **Límites de toda esta investigación, declarados:** cero datos de mid-market, **cero de LATAM**; el corpus es
+tech/enterprise, 90% Norteamérica y Europa occidental. El argumento legal de accesibilidad es de EE.UU. y la UE —
+**para un cliente chileno aplica sólo si vende a esos mercados, y el marco chileno está sin verificar**. Reddit, G2
+y Capterra fueron inaccesibles: toda la voz del comprador viene de Trustpilot y Hacker News. Y **no existe una sola
+encuesta de dolores de equipos de product design in-house que no esté financiada por quien vende la solución** —
+ese vacío es en sí mismo un dato sobre cuánta certeza podemos tener.
 
 ### Proxy adyacente — in-housing creativo
 
