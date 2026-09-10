@@ -426,7 +426,7 @@ Finance y no se publican acá.
 
 | Concepto | Definición aplicable |
 |---|---|
-| **Fully loaded cost** | Del squad asignado, según el modelo de costo canónico de Greenhouse |
+| **Fully loaded cost** | Del squad asignado. ⚠️ **El motor real es `pricing-engine-v2.ts`** (cost stack por línea, `costBasisConfidenceScore`, `suggestedBillRate`, `margin-health` que bloquea bajo el piso) — está en producción y no detrás de flag. El `Member Loaded Cost Model V1` es **SPEC no implementado**: no se cita como capacidad |
 | **Cost-to-serve por lane** | Loaded cost + herramientas + research variable + coordinación + gobierno + memoria. **Se calcula por lane**, porque su perfil difiere: L2 tiene costo variable alto, L3 es intensiva en seniority, L5 es la más estandarizable |
 | **Piso de margen** | 🔴 **45% de margen bruto. Regla, no guía.** El piso se computa, no se siente |
 | **Cotizador** | 🔴 Ningún precio sale sin pasar por el motor de pricing con loaded cost detrás. Un precio sin loaded cost es una corazonada con decimales |
@@ -678,7 +678,10 @@ evidencia directa de este mercado.
 
 ### Costos
 
-[`Member Loaded Cost Model V1`](../../architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md) · motor de pricing
-`src/lib/finance/pricing/pricing-engine-v2.ts` · piso de margen 45% (`creative-practice`, aprobado 2026-07-13)
+Motor real y verificable: `src/lib/finance/pricing/pricing-engine-v2.ts` (en producción, sin flag) · piso de margen
+45% (`creative-practice`, aprobado 2026-07-13) · ⚠️ [`Member Loaded Cost Model V1`](../../architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md)
+es **SPEC no implementado** — sirve como definición conceptual, **nunca se cita como capacidad ante un cliente**
+· 🩸 hallazgo abierto: el loaded cost del squad podría estar subestimado si la base es sueldo bruto y no costo
+empresa (en Chile ~1,25–1,3×) — refuerza la urgencia de D7
 
 **Fecha de verificación de este documento:** 2026-09-10.
