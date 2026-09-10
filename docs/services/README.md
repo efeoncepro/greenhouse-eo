@@ -88,11 +88,12 @@ que diseña, construye y opera la capa digital inteligente. El catálogo económ
 | **Measurement & Analytics** | Measurement Audit · Tagging/Data Layer · GTM/GA4 Implementation · Dashboard & Attribution · Analytics Operations |
 | **Agent Systems & Platforms** | Agent Strategy & Architecture · Custom Agent System · Managed Agent Deployment · Agent Integrations · Agent Evaluation & Operations |
 | **Digital Automation & Integrations** | API/Workflow Sprint · Data Pipeline · Automation Build · Integration Operations |
-| **Product Design 360** *(propuesta)* | Diagnóstico de Experiencia · Experience Design Sprint · Digital Product Design · Design System (build + gobierno) · Experience Research & Validation · Design Operations |
+| **Product Design 360** *(propuesta)* | **Design Velocity** — capacidad por lane: Feature Delivery · Research & Validation · Design System · Accessibility · Design Debt & Consistency · Design Ops. Entradas: Diagnóstico de Capacidad y Sample Sprint. Proyecto: Experience Design Sprint · Digital Product Design · Design System Build |
 
-**Product Design 360** es una **sexta familia propuesta**, todavía no aceptada en el ADR de boundaries. Cubre el
-diseño de superficies operables —web y producto digital— y separa *decidir cómo debe ser la experiencia* de
-*construirla y operarla*, que sigue siendo de Web Experience 360. Ficha:
+**Product Design 360** es una **sexta familia propuesta**, todavía no aceptada en el ADR de boundaries. Su motion
+primario es **extender la capacidad de un equipo de product design in-house**, no reemplazarlo: se venden lanes de
+capacidad gobernada, no diseñadores. Cubre superficies operables —web y producto digital— y separa *decidir cómo
+debe ser la experiencia* de *construirla y operarla*, que sigue siendo de Web Experience 360. Ficha:
 [`wave/product-design-360.md`](wave/product-design-360.md). Modelo:
 [`PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md`](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md).
 Las fichas de servicio de Wave viven en [`wave/`](wave/README.md).

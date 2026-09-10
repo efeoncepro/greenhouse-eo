@@ -51,6 +51,20 @@ Experience 360. Evidencia declarada como capability interna (AXIS, UI Platform, 
 Standard), explícitamente **no** como caso de cliente. Se crea además `docs/services/wave/README.md`, primer
 índice de fichas de Wave. Sin pricing, sin claims públicos, sin venta general.
 
+**Corrección de tesis en la misma sesión (V1.1).** V1 asumía un cliente sin capacidad de diseño y listaba al
+diseñador interno como *blocker*. Estaba invertido: las empresas mid y grandes ya tienen product design in-house, y
+ese líder es el **comprador, el operador y el único con poder de veto**. El motion primario pasa a ser **extensión
+de capacidad**: se venden **lanes** de capacidad gobernada —Feature Delivery, Research & Validation, Design System,
+Accessibility, Design Debt & Consistency, Design Ops—, nunca diseñadores. Se agrega el **contrato
+anti-desplazamiento** (el cliente elige qué lanes conserva; Efeonce no posee visión ni roadmap; no se presenta a
+ejecutivos sin el Head of Design; la telemetría mide nuestras lanes, no a su gente) y la distinción dura **Managed
+Squad ≠ Staff Augmentation** con la deriva como métrica de alarma. Doctrina aplicada desde la skill
+`creative-practice` (in-housing, el comparable real, piso 45%, gobierno que no se descuenta). Comparables de
+mercado **verificados para product design** con fuente y `as-of` 2026 —senior product designer US ~USD 185k mediana,
+loaded 1,4–2,4× base, contractor embebido USD 80–135/h, ratio diseñador:ingeniero 1:2–1:1 en equipos maduros,
+deuda de diseño 10–20% del sprint— con **sesgo de proveedor declarado** y la advertencia de rehacer el cálculo con
+loaded cost chileno antes de usarlos (decisión abierta D7). Diseño integral queda como motion secundario.
+
 ## 2026-09-10 — Conciliación bancaria ago–sep en producción, `fx_drift` cubre USD/MXN y rutina mensual (TASK-1858)
 
 Release `2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` (`released` 20:06Z, run `34523159501`, un solo

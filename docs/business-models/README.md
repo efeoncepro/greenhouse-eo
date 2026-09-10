@@ -214,11 +214,12 @@ Todo business model debe separar al menos estas dimensiones:
   Agentic Readiness Audit como wedge prioritario de validación:
   Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms y Digital
   Automation & Integrations.
-- [Product Design 360 Business Model V1](product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) — `Proposed`;
-  **sexta familia propuesta de Wave**, todavía no aceptada en el ADR de boundaries. Diseño de superficies operables
-  (web y producto digital): research, arquitectura, prototipado, interfaz, design system, accesibilidad, validación y
-  design ops. Separa *decidir la experiencia* de *construirla*, que permanece en Web Experience 360. No autoriza
-  pricing ni venta general.
+- [Product Design 360 Business Model V1.1](product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) — `Proposed`;
+  **sexta familia propuesta de Wave**, todavía no aceptada en el ADR de boundaries. Motion primario: **extender la
+  capacidad de un equipo de product design in-house** vendiendo lanes de capacidad gobernada (feature delivery,
+  research, design system, accesibilidad, deuda de diseño, design ops), nunca diseñadores por hora. Incluye contrato
+  anti-desplazamiento y la distinción dura Managed Squad ≠ Staff Augmentation. Separa *decidir la experiencia* de
+  *construirla*, que permanece en Web Experience 360. No autoriza pricing ni venta general.
 - [Media & Distribution Business Model V1](media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md) —
   `Approved for validation`; tres soluciones comerciales, siete capacidades de delivery y Reach como product brand
   habilitadora. No autoriza pricing público ni venta general.

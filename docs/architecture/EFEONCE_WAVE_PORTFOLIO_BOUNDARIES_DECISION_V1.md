@@ -119,6 +119,12 @@ ninguno de los dos la reclamaba. Tampoco estaba modelada en `docs/services/` ni 
 Su alcance incluye superficies que no son web —app, portal de cliente, SaaS, herramienta interna, experiencia
 conversacional—, razón por la cual no puede vivir subordinada a Web Experience 360.
 
+**Motion primario (delta V1.1 del modelo, 2026-09-10): extensión de capacidad, no sustitución.** Las empresas mid y
+grandes normalmente ya tienen product design in-house. La familia se vende como **lanes de capacidad gobernada** que
+extienden a ese equipo —feature delivery, research, design system, accesibilidad, deuda de diseño, design ops—, con un
+contrato anti-desplazamiento explícito y la distinción dura Managed Squad ≠ Staff Augmentation. El diseño integral de
+producto queda como motion secundario, para clientes sin equipo.
+
 **Frontera con Globe, sin cambios de ownership.** Globe conserva contenido, marca y producción creativa. Product
 Design 360 diseña la interfaz y el sistema con el que alguien opera algo. *Un brandbook no es un design system.*
 

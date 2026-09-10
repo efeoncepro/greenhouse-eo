@@ -1,249 +1,320 @@
-# Product Design 360 — Business Model V1
+# Product Design 360 — Business Model V1.1
 
 > **Status:** `Proposed` — requiere revisión de Strategy, Finance, Legal y Commercial antes de venta general
-> **Owner:** Efeonce Strategy + Wave + Product + Design
-> **Version:** 1.0
+> **Owner:** Efeonce Strategy + Wave + Design
+> **Version:** 1.1 — corrección de tesis: el comprador **ya tiene equipo de diseño**
 > **Date:** 2026-09-10
-> **Validated as of:** 2026-09-10 — evidencia de capability interna verificada; sin cohortes de cliente externo
-> **Review cadence:** trimestral, o antes ante cualquier gate de la sección 11
-> **Related decision / architecture / service:** [`ADR Wave Portfolio Boundaries`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md) · [`Wave Business Model V1`](../wave/WAVE_BUSINESS_MODEL_V1.md) · [`Ficha de servicio`](../../services/wave/product-design-360.md) · [`Product Service Operating Model V1`](../EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md)
+> **Validated as of:** 2026-09-10 — comparables de mercado verificados con fuente y `as-of`; sin cohortes de cliente
+> **Review cadence:** trimestral, o antes ante cualquier gate de la sección 12
+> **Related:** [`ADR Wave Portfolio Boundaries`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md) · [`Wave Business Model V1`](../wave/WAVE_BUSINESS_MODEL_V1.md) · [`Ficha de servicio`](../../services/wave/product-design-360.md) · [`Product Service Operating Model V1`](../EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md)
+
+---
+
+## Delta V1 → V1.1 — qué cambió y por qué
+
+**V1 asumía un cliente sin capacidad de diseño.** Modelaba correctamente la disciplina, pero se equivocaba en el
+comprador y en el motion: proponía que Efeonce diseñara el producto del cliente, y listaba al *"diseñador interno
+que lee el servicio como amenaza"* como un **blocker**.
+
+**Eso estaba invertido.** Las empresas mid y grandes normalmente **ya tienen product design in-house**. El diseñador
+interno no es el obstáculo: es **el comprador, el operador y el campeón** — y también el único con poder de veto.
+
+V1.1 corrige la tesis: el motion primario es **extensión de capacidad de un equipo que ya existe**, no sustitución.
+Cambian las secciones 1, 2, 3, 4, 5, 9, 10 y 13, se agrega la sección 8 (contrato anti-desplazamiento) y se
+reemplaza la evidencia de mercado por comparables verificados de product design.
+
+Lo que **no** cambió: la frontera con Web Experience 360 y con Globe, la unidad de cobro (capacidad gobernada,
+nunca horas ni pantallas) y el estado `Proposed`.
 
 ---
 
 ## 1. Decisión ejecutiva
 
-Efeonce vende el diseño de las superficies con las que una persona **opera** algo: un sitio, una app, un portal de
-cliente, un SaaS, una herramienta interna, una experiencia conversacional. Product Design 360 es la **sexta familia
-propuesta de Wave** y agrupa el oficio que hoy Efeonce ejerce a diario pero nunca nombró como servicio: research,
-arquitectura de información, flujos, prototipado, interfaz, design system, accesibilidad, validación y design ops.
+Efeonce vende **capacidad de product design gobernada, que extiende un equipo in-house sin reemplazarlo**.
 
-**Por qué existe como familia y no como sub-línea de web.** El ADR de Wave le entregó a **Web Experience 360** el
-*diseño técnico, delivery y operación* de la web. Eso cubre arquitectura, performance, accesibilidad técnica,
-despliegue y operación — es decir, **construir y operar**. No cubre **decidir cómo debe ser la experiencia**. Esa
-decisión es una disciplina distinta, con personas, método y evidencia propios, y se aplica a superficies que no son
-un sitio web. Meterla dentro de Web Experience 360 la subordina a "la web" y hace imposible venderla a un cliente
-que tiene un producto digital y no necesita un sitio nuevo.
+La empresa mid o grande ya tiene diseñadores. No le falta gente que sepa diseñar: le falta **capacidad elástica y
+especializada** para las lanes que su equipo nunca alcanza — research, design system, accesibilidad, deuda de
+diseño, overflow de features. Su equipo hace feature work; las lanes especializadas quedan siempre para el próximo
+trimestre, y nunca llega.
 
-**Cómo cobramos.** Tres formas, según la línea: proyecto de alcance cerrado por complejidad (diagnóstico, sprint,
-diseño de producto), build más gobierno recurrente (design system) y **capacidad gobernada mensual** (design ops).
-Nunca por hora ni por pantalla.
+**Dos motions, con prioridad declarada:**
 
-**Qué riesgo asume Efeonce.** El riesgo estructural de este servicio es el **diseño entregado y no implementado**.
-Un diseño que no llega a producción no produce ningún resultado y destruye la evidencia del servicio. Por eso el
-modelo obliga a declarar, en cada engagement, quién construye lo diseñado y con qué capacidad.
+| | Motion | Cliente | Peso |
+|---|---|---|---|
+| **A** | **Design Velocity — extensión de capacidad** | Ya tiene equipo de diseño in-house | **Primario.** Es donde está el mid-market y el enterprise |
+| **B** | **Design ownership — diseño integral** | No tiene equipo, o tiene uno mínimo | Secundario. Mercado real pero menor, y con forma de proyecto |
 
-**Qué NO está aprobado por este documento.** Precio, tarifario, claims públicos, venta general, checkout, ARR ni la
-promoción del nombre "Product Design 360" como marca pública. El estado es `Proposed` y sólo habilita pilotos
-gobernados por SOW.
+**El mecanismo comercial de A: se venden lanes, no diseñadores.** Vender "diseñadores adicionales" es staff
+augmentation — se compite por tarifa, no queda IP y no hay defensa de margen. Vender **una lane con outcome, QA
+propio y accountability medida** es capacidad gobernada. La diferencia no es semántica: define quién responde por
+la entrega, y por lo tanto define el precio.
+
+**El mecanismo político: el Head of Design elige qué lanes conserva.** Nosotros tomamos las que él suelta. Ese
+gesto, hecho explícito en el intake, es lo que convierte al único que puede vetar el deal en el que lo defiende.
+
+**Cómo cobramos.** Envelope de capacidad mensual por lane. Nunca por hora. Nunca por pantalla.
+
+**Qué NO aprueba este documento.** Precio, tarifario, claims públicos, venta general, checkout, ARR, ni el nombre
+público "Product Design 360". Estado `Proposed`: sólo habilita pilotos gobernados por SOW.
 
 ---
 
 ## 2. Problema, operador, ICP, buyer y JTBD
 
-### El problema
+### El problema real, y la aritmética que lo produce
 
-La organización tiene una superficie digital que **funciona técnicamente pero se usa mal**. Nadie discute que el
-sitio carga, que la app compila o que el portal está desplegado. Lo que nadie puede responder es por qué el usuario
-abandona el flujo, por qué cada pantalla nueva se ve distinta, por qué ingeniería reconstruye el mismo componente
-cuatro veces, y por qué cada decisión de interfaz se resuelve por opinión en una reunión.
+El ratio diseñador:ingeniero en un equipo maduro debería estar entre **1:2 y 1:1** cuando la UI es compleja; en
+etapas tempranas ronda **1:4**. Ingeniería crece con presupuesto de ingeniería. Diseño no. Cuando el ratio se
+rompe, **diseño se convierte en el cuello de botella de un equipo que ya está pagado**, y el síntoma no aparece en
+diseño: aparece como sprints bloqueados esperando pantallas.
 
-El síntoma que hace levantar el teléfono suele ser uno de estos cuatro:
+Encima de eso, la deuda de diseño necesita **10–20% de la capacidad de sprint** sostenida para no crecer, y
+**~75% de los equipos la ve volver al backlog** porque el feature work siempre gana la priorización. Esa lane
+—la que nadie protege— es exactamente la que un tercero puede sostener sin quitarle nada al equipo interno.
 
-1. un flujo crítico con abandono que no se explica por precio ni por tráfico;
-2. un producto que creció por agregado y ya no es coherente consigo mismo;
-3. un equipo de ingeniería que gasta tiempo en decisiones visuales que nadie gobierna;
-4. un rediseño anterior que se entregó en Figma y nunca llegó a producción.
+### Señales de compra observables
+
+| Señal | Qué significa |
+|---|---|
+| Sprints bloqueados esperando diseño | El ratio ya se rompió |
+| Backlog de **6+ meses** de solicitudes de componentes | El design system no tiene dueño con tiempo |
+| Inconsistencias de UX creciendo entre superficies | Nadie está sosteniendo la coherencia |
+| Necesidad de skills que el equipo no tiene: research, accesibilidad, design system | Gap estructural, no de volumen |
+| Head of Design haciendo trabajo de producción | El líder es el recurso, y eso tiene techo |
+| Una auditoría de accesibilidad con fecha de cumplimiento | Lane con deadline externo y sin dueño interno |
 
 ### ICP
 
 | Dimensión | Incluido | Excluido |
 |---|---|---|
-| Tipo | Organización con una superficie digital propia que un usuario opera de forma recurrente | Quien sólo necesita una pieza gráfica, un brandbook o una campaña |
-| Madurez | Tiene equipo de ingeniería propio o proveedor de desarrollo estable | Quien no tiene ninguna vía de implementación |
-| Superficie | Sitio transaccional, app, portal de cliente, SaaS, herramienta interna, experiencia conversacional | Producto físico, packaging, diseño industrial, retail físico |
-| Tamaño | Mid-market y enterprise con un producto o canal digital que sostiene ingreso u operación | Emprendimiento sin usuarios ni tráfico donde el diseño precede a la demanda |
+| **Capacidad de diseño** | **Tiene equipo in-house** (desde 1 diseñador con sobrecarga hasta un área con design ops) | — *(sin equipo → motion B)* |
+| Tamaño | Mid-market y enterprise con producto o canal digital que sostiene ingreso u operación | Emprendimiento pre-PMF donde el diseño precede a la demanda |
+| Superficie | App, portal de cliente, SaaS, herramienta interna, sitio transaccional, experiencia conversacional | Producto físico, packaging, diseño industrial |
+| Ingeniería | Tiene equipo o proveedor de desarrollo estable | Sin ninguna vía de implementación |
 
 **Exclusión dura:** si el cliente busca "que se vea mejor" sin una superficie operada por usuarios reales, el
-encargo pertenece a **Creative Services / Globe**, no acá.
+encargo pertenece a **Creative Services / Globe**.
 
 ### Operator & Buying Group Contract
 
 | Rol | Nombre funcional | Qué hace con el servicio |
 |---|---|---|
-| **Operador** | Product Manager / Product Owner; en superficies de marketing, Digital o Web Lead | Vive dentro del problema todos los días: recibe los reclamos, prioriza el backlog y negocia con ingeniería qué se construye |
-| **Primer valor** | — | El diagnóstico le entrega, en una lista defendible y priorizada, la fricción que él ya sospechaba pero no podía sostener frente a su jefe sin sonar a opinión |
-| **Operator-champion path** | PM → Head of Product / Head of Digital → CPO, CTO o Gerente Comercial | El operador se vuelve champion cuando el primer flujo rediseñado llega a producción y mueve una métrica que él ya reportaba |
-| **Problem owner** | Head of Product o Gerente de Marketing Digital | Responde por el resultado de la superficie |
-| **Sponsor / director** | CPO, CTO o CMO según la superficie | Valida prioridad y continuidad |
-| **Economic buyer** | Gerente General, CPO o CMO según el tamaño del engagement | Autoriza presupuesto |
-| **Governance owner** | Head of Engineering | Manda acá más de lo que parece: el design system y el handoff aterrizan sobre **su** equipo, y puede bloquear el servicio sin tener presupuesto sobre él |
-| **Procurement / ratifier** | Compras y Legal | Papeleo, DPA, propiedad intelectual del diseño |
-| **Blockers reales** | Ingeniería sin capacidad de implementación; diseñador interno que lee el servicio como amenaza a su rol | Ambos son causa de muerte del engagement y deben detectarse en intake, no en la semana seis |
+| **Operador** | **Head of Design / Design Director / Design Manager** | Es quien vive el problema: recibe la demanda, no puede contratar al ritmo que la necesita, y su equipo se quema |
+| **Primer valor** | — | Una lane sale de su plato en el primer ciclo, con evidencia de que salió bien — sin que él tenga que supervisarla |
+| **Champion path** | Head of Design → CPO / VP Product → economic buyer | Se vuelve campeón cuando recupera tiempo para el trabajo por el que quiere ser evaluado |
+| **Problem owner** | Head of Design, o Head of Product cuando diseño reporta a producto | Responde por la entrega de diseño |
+| **Sponsor** | CPO, CTO o VP Product | Valida prioridad y continuidad |
+| **Economic buyer** | CPO, CTO o Gerente General según tamaño | Autoriza presupuesto |
+| **Governance owner** | Head of Engineering | El design system y el handoff aterrizan sobre su equipo; puede bloquear sin tener presupuesto |
+| **Procurement** | Compras y Legal | SOW, IP del diseño, DPA cuando hay research con usuarios |
+| **🔴 El veto** | **El propio Head of Design** | Si el pitch huele a reemplazo, mata el deal — sin importar que el CMO o el CPO quieran firmar |
 
-**Decision process** (cómo se decide): el operador reconoce la fricción → busca evidencia → el sponsor prioriza
-frente a otras iniciativas → Engineering confirma que puede implementar → el economic buyer autoriza.
+**Corrección explícita respecto de V1:** el diseñador interno **no es un blocker**. Es el comprador. Tratarlo como
+obstáculo fue el error de tesis de V1 y es el error que pierde este deal en la primera reunión.
 
-**Paper / procurement process** (cómo se firma): SOW con alcance, entregables, rondas y criterio de aceptación
-explícitos; cláusula de propiedad intelectual del diseño entregado; DPA cuando el research toque datos o usuarios
-reales del cliente.
+**Decision process:** el Head of Design reconoce que no llega → busca capacidad → evalúa contratar vs externalizar
+→ el sponsor prioriza → Engineering confirma que puede absorber el output → el economic buyer autoriza.
 
-Estos dos procesos son **distintos** y se mueven a velocidades distintas. Un sí del operador no es un sí de compra.
+**Paper process:** SOW con lanes, envelope, rondas numeradas, criterio de aceptación, IP y DPA. Se mueve más lento
+y por otro carril que el decision process. Un sí del Head of Design no es un sí de compra.
 
 ### JTBD
 
-- **Funcional:** "necesito que este flujo deje de perder gente y que el próximo que construyamos no empiece de cero".
-- **Emocional:** "necesito dejar de defender decisiones de interfaz con mi gusto personal".
-- **De riesgo:** "no puedo pagar otro rediseño que quede en Figma y nunca se construya".
+- **Funcional:** "necesito que salgan las lanes que mi equipo nunca alcanza, sin sumar headcount que después no puedo sostener".
+- **Emocional:** "necesito dejar de ser el cuello de botella de mi propia área y volver a hacer el trabajo por el que me contrataron".
+- **De riesgo:** "no puedo traer un proveedor que le diga a mi jefe que mi equipo no da el ancho".
 
-### Alternativas actuales y costo de no actuar
+### Alternativas — el comparable real
 
-| Alternativa | Por qué la eligen | Dónde falla |
-|---|---|---|
-| Diseñador freelance | Barato y rápido | No deja sistema; el siguiente encargo vuelve a costar lo mismo |
-| Agencia de branding | Ya trabajan con ellos | Entrega marca, no interfaz operable; el brandbook no es un design system |
-| Que lo haga ingeniería | Nadie tiene que aprobar presupuesto | Ingeniería toma decisiones de diseño sin método y las paga en retrabajo |
-| Plantilla o kit UI comprado | Costo cero de decisión | Resuelve la primera pantalla y ninguna de las siguientes |
+🔴 **Nuestro comparable NO es la agencia de diseño local.** Es el costo de contratar, y es la suscripción de
+capacidad. Posicionarse contra la agencia local es auto-descontarse.
 
-**Costo de no actuar:** retrabajo de ingeniería en decisiones no gobernadas, abandono en el flujo crítico, y deuda
-de diseño que crece de forma compuesta — cada superficie nueva incoherente encarece la siguiente.
+| Alternativa | Costo para el cliente | Qué obtiene | Qué NO obtiene |
+|---|---|---|---|
+| **Contratar un senior product designer (US)** | Mediana **~USD 185k/año**; costo cargado **1,4×–2,4× base** → **~USD 186k–239k el primer año** con reclutamiento y rampa | Una persona con contexto total | Elasticidad, cobertura, especialistas; y si la demanda baja, sigue pagando |
+| **Contractor embebido senior (US)** | **USD 80–135/hora** | Manos con seniority | Gobierno, QA propio, método, memoria, accountability |
+| **Design lead fraccional** | **USD 5.000–12.000/mes** | Criterio senior | Capacidad de ejecución |
+| **Suscripción de diseño** *(Design Pickle, NoLimit y similares)* | **USD 399–999/mes** | Volumen de producción gráfica | 🎯 **No es product design.** Es diseño gráfico/marketing. Comparable equivocado si el cliente lo trae a la mesa |
+| **Superside** | **~USD 5.000/mes** + plataforma | Capacidad asignada, rápida | Estrategia, métricas de calidad, equipo con nombre. **Ya publica contenido sobre escalar capacidad de product design: se está moviendo a este terreno** |
+| **No hacer nada** | 0 | La deuda de diseño sigue creciendo de forma compuesta | *(y es el competidor que más deals gana)* |
+| **Efeonce — Design Velocity** | Envelope por lane *(sin precio aprobado)* | Capacidad + criterio + **gobierno medido** | — |
+
+⚠️ **Sesgo declarado de las fuentes.** Buena parte de los comparables de "contratar vs externalizar" provienen de
+proveedores de outsourcing, que tienen interés en que contratar se vea caro. Son direccionalmente útiles y su
+`as-of` es 2026, pero **no son evidencia neutral**. Antes de usarlos en una propuesta hay que rehacer el cálculo
+con el loaded cost del mercado del comprador. Los rangos de arriba son **EE.UU.**; para un comprador chileno el
+cálculo es otro y todavía no está verificado *(ver decisión abierta D7)*.
 
 ---
 
-## 3. Taxonomía de la relación
+## 3. Design Velocity — la arquitectura de lanes
 
-### Delivery models válidos
+**No se venden diseñadores. Se venden lanes.** Cada lane tiene outcome, QA propio, telemetría y un límite
+declarado. El cliente elige cuáles conserva su equipo; Efeonce toma las que suelta.
 
-| Delivery model | Cuándo aplica | Quién responde por el outcome |
+| Lane | Qué absorbe | Por qué el in-house no la cubre |
 |---|---|---|
-| **Productized Service** | Diagnóstico y Experience Design Sprint: alcance, entregable y ciclo fijos | Efeonce |
-| **Implementation** | Digital Product Design y Design System Build: alcance mayor, cerrado por complejidad | Efeonce |
-| **Managed Squad** | Design Operations: capacidad de diseño gobernada y continua | Efeonce conserva staffing, método y accountability |
-| **Staff Augmentation** | Diseñadores integrados al equipo del cliente bajo su dirección | El cliente dirige y asume el outcome operativo del perfil |
-| **Advisory** | Design leadership fraccionado: gobierno, criterio y revisión sin ejecución | Efeonce sobre el criterio; el cliente sobre la ejecución |
-| **Platform-enabled Service** | Cuando la entrega corre sobre AXIS, GVC o la UI Platform de Greenhouse | Efeonce, con la plataforma declarada en el SOW |
+| **L1 · Feature Delivery** | Overflow de diseño de features del roadmap | Es la lane más obvia y la más commoditizable. Se vende, pero no es el moat |
+| **L2 · Research & Validation** | Entrevistas, usability testing, validación de prototipo, medición post-lanzamiento | La mayoría de los equipos tiene 0 o 1 investigador. Gap estructural, no de volumen |
+| **L3 · Design System** | Construcción, mantención, versionado, revisión de contribuciones, drift | El backlog de componentes de 6+ meses es el síntoma clásico |
+| **L4 · Accessibility** | Auditoría, remediación priorizada, criterios incorporados al sistema | Suele haber un "accessibility owner" nominal y sobrecargado; y a veces hay deadline regulatorio |
+| **L5 · Design Debt & Consistency** | La deuda que necesita 10–20% del sprint sostenido y que el feature work siempre desplaza | **Es la lane que el equipo interno nunca protege.** La mejor candidata a externalizar: no le quita nada a nadie |
+| **L6 · Design Ops** | Intake, priorización, QA visual, handoff, memoria de decisiones | Sólo los equipos enterprise grandes tienen design ops propio |
 
-### Engagements
+**Reglas de la arquitectura de lanes:**
 
-`On-Demand` (diagnóstico, sprint, build) · `On-Going` (design ops, gobierno de design system) · `Sample Sprint`
-(prueba acotada antes de un compromiso mayor).
+- Una lane se contrata **completa o no se contrata**. Media lane es staff augmentation con otro nombre.
+- **L1 nunca se vende sola a un cliente nuevo con equipo in-house.** Sola, es sustitución percibida y arranca la
+  guerra política. Se vende acompañada de al menos una lane especializada (L2–L5), que es la que el equipo interno
+  reconoce como ayuda y no como amenaza.
+- El cliente puede recuperar una lane con aviso. La reversibilidad es parte del contrato, no una concesión.
 
-### Operating modes
+### Los tres ejes, sin mezclarlos
 
-`efeonce-managed` (default) · `co-operated` (el design system se opera junto al equipo del cliente) ·
-`client-operated` (sólo tras transferencia de capacidad verificada).
+| Eje | Opciones |
+|---|---|
+| **Delivery model** | Managed Squad *(default de Design Velocity)* · Embedded Managed Pod · Implementation · Advisory · Staff Augmentation *(sólo cuando el cliente lo pide explícitamente y acepta el traslado de accountability)* · Platform-enabled |
+| **Engagement** | On-Going *(el corazón)* · On-Demand *(proyecto)* · Sample Sprint *(la puerta)* |
+| **Operating mode** | `efeonce-managed` · `co-operated` *(lo normal cuando hay equipo in-house)* · `client-operated` *(sólo tras transferencia verificada)* |
 
-### Combinaciones inválidas o condicionadas
+### 🔴 Managed Squad ≠ Staff Augmentation — la distinción que sostiene el margen
 
-| Combinación | Estado | Razón |
+| | **Design Velocity (capacidad gobernada)** | **Staff Augmentation** |
 |---|---|---|
-| Design Operations + `client-operated` | **Inválida** | Si el cliente opera, no es capacidad gestionada de Efeonce; eso es Staff Augmentation o Advisory |
-| Digital Product Design sin vía de implementación declarada | **Inválida** | Es la causa raíz de muerte del servicio; el SOW debe nombrar quién construye |
-| Design System `client-operated` | **Condicionada** | Sólo después de transferencia de capacidad con evidencia de contribución del equipo del cliente |
-| Staff Augmentation vendido como "diseño con outcome garantizado" | **Inválida** | En Staff Augmentation el cliente dirige; Efeonce no puede responder por el outcome |
-| Product Design 360 vendido como producción creativa | **Inválida** | Eso es Globe; ver sección 7 |
+| Qué compra el cliente | **Una lane con outcome y límites declarados** | Un perfil con dedicación |
+| Quién prioriza | El cliente prioriza la cola | El cliente dirige todo |
+| Quién dirige la ejecución | **Efeonce** | El cliente |
+| Quién hace QA | **Efeonce** | El cliente |
+| Quién responde por la entrega | **Efeonce** — por eso puede comprometer telemetría | El cliente. Si su dirección falla, no es falla nuestra |
+| Unidad de cobro | **Envelope de capacidad por lane** | Rate por perfil |
+| Qué queda al salir | Sistema, documentación y memoria de decisiones | Nada |
+
+🔴 **NUNCA usar "staff augmentation" como sinónimo comercial de "squad dedicado".** Y nunca vender Staff
+Augmentation prometiendo outcome: en ese modelo dirige el cliente, y Efeonce no puede responder por lo que no
+dirige.
+
+**El riesgo de deriva es real:** un engagement de capacidad gobernada se degrada a staff augmentation cuando el
+cliente empieza a asignar tareas directo a las personas y Efeonce deja de dirigir. Es la forma más común de perder
+el margen sin cambiar el contrato. Se detecta en el QBR y se corrige ahí.
 
 ---
 
 ## 4. Propuesta de valor y evidencia
 
-### Resultado prometido
+### El reencuadre que gana
 
-Al terminar, el cliente tiene **tres cosas que antes no tenía**: la experiencia diseñada con evidencia en vez de
-opinión, un sistema que hace más barata la superficie siguiente, y un equipo que quedó más capaz de decidir sin
-Efeonce.
+> *"No venimos a reemplazar a tu equipo. Tu equipo tiene el contexto del negocio, que nosotros nunca vamos a tener.
+> Venimos a que tu equipo deje de ser el cuello de botella y pueda hacer aquello para lo que lo contrataron.
+> Nosotros absorbemos las lanes que nunca alcanzan, con un sistema que te muestra si estamos cumpliendo."*
+
+**El argumento político, que es el que decide:** el Head of Design no quiere ser reemplazado — quiere ser
+ascendido. Este servicio es literalmente su promoción: deja de administrar una cola y pasa a dirigir la estrategia
+de diseño con capacidad a su servicio. **Véndeselo a él. El CPO firma; él veta.**
+
+### La aritmética que cierra
+
+| | Contratar un senior más | Design Velocity |
+|---|---|---|
+| Costo | **~USD 186k–239k el primer año** (loaded 1,4–2,4× base, con reclutamiento y rampa) | Envelope declarado |
+| Qué obtiene | **1 persona**, generalista, que se enferma, toma vacaciones y puede renunciar | **Varias lanes**, con especialistas que no justificarían un headcount cada uno |
+| Cuando baja la demanda | Sigue pagando el sueldo | Ajusta el envelope |
+| Cuando sube | Vuelve a reclutar, con meses de rampa | Escala dentro del contrato |
+| Research, a11y y design system | Nadie los cubre: no hay headcount para tres especialistas | Cubiertos como lanes |
+| Su Head of Design | Sigue administrando la cola | **Recupera la estrategia** |
 
 ### Mecanismo causal
 
-El valor no viene de las pantallas. Viene de tres mecanismos verificables:
+1. **La lane sale del plato del equipo interno** y deja de competir por priorización con el feature work.
+2. **El sistema hace más barata la superficie siguiente** — el único mecanismo cuyo retorno crece con el tiempo.
+3. **El handoff sobrevive al build**, verificado contra lo construido en vez de prometido.
+4. **La memoria se acumula:** el ciclo 6 sabe más que el ciclo 1, y eso no se puede comprar de nuevo en otro lado.
 
-1. **Decisión con evidencia.** Research y validación convierten una discusión de gusto en un hallazgo defendible.
-2. **Sistema en vez de piezas.** Un design system amortiza el costo de diseño sobre todas las superficies futuras;
-   es el único mecanismo del servicio cuyo retorno crece con el tiempo.
-3. **Handoff que sobrevive al build.** Un diseño que llega a producción sin degradarse. Esto se verifica, no se
-   promete: es lo que hace Greenhouse Visual Capture.
+### Evidencia — y su límite
 
-### Evidencia disponible — y su límite
+**Capability verificable hoy** (interna, en el repositorio): **AXIS** como design system multi-marca con tokens
+gobernados y drift-guard; **UI Platform** de Greenhouse con contratos de primitives, Composition Shell y gates que
+bloquean el merge cuando una superficie se desvía del sistema; **GVC** para verificación visual de lo construido;
+**Premium UI Delivery Standard** con scorecard; y `designer` como rol formal de la organización.
 
-**Lo que sí podemos demostrar hoy** (capability interna, verificable en el repositorio):
+**Lo que NO podemos afirmar.** Todo eso lo construimos para un producto propio. Demuestra que Efeonce **opera** la
+disciplina con método y gobierno. **No demuestra resultado en un cliente externo, ni demanda.** Hasta cerrar G1, se
+presenta como capability demostrable, nunca como caso de éxito de cliente.
 
-- **AXIS**, design system multi-marca (Efeonce, Kortex, Verk) con tokens gobernados y drift-guard.
-- **UI Platform de Greenhouse**: contratos de primitives, Composition Shell, Adaptive Card, contratos de motion y
-  elevación, y gates mecánicos que bloquean el merge cuando el diseño se desvía del sistema.
-- **Greenhouse Visual Capture (GVC)**: verificación visual automatizada de la superficie construida contra la
-  intención de diseño.
-- **Premium UI Delivery Standard** con scorecard y piso de calidad declarado.
-- Función de diseño formalizada en la organización: `designer` es uno de los 14 role codes reales del portal.
+### 🎯 El moat: accountability medida
 
-**Lo que NO podemos afirmar todavía.** Esa evidencia demuestra que Efeonce **opera** la disciplina con método y
-gobierno propios. No demuestra resultado en un cliente externo, porque el cuerpo de evidencia es un producto propio.
-Hasta cerrar el gate G1 de la sección 11, la evidencia se presenta como **capability demostrable**, nunca como caso
-de éxito de cliente.
+Podemos mostrarle al cliente, en su propio login, **si cumplimos**: OTD, FTR, RpA, cycle time, first-time-right del
+handoff y drift diseño↔runtime. Y el sistema declara cuándo un número no es confiable en vez de pintarlo bonito.
+
+Ninguna suscripción de diseño hace esto. Superside no lo hace.
+
+🔴 **Es un arma de doble filo:** si comprometes un número y no lo cumples, el cliente lo ve antes que tú. **Qué se
+firma como SLA y qué se muestra como telemetría es una decisión comercial, no técnica.**
 
 ### Claims prohibidos
 
-- "Subimos la conversión un X%" sin instrumentación previa y baseline acordado con Measurement & Analytics.
-- "Diseño validado" cuando no hubo usuarios reales del cliente en la validación.
-- "Accesible" o "cumple WCAG" sin auditoría contra un criterio nombrado y su nivel.
+- "Subimos la conversión un X%" sin instrumentación previa y baseline acordado.
+- "Diseño validado" sin usuarios reales del cliente.
+- "Cumple WCAG" sin auditoría contra criterio y nivel nombrados.
 - Presentar la UI Platform de Greenhouse como caso de cliente.
-- Prometer una métrica de negocio que dependa de precio, tráfico, inventario u operación fuera del alcance.
-
-**Nivel de confianza:** capability `alta` (verificable); demanda externa `no verificada`; economics `no validados`.
+- Cualquier insinuación de que el equipo in-house del cliente no da el ancho.
+- Comparaciones de costo con cifras US frente a un comprador chileno sin rehacer el cálculo local.
 
 ---
 
 ## 5. Arquitectura de ingresos
 
-| Línea | Unidad | Trigger de cobro | Incluye | No incluye | Reconocimiento |
-|---|---|---|---|---|---|
-| **Diagnóstico** | Proyecto cerrado por complejidad (superficies × flujos × plataformas) | Firma y hito de entrega | Auditoría, hallazgos priorizados, sesión de lectura | Cualquier ejecución del remedio | Al entregar |
-| **Experience Design Sprint** | Proyecto cerrado por alcance (un flujo o superficie acotada) | Firma; hitos por fase | Research ligero, IA, flujos, prototipo, UI, handoff, rondas declaradas | Implementación; rondas fuera de las declaradas | Por avance de hitos |
-| **Digital Product Design** | Proyecto cerrado por complejidad (superficies × estados × plataformas × idiomas) | Firma; hitos por fase | Research, arquitectura, sistema de patrones, todos los estados, prototipo, handoff, acompañamiento de build | Desarrollo; QA funcional; contenido | Por avance de hitos |
-| **Design System — build** | Proyecto por alcance (inventario de componentes, plataformas, marcas) | Firma; hitos | Auditoría, tokens, componentes, documentación, modelo de contribución | Migración de superficies existentes | Por avance de hitos |
-| **Design System — gobierno** | Fee recurrente por sistema gobernado | Mensual | Versionado, revisión de contribuciones, drift, evolución | Construcción de superficies nuevas | Devengo mensual |
-| **Design Operations** | **Capacidad gobernada mensual** (squad envelope) | Mensual, por adelantado | Cola de diseño priorizada, QA visual, evolución del sistema, acompañamiento de releases | Trabajo fuera del envelope; picos no acordados | Devengo mensual |
-| **Research & Validation** | Proyecto por estudio, o incluido dentro de otra línea | Firma o hito | Diseño del estudio, reclutamiento, ejecución, análisis, recomendación | Incentivos y paneles de terceros (pass-through) | Al entregar |
-| **Advisory / design leadership** | Fee recurrente por ventana de disponibilidad | Mensual | Criterio, gobierno, revisión, decisiones | Ejecución | Devengo mensual |
-| **Pass-through** | Costo + fee de gestión declarado | Al incurrir | Herramientas, paneles, incentivos, licencias de fuentes o assets | — | Sin margen oculto |
+| Línea | Unidad | Trigger | Incluye | No incluye |
+|---|---|---|---|---|
+| **Design Velocity — lane** | **Envelope de capacidad mensual por lane** | Mensual, por adelantado | Ejecución de la lane, QA propio, telemetría, memoria | Trabajo fuera del envelope; lanes no contratadas |
+| **Gobierno / plataforma** | Línea propia por engagement | Mensual | Intake, priorización, quality gates, telemetría, soporte base, memoria | — |
+| **Sample Sprint** | Piloto pagado acotado | Firma | Una lane, un ciclo, gobernanza completa | Compromiso de continuidad |
+| **Diagnóstico** | Proyecto cerrado | Firma | Auditoría de capacidad y de experiencia; recomendación de lanes | Ejecución |
+| **Design System — build** | Proyecto por inventario × plataformas × marcas | Hitos | Auditoría, tokens, componentes, documentación, modelo de contribución | Migración de superficies existentes |
+| **Diseño integral (motion B)** | Proyecto por complejidad | Hitos | Research, arquitectura, sistema, estados, prototipo, handoff, acompañamiento | Desarrollo, QA funcional |
+| **Advisory / design leadership** | Fee por ventana de disponibilidad | Mensual | Criterio, gobierno, revisión | Ejecución |
+| **Derechos de uso** | Se cotiza **aparte** del fee de creación | Según alcance | Canal, territorio y plazo declarados | Perpetuidad e ilimitado dentro del fee base |
+| **Pass-through** | Costo + fee de gestión declarado | Al incurrir | Paneles, incentivos de research, licencias | Margen oculto |
 
-**Reglas duras de esta arquitectura:**
+**Reglas duras:**
 
-- **Nunca** se cobra por hora ni por pantalla. La unidad de Design Operations es **capacidad gobernada**, coherente
-  con el invariante de la práctica creativa. Cobrar por pieza commoditiza el servicio y castiga el diseño que
-  resuelve un problema con menos pantallas — que es justamente el buen diseño.
-- **Nunca** se mezcla costo humano dentro de un pass-through ni dentro de un fee de plataforma.
-- Las **rondas** son parte del alcance y se declaran numéricamente en el SOW. Una ronda adicional es change order,
-  no cortesía.
+- 🔴 **Nunca por hora. Nunca por pantalla.** Cobrar por pieza commoditiza el servicio y castiga al buen diseño, que
+  es el que resuelve el problema con menos pantallas. Además entrega al procurement la calculadora para dividir
+  cualquier propuesta futura.
+- 🔴 **El gobierno es línea propia y no se descuenta.** Tiene costo operativo real y sostiene el control, la
+  transparencia y el switching cost. Si hay que descontar, se descuenta capacidad o alcance — nunca se finge que el
+  gobierno cuesta cero.
+- 🔴 **Nunca "rondas ilimitadas".** Rondas numeradas en el SOW; la siguiente es change order.
+- 🔴 **Nunca derechos perpetuos, exclusivos e ilimitados dentro del fee base.**
+- 🔴 **El ad-hoc nunca más barato que el marginal del plan.** Rompe la planificación y consume coordinación: tiene
+  que costar más.
 
 ### Expansión
 
-Diagnóstico → Sprint → Digital Product Design → Design System → Design Operations es el recorrido natural, y cada
-paso tiene un trigger observable (sección 9). La expansión hacia otras familias de Wave —Web Experience 360 para
-construir, Measurement para medir, Agent Systems para experiencias conversacionales— es composición, no upsell
-automático.
+`Diagnóstico → Sample Sprint (1 lane) → 2ª lane → design system → Design Ops → motion B en una superficie nueva`.
+La expansión hacia otras familias de Wave —Web Experience 360 para construir, Measurement para medir, Agent
+Systems para superficies conversacionales— es composición con ownership declarado, no upsell automático.
 
 ---
 
 ## 6. Unidad económica
 
-**Estado: no validada.** Esta sección declara la *forma* del cálculo y sus guardrails. Los valores concretos
-requieren cierre de Finance y no se publican acá.
+**Estado: no validada.** Se declara la *forma* del cálculo y sus guardrails; los valores concretos los cierra
+Finance y no se publican acá.
 
-| Concepto | Definición aplicable | Fuente |
-|---|---|---|
-| **Fully loaded cost** | Costo del miembro cargado con overhead, herramientas y tiempo no facturable, según el modelo de costo canónico de Greenhouse | `GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md` |
-| **Cost-to-serve** | Fully loaded cost del squad asignado + herramientas de diseño y research + coordinación + memoria/documentación | Finance |
-| **Margen bruto** | Por línea, nunca agregado: proyecto, gobierno y capacidad tienen perfiles distintos | Finance |
-| **Piso de margen** | Se adopta el piso vigente de la práctica creativa (**45%**) como guardrail provisional para capacidad gobernada, hasta que Finance fije el piso propio de esta familia | `creative-practice` — provisional |
-| **Utilización / capacidad** | Para Design Operations, el envelope se dimensiona con holgura declarada; un envelope al 100% no es sostenible ni honesto | Operations |
-| **Realization** | Alcance entregado contra alcance vendido; las rondas no declaradas son la principal fuga | Operations + Finance |
-| **Costo variable p50/p95** | Concentrado en research: reclutamiento, incentivos y paneles. p95 puede duplicar p50 en segmentos difíciles de reclutar | Finance |
-| **Working capital, FX, impuestos** | Según jurisdicción del cliente; el servicio es exportable y arrastra las mismas reglas de FX y tributación que las demás familias de Wave | Finance |
-| **Stop-loss** | Un engagement que supera las rondas declaradas sin change order aprobado se detiene y escala; no se absorbe en silencio | Práctica + Finance |
+| Concepto | Definición aplicable |
+|---|---|
+| **Fully loaded cost** | Del squad asignado, según el modelo de costo canónico de Greenhouse |
+| **Cost-to-serve por lane** | Loaded cost + herramientas + research variable + coordinación + gobierno + memoria. **Se calcula por lane**, porque su perfil difiere: L2 tiene costo variable alto, L3 es intensiva en seniority, L5 es la más estandarizable |
+| **Piso de margen** | 🔴 **45% de margen bruto. Regla, no guía.** El piso se computa, no se siente |
+| **Cotizador** | 🔴 Ningún precio sale sin pasar por el motor de pricing con loaded cost detrás. Un precio sin loaded cost es una corazonada con decimales |
+| **Utilización** | El envelope se dimensiona con holgura declarada; un envelope al 100% no es sostenible ni honesto |
+| **Realization** | Alcance entregado ÷ vendido. Las rondas no declaradas son la principal fuga |
+| **Costo variable p50/p95** | Concentrado en L2 (research): reclutamiento, incentivos y paneles. p95 puede duplicar p50 en segmentos difíciles |
+| **Stop-loss** | Superar las rondas declaradas sin change order aprobado detiene y escala; no se absorbe en silencio |
 
-**Sensibilidad principal.** El margen de este servicio es sensible a **una sola variable dominante: las rondas de
-revisión**. Un cliente con proceso de aprobación difuso o con más de un decisor no declarado puede consumir el
-margen completo en iteración. Por eso el intake debe identificar al decisor único de diseño antes de firmar; si no
-existe, el riesgo se refleja en el alcance, no en la esperanza.
+**Las dos sensibilidades dominantes:** las **rondas de revisión** (un cliente con decisor difuso puede consumir el
+margen completo en iteración) y la **deriva a staff augmentation** (cuando el cliente empieza a dirigir, se pierde
+la justificación del precio de capacidad gobernada sin que nadie cambie el contrato).
 
 ---
 
@@ -253,223 +324,231 @@ existe, el riesgo se refleja en el alcance, no en la esperanza.
 
 | Actividad | Efeonce | Cliente |
 |---|---|---|
-| Método, criterio y decisión de diseño | **A/R** | C |
+| Visión de producto y roadmap | — | **A/R** |
+| Prioridad de la cola de cada lane | C | **A/R** |
+| Dirección de la ejecución dentro de la lane | **A/R** | C |
+| Método, QA y criterio de calidad | **A/R** | C |
 | Acceso a usuarios, datos y sistemas | C | **A/R** |
-| Decisión de negocio y prioridad | C | **A/R** |
-| Implementación en producción | C (o **A/R** si compone Web Experience 360) | **A/R** por defecto |
-| Aceptación del entregable | R | **A** |
+| Implementación en producción | C *(o A/R si compone Web Experience 360)* | **A/R** por defecto |
+| Aceptación | R | **A** |
 
-### Incluido siempre
+### Fronteras — invariantes
 
-Método declarado, entregables nombrados, rondas numeradas, criterio de aceptación explícito, documentación del
-sistema y handoff a quien construya.
+> **Product Design 360 decide cómo debe ser la experiencia.**
+> **Web Experience 360 la construye, la despliega y la opera.**
 
-### Excluido siempre
-
-Desarrollo y despliegue (pertenecen a Web Experience 360 o al equipo del cliente); QA funcional; producción de
-contenido y assets de campaña (Globe); redacción de contenido de producto más allá del microcopy de interfaz;
-gestión de la migración de datos.
-
-### Frontera con Creative Services / Globe — invariante
-
-> Product Design 360 diseña **la interfaz y el sistema con el que alguien opera algo**.
-> Globe produce **contenido, marca y piezas**.
-> Un brandbook no es un design system. Una campaña no es un producto. Un identity system no es una interfaz.
-
-Cuando un engagement necesita ambas, se declara composición con owner por lane. Globe no se subcontrata en silencio
-ni se absorbe su ownership.
-
-### Frontera con Web Experience 360 — invariante
-
-> Product Design 360 **decide cómo debe ser la experiencia**.
-> Web Experience 360 **la construye, la despliega y la opera**.
-
-Ninguna de las dos es completa sola en una superficie web. En una app o portal, quien construye puede ser el equipo
-del cliente; el SOW lo declara.
+> **Product Design 360 diseña la interfaz y el sistema con el que alguien opera algo.**
+> **Globe produce contenido, marca y piezas.** *Un brandbook no es un design system.*
 
 ### Estados degradados
 
 | Situación | Comportamiento |
 |---|---|
-| Sin acceso a usuarios reales | El research se entrega **degradado y declarado**: se reporta qué no se pudo validar en lugar de estimarlo, y desaparece toda afirmación de "validado" |
-| Sin instrumentación de medición | No se prometen métricas de resultado; se propone la composición con Measurement & Analytics o se acota el claim |
-| Ingeniería sin capacidad de build | Se escala al sponsor antes de continuar; entregar diseño sin vía de implementación es acumular deuda para el cliente y destruir la evidencia del servicio |
-| Decisor de diseño no identificado | Se detiene el intake hasta nombrarlo |
-
-### Change order
-
-Alcance nuevo, ronda adicional, superficie adicional, plataforma adicional o idioma adicional son change order. Se
-cotizan antes de ejecutarse.
+| Sin acceso a usuarios reales | El research se entrega **degradado y declarado**; desaparece toda afirmación de "validado" |
+| Sin instrumentación | No se prometen métricas de resultado; se propone composición con Measurement o se acota el claim |
+| Ingeniería sin capacidad de build | Se escala al sponsor antes de continuar |
+| Sin owner de aprobación del lado del cliente | 🔴 Causal de descalificación. Sin una persona que apruebe no hay ronda 1: hay rondas infinitas |
+| El cliente empieza a dirigir a las personas | Se corrige en el QBR o se reclasifica el contrato a Staff Augmentation, con su precio y su accountability |
 
 ---
 
-## 8. Derechos, privacidad, seguridad y compliance
+## 8. Contrato anti-desplazamiento
+
+**Es la sección que hace vendible el servicio a un equipo que ya existe.** Sin ella, el Head of Design veta.
+
+1. **El cliente elige qué lanes conserva.** Se declaran en el SOW, con las que Efeonce toma y las que no.
+2. **Efeonce nunca posee la visión de producto, el roadmap ni la marca.** Esas quedan en el equipo interno.
+3. **Efeonce no presenta a los ejecutivos del cliente sin el Head of Design en la sala.** Nunca por separado.
+4. **La autoría y el crédito del trabajo son del equipo del cliente** hacia adentro de su organización.
+5. **Ninguna comunicación de Efeonce —propuesta, QBR, informe— compara el desempeño del equipo interno con el
+   nuestro.** La telemetría mide nuestras lanes, no a su gente.
+6. **Reversibilidad declarada:** el cliente puede recuperar una lane con aviso, y se lleva el sistema, la
+   documentación y la memoria en formato operable.
+7. **La transferencia de capacidad es un entregable, no una cortesía.** El objetivo declarado es que su equipo
+   quede más capaz — porque un cliente más capaz produce mejores briefs, y mejores briefs son menos rondas, mejor
+   margen y gente que no se quema.
+
+🔴 **Regla anti-humo:** nunca decir "somos una extensión de tu equipo" sin el mecanismo pegado — el login, el
+número, el ciclo, la lane declarada. Dicha sola, es exactamente lo que dice la agencia commodity.
+
+---
+
+## 9. Derechos, privacidad, seguridad y compliance
 
 | Materia | Posición |
 |---|---|
-| **IP del diseño entregado** | Se transfiere al cliente sobre los entregables específicos del engagement, contra pago íntegro. Se declara en el SOW; no se asume |
-| **IP de Efeonce** | Método, plantillas, checklists, criterios de auditoría, herramientas internas y AXIS permanecen de Efeonce. Un design system construido *para* el cliente es del cliente; el método con que se construyó, no |
-| **Licencias de terceros** | Fuentes tipográficas, iconografía, imágenes y componentes de terceros se declaran con licencia, territorio y plazo. El cliente asume la licencia a su nombre cuando corresponde |
-| **Datos de research** | Los datos de usuarios del cliente son del cliente. Requieren DPA, base de licitud, consentimiento informado y política de retención declarada antes de reclutar |
-| **Grabaciones de sesiones** | Consentimiento explícito, finalidad limitada, retención declarada y borrado verificable |
-| **Portfolio rights** | El uso del trabajo como referencia externa requiere autorización expresa y por escrito del cliente, coherente con la regla del catálogo de servicios |
-| **Accesibilidad** | Se declara el criterio y nivel objetivo (WCAG 2.2 AA como piso de referencia). No se afirma cumplimiento sin auditoría |
-| **IA en el proceso** | El uso de IA generativa en el proceso de diseño se declara, con sus derechos de uso y su gobernanza. Canon: `greenhouse-ai-creative-rights-governance` + `legal-privacy-ip-operator` |
+| **IP del diseño entregado** | Se transfiere al cliente sobre los entregables del engagement, contra pago íntegro; se declara en el SOW |
+| **IP de Efeonce** | Método, plantillas, criterios de auditoría, herramientas internas y AXIS permanecen de Efeonce. Un design system construido *para* el cliente es del cliente; el método con que se construyó, no |
+| **Derechos de uso** | Se cotizan **aparte** del fee de creación, con canal, territorio y plazo. Cederlos perpetuos e ilimitados dentro del fee base es regalar múltiplos del trabajo |
+| **Licencias de terceros** | Fuentes, iconografía e imágenes con licencia, territorio y plazo declarados; a nombre del cliente cuando corresponde |
+| **Datos de research** | Del cliente. Requieren DPA, base de licitud, consentimiento informado y retención declarada **antes de reclutar** |
+| **Grabaciones** | Consentimiento explícito, finalidad limitada, borrado verificable |
+| **Portfolio rights** | Uso externo del trabajo sólo con autorización expresa por escrito |
+| **Accesibilidad** | Criterio y nivel declarados (WCAG 2.2 AA como piso de referencia). No se afirma cumplimiento sin auditoría |
+| **IA en el proceso** | Se declara, con derechos de uso y gobernanza. Canon: `greenhouse-ai-creative-rights-governance` + `legal-privacy-ip-operator` |
 
-Legal valida esta sección antes de cualquier venta. Ninguna de estas posiciones está aprobada por este documento.
+Legal valida esta sección antes de cualquier venta.
 
 ---
 
-## 9. Journey y expansión
+## 10. Journey y expansión
 
-`problema → wedge → uso → operator-champion → sponsor → compra recurrente → evangelización`
+`problema → wedge → primera lane → operator-champion → segunda lane → sistema → capacidad recurrente → evangelización`
 
-| Etapa | Qué pasa | Evidencia que lo prueba | Trigger de la siguiente |
+| Etapa | Qué pasa | Evidencia | Trigger |
 |---|---|---|---|
-| **Adquisición** | El operador llega con una fricción concreta o un rediseño fallido | Intake con superficie, flujo y decisor nombrados | Acepta el diagnóstico |
-| **Wedge — Diagnóstico** | Hallazgos priorizados y defendibles | El operador presenta la lista a su jefe sin pedirnos ayuda | Prioriza un flujo para intervenir |
-| **Primer valor — Sprint** | Un flujo rediseñado llega a producción | La superficie construida pasa verificación visual contra el diseño | La métrica que el operador ya reportaba se mueve |
-| **Operator-champion** | El operador defiende internamente la continuidad | Pide una segunda superficie sin que la ofrezcamos | El sponsor pregunta por el resto del producto |
-| **Expansión — Producto / Sistema** | Diseño integral o design system | Ingeniería construye desde el sistema en vez de desde cero | Aparece cola de diseño recurrente |
-| **Compra recurrente — Design Ops** | Capacidad gobernada continua | Cola priorizada, drift bajo control, contribuciones del equipo cliente | Renovación |
-| **Evangelización** | Referencia y caso | Autorización escrita de uso externo | — |
+| **Adquisición** | El Head of Design llega con una lane que nunca alcanza | Intake con lanes, ratio y decisor nombrados | Acepta el diagnóstico |
+| **Wedge — Diagnóstico** | Mapa de capacidad + recomendación de qué lanes soltar | Puede presentar el caso a su jefe sin nuestra ayuda | Elige la primera lane |
+| **Sample Sprint — 1ª lane** | Una lane sale de su plato, un ciclo, gobernanza completa | La lane entrega sin que él la supervise | Pide continuidad |
+| **Operator-champion** | Defiende internamente la continuidad | Pide una segunda lane sin que se la ofrezcamos | El sponsor pregunta por el resto |
+| **Expansión — 2ª lane / sistema** | Se suman lanes especializadas o el design system | Ingeniería construye desde el sistema | Aparece cola recurrente |
+| **Capacidad recurrente** | Envelope estable, QBR con telemetría | OTD/FTR/RpA, drift, adopción del sistema | Renovación |
+| **Evangelización** | Referencia y caso | Autorización escrita | — |
 
-**Onboarding:** intake, inventario de superficies, identificación del decisor único, acceso a sistemas y usuarios,
-acuerdo de rondas.
+**Time-to-value:** la primera lane debe entregar dentro del primer ciclo. Si el Head of Design tiene que
+supervisarnos, no le devolvimos tiempo — y el servicio no cumplió su promesa aunque el trabajo esté bien.
 
-**Time-to-value:** el diagnóstico debe producir una decisión, no un informe. Si el cliente no puede decidir al
-terminarlo, el diagnóstico falló aunque el documento sea correcto.
-
-**Downgrade y offboarding:** el design system y su documentación quedan con el cliente en formato operable, no
-propietario. **La portabilidad es una obligación del modelo, no una cortesía**: un cliente retenido por no poder
-llevarse su propio sistema es exactamente el tipo de captura de valor que el modelo de negocio de Efeonce prohíbe.
+**Offboarding:** sistema, documentación y memoria quedan con el cliente en formato operable, no propietario. **La
+portabilidad es obligación del modelo.** El switching cost se gana por capacidad y memoria, nunca por opacidad.
 
 ---
 
-## 10. Métricas
+## 11. Métricas
 
-Toda métrica declara fórmula, período, denominador, fuente y owner. Las de resultado de negocio **requieren
-instrumentación previa acordada**; sin ella no se comprometen.
+Cada métrica declara fórmula, período, denominador, fuente y owner. Las de resultado de negocio requieren
+instrumentación previa acordada.
 
-### Valor cliente
+**Valor cliente** — capacidad devuelta al equipo interno *(horas de su equipo liberadas de la lane, declaradas por
+el cliente)* · backlog de la lane atendido ÷ ingresado · completitud del flujo crítico *(requiere baseline)* ·
+hallazgos de accesibilidad cerrados por nivel WCAG · deuda de diseño cerrada ÷ detectada.
 
-| Métrica | Fórmula | Período | Fuente | Condición |
-|---|---|---|---|---|
-| Completitud del flujo crítico | sesiones que completan ÷ sesiones que inician | Mensual | Analítica del cliente | Requiere baseline pre-intervención |
-| Tiempo a tarea | mediana del tiempo de completitud | Por estudio | Usability testing | Requiere usuarios reales |
-| Errores por sesión | errores de usuario ÷ sesiones | Mensual | Instrumentación | Requiere Measurement |
-| Hallazgos de accesibilidad cerrados | cerrados ÷ detectados, por nivel WCAG | Por ciclo | Auditoría | Criterio declarado |
+**Delivery** — OTD · FTR · RpA · cycle time · first-time-right del handoff · drift diseño↔runtime.
 
-### Delivery
+**Adopción** — superficies nuevas construidas desde el design system ÷ totales · contribuciones del equipo del
+cliente al sistema · lanes activas por cuenta.
 
-| Métrica | Fórmula | Owner |
-|---|---|---|
-| Ciclo diagnóstico → decisión | días desde entrega hasta decisión priorizada del cliente | Práctica |
-| First-time-right del handoff | componentes construidos sin retrabajo de diseño ÷ componentes entregados | Práctica + Engineering |
-| Drift diseño ↔ runtime | superficies que se desvían del sistema ÷ superficies vivas | Práctica |
-| Rondas consumidas | rondas usadas ÷ rondas declaradas | Práctica + Finance |
+**Economía** — margen por lane y por engagement · utilización del envelope · realization · costo variable de
+research p50/p95.
 
-### Adopción
+**Riesgo / calidad** — 🔴 **engagements derivando a staff augmentation** *(alarma; estado saludable: cero)* ·
+engagements con diseño entregado y no implementado *(alarma; estado saludable: cero)* · engagements sin owner de
+aprobación identificado.
 
-Superficies nuevas construidas desde el design system ÷ superficies nuevas totales · contribuciones del equipo del
-cliente al sistema por período · cola de diseño atendida ÷ cola ingresada.
-
-### Economía
-
-Margen por línea y por engagement · utilización del envelope · realization · costo variable de research p50/p95.
-
-### Riesgo / calidad
-
-Deuda de diseño abierta por superficie · engagements con diseño entregado y no implementado (**esta es la métrica
-de alarma del servicio; su estado saludable es cero**) · engagements sin decisor único identificado.
+🔴 **SLA ≠ telemetría.** Qué número se firma y qué número sólo se muestra es decisión comercial, no técnica.
 
 ---
 
-## 11. Validación y gates
+## 12. Validación y gates
 
-| # | Hipótesis | Experimento | Muestra | Ventana | Éxito | Fallo → decisión | Owner |
-|---|---|---|---|---|---|---|---|
-| **G1** | Existe demanda externa por diseño con evidencia, separado de "hacer un sitio" | Ofrecer el Diagnóstico a cuentas vivas y a pipeline de Wave | 8 conversaciones calificadas | 90 días | ≥3 diagnósticos vendidos a 2 clientes distintos | Replegar a capability dentro de Web Experience 360 | Commercial + Wave |
-| **G2** | El diagnóstico produce decisión, no informe | Medir ciclo diagnóstico → decisión priorizada | Todos los diagnósticos de G1 | 90 días | ≥70% decide en ≤15 días | Rediseñar el entregable del diagnóstico | Práctica |
-| **G3** | El diseño llega a producción | Verificación visual de lo construido contra lo diseñado | Todos los sprints | 120 días | ≥80% de las superficies llegan a producción en ≤2 ciclos | Obligar composición con Web Experience 360 en todo SOW | Práctica + Engineering |
-| **G4** | La capacidad gobernada es económicamente viable | Costear un envelope real de Design Ops | 1 engagement | 6 meses | Margen ≥ piso aprobado por Finance | Reclasificar Design Ops como Staff Augmentation | Finance |
-| **G5** | La frontera con Globe se sostiene en la venta real | Revisar cada propuesta que mezcle diseño y producción | Todas las del período | 90 días | 0 propuestas con ownership ambiguo | Reabrir la frontera en el ADR | Strategy + Creative Practice |
+| # | Hipótesis | Experimento | Muestra | Ventana | Éxito | Fallo → decisión |
+|---|---|---|---|---|---|---|
+| **G1** | Un equipo de diseño in-house **compra** capacidad externa por lane | Diagnóstico + propuesta de lane a cuentas vivas y pipeline Wave | 8 conversaciones con Head of Design | 90 días | ≥3 Sample Sprints vendidos a 2 clientes distintos | Replegar a capability dentro de Web Experience 360 |
+| **G2** | El Head of Design es el comprador, no el veto | Registrar quién abre, quién impulsa y quién frena cada deal | Todos los de G1 | 90 días | ≥60% impulsado por el Head of Design | Rediseñar el pitch y el interlocutor de entrada |
+| **G3** | La lane devuelve capacidad de forma verificable | Medir capacidad liberada declarada por el cliente | Todos los Sample Sprints | 120 días | El cliente declara haber recuperado capacidad y renueva | Rediseñar el alcance de la lane |
+| **G4** | La capacidad gobernada no deriva a staff augmentation | Auditar dirección de tareas en el QBR | Todos los On-Going | 6 meses | 0 engagements derivados | Reclasificar y repreciar |
+| **G5** | El envelope por lane es económicamente viable | Costear lanes reales contra el piso de 45% | ≥2 lanes distintas | 6 meses | Margen ≥ piso en cada lane | Retirar la lane deficitaria del catálogo |
+| **G6** | La frontera con Globe se sostiene en la venta | Revisar cada propuesta que mezcle diseño y producción | Todas las del período | 90 días | 0 propuestas con ownership ambiguo | Reabrir la frontera en el ADR |
 
-**Gates de estado.** `Proposed → Approved for validation` requiere G1 iniciado y Legal con posición sobre la
-sección 8. `Approved for validation → Commercially approved` requiere G1, G3 y G4 cerrados, más pricing aprobado
-por Finance y el pack de pricing de la familia.
+`Proposed → Approved for validation` requiere G1 iniciado y posición de Legal sobre la sección 9.
+`Approved for validation → Commercially approved` requiere G1, G3, G4 y G5 cerrados, más pricing aprobado por
+Finance.
 
 ---
 
-## 12. Riesgos y self-critique
+## 13. Riesgos y self-critique
 
 | Riesgo | Horizonte | Severidad | Mitigación |
 |---|---|---|---|
-| **Diseño entregado y no implementado** | 12 meses | **Crítico** | Vía de implementación declarada en el SOW; composición obligatoria con Web Experience 360 cuando el cliente no tiene capacidad; verificación visual como criterio de cierre |
-| Canibalización con Web Experience 360 en la venta | 12 meses | Alta | Frontera "decidir vs construir" escrita en ambas fichas; una sola propuesta al cliente con lanes declarados |
-| Confusión con Globe en el mercado | 12 meses | Alta | Invariante de sección 7; guion comercial explícito; G5 |
-| Fuga de margen por rondas | 12 meses | Alta | Rondas numeradas en SOW; decisor único identificado en intake; stop-loss |
-| Dependencia de talento senior escaso | 36 meses | Alta | El sistema y el método deben ser el activo, no la persona; documentación y transferencia como parte del entregable |
-| Commoditización por IA generativa de interfaces | 36 meses | Media-alta | El diferenciador no puede ser producir pantallas — eso ya se automatiza. Debe ser research, sistema, gobierno y verificación. Si el modelo depende de producir pantallas, el modelo está muerto a 36 meses |
-| Servicio percibido como estético y no económico | 12 meses | Media | Toda venta entra por fricción medible, nunca por "se ve antiguo" |
-| Cognitive debt del cliente | 36 meses | Media | Transferencia de capacidad y portabilidad como obligación contractual |
+| 🔴 **El Head of Design lo lee como reemplazo y veta** | 12 meses | **Crítico** | Sección 8 completa; el pitch entra por su promoción, no por nuestra capacidad; él elige qué lanes conserva |
+| 🔴 **Deriva a staff augmentation** | 12 meses | **Crítico** | Lanes completas; Efeonce dirige la ejecución; auditoría en QBR; G4 |
+| Diseño entregado y no implementado | 12 meses | Alta | Vía de implementación declarada; composición con Web Experience 360; verificación visual como criterio de cierre |
+| **Superside y las suscripciones entran a product design** | 12–36 meses | Alta | Ya publican sobre escalar capacidad de product design. La defensa no es precio: es criterio, memoria y accountability medida |
+| Fuga de margen por rondas | 12 meses | Alta | Rondas numeradas; owner de aprobación en intake; stop-loss |
+| Canibalización con Web Experience 360 | 12 meses | Media-alta | Frontera "decidir vs construir"; una sola propuesta con lanes declaradas |
+| Confusión con Globe | 12 meses | Media-alta | Invariante de sección 7; guion comercial; G6 |
+| Dependencia de talento senior escaso | 36 meses | Alta | El sistema y el método deben ser el activo, no la persona |
+| Commoditización por IA generativa de interfaces | 36 meses | Media-alta | Producir pantallas ya se automatiza. Si el modelo depende de producir pantallas, está muerto a 36 meses. El diferenciador tiene que ser research, sistema, gobierno y verificación |
 
-### Autocrítica honesta del modelo
+### Autocrítica
 
-1. **La evidencia es propia.** Todo lo que podemos mostrar hoy lo construimos para nosotros. Es evidencia sólida de
-   capability y evidencia nula de demanda. G1 existe justamente porque este modelo podría estar describiendo un
-   servicio que Efeonce sabe hacer y que nadie está pidiendo comprar por separado.
-2. **La sexta familia agrega superficie comercial que hay que sostener.** Wave tenía cinco familias y una historia
-   limpia. Seis es más difícil de contar. Si G1 falla, replegar a capability dentro de Web Experience 360 es la
-   decisión correcta y no debe leerse como fracaso.
-3. **La frontera con Globe es más frágil en la venta que en el papel.** En una reunión real, "diseño" significa
-   ambas cosas para el cliente. La frontera se sostiene con guion comercial, no con un invariante en un documento.
-4. **El nombre puede no resistir el mercado.** "Product design" en Chile y LATAM puede leerse como diseño
-   industrial. Es una decisión abierta, no una decisión tomada.
+1. **La evidencia sigue siendo propia.** Todo lo que podemos mostrar lo construimos para nosotros. Es evidencia
+   sólida de capability y **nula de demanda**. G1 existe porque este modelo podría describir un servicio que
+   Efeonce sabe hacer y que nadie está pidiendo comprar por separado.
+2. **Los comparables de costo tienen sesgo de proveedor** y son de EE.UU. Frente a un comprador chileno, la
+   aritmética de "contratar vs externalizar" todavía no está hecha con datos locales. Usarla tal cual es un riesgo
+   de credibilidad, no un argumento.
+3. **La frontera con Globe es más frágil en la venta que en el papel.** En una reunión real "diseño" significa
+   ambas cosas. Se sostiene con guion comercial, no con un invariante en un documento.
+4. **La sexta familia agrega superficie comercial que hay que sostener.** Si G1 falla, replegar a capability dentro
+   de Web Experience 360 es la decisión correcta y no debe leerse como fracaso.
+5. **El nombre puede no resistir el mercado.** "Product design" en LATAM puede leerse como diseño industrial.
 
 ---
 
-## 13. Decisiones abiertas y revisit triggers
+## 14. Decisiones abiertas y revisit triggers
 
-| # | Decisión abierta | Owner | Revisit trigger |
+| # | Decisión | Owner | Revisit trigger |
 |---|---|---|---|
-| D1 | **Nombre público de la familia.** "Product Design 360" es el término que usa Efeonce internamente y el que usó el operador al pedir este modelo; no está validado contra mercado LATAM, donde puede leerse como diseño industrial | Strategy + Commercial | Antes de cualquier material público |
-| D2 | ¿Design System se vende como línea propia o siempre dentro de otro engagement? | Wave + Commercial | Al segundo cliente que lo pida suelto |
-| D3 | Piso de margen propio de la familia (hoy se adopta el 45% de la práctica creativa como provisional) | Finance | Al cerrar G4 |
+| D1 | **Nombre público de la familia** y de la ruta comercial *(hoy: "Design Velocity", en paralelo a Creative Velocity)* | Strategy + Commercial | Antes de cualquier material público |
+| D2 | ¿L1 Feature Delivery se ofrece sola alguna vez, o queda siempre acompañada? | Wave + Commercial | Al primer cliente que pida sólo overflow |
+| D3 | Piso de margen por lane; hoy se aplica el 45% transversal | Finance | Al cerrar G5 |
 | D4 | ¿El diseño de experiencias conversacionales/agénticas vive acá o en Agent Systems & Platforms? | Wave + Product | Al primer engagement que lo requiera |
-| D5 | Modelo de transferencia de IP del design system cuando conviven marcas del cliente y componentes de Efeonce | Legal | Antes del primer build de design system |
-| D6 | ¿Se aprueba la sexta familia en el ADR de Wave, o se repliega a capability de Web Experience 360? | Strategy + Leadership | Al cerrar G1 |
+| D5 | Transferencia de IP del design system cuando conviven marcas del cliente y componentes de Efeonce | Legal | Antes del primer build |
+| D6 | ¿Se aprueba la sexta familia en el ADR de Wave, o se repliega a capability? | Strategy + Leadership | Al cerrar G1 |
+| **D7** | **Loaded cost local: cuánto cuesta de verdad un senior product designer en Chile con cargas** — sin esto la aritmética de displacement no es usable frente a un comprador chileno | Finance + Commercial | Antes de la primera propuesta a un cliente chileno |
+| D8 | ¿Efeonce ofrece `Fully Managed Design Capacity` (absorber equipo, licencias, contratación) como configuración? | Leadership + Finance + Legal | Si un cliente lo solicita |
 
 ---
 
-## 14. Fuentes y trazabilidad
+## 15. Fuentes y trazabilidad
 
-**Decisiones y arquitectura**
+### Comparables de mercado — product design (verificados 2026-09-10)
 
-- [`ADR — Wave como productora de ingeniería digital, visibilidad y sistemas de agentes`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md) — `Accepted direction` 2026-07-25; define las cinco familias vigentes y el boundary con Globe
-- [`Wave Business Model V1`](../wave/WAVE_BUSINESS_MODEL_V1.md)
-- [`Efeonce Product Service Operating Model V1`](../EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md)
-- [`Efeonce Engagement–Project Operating Model V1`](../EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md)
-- [`Operator & Buying Group Registry V1`](../OPERATOR_BUYING_GROUP_REGISTRY_V1.md)
-- [`Efeonce Operator-First Product & Growth Contract V1`](../../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md)
+| Afirmación | Dato | Fuente | as-of | Confianza |
+|---|---|---|---|---|
+| Senior product designer (US) | Mediana **~USD 185k/año**; senior product designer USD 160k–300k+ en total comp | [Untitled UI](https://www.untitledui.com/blog/ux-designer-salaries) · [KORE1](https://www.kore1.com/ux-designer-salary-guide/) | 2026 | Media-alta |
+| Costo cargado real | **1,4×–2,4× el sueldo base** → ~USD 186k–239k el primer año sobre un hire de USD 120k, con beneficios, reclutamiento y rampa | [you-source](https://www.you-source.com/blogs/cost-to-hire-ux-designer-2026) | 2026 | **Media — fuente proveedor** |
+| Contractor senior embebido (US) | **USD 80–135/hora** | [A.Team](https://www.a.team/talent/guides/product-designer-rates) | 2026 | **Media — fuente proveedor** |
+| Design lead fraccional | **USD 5.000–12.000/mes** | [925 Studios](https://www.925studios.co/blog/alternatives-to-hiring-in-house-designer-2026) | 2026 | **Media — fuente proveedor** |
+| Suscripción de diseño | **USD 399–999/mes** — ⚠️ es diseño gráfico/marketing, **no product design** | [NoLimit Creatives](https://nlc.com/university/in-house-vs-subscription-cost) | 2026 | Media |
+| Ratio diseñador:ingeniero | **~1:4** en etapa temprana; **1:2 o 1:1** en equipos maduros con UI compleja | [Awesomic](https://www.awesomic.com/blog/guide-how-to-structure-your-design-team-in-2024) | 2026 | Media |
+| Estructura enterprise (50+) | Incluye design ops, squads de research, equipos de design system y accessibility owners | [The Design System Guide](https://learn.thedesignsystem.guide/p/design-systems-team-structure-in) | 2026 | Media |
+| Señal de capacidad agotada | Backlog de **6+ meses** de solicitudes de componentes; sprints bloqueados por diseño faltante; inconsistencias de UX creciendo | [The Design System Guide](https://learn.thedesignsystem.guide/p/design-systems-team-structure-in) · [Superside](https://www.superside.com/blog/scale-product-design-capacity) | 2026 | Media |
+| Deuda de diseño | **10–20%** de la capacidad de sprint sostenida; **~75%** de los equipos la ve volver al backlog sin tracking | [Figr](https://figr.design/blog/how-to-reduce-design-debt) | 2026 | Media |
+| Señal competitiva | **Superside ya publica sobre escalar capacidad de product design** — se está moviendo a este terreno | [Superside](https://www.superside.com/blog/scale-product-design-capacity) | 2026 | Alta |
 
-**Evidencia de capability interna** (verificada 2026-09-10)
+⚠️ **Sesgo declarado.** Varias de estas fuentes son proveedores de outsourcing con interés en que contratar se vea
+caro. Direccionalmente útiles; **no neutrales**. Antes de una propuesta hay que rehacer el cálculo con el loaded
+cost del mercado del comprador *(D7)*. Los rangos son de EE.UU.; **nunca mezclar monedas ni mercados en la misma
+lámina**.
 
-- `docs/architecture/ui-platform/` — contratos de primitives, patrones, estado, motion y gobierno
-- `docs/architecture/agent-invariants/UI_PLATFORM_AGENT_INVARIANTS.md`
-- `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md` — scorecard y piso de calidad
-- `docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md` — verificación visual (GVC)
-- `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` y `DESIGN.md` — AXIS
-- `src/config/role-codes.ts` — `designer` como rol formal de la organización
+### Proxy adyacente — in-housing creativo
 
-**Skills que gobiernan la ejecución**
+**82%** de los miembros de ANA tiene in-house agency (vs 58% en 2013); son **5× más** propensos a decir que se
+está in-housing más que nunca; **53%** quiere que su in-house sea socio estratégico upstream; su dolor declarado
+es **talento y energía creativa**, no falta de proveedores.
+Fuente: [ANA](https://www.ana.net/content/show/id/79185) · [Marketing Dive](https://www.marketingdive.com/news/in-house-agency-trend-gain-steam-ana/649681/), as-of 2025–2026, vía `creative-practice/SOURCES.md`.
+⚠️ **Es in-house de *marketing creativo*, no de product design.** Sostiene la dirección de la tesis; no es
+evidencia directa de este mercado.
 
-`greenhouse-ai-design-studio` (orquestador) · `product-design-loop` · `design-studio` · `greenhouse-ux` ·
-`modern-ui` · `typography-design` · `a11y-architect` · `design-system-governance` · `greenhouse-ux-writing`
+### Doctrina y decisiones internas
 
-**Costos y economía**
+- Skill [`creative-practice`](../../../.claude/skills/creative-practice/SKILL.md) — verdades (b) in-housing y (c) el comparable real; `modules/09_DISPLACEMENT.md`; `modules/03_OFERTA.md` §2.1 Managed Squad ≠ Staff Augmentation; regla del piso 45% y del gobierno que no se descuenta
+- [`Creative Velocity — Modular Production Addendum V1`](../../services/creative-services/EFEONCE_CREATIVE_VELOCITY_MODULAR_PRODUCTION_ADDENDUM_V1.md) — el patrón de ruta de velocidad que este modelo replica en product design
+- [`ADR Wave Portfolio Boundaries`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md) · [`Wave Business Model V1`](../wave/WAVE_BUSINESS_MODEL_V1.md)
+- [`Product Service Operating Model V1`](../EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md) · [`Engagement–Project Operating Model V1`](../EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md)
+- [`Operator & Buying Group Registry V1`](../OPERATOR_BUYING_GROUP_REGISTRY_V1.md) · [`Operator-First Product & Growth Contract V1`](../../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md)
 
-- `docs/architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md`
-- Piso de margen provisional: invariante de la skill `creative-practice`
+### Capability interna verificable (2026-09-10)
+
+`docs/architecture/ui-platform/` · `docs/architecture/agent-invariants/UI_PLATFORM_AGENT_INVARIANTS.md` ·
+[`Premium UI Delivery Standard V1`](../../ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md) ·
+[`Frontend Capture Helper V1`](../../architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md) ·
+[`Design Tokens V1`](../../architecture/GREENHOUSE_DESIGN_TOKENS_V1.md) · `src/config/role-codes.ts` (`designer`)
+
+### Costos
+
+[`Member Loaded Cost Model V1`](../../architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md) · motor de pricing
+`src/lib/finance/pricing/pricing-engine-v2.ts` · piso de margen 45% (`creative-practice`, aprobado 2026-07-13)
 
 **Fecha de verificación de este documento:** 2026-09-10.
