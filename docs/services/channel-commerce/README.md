@@ -81,13 +81,13 @@ No cambia:  que Efeonce opera, decide y responde.
 
 ---
 
-## Los dieciocho servicios
+## Los veintitrés servicios
 
 Agrupados como los nombra el mercado chileno —trade marketing y BTL— y no por nuestra taxonomía interna. La oferta
-es completa desde el primer contrato: **Efeonce opera los dieciocho siempre**; lo que cambia por fase es quién
+es completa desde el primer contrato: **Efeonce opera los veintitrés siempre**; lo que cambia por fase es quién
 pone las manos en cada capa.
 
-### Trade marketing — lo continuo, lo que pasa en la góndola todo el año
+### Trade marketing — lo continuo, lo que pasa en la góndola todo el año  ·  13 servicios
 
 | § | Servicio | Qué compra el cliente | Momento | Unidad |
 |---|---|---|---|---|
@@ -99,8 +99,13 @@ pone las manos en cada capa.
 | **T6** | **Anaquel Digital y Visibilidad en IA** | Cómo se ve su producto en cada ficha de retailer y si la IA lo recomienda | Expansión | Según owner |
 | **T7** | **Retail Media y Commerce** | Operar su inversión en las redes de las cadenas, leída junto a la góndola | Expansión | Según owner |
 | **T8** | **Diseño y Medición de Promociones** | Si la promoción vendió de más o canibalizó margen; incluye concursos y sorteos | Avanzado | Proyecto por ola |
+| **T9** | **Estándar de Tienda Perfecta** | Definir qué significa "bien ejecutado" por canal y formato, antes de medir | Entrada consultiva | Proyecto cerrado |
+| **T10** | **Arquitectura de Distribución y Cobertura** | Dónde está, dónde no está y qué vale cada punto que falta | Entrada o expansión | Proyecto por zona |
+| **T11** | **Integración de Datos de Canal** | Sell-in, sell-out y ejecución leídos juntos en un solo lugar | Infraestructura | Implementación + operación |
+| **T12** | **Capacitación de Fuerza de Venta del Canal** | Que quien vende su producto y no trabaja para él sepa venderlo | Expansión | Programa por ola |
+| **T13** | **Gestión de Categoría** | Hablarle al retailer en el idioma de la categoría, no en el de su marca | Avanzado, condicionado | Proyecto por categoría |
 
-### BTL — lo episódico, lo que pasa en momentos
+### BTL — lo episódico, lo que pasa en momentos  ·  9 servicios
 
 | § | Servicio | Qué compra el cliente | Dónde ocurre | Unidad |
 |---|---|---|---|---|
@@ -119,6 +124,11 @@ pone las manos en cada capa.
 | § | Servicio | Qué compra el cliente | Unidad |
 |---|---|---|---|
 | **X1** | **Contenido y Material de Canal** | Material a escala —fichas, catálogos, PDP, kits, adaptaciones por cadena— y el contenido derivado de cada activación | Capacidad gobernada |
+
+> **El catálogo es amplio; la conversación no.** Veintitrés servicios son la capacidad de la línea, no la agenda
+> de la primera reunión. Se entra por una puerta —T1, T2, T5, T9 o T10 según el trigger— y el resto aparece cuando
+> el cliente lo pide o la evidencia lo justifica. Presentar el catálogo completo en la primera conversación
+> dispersa y transmite que no se entendió el problema.
 
 ### Lo que hace distinta esta oferta BTL
 
@@ -149,6 +159,11 @@ pass-through. No nos convertimos en productora.
 | Ferias con caja de tarjetas | Las **tres semanas siguientes** | B8 |
 | Inversión en retail media creciendo | **Leerla junto con la góndola** de esa misma cadena | T6 y T7 |
 | Varias agencias por canal o país | Un **estándar común** para compararlas | T5 |
+| Un puntaje de ejecución que no lo deja decidir | Que el **estándar esté bien definido** antes de medir | T9 |
+| Foco sólo en las tiendas donde ya está | Saber **dónde no está y qué vale** | T10 |
+| Sell-in en el ERP y sell-out en planillas sueltas | Las tres verdades **leídas juntas** | T11 |
+| Vendedores del distribuidor que no conocen el producto | Capacitación **medida contra control** | T12 |
+| Negociar espacio marca por marca | Proponer **cómo se ordena la categoría** | T13 |
 
 > **T6 y T7 son la razón de ser de la línea.** El [benchmark](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
 > y las [battlecards](../../audits/commercial/CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md) confirman que ningún
@@ -349,6 +364,121 @@ producto; reviews; share of shelf digital; y visibilidad de la marca y sus produ
 
 **Ownership.** El motor y la metodología de visibilidad pertenecen a **Wave / Search Visibility 360**. Channel &
 Commerce lo compone y lo traduce a decisión de canal. RACI explícito en cada propuesta.
+
+---
+
+## T9 · Estándar de Tienda Perfecta
+
+**Promesa.** Definir qué significa "bien ejecutado" en tu categoría, por canal y por formato, antes de salir a
+medir nada.
+
+**Por qué va antes que T3.** Un puntaje de ejecución sin un estándar acordado es una opinión con decimales. Si no
+está definido cuántos frentes corresponden en un supermercado versus un almacén de barrio, qué material va en cada
+formato y qué surtido es obligatorio por cadena, no hay contra qué comparar.
+
+**Alcance incluido.** Definición del estándar por canal, formato y cadena: surtido obligatorio y deseable, frentes,
+ubicación, precio de referencia, material y exhibición adicional; ponderación de cada variable según su impacto en
+venta; y el modelo de puntaje resultante, documentado y acordado con el cliente.
+
+**Excluido.** Negociación del espacio con la cadena; imposición del estándar a terceros; y garantía de que el
+estándar se cumpla — eso es lo que T3 mide y T4 corrige.
+
+**Cuándo se vende solo.** Marcas que ya miden pero cuyo reporte no las deja decidir, porque el estándar nunca se
+definió bien. Es una entrada consultiva de alto margen y bajo consumo de capital.
+
+**Unidad (hipótesis).** Proyecto cerrado por categorías × canales × cadenas.
+
+---
+
+## T10 · Arquitectura de Distribución y Cobertura
+
+**Promesa.** Dónde estás, dónde no estás y dónde deberías estar.
+
+**El problema real.** La conversación de canal se concentra en las tiendas donde la marca ya está. La pregunta más
+cara es la otra: cuántos puntos de venta de tu categoría existen en tu zona, en cuántos estás presente, y qué vale
+cada uno de los que faltan. En canal tradicional eso casi nunca está mapeado.
+
+**Alcance incluido.** Universo de puntos de venta relevantes por zona y tipo; cobertura actual versus potencial;
+rendimiento comparado por distribuidor y por zona; identificación de brechas de cobertura y su valor estimado; y
+recomendación de dónde abrir, dónde profundizar y dónde retirarse.
+
+**Excluido.** Negociación con distribuidores; alta de nuevos puntos; logística; y cualquier promesa de crecimiento
+de cobertura.
+
+**Por qué encaja con lo demás.** El canal tradicional es el punto ciego declarado del mercado. Es el servicio que
+más se apoya en la red de captura y el que más justifica un ciclo recurrente después.
+
+**Unidad (hipótesis).** Proyecto por zona y categoría, con opción de actualización periódica.
+
+---
+
+## T11 · Integración de Datos de Canal
+
+**Promesa.** Sell-in, sell-out y ejecución leídos juntos, en un solo lugar.
+
+**El problema real.** El sell-in vive en el ERP, el sell-out llega en planillas de distribuidores y cadenas con
+formatos distintos, y la ejecución vive en otro reporte. Nadie los cruza, y las tres verdades se contradicen entre
+sí sin que se pueda determinar cuál está mal.
+
+**Alcance incluido.** Levantamiento de las fuentes disponibles y su calidad real; normalización de formatos y
+maestros de producto y cliente; consolidación en una lectura única; y el tablero de decisión que cruza las tres
+capas más la inversión digital cuando existe.
+
+**Excluido.** Reemplazar el ERP o el BI del cliente; obtener data que el distribuidor o la cadena no quiera
+entregar —eso se declara como límite, no se promete—; y licencias de data de terceros.
+
+**Ownership.** Wave · Measurement & Analytics. Channel & Commerce aporta el modelo de canal y el esquema de
+scoring.
+
+**Por qué importa más de lo que parece.** Es el puente entre la góndola y lo digital, y por lo tanto la
+infraestructura de T6 y T7. Sin esto, la conexión física-digital se hace a mano cada ciclo.
+
+**Unidad (hipótesis).** Implementación cerrada + operación recurrente.
+
+---
+
+## T12 · Capacitación de Fuerza de Venta del Canal
+
+**Promesa.** Que quien vende tu producto y no trabaja para ti sepa venderlo.
+
+**Cuándo aplica.** Distribución indirecta donde el vendedor del distribuidor, el reponedor de la cadena o el
+dependiente del local decide qué recomendar. Categorías con especificación técnica, portafolio amplio o
+diferenciación que no se ve en el envase.
+
+**Alcance incluido.** Diagnóstico de brechas de conocimiento; diseño del contenido de capacitación; ejecución
+presencial o remota; evaluación de aprendizaje; y medición de si el punto capacitado se comporta distinto del que
+no lo fue.
+
+**Excluido.** Incentivos monetarios al vendedor —eso es T8—; y responsabilidad sobre la relación laboral de
+personas que no son de Efeonce ni del cliente.
+
+**La diferencia.** La capacitación de canal se suele vender por asistentes. Acá se mide comparando el desempeño de
+los puntos capacitados contra un grupo de control, igual que una activación.
+
+**Unidad (hipótesis).** Programa por ola de capacitación.
+
+---
+
+## T13 · Gestión de Categoría  ·  *avanzado, condicionado*
+
+**Promesa.** Hablarle al retailer en su idioma: el de la categoría completa, no el de tu marca.
+
+**Cuándo aplica.** Marcas con posición relevante en su categoría que quieren pasar de negociar espacio a proponer
+cómo se ordena el anaquel. Es la conversación que cambia la relación con la cadena.
+
+**Alcance incluido.** Lectura del árbol de decisión del shopper en la categoría; análisis de surtido, espacio y
+rentabilidad por segmento; propuesta de planograma y de rol de la categoría; y el argumento con el que la marca
+sostiene esa propuesta ante el retailer.
+
+**Excluido.** Representar a la marca ante la cadena; garantizar que el retailer adopte la propuesta; y cualquier
+recomendación que favorezca a la marca en contra del desempeño de la categoría — eso destruye la credibilidad que
+este servicio necesita.
+
+**Condición dura.** Requiere data de categoría de calidad, sea del retailer o de panel licenciado. **Sin esa data
+no se vende**, porque una propuesta de categoría basada sólo en la marca propia la desarma cualquier comprador de
+la cadena en cinco minutos.
+
+**Unidad (hipótesis).** Proyecto por categoría y cadena.
 
 ---
 
