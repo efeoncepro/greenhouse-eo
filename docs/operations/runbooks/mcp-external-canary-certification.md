@@ -1,10 +1,12 @@
 # Runbook técnico — certificación MCP con canary externo eliminable
 
-> TASK-1832 · owner: Identity + MCP Platform · estado al 2026-09-07: **rollout productivo en observación**.
+> TASK-1832 · owner: Identity + MCP Platform · estado al 2026-09-10: **rollout productivo con retiro
+> operativamente bloqueado**.
 > Corrida activa `task-1832-canary-20260906-a`; helper, Playwright, Codex, ChatGPT hospedado, Claude Code
 > `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` están verdes. Code y web renovaron post-TTL sin widening;
 > Desktop ejecutó desde la app nativa sobre el conector remoto. La matriz y el manifiesto acreditan el runtime;
-> este runbook define el procedimiento.
+> este runbook define el procedimiento. La muestra más reciente tiene `refresh_reuse` nuevo sobre un CIMD
+> compartido y el cleanup actual no puede retirar sus hijos canary sin poner en riesgo otros sujetos.
 
 ## Objetivo y frontera
 
@@ -227,6 +229,12 @@ mínima: el apply también exige siete días estables, precondiciones de retiro 
    presume ownership. En cambio, los hijos OAuth de un DCR correctamente marcado siguen el ownership del
    cliente aunque un diagnóstico haya usado otro sujeto: se eliminan por `client_id` sin borrar la sesión ni la
    identidad compartida de ese sujeto.
+   Si un sujeto canary usó además un cliente compartido, el planner, el delete y el readback deben llevar dos
+   conjuntos separados. El DCR run-owned conserva el borrado client-scoped; el cliente shared permanece y sólo
+   se eliminan sus filas con `environment_id` y `subject` canary exactos, más `binding_id` en contexts. El
+   readback debe confirmar que el cliente y los hijos de otros sujetos siguen presentes. La implementación
+   vigente al 2026-09-10 aún no hace esta partición: `oauth_client_not_run_owned` bloquea de forma segura y no
+   se debe retirar, allowlistear ni eludir antes de implementar y probar el contrato completo.
 6. El mismo transaction relee organización, registro, bindings, perfiles, links y todos los artefactos
    auth/OAuth anteriores; cualquier conteo distinto de `0` hace rollback.
 7. Releer aparte superficies 360 y actualizar el manifiesto a `deleted` sólo cuando todo el inventario run-owned
@@ -246,6 +254,11 @@ El apply se niega sin mutar cuando aparece cualquiera de estos estados:
 - FK nueva/no inventariada con conteo positivo;
 - rol DB distinto de migrator;
 - readback final distinto de cero.
+
+Para la corrida activa, `oauth_client_not_run_owned` corresponde al CIMD compartido de Codex. No se resuelve
+marcándolo run-owned: requiere cleanup sujeto-específico y una prueba que preserve el mismo cliente y sus otros
+sujetos. Los eventos `refresh_reuse` nuevos de ese CIMD también rompen el steady hasta quedar atribuidos a
+familias redactadas y contenidas.
 
 Se registra el blocker exacto en el manifiesto y se resuelve mediante el owner del dominio. Nunca se busca ni
 borra por nombre, correo, fecha aproximada o prefijo.

@@ -1,7 +1,9 @@
 # Binding de Identidad Externa para el MCP
 
-> **Estado 2026-09-07:** binding/login/token nativos operativos. TASK-1832 mantiene un canary externo sintético,
-> no comercial y eliminable; el primer cliente real continúa separado en TASK-1841.
+> **Estado 2026-09-10:** binding/login/token nativos operativos. TASK-1832 mantiene un canary externo sintético
+> y no comercial; su retiro está bloqueado hasta diagnosticar refresh reuse en un CIMD compartido e implementar
+> cleanup sujeto-específico que preserve el cliente y sus otros usuarios. El primer cliente real continúa
+> separado en TASK-1841.
 
 ## Frontera con el acceso corporativo
 
@@ -69,6 +71,11 @@ Cada corrida comienza con un manifiesto que registra los IDs antes del primer wr
 fases: primero se revoca authority; después un cleanup con censo dinámico de FKs borra únicamente el grafo
 run-owned si `unexpected_refs=0`. Audit/outbox se conservan desacoplados y el estado `deleted` sólo se declara con
 readback cero. Detalle operativo: [certificar un cliente MCP con canary sintético](../../manual-de-uso/identity/certificar-cliente-mcp-con-canary-sintetico.md).
+
+Si una persona canary usa un cliente OAuth compartido, ese cliente nunca pasa a ser run-owned. Los DCR de la
+corrida se borran completos por `client_id`; para el shared sólo se pueden retirar filas del environment y
+sujeto canary exactos, preservando el cliente y los otros sujetos. Al 2026-09-10 el helper todavía no implementa
+esa partición y bloquea correctamente el apply con `oauth_client_not_run_owned`.
 
 > Detalle técnico: ADR de federación [EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md](../../architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md);
 > dominio en `src/lib/identity/external-access/` (`index.ts`, `types.ts`, `commands.ts`, `store.ts`,

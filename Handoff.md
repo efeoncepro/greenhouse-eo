@@ -1,5 +1,20 @@
 # Handoff activo
 
+**TASK-1604 (2026-09-10, in-progress):** slice SEO/Arte aplicado y documentado. Seis competencias activas,
+nueve preguntas SEO en `sme_review`, cero templates del pack, cero policies y cero assessments. Las vacantes
+`EO-OPN-0674` y `EO-OPN-0675` fueron publicadas por un acto separado y sus rutas responden 200; publicación no
+equivale a pack activo. El CLI ahora exige las preguntas exactas del pack y coincidencia exacta antes de
+reutilizar un template. Pendiente: SME individual, template SEO, binding scorecard Arte y Quality Gate.
+
+**TASK-1832 (readback 2026-09-10T12:17Z): operativamente bloqueada para retiro.** Frontera canary sana
+(`1/1`, purpose drift `0/0`, dos profiles run-owned fuera de Person 360), pero
+`auth.oauth.refresh_reuse_detected=93/24h` sobre el CIMD compartido de Codex. Cleanup dry-run, sin apply:
+`unexpectedRefs=0`, `deletionReady=false` y blockers
+`registration_active|active_authority|active_auth|oauth_client_not_run_owned`. El CIMD tiene 8 artefactos de
+sujetos canary y 35 de otros sujetos; el helper vigente borra por `client_id`. No retirar el blocker ni ejecutar
+`--apply`: implementar planner/delete/readback sujeto-específicos, preservar cliente/hijos ajenos, diagnosticar
+las familias de refresh y recién después reiniciar steady/retirar desde `delete_after`.
+
 **Social Efeonce, 09/09:** [13 piezas y skills](docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
 Pendiente: conciliar MET-2339–2342 tarea/calendario. Producción abierta; cierre documental sin cambios Notion.
 
@@ -43,41 +58,10 @@ matriz de clientes; sin widening ni cambios Entra. Multi-org queda en TASK-1844/
 [Task](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md) ·
 [auditoría](docs/audits/mcp/TASK-1813_OAUTH_HARDENING_QA_2026-09-07.md).
 
-**TASK-1832 — canary productivo en observación; retiro después del 2026-09-13 19:43Z (Codex,
-2026-09-07):** release Greenhouse `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` `released`;
-Vercel/auth-server `00043-ndg` sirven `fb5fc082aa92`; gateway `1.2.0`/`00047-8b5` está 100 % Ready. Gates ON,
-MCP v2 `2.0.0` y CI/deploy verdes. Readback `2026-09-07T12:20:25Z`: Ready/100 %, SHA alineados con
-`origin/main`, health/metadata 200, MCP anónimo 401, producción ON y Vercel staging OFF; cero mutaciones.
-
-ChatGPT hospedado está verde con scope único `efeonce.mcp.read`, dos tools read-only y refresh post-TTL sin
-widening; Codex, correo, passkeys, Playwright y negativas siguen verdes. Claude Code `2.1.263`, Claude.ai y
-Desktop `1.46388.4` completaron login/consentimiento, lectura y renovación base-only; `2.1.186` queda como
-baseline histórico fallido. La matriz técnica de clientes está completa.
-
-Muestra read-only `2026-09-07T12:09:54Z`: registro/binding `1/1`, drift `0/0`, sólo 2 perfiles run-owned,
-cero Person 360, `activeAuthCount=56`, `unexpectedRefs=0` y blockers esperados. Nueve señales están `ok`; los
-seis `refresh_reuse` son negativos inventariados, run-owned y sin eventos nuevos. No hubo apply.
-No ejecutar `--apply` antes de
-`2026-09-13T19:43:30Z`; entonces cortar authority, medir deny, exigir `deletionReady=true`, aplicar con el xcr
-exacto, releer cero y apagar ambos gates. La automatización diaria sólo retira desde esa fecha con precondiciones
-verdes. Fuente viva: `docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md` y matriz
-MCP del mismo directorio. El incidente staging que apagó el Cloud Run compartido quedó resuelto: variable
-GitHub única ON, Vercel staging OFF y build `dpl_D9mkjQLE1a26H4TXQ2HX7wXWMpLf` READY.
-
-**Excepción operativa resuelta; rollout autorizado:** `pnpm pg:connect:migrate` se usó por error como comando de proxy y
-aplicó las dos migraciones aunque la aprobación excluía el apply. Readback 18:49:53Z: `registrations=0`,
-`canary_bindings=0`, drift de purpose externo/interno=0, 30 perfiles `smoke_test` preservados y 0 visibles en
-Person 360. No se crearon organización, cuentas, invitaciones, grants, sesiones, consentimientos o tokens; no se
-configuraron flags, no hubo push/deploy. Evidencia:
-`docs/audits/mcp/TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md`. El operador decidió conservar el schema y autorizó
-el rollout completo el 2026-09-06: commit/push, promoción, deploys, gates, fixture dedicado, buzones controlados,
-sesiones, revocación y cleanup. El alcance sigue limitado a una organización sintética read-only; clientes y
-writes permanecen fuera.
-
-**Readback histórico TASK-1832 (2026-09-06 14:57Z; supersedido por 18:49Z):** la
-[auditoría previa](docs/audits/mcp/TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md) conserva los
-30 perfiles sintéticos entonces visibles en Person 360 y los seis smokes sin entrega real M365/Google.
-`EO-ORG-0050` sigue descartada como fixture: su historia impide eliminarla sin destruir evidencia.
+**Historia TASK-1832 2026-09-06/07:** releases, clientes, correo, passkeys, observaciones y la excepción de
+migración están preservados en la [task](docs/tasks/in-progress/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md)
+y el [manifiesto](docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md); no repetir
+sus snapshots aquí.
 
 **TASK-1835 (EPIC-044 U06) — `COMPLETE` y EN PRODUCCIÓN 2026-09-06 (Claude greenhouse-eo-06, 2026-09-06;
 commits `85c67e97d` · `4eb358d5b` · `b15b1690e`).** Efeonce ID queda enterprise-ready en local. Tres hallazgos que

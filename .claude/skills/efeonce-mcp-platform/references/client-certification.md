@@ -18,8 +18,13 @@ demás.
 
 - DCR público del canary: `software_id=run_id`, callback exacto, PKCE S256, allowlist base; es run-owned.
 - CIMD o client ID compartido por un vendor: es shared. Nunca se borra ni se reclama como propiedad de la corrida.
-- El cleanup borra hijos del DCR run-owned por `client_id`; no debe barrer un cliente compartido por sujeto,
-  correo o fecha. Todo cliente no marcado bloquea el apply.
+- El cleanup borra el DCR run-owned y todos sus hijos por `client_id`, incluso si una prueba errónea usó otro
+  sujeto. Para un cliente shared conserva el cliente y los hijos ajenos; sólo puede borrar artefactos con
+  environment/sujeto canary exactos, y contextos ligados al binding exacto.
+- Al 2026-09-10 la implementación aún no separa esos conjuntos. `oauth_client_not_run_owned` bloquea el apply
+  porque retirarlo dejaría al helper borrar hijos de otros sujetos por `client_id`. No lo allowlistees ni marques
+  el CIMD como run-owned: primero parte planner/delete/readback, añade una comprobación de preservación del
+  cliente/hijos ajenos y prueba ambos caminos. Hasta entonces, no hay cleanup seguro aunque venza la ventana.
 
 ## Discovery después de TASK-1813
 
@@ -87,6 +92,9 @@ conserva PKCE, callbacks, anti-SSRF, auth method y allowlist de scopes. Canon: c
 
 ## ChatGPT, Codex y superficie
 
+- El gateway `efeonce-mcp` `1.4.0` fija `@modelcontextprotocol/server`, `node` y `fastify` `2.0.0`; el registro
+  npm seguía publicando `2.0.0` como latest al 2026-09-10. No usa el SDK monolítico v1 en mantenimiento ni está
+  atrasado frente a esos paquetes oficiales.
 - En ChatGPT verifica la app importada, el catálogo filtrado, una llamada real y refresh post-TTL. La ausencia de
   `offline_access` no es éxito ni bloqueo por sí sola: manda la renovación observada.
 - En Codex un `ERR_BLOCKED_BY_CLIENT` después del callback puede ser sólo cierre visual. Exige confirmación del CLI

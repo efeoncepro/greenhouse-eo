@@ -156,6 +156,9 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### HR y Nomina
 
+- [Pack de evaluación SEO/Arte TASK-1604](hr/task-1604-seo-art-assessment-pack.md) — instrumentos versionados,
+  pesos, evidencia y gates SME para SEO Specialist Senior y Director(a) de Arte Senior; las vacantes pueden
+  estar publicadas mientras el pack sigue sin policy, template runtime ni assessments.
 - [Jornadas y horarios distribuidos](hr/jornadas-y-horarios-distribuidos.md) — calculo funcional de horas efectivas y colacion para jornadas chilenas de 42, 30 y 20 horas, con equivalencias fechadas para España, Colombia y Nicaragua; una conversion no modifica contratos ni valida por si sola otra jurisdiccion.
 
 - [Guía de autoría de preguntas de assessment (SME)](hr/assessment-question-authoring-guide.md) — work-sample-first, anatomía de una buena pregunta, rúbricas contestables, sesgos prohibidos y el flujo draft→revisión SME→activación; incluye la matriz de cobertura vigente.

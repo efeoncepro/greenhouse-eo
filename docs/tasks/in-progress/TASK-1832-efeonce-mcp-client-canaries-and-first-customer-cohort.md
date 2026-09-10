@@ -1,5 +1,27 @@
 # TASK-1832 — Efeonce MCP Synthetic External Canaries and Client Compatibility Certification
 
+## Delta 2026-09-10 — observación no steady y cleanup bloqueado por CIMD compartido
+
+La lectura viva del 2026-09-10T12:17Z conserva la frontera correcta: un registro y un binding canary activos,
+drift de purpose externo/interno `0/0`, dos perfiles de esta corrida `smoke_test` fuera de Person 360,
+organización `other|disqualified|inactive` y un solo grant read-only activo. Las nueve señales de
+binding/invitación, code reuse y CIMD rechazado están en `ok`.
+
+No se puede afirmar una ventana steady. `auth.oauth.refresh_reuse_detected` reportó `93` eventos en 24 horas
+para el cliente CIMD compartido de Codex, entre `2026-09-09T13:23:23Z` y `2026-09-10T12:05:15Z`. La señal es
+por cliente compartido y no permite atribuir todos los eventos a los dos sujetos canary; justamente por eso no
+se reclasifica como negativo run-owned ni se silencia. Debe diagnosticarse antes de cerrar la observación.
+
+El cleanup dry-run fue read-only y falló cerrado con
+`registration_active|active_authority|active_auth|oauth_client_not_run_owned`, `unexpectedRefs=0` y
+`deletionReady=false`. El planner detecta `22` DCR run-owned más
+`https://chatgpt.com/oauth/codex/client.json`; ese CIMD conserva `8` artefactos de los sujetos canary y `35` de
+otros sujetos. El helper actual borra hijos OAuth por `client_id`, por lo que retirar el blocker o reclamar el
+CIMD como propio borraría estado ajeno. Antes de cualquier `--apply`, planner, delete y readback deben separar
+DCR run-owned de clientes compartidos, eliminar en éstos sólo por `environment_id + subject` canary (y
+`binding_id` para contextos), preservar el cliente y los hijos de otros sujetos, y verificar su existencia al
+final. El `delete_after` sigue siendo sólo una fecha mínima; no autoriza saltar estos dos bloqueos.
+
 ## Delta 2026-09-07 — Claude Code y Claude.ai completan la ceremonia real
 
 La causa del fallo histórico quedó acotada al cliente Claude Code `2.1.186`: antes de `2.1.196`, Claude podía
@@ -231,10 +253,10 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Observación productiva activa. La matriz histórica M365/Gmail, passkeys, helper/Playwright, Codex, ChatGPT, Claude Code 2.1.263 y Claude.ai/Desktop se conserva en el manifest; Claude Code 2.1.186 sigue FAIL histórico. El 2026-09-08 el operador autorizó reemplazar sólo la conexión hospedada de Claude por el acceso interno TASK-1844: conector retirado, consentimiento/familia revocados a 19:41:17Z, readback cero; su observación continua termina por decisión explícita. Registro, binding, grants, organización, perfiles y otros clientes permanecen activos. ChatGPT releyó el canary con éxito tras el deploy compatible TASK-1844: gateway ready y SEO no_entitlement, sin gasto. Faltan completar la observación restante, cleanup/readback cero y apagar los gates; no se anticipa el cleanup global ni se afirma siete días ininterrumpidos para Claude hospedado.`
+- Status real: `Operativamente bloqueado para retiro. La matriz de compatibilidad sigue acreditada para Codex, ChatGPT, Claude Code 2.1.263 y Claude.ai/Desktop; Claude Code 2.1.186 conserva su FAIL histórico y la conexión Claude hospedada se retiró bajo la excepción TASK-1844. El 2026-09-10 la frontera canary siguió aislada, pero aparecieron 93 refresh_reuse/24h en el CIMD compartido de Codex y el cleanup dry-run detectó 8 artefactos canary más 35 de otros sujetos sobre ese mismo cliente. No hay autorización ni implementación segura para apply: primero se requiere diagnóstico de la señal y cleanup sujeto-específico que preserve cliente/artefactos compartidos; después, desde delete_after y sólo con steady/preflight verdes, corresponde revocar, releer cero y apagar gates.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
-- Blocked by: `none`
+- Blocked by: `diagnóstico refresh_reuse del CIMD compartido y cleanup OAuth sujeto-específico antes del retiro`
 - Branch: `Greenhouse develop; efeonce-mcp main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -343,8 +365,13 @@ Reglas obligatorias:
 
 ### Gap
 
-- Mantener siete días de señales estables, ejecutar cleanup/readback cero desde `delete_after` y apagar ambos
-  gates. Los dos DCR Claude están inventariados; el CIMD compartido no se usa como asset run-owned.
+- Diagnosticar los `refresh_reuse` nuevos del CIMD compartido; no cuentan como negativo run-owned ni como
+  ventana steady mientras su origen y familias no estén acotados.
+- Implementar y probar cleanup sujeto-específico para artefactos canary observados bajo clientes compartidos.
+  El blocker actual es una protección: no se puede retirar sin partir planner/delete/readback y demostrar que
+  el cliente y sus otros sujetos permanecen intactos.
+- Después, mantener siete días de señales estables, ejecutar cleanup/readback cero desde `delete_after` y
+  apagar ambos gates. Los dos DCR Claude están inventariados; el CIMD compartido nunca es asset run-owned.
 - Mantener el primer cliente consentido fuera de esta task (`TASK-1841`).
 
 ## Modular Placement Contract
@@ -681,6 +708,10 @@ organización dedicada creada sólo después de una autorización específica.
       únicamente `registration_active|active_authority|active_auth`. Las 9 señales de binding/invitación están
       `ok`; los 6 eventos `refresh_reuse` de 24 h corresponden a negativos run-owned ya inventariados, el último
       ocurrió a 02:32:18Z y no apareció uno nuevo.
+- [ ] Observación read-only `2026-09-10T12:17:04Z`: frontera `1/1`, drift `0/0` y cero Person 360, pero
+      `refresh_reuse=93/24h` sobre el CIMD compartido de Codex y dry-run con
+      `oauth_client_not_run_owned`; no acredita steady ni readiness de cleanup. Evidencia y contrato de
+      preservación actualizados en el manifiesto/runbook/skill.
 - [ ] Sesiones interactivas por cliente MCP registradas: Codex y ChatGPT hospedado verdes; ChatGPT importó sólo
       `efeonce.gateway.status|get_seo_entitlement`, ejecutó ambas sin write y rotó refresh dos veces post-TTL.
       Claude Code `2.1.186` conserva su FAIL histórico; `2.1.263` completó consentimiento, catálogo exacto,

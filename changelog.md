@@ -7,6 +7,29 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — TASK-1604: pack SEO/Arte y vacantes reconciliadas
+
+Se agregó el pack versionado de evaluación para SEO Specialist Senior y Director(a) de Arte Senior: seis
+competencias aditivas, nueve preguntas SEO con rúbricas BARS en `sme_review`, scorecard de portfolio/caso para
+Arte, migración y operador local/readback. El guard de materialización ahora cuenta sólo las preguntas exactas
+del pack; la reutilización de templates exige un único match de role hint, módulos, niveles y pesos y falla
+cerrado ante colisiones. Las vacantes `EO-OPN-0674/0675` fueron publicadas por una operación separada y se
+releyeron `active|published|public_listed`, rutas 200, pero continúan con cero policies, templates del pack y
+assessments. Task, registry, epic, documentación funcional y handoff reflejan esa frontera; TASK-1604 sigue
+`in-progress` hasta SME, template/binding y Quality Gate.
+
+## 2026-09-10 — TASK-1832: retiro bloqueado y contrato shared-CIMD documentado
+
+Readback live conserva la organización sintética aislada: registro/binding `1/1`, purpose drift `0/0`, dos
+profiles run-owned fuera de Person 360 y un único grant read-only activo. La muestra dejó de ser steady:
+`auth.oauth.refresh_reuse_detected` reportó 93 eventos/24h sobre el CIMD compartido de Codex. El cleanup dry-run
+no mutó y añadió `oauth_client_not_run_owned`; el mismo cliente tiene 8 artefactos canary y 35 de otros sujetos.
+Task, manifiesto, runbook, manual, doc funcional y skills Claude/Codex ahora prohíben remover ese blocker o
+aplicar el helper client-scoped. El retiro exige primero planner/delete/readback sujeto-específicos y prueba de
+preservación del cliente/hijos ajenos, además del diagnóstico de refresh; no hubo revoke, cleanup apply, gate
+OFF, push ni deploy. El gateway 1.4.0 usa los tres paquetes MCP v2 oficiales 2.0.0, todavía latest en npm al
+momento del chequeo.
+
 ## 2026-09-10 — TASK-1852: canal MCP delegado vivo; TASK-1857 Creative Hub
 
 Canal delegado completo fuera del primitive: scope Entra `efeonce.mcp.client_services.write` (Admin) en la app recurso MCP,
@@ -964,31 +987,3 @@ corregir el owner previo y el sesgo de marcadores QA antes de dejar el flujo con
 El canon reusable distingue el trigger del Customer Agent, la asignación por workflow y la reasignación manual
 entre personas. También registra el límite de evidencia: el owner visible quedó probado, pero la respuesta humana
 y una segunda transferencia en el mismo chat abierto requieren una prueba operativa separada.
-
-## 2026-09-01 — El Customer Agent de ANAM ya sabe que se llama Emma
-
-El perfil y las directrices publicadas del Customer Agent en el portal ANAM `19893546` quedaron alineados con la
-landing: nombre `Emma`, preview `Hola, soy Emma.` y saludo `Soy Emma, de ANAM`. El readback confirmó cero
-borradores. No cambiaron personalidad, conocimiento, permisos, acciones, routing, handoff, canales ni datos CRM,
-y no se envió una conversación real. Dos advertencias anteriores sobre `Registraré tu consulta` quedaron
-documentadas para un cambio conversacional separado.
-
-## 2026-09-01 — Emma convierte la landing ANAM en un concierge digital
-
-La landing de atención de ANAM reemplazó al personaje masculino por Emma y reconstruyó la primera pantalla como
-una experiencia editorial premium: narrativa clara, selector unificado de tres intenciones, un único CTA y un
-panel de confianza integrado con la asistente. La selección prepara el contexto y no abre el chat hasta que la
-persona pulsa `Conversar con Emma`.
-
-El build HubSpot CMS React `#28` está desplegado en el portal ANAM `19893546`. El header usa el logo horizontal
-del catálogo del repo, sin el círculo superior, y el recurso decorativo queda recortado dentro del hero para no
-dejar espacio blanco bajo el footer. La verificación desktop y móvil confirmó HTTP 200, margen del body en cero,
-ausencia de overflow, selección por clic y teclado, transferencia del intent al CTA y cero errores de consola,
-página o red. Emma usa ahora un asset generativo versionado cuyo bordado dice correctamente
-`ANÁLISIS AMBIENTALES S.A.`; se descartó el montaje tipográfico plano y se conservó el asset anterior para
-rollback. No se abrió ni se envió una conversación real; tampoco cambiaron el Customer Agent ni datos CRM.
-
-El cierre documental quedó reflejado en el canon y runbook CMS, documentación funcional, manual operativo,
-dirección visual, changelog de cliente, `project_context.md` y las dos copias espejadas de la skill
-`hubspot-as-a-service`. No se modificaron el router global ni la arquitectura comercial porque no cambió ningún
-contrato transversal.

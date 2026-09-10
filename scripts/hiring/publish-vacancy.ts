@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
 import { executeHiringVacancyPublicationCommand } from '@/lib/hiring/vacancy-publication-operator'
+import { closeGreenhousePostgres } from '@/lib/postgres/client'
 
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
 
@@ -84,7 +85,11 @@ const main = async () => {
   process.stdout.write(`${JSON.stringify(result.data, null, 2)}\n`)
 }
 
-main().catch(error => {
-  process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
-  process.exitCode = 1
-})
+main()
+  .catch(error => {
+    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
+    process.exitCode = 1
+  })
+  .finally(async () => {
+    await closeGreenhousePostgres()
+  })
