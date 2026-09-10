@@ -50,3 +50,4 @@
 | Placement interruptivo (popup/slide-in) | task siguiente | to-do |
 | Admin cockpit autoría/reportes | task futura | to-do |
 | Host WordPress público — landing Trade Marketing & BTL (consumidor de `open_meeting_scheduler` + `<greenhouse-form>`) | TASK-1860 | to-do |
+| Host WordPress: landing de capacidad de diseño (superficie de producto de Product Design 360) — `open_meeting_scheduler` | TASK-1859 | to-do (surface no promovida hasta binding y fase B) |
