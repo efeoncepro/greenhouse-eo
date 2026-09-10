@@ -1,0 +1,133 @@
+{
+  "idempotencyKey": "vacancy-art-director-senior-20260909-v2",
+  "sourceReference": "efeonce-hiring-art-director-senior-20260909-v1",
+  "requestedRole": "Director(a) de Arte Senior",
+  "publicTitle": "Director(a) de Arte Senior",
+  "skillTags": [
+    "Dirección de arte",
+    "Concepto visual",
+    "Sistemas visuales",
+    "Diseño multiformato",
+    "Creative production",
+    "Figma",
+    "Adobe Creative Cloud",
+    "Liderazgo creativo"
+  ],
+  "publicArea": "Creative",
+  "workMode": "remote",
+  "hiringRegion": "LATAM",
+  "publicRemoteEligibleCountries": [
+    "AR",
+    "BO",
+    "BR",
+    "CL",
+    "CO",
+    "CR",
+    "DO",
+    "EC",
+    "SV",
+    "GT",
+    "HN",
+    "MX",
+    "NI",
+    "PA",
+    "PY",
+    "PE",
+    "UY",
+    "VE",
+    "US",
+    "ES"
+  ],
+  "seniority": "Senior",
+  "employmentMode": "Jornada completa",
+  "engagementType": "on_going",
+  "fulfillmentMode": "internal_hire",
+  "demandOrigin": "manual_internal",
+  "requestedSeats": 1,
+  "priority": "high",
+  "ownerUserId": "user-efeonce-internal-daniela-ferreira",
+  "publicCompensationBand": null,
+  "publicContent": {
+    "version": 2,
+    "promise": "Convierte estrategia y restricciones reales en sistemas visuales que el equipo puede producir, defender y mejorar.",
+    "intro": "Buscamos a una persona capaz de transformar briefs, ideas y objetivos de negocio en direcciones visuales claras, relevantes y ejecutables. El rol combina concepto, craft y trabajo hands-on en piezas clave: define territorios, eleva el estándar, entrega feedback útil y protege la intención hasta la salida final.",
+    "outcomes": [
+      "Traducir estrategia en territorios visuales y key visuals con una idea defendible, no sólo una preferencia estética.",
+      "Construir sistemas que mantengan coherencia y calidad al adaptarse entre formatos, canales y ritmos de producción.",
+      "Reducir retrabajo mediante dirección temprana, feedback accionable, handoffs claros y QA proporcional al riesgo.",
+      "Elevar la calidad de piezas digitales, sociales, audiovisuales y asistidas por IA sin perder criterio ni trazabilidad de derechos.",
+      "Elevar el juicio visual del equipo mediante documentación, calibración y conversaciones de calidad."
+    ],
+    "workItems": [
+      "Traducir objetivos de marca, audiencia y negocio en conceptos y territorios visuales claros.",
+      "Dirigir y ejecutar las piezas que fijan el estándar de una campaña, sistema o propuesta.",
+      "Definir reglas de composición, tipografía, color, imagen, movimiento y adaptación multiformato.",
+      "Revisar trabajo, priorizar feedback y distinguir correcciones bloqueantes de mejoras deseables.",
+      "Colaborar con estrategia, contenido, diseño, producción, tecnología y equipos de cuenta desde el brief hasta el QA.",
+      "Presentar y defender decisiones ante clientes y equipos, integrando feedback sin diluir la idea.",
+      "Documentar sistemas, decisiones, créditos, licencias y condiciones de uso de herramientas de IA."
+    ],
+    "essentials": [
+      "Portfolio con casos donde se entiendan el problema, la idea, la ejecución y tu contribución exacta.",
+      "Criterio sólido en composición, tipografía, color, imagen, jerarquía y acabado visual.",
+      "Experiencia llevando un brief desde exploración y concepto hasta producción y control de calidad.",
+      "Capacidad para dar feedback específico, priorizado y respetuoso que mejore la pieza y el criterio del equipo.",
+      "Experiencia presentando decisiones visuales y gestionando desacuerdos con clientes o stakeholders.",
+      "Organización para sostener calidad en varios proyectos sin depender de heroísmo ni control excesivo."
+    ],
+    "preferred": [
+      "Experiencia en campañas digitales, social, motion, web o producción audiovisual.",
+      "Experiencia en agencia, estudio o equipos con varias marcas y plazos simultáneos.",
+      "Dominio práctico de Figma y Adobe Creative Cloud, o herramientas equivalentes.",
+      "Experiencia con IA generativa aplicada con criterio, trazabilidad de fuentes y respeto por derechos."
+    ],
+    "learnables": [
+      "Sistema creativo y prácticas de colaboración de Efeonce.",
+      "AXIS Design System y patrones compartidos entre productos.",
+      "Flujos gobernados de IA para ideación, producción, derechos y provenance.",
+      "Conexión entre craft, datos, operaciones y resultados de negocio."
+    ],
+    "evidenceAsk": "Comparte tres casos de portfolio. Para cada uno, explica el brief, la tensión estratégica, las alternativas exploradas, tu contribución exacta, cómo se produjo y qué cambió a partir del resultado. Puedes anonimizar clientes, datos y material confidencial.",
+    "workModel": "Jornada completa, 100% remota. Contratamos en Latinoamérica, Estados Unidos y España: en Chile con contrato laboral local y, fuera de Chile, por vía internacional con pago directo de Efeonce. La modalidad que aplica a tu país se transparenta durante el proceso. El trabajo se organiza con documentación asíncrona y sincronizaciones planificadas.",
+    "collaboration": {
+      "team": "Creative, Strategy, Content, Technology y equipos de cuenta",
+      "reportsTo": "Creative Operations Lead",
+      "language": "Español",
+      "timezoneOverlap": "Jornada alineada con el horario de Chile (America/Santiago)",
+      "workingRhythm": "Trabajo asíncrono documentado, críticas de diseño y sincronizaciones de producción planificadas"
+    },
+    "process": {
+      "steps": [
+        {
+          "title": "Revisión de portfolio",
+          "body": "Revisamos la calidad del trabajo, el contexto de los casos y tu contribución verificable."
+        },
+        {
+          "title": "Conversación estructurada",
+          "body": "Conversamos sobre concepto, craft, feedback, liderazgo y producción en situaciones reales."
+        },
+        {
+          "title": "Profundización de casos",
+          "body": "Revisamos decisiones de tu portfolio y criticamos un artefacto ficticio; no solicitamos una pieza nueva ni trabajo utilizable por Efeonce o un cliente."
+        },
+        {
+          "title": "Conversación final",
+          "body": "Alineamos expectativas, forma de trabajo, disponibilidad y condiciones antes de una decisión."
+        }
+      ],
+      "expectedTiming": "Estimamos completar el proceso en tres a cuatro semanas, sujeto a disponibilidad mutua.",
+      "responseCommitment": "Te comunicaremos el avance y la decisión final, incluso si no continuamos.",
+      "accommodationPath": "Puedes solicitar una adaptación o ajuste razonable en cualquier etapa del proceso."
+    },
+    "benefits": [],
+    "compensation": null,
+    "additionalSections": [
+      {
+        "title": "Qué no es este rol",
+        "format": "narrative",
+        "intro": "No es un rol de aprobación distante ni de gusto personal. Esperamos dirección con fundamentos, capacidad de ejecutar cuando la pieza lo exige y un sistema de feedback que ayude a otros a producir mejor.",
+        "items": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "idempotencyKey": "vacancy-seo-specialist-senior-20260909-v2",
+  "sourceReference": "efeonce-hiring-seo-specialist-senior-20260909-v1",
+  "requestedRole": "SEO Specialist Senior",
+  "publicTitle": "SEO Specialist Senior",
+  "skillTags": [
+    "SEO técnico",
+    "SEO on-page",
+    "Estrategia de contenidos",
+    "AEO/GEO",
+    "Google Search Console",
+    "GA4",
+    "DataForSEO",
+    "Medición"
+  ],
+  "publicArea": "Growth",
+  "workMode": "remote",
+  "hiringRegion": "LATAM",
+  "publicRemoteEligibleCountries": [
+    "AR",
+    "BO",
+    "BR",
+    "CL",
+    "CO",
+    "CR",
+    "DO",
+    "EC",
+    "SV",
+    "GT",
+    "HN",
+    "MX",
+    "NI",
+    "PA",
+    "PY",
+    "PE",
+    "UY",
+    "VE",
+    "US",
+    "ES"
+  ],
+  "seniority": "Senior",
+  "employmentMode": "Jornada completa",
+  "engagementType": "on_going",
+  "fulfillmentMode": "internal_hire",
+  "demandOrigin": "manual_internal",
+  "requestedSeats": 1,
+  "priority": "high",
+  "ownerUserId": "user-efeonce-admin-julio-reyes",
+  "publicCompensationBand": null,
+  "publicContent": {
+    "version": 2,
+    "promise": "Convierte señales de búsqueda en decisiones que mejoran la visibilidad, la experiencia y el negocio de nuestros clientes.",
+    "intro": "En Efeonce conectamos tecnología, contenido, entidades, experiencia y medición. Tu trabajo será diagnosticar, priorizar e impulsar mejoras en distintos sitios y cuentas para construir visibilidad sostenible tanto en búsqueda tradicional como en experiencias de respuesta con IA, siempre con evidencia documentada.",
+    "outcomes": [
+      "Convertir hallazgos técnicos y de contenido en planes priorizados por impacto, esfuerzo, confianza y riesgo.",
+      "Mejorar rastreo, indexación, arquitectura, enlazado interno, performance y datos estructurados con evidencia antes y después.",
+      "Construir arquitecturas de intención, entidades y contenido que ayuden a personas y sistemas de búsqueda a encontrar, entender y citar respuestas útiles.",
+      "Medir visibilidad orgánica, tráfico cualificado, conversión y presencia generativa sin confundir correlación con causalidad.",
+      "Explicar decisiones y resultados con claridad a clientes y equipos internos."
+    ],
+    "workItems": [
+      "Realizar auditorías técnicas y de contenido, formular hipótesis y ordenar oportunidades según su valor para cada cuenta.",
+      "Investigar demanda, intención, entidades, competidores y vacíos de cobertura para orientar páginas y contenidos.",
+      "Diseñar recomendaciones de SEO on-page, arquitectura, enlazado interno, structured data, utilidad y citabilidad.",
+      "Trabajar con Google Search Console, GA4, DataForSEO y otras fuentes, reconciliando definiciones antes de concluir.",
+      "Coordinar implementación y QA con desarrollo, contenido, diseño y cuentas, protegiendo el objetivo durante el handoff.",
+      "Crear reportes orientados a decisiones, con hechos, incertidumbres, riesgos y siguientes pasos explícitos.",
+      "Documentar playbooks, criterios y aprendizajes que eleven la práctica de SEO/AEO de Efeonce."
+    ],
+    "essentials": [
+      "Experiencia aplicada en SEO técnico, on-page y estrategia de contenidos.",
+      "Dominio de rastreo, indexación, canonicalización, arquitectura, enlazado interno y performance web.",
+      "Uso práctico de Google Search Console y GA4 para diagnosticar y evaluar cambios.",
+      "Capacidad para revisar HTML, datos estructurados y señales de Core Web Vitals con equipos técnicos.",
+      "Criterio para priorizar trabajo en varias cuentas sin convertir cada hallazgo en una urgencia.",
+      "Comunicación clara en español para explicar decisiones, límites y resultados a audiencias técnicas y no técnicas."
+    ],
+    "preferred": [
+      "Experiencia aplicada en AEO, GEO o visibilidad en asistentes de IA.",
+      "Uso de DataForSEO, Screaming Frog, Ahrefs, Semrush o herramientas equivalentes.",
+      "Experiencia con WordPress, Drupal u otros CMS en equipos multidisciplinarios.",
+      "Experiencia en agencia, consultora o entornos con varias marcas y prioridades simultáneas."
+    ],
+    "learnables": [
+      "Metodología Search Visibility 360 de Efeonce.",
+      "Flujos internos de priorización, implementación, QA y evidencia.",
+      "Automatización responsable de investigación, monitoreo y documentación.",
+      "Operación integrada con Creative, Technology, Growth y cuentas."
+    ],
+    "evidenceAsk": "Comparte dos casos en los que hayas influido directamente. Para cada uno, describe el punto de partida, el diagnóstico, las decisiones que tomaste, tu contribución exacta, los resultados y lo que no puede atribuirse con certeza. Puedes anonimizar clientes y datos confidenciales.",
+    "workModel": "Jornada completa, 100% remota. Contratamos en Latinoamérica, Estados Unidos y España: en Chile con contrato laboral local y, fuera de Chile, por vía internacional con pago directo de Efeonce. La modalidad que aplica a tu país se transparenta durante el proceso. El trabajo se organiza con documentación asíncrona y sincronizaciones planificadas.",
+    "collaboration": {
+      "team": "Growth, Technology, Content, Creative y equipos de cuenta",
+      "reportsTo": "Managing Director",
+      "language": "Español",
+      "timezoneOverlap": "Jornada alineada con el horario de Chile (America/Santiago)",
+      "workingRhythm": "Trabajo asíncrono documentado, revisiones de evidencia y sincronizaciones planificadas"
+    },
+    "process": {
+      "steps": [
+        {
+          "title": "Revisión de experiencia",
+          "body": "Revisamos la evidencia compartida, el alcance real de tus casos y la compatibilidad con la modalidad."
+        },
+        {
+          "title": "Conversación estructurada",
+          "body": "Conversamos sobre diagnóstico, priorización, colaboración y situaciones reales de trabajo."
+        },
+        {
+          "title": "Caso ficticio guiado",
+          "body": "Resuelves un caso acotado que no produce trabajo para Efeonce ni para un cliente; puedes usar herramientas si declaras y verificas su aporte."
+        },
+        {
+          "title": "Conversación final",
+          "body": "Alineamos expectativas, forma de trabajo, disponibilidad y condiciones antes de una decisión."
+        }
+      ],
+      "expectedTiming": "Estimamos completar el proceso en tres a cuatro semanas, sujeto a disponibilidad mutua.",
+      "responseCommitment": "Te comunicaremos el avance y la decisión final, incluso si no continuamos.",
+      "accommodationPath": "Puedes solicitar una adaptación o ajuste razonable en cualquier etapa del proceso."
+    },
+    "benefits": [],
+    "compensation": null,
+    "additionalSections": [
+      {
+        "title": "Cómo entendemos un buen trabajo de búsqueda",
+        "format": "narrative",
+        "intro": "No buscamos una lista de tickets ni reportes de posiciones. Buscamos criterio para convertir evidencia imperfecta en decisiones claras, implementarlas con otros equipos y aprender de sus efectos sin prometer causalidad que los datos no sostienen.",
+        "items": []
+      }
+    ]
+  }
+}
