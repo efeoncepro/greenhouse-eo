@@ -7,6 +7,26 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — El sistema de contenidos en Notion queda mapeado y PDR-020 se reconcilia con él
+
+Lectura MCP en vivo de las tres bases que operan el contenido de Efeonce y de la Wiki. El sistema no es
+el calendario: son Pilares JTBD, Content Hub y Calendario de Contenidos encadenados, más 89 páginas de
+doctrina. El mapa con IDs, schema vigente y brechas queda en
+[docs/operations](docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md).
+
+El mapeo corrigió dos supuestos de `PDR-020`, que se escribió sin conocer ese runtime. Existe una base de
+siete Pilares JTBD con job, buyers, tier, registro de voz y canales declarados: es el eje temático
+canónico y las franquicias del PDR son un eje ortogonal, no un reemplazo, de modo que una pieza bien
+formada declara cuatro ejes y no tres. Y `LinkedIn Julio` es un canal distinto de `LinkedIn Página` en
+las tres bases, con voz propia. También queda advertido que `Territorio Arc` no es el territorio de
+`PDR-019`: son dos taxonomías vivas y distintas.
+
+Brechas registradas sin resolver: la Wiki tiene las ocho etiquetas definidas y las 89 páginas sin
+etiquetar; el Calendario no puede expresar franquicia, canal-hogar frente a satélite, territorio ni las
+métricas que la doctrina declara (sends, saves, watch time, dwell), y conserva `Portafolio` como tipo de
+pieza. La propuesta de cambios queda ordenada de menor a mayor invasividad y **ninguna fue aplicada**:
+no se creó, editó ni borró nada en Notion.
+
 ## 2026-09-10 — Las seasonalities entran al catálogo como línea propia de marca
 
 `PDR-020` rev 1.4 cierra la reconciliación con el plan de seasonalities 2026–2027: se conserva como línea propia
@@ -968,20 +988,3 @@ diagnóstico de prospecto) sin tocar la tool ni el gateway; los seis salieron a 
 inventario MCP/gateway/provider SEO, docs funcionales de API Platform y gateway, deltas en arquitectura API/ADR del
 gateway/patrones canónicos/arquitectura SEO, skills `dataforseo-operator` y `seo-aeo-practice`, y README/AGENTS del
 repo `efeonce-mcp`.
-
-## 2026-09-02 — ANAM: entrega premium de Emma y soporte explícito de tres meses
-
-Se consolidó el cierre de la landing, identidad y handoff de Emma en dos PDF de cinco páginas: una especificación
-técnica y una guía funcional. Los HTML/CSS son la fuente editable; los PDF, el master para cliente. Se revisaron
-diez páginas rasterizadas, fuentes Poppins/Geist embebidas, composición, overflow y pies con sitio, correo,
-teléfono y dirección. La captura final de la landing quedó versionada y los borradores Word supersedidos fueron
-excluidos del paquete.
-
-El borrador de correo para Óscar, María Paz, Pablo y Marco explica los cambios de landing e identidad, la matriz
-de routing y el límite de las pruebas E2E. Quedó listo, no enviado. También registra el SharePoint consolidado
-como compromiso pendiente para esta semana.
-
-La documentación y las skills espejo ahora fijan el soporte de Customer Agent y KPI en tres meses, del
-2026-08-13 al 2026-11-12 inclusive. Soporte cubre el alcance construido; nuevas funcionalidades, KPI, workflows,
-automatizaciones, integraciones, rediseños e innovación requieren un alcance separado. No se cambió runtime
-HubSpot, no se envió correo, no se creó SharePoint y no se hizo push.

@@ -69,6 +69,36 @@ cultural, economía de producción opuesta (se conoce con un año de anticipaci�
   Capability de producción: paquete `Executive / Interview Capture` de Run & Gun Studio.
 - **Hook <2s, sin excepción**, y ninguna línea se mide por seguidores ni por volumen de posts.
 
+## Runtime real en Notion — leer ANTES de proponer estructura
+
+El sistema de contenidos **no es el calendario**: son tres bases encadenadas
+(**Pilares JTBD → Content Hub → Calendario de Contenidos**) + la Wiki. Mapa canónico con IDs,
+schema vigente y brechas: **`docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md`**.
+
+| Base | Data source | Rol |
+|---|---|---|
+| Pilares JTBD | `collection://33ecce0f-f806-409d-b193-6f6a23e6f9d2` | **eje temático canónico** — 7 pilares con job, buyers BP1–BP8, tier, registro de voz, split y canales |
+| Content Hub | `collection://9540b2c0-c621-4ccf-986b-efefe63feb7e` | backlog de piezas ancla (blog, pillar, newsletter) |
+| Calendario | `collection://38339c2f-efe7-8113-9c92-000b50674fa8` | cada publicación: canal, plataforma, tipo, flujo, métricas |
+| Wiki de Contenidos | `collection://15839c2f-efe7-819d-90b7-000b9011a403` | 89 páginas de doctrina, formatos, SOPs, playbooks |
+
+**Cuatro ejes ortogonales — una pieza bien formada declara los cuatro:** Pilar JTBD (para quién y qué
+job) · Territorio `PDR-019` (bajo qué se archiva) · Franquicia `PDR-020` (qué forma recurrente) ·
+Canal (dónde nace).
+
+**Reglas duras:**
+
+- **NUNCA** proponer estructura de contenidos sin leer el mapa: el runtime tiene ejes que la doctrina
+  no inventó (tier T1/T2/T3, registro de voz, split, buyers) y siguen vigentes.
+- **NUNCA** confundir `Territorio Arc` (Social Proof, CSC, AEO+SD, Nested Loops, Agentic Web — narrativa
+  de marca) con el territorio de `PDR-019` (taxonomía del blog WordPress). Son dos taxonomías distintas.
+- **NUNCA** tratar `LinkedIn Página 💼` y `LinkedIn Julio 👤` como el mismo canal: el runtime los modela
+  separados y su voz es distinta (marca vs `JULIO_REYES_VOICE_SYSTEM`).
+- **NUNCA** ejecutar una mutación en Notion sin autorización explícita del operador.
+- Brechas al 2026-09-10: Wiki con **89 páginas sin etiquetar**; el Calendario **no puede expresar
+  franquicia, canal-hogar vs satélite, territorio ni sends/saves/watch time/dwell**; `Tipo de pieza`
+  conserva `Portafolio`, descartado por `PDR-020`.
+
 ## Cuándo usar este overlay
 
 Cuando el trabajo social toca los canales propios de Efeonce (marca, Think/Glitch/grader) o

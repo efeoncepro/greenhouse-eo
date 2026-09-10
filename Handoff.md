@@ -57,6 +57,13 @@ sujetos canary y 35 de otros sujetos; el helper vigente borra por `client_id`. N
 `--apply`: implementar planner/delete/readback sujeto-específicos, preservar cliente/hijos ajenos, diagnosticar
 las familias de refresh y recién después reiniciar steady/retirar desde `delete_after`.
 
+**Sistema de contenidos Notion (2026-09-10, mapeado / sin mutaciones):**
+[mapa canónico](docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md) de Pilares JTBD + Content Hub +
+Calendario + Wiki, con IDs y schema. Corrige `PDR-020` a rev 1.5: los Pilares JTBD son el eje temático
+canónico y las franquicias son ortogonales; `LinkedIn Julio` es canal aparte. Pendiente del operador:
+autorizar los 7 cambios propuestos (etiquetar 89 páginas de Wiki, agregar Franquicia/Rol de canal/
+Territorio/métricas al Calendario, deprecar `Portafolio`). Nada escrito en Notion.
+
 **Canales propios Efeonce (2026-09-10, decisión cerrada / ejecución no autorizada):** seasonalities conservadas
 como línea propia de marca (rev 1.4): son temporadas con ventana por mercado, NO efemérides; hogar Instagram,
 sends+saves, LinkedIn recibe argumento y no caption. Plan 2026–2027 sin cambios de alcance.

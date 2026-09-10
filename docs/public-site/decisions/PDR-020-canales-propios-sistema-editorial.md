@@ -69,15 +69,25 @@ canal. La regla operativa está en la capa 4.
 ### 2. Tres ejes ortogonales que no se mezclan
 
 ```text
-TERRITORIOS (de qué hablas)  →  heredados de PDR-019
-FORMATOS    (cómo lo dices)  →  las líneas de la capa 4
-CANALES     (dónde vive)     →  los roles de la capa 5
+PILAR JTBD   (para quién y qué job)  →  Notion, 7 pilares — eje temático canónico
+TERRITORIO   (bajo qué se archiva)   →  PDR-019, taxonomía del blog WordPress
+FRANQUICIA   (qué forma recurrente)  →  las líneas de la capa 4
+CANAL        (dónde nace)            →  los roles de la capa 5
 ```
+
+**Son cuatro ejes ortogonales y una pieza bien formada declara los cuatro.** Un *Versus* (franquicia)
+puede servir al pilar *Operaciones Creativas (CSC)*, archivarse bajo el territorio *Inteligencia
+Artificial* y nacer en YouTube. **NUNCA** colapsar dos ejes en uno.
 
 Confundir los ejes produce listas de contenido inoperables. "Agentes" y "AEO" son territorios, no tipos de
 contenido; "talking head" es un formato, no un canal.
 
 ### 3. Los territorios se heredan del blog; social no crea taxonomía propia
+
+> ⚠️ **`Territorio Arc` (Notion) ≠ territorio de `PDR-019`.** Arc — Social Proof, CSC, AEO+SD, Nested
+> Loops, Agentic Web — es la **narrativa de marca** que gobierna los Pilares JTBD. `PDR-019` es la
+> **taxonomía de archivo del blog WordPress**. Son dos taxonomías vivas y distintas: **NUNCA** las
+> mezcles ni asumas que una reemplaza a la otra. El eje que este PDR hereda es el de `PDR-019`.
 
 Los territorios editoriales de los canales propios son los de la taxonomía canónica de PDR-019 —
 **AEO, Inteligencia Artificial, HubSpot, Loop Marketing, Growth, Diseño, SEO, Marketing Digital,
@@ -100,7 +110,8 @@ El sistema distingue dos cosas:
 | Canal | Formatos nativos |
 |---|---|
 | **Instagram** | proceso y construcción real con tropiezos · talking head de tendencia · trendjacking · **seasonalities (la temporada vista desde el oficio)** · cultura, equipo y talento (employer brand) — **no lleva casos de éxito**: su señal es reenvío, y una métrica B2B no se manda por DM |
-| **LinkedIn** | **contenido educativo** (post extenso y documento nativo) · **el corte del caso de éxito** · POV profesional que abre conversación · talking head en versión ejecutiva |
+| **LinkedIn Página** | **contenido educativo** (post extenso y documento nativo) · **el corte del caso de éxito** · anuncios y posición institucional |
+| **LinkedIn Julio** | POV profesional en primera persona · talking head ejecutivo · el aprendizaje del build. **El runtime ya lo modela como canal separado**; la voz es la de `JULIO_REYES_VOICE_SYSTEM`, no la de la marca |
 | **YouTube** | long-form del experimento completo · tutorial y how-to (demanda de búsqueda) · webinar grabado · Shorts como anzuelo al long-form |
 | **Threads** | reacción rápida y trendjacking · opinión corta con criterio · hilo de aprendizaje en bruto · pregunta abierta a la audiencia |
 | **Blog** | artículos y Pillars · **casos de éxito completos** (canonical) · **tools y graders** · **webinars** · ebooks y lead magnets · data studies · archivo Glitch |
@@ -248,7 +259,8 @@ y se reverifican contra su `SOURCES.md` antes de usarlas como argumento. Este PD
 | Canal | Rol | Señal que manda *(as-of 2026-07)* | Por qué ese catálogo |
 |---|---|---|---|
 | **Blog** | el **activo**: URL canónica, schema, citabilidad IA | orgánico + citación | es lo único que permanece y se cita; aloja lo que necesita URL estable |
-| **LinkedIn** | el **comprador** | dwell ≥61s; comentario con sustancia ≫ like | el texto extenso y el documento nativo son los que pagan dwell |
+| **LinkedIn Página** | la **marca ante el comprador** | dwell ≥61s; comentario con sustancia ≫ like | el texto extenso y el documento nativo son los que pagan dwell |
+| **LinkedIn Julio** | la **persona ante el comprador** | igual señal, mayor alcance orgánico personal | talking head, POV en primera persona, el corte del caso |
 | **YouTube** | la **profundidad** y el segundo buscador | watch time, session engagement | único canal con demanda real de long-form y de búsqueda de tutorial |
 | **Instagram** | el **craft y la cultura** | sends + saves (followers = señal débil) | el proceso visual y el tropiezo son lo reenviable |
 | **Threads** | la **conversación viva** | conversación y respuesta rápida | costo de producción casi nulo; premia la ventana temporal |
@@ -262,6 +274,21 @@ Glitch ya vive como newsletter semanal y como categoría raíz del blog (PDR-019
 **rail adicional de la misma franquicia**: el átomo social es el gancho, la edición email es el producto y el
 post de blog es el archivo. Un Glitch que nace y muere en una red social convierte un activo propio en alcance
 arrendado.
+
+### 7. El runtime manda sobre la ejecución; este PDR manda sobre la doctrina
+
+El sistema opera en Notion sobre tres bases encadenadas — **Pilares JTBD → Content Hub → Calendario
+de Contenidos** — mapeadas en `docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md` con sus IDs.
+
+- **NUNCA** proponer una estructura de contenidos sin leer antes ese mapa: el runtime tiene ejes que
+  la doctrina no inventó (tier, registro de voz, split, buyers BP1–BP8) y que siguen vigentes.
+- **NUNCA** crear en Notion un eje que duplique uno existente. Las franquicias de este PDR **no son**
+  pilares: se agregan como propiedad nueva, no reemplazando `Pilar JTBD`.
+- **NUNCA** ejecutar una mutación en Notion sin autorización explícita del operador. El mapa lista los
+  cambios propuestos en orden de menor a mayor invasividad; ninguno está aplicado.
+- Brechas conocidas del runtime al 2026-09-10: la Wiki tiene **89 páginas con `Etiquetas` vacío**; el
+  Calendario **no puede expresar franquicia, canal-hogar vs satélite, territorio ni las métricas que
+  este PDR declara** (sends, saves, watch time, dwell); `Tipo de pieza` conserva `Portafolio`.
 
 ## Reglas duras
 
