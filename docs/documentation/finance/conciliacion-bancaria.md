@@ -1,9 +1,9 @@
 # Conciliación bancaria
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-04-27 por Claude Opus 4.7 + Julio Reyes
-> **Ultima actualizacion:** 2026-09-10 por Claude (recuperación ago–sep 2026: adapters de cartola, créditos V1, plan de conciliación)
+> **Ultima actualizacion:** 2026-09-10 por Claude (TASK-1858 Slice 3: rutina mensual y decisión sobre facturas Nubox)
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [Finance Movement Feed](finance-movement-feed.md), [TASK-702](../../tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md), [TASK-715](../../tasks/complete/TASK-715-reconciliation-test-period-archive-ux.md), [TASK-720](../../tasks/complete/TASK-720-instrument-category-kpi-rules.md), [TASK-721](../../tasks/complete/TASK-721-finance-evidence-canonical-uploader.md), [TASK-722](../../tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md), [TASK-723](../../tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md), [TASK-726](../../tasks/complete/TASK-726-finance-movement-feed-foundation.md), [TASK-728](../../tasks/complete/TASK-728-finance-movement-feed-decision-polish.md)
 
 ## Qué es
@@ -162,6 +162,17 @@ pnpm finance:rematerialize-balances --account santander-clp
 
 El script histórico `finance:conciliate-mar-apr` (marzo–abril 2026) queda como referencia; el flujo vigente es
 data-driven: el plan JSON es el juicio humano registrado fila por fila.
+
+**Rutina mensual.** El paso a paso por cuenta (fuente, formato, clave del archivo, orden y qué escalar) vive en el
+manual: [Rutina mensual de cierre bancario](../../manual-de-uso/finance/conciliacion-bancaria-operacion.md#rutina-mensual-de-cierre-bancario-checklist).
+
+**Facturas de proveedores llegadas por Nubox (`EXP-NB-*`) — decisión 2026-09-10 (TASK-1858).** No se calzan
+automáticamente contra la cartola. El auto-match sólo propone objetos que ya movieron caja (pagos, cobros,
+settlement legs); una factura `pending` no es un pago, y conciliarla directo dejaría la fila calzada sin
+`expense_payment`, el saldo del banco sin rebajar y la factura aún pendiente. El pago se registra desde la fila
+del banco con la acción `pay_expense` del plan (mismo command `recordExpensePayment` que usa el portal), que crea
+el pago y calza la fila en un solo acto. Si el volumen lo justifica, el siguiente paso canónico es una sugerencia
+«pagar y calzar» en el drawer del período; nunca un auto-match sobre facturas sin pagar.
 
 ### Créditos bancarios
 

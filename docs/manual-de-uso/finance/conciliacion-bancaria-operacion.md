@@ -1,9 +1,9 @@
 # Conciliacion bancaria operativa
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-06-15 por Codex
-> **Ultima actualizacion:** 2026-09-10 por Claude (recuperación conciliación ago–sep 2026: import por archivo, CLI de cartolas, plan de conciliación, Deel/CCA y payables pagados antes de la boleta)
+> **Ultima actualizacion:** 2026-09-10 por Claude (TASK-1858 Slice 3: rutina mensual de cierre bancario y decisión sobre facturas Nubox)
 > **Modulo:** Finance
 > **Rutas en portal:** `/finance/reconciliation`, `/finance/reconciliation/[periodId]`
 > **Documentacion relacionada:** [Operacion Finance end-to-end](../../documentation/finance/operacion-finance-end-to-end.md), [Conciliacion bancaria](../../documentation/finance/conciliacion-bancaria.md), [Sugerencias asistidas de conciliacion](sugerencias-asistidas-conciliacion.md), [Caja, cobros, pagos y liquidaciones](caja-cobros-pagos-y-liquidaciones.md)
@@ -249,6 +249,56 @@ No cierres un periodo para "silenciar" diferencias. Si hay diferencia, se resuel
 ## Archivar periodos de prueba
 
 Si un periodo fue creado para prueba, usa la accion de archivado si la UI la ofrece. Debe haber razon suficiente y no debe usarse sobre periodos cerrados productivos. Archivar no equivale a borrar historia financiera.
+
+## Rutina mensual de cierre bancario (checklist)
+
+Se corre en los primeros dias habiles del mes siguiente, cuenta por cuenta. El orden importa: primero se importa
+todo, despues se calza, al final se declara el cierre. Nada se fuerza: lo que no calza se escala.
+
+**1. Reunir las fuentes** (todo a `data/bank/`, que git ignora; nunca al repositorio):
+
+| Cuenta (`account_id`) | Fuente mensual | Formato del adapter | Clave del archivo |
+|---|---|---|---|
+| Santander CLP (`santander-clp`) | Cartola historica cuenta corriente (N° correlativo del mes) | XLSX del portal Santander Empresas (`santander_cartola_xlsx`) | — |
+| Santander USD (`santander-usd-usd`) | Cartola historica cuenta corriente USD | XLSX del mismo portal (`santander_cartola_xlsx`) | — |
+| Santander Corp TC (`santander-corp-clp`) | Estado de cuenta del ciclo (correo) + «Ultimos movimientos» del ciclo en curso | PDF (`santander_tc_estado_cuenta_text`) · XLSX (`santander_tc_movimientos_xlsx`) | RUT de la empresa sin DV |
+| Global66 CLP (`global66-clp`) y MXN (`global-66-mxn-mxn`) | Extracto historico de movimientos por wallet | XLS exportado desde la app (`global66_xls`); recortar al mes con `--from/--to` | — |
+| Banco de Chile Cuenta Vista (`banco-chile-clp`) | «Cartola Cuenta Vista Mensual» (correo del banco) | PDF (`bancochile_cuenta_vista_text`) | 4 ultimos digitos del RUT de la empresa sin DV |
+| CCA accionista (`sha-cca-julio-reyes-clp`) | Recibos Deel pagados con la tarjeta personal + transferencias «Transf a Julio Reyes» de Santander CLP | Se registran con `pnpm finance:record-deel-receipts`; los reembolsos entran por el plan (`internal_transfer`) | — |
+
+**2. Importar y calzar**, siempre con `--dry-run` la primera vez:
+
+```bash
+pnpm finance:import-statement --account <cuenta> --year <AAAA> --month <M> \
+  --file data/bank/<archivo> --create-period --auto-match --dry-run
+pnpm finance:import-statement --account <cuenta> --year <AAAA> --month <M> \
+  --file data/bank/<archivo> --create-period --auto-match
+```
+
+**3. Plan** para lo que el auto-match no resuelve: un archivo por mes en
+`scripts/finance/reconciliation-plans/<AAAA-MM>.json`, primero como reporte y despues con `--apply` (ver
+«Conciliar con un plan»).
+
+**4. Rematerializar y comparar**: `pnpm finance:rematerialize-balances --account <cuenta>`. El cierre del ultimo
+dia debe calzar con el saldo final de la cartola (CLP al peso; USD/MXN con ±0,05). En `/admin/operations` la
+senal `finance.account_balances.fx_drift` debe quedar en 0 (desde TASK-1858 vigila tambien USD/MXN).
+
+**5. Declarar el cierre**: marcar el periodo como `reconciled` en el portal. `closed` solo cuando contabilidad
+(Nubox) cerro el mes.
+
+**6. Que escalar (no forzar)**: una diferencia mayor que la tolerancia entre ledger y cartola; un movimiento sin
+contraparte que no encaja en ningun tipo del plan; un monto de nomina u honorarios que no coincide con lo que
+registro Payroll (se escala a Payroll, no se corrige desde Finance); un cargo bancario recurrente nuevo; un
+cambio del saldo del CCA sin recibo Deel que lo respalde.
+
+**Decision sobre proveedores con factura Nubox (`EXP-NB-*`) — 2026-09-10, TASK-1858 Slice 3.** Los pagos a
+proveedores cuya factura llego por Nubox **no se calzan automaticamente**. El auto-match solo propone
+contrapartes que ya tienen movimiento de caja (pagos e ingresos registrados, settlement legs); una factura
+`pending` no es un pago, y calzarla directo dejaria la fila conciliada sin `expense_payment`, con el saldo del
+banco sin rebajar y la factura todavia pendiente. Siguen por plan con `pay_expense` (fila del banco →
+`recordExpensePayment` en la moneda de la factura), que crea el pago y calza la fila en el mismo acto. Si el
+volumen crece, la extension canonica es una sugerencia «pagar y calzar» en el drawer del periodo (mismo
+command), nunca un auto-match sobre facturas sin pagar.
 
 ## Que hace automatico Greenhouse
 
