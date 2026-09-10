@@ -19,8 +19,9 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1858](in-progress/TASK-1858-finance-reconciliation-recovery-closeout.md) | **In Progress** — Cierre de la recuperación de conciliación bancaria ago–sep 2026: rollout ISSUE-169, fx_drift USD/MXN, rutina mensual, regularizaciones Payroll/CCA, crédito 420051383906 | none |
 | [TASK-1859](to-do/TASK-1859-landing-product-design-360.md) | Landing pública de capacidad de diseño (superficie de producto de Product Design 360); publicación por fases atada al business model | none |
 | [TASK-1860](to-do/TASK-1860-landing-trade-marketing-btl.md) | Landing pública Trade Marketing & BTL de la línea Channel & Commerce: término cabeza `trade marketing`, posición en el medio entre plataformas y agencias, reuso de Growth Forms/CTA/scheduler | none |
+| [TASK-1861](to-do/TASK-1861-aeo-grader-mcp-operability.md) | AEO Grader operable por MCP (EPIC-020): correr con gasto gobernado, leer resultados, informe web tokenizado y PDF, con autoridad humana delegada y manuales de uso | TASK-1852 (canal delegado, ya vivo) |
 
-Siguiente ID libre `TASK-1861`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1862`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
 
 ## Programa Efeonce Insights: EPIC-045
 
