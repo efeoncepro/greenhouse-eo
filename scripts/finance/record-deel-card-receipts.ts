@@ -29,6 +29,8 @@ interface DeelReceipt {
   paidDate: string
   contractorTotalUsd: number
   deelFeesUsd: number
+  /** Parte del total contractor que excede el entry (bono liquidado por Deel por sobre lo calculado): expense payroll anclado al member. */
+  contractorRemainderUsd?: number
   payExpenseId: string | null
   memberId: string | null
   description: string
@@ -111,6 +113,26 @@ const main = async () => {
 
         console.log(`    ✓ pago ${paid.payment.paymentId} sobre ${r.payExpenseId} (${paid.paymentStatus})`)
       }
+    }
+
+    if ((r.contractorRemainderUsd ?? 0) > 0) {
+      const extra = await createShareholderCardExpense({
+        description: `Deel ${r.receipt} — diferencia contractor vs entry (bono liquidado por Deel) — ${r.description}`,
+        toolCatalogId: 'deel',
+        memberId: r.memberId,
+        supplierName: 'Deel Inc.',
+        currency: 'USD',
+        exchangeRateOverride: r.exchangeRate,
+        paymentDate: r.paidDate,
+        amount: r.contractorRemainderUsd as number,
+        paymentAccountId: plan.ccaInstrumentId,
+        reference: `deel-${r.receipt}-contractor-remainder`,
+        shareholderCardLast4: plan.cardLast4,
+        shareholderName: plan.shareholderName,
+        actorUserId: plan.actor
+      })
+
+      console.log(`    ✓ remanente contractor ${extra.expenseId}`)
     }
 
     if (r.deelFeesUsd > 0) {

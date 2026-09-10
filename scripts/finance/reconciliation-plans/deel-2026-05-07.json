@@ -1,0 +1,36 @@
+{
+  "actor": "user-efeonce-admin-julio-reyes",
+  "ccaInstrumentId": "sha-cca-julio-reyes-clp",
+  "cardLast4": "1879",
+  "shareholderName": "Julio Reyes",
+  "receipts": [
+    {
+      "receipt": "REC-2026-8",
+      "paidDate": "2026-05-05",
+      "contractorTotalUsd": 0,
+      "deelFeesUsd": 80.8,
+      "payExpenseId": null,
+      "memberId": "melkin-hernandez",
+      "description": "Fees Deel mayo (suscripción 49 + processing 31,80). La parte contractor (758,75, entry 2026-04) ya está registrada por Payroll como pagada desde la TC el 05/05 — verificar contra el estado de cuenta TC de mayo"
+    },
+    {
+      "receipt": "REC-2026-9",
+      "paidDate": "2026-06-04",
+      "contractorTotalUsd": 831.88,
+      "contractorRemainderUsd": 118.12,
+      "deelFeesUsd": 88.26,
+      "payExpenseId": "EXP-202605-005",
+      "memberId": "melkin-hernandez",
+      "description": "Melkin Hernandez INV-9j62wyg-2026-7 (trabajo junio; entry 2026-05 net 831,88; Deel liquidó 950 = 675 + bono 275)"
+    },
+    {
+      "receipt": "REC-2026-10",
+      "paidDate": "2026-07-06",
+      "contractorTotalUsd": 927.39,
+      "deelFeesUsd": 87.38,
+      "payExpenseId": "EXP-202606-008",
+      "memberId": "melkin-hernandez",
+      "description": "Melkin Hernandez INV-9j62wyg-2026-8 (trabajo julio; entry 2026-06 net 927,39)"
+    }
+  ]
+}

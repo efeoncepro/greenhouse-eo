@@ -74,6 +74,9 @@ export interface CreateSupplierExpensePaymentInput extends BaseAnchoredInput {
 export interface CreateBankFeeExpensePaymentInput extends BaseAnchoredInput {
   description: string
   miscellaneousCategory?: string | null
+  /** Moneda de la comisión cuando la cuenta no es CLP (ej. fee de recepción internacional en cuenta USD). */
+  currency?: 'CLP' | 'USD' | 'MXN'
+  exchangeRateToClp?: number | null
 }
 
 export interface CreateLoanCuotaExpensePaymentInput extends BaseAnchoredInput {
@@ -206,9 +209,20 @@ const createAnchoredExpensePayment = async (
     paymentSource: 'manual' | 'bank_reconciliation'
     spaceId?: string | null
     currencyOverride?: string | null
+    /** Tipo de cambio moneda→CLP cuando `currencyOverride` no es CLP (amount_clp = amount × rate). */
+    exchangeRateToClp?: number | null
   }
 ): Promise<AnchoredFactoryResult> => {
   ensurePositive(input.amount)
+
+  const anchoredCurrency = input.currencyOverride || 'CLP'
+  const anchoredRate = anchoredCurrency === 'CLP' ? 1 : input.exchangeRateToClp ?? null
+
+  if (anchoredCurrency !== 'CLP' && (!anchoredRate || anchoredRate <= 0)) {
+    throw new FinanceValidationError(`exchangeRateToClp es obligatorio para un expense anclado en ${anchoredCurrency}.`, 422)
+  }
+
+  const anchoredAmountClp = Math.round(input.amount * (anchoredRate ?? 1) * 100) / 100
 
   return withTransaction(async (client: PoolClient) => {
     await ensureAccount(client, input.paymentAccountId)
@@ -245,7 +259,7 @@ const createAnchoredExpensePayment = async (
     }
 
     const expenseId = `EXP-RECON-${input.paymentDate.replace(/-/g, '')}-${Math.floor(Math.random() * 1_000_000).toString(36)}`
-    const currency = input.currencyOverride || 'CLP'
+    const currency = anchoredCurrency
     const totalAmount = input.amount
 
     const anchorEntries = Object.entries(input.anchorColumns).filter(([, v]) => v !== undefined)
@@ -274,13 +288,14 @@ const createAnchoredExpensePayment = async (
       else if (c === 'expense_type') vals.push(input.expenseType)
       else if (c === 'description') vals.push(input.description)
       else if (c === 'currency') vals.push(currency)
-      else if (c === 'subtotal' || c === 'total_amount' || c === 'total_amount_clp' || c === 'amount_paid') vals.push(totalAmount)
+      else if (c === 'subtotal' || c === 'total_amount' || c === 'amount_paid') vals.push(totalAmount)
+      else if (c === 'total_amount_clp') vals.push(anchoredAmountClp)
       else if (c === 'payment_status') vals.push('paid')
       else if (c === 'payment_date' || c === 'document_date') vals.push(input.paymentDate)
       else if (c === 'payment_method') vals.push('bank_transfer')
       else if (c === 'payment_account_id') vals.push(input.paymentAccountId)
       else if (c === 'payment_reference') vals.push(dedupeRef)
-      else if (c === 'exchange_rate_to_clp') vals.push(1)
+      else if (c === 'exchange_rate_to_clp') vals.push(anchoredRate ?? 1)
       else if (c === 'space_id') vals.push(input.spaceId || null)
       else {
         const found = anchorEntries.find(([k]) => k === c)
@@ -319,14 +334,15 @@ const createAnchoredExpensePayment = async (
          $6, 'bank_transfer', $7, 'bank_statement',
          $8, $9, NOW(),
          $10, $11, $12,
-         1, $4, 0, NOW()
+         $13, $14, 0, NOW()
        )`,
       [
         paymentId, finalExpenseId, input.paymentDate, totalAmount, currency,
         dedupeRef, input.paymentAccountId,
         input.notes ?? null, input.actorUserId ?? null,
         Boolean(input.reconciliationRowId), input.reconciliationRowId ?? null,
-        input.reconciliationRowId ? new Date().toISOString() : null
+        input.reconciliationRowId ? new Date().toISOString() : null,
+        anchoredRate ?? 1, anchoredAmountClp
       ]
     )
 
@@ -372,6 +388,38 @@ export const createPayrollExpensePayment = (input: CreatePayrollExpensePaymentIn
     amount: input.amount,
     paymentAccountId: input.paymentAccountId,
     reference: input.reference || input.bankMovementReference,
+    notes: input.notes,
+    actorUserId: input.actorUserId,
+    reconciliationRowId: input.reconciliationRowId
+  })
+
+/**
+ * Pago directo a un colaborador/accionista sin entry de Payroll (ej. sueldo
+ * accionista transferido desde la cuenta corriente). Expense `payroll`
+ * anclado a `member_id`, `economic_category=labor_cost_internal`. Payroll
+ * conserva la autoridad sobre el entry: esto es el registro de caja.
+ */
+export interface CreateMemberPaymentExpenseInput extends BaseAnchoredInput {
+  memberId: string
+  description: string
+  memberName?: string | null
+}
+
+export const createMemberPaymentExpense = (input: CreateMemberPaymentExpenseInput) =>
+  createAnchoredExpensePayment({
+    expenseType: 'payroll',
+    description: input.description,
+    anchorColumns: {
+      member_id: input.memberId,
+      member_name: input.memberName ?? null,
+      miscellaneous_category: 'member_direct_payment',
+      economic_category: 'labor_cost_internal'
+    },
+    paymentSource: 'bank_reconciliation',
+    paymentDate: input.paymentDate,
+    amount: input.amount,
+    paymentAccountId: input.paymentAccountId,
+    reference: input.reference,
     notes: input.notes,
     actorUserId: input.actorUserId,
     reconciliationRowId: input.reconciliationRowId
@@ -451,7 +499,9 @@ export const createBankFeeExpensePayment = (input: CreateBankFeeExpensePaymentIn
     reference: input.reference,
     notes: input.notes,
     actorUserId: input.actorUserId,
-    reconciliationRowId: input.reconciliationRowId
+    reconciliationRowId: input.reconciliationRowId,
+    currencyOverride: input.currency ?? 'CLP',
+    exchangeRateToClp: input.exchangeRateToClp ?? null
   })
 
 export const createLoanCuotaExpensePayment = (input: CreateLoanCuotaExpensePaymentInput) =>

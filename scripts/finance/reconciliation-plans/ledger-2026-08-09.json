@@ -1,0 +1,95 @@
+{
+  "actor": "user-efeonce-admin-julio-reyes",
+  "ops": [
+    {
+      "op": "supersede_settlement_group",
+      "settlementGroupId": "stlgrp-itx-santander-cl-sha-cca-juli-20260907-reconsantander-clp202609-1000000",
+      "reason": "Recuperación 2026-09-10: la transferencia 1/2 de 1.000.000 (07/09) es sueldo accionista, no reembolso a la cuenta corriente accionista (aclaración del operador)."
+    },
+    {
+      "op": "supersede_settlement_group",
+      "settlementGroupId": "stlgrp-itx-santander-cl-sha-cca-juli-20260907-recon-9519ac4b4019-1000000",
+      "reason": "Recuperación 2026-09-10: la transferencia 2/2 de 1.000.000 (07/09) es sueldo accionista, no reembolso a la cuenta corriente accionista (aclaración del operador)."
+    },
+    {
+      "op": "member_payment",
+      "memberId": "julio-reyes",
+      "memberName": "Julio Reyes",
+      "accountId": "santander-clp",
+      "date": "2026-09-07",
+      "amount": 1000000,
+      "description": "Sueldo accionista Julio Reyes — transferencia 1/2 07/09/2026 (sin entry de Payroll; regularizar sueldo empresarial en Payroll)",
+      "reference": "recon-748b6baab0c9-sueldo",
+      "linkRowId": "santander-clp_2026_09_748b6baab0c9"
+    },
+    {
+      "op": "member_payment",
+      "memberId": "julio-reyes",
+      "memberName": "Julio Reyes",
+      "accountId": "santander-clp",
+      "date": "2026-09-07",
+      "amount": 1000000,
+      "description": "Sueldo accionista Julio Reyes — transferencia 2/2 07/09/2026 (sin entry de Payroll; regularizar sueldo empresarial en Payroll)",
+      "reference": "recon-9519ac4b4019-sueldo",
+      "linkRowId": "santander-clp_2026_09_9519ac4b4019"
+    },
+    {
+      "op": "income_payment",
+      "incomeId": "INC-NB-29062197",
+      "date": "2026-07-17",
+      "amount": 84760,
+      "currency": "MXN",
+      "accountId": "global-66-mxn-mxn",
+      "exchangeRate": 53.403475,
+      "reference": "global66-mxn-36881111",
+      "notes": "Recibido de Pinturas Berel SA de CV 17/07/2026 en Global66 MXN (ID 36881111) = factura folio 51 (native MXN 84.760). Pre-genesis de la cuenta MXN (01/08): el saldo de apertura ya lo incluye. Tipo de cambio realizado en la conversión MXN→CLP del 14/08 (10.079.906 / 188.750)."
+    },
+    {
+      "op": "income_payment",
+      "incomeId": "INC-NB-29534371",
+      "date": "2026-08-13",
+      "amount": 52000,
+      "currency": "MXN",
+      "accountId": "global-66-mxn-mxn",
+      "exchangeRate": 53.403475,
+      "reference": "global66-mxn-38788526-a",
+      "notes": "Recibido de Pinturas Berel 13/08/2026 (ID 38788526, MXN 104.000 = folios 52 + 53). Parte 1: folio 52 (native MXN 52.000).",
+      "linkRowId": "global-66-mxn-mxn_2026_08_7c9cd5706f4c"
+    },
+    {
+      "op": "income_payment",
+      "incomeId": "INC-NB-30311386",
+      "date": "2026-08-13",
+      "amount": 52000,
+      "currency": "MXN",
+      "accountId": "global-66-mxn-mxn",
+      "exchangeRate": 53.403475,
+      "reference": "global66-mxn-38788526-b",
+      "notes": "Recibido de Pinturas Berel 13/08/2026 (ID 38788526, MXN 104.000 = folios 52 + 53). Parte 2: folio 53 (native MXN 52.000).",
+      "linkRowId": "global-66-mxn-mxn_2026_08_7c9cd5706f4c",
+      "linkAsSecondary": true
+    },
+    {
+      "op": "income_payment",
+      "incomeId": "INC-HS-COMM-2026Q2",
+      "date": "2026-08-13",
+      "amount": 42.85,
+      "currency": "USD",
+      "accountId": "santander-usd-usd",
+      "exchangeRate": 926.94,
+      "reference": "hubspot-q2-2026-netted-fee",
+      "notes": "Parte de la comisión HubSpot Q2 2026 retenida por el banco como costo de recepción internacional (neteada en el abono de USD 335,15). Se registra como cobrada y su contrapartida es la comisión bancaria del mismo día."
+    },
+    {
+      "op": "bank_fee",
+      "accountId": "santander-usd-usd",
+      "date": "2026-08-13",
+      "amount": 42.85,
+      "currency": "USD",
+      "exchangeRate": 926.94,
+      "description": "Costo de recepción de transferencia internacional (comisión HubSpot Q2 2026, Rec Or de Pago 202699234551) — estimado por diferencia entre lo declarado por HubSpot (USD 378) y lo abonado (USD 335,15); sin aviso COMEX",
+      "reference": "santander-usd-comex-fee-20260813",
+      "notes": "Monto estimado por diferencia; Santander no lo muestra como cargo separado. Ajustar si aparece el aviso de recepción."
+    }
+  ]
+}

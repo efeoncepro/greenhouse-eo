@@ -34,11 +34,8 @@ import {
   createPayrollExpensePayment,
   createTaxExpensePayment
 } from '@/lib/finance/payment-instruments/anchored-payments'
-import {
-  listUnmatchedStatementRowsFromPostgres,
-  setReconciliationLinkInPostgres,
-  updateStatementRowMatchInPostgres
-} from '@/lib/finance/postgres-reconciliation'
+import { listUnmatchedStatementRowsFromPostgres } from '@/lib/finance/postgres-reconciliation'
+import { linkStatementRow, type StatementRowLink } from '@/lib/finance/reconciliation/link-statement-row'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 // ─── Plan contract ──────────────────────────────────────────────────────────
@@ -224,47 +221,10 @@ const paymentIdForExpense = async (expenseId: string, reference?: string | null)
   return rows[0]?.payment_id ?? null
 }
 
-type Link =
-  | { kind: 'expense'; expenseId: string; paymentId: string | null }
-  | { kind: 'income'; incomeId: string; paymentId: string }
-  | { kind: 'settlement'; settlementLegId: string; settlementGroupId: string }
+type Link = StatementRowLink
 
-const linkRow = async (row: UnmatchedRow, link: Link, actor: string) => {
-  const matchedType = link.kind === 'settlement' ? 'settlement' : link.kind
-  const matchedId = link.kind === 'expense' ? link.expenseId : link.kind === 'income' ? link.incomeId : link.settlementGroupId
-  const matchedPaymentId = link.kind === 'settlement' ? null : link.paymentId
-  const matchedSettlementLegId = link.kind === 'settlement' ? link.settlementLegId : null
-
-  await updateStatementRowMatchInPostgres(row.row_id, row.period_id, {
-    matchStatus: 'manual_matched',
-    matchedType,
-    matchedId,
-    matchedPaymentId,
-    matchedSettlementLegId,
-    matchConfidence: 1,
-    matchedByUserId: actor
-  })
-
-  if (link.kind !== 'settlement' && matchedPaymentId) {
-    await setReconciliationLinkInPostgres({
-      matchedType: link.kind,
-      matchedId,
-      matchedPaymentId,
-      matchedSettlementLegId: null,
-      rowId: row.row_id,
-      matchedBy: actor
-    })
-  }
-
-  if (link.kind === 'settlement') {
-    await runGreenhousePostgresQuery(
-      `UPDATE greenhouse_finance.settlement_legs
-       SET is_reconciled = TRUE, reconciliation_row_id = $2, reconciled_at = NOW(), updated_at = NOW()
-       WHERE settlement_leg_id = $1`,
-      [link.settlementLegId, row.row_id]
-    )
-  }
-}
+const linkRow = (row: UnmatchedRow, link: Link, actor: string) =>
+  linkStatementRow({ row_id: row.row_id, period_id: row.period_id }, link, actor)
 
 // ─── Actions ────────────────────────────────────────────────────────────────
 

@@ -178,6 +178,7 @@
     "finance:reconcile-rows": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/reconcile-statement-rows.ts",
     "finance:record-deel-receipts": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/record-deel-card-receipts.ts",
     "finance:contractor-settle": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/contractor-payable-backdated-settlement.ts",
+    "finance:ledger-adjust": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/ledger-adjustments.ts",
     "finance:backfill-deel": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/backfill-deel-payments.ts",
     "finance:task708b-inventory": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/task708b-inventory.ts",
     "finance:task708b-backfill-signals": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/task708b-backfill-signals.ts",
