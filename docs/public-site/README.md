@@ -75,6 +75,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 - [PDR-017 — Content Engineering como territorio editorial y doctrina de experiencia](decisions/PDR-017-content-engineering-territorio-editorial.md)
 - [PDR-018 — Pillar + Cluster Experience federada: arquitectura editorial, social search, conversión y runtime](decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md)
 - [PDR-019 — Taxonomía editorial canónica del blog WordPress](decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md)
+- [PDR-020 — Canales propios de Efeonce: un motor editorial, cinco roles de canal](decisions/PDR-020-canales-propios-sistema-editorial.md)
 - **[Content Engineering Pillar Brief V1](CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md)** — foundation brief de la futura masterpiece: tesis, audiencia, arco, primitives de comprensión/decisión, SEO/AEO, medición, distribución y gates de publicación.
 - **[Creative Workflows Pillar + Cluster Brief V1](CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md)** — brief maestro de audiencia, tesis, arquitectura editorial, prioridades, enlaces, medición y atomización.
 - **[Web agéntica Pillar + Cluster Brief V1](WEB_AGENTICA_PILLAR_CLUSTER_BRIEF_V1.md)** — contrato editorial de la pillar que soporta `/desarrollo-sitios-web/`: definición citable, recorrido, cluster, enlaces, visuales, medición y gate de publicación.
