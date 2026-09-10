@@ -16,6 +16,15 @@ ago, Santander USD ago, Banco de Chile ago, Global66 jul/ago, TC ago. Santander 
 Valentina). **⚠️ Rollout:** el fix ISSUE-169 vive sólo en `develop` local; el ops-worker (Cloud Run) sigue con el
 código viejo y al recomputar saldos por eventos reescribe cuentas USD/MXN en CLP (pasó con el cobro HubSpot;
 se rematerializó local). Hasta desplegar, revisar `santander-usd-usd`/`global-66-mxn-mxn` tras cada evento.
+**Tercera pasada 2026-09-10:** las dos transferencias de 1.000.000 (07/09) son sueldo accionista → expenses
+`payroll` anclados a `julio-reyes` (`createMemberPaymentExpense`, sin entry de Payroll: regularizar sueldo
+empresarial); los otros traspasos a Julio siguen como CCA (reembolsos de Deel pagados con su tarjeta). Berel:
+folio 51 = MXN 84.760 (17/07), folios 52+53 = MXN 104.000 (13/08), cobrados en `global-66-mxn-mxn` al tipo de
+cambio realizado 53,4034. HubSpot: los USD 42,85 faltantes = costo de recepción internacional estimado por
+diferencia (ingreso cobrado completo + comisión bancaria USD en la cuenta USD). Deel REC-2026-8/9/10 en el CCA
+(REC-8 sólo fees: la parte contractor figura pagada por Payroll desde la TC el 05/05 — verificar con el estado
+de cuenta TC de mayo). CLI nuevo `finance:ledger-adjust`. **Punto 2 (Andres/Daniela agosto) sigue esperando
+autorización.**
 **Pendiente con el operador (punto 7):** nómina agosto Andres/Daniela pagada 03/09 (1.985.038 banco vs 2.020.120 registrado por payroll en
 USD, 4 filas Global66 sin calce); Melkin 788,86 USD (registrado en `santander-usd-usd`, no aparece en banco);
 cobro Berel MXN 104.000 (13/08) sin factura asociada; recepción USD 335,15 (13/08); cartola Banco de Chile

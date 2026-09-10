@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — Finance: tercera pasada (sueldo accionista, Berel MXN, fee HubSpot, Deel mayo–julio)
+
+Nace `finance:ledger-adjust` (cobros en moneda nativa con vínculo a fila, comisiones, pagos directos a un member y
+supersede de settlements) sobre el command compartido `linkStatementRow`; los expenses anclados aceptan
+USD/MXN con tipo de cambio explícito y `createMemberPaymentExpense` registra pagos a un colaborador sin entry
+de Payroll. Datos: sueldo accionista 2×1.000.000 reemplaza los traspasos al CCA; Berel folios 51/52/53 cobrados
+en MXN; comisión HubSpot cerrada con la fee de recepción estimada; Deel REC-2026-8/9/10 al CCA.
+
 ## 2026-09-10 — Finance: segunda pasada de conciliación (honorarios brutos, Deel al CCA, payable backdated, Banco de Chile)
 
 El plan de conciliación suma `honorarios_gross_paid`, `income_receipt`, `link_existing_payment` y
