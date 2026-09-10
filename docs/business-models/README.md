@@ -89,13 +89,17 @@ y producto, y los gates para evolucionar de Modular Production Lane a una experi
 ## Channel & Commerce (trade marketing)
 
 - [`Channel & Commerce — Business Model V1`](channel-commerce/CHANNEL_COMMERCE_BUSINESS_MODEL_V1.md)
+- [`Channel & Commerce — Roadmap por fases y asignación de capital V1`](channel-commerce/CHANNEL_COMMERCE_PHASED_ROADMAP_V1.md)
 - [`Channel & Commerce — Plan de apertura y prospección V1`](channel-commerce/CHANNEL_COMMERCE_PROSPECTING_PLAN_V1.md)
+- [`Benchmark del mercado chileno 2026-09-10`](../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
 - [`Channel & Commerce — catálogo de servicios`](../services/channel-commerce/README.md)
 
 Línea que gobierna la inversión de canal de marcas con distribución indirecta. En mercado se nombra **trade
 marketing**; internamente `Channel & Commerce`, porque su alcance excede la ejecución en punto de venta.
 
-Estado `Proposed`: habilita prospección exploratoria y diagnósticos cotizados caso a caso. No autoriza pricing
+Decisión de negocio 2026-09-10: **oferta completa desde el primer contrato**, con ejecución mixta gobernada y
+tecnología propia como destino de fase 3, no de arranque. Estado `Proposed`: habilita prospección exploratoria y
+diagnósticos cotizados caso a caso. No autoriza pricing
 publicado, compromiso de cobertura, contratación de capacidad de terreno ni venta de recurrente hasta cerrar sus
 gates G1–G6. El mercado inicial es Chile, único donde Efeonce tiene entidad, payroll propio y costo cargado
 conocido.

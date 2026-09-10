@@ -1,6 +1,6 @@
 # Channel & Commerce — Business Model V1
 
-> **Status:** `Proposed` — **re-scope pendiente** tras el benchmark chileno del 2026-09-10 (ver §12 y §13)
+> **Status:** `Proposed` — decisión de negocio 2026-09-10: **oferta completa desde el día uno, tecnología propia por fases**. Ejecución y capital en [`CHANNEL_COMMERCE_PHASED_ROADMAP_V1`](CHANNEL_COMMERCE_PHASED_ROADMAP_V1.md)
 > **Owner:** Efeonce Strategy + Commercial (owner de línea por nombrar) · Finance (economics) · Legal (figura laboral) · Operations (capacidad de terreno)
 > **Version:** 1.0
 > **Date:** 2026-09-10
@@ -43,6 +43,12 @@ pass-through explícito, nunca margen escondido.
 **Qué riesgo asumimos.** Calidad y continuidad de la auditoría, gobierno de la capacidad de terreno y
 responsabilidad como contratista bajo la Ley 20.123. **No** asumimos venta, sell-out, inventario, surtido,
 negociación con retailers ni ejecución de terceros que no gobernamos.
+
+**Alcance de la oferta.** Completa desde el primer contrato: diagnóstico, auditoría, remediación en tienda,
+activación, producción y orquestación. Lo que varía por fase es **cuánto ejecuta Efeonce con capacidad propia** y
+cuánto con proveedor gobernado — decisión interna, nunca un tema del cliente. Condición innegociable: todo
+compromiso ante el cliente respaldado por un compromiso equivalente y exigible del proveedor que lo ejecuta
+(**back-to-back o no se firma**). Ver el roadmap por fases.
 
 **Qué NO está aprobado.** Ningún precio, ninguna banda, ningún claim de retorno, ninguna promesa de cobertura y
 ninguna contratación. El estado es `Proposed`: habilita prospección exploratoria y diagnósticos de alcance
@@ -412,6 +418,8 @@ requiere además G2, G3 y G6 con cost snapshot fechado y aprobación de Finance.
 | **Comparison set real: Treid, no una agencia BTL.** Un incumbente con plataforma propia, 15 años y tres países define el techo de la conversación | inmediato | No competir en "medimos mejor"; competir en la conexión física-digital que el peer set no cubre |
 | **La capa de captura ya existe y es regional (Snuuper).** Construir red propia es quemar capital | inmediato | Partner en vez de build (decisión D3); elimina además fraude de misión y riesgo de reclasificación del escalón 1 |
 | **Llave en mano es el estándar chileno.** Una oferta que deja la producción al cliente se lee incompleta | 12 meses | Efeonce responde por la producción y la gobierna; la ejecuta un proveedor como pass-through, con límite de responsabilidad en el SOW |
+| **Working capital.** El modelo llave en mano paga a proveedores y planilla mensual y cobra a 30-90 días: cada contrato grande consume caja antes de generarla | inmediato | Modelar el ciclo de caja real, negociar plazos de proveedor no peores que los de cobro, fijar tamaño máximo de contrato financiable y pedir anticipo en el primer contrato de cada cuenta (§5 del roadmap) |
+| **Promesa llave en mano sin capacidad instalada.** La responsabilidad queda en Efeonce y la ejecución en terceros | fase 1 | Back-to-back exigible con penalidad y plan de reemplazo; sin eso no se firma |
 | **Dilución del foco comercial.** Es una quinta puerta compitiendo con cuatro beachheads vigentes | 12 meses | Owner dedicado o no se abre. Una línea sin dueño es un PDF |
 
 ### Self-critique
@@ -432,6 +440,12 @@ requiere además G2, G3 y G6 con cost snapshot fechado y aprobación de Finance.
 
 | # | Decisión pendiente | Quién decide | Trigger |
 |---|---|---|---|
+> **D3, D4, D6 y D7 quedaron resueltas** por [`CHANNEL_COMMERCE_PHASED_ROADMAP_V1`](CHANNEL_COMMERCE_PHASED_ROADMAP_V1.md):
+> partner en fase 1 con internalización selectiva en fase 2; plataforma propia recién en fase 3 con cuatro gates;
+> el terreno se ofrece desde fase 1 vía proveedor gobernado; y Efeonce responde por la producción física sin
+> ejecutarla. Ese documento agrega D8 (capital asignado y tamaño máximo de contrato financiable), D9 (con qué
+> proveedores se firma back-to-back) y D10 (por dónde arranca la fase 2).
+
 | D1 | Owner nombrado de la línea | Leadership | Antes de prospectar |
 | D2 | Nombre público definitivo de la oferta | Strategy + Brand | Antes de material comercial |
 | D3 | Red de misiones propia vs partner vs mixta — **el benchmark recomienda partner**; queda por decidir con quién y en qué términos | Operations + Finance | Contacto exploratorio con proveedores de captura |

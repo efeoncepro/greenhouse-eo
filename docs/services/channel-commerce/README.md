@@ -142,7 +142,7 @@ con el primero. Un solo ciclo no produce tendencia.
 
 ---
 
-## 4 · Managed Field Pod  ·  *sujeto a gate legal y de Finance*
+## 4 · Managed Field Pod  ·  *se ofrece desde fase 1; con capacidad propia sólo tras los gates*
 
 **Promesa.** Las tiendas que la auditoría marcó como críticas quedan intervenidas, con evidencia del antes y el
 después.
@@ -165,9 +165,15 @@ cobertura garantizada antes de que exista red operativa; y cualquier instrucció
 **Dependencias duras.** Requiere el servicio 3 activo o data de ejecución equivalente provista por el cliente. Sin
 priorización, un pod es reposición ciega.
 
-**Gates previos a cualquier oferta.** Opinión legal escrita sobre la figura (G4); feasibility gate completo de
-[Talent Assurance](../../business-models/EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md) con cost snapshot
-fechado (G6); y evidencia de recruitability. Hasta entonces **no se cotiza**.
+**Cómo se ejecuta según la fase.** El servicio **se ofrece desde el primer contrato**. En fase 1 lo ejecuta un
+proveedor gobernado bajo compromiso back-to-back exigible, con Efeonce respondiendo ante el cliente por el
+resultado. La capacidad propia entra en fase 2 y sólo cuando cumple las tres condiciones de internalización
+—margen, data propietaria y control de calidad—. Ver [`CHANNEL_COMMERCE_PHASED_ROADMAP_V1`](../../business-models/channel-commerce/CHANNEL_COMMERCE_PHASED_ROADMAP_V1.md).
+
+**Gates previos a ejecutarlo con personal propio.** Opinión legal escrita sobre la figura (G4); feasibility gate
+completo de [Talent Assurance](../../business-models/EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md) con cost
+snapshot fechado (G6); y evidencia de recruitability. Ofrecerlo vía proveedor no exige estos gates; **ejecutarlo
+con gente propia, sí**.
 
 **Packaging (hipótesis).** Capacidad mensual comprometida. Nunca cabeza/día.
 
