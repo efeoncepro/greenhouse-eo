@@ -20,8 +20,9 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1859](to-do/TASK-1859-landing-product-design-360.md) | Landing pública de capacidad de diseño (superficie de producto de Product Design 360); publicación por fases atada al business model | none |
 | [TASK-1860](to-do/TASK-1860-landing-trade-marketing-btl.md) | Landing pública Trade Marketing & BTL de la línea Channel & Commerce: término cabeza `trade marketing`, posición en el medio entre plataformas y agencias, reuso de Growth Forms/CTA/scheduler | none |
 | [TASK-1861](to-do/TASK-1861-aeo-grader-mcp-operability.md) | AEO Grader operable por MCP (EPIC-020): correr con gasto gobernado, leer resultados, informe web tokenizado y PDF, con autoridad humana delegada y manuales de uso | TASK-1852 (canal delegado, ya vivo) |
+| [TASK-1862](to-do/TASK-1862-landing-aso.md) | Landing pública ASO, tercera superficie de Visibilidad junto a SEO y AEO: expansión y citabilidad en español, publicación por fases atada a la extensión Search & App Visibility | none |
 
-Siguiente ID libre `TASK-1862`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1863`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
 
 ## Programa Efeonce Insights: EPIC-045
 

@@ -62,6 +62,12 @@ capability dentro del sistema, no presentarse como agencia suelta.
  posiciona a Efeonce en el medio entre plataformas de ejecución y agencias de terreno. Reusa Growth Forms, Growth
  CTA y scheduler nativo. Ver [PDR-021](decisions/PDR-021-landing-trade-marketing-btl-posicionamiento.md).
 
+- **PDR-023 — Landing "ASO"** (Draft for validation) + **TASK-1862** (to-do, ui-ux/flow, UI ready no): tercera
+ superficie del grupo `Visibilidad` en `/servicios/aso/` (working route), hermana de SEO y AEO. No es captura de
+ demanda —`app store optimization` ~20/mes en CL/MX/CO/PE y `aso` ambiguo—: es destino de expansión para clientes
+ con app y referencia citable en español. Publicación por fases atada a la extensión Search & App Visibility, hoy
+ `Proposed`. Ver [PDR-023](decisions/PDR-023-landing-aso-posicionamiento.md).
+
 - **PDR-004 — Landing "Agencia Creativa"** (posicionamiento decidido) + **TASK-1350**
  (to-do, ui-ux/flow, UI ready no): posiciona la **capability creativa** (Globe) como
  partner de producción que **escala** el output de equipos de marketing in-house

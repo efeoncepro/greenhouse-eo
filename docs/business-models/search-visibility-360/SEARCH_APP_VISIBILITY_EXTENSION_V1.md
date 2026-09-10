@@ -9,6 +9,8 @@
 > **Venta:** [`seo-aeo-practice/modules/14_ASO_COMPLEMENTARIO.md`](../../../.claude/skills/seo-aeo-practice/modules/14_ASO_COMPLEMENTARIO.md)
 > **Evidencia de mercado:** [`ASO_SERVICE_MARKET_RESEARCH_2026-09-10.md`](../../audits/commercial/ASO_SERVICE_MARKET_RESEARCH_2026-09-10.md)
 > **Oportunidad viva, sin oferta:** [`berel-app-movil`](../../commercial/tenders/berel-app-movil/README.md)
+> **Superficie pública:** landing `/servicios/aso/` en `TASK-1862` ([PDR-023](../../public-site/decisions/PDR-023-landing-aso-posicionamiento.md)),
+> publicada por fases que siguen el estado de esta extensión.
 > **Próxima revisión:** después del primer diagnóstico con acceso a consolas o de dos oportunidades calificadas.
 
 ## 1. Decisión propuesta

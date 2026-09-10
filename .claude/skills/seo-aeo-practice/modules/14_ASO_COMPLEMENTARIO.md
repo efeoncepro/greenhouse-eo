@@ -31,6 +31,10 @@
 **Por dónde entra:** como **expansión de un cliente SEO existente** que tiene app (Berel es el
 caso vivo: `efeonce/ESTADO_ACTUAL.md`). En frío solo tiene sentido si la app es el producto.
 
+**La landing** (`/servicios/aso/`, `TASK-1862`, PDR-023) no captura demanda —el ASO casi no se busca en
+español—: es el destino que se **envía 1:1** mientras la extensión esté en `Approved for validation` y que se
+enlaza desde SEO y AEO sólo cuando esté `Commercially approved`. Antes de eso, no se comparte.
+
 **Triggers de compra** *(inferencia; no hay encuesta pública)*: lanzamiento o relanzamiento de la
 app · entrada a un país nuevo · crisis de reseñas · alza del costo de adquisición pagada · primera
 inversión en Apple Ads o Google App campaigns.
