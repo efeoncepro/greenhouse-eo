@@ -13,15 +13,22 @@ El sistema de contenidos **no es el calendario**: son tres bases relacionadas, c
 que gobierna y dos capas de ejecución.
 
 ```text
-Pilares JTBD  ──gobierna──>  Content Hub  ──se atomiza en──>  Calendario de Contenidos
-(el eje temático)            (la pieza ancla)                  (cada publicación)
+Pilares JTBD ──gobierna──> Content Hub ──se atomiza en──> Calendario ──publica en──> Think | WordPress
+(eje temático)             (TALLER: donde se                (cada pieza)              (destino)
+                            escribe el texto largo)
 ```
+
+**El Content Hub es el taller de producción de texto largo**, no un backlog de títulos: ahí se
+trabajan los artículos de blog, los ebooks, las pillar pages, las series, los podcasts y los
+storytimes, con **8 templates por tipo** (incluido un template completo de Ebook). Desde ahí el
+material se distribuye a su plataforma: **Think** o el **sitio público WordPress**.
 
 | Base | Data source | Rol real |
 |---|---|---|
 | **Pilares JTBD** | `collection://33ecce0f-f806-409d-b193-6f6a23e6f9d2` | 7 pilares con job, buyers, tier, territorio, canales y formatos permitidos. **Es el eje temático canónico.** |
-| **Content Hub** | `collection://9540b2c0-c621-4ccf-986b-efefe63feb7e` | Backlog de piezas ancla (blog, pillar page, newsletter, storytime) con estado editorial |
-| **Calendario de Contenidos** | `collection://38339c2f-efe7-8113-9c92-000b50674fa8` | Cada publicación con canal, plataforma, tipo de pieza, flujo, métricas y tiempos |
+| **Content Hub** | `collection://9540b2c0-c621-4ccf-986b-efefe63feb7e` | **Taller de texto largo**: 41 piezas — 27 blog, 5 ebook, 3 pillar page, 2 newsletter, 1 serie, 1 storytime, 2 sin tipo. 8 templates por tipo. Estado: Idea → En curso → En revisión → En feedback → Aprobado → Publicado/Archivado |
+| **Calendario de Contenidos (vigente)** | `collection://38339c2f-efe7-8113-9c92-000b50674fa8` | 66 filas, **todas a futuro** (2026-09-18 → 2027-03-21). Canal, plataforma, tipo, flujo, métricas |
+| **Calendario de Contenidos (anterior)** | `collection://2e039c2f-efe7-8118-ab82-000b04f62cfd` | **100 filas de histórico publicado** (dic 2025 → 2026), **schema idéntico**. Es al que apuntan el Content Hub y los Pilares |
 | **Wiki de Contenidos** | `collection://15839c2f-efe7-819d-90b7-000b9011a403` | 89 páginas de doctrina, formatos, SOPs, playbooks, prompts y manuales |
 
 Bases satélite referenciadas por el calendario: Buyer Persona
@@ -88,6 +95,43 @@ archivarse bajo el territorio *Inteligencia Artificial*. Una pieza bien formada 
 La instrumentación de flujo es fuerte y **conecta conceptualmente con las métricas ICO**
 (RpA/OTD/FTR). Esa conexión no está hecha y no se hace en este documento.
 
+## 4.bis El corte de calendarios y la desconexión del eje temático
+
+**Existen dos bases de Calendario con el mismo schema.** No es un error de lectura: es un corte de
+migración que dejó el sistema partido.
+
+| | Anterior `2e039c2f` | Vigente `38339c2f` |
+|---|---|---|
+| Filas | 100 | 66 |
+| Rango | dic 2025 → 2026 (publicado) | 2026-09-18 → 2027-03-21 (futuro) |
+| `Pilar JTBD` poblado | sí | **0 de 66** |
+| Referenciado por Content Hub | **sí** (propiedad `Calendario de Contenidos`) | no por esa propiedad |
+| Referenciado por Pilares JTBD | **sí** (propiedad `Q1 Calendario`) | no |
+
+**Tres consecuencias operativas:**
+
+1. **El eje temático no se está usando en el calendario vigente: 0 de 66 filas declaran `Pilar JTBD`.**
+   Los siete pilares gobiernan el sistema en el papel y ninguna pieza futura los declara.
+2. **El Content Hub y los Pilares apuntan al calendario anterior.** La relación Hub → Calendario
+   vigente sólo existe en el sentido inverso (`Content Hub` en el calendario, poblada en 30 de 66).
+3. **El histórico queda partido.** Las fórmulas de flujo (Lead time, Cycle Time, Cumplimiento) son
+   idénticas en ambas bases pero **no se pueden agregar cross-base**: cualquier promedio de velocidad
+   operativa medido hoy usa la mitad de la evidencia.
+
+**NUNCA** asumir que "el calendario" es una sola base al analizar histórico o velocidad.
+
+## 4.ter Distribución a plataforma — la brecha que no tiene dónde vivir
+
+El flujo declarado por el operador es: se escribe en el Content Hub → se distribuye a **Think** o al
+**sitio público WordPress**. Ese destino **no existe como propiedad**: el Content Hub sólo tiene
+`Enlace` (url), poblado en **5 de 41 piezas**.
+
+Consecuencias: no se puede saber desde Notion qué está publicado y dónde, ni filtrar el backlog por
+destino, ni auditar contra `PDR-018` — que es justamente la decisión de **host y canonical de una
+Pillar** y que hoy no tiene representación en el runtime. El `Tipo` (Pillar Page, Ebook, Publicación
+de blog) sugiere el destino pero no lo declara: una Pillar puede vivir en cualquiera de los dos hosts
+según `PDR-018`, y un ebook no vive en ninguno de los dos (bucket privado + entrega por link).
+
 ## 5. Brechas detectadas
 
 ### 5.1 Wiki — la taxonomía existe y nadie la usa
@@ -128,6 +172,10 @@ Es coherente con la corrección de `PDR-020` rev 1.4: la unidad es la ventana, n
 **Orden recomendado, de más barato a más invasivo:**
 
 1. **Etiquetar las 89 páginas de la Wiki** con la taxonomía ya definida. Sin cambios de schema.
+1.bis **Declarar `Pilar JTBD` en las 66 filas del calendario vigente.** Sin cambio de schema — la
+   propiedad ya existe y está vacía. Es lo que reconecta el eje temático con lo que se va a publicar.
+1.ter **Agregar `Destino` (select: Think · Sitio público WordPress · Bucket privado · Otro)** al
+   Content Hub, y poblar `Enlace` en lo ya publicado. Es la brecha del flujo que el operador declaró.
 2. **Agregar `Franquicia` (select)** al Calendario con las 7 líneas de `PDR-020`.
 3. **Agregar `Rol de canal` (select: hogar · satélite)** o desdoblar `Plataforma` en
    `Plataforma origen` (select) + `Plataforma satélite` (multi).
@@ -135,6 +183,9 @@ Es coherente con la corrección de `PDR-020` rev 1.4: la unidad es la ventana, n
 5. **Agregar métricas** `Saves`, `Sends/Shares`, `Watch time` y `Dwell` como number.
 6. **Retirar `Portafolio`** de `Tipo de pieza` (o marcarlo deprecado sin borrar histórico).
 7. **Escribir en la Wiki** las páginas de doctrina faltantes y revisar las seis en conflicto.
+8. **Decidir el corte de calendarios**: consolidar en una base, o declarar `2e039c2f` como archivo
+   histórico congelado y repuntar las relaciones de Content Hub y Pilares al vigente. **Es la decisión
+   más invasiva y la única que puede romper histórico**: no se toca sin plan de respaldo.
 
 **NUNCA** ejecutar ninguno de estos pasos sin autorización explícita del operador. Retirar una opción
 de un select con histórico es destructivo: se marca deprecada, no se borra.

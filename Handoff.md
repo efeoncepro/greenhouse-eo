@@ -60,9 +60,12 @@ las familias de refresh y recién después reiniciar steady/retirar desde `delet
 **Sistema de contenidos Notion (2026-09-10, mapeado / sin mutaciones):**
 [mapa canónico](docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md) de Pilares JTBD + Content Hub +
 Calendario + Wiki, con IDs y schema. Corrige `PDR-020` a rev 1.5: los Pilares JTBD son el eje temático
-canónico y las franquicias son ortogonales; `LinkedIn Julio` es canal aparte. Pendiente del operador:
-autorizar los 7 cambios propuestos (etiquetar 89 páginas de Wiki, agregar Franquicia/Rol de canal/
-Territorio/métricas al Calendario, deprecar `Portafolio`). Nada escrito en Notion.
+canónico y las franquicias son ortogonales; `LinkedIn Julio` es canal aparte. Tres fracturas medidas: dos bases de Calendario con schema idéntico (100 filas de histórico vs 66 a
+futuro) que parten la evidencia de velocidad; **0 de 66 filas del calendario vigente declaran Pilar
+JTBD**; y el Content Hub no tiene propiedad de destino Think/WordPress (`Enlace` en 5 de 41). Pendiente
+del operador: autorizar los cambios propuestos, en orden — etiquetar Wiki, poblar Pilar JTBD, agregar
+Destino, luego schema del calendario, y por último decidir el corte de calendarios (el único que puede
+romper histórico). Nada escrito en Notion.
 
 **Canales propios Efeonce (2026-09-10, decisión cerrada / ejecución no autorizada):** seasonalities conservadas
 como línea propia de marca (rev 1.4): son temporadas con ventana por mercado, NO efemérides; hogar Instagram,

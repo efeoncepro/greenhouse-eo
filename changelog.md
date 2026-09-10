@@ -9,9 +9,10 @@
 
 ## 2026-09-10 — El sistema de contenidos en Notion queda mapeado y PDR-020 se reconcilia con él
 
-Lectura MCP en vivo de las tres bases que operan el contenido de Efeonce y de la Wiki. El sistema no es
-el calendario: son Pilares JTBD, Content Hub y Calendario de Contenidos encadenados, más 89 páginas de
-doctrina. El mapa con IDs, schema vigente y brechas queda en
+Lectura MCP en vivo de las bases que operan el contenido de Efeonce. El sistema no es el calendario: son
+Pilares JTBD, Content Hub y Calendario encadenados, más la Wiki. El Content Hub es el taller donde se
+escribe el texto largo — artículos, ebooks, pillar pages, series, podcast, storytime, con ocho templates
+por tipo — y desde ahí el material se distribuye a Think o al sitio público WordPress. El mapa con IDs, schema vigente y brechas queda en
 [docs/operations](docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md).
 
 El mapeo corrigió dos supuestos de `PDR-020`, que se escribió sin conocer ese runtime. Existe una base de
@@ -21,7 +22,16 @@ formada declara cuatro ejes y no tres. Y `LinkedIn Julio` es un canal distinto d
 las tres bases, con voz propia. También queda advertido que `Territorio Arc` no es el territorio de
 `PDR-019`: son dos taxonomías vivas y distintas.
 
-Brechas registradas sin resolver: la Wiki tiene las ocho etiquetas definidas y las 89 páginas sin
+Tres fracturas medidas que el mapeo destapó. Existen dos bases de Calendario con schema idéntico: la
+anterior con 100 filas de histórico publicado y la vigente con 66 filas todas a futuro, y el histórico
+queda partido, de modo que cualquier promedio de velocidad operativa usa la mitad de la evidencia. El
+eje temático no se está usando donde importa: cero de las 66 filas del calendario vigente declaran
+Pilar JTBD, mientras el Content Hub y los Pilares siguen apuntando al calendario anterior. Y el destino
+de publicación que el operador declaró como flujo no tiene dónde vivir: el Content Hub sólo tiene
+Enlace, poblado en cinco de 41 piezas, sin propiedad que distinga Think de WordPress, que es
+justamente la decisión de host y canonical de PDR-018.
+
+Brechas previas que siguen abiertas: la Wiki tiene las ocho etiquetas definidas y las 89 páginas sin
 etiquetar; el Calendario no puede expresar franquicia, canal-hogar frente a satélite, territorio ni las
 métricas que la doctrina declara (sends, saves, watch time, dwell), y conserva `Portafolio` como tipo de
 pieza. La propuesta de cambios queda ordenada de menor a mayor invasividad y **ninguna fue aplicada**:
