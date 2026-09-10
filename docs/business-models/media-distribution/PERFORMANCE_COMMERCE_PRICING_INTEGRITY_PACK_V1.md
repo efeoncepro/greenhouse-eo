@@ -123,8 +123,12 @@ escala: 12% hasta USD 30 mil · 9% sobre el tramo 30–100 mil · 6% sobre el ex
 - **Administración de pagos:** preferir que el cliente pague directo a plataformas y partners. Si Efeonce adelanta
   fondos, se agrega una línea de administración del 3–5% de la inversión administrada por capital de trabajo, DSO y FX,
   con aprobación de Finance. Nunca se combina con la escala híbrida sobre el mismo peso sin excepción aprobada.
-- **Gate de seat propio:** inversión programática gestionada ≥ USD 50 mil/mes sostenida dos trimestres, trader asignado
-  y economics comparados contra el partner.
+- **Partner: Real Audiences** (seleccionado 2026-09-10; fees desconocidos). En modo managed, su fee de servicio es
+  pass-through declarado. En modo autogestionado no hay fee de servicio del partner: el trabajo del trader certificado de
+  Efeonce va dentro del nivel y el cliente paga plataforma y medios. Antes de cotizar se necesitan sus fees por escrito.
+- **Gate para pasar a autogestionado:** dos campañas managed auditadas, trader certificado con backup y checklist de
+  brand safety y reporte. **Seat en otro DSP:** sólo si Real Audiences no cubre CTV o ABM B2B y la inversión en ese
+  frente supera USD 50 mil/mes sostenida dos trimestres.
 
 ### 7.1 Canales emergentes y bajo pedido
 

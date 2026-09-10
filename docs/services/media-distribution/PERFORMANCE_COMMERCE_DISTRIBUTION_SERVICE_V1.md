@@ -107,11 +107,13 @@ y su fuente vive en la [investigación de mercado 2026-09-10](../../audits/comme
 | TikTok | `core` si hay capacidad creativa nativa | `no ofrecido` por defecto | cuenta del cliente | sin producción nativa, no se activa. TikTok Shop y GMV Max operan en México y Brasil; en Chile sin fecha oficial a 2026-08 |
 | LinkedIn | `selectivo` | `core` | Campaign Manager del cliente | caro por diseño: se justifica por la calidad de la cuenta alcanzada |
 | Microsoft Advertising | `selectivo` | `selectivo` | cuenta del cliente | búsqueda incremental en audiencias corporativas |
-| Programmatic display, video y native | `vía partner` | `vía partner` (ABM) | trading desk o DSP managed | cláusula de transparencia obligatoria |
-| CTV / OTT | `vía partner` | `no ofrecido` por defecto | trading desk | sólo con escala y objetivo de alcance |
+| Programmatic display, video, rich media e interstitials | `vía partner` | `vía partner` (ABM por confirmar) | Real Audiences, managed o autogestionado | cláusula de transparencia obligatoria |
+| pDOOH (pantallas digitales en vía pública) | `selectivo` vía partner | `no ofrecido` por defecto | Real Audiences | se compone con la capacidad ATL, OOH & DOOH de la línea y con Channel & Commerce cuando la pantalla está cerca del punto de venta |
+| Notificaciones push | `selectivo` vía partner | `no ofrecido` | Real Audiences | sólo con revisión de calidad del inventario |
+| CTV / OTT | `vía partner` | `no ofrecido` por defecto | por confirmar con Real Audiences; si no lo cubre, alternativa | sólo con escala y objetivo de alcance |
 | Retail media (redes de cadenas, marketplaces) | `core` cuando hay commerce | `no ofrecido` | cuenta del cliente en cada red | requiere acceso a venta y catálogo. En Chile: Mercado Ads, Walmart Connect, Cencosud Media, Fmedia, Sodimac Media, Ripley Media |
 | Amazon Ads | `selectivo` sólo en México | `no ofrecido` | cuenta del cliente | Amazon no opera su programa de partners en Chile |
-| Audio digital | `vía partner` | `no ofrecido` | trading desk | selectivo |
+| Audio digital | `vía partner` | `no ofrecido` | Real Audiences | selectivo |
 | **ChatGPT Ads** | `selectivo` donde existe | `selectivo` donde existe | Ads Manager del cliente | self-service en 52 países; en LATAM sólo Brasil y México. **En Chile no hay anuncios ni self-service** a 2026-09-10 |
 | Anuncios en AI Overviews / AI Mode de Google | vía Search/PMax/AI Max | vía Search/AI Max | cuenta Google del cliente | no se compra aparte; hoy sólo en inglés y en 12 países, Chile no incluido |
 | **X Ads** | `selectivo` bajo pedido | `selectivo` bajo pedido | cuenta del cliente | sólo con revisión de brand safety y verificación de terceros |
@@ -122,11 +124,24 @@ Estados: `core` = lo operamos con equipo propio; `selectivo` = lo operamos cuand
 = un partner opera el seat y Efeonce planifica, gobierna y audita; `no ofrecido` = no entra en propuesta sin decisión
 explícita.
 
-## Programmatic y CTV vía partner
+## Programmatic vía Real Audiences
 
-Efeonce no tiene seat propio en un DSP. La compra programática funciona así:
+Efeonce no tiene seat propio en un DSP. El partner programático seleccionado por el CEO el 2026-09-10 es **Real
+Audiences**, un DSP con sede en Miami y oficinas en Chile, México, Colombia, Ecuador, Argentina, Uruguay y Reino Unido.
+Declara inventario y campañas activas en los cinco países de Efeonce: Chile, Colombia, México, Perú y EE.UU. Formatos
+declarados: display, video, rich media, audio, interstitials, pDOOH y notificaciones push, con segmentación
+geolocalizada.
 
-| Efeonce | Partner (trading desk o DSP managed) |
+Se usan dos modos, en secuencia:
+
+| Modo | Quién opera | Cuándo |
+|---|---|---|
+| **Managed por briefing** | Real Audiences opera; Efeonce define y audita | primeras campañas, hasta pasar el gate |
+| **Autogestionado** | un trader de Efeonce certificado por Real Audiences (4 sesiones: campañas, tags y tracking, audiencias y listas, formatos, reportes) | después del gate: más control, aprendizaje propio y sin fee de servicio del partner |
+
+En modo managed, la división del trabajo es:
+
+| Efeonce | Real Audiences |
 |---|---|
 | objetivo, audiencias, listas de cuentas, exclusiones, frecuencia, brand safety | operación del seat, trafficking, optimización táctica |
 | auditoría del supply path y de los reportes por dominio, app y placement | reporte a nivel de dominio, app y placement |
@@ -140,12 +155,16 @@ Efeonce no tiene seat propio en un DSP. La compra programática funciona así:
 4. listas de exclusión de brand safety y de sitios hechos para arbitraje publicitario (MFA) aplicadas y auditables;
 5. derecho del cliente a auditar y a llevarse listas, audiencias y aprendizajes al terminar.
 
-**Gate de seat propio:** se evalúa sólo si la inversión programática gestionada sostenida supera el umbral definido en
-el pricing pack durante dos trimestres, con owner de trading asignado.
+**Gate para pasar a autogestionado:** dos campañas managed entregadas y auditadas contra la cláusula, un trader
+certificado con backup y un checklist de brand safety y reporte aprobado.
 
-**Candidatos a partner (2026-09-10):** MiQ, que compró el negocio LATAM de Adsmovil y opera en Chile, y TenX, partner
-de DV360. Ninguno está evaluado; fees y mínimos se piden por escrito. El DSP de Microsoft (ex Xandr) dejó de operar
-compra en febrero de 2026 y queda fuera. Estado vigente en el [Partnership Registry](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
+**Por confirmar con Real Audiences antes de la primera campaña:** fees de plataforma, datos y servicio, y si hay
+mínimos; aceptación de la cláusula de transparencia; verificación de brand safety de terceros; reporte por dominio, app y
+placement; si cubre CTV y targeting B2B por cuenta. La conversación está abierta desde 2026-09-02, sin acuerdo firmado:
+no se comunica como partnership hasta firmar.
+
+**Alternativas si Real Audiences no cubre una necesidad:** MiQ (compró Adsmovil LATAM) y TenX (DV360). El DSP de
+Microsoft (ex Xandr) cerró su compra en febrero de 2026. Estado vigente en el [Partnership Registry](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
 
 ## Anuncios en respuestas de IA
 

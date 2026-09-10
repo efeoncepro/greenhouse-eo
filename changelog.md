@@ -33,6 +33,10 @@ Canales emergentes (misma fecha): ChatGPT Ads entra como canal `selectivo` donde
 52 países; en LATAM sólo Brasil y México, Chile no—, medido del lado del sitio porque la plataforma sólo entrega vistas y
 clics agregados; en Chile se ofrece preparación en composición con AEO. Nunca se vende como visibilidad orgánica. X Ads
 queda `selectivo` bajo pedido con brand safety de terceros; Perplexity queda `no disponible` (abandonó la publicidad).
+Partner programático: el CEO seleccionó a **Real Audiences** (DSP con operación en CL, CO, MX, PE y EE.UU.), usado
+primero en modo managed por briefing y después autogestionado con trader certificado; suma pDOOH y push como canales
+selectivos. Sin acuerdo firmado: fees, cláusula de transparencia, brand safety, CTV y ABM por confirmar. MiQ y TenX
+quedan como alternativas.
 
 ## 2026-09-10 — Channel & Commerce: se abre la línea de trade marketing y BTL
 

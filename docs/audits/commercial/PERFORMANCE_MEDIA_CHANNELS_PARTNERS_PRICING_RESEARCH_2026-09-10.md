@@ -101,6 +101,9 @@ preparar intents, landings y medición, en composición con AEO.
 
 | Hecho | Fuente |
 |---|---|
+| **Real Audiences (partner seleccionado, 2026-09-10):** Real Audiences LLC, DSP con sede en Miami; oficinas en Chile, México, Colombia, Ecuador, Argentina, Uruguay y Reino Unido; formatos display, video, rich media, audio, interstitials y pDOOH; declara más de 1.000 clientes y más de 20.000 apps | `[V-prov]` [realaudiences.com](https://www.realaudiences.com/), [LinkedIn](https://www.linkedin.com/company/real-audiences) |
+| Real Audiences — modos: managed por briefing o plataforma autogestionada tras una sesión de certificación; declara inventario y campañas activas en CL, CO, MX, PE y EE.UU.; ofrece además notificaciones push geolocalizadas | Correo de Santiago Campos (Sales Director) a Julio Reyes, 2026-09-02 a 2026-09-07 (Outlook) — claim del proveedor |
+| Real Audiences — certificación de trader: 4 sesiones (campañas, tags y tracking, audiencias y listas, formatos, reportes y optimización). Fees, mínimos, CTV, verificación de brand safety y reporte de transparencia: **no publicados** | `[V-prov]` [Real Audiences Academy](https://realaudiences.com/academy/) |
 | MiQ compró el negocio LATAM de Adsmovil (2026-03-25); 12 mercados, Chile incluido; programmatic omnicanal, commerce media, DOOH, CTV | `[V]` [MiQ](https://www.wearemiq.com/latam/resources/news/miq-acquires-adsmovil) |
 | TenX se presenta como partner de DV360 con presencia en CL, MX, CO y PE | `[V-sec]` [TenX](https://www.tenx.lat) |
 | El DSP de Microsoft (ex Xandr) dejó de operar compra el 2026-02-28 | `[V]` [Digiday](https://digiday.com/media-buying/microsoft-advertising-is-closing-the-xandr-dsp/) |
@@ -191,7 +194,8 @@ personas `[V-sec]` [State of PPC 2024 vía Reboot](https://www.rebootonline.com/
    caen en la señal: son la mejor puerta para el Diagnostic.
 4. El motion B2B tiene espacio de anclaje: los competidores B2B locales no publican precio y ninguno vende la conexión
    con la etapa del CRM como producto.
-5. Programmatic se compra vía partner con cláusula de transparencia; MiQ (Adsmovil) y TenX son candidatos a evaluar.
+5. Programmatic se compra vía partner con cláusula de transparencia. El CEO seleccionó a Real Audiences el 2026-09-10;
+   su modo autogestionado permite operar sin seat propio. MiQ (Adsmovil) y TenX quedan como alternativas.
 6. Mercado Ads es el programa de plataforma de mayor retorno para commerce en Chile; Amazon Ads no aplica.
 7. Google Partner es alcanzable y funciona como piso de credibilidad; Premier no es objetivo planificable.
 

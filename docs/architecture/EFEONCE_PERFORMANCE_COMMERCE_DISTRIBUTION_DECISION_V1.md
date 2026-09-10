@@ -14,8 +14,8 @@
 - **Reversibility:** two-way — documental; no hay runtime, schema ni contrato firmado. Revertir = volver a la sección
   única del catálogo de Media & Distribution
 - **Confidence:** high para boundaries, taxonomía y el principio "canal = cobertura, no producto" · medium para el motion
-  B2B como diferencial · **low para demanda, willingness-to-pay y cost-to-serve** · low para economics programáticos vía
-  partner (sin partner seleccionado)
+  B2B como diferencial · **low para demanda, willingness-to-pay y cost-to-serve** · low para economics programáticos (partner
+  seleccionado, fees desconocidos)
 - **Validated as of:** 2026-09-10
 - **Canonical model:** [`Media & Distribution — Business Model V1`](../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md)
 - **Service catalog:** [`Ficha de servicio`](../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md)
@@ -82,11 +82,14 @@ Al 2026-09-10 la solución tenía cinco huecos:
    es dueño del lado CRM (etapas, calidad de datos, sync). Con un solo cliente y un solo engagement, la propuesta nombra
    owner por lane.
 
-6. **Programmatic y CTV se compran vía partner.** Efeonce planifica, define audiencias y exclusiones, gobierna, audita
-   el supply path y lee resultados; un trading desk o DSP en modalidad managed opera el seat. Todo partner programático
-   firma cláusula de transparencia: fee de tecnología y de servicio declarados, reporte a nivel de dominio/app/placement,
-   listas de exclusión de brand safety y sitios MFA, y ningún markup no declarado. Un seat propio sólo se evalúa por
-   gate de volumen (ver pricing pack).
+6. **Programmatic se compra vía Real Audiences.** El partner programático seleccionado por el CEO el 2026-09-10 es
+   **Real Audiences**, un DSP con operación en los cinco países de Efeonce. Se usa en dos modos y en secuencia: primero
+   **managed por briefing** (Real Audiences opera; Efeonce define objetivo, audiencias y exclusiones, audita y lee
+   resultados) y después **autogestionado**, con un trader de Efeonce certificado por Real Audiences, una vez pasado el
+   gate de la ficha. La cláusula de transparencia es obligatoria antes de la primera campaña: fees de plataforma, datos y
+   servicio declarados; reporte por dominio/app/placement; listas de exclusión de brand safety y sitios MFA; y ningún
+   markup no declarado. Un seat en otro DSP sólo se evalúa si Real Audiences no cubre una necesidad —CTV o ABM B2B— con
+   volumen que lo justifique. MiQ y TenX quedan como alternativas.
 
 7. **Los partnerships de plataforma habilitan la ejecución; no son el diferencial.** Se persiguen cuando existe volumen
    gestionado y owner que cumpla los requisitos de cada programa. Ningún badge se comunica antes de verificarlo en el
@@ -150,7 +153,7 @@ Al 2026-09-10 la solución tenía cinco huecos:
 
 - No aprueba precios, bandas públicas, claims ni venta general: el pricing pack queda `hypothesis_only` hasta la revisión
   de Finance.
-- No selecciona partner programático ni firma términos.
+- No firma términos con Real Audiences: registra la selección del CEO; fees, cláusula y alcance siguen por cerrar.
 - No cambia las tres soluciones de Media & Distribution ni el rol de Reach como product brand habilitadora.
 - No construye integración de plataformas en Greenhouse ni federa tools de Ads en el gateway MCP: eso requiere su
   propia TASK con contrato gobernado.
@@ -164,7 +167,7 @@ Pasa a `Accepted` cuando se cumplan:
 2. **Finance:** cost-to-serve por nivel de complejidad medido en el primer piloto, piso de margen fijado y `EFG-003`
    resuelto.
 3. **Legal/Privacy:** posición sobre envío de datos first-party a plataformas bajo la Ley 21.719, con plantilla de DPA.
-4. **Programmatic:** un partner seleccionado con cláusula de transparencia firmada.
+4. **Programmatic:** cláusula de transparencia firmada con Real Audiences y primera campaña managed auditada contra ella.
 
 Si G1 falla sólo en el motion B, se retira el motion B y el resto se mantiene.
 
