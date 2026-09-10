@@ -41,7 +41,8 @@ Cada proveedor pasa por los 10 gates de §7 del operating model. Estos cinco son
 | **2** | **Cumplimiento laboral verificable** | En la capa B, la responsabilidad solidaria de la Ley 20.123 alcanza al cliente. Certificados al día no son burocracia: son condición de que el cliente pueda contratarnos |
 | **3** | **Acceso al dato crudo** | En la capa A, si el proveedor sólo entrega su dashboard, Efeonce no acumula histórico propio y la fase 3 nunca llega. Debe existir salida de datos exportable |
 | **4** | **Plazo de pago** | Un proveedor que cobra a 30 con un cliente que paga a 90 abre 60 días de hueco por ciclo. Ver §4 |
-| **5** | **Sustituibilidad** | Si sólo hay un proveedor posible para una capa, Efeonce no gobierna: depende. Se exige alternativa identificada antes de comprometer la capa |
+| **5** | **Acepta operar bajo el método de Efeonce** | Efeonce opera: fija el plan del ciclo, el estándar de scoring, el criterio de priorización y el control de calidad. Un proveedor que sólo trabaja con su propia metodología y su propio dashboard no sirve — obliga a Efeonce a revender su servicio en vez de operar el suyo |
+| **6** | **Sustituibilidad** | Si sólo hay un proveedor posible para una capa, Efeonce no gobierna: depende. Se exige alternativa identificada antes de comprometer la capa |
 
 **Regla de conflicto de interés.** Varios candidatos de las capas A y B compiten con la línea por la misma cuenta.
 Un proveedor que también vende directo al cliente final necesita acuerdo explícito de no-solicitación sobre las
@@ -156,6 +157,7 @@ Cada proveedor que entre a una propuesta debe tener esta ficha completa:
 | Economics | Tarifa, unidad, mínimos, plazo de pago, escalas |
 | Conflicto de interés | Vende directo al cliente final · acuerdo de no-solicitación |
 | Sustituto identificado | Quién ejecuta si este proveedor falla |
+| Acepta el método Efeonce | Plan, estándar de scoring, criterio de priorización y control de calidad |
 | Owner interno | Quién gobierna la relación |
 | Stop condition | Qué cambio de precio, acceso, calidad o disponibilidad la termina |
 

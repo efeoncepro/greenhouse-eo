@@ -148,6 +148,19 @@ retorno demostrable en un momento en que el costo por hora de cobertura sube por
   de priorización, el pod se convierte en reposición ciega y el modelo pierde su fundamento.
 - **Condicionada:** Escalón 3 — requiere que el cliente ya tenga proveedores de terreno contratados y acepte que
   Efeonce los gobierne sin desplazarlos en el corto plazo.
+### Managed Channel Operations — la modalidad que envuelve la oferta
+
+Efeonce **opera** los tres escalones en las tres fases: plan del ciclo, método y estándar de scoring, dirección,
+control de calidad de la evidencia, gobierno de proveedores, lectura, decisión y accountability. Lo que varía por
+fase es **quién pone las manos**, no quién opera.
+
+Es el mismo patrón de Managed Media Operations en Media & Distribution: una modalidad operativa recurrente que
+gobierna las soluciones, no una solución adicional que se agregue al catálogo.
+
+**Implicación económica directa:** el fee de Efeonce remunera la operación; la ejecución de terceros es
+pass-through documentado sin margen. Sin esa separación, el precio no es defendible y la línea se convierte en
+reventa con markup — que es exactamente lo que un comprador corporativo desarma en la primera negociación.
+
 ### La capacidad de terreno tiene dos cargas de trabajo, no una
 
 El pod del escalón 2 no sólo remedia ejecución: también **activa**. Auditar, remediar, hacer sampling, demostrar

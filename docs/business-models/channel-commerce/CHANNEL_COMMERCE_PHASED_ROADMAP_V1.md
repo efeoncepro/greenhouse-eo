@@ -23,9 +23,14 @@ disciplina para que "ofrecer todo" no signifique "ejecutar todo desde el día un
 
 ```text
 La oferta al cliente es completa y estable desde la fase 1.
-Lo que cambia por fase es cuánto de esa oferta ejecuta Efeonce
-con capacidad propia en vez de con un proveedor gobernado.
+Efeonce OPERA en las tres fases: plan, método, estándar, control
+de calidad, gobierno de proveedores, decisión y accountability.
+Lo que cambia por fase es sólo quién PONE LAS MANOS en cada capa.
 ```
+
+Operar no es ejecutar. Un proveedor puede recorrer la tienda; Efeonce decide qué tiendas, contra qué estándar,
+valida que la evidencia sea real, interpreta, prioriza y responde. Esa capa —Managed Channel Operations— es la que
+justifica el fee y la que impide que la línea sea reventa con markup.
 
 El cliente ve un solo responsable y un solo contrato en las tres fases. El mix build/partner es una decisión
 interna que se mueve con la evidencia, y **nunca** es un tema del cliente.

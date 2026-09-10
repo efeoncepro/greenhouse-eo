@@ -30,27 +30,79 @@ Claims prohibidos hasta tener evidencia propia fechada: incremento de venta o se
 porcentajes de ahorro frente a la agencia del cliente; cobertura nacional; y "Perfect Store" como resultado
 garantizado — es un marco de scoring, no una promesa.
 
+## Managed Channel Operations — la modalidad operativa
+
+**No es un servicio de la lista. Es la capa que envuelve toda la lista**, y es la razón por la que el cliente
+contrata a Efeonce en vez de contratar directo al proveedor que pone las manos.
+
+Sigue el patrón ya canonizado en Media & Distribution, donde Managed Media Operations tampoco es una solución
+adicional sino la modalidad recurrente que gobierna las demás.
+
+### Ejecutar no es operar
+
+| | Qué significa | De quién es |
+|---|---|---|
+| **Ejecutar** | Poner las manos: recorrer la tienda, capturar, reponer, activar, montar | Propio **o** de un proveedor, según la fase y la capa |
+| **Operar** | Planificar el ciclo, fijar el método y el estándar, dirigir, validar la calidad del dato, gobernar a los proveedores, leer el resultado, decidir y responder ante el cliente | **Siempre de Efeonce, en las tres fases** |
+
+Un proveedor ejecuta una misión. Efeonce decide qué tiendas, con qué criterio, contra qué estándar, valida que la
+evidencia sea real, interpreta el resultado, prioriza la intervención y responde si algo falla. Esa es la
+diferencia entre operar y revender.
+
+### Qué incluye operar
+
+- **Plan del ciclo:** qué puntos de venta, con qué frecuencia, qué se mide y por qué.
+- **Método y estándar:** el modelo de scoring, las reglas de negocio y el criterio de priorización — es IP de
+  Efeonce y no cambia porque cambie el proveedor.
+- **Dirección y supervisión:** instrucción, capacitación del estándar y resolución de excepciones.
+- **Control de calidad:** validación de la evidencia, auditoría cruzada de muestras, rechazo y reproceso. **Nunca
+  se publica al cliente un dato que Efeonce no validó.**
+- **Gobierno de proveedores:** selección, back-to-back, medición de desempeño, reemplazo y continuidad.
+- **Lectura y decisión:** el reporte, la lista priorizada, la recomendación del ciclo siguiente y la sesión con el
+  cliente.
+- **Accountability:** un solo responsable ante el cliente, pase lo que pase aguas abajo.
+
+### Por qué esto es lo que se cobra
+
+El fee de Efeonce remunera **la operación**, no la ejecución. La ejecución de terceros es pass-through documentado
+y sin margen. Esa separación es la que hace defendible el precio: el cliente paga por el método, el estándar, la
+validación, la decisión y la responsabilidad — no por un intermediario entre él y un proveedor que podría
+contratar solo.
+
+Si en alguna propuesta Efeonce no aporta plan, estándar, validación ni decisión, **esa propuesta no debería
+existir**: es reventa, no es esta línea.
+
+### Lo que cambia por fase y lo que no
+
+```text
+Cambia:     quién pone las manos en cada capa.
+No cambia:  que Efeonce opera, decide y responde.
+```
+
+---
+
 ## Los once servicios
 
-La oferta es completa desde el primer contrato. Lo que cambia por fase es **quién ejecuta**, nunca qué se promete.
+La oferta es completa desde el primer contrato. **Efeonce opera los once**, siempre. Lo que cambia por fase es
+quién pone las manos en cada capa — nunca qué se promete ni quién responde.
 
 ### A · Puertas de entrada — proyecto cerrado
 
-| § | Servicio | Qué compra el cliente | Ejecuta en fase 1 | Unidad de cobro |
+| § | Servicio | Qué compra el cliente | Pone las manos en fase 1 | Unidad de cobro |
 |---|---|---|---|---|
 | 1 | **Channel Execution Diagnostic** | Saber qué se puede medir, qué está roto y en qué orden intervenir | Efeonce + captura vía partner | Proyecto cerrado por complejidad |
 | 2 | **Trade Investment Audit** | Saber qué componente de su inversión de canal no tiene retorno demostrable | Efeonce | Proyecto cerrado |
 
 ### B · Núcleo recurrente — lo que sostiene la relación
 
-| § | Servicio | Qué compra el cliente | Ejecuta en fase 1 | Unidad de cobro |
+| § | Servicio | Qué compra el cliente | Pone las manos en fase 1 | Unidad de cobro |
 |---|---|---|---|---|
 | 3 | **Cobertura Auditada** | El estado de ejecución por punto de venta y la lista priorizada, cada ciclo | Partner de captura, gobernado por Efeonce | PDV auditados × ciclos |
 | 5 | **Field Orchestration** | Que sus proveedores de terreno se comparen contra el mismo estándar | Efeonce | Proveedores × mercados gobernados |
 
 ### C · Ejecución en el canal — donde se interviene
 
-| § | Servicio | Qué compra el cliente | Ejecuta en fase 1 | Unidad de cobro |
+| § | Servicio | Qué compra el cliente | Pone las manos en fase 1 | Unidad de cobro |
 |---|---|---|---|---|
 | 4 | **Managed Field Pod** | Que las tiendas críticas queden intervenidas, con evidencia antes/después | Proveedor con back-to-back | Capacidad mensual comprometida |
 | 7 | **Activación de Marca Medida** | Activación que se reporta en delta contra tiendas de control, no en contactos | Proveedor + Efeonce (diseño y lectura) | Ola: tiendas × días |
@@ -58,7 +110,7 @@ La oferta es completa desde el primer contrato. Lo que cambia por fase es **qui�
 
 ### D · Conexión digital y expansión — el diferenciador
 
-| § | Servicio | Qué compra el cliente | Ejecuta en fase 1 | Unidad de cobro |
+| § | Servicio | Qué compra el cliente | Pone las manos en fase 1 | Unidad de cobro |
 |---|---|---|---|---|
 | 6 | **Digital Shelf & AI Shopper Visibility** | Cómo se ve su producto en el anaquel digital y si la IA lo recomienda | Efeonce (Wave) | Según owner |
 | 10 | **Retail Media & Commerce Operations** | Operar su inversión en las redes de las cadenas | Efeonce (Media & Distribution) | Según owner |
@@ -229,6 +281,10 @@ mismo estándar.
 
 **Para quién.** Marcas que ya tienen dos o más agencias de terreno por país, canal o categoría, y ninguna lectura
 consolidada.
+
+**No confundir con Managed Channel Operations.** Esta última es la modalidad con que Efeonce opera **sus propias**
+capas y proveedores en cualquier servicio, y no se cotiza aparte. Field Orchestration es un servicio vendible
+distinto: gobernar los proveedores **que el cliente ya tiene contratados**, sin desplazarlos.
 
 **Alcance incluido.** Estandarización del modelo de scoring entre proveedores; consolidación de la data;
 cadencia de gobierno; evaluación comparada de desempeño; recomendación de reasignación de cobertura y
