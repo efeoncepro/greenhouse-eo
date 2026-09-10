@@ -7,6 +7,32 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — Channel & Commerce: se abre la línea de trade marketing y BTL
+
+Efeonce no tenía oferta de trade marketing ni BTL; el dominio existía disperso (retail media en Media &
+Distribution, producción de piezas en Creative Services, medición en Wave) y nadie resolvía la pregunta del
+Gerente Comercial: qué pasó en la góndola, qué costó y dónde reasignar. Se abre **Channel & Commerce** con ADR
+`Accepted` (`EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1.md`), catálogo canónico de **23 servicios** en dos familias
+de mercado —13 trade + 9 BTL + 1 transversal— y `Managed Channel Operations` como modalidad que opera todos:
+Efeonce fija plan, estándar, validación de evidencia y accountability; la ejecución puede ser propia o de
+proveedor, y el fee remunera la operación mientras la ejecución de terceros va como pass-through.
+
+Evidencia de mercado fechada: el benchmark chileno encontró dos categorías ocupadas —software de retail execution
+(Teamcore, Frogmi, Trax, Storecheck) que detecta pero no ejecuta, y agencias de servicio (Touch Latam, Novaprom,
+Treid) que ejecutan pero reportan de forma descriptiva— y ninguna conecta la ejecución física con la inversión
+digital, que es la diferenciación de la línea. Battlecards con vulnerabilidades y reglas de conversación en
+`CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md`.
+
+Modelo económico en `Proposed` con gates G1–G6 abiertos: capital asignado CLP 40M que financia una cuenta ancla a
+la vez, tres fases con la oferta estable y el mix build/partner variable, y el working capital declarado como el
+riesgo que mata el modelo (se paga mensual y se cobra a 30–90 días; el factoring reduce el problema pero no cubre
+el tramo pre-factura). Invariantes duros: nunca staff augmentation de terreno —en Chile sería suministro de
+personal bajo la Ley 20.123—, nunca producción física propia, back-to-back o no se firma, y nunca prometer
+incremento de venta. **No** autoriza precios, claims, cobertura ni contratación de capacidad.
+
+Router: la fila quedó en `AGENTS.md` y en `agent-context-router.json`; **no** en `CLAUDE.md`, que está en su techo
+de presupuesto (34.973/35.000) y requiere liberar espacio primero — registrado como pendiente en el ADR.
+
 ## 2026-09-10 — Product Design 360 modelado como sexta familia propuesta de Wave
 
 UI/UX y product design no estaban modelados en ninguna parte: cero fichas en `docs/services/`, cero modelos en
@@ -978,22 +1004,3 @@ nombre concluirá lo contrario de lo que debe.
 El horizonte del shim no lo fija el calendario de la spec sino el día que un cliente endurezca
 cualquiera de las dos validaciones. Para ese día queda declarado un plan B de pre-registro puro que no
 toca Entra ni el modelo de tokens.
-
-## 2026-09-02 — un release quedó huérfano en `main` y se recuperó sin ensuciar el control plane
-
-La promoción `develop→main` (PR #215, 726 archivos, 1490 commits, 2 migraciones) entró a `main` a las
-`20:51:04Z` y quedó **sin manifest**: la sesión que la promovía fue archivada por accidente antes de dispatchar
-el orquestador. Otra sesión la retomó con autorización directa del operador y cerró el ciclo: run `33683893124`
-completed/success en 11m50s, `release_id` `375f56e24187-546f452b-c60f-4617-9974-9c87760c3ab9`, estado final
-`released`, con los dos gates `production` aprobados en 34 s y post-release health verde.
-
-Tres verificaciones que no se dieron por hechas. El skip del `ops-worker` (51 s, step `Deploy` en `skipped`) se
-validó con el **diff de árbol completo** y con `pnpm worker:deploy-path-gate` —1451 archivos del bundle, todos
-cubiertos; `src/mcp` no entra, lo sirve Vercel—, no con la lista del change-gate. El `data_missing=4` del
-watchdog se trató como falta de evidencia y no como drift: la lectura autoritativa fue `pnpm release:workers`,
-3/4 workers en el target. Y el canary de contrato del lane MCP `skills` se corrió **después** del `released`,
-con asserts que sólo el contrato nuevo puede producir.
-
-Flags: `GROWTH_SEO_SITE_FINDINGS_ENABLED` prendido en el ops-worker con los dos pasos, tras probar **por blob**
-que el evaluador desplegado es idéntico al de `main`. `HIRING_FAIRNESS_MONITOR_ENABLED` NO se prendió: daría
-cero en silencio en una métrica de equidad hasta que cierre `TASK-1365`.

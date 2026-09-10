@@ -55,9 +55,9 @@ Cada servicio debe declarar como mínimo:
 - [Creative Services](creative-services/README.md) — incluye Social Media, su operación recurrente y la capability
   **Efeonce Run & Gun Studio**, que se comercializa mediante **Efeonce Run & Gun Production** con alcance propio.
 - [Media & Distribution](media-distribution/README.md)
-- [Channel & Commerce](channel-commerce/README.md) — trade marketing: ejecución de canal con
-  evidencia, cobertura auditada, capacidad de terreno gobernada y orquestación de proveedores. Estado `Proposed`,
-  mercado inicial Chile.
+- [Channel & Commerce](channel-commerce/README.md) — trade marketing y BTL: 23 servicios en dos familias
+  (13 trade + 9 BTL + 1 transversal) con `Managed Channel Operations` como modalidad que opera todos. Estado
+  `Proposed`, mercado inicial Chile. ADR: [`EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1`](../architecture/EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1.md).
 
 HubSpot as a Service pertenece a **RevOps & CRM**. Su arquitectura vigente usa seis familias por outcome, modos de
 entrega transversales y overlays sectoriales; la evaluación inicial para fit/cotización es sin costo y un blueprint

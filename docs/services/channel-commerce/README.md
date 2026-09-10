@@ -7,6 +7,7 @@
 > tecnología propia como destino de fase 3. Owner de línea: Julio Reyes (interino)
 > **Mercado inicial:** Chile
 > **Última actualización:** 2026-09-10
+> **Decisión canónica:** [`EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1`](../../architecture/EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1.md) (`Accepted` 2026-09-10)
 > **Modelo económico:** [`CHANNEL_COMMERCE_BUSINESS_MODEL_V1`](../../business-models/channel-commerce/CHANNEL_COMMERCE_BUSINESS_MODEL_V1.md)
 > **Fases y capital:** [`roadmap`](../../business-models/channel-commerce/CHANNEL_COMMERCE_PHASED_ROADMAP_V1.md) · [`modelo de caja`](../../business-models/channel-commerce/CHANNEL_COMMERCE_CAPITAL_AND_CASH_MODEL_V1.md) · [`proveedores`](../../business-models/channel-commerce/CHANNEL_COMMERCE_SUPPLIER_REGISTRY_V1.md)
 > **Evidencia de mercado:** [`benchmark chileno 2026-09-10`](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
@@ -21,6 +22,10 @@ de intervenir donde esa evidencia lo justifica. No se vende cobertura por cabeza
 y no se vende material impreso.
 
 ## Estado y límites
+
+**Qué es canónico y qué no.** La taxonomía de los 23 servicios —nombre, alcance, exclusiones, unidad de cobro y
+boundaries con otras líneas— **es canon**: no se inventan servicios fuera de esta lista ni se renombran en una
+propuesta. Lo que sigue bloqueado es la dimensión comercial.
 
 `Proposed` significa: se puede conversar, diagnosticar y cotizar caso a caso. **No** se puede publicar precio,
 comprometer cobertura, prometer tiempos de respuesta, contratar capacidad de terreno ni firmar recurrente hasta
