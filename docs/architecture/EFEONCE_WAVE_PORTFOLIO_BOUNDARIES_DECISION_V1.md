@@ -99,3 +99,34 @@ compuesto no cambia automáticamente el ownership del product service ni crea un
 - El modelo económico y de packaging vive en `docs/business-models/wave/`.
 - La taxonomía comercial derivada vive en `docs/services/README.md` y el context pack.
 - Las skills de agencia y business model deben cargar este ADR antes de razonar sobre Wave.
+
+## Delta 2026-09-10 — Product Design 360 propuesta como sexta familia
+
+**Estado: `Proposed`. Este delta NO modifica la decisión aceptada del 2026-07-25.** Las cinco familias siguen
+siendo las aceptadas; la sexta queda registrada como propuesta pendiente de aprobación.
+
+**Hueco detectado.** Este ADR le entregó a Wave el *diseño técnico, delivery y operación* de la web dentro de
+**Web Experience 360**. Eso cubre construir y operar. No cubre **decidir cómo debe ser la experiencia**: research,
+arquitectura de información, flujos, prototipado, interfaz, design system, accesibilidad, validación y design ops.
+Esa disciplina no tenía dueño en el portfolio — cae entre Wave (ingeniería web) y Globe (producción creativa), y
+ninguno de los dos la reclamaba. Tampoco estaba modelada en `docs/services/` ni en `docs/business-models/`.
+
+**Propuesta.** Registrar **Product Design 360** como sexta familia de Wave, con esta frontera interna:
+
+> Product Design 360 **decide cómo debe ser la experiencia**.
+> Web Experience 360 **la construye, la despliega y la opera**.
+
+Su alcance incluye superficies que no son web —app, portal de cliente, SaaS, herramienta interna, experiencia
+conversacional—, razón por la cual no puede vivir subordinada a Web Experience 360.
+
+**Frontera con Globe, sin cambios de ownership.** Globe conserva contenido, marca y producción creativa. Product
+Design 360 diseña la interfaz y el sistema con el que alguien opera algo. *Un brandbook no es un design system.*
+
+**Lo que este delta no hace.** No aprueba la sexta familia, ni pricing, ni claims públicos, ni el nombre público
+"Product Design 360" (decisión abierta D1 del modelo). No cambia el ownership de ninguna capability existente.
+
+**Condición de resolución.** El gate G1 del modelo económico —demanda externa verificada— decide si la sexta
+familia se acepta en un ADR V2 o si se repliega a capability dentro de Web Experience 360.
+
+**Fuentes:** [`Product Design 360 — Business Model V1`](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) ·
+[`Ficha de servicio`](../services/wave/product-design-360.md)

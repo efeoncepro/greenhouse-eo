@@ -7,6 +7,24 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — Product Design 360 modelado como sexta familia propuesta de Wave
+
+UI/UX y product design no estaban modelados en ninguna parte: cero fichas en `docs/services/`, cero modelos en
+`docs/business-models/`. El ADR de Wave le daba a **Web Experience 360** el *diseño técnico, delivery y operación*
+de la web —construir y operar—, pero nadie poseía **decidir cómo debe ser la experiencia**; la disciplina caía
+entre Wave (ingeniería) y Globe (producción creativa). Se agrega
+`docs/business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md` (`Proposed`, 14 secciones,
+Operator & Buying Group Contract, 5 gates de validación) y la ficha
+`docs/services/wave/product-design-360.md` con seis servicios: Diagnóstico de Experiencia, Experience Design
+Sprint, Digital Product Design, Design System (build + gobierno), Experience Research & Validation y Design
+Operations. Alcance: web **y** producto digital (app, portal, SaaS, herramienta interna, superficie
+conversacional). Unidad de cobro de la línea recurrente: capacidad gobernada, nunca horas ni pantallas. El ADR de
+boundaries recibe un **delta fechado que no reescribe la decisión aceptada**: la sexta familia queda `Proposed` y
+su gate G1 (demanda externa) decide si se acepta en un ADR V2 o si se repliega a capability dentro de Web
+Experience 360. Evidencia declarada como capability interna (AXIS, UI Platform, GVC, Premium UI Delivery
+Standard), explícitamente **no** como caso de cliente. Se crea además `docs/services/wave/README.md`, primer
+índice de fichas de Wave. Sin pricing, sin claims públicos, sin venta general.
+
 ## 2026-09-10 — Conciliación bancaria ago–sep en producción, `fx_drift` cubre USD/MXN y rutina mensual (TASK-1858)
 
 Release `2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` (`released` 20:06Z, run `34523159501`, un solo

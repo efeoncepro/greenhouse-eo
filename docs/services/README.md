@@ -88,6 +88,14 @@ que diseña, construye y opera la capa digital inteligente. El catálogo económ
 | **Measurement & Analytics** | Measurement Audit · Tagging/Data Layer · GTM/GA4 Implementation · Dashboard & Attribution · Analytics Operations |
 | **Agent Systems & Platforms** | Agent Strategy & Architecture · Custom Agent System · Managed Agent Deployment · Agent Integrations · Agent Evaluation & Operations |
 | **Digital Automation & Integrations** | API/Workflow Sprint · Data Pipeline · Automation Build · Integration Operations |
+| **Product Design 360** *(propuesta)* | Diagnóstico de Experiencia · Experience Design Sprint · Digital Product Design · Design System (build + gobierno) · Experience Research & Validation · Design Operations |
+
+**Product Design 360** es una **sexta familia propuesta**, todavía no aceptada en el ADR de boundaries. Cubre el
+diseño de superficies operables —web y producto digital— y separa *decidir cómo debe ser la experiencia* de
+*construirla y operarla*, que sigue siendo de Web Experience 360. Ficha:
+[`wave/product-design-360.md`](wave/product-design-360.md). Modelo:
+[`PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md`](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md).
+Las fichas de servicio de Wave viven en [`wave/`](wave/README.md).
 
 La composición de un proyecto puede incorporar capacidades de RevOps & CRM/Kortex, Creative Services/Globe o
 Media & Distribution (con Reach cuando aplique) según el resultado contratado y el RACI definido. Wave conserva el ownership de sus
