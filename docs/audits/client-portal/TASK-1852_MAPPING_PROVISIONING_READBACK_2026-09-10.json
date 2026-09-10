@@ -393,5 +393,83 @@
         }
       ]
     }
+  },
+  "release": {
+    "releaseId": "f69b9d326a6f-5616d4ef-0b31-4972-9cc7-527a16ef18aa",
+    "targetSha": "f69b9d326a6fe25316b6638a5463f3a19c862758",
+    "orchestratorRun": "34431792218",
+    "pr": 232,
+    "manifestState": "released",
+    "releasedAt": "2026-09-10T03:16:23.904Z",
+    "vercelProduction": "greenhouse-naxc5guq3-efeonce-7670142f.vercel.app",
+    "workers": {
+      "commercial-cost-worker": "f69b9d326a6f",
+      "ico-batch-worker": "f69b9d326a6f",
+      "hubspot-greenhouse-integration": "f69b9d326a6f",
+      "ops-worker": "6807406bd7cc (árbol idéntico, change-gated)",
+      "auth-server": "6807406bd7cc (árbol idéntico, change-gated)"
+    },
+    "watchdog": "3 señales ok; 5/5 workers synced",
+    "flag": "CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true (Vercel Production, horneada en el build)"
+  },
+  "productionContractCanaryAfterRelease": {
+    "observedAt": "2026-09-10T03:18:53.949Z",
+    "baseURL": "https://greenhouse.efeoncepro.com",
+    "releaseSha": "f69b9d326a6fe25316b6638a5463f3a19c862758",
+    "actor": "dedicated internal agent; no human login proof",
+    "cases": [
+      {
+        "case": "berel_preview_new_blocker_code",
+        "status": 200,
+        "blockers": [
+          "person_invitation_pending"
+        ],
+        "readiness": [
+          "producer_coverage_unverified",
+          "identity_link_unverified",
+          "human_login_unverified",
+          "authenticated_route_unverified"
+        ]
+      },
+      {
+        "case": "sky_preview_clean",
+        "status": 200,
+        "canApply": true,
+        "fingerprint": "e2e5d938a6c3221bf514c4305f9dc40eb5d915357dc317a2e4a9c1709779ffcc",
+        "readiness": [
+          "producer_coverage_unverified",
+          "human_login_unverified",
+          "authenticated_route_unverified"
+        ],
+        "channels": [
+          "client-teams-chat-spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9:ready"
+        ]
+      },
+      {
+        "case": "commercial_terms_read_new_route",
+        "status": 200,
+        "activeTerms": {
+          "termsId": "7c26c8df-f409-4e34-bef7-d225aaf9f022",
+          "bundledModules": [
+            "creative_hub_globe_v1"
+          ],
+          "monthlyAmountClp": null
+        }
+      },
+      {
+        "case": "commercial_terms_declare_agent_denied",
+        "status": 403,
+        "codes": [
+          "invalid_delegated_context"
+        ]
+      },
+      {
+        "case": "apply_agent_denied_with_flag_on",
+        "status": 403,
+        "codes": [
+          "invalid_delegated_context"
+        ]
+      }
+    ]
   }
 }

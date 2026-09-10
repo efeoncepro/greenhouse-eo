@@ -5,12 +5,10 @@ Pendiente: conciliar MET-2339–2342 tarea/calendario. Producción abierta; cier
 
 **EPIC-046 / TASK-1852 (09/09):** Production `released`; [evidencia y pendientes](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
 PR #231/main `5726ce9d90`, orquestador `34416904936`; gates y watchdog verdes; excepción pause auditada.
-**10/09 (local, sin push):** términos con `bundledModules` (Berel seo_v2+AEO, Sky creative_hub); tres Berel `invited`
-sin correo; preview Sky limpio en prod; chats Teams `ready` y preferencias `client_service_default_v1` en las seis; contrato
-`delegated_oauth` sólo local. Invitaciones Berel BLOQUEADAS hasta tener UI. Falta: apply Sky (sesión humana + flag),
-release, Entra/gateway; `/creative-hub` 404 (1687).
-[Readback](docs/audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
-TASK-1834 entrada, TASK-1687 catálogo; 1853–1856 to-do; TASK-1690 in-progress.
+**10/09 RELEASE `f69b9d32` (PR #232, run `34431792218`, manifest released 03:16Z, watchdog 5/5, canary 5/5):** términos con
+`bundledModules`, autoridad `delegated_oauth`, invitación diferida, chats Teams `ready`, preferencias `client_service_default_v1`;
+flag writes ON horneada. Pendiente humano: apply Sky (payload `private-scope/sky-apply.json`, fp `e2e5d938…`); Berel sin
+entregar invitaciones (bloqueo del operador hasta UI); MCP delegado espera allowlist/Entra/gateway; `/creative-hub` 404 (1687).
 
 **EPIC-045 ↔ EPIC-046:** Hitos I/N obligatorios: Insights cliente/interno + email/in-app/Teamsbot con
 deep links; shared separado y móvil posterior. Contrato en arquitectura Insights §§7.1/9.1 y ADRs.
