@@ -14,7 +14,8 @@
 |---|---|---|---|
 | **Agencia digital CL** | **CLP 350k – 2,5M/mes** *(mid: 600k–2,5M)* | Ejecución local | Gobierno, métricas, capacidad senior |
 | **Holding / red internacional** | **CLP 5M+/mes** | Marca, premios, escala | Velocidad, transparencia, el equipo senior que le pitchearon |
-| 🎯 **Superside** *(el comparable real)* | **~USD 5.000/mes** + ~USD 1.000 de plataforma | **Capacidad asignada**, async, rápido | 🎯 **Estrategia, contexto, métricas de calidad, un equipo con nombre** |
+| 🎯 **Superside** *(el comparable real)* | 🔴 **Mínimo USD 15.000/mes** · `Dedicated` desde **USD 30.000/mes** a 12 meses · **+USD 1.000/mes** de software · **compromiso anual** *(verificado en su pricing 2026-09-10)* | **Capacidad asignada**, async, rápido; **UI/UX incluido** | 🎯 **Estrategia, contexto, métricas de calidad, un equipo con nombre** |
+| **Eleken** *(comparable de PRODUCT design)* | **USD 4.599–11.999/mes** por diseñador dedicado, mínimo 2 meses | Una persona de producto full-time | Cobertura, elasticidad, especialistas, gobierno |
 | **Design Pickle** | Plataforma **USD 119–299/mes** + horas creativas | Volumen de producción | Todo lo anterior, y además dirección |
 | **Freelance senior** | **USD 900–1.500/día** | Talento puntual | Continuidad, cobertura, gobierno, escala |
 | 🎯 **In-house** *(¡su equipo!)* | **1 art director: USD 7.500–13.300/mes** loaded · **equipo de 3: USD 20k–30k/mes** | Contexto total, dedicación | 🎯 **Capacidad elástica, cobertura, y personas que no se queman** |
@@ -74,8 +75,17 @@ fábrica y pasa a ser el dueño de la marca **con un equipo a su servicio.**
 
 **Es contra quien realmente competimos, y casi nadie en Efeonce lo sabe.**
 
-✅ Superside: **~USD 5.000/mes**, modelo de **capacidad asignada** (no requests ilimitados), plataforma aparte
-(~USD 1.000/mes), async-first, alcance transparente, turnaround predecible. **Son buenos. No los subestimes.**
+✅ Superside *(verificado en su propia página de precios, 2026-09-10)*: **mínimo de suscripción USD 15.000/mes**;
+plan `Dedicated` **desde USD 30.000/mes a 12 meses**; proyectos de alcance fijo desde USD 15.000; **+USD 1.000/mes
+de software**; **toda suscripción con compromiso anual**. Modelo de capacidad/presupuesto (no requests ilimitados),
+async-first, turnaround predecible. **UI/UX está explícitamente incluido** como *specialist production*.
+**Son buenos. No los subestimes.**
+
+> 🔴 **Corrección de doctrina 2026-09-10.** Esta skill decía **~USD 5.000/mes**, tomado de un blog comparativo de
+> tercero. **Subestimaba el precio de entrada 3×.** Consecuencia comercial: la afirmación "estamos en el mismo rango
+> que Superside" **era falsa** — su ticket de entrada es varias veces el nuestro. Eso cambia la conversación de
+> precio en nuestra dirección, y obliga a revisar si estamos subvalorando la capacidad. **Antes de usar cualquier
+> comparable de precio, verifícalo en la página del propio proveedor.**
 
 ### Dónde ganan ellos
 
