@@ -367,6 +367,35 @@ Commerce lo compone y lo traduce a decisión de canal. RACI explícito en cada p
 
 ---
 
+## T7 · Retail Media y Commerce  ·  *owner: Media & Distribution*
+
+Ya existe en el catálogo de [Media & Distribution](../media-distribution/README.md) dentro de Performance &
+Commerce. **No se reimplementa acá.** Channel & Commerce lo nombra porque es el destino natural de expansión
+cuando el cliente invierte en retail media sin lectura de ejecución física, y porque en Chile la categoría está
+creciendo con Walmart Connect, Cencosud Media, Fmedia, Sodimac Media, Ripley Media y Mercado Ads.
+
+La propuesta compuesta declara owner, RACI y facturación por línea.
+
+---
+
+## T8 · Diseño y Medición de Promociones
+
+**Promesa.** Sabes si la promoción vendió de más o simplemente adelantó y canibalizó margen.
+
+**Alcance incluido.** Diseño de mecánicas promocionales e incentivos al canal y a la fuerza de venta; **concursos
+y sorteos al consumidor**, con la coordinación del cumplimiento formal que corresponda —bases, publicación y
+transparencia, validadas con Legal y con la contraparte del cliente—; definición del marco de lectura antes de
+ejecutar; y evaluación de incrementalidad con el diseño de medición acordado previamente.
+
+**Excluido.** Financiar la promoción; ejecutar el pago de incentivos; garantizar incrementalidad.
+
+**Condición dura.** El marco de medición se define **antes** de ejecutar la promoción. Una promoción sin diseño de
+medición previo no se puede evaluar después; se declara así y no se vende la evaluación.
+
+**Madurez.** Servicio avanzado. Requiere que el cliente ya tenga cobertura auditada o data de sell-out confiable.
+
+---
+
 ## T9 · Estándar de Tienda Perfecta
 
 **Promesa.** Definir qué significa "bien ejecutado" en tu categoría, por canal y por formato, antes de salir a
@@ -664,54 +693,6 @@ y esa parte se conecta con el CRM del cliente vía RevOps cuando corresponde.
 
 ---
 
-## X1 · Contenido y Material de Canal  ·  *composición con Creative Services*
-
-**Promesa.** El material de canal deja de ser un acto heroico por campaña.
-
-**Alcance incluido.** Sistema de producción de piezas de canal: material POP digital, fichas y catálogos,
-contenido de PDP, kits para distribuidores, adaptaciones por cadena y por formato.
-
-**Ownership.** Creative Services (Creative Velocity · Run & Gun · Globe). Se vende como **capacidad gobernada**,
-nunca por pieza.
-
-**Captura en activación.** Cuando hay una activación en curso (B1), la capacidad de captura de Efeonce
-—Run & Gun Studio— convierte esa activación en material reutilizable para social, retail media y creator, con
-derechos definidos desde el brief. El BTL tradicional produce fotos de reporte; acá la misma salida produce
-activos. La activación deja de ser un costo que se agota el día del evento.
-
-**Excluido de Efeonce.** Impresión, bodegaje y logística de material físico. Va como pass-through de proveedor.
-
----
-
-## T8 · Diseño y Medición de Promociones
-
-**Promesa.** Sabes si la promoción vendió de más o simplemente adelantó y canibalizó margen.
-
-**Alcance incluido.** Diseño de mecánicas promocionales e incentivos al canal y a la fuerza de venta; **concursos
-y sorteos al consumidor**, con la coordinación del cumplimiento formal que corresponda —bases, publicación y
-transparencia, validadas con Legal y con la contraparte del cliente—; definición del marco de lectura antes de
-ejecutar; y evaluación de incrementalidad con el diseño de medición acordado previamente.
-
-**Excluido.** Financiar la promoción; ejecutar el pago de incentivos; garantizar incrementalidad.
-
-**Condición dura.** El marco de medición se define **antes** de ejecutar la promoción. Una promoción sin diseño de
-medición previo no se puede evaluar después; se declara así y no se vende la evaluación.
-
-**Madurez.** Servicio avanzado. Requiere que el cliente ya tenga cobertura auditada o data de sell-out confiable.
-
----
-
-## T7 · Retail Media y Commerce  ·  *owner: Media & Distribution*
-
-Ya existe en el catálogo de [Media & Distribution](../media-distribution/README.md) dentro de Performance &
-Commerce. **No se reimplementa acá.** Channel & Commerce lo nombra porque es el destino natural de expansión
-cuando el cliente invierte en retail media sin lectura de ejecución física, y porque en Chile la categoría está
-creciendo con Walmart Connect, Cencosud Media, Fmedia, Sodimac Media, Ripley Media y Mercado Ads.
-
-La propuesta compuesta declara owner, RACI y facturación por línea.
-
----
-
 ## B9 · Encuentros de Canal  ·  *hacia el canal, no hacia el shopper*  ·  *condicionado*
 
 **Promesa.** La convención de distribuidores o el lanzamiento a la fuerza de venta deja de ser un gasto anual sin
@@ -732,6 +713,25 @@ como pass-through. Efeonce no se convierte en productora de eventos.
 de entrada: nadie contrata su convención anual con un proveedor que recién conoce.
 
 **Composición.** Contenido y captura con Creative Services; medición y seguimiento con el modelo de canal.
+
+---
+
+## X1 · Contenido y Material de Canal  ·  *composición con Creative Services*
+
+**Promesa.** El material de canal deja de ser un acto heroico por campaña.
+
+**Alcance incluido.** Sistema de producción de piezas de canal: material POP digital, fichas y catálogos,
+contenido de PDP, kits para distribuidores, adaptaciones por cadena y por formato.
+
+**Ownership.** Creative Services (Creative Velocity · Run & Gun · Globe). Se vende como **capacidad gobernada**,
+nunca por pieza.
+
+**Captura en activación.** Cuando hay una activación en curso (B1), la capacidad de captura de Efeonce
+—Run & Gun Studio— convierte esa activación en material reutilizable para social, retail media y creator, con
+derechos definidos desde el brief. El BTL tradicional produce fotos de reporte; acá la misma salida produce
+activos. La activación deja de ser un costo que se agota el día del evento.
+
+**Excluido de Efeonce.** Impresión, bodegaje y logística de material físico. Va como pass-through de proveedor.
 
 ---
 
