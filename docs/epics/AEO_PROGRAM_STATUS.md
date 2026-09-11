@@ -1,8 +1,20 @@
 # Programa AEO / AI Visibility — Estado y Qué Sigue
 
 > **Tipo de documento:** Estado de programa + roadmap operativo (SSOT de "dónde estamos / qué sigue")
-> **Versión:** 1.3
+> **Versión:** 1.4
 > **Creado:** 2026-07-16 por Claude (auditoría multi-agente del programa AEO)
+>
+> 🔴 **Delta 2026-09-11 — primer panel competitivo real.** Se corrió el grader sobre **SKY y 4 competidores**
+> (LATAM, JetSMART, Avianca, Gol) con el mismo set curado de 12 preguntas, el mismo día, mercado Chile y 5 motores:
+> 5 runs `full` en staging (`EO-GRUN-00050`…`00054`, 300 observaciones, ~1 h), entregados (informe web + PDF) y
+> **enviados** a SKY fuera de la licitación, sin propuesta ni precio. **Probó que el motor sirve de punta a punta para
+> un paso de venta** (evidencia antes que promesa). Destapó **tres defectos, todavía sin task**: menciones contadas sólo
+> sobre el extracto de 600 caracteres (sin texto completo para recontar), falso positivo del probe `llms.txt` cuando una
+> SPA responde HTML 200, y detector de lenguaje sensible por substring ("denuncia" dentro de "denunciados"). Hoy el panel
+> es un **procedimiento de operador**; `TASK-1861` (grader por MCP), `TASK-1863` (multi-mercado) y `TASK-1864`
+> (superficie agéntica del MCP) son la base para volverlo capacidad gobernada. Procedimiento:
+> [manual](../manual-de-uso/growth/ai-visibility-grader-smoke.md#panel-competitivo-multi-marca) · contrato:
+> [arquitectura §Delta 2026-09-11](../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md).
 >
 > 🔴 **Delta 2026-09-01 — leer antes que el resto.** `TASK-1321` y `TASK-1330` cerraron: **la puerta
 > pública self-serve YA existe y funciona** (el grader corre desde `/aeo-2/`; 5 leads, los 5 con
@@ -10,7 +22,7 @@
 > Lo que falta no es ingeniería sino **demanda**: el último lead es del 2026-07-05. Las secciones de
 > abajo se escribieron antes de esos cierres y las que los tratan como pendientes están corregidas
 > en línea; los conteos de childs abiertas del cuerpo son de 2026-08-07 (hoy: 14, medido).
-> **Última actualización:** 2026-08-07 por Claude (fila EPIC-022 reconciliada contra el registry: 13 childs `complete`, cockpit operador en 3 de 4 tabs tras TASK-1306/1307/1308)
+> **Última actualización:** 2026-09-11 por Claude (Delta 2026-09-11: primer panel competitivo multi-marca, caso SKY; tres defectos del grader sin task y TASK-1861/1863/1864 como base de la capacidad gobernada)
 > **Documentación técnica:** [`../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`](../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 > **Epics que agrupa:** EPIC-020, EPIC-021, EPIC-022, EPIC-023, EPIC-024
 

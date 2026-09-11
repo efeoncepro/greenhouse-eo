@@ -1,5 +1,15 @@
 # Handoff activo
 
+**Panel competitivo AEO de SKY (2026-09-11, operación + venta):** 5 runs del grader en staging (SKY, LATAM, JetSMART,
+Avianca, Gol; Chile; set curado de 12 preguntas de aerolíneas; `EO-GRUN-00050`…`00054`), 2 aprobados en revisión
+humana por el operador, 5 informes web + PDF entregados y correo enviado a Nicolá Lamiaux (se escribe sin "s"),
+fuera de la licitación SEO. Método documentado: manual comercial `docs/manual-de-uso/comercial/panel-competitivo-aeo-en-venta.md`,
+doc funcional `docs/documentation/comercial/panel-competitivo-aeo.md`, runbook del grader § "Panel competitivo
+multi-marca", plantilla `seo-aeo-practice/templates/correo-panel-competitivo-aeo.md`. **Pendientes sin task:** tres
+defectos del grader medidos ese día (extracto de 600 caracteres sin texto completo; probe de `llms.txt` da positivo
+cuando un SPA sirve HTML; detector de lenguaje sensible por substring). La capacidad gobernada del panel queda en
+`TASK-1861` Delta (d).
+
 **Trendjacking «Nuestro Duo» (2026-09-11, operación):** pieza 4:5 + Short 9:16 (Seedance 2.5) programados vía
 Metricool en la marca Efeonce Group: Threads 11-09 12:30 · Instagram 11-09 19:00 · LinkedIn página 12-09 11:00 · YouTube
 Short 12-09 12:00 (todos `PENDING`; **falta confirmar publicación**). Skills `social-media-studio`, `copywriting`,

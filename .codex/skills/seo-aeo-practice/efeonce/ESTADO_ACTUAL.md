@@ -1,7 +1,8 @@
 # El estado real de la práctica SEO/AEO — sin adornos
 
-> **As-of 2026-08-25.** Base **2026-07-13**, con **corrección estructural del 2026-08-15** *(ver bloque
-> siguiente)* y **delta del 2026-08-25 sobre el estado de la cuenta Berel** *(§ 3b)*.
+> **As-of 2026-09-11.** Base **2026-07-13**, con **corrección estructural del 2026-08-15** *(ver bloque
+> siguiente)*, **delta del 2026-08-25 sobre el estado de la cuenta Berel** *(§ 3b)* y **delta del 2026-09-11:
+> el Grader se usó en un panel competitivo real para SKY** *(§ 3c)*.
 > Fuente: **expediente de licitación** + repo + facturación real + benchmark de mercado verificado +
 > **research SEO/AEO de Berel con su propio Search Console**.
 > 🔴 **Este documento existe para que ningún agente venda con una realidad que no tenemos.**
@@ -32,6 +33,9 @@
 **1. El riesgo se invierte.** No es que dejemos plata en la mesa: es que **tenemos un KPI contratado que no estamos
 midiendo**. El presupuesto compromete **monitoreo mensual de citations** y **15-25 AI citations/mes** — y el
 grader **lleva sin correr desde el 2026-07-17** *(`docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md`)*.
+*(🟡 **Nota 2026-09-11:** el Grader **sí volvió a correr**: 5 runs del panel competitivo de SKY, § 3c. Eso **no**
+acredita el monitoreo mensual de **Berel**, que es la obligación: confírmalo contra los runs de Berel antes de dar
+este punto por cerrado.)*
 🔴 **Eso es under-delivery contra una obligación, y es más urgente que cualquier upside de pricing.**
 *(Y el descuento no lo atenúa: **haber bajado el precio no baja el compromiso**.)*
 
@@ -159,7 +163,7 @@ con el cliente que ya tienes.)*
 
 | Activo | Estado | 🔴 El problema |
 |---|---|---|
-| 🎯 **AI Visibility Grader** | ✅ **En producción**, 7 dimensiones, entity probes, reporte público. **Y ya se usa en la venta** | 🔴 **Compite con el checker GRATIS de Semrush en "medir".** Su valor tiene que migrar a **la prescripción**, no al score |
+| 🎯 **AI Visibility Grader** | ✅ **En producción**, 7 dimensiones, entity probes, reporte público. **Y ya se usa en la venta** *(2026-09-11: primer panel competitivo multi-marca, SKY frente a 4 aerolíneas, § 3c)* | 🔴 **Compite con el checker GRATIS de Semrush en "medir".** Su valor tiene que migrar a **la prescripción**, no al score |
 | **El cotizador** | ✅ Motor cost-plus completo, Full API Parity, Nexa + MCP lo consumen | 🔴 **Se usó UNA vez** (SKY). Para el cliente que factura todos los meses, **no** |
 | **El portal / ICO** | ✅ Existe, está en la oferta de SKY | 🔴 **Va adentro del retainer, sin línea propia ni precio.** Es nuestro mayor diferenciador y **lo regalamos** |
 | **Landing de SEO** (`/servicios/posicionamiento-seo`) | ✅ **Live** (TASK-1343) | — |
@@ -291,6 +295,38 @@ imágenes.**
 
 ---
 
+## 3c. 🎯 Delta 2026-09-11 — el Grader en un panel competitivo real (SKY)
+
+> **Qué pasó:** a pedido de **Nicolá Lamiaux** *(se escribe sin «s»)*, Gerente de Marketing de SKY Airline,
+> corrimos el Grader sobre **SKY, LATAM, JetSMART, Avianca y Gol** con el mismo set de 12 preguntas, el mismo
+> día, mercado Chile y los mismos 5 motores. 🔴 **Fuera de la licitación de SEO en curso: sin propuesta ni
+> precio.** Se usó para mostrar el método.
+
+| | |
+|---|---|
+| **Runs** | 5 en staging, modo `full` *(`EO-GRUN-00050` a `00054`)*: 300 observaciones, ~1 h en total |
+| **Scores** | LATAM 81,1 · JetSMART 72,7 · **SKY 70,6** · Avianca 41,5 · Gol 37,3 *(los dos últimos, con revisión humana)* |
+| **Lo que más pesa para la venta** | SKY aparece tanto como JetSMART *(73% en descubrimiento; LATAM 83%)*, pero **su sitio es fuente en el 29,1% contra el 59,6% de LATAM**; y a *"¿qué alternativas hay a SKY?"* LATAM sale en el 92% |
+| **Entregables** | 5 informes web tokenizados + 5 PDF + correo con método, límites honestos y CTA de reunión de 30–40 min: ✅ **enviado** |
+
+**Tres consecuencias para la práctica:**
+
+1. 🎯 **El panel es el formato de la cuña cuando la pregunta es relativa.** Método y guion:
+   `modules/05_CUNA_GRADER.md` § 3 *(variante)* · correo reusable: `templates/correo-panel-competitivo-aeo.md` ·
+   manual comercial: `docs/manual-de-uso/comercial/panel-competitivo-aeo-en-venta.md`.
+2. ⚠️ **Hoy es un procedimiento operador, no una capacidad gobernada.** Correrlo exige un script local firmado
+   por el operador + la ruta admin en staging *(`seo-aeo` → `efeonce/AI_VISIBILITY_GRADER.md`)*. Se vuelve
+   producto sobre `TASK-1861` *(grader operable por MCP)*, `TASK-1863` *(multi-mercado)* y `TASK-1864`
+   *(superficie agéntica del MCP)*: las tres creadas, sin implementar.
+3. 🔴 **El panel destapó tres defectos del Grader** *(extracto de 600 caracteres, falso positivo del probe
+   `llms.txt` en sitios SPA, detector de lenguaje sensible por substring)*. **Aún no tienen task**: follow-up
+   pendiente de registrar. Mientras tanto, **se declaran en cada entrega**.
+
+🔴 **Esto no es un caso citable** *(§ 2)*: es un diagnóstico entregado, sin resultado ni autorización. **Y no
+cambia el estado de Berel:** el panel no corrió a Berel.
+
+---
+
 ## 4. 🔴🔴 LA HEMORRAGIA — el bug más caro, y es de una línea
 
 > **La landing de SEO (`/servicios/posicionamiento-seo`, live) tiene su form `efeonce-seo-diagnostic` con
@@ -311,7 +347,8 @@ imágenes.**
    y le entregamos al cliente **la calculadora para comoditizarnos.**
 3. 🔴 **~~Regalamos el AEO~~ → CORREGIDO 2026-08-15: el AEO de Berel está PAGADO, y le estamos quedando cortos.**
    El presupuesto compromete **monitoreo mensual de presencia en ChatGPT/Perplexity/AI Overviews/Gemini** y un KPI
-   de **15-25 AI citations/mes**. 🔴 **El grader lleva dormido desde el 2026-07-17.**
+   de **15-25 AI citations/mes**. 🔴 **El grader lleva dormido desde el 2026-07-17.** *(Nota 2026-09-11: volvió
+   a correr para el panel de SKY, § 3c; el monitoreo de Berel hay que confirmarlo aparte.)*
    **No es revenue perdido: es una obligación contratada que no se está cumpliendo** — y el cliente puede pedir
    ese reporte cualquier día. *(Que el mercado cobre el AEO aparte desde USD 900/mes sigue siendo cierto, pero es
    referencia para **clientes nuevos** — no plata sobre la mesa en Berel.)*
@@ -343,7 +380,7 @@ imágenes.**
 
 | # | Acción | Dueño | Impacto |
 |---|---|---|---|
-| **0** | 🔴🔴 **Despertar el grader para Berel — es entrega contratada, no mejora.** KPI comprometido: **15-25 AI citations/mes** con **monitoreo mensual**; dormido desde el **2026-07-17** | Delivery + Ingeniería | 🔴 **Under-delivery contra contrato. Es lo primero** |
+| **0** | 🔴🔴 **Despertar el grader para Berel — es entrega contratada, no mejora.** KPI comprometido: **15-25 AI citations/mes** con **monitoreo mensual**; dormido desde el **2026-07-17** *(el 2026-09-11 corrió para el panel de SKY; eso no cubre a Berel — § 3c)* | Delivery + Ingeniería | 🔴 **Under-delivery contra contrato. Es lo primero** |
 | **1** | 🔴🔴 **Squad blueprint de Berel — ahora es PRERREQUISITO, no tarea.** Alcance Crecimiento completo *(12 art/mes + PR + quincenal)* **al 87% del precio de lista** | Finance + Delivery | **Podría estar al 18%, y con 13% menos de colchón** |
 | **2** | ✅ **Fee RESUELTO: MXN 52.000** *(lista 60.000 − 13,3%)*. Sólo queda pasar el pago inicial de 89.960 como **línea de conciliación contable** | Finance | Cerrado — ya no bloquea |
 | **3** | 🔴 **Arreglar la oferta de SKY** *(plan dominado + ad-hoc invertido)* — **está viva** | Comercial | Reputacional en una licitación |
@@ -418,6 +455,8 @@ perdiendo plata.
 - *"Hemos aumentado el tráfico de nuestros clientes un X%"* → **no hay caso verificado.**
 - *"Somos líderes en AEO en LATAM"* → **no hay dato que lo sostenga.**
 - *"Te garantizamos rankings"* → **nunca, con nadie.** Es la promesa que rompió la categoría.
+- *"{Marca} es la más visible en IA de su categoría"* → **sólo con un panel competitivo que lo muestre.** En
+  aerolíneas de Chile, el panel del 2026-09-11 dice que **lidera LATAM** *(81,1 contra SKY 70,6)* — § 3c.
 - *"Ser citado por ChatGPT te va a generar X en ventas"* → 🔴 **no existe el modelo de atribución.**
   **Y decirlo en voz alta es el activo, no la debilidad.**
 - *"En posición 1 te llevas ~30% de los clics"* → ⚠️ **no en este vertical.** La curva propia de

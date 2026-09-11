@@ -6,14 +6,20 @@
 > dominio** detrás del grader; el grader es el **motor gobernado** que mide,
 > puntúa y recomienda. Cuando trabajes el grader, carga esta skill; cuando
 > asesores AEO en Efeonce, recuerda que existe este producto. Sello: as-of
-> 2026-06-24 (fecha de los docs).
+> 2026-06-24 (fecha de los docs), con delta operador del 2026-09-11 (panel
+> competitivo multi-marca).
 
 ## Docs canónicos del plan (la verdad vive ahí, no acá)
 - ADR: `docs/architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_DECISION_V1.md`
 - Arquitectura: `docs/architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`
 - Dominio: `docs/architecture/GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`
-- Tasks vivas: `TASK-1226` (provider adapter foundation, to-do, P1) →
-  `TASK-1227` (normalization + scoring engine, blocked by 1226).
+- Tasks fundacionales: `TASK-1226` (provider adapter foundation), `TASK-1227`
+  (normalization + scoring engine) y el spike `TASK-1228`: **complete**.
+- Próximas (creadas, sin implementar): `TASK-1861` (grader operable por MCP:
+  correr, leer, informe web y PDF, con autoridad humana delegada) · `TASK-1863`
+  (multi-mercado: una marca, N mercados, lotes y matriz entre mercados) ·
+  `TASK-1864` (superficie agéntica autosuficiente del MCP: instructions, kit de
+  cliente, eval end-to-end de agentes).
 - **Esta skill NO redefine el contrato**: si hay drift, prevalece el doc del
   repo. Acá solo mapeamos conocimiento ↔ producto.
 
@@ -90,6 +96,119 @@ rescatables, limitaciones y correcciones de nuestra medición sin modificar el
 score histórico ni adjudicar al cliente carencias que la evidencia no demuestra.
 Canon: `docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md`.
 
+## Panel competitivo multi-marca (procedimiento operador)
+
+> **As-of 2026-09-11** (caso fuente: SKY frente a LATAM, JetSMART, Avianca y
+> Gol, Chile; runs `EO-GRUN-00050` a `00054`). **Hoy es un procedimiento
+> operador, no una capacidad gobernada:** no hay ruta HTTP para crear el set
+> curado ni para encolar un lote de N marcas. Debería convertirse en capacidad
+> (lote de N marcas con el mismo set) sobre `TASK-1861`, `TASK-1863` y
+> `TASK-1864`. Uso comercial: `seo-aeo-practice` → `modules/05_CUNA_GRADER.md`
+> § 3 + `templates/correo-panel-competitivo-aeo.md`; manual
+> `docs/manual-de-uso/comercial/panel-competitivo-aeo-en-venta.md`; números del
+> caso en `seo-aeo-practice` → `efeonce/ESTADO_ACTUAL.md` § 3c.
+
+**Qué es.** Correr el Grader sobre N marcas (el cliente + sus competidores) con
+**el mismo set de preguntas curado, el mismo día, el mismo mercado y los mismos
+5 motores**, para que los informes sean comparables, y leerlos juntos. Es la
+versión multi-marca del SoV IA de `../modules/07_MEASUREMENT.md`: sólo es
+comparable si las condiciones son idénticas. Sirve en la operación con un
+cliente contratado (línea base re-medible con cadencia fija) y como paso de
+venta.
+
+Rutas de código relativas a `src/lib/growth/ai-visibility/`.
+
+### Pasos
+
+1. **Diseñar el set desde demanda real.** Semrush `phrase_these` +
+   `phrase_questions` (database del mercado; `cl` en el caso SKY) para
+   priorizar segmentos; preguntas conversacionales con la situación del usuario,
+   no keywords. **Máximo 12 en modo `full`.** Composición del caso SKY: 8 de
+   descubrimiento sin marca (presupuesto, equipaje, ruta sur, negocios,
+   Argentina, Brasil, Perú/Colombia, familias + mascotas), 1 comparativa anclada
+   en el cliente (*"¿Qué alternativas hay a SKY…?"*, **texto literal idéntico en
+   los 5 runs**) y 3 que nombran la marca con `{{brand}}` (reputación 2026,
+   reclamos, identidad). Tags del vocabulario cerrado
+   (`prompt-packs/tag-vocabulary.ts`): `family`, `fanOutType`, `intentStage`,
+   `namesBrand`.
+2. **Crear los perfiles y activar el set** con un script local que llama
+   funciones de dominio, **firmado por el operador**:
+   `findOrCreateGraderProfile` (`store.ts`) + `createGraderPromptSetDraft` +
+   `approveGraderPromptSet` (`prompt-packs/prompt-set-command.ts`; capability
+   `growth.ai_visibility.prompt_set.manage`; sujeto armado desde
+   `getTenantAccessRecordByUserId`). `generation_strategy` sólo admite
+   `llm | template_baseline`, así que el set curado se registra
+   `template_baseline` con procedencia `operator_curated:<caso>` en
+   `grounding_sources`. **Aprobar activa directo** (supersede el set activo
+   previo del perfil).
+3. **Encolar** por la ruta admin en staging:
+   `pnpm staging:request POST /api/admin/growth/ai-visibility/runs` con
+   `brandName`, `websiteUrl`, `market: "Chile"`, `locale: "es-CL"`,
+   `category: "aerolinea de pasajeros"`, `competitorsDeclared`, `mode: "full"`,
+   `runKind: "internal_audit"` e `idempotencyKey`. El run usa el set activo del
+   perfil si el flag de arquetipos está ON (staging: ON). **Encola la primera
+   marca, verifica en el run `prompt_set_id` no nulo y 12 prompts, y recién ahí
+   encola el resto.**
+4. **Esperar al worker** (Cloud Scheduler cada 5 min): ejecuta, puntúa, corre
+   probes y **auto-publica** el informe (~30 s tras terminar). ~17 min por run;
+   el worker llegó a ejecutar 2 en paralelo (5 runs en ~1 h). 🔴 **Nunca
+   `POST /score` ni `publish` manual:** pisa la extracción de prosa del worker.
+5. **Revisión humana.** Si el score queda `review_required` (delivery
+   `in_review`), **lee la frase que lo disparó** y, con decisión del operador,
+   aprueba con `approveAiVisibilityReport({ runId, reviewedByUserId, reason })`
+   (`review/commands.ts`), firmado por la persona. Sin lead ni organización, la
+   sync HubSpot y el correo se omiten (`no_lead`).
+6. **Entregar y verificar.** Token en `grader_reports`; web larga
+   `https://think.efeoncepro.com/brand-visibility/r/<token>`, corta
+   `https://think.efeoncepro.com/s/<code>` (`grader_report_short_links`), PDF
+   `https://greenhouse.efeoncepro.com/api/public/growth/ai-visibility/report/<token>/pdf`.
+   Verifica **200 + `<title>` con la marca**, y el PDF como `application/pdf`.
+   Staging y producción comparten `greenhouse_growth`: un token publicado desde
+   staging renderiza en el hub productivo. Los tokens **no vencen**
+   (auto-publish sin `expires_at`).
+7. **Análisis cruzado simétrico.** Cuenta las menciones de TODAS las marcas con
+   la misma regla en todas las respuestas: por pregunta, por motor, la pregunta
+   de alternativas, cuota de citas del sitio propio y fuentes de terceros.
+
+### 🔴 Trampas del input
+
+- **`market` va como nombre** (`"Chile"`), no ISO: el ISO se interpola crudo en
+  los prompts ("…en CL") y el provider de Google AI acepta `location_name`.
+  Fuera de CL/MX/CO/PE/US, un ISO cae a Estados Unidos.
+- **`category` debe resolver en la taxonomía** (`taxonomy/catalog.ts`):
+  `"aerolinea de pasajeros"` es alias exacto de `sector:passenger_airlines`. La
+  etiqueta canónica ("Aerolineas de pasajeros", sin tilde) aparece en los
+  prompts sólo si el set usa `{{category}}`; el set curado la evita escribiendo
+  "aerolínea(s)" literal.
+- **La ruta admin no acepta `businessModel`:** sin set activo, sale el pack
+  genérico de 7 preguntas (`gn01`–`gn07`).
+- **El perfil se identifica por marca + mercado + locale** y los competidores
+  quedan fijos desde el primer run (no hay command para editarlos). Un nombre ya
+  usado reusa el perfil viejo: `"SKY Airline"`/Chile/es-CL traía
+  `blog.skyairline.com` y Flybondi; por eso el caso usó `"SKY"`.
+- **Coincidencia de nombres literal**, palabra completa, sin mayúsculas y **sin
+  alias**: `"LATAM"` (no "LATAM Airlines") para contar ambas formas; `"SKY"` (no
+  "SKY Airline"). "Gol" es palabra común en español (riesgo bajo en respuestas
+  de aerolíneas). El slot `{{competitor}}` usa sólo el primer competidor
+  declarado y se descarta si la lista está vacía.
+
+### ⚠️ Límites conocidos (declararlos siempre)
+
+| Límite | Referencia | Consecuencia |
+|---|---|---|
+| **Extracto de 600 caracteres** | `GROWTH_AI_VISIBILITY_EXCERPT_MAX = 600` (`contracts.ts:210`) | Las menciones se cuentan sobre el tramo inicial (donde suele estar la recomendación); las marcas al final de listas largas quedan subcontadas. `raw_evidence_pointer` fue nulo en las 300 observaciones: **no hay texto completo para recontar** |
+| **Falso positivo del probe `llms.txt`** | — | Un SPA que responde 200 con HTML en `/llms.txt` salió como "llms.txt presente con contenido curado" (falso). "robots.txt no bloquea" es trivialmente cierto si no hay robots real. **No citar esos probes sin abrir el archivo** |
+| **Detector de lenguaje sensible por substring** | `RISKY_REVIEW_TERMS` (`review-gates/gates.ts`), sobre la narrativa extraída (`messageDriftClaims` + `categoryAssociations`) | "denuncia" disparó con "denunciados" (Avianca) y "quiebra" con una frase sobre Gol; "demanda" dispararía con "demandadas". **Una revisión no es necesariamente un problema real** |
+| **Eco de la pregunta comparativa** | diseño del set | La que nombra al cliente produce eco del cliente en esas respuestas |
+| **Sitios que bloquean la lectura automática** | — | Lecturas técnicas "sin dato" (LATAM, Avianca, Gol), **nunca cero** |
+| **Pruebas técnicas desde nuestra red** | — | GPTBot → 403 visto desde nuestra red no equivale a probar desde las IPs de OpenAI: **presentarlo como algo a validar** |
+| **Foto de un día** | — | La tendencia exige repetir el mismo panel con cadencia fija |
+| **Sin atribución a ventas** | `seo-aeo-practice` → módulo 05 § 4 | No se promete revenue |
+
+🔴 Los tres primeros son defectos del grader encontrados el 2026-09-11 y **aún
+no tienen task**: follow-up pendiente de registrar (`greenhouse-task-planner`)
+antes de corregirlos.
+
 ## Tesis del producto (por qué importa para la skill)
 HubSpot mide *percepción de marca* en answer engines. Efeonce convierte los
 **gaps de visibilidad en IA en un plan operativo** (contenido, CRM, PR, SEO/AEO,
@@ -155,7 +274,9 @@ ledger append-only, score determinista versionado, signals de fiabilidad/costo.
 Es la alternativa *first-party* de Efeonce a Profound/Peec/Otterly.
 
 - **MVP / hoy / cualquier cliente:** método manual con WebSearch (módulo 07).
-- **Plataforma / Efeonce:** el grader (`growth.ai_visibility`) cuando exista.
+- **Plataforma / Efeonce:** el grader (`growth.ai_visibility`), ya operativo;
+  para comparar N marcas en condiciones idénticas, ver § *Panel competitivo
+  multi-marca*.
 - Misma teoría, distinto vehículo. No los trates como cosas separadas.
 
 ## Providers = muestreo de answer engines (no réplica)
@@ -198,6 +319,10 @@ provider **no es verdad de negocio**: se normaliza y puntúa después.
 - Evitar `aeo` como nombre de dominio (la capacidad es más amplia que la sigla).
 
 ## Estado y secuencia (as-of 2026-06-24)
+
+> **Delta 2026-09-11:** esta sección es histórica. `TASK-1226`, `TASK-1227` y
+> `TASK-1228` están **complete**; lo que viene es `TASK-1861`, `TASK-1863` y
+> `TASK-1864` (ver *Docs canónicos del plan*).
 - **Fase 0 (hecha):** ADR + arquitectura + dominio aceptados, sin runtime.
 - **TASK-1228 (to-do, P1) — Discovery & Eval Spike (precursor):** valida
   empíricamente el modelo de medición ANTES de hornearlo — corre un prompt pack
@@ -220,7 +345,10 @@ provider **no es verdad de negocio**: se normaliza y puntúa después.
   migración Astro en `EFEONCE_OVERLAY.md`.
 
 ## Cómo usar esto operativamente
-- **Si te toca TASK-1226/1227** (o un follow-up del grader): carga el doc de
+- **Si te piden comparar una marca con sus competidores:** corre el panel
+  competitivo multi-marca (§ arriba) y entrégalo con su bloque de límites.
+- **Si te toca un follow-up del grader** (hoy: `TASK-1861`, `TASK-1863`,
+  `TASK-1864`, o los tres defectos del panel aún sin task): carga el doc de
   arquitectura del repo + esta skill. Usa el mapeo de dimensiones para los
   normalizers/score y el motor de recomendaciones. Respeta los invariantes
   duros de arriba. Sigue el `implement-task` flow del repo.

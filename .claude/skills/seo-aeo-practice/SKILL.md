@@ -185,7 +185,7 @@ mueve, y este es el orden"* sí.
 | **El comprador y su cicatriz** — ICP, comité, **las 6 objeciones que matan el deal** | **`modules/02_COMPRADOR.md`** |
 | **La oferta** — el reframe *(vendes visibilidad, entras por SEO)*, las 4 capas, qué está mal empaquetado | **`modules/03_OFERTA.md`** |
 | 🎯 **Precio, margen, piso, descuentos, FX, cuándo levantarte de la mesa** | **`modules/04_PRICING.md`** |
-| 🎯 **La cuña: el Grader** — el motor de venta, y su migración de *score* a *prescripción* | **`modules/05_CUNA_GRADER.md`** |
+| 🎯 **La cuña: el Grader** — el motor de venta, y su migración de *score* a *prescripción* · 🎯 **el panel competitivo multi-marca** (el cliente + sus competidores con el mismo set de preguntas, el mismo día; caso SKY 2026-09-11) | **`modules/05_CUNA_GRADER.md`** |
 | 🔴 **Descalificación** — los 8 casos en que NO vendemos | **`modules/06_DESCALIFICACION.md`** |
 | **Displacement** — el freelancer · la herramienta · el in-house · la agencia titular · **no hacer nada** | **`modules/07_DISPLACEMENT.md`** |
 | 🎯 **Prueba sin mentir** — el puente de atribución que SÍ existe | **`modules/08_PRUEBA.md`** |
@@ -204,7 +204,9 @@ mueve, y este es el orden"* sí.
 
 **Artefactos listos:** `templates/hoja-de-cuenta.md` *(se llena ANTES de tocar la puerta)* ·
 `templates/secuencia-outbound.md` · `templates/guion-reunion-grader.md` ·
-`templates/propuesta-tipo.md` · `templates/calculadora-piso.md`
+`templates/propuesta-tipo.md` · `templates/calculadora-piso.md` ·
+`templates/correo-panel-competitivo-aeo.md` *(el correo que entrega un panel competitivo: método, preguntas, lectura,
+panorama, límites y reunión)*
 
 🔴 **Carga solo el módulo que la tarea necesita.** `SOURCES.md` se carga **siempre** que vayas a citar un número.
 

@@ -6,6 +6,22 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-11 (d) — el panel competitivo multi-marca debe quedar como capacidad gobernada
+
+El 2026-09-11 se corrió a mano el primer panel competitivo real (SKY frente a LATAM, JetSMART, Avianca y Gol en Chile,
+runs `EO-GRUN-00050`…`00054`) y se usó como paso de venta. Procedimiento, trampas y límites en
+`docs/manual-de-uso/growth/ai-visibility-grader-smoke.md` § "Panel competitivo multi-marca" y
+`docs/manual-de-uso/comercial/panel-competitivo-aeo-en-venta.md`. Hoy exige un script local que llama funciones de
+dominio (perfiles + set curado) porque no hay contrato programático. Esta task debe cubrirlo:
+
+- Command y tool para **preparar un panel**: N marcas (el cliente + competidores) con el mismo set curado, mismo mercado
+  y locale, perfiles y competidores declarados por marca, set activo con procedencia `operator_curated`.
+- Encolar el panel como un lote (una llave de idempotencia por panel, costo total validado antes) y un reader del
+  panel que devuelva los N informes, sus links web y PDF, y el estado de revisión de cada uno.
+- Reader de **análisis cruzado** (presencia simétrica por marca, por pregunta y por motor, pregunta comparativa,
+  cuota de citas propias y fuentes de terceros), hoy un script fuera del repo.
+- Manual MCP: sumar el panel a `aeo-grader-operations` y su lectura a `aeo-results-interpretation`.
+
 ## Delta 2026-09-11 (c) — completo siempre: entregable único, siguiente paso, cotización y simulación (TASK-1864)
 
 El operador pidió que Claude y Codex corran el grader desde MCP de punta a punta, completo, sin re-explicar el

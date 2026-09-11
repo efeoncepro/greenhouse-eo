@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-11 — Panel competitivo AEO multi-marca: primer caso real (SKY) y método documentado
+
+El AI Visibility Grader se corrió sobre SKY y cuatro competidores (LATAM, JetSMART, Avianca, Gol) en Chile con un
+set curado de 12 preguntas idéntico para todos, el mismo día y los mismos 5 motores (`EO-GRUN-00050`…`00054`).
+Resultado: LATAM 81,1 · JetSMART 72,7 · SKY 70,6 · Avianca 41,5 · Gol 37,3; informes web y PDF entregados y usados como
+paso de venta fuera de la licitación SEO. Sin cambios de código ni flags: perfiles y set creados con funciones de
+dominio y aprobaciones de revisión firmadas por el operador.
+
+Se documenta el método en tres capas (manual comercial, doc funcional, runbook del grader con § "Panel competitivo
+multi-marca", Delta de arquitectura) y en las skills `seo-aeo-practice` (módulo de la cuña, plantilla de correo,
+estado actual) y `seo-aeo` (overlay operativo del grader). Quedan registrados tres defectos medidos del grader, sin
+task todavía, y la capacidad gobernada del panel en `TASK-1861` Delta (d).
+
 ## 2026-09-11 — Trendjacking «Nuestro Duo»: pieza híbrida, Short con Seedance 2.5 y 4 canales vía Metricool
 
 Primera operación de trendjacking end-to-end sobre el lanzamiento del iPhone Duo: investigación de las reacciones
@@ -1038,16 +1051,3 @@ ops-worker: lee la señal existente `seo.etv_methodology.drift` y avisa a Micros
 `growth-seo-reliability-alerts` (mismo canal "EO - Admin" que `production-release-alerts`). Antes,
 la única forma de enterarse era abrir `/admin/operations`. Verificado en vivo (rev `ops-worker-00637-2ww`):
 respondió `warning`/`alerted:false`, correcto para el estado actual de la señal.
-
-## 2026-09-03 — TASK-1806: Improved ETV de DataForSEO en producción (rebaseline versionado)
-
-Release `bda12be7e33a` (PR #218, orquestador `33758619690`, manifest `released` 13:14Z, watchdog `ok`). El módulo
-SEO sirve desde hoy `improved_layout_clickstream_v2` en los siete caminos consumidores: ops-worker (`deploy.sh`,
-rev `00636-h6w`) y Vercel Production+staging con ambos selectores en improved; canary de contrato 13:15:26Z sobre
-los lanes de Berel. Antes: contract de schema ETV aplicado (`20260903103858964`), shadow `exact_ab` de 26 requests
-(USD 1,095) evaluado contra Search Console — improved 6× mejor calibrado en Berel (err. rel. 49 % vs 321 %),
-Jaccard 1,0 en páginas/subdominios, historia continua —, memo de decisión y aprobación del operador; drill de
-rollback en staging; rebaseline acotado (historia improved de Berel y Comex, USD 0,2568). Las cifras de tráfico
-estimado bajan ≈ 60 % por cambio de fórmula del proveedor, no por pérdida real; cada cifra declara `etvMethodology`.
-Efeonce se mide aparte de los clientes (guard de organización en celdas bulk). Writers `rowsWritten` ahora cuentan
-filas insertadas. Legacy sólo vuelve como rollback antes del corte 2026-11-01T00:00:00Z.
