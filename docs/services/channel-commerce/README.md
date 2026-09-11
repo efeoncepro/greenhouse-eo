@@ -767,6 +767,7 @@ Ninguna propuesta compuesta se emite sin owner nombrado y RACI por línea.
 ## Referencias
 
 - Modelo económico: [`CHANNEL_COMMERCE_BUSINESS_MODEL_V1`](../../business-models/channel-commerce/CHANNEL_COMMERCE_BUSINESS_MODEL_V1.md)
+- Documento para el equipo (PDF, uso interno; no se comparte con clientes): [cómo se mantiene](../../business-models/channel-commerce/deliverables/README.md) · [PDF](../../business-models/channel-commerce/deliverables/Efeonce-Channel-Commerce-Modelo-de-Negocio.pdf)
 - Guardrail de capacidad humana: [`EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1`](../../business-models/EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md)
 - Precedente de pod gobernado: [`EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1`](../creative-services/EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md)
 - Capa de partners y providers: [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1`](../../business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md)

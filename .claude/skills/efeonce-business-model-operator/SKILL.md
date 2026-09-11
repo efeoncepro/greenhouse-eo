@@ -63,3 +63,9 @@ classify relationships as strategic core, creative capability, execution enabler
 owner, economics, contract, rights, support, fallback and demand evidence before increasing priority.
 The transversal commercial contract is `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`;
 it also separates license/access, advisory, implementation, managed operations, Product Services and Efeonce IP.
+
+When a business model is presented to the team or a third party as a document, deliver it as a branded A4 PDF with
+`report-studio` and `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` (rule lives in the canonical Codex
+skill, section "Artefactos de salida"). Living reference: `docs/business-models/channel-commerce/deliverables/` and
+`scripts/documents/render-channel-commerce-business-model.mjs`. The PDF is derived: regenerate it when the canonical
+model documents change; never edit it as a source.

@@ -446,6 +446,12 @@ resolución/duración, reintentos y costo efectivo por output.
 - Investor translation brief.
 - Decision record and review date.
 
+Cuando el modelo se presenta al equipo o a un tercero como documento, se entrega como PDF A4 membretado con
+`report-studio` y el estándar `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md`: etiqueta de
+confidencialidad, sin códigos internos, rutas ni rastros de agentes, y cifras no aprobadas marcadas como tales.
+El PDF es un derivado: se regenera cuando cambian los documentos canónicos del modelo. Referencia viva:
+`docs/business-models/channel-commerce/deliverables/` y `scripts/documents/render-channel-commerce-business-model.mjs`.
+
 ## Verdicts
 
 - `model_incomplete`;

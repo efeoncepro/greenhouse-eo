@@ -7,6 +7,7 @@
 > **Validated as of:** 2026-09-10 (evidencia de mercado con `as-of`; sin evidencia de demanda propia ni cost snapshot)
 > **Review cadence:** mensual mientras el estado sea `Proposed`
 > **Related:** [`EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1`](../EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md) · [`EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1`](../EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md) · [`EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1`](../EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md) · [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1`](../EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md) · [`MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1`](../media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md) · [`EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1`](../../strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md)
+> **Material para el equipo:** [documento de modelo de negocio (PDF, uso interno)](deliverables/Efeonce-Channel-Commerce-Modelo-de-Negocio.pdf) · [cómo se mantiene](deliverables/README.md)
 
 ---
 

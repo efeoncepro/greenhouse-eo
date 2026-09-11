@@ -95,6 +95,7 @@ y producto, y los gates para evolucionar de Modular Production Lane a una experi
 - [`Channel & Commerce — Plan de apertura y prospección V1`](channel-commerce/CHANNEL_COMMERCE_PROSPECTING_PLAN_V1.md)
 - [`Benchmark del mercado chileno 2026-09-10`](../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
 - [`Channel & Commerce — catálogo de servicios`](../services/channel-commerce/README.md)
+- [`Channel & Commerce — documento para el equipo (PDF, uso interno)`](channel-commerce/deliverables/README.md) · [PDF](channel-commerce/deliverables/Efeonce-Channel-Commerce-Modelo-de-Negocio.pdf)
 
 Línea que gobierna la inversión de canal de marcas con distribución indirecta. En mercado se nombra **trade
 marketing**; internamente `Channel & Commerce`, porque su alcance excede la ejecución en punto de venta.

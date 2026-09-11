@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-11 — Channel & Commerce: documento membretado del modelo de negocio para el equipo
+
+Se entrega el modelo de negocio de Channel & Commerce como PDF A4 de 19 páginas con membrete Efeonce, etiqueta
+"Confidencial · Uso interno" y sin rastros de trabajo interno de agentes
+(`docs/business-models/channel-commerce/deliverables/`). La fuente es HTML editable y la genera
+`scripts/documents/render-channel-commerce-business-model.mjs`: inyecta logos, URL bubble, contacto del catálogo y
+fuentes; pone el pie institucional en todas las páginas, incluida la portada; calcula el índice desde la página real
+y falla si alguna hoja desborda. `report-studio` y el estándar de marca de informes incorporan el patrón de hojas
+fijas, el QA de respaldo con poppler cuando falta PyMuPDF y las reglas para documentos internos. Sin cambios de
+runtime.
+
 ## 2026-09-11 — EPIC-047: portafolio de landings del sitio público con orden de prioridad
 
 Las landings pendientes dejan de colgar de EPIC-019 (control plane técnico) y pasan a `EPIC-047`, que fija su orden
@@ -1026,27 +1037,3 @@ UI TASK-1814 y bug de correlación de releases conservan su condición pendiente
 ## 2026-09-03 — Corrección de reingreso y recuperación de disponibilidad
 
 Las actualizaciones de member confirman identidad y auditoría de forma transaccional; la proyección legal no reabre relaciones terminadas. Recovery y detector comparten vigencia real de episodios. Comando compensatorio con preview, hash de estado e idempotencia sustituye el SQL puntual. [Decisión y contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md). Vercel Production y worker corregidos verificados; Valentina restaurada 18:38:48Z, contratos/pagos/usuario intactos. Proyecciones People completadas 18:42:05Z sin reabrir employee ni alterar datos protegidos. Release `33795564223` cerrado, manifest released 19:30:49Z, health success y watchdog ok; readback final intacto.
-
-## 2026-09-03 — TASK-1349 en producción (release `62356c9b7fd4`) — revisión contractual de offboarding, elegibilidad por episodio y writeback de lifecycle
-
-Cierre operativo posterior: Maggie y María Fernanda revisadas como despido y ejecutadas con fechas 29/06 y
-29/07; reader 4/4, unresolved=0 y nómina agosto lista. Runbook, manual, documentación funcional y skills
-Payroll/Talent Codex/Claude distinguen casos manuales del recovery SCIM y cierre de conciliación Finance.
-[Evidencia y método](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
-
-Cierra el circuito SCIM → decisión → nómina → lifecycle que la auditoría del 03/09 encontró incompleto (ISSUE-117,
-near miss del 06/07). Nómina: el resolver de elegibilidad elige el caso gobernante por relevancia temporal, sirve
-`contract_type_snapshot` (el threshold `international_internal` era inalcanzable), detecta reingresos y deja de tratar
-`members.active=false` como filtro histórico (un inactivo con salida el 02/06 conserva mayo íntegro); una salida sin
-resolver relevante al período mantiene al colaborador proyectado pero **bloquea calcular/aprobar** (readiness
-`unresolved_exit_signal`, `calculatePayroll` 409) y una falla del resolver ya no incluye a todos en silencio.
-Offboarding: command `reviewOffboardingCase` (`access_only` | `relationship_ended`, causal y fechas explícitas,
-`expectedUpdatedAt`, audit + outbox), guard «sin revisión no se aprueba» en el state machine, executor lane-aware
-(solo acceso no toca compensación/relación/member; término real termina relación con fecha real y desactiva member
-detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`, OFF), proyecciones honestas en la cola, tres señales
-nuevas, guards de ownership en SCIM y backfill BQ, capability `workforce.offboarding.review_case` (seed aplicado),
-rutas HR + carril `app`, y `pnpm workforce:offboarding:recovery` (dry-run ejecutado sobre la cohorte real; nada
-aplicado). Tras el release la nómina de septiembre bloqueará hasta resolver Felipe y Maria Fernanda: es el control
-buscado. **Rollout 2026-09-03:** PR #219 squash, orquestador `33779259694` `released` 16:45Z, `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`
-ON en Production+staging tras live smoke sintético (`review-execute.live.test.ts`). Pendiente del operador: recovery
-por allowlist (bloqueada al agente por permisos), causal de Felipe, conciliación Finance, UI TASK-1814.
