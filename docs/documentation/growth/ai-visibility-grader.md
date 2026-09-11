@@ -363,6 +363,7 @@ siempre al presentar resultados:
 - **Es una foto de un día.** Para hablar de tendencia hay que repetir el mismo panel con una cadencia fija.
 - **No mide ventas.** No hay atribución directa entre aparecer en la IA y vender más.
 
-Los tres primeros son defectos del grader que todavía **no tienen task**: quedan como follow-up pendiente de registrar.
+Los tres primeros son defectos del grader y ya tienen task: `TASK-1867` corrige el extracto y `TASK-1868` los chequeos
+técnicos y el detector de lenguaje sensible. Mientras no cierren, se declaran en cada entrega.
 
 > Detalle técnico: §Delta 2026-09-11 en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md). Código: `src/lib/growth/ai-visibility/contracts.ts` (`GROWTH_AI_VISIBILITY_EXCERPT_MAX`), `probes/structural/llms-txt.ts`, `review-gates/gates.ts` (`RISKY_REVIEW_TERMS`).

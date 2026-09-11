@@ -208,8 +208,8 @@ ni precio. **5 runs** en modo `full`, mercado Chile: **12 preguntas × 5 motores
 | **Sitios que bloquean la lectura automática** | "Sin dato", **nunca cero** |
 | **Es una foto de un día** | La tendencia exige repetir el mismo panel con cadencia fija |
 
-🔴 **Los tres defectos de producto** *(extracto, probe `llms.txt`, detector por substring)* **aún no tienen task**:
-son un follow-up pendiente de registrar. Detalle con referencias de código: `seo-aeo` → `efeonce/AI_VISIBILITY_GRADER.md`.
+🔴 **Los tres defectos de producto** *(extracto, probe `llms.txt`, detector por substring)* **están registrados,
+sin implementar**: `TASK-1867` (evidencia completa) y `TASK-1868` (probes y detector). Hasta que cierren, se declaran. Detalle con referencias de código: `seo-aeo` → `efeonce/AI_VISIBILITY_GRADER.md`.
 
 ---
 

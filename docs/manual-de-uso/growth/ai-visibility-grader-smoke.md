@@ -560,7 +560,9 @@ curl -sS -o /dev/null -w '%{http_code} %{content_type}\n' \
 - Es una foto de un día; la tendencia exige repetir el mismo panel con cadencia fija.
 - No hay atribución directa a ventas.
 
-Los tres primeros son defectos del grader que **todavía no tienen task**: quedan como follow-up pendiente de registrar.
+Los tres primeros son defectos del grader registrados el 2026-09-11: el extracto en `TASK-1867` (evidencia completa)
+y los probes de `llms.txt`/`robots.txt`/`sitemap.xml` junto con el detector por substring en `TASK-1868`. Hasta que
+cierren, se declaran en cada entrega.
 La capacidad gobernada (lote de N marcas con el mismo set) debería construirse sobre `TASK-1861` (grader por MCP),
 `TASK-1863` (multi-mercado) y `TASK-1864` (superficie agéntica del MCP).
 

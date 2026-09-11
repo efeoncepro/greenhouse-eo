@@ -8,7 +8,7 @@
 > (LATAM, JetSMART, Avianca, Gol) con el mismo set curado de 12 preguntas, el mismo día, mercado Chile y 5 motores:
 > 5 runs `full` en staging (`EO-GRUN-00050`…`00054`, 300 observaciones, ~1 h), entregados (informe web + PDF) y
 > **enviados** a SKY fuera de la licitación, sin propuesta ni precio. **Probó que el motor sirve de punta a punta para
-> un paso de venta** (evidencia antes que promesa). Destapó **tres defectos, todavía sin task**: menciones contadas sólo
+> un paso de venta** (evidencia antes que promesa). Destapó **tres defectos, registrados como `TASK-1867` y `TASK-1868`**: menciones contadas sólo
 > sobre el extracto de 600 caracteres (sin texto completo para recontar), falso positivo del probe `llms.txt` cuando una
 > SPA responde HTML 200, y detector de lenguaje sensible por substring ("denuncia" dentro de "denunciados"). Hoy el panel
 > es un **procedimiento de operador**; `TASK-1861` (grader por MCP), `TASK-1863` (multi-mercado) y `TASK-1864`
@@ -22,7 +22,7 @@
 > Lo que falta no es ingeniería sino **demanda**: el último lead es del 2026-07-05. Las secciones de
 > abajo se escribieron antes de esos cierres y las que los tratan como pendientes están corregidas
 > en línea; los conteos de childs abiertas del cuerpo son de 2026-08-07 (hoy: 14, medido).
-> **Última actualización:** 2026-09-11 por Claude (Delta 2026-09-11: primer panel competitivo multi-marca, caso SKY; tres defectos del grader sin task y TASK-1861/1863/1864 como base de la capacidad gobernada)
+> **Última actualización:** 2026-09-11 por Claude (Delta 2026-09-11: primer panel competitivo multi-marca, caso SKY; tres defectos del grader registrados como TASK-1867/1868 y TASK-1861/1863/1864 como base de la capacidad gobernada)
 > **Documentación técnica:** [`../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`](../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 > **Epics que agrupa:** EPIC-020, EPIC-021, EPIC-022, EPIC-023, EPIC-024
 

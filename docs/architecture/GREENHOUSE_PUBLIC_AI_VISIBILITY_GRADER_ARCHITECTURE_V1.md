@@ -2179,8 +2179,8 @@ El adapter `google_ai_overview` (`providers/google-ai-overview-adapter.ts`) ten�
 ## Delta 2026-09-11 — panel competitivo multi-marca y límites medidos
 
 **Este delta no cambia ningún invariante ni el runtime.** Documenta cómo se usaron primitives existentes para el primer
-panel competitivo real y tres defectos que ese uso midió. Los defectos quedan como follow-ups **pendientes de
-registrar, todavía sin task**.
+panel competitivo real y tres defectos que ese uso midió. Los defectos quedan registrados como `TASK-1867`
+(evidencia completa) y `TASK-1868` (probes estructurales y compuerta de revisión).
 
 **Qué se corrió.** El grader sobre SKY y 4 competidores (LATAM, JetSMART, Avianca, Gol) con **el mismo set curado de 12
 prompts, el mismo día, mercado Chile, locale `es-CL` y los 5 motores**: 5 runs `full` en staging (`EO-GRUN-00050`…
@@ -2219,7 +2219,7 @@ Uso comercial: [`docs/documentation/comercial/panel-competitivo-aeo.md`](../docu
 - El slot `{{competitor}}` usa sólo el primer competidor declarado y se descarta si la lista está vacía. La coincidencia
   de nombres de marca es literal, palabra completa, sin mayúsculas y sin alias.
 
-**Tres defectos medidos (follow-ups pendientes, sin task).**
+**Tres defectos medidos (registrados: el 1 en `TASK-1867`; el 2 y el 3 en `TASK-1868`).**
 
 1. **Extracto truncado sin texto completo.** `GROWTH_AI_VISIBILITY_EXCERPT_MAX = 600` (`contracts.ts:210`): las menciones
    se cuentan sobre ese tramo inicial, así que las marcas nombradas al final de listas largas quedan subcontadas.
@@ -2227,7 +2227,7 @@ Uso comercial: [`docs/documentation/comercial/panel-competitivo-aeo.md`](../docu
 2. **Falso positivo del probe `llms.txt`** (`probes/structural/llms-txt.ts`): cuando una SPA responde `/llms.txt` con 200
    y el HTML de la aplicación, el probe reporta "llms.txt presente con contenido curado" (caso `skyairline.com`, que
    sirve igual `/robots.txt` y `/sitemap.xml`). Por la misma causa, "robots.txt no bloquea" es trivialmente cierto
-   cuando no hay robots real.
+   cuando no hay robots real, y el probe de sitemap le da crédito parcial (40) a esa misma página HTML.
 3. **Detector de lenguaje sensible por substring.** `RISKY_REVIEW_TERMS` (`review-gates/gates.ts`) compara substrings
    sobre `messageDriftClaims` + `categoryAssociations`: "denuncia" disparó con "denunciados" (Avianca), "quiebra" con una
    frase sobre Gol, y "demanda" dispararía con "demandadas". Produce `review_required` que no reflejan un problema

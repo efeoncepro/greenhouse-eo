@@ -1,5 +1,15 @@
 # TASK-1269 — Growth AI Visibility: Fix-It Artifacts (JSON-LD / llms.txt / Briefs as Deliverables)
 
+## Delta 2026-09-11 — los probes que alimentan Fix-It dan falsos positivos en sitios SPA (TASK-1868)
+
+- Medido en el panel competitivo de Sky: `https://www.skyairline.com/llms.txt`, `/robots.txt` y `/sitemap.xml` responden 200
+  con la página HTML de la aplicación. El probe de `llms.txt` lo reporta presente (score 100) y el de sitemap le da 40.
+  El starter de `llms.txt` se sigue generando siempre (`fix-it/generators.ts:320`), pero `derivedFrom.probeKinds`
+  (`generators.ts:180`) no cita la brecha de `llms.txt`: el artefacto se entrega sin la justificación correcta.
+- La corrección vive en `TASK-1868` (detector de fallback HTML + readiness v2). Mientras no cierre, al revisar un
+  artefacto Fix-It de un sitio SPA hay que comprobar a mano que `/llms.txt` sea texto y no HTML. Esta task no cambia
+  su alcance; sólo hereda findings más honestos cuando `TASK-1868` cierre.
+
 ## Delta 2026-09-04 — capability sin seed en `capabilities_registry` (deuda de paridad cerrada)
 
 `growth.ai_visibility.fix_it.generate` se declaró en `src/config/entitlements-catalog.ts` sin su fila en

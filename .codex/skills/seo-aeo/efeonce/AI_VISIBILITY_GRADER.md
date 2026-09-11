@@ -205,9 +205,10 @@ Rutas de código relativas a `src/lib/growth/ai-visibility/`.
 | **Foto de un día** | — | La tendencia exige repetir el mismo panel con cadencia fija |
 | **Sin atribución a ventas** | `seo-aeo-practice` → módulo 05 § 4 | No se promete revenue |
 
-🔴 Los tres primeros son defectos del grader encontrados el 2026-09-11 y **aún
-no tienen task**: follow-up pendiente de registrar (`greenhouse-task-planner`)
-antes de corregirlos.
+🔴 Los tres primeros son defectos del grader encontrados el 2026-09-11 y
+registrados como `TASK-1867` (extracto → evidencia completa, score v3) y
+`TASK-1868` (probes ante SPA + detector por palabra completa). Hasta que
+cierren, se declaran en cada entrega.
 
 ## Tesis del producto (por qué importa para la skill)
 HubSpot mide *percepción de marca* en answer engines. Efeonce convierte los
@@ -348,7 +349,7 @@ provider **no es verdad de negocio**: se normaliza y puntúa después.
 - **Si te piden comparar una marca con sus competidores:** corre el panel
   competitivo multi-marca (§ arriba) y entrégalo con su bloque de límites.
 - **Si te toca un follow-up del grader** (hoy: `TASK-1861`, `TASK-1863`,
-  `TASK-1864`, o los tres defectos del panel aún sin task): carga el doc de
+  `TASK-1864`, `TASK-1867` o `TASK-1868`): carga el doc de
   arquitectura del repo + esta skill. Usa el mapeo de dimensiones para los
   normalizers/score y el motor de recomendaciones. Respeta los invariantes
   duros de arriba. Sigue el `implement-task` flow del repo.

@@ -25,8 +25,10 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1864](to-do/TASK-1864-mcp-self-sufficient-agent-surface.md) | Superficie agéntica autosuficiente del MCP (EPIC-044, U20): instructions del gateway, contrato de siguiente paso, kit de cliente Claude/Codex y eval end-to-end de agentes | none |
 | [TASK-1865](to-do/TASK-1865-landing-performance-marketing.md) | Landing pública Performance Marketing en `/servicios/performance-marketing/` construida desde cero, con 301 desde la legacy `242862`, firma `Clics / Ventas` y reuso de Growth Forms/CTA/scheduler | none |
 | [TASK-1866](to-do/TASK-1866-careers-funnel-ga4-gtm-measurement.md) | Medición del funnel de Careers por canal en GA4 vía GTM: GTM sólo en rutas públicas de Careers, postulaciones fuera de `generate_lead`, `gh_job_viewed` y convención UTM (EPIC-011) | none |
+| [TASK-1867](to-do/TASK-1867-aeo-grader-full-answer-evidence.md) | AEO Grader: evidencia completa de cada respuesta (EPIC-020): persistir el texto íntegro, medir sobre él y versionar el score (v3); hoy mide sobre 600 caracteres | none |
+| [TASK-1868](to-do/TASK-1868-aeo-grader-deterministic-detector-precision.md) | AEO Grader: precisión de los detectores deterministas (EPIC-020): probes que no confunden la página HTML de un SPA con `llms.txt`/`robots.txt`/`sitemap.xml` y compuerta de revisión por palabra completa | none |
 
-Siguiente ID libre `TASK-1867`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1869`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
 
 ## Programa Efeonce Insights: EPIC-045
 

@@ -124,7 +124,9 @@ Se declaran siempre, en el informe y en la conversación:
 | **Sin atribución a ventas** | El panel no mide cuánto vende una marca por aparecer en IA |
 
 El extracto de 600 caracteres, el falso positivo de `llms.txt` y el detector por fragmentos son defectos del Grader
-detectados el 2026-09-11. Todavía no tienen task: quedan como follow-up pendiente de registrar.
+detectados el 2026-09-11. Ya están registrados como tasks: `TASK-1867` (guardar y medir la respuesta completa) y
+`TASK-1868` (chequeos técnicos ante sitios SPA y detector de lenguaje sensible por palabra completa). Hasta que cierren,
+se declaran en cada entrega.
 
 > Detalle técnico: el límite del extracto es `GROWTH_AI_VISIBILITY_EXCERPT_MAX = 600`
 > (`src/lib/growth/ai-visibility/contracts.ts`); el detector de revisión es `RISKY_REVIEW_TERMS`

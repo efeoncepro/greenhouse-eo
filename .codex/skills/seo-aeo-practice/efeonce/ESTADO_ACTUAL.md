@@ -319,8 +319,9 @@ imágenes.**
    producto sobre `TASK-1861` *(grader operable por MCP)*, `TASK-1863` *(multi-mercado)* y `TASK-1864`
    *(superficie agéntica del MCP)*: las tres creadas, sin implementar.
 3. 🔴 **El panel destapó tres defectos del Grader** *(extracto de 600 caracteres, falso positivo del probe
-   `llms.txt` en sitios SPA, detector de lenguaje sensible por substring)*. **Aún no tienen task**: follow-up
-   pendiente de registrar. Mientras tanto, **se declaran en cada entrega**.
+   `llms.txt` en sitios SPA, detector de lenguaje sensible por substring)*. **Registrados como `TASK-1867`**
+   *(evidencia completa)* **y `TASK-1868`** *(probes y detector)*, sin implementar. Mientras tanto, **se declaran
+   en cada entrega**.
 
 🔴 **Esto no es un caso citable** *(§ 2)*: es un diagnóstico entregado, sin resultado ni autorización. **Y no
 cambia el estado de Berel:** el panel no corrió a Berel.
