@@ -4,6 +4,14 @@
  ZONE 0 — IDENTITY & TRIAGE
  ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-11 — la v2 ya no es `noindex`: dos URLs indexables compiten
+
+Verificado por HTTP (HTML público servido): `/agencia-creativa-v2/` responde `meta robots` `index, follow` y
+canonical a sí misma; `/agencia-creativa/` (título «Agencia Creativa en LATAM») también `index, follow` con
+canonical propio. El `noindex` que registraba esta task y su Runtime delta 2026-07-07 ya no describe el runtime.
+No se verificó si Google indexó ambas. Consecuencia: la task pasa a `Rank EPIC-047-01`; lo primero es decidir la
+URL final y aprobar el 301 de la otra — el cambio de indexación o redirect sigue exigiendo autorización del operador.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -18,9 +26,9 @@
 - Flow: `docs/ui/flows/TASK-1350-landing-agencia-creativa-flow.md`
 - Motion: `docs/ui/motion/TASK-1350-landing-agencia-creativa-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
-- Status real: `Live candidate en /agencia-creativa-v2 noindex`
-- Rank: `TBD`
+- Epic: `EPIC-047`
+- Status real: `/agencia-creativa-v2 publicada e INDEXABLE (verificado 2026-09-11), compitiendo con /agencia-creativa legacy también indexable; cutover pendiente`
+- Rank: `EPIC-047-01`
 - Domain: `content`
 - Blocked by: `none`
 - Branch: `task/TASK-1350-landing-agencia-creativa`

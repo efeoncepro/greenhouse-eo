@@ -83,5 +83,5 @@ La Home no es un tercer género de página: es la fachada = el pitch.
 
 - Refina: [PDR-008](PDR-008-landing-agencia-marketing-digital-posicionamiento.md) (ver su Delta 2026-07-08).
 - Hermanos: [PDR-002](PDR-002-arquitectura-informacion-seccion-visibilidad.md) (IA/dos capas), [PDR-003](PDR-003-layering-ecosistema-digital-efeonce.md) (ecosistema/capas).
-- Ejecución: [`TASK-1358`](././tasks/to-do/TASK-1358-landing-agencia.md) reorientada (Home = pitch). About Us → PDR + task por definir.
+- Ejecución: [`TASK-1358`](././tasks/complete/TASK-1358-landing-agencia.md) reorientada (Home = pitch). About Us → PDR + task por definir.
 - Contexto: `docs/context/09_marca-agencia.md`, `05_voz-tono-estilo.md`, `13_icp-buyer-personas-jtbd.md`.

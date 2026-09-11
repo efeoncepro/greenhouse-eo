@@ -18,9 +18,9 @@
 - Flow: `docs/ui/flows/TASK-1374-web-agentica-ebook-landing-flow.md`
 - Motion: `docs/ui/motion/TASK-1374-web-agentica-ebook-landing-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `TBD`
+- Rank: `EPIC-047-cierre`
 - Domain: `content|ui`
 - Blocked by: `TASK-1375` (solo el slice 3 — form embed; slices 1–2 scaffold+SEO / port visual quedan desbloqueados)
 - Branch: `task/TASK-1374-web-agentica-ebook-landing`

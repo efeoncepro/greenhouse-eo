@@ -18,9 +18,9 @@
 - Flow: `docs/ui/flows/TASK-1401-landing-hubspot-precios-flow.md`
 - Motion: `docs/ui/motion/TASK-1401-landing-hubspot-precios-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `TBD`
+- Rank: `EPIC-047-02`
 - Domain: `public-site`
 - Blocked by: `none`
 - Branch: `task/TASK-1401-landing-hubspot-precios`

@@ -20,9 +20,9 @@
 - Flow: `docs/ui/flows/TASK-1812-salesforce-services-landing-flow.md`
 - Motion: `docs/ui/motion/TASK-1812-salesforce-services-landing-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Oferta canónica, dirección, wireframe, flow y motion listos; discovery, copy final, implementación y publicación no iniciados`
-- Rank: `32`
+- Rank: `EPIC-047-05`
 - Domain: `public-site|crm|content|growth|ui|seo`
 - Blocked by: `none para iniciar Discovery; publicar exige rights/partnership readback, first-fold approval, CTA binding y QA`
 - Branch: `Greenhouse develop; sin worktrees`

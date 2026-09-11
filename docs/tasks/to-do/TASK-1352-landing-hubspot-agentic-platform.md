@@ -33,9 +33,9 @@ ejecucion.
 - Motion: `docs/ui/motion/TASK-1352-landing-hubspot-agentic-platform-motion.md`
 - Visual direction: `docs/ui/visual-directions/TASK-1352-hubspot-immersive-pillar-direction.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Avanzada EN DEFINICION, NO en ejecucion (verificado 2026-09-01). Los dos commits que la nombran reescriben la task y el PDR-006; la landing no esta implementada y ningun dossier editorial (VoC/CRO, SEO/AEO, claim/proof) tiene registro de aprobacion. Ver el Delta`
-- Rank: `TBD`
+- Rank: `EPIC-047-03`
 - Domain: `public-site`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`

@@ -20,9 +20,9 @@
 - Flow: `docs/ui/flows/TASK-1859-landing-product-design-360-flow.md`
 - Motion: `docs/ui/motion/TASK-1859-landing-product-design-360-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `TBD`
+- Rank: `EPIC-047-10`
 - Domain: `content`
 - Blocked by: `none`
 - Branch: `Greenhouse develop para contratos; runtime WordPress efeoncepro.com vía eo-elementor-widgets; sin worktrees`

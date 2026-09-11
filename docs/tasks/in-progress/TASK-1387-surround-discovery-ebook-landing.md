@@ -16,9 +16,9 @@
 - Flow: `docs/ui/flows/TASK-1387-surround-discovery-ebook-landing-flow.md`
 - Motion: `docs/ui/motion/TASK-1387-surround-discovery-ebook-landing-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Live en Think desde main; falta smoke humano de submit, descarga, correo y generate_lead para cierre operativo`
-- Rank: `TBD`
+- Rank: `EPIC-047-cierre`
 - Domain: `content|ui`
 - Blocked by: `none`
 - Branch: `task/TASK-1387-surround-discovery-ebook-landing`

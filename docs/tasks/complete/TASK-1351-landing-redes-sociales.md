@@ -6,9 +6,18 @@
  Un agente lee esto primero. Si Lifecycle = complete, STOP.
  ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-11 — cerrada por decisión del operador
+
+El operador cerró la task porque la landing está publicada. Readback 2026-09-11:
+`https://efeoncepro.com/servicios/redes-sociales/` responde `200`, `meta robots` `index, follow` y canonical a sí
+misma. Es el único criterio que este cierre verificó; los demás quedan sin tildar porque **no se auditaron**, no
+porque fallen. Siguen abiertos como follow-up: cutover de HubSpot delivery de `efeonce-social-audit`, guía pillar
+«community manager» en Think y la definición del entregable de auditoría. Sin cambios de código en este repo:
+`pnpm test` + `pnpm build` no aplican.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -20,9 +29,9 @@
 - Flow: `docs/ui/flows/TASK-1351-landing-redes-sociales-flow.md`
 - Motion: `docs/ui/motion/TASK-1351-landing-redes-sociales-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
-- Status real: `Live indexable; cierre formal pendiente`
-- Rank: `TBD`
+- Epic: `EPIC-047`
+- Status real: `Publicada e indexable en /servicios/redes-sociales/ (verificado 2026-09-11); cerrada por decisión del operador`
+- Rank: `EPIC-047-cerrada`
 - Domain: `public-site`
 - Blocked by: `none`
 - Branch: `task/TASK-1351-landing-redes-sociales`
@@ -92,7 +101,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-1351-landing-redes-sociales.md`
+- `docs/tasks/complete/TASK-1351-landing-redes-sociales.md`
 - `docs/ui/wireframes/TASK-1351-landing-redes-sociales.md`
 - `docs/ui/flows/TASK-1351-landing-redes-sociales-flow.md`
 - `docs/ui/motion/TASK-1351-landing-redes-sociales-motion.md`
@@ -326,7 +335,7 @@ Cambio aditivo de contenido en el sitio público (nueva ruta), sin runtime de da
 
 ## Acceptance Criteria
 
-- [ ] La página `/servicios/redes-sociales` está publicada y accesible en el sitio público.
+- [x] La página `/servicios/redes-sociales` está publicada y accesible en el sitio público. (HTTP `200` + `index, follow`, 2026-09-11)
 - [ ] El `<h1>` trabaja "redes sociales"/"gestión de redes sociales"; el copy trabaja "agencia de redes sociales" (keyword targeting PDR-005).
 - [ ] Cada H2 principal tiene una answer capsule (answer-first, 40–60 palabras) citable.
 - [ ] Los 5 bloques de capability (Community · Creators/Influencers · Trendjacking · Reels/Contenido · Social listening) están presentes y descritos por outcome, no por volumen.
@@ -354,12 +363,12 @@ Cambio aditivo de contenido en el sitio público (nueva ruta), sin runtime de da
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (guía Think, paraguas Agencia Creativa)
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (guía Think, paraguas Agencia Creativa) — 2026-09-11: la guía Think no tiene task; TASK-1350 no depende de esta
 
 - [ ] La página quedó registrada en el route-ownership matrix, el landing registry y (si aplica) la nav del hub `/servicios`.
 

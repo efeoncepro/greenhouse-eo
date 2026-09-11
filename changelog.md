@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-11 — EPIC-047: portafolio de landings del sitio público con orden de prioridad
+
+Las landings pendientes dejan de colgar de EPIC-019 (control plane técnico) y pasan a `EPIC-047`, que fija su orden
+de ejecución en el campo `Rank` de cada task. Se cierran por decisión del operador TASK-1799 (Content Marketing),
+TASK-1358 (Home) y TASK-1351 (Redes Sociales), publicadas e indexables; sus criterios de QA sin verificar quedan
+registrados. TASK-1402 y TASK-1404 salen del ranking de landings porque son artículos del hub HubSpot. Sin cambios de
+código ni de runtime público.
+
 ## 2026-09-11 — Panel competitivo AEO multi-marca: primer caso real (SKY) y método documentado
 
 El AI Visibility Grader se corrió sobre SKY y cuatro competidores (LATAM, JetSMART, Avianca, Gol) en Chile con un
@@ -1042,12 +1050,3 @@ aplicado). Tras el release la nómina de septiembre bloqueará hasta resolver Fe
 buscado. **Rollout 2026-09-03:** PR #219 squash, orquestador `33779259694` `released` 16:45Z, `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`
 ON en Production+staging tras live smoke sintético (`review-execute.live.test.ts`). Pendiente del operador: recovery
 por allowlist (bloqueada al agente por permisos), causal de Felipe, conciliación Finance, UI TASK-1814.
-
-## 2026-09-03 — TASK-1806 seguimiento: alerta Teams determinista para drift de metodología ETV
-
-Nuevo cron `ops-seo-etv-drift-watch` (Cloud Scheduler, diario 12:00 America/Santiago, sin flag) en el
-ops-worker: lee la señal existente `seo.etv_methodology.drift` y avisa a Microsoft Teams sólo si
-`severity=error`, vía el dispatcher determinista `sendManualTeamsAnnouncement` y un destino nuevo
-`growth-seo-reliability-alerts` (mismo canal "EO - Admin" que `production-release-alerts`). Antes,
-la única forma de enterarse era abrir `/admin/operations`. Verificado en vivo (rev `ops-worker-00637-2ww`):
-respondió `warning`/`alerted:false`, correcto para el estado actual de la señal.

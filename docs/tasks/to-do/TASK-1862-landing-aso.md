@@ -22,9 +22,9 @@
 - Visual direction: `docs/ui/visual-directions/TASK-1862-landing-aso-direction.md`
 - Form style: `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `TBD`
+- Rank: `EPIC-047-11`
 - Domain: `content|ui`
 - Blocked by: `none`
 - Promotion blocked by: `extensión Search & App Visibility en Proposed (fase B exige Approved for validation; fase C exige Commercially approved); decisiones D1 y D2 de la extensión; dirección visual y copy ledger aprobados; revisión legal de claims y de marcas de terceros; Growth Form y Growth CTA publicados; slug validado con segunda fuente`

@@ -25,7 +25,7 @@ La revisión del Home público live contra el Why y PDR-012 confirma que el cont
 - PDR-010 y PDR-012 mandan sobre cualquier texto de este documento que suene a landing separada `/agencia`.
 
 > **Skills:** `commercial-expert` (overlay GH), `growth-marketing-cro`, `copywriting`, `digital-marketing`, `seo-aeo`, `product-design-loop`, `efeonce-public-site-wordpress`.
-> **Ejecución:** [`TASK-1358`](././tasks/to-do/TASK-1358-landing-agencia.md) (+ wireframe + flow + motion). Epic: `EPIC-019`.
+> **Ejecución:** [`TASK-1358`](././tasks/complete/TASK-1358-landing-agencia.md) (+ wireframe + flow + motion). Epic: `EPIC-019`.
 > **No-duplicación:** el sustrato ya vive en el context pack — este PDR **cita**, no copia: `docs/context/09_marca-agencia.md` (masterbrand + categoría "growth partner"), `docs/context/05_voz-tono-estilo.md` (voz + clichés a evitar), `docs/context/13_icp-buyer-personas-jtbd.md` (ICP mid-market/enterprise + BPs), `docs/context/02_gtm.md`, `docs/context/14_modelo-negocio-asaas.md` (oferta productizada).
 
 ## Contexto
@@ -153,5 +153,5 @@ efeoncepro.com/ (home) marca + ecosistema ASaaS · entrada primaria
 - Posicionamiento/GTM: `docs/context/09_marca-agencia.md`, `05_voz-tono-estilo.md`, `13_icp-buyer-personas-jtbd.md`, `02_gtm.md`, `14_modelo-negocio-asaas.md`.
 - PDR hermanos: [PDR-002](PDR-002-arquitectura-informacion-seccion-visibilidad.md) (IA/dos capas), [PDR-003](PDR-003-layering-ecosistema-digital-efeonce.md) (ecosistema), [PDR-004](PDR-004-landing-agencia-creativa-posicionamiento.md) (creativa · patrón de landing de marca).
 - IA/rutas: [route-ownership matrix](././operations/public-site-route-ownership-matrix-20260616.md).
-- Ejecución: [`TASK-1358`](././tasks/to-do/TASK-1358-landing-agencia.md) bajo `EPIC-019`.
+- Ejecución: [`TASK-1358`](././tasks/complete/TASK-1358-landing-agencia.md) bajo `EPIC-019`.
 - Skills: `commercial-expert`, `growth-marketing-cro`, `copywriting`, `digital-marketing`, `seo-aeo`, `product-design-loop`, `efeonce-public-site-wordpress`, `greenhouse-ux-writing`.

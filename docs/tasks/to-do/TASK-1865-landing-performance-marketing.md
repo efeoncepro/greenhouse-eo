@@ -22,9 +22,9 @@
 - Visual direction: `docs/ui/visual-directions/TASK-1865-landing-performance-marketing-direction.md`
 - Form style: `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `TBD`
+- Rank: `EPIC-047-06`
 - Domain: `content|ui`
 - Blocked by: `none`
 - Promotion blocked by: `dirección visual aprobada; copy ledger aprobado; revisión legal de la tabla de posición y de los hechos de 2026; Growth Form y Growth CTA publicados; slug y migración de la URL legacy validados`

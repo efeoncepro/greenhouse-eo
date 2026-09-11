@@ -18,9 +18,9 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `TBD`
+- Rank: `EPIC-047-09`
 - Domain: `content`
 - Blocked by: `bios reales del equipo + dirección de arte del hero (ver Open Questions)`
 - Branch: `task/TASK-1369-about-us-identidad`
