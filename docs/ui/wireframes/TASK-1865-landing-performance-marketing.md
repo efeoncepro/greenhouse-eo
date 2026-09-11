@@ -9,7 +9,8 @@
 - Working route: `efeoncepro.com/servicios/performance-marketing/` — hipótesis hasta el Slice 1. Reemplaza a la página
   legacy `242862` (`/servicio-gestion-campanas-publicitarias/`), que pasa a 301 en el Slice 6.
 - Positioning: [PDR-022](../../public-site/decisions/PDR-022-landing-performance-marketing-posicionamiento.md)
-- SEO/AEO: [Performance Landing SEO/AEO Brief V1](../../public-site/PERFORMANCE_LANDING_SEO_AEO_BRIEF_V1.md)
+- SEO/AEO: [Performance Landing SEO/AEO Brief V1](../../public-site/PERFORMANCE_LANDING_SEO_AEO_BRIEF_V1.md) y
+  [investigación de términos por país 2026-09-11](../../audits/public-site/PERFORMANCE_LANDING_KEYWORD_RESEARCH_BY_COUNTRY_2026-09-11.md)
 - Oferta (canon): [ficha de Performance & Commerce Distribution](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md)
   y [decisión de oferta](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md).
 - Surface: WordPress/Ohio público + Elementor. No es el portal Greenhouse.
@@ -103,9 +104,13 @@ Orden de lectura y trabajo de cada región. Ninguna región existe si no cumple 
 - **Desktop:** banda de papel en una columna de lectura (~720 px) con dos pares H2 + cápsula: qué es el performance
   marketing (55 palabras) y qué hace una agencia de performance marketing (50 palabras).
 - **Mobile:** igual, a ancho completo con márgenes de 20 px.
-- **Contenido:** `definition.title`, `definition.capsule`, `definition.agencyTitle`, `definition.agencyCapsule`.
+- **Contenido:** `definition.title`, `definition.capsule`, `definition.agencyTitle`, `definition.agencyCapsule`,
+  `definition.lexicon`.
 - **Regla:** las cápsulas responden la pregunta literal en su primera oración, tienen entre 40 y 60 palabras y son las
   mismas que usa el FAQ, para que el schema marque exactamente lo visible. No se convierte en guía.
+- **Línea de léxico:** una oración bajo las cápsulas que declara los sinónimos con que cada país busca la categoría
+  (paid media, publicidad digital, pauta digital, campañas pagadas). Existe porque la página es una sola para cinco
+  países y ningún término funciona en todos (ver la investigación por país).
 
 ### R3 — Problema
 
@@ -152,7 +157,7 @@ Orden de lectura y trabajo de cada región. Ninguna región existe si no cumple 
 
 ### R6 — Dos formas de trabajar
 
-- **Desktop:** H2 + dos columnas de igual peso, Consumo y e-commerce | Empresas B2B. Cada columna con H3 y cuatro filas
+- **Desktop:** H2 + dos columnas de igual peso, Consumo y e-commerce | Marketing B2B. Cada columna con H3 y cuatro filas
   etiquetadas: para quién, qué optimizamos, canales habituales, cómo lo medimos. La columna B2B agrega la línea de CRM.
 - **Mobile:** columnas apiladas, consumo primero.
 - **Contenido:** `motions.title`, `motions.intro`, `motions.{commerce,b2b}.{name,for,optimizes,channels,measure}`,
@@ -223,7 +228,7 @@ Orden de lectura y trabajo de cada región. Ninguna región existe si no cumple 
 
 - **Desktop:** intro sticky a la izquierda sobre 900 px, acordeón nativo a la derecha. A 900 px o menos, una columna,
   intro estática y 28 px de separación.
-- **Contenido:** `faq.title`, `faq.intro`, `faq.{1..12}.q`, `faq.{1..12}.a`.
+- **Contenido:** `faq.title`, `faq.intro`, `faq.{1..14}.q`, `faq.{1..14}.a`.
 - **Regla:** `<details>`/`<summary>`; cada respuesta presente en el HTML para el schema; las respuestas 1 y 2 reutilizan
   las cápsulas de R2.
 
@@ -327,7 +332,7 @@ columna "Nombre público" para que nadie renombre servicios por su cuenta.
 | Performance Gestionado | Managed Performance |
 | Incrementalidad | Incrementality & Media Investment Architecture |
 | Consumo y e-commerce | Motion A · Demand & Commerce |
-| Empresas B2B | Motion B · B2B Pipeline |
+| Marketing B2B | Motion B · B2B Pipeline |
 
 ## Copy Ledger
 
@@ -353,6 +358,7 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.definition.capsule` | El performance marketing es la publicidad digital que se paga y se optimiza según resultados medibles: una venta, un lead calificado, una oportunidad o una descarga. Se opera en plataformas como Google, Meta, TikTok o LinkedIn, y su calidad depende de qué resultado se mide y de cuán limpia llega esa señal a la plataforma. |
 | `performance.landing.definition.agencyTitle` | ¿Qué hace una agencia de performance marketing? |
 | `performance.landing.definition.agencyCapsule` | Planifica, lanza y optimiza campañas pagadas para que la inversión produzca resultados de negocio. Hoy las plataformas automatizan la puja y la segmentación, así que el trabajo que marca la diferencia es otro: definir la señal correcta, probar creatividad con método, gobernar la automatización y leer qué causó cada resultado. |
+| `performance.landing.definition.lexicon` | También lo vas a encontrar como paid media, publicidad digital, pauta digital o campañas pagadas. Hablamos de lo mismo: publicidad que se paga y se mide por resultados. |
 | `performance.landing.problem.title` | Las plataformas ya compran solas. Optimizan lo que les enseñas. |
 | `performance.landing.problem.attribution.name` | Cada plataforma se atribuye la misma venta |
 | `performance.landing.problem.attribution.body` | Google, Meta y TikTok cuentan conversiones que se superponen. Sumadas, pueden dar más ventas de las que realmente tuviste. |
@@ -413,7 +419,7 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.motions.commerce.optimizes` | La venta, el valor de cada compra y el margen, cuando lo compartes. |
 | `performance.landing.motions.commerce.channels` | Google, Meta, TikTok y retail media. |
 | `performance.landing.motions.commerce.measure` | La eficiencia total de tu negocio, no el retorno que declara cada plataforma. |
-| `performance.landing.motions.b2b.name` | Empresas B2B |
+| `performance.landing.motions.b2b.name` | Marketing B2B |
 | `performance.landing.motions.b2b.for` | Empresas con venta consultiva y un CRM con etapas. |
 | `performance.landing.motions.b2b.optimizes` | Las oportunidades que tu equipo de ventas acepta, no los formularios. |
 | `performance.landing.motions.b2b.channels` | LinkedIn, búsqueda en Google y remarketing. |
@@ -424,7 +430,7 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.modules.signal.name` | Medición y señal |
 | `performance.landing.modules.signal.body` | Definimos qué resultado aprende cada campaña y verificamos que llegue completo, sin duplicados y con consentimiento. |
 | `performance.landing.modules.operations.name` | Operación de medios |
-| `performance.landing.modules.operations.body` | Presupuesto, ritmo de inversión, audiencias, exclusiones y pujas en cada canal. |
+| `performance.landing.modules.operations.body` | Nuestros media buyers y traffickers gestionan presupuesto, ritmo de inversión, audiencias, exclusiones y pujas en cada canal. |
 | `performance.landing.modules.commerce.name` | Commerce media |
 | `performance.landing.modules.commerce.body` | Tu inversión en marketplaces y cadenas, leída junto a tu catálogo, tu stock y tus ventas. |
 | `performance.landing.modules.creative.name` | Creatividad de performance |
@@ -441,16 +447,16 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.channels.chips.available` | Donde está disponible |
 | `performance.landing.channels.chips.onRequest` | Bajo pedido |
 | `performance.landing.channels.items.google.name` | Google Ads |
-| `performance.landing.channels.items.google.body` | Búsqueda, Performance Max, Demand Gen y YouTube. Con exclusiones de marca y señal limpia, para que la automatización no compre a quien ya te buscaba. |
-| `performance.landing.channels.items.meta.name` | Meta Ads |
-| `performance.landing.channels.items.meta.body` | Facebook, Instagram y anuncios que abren una conversación en WhatsApp, cuando vendes por mensajería. |
+| `performance.landing.channels.items.google.body` | Búsqueda (SEM), Performance Max, Demand Gen y YouTube. Con exclusiones de marca y señal limpia, para que la automatización no compre a quien ya te buscaba. |
+| `performance.landing.channels.items.meta.name` | Meta Ads: Facebook e Instagram |
+| `performance.landing.channels.items.meta.body` | Anuncios en Facebook e Instagram, y anuncios que abren una conversación en WhatsApp cuando vendes por mensajería. |
 | `performance.landing.channels.items.tiktok.name` | TikTok Ads |
 | `performance.landing.channels.items.tiktok.body` | Cuando hay video pensado para TikTok. Sin creatividad nativa, no lo recomendamos. |
 | `performance.landing.channels.items.linkedin.name` | LinkedIn Ads |
 | `performance.landing.channels.items.linkedin.body` | Para B2B: llegar a cargos y empresas concretas, medido contra las oportunidades de tu CRM. |
 | `performance.landing.channels.items.programmatic.name` | Programmatic |
 | `performance.landing.channels.items.programmatic.body` | Display, video, audio y pantallas digitales en la vía pública, con reporte por sitio y costos declarados. |
-| `performance.landing.channels.items.retail.name` | Retail media |
+| `performance.landing.channels.items.retail.name` | Retail media y Mercado Ads |
 | `performance.landing.channels.items.retail.body` | Mercado Ads y las redes de medios de las cadenas, leídas junto a tus ventas. |
 | `performance.landing.channels.items.chatgpt.name` | Anuncios en ChatGPT |
 | `performance.landing.channels.items.chatgpt.body` | Bajo las respuestas de ChatGPT, en los países donde OpenAI ya los habilita. En Chile todavía no están disponibles: te dejamos listo para cuando lleguen. |
@@ -520,8 +526,8 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.faq.2.a` | (reutiliza definition.agencyCapsule) |
 | `performance.landing.faq.3.q` | ¿Cuánto cuesta una agencia de performance marketing? |
 | `performance.landing.faq.3.a` | Depende de cuántos canales y mercados operamos y de qué tan madura está tu medición. Cobramos un fee mensual por la operación, separado de tu inversión en medios, y el diagnóstico tiene precio cerrado. Nunca cobramos sólo un porcentaje de lo que inviertes. |
-| `performance.landing.faq.4.q` | ¿Hay una inversión mínima? |
-| `performance.landing.faq.4.a` | Cada plataforma necesita un volumen mínimo de conversiones para aprender. En el diagnóstico revisamos si tu inversión alcanza para los canales que quieres; si no alcanza, te recomendamos concentrarte en menos canales. |
+| `performance.landing.faq.4.q` | ¿Cuánto hay que invertir en publicidad digital? |
+| `performance.landing.faq.4.a` | Depende del canal: cada plataforma necesita un volumen mínimo de conversiones para aprender, y LinkedIn suele pedir más inversión que Google o Meta. En el diagnóstico revisamos si tu inversión alcanza para los canales que quieres; si no alcanza, te recomendamos concentrarte en menos canales. |
 | `performance.landing.faq.5.q` | ¿Las cuentas publicitarias quedan a mi nombre? |
 | `performance.landing.faq.5.a` | Sí. Las cuentas, los píxeles, las audiencias y los datos están a tu nombre. Accedemos como partner y, si terminamos, te quedas con todo, incluido el historial de lo que aprendimos. |
 | `performance.landing.faq.6.q` | ¿Trabajan con mi equipo interno o con mi agencia actual? |
@@ -538,6 +544,10 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.faq.11.a` | Desde el 1 de diciembre de 2026, enviar datos de clientes a una plataforma publicitaria, por ejemplo para crear audiencias o registrar conversiones, requiere una base legal documentada. En el diagnóstico identificamos esos flujos para que tu equipo legal los revise. No es asesoría legal. |
 | `performance.landing.faq.12.q` | ¿Garantizan resultados? |
 | `performance.landing.faq.12.a` | No. El resultado depende también de tu oferta, tu precio, tu stock, tu sitio y tu equipo de ventas. Lo que sí garantizamos es cómo trabajamos: medición verificada, pruebas con método y una recomendación clara cada mes. |
+| `performance.landing.faq.13.q` | ¿Qué es Google Ads y cómo funciona? |
+| `performance.landing.faq.13.a` | Google Ads es la plataforma de publicidad de Google. Muestra anuncios en el buscador y en YouTube, y cobra según clics, vistas o conversiones. Hoy su automatización decide gran parte de las pujas y los públicos, así que lo que más influye en el resultado es qué conversión le enseñas a optimizar. La publicidad en buscadores se conoce como SEM. |
+| `performance.landing.faq.14.q` | ¿Qué es la pauta digital? |
+| `performance.landing.faq.14.a` | La pauta digital es otra forma de llamar a la publicidad digital pagada: los anuncios en buscadores, redes sociales y otros medios digitales por los que una marca paga para llegar a su audiencia. En Colombia y Perú se dice pautar; en Chile también paid media. Cuando la pauta se optimiza según resultados medibles, hablamos de performance marketing. |
 | `performance.landing.conversion.title` | Cuéntanos cómo inviertes hoy y te decimos por dónde empezar |
 | `performance.landing.conversion.body` | Con lo esencial preparamos el diagnóstico y llegamos a la conversación con preguntas concretas. |
 | `performance.landing.form.overline` | Brief de performance |
@@ -591,8 +601,8 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.aria.signalToggle` | Elegir qué aprende la plataforma |
 | `performance.landing.aria.signalList` | Campañas ordenadas por el presupuesto que reciben |
 | `performance.landing.aria.chip` | Estado del canal: {estado} |
-| `performance.landing.seo.title` | Agencia de performance marketing en Chile \| Efeonce |
-| `performance.landing.seo.description` | Performance marketing que optimiza hacia ventas reales en Google, Meta, TikTok y LinkedIn, con tus cuentas a tu nombre y fee separado de tu inversión. |
+| `performance.landing.seo.title` | Agencia de performance marketing y publicidad digital \| Efeonce |
+| `performance.landing.seo.description` | Agencia de performance marketing y publicidad digital: Google Ads, Meta, TikTok y LinkedIn optimizados hacia ventas reales, con tus cuentas a tu nombre. |
 | `performance.landing.og.title` | Performance marketing que aprende de tus ventas |
 | `performance.landing.og.description` | Tu pauta optimiza lo que le enseñas. Te ayudamos a enseñarle a vender, con tus cuentas y tus datos a tu nombre. |
 
@@ -614,6 +624,8 @@ marcadas como condicionales no se publican sin el caso autorizado.
 | **inversión en medios** | Lo que el cliente paga a las plataformas | Reglas del juego, FAQ, formulario |
 | **fee** | Lo que cobra Efeonce | Reglas del juego, FAQ |
 | **oportunidad** | La etapa del CRM que ventas acepta | Motion B, firma, FAQ; nunca "lead calificado" en titulares |
+| **publicidad digital · paid media · pauta digital** | Nombres de la categoría con que busca cada país | Title, línea de léxico de R2 y FAQ 14; en el cuerpo se usa pauta |
+| **media buyers y traffickers** | El rol del operador (Chile y Perú) | Sólo en el módulo de operación, siempre juntos |
 
 No se usan en copy visible: ROAS, CPA, CPL, "growth", "escalar exponencialmente", "maximizar tu inversión", "resultados
 garantizados".

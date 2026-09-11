@@ -62,7 +62,7 @@
 ### J3 — B2B que busca pipeline
 
 1. Llega por el menú, por LinkedIn Ads o por un enlace desde la landing de HubSpot.
-2. Lee la columna Empresas B2B de R6 y la nota B2B de la firma.
+2. Lee la columna Marketing B2B de R6 y la nota B2B de la firma.
 3. Entra a J2; en el brief elige `A empresas (B2B)` y su CRM.
 4. Commercial recibe el brief con el motion B identificado.
 

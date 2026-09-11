@@ -116,6 +116,8 @@ Reglas obligatorias:
   usan los rangos de inversión del formulario; nada de este pack se publica.
 - `docs/audits/commercial/PERFORMANCE_MEDIA_CHANNELS_PARTNERS_PRICING_RESEARCH_2026-09-10.md` — demanda, plataformas,
   ChatGPT Ads, Ley 21.719 y competidores.
+- `docs/audits/public-site/PERFORMANCE_LANDING_KEYWORD_RESEARCH_BY_COUNTRY_2026-09-11.md` — términos, léxico, preguntas y
+  SERP por país (CL, PE, MX, CO, US).
 - `docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md` — estado de Google Ads, Meta y el partner programático.
 - `docs/reference/measurement-gtm-ga4/04-greenhouse-gh-event-convention.md` y `TRACKING-PLAN.md`.
 - `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md` — anatomía del host del brief.
@@ -250,7 +252,7 @@ Reglas obligatorias:
 - Error: envío fallido con mensaje honesto y valores conservados.
 - Degraded / partial: renderer no monta; reunión en el mismo bloque y enlace a `/contacto/`.
 - Permission denied: correo no corporativo o verificación de abuso fallida, con alternativa de reunión.
-- Long content: doce preguntas, ocho canales y cinco frentes en HTML inicial; retículas que colapsan sin truncar.
+- Long content: catorce preguntas, ocho canales y cinco frentes en HTML inicial; retículas que colapsan sin truncar.
 - Mobile / compact: una columna; circuito vertical; tabla de posición en modo card; conversión y FAQ estáticos.
 - Keyboard / focus: control de la firma como radiogroup con flechas; FAQ, CTAs y campos operables; foco doble visible;
   dock oculto `inert`.
@@ -443,7 +445,7 @@ La especificación completa por región —layout desktop y mobile, contenido, I
 | R10 | Posición por tipo de proveedor | `greenhouse_comparison_table` (reuse) |
 | R11 | Reglas del juego + lo que no se promete | `greenhouse_performance_operating` |
 | R12 | Qué recibes + marcas | `greenhouse_performance_proof` + `greenhouse_social_trust` |
-| R13 | FAQ (12) | `greenhouse_performance_faq` |
+| R13 | FAQ (14) | `greenhouse_performance_faq` |
 | R14 | Conversión: brief + reunión + divulgación + dock | `greenhouse_performance_conversion` |
 
 ### Contrato del formulario
@@ -517,7 +519,7 @@ CRM ni contexto. El control de la firma no emite eventos en V1.
 - `public-website:verify-performance-landing-fidelity`: por viewport (1536, 1440, 890, 390 y reduced motion) valida
   separación bajo el masthead, un H1, orden del first fold, tres instancias del rol verde, firma que cambia de primer ítem,
   `<ol>` en firma y escalera, rótulo ilustrativo, ausencia de números sin fuente y de logos de plataformas, ocho canales con
-  chip, doce preguntas operables, form montado con diez campos, CTA que abre el scheduler nativo, dock `inert` cuando está
+  chip, catorce preguntas operables, form montado con diez campos, CTA que abre el scheduler nativo, dock `inert` cuando está
   oculto, consola sin errores propios y `scrollWidth === clientWidth`.
 - `public-website:verify-performance-seo-package`: title, meta, canonical, robots, OG/Twitter, imagen social, `Service` y
   `FAQPage` sin entidades duplicadas, sitemap, menú y HTML inicial.
@@ -670,6 +672,11 @@ el motor ya soporta.
 
 - Spoke "agencia de marketing b2b" (390/mes, KD 9) coordinada con la página de inbound y la landing de HubSpot.
 - Spoke "agencia de Google Ads" para México y Colombia (260/mes cada uno) cuando exista la fase LATAM con hreflang.
+- Página en inglés para Estados Unidos con hreflang: "ppc agency" 18.100, "google ads agency" 12.100, "performance
+  marketing agency" 4.400, "paid media agency" 2.900, "chatgpt ads" 6.600; ángulo posible "hispanic / multicultural paid
+  media".
+- Secciones o páginas por ciudad (Santiago, Lima, CDMX, Monterrey, Bogotá, Medellín, Cali) y "mercadotecnia digital" para
+  México, sólo con presencia local real.
 - Guía editorial de performance marketing en Think para la intención definicional.
 - Primer caso publicable de la línea, con autorización y evidencia.
 - Evento de analítica del control de la firma si aparece una decisión que dependa de él.
@@ -681,8 +688,13 @@ el motor ya soporta.
 - **Decisión del owner:** la landing se construye desde cero y la página legacy `242862` no se parcha. Se retiró el
   Slice 0 de contención; los contadores en cero y el claim de partners no verificado de la legacy quedan como riesgo
   aceptado hasta el 301 del Slice 6.
-- Investigación Semrush de términos por país (Chile, Perú, México, Colombia y Estados Unidos) en curso; su resultado
-  alimenta el brief SEO/AEO y el copy ledger antes del Slice 1.
+- Investigación Semrush de términos por país (Chile, Perú, México, Colombia y Estados Unidos) completada:
+  [auditoría 2026-09-11](../../audits/public-site/PERFORMANCE_LANDING_KEYWORD_RESEARCH_BY_COUNTRY_2026-09-11.md). Ningún
+  término funciona en los cinco países: Chile busca "performance marketing"; Perú, México y Colombia, "publicidad
+  digital"; Colombia además "pauta"; Estados Unidos busca en inglés. Cambios aplicados al copy ledger: title con las dos
+  cabezas, línea de léxico en R2, "Meta Ads: Facebook e Instagram", "Retail media y Mercado Ads", SEM en Google,
+  "Marketing B2B", media buyers y traffickers, y dos preguntas nuevas (Google Ads y pauta digital); el FAQ pasa a
+  catorce. La segunda fuente del Slice 1 sigue pendiente.
 
 ## Open Questions
 

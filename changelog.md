@@ -41,7 +41,9 @@ quedan como alternativas.
 Landing (2026-09-11): `TASK-1865` en `/servicios/performance-marketing/` con dirección "La señal" —firma interactiva
 `Clics / Ventas` que reordena las campañas sin cifras ni logos—, trece módulos semánticos, form `efeonce-performance-brief`
 con rango de inversión alineado a los niveles del pricing pack, y 301 desde la página legacy `242862`, que no se parcha:
-la página se construye desde cero.
+la página se construye desde cero. La investigación Semrush en cinco países mostró que no hay un término único —Chile
+busca "performance marketing"; Perú, México y Colombia, "publicidad digital"; Estados Unidos, en inglés—: el title combina
+ambas cabezas, el copy suma una línea de léxico y el FAQ pasa a catorce preguntas.
 
 ## 2026-09-10 — Channel & Commerce: se abre la línea de trade marketing y BTL
 

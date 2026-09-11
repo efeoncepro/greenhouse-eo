@@ -15,7 +15,9 @@ Canales emergentes: ChatGPT Ads `selectivo` donde existe (LATAM: sólo BR/MX; Ch
 tomó en paralelo la task del MCP autosuficiente) con wireframe, flow, motion, dirección "La señal" y brief SEO/AEO. La
 legacy `/servicio-gestion-campanas-publicitarias/` (`242862`) muestra contadores en cero y un claim de Google/Meta
 Partners no verificado en producción; el owner decidió no parcharla: la página se construye desde cero y la legacy sale
-con 301. Investigación Semrush de términos por país (CL, PE, MX, CO, US) en curso.
+con 301. Investigación Semrush por país completada (`docs/audits/public-site/PERFORMANCE_LANDING_KEYWORD_RESEARCH_BY_COUNTRY_2026-09-11.md`):
+Chile busca "performance marketing", PE/MX/CO "publicidad digital", CO además "pauta", US en inglés (página aparte,
+follow-up). Title y copy ledger ajustados; FAQ a catorce.
 
 **Product Design 360 (2026-09-10, modelado y canonizado; oferta `Proposed`, no autoriza venta):** business model
 V1.1 + ficha `docs/services/wave/product-design-360.md` + ADR `EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`: capability de

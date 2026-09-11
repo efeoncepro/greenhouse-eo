@@ -24,6 +24,18 @@ backlinks de la legacy lo justifican; en ambos casos queda una sola URL indexabl
 legacy no se parcha mientras tanto (decisión del owner, 2026-09-11). Brief SEO/AEO:
 [PERFORMANCE_LANDING_SEO_AEO_BRIEF_V1](../PERFORMANCE_LANDING_SEO_AEO_BRIEF_V1.md).
 
+## Delta 2026-09-11 (b) — términos por país
+
+La [investigación Semrush en Chile, Perú, México, Colombia y Estados Unidos](../../audits/public-site/PERFORMANCE_LANDING_KEYWORD_RESEARCH_BY_COUNTRY_2026-09-11.md)
+muestra que ningún término funciona en todos: Chile busca "performance marketing"; Perú, México y Colombia, "publicidad
+digital"; Colombia además "pauta"; Estados Unidos busca en inglés. Ajustes a esta decisión:
+
+- el title combina las dos cabezas y deja de decir "en Chile": `Agencia de performance marketing y publicidad digital`;
+- el H1 conserva "performance marketing";
+- una línea de léxico en la definición declara paid media, publicidad digital, pauta digital y campañas pagadas como
+  sinónimos, y el FAQ suma "qué es Google Ads" y "qué es la pauta digital";
+- Estados Unidos no se atiende con esta página: queda como follow-up una página en inglés con hreflang.
+
 ## Contexto
 
 PDR-008 dejó performance marketing como capability listada dentro de la página de agencia porque "el cluster
@@ -106,7 +118,8 @@ El copy no da asesoría legal: dice que el Diagnostic inventaría los flujos de 
 
 ## SEO / AEO
 
-- **Title:** "Agencia de performance marketing en Chile | Efeonce" (ajustar largo en ejecución).
+- **Title:** ~~"Agencia de performance marketing en Chile | Efeonce"~~ → reemplazado por el Delta 2026-09-11 (b):
+  "Agencia de performance marketing y publicidad digital | Efeonce".
 - **H1:** "Agencia de performance marketing" + reencuadre *no es X, es Y*.
 - **Meta description y H2 secundario:** "paid media", "Google Ads y Meta Ads".
 - **H2 por canal:** Google Ads, Meta Ads, LinkedIn Ads para B2B, TikTok Ads, programmatic, retail media y anuncios en
