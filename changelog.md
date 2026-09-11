@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-11 — Trendjacking «Nuestro Duo»: pieza híbrida, Short con Seedance 2.5 y 4 canales vía Metricool
+
+Primera operación de trendjacking end-to-end sobre el lanzamiento del iPhone Duo: investigación de las reacciones
+reales de marcas, pieza 4:5 con mockup de plegable (plate `gpt-image-2` con pantallas chroma + homografía + texto y
+logo determinísticos), Short 9:16 con Seedance 2.5 vía Higgsfield y programación en Threads, Instagram, LinkedIn y
+YouTube (marca Efeonce Group, etiqueta IA declarada). Registro con ids y aprendizajes en
+`docs/operations/social/2026-09-11-iphone-duo-trendjack.md`.
+
+Las skills `social-media-studio`, `copywriting`, `greenhouse-ai-image-generator` y `motion-design-studio` (Codex y
+Claude) y `GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md` incorporan lo aprendido: YouTube en Metricool solo acepta
+video; en video las pantallas las renderiza el modelo (el reemplazo con green screen se ve pegado) y se protegen con
+pantallas de texto grande + cada pantalla como referencia; `start_image` de Seedance no fija el encuadre, así que el
+overlay se diagrama midiendo el sujeto por frame; y el copy de trendjacking cita lo que las marcas publicaron, sin
+inventar su estado, con frases naturales y golpe.
+
 ## 2026-09-10 — Performance & Commerce: paid media con dos motions, pricing por nivel y landing propia
 
 La solución de paid media de Media & Distribution vivía como sección del catálogo de la línea, sin precio, con un solo
@@ -1036,33 +1051,3 @@ rollback en staging; rebaseline acotado (historia improved de Berel y Comex, USD
 estimado bajan ≈ 60 % por cambio de fórmula del proveedor, no por pérdida real; cada cifra declara `etvMethodology`.
 Efeonce se mide aparte de los clientes (guard de organización en celdas bulk). Writers `rowsWritten` ahora cuentan
 filas insertadas. Legacy sólo vuelve como rollback antes del corte 2026-11-01T00:00:00Z.
-
-## 2026-09-03 — Berel: cobertura por negocio, skills sincronizadas y minería trazable
-
-Decisión local del operador 2026-09-02: fortalecer elección, protección y aplicación, manteniendo color
-y paletas. [Estrategia](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md), inventario de 49 cuerpos,
-modelo/brief/manual/funcional y skills espejo Berel/SEO-AEO/DataForSEO actualizados; Playbook Notion
-ampliado y releído. [Discovery](docs/audits/seo/BEREL_CAPILLARY_KEYWORD_MINING_2026-09-02.md):
-14 runs Labs, 1.517 keywords distintas, 13 SERPs y 52 PAA; costo reportado US$1,23572.
-Mapa propuesto de 27 intenciones, no 27 artículos aprobados. No tracking, calendario, CMS ni release.
-Ampliación 2026-09-03: skill Berel y espejos incorporan completitud técnica por macropaso, correcciones
-acotadas y conciliación de producto; se retira la inferencia «campo CMS vacío = tiempo inexistente».
-Control técnico y caso Berelex Semibrillante en módulos 12/13; N29 corregido en Notion, artes y
-derivados pendientes, sin publicación. Evidencia: [QA de guardrails](docs/audits/seo/BEREL_TUTORIAL_GUARDRAILS_2026-09-03.md).
-Clasificación de piezas: 51 tareas corregidas y releídas; la skill exige tipo/canal/formato
-y excluye principales del conteo visual. [Auditoría y límites](docs/audits/seo/BEREL_PIECE_COUNT_CLASSIFICATION_2026-09-03.md).
-Tipo/canal obligatorios desde la creación de cada tarea visual, incluidos bloqueados; requisitos y
-checklists explícitos en banners, sociales y fotos. Se mantiene el esquema y la agrupación existentes.
-Distribución: cuatro opciones, no cuatro derivados obligatorios; módulo 15 y matrices por artículo.
-Playbooks Social/Producción en Notion alineados, Instagram Story corregido, contrato 8 artículos
-de 3.000–5.000 palabras/50 gráficas/3 videos y cortesía extendida a nov/dic registrados. Octubre
-excluido. Aclaración: 50 incluyen blog/RRSS; Blog/Facebook/Instagram/Pinterest. Priorización N52→Navidad
-aprobada: 4 banners N52 fuera del paquete, 4 banners y 2 sociales N59 creados. Distribución 50 gráficas
-
-- 3 videos por mes, con reservas técnicas/editoriales; 193 páginas modificadas releídas, sin pérdida de historial.
-
-Corrección de numeración verificada: [mapa por ID y readback 179/179](docs/audits/seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md).
-Skill Berel módulo 16: bloques mensuales completos, reserva de slots, cambios coordinados y aliases
-de archivos; no numerar por orden de trabajo. Se preserva el corte histórico descrito arriba.
-Complemento de `1fcc2ade3`: metodología de research SEO/AEO y DataForSEO versionada con su referencia
-canónica de minería, gate de espejos y documentación de priorización/brief/operación; sin cambios runtime.

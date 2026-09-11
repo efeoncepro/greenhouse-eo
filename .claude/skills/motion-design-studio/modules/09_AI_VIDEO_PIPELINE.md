@@ -31,6 +31,7 @@ No hay "el mejor modelo" — hay **el mejor modelo para ESTA toma**. Elige por l
 | **Runway Gen-4.5** | **Cine dirigido** | Entiende beats y coreografía de cámara (pan/truck/handheld). Fuerte para narrativa dirigida |
 | **Seedance 2.0** | Briefs detallados + refs multimodales | Reference-to-video con hasta 9 imágenes + 3 videos + 3 audios; 4–15 s; native audio. Puede usar previs 3D como **video exportado**; no recibe `.blend`. |
 | **Seedance 2.5 vía Fal** | T2V, I2V y R2V; briefs largos, audio nativo y muchas refs | OpenAPI actual: 480p/720p, 4–30 s; I2V acepta `image_url` y `end_image_url`; R2V admite hasta 30 imágenes, 10 videos, 10 audios y 50 archivos totales, con audio condicionado a imagen/video. No declara 4K, máscara, storyboard, shots ni precio fijo; el costo publicado es una fórmula de Fal y debe refrescarse. |
+| **Seedance 2.5 vía Higgsfield MCP** (`seedance_2_5`) | UI legible en la pantalla de un dispositivo, producto y refs indexadas; el operador lo indicó como el más potente para esto | `generate_video` con `mode: omni_reference` y roles `start_image`, `end_image`, `image_references`, `video_references`, `audio_references`; 4–30 s; 480p/720p/1080p; `bitrate_mode` standard/high; `generate_audio`. Medido 2026-09-11: **72 créditos Higgsfield por 8 s a 1080p**, ~4–5 min por render. Mecánica del MCP en `efeonce/STUDIO_TOOLING.md`; receta de pantallas en §7. |
 | **Kling 3.0** | **Storyboarding multi-shot + Voice Binding** | Voz consistente en 6 cortes / 5 idiomas. Económico |
 | **Veo 3.1** | **Broadcast** | Frame rate de cine, sync audio-visual nativo. ~$0.10/s |
 | **Gemini Omni** | **Edición conversacional multi-turn** | Multimodal, consistencia entre turnos. Vertex (proyecto efeonce-group) |
@@ -86,7 +87,9 @@ referencia — mucho más control que text-to-video puro.**
    stills → **`greenhouse-ai-image-generator` / `design-studio`** (boundary). El still lleva ya la
    composición y el look que quieres.
 2. **i2v desde el keyframe:** el modelo anima *desde* esa imagen, respetando composición y estilo.
-   Reduce la deriva enormemente vs text-to-video.
+   Reduce la deriva enormemente vs text-to-video. Excepción medida: en `omni_reference` (Seedance 2.5 vía
+   Higgsfield) el `start_image` orienta, pero **no fija el encuadre**; el modelo puede reencuadrar durante el
+   clip (ver §7).
 3. **Start + end frame (cuando el modelo lo soporta):** dando el frame inicial **y** final, controlas
    el arco del movimiento (útil para transiciones y reveals precisos).
 4. **Keyframes como red de seguridad de consistencia:** el mismo keyframe base reusado alimenta tomas
@@ -153,11 +156,45 @@ ilusión.** Es el error #1 que separa el video IA amateur del pro. Herramientas 
 | **Handheld / shaky** | Movimiento de cámara "a mano" sale tembloroso, con warping o grano raro | Genera **estático/suave** y agrega el *shake* en post (AE/Resolve), o suma grano en post. No pidas handheld al modelo |
 | **Tomas > ~10s** | Deriva, morphing, pérdida de coherencia en clips largos | Genera en **chunks de 5–8s** y **monta** (`modules/06`). El master largo se arma editando, no generando de una |
 | **Through-object moves** | Cámara que atraviesa un objeto (a través de una ventana, un anillo) se rompe | **Plates estáticos** + el *move* en post (compositing/3D camera en AE). No lo resuelve el modelo hoy |
-| **Manos / texto / detalle fino** | Manos deformes, texto ilegible, logos derretidos | Evita primeros planos de manos/texto generado; pon el **texto real en post** (mograph, `modules/05`); logo compositeado, no generado |
+| **Manos / texto / detalle fino** | Manos deformes, texto ilegible, logos derretidos | Evita primeros planos de manos/texto generado; pon el **texto real en post** (mograph, `modules/05`); logo compositeado, no generado. Excepción: la UI **dentro de la pantalla de un dispositivo** la renderiza el modelo (ver abajo) |
+| **Texto chico en pantalla redibujado** | El modelo reescribe la UI desde el primer frame («B2S» por B2B) | Pantallas **video-safe** como `image_references` + frases exactas en el prompt (ver abajo) |
+| **Reencuadre pese al `start_image`** | El sujeto crece o se desplaza durante el clip e invade el espacio del overlay | Mide el bounding box por frame y diagrama el overlay en las bandas libres (ver abajo) |
 | **Edit `completed` con deriva temporal** | La edición cambia artefactos, cámara o anatomía fuera de la zona pedida | `completed` = candidato. Revisar 1×/0.5× + contact sheet; si sólo faltan timing/orden/repetición y las poses existen, retimar el mismo master en post (`workflows/omni-in-place-edit-and-deterministic-finish.md`) |
 | **Deriva de identidad** | Personaje cambia entre tomas | Soul ID / refs / Voice Binding (§4) |
 | **Deriva de color** | Cada toma con distinta temperatura/contraste | Grade de match unificador (`modules/08 §4`) |
 | **Flicker en upscale** | Detalle "hierve" frame a frame | Video Sequence Enhancement frame-consistent, no upscale imagen-por-imagen (`modules/08 §8`) |
+
+### Pantallas con UI dentro de un dispositivo (Seedance 2.5, verificado 2026-09-11)
+
+Caso fuente: Short 9:16 «Nuestro Duo»
+([`2026-09-11-iphone-duo-trendjack.md`](../../../../docs/operations/social/2026-09-11-iphone-duo-trendjack.md)).
+Si la toma muestra un teléfono o plegable con UI legible, **la pantalla la renderiza el modelo dentro del
+dispositivo**. Tres corridas lo fijaron:
+
+| Corrida | Qué se probó | Resultado |
+|---|---|---|
+| 1 | Plate con las pantallas finales (texto chico) como `start_image` | Buen movimiento, pero el modelo **redibujó el texto** desde el primer frame: «B2S» por B2B, «Tu marce», «quieres» por «quieras». Rechazada |
+| 2 | Pantallas en verde + reemplazo determinístico por frame con tracking de esquinas | Rechazada por el operador antes de usarse: el texto pegado no recibe luz, reflejos ni respuesta al movimiento, y no se ve dentro de la pantalla |
+| 3 ✅ | Pantallas **video-safe** + plate como `start_image` + cada pantalla como `image_references` | Texto correcto y estable los 8 s, con brillo y reflejos nativos |
+
+Receta aprobada:
+
+1. **Pantallas video-safe:** mismo diseño, pero sólo pocas frases GRANDES. Fuera URLs, barra de estado,
+   pestañas y texto diminuto; lo secundario pasa a barras grises.
+2. **`mode: omni_reference`:** el plate como `start_image` y **cada pantalla como `image_references`**. En el
+   prompt, indexa cada referencia (qué imagen va en qué pantalla) y lista las frases exactas entre comillas.
+3. **No confíes el encuadre al `start_image`.** El modelo agrandó el teléfono y lo subió durante el clip (borde
+   superior de 598 a 468 px; inferior máx. 1374 px) aunque el prompt pedía "upper 40% empty". Mide el bounding
+   box del dispositivo por frame (ffmpeg a 4 fps + análisis de píxeles) y diagrama el overlay en las bandas
+   libres. En este caso, logo + eyebrow + titular terminan en 440 px y la bajada parte en 1430 px, entre las
+   manos, sobre la zona de UI de Shorts.
+4. **Texto y logo de la pieza = overlay determinístico** con ffmpeg (PNG transparente, fade-in 0,6 s,
+   `libx264 -crf 18`, 30 fps, AAC). Nunca pasan por el modelo.
+
+QA: hoja de frames a 0/2/4/6/8 s; zoom de pantallas al inicio, medio y final para cazar texto deformado;
+colisión overlay↔sujeto en el último frame. Mide el audio generado con `volumedetect` antes de mezclar (aquí:
+media −29 dB, pico −11,5 dB). Salida publicada en YouTube vía Metricool como Short con
+`isAiGeneratedContent: true`.
 
 ---
 

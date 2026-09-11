@@ -1,5 +1,11 @@
 # Handoff activo
 
+**Trendjacking «Nuestro Duo» (2026-09-11, operación):** pieza 4:5 + Short 9:16 (Seedance 2.5) programados vía
+Metricool en la marca Efeonce Group: Threads 11-09 12:30 · Instagram 11-09 19:00 · LinkedIn página 12-09 11:00 · YouTube
+Short 12-09 12:00 (todos `PENDING`; **falta confirmar publicación**). Skills `social-media-studio`, `copywriting`,
+`greenhouse-ai-image-generator` y `motion-design-studio` actualizadas con los aprendizajes. Detalle e ids:
+`docs/operations/social/2026-09-11-iphone-duo-trendjack.md`.
+
 **Vacantes en LinkedIn (2026-09-11, operación):** 4 vacantes vivas programadas vía Metricool (perfil del operador +
 página Efeonce, 11:00 Chile; **falta confirmar publicación**). Pendientes: ficha de `EO-OPN-0009` sin "caso ficticio" ·
 Careers sin UTM por postulación. Detalle: `docs/operations/hiring/2026-09-11-linkedin-vacancy-distribution.md`.

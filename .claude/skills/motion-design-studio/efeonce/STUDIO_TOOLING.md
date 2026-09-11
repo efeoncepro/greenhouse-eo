@@ -34,6 +34,13 @@
 - **LipSync Studio** (+ voz ElevenLabs vía Higgsfield Speak).
 - Tools MCP: `generate_video` / `generate_image` / `generate_audio`, `models_explore(recommend)`,
   `upscale_video` / `upscale_image`, `reframe`, `motion_control`, `virality_predictor`, `higgsfield-soul-id` (skill).
+- **Seedance 2.5 (`seedance_2_5`) vía `generate_video`** (verificado 2026-09-11): `mode: omni_reference` con roles
+  `start_image`, `end_image`, `image_references`, `video_references`, `audio_references`; 4–30 s;
+  480p/720p/1080p; `bitrate_mode` standard|high; `generate_audio`. Las imágenes entran con `media_import_url`
+  (URL HTTPS pública) → `media_id`. Si la respuesta trae `notice.type: preset_recommendation` (p. ej. «IN THE
+  DARK»), no generó nada: para generar el prompt literal, reintenta con `declined_preset_id`. Costo medido:
+  **72 créditos por 8 s a 1080p** (evidencia interna, no tarifa); ~4–5 min por render entre cola y proceso.
+  Pantallas con UI dentro del cuadro: `../modules/09_AI_VIDEO_PIPELINE.md` §7.
 
 ## Magnific (MCP + API) — upscale / enhance / finish
 
@@ -114,12 +121,19 @@ confiar la exactitud** (citas/nombres de motores/logo/precio) al output IA.
 pregunta, citas con logos reales, gauge, logo). O mezcla beats: **Omni-enhanced** donde solo importa el texto
 grande (pregunta, thinking, ambiente) + **mograph crisp** donde el micro-texto es el mensaje (citas, gauge, end-card).
 
+Esto vale para UI **a pantalla completa**. Si la UI vive en la pantalla de un dispositivo dentro de la toma,
+componerla encima (pantalla verde + tracking) se ve pegada y el operador la rechazó el 2026-09-11 (caso:
+[`2026-09-11-iphone-duo-trendjack.md`](../../../../docs/operations/social/2026-09-11-iphone-duo-trendjack.md)).
+Ahí la pantalla la renderiza el modelo con pantallas video-safe como referencias: `../modules/09_AI_VIDEO_PIPELINE.md` §7.
+
 ## Router de producción (elige la mano correcta)
 
 - **Toma cinematográfica con cámara + personaje consistente** → Higgsfield (Cinema Studio + Soul ID).
 - **Cine dirigido con beats/coreografía** → Runway Gen-4.5.
 - **Set/producto/practical que debe conservar identidad espacial desde una referencia íntegra** → Seedance image/reference-to-video, con gate de actuación y sonido.
 - **RRSS desde un paquete de stills ficticios, sin copy/practical exacto** → Gemini Omni image-to-video (ver `workflows/living-social-wall-clips.md`); no confundir el canal con la regla de motor.
+- **Dispositivo con UI legible dentro de la toma** → Seedance 2.5 (Higgsfield MCP) con pantallas video-safe como
+  `image_references`; nunca pantalla verde + reemplazo por tracking. Titular y logo de la pieza, en overlay.
 - **Broadcast** → Veo 3.1. **Edición conversacional o microescena flexible** → Gemini Omni. Selección completa: `workflows/engine-selection-by-fidelity-contract.md`.
 - **Tipo kinética / mograph de precisión / 3D** → craft humano (AE/Blender/Houdini), handoff con spec.
 - **VFX / compositing** (keying, roto, tracking/matchmove, integración CGI, simulaciones, cleanup) → craft

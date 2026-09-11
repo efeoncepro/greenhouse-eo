@@ -41,30 +41,48 @@ Smoke test de lectura OK contra la cuenta real. Notas operativas:
 - **`getBestTimeToPostByNetwork` requiere** `brandId`, `socialNetwork` (`instagram|facebook|
   twitter|linkedin|youtube|tiktok`), `timezone` (IANA, sale del brand — ej. `America/Santiago`)
   y ventana `fromDate`/`toDate` en **ISO 8601 con offset** (ej. `2026-07-06T00:00:00-04:00`;
-  Chile en invierno = `-04:00`).
+  Chile en invierno = `-04:00`). **No acepta `threads`** (verificado 2026-09-11): en Threads la hora
+  se decide por criterio, no por dato.
 - **Gotcha `dayOfWeek`**: el retorno usa **1 = lunes … 7 = domingo** (el array llega con el 7
   primero). No lo confundas con el estándar JS (0 = domingo). Interpreta el `value` como
   intensidad relativa: a mayor valor, mejor hora.
 - **Cliente correcto = `getBrandSettings` primero, siempre** (repite la regla de
   `CLIENT_DELIVERY.md`): antes de programar en una marca de cliente, confirma el `brandId`.
 
-### Programar con imagen en LinkedIn (verificado 2026-09-11)
+### Programar por red (verificado 2026-09-11)
 
-- **Marcas con LinkedIn** (referencia; igual resuelve por `label`): `Julio Reyes` = `5105024` → perfil personal
-  (`urn:li:person:vj64TIaUfj`); `Efeonce Group` = `3961547` → página de empresa (`urn:li:organization:20503593`).
-  Ambas en `America/Santiago`. Son canales distintos con voz distinta (`EFEONCE_OVERLAY.md`).
+- **Marcas y redes conectadas** (referencia; igual resuelve por `label` con `getBrandSettings`), ambas en
+  `America/Santiago` y con voz distinta por canal (`EFEONCE_OVERLAY.md`):
+  - `Julio Reyes` = `5105024` → LinkedIn perfil personal (`urn:li:person:vj64TIaUfj`).
+  - `Efeonce Group` = `3961547` → Instagram `efeoncepro`, Threads `efeoncecl`, LinkedIn página
+    (`urn:li:organization:20503593`), YouTube (`UCSChYlj2eOqmemSFgevmVKg`), Facebook `107387610876292`.
+- **Un `createScheduledPost` por red** cuando cada red lleva copy u horario distinto, que es lo normal. El post
+  multi-provider solo sirve si texto, media y hora son idénticos.
 - **`media` exige una URL pública.** Metricool la re-aloja en `static.metricool.com/planner/...` y la adjunta como
-  **imagen nativa** del post, no como link. Aloja el asset en
-  `gs://efeonce-group-greenhouse-public-media-prod/campaigns/<campaña>/` (`gcloud storage cp --content-type=image/png`)
-  y verifica HTTP 200 y `content-type` antes de programar.
+  **media nativa** del post, no como link. Aloja el asset en
+  `gs://efeonce-group-greenhouse-public-media-prod/campaigns/<campaña>/` (`gcloud storage cp --content-type=...`)
+  y verifica HTTP 200 y `content-type` antes de programar. **Si reemplazas un asset, súbelo con nombre nuevo
+  (`-v2`)**: la URL pública de GCS cachea y sigue sirviendo la versión anterior (pasó con un plate roto).
 - **`mediaAltText`**: array con el texto alternativo de cada imagen. No lo omitas.
-- **`linkedinData: {type: post, previewIncluded: false, publishImagesAsPDF: false}`**: con `previewIncluded: false`
-  los links del texto no generan tarjeta de preview y la imagen queda como la pieza visual.
 - **Fecha**: `publicationDate {dateTime: 'YYYY-MM-DDTHH:mm:ss', timezone: <IANA>}` (hora local sin offset + zona),
   a diferencia de `getBestTimeToPostByNetwork`, que pide ISO con offset.
 - **`autoPublish: true` + `draft: false` deja el post en `PENDING`**, que significa programado, no publicado. Confirma
   el id y el estado con `getScheduledPosts` en cada marca, y la publicación efectiva después de la hora.
-- Receta completa para vacantes: `linkedin-vacancy-distribution.md`.
+
+| Red | Payload que funcionó | Ojo |
+|---|---|---|
+| **LinkedIn** | `linkedinData: {type: post, previewIncluded: false, publishImagesAsPDF: false}` | con `previewIncluded: false` los links del texto no generan tarjeta y la imagen queda como pieza visual |
+| **Instagram** | `instagramData: {type: "POST", isAiGenerated: true}` | exige imagen o video; `isAiGenerated` declara IA fotorrealista |
+| **Threads** | `threadsData: {}` + imagen + texto | vuelve con `replyControl: EVERYONE`; sin dato de mejor hora |
+| **YouTube** | `youtubeData: {title, type: "short", privacy: "public", tags: [...], category: "SCIENCE_TECHNOLOGY", madeForKids: false, isAiGeneratedContent: true}` + `media: [URL pública .mp4]` + `text` = descripción | **solo video** (`type` = `video` \| `short`); el conector no expone posts de Comunidad, así que una pieza estática exige producir un Short 9:16. Metricool re-aloja el `.mp4` |
+
+**Horario con datos, no con costumbre.** Cruza `getBestTimeToPostByNetwork` con la cola de `getScheduledPosts`: en el
+caso fuente, Instagram tenía su pico el viernes 19:00; LinkedIn viernes 11:00 ya estaba ocupado por otro post de la
+misma página, así que se movió al sábado 11:00 (2.º mejor valor) para no competir en el mismo feed; Threads fue a las
+12:30 por ser el canal reactivo. Ids de esa corrida: Threads `374436590`, Instagram `374436637`, LinkedIn `374436668`,
+YouTube `374447961` (caso: [`2026-09-11-iphone-duo-trendjack.md`](../../../../docs/operations/social/2026-09-11-iphone-duo-trendjack.md)).
+
+Receta completa para vacantes: `linkedin-vacancy-distribution.md`.
 
 ## Higgsfield MCP — producción
 
@@ -106,5 +124,7 @@ autorizan/cotizan aparte. Canon:
 
 - Gana lo humano/imperfecto/serializado. La IA **acelera**, no reemplaza el juicio de marca.
 - Contenido IA que un espectador razonable confundiría con real **debe etiquetarse** ("ante la
-  duda, revela"). ~1/3 de consumidores es menos propenso a marcas con ads de IA (as-of 2026-07).
+  duda, revela"): manos, objetos o personas fotorrealistas generados con IA van con el flag de la red
+  (Instagram `isAiGenerated`, YouTube `isAiGeneratedContent`; ver tabla de §Programar por red).
+  ~1/3 de consumidores es menos propenso a marcas con ads de IA (as-of 2026-07).
 - Brand safety: cura todo output de IA contra marca Efeonce antes de que salga.
