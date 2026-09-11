@@ -30,8 +30,8 @@ runtime.
 
 Las landings pendientes dejan de colgar de EPIC-019 (control plane técnico) y pasan a `EPIC-047`, que fija su orden
 de ejecución en el campo `Rank` de cada task. Se cierran por decisión del operador TASK-1799 (Content Marketing),
-TASK-1358 (Home) y TASK-1351 (Redes Sociales), publicadas e indexables; sus criterios de QA sin verificar quedan
-registrados. TASK-1402 y TASK-1404 salen del ranking de landings porque son artículos del hub HubSpot. Sin cambios de
+TASK-1358 (Home), TASK-1351 (Redes Sociales) y TASK-1352 (Pillar HubSpot), publicadas e indexables; sus criterios de QA sin verificar quedan
+registrados. TASK-1402 y TASK-1404 salen del ranking de landings porque son artículos del hub HubSpot. ASO sube al segundo lugar por el pitch activo con Berel. Sin cambios de
 código ni de runtime público.
 
 ## 2026-09-11 — Panel competitivo AEO multi-marca: primer caso real (SKY) y método documentado

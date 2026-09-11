@@ -4,6 +4,13 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-11 — el Pillar ya está publicado, pero no en `/servicios/hubspot/`
+
+TASK-1352 se cerró: el Pillar vive en `/servicios-contratar-hubspot/` (WordPress `244079`, `200`, `index, follow`).
+La migración a `/servicios/hubspot/` no se hizo y esa ruta hoy responde `301` hacia `/hubspot/hubspot-marketing-ventas/`,
+un post antiguo. Esta página cuelga de `/servicios/hubspot/`: antes de publicar, el operador decide la URL padre del
+hub (decisión registrada en EPIC-047) — cerrado por trabajo en EPIC-047.
+
 ## Delta 2026-09-11 — el bloqueo F0 está parcialmente resuelto
 
 [`HUBSPOT_CUSTOMER_AGENT_ANAM_APPROVAL_RECORD_V1.md`](../../public-site/HUBSPOT_CUSTOMER_AGENT_ANAM_APPROVAL_RECORD_V1.md)

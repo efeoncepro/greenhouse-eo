@@ -1,12 +1,13 @@
 # Handoff activo
 
 **Portafolio de landings del sitio público (2026-09-11, documental):** `EPIC-047` reancla desde EPIC-019 las 20
-tasks de landing y fija su orden en `Rank EPIC-047-01…11`: Agencia Creativa → hub HubSpot (Precios, Pillar, Agentes)
-→ Salesforce → Performance → resto; Contacto es habilitador (`H1`) y los artículos del hub HubSpot (TASK-1402/1404) van
+tasks de landing y fija su orden en `Rank EPIC-047-01…10`: Agencia Creativa → ASO (pitch activo con Berel) → HubSpot
+(Precios, Agentes) → Salesforce → Performance → resto; Contacto es habilitador (`H1`) y los artículos del hub HubSpot (TASK-1402/1404) van
 fuera del ranking. Cerradas por decisión del operador, publicadas e indexables (HTTP 2026-09-11): TASK-1799 Content
-Marketing, TASK-1358 Home y TASK-1351 Redes Sociales; cada una registra sus criterios de QA sin verificar.
+Marketing, TASK-1358 Home, TASK-1351 Redes Sociales y TASK-1352 Pillar HubSpot; cada una registra sus criterios de QA sin verificar.
 **Hallazgo:** `/agencia-creativa/` y `/agencia-creativa-v2/` están ambas indexables con canonical propio → decidir URL
-final + 301 (TASK-1350). Pendientes del operador: validar PDR-021/022/023, owners/SLA de Contacto, alcance de la
+final + 301 (TASK-1350). El Pillar HubSpot vive en `/servicios-contratar-hubspot/`; `/servicios/hubspot/`
+redirige a un post antiguo, así que la URL padre de Precios/Agentes está por decidir. Pendientes del operador: validar PDR-021/022/023, owners/SLA de Contacto, alcance de la
 aprobación ANAM para TASK-1403 y cerrar TASK-1322 como superseded.
 
 **Panel competitivo AEO de SKY (2026-09-11, operación + venta):** 5 runs del grader en staging (SKY, LATAM, JetSMART,

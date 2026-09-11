@@ -41,7 +41,7 @@ capability dentro del sistema, no presentarse como agencia suelta.
 ## Now
 
 - **Orden de ejecución de las landings → [EPIC-047](../epics/to-do/EPIC-047-public-site-landing-portfolio-prioritization.md)**
- (2026-09-11). Este roadmap cuenta el porqué de cada superficie; el epic fija cuál va primero (`Rank EPIC-047-01…11`).
+ (2026-09-11). Este roadmap cuenta el porqué de cada superficie; el epic fija cuál va primero (`Rank EPIC-047-01…10`).
 
 - **PDR-001 — Landing SEO complementaria al AEO** (decidido): posicionamiento SEO
  como *cimiento* de la promesa de visibilidad (no commodity), hermana de
@@ -65,7 +65,7 @@ capability dentro del sistema, no presentarse como agencia suelta.
  posiciona a Efeonce en el medio entre plataformas de ejecución y agencias de terreno. Reusa Growth Forms, Growth
  CTA y scheduler nativo. Ver [PDR-021](decisions/PDR-021-landing-trade-marketing-btl-posicionamiento.md).
 
-- **PDR-023 — Landing "ASO"** (Draft for validation) + **TASK-1862** (to-do, ui-ux/flow, UI ready no): tercera
+- **PDR-023 — Landing "ASO"** (Draft for validation; **pitch activo con Berel**, 2026-09-11 → `Rank EPIC-047-02`) + **TASK-1862** (to-do, ui-ux/flow, UI ready no): tercera
  superficie del grupo `Visibilidad` en `/servicios/aso/` (working route), hermana de SEO y AEO. No es captura de
  demanda —`app store optimization` ~20/mes en CL/MX/CO/PE y `aso` ambiguo—: es destino de expansión para clientes
  con app y referencia citable en español. Publicación por fases atada a la extensión Search & App Visibility, hoy
@@ -104,7 +104,8 @@ capability dentro del sistema, no presentarse como agencia suelta.
  `docs/operations/public-site-social-wall-media-production-20260708.md`.
 
 - **PDR-006 — Landing "HubSpot" (Agentic Customer Platform + partnership)** (posicionamiento
- decidido) + **TASK-1352** (ui-ux, UI ready no): **reposiciona la página existente
+ decidido) + **TASK-1352** (`complete` 2026-09-11: publicada en `/servicios-contratar-hubspot/`; la migración a
+ `/servicios/hubspot/` no se hizo y esa ruta hoy redirige a un post antiguo): **reposiciona la página existente
  `/servicios-contratar-hubspot/`** (id `244079`) del relato "compra e implementa un CRM" al de
  **plataforma agéntica operada con software propio**. Ángulo teach-first ("HubSpot dejó de ser un
  CRM: hay que arquitecturarla, poblarla con datos limpios y gobernar a los agentes"); arco de las

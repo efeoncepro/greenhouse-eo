@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Orden fijado 2026-09-11; 20 tasks reancladas desde EPIC-019; 3 cerradas el mismo día`
+- Status real: `Orden fijado 2026-09-11; 20 tasks reancladas desde EPIC-019; 4 cerradas el mismo día`
 - Rank: `TBD`
 - Domain: `commercial|marketing-ops|public-site|cross-domain`
 - Owner: `Julio Reyes`
@@ -16,7 +16,7 @@
 ## Summary
 
 Agrupa las landings del sitio público (`efeoncepro.com`) en un solo portafolio y fija **en qué orden se
-ejecutan**. El orden vive en el campo `Rank` de cada task (`EPIC-047-01` … `EPIC-047-11`) y en la tabla de
+ejecutan**. El orden vive en el campo `Rank` de cada task (`EPIC-047-01` … `EPIC-047-10`) y en la tabla de
 `## Child Tasks`; ambos se mueven juntos.
 
 Este epic ordena **qué superficie comercial se construye primero**. La infraestructura para gobernar el sitio
@@ -63,16 +63,15 @@ Una landing publicada que **daña** (URL duplicada indexable, promesa sin prueba
 | Rank | Task | Superficie | Estado al 2026-09-11 | Por qué este lugar | Qué la destraba |
 | --- | --- | --- | --- | --- | --- |
 | `01` | [TASK-1350](../../tasks/to-do/TASK-1350-landing-agencia-creativa.md) | Agencia Creativa | `/agencia-creativa-v2/` **y** `/agencia-creativa/` ambas `index, follow` con canonical propio | Dos URLs indexables compiten por el mismo término; creatividad es la línea del retainer base | Decidir URL final + 301 de la otra; dirección de arte del hero y motion |
-| `02` | [TASK-1401](../../tasks/to-do/TASK-1401-landing-hubspot-precios.md) | HubSpot · Precios | Diseño | Única página del hub con demanda real (~1.500/mes en el bloque hispano); F1 de PDR-013 | — |
-| `03` | [TASK-1352](../../tasks/to-do/TASK-1352-landing-hubspot-agentic-platform.md) | HubSpot · Pillar | Definición; landing no implementada | F1 de PDR-013 junto a Precios; cuentas CRM ancla (ANAM/Aguas Andinas, Réditos) | Dossiers VoC/CRO, SEO/AEO y claims/proof aprobados |
-| `04` | [TASK-1403](../../tasks/to-do/TASK-1403-landing-hubspot-agentes.md) | HubSpot · Agentes | Diseño; bloqueo F0 parcialmente resuelto | La que más diferencia; su prueba es el caso ANAM | Confirmar que la aprobación ANAM (2026-07-17) cubre esta página; publicar sigue sin autorización |
-| `05` | [TASK-1812](../../tasks/to-do/TASK-1812-salesforce-services-landing.md) | Salesforce | Oferta, wireframe, flow y motion listos | La práctica no tiene superficie pública; oportunidad SGS observada. **Sube a `02` si SGS está en pitch activo** | Readback de partnership/derechos, first fold, CTA binding |
+| `02` | [TASK-1862](../../tasks/to-do/TASK-1862-landing-aso.md) | ASO | Diseño; promoción atada a la extensión Search & App Visibility (`Proposed`) | **Pitch activo con Berel** (operador, 2026-09-11): acompaña una expansión en cuenta existente. Sin ese pitch sería la última (~20 búsquedas/mes) | Validar PDR-023 + llevar la extensión a `Approved for validation` — ahora urgentes |
+| `03` | [TASK-1401](../../tasks/to-do/TASK-1401-landing-hubspot-precios.md) | HubSpot · Precios | Diseño | Única página del hub con demanda real (~1.500/mes en el bloque hispano); el Pillar ya está publicado | Decidir la URL padre del hub (ver decisiones) |
+| `04` | [TASK-1403](../../tasks/to-do/TASK-1403-landing-hubspot-agentes.md) | HubSpot · Agentes | Diseño; bloqueo F0 parcialmente resuelto | La que más diferencia; su prueba es el caso ANAM | URL padre del hub + confirmar que la aprobación ANAM (2026-07-17) cubre esta página |
+| `05` | [TASK-1812](../../tasks/to-do/TASK-1812-salesforce-services-landing.md) | Salesforce | Oferta, wireframe, flow y motion listos | La práctica no tiene superficie pública; oportunidad SGS observada. **Sube a `03` si SGS está en pitch activo** | Readback de partnership/derechos, first fold, CTA binding |
 | `06` | [TASK-1865](../../tasks/to-do/TASK-1865-landing-performance-marketing.md) | Performance Marketing | Diseño | Mejor demanda pura de las nuevas: 480–590/mes en Chile, KD 11–13, Efeonce no rankea; retira la legacy `242862` con 301 | Validar PDR-022 |
 | `07` | [TASK-1860](../../tasks/to-do/TASK-1860-landing-trade-marketing-btl.md) | Trade Marketing & BTL | Diseño | ~880/mes, pero SERP informativo y laboral; el modificador comercial tiene ~10/mes | Validar PDR-021 |
 | `08` | [TASK-1803](../../tasks/to-do/TASK-1803-landing-branding-studio-sistema-marca.md) | Branding Studio | Estrategia y contratos UI listos | La ruta de Réditos incluye branding, pero está bloqueada | CTA/Brand Diagnostic, casos y derechos, SEO/canonical |
 | `09` | [TASK-1369](../../tasks/to-do/TASK-1369-about-us-identidad.md) | About Us | Diseño | Identidad y E-E-A-T, no captura | Bios reales del equipo + arte del hero |
 | `10` | [TASK-1859](../../tasks/to-do/TASK-1859-landing-product-design-360.md) | Product Design 360 | Diseño | Publicación por fases atada al business model | Aprobación comercial del modelo |
-| `11` | [TASK-1862](../../tasks/to-do/TASK-1862-landing-aso.md) | ASO | Diseño | ~20/mes; depende de la extensión Search & App Visibility, hoy `Proposed` | Validar PDR-023 + aprobar la extensión |
 
 ### Habilitador transversal
 
@@ -87,7 +86,7 @@ aquí porque cierran el hub HubSpot de PDR-013, pero no compiten con las landing
 
 | Rank | Task | Superficie | Cuándo |
 | --- | --- | --- | --- |
-| `A1` | [TASK-1402](../../tasks/to-do/TASK-1402-landing-hubspot-cuando-no-usar.md) | Artículo «Cuándo NO usar HubSpot» | Fase F2b de PDR-013: después de Precios y Pillar. Esfuerzo bajo y la pieza más citable del hub |
+| `A1` | [TASK-1402](../../tasks/to-do/TASK-1402-landing-hubspot-cuando-no-usar.md) | Artículo «Cuándo NO usar HubSpot» | Fase F2b de PDR-013: después de Precios (el Pillar ya está publicado). Esfuerzo bajo y la pieza más citable del hub |
 | `A2` | [TASK-1404](../../tasks/to-do/TASK-1404-landing-hubspot-vs-salesforce.md) | Artículo «HubSpot vs Salesforce» | Sin urgencia: menos de 100 búsquedas/mes en español |
 
 ### Cierre operativo en curso (fuera del ranking)
@@ -107,13 +106,19 @@ Ya están en ejecución; no compiten por prioridad, sólo tienen que cerrarse.
 | [TASK-1799](../../tasks/complete/TASK-1799-landing-content-marketing-content-ops-partner.md) | Content Marketing (`/servicio-marketing-de-contenidos/`) | 2026-09-11 por decisión del operador; publicada e indexable; 8 criterios de QA sin verificar registrados |
 | [TASK-1358](../../tasks/complete/TASK-1358-landing-agencia.md) | Home | 2026-09-11 por decisión del operador; publicada e indexable; QA de editor/teclado y claims sin verificar |
 | [TASK-1351](../../tasks/complete/TASK-1351-landing-redes-sociales.md) | Redes Sociales (`/servicios/redes-sociales/`) | 2026-09-11 por decisión del operador; publicada e indexable; follow-ups de HubSpot delivery, guía Think y auditoría |
+| [TASK-1352](../../tasks/complete/TASK-1352-landing-hubspot-agentic-platform.md) | Pillar HubSpot (`/servicios-contratar-hubspot/`, page `244079`) | 2026-09-11 por decisión del operador; publicada e indexable; sin la migración a `/servicios/hubspot/` y con 27 criterios sin certificar |
 
 ## Decisiones del operador que desbloquean varias landings
 
-- [ ] Validar el posicionamiento de PDR-021 (Trade Marketing), PDR-022 (Performance) y PDR-023 (ASO): los tres
-      siguen en borrador pendiente de validación y ninguna de esas landings se construye antes.
-- [ ] Definir owners y SLA por motivo de Contacto (TASK-1801).
+- [ ] Validar PDR-023 (ASO) y llevar la extensión Search & App Visibility a `Approved for validation`: **urgente por
+      el pitch activo con Berel**.
+- [ ] Validar PDR-021 (Trade Marketing) y PDR-022 (Performance): siguen en borrador pendiente de validación y
+      ninguna de esas landings se construye antes.
+- [ ] Decidir la URL padre del hub HubSpot: mantener el Pillar en `/servicios-contratar-hubspot/` o migrarlo a
+      `/servicios/hubspot/`, que hoy responde `301` hacia `/hubspot/hubspot-marketing-ventas/` (un post antiguo).
+      Precios (`/servicios/hubspot/precios/`) y Agentes (`/servicios/hubspot/agentes/`) cuelgan de esa URL.
 - [ ] Elegir la URL final de Agencia Creativa y aprobar el 301 de la otra.
+- [ ] Definir owners y SLA por motivo de Contacto (TASK-1801).
 - [ ] Confirmar si la aprobación ANAM del 2026-07-17 cubre la página de Agentes (TASK-1403).
 - [ ] Cerrar TASK-1322 como superseded: TASK-1369 la reemplazó el 2026-07-08 y sigue abierta en el backlog.
 
@@ -122,8 +127,9 @@ Ya están en ejecución; no compiten por prioridad, sólo tienen que cerrarse.
 - Reordenar = editar esta tabla **y** el `Rank` de las tasks afectadas en el mismo commit.
 - Este epic no sobrescribe `Priority`/`Impact` de las tasks: el desempate vive en `Rank`.
 - Una landing nueva entra como child con `Rank` explícito; nunca con `TBD`.
-- Al cerrar una landing, su fila pasa a `### Cerradas` y su `Rank` queda en `EPIC-047-cerrada`.
-- Revisar el orden cuando cambie el estado de un deal que lo sostiene (Sky, SGS, Réditos en HubSpot), cuando
+- Al cerrar una landing, su fila pasa a `### Cerradas`, su `Rank` queda en `EPIC-047-cerrada` y el resto se
+  renumera para que el ranking siga contiguo.
+- Revisar el orden cuando cambie el estado de un deal que lo sostiene (Sky, SGS, Réditos, Berel en HubSpot), cuando
   Search Console muestre datos de una landing publicada o cuando se valide o descarte un PDR.
 
 ## Existing Related Work
@@ -140,6 +146,7 @@ Ya están en ejecución; no compiten por prioridad, sólo tienen que cerrarse.
 
 - [ ] Cada child task está `complete` o descartada explícitamente con razón.
 - [ ] Ninguna URL de servicio queda duplicada e indexable (Agencia Creativa resuelta con 301).
+- [ ] La URL padre del hub HubSpot está decidida y Precios/Agentes publican bajo ella.
 - [ ] PDR-021, PDR-022 y PDR-023 validados o descartados antes de construir sus landings.
 - [ ] Contacto recibe los CTA de las landings publicadas con owner y SLA definidos.
 - [ ] `docs/public-site/PRODUCT_ROADMAP.md` refleja el orden de este epic.
@@ -156,17 +163,24 @@ Ya están en ejecución; no compiten por prioridad, sólo tienen que cerrarse.
 Epic creado a pedido del operador para ordenar las landings pendientes. Las 20 tasks cambiaron `Epic: EPIC-019`
 → `EPIC-047` y recibieron `Rank`; TASK-1812 tenía `Rank: 32` (global).
 
-El mismo día, por decisión del operador: se cerraron TASK-1799 (Content Marketing), TASK-1358 (Home) y TASK-1351
-(Redes Sociales) porque están publicadas, y TASK-1402 salió del ranking de landings porque es un artículo. TASK-1404
-recibió el mismo trato porque su propia task ya la había reclasificado como artículo («es un artículo, no una
-landing — y lo forzó el dato»). El ranking se renumeró de 16 a 11 posiciones.
+El mismo día, por decisión del operador:
+
+- Se cerraron TASK-1799 (Content Marketing), TASK-1358 (Home) y TASK-1351 (Redes Sociales) porque están publicadas.
+- TASK-1402 salió del ranking de landings porque es un artículo. TASK-1404 recibió el mismo trato porque su propia
+  task ya la había reclasificado como artículo («es un artículo, no una landing — y lo forzó el dato»).
+- Se cerró TASK-1352 (Pillar HubSpot): implementada y publicada en `/servicios-contratar-hubspot/`.
+- ASO (TASK-1862) subió de la última posición a `02` por el pitch activo con Berel.
+
+El ranking quedó en 10 posiciones contiguas.
 
 Verificado por HTTP el 2026-09-11 (`meta robots` + canonical de la respuesta pública):
 
-- `/servicio-marketing-de-contenidos/`, `/` y `/servicios/redes-sociales/` responden `200` e `index, follow`.
+- `/servicio-marketing-de-contenidos/`, `/`, `/servicios/redes-sociales/` y `/servicios-contratar-hubspot/`
+  responden `200` e `index, follow`.
+- `/servicios/hubspot/` responde `301` hacia `/hubspot/hubspot-marketing-ventas/`, un post antiguo del blog.
 - `/agencia-creativa-v2/` sirve `index, follow` con canonical propio, aunque TASK-1350 decía `noindex`.
 - `/agencia-creativa/` (título «Agencia Creativa en LATAM») también sirve `index, follow` con canonical propio.
 
 **No verificado:** si Google ya indexó ambas URLs de Agencia Creativa (sólo se leyó el HTML servido), el estado
-actual de los deals de Sky, SGS y Réditos en HubSpot, ni tráfico en Search Console. El orden asume la estrategia
-comercial Q2–Q3 2026 (última verificación 2026-06-09); si una de esas cuentas se enfrió, cambia el tramo 02–06.
+de los deals de Sky, SGS, Réditos y Berel en HubSpot (el pitch de Berel lo informó el operador), ni tráfico en
+Search Console. El orden asume la estrategia comercial Q2–Q3 2026 (última verificación 2026-06-09).

@@ -9,7 +9,7 @@
 - Direction mode: `repo-native-benchmark`.
 - Dirección seleccionada: **Sistema vivo de crecimiento**.
 - Source of truth comercial: `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md`.
-- Source of truth ejecutable: `docs/tasks/to-do/TASK-1352-landing-hubspot-agentic-platform.md`.
+- Source of truth ejecutable: `docs/tasks/complete/TASK-1352-landing-hubspot-agentic-platform.md`.
 - Copy status: ninguna gran idea, H1, claim o prueba queda aprobada por este documento; se resuelven mediante el
   proceso de copywriting/VoC de TASK-1352.
 

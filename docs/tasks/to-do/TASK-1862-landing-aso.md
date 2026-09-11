@@ -6,6 +6,13 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-11 — pitch activo con Berel
+
+El operador informó que ASO está en **pitch activo con Berel** (cliente existente). La landing pasa de ser la última
+del portafolio a `Rank EPIC-047-02`: acompaña una expansión en cuenta, que es el primer criterio de EPIC-047. No cambia
+el `Promotion blocked by`: validar PDR-023 y llevar la extensión Search & App Visibility a `Approved for validation`
+pasan a ser urgentes, porque sin eso la página no sale de preview.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -24,7 +31,7 @@
 - Backend impact: `none`
 - Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `EPIC-047-11`
+- Rank: `EPIC-047-02`
 - Domain: `content|ui`
 - Blocked by: `none`
 - Promotion blocked by: `extensión Search & App Visibility en Proposed (fase B exige Approved for validation; fase C exige Commercially approved); decisiones D1 y D2 de la extensión; dirección visual y copy ledger aprobados; revisión legal de claims y de marcas de terceros; Growth Form y Growth CTA publicados; slug validado con segunda fuente`
