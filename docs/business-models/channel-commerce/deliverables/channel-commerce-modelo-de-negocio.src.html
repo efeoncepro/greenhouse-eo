@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<title>Channel &amp; Commerce · Modelo de negocio · Efeonce</title>
+<style>
+{{FONTS}}
+@page { size: A4; margin: 0; }
+:root{--navy:#023c70;--midnight:#022a4e;--blue:#0375d9;--ink:#1d1f36;--text:#2f3349;--muted:#4c4b5b;--line:#e1e1ea;--soft:#f3f3ff;--gray:#848484}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Geist',system-ui,sans-serif;color:var(--text);font-size:10pt;line-height:1.48;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet{width:210mm;height:297mm;position:relative;overflow:hidden;break-after:page;background:#fff}
+.sheet:last-child{break-after:auto}
+.body{position:absolute;top:27mm;bottom:24mm;left:18mm;right:18mm;overflow:hidden}
+.hdr{position:absolute;top:0;left:18mm;right:18mm;height:19mm;display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:3mm;border-bottom:.6pt solid var(--line)}
+.hdr img{height:6.4mm;display:block}
+.hdr .r{text-align:right;font-size:7.4pt;line-height:1.35;color:var(--muted)}
+.hdr .r b{display:block;color:var(--midnight);font-weight:600}
+.ftr{position:absolute;bottom:0;left:0;right:0;height:17mm;padding:0 18mm 7mm;display:flex;align-items:flex-end;gap:5mm;font-size:7.3pt;color:var(--muted)}
+.ftr .rule{position:absolute;left:18mm;right:18mm;top:4mm;border-top:.6pt solid var(--line)}
+.ftr a{color:var(--muted);text-decoration:none}
+.ftr .bubble img{height:5.6mm;display:block}
+.ftr .pn{margin-left:auto;white-space:nowrap}
+.kicker{font:600 8pt 'Geist';letter-spacing:.08em;color:var(--blue);margin:0 0 1.5mm}
+h1{font-family:'Poppins';font-weight:700;font-size:21pt;line-height:1.15;color:var(--midnight);margin:0 0 3.5mm;letter-spacing:-.01em}
+h2{font-family:'Poppins';font-weight:600;font-size:12pt;line-height:1.25;color:var(--midnight);margin:5.5mm 0 2mm}
+h3{font:600 9.8pt/1.3 'Geist';color:var(--ink);margin:2.5mm 0 1mm}
+p{margin:0 0 2.4mm}
+.lead{font-size:11.6pt;line-height:1.45;color:var(--ink);margin:0 0 4.5mm}
+ul,ol{margin:0 0 3mm;padding-left:4.6mm}
+li{margin:0 0 1.1mm}
+b,strong{font-weight:600;color:var(--ink)}
+table.t{width:100%;border-collapse:collapse;font-size:8.6pt;line-height:1.35;margin:1mm 0 3.5mm}
+.t th{text-align:left;font-weight:600;color:var(--midnight);border-bottom:1.1pt solid var(--navy);padding:1.5mm 2.4mm 1.5mm 0;vertical-align:bottom}
+.t td{border-bottom:.5pt solid var(--line);padding:1.5mm 2.4mm 1.5mm 0;vertical-align:top}
+.t .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.t tr.hl td{background:var(--soft)}
+.note{background:var(--soft);border-left:2.4pt solid var(--blue);padding:2.8mm 4mm;font-size:9pt;line-height:1.45;margin:3mm 0}
+.note p:last-child{margin:0}
+.src{font-size:7.4pt;line-height:1.4;color:var(--muted);margin:1mm 0 3mm}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:4mm 8mm}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:0 6mm}
+.col h3{margin-top:0}
+.col p{font-size:9.2pt}
+.idx{font:600 7.4pt 'Geist';color:var(--blue);margin-bottom:.6mm;letter-spacing:.04em}
+.svcg{margin:0 0 3mm}
+.svcg h3{font-family:'Poppins';font-weight:600;font-size:10pt;color:var(--blue);margin:2.6mm 0 1mm}
+.svc{display:grid;grid-template-columns:8.5mm 1fr;gap:0 1mm;margin:0 0 1.5mm;font-size:9.1pt;line-height:1.4}
+.svc .c{font:600 7.6pt/1.9 'Geist';color:var(--muted)}
+.big{font-family:'Poppins';font-weight:700;font-size:15pt;color:var(--midnight);line-height:1.1}
+.quote{font-family:'Poppins';font-weight:600;font-size:11.4pt;line-height:1.4;color:var(--midnight);border-left:2.4pt solid var(--blue);padding:1mm 0 1mm 4mm;margin:3mm 0 4mm}
+.pill{display:inline-block;font:600 7.4pt 'Geist';color:var(--blue);border:.8pt solid var(--blue);border-radius:10pt;padding:.6mm 2.4mm}
+.toc{list-style:none;padding:0;margin:4mm 0 6mm}
+.toc li{display:flex;align-items:baseline;gap:3mm;padding:2.3mm 0;border-bottom:.5pt solid var(--line);margin:0;font-size:10.6pt}
+.toc .k{font:600 8pt 'Geist';color:var(--blue);width:7mm}
+.toc a{color:var(--ink);text-decoration:none;flex:1}
+.toc .num{font-variant-numeric:tabular-nums;color:var(--muted);font-size:9.4pt}
+/* portada */
+.cover{background:var(--midnight)}
+.cover .in{position:absolute;top:0;left:0;right:0;bottom:17mm;padding:22mm 20mm 18mm;color:#fff;display:flex;flex-direction:column}
+.cover .logo{height:11mm;width:auto;align-self:flex-start}
+.cover .eyebrow{margin-top:auto;font:600 9pt 'Geist';letter-spacing:.08em;color:#9fd3ff}
+.cover h1.cv{font-size:40pt;line-height:1.02;color:#fff;margin:3mm 0 5mm;letter-spacing:-.02em}
+.cover .sub{font-size:14pt;line-height:1.4;color:#dfe9f5;max-width:150mm;margin:0 0 9mm}
+.cover .meta{display:flex;gap:6mm;align-items:center;font-size:9.4pt;color:#c9d8ea}
+.cover .conf{border:.8pt solid #9fd3ff;color:#9fd3ff;border-radius:10pt;padding:.8mm 3mm;font-weight:600;font-size:8pt}
+.cover .line{margin-top:12mm;padding-top:5mm;border-top:.6pt solid rgba(255,255,255,.28);font-family:'Poppins';font-weight:600;font-size:12pt;color:#fff;max-width:160mm;line-height:1.35}
+.cover .ftr,.back .ftr{background:#fff}
+/* contraportada */
+.back .in{position:absolute;top:0;left:0;right:0;bottom:17mm;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24mm}
+.back .logo{height:15mm;margin-bottom:9mm}
+.slogan{font-family:'Poppins';color:var(--gray);font-size:17pt;letter-spacing:-.01em;margin-bottom:12mm}
+.slogan .e{font-weight:800;font-style:italic}.slogan .y{font-weight:800}.slogan .g{font-weight:900;font-style:italic}
+.back .in .bubble img{height:9mm}
+.back .contact{margin-top:8mm;font-size:9.6pt;line-height:1.7;color:var(--muted)}
+.back .contact a{color:var(--midnight);text-decoration:none}
+svg text{font-family:'Geist'}
+</style>
+</head>
+<body>
+
+<!-- ============ 1 · PORTADA ============ -->
+<section class="sheet cover" data-cover="1">
+  <div class="in">
+    <img class="logo" src="{{LOGO_NEG}}" alt="Efeonce">
+    <div class="eyebrow">LÍNEA DE NEGOCIO · TRADE MARKETING Y BTL</div>
+    <h1 class="cv">Channel &amp; Commerce</h1>
+    <p class="sub">Modelo de negocio, servicios, mercado y ventaja competitiva de la nueva línea de Efeonce.</p>
+    <div class="meta"><span>Documento para el equipo · Septiembre 2026</span><span class="conf">Confidencial · Uso interno</span></div>
+    <p class="line">Trade marketing que te dice qué corregir primero, lo corrige y lo demuestra.</p>
+  </div>
+</section>
+
+<!-- ============ 2 · ÍNDICE ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">CONTENIDO</p>
+    <h1>Qué encontrarás en este documento</h1>
+    <ol class="toc">
+      <li><span class="k">01</span><a href="#resumen" data-toc="resumen">Resumen ejecutivo</a><span class="num"></span></li>
+      <li><span class="k">02</span><a href="#problema" data-toc="problema">El problema que resolvemos y quién compra</a><span class="num"></span></li>
+      <li><span class="k">03</span><a href="#mercado" data-toc="mercado">El mercado</a><span class="num"></span></li>
+      <li><span class="k">04</span><a href="#competencia" data-toc="competencia">Competencia</a><span class="num"></span></li>
+      <li><span class="k">05</span><a href="#ventaja" data-toc="ventaja">Ventaja competitiva</a><span class="num"></span></li>
+      <li><span class="k">06</span><a href="#servicios" data-toc="servicios">Los servicios</a><span class="num"></span></li>
+      <li><span class="k">07</span><a href="#operacion" data-toc="operacion">Cómo operamos</a><span class="num"></span></li>
+      <li><span class="k">08</span><a href="#proveedores" data-toc="proveedores">Proveedores y financiamiento</a><span class="num"></span></li>
+      <li><span class="k">09</span><a href="#cobro" data-toc="cobro">Cómo cobramos</a><span class="num"></span></li>
+      <li><span class="k">10</span><a href="#capital" data-toc="capital">Capital y caja</a><span class="num"></span></li>
+      <li><span class="k">11</span><a href="#riesgos" data-toc="riesgos">Riesgos y cómo los manejamos</a><span class="num"></span></li>
+      <li><span class="k">12</span><a href="#validacion" data-toc="validacion">Hitos de validación y próximos pasos</a><span class="num"></span></li>
+      <li><span class="k">13</span><a href="#comunicacion" data-toc="comunicacion">Cómo hablamos de la línea</a><span class="num"></span></li>
+      <li><span class="k">14</span><a href="#fuentes" data-toc="fuentes">Fuentes</a><span class="num"></span></li>
+    </ol>
+    <div class="note">
+      <p><b>Sobre este documento.</b> Resume el modelo de negocio de Channel &amp; Commerce tal como está definido a septiembre de 2026. La línea está en etapa de validación: los precios, la cobertura comprometida y la contratación de capacidad propia se habilitan a medida que se cumplen los hitos de la sección 12. Las cifras de mercado indican su fuente y fecha.</p>
+    </div>
+    <div class="note">
+      <p><b>Uso interno.</b> Contiene información de competidores, de proveedores y del capital de la línea. No se comparte con clientes, proveedores ni terceros.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 · RESUMEN ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">01 · RESUMEN EJECUTIVO</p>
+    <h1 id="resumen">Una línea para gobernar la inversión de canal</h1>
+    <p class="lead">Channel &amp; Commerce es la línea de Efeonce que ordena la inversión de canal de las marcas que venden a través de terceros: qué se ejecuta en la tienda, cuánto cuesta, qué retorno produce y dónde conviene poner el próximo peso. En el mercado la llamamos <b>trade marketing</b>.</p>
+    <div class="grid2">
+      <div class="col"><p class="idx">QUÉ VENDEMOS</p><p>Ejecución de canal con evidencia: diagnóstico, cobertura auditada tienda por tienda, corrección en la tienda, activaciones BTL medidas y conexión con la inversión digital de la marca.</p></div>
+      <div class="col"><p class="idx">A QUIÉN</p><p>Marcas de consumo masivo, ferretería, farma, bebidas y mascotas que venden por cadenas, distribuidores o canal tradicional. El presupuesto de canal lo decide el área Comercial, no Marketing.</p></div>
+      <div class="col"><p class="idx">POR QUÉ GANAMOS</p><p>El mercado tiene dos extremos ocupados. El software detecta pero no corrige; las agencias de terreno corrigen pero no priorizan ni se conectan con lo digital. Operamos el ciclo completo y lo cruzamos con retail media, anaquel digital y visibilidad en IA.</p></div>
+      <div class="col"><p class="idx">CÓMO COBRAMOS</p><p>Diagnóstico de precio cerrado, cobertura por puntos de venta auditados, capacidad de terreno mensual y fee de orquestación. Los costos de terceros se traspasan al cliente sin margen.</p></div>
+      <div class="col"><p class="idx">CÓMO ARRANCAMOS</p><p>Chile primero. Oferta completa desde el primer contrato, ejecución con proveedores gobernados por nosotros, y tecnología propia sólo cuando la operación genere datos que el mercado no tiene.</p></div>
+      <div class="col"><p class="idx">CON QUÉ</p><p>Capital asignado de CLP 40 millones, suficiente para una cuenta ancla a la vez. El riesgo principal no es comercial: es la caja, porque pagamos cada mes y las cadenas pagan a 30, 60 o 90 días.</p></div>
+    </div>
+    <h2>Lo que necesitamos del equipo</h2>
+    <ul>
+      <li><b>Cerrar proveedores con compromiso exigible</b> en captura, terreno y producción, antes de firmar el primer contrato.</li>
+      <li><b>Prospectar dentro de la ventana de fin de año,</b> cuando las marcas cierran su presupuesto de canal para 2027.</li>
+      <li><b>Sostener la disciplina de la línea:</b> no prometer lo que no controlamos y no competir por precio por persona.</li>
+    </ul>
+    <div class="note"><p><b>Estado:</b> en validación. Responsable de la línea: Julio Reyes. Ningún precio, cobertura ni contratación de capacidad propia está aprobado todavía.</p></div>
+  </div>
+</section>
+
+<!-- ============ 4 · PROBLEMA ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">02 · EL PROBLEMA Y EL COMPRADOR</p>
+    <h1 id="problema">Sabes lo que le vendes al distribuidor. No sabes qué pasó en la góndola.</h1>
+    <div class="grid3">
+      <div class="col"><p class="idx">SELL-IN</p><h3>Lo que se vende al canal</h3><p>Vive en el ERP y llega a tiempo. Es la única parte que la marca controla.</p></div>
+      <div class="col"><p class="idx">SELL-OUT</p><h3>Lo que compra la gente</h3><p>Llega en planillas de cada cadena y distribuidor, cada una con su formato y su atraso.</p></div>
+      <div class="col"><p class="idx">EJECUCIÓN</p><h3>Lo que pasó en la góndola</h3><p>Llega en otro reporte, que describe lo que pasó pero no dice qué corregir primero.</p></div>
+    </div>
+    <p>Con tres reportes que no se cruzan, cuando la venta cae en una cadena no hay cómo saber si fue quiebre, precio o ejecución. La inversión de canal —descuentos, exhibiciones, material, promotoras, retail media— suele ser una de las líneas más grandes del presupuesto comercial y una de las más difíciles de defender con evidencia.</p>
+    <p class="quote">«Cuando invierto en canal y no sé qué pasó en la tienda, quiero ver dónde está roto y en qué orden arreglarlo, para decidir la próxima inversión con evidencia.»</p>
+    <h2>Quién compra</h2>
+    <table class="t">
+      <thead><tr><th style="width:26%">Rol</th><th style="width:30%">Quién suele ser</th><th>Qué necesita ver</th></tr></thead>
+      <tbody>
+        <tr><td><b>Operador</b></td><td>Trade Marketing Manager, Category Manager, Jefe de Trade</td><td>Dejar de armar a mano el reporte de ejecución y tener argumentos propios ante Comercial.</td></tr>
+        <tr><td><b>Responsable del problema</b></td><td>Gerente Comercial, Director de Ventas</td><td>Que la inversión de canal produzca venta y no se evapore.</td></tr>
+        <tr><td><b>Comprador económico</b></td><td>Comercial o Ventas, no Marketing</td><td>Retorno de la inversión de canal y costo de la cobertura.</td></tr>
+        <tr><td><b>Gobierno</b></td><td>Finanzas y Compras</td><td>Cobro transparente, trazabilidad del gasto y cumplimiento laboral del proveedor.</td></tr>
+        <tr><td><b>Bloqueadores típicos</b></td><td>Agencia incumbente, distribuidor, TI</td><td>Continuidad, datos que no se quieren compartir, integraciones.</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><p><b>Un comité distinto.</b> Nuestras otras líneas le venden a Marketing. Este comprador vive en Comercial y hoy no tenemos relación establecida con esas gerencias: la primera venta también será aprendizaje sobre cómo decide ese comité.</p></div>
+  </div>
+</section>
+
+<!-- ============ 5 · MERCADO ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">03 · EL MERCADO</p>
+    <h1 id="mercado">Chile primero</h1>
+    <p class="lead">Chile es el mercado inicial: es donde tenemos entidad, nómina propia y costo cargado conocido, y donde la categoría ya está en la conversación de las marcas.</p>
+    <h2>Qué busca la gente</h2>
+    <table class="t">
+      <thead><tr><th>Búsqueda</th><th class="n">Búsquedas al mes</th><th>Qué nos dice</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td><b>trade marketing</b></td><td class="n">880</td><td>Es donde está la demanda. Mezcla definiciones, empleo y agencias.</td></tr>
+        <tr><td>btl</td><td class="n">590</td><td>Muy informativa; sirve como término secundario.</td></tr>
+        <tr><td>material pop · visual merchandising</td><td class="n">720 c/u</td><td>Producción y exhibición; ligadas a exhibiciones y material de canal.</td></tr>
+        <tr><td>mystery shopper</td><td class="n">390</td><td>El costo por clic más alto del grupo: intención comercial fuerte.</td></tr>
+        <tr><td>agencia de promotoras</td><td class="n">320</td><td>Comercial y fragmentada; se compra por precio por persona.</td></tr>
+        <tr><td>pop up store · roadshow</td><td class="n">260 · 210</td><td>Demanda propia para BTL.</td></tr>
+        <tr><td>activaciones de marca</td><td class="n">110</td><td>Comercial; puerta de entrada al BTL medido.</td></tr>
+        <tr><td>agencia de trade marketing</td><td class="n">10</td><td>El modificador comercial casi no tiene volumen.</td></tr>
+      </tbody>
+    </table>
+    <p class="src">Fuente: Semrush, base Chile, septiembre 2026. Los resultados de búsqueda de «trade marketing» son mayoritariamente definiciones y ofertas de empleo; entre los comerciales aparecen Treid, Touch Latam, tmktchile y stmtrade.</p>
+    <h2>Tres fuerzas que juegan a favor</h2>
+    <div class="grid3">
+      <div class="col"><p class="idx">RETAIL MEDIA CRECE</p><p>Pasó de ~5% de la inversión digital en 2025 a una proyección de 7% en 2026, con Walmart Connect, Cencosud Media, Falabella, Sodimac, Ripley y Mercado Ads. La inversión crece más rápido que la capacidad de leerla junto con lo que pasa en la tienda.</p></div>
+      <div class="col"><p class="idx">EL CANAL TRADICIONAL ES UN PUNTO CIEGO</p><p>Mueve más de la mitad del consumo masivo en varios mercados de la región y casi nadie tiene datos de cómo se ejecuta. Es donde más valor aporta medir.</p></div>
+      <div class="col"><p class="idx">EL COSTO DE COBERTURA SUBE POR LEY</p><p>Desde el 26 de abril de 2026 la jornada es de 42 horas y en 2028 será de 40, sin reducción de sueldo. Cada visita a tienda cuesta más: los modelos de cobertura fija se encarecen y el variable no.</p></div>
+    </div>
+    <div class="note"><p><b>Lo que no sabemos todavía:</b> no existe una medición pública del tamaño del mercado chileno de trade marketing ni de cuánto paga una marca por él. Lo validamos en las primeras conversaciones con gerencias comerciales.</p></div>
+  </div>
+</section>
+
+<!-- ============ 6 · COMPETENCIA ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">04 · COMPETENCIA</p>
+    <h1 id="competencia">Dos extremos ocupados y un espacio en el medio</h1>
+    <p class="lead">El mercado chileno está consolidado en dos categorías. Competimos en el medio, y esa posición es deliberada.</p>
+    <table class="t">
+      <thead><tr><th style="width:18%"></th><th style="width:27%">Plataformas de ejecución</th><th style="width:28%">Efeonce</th><th>Agencias de terreno</th></tr></thead>
+      <tbody>
+        <tr><td><b>Qué hacen</b></td><td>Detectan y priorizan problemas en la tienda</td><td><b>Operamos el ciclo completo</b></td><td>Ejecutan en la tienda</td></tr>
+        <tr><td><b>Qué entregan</b></td><td>Alertas y tableros</td><td><b>Lista priorizada, corrección y lectura del ciclo</b></td><td>Un reporte que describe lo que pasó</td></tr>
+        <tr><td><b>Qué les falta</b></td><td>Alguien que vaya a corregir</td><td>Casos y cobertura instalada</td><td>Priorizar y demostrar el resultado</td></tr>
+        <tr><td><b>Lo digital</b></td><td>No lo tocan</td><td><b>Lo cruzamos con retail media, anaquel digital y visibilidad en IA</b></td><td>No lo tocan</td></tr>
+      </tbody>
+    </table>
+    <h2>Los actores que hay que conocer</h2>
+    <table class="t">
+      <thead><tr><th style="width:17%">Actor</th><th style="width:37%">Qué es</th><th style="width:23%">Dónde es fuerte</th><th>Dónde es vulnerable</th></tr></thead>
+      <tbody>
+        <tr><td><b>Teamcore</b></td><td>Plataforma chilena de ejecución retail con IA, desde 2015. Declara 500+ marcas en 20+ países; se fusionó con Tech-K con respaldo de Accel-KKR.</td><td>Producto maduro, marcas multinacionales, capital.</td><td>Detecta pero no corrige; implementación pesada; no toca lo digital.</td></tr>
+        <tr><td><b>Treid</b></td><td>Consultoría y plataforma propia de ejecución desde 2011, en Chile, Perú y Colombia. Marca BTL hermana: Disrupt.</td><td>Tecnología de tienda y cobertura.</td><td>No conecta la tienda con la inversión digital.</td></tr>
+        <tr><td><b>Touch Latam</b></td><td>Servicio integrado desde 2003 en Chile, Perú y Colombia: promotoría, trade, BTL, fuerza de ventas, logística y bodega propias.</td><td>Cobertura instalada y precio por escala.</td><td>Reporta con tableros básicos que describen pero no priorizan; promete aumento de venta.</td></tr>
+        <tr><td><b>Snuuper</b></td><td>Auditoría por misiones con más de 200.000 auditores en cinco países.</td><td>Escala y rapidez de captura.</td><td>Captura sin operación del ciclo: candidato natural a proveedor.</td></tr>
+        <tr><td>Frogmi · Trax · Storecheck · Involves</td><td>Plataformas de tareas, ejecución y reconocimiento de imagen en tienda.</td><td>Tecnología especializada.</td><td>Mismo límite que Teamcore: no corrigen.</td></tr>
+        <tr><td>Novaprom · Tradercom · ECR · Masglobal</td><td>Personal de terreno y promotoría.</td><td>Volumen de personas.</td><td>Venden la persona, no el resultado.</td></tr>
+      </tbody>
+    </table>
+    <p class="src">Información tomada de los sitios públicos de cada empresa y de prensa sectorial, septiembre 2026. No verificada de forma independiente. La descripción de la reportería de las agencias de terreno proviene de experiencia directa en la industria.</p>
+  </div>
+</section>
+
+<!-- ============ 7 · VENTAJA ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">05 · VENTAJA COMPETITIVA</p>
+    <h1 id="ventaja">Por qué nos eligen a nosotros</h1>
+    <p class="quote">El software te dice qué está roto pero no lo arregla. La agencia lo arregla pero no te demuestra que funcionó. Nosotros hacemos las dos cosas bajo un solo responsable, y conectamos la góndola con la inversión digital.</p>
+    <div class="grid2">
+      <div class="col"><p class="idx">1 · EL CICLO COMPLETO</p><p>Estándar, cobertura, priorización, corrección y lectura, bajo un solo responsable. Ningún actor del mercado se posiciona haciéndose cargo de todo el ciclo y de su resultado.</p></div>
+      <div class="col"><p class="idx">2 · LA CONEXIÓN CON LO DIGITAL</p><p>Retail media, anaquel digital y visibilidad del producto en asistentes de IA son capacidades que Efeonce ya opera en otras líneas. Ni las plataformas ni las agencias de terreno las cruzan con la tienda.</p></div>
+      <div class="col"><p class="idx">3 · EVIDENCIA QUE DECIDE</p><p>No entregamos un tablero que describe: entregamos la lista de qué corregir primero, ordenada por impacto y costo, con foto de cada hallazgo y el denominador a la vista.</p></div>
+      <div class="col"><p class="idx">4 · INSTRUMENTAL PROPIO</p><p>Gobernamos capacidad humana con nuestro sistema: costo cargado por persona, utilización, cumplimiento de entregas y documentación laboral al día. Es la base del margen, no el argumento de venta.</p></div>
+    </div>
+    <h2>Nuestras debilidades, sin adornos</h2>
+    <table class="t">
+      <thead><tr><th style="width:32%">Debilidad</th><th>Cómo la manejamos</th></tr></thead>
+      <tbody>
+        <tr><td>Cero casos en la categoría</td><td>Llegamos a la reunión con la foto del prospecto hecha (radiografía de ejecución). No inventamos ni insinuamos casos.</td></tr>
+        <tr><td>Sin cobertura instalada</td><td>No prometemos cobertura antes de tener el plan de la cuenta y los proveedores comprometidos.</td></tr>
+        <tr><td>Capital muy inferior al de los incumbentes</td><td>Define el tamaño de cuenta que perseguimos: no competimos por contratos que no podemos financiar.</td></tr>
+        <tr><td>Sin marca en la categoría</td><td>Entramos por el problema, no por la credencial. El contenido y la comunidad construyen reconocimiento en paralelo.</td></tr>
+      </tbody>
+    </table>
+    <h2>Dónde elegimos la pelea</h2>
+    <ol>
+      <li><b>Marca mediana con presupuesto de canal y sin equipo propio de terreno:</b> muy chica para el despliegue de una plataforma enterprise y demasiado exigente para conformarse con una agencia que no le demuestra nada.</li>
+      <li><b>Marca que ya invierte en retail media:</b> ahí la desconexión entre la tienda y la inversión digital es visible, y nadie compite.</li>
+      <li><b>Marca con dos o más agencias de terreno sin consolidar:</b> entramos por orquestación, el servicio de mayor margen y menor consumo de capital.</li>
+    </ol>
+    <p><b>Donde no competimos:</b> licitaciones por precio por persona o por cobertura nacional, y construcción de una plataforma de ejecución propia.</p>
+  </div>
+</section>
+
+<!-- ============ 8 · SERVICIOS TRADE ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">06 · LOS SERVICIOS</p>
+    <h1 id="servicios">23 servicios en dos familias</h1>
+    <p class="lead">Los agrupamos como los nombra el mercado —trade marketing y BTL— más uno transversal. Efeonce opera todos; lo que cambia por etapa es quién pone las manos.</p>
+    <h2>Trade marketing · 13 servicios</h2>
+    <div class="grid2">
+      <div>
+        <div class="svcg"><h3>Entender</h3>
+          <div class="svc"><span class="c">T1</span><span><b>Diagnóstico de Ejecución de Canal.</b> Qué se puede medir, qué está mal hoy en una muestra real y en qué orden corregirlo.</span></div>
+          <div class="svc"><span class="c">T2</span><span><b>Auditoría de Inversión de Canal.</b> Qué parte del presupuesto de canal no tiene cómo demostrar retorno.</span></div>
+          <div class="svc"><span class="c">T9</span><span><b>Estándar de Tienda Perfecta.</b> Qué significa bien ejecutado en la categoría, por canal y formato, antes de medir.</span></div>
+          <div class="svc"><span class="c">T10</span><span><b>Arquitectura de Distribución y Cobertura.</b> Dónde está la marca, dónde no y qué vale cada punto de venta que falta.</span></div>
+        </div>
+        <div class="svcg"><h3>Medir cada ciclo</h3>
+          <div class="svc"><span class="c">T3</span><span><b>Cobertura Auditada.</b> El estado de cada tienda y la lista de qué corregir primero, cada ciclo. Es el núcleo recurrente.</span></div>
+          <div class="svc"><span class="c">T5</span><span><b>Orquestación de Terreno.</b> Los proveedores actuales del cliente, medidos contra el mismo estándar y en un solo reporte.</span></div>
+          <div class="svc"><span class="c">T11</span><span><b>Integración de Datos de Canal.</b> Lo que se vende al canal, lo que compró la gente y lo que pasó en la góndola, en un solo lugar.</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="svcg"><h3>Corregir</h3>
+          <div class="svc"><span class="c">T4</span><span><b>Equipo de Terreno Gestionado.</b> Las tiendas críticas corregidas, con foto del antes y el después.</span></div>
+          <div class="svc"><span class="c">T8</span><span><b>Diseño y Medición de Promociones.</b> Si la promoción vendió de más o sólo adelantó compras y se comió el margen. Incluye concursos y sorteos.</span></div>
+          <div class="svc"><span class="c">T12</span><span><b>Capacitación de Fuerza de Venta del Canal.</b> Que quien vende el producto sin trabajar para la marca sepa venderlo, medido contra tiendas de control.</span></div>
+          <div class="svc"><span class="c">T13</span><span><b>Gestión de Categoría.</b> Una propuesta de cómo ordenar la categoría completa, en el idioma del comprador de la cadena. Sólo con datos de categoría reales.</span></div>
+        </div>
+        <div class="svcg"><h3>Conectar con lo digital</h3>
+          <div class="svc"><span class="c">T6</span><span><b>Anaquel Digital y Visibilidad en IA.</b> Cómo se ve el producto en la ficha de cada retailer y si los asistentes de IA lo recomiendan.</span></div>
+          <div class="svc"><span class="c">T7</span><span><b>Retail Media y Commerce.</b> La inversión en la red de medios de cada cadena, leída junto a lo que pasa en sus tiendas.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="note"><p><b>T6 y T7 son la razón de ser de la línea.</b> Auditar, poner personas en la tienda y producir material ya lo hacen otros. Conectar la góndola con la inversión digital no lo hace ninguno de los dos extremos del mercado.</p></div>
+  </div>
+</section>
+
+<!-- ============ 9 · SERVICIOS BTL ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">06 · LOS SERVICIOS</p>
+    <h2 style="margin-top:0">BTL · 9 servicios</h2>
+    <p>Cada activación sale a terreno con su medición ya definida. El BTL del mercado se vende como producción y presencia; el nuestro se vende con evidencia.</p>
+    <div class="grid3">
+      <div class="svcg"><h3>En la tienda</h3>
+        <div class="svc"><span class="c">B1</span><span><b>Activaciones en Sala Medidas.</b> Degustación, demo o sampling, comparado contra tiendas donde no se activó.</span></div>
+        <div class="svc"><span class="c">B2</span><span><b>Promotoría e Impulso.</b> Venta asistida, medida en conversión y no en horas cubiertas.</span></div>
+        <div class="svc"><span class="c">B3</span><span><b>Visual Merchandising y Exhibiciones Adicionales.</b> Bien instaladas y verificadas mientras dura lo que se pagó.</span></div>
+      </div>
+      <div class="svcg"><h3>Fuera de la tienda</h3>
+        <div class="svc"><span class="c">B4</span><span><b>Roadshow y Tour de Marca.</b> Una gira leída ciudad por ciudad, para saber dónde volver.</span></div>
+        <div class="svc"><span class="c">B5</span><span><b>Street Marketing y Sampling Masivo.</b> Entrega masiva con registro de dónde, cuándo y a quién.</span></div>
+        <div class="svc"><span class="c">B6</span><span><b>Pop-up y Espacios Efímeros.</b> Objetivo comercial y métrica acordada antes de abrir.</span></div>
+      </div>
+      <div class="svcg"><h3>En eventos</h3>
+        <div class="svc"><span class="c">B7</span><span><b>Activación de Patrocinios.</b> Que el patrocinio pagado rinda más que un logo, partiendo por los derechos sin usar.</span></div>
+        <div class="svc"><span class="c">B8</span><span><b>Ferias y Exposiciones.</b> Que la feria termine en oportunidades de venta, no en una caja de tarjetas.</span></div>
+        <div class="svc"><span class="c">B9</span><span><b>Encuentros de Canal.</b> Convenciones de distribuidores y lanzamientos a la fuerza de venta, con seguimiento.</span></div>
+      </div>
+    </div>
+    <h2>Transversal</h2>
+    <div class="svc"><span class="c">X1</span><span><b>Contenido y Material de Canal.</b> Fichas, catálogos, contenido para cada retailer y kits para distribuidores, producidos como sistema y no campaña por campaña.</span></div>
+    <h2>Lo que distingue nuestra oferta BTL</h2>
+    <ol>
+      <li><b>La medición se diseña antes de ejecutar:</b> tiendas de control, lectura por ciudad, métrica acordada antes de abrir un pop-up, seguimiento después de una feria.</li>
+      <li><b>La activación alimenta el dato del canal:</b> quien activa o promociona ya está en la tienda, y esa visita también sirve para auditar. Verificar que una exhibición siga instalada sale de la misma cobertura.</li>
+      <li><b>Cada activación deja activos, no sólo fotos de reporte:</b> el contenido capturado se reutiliza en redes, retail media y creadores, con derechos definidos desde el brief.</li>
+    </ol>
+    <p>La producción física —montaje, mobiliario, stands, bodega, transporte y permisos— la contratamos y respondemos por ella, pero la ejecuta un proveedor y se factura como costo de terceros. No somos productora.</p>
+    <h2>Por dónde entra una cuenta</h2>
+    <p>El catálogo es nuestra capacidad, no la agenda de la primera reunión. Se entra por una puerta según el problema del cliente: <b>Diagnóstico de Ejecución de Canal, Auditoría de Inversión de Canal, Orquestación de Terreno, Estándar de Tienda Perfecta o Arquitectura de Distribución.</b> El resto aparece cuando el cliente lo pide o la evidencia lo justifica. Presentar el catálogo completo en la primera conversación dispersa y transmite que no entendimos el problema.</p>
+  </div>
+</section>
+
+<!-- ============ 10 · OPERACIÓN ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">07 · CÓMO OPERAMOS</p>
+    <h1 id="operacion">Efeonce opera; quién pone las manos puede variar</h1>
+    <table class="t">
+      <thead><tr><th style="width:16%"></th><th style="width:50%">Qué significa</th><th>De quién es</th></tr></thead>
+      <tbody>
+        <tr><td><b>Ejecutar</b></td><td>Poner las manos: recorrer la tienda, capturar, reponer, activar, montar.</td><td>Propio o de un proveedor, según la etapa y la capa.</td></tr>
+        <tr><td><b>Operar</b></td><td>Planificar el ciclo, fijar el método y el estándar, dirigir, validar la calidad de cada dato, gobernar a los proveedores, leer el resultado, decidir y responder ante el cliente.</td><td><b>Siempre de Efeonce</b>, en todas las etapas.</td></tr>
+      </tbody>
+    </table>
+    <p>A esta capa la llamamos <b>Managed Channel Operations</b>. No es un servicio más ni se cotiza aparte: es la forma en que operamos los 23 servicios. <b>El fee remunera la operación; la ejecución de terceros se traspasa sin margen.</b> Si una propuesta no aporta plan, estándar, validación ni decisión, no debería existir: sería reventa, y un comprador corporativo la desarma en la primera negociación.</p>
+    <p><b>Un dato que no validamos no llega al reporte del cliente.</b> Si en un ciclo no alcanzamos la cobertura acordada, se entrega lo que sí se midió y se declara lo que faltó; nunca se estima lo que no se vio.</p>
+    <h2>Tres etapas, con la oferta completa desde el primer contrato</h2>
+    <table class="t">
+      <thead><tr><th style="width:21%">Etapa</th><th style="width:27%">Qué ejecutamos nosotros</th><th style="width:27%">Qué ejecuta un proveedor</th><th>Para pasar a la siguiente</th></tr></thead>
+      <tbody>
+        <tr><td><b>1 · Integrador</b><br>meses 0 a 9</td><td>Diagnóstico, estándar, priorización, lectura del ciclo y toda la conexión digital.</td><td>Captura por misiones, personal de terreno y producción física.</td><td>Dos cuentas con ciclos completos, costos reales medidos y al menos una renovación.</td></tr>
+        <tr><td><b>2 · Internalización selectiva</b><br>meses 9 a 24</td><td>Lo anterior, más las capas que cumplan margen, dato propio y control de calidad. Primero, líderes de terreno.</td><td>El resto de la ejecución; producción física siempre.</td><td>Volumen e histórico suficientes para producir información que nadie más tiene.</td></tr>
+        <tr><td><b>3 · Tecnología propia</b><br>por tracción, no por fecha</td><td>Tecnología sólo en la conexión entre tienda, inversión digital y visibilidad en IA.</td><td>La plataforma de ejecución que el cliente ya tenga.</td><td>Un cliente que pague por esa capacidad, no que la reciba incluida.</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><p><b>La regla que protege la promesa: con compromiso exigible o no se firma.</b> Todo lo que prometemos al cliente —cobertura, plazo, calidad, montaje— debe estar respaldado por un compromiso equivalente del proveedor que lo ejecuta, con penalidad y plan de reemplazo. Sin eso, el primer contrato que falle se lleva el capital y la única referencia que tenemos.</p></div>
+    <p><b>Nunca construimos una plataforma de ejecución retail.</b> Es una categoría global y en consolidación con respaldo de capital privado; nuestra diferencia no pasa por igualar ese producto. Tampoco vendemos personal bajo la dirección diaria del cliente: en Chile eso deja de ser un servicio y pasa a ser suministro de personas.</p>
+  </div>
+</section>
+
+<!-- ============ 11 · PROVEEDORES ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">08 · PROVEEDORES Y FINANCIAMIENTO</p>
+    <h1 id="proveedores">Lo que contratamos y cómo lo elegimos</h1>
+    <table class="t">
+      <thead><tr><th style="width:24%">Capa</th><th style="width:40%">Qué compramos</th><th>¿Se internaliza?</th></tr></thead>
+      <tbody>
+        <tr><td><b>Captura por misiones</b></td><td>Auditoría de tienda con foto y ubicación verificable.</td><td>Sólo si el volumen lo justifica y el proveedor no da acceso al dato.</td></tr>
+        <tr><td><b>Personal de terreno</b></td><td>Reposición, corrección y ejecución de activaciones.</td><td>Desde la etapa 2, empezando por líderes de terreno.</td></tr>
+        <tr><td><b>Producción física</b></td><td>Material, mobiliario, stands, montaje, logística y permisos.</td><td>Nunca. Se contrata y se gobierna.</td></tr>
+        <tr><td><b>Datos de mercado</b></td><td>Panel de hogares y medición retail (Kantar, NielsenIQ).</td><td>Nunca. Se licencia cuando una propuesta lo requiere.</td></tr>
+        <tr><td><b>Financiamiento</b></td><td>Anticipo de facturas emitidas (factoring).</td><td>Relación financiera permanente.</td></tr>
+      </tbody>
+    </table>
+    <h2>Cómo calificamos a un proveedor</h2>
+    <ol>
+      <li><b>Compromiso exigible.</b> Es el criterio que elimina: sin compromiso equivalente, penalidad y reemplazo, no entra a una propuesta.</li>
+      <li><b>Cumplimiento laboral verificable.</b> Por la Ley 20.123, el cliente responde solidariamente por las obligaciones laborales de quien trabaja en su tienda y nos exigirá certificados cada mes.</li>
+      <li><b>Acceso al dato crudo.</b> Si sólo nos entrega su tablero, nunca acumulamos histórico propio.</li>
+      <li><b>Acepta operar bajo nuestro método:</b> nuestro plan, estándar y control de calidad. Si sólo trabaja con su propia metodología, estaríamos revendiendo su servicio.</li>
+      <li><b>Plazo de pago.</b> Un proveedor que cobra a 30 días con un cliente que paga a 90 abre 60 días de hueco por ciclo.</li>
+      <li><b>Sustituibilidad.</b> Para cada capa debe existir una alternativa identificada.</li>
+    </ol>
+    <div class="note"><p><b>Conflicto de interés.</b> Muchos candidatos obvios —agencias de trade, promotoría y producción— venden directo al mismo cliente. Si ejecutan para nosotros en una cuenta, exigimos un acuerdo de no captación sobre esa cuenta o no participan. En producción preferimos fabricantes puros de material, que no compiten con nosotros.</p></div>
+    <h2>Factoring: ayuda, con tres límites</h2>
+    <p>Efeonce ya opera el factoring con su contabilidad y conciliación. Nos permite tomar cuentas más grandes con el mismo capital, pero:</p>
+    <ul>
+      <li><b>No cubre lo que gastamos antes de facturar.</b> Ese tramo lo financia siempre el capital propio; se acorta facturando con anticipo y en forma quincenal.</li>
+      <li><b>Cuesta entre 3 y 5 puntos de margen,</b> y ese costo tiene que ir dentro del precio de la propuesta.</li>
+      <li><b>Se aprueba según el riesgo del cliente, no el nuestro.</b> Con marcas grandes es accesible; con medianas puede no aprobarse. Si es con responsabilidad, no traspasa el riesgo de no pago: sólo adelanta el tiempo.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 12 · COBRO ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">09 · CÓMO COBRAMOS</p>
+    <h1 id="cobro">Cobramos por la operación, no por las personas</h1>
+    <table class="t">
+      <thead><tr><th style="width:17%">Línea</th><th style="width:20%">Unidad de cobro</th><th style="width:15%">Cuándo</th><th style="width:27%">Incluye</th><th>No incluye</th></tr></thead>
+      <tbody>
+        <tr><td><b>Diagnóstico</b></td><td>Proyecto cerrado según mercados, cadenas, marcas y calidad de datos</td><td>Al aceptar la propuesta</td><td>Arquitectura del canal, mapa de datos, muestra real y decisiones priorizadas</td><td>Ejecución continua e integraciones</td></tr>
+        <tr><td><b>Cobertura auditada</b></td><td>Puntos de venta auditados por ciclo</td><td>Al cerrar y validar el ciclo</td><td>Misiones, control de calidad, puntaje, priorización y reporte</td><td>Corrección en tienda, material y medios</td></tr>
+        <tr><td><b>Capacidad de terreno</b></td><td>Capacidad mensual comprometida</td><td>Mensual</td><td>Equipo, dirección, supervisión, respaldo, evidencia y cumplimiento laboral</td><td>Reposición ilimitada y transporte de mercadería</td></tr>
+        <tr><td><b>Activación medida</b></td><td>Ola: tiendas por días de presencia</td><td>Al cerrar la ola</td><td>Mecánica, ejecución, captura de datos, tiendas de control y lectura</td><td>Montaje, material, producto y promesa de venta</td></tr>
+        <tr><td><b>Orquestación</b></td><td>Proveedores por mercado gobernados</td><td>Mensual</td><td>Estándar común, consolidación, cadencia y recomendación de reasignación</td><td>El costo de los proveedores</td></tr>
+        <tr><td><b>Costos de terceros</b></td><td>Costo real, sin margen</td><td>Según el tercero</td><td>Retail media, datos de panel, incentivos, material y producción física</td><td>Margen oculto</td></tr>
+        <tr><td><b>Otras líneas</b></td><td>Según la línea</td><td>Según la línea</td><td>Retail media, contenido, SEO y visibilidad en IA, medición</td><td>Se cotiza con su responsable</td></tr>
+      </tbody>
+    </table>
+    <h2>Lo que nunca cobramos ni vendemos</h2>
+    <ul>
+      <li>Precio como porcentaje de la inversión de canal del cliente: crea conflicto de interés y no se defiende ante Finanzas.</li>
+      <li>Personas por día u hora de promotora: premia la presencia, no el resultado, y nos pone a competir por precio.</li>
+      <li>Producción física como servicio propio: montaje, mobiliario, bodega, transporte o permisos.</li>
+      <li>Garantía de aumento de venta, sell-out, participación o rotación: dependen del precio, el surtido, la negociación con la cadena y la demanda.</li>
+      <li>Personal bajo la dirección diaria del cliente.</li>
+    </ul>
+    <div class="note"><p><b>Precios en validación.</b> Mientras no tengamos costos reales por visita, por tienda corregida y por día de activación, cada propuesta se cotiza caso a caso, con un piso de 45% de margen bruto que incluye el costo del factoring cuando aplica.</p></div>
+  </div>
+</section>
+
+<!-- ============ 13 · CAPITAL ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">10 · CAPITAL Y CAJA</p>
+    <h1 id="capital">El riesgo principal es la caja</h1>
+    <p class="lead">Pagamos a proveedores y personas cada mes, y las cadenas grandes pagan a 30, 60 o 90 días. Cada contrato grande consume caja antes de generarla: vender más acelera el problema.</p>
+    <h2>Cómo se asignan los CLP 40 millones</h2>
+    <table class="t">
+      <thead><tr><th>Destino</th><th class="n">Monto</th><th class="n">%</th><th>Para qué</th></tr></thead>
+      <tbody>
+        <tr><td><b>Arranque comercial</b></td><td class="n">$5.000.000</td><td class="n">13%</td><td>Radiografías de ejecución, material comercial, revisión legal y reuniones</td></tr>
+        <tr><td><b>Reserva de contingencia</b></td><td class="n">$8.000.000</td><td class="n">20%</td><td>El primer contrato que salga mal. No se usa para financiar operación.</td></tr>
+        <tr><td><b>Capital de trabajo</b></td><td class="n">$27.000.000</td><td class="n">68%</td><td>Financiar la operación entre lo que gastamos y lo que cobramos</td></tr>
+      </tbody>
+    </table>
+    <p><b>Tope por contrato: $16.200.000 de capital comprometido,</b> el 60% del capital de trabajo, aunque se gane un contrato mayor.</p>
+    <h2>Con el mismo capital, la forma de pago multiplica casi por cinco el contrato que podemos tomar</h2>
+    <p class="src" style="margin-top:0">Facturación mensual máxima por contrato, en millones de pesos, con el tope de $16,2 millones de capital comprometido y 45% de margen bruto.</p>
+    <svg role="img" aria-labelledby="ch-t ch-d" viewBox="0 0 640 262" width="100%" style="display:block;max-height:92mm">
+      <title id="ch-t">Facturación mensual máxima por estructura de pago</title>
+      <desc id="ch-d">Sin factoring: 6,5 millones cobrando a 90 días, 8,4 a 60 días y 11,8 a 30 días. Con factoring: 17,3 facturando mensual, 24,5 facturando quincenal y 31,0 con anticipo y facturación quincenal.</desc>
+      <g stroke="#e1e1ea" stroke-width="1">
+        <line x1="232" y1="22" x2="232" y2="232"/><line x1="338.5" y1="22" x2="338.5" y2="232"/><line x1="444.9" y1="22" x2="444.9" y2="232"/><line x1="551.4" y1="22" x2="551.4" y2="232"/>
+      </g>
+      <g font-size="10" fill="#4c4b5b" text-anchor="middle">
+        <text x="232" y="250">0</text><text x="338.5" y="250">10</text><text x="444.9" y="250">20</text><text x="551.4" y="250">30 M</text>
+      </g>
+      <g font-size="10.5" font-weight="600" fill="#022a4e"><text x="0" y="16">Sin factoring</text><text x="0" y="128">Con factoring</text></g>
+      <g font-size="10.5" fill="#2f3349" text-anchor="end">
+        <text x="222" y="41">Factura mensual, cobro a 90 días</text>
+        <text x="222" y="71">Factura mensual, cobro a 60 días</text>
+        <text x="222" y="101">Factura mensual, cobro a 30 días</text>
+        <text x="222" y="153">Factura mensual, cobro a 60 días</text>
+        <text x="222" y="183">Factura quincenal, cobro a 60 días</text>
+        <text x="222" y="213">Anticipo + factura quincenal</text>
+      </g>
+      <g fill="#0375d9">
+        <path d="M232,27 H297.2 Q301.2,27 301.2,31 V43 Q301.2,47 297.2,47 H232 Z"/>
+        <path d="M232,57 H317.4 Q321.4,57 321.4,61 V73 Q321.4,77 317.4,77 H232 Z"/>
+        <path d="M232,87 H353.6 Q357.6,87 357.6,91 V103 Q357.6,107 353.6,107 H232 Z"/>
+        <path d="M232,139 H412.2 Q416.2,139 416.2,143 V155 Q416.2,159 412.2,159 H232 Z"/>
+        <path d="M232,169 H488.8 Q492.8,169 492.8,173 V185 Q492.8,189 488.8,189 H232 Z"/>
+        <path d="M232,199 H558.0 Q562.0,199 562.0,203 V215 Q562.0,219 558.0,219 H232 Z"/>
+      </g>
+      <g font-size="10.5" font-weight="600" fill="#1d1f36">
+        <text x="307" y="41">$6,5 M</text><text x="327" y="71">$8,4 M</text><text x="363" y="101">$11,8 M</text>
+        <text x="422" y="153">$17,3 M</text><text x="498" y="183">$24,5 M</text><text x="568" y="213">$31,0 M</text>
+      </g>
+    </svg>
+    <p class="src">Fuente: modelo interno de caja de la línea, septiembre 2026. Supuestos: margen bruto de 45%; un mes de ejecución antes de facturar; 15 días de aprobación de factura; anticipo de factoring en unos 6 días. No incluye IVA ni la remuneración del responsable de la línea. Detalle en la página siguiente.</p>
+  </div>
+</section>
+
+<!-- ============ 14 · CAPITAL (cont.) ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">10 · CAPITAL Y CAJA</p>
+    <h2 style="margin-top:0">Detalle de los escenarios</h2>
+    <table class="t">
+      <thead><tr><th>Escenario</th><th class="n">Meses de costo atados</th><th class="n">Costo directo máx./mes</th><th class="n">Facturación máx./mes</th></tr></thead>
+      <tbody>
+        <tr><td>Sin factoring · factura mensual · cobro a 90 días</td><td class="n">4,5</td><td class="n">$3,6 M</td><td class="n">$6,5 M</td></tr>
+        <tr><td>Sin factoring · factura mensual · cobro a 60 días</td><td class="n">3,5</td><td class="n">$4,6 M</td><td class="n">$8,4 M</td></tr>
+        <tr><td>Sin factoring · factura mensual · cobro a 30 días</td><td class="n">2,5</td><td class="n">$6,5 M</td><td class="n">$11,8 M</td></tr>
+        <tr><td>Con factoring · factura mensual · cobro a 60 días</td><td class="n">1,7</td><td class="n">$9,5 M</td><td class="n">$17,3 M</td></tr>
+        <tr><td>Con factoring · factura quincenal · cobro a 60 días</td><td class="n">1,2</td><td class="n">$13,5 M</td><td class="n">$24,5 M</td></tr>
+        <tr><td>Con factoring · anticipo + factura quincenal</td><td class="n">0,95</td><td class="n">$17,1 M</td><td class="n">$31,0 M</td></tr>
+      </tbody>
+    </table>
+    <p class="src">Capital que ata un contrato = costo directo mensual × meses entre el gasto y el cobro (o el anticipo del factoring).</p>
+    <h2>Tres reglas de negociación que valen más que un descuento</h2>
+    <ol>
+      <li><b>Anticipo al inicio de cada ciclo.</b> Es lo que más mueve el tamaño de contrato que podemos tomar.</li>
+      <li><b>Facturación quincenal, no al cierre del trimestre.</b> Cada semana que acortamos el tramo antes de facturar es capital propio liberado.</li>
+      <li><b>Plazo a proveedores no peor que el de cobro al cliente.</b> Ese hueco no lo cubre el factoring.</li>
+    </ol>
+    <h2>El costo del factoring va dentro del precio</h2>
+    <table class="t">
+      <thead><tr><th>Tasa mensual</th><th class="n">Costo sobre la factura (2 meses + comisión)</th><th class="n">Margen efectivo desde 45%</th></tr></thead>
+      <tbody>
+        <tr><td>1,2%</td><td class="n">~2,9%</td><td class="n">42,1%</td></tr>
+        <tr><td>1,7%</td><td class="n">~3,9%</td><td class="n">41,1%</td></tr>
+        <tr><td>2,2%</td><td class="n">~4,9%</td><td class="n">40,1%</td></tr>
+      </tbody>
+    </table>
+    <p class="src">Tasas referenciales; la tasa real depende de cada cliente y se confirma con la institución antes de cotizar.</p>
+    <h2>Una cuenta ancla a la vez</h2>
+    <p>Con factoring y factura mensual, el capital alcanza para una cuenta de unos $17 millones al mes <b>o</b> dos de unos $8,7 millones. Dos cuentas medianas no duplican la capacidad; la dividen, y duplican el riesgo de que una pague tarde. <b>La segunda cuenta entra sólo con dos ciclos consecutivos cobrados en plazo.</b></p>
+    <table class="t">
+      <thead><tr><th style="width:55%">Situación de la oportunidad</th><th>Decisión</th></tr></thead>
+      <tbody>
+        <tr><td>El contrato está dentro del tope del escenario que aplica</td><td>Se puede tomar</td></tr>
+        <tr><td>Es mayor, pero el cliente acepta anticipo y facturación quincenal</td><td>Se toma, condicionado a esa forma de pago</td></tr>
+        <tr><td>Es mayor, el cliente no negocia plazos y no hay factoring aprobado para él</td><td><b>No se toma.</b> Ganar un contrato que no podemos financiar es peor que perderlo.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 15 · RIESGOS ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">11 · RIESGOS</p>
+    <h1 id="riesgos">Riesgos y cómo los manejamos</h1>
+    <table class="t">
+      <thead><tr><th style="width:30%">Riesgo</th><th style="width:30%">Por qué importa</th><th>Cómo lo manejamos</th></tr></thead>
+      <tbody>
+        <tr><td><b>No hay cuenta ancla</b></td><td>Entramos por prospección en frío, donde históricamente cerramos 2 a 3% de las propuestas.</td><td>Contenido, comunidad y radiografía antes del primer contacto; prospectar en la ventana de planificación.</td></tr>
+        <tr><td><b>Comité comprador nuevo</b></td><td>Compra Comercial, con quien no tenemos relación establecida.</td><td>Tratar la primera venta como aprendizaje del comité y registrarlo.</td></tr>
+        <tr><td><b>Comparación por precio por persona</b></td><td>Frente a incumbentes de 20 años perdemos si el eje es la tarifa.</td><td>Vender decisión y evidencia; nunca cotizar persona por día.</td></tr>
+        <tr><td><b>Caja</b></td><td>Pagamos mensual y cobramos a 30 a 90 días.</td><td>Tope por contrato, anticipo, facturación quincenal y factoring con su costo en el precio.</td></tr>
+        <tr><td><b>Un proveedor falla</b></td><td>La responsabilidad ante el cliente es nuestra.</td><td>Compromiso exigible con penalidad y reemplazo; sin eso no se firma.</td></tr>
+        <tr><td><b>Responsabilidad laboral solidaria</b></td><td>El cliente responde por las obligaciones de quien trabaja en su tienda.</td><td>Cumplimiento documental mensual como parte del servicio; nunca suministro de personal.</td></tr>
+        <tr><td><b>Reclasificación laboral en las misiones</b></td><td>Pagar por misión con horario o exclusividad puede leerse como relación laboral.</td><td>Misiones por resultado, sin horario ni exclusividad; revisión legal antes de operar.</td></tr>
+        <tr><td><b>Datos de venta no disponibles</b></td><td>El sell-out vive en cadenas y distribuidores.</td><td>La auditoría genera su propio dato; el sell-out es una expansión, no un requisito.</td></tr>
+        <tr><td><b>Fraude en la captura</b></td><td>Una misión remota se puede falsificar.</td><td>Control de calidad, auditoría cruzada y costo de reproceso incluido en el precio.</td></tr>
+        <tr><td><b>Costo laboral creciente</b></td><td>La jornada baja a 40 horas en 2028 sin reducción de sueldo.</td><td>Modelo variable primero; todo costeo proyecta ambos escalones.</td></tr>
+        <tr><td><b>Solapamiento con otras líneas</b></td><td>Retail media también vive en Performance.</td><td>Toda propuesta compuesta declara responsable y roles de cada línea.</td></tr>
+        <tr><td><b>Dispersión del foco comercial</b></td><td>Es una línea más compitiendo por la atención del equipo.</td><td>Responsable dedicado y entrada por una sola puerta según el problema del cliente.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 16 · VALIDACIÓN ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">12 · HITOS Y PRÓXIMOS PASOS</p>
+    <h1 id="validacion">De la validación a la venta aprobada</h1>
+    <p>La línea pasa a venta aprobada sólo cuando se cumplen estos hitos. Los dos primeros van antes que el resto: no costeamos capacidad para una figura que puede ser inviable ni reclutamos para una demanda que no existe.</p>
+    <table class="t">
+      <thead><tr><th style="width:20%">Hito</th><th style="width:40%">Qué tiene que pasar</th><th>Si no pasa</th></tr></thead>
+      <tbody>
+        <tr><td><b>Figura laboral</b></td><td>Opinión legal escrita que habilite el diseño en Chile.</td><td>Operamos sólo auditoría y orquestación.</td></tr>
+        <tr><td><b>Demanda</b></td><td>Un diagnóstico pagado en 90 días, tras al menos 5 conversaciones con gerencias comerciales.</td><td>Revisamos problema, puerta de entrada o segmento antes de invertir.</td></tr>
+        <tr><td><b>Margen</b></td><td>El costo real por visita deja 45% de margen bruto, medido con el peor caso y no con el promedio.</td><td>Rediseñamos la red o abandonamos esa capa.</td></tr>
+        <tr><td><b>Calidad del dato</b></td><td>Auditoría cruzada sobre una muestra, con fraude bajo control.</td><td>Sin dato confiable no hay línea.</td></tr>
+        <tr><td><b>Conversión</b></td><td>Al menos un diagnóstico que pase a ciclo recurrente.</td><td>El diagnóstico no es puerta de entrada: es un proyecto suelto.</td></tr>
+        <tr><td><b>Capacidad</b></td><td>Equipo de terreno reclutable al costo modelado, con aprobación de Finanzas.</td><td>No abrimos capacidad propia de terreno.</td></tr>
+      </tbody>
+    </table>
+    <h2>La ventana es ahora</h2>
+    <p>Las marcas cierran su presupuesto de canal para 2027 entre noviembre y diciembre. Si las conversaciones no ocurren en las próximas 8 a 10 semanas, el siguiente punto de entrada natural es un año después. La landing pública de la línea, en <b>efeoncepro.com/servicios/trade-marketing</b>, está en preparación.</p>
+    <h2>Cómo prospectamos</h2>
+    <div class="grid3">
+      <div class="col"><p class="idx">OLA 0 · SEMANAS 1 Y 2</p><h3>Barrer la base propia</h3><p>Toda cuenta actual, histórica o perdida con distribución indirecta o presencia en retail. Es la única fuente donde el cierre es de 50% y no de 3%.</p></div>
+      <div class="col"><p class="idx">OLA 1 · SEMANAS 2 A 8</p><h3>Presencia y evidencia</h3><p>Contenido sobre el problema, presencia en la comunidad del retail media y una radiografía de ejecución por categoría prioritaria.</p></div>
+      <div class="col"><p class="idx">OLA 2 · SEMANAS 6 A 12</p><h3>Contacto con evidencia</h3><p>De 20 a 30 cuentas, contactadas con la radiografía de su categoría en la mano. El operador abre la puerta; el comprador económico firma.</p></div>
+    </div>
+    <div class="note"><p><b>La radiografía de ejecución.</b> Auditamos por cuenta propia entre 10 y 15 tiendas de una categoría, en sala abierta al público, y llegamos a la reunión con la foto del prospecto hecha. Su valor es cruzar lo observado en la tienda con la presencia digital del producto. Salvaguardas: sin personas identificables, respetando las políticas de cada cadena y con revisión legal antes de la primera salida.</p></div>
+  </div>
+</section>
+
+<!-- ============ 17 · VALIDACIÓN (cont.) + COMUNICACIÓN ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">12 · HITOS Y PRÓXIMOS PASOS</p>
+    <h2 style="margin-top:0">Cómo sabremos si va bien</h2>
+    <table class="t">
+      <thead><tr><th>Métrica en las primeras 12 semanas</th><th class="n">Meta</th></tr></thead>
+      <tbody>
+        <tr><td>Conversaciones con gerencias comerciales</td><td class="n">8 o más</td></tr>
+        <tr><td>Radiografías entregadas</td><td class="n">10 o más</td></tr>
+        <tr class="hl"><td><b>Diagnósticos vendidos</b></td><td class="n"><b>1 o más</b></td></tr>
+        <tr><td>Comités de compra mapeados con sus roles reales</td><td class="n">5 o más</td></tr>
+      </tbody>
+    </table>
+    <p><b>Condición de parada:</b> si al cierre de las 12 semanas no hay ningún diagnóstico vendido y hubo menos de 5 conversaciones con comprador económico, o si la revisión legal declara inviable la figura y la auditoría tampoco alcanza el margen, o si el problema existe pero el presupuesto no está disponible en el ciclo, detenemos la inversión y reevaluamos. Parar a tiempo con evidencia es un resultado válido.</p>
+    <h2>Decisiones abiertas</h2>
+    <ul>
+      <li>Con qué proveedores firmamos compromiso exigible en cada capa.</li>
+      <li>Si la etapa 2 arranca por líderes de terreno o por captura propia.</li>
+      <li>Quién de Comercial recibe los briefs y las reuniones de la línea.</li>
+      <li>Aprobación del título y la dirección visual de la landing.</li>
+    </ul>
+    <p class="kicker" style="margin-top:7mm">13 · CÓMO HABLAMOS DE LA LÍNEA</p>
+    <h1 id="comunicacion" style="font-size:17pt">Reglas para toda conversación con clientes</h1>
+    <ul>
+      <li><b>Un solo interlocutor y un solo responsable.</b> En el pitch no se menciona cómo estructuramos la ejecución ni la existencia de proveedores. Se declara cuando Compras o el contrato lo piden, cuando el cliente pregunta directo o cuando hay personas de un tercero en su tienda, porque la ley lo exige. No mencionar no es negar: nunca afirmamos capacidad propia que no tenemos.</li>
+      <li><b>Nunca prometemos aumento de venta,</b> sell-out, participación ni rotación.</li>
+      <li><b>Nunca decimos que el mercado no mide ni que un competidor no reporta.</b> Es falso y el cliente probablemente tiene el tablero abierto. El argumento es que lo que recibe describe pero no prioriza.</li>
+      <li><b>Nunca nombramos competidores</b> en propuestas ni en la landing, y nunca atacamos la plataforma que el cliente ya compró: operamos sobre ella.</li>
+      <li><b>Hablamos como el cliente:</b> tienda para el local, góndola para el mueble, sala en la jerga del trade, punto de venta como unidad; corregir para la intervención.</li>
+    </ul>
+    <h2>Preguntas que abren la conversación</h2>
+    <ul>
+      <li>«Con el reporte que recibes hoy, ¿qué decisión tomaste el mes pasado que no habrías tomado sin él?»</li>
+      <li>«La plataforma te dice qué está roto. ¿Quién lo arregla y quién te confirma que quedó arreglado?»</li>
+      <li>«¿Alguien cruza lo que pasa en la góndola con lo que inviertes en la red de medios de esa misma cadena?»</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 18 · FUENTES ============ -->
+<section class="sheet">
+  <div class="body">
+    <p class="kicker">14 · FUENTES</p>
+    <h1 id="fuentes">Fuentes</h1>
+    <p>Consultadas en septiembre de 2026. La información de competidores proviene de sus sitios públicos y de prensa sectorial y no fue verificada de forma independiente.</p>
+    <table class="t">
+      <thead><tr><th style="width:33%">Tema</th><th>Fuente</th></tr></thead>
+      <tbody>
+        <tr><td>Demanda de búsqueda y resultados en Chile</td><td>Semrush, base Chile.</td></tr>
+        <tr><td>Retail media en Chile</td><td>Ecosistema Startup, «Retail media en Chile 2026»; Tinuiti, «Retail Media Trends 2026»; Path to Purchase Institute, «2026 Shopper Marketing Predictions».</td></tr>
+        <tr><td>Canal tradicional y ejecución en tienda</td><td>Snuuper, «El canal tradicional sigue siendo el punto ciego»; Involves Club, «Tendencias de trade marketing 2026».</td></tr>
+        <tr><td>Auditoría por misiones frente a equipos dedicados</td><td>Field Agent Canada, «Crowdsourced audits vs traditional field teams» (referencia norteamericana, no aplicable a Chile sin costeo local).</td></tr>
+        <tr><td>Jornada laboral en Chile</td><td>Ley 21.561; BST y Buk sobre la jornada de 42 horas.</td></tr>
+        <tr><td>Subcontratación y responsabilidad solidaria</td><td>Ley 20.123; Dirección del Trabajo.</td></tr>
+        <tr><td>Servicios especializados en México</td><td>Registro REPSE de la Secretaría del Trabajo y Previsión Social.</td></tr>
+        <tr><td>Competidores</td><td>Sitios de Teamcore, Treid, Touch Latam, Snuuper, Frogmi, Storecheck, Novaprom, Tradercom, ECR Group y Masglobal; Accel-KKR sobre la fusión de Teamcore y Tech-K; Endeavor Chile sobre Frogmi; CB Insights.</td></tr>
+        <tr><td>Datos de consumo</td><td>Kantar Worldpanel Chile; NielsenIQ, Retail Spend Barometer Chile.</td></tr>
+        <tr><td>Vocabulario del operador</td><td>Avisos de empleo de Jefe de Trade Marketing en Chile (Chiletrabajos, BeBee).</td></tr>
+        <tr><td>Caja y capital</td><td>Modelo interno de caja de la línea, septiembre 2026.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 19 · CONTRAPORTADA ============ -->
+<section class="sheet back" data-back="1">
+  <div class="in">
+    <img class="logo" src="{{LOGO_FULL}}" alt="Efeonce">
+    <div class="slogan"><span class="e">Empower</span> <span class="y">your</span> <span class="g">Growth</span></div>
+    <a class="bubble" href="https://efeoncepro.com"><img src="{{URL_BUBBLE}}" alt="efeoncepro.com"></a>
+    <div class="contact">
+      <a href="mailto:sales@efeoncepro.com">sales@efeoncepro.com</a><br>
+      <a href="tel:+56937323064">+56 9 3732 3064</a><br>
+      Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
