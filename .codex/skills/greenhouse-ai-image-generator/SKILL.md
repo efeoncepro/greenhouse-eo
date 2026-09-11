@@ -222,6 +222,14 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
   consistency — they treat the reference as inspiration and drift to a different subject + mangled logo.
 - **Prompt = identity-lock scaffold + one small delta.** Fix everything (face, hair, outfit, the exact logo, framing, lighting) and change ONLY the requested pose/expression. Big deltas break consistency; small deltas hold it. Anchor every variant to the SAME canonical reference, not to a previous generation.
 - **No engine keeps a logo pixel-exact** (~90% redraw). If the mark must be exact, mask its region and re-stamp the real vector (e.g. `public/branding/SVG/isotipo-efeonce-negativo.svg`) by composition. With `gpt-image-2` the logo is faithful enough that this is optional.
+  - **Social piece with a logo seal** (worked 2026-09-11, Efeonce "We are Hiring", LinkedIn 4:5): here the logo is
+    never generated. Generate only the art (Higgsfield MCP `generate_image`, `gpt_image_2`, `resolution 2k`,
+    `quality high`, `count 2`) with approved brand blues only and the bottom band left empty. `gpt_image_2` offers
+    no 4:5: generate `3:4` and crop to 4:5 **from the bottom only** (the headline moves toward the optical center
+    and the bottom band stays free), then resize to 1080×1350. Compose the real SVG with sharp (Node) — that run:
+    `public/branding/logo-negative.svg` at 300 px wide, centered, 104 px from the bottom edge, thin white rule
+    (56 px, 45% opacity) 34 px above. Zoom-inspect the seal at 100% before hosting. Campaign log:
+    `docs/operations/hiring/2026-09-11-linkedin-vacancy-distribution.md`.
 - **Background:** GPT Image 2 can return native transparency in preview when the request uses
   `background: 'transparent'` with PNG or WebP. Validate alpha from the decoded bytes; metadata or prompt copy is
   insufficient. Use `pnpm ai:image:rmbg` only as local post-processing for an intentionally opaque source or a

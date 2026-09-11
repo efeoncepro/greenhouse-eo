@@ -141,7 +141,7 @@ Inbound checklist:
 - [ ] Requirements are not a wishlist.
 - [ ] Process is transparent and candidate-facing.
 - [ ] Talent pool is backed by Growth Forms or Hiring command if it captures leads.
-- [ ] UTM/source attribution is preserved when campaigns drive candidates.
+- [ ] Source attribution is a **known gap today**: Greenhouse Careers does not persist UTM or channel per application (verified 2026-09-11), so campaign links stay clean and per-channel applies are not reported until Hiring captures a canonical source signal. Do not claim channel results you cannot measure.
 - [ ] The public Careers detail and apply URLs are the single canonical destination for all distribution.
 - [ ] The funnel has a baseline and a hypothesis: visits/impressions → completed applies → qualified screen → assessment/interview → offer → acceptance, by source.
 - [ ] Each external post keeps the same verified role truth and returns to the canonical Careers URL; channel-specific framing never changes scope, eligibility, compensation or assessment.

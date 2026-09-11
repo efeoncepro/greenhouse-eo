@@ -318,6 +318,13 @@ Listing/detail must consume `PublicOpeningPayload` only. Apply must use the
 Growth Forms compatible contract (`efeonce-careers-application`) but the
 authoritative write remains Hiring (`POST /api/public/hiring/applications`).
 
+Attribution gap (verified 2026-09-11): Careers stores no channel or UTM per
+application — no `utm_` handling in the careers routes, components or
+`src/lib/hiring/public-careers`, and no GTM on those routes. `source='public_careers'`
+identifies the surface, not the campaign. Do not claim per-channel results for
+external distribution until this closes (see
+`inbound-recruiting-job-ad-research.md` §Measurement).
+
 Full API Parity is already present for the current vacancy workflow:
 
 - `POST /api/hiring/demands` -> `createTalentDemand`.
@@ -391,8 +398,8 @@ contract, or initial cutover smoke.
 ### Canonical public vacancy content + JobPosting (TASK-1740/1741)
 
 The public vacancy carries a versioned structured content block and a technical-SEO
-foundation. Rollout is honest: the flag is OFF everywhere and the production release
-is deliberately held until TASK-1741 (editorial renderer) lands.
+foundation. Rollout: renderer (TASK-1741) and schema are both ON in Production since
+2026-08-18 (release `fa54670470c1`), flipped in the order the rule below requires.
 
 - **`PublicOpeningContent` v2** lives in
   `greenhouse_hiring.hiring_opening.public_content_json` (JSONB): promise, intro,
@@ -457,15 +464,19 @@ is deliberately held until TASK-1741 (editorial renderer) lands.
 - **Fixture** for the TASK-1741 renderer:
   `src/lib/hiring/public-careers/editorial-opening.fixture.ts`
   (`editorialOpeningFixture` + `legacyOpeningFixture`).
-- **Live data**: eligible countries approved by the CEO 2026-08-17 and ALREADY SET
-  via the canonical command on the 2 published vacancies (EO-OPN-0009 and
+- **Live data**: eligible countries approved by the CEO 2026-08-17 were set via
+  the canonical command on the 2 vacancies published at the time (EO-OPN-0009 and
   EO-OPN-0061): all of Latin America EXCEPT Cuba + US + ES — AR BO BR CL CO CR DO
   EC SV GT HN MX NI PA PY PE UY VE + US + ES (20 countries). The contractual route
   is declared in `content.workModel`: Chile with a local labor contract; outside
   Chile, the international route with direct payment by Efeonce (contract type
-  `international_internal`, no EOR). Both produce a valid JobPosting when the flag
-  flips — the rendered JSON-LD was validated for real in local (flag flipped ON
-  temporarily and restored to OFF), with zero missing required fields.
+  `international_internal`, no EOR). Before the flip, the rendered JSON-LD of both
+  was validated for real in local (flag flipped ON temporarily and restored), with
+  zero missing required fields. **Current state (verified 2026-09-11): 4 published
+  vacancies** — those two plus EO-OPN-0674 (SEO Specialist Senior) and EO-OPN-0675
+  (Director(a) de Arte Senior), published 2026-09-09 with the same 20 countries and
+  contractual route (`docs/documentation/hr/task-1604-seo-art-assessment-pack.md`;
+  their assessment layer is not active).
 
 Docs: ADR Delta 2026-08-17 in `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` ·
 functional `docs/documentation/hr/careers-publicas.md` §Contenido estructurado y

@@ -39,7 +39,7 @@ Before producing a final draft, record these facts in the job brief or working n
 | Working model | Employment or engagement path, country eligibility, working language, time-zone overlap, async/sync expectations and equipment/travel requirements. |
 | Total offer | Approved compensation disclosure, benefits by engagement type, learning, flexibility and credible employer-brand proof. |
 | Candidate journey | Application fields, stages, any exercise, accommodations, response commitment, owner and target timing. |
-| Measurement | Source/UTM plan, funnel baseline and the experiment hypothesis. |
+| Measurement | Source/UTM plan, funnel baseline and the experiment hypothesis. In Greenhouse, record that per-application source is not captured yet (see §Measurement). |
 
 Do not publish a global/remote role until the working-model row is complete. A job may be fully remote while still having country, entity, payroll, overlap or legal constraints.
 
@@ -131,10 +131,24 @@ Do not use “work from anywhere” if there are country restrictions, tax/visa 
 
 Publishing is the start of inbound, not its completion.
 
-- Keep one canonical Careers opening and detail/apply URL; every external channel links to it with source attribution.
+- Keep one canonical Careers opening and detail/apply URL; every external channel links to it. Source attribution is the target, but Greenhouse Careers does not capture it yet (see §Measurement).
 - Match distribution to the evidence sought: portfolio communities and design networks for creative work; relevant regional and professional communities; referrals and consented Talent Pool for warm demand.
-- Respect platform/group rules and never represent an approval queue as a live post.
+- Respect platform/group rules and never represent an approval queue, or a scheduled post, as a live post.
 - Do not turn every channel into the same announcement. Reframe the same verified role truth for the channel and link back to the canonical Careers URL. Never change eligibility, scope, compensation or selection criteria by channel.
+
+### Social posts for live vacancies (LinkedIn, validated 2026-09-11)
+
+A multi-vacancy post applies the vacancy method in miniature: first lines carry what decides the application (remote, eligible countries, transparent process); each role names the problem the person will solve and the evidence asked for, not a requirements list; trust comes from the engagement path by country, benefits with their condition, no unpaid work, a guaranteed reply and the response window; language stays inclusive (no "rockstar", no "great culture"); and the equipment amount stays out, because the benefits charter forbids it in public ads. Operator rules on top:
+
+1. **Voice**: first-person plural as Efeonce ("buscamos", "trabajamos", "te pagamos"); never third person about Efeonce.
+2. **Identity above the fold**: say what Efeonce is in the first ~210 characters, before LinkedIn's "see more" cut.
+3. **One detail link per vacancy** (`/public/careers/EO-OPN-XXXX`), not a single link to the listing.
+4. **One variant per channel** (personal profile vs company page): different wording, identical role truth. Roles, requirements, countries, benefits, process and links never change between variants.
+5. **The post never outruns the page**: do not state what the public detail page does not say without the owner's confirmation; once confirmed, align the Careers page through the canonical command so channel and page do not diverge.
+6. **Length**: LinkedIn allows 3,000 characters per post; count each variant.
+7. **Explicit human confirmation before scheduling**; afterwards, verify the scheduled state and confirm actual publication after the slot.
+
+Channel mechanics (Metricool brands, image, best time, calendar check) live in `.claude/skills/social-media-studio/efeonce/linkedin-vacancy-distribution.md`; the first run is recorded in `docs/operations/hiring/2026-09-11-linkedin-vacancy-distribution.md`.
 
 ## Full-funnel inbound operating model
 
@@ -213,7 +227,11 @@ Compensation is not a cosmetic footer. It changes the candidate's search and sel
 
 ## Measurement, diagnostics and experimentation
 
-Create a source/UTM taxonomy before distribution. Measure the following cohort funnel by source, region and role family where volume makes interpretation safe:
+Create a source/UTM taxonomy before distribution — and first check that the runtime can store it.
+
+**Greenhouse gap (verified 2026-09-11):** Careers does not persist source or UTM per application. There is no `utm_` handling in `src/app/public/careers`, `src/components/greenhouse/careers` or `src/lib/hiring/public-careers`, and no GTM on the public careers routes. Until that closes, per-channel attribution in the application funnel is not measurable: do not report applications "from LinkedIn", do not rank channels, and treat the UTM/source item of the `templates/job-offer-recipe.md` checklist as an open gap, not a satisfied control. The 2026-09-11 LinkedIn posts shipped untagged detail links for that reason.
+
+Once the runtime captures source, measure the following cohort funnel by source, region and role family where volume makes interpretation safe:
 
 ```text
 qualified visits → apply starts → completed applies → qualified screens

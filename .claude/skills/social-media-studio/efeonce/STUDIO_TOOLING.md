@@ -25,8 +25,9 @@
 - `getScheduledPosts` / `updateScheduledPost` — revisar/editar la cola.
 - `getAnalyticsAvailableMetrics` + `getAnalyticsDataByMetrics` — analítica para reportes.
 
-Flujo típico: `getBrandSettings` → (produce asset) → `getBestTimeToPostByNetwork` → propone
-calendario en `templates/content-calendar-30d.md` → **el operador aprueba** → `createScheduledPost`.
+Flujo típico: `getBrandSettings` → (produce asset) → `getBestTimeToPostByNetwork` → `getScheduledPosts`
+(colisiones en la cola) → propone calendario en `templates/content-calendar-30d.md` → **el operador aprueba** →
+`createScheduledPost` → `getScheduledPosts` (id y estado) → después de la hora, confirma la publicación.
 
 ### Verificado en vivo (as-of 2026-07-05)
 
@@ -47,9 +48,30 @@ Smoke test de lectura OK contra la cuenta real. Notas operativas:
 - **Cliente correcto = `getBrandSettings` primero, siempre** (repite la regla de
   `CLIENT_DELIVERY.md`): antes de programar en una marca de cliente, confirma el `brandId`.
 
+### Programar con imagen en LinkedIn (verificado 2026-09-11)
+
+- **Marcas con LinkedIn** (referencia; igual resuelve por `label`): `Julio Reyes` = `5105024` → perfil personal
+  (`urn:li:person:vj64TIaUfj`); `Efeonce Group` = `3961547` → página de empresa (`urn:li:organization:20503593`).
+  Ambas en `America/Santiago`. Son canales distintos con voz distinta (`EFEONCE_OVERLAY.md`).
+- **`media` exige una URL pública.** Metricool la re-aloja en `static.metricool.com/planner/...` y la adjunta como
+  **imagen nativa** del post, no como link. Aloja el asset en
+  `gs://efeonce-group-greenhouse-public-media-prod/campaigns/<campaña>/` (`gcloud storage cp --content-type=image/png`)
+  y verifica HTTP 200 y `content-type` antes de programar.
+- **`mediaAltText`**: array con el texto alternativo de cada imagen. No lo omitas.
+- **`linkedinData: {type: post, previewIncluded: false, publishImagesAsPDF: false}`**: con `previewIncluded: false`
+  los links del texto no generan tarjeta de preview y la imagen queda como la pieza visual.
+- **Fecha**: `publicationDate {dateTime: 'YYYY-MM-DDTHH:mm:ss', timezone: <IANA>}` (hora local sin offset + zona),
+  a diferencia de `getBestTimeToPostByNetwork`, que pide ISO con offset.
+- **`autoPublish: true` + `draft: false` deja el post en `PENDING`**, que significa programado, no publicado. Confirma
+  el id y el estado con `getScheduledPosts` en cada marca, y la publicación efectiva después de la hora.
+- Receta completa para vacantes: `linkedin-vacancy-distribution.md`.
+
 ## Higgsfield MCP — producción
 
 - `generate_image` / `generate_video` / `generate_audio` — núcleo de producción.
+- Si la sesión del CLI `higgsfield` está vencida, el conector MCP funciona igual (verificado 2026-09-11). En
+  `gpt_image_2` no hay `aspect_ratio` 4:5: genera `3:4` y recorta (receta de pieza social con sello de logo en
+  `greenhouse-ai-image-generator/SKILL.md`).
 - `models_explore(action:'recommend')` — cuando no sepas qué modelo calza, pídele recomendación.
 - Edición dedicada: `upscale_*`, `outpaint_image`, `reframe` (cambiar aspect ratio de video),
   `remove_background`, `motion_control`.
