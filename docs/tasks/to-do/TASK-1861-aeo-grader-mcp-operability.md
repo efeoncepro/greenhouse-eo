@@ -6,6 +6,33 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-11 (c) — completo siempre: entregable único, siguiente paso, cotización y simulación (TASK-1864)
+
+El operador pidió que Claude y Codex corran el grader desde MCP de punta a punta, completo, sin re-explicar el
+contexto. La plataforma lo resuelve en `TASK-1864` (instructions del gateway, contrato `next`, kit de cliente, eval
+end-to-end). Esta task agrega lo que es del dominio AEO:
+
+- **Entregable único:** tool nueva `get_aeo_grade_result({ runRef | batchRef })` que, en estado terminal, devuelve de una
+  vez score por mercado, 7 dimensiones, escalera, share of voice, recomendaciones, link web (larga/corta), URL del PDF,
+  `asOf`, `scoreVersion` y una lista `completeness` (qué está y qué falta, con motivo). "Completo" lo define el servidor,
+  no la memoria del agente. El inventario pasa a 19 tools.
+- **Siguiente paso estructurado:** toda respuesta del lane AEO lleva `data.next` con el contrato `McpNextStep` de
+  `TASK-1864` (readiness → preparar/cotizar; cotización → pedir confirmación; run aceptado → `get_aeo_run` en
+  `afterSeconds`; terminal → `get_aeo_grade_result`; entregado → `terminal: true`). El gateway lo renderiza genérico: no
+  se escribe prosa por tool en `efeonce-mcp`.
+- **Cotización con confirmación mecánica:** `run_aeo_grader` con `confirmed: false` devuelve la cotización (mercados,
+  modo, costo máximo, tope diario restante) y un `quoteToken` de 10 minutos atado a esos argumentos, sin gastar;
+  `confirmed: true` exige ese `quoteToken` y ejecuta. Un `quoteToken` con argumentos distintos o vencido → `409
+  aeo_quote_mismatch`.
+- **Modo simulación gobernado** (para el eval, nunca para clientes): `simulate: true` crea un run `runKind: 'eval'` con
+  el adapter falso detrás de una fábrica gobernada (hoy el registry de runtime no lo incluye,
+  `providers/registry.ts:1-30`), costo USD 0, excluido de tendencia, cockpit, HubSpot, correo, ledger de gasto y regrade;
+  su informe público sale con banner "Simulación — no es una medición" y vence en 24 h. Capability dedicada
+  `growth.ai_visibility.run.simulate` (grant `efeonce_admin`, `ai_tooling_admin`) + flag
+  `GROWTH_AI_VISIBILITY_SIMULATION_ENABLED` (Vercel y `ops-worker`).
+- **Criterio de aceptación agéntico:** el escenario `aeo-grade` del eval de `TASK-1864` pasa sus umbrales con Claude Code y
+  con Codex (disciplina de confirmación 100%, completitud ≥ (N−1)/N, entregable 100%).
+
 ## Delta 2026-09-10 (b) — las tools nacen multi-mercado (TASK-1863)
 
 El operador decidió que el grader sea multi-mercado con selección múltiple (`TASK-1863`). Cambios a esta task:

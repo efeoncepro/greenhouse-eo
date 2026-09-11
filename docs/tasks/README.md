@@ -22,8 +22,9 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1861](to-do/TASK-1861-aeo-grader-mcp-operability.md) | AEO Grader operable por MCP (EPIC-020): correr con gasto gobernado, leer resultados, informe web tokenizado y PDF, con autoridad humana delegada y manuales de uso | TASK-1852 (canal delegado, ya vivo) |
 | [TASK-1862](to-do/TASK-1862-landing-aso.md) | Landing pública ASO, tercera superficie de Visibilidad junto a SEO y AEO: expansión y citabilidad en español, publicación por fases atada a la extensión Search & App Visibility | none |
 | [TASK-1863](to-do/TASK-1863-aeo-grader-multi-market.md) | AEO Grader multi-mercado (EPIC-020): una marca con N mercados, lotes de selección múltiple, catálogo único de mercados, prompts localizados y matriz entre mercados; Sky como primer tenant | none |
+| [TASK-1864](to-do/TASK-1864-mcp-self-sufficient-agent-surface.md) | Superficie agéntica autosuficiente del MCP (EPIC-044, U20): instructions del gateway, contrato de siguiente paso, kit de cliente Claude/Codex y eval end-to-end de agentes | none |
 
-Siguiente ID libre `TASK-1864`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1865`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
 
 ## Programa Efeonce Insights: EPIC-045
 
