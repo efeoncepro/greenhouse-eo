@@ -6,6 +6,27 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-11 — la puerta pública conserva un mercado por defecto, declarado
+
+- **Formulario público sin cambios obligatorios.** Verificado contra el contrato publicado en producción
+  (`GET /api/public/growth/forms/b120566a-dd1a-43c8-956a-4e0121e805b8`, 2026-09-10): `country` es un `select`
+  con Chile, Colombia, México y Perú, y `mainCompetitor` es un único campo de texto. La puerta pública sigue
+  siendo de un mercado (el país elegido) y un competidor; esta task sólo muda el mapeo
+  (`AEO_MARKET_BY_COUNTRY`, `public-intake/aeo-form-grader-adapter.ts:46-56`) al catálogo, con resultado idéntico
+  para esas cuatro opciones. Sin versión nueva del formulario, sin WordPress, sin HubSpot.
+- **Corrección de una contradicción de esta spec.** El invariante "ningún país desconocido cae a otro" aplica a
+  providers (ubicación) y a perfiles/mercados configurados. En la puerta pública, `resolveAeoMarketLocale` cae a
+  Chile si el país llega vacío o desconocido (sólo posible manipulando el envío, porque el selector es cerrado).
+  Ese default **se conserva, pero declarado**: el run registra el origen del mercado (`marketSource`:
+  `form_selected` | `form_default` | `profile` | `operator`) en `matching_snapshot`, y la señal
+  `growth.ai_visibility.market_unresolved` cuenta los `form_default`. Criterio de aceptación adicional: un envío
+  público con país vacío produce un run CL con `marketSource = 'form_default'` visible (test).
+- **Opcional, después del Slice 6:** sumar Argentina, Brasil, Uruguay, España o Estados Unidos al selector es una
+  versión nueva del formulario por el ciclo de vida de Growth Forms (`/aeo-2/` renderiza `<greenhouse-form>`
+  desde el contrato). Antes de que existan los prompts `pt-BR`, un lead brasileño se mediría en español.
+- **Fuera de alcance:** selección de varios mercados en el formulario público (puerta gratuita, modo `light`,
+  presupuesto global diario de USD 25). La selección múltiple es para operador y clientes contratados.
+
 ## Status
 
 - Lifecycle: `to-do`
