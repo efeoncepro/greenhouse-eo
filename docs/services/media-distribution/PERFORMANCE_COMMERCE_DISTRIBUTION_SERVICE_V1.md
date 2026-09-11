@@ -34,6 +34,24 @@ Inversión publicitaria que optimiza hacia la señal de negocio correcta —vent
 clic ni el formulario—, con aprendizaje acumulado y documentado que el cliente conserva, y una recomendación explícita
 de asignación para el siguiente ciclo.
 
+## Catálogo en una vista
+
+| # | Servicio | Qué compra el cliente | Forma | Estado |
+|---|---|---|---|---|
+| 1 | **Performance Diagnostic** | revisión de inversión, cuentas, señal, creatividad y datos hacia plataformas; plan de 90 días | 2–4 semanas, precio fijo | `Proposed` |
+| 2 | **Growth Activation Sprint** | señal remediada, cuentas reestructuradas o tomadas, primera matriz creativa, línea base | 8–12 semanas, precio fijo | `Proposed` |
+| 3 | **Managed Performance** | operación mensual de los canales del motion, testing, reporting y gobierno trimestral | mensual por nivel, mínimo 3 meses | `Proposed` |
+| 4 | **Incrementality & Media Investment Architecture** | experimentos y MMM para una pregunta de asignación | por estudio | `Proposed`, sólo con madurez |
+| 5 | **Programmatic vía Real Audiences** | display, video, audio, pDOOH y push dentro del mix | canal dentro de 2 o 3; managed y luego autogestionado | pendiente de términos |
+| 6 | **ChatGPT Ads** | campañas donde OpenAI lo habilita (MX, BR, EE.UU., España…) | canal selectivo dentro de 3 | `Proposed` |
+| 7 | **Preparación para anuncios en IA** | intents, landings y medición listos para cuando ChatGPT Ads llegue a Chile | dentro de 1 o con Search Visibility 360 | `Proposed` |
+| 8 | **Staff Augmentation** | perfil de performance dirigido por el cliente | tarifa de rol del catálogo | vigente en catálogo |
+| 9 | **Advisory** | criterio y recomendación; el cliente opera | fase o retainer | `Proposed` |
+
+Cada servicio 1–4 tiene dos variantes —**Demand & Commerce** y **B2B Pipeline**— y se entrega como Managed Squad o
+co-operated. Los canales (Google, Meta, TikTok, LinkedIn, retail media, programmatic, ChatGPT Ads, X bajo pedido) son
+cobertura dentro de estos servicios, nunca productos sueltos.
+
 ---
 
 # Las dos motions
