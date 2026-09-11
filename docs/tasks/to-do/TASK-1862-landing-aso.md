@@ -54,10 +54,10 @@ La página también tiene que resolver un problema de búsqueda que ninguna land
 (`as-of 2026-09`): `app store optimization` ~20/mes en CL, MX, CO y PE; `agencia aso` 10; `posicionamiento de
 apps` 0. `aso` suma 480–3.600/mes, pero su SERP lo ocupan el examen médico *antiestreptolisina O*, la empresa de
 buses ADO y música. Optimizar esta página por tráfico sería medirla contra algo que no existe; el PDR-023 le
-asigna otros trabajos. La segunda fuente prevista —el snapshot de DataForSEO Labs que Greenhouse expone por MCP
-(`get_seo_keyword_market_data`)— no tiene estos términos: con las organizaciones Efeonce (Chile) y Grupo Berel
-(México) responde `found=false` para los ocho, porque nunca se capturaron. Es desconocido, no cero: la demanda
-tiene una sola fuente.
+asigna otros trabajos. En Chile lo confirma una segunda fuente: una corrida de discovery de DataForSEO Labs (2026-09-11, USD 0,25)
+devuelve `aso` con 390/mes repartido entre una marca de tobilleras, un fungicida y el examen médico, y 10/mes o
+menos para cada término de la disciplina. México, Colombia y Perú siguen con una sola fuente: Efeonce no tiene
+target SEO en esos mercados.
 
 **Prioridad estimada P1** por la oportunidad de Berel y porque la fase B —URL `noindex` que se envía 1:1— sirve a
 esa conversación. Ajustar si el owner prefiere esperar la aprobación de la extensión.
@@ -192,8 +192,8 @@ Reglas obligatorias:
 
 - No existe página, formulario, CTA ni entrada de menú para ASO; SEO y AEO no mencionan apps.
 - La extensión está en `Proposed`: sólo la fase A está autorizada.
-- Demanda con una sola fuente (Semrush): el snapshot de DataForSEO Labs no tiene estos términos y capturarlos
-  exige una corrida con gasto gobernado.
+- Demanda triangulada sólo en Chile (Semrush + DataForSEO Labs); México, Colombia y Perú tienen una sola
+  fuente porque Efeonce no tiene target SEO en esos mercados.
 - Sin confirmar: disponibilidad de Ask Play, Personalized Collections y App Store tags en CL/MX/CO/PE; guías de
   marca de Apple y Google; kind del form en el motor; binding y duración de la surface `discovery`; targeting de
   GVC al host público.
@@ -351,7 +351,8 @@ Reglas obligatorias:
 
 ### Slice 1 — Validación de demanda, slug, disponibilidad y marcas
 
-- Triangular demanda y SERP con una segunda fuente (una captura gobernada de DataForSEO Labs para estos términos, o Search Console) y registrar el readback
+- Chile ya está triangulado (brief §1b). Para México, Colombia y Perú, conseguir la segunda fuente —un target SEO
+  de Efeonce por mercado para correr discovery, o Search Console— y registrar el readback
   en el brief.
 - Confirmar o reemplazar `/servicios/aso/`, el title y la meta; fijar canonical sólo después.
 - Verificar en un dispositivo de cada país (CL, MX, CO, PE) si Ask Play, las recomendaciones de Gemini, las
@@ -581,7 +582,8 @@ CTA. La reunión queda en fallback a `/contacto/` mientras la surface no esté e
 
 - Owner de la extensión: estado del modelo de negocio para las fases B y C, y decisiones D1 y D2.
 - Revisión legal de claims y de uso de marcas de Apple y Google.
-- Aprobación del gasto de una captura de DataForSEO Labs, o acceso a Search Console, para la segunda fuente.
+- Decisión de crear targets SEO de Efeonce en México, Colombia y Perú (o acceso a Search Console) para la
+  segunda fuente de esos mercados.
 - Dispositivos o personas en CL, MX, CO y PE para verificar la disponibilidad de las funciones de IA de las tiendas.
 - Acceso al checkout y al rail de despliegue gobernado de `efeonce-public-site-runtime`.
 - Commercial: quién recibe los diagnósticos y reuniones, y el owner de la cuenta Berel para la fase B.

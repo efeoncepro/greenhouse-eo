@@ -4,8 +4,9 @@
 > **Owner task:** `TASK-1862` · **PDR:** [PDR-023](decisions/PDR-023-landing-aso-posicionamiento.md)
 > **Mercados:** Chile (`cl`), México (`mx`), Colombia (`co`) y Perú (`pe`)
 > **Fecha:** 2026-09-10 · **Datos as-of:** 2026-09 (Semrush, base de agosto 2026)
-> **Confianza general:** media-baja — una sola fuente de volumen. El snapshot de DataForSEO Labs en
-> Greenhouse (`get_seo_keyword_market_data`) no tiene estos términos: `found=false`, nunca capturados; desconocido, no cero. El Slice 1 de la task triangula antes de fijar canonical.
+> **Confianza general:** media en Chile — dos fuentes coinciden (Semrush y una corrida de discovery de DataForSEO
+> Labs del 2026-09-11, §1b); media-baja en México, Colombia y Perú — sólo Semrush, porque Efeonce no tiene target
+> SEO en esos mercados.
 
 ## 1. Diagnóstico
 
@@ -44,6 +45,30 @@ Brasil 320, España 260. Es la señal para una futura spoke `en-US`, no para est
 **Lectura:** la intención "App Store Optimization" es minoritaria y la sirven blogs de vendors. Competir por
 `aso` a secas atraería tráfico médico y musical. La página se desambigua para quien sí busca la disciplina y para
 los asistentes que la citan.
+
+### Segunda fuente: DataForSEO Labs en Chile (2026-09-11)
+
+Corrida de keyword discovery `seokdr-610b24e6-3f9f-4d33-bdbd-c23490cb9499` por el pipeline gobernado de Greenhouse
+(`queueKeywordDiscovery` + `runKeywordDiscovery`), atribuida a la organización Efeonce, target
+`seot-efeonce-own-brand` (Chile, `2152/es`): diez semillas de ASO, `keyword_suggestions` y `related_keywords` con 30
+resultados por llamada. 20 llamadas, **USD 0,2466** (estimado 0,36), 48 keywords distintas.
+
+| Término | Volumen CL (DataForSEO) | Semrush CL | Lectura |
+|---|---:|---:|---|
+| `aso` | 390 | 480 | Coinciden en orden de magnitud; la intención ajena domina |
+| `tobilleras aso` · `tobillera aso` | 390 · 390 | — | Marca de tobilleras ortopédicas: otra intención que compite por `aso` |
+| `aso examen` · `aso en medicina` · `antiestreptolisina o aso` | 110 · 30 · 20 | — | Examen de laboratorio |
+| `serenade aso` | 110 | — | Fungicida agrícola |
+| `app store optimization` | 10 (CPC USD 3,03) | 20 | La disciplina: volumen marginal, pero con puja |
+| `aso app` · `aso app store` | 10 · 10 | 20 · — | Marginal |
+| `que es aso` · `que es aso marketing` | 10 · 10 | 20 · — | Casi todo lo definicional es médico |
+| `posicionamiento en google play` | 10 | 0 | Marginal |
+| `posicionamiento de apps` · `posicionamiento en app store` · `optimizacion de apps` · `descargas de apps` | sin datos | 0 | El proveedor no devolvió candidatos: desconocido, no cero |
+
+**Lectura:** las dos fuentes coinciden. En Chile la disciplina tiene 10–20 búsquedas por término, y `aso` suma al
+examen médico dos intenciones más que Semrush no mostraba (una marca de tobilleras y un fungicida). El CPC de USD
+3,03 en `app store optimization` indica que alguien paga por esa búsqueda: poca demanda, pero comercial. México,
+Colombia y Perú no se pueden triangular por esta vía hasta que Efeonce tenga un target SEO en esos mercados.
 
 ### Consecuencia estratégica
 

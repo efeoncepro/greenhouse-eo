@@ -29,8 +29,9 @@ Cuatro hechos condicionan esta página y no son opinables:
 2. **`aso` tiene volumen, pero no es nuestra intención.** `aso` suma 480 (CL), 3.600 (MX), 1.600 (CO) y 720 (PE)
    búsquedas/mes, y su SERP lo ocupan el examen de laboratorio *antiestreptolisina O*, la empresa de buses ADO,
    música y una acción bursátil. La disciplina ASO aparece en minoría (Telefónica, Rocketlab, Pickaso). `que es
-   aso` (MX 90) devuelve un SERP casi totalmente médico. Una sola fuente: el snapshot de DataForSEO Labs
-   en Greenhouse no tiene estos términos (`found=false`, nunca capturados) al 2026-09-10.
+   aso` (MX 90) devuelve un SERP casi totalmente médico. En Chile lo confirma una segunda fuente: una corrida de discovery de DataForSEO Labs (2026-09-11)
+   da `aso` con 390/mes, repartido entre una marca de tobilleras, un fungicida y el examen médico, y 10/mes o menos
+   para cada término de la disciplina.
 3. **La oferta está en `Proposed`.** El modelo de negocio no autoriza claims públicos, pricing ni capacidad
    vigente. La página se puede diseñar y construir, pero no publicar como si la oferta estuviera aprobada.
 4. **Ya existen las dos hermanas.** `/servicios/posicionamiento-seo/` (página `251078`, cimiento Google) y
@@ -171,7 +172,8 @@ L0 App Visibility Diagnostic → L1/L2 → L3 operación → expansión
 
 ## Validaciones pendientes
 
-1. Segunda fuente de demanda y SERP (captura gobernada de DataForSEO Labs o Search Console); confirmar `/servicios/aso/`.
+1. Segunda fuente para México, Colombia y Perú (Chile quedó triangulado el 2026-09-11) y confirmación de
+   `/servicios/aso/`.
 2. Disponibilidad real de Ask Play, Personalized Collections y App Store tags en CL/MX/CO/PE, en un dispositivo
    del país.
 3. Guías de marca de Apple y Google para nombrar las tiendas sin badges ni logos.
