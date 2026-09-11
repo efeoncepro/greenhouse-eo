@@ -2,7 +2,7 @@
 
 > **Tipo:** Product Decision Record de posicionamiento y conversión del sitio público.
 > **Estado:** Draft for validation · 2026-09-10
-> **Ejecución propuesta:** TASK por crear (ui-ux) una vez aprobado este PDR
+> **Ejecución:** [TASK-1865](../../tasks/to-do/TASK-1865-landing-performance-marketing.md) (ui-ux · flow · UI ready no)
 > **Enmienda a:** [PDR-008](PDR-008-landing-agencia-marketing-digital-posicionamiento.md), sólo en su conclusión
 > "performance es capability listada, no cabecera"
 > **Oferta:** [Performance & Commerce Distribution — ficha](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md)
@@ -10,6 +10,19 @@
 > **Skills de ejecución:** `efeonce-public-site-wordpress`, `seo-aeo`, `copywriting`, `growth-marketing-cro`,
 > `greenhouse-growth-forms`, `greenhouse-growth-ctas`, `greenhouse-growth-meetings`, `digital-marketing`,
 > `greenhouse-ai-design-studio`.
+
+## Delta 2026-09-11 — existe una página legacy de Performance
+
+Al crear la task apareció una página que este PDR no consideraba: `242862`, `/servicio-gestion-campanas-publicitarias/`,
+publicada desde 2023, indexable y en el menú como `Performance Marketing`. En producción muestra contadores en cero y
+afirma "Somos Google Partners y Meta Business Partners", estados que el Partnership Registry no tiene verificados; no
+rankea ninguna keyword del cluster.
+
+Decisión: la landing nace en `/servicios/performance-marketing/` y la legacy pasa a 301 en la misma ventana de promoción,
+con el ítem de menú reapuntado y la legacy en `private`. El Slice 1 de `TASK-1865` puede revertir esa elección si los
+backlinks de la legacy lo justifican; en ambos casos queda una sola URL indexable. Antes de cualquier diseño, el Slice 0
+contiene los contadores y el claim de partners. Brief SEO/AEO:
+[PERFORMANCE_LANDING_SEO_AEO_BRIEF_V1](../PERFORMANCE_LANDING_SEO_AEO_BRIEF_V1.md).
 
 ## Contexto
 

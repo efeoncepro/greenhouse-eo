@@ -624,6 +624,15 @@ CTA, que el motor ya soporta.
   nombrada —tienda el local, góndola el mueble, sala la jerga del trade, punto de venta la unidad— y no por término
   único.
 
+## Delta 2026-09-11
+
+- La página de Performance que esta task enlaza desde su conexión digital (`/servicio-gestion-campanas-publicitarias/`,
+  página `242862`) será reemplazada por `/servicios/performance-marketing/` con un 301, en el Slice 6 de
+  [TASK-1865](TASK-1865-landing-performance-marketing.md). El 301 mantiene el enlace funcionando, pero al construir el
+  enlace `digital.items.retailMedia.link` conviene apuntar a la URL nueva (anchor `#canales`) si `TASK-1865` ya promovió,
+  para no depender de la redirección. Si ambas tasks construyen su módulo base a la vez, coordinar en Discovery para no
+  duplicarlo.
+
 ## Open Questions
 
 - ¿El owner aprueba la dirección A o prefiere producir un export en Claude Design y pasar a `source-led`?

@@ -38,6 +38,11 @@ primero en modo managed por briefing y después autogestionado con trader certif
 selectivos. Sin acuerdo firmado: fees, cláusula de transparencia, brand safety, CTV y ABM por confirmar. MiQ y TenX
 quedan como alternativas.
 
+Landing (2026-09-11): `TASK-1865` en `/servicios/performance-marketing/` con dirección "La señal" —firma interactiva
+`Clics / Ventas` que reordena las campañas sin cifras ni logos—, trece módulos semánticos, form `efeonce-performance-brief`
+con rango de inversión alineado a los niveles del pricing pack, y 301 desde la página legacy `242862`. La legacy muestra
+hoy contadores en cero y un claim de partners no verificado; el Slice 0 los contiene antes de cualquier diseño.
+
 ## 2026-09-10 — Channel & Commerce: se abre la línea de trade marketing y BTL
 
 Efeonce no tenía oferta de trade marketing ni BTL; el dominio existía disperso (retail media en Media &

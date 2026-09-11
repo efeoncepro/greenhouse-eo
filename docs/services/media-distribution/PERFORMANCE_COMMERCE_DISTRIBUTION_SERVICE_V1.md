@@ -8,6 +8,8 @@
 > **Decisión:** [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md)
 > **Pricing:** [`Pricing Integrity Pack V1`](../../business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md)
 > **Catálogo de la línea:** [`Media & Distribution`](README.md)
+> **Superficie pública:** [TASK-1865](../../tasks/to-do/TASK-1865-landing-performance-marketing.md), en diseño; reemplaza
+> a la página legacy `/servicio-gestion-campanas-publicitarias/`
 
 ## Qué es
 
