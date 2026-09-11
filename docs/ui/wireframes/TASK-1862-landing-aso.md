@@ -177,7 +177,9 @@ El anchor del formulario es `#diagnostico`, el mismo de AEO, para que las tres h
 
 - **Desktop:** intro sticky a la izquierda sobre 900 px; acordeón nativo a la derecha. A 900 px o menos, una
   columna, intro estática y 28 px de separación.
-- **Contenido:** `faq.title`, `faq.intro`, `faq.items[1..8].question`, `faq.items[1..8].answer`.
+- **Contenido:** `faq.title`, `faq.intro`, `faq.items[1..9].question`, `faq.items[1..9].answer`.
+- **Orden visible:** 1, 2, 9, 3, 4, 5, 6, 7, 8. La pregunta sobre app marketing va junto a las de definición; su ID
+  es `faq.9` para no renumerar las demás.
 - **Regla:** `<details>`/`<summary>`; cada respuesta en HTML para el `FAQPage`. Las respuestas 1 y 2 reutilizan las
   cápsulas de R2.
 
@@ -380,6 +382,8 @@ mercados). Los nombres públicos de las líneas son canon de este ledger.
 | `aso.landing.faq.7.a` | No. El ASO de juegos depende de otras palancas y te conviene un especialista. |
 | `aso.landing.faq.8.q` | ¿Cómo se cobra? |
 | `aso.landing.faq.8.a` | Por alcance: cuántas apps, plataformas y países, más la capacidad mensual de trabajo. Nunca por keyword, por captura ni por reseña respondida. |
+| `aso.landing.faq.9.q` | ¿El ASO es lo mismo que app marketing? |
+| `aso.landing.faq.9.a` | No. El app marketing incluye todo lo que hace crecer una app: anuncios, campañas, correos y notificaciones. El ASO es la parte que ocurre en la tienda y en las búsquedas: que tu app aparezca y que su ficha convenza. Si también necesitas anuncios, los sumamos con el equipo de medios de Efeonce. |
 | `aso.landing.conversion.title` | Cuéntanos de tu app |
 | `aso.landing.conversion.body` | Con el enlace de tu ficha y lo esencial, te decimos por dónde conviene empezar y qué necesitamos revisar. |
 | `aso.landing.form.overline` | Diagnóstico de tu app |

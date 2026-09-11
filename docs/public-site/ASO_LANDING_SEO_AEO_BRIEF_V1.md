@@ -70,6 +70,44 @@ examen médico dos intenciones más que Semrush no mostraba (una marca de tobill
 3,03 en `app store optimization` indica que alguien paga por esa búsqueda: poca demanda, pero comercial. México,
 Colombia y Perú no se pueden triangular por esta vía hasta que Efeonce tenga un target SEO en esos mercados.
 
+### Cómo se llama: el nombre funciona, la demanda no está (Semrush, 2026-09-11)
+
+La pregunta obvia —"¿y si en español no se le llama ASO?"— se midió. **ASO es el nombre de la categoría también en
+español**; lo que falta en Latinoamérica es búsqueda, bajo cualquier nombre.
+
+| Término | España | México | Chile |
+|---|---:|---:|---:|
+| `aso` | 2.900 (CPC USD 4,23) | 3.600* | 480* |
+| `agencia aso` | **320** | 10 | — |
+| `posicionamiento aso` | 260 | — | — |
+| `app store optimization` | 260 | 20 | 20 |
+| `aso app` | 110 | 20 | 20 |
+| `posicionamiento de apps` | 70 | 0 | 0 |
+
+\* En México y Chile, mayoritariamente otras intenciones (examen médico, tobilleras, fungicida).
+
+Alternativas por el lado del problema, en Latinoamérica:
+
+| Cómo lo diría alguien | México | Chile |
+|---|---:|---:|
+| `promocionar app` | 30 | 30 |
+| `como promocionar una app` | 20 | 20 |
+| `publicidad para apps` | 20 | 10 |
+| `user acquisition` | 30 | 30 |
+| `aso app store` · `aso google play` | 20 · 20 | — · 0 |
+| `marketing de aplicaciones moviles` | 0 | — |
+| `app marketing` · `mobile marketing` | 140 · 140 | 20 · 20 |
+
+**Lectura:**
+
+- En España hay 320 búsquedas al mes de "agencia ASO": cuando el mercado madura, el comprador busca con ese nombre.
+  Es la señal de hacia dónde puede ir la búsqueda en Latinoamérica, no un mercado de esta página.
+- En Latinoamérica ninguna variante tiene volumen propio. Quien compra —el equipo de growth móvil— conoce el término
+  y llega por red, por sus herramientas o porque ya es cliente, no por Google.
+- `app marketing` y `mobile marketing` (140/mes en México) son categorías más amplias —incluyen anuncios pagados y
+  marketing por SMS o notificaciones—, no sinónimos de ASO. Se atienden con una pregunta de la FAQ que diga la
+  diferencia, sin cambiar el foco de la página.
+
 ### Consecuencia estratégica
 
 1. **Desambiguar en title, H1, meta y primer párrafo** con `apps`, `App Store` y `Google Play`.
@@ -78,6 +116,9 @@ Colombia y Perú no se pueden triangular por esta vía hasta que Efeonce tenga u
 3. **Ser el nodo del trío de Visibilidad**: enlaces por función a SEO y AEO, y desde ellos en fase C.
 4. **Medir por presencia en asistentes y por conversión**, no por sesiones orgánicas.
 5. **Guardar el inglés para después**: la demanda real de la categoría está en `en-US`.
+6. **Mantener el nombre**: "ASO" en H1, title y menú, con "posicionamiento de apps" como descriptor. Es el término de la
+   categoría en español (España lo confirma); cambiarlo por una variante descriptiva no suma demanda, porque ninguna
+   la tiene en Latinoamérica.
 
 ## 2. Keyword e intent
 
@@ -88,6 +129,7 @@ Colombia y Perú no se pueden triangular por esta vía hasta que Efeonce tenga u
 | Primario de categoría | `aso` + desambiguación (`apps`, `App Store`, `Google Play`) | Title, H1, meta, primer párrafo, URL |
 | Definicional | `que es aso`, `app store optimization`, `aso app` | Cápsula de definición (R2) y FAQ 1 |
 | Relación | `aso seo`, `aso marketing` | Cápsula "en qué se parece al SEO" (R2), R4 y FAQ 2 |
+| Categoría amplia | `app marketing`, `mobile marketing` (MX 140) | FAQ 9, que dice la diferencia |
 | Vocabulario del operador | ficha, metadata, capturas, fichas personalizadas, experimentos, reseñas, App Store Connect, Play Console, Apple Ads | R6, R7 y FAQ |
 | Excluido | `app store`, `google play console`, `app store connect` como targets; `aso` en su sentido médico o musical | No se persiguen |
 
@@ -114,6 +156,7 @@ Cada pregunta real se responde con una cápsula visible y autocontenida bajo un 
 | ¿ChatGPT recomienda apps? | FAQ 5 | Sí; no existe forma de medir instalaciones que vengan de ahí |
 | ¿El ASO sirve si ya invierto en Apple Ads? | FAQ 4 | Sí; las fichas alternativas se usan en campañas; los anuncios se gestionan aparte |
 | ¿Se puede garantizar el primer lugar? | FAQ 6 + R8 | No |
+| ¿El ASO es lo mismo que app marketing? | FAQ 9 | No: app marketing incluye anuncios y campañas; el ASO es lo que pasa en la tienda y en las búsquedas |
 
 Las cápsulas son contenido visible y no una promesa de rich result.
 

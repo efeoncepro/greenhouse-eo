@@ -251,7 +251,7 @@ Reglas obligatorias:
 - Degraded / partial: renderer no monta → reunión en el mismo bloque y `/contacto/`; surface de Meetings sin
   binding → CTA a `/contacto/`.
 - Permission denied: correo no corporativo o verificación de abuso fallida, con alternativa de reunión.
-- Long content: cinco líneas, tabla de cinco filas y ocho preguntas en HTML inicial; retículas que colapsan.
+- Long content: cinco líneas, tabla de cinco filas y nueve preguntas en HTML inicial; retículas que colapsan.
 - Mobile / compact: una columna; tabla en modo card; tira de marcos contenida; FAQ y conversión estáticos.
 - Keyboard / focus: puntos, FAQ, CTAs y campos operables; foco doble visible; CTA fijo oculto `inert`.
 - Reduced motion: contenido y estados completos sin reveals, trazos ni scroll suave.
@@ -449,7 +449,7 @@ el [wireframe](../../ui/wireframes/TASK-1862-landing-aso.md). Resumen:
 | R7 | Medición: App Store Connect vs Play Console + tres advertencias | `greenhouse_aso_measurement` + `greenhouse_comparison_table` (reuse) |
 | R8 | Lo que no se promete + para quién no es | `greenhouse_aso_boundaries` |
 | R9 | Qué recibes + marcas que confían en Efeonce | `greenhouse_aso_proof` + `greenhouse_social_trust` |
-| R10 | FAQ (8) | `greenhouse_aso_faq` |
+| R10 | FAQ (9) | `greenhouse_aso_faq` |
 | R11 | Conversión: brief + reunión + divulgación + CTA fijo móvil | `greenhouse_aso_conversion` |
 
 ### Contrato del formulario
