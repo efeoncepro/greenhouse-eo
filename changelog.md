@@ -40,8 +40,8 @@ quedan como alternativas.
 
 Landing (2026-09-11): `TASK-1865` en `/servicios/performance-marketing/` con dirección "La señal" —firma interactiva
 `Clics / Ventas` que reordena las campañas sin cifras ni logos—, trece módulos semánticos, form `efeonce-performance-brief`
-con rango de inversión alineado a los niveles del pricing pack, y 301 desde la página legacy `242862`. La legacy muestra
-hoy contadores en cero y un claim de partners no verificado; el Slice 0 los contiene antes de cualquier diseño.
+con rango de inversión alineado a los niveles del pricing pack, y 301 desde la página legacy `242862`, que no se parcha:
+la página se construye desde cero.
 
 ## 2026-09-10 — Channel & Commerce: se abre la línea de trade marketing y BTL
 

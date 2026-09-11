@@ -57,12 +57,12 @@ Además, tres cambios de 2026 —la atribución de Meta, el retiro de las campa�
 vigencia de la Ley 21.719— dan una razón concreta para que un anunciante revise su pauta este semestre. Sin una página
 nueva, esa ventana no tiene destino.
 
-**Prioridad estimada P1** por el riesgo de los claims en vivo y la ventana del segundo semestre. Ajustar si el owner decide
-otra secuencia.
+**Prioridad estimada P1** porque la página actual contradice la oferta y por la ventana del segundo semestre. Ajustar si
+el owner decide otra secuencia.
 
 ## Goal
 
-- Contener en la legacy, antes de cualquier diseño, los contadores en cero y el claim de partners no verificado.
+- Construir la página desde cero, sin reutilizar contenido, estructura ni assets de la legacy.
 - Publicar una landing indexable que responda la intención definicional y la convierta en intención comercial.
 - Hacer visible el mecanismo con una firma interactiva honesta, sin cifras, logos ni badges no verificados.
 - Presentar las dos formas de trabajar, los cinco frentes, ocho canales con su estado y la escalera de entrada.
@@ -136,11 +136,12 @@ Reglas obligatorias:
 - Runtime `efeonce-public-site-runtime` con el plugin `eo-elementor-widgets` y los primitives
   `greenhouse_comparison_table`, `greenhouse_social_trust` y `greenhouse_growth_form`.
 - Yoast SEO Premium como dueño de los redirects del sitio.
-- Aprobación del owner de Media & Distribution sobre contención, dirección visual, copy y promoción.
+- Aprobación del owner de Media & Distribution sobre dirección visual, copy y promoción.
 
 ### Blocks / Impacts
 
-- Página legacy `242862`: contención en el Slice 0 y 301 en el Slice 6.
+- Página legacy `242862`: se reemplaza por la construcción nueva y sale con 301 en el Slice 6; no se parcha mientras
+  tanto (decisión del owner, 2026-09-11).
 - Menú primario: el ítem `Performance Marketing` pasa a apuntar a la página nueva.
 - `TASK-1860`: su enlace de conexión digital a Performance cambia de URL (Delta registrado).
 - `EPIC-019`: nueva hija en la tabla de child tasks.
@@ -191,7 +192,8 @@ Reglas obligatorias:
 ### Gap
 
 - No existe la página nueva, el formulario, el CTA ni la surface de la línea.
-- La legacy muestra contadores en cero y un claim de partners no verificado **en producción**.
+- La legacy muestra contadores en cero y un claim de partners no verificado **en producción**. Por decisión del owner no
+  se corrige: se reemplaza al promover la página nueva.
 - Dirección visual sin aprobar; copy sin validación de voz de cliente; casos sin autorización.
 - Demanda con una sola fuente (Semrush); backlinks y tráfico de la legacy sin medir.
 - Sin confirmar: ID del ítem de menú y su grupo; selección múltiple, campos condicionales e iconos por opción en el
@@ -326,7 +328,7 @@ Reglas obligatorias:
 - Required `data-capture` markers: los dieciséis del wireframe.
 - Scroll-width check: en los cuatro viewports y durante las animaciones.
 - Accessibility/focus checks: teclado en la firma, FAQ, CTAs y campos; foco devuelto; dock `inert`; región live.
-- Before/after evidence: before = legacy `242862` capturada antes del Slice 0 y después de la contención; after con
+- Before/after evidence: before = legacy `242862` capturada antes de la promoción; after con
   baseline aprobado.
 - Known visual debt: ninguno declarado al crear la task.
 - Visual scorecard: `docs/ui/reviews/TASK-1865-landing-performance-marketing.scorecard.json`
@@ -346,16 +348,6 @@ Reglas obligatorias:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
-
-### Slice 0 — Contención de la página legacy
-
-- Snapshot de `_elementor_data`, `_elementor_page_settings` y metas de la página `242862` como
-  `_gh_backup_before_task1865_containment_<timestamp>`.
-- Con aprobación del owner, retirar la sección de contadores ("Liderando el Performance Marketing") y reemplazar el claim
-  "Somos Google Partners y Meta Business Partners" y sus logos por un texto sin claim de partnership, o retirarlo, hasta que
-  el Partnership Registry verifique cada estado.
-- Purgar la cache de Kinsta y capturar la legacy antes y después.
-- Entregable: legacy sin contadores en cero ni claims no verificados, con snapshot y evidencia.
 
 ### Slice 1 — Validación de demanda, URL y dependencias
 
@@ -419,6 +411,7 @@ Reglas obligatorias:
 
 ## Out of Scope
 
+- Parchar, rediseñar o reutilizar la página legacy: la landing se construye desde cero (decisión del owner, 2026-09-11).
 - Precios, bandas o calculadoras.
 - Guía editorial de performance marketing en Think.
 - Spoke propia de "agencia de marketing b2b" o spokes por canal.
@@ -534,7 +527,6 @@ CRM ni contexto. El control de la firma no emite eventos en V1.
 
 ### Slice ordering hard rule
 
-- Slice 0 va primero y no depende del diseño: corrige claims en vivo.
 - Slice 1 → Slice 2 → Slice 3. El copy y la dirección dependen de la demanda y la URL validadas.
 - Slice 4 puede correr en paralelo con Slice 3 una vez cerrado el Slice 2, porque el copy del form sale del ledger.
 - Slice 5 exige Slices 3 y 4 cerrados: no se construye sin `UI ready: yes` ni sin form y CTA publicados.
@@ -545,7 +537,7 @@ CRM ni contexto. El control de la firma no emite eventos en V1.
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| La legacy sigue mostrando claims no verificados mientras se diseña | Contenido / legal | high | Slice 0 antes de cualquier diseño | Captura de la legacy tras el Slice 0 |
+| La legacy sigue mostrando contadores en cero y claims no verificados hasta la promoción | Contenido / legal | high | Riesgo aceptado por el owner (2026-09-11); desaparece con el 301 del Slice 6 | Sin signal automática; fecha de promoción |
 | Un claim de resultado o de partner se cuela en el copy | Contenido / legal | medium | Revisión legal en Slice 2 y aserciones del gate de fidelidad | Revisión del owner; gate de fidelidad |
 | Un hecho de 2026 queda desactualizado | Contenido | medium | Fecha visible y revisión trimestral; retiro del bloque | Revisión trimestral registrada en el manual |
 | La disponibilidad de ChatGPT Ads cambia | Contenido | high | Fecha visible en canales y FAQ; revisión mensual contra el centro de ayuda de OpenAI | Revisión mensual registrada en el manual |
@@ -566,9 +558,8 @@ CRM ni contexto. El control de la firma no emite eventos en V1.
 
 Sin flag de entorno: el cambio es aditivo y page-scoped. El cutover es por estado de la página en WordPress:
 
-1. Legacy contenida (Slice 0).
-2. Candidata `noindex`, fuera del menú y del hub (Slice 5).
-3. Promoción en una sola ventana: `index, follow`, canonical, sitemap, 301 de la legacy, menú reapuntado, enlaces internos
+1. Candidata `noindex`, fuera del menú y del hub (Slice 5).
+2. Promoción en una sola ventana: `index, follow`, canonical, sitemap, 301 de la legacy, menú reapuntado, enlaces internos
    actualizados y legacy `private` (Slice 6).
 
 El form y el CTA se publican como versiones nuevas del motor; su retiro es por deprecación de versión y pausa del CTA, que
@@ -578,7 +569,6 @@ el motor ya soporta.
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| Slice 0 | Restaurar el snapshot `_gh_backup_before_task1865_containment_*` | <10 min | sí (no se debería restaurar un claim no verificado) |
 | Slice 1 | Revertir los cambios documentales | minutos | sí |
 | Slice 2 | Revertir el copy ledger | minutos | sí |
 | Slice 3 | Volver a `UI ready: no` y a la dirección anterior | minutos | sí |
@@ -588,18 +578,17 @@ el motor ya soporta.
 
 ### Production verification sequence
 
-1. Legacy contenida y capturada; purga de Kinsta.
-2. Candidata `noindex` desplegada; purga; gate de fidelidad en los cuatro viewports y reduced motion.
-3. Gate SEO sobre la candidata, con el título y la meta validados.
-4. Readback del form y del CTA: form montado, scheduler abierto, sin crear lead ni reserva.
-5. GVC premium, dossier y scorecard; aprobación del owner.
-6. Ventana de promoción: índice, 301, menú, enlaces, legacy `private`; purga de cache.
-7. Gates de fidelidad, SEO y redirect después de la migración.
-8. Monitorear durante 14 días: `gh_form_*`, rechazo del form, consultas y URLs en Search Console y LCP de campo.
+1. Candidata `noindex` desplegada; purga; gate de fidelidad en los cuatro viewports y reduced motion.
+2. Gate SEO sobre la candidata, con el título y la meta validados.
+3. Readback del form y del CTA: form montado, scheduler abierto, sin crear lead ni reserva.
+4. GVC premium, dossier y scorecard; aprobación del owner.
+5. Ventana de promoción: captura final de la legacy, índice, 301, menú, enlaces, legacy `private`; purga de cache.
+6. Gates de fidelidad, SEO y redirect después de la migración.
+7. Monitorear durante 14 días: `gh_form_*`, rechazo del form, consultas y URLs en Search Console y LCP de campo.
 
 ### Out-of-band coordination required
 
-- Aprobación del owner de Media & Distribution sobre la contención, la dirección visual, el copy y la promoción.
+- Aprobación del owner de Media & Distribution sobre la dirección visual, el copy y la promoción.
 - Revisión legal de la tabla de posición, los hechos de 2026 y las cápsulas de ChatGPT Ads y de la Ley 21.719.
 - Autorización escrita de cualquier caso o testimonio.
 - Acceso a Search Console o Keyword Planner para la segunda fuente.
@@ -619,7 +608,7 @@ el motor ya soporta.
 - [ ] `UI ready` permanece `no` hasta que el wireframe y el `## UI/UX Contract` tengan implementation mapping, GVC scenario
       plan y design decision log; si está en `yes`, pasa `pnpm task:lint --task TASK-1865`.
 - [ ] El wireframe, el flow, el motion y la dirección visual declarados existen.
-- [ ] La legacy `242862` no muestra contadores en cero ni claims de partnership no verificados (Slice 0).
+- [ ] La página nueva no reutiliza contenido, estructura ni assets de la legacy.
 - [ ] La demanda está triangulada con una segunda fuente y la decisión de URL quedó cerrada antes del canonical.
 - [ ] El H1 contiene `performance marketing`, el title contiene `agencia de performance marketing` y existe un solo H1.
 - [ ] Las dos cápsulas de R2 tienen entre 40 y 60 palabras y están bajo un H2 con la pregunta literal.
@@ -687,11 +676,18 @@ el motor ya soporta.
 - Registro periódico de prompts AEO y exactitud de la descripción de Efeonce en motores de respuesta.
 - Graduar un módulo base compartido de landings de servicio si `TASK-1860` y esta task terminan con bases equivalentes.
 
+## Delta 2026-09-11
+
+- **Decisión del owner:** la landing se construye desde cero y la página legacy `242862` no se parcha. Se retiró el
+  Slice 0 de contención; los contadores en cero y el claim de partners no verificado de la legacy quedan como riesgo
+  aceptado hasta el 301 del Slice 6.
+- Investigación Semrush de términos por país (Chile, Perú, México, Colombia y Estados Unidos) en curso; su resultado
+  alimenta el brief SEO/AEO y el copy ledger antes del Slice 1.
+
 ## Open Questions
 
 - ¿El owner aprueba la dirección A o prefiere producir un export en Claude Design y pasar a `source-led`?
 - ¿Aprueba el H1 recomendado, "Performance marketing que aprende de tus ventas, no de tus clics."?
-- ¿La contención del Slice 0 retira el bloque de partners completo o lo reemplaza por un texto sin claim?
 - ¿El estado real en Google Partners permite mostrar algún badge después del Slice 1?
 - ¿El testimonio de Eusari y el caso de Bresler tienen autorización escrita y fuente del dato?
 - ¿El renderer admite selección múltiple, campos condicionales e iconos por opción?

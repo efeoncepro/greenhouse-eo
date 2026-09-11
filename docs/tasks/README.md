@@ -23,7 +23,7 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1862](to-do/TASK-1862-landing-aso.md) | Landing pública ASO, tercera superficie de Visibilidad junto a SEO y AEO: expansión y citabilidad en español, publicación por fases atada a la extensión Search & App Visibility | none |
 | [TASK-1863](to-do/TASK-1863-aeo-grader-multi-market.md) | AEO Grader multi-mercado (EPIC-020): una marca con N mercados, lotes de selección múltiple, catálogo único de mercados, prompts localizados y matriz entre mercados; Sky como primer tenant | none |
 | [TASK-1864](to-do/TASK-1864-mcp-self-sufficient-agent-surface.md) | Superficie agéntica autosuficiente del MCP (EPIC-044, U20): instructions del gateway, contrato de siguiente paso, kit de cliente Claude/Codex y eval end-to-end de agentes | none |
-| [TASK-1865](to-do/TASK-1865-landing-performance-marketing.md) | Landing pública Performance Marketing en `/servicios/performance-marketing/` con 301 desde la legacy `242862`, contención previa de sus contadores en cero y claim de partners, firma `Clics / Ventas` y reuso de Growth Forms/CTA/scheduler | none |
+| [TASK-1865](to-do/TASK-1865-landing-performance-marketing.md) | Landing pública Performance Marketing en `/servicios/performance-marketing/` construida desde cero, con 301 desde la legacy `242862`, firma `Clics / Ventas` y reuso de Growth Forms/CTA/scheduler | none |
 
 Siguiente ID libre `TASK-1866`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
 

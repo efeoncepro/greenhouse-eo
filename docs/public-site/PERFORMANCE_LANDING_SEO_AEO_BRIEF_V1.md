@@ -92,7 +92,6 @@ La SERP es ganable con una página de servicio sustantiva, cápsulas citables y 
 |---|---|---|
 | Inventario de enlaces internos a la legacy | Slice 1 | Búsqueda en contenido de WordPress, menús y widgets |
 | Backlinks y tráfico de la legacy | Slice 1 | Semrush backlinks + Search Console de la URL |
-| Contención de claims y contadores en la legacy | Slice 0 | Snapshot + edición mínima aprobada por el owner |
 | 301 legacy → nueva | Slice 6, en la misma ventana que la promoción | API de redirects de Yoast SEO Premium; verificar colisiones con y sin barra final |
 | Menú y enlaces internos | Slice 6 | Reapuntar el ítem `Performance Marketing`; actualizar los enlaces del inventario |
 | Legacy fuera del sitemap y `private` | Slice 6 | Estado `private`, sin borrar |

@@ -151,9 +151,9 @@ capability dentro del sistema, no presentarse como agencia suelta.
  `/servicios/performance-marketing` (working slug) para la solución Performance & Commerce Distribution. Enmienda la
  conclusión de PDR-008 "performance no es cabecera": "agencia (de) performance marketing" tiene 480–590/mes en Chile
  con KD 11–13 y Efeonce no rankea nada del cluster. Una sola spoke con las dos motions (commerce y B2B) y un H2 por
- canal; sin páginas por plataforma. Ejecución en **TASK-1865** (to-do, ui-ux/flow, UI ready no), que además retira con
- 301 la página legacy `242862` (`/servicio-gestion-campanas-publicitarias/`) y antes contiene sus contadores en cero y
- su claim de partners no verificado. Ver
+ canal; sin páginas por plataforma. Ejecución en **TASK-1865** (to-do, ui-ux/flow, UI ready no): página construida desde
+ cero que retira con 301 la legacy `242862` (`/servicio-gestion-campanas-publicitarias/`), sin parcharla mientras tanto.
+ Ver
  [PDR-022](decisions/PDR-022-landing-performance-marketing-posicionamiento.md) y
  `docs/tasks/to-do/TASK-1865-landing-performance-marketing.md`.
 

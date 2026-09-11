@@ -20,8 +20,8 @@ rankea ninguna keyword del cluster.
 
 Decisión: la landing nace en `/servicios/performance-marketing/` y la legacy pasa a 301 en la misma ventana de promoción,
 con el ítem de menú reapuntado y la legacy en `private`. El Slice 1 de `TASK-1865` puede revertir esa elección si los
-backlinks de la legacy lo justifican; en ambos casos queda una sola URL indexable. Antes de cualquier diseño, el Slice 0
-contiene los contadores y el claim de partners. Brief SEO/AEO:
+backlinks de la legacy lo justifican; en ambos casos queda una sola URL indexable. La página se construye desde cero y la
+legacy no se parcha mientras tanto (decisión del owner, 2026-09-11). Brief SEO/AEO:
 [PERFORMANCE_LANDING_SEO_AEO_BRIEF_V1](../PERFORMANCE_LANDING_SEO_AEO_BRIEF_V1.md).
 
 ## Contexto
