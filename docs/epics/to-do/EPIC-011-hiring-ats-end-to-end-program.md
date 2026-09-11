@@ -456,6 +456,7 @@ declarado, como `CHECK` de base.
 - `TASK-1770` — **Motor de disponibilidad y propuesta de horarios** (`getSchedule`). *Bloqueada por 1769.*
 
 - `TASK-1773` — **Parity gobernada del eje de desenlace.** El eje se entregó COMPLETO y sin contrato
+- `TASK-1866` — Medición del funnel de Careers por canal en GA4 vía GTM: GTM sólo en rutas públicas de Careers, postulaciones fuera de `generate_lead` y convención UTM (decisión del operador 2026-09-11: sólo GA4, sin persistir canal en Hiring).
   programático: se puede cerrar una postulación desde el portal y desde ningún otro lado — ni por
   `api/platform/app/**`, ni por MCP, ni por Nexa. Es una violación directa de Full API Parity, y el
   agravante es que **ninguna de las cuatro tasks del eje lo declaró como pendiente**: la pregunta

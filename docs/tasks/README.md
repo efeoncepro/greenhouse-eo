@@ -24,8 +24,9 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1863](to-do/TASK-1863-aeo-grader-multi-market.md) | AEO Grader multi-mercado (EPIC-020): una marca con N mercados, lotes de selección múltiple, catálogo único de mercados, prompts localizados y matriz entre mercados; Sky como primer tenant | none |
 | [TASK-1864](to-do/TASK-1864-mcp-self-sufficient-agent-surface.md) | Superficie agéntica autosuficiente del MCP (EPIC-044, U20): instructions del gateway, contrato de siguiente paso, kit de cliente Claude/Codex y eval end-to-end de agentes | none |
 | [TASK-1865](to-do/TASK-1865-landing-performance-marketing.md) | Landing pública Performance Marketing en `/servicios/performance-marketing/` construida desde cero, con 301 desde la legacy `242862`, firma `Clics / Ventas` y reuso de Growth Forms/CTA/scheduler | none |
+| [TASK-1866](to-do/TASK-1866-careers-funnel-ga4-gtm-measurement.md) | Medición del funnel de Careers por canal en GA4 vía GTM: GTM sólo en rutas públicas de Careers, postulaciones fuera de `generate_lead`, `gh_job_viewed` y convención UTM (EPIC-011) | none |
 
-Siguiente ID libre `TASK-1866`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1867`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
 
 ## Programa Efeonce Insights: EPIC-045
 
