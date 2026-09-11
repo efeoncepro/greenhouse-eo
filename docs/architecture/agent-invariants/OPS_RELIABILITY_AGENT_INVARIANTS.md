@@ -124,6 +124,57 @@ Toda decisión "dónde vive un cron" pasa por las **3 categorías canónicas** d
 **Reader runtime**: `src/lib/reliability/queries/cron-staging-drift.ts`.
 **CI gate**: `scripts/ci/vercel-cron-async-critical-gate.mjs`.
 
+### Outbox publisher canónico — Cloud Scheduler, no Vercel (TASK-773)
+
+> **Relocado de `CLAUDE.md` (2026-09-11, verbatim)** para liberar presupuesto del router (TASK-1160). El «comentario en CLAUDE.md» que exige la regla de state machine se mantiene ahora en esta sección.
+
+El **outbox publisher** mueve eventos de `greenhouse_sync.outbox_events` (Postgres) a `greenhouse_raw.postgres_outbox_events` (BigQuery) y los marca como `status='published'`. El **reactive consumer** (que materializa projections downstream — account_balance, provider_bq_sync, etc.) filtra `WHERE status='published'`. Si el publisher está caído o un batch persiste fallando, NINGUNA projection corre, NINGUN account_balance se rematerializa, NINGUN downstream side effect ocurre.
+
+**El publisher canónico vive en Cloud Scheduler + ops-worker, NO en Vercel cron**:
+
+- `Cloud Scheduler ops-outbox-publish` (cron `*/2 min`) → `POST /outbox/publish-batch` en ops-worker.
+- Helper canónico: `publishPendingOutboxEvents` ([src/lib/sync/outbox-consumer.ts](../src/lib/sync/outbox-consumer.ts)) con state machine atómica.
+- Endpoint: `services/ops-worker/server.ts:handleOutboxPublishBatch`.
+
+**Por qué Cloud Scheduler y no Vercel cron**: Vercel solo ejecuta crons en deploys de **Production**. Staging custom environment **no los corre**. Eso significa que **cualquier flow async que dependa del outbox queda invisible en staging** (root cause del incidente Figma 2026-05-03 cuando el pago no rebajaba TC). Cloud Scheduler corre por proyecto GCP, igual en staging y prod, sin distinción.
+
+**State machine canónica**:
+
+```text
+                 ┌──────────────┐
+                 │   pending    │  (writer INSERT default)
+                 └──────┬───────┘
+                        │ SELECT FOR UPDATE SKIP LOCKED
+                        ▼
+                 ┌──────────────┐
+                 │  publishing  │  (worker tomó el lock)
+                 └──┬───────┬───┘
+            BQ OK   │       │   BQ FAIL
+                    ▼       ▼
+            ┌───────────┐  ┌─────────┐
+            │ published │  │ failed  │  (retries++)
+            └───────────┘  └────┬────┘
+                                │ retries >= OUTBOX_MAX_PUBLISH_ATTEMPTS (5)
+                                ▼
+                          ┌─────────────┐
+                          │ dead_letter │  (humano interviene)
+                          └─────────────┘
+```
+
+**Reliability signals canónicos** (visibles en `/admin/operations`):
+
+- `sync.outbox.unpublished_lag` — events `pending`/`failed` con edad > 10 min. Steady=0. Si > 0, publisher caído o falla persistente.
+- `sync.outbox.dead_letter` — events agotaron retries. Steady=0. Cualquier > 0 requiere humano: replay manual o investigación root cause.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** agregar nuevos crons de outbox/event-bus/projection-refresh a `vercel.json`. Solo se permiten crons Vercel para tareas que pueden correr únicamente en producción (e.g. backfill nocturno, scheduled report). Los crons del path async crítico van a `services/ops-worker/deploy.sh`.
+- **NUNCA** modificar la state machine sin actualizar la CHECK constraint `outbox_events_status_check` + comentario en CLAUDE.md.
+- **NUNCA** filtrar eventos por `WHERE status='pending'` en consumers downstream. El reactive consumer canónico filtra `'published'`. Si necesitas un consumer que toque pending (e.g. UI de troubleshooting), declara explícitamente el contract.
+- **NUNCA** catch + swallow errores del helper `publishPendingOutboxEvents`. La state machine atómica se basa en que la tx PG complete o aborte limpio.
+
+**Spec canónica**: `docs/tasks/complete/TASK-773-outbox-publisher-cloud-scheduler-cutover.md`. Patrón replicable: cuando emerja otro Vercel cron infrastructure-critical (TASK-258 sync-conformed pipeline, TASK-259 entra-profile-sync), seguir el mismo template (helper canónico → endpoint ops-worker → Cloud Scheduler job → reliability signal).
+
 ### Reliability dashboard hygiene — orphan archive, channel readiness, smoke lane bus, domain incidents
 
 Cuatro patrones que evitan que el dashboard muestre falsos positivos o señales `awaiting_data` perpetuas.

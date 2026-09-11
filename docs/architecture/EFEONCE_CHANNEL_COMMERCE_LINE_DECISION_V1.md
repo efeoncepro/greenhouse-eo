@@ -101,21 +101,6 @@ sus gates G1–G6, del feasibility gate de Talent Assurance y de la revisión le
 | Apertura comercial y prospección | [`CHANNEL_COMMERCE_PROSPECTING_PLAN_V1`](../business-models/channel-commerce/CHANNEL_COMMERCE_PROSPECTING_PLAN_V1.md) |
 | Evidencia de mercado y competencia | [`benchmark`](../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md) · [`battlecards`](../audits/commercial/CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md) |
 
-### Pendiente de canonización: fila en el router de agentes
-
-`CLAUDE.md` está en su techo de presupuesto (34.973 / 35.000 ~tokens al 2026-09-10), de modo que **la fila de este
-dominio en el router de dominios no pudo agregarse**. Agregarla requiere liberar espacio moviendo algún bloque
-inline a su companion, que es el refactor pendiente de `TASK-1160` (target 30.000) y una decisión separada.
-
-**El enrutamiento sí quedó cubierto para agentes genéricos y Codex**: la fila está en el router de `AGENTS.md` y en
-el manifest `docs/operations/agent-context-router.json`, que no tienen techo de presupuesto. Lo que falta es sólo la
-fila espejo en `CLAUDE.md`, de modo que una sesión Claude no la recibe en el prompt inicial y debe llegar por
-`AGENTS.md` o por los índices. Fila propuesta, lista para insertar cuando haya presupuesto:
-
-```text
-| Trade marketing · BTL · canal (**Channel & Commerce**) | `commercial-expert` + `efeonce-business-model-operator` | `architecture/EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1.md` (NUNCA staff aug de terreno ni producción propia; back-to-back o no se firma) + `services/channel-commerce/README.md` |
-```
-
 ### Documentación funcional y manual de uso
 
 El [Platform Documentation Protocol](../../CLAUDE.md) exige tres capas. Aquí se aplica proporcionalidad y se

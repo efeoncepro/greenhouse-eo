@@ -24,6 +24,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Salesforce (CRM · MC Engagement · MC Next) · operar o vender | `salesforce-crm-practice` / `salesforce-marketing-cloud-engagement` / `salesforce-marketing-cloud-next` | `services/salesforce/README.md` + `SALESFORCE_PRODUCT_AND_OFFERING_MAP_V1.md` + `operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md`; Consulting Partner ≠ Cloud Reseller; Engagement ≠ Next |
 | Business model, customer model, packaging, pricing, unit economics | `efeonce-business-model-operator` + `efeonce-customer-model-operator` + `efeonce-pricing-operator` + práctica dueña | `business-models/README.md` + modelo vigente + Finance/Legal/Product según corresponda; customer model gobierna ICP/JTBD/buying group; `creative-practice` conserva Creative Studio |
 | Capital, inversión y fundraising | `efeonce-investor-readiness` + `efeonce-agency` + Finance/Legal | `strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md` + `strategy/ASAAS_MANIFESTO_V1.md`; no emitir, endeudar, transferir IP ni crear spinout sin aprobación proporcional |
+| Trade marketing · BTL · canal (**Channel & Commerce**) | `commercial-expert` + `efeonce-business-model-operator` | `architecture/EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1.md` (NUNCA staff aug de terreno ni producción propia; back-to-back o no se firma) + `services/channel-commerce/README.md` |
 | Integraciones/infra (signature/observability/postgres-pooling) | — | `architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md` |
 | Identity/Workforce (legal profile/role-title/SCIM/session-access/bridge-cutover/auth de personas externas) | — | `architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` |
 | Org workspace + Client portal | — | `architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md` |
@@ -930,52 +931,7 @@ Los invariantes operativos de Finance reconciliación/ledger/FX — reconciliaci
 
 ### Outbox publisher canónico — Cloud Scheduler, no Vercel (TASK-773)
 
-El **outbox publisher** mueve eventos de `greenhouse_sync.outbox_events` (Postgres) a `greenhouse_raw.postgres_outbox_events` (BigQuery) y los marca como `status='published'`. El **reactive consumer** (que materializa projections downstream — account_balance, provider_bq_sync, etc.) filtra `WHERE status='published'`. Si el publisher está caído o un batch persiste fallando, NINGUNA projection corre, NINGUN account_balance se rematerializa, NINGUN downstream side effect ocurre.
-
-**El publisher canónico vive en Cloud Scheduler + ops-worker, NO en Vercel cron**:
-
-- `Cloud Scheduler ops-outbox-publish` (cron `*/2 min`) → `POST /outbox/publish-batch` en ops-worker.
-- Helper canónico: `publishPendingOutboxEvents` ([src/lib/sync/outbox-consumer.ts](../src/lib/sync/outbox-consumer.ts)) con state machine atómica.
-- Endpoint: `services/ops-worker/server.ts:handleOutboxPublishBatch`.
-
-**Por qué Cloud Scheduler y no Vercel cron**: Vercel solo ejecuta crons en deploys de **Production**. Staging custom environment **no los corre**. Eso significa que **cualquier flow async que dependa del outbox queda invisible en staging** (root cause del incidente Figma 2026-05-03 cuando el pago no rebajaba TC). Cloud Scheduler corre por proyecto GCP, igual en staging y prod, sin distinción.
-
-**State machine canónica**:
-
-```text
-                 ┌──────────────┐
-                 │   pending    │  (writer INSERT default)
-                 └──────┬───────┘
-                        │ SELECT FOR UPDATE SKIP LOCKED
-                        ▼
-                 ┌──────────────┐
-                 │  publishing  │  (worker tomó el lock)
-                 └──┬───────┬───┘
-            BQ OK   │       │   BQ FAIL
-                    ▼       ▼
-            ┌───────────┐  ┌─────────┐
-            │ published │  │ failed  │  (retries++)
-            └───────────┘  └────┬────┘
-                                │ retries >= OUTBOX_MAX_PUBLISH_ATTEMPTS (5)
-                                ▼
-                          ┌─────────────┐
-                          │ dead_letter │  (humano interviene)
-                          └─────────────┘
-```
-
-**Reliability signals canónicos** (visibles en `/admin/operations`):
-
-- `sync.outbox.unpublished_lag` — events `pending`/`failed` con edad > 10 min. Steady=0. Si > 0, publisher caído o falla persistente.
-- `sync.outbox.dead_letter` — events agotaron retries. Steady=0. Cualquier > 0 requiere humano: replay manual o investigación root cause.
-
-**⚠️ Reglas duras**:
-
-- **NUNCA** agregar nuevos crons de outbox/event-bus/projection-refresh a `vercel.json`. Solo se permiten crons Vercel para tareas que pueden correr únicamente en producción (e.g. backfill nocturno, scheduled report). Los crons del path async crítico van a `services/ops-worker/deploy.sh`.
-- **NUNCA** modificar la state machine sin actualizar la CHECK constraint `outbox_events_status_check` + comentario en CLAUDE.md.
-- **NUNCA** filtrar eventos por `WHERE status='pending'` en consumers downstream. El reactive consumer canónico filtra `'published'`. Si necesitas un consumer que toque pending (e.g. UI de troubleshooting), declara explícitamente el contract.
-- **NUNCA** catch + swallow errores del helper `publishPendingOutboxEvents`. La state machine atómica se basa en que la tx PG complete o aborte limpio.
-
-**Spec canónica**: `docs/tasks/complete/TASK-773-outbox-publisher-cloud-scheduler-cutover.md`. Patrón replicable: cuando emerja otro Vercel cron infrastructure-critical (TASK-258 sync-conformed pipeline, TASK-259 entra-profile-sync), seguir el mismo template (helper canónico → endpoint ops-worker → Cloud Scheduler job → reliability signal).
+El publisher del outbox (`greenhouse_sync.outbox_events` → BigQuery → `status='published'`) vive en **Cloud Scheduler `ops-outbox-publish` + ops-worker**, no en Vercel cron (staging no corre crons Vercel). State machine, signals y reglas: **`docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md` → §`Outbox publisher canónico`**. **NUNCA** agregar crons de outbox/event-bus/projection-refresh a `vercel.json`; **NUNCA** filtrar `status='pending'` en consumers downstream (el canónico filtra `'published'`).
 
 ### Production Release Control Plane — invariantes (TASK-848…854, 871)
 
