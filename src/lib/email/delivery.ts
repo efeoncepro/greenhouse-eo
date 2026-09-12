@@ -12,6 +12,7 @@ import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { resolveEmailContext, EmailUndeliverableError } from './context-resolver'
+import { providerBlockedConditionSql } from './provider-block'
 import { checkRecipientRateLimit } from './rate-limit'
 import { getSubscribers } from './subscriptions'
 import { resolveTemplate } from './templates'
@@ -1005,6 +1006,26 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
     })
 
     if (acceptedResendId) {
+      // ISSUE-172 — el proveedor ACEPTÓ el envío y el cierre local falló: el estado real es
+      // `unknown`, no `failed`. Sin marca en la fila, el reintento automático y el revive de
+      // dead_letter lo tratan como un fallo ordinario y reenvían un correo que ya salió (duplicado
+      // al candidato). Se persiste el `resend_id` recibido y `error_class='dispatch_unknown'`;
+      // ambos caminos lo excluyen y la fila queda visible para recuperación explícita.
+      if (durableDeliveryId) {
+        await runGreenhousePostgresQuery(
+          `UPDATE greenhouse_notifications.email_deliveries
+              SET resend_id = COALESCE(resend_id, $2),
+                  status = 'failed',
+                  error_class = 'dispatch_unknown',
+                  error_message = $3,
+                  updated_at = NOW()
+            WHERE delivery_id = $1`,
+          [durableDeliveryId, acceptedResendId, 'Email dispatch state is unknown (provider accepted; local close failed).']
+        ).catch(err => {
+          console.warn('[email-delivery] Failed to mark dispatch_unknown delivery row:', err)
+        })
+      }
+
       return {
         deliveryId: durableDeliveryId || input.batchId,
         recipientEmail: input.recipient.email,
@@ -1663,18 +1684,23 @@ export const reviveDeadLetterEmailDeliveries = async (input: ReviveDeadLetterEma
              resend_reason = $1,
              updated_at = NOW()
        WHERE delivery_id IN (
-         SELECT delivery_id
-           FROM greenhouse_notifications.email_deliveries
-          WHERE status = 'dead_letter'
-            AND created_at > NOW() - ($2::int * INTERVAL '1 hour')
-            AND NOT (email_type = ANY($3::text[]))
-            AND COALESCE(delivery_payload->'persistence'->>'retryable', 'true') <> 'false'
+         SELECT d.delivery_id
+           FROM greenhouse_notifications.email_deliveries d
+          WHERE d.status = 'dead_letter'
+            AND d.created_at > NOW() - ($2::int * INTERVAL '1 hour')
+            AND NOT (d.email_type = ANY($3::text[]))
+            AND COALESCE(d.delivery_payload->'persistence'->>'retryable', 'true') <> 'false'
+            -- Un envío que el proveedor ya aceptó (cierre incierto) no se revive: sería un duplicado.
+            AND d.resend_id IS NULL
+            AND COALESCE(d.error_class, '') <> 'dispatch_unknown'
+            -- Un buzón bloqueado por el proveedor nunca se vuelve a insistir por correo.
+            AND NOT ${providerBlockedConditionSql('d')}
             AND (
               -- delivery_id es uuid: se compara como texto para que un id malformado no reviente la query.
-              ($4::text[] <> '{}' AND delivery_id::text = ANY($4::text[]))
-              OR ($5::text[] <> '{}' AND email_type = ANY($5::text[]))
+              ($4::text[] <> '{}' AND d.delivery_id::text = ANY($4::text[]))
+              OR ($5::text[] <> '{}' AND d.email_type = ANY($5::text[]))
             )
-          ORDER BY created_at ASC
+          ORDER BY d.created_at ASC
           LIMIT $6
        )
        RETURNING delivery_id, email_type
@@ -1682,7 +1708,8 @@ export const reviveDeadLetterEmailDeliveries = async (input: ReviveDeadLetterEma
     [reason, sinceHours, [...TOKEN_SENSITIVE_EMAIL_TYPES], deliveryIds, emailTypes, limit]
   )
 
-  console.log(`[email-delivery] revived ${rows.length} dead_letter deliveries → failed (reason: ${reason})`)
+  // El motivo es texto libre del operador: puede traer PII. Al log va su tamaño; el texto queda en la fila.
+  console.log(`[email-delivery] revived ${rows.length} dead_letter deliveries → failed (reason: ${reason.length} chars)`)
 
   return {
     revived: rows.length,
@@ -1726,7 +1753,7 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
         actor_email,
         error_message,
         attempt_number
-      FROM greenhouse_notifications.email_deliveries
+      FROM greenhouse_notifications.email_deliveries d
       WHERE (
         (status = 'failed' AND attempt_number < 3)
         OR (status = 'rate_limited' AND updated_at < NOW() - INTERVAL '1 hour' AND attempt_number < 3)
@@ -1734,6 +1761,10 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
         AND created_at > NOW() - INTERVAL '24 hours'
         AND NOT (email_type = ANY($2::text[]))
         AND COALESCE(delivery_payload->'persistence'->>'retryable', 'true') <> 'false'
+        -- ISSUE-172: un cierre incierto (el proveedor ya aceptó) no se reintenta a ciegas, y un buzón que el
+        -- proveedor bloqueó (bounced|complained|suppressed) NUNCA se vuelve a insistir por correo.
+        AND COALESCE(error_class, '') <> 'dispatch_unknown'
+        AND NOT ${providerBlockedConditionSql('d')}
       ORDER BY created_at ASC
       LIMIT $1
     `,
