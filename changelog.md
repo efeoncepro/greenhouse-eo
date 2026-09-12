@@ -17,8 +17,19 @@ endpoints que falla en silencio (`domain_intersection` AND vs unión, `rank_scal
 referencias de AI Overview anidadas en varios niveles) y el método (scoring de visibilidad en IA, umbral de
 significancia, higiene de denominador, canibalización SERP-first, 28 checks de cartera, offer bank). Las curvas de CTR
 del proveedor quedaron declaradas como discrepantes ~6× frente a las mediciones propias, que gobiernan.
-`ai_optimization` permanece fuera del allowlist. Sin cambios de código, flags, datos ni release.
-[RESEARCH-011](docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md).
+`ai_optimization` permanece fuera del allowlist. [RESEARCH-011](docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md).
+
+**Decisiones y consecuencias del mismo día.** Las cuatro preguntas abiertas quedaron resueltas:
+screening masivo de toxicidad (`TASK-1871`) y rotación de URL en el SERP derivada a costo cero de
+`seo_serp_top_results` (`TASK-1870`), ambas con `task:lint` limpio; disavow **descartado** como
+entregable automático, con el criterio de cuándo sí escrito en `seo-aeo/modules/05_OFFPAGE_AUTHORITY.md`;
+y gate de `rank_scale` implementado (`dataforseo-backlinks-rank-scale-guard.test.ts`, verificado en
+ambos sentidos), que destapó que `prospect/` pedía `rank` en escala 0–1000 sin declararlo — corregido.
+Abierto `ISSUE-170`: el link gap del diagnóstico de prospecto pasa hasta 5 competidores juntos a
+`domain_intersection` y el default `all` devolvería sólo los dominios que enlazan a todos; registrado
+con experimento definido, no afirmado. `project_context.md` compactado de 11.997 a 11.297 tokens con
+control de no-pérdida verificado (148 rutas antes y después). La copia de `seo-aeo` en `~/.claude/skills`
+quedó sincronizada con marcador de procedencia.
 
 ## 2026-09-11 — CLAUDE.md: bloque del outbox a su companion y fila de Channel & Commerce en el router
 

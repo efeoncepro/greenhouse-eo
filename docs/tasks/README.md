@@ -27,8 +27,10 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1866](to-do/TASK-1866-careers-funnel-ga4-gtm-measurement.md) | Medición del funnel de Careers por canal en GA4 vía GTM: GTM sólo en rutas públicas de Careers, postulaciones fuera de `generate_lead`, `gh_job_viewed` y convención UTM (EPIC-011) | none |
 | [TASK-1867](to-do/TASK-1867-aeo-grader-full-answer-evidence.md) | AEO Grader: evidencia completa de cada respuesta (EPIC-020): persistir el texto íntegro, medir sobre él y versionar el score (v3); hoy mide sobre 600 caracteres | none |
 | [TASK-1868](to-do/TASK-1868-aeo-grader-deterministic-detector-precision.md) | AEO Grader: precisión de los detectores deterministas (EPIC-020): probes que no confunden la página HTML de un SPA con `llms.txt`/`robots.txt`/`sitemap.xml` y compuerta de revisión por palabra completa | none |
+| [TASK-1870](to-do/TASK-1870-growth-seo-serp-rotation-signal.md) | Growth SEO: rotación de URL en el SERP como señal de canibalización sin Search Console (EPIC-022): deriva `rotation_count` del top-N ya persistido por TASK-1699 a costo de proveedor cero, única lente para competidores y prospectos; cobertura declarada e `insufficient_history` porque la serie empieza el 2026-08-29. No toca el detector GSC de TASK-1700 | none |
+| [TASK-1871](to-do/TASK-1871-growth-seo-bulk-spam-screening.md) | Growth SEO: screening masivo de toxicidad con `bulk_spam_score` (EPIC-022): hasta 1.000 dominios por request para priorizar prospección e higiene del perfil; hecho de mercado por dominio, append-only, con condición de disparo y tope. Diagnostica, NO genera disavow | none |
 
-Siguiente ID libre `TASK-1869`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1872`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
 
 ## Programa Efeonce Insights: EPIC-045
 

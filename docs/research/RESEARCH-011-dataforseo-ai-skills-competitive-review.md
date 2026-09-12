@@ -107,14 +107,31 @@ cuatro integraciones LLM propias, decisión que pertenece a `arch-architect`, no
 - **Su corte de canibalización** como reemplazo del nuestro: su argumento de host-crowding no aplica a GSC, que reporta
   por par `(query, page)` con independencia de la co-aparición en una SERP.
 
-## Preguntas abiertas
+## Decisiones tomadas (2026-09-11)
 
-1. ¿Adoptamos `bulk_spam_score` (1.000 targets por llamada) para screening masivo de prospectos? Hoy tenemos spam score
-   por backlink, no el bulk.
-2. ¿Construimos el **archivo de disavow** como entregable? No existe nada de `disavow` en el repo.
-3. ¿Incorporamos la señal de **rotación over-time** para detectar canibalización en **prospectos y competidores**, donde
-   no hay GSC y hoy estamos ciegos?
-4. ¿Vale un gate que verifique `rank_scale` explícito en toda llamada que alimente un blend 0–100?
+Las cuatro preguntas que este brief dejó abiertas quedaron resueltas el mismo día, con las
+skills del dominio cargadas. Ninguna amplía el allowlist: las cuatro caen en familias ya
+permitidas.
+
+| Pregunta | Decisión | Dónde vive |
+|---|---|---|
+| `bulk_spam_score` para screening masivo | **Sí**, como hecho de mercado por dominio (tabla propia sin `organization_id`: el spam score de un dominio es el mismo para todos) con condición de disparo sobre agregado ya pagado y pre-check de **frescura**, no de existencia | `TASK-1871` |
+| Disavow como entregable | **No.** Google descuenta el spam entrante por su cuenta; el disavow es para cuando el propio sitio construyó enlaces manipulativos, y una herramienta de un clic invita a usarlo donde daña. Criterio de cuándo sí —acción manual confirmada, historial declarado de compra de enlaces, spam dirigido fechado; los tres se **declaran**, ninguno se detecta por score— más las guardas de Google si algún día se entrega uno | `seo-aeo/modules/05_OFFPAGE_AUTHORITY.md` § *Enlaces tóxicos y disavow* |
+| Rotación over-time sin GSC | **Sí, y a costo de proveedor CERO**: se deriva de `seo_serp_top_results`, que ya persiste el top-N diario completo —incluidos los dominios ajenos—, así que la señal existe para competidores y prospectos sin comprar nada. Se deriva al leer, no se persiste. `insufficient_history` es veredicto de primera clase: la serie arranca el 2026-08-29 y una ventana de 30 días todavía no existe | `TASK-1870` |
+| Gate de `rank_scale` | **Sí, ya implementado.** Guard por módulo —el repo separa el contrato del endpoint de la llamada que arma el payload— verificado en ambos sentidos | `src/lib/ai/__tests__/dataforseo-backlinks-rank-scale-guard.test.ts` |
+
+**Hallazgo del camino:** implementar el gate destapó que `prospect/` pedía `rank` en escala
+0–1000 sin declararlo. No lo consume hoy, así que no hubo daño, pero la trampa quedaba armada
+para el primer consumer futuro. Corregido en las dos llamadas.
+
+**Defecto abierto:** [`ISSUE-170`](../issues/open/ISSUE-170-prospect-link-gap-colapsa-por-interseccion-and.md)
+— el diagnóstico de prospecto pasa hasta 5 competidores juntos a `domain_intersection` sin
+declarar `intersection_mode`, y el default `all` devolvería sólo los dominios que enlazan a
+todos. Registrado con experimento definido, no afirmado: la glosa de la propia documentación es
+ambigua y no se midió contra respuesta real.
+
+**Lo que la economía ajena NO se lleva:** `TASK-1870` deja fuera de V1 el `clicks_at_risk` /
+`value_at_risk` del proveedor precisamente por la discrepancia de CTR documentada arriba.
 
 ## Anexos
 
