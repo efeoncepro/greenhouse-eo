@@ -3,7 +3,7 @@
 > **Tipo:** Incidente de runtime
 > **Ambiente:** producción (`/agency/hiring/pipeline`; una sola instancia Cloud SQL compartida dev/staging/prod)
 > **Detectado:** 2026-09-12
-> **Estado:** open — causa raíz reproducida; **fix implementado en local (opción estructural), NO desplegado**
+> **Estado:** resolved 2026-09-12 — fix estructural en producción (release `586a8627568a`, manifest `released` 14:44:56Z)
 > **Superficie dueña:** `src/views/greenhouse/hiring/PipelineDeskView.tsx`
 
 ## Síntoma
@@ -110,6 +110,16 @@ un `source` nulo o inesperado revienta el render del tablero completo. Hoy no mu
 **6 CV de `EO-OPN-0675` están en `quarantined`** y 2 postulaciones no adjuntaron ninguno. La cuarentena es el escáner
 bloqueando el archivo; la postulación se aceptó igual y el candidato vio el mismo mensaje genérico de éxito, como
 corresponde. Esos 6 CV no se pueden abrir hasta que un humano los revise.
+
+## Resolución (2026-09-12)
+
+Release `586a8627568a-d336e91c-115f-4b1f-a7f0-9eadb5157b42` (PR #234, orquestador `34699636555`, `released`
+14:44:56Z, Vercel Production READY para `586a86275`). Verificación: test de regresión
+`pipeline-desk-snapshot-sync.test.tsx` (re-render de la misma instancia con el snapshot de otra vacante → las tarjetas
+nuevas aparecen, 0 residuales, sin «Sin resultados») + revisión de arquitectura (sin bloqueantes; se corrigió la
+identidad del estado de overrides). Verificación visual en producción por el operador: cambiar de vacante en
+`/agency/hiring/pipeline` sin recargar — las tarjetas deben seguir a la vacante elegida. Adyacentes registrados en
+`ISSUE-172` (tope de 120 mudo, libro de intake ciego, `source` sin guarda) siguen como follow-ups.
 
 ## Referencias
 

@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-12 — Hiring: incidente P1 del Banco de Talento resuelto y liberado (ISSUE-171/172/173)
+
+`lpad(nextval::text, 5, '0')` recortaba el `public_id` de `talent_pool_membership` pasado 99 999: diez valores de
+secuencia colapsaban contra `UNIQUE`, el cron `ops-hiring-talent-pool-reconcile` fallaba en cada corrida y el consumer
+que crea postulaciones desde el Growth Form abrió su circuito — hasta 38 personas reales sin proyectar durante horas,
+sin ninguna señal (nada se borró). Migración a una función que rellena sin recortar + `setval`; anti-join en la
+projection (cortaba ~71k `nextval`/día); parser público que ya no rechaza una postulación por un enlace opcional
+(href canónico https); señal `sync.reactive.circuit_open`; el sender propaga el `error.name` de Resend; revive
+gobernado de `dead_letter` (excluye buzones bloqueados y cierres inciertos, ventana por `updated_at`); tablero
+del pipeline que sigue al snapshot del servidor; `reason_code` en la señal de aviso de rotación (Sentry 91/96);
+`denyUrls` contra el filename crudo (Sentry 94). Recuperación por replay gobernado: 0 sin postulación, 164 acuses
+(el plan Free de Resend se agotó en la ráfaga; ahora Pro). Release `586a8627568a` (PR #234), watchdog 5/5, canary
+verde. `ISSUE-173` (el drain del dominio deja huérfano al handler que el breaker saltó) queda abierta con diseño.
+
 ## 2026-09-12 — Bricolage Grotesque disponible para assets creativos Efeonce
 
 Se incorporó `BricolageGrotesque-Variable.ttf` desde el repositorio oficial de Google Fonts, junto con su licencia SIL

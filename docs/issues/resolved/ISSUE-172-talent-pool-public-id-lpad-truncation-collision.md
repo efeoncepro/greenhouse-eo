@@ -3,7 +3,7 @@
 > **Tipo:** Incidente de runtime
 > **Ambiente:** producción (`ops-worker`; una sola instancia Cloud SQL compartida dev/staging/prod)
 > **Detectado:** 2026-09-12 (reportado por Codex, verificado contra runtime en esta sesión)
-> **Estado:** open — causa raíz probada; **fix implementado en local, NO desplegado; migración NO aplicada** (requiere autorización del operador)
+> **Estado:** resolved 2026-09-12 — migración aplicada, recuperación ejecutada y código en producción (release `586a8627568a`, `released` 14:44:56Z); follow-ups abajo
 > **Severidad:** P1 — falla el carril por el que entran las postulaciones de candidatos
 
 ## Síntoma
@@ -186,6 +186,85 @@ cron `ops-hiring-talent-pool-reconcile` sigue sin señal propia (no registra `so
 6. **Opcional:** pausar `ops-hiring-talent-pool-reconcile` hasta que el ops-worker despliegue el
    anti-join, para que el cron viejo no siga quemando secuencia (~71k/día) mientras tanto; el consumer
    crea memberships para las postulaciones nuevas de todos modos.
+
+## Recuperación ejecutada (2026-09-12, 12:48Z → 13:15Z; autorizada por el operador)
+
+| Paso | Resultado medido |
+|---|---|
+| Migración `20260912122159611` aplicada con `pnpm pg:connect:migrate` (~12:48Z) | `column_default = next_talent_pool_public_id()`; `last_value` reanclado (72 441 → 72 668 tras dos corridas del cron viejo, que sigue evaluando 247 defaults hasta el deploy del anti-join) |
+| Circuito del consumer | **`closed` a las 12:50:02Z** — el drain programado probó en `half_open` y tuvo éxito solo, sin reset manual |
+| Cron `ops-hiring-talent-pool-reconcile` | forzado 12:50Z: `done` en 171 ms / 529 ms, `CODE` vacío; facets sin membership 17 → 7, y los 7 son personas `smoke_test` excluidas a propósito (`REAL_PERSON_JOIN`) → **Banco de Talento real completo** |
+| Replay gobernado (`pnpm reactive:backfill --replay-failed-handlers --handler=growth_hiring…`) | 12:54–12:56Z: 33 postulaciones creadas; `sin_postulacion` 38 → 8 |
+| Drain acotado por handler (mitigación de `ISSUE-173`) | 13:1xZ: `6/6 ok` — los 5 eventos que el breaker dejó huérfanos + 1 nuevo |
+| **Recuento final 13:15Z** | **249 submissions, 0 sin postulación**, 50 postulaciones creadas desde las 12:50Z, circuito `closed` |
+| Las 2 personas rechazadas por `linkedinUrl` sin `https://` | recuperadas: el replay corre en local con el árbol de trabajo, así que ejercitó el parser tolerante (capa 3) contra la base compartida; las 4 «no cumple contrato ATS» que quedaron en `retry` son submissions del 2026-07-13 sobre vacantes de prueba (`EO-OPN-0051…0056`) de personas que ya tienen postulación — no son pérdida |
+| Acuses de recibo (TASK-1689) | **80 `sent`** (candidato + interno) y **8 `dead_letter`** (4 + 4). Causa: el plan de Resend era **Free con límite diario de 100** y la ráfaga lo agotó a las 12:58:11Z — desde ahí `resend_api_error` en todo envío; el operador subió el plan a **Pro (diario ilimitado, 474/50 000 mensual)** ~13:05Z y `ops-email-delivery-retry` (forzado 13:08/13:09Z) recuperó 39+39; los 8 restantes habían agotado sus reintentos dentro de la ventana |
+
+### Hallazgos colaterales que salieron de la recuperación
+
+- **`ISSUE-173`** — el drain programado del dominio nunca vuelve a ver un evento que el breaker saltó si otro
+  handler del mismo tipo ya escribió su fila (Phase A excluye por «cualquier handler»). Explica las 12
+  «saltadas» y los 5 huérfanos; mitigación manual = drain acotado por handler. Fix estructural en task propia.
+- **`delivery.ts:934` tragaba el `error.name` de Resend** (`daily_quota_exceeded` vs `rate_limit_exceeded` vs
+  `validation_error`): ni `email_deliveries` ni Sentry decían por qué fallaban 41 correos; se supo abriendo el
+  panel del proveedor. Corregido en este release (`fc2a67163`): el nombre viaja en el mensaje, el `message` no
+  (cita la dirección destino en errores de validación).
+- **No existía camino gobernado para revivir un `dead_letter` de `email_deliveries`** (`processFailedEmailDeliveries`
+  sólo toma `failed`). Se agregó `reviveDeadLetterEmailDeliveries` (motivo forense en `resend_reason`, excluye
+  token-sensitive y no retryables, vuelve la fila a `failed` para que el cron reenvíe) + cuerpo opcional
+  `reviveDeadLetter` en `POST /api/admin/ops/email-delivery-retry`. Ejercitado contra PG el 2026-09-12 ~13:30Z:
+  **8 revividos y reenviados** (EO-APP-0840/0841/0842/0843 + alertas internas de 0841/0842/0843/0849); estado final de
+  los correos de Hiring desde las 12:50Z: **102 `sent`, 0 `dead_letter`**. Primer intento reventó con `uuid = text`
+  (`delivery_id` es uuid) — el test unitario mockea el SQL y no lo ve; se cazó ejercitándolo contra la base.
+- **`GROWTH_FORMS_SERVER_VALIDATION_ENABLED`**: el ledger lo da como corregido a `true` en Production
+  (2026-09-01) y aun así dos submissions persistieron `linkedinUrl` sin scheme — pendiente verificar el valor live
+  (`pnpm flags:audit`) y por qué la normalización del validador `url` no aterrizó. No bloquea: la capa 3 lo cubre.
+- Sentry `JAVASCRIPT-NEXTJS-94` (`M_ID` en `app:///executors/200.js`) es una extensión del navegador del
+  visitante, no nuestro bundle: `denyUrls` en `instrumentation-client.ts` (`7701e145f`). `NEXTJS-91/96`
+  (`recovery.outcome_reason`) es otro defecto —la columna real es `reason_code`— con fix sin commitear de otra
+  sesión en el checkout compartido al momento de escribir esto.
+
+### Follow-ups de la revisión de dominio (talento) y de arquitectura, 2026-09-12
+
+- **Transparencia del enlace descartado (IMPORTANTE, task propia):** un `linkedinUrl`/`portfolioUrl` que el
+  parser descarta llega como `null` y Application 360 muestra «Sin enlaces públicos informados» — el
+  candidato SÍ lo informó. Propuesta: `normalizeOptionalHttpsUrl` devuelve `{ url, discarded? }`, el parser
+  expone `intakeWarnings` (sin el raw: un `javascript:` guardado es un vector si alguna vez se renderiza), el
+  command lo persiste application-scoped (mismo criterio que `candidate_message`) y Application 360 lo dice
+  («envió un enlace que no pudimos leer; pídelo en el primer contacto»). En el carril Growth el raw sobrevive
+  en `form_submission.normalized_fields_json`.
+- **Cerrados en este release** (hallazgos verificados): el revive y el reintento automático excluyen buzones
+  bloqueados (`bounced|complained|suppressed`, predicado canónico movido a `src/lib/email/provider-block.ts`
+  con re-export desde hiring) y envíos con cierre incierto (`dispatch_unknown`: el proveedor aceptó y el
+  cierre local falló; antes se reenviaba un correo que ya salió). El log del revive no imprime el motivo
+  libre (puede traer PII).
+- Preexistente, fuera de este lote: `captureWithDomain` del sender sigue enviando `recipientEmail` a Sentry
+  (`delivery.ts` ~L985).
+
+## Resolución (2026-09-12)
+
+- **Release** `586a8627568a-d336e91c-115f-4b1f-a7f0-9eadb5157b42` (PR #234, orquestador `34699636555`, dispatch
+  14:33:30Z con `bypass_preflight_reason` por `db_migrations` ya aplicada + `finance` = closeout TASK-1858;
+  `released` 14:44:56Z). Watchdog `ok`, 5/5 workers sincronizados; `ops-worker` y `auth-server` sirven
+  `72171ee10` con **diff de árbol completo = 0 archivos** contra el target (no-op legítimo del change-gate).
+- **Canary de contrato:** con el worker nuevo, una corrida forzada del cron dejó la secuencia **intacta**
+  (`last_value` 74 540 → 74 540; memberships 313 → 313), y en 85 min la secuencia avanzó exactamente lo que las
+  filas reales (+32 = +32 memberships). El anti-join estaba vivo desde el deploy de `develop` (el push a `develop`
+  despliega el `ops-worker` compartido), y el release lo hizo permanente.
+- **Estado final medido 14:46Z:** circuito `closed`, `handler_health` = `healthy`, 281 submissions / **0 sin
+  postulación**, correos de Hiring desde las 12:50Z **164 `sent` / 0 fallidos**, `/api/auth/health` 200, careers 200.
+- Revisiones por subagentes antes del merge (arquitectura + talento): sin bloqueantes; se corrigieron en el mismo
+  lote `denyUrls` (casaba contra `app:///`, que se reescribe DESPUÉS del filtro), la ventana del reintento
+  (`GREATEST(created_at, updated_at)`), el estado `failed` de `handler_health` en la señal, el href canónico del
+  parser, el 400 canónico de la ruta admin y la exclusión de buzones bloqueados / cierres inciertos en revive y
+  reintento.
+
+**Follow-ups que quedan abiertos (no bloquean el cierre):** `ISSUE-173` (task propia, diseño adjunto);
+transparencia del enlace descartado en Application 360 (task); verificar el valor live de
+`GROWTH_FORMS_SERVER_VALIDATION_ENABLED` y por qué la normalización `url` no aterrizó; `captureWithDomain` del
+sender envía `recipientEmail` a Sentry (preexistente); 4 filas `retry` del 2026-07-13 (personas con postulación,
+vacantes de prueba) que morirán en dead-letter; Sentry 92 (`growth_form_upload_quarantined`) es el escáner
+haciendo su trabajo — 6 CV de `EO-OPN-0675` en cuarentena esperan revisión humana.
 
 ## Referencias
 

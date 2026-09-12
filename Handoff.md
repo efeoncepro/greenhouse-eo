@@ -4,17 +4,16 @@
 `src/assets/fonts/`; licencia, procedencia y hash constan en `BricolageGrotesque-SOURCE.md`. Docs y skills espejo la
 registran como display para campañas fuera de UI. El contrato de UI permanece Poppins + Geist; no se cambió runtime.
 
-**Pipeline de Hiring vacío por vacante (2026-09-12, diagnóstico; `ISSUE-171`):** `/agency/hiring/pipeline` se veía
-vacío en `EO-OPN-0674` y `EO-OPN-0675` con 15 y 51 postulaciones reales **intactas, sin pérdida de datos**. Causa raíz
-reproducida: `PipelineDeskView.tsx:125` siembra `applications` con `useState` y nunca re-sincroniza, mientras el
-hermano `openingId` sí (efecto `:150`), así que al cambiar de vacante el tablero filtra el arreglo del montaje y da 0.
-Preexistente desde `559f5654b` (2026-07-09); no es regresión de la publicación del 2026-09-09. **Fix en local, sin desplegar.** Detalle y adyacentes en
-`docs/issues/open/ISSUE-171-hiring-pipeline-empty-stale-client-snapshot.md`. **`ISSUE-172` (P1):** `lpad` recorta el `public_id` del Banco de Talento pasado 99 999 → colisión que
-abre el circuito del consumer de postulaciones (25 personas sin proyectar, nada borrado); fix en local
-(migración + anti-join + parser tolerante + señal `sync.reactive.circuit_open`), **migración NO aplicada**. Aparte:
-6 CV en `quarantined`. El script read-only vive sólo en `claude/hiring-pipeline-bug-880pbn` (con
-`TASK-1869`); esa rama contiene `origin/develop` pero **no** el develop local (4 commits sin pushear) — su merge no es
-ff-only hoy. Siguiente ID libre: `TASK-1870`.
+**Hiring: incidente P1 resuelto y en producción (2026-09-12; `ISSUE-171`/`172` resolved, `ISSUE-173` open; release
+`586a8627568a`):** el tablero no re-leía el snapshot al cambiar de vacante (`ISSUE-171`) y `lpad` recortaba el
+`public_id` del Banco de Talento pasado 99 999 (`ISSUE-172`, P1): colisión que rompía el cron y abrió el circuito
+del consumer de postulaciones. Recuperado por vías gobernadas sin borrar nada (migración, replay, revive de correos):
+**281 submissions / 0 sin postulación, 164 acuses enviados**, circuito `closed`, handler `healthy`; canary: con el
+worker nuevo la secuencia ya no avanza por corrida. Release PR #234 → `released` 14:44:56Z, watchdog 5/5.
+Follow-ups (task propia cada uno): `ISSUE-173` (Phase A del consumer reactivo deja huérfano al handler que el
+breaker saltó; diseño adjunto), transparencia del enlace descartado en Application 360, valor live de
+`GROWTH_FORMS_SERVER_VALIDATION_ENABLED`, 6 CV en cuarentena de `EO-OPN-0675` esperan revisión humana. Plan de
+Resend subido a Pro (Free 100/día se agotó en la ráfaga). Siguiente ID libre: `TASK-1870`.
 
 **Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
 **no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a
