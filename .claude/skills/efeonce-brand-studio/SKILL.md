@@ -107,3 +107,18 @@ Leer solo lo necesario:
 - `references/research-sources-2026.md` para evidencia fechada, confianza y fuentes de investigación.
 
 Usar las plantillas de `templates/` cuando el usuario necesite un artefacto formal. Ejecutar `scripts/validate-brand-artifact.py` antes de cerrar entregables estructurados.
+
+## Activación cultural y social
+
+Para seasonality, trendjacking, memes o marca integrada en piezas, `social-media-studio` conserva el
+entregable completo. Cargar su [módulo 11](../social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md)
+y [brand-in-scene](../social-media-studio/references/brand-in-scene.md). Esta skill decide relación estratégica,
+papel de marca y evidencia de reconocimiento. Separar activo oficial (manual), sistema consistente y activo
+distintivo medido; no sustituir atribución por un color sin evidencia. Una firma editorial identifica al autor,
+una aplicación física debe pertenecer al objeto y ninguna demuestra por sí sola pertinencia estratégica.
+No convertir una solicitud de pieza en un proyecto de branding completo si el encargo ya tiene marca y brief.
+
+Para mecanismos, innovación y conexión emocional en creatividad social, cargar
+[social módulo 12](../social-media-studio/modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md).
+Separar hipótesis de diseño de evidencia psicológica/neural y de resultados de audiencia; revisar memoria
+para el mensaje y para la marca por separado. No presentar una heurística como garantía de persuasión.

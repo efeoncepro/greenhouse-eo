@@ -193,3 +193,12 @@ Carga selectiva: no traigas los 7 módulos de una.
 | `efeonce/EFEONCE_OVERLAY.md` | Ecosistema Efeonce: Think, Marketing con Manzanitas, Glitch, Content Factory, ebooks/lead magnets, bow-tie, ICPs |
 | `efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md` | Canon de infografías: precedentes, paleta, shell estable, arquetipos variables, sello URL, SVG directo, benchmark y gates |
 | `templates/` | content-strategy-brief, editorial-infographic-contract, pillar-cluster-map, editorial-calendar, content-brief, citation-utility-contract, repurposing-map, distribution-plan, measurement-dashboard |
+
+## Derivación a creatividad social
+
+Cuando el pedido sea una seasonality, trendjacking, meme de marca o pieza social original, cargar
+[social-media-studio](../social-media-studio/SKILL.md) y su módulo 11. El protocolo de artículo/pillar no
+sustituye ese flujo: clasificar oportunidad, definir aportación y papel de marca, producir y revisar por formato.
+Una firma editorial exacta conserva el contrato de infografía; marca física sobre un objeto usa
+[brand-in-scene](../social-media-studio/references/brand-in-scene.md). No extender footer-only a escenas
+sociales ni adaptar una reacción a canales fuera de su ventana; conservar el catálogo editorial de la cuenta.

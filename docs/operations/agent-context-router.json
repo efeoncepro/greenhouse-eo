@@ -4,6 +4,41 @@
   "fallbackSnapshot": "docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md",
   "domains": [
     {
+      "id": "social-creative-production",
+      "triggers": [
+        "seasonality",
+        "seasonalities",
+        "temporada",
+        "efeméride",
+        "trendjacking",
+        "trendjack",
+        "newsjacking",
+        "meme de marca",
+        "pieza social",
+        "product placement",
+        "logo en relieve",
+        "branding en escena",
+        "mecanismos creativos",
+        "conexión emocional",
+        "heurísticas creativas",
+        "sesgos en publicidad",
+        "neurociencia y creatividad"
+      ],
+      "skills": [
+        "social-media-studio",
+        "design-studio",
+        "copywriting",
+        "efeonce-brand-studio"
+      ],
+      "sources": [
+        "docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md",
+        ".codex/skills/social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md",
+        ".codex/skills/social-media-studio/references/brand-in-scene.md",
+        ".codex/skills/social-media-studio/efeonce/SEASONAL_CONTENT.md",
+        ".codex/skills/social-media-studio/modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md"
+      ]
+    },
+    {
       "id": "report-production",
       "triggers": [
         "informe",

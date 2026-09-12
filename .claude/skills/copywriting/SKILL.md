@@ -265,3 +265,18 @@ cuando aplique; gráficos con unidades y fuentes claras. Si el destino es PDF, e
 y revisa el PDF A4; el HTML queda como insumo editable.
 
 Para crear o mejorar el informe completo, carga `report-studio`: narrativa, evidencia, gráficos, producción y QA del formato final. La práctica especializada conserva sus contratos y datos.
+
+## Copy para seasonality y trendjacking
+
+Cargar [producción social](../social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md) cuando el
+pedido incluya pieza, tendencia o temporada. Definir qué aporta la imagen y qué añade el texto: anclaje,
+complemento, contraste o doble sentido; no duplicar información por defecto. Conservar copy literal y
+restricciones ya dadas; no agregar fecha, nombre de ocasión, CTA ni apoyo para llenar espacio. No confundir
+juego verbal con insight ni prometer viralidad. Para reacción, verificar significado y vigencia del código
+antes del gag; para seasonality, partir del comportamiento y sentido cultural. Entregar el copy en su layout
+o secuencia cuando la pieza completa esté encargada; Social Media sigue siendo responsable del resultado.
+
+Para mecanismos, innovación y conexión emocional en creatividad social, cargar
+[social módulo 12](../social-media-studio/modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md).
+Separar hipótesis de diseño de evidencia psicológica/neural y de resultados de audiencia; revisar memoria
+para el mensaje y para la marca por separado. No presentar una heurística como garantía de persuasión.

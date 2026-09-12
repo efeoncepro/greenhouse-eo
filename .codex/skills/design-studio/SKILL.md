@@ -223,3 +223,17 @@ cuando aplique; gráficos con unidades y fuentes claras. Si el destino es PDF, e
 y revisa el PDF A4; el HTML queda como insumo editable.
 
 Para crear o mejorar el informe completo, carga `report-studio`: narrativa, evidencia, gráficos, producción y QA del formato final. La práctica especializada conserva sus contratos y datos.
+
+## Entrada de creatividad social
+
+Para seasonality, trendjacking, memes y correcciones de marca sobre objetos, cargar
+[social-media-studio módulo 11](../social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md).
+Social decide pertinencia/objetivo y conserva el entregable; Design resuelve recorrido visual, cámara, luz,
+material, tipografía y adaptación. Leer módulos 03/13 y, si hay marca física,
+[brand-in-scene](../social-media-studio/references/brand-in-scene.md). No usar la calidad de render como
+prueba de concepto ni reconstruir una firma editorial con el modelo.
+
+Para mecanismos, innovación y conexión emocional en creatividad social, cargar
+[social módulo 12](../social-media-studio/modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md).
+Separar hipótesis de diseño de evidencia psicológica/neural y de resultados de audiencia; revisar memoria
+para el mensaje y para la marca por separado. No presentar una heurística como garantía de persuasión.

@@ -103,6 +103,15 @@ familia display dominante por pieza: Bricolage puede convivir con Geist como tex
 con Poppins en el mismo headline. Esta familia no amplía el contrato tipográfico de la UI de Greenhouse, PDF/email
 compartidos ni Globe.
 
+Para seasonalities Efeonce, el pairing aprobado es **Bricolage Grotesque para el headline/idea dominante** y
+**Poppins para fecha, contexto, invitación o texto de apoyo**. Bricolage aporta carácter mediante `opsz`, `wdth` y
+`wght`; Poppins aporta claridad y ritmo. Mantén una jerarquía inequívoca: una sola voz display manda, y no alternes
+ambas familias dentro de la misma palabra o línea salvo que exista una razón compositiva explícita. La atribución de marca debe funcionar en móvil: firma editorial oficial o aplicación física pertinente.
+Un color o dispositivo aprobado no garantiza reconocimiento sin evidencia. No confundir firma con product
+placement. Para marca sobre objeto, usar [brand-in-scene](../../social-media-studio/references/brand-in-scene.md).
+Poppins sólo entra si hay apoyo necesario: no añadir fecha, nombre de ocasión o CTA por completar el pairing.
+Mantener la marca fuera de objetos rituales sin revisión cultural específica.
+
 ## 7. Tipografía expresiva / display `(volátil as-of 2026-07 — reverificar)`
 
 - Vigente: display con carácter fuerte, serifas dramáticas de alto contraste, grotescas anchas,
@@ -147,3 +156,17 @@ compartidos ni Globe.
    fondo se lo come (scrim).
 3. ¿El texto flota sin alinear a nada? Alinéalo a un eje (`modules/01 §2`).
 4. ¿La pregunta real es de peso/variante/escala exacta? → **para y delega a `typography-design`**.
+
+
+## Control tipográfico para contenido cultural
+
+Antes de componer, declarar función de cada texto (idea, anclaje, explicación o acción), orden de lectura y
+relación con la imagen (complemento, contraste intencional o anclaje). Eliminar redundancias sin cambiar copy
+literal aprobado. Diseñar cortes de línea por sentido y ritmo; no sólo por cabida. La palabra dominante debe
+apoyar el mecanismo creativo, no competir accidentalmente con el sujeto. Guardar familia real, archivo y
+licencia, ejes variables, peso, tamaño, tracking, interlínea, alineación y coordenadas reproducibles.
+
+Revisar caracteres/acentos, contraste local sobre el fondo real, lectura móvil y recortes. No convertir un
+threshold técnico en juicio creativo. Titulares/firma editorial se componen después del último pase generativo;
+texto o logo material sobre un objeto puede requerir referencia guiada y revisión física separada. Si el modelo
+altera ese arte, corregir o cambiar de ruta; no declarar fidelidad por semejanza a primera vista.

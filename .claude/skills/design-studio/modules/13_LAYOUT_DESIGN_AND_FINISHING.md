@@ -15,8 +15,9 @@ anchor aprobado → layout contract → clean ratio plate → finish acotado →
 La autoridad cambia por etapa:
 
 - el **director de arte** decide tesis, jerarquía, grilla y hook;
-- el **modelo generativo** eleva únicamente el raster limpio;
-- el **compositor determinístico** gobierna copy, tipo, logo, CTA, legal y export;
+- el **modelo generativo** trabaja escena/material, sin overlays editoriales finales; puede recibir arte
+  oficial para materialización física con el contrato de marca indicado abajo;
+- el **compositor determinístico** gobierna copy, tipo, firma editorial, CTA, legal y export;
 - una **persona** aprueba el craft y el release.
 
 Nunca devolver el anuncio final con texto y marca a un modelo para “pulirlo”: vuelve probabilístico lo que ya
@@ -30,7 +31,8 @@ era exacto.
 | `optical_underlay` | scrim, halo o gradiente para integración | compositor                                         |
 | `campaign_hook`    | rail, trazo, módulo o gesto repetible    | compositor, salvo que sea parte orgánica del mundo |
 | `type`             | headline/support/CTA                     | compositor + SoT tipográfico                       |
-| `brand`            | logo, firma, URL, legal                  | activos oficiales + compositor                     |
+| `brand`            | firma editorial, URL, legal             | activos oficiales + compositor                     |
+| Marca física en plate | arte sobre producto/objeto           | arte oficial + ruta física + revisión de identidad |
 | `channel`          | crop, safe zone, peso, color, bleed/trim | compositor/prepress                                |
 
 Una “capa” de Seedream es una región semántica de un raster plano; no sustituye este contrato ni entrega
@@ -63,9 +65,9 @@ Elegir según el **delta restante**, no por preferencia de proveedor:
 | ----------------------------------------------------------------------- | ---------------------------------------- |
 | material, microtextura, color, luz, atmósfera, integración orgánica     | Seedream 5 Pro Edit                      |
 | geometría, escala, crop, espacio negativo, identidad o región protegida | GPT Image 2 Edit; máscara si corresponde |
-| copy, logo, rail, grilla, CTA, legal, localización, resize y sharpening | composición determinística               |
+| copy, firma editorial, rail, grilla, CTA, legal, localización, resize y sharpening | composición determinística               |
 
-Pro recibe sólo el `clean_plate`, sin copy/logo final. El prompt declara una transformación principal y locks
+Pro recibe sólo el `clean_plate`, sin copy/firma editorial final. El prompt declara una transformación principal y locks
 explícitos. GPT recibe la misma disciplina. Si un pase no mejora el scorecard o el delta siguiente es exacto,
 detener la generación.
 
@@ -76,7 +78,8 @@ detener la generación.
 3. Aplicar un solo delta generativo: por ejemplo, cohesión material y profundidad atmosférica.
 4. Comparar contra el plate anterior: identidad, bordes, safe zone, croma y artefactos.
 5. Aceptar el finish sólo si mejora el craft sin degradar locks.
-6. Componer determinísticamente underlay, hook, tipo y marca.
+6. Si hay marca física, materializarla con referencias oficiales y revisar identidad/soporte antes del texto.
+   Después componer determinísticamente underlay, hook, tipo y firma editorial que corresponda.
 7. Masterizar por destino: color, contraste, tamaño, compresión, naming y package.
 8. Ejecutar QA técnico y revisión humana del set completo.
 
@@ -127,7 +130,7 @@ Evidencia: `ai-generations/2026-07-18_high-frequency-campaign-e2e/brief/layout-d
 
 - diseñar el layout dentro de un prompt y esperar precisión de producción;
 - pedir “más premium” sin delta verificable;
-- hornear copy/logo/legal en el raster generativo;
+- hornear copy/firma editorial/legal en el raster generativo;
 - devolver el anuncio compuesto al modelo;
 - repetir el mismo layout por crop mecánico;
 - usar Seedream Pro por ritual cuando el problema es geometría;
@@ -139,10 +142,23 @@ Evidencia: `ai-generations/2026-07-18_high-frequency-campaign-e2e/brief/layout-d
 ## Cierre mínimo
 
 - [ ] Existe layout contract por set y grilla por ratio.
-- [ ] El finish recibe clean plates sin copy ni marca final.
+- [ ] El finish recibe clean plates sin copy ni firma editorial final.
 - [ ] Cada pase registra un delta, locks, modelo/endpoint, parent, costo y aceptación.
 - [ ] El compositor autoritativo y los activos oficiales están declarados.
-- [ ] Copy, logo, CTA, legal y locale son determinísticos.
+- [ ] Copy, firma editorial, CTA, legal y locale son determinísticos; la marca física pasó su revisión separada.
 - [ ] El set pasa thumbnail, tamaño real, contraste, crop/destino y QA técnico.
 - [ ] La aprobación humana distingue `creative release` de activación en medios.
 - [ ] `pnpm creative:layout ... --mode check` pasa y los manifests son portables.
+
+### Ruta de marca física: autoridad por función
+
+Un logo oficial como referencia para materializar foil, relieve o impresión sobre un objeto no es una
+firma editorial generada de memoria. Separar ese pase del titular y de las firmas exactas; verificar identidad
+y material con [brand-in-scene](../../social-media-studio/references/brand-in-scene.md). No prometer identidad vectorial tras generación.
+
+
+La ruta física no cambia el schema del compiler. Si una operación (proyección, material o tipografía variable)
+no está soportada, registrar el artefacto y limitación; no inventar campos ni falsificar checkpoints humanos.
+Para decisiones de seasonality/trendjacking y papel de marca, cargar primero
+[producción social](../../social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md).
+El layout desarrolla la idea elegida; no sustituye la justificación de participar ni la conexión con el oficio.

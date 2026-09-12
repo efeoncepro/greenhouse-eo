@@ -19,6 +19,13 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // Idea, producción y revisión social deben conservar el mismo contrato en ambos agentes.
+    id: 'social-media-studio',
+    mode: 'byte-identical',
+    codex: '.codex/skills/social-media-studio',
+    claude: '.claude/skills/social-media-studio',
+  },
+  {
     id: 'report-studio',
     mode: 'shared-files',
     agentLocal: ['agents/openai.yaml'],

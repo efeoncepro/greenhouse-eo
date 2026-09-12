@@ -4,6 +4,18 @@
 > conectadas en el loop **idear → producir → programar → medir → iterar**. Reverifica
 > capacidades de cada tool (los MCP cambian de endpoints/features — trimestral).
 
+## Entrada de solicitudes creativas
+
+Para seasonality, trendjacking o una pieza social integral, cargar primero
+[el módulo 11](../modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md), luego
+[el protocolo de producción](../modules/10_AI_AND_PRODUCTION_STUDIO.md) y
+[los contratos de conectores](../references/social-production-connectors.md).
+Clasificación, concepto y papel de marca preceden a selección de modelo. Una festividad es seasonality salvo
+que exista un detonante emergente documentado. No finalizar con un prompt si se pidió una pieza.
+
+La siguiente tabla enruta funciones, no promete tools instalados. Verificar nombres/schema actuales. El uso
+de varias herramientas no es un criterio de calidad; cada pase debe resolver un defecto identificado.
+
 ## El loop y qué herramienta corre cada paso
 
 | Paso | Herramienta / skill | Qué hace |
@@ -86,18 +98,24 @@ Receta completa para vacantes: `linkedin-vacancy-distribution.md`.
 
 ## Higgsfield MCP — producción
 
-- `generate_image` / `generate_video` / `generate_audio` — núcleo de producción.
-- Si la sesión del CLI `higgsfield` está vencida, el conector MCP funciona igual (verificado 2026-09-11). En
-  `gpt_image_2` no hay `aspect_ratio` 4:5: genera `3:4` y recorta (receta de pieza social con sello de logo en
-  `greenhouse-ai-image-generator/SKILL.md`).
-- `models_explore(action:'recommend')` — cuando no sepas qué modelo calza, pídele recomendación.
-- Edición dedicada: `upscale_*`, `outpaint_image`, `reframe` (cambiar aspect ratio de video),
-  `remove_background`, `motion_control`.
-- `virality_predictor` — estima performance/hook/retención de un video antes de publicar.
-- UGC/avatares: workflows de talking-head/UGC (pide `get_workflow_instructions` primero).
+Contrato y secuencia verificados por superficie:
+[`social-production-connectors.md`](../references/social-production-connectors.md).
+Descubrir herramientas actuales; `models_recommend` → `models_get` → estimate cuando aplique → input
+confirmado → generación → `jobs_wait` → resultado visible. No asumir que `models_explore` o
+`media_upload_widget` siguen expuestos ni que todos los modelos tienen los mismos ratios.
 
-> Para input de media local del operador en clientes con UI, Higgsfield pide
-> `media_upload_widget`. No pidas adjuntar en el chat.
+La sesión de CLI y MCP son independientes; verificar la ruta elegida. Un predictor, si está disponible,
+es una hipótesis y nunca evidencia de performance. Cargar la skill específica de producto/UGC/preset
+cuando el encargo la requiera.
+
+## Magnific, motor nativo y composición exacta
+
+Usar Magnific para el delta de detalle/resolución que realmente falte, no para sustituir dirección de arte.
+Su herramienta `images_upscale` y el catálogo TTI son superficies diferentes; leer el schema antes de pasar
+controles de creatividad que sólo estén en la web/API. El motor nativo disponible puede generar/editar el
+plate directamente. Después del último pase generativo, componer tipografía y firmas editoriales desde archivos
+oficiales. La marca física se resuelve antes como material del objeto, con referencia oficial y revisión propia.
+Recetas y límites en la [referencia de conectores](../references/social-production-connectors.md).
 
 ## Regla dura: propose → confirm → execute
 
@@ -108,12 +126,15 @@ publicación sin que el operador diga que sí. Es la misma doctrina Full API Par
 ## Gasto gobernado
 
 El saldo/precio de Higgsfield u otro provider es **costo interno**, no Studio Credits. Dentro de Creative
-Studio, los créditos miden operaciones generativas gobernadas y provider-neutral. Antes de producir:
+Studio, los créditos miden operaciones generativas gobernadas y provider-neutral. Para operaciones que realmente pasan por ese runtime gobernado, antes de producir:
 
 1. clasifica las operaciones de imagen/video/audio requeridas;
 2. ejecuta `estimate → reservation → approval` con rate version vigente;
 3. registra attempts y cierra `settlement | release | refund adjustment` según outcome;
 4. no cobres dos veces un retry técnico ni traduzcas precio vendor→crédito.
+
+Fuera de ese runtime, respetar el presupuesto y autorización del encargo; no crear reservas ni aprobaciones
+ficticias. Una petición de producción autoriza sus pasos reversibles, no una compra o ampliación de gasto.
 
 Copy, layout de carrusel, edición, subtítulos, export, programación, QA y medición devengan **0 Studio Credits**,
 aunque consuman capacidad/gobierno. Derechos de creator, whitelisting, música, voz, likeness y paid usage se
@@ -122,9 +143,14 @@ autorizan/cotizan aparte. Canon:
 
 ## Autenticidad + gobernanza IA
 
-- Gana lo humano/imperfecto/serializado. La IA **acelera**, no reemplaza el juicio de marca.
+- El grado de pulido responde al concepto y al formato; no existe ganador universal. La IA **acelera**, no reemplaza el juicio de marca.
 - Contenido IA que un espectador razonable confundiría con real **debe etiquetarse** ("ante la
   duda, revela"): manos, objetos o personas fotorrealistas generados con IA van con el flag de la red
   (Instagram `isAiGenerated`, YouTube `isAiGeneratedContent`; ver tabla de §Programar por red).
-  ~1/3 de consumidores es menos propenso a marcas con ads de IA (as-of 2026-07).
 - Brand safety: cura todo output de IA contra marca Efeonce antes de que salga.
+
+### Marca física frente a firma editorial
+
+La composición posterior de logos aplica a firmas gráficas. Para marca en una libreta, envase o prenda,
+seguir [brand-in-scene.md](../references/brand-in-scene.md): puede requerir pasar el arte oficial al modelo
+para materializar profundidad, textura y luz antes de incorporar el titular exacto.

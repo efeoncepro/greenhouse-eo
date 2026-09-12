@@ -325,6 +325,17 @@ adapters or Globe payloads without a separate approved typography decision. In a
 as the expressive display voice and keep supporting text in the approved companion family; do not make Poppins and
 Bricolage compete as co-dominant headlines.
 
+For Efeonce seasonalities, the approved pairing is **Bricolage Grotesque for the dominant headline/idea** and
+**Poppins for context, date, invitation and supporting copy**. Bricolage carries expressive character through its
+`opsz`, `wdth` and `wght` axes; Poppins carries clarity and rhythm. One family must clearly dominate the headline.
+Every seasonality requires recognizable Efeonce attribution: an official editorial signature, a plausible
+physical brand integration, or an approved distinctive asset with sufficient recognition evidence. A graphic
+signature is not product placement; a color alone does not establish attribution. Do not force a corporate
+object into the scene. Supporting copy/date/CTA is optional, not a reason to add text. The social craft owner is
+[SEASONAL_CONTENT.md](.codex/skills/social-media-studio/efeonce/SEASONAL_CONTENT.md), with
+[physical integration](.codex/skills/social-media-studio/references/brand-in-scene.md) governing geometry,
+material and identity checks. These creative rules do not change the product UI typography contract.
+
 > **Units (this contract is agent-facing — you emit code; humans use Figma/AXIS).**
 > Emit the **token / MUI variant by name** (`<Typography variant="…">`), **never a
 > raw font-size**. The concrete value lives in the front-matter above and is in

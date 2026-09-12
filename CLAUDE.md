@@ -10,6 +10,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 
 | Dominio / disparador | Skill a invocar | Invariantes (cargar al tocar) |
 |---|---|---|
+| Seasonality, trendjacking, memes, piezas sociales y marca sobre objetos | `social-media-studio` + `design-studio`; `copywriting`/`efeonce-brand-studio` según decisión | [Protocolo de ejecución social](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md): clasificación, investigación, idea, papel de marca, producción por defecto y QA; módulos/overlays espejo son el canon de oficio. |
 | Contractor engagements/payables/honorarios | `greenhouse-finance-accounting-operator` (+payroll) | `architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` |
 | Hiring/ATS: docs candidato · scan/quarantine · procedencia | `greenhouse-talent-people-operator` | `architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (§Candidate document capture · §Delta 2026-08-18 `data_origin` ⊥ `source`, NUNCA en su CHECK; `real`=default=VISIBLE; NUNCA publicar vacante no-real ni sintética a quien tenga vida laboral; retención/comms ciegas) |
 | Production release / promoción develop→main | `greenhouse-production-release` | `architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` |

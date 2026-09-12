@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-12 — Criterio y ejecución de seasonality/trendjacking para Codex y Claude
+
+[Protocolo compartido](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md) y skills espejo: clasificación,
+evidencia, elegibilidad, mecanismos creativos, papel de marca, dirección por formato, producción por defecto y
+cinco revisiones separadas. Routers AGENTS/CLAUDE/JSON y studios adyacentes apuntan al canon social.
+Módulo 12 añade mecanismos/innovación, emoción-atención-memoria y heurísticas/pruebas, con fuentes académicas,
+alcance de acceso, contrapesos y aplicaciones como hipótesis. Se corrigen recetas psicológicas universales en
+fundamentos visuales/dirección/copy. [Investigación](docs/audits/social/2026-09-12-creative-cognition-research.md).
+Se corrigen firma vs placement físico, activo aprobado vs reconocimiento demostrado y concepto vs permiso de
+render. La materialización puede usar logo oficial como referencia; titulares y firmas editoriales siguen exactos.
+Prueba Día de Muertos: v5 rechazada por deformación; v6 es iteración con referencia, no aprobación ni performance.
+[Evidencia, escenarios y límites](docs/audits/social/2026-09-12-social-creative-production.md). Sin publicación.
+
 ## 2026-09-12 — Hiring: incidente P1 del Banco de Talento resuelto y liberado (ISSUE-171/172/173)
 
 `lpad(nextval::text, 5, '0')` recortaba el `public_id` de `talent_pool_membership` pasado 99 999: diez valores de
@@ -1042,25 +1055,3 @@ real firmado por el HSM y verificado con el JWKS servido desde PG; `services/aut
 in-place, 0 destruidos; `mcp.efeonce.org` intacto); señales `auth.issuer.jwks_unreachable` y
 `auth.signing_keys.lifecycle` en el control plane; runbook `docs/operations/runbooks/auth-server.md`. Producción del
 emisor queda `code complete, rollout pendiente` (release control plane).
-
-## 2026-09-03 — Globe: pausa reversible del reconciliador externo de tenancy
-
-`ops-globe-tenancy-reconcile` (`efeonce-group/us-east4`) quedó `PAUSED` a las 22:26:05Z, sin eliminar su
-definición ni modificar cron, destino o identidad. Deja de programar llamadas hacia Globe con SQL detenido.
-`services/ops-worker/deploy.sh` declara la pausa deseada localmente; sin commit/push/deploy en esta ejecución,
-la protección frente a futuros despliegues aún requiere promoción. Reinicio y sincronización source/runtime:
-[runbook](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
-TASK-1807 sigue abierta; ahorro posterior al corte pendiente de Billing Export.
-
-## 2026-09-03 — EPIC-044: authorization server propio de Efeonce (ADR aceptado) y siete tasks nuevas
-
-Decisión del operador: Efeonce construye y opera su propio authorization server en `auth.efeonce.org`; no se compra
-un IdP. Nuevo ADR `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (Accepted) supersede la composición WorkOS del
-ADR de federación y conserva sus invariantes, binding y contrato del gateway. `EPIC-044` (`in-progress`) agrupa
-TASK-1626/1631/1813 y crea TASK-1828 (runtime Cloud Run + front door + KMS HSM + JWKS), TASK-1829 (metadata, CIMD, DCR
-compat, PKCE, tokens ES256, refresh, revocación, consentimiento), TASK-1830 (passkeys, magic link, TOTP, recuperación),
-TASK-1831 (gateway multi-issuer `AuthContext`), TASK-1832 (canaries + primera cohorte), TASK-1833 (red-team, pentest,
-rotación, runbooks, privacidad V2) y TASK-1834 (convergencia del login cliente). `TASK-1631` re-alcanzada a binding/grants.
-`DECISIONS_INDEX`, registries y READMEs sincronizados. Delta posterior el mismo día: el emisor se publica como segundo host
-del front door del gateway (sin LB ni Armor nuevos, ≈ USD 15/mes adicionales medidos contra el billing export) —
-ADR §Delta 2026-09-03 y TASK-1828 actualizados.

@@ -116,7 +116,8 @@ Efeonce Insights: [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE
 Diseño de deck/A4/web por edición; implementación pendiente en TASK-1845–1849.
 
 Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
-Efemérides: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.
+Seasonalities: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.
+Producción seasonality/trendjacking: [protocolo de agentes](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md); canon en skills espejo `social-media-studio` (idea, marca, dirección, producción y QA).
 Berel: `berel-content-production` · [plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
 [informes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) ·
 [colaboración](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md). Preservar análisis, N1–N4 y
@@ -183,7 +184,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo modelar Wave y sus boundaries con Efeonce Digital, Kortex, Globe y Reach | `docs/architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md` + `docs/business-models/wave/WAVE_BUSINESS_MODEL_V1.md` |
 | Qué tooling/modelos evalúa Efeonce Globe / Creative Studio | `docs/architecture/EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md` + capability registry |
 | Cómo crea y captura valor Creative Studio, sus créditos y qué skills lo adoptan | `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md` |
-| Qué tipografías están disponibles para UI y assets creativos Efeonce | UI: `DESIGN.md` + `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`; asset creativo Bricolage: `src/assets/fonts/BricolageGrotesque-Variable.ttf` + `BricolageGrotesque-SOURCE.md` + skills `design-studio`/`greenhouse-ai-image-generator` |
+| Qué tipografías y firma de marca usan las seasonalities Efeonce | UI: `DESIGN.md` + `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md`; seasonalities: Bricolage display + Poppins apoyo, con atribución oficial o activo distintivo validado; asset: `src/assets/fonts/BricolageGrotesque-Variable.ttf` + `BricolageGrotesque-SOURCE.md` + skills `social-media-studio`/`design-studio`/`greenhouse-ai-image-generator` |
 | Cómo producir posts sociales visuales con reportes, dashboards o evidencia de producto | `docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md` + capas funcional/manual + skills `design-studio` y `social-media-studio` |
 | Cómo crear o modificar templates, footers y hero images de email | skill espejo `greenhouse-email` + `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`; delivery/provider se opera aparte con `resend-email-platform` y visuales GPT Image 2 con `greenhouse-ai-image-generator` |
 | Cómo diseñar, auditar o mejorar dashboards en Google Data Studio (antes Looker Studio) | `.codex/skills/google-data-studio/SKILL.md` + `.claude/skills/google-data-studio/SKILL.md`; usar `inspect` por defecto; validar modelado, filtros, browser, permisos y sharing en sus references |

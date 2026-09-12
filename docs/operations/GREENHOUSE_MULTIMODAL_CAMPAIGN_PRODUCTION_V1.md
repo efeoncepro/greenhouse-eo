@@ -12,6 +12,27 @@ sin depender de un único modelo ni confundir una imagen atractiva con un releas
 trabajo es un **linaje aprobable de assets**: brief, territorios, anchor, plates, motion, composición,
 prepress, QA, paquete y aprendizaje.
 
+## Entrada social: clasificación y límites de este documento
+
+Para solicitudes de seasonality, trendjacking y piezas sociales, el canon de oportunidad, idea, marca y crítica
+es [social-media-studio, módulo 11](../../.codex/skills/social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md)
+(espejo Claude: ../../.claude/skills/social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md).
+Este documento conserva el flujo de campaña y los gates humanos; no sustituye esa decisión creativa ni exige
+usar todos los proveedores del piloto histórico. Aplicar:
+
+- **Seasonality:** ventana previsible y comportamiento cultural/comercial; planificar etapa, significado y
+  relación de marca. Una fecha no es por sí sola un concepto.
+- **Trendjacking:** detonante emergente observado, código, audiencia, oportunidad vigente y aportación propia;
+  revalidar antes de activar. Si no existe detonante, clasificar como seasonality o evergreen.
+- **Híbrido:** documentar por separado temporada y detonante; no usar la etiqueta para evitar decidir.
+- Definir objetivo, mecanismo y papel de marca antes de producir; calidad visual no compensa falta de sentido.
+- Escalar alternativas, producción y aprobaciones al encargo autorizado. Los gates de este pipeline runtime/
+  campaña no se falsean ni se eliminan; tampoco se imponen como nuevas autorizaciones a cada borrador local.
+
+Los modelos y parámetros del «router validado» registran una corrida histórica, **no disponibilidad vigente ni
+ranking universal**. Para otra corrida, descubrir schema y seleccionar por delta según
+[conectores sociales](../../.codex/skills/social-media-studio/references/social-production-connectors.md).
+
 ## Dos ejes que no deben confundirse
 
 ### Canal
@@ -27,14 +48,35 @@ prepress, QA, paquete y aprendizaje.
 
 | `brandMode`         | Significado                                    | Regla                                                     |
 | ------------------- | ---------------------------------------------- | --------------------------------------------------------- |
-| `branded`           | marca, tipo, URL y paleta visibles             | activos oficiales y composición determinista              |
-| `brand-light`       | la campaña se reconoce sin dominar con el logo | firma/end card discreto; nunca logo generado              |
+| `branded`           | marca, tipo, URL y paleta visibles             | activos oficiales; firma exacta, marca física según contrato              |
+| `brand-light`       | la campaña se reconoce sin dominar con el logo | firma/end card discreto exacto; física sólo con arte oficial              |
 | `editorial-neutral` | plate útil sin firma visual de Efeonce         | no hereda AXIS ni una skin Efeonce; conserva provenance   |
 | `client-brand`      | pertenece a un cliente                         | sólo brand book/activos del cliente; Efeonce no contamina |
 
 `off-branding` no significa “fuera de control”. Significa que la capa visual generativa queda limpia
 para contenido editorial, performance, motion o cliente, y que la firma correcta se decide en post. Tampoco
 es sinónimo de `offline`: una pieza puede ser digital y editorial-neutral, o un OOH completamente branded.
+
+### Marca física y firma editorial: autoridades separadas
+
+El papel narrativo de marca (firma, punto de vista, participante, facilitadora, demostración o protagonista)
+se declara en el brief; no añade enums al schema `brandMode`. La modalidad física tampoco es un nuevo enum.
+
+- **Firma editorial:** logo, titular, CTA, URL, legal y captions permanecen exactos en el compositor.
+- **Marca física:** logo o packaging sobre objeto realista puede requerir referencia oficial al modelo,
+  mockup fotográfico o 3D para describir tinta, foil, bajorrelieve, grabado o bordado. No generar de memoria.
+- Registrar un `materialized_plate` como artefacto de trabajo separado: escena con marca física revisada,
+  sin titular/firma editorial. El nombre es descriptivo, no nuevo tipo o estado del compiler.
+- Verificar identidad, proporción sobre la superficie, luz/material y reconocimiento en consumo. Una
+  homografía matemáticamente válida no demuestra escala física ni relieve; inspeccionar el crop de marca.
+- Si la marca debe ser exacta y la generación no conserva su identidad, cambiar a composición/mockup/3D
+  controlable. No aceptar deformación por realismo ni añadir un segundo logo para ocultar el defecto.
+- El master editorial compuesto nunca vuelve al generador. Para corregir marca física, volver a su plate,
+  proteger el resto, revisar y recomponer el mismo titular después.
+
+Contrato de oficio: [brand-in-scene.md](../../.codex/skills/social-media-studio/references/brand-in-scene.md).
+No cambia approvals, schema ni capacidad del layout compiler. Si éste no admite una operación, no falsificar
+su contrato; resolver el asset fuera de él con lineage y conservar sus gates para la composición aplicable.
 
 ## Arquitectura de manos
 
@@ -61,7 +103,7 @@ GPT Image 2 ────── organize, repair, extend ratios, copy fields
               │                   │
               └─────┬─────────────┘
                     ▼
-deterministic post: type / logo / CTA / legal / captions / audio mix
+deterministic post: type / editorial logo / CTA / legal / captions / audio mix
                     ▼
 digital release + print/OOH production proofs + manifests + QA
 ```
@@ -96,7 +138,7 @@ anchor aprobado; no se encadenan derivados como `v1 → v2 → v3`.
 | Toma motion base desde anchor limpio            | Gemini Omni Flash                      | una toma continua por ratio, con audio nativo y plate sin marca               |
 | Familia 15/10/6 desde toma aprobada             | edición determinista                   | trim, montaje, format wall, end card, mezcla y exports sin regenerar          |
 | Nueva toma, ángulo o continuidad física ausente | Seedance 2.0, fallback                 | sólo cuando los píxeles/actuación necesarios no existen en el master aprobado |
-| Copy/logo/legal exactos                         | composición determinista               | precisión, localización, compliance y reemplazo sin regenerar                 |
+| Copy/firma editorial/legal exactos                         | composición determinista               | precisión, localización, compliance y reemplazo sin regenerar                 |
 | Aprobación                                      | director/a de arte + brand/legal/media | el modelo no es autoridad de marca ni de lanzamiento                          |
 
 Gemini Omni Flash es **video**, no un tercer generador de stills. Al 2026-07-18 está en preview como
@@ -137,8 +179,8 @@ cuadro muestra UI, esa pantalla es parte de la toma, no de la capa de marca:
   chico como `start_image` hizo que el modelo redibujara palabras desde el primer frame («B2S» por B2B).
 - **El encuadre no queda fijo.** En `omni_reference`, `start_image` no lo bloquea: el dispositivo creció y subió
   durante el clip. El overlay se diagrama sobre el bounding box medido por frame, en las bandas libres.
-- **Titular, bajada y logo siguen fuera del modelo** (overlay ffmpeg). Esta regla no autoriza generar el copy ni
-  la marca de la pieza.
+- **Titular, bajada y firma editorial siguen fuera del modelo** (overlay ffmpeg). El caso de pantallas no
+  autoriza generar esos overlays; la marca física tiene el contrato separado definido arriba.
 - **QA:** hoja de frames a 0/2/4/6/8 s, zoom de pantallas al inicio, medio y final, y colisión overlay↔sujeto en
   el último frame.
 
@@ -158,7 +200,8 @@ Fijar mensajes, ratios, safe zones, activos oficiales, localización, riesgos de
 de marca y qué contenido debe ser exacto. Separar desde el inicio:
 
 - `clean plate`: sujeto, ambiente, material y luz; sin texto/logo;
-- `brand layer`: logo, tipo, CTA, URL, legal, captions y end card;
+- `materialized_plate` opcional: escena con marca física desde arte oficial, validada por identidad y material;
+- `brand layer`: firma editorial, tipo, CTA, URL, legal, captions y end card;
 - `channel layer`: crop, duración, audio, peso, bleed, ICC y specs del proveedor.
 
 ### 2. Divergencia Seedream Lite
@@ -179,7 +222,7 @@ crop y riesgo semántico. Un anchor es una decisión con owner; todavía no es u
 ### 5. GPT Image 2 organiza y extiende
 
 Desde el mismo anchor, producir plates directos por ratio. Un pase cambia un delta: escala, crop, espacio de
-copy, reparación o extensión. Bloquear sujeto, hook, paleta y dirección de luz. Texto de modelo es concept-only.
+copy, reparación o extensión. Bloquear sujeto, hook, paleta y dirección de luz. Texto editorial de modelo es concept-only; marca física sigue el contrato separado de referencias y revisión.
 
 ### 5A. Layout Design & Finishing para sets estáticos
 
@@ -195,7 +238,8 @@ anchor → layout contract → clean plate por ratio → bounded finish → comp
 2. Exportar un `clean_plate` por ratio sin headline, logo, CTA, legal ni locale.
 3. Elegir el executor por el delta restante: Seedream 5 Pro para material, microtextura, luz, color, atmósfera
    e integración; GPT Image 2 para geometría, escala, safe zones, identidad o reparación protegida.
-4. Aplicar un solo delta por pase y restatar locks. Detener si el scorecard no mejora o el siguiente trabajo
+4. Cuando exista marca física, ejecutar el pase de materialización antes del titular y registrar su review.
+   Aplicar un solo delta por pase y restatar locks. Detener si el scorecard no mejora o el siguiente trabajo
    ya es determinístico.
 5. Componer underlay óptico, hook, tipo, logo, CTA y legal en Figma, Adobe, código/Sharp u otra herramienta
    declarada. Nunca devolver el anuncio final al modelo para “pulirlo”.
@@ -216,16 +260,20 @@ el release humano permanece como checkpoint separado. Contrato técnico:
 
 ### 6. Bifurcación still/motion
 
-- **Still:** el clean plate pasa a composición determinista branded, brand-light, neutral o client-brand.
+- **Still:** el clean plate, o el materialized plate revisado cuando corresponda, pasa a composición
+  determinista branded, brand-light, neutral o client-brand.
 - **Motion:** un plate 9:16/16:9 sin logo ni copy se entrega a Gemini Omni como `<FIRST_FRAME>` o referencia.
   Fijar una toma continua, duración, cámara, acción, audio, continuidad, anatomía temporal, prohibiciones y
   poster frame. Primero se genera y aprueba el single-shot; las duraciones de release se editan después.
+  Si el concepto exige marca física en la toma, entregar el plate materializado y las referencias que admita
+  el modelo; revisar identidad durante todo el movimiento, oclusiones y cambios de luz. Esa ruta requiere
+  evidencia propia: el piloto clean no la certifica. Titulares y firmas editoriales siguen fuera del modelo.
 
 ### 7. Iteración conversacional Gemini Omni
 
 Si el single-shot necesita un cambio generativo localizado, cada edición usa un delta simple y termina con
 `Keep everything else the same`. Conservar el interaction/video parent y no reabrir simultáneamente cámara,
-sujeto, ambiente y audio. El output generativo sigue siendo un master de motion: captions, logos, CTA, legal,
+sujeto, ambiente y audio. El output generativo sigue siendo un master de motion: captions, firmas editoriales, CTA, legal,
 familia 15/10/6, format wall, mezcla y loudness se terminan fuera del modelo. Si lo solicitado es una nueva
 toma/ángulo o continuidad física ausente, no forzar la edición conversacional: abrir el fallback Seedance 2.0.
 
@@ -344,14 +392,25 @@ campaign-id/
   qa/             technical, visual, temporal, prepress, release verdict
 ```
 
+## Gate social adicional
+
+Antes del release, registrar cinco veredictos independientes: estratégico (razón de participar), creativo
+(mecanismo y aportación), cultural/contextual (significado y vigencia), marca (atribución y asociación) y
+producción (archivo y ejecución). El agente registra su revisión; no se autoasigna aprobación humana.
+
+Entregar la pieza visible y los formatos solicitados, no sólo el prompt. Anotar qué fue investigado, ejecutado,
+revisado, aprobado y publicado como estados diferentes. Sin datos de audiencia, desempeño queda no medido.
+La crítica de un placement rechazado prevalece sobre checks verdes de tamaño, contraste o geometría.
+
 ## Gate de cierre
 
 - [ ] `channelMode` y `brandMode` declarados por asset.
 - [ ] Cada salida deriva de un anchor aprobado, no de otro derivado.
-- [ ] Clean plates no contienen marca accidental ni texto generado.
-- [ ] Sets con Layout Design declaran grilla/capas por ratio; el finish sólo recibe clean plates.
+- [ ] Clean plates no contienen marca accidental ni texto generado; los materialized plates se identifican aparte.
+- [ ] Sets con Layout Design declaran grilla/capas por ratio; finish nunca recibe el master editorial compuesto.
 - [ ] El anuncio final compuesto no vuelve a un modelo generativo.
-- [ ] Copy/logo/CTA/legal/captions son determinísticos.
+- [ ] Copy/firma editorial/CTA/legal/captions son determinísticos.
+- [ ] Marca física tiene arte oficial, proceso, lineage y revisión separada de identidad/geometría/material/lectura.
 - [ ] Motion pasa identidad temporal, anatomía, flicker, audio y poster frame.
 - [ ] La familia 15/10/6 deriva del single-shot aprobado; cualquier nueva generación justifica qué píxel/toma faltaba.
 - [ ] El format wall usa piezas reales del release con lineage, no formatos o interfaces inventados.

@@ -1,8 +1,8 @@
 # Handoff activo
 
-**Tipografía creativa Efeonce (2026-09-12, documental):** `Bricolage Grotesque` variable está en
-`src/assets/fonts/`; licencia, procedencia y hash constan en `BricolageGrotesque-SOURCE.md`. Docs y skills espejo la
-registran como display para campañas fuera de UI. El contrato de UI permanece Poppins + Geist; no se cambió runtime.
+**Creatividad social:** [protocolo Codex/Claude](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md),
+[evidencia](docs/audits/social/2026-09-12-social-creative-production.md). V5 rechazada; V6 pendiente de aprobación.
+Bricolage: `src/assets/fonts/BricolageGrotesque-SOURCE.md`; UI Poppins + Geist. Sin publicación.
 
 **Hiring: incidente P1 resuelto y en producción (2026-09-12; `ISSUE-171`/`172` resolved, `ISSUE-173` open; release
 `586a8627568a`):** el tablero no re-leía el snapshot al cambiar de vacante (`ISSUE-171`) y `lpad` recortaba el
