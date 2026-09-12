@@ -187,6 +187,21 @@ Checks sitewide (en `summary.domain_info.checks`): `sitemap`, `robots_txt`, `ssl
 - Excepción de refund: páginas 4xx/5xx y bloqueos Cloudflare **sí se cobran** (help-center, §9).
 - `custom_js` no tiene fee separado listado (incluido en el precio del crawl).
 
+### 8.1 Coste de un audit de CARTERA: lo domina la keyword, no el sitio
+
+(as-of 2026-09-11; modelo de la skill `seo-portfolio-audit` **del proveedor** — los precios unitarios son los de la tabla de arriba.)
+
+```
+llamadas ≈ N×6 + K + P       N = clientes · K = keywords totales · P = landing pages únicas
+P ≈ K × 0,7                  ("cada keyword rankea ~1 página; asumir conservadoramente 70% únicas")
+```
+
+- Cada **cliente** cuesta un bloque **fijo** de llamadas: instant_pages de la home + lighthouse + domain_rank_overview (Labs) + backlinks summary + backlinks timeseries. *(El desglose de costo del proveedor lista 5 líneas por cliente y su fórmula usa 6 — discrepancia del original, no resuelta.)*
+- Cada **keyword** cuesta **1 SERP + ~0,7 crawls de landing page**. Con 10 clientes × 10 keywords: ~60 llamadas atribuibles a clientes contra **~170 atribuibles a keywords**. 🔴 **Por eso la palanca de recorte del presupuesto es la keyword, no el cliente** — el gate del proveedor pregunta literalmente si quiere *"trim the keyword list"*.
+- **`P` es la única variable no acotada**: el deep scan audita TODAS las landing pages únicas que rankean, sin cap (el propio eval del proveedor exige *"not capped at 10"*). Un cliente con cola larga de páginas rankeando puede duplicar el costo del run sin que el gate lo haya anticipado.
+- Dos supuestos de precio que hay que sostener para que la estimación cuadre: el SERP va con **`depth: 10`** (= 1 SERP facturable) y los `instant_pages` van **sin extras** (precio base ×1) — sumar los multiplicadores de `load_resources`/JS/rendering sobre-estima el audit por un orden de magnitud (§8).
+- Dedupe barato que evita el crawl más caro: **la home con y sin slash final es la MISMA URL** (aparece en casi todos los SERPs del cliente).
+
 ---
 
 ## 9. Gotchas
@@ -203,6 +218,11 @@ Checks sitewide (en `summary.domain_info.checks`): `sitemap`, `robots_txt`, `ssl
 8. **Instant pages y dominios repetidos:** máx 20 tasks/request y no más de **5 URLs del mismo dominio** por request.
 9. **Cobro pese a fallo:** 4xx/5xx y páginas bloqueadas por Cloudflare se facturan (sin refund).
 10. **`respect_sitemap` anula `max_crawl_depth`.**
+11. 🔴 **Trampas de tipo y de forma entre conectores V1/V3 en `instant_pages` y `lighthouse`** (as-of 2026-09-11; field map de la skill `seo-portfolio-audit` **del proveedor**, verificado por ellos contra respuestas reales — no está en la doc oficial). Las cuatro muerden en silencio:
+    - **`no_image_alt` es BOOLEAN en V3 y un ENTERO (conteo) en V1** para el mismo campo. Un contador que sume el campo directo da 1/0 en vez del número real de imágenes sin alt: la métrica "imágenes sin alt" queda **sistemáticamente subreportada** y nunca falla.
+    - **`broken_links` puede venir AUSENTE cuando vale 0** (no llega como `0`). `resp.broken_links ?? 0` y `resp.broken_links === undefined → "N/A"` divergen justo en el caso sano: el segundo pinta **"sin datos" donde la verdad es "perfecto"**. **Ausencia ≠ cero** — modelar los tres estados (ausente · cero · N) desde el borde de adquisición.
+    - **Rutas que no están donde uno las busca** en el shape plano V3 `.ai`: `internal_links` cuelga de `items[0].meta.internal_links_count` (**no** top-level), y los scores de Lighthouse llegan como **floats 0–1 directamente en `items[0].categories.*.score`** (×100 para 0–100), **NO** anidados bajo `lighthouse_result`. El `best_practices` se lee `categories["best-practices"]`, con guion.
+    - **`status_code 40501` = "Domain Not Found"** en `instant_pages`: es el hallazgo más urgente de un audit (el sitio es invisible para Google) **y** una señal de ahorro — no gastar el Lighthouse de ese cliente. Como todo v3, se valida **por task antes de leer `items`**: una task degradada se ve igual que "no hay resultados" (ver `01-serp.md` §7 gotcha 12).
 
 ---
 

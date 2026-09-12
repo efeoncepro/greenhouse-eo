@@ -36,6 +36,14 @@ relevante de Reddit puede pesar más para AEO que un backlink mediocre.
   manipulación (riesgo, ver `ANTIPATTERNS.md`).
 - **Link velocity:** crecimiento orgánico y sostenido; picos antinaturales son
   bandera roja.
+- 📐 **Para convertir un link gap en lista de outreach priorizada:** el corte
+  `add_me_candidate` (la página ya lista ≥2 competidores, o es *resource page*, o su anchor/URL
+  dice *best/top/alternatives/vs/roundup*), la matriz 2×2 **priority × attainability** con umbral
+  50/50 y sus glosas (*start here / long game / quick wins si sobra capacidad / skip*), y el dedupe
+  en dos capas (eTLD+1 **con excepción para plataformas alojadas** + colapso por subred `/24`
+  **con allowlist de CDN**) → `../references/competitor-methodologies-2026-09.md` §4. Fórmulas de
+  terceros, **no validadas con nuestros datos**; `ANTIPATTERNS.md` sigue gobernando qué enlace se
+  persigue.
 
 ## Digital PR (el motor de links + menciones de calidad)
 

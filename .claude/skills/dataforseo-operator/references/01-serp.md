@@ -122,6 +122,8 @@ Fuentes: [ai_mode/overview](https://docs.dataforseo.com/v3/serp-google-ai_mode-o
   - `ai_overview_video_element`, `ai_overview_table_element` (markdown + tabla headers/rows + references), `ai_overview_expanded_element`, `ai_overview_shopping`, `ai_overview_paid`.
 - **`references[]`**: `type: ai_overview_reference`, **`source`, `domain`, `url`, `title`, `text`** → la unidad atómica para medir citabilidad/menciones de marca.
   - ⚠️ **En la práctica (verificado contra respuesta live real, as-of 2026-08-27 — NO está en la doc del proveedor):** `domain` y `url` NO identifican la fuente citada — Google envuelve TODAS las references en redirects propios (`domain=google.com`/`www.google.com`, `url=https://google.com/goto?url=<token opaco>` o `/searchviewer`, no decodificable client-side). La identidad real viene SOLO en `source` (a veces domain-shaped, a veces nombre de marca). Para atribución, derivar dominio de `source`; una ref cuya `source` es solo marca no es atribuible a dominio (ver gotcha 11).
+  - ⚠️ **Las `references` viven en MÚLTIPLES niveles anidados, no sólo en el primero** (as-of 2026-09-11; la doc de AI Mode lo dice verbatim: *"References appear at multiple nesting levels"* — dentro de `ai_overview_element`, `ai_overview_table_element`, `ai_overview_expanded_element` y `ai_overview_shopping`). Recorrer sólo el `references` de primer nivel **sub-cuenta las citas y parece un éxito**: un split/map sobre un ítem que no tiene campo `references` no lanza error, simplemente no emite filas. Los templates n8n 7539/7540 publicados por el propio proveedor cometen exactamente ese error; el adapter Greenhouse ya barre recursivamente `['references','links','sources']`.
+  - **El shape de las referencias es IDÉNTICO entre AI Overview y AI Mode** (`type: ai_overview_reference` + `source`/`domain`/`url`/`title`/`text`): cambia el endpoint, no la estructura — **un solo parser sirve para las dos superficies**. Y `text` es el *fragmento atribuido* ("text snippet from the page that was used to generate the `ai_overview_element`"), no un resumen: es la evidencia de QUÉ de esa página se citó.
 - `links[]`: `link_element` con title/description/url/domain · `images[]`: `images_element` con alt/url/image_url.
 - Gotcha declarado por la doc: se ignora personalización/historial; verificar contra incógnito.
 - **Fallo per-task bajo HTTP 200:** un `location_name` inválido (p. ej. un ISO-2 crudo como `"CL"`) produce task-level `40501` con `result: null` dentro de un batch HTTP 200 — de ahí el gate per-task por `status_code=20000` del adapter Greenhouse (TASK-1652).
@@ -129,9 +131,22 @@ Fuentes: [ai_mode/overview](https://docs.dataforseo.com/v3/serp-google-ai_mode-o
 ### 4.2 AI Overview dentro de Organic
 
 - `ai_overview` es un item type del organic advanced; cuando Google lo carga asíncrono, hay que pasar **`load_async_ai_overview: true`** (recargo) o no aparecerá.
+- ⚠️ **El default es `false`, y en ese modo la respuesta sale de CACHÉ, no del SERP de hoy** (as-of 2026-09-11, verbatim de la doc citada por los templates n8n 7539/13431 del proveedor: *"you'll only obtain `ai_overview` items from cache"*). Sin el flag no recibes error ni item vacío: recibes **HTTP 200 con menos ítems**. Una medición de AI Overview sin el flag mide la caché del proveedor y **falla en silencio**.
+- **Economía de los recargos (as-of 2026-09-11):** `load_async_ai_overview` cuesta **+USD 0.002 por request** y se **reembolsa** *"if the element is absent or contains `"asynchronous_ai_overview": false`"* — forzar la carga no se paga cuando no había AI Overview que cargar, así que el flag es barato de dejar prendido en monitoreo. `people_also_ask_click_depth` (1–4) cobra **+USD 0.00015 por clic** y **también se reembolsa** si se hacen menos clics de los pedidos. `calculate_rectangles: true` **duplica** el costo de la task, sin reembolso asociado.
 - Diferencia práctica: organic te da el AI Overview *en contexto de SERP completo* (posición, qué features lo rodean); AI Mode te da la *experiencia conversacional completa* con refinement chips.
 
-### 4.3 Sección hermana: AI Optimization API (`/v3/ai_optimization/*`)
+### 4.3 Dos lentes para medir AI Overview — no son intercambiables
+
+> Referenciada desde `02-labs.md` §8.7. (as-of 2026-09-11, contraste derivado de los templates n8n 7539/7540 vs 13431 publicados por el proveedor.)
+
+| Lente | Endpoint | Pregunta que responde | Costo |
+|---|---|---|---|
+| **SERP-first** | `serp/google/organic/live/advanced` + `load_async_ai_overview: true` | *"Para ESTA keyword, ¿a quién cita Google hoy?"* → el set completo de citas, incluidos competidores y autoridades que no sabías que existían | 1 SERP por keyword + recargo del flag |
+| **Target-first** | `dataforseo_labs/google/ranked_keywords/live` + `item_types: ["ai_overview_reference"]` | *"Para MI dominio, ¿en qué keywords ya estoy citado?"* → inventario propio, paginable | precio Labs por fila; **sin pagar un SERP por keyword** |
+
+La target-first convierte un endpoint de rank tracking en un **inventario de presencia en AI Overview a escala de dominio**, órdenes de magnitud más barato. Pero no sustituye a la otra: target-first **nunca** te muestra al competidor citado, y SERP-first **nunca** te da el inventario completo del dominio. La elección debe quedar **nombrada en el contrato de la capability**, no implícita en qué reader la llamó.
+
+### 4.4 Sección hermana: AI Optimization API (`/v3/ai_optimization/*`)
 
 Fuente: [ai_optimization/overview](https://docs.dataforseo.com/v3/ai_optimization-overview/) (as-of 2026-08-06). Es OTRA sección de la doc (no SERP), pero clave para AEO:
 
@@ -185,6 +200,8 @@ Fuente: [serp/locations](https://docs.dataforseo.com/v3/serp-se-locations/) (as-
 9. **URLs de doc**: los slugs canónicos usan guiones (`serp-google-ai_mode-overview`); varias URLs "de carpeta" devuelven 404.
 10. **Postback timeout**: 10 s para responder o se aborta la conexión; diseñar el receptor como ack-rápido + proceso async (patrón outbox).
 11. **AI Mode: `references[].domain/url` son el redirect de Google, NO la fuente** (as-of 2026-08-27, verificado contra respuesta live real — la doc oficial describe `references[]` con source/domain/url/title/text sin advertirlo): TODAS las references llegan con `domain=google.com` y `url` de tipo `google.com/goto?url=<token opaco>` (o `/searchviewer`). Atribuir por `domain`/`url` asigna el 100% de la citabilidad a google.com. La fuente real vive SOLO en `source` — y solo cuando es domain-shaped; cuando es nombre de marca (`"Bigbuda"`) la ref no es atribuible a dominio. En un payload live real: 27 refs únicas → 2 atribuibles por `source`, 25 no atribuibles. Complemento del gate per-task: un `location_name` inválido devuelve `40501` per-task con `result: null` bajo HTTP 200 batch — validar `status_code=20000` por task antes de parsear.
+
+12. 🔴 **Ningún consumer debe navegar a `result[0].items` (ni a `items[]` en el shape plano V3 `.ai`) sin validar antes `status_code == 20000` por task.** Una task degradada del proveedor se manifiesta como **cero filas**, indistinguible de "no hay resultados": el pipeline sigue verde, el reporte dice "sin citas"/"sin datos" y nadie se entera. Es transversal a TODA la API v3 (SERP, Labs, Backlinks, OnPage), no sólo a AI Mode (§4.1). En el shape plano V3 `.ai` el `status_code` a mirar es el de **nivel superior**; en el shape con wrapper, el de `tasks[0]`. (as-of 2026-09-11: verificado como defecto presente en los 7 workflows n8n publicados por el propio proveedor — **ninguno** valida el status de la task antes del traversal.)
 
 ---
 

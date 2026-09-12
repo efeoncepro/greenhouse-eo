@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-11 — Conocimiento de las «AI Skills» de DataForSEO incorporado a las skills propias
+
+Seis skills públicas del proveedor (licencia libre de uso, copia, modificación y redistribución) descargadas y
+analizadas como datos, más 62 páginas de la API AI Optimization y 11 templates n8n/Make. Ninguna se instala: duplican
+capacidades existentes y comprarían API fuera del ledger de gasto. Se incorporó el delta real —comportamiento de
+endpoints que falla en silencio (`domain_intersection` AND vs unión, `rank_scale: one_hundred` en `bulk_ranks`,
+`info.target_spam_score` ≠ `backlinks_spam_score`, lost-link spike derivado, asimetría V1/V3 en `historical_serps`,
+referencias de AI Overview anidadas en varios niveles) y el método (scoring de visibilidad en IA, umbral de
+significancia, higiene de denominador, canibalización SERP-first, 28 checks de cartera, offer bank). Las curvas de CTR
+del proveedor quedaron declaradas como discrepantes ~6× frente a las mediciones propias, que gobiernan.
+`ai_optimization` permanece fuera del allowlist. Sin cambios de código, flags, datos ni release.
+[RESEARCH-011](docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md).
+
 ## 2026-09-11 — CLAUDE.md: bloque del outbox a su companion y fila de Channel & Commerce en el router
 
 El bloque "Outbox publisher canónico" (TASK-773) se movió verbatim a
@@ -1031,13 +1044,3 @@ compensación y desactiva en `afterAll`), en producción con PR #220 (`a824d073a
 Docs: `LIVE_TESTS_AGENT_INVARIANTS.md` §3 (nunca dejar compensación abierta en un sujeto sintético),
 `PAYROLL_WORKFORCE_AGENT_INVARIANTS.md`, decisión (2) en `GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`,
 runbook `offboarding-recovery.md` (readback previo por sujeto, lección Valentina; harness vs commands por `tsx`).
-
-## 2026-09-03 — Contratos y skills de reingreso sincronizados
-
-Arquitectura, invariantes, manuales, documentación funcional y runbooks reflejan compensación bruta/snapshots,
-proporcionales autorizados, identidad longitudinal, recuperación transaccional y verificación de consumidores.
-Skills de Payroll, Talent, Finance, Release, QA y arquitectura actualizadas para Codex/Claude; nuevo espejo
-Finance con gate. Tareas e índices ya no prescriben restaurar Valentina por SQL ni presentan la guarda como
-pendiente de deploy. [Cobertura documental](docs/audits/payroll/VALENTINA_DOCUMENTATION_SKILLS_CLOSURE_2026-09-03.md).
-Sin nuevas mutaciones de datos, flags o release. Prorrateo automático, resolución de ID público en off-cycle,
-UI TASK-1814 y bug de correlación de releases conservan su condición pendiente.

@@ -104,6 +104,15 @@ editoriales. Un éxito de escritura o un archivo local correcto no demuestra que
 la versión de Notion quedó actualizada. Informa por separado cualquier destino
 que no se pudo verificar; sólo declara completa la entrega verificada.
 
+📐 **Siguiente paso anclado a la evidencia del propio informe.** El patrón «offer bank» de un
+tercero —condición de disparo por oferta evaluada contra los datos recién recolectados, ranking por
+fuerza de señal, máximo 2 ofertas por tema, piso 3 y techo 5, y placeholders rellenos con los
+números reales del reporte— está en
+`../references/competitor-methodologies-2026-09.md` §7, junto con la **honestidad metodológica
+impresa en el entregable** (tráfico modelado ≠ analítica, CWV lab ≠ campo, frescura del índice del
+proveedor) en §6.4. Patrón de terceros, **no validado con nuestros datos**; toda oferta que dispare
+debe poder ejecutarse con el equipo y los datos que existen.
+
 ## Presentación y entrega institucional
 
 Aplica `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` al informe:

@@ -406,6 +406,15 @@ GSC/CrUX (punto **(a)**)— y **`llms.txt`**, de ROI marginal y que Google no us
 Corolario: la checklist §A de `templates/audit-checklists.md` **no se puede tildar desde el
 reporte del crawler**. Varias de sus filas exigen verificación aparte.
 
+📐 **Un catálogo de terceros, con severidad y scores, para contrastar el propio:** 28 checks
+tipificados (indexabilidad, on-page con cortes de longitud title 50–60 / description 120–158,
+Lighthouse, CWV de laboratorio, riesgo de backlinks), las fórmulas `technical` / `visibility`
+(logarítmica) / `risk` / `overall` con semáforo **75/50**, y el orden cross-cliente
+**Severidad → Impacto → Esfuerzo** (quick wins primero) →
+`../references/competitor-methodologies-2026-09.md` §5. **No validado con nuestros datos**, y su
+catálogo **no cubre** nada de lo del punto (d) de arriba: acceso de crawlers IA, bloqueo en el
+borde, JSON-LD ausente ni la regla `Sitemap:`.
+
 ## Checklist técnico rápido (orden de prioridad)
 1. ¿Indexación rota? (GSC Pages) → arreglar primero, bloquea todo lo demás.
 2. ¿Contenido crítico requiere JS? → SSR/SSG.

@@ -328,6 +328,15 @@ respuestas de los motores IA, vs. competidores?**
    consistencia del panel es lo que hace comparable la serie.
 - Tablero sugerido: `templates/checklists` (incluye un esqueleto de tracking).
 
+📐 **Cómo lo formaliza un tercero** (fórmulas de terceros, **no validadas con nuestros datos**):
+score `0,6 × mention_share + 0,4 × citation_share` con denominador = prompts unbranded × modelos −
+celdas no medidas; umbral de significancia `eps = max(3,0 · 100/denom)` para no pintar ruido como
+tendencia; e higiene del denominador (`not_measured` ≠ ausente tras 3 reintentos; >20% de celdas
+fallidas degrada el run a *low-confidence*) →
+`../references/competitor-methodologies-2026-09.md` §1.
+🔴 Sus **curvas de CTR** contradicen las dos medidas de este módulo por un factor ~6 en la
+posición 5: gobierna lo medido (§9.1 de esa referencia).
+
 ### Herramientas dedicadas (cuando el presupuesto lo permite) — as-of 2026-06
 - **Profound** — enterprise; G2 AEO Leader; $96M Serie C / valuación $1B.
 - **Peec** — tracking de visibilidad y share competitivo, directo.

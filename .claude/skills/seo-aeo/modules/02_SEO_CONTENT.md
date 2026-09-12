@@ -387,6 +387,15 @@ hace falta juicio editorial para separar los dos backlogs. Medido en el caso fue
 Ninguna de esas seis es una oportunidad de "subir posiciones": son seis decisiones
 de arquitectura.
 
+📐 **Sin GSC** (prospectos, competidores) la detección cambia de instrumento: host-crowding hace
+que dos páginas propias casi nunca co-aparezcan en una SERP, así que la señal es la **rotación en
+el tiempo** (`rotation_count >= 2`), con gate de posición y matriz de veredicto por banda
+(comercial 30 / informacional 20, nada que pelear más allá de 40), override de intención por tipo
+de página y la regla **«no fusiones por defecto»** →
+`../references/competitor-methodologies-2026-09.md` §3. Es método de terceros, **no validado con
+nuestros datos**; con GSC disponible gobierna el corte de arriba (contradicción declarada en §9.2
+de esa referencia).
+
 ### La inflación de los totales de clúster de terceros
 
 Cuando el **carril B** suma el volumen de un clúster para justificar una pieza, ese
@@ -463,6 +472,13 @@ cola de días recientes **todavía se está consolidando** → `07_MEASUREMENT.m
 - Usa **Semrush MCP** (`keyword_research`, `organic_research`) para volumen,
   dificultad, intención y gaps vs. competidores. Database `cl` para Chile.
 - **Keyword gap** vs competidores = mapa de oportunidades de cluster.
+- 📐 **Una fórmula de terceros para ordenar el carril B** (y sólo el carril B):
+  `priority_score = round(100 × ln(1+vol)/ln(1+vol_max) × winnability/100)` con
+  `winnability = 100 − avg_difficulty`, tiers *Quick win / Strategic / Fill* cortados en dificultad
+  30 y la **mediana** del volumen de clusters, y guardrails de clustering (3–4 kw mínimo por
+  cluster, 6–15 clusters, un pillar por cluster, `links_to` obligatorio) →
+  `../references/competitor-methodologies-2026-09.md` §2. **No validada con nuestros datos**, y
+  🔴 nunca para priorizar páginas existentes: ahí manda el GSC propio.
 - Pero complementa con **prompt/answer-space research** (qué le preguntan a los
   LLMs, no solo qué teclean en Google) → `04_AEO_GEO.md`. Son disciplinas
   hermanas: keyword research para la SERP, prompt research para la respuesta IA.

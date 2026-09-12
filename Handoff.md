@@ -1,5 +1,11 @@
 # Handoff activo
 
+**Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
+**no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a
+`seo-aeo/references/competitor-methodologies-2026-09.md` (nuevo). `ai_optimization` sigue fuera del allowlist.
+Decisión, hallazgos, pendientes del operador y 4 preguntas abiertas:
+`docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md`.
+
 **Portafolio de landings del sitio público (2026-09-11, documental):** `EPIC-047` reancla desde EPIC-019 las 20
 tasks de landing y fija su orden en `Rank EPIC-047-01…10`: Agencia Creativa → ASO (pitch activo con Berel) → HubSpot
 (Precios, Agentes) → Salesforce → Performance → resto; Contacto es habilitador (`H1`) y los artículos del hub HubSpot (TASK-1402/1404) van
@@ -397,30 +403,3 @@ Commit `79a1c3f74` en `develop`. Verificado en vivo (revisión `ops-worker-00637
 `{"severity":"warning","alerted":false}` — correcto, hoy es `warning` no `error`. 6/6 tests verdes. (2) Rutina
 `trig_015zxhP1D4yXfTacUm5HqmQU`, dispara una vez el 2026-09-17 13:00 America/Santiago tras la primera captura
 improved desatendida, sin credenciales locales: sólo recuerda verificar manualmente, no ejecuta verificación real.
-
-## 2026-09-03 — TASK-1806 COMPLETE: Improved ETV en producción (release `bda12be7e33a`), rebaseline versionado
-
-Cuarto release del día: PR #218 squash (`main=bda12be7e33af93906805054146c5e17a8b9c328`, 12:42Z), orquestador
-`33758619690` (13:01→13:14Z, un solo run, sin retry; los DOS gates `production` aprobados a 13:04:26Z/13:04:57Z),
-manifest `released` (`bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990`), watchdog `ok`, 3/4 workers en el
-target y ops-worker change-gated en `d2ebdb8f3` (diff de árbol completo = sólo el ledger de flags). **Canary de
-contrato 13:15:26Z:** lanes prod `domain-overview`/`url-visibility` de Berel sirven
-`etvMethodology.version=improved_layout_clickstream_v2` `single_methodology`; `/health` del worker
-(`00636-h6w`) improved en escritura y lectura; `/api/auth/health` 200. Vercel Production+staging con ambos
-selectores improved (valores verificados por `env pull`); staging con cutover y **drill de rollback** ejercitado
-(legacy → improved, 3 redeploys).
-
-**Decisión:** el shadow (USD 1,095) mostró improved 6× mejor calibrado contra GSC en Berel (err. rel. 49 % vs
-321 %), Jaccard 1,0 e historia continua; el operador aprobó `go_rebaseline` y el cutover. Rebaseline acotado:
-historia improved de Berel 2025-09..2026-09 y de Comex 2025-09..2026-03 (backfill USD 0,2568, sembró 14 filas);
-la de julio 2026 en adelante es `fully_recomputed`, antes `calibrated_approximation`; `breakpointDate=null`.
-Efeonce se mide aparte (su org/CL/GSC); guard en `assertEtvShadowCohort` para que un bulk nunca mezcle
-organizaciones; cohorte v2.
-
-**Riesgos abiertos / pendientes con dueño:** (1) señal `seo.etv_methodology.drift` en `warning` hasta que las
-filas contractuales del 27-29/08 salgan de la ventana de 7 días (≤ 2026-09-05); el cron del 16/17 será la
-primera captura improved DESATENDIDA del worker — si escribiera otra cosa, es incidente. (2) Berel verá sus
-cifras de tráfico estimado ≈ −60 % por cambio de fórmula, no por pérdida real: comunicarlo. (3) Sujetos sin fila
-improved degradan `not_available_for_method` hasta su próxima captura (subfolder/url de Berel el día 17).
-(4) Rollback a legacy sólo antes del 2026-11-01T00:00:00Z (selectores + deploy.sh + redeploy). Sin push de
-docs de cierre hasta este commit; WIP ajeno en el árbol intacto.
