@@ -9,6 +9,10 @@
 
 ## 2026-09-12 — Criterio y ejecución de seasonality/trendjacking para Codex y Claude
 
+Workflow espejo de video estacional desde metáfora visual: previs y keyframes, Seedance 2.5,
+preflight/costo, tipografía/logo exactos, audio medido, QA temporal y MP4 en OneDrive.
+Caso «Hay abrazos que encendemos»: candidato técnico; escucha/revisión completa y aprobación pendientes.
+
 [Protocolo compartido](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md) y skills espejo: clasificación,
 evidencia, elegibilidad, mecanismos creativos, papel de marca, dirección por formato, producción por defecto y
 cinco revisiones separadas. Routers AGENTS/CLAUDE/JSON y studios adyacentes apuntan al canon social.
@@ -18,7 +22,12 @@ fundamentos visuales/dirección/copy. [Investigación](docs/audits/social/2026-0
 Se corrigen firma vs placement físico, activo aprobado vs reconocimiento demostrado y concepto vs permiso de
 render. La materialización puede usar logo oficial como referencia; titulares y firmas editoriales siguen exactos.
 Prueba Día de Muertos: v5 rechazada por deformación; v6 es iteración con referencia, no aprobación ni performance.
-[Evidencia, escenarios y límites](docs/audits/social/2026-09-12-social-creative-production.md). Sin publicación.
+[Evidencia, escenarios y límites](docs/audits/social/2026-09-12-social-creative-production.md). Base en `87b05206e`.
+[V8](docs/audits/social/2026-09-12-editorial-type-brand-v8.md): tres formatos corregidos, firma agrupada,
+espaciado por tinta, contraste final y pruebas de fusión; protocolo espejo de auditoría editorial.
+Delta v8 local, revisión pendiente y sin publicación. Entrega PNG a OneDrive Marketing con carpetas
+semánticas y verificación de integridad; `5. Contenidos` es la biblioteca general para buscar, adaptar y
+organizar assets, no sólo seasonalities. Convención en `social-media-studio/efeonce/ONEDRIVE_DELIVERY.md`.
 
 ## 2026-09-12 — Hiring: incidente P1 del Banco de Talento resuelto y liberado (ISSUE-171/172/173)
 
@@ -43,7 +52,9 @@ Se incorporó `BricolageGrotesque-Variable.ttf` desde el repositorio oficial de 
 OFL 1.1 y nota de procedencia/hash en `src/assets/fonts/`. `DESIGN.md`,
 `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` y las skills espejo de tipografía, `design-studio` e
 `greenhouse-ai-image-generator` documentan su uso como display expresiva para campañas y piezas editoriales fuera de
-la UI. No cambia el runtime: Greenhouse mantiene Poppins + Geist como sus únicas familias activas de producto.
+la UI. Se fijó además la regla de que toda seasonality debe incluir product placement reconocible de Efeonce, con
+Bricolage para la idea display y Poppins para contexto/apoyo, sin invadir elementos rituales. No cambia el runtime:
+Greenhouse mantiene Poppins + Geist como sus únicas familias activas de producto.
 
 ## 2026-09-11 — Conocimiento de las «AI Skills» de DataForSEO incorporado a las skills propias
 

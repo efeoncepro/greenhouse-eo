@@ -56,3 +56,9 @@ mograph reales compuestos.** El operador aprueba antes de entregar; **gasto gobe
 IA. Contrato del modelo Omni: `efeonce/GEMINI_OMNI_VERTEX.md`.
 
 **El estado técnico no es aprobación creativa.** Un video Omni o Seedance `completed` entra a revisión temporal; sólo si requiere geometría/acción inexistente se itera con el modelo. Retime, orden, repetición y texto exacto se resuelven sobre el clip existente. Si se pide foley nativo, revisar audio y video por separado y rescatar sólo eventos aprobados sobre la placa aceptada.
+
+## Seasonalities en video
+
+[Metáfora visual → video con marca exacta](seasonality-visual-metaphor-to-video.md): ejecución técnica comprobada
+2026-09-12 con Seedance 2.5; candidato creativo pendiente, revisión temporal/audio incompleta. Incluye
+clasificación, previs, referencias, preflight, post exacta, sonido, QA y entrega; no es aprobación de campaña.

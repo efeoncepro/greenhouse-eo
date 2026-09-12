@@ -133,3 +133,10 @@ pero no demuestra por sí misma el oficio de Efeonce. Verificar que la escena no
 V5 fue rechazada por elongación/perspectiva del logo pese a checks técnicos verdes. V6 es una revisión generativa
 con referencias, no una aprobación del operador ni evidencia de resultados. Conservar ambas revisiones y su
 estado; no convertir el caso en receta universal de silla, libreta, luz cálida o bajorrelieve.
+
+## Producción audiovisual
+
+Para transformar esta línea en video, seguir
+[metáfora visual → video](../../motion-design-studio/workflows/seasonality-visual-metaphor-to-video.md).
+La metáfora necesita acción y revelación temporal; el texto aparece después de poder entenderla.
+El caso Día de Muertos documenta un candidato real con marca exacta, no aprobación ni eficacia demostrada.

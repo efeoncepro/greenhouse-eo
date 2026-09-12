@@ -175,3 +175,10 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
   y el **par Gemini Omni**: **`GEMINI_OMNI_VERTEX.md`** (contrato operativo: endpoint/auth/pricing/gotchas +
   §9.1 capacidades verificadas en vivo) + **`GEMINI_OMNI_CAPABILITIES.md`** (catálogo a todo nivel + **mapa
   de sinergia con las skills hermanas** + playbook de máximo aprovechamiento). Léelos al operar/dirigir Omni.
+
+## Video social estacional desde un KV
+
+Para animar una metáfora cultural o producir un video de seasonality, cargar
+`workflows/seasonality-visual-metaphor-to-video.md` junto con Social Media Studio. La clasificación
+editorial no cambia por usar video. Separar previs de fotogramas reales, render de aprobación,
+referencia generativa de titular/logo exactos y costo estimado de débito comprobado.

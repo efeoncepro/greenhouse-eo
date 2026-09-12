@@ -48,6 +48,15 @@ Exactly **two active families**:
 
 **Runtime SoT:** `typographyScale` owns family/size/weight/line-height/letter-spacing/numeric features → `TYPOGRAPHY_VARIANT_BRIDGE` maps token↔MUI variant (1:1, as code) + `SECONDARY_VARIANT_TOKENS` (`h6→labelMd`, `subtitle2→bodySm`) + `controlText` (Button/Tab/Dialog sizing). **Runtime wins on conflict; docs follow.**
 
+### Rama de auditoría editorial de campañas
+
+Para posts, stories, portadas, posters y texto sobre imagen, cargar
+[editorial-typography-brand-audit](../social-media-studio/references/editorial-typography-brand-audit.md).
+Esta rama usa el asset y contrato de campaña: los tamaños, pesos intermedios disponibles y coordenadas del
+lienzo no son tokens MUI ni amplían la UI. Auditar significado del énfasis, cajas de tinta, alineación óptica,
+tracking por tramo, leading mixto, marca agrupada y contraste del archivo final. Las reglas de variantes,
+fontSize inline y peso 500 de producto no deben aplicarse mecánicamente a esta excepción editorial.
+
 ### Creative asset boundary — Bricolage Grotesque
 
 `Bricolage Grotesque` is available as an expressive display family for Efeonce campaign assets outside Greenhouse

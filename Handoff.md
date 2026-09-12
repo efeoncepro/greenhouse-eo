@@ -1,8 +1,10 @@
 # Handoff activo
 
-**Creatividad social:** [protocolo Codex/Claude](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md),
-[evidencia](docs/audits/social/2026-09-12-social-creative-production.md). V5 rechazada; V6 pendiente de aprobación.
-Bricolage: `src/assets/fonts/BricolageGrotesque-SOURCE.md`; UI Poppins + Geist. Sin publicación.
+**Creatividad social:** [protocolo](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md).
+[V8: tres formatos, auditoría tipográfica y firma agrupada](docs/audits/social/2026-09-12-editorial-type-brand-v8.md).
+Video «Hay abrazos que encendemos»: Seedance 2.5, MP4 con marca en OneDrive; candidato, sin publicación.
+[Metodología y límites](.codex/skills/motion-design-studio/workflows/seasonality-visual-metaphor-to-video.md).
+Base documental: `87b05206e`; cambios posteriores locales.
 
 **Hiring: incidente P1 resuelto y en producción (2026-09-12; `ISSUE-171`/`172` resolved, `ISSUE-173` open; release
 `586a8627568a`):** el tablero no re-leía el snapshot al cambiar de vacante (`ISSUE-171`) y `lpad` recortaba el

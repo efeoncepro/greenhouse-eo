@@ -3,6 +3,8 @@
 Fecha: 2026-09-12. Encargo del operador: ampliar la capacidad de idea, desarrollo, dirección visual,
 conectores, flujos multistep, logos/tipografías y product placement; aplicarla al ejemplo existente.
 
+Candidato posterior: [v8, auditoría tipográfica y tres formatos](2026-09-12-editorial-type-brand-v8.md).
+
 ## Resultado y alcance
 
 Actualización local de `social-media-studio` en Codex y Claude. Entrada:

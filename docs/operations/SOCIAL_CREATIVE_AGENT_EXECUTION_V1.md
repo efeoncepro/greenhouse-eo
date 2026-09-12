@@ -119,3 +119,12 @@ nombrarlo y declarar la pieza como prueba incompleta. No ocultar el defecto con 
 Marco de decisiones existente: [ADR del router de agentes](../architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md)
 y contrato multimodal. Esta actualización desarrolla el oficio y las rutas dentro de esos límites; no cambia
 source of truth runtime, autonomía, allowlists, presupuesto, compiler ni derechos de publicación.
+
+## Video de seasonality desde una metáfora visual
+
+Social mantiene el ownership y carga el [workflow audiovisual](../../.codex/skills/motion-design-studio/workflows/seasonality-visual-metaphor-to-video.md)
+(espejo Claude). Extiende este protocolo a storyboard/contact sheet, keyframes, preflight, generación,
+marca exacta, audio, revisión temporal y entrega. Un render es candidato, no aprobación. La ejecución
+Seedance 2.5 del 2026-09-12 conserva limitaciones y hashes en el workflow. Este aprendizaje artesanal
+no modifica compiler, autoridad MCP ni runtime del contrato multimodal. ADR de referencia:
+`GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md` (Proposed; no implica aprobación del proveedor).

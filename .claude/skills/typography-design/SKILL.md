@@ -23,6 +23,15 @@ Lo único que ambos comparten, y que no se re-litiga: dos familias, **Poppins di
 
 Greenhouse is not greenfield. Typography is already a governed 3-surface system with a CI drift-guard. The global skill teaches *the craft* (weights, contrast, measure, OpenType, i18n); this overlay pins *the answers already decided here* so an agent never re-litigates the scale, picks a banned weight, or hardcodes a size. Two families are fixed: **Poppins** (display, h1–h4 + `surfaceHeroTitle` only) + **Geist** (everything else). Numbers use **Geist + `tabular-nums`** — never a monospace family.
 
+### Rama de auditoría editorial de campañas
+
+Para posts, stories, portadas, posters y texto sobre imagen, cargar
+[editorial-typography-brand-audit](../social-media-studio/references/editorial-typography-brand-audit.md).
+Esta rama usa el asset y contrato de campaña: los tamaños, pesos intermedios disponibles y coordenadas del
+lienzo no son tokens MUI ni amplían la UI. Auditar significado del énfasis, cajas de tinta, alineación óptica,
+tracking por tramo, leading mixto, marca agrupada y contraste del archivo final. Las reglas de variantes,
+fontSize inline y peso 500 de producto no deben aplicarse mecánicamente a esta excepción editorial.
+
 ### Creative asset boundary — Bricolage Grotesque
 
 `Bricolage Grotesque` is available as an expressive display family for Efeonce campaign assets outside Greenhouse

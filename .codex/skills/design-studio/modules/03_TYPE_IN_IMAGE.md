@@ -152,8 +152,8 @@ Mantener la marca fuera de objetos rituales sin revisión cultural específica.
 ## Diagnóstico rápido — tipo mal dirigido
 
 1. ¿Cuántas voces de display compiten? >1 = subordina todas menos una.
-2. ¿Se lee el headline en 1 segundo a tamaño thumbnail? No = falta contraste de escala o el
-   fondo se lo come (scrim).
+2. ¿Se entiende el headline en la revisión a tamaño thumbnail? Si no, revisar escala,
+   cortes, densidad y contraste local; un scrim no resuelve todos esos problemas.
 3. ¿El texto flota sin alinear a nada? Alinéalo a un eje (`modules/01 §2`).
 4. ¿La pregunta real es de peso/variante/escala exacta? → **para y delega a `typography-design`**.
 
@@ -170,3 +170,12 @@ Revisar caracteres/acentos, contraste local sobre el fondo real, lectura móvil 
 threshold técnico en juicio creativo. Titulares/firma editorial se componen después del último pase generativo;
 texto o logo material sobre un objeto puede requerir referencia guiada y revisión física separada. Si el modelo
 altera ese arte, corregir o cambiar de ruta; no declarar fidelidad por semejanza a primera vista.
+
+## Auditoría fina de la composición editorial
+
+Ante problemas de interespaciado, jerarquía o firma, cargar la skill tipográfica del agente y el protocolo
+[editorial-typography-brand-audit](../../social-media-studio/references/editorial-typography-brand-audit.md).
+Su rama de campañas separa cajas de tinta de baselines, tracking de kerning, agrupación de contraste y fusión
+de materialidad. La invocación de craft no exige detener la entrega ni crear subagentes. Revisar a tamaño de
+consumo; una firma aislada puede competir aun siendo pequeña. Una lectura rápida es observación cualitativa
+salvo que se haya realizado una prueba temporal: no afirmar que el titular se lee en un segundo sin medirlo.

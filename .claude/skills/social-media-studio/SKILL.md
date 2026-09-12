@@ -72,6 +72,20 @@ La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels,
    `efeonce/CLIENT_DELIVERY.md`: la pieza social no es la unidad de crédito; identifica las operaciones
    generativas y separa layout/copy/export/QA, capacidad y derechos.
 
+### Entrega de imágenes al equipo de Marketing
+
+Para buscar, manipular, adaptar, organizar o entregar assets de Marketing Efeonce, cargar
+[la biblioteca OneDrive](efeonce/ONEDRIVE_DELIVERY.md): raíz `5. Contenidos`, categorías existentes,
+fuentes/derivados, versiones y verificación de destino. Seasonalities es sólo una categoría; PNG aplica
+a entregas estáticas, no a todos los formatos de la biblioteca.
+
+### Auditoría editorial de tipografía y marca
+
+Para auditar o corregir interespaciado, contraste tipográfico, cortes de línea, escala, firma aislada o modos
+de fusión, cargar [editorial-typography-brand-audit](references/editorial-typography-brand-audit.md) junto con
+la skill de tipografía del agente. Resolver significado y agrupación antes de aplicar efectos; medir tinta,
+contraste local y exportación reducida. Conservar la responsabilidad de producir y mostrar la corrección.
+
 ### Activación obligatoria para solicitudes creativas
 
 Ante «haz una pieza», «aprovecha esta fecha/tendencia», «desarrolla una idea», «integra el producto/logo»,
@@ -244,3 +258,11 @@ Las pruebas de un carril no certifican otros formatos ni rendimiento de audienci
   `CLIENT_DELIVERY.md`.
 
 Para logos sobre objetos, relieves y product placement físico: [brand-in-scene.md](references/brand-in-scene.md).
+
+## Seasonalities en video: ruta obligatoria de producción
+
+Si el encargo convierte un KV estacional en video, cargar
+`../motion-design-studio/workflows/seasonality-visual-metaphor-to-video.md`. Social conserva concepto,
+clasificación y entrega; Motion dirige acción, cámara, sonido y post. Incluir contact sheet previo,
+referencias individuales, preflight real del modelo, capas exactas de marca, QA temporal y MP4 reproducible.
+Una festividad previsible sigue siendo seasonality; no llamarla trendjacking por animarla.
