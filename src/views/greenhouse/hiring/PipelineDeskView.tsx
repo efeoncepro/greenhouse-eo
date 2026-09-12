@@ -173,7 +173,8 @@ const PipelineDeskView = ({
   // Un snapshot nuevo del servidor es autoritativo: los overrides optimistas ya se persistieron
   // (o se revirtieron) antes de cualquier navegación, así que no hay nada que preservar.
   useEffect(() => {
-    setStageOverrides({})
+    // Identidad estable cuando ya está vacío: evita un render extra por cada snapshot.
+    setStageOverrides((current) => (Object.keys(current).length > 0 ? {} : current))
   }, [initialSnapshot.applications])
 
   useEffect(() => {

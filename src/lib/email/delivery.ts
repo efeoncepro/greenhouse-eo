@@ -1679,9 +1679,9 @@ export const reviveDeadLetterEmailDeliveries = async (input: ReviveDeadLetterEma
       UPDATE greenhouse_notifications.email_deliveries
          SET status = 'failed',
              attempt_number = 0,
-             error_message = NULL,
-             error_class = NULL,
-             resend_reason = $1,
+             -- El ultimo error (p. ej. el 'name' de Resend) NO se borra: es el unico rastro de por que murio.
+             -- El motivo del revive va a resend_reason, con el error previo detras.
+             resend_reason = $1 || CASE WHEN error_message IS NOT NULL THEN ' | previous: ' || error_message ELSE '' END,
              updated_at = NOW()
        WHERE delivery_id IN (
          SELECT d.delivery_id
@@ -1758,7 +1758,10 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
         (status = 'failed' AND attempt_number < 3)
         OR (status = 'rate_limited' AND updated_at < NOW() - INTERVAL '1 hour' AND attempt_number < 3)
       )
-        AND created_at > NOW() - INTERVAL '24 hours'
+        -- ISSUE-172: la ventana mira tambien updated_at: un dead_letter revivido (que puede tener mas de
+        -- 24 h de creado) vuelve a 'failed' con updated_at = NOW(); con solo created_at quedaba atascado
+        -- en 'failed' para siempre, fuera de la poblacion que alguien consulta.
+        AND GREATEST(created_at, updated_at) > NOW() - INTERVAL '24 hours'
         AND NOT (email_type = ANY($2::text[]))
         AND COALESCE(delivery_payload->'persistence'->>'retryable', 'true') <> 'false'
         -- ISSUE-172: un cierre incierto (el proveedor ya aceptó) no se reintenta a ciegas, y un buzón que el

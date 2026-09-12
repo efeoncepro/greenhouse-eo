@@ -63,6 +63,12 @@ describe('parsePublicHiringApplication', () => {
     expect(parsePublicHiringApplication({ ...valid, portfolioUrl: 'http://inseguro.com' })?.portfolioUrl).toBe('https://inseguro.com')
   })
 
+  it('persiste el href canónico: slashes colapsados, percent-encoding, sin barra final en un origen pelado', () => {
+    expect(parsePublicHiringApplication({ ...valid, linkedinUrl: 'https:////evil.com' })?.linkedinUrl).toBe('https://evil.com')
+    expect(parsePublicHiringApplication({ ...valid, portfolioUrl: 'ada.dev/mi portafolio' })?.portfolioUrl).toBe('https://ada.dev/mi%20portafolio')
+    expect(parsePublicHiringApplication({ ...valid, portfolioUrl: 'https://ada.dev/' })?.portfolioUrl).toBe('https://ada.dev')
+  })
+
   it('acepta URLs https válidas y las conserva', () => {
     const out = parsePublicHiringApplication({ ...valid, portfolioUrl: 'https://ada.dev', linkedinUrl: 'https://linkedin.com/in/ada' })
 

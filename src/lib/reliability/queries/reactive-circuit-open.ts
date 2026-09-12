@@ -28,12 +28,17 @@ const CIRCUITS_SQL = `
   ORDER BY opened_at ASC NULLS LAST
 `
 
+// Máquina de estados de handler_health: healthy → degraded (≥3) → failed (dead-letter o ≥10) → quarantined.
+// `failed` es PEOR que `degraded`; omitirlo dejaba invisible justo el estado que esta señal existe para ver.
 const HANDLERS_SQL = `
   SELECT handler, current_state, consecutive_failures
   FROM greenhouse_sync.handler_health
-  WHERE current_state IN ('degraded', 'quarantined')
+  WHERE current_state IN ('degraded', 'failed', 'quarantined')
   ORDER BY consecutive_failures DESC
 `
+
+/** Los errores de validación del proveedor citan direcciones; la evidencia es admin-only pero no las repite. */
+const redactEmails = (value: string): string => value.replace(/[^\s@<>()]+@[^\s@<>()]+/g, '[email]')
 
 type CircuitRow = {
   projection_name: string
@@ -60,7 +65,10 @@ export const getReactiveCircuitOpenSignal = async (): Promise<ReliabilitySignal>
       query<HandlerRow>(HANDLERS_SQL)
     ])
 
-    const severity: ReliabilitySeverity = circuits.length > 0 ? 'error' : handlers.length > 0 ? 'warning' : 'ok'
+    const failedHandlers = handlers.filter(row => row.current_state === 'failed' || row.current_state === 'quarantined')
+
+    const severity: ReliabilitySeverity =
+      circuits.length > 0 || failedHandlers.length > 0 ? 'error' : handlers.length > 0 ? 'warning' : 'ok'
 
     const summary =
       circuits.length > 0
@@ -99,7 +107,7 @@ export const getReactiveCircuitOpenSignal = async (): Promise<ReliabilitySignal>
         ...circuits.map(row => ({
           kind: 'metric' as const,
           label: row.projection_name,
-          value: `${row.state} · ${row.consecutive_failures} fallos consecutivos · abierto ${row.opened_at ?? '—'} · ${(row.last_error ?? '').slice(0, 160)}`
+          value: `${row.state} · ${row.consecutive_failures} fallos consecutivos · abierto ${row.opened_at ?? '—'} · ${redactEmails((row.last_error ?? '').slice(0, 160))}`
         }))
       ]
     }

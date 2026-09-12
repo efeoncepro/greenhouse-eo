@@ -63,8 +63,15 @@ export const normalizeOptionalHttpsUrl = (raw: string): string | null => {
   if (!isSafeHttpUrl(candidate)) return null
 
   try {
+    const url = new URL(candidate)
+
     // Un host sin punto («https://no-url») parsea pero no es un enlace de una persona.
-    return new URL(candidate).hostname.includes('.') ? candidate : null
+    if (!url.hostname.includes('.')) return null
+
+    // Se persiste el href CANÓNICO (percent-encoding, slashes colapsados, sin tab/NL embebidos), no el
+    // texto crudo: «https:////evil.com» o un salto de línea dentro del path no deben llegar a la base.
+    // Un origen pelado conserva su forma sin barra final («https://ada.dev»), que es lo que muestra la UI.
+    return url.pathname === '/' && !url.search && !url.hash ? url.href.replace(/\/$/, '') : url.href
   } catch {
     return null
   }
