@@ -33,8 +33,10 @@
 
 Un agente que corre en cloud (Claude Code web, Codex cloud) no puede hoy responder una pregunta operativa básica
 —«cuántas postulaciones tiene esta vacante y por qué el desk muestra cero»— sin que el operador encienda su
-máquina y corra un script. Esta task expone ese diagnóstico como **readbacks agregados read-only** por el lane
-ecosystem y las tools MCP que ya existen, sin abrir acceso a Cloud SQL ni exponer PII.
+máquina y corra un script. Esta task crea el lugar declarado donde cada dominio publica su **corte de diagnóstico
+agregado read-only**, lo expone por el lane ecosystem y lo federa como tools MCP, sin abrir acceso a Cloud SQL ni
+exponer PII. El primer contribuyente es Hiring; las señales de confiabilidad ya viajan por `get_platform_health` y
+no se duplican acá.
 
 ## Why This Task Exists
 
@@ -63,6 +65,8 @@ access»), y el hecho de que exista **una sola instancia Cloud SQL para dev, sta
 
 - Exponer diagnóstico operativo agregado como readbacks gobernados, consumibles por cualquier agente autorizado
   sin credenciales nuevas y sin depender de la máquina de una persona.
+- Dejar el dominio como dueño de su propio corte: extender a finance o payroll debe ser registrar un
+  contribuyente, no tocar el lane ni el gateway.
 - Mantener la frontera: solo lectura, solo agregados, cero PII, solo bindings `internal` con 404 anti-oracle.
 - Cerrar el caso fuente: que la pregunta «por qué el pipeline de esta vacante se ve vacío» se responda por el
   canal, con evidencia.
@@ -92,6 +96,11 @@ Reglas obligatorias:
 
 - El gateway es un adapter neutral: una tool delega en el reader canónico del producto y **nunca** accede a DB,
   storage ni lógica de dominio propia.
+- **No duplicar Platform Health.** `src/lib/platform-health/composer.ts` ya consume `getReliabilityOverview` y
+  `get_platform_health` ya está federada como tool de dominio `platform`. Las señales de confiabilidad se
+  **consumen** por ahí; esta task no crea un readback paralelo de señales.
+- **El dominio es dueño de su agregado.** El plano `platform` transporta; no conoce vacantes, nóminas ni
+  facturas. Cada dominio registra su propio contribuyente de diagnóstico en `src/lib/<dominio>/diagnostics.ts`.
 - El readback es **agregado**. No devuelve filas de personas, ni nombres, ni correos, ni identificadores de
   candidato. Si una pregunta exige PII, la responde el provider dueño de esa entidad, no este.
 - Lane `internal`-binding únicamente, con **404 anti-oracle** para cualquier otro binding — mismo contrato que
@@ -101,6 +110,26 @@ Reglas obligatorias:
 - El protocolo de federación arranca en Greenhouse: entrada en `src/mcp/greenhouse/tool-manifest.ts` +
   `pnpm mcp:manifest:generate`. **Nunca** editar `greenhouse-tool-manifest.generated.ts` a mano.
 - Toda tool federada declara `annotations` con `readOnlyHint` coherente con su clase.
+
+### Domain boundary
+
+- **Dueño del plano de transporte:** Platform (lane ecosystem + registry + tools MCP).
+- **Dueño de cada agregado:** el dominio que lo produce. Hiring es dueño del corte de Hiring; Platform nunca
+  interpreta su semántica ni conoce sus tablas.
+- **Fuera de la frontera:** cualquier lectura que identifique a una persona (la responde el provider dueño de la
+  entidad, con su capability y su auditoría), cualquier escritura, y cualquier remediación.
+
+### Patrones canonizados que este diseño extiende
+
+1. **Platform Health V1 (`TASK-672`)** — contrato de salud para agentes/MCP con safe modes y degradación honesta.
+   Este diseño lo **consume y complementa**: Platform Health responde «¿está sano el runtime?»; el diagnóstico de
+   dominio responde «¿qué dice el estado de este dominio?». No lo reimplementa.
+2. **Registry gobernado con seed + detección de drift (`TASK-827`, view registry)** — un registro TS de
+   contribuyentes con su entrada declarada y un gate que falla cuando alguien agrega un contribuyente sin
+   declararlo. Es el patrón del registry de diagnóstico de esta task.
+3. **Lane ecosystem `internal`-only con 404 anti-oracle (`get_seo_provider_spend`, `get_seo_keyword_gap`,
+   `TASK-1696`/`TASK-1662`)** — la frontera exacta que este lane hereda: un binding de cliente no recibe `403`
+   (que confirmaría la existencia del recurso), recibe `404`.
 
 ## Normative Docs
 
@@ -113,7 +142,8 @@ Reglas obligatorias:
 ### Depends on
 
 - `src/mcp/greenhouse/tool-manifest.ts` — manifiesto canónico (47 entradas hoy, 10 de dominio `platform`).
-- `src/lib/reliability/queries/` — readers de señales de confiabilidad ya existentes.
+- `src/lib/platform-health/composer.ts` y `get_platform_health` — ya cubren las señales de confiabilidad; esta
+  task las consume como capacidad existente y no las reimplementa.
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` + `scripts/` del auditor de flags (`pnpm flags:audit`).
 - `src/lib/hiring/desk.ts` — `getHiringDeskSnapshot` y los agregados `countByOpening` que ya calcula.
 - `TASK-1631` (bindings y grants externos, aplicado 2026-09-04) y `TASK-1831` (verificación multi-issuer).
@@ -130,7 +160,8 @@ Reglas obligatorias:
 ### Files owned
 
 - `src/app/api/platform/ecosystem/platform/diagnostics/**`
-- `src/lib/platform/diagnostics/**`
+- `src/lib/platform/diagnostics/**` (contrato + registry de contribuyentes; sin conocimiento de dominio)
+- `src/lib/hiring/diagnostics.ts` (primer contribuyente, propiedad del dominio Hiring)
 - `src/mcp/greenhouse/tool-manifest.ts`
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/documentation/plataforma/diagnostico-operativo-por-mcp.md`
@@ -143,15 +174,19 @@ Reglas obligatorias:
 - Gateway productivo `mcp.efeonce.org`, verificado `gateway: ready` con seis providers `enabled`
   (`globe`, `greenhouse-globe-credit-funding`, `greenhouse-seo`, `greenhouse-hiring`, `greenhouse-skills`,
   `greenhouse-client-services`), protocolo `2026-07-28`.
+- **`get_platform_health` ya federada** (dominio `platform`) sobre `src/lib/platform-health/composer.ts`, que ya
+  consume `getReliabilityOverview`. Las señales de confiabilidad **ya son accesibles por el canal**.
 - Manifiesto canónico + gate `pnpm mcp:manifest:check` corriendo dentro de `pnpm local:check`.
 - Lane ecosystem `/api/platform/ecosystem/**` con binding por consumer y patrón 404 anti-oracle establecido.
 - Emisor nativo `services/auth-server` y verificación multi-issuer (`TASK-1829`/`1830`/`1831`/`1836`/`1844`).
-- Readers de señales de confiabilidad y `getHiringDeskSnapshot`, que ya calcula conteos por opening sin límite.
+- `getHiringDeskSnapshot` (`src/lib/hiring/desk.ts`), que ya calcula conteos por opening sin límite.
 
 ### Gap
 
-- Ningún readback expone estado operativo agregado por dominio: conteos, distribución por etapa, procedencia,
-  ni desenlaces del intake público.
+- Ningún readback expone estado operativo **de dominio**: conteos, distribución por etapa, procedencia, ni
+  desenlaces del intake público. Platform Health cubre salud de runtime, no estado de dominio.
+- No existe un lugar declarado donde un dominio publique su corte de diagnóstico, así que cada necesidad nueva
+  terminaría como un endpoint suelto.
 - El diagnóstico depende del entorno local del operador (`.env.local` + gcloud + Cloud SQL Connector), por lo que
   un agente cloud queda ciego y el operador queda en el camino crítico de cada revisión.
 - `hiring_application_intake_events` registra `captcha_failed` e `invalid` con `opening_public_id` en `NULL`, así
@@ -162,8 +197,9 @@ Reglas obligatorias:
 - Topology impact: `api`
 - Current home: `src/app/api/platform/ecosystem/platform/diagnostics/**` + `src/lib/platform/diagnostics/**` (portal Vercel)
 - Future candidate home: `api`
-- Boundary: readers puros en `src/lib/platform/diagnostics/**`; el lane ecosystem y las tools MCP son los únicos
-  consumers autorizados. El gateway delega, nunca calcula.
+- Boundary: `src/lib/platform/diagnostics/**` define el contrato y el registry, sin conocimiento de dominio; cada
+  dominio implementa su contribuyente dentro de su propio módulo (`src/lib/hiring/diagnostics.ts`). El lane
+  ecosystem y las tools MCP son los únicos consumers autorizados. El gateway delega, nunca calcula.
 - Server/browser split: readers `server-only`; nada de este contrato llega al browser.
 - Build impact: `none` — reusa `runGreenhousePostgresQuery` y los readers de reliability ya presentes.
 - Extraction blocker: `none` — lectura sin transacción ni estado compartido.
@@ -174,8 +210,8 @@ Reglas obligatorias:
 
 - Backend rigor: `backend-standard`
 - Impacto principal: `api`
-- Source of truth afectado: readers existentes (`src/lib/reliability/queries/`, `src/lib/hiring/desk.ts`) y las
-  tablas que ya consultan; esta task no crea tabla ni migración.
+- Source of truth afectado: los readers del dominio contribuyente (para Hiring, las tablas que `src/lib/hiring/desk.ts`
+  ya consulta) y el ledger de flags; esta task no crea tabla ni migración.
 - Consumidores afectados: MCP (agentes cloud), lane ecosystem, operadores vía runbook.
 - Runtime target: `staging` y luego `production` (Vercel; el lane vive en el portal, ningún Cloud Run lo lee).
 
@@ -183,8 +219,8 @@ Reglas obligatorias:
 
 - Contrato existente a respetar: `/api/platform/ecosystem/**` (binding + `externalScopeType`/`externalScopeId`),
   `src/mcp/greenhouse/tool-manifest.ts`, `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md`.
-- Contrato nuevo: lane `GET /api/platform/ecosystem/platform/diagnostics/{signals,flags,domain-summary}` y sus
-  tools federadas de dominio `platform`.
+- Contrato nuevo: lane `GET /api/platform/ecosystem/platform/diagnostics/{domains,domain}` (con el corte de flags
+  como contribuyente transversal) y sus tools federadas de dominio `platform`.
 - Backward compatibility: `compatible` — additive puro, ninguna tool existente cambia de forma.
 - Full API parity: los tres readbacks son readers canónicos en `src/lib/platform/diagnostics/**`; el lane y las
   tools son consumers del mismo primitive, sin lógica duplicada.
@@ -192,13 +228,14 @@ Reglas obligatorias:
 ### Data model and invariants
 
 - Entidades/tablas afectadas (solo lectura): `greenhouse_hiring.hiring_application`,
-  `greenhouse_hiring.hiring_opening`, `greenhouse_hiring.hiring_application_intake_events`, y las que ya leen los
-  readers de reliability.
+  `greenhouse_hiring.hiring_opening`, `greenhouse_hiring.hiring_application_intake_events`.
 - Invariantes que no se pueden romper:
   - El readback devuelve **agregados**; nunca una fila que identifique a una persona.
   - El conteo y la lista deben salir del **mismo predicado**: un total filtrado junto a una lista sin filtrar es
     precisamente el defecto que motivó la task.
-  - `data_origin` viaja en el corte, nunca se colapsa: un conteo que mezcla real y sintético miente.
+  - `data_origin` viaja desglosado en el corte, nunca colapsado: un conteo que mezcla real y sintético miente en
+    la dirección más difícil de detectar.
+  - El registry no conoce dominios: agregar un corte nuevo no edita el lane ni el transporte.
   - Binding `internal` únicamente; cualquier otro binding recibe `404`, nunca `403`.
 - Write-target allowlist: `N/A` — esta task no escribe en ninguna tabla.
 - Tenant/space boundary: derivado del binding verificado del consumer, nunca de un parámetro libre.
@@ -257,29 +294,31 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Fundación del lane de diagnóstico
+### Slice 1 — Contrato + registry de contribuyentes de diagnóstico
 
-- Readers puros en `src/lib/platform/diagnostics/**` con su contrato de tipos.
-- Lane `GET /api/platform/ecosystem/platform/diagnostics/signals` detrás de `PLATFORM_DIAGNOSTICS_LANE_ENABLED`.
+- `src/lib/platform/diagnostics/**`: tipo del corte, registry de contribuyentes y resolución por clave de dominio.
+  **Sin conocimiento de dominio**: el registry no sabe qué es una vacante.
+- Lane `GET /api/platform/ecosystem/platform/diagnostics/domains` (qué dominios contribuyen) y
+  `.../diagnostics/domain?domain=<clave>`, detrás de `PLATFORM_DIAGNOSTICS_LANE_ENABLED`.
 - Autorización: binding `internal` únicamente; cualquier otro binding recibe `404` anti-oracle.
+- Gate que falla si un contribuyente se registra sin declararse (patrón `TASK-827`).
 - Tests del lane: allow, deny `404`, ausencia de token `401`, y flag OFF `404`.
 
-### Slice 2 — Readback de estado de flags por runtime
+### Slice 2 — Primer contribuyente: Hiring
 
-- Reader que cruza los `*_ENABLED` presentes en código contra el ledger, declarando el runtime de cada uno
-  (Vercel / `ops-worker` / Cloud Run) y marcando los que carecen de fila.
-- Lane `.../diagnostics/flags`.
-- El readback declara explícitamente que el ledger es el SSOT humano y que la verdad viva es `vercel env ls`:
-  nunca presenta el ledger como estado confirmado del runtime.
-
-### Slice 3 — Readback agregado por dominio, empezando por Hiring
-
-- Reader `domain-summary` para Hiring: por opening, conteo total y visible, corte por `data_origin`, corte por
-  etapa, archivados, y primera/última postulación.
+- `src/lib/hiring/diagnostics.ts`, propiedad del dominio Hiring, registrado en el registry de Slice 1.
+- Corte por opening: conteo total y visible, corte por `data_origin`, corte por etapa, archivados, y
+  primera/última postulación.
 - Corte de `hiring_application_intake_events` por outcome y por día (últimos 30), declarando de forma explícita
   qué proporción no es atribuible a una vacante por el `NULL` conocido en `opening_public_id`.
-- Lane `.../diagnostics/domain-summary?domain=hiring`.
 - Gate anti-leak: test que falla si la proyección incluye cualquier campo de persona.
+
+### Slice 3 — Estado de flags por runtime
+
+- Contribuyente transversal que cruza los `*_ENABLED` presentes en código contra el ledger, declarando el runtime
+  de cada uno (Vercel / `ops-worker` / Cloud Run) y marcando los que carecen de fila.
+- El readback declara explícitamente que el ledger es el SSOT humano y que la verdad viva es `vercel env ls`:
+  nunca presenta el ledger como estado confirmado del runtime.
 
 ### Slice 4 — Federación en el gateway
 
@@ -295,7 +334,10 @@ Reglas obligatorias:
 ## Out of Scope
 
 - **SQL ad-hoc / query runner por MCP.** Viola la regla dura del gateway y Full API Parity. Si un diagnóstico no
-  cabe en un readback, se modela un readback nuevo; no se abre una puerta genérica.
+  cabe en un readback, se modela un contribuyente nuevo; no se abre una puerta genérica.
+- **Un readback propio de señales de confiabilidad.** Ya existe: `get_platform_health` sobre
+  `src/lib/platform-health/composer.ts`, que consume `getReliabilityOverview`. Duplicarlo crearía dos verdades
+  sobre la salud del sistema.
 - Cualquier escritura, acción o remediación. Este canal es de lectura.
 - PII de candidatos, colaboradores o clientes. Eso pertenece a los providers dueños de esas entidades, con sus
   propias capabilities y auditoría.
@@ -307,9 +349,9 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-Los tres readbacks comparten forma: un objeto con `contractVersion`, el corte solicitado y una declaración
-explícita de lo que el dato **no** prueba. Esa última parte es deliberada: el defecto que originó la task no fue
-falta de datos, fue un número presentado sin su predicado, y un readback que repita ese patrón no sirve.
+Cada contribuyente devuelve un objeto con `contractVersion`, el corte solicitado y una declaración explícita de lo
+que el dato **no** prueba. Esa última parte es deliberada: el defecto que originó la task no fue falta de datos,
+fue un número presentado sin su predicado, y un readback que repita ese patrón no sirve.
 
 El corte de Hiring debe permitir distinguir, sin ambigüedad, entre tres familias de causa:
 
@@ -320,14 +362,36 @@ El corte de Hiring debe permitir distinguir, sin ambigüedad, entre tres familia
 Para eso, `total` y `visible` viajan siempre juntos y con el predicado que los produjo declarado en la respuesta.
 Un readback que devuelva solo uno de los dos reintroduce exactamente el problema que vino a resolver.
 
+### Procedencia: ver lo que el desk oculta es una excepción declarada
+
+El desk filtra `data_origin <> 'real'` a propósito (`TASK-1739`). El diagnóstico necesita ver ambos lados —si no,
+no puede distinguir la familia (2) de la (1)—, así que consulta **sin** ese filtro y **desglosa por procedencia**
+en la respuesta. Esa es la única excepción, y es explícita: el readback nunca devuelve un total mezclado que
+oculte el desglose, porque un conteo que suma real y sintético miente en la dirección más difícil de detectar.
+
+### 4-Pillar Score
+
+- **Safety** — lectura pura, sin escrituras ni remediación; binding `internal` con 404 anti-oracle; agregados sin
+  PII con gate anti-leak ejecutable; sin scope OAuth nuevo, por lo que no amplía la superficie de autorización de
+  ningún cliente existente.
+- **Robustness** — el contribuyente declara su predicado junto al número, así que un corte no puede presentar un
+  total sin decir de qué población salió; el desglose por procedencia impide el conteo mezclado; el registry
+  obliga a declarar cada contribuyente y su gate falla si alguien lo omite.
+- **Resilience** — flag OFF por defecto con rollback en menos de cinco minutos; el lane degrada a `404` sin
+  arrastrar a ninguna otra tool; no introduce dependencia nueva de infraestructura ni credencial nueva; si un
+  contribuyente falla, el corte reporta la falla en vez de devolver un cero que se leería como «no hay nada».
+- **Scalability** — agregados acotados con límites fijos, sin parámetros de consulta libres; extender a otro
+  dominio es registrar un contribuyente en su propio módulo, sin tocar el lane, el gateway ni Entra.
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- Slice 1 (fundación + autorización) → Slice 2 y Slice 3, que pueden correr en paralelo una vez cerrado Slice 1.
+- Slice 1 (contrato + registry + autorización) → Slice 2 y Slice 3, que pueden correr en paralelo una vez cerrado
+  Slice 1: ambos son contribuyentes del mismo registry.
 - Slice 4 (federación) va **al final**: federar una tool cuyo lane todavía cambia de forma obliga a un segundo
   bump de superficie y deja al cliente con una descripción inválida en caché.
-- El gate anti-leak de Slice 3 debe existir **antes** de que Slice 4 federe el readback de dominio.
+- El gate anti-leak de Slice 2 debe existir **antes** de que Slice 4 federe el corte de Hiring.
 
 ### Risk matrix
 
@@ -352,14 +416,15 @@ Un readback que devuelva solo uno de los dos reintroduce exactamente el problema
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
 | Slice 1 | `PLATFORM_DIAGNOSTICS_LANE_ENABLED=false` + redeploy | <5 min | si |
-| Slice 2 | mismo flag; el corte de flags desaparece con el lane | <5 min | si |
-| Slice 3 | mismo flag | <5 min | si |
+| Slice 2 | mismo flag; o retirar el contribuyente Hiring del registry sin tocar el lane | <5 min | si |
+| Slice 3 | mismo flag; o retirar el contribuyente de flags del registry | <5 min | si |
 | Slice 4 | revert del PR en `efeonce-mcp` + redeploy del gateway a la revisión anterior | <15 min | si |
 
 ### Production verification sequence
 
 1. Deploy a staging con el flag apagado; verificar que el lane responde `404` y que ninguna tool existente cambió.
-2. Encender el flag en staging; ejercitar los tres readbacks con token real de consumer `internal`.
+2. Encender el flag en staging; ejercitar el listado de dominios y cada contribuyente con token real de consumer
+   `internal`.
 3. Comparar los números del corte de Hiring contra el desk del portal en staging: deben coincidir exactamente.
 4. Ejercitar el deny: binding no interno debe recibir `404`, y sin token `401`.
 5. Federar en el gateway y correr el canary contra staging.
@@ -381,12 +446,15 @@ Cloud Run). Sin cambios en Entra, sin secretos nuevos, sin coordinación con ter
 
 ## Acceptance Criteria
 
-- [ ] Los tres readbacks existen como readers puros en `src/lib/platform/diagnostics/**` y el lane los consume sin
-      reimplementar lógica.
+- [ ] El contrato y el registry viven en `src/lib/platform/diagnostics/**` sin conocimiento de dominio, y cada
+      contribuyente vive en el módulo de su dominio (`src/lib/hiring/diagnostics.ts` para el primero).
+- [ ] Existe un gate que falla si un contribuyente se registra sin declararse.
+- [ ] La task NO agrega un readback de señales de confiabilidad: esas se consumen por `get_platform_health`.
 - [ ] El lane responde `404` con el flag apagado, `401` sin token, `404` anti-oracle para un binding no interno y
       `200` para un binding `internal`.
 - [ ] El corte de Hiring devuelve `total` y `visible` juntos, con el predicado que los produjo declarado en la
-      respuesta.
+      respuesta, y desglosa `data_origin` en vez de colapsarlo.
+- [ ] Un contribuyente que falla reporta la falla; nunca devuelve un cero que se lea como «no hay nada».
 - [ ] Existe un test anti-leak que falla si la proyección incluye cualquier campo que identifique a una persona.
 - [ ] El readback de flags declara el runtime de cada flag y marca los que no tienen fila en el ledger.
 - [ ] Las tools están en `src/mcp/greenhouse/tool-manifest.ts` con `writes: false` y `annotations` coherentes, y
@@ -395,6 +463,7 @@ Cloud Run). Sin cambios en Entra, sin secretos nuevos, sin coordinación con ter
 - [ ] Los números del readback de Hiring coinciden con el desk del portal para la misma vacante.
 - [ ] El flag tiene fila en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` con su runtime declarado.
 - [ ] Las tres capas documentales existen: técnica, funcional y manual de uso.
+- [ ] El spec declara `Domain boundary`, los tres patrones canonizados que extiende y el 4-Pillar Score.
 
 ## Verification
 
@@ -426,4 +495,4 @@ Cloud Run). Sin cambios en Entra, sin secretos nuevos, sin coordinación con ter
 
 - ¿El corte de flags debe leer la verdad viva de Vercel (requiere credencial de Vercel en el runtime del portal) o
   quedarse en el cruce código-vs-ledger? La propuesta de esta task es lo segundo, por ser suficiente para
-  diagnosticar y no agregar una credencial nueva; confirmar con el operador antes de Slice 2.
+  diagnosticar y no agregar una credencial nueva; confirmar con el operador antes de Slice 3.
