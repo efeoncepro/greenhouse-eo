@@ -103,3 +103,31 @@ Cerrar una postulación ya NO se opera sólo desde el portal: además del desk h
 
 `NEXA_HIRING_ACTIONS_ENABLED` nace **OFF** (Vercel-only, sobre el master `NEXA_ACTION_RUNTIME_ENABLED`):
 `code complete, rollout pendiente`. No describir este carril como operativo sin verificar el valor vivo.
+
+## Intake, pipeline y Banco de Talento (ISSUE-171/172/173, 2026-09-12)
+
+Ambos incidentes están en producción desde el release `586a8627568a` (2026-09-12); ISSUE-173 sigue abierto con
+mitigación manual. Contrato y follow-ups: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-09-12.
+
+- **NUNCA copiar el snapshot del servidor a un `useState` que no se re-sincroniza.** El tablero se deriva con
+  `useMemo` de `initialSnapshot.applications` + `stageOverrides`; la copia rancia pintó «Sin resultados» sobre 51
+  postulaciones reales en la navegación soft del selector (`ISSUE-171`).
+- **NUNCA generar un id secuencial con `lpad(n::text, k, '0')`.** `lpad` recorta pasado el ancho y diez valores
+  colapsan contra `UNIQUE`; el default canónico es `greenhouse_hiring.next_talent_pool_public_id()` (un solo
+  `nextval`, `GREATEST(k, length(n))`) (`ISSUE-172`).
+- **NUNCA un `INSERT … SELECT … ON CONFLICT DO NOTHING` masivo sin anti-join sobre una tabla con default
+  `nextval`.** PostgreSQL evalúa el default por fila candidata antes de descartarla: ~71k valores/día quemados.
+- **NUNCA rechazar una postulación por un enlace opcional.** `normalizeOptionalHttpsUrl` eleva a https, persiste el
+  href canónico y descarta (`null`) lo peligroso; nunca persiste otro scheme. Dos personas reales perdieron su
+  postulación por `linkedin.com/in/x`.
+- **NUNCA declarar el intake sano contando filas ni leyendo `hiring_application_intake_events`** (ciego al carril
+  vivo: sólo lo escribe el endpoint directo). Se reconcilia por contenido: submissions por `email` + vacante contra
+  `hiring_application`, y `sin_postulacion = 0`.
+- **NUNCA recuperar postulaciones por SQL.** Migración +
+  `pnpm reactive:backfill --replay-failed-handlers --handler=<key>` (retry/dead-letter) +
+  `pnpm reactive:backfill --handler=<key>` (huérfanos del breaker, `ISSUE-173`: el drain del dominio no los recoge si
+  un sibling ya escribió fila) + cron `ops-email-delivery-retry`. Ese CLI escribe producción con el árbol local:
+  declararlo.
+- **SIEMPRE mirar `sync.reactive.circuit_open` (`/admin/ops-health`) ante un consumer que no procesa**: un breaker
+  abierto no deja fila, así que ninguna señal de dead-letter lo ve; y antes de un replay que dispare correos, contar
+  cuántos y mirar plan/cuota del proveedor (la ráfaga del 2026-09-12 agotó el plan Free de Resend).

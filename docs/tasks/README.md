@@ -29,8 +29,11 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1868](to-do/TASK-1868-aeo-grader-deterministic-detector-precision.md) | AEO Grader: precisión de los detectores deterministas (EPIC-020): probes que no confunden la página HTML de un SPA con `llms.txt`/`robots.txt`/`sitemap.xml` y compuerta de revisión por palabra completa | none |
 | [TASK-1870](to-do/TASK-1870-growth-seo-serp-rotation-signal.md) | Growth SEO: rotación de URL en el SERP como señal de canibalización sin Search Console (EPIC-022): deriva `rotation_count` del top-N ya persistido por TASK-1699 a costo de proveedor cero, única lente para competidores y prospectos; cobertura declarada e `insufficient_history` porque la serie empieza el 2026-08-29. No toca el detector GSC de TASK-1700 | none |
 | [TASK-1871](to-do/TASK-1871-growth-seo-bulk-spam-screening.md) | Growth SEO: screening masivo de toxicidad con `bulk_spam_score` (EPIC-022): hasta 1.000 dominios por request para priorizar prospección e higiene del perfil; hecho de mercado por dominio, append-only, con condición de disparo y tope. Diagnostica, NO genera disavow | none |
+| [TASK-1872](to-do/TASK-1872-reactive-consumer-pending-per-handler.md) | Consumer reactivo: pendiente por handler en Phase A (cierra ISSUE-173) — un breaker abierto sobre un evento multi-handler ya no deja huérfano al handler saltado; señal `sync.reactive.handler_orphan_residue`; inventario y pre-reconocimiento gobernado de huérfanos históricos antes del deploy; sin migración ni flag | none |
+| [TASK-1873](to-do/TASK-1873-hiring-intake-discarded-link-warnings.md) | Intake de postulaciones: el enlace descartado por el parser queda visible como `intakeWarnings` application-scoped (sin el raw) en `hiring_application` y en el reader canónico; migración expand-only (EPIC-011) | none |
+| [TASK-1874](to-do/TASK-1874-application-360-discarded-link-notice.md) | Application 360: aviso «Envió un enlace de LinkedIn/portafolio que no pudimos leer; pídelo en el primer contacto» en «Perfil del candidato» y empty state coherente en «Portafolio y enlaces»; copy en diccionarios es-CL/en-US, `Alert info` reutilizado (EPIC-011) | TASK-1873 |
 
-Siguiente ID libre `TASK-1872`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1875`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
 
 ## Programa Efeonce Insights: EPIC-045
 

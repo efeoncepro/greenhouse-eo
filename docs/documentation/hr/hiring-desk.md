@@ -1,9 +1,9 @@
 # Hiring Desk
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** con TASK-355 (previo al registro de metadatos)
-> **Ultima actualizacion:** 2026-08-24 por Codex (retorno contextual y revisión secuencial)
+> **Ultima actualizacion:** 2026-09-12 por Claude (ISSUE-171/172: el tablero sigue a la vacante elegida; recuperación del intake)
 > **Documentacion tecnica:** [ADR del vocabulario de etapas y desenlaces](../../architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md) · [Arquitectura Hiring/ATS](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
 > **Manual de uso:** [Operar Hiring Desk](../../manual-de-uso/hr/operar-hiring-desk.md)
 
@@ -90,6 +90,52 @@ code-complete y pendiente de rollout: [Entrega y recuperación de acceso a tests
 su consulta general ni en el lookup de foco. Si una archivada permanece o reaparece en el board, no significa
 que se haya reactivado ni que vuelva a ser elegible; contradice el contrato de visibilidad y debe corregirse
 antes del rollout de este delta.
+
+## El tablero sigue a la vacante elegida (ISSUE-171, en producción desde 2026-09-12)
+
+Desde el release del 2026-09-12, cambiar de vacante en el selector del Pipeline muestra de inmediato las
+postulaciones de esa vacante, sin recargar la página. Antes, si entrabas con una vacante ya elegida en la URL (por
+ejemplo al volver desde una Postulación 360 o desde un enlace del Demand Desk) y cambiabas a otra, el tablero se
+quedaba con la lista de la primera y decía «Sin resultados» aunque la segunda tuviera decenas de postulaciones.
+Recargar la página lo «arreglaba»: era una copia vieja en pantalla, nunca datos perdidos. Las postulaciones de
+`EO-OPN-0674` y `EO-OPN-0675` que parecían no existir estaban completas en la base; en la verificación del
+2026-09-12, `EO-OPN-0675` mostró sus 66 tarjetas al cambiar de vacante sin recargar.
+
+Qué cambió por dentro, en una frase: el tablero ya no guarda su propia copia de las postulaciones; las lee siempre
+del servidor y sólo recuerda, mientras arrastras una tarjeta, a qué columna la moviste.
+
+**Limitación conocida (medida el 2026-09-12): el contador del tablero puede quedar por debajo del Demand Desk.** El
+tablero recibe como máximo 120 postulaciones por carga. Al entrar sin vacante elegida (montaje frío) esas 120 se
+reparten entre todas las vacantes, así que una vacante con muchas postulaciones aparece con menos tarjetas de las que
+tiene, y el contador visible —que cuenta tarjetas— no coincide con la columna «postulaciones» del Demand Desk. No hay
+aviso en pantalla cuando esto pasa. Al elegir la vacante, viajan hasta 120 de esa vacante. Es un follow-up registrado
+(Delta 2026-09-12 de la arquitectura, follow-up 6); mientras tanto, la cifra confiable es la del Demand Desk.
+
+## Cómo se recuperaron las postulaciones del 2026-09-12 (ISSUE-172)
+
+El mismo día se detectó un segundo problema, independiente del tablero: el proceso que convierte cada envío del
+formulario público en una postulación estuvo fallando de forma intermitente y luego se detuvo por varias horas (su
+«interruptor de seguridad» se abrió a las 12:15Z), con hasta 38 personas esperando entrar. La causa fue un defecto en
+cómo se generaban los códigos `EO-TLP-…` del Banco de Talento, que producía códigos repetidos. Ningún envío se perdió:
+todos quedaron guardados en el formulario y se reprocesaron por el mecanismo gobernado de reintento, nunca a mano en
+la base.
+
+- Resultado medido a las 14:46Z: 281 envíos del formulario de postulación y **0 sin postulación**; el proceso volvió a
+  estar sano a las 12:50Z.
+- Los candidatos recuperados recibieron su acuse de recibo **tarde** (y People su alerta interna). Son correos
+  legítimos: nadie los había recibido antes. La ráfaga agotó la cuota diaria del proveedor de correo y el operador
+  subió el plan ese mismo día; al final quedaron 164 correos enviados y 0 fallidos.
+- Dos personas que el formulario había rechazado por escribir su LinkedIn sin `https://` quedaron aceptadas: desde
+  este release un enlace mal escrito se corrige o se ignora, pero nunca bloquea la postulación (ver el manual de
+  Careers públicas, §Enlaces del candidato).
+- Pendiente humano: **6 CV de `EO-OPN-0675` están en cuarentena** del escáner de archivos. La postulación se aceptó y
+  el candidato vio el mensaje normal; el archivo no se puede abrir hasta que alguien lo revise desde el panel
+  Documentos.
+
+> Detalle técnico: Delta 2026-09-12 en `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` · fichas
+> `docs/issues/resolved/ISSUE-171-hiring-pipeline-empty-stale-client-snapshot.md` y
+> `docs/issues/resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md` · tablero
+> `src/views/greenhouse/hiring/PipelineDeskView.tsx` · snapshot `src/lib/hiring/desk.ts`.
 
 ## Acceso
 

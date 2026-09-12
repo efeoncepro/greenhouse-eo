@@ -31,6 +31,19 @@ para un retry ambiguo.
 - Las cuotas diaria/mensual son distintas del rate limit; sent y received cuentan para cuota.
 - `429` puede significar rate limit, cuota diaria o cuota mensual: decide por `type`, no sólo status.
 
+### Delta 2026-09-12 — cuota diaria agotada en Greenhouse (ISSUE-172)
+
+- [OBS] Con plan **Free (100 correos/día)**, la ráfaga de acuses de una recuperación gobernada de postulaciones
+  agotó la cuota a las 12:58:11Z: todo envío posterior falló con `resend_api_error` hasta que el operador subió
+  el plan a **Pro** (diario ilimitado, 50 000/mes) ~13:05Z. Los `failed` los recuperó el cron de reintento; 8
+  `dead_letter` necesitaron el revive gobernado (`reviveDeadLetterEmailDeliveries`, `src/lib/email/delivery.ts`).
+- Regla: antes de un replay/backfill que dispare correos, contar cuántos emitirá (entidades × correos por
+  entidad) y comparar contra plan y cuota restante. Un `429 daily_quota_exceeded` no se arregla con retry.
+- El sender ya persiste `error.name` en `email_deliveries.error_message`
+  (`Email provider rejected dispatch (<name>).`): `daily_quota_exceeded` vs `rate_limit_exceeded` vs
+  `validation_error` se distingue desde la fila, sin abrir el panel del proveedor.
+- Ficha: `docs/issues/resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md`.
+
 ## Taxonomía de retry
 
 | Respuesta                            | Acción                                                                 |

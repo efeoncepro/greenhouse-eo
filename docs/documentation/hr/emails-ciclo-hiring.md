@@ -1,9 +1,9 @@
 # Emails del Ciclo de Hiring — Notificaciones a Candidatos y People
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-08-12 por Claude (TASK-1689)
-> **Ultima actualizacion:** 2026-08-21 por Codex (correo de persona seleccionada)
+> **Ultima actualizacion:** 2026-09-12 por Claude (acuses tardíos tras una recuperación, cuota del proveedor, ISSUE-172)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) (Delta 2026-08-12)
 
 ## Qué hace
@@ -96,3 +96,31 @@ candidato están en `develop`/staging. Detalle funcional:
 
 > Detalle técnico: consumers en `src/lib/sync/projections/hiring-lifecycle-emails.ts`, política en
 > `src/lib/hiring/notifications/`, templates en `src/emails/Hiring*.tsx`.
+
+## Acuses tardíos tras una recuperación
+
+A veces la plataforma deja de crear postulaciones por un rato aunque el formulario público las siga
+recibiendo (el 2026-09-12 pasó durante horas por un defecto ya corregido; ninguna postulación se perdió).
+Cuando Operations recupera esas postulaciones por la vía gobernada, **cada una emite sus correos
+normales**: el acuse al candidato y el aviso interno a People. Llegan tarde respecto del momento en que la
+persona postuló, pero son legítimos: nadie había recibido nada.
+
+- **El copy está pensado para eso.** El acuse habla en pretérito («Recibimos tu postulación») y no promete
+  plazos, así que uno que llega horas después sigue siendo verdadero. No se reescribe ni se reenvía «con
+  disculpas».
+- **Llegan en ráfaga y el proveedor tiene cuota.** Una recuperación grande produce decenas de correos en
+  pocos minutos. El 2026-09-12 el plan de correo de ese momento (100 correos por día) se agotó a las 12:58
+  UTC en medio de la ráfaga y una parte de los acuses quedó sin salir hasta que el plan se amplió (~13:05
+  UTC; hoy: diario ilimitado, 50 000 al mes). Resultado final de ese día: 164 correos de Hiring aceptados
+  desde las 12:50 UTC y 0 fallidos.
+- **Un correo que agotó sus reintentos no se pierde.** Queda como entrega muerta (`dead_letter`) y existe una
+  acción gobernada para revivirlo una vez resuelta la causa; el ciclo normal lo reenvía (ese día: 8
+  revividos). Nunca se reenvía así un correo que transporte un acceso con credencial (esos se recuperan por
+  su propio flujo), ni uno dirigido a un buzón que el proveedor bloqueó, ni uno que el proveedor ya había
+  aceptado aunque el registro local quedara incierto.
+
+> Detalle técnico: procedimiento en
+> [Operar los emails del ciclo de hiring](../../manual-de-uso/hr/operar-emails-ciclo-hiring.md) («Revivir
+> entregas muertas») y en `docs/operations/runbooks/resend-email-lifecycle-rollout.md` («Revivir entregas
+> dead_letter (gobernado)»); código en `src/lib/email/delivery.ts` (`reviveDeadLetterEmailDeliveries`); ficha
+> del incidente `docs/issues/resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md`.

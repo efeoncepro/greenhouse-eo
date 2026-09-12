@@ -365,7 +365,7 @@ The Hiring cycle registers 8 transactional email types as reactive consumers in 
 - `hiring.application.stage_changed` → progress email **only for candidate-facing stages** (allowlist: `shortlisted`="Preselección", `interview`="Entrevista"); internal stage names never reach candidate copy.
 - `hiring.application.decided` → **only 2 of the 6 outcomes reach a candidate today**: `selected` (congratulations) and `rejected` (thank-you; type `hiring_decision_rejected` is independently pausable). `not_selected` **already has its own template and `EmailType`** (`hiring_decision_not_selected`, TASK-1762 — «esta vez elegimos a otra persona», consent-aware, distinct from the discard thank-you), but it is **born off**: its `email_type_config` row is seeded `enabled=false` and `HIRING_CAPACITY_FILLED_EMAIL_ENABLED` is OFF, so closing with it sends nothing yet. `backup_selected` and `withdrawn` are designed but have **no template yet**, and `unresponsive` is silent **by design**. The selector is an explicit map with a declared no-op (`DECISION_EMAIL_TYPE`, `src/lib/hiring/notifications/send.ts`): an outcome absent from it is born mute rather than inheriting its neighbour's type. **NEVER** reuse another outcome's `EmailType` to "at least notify" — **one `EmailType` per outcome, the cause modulates the BODY, never the type**: the system branches on that value in three places (per-type kill-switch in `email_type_config`, footer profile, and this selector), so collapsing two outcomes leaves a cohort closure and an individual discard under the same switch. The dedupe is **not** an argument here: it keys on `source_event_id + source_entity + recipient_email`, not on `EmailType`.
 
-Governance: flag `HIRING_LIFECYCLE_EMAILS_ENABLED` **ON in production since 2026-08-12** (rev `ops-worker-00548-x52`, default `true` in `services/ops-worker/deploy.sh`) — **it lives ONLY in the ops-worker** (flipping it in Vercel does nothing); per-type kill-switch in `greenhouse_notifications.email_type_config`; dedupe via `wasEmailAlreadySent`. EmailTypes: `hiring_application_received_internal`, `hiring_application_confirmation`, `hiring_assessment_assigned`, `hiring_assessment_submitted_internal`, `hiring_stage_advanced`, `hiring_decision_selected`, `hiring_decision_rejected`, and `hiring_decision_not_selected` (registered by TASK-1762, seeded `enabled=false`, footer profile pending `TASK-1764` — until then it resolves to the legacy profile silently). The submitted-test alert shipped in production through release `0fe2420ed894` (orchestrator `31915501771`, manifest `released`, watchdog `ok`/`drift_count=0`); its live delivery has not yet been exercised with a real completed candidate test. Real E2E exercised (EO-APP-0090): 5 prior types `status=sent`; `hiring_decision_selected` is covered by tests until its first real use. Remaining open items: Legal/Privacy review of retention/notice, parser-level required flip for country, formal GVC scorecard.
+Governance: flag `HIRING_LIFECYCLE_EMAILS_ENABLED` **ON in production since 2026-08-12** (rev `ops-worker-00548-x52`, default `true` in `services/ops-worker/deploy.sh`) — **it lives ONLY in the ops-worker** (flipping it in Vercel does nothing); per-type kill-switch in `greenhouse_notifications.email_type_config`; dedupe via `wasEmailAlreadySent`. EmailTypes: `hiring_application_received_internal`, `hiring_application_confirmation`, `hiring_assessment_assigned`, `hiring_assessment_submitted_internal`, `hiring_stage_advanced`, `hiring_decision_selected`, `hiring_decision_rejected`, and `hiring_decision_not_selected` (registered by TASK-1762, seeded `enabled=false`, footer profile pending `TASK-1764` — until then it resolves to the legacy profile silently). The submitted-test alert shipped in production through release `0fe2420ed894` (orchestrator `31915501771`, manifest `released`, watchdog `ok`/`drift_count=0`); its live delivery has not yet been exercised with a real completed candidate test. Real E2E exercised (EO-APP-0090): 5 prior types `status=sent`; `hiring_decision_selected` is covered by tests until its first real use. Remaining open items: Legal/Privacy review of retention/notice, parser-level required flip for country, formal GVC scorecard. **Proveedor (2026-09-12):** Resend pasó de **Free (100 correos/día)** a **Pro** (diario ilimitado, 50 000/mes) ~13:05Z, después de que la ráfaga de acuses de la recuperación de ISSUE-172 agotara la cuota a las 12:58:11Z; antes de un replay que dispare correos, contar cuántos y mirar plan/cuota (ver §Pipeline e intake — incidente 2026-09-12).
 
 Docs: manual `docs/manual-de-uso/hr/operar-emails-ciclo-hiring.md` · functional `docs/documentation/hr/emails-ciclo-hiring.md` · architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (Delta 2026-08-12) · flag ledger `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
@@ -492,6 +492,137 @@ Public Careers applications now capture durable candidate contact, person-first.
 
 Docs: ADR Delta 2026-08-12 in `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (+ row in `DECISIONS_INDEX.md`) · functional `docs/documentation/hr/hiring-desk.md` §Datos de contacto del candidato · manual `docs/manual-de-uso/hr/operar-careers-publicas.md` §Datos de contacto en el formulario.
 
+## Pipeline e intake — incidente 2026-09-12 (ISSUE-171/172/173)
+
+Tres defectos distintos se vieron el mismo día bajo un mismo síntoma («el pipeline está vacío»), y confundirlos fue el
+primer error de diagnóstico. Fichas: `docs/issues/resolved/ISSUE-171-hiring-pipeline-empty-stale-client-snapshot.md`,
+`docs/issues/resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md` y
+`docs/issues/open/ISSUE-173-reactive-consumer-strands-breaker-skipped-handler-events.md`. Contrato técnico y
+follow-ups numerados: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-09-12. Los dos primeros
+están en producción desde el release `586a8627568a` (2026-09-12, manifest `released` 14:44:56Z); el tercero está
+reproducido y mitigado a mano, con el diseño del fix en su ficha y task pendiente. Nada se perdió en ninguno.
+
+**El tablero deriva del snapshot del servidor; nunca lo copia (ISSUE-171).** `PipelineDeskView.tsx` sembraba
+`applications` con `useState(initialSnapshot.applications)` y nunca lo re-sincronizaba, mientras `openingId` sí lo
+hacía en un efecto. Cambiar de vacante en el selector es `router.replace`: navegación soft, el componente no se
+desmonta, el inicializador de `useState` no vuelve a correr. El servidor mandaba el snapshot de la vacante nueva,
+`openingId` cambiaba, la lista conservaba el arreglo del montaje y el cruce daba 0 → «Sin resultados» sobre decenas de
+postulaciones reales (`EO-OPN-0674`/`EO-OPN-0675`). Preexistente desde `559f5654b` (2026-07-09); se hizo visible al
+pasar de una a cuatro vacantes con postulaciones, porque con una sola nadie cambia de vacante. El fix es estructural:
+la lista se deriva con `useMemo` de `initialSnapshot.applications` y el único estado cliente legítimo es el delta
+optimista del arrastre, como mapa `stageOverrides` (`applicationId → stage`) que un snapshot nuevo limpia. Test
+`pipeline-desk-snapshot-sync.test.tsx`. Verificación runtime del 2026-09-12 (Playwright, staging = misma base y código
+que producción): montaje en `EO-OPN-0009` → 120 tarjetas; cambio a `EO-OPN-0675` sin recargar → 66 tarjetas y 0 «Sin
+resultados»; vuelta → 120.
+
+- **NUNCA** copiar estado de servidor a un `useState` sin re-sincronizarlo — mejor, sin derivarlo. Un
+  `useState(props.x)` es una foto del montaje; si la superficie navega en soft y la prop cambia, la foto se queda. El
+  autor «ya había sincronizado tres estados hermanos»: el cuarto olvidado es exactamente esta clase de bug.
+- **SIEMPRE** que un F5 «arregle» una pantalla, sospechar estado cliente rancio antes que datos perdidos. Acá el
+  tablero afirmaba que no había postulantes cuando había 51, con los datos intactos.
+
+**El `public_id` secuencial nunca se genera con `lpad` de ancho fijo (ISSUE-172, P1).** El default de
+`talent_pool_membership.public_id` era `'EO-TLP-' || lpad(nextval(seq)::text, 5, '0')`, y en PostgreSQL `lpad`
+**recorta** cuando el texto excede el largo: pasado 99 999, diez valores consecutivos de la secuencia colapsan en un
+mismo `public_id` contra `UNIQUE`. La secuencia iba en 575 712 con 230 filas porque la projection hacía
+`INSERT … SELECT … ON CONFLICT DO NOTHING` sobre los 247 facets activos cada 5 minutos, y PostgreSQL evalúa el DEFAULT
+(y por tanto `nextval`) por cada fila candidata **antes** de descartarla: ~71k valores quemados al día. Consecuencias:
+cron `ops-hiring-talent-pool-reconcile` rojo en cada corrida (`CODE 13`) y el consumer que crea las postulaciones
+(`growth_hiring_application_from_submission`, que llama `ensureTalentPoolMembership`) fallando hasta abrir su circuito
+(12:15:03Z): hasta 38 personas reales sin proyectar durante horas y **ninguna señal** — se supo por logs de Cloud Run.
+Fix: migración `20260912122159611_issue-172-talent-pool-public-id-no-truncation.sql` (función
+`greenhouse_hiring.next_talent_pool_public_id()`: un solo `nextval`, `lpad(n, GREATEST(5, length(n)), '0')` rellena y
+nunca recorta; `to_char(n,'FM00000')` se descartó porque desborda a `#####`; `setval` sobre el MAX real, 72 440 →
+72 441), anti-join `NOT EXISTS` en `projection.ts` (el `ON CONFLICT` queda como guarda de carrera) y test que fija el
+predicado. Aplicada 12:48Z; el circuito cerró solo a las 12:50:02Z. Canary con el worker nuevo: la secuencia avanza
+exactamente lo que las filas reales.
+
+- **NUNCA** `lpad(n::text, k, '0')` como generador de un id secuencial: rellena Y recorta, y un espacio «de años» se
+  agota en semanas si alguien evalúa el default por fila descartada. El patrón canónico es una función con un solo
+  `nextval` y `GREATEST(k, length(n))`.
+- **NUNCA** un `INSERT … SELECT … ON CONFLICT DO NOTHING` masivo sin anti-join cuando la tabla tiene un default con
+  `nextval`: el `ON CONFLICT` descarta filas, no evaluaciones de secuencia.
+
+**El parser público nunca rechaza una postulación por un enlace opcional.** `normalizeOptionalHttpsUrl`
+(`src/lib/hiring/public-careers/schema.ts`): sin scheme o con `http://` → `https://`; `javascript:`/`data:`/host sin
+punto → el campo se descarta (`null`) y la postulación sigue; se persiste el href **canónico** (`new URL().href`, sin
+barra final en un origen pelado), nunca el texto crudo ni un scheme distinto de https. Dos personas reales habían sido
+rechazadas por `linkedin.com/in/x`. Ambas entradas (form estándar y Growth Form nativo) usan el mismo parser, así que
+la entry parity se conserva. Lo que hoy se descarta se descarta **en silencio**: Application 360 dice «Sin enlaces
+públicos informados» aunque el candidato sí informó uno — follow-up 2 del Delta 2026-09-12 (`{ url, discarded? }` +
+`intakeWarnings` sin el raw + aviso en Application 360). Capa 2 pendiente: la re-validación server-side del Growth Form
+(`GROWTH_FORMS_SERVER_VALIDATION_ENABLED`) figura ON en Production en el ledger y aun así dos submissions persistieron
+el raw; verificar el valor live con `pnpm flags:audit` (follow-up 3).
+
+- **NUNCA** tratar un campo opcional como fatal en una frontera pública. El criterio es el mismo que `availability`
+  fuera de catálogo: se descarta el campo, no a la persona.
+- **NUNCA** persistir un enlace del candidato sin canonicalizarlo ni con un scheme distinto de https: un `javascript:`
+  guardado es un vector el día que alguien lo renderice.
+
+**Cómo verificar que el intake está sano: reconciliar, no contar filas.** La prueba es cruzar las submissions del form
+`efeonce-careers-application` (`greenhouse_growth.form_submission`) por `email` + `openingPublicId` contra la persona
+(`identity_profiles`) y su `hiring_application` en esa `hiring_opening`, y exigir `sin_postulacion = 0`. Estado
+2026-09-12 14:46Z: 281 submissions / 0 sin postulación; circuito `closed`; `handler_health` `healthy`; cron verde (CODE
+vacío). **`greenhouse_hiring.hiring_application_intake_events` es ciego al carril vivo**: lo escribe sólo el endpoint
+directo `/api/public/hiring/applications` (7 filas históricas contra 281 submissions); el carril real es Growth Form →
+projection reactiva, y no deja huella ahí. La señal `sync.reactive.circuit_open` (kind `incident`, módulo `sync`,
+steady 0; `error` con breaker `open`/`half_open` o handler `failed`/`quarantined`, `warning` con `degraded`; correos
+redactados en la evidencia) existe desde este incidente y se lee en `/admin/ops-health`; con ella esto se habría visto
+a los 5 minutos, no horas después.
+
+- **NUNCA** declarar «el intake está sano» por conteo de filas o por el ledger de intake. Sólo la reconciliación por
+  contenido (email + vacante) contra postulaciones prueba que nadie quedó fuera.
+- **SIEMPRE** que un consumer reactivo deje de procesar, mirar primero `projection_circuit_state` + `handler_health`
+  (la señal `sync.reactive.circuit_open`): un breaker abierto **no deja fila** en `outbox_reactive_log`, así que
+  ninguna señal de dead-letter lo ve.
+
+**Recuperación gobernada — nunca SQL sobre postulaciones.** Orden y comandos exactos, tal como se ejecutaron el
+2026-09-12 (12:48Z → ~13:30Z) con autorización del operador:
+
+1. Migración con `pnpm pg:connect:migrate`; verificar después `column_default` y `last_value`. `pg:connect:status` es
+   dry-run e **imprime el SQL como si lo hubiera aplicado**.
+2. Cron y circuito se recuperan solos (o `gcloud scheduler jobs run ops-hiring-talent-pool-reconcile --location=us-east4`).
+3. Filas `retry`/`dead-letter` del handler:
+   `pnpm reactive:backfill --replay-failed-handlers --handler=growth_hiring_application_from_submission:growth.forms.submission_accepted`
+   (primero con `--dry-run`). Resultado del día: 33 postulaciones creadas, `sin_postulacion` 38 → 8.
+4. Huérfanos del breaker (ISSUE-173):
+   `pnpm reactive:backfill --handler=growth_hiring_application_from_submission:growth.forms.submission_accepted`
+   (sin replay). Resultado: `6/6 ok`. El drain programado del dominio **no** los recoge: Phase A excluye un evento si
+   CUALQUIER handler del tipo tiene fila, y `growth.forms.submission_accepted` tiene cuatro. Repetir tras cada
+   apertura de circuito de una projection con siblings hasta que aterrice el fix estructural (follow-up 1).
+5. Correos: el cron `ops-email-delivery-retry` reenvía los `failed`
+   (`gcloud scheduler jobs run ops-email-delivery-retry --location=us-east4`). Un `dead_letter` se revive con
+   `reviveDeadLetterEmailDeliveries` vía `POST /api/admin/ops/email-delivery-retry` y cuerpo
+   `{ reviveDeadLetter: { reason, deliveryIds? | emailTypes?, sinceHours?, limit? } }` (motivo ≥10 caracteres; excluye
+   token-sensitive, no retryables, `dispatch_unknown` y buzones bloqueados; no envía nada, sólo vuelve la fila a
+   `failed` para que el cron la tome). Ese día: 8 revividos y reenviados.
+
+Ese CLI ejecuta el **árbol local** contra la única base (dev/staging/prod): sirve como recovery y como canary, pero
+escribe producción con código no desplegado — **declararlo** siempre en el handoff. Y el push a `develop` despliega el
+`ops-worker` compartido: el anti-join estaba vivo antes del release.
+
+- **NUNCA** crear, borrar ni «arreglar» una `hiring_application` por SQL para recuperar un intake. El replay gobernado
+  es idempotente (`public-apply:<fingerprint>`, persona email-first, `ensureTalentPoolMembership` con `ON CONFLICT`) y
+  deja la traza que un humano puede auditar.
+- **SIEMPRE** contar cuántos correos disparará un replay y mirar plan/cuota del proveedor **antes** de correrlo.
+
+**Acuses tardíos tras una recuperación son legítimos.** Cada postulación recuperada emite `hiring.application.created`
+→ acuse al candidato + alerta interna a People (TASK-1689). Nadie había recibido acuse, así que el correo corresponde:
+llega tarde, no de más. El 2026-09-12 la ráfaga agotó el plan **Free de Resend (100 correos/día)** a las 12:58:11Z —
+todo envío rechazado desde ahí, y `email_deliveries` no decía por qué porque el sender tragaba `error.name` (corregido
+en el mismo release: el rechazo viaja con el nombre, `daily_quota_exceeded`; el `message` no, porque cita direcciones).
+El operador subió a **Pro** (diario ilimitado, 50 000/mes) ~13:05Z; los `failed` se recuperaron con el cron y los 8
+`dead_letter` con el revive. Estado final: 164 `sent` / 0 fallidos desde las 12:50Z.
+
+**Pendiente operativo humano:** **6 CV de `EO-OPN-0675` están en cuarentena** (Sentry `NEXTJS-92`
+`growth_form_upload_quarantined:suspicious` es el escáner funcionando, no un error). Las postulaciones se aceptaron y el
+candidato vio el mismo éxito genérico, como corresponde; los archivos no se abren hasta revisión humana (follow-up 7).
+
+**Adyacentes medidos y aún abiertos (follow-up 6):** el snapshot del desk embarca hasta 120 postulaciones y trunca **en
+silencio** — el contador visible usa `filtered.length`, así que en montaje frío discrepa de la columna «postulaciones»
+del Demand Desk sin señal; la tarjeta hace `source.replaceAll(...)` sin guarda; y el ledger de intake ciego de arriba.
+Rutas exactas: `references/greenhouse-runtime.md` §Pipeline board / intake recovery.
+
 ## Public vacancy canonical content + JobPosting (TASK-1740/1741)
 
 The public vacancy carries a versioned structured block **`PublicOpeningContent` v2**
@@ -571,7 +702,11 @@ Chile, the international route with direct payment by Efeonce** (contract type `
 EOR). Open discrepancy: the public stage 2 of `EO-OPN-0009` ("Assessment práctico…") does not say the case is
 fictitious, while the other three do; the owner confirmed in chat that it is, and the 2026-09-11 LinkedIn post
 states it for all four. Align the public copy via `updateHiringOpening` / `PATCH /api/hiring/openings/{id}`
-(`hiring.opening.write`) with operator authorization — not done as of 2026-09-11. Renderer fixture:
+(`hiring.opening.write`) with operator authorization — still not done as of 2026-09-12 (follow-up 7 del Delta
+2026-09-12). Intake al 2026-09-12 14:46Z: **281 submissions** del form `efeonce-careers-application` / **0 sin
+postulación**; tablero verificado ese día en runtime: `EO-OPN-0009` muestra **120 tarjetas** (exactamente el tope
+del snapshot, así que el número real puede ser mayor) y `EO-OPN-0675` **66 tarjetas** al cambiar sin recargar — ver
+§Pipeline e intake. Renderer fixture:
 `src/lib/hiring/public-careers/editorial-opening.fixture.ts`.
 
 Docs: ADR Delta 2026-08-17 in `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` · functional
@@ -608,6 +743,12 @@ tools `hiring.applications.review.list` / `hiring.application.review_packet.get`
 chunks bound to an asset hash, with purpose/audit; no raw PDF, contact, ranking, writes or B2B. Formal owner
 sign-offs, revoked/base-only evidence and a rollback/revocation drill remain open. Read the full runtime
 binding, evidence and rollback facts in `references/greenhouse-runtime.md` §Talent Pool / Banco de Talento.
+
+**Estado 2026-09-12 (ISSUE-172):** el `public_id` de la membership sale ahora de
+`greenhouse_hiring.next_talent_pool_public_id()` (rellena, nunca recorta; migración `20260912122159611`) y la
+projection de reconciliación sólo intenta los facets sin membership (anti-join); el cron
+`ops-hiring-talent-pool-reconcile` volvió a verde (CODE vacío) y la secuencia avanza sólo con las filas reales.
+Detalle y recuperación en §Pipeline e intake — incidente 2026-09-12.
 
 ## Evaluation Dossier (TASK-1735 + consumer UI TASK-1737 — production 2026-08-18)
 

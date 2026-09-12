@@ -1,9 +1,9 @@
 # Operar los Emails del Ciclo de Hiring
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-08-12 por Claude (TASK-1689)
-> **Ultima actualizacion:** 2026-08-21 por Codex (correo de persona seleccionada)
+> **Ultima actualizacion:** 2026-09-12 por Claude (cuota del proveedor, revive de entregas muertas, acuses tardíos; ISSUE-172)
 > **Documentacion funcional:** [emails-ciclo-hiring.md](../../documentation/hr/emails-ciclo-hiring.md)
 
 ## Para qué sirve
@@ -18,6 +18,11 @@ cualquiera de ellos no le escribe nada a la persona.
 
 - Los correos los envía el **ops-worker** (Cloud Run), no Vercel. Prender el flag en Vercel no
   hace nada.
+- **El proveedor de correo (Resend) tiene cuota por plan.** Desde el 2026-09-12 (~13:05 UTC) el plan es
+  Pro (diario ilimitado, 50 000 correos al mes); antes era Free (100 al día) y una ráfaga de acuses de una
+  recuperación de postulaciones lo agotó a las 12:58 UTC de ese día. Antes de cualquier recuperación o
+  replay que cree postulaciones, cuenta cuántos correos va a disparar (cada postulación = acuse al
+  candidato + aviso interno) y revisa el plan.
 - El buzón interno por defecto es `people@efeoncepro.com`; se cambia con la env var
   `HIRING_INTERNAL_NOTIFICATIONS_EMAIL` del ops-worker.
 - **Las respuestas de los candidatos también llegan a `people@efeoncepro.com`.** Los ocho tipos
@@ -88,6 +93,11 @@ Su primer envío productivo sigue como smoke pendiente; no re-proceses un evento
   no corresponde notificar: etapa interna, scorecard, decisión que no notifica).
 - El registro de cada envío queda en `greenhouse_notifications.email_deliveries`
   (`email_type LIKE 'hiring%'`).
+- Si el proveedor rechazó el envío, `error_message` de esa fila dice el motivo con el nombre del error del
+  proveedor: `Email provider rejected dispatch (daily_quota_exceeded).` (cuota diaria agotada),
+  `rate_limit_exceeded` o `validation_error` (dirección inválida). Un correo que agota sus 3 intentos pasa a
+  `dead_letter`. Un envío que el proveedor aceptó pero cuyo cierre local falló queda `failed` con
+  `error_class = dispatch_unknown` y **no** se reintenta solo: ya salió.
 - Sólo un webhook firmado del proveedor puede registrar `delivered`, `bounced`, `complained`, `suppressed`
   u otro lifecycle posterior. `opened` y `clicked` no reemplazan `delivered`.
 - El receptor global de Resend, la reconciliación y la recuperación de acceso al assessment quedaron
@@ -149,6 +159,38 @@ monitoreo de `email.delivery.lifecycle_health`. El código del recovery y de la 
 el email de recovery nace deshabilitado, la UI operativa no está desplegada y el cutover de links públicos
 permanece OFF. No habilites una pieza aislada.
 
+## Revivir entregas muertas (tras una cuota agotada o un rate limit)
+
+Un correo que agotó sus 3 reintentos queda en `dead_letter` y el ciclo automático ya no lo toca. Desde el
+2026-09-12 existe una acción gobernada para devolverlo al ciclo **una vez resuelta la causa** (plan ampliado,
+rate limit vencido). No es un reenvío: sólo marca la fila para que el cron la reenvíe. Caso fuente: 8 acuses
+revividos y reenviados ese día.
+
+1. Confirma la causa en `error_message` (`daily_quota_exceeded`, `rate_limit_exceeded`) y que ya está resuelta.
+   Si dice `validation_error`, revivir no sirve: la dirección es inválida.
+2. Con sesión admin, llama `POST /api/admin/ops/email-delivery-retry` con este cuerpo:
+
+   ```json
+   { "reviveDeadLetter": { "reason": "cuota diaria de Resend agotada el 2026-09-12; plan ampliado a Pro",
+                           "emailTypes": ["hiring_application_confirmation", "hiring_application_received_internal"],
+                           "sinceHours": 24 } }
+   ```
+
+   El `reason` (mínimo 10 caracteres) queda guardado en la fila como evidencia. Puedes pasar `deliveryIds` en
+   vez de (o además de) `emailTypes`; `sinceHours` mira hacia atrás sobre la fecha de creación (default 24,
+   máximo 168) y `limit` acota filas por llamada (default 25, máximo 200). La respuesta trae `revived.revived`
+   y `revived.byEmailType`.
+3. El cron `ops-email-delivery-retry` del ops-worker (cada 5 min) reenvía. Para no esperar:
+   `gcloud scheduler jobs run ops-email-delivery-retry --location=us-east4 --project=efeonce-group`.
+4. Verifica en `email_deliveries`: la fila pasa a `failed` con `attempt_number = 0` al revivir y a `sent` cuando
+   el cron la reenvía. `sent` sigue siendo «aceptado por el proveedor», no entregado.
+
+Lo que la acción **no** hace, a propósito: no revive correos que transportan un acceso con credencial
+(`hiring_assessment_assigned`, `hiring_assessment_access_recovery`, `hiring_talent_pool_verification`: se recuperan
+desde la ficha del candidato), ni envíos que el proveedor ya aceptó (`dispatch_unknown`), ni correos a buzones
+bloqueados (`bounced`, `complained`, `suppressed`). Procedimiento completo y exclusiones:
+`docs/operations/runbooks/resend-email-lifecycle-rollout.md` → «Revivir entregas dead_letter (gobernado)».
+
 ## Problemas comunes
 
 | Síntoma | Causa probable | Acción |
@@ -161,6 +203,8 @@ permanece OFF. No habilites una pieza aislada.
 | El candidato no se enteró de que le rotaron el acceso | La entrega en mano falló y el aviso no salió (sin correo, buzón bloqueado o kill-switch apagado) | Revisa la señal `hiring.assessment.access_recovery.rotation_unnotified` en `/admin/operations` (normal = 0) y la fila del tipo `hiring_assessment_access_rotated` |
 | Correo interno no llega | Buzón mal configurado | Revisar `HIRING_INTERNAL_NOTIFICATIONS_EMAIL` |
 | No llega el aviso de test completado | Evento publicado antes del consumer, kill-switch pausado o evento aún no drenado | No hay backfill: verifica revisión activa, fila `hiring_assessment_submitted_internal`, `email_deliveries` y reactive log para el test nuevo |
+| Llegan acuses de postulación «viejos» de golpe | Una recuperación gobernada creó postulaciones atrasadas; cada una emite su acuse y su aviso interno | Son legítimos (nadie los había recibido) y el copy es en pretérito sin plazos: no reenviar ni disculparse. Antes del próximo replay, contar correos y revisar cuota |
+| Muchos `failed`/`dead_letter` seguidos con `daily_quota_exceeded` | Cuota diaria del plan del proveedor agotada | Ampliar/verificar el plan con autorización; los `failed` los retoma el cron; los `dead_letter` se reviven con la acción gobernada de arriba |
 
 ## Referencias técnicas
 
@@ -170,3 +214,6 @@ permanece OFF. No habilites una pieza aislada.
 - Ledger de flags: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
 - Arquitectura: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (Delta 2026-08-12)
 - Recuperación: `docs/manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md`
+- Revive de entregas muertas: `src/lib/email/delivery.ts` (`reviveDeadLetterEmailDeliveries`), ruta
+  `src/app/api/admin/ops/email-delivery-retry/route.ts`, runbook `docs/operations/runbooks/resend-email-lifecycle-rollout.md`
+- Incidente fuente: `docs/issues/resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md`

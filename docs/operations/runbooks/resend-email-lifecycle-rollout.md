@@ -233,6 +233,71 @@ No declares `complete` sin evidencia live de todos estos puntos:
 
 Hasta completar esa lista, el estado correcto es **code complete, rollout pendiente**.
 
+## Revivir entregas dead_letter (gobernado)
+
+> Agregado 2026-09-12 (ISSUE-172). Caso fuente: 8 acuses de postulación murieron en `dead_letter` cuando el plan
+> Free de Resend (100 correos/día) agotó su cuota a las 12:58:11Z por la ráfaga de una recuperación; con el plan ya
+> en Pro (diario ilimitado, 50 000/mes, ~13:05Z) reintentarlos era correcto y no existía ninguna vía canónica:
+> `processFailedEmailDeliveries` sólo toma `failed`. Ficha:
+> [ISSUE-172](../../issues/resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md).
+
+**Cuándo.** Sólo cuando la causa del fallo ya está resuelta y era externa al correo mismo: cuota diaria/mensual del
+plan agotada y ya ampliada, rate limit vencido, `RESEND_API_KEY` que faltaba y ya está montada. Lee primero
+`email_deliveries.error_message`: el sender persiste el `name` del error del proveedor
+(`Email provider rejected dispatch (daily_quota_exceeded).`). Si dice `validation_error`, revivir no arregla nada.
+
+**Cómo (dos vías, la misma primitive `reviveDeadLetterEmailDeliveries` de `src/lib/email/delivery.ts`).**
+
+1. Ruta admin (canónica; sesión `requireAdminTenantContext`):
+
+   ```text
+   POST /api/admin/ops/email-delivery-retry
+   { "reviveDeadLetter": { "reason": "<motivo forense, >= 10 caracteres>",
+                           "emailTypes": ["hiring_application_confirmation"],
+                           "sinceHours": 24, "limit": 25 } }
+   ```
+
+   `emailTypes` y `deliveryIds` (uuid como texto) son alternativos y combinables; hace falta al menos uno.
+   `reason` con menos de 10 caracteres o selección vacía → `400` canónico `invalid_request`. `sinceHours` default
+   24, tope 168 (ventana sobre `created_at`); `limit` default 25, tope 200. Sin cuerpo, la ruta sólo corre el ciclo
+   de reintento de siempre. La respuesta trae el resultado del reintento más `revived: { revived, byEmailType }`.
+
+2. Helper local: invocar `reviveDeadLetterEmailDeliveries({...})` desde el árbol de trabajo (`tsx`) contra la base
+   compartida. No existe CLI dedicado. Es código LOCAL escribiendo la única base (dev/staging/prod): declararlo
+   en la evidencia. Primer intento del 2026-09-12 reventó con `uuid = text` — el test unitario mockea el SQL y no
+   lo ve; ejercitar contra PG antes de dar por bueno un predicado nuevo.
+
+**Qué hace.** Vuelve `dead_letter → failed` con `attempt_number = 0`, conserva el último error y antepone el motivo
+en `resend_reason` (`<motivo> | previous: <error_message>`), y **no envía nada**. Al log va sólo el largo del
+motivo (es texto libre del operador y puede traer PII).
+
+**Qué NO hace (exclusiones del predicado; no son configurables).**
+
+- Tipos **token-sensitive** (`TOKEN_SENSITIVE_EMAIL_TYPES`, entre ellos `hiring_assessment_assigned`,
+  `hiring_assessment_access_recovery`, `hiring_talent_pool_verification`, magic links, invitaciones): un bearer
+  muerto se rota por su propio contrato de recuperación, nunca se reenvía.
+- `persistence.retryable = false`.
+- Filas con `resend_id IS NOT NULL` o `error_class = 'dispatch_unknown'`: el proveedor ya aceptó y el cierre local
+  falló; reenviar sería un duplicado al destinatario. Quedan visibles para recuperación explícita.
+- **Buzones bloqueados** (`bounced_at`/`complained_at`/`suppressed_at` o `provider_status` en
+  `bounced|complained|suppressed`; predicado `providerBlockedConditionSql` de `src/lib/email/provider-block.ts`).
+- Filas fuera de la ventana `sinceHours` o más allá de `limit` (repite la llamada; `ORDER BY created_at ASC`).
+
+**Quién reenvía.** El cron `ops-email-delivery-retry` (Cloud Scheduler `*/5 * * * *` → ops-worker
+`POST /email-delivery-retry` → `processFailedEmailDeliveries`; declarado en `services/ops-worker/deploy.sh`). Toma
+`failed` con `attempt_number < 3` dentro de `GREATEST(created_at, updated_at) > NOW() - 24h` — por eso un revivido
+con más de 24 h de creado sí entra — y aplica las mismas exclusiones (token-sensitive, no retryable,
+`dispatch_unknown`, buzones bloqueados). Para no esperar 5 min:
+`gcloud scheduler jobs run ops-email-delivery-retry --location=us-east4 --project=efeonce-group`.
+
+**Verificación.** Leer `status`, `attempt_number`, `resend_reason`, `error_message`, `resend_id` de
+`greenhouse_notifications.email_deliveries` para las filas revividas: tras el revive `failed` / `0`; tras el cron
+`sent` con `resend_id` nuevo (o `failed` con el `name` del proveedor si la causa no estaba resuelta; al tercer
+intento vuelve a `dead_letter`). `sent` sigue significando aceptado para despacho, no entregado (invariante 5).
+
+**Antes de un replay que dispare correos.** Contar cuántos emitirá (entidades × correos por entidad) y comparar
+contra plan y cuota (`resend-email-platform` → `references/envio-y-limites.md`).
+
 ## Rollback
 
 | Síntoma                   | Acción inmediata                                              | Lo que no debes hacer                                    |

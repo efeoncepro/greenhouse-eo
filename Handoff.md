@@ -8,12 +8,13 @@ Bricolage: `src/assets/fonts/BricolageGrotesque-SOURCE.md`; UI Poppins + Geist. 
 `586a8627568a`):** el tablero no re-leía el snapshot al cambiar de vacante (`ISSUE-171`) y `lpad` recortaba el
 `public_id` del Banco de Talento pasado 99 999 (`ISSUE-172`, P1): colisión que rompía el cron y abrió el circuito
 del consumer de postulaciones. Recuperado por vías gobernadas sin borrar nada (migración, replay, revive de correos):
-**281 submissions / 0 sin postulación, 164 acuses enviados**, circuito `closed`, handler `healthy`; canary: con el
-worker nuevo la secuencia ya no avanza por corrida. Release PR #234 → `released` 14:44:56Z, watchdog 5/5.
-Follow-ups (task propia cada uno): `ISSUE-173` (Phase A del consumer reactivo deja huérfano al handler que el
-breaker saltó; diseño adjunto), transparencia del enlace descartado en Application 360, valor live de
-`GROWTH_FORMS_SERVER_VALIDATION_ENABLED`, 6 CV en cuarentena de `EO-OPN-0675` esperan revisión humana. Plan de
-Resend subido a Pro (Free 100/día se agotó en la ráfaga). Siguiente ID libre: `TASK-1870`.
+**281 submissions / 0 sin postulación, 164 acuses enviados**, circuito `closed`, handler `healthy`. Release PR #234 →
+`released` 14:44:56Z, watchdog 5/5. Docs y skills barridas ese día: ATS §Delta 2026-09-12, `.claude/rules/hiring.md`,
+invariantes SQL/Ops, playbook reactivo, skills talento/resend/email/release (+ espejos `.codex/`), desk/careers/emails.
+Follow-ups formales: `TASK-1872` (fix de `ISSUE-173`: Phase A del consumer deja huérfano al handler que el breaker
+saltó; mitigación `reactive:backfill --handler=`), `TASK-1873`+`TASK-1874` (enlace descartado: warnings de intake +
+aviso en Application 360). Sin task: valor live de `GROWTH_FORMS_SERVER_VALIDATION_ENABLED`, 6 CV en cuarentena de
+`EO-OPN-0675`, reader canónico submissions↔postulaciones (hoy ad hoc). Resend en Pro. Siguiente ID libre: `TASK-1875`.
 
 **Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
 **no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a

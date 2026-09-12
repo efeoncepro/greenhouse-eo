@@ -600,6 +600,10 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
       dispatch del propio orquestador queda bloqueado hasta la autorización. Costo medido ese día:
       **64 min** entre evidencia verde y dispatch. Pedir la autorización completa por adelantado no es
       cortesía, es el ítem más caro del release cuando todo lo demás salió a la primera.
+    - **Delta 2026-09-12 (release `586a8627568a`): el clasificador bloquea también un comando COMBINADO
+      `gh pr checks --watch && gh pr merge && gh workflow run` aunque cada uno suelto pase.** Separar lectura
+      de mutación y no encadenar: el `--watch` (lectura) por un lado, y cada mutación (`gh pr merge`,
+      `gh workflow run`) como llamada suelta, ya autorizada por adelantado.
 
 17. **Tres delta del release `e1718a359575` (2026-08-29, 4.º del día).** (a) "Confirmar `develop`
     verde" se verifica sobre el run del **HEAD actual Y los rojos/cancelados de la ráfaga**:

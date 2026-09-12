@@ -70,6 +70,91 @@ Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory).
 
 Technical canon: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Pipeline Board / Application 360.
 
+## Pipeline board / intake recovery — code paths (2026-09-12, ISSUE-171/172/173)
+
+Líneas medidas sobre `develop` el 2026-09-12, después del release `586a8627568a`; pueden moverse, los símbolos no.
+Contrato: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-09-12.
+
+- **Tablero (ISSUE-171)** — `src/views/greenhouse/hiring/PipelineDeskView.tsx`: `stageOverrides`
+  (`useState<Record<string, HiringApplicationStage>>`, `:130`) es el ÚNICO estado cliente de postulaciones;
+  `applications` es un `useMemo` sobre `initialSnapshot.applications` + overrides (`:132-140`); el efecto de
+  `:174-178` vacía los overrides cuando llega un snapshot nuevo (identidad estable si ya está vacío, para no
+  re-renderizar de más); `filtered` (`:186`) cruza esa lista con `openingId`. Test de regresión
+  `src/views/greenhouse/hiring/pipeline-desk-snapshot-sync.test.tsx` (re-render de la MISMA instancia con el snapshot
+  de otra vacante → tarjetas nuevas, 0 residuales, sin «Sin resultados»). Aún sin guarda:
+  `item.application.source.replaceAll(...)` (`:355`) revienta el render del tablero con un `source` nulo o inesperado
+  (follow-up 6).
+- **Snapshot del desk — tope de 120 y descartes mudos (vigentes, follow-up 6)** — `src/lib/hiring/desk.ts`:
+  `clampLimit` (`:69-70`) acota a `[1, 120]`; `getHiringDeskSnapshot` toma `applicationLimit` con default 100
+  (`:110`) y lo aplica en `listHiringApplications({ openingId: effectiveOpeningId, limit: applicationLimit })`
+  (`:136`). Las pages piden 120: `src/app/(dashboard)/agency/hiring/pipeline/page.tsx:48`,
+  `src/app/(dashboard)/agency/hiring/page.tsx:45`, `src/app/(dashboard)/agency/hiring/applications/[applicationId]/page.tsx:86`
+  y `DemandDeskView.tsx:426` vía `/api/hiring/desk`. El snapshot NO declara truncamiento: sin `openingId` (montaje
+  frío) embarca 120 de N y el contador visible del tablero es `filtered.length`, distinto de la columna
+  «postulaciones» del Demand Desk; con `openingId` viajan hasta 120 de ESA vacante.
+- **Parser público (ISSUE-172, capa 3)** — `src/lib/hiring/public-careers/schema.ts`: `isSafeHttpUrl` (`:36`, exige
+  `https:` parseable) y `normalizeOptionalHttpsUrl` (`:54-78`): scheme ausente → `https://`; `http://` → `https://`;
+  `!isSafeHttpUrl` u host sin punto → `null`; retorna `url.href` canónico (origen pelado sin barra final, `:74`).
+  Callers `:125-126` (`portfolioUrl`, `linkedinUrl`); un `null` nunca hace fallar `parsePublicHiringApplication`.
+  Ambas entradas (form estándar y Growth Form nativo) pasan por acá.
+- **Talent Pool `public_id` (ISSUE-172, capas 1-2)** — migración
+  `migrations/20260912122159611_issue-172-talent-pool-public-id-no-truncation.sql`: función
+  `greenhouse_hiring.next_talent_pool_public_id()` (`:14-22`; un solo `nextval`,
+  `lpad(n::text, GREATEST(5, length(n::text)), '0')`), `SET DEFAULT` (`:30`), `setval` sobre el MAX real (`:36-38`),
+  bloque `DO` que aborta si el default no cambió, si la expresión recorta o si la secuencia no quedó bajo 100 000
+  (`:56-65`); Down restaura el default original y borra la función (`:85-87`), sin devolver la secuencia.
+  `src/lib/hiring/talent-pool/projection.ts`: `INSERT INTO greenhouse_hiring.talent_pool_membership … SELECT` (`:61`)
+  con anti-join `AND NOT EXISTS (SELECT 1 FROM … talent_pool_membership m …)` (`:77`) y
+  `ON CONFLICT (candidate_facet_id) DO NOTHING` (`:79`) como guarda de carrera contra `ensureTalentPoolMembership`
+  (`src/lib/hiring/talent-pool/self-service.ts:28`, llamado desde
+  `src/lib/hiring/public-careers/submit-application.ts:170` — el punto por donde el consumer de postulaciones chocaba
+  con la colisión). Job: `services/ops-worker/deploy.sh:1341` (`ops-hiring-talent-pool-reconcile`, `*/5 * * * *`).
+- **Señal `sync.reactive.circuit_open`** — `src/lib/reliability/queries/reactive-circuit-open.ts`
+  (`REACTIVE_CIRCUIT_OPEN_SIGNAL_ID`, `:22`; kind `incident`, `moduleKey: 'sync'`, steady 0; lee
+  `projection_circuit_state` y `handler_health` con `current_state IN ('degraded','failed','quarantined')`, `:31-36`
+  — `failed` es peor que `degraded`, y omitirlo dejaba invisible justo el estado que la señal existe para ver).
+  Cableada en `src/lib/reliability/get-reliability-overview.ts:78` (degrada a `null`); comentario en
+  `src/lib/reliability/registry.ts:292`. Superficie: `/admin/ops-health`
+  (`src/app/(dashboard)/admin/ops-health/page.tsx`).
+- **Consumer reactivo (ISSUE-173, abierto)** — `src/lib/sync/reactive-consumer.ts`: Phase A (`:474`) excluye un
+  evento si CUALQUIER handler key del dominio tiene fila (`r.handler = ANY($2)`, `:525`; mismo predicado en el
+  replay `:495` y en su `ORDER BY` `:507`); Phase C (`:685`) con breaker abierto deja el grupo sin fila a propósito
+  (`:707-715`). Con `growth.forms.submission_accepted` (4 handlers) los siblings escriben `no-op` y el handler
+  saltado queda huérfano para el drain programado. Mitigación: `scripts/reactive-backfill.ts`
+  (`pnpm reactive:backfill`, `package.json:240`) con `--handler=<key>:<event_type>` (`:99`) reduce `$2` a una sola
+  key; `--replay-failed-handlers` (`:93`) relee `retry`/`dead-letter`; `--dry-run` (`:78`). Diseño del fix
+  (pendiente POR handler, emparejar `handler ↔ event_type`, sin migración ni flag) en la ficha del ISSUE.
+- **Correos — rechazo con nombre, cierre incierto, revive gobernado** — `src/lib/email/delivery.ts`:
+  `providerErrorName` desde `result.error.name` (`:940`; el `message` no viaja porque cita direcciones); la rama
+  `dispatchOutcome:'unknown'` persiste `resend_id` + `error_class='dispatch_unknown'` + `status='failed'`
+  (`:1012-1025`); `reviveDeadLetterEmailDeliveries` (`:1660`; `reason` ≥10, `deliveryIds` | `emailTypes`,
+  `sinceHours` ≤168, `limit` ≤200; excluye `dispatch_unknown` `:1695`, token-sensitive, no retryables y buzones
+  bloqueados; vuelve `dead_letter → failed` con `attempt_number=0` y deja el motivo en `resend_reason`; no envía);
+  `processFailedEmailDeliveries` (`:1725`) excluye `dispatch_unknown` y buzones bloqueados, ventana
+  `GREATEST(created_at, updated_at) > NOW() - INTERVAL '24 hours'` (`:1764`). Predicado de buzón bloqueado:
+  `src/lib/email/provider-block.ts` (fuente única; email no depende de hiring) con re-export en
+  `src/lib/hiring/assessment/access-recovery/provider-block.ts:11`. Ruta admin
+  `src/app/api/admin/ops/email-delivery-retry/route.ts`: cuerpo opcional `{ reviveDeadLetter: {...} }` (`:20-26`),
+  validación en frontera con `canonicalErrorResponse('invalid_request')` (`:36`; código nuevo en
+  `src/lib/api/canonical-error-response.ts:236`, 400, es-CL), luego `reviveDeadLetterEmailDeliveries` (`:44`); sin
+  cuerpo = comportamiento previo. Cron: `services/ops-worker/deploy.sh:1788` (`ops-email-delivery-retry`,
+  `*/5 * * * *`). Preexistente (follow-up 4): los `captureWithDomain` del sender envían `recipientEmail` a Sentry
+  (varios entre `:975` y `:1031`).
+- **Ledger de intake ciego al carril vivo (follow-up 6)** — `greenhouse_hiring.hiring_application_intake_events` lo
+  escribe sólo `src/lib/hiring/public-careers/abuse-guard.ts:45`, consumido por el endpoint directo
+  `src/app/api/public/hiring/applications/route.ts`. El carril vivo,
+  `src/lib/sync/projections/growth-hiring-application-from-submission.ts`, no lo toca: 7 filas históricas contra 281
+  submissions al 2026-09-12. La salud del intake se prueba reconciliando `greenhouse_growth.form_submission`
+  (`efeonce-careers-application`) por `email` + `openingPublicId` contra `identity_profiles` + `hiring_application`
+  de esa `hiring_opening`; no existe reader canónico para esa reconciliación (se corrió ad hoc).
+- **Sentry del mismo lote** — `src/instrumentation-client.ts:14-20`: `denyUrls`
+  `[/\/executors\/\d+\.js$/i, /^(chrome|moz|safari-web)-extension:\/\//i]` (NEXTJS-94: extensión del navegador del
+  visitante; `denyUrls` corre en `inboundFilters` ANTES de que la integración de Next reescriba los frames a
+  `app:///`, así que el patrón casa con el filename crudo).
+  `src/lib/reliability/queries/hiring-assessment-rotation-notice-signals.ts:74`: `recovery.reason_code`
+  (NEXTJS-91/96; `outcome_reason` no existe en la tabla). NEXTJS-92 (`growth_form_upload_quarantined:suspicious`) es
+  el escáner funcionando: 6 CV de `EO-OPN-0675` en cuarentena esperan revisión humana.
+
 ## Opening capacity closure — code paths (TASK-1762, code complete / rollout pendiente)
 
 - ADR `docs/architecture/GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1.md` (`Accepted`, amended in

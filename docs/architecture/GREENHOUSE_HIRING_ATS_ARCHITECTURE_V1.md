@@ -1,5 +1,167 @@
 # Greenhouse Hiring / ATS Architecture V1
 
+## Delta 2026-09-12 — ISSUE-171/172: tablero que sigue al snapshot, public_id sin recorte, intake tolerante y recuperación gobernada
+
+Fichas: [ISSUE-171](../issues/resolved/ISSUE-171-hiring-pipeline-empty-stale-client-snapshot.md) (resuelta),
+[ISSUE-172](../issues/resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md) (resuelta, P1) e
+[ISSUE-173](../issues/open/ISSUE-173-reactive-consumer-strands-breaker-skipped-handler-events.md) (abierta: defecto
+estructural del consumer reactivo, hallado durante la recuperación). Tres causas distintas coincidieron en un mismo
+síntoma —«el pipeline está vacío»— y ninguna fue pérdida de datos. Este Delta fija los contratos que quedaron en
+producción y numera los follow-ups tal como los dejó el inventario del incidente. Rutas de código exactas:
+`.claude/skills/greenhouse-talent-people-operator/references/greenhouse-runtime.md` §Pipeline board / intake recovery.
+
+### Causa raíz 1 — el tablero copiaba el snapshot y nunca lo re-sincronizaba (ISSUE-171)
+
+`PipelineDeskView` sembraba `applications` con `useState(initialSnapshot.applications)`; sus únicos `setApplications`
+eran el update optimista del arrastre y su rollback. El estado hermano `openingId` sí se sincronizaba en un efecto. El
+selector de vacante hace `router.replace`: navegación soft, el componente no se desmonta y el inicializador de
+`useState` no vuelve a correr. El servidor re-renderizaba con el snapshot scopeado a la vacante nueva
+(`getHiringDeskSnapshot` filtra el `SELECT` por `openingId`), `openingId` cambiaba, la lista conservaba el arreglo del
+montaje y el cruce daba 0 → «Sin resultados». Preexistente desde `559f5654b` (2026-07-09); visible al pasar de una a
+cuatro vacantes con postulaciones, porque con una sola nadie cambia de vacante.
+
+**Contrato:** el snapshot del servidor es la única fuente de las postulaciones del tablero. La lista es un `useMemo`
+sobre `initialSnapshot.applications`; el único estado cliente legítimo es el delta optimista de etapa del arrastre,
+como mapa `stageOverrides` (`applicationId → stage`), y un snapshot nuevo lo limpia (los overrides ya se persistieron o
+revirtieron antes de cualquier navegación). Test de regresión `pipeline-desk-snapshot-sync.test.tsx`: re-render de la
+misma instancia con el snapshot de otra vacante → tarjetas nuevas, 0 residuales, sin «Sin resultados».
+
+### Causa raíz 2 — `lpad` recorta el `public_id` del Banco de Talento (ISSUE-172, P1)
+
+El default de `greenhouse_hiring.talent_pool_membership.public_id` era
+`'EO-TLP-' || lpad(nextval(seq)::text, 5, '0')`. En PostgreSQL `lpad` **recorta** cuando el texto excede el largo:
+pasado 99 999, diez valores consecutivos de la secuencia colapsan en un mismo `public_id` contra `UNIQUE`. La secuencia
+estaba en 575 712 con 230 filas porque la projection de reconciliación hacía `INSERT … SELECT … ON CONFLICT DO NOTHING`
+sobre los 247 facets activos cada 5 minutos, y PostgreSQL evalúa el DEFAULT —y por tanto `nextval`— por cada fila
+candidata **antes** de descartarla (~71k valores/día). Consecuencias: el cron `ops-hiring-talent-pool-reconcile`
+fallaba en cada corrida (`CODE 13`) y el consumer que crea las postulaciones desde el Growth Form
+(`growth_hiring_application_from_submission` → `submitPublicHiringApplication` → `ensureTalentPoolMembership`) falló
+hasta abrir su circuito (12:15:03Z): hasta 38 personas reales sin proyectar durante horas, **sin señal**
+(`projection_circuit_state` y `handler_health` no tenían señal de reliability; se vio en los logs de Cloud Run).
+
+**Contrato del `public_id` del Talent Pool:**
+
+- El default es `greenhouse_hiring.next_talent_pool_public_id()` (migración
+  `20260912122159611_issue-172-talent-pool-public-id-no-truncation.sql`): un solo `nextval` por fila y
+  `lpad(n, GREATEST(5, length(n)), '0')` — rellena a 5 y **nunca recorta**. `to_char(n, 'FM00000')` se descartó porque
+  desborda a `#####` pasado el patrón. La migración reancló la secuencia con `setval` sobre el MAX real (72 440 →
+  72 441) y aborta si el default no cambió, si la expresión recorta o si la secuencia no quedó bajo 100 000. Down
+  restaura el default original y borra la función; no devuelve la secuencia.
+- La projection (`src/lib/hiring/talent-pool/projection.ts`) sólo intenta los facets **sin** membership (anti-join
+  `NOT EXISTS`); el `ON CONFLICT (candidate_facet_id) DO NOTHING` queda como guarda de carrera contra
+  `ensureTalentPoolMembership`. Test que fija el predicado. Canary tras el release: una corrida forzada del cron deja la
+  secuencia intacta, y en 85 minutos avanzó exactamente lo que las filas reales.
+
+### Contrato nuevo del parser público — un enlace opcional nunca tumba la postulación
+
+`normalizeOptionalHttpsUrl` (`src/lib/hiring/public-careers/schema.ts`) gobierna `linkedinUrl` y `portfolioUrl` en
+ambas entradas (form estándar y Growth Form nativo; la entry parity se conserva):
+
+- sin scheme (`linkedin.com/in/x`) o con `http://` → `https://`;
+- `javascript:`, `data:`, host sin punto o cualquier valor que no parsee como `https:` → el **campo** se descarta
+  (`null`) y la postulación sigue;
+- se persiste el href **canónico** (`new URL().href`: percent-encoding, slashes colapsados, sin tab/NL embebidos; un
+  origen pelado conserva su forma sin barra final), nunca el texto crudo ni un scheme distinto de https.
+
+Dos personas reales habían sido rechazadas por un `linkedinUrl` sin `https://`. Capa 2 pendiente: la re-validación
+server-side del Growth Form (`GROWTH_FORMS_SERVER_VALIDATION_ENABLED`) figura ON en Production en el ledger y aun así
+dos submissions persistieron el raw — verificar el valor live (follow-up 3). Lo que se descarta hoy se descarta **en
+silencio**: Application 360 muestra «Sin enlaces públicos informados» aunque el candidato sí informó uno (follow-up 2).
+
+### Observabilidad y recuperación gobernada
+
+- **Señal `sync.reactive.circuit_open`** (`src/lib/reliability/queries/reactive-circuit-open.ts`; kind `incident`,
+  módulo `sync`, steady 0): `error` con un breaker `open`/`half_open` o un handler `failed`/`quarantined`; `warning`
+  con `degraded`; correos redactados en la evidencia. Cableada en `get-reliability-overview.ts`; se lee en
+  `/admin/ops-health`. Es la capa que faltaba: un breaker abierto **no deja fila** en `outbox_reactive_log`, así que
+  ninguna señal de dead-letter lo ve.
+- **El ledger `hiring_application_intake_events` es ciego al carril vivo**: lo escribe sólo el endpoint directo
+  `/api/public/hiring/applications` (7 filas históricas contra 281 submissions). La salud del intake se prueba
+  **reconciliando por contenido** —submissions del form `efeonce-careers-application` por `email` + `openingPublicId`
+  contra `identity_profiles` + `hiring_application` de esa `hiring_opening`— y exigiendo `sin_postulacion = 0`; nunca
+  contando filas.
+- **Recuperación ejecutada el 2026-09-12 (12:48Z → ~13:30Z), íntegramente por vías gobernadas, nunca SQL sobre
+  postulaciones:** migración (`pnpm pg:connect:migrate`); el circuito cerró solo a las 12:50:02Z; replay de
+  `retry`/`dead-letter` con
+  `pnpm reactive:backfill --replay-failed-handlers --handler=growth_hiring_application_from_submission:growth.forms.submission_accepted`
+  (33 postulaciones; `sin_postulacion` 38 → 8); drain acotado por handler para los huérfanos del breaker con
+  `pnpm reactive:backfill --handler=<la misma key>` (`6/6 ok`, mitigación de ISSUE-173); correos con el cron
+  `ops-email-delivery-retry`. Ese CLI ejecuta el **árbol local** contra la única base (dev/staging/prod): sirve como
+  recovery y como canary, pero escribe producción con código no desplegado y debe declararse.
+- **ISSUE-173 (abierto):** Phase A del consumer reactivo excluye un evento si CUALQUIER handler key del dominio tiene
+  fila (`r.handler = ANY($2)`) y Phase C con breaker abierto salta el grupo sin escribir fila; con eventos
+  multi-handler (`growth.forms.submission_accepted` tiene 4) los siblings escriben `no-op` y el handler saltado queda
+  huérfano para siempre para el drain programado (reproducido: drain del dominio `0 processed`; drain acotado
+  `6/6 ok`). Fix diseñado en la ficha (opción A: pendiente POR handler, sin migración ni flag; trampa: emparejar
+  `handler ↔ event_type`); mitigación manual = el drain acotado tras cada apertura de circuito con siblings.
+- **Correos (`src/lib/email/delivery.ts`):** el rechazo del proveedor viaja con `result.error.name`
+  (`daily_quota_exceeded`), no con el `message` (cita direcciones); la rama `dispatchOutcome:'unknown'` persiste
+  `resend_id` + `error_class='dispatch_unknown'` + `status='failed'`; `processFailedEmailDeliveries` excluye
+  `dispatch_unknown` y buzones bloqueados, con ventana `GREATEST(created_at, updated_at) > NOW()-24h`;
+  `reviveDeadLetterEmailDeliveries({ reason ≥10, deliveryIds? | emailTypes?, sinceHours ≤168, limit ≤200 })` vuelve
+  `dead_letter → failed` (`attempt_number=0`, motivo en `resend_reason`), excluye token-sensitive, no retryables,
+  `dispatch_unknown` y buzones bloqueados, y no envía nada — el cron reenvía. Expuesto por
+  `POST /api/admin/ops/email-delivery-retry` con cuerpo opcional `{ reviveDeadLetter: {...} }`, validado con
+  `canonicalErrorResponse('invalid_request')` (código nuevo, 400, es-CL); sin cuerpo = comportamiento previo. El
+  predicado de buzón bloqueado se movió a `src/lib/email/provider-block.ts` (email no depende de hiring;
+  `hiring/assessment/access-recovery/provider-block.ts` re-exporta).
+- **Acuses tardíos:** cada postulación recuperada emite `hiring.application.created` → acuse + alerta interna
+  (TASK-1689). Son legítimos: nadie había recibido acuse. La ráfaga agotó el plan **Free de Resend (100/día)** a las
+  12:58:11Z; el operador subió a **Pro** (diario ilimitado, 50 000/mes) ~13:05Z; los `failed` se recuperaron con el
+  cron y 8 `dead_letter` con el revive. Estado final: 164 `sent` / 0 fallidos desde las 12:50Z.
+
+### Invariantes operativos para agentes — Pipeline, intake y Banco de Talento
+
+- **NUNCA** copiar estado de servidor a un `useState` sin re-sincronizarlo; derivarlo con `useMemo` y guardar sólo el
+  delta cliente (overrides). Un F5 que «arregla» la pantalla es la firma del estado rancio, no de datos perdidos.
+- **NUNCA** generar un id secuencial con `lpad(n::text, k, '0')`: rellena Y recorta. El patrón es una función con un
+  solo `nextval` y `GREATEST(k, length(n))`.
+- **NUNCA** un `INSERT … SELECT … ON CONFLICT DO NOTHING` masivo sin anti-join sobre una tabla con default `nextval`:
+  el `ON CONFLICT` descarta filas, no evaluaciones de secuencia.
+- **NUNCA** rechazar una postulación por un campo opcional en la frontera pública: se descarta el campo, no a la
+  persona. **NUNCA** persistir un enlace del candidato sin canonicalizar ni con scheme distinto de https.
+- **NUNCA** declarar el intake sano por conteo de filas ni por `hiring_application_intake_events`; sólo la
+  reconciliación por contenido (email + vacante) contra postulaciones.
+- **NUNCA** crear, borrar ni corregir una `hiring_application` por SQL para recuperar un intake: replay gobernado
+  (idempotente por `public-apply:<fingerprint>`, persona email-first, `ensureTalentPoolMembership` con `ON CONFLICT`).
+- **SIEMPRE** que un consumer reactivo deje de procesar, mirar `projection_circuit_state` + `handler_health` (señal
+  `sync.reactive.circuit_open`) antes que el ledger: el breaker abierto no deja fila.
+- **SIEMPRE** que un breaker se abra sobre una projection con siblings, correr el drain acotado por handler hasta que
+  aterrice el fix de ISSUE-173; el drain del dominio no los recoge.
+- **SIEMPRE** contar cuántos correos disparará un replay y mirar plan/cuota del proveedor antes de correrlo; y
+  **SIEMPRE** declarar cuando un CLI local escribió producción con código no desplegado.
+- **NUNCA** leer `pg:connect:status` como aplicación: es dry-run e imprime el SQL como si lo hubiera aplicado.
+  **SIEMPRE** ejercitar cada SQL nuevo contra PG antes de commitear (`uuid = text` y un backtick dentro de un
+  comentario SQL en un template literal pasan el unit test mockeado).
+
+### Estado de rollout
+
+Release `586a8627568a` (PR #234, orquestador `34699636555`, manifest
+`586a8627568a-d336e91c-115f-4b1f-a7f0-9eadb5157b42` en `released` 2026-09-12 14:44:56Z). Watchdog `ok`, 5/5 workers
+sincronizados; `ops-worker` y `auth-server` sirven `72171ee10` con diff de árbol completo = 0 archivos contra el target
+(no-op legítimo del change-gate). El anti-join estaba vivo antes del release: el push a `develop` despliega el
+`ops-worker` compartido. Estado medido 14:46Z: 281 submissions / 0 sin postulación; circuito
+`growth_hiring_application_from_submission` `closed`; `handler_health` `healthy`; cron
+`ops-hiring-talent-pool-reconcile` verde (CODE vacío); correos de Hiring desde 12:50Z 164 `sent` / 0 fallidos.
+Verificación runtime del tablero (Playwright, staging = misma base y código que producción): montaje en `EO-OPN-0009`
+→ 120 tarjetas; cambio a `EO-OPN-0675` sin recargar → 66 tarjetas, 0 «Sin resultados»; vuelta → 120.
+
+### Follow-ups (numeración del inventario del incidente; cada uno debe ser task — siguiente ID libre a verificar en registry + filesystem + `docs/ui/`, hoy `TASK-1870`)
+
+1. Fix estructural de ISSUE-173 (consumer reactivo, pendiente por handler) + señal
+   `sync.reactive.handler_orphan_residue` + test de regresión + inventario de huérfanos históricos.
+2. Transparencia del enlace descartado: `normalizeOptionalHttpsUrl` → `{ url, discarded? }`, `intakeWarnings` sin raw
+   persistido application-scoped, y Application 360 lo muestra («envió un enlace que no pudimos leer»).
+3. Verificar el valor live de `GROWTH_FORMS_SERVER_VALIDATION_ENABLED` (`pnpm flags:audit`) y por qué la normalización
+   `url` del validador no aterrizó en `normalized_fields_json`.
+4. `captureWithDomain` del sender envía `recipientEmail` a Sentry (preexistente, `delivery.ts`).
+5. 4 filas `retry` del 2026-07-13 (vacantes de prueba `EO-OPN-0051…0056`, personas ya con postulación; anteriores al
+   país obligatorio): morirán en dead-letter; opcionalmente reconocerlas.
+6. Adyacentes de ISSUE-171 aún abiertos: tope de 120 del snapshot que trunca en silencio (contador visible ≠ Demand
+   Desk), `hiring_application_intake_events` ciego al carril vivo, tarjeta que revienta con `source` inesperado.
+7. Operativo: 6 CV en cuarentena de `EO-OPN-0675` esperan revisión humana; ficha pública de `EO-OPN-0009` sin «caso
+   ficticio».
+
 ## Acceso al test del candidato — asignación, recuperación y aviso (TASK-1746/1747/1757)
 
 Contrato vigente. Cubre el write de recuperación, su carril de lectura, el único camino de asignación y el

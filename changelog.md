@@ -33,6 +33,9 @@ del pipeline que sigue al snapshot del servidor; `reason_code` en la señal de a
 `denyUrls` contra el filename crudo (Sentry 94). Recuperación por replay gobernado: 0 sin postulación, 164 acuses
 (el plan Free de Resend se agotó en la ráfaga; ahora Pro). Release `586a8627568a` (PR #234), watchdog 5/5, canary
 verde. `ISSUE-173` (el drain del dominio deja huérfano al handler que el breaker saltó) queda abierta con diseño.
+Docs y skills sincronizadas el mismo día (arquitectura ATS §Delta 2026-09-12, `.claude/rules/hiring.md`, invariantes
+SQL/Ops, playbook reactivo, skills talento/resend/email/release con espejos `.codex/`, desk/careers/emails) y follow-ups
+formalizados: `TASK-1872` (fix de ISSUE-173), `TASK-1873`/`TASK-1874` (enlace descartado en intake y Application 360).
 
 ## 2026-09-12 — Bricolage Grotesque disponible para assets creativos Efeonce
 
