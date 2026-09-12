@@ -23,6 +23,18 @@ Lo único que ambos comparten, y que no se re-litiga: dos familias, **Poppins di
 
 Greenhouse is not greenfield. Typography is already a governed 3-surface system with a CI drift-guard. The global skill teaches *the craft* (weights, contrast, measure, OpenType, i18n); this overlay pins *the answers already decided here* so an agent never re-litigates the scale, picks a banned weight, or hardcodes a size. Two families are fixed: **Poppins** (display, h1–h4 + `surfaceHeroTitle` only) + **Geist** (everything else). Numbers use **Geist + `tabular-nums`** — never a monospace family.
 
+### Creative asset boundary — Bricolage Grotesque
+
+`Bricolage Grotesque` is available as an expressive display family for Efeonce campaign assets outside Greenhouse
+product UI: key visuals, social stories/posts, posters and editorial compositions. The local variable font is
+`src/assets/fonts/BricolageGrotesque-Variable.ttf` with `opsz`, `wdth` and `wght` axes; provenance and SIL OFL 1.1
+licensing live in `src/assets/fonts/BricolageGrotesque-SOURCE.md`.
+
+This is a creative-asset exception, not a third active UI family. Keep Poppins + Geist as the only Greenhouse UI
+families and do not add Bricolage to the UI SoT, `next/font`, MUI variants, shared PDF/email adapters or Globe
+payloads without a separate approved decision. When a creative piece uses Bricolage, make it the single expressive
+display voice and keep companion text in the approved family.
+
 ## Canonical sources of truth (READ in this order)
 
 | Surface | File | Authority |

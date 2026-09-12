@@ -1,5 +1,9 @@
 # Handoff activo
 
+**Tipografía creativa Efeonce (2026-09-12, documental):** `Bricolage Grotesque` variable está en
+`src/assets/fonts/`; licencia, procedencia y hash constan en `BricolageGrotesque-SOURCE.md`. Docs y skills espejo la
+registran como display para campañas fuera de UI. El contrato de UI permanece Poppins + Geist; no se cambió runtime.
+
 **Pipeline de Hiring vacío por vacante (2026-09-12, diagnóstico; `ISSUE-171`):** `/agency/hiring/pipeline` se veía
 vacío en `EO-OPN-0674` y `EO-OPN-0675` con 15 y 51 postulaciones reales **intactas, sin pérdida de datos**. Causa raíz
 reproducida: `PipelineDeskView.tsx:125` siembra `applications` con `useState` y nunca re-sincroniza, mientras el

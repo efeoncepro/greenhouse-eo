@@ -83,6 +83,18 @@ El stack vive textualmente en `src/app/layout.tsx` (param `fallback` de `next/fo
 
 **Regla dura**: máximo 2 familias activas en una surface. Una página que combine Geist body + Poppins hero + monospace amounts = 3 familias = fail.
 
+### 3.1.1 Familia para assets creativos (fuera del runtime de UI)
+
+`Bricolage Grotesque` queda disponible como familia display expresiva para campañas, key visuals, posters, piezas
+sociales y composiciones editoriales de Efeonce. El asset variable vive en
+`src/assets/fonts/BricolageGrotesque-Variable.ttf` y expone los ejes `opsz`, `wdth` y `wght`. La fuente y su licencia
+SIL OFL 1.1 tienen procedencia registrada en `src/assets/fonts/BricolageGrotesque-SOURCE.md`.
+
+Esta disponibilidad no amplía el contrato de Greenhouse: la UI, sus tokens, MUI, PDF/email compartidos y el payload
+de Globe siguen limitados a Poppins + Geist. Bricolage requiere una composición creativa explícita y no debe entrar
+como tercera familia en una surface de producto. En una pieza creativa, elige una sola voz display dominante; Poppins
+y Bricolage no deben competir en el mismo headline.
+
 ### 3.2 Type scale
 
 Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other sizes are relative.

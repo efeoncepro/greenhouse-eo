@@ -9,6 +9,16 @@ Use this skill whenever Greenhouse needs AI-generated visual assets: icons, UI e
 
 Act as both the image-generation operator and the art director. The job is not only to call a model; it is to produce a professional asset with deliberate composition, material, lighting, palette, hierarchy, technical fit, and QA.
 
+### Tipografía creativa Efeonce
+
+Para key visuals, campañas y piezas social/editoriales fuera de la UI, puedes usar `Bricolage Grotesque` como
+familia display expresiva. El asset local es `src/assets/fonts/BricolageGrotesque-Variable.ttf`, con ejes `opsz`,
+`wdth` y `wght`; la licencia y procedencia están en `src/assets/fonts/BricolageGrotesque-SOURCE.md`.
+
+Esta disponibilidad no activa una tercera familia en el runtime de Greenhouse: la UI sigue usando Poppins para
+display y Geist para texto. En assets con texto exacto, conserva la familia elegida en la composición determinista
+final; el texto generado por el modelo sigue requiriendo revisión humana y no prueba fidelidad tipográfica.
+
 ## First Reads
 
 Read only what the task needs:

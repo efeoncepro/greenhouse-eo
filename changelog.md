@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-12 — Bricolage Grotesque disponible para assets creativos Efeonce
+
+Se incorporó `BricolageGrotesque-Variable.ttf` desde el repositorio oficial de Google Fonts, junto con su licencia SIL
+OFL 1.1 y nota de procedencia/hash en `src/assets/fonts/`. `DESIGN.md`,
+`docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` y las skills espejo de tipografía, `design-studio` e
+`greenhouse-ai-image-generator` documentan su uso como display expresiva para campañas y piezas editoriales fuera de
+la UI. No cambia el runtime: Greenhouse mantiene Poppins + Geist como sus únicas familias activas de producto.
+
 ## 2026-09-11 — Conocimiento de las «AI Skills» de DataForSEO incorporado a las skills propias
 
 Seis skills públicas del proveedor (licencia libre de uso, copia, modificación y redistribución) descargadas y
@@ -1042,16 +1050,3 @@ rotación, runbooks, privacidad V2) y TASK-1834 (convergencia del login cliente)
 `DECISIONS_INDEX`, registries y READMEs sincronizados. Delta posterior el mismo día: el emisor se publica como segundo host
 del front door del gateway (sin LB ni Armor nuevos, ≈ USD 15/mes adicionales medidos contra el billing export) —
 ADR §Delta 2026-09-03 y TASK-1828 actualizados.
-
-## 2026-09-03 — TASK-1349: un `identity_only` ejecutado no es hecho de salida; purga de sujetos sintéticos (PR #220)
-
-Incidente «colaboradores fantasma» ~17:50Z: la pre-nómina de septiembre mostró seis `Colaborador <uuid>` «sin
-contrato» — sujetos sintéticos de `review-execute.live.test.ts`, inactivos con compensación abierta, admitidos por el
-roster relajado de Slice 2 y rescatados por `hasDecidedExitFact`, que contaba su caso `identity_only` ejecutado como
-salida decidida. Fix `0233f81e7` (`policy.ts` exige lane ≠ `identity_only`; `policy.test.ts`; el live test cierra
-compensación y desactiva en `afterAll`), en producción con PR #220 (`a824d073a`, manifest released 19:30:49Z). Datos:
-9 compensaciones cerradas con `closeCompensationVigencyAtExit`; 18:37Z purga de los 12 sujetos (253 filas,
-`scripts/workforce/purge-task1349-live-subjects.sql`, predicado sintético explícito; 265→253 members, 0 reales).
-Docs: `LIVE_TESTS_AGENT_INVARIANTS.md` §3 (nunca dejar compensación abierta en un sujeto sintético),
-`PAYROLL_WORKFORCE_AGENT_INVARIANTS.md`, decisión (2) en `GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`,
-runbook `offboarding-recovery.md` (readback previo por sujeto, lección Valentina; harness vs commands por `tsx`).

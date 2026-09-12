@@ -35,7 +35,8 @@
 
 - **Paleta:** [primario / secundario / acento / neutros — tokens si va a UI]
 - **Proporción:** [60/30/10]
-- **Tipografía:** [display / texto / rol — `typography-design`]
+- **Tipografía:** [display / texto / rol — `typography-design`]. Para campañas Efeonce fuera de UI, display puede ser
+  Poppins o `Bricolage Grotesque` (`src/assets/fonts/BricolageGrotesque-Variable.ttf`); elige una sola voz dominante.
 - **Elemento recurrente:** [descripción + cómo aparece en cada formato]
 
 ## 4. Specs por formato
