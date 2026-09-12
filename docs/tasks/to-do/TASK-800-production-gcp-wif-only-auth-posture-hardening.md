@@ -6,6 +6,22 @@
 - **Herramienta nueva útil para ESTA task:** el endpoint `GET /api/internal/health/scanner-auth?probe=scan` (guard `CRON_SECRET` o tenant agency) acuña el ID token EN el runtime donde corre y reporta plan/diagnóstico/claims sin exponer el token. Al ejecutar el cutover WIF-only, correrlo en el canary y en producción valida la rama WIF de ID tokens con evidencia real — exactamente el tipo de validación por-consumer que esta task exige (agregarlo a los checks de Slice 3/4 junto a `/api/internal/health`).
 - **Al retirar la key**, el plan de producción pasa de `service_account_key` a `wif` y los consumers de ID tokens ya lo soportan por construcción (el resolver enruta por `getGoogleIdTokenProviderPlan()`), así que el cutover no requiere cambios de código adicionales en ese camino.
 
+## Delta 2026-09-12
+
+- **La documentación del repo ya afirma como vigente la postura que esta task todavía debe construir.** `CLAUDE.md`
+  §`PostgreSQL Access` describe el runtime de Vercel conectándose a Cloud SQL con «WIF + OIDC», pero el código
+  resuelve credenciales por `GOOGLE_APPLICATION_CREDENTIALS_JSON` (`src/lib/google-credentials.ts`, consumido por
+  `createGoogleAuth` en `src/lib/postgres/client.ts`). El Delta 2026-08-12 de esta misma task ya registraba que
+  Production corre `GCP_AUTH_PREFERENCE=service_account_key`, así que el drift no es del runtime: es del documento
+  que lo describe.
+- **Por qué importa más de lo que parece:** un agente que lee `CLAUDE.md` para decidir cómo dar acceso a un
+  consumer nuevo concluye que la federación de identidad ya existe y diseña sobre una premisa falsa. El hallazgo
+  salió justamente así, mientras se evaluaba cómo dar acceso a datos a agentes que corren en cloud (`TASK-1869`).
+- **Aporte concreto:** corregir `CLAUDE.md` para que describa la postura real y su carácter transicional, apuntando
+  a esta task como dueña del cierre. Es un cambio de documentación y no altera el plan de cutover ya definido acá.
+- `TASK-1869` (diagnóstico operativo por MCP) declara explícitamente fuera de alcance la postura GCP y apunta a esta
+  task, para que el acceso de agentes no se resuelva repartiendo llaves estáticas mientras el cutover está pendiente.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -297,6 +313,7 @@ Si cualquier consumidor GCP falla en canary:
 - [ ] La service account key estatica queda deshabilitada/eliminada o documentada como excepcion temporal con owner y fecha de retiro.
 - [ ] Rollback queda documentado y probado al menos como procedimiento.
 - [ ] No se imprimieron ni commitearon secretos.
+- [ ] `CLAUDE.md` describe la postura de autenticacion GCP realmente vigente en Production, sin afirmar WIF mientras la llave estatica siga viva (Delta 2026-09-12).
 
 ## Verification
 

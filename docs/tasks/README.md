@@ -27,6 +27,7 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1866](to-do/TASK-1866-careers-funnel-ga4-gtm-measurement.md) | Medición del funnel de Careers por canal en GA4 vía GTM: GTM sólo en rutas públicas de Careers, postulaciones fuera de `generate_lead`, `gh_job_viewed` y convención UTM (EPIC-011) | none |
 | [TASK-1867](to-do/TASK-1867-aeo-grader-full-answer-evidence.md) | AEO Grader: evidencia completa de cada respuesta (EPIC-020): persistir el texto íntegro, medir sobre él y versionar el score (v3); hoy mide sobre 600 caracteres | none |
 | [TASK-1868](to-do/TASK-1868-aeo-grader-deterministic-detector-precision.md) | AEO Grader: precisión de los detectores deterministas (EPIC-020): probes que no confunden la página HTML de un SPA con `llms.txt`/`robots.txt`/`sitemap.xml` y compuerta de revisión por palabra completa | none |
+| [TASK-1869](to-do/TASK-1869-mcp-operational-diagnostics-readbacks.md) | Diagnóstico operativo por MCP (EPIC-044): readbacks agregados read-only —señales, flags por runtime y resumen por dominio— para que un agente en cloud diagnostique sin depender de la máquina del operador ni de acceso a Cloud SQL | none |
 
 Siguiente ID libre `TASK-1869`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
 

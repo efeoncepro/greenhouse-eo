@@ -1,5 +1,14 @@
 # TASK-1864 — Superficie agéntica autosuficiente del MCP de Efeonce: instructions del gateway, kit de cliente Claude/Codex y eval end-to-end de agentes
 
+## Delta 2026-09-12
+
+- `TASK-1869` agrega tools de diagnóstico operativo de dominio `platform` (señales de confiabilidad, estado de
+  flags por runtime, resumen agregado por dominio). Cuando se federen, deben quedar cubiertas por las
+  `instructions` derivadas del manifiesto y por el digest de superficie que esta task define: una tool de
+  diagnóstico que el agente no sabe cuándo usar es exactamente el hueco que esta task existe para cerrar.
+- Sin cambio de alcance acá: `TASK-1869` es dueña de los readbacks y de su federación; esta task sigue siendo
+  dueña de cómo el agente aprende a operarlos.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
