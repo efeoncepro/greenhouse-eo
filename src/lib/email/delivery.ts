@@ -1670,7 +1670,8 @@ export const reviveDeadLetterEmailDeliveries = async (input: ReviveDeadLetterEma
             AND NOT (email_type = ANY($3::text[]))
             AND COALESCE(delivery_payload->'persistence'->>'retryable', 'true') <> 'false'
             AND (
-              ($4::text[] <> '{}' AND delivery_id = ANY($4::text[]))
+              -- delivery_id es uuid: se compara como texto para que un id malformado no reviente la query.
+              ($4::text[] <> '{}' AND delivery_id::text = ANY($4::text[]))
               OR ($5::text[] <> '{}' AND email_type = ANY($5::text[]))
             )
           ORDER BY created_at ASC
