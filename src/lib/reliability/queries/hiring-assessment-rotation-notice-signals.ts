@@ -71,7 +71,7 @@ export const getHiringAssessmentRotationNoticeSignal = async (): Promise<Reliabi
             -- Credencial viva: una vencida ya no tiene remedio disponible.
             AND recovery.expires_at > clock_timestamp()
             -- Espejo de decideAssessmentAccessRotationNotice: los skips legítimos no son fallas.
-            AND recovery.outcome_reason IS DISTINCT FROM 'provider_delivery_failed'
+            AND recovery.reason_code IS DISTINCT FROM 'provider_delivery_failed'
             AND profile.canonical_email IS NOT NULL
             AND BTRIM(profile.canonical_email) <> ''
             AND NOT EXISTS (
