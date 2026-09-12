@@ -1610,6 +1610,90 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(
   }
 }
 
+export interface ReviveDeadLetterEmailDeliveriesInput {
+  /** Motivo forense (≥ 10 chars); queda en la fila como `resend_reason`. */
+  reason: string
+  /** Revivir exactamente estas entregas. Excluyente con `emailTypes` sólo por claridad; pueden combinarse. */
+  deliveryIds?: string[]
+  /** Revivir todo `dead_letter` de estos tipos dentro de la ventana. */
+  emailTypes?: string[]
+  /** Ventana hacia atrás sobre `created_at` (default 24 h; tope 168 h). */
+  sinceHours?: number
+  /** Tope de filas por llamada (default 25; tope 200). */
+  limit?: number
+}
+
+/**
+ * ISSUE-172 (2026-09-12) — camino GOBERNADO para revivir entregas `dead_letter`.
+ *
+ * `processFailedEmailDeliveries` sólo toma `failed`: una entrega que agotó sus 3 intentos quedaba
+ * muerta sin ninguna vía canónica de vuelta, y la única salida era un UPDATE a mano. El caso
+ * fuente: 8 acuses de postulación murieron en la ventana en que el plan Free de Resend agotó su
+ * cuota diaria (100/día) — con el plan corregido, reintentarlos es correcto y nadie podía.
+ *
+ * Contrato: sólo entregas retryables y NUNCA token-sensitive (un bearer muerto no se reenvía: se
+ * rota por su propio contrato); vuelve la fila a `failed` con `attempt_number = 0` y deja el
+ * motivo en `resend_reason`, y el ciclo normal (`processFailedEmailDeliveries`, cron
+ * `ops-email-delivery-retry`) la reenvía. No envía nada por sí mismo.
+ */
+export const reviveDeadLetterEmailDeliveries = async (input: ReviveDeadLetterEmailDeliveriesInput) => {
+  const reason = input.reason?.trim() ?? ''
+
+  if (reason.length < 10) {
+    throw new Error('reviveDeadLetterEmailDeliveries requires a forensic reason (>= 10 chars).')
+  }
+
+  const deliveryIds = (input.deliveryIds ?? []).filter(id => typeof id === 'string' && id.trim().length > 0)
+  const emailTypes = (input.emailTypes ?? []).filter(type => typeof type === 'string' && type.trim().length > 0)
+
+  if (deliveryIds.length === 0 && emailTypes.length === 0) {
+    throw new Error('reviveDeadLetterEmailDeliveries requires deliveryIds or emailTypes.')
+  }
+
+  const sinceHours = Math.min(Math.max(Math.floor(input.sinceHours ?? 24), 1), 168)
+  const limit = Math.min(Math.max(Math.floor(input.limit ?? 25), 1), 200)
+
+  const rows = await runGreenhousePostgresQuery<{ delivery_id: string; email_type: string } & Record<string, unknown>>(
+    `
+      UPDATE greenhouse_notifications.email_deliveries
+         SET status = 'failed',
+             attempt_number = 0,
+             error_message = NULL,
+             error_class = NULL,
+             resend_reason = $1,
+             updated_at = NOW()
+       WHERE delivery_id IN (
+         SELECT delivery_id
+           FROM greenhouse_notifications.email_deliveries
+          WHERE status = 'dead_letter'
+            AND created_at > NOW() - ($2::int * INTERVAL '1 hour')
+            AND NOT (email_type = ANY($3::text[]))
+            AND COALESCE(delivery_payload->'persistence'->>'retryable', 'true') <> 'false'
+            AND (
+              ($4::text[] <> '{}' AND delivery_id = ANY($4::text[]))
+              OR ($5::text[] <> '{}' AND email_type = ANY($5::text[]))
+            )
+          ORDER BY created_at ASC
+          LIMIT $6
+       )
+       RETURNING delivery_id, email_type
+    `,
+    [reason, sinceHours, [...TOKEN_SENSITIVE_EMAIL_TYPES], deliveryIds, emailTypes, limit]
+  )
+
+  console.log(`[email-delivery] revived ${rows.length} dead_letter deliveries → failed (reason: ${reason})`)
+
+  return {
+    revived: rows.length,
+    deliveryIds: rows.map(row => row.delivery_id),
+    byEmailType: rows.reduce<Record<string, number>>((acc, row) => {
+      acc[row.email_type] = (acc[row.email_type] ?? 0) + 1
+
+      return acc
+    }, {})
+  }
+}
+
 export const processFailedEmailDeliveries = async (limit = 25) => {
   if (!isResendConfigured()) {
     return {

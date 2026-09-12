@@ -621,3 +621,51 @@ describe('email delivery layer', () => {
     expect(result.recipientResults?.[0]?.status).toBe('failed')
   })
 })
+
+describe('reviveDeadLetterEmailDeliveries (ISSUE-172)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('exige motivo forense y un criterio de selección', async () => {
+    const { reviveDeadLetterEmailDeliveries } = await import('./delivery')
+
+    await expect(reviveDeadLetterEmailDeliveries({ reason: 'corto', deliveryIds: ['d-1'] })).rejects.toThrow(/forensic reason/)
+    await expect(reviveDeadLetterEmailDeliveries({ reason: 'cuota diaria de Resend agotada' })).rejects.toThrow(/deliveryIds or emailTypes/)
+    expect(mockRunGreenhousePostgresQuery).not.toHaveBeenCalled()
+  })
+
+  it('vuelve dead_letter → failed con attempt_number 0, excluye token-sensitive y deja el motivo en la fila', async () => {
+    const { reviveDeadLetterEmailDeliveries } = await import('./delivery')
+
+    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
+      { delivery_id: 'd-1', email_type: 'hiring_application_confirmation' },
+      { delivery_id: 'd-2', email_type: 'hiring_application_confirmation' },
+      { delivery_id: 'd-3', email_type: 'hiring_application_received_internal' }
+    ])
+
+    const result = await reviveDeadLetterEmailDeliveries({
+      reason: 'ISSUE-172: cuota diaria de Resend agotada durante la recuperación',
+      emailTypes: ['hiring_application_confirmation', 'hiring_application_received_internal'],
+      sinceHours: 6
+    })
+
+    expect(result).toEqual({
+      revived: 3,
+      deliveryIds: ['d-1', 'd-2', 'd-3'],
+      byEmailType: { hiring_application_confirmation: 2, hiring_application_received_internal: 1 }
+    })
+
+    const [sql, params] = mockRunGreenhousePostgresQuery.mock.calls[0] as [string, unknown[]]
+
+    expect(sql).toContain("SET status = 'failed'")
+    expect(sql).toContain('attempt_number = 0')
+    expect(sql).toContain("WHERE status = 'dead_letter'")
+    expect(sql).toContain("delivery_payload->'persistence'->>'retryable'")
+    // El bearer de un test de candidato nunca se reenvía por acá: se rota por su propio contrato.
+    expect((params[2] as string[])).toContain('hiring_assessment_assigned')
+    expect(params[0]).toBe('ISSUE-172: cuota diaria de Resend agotada durante la recuperación')
+    expect(params[1]).toBe(6)
+    expect(params[5]).toBe(25)
+  })
+})
