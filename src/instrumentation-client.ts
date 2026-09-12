@@ -11,6 +11,11 @@ if (dsn) {
     environment: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? 'development',
     tracesSampleRate: 0.1,
     sendDefaultPii: false,
+    // Sentry JAVASCRIPT-NEXTJS-94 (2026-09-12): `TypeError … reading 'M_ID'` en `app:///executors/200.js`
+    // sobre /public/careers/[publicId]. Ese origen no existe en nuestro bundle (Next sirve
+    // `_next/static/chunks/*`): es un script inyectado por una extensión del navegador del visitante.
+    // Se descarta en origen para que la señal de la página pública no la contamine ruido ajeno.
+    denyUrls: [/^app:\/\/\/executors\//i],
     beforeSend(event) {
       return isFacebookAndroidBridgeTeardownEvent(event) ? null : event
     }
