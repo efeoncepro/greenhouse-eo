@@ -40,6 +40,9 @@ capability dentro del sistema, no presentarse como agencia suelta.
 
 ## Now
 
+- **Orden de ejecución de las landings → [EPIC-047](../epics/to-do/EPIC-047-public-site-landing-portfolio-prioritization.md)**
+ (2026-09-11). Este roadmap cuenta el porqué de cada superficie; el epic fija cuál va primero (`Rank EPIC-047-01…10`).
+
 - **PDR-001 — Landing SEO complementaria al AEO** (decidido): posicionamiento SEO
  como *cimiento* de la promesa de visibilidad (no commodity), hermana de
  `/aeo-2`. Ver [PDR-001](decisions/PDR-001-seo-landing-complementaria-al-aeo.md).
@@ -56,6 +59,18 @@ capability dentro del sistema, no presentarse como agencia suelta.
  Reusa el `<greenhouse-form>` + grader (Full API Parity por reuso). UI ready no.
  Ver `docs/tasks/to-do/TASK-1343-servicios-posicionamiento-seo-landing.md`.
 
+- **PDR-021 — Landing "Trade Marketing & BTL"** (Draft for validation) + **TASK-1860** (to-do, ui-ux/flow,
+ UI ready no): spoke de la línea Channel & Commerce en `/servicios/trade-marketing/` (working route). Ataca el
+ término cabeza `trade marketing` (~880/mes CL) con una cápsula de definición y la convierte en intención comercial;
+ posiciona a Efeonce en el medio entre plataformas de ejecución y agencias de terreno. Reusa Growth Forms, Growth
+ CTA y scheduler nativo. Ver [PDR-021](decisions/PDR-021-landing-trade-marketing-btl-posicionamiento.md).
+
+- **PDR-023 — Landing "ASO"** (Draft for validation; **pitch activo con Berel**, 2026-09-11 → `Rank EPIC-047-02`) + **TASK-1862** (to-do, ui-ux/flow, UI ready no): tercera
+ superficie del grupo `Visibilidad` en `/servicios/aso/` (working route), hermana de SEO y AEO. No es captura de
+ demanda —`app store optimization` ~20/mes en CL/MX/CO/PE y `aso` ambiguo—: es destino de expansión para clientes
+ con app y referencia citable en español. Publicación por fases atada a la extensión Search & App Visibility, hoy
+ `Proposed`. Ver [PDR-023](decisions/PDR-023-landing-aso-posicionamiento.md).
+
 - **PDR-004 — Landing "Agencia Creativa"** (posicionamiento decidido) + **TASK-1350**
  (to-do, ui-ux/flow, UI ready no): posiciona la **capability creativa** (Globe) como
  partner de producción que **escala** el output de equipos de marketing in-house
@@ -66,8 +81,8 @@ capability dentro del sistema, no presentarse como agencia suelta.
  `docs/tasks/to-do/TASK-1350-landing-agencia-creativa.md`. Pendiente: dirección de
  arte del hero + contrato de Motion antes de `UI ready: yes`.
 
-- **PDR-005 — Landing "Redes Sociales"** (posicionamiento decidido; v1 live/noindex) +
- **TASK-1351** (formalmente `to-do`, ui-ux, UI ready no hasta cierre de lifecycle):
+- **PDR-005 — Landing "Redes Sociales"** (posicionamiento decidido; v1 live e indexable) +
+ **TASK-1351** (`complete` 2026-09-11, cerrada por decisión del operador):
  spoke de servicio `/servicios/redes-sociales` para un servicio humano y recurrente de
  Social Media operado por squad. El beachhead es **B2B experto**: empresas con ofertas
  complejas, conocimiento y voceros que necesitan autoridad y demanda; consumo especializado
@@ -81,15 +96,16 @@ capability dentro del sistema, no presentarse como agencia suelta.
  Mantiene el ángulo **outcome + craft moderno + prueba**,
  spoke Ohio y sección firma "muro social vivo". Head term comercial "agencia de redes sociales"
  (Semrush CL 170); "community manager" (4.400, job/how-to) → guía pillar en Think. Estado
- runtime: página WordPress `251300` publicada con `noindex`; no cambiar ese estado desde la
- documentación. Pendiente: aprobar indexación/canonical, cutover HubSpot delivery, cierre formal
- de TASK-1351, guía pillar Think y decisión auditoría/diagnóstico.
+ runtime: página WordPress `251300` publicada; al 2026-09-11 sirve `index, follow` (verificado por HTTP; el
+ `noindex` que registraba esta línea quedó desactualizado). No cambiar ese estado desde la documentación. Siguen como follow-up tras el cierre: cutover HubSpot delivery,
+ guía pillar Think y decisión auditoría/diagnóstico.
  Ver [PDR-005](decisions/PDR-005-landing-redes-sociales-posicionamiento.md),
- `docs/tasks/to-do/TASK-1351-landing-redes-sociales.md` y
+ `docs/tasks/complete/TASK-1351-landing-redes-sociales.md` y
  `docs/operations/public-site-social-wall-media-production-20260708.md`.
 
 - **PDR-006 — Landing "HubSpot" (Agentic Customer Platform + partnership)** (posicionamiento
- decidido) + **TASK-1352** (ui-ux, UI ready no): **reposiciona la página existente
+ decidido) + **TASK-1352** (`complete` 2026-09-11: publicada en `/servicios-contratar-hubspot/`; la migración a
+ `/servicios/hubspot/` no se hizo y esa ruta hoy redirige a un post antiguo): **reposiciona la página existente
  `/servicios-contratar-hubspot/`** (id `244079`) del relato "compra e implementa un CRM" al de
  **plataforma agéntica operada con software propio**. Ángulo teach-first ("HubSpot dejó de ser un
  CRM: hay que arquitecturarla, poblarla con datos limpios y gobernar a los agentes"); arco de las
@@ -135,8 +151,18 @@ capability dentro del sistema, no presentarse como agencia suelta.
  arte del hero**. Ver [PDR-011](decisions/PDR-011-about-us-identidad-golden-circle.md) +
  `docs/tasks/to-do/TASK-1369-about-us-identidad.md`.
 
+- **PDR-022 — Landing "Performance Marketing"** (Draft for validation, 2026-09-10): spoke de demand capture en
+ `/servicios/performance-marketing` (working slug) para la solución Performance & Commerce Distribution. Enmienda la
+ conclusión de PDR-008 "performance no es cabecera": "agencia (de) performance marketing" tiene 480–590/mes en Chile
+ con KD 11–13 y Efeonce no rankea nada del cluster. Una sola spoke con las dos motions (commerce y B2B) y un H2 por
+ canal; sin páginas por plataforma. Ejecución en **TASK-1865** (to-do, ui-ux/flow, UI ready no): página construida desde
+ cero que retira con 301 la legacy `242862` (`/servicio-gestion-campanas-publicitarias/`), sin parcharla mientras tanto.
+ Ver
+ [PDR-022](decisions/PDR-022-landing-performance-marketing-posicionamiento.md) y
+ `docs/tasks/to-do/TASK-1865-landing-performance-marketing.md`.
+
 - **PDR-008 — Landing "Agencia" (`/agencia`)** (posicionamiento + IA decididos; **§IA refinada por PDR-010**
- — el pitch vive en la Home, no en `/agencia`) + **TASK-1358** (to-do, reorientada a rework de la Home):
+ — el pitch vive en la Home, no en `/agencia`) + **TASK-1358** (`complete` 2026-09-11: Home publicada, cerrada por decisión del operador):
  el **pillar de categoría** que faltaba — hoy el sitio solo tiene
  spokes de servicio + about-us, sin puerta comercial para la demanda de categoría completa. Resuelve
  la falsa dicotomía *growth-partner vs agencia-digital* con las **dos capas** de [PDR-002](decisions/PDR-002-arquitectura-informacion-seccion-visibilidad.md):
@@ -150,7 +176,7 @@ capability dentro del sistema, no presentarse como agencia suelta.
  `/servicios/*` y enlaza el about-us (E-E-A-T) + el grader. Distinto de `/servicios` (hub navegacional)
  y del about-us (identidad). es-LATAM neutro `hreflang`-ready (pan-hispano, LATAM-first→EEUU→mundo).
  Ver [PDR-008](decisions/PDR-008-landing-agencia-marketing-digital-posicionamiento.md) +
- `docs/tasks/to-do/TASK-1358-landing-agencia.md`. Pendiente: art direction del hero + contrato de Motion +
+ `docs/tasks/complete/TASK-1358-landing-agencia.md`. Pendiente: art direction del hero + contrato de Motion +
  adopción de `open_meeting_scheduler` sólo cuando `/agencia` complete su propio gate de surface/binding, booking y medición;
  el scheduler nativo es el mecanismo canónico, pero esta landing todavía no está promovida.
 

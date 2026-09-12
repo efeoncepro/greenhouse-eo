@@ -187,7 +187,11 @@ export const collectProspectMarketEvidence = async (
     payload: {
       target: subject.rootDomain,
       limit: PROSPECT_BACKLINKS_COMPETITORS_LIMIT,
-      exclude_large_domains: true
+      exclude_large_domains: true,
+      // El `rank` del proveedor llega en escala 0–1000 por defecto. Se pide 0–100 SIEMPRE,
+      // aunque hoy este carril no lo consuma: el parámetro es gratis y la alternativa es que
+      // el primer consumer futuro lea 0–1000 creyendo 0–100 — ~10× fuera de escala, sin error.
+      rank_scale: 'one_hundred'
     }
   })
 
@@ -214,7 +218,8 @@ export const collectProspectMarketEvidence = async (
           payload: {
             targets: Object.fromEntries(linkGapTargets.map((domain, index) => [String(index + 1), domain])),
             exclude_targets: [subject.rootDomain],
-            limit: PROSPECT_LINK_GAP_LIMIT
+            limit: PROSPECT_LINK_GAP_LIMIT,
+            rank_scale: 'one_hundred'
           }
         })
       : {

@@ -32,18 +32,19 @@ Efeonce.** Cárgalo antes de proponer formato, calendario o distribución en can
 | **Blog** | el activo (URL canónica, schema, citabilidad) | artículos y Pillars · **casos de éxito completos (canonical)** · tools/graders · webinars · ebooks · data studies · archivo Glitch |
 | **LinkedIn** | el comprador | **educativo** (post extenso + documento nativo) · el corte del caso de éxito · POV profesional · talking head ejecutivo |
 | **YouTube** | la profundidad + segundo buscador | experimento completo · tutorial/how-to · webinar grabado · Shorts como anzuelo |
-| **Instagram** | craft y cultura | proceso real con tropiezos · talking head de tendencia · trendjacking · **estacional (la fecha vista desde el oficio)** · cultura y talento. **NO lleva casos de éxito** |
+| **Instagram** | craft y cultura | proceso real con tropiezos · talking head de tendencia · trendjacking · **seasonalities (la temporada vista desde el oficio)** · cultura y talento. **NO lleva casos de éxito** |
 | **Threads** | conversación viva | reacción rápida · opinión corta · hilo en bruto · pregunta abierta. **Experimento con criterio de salida** |
 | **Glitch (email)** | la propiedad | la edición semanal |
 
 **Franquicias con canal-hogar** (nacen en uno, viajan como corte con trabajo propio, nunca como copia):
 Behind the Build → Instagram · Versus → YouTube + Blog · Educativo → LinkedIn · Glitch → email ·
-Trendjacking → Threads + Instagram · Casos de Éxito → Blog · **Estacional → Instagram**.
+Trendjacking → Threads + Instagram · Casos de Éxito → Blog · **Seasonalities → Instagram**.
 
-**Estacional** (PDR-020 §4.4) es línea propia permanente: la fecha cultural contada como demostración de una
-disciplina de la casa, **nunca un saludo**. Métrica sends + saves. LinkedIn recibe el argumento profesional
-desarrollado, no la misma pieza con otro caption. No se fusiona con Trendjacking: misma familia cultural,
-economía de producción opuesta (meses de planificación vs ventana de horas). Plan vigente:
+**Seasonalities** (PDR-020 §4.4) es línea propia permanente: la **temporada** contada como demostración de una
+disciplina de la casa, **nunca un saludo**. **NO son efemérides:** la unidad de trabajo es la ventana por
+mercado, no el día — por eso Navidad se entrega en octubre. Métrica sends + saves. LinkedIn recibe el argumento
+profesional desarrollado, no la misma pieza con otro caption. No se fusiona con Trendjacking: misma familia
+cultural, economía de producción opuesta (se conoce con un año de anticipación vs ventana de horas). Plan vigente:
 `docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md`.
 
 ### Reglas duras de canal propio
@@ -68,6 +69,44 @@ economía de producción opuesta (meses de planificación vs ventana de horas). 
   Capability de producción: paquete `Executive / Interview Capture` de Run & Gun Studio.
 - **Hook <2s, sin excepción**, y ninguna línea se mide por seguidores ni por volumen de posts.
 
+## Runtime real en Notion — leer ANTES de proponer estructura
+
+El sistema de contenidos **no es el calendario**: son tres bases encadenadas
+(**Pilares JTBD → Content Hub → Calendario de Contenidos**) + la Wiki. Mapa canónico con IDs,
+schema vigente y brechas: **`docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md`**.
+
+| Base | Data source | Rol |
+|---|---|---|
+| Pilares JTBD | `collection://33ecce0f-f806-409d-b193-6f6a23e6f9d2` | **eje temático canónico** — 7 pilares con job, buyers BP1–BP8, tier, registro de voz, split y canales |
+| Content Hub | `collection://9540b2c0-c621-4ccf-986b-efefe63feb7e` | **taller de texto largo**: artículos, ebooks, pillar pages, series, podcast, storytime (41 piezas, 8 templates). Desde acá se distribuye a **Think** o **WordPress** |
+| Calendario **vigente** | `collection://38339c2f-efe7-8113-9c92-000b50674fa8` | 66 filas, todas a futuro (2026-09-18 → 2027-03-21) |
+| Calendario **anterior** | `collection://2e039c2f-efe7-8118-ab82-000b04f62cfd` | 100 filas de histórico publicado, **schema idéntico**; es al que apuntan Content Hub y Pilares |
+| Wiki de Contenidos | `collection://15839c2f-efe7-819d-90b7-000b9011a403` | 89 páginas de doctrina, formatos, SOPs, playbooks |
+
+**Cuatro ejes ortogonales — una pieza bien formada declara los cuatro:** Pilar JTBD (para quién y qué
+job) · Territorio `PDR-019` (bajo qué se archiva) · Franquicia `PDR-020` (qué forma recurrente) ·
+Canal (dónde nace).
+
+**Reglas duras:**
+
+- **NUNCA** proponer estructura de contenidos sin leer el mapa: el runtime tiene ejes que la doctrina
+  no inventó (tier T1/T2/T3, registro de voz, split, buyers) y siguen vigentes.
+- **NUNCA** confundir `Territorio Arc` (Social Proof, CSC, AEO+SD, Nested Loops, Agentic Web — narrativa
+  de marca) con el territorio de `PDR-019` (taxonomía del blog WordPress). Son dos taxonomías distintas.
+- **NUNCA** tratar `LinkedIn Página 💼` y `LinkedIn Julio 👤` como el mismo canal: el runtime los modela
+  separados y su voz es distinta (marca vs `JULIO_REYES_VOICE_SYSTEM`).
+- **NUNCA** ejecutar una mutación en Notion sin autorización explícita del operador.
+- **NUNCA** asumir que "el calendario" es una sola base: hay **dos** con schema idéntico y el histórico
+  está partido. Cualquier promedio de velocidad operativa medido sobre una sola usa la mitad de la
+  evidencia.
+- **NUNCA** inferir el destino de publicación desde el `Tipo`: una Pillar puede vivir en Think o en
+  WordPress según `PDR-018`, y un ebook no vive en ninguno (bucket privado + entrega por link). Hoy el
+  Content Hub **no tiene propiedad de destino** — sólo `Enlace`, poblado en 5 de 41 piezas.
+- Brecha crítica del eje temático: **0 de 66 filas del calendario vigente declaran `Pilar JTBD`.**
+- Brechas al 2026-09-10: Wiki con **89 páginas sin etiquetar**; el Calendario **no puede expresar
+  franquicia, canal-hogar vs satélite, territorio ni sends/saves/watch time/dwell**; `Tipo de pieza`
+  conserva `Portafolio`, descartado por `PDR-020`.
+
 ## Cuándo usar este overlay
 
 Cuando el trabajo social toca los canales propios de Efeonce (marca, Think/Glitch/grader) o
@@ -77,7 +116,7 @@ la operación para un cliente internacional futuro. Para Social Media actual bas
 
 | Archivo | Qué cubre |
 |---|---|
-| `SEASONAL_CONTENT.md` | Efemérides por mercado, conceptos visuales, briefs ejecutables y producción anticipada; relación con tareas/calendario Notion. |
+| `SEASONAL_CONTENT.md` | **Seasonalities** (temporadas, no efemérides) por mercado, conceptos visuales, briefs ejecutables y producción anticipada; relación con tareas/calendario Notion. |
 | `STUDIO_TOOLING.md` | El pipeline real de ejecución: Metricool + Higgsfield + AI-image + Figma/Express + hand-offs. |
 | `SOCIAL_BOUNDARY.md` | La costura completa vs digital-marketing / growth-marketing-cro / copywriting / seo-aeo / efeonce-agency / generadores. Regla de precedencia. |
 | `CLIENT_DELIVERY.md` | Adaptador futuro para clientes internacionales: multi-marca, aprobaciones y reporting. No implica disponibilidad de Globe. |

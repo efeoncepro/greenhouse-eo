@@ -4,6 +4,13 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-11 — el Pillar ya está publicado, pero no en `/servicios/hubspot/`
+
+TASK-1352 se cerró: el Pillar vive en `/servicios-contratar-hubspot/` (WordPress `244079`, `200`, `index, follow`).
+La migración a `/servicios/hubspot/` no se hizo y esa ruta hoy responde `301` hacia `/hubspot/hubspot-marketing-ventas/`,
+un post antiguo. Esta página cuelga de `/servicios/hubspot/`: antes de publicar, el operador decide la URL padre del
+hub (decisión registrada en EPIC-047) — cerrado por trabajo en EPIC-047.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -18,9 +25,9 @@
 - Flow: `docs/ui/flows/TASK-1401-landing-hubspot-precios-flow.md`
 - Motion: `docs/ui/motion/TASK-1401-landing-hubspot-precios-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `TBD`
+- Rank: `EPIC-047-03`
 - Domain: `public-site`
 - Blocked by: `none`
 - Branch: `task/TASK-1401-landing-hubspot-precios`

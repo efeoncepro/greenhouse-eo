@@ -69,6 +69,13 @@ export const reconcileTalentPoolProjection = async ({
          THEN 'active_process' ELSE 'needs_reconsent' END,
        $1
      FROM greenhouse_hiring.candidate_facet cf ${REAL_PERSON_JOIN} WHERE cf.status='active'
+       -- ISSUE-172 — sólo los facets SIN membership. Sin este anti-join, PostgreSQL evaluaba el
+       -- default de public_id (nextval) para los 247 facets activos en cada corrida de 5 minutos
+       -- ANTES de que ON CONFLICT descartara los 230 ya existentes: ~71k valores de secuencia
+       -- quemados al día, que agotaron el espacio de 5 dígitos en tres semanas. El ON CONFLICT
+       -- queda como guarda de carrera contra ensureTalentPoolMembership (self-service.ts).
+       AND NOT EXISTS (SELECT 1 FROM greenhouse_hiring.talent_pool_membership m
+                        WHERE m.candidate_facet_id = cf.candidate_facet_id)
      ON CONFLICT (candidate_facet_id) DO NOTHING
      RETURNING membership_id,public_id,candidate_facet_id`,
       [actorUserId]

@@ -198,5 +198,33 @@ agent-ready).**
 ## 9. Fuera de alcance v1 (mencionados, no cubiertos a fondo)
 
 - **E-commerce SEO profundo** (faceted nav a escala, feeds de producto).
-- **ASO** — *App Store Optimization* (otra disciplina).
+- ~~**ASO**~~ — salió de esta lista el 2026-09-10: ahora es superficie adyacente, ver §10 y
+  `modules/10_ASO_APP_DISCOVERY.md`.
 - **Voice search** como tema aparte — absorbido en AEO (consultas conversacionales).
+
+## 10. Tiendas de apps (ASO) — delta 2026-09-10
+
+- **ASO** — *App Store Optimization*. Visibilidad y conversión de una app dentro de App Store y
+  Google Play. Desde 2025-26 incluye el descubrimiento por IA dentro y fuera de la tienda.
+- **Ficha** — *product page* (Apple) o *store listing* (Google). La página de la app en la tienda.
+- **Campo de keywords** — 100 caracteres ocultos al usuario, separados por coma sin espacios.
+  Solo existe en Apple; Google Play no tiene campo equivalente e indexa la descripción larga.
+- **App Store tags** — etiquetas que Apple muestra en los resultados de búsqueda, generadas con
+  LLM a partir de la metadata cargada en App Store Connect.
+- **CPP** — *Custom Product Page* (Apple). Hasta 70 versiones alternativas de la ficha, con deep
+  link propio. Se les pueden asignar keywords para que aparezcan en la búsqueda orgánica.
+- **CSL** — *Custom Store Listing* (Google Play). Ficha alternativa por país, estado del usuario,
+  campaña o keyword.
+- **PPO** — *Product Page Optimization* (Apple). A/B test nativo de la ficha por defecto.
+- **Store Listing Experiments** — el equivalente de Google Play.
+- **Personalized Collections / App Notes** — recomendaciones personalizadas de Apple en las
+  pestañas Apps, Games y Search (WWDC 2026). Cada una trae una nota que explica por qué se sugiere.
+- **Ask Play** — chat con Gemini dentro de Google Play (I/O 2026) que responde preguntas sobre las
+  apps y muestra resúmenes (*Ask Play highlights*) en los resultados. Es el AI Overview de la tienda.
+- **App Intents** — framework de Apple con el que la app declara acciones y entidades que Siri,
+  Spotlight, Shortcuts y widgets pueden descubrir y ejecutar sin abrir la app.
+- **Engage SDK** — SDK de Google que lleva contenido de la app a superficies de Android fuera de la
+  app (y, desde 2026, a la ficha para usuarios existentes).
+- **Source type** — fuente de adquisición que reporta la tienda: App Store Search, App Store Browse,
+  App Referrer, Web Referrer y App Clips en Apple; Search, Explore, Google Search, Google Ads, UTM y
+  referidos de terceros en Google Play.

@@ -336,6 +336,23 @@ No matchees todo contra el documento base. Usa o registra settlement leg de fee.
 
 Processor no es necesariamente cuenta. Revisa source account/funding instrument y settlement legs.
 
+### "El saldo de apertura del periodo esta mal"
+
+Pasa cuando el periodo se creo antes de conciliar el anterior (tipico en tarjetas con ciclo: el periodo hereda la
+OTB del cierre de ciclo viejo en vez del cierre del periodo previo). Mientras el periodo siga `open` o
+`in_progress`, corrige el saldo con `PUT /api/finance/reconciliation/<periodId>` enviando `openingBalance` (y una
+nota con la fuente). No se puede corregir un periodo `reconciled` o `closed`: hay que reabrirlo primero. Corregir
+la apertura no toca los saldos diarios de la cuenta; solo cambia contra que se compara el cierre del extracto.
+
+### "Marcar conciliado, cerrar y los saldos"
+
+- `reconciled` no cambia ningun saldo: recalcula los saldos diarios de la cuenta desde el primer dia del mes
+  (mismos numeros si el ledger ya estaba al dia) y deja el periodo bloqueado para nuevas importaciones.
+- `closed` si congela: los dias del mes quedan `is_period_closed` y la rematerializacion los salta. Usalo solo
+  cuando contabilidad cerro el mes.
+- No marques reconciliado un periodo sin saldo del banco (extracto incompleto o ciclo de tarjeta aun abierto):
+  la diferencia $0 que ves es ausencia de datos, no cuadratura.
+
 ### "Hay un movimiento historico duplicado"
 
 No lo borres. Usa patrones de supersede/dismiss canonicos si existen para phantoms historicos, con razon y audit.

@@ -70,9 +70,8 @@ Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que p
 | `TASK-TBD` | `5` | `planned` | Attribution and reporting: HubSpot campaign/form/meeting linkage, landing performance snapshot and Pulse/Account 360 hooks. |
 | `TASK-TBD` | `6` | `planned` | Nexa advisory layer: draft copy/SEO suggestions and opportunity detection after deterministic publishing is stable. |
 | `TASK-1326` | `4` | `to-do` | **Control plane Astro multi-repo**: generaliza el binding + GitHub Control Plane de public-site Astro de single-repo (hoy pineado a `efeonce-web`) a un registro multi-repo, para gobernar `efeonce-think` desde Greenhouse. *(Reconciliada 2026-08-05: declaraba `Epic: EPIC-020`, pero es control plane del sitio público, no AEO.)* |
-| `TASK-1799` | `4` | `in-progress / landing publicada` | Content Marketing / Content Ops: trece widgets Elementor desde diseño aprobado, Growth Forms, Yoast/Service y menú. Pendientes de QA ampliado en su [task](../../tasks/in-progress/TASK-1799-landing-content-marketing-content-ops-partner.md); no implica cierre del control plane completo. |
 | `TASK-1802` | `4` | `to-do` | Content Hub Efeonce: reconstruye `/blog` con widgets Elementor query-driven sobre posts WordPress publicados, archivo/paginación navegable y formatos federados (Artículos, Glitch, Tools, Videos y Webinars). Demo 35 deja de ser dirección final; cualquier schema/reader reusable faltante se separa antes como foundation backend. |
-| `TASK-1803` | `4` | `to-do` | Landing Branding Studio: articula la marca como sistema de decisión —definición, expresión y operación— y coordina su continuidad con Agencia Creativa y Producción Creativa. Incluye investigación/copy, wireframe, flow y motion; Discovery debe cerrar identidad de URL, casos, CTA y bindings antes de implementación. |
+| `EPIC-047` | — | `reancladas 2026-09-11` | **Las landings del sitio público salieron a [EPIC-047](EPIC-047-public-site-landing-portfolio-prioritization.md)**, que fija su orden de ejecución (campo `Rank EPIC-047-*`): TASK-1799, 1358, 1351, 1350, 1401, 1352, 1402, 1403, 1812, 1865, 1860, 1803, 1369, 1859, 1404, 1862, 1801, 1345, 1374 y 1387. Este epic conserva el control plane técnico. |
 
 ## Existing Related Work
 
@@ -135,3 +134,10 @@ Regla nueva: landings SEO primarias no se publican en `landing.efeoncepro.com`; 
 `TASK-1161` aterriza la primera pieza runtime read-first del rail Astro: Greenhouse puede observar binding repo↔Vercel, deploy production/staging, HEAD GitHub y route ownership mediante `public-site-astro-binding.v1`. El endpoint esta gobernado por capabilities y la signal `public_site.astro_deploy_failed` queda disponible para Reliability. Staging quedo verificado en `greenhouse-3jckt2aq4` con `status=ok`, `confidence=high` y signal `ok`; no se agregan comandos ni se cambia el runtime live.
 
 `TASK-1167` agrega la pieza repo/CI del mismo rail: Greenhouse puede componer `public-site-github-control-plane.v1` desde GitHub para `efeoncepro/efeonce-web`, observar workflow `CI`, ramas `main`/`develop`, runs, PRs/issues/releases y correlacionar commits con el binding reader. Tambien crea el adapter `public-site-github-command-adapter.v1` con commands allowlisted/default OFF (`rerun_failed`, `dispatch`) y la signal `public_site.astro_ci_failed`. El estado real verificado es CI rojo en `main`; la signal reporta `error` hasta que el repo hermano se corrija. Staging quedo verificado en `greenhouse-8arcw12v5`: reader HTTP 200 `confidence=high`, latest `CI` run `27657858751` failure, command OFF HTTP 409 `public_site_github_command_disabled`, reliability severity `error`. No hay deploy/rollback/cutover.
+
+## Delta 2026-09-11
+
+Las 20 tasks de landing que declaraban `Epic: EPIC-019` se reanclaron a
+[EPIC-047](EPIC-047-public-site-landing-portfolio-prioritization.md) (portafolio de landings y su orden de
+prioridad). EPIC-019 queda con su programa original: inventario, bridge WordPress, manifest, publish pipeline,
+drift y attribution, más TASK-1802 (Content Hub) y TASK-1326 (control plane Astro multi-repo).

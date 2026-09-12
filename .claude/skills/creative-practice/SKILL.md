@@ -204,13 +204,18 @@ Esta es **la verdad que más plata nos cuesta ignorar.** ✅ *verificado 2026-07
 
 | Contra quién crees que compites | Contra quién compites de verdad |
 |---|---|
-| Agencia digital CL: **CLP 600k – 2,5M/mes** | 🎯 **Superside: ~USD 5.000/mes** *(capacidad asignada)* |
+| Agencia digital CL: **CLP 600k – 2,5M/mes** | 🎯 **Superside: mínimo USD 15.000/mes** · `Dedicated` desde USD 30.000/mes a 12 meses · +USD 1.000/mes software *(verificado 2026-09-10)* |
 | | 🎯 **1 art director in-house US: USD 7.500 – 13.300/mes** *(loaded)* |
 | | 🎯 **Retainer de diseño/marca: USD 3.000 – 15.000/mes** |
 
 **El squad SKY completo — 9 roles, 2,2 FTE — se vende a CLP 5,2M/mes.** Eso es **menos de lo que le cuesta a
-un cliente enterprise UN SOLO director de arte interno**, y está **en el mismo rango que Superside**, que vende
-capacidad **sin métricas de calidad ni estrategia**.
+un cliente enterprise UN SOLO director de arte interno**.
+
+> 🔴 **Corrección 2026-09-10.** Esta sección decía que estábamos "en el mismo rango que Superside" con un
+> comparable de ~USD 5.000/mes tomado de un blog de tercero. **Falso:** su propia página fija un **mínimo de
+> USD 15.000/mes** con compromiso anual. No estamos en su rango — estamos **muy por debajo**. Eso deja de ser un
+> argumento de paridad y pasa a ser una pregunta abierta para Finance: **¿estamos subvalorando la capacidad?**
+> No uses el viejo número. Detalle en `modules/09_DISPLACEMENT.md`.
 
 > ## 🔴 Si te posicionas contra la agencia chilena, te auto-descuentas hasta romper el piso.
 > **El precio no está caro. El comparable estaba mal.**

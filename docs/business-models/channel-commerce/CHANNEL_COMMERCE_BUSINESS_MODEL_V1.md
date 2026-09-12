@@ -7,6 +7,7 @@
 > **Validated as of:** 2026-09-10 (evidencia de mercado con `as-of`; sin evidencia de demanda propia ni cost snapshot)
 > **Review cadence:** mensual mientras el estado sea `Proposed`
 > **Related:** [`EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1`](../EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md) · [`EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1`](../EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md) · [`EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1`](../EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md) · [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1`](../EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md) · [`MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1`](../media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md) · [`EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1`](../../strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md)
+> **Material para el equipo:** [documento de modelo de negocio (PDF, uso interno)](deliverables/Efeonce-Channel-Commerce-Modelo-de-Negocio.pdf) · [cómo se mantiene](deliverables/README.md)
 
 ---
 
@@ -148,6 +149,19 @@ retorno demostrable en un momento en que el costo por hora de cobertura sube por
   de priorización, el pod se convierte en reposición ciega y el modelo pierde su fundamento.
 - **Condicionada:** Escalón 3 — requiere que el cliente ya tenga proveedores de terreno contratados y acepte que
   Efeonce los gobierne sin desplazarlos en el corto plazo.
+### Managed Channel Operations — la modalidad que envuelve la oferta
+
+Efeonce **opera** los tres escalones en las tres fases: plan del ciclo, método y estándar de scoring, dirección,
+control de calidad de la evidencia, gobierno de proveedores, lectura, decisión y accountability. Lo que varía por
+fase es **quién pone las manos**, no quién opera.
+
+Es el mismo patrón de Managed Media Operations en Media & Distribution: una modalidad operativa recurrente que
+gobierna las soluciones, no una solución adicional que se agregue al catálogo.
+
+**Implicación económica directa:** el fee de Efeonce remunera la operación; la ejecución de terceros es
+pass-through documentado sin margen. Sin esa separación, el precio no es defendible y la línea se convierte en
+reventa con markup — que es exactamente lo que un comprador corporativo desarma en la primera negociación.
+
 ### La capacidad de terreno tiene dos cargas de trabajo, no una
 
 El pod del escalón 2 no sólo remedia ejecución: también **activa**. Auditar, remediar, hacer sampling, demostrar
@@ -160,6 +174,11 @@ complementaria sobre la misma capacidad **suben la utilización**, y la utilizac
 modelo de capacidad gobernada alcanza el piso de margen o no.
 
 Un pod que sólo audita tiene valles. Un pod que audita y activa los llena.
+
+**Y la carga de activación no es una sola.** El catálogo BTL cubre nueve superficies —activación en sala,
+promotoría e impulso, visual merchandising, roadshow, street y sampling masivo, pop-up, activación de patrocinios,
+ferias y encuentros de canal—, cada una con su propia estacionalidad. Cuanto más ancha la cartera BTL, más plana
+la curva de utilización de la misma capacidad, y más alcanzable el piso de margen del escalón 2.
 
 - **Inválida:** staff augmentation de personal de terreno bajo dirección diaria del cliente. Rompe el boundary
   económico *y* la figura legal. Ver §8.
@@ -178,6 +197,13 @@ costo → intervención sólo donde el score lo justifica → medición del delt
 —auditar barato en toda la cobertura y desplegar el recurso caro sólo donde hay incumplimiento— es el que usan las
 marcas líderes y reporta ahorros del orden del 75% frente a desplegar un representante dedicado en toda la red
 (`as-of` 2026-09; ver §14).
+
+**Posición competitiva.** El comparison set real son dos categorías ocupadas: el software de retail execution
+(Teamcore, Frogmi, Trax, Storecheck), que **detecta pero no ejecuta**; y las agencias de servicio integrado (Touch
+Latam, Novaprom, Tradercom, ECR), que **ejecutan pero no demuestran**. Efeonce compite desde el medio: opera el
+ciclo completo bajo un responsable y lo conecta con la inversión digital, que es lo único que ninguna de las dos
+categorías cubre. Battlecards, vulnerabilidades y reglas de conversación en
+[`CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1`](../../audits/commercial/CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md).
 
 **Evidencia disponible hoy:** ninguna propia. Toda la evidencia es de mercado y de terceros.
 

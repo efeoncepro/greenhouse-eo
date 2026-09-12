@@ -6,8 +6,9 @@ TASK-354 dejó la interfaz pública de careers implementada. **Desde 2026-08-18 
 detalle sirve la hoja editorial de TASK-1741 y el JSON-LD `JobPosting` de
 TASK-1740 EN PRODUCCIÓN**: `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` y
 `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` están ON (release `fa54670470c1`), y el
-schema emitido pasó `validator.schema.org` con 0 errores y 0 advertencias. Las dos
-vacantes vivas están autoradas en contrato v2 completo. TASK-1373 migró el apply a
+schema emitido pasó `validator.schema.org` con 0 errores y 0 advertencias. Al
+2026-09-11 hay cuatro vacantes vivas (detalle en §Contenido estructurado y SEO
+técnico). TASK-1373 migró el apply a
 un Growth Form nativo detrás de `CAREERS_NATIVE_GROWTH_FORM_ENABLED`, también ON en
 producción.
 
@@ -106,13 +107,50 @@ La oferta debe separar `Ubicacion` y `Modalidad` como datos de dominio:
 - `public_compensation_band` queda disponible como campo estructurado opcional,
   no publish-required hasta cerrar governance de bandas.
 
+### Difusión externa y atribución
+
+La difusión en redes (grupos de Facebook, LinkedIn personal del operador y página
+de Efeonce vía Metricool) ocurre después de publicar: enlaza al detalle canónico
+de cada vacante y no crea openings ni cambia estado en Hiring.
+
+Careers hoy no guarda UTM ni canal por postulación: las rutas públicas de careers
+no leen parámetros `utm_` ni cargan GTM, y la postulación identifica la superficie
+(`public_careers`), no la campaña. Mientras ese gap siga abierto, no se puede
+atribuir una postulación a un canal ni comparar canales por postulaciones.
+
+Paso a paso: [Operar Careers públicas — Difundir una vacante publicada](../../manual-de-uso/hr/operar-careers-publicas.md#difundir-una-vacante-publicada).
+
 ## Contenido estructurado y SEO técnico (TASK-1740)
 
 **Estado: en producción desde 2026-08-18.** El renderer editorial y el schema
-`JobPosting` están ambos ON en Production, y las dos vacantes vivas
-(`EO-OPN-0009` y `EO-OPN-0061`) ya están autoradas en contrato v2 completo, con
-las 13 secciones del contrato pobladas. El schema emitido pasó la validación
+`JobPosting` están ambos ON en Production. Las dos vacantes vivas al momento del
+flip (`EO-OPN-0009` y `EO-OPN-0061`) se autoraron en contrato v2 completo, con
+las 13 secciones del contrato pobladas, y el schema emitido pasó la validación
 externa de `validator.schema.org` con 0 errores y 0 advertencias.
+
+Estado vigente (verificado el 2026-09-11 en `/public/careers`; cada detalle
+responde HTTP 200): **cuatro vacantes vivas**.
+
+| Opening | Rol | Seniority | Reporta a |
+| --- | --- | --- | --- |
+| `EO-OPN-0009` | Account Manager / Especialista en Marketing | Semi-senior | CEO |
+| `EO-OPN-0061` | Content Creator — Editorial, SEO/AEO & Social | Semi-senior | Creative Operations Lead |
+| `EO-OPN-0674` | SEO Specialist Senior (área Growth) | Senior | Managing Director |
+| `EO-OPN-0675` | Director(a) de Arte Senior (área Creative) | Senior | Creative Operations Lead |
+
+`EO-OPN-0674` y `EO-OPN-0675` se publicaron el 2026-09-09 por un acto operativo
+separado, registrado en
+[Pack de evaluación — SEO Specialist Senior y Director(a) de Arte Senior](task-1604-seo-art-assessment-pack.md);
+su capa de assessment no está activa. Las cuatro publican los mismos hechos:
+LATAM, remoto, jornada completa, los mismos 20 países elegibles, la misma
+vinculación por país, respuesta en 3 a 4 semanas, compensación que se conversa
+durante el proceso y beneficios con el calificador de modalidad y país.
+
+Pendiente: la ficha de `EO-OPN-0009` describe su etapa 2 como un assessment
+práctico sin decir que el caso es ficticio; las otras tres sí lo dicen. El dueño
+confirmó que también es ficticio, pero falta alinear la ficha por el command
+canónico (`PATCH /api/hiring/openings/{id}`, capability `hiring.opening.write`)
+con autorización del operador.
 
 Toda publicación nueva usa `public_content_json` v2 como fuente editorial única:
 promesa, intro, 3–5 resultados, 4–8 elementos de trabajo, habilidades esenciales,

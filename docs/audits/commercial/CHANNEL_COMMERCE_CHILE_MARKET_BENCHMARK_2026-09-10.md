@@ -77,6 +77,89 @@ principiante.
 
 ---
 
+## 1.bis Delta 2026-09-10 (mismo día) — dos capas que el primer barrido no vio
+
+El barrido inicial buscó "agencias" y encontró agencias. Faltaba la capa de **software de retail execution**, que
+es una categoría global, madura y en consolidación, con dos jugadores chilenos relevantes. Y faltaba el mayor
+integrador regional de servicios. Ambos entraron por indicación del owner de la línea.
+
+### Teamcore — la fase 3 tal como estaba escrita no es alcanzable
+
+Fundada en 2015 en Santiago. Plataforma de IA para ejecución retail en canal moderno y tradicional: detecta y
+prioriza quiebres, errores de precio y promociones mal ejecutadas, y entrega tareas y recomendaciones en tiempo
+real a equipos de terreno, brand managers y retailers. Declara **más de 500 marcas de consumo masivo y presencia
+en más de 20 países**, con operación en 7+ países de LATAM y Estados Unidos.
+
+**Se fusionó con Tech-K con respaldo de Accel-KKR**, private equity de software, con la ambición declarada de ser
+la plataforma líder de retail analytics de Latinoamérica. En enero de 2026 presentó `Execution Intelligence` y su
+motor `Teamcore Nova`; en julio de 2026 su CEO habla públicamente de pasar "de una experiencia IA a una revolución
+agéntica".
+
+**Consecuencia directa:** la fase 3 del roadmap —"tecnología propia" entendida como una plataforma de ejecución
+retail— **no es alcanzable** y debe redefinirse. No se construye un competidor de una categoría respaldada por
+private equity con CLP 40.000.000.
+
+### La categoría completa, para dimensionar
+
+| Actor | Origen | Señal |
+|---|---|---|
+| **Teamcore** | Chile | 500+ marcas, 20+ países, fusión con Tech-K respaldada por Accel-KKR |
+| **Frogmi** | Chile | Task management y ejecución en tienda, 50+ clientes en 10+ países, Endeavor |
+| **Trax** | Global | Reconocimiento de imagen de anaquel; alianza con Storecheck en México |
+| **Storecheck** | México | Ejecución en PDV, integra marcas, retailers y agencias |
+| **Involves** | Brasil | Trade marketing y ejecución |
+| **TCG Scout · ShelfAI · ParallelDots · Ailet · Vispera · Neurolabs · Infilect** | Global | Análisis de góndola por imagen |
+
+### Touch Latam — el integrador regional de servicios
+
+Fundada en 2003, con presencia en Chile, Perú y Colombia. Portafolio: equipos de venta especializados, trade
+marketing, promotoría, impulso y anfitrionaje, BTL y eventos, staffing on-demand, **y logística y almacenamiento**,
+incluida logística de e-commerce.
+
+Es el arquetipo llave en mano llevado al extremo: 23 años y bodega propia. **Competir con Touch Latam en la capa de
+ejecución del bloque C no es viable** con el capital disponible.
+
+### La lectura estratégica: el hueco está en medio, y es real
+
+```text
+SOFTWARE                    ¿?                      SERVICIO
+Teamcore · Frogmi                                   Touch Latam · Novaprom
+Trax · Storecheck                                   ECR · Tradercom
+detecta y prioriza                                  pone las manos
+```
+
+Las plataformas **detectan**. Las agencias **ejecutan**. Entre medio queda quién **opera el ciclo**: quién decide
+contra qué estándar, quién valida que la evidencia sea real, quién cierra el loop entre la alerta y la corrección,
+y quién conecta todo eso con la inversión digital de la marca.
+
+Hay señal de que ese hueco es reconocido por la propia categoría: Teamcore sostiene públicamente que las marcas
+que ganen en 2026 serán las capaces de alinear ventas, trade marketing y operaciones bajo una lógica de
+priorización inteligente **con ejecución orquestada**. Eso describe un problema de operación y de servicio, no de
+software adicional.
+
+**Además, estas plataformas crean demanda para la capa de servicio.** Una marca compra Teamcore y recibe alertas;
+alguien tiene que priorizarlas, ejecutarlas y cerrar el ciclo. Ese patrón —software que necesita quien lo opere—
+es el mismo que sostiene la práctica de RevOps & CRM de Efeonce sobre HubSpot y Salesforce.
+
+**Corrección de encuadre 2026-09-10.** Una primera versión de este delta trató a Teamcore y a Touch Latam como
+proveedores potenciales en vez de competidores. **Ese encuadre era incorrecto.** Ambos hacen, cada uno desde su
+lado, lo que esta línea se propone hacer: Touch Latam vende el servicio integrado completo y Teamcore vende la
+detección instrumentada. Son el comparison set real y hay que ganarles con diferenciación, no rodearlos.
+
+Las battlecards con su análisis, vulnerabilidades y cómo se compite viven en
+[`CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1`](CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md).
+
+**Recomendación revisada, que reemplaza la del §5 original en lo que toca a tecnología:**
+
+1. **No construir plataforma de ejecución retail. Nunca.** La diferenciación no pasa por igualar producto.
+2. **Competir contra ambos desde el medio**, que es la posición que ninguno ocupa: el software detecta pero no
+   ejecuta; la agencia ejecuta pero no demuestra. Efeonce opera el ciclo completo y lo conecta con lo digital.
+3. **Redefinir la fase 3**: la tecnología propia sólo se justifica en la capa que nadie cubre —la conexión entre
+   ejecución física, inversión digital y visibilidad en motores de IA— y sobre Greenhouse.
+4. **Operar sobre la plataforma que el cliente ya tenga** es una táctica comercial válida en esa cuenta —
+   rentabiliza una inversión hecha y evita atacar una decisión tomada—. No convierte al proveedor de esa
+   plataforma en partner de Efeonce, y no debe presentarse como tal sin acuerdo real.
+
 ## 2. Peer set y estructura del mercado
 
 Peer set construido por observación de la oferta pública. No es exhaustivo ni un ranking.
@@ -219,6 +302,19 @@ responde G1 del business model, y sigue siendo el gate que importa.
 
 **Intento fallido registrado:** `treid.cl/trade-marketing` respondió HTTP 403 a la lectura directa; sus datos
 provienen de resultados de búsqueda y no de la lectura de la página. Confianza ajustada a media.
+
+### Evidencia del delta
+
+| Fuente | Aporta |
+|---|---|
+| [Teamcore Chile](https://www.teamcore.net/cl/) · [teamcore.com](https://teamcore.com/) · [CB Insights](https://www.cbinsights.com/company/teamcore) | Plataforma, fundación 2015, Santiago, alcance declarado |
+| [Accel-KKR — Teamcore y Tech-K unen fuerzas](https://www.accel-kkr.com/teamcore-y-tech-k-unen-fuerzas-para-convertirse-en-la-plataforma-tecnologica-lider-de-retail-analytics-en-latinoamerica/) | Fusión con respaldo de private equity y ambición regional |
+| [EMPREFINANZAS — Execution Intelligence](https://emprefinanzas.com.mx/2026/01/30/presenta-teamcore-execution-intelligence-las-decisiones-que-marcaran-la-ejecucion-en-2026/) · [PRODU](https://www.produ.com/mercadeo/noticias/teamcore-analiza-las-claves-de-la-ejecucion-comercial-que-marcaran-el-2026-en-america-latina/) · [Impacta](https://www.impactamag.com/2026/07/hoy-en-el-retail-pasamos-de-una.html) | Nova, tesis de ejecución orquestada, discurso agéntico 2026 |
+| [Frogmi](https://frogmi.com/quienes-somos/) · [Endeavor Chile](https://endeavor.cl/company/frogmi/) | Task management y ejecución, 50+ clientes en 10+ países |
+| [Touch Latam](https://touchlatam.com/soluciones/) · [CB Insights](https://www.cbinsights.com/company/touch-latam) | Portafolio integrado con logística y almacenamiento; 2003; Chile, Perú, Colombia |
+| [Trax + Storecheck](https://www.technocio.com/trax-y-storecheck-unen-fuerzas-en-mexico-para-proporcionar-datos-e-insights-de-alto-valor-sobre-puntos-de-venta-y-ejecucion-en-el-canal-tradicional/) · [ShelfAI — herramientas de análisis de góndola 2026](https://getshelfai.com/blog/mejores-herramientas-analisis-gondola) | Mapa de la categoría de análisis de anaquel |
+
+Todo auto-declarado o de prensa sectorial, `as-of` 2026-09. Sin verificación independiente de volúmenes ni cuotas.
 
 ## 7. Siguiente paso de investigación
 

@@ -122,7 +122,24 @@ const PipelineDeskView = ({
   simulateStageFailure = false,
 }: PipelineDeskViewProps) => {
   const router = useViewTransitionRouter()
-  const [applications, setApplications] = useState(initialSnapshot.applications)
+  // ISSUE-171 — el snapshot del servidor es la única fuente de las postulaciones. Antes se
+  // copiaba a un useState que nunca se re-sincronizaba: en la navegación soft del selector el
+  // componente no se desmonta, `openingId` cambiaba y la lista se quedaba con el arreglo del
+  // montaje, así que el tablero de la vacante nueva salía vacío. El único estado cliente legítimo
+  // es el delta optimista de etapa del arrastre, y vive aparte como overrides por applicationId.
+  const [stageOverrides, setStageOverrides] = useState<Record<string, HiringApplicationStage>>({})
+
+  const applications = useMemo(
+    () => initialSnapshot.applications.map((item) => {
+      const stage = stageOverrides[item.application.applicationId]
+
+      return stage && stage !== item.application.stage
+        ? { ...item, application: { ...item.application, stage } }
+        : item
+    }),
+    [initialSnapshot.applications, stageOverrides],
+  )
+
   const [openingId, setOpeningId] = useState(initialOpeningId ?? initialSnapshot.openings[0]?.opening.openingId ?? '')
   const [query, setQuery] = useState('')
   const simulateFailure = simulateStageFailure
@@ -152,6 +169,13 @@ const PipelineDeskView = ({
     setReturnedApplicationId(initialFocusApplicationId ?? null)
     setReturnUnavailable(initialFocusUnavailable)
   }, [initialFocusApplicationId, initialFocusUnavailable, initialOpeningId, initialSnapshot.openings])
+
+  // Un snapshot nuevo del servidor es autoritativo: los overrides optimistas ya se persistieron
+  // (o se revirtieron) antes de cualquier navegación, así que no hay nada que preservar.
+  useEffect(() => {
+    // Identidad estable cuando ya está vacío: evita un render extra por cada snapshot.
+    setStageOverrides((current) => (Object.keys(current).length > 0 ? {} : current))
+  }, [initialSnapshot.applications])
 
   useEffect(() => {
     if (!initialFocusUnavailable) return
@@ -248,11 +272,7 @@ const PipelineDeskView = ({
 
     if (previous === stage || savingIds.has(item.application.applicationId)) return
 
-    setApplications((current) => current.map((candidate) => (
-      candidate.application.applicationId === item.application.applicationId
-        ? { ...candidate, application: { ...candidate.application, stage } }
-        : candidate
-    )))
+    setStageOverrides((current) => ({ ...current, [item.application.applicationId]: stage }))
     setSavingIds((current) => new Set(current).add(item.application.applicationId))
     if (liveRef.current) liveRef.current.textContent = copy.pipeline.saving
 
@@ -271,11 +291,10 @@ const PipelineDeskView = ({
       setToast({ message: copy.pipeline.saved, severity: 'success' })
       if (liveRef.current) liveRef.current.textContent = `${item.candidateName}: ${copy.pipeline.saved}`
     } catch {
-      setApplications((current) => current.map((candidate) => (
-        candidate.application.applicationId === item.application.applicationId
-          ? { ...candidate, application: { ...candidate.application, stage: previous } }
-          : candidate
-      )))
+      // Rollback = soltar el override: la fila vuelve a la etapa que el servidor ya tenía (`previous`).
+      setStageOverrides((current) => Object.fromEntries(
+        Object.entries(current).filter(([applicationId]) => applicationId !== item.application.applicationId),
+      ))
       setToast({ message: copy.pipeline.rollback, severity: 'error' })
       if (liveRef.current) liveRef.current.textContent = `${item.candidateName}: ${copy.pipeline.rollback}`
     } finally {

@@ -18,9 +18,9 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `TBD`
+- Rank: `EPIC-047-A2`
 - Domain: `content`
 - Blocked by: `none`
 - Branch: `task/TASK-1404-articulo-hubspot-vs-salesforce`

@@ -36,6 +36,37 @@ relevante de Reddit puede pesar más para AEO que un backlink mediocre.
   manipulación (riesgo, ver `ANTIPATTERNS.md`).
 - **Link velocity:** crecimiento orgánico y sostenido; picos antinaturales son
   bandera roja.
+- 📐 **Para convertir un link gap en lista de outreach priorizada:** el corte
+  `add_me_candidate` (la página ya lista ≥2 competidores, o es *resource page*, o su anchor/URL
+  dice *best/top/alternatives/vs/roundup*), la matriz 2×2 **priority × attainability** con umbral
+  50/50 y sus glosas (*start here / long game / quick wins si sobra capacidad / skip*), y el dedupe
+  en dos capas (eTLD+1 **con excepción para plataformas alojadas** + colapso por subred `/24`
+  **con allowlist de CDN**) → `../references/competitor-methodologies-2026-09.md` §4. Fórmulas de
+  terceros, **no validadas con nuestros datos**; `ANTIPATTERNS.md` sigue gobernando qué enlace se
+  persigue.
+
+### Enlaces tóxicos y disavow — cuándo SÍ y (casi siempre) cuándo NO
+
+Decisión Efeonce 2026-09-11: **no construimos un generador automático de disavow**, y un
+"informe de toxicidad" no es por sí solo motivo para entregar uno.
+
+- **Por qué no.** Google descuenta por su cuenta la gran mayoría del spam entrante; el
+  disavow existe para el caso en que el propio sitio construyó enlaces manipulativos. Un
+  archivo generado por umbral desautoriza enlaces que estaban aportando, y el daño es
+  difícil de revertir porque el efecto tarda en reprocesarse. Una herramienta que lo
+  produce con un clic invita a usarlo donde no corresponde.
+- **Cuándo sí, con juicio humano de por medio:** acción manual confirmada en Search
+  Console; historial declarado de compra de enlaces o de una agencia previa que los
+  construyó; o un patrón de spam entrante masivo y dirigido que el cliente puede fechar.
+  Ninguno de los tres se detecta por un score: los tres se declaran.
+- **Si se llega a entregar uno:** desautorizar a nivel `domain:` (no URLs sueltas),
+  deduplicar, y verificar los dos topes duros de Google —**menos de 100.000 líneas y menos
+  de 2 MB**— antes de entregar. Revisión humana obligatoria línea por dominio; el score de
+  spam ordena la revisión, no la reemplaza. Detalle operativo del patrón y sus trampas:
+  `.claude/skills/dataforseo-operator/references/03-backlinks.md` §8.1.
+- **Lo que sí hacemos con el score de toxicidad:** diagnóstico y priorización de
+  *prospección* (qué perfil de enlaces tiene un dominio antes de perseguirlo) y vigilancia
+  de un pico de pérdida. Diagnosticar ≠ desautorizar.
 
 ## Digital PR (el motor de links + menciones de calidad)
 

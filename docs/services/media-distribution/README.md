@@ -4,7 +4,7 @@
 > **Marca contractual:** Efeonce
 > **Product brand habilitadora:** Reach, cuando aporte tecnología, método o diferenciación
 > **Estado:** `Approved for validation`
-> **Última actualización:** 2026-07-26
+> **Última actualización:** 2026-09-10 (Performance & Commerce: ficha, decisión y pricing propios)
 
 ## Propósito
 
@@ -61,6 +61,14 @@ canales, proveedores y calidad de datos. No publicar precio hasta validar horas 
 conversiones a ejecución y willingness-to-pay.
 
 ### 2. Performance & Commerce Distribution
+
+> **Delta 2026-09-10 — ficha, decisión y pricing propios (`Proposed`).** La solución se opera como una capability con
+> dos motions por comprador —**Demand & Commerce** (B2C, commerce) y **B2B Pipeline** (LinkedIn, Search y señal de CRM)—;
+> los canales son cobertura, no productos; programmatic y CTV se compran vía partner con cláusula de transparencia.
+> Ver [ficha](PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md),
+> [decisión](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md) y
+> [Pricing Integrity Pack](../../business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md).
+> Esta sección conserva el resumen; la ficha manda en caso de diferencia.
 
 **Job del cliente:** “Cuando tengo inversión en adquisición o commerce pero no logro conectar eficiencia, cobertura y
 conversión, quiero una operación integrada que redistribuya inversión según evidencia.”
@@ -295,4 +303,6 @@ Fuentes relacionadas:
 
 - [Arquitectura de portfolio, marcas y líneas de negocio](../../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md)
 - [Investigación de mercado Performance & Commerce Distribution 2025–2026](../../audits/commercial/PERFORMANCE_COMMERCE_DISTRIBUTION_MARKET_RESEARCH_2026-07-26.md)
+- [Performance & Commerce Distribution — ficha de servicio](PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md)
+- [Performance media — canales, partners, precios y demanda 2026-09-10](../../audits/commercial/PERFORMANCE_MEDIA_CHANNELS_PARTNERS_PRICING_RESEARCH_2026-09-10.md)
 - [Catálogo general de servicios](../README.md)

@@ -13,7 +13,8 @@ description: >-
   cobramos", "retainer", "margen", "piso", "cotizar SEO", "propuesta de SEO",
   "descuento", "prospección SEO", "outbound de SEO", "canales para vender SEO",
   "objeción SEO", "el cliente dice que es caro", "competimos con un freelancer",
-  "AI Visibility Grader como venta", "licitación de contenido".
+  "AI Visibility Grader como venta", "licitación de contenido", "vender ASO",
+  "ASO para un cliente con app", "servicios complementarios de ASO".
 ---
 
 # SEO/AEO Practice — el negocio, no el oficio
@@ -184,7 +185,7 @@ mueve, y este es el orden"* sí.
 | **El comprador y su cicatriz** — ICP, comité, **las 6 objeciones que matan el deal** | **`modules/02_COMPRADOR.md`** |
 | **La oferta** — el reframe *(vendes visibilidad, entras por SEO)*, las 4 capas, qué está mal empaquetado | **`modules/03_OFERTA.md`** |
 | 🎯 **Precio, margen, piso, descuentos, FX, cuándo levantarte de la mesa** | **`modules/04_PRICING.md`** |
-| 🎯 **La cuña: el Grader** — el motor de venta, y su migración de *score* a *prescripción* | **`modules/05_CUNA_GRADER.md`** |
+| 🎯 **La cuña: el Grader** — el motor de venta, y su migración de *score* a *prescripción* · 🎯 **el panel competitivo multi-marca** (el cliente + sus competidores con el mismo set de preguntas, el mismo día; caso SKY 2026-09-11) | **`modules/05_CUNA_GRADER.md`** |
 | 🔴 **Descalificación** — los 8 casos en que NO vendemos | **`modules/06_DESCALIFICACION.md`** |
 | **Displacement** — el freelancer · la herramienta · el in-house · la agencia titular · **no hacer nada** | **`modules/07_DISPLACEMENT.md`** |
 | 🎯 **Prueba sin mentir** — el puente de atribución que SÍ existe | **`modules/08_PRUEBA.md`** |
@@ -199,10 +200,13 @@ mueve, y este es el orden"* sí.
 
 | 🔴 **Lo que NUNCA se hace** *(+ los bugs vivos de Efeonce marcados 🩸)* | **`ANTIPATTERNS.md`** |
 | **El vocabulario de la práctica** *(loaded cost, piso, la cuña, la cicatriz, el puente…)* | **`GLOSSARY.md`** |
+| 🎯 **ASO complementario** — cuándo se vende a un cliente con app, las líneas de servicio, qué NO se vende, cómo se prueba sin atribuir a IA *(el oficio vive en `seo-aeo/modules/10_ASO_APP_DISCOVERY.md`)* | **`modules/14_ASO_COMPLEMENTARIO.md`** |
 
 **Artefactos listos:** `templates/hoja-de-cuenta.md` *(se llena ANTES de tocar la puerta)* ·
 `templates/secuencia-outbound.md` · `templates/guion-reunion-grader.md` ·
-`templates/propuesta-tipo.md` · `templates/calculadora-piso.md`
+`templates/propuesta-tipo.md` · `templates/calculadora-piso.md` ·
+`templates/correo-panel-competitivo-aeo.md` *(el correo que entrega un panel competitivo: método, preguntas, lectura,
+panorama, límites y reunión)*
 
 🔴 **Carga solo el módulo que la tarea necesita.** `SOURCES.md` se carga **siempre** que vayas a citar un número.
 

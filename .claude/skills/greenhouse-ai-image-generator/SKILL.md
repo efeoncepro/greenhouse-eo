@@ -9,6 +9,16 @@ Use this skill whenever Greenhouse needs AI-generated visual assets: icons, UI e
 
 Act as both the image-generation operator and the art director. The job is not only to call a model; it is to produce a professional asset with deliberate composition, material, lighting, palette, hierarchy, technical fit, and QA.
 
+### Tipografía creativa Efeonce
+
+Para key visuals, campañas y piezas social/editoriales fuera de la UI, puedes usar `Bricolage Grotesque` como
+familia display expresiva. El asset local es `src/assets/fonts/BricolageGrotesque-Variable.ttf`, con ejes `opsz`,
+`wdth` y `wght`; la licencia y procedencia están en `src/assets/fonts/BricolageGrotesque-SOURCE.md`.
+
+Esta disponibilidad no activa una tercera familia en el runtime de Greenhouse: la UI sigue usando Poppins para
+display y Geist para texto. En assets con texto exacto, conserva la familia elegida en la composición determinista
+final; el texto generado por el modelo sigue requiriendo revisión humana y no prueba fidelidad tipográfica.
+
 ## First Reads
 
 Read only what the task needs:
@@ -222,6 +232,41 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
   consistency — they treat the reference as inspiration and drift to a different subject + mangled logo.
 - **Prompt = identity-lock scaffold + one small delta.** Fix everything (face, hair, outfit, the exact logo, framing, lighting) and change ONLY the requested pose/expression. Big deltas break consistency; small deltas hold it. Anchor every variant to the SAME canonical reference, not to a previous generation.
 - **No engine keeps a logo pixel-exact** (~90% redraw). If the mark must be exact, mask its region and re-stamp the real vector (e.g. `public/branding/SVG/isotipo-efeonce-negativo.svg`) by composition. With `gpt-image-2` the logo is faithful enough that this is optional.
+  - **Social piece with a logo seal** (worked 2026-09-11, Efeonce "We are Hiring", LinkedIn 4:5): here the logo is
+    never generated. Generate only the art (Higgsfield MCP `generate_image`, `gpt_image_2`, `resolution 2k`,
+    `quality high`, `count 2`) with approved brand blues only and the bottom band left empty. `gpt_image_2` offers
+    no 4:5: generate `3:4` and crop to 4:5 **from the bottom only** (the headline moves toward the optical center
+    and the bottom band stays free), then resize to 1080×1350. Compose the real SVG with sharp (Node) — that run:
+    `public/branding/logo-negative.svg` at 300 px wide, centered, 104 px from the bottom edge, thin white rule
+    (56 px, 45% opacity) 34 px above. Zoom-inspect the seal at 100% before hosting. Campaign log:
+    `docs/operations/hiring/2026-09-11-linkedin-vacancy-distribution.md`.
+  - **Pieza 4:5 con mockup de dispositivo y pantallas exactas** (funcionó 2026-09-11, trendjacking «Nuestro
+    Duo»; caso: [`2026-09-11-iphone-duo-trendjack.md`](../../../docs/operations/social/2026-09-11-iphone-duo-trendjack.md)).
+    El modelo genera sólo el **clean plate**; pantallas, titular y logo se componen. Receta híbrida:
+    1. `pnpm ai:image --model gpt-image-2 --size 1600x2000 --quality high --count 2`: manos + plegable abierto
+       con **ambas pantallas en verde chroma plano (#00FF00)**, fondo en azules de marca y tercio superior vacío
+       para el titular. A diferencia de la ruta Higgsfield de arriba (sin 4:5), el CLI directo acepta
+       `1600x2000` como custom size de `gpt-image-2`: 4:5 nativo, sin recorte. La evidencia del CLI debe decir
+       `gpt-image-2 · 1600x2000`.
+    2. Chroma key con despill en Node + sharp. Separa las dos mitades por la bisagra (la columna con menos verde
+       en el tercio central) y toma las 4 esquinas de cada mitad por los extremos de `x+y` y `x−y`; agrándalas
+       ~2,5% para cubrir las esquinas redondeadas.
+    3. Renderiza la UI exacta en HTML con Playwright a 2x y proyéctala con **homografía → CSS `matrix3d`**,
+       detrás del plate ya keyed, así los pulgares quedan delante. Suma una sombra de pliegue hacia la bisagra y
+       un brillo diagonal de vidrio para que la pantalla no se vea pegada.
+    4. Titular, bajada y logo real (`public/branding/logo-negative.svg`) se componen de forma determinística;
+       nunca el logo generado.
+    QA: zoom al 100% de pulgares, esquinas y bisagra; cualquier halo verde bloquea. Trampas medidas:
+    - `page.setContent()` **no carga recursos `file://`** (fuentes, imágenes, SVG) porque el documento es
+      `about:blank`: sale un plate vacío con fuente de reserva y sin error. Escribe el HTML a disco y usa
+      `page.goto('file://…')`.
+    - `text-shadow` en el padre de un span con `background-clip:text` + `color:transparent` se transparenta y
+      agrisa el degradado. Pon `text-shadow:none` en ese span.
+    - Para reemplazar un asset público en GCS, súbelo con **nombre nuevo**: la caché pública sigue sirviendo el
+      anterior.
+    Esta receta es **sólo para la imagen fija**. En video el operador rechazó reemplazar pantallas de forma
+    determinística (el texto pegado no recibe luz, reflejos ni movimiento): ahí las pantallas las renderiza el
+    modelo con referencias. Receta: `motion-design-studio` → `modules/09_AI_VIDEO_PIPELINE.md` §7.
 - **Background:** GPT Image 2 can return native transparency in preview when the request uses
   `background: 'transparent'` with PNG or WebP. Validate alpha from the decoded bytes; metadata or prompt copy is
   insufficient. Use `pnpm ai:image:rmbg` only as local post-processing for an intentionally opaque source or a

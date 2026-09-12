@@ -20,9 +20,9 @@
 - Flow: `docs/ui/flows/TASK-1345-desarrollo-sitios-web-landing-flow.md`
 - Motion: `docs/ui/motion/TASK-1345-desarrollo-sitios-web-landing-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Live WordPress landing v1; IA/form/legacy route follow-ups pending`
-- Rank: `TBD`
+- Rank: `EPIC-047-cierre`
 - Domain: `public-site`
 - Blocked by: `none`
 - Branch: `develop` (operator override via `pnpm codex:task-hook TASK-1345 --develop`)

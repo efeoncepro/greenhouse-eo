@@ -3,6 +3,14 @@
 > **Tipo:** Product Decision Record (posicionamiento/GTM + IA de una superficie del sitio público).
 > **Estado:** Accepted (posicionamiento + copy/CRO/SEO) — **§Arquitectura de información refinada por [PDR-010](PDR-010-home-es-el-pitch-agencia-se-pliega.md)**.
 
+## Delta 2026-09-10 — la conclusión "performance no es cabecera" queda enmendada por PDR-022
+
+El dato "cluster performance ≤480 e informacional" midió "performance marketing" (140) y no las variantes comerciales
+"agencia (de) performance marketing" (480 y 590/mes en Chile, KD 11–13; Semrush `cl`, 2026-09-10). Performance sigue
+siendo capability listada **en la Home**, pero ahora tiene spoke propia:
+[PDR-022](PDR-022-landing-performance-marketing-posicionamiento.md). Además, el ~2.400/mes citado abajo para "agencia de
+marketing digital" coincide con Semrush `mx`; `cl` da hoy 590.
+
 ## Delta 2026-07-08 — el pitch de `/agencia` ES la Home (PDR-010)
 
 Al escribir el copy quedó claro que el pitch de `/agencia` y el de la Home son **el mismo discurso**: una agencia tiene un solo trabajo de venta arriba del embudo. Decisión ([PDR-010](PDR-010-home-es-el-pitch-agencia-se-pliega.md)): **`/agencia` NO se construye como página separada; su contenido es el de la Home** (que absorbe posicionamiento de categoría + head term "agencia de marketing digital" en title/H1 + repartición a spokes). `/agencia` nunca existió (sin 301) → sin costo de plegado. **TASK-1358 se reorienta** de "crear `/agencia`" a "rework de la Home como el pitch". El material de identidad (4 unidades, ICO, ecosistema) se relocaliza al **About Us** (gap real). **Todo lo de abajo (dos capas, reencuadre no-es-X-es-Y, anti-ICP, casos citables, voz, JSON-LD, CRO, grader compartido) sigue vigente, aplicado a la Home** — solo cambia el contenedor.
@@ -17,7 +25,7 @@ La revisión del Home público live contra el Why y PDR-012 confirma que el cont
 - PDR-010 y PDR-012 mandan sobre cualquier texto de este documento que suene a landing separada `/agencia`.
 
 > **Skills:** `commercial-expert` (overlay GH), `growth-marketing-cro`, `copywriting`, `digital-marketing`, `seo-aeo`, `product-design-loop`, `efeonce-public-site-wordpress`.
-> **Ejecución:** [`TASK-1358`](././tasks/to-do/TASK-1358-landing-agencia.md) (+ wireframe + flow + motion). Epic: `EPIC-019`.
+> **Ejecución:** [`TASK-1358`](././tasks/complete/TASK-1358-landing-agencia.md) (+ wireframe + flow + motion). Epic: `EPIC-019`.
 > **No-duplicación:** el sustrato ya vive en el context pack — este PDR **cita**, no copia: `docs/context/09_marca-agencia.md` (masterbrand + categoría "growth partner"), `docs/context/05_voz-tono-estilo.md` (voz + clichés a evitar), `docs/context/13_icp-buyer-personas-jtbd.md` (ICP mid-market/enterprise + BPs), `docs/context/02_gtm.md`, `docs/context/14_modelo-negocio-asaas.md` (oferta productizada).
 
 ## Contexto
@@ -145,5 +153,5 @@ efeoncepro.com/ (home) marca + ecosistema ASaaS · entrada primaria
 - Posicionamiento/GTM: `docs/context/09_marca-agencia.md`, `05_voz-tono-estilo.md`, `13_icp-buyer-personas-jtbd.md`, `02_gtm.md`, `14_modelo-negocio-asaas.md`.
 - PDR hermanos: [PDR-002](PDR-002-arquitectura-informacion-seccion-visibilidad.md) (IA/dos capas), [PDR-003](PDR-003-layering-ecosistema-digital-efeonce.md) (ecosistema), [PDR-004](PDR-004-landing-agencia-creativa-posicionamiento.md) (creativa · patrón de landing de marca).
 - IA/rutas: [route-ownership matrix](././operations/public-site-route-ownership-matrix-20260616.md).
-- Ejecución: [`TASK-1358`](././tasks/to-do/TASK-1358-landing-agencia.md) bajo `EPIC-019`.
+- Ejecución: [`TASK-1358`](././tasks/complete/TASK-1358-landing-agencia.md) bajo `EPIC-019`.
 - Skills: `commercial-expert`, `growth-marketing-cro`, `copywriting`, `digital-marketing`, `seo-aeo`, `product-design-loop`, `efeonce-public-site-wordpress`, `greenhouse-ux-writing`.

@@ -164,7 +164,10 @@ Reach es una product brand habilitadora, no una agencia ni un business unit cont
 compra acceso y distribución ante una audiencia; UGC compra principalmente un activo y sus derechos, por lo que
 deben modelarse como ofertas y economics distintos. Performance & Commerce debe modelarse como signal/data infrastructure,
 media/commerce operations, creative performance y governance, no como simple configuración de plataformas. IMO y Managed Media Operations son capas operativas, no servicios
-adicionales.
+adicionales. Desde 2026-09-10 Performance & Commerce tiene decisión, ficha y pricing pack propios
+(`docs/architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md`): una capability con dos motions por
+comprador —Demand & Commerce y B2B Pipeline—, canales como cobertura y nunca SKU, y programmatic vía partner con
+cláusula de transparencia.
 
 ### 3. Definir customer/value
 
@@ -442,6 +445,12 @@ resolución/duración, reintentos y costo efectivo por output.
 - Risk and governance register.
 - Investor translation brief.
 - Decision record and review date.
+
+Cuando el modelo se presenta al equipo o a un tercero como documento, se entrega como PDF A4 membretado con
+`report-studio` y el estándar `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md`: etiqueta de
+confidencialidad, sin códigos internos, rutas ni rastros de agentes, y cifras no aprobadas marcadas como tales.
+El PDF es un derivado: se regenera cuando cambian los documentos canónicos del modelo. Referencia viva:
+`docs/business-models/channel-commerce/deliverables/` y `scripts/documents/render-channel-commerce-business-model.mjs`.
 
 ## Verdicts
 

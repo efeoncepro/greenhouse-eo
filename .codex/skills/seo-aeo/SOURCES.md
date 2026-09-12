@@ -13,6 +13,12 @@
 > sola pasada de HTML unescaping. Se fijaron alcance, serialización canónica,
 > detección de doble escape y medición en `modules/01_SEO_TECHNICAL.md` §5.
 
+> **Delta 2026-09-10:** ASO y descubrimiento de apps verificados contra Apple
+> Developer, Apple Newsroom, Play Console Help, Android Developers Blog y OpenAI
+> Help Center. Datos en §5; método en `modules/10_ASO_APP_DISCOVERY.md`.
+> Todo lo de tiendas es 🔴: Apple y Google cambian la búsqueda de sus tiendas en
+> cada WWDC e I/O, sin documentar el algoritmo.
+
 ## 1. Niveles de volatilidad (qué reverificar y cada cuánto)
 
 **Verificado 2026-08-30:** [Search Central updates](https://developers.google.com/search/updates):
@@ -149,3 +155,37 @@ proveedor— y fecha. Nunca cites una cifra 🔴 de memoria en un entregable.
   (CrUX may-2026).
 - **Herramientas SoV IA:** Profound (G2 AEO Leader, $1B val), Peec, Otterly, Akii,
   Promptmonitor; pricing $19–$1.499+/mes.
+
+## 5. Tiendas de apps (ASO) — verificado 2026-09-10
+
+> Todo 🔴. Apple y Google no documentan el algoritmo de sus tiendas y lo cambian en cada
+> WWDC e I/O. ✅ = documento oficial · ⚠️ = vendor/comunidad ASO · ❌ = no hay dato público.
+
+| Dato | Marca | Fuente |
+|---|---|---|
+| Apple indexa nombre, subtítulo, campo de keywords (100 caracteres, coma sin espacios) y categorías primaria y secundaria | ✅ | [Apple — App Store search](https://developer.apple.com/app-store/search/) |
+| Ranking de Apple = relevancia textual + comportamiento (descargas, ratings y reseñas, "y más") | ✅ | idem |
+| Las App Store tags se generan con LLM desde la metadata de App Store Connect | ✅ | idem |
+| El texto de los screenshots cuenta desde junio de 2025, como señal débil | ⚠️ | [AppScreenshotStudio](https://appscreenshotstudio.com/blog/how-apple-ocr-indexes-app-store-screenshot-text-2026) · [Phiture](https://phiture.com/asostack/aso-trends-in-2026/) — Apple no lo documenta |
+| Hasta 70 Custom Product Pages; keywords asignables → aparecen en búsqueda orgánica; deep link iOS 18+ | ✅ | [Apple — Custom Product Pages](https://developer.apple.com/app-store/custom-product-pages/) |
+| Referir a una CPP sube la conversión 2,5 pp en promedio (base 1,6% en la ficha por defecto) | ✅ dato de Apple, ⚠️ como lift | idem — sin metodología publicada |
+| Personalized Collections + App Notes: Apps, Games y Search; en inglés EE.UU. desde junio de 2026 | ✅ | [Apple Newsroom, 2026-06](https://www.apple.com/newsroom/2026/06/apple-expands-app-store-capabilities-to-help-developers-grow-and-reach-new-users/) |
+| Creative Assets (imagen y video) en header y resultados de búsqueda; Asset Library sin release | ✅ | idem ("este año") |
+| App Intents vuelve descubribles acciones y entidades en Siri, Spotlight, Shortcuts y widgets; `IndexedEntity` da búsqueda semántica en Spotlight | ✅ | [Apple — App Intents](https://developer.apple.com/documentation/appintents) · [WWDC26](https://developer.apple.com/wwdc26/guides/apple-intelligence/) |
+| Fuentes de adquisición Apple: App Store Search, App Store Browse, App Referrer, Web Referrer, App Clips | ✅ | [App Store Connect — Acquisition](https://developer.apple.com/help/app-store-connect-analytics/acquisition/acquisition/) |
+| Google Play: título ≤30, descripción corta ≤80, descripción larga ≤4.000; no repetir palabras | ✅ | [Play Console — store listing best practices](https://support.google.com/googleplay/android-developer/answer/13393723) |
+| Ask Play (búsqueda conversacional + highlights), descubrimiento en Gemini, CSL generada por Gemini desde una keyword | ✅ | [Android Developers Blog — I/O 2026](https://developer.android.com/blog/posts/i-o-2026-what-s-new-in-google-play) |
+| Ask Play usa la ficha y el sitio web de la app como fuentes | ⚠️ | [Yellowhead](https://www.yellowhead.com/blog/ask-play-gemini-google-io-2026-aso-strategy/) · [Appbot](https://appbot.co/blog/google-ask-play/) — Google no lo detalla |
+| Fuentes de adquisición Google Play: Play Store (Search / Explore), Google Search orgánico, Google Ads, UTM, referidos de terceros | ✅ | [Play Console — acquisition](https://support.google.com/googleplay/android-developer/answer/6263332?hl=en) |
+| Desde julio de 2026 los reportes de ficha de Play miden clics (intención) en vez de adquisiciones | ⚠️ | Resumen de buscador sobre Play Console Help; no aparece en la página de adquisición consultada. Verificar antes de comparar series |
+| El directorio de apps de ChatGPT pasó a ser el Plugin Directory el 2026-07-09 | ✅ | [OpenAI Help Center](https://help.openai.com/en/articles/20001256-plugins-in-codex) (texto visto vía buscador; la página devuelve 403 a fetch) |
+| Cuántas instalaciones genera una recomendación de un asistente de IA | ❌ | No hay source type ni estudio público. No se cita |
+| App Store Search incluye los anuncios de Apple Ads; en iOS, Web Referrer solo cuenta Safari (Chrome → App Referrer) | ✅ | [App Store Connect — Acquisition](https://developer.apple.com/help/app-store-connect-analytics/acquisition/acquisition/) |
+| App Store tags: metadata + IA + curación humana; el developer solo puede deseleccionar; **solo EE. UU. y metadata en_US** | ✅ | [Apple — Manage app tags](https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-tags) |
+| App Store Connect solo ofrece Spanish (Mexico) y Spanish (Spain); CL, CO, MX y PE usan es-MX por defecto, con English (U.K.) como idioma adicional | ✅ | [Apple — App Store localizations](https://developer.apple.com/help/app-store-connect/reference/app-information/app-store-localizations/) |
+| Play Console: "Search" = nombre de la app o marca; "Explore" incluye búsquedas de categoría y autocompletado; existe la dimensión término de búsqueda | ✅ | [Play Console — user base](https://support.google.com/googleplay/android-developer/answer/9859173?hl=en) |
+| "70% de los visitantes usa la búsqueda" y "casi 65% de las descargas ocurre tras una búsqueda": App Store, mundial, **2022**, publicado por Apple Ads e incluye búsqueda pagada | ✅ con advertencia | [Apple Ads](https://ads.apple.com/app-store) — no presentarlo como dato actual ni orgánico |
+| Cuota móvil Android en páginas vistas web, ago-2026: CL 70,3% · MX 66,0% · CO 75,4% · PE 82,3% | ✅ | StatCounter ([CL](https://gs.statcounter.com/os-market-share/mobile/chile) · [MX](https://gs.statcounter.com/os-market-share/mobile/mexico) · [CO](https://gs.statcounter.com/os-market-share/mobile/colombia) · [PE](https://gs.statcounter.com/os-market-share/mobile/peru)) — mide web, no parque instalado |
+| "De 3 a 4 estrellas = +89% de conversión" y variantes | ❌ | Fuente original no localizada (se atribuye a una encuesta de intención de 2015). No se cita |
+| DataForSEO App Data: App Store cubre CL/CO/MX/PE; Listings solo EE. UU.; Google Play por país sin verificar | ✅ / ❌ | [Ubicaciones Apple](https://docs.dataforseo.com/v3/app_data-apple-locations/) · [pricing App Store](https://dataforseo.com/pricing/app-data/app-store) |
+| Investigación de mercado completa (taxonomía, precios, comprador, riesgos) | — | `docs/audits/commercial/ASO_SERVICE_MARKET_RESEARCH_2026-09-10.md` |

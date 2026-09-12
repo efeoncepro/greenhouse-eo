@@ -1,6 +1,11 @@
-# Efemérides y briefs sociales de Efeonce
+# Seasonalities y briefs sociales de Efeonce
 
-> **La barra de esta línea (PDR-020 §4.4): cada fecha demuestra una disciplina de la casa, nunca saluda.**
+> **Son seasonalities, NUNCA efemérides.** Una efeméride es una fecha conmemorativa puntual; una **seasonality
+> es una temporada con comportamiento propio de audiencia y mercado**, con ventana (antes, pico, después), que
+> varía por mercado y se planifica con anticipación. La unidad de trabajo es **la ventana, no el día** — por eso
+> Navidad se entrega en octubre. Una temporada puede sostener más de una pieza cuando la ventana lo justifica.
+>
+> **La barra de esta línea (PDR-020 §4.4): cada temporada demuestra una disciplina de la casa, nunca saluda.**
 > El estándar vivo son las 13 direcciones del plan 2026–2027: Halloween es un envase que pierde personalidad
 > por imitación (branding); el Día de la Usabilidad son fricciones digitales como obstáculos físicos (UX);
 > el Óscar es retirar una luz para cambiar una escena (dirección de arte). **Si la pieza no demuestra oficio,

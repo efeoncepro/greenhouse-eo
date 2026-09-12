@@ -4,6 +4,7 @@ Auditorias tecnicas y operativas del dominio Commercial de Greenhouse.
 
 ## Auditorias
 
+- [Channel & Commerce — Battlecards competitivas V1](CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md) — posición en el medio entre software de ejecución y agencias de servicio; battlecards de Touch Latam y Teamcore con vulnerabilidades, preguntas de discovery y dónde no competir.
 - [Trade Marketing, BTL y Field Marketing en Chile — Benchmark 2026-09-10](CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md) — peer set chileno en tres clusters, Snuuper y Treid como incumbentes de la tesis, llave en mano como estándar de contratación y veredicto `re-scope` para Channel & Commerce.
 - [HubSpot Services Market Benchmark 2026-08-30](HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md) — producto 2026, peer set de 11 partners, patrones de mediana/top quartile y decisiones para oferta, agentes, Revenue Hub y sectores.
 - [Salesforce Practice Skill Foundation 2026-08-27](SALESFORCE_PRACTICE_SKILL_FOUNDATION_2026-08-27.md) — funda tres skills para operar y vender CRM, Marketing Cloud Engagement y Marketing Cloud Next, con claims y reventa fail-closed hasta readback.

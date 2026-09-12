@@ -289,6 +289,9 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     // Reliability dashboard ahora detecta:
     //   - sync.outbox.unpublished_lag (events 'pending'/'failed' con edad > 10 min)
     //   - sync.outbox.dead_letter (events que agotaron retries — requieren humano)
+    //   - sync.reactive.circuit_open (ISSUE-172: breaker open/half_open o handler degradado —
+    //     esa projection NO procesa y sus eventos no dejan fila, así que ninguna señal de
+    //     dead-letter los ve; el intake de postulaciones estuvo detenido horas sin señal)
     moduleKey: 'sync',
     label: 'Event Bus & Sync Infrastructure',
     description:

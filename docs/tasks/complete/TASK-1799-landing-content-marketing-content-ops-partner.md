@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -20,14 +20,27 @@
 - Flow: `docs/ui/flows/TASK-1799-landing-content-marketing-content-ops-flow.md`
 - Motion: `docs/ui/motion/TASK-1799-landing-content-marketing-content-ops-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
-- Status real: `En progreso`
-- Rank: `TBD`
+- Epic: `EPIC-047`
+- Status real: `Publicada en /servicio-marketing-de-contenidos/ (page 242603, index/follow, verificado 2026-09-11); cerrada por decisión del operador con 8 criterios compuestos sin verificar`
+- Rank: `EPIC-047-cerrada`
 - Domain: `public-site|content|growth|seo`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; runtime público main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-09-11 — cerrada por decisión del operador
+
+El operador cerró la task porque la landing está publicada. Readback 2026-09-11:
+`https://efeoncepro.com/servicio-marketing-de-contenidos/` responde `200`, `meta robots` `index, follow`, título
+«Agencia de Content Marketing y Content Ops | Efeonce»; REST `pages/242603` devuelve `status=publish`
+(modificada 2026-08-31).
+
+Los 8 criterios sin tildar **no se verificaron en este cierre y no se dan por cumplidos**: experiencia sin JS,
+teclado y reduced motion; research SEO/AEO regional documentado; claims aprobados; formulario/scheduler con
+negative path y readback; GVC premium; scorecard; CWV; backup/rollback ensayado. Si alguno importa, se abre como
+task propia; esta no se reabre. No hubo cambios de código en este repo, así que el gate `pnpm test` + `pnpm build`
+no aplica.
 
 ## Publicación verificada — 2026-08-31
 
@@ -154,7 +167,7 @@ El renderer compartido incluye la variante `content_marketing` y restauración d
 [Mapa y límites de ownership](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md).
 La lista siguiente conserva artefactos de planificación; no prescribe rehacer el diseño aprobado.
 
-- `docs/tasks/in-progress/TASK-1799-landing-content-marketing-content-ops-partner.md`
+- `docs/tasks/complete/TASK-1799-landing-content-marketing-content-ops-partner.md`
 - `docs/ui/visual-directions/TASK-1799-landing-content-marketing-content-ops.md`
 - `docs/ui/wireframes/TASK-1799-landing-content-marketing-content-ops.md`
 - `docs/ui/flows/TASK-1799-landing-content-marketing-content-ops-flow.md`
@@ -595,7 +608,7 @@ No confundir sus PASS con aceptación del backend, GA4, scorecard premium o CWV 
 - [x] `docs/tasks/README.md` quedó sincronizado con el cierre
 - [x] `Handoff.md` quedó actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [x] `changelog.md` quedó actualizado si cambió comportamiento, estructura o protocolo visible
-- [ ] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas (2026-09-11: la citan TASK-1803, 1859, 1369 y 1353; sólo TASK-1803 la trataba como WIP y recibió Delta)
 
 ## Follow-ups
 

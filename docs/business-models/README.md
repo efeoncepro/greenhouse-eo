@@ -95,6 +95,7 @@ y producto, y los gates para evolucionar de Modular Production Lane a una experi
 - [`Channel & Commerce — Plan de apertura y prospección V1`](channel-commerce/CHANNEL_COMMERCE_PROSPECTING_PLAN_V1.md)
 - [`Benchmark del mercado chileno 2026-09-10`](../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
 - [`Channel & Commerce — catálogo de servicios`](../services/channel-commerce/README.md)
+- [`Channel & Commerce — documento para el equipo (PDF, uso interno)`](channel-commerce/deliverables/README.md) · [PDF](channel-commerce/deliverables/Efeonce-Channel-Commerce-Modelo-de-Negocio.pdf)
 
 Línea que gobierna la inversión de canal de marcas con distribución indirecta. En mercado se nombra **trade
 marketing**; internamente `Channel & Commerce`, porque su alcance excede la ejecución en punto de venta.
@@ -214,9 +215,19 @@ Todo business model debe separar al menos estas dimensiones:
   Agentic Readiness Audit como wedge prioritario de validación:
   Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms y Digital
   Automation & Integrations.
+- [Product Design 360 Business Model V1.1](product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) — `Proposed`;
+  **sexta familia propuesta de Wave**, todavía no aceptada en el ADR de boundaries. Motion primario: **extender la
+  capacidad de un equipo de product design in-house** vendiendo lanes de capacidad gobernada (feature delivery,
+  research, design system, accesibilidad, deuda de diseño, design ops), nunca diseñadores por hora. Incluye contrato
+  anti-desplazamiento y la distinción dura Managed Squad ≠ Staff Augmentation. Separa *decidir la experiencia* de
+  *construirla*, que permanece en Web Experience 360. No autoriza pricing ni venta general.
 - [Media & Distribution Business Model V1](media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md) —
   `Approved for validation`; tres soluciones comerciales, siete capacidades de delivery y Reach como product brand
   habilitadora. No autoriza pricing público ni venta general.
+- [Performance & Commerce Pricing Integrity Pack V1](media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md) —
+  `hypothesis_only`; fee mensual por tres niveles de complejidad con piso de 45%, Diagnostic y Sprint de precio fijo,
+  híbrido porcentual sólo como alternativa con piso, programmatic sin markup y regla de no doble cobro. Decisión:
+  [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md).
 - [Creator Influence & Content Business Model V1](media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md) —
   submodelo de Influencers, Creators & UGC; separa intelligence, activation, content, partnerships y whitelisting.
   `Approved for validation`; no autoriza pricing público ni venta general.

@@ -69,15 +69,25 @@ canal. La regla operativa está en la capa 4.
 ### 2. Tres ejes ortogonales que no se mezclan
 
 ```text
-TERRITORIOS (de qué hablas)  →  heredados de PDR-019
-FORMATOS    (cómo lo dices)  →  las líneas de la capa 4
-CANALES     (dónde vive)     →  los roles de la capa 5
+PILAR JTBD   (para quién y qué job)  →  Notion, 7 pilares — eje temático canónico
+TERRITORIO   (bajo qué se archiva)   →  PDR-019, taxonomía del blog WordPress
+FRANQUICIA   (qué forma recurrente)  →  las líneas de la capa 4
+CANAL        (dónde nace)            →  los roles de la capa 5
 ```
+
+**Son cuatro ejes ortogonales y una pieza bien formada declara los cuatro.** Un *Versus* (franquicia)
+puede servir al pilar *Operaciones Creativas (CSC)*, archivarse bajo el territorio *Inteligencia
+Artificial* y nacer en YouTube. **NUNCA** colapsar dos ejes en uno.
 
 Confundir los ejes produce listas de contenido inoperables. "Agentes" y "AEO" son territorios, no tipos de
 contenido; "talking head" es un formato, no un canal.
 
 ### 3. Los territorios se heredan del blog; social no crea taxonomía propia
+
+> ⚠️ **`Territorio Arc` (Notion) ≠ territorio de `PDR-019`.** Arc — Social Proof, CSC, AEO+SD, Nested
+> Loops, Agentic Web — es la **narrativa de marca** que gobierna los Pilares JTBD. `PDR-019` es la
+> **taxonomía de archivo del blog WordPress**. Son dos taxonomías vivas y distintas: **NUNCA** las
+> mezcles ni asumas que una reemplaza a la otra. El eje que este PDR hereda es el de `PDR-019`.
 
 Los territorios editoriales de los canales propios son los de la taxonomía canónica de PDR-019 —
 **AEO, Inteligencia Artificial, HubSpot, Loop Marketing, Growth, Diseño, SEO, Marketing Digital,
@@ -99,8 +109,9 @@ El sistema distingue dos cosas:
 
 | Canal | Formatos nativos |
 |---|---|
-| **Instagram** | proceso y construcción real con tropiezos · talking head de tendencia · trendjacking · **estacional (la fecha vista desde el oficio)** · cultura, equipo y talento (employer brand) — **no lleva casos de éxito**: su señal es reenvío, y una métrica B2B no se manda por DM |
-| **LinkedIn** | **contenido educativo** (post extenso y documento nativo) · **el corte del caso de éxito** · POV profesional que abre conversación · talking head en versión ejecutiva |
+| **Instagram** | proceso y construcción real con tropiezos · talking head de tendencia · trendjacking · **seasonalities (la temporada vista desde el oficio)** · cultura, equipo y talento (employer brand) — **no lleva casos de éxito**: su señal es reenvío, y una métrica B2B no se manda por DM |
+| **LinkedIn Página** | **contenido educativo** (post extenso y documento nativo) · **el corte del caso de éxito** · anuncios y posición institucional |
+| **LinkedIn Julio** | POV profesional en primera persona · talking head ejecutivo · el aprendizaje del build. **El runtime ya lo modela como canal separado**; la voz es la de `JULIO_REYES_VOICE_SYSTEM`, no la de la marca |
 | **YouTube** | long-form del experimento completo · tutorial y how-to (demanda de búsqueda) · webinar grabado · Shorts como anzuelo al long-form |
 | **Threads** | reacción rápida y trendjacking · opinión corta con criterio · hilo de aprendizaje en bruto · pregunta abierta a la audiencia |
 | **Blog** | artículos y Pillars · **casos de éxito completos** (canonical) · **tools y graders** · **webinars** · ebooks y lead magnets · data studies · archivo Glitch |
@@ -114,7 +125,7 @@ El sistema distingue dos cosas:
 | **Versus** | YouTube + Blog (data study) | Instagram: el resultado visual · LinkedIn: el veredicto y qué implica |
 | **Glitch** | Glitch (email) | Blog: archivo · Threads: el gancho · LinkedIn: la lectura de una noticia |
 | **Trendjacking** | Threads + Instagram | — reactivo; no se despieza a canales lentos |
-| **Estacional** | Instagram | LinkedIn: el argumento profesional detrás de la metáfora, sólo cuando la disciplina es legible para un comprador (ver capa 4.4) |
+| **Seasonalities** | Instagram | LinkedIn: el argumento profesional detrás de la metáfora, sólo cuando la disciplina es legible para un comprador (ver capa 4.4) |
 | **Casos de Éxito** | Blog (canonical) | LinkedIn: el corte que circula · sales enablement: la versión en video · landings: el dato citable |
 | **Educativo** | LinkedIn | Blog: la versión que responde a búsqueda (ver capa 4.1) |
 
@@ -179,42 +190,58 @@ una con su superficie y su trabajo.
   en landings y como pieza editorial en el blog. Si se decide un índice agregador, es decisión de producto
   aparte y depende del inventario de la decisión pendiente 2.
 
-### 4.4 Estacional: la fecha cultural vista desde el oficio
+### 4.4 Seasonalities: la temporada vista desde el oficio
 
 **Decisión (2026-09-10): se conserva como línea propia y permanente**, no como compromiso previo con
-vencimiento. Su razón de existir es **marca**: conecta a Efeonce con el calendario cultural de sus mercados
-(Chile, Perú, Colombia, México, Estados Unidos) hablando en el idioma de su propio oficio.
+vencimiento. Su razón de existir es **marca**: conecta a Efeonce con los momentos en que sus mercados
+(Chile, Perú, Colombia, México, Estados Unidos) cambian de comportamiento, hablando en el idioma de su oficio.
 
-Lo que la salva del post genérico de efeméride es que **cada fecha se cuenta como una demostración de una
-disciplina de la casa**, no como saludo. El plan vigente lo hace en las 13 piezas: Halloween es un envase que
-pierde personalidad hasta desaparecer por imitación (branding); el Día de la Usabilidad son fricciones
-digitales como obstáculos físicos (UX); el Óscar es retirar una taza o una luz para cambiar una escena
-(dirección de arte); el Día de la Poesía es un párrafo que pierde palabras hasta revelar un poema
-(copywriting); el Carnaval es una retícula editorial que empieza a bailar (diseño editorial).
+**Son seasonalities, no efemérides — y la distinción es operativa, no de vocabulario.** Una efeméride es una
+fecha conmemorativa puntual que se marca ese día. Una **seasonality es una temporada con comportamiento propio
+de audiencia y mercado**: tiene ventana (antes, pico, después), varía por mercado y se planifica con
+anticipación porque la demanda de atención se mueve antes que la fecha. Consecuencias directas:
+
+- **La unidad de trabajo es la ventana, no el día.** Por eso el plan vigente entrega Navidad en octubre y
+  Carnaval en noviembre: se produce para una temporada, no para una publicación.
+- **Son por mercado, no universales.** Canción Criolla es Perú, Velitas es Colombia, Super Bowl es Estados
+  Unidos. Una seasonality de un mercado no se publica indiferenciada a todos.
+- **Una temporada puede sostener más de una pieza** (entrada, pico, cierre) cuando la ventana lo justifica;
+  una efeméride, por definición, sólo una.
+
+Lo que la salva del post genérico es que **cada temporada se cuenta como una demostración de una disciplina de
+la casa**, no como saludo. El plan vigente lo hace en las 13 piezas: Halloween es un envase que pierde
+personalidad hasta desaparecer por imitación (branding); el Día de la Usabilidad son fricciones digitales como
+obstáculos físicos (UX); el Óscar es retirar una taza o una luz para cambiar una escena (dirección de arte);
+el Día de la Poesía es un párrafo que pierde palabras hasta revelar un poema (copywriting); el Carnaval es una
+retícula editorial que empieza a bailar (diseño editorial).
 
 | Atributo | Valor |
 |---|---|
 | **Canal-hogar** | Instagram — es craft y cultura, y la pieza es visual antes que argumental |
 | **Satélite** | LinkedIn, **sólo** cuando la disciplina de la metáfora es legible para un comprador |
-| **Qué recibe el satélite** | **el argumento profesional detrás de la metáfora**, desarrollado — nunca el mismo post con otro caption |
+| **Qué recibe el satélite** | **el argumento profesional detrás de la metáfora**, desarrollado — nunca la misma pieza con otro caption |
 | **Métrica** | sends + saves (que la pieza se reenvíe). **Nunca seguidores ni volumen de posts** |
 | **Trabajo** | afinidad de marca por demostración de oficio |
+| **Unidad de planificación** | la ventana de la temporada, por mercado |
 
 **Relación con Trendjacking:** son la misma familia — cultura — con **economía de producción opuesta**.
-Estacional se planifica con meses de anticipación sobre fechas conocidas; Trendjacking no se puede planificar
-y vive en una ventana de horas. Se complementan: una llena el calendario predecible, la otra aprovecha lo
-impredecible. **NUNCA fusionarlas en una sola línea**: tienen cadencia, aprobación y riesgo distintos.
+Una seasonality se conoce con un año de anticipación y se produce para su ventana; Trendjacking no se puede
+planificar y vive en una ventana de horas. Se complementan: una llena el calendario predecible, la otra
+aprovecha lo impredecible. **NUNCA fusionarlas en una sola línea**: tienen cadencia, aprobación y riesgo
+distintos.
 
 **Reglas:**
 
 - **NUNCA un saludo.** Si la pieza no demuestra una disciplina de la casa, no es de esta línea y no se publica.
   El estándar es el del plan vigente: una metáfora que sólo Efeonce podría firmar.
+- **NUNCA tratar una seasonality como una fecha.** Se planifica por ventana y por mercado; la fecha de
+  publicación es un hito dentro de la temporada, no la temporada.
 - **NUNCA publicar la misma pieza en Instagram y LinkedIn con caption distinto.** LinkedIn recibe el
   argumento desarrollado o no recibe nada.
 - **El plan 2026–2027 sigue vigente** (`docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md`):
   13 piezas, 5 mercados, con adaptación en inglés para Estados Unidos en Super Bowl y Óscar. Pendiente
   operativo heredado de ese plan: la conciliación tarea/calendario de MET-2339–2342.
-- El nombre operativo de la línea es **Estacional**; el equipo la opera hoy como "efemérides".
+- El nombre de la línea es **Seasonalities**, que es como la opera el equipo. **No es "efemérides"**.
 
 ### 4.2 El blog es multiformato, no un feed de artículos
 
@@ -232,7 +259,8 @@ y se reverifican contra su `SOURCES.md` antes de usarlas como argumento. Este PD
 | Canal | Rol | Señal que manda *(as-of 2026-07)* | Por qué ese catálogo |
 |---|---|---|---|
 | **Blog** | el **activo**: URL canónica, schema, citabilidad IA | orgánico + citación | es lo único que permanece y se cita; aloja lo que necesita URL estable |
-| **LinkedIn** | el **comprador** | dwell ≥61s; comentario con sustancia ≫ like | el texto extenso y el documento nativo son los que pagan dwell |
+| **LinkedIn Página** | la **marca ante el comprador** | dwell ≥61s; comentario con sustancia ≫ like | el texto extenso y el documento nativo son los que pagan dwell |
+| **LinkedIn Julio** | la **persona ante el comprador** | igual señal, mayor alcance orgánico personal | talking head, POV en primera persona, el corte del caso |
 | **YouTube** | la **profundidad** y el segundo buscador | watch time, session engagement | único canal con demanda real de long-form y de búsqueda de tutorial |
 | **Instagram** | el **craft y la cultura** | sends + saves (followers = señal débil) | el proceso visual y el tropiezo son lo reenviable |
 | **Threads** | la **conversación viva** | conversación y respuesta rápida | costo de producción casi nulo; premia la ventana temporal |
@@ -246,6 +274,21 @@ Glitch ya vive como newsletter semanal y como categoría raíz del blog (PDR-019
 **rail adicional de la misma franquicia**: el átomo social es el gancho, la edición email es el producto y el
 post de blog es el archivo. Un Glitch que nace y muere en una red social convierte un activo propio en alcance
 arrendado.
+
+### 7. El runtime manda sobre la ejecución; este PDR manda sobre la doctrina
+
+El sistema opera en Notion sobre tres bases encadenadas — **Pilares JTBD → Content Hub → Calendario
+de Contenidos** — mapeadas en `docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md` con sus IDs.
+
+- **NUNCA** proponer una estructura de contenidos sin leer antes ese mapa: el runtime tiene ejes que
+  la doctrina no inventó (tier, registro de voz, split, buyers BP1–BP8) y que siguen vigentes.
+- **NUNCA** crear en Notion un eje que duplique uno existente. Las franquicias de este PDR **no son**
+  pilares: se agregan como propiedad nueva, no reemplazando `Pilar JTBD`.
+- **NUNCA** ejecutar una mutación en Notion sin autorización explícita del operador. El mapa lista los
+  cambios propuestos en orden de menor a mayor invasividad; ninguno está aplicado.
+- Brechas conocidas del runtime al 2026-09-10: la Wiki tiene **89 páginas con `Etiquetas` vacío**; el
+  Calendario **no puede expresar franquicia, canal-hogar vs satélite, territorio ni las métricas que
+  este PDR declara** (sends, saves, watch time, dwell); `Tipo de pieza` conserva `Portafolio`.
 
 ## Reglas duras
 
@@ -318,9 +361,12 @@ tengan cadencia sostenida. YouTube depende además de la decisión 1.
 - **Glitch como marca social nueva** — convierte un activo owned en alcance arrendado y fractura una franquicia
   que ya opera en dos superficies.
 - **Abrir los cinco canales el mismo mes** — garantiza que ninguno alcance cadencia.
-- **Tratar el plan estacional como compromiso previo con vencimiento** — descartado 2026-09-10: su trabajo es
-  marca y sus piezas demuestran oficio, no saludan una fecha; entra al catálogo como línea permanente.
-- **Fusionar Estacional con Trendjacking** — misma familia cultural, pero economía de producción opuesta
+- **Tratar el plan de seasonalities como compromiso previo con vencimiento** — descartado 2026-09-10: su trabajo
+  es marca y sus piezas demuestran oficio, no saludan una fecha; entra al catálogo como línea permanente.
+- **Tratar las seasonalities como efemérides** — una efeméride es una fecha puntual; una seasonality es una
+  temporada con ventana, comportamiento de mercado propio y planificación anticipada. Confundirlas colapsa la
+  ventana en un día y borra la dimensión de mercado.
+- **Fusionar Seasonalities con Trendjacking** — misma familia cultural, pero economía de producción opuesta
   (meses de planificación vs ventana de horas) y distinto régimen de aprobación.
 - **Un catálogo de formatos común a todos los canales** — descartado en la revisión 1.1: confunde economía de
   producción con catálogo, replica piezas a canales cuya señal no las premia y ensucia cada canal con formatos

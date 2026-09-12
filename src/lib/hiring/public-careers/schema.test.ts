@@ -35,10 +35,38 @@ describe('parsePublicHiringApplication', () => {
     expect(parsePublicHiringApplication(null)).toBeNull()
   })
 
-  it('rechaza URLs de portafolio/LinkedIn no-https o peligrosas → null', () => {
-    expect(parsePublicHiringApplication({ ...valid, portfolioUrl: 'javascript:alert(1)' })).toBeNull()
-    expect(parsePublicHiringApplication({ ...valid, portfolioUrl: 'http://inseguro.com' })).toBeNull()
-    expect(parsePublicHiringApplication({ ...valid, linkedinUrl: 'data:text/html,x' })).toBeNull()
+  // ISSUE-172 — un enlace opcional jamás tumba la postulación. Antes `javascript:`/`data:`/`http:`
+  // devolvían null y dos personas reales quedaron fuera por escribir «linkedin.com/in/x» sin https.
+  it('descarta URLs peligrosas o ilegibles SIN rechazar la postulación', () => {
+    const dangerous = parsePublicHiringApplication({ ...valid, portfolioUrl: 'javascript:alert(1)' })
+
+    expect(dangerous).not.toBeNull()
+    expect(dangerous?.portfolioUrl).toBeNull()
+
+    const data = parsePublicHiringApplication({ ...valid, linkedinUrl: 'data:text/html,x' })
+
+    expect(data).not.toBeNull()
+    expect(data?.linkedinUrl).toBeNull()
+
+    const noHost = parsePublicHiringApplication({ ...valid, linkedinUrl: 'no-url' })
+
+    expect(noHost).not.toBeNull()
+    expect(noHost?.linkedinUrl).toBeNull()
+  })
+
+  it('normaliza a https los enlaces sin scheme y los http (caso real ISSUE-172)', () => {
+    const schemeless = parsePublicHiringApplication({ ...valid, linkedinUrl: 'linkedin.com/in/ada', portfolioUrl: 'ada.dev/work' })
+
+    expect(schemeless?.linkedinUrl).toBe('https://linkedin.com/in/ada')
+    expect(schemeless?.portfolioUrl).toBe('https://ada.dev/work')
+
+    expect(parsePublicHiringApplication({ ...valid, portfolioUrl: 'http://inseguro.com' })?.portfolioUrl).toBe('https://inseguro.com')
+  })
+
+  it('persiste el href canónico: slashes colapsados, percent-encoding, sin barra final en un origen pelado', () => {
+    expect(parsePublicHiringApplication({ ...valid, linkedinUrl: 'https:////evil.com' })?.linkedinUrl).toBe('https://evil.com')
+    expect(parsePublicHiringApplication({ ...valid, portfolioUrl: 'ada.dev/mi portafolio' })?.portfolioUrl).toBe('https://ada.dev/mi%20portafolio')
+    expect(parsePublicHiringApplication({ ...valid, portfolioUrl: 'https://ada.dev/' })?.portfolioUrl).toBe('https://ada.dev')
   })
 
   it('acepta URLs https válidas y las conserva', () => {

@@ -25,6 +25,7 @@ autoriza nombrarlos ante un cliente, asumir su capacidad ni incluirlos en una co
 | **A** | **Captura por misiones** | Auditoría de ejecución en PDV con evidencia verificable y geolocalización | Fase 2, sólo si el volumen y el acceso al dato crudo lo justifican |
 | **B** | **Personal de terreno** | Reposición, merchandising, remediación y ejecución de activación | Fase 2 empezando por field leads; nunca el ejército completo |
 | **C** | **Producción física** | Material POP, mobiliario, displays, stands, montaje, logística y permisos | **Nunca.** Se gobierna, no se opera |
+| **T** | **Plataforma de ejecución retail** | El software que detecta y prioriza quiebres, precio y cumplimiento | **Nunca.** Se opera la del cliente o se propone una; no se construye |
 | **D** | **Data de mercado** | Panel de hogares, retail measurement, share y contexto de categoría | Nunca — es dato licenciado de terceros |
 | **E** | **Financiamiento de capital de trabajo** | Anticipo de facturas emitidas | No aplica; es una relación financiera permanente |
 
@@ -41,7 +42,8 @@ Cada proveedor pasa por los 10 gates de §7 del operating model. Estos cinco son
 | **2** | **Cumplimiento laboral verificable** | En la capa B, la responsabilidad solidaria de la Ley 20.123 alcanza al cliente. Certificados al día no son burocracia: son condición de que el cliente pueda contratarnos |
 | **3** | **Acceso al dato crudo** | En la capa A, si el proveedor sólo entrega su dashboard, Efeonce no acumula histórico propio y la fase 3 nunca llega. Debe existir salida de datos exportable |
 | **4** | **Plazo de pago** | Un proveedor que cobra a 30 con un cliente que paga a 90 abre 60 días de hueco por ciclo. Ver §4 |
-| **5** | **Sustituibilidad** | Si sólo hay un proveedor posible para una capa, Efeonce no gobierna: depende. Se exige alternativa identificada antes de comprometer la capa |
+| **5** | **Acepta operar bajo el método de Efeonce** | Efeonce opera: fija el plan del ciclo, el estándar de scoring, el criterio de priorización y el control de calidad. Un proveedor que sólo trabaja con su propia metodología y su propio dashboard no sirve — obliga a Efeonce a revender su servicio en vez de operar el suyo |
+| **6** | **Sustituibilidad** | Si sólo hay un proveedor posible para una capa, Efeonce no gobierna: depende. Se exige alternativa identificada antes de comprometer la capa |
 
 **Regla de conflicto de interés.** Varios candidatos de las capas A y B compiten con la línea por la misma cuenta.
 Un proveedor que también vende directo al cliente final necesita acuerdo explícito de no-solicitación sobre las
@@ -62,6 +64,7 @@ Origen: benchmark de mercado 2026-09-10. **Auto-declarado, sin verificar, sin co
 
 | Candidato | Señal | Estado |
 |---|---|---|
+| Touch Latam | Desde 2003; Chile, Perú y Colombia; equipos de venta, trade, promotoría, impulso, BTL, staffing on-demand **y logística y almacenamiento** | No contactado · **posible conflicto**: portafolio llave en mano completo |
 | ECR Group | Outsourcing de reposición, PDV, logística y fuerza de venta | No contactado |
 | Masglobal | Outsourcing comercial y fuerza de ventas presencial | No contactado |
 | Novaprom | Se declara agencia de RRHH para trade: exhibición, rotación, reposición, promoción, supervisión | No contactado · **posible conflicto**: vende trade directo |
@@ -81,6 +84,23 @@ Origen: benchmark de mercado 2026-09-10. **Auto-declarado, sin verificar, sin co
 | *(fabricantes puros de POP y señalética)* | Sin oferta de trade propia | **Pendiente de identificar — perfil preferido** |
 
 El perfil preferido en la capa C es el fabricante puro: no compite y no tiene incentivo a saltarse a Efeonce.
+
+### Capa T — Plataforma de ejecución retail
+
+**Son competidores, no proveedores.** Figuran en este registro sólo porque en una cuenta que ya compró una de
+estas plataformas, Efeonce puede operar sobre ella en vez de atacarla. Eso es una táctica comercial de esa
+cuenta —rentabiliza una inversión ya hecha— y **no** una relación de partner. Su análisis competitivo vive en
+[`battlecards`](../../audits/commercial/CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md).
+
+| Candidato | Señal | Estado |
+|---|---|---|
+| Teamcore (Chile) | 500+ marcas, 20+ países, fusión con Tech-K respaldada por Accel-KKR, motor Nova | No contactado |
+| Frogmi (Chile) | Task management y ejecución en tienda, 50+ clientes en 10+ países, Endeavor | No contactado |
+| Trax · Storecheck · Involves | Reconocimiento de anaquel y ejecución, presencia regional | No contactados |
+
+**Hipótesis a validar, no conclusión:** algunas plataformas tienen programa de partners de implementación. Si
+existiera y aceptara a Efeonce, abriría acceso a cuentas que ya compraron el software y no tienen quién opere el
+ciclo. Hasta que haya evidencia de programa y de aceptación, siguen siendo competidores y nada más.
 
 ### Capa D — Data de mercado
 
@@ -156,6 +176,7 @@ Cada proveedor que entre a una propuesta debe tener esta ficha completa:
 | Economics | Tarifa, unidad, mínimos, plazo de pago, escalas |
 | Conflicto de interés | Vende directo al cliente final · acuerdo de no-solicitación |
 | Sustituto identificado | Quién ejecuta si este proveedor falla |
+| Acepta el método Efeonce | Plan, estándar de scoring, criterio de priorización y control de calidad |
 | Owner interno | Quién gobierna la relación |
 | Stop condition | Qué cambio de precio, acceso, calidad o disponibilidad la termina |
 

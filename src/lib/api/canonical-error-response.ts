@@ -52,6 +52,7 @@ export type CanonicalErrorCode =
   // Generic input / throttle / server codes (Coming Soon notify + reusable).
   | 'invalid_email'
   | 'invalid_period'
+  | 'invalid_request'
   | 'rate_limited'
   | 'internal_error'
   // TASK-1631 — External identity binding foundation (commands de operador + lane del gateway).
@@ -229,6 +230,13 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 403,
     message: 'Este recurso solo está disponible para usuarios de cliente.',
     actionable: false
+  },
+  // ISSUE-172 — validación genérica de un cuerpo/parámetro de request (admin ops). Antes las rutas
+  // lanzaban y el consumer veía un 502 con prosa inglesa cruda.
+  invalid_request: {
+    status: 400,
+    message: 'La solicitud no es válida. Revisa los datos enviados.',
+    actionable: true
   },
   invalid_email: {
     status: 422,

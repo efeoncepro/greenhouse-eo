@@ -23,6 +23,12 @@ pero no se presenta como una agencia o proveedor contractual separado.
 | **Agent Systems & Platforms** | Agentes propios o desplegados sobre plataformas gestionadas | Agent Strategy, Custom Agent System, Managed Agent Deployment, Integrations, Evaluation & Operations |
 | **Digital Automation & Integrations** | Workflows e integración de sistemas | API/Workflow Sprint, Data Pipeline, Automation Build, Integration Operations |
 
+**Sexta familia propuesta (no aceptada).** [`Product Design 360`](../product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md)
+está registrada como `Proposed`: diseño de superficies operables —web y producto digital— separando *decidir la
+experiencia* de *construirla y operarla*, que permanece en Web Experience 360. No modifica las cinco familias
+vigentes hasta que se cierre su gate G1. Delta en el
+[`ADR de boundaries`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md).
+
 ## Wedge prioritario para validación
 
 **Agentic Readiness Audit** es el wedge de entrada propuesto para Wave. Evalúa si la capa digital de una organización

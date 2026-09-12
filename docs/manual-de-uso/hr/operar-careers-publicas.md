@@ -9,7 +9,8 @@ Confirma:
 - `CAREERS_NATIVE_GROWTH_FORM_ENABLED` está en el estado esperado del ambiente
   si quieres probar el apply con el renderer nativo de Growth Forms;
 - `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` está en el estado esperado si vas a
-  validar la hoja editorial; permanece OFF por defecto hasta rollout;
+  validar la hoja editorial: está ON en Production y staging desde el 2026-08-18
+  (release `fa54670470c1`); el renderer legacy queda solo como rollback;
 - Turnstile y consentimiento están aprobados para el ambiente objetivo;
 - la ruta pública que vas a probar corresponde al ambiente correcto.
 
@@ -158,6 +159,34 @@ La distribución en redes o grupos externos ocurre **después** de publicar y ve
 7. Adjunta una imagen solo si el mecanismo de carga funciona; no fuerces ni eludas el selector de archivos. Publica sin imagen únicamente con autorización explícita y deja la decisión registrada.
 
 Conserva el registro de campaña bajo `docs/operations/hiring/` con opening, URL, copy aprobado, destinos, estado observado y moderaciones pendientes. Ejemplo: [distribución de Facebook del 2026-08-11](../../operations/hiring/2026-08-11-facebook-vacancy-distribution.md).
+
+### LinkedIn (perfil personal y página de Efeonce vía Metricool)
+
+Los pasos generales de arriba siguen vigentes. Para LinkedIn se programa por el conector de Metricool, con una variante por canal:
+
+1. **Verifica las fichas.** Abre `/public/careers` y el detalle de cada vacante que vas a difundir; confirma que responde y anota lo que dice (seniority, países, vinculación, proceso, beneficios, compensación). El post solo puede afirmar lo que la ficha afirma. Si quieres decir algo que la ficha no dice, confírmalo con el dueño y alinea la ficha por el command canónico.
+2. **Redacta dos variantes**, una para el perfil personal del operador y otra para la página de empresa. Cambia la redacción, no la verdad: roles, requisitos, países, beneficios, proceso y links son idénticos en ambas. En las dos:
+   - escribe en primera persona plural (`buscamos`, `trabajamos`, `te pagamos`), nunca en tercera persona sobre Efeonce;
+   - di qué es Efeonce en las primeras líneas, antes del "ver más" de LinkedIn (unos 210 caracteres), junto con lo que decide la postulación: remoto, países y proceso transparente;
+   - por rol, cuenta el problema que la persona resolverá y la evidencia que pedimos, no una lista de requisitos;
+   - da señales de confianza: vinculación por país, beneficios con su condición, sin trabajo gratis, respuesta siempre y plazo;
+   - pon un link de detalle por vacante (`https://greenhouse.efeoncepro.com/public/careers/EO-OPN-XXXX`), no un solo link al listado;
+   - no pases de 3.000 caracteres por post; cuenta cada variante.
+3. **Prepara la imagen.** Usa una sola pieza de marca con el logo real de Efeonce compuesto encima, alojada en el bucket público de campañas. Metricool la adjunta como imagen nativa del post, no como link.
+4. **Confirma con el operador.** Muestra ambas variantes, la imagen, la marca de destino, la fecha y la hora, y espera un sí explícito antes de programar.
+5. **Programa en la marca correcta.** En Metricool, la marca `Julio Reyes` (blogId `5105024`) es el LinkedIn personal del operador y `Efeonce Group` (blogId `3961547`) es la página de empresa. Elige la hora con la hora pico del canal (`getBestTimeToPostByNetwork`) y exprésala en hora de Chile.
+6. **Verifica en el calendario.** Consulta los posts programados y confirma que ambos quedaron en estado `PENDING`, en la marca, fecha y hora correctas, con la imagen adjunta. `PENDING` significa programado, no publicado.
+7. **Confirma la publicación después de la hora.** Revisa que ambos posts estén visibles en LinkedIn y registra el resultado. Si uno no salió, busca primero si quedó publicado o duplicado antes de reprogramar.
+
+Receta del canal: [companion de LinkedIn de la skill social](../../../.claude/skills/social-media-studio/efeonce/linkedin-vacancy-distribution.md). Registro de la primera corrida: [distribución de LinkedIn del 2026-09-11](../../operations/hiring/2026-09-11-linkedin-vacancy-distribution.md).
+
+Qué no hacer:
+
+- No reportes postulaciones "por LinkedIn" ni compares canales: Careers no guarda UTM ni canal por postulación (ver [Careers públicas](../../documentation/hr/careers-publicas.md), §Difusión externa y atribución).
+- No publiques el monto de equipamiento: el charter de beneficios lo prohíbe en avisos públicos.
+- No uses `rockstar`, `gran cultura` ni lenguaje con sesgo de género o edad.
+- No cambies rol, requisitos, países, beneficios, proceso ni links entre variantes.
+- No programes sin la confirmación explícita del operador, y no des por publicado un post que solo está programado.
 
 ## Pausar y reabrir una vacante viva
 

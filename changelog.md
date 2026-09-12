@@ -7,10 +7,295 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-09-10 — El contenido estacional entra al catálogo como línea propia de marca
+## 2026-09-12 — Bricolage Grotesque disponible para assets creativos Efeonce
 
-`PDR-020` rev 1.3 cierra la reconciliación con el plan estacional 2026–2027: se conserva como línea propia y
-permanente porque su trabajo es marca, no como compromiso previo con vencimiento. Lo que la distingue del post
+Se incorporó `BricolageGrotesque-Variable.ttf` desde el repositorio oficial de Google Fonts, junto con su licencia SIL
+OFL 1.1 y nota de procedencia/hash en `src/assets/fonts/`. `DESIGN.md`,
+`docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` y las skills espejo de tipografía, `design-studio` e
+`greenhouse-ai-image-generator` documentan su uso como display expresiva para campañas y piezas editoriales fuera de
+la UI. No cambia el runtime: Greenhouse mantiene Poppins + Geist como sus únicas familias activas de producto.
+
+## 2026-09-11 — Conocimiento de las «AI Skills» de DataForSEO incorporado a las skills propias
+
+Seis skills públicas del proveedor (licencia libre de uso, copia, modificación y redistribución) descargadas y
+analizadas como datos, más 62 páginas de la API AI Optimization y 11 templates n8n/Make. Ninguna se instala: duplican
+capacidades existentes y comprarían API fuera del ledger de gasto. Se incorporó el delta real —comportamiento de
+endpoints que falla en silencio (`domain_intersection` AND vs unión, `rank_scale: one_hundred` en `bulk_ranks`,
+`info.target_spam_score` ≠ `backlinks_spam_score`, lost-link spike derivado, asimetría V1/V3 en `historical_serps`,
+referencias de AI Overview anidadas en varios niveles) y el método (scoring de visibilidad en IA, umbral de
+significancia, higiene de denominador, canibalización SERP-first, 28 checks de cartera, offer bank). Las curvas de CTR
+del proveedor quedaron declaradas como discrepantes ~6× frente a las mediciones propias, que gobiernan.
+`ai_optimization` permanece fuera del allowlist. [RESEARCH-011](docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md).
+
+**Decisiones y consecuencias del mismo día.** Las cuatro preguntas abiertas quedaron resueltas:
+screening masivo de toxicidad (`TASK-1871`) y rotación de URL en el SERP derivada a costo cero de
+`seo_serp_top_results` (`TASK-1870`), ambas con `task:lint` limpio; disavow **descartado** como
+entregable automático, con el criterio de cuándo sí escrito en `seo-aeo/modules/05_OFFPAGE_AUTHORITY.md`;
+y gate de `rank_scale` implementado (`dataforseo-backlinks-rank-scale-guard.test.ts`, verificado en
+ambos sentidos), que destapó que `prospect/` pedía `rank` en escala 0–1000 sin declararlo — corregido.
+Abierto `ISSUE-170`: el link gap del diagnóstico de prospecto pasa hasta 5 competidores juntos a
+`domain_intersection` y el default `all` devolvería sólo los dominios que enlazan a todos; registrado
+con experimento definido, no afirmado. `project_context.md` compactado de 11.997 a 11.297 tokens con
+control de no-pérdida verificado (148 rutas antes y después). La copia de `seo-aeo` en `~/.claude/skills`
+quedó sincronizada con marcador de procedencia.
+
+## 2026-09-11 — CLAUDE.md: bloque del outbox a su companion y fila de Channel & Commerce en el router
+
+El bloque "Outbox publisher canónico" (TASK-773) se movió verbatim a
+`docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md` y en `CLAUDE.md` queda un puntero con sus
+dos reglas más peligrosas. Con ese espacio entra la fila de Channel & Commerce en el router de dominios, que el ADR
+`EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1` dejaba pendiente por el techo de 35.000 tokens; se retira del ADR la
+sección de pendiente. `pnpm claude-md check`: presupuesto al 98% y 0 huérfanos en ambos niveles del audit.
+
+## 2026-09-11 — Channel & Commerce: documento membretado del modelo de negocio para el equipo
+
+Se entrega el modelo de negocio de Channel & Commerce como PDF A4 de 19 páginas con membrete Efeonce, etiqueta
+"Confidencial · Uso interno" y sin rastros de trabajo interno de agentes
+(`docs/business-models/channel-commerce/deliverables/`). La fuente es HTML editable y la genera
+`scripts/documents/render-channel-commerce-business-model.mjs`: inyecta logos, URL bubble, contacto del catálogo y
+fuentes; pone el pie institucional en todas las páginas, incluida la portada; calcula el índice desde la página real
+y falla si alguna hoja desborda. `report-studio` y el estándar de marca de informes incorporan el patrón de hojas
+fijas, el QA de respaldo con poppler cuando falta PyMuPDF y las reglas para documentos internos. Sin cambios de
+runtime.
+
+## 2026-09-11 — EPIC-047: portafolio de landings del sitio público con orden de prioridad
+
+Las landings pendientes dejan de colgar de EPIC-019 (control plane técnico) y pasan a `EPIC-047`, que fija su orden
+de ejecución en el campo `Rank` de cada task. Se cierran por decisión del operador TASK-1799 (Content Marketing),
+TASK-1358 (Home), TASK-1351 (Redes Sociales) y TASK-1352 (Pillar HubSpot), publicadas e indexables; sus criterios de QA sin verificar quedan
+registrados. TASK-1402 y TASK-1404 salen del ranking de landings porque son artículos del hub HubSpot. ASO sube al segundo lugar por el pitch activo con Berel. Sin cambios de
+código ni de runtime público.
+
+## 2026-09-11 — Panel competitivo AEO multi-marca: primer caso real (SKY) y método documentado
+
+El AI Visibility Grader se corrió sobre SKY y cuatro competidores (LATAM, JetSMART, Avianca, Gol) en Chile con un
+set curado de 12 preguntas idéntico para todos, el mismo día y los mismos 5 motores (`EO-GRUN-00050`…`00054`).
+Resultado: LATAM 81,1 · JetSMART 72,7 · SKY 70,6 · Avianca 41,5 · Gol 37,3; informes web y PDF entregados y usados como
+paso de venta fuera de la licitación SEO. Sin cambios de código ni flags: perfiles y set creados con funciones de
+dominio y aprobaciones de revisión firmadas por el operador.
+
+Se documenta el método en tres capas (manual comercial, doc funcional, runbook del grader con § "Panel competitivo
+multi-marca", Delta de arquitectura) y en las skills `seo-aeo-practice` (módulo de la cuña, plantilla de correo,
+estado actual) y `seo-aeo` (overlay operativo del grader). Quedan registrados tres defectos medidos del grader, sin
+task todavía, y la capacidad gobernada del panel en `TASK-1861` Delta (d).
+
+## 2026-09-11 — Trendjacking «Nuestro Duo»: pieza híbrida, Short con Seedance 2.5 y 4 canales vía Metricool
+
+Primera operación de trendjacking end-to-end sobre el lanzamiento del iPhone Duo: investigación de las reacciones
+reales de marcas, pieza 4:5 con mockup de plegable (plate `gpt-image-2` con pantallas chroma + homografía + texto y
+logo determinísticos), Short 9:16 con Seedance 2.5 vía Higgsfield y programación en Threads, Instagram, LinkedIn y
+YouTube (marca Efeonce Group, etiqueta IA declarada). Registro con ids y aprendizajes en
+`docs/operations/social/2026-09-11-iphone-duo-trendjack.md`.
+
+Las skills `social-media-studio`, `copywriting`, `greenhouse-ai-image-generator` y `motion-design-studio` (Codex y
+Claude) y `GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md` incorporan lo aprendido: YouTube en Metricool solo acepta
+video; en video las pantallas las renderiza el modelo (el reemplazo con green screen se ve pegado) y se protegen con
+pantallas de texto grande + cada pantalla como referencia; `start_image` de Seedance no fija el encuadre, así que el
+overlay se diagrama midiendo el sujeto por frame; y el copy de trendjacking cita lo que las marcas publicaron, sin
+inventar su estado, con frases naturales y golpe.
+
+## 2026-09-10 — Performance & Commerce: paid media con dos motions, pricing por nivel y landing propia
+
+La solución de paid media de Media & Distribution vivía como sección del catálogo de la línea, sin precio, con un solo
+comprador B2C y sin decisión sobre programmatic ni partnerships de plataforma. Se propone su arquitectura V1
+(`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md`, `Proposed`): una capability con dos motions por
+comprador —Demand & Commerce, que optimiza hacia venta y margen, y B2B Pipeline, que optimiza hacia la etapa del CRM
+con LinkedIn, Search y ABM vía partner—; los canales son cobertura y nunca SKU ni página; programmatic y CTV se compran
+vía partner con cláusula de transparencia. Performance especifica la señal; Wave Measurement & Analytics la implementa;
+RevOps & CRM opera el lado CRM.
+
+Pricing Integrity Pack `hypothesis_only`: fee mensual por tres niveles de complejidad costeados con el catálogo
+Greenhouse (USD 2.400 / 5.900 / 11.800 al piso de 45%), Diagnostic y Sprint de precio fijo, híbrido porcentual sólo
+como alternativa con piso y programmatic sin markup. El SKU legacy `EFG-003` (asignado a Wave, con creatividad
+incluida y bajo el piso) queda en conflicto y se pide su retiro a Finance. Market update fechado con evidencia de
+demanda, plataformas, programas de partners, programmatic, precios Chile/LATAM y costo de talento; el registry suma
+diez relaciones de plataformas y medios, todas `No iniciado` salvo Google Ads (estado sin verificar).
+
+PDR-022 propone una spoke `/servicios/performance-marketing`: "agencia (de) performance marketing" tiene 480–590
+búsquedas al mes en Chile con KD 11–13, dato que PDR-008 no había medido. Sin páginas por plataforma. Nada autoriza
+precios públicos, badges, venta general ni implementación de la landing. Las skills `efeonce-pricing-operator` y
+`efeonce-business-model-operator` (Codex y Claude) y el router de contexto de agentes enrutan ahora a estos documentos.
+
+Canales emergentes (misma fecha): ChatGPT Ads entra como canal `selectivo` donde OpenAI lo habilita —self-service en
+52 países; en LATAM sólo Brasil y México, Chile no—, medido del lado del sitio porque la plataforma sólo entrega vistas y
+clics agregados; en Chile se ofrece preparación en composición con AEO. Nunca se vende como visibilidad orgánica. X Ads
+queda `selectivo` bajo pedido con brand safety de terceros; Perplexity queda `no disponible` (abandonó la publicidad).
+Partner programático: el CEO seleccionó a **Real Audiences** (DSP con operación en CL, CO, MX, PE y EE.UU.), usado
+primero en modo managed por briefing y después autogestionado con trader certificado; suma pDOOH y push como canales
+selectivos. Sin acuerdo firmado: fees, cláusula de transparencia, brand safety, CTV y ABM por confirmar. MiQ y TenX
+quedan como alternativas.
+
+Landing (2026-09-11): `TASK-1865` en `/servicios/performance-marketing/` con dirección "La señal" —firma interactiva
+`Clics / Ventas` que reordena las campañas sin cifras ni logos—, trece módulos semánticos, form `efeonce-performance-brief`
+con rango de inversión alineado a los niveles del pricing pack, y 301 desde la página legacy `242862`, que no se parcha:
+la página se construye desde cero. La investigación Semrush en cinco países mostró que no hay un término único —Chile
+busca "performance marketing"; Perú, México y Colombia, "publicidad digital"; Estados Unidos, en inglés—: el title combina
+ambas cabezas, el copy suma una línea de léxico y el FAQ pasa a catorce preguntas.
+
+## 2026-09-10 — Channel & Commerce: se abre la línea de trade marketing y BTL
+
+Efeonce no tenía oferta de trade marketing ni BTL; el dominio existía disperso (retail media en Media &
+Distribution, producción de piezas en Creative Services, medición en Wave) y nadie resolvía la pregunta del
+Gerente Comercial: qué pasó en la góndola, qué costó y dónde reasignar. Se abre **Channel & Commerce** con ADR
+`Accepted` (`EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1.md`), catálogo canónico de **23 servicios** en dos familias
+de mercado —13 trade + 9 BTL + 1 transversal— y `Managed Channel Operations` como modalidad que opera todos:
+Efeonce fija plan, estándar, validación de evidencia y accountability; la ejecución puede ser propia o de
+proveedor, y el fee remunera la operación mientras la ejecución de terceros va como pass-through.
+
+Evidencia de mercado fechada: el benchmark chileno encontró dos categorías ocupadas —software de retail execution
+(Teamcore, Frogmi, Trax, Storecheck) que detecta pero no ejecuta, y agencias de servicio (Touch Latam, Novaprom,
+Treid) que ejecutan pero reportan de forma descriptiva— y ninguna conecta la ejecución física con la inversión
+digital, que es la diferenciación de la línea. Battlecards con vulnerabilidades y reglas de conversación en
+`CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md`.
+
+Modelo económico en `Proposed` con gates G1–G6 abiertos: capital asignado CLP 40M que financia una cuenta ancla a
+la vez, tres fases con la oferta estable y el mix build/partner variable, y el working capital declarado como el
+riesgo que mata el modelo (se paga mensual y se cobra a 30–90 días; el factoring reduce el problema pero no cubre
+el tramo pre-factura). Invariantes duros: nunca staff augmentation de terreno —en Chile sería suministro de
+personal bajo la Ley 20.123—, nunca producción física propia, back-to-back o no se firma, y nunca prometer
+incremento de venta. **No** autoriza precios, claims, cobertura ni contratación de capacidad.
+
+Router: la fila quedó en `AGENTS.md` y en `agent-context-router.json`; **no** en `CLAUDE.md`, que está en su techo
+de presupuesto (34.973/35.000) y requiere liberar espacio primero — registrado como pendiente en el ADR.
+
+## 2026-09-10 — Product Design 360 canonizado: ADR propuesto, índice y enrutamiento de agentes
+
+Se crea `docs/architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md` en estado **`Proposed`** —capability única
+con dos ofertas por comprador, siete lanes, invariantes duros, condición de aceptación y alternativas rechazadas—,
+indexado en `DECISIONS_INDEX.md` bajo decisiones propuestas. Enrutamiento: dominio `product-design-360` en
+`docs/operations/agent-context-router.json` con **triggers específicos** (`Design Velocity`, `capacidad de diseño`,
+`equipo de diseño in-house`…) para no robarle enrutamiento al dominio `ui-platform`, cuyos triggers son genéricos;
+fila en el router de `AGENTS.md`. `CLAUDE.md` no se toca, siguiendo el precedente de Channel & Commerce del mismo
+día. **Canonizar no aprueba la oferta**: la vuelve fuente única, descubrible y enrutada; el estado sigue `Proposed`
+y el ADR declara qué lo haría `Accepted` (G1, Legal, piso de margen con loaded cost local, marco chileno de
+accesibilidad).
+
+## 2026-09-10 — Product Design 360: investigación de mercado, re-corte de lanes y corrección de doctrina
+
+Fan-out de cuatro investigaciones (dolor de equipos de producto, dolor de equipos de sitio público, oferta
+existente y huecos, efecto de la IA). Tres consecuencias.
+
+**Corrección de doctrina en `creative-practice`.** El comparable Superside decía ~USD 5.000/mes, tomado de un blog
+de tercero. Su propia página fija **mínimo USD 15.000/mes**, `Dedicated` desde USD 30.000/mes a 12 meses, +USD 1.000
+de software y compromiso anual — **error de 3×**. La afirmación "estamos en el mismo rango que Superside" era falsa:
+estamos muy por debajo, y eso pasa a ser pregunta abierta para Finance sobre si subvaloramos la capacidad. Corregido
+en `SKILL.md`, `modules/09_DISPLACEMENT.md` y `SOURCES.md` + espejo Codex, con comparables de product design que
+faltaban (Eleken USD 4.599–11.999/mes por diseñador dedicado, Awesomic, Penji, ManyPixels) y la señal de que Design
+Pickle retiró su precio público. **Regla derivada: todo comparable de precio se verifica en la página del proveedor.**
+
+**Arquitectura: capability única, dos ofertas, dos superficies.** El oficio de diseño es uno; los compradores son
+dos. Product Design 360 posee la capability y vende la superficie de producto (Head of Design → CPO/CTO); **Web
+Experience 360 conserva la superficie de sitio público** (CMO → Head of Digital) consumiendo la misma capability.
+Accesibilidad y design system/tokens son lanes **compartidas**, contratadas una sola vez por cliente. Regla
+anti-conflicto de canal: nunca dos ofertas de Efeonce por la capacidad de diseño de una misma cuenta.
+
+**Lanes re-priorizadas por evidencia, no por intuición.** Accesibilidad sube de 4ª a 1ª —único dolor con ley,
+medición independiente y tendencia empeorando: WebAIM Million verificado en fuente primaria, 95,9% de home pages
+fallando, 56,1 errores/página, +10,1% interanual revirtiendo seis años de mejora, con ARIA promediando 59,1 errores
+vs 42 sin ARIA—. Entrega de diseño baja de 1ª a 4ª por comoditización. Design system se re-corta: no es
+construirlo (buy-in 42%→32%, 7% de adopción completa, 5% mide ROI) sino **hacerlo adoptado y demostrable**. Se
+agrega L7, endurecer lo generado con IA, con evidencia de earnings de Upwork.
+
+**Y el moat se degrada a hipótesis.** La investigación no encontró a ningún comprador articulando que no pudo medir
+el cumplimiento de su proveedor: el hueco de accountability es de **oferta**, no demanda demostrada. Queda escrito
+como hipótesis a validar en G1, con la evidencia indirecta que sí existe (reclamos por opacidad) y su límite (casi
+toda de diseño de marketing, no de producto). Límites declarados de toda la investigación: cero mid-market, cero
+LATAM, y ninguna encuesta del sector sin un proveedor financiándola.
+
+## 2026-09-10 — Product Design 360 modelado como sexta familia propuesta de Wave
+
+UI/UX y product design no estaban modelados en ninguna parte: cero fichas en `docs/services/`, cero modelos en
+`docs/business-models/`. El ADR de Wave le daba a **Web Experience 360** el *diseño técnico, delivery y operación*
+de la web —construir y operar—, pero nadie poseía **decidir cómo debe ser la experiencia**; la disciplina caía
+entre Wave (ingeniería) y Globe (producción creativa). Se agrega
+`docs/business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md` (`Proposed`, 14 secciones,
+Operator & Buying Group Contract, 5 gates de validación) y la ficha
+`docs/services/wave/product-design-360.md` con seis servicios: Diagnóstico de Experiencia, Experience Design
+Sprint, Digital Product Design, Design System (build + gobierno), Experience Research & Validation y Design
+Operations. Alcance: web **y** producto digital (app, portal, SaaS, herramienta interna, superficie
+conversacional). Unidad de cobro de la línea recurrente: capacidad gobernada, nunca horas ni pantallas. El ADR de
+boundaries recibe un **delta fechado que no reescribe la decisión aceptada**: la sexta familia queda `Proposed` y
+su gate G1 (demanda externa) decide si se acepta en un ADR V2 o si se repliega a capability dentro de Web
+Experience 360. Evidencia declarada como capability interna (AXIS, UI Platform, GVC, Premium UI Delivery
+Standard), explícitamente **no** como caso de cliente. Se crea además `docs/services/wave/README.md`, primer
+índice de fichas de Wave. Sin pricing, sin claims públicos, sin venta general.
+
+**Corrección de tesis en la misma sesión (V1.1).** V1 asumía un cliente sin capacidad de diseño y listaba al
+diseñador interno como *blocker*. Estaba invertido: las empresas mid y grandes ya tienen product design in-house, y
+ese líder es el **comprador, el operador y el único con poder de veto**. El motion primario pasa a ser **extensión
+de capacidad**: se venden **lanes** de capacidad gobernada —Feature Delivery, Research & Validation, Design System,
+Accessibility, Design Debt & Consistency, Design Ops—, nunca diseñadores. Se agrega el **contrato
+anti-desplazamiento** (el cliente elige qué lanes conserva; Efeonce no posee visión ni roadmap; no se presenta a
+ejecutivos sin el Head of Design; la telemetría mide nuestras lanes, no a su gente) y la distinción dura **Managed
+Squad ≠ Staff Augmentation** con la deriva como métrica de alarma. Doctrina aplicada desde la skill
+`creative-practice` (in-housing, el comparable real, piso 45%, gobierno que no se descuenta). Comparables de
+mercado **verificados para product design** con fuente y `as-of` 2026 —senior product designer US ~USD 185k mediana,
+loaded 1,4–2,4× base, contractor embebido USD 80–135/h, ratio diseñador:ingeniero 1:2–1:1 en equipos maduros,
+deuda de diseño 10–20% del sprint— con **sesgo de proveedor declarado** y la advertencia de rehacer el cálculo con
+loaded cost chileno antes de usarlos (decisión abierta D7). Diseño integral queda como motion secundario.
+
+**Segunda corrección de la misma sesión: recurrencia y razón de compra.** El modelo estaba construido sobre señales
+de **disfunción**, lo que sesgaba el ICP hacia clientes con problemas, y sus lanes eran mayormente de **arreglo**,
+que termina. Se incorporan **tres razones de compra**: expansión de capacidad productiva (el roadmap creció y el
+equipo no alcanza), gap estructural permanente (no tiene ni tendrá research, accesibilidad o design system) y
+deterioro. **Las dos primeras son retainer desde el mes uno y no requieren conversión**; sólo el deterioro entra
+como proyecto. Para ese caso se agregan los **dos tiempos de una lane** —arreglar y sostener— con disparador de
+conversión declarado por lane y la regla de que todo SOW de arreglo declara el sostener que le sigue. El
+diagnóstico se reformula hacia adelante: deja de preguntar *"¿qué tienes roto?"* y pasa a **dimensionar la
+capacidad que exige el roadmap** contra la del equipo. Se agregan métricas de recurrencia (lanes en `run` ÷
+contratadas, conversión fix→run, drift en ventanas sin gobierno) y la regla de honestidad: **si el drift no sube
+cuando nos vamos, el retainer no se merecía**. Prospección: se busca a quien va a construir más de lo que su equipo
+alcanza a diseñar —señal pública y anticipable—, no a quien ya está en problemas.
+
+## 2026-09-10 — Conciliación bancaria ago–sep en producción, `fx_drift` cubre USD/MXN y rutina mensual (TASK-1858)
+
+Release `2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` (`released` 20:06Z, run `34523159501`, un solo
+intento): producción y el `ops-worker` sirven el fix de `ISSUE-169` (cuentas USD/MXN en unidades de la cuenta,
+día genesis materializado, piso de genesis reactivo), los adapters de cartola y las CLIs `finance:*`. El
+detector `finance.account_balances.fx_drift` deja de filtrar `currency = 'CLP'` y compara en la moneda de cada
+cuenta (tolerancia nativa 0,05); el remediator nunca auto-remedia filas no-CLP. Manual de conciliación v1.2 con
+la rutina mensual por cuenta y la decisión sobre facturas Nubox (siguen por plan `pay_expense`). OTB del CCA del
+accionista al 01/08/2026 = 2.141.867 (`estimated`). Retención SII de Humberly (jul/ago) asumida por la empresa
+por decisión del operador, registrada en Finance; Payroll sin tipo de ajuste para modelarla.
+
+## 2026-09-10 — El sistema de contenidos en Notion queda mapeado y PDR-020 se reconcilia con él
+
+Lectura MCP en vivo de las bases que operan el contenido de Efeonce. El sistema no es el calendario: son
+Pilares JTBD, Content Hub y Calendario encadenados, más la Wiki. El Content Hub es el taller donde se
+escribe el texto largo — artículos, ebooks, pillar pages, series, podcast, storytime, con ocho templates
+por tipo — y desde ahí el material se distribuye a Think o al sitio público WordPress. El mapa con IDs, schema vigente y brechas queda en
+[docs/operations](docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md).
+
+El mapeo corrigió dos supuestos de `PDR-020`, que se escribió sin conocer ese runtime. Existe una base de
+siete Pilares JTBD con job, buyers, tier, registro de voz y canales declarados: es el eje temático
+canónico y las franquicias del PDR son un eje ortogonal, no un reemplazo, de modo que una pieza bien
+formada declara cuatro ejes y no tres. Y `LinkedIn Julio` es un canal distinto de `LinkedIn Página` en
+las tres bases, con voz propia. También queda advertido que `Territorio Arc` no es el territorio de
+`PDR-019`: son dos taxonomías vivas y distintas.
+
+Tres fracturas medidas que el mapeo destapó. Existen dos bases de Calendario con schema idéntico: la
+anterior con 100 filas de histórico publicado y la vigente con 66 filas todas a futuro, y el histórico
+queda partido, de modo que cualquier promedio de velocidad operativa usa la mitad de la evidencia. El
+eje temático no se está usando donde importa: cero de las 66 filas del calendario vigente declaran
+Pilar JTBD, mientras el Content Hub y los Pilares siguen apuntando al calendario anterior. Y el destino
+de publicación que el operador declaró como flujo no tiene dónde vivir: el Content Hub sólo tiene
+Enlace, poblado en cinco de 41 piezas, sin propiedad que distinga Think de WordPress, que es
+justamente la decisión de host y canonical de PDR-018.
+
+Brechas previas que siguen abiertas: la Wiki tiene las ocho etiquetas definidas y las 89 páginas sin
+etiquetar; el Calendario no puede expresar franquicia, canal-hogar frente a satélite, territorio ni las
+métricas que la doctrina declara (sends, saves, watch time, dwell), y conserva `Portafolio` como tipo de
+pieza. La propuesta de cambios queda ordenada de menor a mayor invasividad y **ninguna fue aplicada**:
+no se creó, editó ni borró nada en Notion.
+
+## 2026-09-10 — Las seasonalities entran al catálogo como línea propia de marca
+
+`PDR-020` rev 1.4 cierra la reconciliación con el plan de seasonalities 2026–2027: se conserva como línea propia
+y permanente porque su trabajo es marca, no como compromiso previo con vencimiento. Son **seasonalities, no
+efemérides**, y la distinción es operativa: una efeméride es una fecha conmemorativa puntual, mientras una
+seasonality es una temporada con comportamiento propio de audiencia y mercado, con ventana y variación por país.
+La unidad de trabajo es la ventana, no el día — por eso Navidad se entrega en octubre — y una temporada puede
+sostener más de una pieza. Lo que la distingue del post
 genérico de efeméride es que cada fecha demuestra una disciplina de la casa — Halloween es un envase que pierde
 personalidad por imitación, el Día de la Usabilidad son fricciones digitales como obstáculos físicos, el Óscar es
 retirar una luz para cambiar una escena — y ese es el estándar declarado de la línea. Canal-hogar Instagram,
@@ -765,219 +1050,3 @@ rotación, runbooks, privacidad V2) y TASK-1834 (convergencia del login cliente)
 `DECISIONS_INDEX`, registries y READMEs sincronizados. Delta posterior el mismo día: el emisor se publica como segundo host
 del front door del gateway (sin LB ni Armor nuevos, ≈ USD 15/mes adicionales medidos contra el billing export) —
 ADR §Delta 2026-09-03 y TASK-1828 actualizados.
-
-## 2026-09-03 — TASK-1349: un `identity_only` ejecutado no es hecho de salida; purga de sujetos sintéticos (PR #220)
-
-Incidente «colaboradores fantasma» ~17:50Z: la pre-nómina de septiembre mostró seis `Colaborador <uuid>` «sin
-contrato» — sujetos sintéticos de `review-execute.live.test.ts`, inactivos con compensación abierta, admitidos por el
-roster relajado de Slice 2 y rescatados por `hasDecidedExitFact`, que contaba su caso `identity_only` ejecutado como
-salida decidida. Fix `0233f81e7` (`policy.ts` exige lane ≠ `identity_only`; `policy.test.ts`; el live test cierra
-compensación y desactiva en `afterAll`), en producción con PR #220 (`a824d073a`, manifest released 19:30:49Z). Datos:
-9 compensaciones cerradas con `closeCompensationVigencyAtExit`; 18:37Z purga de los 12 sujetos (253 filas,
-`scripts/workforce/purge-task1349-live-subjects.sql`, predicado sintético explícito; 265→253 members, 0 reales).
-Docs: `LIVE_TESTS_AGENT_INVARIANTS.md` §3 (nunca dejar compensación abierta en un sujeto sintético),
-`PAYROLL_WORKFORCE_AGENT_INVARIANTS.md`, decisión (2) en `GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`,
-runbook `offboarding-recovery.md` (readback previo por sujeto, lección Valentina; harness vs commands por `tsx`).
-
-## 2026-09-03 — Contratos y skills de reingreso sincronizados
-
-Arquitectura, invariantes, manuales, documentación funcional y runbooks reflejan compensación bruta/snapshots,
-proporcionales autorizados, identidad longitudinal, recuperación transaccional y verificación de consumidores.
-Skills de Payroll, Talent, Finance, Release, QA y arquitectura actualizadas para Codex/Claude; nuevo espejo
-Finance con gate. Tareas e índices ya no prescriben restaurar Valentina por SQL ni presentan la guarda como
-pendiente de deploy. [Cobertura documental](docs/audits/payroll/VALENTINA_DOCUMENTATION_SKILLS_CLOSURE_2026-09-03.md).
-Sin nuevas mutaciones de datos, flags o release. Prorrateo automático, resolución de ID público en off-cycle,
-UI TASK-1814 y bug de correlación de releases conservan su condición pendiente.
-
-## 2026-09-03 — Corrección de reingreso y recuperación de disponibilidad
-
-Las actualizaciones de member confirman identidad y auditoría de forma transaccional; la proyección legal no reabre relaciones terminadas. Recovery y detector comparten vigencia real de episodios. Comando compensatorio con preview, hash de estado e idempotencia sustituye el SQL puntual. [Decisión y contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md). Vercel Production y worker corregidos verificados; Valentina restaurada 18:38:48Z, contratos/pagos/usuario intactos. Proyecciones People completadas 18:42:05Z sin reabrir employee ni alterar datos protegidos. Release `33795564223` cerrado, manifest released 19:30:49Z, health success y watchdog ok; readback final intacto.
-
-## 2026-09-03 — TASK-1349 en producción (release `62356c9b7fd4`) — revisión contractual de offboarding, elegibilidad por episodio y writeback de lifecycle
-
-Cierre operativo posterior: Maggie y María Fernanda revisadas como despido y ejecutadas con fechas 29/06 y
-29/07; reader 4/4, unresolved=0 y nómina agosto lista. Runbook, manual, documentación funcional y skills
-Payroll/Talent Codex/Claude distinguen casos manuales del recovery SCIM y cierre de conciliación Finance.
-[Evidencia y método](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
-
-Cierra el circuito SCIM → decisión → nómina → lifecycle que la auditoría del 03/09 encontró incompleto (ISSUE-117,
-near miss del 06/07). Nómina: el resolver de elegibilidad elige el caso gobernante por relevancia temporal, sirve
-`contract_type_snapshot` (el threshold `international_internal` era inalcanzable), detecta reingresos y deja de tratar
-`members.active=false` como filtro histórico (un inactivo con salida el 02/06 conserva mayo íntegro); una salida sin
-resolver relevante al período mantiene al colaborador proyectado pero **bloquea calcular/aprobar** (readiness
-`unresolved_exit_signal`, `calculatePayroll` 409) y una falla del resolver ya no incluye a todos en silencio.
-Offboarding: command `reviewOffboardingCase` (`access_only` | `relationship_ended`, causal y fechas explícitas,
-`expectedUpdatedAt`, audit + outbox), guard «sin revisión no se aprueba» en el state machine, executor lane-aware
-(solo acceso no toca compensación/relación/member; término real termina relación con fecha real y desactiva member
-detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`, OFF), proyecciones honestas en la cola, tres señales
-nuevas, guards de ownership en SCIM y backfill BQ, capability `workforce.offboarding.review_case` (seed aplicado),
-rutas HR + carril `app`, y `pnpm workforce:offboarding:recovery` (dry-run ejecutado sobre la cohorte real; nada
-aplicado). Tras el release la nómina de septiembre bloqueará hasta resolver Felipe y Maria Fernanda: es el control
-buscado. **Rollout 2026-09-03:** PR #219 squash, orquestador `33779259694` `released` 16:45Z, `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`
-ON en Production+staging tras live smoke sintético (`review-execute.live.test.ts`). Pendiente del operador: recovery
-por allowlist (bloqueada al agente por permisos), causal de Felipe, conciliación Finance, UI TASK-1814.
-
-## 2026-09-03 — TASK-1806 seguimiento: alerta Teams determinista para drift de metodología ETV
-
-Nuevo cron `ops-seo-etv-drift-watch` (Cloud Scheduler, diario 12:00 America/Santiago, sin flag) en el
-ops-worker: lee la señal existente `seo.etv_methodology.drift` y avisa a Microsoft Teams sólo si
-`severity=error`, vía el dispatcher determinista `sendManualTeamsAnnouncement` y un destino nuevo
-`growth-seo-reliability-alerts` (mismo canal "EO - Admin" que `production-release-alerts`). Antes,
-la única forma de enterarse era abrir `/admin/operations`. Verificado en vivo (rev `ops-worker-00637-2ww`):
-respondió `warning`/`alerted:false`, correcto para el estado actual de la señal.
-
-## 2026-09-03 — TASK-1806: Improved ETV de DataForSEO en producción (rebaseline versionado)
-
-Release `bda12be7e33a` (PR #218, orquestador `33758619690`, manifest `released` 13:14Z, watchdog `ok`). El módulo
-SEO sirve desde hoy `improved_layout_clickstream_v2` en los siete caminos consumidores: ops-worker (`deploy.sh`,
-rev `00636-h6w`) y Vercel Production+staging con ambos selectores en improved; canary de contrato 13:15:26Z sobre
-los lanes de Berel. Antes: contract de schema ETV aplicado (`20260903103858964`), shadow `exact_ab` de 26 requests
-(USD 1,095) evaluado contra Search Console — improved 6× mejor calibrado en Berel (err. rel. 49 % vs 321 %),
-Jaccard 1,0 en páginas/subdominios, historia continua —, memo de decisión y aprobación del operador; drill de
-rollback en staging; rebaseline acotado (historia improved de Berel y Comex, USD 0,2568). Las cifras de tráfico
-estimado bajan ≈ 60 % por cambio de fórmula del proveedor, no por pérdida real; cada cifra declara `etvMethodology`.
-Efeonce se mide aparte de los clientes (guard de organización en celdas bulk). Writers `rowsWritten` ahora cuentan
-filas insertadas. Legacy sólo vuelve como rollback antes del corte 2026-11-01T00:00:00Z.
-
-## 2026-09-03 — Berel: cobertura por negocio, skills sincronizadas y minería trazable
-
-Decisión local del operador 2026-09-02: fortalecer elección, protección y aplicación, manteniendo color
-y paletas. [Estrategia](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md), inventario de 49 cuerpos,
-modelo/brief/manual/funcional y skills espejo Berel/SEO-AEO/DataForSEO actualizados; Playbook Notion
-ampliado y releído. [Discovery](docs/audits/seo/BEREL_CAPILLARY_KEYWORD_MINING_2026-09-02.md):
-14 runs Labs, 1.517 keywords distintas, 13 SERPs y 52 PAA; costo reportado US$1,23572.
-Mapa propuesto de 27 intenciones, no 27 artículos aprobados. No tracking, calendario, CMS ni release.
-Ampliación 2026-09-03: skill Berel y espejos incorporan completitud técnica por macropaso, correcciones
-acotadas y conciliación de producto; se retira la inferencia «campo CMS vacío = tiempo inexistente».
-Control técnico y caso Berelex Semibrillante en módulos 12/13; N29 corregido en Notion, artes y
-derivados pendientes, sin publicación. Evidencia: [QA de guardrails](docs/audits/seo/BEREL_TUTORIAL_GUARDRAILS_2026-09-03.md).
-Clasificación de piezas: 51 tareas corregidas y releídas; la skill exige tipo/canal/formato
-y excluye principales del conteo visual. [Auditoría y límites](docs/audits/seo/BEREL_PIECE_COUNT_CLASSIFICATION_2026-09-03.md).
-Tipo/canal obligatorios desde la creación de cada tarea visual, incluidos bloqueados; requisitos y
-checklists explícitos en banners, sociales y fotos. Se mantiene el esquema y la agrupación existentes.
-Distribución: cuatro opciones, no cuatro derivados obligatorios; módulo 15 y matrices por artículo.
-Playbooks Social/Producción en Notion alineados, Instagram Story corregido, contrato 8 artículos
-de 3.000–5.000 palabras/50 gráficas/3 videos y cortesía extendida a nov/dic registrados. Octubre
-excluido. Aclaración: 50 incluyen blog/RRSS; Blog/Facebook/Instagram/Pinterest. Priorización N52→Navidad
-aprobada: 4 banners N52 fuera del paquete, 4 banners y 2 sociales N59 creados. Distribución 50 gráficas
-
-- 3 videos por mes, con reservas técnicas/editoriales; 193 páginas modificadas releídas, sin pérdida de historial.
-
-Corrección de numeración verificada: [mapa por ID y readback 179/179](docs/audits/seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md).
-Skill Berel módulo 16: bloques mensuales completos, reserva de slots, cambios coordinados y aliases
-de archivos; no numerar por orden de trabajo. Se preserva el corte histórico descrito arriba.
-Complemento de `1fcc2ade3`: metodología de research SEO/AEO y DataForSEO versionada con su referencia
-canónica de minería, gate de espejos y documentación de priorización/brief/operación; sin cambios runtime.
-
-## 2026-09-03 — TASK-1805 en producción: foundation ETV versionada desplegada, selección legacy explícita
-
-Release `5ec4cf769977` (run `33698245254`): readers/lane/MCP sirven `etvMethodology`, señal `seo.etv_methodology.drift`,
-readback del selector en `/health` del ops-worker, selectores `legacy_static_v1` explícitos en Vercel y worker,
-gateway sincronizado. Canary de contrato en producción verde. Contract de schema parqueado con condición de 7 días
-(precondición de `TASK-1806`). Improved ETV no activado.
-
-## 2026-09-02 — TASK-1805: la fórmula detrás de `etv` pasa a ser identidad del hecho (foundation, todavía legacy)
-
-DataForSEO cambia el cálculo de `etv` bajo el mismo campo y corta legacy el `2026-11-01T00:00:00Z` sin exponer
-versión. Greenhouse deja de depender del default: una policy pura endpoint-aware construye `use_improved_etv`
-explícito por request (falla cerrado ante familia ignorada/no habilitada, config inválida o legacy desde el
-corte), las tres tablas ETV ganan versión + evidencia + instante UTC + policy (expand aplicado; filas previas
-`legacy_static_v1` por contrato, nunca por fecha; guard de corte en la base), los siete caminos consumidores la
-persisten, readers/API/MCP sirven UNA fórmula con `etvMethodology` y `not_available_for_method`, la señal
-`seo.etv_methodology.drift` compara configurado vs solicitado en Vercel y ops-worker, y un evaluador
-dry-run/replay compara valor, membresía del top-N, traffic cost y prospecto sin gastar. Contract de schema
-parqueado hasta el release. Estado: code complete, rollout pendiente; Improved ETV NO activado (`TASK-1806`).
-
-## 2026-09-02 — DCR deprecado en MCP `2026-07-28`: el shim del gateway se queda, pero deja de ser el futuro
-
-La revisión Current del protocolo marcó Dynamic Client Registration como `Deprecated` (PR #2858),
-migración a Client ID Metadata Documents, retiro más temprano en la primera revisión publicada en o
-después de 2027-07-28. El shim se mantiene porque la excepción está redactada para nuestro caso exacto:
-DCR se retiene _"for backwards compatibility with authorization servers that do not support Client ID
-Metadata Documents"_, y Entra no soporta ninguno de los dos — su única vía oficial es el pre-registro,
-que es justo lo que `POST /register` devuelve.
-
-Lo que cierra la pregunta de fondo: **CIMD no es implementable en la capa del shim.** Es capacidad del
-authorization server, el AS es Entra, y el gateway espeja `authorize`/`token` en lugar de proxearlos;
-soportarlo exige emitir los tokens, o sea el broker que `TASK-1631` ya está eligiendo con CIMD entre sus
-requisitos. No hay task paralela que abrir.
-
-En el camino aparecieron tres cosas que la evaluación no buscaba. La misma revisión agregó texto que no
-existía en `2025-11-25` —el `issuer` de la metadata debe ser idéntico al identificador con que se
-construyó la well-known URL— y los nuestros difieren desde que el shim existe; funciona sólo porque los
-clientes todavía no lo aplican. El `client_id` estático compartido, con `http://localhost` sin puerto
-entre sus redirect URIs y el consentimiento cacheado por Entra, reproduce la forma del confused deputy
-aunque la letra del `MUST` no ate: lo acota que ese cliente no lleve scopes de escritura, una regla
-escrita por otra razón que resulta ser la que limita el daño a lectura. Y esa misma aplicación se llama
-"Local Canary Client" cuando es el cliente compartido de producción, de modo que quien la audite por el
-nombre concluirá lo contrario de lo que debe.
-
-El horizonte del shim no lo fija el calendario de la spec sino el día que un cliente endurezca
-cualquiera de las dos validaciones. Para ese día queda declarado un plan B de pre-registro puro que no
-toca Entra ni el modelo de tokens.
-
-## 2026-09-02 — un release quedó huérfano en `main` y se recuperó sin ensuciar el control plane
-
-La promoción `develop→main` (PR #215, 726 archivos, 1490 commits, 2 migraciones) entró a `main` a las
-`20:51:04Z` y quedó **sin manifest**: la sesión que la promovía fue archivada por accidente antes de dispatchar
-el orquestador. Otra sesión la retomó con autorización directa del operador y cerró el ciclo: run `33683893124`
-completed/success en 11m50s, `release_id` `375f56e24187-546f452b-c60f-4617-9974-9c87760c3ab9`, estado final
-`released`, con los dos gates `production` aprobados en 34 s y post-release health verde.
-
-Tres verificaciones que no se dieron por hechas. El skip del `ops-worker` (51 s, step `Deploy` en `skipped`) se
-validó con el **diff de árbol completo** y con `pnpm worker:deploy-path-gate` —1451 archivos del bundle, todos
-cubiertos; `src/mcp` no entra, lo sirve Vercel—, no con la lista del change-gate. El `data_missing=4` del
-watchdog se trató como falta de evidencia y no como drift: la lectura autoritativa fue `pnpm release:workers`,
-3/4 workers en el target. Y el canary de contrato del lane MCP `skills` se corrió **después** del `released`,
-con asserts que sólo el contrato nuevo puede producir.
-
-Flags: `GROWTH_SEO_SITE_FINDINGS_ENABLED` prendido en el ops-worker con los dos pasos, tras probar **por blob**
-que el evaluador desplegado es idéntico al de `main`. `HIRING_FAIRNESS_MONITOR_ENABLED` NO se prendió: daría
-cero en silencio en una métrica de equidad hasta que cierre `TASK-1365`.
-
-## 2026-09-02 — la práctica Salesforce se canoniza como oferta por outcomes y lifecycle
-
-La práctica Revenue Operations & CRM incorpora una arquitectura comercial Salesforce en cuatro fases:
-Diagnose & Architect, Implement & Integrate, Activate & Adopt y Operate & Evolve. El contrato separa CRM core,
-Marketing Cloud Engagement y Marketing Cloud Next; define carriles de solución, ICP/anti-ICP, operator y buying
-group, delivery, métricas, límites de claims y gates de madurez. El estado queda `Approved for validation`: no
-autoriza todavía partnership, badge, certificaciones, reventa, pricing, casos ni Product Service comercialmente
-aprobado sin evidencia y sign-offs propios.
-
-## 2026-09-02 — MCP: el manual de uso viaja por el protocolo (TASK-1804, released)
-
-La superficie MCP gana un segundo canal de conocimiento de uso: un manifiesto de manuales
-(`skill-manifest.ts`) hermano del de tools, tres `SKILL.md` publicables en `docs/mcp/skills/`
-(`seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop`), la tool `get_greenhouse_skill`,
-el recurso `skill://efeonce/<name>/SKILL.md` y la lane ecosystem `GET /api/platform/ecosystem/mcp/skills[/{name}]`,
-todos sobre el mismo reader. Los cuerpos viajan en el bundle como artefacto generado (`pnpm mcp:skills:generate`
-/ `mcp:skills:check`): leerlos del filesystem exigía `outputFileTracingIncludes` y Vercel rechazó el build (función sola
-de 397 MB). Publicar es un acto explícito (drift manifiesto↔filesystem no construye el
-servidor), un binding de cliente no sabe que los manuales existen (404 anti-oráculo) y la fuga de contenido
-interno la controla un test. Las `instructions` del handshake rutean al manual en vez de contener el
-procedimiento de gasto. El gateway federa la tool con su propio guard de paridad no-SEO (desplegado,
-`efeonce-mcp-gateway-00028-pmx`) y la lane salió a producción en el release `375f56e24` del mismo día, con canary de
-contrato verde contra producción. Sin Entra, flag ni persistencia nuevos. Follow-up del mismo día: un agente Claude Code
-real cargó el manual por el front door OAuth, y el catálogo creció a seis manuales (discovery→tracking, salud técnica,
-diagnóstico de prospecto) sin tocar la tool ni el gateway; los seis salieron a producción en el segundo release del día
-(`4379c495013f`) con canary de contrato verde. Barrido documental posterior por subagentes: manuales de uso del
-inventario MCP/gateway/provider SEO, docs funcionales de API Platform y gateway, deltas en arquitectura API/ADR del
-gateway/patrones canónicos/arquitectura SEO, skills `dataforseo-operator` y `seo-aeo-practice`, y README/AGENTS del
-repo `efeonce-mcp`.
-
-## 2026-09-02 — ANAM: entrega premium de Emma y soporte explícito de tres meses
-
-Se consolidó el cierre de la landing, identidad y handoff de Emma en dos PDF de cinco páginas: una especificación
-técnica y una guía funcional. Los HTML/CSS son la fuente editable; los PDF, el master para cliente. Se revisaron
-diez páginas rasterizadas, fuentes Poppins/Geist embebidas, composición, overflow y pies con sitio, correo,
-teléfono y dirección. La captura final de la landing quedó versionada y los borradores Word supersedidos fueron
-excluidos del paquete.
-
-El borrador de correo para Óscar, María Paz, Pablo y Marco explica los cambios de landing e identidad, la matriz
-de routing y el límite de las pruebas E2E. Quedó listo, no enviado. También registra el SharePoint consolidado
-como compromiso pendiente para esta semana.
-
-La documentación y las skills espejo ahora fijan el soporte de Customer Agent y KPI en tres meses, del
-2026-08-13 al 2026-11-12 inclusive. Soporte cubre el alcance construido; nuevas funcionalidades, KPI, workflows,
-automatizaciones, integraciones, rediseños e innovación requieren un alcance separado. No se cambió runtime
-HubSpot, no se envió correo, no se creó SharePoint y no se hizo push.

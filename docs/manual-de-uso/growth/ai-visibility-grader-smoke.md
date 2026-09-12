@@ -1,7 +1,7 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.15 · **Ultima actualizacion:** 2026-08-27 por Claude (TASK-1652 — sanity de AI Mode + semántica del `skipped:no_ai_overview_block`)
+> **Version:** 1.16 · **Ultima actualizacion:** 2026-09-11 por Claude (panel competitivo multi-marca: procedimiento, trampas del input y límites medidos; notas de corrección sobre `/score` manual y formato de `market`)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
@@ -20,6 +20,11 @@ Antes de una corrida real:
 5. documenta la evidencia en [`AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md`](../../audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md).
 
 ## Estado actual del rollout (2026-06-29)
+
+> **Nota 2026-09-11:** este bloque es el snapshot del 2026-06-29 y no se reescribió entero. Medido el 2026-09-11:
+> staging y producción **comparten `greenhouse_growth`** (un token publicado desde staging renderiza en el hub
+> productivo `think.efeoncepro.com`), y el flag de prompts por arquetipo está ON en staging (un run usa el set activo
+> de su perfil). Ver [Panel competitivo multi-marca](#panel-competitivo-multi-marca).
 
 - **staging:** grader ON. El worker efectivo (`ops-worker-00418-2m6`) tiene `GRADER`, OpenAI, Anthropic, Perplexity, Gemini, Google AI Overview, probes, agentic readiness, entity probes, email, HubSpot y re-grade ON. Gemini usa **Gemini 3** (`gemini-3-flash-preview` via Vertex grounding; ajustable con `GREENHOUSE_GEMINI_GROUNDED_MODEL` sin redeploy).
 - **Google AI Overview / AI Mode (TASK-1265):** ON en staging via DataForSEO. Usa `DATAFORSEO_API_LOGIN` + `DATAFORSEO_API_PASSWORD_SECRET_REF`; no scrapea Google directo. Si Google/DataForSEO no devuelve bloque AI Mode, la observation queda `skipped:no_ai_overview_block`, no `succeeded` vacío. Desde TASK-1652 (2026-08-27) ese skip queda **reservado a tasks realmente ejecutadas** (`status_code=20000`): un fallo per-task del proveedor se registra `failed:provider_error` con el código en `usage.dataforseo_status_code`. DataForSEO reporta costo por request, no por tokens.
@@ -132,9 +137,20 @@ pnpm staging:request /api/admin/growth/ai-visibility/runs/<runId>
 
 Campos del body POST: `brandName`/`market`/`locale`/`category` (requeridos), `mode` (`light`/`full`/`internal_audit`), `runKind` (default `smoke`), `websiteUrl`/`competitorsDeclared`/`onlyProviders`/`discoveryOnly`/`idempotencyKey` (opcionales). Respuesta: `{ run, observationCount, idempotentHit, costGuardTripped }`. Con `idempotencyKey` repetido NO reejecuta (devuelve el run previo).
 
+> **Nota 2026-09-11 (trampas medidas del input):** `market` va como **nombre** (`"Chile"`), no como ISO: el ISO se
+> interpola crudo en los prompts ("…en CL"), y fuera de CL/MX/CO/PE/US un ISO cae a Estados Unidos en el provider de
+> Google AI. `category` debe resolver en la taxonomía (`taxonomy/catalog.ts`). La ruta **no acepta `businessModel`**:
+> sin set activo en el perfil, el run sale con el pack genérico de 7 preguntas (`gn01`–`gn07`). El perfil se identifica
+> por marca + mercado + locale y sus competidores quedan fijos desde el primer run. Detalle y resto de trampas en
+> [Panel competitivo multi-marca](#panel-competitivo-multi-marca).
+
 ### 4. Puntuar un run (normalización + score — TASK-1227)
 
 Una vez que un run tiene observaciones, se computa el score (determinista, recomputable):
+
+> **Nota 2026-09-11:** en un run ejecutado por el **worker async** (staging), no llames `POST /score` ni publiques a
+> mano: el worker ya puntúa, corre los probes y auto-publica el informe (~30 s después de terminar). Un `POST /score`
+> manual pisa la extracción de prosa que hizo el worker. Espera al worker y lee el detalle del run.
 
 ```bash
 # Computar/persistir el score de un run (capability run.execute, idempotente)
@@ -277,7 +293,7 @@ gcloud scheduler jobs pause ops-growth-grader-regrade \
 
 ## Leer el reporte de un run (TASK-1235)
 
-Una vez que un run tiene puntaje persistido (corriste `POST /runs/[runId]/score`), puedes leer su **reporte** derivado:
+Una vez que un run tiene puntaje persistido (lo puntuó el worker async o, en un run inline, corriste `POST /runs/[runId]/score` — ver la nota 2026-09-11 del paso 4), puedes leer su **reporte** derivado:
 
 ```bash
 pnpm staging:request /api/admin/growth/ai-visibility/runs/<runId>/report --pretty
@@ -393,6 +409,162 @@ node scripts/verify-report.mjs \
 Esperado: HTTP 200 en 1440/1280/390, `scrollWidth == clientWidth`, sin leaks visibles ni claves internas. Si `category` viene `unknown` o sin categorías, la sección de categoría puede no renderizar; eso es correcto.
 
 Regla de diagnóstico: si el render necesita calcular Share of Model, benchmark, readiness, sentimiento, totales de citas o next step localmente, el contrato está incompleto. Agrega el fact en Greenhouse y sólo después simplifica el renderer.
+
+## Panel competitivo multi-marca
+
+> Agregado 2026-09-11 por Claude. Caso fuente: panel SKY vs LATAM, JetSMART, Avianca y Gol (`EO-GRUN-00050`…
+> `EO-GRUN-00054`, staging, modo `full`, mercado Chile). **Mientras no exista TASK-1861 esto es un procedimiento de
+> operador**, no una capacidad gobernada. Cómo presentarlo en venta:
+> [Panel competitivo AEO](../../documentation/comercial/panel-competitivo-aeo.md). Contrato técnico: §Delta 2026-09-11 de
+> la [arquitectura](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md).
+
+**Qué es:** correr el grader sobre N marcas (el cliente + sus competidores) con **el mismo set de preguntas curado, el
+mismo día, el mismo mercado y los mismos 5 motores**, para que los informes sean comparables entre sí, y después
+leerlos juntos (análisis cruzado). Sirve en la operación con un cliente contratado y como paso de venta (evidencia antes
+que promesa).
+
+**Tiempos de referencia (caso SKY):** ~17 min por run; el worker llegó a ejecutar 2 en paralelo; los 5 runs en ~1 h.
+Cada run `full` con 12 preguntas deja 60 observaciones (12 × 5 motores).
+
+### 1. Diseñar el set de preguntas
+
+- Parte de demanda real: Semrush `phrase_these` + `phrase_questions` con la database del mercado (`cl` para Chile) para
+  priorizar segmentos.
+- Redacta preguntas conversacionales con la situación del usuario, no keywords.
+- Mezcla del caso SKY (12 preguntas): 8 de descubrimiento sin marca (presupuesto, equipaje, ruta sur, negocios,
+  Argentina, Brasil, Perú/Colombia, familias + mascotas); 1 comparativa anclada en el cliente, con **texto literal
+  idéntico en todos los runs** ("¿Qué alternativas hay a SKY…?"); 3 que nombran la marca de cada run con `{{brand}}`
+  (reputación 2026, reclamos, identidad).
+- Máximo **12 preguntas** en modo `full`. Tags sólo del vocabulario cerrado (`prompt-packs/tag-vocabulary.ts`):
+  `family`, `fanOutType`, `intentStage`, `namesBrand`.
+
+### 2. Crear los perfiles y activar el set (script local)
+
+No hay ruta HTTP para esto. Un script local, **firmado por el operador**, llama funciones de dominio (con el proxy de
+PostgreSQL arriba: `pnpm pg:connect`):
+
+1. `findOrCreateGraderProfile` (`src/lib/growth/ai-visibility/store.ts`) por cada marca del panel.
+2. `createGraderPromptSetDraft` + `approveGraderPromptSet` (`src/lib/growth/ai-visibility/prompt-packs/prompt-set-command.ts`),
+   capability `growth.ai_visibility.prompt_set.manage`, con el sujeto armado desde `getTenantAccessRecordByUserId`
+   para el usuario del operador.
+3. Registra el set con `generation_strategy: 'template_baseline'` (el enum sólo admite `llm | template_baseline`) y la
+   procedencia `operator_curated:<caso>` en `grounding_sources`.
+4. Aprobar **activa directo**: supersede el set activo previo del perfil.
+
+### 3. Encolar los runs
+
+Encola primero **un** run y verifícalo antes de encolar el resto:
+
+```bash
+pnpm staging:request POST /api/admin/growth/ai-visibility/runs \
+  '{"brandName":"<Marca>","websiteUrl":"https://<sitio-de-la-marca>","market":"Chile","locale":"es-CL","category":"aerolinea de pasajeros","competitorsDeclared":["<Competidor 1>","<Competidor 2>"],"mode":"full","runKind":"internal_audit","idempotencyKey":"<caso>-<marca>-<fecha>"}'
+```
+
+El run usa el set activo del perfil si el flag de prompts por arquetipo está ON (staging ON). **Verifica** que el run
+quedó con el set y con las 12 preguntas:
+
+```sql
+SELECT public_id, prompt_set_id, prompt_set_version, jsonb_array_length(execution_prompts) AS prompts
+FROM greenhouse_growth.grader_runs
+WHERE public_id = 'EO-GRUN-#####';
+```
+
+Esperado: `prompt_set_id` **no nulo** y `prompts = 12`. Si `prompt_set_id` es nulo, el run no tomó el set curado (sin
+set activo, la ruta usa el pack genérico de 7 preguntas): no encoles el resto hasta corregirlo.
+
+### 4. Esperar al worker
+
+- Cloud Scheduler dispara el drain cada 5 min. El worker ejecuta, puntúa, corre los probes y **auto-publica** el informe
+  (~30 s después de terminar).
+- **Nunca** `POST /score` ni publish manual sobre estos runs: pisa la extracción de prosa del worker.
+- Poll del avance: `pnpm staging:request /api/admin/growth/ai-visibility/runs/<runId>`.
+
+### 5. Revisión humana (si aplica)
+
+- Si el score queda `review_required` (delivery `in_review`), **lee la frase que lo disparó** antes de decidir (ver el
+  límite del detector por substring más abajo). En el caso SKY pasaron por revisión Avianca y Gol.
+- Con decisión del operador, aprueba con `approveAiVisibilityReport({ runId, reviewedByUserId, reason })`
+  (`src/lib/growth/ai-visibility/review/commands.ts`), firmado por la persona. La ruta
+  `POST /api/admin/growth/ai-visibility/runs/<runId>/review/approve` (sección
+  [Public delivery, review gate y lectura publica](#public-delivery-review-gate-y-lectura-publica)) llama al mismo
+  command con el usuario de la sesión como revisor.
+- Sin lead ni organización, la sync HubSpot y el correo se omiten (`no_lead`). Es lo esperado en un panel.
+
+### 6. Entregar y verificar
+
+Obtén token y código corto de cada run:
+
+```sql
+SELECT g.public_id, r.report_token, s.short_code
+FROM greenhouse_growth.grader_runs g
+JOIN greenhouse_growth.grader_reports r ON r.run_id = g.run_id
+LEFT JOIN greenhouse_growth.grader_report_short_links s ON s.report_id = r.report_id
+WHERE g.public_id IN ('EO-GRUN-#####', 'EO-GRUN-#####');
+```
+
+| Entregable | Formato |
+| --- | --- |
+| Informe web (largo) | `https://think.efeoncepro.com/brand-visibility/r/<token>` |
+| Informe web (corto) | `https://think.efeoncepro.com/s/<code>` |
+| PDF | `https://greenhouse.efeoncepro.com/api/public/growth/ai-visibility/report/<token>/pdf` |
+
+Verifica cada entregable antes de mandarlo:
+
+```bash
+# 200 + <title> con el nombre de la marca (repite con el link corto)
+curl -sSL -o /dev/null -w '%{http_code}\n' "https://think.efeoncepro.com/brand-visibility/r/<token>"
+curl -sSL "https://think.efeoncepro.com/brand-visibility/r/<token>" | grep -o '<title>[^<]*</title>'
+
+# PDF: 200 + application/pdf
+curl -sS -o /dev/null -w '%{http_code} %{content_type}\n' \
+  "https://greenhouse.efeoncepro.com/api/public/growth/ai-visibility/report/<token>/pdf"
+```
+
+- Staging y producción **comparten `greenhouse_growth`**: un token publicado desde staging renderiza en el hub
+  productivo.
+- Los tokens **no vencen** (el auto-publish no fija `expires_at`): quien reciba el link lo puede abrir indefinidamente.
+
+### 7. Análisis cruzado
+
+- Cuenta las menciones de **todas** las marcas con la misma regla en todas las respuestas (conteo simétrico): por
+  pregunta, por motor, en la pregunta de alternativas, cuota de citas al sitio propio y fuentes de terceros más
+  citadas.
+- La presencia de descubrimiento se mide sólo en las preguntas que no nombran marca (en el caso SKY, las preguntas 1–8).
+
+### Trampas del input (reglas duras)
+
+| Campo / tema | Regla | Qué pasa si no |
+| --- | --- | --- |
+| `market` | Va como **nombre** (`"Chile"`), no como ISO. | El ISO se interpola crudo en los prompts ("…en CL"); el provider de Google AI acepta `location_name`, y fuera de CL/MX/CO/PE/US un ISO cae a Estados Unidos. |
+| `category` | Debe resolver en `taxonomy/catalog.ts` ("aerolinea de pasajeros" es alias exacto de `sector:passenger_airlines`). | La etiqueta canónica ("Aerolineas de pasajeros", sin tilde) aparece en los prompts sólo si el set usa `{{category}}`; el set curado la evita escribiendo "aerolínea(s)" literal. |
+| `businessModel` | La ruta admin **no lo acepta**. | Sin set activo en el perfil sale el pack genérico de 7 preguntas (`gn01`–`gn07`). |
+| Perfil | Se identifica por **marca + mercado + locale**; los competidores quedan fijos desde el primer run (no hay command para editarlos). | Un nombre ya usado reusa el perfil viejo: "SKY Airline"/Chile/es-CL resolvía un perfil antiguo con `blog.skyairline.com` y Flybondi; por eso el caso usó "SKY". |
+| Nombres de marca | Coincidencia **literal**, palabra completa, sin mayúsculas y **sin alias**. | Usa "LATAM" (no "LATAM Airlines") para contar ambas formas y "SKY" (no "SKY Airline"). "Gol" es palabra común en español (riesgo bajo en respuestas de aerolíneas). |
+| `{{competitor}}` | Usa sólo el **primer** competidor declarado. | Se descarta si la lista de competidores está vacía. |
+
+### Límites (declararlos siempre)
+
+- **Extracto de 600 caracteres:** `GROWTH_AI_VISIBILITY_EXCERPT_MAX = 600` (`contracts.ts:210`). Las menciones se cuentan
+  sobre ese tramo inicial (donde suele estar la recomendación); las marcas nombradas al final de listas largas quedan
+  subcontadas. `raw_evidence_pointer` es nulo en las 300 observaciones del caso: no hay texto completo para recontar.
+- **Falso positivo del probe `llms.txt`:** si el sitio (SPA) responde 200 con HTML en `/llms.txt`, el probe dice
+  "llms.txt presente con contenido curado" (falso). Del mismo modo, "robots.txt no bloquea" es trivialmente cierto
+  cuando no hay robots real. No cites esos probes sin revisar el contenido.
+- **Detector de lenguaje sensible por substring:** `RISKY_REVIEW_TERMS` (`review-gates/gates.ts`) compara substrings en
+  la narrativa extraída (`messageDriftClaims` + `categoryAssociations`). "denuncia" disparó con "denunciados" (Avianca)
+  y "quiebra" con una frase sobre Gol; "demanda" también dispararía con "demandadas". Una revisión no es necesariamente
+  un problema real.
+- La pregunta comparativa que nombra al cliente produce **eco** del cliente en esas respuestas.
+- Sitios que bloquean la lectura automática (en el caso: LATAM, Avianca, Gol) → lecturas técnicas "sin dato", nunca
+  cero.
+- Es una foto de un día; la tendencia exige repetir el mismo panel con cadencia fija.
+- No hay atribución directa a ventas.
+
+Los tres primeros son defectos del grader registrados el 2026-09-11: el extracto en `TASK-1867` (evidencia completa)
+y los probes de `llms.txt`/`robots.txt`/`sitemap.xml` junto con el detector por substring en `TASK-1868`. Hasta que
+cierren, se declaran en cada entrega.
+La capacidad gobernada (lote de N marcas con el mismo set) debería construirse sobre `TASK-1861` (grader por MCP),
+`TASK-1863` (multi-mercado) y `TASK-1864` (superficie agéntica del MCP).
 
 ## Generar Fix-It Artifacts (TASK-1269) — staging ON, smoke funcional pendiente
 

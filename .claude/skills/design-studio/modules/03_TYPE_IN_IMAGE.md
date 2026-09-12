@@ -91,6 +91,18 @@ no escalones tímidos); agrupa por proximidad (`modules/01 §3`); alinea todo a 
 - El **cómo emparejar bien** (superfamilias, ejes variables, x-height, match óptico) es craft de
   `typography-design`. Si la pregunta es "¿qué dos fuentes?", delega.
 
+### Familia display creativa de Efeonce
+
+Para campañas, key visuals, posters, stories y otras piezas editoriales fuera de la UI, Efeonce dispone de
+`Bricolage Grotesque` como voz display expresiva. El asset variable es
+`src/assets/fonts/BricolageGrotesque-Variable.ttf` y sus ejes son `opsz`, `wdth` y `wght`; la licencia y procedencia
+están en `src/assets/fonts/BricolageGrotesque-SOURCE.md`.
+
+Úsala cuando el brief necesite una presencia más escultórica, contemporánea o editorial que Poppins. Elige una sola
+familia display dominante por pieza: Bricolage puede convivir con Geist como texto de apoyo, pero no debe competir
+con Poppins en el mismo headline. Esta familia no amplía el contrato tipográfico de la UI de Greenhouse, PDF/email
+compartidos ni Globe.
+
 ## 7. Tipografía expresiva / display `(volátil as-of 2026-07 — reverificar)`
 
 - Vigente: display con carácter fuerte, serifas dramáticas de alto contraste, grotescas anchas,

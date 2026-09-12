@@ -1,46 +1,109 @@
 # Handoff activo
 
-**Conciliación bancaria ago–sep 2026 (2026-09-10, code complete + datos cargados; rollout = mismo Cloud SQL):**
-re-anclaje OTB al 01/08 por cuenta (Global66 al 31/07, TC al cierre 06/08), `banco-chile-clp` (Cuenta Vista
-308526005) registrada por CLI canónica, cartolas reales importadas con los adapters nuevos
-(`src/lib/finance/bank-statements/`) y 77 filas conciliadas con `scripts/finance/reconciliation-plans/2026-08-09.json`.
-Períodos `reconciled`: global66-clp 2026-07/08, santander-corp-clp 2026-08 (ciclo 06/08–07/09). Saldos vs banco:
-Global66 exacto; Santander CLP +450.000 (ago) / +692.819 (sep) explicados fila por fila; TC exacto.
-**Segunda pasada 2026-09-10 (tarde):** Humberly = honorarios brutos sin retención (neto sobre la nómina +
-remanente anclado al entry, 195.750 jul / 68.625 ago); Deel REC-2026-11/12/13 con tarjeta personal *1879 → CCA
-(`finance:record-deel-receipts`); Valentina = boleta N°47 adjuntada al payable EO-CPAY-0002, orden
-`por-68676079` pagada con `paidAt=2026-09-07` (`finance:contractor-settle`), fila vinculada; comisión HubSpot
-Q2 2026 = ingreso `INC-HS-COMM-2026Q2` USD 378 con cobro 335,15; Banco de Chile FAN Emprende anclado (10.600 al
-01/08) e importado con el adapter `bancochile_cuenta_vista_text`. Períodos `reconciled` ahora: Santander CLP
-ago, Santander USD ago, Banco de Chile ago, Global66 jul/ago, TC ago. Santander CLP sep difiere 0,45 (redondeo
-Valentina). **⚠️ Rollout:** el fix ISSUE-169 vive sólo en `develop` local; el ops-worker (Cloud Run) sigue con el
-código viejo y al recomputar saldos por eventos reescribe cuentas USD/MXN en CLP (pasó con el cobro HubSpot;
-se rematerializó local). Hasta desplegar, revisar `santander-usd-usd`/`global-66-mxn-mxn` tras cada evento.
-**Tercera pasada 2026-09-10:** las dos transferencias de 1.000.000 (07/09) son sueldo accionista → expenses
-`payroll` anclados a `julio-reyes` (`createMemberPaymentExpense`, sin entry de Payroll: regularizar sueldo
-empresarial); los otros traspasos a Julio siguen como CCA (reembolsos de Deel pagados con su tarjeta). Berel:
-folio 51 = MXN 84.760 (17/07), folios 52+53 = MXN 104.000 (13/08), cobrados en `global-66-mxn-mxn` al tipo de
-cambio realizado 53,4034. HubSpot: los USD 42,85 faltantes = costo de recepción internacional estimado por
-diferencia (ingreso cobrado completo + comisión bancaria USD en la cuenta USD). Deel REC-2026-8/9/10 en el CCA
-(REC-8 sólo fees: la parte contractor figura pagada por Payroll desde la TC el 05/05 — verificar con el estado
-de cuenta TC de mayo). CLI nuevo `finance:ledger-adjust`. **Punto 2 (Andres/Daniela agosto) sigue esperando
-autorización.**
-**Cierre 2026-09-10 (autorizado "hagamos todo eso"):** punto 2 ejecutado (pagos payroll_system de Andres/Daniela
-superseded; nómina agosto pagada al valor real de Global66; `amount_clp` fijado al monto de la cartola porque
-el ledger redondea la tasa a 2 decimales) → Global66 sep `reconciled` (16.468). `TASK-1858` creada y
-registrada (rollout ISSUE-169 + fx_drift no-CLP + rutina mensual + regularizaciones Payroll + OTB CCA +
-crédito 420051383906). CCA cierra en −125.194 al 10/09 (reembolsos ≈ Deel; ancla formal en TASK-1858).
-**⚠️ 2026-09-10 tarde:** el ops-worker (rev `00675`, código viejo) volvió a corromper USD/MXN al procesar los
-cobros HubSpot/Berel y creó filas pre-genesis en MXN; se agregó el genesis floor al camino reactivo
-(`rematerializeAccountBalancesFromDate`) y se rematerializó local. Mientras no se despliegue el worker (push
-a develop → `ops-worker-deploy.yml`), cada evento en cuentas USD/MXN vuelve a romper el saldo.
-**Pendiente con el operador (punto 7):** nómina agosto Andres/Daniela pagada 03/09 (1.985.038 banco vs 2.020.120 registrado por payroll en
-USD, 4 filas Global66 sin calce); Melkin 788,86 USD (registrado en `santander-usd-usd`, no aparece en banco);
-cobro Berel MXN 104.000 (13/08) sin factura asociada; recepción USD 335,15 (13/08); cartola Banco de Chile
-(PDF cifrado, clave no coincide con los 4 últimos dígitos del RUT de la empresa) → OTB pendiente; estado de cuenta
-trimestral del crédito 420051383906 para completar `original_amount`. Bugs corregidos: `ISSUE-169`
-(saldos en moneda extranjera + día genesis). Follow-up formal propuesto: `TASK-1858` (pendiente de confirmación del operador para registrarla). Dev server local con la UI en
-`http://localhost:3000/finance/reconciliation`. **Push a `develop` hecho 2026-09-10 (`624468187`) por autorización del operador**, desde una copia limpia con `local:check` verde (el checkout compartido tenía skills sin espejar de otra sesión); dispara `ops-worker-deploy.yml`.
+**Tipografía creativa Efeonce (2026-09-12, documental):** `Bricolage Grotesque` variable está en
+`src/assets/fonts/`; licencia, procedencia y hash constan en `BricolageGrotesque-SOURCE.md`. Docs y skills espejo la
+registran como display para campañas fuera de UI. El contrato de UI permanece Poppins + Geist; no se cambió runtime.
+
+**Pipeline de Hiring vacío por vacante (2026-09-12, diagnóstico; `ISSUE-171`):** `/agency/hiring/pipeline` se veía
+vacío en `EO-OPN-0674` y `EO-OPN-0675` con 15 y 51 postulaciones reales **intactas, sin pérdida de datos**. Causa raíz
+reproducida: `PipelineDeskView.tsx:125` siembra `applications` con `useState` y nunca re-sincroniza, mientras el
+hermano `openingId` sí (efecto `:150`), así que al cambiar de vacante el tablero filtra el arreglo del montaje y da 0.
+Preexistente desde `559f5654b` (2026-07-09); no es regresión de la publicación del 2026-09-09. **Fix en local, sin desplegar.** Detalle y adyacentes en
+`docs/issues/open/ISSUE-171-hiring-pipeline-empty-stale-client-snapshot.md`. **`ISSUE-172` (P1):** `lpad` recorta el `public_id` del Banco de Talento pasado 99 999 → colisión que
+abre el circuito del consumer de postulaciones (25 personas sin proyectar, nada borrado); fix en local
+(migración + anti-join + parser tolerante + señal `sync.reactive.circuit_open`), **migración NO aplicada**. Aparte:
+6 CV en `quarantined`. El script read-only vive sólo en `claude/hiring-pipeline-bug-880pbn` (con
+`TASK-1869`); esa rama contiene `origin/develop` pero **no** el develop local (4 commits sin pushear) — su merge no es
+ff-only hoy. Siguiente ID libre: `TASK-1870`.
+
+**Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
+**no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a
+`seo-aeo/references/competitor-methodologies-2026-09.md` (nuevo). `ai_optimization` sigue fuera del allowlist.
+Las 4 preguntas quedaron decididas el mismo día: `TASK-1870` (rotación SERP, costo cero) y `TASK-1871`
+(screening de toxicidad) en `to-do`; disavow descartado; gate de `rank_scale` ya en el repo. **Abierto:**
+`ISSUE-170` — el link gap del prospecto puede colapsar por intersección AND, con experimento definido y
+sin medir. Decisión y evidencia: `docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md`.
+
+**Portafolio de landings del sitio público (2026-09-11, documental):** `EPIC-047` reancla desde EPIC-019 las 20
+tasks de landing y fija su orden en `Rank EPIC-047-01…10`: Agencia Creativa → ASO (pitch activo con Berel) → HubSpot
+(Precios, Agentes) → Salesforce → Performance → resto; Contacto es habilitador (`H1`) y los artículos del hub HubSpot (TASK-1402/1404) van
+fuera del ranking. Cerradas por decisión del operador, publicadas e indexables (HTTP 2026-09-11): TASK-1799 Content
+Marketing, TASK-1358 Home, TASK-1351 Redes Sociales y TASK-1352 Pillar HubSpot; cada una registra sus criterios de QA sin verificar.
+**Hallazgo:** `/agencia-creativa/` y `/agencia-creativa-v2/` están ambas indexables con canonical propio → decidir URL
+final + 301 (TASK-1350). El Pillar HubSpot vive en `/servicios-contratar-hubspot/`; `/servicios/hubspot/`
+redirige a un post antiguo, así que la URL padre de Precios/Agentes está por decidir. Pendientes del operador: validar PDR-021/022/023, owners/SLA de Contacto, alcance de la
+aprobación ANAM para TASK-1403 y cerrar TASK-1322 como superseded.
+
+**Panel competitivo AEO de SKY (2026-09-11, operación + venta):** 5 runs del grader en staging (SKY, LATAM, JetSMART,
+Avianca, Gol; Chile; set curado de 12 preguntas de aerolíneas; `EO-GRUN-00050`…`00054`), 2 aprobados en revisión
+humana por el operador, 5 informes web + PDF entregados y correo enviado a Nicolá Lamiaux (se escribe sin "s"),
+fuera de la licitación SEO. Método documentado: manual comercial `docs/manual-de-uso/comercial/panel-competitivo-aeo-en-venta.md`,
+doc funcional `docs/documentation/comercial/panel-competitivo-aeo.md`, runbook del grader § "Panel competitivo
+multi-marca", plantilla `seo-aeo-practice/templates/correo-panel-competitivo-aeo.md`. **Tres defectos del
+grader medidos ese día, ya con task:** `TASK-1867` (P1: extracto de 600 caracteres sin texto completo → persistir y
+medir la respuesta íntegra, score v3) y `TASK-1868` (P2: probes de `llms.txt`/`robots.txt`/`sitemap.xml` que toman el
+HTML de un SPA por archivo real + detector de lenguaje sensible por substring). La capacidad gobernada del panel queda
+en `TASK-1861` Delta (d).
+
+**Trendjacking «Nuestro Duo» (2026-09-11, operación):** pieza 4:5 + Short 9:16 (Seedance 2.5) programados vía
+Metricool en la marca Efeonce Group: Threads 11-09 12:30 · Instagram 11-09 19:00 · LinkedIn página 12-09 11:00 · YouTube
+Short 12-09 12:00 (todos `PENDING`; **falta confirmar publicación**). Skills `social-media-studio`, `copywriting`,
+`greenhouse-ai-image-generator` y `motion-design-studio` actualizadas con los aprendizajes. Detalle e ids:
+`docs/operations/social/2026-09-11-iphone-duo-trendjack.md`.
+
+**Vacantes en LinkedIn (2026-09-11, operación):** 4 vacantes vivas programadas vía Metricool (perfil del operador +
+página Efeonce, 11:00 Chile; **falta confirmar publicación**). Pendientes: ficha de `EO-OPN-0009` sin "caso ficticio" ·
+Careers sin UTM por postulación. Detalle: `docs/operations/hiring/2026-09-11-linkedin-vacancy-distribution.md`.
+
+**Performance & Commerce Distribution (2026-09-10, documental; `Proposed`, no autoriza venta):** ADR
+`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md` + ficha + Pricing Integrity Pack `hypothesis_only` + market
+update 2026-09-10 + PDR-022 (spoke `/servicios/performance-marketing`). La capability tiene dos motions (Demand & Commerce ·
+B2B Pipeline), los canales son cobertura y programmatic va vía partner con cláusula de transparencia. Niveles al piso de 45%:
+USD 2.400 / 5.900 / 11.800 al mes. El costo del Performance Lead (USD 5.500) es hipótesis: el catálogo no tiene el rol.
+Registry: diez relaciones nuevas `No iniciado`. Pendientes con dueño: retiro de `EFG-003` (asignado a Wave, bajo el
+piso), costo del lead, overhead y piso (Finance) · posición sobre datos first-party bajo la Ley 21.719, vigente el
+2026-12-01 (Legal) · verificar Google Partners y cerrar términos con Real Audiences, partner programático seleccionado por el CEO
+(fees, cláusula de transparencia, brand safety, CTV, ABM y certificación de trader; Commercial) · G1: dos
+Diagnostics pagados en 90 días, uno por motion · TASK ui-ux de la landing, sin crear. Sin runtime ni push.
+Canales emergentes: ChatGPT Ads `selectivo` donde existe (LATAM: sólo BR/MX; Chile no), X Ads bajo pedido, Perplexity
+`no disponible`. **Landing: `TASK-1865`** (to-do, ui-ux/flow, UI ready no; reservada como 1864 y renumerada porque la
+tomó en paralelo la task del MCP autosuficiente) con wireframe, flow, motion, dirección "La señal" y brief SEO/AEO. La
+legacy `/servicio-gestion-campanas-publicitarias/` (`242862`) muestra contadores en cero y un claim de Google/Meta
+Partners no verificado en producción; el owner decidió no parcharla: la página se construye desde cero y la legacy sale
+con 301. Investigación Semrush por país completada (`docs/audits/public-site/PERFORMANCE_LANDING_KEYWORD_RESEARCH_BY_COUNTRY_2026-09-11.md`):
+Chile busca "performance marketing", PE/MX/CO "publicidad digital", CO además "pauta", US en inglés (página aparte,
+follow-up). Title y copy ledger ajustados; FAQ a catorce.
+
+**Product Design 360 (2026-09-10, modelado y canonizado; oferta `Proposed`, no autoriza venta):** business model
+V1.1 + ficha `docs/services/wave/product-design-360.md` + ADR `EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`: capability de
+oficio con dos ofertas por comprador (producto → Product Design 360 · sitio público → Web Experience 360), siete lanes
+con accesibilidad primero; se venden lanes, nunca horas ni pantallas. `creative-practice` corregido: Superside mínimo
+USD 15.000/mes (decía ~5.000, error 3×). Landing `TASK-1859` creada (to-do, UI ready no; no se indexa hasta
+`Commercially approved`). **Colisión de ID resuelta:** la landing de Trade Marketing & BTL, que usó `TASK-1859` en
+paralelo, se registró como `TASK-1860` (`a2081e4f1`); `TASK-1859` es la landing de Product Design 360 y no
+cambió. Pendientes con dueño: G1 demanda (Commercial) · D7 loaded cost chileno de un
+senior product designer y piso de margen por lane (Finance) · IP del design system, datos de research y marco chileno
+de accesibilidad (Legal) · nombre público D1 (Strategy) · Calculadora de Capacidad (wedge, sin task). **BP9** (Head of Design in-house) agregada a `13_icp` como persona
+candidata: su plan de validación —≥ 5 conversaciones con Heads of Design— valida también el copy de la landing.
+
+**TASK-1858 — conciliación bancaria ago–sep 2026 (2026-09-10, in-progress; Slices 1/2/3/5 hechos):** release
+`2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` `released` 20:06Z (PR #233, run `34523159501`, un intento,
+bypass forense por la migración de TASK-1604 ya aplicada; watchdog 5/5, `ops-worker`/`auth-server` change-gated
+en `f8803acc3` con árbol equivalente). Producción y el worker sirven `ISSUE-169`; saldos = banco (Santander CLP
+33.002.610 · USD 336,44 · Global66 16.468 · MXN 10 · Banco de Chile 3.660.000 · TC 1.532.944; CCA −125.194).
+`fx_drift` cubre USD/MXN (0 drift contra PG real). Manual v1.2 con rutina mensual + decisión Nubox (facturas
+`EXP-NB-*` siguen por plan `pay_expense`). OTB del CCA al 01/08 = 2.141.867 `estimated`
+(`obtb-sha-cca-julio-reyes-clp-20260801-275f0308`): pasa a `reconciled` cuando el accionista confirme.
+**Slice 4 (Payroll):** Humberly cobra **450.000 líquidos**; v2 (desde 01/07) quedó cargada como bruto por error
+(boletas: julio 300.000, agosto 450.000; pagado 450.000 ambos). La reliquidación canónica se detuvo en la guarda sin
+escribir (v2 con entries exportados no se edita; el recálculo por entry conserva la versión del entry; el del
+período completo tocaría a Felipe Zurita y María Fernanda González en julio). El operador pidió **no forzar**: los
+complementos `EXP-RECON-20260803-57fj` (195.750) y `EXP-RECON-20260903-bcfh` (68.625) quedan asumidos
+internamente como costo laboral. Desde 01/09 rige `humberly-henriquez_v3` (bruto 530.973,45 = 450.000 líquidos; v2 cerrada al
+31/08): **Humberly debe emitir boletas por 530.973 desde septiembre**. Pendiente con el operador: sueldo
+empresarial de Julio (2×1.000.000 del 07/09 como expenses `payroll` sin entry), estado de cuenta TC de mayo para
+Melkin (`EXP-202604-005`), y el PDF `36_16359_420051383906_2026-06-30.pdf` para el crédito antiguo.
+Contable a revisar: pagar el bruto sobre boletas con retención deja la retención sin documento propio.
 
 **TASK-1604 (2026-09-10, in-progress):** slice SEO/Arte aplicado y documentado. Seis competencias activas,
 nueve preguntas SEO en `sme_review`, cero templates del pack, cero policies y cero assessments. Las vacantes
@@ -57,9 +120,19 @@ sujetos canary y 35 de otros sujetos; el helper vigente borra por `client_id`. N
 `--apply`: implementar planner/delete/readback sujeto-específicos, preservar cliente/hijos ajenos, diagnosticar
 las familias de refresh y recién después reiniciar steady/retirar desde `delete_after`.
 
-**Canales propios Efeonce (2026-09-10, decisión cerrada / ejecución no autorizada):** estacional conservado
-como línea propia de marca (rev 1.3): hogar Instagram, sends+saves, LinkedIn recibe argumento y no caption.
-Plan 2026–2027 sin cambios de alcance.
+**Sistema de contenidos Notion (2026-09-10, mapeado / sin mutaciones):**
+[mapa canónico](docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md) de Pilares JTBD + Content Hub +
+Calendario + Wiki, con IDs y schema. Corrige `PDR-020` a rev 1.5: los Pilares JTBD son el eje temático
+canónico y las franquicias son ortogonales; `LinkedIn Julio` es canal aparte. Tres fracturas medidas: dos bases de Calendario con schema idéntico (100 filas de histórico vs 66 a
+futuro) que parten la evidencia de velocidad; **0 de 66 filas del calendario vigente declaran Pilar
+JTBD**; y el Content Hub no tiene propiedad de destino Think/WordPress (`Enlace` en 5 de 41). Pendiente
+del operador: autorizar los cambios propuestos, en orden — etiquetar Wiki, poblar Pilar JTBD, agregar
+Destino, luego schema del calendario, y por último decidir el corte de calendarios (el único que puede
+romper histórico). Nada escrito en Notion.
+
+**Canales propios Efeonce (2026-09-10, decisión cerrada / ejecución no autorizada):** seasonalities conservadas
+como línea propia de marca (rev 1.4): son temporadas con ventana por mercado, NO efemérides; hogar Instagram,
+sends+saves, LinkedIn recibe argumento y no caption. Plan 2026–2027 sin cambios de alcance.
 [PDR-020](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) rev 1.2 — rol y catálogo por
 canal, franquicias con canal-hogar, vocero Julio Reyes. Propagado a `TASK-1802`, `PDR-003/004/005/019`, roadmap,
 context pack y diez archivos de skills espejados. Pendiente: 7 decisiones, entre ellas canonical de video (bloquea
@@ -348,64 +421,3 @@ Commit `79a1c3f74` en `develop`. Verificado en vivo (revisión `ops-worker-00637
 `{"severity":"warning","alerted":false}` — correcto, hoy es `warning` no `error`. 6/6 tests verdes. (2) Rutina
 `trig_015zxhP1D4yXfTacUm5HqmQU`, dispara una vez el 2026-09-17 13:00 America/Santiago tras la primera captura
 improved desatendida, sin credenciales locales: sólo recuerda verificar manualmente, no ejecuta verificación real.
-
-## 2026-09-03 — TASK-1806 COMPLETE: Improved ETV en producción (release `bda12be7e33a`), rebaseline versionado
-
-Cuarto release del día: PR #218 squash (`main=bda12be7e33af93906805054146c5e17a8b9c328`, 12:42Z), orquestador
-`33758619690` (13:01→13:14Z, un solo run, sin retry; los DOS gates `production` aprobados a 13:04:26Z/13:04:57Z),
-manifest `released` (`bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990`), watchdog `ok`, 3/4 workers en el
-target y ops-worker change-gated en `d2ebdb8f3` (diff de árbol completo = sólo el ledger de flags). **Canary de
-contrato 13:15:26Z:** lanes prod `domain-overview`/`url-visibility` de Berel sirven
-`etvMethodology.version=improved_layout_clickstream_v2` `single_methodology`; `/health` del worker
-(`00636-h6w`) improved en escritura y lectura; `/api/auth/health` 200. Vercel Production+staging con ambos
-selectores improved (valores verificados por `env pull`); staging con cutover y **drill de rollback** ejercitado
-(legacy → improved, 3 redeploys).
-
-**Decisión:** el shadow (USD 1,095) mostró improved 6× mejor calibrado contra GSC en Berel (err. rel. 49 % vs
-321 %), Jaccard 1,0 e historia continua; el operador aprobó `go_rebaseline` y el cutover. Rebaseline acotado:
-historia improved de Berel 2025-09..2026-09 y de Comex 2025-09..2026-03 (backfill USD 0,2568, sembró 14 filas);
-la de julio 2026 en adelante es `fully_recomputed`, antes `calibrated_approximation`; `breakpointDate=null`.
-Efeonce se mide aparte (su org/CL/GSC); guard en `assertEtvShadowCohort` para que un bulk nunca mezcle
-organizaciones; cohorte v2.
-
-**Riesgos abiertos / pendientes con dueño:** (1) señal `seo.etv_methodology.drift` en `warning` hasta que las
-filas contractuales del 27-29/08 salgan de la ventana de 7 días (≤ 2026-09-05); el cron del 16/17 será la
-primera captura improved DESATENDIDA del worker — si escribiera otra cosa, es incidente. (2) Berel verá sus
-cifras de tráfico estimado ≈ −60 % por cambio de fórmula, no por pérdida real: comunicarlo. (3) Sujetos sin fila
-improved degradan `not_available_for_method` hasta su próxima captura (subfolder/url de Berel el día 17).
-(4) Rollback a legacy sólo antes del 2026-11-01T00:00:00Z (selectores + deploy.sh + redeploy). Sin push de
-docs de cierre hasta este commit; WIP ajeno en el árbol intacto.
-
-## 2026-09-03 — Berel: cobertura temática y minería solicitadas por el operador
-
-Fecha local 2026-09-02. [Estrategia](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) y skills
-Berel/SEO-AEO/DataForSEO sincronizadas; Playbook Notion ampliado y confirmado por nueva lectura.
-[Research](docs/audits/seo/BEREL_CAPILLARY_KEYWORD_MINING_2026-09-02.md): 14 runs succeeded,
-1.517 keywords distintas, 13 SERPs, 52 PAA, costo US$1,23572. 27 intenciones propuestas; 60 keywords
-representativas revisadas, el resto del CSV es triage explícito. El tutorial público de baño aparece
-#2 en SERP fuera de los 49 cuerpos del Hub: no crear duplicado. Priorizar elección/protección/aplicación.
-Ese corte describe discovery, no las ediciones posteriores en Notion. Continuidad 2026-09-03: N29 pasó
-a Berelex Semibrillante tras Wiki/página/PDF; tutorial, ALT paso 3, ficha N2 y nota de tarea releídos.
-Artes y copies sociales aún pendientes; no asumir paquete aprobado ni publicación Drupal. La skill
-incorpora [control técnico y QA](docs/audits/seo/BEREL_TUTORIAL_GUARDRAILS_2026-09-03.md) para futuras piezas.
-Etiquetado: [auditoría](docs/audits/seo/BEREL_PIECE_COUNT_CLASSIFICATION_2026-09-03.md), 51 correcciones
-Notion releídas (formato/canal/tipo), sin otros cambios. Nov/dic: 65 tareas visuales por mes, no archivos
-ni entregas; rollups numéricos no expuestos por MCP. Operador confirma solo etiquetas, sin migración.
-Relectura oct–dic: 221 tareas, 196 visuales etiquetadas y 25 principales excluidas; sin nuevas escrituras.
-Skills espejo exigen tipo/canal desde la creación y en QA. Histórico fuera de esos meses y N31 pendientes.
-Distribución selectiva: [auditoría y continuación](docs/audits/seo/BEREL_SELECTIVE_SOCIAL_DISTRIBUTION_2026-09-03.md).
-Playbooks/skills y matrices de 17 slots + principales actualizados; 34/34 releídas e historial intacto.
-Aplicación terminada: 193 páginas modificadas releídas, 128/128 registros sociales; octubre excluido. Cupos 8 artículos de 3.000–5.000 palabras,
-50 gráficas y 3 videos/mes (cortesía mayo–octubre extendida a nov/dic). Operador confirmó: las 50
-incluyen blog/RRSS; superficies Blog/Facebook/Instagram/Pinterest. Priorización N52→Navidad aprobada:
-4 banners N52 Cancelada sin etiquetas de reserva, historial intacto; 4 banners y 2 sociales N59 creados.
-Conteo vivo + briefs: 50 gráficas + 3 videos/mes (41/44 tareas estáticas); N45/N46 En curso, N50/N54 con gates.
-Siguiente paso: conciliar derivados/assets de N29 y mantener bloqueos de sistemas no validados.
-Commit local solicitado del trabajo editorial propio; sin push/cambio de branch/release.
-Cambios ajenos de SEO y OAuth preservados; este trabajo no resuelve ese incidente Git/MCP.
-
-Corrección de numeración verificada: [mapa y readback 179/179](docs/audits/seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md).
-Noviembre N43–N51 (Navidad adicional), diciembre N52–N59; números de párrafos/auditorías anteriores
-son históricos. Módulo 16 en skills espejo; no renombrar archivos ni reutilizar IDs por número.
-Complemento autorizado: el método SEO/AEO y DataForSEO excluido de `1fcc2ade3` se incorpora por separado:
-referencia 09 de minería, routers/espejos, priorización §2.3, brief, manual y funcional; sin nueva compra ni push.

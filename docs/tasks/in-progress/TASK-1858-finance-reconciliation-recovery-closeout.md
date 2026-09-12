@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `Discovery`
+- Status real: `Slices 1, 2, 3 y 5 ejecutados el 2026-09-10 — release 2cf8c26cfa2d released (run 34523159501), fx_drift no-CLP en producción, rutina mensual + decisión Nubox documentadas, OTB del CCA al 01/08 estimated; Slice 4 parcial: Humberly = 450.000 líquidos; reliquidación canónica no viable (versión atada al entry; v2 usada en período exportado) y el operador pidió no forzar → complementos jul/ago asumidos internamente (EXP-RECON-20260803-57fj / EXP-RECON-20260903-bcfh); v3 de Humberly desde 01/09 (530.973,45 bruto = 450.000 líquidos); pendientes: sueldo empresarial de Julio, TC de mayo de Melkin, PDF del crédito 420051383906`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
@@ -215,12 +215,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada en el allowlist de destinos de escritura del dominio: N/A (sin tablas nuevas).
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. (`account_balances`, `account_opening_trial_balance`, reader `account-balances-fx-drift.ts`, remediator, manual/doc funcional)
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. (OTB append-only con supersede; detector read-only; plan JSON idempotente sobre filas sin calce)
+- [x] Toda tabla nueva queda declarada en el allowlist de destinos de escritura del dominio: N/A (sin tablas nuevas).
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. (sin migraciones; rollback Slice 2 = revert; OTB nueva supersede la anterior)
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. (release `2cf8c26cfa2d` released 20:06Z; detector 0 drift contra PG real; saldos USD 336,44 / MXN 10 tras el release; OTB `obtb-sha-cca-julio-reyes-clp-20260801-275f0308`)
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. (signal `finance.account_balances.fx_drift` con `tolerance_native`; remediator `unknown_requires_review` para no-CLP)
 
 <!-- ZONE 2 — PLAN MODE: no llenar al crear la task. -->
 
@@ -255,6 +255,17 @@ Reglas obligatorias:
 
 - Humberly: revisar entry 2026-07 (bruto 300.000 vs pagado 450.000) y política de retención SII no practicada
   (68.625 agosto + julio); decidir si se descuenta o se asume.
+  - **Decisión 2026-09-10 (operador): el acuerdo es 450.000 LÍQUIDOS; la versión v2 (desde 01/07) quedó cargada
+    como bruto por error. Boletas reales: julio 300.000, agosto 450.000; pagado 450.000 ambos meses.** Se intentó la
+    reliquidación canónica (TASK-410) y se detuvo sin escribir: `updateCompensationVersion` rechaza editar v2 porque ya
+    tiene entries exportados, y el recálculo por entry conserva la versión atada al entry (julio → v1 = 300.000), así
+    que sólo el recálculo del período completo re-resuelve versiones y ese toca a las demás personas (julio incluye a
+    Felipe Zurita y María Fernanda González con salidas ejecutadas después). Instrucción del operador: **no forzar; se
+    asume internamente.** Resultado: entries fieles a las boletas; los complementos `EXP-RECON-20260803-57fj` (195.750)
+    y `EXP-RECON-20260903-bcfh` (68.625) quedan como costo laboral anclado a los entries con la decisión en su
+    `description`. Desde septiembre: **v3 creada** (`humberly-henriquez_v3`, efectiva 01/09, bruto 530.973,45 = 450.000 líquidos,
+    `desired_net_clp` 450.000; v2 cerrada al 31/08) con `createCompensationVersion`. Humberly debe emitir sus boletas
+    por 530.973 desde septiembre; si siguen por 450.000 se repite el complemento.
 - Julio Reyes: crear sueldo empresarial como entry de Payroll y re-vincular los expenses
   `EXP-RECON-20260907-38j4/efpg` (pagos directos) al entry.
 - Melkin 2026-04: confirmar con el estado de cuenta TC de mayo si `EXP-202604-005` salió de la TC o de la
@@ -334,13 +345,13 @@ crudos y reutilizar la función, para que no existan dos implementaciones).
 
 ## Acceptance Criteria
 
-- [ ] Producción y `ops-worker` corren `ISSUE-169`; las 9 cuentas rematerializadas calzan con sus cartolas.
-- [ ] `finance.account_balances.fx_drift` cubre cuentas USD/MXN y reporta 0 en steady.
-- [ ] El manual tiene la checklist mensual con fuente por cuenta y la decisión Nubox implementada.
+- [x] Producción y `ops-worker` corren `ISSUE-169`; las 9 cuentas rematerializadas calzan con sus cartolas. (release `2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` released 2026-09-10 20:06Z; watchdog 5/5 `drift_count=0`; saldos post-release = banco)
+- [x] `finance.account_balances.fx_drift` cubre cuentas USD/MXN y reporta 0 en steady. (commit `f8803acc3`; detector contra PG real: 0 filas en `santander-usd-usd` y `global-66-mxn-mxn`; 26 tests focales)
+- [x] El manual tiene la checklist mensual con fuente por cuenta y la decisión Nubox implementada. (manual v1.2 «Rutina mensual de cierre bancario»; decisión: facturas Nubox siguen por plan `pay_expense`, sin auto-match de facturas sin pagar)
 - [ ] Payroll registró las regularizaciones (Humberly 2026-07, retención no practicada, sueldo empresarial
-      Julio, Melkin 2026-04) y Finance re-vinculó los expenses correspondientes.
-- [ ] OTB del CCA al 01/08/2026 declarada con evidencia y regla documentada.
-- [ ] `loan-santander-420051383906` con `original_amount` e `installment_count`.
+      Julio, Melkin 2026-04) y Finance re-vinculó los expenses correspondientes. — PARCIAL 2026-09-10: retención de Humberly asumida por la empresa (decisión del operador), registrada en Finance sobre los remanentes anclados a los entries; el dominio Payroll no tiene un tipo de ajuste para «retención asumida» (`payroll_adjustments.kind` ∈ {exclude, gross_factor}) y los períodos 2026-07/08 están `exported`, así que el entry se conserva fiel a la boleta. Faltan: base de julio (300.000 vs 450.000), sueldo empresarial de Julio, TC de mayo de Melkin.
+- [x] OTB del CCA al 01/08/2026 declarada con evidencia y regla documentada. (`obtb-sha-cca-julio-reyes-clp-20260801-275f0308` = 2.141.867,19 `estimated`; pasa a `reconciled` cuando el accionista confirme el saldo)
+- [ ] `loan-santander-420051383906` con `original_amount` e `installment_count`. — BLOQUEADO: el PDF `36_16359_420051383906_2026-06-30.pdf` no está en `data/bank/` (revisado 2026-09-10).
 
 ## Verification
 

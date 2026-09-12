@@ -9,7 +9,7 @@ Convierte evidencia verificable en un informe que permite **entender el resultad
 
 ## Activación y resultado
 
-Aplica a informes de gestión, resultados de servicio, auditorías, evaluación, investigación y diagnóstico. También a la mejora editorial o visual de un informe existente. Si sólo se pide resumir una cifra o corregir una frase, actúa proporcionalmente; no generes un expediente completo.
+Aplica a informes de gestión, resultados de servicio, auditorías, evaluación, investigación y diagnóstico, y a documentos internos membretados para el equipo (modelo de negocio, plan o decisión), que siguen el mismo contrato de marca y además no pueden dejar rastros de trabajo de agentes: ver el [overlay Efeonce](references/efeonce-overlay.md). También a la mejora editorial o visual de un informe existente. Si sólo se pide resumir una cifra o corregir una frase, actúa proporcionalmente; no generes un expediente completo.
 
 El entregable es el formato pedido por el usuario, no la tecnología intermedia. Si pidió PDF con HTML de insumo, entrega un **PDF revisado** y conserva su fuente. Si pidió Word editable, conserva semántica Word; no conviertas páginas en imágenes. Si pidió un dashboard, usa el flujo de producto y aporta aquí sólo el contrato de evidencia.
 

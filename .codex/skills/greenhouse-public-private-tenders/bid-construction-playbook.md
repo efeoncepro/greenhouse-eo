@@ -60,6 +60,12 @@ El diagnóstico del grader (Fase 4) es un diferencial brutal, pero **cómo se pr
 
 **Regla de operación (Fase 4, recordatorio):** el informe completo (con tono + categoría percibida) SOLO sale del **camino del worker** (encolar run async → el worker ejecuta, puntúa CON extracción de prosa y **auto-publica** el snapshot). **NUNCA** `POST /score` ni `report/publish` manual desde local/Vercel: la extracción de prosa solo corre en el worker, y un score manual congela un informe incompleto (tono/categoría en blanco) — caso real SKY 2026-07-11.
 
+**Panel competitivo como evidencia adyacente a una licitación** (caso SKY 2026-09-11): si la cuenta pide compararse con sus competidores mientras corre el proceso, el **panel competitivo multi-marca** (Grader sobre N marcas, mismo set, día, mercado y motores) se entrega **por fuera de la oferta**:
+- declarar por escrito que es **independiente del proceso**, **sin propuesta ni precio**;
+- **registro formal (usted)** de principio a fin;
+- **bloque de límites** obligatorio (foto de un día, extracto de 600 caracteres, eco de la pregunta comparativa, "sin dato" ≠ cero, sin atribución a ventas).
+Método y correo: `seo-aeo-practice` → `modules/05_CUNA_GRADER.md` § 3 + `templates/correo-panel-competitivo-aeo.md`.
+
 ### Fase 4-ter — Radiografía AEO como demostración de ejecución
 
 Cuando la propuesta necesita probar que Efeonce no sólo diagnostica, sino que **ejecuta**, usa la **Radiografía AEO** (`think.efeoncepro.com/muestras/<slug>-<token>`). El Grader mide el hueco; la Radiografía muestra un artículo real, su capa de máquina y sus piezas derivadas.

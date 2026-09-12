@@ -54,10 +54,12 @@ Cada servicio debe declarar como mínimo:
   Marketing Cloud Engagement y Marketing Cloud Next, con operación, venta y coexistencia separadas.
 - [Creative Services](creative-services/README.md) — incluye Social Media, su operación recurrente y la capability
   **Efeonce Run & Gun Studio**, que se comercializa mediante **Efeonce Run & Gun Production** con alcance propio.
-- [Media & Distribution](media-distribution/README.md)
-- [Channel & Commerce](channel-commerce/README.md) — trade marketing: ejecución de canal con
-  evidencia, cobertura auditada, capacidad de terreno gobernada y orquestación de proveedores. Estado `Proposed`,
-  mercado inicial Chile.
+- [Media & Distribution](media-distribution/README.md) — incluye la ficha propia de
+  [Performance & Commerce Distribution](media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md) (`Proposed`):
+  paid media con dos motions (Demand & Commerce · B2B Pipeline), canales como cobertura y programmatic vía partner.
+- [Channel & Commerce](channel-commerce/README.md) — trade marketing y BTL: 23 servicios en dos familias
+  (13 trade + 9 BTL + 1 transversal) con `Managed Channel Operations` como modalidad que opera todos. Estado
+  `Proposed`, mercado inicial Chile. ADR: [`EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1`](../architecture/EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1.md).
 
 HubSpot as a Service pertenece a **RevOps & CRM**. Su arquitectura vigente usa seis familias por outcome, modos de
 entrega transversales y overlays sectoriales; la evaluación inicial para fit/cotización es sin costo y un blueprint
@@ -88,12 +90,27 @@ que diseña, construye y opera la capa digital inteligente. El catálogo económ
 | **Measurement & Analytics** | Measurement Audit · Tagging/Data Layer · GTM/GA4 Implementation · Dashboard & Attribution · Analytics Operations |
 | **Agent Systems & Platforms** | Agent Strategy & Architecture · Custom Agent System · Managed Agent Deployment · Agent Integrations · Agent Evaluation & Operations |
 | **Digital Automation & Integrations** | API/Workflow Sprint · Data Pipeline · Automation Build · Integration Operations |
+| **Product Design 360** *(propuesta)* | **Capability de oficio** consumida por dos superficies. Lanes: Accesibilidad · Design system y tokens · Research y validación · Entrega de diseño (UI/UX) · Deuda de diseño · Design ops · Endurecer lo generado con IA. Entradas: Diagnóstico de Capacidad y Sample Sprint |
+
+**Product Design 360** es una **sexta familia propuesta**, todavía no aceptada en el ADR de boundaries. Su motion
+primario es **extender la capacidad de un equipo de product design in-house**, no reemplazarlo: se venden lanes de
+capacidad gobernada, no diseñadores. Cubre superficies operables —web y producto digital— y separa *decidir cómo
+debe ser la experiencia* de *construirla y operarla*, que sigue siendo de Web Experience 360. Ficha:
+[`wave/product-design-360.md`](wave/product-design-360.md). Modelo:
+[`PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md`](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md).
+Las fichas de servicio de Wave viven en [`wave/`](wave/README.md). **El oficio de diseño es uno y los compradores
+son dos:** la superficie de producto la vende Product Design 360 (Head of Design → CPO/CTO) y la superficie de
+sitio público la vende **Web Experience 360** (CMO → Head of Digital) consumiendo la misma capability. Accesibilidad
+y design system son lanes **compartidas**: se contratan una sola vez aunque el cliente compre las dos superficies.
+Nunca dos ofertas de Efeonce compitiendo por la capacidad de diseño de una misma cuenta.
 
 La composición de un proyecto puede incorporar capacidades de RevOps & CRM/Kortex, Creative Services/Globe o
 Media & Distribution (con Reach cuando aplique) según el resultado contratado y el RACI definido. Wave conserva el ownership de sus
 familias de servicio.
 
 La composición propuesta [`Search + Social Visibility`](../business-models/search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md) conecta Search Visibility 360 con Social Media sin fusionar ownership, pricing o accountability.
+
+La extensión propuesta [`Search & App Visibility`](../business-models/search-visibility-360/SEARCH_APP_VISIBILITY_EXTENSION_V1.md) (`Proposed`, 2026-09-10) lleva Search Visibility 360 a las tiendas de apps y al descubrimiento de apps por IA para clientes con app. Es expansión por superficie, no una familia nueva: Apple Ads y App campaigns siguen en Reach, los creativos en Globe y la instrumentación en Measurement & Analytics.
 
 ### Delivery models de Wave
 

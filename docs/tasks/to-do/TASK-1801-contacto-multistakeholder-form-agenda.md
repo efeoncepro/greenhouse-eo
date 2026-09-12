@@ -20,9 +20,9 @@
 - Flow: `docs/ui/flows/TASK-1801-contacto-multistakeholder-flow.md`
 - Motion: `docs/ui/motion/TASK-1801-contacto-multistakeholder-motion.md`
 - Backend impact: `integration`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Diseño contratado; owners, SLA, destino y binding por verificar antes de UI ready`
-- Rank: `TBD`
+- Rank: `EPIC-047-H1`
 - Domain: `public-site|growth|crm|content|ui|data`
 - Blocked by: `decisión operativa de owners/SLA por motivo + validación de rollout de TASK-1509/TASK-1510 para Contacto`
 - Branch: `Greenhouse develop; sin worktrees`

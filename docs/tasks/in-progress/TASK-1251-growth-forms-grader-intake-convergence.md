@@ -6,6 +6,15 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-10 — la operabilidad MCP del grader no es "por construcción"
+
+- La línea de `Goal`/Summary que dice que esta convergencia "habilita que el grader sea operable por
+  Nexa/MCP/CLI vía el contrato del motor sin trabajo grader-específico" cubre **el intake público**
+  (submission del motor de Forms), no el run operador ni la lectura de resultados. El discovery
+  2026-09-10 midió cero tools MCP del grader y ningún lane de API Platform para él. Esa capacidad la
+  construye `TASK-1861` (lane `app` con autoridad humana delegada + tools federadas + manuales);
+  esta task no cambia de alcance.
+
 ## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
 
 23 checkboxes en cero con `Status real: Diseno`, teniendo 4 slices en la historia y DOS migraciones

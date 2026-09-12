@@ -6,6 +6,12 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-11
+
+- TASK-1799 (Content Marketing) y TASK-1358 (Home) se cerraron el 2026-09-11 por decisión del operador: sus
+  contratos dejan de ser WIP y pasan a ser la línea base publicada que esta landing debe respetar — cerrado por
+  trabajo en EPIC-047. TASK-1350 (Agencia Creativa) sigue abierta. Orden en el portafolio: `Rank EPIC-047-08`.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -20,9 +26,9 @@
 - Flow: `docs/ui/flows/TASK-1803-landing-branding-studio-flow.md`
 - Motion: `docs/ui/motion/TASK-1803-landing-branding-studio-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Estrategia, dirección, wireframe, flow y motion contratados; VoC, casos, CTA, slug y runtime binding pendientes`
-- Rank: `TBD`
+- Rank: `EPIC-047-08`
 - Domain: `public-site|agency|content|growth|ui|seo`
 - Blocked by: `decisión comercial del Brand Diagnostic/CTA; inventario de casos y derechos; research SEO/canonical; discovery de work page WordPress`
 - Branch: `Greenhouse develop; sin worktrees`

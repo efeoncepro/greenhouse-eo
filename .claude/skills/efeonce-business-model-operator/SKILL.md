@@ -11,6 +11,11 @@ blind-eval protocol.
 For Media & Distribution, use the canonical service catalog at `docs/services/media-distribution/README.md` and
 preserve the distinction between Efeonce as the contracting masterbrand, the business line and Reach as enabling
 product brand.
+For Performance & Commerce Distribution (paid media), load its decision
+`docs/architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md`, service sheet
+`docs/services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md` and pricing pack
+`docs/business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md`: one capability with two
+buyer motions (Demand & Commerce, B2B Pipeline), channels as coverage never as SKU, programmatic via partner.
 Load that skill and the current model under `docs/business-models/`. Finance owns accounting, cost, cash and
 margin controls; Legal owns contracts, IP and privacy; Commercial owns execution of offers and sales.
 For Media & Distribution, the current model is `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md`.
@@ -58,3 +63,9 @@ classify relationships as strategic core, creative capability, execution enabler
 owner, economics, contract, rights, support, fallback and demand evidence before increasing priority.
 The transversal commercial contract is `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`;
 it also separates license/access, advisory, implementation, managed operations, Product Services and Efeonce IP.
+
+When a business model is presented to the team or a third party as a document, deliver it as a branded A4 PDF with
+`report-studio` and `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` (rule lives in the canonical Codex
+skill, section "Artefactos de salida"). Living reference: `docs/business-models/channel-commerce/deliverables/` and
+`scripts/documents/render-channel-commerce-business-model.mjs`. The PDF is derived: regenerate it when the canonical
+model documents change; never edit it as a source.

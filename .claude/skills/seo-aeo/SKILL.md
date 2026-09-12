@@ -12,9 +12,14 @@ description: >-
   WordPress/Kinsta. Úsala también para blogposts,
   pillars y guías: research dossier, intent/SERP, claim ledger, metadata,
   canonical/robots, author Person, Article schema, publicación y QA live.
+  Cubre además ASO y descubrimiento de apps en la era de IA como superficie
+  adyacente: metadata de App Store y Google Play, creativos de ficha, Custom
+  Product Pages y Custom Store Listings, reseñas, Ask Play, Gemini,
+  Personalized Collections, App Intents/Spotlight y medición por fuente.
   Triggers: SEO, AEO, GEO, LLMO, schema, JSON-LD, E-E-A-T, knowledge graph,
   citabilidad, llms.txt, Core Web Vitals, topical authority, backlinks, hreflang,
-  auditoría SEO, rankear, posicionamiento, tráfico orgánico, Semrush y GSC.
+  auditoría SEO, rankear, posicionamiento, tráfico orgánico, Semrush, GSC, ASO,
+  App Store, Google Play y ficha de app.
 ---
 
 # SEO + AEO/GEO — Skill operativa 2026
@@ -31,6 +36,11 @@ description: >-
 > cobertura de AI Overviews, umbrales CWV, qué bots existen, qué herramienta
 > lidera), **reverifica con browsing Codex/WebSearch**. Ver `SOURCES.md` para niveles de
 > volatilidad por tema.
+
+> **Delta 2026-09-10 — ASO entra como superficie adyacente.** Las tiendas de apps se
+> volvieron motores de respuesta (Ask Play, App Store tags generadas por LLM,
+> Personalized Collections con App Notes). Módulo nuevo: `modules/10_ASO_APP_DISCOVERY.md`.
+> Cómo se vende y empaqueta: skill `seo-aeo-practice`.
 
 ---
 
@@ -78,6 +88,12 @@ vez. AEO **no reemplaza** SEO: lo *extiende*. Quien tiene fundamentos sólidos
 (Capa 1) parte ganando en las tres. Lo verdaderamente nuevo de AEO es: cómo se
 **recupera** (RAG/embeddings + Query Fan-Out), cómo se **estructura** para ser
 citable (chunking, answer capsules) y cómo se **mide** (Share of Voice en LLMs).
+
+**Las tiendas de apps repiten las tres capas (delta 2026-09-10).** Fundamentos compartidos
+(la misma entidad en la web, la ficha y las reseñas) · ASO clásico (rankear en la búsqueda de
+la tienda y convertir la ficha) · descubrimiento por IA (Ask Play, Gemini, Personalized
+Collections, Siri/Spotlight). Para un cliente con app, la tienda es una superficie más del
+mismo trabajo, no otra disciplina → `modules/10_ASO_APP_DISCOVERY.md`.
 
 **Por qué importa ahora (data verificada 2026-06):**
 - AI Overviews aparecen en ~**48–50%** de las búsquedas en Google (Mar 2026).
@@ -139,6 +155,7 @@ decláralo. Ramifica la recomendación según las respuestas.
 | Fuentes canónicas + qué reverificar y cada cuánto | `SOURCES.md` |
 | GSC API, Platform Properties, URL Inspection, sitemaps, ping o aviso de una URL nueva | `references/google-search-console-api-indexing.md` + `modules/01_SEO_TECHNICAL.md` |
 | Infografías, SVG directo, `<picture>`, image SEO, ALT/caption, featured/OG y descripción larga | `references/editorial-image-seo.md` + `modules/01_SEO_TECHNICAL.md` |
+| **Fórmulas y cortes de terceros** (scoring de visibilidad IA, priorización de clusters, canibalización SERP-first, gap de backlinks, auditoría de cartera, índice de visibilidad, offer bank): qué método usa la competencia y **dónde contradice lo que ya medimos** | `references/competitor-methodologies-2026-09.md` ⚠️ (fórmulas ajenas **no validadas con nuestros datos**; donde hay motor propio —canibalización sobre GSC, curvas de CTR— **manda el propio**; endpoints y costos → skill `dataforseo-operator`) |
 | Blogposts, pillars y guías: dossier, traducción de metadata, E-E-A-T, publicación WordPress/Think, link health y verificación live | `references/agentic-editorial-eeat.md` + `content-marketing-studio/references/metadata-translation-method.md` |
 | Pillar Experience Efeonce: canonical, mapa de cluster, `ItemList`, enlaces y placement Think/host | `docs/public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md`; esta skill valida semántica/schema, no elige el CMS por SEO |
 | Cluster Experience federada: nodos owned/platform-native, indexación social y medición por superficie | Canon editorial en `../content-marketing-studio/references/content-engineering.md`; aplicar contrato de búsqueda federada abajo y reverificar plataformas |
@@ -147,6 +164,7 @@ decláralo. Ramifica la recomendación según las respuestas.
 | Caso Efeonce: WordPress/Kinsta + AI Content Factory + HubSpot + ICP Globe | `efeonce/EFEONCE_OVERLAY.md` |
 | **Producto Greenhouse que operacionaliza esta skill** (AI Visibility Grader / dominio `growth`, TASK-1226/1227) | `efeonce/AI_VISIBILITY_GRADER.md` |
 | **Radiografía AEO** (Think): muestra viva que educa y demuestra ejecución SEO/AEO sobre un hueco medido; no reemplaza al Grader | `docs/think/radiografia-aeo-architecture.md` + manual comercial `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md` |
+| **Tiendas de apps (ASO) y descubrimiento de apps por IA**: metadata de App Store y Google Play, creativos, Custom Product Pages / Custom Store Listings, reseñas, Ask Play, Gemini, Personalized Collections, App Intents/Spotlight, puente web↔ficha↔IA y medición por fuente de adquisición | `modules/10_ASO_APP_DISCOVERY.md` (venta y empaquetado → skill `seo-aeo-practice`; paid de tiendas → Reach) |
 | **Web agéntica**: WebMCP, exponer tools a agentes, agentic-web *readiness* (¿los agentes pueden *usar* el sitio, no solo *citarlo*?), Lighthouse API programática + audit `registered-webmcp-tools` | **skill `webmcp`** (cross-skill) |
 | Artefactos listos para usar | `templates/` (jsonld, llms-txt, briefs, checklists) |
 

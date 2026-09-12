@@ -75,6 +75,7 @@ import { getContractingValidationBlockedOverdueSignal } from './queries/contract
 import { getContractorPayableUnbatchedOverdueSignal } from './queries/contractor-payable-unbatched-overdue'
 import { getContractorPayableBridgeDeadLetterSignal } from './queries/contractor-payable-bridge-dead-letter'
 import { getContractorRemittanceEmailDeadLetterSignal } from './queries/contractor-remittance-email-dead-letter'
+import { getReactiveCircuitOpenSignal } from './queries/reactive-circuit-open'
 import { getContractorPayableTaxReviewOverdueSignal } from './queries/contractor-payable-tax-review-overdue'
 import { getContractorPayableFxUnresolvedOverdueSignal } from './queries/contractor-payable-fx-unresolved-overdue'
 import { getContractorPayableExceedsAgreedAmountSignal } from './queries/contractor-payable-exceeds-agreed-amount'
@@ -866,6 +867,8 @@ interface ReliabilityOverviewSources {
   contractorPayableReadyWithoutObligation?: ReliabilitySignal | null
   contractorPayableBridgeDeadLetter?: ReliabilitySignal | null
   contractorRemittanceEmailDeadLetter?: ReliabilitySignal | null
+  /** ISSUE-172 — breaker open/half_open o handler degradado en el consumer reactivo. */
+  reactiveCircuitOpen?: ReliabilitySignal | null
   /** TASK-795 Fase A — international boundary block signals (tax review + FX). */
   contractorPayableTaxReviewOverdue?: ReliabilitySignal | null
   contractorPayableFxUnresolvedOverdue?: ReliabilitySignal | null
@@ -1332,6 +1335,8 @@ export const buildReliabilityOverview = (
     ...(sources.contractorPayableReadyWithoutObligation ? [sources.contractorPayableReadyWithoutObligation] : []),
     ...(sources.contractorPayableBridgeDeadLetter ? [sources.contractorPayableBridgeDeadLetter] : []),
     ...(sources.contractorRemittanceEmailDeadLetter ? [sources.contractorRemittanceEmailDeadLetter] : []),
+    // ISSUE-172 — circuitos abiertos del consumer reactivo (una projection detenida no deja fila).
+    ...(sources.reactiveCircuitOpen ? [sources.reactiveCircuitOpen] : []),
     // TASK-795 Fase A — international boundary block signals (tax review + FX).
     ...(sources.contractorPayableTaxReviewOverdue ? [sources.contractorPayableTaxReviewOverdue] : []),
     ...(sources.contractorPayableFxUnresolvedOverdue ? [sources.contractorPayableFxUnresolvedOverdue] : []),
@@ -2270,6 +2275,14 @@ export const getReliabilityOverview = async (
       ? preloadedSources.contractorRemittanceEmailDeadLetter
       : await getContractorRemittanceEmailDeadLetterSignal().catch(() => null)
 
+  // ISSUE-172 — un breaker abierto detiene una projection entera sin dejar fila en el log, así
+  // que ninguna señal de dead-letter lo ve. Degrada a null como el resto: un signal roto no
+  // envenena el overview.
+  const reactiveCircuitOpen =
+    preloadedSources.reactiveCircuitOpen !== undefined
+      ? preloadedSources.reactiveCircuitOpen
+      : await getReactiveCircuitOpenSignal().catch(() => null)
+
   // TASK-795 Fase A — payables blocked by the international boundary (tax review + FX).
   const contractorPayableTaxReviewOverdue =
     preloadedSources.contractorPayableTaxReviewOverdue !== undefined
@@ -3031,6 +3044,7 @@ export const getReliabilityOverview = async (
     contractorPayableUnbatchedOverdue,
     contractorPayableBridgeDeadLetter,
     contractorRemittanceEmailDeadLetter,
+    reactiveCircuitOpen,
     contractorPayableTaxReviewOverdue,
     contractorPayableFxUnresolvedOverdue,
     contractorPayableExceedsAgreedAmount,

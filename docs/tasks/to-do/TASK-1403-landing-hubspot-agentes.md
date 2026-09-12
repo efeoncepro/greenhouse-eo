@@ -4,6 +4,21 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-11 — el Pillar ya está publicado, pero no en `/servicios/hubspot/`
+
+TASK-1352 se cerró: el Pillar vive en `/servicios-contratar-hubspot/` (WordPress `244079`, `200`, `index, follow`).
+La migración a `/servicios/hubspot/` no se hizo y esa ruta hoy responde `301` hacia `/hubspot/hubspot-marketing-ventas/`,
+un post antiguo. Esta página cuelga de `/servicios/hubspot/`: antes de publicar, el operador decide la URL padre del
+hub (decisión registrada en EPIC-047) — cerrado por trabajo en EPIC-047.
+
+## Delta 2026-09-11 — el bloqueo F0 está parcialmente resuelto
+
+[`HUBSPOT_CUSTOMER_AGENT_ANAM_APPROVAL_RECORD_V1.md`](../../public-site/HUBSPOT_CUSTOMER_AGENT_ANAM_APPROVAL_RECORD_V1.md)
+registra que ANAM aprobó el caso el 2026-07-17 (artículo privado v4): ANAM puede nombrarse y sus hechos y cifras
+pueden seguir el flujo editorial. **No** autoriza publicar en WordPress ni usar logos o capturas fuera del texto, y
+el agente no se presenta como activo. `Blocked by` se mantiene hasta que el operador confirme que esa aprobación
+cubre esta página. Orden en el portafolio: `Rank EPIC-047-04`.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -18,9 +33,9 @@
 - Flow: `docs/ui/flows/TASK-1403-landing-hubspot-agentes-flow.md`
 - Motion: `docs/ui/motion/TASK-1403-landing-hubspot-agentes-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
+- Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `TBD`
+- Rank: `EPIC-047-04`
 - Domain: `public-site`
 - Blocked by: 🔴 **F0 — el caso ANAM verificado + autorizado** *(sin él, esta página es capability sin prueba)*
 - Branch: `task/TASK-1403-landing-hubspot-agentes`

@@ -20,6 +20,44 @@ Layering canónico del ecosistema digital (SSOT: `docs/public-site/decisions/PDR
 
 El **AI Visibility Grader** es la costura top→bottom del ecosistema. Cargar PDR-003 al razonar sobre superficies/hosts/dónde nace una pieza.
 
+## Runtime real en Notion — leer ANTES de proponer estructura
+
+El sistema de contenidos **no es el calendario**: son tres bases encadenadas
+(**Pilares JTBD → Content Hub → Calendario de Contenidos**) + la Wiki. Mapa canónico con IDs,
+schema vigente y brechas: **`docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md`**.
+
+| Base | Data source | Rol |
+|---|---|---|
+| Pilares JTBD | `collection://33ecce0f-f806-409d-b193-6f6a23e6f9d2` | **eje temático canónico** — 7 pilares con job, buyers BP1–BP8, tier, registro de voz, split y canales |
+| Content Hub | `collection://9540b2c0-c621-4ccf-986b-efefe63feb7e` | **taller de texto largo**: artículos, ebooks, pillar pages, series, podcast, storytime (41 piezas, 8 templates). Desde acá se distribuye a **Think** o **WordPress** |
+| Calendario **vigente** | `collection://38339c2f-efe7-8113-9c92-000b50674fa8` | 66 filas, todas a futuro (2026-09-18 → 2027-03-21) |
+| Calendario **anterior** | `collection://2e039c2f-efe7-8118-ab82-000b04f62cfd` | 100 filas de histórico publicado, **schema idéntico**; es al que apuntan Content Hub y Pilares |
+| Wiki de Contenidos | `collection://15839c2f-efe7-819d-90b7-000b9011a403` | 89 páginas de doctrina, formatos, SOPs, playbooks |
+
+**Cuatro ejes ortogonales — una pieza bien formada declara los cuatro:** Pilar JTBD (para quién y qué
+job) · Territorio `PDR-019` (bajo qué se archiva) · Franquicia `PDR-020` (qué forma recurrente) ·
+Canal (dónde nace).
+
+**Reglas duras:**
+
+- **NUNCA** proponer estructura de contenidos sin leer el mapa: el runtime tiene ejes que la doctrina
+  no inventó (tier T1/T2/T3, registro de voz, split, buyers) y siguen vigentes.
+- **NUNCA** confundir `Territorio Arc` (Social Proof, CSC, AEO+SD, Nested Loops, Agentic Web — narrativa
+  de marca) con el territorio de `PDR-019` (taxonomía del blog WordPress). Son dos taxonomías distintas.
+- **NUNCA** tratar `LinkedIn Página 💼` y `LinkedIn Julio 👤` como el mismo canal: el runtime los modela
+  separados y su voz es distinta (marca vs `JULIO_REYES_VOICE_SYSTEM`).
+- **NUNCA** ejecutar una mutación en Notion sin autorización explícita del operador.
+- **NUNCA** asumir que "el calendario" es una sola base: hay **dos** con schema idéntico y el histórico
+  está partido. Cualquier promedio de velocidad operativa medido sobre una sola usa la mitad de la
+  evidencia.
+- **NUNCA** inferir el destino de publicación desde el `Tipo`: una Pillar puede vivir en Think o en
+  WordPress según `PDR-018`, y un ebook no vive en ninguno (bucket privado + entrega por link). Hoy el
+  Content Hub **no tiene propiedad de destino** — sólo `Enlace`, poblado en 5 de 41 piezas.
+- Brecha crítica del eje temático: **0 de 66 filas del calendario vigente declaran `Pilar JTBD`.**
+- Brechas al 2026-09-10: Wiki con **89 páginas sin etiquetar**; el Calendario **no puede expresar
+  franquicia, canal-hogar vs satélite, territorio ni sends/saves/watch time/dwell**; `Tipo de pieza`
+  conserva `Portafolio`, descartado por `PDR-020`.
+
 ## El motor: AI Content Factory (no reimplementar)
 
 `src/lib/public-site/content-factory/` — planificación/validación Gutenberg, catálogo de patrones, patch/refresh de posts, deep-inspection. **Herramienta de producción/publicación; se opera vía `efeonce-public-site-wordpress`.**

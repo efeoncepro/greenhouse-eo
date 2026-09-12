@@ -7,7 +7,7 @@
 > **Skills:** `hubspot-solutions-partner` (dominio HubSpot: producto, programa, battlecards, waiver),
 > `commercial-expert` (motion, wedge, land-and-expand, JOLT/Challenger), `growth-marketing-cro`,
 > `seo-aeo`, `efeonce-agency`, `product-design-loop`, `efeonce-public-site-wordpress`.
-> **Ejecución:** [`TASK-1352`](../../tasks/to-do/TASK-1352-landing-hubspot-agentic-platform.md) —
+> **Ejecución:** [`TASK-1352`](../../tasks/complete/TASK-1352-landing-hubspot-agentic-platform.md) —
 > reposición in-place de `/servicios-contratar-hubspot/` (WordPress id `244079`). Epic: `EPIC-019`.
 > **No-duplicación:** cita, no copia — `docs/context/02_gtm.md` (CRM Solutions, 4 capas, Solutions Partner,
 > co-sell con PDM), `docs/context/08_estrategia-comercial.md`, `docs/context/09_marca-agencia.md`,

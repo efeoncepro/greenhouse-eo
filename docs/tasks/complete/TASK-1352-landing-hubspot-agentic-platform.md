@@ -6,6 +6,21 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-11 — cerrada por decisión del operador
+
+El operador cerró la task: el Pillar HubSpot quedó implementado y publicado. Readback HTTP 2026-09-11:
+`https://efeoncepro.com/servicios-contratar-hubspot/` (WordPress `244079`) responde `200`, `meta robots`
+`index, follow`, canonical a sí misma y título «Implementación y operación de HubSpot | Efeonce».
+
+**La URL no es la que planeaba PDR-013.** No se ejecutó la migración a `/servicios/hubspot/`, y esa ruta hoy
+responde `301` hacia `/hubspot/hubspot-marketing-ventas/`, un post antiguo del blog («HubSpot: Marketing y Ventas
+para un Crecimiento Sostenible»). Como TASK-1401 (Precios) y TASK-1403 (Agentes) cuelgan de `/servicios/hubspot/`,
+la URL padre del hub queda como decisión del operador en EPIC-047; ambas tasks recibieron Delta.
+
+Los 27 criterios de aceptación quedan sin tildar: **no se certificaron** en este cierre (dossiers editoriales,
+first fold aceptado, conversión con lead real, GVC premium, scorecard, observación de 4–8 semanas) y el del redirect
+301 directamente no se hizo. Sin cambios de código en este repo: `pnpm test` + `pnpm build` no aplican.
+
 ## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
 
 27 checkboxes en cero con `Status real: Avanzada`. Verificado hoy: los dos commits que la nombran
@@ -20,7 +35,7 @@ ejecucion.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -33,9 +48,9 @@ ejecucion.
 - Motion: `docs/ui/motion/TASK-1352-landing-hubspot-agentic-platform-motion.md`
 - Visual direction: `docs/ui/visual-directions/TASK-1352-hubspot-immersive-pillar-direction.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
-- Status real: `Avanzada EN DEFINICION, NO en ejecucion (verificado 2026-09-01). Los dos commits que la nombran reescriben la task y el PDR-006; la landing no esta implementada y ningun dossier editorial (VoC/CRO, SEO/AEO, claim/proof) tiene registro de aprobacion. Ver el Delta`
-- Rank: `TBD`
+- Epic: `EPIC-047`
+- Status real: `Pillar publicado en /servicios-contratar-hubspot/ (page 244079, index/follow, verificado 2026-09-11); cerrada por decisión del operador sin la migración a /servicios/hubspot/ y con 27 criterios sin certificar`
+- Rank: `EPIC-047-cerrada`
 - Domain: `public-site`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
@@ -201,7 +216,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-1352-landing-hubspot-agentic-platform.md`
+- `docs/tasks/complete/TASK-1352-landing-hubspot-agentic-platform.md`
 - `docs/ui/visual-directions/TASK-1352-hubspot-immersive-pillar-direction.md`
 - `docs/ui/wireframes/TASK-1352-landing-hubspot-agentic-platform.md`
 - `docs/ui/flows/TASK-1352-landing-hubspot-agentic-platform-flow.md`
@@ -712,12 +727,12 @@ gate funciona como control de diseño antes de invertir en el resto de la págin
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedó actualizado si cambió comportamiento, estructura o protocolo visible
-- [ ] se ejecutó chequeo de impacto cruzado sobre TASK-1401…1404, PDR-013, spec del hub y tracking plan
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedó actualizado si cambió comportamiento, estructura o protocolo visible
+- [x] se ejecutó chequeo de impacto cruzado sobre TASK-1401…1404, PDR-013, spec del hub y tracking plan — 2026-09-11: TASK-1401 y TASK-1403 recibieron Delta por la URL padre; TASK-1402/1404 son artículos bajo `/hubspot/` y no dependen de ella; PDR-013, spec del hub y tracking plan no se editaron
 - [ ] el reference operacional de la landing contiene identidad, URL, snapshot, form, tracking y rollback vigentes
 - [ ] cualquier follow-up tiene task/owner explícito; no se cierra como “pendiente del operador” si existe verificación
   disponible para el agente

@@ -99,3 +99,50 @@ compuesto no cambia automáticamente el ownership del product service ni crea un
 - El modelo económico y de packaging vive en `docs/business-models/wave/`.
 - La taxonomía comercial derivada vive en `docs/services/README.md` y el context pack.
 - Las skills de agencia y business model deben cargar este ADR antes de razonar sobre Wave.
+
+## Delta 2026-09-10 — Product Design 360 propuesta como sexta familia
+
+**Estado: `Proposed`. Este delta NO modifica la decisión aceptada del 2026-07-25.** Las cinco familias siguen
+siendo las aceptadas; la sexta queda registrada como propuesta pendiente de aprobación.
+
+**Hueco detectado.** Este ADR le entregó a Wave el *diseño técnico, delivery y operación* de la web dentro de
+**Web Experience 360**. Eso cubre construir y operar. No cubre **decidir cómo debe ser la experiencia**: research,
+arquitectura de información, flujos, prototipado, interfaz, design system, accesibilidad, validación y design ops.
+Esa disciplina no tenía dueño en el portfolio — cae entre Wave (ingeniería web) y Globe (producción creativa), y
+ninguno de los dos la reclamaba. Tampoco estaba modelada en `docs/services/` ni en `docs/business-models/`.
+
+**Propuesta.** Registrar **Product Design 360** como sexta familia de Wave, con esta frontera interna:
+
+> Product Design 360 **decide cómo debe ser la experiencia**.
+> Web Experience 360 **la construye, la despliega y la opera**.
+
+Su alcance incluye superficies que no son web —app, portal de cliente, SaaS, herramienta interna, experiencia
+conversacional—, razón por la cual no puede vivir subordinada a Web Experience 360.
+
+**Motion primario (delta V1.1 del modelo, 2026-09-10): extensión de capacidad, no sustitución.** Las empresas mid y
+grandes normalmente ya tienen product design in-house. La familia se vende como **lanes de capacidad gobernada** que
+extienden a ese equipo —feature delivery, research, design system, accesibilidad, deuda de diseño, design ops—, con un
+contrato anti-desplazamiento explícito y la distinción dura Managed Squad ≠ Staff Augmentation. El diseño integral de
+producto queda como motion secundario, para clientes sin equipo.
+
+**Relación con Web Experience 360 (delta 2026-09-10): capability única, dos ofertas.** El oficio de diseño es el
+mismo para un producto y para un sitio público; lo que cambia es el comprador. Product Design 360 posee la
+**capability** —método, gente, quality gates, práctica de design system, telemetría— y vende la **superficie de
+producto** (Head of Design → CPO/CTO). **Web Experience 360 conserva la superficie de sitio público** (CMO → Head
+of Digital) y consume esta capability dentro de su oferta. Accesibilidad y design system/tokens son lanes
+compartidas: se contratan una sola vez por cliente. **NUNCA dos ofertas de Efeonce compitiendo por la capacidad de
+diseño de la misma cuenta**: una sola propuesta, con owner declarado por lane.
+
+**Frontera con Globe, sin cambios de ownership.** Globe conserva contenido, marca y producción creativa. Product
+Design 360 diseña la interfaz y el sistema con el que alguien opera algo. *Un brandbook no es un design system.*
+
+**Lo que este delta no hace.** No aprueba la sexta familia, ni pricing, ni claims públicos, ni el nombre público
+"Product Design 360" (decisión abierta D1 del modelo). No cambia el ownership de ninguna capability existente.
+
+**Condición de resolución.** El gate G1 del modelo económico —demanda externa verificada— decide si la sexta
+familia se acepta en un ADR V2 o si se repliega a capability dentro de Web Experience 360.
+
+**Decisión propia:** [`EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`](EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md) (`Proposed`) — capability, dos ofertas, lanes e invariantes.
+
+**Fuentes:** [`Product Design 360 — Business Model V1`](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) ·
+[`Ficha de servicio`](../services/wave/product-design-360.md)

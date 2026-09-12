@@ -141,3 +141,37 @@ probablemente haya que construirlo con `research-benchmark-operator` + entrevist
 | **¿Alguien tiene atribución LLM → revenue?** | Si aparece, cambia el pricing de la categoría | 🔴 Alta |
 
 🔜 **Van a `modules/01_MERCADO_2026.md`**, que **todavía no existe**. **No lo cites.**
+
+---
+
+## 8. ASO — mercado, herramientas y medición — verificado **2026-09-10**
+
+Informe completo con URL y fecha por dato: `docs/audits/commercial/ASO_SERVICE_MARKET_RESEARCH_2026-09-10.md`.
+Datos de plataforma (Apple, Google, OpenAI): `seo-aeo/SOURCES.md` §5.
+
+| Dato | Valor | Marca |
+|---|---|---|
+| Retainer ASO | USD 500–2.000/mes entrada · 2.000–5.000 medio · 5.000–10.000+ premium | ⚠️ secundaria sin metodología (Admiral Media) — solo orden de magnitud |
+| Auditoría o paquete de lanzamiento ASO | USD 2.000–15.000 | ⚠️ idem |
+| Precios de agencias ASO en LATAM | — | ❌ ninguna publica tarifas |
+| Agencias que venden ASO + SEO integrado | yellowHEAD ("Holistic Organic: ASO+SEO") · Moburst (ASO junto a SEO y AEO) | ⚠️ autodescripción |
+| Agencia LATAM que venda ASO + AEO en español | No encontrada | ⚠️ inferencia: no prueba que no exista, no se usa como claim público |
+| AppTweak | desde ~USD 79/mes | ⚠️ agregadores, no la página oficial |
+| MobileAction · Appfigures | desde ~USD 15 · desde USD 9,99/mes | ⚠️ agregadores |
+| Sensor Tower | sin precio público; ~USD 75.000/año estimado | ⚠️ Vendr |
+| DataForSEO App Data — ficha de app | USD 0,0006 (standard) | ✅ [pricing](https://dataforseo.com/pricing/app-data/app-store) |
+| DataForSEO App Data — búsqueda en tienda | USD 0,0012 por 100 resultados (App Store) / por 30 (Google Play) | ✅ idem |
+| Cuota Android, páginas vistas web ago-2026 | CL 70,3% · MX 66,0% · CO 75,4% · PE 82,3% | ✅ StatCounter — mide web, no parque |
+| "70% de los visitantes usa la búsqueda" · "casi 65% de las descargas tras una búsqueda" | App Store, mundial, **2022** | ✅ Apple Ads — incluye búsqueda pagada; no es dato actual |
+| Custom Product Pages: +2,5 pp de conversión en promedio (base 1,6%) | según Apple | ✅ como dicho de Apple, ⚠️ como lift esperado — sin metodología |
+| Enforcement 2025 | Apple: ~195 M ratings/reseñas fraudulentas bloqueadas, 193.000 cuentas terminadas · Google: 160 M reseñas spam | ✅ reportes oficiales de cada empresa |
+
+### Datos de ASO que NO se citan
+
+| ❌ No decir | Por qué |
+|---|---|
+| *"De 3 a 4 estrellas = +89% de conversión"* (y variantes) | Sin fuente original localizable |
+| *"El 65–70% de las descargas viene de búsqueda"* como dato de hoy | Es de 2022, lo publica Apple Ads, mezcla dos métricas e incluye paid |
+| *"La IA te va a traer instalaciones"* | ❌ No existe source type ni estudio público |
+| *"Ask Play lee tu web"* | Lo dicen vendors; Google no lo confirma |
+| Cualquier precio "de mercado LATAM" para ASO | ❌ Nadie lo publica |

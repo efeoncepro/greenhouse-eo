@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.25
+> **Version:** 1.26
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-08-27 por Claude (TASK-1652 — corrección de ubicación, fallo honesto y fuente real de las citas en Google AI Mode)
+> **Ultima actualizacion:** 2026-09-11 por Claude (sets de preguntas curados para paneles competitivos multi-marca + límites conocidos medidos en el primer panel real)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -301,6 +301,35 @@ El grader mide si una marca aparece haciéndole a los motores de IA las pregunta
 
 > Detalle técnico: §Delta TASK-1290 en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md). Código: `src/lib/growth/ai-visibility/prompt-packs/{archetypes,authoring}/*` + `prompt-set-store.ts`. Detrás de los flags `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED` + `GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED` (default OFF; rollout tras eval TASK-1292 + review TASK-1291).
 
+### Sets curados por el operador para paneles competitivos (agregado 2026-09-11)
+
+Cuando se quiere comparar a una marca con sus competidores, no sirve que cada marca tenga su propio set de preguntas:
+los informes no serían comparables. Para eso existe el **panel competitivo multi-marca**: se corre el grader sobre el
+cliente y sobre cada competidor con **el mismo set de preguntas, el mismo día, el mismo mercado y los mismos 5
+motores**, y después se leen los informes juntos.
+
+- **Quién escribe las preguntas:** una persona del equipo, no el asistente de IA. Parte de lo que la gente realmente
+  busca en ese mercado y redacta preguntas conversacionales, con la situación del usuario ("viajo con mi mascota…"),
+  no palabras clave sueltas.
+- **Qué mezcla lleva:** preguntas de descubrimiento que no nombran ninguna marca (miden si la IA te encuentra a
+  ciegas), una pregunta comparativa anclada en el cliente con el mismo texto exacto en todos los informes (por ejemplo,
+  "¿Qué alternativas hay a SKY…?") y unas pocas preguntas que nombran la marca de cada informe (reputación, reclamos,
+  identidad). En el modo completo caben hasta 12 preguntas.
+- **Cómo queda registrado:** el set se guarda en el perfil de cada marca como un set aprobado y activo, con su origen
+  marcado ("curado por el operador" y el caso). Desde ahí cada medición lo usa congelado, igual que un set propuesto por
+  IA y aprobado. Hoy lo carga el operador con un script; no hay botón ni pantalla para esto.
+- **Qué se compara después:** las menciones de todas las marcas, contadas con la misma regla en todas las respuestas
+  (por pregunta, por motor y en la pregunta de alternativas), cuánto cita cada motor el sitio propio de cada marca y
+  qué fuentes de terceros aparecen más.
+- **Hoy es un procedimiento, no un producto.** El primer panel real fue el de SKY frente a LATAM, JetSMART, Avianca y
+  Gol (2026-09-11, cinco análisis en cerca de una hora). Las tasks TASK-1861, TASK-1863 y TASK-1864 son la base para
+  convertirlo en una capacidad gobernada (correr un lote de N marcas con el mismo set).
+
+Cómo usarlo y presentarlo en venta: [Panel competitivo AEO](../comercial/panel-competitivo-aeo.md). Paso a paso
+operativo: [manual — Panel competitivo multi-marca](../../manual-de-uso/growth/ai-visibility-grader-smoke.md#panel-competitivo-multi-marca).
+
+> Detalle técnico: §Delta 2026-09-11 en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md). Código: `src/lib/growth/ai-visibility/prompt-packs/prompt-set-command.ts` (`createGraderPromptSetDraft` + `approveGraderPromptSet`).
+
 ## Límites actuales
 
 - No usa IA para escribir el score ni la narrativa central del reporte: el score y el reporte son deterministas/versionados; la extracción LLM opcional solo enriquece campos acotados y está OFF por defecto.
@@ -311,3 +340,30 @@ El grader mide si una marca aparece haciéndole a los motores de IA las pregunta
 - No debe prender producción sin release control plane, migraciones/capabilities, rotación de credenciales expuestas y sign-off legal/comercial.
 
 > Detalle tecnico: invariantes y contrato en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md) (§Delta 2026-06-24). Codigo: `src/lib/growth/ai-visibility/**`. Operacion: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
+
+### Límites conocidos (medidos el 2026-09-11)
+
+El primer panel competitivo real destapó límites de la medición que aplican a cualquier análisis. Hay que declararlos
+siempre al presentar resultados:
+
+- **Se lee sólo el comienzo de cada respuesta.** De cada respuesta se guardan los primeros 600 caracteres y las
+  menciones se cuentan sobre ese tramo (donde suele estar la recomendación). Una marca nombrada al final de una lista
+  larga queda subcontada, y hoy no se guarda el texto completo para volver a contar.
+- **El chequeo de `llms.txt` puede dar un falso positivo.** Algunos sitios que se arman con JavaScript responden a
+  cualquier dirección con su propia página, también a `/llms.txt`. El chequeo lo lee como "llms.txt presente con
+  contenido curado" aunque el archivo no exista. Por la misma razón, "robots.txt no bloquea" sale cierto sin decir nada
+  cuando no hay un robots.txt real. No citar esos resultados sin revisar el contenido.
+- **La revisión por lenguaje sensible se dispara con pedazos de palabras.** El detector busca palabras como "denuncia",
+  "quiebra" o "demanda" dentro del texto, así que "denunciados" o "demandadas" también lo activan. Que un informe pase a
+  revisión no significa que haya un problema real: hay que leer la frase antes de aprobar.
+- **La pregunta que nombra al cliente produce eco.** Si una pregunta comparativa nombra al cliente, las respuestas lo
+  mencionan por eso. La presencia espontánea se mide en las preguntas que no nombran ninguna marca.
+- **Sitio que bloquea la lectura automática = "sin dato".** Cuando un sitio bloquea la lectura automática (pasó con
+  LATAM, Avianca y Gol), sus lecturas técnicas quedan "sin dato", nunca en cero.
+- **Es una foto de un día.** Para hablar de tendencia hay que repetir el mismo panel con una cadencia fija.
+- **No mide ventas.** No hay atribución directa entre aparecer en la IA y vender más.
+
+Los tres primeros son defectos del grader y ya tienen task: `TASK-1867` corrige el extracto y `TASK-1868` los chequeos
+técnicos y el detector de lenguaje sensible. Mientras no cierren, se declaran en cada entrega.
+
+> Detalle técnico: §Delta 2026-09-11 en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md). Código: `src/lib/growth/ai-visibility/contracts.ts` (`GROWTH_AI_VISIBILITY_EXCERPT_MAX`), `probes/structural/llms-txt.ts`, `review-gates/gates.ts` (`RISKY_REVIEW_TERMS`).

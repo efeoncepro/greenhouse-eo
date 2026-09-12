@@ -59,6 +59,35 @@ Antes de entregar:
 5. Corrige y vuelve a exportar hasta resolver los defectos observados. Entrega el PDF y conserva el
    insumo editable y evidencia de revisión. Un HTML correcto no prueba que el PDF esté revisado.
 
+## Documentos internos para el equipo
+
+**Origen:** caso aprobado por el operador, 2026-09-11. Aplica a documentos escritos para el equipo de Efeonce
+—modelos de negocio, planes, lecturas estratégicas— que se entregan como PDF fuera del repo.
+
+- Llevan el **mismo membrete completo** de este estándar: logo oficial, URL bubble, dirección, teléfono y folio
+  en todas las páginas, incluidas portada y contraportada.
+- La portada y la cabecera de las páginas interiores muestran la etiqueta **«Confidencial · Uso interno»**.
+- Una nota **«Sobre este documento»** declara el estado de lo que se describe y la fecha de la información.
+- El texto no filtra el taller: sin códigos internos de trabajo (tasks, epics, ADR, PDR, gates), rutas de
+  archivos, marcadores de verificación, nombres de herramientas o agentes ni notas al operador. Los códigos
+  internos se traducen a nombres claros («hitos de validación», no «G1–G6»).
+- Las cifras no verificadas se marcan en lenguaje claro (por ejemplo, tasas de factoring referenciales, por
+  confirmar con Finance) y las fuentes llevan fecha. Lo que está en validación no se presenta como aprobado.
+- Si el documento contiene información de competidores, proveedores o capital, no se comparte con clientes,
+  proveedores ni terceros.
+- El PDF es un **derivado**: la fuente de verdad son los documentos del dominio. Si cambian, se edita el insumo
+  editable y se regenera; el PDF no se edita a mano.
+- Además de la revisión de la sección anterior, antes de entregar barre el texto extraído del PDF buscando esas
+  fugas y revisa cada coincidencia (hay falsos positivos, como «todo» o «método»).
+
+**Ejemplo vivo, no plantilla obligatoria:** el documento de modelo de negocio de Channel & Commerce
+([cómo se mantiene](../business-models/channel-commerce/deliverables/README.md)), renderizado con
+`scripts/documents/render-channel-commerce-business-model.mjs`. El script inyecta fuentes y logos oficiales,
+resuelve el contacto desde `back-cover-full.slots.json`, pone cabecera en las páginas interiores y pie en todas,
+calcula el índice desde la página real de cada sección, falla si una página desborda o si fuentes o imágenes no
+cargan, y escribe el PDF de forma atómica. Otro documento puede resolverlo de otra forma mientras cumpla el
+estándar.
+
 ## Aplicación y propietarios
 
 `design-studio` gobierna composición; `deck-studio` aporta lectura sin narrador y evidencia visual;

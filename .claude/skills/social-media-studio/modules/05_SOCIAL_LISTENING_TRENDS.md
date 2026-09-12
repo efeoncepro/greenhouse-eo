@@ -132,24 +132,57 @@ No sumes impresiones de estos planos: tienen superficies, denominadores y metodo
 ## 6. Trend-jacking RESPONSABLE
 
 Sumarse a una tendencia (audio, formato, meme, conversación) puede multiplicar alcance —
-o quemar la marca si calza mal o llegas tarde. Evalúa **antes** de saltar:
+o quemar la marca si calza mal o llegas tarde. Evalúa **antes** de saltar.
+
+**Investiga el trend antes de escribir una línea** (minutos, no horas):
+- Lee los posts **textuales** de las marcas que ya se sumaron, no el resumen de alguien.
+- Cruza **≥2 fuentes** de medios de marketing (Marketing-Interactive, Social Samosa, ContentGrip,
+  PR Week o equivalentes) para saber qué funcionó y qué se criticó.
+- Mira **≥10 imágenes reales** del trend (memes de la gente + material oficial): el chiste dominante
+  sale de ahí, no de tu intuición.
+- **Nunca caracterices el estado o la intención de otra marca**: cita o describe lo que publicó, con su
+  tono. Caso real: se escribió «Duolingo está en pánico por su SEO», y era falso. Duolingo publicó
+  «oh god oh god my SEO my SEO» como chiste de personaje para **sumarse** al trend.
 
 **¿Este trend calza? (filtro de 5 preguntas)**
 1. **Relevancia**: ¿se conecta con lo que la marca hace/cree, o es forzado? Forzado = daño.
 2. **Riesgo de marca**: ¿el origen del trend es limpio? (¿controversia, tragedia, política,
    apropiación?). Ante duda de riesgo → **no**.
 3. **Ventana**: ¿estás dentro de la ventana de oportunidad? Un trend efímero muere en
-   **24–72 h** `(as-of 2026-07 — volátil)`. Llegar tarde se ve desesperado.
-4. **Aporte**: ¿agregas un giro propio, o solo copias? El algoritmo y la audiencia premian
-   el giro, castigan el clon.
+   **24–72 h** `(as-of 2026-07 — volátil)`. Publica en horas, máximo al día siguiente, y escalona
+   las redes (el canal reactivo primero). Llegar tarde se ve desesperado.
+4. **Aporte**: ¿el chiste **lleva el mensaje de la marca**? Falla cuando la referencia cultural es
+   decoración alrededor de un claim escrito de antemano (lección de ContentGrip sobre el iPhone Duo).
+   Tampoco copies la mecánica que otra marca ya hizo suya en esa conversación: la comparación de precio
+   era de Duolingo y el «lo hicimos primero», de Samsung. El clon se castiga.
 5. **Costo de producción vs vida útil**: no inviertas 3 días en algo que muere mañana.
+
+**Mecánicas probadas para sumarse a un lanzamiento** (mapa del iPhone Duo, 2026-09; sirve para el próximo):
+
+| Mecánica | Ejemplo | Cuándo te sirve |
+|---|---|---|
+| Juego con el nombre | Duolingo, dueño natural de «Duo» | solo si el nombre te pertenece de verdad |
+| «Lo hicimos primero» | Samsung, Motorola | si tu categoría tuvo el producto antes |
+| Tu producto como el objeto del trend | Domino's «Duomino», Heinz UK «Ketchup Duo» (dos sobres) | producto físico o visual que se deja «duplicar» |
+| Tensión del oficio en las dos mitades | Canva: lo que pide el cliente vs lo que quieres diseñar | servicios B2B: la tensión que vive tu cliente |
+| El formato como metáfora | Durex, Ryanair, KitKat con el pliegue | cuando la forma del objeto ya dice tu mensaje |
+
+**Canal y personaje.**
+- Canal-hogar del trend-jack en Efeonce = **Threads + Instagram** (PDR-020). LinkedIn recibe el
+  argumento profesional detrás del chiste, no la misma broma con otro caption.
+- El personaje de la marca se mantiene aunque el trend empuje a otra cosa: Duolingo rechazó la
+  «alianza» que le propuso Samsung y siguió en su personaje.
+- Si la pieza tiene manos, objetos o personas fotorrealistas generados con IA, **declárala** (flags por
+  red en `efeonce/STUDIO_TOOLING.md`).
 
 **Velocidad vs riesgo**: el trend-jacking vive en la tensión rapidez ↔ seguridad. Ten una
 **vía rápida aprobada**: qué categorías de trend puede saltar el CM sin escalar, y cuáles
 requieren sign-off. Documéntalo para no perder la ventana pidiendo permiso.
 
 El artefacto operativo es `templates/trend-jack-checklist.md` — úsalo para decidir go/no-go
-en minutos y registrar la razón. **Cierra con ese artefacto.**
+en minutos y registrar la razón. **Cierra con ese artefacto.** Caso fuente completo (research,
+copy rechazado y aprobado, programación por red):
+[`2026-09-11-iphone-duo-trendjack.md`](../../../../docs/operations/social/2026-09-11-iphone-duo-trendjack.md).
 
 ## 7. Sonido / audio trending
 
@@ -192,6 +225,8 @@ presupuesto o pilares.
   cifra de impresiones o "alcance total".
 - **NUNCA** hagas keyword-stuffing ni hashtag-confeti: baja calidad y no rankea.
 - **NUNCA** saltes a un trend sin pasar el filtro de 5 preguntas — el riesgo de marca es real.
+- **NUNCA** atribuyas a otra marca un estado o una intención («está en pánico», «se defiende»): cita
+  o describe lo que publicó.
 - **NUNCA** reestructures la estrategia por un trend efímero.
 - **NUNCA** afirmes cifras de social search de memoria — son `semestrales`, reverifica.
 - **NUNCA** uses audio comercial ajeno en cuenta de marca sin verificar derechos.

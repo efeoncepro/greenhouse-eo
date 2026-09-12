@@ -2,9 +2,18 @@
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
+## Delta 2026-09-11 — cerrada por decisión del operador
+
+El operador cerró la task porque la Home está publicada. Readback 2026-09-11: `https://efeoncepro.com/` responde
+`200`, `meta robots` `index, follow`, título «Efeonce | Agencia de marketing digital y tecnología».
+
+Quedan sin verificar y **no se dan por cumplidos**: edición real en el editor con save/reload y hash, QA manual de
+teclado/player y remount, y aprobación final de copy/claims/SEO con medición. Los Follow-ups 1–3 siguen como trabajo
+opcional; si se retoman, van en task propia. Sin cambios de código en este repo: `pnpm test` + `pnpm build` no aplican.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -16,9 +25,9 @@
 - Flow: `docs/ui/flows/TASK-1358-landing-agencia-flow.md`
 - Motion: `docs/ui/motion/TASK-1358-home-agency-motion.md`
 - Backend impact: `none`
-- Epic: `EPIC-019`
-- Status real: `Avanzada`
-- Rank: `TBD`
+- Epic: `EPIC-047`
+- Status real: `Home publicada en la raíz (index/follow, verificado 2026-09-11); cerrada por decisión del operador con 3 criterios de QA sin verificar`
+- Rank: `EPIC-047-cerrada`
 - Domain: `content`
 - Blocked by: `none`
 - Branch: `checkout compartido actual; sin cambio de branch ni worktrees`
@@ -238,7 +247,7 @@ Procedimiento de recuperación y límites en manual; no se ensayó rollback en e
 - [ ] Editor real: edición representativa, guardar/recargar, metadatos y hash verificados.
 - [ ] QA manual completa de teclado/player y remount; resolver o acotar fallas con evidencia.
 - [ ] Copy/claims/SEO final aprobados y mecanismos de medición/conversión verificados en su alcance.
-- [ ] Lifecycle/carpeta/índices cerrados sólo con evidencia final.
+- [ ] Lifecycle/carpeta/índices cerrados sólo con evidencia final. — No se cumplió así: el operador cerró el 2026-09-11 sin la evidencia de QA de los tres criterios anteriores; lifecycle, carpeta e índices sí quedaron sincronizados.
 
 ## Verification
 
@@ -249,9 +258,9 @@ No hubo cambios de producción, reservas, leads, commit o push durante la consol
 
 ## Closing Protocol
 
-Mantener task abierta. Responsable de QA: próximo ejecutor con acceso al editor; aprobación
-editorial: operador. Usar governance documental, task lint y context strict como último gate.
-Cuando haya evidencia suficiente, mover lifecycle y sincronizar índices en el mismo cambio.
+Cerrada el 2026-09-11 por decisión del operador (Home publicada). Lifecycle, carpeta, `docs/tasks/README.md`,
+registry, `Handoff.md` y `changelog.md` sincronizados en el mismo cambio. Impacto cruzado: TASK-1803 recibió Delta;
+TASK-1369, 1353 y 1859 sólo la citan como referencia.
 
 ## Follow-ups
 

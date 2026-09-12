@@ -40,6 +40,13 @@ coordinan varios proveedores y tienen presión por demostrar eficiencia, cobertu
 El alcance inicial debe priorizar cuentas donde Efeonce pueda acceder a datos, aprobaciones, proveedores y un owner
 interno con capacidad de decisión.
 
+**Delta 2026-09-10 — Performance & Commerce con dos motions.** La solución Performance & Commerce Distribution se
+valida con dos motions por comprador: **Demand & Commerce** (el beachhead B2C/B2B2C de arriba) y **B2B Pipeline**
+(empresas B2B con CRM operativo, optimizando hacia la etapa del CRM con LinkedIn, Search y ABM programático vía
+partner). El motion B amplía el beachhead de esta solución, no el de la línea completa. Decisión y economics:
+[`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md) ·
+[Pricing Integrity Pack](PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md) (`hypothesis_only`).
+
 Triggers prioritarios:
 
 - cambio o fragmentación de agencias/proveedores;
@@ -236,6 +243,10 @@ evidence ledger con fuente, fecha, owner, confianza, decisión y condición de a
 - operación manual que destruya margen;
 - canibalización u overlap con Creative Services, Wave, Kortex o Growth Strategy & Measurement.
 
+Para Performance & Commerce, el modelo de fee (niveles de complejidad con piso de margen), el mínimo de complejidad y
+la compra programática vía partner tienen propuesta desde 2026-09-10 en su pricing pack y su decisión; siguen abiertos
+hasta la revisión de Finance.
+
 Decisiones abiertas: beachhead vertical prioritario; mínimo de inversión o complejidad; modelo de fee por solución;
 capacidad y provider panel; stack real de Reach/Verk/Greenhouse; casos citables; rights playbook; y criterio para
 declarar una solución `Commercially approved`.
@@ -244,6 +255,8 @@ declarar una solución `Commercially approved`.
 
 - [Media & Distribution — catálogo de servicios](../../services/media-distribution/README.md)
 - [Performance & Commerce Distribution — market research 2025–2026](../../audits/commercial/PERFORMANCE_COMMERCE_DISTRIBUTION_MARKET_RESEARCH_2026-07-26.md)
+- [Performance media — canales, partners, precios y demanda 2026-09-10](../../audits/commercial/PERFORMANCE_MEDIA_CHANNELS_PARTNERS_PRICING_RESEARCH_2026-09-10.md)
+- [Performance & Commerce Distribution — ficha de servicio](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md)
 - Reach brochure 2026 — `Alineación/4. Comercial/Brochures/2026/EO_Brochure_Reach-2026.pdf`, referencia comercial local revisada 2026-07-26; no es source of truth
 - [Portfolio, Brand and Business Line Architecture V1](../../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md)
 - [Efeonce Product Service Operating Model V1](../EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md)

@@ -49,3 +49,6 @@
 | Renderer portable + hosts + gobernanza Growth | TASK-1340 | esta task |
 | Placement interruptivo (popup/slide-in) | task siguiente | to-do |
 | Admin cockpit autoría/reportes | task futura | to-do |
+| Host WordPress público — landing Trade Marketing & BTL (consumidor de `open_meeting_scheduler` + `<greenhouse-form>`) | TASK-1860 | to-do |
+| Host WordPress: landing de capacidad de diseño (superficie de producto de Product Design 360) — `open_meeting_scheduler` | TASK-1859 | to-do (surface no promovida hasta binding y fase B) |
+| Host WordPress público — landing ASO, tercera superficie de Visibilidad (consumidor de `<greenhouse-form>` + `open_meeting_scheduler`, con fallback a `/contacto/` sin binding) | TASK-1862 | to-do (publicación por fases atada a la extensión Search & App Visibility) |

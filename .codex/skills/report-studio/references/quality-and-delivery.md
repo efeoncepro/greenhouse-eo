@@ -13,6 +13,7 @@ Este módulo gobierna el archivo que recibirá el lector. Una captura del HTML, 
 | Responsabilidad | ¿Queda claro quién actúa? | Acciones con dueño y cierre | Trasladar al cliente nuestro trabajo |
 | Identidad | ¿Emisor y cliente están bien representados? | Assets y contacto canónicos | Logo incorrecto o pie omitido |
 | Composición | ¿Cada página se puede leer? | Inspección de todas las páginas | Cortes, superposiciones o texto ilegible |
+| Limpieza | ¿Quedan rastros del proceso de producción? | Barrido de fugas sobre el texto extraído | Código interno, ruta, nombre de herramienta o nota al operador visible |
 | Navegación | ¿Se llega al contenido correcto? | Índice, enlaces y marcadores | Destinos ausentes o equivocados |
 | Accesibilidad | ¿Qué se verificó realmente? | Semántica, orden, contraste y prueba asistiva | Declaración de conformidad no sustentada |
 | Reproducción | ¿Puede regenerarse? | Scripts, datos, versiones y hashes | Fuente perdida o exportación acumulativa |
@@ -36,6 +37,28 @@ El helper comprueba:
 Unidades de contenido: usa frases o registros suficientemente específicos. No uses palabras comunes como prueba de cobertura. Para evitar falsos positivos, delimita las unidades a secciones o exige ocurrencias exactas sólo cuando realmente deben ser únicas. El orden extraído puede diferir del orden semántico en documentos con columnas; un fallo requiere inspección, nunca ocultarlo con una normalización excesiva. Normalizar espacios y Unicode es razonable; borrar números, signos o negaciones destruye la prueba.
 
 El helper no verifica cálculos contra un proveedor, fidelidad de imágenes, colores de marca, orden semántico de tags, asociaciones complejas de tabla ni comprensión humana. Registra esas dimensiones aparte.
+
+### Respaldo con poppler cuando falta PyMuPDF
+
+No instales dependencias sin autorización del operador. Usa poppler (`pdfinfo`, `pdftotext`, `pdftoppm`; en macOS viene con Homebrew) y declara en la entrega que el preflight completo no corrió.
+
+- `pdfinfo informe.pdf`: páginas, tamaño (A4 ≈ 595 × 842 pt), `Tagged: yes` y `Title`.
+- Pie en todas las páginas: por cada página, `pdftotext -f i -l i informe.pdf -` y busca la dirección y el teléfono vigentes; el conteo de páginas con ambos debe igualar el total.
+- Índice: `pdftotext -layout -f N -l N` sobre la página del índice y compara cada número con la página donde aparece el título.
+- Visual: `pdftoppm -r 70 -png` de todas las páginas y revisa cada imagen; sube a `-r 110` o más para el detalle de una página corregida.
+
+Este respaldo no prueba destinos de enlaces, conteos exactos ni orden de unidades de contenido; para incrustación de fuentes, `pdffonts` muestra la columna `emb`. Registra lo no cubierto como no verificado.
+
+## Barrido de fugas
+
+Todo documento, para cliente o para el equipo, sale sin rastros del proceso de producción. Extrae el texto del PDF final y busca:
+
+- Códigos de trabajo interno (`TASK-`, `EPIC-`, `MINI-`, `ADR`, `PDR`) y códigos de hitos propios del modelo (por ejemplo, G1–G6).
+- Rutas de archivo, extensiones `.md` y marcadores como `[verificar]`.
+- Nombres de herramientas o agentes: skill, agente, Claude, Codex, lint, gate, pnpm, repo.
+- Estados en inglés del flujo interno (Proposed, Accepted).
+
+Revisa cada coincidencia en vez de fallar automáticamente. Falsos positivos observados: `TODO` con `-i` coincide con «todo», «todos» y «método» (busca `TODO` sensible a mayúsculas); «verificar» es un verbo legítimo en español. Corrige la fuente editable, no el PDF, y vuelve a exportar.
 
 ## Revisión visual del PDF final
 
@@ -77,4 +100,4 @@ Para evaluar esta skill, usa `evals/cases.json`: entrega un caso a un agente que
 
 Corrige bloqueantes y mayores. No congeles una entrega por preferencias menores no acordadas; registra la decisión editorial. No uses un puntaje propio de 9/10 como evidencia de aprobación.
 
-Entrega: PDF o formato final pedido, fuente editable, evidencia reproducible y registro de QA. Conserva fecha, versión y alcance de revisión. No declares envío, publicación ni guardado remoto sin efectuarlo y leerlo de vuelta. El mensaje al usuario debe distinguir mejoras aplicadas de verificaciones que siguen pendientes.
+Entrega: PDF o formato final pedido, fuente editable, evidencia reproducible y registro de QA. Conserva fecha, versión y alcance de revisión. No declares envío, publicación ni guardado remoto sin efectuarlo y leerlo de vuelta. El mensaje al usuario debe distinguir mejoras aplicadas de verificaciones que siguen pendientes y declarar el carril de QA usado (preflight completo o respaldo).

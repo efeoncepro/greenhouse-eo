@@ -48,6 +48,27 @@
 - Hook en la primera línea (el feed corta rápido). Nativo por plataforma, con voz.
 - El craft del post es de aquí; la estrategia de plataforma/calendario de `digital-marketing/04`.
 
+**Trend-jack: punch, no explicación.** En un trend el copy informativo se siente plano (el operador pidió
+«más punch» dos veces en el caso fuente). Lo que funcionó y se publicó:
+
+- **Gancho que mapea el objeto del trend al insight del cliente**, en una frase natural:
+  *«El iPhone Duo tiene dos pantallas. Tu cliente también.»*
+- **Resolución concreta con nombres propios**: *«En una te busca en Google. En la otra le pregunta a ChatGPT.»*
+- **Riesgo real > beneficio abstracto > metáfora**: *«La que te falta se la queda tu competencia.»*
+- **Remate con el chiste dominante del trend a favor del argumento**: *«Nadie paga US$1.999 por medio Duo.»*
+  (el precio de entrada era el chiste más repetido; verifica la cifra antes de usarla).
+- Un solo recurso retórico por bloque y frases que alguien diría en voz alta.
+
+**Misma verdad, variante por canal:**
+- **LinkedIn**: el argumento + pregunta que incomoda (*«¿Apareces en las dos?»*) + CTA a la landing.
+- **Instagram**: corto + CTA de reenvío (*«Mándaselo a quien lleva el marketing de tu marca»*).
+- **Threads**: conversacional, cierra con pregunta (*«¿En cuál apareces tú?»*).
+
+Las versiones rechazadas de ese mismo post (caption que describe la imagen, calco forzado, hecho inventado
+sobre otra marca, jerga interna) están en `ANTIPATTERNS.md`. Caso fuente:
+[`2026-09-11-iphone-duo-trendjack.md`](../../../../docs/operations/social/2026-09-11-iphone-duo-trendjack.md).
+El go/no-go del trend es de `social-media-studio` (`modules/05` §6).
+
 ## 7. Tagline & slogan
 
 - **Tagline:** frase duradera de identidad de marca (ej. Efeonce **"Empower your Growth"**).
@@ -79,6 +100,7 @@
 - [ ] Creative-message match (ad ↔ landing).
 - [ ] Microcopy: crafteado aquí, tokenizado vía UX-writing; nada hardcodeado.
 - [ ] CTA con verbo + valor; ansiedad reducida al lado.
+- [ ] Social/trend-jack: el gancho mapea el trend al insight del cliente, un recurso por bloque, variante por canal.
 
 ## Cross-links
 

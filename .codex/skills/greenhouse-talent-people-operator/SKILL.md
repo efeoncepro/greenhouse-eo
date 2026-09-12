@@ -79,6 +79,7 @@ Apply this workflow whenever the output will attract candidates externally: a Ca
 5. Draft from candidate value and demonstrable work: concrete problem → work and outcomes → evidence sought → what the organization supplies → transparent process → low-friction CTA. A long requirements list is not a strategy.
 6. For remote/global roles, stop before publication unless country eligibility, engagement path, time-zone overlap, language and benefit applicability are explicit. `Global` is not a substitute for an operating model.
 7. If a candidate-facing output names any Efeonce benefit, load `references/efeonce-candidate-benefits-charter.md` in the current task before drafting. Derive every quantitative entitlement from its current table; never reuse figures from an earlier draft or conversation. Separately verify the active Leave/runtime state: the charter does not prove a portal workflow, contract term or payment treatment. Local law may improve the global floor but never reduce it.
+8. Social distribution of a live vacancy (LinkedIn personal profile + Efeonce company page via Metricool) is a projection of the published Careers truth, never a new claim: follow `.claude/skills/social-media-studio/efeonce/linkedin-vacancy-distribution.md` and the social-post rules in `references/inbound-recruiting-job-ad-research.md` §Distribution and learning loop. Careers does not persist source/UTM per application yet, so per-channel attribution is an open gap, not a working metric.
 
 ### Senior creative IC calibration
 
@@ -553,13 +554,24 @@ load-bearing in `templates/job-offer-recipe.md`. Builder `job-posting.ts` consum
 
 **Estado**: **EN PRODUCCIÓN 2026-08-18** (release `fa54670470c1`) — editorial page + JSON-LD `JobPosting`,
 **both flags ON**, schema externally validated by validator.schema.org with **0 errors / 0 warnings**.
-The two live vacancies were authored in **full v2 contract**: `EO-OPN-0009` (Account Manager, reports to the
-CEO) and `EO-OPN-0061` (Content Creator, reports to the Creative Operations Lead), with a published response
-commitment of **3 to 4 weeks**. Eligible countries were approved by the CEO 2026-08-17 and are set on both:
-all of Latin America EXCEPT Cuba + US + ES (20 countries — AR BO BR CL CO CR DO EC SV GT HN MX NI PA PY PE UY
-VE + US + ES), with the contractual route made explicit in `content.workModel`: **Chile with a local labor
-contract; outside Chile, the international route with direct payment by Efeonce** (contract type
-`international_internal`, no EOR). Renderer fixture:
+The two vacancies live at the flip were authored in **full v2 contract**: `EO-OPN-0009` (Account Manager /
+Especialista en Marketing, Semi-senior, reports to the CEO) and `EO-OPN-0061` (Content Creator — Editorial,
+SEO/AEO & Social, Semi-senior, reports to the Creative Operations Lead).
+
+**Live today (verified 2026-09-11 on `/public/careers`, every detail HTTP 200): 4 vacancies** — those two plus
+`EO-OPN-0674` (SEO Specialist Senior, Senior, Growth, reports to the Managing Director) and `EO-OPN-0675`
+(Director(a) de Arte Senior, Senior, Creative, reports to the Creative Operations Lead), published
+**2026-09-09** by a separate operational act recorded in `docs/documentation/hr/task-1604-seo-art-assessment-pack.md`
+(their assessment layer is NOT active). All four publish the same facts: LATAM, remote, full-time, a response
+commitment of **3 to 4 weeks**, compensation discussed transparently during the process, charter benefits with
+the modality/country qualifier, and the same eligible countries approved by the CEO 2026-08-17: all of Latin
+America EXCEPT Cuba + US + ES (20 countries — AR BO BR CL CO CR DO EC SV GT HN MX NI PA PY PE UY VE + US + ES),
+with the contractual route made explicit in `content.workModel`: **Chile with a local labor contract; outside
+Chile, the international route with direct payment by Efeonce** (contract type `international_internal`, no
+EOR). Open discrepancy: the public stage 2 of `EO-OPN-0009` ("Assessment práctico…") does not say the case is
+fictitious, while the other three do; the owner confirmed in chat that it is, and the 2026-09-11 LinkedIn post
+states it for all four. Align the public copy via `updateHiringOpening` / `PATCH /api/hiring/openings/{id}`
+(`hiring.opening.write`) with operator authorization — not done as of 2026-09-11. Renderer fixture:
 `src/lib/hiring/public-careers/editorial-opening.fixture.ts`.
 
 Docs: ADR Delta 2026-08-17 in `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` · functional

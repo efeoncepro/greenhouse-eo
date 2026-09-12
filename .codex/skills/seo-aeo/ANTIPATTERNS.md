@@ -73,6 +73,54 @@ contrafactual, el número describe un patrón — no prueba un lift.** Decláral
   contenido de terceros poco relacionado. Google endureció contra esto
   ("site reputation abuse", 2024).
 
+## Borde black-hat en tiendas de apps (verificado 2026-09-10)
+
+En una tienda el riesgo no es una caída de ranking: es que expulsen al cliente del programa de
+desarrolladores. Y Apple lo aplica también a lo que hace un tercero en su nombre, o sea, a
+nosotros.
+
+- **Comprar, incentivar o filtrar reseñas y ratings.** Apple: *"If we find that you have
+  attempted to manipulate reviews, inflate your chart rankings with paid, incentivized,
+  filtered, or fake feedback, or engage with third-party services to do so on your behalf
+  […] may include expelling you from the Apple Developer Program"*
+  ([App Review Guidelines 3.2.2](https://developer.apple.com/app-store/review/guidelines/)).
+  Google prohíbe inflar ratings, reseñas o instalaciones por medios ilegítimos: ofrecer un
+  descuento a cambio de un rating alto, reseñas falsas haciéndose pasar por usuarios y reseñas
+  con cupones, códigos o links
+  ([Ratings, Reviews, and Installs](https://support.google.com/googleplay/android-developer/answer/9898684)).
+  Pedir reseña solo a los usuarios contentos es "filtered feedback".
+- **Install farms y tráfico automatizado.** Google pide explícitamente no usar servicios
+  automatizados para inflar instalaciones o ratings (misma política).
+- **Rellenar metadata.** Apple 2.3.7: no llenar la metadata con marcas de terceros, nombres
+  de apps populares, precios u otras frases irrelevantes "just to game the system", y Apple
+  puede modificar keywords inapropiadas. Google pide lenguaje natural y no repetir palabras
+  ([best practices](https://support.google.com/googleplay/android-developer/answer/13393723)),
+  y su [política de metadata](https://support.google.com/googleplay/android-developer/answer/9898842)
+  prohíbe keywords repetitivas o sin relación y claims como "#1" o precios en el ícono o el título.
+- **Screenshots como vehículo de keywords.** Los captions se escriben para convertir; una
+  captura que no muestra la app para meter texto choca con las guías de Apple.
+- **Escala de detección.** Según sus reportes de 2025, Apple bloqueó ~195 millones de ratings y
+  reseñas fraudulentas y terminó 193.000 cuentas de developer; Google bloqueó 160 millones de
+  reseñas spam ([Apple Newsroom, 2026-05](https://www.apple.com/newsroom/2026/05/the-app-store-stopped-over-2-point-2-billion-usd-in-fraudulent-transactions-in-2025/) ·
+  [Google, 2026-02](https://blog.google/security/keeping-google-play-android-app-ecosystem-safe-2025/)).
+
+**Regla contractual:** todo SOW de ASO prohíbe por escrito incentivos, compra de instalaciones o
+reseñas, filtrado de usuarios y keyword stuffing.
+
+### Errores de lectura en tiendas (cuestan credibilidad, no penalizaciones)
+
+1. **Citar el "65–70% de las descargas viene de búsqueda" como dato actual.** Es de 2022, lo
+   publica Apple Ads, mezcla dos métricas distintas e incluye búsqueda pagada.
+2. **Comparar "App Store Search" con "Search" de Google Play.** El primero incluye anuncios; el
+   segundo solo cuenta búsquedas de la marca (las de categoría están en Explore).
+3. **Leer App Store Search como orgánico.** Hay que restar Apple Ads.
+4. **Trasladar volúmenes de Google Search como demanda de tienda.** Se miden con datos de tienda.
+5. **Prometer instalaciones por recomendaciones de IA.** No existe source type ni estudio
+   público que las mida.
+6. **Citar "de 3 a 4 estrellas = +89% de conversión".** No tiene fuente original localizable.
+7. **Vender Ask Play, Personalized Collections o App Store tags como activas en LATAM** sin
+   verificar disponibilidad en el país. Las tags hoy son solo EE. UU.
+
 ## Anti-patrones específicos de AEO/GEO
 
 - **Tratar "AEO" como canal único** — optimizar genérico "para IA" sin distinguir

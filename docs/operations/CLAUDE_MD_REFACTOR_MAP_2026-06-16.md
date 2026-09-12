@@ -32,6 +32,7 @@
 | 22 | Access singles (894/987/1020) | companions | ~33.983 |
 | 23 | Task Closing Gate résumé | `TASK_CLOSING_QUALITY_GATE_V1.md` | ~31.885 |
 | Slice 5 | + router table | — | ~32.901 |
+| 24 (2026-09-11) | Outbox publisher canónico (TASK-773) → libera techo para la fila Channel & Commerce del router | `agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md` | ~34.269 |
 
 **Patrón por tanda (probado, 0 huérfanas en las 23):** cluster contiguo por título H3 → mover verbatim a §"Invariantes operativos para agentes" del destino → reemplazar en CLAUDE.md por 1 pointer que preserva inline las reglas más peligrosas/cross-cutting → `pnpm claude-md:rule-audit --strict` = 0 huérfanas → `pnpm claude-md:budget` → commit. Helper de relocación: `/tmp/relocate.mjs` (throwaway). Companions creados bajo `docs/architecture/agent-invariants/`.
 

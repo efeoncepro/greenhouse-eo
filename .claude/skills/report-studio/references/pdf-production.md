@@ -32,7 +32,7 @@ Usar textos alternativos útiles para imágenes informativas y excluir decoraci�
 Cada gráfico necesita título, unidad, período, fuente y una explicación textual; conservar datos accesibles.
 No introducir texto esencial como background-image, canvas o imagen sin equivalente textual.
 Ocultar navegación web y controles de impresión al exportar; mantener índice editorial y links.
-Evitar alturas fijas en bloques de texto, `overflow:hidden` y escalado global para que todo quepa.
+Evitar alturas fijas en bloques de texto, `overflow:hidden` y escalado global para que todo quepa. Excepción: el patrón de hojas fijas (§4), donde el recorte es deliberado y lo compensa una guarda de desborde obligatoria.
 Configurar `@page` explícito y comprobar el soporte del renderer usado.
 
 ## 4. Render determinista
@@ -51,6 +51,18 @@ Playwright usa estilos print en PDF. Sus plantillas de cabecera/pie no heredan C
 No asumir que las margin boxes o named pages de una especificación están soportadas: comprobar la salida real.
 Un recurso cargado en pantalla puede faltar al exportar; la verificación decisiva pertenece al PDF generado.
 
+### Alternativa: hojas fijas con membrete en el DOM
+
+Úsala cuando el pie necesita tipografía de marca, la URL bubble como imagen o un tratamiento propio en portada y contraportada. Referencia viva: `scripts/documents/render-channel-commerce-business-model.mjs`, con fuente `docs/business-models/channel-commerce/deliverables/channel-commerce-modelo-de-negocio.src.html` (placeholders de fuentes, logos y bubble que el script resuelve).
+
+- `@page { size: A4; margin: 0 }`. Cada página es un `<section class="sheet">` de 210 × 297 mm con `overflow: hidden` y un cuerpo `.body` absoluto con márgenes fijos (referencia: 27 mm arriba, 24 mm abajo, 18 mm laterales).
+- El script inyecta en el DOM de cada hoja la cabecera (logo positivo, nombre del documento, etiqueta de confidencialidad si aplica) y el pie (URL bubble enlazada, dirección, teléfono como `tel:`, «Página N de T»). Lee el contacto del catálogo en runtime; nunca lo escribe en la fuente.
+- Ventaja frente a `headerTemplate`/`footerTemplate`: cabecera y pie heredan CSS y fuentes de la página, y portada y contraportada pueden llevar un pie propio sin folio.
+- Costo: la paginación es manual. Cada hoja se compone a mano y el texto no fluye a la siguiente, así que `overflow: hidden` corta contenido sin error. La guarda de desborde es obligatoria: por cada `.body`, si `scrollHeight - clientHeight > 1` o `scrollWidth - clientWidth > 1`, reporta la página y sal con código distinto de cero antes de exportar. Caso real: atrapó 14 px que habrían cortado la última fila de una tabla.
+- El pie vive dentro de la hoja, así que las reglas de la hoja también lo alcanzan. Acota los selectores de contenido a su región (`.back .in .bubble img`, no `.back .bubble img`): una regla del cuerpo de la contraportada agrandó la burbuja del pie inyectado.
+- Antes de exportar, falla si `document.fonts.check` no confirma cada familia/peso requerido o si hay imágenes rotas; emula `media: 'print'` con `reducedMotion: 'reduce'`. Mantén los pasos 7 y 8 (opciones de exportación y escritura atómica `.tmp` + `rename`).
+- Cabecera y pie en el DOM entran al árbol de etiquetas como contenido, no como artefactos; si el encargo exige PDF/UA, inspecciona la estructura antes de declarar nada (§6).
+
 ## 5. Paginación e índice
 
 - Mantener títulos con contenido posterior; evitar títulos solos al final de página.
@@ -60,6 +72,7 @@ Un recurso cargado en pantalla puede faltar al exportar; la verificación decisi
 - Resolver tablas anchas mediante selección editorial de columnas, fichas o anexos; no reducir texto hasta volverlo ilegible.
 - Generar índice visible y bookmarks desde la misma jerarquía de contenido.
 - Exportar, extraer destinos, actualizar números, regenerar y verificar convergencia.
+- Con hojas fijas (§4) el índice se calcula en la misma pasada: `id` del título → `closest('.sheet')` → índice + 1. No hace falta render en dos pasadas; igual compara cada número contra el texto extraído de la página del índice.
 - Limitar iteraciones; si no converge, fallar con diagnóstico en vez de entregar números antiguos.
 - Cada cambio de copy, fuente, tamaño, margen o figura invalida la paginación anterior.
 - Verificar tanto el número visible como el destino del enlace; una coincidencia de conteos no basta.

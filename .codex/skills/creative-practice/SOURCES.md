@@ -48,8 +48,13 @@ energía, no falta de manos.
 
 | Afirmación | Dato | Fuente | as-of |
 |---|---|---|---|
-| **Superside** (nuestro comparable real) | Desde **~USD 5.000/mes**; modelo de **capacidad asignada**, no requests ilimitados. Fee de plataforma ~USD 1.000/mes aparte | [Designity](https://www.designity.com/blog/superside-vs-design-pickle-vs-designity) | 2026 |
+| **Superside** (nuestro comparable real) | 🔴 **CORREGIDO 2026-09-10 en la fuente primaria:** mínimo de suscripción **USD 15.000/mes**; plan `Dedicated` **desde USD 30.000/mes** a 12 meses; proyectos de alcance fijo desde USD 15.000; **+USD 1.000/mes de software**; toda suscripción con **compromiso anual**. UI/UX incluido como *specialist production*. **UI/UX SÍ está en su oferta.** | [superside.com/pricing](https://www.superside.com/pricing) (página propia) | **2026-09-10** |
+| ~~Superside ~USD 5.000/mes~~ | ⚠️ **DATO RETIRADO.** Venía de un blog comparativo de tercero ([Designity](https://www.designity.com/blog/superside-vs-design-pickle-vs-designity)) y **subestimaba el precio de entrada 3×**. No volver a citarlo. | — | retirado 2026-09-10 |
 | **Design Pickle** cambió de modelo | En 2025 separó **plataforma** (~USD 119–299/mes) de **capacidad** (horas creativas diarias). Ya no es "flat unlimited" | [Designity](https://www.designity.com/blog/subscription-design-agencies) | 2025→2026 |
+| **Eleken** — diseñador de producto dedicado *(el comparable real de PRODUCT design)* | **USD 4.599 / 6.599 / 11.999 al mes** por persona full-time; mínimo 2 meses | [eleken.co/pricing](https://www.eleken.co/pricing) | 2026-09-10 |
+| **Awesomic** — suscripción con product design | **USD 200 / 1.490 / 2.995 al mes**; unidad = 1 tarea activa concurrente | [awesomic.com/pricing](https://awesomic.com/pricing) | 2026-09-10 |
+| **Penji** / **ManyPixels** — producción gráfica | Penji **USD 995 / 1.995 / 4.500**; ManyPixels **USD 699 / 1.199 / 1.399 / 2.599** | [penji.co/pricing](https://penji.co/pricing/) · [manypixels.co/pricing](https://www.manypixels.co/pricing) | 2026-09-10 |
+| **Design Pickle** | 🎯 **Retiró su precio público** — ahora "book a call". Señal de que la categoría dejó de competir por precio de lista | [designpickle.com/pricing](https://www.designpickle.com/pricing/) | 2026-09-10 |
 | Retainer de diseño/marca | **USD 3.000 – 15.000/mes** típico | [ManyPixels](https://www.manypixels.co/blog/get-a-designer/design-agency-pricing) | 2026 |
 | **Art director in-house (US)** | Salario **USD 90k–160k/año** → **USD 7.500–13.300/mes** | [My Personal Recruiter](https://mypersonalrecruiter.com/art-director-salary/) | 2026 |
 | **Creative director (US)** | Promedio **~USD 144k/año**; rango 69k → 525k (CCO p90) | [GTM 8020](https://www.gtm8020.com/blog/creative-director-salary-statistics) | 2026 |

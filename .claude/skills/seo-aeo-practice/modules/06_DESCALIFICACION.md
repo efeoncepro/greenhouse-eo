@@ -99,3 +99,19 @@ hispano. **Nos íbamos a vender SEO a nosotros mismos sobre una demanda que no e
 3. 🔴 **Nunca prometas lo que no controlas** (rankings, revenue de IA).
 4. 🎯 **Siempre ofrece el pivote honesto** si existe. **Un "no para esto" no es un "no".**
 5. 🎯 **Cada "no" temprano vale más que un "sí" que churnea.**
+
+---
+
+## 7. ASO — los seis casos en que no se vende *(delta 2026-09-10)*
+
+Aplica a la extensión de tiendas (`14_ASO_COMPLEMENTARIO.md`). Mismo principio: *"no para esto"*, con
+pivote cuando existe.
+
+| # | Si el cliente… | Por qué no | Qué le decimos | Pivote |
+|---|---|---|---|---|
+| **1** | 🔴 **Su app es un juego** | Otro oficio: featuring editorial, LiveOps, creativos y UA pagado. Hay agencias especializadas solo en juegos | *"Para un juego te conviene un especialista en ASO de juegos. Nosotros no lo somos"* | — |
+| **2** | 🔴 **Su app es interna o se distribuye por MDM** | No hay búsqueda pública que optimizar | *"Tu app no compite en la tienda: no hay nada que posicionar"* | — |
+| **3** | 🔴 **Tiene muy poco tráfico en la ficha** | Los experimentos nunca llegan a significancia y la lane no se paga | *"A tu volumen, un retainer de tienda no se justifica"* | **Store Foundation** una vez |
+| **4** | 🔴 **Casi todas sus instalaciones son pagadas** | El ASO orgánico mueve poco | *"Tu palanca es la conversión de la ficha para tus anuncios, no el orgánico"* | CRO de ficha y CPP/CSL para paid, compuesto con Reach |
+| **5** | 🔴 **No da acceso a App Store Connect ni a Play Console** | Sin línea base, todo es estimado y nada se puede probar | *"Sin la consola te estaría vendiendo una opinión"* | Diagnóstico ◑, con fecha y alcance acotado |
+| **6** | 🔴 **Pide instalaciones garantizadas o reseñas compradas** | No lo controlamos, y lo segundo puede costarle su cuenta de developer | *"Eso puede hacer que Apple te expulse del programa. No lo hacemos"* | — **Te levantas de la mesa** |

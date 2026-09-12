@@ -34,7 +34,10 @@
 
 ---
 
-## Los 8 Buyer Personas (comités de compra)
+## Buyer Personas (comités de compra)
+
+8 vigentes, de la Segmentación Comercial (mar-2026), y 1 **candidata en validación** (BP9). Una persona candidata
+**no** es un buyer persona vigente: lo es cuando pasa su plan de validación.
 
 | BP | Rol | Dolor central | Qué necesita ver |
 |---|---|---|---|
@@ -46,6 +49,7 @@
 | **BP6** | **Brand Manager / Dir. de Arte** | Cada campaña es un acto heroico; inconsistencia entre piezas | Gobernanza de marca, consistencia, velocidad |
 | **BP7** | **Head of E-commerce** | E-commerce es "el hijo no reconocido"; retail media aislado | Retail media como canal medido |
 | **BP8** | **Director Comercial / VP Ventas** | Marketing y ventas desalineados | Leads calificados, ciclo más corto |
+| **BP9** *(candidata · hipótesis)* | **Head of Design / Design Director in-house** | La demanda de diseño crece más rápido que su equipo; research, accesibilidad y design system quedan siempre para el próximo trimestre | Capacidad liberada verificable, control de qué delega y evidencia para pedir presupuesto |
 
 > Para producto: **BP1, BP2, BP5 y BP6 son los usuarios primarios del portal.** Son quienes se logean. El dashboard tiene que responder *su* pregunta en los primeros 10 segundos (revenue para BP1, foto unificada para BP2, fuente de verdad para BP5, gobernanza/RpA para BP6).
 
@@ -70,6 +74,78 @@ creativos con múltiples cuentas, picos de demanda y presión de consistencia. A
 tenancy agencia→cliente final, confidencialidad, derechos, aprobación de marca, atribución
 `white-label|endorsed`, accountability y economics. No se crea una modalidad nueva: cualquier piloto usaría
 `Studio Access`, `co-operated` o `client-operated` bajo los gates del business model.
+
+### Persona candidata — líder de diseño in-house (BP9 · Product Design 360)
+
+> **Estado:** `hypothesis_only` · **Owner:** Strategy + Commercial, con Wave + Design · **Fecha:** 2026-09-10 ·
+> **Confidence:** baja · **Oferta:** [Product Design 360](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) (`Proposed`)
+
+No se suma a los buyer personas vigentes hasta pasar su plan de validación. Nace del business model y de
+investigación de escritorio, **no de conversaciones con este comprador**. Los roles son roles, no cargos: una misma
+persona puede tener varios, y en cuentas chicas el Head of Design suele ser también el problem owner.
+
+| Rol | Quién suele ser *(hipótesis)* | Qué le importa | Evidencia |
+|---|---|---|---|
+| Operador | Head of Design / Design Director / Design Manager | Que su equipo deje de ser el cuello de botella | `unknown` |
+| Operator-champion | La misma persona, cuando el primer frente entrega sin que tenga que supervisarlo | Recuperar tiempo para el trabajo por el que quiere ser evaluado | `unknown` |
+| Problem owner | Head of Design, o Head of Product si diseño reporta a producto | La entrega de diseño | `unknown` |
+| Sponsor | CPO, CTO (BP4) o VP Product | Que ingeniería no se detenga esperando diseño | `unknown` |
+| Economic buyer | CPO, CTO o Gerente General según tamaño | Costo frente a contratar | `unknown` |
+| Governance owner | Head of Engineering | Que el design system y el handoff no le sumen trabajo | `unknown` |
+| Procurement / ratifier | Compras y Legal | IP del diseño y datos de research | `unknown` |
+| **Veto** | **El propio Head of Design** | Que el proveedor no se lea como su reemplazo | `unknown` |
+
+🔴 **Riesgo central: puede adoptar, pero no suele poder comprar.** El presupuesto vive en CPO/CTO, no en diseño. El
+valor tiene que traducirse al idioma del sponsor —capacidad de ingeniería que ya se pagó y no puede avanzar— o el
+deal queda en un sí del operador sin compra. `unknown` hasta verificar quién tiene el presupuesto en cuentas reales.
+
+**JTBD**
+
+- *Funcional:* Cuando ingeniería crece y diseño no, quiero sacar de mi equipo los frentes que nunca alcanza, para cumplir el roadmap sin sumar headcount que después no pueda sostener.
+- *Emocional:* Cuando la demanda me supera, quiero dejar de ser el cuello de botella de mi propia área, para volver al trabajo por el que me contrataron.
+- *Social:* Cuando presento el plan a mi jefatura, quiero verme como quien convirtió diseño en un sistema medible, no como quien sólo pidió más gente.
+- *De riesgo:* Cuando evalúo un proveedor, quiero que no le diga a mi jefatura que mi equipo no da el ancho, para no perder autoría ni poder interno.
+
+**ICP y anti-ICP** *(hipótesis, por fase)*
+
+| | Estratégico | De oportunidad | De delivery |
+|---|---|---|---|
+| **ICP** | Mid-market y enterprise con producto digital propio (app, portal, SaaS) y equipo de diseño in-house | Trigger activo: ronda, ingeniería contratando sin diseño, línea nueva, deadline de accesibilidad | Decisor único de diseño identificado; vía de implementación declarada; acceso a usuarios para research |
+| **Anti-ICP** | Sin equipo de diseño (→ diseño integral, otra oferta de la misma familia); "que se vea mejor" sin superficie operada (→ Creative Services) | Sin trigger ni presupuesto accesible | Sin decisor de diseño, sin ingeniería que construya, o con intención de dirigir a las personas (→ Staff Augmentation, otro precio y otra accountability) |
+
+**Triggers observables:** ronda levantada · vacantes de ingeniería abiertas sin vacantes de diseño · línea de producto
+nueva · entrada a un mercado · deadline de accesibilidad · backlog de solicitudes de componentes de 6+ meses.
+
+**Dolores de agencia → capacidad → evidencia al sponsor**
+
+| Dolor | Cómo lo vive el operador | Capacidad que lo reduce | Evidencia que llega al sponsor |
+|---|---|---|---|
+| Contexto perdido | Cada freelance o suscripción empieza de cero | Squad con nombre y memoria de decisiones | Continuidad de personas; registro de decisiones |
+| Retrabajo | Ingeniería vuelve a preguntar qué pasa en cada estado | Handoff con estados completos | First-time-right del handoff |
+| Aprobaciones difusas | Rondas sin fin | Decisor único y rondas numeradas | Rondas consumidas frente a declaradas |
+| Reporting débil | No puede demostrar que el design system sirve | Adopción y drift medidos | Superficies construidas desde el sistema |
+| Ownership difuso | Coordinación cada vez más desordenada | Design ops como frente | Cola atendida frente a ingresada |
+| Dependencia de una persona | Todo pasa por un senior | Cobertura del squad | Continuidad ante ausencias |
+| Coordinación multi-proveedor | Freelancers + suscripción + agencia | Un contrato con frentes declarados | Un solo reporte de cumplimiento |
+
+**Plan de validación**
+
+- **Hipótesis falsable:** en empresas mid/enterprise con equipo in-house, quien siente el dolor de capacidad de diseño es el Head of Design, y el presupuesto está en CPO/CTO.
+- **Muestra:** ≥ 5 conversaciones con Heads of Design o Design Directors in-house, idealmente en Chile, más ≥ 2 con su CPO o CTO.
+- **Métrica primaria:** cuántos describen el dolor de capacidad sin inducción y nombran quién aprueba el gasto.
+- **Umbral:** ≥ 4 de 5 lo describen sin inducción y ≥ 3 de 5 ubican el presupuesto fuera de diseño.
+- **Stop / reemplazo:** si el dolor lo siente otro rol (PM, CTO) o el Head of Design no reconoce la capacidad como problema, se redefine el operador y se reescribe la persona.
+- **Owner:** Commercial + Research. **Registro:** palabras literales, que alimentan el copy de la landing [`TASK-1859`](../tasks/to-do/TASK-1859-landing-product-design-360.md).
+
+**Evidencia hoy**
+
+| Claim | Fuente | Fecha | Confidence | Se falsa si… |
+|---|---|---|---|---|
+| El dolor es de capacidad, no de calidad | Business model §2 · zeroheight Design Systems Report 2026 (56% nombra falta de staffing) | 2026-09-10 | baja — encuesta de proveedor, NA/EU | los líderes lo describen como problema de calidad o de proceso |
+| La coordinación, más que la ejecución, es el nuevo cuello | AI in Design Report 2026 (65% hace trabajo de PM/ingeniería; 34% reporta colaboración más desordenada) | 2026-09-10 | media — financiado por VCs, pero es un dato contra su interés | el dolor dominante resulta ser la ejecución |
+| El presupuesto no vive en diseño | inferencia del business model | 2026-09-10 | `unknown` | el Head of Design controla su presupuesto de proveedores |
+
+Toda la evidencia disponible es enterprise de Norteamérica y Europa: **cero mid-market y cero LATAM**.
 
 ---
 
@@ -105,6 +181,8 @@ Formato del doc: Situación/Trigger → Job Statement → Resultado Esperado. Aq
 
 > Media & Distribution y Digital Services & Engineering tienen sus propios JTBD en el doc fuente (vocería/PR, distribución integrada, velocidad web, infra, datos). Para producto son secundarios hoy porque Greenhouse modela sobre todo operación creativa, métricas y CRM.
 
+> **Product Design 360 (candidato):** su JTBD vive en la sección de la persona candidata BP9; no se mezcla con los vigentes hasta validarse.
+
 ---
 
 ## Rutas de entrada → expansión (por qué el portal importa)
@@ -132,6 +210,7 @@ Cada job mapea a una capacidad del portal. Esto es lo accionable:
 | "Foto unificada / dejar de coordinar proveedores" (BP2) | Greenhouse como **hub único** (`03`): un login que reemplaza 4 dashboards. |
 | "Visibilidad en motores de IA" (AEO) | Métricas AEO del **motor propio** (AI Visibility Grader) expuestas como otra capa del dashboard. |
 | "Una sola fuente de verdad" (BP5) | Confiabilidad del dato = por qué el test coverage en finance/identity no es opcional; revisar arquitectura vigente y `04` antes de tocar esos dominios. |
+| "Sacar de mi equipo los frentes que nunca alcanza" (BP9 · candidata) | Telemetría **por frente** (OTD/FTR/RpA, first-time-right del handoff, drift, adopción del design system) visible al líder de diseño **sin medir a su gente**. Se prioriza sólo si BP9 se valida. |
 
 **Regla para el agente:** antes de construir una feature, identifica la línea de negocio, product brand habilitadora, BP y tier del job. Una feature que no sirve a un job de BP1/BP2/BP5/BP6 (los que usan el portal) probablemente no es prioridad. Para casos reales por ICP usa solo los confirmados (`01`/`06`): Sky (Creative Services), Bresler y Berel (Growth Strategy & Measurement / AEO+SEO).
 
@@ -141,3 +220,6 @@ Cada job mapea a una capacidad del portal. Esto es lo accionable:
 
 *Última verificación de drift contra runtime: 2026-07-23 — roles Creative Studio y la hipótesis B2B2B quedan
 alineados al business model V1.1 sin modificar los 12 ICPs vigentes.*
+
+*2026-09-10 — se agrega BP9 como persona candidata (`hypothesis_only`) para Product Design 360; no modifica los 8
+buyer personas ni los 12 ICPs vigentes.*

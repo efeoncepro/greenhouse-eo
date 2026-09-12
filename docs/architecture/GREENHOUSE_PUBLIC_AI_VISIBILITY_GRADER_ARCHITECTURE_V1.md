@@ -2175,3 +2175,69 @@ El adapter `google_ai_overview` (`providers/google-ai-overview-adapter.ts`) ten�
 - **Hallazgo del smoke live — wrapper de citas:** Google envuelve TODAS las references de AI Mode en redirects propios — `domain` llega como `google.com`/`www.google.com` y `url` como `https://google.com/goto?url=<token opaco>` (o `/searchviewer`), no decodificable client-side; la identidad real de la fuente viene SOLO en el campo `source` (a veces domain-shaped como `agenciagrowth.cl`, a veces nombre de marca como `Bigbuda`). Sin manejo, toda cita se atribuía a google.com y el SoV de citabilidad quedaba envenenado. El adapter deriva el dominio real de `source` cuando es domain-shaped (`normalizeDomain`); las refs de marca no atribuible se DESCARTAN honesto (nunca atribuir a google.com) y se cuentan dedupeadas por URL en `usage.dataforseo_citations_unattributable`. Payload live real: 27 refs únicas → 2 atribuibles (`metrix.digital`, `agenciagrowth.cl`), 25 no atribuibles. Implicación para atribución URL-level futura (TASK-1311, ya tiene Delta): las `url` persistidas de este provider son punteros al wrapper, no la página citada.
 - **Dimensionamiento histórico** (query read-only sobre `greenhouse_growth.provider_observations`): 60 observaciones históricas `skipped:no_ai_overview_block` (2026-06-29 → 2026-07-17) eran falsos negativos con task fallido (54 con `40501`, 6 con `40201`). Regrade DESCARTADO: los tasks nunca se ejecutaron (nada que reinterpretar) y río abajo skipped/failed se excluyen por igual.
 - **Estado:** AIO en producción sigue OFF (gated por TASK-1341); el fix llega inerte a producción hasta ese rollout. AI Mode sigue English-only (`language_code='en'`). Smoke sanity: `scripts/growth/_sanity-task-1652-ai-mode-smoke.ts` (dry por defecto; `--spend` ejecuta una llamada real ~USD 0,004). Spec: `docs/tasks/complete/TASK-1652-aeo-grader-dataforseo-ai-mode-request-correctness.md`.
+
+## Delta 2026-09-11 — panel competitivo multi-marca y límites medidos
+
+**Este delta no cambia ningún invariante ni el runtime.** Documenta cómo se usaron primitives existentes para el primer
+panel competitivo real y tres defectos que ese uso midió. Los defectos quedan registrados como `TASK-1867`
+(evidencia completa) y `TASK-1868` (probes estructurales y compuerta de revisión).
+
+**Qué se corrió.** El grader sobre SKY y 4 competidores (LATAM, JetSMART, Avianca, Gol) con **el mismo set curado de 12
+prompts, el mismo día, mercado Chile, locale `es-CL` y los 5 motores**: 5 runs `full` en staging (`EO-GRUN-00050`…
+`EO-GRUN-00054`, 60 observaciones cada uno, 300 en total; ~17 min por run, el worker llegó a ejecutar 2 en paralelo).
+Los 5 informes salieron por el auto-publish del worker; dos (Avianca, Gol) pasaron por revisión humana y se aprobaron
+con `approveAiVisibilityReport` (`review/commands.ts`). Sin lead ni organización, HubSpot y correo hicieron skip
+`no_lead`. Staging y producción comparten `greenhouse_growth`, así que un token publicado desde staging renderiza en el
+hub productivo; el auto-publish no fija `expires_at` (los tokens no vencen). Hoy el panel es un **procedimiento de
+operador**, no una capacidad gobernada. Procedimiento:
+[manual — Panel competitivo multi-marca](../manual-de-uso/growth/ai-visibility-grader-smoke.md#panel-competitivo-multi-marca).
+Uso comercial: [`docs/documentation/comercial/panel-competitivo-aeo.md`](../documentation/comercial/panel-competitivo-aeo.md).
+
+**Sets de prompts curados por el operador (sobre el lifecycle de TASK-1290, Slice 2).**
+
+- Se crean y activan con `createGraderPromptSetDraft` + `approveGraderPromptSet` (`prompt-packs/prompt-set-command.ts`,
+  capability `growth.ai_visibility.prompt_set.manage`), desde un script local firmado por el operador (sujeto armado con
+  `getTenantAccessRecordByUserId`). **No hay ruta HTTP** para esto.
+- `generation_strategy` sólo admite `llm | template_baseline`: el set curado se registra `template_baseline` y su
+  procedencia viaja en `grounding_sources` como `operator_curated:<caso>`. No se agregó ningún valor al enum.
+- Aprobar activa directo y supersede el `active` previo del perfil (mismo lifecycle `draft → approved → active`).
+- El run usa el set `active` del perfil sólo con el flag de prompts por arquetipo ON (staging ON). Verificación por run:
+  `grader_runs.prompt_set_id` no nulo y 12 entradas en `execution_prompts`. Máximo 12 prompts en modo `full`; tags del
+  vocabulario cerrado (`family`, `fanOutType`, `intentStage`, `namesBrand`).
+
+**Identidad del perfil y forma del input (comportamiento vigente, medido).**
+
+- `findOrCreateGraderProfile` (`store.ts`) identifica el perfil por **marca + mercado + locale** en texto libre. Los
+  competidores quedan fijos desde el primer run y **no hay command para editarlos**; un nombre ya usado reusa el perfil
+  viejo (caso: "SKY Airline"/Chile/es-CL resolvía un perfil antiguo con `blog.skyairline.com` y Flybondi; por eso el
+  panel usó "SKY").
+- La ruta admin `POST /api/admin/growth/ai-visibility/runs` **no acepta `businessModel`**: sin set activo, el run sale
+  con el pack genérico de 7 prompts (`gn01`–`gn07`).
+- `market` debe ir como nombre ("Chile"): un ISO se interpola crudo en los prompts ("…en CL") y el provider de Google AI
+  acepta `location_name`; fuera de CL/MX/CO/PE/US un ISO cae a Estados Unidos. `category` debe resolver en
+  `taxonomy/catalog.ts` ("aerolinea de pasajeros" es alias exacto de `sector:passenger_airlines`).
+- El slot `{{competitor}}` usa sólo el primer competidor declarado y se descarta si la lista está vacía. La coincidencia
+  de nombres de marca es literal, palabra completa, sin mayúsculas y sin alias.
+
+**Tres defectos medidos (registrados: el 1 en `TASK-1867`; el 2 y el 3 en `TASK-1868`).**
+
+1. **Extracto truncado sin texto completo.** `GROWTH_AI_VISIBILITY_EXCERPT_MAX = 600` (`contracts.ts:210`): las menciones
+   se cuentan sobre ese tramo inicial, así que las marcas nombradas al final de listas largas quedan subcontadas.
+   `raw_evidence_pointer` quedó nulo en las 300 observaciones del panel: no hay texto completo para recontar.
+2. **Falso positivo del probe `llms.txt`** (`probes/structural/llms-txt.ts`): cuando una SPA responde `/llms.txt` con 200
+   y el HTML de la aplicación, el probe reporta "llms.txt presente con contenido curado" (caso `skyairline.com`, que
+   sirve igual `/robots.txt` y `/sitemap.xml`). Por la misma causa, "robots.txt no bloquea" es trivialmente cierto
+   cuando no hay robots real, y el probe de sitemap le da crédito parcial (40) a esa misma página HTML.
+3. **Detector de lenguaje sensible por substring.** `RISKY_REVIEW_TERMS` (`review-gates/gates.ts`) compara substrings
+   sobre `messageDriftClaims` + `categoryAssociations`: "denuncia" disparó con "denunciados" (Avianca), "quiebra" con una
+   frase sobre Gol, y "demanda" dispararía con "demandadas". Produce `review_required` que no reflejan un problema
+   real; la revisión humana los contiene leyendo la frase antes de aprobar.
+
+Otros límites del método (no son defectos): la pregunta comparativa que nombra al cliente produce eco del cliente en
+esas respuestas; los sitios que bloquean la lectura automática (LATAM, Avianca, Gol) dejan lecturas técnicas "sin dato",
+nunca cero; y es una foto de un día (la tendencia exige repetir el mismo panel con cadencia fija).
+
+**Hacia una capacidad gobernada.** `TASK-1861` (grader operable por MCP: correr, leer, informe web y PDF, con autoridad
+humana delegada), `TASK-1863` (grader multi-mercado: una marca, N mercados, lotes y matriz entre mercados) y `TASK-1864`
+(superficie agéntica autosuficiente del MCP) son la base sobre la que el panel debería convertirse en capacidad
+gobernada (un lote de N marcas con el mismo set). Las tres están creadas y sin implementar.

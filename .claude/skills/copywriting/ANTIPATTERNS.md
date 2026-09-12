@@ -28,12 +28,18 @@ honestidad legítima** — solo una estaba enferma.
 
 - **Clever > clear.** Juego de palabras, doble sentido o "creatividad" que sacrifica la
   comprensión. Si el lector tiene que releer para entender, perdiste. Claridad primero.
+  Caso: *«Apple partió la pantalla en dos. La búsqueda ya estaba partida.»* → calco forzado (en
+  español nadie dice que la búsqueda «está partida»). Prueba rápida: **¿alguien lo diría en voz alta?**
+- **Caption que describe la imagen.** *«SEO de un lado. AEO del otro. Se pliega, no se separa.»* →
+  repite lo que la pieza ya muestra, no da beneficio y encima se contradice (el visual separa, el copy
+  dice «no se separa»). El copy aporta lo que la imagen no puede decir: el beneficio o el riesgo.
 - **Escribir para "el público".** Copy genérico dirigido a todos = resuena con nadie.
   Escribe para UNA persona con un dolor concreto y su lenguaje.
 - **Feature-dumping.** Listar características en vez de traducirlas a beneficios y a lo que
   el lector *siente/gana*. "Tiene X" no vende; "con X logras Y" sí (FAB, `02`).
 - **Jerga / corporate-speak.** "Soluciones sinérgicas de vanguardia", "leverage", "empoderar
-  el ecosistema". Palabras vacías que esconden que no tienes nada específico que decir.
+  el ecosistema". Palabras vacías que esconden que no tienes nada específico que decir. Incluye la
+  **jerga interna**: *«trabajar solo una pantalla»* tiene sentido en la reunión donde nació, no en el feed.
 - **Adjetivos de autoelogio en vez de prueba.** "El mejor", "líder", "innovador",
   "revolucionario" sin evidencia. Muestra, no digas: un dato/caso vence a diez adjetivos.
 - **Enterrar la gran idea.** El one thing escondido en el párrafo 4. El headline y el lead
@@ -53,6 +59,10 @@ honestidad legítima** — solo una estaba enferma.
   Consumidor CL) y letal para la marca. La escasez **real** persuade; la falsa traiciona.
 - **Prueba social sembrada / autoridad fabricada.** Testimonios inventados, reviews falsas,
   credenciales infladas. Ilegal y destructivo. La prueba es real o no es.
+- **Hechos inventados sobre terceros.** *«Duolingo está en pánico por su SEO»* era falso: Duolingo
+  bromeaba en su personaje para sumarse al trend. Atribuir a otra marca un estado o una intención es
+  inventar un hecho. Cita o describe lo que publicó, con su tono (caso:
+  [`2026-09-11-iphone-duo-trendjack.md`](../../../docs/operations/social/2026-09-11-iphone-duo-trendjack.md)).
 - **Dark patterns verbales.** Confirmshaming ("No, no quiero ahorrar dinero"), opt-out
   culposo, letra chica que contradice el titular. Persuadir ≠ engañar.
 - **Presión emocional deshonesta.** Explotar miedo/vergüenza sin una solución real detrás.
@@ -71,7 +81,8 @@ honestidad legítima** — solo una estaba enferma.
 ## IA (2026)
 
 - **Publicar AI-slop.** Output crudo de un modelo sin edición: genérico, a veces incorrecto,
-  con los tells típicos (em-dash excesivo, "delve", "no es solo X, es Y", entusiasmo plano).
+  con los tells típicos (em-dash excesivo, "delve", "no es solo X, es Y", tres antítesis
+  apiladas seguidas, entusiasmo plano). Un solo recurso retórico por bloque.
   El 69% de los lectores lo siente. Bien editado rankea; crudo, se ignora.
 - **Homogenización.** Aceptar la voz "promedio" del modelo. Todos usando los mismos LLMs
   convergen al mismo centro; la voz de marca se difumina. El diferencial es voz + especificidad

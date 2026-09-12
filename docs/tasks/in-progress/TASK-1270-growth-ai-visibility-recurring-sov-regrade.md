@@ -1,5 +1,12 @@
 # TASK-1270 — Growth AI Visibility: Recurring Share-of-Voice + Scheduled Re-Grade
 
+## Delta 2026-09-10 — el regrade pasa a ser por mercado (TASK-1863)
+
+- `TASK-1863` separa marca de mercado: la cadencia (`recurring_regrade_*`) se muda de `grader_profiles` a
+  `grader_profile_markets` y el scheduler (`src/lib/growth/ai-visibility/regrade/scheduler.ts`) itera mercados
+  vencidos. Las columnas del perfil quedan como espejo del mercado primario hasta la migración de contract.
+  Cualquier trabajo pendiente de esta task sobre la cadencia debe hacerse por mercado, no por perfil.
+
 ## Delta 2026-08-27
 
 - El grader ya tiene gate de dinero per-org: `resolveAeoBudget`

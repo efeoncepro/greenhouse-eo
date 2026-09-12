@@ -23,9 +23,14 @@ disciplina para que "ofrecer todo" no signifique "ejecutar todo desde el día un
 
 ```text
 La oferta al cliente es completa y estable desde la fase 1.
-Lo que cambia por fase es cuánto de esa oferta ejecuta Efeonce
-con capacidad propia en vez de con un proveedor gobernado.
+Efeonce OPERA en las tres fases: plan, método, estándar, control
+de calidad, gobierno de proveedores, decisión y accountability.
+Lo que cambia por fase es sólo quién PONE LAS MANOS en cada capa.
 ```
+
+Operar no es ejecutar. Un proveedor puede recorrer la tienda; Efeonce decide qué tiendas, contra qué estándar,
+valida que la evidencia sea real, interpreta, prioriza y responde. Esa capa —Managed Channel Operations— es la que
+justifica el fee y la que impide que la línea sea reventa con markup.
 
 El cliente ve un solo responsable y un solo contrato en las tres fases. El mix build/partner es una decisión
 interna que se mueve con la evidencia, y **nunca** es un tema del cliente.
@@ -111,9 +116,24 @@ jornada de 42 horas y su baja a 40 en 2028 se proyectan en todo escenario.
 
 ---
 
-## 3. Fase 3 — Tecnología propia
+## 3. Fase 3 — Tecnología propia, redefinida
 
 **Horizonte:** por tracción, **no por fecha**.
+
+> **Corrección 2026-09-10.** La versión original entendía la fase 3 como una plataforma propia de ejecución
+> retail. El [delta del benchmark](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
+> lo descartó: esa categoría es global, madura y en consolidación —Teamcore con 500+ marcas en 20+ países y fusión
+> respaldada por private equity, Frogmi, Trax, Storecheck, Involves y una decena más—. **Efeonce no construye una
+> plataforma de retail execution, ni ahora ni después.**
+>
+> Lo que sí se construye, y sólo cuando los gates se cumplan, es tecnología en **la capa que ninguna de esas
+> plataformas cubre**: la conexión entre ejecución física, inversión digital y visibilidad en motores de respuesta
+> IA. Sobre Greenhouse, no como producto nuevo.
+>
+> Y hay una consecuencia comercial favorable: esas plataformas **crean demanda** para la capa de operación. Una
+> marca compra el software y recibe alertas; alguien tiene que priorizarlas, ejecutarlas y cerrar el ciclo. Es el
+> mismo patrón que sostiene la práctica de RevOps & CRM sobre HubSpot y Salesforce. Se tratan como providers
+> tecnológicos y posible canal, no como competidores.
 
 ### La regla que evita el error más caro
 
@@ -129,7 +149,7 @@ operando: la secuencia importa más que la ambición.
 |---|---|
 | 1 | Volumen acumulado de ciclos y puntos de venta suficiente para que el histórico produzca un insight que el proveedor no entrega |
 | 2 | Un costo anual de licencia o fee de partner que la plataforma pueda amortizar en un horizonte definido |
-| 3 | Una capacidad demostrada que el mercado no tiene — el candidato natural es cruzar ejecución física con inversión digital y visibilidad en motores de IA |
+| 3 | Una capacidad demostrada que el mercado no tiene. **Es el único candidato válido:** cruzar ejecución física con inversión digital y visibilidad en motores de IA. Cualquier cosa que se parezca a una plataforma de retail execution queda descartada de entrada |
 | 4 | Un cliente que pague por esa capacidad, no que la reciba incluida |
 
 ### La ventaja que sí es real, y que conviene no malgastar

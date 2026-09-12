@@ -312,6 +312,19 @@ The split is intentional:
 
 Numeric alignment uses Geist with tabular numerals semantics. Do not introduce monospace for IDs, amounts, or tables. The semantic equivalents are `numeric-id`, `numeric-amount`, and `kpi-value`.
 
+### Creative asset family — Bricolage Grotesque
+
+`Bricolage Grotesque` is an approved expressive display family for Efeonce creative assets outside the product UI:
+campaign key visuals, social posts/stories, posters, art-directed image compositions and other editorial campaign
+pieces. It is available as the variable asset `src/assets/fonts/BricolageGrotesque-Variable.ttf`, with axes `opsz`,
+`wdth` and `wght`; its SIL OFL 1.1 provenance is recorded in `src/assets/fonts/BricolageGrotesque-SOURCE.md`.
+
+This does not change the Greenhouse UI contract: the active UI families remain exactly Poppins for controlled display
+and Geist for product text. Do not add Bricolage to `typographyScale`, `next/font`, MUI variants, shared PDF/email
+adapters or Globe payloads without a separate approved typography decision. In a single creative piece, use Bricolage
+as the expressive display voice and keep supporting text in the approved companion family; do not make Poppins and
+Bricolage compete as co-dominant headlines.
+
 > **Units (this contract is agent-facing — you emit code; humans use Figma/AXIS).**
 > Emit the **token / MUI variant by name** (`<Typography variant="…">`), **never a
 > raw font-size**. The concrete value lives in the front-matter above and is in

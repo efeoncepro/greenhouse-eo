@@ -123,6 +123,28 @@ Seedance 2.0 no es una etapa ritual ni un “mejorador” del single-shot. Se ab
 contiene la toma, el ángulo, el blocking o la continuidad física que el relato exige. Si sólo cambian duración,
 orden, hold, grade, format wall, end card, copy, captions o audio/loudness, la mano correcta es determinista.
 
+### Regla: UI en la pantalla de un dispositivo dentro del video
+
+Aprendizaje del Short «Nuestro Duo» (2026-09-11, Seedance 2.5 vía Higgsfield MCP; caso:
+[`social/2026-09-11-iphone-duo-trendjack.md`](social/2026-09-11-iphone-duo-trendjack.md)). Si un dispositivo en
+cuadro muestra UI, esa pantalla es parte de la toma, no de la capa de marca:
+
+- **La renderiza el modelo.** Reemplazar pantallas verdes por tracking de esquinas se rechazó antes de usarse:
+  el texto pegado no recibe luz, reflejos ni respuesta al movimiento, y no se ve dentro de la pantalla.
+- **Pantallas video-safe como `image_references`.** Mismo diseño reducido a pocas frases grandes (sin URLs,
+  barra de estado, pestañas ni texto diminuto; lo secundario pasa a barras grises). El plate va como
+  `start_image`, cada pantalla como referencia indexada, y el prompt lista las frases exactas. Un plate con texto
+  chico como `start_image` hizo que el modelo redibujara palabras desde el primer frame («B2S» por B2B).
+- **El encuadre no queda fijo.** En `omni_reference`, `start_image` no lo bloquea: el dispositivo creció y subió
+  durante el clip. El overlay se diagrama sobre el bounding box medido por frame, en las bandas libres.
+- **Titular, bajada y logo siguen fuera del modelo** (overlay ffmpeg). Esta regla no autoriza generar el copy ni
+  la marca de la pieza.
+- **QA:** hoja de frames a 0/2/4/6/8 s, zoom de pantallas al inicio, medio y final, y colisión overlay↔sujeto en
+  el último frame.
+
+Receta completa: skill `motion-design-studio` → `modules/09_AI_VIDEO_PIPELINE.md` §7. En estático, la pantalla
+exacta sí se compone (homografía sobre chroma): skill `greenhouse-ai-image-generator`.
+
 ## Flujo end-to-end
 
 ### 0. Intake y autoridad

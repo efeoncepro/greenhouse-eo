@@ -48,6 +48,18 @@ Exactly **two active families**:
 
 **Runtime SoT:** `typographyScale` owns family/size/weight/line-height/letter-spacing/numeric features → `TYPOGRAPHY_VARIANT_BRIDGE` maps token↔MUI variant (1:1, as code) + `SECONDARY_VARIANT_TOKENS` (`h6→labelMd`, `subtitle2→bodySm`) + `controlText` (Button/Tab/Dialog sizing). **Runtime wins on conflict; docs follow.**
 
+### Creative asset boundary — Bricolage Grotesque
+
+`Bricolage Grotesque` is available as an expressive display family for Efeonce campaign assets outside Greenhouse
+product UI: key visuals, social stories/posts, posters and editorial compositions. The local variable font is
+`src/assets/fonts/BricolageGrotesque-Variable.ttf` with `opsz`, `wdth` and `wght` axes; provenance and SIL OFL 1.1
+licensing live in `src/assets/fonts/BricolageGrotesque-SOURCE.md`.
+
+This is a creative-asset exception, not a third active UI family. Keep Poppins + Geist as the only Greenhouse UI
+families and do not add Bricolage to the UI SoT, `next/font`, MUI variants, shared PDF/email adapters or Globe
+payloads without a separate approved decision. When a creative piece uses Bricolage, make it the single expressive
+display voice and keep companion text in the approved family.
+
 ### The canonical scale (TASK-1038, approved 2026-06-06)
 | MUI | contract | family | px | weight | line-height | use |
 |---|---|---|---:|---:|---:|---|

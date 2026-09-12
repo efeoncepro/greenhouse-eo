@@ -12,6 +12,7 @@ import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { resolveEmailContext, EmailUndeliverableError } from './context-resolver'
+import { providerBlockedConditionSql } from './provider-block'
 import { checkRecipientRateLimit } from './rate-limit'
 import { getSubscribers } from './subscriptions'
 import { resolveTemplate } from './templates'
@@ -931,7 +932,14 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
     })
 
     if (result?.error || !result?.data?.id) {
-      throw new Error('Email provider rejected dispatch.')
+      // ISSUE-172 (2026-09-12): el `name` del error de Resend es un enum del proveedor
+      // (`daily_quota_exceeded`, `rate_limit_exceeded`, `validation_error`…), sin PII, y es lo
+      // único que distingue "cuota diaria agotada" de "dirección inválida" en `email_deliveries` y
+      // en Sentry. Tragarlo dejó 41 acuses fallidos sin causa legible hasta abrir el panel del
+      // proveedor. El `message` NO viaja: en errores de validación cita la dirección destino.
+      const providerErrorName = typeof result?.error?.name === 'string' ? result.error.name : null
+
+      throw new Error(providerErrorName ? `Email provider rejected dispatch (${providerErrorName}).` : 'Email provider rejected dispatch.')
     }
 
     const resendId = result.data.id
@@ -998,6 +1006,26 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
     })
 
     if (acceptedResendId) {
+      // ISSUE-172 — el proveedor ACEPTÓ el envío y el cierre local falló: el estado real es
+      // `unknown`, no `failed`. Sin marca en la fila, el reintento automático y el revive de
+      // dead_letter lo tratan como un fallo ordinario y reenvían un correo que ya salió (duplicado
+      // al candidato). Se persiste el `resend_id` recibido y `error_class='dispatch_unknown'`;
+      // ambos caminos lo excluyen y la fila queda visible para recuperación explícita.
+      if (durableDeliveryId) {
+        await runGreenhousePostgresQuery(
+          `UPDATE greenhouse_notifications.email_deliveries
+              SET resend_id = COALESCE(resend_id, $2),
+                  status = 'failed',
+                  error_class = 'dispatch_unknown',
+                  error_message = $3,
+                  updated_at = NOW()
+            WHERE delivery_id = $1`,
+          [durableDeliveryId, acceptedResendId, 'Email dispatch state is unknown (provider accepted; local close failed).']
+        ).catch(err => {
+          console.warn('[email-delivery] Failed to mark dispatch_unknown delivery row:', err)
+        })
+      }
+
       return {
         deliveryId: durableDeliveryId || input.batchId,
         recipientEmail: input.recipient.email,
@@ -1603,6 +1631,97 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(
   }
 }
 
+export interface ReviveDeadLetterEmailDeliveriesInput {
+  /** Motivo forense (≥ 10 chars); queda en la fila como `resend_reason`. */
+  reason: string
+  /** Revivir exactamente estas entregas. Excluyente con `emailTypes` sólo por claridad; pueden combinarse. */
+  deliveryIds?: string[]
+  /** Revivir todo `dead_letter` de estos tipos dentro de la ventana. */
+  emailTypes?: string[]
+  /** Ventana hacia atrás sobre `created_at` (default 24 h; tope 168 h). */
+  sinceHours?: number
+  /** Tope de filas por llamada (default 25; tope 200). */
+  limit?: number
+}
+
+/**
+ * ISSUE-172 (2026-09-12) — camino GOBERNADO para revivir entregas `dead_letter`.
+ *
+ * `processFailedEmailDeliveries` sólo toma `failed`: una entrega que agotó sus 3 intentos quedaba
+ * muerta sin ninguna vía canónica de vuelta, y la única salida era un UPDATE a mano. El caso
+ * fuente: 8 acuses de postulación murieron en la ventana en que el plan Free de Resend agotó su
+ * cuota diaria (100/día) — con el plan corregido, reintentarlos es correcto y nadie podía.
+ *
+ * Contrato: sólo entregas retryables y NUNCA token-sensitive (un bearer muerto no se reenvía: se
+ * rota por su propio contrato); vuelve la fila a `failed` con `attempt_number = 0` y deja el
+ * motivo en `resend_reason`, y el ciclo normal (`processFailedEmailDeliveries`, cron
+ * `ops-email-delivery-retry`) la reenvía. No envía nada por sí mismo.
+ */
+export const reviveDeadLetterEmailDeliveries = async (input: ReviveDeadLetterEmailDeliveriesInput) => {
+  const reason = input.reason?.trim() ?? ''
+
+  if (reason.length < 10) {
+    throw new Error('reviveDeadLetterEmailDeliveries requires a forensic reason (>= 10 chars).')
+  }
+
+  const deliveryIds = (input.deliveryIds ?? []).filter(id => typeof id === 'string' && id.trim().length > 0)
+  const emailTypes = (input.emailTypes ?? []).filter(type => typeof type === 'string' && type.trim().length > 0)
+
+  if (deliveryIds.length === 0 && emailTypes.length === 0) {
+    throw new Error('reviveDeadLetterEmailDeliveries requires deliveryIds or emailTypes.')
+  }
+
+  const sinceHours = Math.min(Math.max(Math.floor(input.sinceHours ?? 24), 1), 168)
+  const limit = Math.min(Math.max(Math.floor(input.limit ?? 25), 1), 200)
+
+  const rows = await runGreenhousePostgresQuery<{ delivery_id: string; email_type: string } & Record<string, unknown>>(
+    `
+      UPDATE greenhouse_notifications.email_deliveries
+         SET status = 'failed',
+             attempt_number = 0,
+             -- El ultimo error (p. ej. el 'name' de Resend) NO se borra: es el unico rastro de por que murio.
+             -- El motivo del revive va a resend_reason, con el error previo detras.
+             resend_reason = $1 || CASE WHEN error_message IS NOT NULL THEN ' | previous: ' || error_message ELSE '' END,
+             updated_at = NOW()
+       WHERE delivery_id IN (
+         SELECT d.delivery_id
+           FROM greenhouse_notifications.email_deliveries d
+          WHERE d.status = 'dead_letter'
+            AND d.created_at > NOW() - ($2::int * INTERVAL '1 hour')
+            AND NOT (d.email_type = ANY($3::text[]))
+            AND COALESCE(d.delivery_payload->'persistence'->>'retryable', 'true') <> 'false'
+            -- Un envío que el proveedor ya aceptó (cierre incierto) no se revive: sería un duplicado.
+            AND d.resend_id IS NULL
+            AND COALESCE(d.error_class, '') <> 'dispatch_unknown'
+            -- Un buzón bloqueado por el proveedor nunca se vuelve a insistir por correo.
+            AND NOT ${providerBlockedConditionSql('d')}
+            AND (
+              -- delivery_id es uuid: se compara como texto para que un id malformado no reviente la query.
+              ($4::text[] <> '{}' AND d.delivery_id::text = ANY($4::text[]))
+              OR ($5::text[] <> '{}' AND d.email_type = ANY($5::text[]))
+            )
+          ORDER BY d.created_at ASC
+          LIMIT $6
+       )
+       RETURNING delivery_id, email_type
+    `,
+    [reason, sinceHours, [...TOKEN_SENSITIVE_EMAIL_TYPES], deliveryIds, emailTypes, limit]
+  )
+
+  // El motivo es texto libre del operador: puede traer PII. Al log va su tamaño; el texto queda en la fila.
+  console.log(`[email-delivery] revived ${rows.length} dead_letter deliveries → failed (reason: ${reason.length} chars)`)
+
+  return {
+    revived: rows.length,
+    deliveryIds: rows.map(row => row.delivery_id),
+    byEmailType: rows.reduce<Record<string, number>>((acc, row) => {
+      acc[row.email_type] = (acc[row.email_type] ?? 0) + 1
+
+      return acc
+    }, {})
+  }
+}
+
 export const processFailedEmailDeliveries = async (limit = 25) => {
   if (!isResendConfigured()) {
     return {
@@ -1634,14 +1753,21 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
         actor_email,
         error_message,
         attempt_number
-      FROM greenhouse_notifications.email_deliveries
+      FROM greenhouse_notifications.email_deliveries d
       WHERE (
         (status = 'failed' AND attempt_number < 3)
         OR (status = 'rate_limited' AND updated_at < NOW() - INTERVAL '1 hour' AND attempt_number < 3)
       )
-        AND created_at > NOW() - INTERVAL '24 hours'
+        -- ISSUE-172: la ventana mira tambien updated_at: un dead_letter revivido (que puede tener mas de
+        -- 24 h de creado) vuelve a 'failed' con updated_at = NOW(); con solo created_at quedaba atascado
+        -- en 'failed' para siempre, fuera de la poblacion que alguien consulta.
+        AND GREATEST(created_at, updated_at) > NOW() - INTERVAL '24 hours'
         AND NOT (email_type = ANY($2::text[]))
         AND COALESCE(delivery_payload->'persistence'->>'retryable', 'true') <> 'false'
+        -- ISSUE-172: un cierre incierto (el proveedor ya aceptó) no se reintenta a ciegas, y un buzón que el
+        -- proveedor bloqueó (bounced|complained|suppressed) NUNCA se vuelve a insistir por correo.
+        AND COALESCE(error_class, '') <> 'dispatch_unknown'
+        AND NOT ${providerBlockedConditionSql('d')}
       ORDER BY created_at ASC
       LIMIT $1
     `,

@@ -196,6 +196,14 @@ conversacional, más largo, más contexto). Disciplina nueva:
   inmutable. La matriz de `../templates/fan-out-matrix.md` es la herramienta de
   diseño de esos packs. Detalle → `../efeonce/AI_VISIBILITY_GRADER.md`.
 
+📐 **Cómo construye un tercero su panel de prompts** — taxonomía cerrada de 4 tipos
+(Informational / Comparative / Recommendation / Branded), asignación determinista por `k`
+prompts-por-keyword, e invariantes duros (≥1 unbranded por keyword, ≤1 branded) →
+`../references/competitor-methodologies-2026-09.md` §1.7. Ahí también: mención ≠ citación y el
+*citation-only gap*, prominencia como cuarta dimensión, y competidores like-for-like sacados de la
+misma respuesta unbranded a costo cero (§1.2, §1.3, §1.8). Son fórmulas de terceros, **no
+validadas con nuestros datos**.
+
 ## llms.txt — objetivo y consumidor antes que archivo (verificado 2026-08-30)
 
 `llms.txt` es un archivo Markdown propuesto para orientar a consumidores del sitio.
