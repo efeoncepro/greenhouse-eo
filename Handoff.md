@@ -4,12 +4,11 @@
 vacío en `EO-OPN-0674` y `EO-OPN-0675` con 15 y 51 postulaciones reales **intactas, sin pérdida de datos**. Causa raíz
 reproducida: `PipelineDeskView.tsx:125` siembra `applications` con `useState` y nunca re-sincroniza, mientras el
 hermano `openingId` sí (efecto `:150`), así que al cambiar de vacante el tablero filtra el arreglo del montaje y da 0.
-Preexistente desde `559f5654b` (2026-07-09); no es regresión de la publicación del 2026-09-09. **Fix NO implementado:**
-dos opciones propuestas al operador, sin respuesta. Diagnóstico, evidencia, descartes y tres defectos adyacentes
-medidos (tope de 120 que trunca mudo · `hiring_application_intake_events` ciego al carril vivo, 7 filas contra 187
-postulaciones · tarjeta que revienta con `source` inesperado) en
-`docs/issues/open/ISSUE-171-hiring-pipeline-empty-stale-client-snapshot.md`. Aparte: 6 CV de `EO-OPN-0675` en
-`quarantined` piden revisión humana. El script read-only vive sólo en `claude/hiring-pipeline-bug-880pbn` (con
+Preexistente desde `559f5654b` (2026-07-09); no es regresión de la publicación del 2026-09-09. **Fix en local, sin desplegar.** Detalle y adyacentes en
+`docs/issues/open/ISSUE-171-hiring-pipeline-empty-stale-client-snapshot.md`. **`ISSUE-172` (P1):** `lpad` recorta el `public_id` del Banco de Talento pasado 99 999 → colisión que
+abre el circuito del consumer de postulaciones (25 personas sin proyectar, nada borrado); fix en local
+(migración + anti-join + parser tolerante + señal `sync.reactive.circuit_open`), **migración NO aplicada**. Aparte:
+6 CV en `quarantined`. El script read-only vive sólo en `claude/hiring-pipeline-bug-880pbn` (con
 `TASK-1869`); esa rama contiene `origin/develop` pero **no** el develop local (4 commits sin pushear) — su merge no es
 ff-only hoy. Siguiente ID libre: `TASK-1870`.
 

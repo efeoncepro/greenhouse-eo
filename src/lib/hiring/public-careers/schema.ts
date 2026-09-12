@@ -45,6 +45,31 @@ export const isSafeHttpUrl = (value: string): boolean => {
   }
 }
 
+/**
+ * ISSUE-172 — normaliza un enlace opcional del candidato a https o lo descarta. Devuelve la URL
+ * https canónica, o `null` cuando no hay valor o cuando el enlace no puede volverse seguro
+ * (scheme peligroso, sin host con dominio). NUNCA devuelve un scheme distinto de https, y NUNCA
+ * es motivo para rechazar la postulación: el caller conserva la application y deja el campo vacío.
+ */
+export const normalizeOptionalHttpsUrl = (raw: string): string | null => {
+  const value = raw.trim()
+
+  if (!value) return null
+
+  // «linkedin.com/in/ada» → https://linkedin.com/in/ada · «http://ada.dev» → https://ada.dev
+  const withScheme = /^[a-z][a-z0-9+.-]*:/i.test(value) ? value : `https://${value}`
+  const candidate = withScheme.replace(/^http:\/\//i, 'https://')
+
+  if (!isSafeHttpUrl(candidate)) return null
+
+  try {
+    // Un host sin punto («https://no-url») parsea pero no es un enlace de una persona.
+    return new URL(candidate).hostname.includes('.') ? candidate : null
+  } catch {
+    return null
+  }
+}
+
 export interface NormalizedApplicationInput {
   openingPublicId: string
   firstName: string
@@ -85,13 +110,14 @@ export const parsePublicHiringApplication = (raw: unknown): NormalizedApplicatio
   if (!openingPublicId || !firstName || !lastName) return null
   if (!EMAIL_RE.test(email)) return null
 
-  const portfolioRaw = asTrimmed(body.portfolioUrl, MAX_URL)
-  const linkedinRaw = asTrimmed(body.linkedinUrl, MAX_URL)
+  // ISSUE-172 — las URLs son OPCIONALES y nunca tumban la postulación. Un enlace sin scheme
+  // («linkedin.com/in/x», que el formulario aceptaba) o con `http://` se normaliza a https; uno
+  // peligroso o ilegible (`javascript:`, `data:`, sin host) se DESCARTA y la postulación sigue —
+  // el mismo criterio que `availability` fuera de catálogo. Dos personas reales perdieron su
+  // postulación por un enlace sin `https://` el 2026-09-11; nunca se persiste un scheme inseguro.
+  const portfolioUrl = normalizeOptionalHttpsUrl(asTrimmed(body.portfolioUrl, MAX_URL))
+  const linkedinUrl = normalizeOptionalHttpsUrl(asTrimmed(body.linkedinUrl, MAX_URL))
   const phoneRaw = asTrimmed(body.phone, MAX_NAME)
-
-  // URLs opcionales: si vienen, DEBEN ser https browser-safe (rechazo javascript:/data:).
-  if (portfolioRaw && !isSafeHttpUrl(portfolioRaw)) return null
-  if (linkedinRaw && !isSafeHttpUrl(linkedinRaw)) return null
 
   // TASK-1688 — país de residencia autodeclarado, REQUERIDO (flip contract 2026-08-12: ambas
   // superficies verificadas en producción con release 393144e9f; ver ADR delta en la
@@ -116,8 +142,8 @@ export const parsePublicHiringApplication = (raw: unknown): NormalizedApplicatio
     email,
     phone: phoneResult ? String(phoneResult.normalized) : null,
     residenceCountryCode: residenceRaw || null,
-    portfolioUrl: portfolioRaw || null,
-    linkedinUrl: linkedinRaw || null,
+    portfolioUrl,
+    linkedinUrl,
     // TASK-1736 — availability se contrasta server-side contra el catálogo estable de options del
     // Growth Form (mismo SSOT de copy): match mecánico-seguro devuelve el valor CANÓNICO; un valor
     // fuera de catálogo se conserva como texto acotado (fallback tolerante — el intake público

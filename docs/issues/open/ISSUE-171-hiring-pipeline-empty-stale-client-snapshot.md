@@ -3,7 +3,7 @@
 > **Tipo:** Incidente de runtime
 > **Ambiente:** producción (`/agency/hiring/pipeline`; una sola instancia Cloud SQL compartida dev/staging/prod)
 > **Detectado:** 2026-09-12
-> **Estado:** open — causa raíz identificada y reproducida; **fix NO implementado** (propuesto al operador, sin respuesta)
+> **Estado:** open — causa raíz reproducida; **fix implementado en local (opción estructural), NO desplegado**
 > **Superficie dueña:** `src/views/greenhouse/hiring/PipelineDeskView.tsx`
 
 ## Síntoma
@@ -65,7 +65,15 @@ El operador no puede trabajar el pipeline de una vacante tras cambiar de vacante
 que no hay postulantes cuando hay 51. Riesgo operativo real: 66 candidaturas vivas que parecen inexistentes, con un
 compromiso público de respuesta de 3 a 4 semanas. Sin pérdida de datos.
 
-## Solución propuesta (no aplicada)
+## Solución (implementada en local 2026-09-12; pendiente de release)
+
+Se aplicó la **opción recomendada**: `PipelineDeskView` deriva la lista con `useMemo` desde
+`initialSnapshot.applications` y guarda sólo `stageOverrides` (mapa `applicationId → stage`) para el
+arrastre; un snapshot nuevo limpia los overrides. Test de regresión
+`pipeline-desk-snapshot-sync.test.tsx` (re-render de la MISMA instancia con el snapshot de otra vacante
+→ 4 tarjetas nuevas, 0 residuales, sin «Sin resultados»). Verificado con los tests del tablero y lint.
+
+### Opciones que se evaluaron
 
 **Opción recomendada — dejar de duplicar el estado de servidor.** `initialSnapshot.applications` pasa a ser la única
 fuente; el único estado cliente legítimo es el delta optimista de etapa del arrastre, como mapa de overrides

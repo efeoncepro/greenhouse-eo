@@ -126,3 +126,29 @@ describe('TASK-1748 — la projection no materializa personas sinteticas', () =>
     ).toHaveLength(6)
   })
 })
+
+describe('ISSUE-172 — la creación de memberships sólo intenta los facets sin membership', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mocks.query.mockResolvedValue({ rows: [], rowCount: 0 })
+    mocks.query.mockResolvedValueOnce({
+      rows: [{ total_facets: 1, active_process: 1, needs_reconsent: 0 }],
+      rowCount: 1
+    })
+    mocks.publish.mockResolvedValue(undefined)
+  })
+
+  it('el INSERT lleva anti-join contra talent_pool_membership, no sólo ON CONFLICT', async () => {
+    await reconcileTalentPoolProjection({ apply: true, actorUserId: 'issue-172' })
+    const statements = mocks.query.mock.calls.map(call => String(call[0]))
+    const insert = statements.find(sql => sql.includes('INSERT INTO greenhouse_hiring.talent_pool_membership'))
+
+    // PostgreSQL evalúa el DEFAULT de public_id (nextval) para CADA fila candidata antes de que
+    // ON CONFLICT la descarte: sin el anti-join, 247 facets × 288 corridas/día quemaban ~71k
+    // valores de secuencia al día y agotaron el espacio de 5 dígitos en tres semanas.
+    expect(insert, 'debe existir el INSERT de memberships').toBeDefined()
+    expect(insert).toContain('NOT EXISTS (SELECT 1 FROM greenhouse_hiring.talent_pool_membership m')
+    expect(insert).toContain('WHERE m.candidate_facet_id = cf.candidate_facet_id')
+    expect(insert, 'el ON CONFLICT queda como guarda de carrera').toContain('ON CONFLICT (candidate_facet_id) DO NOTHING')
+  })
+})
