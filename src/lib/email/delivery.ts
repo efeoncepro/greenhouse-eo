@@ -931,7 +931,14 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
     })
 
     if (result?.error || !result?.data?.id) {
-      throw new Error('Email provider rejected dispatch.')
+      // ISSUE-172 (2026-09-12): el `name` del error de Resend es un enum del proveedor
+      // (`daily_quota_exceeded`, `rate_limit_exceeded`, `validation_error`…), sin PII, y es lo
+      // único que distingue "cuota diaria agotada" de "dirección inválida" en `email_deliveries` y
+      // en Sentry. Tragarlo dejó 41 acuses fallidos sin causa legible hasta abrir el panel del
+      // proveedor. El `message` NO viaja: en errores de validación cita la dirección destino.
+      const providerErrorName = typeof result?.error?.name === 'string' ? result.error.name : null
+
+      throw new Error(providerErrorName ? `Email provider rejected dispatch (${providerErrorName}).` : 'Email provider rejected dispatch.')
     }
 
     const resendId = result.data.id
