@@ -117,8 +117,10 @@ Release `586a8627568a-d336e91c-115f-4b1f-a7f0-9eadb5157b42` (PR #234, orquestado
 14:44:56Z, Vercel Production READY para `586a86275`). Verificación: test de regresión
 `pipeline-desk-snapshot-sync.test.tsx` (re-render de la misma instancia con el snapshot de otra vacante → las tarjetas
 nuevas aparecen, 0 residuales, sin «Sin resultados») + revisión de arquitectura (sin bloqueantes; se corrigió la
-identidad del estado de overrides). Verificación visual en producción por el operador: cambiar de vacante en
-`/agency/hiring/pipeline` sin recargar — las tarjetas deben seguir a la vacante elegida. Adyacentes registrados en
+identidad del estado de overrides). **Verificación runtime (2026-09-12, Playwright + sesión de agente en staging, misma base y mismo código que
+producción):** montaje en `EO-OPN-0009` → 120 tarjetas; cambio a `EO-OPN-0675` sin recargar → **66 tarjetas y 0
+«Sin resultados»** (antes del fix: 0 tarjetas); vuelta a `EO-OPN-0009` → 120. Capturas en
+`.captures/issue-171-verify/` (ignorado por git). Adyacentes registrados en
 `ISSUE-172` (tope de 120 mudo, libro de intake ciego, `source` sin guarda) siguen como follow-ups.
 
 ## Referencias
