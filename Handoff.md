@@ -1,5 +1,18 @@
 # Handoff activo
 
+**Pipeline de Hiring vacío por vacante (2026-09-12, diagnóstico; `ISSUE-171`):** `/agency/hiring/pipeline` se veía
+vacío en `EO-OPN-0674` y `EO-OPN-0675` con 15 y 51 postulaciones reales **intactas, sin pérdida de datos**. Causa raíz
+reproducida: `PipelineDeskView.tsx:125` siembra `applications` con `useState` y nunca re-sincroniza, mientras el
+hermano `openingId` sí (efecto `:150`), así que al cambiar de vacante el tablero filtra el arreglo del montaje y da 0.
+Preexistente desde `559f5654b` (2026-07-09); no es regresión de la publicación del 2026-09-09. **Fix NO implementado:**
+dos opciones propuestas al operador, sin respuesta. Diagnóstico, evidencia, descartes y tres defectos adyacentes
+medidos (tope de 120 que trunca mudo · `hiring_application_intake_events` ciego al carril vivo, 7 filas contra 187
+postulaciones · tarjeta que revienta con `source` inesperado) en
+`docs/issues/open/ISSUE-171-hiring-pipeline-empty-stale-client-snapshot.md`. Aparte: 6 CV de `EO-OPN-0675` en
+`quarantined` piden revisión humana. El script read-only vive sólo en `claude/hiring-pipeline-bug-880pbn` (con
+`TASK-1869`); esa rama contiene `origin/develop` pero **no** el develop local (4 commits sin pushear) — su merge no es
+ff-only hoy. Siguiente ID libre: `TASK-1870`.
+
 **Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
 **no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a
 `seo-aeo/references/competitor-methodologies-2026-09.md` (nuevo). `ai_optimization` sigue fuera del allowlist.
