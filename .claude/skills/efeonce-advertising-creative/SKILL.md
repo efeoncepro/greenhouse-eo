@@ -12,10 +12,13 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
 
 1. Lee el contrato operativo en
    [ADVERTISING_CREATIVE_AGENT_EXECUTION_V1](../../../docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md).
-2. Consulta la fuente portable vigente en el repo hermano de AXIS:
-   `../axis-design-system/docs/creative-applications/advertising-social/DESIGN.md`, el export
-   `axisAdvertising` y el contrato `efeonce.advertising-typography`. Su lifecycle `trial` obliga a conservar
-   evidencia y evita presentarlo como estable antes del segundo consumidor real.
+2. Consulta primero la guía portable
+   `../axis-design-system/docs/creative-applications/advertising-social/DESIGN.md` y abre el
+   [Creative Typography Workbench](https://axis.efeonce.org/references/creative-typography/). Usa su asesor con
+   el soporte, largo e intención reales para obtener una receta candidata y un caso comparable; después resuelve
+   cada valor desde el export `axisAdvertising` y el contrato `efeonce.advertising-typography`. El contrato
+   versionado prevalece ante cualquier drift. Su lifecycle `trial` obliga a conservar evidencia y evita
+   presentarlo como estable antes del segundo consumidor real.
 3. Carga la skill tipográfica activa y sólo las referencias que apliquen:
    - [ink, jerarquía y espaciado](../../../.codex/skills/greenhouse-typography-accessibility/references/campaign-ink-metrics-and-hierarchy.md);
    - [casos reales y reconstrucciones didácticas](../../../.codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md).
@@ -32,8 +35,9 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    CTA, activos disponibles, derechos y estado esperado. Aprovecha el contexto ya entregado; pregunta sólo
    por una ausencia que cambie materialmente la pieza.
 2. **Asigna funciones, no fuentes por gusto.** Declara una voz display dominante, una voz estructural y, si
-   aporta sentido, un gesto breve. Elige receta/peso/ejes desde AXIS después de conocer longitud, fondo,
-   tamaño final y distancia de lectura.
+   aporta sentido, un gesto breve. Prueba el encargo en el asesor del Workbench y usa su resultado como hipótesis:
+   Bricolage instala la idea, Poppins estructura y Guttery sólo aparece como gesto opcional. Elige los valores
+   definitivos desde AXIS después de conocer longitud, fondo, tamaño final y distancia de lectura.
 3. **Construye el medio limpio.** Genera o selecciona imagen/video sin texto ni logotipos inventados. Compón
    tipografía, marcas y legales de forma determinista con los archivos oficiales.
 4. **Diseña contraste.** Prueba peso, ancho, tamaño, leading, tracking, cortes y densidad juntos. ExtraBold no
@@ -61,6 +65,8 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
 - No uses rectángulos decorativos detrás de palabras como solución automática. Un plate existe para asegurar
   contraste y debe responder a la composición, no parecer una etiqueta accidental.
 - No conviertas un ejemplo aprobado en regla universal ni un mockup didáctico en campaña publicada.
+- No presentes una receta del Workbench como aprobación creativa. La recomendación aún requiere composición,
+  QA tipográfico, contraste sobre píxeles reales y las aprobaciones de marca/cliente que correspondan.
 - Producir y corregir son acciones reversibles autorizadas por el encargo. Programar, publicar, enviar o gastar
   presupuesto sigue requiriendo la autoridad correspondiente.
 

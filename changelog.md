@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-13 — Creative Typography Workbench de AXIS desplegado
+
+La guía pública [Creative Typography Workbench](https://axis.efeonce.org/references/creative-typography/) quedó
+desplegada desde AXIS: implementación `93810997c72a2664e8be6d3a85be410b5b5985f9`, release HEAD `f37e703`, deployment Vercel
+`dpl_CkFEqo7bv8ZRyXxxj7hpywWEuqrV` y GitHub verify verde. El readback público respondió `200`, encontró
+Bricolage, Poppins y Guttery reales, expuso el asesor interactivo y no mostró overflow en desktop. Greenhouse
+enlaza la experiencia desde el contrato operativo, la descripción funcional y el manual sin duplicar recetas.
+El despliegue del Lab no cambia `efeonce.advertising-typography` de `trial` a `stable`, no activa tipografía
+publicitaria en la UI de producto y no aprueba automáticamente ninguna pieza.
+
 ## 2026-09-13 — Publicidad tipográfica activable por Codex y Claude
 
 Se añade la skill espejo `efeonce-advertising-creative`, su brief/gate DO/DON'T y la activación por los routers
@@ -1025,13 +1035,3 @@ y reader externo excluye grants vencidos. DTO canónico integrado en authorize, 
 permisos separados por organización y fallos sin fallback. Retorno OAuth/Microsoft conectado con flag y validación de URL; code/refresh revalidan scopes actuales del cliente. Guard de origen protege sesiones y factores, con regresiones de login CSRF; shell consume fuentes/licencias y CSS bajo CSP estricta; segundo factor TOTP/UV y alta con QR local integrados. Cuatro GVC desktop/móvil y seis checks de navegador pasan con factores ficticios. Primer despliegue autorizado con gates OFF; recheck por jti agrega revocación del token a la validación de contexto antes de activar la cohorte. El piloto ya tiene enrollment y grant de lectura temporal, por el command interno (integración auditora compartida reabierta posteriormente). Se restauran seis permisos release faltantes del rol administrador (execute ya existía), con negativos para los otros roles y Finance sólo lectura de resultados. CLI exige motivo para excepciones y lo conserva en manifest/auditoría; no inventa identidad Greenhouse desde GitHub actor. Pruebas focales 46 passed y typecheck correcto. Actualización operativa: PR #222 / main1086fe40 released por run33978290957; CI/Deep/E2E y watchdog5/5 correctos. Reader y emisor internos ON; GC ON con scheduler y ejecución real confirmada, once tablas y cero borrados. Motivo de excepción releído en manifest y auditoría PG. Activación del gateway detenida por intento de sobrescribir tag inmutable; flags restaurados OFF y fix de reutilización por digest publicado en dd04f470, 125 pruebas correctas, nuevo deploy en curso. Login Microsoft/MFA completado, callback propio rechazado. Follow-up local con openid profile, reloj JWT posterior al intercambio y diagnóstico cerrado; 65 pruebas y typecheck correctos. Emisor temporalmente OFF durante publicación; token, canaries y rollback aún pendientes. [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
 
 Estado actualizado: PR #223 / main a6866250 released por run33982717767, sin override, health y watchdog5/5 correctos. Corrección OIDC y CSRF publicadas; emisor permanece OFF por hallazgo de integridad confirmado. El audit interno existe pero faltaba audit externo canónico para binding/grant; detector nuevo mide2 en PG. Decisión A: población persistida y primitives transaccionales compartidas, recuperación aislada, reconciliación actual con procedencia sin fabricar historia. Implementación local: 146 tests integrados y typecheck correctos, migración SQL13/13 y commands live TEMP correctos; endurecimiento de guard final/último canary de poblaciones en validación. No se aplicó la migración ni reconciliación real. Criterio auditado de TASK-1836 reabierto; Claude dejó ownership a Codex.
-
-## 2026-09-04 — Berel: feedback de septiembre promovido a la skill de producción
-
-Lectura integral del Playbook Producción vivo y contraste con Recomendaciones Cliente, Reglas del cliente
-y Aprendizajes del feedback. Las skills espejo Claude/Codex incorporan voz pública sin lenguaje interno,
-la rama para productos nuevos/de awareness, vocabulario técnico/público inequívoco, Kelvin homologado,
-tablas y CTA accionables, render oficial del empaque, datos faltantes solo como pendientes internos,
-correcciones de catálogo y separación Notion → CMS → publicación → URL viva. Se conserva la precedencia
-vigente frente a reglas antiguas del Playbook (`Enlace`, `/search`, longitud). No se editaron artículos,
-assets ni Drupal y no se declara ninguna publicación.

@@ -6,6 +6,11 @@ Dentro de este repo, describe normalmente la pieza. Los routers detectan formato
 tipografía de campaña y texto sobre imagen, y cargan `efeonce-advertising-creative` junto con las especialidades
 necesarias.
 
+Antes de producir o auditar, abre la
+[guía interactiva de tipografía creativa de AXIS](https://axis.efeonce.org/references/creative-typography/).
+El asesor permite comparar soporte, longitud e intención y devuelve una receta explicada. Úsala como banco de
+pruebas; el agente debe volver a medir la composición final sobre su fondo y tamaño reales.
+
 Ejemplos:
 
 - `Crea un post 4:5 de Efeonce con este copy y entrégame el PNG revisado.`
@@ -43,6 +48,9 @@ esas acciones autoriza publicación.
 - Texto y logo deben sostener contraste sobre el peor sector del fondo, no sólo en promedio.
 - Ningún texto o logo crítico debe venir horneado por el generador si debía ser exacto.
 - Las guías y notas de revisión no pueden aparecer en el export.
+
+La guía pública ayuda a entender y discutir las decisiones, pero no aprueba una pieza ni convierte una receta
+en preset universal. El estado `trial` del contrato exige conservar ficha, evidencia y gate por cada composición.
 
 ## MCP
 

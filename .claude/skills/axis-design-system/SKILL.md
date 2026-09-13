@@ -73,6 +73,21 @@ Tailwind, CSS, canvas or motion. For an advertising/social piece, compose this s
 Greenhouse. The contract remains `trial`: do not claim stable or make its Lab adapter global before a second
 consumer and cross-runtime evidence exist.
 
+Use the sources in this order for every piece with advertising text:
+
+1. Read the sibling guide and the current `axisAdvertising` contract to establish roles, allowed ranges and
+   hard limits. The versioned contract remains the source of truth.
+2. Open the public [Creative Typography Workbench](https://axis.efeonce.org/references/creative-typography/)
+   and use its adviser with the real support, title length and intention. Treat the resulting Bricolage weight,
+   Poppins role, optional Guttery gesture, rhythm, safe area and comparison case as a candidate recipe.
+3. Resolve the exact values from the contract, compose with the real licensed files supplied by the consumer
+   and validate the final pixels. If the Workbench and contract diverge, stop and report the drift; never copy
+   the visual projection back into tokens by eye.
+
+The Workbench is the guided visual projection of the guide, not another source of truth and not creative
+approval. Its recommendation does not authorize a brand decision, client delivery, scheduling or publication.
+Do not make its adapter, families or recipes global, and do not package licensed font files with AXIS.
+
 ### AXIS Lab
 
 The Lab lives in `../axis-design-system/apps/lab`, not in Greenhouse. Its current runtime is Astro 7.1.6

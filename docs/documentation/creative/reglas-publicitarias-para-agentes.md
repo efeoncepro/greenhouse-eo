@@ -24,6 +24,11 @@ La salida incluye la pieza o corrección solicitada, su ficha tipográfica y un 
 marca, formato, movimiento y derechos. El agente distingue siempre una prueba revisada de una pieza aprobada,
 programada o publicada.
 
+La [guía pública Creative Typography Workbench de AXIS](https://axis.efeonce.org/references/creative-typography/)
+expone estas decisiones como una experiencia interactiva para diseñadores y agentes: explica el papel de cada
+familia, permite construir una receta por soporte, longitud e intención, y reúne comparaciones DO/DON'T. Es una
+proyección didáctica del contrato `trial`; AXIS conserva el SSOT y cada pieza conserva su revisión propia.
+
 ## Qué evita
 
 - titulares pesados por usar ExtraBold como receta automática;

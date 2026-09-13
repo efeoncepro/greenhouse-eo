@@ -17,8 +17,11 @@ improvise pesos, estilos, espaciados, colores, safe areas o estados de aprobaci�
 - **Social, Design, Motion, Image, Copy y Brand** conservan su ownership de canal, producción, lenguaje, derechos
   e identidad.
 
-Canon técnico: [AXIS ownership](../architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md). Guía visual
-y datos: `../axis-design-system/docs/creative-applications/advertising-social/DESIGN.md` y paquetes AXIS.
+Canon técnico: [AXIS ownership](../architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md). La
+[guía pública interactiva de tipografía creativa](https://axis.efeonce.org/references/creative-typography/)
+permite explorar funciones, familias, contraste, espaciado y aplicaciones. Las reglas machine-readable y sus
+datos siguen viviendo en `../axis-design-system/docs/creative-applications/advertising-social/DESIGN.md` y en
+los paquetes AXIS; la página pública es una superficie didáctica, no un segundo SSOT.
 
 ## Activación
 
@@ -35,7 +38,8 @@ un brief ya resuelto ni delega el ownership del resultado.
 
 1. Resolver marca, objetivo, soporte, dimensiones/duración, audiencia, copy literal, CTA, activos, derechos y
    estado solicitado.
-2. Leer la versión vigente del contrato AXIS. No transcribir sus números a skills o docs operativos.
+2. Leer la versión vigente del contrato AXIS. Usar la guía pública para explorar y comparar recetas, sin
+   transcribir sus números a skills o docs operativos.
 3. Declarar las funciones tipográficas: una voz dominante, apoyo estructural y gesto opcional.
 4. Probar peso, ancho/ejes, tamaño, tracking, leading, cortes y densidad sobre el texto y medio finales.
 5. Generar o seleccionar el medio sin texto/logo inventado y componer las capas exactas de forma determinista.
