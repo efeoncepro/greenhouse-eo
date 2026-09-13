@@ -2,6 +2,9 @@
 
 ## Rama fotohistoria y recursos de Nexa
 
+Para la submarca, consultar el [inventario de Marketing con Manzanitas](../../operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md):
+elegir SVG completo, sin símbolo o manzana independiente; verificar contraste antes de rasterizar.
+
 Antes de producir con Nexa, consultar la [biblioteca verificada](../../operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md):
 poses, vestuario, avatar, entornos y voz; seleccionar archivos, no inventar un nuevo personaje.
 Para carrusel dialogado, fijar actuación/orden, componer globos y texto exacto y mostrar todas las

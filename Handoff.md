@@ -3,7 +3,7 @@
 **Pódcast 13/09:** [fotohistoria v04 y evidencia](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md):
 seis PNG Instagram + PDF LinkedIn programados para 30/09, 19:00/11:00 Chile; ambos PENDING.
 Video suspendido, sin nuevas pruebas; publicación pendiente. Docs/skills espejo incluyen
-[biblioteca Nexa](docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md), continuidad, globos y copy aprobado.
+[Nexa](docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md) y [nueve SVG Manzanitas](docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md).
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
 TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con

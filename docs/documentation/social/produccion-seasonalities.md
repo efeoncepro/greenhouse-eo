@@ -1,5 +1,8 @@
 # Producción y programación de campañas estacionales
 
+La [biblioteca gráfica de Marketing con Manzanitas](../../operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md)
+identifica nueve originales SVG reutilizables y su convivencia con efeonce; no se limita al Pódcast.
+
 La rama de **fotohistoria dialogada** conserva continuidad entre imágenes nativas, globos legibles
 y actuación secuencial. Puede entregar PNG ordenados a Instagram y un documento PDF a LinkedIn;
 no son la misma operación de publicación. [Caso y estado Pódcast](../../operations/social/2026-09-13-podcast-fotohistoria-production-method.md).

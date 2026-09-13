@@ -15,6 +15,10 @@ PDF, captions y readback Metricool. Programado 30/09: LinkedIn11:00 e Instagram1
 Manual, funcional y skills Codex/Claude actualizados; [recursos Nexa](docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md)
 localizados para reuso. Sin nuevas generaciones, publicación, cambio de runtime ni push.
 
+Complemento: [inventario completo de Marketing con Manzanitas](docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md):
+nueve SVG verificados, cuatro logos y cinco símbolos, colores/viewBox y rutas exactas; enlaces en
+Design/Social de ambos agentes, manual y descripción funcional. Sin modificar los originales.
+
 ## 2026-09-13 — Referente de seasonalities Metricool separado del calendario editorial
 
 [Revisión de 407 eventos y oportunidades por mercado](docs/audits/social/2026-09-13-seasonality-reference-opportunities.md):

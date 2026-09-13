@@ -22,6 +22,9 @@ de vestuario contienen dos espacios. Resolver con listado real, no normalizar/re
 
 ## Selección segura y continuidad
 
+Para acompañar a Nexa con Marketing con Manzanitas, usar su
+[biblioteca gráfica original](MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md), no logos recreados.
+
 1. Inspeccionar archivos originales antes de elegir. Registrar ruta y función de cada referencia:
    rostro/identidad, pose, vestuario, voz, fondo. El nombre de la carpeta no certifica aprobación.
 2. Para diálogo, explorar The Listen y The Read según actuación; para gestos, explorar The Point

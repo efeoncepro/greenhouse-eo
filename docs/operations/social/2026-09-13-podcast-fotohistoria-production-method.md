@@ -70,6 +70,9 @@ Scripts locales son trazabilidad del caso, no un reemplazo del compositor/layout
 
 ## Fuentes y archivo
 
+La [biblioteca de Marketing con Manzanitas](MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md)
+completa la referencia puntual del logo: nueve SVG, nombres exactos, colores, variantes y uso con efeonce.
+
 Raíz OneDrive (la carpeta Alineación usa Unicode descompuesto):
 
 `Alineación/5. Contenidos/Seasonalities/Día del Pódcast/2026/Una última pregunta`

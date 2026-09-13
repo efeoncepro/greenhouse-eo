@@ -66,6 +66,11 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 
 ## 1. Cómo se usa esta skill (router)
 
+Para Marketing con Manzanitas, consultar la
+[biblioteca gráfica](../../../docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md):
+logos completos, versiones sin manzana y cinco símbolos; conservar el SVG original y distinguir
+marca física integrada de gráfico plano. No inventar lockups con efeonce.
+
 Para Nexa como personaje creativo, cargar
 [su biblioteca de recursos](../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md).
 Para globos fotorealistas y continuidad, cargar
