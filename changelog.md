@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-13 — Pódcast: fotohistoria, biblioteca Nexa y entrega documentada
+
+[Bitácora y evidencia](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md):
+decisiones y rechazos de video, continuidad/identidad, logo físico, globos, texto compacto, seis slides,
+PDF, captions y readback Metricool. Programado 30/09: LinkedIn11:00 e Instagram19:00 Chile; no publicado.
+Manual, funcional y skills Codex/Claude actualizados; [recursos Nexa](docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md)
+localizados para reuso. Sin nuevas generaciones, publicación, cambio de runtime ni push.
+
 ## 2026-09-13 — Referente de seasonalities Metricool separado del calendario editorial
 
 [Revisión de 407 eventos y oportunidades por mercado](docs/audits/social/2026-09-13-seasonality-reference-opportunities.md):
@@ -1052,20 +1060,3 @@ dos navegadores.
 ## 2026-09-04 — Release `9100bbd2765d` a producción: EPIC-044 (auth-server + OAuth code complete) y TASK-1631
 
 PR #221 squash `9100bbd27`, orquestador `33893120972` (un run, sin retry), manifest `released` 16:39:40Z. `auth-server` en producción (`/readyz` 200, JWKS 2 kid, superficie OAuth 404 con `AUTH_SERVER_OAUTH_ENABLED=false`), TASK-1631 lane ecosystem verificado en prod, 4/4 workers + auth-server Ready (dos change-gated con árbol idéntico). Post-release: `AUTH_SERVER_JWKS_URL` en Vercel Production+staging con redeploy; environment `efeonce-auth` registrado `draft` por command (`pnpm auth-server:register-issuer-environment`). El watchdog aprendió el change-gate del `auth-server` (espejo por servicio + test de paridad con los workflows). Ledger de tiempos y de flags actualizados. Barrido documental del release: control plane, playbook (anti-patterns #17/#18), runbooks y manuales del orquestador/watchdog/auth-server, ADR nativo, contrato OAuth, `CLOUD_RUN.md`, EPIC-044, rule `auth-server` y skills `efeonce-mcp-platform` (+espejo Codex), `greenhouse-production-release` y `greenhouse-backend`.
-
-## 2026-09-04 — TASK-1829 (EPIC-044 U02): superficie OAuth del emisor propio, code complete detrás de flag
-
-`auth.efeonce.org` gana su protocolo, detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (`services/auth-server/deploy.sh`):
-metadata RFC 8414 + OIDC con `issuer` idéntico al origen y `client_id_metadata_document_supported`, CIMD como
-registro primario (URL `client_id`, anti-SSRF, cache 24 h + etag), DCR RFC 7591 sólo para clientes públicos,
-clientes confidenciales pre-registrados por command (`pnpm auth-server:register-client` · `POST /api/admin/auth-server/oauth-clients`),
-`authorize` con PKCE S256 obligatorio, consentimiento por (sujeto, cliente, scope) y step-up para escrituras,
-access JWT ES256 de 15 min firmado en KMS HSM (`iss sub aud azp scope gv jti`), refresh opaco rotativo 30/90 d
-con detección de reuso que revoca la familia, revoke RFC 7009, introspect RFC 7662 y `POST /oauth/consent`.
-Siete tablas nuevas en `greenhouse_auth` (aplicadas) y dos capabilities (`identity.auth_client.register`,
-`identity.auth_consent.revoke`, EFEONCE_ADMIN). Las primitives puras del broker sister-platform se extrajeron a
-`src/lib/auth-server/oauth/primitives.ts` sin cambiar su contrato. Tres señales `auth.oauth.*` (steady 0).
-`gv = max(grantsVersion)` de memberships `bound` (TASK-1631); sin binding, `access_denied`. Hasta TASK-1830
-`authorize` responde `login_required`: ningún token para persona real todavía. Contrato:
-[EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1](docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md). Rollout
-pendiente: release del runtime a `main`, fila del emisor en `external_identity_environments`, flag ON en staging.

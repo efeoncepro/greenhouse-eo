@@ -46,6 +46,10 @@ La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels,
 
 ## 1. Cómo se usa esta skill (router)
 
+Para fotohistorias, globos y PDF social, cargar
+[dialogue-carousel-and-document-delivery.md](references/dialogue-carousel-and-document-delivery.md).
+Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes de generar.
+
 1. **Clasifica la intención** con el árbol de §2. ¿Es realmente social de ejecución
    profunda, o pertenece a una skill hermana? Si pertenece a otra, carga la skill dueña (§5). Para encargos sociales integrales,
    conserva la dirección y la entrega; invocar una skill no autoriza crear subagentes.

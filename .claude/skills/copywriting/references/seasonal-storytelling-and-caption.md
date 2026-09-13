@@ -46,6 +46,12 @@ aprobado en el composer. Si hace falta una corrección, documentar el delta y su
 
 ## Pase de edición
 
+En fotohistorias cómicas, el punch nace de una situación reconocible: no explicar el chiste ni
+adelantar el remate en el caption. Leer en voz alta y evitar ingenio forzado. Congelar la versión
+aprobada por red; no recuperar disclaimers editoriales rechazados de borradores viejos. Esto no
+anula flags nativos ni requisitos vigentes de la plataforma. Caso:
+[Día del Pódcast](../../../../docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md).
+
 1. Leer la frase en orden real de aparición, con las pausas y la retirada del gesto.
 2. Revisar sintaxis, tildes, signos, continuidad y qué palabra recibe el mayor peso visual.
 3. Leer el cierre con la firma: emisor/destinatario inequívocos.

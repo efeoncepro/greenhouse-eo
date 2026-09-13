@@ -1,5 +1,17 @@
 # Producir y programar una seasonality
 
+## Rama fotohistoria y recursos de Nexa
+
+Antes de producir con Nexa, consultar la [biblioteca verificada](../../operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md):
+poses, vestuario, avatar, entornos y voz; seleccionar archivos, no inventar un nuevo personaje.
+Para carrusel dialogado, fijar actuación/orden, componer globos y texto exacto y mostrar todas las
+piezas finales. Exportar PNG 4:5 para Instagram y PDF único 4:5 para LinkedIn si ese es el encargo.
+Reabrir PDF, contar páginas y verificar orden. Programar sólo lo aprobado y comparar caption/media
+con readback. El [caso Pódcast](../../operations/social/2026-09-13-podcast-fotohistoria-production-method.md)
+registra el giro desde video, la pausa narrativa, ajustes de texto y programación final; no repetir
+pruebas pagadas ni duplicar posts al retomar.
+
+
 Owner: Social Media Studio. Para operadores y agentes con un encargo creativo autorizado.
 [Descripción funcional](../../documentation/social/produccion-seasonalities.md) ·
 [Protocolo](../../operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md) ·

@@ -212,6 +212,13 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 
 ## Video social estacional desde un KV
 
+Para diálogo con audio nativo, validar pronunciación, pausas, timbre y lipsync en el resultado:
+no están garantizados por prescindir de audio externo. Dos ratios de 30 s no forman un minuto;
+producir primero el aprobado y no gastar en la otra variante sin autorización. Si se pivota a
+estáticos, detener nuevas pruebas de video y cargar la
+[referencia de fotohistorias](../social-media-studio/references/dialogue-carousel-and-document-delivery.md).
+Para Nexa, consultar [recursos originales](../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md).
+
 Para animar una metáfora cultural o producir un video de seasonality, cargar
 `workflows/seasonality-visual-metaphor-to-video.md` junto con Social Media Studio. La clasificación
 editorial no cambia por usar video. Separar previs de fotogramas reales, render de aprobación,

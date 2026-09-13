@@ -1,5 +1,11 @@
 # Tipografía de campaña: cajas de tinta, jerarquía y composición exacta
 
+Para globos de diálogo, medir padding contra el interior visible, no contra sombra/cola.
+Compactar con kerning nativo y comprobar a tamaño móvil. En el caso Pódcast, 1.20→1.02
+mide distancia entre centros de tinta del script, **no leading entre líneas base**; no trasladarlo
+como token universal ni comprimir letras horizontalmente. Ver
+[caso y medidas](../../../../docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md).
+
 Rama editorial fuera de la UI. Complementa
 [editorial-typography-brand-audit](../../social-media-studio/references/editorial-typography-brand-audit.md).
 Caso y evidencia: [Fiestas Patrias 2026](../../../../docs/operations/social/2026-09-13-fiestas-patrias-production-method.md).

@@ -1,5 +1,12 @@
 # Producción y programación de campañas estacionales
 
+La rama de **fotohistoria dialogada** conserva continuidad entre imágenes nativas, globos legibles
+y actuación secuencial. Puede entregar PNG ordenados a Instagram y un documento PDF a LinkedIn;
+no son la misma operación de publicación. [Caso y estado Pódcast](../../operations/social/2026-09-13-podcast-fotohistoria-production-method.md).
+[Nexa como recurso creativo](../../operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md) reúne las
+rutas verificadas de identidad, poses, vestuario, fondos, voz y contenidos; no cambia el asistente
+conversacional del producto.
+
 Owner: Social Media Studio. Alcance: trabajo creativo local autorizado de Efeonce; no representa
 una nueva pantalla, feature ni rollout de Globe.
 

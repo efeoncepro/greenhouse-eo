@@ -36,6 +36,11 @@ no sobrescribir silenciosamente. Agrupar tres archivos en una misma versión cua
 
 ## Trabajo con assets existentes
 
+**Nexa:** poses, vestuario, avatar, fondos, voz y contenidos viven en
+`10. Nexa (Influencer IA)` bajo esta raíz. Cargar el
+[inventario y contrato de selección](../../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md)
+antes de reutilizarla; incluye rutas y particularidades Unicode verificadas.
+
 Ante una solicitud de buscar, adaptar, editar, reutilizar u organizar assets, comenzar en esta raíz y explorar
 sólo las categorías pertinentes. Identificar archivo fuente, marca, versión y uso antes de editar. Reutilizar
 recursos y plantillas adecuados; conservar originales y guardar derivados con nombre semántico y versión.

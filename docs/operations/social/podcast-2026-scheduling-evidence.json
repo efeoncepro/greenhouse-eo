@@ -1,0 +1,80 @@
+{
+  "asOf": "2026-09-13",
+  "source": "Metricool getScheduledPosts readback",
+  "brandId": 3961547,
+  "status": "scheduled_not_published",
+  "posts": [
+    {
+      "id": 375227205,
+      "uuid": "212483069668576965",
+      "publicationDate": {
+        "dateTime": "2026-09-30T11:00:00",
+        "timezone": "America/Santiago"
+      },
+      "text": "Quien ha grabado un podcast conoce esa mirada: la de «esa pregunta no estaba en la pauta».\n\nA veces, ahí empieza la mejor parte.\n\nCuando dejas de preparar tu siguiente respuesta y te toca pensar. Cuando quien entrevista escucha algo que merece una segunda pregunta.\n\nEn Marketing con Manzanitas, Nexa tenía una más.\n\nEste Día del Podcast celebramos a quienes saben hacerlas. Y a los invitados que se quedan a responder.",
+      "providers": [
+        {
+          "network": "linkedin",
+          "status": "PENDING",
+          "detailedStatus": "Pending"
+        }
+      ],
+      "media": [
+        "https://static.metricool.com/planner/202609/3961547-file-8596578713180269477.pdf"
+      ],
+      "mediaAltText": [
+        null
+      ],
+      "autoPublish": true,
+      "draft": false,
+      "instagramData": {
+        "autoPublish": true,
+        "isAiGenerated": false
+      },
+      "linkedinData": {
+        "previewIncluded": false,
+        "type": "POST"
+      }
+    },
+    {
+      "id": 375227227,
+      "uuid": "2767672037698847689",
+      "publicationDate": {
+        "dateTime": "2026-09-30T19:00:00",
+        "timezone": "America/Santiago"
+      },
+      "text": "Hay silencios que merecen quedarse en la edición. 🎙️\n\nNexa hizo una última pregunta. El resto está en el carrusel.\n\nFeliz día del Podcast.\nPor las conversaciones que se ponen buenas justo cuando alguien se sale del guion.\n\n#DíaDelPodcast #MarketingConManzanitas",
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING",
+          "detailedStatus": "Pending"
+        }
+      ],
+      "media": [
+        "https://static.metricool.com/planner/202609/3961547-file-15479027107670148847.png",
+        "https://static.metricool.com/planner/202609/3961547-file-14245437615249787125.png",
+        "https://static.metricool.com/planner/202609/3961547-file-9822424930081277038.png",
+        "https://static.metricool.com/planner/202609/3961547-file-12498347962431020243.png",
+        "https://static.metricool.com/planner/202609/3961547-file-5744551201669426767.png",
+        "https://static.metricool.com/planner/202609/3961547-file-5906022722215863949.png"
+      ],
+      "mediaAltText": [
+        "Invitado: «Con IA puedes producirlo todo en automático».",
+        "Nexa: «¿Todo?». Invitado: «Guion, imagen, voz… todo».",
+        "Nexa: «¿Y quién decide si vale la pena publicarlo?».",
+        "El invitado guarda silencio y baja la mirada. Globo: «…».",
+        "Invitado: «¿Podemos editar esa parte?».",
+        "Nexa y el invitado en el estudio de Marketing con Manzanitas. «Feliz día del Podcast»."
+      ],
+      "autoPublish": true,
+      "draft": false,
+      "instagramData": {
+        "autoPublish": true,
+        "type": "POST",
+        "showReelOnFeed": true,
+        "isAiGenerated": true
+      }
+    }
+  ]
+}

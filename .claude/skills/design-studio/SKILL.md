@@ -66,6 +66,12 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 
 ## 1. Cómo se usa esta skill (router)
 
+Para Nexa como personaje creativo, cargar
+[su biblioteca de recursos](../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md).
+Para globos fotorealistas y continuidad, cargar
+[la referencia de fotohistorias](../social-media-studio/references/dialogue-carousel-and-document-delivery.md).
+Separar referencias de identidad de placas de escena; no extender textura de pared a rostros.
+
 1. **Clasifica la intención** (§2). ¿Es dirección de arte / diseño gráfico / auditoría de
    KV / imagen de marketing? Si pertenece a otra skill, **delega explícito** (§5) y para.
 2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 13 — carga lo justo.
