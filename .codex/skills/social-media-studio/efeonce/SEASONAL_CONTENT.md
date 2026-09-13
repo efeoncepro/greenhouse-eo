@@ -140,3 +140,55 @@ Para transformar esta línea en video, seguir
 [metáfora visual → video](../../motion-design-studio/workflows/seasonality-visual-metaphor-to-video.md).
 La metáfora necesita acción y revelación temporal; el texto aparece después de poder entenderla.
 El caso Día de Muertos documenta un candidato real con marca exacta, no aprobación ni eficacia demostrada.
+
+## Elegir video o estático por el mecanismo creativo
+
+Criterio editorial acordado el 2026-09-13; hipótesis de dirección, no evidencia de superioridad de un formato.
+La clasificación seasonality depende de la ocasión previsible, no del medio elegido.
+
+**Elegir video cuando el significado necesita tiempo:** una transformación, una acción y su consecuencia,
+un encuentro, una secuencia o una relación específica con el sonido. Identificar qué descubre el espectador
+entre inicio y cierre. Si el movimiento sólo añade zoom, partículas o un logo animado, no demuestra que
+la idea mejore como video. El concepto debe conservar una lectura suficiente sin sonido cuando el consumo
+previsto lo requiera; la música no debe rescatar una metáfora incomprensible.
+
+**Elegir estático cuando la fuerza está en una asociación visual inmediata:** la imagen y el titular
+concentran el significado en una composición. Revisar reconocimiento de la ocasión, metáfora, lectura y
+atribución a tamaño de consumo. «Inmediato» es una intención que debe comprobarse; no asumir comprensión
+porque el equipo conoce el concepto. No agregar explicación para ocultar una imagen culturalmente genérica.
+
+| Pregunta del brief | Decisión inicial | Comprobación |
+|---|---|---|
+| ¿El cambio entre dos estados aporta significado? | Video | La revelación se entiende y merece la espera |
+| ¿Un solo encuadre contiene la idea completa? | Estático | Imagen, copy y marca se leen sin explicación externa |
+| ¿La secuencia añade algo que el estático no puede expresar? | Video principal, si el encargo lo permite | No confundir acabado espectacular con aportación narrativa |
+| ¿Ambos aportan funciones diferentes? | Familia complementaria | Video como relato; estático como síntesis, cada uno autónomo |
+| ¿Sólo se propone animar porque existe un generador? | Mantener estático como punto de partida | Justificar una acción con significado antes de gastar en video |
+
+Registrar elección, razón, función por canal y prueba de comprensión en el brief. Considerar también
+objetivo, contexto de consumo, capacidad, plazo y costo. No producir ambos automáticamente si sólo se
+encargó uno; proponer el complemento cuando aporte valor dentro del alcance. No existe una regla
+«las seasonalities funcionan mejor en video» ni una prioridad por supuestos del algoritmo sin evidencia.
+
+### Aplicación: «Hay abrazos que encendemos»
+
+Dirección propuesta: video como pieza principal porque descubrir cómo el abrazo nace de la llama añade
+una acción a la metáfora; estático 4:5 como síntesis porque reúne abrazo, códigos de Día de Muertos y
+headline en un instante. Esta elección no prueba mayor alcance, emoción, retención o recuerdo de marca.
+
+El inicio del video dedica bastante tiempo al recorrido entre pétalos antes de mostrar lo distintivo.
+Próxima mejora editorial propuesta: acortar ese recorrido y adelantar la transformación, conservando
+anticipación. Definir dónde aparece la primera señal interesante, cuándo se reconoce el abrazo y cuánto
+se sostiene el mensaje. No aplicar un umbral universal de segundos ni revelar todo de golpe por rutina.
+La v02 corrigió encuadre final, entrada del titular y salida de audio; **no acortó ese inicio**. No registrar
+una propuesta de montaje como ejecutada ni prometer que adelantar el motivo mejorará resultados.
+
+### Cómo comparar rendimiento si se decide probar
+
+Antes de publicar, definir un objetivo común, audiencia, ventana, distribución, inversión si aplica y una
+métrica principal con denominador explícito. Mantener concepto, mensaje y branding comparables, adaptando
+la ejecución nativa a cada formato. Separar diagnósticos exclusivos del video (retención, reproducción)
+de resultados comparables (por ejemplo, guardados o compartidos por alcance, si el objetivo los justifica).
+No comparar reproducciones con impresiones como si fueran equivalentes ni declarar ganador por una
+publicación aislada. Si distribución, audiencia o exposición difieren, reportar esas limitaciones y tratar
+la lectura como exploratoria; para conclusiones causales se necesita un diseño de prueba adecuado.

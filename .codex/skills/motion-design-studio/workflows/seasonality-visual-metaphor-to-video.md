@@ -224,3 +224,11 @@ menor de lo deseado. No se hizo comparación A/B con Flux, Minimax u otro modelo
 No se completó animatic ni validación exhaustiva audiovisual: son pendientes del candidato, no pasos
 supuestamente realizados. El «bien, actualiza» del usuario autoriza este aprendizaje; no documenta por sí
 solo autorización para publicar ni certifica performance, recuerdo de marca o efectos emocionales medidos.
+
+## 12. Decidir si la idea necesita video
+
+Antes de animar, aplicar [video o estático por mecanismo creativo](../../social-media-studio/efeonce/SEASONAL_CONTENT.md#elegir-video-o-estático-por-el-mecanismo-creativo).
+La transformación, secuencia o sonido deben aportar significado; una asociación completa en un encuadre
+puede funcionar como estático. En «Hay abrazos que encendemos» se propone video como relato y estático
+como síntesis, sin rendimiento comparado demostrado. Acortar el arranque entre pétalos y adelantar la
+transformación es una mejora propuesta, todavía no ejecutada en v02. No generar ambos formatos por rutina.

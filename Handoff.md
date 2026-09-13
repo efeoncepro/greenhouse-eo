@@ -1,10 +1,9 @@
 # Handoff activo
 
 **Creatividad social:** [protocolo](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md).
-[V8: tres formatos, auditoría tipográfica y firma agrupada](docs/audits/social/2026-09-12-editorial-type-brand-v8.md).
-Video «Hay abrazos que encendemos»: Seedance 2.5, MP4 con marca en OneDrive; candidato, sin publicación.
-[Metodología y límites](.codex/skills/motion-design-studio/workflows/seasonality-visual-metaphor-to-video.md).
-Base documental: `87b05206e`; cambios posteriores locales.
+«Hay abrazos que encendemos»: video v02 en OneDrive, candidato; escucha pendiente, sin publicación.
+[Workflow](.codex/skills/motion-design-studio/workflows/seasonality-visual-metaphor-to-video.md).
+Base `22e193bd2`; delta local 13/09: elección video/estático por mecanismo. Acortar el inicio sigue propuesto.
 
 **Hiring: incidente P1 resuelto y en producción (2026-09-12; `ISSUE-171`/`172` resolved, `ISSUE-173` open; release
 `586a8627568a`):** el tablero no re-leía el snapshot al cambiar de vacante (`ISSUE-171`) y `lpad` recortaba el

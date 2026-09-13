@@ -266,3 +266,8 @@ Si el encargo convierte un KV estacional en video, cargar
 clasificación y entrega; Motion dirige acción, cámara, sonido y post. Incluir contact sheet previo,
 referencias individuales, preflight real del modelo, capas exactas de marca, QA temporal y MP4 reproducible.
 Una festividad previsible sigue siendo seasonality; no llamarla trendjacking por animarla.
+
+Para elegir **video o estático** en una seasonality, aplicar
+`efeonce/SEASONAL_CONTENT.md` → «Elegir video o estático por el mecanismo creativo»: transformación temporal
+frente a asociación inmediata, funciones complementarias y evaluación comparable sin promesas de rendimiento.
+El criterio de formato es transferible; el ejemplo y los activos Efeonce no se trasladan a otras marcas.

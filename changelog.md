@@ -9,6 +9,9 @@
 
 ## 2026-09-12 — Criterio y ejecución de seasonality/trendjacking para Codex y Claude
 
+Ampliación 2026-09-13: criterio espejo video/estático por mecanismo, complementariedad y comparación
+de resultados; adelantar la transformación sigue como propuesta, no como mejora ejecutada en v02.
+
 Workflow espejo de video estacional desde metáfora visual: previs y keyframes, Seedance 2.5,
 preflight/costo, tipografía/logo exactos, audio medido, QA temporal y MP4 en OneDrive.
 Caso «Hay abrazos que encendemos»: candidato técnico; escucha/revisión completa y aprobación pendientes.
