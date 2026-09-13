@@ -267,6 +267,12 @@ Las pruebas de un carril no certifican otros formatos ni rendimiento de audienci
 
 Para logos sobre objetos, relieves y product placement físico: [brand-in-scene.md](references/brand-in-scene.md).
 
+## Referente de fechas y calendario editorial
+
+Para consultar el calendario de seasonalities preparado por Metricool en Notion, cargar
+[`references/seasonality-reference-calendar.md`](references/seasonality-reference-calendar.md).
+Es inspiración para Efeonce y clientes; no es el calendario de contenidos ni el planner de Metricool.
+
 ## Seasonalities en video: ruta obligatoria de producción
 
 Si el encargo convierte un KV estacional en video, cargar

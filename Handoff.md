@@ -1,8 +1,7 @@
 # Handoff activo
 
-**Creatividad social (2026-09-13):** Fiestas Patrias y Día de Muertos programados con video/portada/copy;
-publicación pendiente. Método, fechas, IDs y evidencias en [caso completo](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md).
-Skills Codex/Claude actualizadas.
+**Social 13/09:** [Fiestas Patrias/Muertos](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md) programadas; publicación pendiente.
+[Referente Metricool](docs/audits/social/2026-09-13-seasonality-reference-opportunities.md): 407 eventos revisados, oportunidades propuestas, separado del calendario editorial. Docs/skills espejo actualizados; sin nuevas programaciones.
 
 **Hiring: incidente P1 resuelto y en producción (2026-09-12; `ISSUE-171`/`172` resolved, `ISSUE-173` open; release
 `586a8627568a`):** el tablero no re-leía el snapshot al cambiar de vacante (`ISSUE-171`) y `lpad` recortaba el

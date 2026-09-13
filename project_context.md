@@ -117,6 +117,7 @@ Diseño de deck/A4/web por edición; implementación pendiente en TASK-1845–18
 
 Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
 Seasonalities: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.
+[Referente Metricool](.codex/skills/social-media-studio/references/seasonality-reference-calendar.md): inspiración para Efeonce/clientes; separado del calendario editorial y del scheduler.
 Producción seasonality/trendjacking: [protocolo de agentes](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md); canon en skills espejo `social-media-studio` (idea, marca, dirección, producción y QA).
 Ejecución audiovisual por formato, tipografía exacta, audio aprobado y programación con portadas:
 [manual de seasonalities](docs/manual-de-uso/social/producir-y-programar-seasonalities.md), con referencias de oficio Codex/Claude.

@@ -16,6 +16,13 @@ que exista un detonante emergente documentado. No finalizar con un prompt si se 
 La siguiente tabla enruta funciones, no promete tools instalados. Verificar nombres/schema actuales. El uso
 de varias herramientas no es un criterio de calidad; cada pase debe resolver un defecto identificado.
 
+## Dos usos distintos del nombre Metricool
+
+El [calendario de seasonalities en Notion](../references/seasonality-reference-calendar.md) es un
+referente de investigación. El planner/MCP de Metricool ejecuta programación autorizada por cuenta.
+El calendario editorial propio de Efeonce o de cada cliente conserva los contenidos seleccionados.
+Consultar el primero no crea compromisos ni estados en los otros dos.
+
 ## El loop y qué herramienta corre cada paso
 
 | Paso | Herramienta / skill | Qué hace |

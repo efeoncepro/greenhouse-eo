@@ -10,6 +10,14 @@ conserva las decisiones y parámetros reales; el [manual](../../manual-de-uso/so
 explica cómo repetir el trabajo. El [protocolo de agentes](../../operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md)
 enruta las skills.
 
+## Referencia cultural y planificación
+
+El [calendario de seasonalities preparado por Metricool en Notion](../../../.codex/skills/social-media-studio/references/seasonality-reference-calendar.md)
+es una biblioteca de inspiración para Efeonce y clientes. No es el calendario de contenidos. La selección
+editorial tiene su propio destino por marca; la programación se verifica aparte en el planner Metricool.
+El [análisis del referente y oportunidades por mercado](../../audits/social/2026-09-13-seasonality-reference-opportunities.md)
+contiene propuestas, sin crear piezas ni alterar publicaciones existentes.
+
 ## Responsabilidades y superficies
 
 | Superficie | Qué resuelve | Evidencia de salida |

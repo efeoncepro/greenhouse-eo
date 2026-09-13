@@ -5,6 +5,15 @@ Owner: Social Media Studio. Para operadores y agentes con un encargo creativo au
 [Protocolo](../../operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md) ·
 [Caso detallado Fiestas Patrias](../../operations/social/2026-09-13-fiestas-patrias-production-method.md).
 
+## 0. Seleccionar una oportunidad, si aún no existe un brief
+
+Consultar el [referente de seasonalities de Metricool](../../../.codex/skills/social-media-studio/references/seasonality-reference-calendar.md)
+y comprobar ocasión, país y año en fuente primaria. No confundirlo con el calendario de contenidos.
+Contrastar la oportunidad con el plan de la marca, capacidad y piezas ya previstas. Documentar razón,
+ventana y concepto; sólo llevar la selección al calendario editorial cuando el encargo incluya planificar.
+El [análisis por mercado](../../audits/social/2026-09-13-seasonality-reference-opportunities.md) es un
+punto de partida, no una aprobación ni una orden de programación.
+
 ## 1. Recuperar el encargo
 
 Leer conversación y archivos aceptados. Anotar marca, país, fecha, audiencia, concepto, red,

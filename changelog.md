@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-13 — Referente de seasonalities Metricool separado del calendario editorial
+
+[Revisión de 407 eventos y oportunidades por mercado](docs/audits/social/2026-09-13-seasonality-reference-opportunities.md):
+referente de inspiración para Efeonce/clientes, calendario editorial por marca y planner Metricool
+identificados como superficies distintas. Cruce corregido con las cinco líneas: Influencer, Marketing,
+Pódcast y demás vínculos profesionales, con prioridad y evidencia separadas. Social Media Studio y Notion Platform incorporan el contrato
+espejado; manual, funcional y protocolo enlazan la fuente. Fechas propuestas sin crear ni programar piezas.
+
 ## 2026-09-13 — Metodología completa de Fiestas Patrias y programación con portadas
 
 [Bitácora del caso](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md), manual y descripción
@@ -1061,12 +1069,3 @@ Siete tablas nuevas en `greenhouse_auth` (aplicadas) y dos capabilities (`identi
 `authorize` responde `login_required`: ningún token para persona real todavía. Contrato:
 [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1](docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md). Rollout
 pendiente: release del runtime a `main`, fila del emisor en `external_identity_environments`, flag ON en staging.
-
-## 2026-09-04 — Método de informes SEO/AEO y continuidad de Berel
-
-Se incorpora el [modelo de informes para clientes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md)
-a las skills SEO/AEO y Berel, espejadas para Claude/Codex: lectura de auditorías y Content Hub, voz de agencia
-que redacta/publica, límites GSC/GA4/DataForSEO, validez de preguntas y probes del Grader y readback Notion/Markdown.
-Se conserva la [auditoría de agosto](docs/audits/seo/BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md) como caso fechado.
-El método no implementa las correcciones del Grader ni del sitio; esas acciones siguen pendientes.
-Se añade `report-studio` para Claude/Codex, registrada en router y gate de espejos: fuentes primarias, siete módulos, plantillas, evaluación editorial y preflight PDF con pruebas negativas. Berel conserva 55 páginas A4 con marca/contacto completos, cobertura On-time, gráficos y acabado reproducible; revisión y evidencia en su carpeta de informe. Entrega local, sin envío.

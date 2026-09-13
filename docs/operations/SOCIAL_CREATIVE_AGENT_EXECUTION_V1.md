@@ -28,6 +28,13 @@ El [contrato multimodal](GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md) conser
 runtime. Si una capacidad artesanal no está soportada por el compiler, describir la prueba local como tal;
 no inventar campos de schema ni aprobar una campaña para ejecutar un experimento.
 
+## Referente de seasonalities y destino editorial
+
+El [calendario de Metricool en Notion](../../.codex/skills/social-media-studio/references/seasonality-reference-calendar.md)
+es un referente de fechas e ideas para Efeonce y clientes. No es el calendario de contenidos ni el
+scheduler. Cargar esa referencia para investigar ocasiones, verificar mercado/año y resolver el destino
+editorial; sólo las oportunidades seleccionadas dentro de un encargo pasan a brief y planificación.
+
 ## 2. Responder al pedido que existe
 
 | Pedido del operador | Acción requerida | Cierre esperado |

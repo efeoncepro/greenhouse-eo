@@ -18,6 +18,13 @@ el oficio de idea/dirección/producción se comparte; la seasonality no se convi
 El texto de contexto es opcional: no añadir la fecha o el nombre de la ocasión cuando la escena ya la comunica
 o el operador lo retiró. Poppins acompaña sólo si hay un texto de apoyo necesario.
 
+## Referente cultural y selección editorial
+
+El [calendario preparado por Metricool en Notion](../references/seasonality-reference-calendar.md)
+reúne fechas e ideas para Efeonce y clientes. Es sólo referencia de seasonalities: no es nuestro
+calendario de contenidos, no asigna trabajo y no acredita programación. Validar país, año y pertinencia
+antes de seleccionar; la referencia enlazada conserva identidades, controles y análisis por mercado.
+
 ## Papel y atribución de marca obligatorios
 
 Declarar por separado **papel estratégico** (firma, punto de vista, participante, facilitadora, demostración
