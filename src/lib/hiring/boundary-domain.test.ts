@@ -53,6 +53,8 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_hiring.hiring_assessment_response',
   'greenhouse_hiring.hiring_competency_result',
   'greenhouse_hiring.hiring_assessment_ai_proposal',
+  // TASK-1719 D4 — append-only lineage for assessment question revisions.
+  'greenhouse_hiring.hiring_question_revision',
 
   // TASK-1734 — Assessment AI Scoring Run: aggregate durable + items + historia append-only.
   'greenhouse_hiring.hiring_assessment_ai_scoring_run',
