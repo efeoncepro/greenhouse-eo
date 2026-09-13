@@ -141,7 +141,7 @@ Plan aprobado: schema aditivo → primitive snapshot y consumidores → tests �
   dos fallos de configuración. Se corrigió la selección con `--project unit` y se verificaron ambos live
   por el runner canónico; no se ocultaron fallos funcionales ni se contaron skips como evidencia.
 
-### Pendientes concretos
+### Pendientes al corte previo a la autorización
 
 1. Decisión del operador sobre mantener calibración independiente previa o autorizar piloto manual con
    conformidad editorial y calibración pendiente explícita. Pregunta enviada; todavía sin respuesta.
@@ -150,7 +150,7 @@ Plan aprobado: schema aditivo → primitive snapshot y consumidores → tests �
 3. Release canónico del código D4 y sus consumidores, seguido de smoke real del recorrido y entrega a
    destino de prueba autorizado. No hubo push/deploy ni envío. No declarar test asignable todavía.
 
-## QA Release Audit — TASK-1604 / D4 TASK-1719
+## QA Release Audit — corte previo a la autorización de piloto
 
 ### Verdict
 
@@ -242,3 +242,16 @@ Esta decisión sustituye el bloqueo de calibración descrito en el corte anterio
 - Ningún command de asignación ejecutado, ninguna comunicación enviada. La policy manual ya está habilitada;
   la protección D4 todavía requiere su release y smoke desplegado. El bloqueo de calibración quedó resuelto
   para el piloto por decisión humana, no por una calibración ficticia.
+
+## Preparación de release acotado
+
+Commit candidato inicial `8461c90c1f6818147470d871c0141528fd1c55d8`, padre main
+`586a8627568a86ebee15c910cff2cb0f8e2405ce`. Preparado mediante índice Git temporal y commit-tree;
+no cambió la rama/índice/worktree compartidos. El patch de este alcance se aplicó con merge de tres vías
+sobre main; 119 cambios previos de documentación/tooling de develop quedaron excluidos. Igualdad de árbol
+runtime (src, services, migraciones, package/lock/config) con el código probado verificada.
+Preflight local: `release_batch_policy=requires_break_glass`, por las dos migraciones y tipos DB. Requiere
+excepción auditada con motivo >=20 caracteres y capability del operador. No se aplicó ningún override.
+Los otros resultados previos a publicar son evidencia incompleta (SHA todavía local/sin CI, credenciales
+WIF/Sentry del proceso local); no se presentan como fallos funcionales del código ni se omiten para desplegar.
+La aprobación del piloto no se presenta como autorización de esta excepción del control plane.

@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `migration|seed`
 - Epic: `EPIC-038`
-- Status real: `Slice SEO/Arte aplicado; 2026-09-13: nueve preguntas SEO afinadas en sme_review con ocho versiones originales retiradas y linaje idempotente. D4 local y dos migraciones aplicadas; sin release. Piloto manual autorizado con calibración pendiente, nueve activas y template/policy enabled/manual verificadas. Las dos vacantes reales fueron publicadas por un acto operativo separado el 2026-09-09 y hoy están active/public_listed; siguen sin policy ni assessments. Activación SME, template runtime SEO y binding del scorecard de Arte permanecen pendientes.`
+- Status real: `2026-09-13: piloto SEO manual autorizado con calibración independiente pendiente. Nueve preguntas afinadas activas, ocho originales retiradas con linaje, plantilla y policy enabled/manual de 75 minutos verificadas por API/reader. Sin asignaciones ni correos. D4 implementado y migraciones aplicadas; release y smoke desplegado pendientes. Arte conserva su binding pendiente.`
 - Rank: `EPIC-038-phase-1`
 - Domain: `hiring|hr|content|agency`
 - Blocked by: `none`
