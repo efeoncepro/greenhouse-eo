@@ -1,6 +1,6 @@
 # GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1 — Policy de assignment opening→plantilla, fan-in de comunicación y snapshot inmutable del cuestionario
 
-- **Status**: Accepted (2026-08-17 — autorización ejecutiva del CEO, misma figura que `TASK-1734`/`TASK-1736`. **Aceptar ≠ prender**: `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` nace OFF, toda policy nace `draft`+`manual`, y la expansión más allá del canary sigue bloqueada por el snapshot de D4)
+- **Status**: Accepted (2026-08-17 — autorización ejecutiva del CEO, misma figura que `TASK-1734`/`TASK-1736`. **Aceptar ≠ prender**: `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` y cada policy siguen gobernados por separado; toda policy nace `draft`+`manual`. El snapshot D4 ya está desplegado; ampliar el carril automático sigue requiriendo habilitación deliberada de la policy, evidencia de operación y calibración.)
 - **Date**: 2026-08-17
 - **Deciders**: CEO (autorización ejecutiva 2026-08-17, sesión de operador) · agente ejecutor Slice 0 `TASK-1719` (lentes `arch-architect` + `greenhouse-talent-people-operator`)
 - **Tags**: hiring, ats, assessment, ops-worker, notifications, governance, fairness, privacy
@@ -501,6 +501,21 @@ obsoleta.
 **Secuencia**: el digest entra en Slice 1. **El snapshot es requisito duro antes de expandir la automatización
 más allá del canary** — no un follow-up opcional.
 
+**Implementación y rollout 2026-09-13 (TASK-1719 / TASK-1604 D4):**
+`assessment/questionnaire.ts` comparte la resolución entre policy, captura y fallback legado.
+`hiring_assessment.questionnaire_snapshot_json` contiene `version:1`, `policyDigest`, `contentDigest`
+y `rows` con orden, pesos, contenido, opciones y pautas; el digest completo canonicaliza claves JSON.
+El digest público de policy mantiene su contrato previo. `insertCandidateTest` captura en la misma
+transacción; un replay devuelve la instancia existente. Trigger DB impide alterar la captura y protege
+los IDs del banco referenciados. La vista interna `hiring_assessment_question` sirve corrección,
+dossier y gold-set por assessment; sólo instancias NULL usan banco vivo. No backfill histórico.
+La proyección pública conserva allowlist y no expone pautas. Migración `20260913095245733` aplicada;
+prueba PostgreSQL de cambio/retiro y corrección pasada. El cambio quedó en producción con el manifiesto
+`cc3ec449495b-58fdc69f-3223-4348-8767-382008593b54`, orquestador `34754161855` y SHA
+`cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9`. La verificación de SEO confirmó la policy manual y la
+capacidad de asignar sin crear instancias ni enviar correos; este release no habilita una expansión
+automática por etapa. [Evidencia](../audits/hiring/2026-09-13-seo-assignment-readiness.md).
+
 ### D5 — Tres protecciones propias, sin esperar a `TASK-1739`
 
 1. **Nacimiento seguro.** Toda policy nace `draft` + `manual`. Pasar a `enabled` + `on_stage_entry` exige la
@@ -639,7 +654,7 @@ etapa→plantilla, sin inferencia, sin modelo, sin puntaje. El invariante que la
 - **Gates**: policy nace `draft`+`manual` y su habilitación exige capability role-only + opening `published` + audit (D3/D5.1); cap de volumen con auto-detención (D5.2); readiness fail-closed con denylist (D5.3); fan-in con intent persistido antes de enviar (D1); snapshot inmutable como requisito de expansión (D4); flag `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` default-OFF sólo en ops-worker.
 - **Blast radius if wrong**: acotado por opening y por ventana (cap de volumen). El peor caso sin cap sería la cohorte completa de una vacante; con cap, N correos y detención automática.
 - **Verified by**: tests de capability/grant coverage, tests de fan-in (terminal ⇒ genérico en la misma ejecución; fault ⇒ sin correo), probes de readiness, y el paso 0 del rollout (un humano rinde el test).
-- **Residual risk**: mientras el snapshot de D4 no exista, el banco de preguntas puede derivar entre candidatos — y con cuatro competencias de **una sola pregunta activa**, archivar una deja un módulo vacío en silencio. Mitigado por el `content_digest` observado en la policy y por el límite duro de no expandir más allá del canary. Riesgo abierto adicional: la accesibilidad (`accommodations_json`) no tiene write path, así que un ajuste sólo puede pedirse por correo y aplicarse a mano.
+- **Residual risk**: las instancias históricas con `questionnaire_snapshot_json IS NULL` conservan fallback al banco vivo y no se backfillean; las instancias nuevas capturan el cuestionario exacto dentro de la transacción de assignment. El `content_digest` de la policy sigue detectando drift antes de confirmar, y el release no amplía por sí solo la automatización. El ajuste razonable ya tiene write path gobernado; la comunicación al candidato de ese otorgamiento sigue siendo una acción humana explícita.
 
 ### Robustness
 
@@ -710,7 +725,7 @@ etapa→plantilla, sin inferencia, sin modelo, sin puntaje. El invariante que la
    ⚠️ **NUNCA resolver el intento de un confirm humano a un número LIBRE cuando la clave está legítimamente ocupada** (TASK-1755). Si el intento vigente es `assigned`/`already_assigned`/`intent`, el resolver devuelve **SU** número para que el `ON CONFLICT` colisione y la respuesta sea el replay: un casillero vacío junto a un `assigned` vivo le crea una **segunda prueba** al mismo candidato. **NUNCA** atar el intento nuevo al digest de la propuesta en vez de a su identidad: `templateStatus` no está en el material del digest y `blocked: template_inactive` quedaría irrecuperable. **NUNCA** tomar el `max` sólo entre filas vigentes: reusar el rótulo de un intento superseded deja dos filas diciendo "intento N".
 4. **NUNCA dejar escapar un `23505` crudo del assignment** (fabrica dead-letters): **SIEMPRE** `ON CONFLICT DO NOTHING RETURNING` + re-lectura del ganador sobre el índice parcial existente, patrón `createScoringRun`. **NUNCA** devolver token en la rama `created:false`.
 5. **NUNCA gobernar la policy con `hiring.assessment.author` ni con routeGroup `internal`.** La capability es `hiring.assessment.policy.govern` (role-only, `execute`/`tenant`), granteada en el **mismo PR** que la registra. El assign manual puntual se queda en `author`.
-6. **NUNCA expandir la automatización más allá del canary sin el snapshot inmutable del cuestionario por instancia.** `public-taking` resuelve preguntas en vivo; sin snapshot, dos candidatos "del mismo test" rindieron exámenes distintos. **NUNCA** versionar el template como sustituto: ya está versionado, el problema es la resolución.
+6. **NUNCA crear una instancia nueva sin el snapshot inmutable del cuestionario por instancia.** Las instancias nuevas deben materializar `questionnaire_snapshot_json` en la misma transacción del assignment y `public-taking` debe leerlo; las instancias históricas `NULL` usan el fallback legacy declarado y no se backfillean. **NUNCA** versionar el template como sustituto: ya está versionado, el problema es la resolución. La automatización sólo se amplía mediante una policy habilitada de forma deliberada y con evidencia de operación.
 7. **NUNCA una policy nace `enabled`+`on_stage_entry`** (nace `draft`+`manual`; el flip exige capability + opening `published` + audit). **SIEMPRE** cap de volumen por opening/ventana con auto-detención y readiness fail-closed. **NUNCA** planear "probar en staging" como carril aislado: el `ops-worker` es único y compartido. **NUNCA** mover etapas en bulk con el auto encendido.
 8. **NUNCA disparar un assessment desde un score, match o atributo inferido — el trigger es la etapa.** Ese invariante es lo que mantiene esta automatización fuera de "IA de alto riesgo"; romperlo exige una decisión nueva, no una excepción.
 9. **NUNCA comunicar hacia afuera por un evento rancio.** Un `stage_changed` de más de `STAGE_CHANGE_ACTIONABLE_WINDOW_HOURS` (24 h) no comunica ni asigna: va a la cola humana. Es regla de dominio —avisarle a alguien "avanzaste" por un movimiento de la semana pasada es peor que callar— y de paso hace segura la primera corrida de un consumer nuevo. La guarda depende de `_occurredAt`, que el consumer reactivo inyecta en el payload (`parsePayload`): **si esa inyección se pierde, la ventana se vuelve código muerto que nunca dispara, sin romper build ni tests** — por eso está cubierta por test propio.
@@ -734,7 +749,7 @@ etapa→plantilla, sin inferencia, sin modelo, sin puntaje. El invariante que la
 ## Open Questions (deliberadamente no decidido)
 
 1. **TTL del proposal y SLA de reconciliación**: los números exactos se fijan con la evidencia del canary de Account Manager, no se inventan aquí.
-2. **Snapshot: ¿slice de `TASK-1719` o task hija?** Su necesidad y su condición de bloqueo (pre-expansión) están decididas; su empaquetado no.
+2. ~~**Snapshot: ¿slice de `TASK-1719` o task hija?**~~ **CERRADA 2026-09-13:** se implementó como slice de `TASK-1719` junto con la revisión de preguntas de `TASK-1604`; el contrato vive en `questionnaire_snapshot_json` y se verificó en producción. No hay backfill de instancias históricas.
 3. **Recordatorios del test**: hoy `Out of Scope`, y el riesgo queda declarado — **14 días sin recordatorio es un cementerio silencioso**. Mitigación mínima mientras no exista: el correo dice la **FECHA límite**, no la duración.
 4. **Qué significa `expired` operativamente**: el estado existe y hoy **nadie lo mira**. Falta definir si es cola de reclutador, señal, o ambas.
 5. **Qué pasa si se avanza a `interview` con el test de `shortlisted` abierto**: hoy no hay respuesta. ¿Se cancela, se conserva, se comunica?

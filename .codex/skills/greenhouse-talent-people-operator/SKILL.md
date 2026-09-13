@@ -88,6 +88,35 @@ Apply this workflow whenever the output will attract candidates externally: a Ca
 - Describe craft as evidence: visual systems, campaigns, identities, editorial/digital assets, templates, files or production constraints that are genuinely in scope. Never list a channel merely because it sounds senior.
 - The role promise may be ambitious, but it must expose a real tension the candidate will solve. For Efeonce, connect craft to clearer work, lower rework, reusable memory or client capability only where the role can actually influence it.
 
+### Role-specific assessment packs and opening binding (TASK-1604 / TASK-1719 D4)
+
+When a role has a governed assessment pack, load the pack's evidence and the assessment runtime reference before
+changing questions or assigning a test: `docs/documentation/hr/task-1604-seo-art-assessment-pack.md`,
+`docs/architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`, and
+`references/greenhouse-runtime.md`.
+
+- **Version the bank append-only.** Do not edit an active question in place. Use the role's revision command
+  (`scripts/hiring/revise-task-1604-seo-questions.ts --apply`) and its manifest: an approved change creates a
+  successor with lineage and retires the predecessor. Keep competencies, weights and method explicit, and require
+  every module's resolved question count before activating a template.
+- **Bind in two steps.** The opening policy resolves the active template and the assignment command targets a
+  concrete `hiring_application`; a vacancy does not receive a candidate test by itself. For the SEO Specialist
+  Senior opening (`EO-OPN-0674`), the approved pilot is `enabled` + `manual`, with no stage trigger and a 75-minute
+  limit. Use the canonical policy reader and existing propose/confirm or assignment command; do not create a second
+  opening/template/policy binding.
+- **Freeze the exam at assignment.** D4 captures the resolved competencies, order, weights, content, options and
+  grading guidance in `hiring_assessment.questionnaire_snapshot_json` with policy/content digests in the same
+  transaction. Candidate taking, correction and review read that snapshot; only legacy instances with a null
+  snapshot use the legacy bank. Database guards make the capture append-only. This evidence of the exact exam taken
+  is required before expanding stage automation.
+- **Keep the pilot honest.** Editorial approval is not independent SME calibration. Record calibration as pending
+  until two raters score the defined strong, sufficient and insufficient responses independently. Never invent a
+  calibration result, auto-reject, auto-hire or send a candidate communication as a side effect of preparing the
+  pack. The Director(a) de Arte opening (`EO-OPN-0675`) remains outside this binding until its own pack is approved.
+- **Close with runtime evidence.** Code, migrations and a local or staging readback do not prove production. A
+  release of D4 must be checked against the exact deployed commit, manifest state, workers and safe canary/readback;
+  if the canary cannot run without creating a real assignment or email, report that evidence as missing.
+
 ## Synergies (compose, don't duplicate)
 
 | Skill                                                                                                                         | Synergy                                                                                                                                                                                                                                                                                             |
@@ -693,7 +722,8 @@ SEO/AEO & Social, Semi-senior, reports to the Creative Operations Lead).
 `EO-OPN-0674` (SEO Specialist Senior, Senior, Growth, reports to the Managing Director) and `EO-OPN-0675`
 (Director(a) de Arte Senior, Senior, Creative, reports to the Creative Operations Lead), published
 **2026-09-09** by a separate operational act recorded in `docs/documentation/hr/task-1604-seo-art-assessment-pack.md`
-(their assessment layer is NOT active). All four publish the same facts: LATAM, remote, full-time, a response
+(the SEO opening now has its approved manual assessment binding; the Art opening's assessment layer remains inactive).
+All four publish the same facts: LATAM, remote, full-time, a response
 commitment of **3 to 4 weeks**, compensation discussed transparently during the process, charter benefits with
 the modality/country qualifier, and the same eligible countries approved by the CEO 2026-08-17: all of Latin
 America EXCEPT Cuba + US + ES (20 countries — AR BO BR CL CO CR DO EC SV GT HN MX NI PA PY PE UY VE + US + ES),

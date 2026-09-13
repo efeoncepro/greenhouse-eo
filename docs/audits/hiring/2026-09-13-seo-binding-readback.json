@@ -1,0 +1,73 @@
+{
+  "templateId": "atpl-6621f306-cb50-4286-a41d-969927a579e3",
+  "digest": "5589fd745b087518ca9676f12c95712647fb28fba7330fdb48e86c8fad5140aa",
+  "moduleCount": 6,
+  "questionCount": 9,
+  "emptyModuleCount": 0,
+  "questions": [
+    {
+      "questionId": "qst-147dc81b-c4ea-4722-8911-b2716db19060",
+      "competencyKey": "seo_technical_strategy",
+      "weight": 30
+    },
+    {
+      "questionId": "qst-a1d6f6e4-18af-4cf5-9027-4cc91f870cc2",
+      "competencyKey": "seo_technical_strategy",
+      "weight": 30
+    },
+    {
+      "questionId": "qst-11466558-3cd1-4a20-bdfe-9c405208527a",
+      "competencyKey": "search_content_aeo",
+      "weight": 20
+    },
+    {
+      "questionId": "qst-df5553f2-712d-4cf5-8bf7-8685b559c8ec",
+      "competencyKey": "search_content_aeo",
+      "weight": 20
+    },
+    {
+      "questionId": "qst-476eccae-4c29-40a9-aaef-d92523fd7c90",
+      "competencyKey": "search_measurement",
+      "weight": 20
+    },
+    {
+      "questionId": "qst-5b4a6088-4847-42c4-891e-03e89fe556f3",
+      "competencyKey": "search_measurement",
+      "weight": 20
+    },
+    {
+      "questionId": "qst-3b1ba759-481c-4e64-b65e-5e8067facb2e",
+      "competencyKey": "communication",
+      "weight": 10
+    },
+    {
+      "questionId": "qst-4ac23c1f-0c5d-4528-a963-325a6840b8be",
+      "competencyKey": "ownership",
+      "weight": 10
+    },
+    {
+      "questionId": "qst-7766a393-4175-4626-a002-35431f1dfc04",
+      "competencyKey": "research_synthesis",
+      "weight": 10
+    }
+  ],
+  "policy": {
+    "policyId": "hoap-e7e269ac-2c2a-4023-8873-15db1302d63e",
+    "openingId": "opng-262f0d6d-f139-4355-9017-165cbab54b9c",
+    "templateId": "atpl-6621f306-cb50-4286-a41d-969927a579e3",
+    "policyVersion": 1,
+    "mode": "manual",
+    "state": "enabled",
+    "triggerStage": null,
+    "timeLimitMinutes": 75,
+    "templateContentDigest": "5589fd745b087518ca9676f12c95712647fb28fba7330fdb48e86c8fad5140aa",
+    "volumeCapPerWindow": 5,
+    "volumeWindowMinutes": 60,
+    "createdBy": "user-agent-e2e-001",
+    "enabledBy": "user-agent-e2e-001",
+    "enabledAt": "2026-09-13T10:14:01.600Z",
+    "createdAt": "2026-09-13T10:13:44.850Z",
+    "updatedAt": "2026-09-13T10:14:01.600Z"
+  },
+  "enabledAndExact": true
+}

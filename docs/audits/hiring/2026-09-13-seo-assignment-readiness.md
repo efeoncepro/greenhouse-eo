@@ -3,7 +3,9 @@
 ## Solicitud y estado
 
 El operador pidió completar la preparación del test SEO y revisar después la automatización.
-Este documento registra discovery, ejecución y evidencia; no declara activación ni release.
+Este documento registra discovery, ejecución, release y evidencia. Las secciones fechadas como cortes
+históricos conservan el estado que tenían antes de activar el piloto; el cierre vigente está en
+“Release y canary de producción”.
 
 - Vacante: `EO-OPN-0674` / `opng-262f0d6d-f139-4355-9017-165cbab54b9c`.
 - Checkout compartido observado: `develop`; no se cambia de rama ni se usan worktrees o subagentes.

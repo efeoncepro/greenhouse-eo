@@ -64,6 +64,15 @@ description: >-
    antes de redactar: continuidad histórica, responsabilidad de la agencia, validez
    de las fuentes y lectura de vuelta del entregable forman parte del cierre.
 
+### SEO/AEO como competencia de selección
+
+Cuando SEO/AEO se evalúa como parte de una contratación, esta skill aporta el oficio y la evidencia técnica; la
+dueña del proceso es `greenhouse-talent-people-operator`. Carga `../greenhouse-talent-people-operator/references/assessment-interviewing.md`
+y `../greenhouse-talent-people-operator/references/greenhouse-runtime.md` para diseñar, versionar y vincular el
+instrumento. Evalúa razonamiento y trabajo observable con casos ficticios o autorizados: no uses promesas
+comerciales, rankings inventados, datos de clientes ni acceso a herramientas de pago como proxy de seniority. El
+resultado es advisory y la decisión permanece humana.
+
 ---
 
 ## 1. Modelo mental: SEO y AEO no son dos juegos, son tres capas

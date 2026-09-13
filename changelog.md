@@ -421,9 +421,9 @@ Datos: `banco-chile-clp` registrada, 9 períodos ago/sep importados, 77 filas co
 ## 2026-09-10 — TASK-1604: pack SEO/Arte y vacantes reconciliadas
 
 Ampliación 2026-09-13: nueve preguntas SEO afinadas activas para piloto manual, ocho originales retiradas con
-linaje idempotente. Snapshot D4 implementado localmente, dos migraciones aplicadas; 594 tests focales y dos
+linaje idempotente. Snapshot D4 desplegado en producción, dos migraciones aplicadas; 594 tests focales y dos
 live passed. [Evidencia](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md). Pendientes calibración independiente,
-release D4 y smoke. Piloto autorizado: nueve activas y template/policy manual habilitada con 75 min y cap 5/h. Sin asignaciones ni correos.
+recorrido sintético y automatización por etapa. Piloto autorizado: nueve activas y template/policy manual habilitada con 75 min y cap 5/h. Sin asignaciones ni correos.
 
 Se agregó el pack versionado de evaluación para SEO Specialist Senior y Director(a) de Arte Senior: seis
 competencias aditivas, nueve preguntas SEO con rúbricas BARS en `sme_review`, scorecard de portfolio/caso para

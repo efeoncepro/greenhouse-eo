@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Versión:** 1.3
 > **Creado:** 2026-08-17 por Claude (TASK-1719)
-> **Última actualización:** 2026-08-23 por Claude (TASK-1771 — desatascar una asignación automática)
+> **Última actualización:** 2026-09-13 por Codex (TASK-1719 / TASK-1604 — snapshot inmutable del cuestionario en producción)
 > **Documentación funcional:** [`asignacion-de-tests-por-etapa.md`](../../documentation/hr/asignacion-de-tests-por-etapa.md)
 > **ADR:** [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](../../architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md)
 
@@ -21,8 +21,8 @@ y —cuando el equipo lo decida— dejar que se asigne sola al mover una postula
 - Para **otorgar un ajuste razonable** necesitas `hiring.assessment.grant_accommodation`, que es
   otra distinta y más acotada: conceder una adaptación a una persona concreta no es lo mismo que
   autorar contenido de evaluación.
-- **La automatización viene apagada.** Hoy sólo funciona el camino manual. Encenderla es un
-  procedimiento aparte, más abajo.
+- **La automatización por etapa viene apagada.** El camino manual está disponible para la policy SEO
+  `EO-OPN-0674` (`enabled/manual`). Encender automatización es un procedimiento aparte, más abajo.
 - **No hay pantalla todavía** para configurar la política ni para cancelar. Se opera por API
   mientras la interfaz no exista.
 
@@ -55,6 +55,17 @@ y —cuando el equipo lo decida— dejar que se asigne sola al mover una postula
 Para apagarla, la misma ruta con `{"action":"disable"}`. Deshabilitar es el freno de mano: no
 borra nada y detiene toda asignación nueva de esa vacante.
 
+### Piloto SEO vigente
+
+`EO-OPN-0674` usa la plantilla `atpl-6621f306-cb50-4286-a41d-969927a579e3`, policy
+`hoap-e7e269ac-2c2a-4023-8873-15db1302d63e`, versión 1, `enabled/manual`, 75 minutos y cap de cinco
+asignaciones por hora. El cuestionario D4 se captura al crear cada instancia y queda inmutable; sus
+consumidores leen la captura y las instancias históricas sin captura usan sólo el fallback legado.
+
+La calibración independiente de las nueve preguntas sigue pendiente. Por eso el piloto requiere decisión
+humana por postulante y no autoriza automatización por etapa. No existe todavía una UI para operar este
+binding: usa los commands de esta guía.
+
 ## Paso a paso — asignar una prueba a un candidato
 
 Son dos pasos, y el segundo sólo ejecuta lo que el primero mostró.
@@ -68,6 +79,12 @@ Son dos pasos, y el segundo sólo ejecuta lo que el primero mostró.
    ```bash
    pnpm staging:request POST /api/hiring/applications/<applicationId>/assessment-assignment '{"action":"confirm","proposalId":"<haap-...>"}'
    ```
+
+Al confirmar, el sistema congela el cuestionario exacto de esa instancia en una captura inmutable:
+preguntas, competencias, pesos, orden y contenido quedan ligados al assessment y no cambian si después
+se edita o archiva el banco. Las instancias históricas que no tienen captura usan el fallback legacy y no
+se backfillean. La policy y la plantilla siguen siendo responsabilidad del opening; la ejecución sigue
+siendo una instancia independiente por postulación.
 
 **Lee el campo `status` de la respuesta, no el código HTTP.** Un 200 no significa que se asignó:
 significa que la operación se procesó. Los estados posibles son `assigned`, `already_assigned`,

@@ -15,11 +15,11 @@
 - Motion: `none`
 - Backend impact: `migration|seed`
 - Epic: `EPIC-038`
-- Status real: `Slice SEO/Arte aplicado: instrumentos versionados, seis competencias activas y nueve preguntas SEO en sme_review. Las dos vacantes reales fueron publicadas por un acto operativo separado el 2026-09-09 y hoy están active/public_listed; siguen sin policy ni assessments. Activación SME, template runtime SEO y binding del scorecard de Arte permanecen pendientes.`
+- Status real: `2026-09-13: piloto SEO manual habilitado para EO-OPN-0674 con calibración independiente pendiente. Nueve preguntas afinadas activas, ocho originales retiradas con linaje, plantilla y policy enabled/manual de 75 minutos verificadas por API/reader. Release cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9 (manifest released, orquestador 34754161855), canary de producción y workers verificados. Sin asignaciones ni correos. Dirección de Arte conserva su binding y método interviewer_scorecard fuera de este slice.`
 - Rank: `EPIC-038-phase-1`
 - Domain: `hiring|hr|content|agency`
 - Blocked by: `none`
-- Branch: `task/TASK-1604-role-scorecard-assessment-template-pack`
+- Branch: `develop` (checkout compartido; goal SEO confirmado 2026-09-13)
 - GitHub Issue: `none`
 
 ## Summary
@@ -50,8 +50,9 @@ El motor de assessment existe, pero los estándares por rol, work samples, softw
 
 - Para el slice autorizado de autoría y drafts: assessment engine `TASK-1360..1363` y el operador canónico de
   openings de `TASK-1719`.
-- La activación de preguntas, el claim de pack aprobado, el quality gate obligatorio y cualquier asignación
-  automática siguen dependiendo de `TASK-1602` y `TASK-1603`.
+- La activación y asignación manual del piloto SEO no dependen de `TASK-1602` ni `TASK-1603`; esos trabajos
+  conservan ownership de los claims de pack certificado y del quality gate obligatorio. La automatización
+  por etapa y la calibración independiente siguen pendientes y requieren sus propios gates.
 
 ### Blocks / Impacts
 
@@ -118,10 +119,15 @@ El motor de assessment existe, pero los estándares por rol, work samples, softw
 
 ## Acceptance Criteria
 
+- [x] Slice SEO 2026-09-13: banco afinado sincronizado sin duplicados, originales conservadas y motivo editorial trazable; preview/apply/replay en auditoría fechada.
+- [x] Slice SEO 2026-09-13: piloto autorizado y plantilla de nueve preguntas exactas vinculada a EO-OPN-0674 enabled/manual; reader y API desplegada HTTP 200 en auditoría.
+- [x] Slice SEO 2026-09-13: snapshot D4 desplegado y readback de banco/frontera de asignación verificado en producción mediante el release `cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9` y canary `2026-09-13-seo-production-canary.json`; ninguna asignación real no solicitada.
+- [ ] Slice SEO 2026-09-13: recorrido sintético completo recibido → abierto → respondido → entregado con evidencia de snapshot en runtime.
+
 - [ ] Account Manager y Content Creator tienen template aprobado y coverage matrix.
 - [ ] Cada pregunta tiene rubric observable y revisión SME.
 - [ ] Se prueba candidate projection sin answer key/rubric.
-- [ ] Manual de asignación y entrevista queda actualizado.
+- [x] Manual de asignación y entrevista queda actualizado para el binding `enabled/manual` y los límites del piloto.
 
 ## Delta 2026-09-09 — SEO Specialist Senior y Director(a) de Arte Senior
 
@@ -176,8 +182,9 @@ adelanta la policy de claims de `TASK-1602` o el quality gate de `TASK-1603`.
   ejecutó después por el command gobernado y no forma parte del acto de autoría del pack.
 - [x] El slice de autoría no habilitó `assessment_policy`, no creó instancias para candidatos, no envió correos
   y no ejecutó `publishOpening`. La publicación posterior tampoco agregó policy ni assessments.
-- [x] Quedan documentados los IDs de preguntas, demandas y openings, la ausencia intencional de templates
-  runtime/digests y los gates/readbacks ejecutados.
+- [x] Al corte de autoría del 2026-09-09 quedaron documentados los IDs de preguntas, demandas y openings,
+  la ausencia entonces intencional de templates runtime/digests y los gates/readbacks ejecutados. El estado
+  vigente del binding SEO está en el delta del 2026-09-13 y en la auditoría de readiness.
 
 ### Evidencia del slice 2026-09-09
 
@@ -234,3 +241,22 @@ Seed → revisión SME → staging → aplicación a un opening piloto → produ
 - [ ] Coverage, anti-leak, scoring y live smoke verdes.
 - [ ] SME owner acepta cada template.
 - [ ] Docs/runbook y registry sincronizados.
+
+## Delta 2026-09-13 — Goal SEO confirmado
+
+El operador confirmó el goal de cierre manual SEO y D4 de TASK-1719, en develop compartido, sin
+subagentes, sin worktrees, sin cambios en Arte y sin asignación automática ni envíos a postulantes reales.
+Plan y evidencia: `docs/audits/hiring/2026-09-13-seo-assignment-readiness.md`.
+Los hooks de ambas dueñas fueron ejecutados. Se reutilizan writers, plantilla, policy y propose/confirm.
+La aprobación editorial está registrada en la conversación; la calibración independiente no se inventa.
+El binding básico es EPIC-011 y no depende del claim de TASK-1602 ni del Quality Gate de TASK-1603;
+los claims de pack certificado y el Quality Gate conservan sus gates separados.
+
+Avance verificado: ocho revisiones + una pregunta intacta; nueve SME review, cero templates/policies/asignaciones.
+594 pruebas focales y dos live passed; código D4 local, migraciones aplicadas, tipos regenerados.
+Al cierre de ese corte faltaban decisión de piloto, activación, vinculación, release y smoke de entrega;
+el estado vigente posterior está registrado abajo y en la auditoría.
+
+Delta posterior: operador autorizó piloto, activación y binding manual aplicados y verificados.
+Release D4 y canary de producción completados; la calibración completa y el recorrido sintético con una
+instancia siguen pendientes declarados. Dirección de Arte no se modificó.

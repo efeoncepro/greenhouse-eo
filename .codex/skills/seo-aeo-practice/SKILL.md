@@ -34,6 +34,11 @@ Esta skill opera **el negocio de vender SEO/AEO**. No enseña a hacer SEO.
 
 ---
 
+Cuando el conocimiento SEO/AEO se use en un test de selección, esta skill sólo aporta contexto de negocio para
+casos ficticios o autorizados. Claims comerciales, rankings, precios, casos de clientes o acceso a herramientas
+de pago no son evidencia de seniority. La dueña del instrumento, su binding por opening, el snapshot inmutable y
+la calibración es `greenhouse-talent-people-operator`; la decisión sigue siendo humana y advisory.
+
 ## 0. La tesis — en una categoría de humo, la honestidad es el producto
 
 **Vender SEO no se parece a vender HubSpot. Se parece a lo contrario.**

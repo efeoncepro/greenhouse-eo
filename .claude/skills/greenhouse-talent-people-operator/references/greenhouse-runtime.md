@@ -250,6 +250,30 @@ Operational sequence:
 - Operator reviews via `GET /api/hiring/assessments/[id]`; score/finish via `/score` under `hiring.assessment.score`.
 - Decision remains human in Application 360. `selected + internal_hire` → handoff → Hiring Activation Lane. Assessment never activates anyone directly.
 
+### Role-specific opening policy and D4 snapshot (TASK-1604 / TASK-1719)
+
+The canonical role pack is `docs/documentation/hr/task-1604-seo-art-assessment-pack.md`; the governing contract is
+`docs/architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`.
+
+- Question changes are append-only: `reviseUnpublishedQuestion` creates a successor with lineage and retires the
+  predecessor. The approved manifest and `scripts/hiring/revise-task-1604-seo-questions.ts --apply` are the
+  repeatable path; editing an active row in place or loading questions by free text is not.
+- The opening policy resolves the template, while the assignment command receives a concrete application. For
+  `EO-OPN-0674` the approved pilot is `enabled/manual`, has no stage trigger and uses a 75-minute limit. The
+  `EO-OPN-0675` Art opening has no active assessment binding.
+- `insertCandidateTest` resolves and stores the exact questionnaire in the same transaction as the assignment:
+  `hiring_assessment.questionnaire_snapshot_json` contains version, policy/content digests and ordered rows with
+  competencies, weights, content, options and grading guidance. A database guard makes it append-only. Public
+  taking, correction, dossier and review read the snapshot; only pre-D4 legacy instances with a null snapshot use
+  the live bank. There is no historical backfill.
+- The snapshot is a hard prerequisite before expanding stage automation. A manual pilot, editorial approval or API
+  readback does not establish independent SME calibration, and no calibration result may be invented. The score
+  remains advisory and the human decides; no candidate assignment or email is an implicit release smoke.
+
+Release closure for this contract requires exact commit/runtime evidence, manifest state, worker health and a safe
+canary or an explicit missing-evidence/degraded classification. Never create a real candidate assignment merely to
+make the canary green.
+
 ### Assessment delivery, recovery and public session (TASK-1745/1746/1747/1757)
 
 **Runtime status (re-verified 2026-08-26).** Provider lifecycle (1745) and the recovery command + capabilities + candidate

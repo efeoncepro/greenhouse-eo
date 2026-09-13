@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional + guía operativa
 > **Version:** 1.0
 > **Creado:** 2026-07-10 por Claude (TASK-1384)
-> **Ultima actualizacion:** 2026-07-10 por Claude (TASK-1384)
+> **Ultima actualizacion:** 2026-09-13 por Codex (TASK-1604/TASK-1719 — revisión append-only y snapshot D4)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) §Assessment
 
 ## Para quién es esto
@@ -46,6 +46,18 @@ Lo actitudinal (`composure_pressure`, `ownership`, etc.) NUNCA se evalúa como a
 2. **Revisión SME** (`sme_review`): TÚ validas contra esta guía: ¿anclada al rol? ¿rúbrica contestable? ¿checklist de sesgos limpia? ¿nivel honesto? Editas el borrador si hace falta (las preguntas draft son editables; una vez ACTIVA y usada, es inmutable — se retira y versiona).
 3. **Activación** (`active`): solo tras tu aprobación (`transitionQuestionStatus` — queda registrado quién). La pregunta entra al pool asignable.
 4. **Retiro** (`retired`): si una pregunta se filtra, envejece o mide mal → se retira, nunca se borra (los assessments históricos la referencian).
+
+### Revisar una pregunta existente sin perder su linaje
+
+Una pregunta en `sme_review` se corrige mediante el writer `reviseUnpublishedQuestion`, que exige el digest
+esperado, conserva la versión original y crea un sucesor con su referencia de linaje. El endpoint interno es
+`POST /api/hiring/assessments/questions/revisions`; para el lote SEO se usó
+`scripts/hiring/revise-task-1604-seo-questions.ts --apply`. Repetir el mismo apply es idempotente.
+
+Una pregunta ya activa o usada no se edita en sitio: se retira y se versiona. El snapshot D4 de
+`hiring_assessment` conserva el contenido exacto que recibió cada instancia nueva, de modo que retirar o
+versionar el banco no cambia una evaluación ya asignada. La revisión editorial del operador puede autorizar
+un piloto manual, pero no equivale a la calibración independiente de dos SMEs.
 
 ## Matriz de cobertura vigente
 

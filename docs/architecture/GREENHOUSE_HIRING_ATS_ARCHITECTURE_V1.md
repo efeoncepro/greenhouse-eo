@@ -1,5 +1,26 @@
 # Greenhouse Hiring / ATS Architecture V1
 
+## Delta 2026-09-13 — TASK-1719 / TASK-1604: snapshot inmutable del cuestionario en producción
+
+Las instancias nuevas de assessment ya materializan el cuestionario exacto en
+`hiring_assessment.questionnaire_snapshot_json` durante el assignment. El snapshot conserva versión,
+digests de policy y contenido, orden, competencias, pesos, prompt, opciones, tipo, nivel y pautas; un
+trigger de base de datos impide modificarlo después. `public-taking`, revisión, scoring, dossier y
+gold-set leen la vista acotada al assessment, mientras las instancias históricas sin snapshot mantienen
+el fallback legacy explícito. No hay backfill histórico.
+
+El cambio quedó desplegado en producción con el manifiesto
+`cc3ec449495b-58fdc69f-3223-4348-8767-382008593b54`, orquestador `34754161855` y SHA
+`cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9`. El piloto SEO (`EO-OPN-0674`) mantiene policy manual y
+la verificación de asignación fue read-only: no se crearon instancias ni se enviaron correos. Este
+release cierra la condición técnica D4; no habilita por sí solo nuevas policies automáticas ni la
+asignación por etapa.
+
+Evidencia: [`2026-09-13-seo-assignment-readiness.md`](../audits/hiring/2026-09-13-seo-assignment-readiness.md),
+`src/lib/hiring/assessment/questionnaire.ts` y las migraciones
+`20260913095245733_task-1719-assessment-questionnaire-snapshot.sql` /
+`20260913095857943_task-1604-question-revision-lineage.sql`.
+
 ## Delta 2026-09-12 — ISSUE-171/172: tablero que sigue al snapshot, public_id sin recorte, intake tolerante y recuperación gobernada
 
 Fichas: [ISSUE-171](../issues/resolved/ISSUE-171-hiring-pipeline-empty-stale-client-snapshot.md) (resuelta),
@@ -852,7 +873,7 @@ El assessment dejó de ser sólo motor y ahora tiene dos superficies runtime sob
 - **Accommodations:** el tiempo efectivo se deriva de `accommodations_json` (`extraMinutes`, `timeExtensionMinutes`, `additionalMinutes`, `extendedTimeMinutes`, `timeMultiplier`, `extendedTimeMultiplier`, `extendedTimePercent`, `timeExtensionPercent`) y se refleja en timer, banner público y expiración server-side.
 - **Operador interno:** Application 360 (`/agency/hiring/applications/[id]`, tab `Evaluación`) carga `reviewItems` y `competencyModules` desde `GET /api/hiring/assessments/[id]`. El scorecard es advisory, con barras/radar + tabla sr-only, y la cola/drawer de corrección mantiene anti-anclaje: pregunta/respuesta/rúbrica antes de la sugerencia IA.
 - **Contrato de error público:** errores públicos son genéricos y no revelan si el token expiró, fue usado o no existe; el diagnóstico interno queda en logging/capture del dominio.
-- **Evidencia local:** GVC candidate `.captures/2026-07-13T14-44-45_task1363-assessment-taking-runtime`; GVC operator desktop/mobile `.captures/2026-07-13T14-44-04_task1363-assessment-review-runtime`; lint/typecheck/build/Vitest full verdes. Rollout remoto queda pendiente de push/deploy, no de arquitectura.
+- **Evidencia local:** GVC candidate `.captures/2026-07-13T14-44-45_task1363-assessment-taking-runtime`; GVC operator desktop/mobile `.captures/2026-07-13T14-44-04_task1363-assessment-review-runtime`; lint/typecheck/build/Vitest full verdes. Ese delta histórico fue desplegado posteriormente; el estado vigente del snapshot D4 está en el delta 2026-09-13 al inicio de este documento.
 
 ## Delta 2026-07-13 — TASK-1400: resolución gobernada de blockers de Hiring Activation
 
@@ -877,12 +898,12 @@ Auditoría 2026-07-10 (código real + specs downstream) → hardening pre-TASK-1
 
 **Invariante nuevo — Template Versioning (pre-TASK-1364/1365):** un `hiring_assessment_template` con instancias es **INMUTABLE** en contenido y módulos (trigger DB; solo `status` muta). Editar = crear versión nueva con `version` + `supersedes_template_id`. **NUNCA** editar in-place un template usado: la correlación validez/fairness por `template_id` asume contenido congelado.
 
-**Invariante complementario — el versionado NO congela el instrumento (auditoría 2026-08-17).** Lo que el trigger congela es la **declaración** (nombre, módulos, pesos); las **preguntas se resuelven en vivo** en cada render, save y submit vía `PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL`, sin snapshot ni caché. Dos consecuencias que ningún gate detecta:
+**Invariante complementario — el versionado NO congelaba el instrumento (auditoría histórica 2026-08-17).** Para instancias legacy sin snapshot, lo que el trigger congela es la **declaración** (nombre, módulos, pesos) y las **preguntas se resuelven en vivo** en cada render, save y submit vía `PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL`. Desde el delta 2026-09-13, toda instancia nueva lee su snapshot y no vuelve a resolver el banco vivo. El comportamiento legacy conserva estas consecuencias:
 
 - **Un módulo cuya competencia no tiene preguntas activas no desaparece.** El resolvedor conserva la fila con `question_id IS NULL` y el mapper registra la competencia antes del `continue`: el candidato **ve la sección vacía**, y `submitPublicAssessment` sólo exige responder las preguntas resueltas, así que el **examen encogido se envía sin error** y se puntúa sobre una fracción del peso declarado. Detectado en dos plantillas activas (45% y 25% del peso ciego), archivadas por `migrations/20260817103353922_archive-questionless-module-templates.sql`.
 - **Archivar o insertar una pregunta cambia el examen del siguiente candidato** sin tocar template ni versión (el orden es `match de nivel → tipo → created_at DESC`), y a mitad de rendición falla ruidosamente contra el candidato: `404 assessment_question_not_found` al guardar, `400 assessment_incomplete` al enviar.
 
-**NUNCA** declarar sano un instrumento contando módulos: **SIEMPRE** ejercitar el resolvedor real contra la plantilla. Señal canónica de la clase: `hiring.assessment.template_module_without_questions` (steady=0; `error` con una sola plantilla rota, `warning` en el precursor de competencias sin banco). El snapshot inmutable por instancia sigue pendiente — es prerrequisito declarado para expandir la automatización de assignment más allá del canary.
+**NUNCA** declarar sano un instrumento contando módulos: **SIEMPRE** ejercitar el resolvedor real contra la plantilla antes de crear nuevas instancias, y verificar que el snapshot quede materializado después del assignment. Señal canónica de la clase: `hiring.assessment.template_module_without_questions` (steady=0; `error` con una sola plantilla rota, `warning` en el precursor de competencias sin banco). El snapshot inmutable por instancia ya está en producción; ampliar la automatización de assignment sigue siendo una decisión separada y exige policy habilitada, evidencia y calibración.
 
 **Quién asigna la plantilla y cómo (TASK-1719):** la vinculación vacante→plantilla es una **policy versionada por opening** y el assignment pasa por **un solo command idempotente** que resuelve la plantilla server-side — el caller (persona, agente o integración) **NUNCA** entrega `templateId`. Manual (propose→confirm con effect digest y expiry enforceado) y automático (consumer reactivo por entrada a etapa, flag `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` sólo en ops-worker, default OFF) convergen en ese command. La cancelación pre-inicio invalida el token y **libera el cupo de unicidad**, que es lo que la hace recuperación real. La comunicación al candidato la decide **un solo consumer** (`hiring_stage_changed_candidate_comms`, que absorbió al de TASK-1689): una por movimiento, ni cero ni dos. Contrato completo, invariantes y matriz de riesgo: [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md).
 

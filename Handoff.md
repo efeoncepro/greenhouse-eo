@@ -106,11 +106,11 @@ empresarial de Julio (2×1.000.000 del 07/09 como expenses `payroll` sin entry),
 Melkin (`EXP-202604-005`), y el PDF `36_16359_420051383906_2026-06-30.pdf` para el crédito antiguo.
 Contable a revisar: pagar el bruto sobre boletas con retención deja la retención sin documento propio.
 
-**TASK-1604 / SEO (2026-09-13):** piloto manual autorizado con calibración independiente pendiente.
-Nueve preguntas activas y plantilla/policy `enabled/manual`, 75 min, cinco asignaciones/hora. Binding exacto
-verificado por API desplegada y reader. [Evidencia](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md).
-D4 implementado localmente; dos migraciones aplicadas, 594 focales y dos live passed; falta release y smoke.
-Sin asignaciones ni correos; Arte intacto.
+**TASK-1604 / SEO (2026-09-13):** piloto manual autorizado; calibración independiente pendiente.
+Nueve preguntas y template/policy `enabled/manual` vinculados a `EO-OPN-0674` (75 min, cap 5/h), binding
+verificado por API/reader. [Evidencia](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md).
+D4 desplegado en producción con release `cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9`, canary sin efectos.
+Recorrido sintético y automatización pendientes; sin asignaciones/correos; Arte intacto.
 
 **TASK-1832 (readback 2026-09-10T12:17Z): operativamente bloqueada para retiro.** Frontera canary sana
 (`1/1`, purpose drift `0/0`, dos profiles run-owned fuera de Person 360), pero
