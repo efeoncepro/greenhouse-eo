@@ -10,8 +10,9 @@
 ## 2026-09-13 — Creative Typography Workbench de AXIS desplegado
 
 La guía pública [Creative Typography Workbench](https://axis.efeonce.org/references/creative-typography/) quedó
-desplegada desde AXIS: implementación `93810997c72a2664e8be6d3a85be410b5b5985f9`, release HEAD `f37e703`, deployment Vercel
-`dpl_CkFEqo7bv8ZRyXxxj7hpywWEuqrV` y GitHub verify verde. El readback público respondió `200`, encontró
+desplegada desde AXIS: implementación `93810997c72a2664e8be6d3a85be410b5b5985f9`, release HEAD
+`e2694025f8f7cb06fbb3ebe85ea0d2b4687d8786`, deployment Vercel `dpl_G9gbrg5gkzR4RQotfZes9G3eoduS` y
+GitHub verify verde. El readback público respondió `200`, encontró
 Bricolage, Poppins y Guttery reales, expuso el asesor interactivo y no mostró overflow en desktop. Greenhouse
 enlaza la experiencia desde el contrato operativo, la descripción funcional y el manual sin duplicar recetas.
 El despliegue del Lab no cambia `efeonce.advertising-typography` de `trial` a `stable`, no activa tipografía
