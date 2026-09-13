@@ -106,11 +106,11 @@ empresarial de Julio (2×1.000.000 del 07/09 como expenses `payroll` sin entry),
 Melkin (`EXP-202604-005`), y el PDF `36_16359_420051383906_2026-06-30.pdf` para el crédito antiguo.
 Contable a revisar: pagar el bruto sobre boletas con retención deja la retención sin documento propio.
 
-**TASK-1604 (2026-09-10, in-progress):** slice SEO/Arte aplicado y documentado. Seis competencias activas,
-nueve preguntas SEO en `sme_review`, cero templates del pack, cero policies y cero assessments. Las vacantes
-`EO-OPN-0674` y `EO-OPN-0675` fueron publicadas por un acto separado y sus rutas responden 200; publicación no
-equivale a pack activo. El CLI ahora exige las preguntas exactas del pack y coincidencia exacta antes de
-reutilizar un template. Pendiente: SME individual, template SEO, binding scorecard Arte y Quality Gate.
+**TASK-1604 / SEO (2026-09-13):** piloto manual autorizado con calibración independiente pendiente.
+Nueve preguntas activas y plantilla/policy `enabled/manual`, 75 min, cinco asignaciones/hora. Binding exacto
+verificado por API desplegada y reader. [Evidencia](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md).
+D4 implementado localmente; dos migraciones aplicadas, 594 focales y dos live passed; falta release y smoke.
+Sin asignaciones ni correos; Arte intacto.
 
 **TASK-1832 (readback 2026-09-10T12:17Z): operativamente bloqueada para retiro.** Frontera canary sana
 (`1/1`, purpose drift `0/0`, dos profiles run-owned fuera de Person 360), pero
@@ -339,6 +339,8 @@ tener wireframe/flow reales. Siguiente ID libre `TASK-1835` / `EPIC-045`.
 `src/lib/identity/external-access/**`, rutas admin, reader del gateway `GET /api/platform/ecosystem/identity/binding` y 4
 señales; smoke `pnpm identity:external-access:smoke`. **Staging verificado 2026-09-04** (develop `02dc5d987` pusheado coordinado con TASK-1828): 4 señales en `/api/admin/reliability`, rutas admin 200, lane ecosystem 401 sin consumer. **En producción** desde el release 2026-09-04 (run 33893120972; canary del lane 400/200 `environment_inactive`/401; emisor `efeonce-auth` en `draft`). **Próximo paso:** operador lee las 4 señales en `/admin/operations` prod con sesión humana; TASK-1829 emite tokens y pasa el environment a `active`; TASK-1831 consume el reader.
 Paridad registry↔catálogo roja por 11 capabilities ajenas sin seed (task aparte).
+
+Release SEO/D4 (2026-09-13): PR #235, run `34754161855`, manifiesto `released`; [auditoría](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md).
 
 Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y
 skills Payroll/Talent Codex/Claude; Finance histórico pendiente de conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).

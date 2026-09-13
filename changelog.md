@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-13 — Release TASK-1604 / TASK-1719 D4
+
+- PR #235 promovida a `main` con SHA `cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9` mediante el
+  orquestador `34754161855`; manifiesto `cc3ec449495b-58fdc69f-3223-4348-8767-382008593b54`
+  en estado `released`.
+- Vercel Production, `/api/auth/health` y los cinco workers Cloud Run quedaron verificados para
+  el SHA exacto. Azure cerró sus health checks y omitió Bicep por `no_infra_diff`.
+- Canary interno productivo confirmó las ocho revisiones SEO activas y la frontera de asignación
+  manual (`canAssign=true`, `proposal=null`) sin crear propuestas, instancias ni correos.
+- La captura inmutable D4 se conserva para el primer recorrido sintético autorizado; no se presenta
+  una asignación de candidato como evidencia. Calibración independiente y trigger `on_stage_entry`
+  siguen pendientes.
+
 ## 2026-09-12 — Criterio y ejecución de seasonality/trendjacking para Codex y Claude
 
 Ampliación 2026-09-13: criterio espejo video/estático por mecanismo, complementariedad y comparación
@@ -406,6 +419,11 @@ Datos: `banco-chile-clp` registrada, 9 períodos ago/sep importados, 77 filas co
 `reconciled`; las discrepancias de nómina y dos cobros quedan escaladas al operador (follow-up propuesto `TASK-1858`, sin registrar aún).
 
 ## 2026-09-10 — TASK-1604: pack SEO/Arte y vacantes reconciliadas
+
+Ampliación 2026-09-13: nueve preguntas SEO afinadas activas para piloto manual, ocho originales retiradas con
+linaje idempotente. Snapshot D4 implementado localmente, dos migraciones aplicadas; 594 tests focales y dos
+live passed. [Evidencia](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md). Pendientes calibración independiente,
+release D4 y smoke. Piloto autorizado: nueve activas y template/policy manual habilitada con 75 min y cap 5/h. Sin asignaciones ni correos.
 
 Se agregó el pack versionado de evaluación para SEO Specialist Senior y Director(a) de Arte Senior: seis
 competencias aditivas, nueve preguntas SEO con rúbricas BARS en `sme_review`, scorecard de portfolio/caso para
@@ -1058,17 +1076,3 @@ Barrido documental del mismo día: skills `efeonce-mcp-platform`/`seo-aeo-practi
 `.claude/rules/identity-external-access.md`, AGENTS.md, docs de API (OpenAPI + referencia), 18 docs de arquitectura y 10
 manuales/docs funcionales: «fail-closed hasta TASK-1631» pasa a «hasta el emisor + gateway multi-issuer de EPIC-044; el grant
 ya existe». Backfill de paridad `capabilities_registry` (11 capabilities ajenas).
-
-## 2026-09-04 — TASK-1828: runtime del authorization server propio desplegado en staging y publicado en el front door del gateway
-
-Slices 0–2 de `TASK-1828` (EPIC-044): llave ES256 con protección **HSM** en Cloud KMS (`auth-server-es256`, versión 1
-activa) y SA `auth-server@` con permiso de firma sólo sobre esa llave; schema `greenhouse_auth` (`signing_keys` con una
-sola `active` por índice parcial + `signing_key_events` append-only) aplicado; `src/lib/auth-server/keys` (firma vía
-KMS con CRC32C, DER→JOSE, `kid` RFC 7638, verificación local obligatoria, rotación `active→retiring→retired`) con token
-real firmado por el HSM y verificado con el JWKS servido desde PG; `services/auth-server` (node:http, `/healthz`,
-`/readyz`, `/.well-known/jwks.json`, Host allowlist) desplegado en Cloud Run `us-east4` con `AUTH_SERVER_ENABLED=false`;
-`Auth Server Deploy` registrado en `RELEASE_DEPLOY_WORKFLOWS` y cableado en `production-release.yml`; host
-`auth.efeonce.org` publicado como segundo host del LB del gateway (`efeonce-mcp` `6a144a5`: 3 recursos nuevos, 2
-in-place, 0 destruidos; `mcp.efeonce.org` intacto); señales `auth.issuer.jwks_unreachable` y
-`auth.signing_keys.lifecycle` en el control plane; runbook `docs/operations/runbooks/auth-server.md`. Producción del
-emisor queda `code complete, rollout pendiente` (release control plane).
