@@ -1,0 +1,56 @@
+[
+  {
+    "key": "seo-technical-diagnosis",
+    "sourceQuestionId": "qst-13c5b215-d906-4a31-9224-daa91ea9c5b2",
+    "expectedSourceDigest": "00ae4316ae8757db745fb0b312d39df52db150376790f64879eef963c9c2ab60",
+    "targetDigest": "61508c1e48e3decff43b7a8bcb91a2a3b25c64219353f515d40413902474e65e"
+  },
+  {
+    "key": "seo-technical-prioritization",
+    "sourceQuestionId": "qst-a5b381ba-a29f-4430-9bf1-f0490f214c8a",
+    "expectedSourceDigest": "6ce34c0435bdbe2decd61f29bd64768cf1def93cb0bf30b843659ca069e4d6d8",
+    "targetDigest": "1e2dcb7cd6930bc75038773236cb5cabc6406431f2471f5baa277488af98f7c5"
+  },
+  {
+    "key": "seo-aeo-content-architecture",
+    "sourceQuestionId": "qst-62ae20a9-f841-4b01-a465-1022e1f7ce66",
+    "expectedSourceDigest": "87ada27014fee4d428789b4922423ca5ce837a3345505188726a72d10bbc7f57",
+    "targetDigest": "e1ce9cd63fd41fc27d97ba467f12793f5a8bf750f2b9a97e677b4d6d76b8daa1"
+  },
+  {
+    "key": "seo-aeo-serp-critique",
+    "sourceQuestionId": "qst-19db30c8-99c0-4b3e-b0e9-e36d26691527",
+    "expectedSourceDigest": "d445346b82ee7a703685acdec44efb315d417d6b926b72b1ecb0445be5bd994d",
+    "targetDigest": "389121d2124c4ebc5625ea1f43df95b08e21051d970b0acb5e734968428b5105"
+  },
+  {
+    "key": "seo-measurement-plan",
+    "sourceQuestionId": "qst-f72e3605-1326-463b-8dd4-e01ee9ca38c6",
+    "expectedSourceDigest": "220781cf93fb72e905c39f3cdd771de19c1b901d122a2547394fa907ff742bc5",
+    "targetDigest": "3bf4c3ec4b83381c41bb6322e8f82a395cd60d9f6073193aec90210bed5ebe4d"
+  },
+  {
+    "key": "seo-measurement-experiment",
+    "sourceQuestionId": "qst-b3f3f74d-74fb-46ff-abe5-e255d9f3b3f4",
+    "expectedSourceDigest": "567ae5ba0081dfbb0166f379639896d1e02f3895c0d03ed75b00c07a1a9c9e27",
+    "targetDigest": "bc3a6732a884c17b76056087a64a5fc5e33c5c35918aefe9a6c307c8ebcae433"
+  },
+  {
+    "key": "seo-research-synthesis",
+    "sourceQuestionId": "qst-7766a393-4175-4626-a002-35431f1dfc04",
+    "expectedSourceDigest": "07f9c310e20c37f3d4fdf885e09f840d360b17ea1c56c4bc6e61dfd28f594b27",
+    "targetDigest": "07f9c310e20c37f3d4fdf885e09f840d360b17ea1c56c4bc6e61dfd28f594b27"
+  },
+  {
+    "key": "seo-executive-communication",
+    "sourceQuestionId": "qst-ff526911-30f6-4146-8946-e1aaeddaa21d",
+    "expectedSourceDigest": "8b67aab287d5f196cae1b5d95dd7fc5d221b2f91365c01309bf51ee8c908eb62",
+    "targetDigest": "e3948db4ac7517498fb25569fad7f818f6916a69c53aa656d4674d5ae486e4ab"
+  },
+  {
+    "key": "seo-incident-ownership",
+    "sourceQuestionId": "qst-3d56b852-88a9-46d4-83c4-73e818273494",
+    "expectedSourceDigest": "3808b3383e39b5de9e5ae81d7f0513c4c02f7f124ba2de6cfc656bfacac4ab47",
+    "targetDigest": "20f47aa94e5f880a6cb7fe37ef82bc502a6ccb0de3ed7fea02876365c972f640"
+  }
+]

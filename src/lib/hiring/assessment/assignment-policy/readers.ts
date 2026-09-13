@@ -1,7 +1,5 @@
 import 'server-only'
 
-import { createHash } from 'node:crypto'
-
 import type { PoolClient } from 'pg'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -9,7 +7,7 @@ import type { OpeningAssessmentPolicy, OpeningAssessmentTriggerStage } from '@/t
 import type { HiringApplicationStage } from '@/types/hiring'
 
 import { activeProcessPredicate } from '../../active-process'
-import { PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL } from '../public-taking'
+import { PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL, summarizeQuestionnaire } from '../questionnaire'
 import { findActivePolicyForOpening, getPolicyById } from './store'
 
 // TASK-1719 Slice 1 — Readers de la policy. Acá vive EL predicado canónico: el mismo que
@@ -87,34 +85,7 @@ export const resolveTemplateContentDigest = async (
     options_json: unknown
   }>(client, PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL, [templateId])
 
-  const lines = rows.map(row => {
-    const content = createHash('sha256')
-      .update(
-        [
-          str(row.level),
-          str(row.type),
-          str(row.prompt),
-          // `options_json` llega como objeto (jsonb) o string según el driver; se normaliza para
-          // que el digest no cambie por la representación, sólo por el contenido real.
-          typeof row.options_json === 'string' ? row.options_json : JSON.stringify(row.options_json ?? null),
-        ].join('|'),
-      )
-      .digest('hex')
-
-    return `${str(row.module_id)}:${str(row.competency_id)}:${str(row.question_id) || '-'}:${
-      row.question_id == null ? '-' : content
-    }`
-  })
-
-  const modules = new Set(rows.map(row => str(row.module_id)))
-  const emptyModules = new Set(rows.filter(row => row.question_id == null).map(row => str(row.module_id)))
-
-  return {
-    digest: createHash('sha256').update(lines.join('\n')).digest('hex'),
-    moduleCount: modules.size,
-    questionCount: rows.filter(row => row.question_id != null).length,
-    emptyModuleCount: emptyModules.size,
-  }
+  return summarizeQuestionnaire(rows)
 }
 
 export interface ApplicationAwaitingAssignment {

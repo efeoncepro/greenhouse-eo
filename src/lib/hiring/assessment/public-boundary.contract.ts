@@ -47,6 +47,8 @@ export const PUBLIC_ASSESSMENT_FORBIDDEN_FIELDS = [
   'answer_key',
   'answerkey',
   'rubric',
+  'questionnaire_snapshot',
+  'questionnairesnapshot',
 ] as const
 
 /** Deep-scan: recolecta todas las keys (a cualquier profundidad) de un valor serializable. */

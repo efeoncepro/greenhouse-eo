@@ -382,6 +382,7 @@ export const assignAssessmentFromPolicy = async (
       {
         applicationId,
         templateId: policy.templateId,
+        expectedTemplateContentDigest: policy.templateContentDigest,
         timeLimitMinutes: policy.timeLimitMinutes,
       },
       input.actorUserId,

@@ -83,10 +83,9 @@ export const proposeScoreForResponse = async (
 
   const rows = await runGreenhousePostgresQuery<ScoreContextRow>(
     `SELECT r.answer_json, q.prompt AS question_prompt, q.rubric_json, q.type AS question_type,
-            c.key AS competency_key, c.name AS competency_name, q.level
+            q.competency_key, q.competency_name, q.level
        FROM greenhouse_hiring.hiring_assessment_response r
-       JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
-       JOIN greenhouse_hiring.hiring_competency c ON c.competency_id = r.competency_id
+       JOIN greenhouse_hiring.hiring_assessment_question q ON q.question_id = r.question_id AND q.assessment_id = r.assessment_id
       WHERE r.response_id = $1`,
     [responseId],
   )

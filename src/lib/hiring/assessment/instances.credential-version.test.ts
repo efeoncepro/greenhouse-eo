@@ -1,13 +1,25 @@
+import type { PoolClient } from 'pg'
 import { describe, expect, it, vi } from 'vitest'
 
+import type * as QuestionnaireModule from './questionnaire'
+
 vi.mock('server-only', () => ({}))
+
+// This suite isolates assignment/credential behavior. Real capture and DB immutability
+// are exercised in questionnaire.test.ts and questionnaire.live.test.ts.
+vi.mock('./questionnaire', async importOriginal => {
+  const actual = await importOriginal<typeof QuestionnaireModule>()
+
+  return { ...actual, captureQuestionnaire: vi.fn(async () => actual.buildQuestionnaireSnapshot([{
+    module_id: 'module-fixture', competency_id: 'competency-fixture', question_id: 'question-fixture',
+    level: 'avanzado', type: 'open_text', prompt: 'Fixture', options_json: [], rubric_json: {}, answer_key_json: {},
+  }])) }
+})
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: vi.fn(),
   withGreenhousePostgresTransaction: vi.fn(),
 }))
 vi.mock('@/lib/sync/publish-event', () => ({ publishOutboxEvent: vi.fn() }))
-
-import type { PoolClient } from 'pg'
 
 import {
   insertCandidateTest,
@@ -40,9 +52,11 @@ describe('assessment credential versions', () => {
   it('writes a fresh UUID beside every initial candidate credential', async () => {
     const client = clientWithRows([assessmentRow])
 
+    vi.mocked(client.query).mockResolvedValueOnce({ rows: [] } as never)
+
     await insertCandidateTest(client, { applicationId: 'happ-1', templateId: 'atpl-1' }, 'user-1')
 
-    const [sql, values] = vi.mocked(client.query).mock.calls[0] as unknown as [string, unknown[]]
+    const [sql, values] = vi.mocked(client.query).mock.calls.find(call => String(call[0]).includes('INSERT INTO')) as unknown as [string, unknown[]]
 
     expect(sql).toContain('access_token_version_id')
     expect(values[3]).toMatch(/^[a-f0-9-]{36}$/)

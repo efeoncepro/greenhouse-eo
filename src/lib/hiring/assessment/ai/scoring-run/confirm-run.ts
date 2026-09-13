@@ -44,7 +44,7 @@ const computeCurrentResponseDigest = async (client: PoolClient, responseId: stri
   const result = await client.query(
     `SELECT r.answer_json, q.prompt AS question_prompt
        FROM greenhouse_hiring.hiring_assessment_response r
-       JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
+       JOIN greenhouse_hiring.hiring_assessment_question q ON q.question_id = r.question_id AND q.assessment_id = r.assessment_id
       WHERE r.response_id = $1`,
     [responseId],
   )

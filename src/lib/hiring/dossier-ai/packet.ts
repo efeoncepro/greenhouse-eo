@@ -134,7 +134,7 @@ export const assembleEvaluationDossierPacket = async (applicationId: string): Pr
        FROM greenhouse_hiring.hiring_assessment_response r
        JOIN greenhouse_hiring.hiring_assessment a ON a.assessment_id = r.assessment_id
        JOIN greenhouse_hiring.hiring_competency c ON c.competency_id = r.competency_id
-       LEFT JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
+       LEFT JOIN greenhouse_hiring.hiring_assessment_question q ON q.question_id = r.question_id AND q.assessment_id = r.assessment_id
        LEFT JOIN LATERAL (
          SELECT proposal_id FROM greenhouse_hiring.hiring_assessment_ai_proposal
           WHERE kind = 'response_score' AND target_ref = r.response_id

@@ -90,7 +90,7 @@ export const listAssessmentReviewItems = async (assessmentId: string): Promise<A
      FROM greenhouse_hiring.hiring_assessment_response r
      JOIN greenhouse_hiring.hiring_assessment a ON a.assessment_id = r.assessment_id
      JOIN greenhouse_hiring.hiring_competency c ON c.competency_id = r.competency_id
-     LEFT JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
+     LEFT JOIN greenhouse_hiring.hiring_assessment_question q ON q.question_id = r.question_id AND q.assessment_id = r.assessment_id
      LEFT JOIN greenhouse_hiring.hiring_assessment_template_module tm
        ON tm.template_id = a.template_id
       AND tm.competency_id = r.competency_id
