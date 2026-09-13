@@ -2,6 +2,9 @@ import 'server-only'
 
 import type { PoolClient } from 'pg'
 
+import { PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL, readQuestionnaireSnapshot } from './questionnaire'
+
+
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import {
   type AssessmentDeadlineResult,
@@ -285,43 +288,7 @@ const getAssessmentContext = async (
  * drift real del banco de preguntas. Consumidores: `listPublicAssessmentQuestions` acá y
  * `resolveTemplateContentDigest` en `assignment-policy/readers.ts`. NUNCA duplicar el SQL.
  */
-export const PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL = `WITH ranked AS (
-       SELECT tm.module_id,
-              tm.weight,
-              tm.target_level,
-              c.competency_id,
-              c.key AS competency_key,
-              c.name AS competency_name,
-              c.category AS competency_category,
-              c.description AS competency_description,
-              q.question_id,
-              q.level,
-              q.type,
-              q.prompt,
-              q.options_json,
-              ROW_NUMBER() OVER (
-                PARTITION BY tm.module_id
-                ORDER BY
-                  CASE WHEN tm.target_level IS NOT NULL AND q.level = tm.target_level THEN 0 ELSE 1 END,
-                  CASE WHEN q.type IN ('situational', 'open_text') THEN 0 ELSE 1 END,
-                  q.created_at DESC NULLS LAST,
-                  q.question_id
-              ) AS question_rank,
-              DENSE_RANK() OVER (ORDER BY tm.weight DESC, c.key) AS module_rank
-       FROM greenhouse_hiring.hiring_assessment_template_module tm
-       JOIN greenhouse_hiring.hiring_competency c ON c.competency_id = tm.competency_id
-       LEFT JOIN greenhouse_hiring.hiring_question q
-         ON q.competency_id = tm.competency_id
-        AND q.status = 'active'
-        AND (tm.target_level IS NULL OR q.level = tm.target_level)
-       WHERE tm.template_id = $1
-     )
-     SELECT *
-     FROM ranked
-     WHERE question_id IS NULL
-        OR question_rank <= CASE WHEN module_rank <= 3 THEN 2 ELSE 1 END
-     ORDER BY weight DESC, competency_key, question_rank
-     LIMIT 12`
+export { PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL } from './questionnaire'
 
 export const listPublicAssessmentQuestionsWithClient = async (
   client: PoolClient | null,
@@ -332,7 +299,9 @@ export const listPublicAssessmentQuestionsWithClient = async (
 }> => {
   if (!assessment.templateId) return { competencies: [], questions: [] }
 
-  const rows = client
+  const snapshot = await readQuestionnaireSnapshot(assessment.assessmentId, client)
+
+  const rows = snapshot ? snapshot.rows as PublicQuestionRow[] : client
     ? (await client.query<PublicQuestionRow>(PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL, [assessment.templateId])).rows
     : await runGreenhousePostgresQuery<PublicQuestionRow>(PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL, [assessment.templateId])
 

@@ -77,9 +77,9 @@ const main = async () => {
             r.question_id,
             a.template_id,
             t.version AS template_version,
-            c.key  AS competency_key,
-            c.name AS competency_name,
-            m.weight AS competency_weight,
+            q.competency_key,
+            q.competency_name,
+            q.weight AS competency_weight,
             q.level,
             q.prompt,
             q.rubric_json,
@@ -93,13 +93,10 @@ const main = async () => {
               ARRAY[]::text[]
             ) AS router_reasons
        FROM greenhouse_hiring.hiring_assessment_response r
-       JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
-       JOIN greenhouse_hiring.hiring_competency c ON c.competency_id = r.competency_id
+       JOIN greenhouse_hiring.hiring_assessment_question q ON q.question_id = r.question_id AND q.assessment_id = r.assessment_id
        JOIN greenhouse_hiring.hiring_assessment a ON a.assessment_id = r.assessment_id
        JOIN greenhouse_hiring.hiring_application ha ON ha.application_id = a.application_id
        LEFT JOIN greenhouse_hiring.hiring_assessment_template t ON t.template_id = a.template_id
-       LEFT JOIN greenhouse_hiring.hiring_assessment_template_module m
-              ON m.template_id = a.template_id AND m.competency_id = r.competency_id
       WHERE q.type IN ('open_text', 'situational')
         AND r.answer_json->>'text' IS NOT NULL
         -- TASK-1739 — Exclusión de datos sintéticos SIN opt-in y SIN flag.

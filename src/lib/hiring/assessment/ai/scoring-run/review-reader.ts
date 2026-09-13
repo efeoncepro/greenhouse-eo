@@ -206,7 +206,7 @@ export const listAssessmentAiReviewItems = async (runId: string): Promise<Assess
             p.model, p.prompt_version, p.input_digest AS proposal_input_digest
        FROM greenhouse_hiring.hiring_assessment_ai_scoring_run_item i
        JOIN greenhouse_hiring.hiring_assessment_response r ON r.response_id = i.response_id
-       JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
+       JOIN greenhouse_hiring.hiring_assessment_question q ON q.question_id = r.question_id AND q.assessment_id = r.assessment_id
        LEFT JOIN greenhouse_hiring.hiring_assessment_ai_proposal p ON p.proposal_id = i.proposal_id
       WHERE i.run_id = $1
       ORDER BY i.created_at, i.run_item_id`,

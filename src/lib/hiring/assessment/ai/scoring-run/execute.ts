@@ -140,12 +140,9 @@ const loadItemContexts = async (responseIds: string[]): Promise<Map<string, Item
 
   const rows = await runGreenhousePostgresQuery<ItemContextRow>(
     `SELECT r.response_id, r.answer_json, q.rubric_json, r.human_score,
-            m.weight AS competency_weight
+            q.weight AS competency_weight
        FROM greenhouse_hiring.hiring_assessment_response r
-       JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
-       JOIN greenhouse_hiring.hiring_assessment a ON a.assessment_id = r.assessment_id
-       LEFT JOIN greenhouse_hiring.hiring_assessment_template_module m
-         ON m.template_id = a.template_id AND m.competency_id = r.competency_id
+       JOIN greenhouse_hiring.hiring_assessment_question q ON q.question_id = r.question_id AND q.assessment_id = r.assessment_id
       WHERE r.response_id = ANY($1::text[])`,
     [responseIds],
   )

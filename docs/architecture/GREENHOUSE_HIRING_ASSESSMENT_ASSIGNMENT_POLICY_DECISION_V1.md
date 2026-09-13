@@ -501,6 +501,18 @@ obsoleta.
 **Secuencia**: el digest entra en Slice 1. **El snapshot es requisito duro antes de expandir la automatización
 más allá del canary** — no un follow-up opcional.
 
+**Implementación local 2026-09-13 (TASK-1719, rollout pendiente):**
+`assessment/questionnaire.ts` comparte la resolución entre policy, captura y fallback legado.
+`hiring_assessment.questionnaire_snapshot_json` contiene `version:1`, `policyDigest`, `contentDigest`
+y `rows` con orden, pesos, contenido, opciones y pautas; el digest completo canonicaliza claves JSON.
+El digest público de policy mantiene su contrato previo. `insertCandidateTest` captura en la misma
+transacción; un replay devuelve la instancia existente. Trigger DB impide alterar la captura y protege
+los IDs del banco referenciados. La vista interna `hiring_assessment_question` sirve corrección,
+dossier y gold-set por assessment; sólo instancias NULL usan banco vivo. No backfill histórico.
+La proyección pública conserva allowlist y no expone pautas. Migración `20260913095245733` aplicada;
+prueba PostgreSQL de cambio/retiro y corrección pasada. Esto no declara el código desplegado ni autoriza
+expansión del canary. [Evidencia](../audits/hiring/2026-09-13-seo-assignment-readiness.md).
+
 ### D5 — Tres protecciones propias, sin esperar a `TASK-1739`
 
 1. **Nacimiento seguro.** Toda policy nace `draft` + `manual`. Pasar a `enabled` + `on_stage_entry` exige la

@@ -125,7 +125,7 @@ return { outcome: 'expired' }
     const resp = await client.query(
       `SELECT r.response_id, q.type, q.answer_key_json, r.answer_json
        FROM greenhouse_hiring.hiring_assessment_response r
-       JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
+       JOIN greenhouse_hiring.hiring_assessment_question q ON q.question_id = r.question_id AND q.assessment_id = r.assessment_id
        WHERE r.assessment_id = $1 AND r.question_id IS NOT NULL`,
       [assessmentId],
     )

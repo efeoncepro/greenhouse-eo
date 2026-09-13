@@ -95,7 +95,7 @@ export const listEligibleResponses = async (
 ): Promise<EligibleResponseRow[]> => {
   const text = `SELECT r.response_id, r.answer_json, q.prompt AS question_prompt, q.rubric_json
        FROM greenhouse_hiring.hiring_assessment_response r
-       JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
+       JOIN greenhouse_hiring.hiring_assessment_question q ON q.question_id = r.question_id AND q.assessment_id = r.assessment_id
       WHERE r.assessment_id = $1
         AND r.needs_human_rating = TRUE
         AND r.human_score IS NULL
@@ -128,7 +128,7 @@ export const computeCurrentScoringRunDigest = async (
 ): Promise<string> => {
   const text = `SELECT r.response_id, r.answer_json, q.prompt AS question_prompt, q.rubric_json
        FROM greenhouse_hiring.hiring_assessment_response r
-       JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
+       JOIN greenhouse_hiring.hiring_assessment_question q ON q.question_id = r.question_id AND q.assessment_id = r.assessment_id
       WHERE r.response_id = ANY($1::text[])`
 
   const values = [responseIds]

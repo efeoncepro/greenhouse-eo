@@ -104,7 +104,7 @@ const SEO_QUESTIONS: RoleQuestionSpec[] = [
     type: 'situational',
     timeboxMinutes: 10,
     prompt:
-      'Caso ficticio. Un sitio B2B de 18.000 URLs perdió 34% de clics orgánicos no-branded en seis semanas. Hubo una migración parcial de plantillas, aumentaron las URLs “Descubierta: actualmente sin indexar”, el sitemap incluye filtros y el equipo atribuye todo a una actualización de Google. Diseña un plan de diagnóstico para las primeras 48 horas. Ordena tus cinco primeras comprobaciones, indica qué evidencia buscarías, qué hipótesis podría confirmar o descartar cada una y qué cambio evitarías hacer todavía.',
+      'Caso ficticio. Un sitio B2B de 18.000 URLs perdió 34% de clics orgánicos de búsquedas que no incluyen la marca en seis semanas. Hubo una migración parcial de plantillas, aumentaron las URLs “Descubierta: actualmente sin indexar”, el sitemap incluye filtros y el equipo atribuye todo a una actualización de Google. Diseña un plan de diagnóstico para las primeras 48 horas. Ordena tus cinco primeras comprobaciones, indica qué evidencia buscarías, qué hipótesis podría confirmar o descartar cada una y qué cambio evitarías hacer todavía.',
     evidenceExpected: [
       'Separa síntomas, hipótesis y hechos.',
       'Prioriza por impacto, reversibilidad y costo de información.',
@@ -128,11 +128,11 @@ const SEO_QUESTIONS: RoleQuestionSpec[] = [
     type: 'open_text',
     timeboxMinutes: 8,
     prompt:
-      'En el mismo caso ficticio encuentras cuatro hallazgos: 4.000 URLs de filtros rastreables sin valor, canonical cruzado en 12 plantillas de alto tráfico, LCP móvil lento en todo el sitio y 160 enlaces internos rotos. Tienes capacidad de desarrollo para una sola intervención esta semana. Elige una, explica por qué gana, qué información falta para confirmar la prioridad y define un criterio de éxito y uno de rollback. Máximo 300 palabras.',
+      'Caso ficticio. Un sitio B2B perdió tráfico orgánico después de una migración parcial. Encuentras cuatro hallazgos: 4.000 URLs de filtros rastreables sin valor, canonical cruzado en 12 plantillas de alto tráfico, LCP móvil lento en todo el sitio y 160 enlaces internos rotos. Tienes capacidad de desarrollo para una sola intervención esta semana. Elige una intervención provisional, explica por qué la priorizas y qué dato podría cambiar tu decisión. Define cómo verificarías el resultado técnico y su impacto en búsqueda, y qué señal justificaría revertir el cambio. Máximo 300 palabras.',
     evidenceExpected: ['Compara alcance, impacto y riesgo.', 'Evita decidir sólo por volumen.', 'Define éxito y rollback observables.'],
     rubric: barsRubric(
       [
-        { name: 'Criterio de prioridad', evidence: 'Combina impacto sobre URLs/queries valiosas, severidad, confianza y esfuerzo.' },
+        { name: 'Criterio de prioridad', evidence: 'Combina impacto sobre URLs/queries valiosas, severidad, confianza y esfuerzo; acepta prioridades distintas si están justificadas y sujetas a comprobación.' },
         { name: 'Uso de incertidumbre', evidence: 'Declara qué dato faltante podría cambiar la decisión.' },
         { name: 'Plan verificable', evidence: 'Formula señal de éxito, ventana de observación y rollback.' },
       ],
@@ -146,7 +146,7 @@ const SEO_QUESTIONS: RoleQuestionSpec[] = [
     type: 'situational',
     timeboxMinutes: 9,
     prompt:
-      'Caso ficticio. Una empresa de software quiere ser la referencia para “cómo conciliar marketing y ventas”, pero hoy tiene cinco artículos solapados, una landing comercial y opiniones sin fuente. Propón una arquitectura de búsqueda y contenido que sirva tanto a personas como a motores y asistentes de IA. Incluye intención, entidades/subpreguntas, decisión de consolidar o separar, evidencia necesaria, enlaces internos, datos estructurados sólo cuando correspondan y siguiente paso de negocio.',
+      'Caso ficticio. Una empresa vende software para conectar los datos de marketing y ventas. Quiere ayudar a responsables de ambas áreas que buscan “cómo conciliar marketing y ventas”, pero hoy tiene cinco artículos solapados, una landing comercial y opiniones sin fuente. Propón una arquitectura de búsqueda y contenido que sirva tanto a personas como a motores y asistentes de IA. Incluye intención, entidades/subpreguntas, decisión de consolidar o separar, evidencia necesaria, enlaces internos, datos estructurados sólo cuando correspondan y siguiente paso de negocio.',
     evidenceExpected: ['Modela intención y entidades.', 'Resuelve canibalización con criterio.', 'Distingue estructura, evidencia y schema.', 'Conecta utilidad con siguiente paso.'],
     rubric: barsRubric(
       [
@@ -165,7 +165,7 @@ const SEO_QUESTIONS: RoleQuestionSpec[] = [
     type: 'open_text',
     timeboxMinutes: 7,
     prompt:
-      'Una página abre con 450 palabras de marca antes de responder, presenta una cifra sin fuente, usa seis H2 casi idénticos y cierra con “Contáctanos”. Reescribe únicamente el esquema de la primera pantalla y la jerarquía de secciones. Explica qué conservarías, qué eliminarías y cómo comprobarías que la mejora responde mejor a la intención sin medir éxito sólo por posición. Máximo 250 palabras.',
+      'Caso ficticio. Una página de una empresa de software busca ayudar a responsables de marketing y ventas a conciliar los datos de ambas áreas. Abre con 450 palabras de marca antes de responder, presenta una cifra sin fuente, usa seis H2 casi idénticos y cierra con “Contáctanos”. Sin redactar el artículo completo, propone el esquema de la primera pantalla y la jerarquía de secciones. No inventes la cifra ni resultados del producto. Explica qué conservarías, qué eliminarías y cómo comprobarías que la mejora responde mejor a la intención sin medir éxito sólo por posición. Máximo 250 palabras.',
     evidenceExpected: ['Respuesta directa y jerarquía clara.', 'Tratamiento explícito del claim sin fuente.', 'Medición más amplia que ranking.'],
     rubric: barsRubric(
       [
@@ -184,13 +184,13 @@ const SEO_QUESTIONS: RoleQuestionSpec[] = [
     type: 'situational',
     timeboxMinutes: 9,
     prompt:
-      'Caso ficticio. Tras publicar un hub, las impresiones suben 40%, los clics 8%, las sesiones orgánicas GA4 3% y los leads atribuidos bajan 5%. Diseña un plan de lectura antes de declarar éxito o fracaso. Incluye definiciones, segmentaciones, problemas de medición, ventana temporal, comparación o control razonable y la decisión que tomarías bajo tres posibles resultados.',
+      'Caso ficticio. En las cuatro semanas posteriores a publicar un conjunto de páginas relacionadas (hub), frente a las cuatro anteriores, las impresiones en Search Console suben 40%, sus clics 8%, las sesiones orgánicas en GA4 3% y los leads atribuidos al canal orgánico bajan 5%. No tienes aún los volúmenes absolutos ni confirmación de que los informes cubran las mismas páginas. Diseña un plan de lectura antes de declarar éxito o fracaso. Prioriza tres comprobaciones iniciales: qué compararías, con qué fuente y qué podría explicar la diferencia. Indica qué ventana o comparación adicional necesitas y qué harías si encuentras un error de medición, un cambio en el tipo de tráfico o una caída real de conversión.',
     evidenceExpected: ['Reconcilia fuentes y definiciones.', 'Segmenta intención/brand/dispositivo/landing.', 'Evita atribución causal automática.', 'Predefine decisiones.'],
     rubric: barsRubric(
       [
         { name: 'Lectura de métricas', evidence: 'Distingue exposición, visita, calidad y outcome; no promedia señales incompatibles.' },
         { name: 'Calidad del dato', evidence: 'Revisa cobertura, tracking, atribución, estacionalidad y cambios de mix.' },
-        { name: 'Diseño de evaluación', evidence: 'Propone cortes, baseline y ventana suficientes para reducir explicaciones alternativas.' },
+        { name: 'Diseño de evaluación', evidence: 'Propone cortes, volúmenes absolutos, alcance comparable y ventana suficientes para reducir explicaciones alternativas.' },
         { name: 'Decisión', evidence: 'Conecta escenarios de evidencia con mantener, corregir o detener.' },
       ],
       ['Declara éxito por impresiones.', 'Atribuye leads a SEO sin revisar medición ni mix.'],
@@ -203,13 +203,13 @@ const SEO_QUESTIONS: RoleQuestionSpec[] = [
     type: 'open_text',
     timeboxMinutes: 7,
     prompt:
-      'Tienes diez páginas comparables y capacidad para mejorar sólo cinco. Diseña un experimento práctico para evaluar una nueva estructura de respuesta inicial y enlaces internos. Define unidad de análisis, selección de páginas, métricas primarias/secundarias, guardrails, duración mínima, factores de confusión y qué conclusión no permitirían los datos. Máximo 300 palabras.',
+      'Tienes diez páginas de temática, tráfico y tendencia similares, y capacidad para modificar sólo cinco. Diseña una comparación práctica para evaluar una nueva estructura de respuesta inicial y enlaces internos. Explica cómo seleccionarías las cinco páginas y qué conservarías sin cambios en las otras. Decide si evaluarás ambas mejoras como un conjunto o por separado, y qué podrás atribuir a cada una. Define una métrica principal, métricas secundarias, señales de daño y cómo decidirías la duración según el tráfico y el tiempo de rastreo e indexación. Explicita las limitaciones de trabajar con diez páginas, los factores de confusión y qué harías si el resultado no es concluyente. Máximo 300 palabras.',
     evidenceExpected: ['Diseño comparable y factible.', 'Métrica primaria coherente.', 'Guardrails y límites causales.'],
     rubric: barsRubric(
       [
-        { name: 'Diseño', evidence: 'Construye comparación razonable y evita elegir tratamiento por resultado esperado.' },
+        { name: 'Diseño', evidence: 'Construye una comparación razonable, evita elegir tratamiento por resultado esperado y distingue el efecto del conjunto del efecto de cada cambio.' },
         { name: 'Métricas', evidence: 'Predefine resultado primario, secundarios y señales de daño.' },
-        { name: 'Inferencia', evidence: 'Explicita confusores, potencia limitada y conclusiones no soportadas.' },
+        { name: 'Inferencia', evidence: 'Explicita confusores, posible interferencia de enlaces entre grupos, muestra limitada y conclusiones no soportadas; acepta un resultado inconcluso.' },
       ],
       ['Cambia todas las páginas a la vez.', 'Selecciona sólo las páginas con mejor tendencia previa.'],
     ),
@@ -239,7 +239,7 @@ const SEO_QUESTIONS: RoleQuestionSpec[] = [
     type: 'situational',
     timeboxMinutes: 6,
     prompt:
-      'Debes explicar a una dirección no técnica que el tráfico bajó, pero la evidencia todavía no permite atribuirlo a la migración. Redacta un update de máximo 180 palabras con: hecho confirmado, incertidumbre, impacto, acción inmediata, decisión que necesitas y próxima fecha de evidencia. No uses jerga sin explicarla.',
+      'Caso ficticio. Los clics orgánicos de un sitio B2B bajaron 34% en seis semanas y hubo una migración parcial de plantillas. La evidencia todavía no permite atribuir la caída a la migración ni cuantificar su impacto en leads. Debes informar a una dirección no técnica. Redacta un update de máximo 180 palabras con: hecho confirmado, incertidumbre, impacto, acción inmediata, decisión que necesitas y próxima fecha de evidencia. No inventes impacto ni una causa confirmada. Puedes proponer un plazo para la próxima actualización. No uses jerga sin explicarla.',
     evidenceExpected: ['Mensaje ejecutivo y accionable.', 'Incertidumbre explícita.', 'Petición/decisión concreta.'],
     rubric: barsRubric(
       [
@@ -257,13 +257,13 @@ const SEO_QUESTIONS: RoleQuestionSpec[] = [
     type: 'situational',
     timeboxMinutes: 7,
     prompt:
-      'Una recomendación tuya se implementó y 600 páginas valiosas quedaron con noindex durante 36 horas. Describe qué haces en los primeros 30 minutos, durante el día y después de estabilizar. Incluye comunicación, contención, verificación, registro y cambio sistémico para evitar repetición. No busques culpables.',
+      'Caso ficticio. Una recomendación tuya se implementó y 600 páginas valiosas quedaron con noindex durante 36 horas. Acabas de detectar el incidente. Describe qué haces en los primeros 30 minutos, durante el día y después de estabilizar. Incluye comunicación, contención, verificación, registro y cambio sistémico para evitar repetición. Distingue retirar la instrucción noindex de comprobar la recuperación de indexación y tráfico; no prometas plazos que no puedes controlar. No busques culpables.',
     evidenceExpected: ['Contiene antes de explicar.', 'Comunica con hechos y cadencia.', 'Verifica recuperación.', 'Crea prevención sistémica.'],
     rubric: barsRubric(
       [
         { name: 'Respuesta al incidente', evidence: 'Prioriza contención reversible, alcance y preservación de evidencia.' },
         { name: 'Responsabilidad', evidence: 'Asume su contribución, coordina y comunica sin culpar ni ocultar.' },
-        { name: 'Recuperación', evidence: 'Define comprobaciones técnicas y de negocio posteriores.' },
+        { name: 'Recuperación', evidence: 'Distingue corregir noindex, verificar rastreo/indexación y observar recuperación de tráfico, sin garantizar plazos externos.' },
         { name: 'Aprendizaje sistémico', evidence: 'Cambia QA, revisión, alertas o rollout; no se limita a “tener más cuidado”.' },
       ],
       ['Oculta el incidente.', 'Cambia varias cosas sin preservar evidencia o propone sólo capacitación.'],
@@ -340,6 +340,8 @@ export const SEO_SPECIALIST_SENIOR_PACK: RoleAssessmentPack = {
     'El caso es ficticio y no produce trabajo utilizable para Efeonce ni para un cliente.',
     'Puedes consultar documentación, buscadores y herramientas de AI; declara cuáles usaste y cómo verificaste sus aportes.',
     'Se evalúa la calidad del razonamiento, las decisiones, la evidencia y los límites, no la extensión ni la coincidencia con una respuesta única.',
+    'Responde con listas, tablas o texto breve. No necesitas acceder a cuentas reales ni usar herramientas de pago. Cuando falte un dato, declara tu supuesto y cómo lo comprobarías; no inventes resultados.',
+    'Dispones de 75 minutos en total; los tiempos por pregunta son orientativos y suman 69 minutos, con 6 minutos para lectura y revisión.',
     'La entrevista posterior puede pedirte defender o cambiar una decisión con nueva evidencia.',
   ],
   questions: SEO_QUESTIONS,

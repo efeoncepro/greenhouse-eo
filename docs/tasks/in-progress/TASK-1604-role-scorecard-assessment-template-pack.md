@@ -15,11 +15,11 @@
 - Motion: `none`
 - Backend impact: `migration|seed`
 - Epic: `EPIC-038`
-- Status real: `Slice SEO/Arte aplicado: instrumentos versionados, seis competencias activas y nueve preguntas SEO en sme_review. Las dos vacantes reales fueron publicadas por un acto operativo separado el 2026-09-09 y hoy están active/public_listed; siguen sin policy ni assessments. Activación SME, template runtime SEO y binding del scorecard de Arte permanecen pendientes.`
+- Status real: `Slice SEO/Arte aplicado; 2026-09-13: nueve preguntas SEO afinadas en sme_review con ocho versiones originales retiradas y linaje idempotente. D4 local y dos migraciones aplicadas; sin release. Piloto manual autorizado con calibración pendiente, nueve activas y template/policy enabled/manual verificadas. Las dos vacantes reales fueron publicadas por un acto operativo separado el 2026-09-09 y hoy están active/public_listed; siguen sin policy ni assessments. Activación SME, template runtime SEO y binding del scorecard de Arte permanecen pendientes.`
 - Rank: `EPIC-038-phase-1`
 - Domain: `hiring|hr|content|agency`
 - Blocked by: `none`
-- Branch: `task/TASK-1604-role-scorecard-assessment-template-pack`
+- Branch: `develop` (checkout compartido; goal SEO confirmado 2026-09-13)
 - GitHub Issue: `none`
 
 ## Summary
@@ -117,6 +117,10 @@ El motor de assessment existe, pero los estándares por rol, work samples, softw
 - Nuevas UI de authoring y AI scoring autónomo.
 
 ## Acceptance Criteria
+
+- [x] Slice SEO 2026-09-13: banco afinado sincronizado sin duplicados, originales conservadas y motivo editorial trazable; preview/apply/replay en auditoría fechada.
+- [x] Slice SEO 2026-09-13: piloto autorizado y plantilla de nueve preguntas exactas vinculada a EO-OPN-0674 enabled/manual; reader y API desplegada HTTP 200 en auditoría.
+- [ ] Slice SEO 2026-09-13: snapshot D4 de TASK-1719 verificado, recorrido sintético y readback desplegado; ninguna asignación real no solicitada.
 
 - [ ] Account Manager y Content Creator tienen template aprobado y coverage matrix.
 - [ ] Cada pregunta tiene rubric observable y revisión SME.
@@ -234,3 +238,20 @@ Seed → revisión SME → staging → aplicación a un opening piloto → produ
 - [ ] Coverage, anti-leak, scoring y live smoke verdes.
 - [ ] SME owner acepta cada template.
 - [ ] Docs/runbook y registry sincronizados.
+
+## Delta 2026-09-13 — Goal SEO confirmado
+
+El operador confirmó el goal de cierre manual SEO y D4 de TASK-1719, en develop compartido, sin
+subagentes, sin worktrees, sin cambios en Arte y sin asignación automática ni envíos a postulantes reales.
+Plan y evidencia: `docs/audits/hiring/2026-09-13-seo-assignment-readiness.md`.
+Los hooks de ambas dueñas fueron ejecutados. Se reutilizan writers, plantilla, policy y propose/confirm.
+La aprobación editorial está registrada en la conversación; la calibración independiente no se inventa.
+El binding básico es EPIC-011 y no depende del claim de TASK-1602 ni del Quality Gate de TASK-1603;
+los claims de pack certificado y el Quality Gate conservan sus gates separados.
+
+Avance verificado: ocho revisiones + una pregunta intacta; nueve SME review, cero templates/policies/asignaciones.
+594 pruebas focales y dos live passed; código D4 local, migraciones aplicadas, tipos regenerados.
+Faltan decisión calibración/piloto, activación y vinculación, release y smoke de entrega; no se cierra la task.
+
+Delta posterior: operador autorizó piloto, activación y binding manual aplicados y verificados.
+Pendientes del objetivo completo: release D4 y smoke de recorrido; la calibración completa sigue pendiente declarada.

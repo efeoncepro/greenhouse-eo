@@ -1,6 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type * as QuestionnaireModule from '../questionnaire'
+
 vi.mock('server-only', () => ({}))
+
+// This suite isolates assignment/credential behavior. Real capture and DB immutability
+// are exercised in questionnaire.test.ts and questionnaire.live.test.ts.
+vi.mock('../questionnaire', async importOriginal => {
+  const actual = await importOriginal<typeof QuestionnaireModule>()
+
+  return { ...actual, captureQuestionnaire: vi.fn(async () => actual.buildQuestionnaireSnapshot([{
+    module_id: 'module-fixture', competency_id: 'competency-fixture', question_id: 'question-fixture',
+    level: 'avanzado', type: 'open_text', prompt: 'Fixture', options_json: [], rubric_json: {}, answer_key_json: {},
+  }])) }
+})
 
 // Mocks de PG con el patrón de `assign.test.ts`: handlers por regex sobre el texto del SQL,
 // primer match gana. Ejercitan la LÓGICA, no el SQL — el SQL de este slice se ejercita contra

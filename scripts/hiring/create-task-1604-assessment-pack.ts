@@ -190,7 +190,11 @@ const readback = async () => {
   const questionRows = await runGreenhousePostgresQuery<{ status: string; count: number }>(
     `SELECT q.status, COUNT(*)::int AS count
      FROM greenhouse_hiring.hiring_question q
-     WHERE q.created_by = $1
+     WHERE q.created_by = $1 OR EXISTS (
+       SELECT 1 FROM greenhouse_hiring.hiring_question_revision revision
+       JOIN greenhouse_hiring.hiring_question source ON source.question_id = revision.source_question_id
+       WHERE revision.revision_question_id = q.question_id AND source.created_by = $1
+     )
      GROUP BY q.status
      ORDER BY q.status`,
     [ACTOR],
