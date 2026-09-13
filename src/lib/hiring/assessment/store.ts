@@ -312,19 +312,28 @@ const QUESTION_STATUS_TRANSITIONS: Record<QuestionStatus, QuestionStatus[]> = {
   retired: [],
 }
 
+/** Internal reader; never project the returned answer key/rubric to candidates. */
+export const getQuestionById = async (questionId: string, client: PoolClient | null = null): Promise<Question | null> => {
+  const rows = await runQuery<QuestionRow>(client,
+    `SELECT ${QUESTION_COLS_FULL} FROM greenhouse_hiring.hiring_question WHERE question_id = $1`, [questionId])
+
+  return rows[0] ? normalizeQuestion(rows[0]) : null
+}
+
 /** SME gate: draft → sme_review → active → retired. Solo transiciones permitidas. */
 export const transitionQuestionStatus = async (
   questionId: string,
   toStatus: QuestionStatus,
   actorUserId: string | null,
+  externalClient: PoolClient | null = null,
 ): Promise<Question> => {
   const next = assertEnum(toStatus, QUESTION_STATUSES, 'status')
 
   
-return withGreenhousePostgresTransaction(async (client) => {
+const run = async (client: PoolClient): Promise<Question> => {
     const current = await runQuery<{ status: string }>(
       client,
-      `SELECT status FROM greenhouse_hiring.hiring_question WHERE question_id = $1 LIMIT 1`,
+      `SELECT status FROM greenhouse_hiring.hiring_question WHERE question_id = $1 LIMIT 1 FOR UPDATE`,
       [questionId],
     )
 
@@ -350,7 +359,9 @@ return withGreenhousePostgresTransaction(async (client) => {
 
     
 return normalizeQuestion(rows[0])
-  })
+  }
+
+  return externalClient ? run(externalClient) : withGreenhousePostgresTransaction(run)
 }
 
 // ══════════════════════════════════════════════════════════════════════════

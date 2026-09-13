@@ -1,6 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type * as QuestionnaireModule from './questionnaire'
+
 vi.mock('server-only', () => ({}))
+
+// This suite isolates assignment/credential behavior. Real capture and DB immutability
+// are exercised in questionnaire.test.ts and questionnaire.live.test.ts.
+vi.mock('./questionnaire', async importOriginal => {
+  const actual = await importOriginal<typeof QuestionnaireModule>()
+
+  return { ...actual, captureQuestionnaire: vi.fn(async () => actual.buildQuestionnaireSnapshot([{
+    module_id: 'module-fixture', competency_id: 'competency-fixture', question_id: 'question-fixture',
+    level: 'avanzado', type: 'open_text', prompt: 'Fixture', options_json: [], rubric_json: {}, answer_key_json: {},
+  }])) }
+})
 
 const queries: { text: string; values: unknown[] }[] = []
 
@@ -79,15 +92,13 @@ describe('TASK-1719 Slice 2 — el predicado de instancia abierta cubre los 4 es
     expect([...OPEN_ASSESSMENT_INSTANCE_STATUSES]).toEqual(['assigned', 'sent', 'in_progress', 'submitted'])
   })
 
-  it('el INSERT usa ON CONFLICT sobre el índice parcial, no un SELECT previo', async () => {
+  it('replays a submitted instance without replacing its original questionnaire', async () => {
     handlers = submittedConflictHandlers()
+    const result = await insertCandidateTest(fakeClient as never, { applicationId: 'happ-1', templateId: 'atpl-1' }, null)
 
-    await insertCandidateTest(fakeClient as never, { applicationId: 'happ-1', templateId: 'atpl-1' }, null)
-
-    const insert = queries.find(q => /INSERT INTO greenhouse_hiring\.hiring_assessment\s/.test(q.text))
-
-    expect(insert?.text).toMatch(/ON CONFLICT \(application_id, template_id\) WHERE status IN \('assigned', 'sent', 'in_progress', 'submitted'\)/)
-    expect(insert?.text).toMatch(/DO NOTHING/)
+    expect(result.created).toBe(false)
+    expect(result.assessment.assessmentId).toBe('asmt-submitted')
+    expect(result.token).toBeNull()
   })
 })
 

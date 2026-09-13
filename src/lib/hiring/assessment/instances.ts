@@ -4,6 +4,8 @@ import { createHash, randomBytes, randomUUID } from 'node:crypto'
 
 import type { PoolClient } from 'pg'
 
+import { captureQuestionnaire } from './questionnaire'
+
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -264,6 +266,7 @@ export const resolveAssessmentByToken = async (rawToken: string): Promise<Assess
 // ── Writers ──
 
 interface AssignCandidateTestInput {
+  expectedTemplateContentDigest?: string | null
   applicationId: string
   templateId: string
   timeLimitMinutes?: number | null
@@ -325,16 +328,23 @@ export const insertCandidateTest = async (
 ): Promise<InsertCandidateTestResult> => {
   const applicationId = str(input.applicationId)
   const templateId = str(input.templateId)
+  // Replays retain their original snapshot even if the bank has since been retired.
+  // The unique INSERT below still arbitrates concurrent first assignments.
+  const existing = await findOpenCandidateTest(client, applicationId, templateId)
+
+  if (existing) return { assessment: existing, created: false, token: null }
+
   const rawToken = randomBytes(24).toString('base64url')
   const accessTokenVersionId = randomUUID()
+  const snapshot = await captureQuestionnaire(client, templateId, input.expectedTemplateContentDigest)
 
   const rows = await runQuery<AssessmentRow>(
     client,
     `INSERT INTO greenhouse_hiring.hiring_assessment
        (application_id, template_id, method, status, access_token_hash, access_token_version_id,
-        time_limit_minutes, accommodations_json, created_by, token_expires_at)
+        time_limit_minutes, accommodations_json, created_by, token_expires_at, questionnaire_snapshot_json)
      VALUES ($1, $2, 'candidate_test', 'assigned', $3, $4::uuid, $5, $6::jsonb, $7,
-             NOW() + make_interval(days => ${TOKEN_TTL_DAYS}))
+             NOW() + make_interval(days => ${TOKEN_TTL_DAYS}), $8::jsonb)
      ON CONFLICT (application_id, template_id) WHERE ${OPEN_INSTANCE_SQL_PREDICATE}
      DO NOTHING
      RETURNING ${ASSESSMENT_COLS}`,
@@ -346,6 +356,7 @@ export const insertCandidateTest = async (
       input.timeLimitMinutes ?? null,
       JSON.stringify(input.accommodations ?? {}),
       actorUserId,
+      JSON.stringify(snapshot),
     ],
   )
 
@@ -542,9 +553,9 @@ export const saveResponseWithClient = async (
 
   if (started.outcome === 'expired') return started
 
-    const open = await runQuery<{ status: string; answer_deadline: unknown; close_deadline: unknown; database_now: unknown }>(
+    const open = await runQuery<{ status: string; has_questionnaire: boolean; answer_deadline: unknown; close_deadline: unknown; database_now: unknown }>(
       client,
-      `SELECT status,
+      `SELECT status, questionnaire_snapshot_json IS NOT NULL AS has_questionnaire,
               greenhouse_hiring.assessment_candidate_test_deadline(
                 started_at, time_limit_minutes, accommodations_json) AS answer_deadline,
               greenhouse_hiring.assessment_candidate_test_close_deadline(
@@ -555,6 +566,10 @@ export const saveResponseWithClient = async (
     )
 
     if (!open[0]) throw new HiringNotFoundError('La evaluación no existe.', 'assessment_not_found')
+
+    if (open[0].has_questionnaire && !questionId) {
+      throw new HiringValidationError('La respuesta debe corresponder al cuestionario asignado.', 'assessment_question_not_found', 409)
+    }
 
     if (!['assigned', 'sent', 'in_progress'].includes(open[0].status)) {
       throw new HiringValidationError('La evaluación ya no acepta respuestas.', 'assessment_not_open', 409, {
@@ -585,8 +600,9 @@ return { outcome: 'expired' }
     if (questionId) {
       const q = await runQuery<{ type: string }>(
         client,
-        `SELECT type FROM greenhouse_hiring.hiring_question WHERE question_id = $1 LIMIT 1`,
-        [questionId],
+        `SELECT type FROM greenhouse_hiring.hiring_assessment_question q
+         WHERE q.assessment_id = $2 AND q.question_id = $1 AND q.competency_id = $3 LIMIT 1`,
+        [questionId, assessmentId, competencyId],
       )
 
       if (!q[0]) throw new HiringNotFoundError('La pregunta no existe.', 'assessment_question_not_found')

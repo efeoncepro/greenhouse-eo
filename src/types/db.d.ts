@@ -8624,6 +8624,7 @@ export interface GreenhouseHiringHiringAssessment {
   first_access_exchanged_at: Timestamp | null;
   method: Generated<string>;
   public_id: Generated<string>;
+  questionnaire_snapshot_json: Json | null;
   started_at: Timestamp | null;
   /**
    * TASK-1719: `cancelled` es TERMINAL y sólo alcanzable desde `assigned`/`sent` (el candidato aún no empezó). Queda FUERA del predicado de instancia abierta a propósito: liberar el slot (application, template) ES el mecanismo de recuperación — se re-asigna sin borrar la fila cancelada. NUNCA agregar `cancelled` a hiring_assessment_open_instance_unique_idx.
@@ -8819,6 +8820,21 @@ export interface GreenhouseHiringHiringAssessmentPublicSession {
   session_token_hash: string;
   status: Generated<string>;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringAssessmentQuestion {
+  answer_key_json: Json | null;
+  assessment_id: string | null;
+  competency_id: string | null;
+  competency_key: string | null;
+  competency_name: string | null;
+  level: string | null;
+  options_json: Json | null;
+  prompt: string | null;
+  question_id: string | null;
+  rubric_json: Json | null;
+  type: string | null;
+  weight: Numeric | null;
 }
 
 export interface GreenhouseHiringHiringAssessmentResponse {
@@ -9137,6 +9153,16 @@ export interface GreenhouseHiringHiringQuestion {
   status_changed_by: string | null;
   type: string;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringQuestionRevision {
+  actor_user_id: string;
+  created_at: Generated<Timestamp>;
+  reason: string;
+  revision_question_id: string;
+  source_digest: string;
+  source_question_id: string;
+  target_digest: string;
 }
 
 export interface GreenhouseHiringTalentDemand {
@@ -13680,6 +13706,7 @@ export interface DB {
   "greenhouse_hiring.hiring_assessment_assignment_proposal": GreenhouseHiringHiringAssessmentAssignmentProposal;
   "greenhouse_hiring.hiring_assessment_public_request_bucket": GreenhouseHiringHiringAssessmentPublicRequestBucket;
   "greenhouse_hiring.hiring_assessment_public_session": GreenhouseHiringHiringAssessmentPublicSession;
+  "greenhouse_hiring.hiring_assessment_question": GreenhouseHiringHiringAssessmentQuestion;
   "greenhouse_hiring.hiring_assessment_response": GreenhouseHiringHiringAssessmentResponse;
   "greenhouse_hiring.hiring_assessment_template": GreenhouseHiringHiringAssessmentTemplate;
   "greenhouse_hiring.hiring_assessment_template_module": GreenhouseHiringHiringAssessmentTemplateModule;
@@ -13698,6 +13725,7 @@ export interface DB {
   "greenhouse_hiring.hiring_opening_closure_run": GreenhouseHiringHiringOpeningClosureRun;
   "greenhouse_hiring.hiring_opening_closure_run_item": GreenhouseHiringHiringOpeningClosureRunItem;
   "greenhouse_hiring.hiring_question": GreenhouseHiringHiringQuestion;
+  "greenhouse_hiring.hiring_question_revision": GreenhouseHiringHiringQuestionRevision;
   "greenhouse_hiring.talent_demand": GreenhouseHiringTalentDemand;
   "greenhouse_hiring.talent_pool_access_audit": GreenhouseHiringTalentPoolAccessAudit;
   "greenhouse_hiring.talent_pool_activity": GreenhouseHiringTalentPoolActivity;

@@ -1,0 +1,78 @@
+{
+  "mode": "applied",
+  "actor": "codex:TASK-1604:seo-editorial-revision",
+  "questions": [
+    {
+      "key": "seo-technical-diagnosis",
+      "sourceQuestionId": "qst-13c5b215-d906-4a31-9224-daa91ea9c5b2",
+      "questionId": "qst-147dc81b-c4ea-4722-8911-b2716db19060",
+      "status": "sme_review",
+      "requiresRevision": true,
+      "targetDigest": "61508c1e48e3decff43b7a8bcb91a2a3b25c64219353f515d40413902474e65e"
+    },
+    {
+      "key": "seo-technical-prioritization",
+      "sourceQuestionId": "qst-a5b381ba-a29f-4430-9bf1-f0490f214c8a",
+      "questionId": "qst-a1d6f6e4-18af-4cf5-9027-4cc91f870cc2",
+      "status": "sme_review",
+      "requiresRevision": true,
+      "targetDigest": "1e2dcb7cd6930bc75038773236cb5cabc6406431f2471f5baa277488af98f7c5"
+    },
+    {
+      "key": "seo-aeo-content-architecture",
+      "sourceQuestionId": "qst-62ae20a9-f841-4b01-a465-1022e1f7ce66",
+      "questionId": "qst-df5553f2-712d-4cf5-8bf7-8685b559c8ec",
+      "status": "sme_review",
+      "requiresRevision": true,
+      "targetDigest": "e1ce9cd63fd41fc27d97ba467f12793f5a8bf750f2b9a97e677b4d6d76b8daa1"
+    },
+    {
+      "key": "seo-aeo-serp-critique",
+      "sourceQuestionId": "qst-19db30c8-99c0-4b3e-b0e9-e36d26691527",
+      "questionId": "qst-11466558-3cd1-4a20-bdfe-9c405208527a",
+      "status": "sme_review",
+      "requiresRevision": true,
+      "targetDigest": "389121d2124c4ebc5625ea1f43df95b08e21051d970b0acb5e734968428b5105"
+    },
+    {
+      "key": "seo-measurement-plan",
+      "sourceQuestionId": "qst-f72e3605-1326-463b-8dd4-e01ee9ca38c6",
+      "questionId": "qst-5b4a6088-4847-42c4-891e-03e89fe556f3",
+      "status": "sme_review",
+      "requiresRevision": true,
+      "targetDigest": "3bf4c3ec4b83381c41bb6322e8f82a395cd60d9f6073193aec90210bed5ebe4d"
+    },
+    {
+      "key": "seo-measurement-experiment",
+      "sourceQuestionId": "qst-b3f3f74d-74fb-46ff-abe5-e255d9f3b3f4",
+      "questionId": "qst-476eccae-4c29-40a9-aaef-d92523fd7c90",
+      "status": "sme_review",
+      "requiresRevision": true,
+      "targetDigest": "bc3a6732a884c17b76056087a64a5fc5e33c5c35918aefe9a6c307c8ebcae433"
+    },
+    {
+      "key": "seo-research-synthesis",
+      "sourceQuestionId": "qst-7766a393-4175-4626-a002-35431f1dfc04",
+      "questionId": "qst-7766a393-4175-4626-a002-35431f1dfc04",
+      "status": "sme_review",
+      "requiresRevision": false,
+      "targetDigest": "07f9c310e20c37f3d4fdf885e09f840d360b17ea1c56c4bc6e61dfd28f594b27"
+    },
+    {
+      "key": "seo-executive-communication",
+      "sourceQuestionId": "qst-ff526911-30f6-4146-8946-e1aaeddaa21d",
+      "questionId": "qst-3b1ba759-481c-4e64-b65e-5e8067facb2e",
+      "status": "sme_review",
+      "requiresRevision": true,
+      "targetDigest": "e3948db4ac7517498fb25569fad7f818f6916a69c53aa656d4674d5ae486e4ab"
+    },
+    {
+      "key": "seo-incident-ownership",
+      "sourceQuestionId": "qst-3d56b852-88a9-46d4-83c4-73e818273494",
+      "questionId": "qst-4ac23c1f-0c5d-4528-a963-325a6840b8be",
+      "status": "sme_review",
+      "requiresRevision": true,
+      "targetDigest": "20f47aa94e5f880a6cb7fe37ef82bc502a6ccb0de3ed7fea02876365c972f640"
+    }
+  ]
+}

@@ -111,7 +111,7 @@ describe('TASK-1746 assessment deadline primitives', () => {
         }] }
       }
 
-      if (sql.includes('FROM greenhouse_hiring.hiring_question')) return { rows: [{ type: 'open_text' }] }
+      if (sql.includes('FROM greenhouse_hiring.hiring_assessment_question')) return { rows: [{ type: 'open_text' }] }
 
       if (sql.includes('hiring_assessment_response')) {
         return { rows: [{ response_id: 'resp-1', assessment_id: 'asmt-1', question_id: 'q-1' }] }
@@ -142,7 +142,7 @@ describe('TASK-1746 assessment deadline primitives', () => {
         }] }
       }
 
-      if (sql.includes('FROM greenhouse_hiring.hiring_question')) return { rows: [{ type: 'single_choice' }] }
+      if (sql.includes('FROM greenhouse_hiring.hiring_assessment_question')) return { rows: [{ type: 'single_choice' }] }
 
       if (sql.includes('INSERT INTO greenhouse_hiring.hiring_assessment_response')) {
         return { rows: [{

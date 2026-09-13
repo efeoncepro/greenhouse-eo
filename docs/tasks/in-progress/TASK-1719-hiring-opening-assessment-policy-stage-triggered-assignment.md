@@ -198,7 +198,7 @@ vacante pública de que el proceso incluye evaluación.
 - Motion: `none`
 - Backend impact: `command|sync`
 - Epic: `EPIC-011`
-- Status real: `EN PRODUCCIÓN desde 2026-08-18, no «Diseño» (línea corregida 2026-08-26 tras verificación contra runtime). Slices 0-5 implementados y desplegados; HIRING_STAGE_TEST_ASSIGNMENT_ENABLED=true en el ops-worker (declarado en deploy.sh, re-verificado en la revisión activa ops-worker-00594-2tp); backlog drenado 17-ago y policy del canary EO-OPN-0009 en on_stage_entry+enabled. Falta SÓLO escribir la evidencia del monitor de 7 días: la ventana ya transcurrió. TASK-1603 es ajena y ya declarada no-bloqueante`
+- Status real: `Delta D4 2026-09-13: implementado localmente, migración aplicada y pruebas live passed; release y smoke desplegado pendientes. El estado siguiente corresponde a slices previos. EN PRODUCCIÓN desde 2026-08-18, no «Diseño» (línea corregida 2026-08-26 tras verificación contra runtime). Slices 0-5 implementados y desplegados; HIRING_STAGE_TEST_ASSIGNMENT_ENABLED=true en el ops-worker (declarado en deploy.sh, re-verificado en la revisión activa ops-worker-00594-2tp); backlog drenado 17-ago y policy del canary EO-OPN-0009 en on_stage_entry+enabled. Falta SÓLO escribir la evidencia del monitor de 7 días: la ventana ya transcurrió. TASK-1603 es ajena y ya declarada no-bloqueante`
 - Rank: `TBD`
 - Domain: `hr|data|ops`
 - Blocked by: `none`
@@ -806,3 +806,15 @@ Detalle y razonamiento completos en el ADR (`Delta 2026-08-17 (2)`); acá el reg
 
 - Ninguna bloquea registrar. Slice 0 fija TTL de proposal, límites de time limit, nomenclatura SQL exacta,
   correction-email vs operator follow-up y SLA de reconciliation.
+
+## Delta 2026-09-13 — D4 para cierre SEO manual
+
+Goal confirmado: snapshot inmutable por instancia para EO-OPN-0674 y futuras asignaciones del primitive
+canónico; compatibilidad explícita para instancias previas. Sin activar automatización ni enviar a
+postulantes reales. Secuencial, develop compartido. Plan:
+`docs/audits/hiring/2026-09-13-seo-assignment-readiness.md`.
+
+- [x] Captura atómica de preguntas, competencias, pesos, orden, claves y rúbricas; DB impide su modificación (questionnaire.live.test.ts, 13/09).
+- [x] Lectura pública y corrección humana/objetiva/IA consumen la misma versión en código local; fallback sólo legado (594 focales, dos live passed; sin afirmar deploy).
+- [x] Tests prueban cambio/retiro del banco, no leakage, rechazo de pregunta ajena y replay sin duplicación (questionnaire.live.test.ts y contract).
+- [ ] Migración, consumidores desplegados y recorrido sintético verificados.
