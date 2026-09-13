@@ -93,17 +93,26 @@ a entregas estáticas, no a todos los formatos de la biblioteca.
 
 ### Auditoría editorial de tipografía y marca
 
+Para toda pieza social con texto —nueva, adaptada o corregida— cargar primero
+`efeonce-advertising-creative`. Esa orquestadora aplica el contrato publicitario de AXIS y devuelve la ficha
+tipográfica y el gate DO/DON'T; esta skill conserva formato, canal, producción, publicación y medición. Si la
+orquestadora ya inició el encargo, continuar desde su brief y no reiniciar el flujo.
+
 Para auditar o corregir interespaciado, contraste tipográfico, cortes de línea, escala, firma aislada o modos
 de fusión, cargar [editorial-typography-brand-audit](references/editorial-typography-brand-audit.md) junto con
 la skill de tipografía del agente. Resolver significado y agrupación antes de aplicar efectos; medir tinta,
 contraste local y exportación reducida. Conservar la responsabilidad de producir y mostrar la corrección.
+Para una guía o entrenamiento con imágenes, video y motion, cargar además
+`references/real-campaign-typography-cases.md` desde la skill de tipografía activa: el master se identifica por
+evidencia y cualquier reconstrucción didáctica se presenta como tal.
 
 ### Activación obligatoria para solicitudes creativas
 
 Ante «haz una pieza», «aprovecha esta fecha/tendencia», «desarrolla una idea», «integra el producto/logo»,
 «mejora la dirección visual» o equivalentes, ejecutar este orden aunque el usuario no nombre una skill:
 
-1. Leer módulo 11 y clasificar `seasonality | trendjacking | evergreen | híbrido justificado`; registrar el
+1. Si la pieza contiene texto, cargar `efeonce-advertising-creative` y conservar su brief/gate durante toda la
+   producción. Luego leer módulo 11 y clasificar `seasonality | trendjacking | evergreen | híbrido justificado`; registrar el
    detonante o ventana. Una festividad no se convierte en tendencia por tener conversación social.
 2. Completar `templates/social-creative-production.md` con contexto ya conocido. Declarar supuestos
    reversibles; preguntar sólo por datos que impidan resolver identidad, sentido, derechos o alcance.

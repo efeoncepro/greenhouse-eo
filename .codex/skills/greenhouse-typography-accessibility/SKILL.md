@@ -1,6 +1,6 @@
 ---
 name: greenhouse-typography-accessibility
-description: Audit, design, and implement Greenhouse typography across Poppins/Geist, font weights & styles, MUI Typography variants, type scale, line-height/leading, line length (measure), letter-spacing/tracking, casing, numerals (tabular/lining/oldstyle/slashed-zero), optical sizing, variable-font axes, OpenType features, font pairing, fluid type, font-loading/CLS, multilingual/RTL/CJK, text contrast (WCAG 1.4.3/1.4.4/1.4.12 + APCA) and token governance. Use when UI text feels too bold/heavy/flat, when choosing between Typography variants, when changing typography tokens, when reviewing title/label/body/KPI hierarchy, or when aligning Figma/AXIS typography with the Greenhouse runtime. Codex mirror of the Claude `typography-design` skill (global craft + Greenhouse overlay) — keep them in sync.
+description: Audit, design, and implement Greenhouse and Efeonce campaign typography: Poppins/Geist UI roles plus Bricolage/Poppins/Guttery advertising roles, weights, styles, variable axes, line-height, tracking, measure, contrast and token governance. Use when UI or advertising text feels too bold/heavy/flat, when choosing variants or campaign recipes, reviewing text over image, posts/stories/reels/covers/brochures, or aligning Figma/AXIS with the rendered result. Codex mirror of the Claude typography craft plus Greenhouse overlay.
 ---
 
 # Greenhouse Typography Accessibility
@@ -61,6 +61,11 @@ Para tipografía mixta compacta, shaping determinístico y medición real de gap
 [campaign ink metrics and hierarchy](references/campaign-ink-metrics-and-hierarchy.md). Incluye el ejemplo
 medido de Fiestas Patrias; sus coordenadas y pesos pertenecen a la campaña, no a la escala de UI.
 
+Para enseñar desde archivos aprobados en lugar de mockups, cargar
+[real campaign typography cases](references/real-campaign-typography-cases.md). Esta referencia separa master,
+despiece didáctico, aprobación creativa, programación y publicación; también gobierna cuándo producir un caso
+original con ImageGen/Fal porque no existe una referencia publicable.
+
 ### Creative asset boundary — Bricolage Grotesque
 
 `Bricolage Grotesque` is available as an expressive display family for Efeonce campaign assets outside Greenhouse
@@ -72,6 +77,23 @@ This is a creative-asset exception, not a third active UI family. Keep Poppins +
 families and do not add Bricolage to the UI SoT, `next/font`, MUI variants, shared PDF/email adapters or Globe
 payloads without a separate approved decision. When a creative piece uses Bricolage, make it the single expressive
 display voice and keep companion text in the approved family.
+
+### Canon publicitario de AXIS — contrato portable, adapter local
+
+Para publicidad, social, portadas, brochure y motion, AXIS publica el contrato portable
+`efeonce.advertising-typography` y los valores `axisAdvertising` desde el repo
+`efeoncepro/axis-design-system`. Ese contrato gobierna roles, familias, pesos, tracking, leading, límites de
+palabras/líneas, safe areas, color y pisos de contraste. Su lifecycle es `trial`: sirve como canon de trabajo,
+pero no se promueve a `stable` hasta comparar al menos dos consumidores reales.
+
+La traducción al motor pertenece al consumidor. En Tailwind v4, mapear los valores con `@theme inline` y
+utilities locales; en MUI, con theme/variants locales. **Nunca** copiar los números para rediseñarlos, importar
+la referencia publicitaria en el CSS global de producto ni publicar utilities Tailwind desde AXIS. El Lab de
+AXIS contiene el adapter de referencia porque es una aplicación consumidora, no un paquete distribuible.
+
+Los archivos de Bricolage, Poppins y Guttery siguen siendo propiedad del consumidor/licencia: el contrato sólo
+declara los nombres y capacidades. Cargar el archivo real, usar `font-synthesis: none` y no simular cursiva,
+negrita o gesto con `skew`, `stroke` u otra deformación.
 
 ### The canonical scale (TASK-1038, approved 2026-06-06)
 | MUI | contract | family | px | weight | line-height | use |

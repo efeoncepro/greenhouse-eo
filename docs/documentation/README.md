@@ -16,6 +16,9 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Social y Creative Studio
 
+- [Reglas publicitarias para agentes](creative/reglas-publicitarias-para-agentes.md) — activación común de
+  Codex/Claude para posts, stories, reels, covers, banners, brochure y motion con contrato AXIS, tipografía real,
+  contraste, gate DO/DON'T y estados separados de publicación.
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar

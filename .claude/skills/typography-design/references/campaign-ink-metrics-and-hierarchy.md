@@ -11,6 +11,26 @@ Rama editorial fuera de la UI. Complementa
 Caso y evidencia: [Fiestas Patrias 2026](../../../../docs/operations/social/2026-09-13-fiestas-patrias-production-method.md).
 No cambia Poppins/Geist, variantes, tokens ni pesos autorizados de producto.
 
+## Canon AXIS para aplicaciones publicitarias
+
+El punto de partida compartido vive en `packages/tokens/src/tokens.ts` del repo AXIS como
+`axisAdvertising`, registrado por el contrato `efeonce.advertising-typography`. No es una escala de UI ni una
+hoja global: es una especificación portable que cada consumidor traduce a su motor sin cambiar sus valores.
+
+| Rol | Recetas AXIS | Intención |
+| --- | --- | --- |
+| Idea / Bricolage | `ideaImpact`, `ideaShort`, `ideaMedium`, `ideaLong`, `ideaLead`, `ideaFocus` | Variar masa y ritmo según longitud; evitar que todo sea ExtraBold |
+| Estructura / Poppins | `structureLabel`, `structureCopy`, `structureEmphasis` | Ordenar contexto y lectura; cursiva sólo como énfasis de hasta tres palabras |
+| Gesto / Guttery | `gesture` | Una intervención puntual de una línea; nunca cuerpo, legal o segundo titular |
+
+Las recetas también fijan safe areas por `feed`, `story` y `cover`, colores funcionales y pisos WCAG de
+`4.5:1` para texto normal, `3:1` para texto grande y `3:1` para elementos gráficos necesarios. Medir siempre
+contra el píxel real del fondo: sobre fotografía o video, el token de color por sí solo no prueba contraste.
+
+En Tailwind v4, el consumidor puede traducir el contrato con `@theme inline` y `@utility`; esa hoja debe ser
+local, opt-in y limitada a superficies publicitarias. No cargarla en el runtime global de Greenhouse ni
+distribuirla como CSS desde AXIS. Los binarios de fuente tampoco viajan en el contrato.
+
 ## Decidir por significado
 
 Asignar a cada tramo una función antes de elegir tamaño: entrada, afirmación dominante, remate, saludo,
@@ -34,6 +54,31 @@ La palabra “rediseño” domina porque contiene el mecanismo, no porque sea la
 Si el usuario dice “interespaciado excesivo”, revisar estas cinco dimensiones y mostrar el resultado,
 no corregir sólo `line-height`. No comprimir con escala horizontal arbitraria ni convertir la compacidad
 en colisión de acentos/descendentes. Una misma interlínea nominal no resuelve familias y tamaños mixtos.
+
+### Rangos de partida para campaña
+
+Estos rangos ayudan a iniciar una prueba; no son tokens de producto ni límites automáticos:
+
+| Uso | Tracking inicial | Leading inicial | Validación |
+| --- | ---: | ---: | --- |
+| Bricolage `28–47 px` | `0` a `-0.020em` | `1.00–1.12` | Titular medio, tildes y signos despejados |
+| Bricolage `48–79 px` | `-0.010em` a `-0.030em` | `0.92–1.02` | Palabra completa a tamaño final |
+| Bricolage `80 px` o más | `-0.020em` a `-0.040em` | `0.88–0.98` | Gap de tinta positivo entre líneas |
+| Poppins de apoyo o cuerpo | `0` a `-0.010em` | `1.45–1.65` | Zoom `200 %`, ancho de lectura y reflow |
+| Poppins en overline breve | `+0.060em` a `+0.100em` | `1.20–1.40` | Mayúsculas cortas, nunca párrafos |
+| Guttery puntual | Espaciado nativo | Una sola línea | Ligaduras, acentos y revisión óptica |
+
+La prueba visual debe incluir al menos tres estados con la misma familia, peso, tamaño y copy:
+
+- **DON’T cerrado:** tracking próximo a `-0.070em` o leading próximo a `0.76`; evidencia letras pegadas,
+  contraformas cerradas o colisión de tinta.
+- **DO equilibrado:** punto inicial cercano a `-0.020em`/`0.92` en Bricolage display, ajustado al copy y al
+  gap de tinta real.
+- **DON’T abierto:** tracking próximo a `+0.050em` o leading próximo a `1.18`; evidencia pérdida de unidad
+  verbal, no “más aire” por sí mismo.
+
+Si el texto no cabe, cambiar corte, tamaño o medida. Nunca usar tracking para forzarlo dentro de una caja.
+Revisar ñ, tildes, signos de apertura, pares problemáticos, miniatura y móvil antes de aprobar.
 
 ## Procedimiento determinístico con fontkit
 

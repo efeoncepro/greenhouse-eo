@@ -427,6 +427,21 @@ fija: la propagación es *pull*, nunca *push*.
 - **SIEMPRE** que se agregue un rol o un pattern, declarar de qué valor deriva o clasificarlo como propio del
   producto. El gate de descubrimiento rompe si no.
 
+## Delta 2026-09-13 — tipografía publicitaria portable
+
+Se incorpora a AXIS, con lifecycle `trial`, el contrato `efeonce.advertising-typography` y su fuente de valores
+`axisAdvertising`. El alcance cubre publicidad, social media, portadas, brochure y motion: roles tipográficos,
+recetas de peso/tracking/leading, límites de longitud, safe areas, color y mínimos de contraste.
+
+La decisión aplica sin cambiar la frontera de este ADR:
+
+- AXIS publica los datos y el contrato; no publica una hoja Tailwind consumible.
+- El Lab de AXIS mantiene un adapter Tailwind v4 de referencia, local y opt-in, porque el Lab es un consumidor.
+- Cada runtime traduce el mismo contrato a su motor sin redefinir valores y sin cargarlo en su CSS global de UI.
+- Los binarios de Bricolage, Poppins y Guttery no forman parte del paquete; cada consumidor carga activos con
+  licencia y conserva `font-synthesis: none`.
+- La promoción a `stable` requiere un segundo consumidor real y comparación visual cross-runtime.
+
 ## Open questions
 
 - **Cuánto divergen hoy los dos adapters de `efeonce.status`.** Es medible el primer día del eje 3 y

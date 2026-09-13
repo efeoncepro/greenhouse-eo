@@ -19,6 +19,14 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // La orquestación publicitaria debe activar las mismas fuentes, gates y límites de publicación
+    // en Codex y Claude. Un drift aquí vuelve a producir dos criterios de marca.
+    id: 'efeonce-advertising-creative',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-advertising-creative',
+    claude: '.claude/skills/efeonce-advertising-creative',
+  },
+  {
     // Idea, producción y revisión social deben conservar el mismo contrato en ambos agentes.
     id: 'social-media-studio',
     mode: 'byte-identical',

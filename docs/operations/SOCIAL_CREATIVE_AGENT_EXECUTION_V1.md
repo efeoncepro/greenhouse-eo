@@ -13,6 +13,7 @@ No cargar todos los studios: componer únicamente las capacidades que exige el e
 
 | Necesidad | Fuente a cargar | Responsabilidad |
 |---|---|---|
+| Pieza social con texto, contraste tipográfico o Bricolage/Poppins/Guttery | [Advertising Creative](../../.codex/skills/efeonce-advertising-creative/SKILL.md) | aplicar contrato AXIS, brief, ficha tipográfica y gate DO/DON'T; Social conserva el canal |
 | Mecanismos, innovación, emoción, atención, memoria, heurísticas o sesgos | [Módulo 12](../../.codex/skills/social-media-studio/modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md) | convertir evidencia en hipótesis de diseño y ejecuciones; no prometer efectos neuronales/comerciales |
 | Clasificar, idear, dirigir y entregar una pieza social | [Social Media Studio](../../.codex/skills/social-media-studio/SKILL.md) y [módulo 11](../../.codex/skills/social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md) | Social conserva el seguimiento del entregable completo |
 | Detectar o comprobar conversación emergente | [Listening y trends](../../.codex/skills/social-media-studio/modules/05_SOCIAL_LISTENING_TRENDS.md) | verificar detonante, código, mercado y vigencia |

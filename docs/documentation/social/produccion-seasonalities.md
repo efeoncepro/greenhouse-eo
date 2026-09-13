@@ -66,3 +66,16 @@ registrada. No modifica autoridad MCP, derechos de terceros, modelos habilitados
 La compatibilidad y precio del proveedor se verifican antes de cada operación; las cifras históricas
 del caso no son promesas futuras. Los parámetros visuales son referencias del encuadre, no reglas
 universales de diseño.
+
+## Casos reales como material de aprendizaje
+
+Una campaña aprobada puede enseñar el método si el material publicado identifica su estado, conserva contexto y
+se audita. Aprobado no significa ejemplar: la guía debe separar aciertos, límites y correcciones propuestas.
+Fiestas Patrias 2026 es el caso activo: muestra portadas 4:5/9:16, un Reel final y un despiece temporal basado
+en los timings registrados. Las piezas reales y la reconstrucción explicativa son superficies distintas.
+
+La biblioteca enseña decisiones, no estilos para copiar: qué tramo abre, cuál sostiene, dónde se concentra el
+pesos, cuándo una familia se omite y cuándo dos pesos nominalmente distintos producen una masa casi igual.
+También mantiene separados producido, aprobado, normativamente sólido, programado, publicado y medido. La
+referencia operativa para agentes vive en
+[casos reales de tipografía](../../../.codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md).

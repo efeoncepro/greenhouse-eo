@@ -7,6 +7,29 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-13 — Publicidad tipográfica activable por Codex y Claude
+
+Se añade la skill espejo `efeonce-advertising-creative`, su brief/gate DO/DON'T y la activación por los routers
+humano y machine-readable. La orquestadora usa `axisAdvertising` y `efeonce.advertising-typography` como fuente,
+compone Typography/Social/Motion/Image/Copy/Brand según el soporte y exige prueba de peso, tracking, leading,
+contraste local, safe area, logo y estado. Documentación técnica, funcional y manual explican invocación automática
+y explícita. `mcp.efeonce.org` se evaluó y no se usó como atajo: su catálogo sólo admite manuales ligados a tools
+reales y no existe una tool creativa federada; no hubo cambio de manifiesto, gateway, runtime ni publicación.
+
+## 2026-09-13 — Casos tipográficos reales para diseñadores y agentes
+
+La guía pública de aplicaciones creativas de AXIS incorpora las portadas 4:5/9:16 y el Reel aprobado de
+Fiestas Patrias 2026 como caso auditado, no como patrón automático. Se documenta el límite 750/800 de las
+portadas, el mejor relevo temporal del Reel y una comparación 580/760 sobre el plate limpio: el ritmo vertical
+fragmentado se documenta como **DON’T** y el ajuste óptico como **DO**. Además se produjo
+con ImageGen un fondo editorial sin texto ni marca para cuatro composiciones normativas resueltas con overlays
+deterministas y motion accesible. El brochure compara además el logo negativo perdido sobre fotografía clara
+como **DON’T** con el wordmark positivo sobre blanco estable como **DO**. Typography y Social Media Studio comparten una referencia espejo que separa
+aprobación, calidad normativa, programación, publicación y performance. El Lab incorpora además un control de
+tracking/leading, seis pruebas visuales y rangos por tamaño; el supuesto DO de “rediseño” se corrigió porque
+`-0.060em`/`0.84` comprimía letras e interlínea en exceso. No se llamó a Fal: el Reel real ya cubre
+video y las animaciones didácticas se resuelven localmente.
+
 ## 2026-09-13 — Pódcast: fotohistoria, biblioteca Nexa y entrega documentada
 
 [Bitácora y evidencia](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md):
@@ -1012,55 +1035,3 @@ tablas y CTA accionables, render oficial del empaque, datos faltantes solo como 
 correcciones de catálogo y separación Notion → CMS → publicación → URL viva. Se conserva la precedencia
 vigente frente a reglas antiguas del Playbook (`Enlace`, `/search`, longitud). No se editaron artículos,
 assets ni Drupal y no se declara ninguna publicación.
-
-## 2026-09-04 — TASK-1830: autenticación de personas externas del emisor, sin contraseñas (viva desde el 05)
-
-**Delta 2026-09-05 — activada, y el correo del magic link estaba muerto.** El operador prendió ambos
-flags (revisión `auth-server-00007-cxb`) y la superficie quedó viva. El canary nuevo
-`pnpm auth-server:person-auth:canary` —que ejercita el contrato HTTP contra el host desplegado, no el
-SQL contra la base— encontró en su primera corrida que el enlace de acceso fallaba con
-`RESEND_API_KEY is not configured`: el `deploy.sh` declaraba el `*_SECRET_REF` sin montar el secreto,
-y `sendEmail` usa el cliente síncrono, que lee un secreto ya resuelto. Arreglado en `deploy.sh`,
-pendiente de redeploy.
-
-Nadie se habría enterado: la respuesta al pedir un enlace es 202 idéntica exista o no el correo, así
-que un correo muerto no se reporta solo (misma clase que `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`). De
-ahí la regla generalizable: **toda superficie cuya respuesta es deliberadamente indistinguible
-necesita una verificación externa de su efecto**, porque por diseño renunció a reportarlo.
-
-Verificado en vivo por primera vez (22 ok / 0 fallidos): consumo del enlace y su uso único, sesión
-sin filtrar el sujeto, passkey con `uv` abriendo en `step_up`, TOTP con secreto cifrado por KMS,
-anti-replay y muerte de la sesión al revocar el link. El canary comprueba además que la señal de
-sesión huérfana **se enciende** al revocar —un detector que sólo se ve en `ok` es una afirmación— y
-distingue tres estados: verde, rojo e **incompleto**, porque un canary con pasos omitidos no es
-verde. Pendiente: redeploy, organización elegible para el carril de tokens, passkey en dos
-navegadores y el límite de tasa del reto de passkey anónimo.
-
-Cuatro slices en `develop` detrás de `AUTH_SERVER_PERSON_AUTH_ENABLED=false`: sesión propia
-(`__Host-efeonce_auth`) que implementa el `SubjectSessionPort` que dejaba a `authorize` en
-`login_required` desde TASK-1829; magic link con patrón selector/verificador (15 min, un uso, consumo
-por POST tras página intermedia porque los escáneres de correo abren los GET); passkeys con
-credenciales descubribles —sin `allowCredentials`, que sería un oráculo de existencia— y contador
-anti-clonación; TOTP de step-up cifrado con la llave KMS **simétrica** `auth-server-totp-envelope`
-creada el mismo día (la de firma es EC y no cifra), con AAD `<environment>|<subject>` verificada
-contra la llave real; recuperación por re-invitación auditada, sin self-service de reset.
-
-8 tablas `greenhouse_auth` aplicadas y verificadas contra PG real, capability
-`identity.auth_person.revoke` con su ruta admin por Full API Parity y 3 señales `auth.person.*`.
-Desviaciones declaradas: ledger propio `person_auth_attempts` (el del portal tiene CHECK cerrados de
-NextAuth y GRANT a otro rol) y `sha256`+timing-safe en vez de bcrypt (un KDF lento no agrega nada
-sobre 256 bits y sí 300-800 ms de CPU en un endpoint no autenticado).
-
-Cuatro defectos los encontró el trabajo, no una revisión: la librería de WebAuthn lanzaba al
-retroceder el contador y dejaba **viva** la credencial clonada; `deactivateOrphanSourceLinks` no se
-llamaba al aceptar una re-invitación, así que el subject anterior seguía autenticando y la
-recuperación no recuperaba nada; `epochTolerance` de `otplib` va en `verify` y el `epoch` en
-segundos; y un código mal formado hacía responder 500 a un endpoint público de autenticación.
-
-Falta rollout: prender el flag en staging (exige `AUTH_SERVER_OAUTH_ENABLED=true` + environment
-`efeonce-auth` en `active`), verificar que el correo sale de verdad por Resend y probar passkey en
-dos navegadores.
-
-## 2026-09-04 — Release `9100bbd2765d` a producción: EPIC-044 (auth-server + OAuth code complete) y TASK-1631
-
-PR #221 squash `9100bbd27`, orquestador `33893120972` (un run, sin retry), manifest `released` 16:39:40Z. `auth-server` en producción (`/readyz` 200, JWKS 2 kid, superficie OAuth 404 con `AUTH_SERVER_OAUTH_ENABLED=false`), TASK-1631 lane ecosystem verificado en prod, 4/4 workers + auth-server Ready (dos change-gated con árbol idéntico). Post-release: `AUTH_SERVER_JWKS_URL` en Vercel Production+staging con redeploy; environment `efeonce-auth` registrado `draft` por command (`pnpm auth-server:register-issuer-environment`). El watchdog aprendió el change-gate del `auth-server` (espejo por servicio + test de paridad con los workflows). Ledger de tiempos y de flags actualizados. Barrido documental del release: control plane, playbook (anti-patterns #17/#18), runbooks y manuales del orquestador/watchdog/auth-server, ADR nativo, contrato OAuth, `CLOUD_RUN.md`, EPIC-044, rule `auth-server` y skills `efeonce-mcp-platform` (+espejo Codex), `greenhouse-production-release` y `greenhouse-backend`.

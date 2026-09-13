@@ -1,16 +1,19 @@
 # Handoff activo
 
-**Pódcast 13/09:** [fotohistoria v04 y evidencia](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md):
-seis PNG Instagram + PDF LinkedIn programados para 30/09, 19:00/11:00 Chile; ambos PENDING.
-Video suspendido, sin nuevas pruebas; publicación pendiente. Docs/skills espejo incluyen
-[Nexa](docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md) y [nueve SVG Manzanitas](docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md).
+**Creatividad publicitaria para agentes (13/09, local):** [skill espejo y contrato](docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md)
+activan AXIS/Typography/formato con brief y gate. Sin commit/release/publicación; MCP espera una tool creativa real.
+
+**Pódcast 13/09:** [fotohistoria v04 y evidencia](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md),
+recursos [Nexa](docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md) y [Manzanitas](docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md).
+Instagram/LinkedIn 30/09 PENDING; video suspendido y publicación pendiente.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
 TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con
 autorización:** el artículo publicado del caso (post `251432`) aún dice «no operativo».
 
-**Social 13/09:** [Fiestas Patrias/Muertos](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md) programadas; publicación pendiente.
-[Referente Metricool](docs/audits/social/2026-09-13-seasonality-reference-opportunities.md): 407 eventos revisados, oportunidades propuestas, separado del calendario editorial. Docs/skills espejo actualizados; sin nuevas programaciones.
+**Social 13/09:** [Fiestas Patrias/Muertos](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md)
+programadas, publicación pendiente. [Casos tipográficos](.codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md)
+y Lab AXIS locales; sin commit ni deploy.
 
 **Hiring: incidente P1 resuelto y en producción (2026-09-12; `ISSUE-171`/`172` resolved, `ISSUE-173` open; release
 `586a8627568a`):** el tablero no re-leía el snapshot al cambiar de vacante (`ISSUE-171`) y `lpad` recortaba el

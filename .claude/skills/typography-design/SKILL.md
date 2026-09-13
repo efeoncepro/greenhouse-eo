@@ -1,6 +1,6 @@
 ---
 name: typography-design-greenhouse-overlay
-description: Greenhouse-specific pinned typography decisions that OVERRIDE the global typography-design skill defaults. Load this first whenever typography-design is invoked inside the greenhouse-eo repo. Pins the real families (Poppins display + Geist text), the actual loaded weights/styles, the SoT (typography-tokens.ts), the variant bridge, the drift-guard, the lint rules, charts/PDF/email adapters, and the hard "NUNCA" rules.
+description: Greenhouse-specific typography overlay for product UI and Efeonce advertising. Load it whenever typography-design is invoked in this repo, including posts, stories, reels, covers, brochures or text over image. Pins Poppins/Geist UI roles and routes Bricolage/Poppins/Guttery campaign work to the AXIS advertising contract, real font files, contrast and spacing evidence.
 type: overlay
 overrides: typography-design
 ---
@@ -36,6 +36,11 @@ Para tipografía mixta compacta, shaping determinístico y medición real de gap
 [campaign ink metrics and hierarchy](references/campaign-ink-metrics-and-hierarchy.md). Incluye el ejemplo
 medido de Fiestas Patrias; sus coordenadas y pesos pertenecen a la campaña, no a la escala de UI.
 
+Para enseñar desde archivos aprobados en lugar de mockups, cargar
+[real campaign typography cases](references/real-campaign-typography-cases.md). Esta referencia separa master,
+despiece didáctico, aprobación creativa, programación y publicación; también gobierna cuándo producir un caso
+original con ImageGen/Fal porque no existe una referencia publicable.
+
 ### Creative asset boundary — Bricolage Grotesque
 
 `Bricolage Grotesque` is available as an expressive display family for Efeonce campaign assets outside Greenhouse
@@ -47,6 +52,23 @@ This is a creative-asset exception, not a third active UI family. Keep Poppins +
 families and do not add Bricolage to the UI SoT, `next/font`, MUI variants, shared PDF/email adapters or Globe
 payloads without a separate approved decision. When a creative piece uses Bricolage, make it the single expressive
 display voice and keep companion text in the approved family.
+
+### Canon publicitario de AXIS — contrato portable, adapter local
+
+Para publicidad, social, portadas, brochure y motion, AXIS publica el contrato portable
+`efeonce.advertising-typography` y los valores `axisAdvertising` desde el repo
+`efeoncepro/axis-design-system`. Ese contrato gobierna roles, familias, pesos, tracking, leading, límites de
+palabras/líneas, safe areas, color y pisos de contraste. Su lifecycle es `trial`: sirve como canon de trabajo,
+pero no se promueve a `stable` hasta comparar al menos dos consumidores reales.
+
+La traducción al motor pertenece al consumidor. En Tailwind v4, mapear los valores con `@theme inline` y
+utilities locales; en MUI, con theme/variants locales. **Nunca** copiar los números para rediseñarlos, importar
+la referencia publicitaria en el CSS global de producto ni publicar utilities Tailwind desde AXIS. El Lab de
+AXIS contiene el adapter de referencia porque es una aplicación consumidora, no un paquete distribuible.
+
+Los archivos de Bricolage, Poppins y Guttery siguen siendo propiedad del consumidor/licencia: el contrato sólo
+declara los nombres y capacidades. Cargar el archivo real, usar `font-synthesis: none` y no simular cursiva,
+negrita o gesto con `skew`, `stroke` u otra deformación.
 
 ## Canonical sources of truth (READ in this order)
 

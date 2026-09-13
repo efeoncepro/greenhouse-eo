@@ -108,3 +108,19 @@ Entregar enlaces al planner, hora con zona, carpeta y estado real. La publicaci�
 readback posterior a la fecha; no se crea un monitor recurrente por inferencia. Si el encargo incluye
 actualizar Notion, leer y escribir el par task/calendario correcto; la fecha de producción no sustituye
 la fecha de publicación y el scheduler no modifica Notion automáticamente.
+
+## 9. Incorporar un caso real a una guía de diseño
+
+1. Verifica master, versión, aprobación y alcance contra el caso canónico y los binarios finales.
+2. Selecciona únicamente archivos aprobados; no copies descartes, prompts, rutas privadas ni piezas de cliente.
+3. Audita el archivo contra la regla vigente. Registra qué funciona, qué es discutible y qué corregirías; no uses
+   “aprobado” como sinónimo de “ejemplar”.
+4. Explica la función de cada familia/peso y qué se omitió. No publiques sólo una galería sin criterio.
+5. Distingue la pieza real de cualquier despiece, reconstrucción normativa o animación explicativa.
+6. Agrega texto alternativo, transcripción visual, controles de video y equivalencia para movimiento reducido.
+7. Declara con precisión el estado: aprobado, normativamente sólido, programado, publicado o medido.
+8. Si no existe un caso publicable, produce uno propio para la guía y registra proveedor, inputs, intervención
+   humana, revisión y release state. No lo presentes como campaña publicada.
+
+Usa la [biblioteca de casos reales](../../../.codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md)
+para resolver el caso activo y sus límites antes de tocar el HTML o distribuir media.

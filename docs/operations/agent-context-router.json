@@ -4,6 +4,38 @@
   "fallbackSnapshot": "docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md",
   "domains": [
     {
+      "id": "advertising-creative-production",
+      "triggers": [
+        "pieza publicitaria",
+        "publicidad con texto",
+        "post 4:5",
+        "story 9:16",
+        "reel",
+        "cover 16:9",
+        "key visual",
+        "banner",
+        "portada de brochure",
+        "OOH",
+        "texto sobre imagen",
+        "Bricolage",
+        "Poppins",
+        "Guttery",
+        "contraste tipográfico",
+        "peso tipográfico",
+        "tracking",
+        "leading"
+      ],
+      "skills": [
+        "efeonce-advertising-creative"
+      ],
+      "sources": [
+        "docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md",
+        "docs/architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md",
+        ".codex/skills/greenhouse-typography-accessibility/references/campaign-ink-metrics-and-hierarchy.md",
+        ".codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md"
+      ]
+    },
+    {
       "id": "social-creative-production",
       "triggers": [
         "seasonality",
@@ -25,6 +57,7 @@
         "neurociencia y creatividad"
       ],
       "skills": [
+        "efeonce-advertising-creative",
         "social-media-studio",
         "design-studio",
         "copywriting",

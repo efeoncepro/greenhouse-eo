@@ -12,6 +12,9 @@ La diferencia con otras capas de documentacion:
 
 ### Social y Creative Studio
 
+- [Usar reglas publicitarias con Codex y Claude](creative/usar-reglas-publicitarias-con-agentes.md) — prompts,
+  entregables, ficha tipográfica y revisión para crear/corregir publicidad y social con texto sin confundir
+  producción, aprobación y publicación.
 - [Manual: producir un post visual de reporte](social/visual-report-social-production.md) — brief, dirección,
   crop, logo, QA y gates contra capturas ilegibles o composiciones genéricas.
 - [Manual: operar Creator Influence & Content](media-distribution/operar-creator-influence-content.md) — intake,

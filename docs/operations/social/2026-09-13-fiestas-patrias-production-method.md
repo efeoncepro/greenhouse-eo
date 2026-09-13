@@ -301,3 +301,25 @@ El checker de paquete puede incluir WIP ajeno; la decisión de alcance usa el di
 La revisión de escenarios cubrió: rechazo visual pese a decode verde; audio aprobado frente a LEEME
 viejo; 9:16 con relleno; portada confundida con cierre; cuenta personal frente a empresa; timeout de
 creación; rango horario parcial; PENDING confundido con publicado. Se resolvieron en sus fuentes.
+
+## 15. Reutilización como caso tipográfico público
+
+Por instrucción del operador, las portadas aprobadas 4:5/9:16, el Reel final v10 y un keyframe limpio se usan
+como caso real auditado en la guía de aplicaciones publicitarias de AXIS. La copia publicada en el Lab separa
+lo que funcionó, lo discutible y una reconstrucción normativa; no presenta la aprobación como prueba de buen
+uso ni expone prompts, jobs, saldos, rutas privadas o descartes.
+
+El caso público conserva estos límites:
+
+- aprobación creativa y autorización de programación no se presentan como publicación ni performance;
+- aprobación creativa tampoco se presenta como calidad tipográfica canónica: la cercanía entre Bricolage 750 y
+  800 en portada queda registrada como límite, mientras el relevo temporal del Reel se evalúa por separado;
+- el MP4 final se distingue del despiece animado didáctico;
+- la comparación 580/760 sobre el plate limpio se identifica como aprendizaje no publicado: la versión con
+  huecos verticales excesivos es **DON’T** y la versión con cajas de tinta unidas es **DO**;
+- tamaños, baselines y coordenadas se describen como datos del caso, no como presets;
+- Guttery se omite deliberadamente porque no agrega una función narrativa;
+- las imágenes incluyen alternativa textual, el video no usa autoplay y motion respeta reducción de movimiento;
+- otros binarios de OneDrive permanecen fuera de AXIS salvo una nueva selección explícita y revisión de derechos.
+
+Referencia para agentes: [casos reales de tipografía](../../../.codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md).

@@ -1,6 +1,6 @@
 ---
 name: axis-design-system
-description: "Use for any task involving the Efeonce AXIS design-system packages: tokens, contracts, registry, versioning, adapters, private-package consumption, canaries, release gates, rollback, or distribution credentials."
+description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including the portable advertising typography contract used by posts, stories, reels, covers, brochures, banners and motion."
 ---
 
 # AXIS Design System
@@ -63,6 +63,15 @@ packages and ADRs.
 When token values change, run `pnpm design:generate` in the AXIS repository and verify
 `pnpm design:check`. Do not edit generated frontmatter by hand. Do not treat the AXIS guide as a replacement
 for Greenhouse's root `DESIGN.md`, which remains the product-specific MUI/Vuexy contract.
+
+### Advertising typography
+
+AXIS owns `axisAdvertising` and `efeonce.advertising-typography`; the consumer owns only the translation to
+Tailwind, CSS, canvas or motion. For an advertising/social piece, compose this skill with
+`efeonce-advertising-creative` and the active typography skill. Read the sibling guide at
+`../axis-design-system/docs/creative-applications/advertising-social/DESIGN.md` instead of copying recipes into
+Greenhouse. The contract remains `trial`: do not claim stable or make its Lab adapter global before a second
+consumer and cross-runtime evidence exist.
 
 ### AXIS Lab
 
