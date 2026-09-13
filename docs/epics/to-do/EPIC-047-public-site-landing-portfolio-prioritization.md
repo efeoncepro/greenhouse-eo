@@ -193,3 +193,6 @@ Por decisión del operador, TASK-1403 deja de ser una página informativa sobre 
 landing del **servicio de agentes** en HubSpot: diseño, construcción, despliegue y operación gestionada. El operador
 confirmó además que el Customer Agent de ANAM está activo y en producción. Sus contratos UI quedaron marcados como
 superados y se rehacen dentro de la task; su posición en el ranking no cambia.
+
+El alcance de esa landing es sólo agentes de HubSpot. Una landing de agentes en otras plataformas (Agentforce y
+demás) queda anotada como futura, sin task ni `Rank` hasta que el operador la priorice.

@@ -361,7 +361,8 @@ funcionan. El operador la reenfocó el 2026-09-13: la honestidad es la prueba, e
 
 ## Out of Scope
 
-- Agentes fuera de HubSpot (Salesforce Agentforce u otras plataformas): otra landing, si se decide.
+- Agentes fuera de HubSpot (Salesforce Agentforce u otras plataformas): tendrán su propia landing más adelante,
+  por decisión del operador (2026-09-13).
 - Catálogo completo de agentes con detalle de producto.
 - Precios detallados de licencias y créditos (TASK-1401) y comparación con Salesforce (TASK-1404).
 - Actualizar el artículo publicado del caso ANAM (follow-up con autorización propia).
@@ -515,12 +516,15 @@ Playwright live 1440 + 390 con las assertions del plan · Rich Results Test · H
 - Segundo caso de agente para salir de n=1.
 - Validar economics de Managed Agentic Operations con pricing.
 - Variante `en-US`.
+- Landing de agentes en otras plataformas (Agentforce y demás), sin task todavía: se crea cuando el operador la
+  priorice y debe enlazar con esta sin duplicar el ciclo de servicio.
 
 ## Open Questions
 
 - ¿Cuál es la URL padre del hub? (bloquea el Slice 1)
-- ¿El alcance es sólo agentes sobre HubSpot o también agentes en otras plataformas? Inferencia actual: sólo
-  HubSpot, por la ubicación en el hub y la oferta V2; ajustar si el operador quiere una landing multiplataforma.
+- ~~¿El alcance es sólo agentes sobre HubSpot o también agentes en otras plataformas?~~ **Resuelta 2026-09-13
+  (operador):** esta página es sólo de agentes de HubSpot. Agentforce y otras plataformas tendrán su propia landing
+  más adelante.
 - ¿Desde cuándo está en producción el Customer Agent de ANAM y sobre qué ventana se mide la reducción de carga?
 - ¿ANAM autoriza nombrarlo con el estado «en producción» y la métrica en esta landing?
 - ¿Se publica Managed Agentic Operations con precio de referencia o sólo como modo de entrega bajo evaluación?
