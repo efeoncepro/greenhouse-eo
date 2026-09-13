@@ -192,3 +192,11 @@ de resultados comparables (por ejemplo, guardados o compartidos por alcance, si 
 No comparar reproducciones con impresiones como si fueran equivalentes ni declarar ganador por una
 publicación aislada. Si distribución, audiencia o exposición difieren, reportar esas limitaciones y tratar
 la lectura como exploratoria; para conclusiones causales se necesita un diseño de prueba adecuado.
+
+## Caso completo: Fiestas Patrias 2026
+
+La [bitácora de producción](../../../../docs/operations/social/2026-09-13-fiestas-patrias-production-method.md)
+conserva decisiones del operador, mesa/apetito, tipografía, timeline, cueca, adaptación nativa 9:16,
+portadas, entrega y programación verificada. Consultar el [manual operativo](../../../../docs/manual-de-uso/social/producir-y-programar-seasonalities.md)
+para repetir el flujo. Los parámetros son del caso, no una plantilla universal; el registro de Metricool
+no implica actualización de Notion ni publicación efectiva.

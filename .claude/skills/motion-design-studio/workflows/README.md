@@ -62,3 +62,9 @@ IA. Contrato del modelo Omni: `efeonce/GEMINI_OMNI_VERTEX.md`.
 [Metáfora visual → video con marca exacta](seasonality-visual-metaphor-to-video.md): ejecución técnica comprobada
 2026-09-12 con Seedance 2.5; candidato creativo pendiente, revisión temporal/audio incompleta. Incluye
 clasificación, previs, referencias, preflight, post exacta, sonido, QA y entrega; no es aprobación de campaña.
+
+## Mesa gastronómica y formatos nativos
+
+[Mesa gastronómica → video nativo por formato + post exacta](food-table-native-reel-and-exact-post.md):
+validado y aprobado 2026-09-13 en Fiestas Patrias. Separa plate/movimiento/overlays, preserva cueca,
+resuelve 9:16 con una nueva toma cuando corresponde y verifica masters/portadas con evidencia real.

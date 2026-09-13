@@ -1,9 +1,8 @@
 # Handoff activo
 
-**Creatividad social:** [protocolo](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md).
-«Hay abrazos que encendemos»: video v02 en OneDrive, candidato; escucha pendiente, sin publicación.
-[Workflow](.codex/skills/motion-design-studio/workflows/seasonality-visual-metaphor-to-video.md).
-Base `22e193bd2`; delta local 13/09: elección video/estático por mecanismo. Acortar el inicio sigue propuesto.
+**Creatividad social (2026-09-13):** Fiestas Patrias y Día de Muertos programados con video/portada/copy;
+publicación pendiente. Método, fechas, IDs y evidencias en [caso completo](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md).
+Skills Codex/Claude actualizadas.
 
 **Hiring: incidente P1 resuelto y en producción (2026-09-12; `ISSUE-171`/`172` resolved, `ISSUE-173` open; release
 `586a8627568a`):** el tablero no re-leía el snapshot al cambiar de vacante (`ISSUE-171`) y `lpad` recortaba el

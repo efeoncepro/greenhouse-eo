@@ -32,6 +32,10 @@ lienzo no son tokens MUI ni amplían la UI. Auditar significado del énfasis, ca
 tracking por tramo, leading mixto, marca agrupada y contraste del archivo final. Las reglas de variantes,
 fontSize inline y peso 500 de producto no deben aplicarse mecánicamente a esta excepción editorial.
 
+Para tipografía mixta compacta, shaping determinístico y medición real de gaps entre líneas, cargar
+[campaign ink metrics and hierarchy](references/campaign-ink-metrics-and-hierarchy.md). Incluye el ejemplo
+medido de Fiestas Patrias; sus coordenadas y pesos pertenecen a la campaña, no a la escala de UI.
+
 ### Creative asset boundary — Bricolage Grotesque
 
 `Bricolage Grotesque` is available as an expressive display family for Efeonce campaign assets outside Greenhouse

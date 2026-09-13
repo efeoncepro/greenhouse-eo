@@ -257,3 +257,11 @@ Para mecanismos, innovación y conexión emocional en creatividad social, cargar
 [social módulo 12](../social-media-studio/modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md).
 Separar hipótesis de diseño de evidencia psicológica/neural y de resultados de audiencia; revisar memoria
 para el mensaje y para la marca por separado. No presentar una heurística como garantía de persuasión.
+
+## Escenas culturales y comida premium
+
+Para comida, mesa y detalles de una celebración, cargar
+[art direction de comida cultural](references/premium-cultural-food-art-direction.md): autenticidad,
+referencias, anatomía, apetito, luz, profundidad, decisión foto/generación/3D y composición por ratio.
+El [caso Fiestas Patrias](../../../docs/operations/social/2026-09-13-fiestas-patrias-production-method.md)
+conserva la metodología completa con evidencia y programación.

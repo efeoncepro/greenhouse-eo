@@ -280,3 +280,7 @@ Para mecanismos, innovación y conexión emocional en creatividad social, cargar
 [social módulo 12](../social-media-studio/modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md).
 Separar hipótesis de diseño de evidencia psicológica/neural y de resultados de audiencia; revisar memoria
 para el mensaje y para la marca por separado. No presentar una heurística como garantía de persuasión.
+
+Para continuidad entre planos, saludo de cierre, emisor y caption por red, cargar
+[seasonal storytelling and caption](references/seasonal-storytelling-and-caption.md). Separar texto
+intra-pieza, portada y cuerpo de publicación; verificar el copy literal al programar.

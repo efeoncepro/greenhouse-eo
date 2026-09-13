@@ -83,3 +83,19 @@ Adjuntar estado de revisión, metadata técnica y hashes sin URLs firmadas ni se
 `Seasonalities/Día de Muertos/2026/Hay abrazos que encendemos/Video/Seedance 2.5 v01/`.
 La aprobación del estático no aprueba automáticamente el video. Ver
 [workflow audiovisual](../../motion-design-studio/workflows/seasonality-visual-metaphor-to-video.md).
+
+## Paquete aprobado para publicación
+
+Cuando se solicite guardar y programar, conservar las versiones de trabajo ya entregadas y consolidar
+los archivos vigentes en `Entrega para publicación/` dentro del concepto, si evita ambigüedad. Incluir
+un MP4 y portada por formato solicitado, PNG master, copy por red y `PROGRAMACION.md` con IDs,
+fecha/hora/zona y estado verificado. Un JPG necesario para transporte es un derivado adicional;
+no sustituye el PNG ni supone permiso para reemplazarlo. Si la versión ya constituye un paquete
+inequívoco, registrar programación allí sin duplicar por obligación.
+
+Validar también el archivo de portada: ratio y recorte, legibilidad, firma y correspondencia con el
+video aprobado. Conservar audio aprobado y distinguir fuente, master, entrega y transporte.
+Comparar hashes de destino antes de subir a Metricool. Guardar readback saneado, sin correos,
+credenciales ni URLs firmadas. Documentar guardado local y programación por separado; no afirmar
+sincronización remota ni publicación efectiva por una copia o un estado `PENDING`.
+Flujo: [video-delivery-metricool.md](../references/video-delivery-metricool.md).

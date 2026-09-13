@@ -182,3 +182,10 @@ Para animar una metáfora cultural o producir un video de seasonality, cargar
 `workflows/seasonality-visual-metaphor-to-video.md` junto con Social Media Studio. La clasificación
 editorial no cambia por usar video. Separar previs de fotogramas reales, render de aprobación,
 referencia generativa de titular/logo exactos y costo estimado de débito comprobado.
+
+## Comida, gesto gráfico y adaptación vertical real
+
+Para campañas gastronómicas estacionales, cargar
+`workflows/food-table-native-reel-and-exact-post.md`: plate limpio, toma generativa, texto/logo
+compuestos, cursor que no deforma el alimento, grade localizado, audio aprobado conservado,
+nueva toma 9:16 cuando el encuadre lo exige y QA del export/portada. Caso validado: Fiestas Patrias 2026.

@@ -114,6 +114,9 @@ Indice maestro de la documentacion no operativa del repo.
 - [Greenhouse Visual Capture](documentation/plataforma/captura-visual.md)
 - [Sistema de Observabilidad de Tests](documentation/plataforma/sistema-observabilidad-de-tests.md)
 - [Sister Platform Bindings](documentation/plataforma/sister-platform-bindings.md)
+- [Producción de seasonalities: dirección, formatos y programación](documentation/social/produccion-seasonalities.md)
+- [Manual: producir y programar seasonalities](manual-de-uso/social/producir-y-programar-seasonalities.md)
+- [Caso Fiestas Patrias 2026: metodología completa](operations/social/2026-09-13-fiestas-patrias-production-method.md)
 - [Producción visual social para reportes](documentation/social/visual-report-social-production.md)
 
 ### Manual de uso

@@ -1,6 +1,6 @@
 # Ejecución de creatividad social para Codex y Claude
 
-Estado: vigente para trabajo local autorizado. Owner: Social Media Studio. Actualizado: 2026-09-12.
+Estado: vigente para trabajo local autorizado. Owner: Social Media Studio. Actualizado: 2026-09-13.
 Alcance: solicitudes de seasonality, trendjacking, memes de marca, creatividad social y correcciones de
 identidad/product placement. Es un protocolo de entrada y cierre; las skills enlazadas contienen el oficio.
 No habilita publicación, presupuestos externos nuevos ni cambios de runtime.
@@ -87,6 +87,7 @@ referenciar el brief anterior y registrar sólo el delta y las revisiones que pu
 | Prueba producida | archivo accesible y abierto | que pasó revisión o aprobación |
 | Revisada por el agente | observaciones de las cinco revisiones aplicables, móvil/detalle/formato | aprobación del operador, exactitud vectorial generativa ni performance |
 | Aprobada por el operador | instrucción explícita vinculada a versión y alcance | publicación si sólo aprobó el arte |
+| Programada | readback del scheduler con ID, fecha/zona, provider, copy, media, portada y estado | publicación efectiva o resultados |
 | Publicada/enviada | readback del canal/destino y versión | resultados de audiencia |
 | Medida | datos con periodo, denominador, fuente y limitaciones | causalidad comercial no demostrada |
 
@@ -128,3 +129,14 @@ marca exacta, audio, revisión temporal y entrega. Un render es candidato, no ap
 Seedance 2.5 del 2026-09-12 conserva limitaciones y hashes en el workflow. Este aprendizaje artesanal
 no modifica compiler, autoridad MCP ni runtime del contrato multimodal. ADR de referencia:
 `GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md` (Proposed; no implica aprobación del proveedor).
+
+## De una mesa gastronómica a una campaña programada
+
+La [metodología Fiestas Patrias](social/2026-09-13-fiestas-patrias-production-method.md) conserva correcciones,
+valores efectivos, timeline, entregables y programación; el [manual](../manual-de-uso/social/producir-y-programar-seasonalities.md)
+y la [descripción funcional](../documentation/social/produccion-seasonalities.md) permiten operarla.
+Para ejecución cargar [Motion](../../.codex/skills/motion-design-studio/workflows/food-table-native-reel-and-exact-post.md),
+[tipografía](../../.codex/skills/greenhouse-typography-accessibility/references/campaign-ink-metrics-and-hierarchy.md)
+y [entrega/Metricool](../../.codex/skills/social-media-studio/references/video-delivery-metricool.md).
+Los valores del caso no son presets universales; la autorización ya otorgada persiste y PENDING sigue
+separado de publicado. Estos aprendizajes no amplían el contrato multimodal ni el presupuesto.

@@ -72,6 +72,14 @@ La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels,
    `efeonce/CLIENT_DELIVERY.md`: la pieza social no es la unidad de crédito; identifica las operaciones
    generativas y separa layout/copy/export/QA, capacidad y derechos.
 
+### Videos aprobados, portadas y programación
+
+Para entregar un video por red y programarlo con portada, cargar
+[video-delivery-metricool.md](references/video-delivery-metricool.md). Incluye adaptación nativa,
+PNG master y transporte, autorización existente, cuenta/zona, duplicados y readback de media,
+portada y estado. Una instrucción explícita de programar satisface la confirmación humana de §4;
+no pedirla otra vez para la misma acción autorizada.
+
 ### Entrega de imágenes al equipo de Marketing
 
 Para buscar, manipular, adaptar, organizar o entregar assets de Marketing Efeonce, cargar

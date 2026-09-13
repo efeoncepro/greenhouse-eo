@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-13 — Metodología completa de Fiestas Patrias y programación con portadas
+
+[Bitácora del caso](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md), manual y descripción
+funcional: dirección gastronómica/cultural, tipografía por tinta, storytelling, Seedance + post exacta,
+cueca preservada, adaptación nativa9:16, portadas, entrega y readback Metricool. Skills de Design,
+Typography, Copy, Brand, Motion, Audio y Social actualizadas en ambos agentes, conservando overlays propios.
+Fiestas Patrias18/09 (LinkedIn11:00, Instagram19:00) y Día de Muertos02/11 (11:00/18:00), horaChile:
+programadas con video/copy/portada; publicación efectiva pendiente. Aprobación posterior supera el estado
+histórico de candidato de las entradas previas. No cambia runtime ni habilita proveedores de Globe.
+
 ## 2026-09-13 — Release TASK-1604 / TASK-1719 D4
 
 - PR #235 promovida a `main` con SHA `cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9` mediante el
@@ -1060,19 +1070,3 @@ que redacta/publica, límites GSC/GA4/DataForSEO, validez de preguntas y probes 
 Se conserva la [auditoría de agosto](docs/audits/seo/BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md) como caso fechado.
 El método no implementa las correcciones del Grader ni del sitio; esas acciones siguen pendientes.
 Se añade `report-studio` para Claude/Codex, registrada en router y gate de espejos: fuentes primarias, siete módulos, plantillas, evaluación editorial y preflight PDF con pruebas negativas. Berel conserva 55 páginas A4 con marca/contacto completos, cobertura On-time, gráficos y acabado reproducible; revisión y evidencia en su carpeta de informe. Entrega local, sin envío.
-
-## 2026-09-04 — TASK-1631 (EPIC-044 U04): binding de identidad externa aplicado, commands, API y señales
-
-Migración aditiva aplicada en `greenhouse_core` (environments registry, bindings Account 360, grants provider-neutral con
-`profile_id` opcional, invitaciones con `token_hash`, audit y resolution log append-only, índice único parcial de subjects
-`external_idp:%`) más forward-fix del CHECK `linked_consistent`. Dominio `src/lib/identity/external-access/**`: seis
-commands idempotentes en una transacción (estado + audit + outbox, `grants_version` sube en cada cambio de autoridad) y el
-reader `resolveExternalAccess(environment, subject)` que deniega fail-closed y registra sólo denials. Seis capabilities
-`identity.external_*` (sólo `efeonce_admin`), rutas admin `/api/admin/identity/external-access/**`, lane ecosystem
-`GET /api/platform/ecosystem/identity/binding` para el gateway (TASK-1831) y cuatro señales `identity.external_binding.*`.
-Smoke live `pnpm identity:external-access:smoke` verificó bind → grant → invite → accept → resolve → revoke contra PG real.
-Estado: code complete, rollout pendiente (deploy + señales en `/admin/operations`).
-Barrido documental del mismo día: skills `efeonce-mcp-platform`/`seo-aeo-practice`/`talent`/`growth-cro` (+ espejos), regla
-`.claude/rules/identity-external-access.md`, AGENTS.md, docs de API (OpenAPI + referencia), 18 docs de arquitectura y 10
-manuales/docs funcionales: «fail-closed hasta TASK-1631» pasa a «hasta el emisor + gateway multi-issuer de EPIC-044; el grant
-ya existe». Backfill de paridad `capabilities_registry` (11 capabilities ajenas).

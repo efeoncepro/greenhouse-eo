@@ -96,6 +96,19 @@ YouTube `374447961` (caso: [`2026-09-11-iphone-duo-trendjack.md`](../../../../do
 
 Receta completa para vacantes: `linkedin-vacancy-distribution.md`.
 
+### Videos con portadas y cierre verificable (2026-09-13)
+
+Para LinkedIn video e Instagram Reel, cargar
+[video-delivery-metricool.md](../references/video-delivery-metricool.md): adaptación nativa, portada
+editorial, transporte público versionado, `videoThumbnailUrl`, REEL/feed, recuperación de ventanas
+parciales, prevención de duplicados y readback por ID. La evidencia de Fiestas Patrias y Día de Muertos
+confirma PNG/JPEG como portadas en esas operaciones; no imponer JPEG como requisito universal.
+
+La aprobación explícita de programar ya dada en la conversación satisface el gate humano. Ejecutar
+sin volver a solicitarla, conservando campaña, cuentas, fecha y assets autorizados. Si una consulta de
+cola parece incompleta, ampliar y filtrar antes de crear o reintentar. Un slot de autolista no demuestra
+un post concreto. Guardar evidencia saneada y distinguir `PENDING` de publicado.
+
 ## Higgsfield MCP — producción
 
 Contrato y secuencia verificados por superficie:
