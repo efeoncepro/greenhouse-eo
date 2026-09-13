@@ -1,5 +1,9 @@
 # Handoff activo
 
+**Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
+TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con
+autorización:** el artículo publicado del caso (post `251432`) aún dice «no operativo».
+
 **Social 13/09:** [Fiestas Patrias/Muertos](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md) programadas; publicación pendiente.
 [Referente Metricool](docs/audits/social/2026-09-13-seasonality-reference-opportunities.md): 407 eventos revisados, oportunidades propuestas, separado del calendario editorial. Docs/skills espejo actualizados; sin nuevas programaciones.
 
@@ -23,15 +27,8 @@ Las 4 preguntas quedaron decididas el mismo día: `TASK-1870` (rotación SERP, c
 `ISSUE-170` — el link gap del prospecto puede colapsar por intersección AND, con experimento definido y
 sin medir. Decisión y evidencia: `docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md`.
 
-**Portafolio de landings del sitio público (2026-09-11, documental):** `EPIC-047` reancla desde EPIC-019 las 20
-tasks de landing y fija su orden en `Rank EPIC-047-01…10`: Agencia Creativa → ASO (pitch activo con Berel) → HubSpot
-(Precios, Agentes) → Salesforce → Performance → resto; Contacto es habilitador (`H1`) y los artículos del hub HubSpot (TASK-1402/1404) van
-fuera del ranking. Cerradas por decisión del operador, publicadas e indexables (HTTP 2026-09-11): TASK-1799 Content
-Marketing, TASK-1358 Home, TASK-1351 Redes Sociales y TASK-1352 Pillar HubSpot; cada una registra sus criterios de QA sin verificar.
-**Hallazgo:** `/agencia-creativa/` y `/agencia-creativa-v2/` están ambas indexables con canonical propio → decidir URL
-final + 301 (TASK-1350). El Pillar HubSpot vive en `/servicios-contratar-hubspot/`; `/servicios/hubspot/`
-redirige a un post antiguo, así que la URL padre de Precios/Agentes está por decidir. Pendientes del operador: validar PDR-021/022/023, owners/SLA de Contacto, alcance de la
-aprobación ANAM para TASK-1403 y cerrar TASK-1322 como superseded.
+**Portafolio de landings (2026-09-11, documental):** `EPIC-047` ordena las landings del sitio público en `Rank`;
+cuatro cerradas por el operador (1799, 1358, 1351, 1352). Decisiones pendientes en el epic.
 
 **Panel competitivo AEO de SKY (2026-09-11, operación + venta):** 5 runs del grader en staging (SKY, LATAM, JetSMART,
 Avianca, Gol; Chile; set curado de 12 preguntas de aerolíneas; `EO-GRUN-00050`…`00054`), 2 aprobados en revisión

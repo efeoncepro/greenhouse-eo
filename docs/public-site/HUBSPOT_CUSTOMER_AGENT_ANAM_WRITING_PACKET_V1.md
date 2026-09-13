@@ -8,6 +8,7 @@
 > **Pieza:** artículo 2 de la serie ANAM.
 > **Brief rector:** [Caso ANAM — Customer Agent, conocimiento y frontera humana](./HUBSPOT_CUSTOMER_AGENT_ANAM_CASE_STUDY_BRIEF_V1.md).
 > **Estado runtime al corte:** configurado y probado en preview, pero no operativo para conversaciones nuevas.
+> **Estado vigente (2026-09-13):** activo y en producción, confirmado por el operador.
 > **Draft resultante:** [Artículo privado v4 — pasada autoral en voz de Julio](./HUBSPOT_CUSTOMER_AGENT_ANAM_ARTICLE_DRAFT_V4.md).
 > **Auditoría editorial:** [copywriting, SEO y AEO — 2026-07-17](../audits/public-site/2026-07-17-anam-customer-agent-copy-seo-aeo.md).
 > **Aprobación cliente:** [confirmada; registro interno](./HUBSPOT_CUSTOMER_AGENT_ANAM_APPROVAL_RECORD_V1.md).

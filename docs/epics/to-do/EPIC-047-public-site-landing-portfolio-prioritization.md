@@ -65,7 +65,7 @@ Una landing publicada que **daña** (URL duplicada indexable, promesa sin prueba
 | `01` | [TASK-1350](../../tasks/to-do/TASK-1350-landing-agencia-creativa.md) | Agencia Creativa | `/agencia-creativa-v2/` **y** `/agencia-creativa/` ambas `index, follow` con canonical propio | Dos URLs indexables compiten por el mismo término; creatividad es la línea del retainer base | Decidir URL final + 301 de la otra; dirección de arte del hero y motion |
 | `02` | [TASK-1862](../../tasks/to-do/TASK-1862-landing-aso.md) | ASO | Diseño; promoción atada a la extensión Search & App Visibility (`Proposed`) | **Pitch activo con Berel** (operador, 2026-09-11): acompaña una expansión en cuenta existente. Sin ese pitch sería la última (~20 búsquedas/mes) | Validar PDR-023 + llevar la extensión a `Approved for validation` — ahora urgentes |
 | `03` | [TASK-1401](../../tasks/to-do/TASK-1401-landing-hubspot-precios.md) | HubSpot · Precios | Diseño | Única página del hub con demanda real (~1.500/mes en el bloque hispano); el Pillar ya está publicado | Decidir la URL padre del hub (ver decisiones) |
-| `04` | [TASK-1403](../../tasks/to-do/TASK-1403-landing-hubspot-agentes.md) | HubSpot · Agentes | Diseño; bloqueo F0 parcialmente resuelto | La que más diferencia; su prueba es el caso ANAM | URL padre del hub + confirmar que la aprobación ANAM (2026-07-17) cubre esta página |
+| `04` | [TASK-1403](../../tasks/to-do/TASK-1403-landing-hubspot-agentes.md) | HubSpot · Servicio de agentes (diseño, construcción, despliegue y operación) | Diseño; reenfocada 2026-09-13 a landing de servicio; contratos UI por rehacer | Familia formal «Agent Hub & Agentic Operations»; caso ANAM con Customer Agent activo y en producción | URL padre del hub + verificar la métrica ANAM y el alcance de su autorización + rehacer dirección visual, wireframe, flow y motion |
 | `05` | [TASK-1812](../../tasks/to-do/TASK-1812-salesforce-services-landing.md) | Salesforce | Oferta, wireframe, flow y motion listos | La práctica no tiene superficie pública; oportunidad SGS observada. **Sube a `03` si SGS está en pitch activo** | Readback de partnership/derechos, first fold, CTA binding |
 | `06` | [TASK-1865](../../tasks/to-do/TASK-1865-landing-performance-marketing.md) | Performance Marketing | Diseño | Mejor demanda pura de las nuevas: 480–590/mes en Chile, KD 11–13, Efeonce no rankea; retira la legacy `242862` con 301 | Validar PDR-022 |
 | `07` | [TASK-1860](../../tasks/to-do/TASK-1860-landing-trade-marketing-btl.md) | Trade Marketing & BTL | Diseño | ~880/mes, pero SERP informativo y laboral; el modificador comercial tiene ~10/mes | Validar PDR-021 |
@@ -119,7 +119,9 @@ Ya están en ejecución; no compiten por prioridad, sólo tienen que cerrarse.
       Precios (`/servicios/hubspot/precios/`) y Agentes (`/servicios/hubspot/agentes/`) cuelgan de esa URL.
 - [ ] Elegir la URL final de Agencia Creativa y aprobar el 301 de la otra.
 - [ ] Definir owners y SLA por motivo de Contacto (TASK-1801).
-- [ ] Confirmar si la aprobación ANAM del 2026-07-17 cubre la página de Agentes (TASK-1403).
+- [ ] Confirmar si la aprobación ANAM del 2026-07-17 cubre la landing del servicio de agentes (TASK-1403).
+- [ ] Autorizar la actualización del artículo publicado del caso ANAM (`/hubspot/ia-atencion-cliente-caso-anam/`),
+      que todavía dice que el agente no está operativo.
 - [ ] Cerrar TASK-1322 como superseded: TASK-1369 la reemplazó el 2026-07-08 y sigue abierta en el backlog.
 
 ## Cómo se mantiene el orden
@@ -184,3 +186,10 @@ Verificado por HTTP el 2026-09-11 (`meta robots` + canonical de la respuesta pú
 **No verificado:** si Google ya indexó ambas URLs de Agencia Creativa (sólo se leyó el HTML servido), el estado
 de los deals de Sky, SGS, Réditos y Berel en HubSpot (el pitch de Berel lo informó el operador), ni tráfico en
 Search Console. El orden asume la estrategia comercial Q2–Q3 2026 (última verificación 2026-06-09).
+
+## Delta 2026-09-13
+
+Por decisión del operador, TASK-1403 deja de ser una página informativa sobre qué agentes funcionan y pasa a ser la
+landing del **servicio de agentes** en HubSpot: diseño, construcción, despliegue y operación gestionada. El operador
+confirmó además que el Customer Agent de ANAM está activo y en producción. Sus contratos UI quedaron marcados como
+superados y se rehacen dentro de la task; su posición en el ranking no cambia.

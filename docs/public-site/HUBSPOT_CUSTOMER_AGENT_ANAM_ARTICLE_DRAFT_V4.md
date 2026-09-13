@@ -8,7 +8,8 @@
 > **Aprobación editorial:** publicación autorizada expresamente por Julio Reyes el 2026-07-17.
 > **Fecha de corte de la evidencia:** 2026-07-17.
 > **Estado operativo al corte:** configurado y probado en vista previa, pero no operativo para conversaciones nuevas.
-> **Pendiente operativo ajeno a la publicación:** verificar el Customer Agent en conversaciones nuevas cuando se resuelva la dependencia de facturación.
+> **Estado vigente (2026-09-13):** activo y en producción, confirmado por el operador. El artículo publicado describe el corte del 2026-07-17; actualizarlo es modificar contenido público y requiere autorización.
+> **Pendiente operativo ajeno a la publicación:** verificar el Customer Agent en conversaciones nuevas cuando se resuelva la dependencia de facturación. **Superado 2026-09-13:** el operador confirma el agente en producción; falta la verificación independiente contra el portal.
 > **SEO title:** IA para atención al cliente: caso ANAM - Efeonce
 > **OG title:** ¿Qué necesita una IA para atender bien? | Caso ANAM
 > **Meta description:** Qué necesita una IA para atender bien a tus clientes: conocimiento, límites, pruebas y transferencia humana en el caso Customer Agent de ANAM.

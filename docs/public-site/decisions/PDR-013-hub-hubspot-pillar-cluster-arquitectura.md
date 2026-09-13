@@ -164,6 +164,13 @@ Tres capas, las tres verdaderas (→ `hubspot-solutions-partner/modules/13_AGENT
 3. **Construimos agentes propios.** ⚠️ **Agent Tools** (beta) — *"te construimos tu agente"*: servicio, no licencia.
 🔴 **El gobierno es el producto:** *"el agente propone, un humano confirma, y recién ahí se ejecuta."*
 
+> **Delta 2026-09-13 (operador):** esta página pasa a ser la **landing del servicio completo de agentes**
+> —diseño, construcción, despliegue y operación gestionada—, alineada con la familia *Agent Hub & Agentic
+> Operations* de la [oferta V2](../../services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md). Las tres capas
+> de arriba siguen siendo verdaderas, pero ya no son el producto: son partes del servicio. Se retira la cifra fija
+> «tres en GA»: el inventario se publica fechado por caso de uso y sin número fijo. El Customer Agent de ANAM está
+> activo y en producción. Ejecución y estructura: TASK-1403 y la spec del hub §3.
+
 ### Los seis Hubs
 El **título es el dolor**, no el nombre del Hub (Command of the Message). Cada uno: el dolor → qué resuelve →
 qué implementamos → **cuándo NO te sirve** → el caso → CTA.

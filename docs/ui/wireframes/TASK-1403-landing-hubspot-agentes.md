@@ -1,5 +1,12 @@
 # TASK-1403 / `efeoncepro.com/servicios/hubspot/agentes/` — **"Los agentes de IA de HubSpot: cuáles funcionan de verdad"**
 
+> ⚠️ **Delta 2026-09-13 — contenido superado; se rehace en TASK-1403 Slice 1. No implementar desde esta versión.**
+> El operador reenfocó la página: ya no es sólo «cuáles funcionan de verdad», sino la **landing del servicio de
+> agentes** (diseño, construcción, despliegue y operación gestionada). El Customer Agent de ANAM está **activo y en
+> producción**, y ya no se publica una cifra fija de agentes en GA: el inventario va fechado por caso de uso. Las
+> reglas de honestidad, gobierno y accesibilidad de este documento siguen valiendo como insumo; la estructura de
+> regiones y el copy ledger no.
+
 > **Cluster 3 de 4** del hub HubSpot. Pillar: **TASK-1352** (`/servicios/hubspot/`).
 > Fuente: **[SPEC del hub](../../public-site/HUBSPOT_HUB_LANDINGS_SPEC.md) § 3** +
 > skill `hubspot-solutions-partner` → **`modules/13_AGENTES.md`** *(cargarlo entero)*.
