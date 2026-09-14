@@ -220,8 +220,11 @@ redactado en el manifiesto.
 
 Un negativo de refresh reuse ejecutado por la propia corrida puede mantener esa señal roja durante 24 horas.
 Clasifícalo por timestamp y DCR run-owned, confirma familia revocada y ausencia de eventos posteriores. No lo
-marques `ok`, pero tampoco lo declares drift inexplicado si cumple esas tres condiciones. Cualquier evento nuevo,
-cliente ajeno o familia activa bloquea el retiro. No abras nuevos consentimientos, clientes o sesiones sólo para
+marques `ok`, pero tampoco lo declares drift inexplicado si cumple esas tres condiciones. Cualquier evento nuevo
+de los sujetos exactos, un cliente canary no inventariado o una familia canary activa bloquea el retiro. Si el
+cliente es compartido, no atribuyas su agregado a la canary: correlaciona por `subject_hash`, `grant_id`, familia
+y `profile.data_origin`. Sólo la actividad de los sujetos exactos de la corrida reinicia su ventana; la de otros
+sujetos se registra y se atiende por separado. No abras nuevos consentimientos, clientes o sesiones sólo para
 mantener viva la observación.
 
 ## 7. Revoca antes de borrar
@@ -253,7 +256,7 @@ No borres si `deletionReady` no es `true`, `unexpectedRefs` no es `0`, hay `logi
 shared. Corrige la dependencia mediante su command dueño y repite el dry-run.
 
 Si aparece `oauth_client_not_run_owned`, no reclames el cliente como propio ni retires el blocker. Al
-2026-09-10, el cleanup vigente no puede separar con seguridad los artefactos de sujetos canary que viven bajo
+2026-09-14, el cleanup vigente no puede separar con seguridad los artefactos de sujetos canary que viven bajo
 un CIMD compartido: su helper borra hijos por `client_id`. Antes de aplicar se debe implementar una partición
 end-to-end en planner/delete/readback: conservar el cliente compartido y los hijos de otros sujetos, borrar sólo
 las filas del environment/sujeto canary exactos (más binding para contexts) y verificar ambas cosas al final.

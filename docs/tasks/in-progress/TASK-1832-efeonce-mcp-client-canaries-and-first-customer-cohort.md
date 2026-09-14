@@ -1,5 +1,30 @@
 # TASK-1832 — Efeonce MCP Synthetic External Canaries and Client Compatibility Certification
 
+## Delta 2026-09-14 — atribución de `refresh_reuse` corregida por sujeto
+
+La revisión read-only del 2026-09-14 corrigió la interpretación conservadora del 2026-09-10 sin debilitar el
+cleanup. Los `458` eventos de siete días observados sobre el CIMD compartido de Codex se correlacionaron por
+`subject_hash` y `grant_id`: todos pertenecen a un perfil interno `real`, no a los dos perfiles `smoke_test` de
+TASK-1832. Una familia tenía un único evento después de una revocación de TASK-1844; la otra registró una
+reutilización y `456` reintentos de una credencial ya revocada desde el 2026-09-09. Ese ruido operacional no es
+actividad canary y ya no bloquea su ventana steady.
+
+El filtro exacto de los dos sujetos canary encontró `14` eventos desde el alta: los seis negativos deliberados
+e inventariados del 2026-09-06/07 y ocho eventos sobre el DCR run-owned de Claude Code del 2026-09-11 —una
+reutilización contenida y siete reintentos posteriores a la revocación—. El último ocurrió a
+`2026-09-11T01:33:34.325Z`; no se observó actividad canary posterior. Por criterio conservador, la primera fecha
+que puede acreditar siete días específicos de la corrida es `2026-09-18T01:33:34.325Z`.
+
+La conectividad MCP posterior a TASK-1832 también quedó confirmada por separado: el perfil interno real tenía
+un grant hospedado de Claude vigente, una familia refresh activa con `44` rotaciones y un access token emitido a
+`2026-09-14T13:55:32Z`, con vigencia hasta `14:10:32Z`. Esto prueba tráfico MCP posterior a la certificación,
+pero no convierte esa conexión interna en actividad de la canary.
+
+El blocker de retiro que sí permanece es el cleanup: el planner encuentra artefactos de los sujetos canary bajo
+el CIMD compartido, mientras el delete vigente opera por `client_id`. El apply sigue prohibido hasta que
+planner/delete/readback eliminen por environment+sujeto canary, preserven el cliente y los hijos ajenos, y el
+dry-run resulte verde después de la ventana específica anterior.
+
 ## Delta 2026-09-10 — observación no steady y cleanup bloqueado por CIMD compartido
 
 La lectura viva del 2026-09-10T12:17Z conserva la frontera correcta: un registro y un binding canary activos,
@@ -253,10 +278,10 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Operativamente bloqueado para retiro. La matriz de compatibilidad sigue acreditada para Codex, ChatGPT, Claude Code 2.1.263 y Claude.ai/Desktop; Claude Code 2.1.186 conserva su FAIL histórico y la conexión Claude hospedada se retiró bajo la excepción TASK-1844. El 2026-09-10 la frontera canary siguió aislada, pero aparecieron 93 refresh_reuse/24h en el CIMD compartido de Codex y el cleanup dry-run detectó 8 artefactos canary más 35 de otros sujetos sobre ese mismo cliente. No hay autorización ni implementación segura para apply: primero se requiere diagnóstico de la señal y cleanup sujeto-específico que preserve cliente/artefactos compartidos; después, desde delete_after y sólo con steady/preflight verdes, corresponde revocar, releer cero y apagar gates.`
+- Status real: `Operativamente bloqueado para retiro. La matriz de compatibilidad sigue acreditada para Codex, ChatGPT, Claude Code 2.1.263 y Claude.ai/Desktop; Claude Code 2.1.186 conserva su FAIL histórico. La revisión del 2026-09-14 atribuyó los 458 refresh_reuse/7d del CIMD compartido de Codex a un perfil interno real, no a la canary, y confirmó una conexión MCP hospedada de Claude activa. Para los dos sujetos canary, el último evento específico fue un reintento ya contenido el 2026-09-11T01:33:34.325Z; la ventana conservadora termina el 2026-09-18T01:33:34.325Z. No hay implementación segura para apply: el cleanup aún borra hijos por client_id y debe pasar a una partición sujeto-específica que preserve el CIMD y los artefactos ajenos; después corresponde dry-run verde, revocación, readback cero y gates OFF.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
-- Blocked by: `diagnóstico refresh_reuse del CIMD compartido y cleanup OAuth sujeto-específico antes del retiro`
+- Blocked by: `cleanup OAuth sujeto-específico y ventana canary hasta 2026-09-18T01:33:34.325Z antes del retiro`
 - Branch: `Greenhouse develop; efeonce-mcp main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -365,8 +390,9 @@ Reglas obligatorias:
 
 ### Gap
 
-- Diagnosticar los `refresh_reuse` nuevos del CIMD compartido; no cuentan como negativo run-owned ni como
-  ventana steady mientras su origen y familias no estén acotados.
+- Mantener la observación filtrada por los dos sujetos canary y sus clientes run-owned hasta
+  `2026-09-18T01:33:34.325Z`. La señal agregada del CIMD compartido no se usa como blocker canary: su actividad
+  fue atribuida a un perfil interno real y se sigue como ruido operacional separado.
 - Implementar y probar cleanup sujeto-específico para artefactos canary observados bajo clientes compartidos.
   El blocker actual es una protección: no se puede retirar sin partir planner/delete/readback y demostrar que
   el cliente y sus otros sujetos permanecen intactos.
@@ -708,10 +734,16 @@ organización dedicada creada sólo después de una autorización específica.
       únicamente `registration_active|active_authority|active_auth`. Las 9 señales de binding/invitación están
       `ok`; los 6 eventos `refresh_reuse` de 24 h corresponden a negativos run-owned ya inventariados, el último
       ocurrió a 02:32:18Z y no apareció uno nuevo.
-- [ ] Observación read-only `2026-09-10T12:17:04Z`: frontera `1/1`, drift `0/0` y cero Person 360, pero
+- [x] Observación read-only `2026-09-10T12:17:04Z`: frontera `1/1`, drift `0/0` y cero Person 360, pero
       `refresh_reuse=93/24h` sobre el CIMD compartido de Codex y dry-run con
-      `oauth_client_not_run_owned`; no acredita steady ni readiness de cleanup. Evidencia y contrato de
-      preservación actualizados en el manifiesto/runbook/skill.
+      `oauth_client_not_run_owned`; la muestra fue correctamente conservadora y su atribución se resolvió en la
+      revisión del 2026-09-14. No acreditó readiness de cleanup.
+- [x] Correlación read-only `2026-09-14T14:12:01Z`: los `458` eventos de siete días del CIMD compartido de Codex
+      pertenecen a un perfil interno `real`; no son canary. Los dos sujetos de TASK-1832 acumulan `14` eventos
+      desde el registro, todos bajo negativos/DCR run-owned ya revocados; el último fue
+      `2026-09-11T01:33:34.325Z`. No hubo evento canary posterior. El mismo readback confirmó que el MCP posterior
+      a TASK-1832 funciona mediante un grant hospedado de Claude activo. El retiro sigue bloqueado por el cleanup
+      sujeto-específico y por la ventana conservadora hasta `2026-09-18T01:33:34.325Z`.
 - [ ] Sesiones interactivas por cliente MCP registradas: Codex y ChatGPT hospedado verdes; ChatGPT importó sólo
       `efeonce.gateway.status|get_seo_entitlement`, ejecutó ambas sin write y rotó refresh dos veces post-TTL.
       Claude Code `2.1.186` conserva su FAIL histórico; `2.1.263` completó consentimiento, catálogo exacto,

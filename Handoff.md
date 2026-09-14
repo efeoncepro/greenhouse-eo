@@ -111,14 +111,16 @@ verificado por API/reader. [Evidencia](docs/audits/hiring/2026-09-13-seo-assignm
 D4 desplegado en producción con release `cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9`, canary sin efectos.
 Recorrido sintético y automatización pendientes; sin asignaciones/correos; Arte intacto.
 
-**TASK-1832 (readback 2026-09-10T12:17Z): operativamente bloqueada para retiro.** Frontera canary sana
-(`1/1`, purpose drift `0/0`, dos profiles run-owned fuera de Person 360), pero
-`auth.oauth.refresh_reuse_detected=93/24h` sobre el CIMD compartido de Codex. Cleanup dry-run, sin apply:
-`unexpectedRefs=0`, `deletionReady=false` y blockers
-`registration_active|active_authority|active_auth|oauth_client_not_run_owned`. El CIMD tiene 8 artefactos de
-sujetos canary y 35 de otros sujetos; el helper vigente borra por `client_id`. No retirar el blocker ni ejecutar
-`--apply`: implementar planner/delete/readback sujeto-específicos, preservar cliente/hijos ajenos, diagnosticar
-las familias de refresh y recién después reiniciar steady/retirar desde `delete_after`.
+**TASK-1832 (revisión read-only 2026-09-14T14:12Z): operativamente bloqueada para retiro, no para uso MCP.**
+La correlación por sujeto atribuyó los `458 refresh_reuse/7d` del CIMD compartido de Codex a un perfil interno
+`real`, no a los dos perfiles canary. La conexión posterior a TASK-1832 funciona por el conector hospedado de
+Claude: grant vigente, familia refresh activa y access token emitido a `13:55:32Z`, con vigencia hasta
+`14:10:32Z`. Para los sujetos canary hubo `14` eventos desde el alta, todos contenidos en negativos/DCR
+run-owned; el último fue
+`2026-09-11T01:33:34.325Z`, sin actividad posterior. La primera fecha conservadora de siete días es
+`2026-09-18T01:33:34.325Z`. El apply sigue prohibido por `oauth_client_not_run_owned`: el helper borra por
+`client_id` y debe pasar a planner/delete/readback sujeto-específicos que preserven el CIMD y sus hijos ajenos.
+[Evidencia y alcance](docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md).
 
 **Sistema de contenidos Notion (2026-09-10, mapeado / sin mutaciones):**
 [mapa canónico](docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md) de Pilares JTBD + Content Hub +

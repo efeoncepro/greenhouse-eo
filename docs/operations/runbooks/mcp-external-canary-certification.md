@@ -1,12 +1,13 @@
 # Runbook técnico — certificación MCP con canary externo eliminable
 
-> TASK-1832 · owner: Identity + MCP Platform · estado al 2026-09-10: **rollout productivo con retiro
+> TASK-1832 · owner: Identity + MCP Platform · estado al 2026-09-14: **rollout productivo con retiro
 > operativamente bloqueado**.
 > Corrida activa `task-1832-canary-20260906-a`; helper, Playwright, Codex, ChatGPT hospedado, Claude Code
 > `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` están verdes. Code y web renovaron post-TTL sin widening;
 > Desktop ejecutó desde la app nativa sobre el conector remoto. La matriz y el manifiesto acreditan el runtime;
-> este runbook define el procedimiento. La muestra más reciente tiene `refresh_reuse` nuevo sobre un CIMD
-> compartido y el cleanup actual no puede retirar sus hijos canary sin poner en riesgo otros sujetos.
+> este runbook define el procedimiento. La señal agregada del CIMD compartido fue atribuida a un perfil interno,
+> no a la canary; el retiro sigue bloqueado por su ventana específica y porque el cleanup actual no puede retirar
+> sus hijos canary sin poner en riesgo otros sujetos.
 
 ## Objetivo y frontera
 
@@ -197,8 +198,11 @@ Cada muestra diaria es read-only y registra en el manifiesto, sin identificadore
 
 Un negativo deliberado de reutilización puede mantener `auth.oauth.refresh_reuse_detected` en rojo durante su ventana de
 24 horas. No lo renombres `ok`: atribúyelo por timestamp y DCR marcado con el `run_id`, confirma que la familia
-quedó revocada y que no aparecieron eventos posteriores al baseline. Un evento nuevo, una familia no revocada o
-un cliente que no sea run-owned es drift no explicado y bloquea el retiro.
+quedó revocada y que no aparecieron eventos posteriores al baseline. Para un cliente compartido, el agregado por
+`client_id` no atribuye actividad a la canary: correlaciona primero `subject_hash`, `grant_id`, familia y
+`profile.data_origin`. Sólo un evento de los sujetos exactos de la corrida, una familia canary no revocada o un
+cliente canary no inventariado bloquea su steady. La actividad de otro sujeto se conserva como señal operacional
+separada y nunca se silencia, pero no reinicia la ventana de la corrida.
 
 La observación no crea clientes, consentimientos, grants, sesiones ni tokens. `delete_after` es sólo la fecha
 mínima: el apply también exige siete días estables, precondiciones de retiro y aprobación explícita.
@@ -257,8 +261,10 @@ El apply se niega sin mutar cuando aparece cualquiera de estos estados:
 
 Para la corrida activa, `oauth_client_not_run_owned` corresponde al CIMD compartido de Codex. No se resuelve
 marcándolo run-owned: requiere cleanup sujeto-específico y una prueba que preserve el mismo cliente y sus otros
-sujetos. Los eventos `refresh_reuse` nuevos de ese CIMD también rompen el steady hasta quedar atribuidos a
-familias redactadas y contenidas.
+sujetos. La revisión del 2026-09-14 atribuyó la señal agregada reciente a un perfil interno `real`; por eso no
+rompe el steady canary. Los eventos de los dos sujetos exactos sí cuentan: su último reintento contenido fue el
+`2026-09-11T01:33:34.325Z`, por lo que la ventana conservadora no termina antes del
+`2026-09-18T01:33:34.325Z`.
 
 Se registra el blocker exacto en el manifiesto y se resuelve mediante el owner del dominio. Nunca se busca ni
 borra por nombre, correo, fecha aproximada o prefijo.

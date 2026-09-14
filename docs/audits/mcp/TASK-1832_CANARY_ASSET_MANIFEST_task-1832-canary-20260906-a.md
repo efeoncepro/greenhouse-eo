@@ -8,13 +8,16 @@ no contiene correos completos, tokens, códigos, cookies, verifiers, hashes de s
 - `run_id`: `task-1832-canary-20260906-a`
 - `canary_registration_id`: `xcr-48dacd1f-ad4b-4a73-b454-3d94574e7d09`
 - `environment`: `efeonce-auth` — asset compartido, nunca eliminar
-- `state`: `production_observation_blocked`; compatibilidad histórica certificada, pero la muestra del
-  2026-09-10 no es steady y el cleanup no soporta aún artefactos canary en un CIMD compartido
+- `state`: `production_observation_pending_cleanup`; compatibilidad histórica certificada; la señal agregada
+  del CIMD compartido fue atribuida a un perfil interno y el cleanup aún no soporta artefactos canary en un
+  cliente compartido
 - `created_at`: `2026-09-06T19:43:30Z`
 - `created_by`: `jreye` mediante sesión admin gobernada
 - `reason`: `TASK-1832 external MCP compatibility certification`
 - `expires_at`: `2026-09-14T19:43:30Z`
 - `delete_after`: `2026-09-13T19:43:30Z`, después de siete días steady y readback
+- `effective_retirement_not_before`: `2026-09-18T01:33:34.325Z`, siete días después del último evento
+  `refresh_reuse` específico de los sujetos canary
 - `cleanup_approved_by`: `operador, autorización de rollout 2026-09-06`; apply condicionado a preflight verde
 
 ## Organización efímera
@@ -180,6 +183,7 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 | 2026-09-07T11:10:05Z | `registrations=1`, `canary_bindings=1`, registro activo | Claude Code local actualizado a 2.1.263; DCR exclusivo con scope base y callback fijo                                         | preflight OAuth mínimo; cancelado antes de consentimiento por Mac bloqueada; cero token nuevo                              | 21 DCR, 2 profiles/links, 18 sesiones, 14 magic links, 2 passkeys, 5 challenges, 19 codes/consents, 25 refresh/access, 4 contexts; `unexpectedRefs=0`; no apply                         | `steady`; ownership preservado, certificación Claude pendiente                             |
 | 2026-09-07T12:03:40Z | `registrations=1`, `canary_bindings=1`, registro activo | Claude Code 2.1.263 y Claude.ai sobre la organización exacta; Desktop 1.46388.4 usa el mismo conector remoto                  | ambos DCR completaron lectura y una rotación post-TTL base-only; Desktop ejecutó después desde la UI nativa                 | 22 DCR, 2 profiles/links, 18 sesiones, 14 magic links, 2 passkeys, 5 challenges, 21 codes/consents, 29 refresh/access, 4 contexts; `unexpectedRefs=0`; no apply                         | `steady`; matriz cliente completa, cero writes y ownership preservado                      |
 | 2026-09-07T12:09:54Z | `registrations=1`, `canary_bindings=1`, registro activo | drift externo/interno `0/0`; `smoke_profiles=32`; 2 run-owned; `smoke_in_person_360=0`                                        | 9 señales binding/invitación `ok`; code reuse y CIMD `ok`. Los 6 `refresh_reuse` son negativos run-owned esperados, el último a 02:32:18Z; cero eventos posteriores | 22 DCR, 2 profiles/links, 18 sesiones, 14 magic links, 2 passkeys, 5 challenges, 21 codes/consents, 29 refresh/access, 4 contexts; `activeAuthCount=56`; `unexpectedRefs=0`; no apply | `steady`; blockers sólo `registration_active|active_authority|active_auth`, sin drift nuevo |
+| 2026-09-14T14:12:01Z | registro/binding y grant read-only todavía activos; dos perfiles canary exactos | la señal agregada del CIMD de Codex se atribuyó íntegramente a un perfil interno `real`; la conexión MCP hospedada de Claude estaba activa | 14 `refresh_reuse` canary desde el alta: 6 negativos deliberados y 8 del DCR Claude Code run-owned ya revocado; último `2026-09-11T01:33:34.325Z`, sin evento posterior | dry-run sigue fail-closed con `unexpectedRefs=0` y `oauth_client_not_run_owned`; no apply | señal global corregida; steady canary no antes de `2026-09-18T01:33:34.325Z`; cleanup sujeto-específico pendiente |
 
 ## Observación y diagnóstico de ownership — 2026-09-10
 
@@ -206,6 +210,30 @@ clientes shared; en estos últimos, borrar sólo por environment/sujeto canary (
 contexts), preservar el cliente y los hijos ajenos, y comprobar esa preservación en el readback final. Hasta
 que planner, delete, readback y pruebas cubran esa partición, `--apply` está prohibido incluso después de
 `delete_after`.
+
+## Revisión de atribución por sujeto — 2026-09-14
+
+La revisión read-only agrupó los eventos OAuth por `subject_hash` y `grant_id`, en vez de usar el agregado por
+`client_id` como atribución. Los `458` `refresh_reuse` de los últimos siete días del CIMD compartido de Codex
+pertenecían al mismo perfil interno `real`: una familia aportó un evento tras una revocación de TASK-1844 y otra
+aportó una reutilización más `456` reintentos de una credencial revocada desde el 2026-09-09. Ninguno correspondía
+a los dos perfiles `smoke_test` de esta corrida. La conclusión del 2026-09-10 se conserva como hallazgo histórico
+correctamente cauteloso, pero queda supersedida en su atribución: la señal global no reinicia la ventana canary.
+
+El filtro por los dos sujetos exactos de TASK-1832 encontró `14` eventos desde `created_at`: seis negativos
+deliberados/inventariados del 2026-09-06/07 y ocho sobre el DCR run-owned de Claude Code el 2026-09-11. Estos
+últimos fueron una reutilización que revocó la familia y siete reintentos con `previous_status=revoked`; el último
+ocurrió a `2026-09-11T01:33:34.325Z`. No se observó evento canary posterior. La fecha conservadora para siete días
+específicos de la corrida pasa a `2026-09-18T01:33:34.325Z`.
+
+La misma revisión confirmó por separado el uso MCP posterior a TASK-1832: el perfil interno real conservaba un
+grant hospedado de Claude, una familia refresh activa con `44` rotaciones y un access token emitido a
+`2026-09-14T13:55:32Z`, vigente hasta `14:10:32Z`. Esa conexión prueba tráfico MCP posterior a TASK-1832; no
+pertenece al canary y no amplía la certificación ni la cohorte externa.
+
+La corrección de atribución no autoriza el cleanup. El CIMD sigue siendo `shared` y el helper vigente borra hijos
+por `client_id`; `oauth_client_not_run_owned` debe permanecer hasta que planner, delete y readback operen por
+environment+sujeto canary, preserven el cliente y sus hijos ajenos y demuestren ambos resultados.
 
 Readback de control plane a `2026-09-07T12:20:25Z`: auth-server `auth-server-00043-ndg`, SHA
 `fb5fc082aa92…`, y gateway `efeonce-mcp-gateway-00046-6n2`, SHA `171965c99034…`, seguían Ready, 100 % y
@@ -271,7 +299,7 @@ La lectura del canary desde ChatGPT pasó después de la sustitución (gateway r
 - `apply_at`: `PENDIENTE`
 - `apply_actor`: `PENDIENTE`
 - `apply_result`: `PENDIENTE`
-- `refusal_reason`: `2026-09-10: registration_active|active_authority|active_auth|oauth_client_not_run_owned; CIMD compartido con sujetos ajenos y refresh_reuse nuevo; no apply`
+- `refusal_reason`: `2026-09-14: registration_active|active_authority|active_auth|oauth_client_not_run_owned; la señal global de Codex no es canary; cleanup sujeto-específico y ventana hasta 2026-09-18T01:33:34.325Z pendientes; no apply`
 
 El estado `deleted` se usa únicamente después de releer cero en organización, registro, binding, grants,
 invitaciones, perfiles, links, contextos, consents, codes, tokens y sesiones, con Person/Account 360 y

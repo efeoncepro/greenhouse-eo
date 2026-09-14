@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-14 — TASK-1832 corrige la atribución de señales del CIMD compartido
+
+La revisión por sujeto/familia confirmó que la actividad `refresh_reuse` agregada de Codex pertenecía a una
+identidad interna real y que el MCP posterior a la certificación funciona mediante Claude hospedado. El canary
+mantiene su propio corte al `2026-09-11T01:33:34.325Z`; el retiro continúa bloqueado hasta completar siete días y
+hasta que el cleanup preserve el cliente compartido y sus artefactos ajenos. El runbook, manual y skills espejo
+ahora exigen correlación por sujeto antes de usar una señal por `client_id` como blocker canary.
+
 ## 2026-09-14 — Selección colaborativa portable e invocable por agentes en AXIS
 
 AXIS incorpora en source `efeonce.collaboration-selection` `0.2.0` (`candidate`) y el manifest
@@ -1026,13 +1034,3 @@ Actualización22:44Z: canary interno real completo con09def4fc4: Microsoft, cons
 token y lectura propia correctos, foreigndeny, refreshrotativo, revocacióntoken10.151s,
 retirogrant<=11s y gatewayOFFdeny<=20s. Piloto restauradoON, gv5 y expiración original;
 tokenspruebarevocados. Promociónformal main y matricesamplias externas/UI pendientes.
-
-## 2026-09-05 — TASK-1836: reparación de integridad aplicada en PG
-
-Migración CLI `20260905183812333` aplicada: población explícita e inmutable, verificación de evidencia
-y grants internos con caducidad. Piloto gv 2 → 3; reconciliación actual audit/outbox para binding y
-grant, con actor/razón, sin extender autoridad ni fabricar historia. Repetición 0/0; señales de
-escrituras sin evidencia y mezcla ambas cero. Resolver externo devuelve `internal_population`;
-gateway comprende el rechazo sin fallback. Pruebas: 118 unitarias, 20 live y 1 live adicional de
-recuperación. Publicación pendiente mientras Claude termina WIP UI que bloqueó el build compartido;
-emisor interno OFF. Commit completo `7d704f483` autorizado por el operador, incluido Berel.
