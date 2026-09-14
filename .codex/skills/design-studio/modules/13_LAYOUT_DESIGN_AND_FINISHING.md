@@ -102,6 +102,19 @@ El compiler nunca llama a un modelo. No reemplaza el finish ni el juicio de arte
 exacta. Mantener `human_release: pending` hasta revisar el set completo y usar `baseline` al migrar masters
 aprobados. Contrato técnico: `docs/architecture/GREENHOUSE_CAMPAIGN_LAYOUT_COMPILER_V1.md`.
 
+### Capa opcional de selección colaborativa
+
+Si la dirección de arte representa trabajo compartido con bounding box y cursores, resuelve primero un
+`AxisCollaborationSelectionIntent` mediante el contrato AXIS `efeonce.collaboration-selection`. El handoff al
+renderer es el manifest `axis.collaboration-selection-composition.v1`, no el CSS del Lab ni posiciones libres.
+El adapter liga `target.id` a la capa real del compositor, mide texto/objeto/grupo, agrega aire proporcional y
+sitúa cada hotspot según su anclaje semántico.
+
+El Campaign Layout Compiler V1 todavía no consume ese manifest. Hasta que exista un adapter con fixture y QA,
+declara la capa `pending adapter`; no la hornees en el plate generativo, no inventes campos del contrato YAML y no
+aproximes la metáfora con coordenadas. El resolver AXIS no sustituye `creative:layout`: uno normaliza relaciones
+semánticas y el otro ensambla el set estático.
+
 ## Gates
 
 - **Anchor:** tesis, sujeto, anatomía/producto, paleta y hook aprobados.

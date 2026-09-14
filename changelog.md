@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-14 — Selección colaborativa portable e invocable por agentes en AXIS
+
+AXIS incorpora en source `efeonce.collaboration-selection` `0.2.0` (`candidate`) y el manifest
+`axis.collaboration-selection-composition.v1`. La intención declara target de texto/objeto/grupo, variante,
+aire proporcional, overlay y cursores; el resolver completa defaults, dirección, acción y attachment y rechaza
+relaciones contradictorias. El primer adapter en Lab conserva tipografía correcta, bounding box adaptativo,
+overlay luminosity sutil, cursor local con hotspot estable, multiplayer `acting`/`moving`, placas arbitrarias de
+persona/rol/departamento y URL Bubble canónica en desktop y móvil.
+
+Los contratos operativo/arquitectónico, manuales y skills espejo enseñan a los agentes a producir intención,
+resolver el manifest y exigir un adapter de superficie, sin copiar Astro/CSS ni usar coordenadas decorativas.
+Campaign Layout Compiler y otros runtimes quedan explícitamente `pending adapter`. No hubo publish de paquete,
+push, deploy, promoción a `stable`, publicación de pieza ni cambio MCP; `@efeoncepro/axis-ui-contracts@0.1.5`
+sigue siendo la versión privada consumible.
+
 ## 2026-09-13 — Creative Typography Workbench de AXIS desplegado
 
 La guía pública [Creative Typography Workbench](https://axis.efeonce.org/references/creative-typography/) quedó
@@ -1021,18 +1036,3 @@ escrituras sin evidencia y mezcla ambas cero. Resolver externo devuelve `interna
 gateway comprende el rechazo sin fallback. Pruebas: 118 unitarias, 20 live y 1 live adicional de
 recuperación. Publicación pendiente mientras Claude termina WIP UI que bloqueó el build compartido;
 emisor interno OFF. Commit completo `7d704f483` autorizado por el operador, incluido Berel.
-
-## 2026-09-05 — TASK-1836: autoridad corporativa nativa y límites de autenticación
-
-Backend implementado con Entra OIDC, procedencia de sesión persistida, contexto delegado por cliente/binding,
-consentimiento aislado y refresh sin rejuvenecer auth_time. Enrolamiento interno gobernado sobre la
-persona y organización propias, grants personales con vigencia y reader sin caché positiva. Tres migraciones
-aplicadas en PG compartido; pruebas reales de persistencia/identidad/GC y UV ligado a sesión. Tras aviso de Claude se añaden
-límites passkey y limpieza SECURITY DEFINER acotada de estado vencido; auditoría y familias refresh vivas
-se conservan. App Entra, secreto y KMS dedicados preparados con cohorte upstream individual. Emisor
-y gateway publicados con gates internos OFF; sin acceso MCP interno real todavía. Gateway con 114 pruebas y JWKS acotado; first fold UI con
-GVC anónimo sin credenciales, pendiente aprobación visual. Consentimiento revalida binding/step-up
-y reader externo excluye grants vencidos. DTO canónico integrado en authorize, POST y renderer;
-permisos separados por organización y fallos sin fallback. Retorno OAuth/Microsoft conectado con flag y validación de URL; code/refresh revalidan scopes actuales del cliente. Guard de origen protege sesiones y factores, con regresiones de login CSRF; shell consume fuentes/licencias y CSS bajo CSP estricta; segundo factor TOTP/UV y alta con QR local integrados. Cuatro GVC desktop/móvil y seis checks de navegador pasan con factores ficticios. Primer despliegue autorizado con gates OFF; recheck por jti agrega revocación del token a la validación de contexto antes de activar la cohorte. El piloto ya tiene enrollment y grant de lectura temporal, por el command interno (integración auditora compartida reabierta posteriormente). Se restauran seis permisos release faltantes del rol administrador (execute ya existía), con negativos para los otros roles y Finance sólo lectura de resultados. CLI exige motivo para excepciones y lo conserva en manifest/auditoría; no inventa identidad Greenhouse desde GitHub actor. Pruebas focales 46 passed y typecheck correcto. Actualización operativa: PR #222 / main1086fe40 released por run33978290957; CI/Deep/E2E y watchdog5/5 correctos. Reader y emisor internos ON; GC ON con scheduler y ejecución real confirmada, once tablas y cero borrados. Motivo de excepción releído en manifest y auditoría PG. Activación del gateway detenida por intento de sobrescribir tag inmutable; flags restaurados OFF y fix de reutilización por digest publicado en dd04f470, 125 pruebas correctas, nuevo deploy en curso. Login Microsoft/MFA completado, callback propio rechazado. Follow-up local con openid profile, reloj JWT posterior al intercambio y diagnóstico cerrado; 65 pruebas y typecheck correctos. Emisor temporalmente OFF durante publicación; token, canaries y rollback aún pendientes. [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
-
-Estado actualizado: PR #223 / main a6866250 released por run33982717767, sin override, health y watchdog5/5 correctos. Corrección OIDC y CSRF publicadas; emisor permanece OFF por hallazgo de integridad confirmado. El audit interno existe pero faltaba audit externo canónico para binding/grant; detector nuevo mide2 en PG. Decisión A: población persistida y primitives transaccionales compartidas, recuperación aislada, reconciliación actual con procedencia sin fabricar historia. Implementación local: 146 tests integrados y typecheck correctos, migración SQL13/13 y commands live TEMP correctos; endurecimiento de guard final/último canary de poblaciones en validación. No se aplicó la migración ni reconciliación real. Criterio auditado de TASK-1836 reabierto; Claude dejó ownership a Codex.

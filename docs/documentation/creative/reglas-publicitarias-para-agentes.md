@@ -29,6 +29,12 @@ expone estas decisiones como una experiencia interactiva para diseñadores y age
 familia, permite construir una receta por soporte, longitud e intención, y reúne comparaciones DO/DON'T. Es una
 proyección didáctica del contrato `trial`; AXIS conserva el SSOT y cada pieza conserva su revisión propia.
 
+La misma entrada puede orquestar `efeonce.collaboration-selection` cuando el concepto muestra selección activa o
+presencia multiplayer. El agente describe relaciones —qué texto/objeto/grupo está seleccionado, qué cursor actúa
+en qué anclaje y quién sólo se mueve por el canvas— y AXIS las normaliza en un manifest independiente del motor.
+Cada superficie necesita un adapter que mida el objeto real. La primera implementación vive en AXIS Lab; que el
+contrato exista no significa que Greenhouse, Globe o los compositores ya lo pinten.
+
 ## Qué evita
 
 - titulares pesados por usar ExtraBold como receta automática;
@@ -39,6 +45,8 @@ proyección didáctica del contrato `trial`; AXIS conserva el SSOT y cada pieza 
 - interletraje/interlínea extremos para hacer caber copy;
 - cajas, guías o notas internas visibles en el export;
 - tres voces tipográficas compitiendo al mismo tiempo.
+- cursores decorativos separados de su identidad o que no señalan semánticamente al objeto seleccionado;
+- bounding boxes fijos que cambian el aire al variar el copy o el formato.
 
 ## Relación con MCP
 

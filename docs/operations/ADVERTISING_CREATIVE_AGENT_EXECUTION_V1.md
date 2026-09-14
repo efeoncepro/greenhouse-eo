@@ -10,6 +10,8 @@ improvise pesos, estilos, espaciados, colores, safe areas o estados de aprobaci�
 
 - **AXIS** posee valores y reglas portables mediante `axisAdvertising` y el contrato
   `efeonce.advertising-typography`, actualmente `trial`.
+- **AXIS** posee además `efeonce.collaboration-selection`, actualmente `candidate`, cuando la pieza usa la
+  metáfora de selección activa o presencia multiplayer.
 - **El consumidor** traduce esos datos a su motor —Tailwind, CSS, canvas, video o compositor— sin redefinirlos.
 - **`efeonce-advertising-creative`** orquesta el encargo y carga el oficio necesario; no contiene un segundo set
   de valores.
@@ -46,6 +48,36 @@ un brief ya resuelto ni delega el ownership del resultado.
 6. Medir contraste local de texto y marca; revisar al tamaño final, en miniatura y en frames críticos.
 7. Emitir pieza, fuente/export, ficha tipográfica, provenance, gate `PASS | REWORK | DON’T` y estado honesto.
 
+## Selección colaborativa: intención → manifest → adapter
+
+Cuando la dirección de arte use bounding box, cursor local o participantes multiplayer, el agente no dibuja la
+escena por coordenadas. Declara `AxisCollaborationSelectionIntent` y normaliza desde el repo AXIS:
+
+```bash
+pnpm collaboration:resolve -- \
+  --input docs/examples/collaboration-selection-intent.json \
+  --out /ruta/absoluta/collaboration-selection.manifest.json
+```
+
+El manifest resuelto es el único handoff portable. El adapter de la superficie debe:
+
+1. enlazar `target.id` con un texto, objeto o grupo real y medir su contenido pintado;
+2. ampliar esos bounds con el aire proporcional resuelto y corregir ópticamente el tracking terminal en texto;
+3. pintar el overlay gris de baja opacidad dentro del box y debajo del contenido/controles;
+4. ubicar el hotspot del cursor local en el anclaje; `screen-fixed` conserva la silueta noroeste y sólo
+   `target-directed` rota hacia el target;
+5. mantener el cuerpo de un multiplayer `acting` fuera del box, con su punta sobre la esquina declarada, y
+   mantener puntero + placa de nombre separados pero próximos;
+6. permitir que un multiplayer `moving` transite junto a su placa por una región semántica sin target ni
+   contacto con la selección;
+7. validar geometría en el formato más estrecho y el más ancho antes de declarar conformidad.
+
+El texto de la placa acepta una persona, rol o departamento arbitrario; `Devs` y `Designer` son sólo copy de un
+caso. La URL Bubble es otro componente canónico y no se reemplaza por un rectángulo con texto. El resolver no
+llama a modelos, no compone el anuncio completo, no publica y no aprueba. Si el motor no tiene adapter, el agente
+reporta `unsupported/pending adapter`; no copia `CollaborationSelection.astro`, no inventa campos y no simula la
+capacidad con `top`/`left`.
+
 ## Invariantes
 
 - No hay ExtraBold por defecto. Cada tramo debe justificar la masa por longitud, fondo, formato y distancia.
@@ -54,6 +86,8 @@ un brief ya resuelto ni delega el ownership del resultado.
 - El contraste se mide sobre el fondo local real. Un logo oficial puede seguir siendo ilegible y quedar como DON’T.
 - Safe area no sustituye composición; los textos no se pegan al borde ni a controles de plataforma.
 - Ninguna guía, caja de selección, label técnico o nota interna queda dentro del export público.
+- Cuando la selección colaborativa es parte deliberada del concepto final, bounding box, cursores, nombres y
+  URL Bubble sí son capas editoriales; las marcas de revisión del Lab y sus comentarios siguen siendo internas.
 - Un ejemplo aprobado informa, pero no se convierte en preset universal.
 - Producido, revisado, aprobado, programado, publicado y medido son estados distintos.
 

@@ -1,11 +1,11 @@
 # Handoff activo
 
-**Creative/social 13/09:** [Creative Typography Workbench](https://axis.efeonce.org/references/creative-typography/)
-desplegado y verificado; evidencia exacta en `changelog.md`. El contrato sigue `trial`; `stable` requiere segundo
-consumidor y comparación cross-runtime. [Fiestas Patrias/Muertos](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md)
+**Creative/social 14/09:** AXIS incorpora en source `efeonce.collaboration-selection` `0.2.0` (`candidate`),
+resolver/manifest agent-facing y primer adapter responsive en Lab. El package publicado sigue en `0.1.5` y los
+demás runtimes quedan `pending adapter`; release y promoción no están autorizados. Tipografía sigue `trial` y
+`stable` requiere segundo consumer cross-runtime. [Fiestas Patrias/Muertos](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md)
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
-no publicados; el video del Pódcast sigue suspendido. Los casos se auditan individualmente, no son presets. MCP
-sigue sin tool creativa federada.
+no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
 TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con

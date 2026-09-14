@@ -52,6 +52,21 @@ pnpm creative:layout -- --contract brief/layout-compiler-v1.yaml --mode check
 layout o finishes no están aprobados. `check` valida masters y hashes existentes sin recomponer. Ninguno de los
 tres modos llama a un proveedor o consume presupuesto generativo.
 
+### Si la pieza usa selección colaborativa
+
+1. Crea un intent JSON con `targetId`, `targetKind`, variante, aire, overlay y cursores.
+2. Desde `../axis-design-system`, ejecuta `pnpm collaboration:resolve -- --input <intent.json> --out
+   <manifest.json>`.
+3. Entrega el manifest al adapter del renderer y enlaza `target.id` con la capa real; revisa que el bounding box
+   se adapte al contenido, que el cursor local toque su anclaje y que cada multiplayer `acting` quede fuera con
+   su punta sobre la esquina.
+4. Revisa también que cursor y placa multiplayer permanezcan próximos, que los nombres arbitrarios no cambien
+   la geometría y que el estado `moving` no toque ninguna selección.
+
+El compiler actual no trae ese adapter. Si no existe para la superficie elegida, deja `pending adapter` y
+detén esa capa: no copies el componente del Lab, no la generes dentro del clean plate y no la aproximes con
+coordenadas. Resolver el manifest tampoco autoriza release ni publicación.
+
 Revisa el SVG `*-layout-source.svg` cuando necesites ajustar manualmente capas o relevar la pieza a otra
 herramienta. El SVG contiene el plate enlazado y overlays vectoriales; mueve el conjunto junto con sus plates.
 

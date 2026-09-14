@@ -1,6 +1,6 @@
 ---
 name: axis-design-system
-description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including the portable advertising typography contract used by posts, stories, reels, covers, brochures, banners and motion."
+description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including portable advertising typography and semantic collaboration-selection intents with adaptive bounding boxes, local cursors and multiplayer presence."
 ---
 
 # AXIS Design System
@@ -87,6 +87,27 @@ Use the sources in this order for every piece with advertising text:
 The Workbench is the guided visual projection of the guide, not another source of truth and not creative
 approval. Its recommendation does not authorize a brand decision, client delivery, scheduling or publication.
 Do not make its adapter, families or recipes global, and do not package licensed font files with AXIS.
+
+### Collaboration selection
+
+AXIS source owns the candidate `efeonce.collaboration-selection` contract and
+`axis.collaboration-selection-composition.v1` manifest. Agents author semantic intent rather than pixels:
+`targetId`, `targetKind`, selection variant, proportional padding, overlay and cursor relationships. Normalize it
+from the sibling AXIS repository with:
+
+```bash
+pnpm collaboration:resolve -- \
+  --input docs/examples/collaboration-selection-intent.json \
+  --out /absolute/path/collaboration-selection.manifest.json
+```
+
+The command validates and resolves defaults, cursor direction/action and multiplayer attachment. It does not
+render, call a model, approve or publish. A surface adapter consumes only the normalized manifest, binds
+`target.id` to real text/object/group geometry and verifies the hotspot/selection relationship at narrow and wide
+formats. Never copy the Lab Astro/CSS or fall back to free `top`/`left` coordinates. If no adapter exists, report
+the capability as pending. The source contract is `candidate` and is not in the currently published `0.1.5`
+package; do not claim Greenhouse, Globe or another runtime has adopted it until package release and consumer
+evidence are recorded.
 
 ### AXIS Lab
 

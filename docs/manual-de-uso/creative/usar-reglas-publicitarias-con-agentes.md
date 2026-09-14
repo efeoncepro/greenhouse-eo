@@ -17,6 +17,7 @@ Ejemplos:
 - `Adapta esta pieza a story 9:16 y cover 16:9 sin perder jerarquía ni safe area.`
 - `Audita el peso, tracking, leading y contraste de esta portada de brochure.`
 - `Haz un Reel de 9 segundos; Bricolage abre, Poppins explica y Guttery sólo puede cerrar si aporta.`
+- `Compón la selección colaborativa sobre este titular; Camila está redimensionando y Producto se mueve por el canvas.`
 
 ## Uso explícito
 
@@ -38,6 +39,12 @@ esas acciones autoriza publicación.
    color/fondo y safe area por tramo.
 4. Resultado `PASS | REWORK | DON’T` para jerarquía, tipografía, contraste, marca, formato, movimiento y derechos.
 5. Estado real: prueba, revisada, aprobada, programada, publicada o medida.
+
+Si pides selección colaborativa, el agente debe entregarte además el intent o manifest AXIS usado y decir qué
+adapter pintó la escena. El bounding box debe seguir el texto/objeto/grupo real; un cursor `acting` apunta a un
+anclaje y un cursor `moving` puede no tocar nada. La placa acepta cualquier nombre de persona, rol o departamento
+y siempre viaja cerca de su puntero. Si la superficie no tiene adapter, la respuesta correcta es `pending
+adapter`, no una imitación dibujada libremente.
 
 ## Cómo revisar la respuesta
 

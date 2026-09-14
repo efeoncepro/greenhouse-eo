@@ -26,13 +26,35 @@
         "leading"
       ],
       "skills": [
-        "efeonce-advertising-creative"
+        "efeonce-advertising-creative",
+        "axis-design-system"
       ],
       "sources": [
         "docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md",
         "docs/architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md",
         ".codex/skills/greenhouse-typography-accessibility/references/campaign-ink-metrics-and-hierarchy.md",
         ".codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md"
+      ]
+    },
+    {
+      "id": "axis-collaboration-selection",
+      "triggers": [
+        "selección colaborativa",
+        "collaboration selection",
+        "cursor multiplayer",
+        "puntero multiplayer",
+        "bounding box adaptativo",
+        "cursor semántico",
+        "presencia multiplayer"
+      ],
+      "skills": [
+        "axis-design-system",
+        "efeonce-advertising-creative"
+      ],
+      "sources": [
+        "docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md",
+        "docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md",
+        "docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md"
       ]
     },
     {

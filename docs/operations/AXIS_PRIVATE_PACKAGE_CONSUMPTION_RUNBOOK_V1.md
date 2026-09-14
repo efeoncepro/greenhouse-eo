@@ -57,6 +57,18 @@ source control.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
 
+## Delta de source — 2026-09-14: selección colaborativa agent-facing
+
+El repo AXIS contiene en source `efeonce.collaboration-selection` `0.2.0` con lifecycle `candidate`, el resolver
+`resolveCollaborationSelectionIntent()` y el schema normalizado
+`axis.collaboration-selection-composition.v1`. El Lab es su primer adapter. Los agentes pueden validar y resolver
+un intent localmente con `pnpm collaboration:resolve -- --input <intent.json> --out <manifest.json>`.
+
+Este delta **no está publicado** en `@efeoncepro/axis-ui-contracts@0.1.5` y no habilita por sí solo Greenhouse,
+Globe, Artifact Composer, Campaign Layout Compiler u otro runtime. Para consumirlo se requiere release AXIS
+normal, versión exacta fijada, adapter nativo, fixture, evidencia responsive/cross-runtime y registro del consumer.
+No se debe copiar el adapter Astro/CSS del Lab ni describir la capacidad como desplegada antes de ese ciclo.
+
 ## Delta 2026-08-29 — la credencial venció, bloqueó un release, y el detector SÍ había avisado
 
 Caso fuente del modo de falla que este runbook venía anunciando desde el 2026-07-29 ("el día que

@@ -111,6 +111,13 @@ digital release + print/OOH production proofs + manifests + QA
 No es un ranking de modelos. Cada mano recibe un delta y conserva locks. Todos los formatos vuelven al
 anchor aprobado; no se encadenan derivados como `v1 → v2 → v3`.
 
+Cuando una pieza aprobada usa la metáfora de selección activa o multiplayer, esa geometría pertenece al
+postproceso determinista, nunca al plate generativo. El agente normaliza un `AxisCollaborationSelectionIntent`
+con `efeonce.collaboration-selection` y entrega el manifest
+`axis.collaboration-selection-composition.v1` al adapter del compositor. Si ese adapter no existe, la capa queda
+`pending adapter`: no se inventan coordenadas ni se devuelve la pieza compuesta al modelo para simularla. El
+manifest de selección complementa el manifest de campaña; no reemplaza lineage, gates ni aprobación humana.
+
 ## Gobernanza arquitectónica
 
 - **Arquetipo:** pipeline creativo multimodelo, out-of-band y human-in-the-loop; no es una feature autónoma

@@ -14,6 +14,7 @@ evidencia junto a la versión revisada.
 | Audiencia / contexto | Quién lo verá, dónde y a qué distancia/velocidad |
 | Copy | Texto literal, jerarquía semántica, CTA y legales |
 | Activos | Imagen/video, logo, fonts y provenance/licencia |
+| Selección colaborativa | Target real, variante, aire, overlay, cursores local/acting/moving, labels y adapter |
 | Estado esperado | Explorar, producir, corregir, aprobar, programar o publicar |
 
 ## Ficha tipográfica
@@ -38,6 +39,9 @@ necesitan gritar a la vez, el problema es de jerarquía, no de tamaño.
 5. **Escala:** revisa al 100 % y en miniatura/tamaño de feed. La lectura principal debe sobrevivir primero.
 6. **Movimiento:** una función por momento; no animes las tres voces simultáneamente. Subtítulos y copy crítico
    permanecen legibles sin depender del audio.
+7. **Selección colaborativa:** conserva el intent y manifest AXIS. Verifica target real, aire óptico consistente,
+   overlay bajo el contenido, hotspot local sobre el anclaje, multiplayer `acting` fuera con la punta en la
+   esquina, `moving` sin contacto y placa siempre próxima al puntero. Repite en el formato más estrecho y ancho.
 
 ## Gate DO / DON’T
 
@@ -51,6 +55,11 @@ necesitan gritar a la vez, el problema es de jerarquía, no de tamaño.
 | Imagen | Zona estable o protección diseñada | Texto/logo sobre detalle variable sin medición |
 | Logo | Versión con contraste y aire sostenidos | Wordmark blanco perdido sobre fotografía clara |
 | Producción | Medio limpio + overlay determinista | Texto crítico generado dentro de la imagen |
+| Bounding box | Se adapta a texto/objeto/grupo y agrega aire proporcional | Dimensión fija o borde pegado a una cara |
+| Cursor local | Hotspot sobre anclaje; `screen-fixed` mantiene orientación familiar | Flecha invertida, sin relleno o separada del target |
+| Multiplayer | Punta y placa separadas pero próximas; label libre | Puntero decorativo, placa huérfana o identidad hardcodeada |
+| Estado moving | Presencia conjunta en región semántica, sin tocar selección | Target/anclaje fingido para justificar su posición |
+| Portabilidad | Manifest normalizado + adapter conformante | Copiar CSS del Lab o usar coordenadas libres |
 
 ## Salida de la revisión
 
