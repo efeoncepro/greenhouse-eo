@@ -16,7 +16,9 @@ todos los targets, `insights_v1` sin asignar a ninguna org, canary staging (dos 
 federación en `efeonce-mcp` sin ejecutar, `pnpm build` no corrido (autorización), `migrate:down` no
 ensayado. Emitir falla cerrado (`not_ready`) hasta TASK-1846. Drift ajeno visto: 3 capabilities
 `identity.internal_access.*` en TS sin seed DB (parity live rojo preexistente). WIP creativo ajeno en el
-árbol intacto. Próximo: autorizar canary staging con flags ON, luego TASK-1846.
+árbol intacto. Decisión del mismo día (delta ADR): la vista web compartida se renderiza en `efeonce-think` desde
+`InsightWebModelV1` (TASK-1848 expone resolver/proxy; TASK-1849 ejecuta el render allá). Próximo: autorizar canary
+staging con flags ON, luego TASK-1846.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
 TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con
