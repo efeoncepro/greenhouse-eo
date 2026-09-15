@@ -17,7 +17,8 @@ federación en `efeonce-mcp` sin ejecutar, `pnpm build` no corrido (autorizació
 ensayado. Emitir falla cerrado (`not_ready`) hasta TASK-1846. Drift ajeno visto: 3 capabilities
 `identity.internal_access.*` en TS sin seed DB (parity live rojo preexistente). WIP creativo ajeno en el
 árbol intacto. Decisión del mismo día (delta ADR): la vista web compartida se renderiza en `efeonce-think` desde
-`InsightWebModelV1` (TASK-1848 expone resolver/proxy; TASK-1849 ejecuta el render allá). Próximo: autorizar canary
+`InsightWebModelV1` (TASK-1848 expone resolver/proxy; TASK-1849 ejecuta el render allá). **TASK-1875** creada (vista web
+compartida en Think, bloqueada por 1848; master flow `EPIC-045-efeonce-insights-UI-FLOW.md`). Próximo: autorizar canary
 staging con flags ON, luego TASK-1846.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
@@ -34,7 +35,7 @@ invariantes SQL/Ops, playbook reactivo, skills talento/resend/email/release (+ e
 Follow-ups formales: `TASK-1872` (fix de `ISSUE-173`: Phase A del consumer deja huérfano al handler que el breaker
 saltó; mitigación `reactive:backfill --handler=`), `TASK-1873`+`TASK-1874` (enlace descartado: warnings de intake +
 aviso en Application 360). Sin task: valor live de `GROWTH_FORMS_SERVER_VALIDATION_ENABLED`, 6 CV en cuarentena de
-`EO-OPN-0675`, reader canónico submissions↔postulaciones (hoy ad hoc). Resend en Pro. Siguiente ID libre: `TASK-1875`.
+`EO-OPN-0675`, reader canónico submissions↔postulaciones (hoy ad hoc). Resend en Pro. Siguiente ID libre: `TASK-1876`.
 
 **Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
 **no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a
