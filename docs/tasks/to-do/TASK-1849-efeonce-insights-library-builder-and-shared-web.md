@@ -2,6 +2,7 @@
 
 ## Delta 2026-09-15
 
+- **Decisión del operador (ADR delta 2026-09-15):** la vista web compartida NO se construye en Greenhouse: se renderiza en `efeonce-think` desde `InsightWebModelV1` (endpoint público de TASK-1848). Esta task conserva biblioteca/builder/detalle del portal + presentación email en Greenhouse, y la experiencia compartida como slice ejecutado en el repo `efeonce-think` (mismo modelo de trabajo que TASK-1325). Los criterios de GVC/estados (expirado/revocado/unknown) aplican allá; el `StatusScreen` de Think ya cubre `not_found`/`gone`.
 - Los DTOs de UI ya existen: `InsightEditionDto`/`InsightReportDto` (`readers/projection.ts`, browser-safe) con estado redactado por audiencia; lane app `platform/app/insights/**` completo (catálogo, reportes, ediciones, create/revise/issue/withdraw/recover). Esta task consume esos readers/commands; no escribe backend. — por TASK-1845
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -95,7 +96,8 @@ El ADR acepta planificación, no acredita implementación. Rutas/tablas nuevas s
 
 - `src/views/greenhouse/insights/** (nuevo propuesto)`
 - `src/components/insights/{library,builder,viewer}/** (nuevo propuesto; charts de TASK-1847)`
-- `src/app/(dashboard)/insights/** y src/app/insights/shared/** (rutas propuestas)`
+- `src/app/(dashboard)/insights/** (rutas propuestas del portal autenticado)`
+- Repo hermano `efeoncepro/efeonce-think`: `src/pages/insights/r/[token].astro` + componentes del informe web (render tonto de `InsightWebModelV1`; patrón de `/brand-visibility/r/[token]`, TASK-1325). Slice propio con GVC desktop+390px en ese repo.
 - `src/lib/copy/insights.ts y src/config/greenhouse-nomenclature.ts (claves Insights, serializadas)`
 - `src/emails/insights-ready.tsx (presentación nueva propuesta sobre EmailLayout)`
 - `registro de navegación y GVC para Insights; puntos exactos se verifican antes del JSX`

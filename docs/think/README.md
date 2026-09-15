@@ -25,6 +25,7 @@ y la route-ownership matrix.
 - [Landing Brand Visibility](brand-visibility-landing.md)
 - [Manual para reutilizar patrones UI Think](reuse-ui-patterns-manual.md)
 - **[Radiografía AEO — Arquitectura](radiografia-aeo-architecture.md)** · **[Manual](radiografia-aeo-manual.md)**
+- Efeonce Insights — vista web compartida por token (decisión 2026-09-15; contrato en [arquitectura Insights §8](../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md#8-acceso-web-compartido); render pendiente en TASK-1849 sobre `InsightWebModelV1` de TASK-1848)
 
 ## Herramientas vivas en Think
 

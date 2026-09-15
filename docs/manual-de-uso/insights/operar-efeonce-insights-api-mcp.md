@@ -46,6 +46,9 @@ Lane ecosystem: mismas rutas bajo `/api/platform/ecosystem/insights/**` con `ext
 en la query. Un binding org-scoped sólo lee; uno `internal` crea/revisa/recupera pasando `organizationId`.
 Ningún binding emite.
 
+Vista web compartida: cuando exista (TASK-1848/1849), el enlace apuntará a `think.efeoncepro.com/insights/r/<token>`;
+Think resuelve el token contra Greenhouse en cada visita, así que revocar el enlace corta el acceso de inmediato.
+
 MCP: `get_insights_catalog` → `create_insight_edition` → `get_insight_edition` (con `includeEvidence`),
 con el manual servido `efeonce-insights` (`get_greenhouse_skill`). Federar las tools en el gateway
 `efeonce-mcp` es un paso aparte todavía pendiente.

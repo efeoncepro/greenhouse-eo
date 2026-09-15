@@ -13,6 +13,10 @@ Efeonce Insights convierte la evidencia de un cliente (SEO, visibilidad en IA, e
 y las mismas cifras en deck, informe vertical y web. Greenhouse guarda la biblioteca, el encargo, los
 permisos y el ciclo de vida; los módulos siguen siendo dueños de sus métricas.
 
+La vista web que se comparte por enlace no vivirá en el portal: se mostrará en `think.efeoncepro.com`, el mismo
+hub que hoy muestra el informe de visibilidad en IA. Greenhouse sigue siendo dueño del dato y del enlace; Think
+sólo lo dibuja (decisión del 2026-09-15). La biblioteca para pedir y revisar informes sí queda en el portal.
+
 Hoy (TASK-1845) existe el **núcleo**: crear un encargo, recolectar evidencia, redactar el plan y dejar
 la edición lista para revisión. **Todavía no se renderiza ningún PDF ni vista web, no se comparte por
 enlace ni se envía por correo** (unidades posteriores del programa). Y como emitir exige salidas

@@ -102,6 +102,7 @@ TASK-1849 es consumer UI, backend none; si encuentra un gap de command vuelve a 
   integración E2E es criterio compartido de cierre. No reparentar ni duplicar tasks.
 - [TASK-1672](../../tasks/to-do/TASK-1672-growth-seo-audit-report-artifact.md): artefacto especializado de auditoría técnica SEO. Conserva findings/frescura y gates; consume el nuevo catálogo y snapshot. No otro motor.
 - [TASK-1673](../../tasks/to-do/TASK-1673-growth-seo-audit-report-share-send.md): entrypoint de compartir/enviar esa auditoría; consume TASK-1848 sin segundo token store/sender.
+- **Vista web compartida en `efeonce-think` (decisión 2026-09-15, delta del ADR):** la salida `web` por token se renderiza en `think.efeoncepro.com` con el patrón headless del Grader ([ADR](../../architecture/GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md), TASK-1325). Greenhouse expone `InsightWebModelV1` + resolver/proxy (TASK-1848); TASK-1849 ejecuta el render como slice en el repo hermano. La biblioteca autenticada sigue en el portal.
 - [TASK-1644](../../tasks/to-do/TASK-1644-artifact-composer-visual-profiles-proposal-studio.md): única dueña de VisualProfile; co-branding simple no la reimplementa ni depende de construir skins.
 - EPIC-018: dashboards de desempeño y primitives; Insights es edición congelada, no rediseño de esas pantallas.
 - TASK-1235/1239/1248/1330 y componentes actuales: Grader/snapshots/links como productores y patrones, sin migración general.

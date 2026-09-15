@@ -131,3 +131,26 @@ fija destinatarios, canales, preferencias, deep links y medición. TASK-1848/184
 y experiencia Insights; Notification Hub conserva routing/adapters/preferencias, coordinado desde
 EPIC-046/P09. Hitos I/N se certifican juntos para el recorrido de informes; no hay segundo sender,
 motor de digest ni gateway móvil. Esta decisión no habilita canales, destinatarios ni schedules live.
+
+## Delta 2026-09-15 — la vista web compartida se renderiza en Think, no en Greenhouse
+
+**Accepted**, por decisión del operador (2026-09-15). La salida `web` de una edición **compartida por
+token** se renderiza en el hub público `efeoncepro/efeonce-think` (`think.efeoncepro.com`, Astro +
+Tailwind sobre tokens AXIS), con el mismo patrón headless ya vigente para el informe del AI Visibility
+Grader ([`GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md`](GREENHOUSE_PUBLIC_REPORT_HEADLESS_RENDER_DECISION_V1.md)).
+Motivo: libertad editorial y de marca sin heredar MUI/chrome del portal, dominio adecuado para una pieza
+que el cliente reenvía, y separación limpia entre quien posee el dato y quien lo presenta.
+
+Lo que NO cambia: Greenhouse sigue siendo dueño del snapshot, del plan, del token y de la revocación;
+la **biblioteca autenticada** (ver, encargar, seguir, revisar) se queda en el portal Greenhouse; PDF deck
+y A4 siguen saliendo del Composer/Artifact Worker; el correo sigue en el sender central.
+
+Condiciones exigibles (arquitectura §8): Think resuelve el token **en cada request** contra un endpoint
+público de Greenhouse (nunca pre-render ni cache: revocar debe revocar), recibe un **modelo web
+versionado** (`InsightWebModelV1`, proyección client-facing del plan + snapshot, sin evidencia interna),
+no re-deriva cifras ni consulta productores, sirve descargas sólo por proxy autorizado de Greenhouse y
+aplica `noindex`, `no-referrer` y `no-store`. Ambos renderers (Composer y Astro) leen el mismo
+`ChartSpecV1`; la fidelidad exigida es semántica, y píxel a píxel sólo si un renderer SVG compartido lo
+demuestra. Ownership: TASK-1848 expone el resolver público y el modelo web; TASK-1849 conserva la
+experiencia compartida, cuya materialización vive en el repo `efeonce-think` (como TASK-1325 para el
+Grader). Sin código ni rollout en este delta.

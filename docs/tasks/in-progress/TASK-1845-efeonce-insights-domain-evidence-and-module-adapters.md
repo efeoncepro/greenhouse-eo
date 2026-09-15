@@ -309,7 +309,9 @@ ventana añadida en el dueño (`readSeoOverviewKpisForWindow`); generación por 
 commit (TASK-1846 la mueve al worker); ecosystem lane: binding org-scoped sólo lee, internal crea,
 ningún binding emite. Estado real: **code complete, rollout pendiente** (ver Status real y criterios
 sin tildar). Drift ajeno observado: 3 capabilities `identity.internal_access.*` en TS sin seed en DB
-(parity live rojo preexistente, no tocado).
+(parity live rojo preexistente, no tocado). **Decisión posterior del operador (mismo día):** la vista web
+compartida se renderiza en `efeonce-think` desde `InsightWebModelV1` (ADR delta 2026-09-15; TASK-1848/1849);
+no cambia el alcance de esta task.
 
 ## Delta 2026-09-09 — dos poblaciones autenticadas, EPIC-046
 
