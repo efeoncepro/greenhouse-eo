@@ -1018,30 +1018,3 @@ intacto. Sabido: ningún cliente Claude renderiza `icons` hoy — se declara por
 Detalle y razones en
 [`EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
 §Delta 2026-09-05.
-
-## 2026-09-05 — TASK-1836: diagnóstico cerrado del rechazo JWT corporativo
-
-El callback real pasó el intercambio upstream y fue rechazado por jwtVerify; no se emitió token MCP.
-Se añaden causas internas fijas para firma/clave/algoritmo, claims requeridos, issuer/audience y tiempo,
-sin conservar payload/cause ni relajar verificaciones. Respuesta pública sin detalles sensibles.
-20 pruebas focales y106 de auth correctas; revisión independiente sin hallazgos materiales. Emisor OFF
-tras el fallo, diagnóstico aún local y causa exacta pendiente de comprobar en runtime. Tsc y bundle
-del emisor correctos; build Next compiló pero se interrumpió en tipos, sin acreditarlo completo.
-
-Actualización21:48Z: diagnóstico desplegado confirma jwt_expired. Corrección local sustituye
-max_age=0 por prompt=login, conserva exp estricto y auth_time firmado/fresco; elimina orden
-no requerido auth_time<=iat. Emisor OFF rev19; nuevo canary y rollout pendientes.
-
-Actualización22:04Z: SSO Microsoft correcto en runtime. Consentimiento bloqueado por lector
-externo usado para organización interna; corrección local agrega proyección interna mínima y
-selección/verificación explícita de población. Readback PG real y150pruebas correctos;
-publicación/token/canary final pendientes, emisorOFF rev22.
-
-Actualización22:19Z: consentimiento visible tras publicar reader. Envío del formulario
-rechazado por Origin:null bajo no-referrer, reproducido con navegador real. Corrección local
-HTMLstrict-origin conserva CSRF y no envía rutas/query en Referer; canarytoken pendiente.
-
-Actualización22:44Z: canary interno real completo con09def4fc4: Microsoft, consentimiento,
-token y lectura propia correctos, foreigndeny, refreshrotativo, revocacióntoken10.151s,
-retirogrant<=11s y gatewayOFFdeny<=20s. Piloto restauradoON, gv5 y expiración original;
-tokenspruebarevocados. Promociónformal main y matricesamplias externas/UI pendientes.
