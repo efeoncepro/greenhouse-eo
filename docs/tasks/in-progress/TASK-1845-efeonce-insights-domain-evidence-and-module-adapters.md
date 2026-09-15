@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-045`
-- Status real: `Code complete + canary staging verde 2026-09-15 (develop 8844a3d5c pushed, CI/workers verdes; INSIGHTS_GENERATION_ENABLED=true sólo en staging; insights_v1 asignado a la org sintética Greenhouse Demo; ediciones EO-INS-000012/000013 creadas por app y ecosystem; gateway efeonce-mcp v1.5.0 mergeado (PR #12 cad57b31d) y desplegado (revisión 00053-dsk); scope efeonce.mcp.insights.write creado en Entra). Rollout pendiente: release develop→main + flag en Production, ensayo de rollback (migrate:down no ejecutado) y sesión MCP servida con token humano`
+- Status real: `Code complete + canary staging verde 2026-09-15 (develop 8844a3d5c pushed, CI/workers verdes; INSIGHTS_GENERATION_ENABLED=true sólo en staging; insights_v1 asignado a la org sintética Greenhouse Demo; ediciones EO-INS-000012/000013 creadas por app y ecosystem; gateway efeonce-mcp v1.5.0 mergeado (PR #12 cad57b31d) y desplegado (revisión 00053-dsk); scope efeonce.mcp.insights.write creado en Entra). Release develop→main APLICADO 2026-09-15 22:55Z (PR #236 → 9c0946883, manifest 9c094688309d-500ec9e7 released, run 35032358217, watchdog ok, canary prod: rutas ejecutando). Pendiente: INSIGHTS_GENERATION_ENABLED en Production + redeploy (bloqueado al agente, delegado), ensayo migrate:down, sesión MCP con token humano`
 - Rank: `TBD`
 - Domain: `platform|data`
 - Blocked by: `none`
@@ -292,7 +292,9 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - Gateway `efeonce-mcp` (rama `feat/task-1845-insights-federation`, `a37d526`, v1.5.0, 47 tools, `pnpm check` 184/184): `scripts/greenhouse-insights-canary.mjs` con el provider REAL contra staging: catalog ✓ list ✓ edition ✓ deny ✓.
 - Hallazgo menor: `plan.limits` repite «ico: sin datos.» por cada rechazo (4 líneas iguales); dedupe cosmético para TASK-1846.
 - Gateway desplegado 2026-09-15 (Codex ejecutó push/PR/merge/dispatch; PR #12 → `cad57b31d`; run `35027446001` success; revisión `efeonce-mcp-gateway-00053-dsk` con 100 % del tráfico, imagen `sha256:5776558…`, `Ready=True`; front door PRM 200 / `/health` 200 / `/mcp` 401). Scope `efeonce.mcp.insights.write` creado en la app recurso de Entra (id `e1a577d7-…`, Admin; readback: 7 scopes, los 6 previos con ids intactos; cliente PKCE compartido intacto).
-- Pendiente: release develop→main + `INSIGHTS_GENERATION_ENABLED` en Production, ensayo `migrate:down` (Codex no lo ejecutó: `pgmigrations.run_on` y las 2 ediciones siguen intactos), `tools/list` por sesión MCP servida con token humano (evidencia del conteo 47 y de la skill sin historial).
+- Release a producción 2026-09-15: PR #236 → `main` `9c094688309d345b9780b563968ecd1c5c96afd4`; orquestador `35032358217` un solo run sin retry (`bypass_preflight_reason` con hechos: migración ya aplicada, `auth_access` = paridad de scopes); manifest `9c094688309d-500ec9e7-3f22-4229-b152-e70a197ee1af` → `released` 22:55:13Z; Vercel Production `greenhouse-e8i8fkqbd` READY; watchdog `aggregateSeverity=ok`, 5/5 workers synced; ops-worker y auth-server retienen `0a05c8dc8267` con diff de árbol docs-only (skip legítimo); Azure `no_infra_diff`; `/api/auth/health` 200.
+- Canary de contrato en producción (lane ecosystem, consumer del gateway): catálogo 200 (ico disponible), org sin módulo 404, lista 200 (2 ediciones de staging: misma instancia), create 503 `generation_disabled` — las rutas nuevas ejecutan; sólo falta el flag.
+- Pendiente: `INSIGHTS_GENERATION_ENABLED` en Production + redeploy + create 202 (delegado: el clasificador bloquea `vercel env add … production`), ensayo `migrate:down` (no ejecutado: `pgmigrations.run_on` y ediciones intactos), `tools/list` por sesión MCP con token humano.
 
 ## Verification
 
