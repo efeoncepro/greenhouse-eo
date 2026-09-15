@@ -12,6 +12,7 @@
 > **Runtime destino:** blog WordPress de `efeoncepro.com`, vía Content Factory y estado inicial `private`.
 > **Artículo anterior:** [Dashboards confiables en HubSpot: el caso ANAM](https://efeoncepro.com/hubspot/dashboards-hubspot-confiables-caso-anam/).
 > **Servicio probado:** [`hubspot.customer-agent-managed`](../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md).
+> **Estado vigente del agente (2026-09-13):** activo y en producción, confirmado por el operador; el criterio «si continúa pausado» ya no aplica a piezas nuevas.
 > **Draft privado:** [Artículo v4 — pasada autoral en voz de Julio](./HUBSPOT_CUSTOMER_AGENT_ANAM_ARTICLE_DRAFT_V4.md).
 > **Auditoría editorial:** [copywriting, SEO y AEO — 2026-07-17](../audits/public-site/2026-07-17-anam-customer-agent-copy-seo-aeo.md).
 > **Aprobación cliente:** [confirmada; registro interno](./HUBSPOT_CUSTOMER_AGENT_ANAM_APPROVAL_RECORD_V1.md).

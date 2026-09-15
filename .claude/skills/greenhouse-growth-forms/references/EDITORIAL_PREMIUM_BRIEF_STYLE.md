@@ -16,6 +16,9 @@ Canonical visual specification:
 - Use Core Blue for the public-site submit when the surrounding Efeonce landing establishes blue, not teal.
 - Keep one caret per trigger. Country flags are vector circles with explicit optical centering, crisp outline and
   no blur; other options use semantic pictograms.
+- The caret is down when closed and rotates the same element 180 degrees around its optical center when opened;
+  close follows the inverse path. Drive it from `aria-expanded`/`data-open`, never shift its axis or animate a host
+  pseudo-caret, and make reduced motion reach the same final orientation immediately.
 - Desktop and 390 px, dropdown-open, focus/error, reduced-motion, overflow and empty-submit behavior require live
   verification.
 

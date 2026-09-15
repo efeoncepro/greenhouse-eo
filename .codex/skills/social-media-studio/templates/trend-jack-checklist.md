@@ -1,57 +1,60 @@
-# Checklist de trend-jacking
+# Decisión reactiva: trendjacking / newsjacking
 
-> **Para qué.** Decidir en minutos si te subes a un trend o lo dejas pasar — sin quemar la
-> marca ni llegar tarde. La ventana de un trend es **corta** (a veces horas/días). Trend-jacking
-> bien hecho = alcance frío regalado; mal hecho = cringe, riesgo reputacional o irrelevancia.
-> Regla base: **si tienes que explicar por qué la marca calza con el trend, no calza.**
-> Criterio completo en `modules/05` §6; caso fuente:
-> [`2026-09-11-iphone-duo-trendjack.md`](../../../../docs/operations/social/2026-09-11-iphone-duo-trendjack.md).
+Usar para una conversación observada. Si sólo hay fecha previsible, clasificar seasonality y usar el
+[brief de producción](social-creative-production.md). Canon:
+[playbook](../references/social-opportunity-playbook.md). Completar con hechos; `unknown` y límites son válidos.
+No convertir casillas en aprobación ni puntuación en pronóstico.
 
-## 1. Identificación del trend
-- **Trend / sonido / formato:** `[nombre + link]`
-- **Dónde vive:** `[TikTok | Reels | Threads | X | LinkedIn]`
-- **Qué lo define (sonido, formato, meme, hashtag):** `[…]`
-- **¿Sigue subiendo o ya pasó su pico?** `[subiendo | pico | bajando]` *(reverifica en vivo)*
-- **Detectado:** `[fecha/hora]` *(el tiempo corre)*
+## 1. Identificación y evidencia
 
-**Investigación mínima (antes de escribir):**
-- [ ] Leí los posts **textuales** de las marcas que ya se sumaron: `[marca → qué publicó]`
-- [ ] Crucé **≥2 fuentes** de medios de marketing: `[fuente 1, fuente 2]`
-- [ ] Vi **≥10 imágenes reales** del trend (memes + material oficial). Chiste dominante: `[…]`
+- Clasificación primaria/secundaria y razón:
+- Detonante original: URL, fecha, mercado, qué ocurrió:
+- Código reconocible y qué están transformando los participantes:
+- Audiencia pertinente y valor que recibirá:
+- Muestra efectiva: URLs, autores, fechas y límites; separar público/marcas/material oficial:
+- Estado puntual observado:
+- Evolución: observaciones comparables o «no verificada»; no inferir desde acumulados:
+- Hora de consulta / `review_before` / `expires_at` o `unknown` / condición de retiro:
+- Hechos confirmados / interpretaciones / premisas por verificar:
 
-## 2. Evaluación (marca antes que impulso)
-| Criterio | Pregunta | Respuesta | Bandera |
+## 2. Evaluación operativa
+
+| Criterio | Evidencia o razón | Defecto concreto | Corrección viable |
 |---|---|---|---|
-| **Fit de marca** | ¿Calza natural con lo que somos/decimos? | `[…]` | 🟢/🟡/🔴 |
-| **Ventana de tiempo** | ¿Llegamos antes de que muera? | `[…]` | 🟢/🟡/🔴 |
-| **Riesgo reputacional** | ¿Origen turbio, tema sensible, drama? | `[…]` | 🟢/🟡/🔴 |
-| **Esfuerzo de producción** | ¿Lo hacemos hoy con lo que tenemos? | `[…]` | 🟢/🟡/🔴 |
-| **Ángulo propio** | ¿Tenemos un giro que aporta, no copia? ¿La mecánica no es la que otra marca ya hizo suya? | `[…]` | 🟢/🟡/🔴 |
-| **Chiste = mensaje** | ¿El chiste lleva nuestro mensaje, o decora un claim escrito antes? | `[…]` | 🟢/🟡/🔴 |
-| **Audiencia** | ¿A NUESTRA gente le hará sentido? | `[…]` | 🟢/🟡/🔴 |
+| Audiencia y contexto | | | |
+| Papel y relación de marca | | | |
+| Aporte propio y código reconocible | | | |
+| Hechos, lectura cultural y derechos aplicables | | | |
+| Tiempo, herramientas y alcance disponible | | | |
 
-## 3. Nuestro ángulo
-- **Mecánica:** `[juego con el nombre | lo hicimos primero | nuestro producto como el objeto | tensión del oficio en las dos mitades | el formato como metáfora]` *(mapa en `modules/05` §6)*
-- **El giro propio (qué aportamos, no solo replicar):** `[…]`
-- **Cómo conecta con nuestro mensaje/pilar:** `[…]`
-- **Copy por red (misma verdad, distinta forma):** Threads/Instagram = el chiste · LinkedIn = el argumento · `[…]` *(craft en `copywriting/modules/08` §6)*
-- **Formato + sonido a usar:** `[…]` *(sonido verificado vivo `as-of [fecha]`)*
-- **Producción con:** `[grabación rápida | higgsfield-* | plantilla]` · YouTube exige video (Short 9:16)
+No exigir que el público comprenda una explicación estratégica: la ejecución debe comunicar; el brief debe
+poder explicar por qué participamos. No afirmar que otra marca «posee» un mecanismo creativo general;
+evitar copiar su ejecución y describir antecedentes cuando importen.
 
-## 4. Riesgo y aprobación
-- **Origen del trend limpio:** `[sí/no — evita trends con drama, tragedia o política divisiva]`
-- **¿Podría malinterpretarse?** `[peor lectura posible]`
-- **¿Nombramos a otra marca?** `[sí/no — si sí: citamos o describimos lo que publicó, con su tono; nunca su estado ni su intención]`
-- **Aprobación necesaria:** `[quién firma antes de publicar]`
-- **Etiquetado IA si aplica:** `[sí/no — manos/objetos/personas fotorrealistas con IA = sí; flags IG isAiGenerated, YouTube isAiGeneratedContent]`
+## 3. Ángulo y producción
 
-## 5. Semáforo de decisión (GO / NO-GO)
-- 🟢 **GO** — fit natural + ventana abierta + riesgo bajo + ángulo propio + producible hoy. **Publica rápido** (tras confirmación humana).
-- 🟡 **CAUTELA** — 1-2 amarillas. Ajusta el ángulo o el timing; si no lo resuelves en `[X min]`, es NO-GO. La velocidad importa: no lo pienses una semana.
-- 🔴 **NO-GO** — cualquier roja en fit, riesgo reputacional u origen. **Déjalo pasar.** Un trend perdido no cuesta nada; una marca quemada sí.
+- Observación → tensión → insight propuesto → mecanismo → ejecución:
+- Conexión de marca y asociación buscada:
+- Concepto/copy fijados y libertad restante:
+- Formato/superficie y razón; no exigir humor, video ni todas las redes:
+- Activos oficiales y modo visual de marca:
+- Brief, layout, operaciones y cinco niveles de QA: [social-creative-production.md](social-creative-production.md).
+- Derechos/disclosure: verificar contrato vigente del canal y activo; no inventar flags del conector:
 
-## 6. Post-decisión
-- **Decisión:** `[GO | CAUTELA | NO-GO]` · **Por:** `[…]` · **Hora:** `[…]`
-- **Si GO — deadline de publicación:** `[hoy antes de HH:MM]` · **escalonado por red:** `[Threads HH:MM → Instagram HH:MM → LinkedIn HH:MM]` *(un post programado por red; cola revisada antes y después)*
-- **KPI que miramos:** `[alcance a no-seguidores | sends]`
-- **Aprendizaje (post):** `[funcionó el ángulo? repetiríamos el formato?]`
+## 4. Decisión
+
+- `go | revise | no-go`, razón, autor y hora:
+- Si `revise`: qué cambiar y momento de reevaluación dentro de ventana:
+- Si `no-go`: premisa/ventana/requisito irresoluble y alternativa pertinente:
+- Si `go`: alcance de producción, entrega y revalidación antes de distribuir:
+- Autorización de producir:
+- Autorización separada de publicar/programar, alcance y fuente; si falta, terminar prueba reviewable:
+
+## 5. Cierre y aprendizaje
+
+- Artefacto y revisión interna, defectos abiertos y evidencia:
+- Relectura de conversación antes de distribución: hora, cambio observado y decisión:
+- KPI/definición/denominador/ventana/cuenta/formato/paid-organic/baseline:
+- Resultado observado o «desempeño no medido»:
+- Hipótesis apoyada/no apoyada/no evaluable; no afirmar causalidad desde una pieza:
+- Próximo cambio concreto; no prometer monitoreo futuro si no está autorizado:

@@ -1,0 +1,57 @@
+{
+  "schema": "axis.collaboration-selection-composition.v1",
+  "contract": {
+    "id": "efeonce.collaboration-selection",
+    "version": "0.2.0"
+  },
+  "target": {
+    "id": "harness-primary-headline",
+    "kind": "text"
+  },
+  "selection": {
+    "variant": "eight-handles",
+    "padding": "standard",
+    "paddingRatio": {
+      "inline": 0.012,
+      "block": 0.01
+    },
+    "overlay": "subtle",
+    "overlayOpacity": 0.1,
+    "overlayBlendMode": "luminosity"
+  },
+  "cursors": [
+    {
+      "id": "local-cursor",
+      "kind": "local",
+      "targetId": "harness-primary-headline",
+      "anchor": "bottom-center",
+      "action": "select",
+      "orientation": "screen-fixed",
+      "direction": "north-west"
+    },
+    {
+      "id": "creative-operations",
+      "kind": "collaborator",
+      "targetId": "harness-primary-headline",
+      "anchor": "top-end",
+      "action": "resize",
+      "label": "Creative Ops",
+      "participantKind": "department",
+      "state": "acting",
+      "direction": "south-west",
+      "attachment": "south-west"
+    },
+    {
+      "id": "camila-acting",
+      "kind": "collaborator",
+      "targetId": "harness-primary-headline",
+      "anchor": "bottom-end",
+      "action": "rotate",
+      "label": "Camila",
+      "participantKind": "person",
+      "state": "acting",
+      "direction": "north-west",
+      "attachment": "north-west"
+    }
+  ]
+}

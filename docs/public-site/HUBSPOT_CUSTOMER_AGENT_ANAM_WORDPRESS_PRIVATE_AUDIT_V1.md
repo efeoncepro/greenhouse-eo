@@ -4,6 +4,7 @@
 > **Fecha:** 2026-07-17
 > **Post:** `251432`
 > **Publicación:** autorizada y ejecutada el 2026-07-17
+> **Estado vigente del agente (2026-09-13):** activo y en producción según el operador; el post publicado todavía describe el corte del 2026-07-17 (no operativo). Actualizarlo requiere autorización.
 
 ## Resultado de la fase privada
 

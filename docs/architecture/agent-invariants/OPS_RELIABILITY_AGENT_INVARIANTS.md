@@ -286,3 +286,78 @@ ejecución = un artefacto** (`tasks=1`, `parallelism=1`, `max-retries=0`).
   ops-worker dispatch · el Job): prenderlo en uno solo deja el pipeline muerto **en silencio**.
 
 Spec: `GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md` · Runbook: `docs/manual-de-uso/proposal-studio/operar-el-artifact-worker.md`
+
+## Consumer reactivo: breaker, huérfanos y señal de circuito (ISSUE-172/173, 2026-09-12)
+
+> Fuente: `docs/issues/resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md` +
+> `docs/issues/open/ISSUE-173-reactive-consumer-strands-breaker-skipped-handler-events.md`. Reproducción y
+> predicado exacto en `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md` → «Delta 2026-09-12 — ISSUE-173». El fix
+> estructural (pendiente POR handler) **no está implementado**: vive como diseño en la ficha de ISSUE-173 y exige
+> task propia. Skill: `greenhouse-cron-sync-ops` («Delta 2026-09-12»).
+
+**El hueco (medido en producción el 2026-09-12).** El consumer reactivo V2 (`src/lib/sync/reactive-consumer.ts`)
+decide en **Phase A** qué eventos están pendientes con un `NOT EXISTS` sobre `greenhouse_sync.outbox_reactive_log`
+filtrado por `r.handler = ANY($2)`, donde `$2` son **todas** las handler keys del dominio: un evento cuenta como
+procesado si **cualquier** handler tiene fila. En **Phase C**, con el breaker `open`, el grupo se salta **sin
+escribir fila** (a propósito, para re-tomarlo tras el enfriamiento). Las dos decisiones juntas producen huérfanos:
+en un evento multi-handler (`growth.forms.submission_accepted` tiene 4 projections registradas) los siblings
+escriben `no-op` en la misma corrida en que el breaker salta al cuarto, y desde ese momento el drain programado del
+dominio (`ops-reactive-*`) **nunca vuelve a fetchear** el evento para el handler saltado. No hay fila `retry`, no
+hay dead-letter, `--replay-failed-handlers` no lo ve. En Hiring el residuo son postulaciones que nunca nacen: el
+2026-09-12, con el circuito de `growth_hiring_application_from_submission` abierto desde 12:15:03Z (cerró solo
+12:50:02Z), hubo hasta 38 personas reales sin proyectar durante horas y ninguna señal lo mostró.
+
+- **Mitigación manual (única vía hoy):** drain acotado por handler —
+  `pnpm reactive:backfill --handler=<projection>:<event_type>`. Con `$2` reducido a una sola key el `NOT EXISTS`
+  vuelve a ser verdadero y el evento entra. Caso fuente:
+  `pnpm reactive:backfill --handler=growth_hiring_application_from_submission:growth.forms.submission_accepted`
+  → `6/6 ok` cuando el drain del dominio reportaba `0 processed`. **SIEMPRE** correrlo tras cada apertura de
+  circuito de una projection que comparta tipo de evento con otras, hasta que el fix estructural aterrice.
+- **Señal `sync.reactive.circuit_open`** (`src/lib/reliability/queries/reactive-circuit-open.ts`; kind `incident`,
+  módulo `sync`, steady 0; cableada en `src/lib/reliability/get-reliability-overview.ts`, comentario en
+  `registry.ts`). Lee `greenhouse_sync.projection_circuit_state WHERE state <> 'closed'` y
+  `greenhouse_sync.handler_health WHERE current_state IN ('degraded','failed','quarantined')`. Severidad: `error`
+  con al menos un breaker `open`/`half_open` **o** un handler `failed`/`quarantined`; `warning` si sólo hay
+  handlers `degraded` (todavía procesan); `ok` en steady; `unknown` si la lectura falla (capturado con
+  `captureWithDomain(…, 'sync')`). La evidencia redacta direcciones de correo (los errores de validación del
+  proveedor las citan). **Lo que NO ve:** el residuo que deja un breaker al cerrar (ISSUE-173); esa señal
+  (`sync.reactive.handler_orphan_residue`) es parte del fix pendiente.
+- **Antes de la señal no había nada:** ninguna señal de reliability miraba `projection_circuit_state` ni
+  `handler_health`; el circuito abierto se supo por los logs de Cloud Run. Con la señal, el mismo incidente habría
+  sido visible en el siguiente ciclo del overview.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** leas `0 processed` del drain de un dominio como «no hay pendientes». Con un breaker que abrió sobre una
+  projection con siblings, el fetch de Phase A excluye justo lo que falta. Verifica **por contenido** (la entidad
+  downstream que debería existir) o con el drain acotado por handler.
+- **NUNCA** «arregles» un huérfano insertando/borrando filas de `outbox_reactive_log` ni escribiendo la entidad
+  downstream por SQL. La vía es el drain gobernado por handler: es idempotente (`bulkAcknowledgeEvents` hace
+  `ON CONFLICT (event_id, handler)`), y la recuperación de ISSUE-172 se hizo íntegra así, nunca con SQL sobre
+  postulaciones.
+- **NUNCA** hagas que el skip por breaker escriba una fila «de paso» para que Phase A lo re-tome (opción B de
+  ISSUE-173): `classifyOutcome` mapea cualquier `result` desconocido a éxito, `recordHandlerOutcomes` resetearía
+  `consecutive_failures`/`recovered_at` (corrompe `handler_health` y el KPI de dead-letters activos) y los readers
+  de backlog cuentan «cualquier fila» como reaccionado. El diseño aceptado es **pendiente POR handler en Phase A**,
+  emparejando `handler ↔ event_type` — la trampa: `unnest($2)` con todas las keys del dominio hace pendiente a
+  TODO evento para siempre, porque una key de otro tipo nunca tendrá fila.
+- **NUNCA** cuentes con que el enfriamiento del breaker «re-toma solo» un evento: sólo es cierto cuando el evento
+  tiene un único handler registrado. El comentario de Phase C que lo promete está incompleto.
+- **SIEMPRE** que un consumer del carril vivo falle de forma intermitente, mira `projection_circuit_state` y
+  `handler_health` (o la señal) **antes** que los logs del worker; y **SIEMPRE** que un circuito cierre, corre el
+  drain acotado por handler y confirma por contenido que el residuo es 0.
+
+**Dos hechos de runtime que gobiernan la recuperación:**
+
+- **El push a `develop` despliega el `ops-worker` compartido** (`.github/workflows/ops-worker-deploy.yml`,
+  `push.branches: develop`; un solo servicio para staging y producción, ver §Cloud Run ops-worker). Un fix del
+  consumer, del anti-join de una projection o de cualquier handler queda **vivo en producción al mergear a
+  `develop`**, antes del release control plane. En ISSUE-172 el anti-join del talent pool estaba operando antes del
+  release `586a8627568a`; el release lo hizo permanente. Declarar ese blast radius en la task **antes** del merge.
+- **`pnpm reactive:backfill` ejecuta el ÁRBOL LOCAL contra la única base** (`tsx scripts/reactive-backfill.ts`;
+  Cloud SQL compartida dev/staging/prod). Sirve como recovery y como canary del código no desplegado (en ISSUE-172
+  ejercitó el parser tolerante de URLs antes del deploy), pero eso significa **escribir producción con código que
+  aún no está en ningún runtime**: declararlo en la evidencia, no descubrirlo después. `--dry-run` primero;
+  `--replay-failed-handlers --handler=<key>` relee `retry`/`dead-letter`; `--handler=<key>` sin replay drena los
+  huérfanos del breaker. Si la recuperación crea entidades que emiten correo, contar antes cuántos y mirar la
+  cuota del proveedor (`resend-email-platform` → «Delta 2026-09-12»).

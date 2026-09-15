@@ -1,20 +1,32 @@
 # Handoff activo
 
-**Tipografía creativa Efeonce (2026-09-12, documental):** `Bricolage Grotesque` variable está en
-`src/assets/fonts/`; licencia, procedencia y hash constan en `BricolageGrotesque-SOURCE.md`. Docs y skills espejo la
-registran como display para campañas fuera de UI. El contrato de UI permanece Poppins + Geist; no se cambió runtime.
+**Contacto:** TASK-1801 cerrada; [alcance y evidencia](.codex/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
 
-**Pipeline de Hiring vacío por vacante (2026-09-12, diagnóstico; `ISSUE-171`):** `/agency/hiring/pipeline` se veía
-vacío en `EO-OPN-0674` y `EO-OPN-0675` con 15 y 51 postulaciones reales **intactas, sin pérdida de datos**. Causa raíz
-reproducida: `PipelineDeskView.tsx:125` siembra `applications` con `useState` y nunca re-sincroniza, mientras el
-hermano `openingId` sí (efecto `:150`), así que al cambiar de vacante el tablero filtra el arreglo del montaje y da 0.
-Preexistente desde `559f5654b` (2026-07-09); no es regresión de la publicación del 2026-09-09. **Fix en local, sin desplegar.** Detalle y adyacentes en
-`docs/issues/open/ISSUE-171-hiring-pipeline-empty-stale-client-snapshot.md`. **`ISSUE-172` (P1):** `lpad` recorta el `public_id` del Banco de Talento pasado 99 999 → colisión que
-abre el circuito del consumer de postulaciones (25 personas sin proyectar, nada borrado); fix en local
-(migración + anti-join + parser tolerante + señal `sync.reactive.circuit_open`), **migración NO aplicada**. Aparte:
-6 CV en `quarantined`. El script read-only vive sólo en `claude/hiring-pipeline-bug-880pbn` (con
-`TASK-1869`); esa rama contiene `origin/develop` pero **no** el develop local (4 commits sin pushear) — su merge no es
-ff-only hoy. Siguiente ID libre: `TASK-1870`.
+**Creative/social 14/09:** AXIS `v0.2.5` publicó `supportingTagline` y selección colaborativa; Greenhouse fija
+los packages y `pnpm creative:layout` los adapta a texto/objeto/grupo. El harness agrega el SVG URL Bubble con
+blend raster `luminosity` `0.72` verificado. Templates: `efeonce-advertising-creative`. Globe/otros runtimes:
+`pending adapter`; tipografía: `trial`; selección: `candidate`.
+[Fiestas Patrias/Muertos](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md)
+y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
+no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
+
+**Efeonce Insights — TASK-1845 code complete + canary staging verde (2026-09-15, Claude, `develop` `8844a3d5c` pushed; CI y deploys de workers verdes):** dominio `src/lib/efeonce-insights/`, schema `greenhouse_insights`, adapters SEO/AEO/ICO, lanes app+ecosystem, 4 tools MCP, skill `efeonce-insights`. **Staging:** `INSIGHTS_GENERATION_ENABLED=true` sólo ahí, `insights_v1` asignado a la org sintética `Greenhouse Demo`; ambos lanes crearon/leyeron ediciones sintéticas (`EO-INS-000012/13`, 0 hechos por falta de snapshots ICO) y el deny fue 404. Detalle en «Rollout evidence» de la task. **Gateway `efeonce-mcp`:** rama `feat/task-1845-insights-federation` `a37d526` (4 tools, scope `efeonce.mcp.insights.write` sólo para crear, fail-closed, v1.5.0, 47 tools); provider real verde contra staging. **Después (mutaciones ejecutadas por Codex):** gateway PR #12 → `cad57b31d`, desplegado como revisión `efeonce-mcp-gateway-00053-dsk` (front door 200/200/401); scope `efeonce.mcp.insights.write` creado en la app recurso de Entra (round-trip 6→7). **Pendiente:** release develop→main + `INSIGHTS_GENERATION_ENABLED` en Production (preflight local: `requires_break_glass`; migración ya aplicada, `auth_access` = paridad de scopes); `migrate:down` sin ensayar; `tools/list` por sesión MCP humana. Próximo: TASK-1846.
+
+**Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
+TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con
+autorización:** el artículo publicado del caso (post `251432`) aún dice «no operativo».
+
+**Hiring: incidente P1 resuelto y en producción (2026-09-12; `ISSUE-171`/`172` resolved, `ISSUE-173` open; release
+`586a8627568a`):** el tablero no re-leía el snapshot al cambiar de vacante (`ISSUE-171`) y `lpad` recortaba el
+`public_id` del Banco de Talento pasado 99 999 (`ISSUE-172`, P1): colisión que rompía el cron y abrió el circuito
+del consumer de postulaciones. Recuperado por vías gobernadas sin borrar nada (migración, replay, revive de correos):
+**281 submissions / 0 sin postulación, 164 acuses enviados**, circuito `closed`, handler `healthy`. Release PR #234 →
+`released` 14:44:56Z, watchdog 5/5. Docs y skills barridas ese día: ATS §Delta 2026-09-12, `.claude/rules/hiring.md`,
+invariantes SQL/Ops, playbook reactivo, skills talento/resend/email/release (+ espejos `.codex/`), desk/careers/emails.
+Follow-ups formales: `TASK-1872` (fix de `ISSUE-173`: Phase A del consumer deja huérfano al handler que el breaker
+saltó; mitigación `reactive:backfill --handler=`), `TASK-1873`+`TASK-1874` (enlace descartado: warnings de intake +
+aviso en Application 360). Sin task: valor live de `GROWTH_FORMS_SERVER_VALIDATION_ENABLED`, 6 CV en cuarentena de
+`EO-OPN-0675`, reader canónico submissions↔postulaciones (hoy ad hoc). Resend en Pro. Siguiente ID libre: `TASK-1876`.
 
 **Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
 **no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a
@@ -24,15 +36,8 @@ Las 4 preguntas quedaron decididas el mismo día: `TASK-1870` (rotación SERP, c
 `ISSUE-170` — el link gap del prospecto puede colapsar por intersección AND, con experimento definido y
 sin medir. Decisión y evidencia: `docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md`.
 
-**Portafolio de landings del sitio público (2026-09-11, documental):** `EPIC-047` reancla desde EPIC-019 las 20
-tasks de landing y fija su orden en `Rank EPIC-047-01…10`: Agencia Creativa → ASO (pitch activo con Berel) → HubSpot
-(Precios, Agentes) → Salesforce → Performance → resto; Contacto es habilitador (`H1`) y los artículos del hub HubSpot (TASK-1402/1404) van
-fuera del ranking. Cerradas por decisión del operador, publicadas e indexables (HTTP 2026-09-11): TASK-1799 Content
-Marketing, TASK-1358 Home, TASK-1351 Redes Sociales y TASK-1352 Pillar HubSpot; cada una registra sus criterios de QA sin verificar.
-**Hallazgo:** `/agencia-creativa/` y `/agencia-creativa-v2/` están ambas indexables con canonical propio → decidir URL
-final + 301 (TASK-1350). El Pillar HubSpot vive en `/servicios-contratar-hubspot/`; `/servicios/hubspot/`
-redirige a un post antiguo, así que la URL padre de Precios/Agentes está por decidir. Pendientes del operador: validar PDR-021/022/023, owners/SLA de Contacto, alcance de la
-aprobación ANAM para TASK-1403 y cerrar TASK-1322 como superseded.
+**Portafolio de landings (2026-09-11, documental):** `EPIC-047` ordena las landings del sitio público en `Rank`;
+cuatro cerradas por el operador (1799, 1358, 1351, 1352). Decisiones pendientes en el epic.
 
 **Panel competitivo AEO de SKY (2026-09-11, operación + venta):** 5 runs del grader en staging (SKY, LATAM, JetSMART,
 Avianca, Gol; Chile; set curado de 12 preguntas de aerolíneas; `EO-GRUN-00050`…`00054`), 2 aprobados en revisión
@@ -105,20 +110,22 @@ empresarial de Julio (2×1.000.000 del 07/09 como expenses `payroll` sin entry),
 Melkin (`EXP-202604-005`), y el PDF `36_16359_420051383906_2026-06-30.pdf` para el crédito antiguo.
 Contable a revisar: pagar el bruto sobre boletas con retención deja la retención sin documento propio.
 
-**TASK-1604 / SEO (2026-09-13):** piloto manual autorizado con calibración independiente pendiente.
-Nueve preguntas activas y plantilla/policy `enabled/manual`, 75 min, cinco asignaciones/hora. Binding exacto
-verificado por API desplegada y reader. [Evidencia](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md).
-D4 implementado localmente; dos migraciones aplicadas, 594 focales y dos live passed; falta release y smoke.
-Sin asignaciones ni correos; Arte intacto.
+**TASK-1604 / SEO (2026-09-13):** piloto manual autorizado; calibración independiente pendiente.
+Nueve preguntas y template/policy `enabled/manual` vinculados a `EO-OPN-0674` (75 min, cap 5/h), binding
+verificado por API/reader. [Evidencia](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md).
+D4 desplegado en producción con release `cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9`, canary sin efectos.
+Recorrido sintético y automatización pendientes; sin asignaciones/correos; Arte intacto.
 
-**TASK-1832 (readback 2026-09-10T12:17Z): operativamente bloqueada para retiro.** Frontera canary sana
-(`1/1`, purpose drift `0/0`, dos profiles run-owned fuera de Person 360), pero
-`auth.oauth.refresh_reuse_detected=93/24h` sobre el CIMD compartido de Codex. Cleanup dry-run, sin apply:
-`unexpectedRefs=0`, `deletionReady=false` y blockers
-`registration_active|active_authority|active_auth|oauth_client_not_run_owned`. El CIMD tiene 8 artefactos de
-sujetos canary y 35 de otros sujetos; el helper vigente borra por `client_id`. No retirar el blocker ni ejecutar
-`--apply`: implementar planner/delete/readback sujeto-específicos, preservar cliente/hijos ajenos, diagnosticar
-las familias de refresh y recién después reiniciar steady/retirar desde `delete_after`.
+**TASK-1832 (revisión read-only 2026-09-14T14:12Z): operativamente bloqueada para retiro, no para uso MCP.**
+La correlación por sujeto atribuyó los `458 refresh_reuse/7d` del CIMD compartido de Codex a un perfil interno
+`real`, no a los dos perfiles canary. La conexión posterior a TASK-1832 funciona por el conector hospedado de
+Claude: grant vigente, familia refresh activa y access token emitido a `13:55:32Z`, con vigencia hasta
+`14:10:32Z`. Para los sujetos canary hubo `14` eventos desde el alta, todos contenidos en negativos/DCR
+run-owned; el último fue
+`2026-09-11T01:33:34.325Z`, sin actividad posterior. La primera fecha conservadora de siete días es
+`2026-09-18T01:33:34.325Z`. El apply sigue prohibido por `oauth_client_not_run_owned`: el helper borra por
+`client_id` y debe pasar a planner/delete/readback sujeto-específicos que preserven el CIMD y sus hijos ajenos.
+[Evidencia y alcance](docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md).
 
 **Sistema de contenidos Notion (2026-09-10, mapeado / sin mutaciones):**
 [mapa canónico](docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md) de Pilares JTBD + Content Hub +
@@ -339,6 +346,8 @@ tener wireframe/flow reales. Siguiente ID libre `TASK-1835` / `EPIC-045`.
 señales; smoke `pnpm identity:external-access:smoke`. **Staging verificado 2026-09-04** (develop `02dc5d987` pusheado coordinado con TASK-1828): 4 señales en `/api/admin/reliability`, rutas admin 200, lane ecosystem 401 sin consumer. **En producción** desde el release 2026-09-04 (run 33893120972; canary del lane 400/200 `environment_inactive`/401; emisor `efeonce-auth` en `draft`). **Próximo paso:** operador lee las 4 señales en `/admin/operations` prod con sesión humana; TASK-1829 emite tokens y pasa el environment a `active`; TASK-1831 consume el reader.
 Paridad registry↔catálogo roja por 11 capabilities ajenas sin seed (task aparte).
 
+Release SEO/D4 (2026-09-13): PR #235, run `34754161855`, manifiesto `released`; [auditoría](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md).
+
 Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y
 skills Payroll/Talent Codex/Claude; Finance histórico pendiente de conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
 
@@ -406,18 +415,3 @@ TASK-1625/ISSUE-129–134 conservan trazabilidad; OAuth TASK-1813 e identidad TA
 Primer paso: plan y ADR acotado de TASK-1816, cálculo atómico/aprobación de versión.
 [Baseline](docs/audits/payroll/PAYROLL_RELIABILITY_API_PARITY_PROGRAM_BASELINE_2026-09-03.md).
 Sólo planificación/documentación; sin código, migraciones, envíos, pagos ni deploy.
-
-## 2026-09-03 — TASK-1806 seguimiento: alerta Teams determinista + rutina de recordatorio del cutover ETV
-
-Después del cierre `complete` de TASK-1806 (ver entrada debajo, release `bda12be7e33a`), el operador preguntó
-quién vigila la señal `seo.etv_methodology.drift` — hoy sólo es pull vía `/admin/operations`, nadie se entera
-si no lo abre. Autorizado en chat ("las 3 formas de vigilar"), se desplegaron dos capas nuevas: (1) cron
-`ops-seo-etv-drift-watch` (Cloud Scheduler, diario 12:00 America/Santiago, sin flag) que llama
-`checkAndAlertSeoEtvMethodologyDrift()` (`src/lib/growth/seo/etv-methodology/drift-alert.ts`), lee la señal
-existente sin tocarla y avisa a Teams sólo si `severity=error` — endpoint `POST /seo/etv-methodology-drift-watch`,
-dispatcher `sendManualTeamsAnnouncement`, destino nuevo `growth-seo-reliability-alerts`
-(`src/config/manual-teams-announcements.ts`), mismo canal físico "EO - Admin" que `production-release-alerts`.
-Commit `79a1c3f74` en `develop`. Verificado en vivo (revisión `ops-worker-00637-2ww`): llamada real respondió
-`{"severity":"warning","alerted":false}` — correcto, hoy es `warning` no `error`. 6/6 tests verdes. (2) Rutina
-`trig_015zxhP1D4yXfTacUm5HqmQU`, dispara una vez el 2026-09-17 13:00 America/Santiago tras la primera captura
-improved desatendida, sin credenciales locales: sólo recuerda verificar manualmente, no ejecuta verificación real.

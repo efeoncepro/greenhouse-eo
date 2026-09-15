@@ -44,10 +44,11 @@ menciones). Qué vigilar:
 | **Hashtags / audios** | Qué sube, qué se satura | Trend-jacking, timing |
 | **Creators / voces** | Quién mueve la conversación del nicho | Sourcing de creadores (ver 06) |
 
-- **Menciones indirectas importan más que las @**: la mayoría del boca-a-boca no te etiqueta.
-  Monitorea el nombre suelto, variantes y typos, no solo el handle.
-- **Alerta temprana de crisis**: un salto de volumen + caída de sentiment = señal para
-  activar el protocolo de crisis (04 §5) antes de que escale.
+- **Cubrir menciones directas e indirectas:** buscar nombre, variantes y errores además del handle.
+  No afirmar cuál pesa más sin datos de la cuenta/categoría; las conversaciones privadas pueden no ser observables.
+- **Alerta temprana de crisis:** un cambio de volumen o tono motiva revisar ejemplos, contexto y método
+  de clasificación antes de activar el protocolo (04 §5). Sarcasmo, duplicados y cobertura parcial pueden
+  distorsionar sentiment; no declarar crisis desde una métrica aislada.
 
 **Herramientas** `(as-of 2026-07 — reverificar capacidades)`: nativas (búsqueda en cada
 red, alertas), Metricool (menciones/analítica de lo conectado), y suites dedicadas
@@ -69,29 +70,32 @@ definidos. Mide cuánta conversación de la categoría es tuya.
 
 ## 3. Social search y recomendación dentro de la plataforma
 
-La gente **busca dentro de la red**: "mejores audífonos", "receta X", "agencia de marketing
-en Chile". El algoritmo de búsqueda de cada red indexa **texto, audio y visual**. Optimiza
-cada pieza para ser encontrada:
+Preparar contenido comprensible para consultas relevantes de la audiencia y verificar qué señales y
+métricas documenta actualmente cada plataforma, mercado y tipo de cuenta. No asumir que todas indexan las
+mismas capas ni trasladar resultados de TikTok a LinkedIn o Instagram.
 
-- [ ] **Keyword en los primeros 3 segundos** — hablada y/o en texto en pantalla. El motor y
-      el espectador deciden rápido de qué trata.
-- [ ] **On-screen text** con el término de búsqueda (los motores leen el texto en pantalla).
-- [ ] **Caption con keyword natural** al inicio (no relleno; el término real que la gente
-      escribe). Escribe para el buscador humano, no keyword-stuffing.
-- [ ] **Alt-text** descriptivo con keyword (accesibilidad + indexación).
-- [ ] **Nombre de archivo** descriptivo con keyword antes de subir (señal menor pero gratis).
-- [ ] **Hashtags como taxonomía**, no como confeti: 1 amplio + 1 de nicho + 1 de marca,
-      alineados al término buscado. El hashtag clasifica el contenido, no lo "viraliza".
-- [ ] **Audio hablado claro** — la transcripción automática es índice de búsqueda; si el
-      audio es basura, el motor no te lee.
-- [ ] **Coincidencia texto↔visual↔audio**: los tres refuerzan el mismo término. La búsqueda
-      es **multi-modal** (texto / visual / voz); una pieza que dice, muestra y escribe el
-      mismo concepto rankea mejor que una que solo lo dice.
+- Expresar pronto el tema cuando ayude a comprenderlo; «primeros tres segundos» es una posible decisión
+  creativa, no umbral universal de ranking ni requisito de todo post.
+- Usar texto en pantalla y caption natural cuando aporten claridad. No forzar keyword en una pieza cuyo
+  mecanismo depende de revelación o doble sentido. Priorizar propósito editorial sobre checklist SEO.
+- Alt-text describe el contenido para accesibilidad. Incluir términos pertinentes sólo si forman parte
+  de la descripción; no prometer que el alt-text mejora ranking en todas las redes.
+- Nombre de archivo descriptivo sirve a organización. No presentarlo como señal algorítmica sin fuente
+  vigente del canal.
+- Hashtags pertinentes cuando tengan función de clasificación/discovery; cantidad y utilidad se deciden
+  con evidencia del canal, no fórmula fija «1 amplio + 1 nicho + 1 marca».
+- Audio claro, transcripción y subtítulos ayudan comprensión/acceso cuando corresponden. Verificar qué
+  utiliza el buscador; no prometer indexación universal por audio ni obligar sonido a un estático.
+- Coherencia entre texto/imagen/audio evita confusión. Complementariedad es válida: no deben repetir lo
+  mismo para supuestamente rankear mejor. No afirmar efectos de ranking sin evidencia.
 
-Regla dura: escribe **para que un humano la encuentre buscando**, no para engañar al motor.
-El keyword-stuffing y el hashtag-confeti bajan la calidad percibida y no rankean.
+Keyword stuffing perjudica claridad; evitarlo por esa razón sin inventar penalizaciones universales.
 
-### Evidencia nativa por plataforma
+### Pistas de verificación nativa por plataforma
+
+Las siguientes referencias son rutas de consulta, no disponibilidad live certificada. Antes de afirmar o
+operar la capacidad, verificar documentación oficial y cuenta/región con fecha de consulta. Si falta, declarar
+no verificado y no prometer ese reporte.
 
 - **TikTok Creator Search Insights** permite explorar temas buscados, content gaps y rendimiento
   de publicaciones en búsqueda, según disponibilidad de la cuenta/región.
@@ -105,8 +109,9 @@ El keyword-stuffing y el hashtag-confeti bajan la calidad percibida y no rankean
 
 ## 4. Aparición de piezas sociales en Google
 
-Las piezas sociales también pueden aparecer fuera de su plataforma. Search Console ofrece
-**Platform Properties** para Instagram, TikTok, X y YouTube, con despliegue gradual. Reporta
+Las piezas sociales también pueden aparecer fuera de su plataforma. Verificar en documentación oficial y cuenta si Search Console dispone de
+**Platform Properties** para la red solicitada; no dar disponibilidad por confirmada desde esta skill. Si
+la propiedad está disponible, comprobar exactamente qué métricas expone antes de reportar
 clics, impresiones, CTR y posición de esas cuentas en Google Search y, cuando hay datos,
 Discover y News. Esto **no** mide vistas dentro de Instagram/TikTok/X/YouTube.
 
@@ -131,33 +136,36 @@ No sumes impresiones de estos planos: tienen superficies, denominadores y metodo
 
 ## 6. Trend-jacking RESPONSABLE
 
-Sumarse a una tendencia (audio, formato, meme, conversación) puede multiplicar alcance —
-o quemar la marca si calza mal o llegas tarde. Evalúa **antes** de saltar.
+Para convertir la oportunidad en una pieza, cargar
+[`11_TRENDJACKING_CREATIVE_PRODUCTION.md`](11_TRENDJACKING_CREATIVE_PRODUCTION.md): idea propia,
+layout antes del plate, producción por delta y revisión del master. Una seasonality usa ese oficio, pero
+no se declara trend activo sin evidencia de conversación.
 
-**Investiga el trend antes de escribir una línea** (minutos, no horas):
-- Lee los posts **textuales** de las marcas que ya se sumaron, no el resumen de alguien.
-- Cruza **≥2 fuentes** de medios de marketing (Marketing-Interactive, Social Samosa, ContentGrip,
-  PR Week o equivalentes) para saber qué funcionó y qué se criticó.
-- Mira **≥10 imágenes reales** del trend (memes de la gente + material oficial): el chiste dominante
-  sale de ahí, no de tu intuición.
-- **Nunca caracterices el estado o la intención de otra marca**: cita o describe lo que publicó, con su
-  tono. Caso real: se escribió «Duolingo está en pánico por su SEO», y era falso. Duolingo publicó
-  «oh god oh god my SEO my SEO» como chiste de personaje para **sumarse** al trend.
+El canon de clasificación, evidencia y decisiones es
+[social-opportunity-playbook.md](../references/social-opportunity-playbook.md), §§1–4. Seasonality es
+una ventana previsible; una efeméride no obliga a producir; meme es lenguaje; tiempo real es capacidad;
+newsjacking es intervención ligada a una noticia. Una misma pieza puede tener dos capas, que se registran.
 
-**¿Este trend calza? (filtro de 5 preguntas)**
-1. **Relevancia**: ¿se conecta con lo que la marca hace/cree, o es forzado? Forzado = daño.
-2. **Riesgo de marca**: ¿el origen del trend es limpio? (¿controversia, tragedia, política,
-   apropiación?). Ante duda de riesgo → **no**.
-3. **Ventana**: ¿estás dentro de la ventana de oportunidad? Un trend efímero muere en
-   **24–72 h** `(as-of 2026-07 — volátil)`. Publica en horas, máximo al día siguiente, y escalona
-   las redes (el canal reactivo primero). Llegar tarde se ve desesperado.
-4. **Aporte**: ¿el chiste **lleva el mensaje de la marca**? Falla cuando la referencia cultural es
-   decoración alrededor de un claim escrito de antemano (lección de ContentGrip sobre el iPhone Duo).
-   Tampoco copies la mecánica que otra marca ya hizo suya en esa conversación: la comparación de precio
-   era de Duolingo y el «lo hicimos primero», de Samsung. El clon se castiga.
-5. **Costo de producción vs vida útil**: no inviertas 3 días en algo que muere mañana.
+**Research antes de escribir o generar:**
+- Leer el detonante original y ejemplos nativos completos. Registrar URL, autor, publicación, consulta,
+  mercado y qué demuestra cada ejemplo. Describir lo publicado; no atribuir estados mentales a terceros.
+- Buscar cobertura diversa; ≥10 piezas es un objetivo de cobertura cuando existen, nunca cuota obligatoria
+  ni permiso para inventar muestras. Prensa es contexto adicional, no sustituto del origen ni condición
+  necesaria para reconocer una conversación temprana. Su comentario no prueba desempeño sin datos.
+- Registrar código repetido, variaciones, audiencia, participantes y aporte posible. Diferenciar hechos,
+  interpretación y propuesta. Un chiste no es necesariamente una declaración literal de su autor.
+- Una captura permite describir estado puntual; evolución requiere observaciones comparables. Volumen
+  acumulado no prueba aceleración. Si falta serie, registrar «evolución no verificada».
+- Definir hora de revalidación y condición de retiro. No imponer duración universal ni exigir que todo
+  se haga hoy. La producción debe caber en la ventana defendible del caso.
 
-**Mecánicas probadas para sumarse a un lanzamiento** (mapa del iPhone Duo, 2026-09; sirve para el próximo):
+**Decisión antes de render:** audiencia pertinente + relación de marca + aporte propio + viabilidad +
+premisa verificada. `go` permite producir; `revise` nombra defecto/corrección; `no-go` explica por qué la
+premisa, ventana o requisito esencial impide continuar. No convertir cualquier incertidumbre en prohibición;
+resolver lo comprobable y escalar sólo lo que realmente requiere decisión del operador. Publicación necesita
+autorización vigente. Revalidar conversación antes de distribuir, aunque la pieza ya esté terminada.
+
+**Mecánicas documentadas en un caso de lanzamiento; no garantías transferibles** (mapa del iPhone Duo, 2026-09; sirve para el próximo):
 
 | Mecánica | Ejemplo | Cuándo te sirve |
 |---|---|---|
@@ -186,28 +194,28 @@ copy rechazado y aprobado, programación por red):
 
 ## 7. Sonido / audio trending
 
-- **El audio es señal de distribución** en TikTok/Reels: usar un sonido en ascenso puede
-  darte una ola de alcance mientras dura.
-- **Cázalo temprano**: un audio con pocos miles de usos y subiendo > uno ya saturado con
-  millones (ya pasó la ola).
-- **Sonido original propio**: si tu audio se vuelve usable por otros, cada uso ajeno es
-  distribución de marca. Vale invertir en audios propios "remixeable".
-- **Derechos**: usa el catálogo nativo de la red (licenciado); audio comercial ajeno puede
-  ser silenciado o bajado, sobre todo en cuentas de marca. `(reverificar política por red)`
+El audio es un código creativo potencial, no un atajo garantizado de distribución. Verificar uso actual,
+significado, pertinencia de audiencia y disponibilidad para la cuenta. Pocos usos no prueban ascenso; muchos
+no prueban saturación. Observar evolución y variaciones cuando sea posible, con las mismas limitaciones de §6.
+
+Un audio propio puede invitar a participación si tiene una función reutilizable; esa es una hipótesis a probar.
+No afirmar que cada reproducción o reutilización atribuye marca. Verificar derechos para uso comercial,
+territorio, cuenta, plataforma y derivaciones; estar en un catálogo no autoriza automáticamente toda campaña
+ni republicación fuera de esa red. Componer con la skill de derechos y tooling vigente para disclosure aplicable.
 
 ## 8. Trend efímero vs shift estructural (no confundir)
 
 | | **Trend efímero** | **Shift estructural** |
 |---|---|---|
-| Vida útil | Horas–semanas | Trimestres–años |
-| Ejemplo | Un audio, un meme, un formato de la semana | Social search, long-form volviendo, social commerce |
-| Respuesta | Trend-jack táctico (rápido, barato, desechable) | Cambiar estrategia/pilares/inversión |
-| Riesgo | Perderlo = poco costo | Ignorarlo = quedar obsoleto |
+| Persistencia | Dependencia de un detonante/código; duración observada | Cambio sostenido en comportamientos, no sólo conversación |
+| Ejemplo hipotético | Conversación concentrada alrededor de un acontecimiento | Cambio repetido de hábitos de búsqueda/compra, si la evidencia lo sostiene |
+| Respuesta | Intervención proporcional a ventana y objetivo | Evaluar cambio estratégico con evidencia y ownership |
+| Evaluación | Costo de oportunidad según objetivo, no urgencia automática | Impacto por audiencia/categoría, no obsolescencia presunta |
 
 Regla dura: **no reestructures la estrategia por un trend efímero, ni trates un shift
-estructural como moda pasajera.** El listening sirve para distinguirlos: un efímero pico y
-baja; un shift sube y se sostiene por trimestres. Confirma la categoría antes de mover
-presupuesto o pilares.
+estructural como moda pasajera.** El listening sirve para distinguirlos: un pico aislado no demuestra
+cambio estructural; buscar persistencia, comportamiento y fuentes independientes. Confirmar alcance y
+confianza antes de proponer cambios de presupuesto o pilares.
 
 ## 9. Métricas de listening
 
@@ -215,16 +223,18 @@ presupuesto o pilares.
 - **Sentiment** (% pos/neu/neg y su tendencia).
 - **Share of Voice** vs set de competidores.
 - **Emerging topics/keywords** (qué sube en el nicho).
-- **Reach/impresiones de la conversación** (cuánta gente ve lo que se dice de ti).
-- **Time-to-detect** de una crisis (cuánto tardas en verla — objetivo: minutos, no días).
+- **Reach/impresiones disponibles**: indicar si observados o estimados y cobertura; no sumar audiencias
+  solapadas ni presentar la muestra pública como toda la conversación.
+- **Time-to-detect**: tiempo desde un evento observable hasta detección, con SLA realmente acordado;
+  no prometer monitoreo continuo si no está incluido.
 
 ## 10. NUNCA (anti-patrones)
 
 - **NUNCA** reduzcas social search a "sólo in-platform": una URL social puede aparecer en Google.
 - **NUNCA** mezcles Search Console externo, analytics nativo y progreso downstream en una sola
   cifra de impresiones o "alcance total".
-- **NUNCA** hagas keyword-stuffing ni hashtag-confeti: baja calidad y no rankea.
-- **NUNCA** saltes a un trend sin pasar el filtro de 5 preguntas — el riesgo de marca es real.
+- **NUNCA** hagas keyword-stuffing ni agregues hashtags sin función; no inventes efectos de ranking.
+- **NUNCA** saltes a un trend sin documentar evidencia, elegibilidad y decisión de §6.
 - **NUNCA** atribuyas a otra marca un estado o una intención («está en pánico», «se defiende»): cita
   o describe lo que publicó.
 - **NUNCA** reestructures la estrategia por un trend efímero.

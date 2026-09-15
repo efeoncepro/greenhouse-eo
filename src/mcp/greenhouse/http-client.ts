@@ -691,6 +691,36 @@ export class GreenhouseApiPlatformClient {
     return this.request('/api/platform/ecosystem/quotation/simulate', {}, { method: 'POST', body: { ...input } })
   }
 
+  // ── TASK-1845 — Efeonce Insights (lane ecosystem `/insights/**`). Para bindings internos
+  //    `organizationId` es requerido; para bindings org-scoped se omite (la org es la del binding).
+  async getInsightsCatalog(input: { organizationId?: string }) {
+    return this.request('/api/platform/ecosystem/insights/catalog', { organizationId: input.organizationId })
+  }
+
+  async listInsightEditions(input: { organizationId?: string; reportId?: string; state?: string; page?: number; pageSize?: number }) {
+    return this.request('/api/platform/ecosystem/insights/editions', {
+      organizationId: input.organizationId,
+      reportId: input.reportId,
+      state: input.state,
+      page: input.page,
+      pageSize: input.pageSize
+    })
+  }
+
+  async getInsightEdition(input: { organizationId?: string; editionId: string; includeEvidence?: boolean }) {
+    return this.request(`/api/platform/ecosystem/insights/editions/${encodeURIComponent(input.editionId)}`, {
+      organizationId: input.organizationId,
+      include: input.includeEvidence ? 'evidence' : undefined
+    })
+  }
+
+  async createInsightEdition(input: { organizationId?: string; request: Record<string, unknown> }) {
+    return this.request('/api/platform/ecosystem/insights/editions', {}, {
+      method: 'POST',
+      body: { organizationId: input.organizationId, request: input.request }
+    })
+  }
+
   private async request<TData>(
     path: string,
     query: QueryParams = {},

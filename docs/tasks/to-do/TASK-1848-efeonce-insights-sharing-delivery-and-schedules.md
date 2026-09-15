@@ -1,5 +1,10 @@
 # TASK-1848 — Efeonce Insights: acceso compartido, correo y recurrencia gobernados
 
+## Delta 2026-09-15
+
+- **Decisión del operador (ADR delta 2026-09-15):** la vista web compartida se renderiza en `efeonce-think` (`think.efeoncepro.com/insights/r/<token>`, patrón headless del Grader). Esta task expone el resolver público por token (`GET /api/public/insights/shared/[token]` → `InsightWebModelV1`, proyección client-facing versionada del plan + snapshot) y el proxy de descarga con chequeo de revocación; Think resuelve por request, sin pre-render ni cache. Arquitectura §8. El render es **TASK-1875** (bloqueada por esta task): el correo con ShareGrant enlaza a `think.efeoncepro.com/insights/r/<token>`; el contrato de respuesta esperado por 1875 está en su `## Detailed Spec` (200/404/410/429 + `downloads[]` con `available|unavailable`).
+- Existe `InsightSharePort` declarado (`ports.ts`, `implemented: false`) y el evento `insights.edition.issued` con `issuedHash`; la proyección por audiencia (`readers/projection.ts`) y `canViewEvidence` ya distinguen emitida/no emitida. El manual servido `efeonce-insights` reserva sus recetas de distribución a esta task. — por TASK-1845
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -88,7 +93,8 @@ El ADR acepta planificación, no acredita implementación. Rutas/tablas nuevas s
 
 - `src/lib/insights/{sharing,delivery,schedules}/** (nuevo propuesto)`
 - `src/app/api/platform/{app,ecosystem}/insights/{shares,deliveries,schedules}/** (propuesto)`
-- `src/app/api/insights/shared/** (reader público propuesto; no UI)`
+- `src/app/api/public/insights/shared/** (reader público propuesto: `resolveSharedEdition` → `InsightWebModelV1` + `downloadSharedOutput` proxy; sin UI — el render Astro vive en el repo `efeonce-think`, TASK-1849)`
+- `src/lib/efeonce-insights/contracts/web-model.ts (InsightWebModelV1 versionado, browser-safe; propuesto)`
 - `src/lib/email/{types.ts,templates.ts} (registro/contexto Insights; presentación en TASK-1849)`
 - `src/mcp/greenhouse/tool-manifest.ts (entradas sharing/delivery/schedules, serializadas)`
 - `migraciones additive de grants/intents/schedules y registro consumer existente; sin cron por cliente`

@@ -158,6 +158,93 @@ const makeFixture = async (finishStatus, options = {}) => {
   await writeFile(path.join(root, 'plate.png'), plate)
   const contract = buildContract(finishStatus)
 
+  if (options.axisAdvertising) {
+    const targetId = 'campaign-headline-primary'
+    const targetBinding = options.axisAdvertisingBinding ?? 'headline'
+    const targetKinds = { headline: 'text', support: 'text', hook: 'object', lockup: 'group' }
+
+    contract.message.headline = ['WORKFLOWS']
+    contract.message.url = 'efeoncepro.com'
+    contract.message.support = {
+      composition: 'supportingTagline',
+      reference: 'primary-lockup-inline-size',
+      segments: [
+        { text: 'Cómo', role: 'base' },
+        { text: 'escalar', role: 'growth' },
+        { text: 'la creatividad sin', role: 'base' },
+        { text: 'automatizar', role: 'intervention' },
+        { text: 'el criterio', role: 'base' }
+      ]
+    }
+    contract.brand.fonts.regular = path.join(repoRoot, 'src', 'assets', 'fonts', 'Poppins-Regular.ttf')
+    contract.brand.fonts.bold_italic = path.join(repoRoot, 'src', 'assets', 'fonts', 'Poppins-BoldItalic.ttf')
+    contract.brand.url_bubble = path.join(
+      repoRoot,
+      'src',
+      'lib',
+      'artifact-composer',
+      'catalogs',
+      'deck-axis',
+      'assets',
+      'url-lum.svg'
+    )
+    contract.collaboration_selection = {
+      intent: 'collaboration-intent.json',
+      target_binding: targetBinding
+    }
+    contract.formats.forEach((format, index) => {
+      format.layout.support.min_size = 8
+      format.layout.support.max_size = 18
+      format.layout.url =
+        index === 0
+          ? { x: 200, y: 300, width: 240, size: 12, tracking: 0 }
+          : { x: 80, y: 560, width: 200, size: 11, tracking: 0 }
+      format.layout.rule.visible = false
+    })
+    await writeFile(
+      path.join(root, contract.collaboration_selection.intent),
+      `${JSON.stringify(
+        {
+          targetId,
+          targetKind: targetKinds[targetBinding],
+          variant: 'eight-handles',
+          padding: 'standard',
+          overlay: 'subtle',
+          cursors: [
+            {
+              id: 'local',
+              kind: 'local',
+              targetId,
+              anchor: 'bottom-center',
+              action: 'select'
+            },
+            {
+              id: 'creative-team',
+              kind: 'collaborator',
+              targetId,
+              anchor: 'top-end',
+              action: 'resize',
+              label: 'Equipo creativo',
+              participantKind: 'department'
+            },
+            {
+              id: 'camila-moving',
+              kind: 'collaborator',
+              state: 'moving',
+              canvasRegion: 'lower-end',
+              direction: 'east',
+              action: 'move',
+              label: 'Camila',
+              participantKind: 'person'
+            }
+          ]
+        },
+        null,
+        2
+      )}\n`
+    )
+  }
+
   if (options.baselineThreshold !== undefined) {
     const baseline = await sharp({
       create: { width: 640, height: 360, channels: 3, background: '#000000' }
@@ -208,6 +295,106 @@ test('compiles approved formats into editable sources, masters, manifest, contac
       assert.match(editable, /data-layer="clean_plate"/)
       assert.match(editable, /data-layer="type"/)
       assert.match(editable, /data-layer="brand"/)
+    }
+  } finally {
+    await rm(fixture.root, { recursive: true, force: true })
+  }
+})
+
+test('compiles AXIS supporting tagline and semantic collaboration selection without free coordinates', async () => {
+  const fixture = await makeFixture('approved', { axisAdvertising: true })
+
+  try {
+    const compiled = await compileLayoutCampaign(fixture.contractPath)
+
+    assert.equal(compiled.qa.pass, true)
+    assert.equal(compiled.manifest.collaborationSelection.contract.version, '0.2.0')
+
+    for (const result of compiled.manifest.results) {
+      assert.equal(result.supportLayout.copy, 'Cómo escalar la creatividad sin automatizar el criterio')
+      assert.ok(['single-line', 'balanced-wrap'].includes(result.supportLayout.mode))
+      assert.ok(result.supportLayout.referenceWidth > 0)
+      assert.ok(result.supportLayout.lines.every(line => line.width <= result.supportLayout.referenceWidth + 0.01))
+      assert.equal(result.collaborationSelection.noFreeCoordinates, true)
+      assert.equal(result.collaborationSelection.targetGeometrySource, 'rendered-content-bounds')
+      assert.equal(result.collaborationSelection.withinCanvas, true)
+      assert.equal(result.urlBubbleRasterEvidence.method, 'non-separable-luminosity')
+      assert.equal(result.urlBubbleRasterEvidence.opacity, 0.72)
+      assert.equal(result.urlBubbleRasterEvidence.visible, true)
+      assert.equal(
+        result.collaborationSelection.cursorEvidence.find(cursor => cursor.id === 'local').touchesTarget,
+        true
+      )
+      assert.equal(
+        result.collaborationSelection.cursorEvidence.find(cursor => cursor.id === 'creative-team').touchesTarget,
+        true
+      )
+      assert.equal(
+        result.collaborationSelection.cursorEvidence.find(cursor => cursor.id === 'camila-moving').clearOfTarget,
+        true
+      )
+
+      const overlay = await readFile(path.join(fixture.root, result.vectorOverlay), 'utf8')
+
+      assert.match(overlay, /data-axis-ad-composition="supportingTagline"/)
+      assert.match(overlay, /data-axis-ad-emphasis="growth"/)
+      assert.match(overlay, /data-axis-ad-emphasis="intervention"/)
+      assert.match(overlay, /data-axis-selection-target="campaign-headline-primary"/)
+      assert.match(overlay, /data-axis-cursor-state="acting"/)
+      assert.match(overlay, /data-axis-cursor-state="moving"/)
+      assert.match(overlay, /data-axis-cursor-action="select"/)
+      assert.match(overlay, /data-axis-cursor-action="resize"/)
+      assert.match(overlay, /data-axis-cursor-action="move"/)
+      assert.match(overlay, /data-axis-collaborator="Equipo creativo"/)
+      assert.match(overlay, /data-axis-collaborator="Camila"/)
+      assert.match(overlay, /data-axis-brand-primitive="url-bubble"/)
+      assert.match(overlay, /mix-blend-mode:luminosity/)
+      assert.match(overlay, /opacity="0.72"/)
+
+      const bubbleRegion =
+        result.id === 'landscape'
+          ? { left: 200, top: 300, width: 240, height: 47 }
+          : { left: 80, top: 560, width: 200, height: 39 }
+
+      const outputPixels = await sharp(path.join(fixture.root, result.output))
+        .extract(bubbleRegion)
+        .removeAlpha()
+        .raw()
+        .toBuffer()
+
+      const underlayPixels = await sharp(path.join(fixture.root, result.underlay))
+        .extract(bubbleRegion)
+        .removeAlpha()
+        .raw()
+        .toBuffer()
+
+      let changedChannels = 0
+
+      for (let index = 0; index < outputPixels.length; index += 1) {
+        if (Math.abs(outputPixels[index] - underlayPixels[index]) > 10) changedChannels += 1
+      }
+
+      assert.ok(changedChannels > 500, 'canonical URL Bubble must paint visible pixels in the master')
+    }
+  } finally {
+    await rm(fixture.root, { recursive: true, force: true })
+  }
+})
+
+test('binds collaboration selection to a rendered object rather than only text', async () => {
+  const fixture = await makeFixture('approved', { axisAdvertising: true, axisAdvertisingBinding: 'hook' })
+
+  try {
+    const compiled = await compileLayoutCampaign(fixture.contractPath)
+
+    assert.equal(compiled.qa.pass, true)
+    assert.equal(compiled.manifest.collaborationSelection.target.kind, 'object')
+
+    for (const result of compiled.manifest.results) {
+      const overlay = await readFile(path.join(fixture.root, result.vectorOverlay), 'utf8')
+
+      assert.match(overlay, /data-axis-layout-element="hook" data-axis-selection-target="campaign-headline-primary"/)
+      assert.equal(result.collaborationSelection.withinCanvas, true)
     }
   } finally {
     await rm(fixture.root, { recursive: true, force: true })

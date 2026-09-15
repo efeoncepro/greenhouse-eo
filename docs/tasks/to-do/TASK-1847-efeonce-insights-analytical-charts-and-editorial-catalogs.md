@@ -1,5 +1,9 @@
 # TASK-1847 — Efeonce Insights: gráficos y catálogos premium para deck e informe vertical
 
+## Delta 2026-09-15
+
+- `ChartSpecV1` (familias bar/bar_grouped/bar_stacked/line/pie/donut/scatter, `validateChartSpec`) y `EditorialPlanV1` ya existen en `src/lib/efeonce-insights/contracts/`; el planner determinista emite barras con origen cero y equivalente tabular. Esta task construye la librería/catálogos sobre ese contrato, no otro. — por TASK-1845
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

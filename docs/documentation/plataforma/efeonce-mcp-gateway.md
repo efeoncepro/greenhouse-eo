@@ -221,11 +221,15 @@ El servicio conserva Entra legado y tiene un piloto corporativo nativo verificad
 una capability de lectura y un binding de workspace exacto. Esto evita que una conexión MCP sea un bypass de
 los permisos de Globe.
 
-El gateway maneja siete permisos: el permiso base de conexión, el permiso de lectura de Globe, el permiso de
+El gateway maneja ocho permisos: el permiso base de conexión, el permiso de lectura de Globe, el permiso de
 escritura interna para el fondeo de créditos, el permiso de escritura SEO (`efeonce.mcp.seo.write`), el permiso de
 lectura de Hiring, el permiso de escritura de identidad (`efeonce.mcp.identity.write`, para invitar personas a la
-propia organización) y, desde el 2026-09-10, el permiso de habilitación de servicios de cliente
-(`efeonce.mcp.client_services.write`, exigido también por la previsualización). El PRM publica sólo el permiso base; los demás se descubren en el `403 insufficient_scope`
+propia organización), desde el 2026-09-10 el permiso de habilitación de servicios de cliente
+(`efeonce.mcp.client_services.write`, exigido también por la previsualización) y, desde el 2026-09-15, el permiso
+de creación de ediciones de Efeonce Insights (`efeonce.mcp.insights.write`; leer el catálogo y las ediciones va
+con el permiso base). El gateway lo sirve desde el 2026-09-15 y el permiso ya existe en Entra; ningún cliente lo
+tiene concedido todavía, así que crear una edición por MCP responde `insufficient_scope` hasta que exista un
+consentimiento gobernado. El PRM publica sólo el permiso base; los demás se descubren en el `403 insufficient_scope`
 de la tool exacta y siguen sujetos a sus flags, policy, capability y autoridad downstream.
 
 Los entitlements por organización/persona ya existen, el gateway multi-issuer está construido y la matriz

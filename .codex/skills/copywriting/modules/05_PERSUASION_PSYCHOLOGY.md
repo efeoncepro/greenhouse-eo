@@ -1,73 +1,102 @@
-# 05 · Persuasión & Psicología
+# 05 · Persuasión y psicología: decisiones con evidencia
 
-> La persuasión ética es una **estrategia**, no un truco. Los principios son atajos mentales
-> reales; se vuelven manipulación solo cuando se usan con **claims falsos** o en el momento
-> equivocado. En Efeonce: persuadimos con verdad.
+Persuadir es ayudar a comprender valor y decidir con información suficiente. Un claim verdadero es necesario,
+pero no basta si se ocultan condiciones, se fabrica consenso o se presiona mediante vulnerabilidades.
+Los principios no son botones universales ni aseguran confianza/conversión. Para creatividad social cargar
+[módulo 12](../../social-media-studio/modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md) y
+[heurísticas, sesgos y pruebas](../../social-media-studio/references/heuristics-biases-and-testing.md).
 
-## 1. Los 7 principios de Cialdini (aplicados al copy)
+## 1. Recursos persuasivos: uso condicionado
 
-| Principio | En el copy | Ejemplo verbal |
+La taxonomía difundida por Cialdini sirve como inventario de posibilidades, no como certificación de eficacia
+ni afirmación de que todos sus principios «sobrevivieron la crisis de replicación». Para claims de efecto,
+consultar estudio pertinente, población, tarea y resultado; no extrapolar magnitud a campañas.
+
+| Recurso | Uso concreto | Condición y límite |
 |---|---|---|
-| **Reciprocity** | da valor antes de pedir | un diagnóstico/recurso gratis y real primero |
-| **Commitment/Consistency** | micro-compromisos que llevan al grande | "empieza con tu grade gratis" → luego el paso mayor |
-| **Social proof** | otros como el lector ya confían | "500 marcas ya saben cómo las ve la IA" (si es real) |
-| **Authority** | expertise/credenciales/datos | metodología, resultados, fuentes citadas |
-| **Liking** | similitud, empatía, voz humana | hablar su idioma, mostrar que entiendes su dolor |
-| **Scarcity** | límite **real** de tiempo/cupo/acceso | "cupos de la cohorte de julio" (si es cierto) |
-| **Unity** | identidad compartida ("nosotros") | "para gente que construye marcas, no solo campañas" |
+| Reciprocidad | ofrecer un recurso útil antes de invitar al siguiente paso | utilidad real y sin obligación oculta; no presumir deuda del lector |
+| Compromiso/consistencia | secuencia voluntaria de pasos que clarifica necesidades | cada paso mantiene elección y condiciones visibles; no encerrar al usuario por un compromiso inicial |
+| Prueba social | testimonio o dato de adopción pertinente | fuente, permiso, base y periodo; adopción no demuestra satisfacción ni eficacia |
+| Autoridad | metodología, experiencia y fuentes de la afirmación | competencia relevante, verificable; título/cargo no sustituye evidencia |
+| Afinidad | voz comprensible y reconocimiento de experiencias reales | no fingir identidad, intimidad ni similitud que no existe |
+| Escasez | comunicar cupo/fecha/stock efectivos cuando importen | verificar antes de publicar y actualizar al cambiar; no contadores reiniciables ni urgencia ornamental |
+| Identidad compartida | nombrar una experiencia o práctica del grupo | evitar atribuir uniformidad a una comunidad o excluir para presionar |
 
-**El core (6 principios) sobrevivió la replication crisis**; unity es el 7º (2016). Son
-atemporales — no requieren reverificación.
+Una norma **descriptiva** dice qué hace un grupo; una **injuntiva**, qué aprueba. No son equivalentes a un
+caso/testimonio. Mostrar un comportamiento indeseado como mayoritario puede normalizarlo; la dirección del
+efecto depende del contexto. Fuente y caso: [referencia de evidencia §3](../../social-media-studio/references/heuristics-biases-and-testing.md).
 
-## 2. La línea ética (persuasión vs manipulación)
+## 2. Veracidad, autonomía y contexto
 
-- **Ética = principio correcto, en el momento correcto, con claim verdadero.** Genera confianza
-  que dura más que una conversión.
-- **Manipulación = scarcity falsa, reviews sembradas, autoridad fabricada, presión emocional sin
-  solución real.** Ilegal (FTC / Ley del Consumidor CL), destructivo para la marca, y detectable.
-- Regla Efeonce: si tienes que mentir para que persuada, el problema es la oferta, no el copy.
+- Mostrar límites materiales de la oferta junto a la promesa; no ocultarlos donde el lector no los espera.
+- No fabricar reviews, usuarios, expertos, resultados ni disponibilidad. No transformar una escena ilustrativa
+  o generada en prueba de adopción o testimonio real.
+- Evitar culpa, amenazas y presión emocional desproporcionada, aunque una frase aislada sea literalmente cierta.
+- Claims legales requieren revisión vigente por jurisdicción/uso; no declarar toda táctica automáticamente
+  legal o ilegal desde esta skill. Componer con `legal-privacy-ip-operator` si el encargo lo requiere.
+- Si la oferta no sostiene la promesa, corregir la promesa/oferta; no buscar una formulación que oculte la brecha.
 
-## 3. Emoción primero, razón para justificar
+## 3. Emoción, razón y decisión
 
-- La gente **decide con emoción y justifica con lógica.** El copy conecta con el deseo/dolor
-  (emoción) y luego **da la munición racional** (datos, prueba) para justificar la decisión.
-- No es "emocional vs racional": es **emoción para mover + razón para respaldar**.
-- Emociones que mueven en copy: alivio, aspiración, pertenencia, miedo a perder (honesto),
-  orgullo, curiosidad.
+No usar «la gente decide con emoción y justifica con lógica» como ley universal. Tarea, implicación,
+conocimiento, riesgo y contexto afectan qué necesita el lector. Una pieza puede priorizar comprensión,
+emoción, demostración o evaluación; la secuencia se decide por objetivo y evidencia, no por fórmula.
 
-## 4. Sesgos cognitivos útiles (con ética)
+Registrar emoción **propuesta**, estímulo concreto y lectura alternativa. Alivio no exige miedo previo;
+pertenencia no exige exclusión; curiosidad no exige ocultar información esencial. En contextos culturales,
+no instrumentalizar duelo ni pérdida como presión de compra. Para interpretar ocasión y papel de marca:
+[playbook de oportunidad](../../social-media-studio/references/social-opportunity-playbook.md).
 
-- **Aversión a la pérdida:** enmarca lo que se **pierde** por no actuar (más potente que la
-  ganancia), sin inventar catástrofes.
-- **Anclaje:** el primer número/referencia condiciona la percepción de valor.
-- **Efecto de encuadre (framing):** "90% libre de grasa" > "10% grasa". Verdad, distinto marco.
-- **Prueba social específica:** "usado por equipos de marketing de aerolíneas" > "miles de clientes".
-- **Sesgo de autoridad:** datos, metodología y fuentes reales (no credenciales infladas).
+## 4. Heurísticas y sesgos: hipótesis comprobables
 
-## 5. Manejo de objeciones (persuadir es responder dudas)
+| Tema | Decisión de copy que puede explorarse | Qué no afirmar |
+|---|---|---|
+| Framing | comparar enfoques veraces de una consecuencia, preservando hechos y condiciones | que una formulación positiva/negativa siempre gana |
+| Aversión a pérdida | comunicar pérdida evitable real si existe decisión y referencia pertinentes | «las pérdidas venden el doble»; coeficiente de valoración no es uplift publicitario |
+| Anclaje | contextualizar precio con referencia pertinente y trazable | descuentos contra precio ficticio o primer número como garantía de efecto |
+| Fluidez | facilitar sintaxis y comprensión sin borrar precisión o interés | que toda complejidad es mala o que facilidad prueba verdad |
+| Curiosidad | plantear una pregunta específica y entregar una resolución valiosa | que vaguedad genera más clicks o confianza |
+| Evidencia específica | ejemplo pertinente a la audiencia con contexto | que una muestra pequeña vence siempre a un dato agregado verdadero |
 
-Toda venta es una conversación de objeciones. En el copy:
-1. **Anticipa** las objeciones reales (del voice-of-customer, `01`): precio, tiempo, riesgo,
-   "¿funcionará para mí?", "¿por qué ahora?".
-2. **Neutralízalas** en el copy, no las escondas: prueba, garantía, comparación, FAQ.
-3. **Risk reversal:** traslada el riesgo al vendedor (garantía, "sin tarjeta", prueba gratis).
-Mapa emitible en `templates/objection-handling-map.md`.
+Antes de invocar un efecto, escribir conducta objetivo, variable que cambia, predicción, explicación alternativa
+y método disponible. Las fuentes primarias y límites están en
+[heurísticas, sesgos y pruebas](../../social-media-studio/references/heuristics-biases-and-testing.md).
+No asignar mecanismos cerebrales ni nombres de sesgos para decorar una decisión sin evidencia.
 
-## 6. Urgencia y escasez (solo si son reales)
+## 5. Objeciones y evaluación de la oferta
 
-- La escasez real convierte (cupo, tiempo, edición limitada). La **falsa traiciona** y es un
-  antipatrón duro (`ANTIPATTERNS`).
-- Urgencia honesta: deadlines reales, consecuencia real de esperar, disponibilidad real.
+1. Recoger dudas reales desde voice-of-customer (`01`), no fabricar ansiedad: precio, implementación,
+   requisitos, adecuación, tiempo y límites.
+2. Responder con evidencia, explicación, comparación justa o condición contractual real. No «neutralizar»
+   una objeción válida escondiendo el tradeoff.
+3. Garantía, prueba o «sin tarjeta» sólo si la operación/contrato lo cumple; indicar alcance, plazo y exclusiones.
+4. Si el objetivo es vínculo editorial y no venta, no imponer mapa de objeciones ni CTA comercial.
+
+Artefacto cuando corresponde: `templates/objection-handling-map.md`.
+
+## 6. Evaluación del copy
+
+Separar claridad, agrado/interés, comprensión, recuerdo de marca, clic y resultado. Una preferencia interna
+no demuestra respuesta de audiencia; varios LLM no constituyen una muestra de personas. Prueba cualitativa
+observa interpretaciones bajo condiciones registradas; analytics observa comportamiento; causalidad requiere
+diseño apropiado. Experimentos de conversión: `growth-marketing-cro`.
+
+Comparar versiones con objetivo y variable definidos. Dos posts orgánicos en días distintos no son por sí
+solos un A/B causal. No declarar equivalencia por ausencia de significancia ni inventar tamaño muestral.
+Cuando no hay datos, escribir «hipótesis» o «desempeño no medido».
 
 ## Checklist de salida
 
-- [ ] Principios de Cialdini usados con **claims verdaderos**.
-- [ ] Emoción para mover + razón (datos/prueba) para justificar.
-- [ ] Objeciones reales anticipadas y neutralizadas; risk reversal donde aplique.
-- [ ] Cero scarcity/prueba/autoridad falsa. Persuasión, no manipulación.
+- [ ] Promesa, prueba, condiciones y límites son coherentes y verificables.
+- [ ] Recurso persuasivo elegido por función; no todos deben estar presentes.
+- [ ] Lectura emocional propuesta y alternativa consideradas, sin presión artificial.
+- [ ] Objeciones respondidas cuando el objetivo requiere evaluación de oferta.
+- [ ] Cero escasez, autoridad, evidencia o consenso fabricados.
+- [ ] Resultado de revisión separado de desempeño medido.
 
 ## Cross-links
 
-- Prueba social como narrativa (casos/testimonios) → `04`; framework → `02`
-- Prueba social/urgencia como palanca de conversión + testeo → `growth-marketing-cro`
-- Errores (dark patterns, hype) → `ANTIPATTERNS.md`; artefacto → `templates/objection-handling-map.md`
+- Casos/testimonios → `04`; frameworks → `02`.
+- Persuasión/medición de conversión → `growth-marketing-cro`.
+- Errores → `../ANTIPATTERNS.md`; marca física y demostración visual como evidencia →
+  [brand-in-scene.md](../../social-media-studio/references/brand-in-scene.md).

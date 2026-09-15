@@ -16,6 +16,9 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Social y Creative Studio
 
+- [Reglas publicitarias para agentes](creative/reglas-publicitarias-para-agentes.md) — activación común de
+  Codex/Claude para posts, stories, reels, covers, banners, brochure y motion con contrato AXIS, tipografía real,
+  contraste, gate DO/DON'T y estados separados de publicación.
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar
@@ -139,6 +142,10 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Los gates y por qué existen](proposal-studio/los-gates-y-por-que-existen.md) — la razón de negocio detrás de cada compuerta: audiencia por referencia (la evidencia interna lleva loaded cost = el piso de negociación), accesibilidad como admisibilidad (mejor no ofertar que entregar un PDF inadmisible), deadline, margen, gates humanos (propose → confirm → execute), QA visual mecánica (los 4 detectores que reemplazan a "mirar los frames"), drift del manifiesto e idempotencia.
 - [El motor de composición](proposal-studio/el-motor-de-composicion.md) — el Artifact Composer: por qué es domain-free, qué es un catálogo (dato, no código), el brand pack (la marca es INPUT → nace as-a-service), el selector determinista (el autor declara intención, nunca plantilla), el manifiesto resuelto y sus hashes, los destinos de salida y por qué el render es hermético.
 - [Decisiones de diseño](proposal-studio/decisiones-de-diseno.md) — las decisiones y sus alternativas rechazadas: Cloud Run Job (nunca Vercel ni `ops-worker`), el worker reclama su trabajo en vez de escalar IAM, cola con deadline + envejecimiento (nunca FIFO), hash canónico (JSONB reordena claves), retry del dominio, entitlement por organización (un rol no se factura) y los seis aprendizajes de ISSUE-121.
+
+### Efeonce Insights
+
+- [Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)](insights/efeonce-insights-dominio-ediciones.md) — qué es una edición (informe congelado por período con versión e identidad `EO-INS-…`), cómo se genera por fases (recolectar evidencia de SEO/AEO/ICO con unidad, cobertura y corte → plan determinista con cifras que referencian hechos → validación), qué ve cada audiencia, por qué **ausente no es cero**, y el estado honesto a 2026-09-15: núcleo en código, flags OFF, sin render ni emisión hasta TASK-1846. TASK-1845, EPIC-045.
 
 ### Growth
 

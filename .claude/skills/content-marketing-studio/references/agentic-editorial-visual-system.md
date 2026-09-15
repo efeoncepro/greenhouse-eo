@@ -170,7 +170,7 @@ Cada visual system brief debe declarar una **brand signature policy** antes de g
 - ubicación, tamaño relativo, zona de respeto y contraste por superficie;
 - separación entre firma editorial, marca del cliente y marcas de plataforma;
 - tratamiento de capturas/evidencia, donde la firma vive fuera del contenido probatorio;
-- tipografías, paleta y reglas compositivas que hacen reconocible la marca sin depender del logo;
+- tipografías, paleta y reglas compositivas que construyen consistencia; no presumir reconocimiento sin evidencia;
 - usos prohibidos: reconstrucción, deformación, recolor arbitrario, watermark dominante, textura repetida o acumulación de logos.
 
 Para Efeonce, usar exclusivamente los wordmarks oficiales de `public/branding/`; `AxisWordmark` es interno y no
@@ -182,7 +182,11 @@ debe componerse dentro del footer y sin competir con fuente, fecha o contenido. 
 kicker, título y bajada editorial. Hero/OG constituye otra superficie y puede usar una firma dentro de su zona
 segura si el brief lo declara. El logo de un cliente identifica el caso y
 requiere autorización específica; no reemplaza ni se fusiona con la firma de Efeonce. No pedir al generador que
-dibuje un logo: componer el activo oficial de forma determinística después de seleccionar el master.
+dibuje una firma editorial: componer el activo oficial de forma determinística después de seleccionar el master.
+Esta regla gobierna firma gráfica y contenido informativo exacto. Para una escena social con marca física
+en un objeto, cargar [brand-in-scene](../../social-media-studio/references/brand-in-scene.md): arte oficial
+como referencia de materialización, seguido de revisión de identidad/material y composición editorial.
+No aplicar esa ruta generativa al texto o datos de una infografía.
 
 El contrato completo de infografías de cuerpo —footer, arquetipos, source/delivery, SVG SEO, descripción larga,
 responsive, shareability y estados por canal— vive en

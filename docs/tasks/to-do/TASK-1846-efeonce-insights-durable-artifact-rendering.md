@@ -1,5 +1,9 @@
 # TASK-1846 — Efeonce Insights: render durable y Artifact Worker multiconsumidor
 
+## Delta 2026-09-15
+
+- Existe el puerto `InsightOutputsPort` (`src/lib/efeonce-insights/ports.ts`, `setInsightOutputsPort`) que `issueInsightEdition` invoca antes de emitir: hoy falla cerrado (`not_ready`). El pipeline por fases vive en `commands/generation.ts` (síncrono tras el commit); snapshot sellado y plan congelado en `greenhouse_insights.insight_evidence_snapshots`/`insight_editorial_plans`. Eventos `insights.edition.created`/`insights.evidence.sealed` ya se publican. — cerrado/preparado por TASK-1845
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

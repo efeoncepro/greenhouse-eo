@@ -29,6 +29,17 @@ description: Dirige arte y diseño gráfico enterprise con IA y humanos. Use for
 
 ## 1. Cómo se usa esta skill (router)
 
+Para Marketing con Manzanitas, consultar la
+[biblioteca gráfica](../../../docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md):
+logos completos, versiones sin manzana y cinco símbolos; conservar el SVG original y distinguir
+marca física integrada de gráfico plano. No inventar lockups con efeonce.
+
+Para Nexa como personaje creativo, cargar
+[su biblioteca de recursos](../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md).
+Para globos fotorealistas y continuidad, cargar
+[la referencia de fotohistorias](../social-media-studio/references/dialogue-carousel-and-document-delivery.md).
+Separar referencias de identidad de placas de escena; no extender textura de pared a rostros.
+
 1. **Clasifica la intención** (§2). ¿Es dirección de arte / diseño gráfico / auditoría de
    KV / imagen de marketing? Si pertenece a otra skill, **delega explícito** (§5) y para.
 2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 13 — carga lo justo.
@@ -223,3 +234,25 @@ cuando aplique; gráficos con unidades y fuentes claras. Si el destino es PDF, e
 y revisa el PDF A4; el HTML queda como insumo editable.
 
 Para crear o mejorar el informe completo, carga `report-studio`: narrativa, evidencia, gráficos, producción y QA del formato final. La práctica especializada conserva sus contratos y datos.
+
+## Entrada de creatividad social
+
+Para seasonality, trendjacking, memes y correcciones de marca sobre objetos, cargar
+[social-media-studio módulo 11](../social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md).
+Social decide pertinencia/objetivo y conserva el entregable; Design resuelve recorrido visual, cámara, luz,
+material, tipografía y adaptación. Leer módulos 03/13 y, si hay marca física,
+[brand-in-scene](../social-media-studio/references/brand-in-scene.md). No usar la calidad de render como
+prueba de concepto ni reconstruir una firma editorial con el modelo.
+
+Para mecanismos, innovación y conexión emocional en creatividad social, cargar
+[social módulo 12](../social-media-studio/modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md).
+Separar hipótesis de diseño de evidencia psicológica/neural y de resultados de audiencia; revisar memoria
+para el mensaje y para la marca por separado. No presentar una heurística como garantía de persuasión.
+
+## Escenas culturales y comida premium
+
+Para comida, mesa y detalles de una celebración, cargar
+[art direction de comida cultural](references/premium-cultural-food-art-direction.md): autenticidad,
+referencias, anatomía, apetito, luz, profundidad, decisión foto/generación/3D y composición por ratio.
+El [caso Fiestas Patrias](../../../docs/operations/social/2026-09-13-fiestas-patrias-production-method.md)
+conserva la metodología completa con evidencia y programación.

@@ -164,38 +164,51 @@ puerta anónima. **Meter una licencia de vendor dentro del engine cost-plus cont
 
 ---
 
-## 🤖 3 · `/servicios/hubspot/agentes/` — **Agent Hub y Agentic Operations**
+## 🤖 3 · `/servicios/hubspot/agentes/` — **Servicio de agentes: diseño, construcción, despliegue y operación**
+
+> **Delta 2026-09-13 (operador):** la página deja de ser sólo contenido honesto sobre agentes y pasa a ser la
+> **landing del servicio** de la familia *Agent Hub & Agentic Operations*
+> ([oferta V2](../services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md) §2–§3 y §6). La honestidad sobre
+> estado, costo y límites se queda como prueba del servicio, no como producto de la página. El Customer Agent de
+> ANAM está **activo y en producción** (confirmado por el operador). La URL padre está por decidir: el Pillar vive
+> en `/servicios-contratar-hubspot/` y `/servicios/hubspot/` hoy redirige a un post antiguo. Ejecución: TASK-1403.
 
 | | |
 |---|---|
-| **H1** | **"Agentes de HubSpot: cuáles sirven para tu caso y cómo gobernarlos."** |
-| **Para quién** | El CEO al que el directorio le pidió "IA" · el COO con el servicio desbordado |
-| **Su trabajo** | Ser **el único contenido honesto del mercado** sobre agentes. Y mostrar el caso |
-| **Por qué la citan** | Compara readiness, estado, costo, autonomía, handoff y operación en un inventario fechado |
-| **CTA** | *"Te decimos si un agente te sirve"* → reunión |
+| **H1 (dirección, no copy final)** | *"Agentes de IA en HubSpot: los diseñamos, construimos, desplegamos y operamos contigo."* |
+| **Para quién** | El CEO al que el directorio le pidió "IA" · el COO con el servicio desbordado · el líder de servicio o RevOps que ya opera HubSpot |
+| **Su trabajo** | Vender el servicio completo de agentes con evidencia: qué hacemos en cada etapa, qué se promete y qué va a piloto |
+| **Por qué la citan** | Explica el ciclo de un agente en producción —contexto, autonomía, handoff, evaluación, costo y operación— con un inventario fechado |
+| **CTA** | *Evaluación inicial sin costo* (primario) · reunión (secundario) |
 
-**Secciones:**
+**Secciones (dirección; el wireframe de TASK-1403 las fija):**
 
-1. 🎯 **La verdad primero** — Agent Hub está beta al corte; no existe un roster fijo publicable. Cada agente o
-   workflow muestra job, release/elegibilidad, contexto, tools/permisos, autonomía/handoff, consumo y evaluación.
-2. **Cuánto cuestan de verdad** — donde exista outcome-based: **pagas cuando funciona**. USD 0,50 por conversación
-   **resuelta** *(definición de HubSpot: el agente resolvió y **no hubo escalamiento humano en 72 horas**)*.
-3. 🎯 **El caso** — **ANAM · Customer Agent en producción.** El equipo de atención redujo su carga
-   **un 56% en promedio** *(76% en el mejor mes)*.
-   🔴 **Lidera con el 56%.** *"Hasta 76%"* suena a cherry-picking y descuenta todo lo demás.
-   ⚠️ **Requiere autorización de ANAM.** Sin ella → anonimizado.
-4. **Lo que implementamos de verdad** — readiness, datos/knowledge/context, agente prebuilt o custom, tools,
-   **gobierno**, human handoff, evaluación, observabilidad y **modelado de costo**.
-5. 🎯 **Y operamos tu HubSpot *con* agentes** — HubSpot publicó la **Agent CLI** (junio 2026) para que agentes
-   de IA operen el CRM **sin humano en el loop**. **Nosotros ya trabajamos así.** No es roadmap: es cómo operamos.
-6. 🔴 **El gobierno es el producto** — *"El agente propone. Un humano confirma. Recién ahí se ejecuta. Y todo
-   pasa por `--dry-run` antes. **Nadie le da la llave del CRM a una IA sin supervisión — y quien te diga que
-   sí, sal corriendo.**"*
-7. **Cuándo un agente NO te sirve** — datos sucios *(el agente amplifica lo que hay)* · volumen bajo *(no paga
-   la implementación)* · procesos sin definir *(no se gobierna lo que no existe)*.
+1. **El problema** — HubSpot trae agentes, pero no trae el contexto, el gobierno, el handoff, el modelado de costo
+   ni la operación. **Eso es el servicio.**
+2. 🎯 **Qué hacemos, etapa por etapa** — readiness y contexto → diseño (job, permisos, autonomía, handoff) →
+   construcción (agentes preconstruidos: Customer, Prospecting, Data; agentes custom: Agent Builder, Agent Tools,
+   APIs, MCP, workflow actions) → evaluación y QA → despliegue en el canal → **operación gestionada** (consumo,
+   observabilidad, incidentes, cambios, optimización y retiro).
+3. **Qué se promete y qué va a piloto** — Customer Agent gestionado: con evidencia. Otros preconstruidos: se
+   califican por portal. Agent Hub y agentes custom mientras sean beta: **piloto primero, sin SLA**. Operación
+   gestionada: cuando hay backlog, owner y economics. Inventario fechado por caso de uso (job, release/elegibilidad,
+   contexto, permisos, autonomía, consumo, evaluación, operación). 🔴 **Sin número fijo de agentes.**
+4. 🎯 **El caso — ANAM · Customer Agent activo y en producción.** El equipo de atención redujo su carga
+   **un 56% en promedio** *(76% en el mejor mes)*, cifra sujeta a verificación de período, línea base y denominador.
+   🔴 **Lidera con el 56%.** El nombre sólo dentro del alcance que ANAM autorizó.
+5. 🔴 **El gobierno es el producto** — *"El agente propone. Un humano confirma. Recién ahí se ejecuta. Y todo
+   pasa por `--dry-run` antes. **Nadie le da la llave del CRM a una IA sin supervisión.**"*
+6. **Cuánto cuesta** — cobro por resultado donde exista (USD 0,50 por conversación **resuelta**: sin escalamiento
+   humano en 72 horas) y **modelado de costo como parte del servicio** → `/precios/`.
+7. **Cómo trabajamos** — evaluación inicial sin costo · blueprint pagado · implementación · sprint de optimización ·
+   Managed Agentic Operations.
+8. **Y operamos tu HubSpot *con* agentes** — Agent CLI (beta pública, junio 2026): es nuestra forma de trabajar,
+   no un producto que se vende.
+9. **Cuándo un agente NO te sirve** — datos sucios *(el agente amplifica lo que hay)* · volumen bajo *(no paga la
+   implementación)* · procesos sin definir *(no se gobierna lo que no existe)*.
 
-**No dice:** *"flota de agentes de IA"* · **ningún SLA sobre un agente en beta** *(los Custom Assistants
-murieron el 2026-07-13 — no es hipotético)*.
+**No dice:** *"flota de agentes de IA"* · **ningún SLA sobre un agente o capacidad en beta** *(los Custom
+Assistants pasaron a solo lectura el 2026-07-13)* · *"tu CRM va a correr solo"*.
 
 ---
 

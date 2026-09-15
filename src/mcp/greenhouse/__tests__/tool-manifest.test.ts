@@ -75,6 +75,8 @@ describe('manifiesto de tools MCP (TASK-1780)', () => {
       [
         'apply_client_service_enablement',
         'rollback_client_service_enablement',
+        // TASK-1845 — crear una edición Insights escribe (sin gasto de proveedor); emitir no existe por MCP.
+        'create_insight_edition',
         'declare_seo_competitors',
         'discover_seo_keywords',
         'prepare_seo_grounded_queries',

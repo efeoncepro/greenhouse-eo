@@ -75,6 +75,47 @@ por propósito**, cada uno con su tracking independiente:
 Beneficio adicional y real: si una campaña quema la reputación del subdominio de marketing, el correo
 que un candidato *necesita* recibir no se ve afectado.
 
+## Delta 2026-09-12 — cuota del plan, `error.name` y revive gobernado (ISSUE-172)
+
+Fuente: `docs/issues/resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md`. Ley del día: **una
+recuperación que crea entidades dispara sus correos, y el proveedor tiene cuota.**
+
+- **[OBS] El plan era Free (100 correos/día) y se agotó a las 12:58:11Z** por la ráfaga de acuses que disparó el
+  replay gobernado de postulaciones de Hiring (cada postulación recuperada emite acuse al candidato + alerta
+  interna). Desde ese instante **todo** envío falló con `resend_api_error`; el operador subió el plan a **Pro**
+  (diario ilimitado, 50 000/mes) ~13:05Z. Los `failed` los recuperó el cron `ops-email-delivery-retry`; 8
+  `dead_letter` (agotaron sus reintentos dentro de la ventana) se revivieron con el helper nuevo. Estado final de
+  los correos de Hiring desde 12:50Z: 164 `sent`, 0 fallidos.
+- **Regla: antes de un replay/backfill que dispare correos, cuenta cuántos va a emitir (entidades × correos por
+  entidad) y mira plan y cuota** (`references/envio-y-limites.md`). Un `429` de cuota no se resuelve con retry:
+  espera la ventana o cambia el plan con autorización. La cuota es del team, no del dominio.
+- **El sender ya propaga `error.name` del proveedor** (`src/lib/email/delivery.ts`): la fila de `email_deliveries`
+  y Sentry dicen `Email provider rejected dispatch (daily_quota_exceeded).` en vez de un genérico. Nombres
+  relevantes según `references/envio-y-limites.md`: `daily_quota_exceeded`, `monthly_quota_exceeded`,
+  `rate_limit_exceeded`, `invalid_idempotent_request`, `concurrent_idempotent_requests`; además
+  `validation_error` (dirección inválida). El `message` del proveedor **no** viaja: en errores de validación cita
+  la dirección destino.
+- **Revive gobernado de `dead_letter`** — `reviveDeadLetterEmailDeliveries({ reason ≥10 chars, deliveryIds? |
+  emailTypes?, sinceHours? (default 24, tope 168), limit? (default 25, tope 200) })` en `delivery.ts`: vuelve
+  `dead_letter → failed` con `attempt_number = 0`, deja el motivo (+ el error previo) en `resend_reason`, y **no
+  envía nada** — el cron `ops-email-delivery-retry` (`*/5`, ops-worker `POST /email-delivery-retry` →
+  `processFailedEmailDeliveries`) reenvía. Excluye tipos token-sensitive (`TOKEN_SENSITIVE_EMAIL_TYPES`: un bearer
+  muerto se rota, no se reenvía), `persistence.retryable=false`, filas con `resend_id IS NOT NULL` o
+  `error_class='dispatch_unknown'`, y buzones bloqueados (`providerBlockedConditionSql`). Ruta admin:
+  `POST /api/admin/ops/email-delivery-retry` (`requireAdminTenantContext`) con cuerpo opcional
+  `{ reviveDeadLetter: { reason, deliveryIds?, emailTypes?, sinceHours?, limit? } }`; motivo corto o selección
+  vacía → 400 canónico `invalid_request`; sin cuerpo = sólo el ciclo de reintento de siempre. Procedimiento:
+  `docs/operations/runbooks/resend-email-lifecycle-rollout.md` → «Revivir entregas dead_letter (gobernado)».
+- **Rama `dispatch_unknown`**: cuando el proveedor ACEPTÓ y el cierre local falló, la fila persiste `resend_id` +
+  `error_class='dispatch_unknown'` + `status='failed'`. Ni el reintento automático ni el revive la toman (sería un
+  duplicado al destinatario); queda visible para recuperación explícita. `processFailedEmailDeliveries` además usa
+  la ventana `GREATEST(created_at, updated_at) > NOW() - 24h`, para que un revivido con más de 24 h de creado sí
+  entre.
+- **`providerBlockedConditionSql` vive en `src/lib/email/provider-block.ts`** (con `BLOCKING_PROVIDER_STATUSES`,
+  `providerBlockStatusSql`, `providerBlockRecencySql`, `providerBlockStatusForEmailSql`);
+  `src/lib/hiring/assessment/access-recovery/provider-block.ts` re-exporta. Email no depende de hiring; **NUNCA**
+  redefinir el predicado en un dominio.
+
 ## Referencias
 
 Cárgalas según lo que estés tocando — no leas todo por defecto:

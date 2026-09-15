@@ -1,6 +1,6 @@
 ---
 name: social-media-studio
-description: Diseña y opera social media por plataforma para estrategia editorial, producción, publicación, community, listening, medición, creator/UGC y formatos de Instagram, TikTok, LinkedIn, YouTube y otros. Use for Studio Credits y derechos dentro de producción social; no reemplaza la estrategia de canales. Delega a content-marketing-studio la pertenencia de una pieza al territorio/Pillar/Cluster Experience.
+description: Diseña y opera social media por plataforma, incluido trendjacking y seasonalities desde idea creativa hasta dirección visual, producción multistep, tipografía exacta, identidad de marca, product placement, revisión y aprendizaje. Cubre estrategia editorial, publicación, community, listening, medición y creator/UGC; no reemplaza estrategia de canales ni la pertenencia editorial gobernada por content-marketing-studio.
 user-invocable: true
 argument-hint: "[red/tarea o pregunta — ej: 'plan de 30 días para LinkedIn del grader', 'guion de Reel para el lanzamiento', 'auditar nuestro Instagram', 'estrategia de TikTok Shop', 'matriz de community management']"
 ---
@@ -46,10 +46,17 @@ La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels,
 
 ## 1. Cómo se usa esta skill (router)
 
+Para fotohistorias, globos y PDF social, cargar
+[dialogue-carousel-and-document-delivery.md](references/dialogue-carousel-and-document-delivery.md).
+Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes de generar.
+
 1. **Clasifica la intención** con el árbol de §2. ¿Es realmente social de ejecución
-   profunda, o pertenece a una skill hermana? Si pertenece a otra, **delega explícito**
-   (§5) y para.
-2. **Carga el módulo o módulos** que apliquen (§3). No cargues los 10 — carga lo justo.
+   profunda, o pertenece a una skill hermana? Si pertenece a otra, carga la skill dueña (§5). Para encargos sociales integrales,
+   conserva la dirección y la entrega; invocar una skill no autoriza crear subagentes.
+2. **Carga el módulo o módulos** que apliquen (§3). No cargues todos — carga lo justo.
+   Para trendjacking, seasonalities o una pieza social que necesita idea y dirección visual, cargar
+   `modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md`. Mantener ownership del resultado hasta mostrar
+   la pieza revisada; componer skills y herramientas no equivale a terminar entregando sólo un prompt.
 3. **Chequea frescura**: si vas a afirmar algo de la tabla `volátil`/`trimestral` de
    `SOURCES.md`, reverifica primero.
 4. **Si hay que ejecutar** (producir/programar/medir), abre `efeonce/STUDIO_TOOLING.md`
@@ -61,13 +68,76 @@ La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels,
    `greenhouse-talent-people-operator`.
 5. **Aterriza a Efeonce** si el trabajo es de canales propios o de un cliente internacional:
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`. Globe es un adaptador futuro gated, no una dependencia.
-6. **Cierra con un artefacto** de `templates/` (brief, calendario, guion, reporte…),
-   no con prosa suelta.
-   Para efemérides, metáforas visuales y planificación anticipada de canales propios,
+6. **Cierra con el resultado solicitado**: artefacto de `templates/` en ejecución, pieza si se encargó producción,
+   o explicación si sólo se pidió comprender/evaluar. No inventar un entregable para una pregunta.
+   Para seasonalities, metáforas visuales y planificación anticipada de canales propios,
    carga `efeonce/SEASONAL_CONTENT.md`; las tareas y su calendario se verifican por separado.
 7. Si la producción corre por Creative Studio / un runtime futuro de Globe, carga el Business Model y Credit Model desde
    `efeonce/CLIENT_DELIVERY.md`: la pieza social no es la unidad de crédito; identifica las operaciones
    generativas y separa layout/copy/export/QA, capacidad y derechos.
+
+### Videos aprobados, portadas y programación
+
+Para entregar un video por red y programarlo con portada, cargar
+[video-delivery-metricool.md](references/video-delivery-metricool.md). Incluye adaptación nativa,
+PNG master y transporte, autorización existente, cuenta/zona, duplicados y readback de media,
+portada y estado. Una instrucción explícita de programar satisface la confirmación humana de §4;
+no pedirla otra vez para la misma acción autorizada.
+
+### Entrega de imágenes al equipo de Marketing
+
+Para buscar, manipular, adaptar, organizar o entregar assets de Marketing Efeonce, cargar
+[la biblioteca OneDrive](efeonce/ONEDRIVE_DELIVERY.md): raíz `5. Contenidos`, categorías existentes,
+fuentes/derivados, versiones y verificación de destino. Seasonalities es sólo una categoría; PNG aplica
+a entregas estáticas, no a todos los formatos de la biblioteca.
+
+### Auditoría editorial de tipografía y marca
+
+Para toda pieza social con texto —nueva, adaptada o corregida— cargar primero
+`efeonce-advertising-creative`. Esa orquestadora aplica el contrato publicitario de AXIS y devuelve la ficha
+tipográfica y el gate DO/DON'T; esta skill conserva formato, canal, producción, publicación y medición. Si la
+orquestadora ya inició el encargo, continuar desde su brief y no reiniciar el flujo.
+
+Para auditar o corregir interespaciado, contraste tipográfico, cortes de línea, escala, firma aislada o modos
+de fusión, cargar [editorial-typography-brand-audit](references/editorial-typography-brand-audit.md) junto con
+la skill de tipografía del agente. Resolver significado y agrupación antes de aplicar efectos; medir tinta,
+contraste local y exportación reducida. Conservar la responsabilidad de producir y mostrar la corrección.
+Para una guía o entrenamiento con imágenes, video y motion, cargar además
+`references/real-campaign-typography-cases.md` desde la skill de tipografía activa: el master se identifica por
+evidencia y cualquier reconstrucción didáctica se presenta como tal.
+
+### Activación obligatoria para solicitudes creativas
+
+Ante «haz una pieza», «aprovecha esta fecha/tendencia», «desarrolla una idea», «integra el producto/logo»,
+«mejora la dirección visual» o equivalentes, ejecutar este orden aunque el usuario no nombre una skill:
+
+1. Si la pieza contiene texto, cargar `efeonce-advertising-creative` y conservar su brief/gate durante toda la
+   producción. Luego leer módulo 11 y clasificar `seasonality | trendjacking | evergreen | híbrido justificado`; registrar el
+   detonante o ventana. Una festividad no se convierte en tendencia por tener conversación social.
+2. Completar `templates/social-creative-production.md` con contexto ya conocido. Declarar supuestos
+   reversibles; preguntar sólo por datos que impidan resolver identidad, sentido, derechos o alcance.
+3. Cargar módulo 05 si hace falta validar conversación emergente; `efeonce/SEASONAL_CONTENT.md` para
+   estacionalidad de Efeonce; `references/brand-in-scene.md` para producto o marca sobre objetos.
+4. Cargar módulo 10 y `references/social-production-connectors.md` antes de producir. Seleccionar herramienta
+   por operación pendiente, no por nombre de proveedor ni por una secuencia fija de modelos.
+5. Entregar según intención: explicación si pregunta, rutas si pide conceptos, pieza visible revisada si
+   encarga producción, delta si pide corrección. Añadir sólo derivados pedidos, decisiones y límites.
+   «Desarrolla una idea» no obliga a renderizar. El
+   [protocolo compartido](../../../docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md) resuelve alcance y faltantes.
+   Si falta acceso o un activo imprescindible, informar el bloqueo específico y completar el trabajo independiente.
+
+**Autoridad:** una solicitud de producir autoriza el trabajo creativo reversible dentro de su alcance. No exige
+una confirmación nueva por cada boceto, composición o corrección. La aprobación de publicación, los límites de
+presupuesto existentes y los gates del runtime se conservan. No presentar revisión del agente como aprobación
+humana ni convertir un encargo exploratorio en un flujo runtime para obtener un estado verde.
+
+### Profundización creativa y psicológica
+
+Ante solicitudes de mecanismos, innovación, conexión emocional, atención, memoria, heurísticas, sesgos o
+«neurociencia» aplicada a piezas, cargar [módulo 12](modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md).
+Distinguir mecanismo creativo, hipótesis psicológica y evidencia científica. Aplicar a conceptos/ejecuciones
+concretos; no limitarse a enumerar sesgos ni prometer que una técnica produce emoción, recuerdo o ventas.
+El módulo enruta a tres referencias por problema y conserva el alcance: explicar, idear, producir o corregir.
 
 ## 2. Árbol de decisión (a qué skill pertenece)
 
@@ -100,6 +170,8 @@ La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels,
 | 08 | `modules/08_SOCIAL_COMMERCE.md` | TikTok Shop, IG/FB Shops, live shopping, shoppable video |
 | 09 | `modules/09_ANALYTICS_MEASUREMENT.md` | métricas nativas, reporting, qué mirar por objetivo |
 | 10 | `modules/10_AI_AND_PRODUCTION_STUDIO.md` | producir con IA + orquestar herramientas del estudio |
+| 11 | `modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md` | oportunidad, idea propia, dirección visual, producción por etapas, logos/tipografía/placement y QA |
+| 12 | `modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md` | mecanismos, innovación, emoción, atención/memoria, heurísticas, sesgos y pruebas con evidencia |
 
 ## 4. La mano de ejecución (por qué es "studio")
 
@@ -168,32 +240,35 @@ negocio → mecanismo → prueba → aplicación → debate. Ver la investigaci�
 - **NUNCA** cotices Studio Credits por post, slide, Reel u hora. Estima sólo operaciones generativas
   gobernadas; composición, copy, publicación, QA y medición se financian por capacidad/gobierno.
 
-## 6. Doctrina 2026 (lo que hay que creer este año)
+## 6. Criterios de trabajo y evidencia de plataforma
 
-Estas son las apuestas verificadas hoy; cada una con su volatilidad en `SOURCES.md`:
-
-1. **Video corto tiene parity entre redes** — pero el **long-form vuelve** (más views y
-   saves por pieza). El formato se elige por *objetivo*, no por moda.
-2. **Likes y followers están demotados** a señal débil en todas las redes. Lo que rankea
-   es **watch time / completion, saves, shares/sends y dwell time**.
-3. **Social search vence a Google** para <30 años (>50% en Gen Z): TikTok/IG/YT como
-   buscador → hay que optimizar para **AEO-social** (captions, alt, on-screen text, keywords).
-4. **Autenticidad > pulido**: saturación de IA → gana lo humano, imperfecto, serializado.
-   **IA que un espectador razonable confunda con real debe etiquetarse** ("ante la duda, revela").
-5. **Community management es palanca de alcance**, no soporte: el algoritmo premia *cómo*
-   interactúas, no solo *qué* publicas. Incluye **dark social** (DM/WhatsApp/Discord).
-6. **Social commerce explota** (mercado ~$2.1T; TikTok Shop ~$23B US 2026, convierte ~4.7%;
-   live shopping 12–30%). **Contenido de creador convierte más que el de marca**;
-   partnerships por performance, no fee plano.
-7. **Micro/nano creadores** rinden 2.4×–6.7× más engagement por post que los grandes.
-8. **"Estar en todas" murió**: gana elegir *una* red primaria, *un* formato, *una* cadencia
-   sostenible. Consistencia + engagement > volumen.
+1. Elegir formato por objetivo, comportamiento de audiencia y capacidad de producción; ninguna duración,
+   red o grado de acabado gana universalmente. Distinguir contenido orgánico de publicidad.
+2. Medir distribución, atención, respuesta, atribución de marca y resultado según objetivo. Likes, saves,
+   sends o completion son señales parciales; no demuestran por sí solos ranking, ventas o recuerdo de marca.
+3. Social Search requiere entender consultas e intención dentro de cada plataforma. No afirmar que sustituye
+   la búsqueda web para una generación completa ni imponer fórmulas de keywords sin evidencia pertinente.
+4. Seleccionar autenticidad y acabado según el concepto. No prometer que lo imperfecto supera lo pulido;
+   comprobar identidad, disclosure aplicable y fidelidad de los materiales generados.
+5. Community management escucha y responde; su valor no autoriza inventar multiplicadores de alcance ni
+   tratar la interacción como un truco algorítmico.
+6. Commerce y creators se evalúan por ajuste con la audiencia, derechos, economía y resultados observados.
+   Tamaño de creador, formato de venta y red no garantizan conversión ni retorno.
+7. Cadencia y canales deben ser sostenibles. Proponer una hipótesis y evaluarla con datos del caso; no imponer
+   una sola red o una frecuencia universal como requisito estratégico.
+8. Para cualquier cifra, mecanismo algorítmico, política o capacidad volátil, registrar fuente primaria,
+   fecha, mercado, superficie y límite de aplicación. Si no se verifica, omitir el claim o marcarlo como
+   hipótesis/no verificado; nunca convertirlo en instrucción automática de publicación.
 
 ## 7. Artefactos (cierra con uno)
 
 `templates/social-brief.md` · `content-calendar-30d.md` · `reel-script.md` ·
 `carousel-outline.md` · `platform-launch-playbook.md` · `community-response-matrix.md` ·
 `ugc-creator-brief.md` · `social-report.md` · `trend-jack-checklist.md`
+
+Producción creativa: `templates/social-creative-production.md`. Conectores vigentes y sus límites:
+`references/social-production-connectors.md`. Regresiones del oficio: `references/creative-review-cases.md`.
+Las pruebas de un carril no certifican otros formatos ni rendimiento de audiencia.
 
 ## 8. Archivos de apoyo
 
@@ -202,3 +277,24 @@ Estas son las apuestas verificadas hoy; cada una con su volatilidad en `SOURCES.
 - `ANTIPATTERNS.md` — los errores que matan cuentas y campañas.
 - `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `SOCIAL_BOUNDARY.md`,
   `CLIENT_DELIVERY.md`.
+
+Para logos sobre objetos, relieves y product placement físico: [brand-in-scene.md](references/brand-in-scene.md).
+
+## Referente de fechas y calendario editorial
+
+Para consultar el calendario de seasonalities preparado por Metricool en Notion, cargar
+[`references/seasonality-reference-calendar.md`](references/seasonality-reference-calendar.md).
+Es inspiración para Efeonce y clientes; no es el calendario de contenidos ni el planner de Metricool.
+
+## Seasonalities en video: ruta obligatoria de producción
+
+Si el encargo convierte un KV estacional en video, cargar
+`../motion-design-studio/workflows/seasonality-visual-metaphor-to-video.md`. Social conserva concepto,
+clasificación y entrega; Motion dirige acción, cámara, sonido y post. Incluir contact sheet previo,
+referencias individuales, preflight real del modelo, capas exactas de marca, QA temporal y MP4 reproducible.
+Una festividad previsible sigue siendo seasonality; no llamarla trendjacking por animarla.
+
+Para elegir **video o estático** en una seasonality, aplicar
+`efeonce/SEASONAL_CONTENT.md` → «Elegir video o estático por el mecanismo creativo»: transformación temporal
+frente a asociación inmediata, funciones complementarias y evaluación comparable sin promesas de rendimiento.
+El criterio de formato es transferible; el ejemplo y los activos Efeonce no se trasladan a otras marcas.

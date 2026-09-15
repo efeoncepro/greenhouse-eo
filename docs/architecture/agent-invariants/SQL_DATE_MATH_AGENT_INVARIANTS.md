@@ -8,12 +8,14 @@
 > a su spec. Contenido **verbatim**, sin pérdida (validado por `claude-md audit --strict`).
 >
 > **Cargar este doc al escribir CUALQUIER query SQL embebida en TS** (readers, commands,
-> materializers, signal/reliability queries, audit scripts, paginación), en **cualquier dominio**.
+> materializers, signal/reliability queries, audit scripts, paginación) **y al declarar un DEFAULT
+> o un generador de ids en una migración**, en **cualquier dominio**.
 >
 > ⚠️ **El nombre del archivo dice `SQL_DATE_MATH`, pero el alcance es TODO el SQL embebido.**
 > Nació con la date-math de `TASK-893` y fue creciendo con cada familia que comparte la misma raíz —
 > `NOW()` vs `clock_timestamp()` (`TASK-1308`), aislamiento de sanity scripts (`TASK-1300`), orden y
-> paginación (`TASK-1700`). El archivo **conserva su nombre a propósito**: lo citan una docena de
+> paginación (`TASK-1700`), ids secuenciales que se recortan, `uuid = text` y backticks dentro de
+> comentarios SQL (`ISSUE-172`). El archivo **conserva su nombre a propósito**: lo citan una docena de
 > tasks, el `agent-context-router.json`, skills y el changelog, y renombrarlo rompería esos punteros
 > sin agregar una sola regla. Lo que se corrige es el encabezado, para que el nombre no siga
 > mintiendo sobre lo que contiene.
@@ -446,3 +448,156 @@ junto, idempotente y cediendo ante decisiones humanas posteriores
   fila**, no al descubrir el residuo.
 - En una tabla append-only la limpieza es **supersede por el command canónico**, jamás `DELETE` —
   y el supersede apunta al item del residuo original para que el par se lea junto.
+
+---
+
+### Ids secuenciales, casts y comentarios: tres bug classes de ISSUE-172 (Hiring + email, medido 2026-09-12)
+
+Cuarta familia del mismo gate. Dos de las tres corren en verde con SQL mockeado y sólo revientan
+contra PostgreSQL real; la tercera ni siquiera llega a la base. Se pagaron en `greenhouse_hiring` y en
+el email delivery, pero **no son de esos dominios**: muerden a cualquier tabla con un id público
+generado por secuencia, a cualquier reader que reciba ids como texto y a cualquier SQL escrito dentro
+de un template literal.
+
+#### 1. `lpad(texto, N)` RECORTA — y el DEFAULT se evalúa por cada fila candidata, aunque `ON CONFLICT` la descarte
+
+**Mecanismo.** `lpad(s, n, fill)` devuelve una cadena de **exactamente** `n` caracteres: rellena por
+la izquierda si `s` es más corta y **recorta por la derecha si es más larga**. No es un "rellenar
+hasta"; es un truncador. Con un id público `'EO-TLP-' || lpad(nextval(seq)::text, 5, '0')`, pasado
+`99 999` los valores `575710…575719` colapsan todos en `EO-TLP-57571` contra `UNIQUE (public_id)` →
+`23505 unique_violation`, diez valores consecutivos por cada colisión.
+
+Y la secuencia llegó ahí mucho antes de lo que las filas justifican: estaba en **575 712 con 230
+filas**. El proyector (`src/lib/hiring/talent-pool/projection.ts`) hacía `INSERT … SELECT … ON
+CONFLICT DO NOTHING` sobre los 247 facets activos cada 5 minutos, y **PostgreSQL evalúa el DEFAULT
+(`nextval`) para cada fila candidata ANTES de que `ON CONFLICT` descarte las 230 que ya existían**:
+~71 000 valores de secuencia quemados al día, el espacio de cinco dígitos agotado en tres semanas.
+`ON CONFLICT` deduplica filas; no evita evaluar sus defaults.
+
+🔴 **Síntoma medido (2026-09-12).** El cron `ops-hiring-talent-pool-reconcile` en rojo en cada corrida
+(`CODE 13`); el consumer `growth_hiring_application_from_submission` —el carril vivo de postulaciones,
+que llama `ensureTalentPoolMembership`— falló de forma intermitente hasta abrir su circuito
+(12:15:03Z), y hasta 38 personas reales quedaron sin proyectar durante horas, sin señal de reliability
+(`projection_circuit_state`/`handler_health` no tenían señal; hoy existe `sync.reactive.circuit_open`).
+Una secuencia 2 500× por delante de sus filas no dispara nada por sí sola.
+
+```sql
+-- ✗ PROHIBIDO — lpad recorta pasado el ancho; y nextval en dos argumentos saltaría un valor por fila
+ALTER TABLE t ALTER COLUMN public_id
+  SET DEFAULT ('EO-TLP-' || lpad(nextval('seq')::text, 5, '0'));
+
+-- ✗ PROHIBIDO — to_char desborda a '#####' cuando el número no cabe en la máscara: también colisiona
+SELECT 'EO-TLP-' || to_char(nextval('seq'), 'FM00000');
+
+-- ✓ CANÓNICO — UN solo nextval; rellena hasta 5 y crece cuando 5 no alcanza. Nunca recorta.
+CREATE OR REPLACE FUNCTION greenhouse_hiring.next_talent_pool_public_id() RETURNS text
+LANGUAGE plpgsql VOLATILE AS $fn$
+DECLARE n bigint := nextval('greenhouse_hiring.talent_pool_public_seq');
+BEGIN
+  RETURN 'EO-TLP-' || lpad(n::text, GREATEST(5, length(n::text)), '0');
+END $fn$;
+
+-- ✓ CANÓNICO — el proyector filtra lo que ya existe ANTES de que se evalúe el default;
+--   ON CONFLICT queda como guarda de carrera (contra ensureTalentPoolMembership), no como filtro
+INSERT INTO greenhouse_hiring.talent_pool_membership (candidate_facet_id, …)
+SELECT cf.candidate_facet_id, …
+  FROM greenhouse_hiring.candidate_facet cf
+ WHERE cf.status = 'active'
+   AND NOT EXISTS (SELECT 1 FROM greenhouse_hiring.talent_pool_membership m
+                    WHERE m.candidate_facet_id = cf.candidate_facet_id)
+ON CONFLICT (candidate_facet_id) DO NOTHING;
+```
+
+- **NUNCA** generar un id público con `lpad(x, N, '0')` sobre una secuencia (ni sobre cualquier
+  texto que pueda crecer): el ancho fijo es un techo silencioso. Es
+  `lpad(n, GREATEST(N, length(n)), '0')` — rellena hasta N y crece cuando N no alcanza.
+- **NUNCA** reemplazarlo por `to_char(n, 'FM00000')`: cuando el número excede la máscara PostgreSQL
+  devuelve `#####`, que también colisiona.
+- **NUNCA** llamar `nextval` dos veces en la misma expresión (valor y largo): consume dos valores por
+  fila. Si el valor se necesita más de una vez, va en una función plpgsql que lo toma **una** sola vez.
+- **NUNCA** un `INSERT … SELECT … ON CONFLICT DO NOTHING` periódico sobre una tabla con default
+  secuencial (o cualquier default con efecto persistente) sin un `WHERE NOT EXISTS` que descarte las
+  filas ya existentes antes de que el default se evalúe. El `ON CONFLICT` se queda como guarda de
+  carrera; el filtro es el anti-join.
+- **SIEMPRE** que se cambie un generador de ids, reanclar la secuencia con `setval` sobre el MAX real
+  (acá 72 440 → siguiente 72 441) y dejar en la migración un bloque `DO` que pruebe la expresión con un
+  valor **más largo** que el ancho (`lpad('575712', GREATEST(5, length('575712')), '0') = '575712'`) y
+  con uno corto (`'7' → '00007'`).
+
+**Detector.** `SELECT last_value FROM pg_sequences WHERE sequencename = '<seq>'` contra
+`SELECT COUNT(*) FROM <tabla>`: una secuencia órdenes de magnitud por encima de las filas ES la quema,
+aunque todavía no haya colisionado. El test `src/lib/hiring/talent-pool/projection.test.ts` fija el
+predicado `NOT EXISTS` para que nadie lo retire "porque el `ON CONFLICT` ya lo cubre".
+
+**Caso fuente:** `migrations/20260912122159611_issue-172-talent-pool-public-id-no-truncation.sql`
+(función + `setval` + guard `DO`, aplicada 2026-09-12 12:48Z; el circuito cerró solo a las 12:50:02Z)
+y el anti-join comentado en `src/lib/hiring/talent-pool/projection.ts`.
+
+#### 2. `uuid = text` no existe: un id que llega como texto se compara casteando la COLUMNA
+
+**Mecanismo.** Una lista de ids que viene del operador o de un cuerpo JSON entra como `text[]`.
+`delivery_id = ANY($4::text[])` sobre una columna `uuid` no resuelve en PostgreSQL:
+`42883 operator does not exist: uuid = text`. Y castear el parámetro (`$4::uuid[]`) mueve el problema:
+un id malformado en la lista revienta la query entera con `22P02 invalid input syntax for type uuid`,
+en vez de simplemente no matchear.
+
+```sql
+-- ✗ PROHIBIDO — 42883 en runtime; el test con SQL mockeado lo da por bueno
+WHERE d.delivery_id = ANY($4::text[])
+
+-- ✓ CANÓNICO — se castea la columna: un id malformado no matchea, no revienta
+WHERE d.delivery_id::text = ANY($4::text[])
+```
+
+- **NUNCA** comparar una columna `uuid` contra un parámetro `text`/`text[]` sin castear un lado; para
+  listas de ids que vienen de afuera, se castea la **columna** a `::text`.
+- **NUNCA** dar por buena la query porque su test unitario pasó: el mock del cliente `pg` acepta
+  cualquier string SQL. Este caso pasó el test y falló al primer intento contra PG real.
+
+**Caso fuente:** `reviveDeadLetterEmailDeliveries` en `src/lib/email/delivery.ts` (el comentario junto
+al `ANY` conserva el porqué).
+
+#### 3. Un backtick dentro de un comentario `-- …` cierra el template literal
+
+**Mecanismo.** El SQL embebido vive dentro de un template literal de TS. Un backtick dentro de un
+comentario SQL no es "parte del SQL": **cierra la cadena** y TypeScript intenta parsear el resto del
+SQL como código. Es un error de parsing, así que lo atrapan `pnpm lint` / `pnpm typecheck` (y el hook
+pre-commit sobre archivos staged), pero **no** un test unitario que mockee el módulo. Hay que tener el
+hábito, no confiar en descubrirlo.
+
+```ts
+// ✗ PROHIBIDO — el backtick del comentario cierra la cadena en `resend_reason`
+const sql = `
+  UPDATE greenhouse_notifications.email_deliveries
+     SET -- el motivo del revive va a `resend_reason`
+         resend_reason = $1
+`
+
+// ✓ CANÓNICO — comillas simples o nada dentro del comentario
+const sql = `
+  UPDATE greenhouse_notifications.email_deliveries
+     SET -- el motivo del revive va a resend_reason (p. ej. el 'name' de Resend)
+         resend_reason = $1
+`
+```
+
+- **NUNCA** usar backticks dentro de un template literal SQL, ni en comentarios `--` ni en literales:
+  los identificadores se citan con comillas simples en el comentario (`'name'`) o sin comillas.
+- **SIEMPRE** correr `pnpm local:check` (lint + tsc) antes de commitear un archivo con SQL embebido;
+  el hook pre-commit lo detiene, siempre que no se lo salte con `--no-verify`.
+
+**Caso fuente:** los comentarios del `UPDATE` de `reviveDeadLetterEmailDeliveries`
+(`src/lib/email/delivery.ts`) citan `'name'` con comillas simples por esta razón.
+
+#### El gate transversal, reforzado
+
+Las dos primeras son el defecto de siempre —SQL que los mocks dan por bueno— en dos formas nuevas: un
+DEFAULT de migración que sólo se quiebra pasado un umbral y un operador que no existe. **SIEMPRE**
+ejercitar cada SQL nuevo contra PostgreSQL real **antes de commitear** (§1 de este doc), y para una
+migración eso incluye **probar la expresión con el valor que la quiebra**, no sólo con el que la hace
+ver bien. Dos trampas del mismo día: `pnpm pg:connect:status` es un **dry-run** que imprime el SQL
+como si lo hubiera aplicado (se aplica con `pg:connect:migrate` y se verifica el objeto después); y un
+push a `develop` despliega el `ops-worker` compartido, así que el anti-join estuvo vivo en producción
+**antes** del release — los CLIs de recovery (`pnpm reactive:backfill …`) ejecutan el árbol local
+contra la única base: sirven como canary, pero escriben producción con código no desplegado y hay que
+declararlo.

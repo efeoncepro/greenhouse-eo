@@ -76,6 +76,29 @@ The engine (EPIC-011 / TASK-1360..1363) implements exactly the above. Map your w
 - **Rollup** — result per competency rolls into `hiring_application.score` (advisory); the human decides. Never feeds payroll/ICO.
 - **Interviewer scorecard** — the same engine records structured interview ratings (`method=interviewer_scorecard`).
 
+### Versioned role packs and the D4 questionnaire snapshot
+
+For a role-specific pack, keep the question bank and the opening binding as separate governed objects. The canonical
+SEO example is documented in `docs/documentation/hr/task-1604-seo-art-assessment-pack.md` and its policy in
+`docs/architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`.
+
+- Revise an active question through a new successor with append-only lineage (`reviseUnpublishedQuestion` and the
+  role manifest); do not edit or silently replace the predecessor. Resolve every module against `status='active'`
+  before activating the template, or a module can become empty without an error.
+- A vacancy policy chooses the template, but assignment always targets a concrete `hiring_application` and creates
+  one `hiring_assessment`. The current SEO pilot is `enabled/manual`; it has no stage-triggered automation. Keep
+  this manual binding distinct from calibration and candidate communications.
+- At assignment, D4 materializes the exact resolved rows (competencies, order, weights, content, options and grading
+  guidance) with policy/content digests in `hiring_assessment.questionnaire_snapshot_json`. The database makes the
+  snapshot append-only; taking, scoring and review share it. Only legacy instances with a null snapshot fall back to
+  the live bank. This preserves comparability and evidence of which exam was taken.
+- Editorial approval does not equal independent SME calibration. Until two raters score the defined reference
+  answers independently, calibration remains pending. AI can propose, but a human confirms; no score may auto-reject
+  or auto-hire.
+
+The complete binding and release readback belongs in the role audit and production release evidence; a passing local
+test, migration or API response alone does not prove that the deployed runtime can safely assign the test.
+
 **Elegibilidad y etapa terminal (TASK-1754 Slice F).** Los tres guards de assessment que bloquean por «este
 recorrido terminó» —instancias, sesión pública y recuperación de acceso— leen hoy la **fuente única**
 `TERMINAL_APPLICATION_STAGES` (`src/types/hiring.ts`), hoy `{'closed'}`. Antes eran **tres copias verbatim**

@@ -1,5 +1,10 @@
 # TASK-1403 — `/servicios/hubspot/agentes/` — Motion Contract
 
+> ⚠️ **Delta 2026-09-13 — se revisa en TASK-1403 Slice 1.** La página pasa a ser la **landing del servicio de
+> agentes**. La prohibición del lenguaje visual de «IA» y el stepper del gobierno siguen valiendo; el inventario de
+> motion debe rehacerse sobre las nuevas regiones (etapas del servicio, modos de entrega) y alinearse con el
+> contrato que el Pillar implementado usa realmente, que no es necesariamente el que este documento asume.
+
 > Cluster 3 de 4 del hub HubSpot. **Hereda el motion contract del pillar (TASK-1352)**: misma escala, mismo
 > easing, mismo contrato de `reduced-motion`.
 >

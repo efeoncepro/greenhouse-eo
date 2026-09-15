@@ -12,6 +12,9 @@ La diferencia con otras capas de documentacion:
 
 ### Social y Creative Studio
 
+- [Usar reglas publicitarias con Codex y Claude](creative/usar-reglas-publicitarias-con-agentes.md) — prompts,
+  entregables, ficha tipográfica y revisión para crear/corregir publicidad y social con texto sin confundir
+  producción, aprobación y publicación.
 - [Manual: producir un post visual de reporte](social/visual-report-social-production.md) — brief, dirección,
   crop, logo, QA y gates contra capturas ilegibles o composiciones genéricas.
 - [Manual: operar Creator Influence & Content](media-distribution/operar-creator-influence-content.md) — intake,
@@ -55,6 +58,10 @@ La diferencia con otras capas de documentacion:
 - [Construir una licitación paso a paso](comercial/construir-una-licitacion.md) — runbook para armar una propuesta de licitación (pública/privada, RFP/RFQ) end-to-end: leer bases, admisibilidad, bid/no-bid, alcance, squad, precio, redacción, económica y presentación human-in-control.
 - [Revisar licitaciones Wherex con Playwright](comercial/revisar-licitaciones-wherex-con-chrome.md) — CLI autenticada y protegida, lectura de bases y fit comercial antes de participar; archivo de originales en OneDrive y verificación/alta confirmada de empresa, deal y asociación en HubSpot.
 - [Usar la Radiografía AEO en venta y educación](comercial/usar-radiografia-aeo-en-venta.md) — manual comercial para usar la muestra como educación, demo en vivo, evidencia en licitaciones, follow-up del Grader y herramienta de sales enablement SEO/AEO.
+
+### Efeonce Insights
+
+- [Operar Efeonce Insights por API y MCP](insights/operar-efeonce-insights-api-mcp.md) — crear y seguir ediciones sin pantalla: flags y módulo `insights_v1` como prerrequisitos, el encargo (módulos, período `[inicio, fin)` en zona IANA, comparación, idempotencia), lectura de evidencia sellada y plan congelado, estados por audiencia, códigos de rechazo, y qué está bloqueado a propósito (emitir sin salidas validadas, emitir por MCP). TASK-1845.
 
 ### Growth
 

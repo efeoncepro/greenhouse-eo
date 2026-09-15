@@ -19,6 +19,19 @@ Esta disponibilidad no activa una tercera familia en el runtime de Greenhouse: l
 display y Geist para texto. En assets con texto exacto, conserva la familia elegida en la composición determinista
 final; el texto generado por el modelo sigue requiriendo revisión humana y no prueba fidelidad tipográfica.
 
+En **seasonality/trendjacking**, cargar primero
+[social-media-studio](../social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md): clasificar
+la oportunidad, justificar participación, definir mecanismo creativo y papel de marca antes del prompt.
+Para Efeonce, aplicar [SEASONAL_CONTENT](../social-media-studio/efeonce/SEASONAL_CONTENT.md): el oficio debe
+ser demostrable y la atribución reconocible. No forzar un objeto corporativo para cumplir branding. Color,
+marco o tipografía oficiales no equivalen a activos distintivos reconocidos sin evidencia.
+
+Separar dos rutas: **firma editorial**, con zona reservada y activo exacto compuesto después del modelo;
+**marca física**, con soporte pertinente, geometría y acabado definidos, usando arte oficial como referencia
+si se elige materialización generativa. La segunda no exige regenerar titulares ni acepta deformación del logo.
+Aplicar [brand-in-scene](../social-media-studio/references/brand-in-scene.md). Mantener la marca fuera de objetos
+rituales sin revisión cultural específica. No añadir nombre de ocasión/fecha/CTA si no tiene función o fue retirado.
+
 ## First Reads
 
 Read only what the task needs:
@@ -231,7 +244,7 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
   face/expression, with separate vendor usage). Do NOT use text-to-image or "character" models (e.g. Soul) for
   consistency — they treat the reference as inspiration and drift to a different subject + mangled logo.
 - **Prompt = identity-lock scaffold + one small delta.** Fix everything (face, hair, outfit, the exact logo, framing, lighting) and change ONLY the requested pose/expression. Big deltas break consistency; small deltas hold it. Anchor every variant to the SAME canonical reference, not to a previous generation.
-- **No engine keeps a logo pixel-exact** (~90% redraw). If the mark must be exact, mask its region and re-stamp the real vector (e.g. `public/branding/SVG/isotipo-efeonce-negativo.svg`) by composition. With `gpt-image-2` the logo is faithful enough that this is optional.
+- **Reference-guided generation does not guarantee logo identity.** Do not assign a universal fidelity percentage or exempt a model from review. Exact editorial marks use the official vector. Physical marks require identity, geometry and material review together; a re-stamp without physical integration is insufficient. If unacceptable drift persists, use controlled photographic composition or 3D/material rendering.
   - **Social piece with a logo seal** (worked 2026-09-11, Efeonce "We are Hiring", LinkedIn 4:5): here the logo is
     never generated. Generate only the art (Higgsfield MCP `generate_image`, `gpt_image_2`, `resolution 2k`,
     `quality high`, `count 2`) with approved brand blues only and the bottom band left empty. `gpt_image_2` offers
@@ -301,7 +314,7 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
   become the next anchor without explicit human promotion.
 - For layout-designed static sets, the model receives only a clean ratio plate. Build the layout contract first,
   use Seedream Pro for material/light/atmosphere or GPT Image 2 for geometry/protected repair, then compose
-  final copy, logo, CTA and legal deterministically. After approving the finish, use `pnpm creative:layout` for
+  final copy, editorial logo, CTA and legal deterministically. After approving the finish, use `pnpm creative:layout` for
   reproducible composition/QA when the contract fits V1. The compiler never calls a provider. Never send the
   composed ad back through a model.
 - Use `generateAnimation()` for small SVG/CSS animations, not raster image generation.
@@ -414,8 +427,9 @@ deterministic and are composed after any generative finish.
   runtime does not expose `model_id`; never infer it from visual quality.
 - Never generate official logos or brand marks from memory.
 - Do not include visible text unless the user explicitly asks and accepts risk; image models can still struggle with precise text.
-- Treat model-rendered campaign text as concept-only. Final copy, logo, CTA, price, legal and
-  localization require deterministic composition unless an explicit exception accepts raster risk.
+- Treat model-rendered campaign text as concept-only. Final copy, editorial logo, CTA, price, legal and
+  localization require deterministic composition unless an explicit exception accepts raster risk. Physical
+  brand materialization uses official references and the separate identity/material review above.
 - Seedream Pro «region/layer editing» is semantic art direction over one flattened raster, not editable
   layers or pixel-perfect locality. Use GPT + alpha mask when protected-region drift has operational cost.
 - If a still becomes motion, hand the approved clean plate to `motion-design-studio`. Build the 15/10/6
@@ -439,3 +453,10 @@ deterministic and are composed after any generative finish.
 ## Closure Bar
 
 A generated asset is done only when it has a clear path, has been visually inspected, and its technical contract has been validated. For transparent PNGs, alpha verification is mandatory. For hybrid outputs, provenance must include the parent asset, `anchor_id`/revision/topology, exact model/endpoint, ordered references, mask, stage/delta, channel/brand modes, latency and request ID/tokens when available. Print/OOH remain `proof-only` until vendor specs/ICC are known; motion remains incomplete until its duration-specific post/audio gates pass.
+
+### Evidencia de cierre social
+
+Conservar input oficial, plate, resultado del pase físico, detalle comparativo y master tipografiado como
+revisiones identificables. Reportar por separado idea/pertinencia, identidad, geometría, material, lectura móvil
+y checks técnicos. V5 de la silla fue rechazada pese a checks verdes; V6 no implica aprobación humana ni
+resultados de audiencia. No publicar, reutilizar como aprobado ni promover a release por completar una generación.

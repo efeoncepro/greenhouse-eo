@@ -3,7 +3,9 @@
 ## Solicitud y estado
 
 El operador pidió completar la preparación del test SEO y revisar después la automatización.
-Este documento registra discovery, ejecución y evidencia; no declara activación ni release.
+Este documento registra discovery, ejecución, release y evidencia. Las secciones fechadas como cortes
+históricos conservan el estado que tenían antes de activar el piloto; el cierre vigente está en
+“Release y canary de producción”.
 
 - Vacante: `EO-OPN-0674` / `opng-262f0d6d-f139-4355-9017-165cbab54b9c`.
 - Checkout compartido observado: `develop`; no se cambia de rama ni se usan worktrees o subagentes.
@@ -243,7 +245,7 @@ Esta decisión sustituye el bloqueo de calibración descrito en el corte anterio
   la protección D4 todavía requiere su release y smoke desplegado. El bloqueo de calibración quedó resuelto
   para el piloto por decisión humana, no por una calibración ficticia.
 
-## Preparación de release acotado
+## Preparación de release acotado (corte histórico, superseded)
 
 Commit candidato inicial `8461c90c1f6818147470d871c0141528fd1c55d8`, padre main
 `586a8627568a86ebee15c910cff2cb0f8e2405ce`. Preparado mediante índice Git temporal y commit-tree;
@@ -255,3 +257,42 @@ excepción auditada con motivo >=20 caracteres y capability del operador. No se 
 Los otros resultados previos a publicar son evidencia incompleta (SHA todavía local/sin CI, credenciales
 WIF/Sentry del proceso local); no se presentan como fallos funcionales del código ni se omiten para desplegar.
 La aprobación del piloto no se presenta como autorización de esta excepción del control plane.
+
+## Readback de asignabilidad y handoff de release (corte histórico, superseded)
+
+Read-only: las 24 postulaciones actuales de SEO devolvieron `ready` en
+`buildAssignmentEffectMaterial` + `deriveAssignmentPreviewBlocker`. GET desplegado de
+`/api/hiring/applications/[id]/assessment-assignment`: `canAssign=true`, `proposal=null`.
+No se creó propuesta, instancia ni correo. El resultado es readiness, no evidencia de entrega.
+
+PR draft: https://github.com/efeoncepro/greenhouse-eo/pull/235, rama remota
+`codex/task-1604-seo-pilot`, head `0231aba116226b714bee146b321977c188f5f841`.
+Pre-push canónico pasó (lint completo: cero errores y 26 warnings previos; typecheck y demás gates).
+CI/preview de ese head en curso al corte; no merge, no dispatch ni override.
+Solicitada autorización explícita para promoción y excepción auditada requerida por migraciones.
+La autorización del piloto fue ejecutada; no se vuelve a solicitar. Checkout sigue develop y conserva WIP.
+La PR se creó desde objetos Git sobre main, sin cherry-pick desde develop ni checkout aislado.
+
+## Release y canary de producción — 2026-09-13
+
+- PR #235 se marcó lista y se fusionó por squash. El SHA exacto promovido a `main` es
+  `cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9`.
+- El orquestador canónico `34754161855` terminó `success` entre `11:20:02Z` y `11:35:31Z`.
+  El manifiesto `cc3ec449495b-58fdc69f-3223-4348-8767-382008593b54` quedó `released`; su tramo
+  `started_at → completed_at` fue `782s` (`11:22:19.316Z → 11:35:21.173Z`).
+- CI y CI Deep del SHA exacto pasaron (`34753547859` y `34753547823`). Vercel Production quedó
+  `READY` en `dpl_5neCaodRXE162x8vuoe1NHpgTEKR`; `/api/auth/health` respondió HTTP 200 con estado
+  `ready`.
+- `ops-worker`, `commercial-cost-worker`, `auth-server`, `ico-batch-worker` y
+  `hubspot-greenhouse-integration` terminaron `Ready=True` y verificaron `GIT_SHA` igual al SHA del
+  release. Azure ejecutó health checks y omitió los applies Bicep por `no_infra_diff`.
+- Canary real de producción: `GET /api/hiring/assessments/questions` devolvió HTTP 200 y ocho
+  sucesoras activas con el marcador `codex:TASK-1604:seo-editorial-revision`; el GET de asignación
+  para `EO-APP-0957` devolvió `canAssign=true`, `proposal=null` y cero efectos. El readback completo
+  está en [canary JSON](2026-09-13-seo-production-canary.json).
+- El canary no asignó a una persona ni envió correo. La captura D4 se ejecutará cuando exista un
+  recorrido sintético autorizado; por eso esta evidencia prueba el banco y la frontera de asignación,
+  pero no presenta una instancia candidata como si ya tuviera snapshot.
+- `pnpm release:watchdog --json` terminó `aggregateSeverity: ok`, `exitCode: 0`; sus tres señales
+  basadas en `GITHUB_RELEASE_OBSERVER_TOKEN` quedaron `unknown` por falta del token, sin findings
+  accionables ni dispatch a Teams.

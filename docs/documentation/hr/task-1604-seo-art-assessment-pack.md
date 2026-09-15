@@ -2,17 +2,20 @@
 
 ## Estado y límites
 
-Este documento versiona los instrumentos autorizados en `TASK-1604`. No activa preguntas, no asigna tests,
-no crea postulaciones y no automatiza decisiones. Toda puntuación es evidencia advisory para una decisión
-humana. La persona candidata puede pedir ajustes razonables en cualquier etapa.
+Este documento versiona los instrumentos autorizados en `TASK-1604`. La versión SEO está habilitada para
+asignación manual en `EO-OPN-0674`; no crea postulaciones ni automatiza decisiones. Toda puntuación es
+evidencia advisory para una decisión humana. La persona candidata puede pedir ajustes razonables en cualquier
+etapa.
 
 La definición ejecutable vive en
 `scripts/hiring/task-1604-role-assessment-pack.ts`. Las preguntas y rúbricas son internas; el payload público
 del candidato usa la proyección allowlist del assessment engine y nunca contiene answer keys o rúbricas.
 
 Las vacantes `EO-OPN-0674` y `EO-OPN-0675` fueron publicadas por un acto operativo separado el 2026-09-09.
-Ese estado no activa la capa de assessment: el readback del 2026-09-10 confirma cero policies, cero instancias,
-nueve preguntas todavía en `sme_review` y ningún template del pack materializado.
+El 2026-09-13 se activó sólo el piloto manual SEO: template
+`atpl-6621f306-cb50-4286-a41d-969927a579e3`, policy
+`hoap-e7e269ac-2c2a-4023-8873-15db1302d63e`, `enabled/manual`, 75 minutos y cap de cinco asignaciones por
+hora. Arte permanece fuera de este binding.
 
 ## Escala común
 
@@ -163,8 +166,12 @@ revelar información protegida ni se solicita recrear trabajo confidencial.
    `pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/create-task-1604-assessment-pack.ts`.
 2. Aplicar la migración por el runner gobernado.
 3. Crear las preguntas SEO en `sme_review` con `--apply-questions`.
-4. Realizar revisión y calibración SME por pregunta. La activación es una acción humana separada.
+4. Realizar revisión y calibración SME por pregunta. Para el piloto vigente, la aprobación editorial del
+   operador permitió activar la versión sin afirmar que la calibración independiente ya ocurrió; la
+   calibración completa sigue siendo un gate de calidad pendiente.
 5. Sólo con las nueve preguntas exactas de este pack activas, materializar la plantilla SEO con
    `--materialize-seo-template`. El command falla ante templates homónimos con `roleHint`, módulos, niveles o
    pesos distintos, y también ante duplicados exactos.
-6. No crear una policy de opening ni asignar assessments hasta un acto posterior expresamente autorizado.
+6. Para el piloto vigente, la policy manual ya está habilitada para `EO-OPN-0674`. Asignar sólo mediante
+   propose → confirm y con autorización humana por postulante; no activar `on_stage_entry` ni enviar a
+   postulantes hasta que exista una autorización específica.

@@ -188,9 +188,15 @@ describe('growth-forms-renderer · FormRenderer', () => {
       root.querySelector('[data-ghf-field-key="email"] .ghf-control-icon')!.compareDocumentPosition(email) &
         Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy()
-    expect(root.querySelector('[data-ghf-field-key="phone"] .ghf-tel-input-shell .ghf-control-icon[data-icon="phone"]')).toBeTruthy()
-    expect(root.querySelector('[data-ghf-field-key="cvFile"] .ghf-file-dropzone .ghf-file-dropzone-icon[data-icon="file"]')).toBeTruthy()
-    expect(root.querySelector('[data-ghf-field-key="message"] .ghf-control--textarea .ghf-control-icon[data-icon="message"]')).toBeTruthy()
+    expect(
+      root.querySelector('[data-ghf-field-key="phone"] .ghf-tel-input-shell .ghf-control-icon[data-icon="phone"]')
+    ).toBeTruthy()
+    expect(
+      root.querySelector('[data-ghf-field-key="cvFile"] .ghf-file-dropzone .ghf-file-dropzone-icon[data-icon="file"]')
+    ).toBeTruthy()
+    expect(
+      root.querySelector('[data-ghf-field-key="message"] .ghf-control--textarea .ghf-control-icon[data-icon="message"]')
+    ).toBeTruthy()
     expect(root.querySelector('[data-ghf-primary] .ghf-btn-icon[data-icon="send"]')).toBeTruthy()
     expect(root.querySelector('[data-ghf-field-key="linkedinUrl"] .ghf-optional')).toBeNull()
     expect(root.querySelector('[data-ghf-field-key="linkedinUrl"] .ghf-label')?.textContent).toBe('LinkedIn (opcional)')
@@ -612,23 +618,65 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(root.querySelector('[role="option"][aria-selected="true"]')?.textContent).toBe('1 - 10')
   })
 
+  it('renders an opt-in country select with vector flags inside hubspot_pillar', () => {
+    const { root } = mountInto(
+      staticContractFixture({
+        styleVariant: 'hubspot_pillar',
+        fields: [
+          {
+            key: 'country',
+            type: 'select',
+            label: 'País',
+            placeholder: 'Selecciona tu país',
+            presentation: { control: 'country_select' },
+            options: [
+              { value: 'Chile', label: 'Chile', countryCode: 'CL' },
+              { value: 'Colombia', label: 'Colombia', countryCode: 'CO' }
+            ]
+          }
+        ],
+        consent: undefined
+      })
+    )
+
+    const trigger = root.querySelector<HTMLButtonElement>('[name="country"].ghf-select-trigger')!
+
+    expect(trigger.getAttribute('role')).toBe('combobox')
+    expect(root.querySelector('.ghf-choice-group')).toBeNull()
+    trigger.click()
+    expect(root.querySelectorAll('.ghf-select-option .ghf-country-flag')).toHaveLength(2)
+    expect(root.querySelector<HTMLImageElement>('[data-value="Chile"] .ghf-country-flag')?.src).toBe(
+      'https://gh.test/growth-forms/flags/cl.svg'
+    )
+
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'c', bubbles: true }))
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'o', bubbles: true }))
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+    expect(trigger.textContent).toContain('Colombia')
+    expect(trigger.querySelector('.ghf-country-flag')).not.toBeNull()
+  })
+
   it('renders free-entry multiselect fields as removable chips and submits string arrays', async () => {
     const fetchImpl = okFetch()
 
-    const { root } = mountInto(staticContractFixture({
-      styleVariant: 'diagnostic_premium',
-      fields: [
-        {
-          key: 'competitorsDeclared',
-          type: 'multiselect',
-          label: 'Competidores de referencia',
-          placeholder: 'Escribe una marca y presiona Enter',
-          freeEntry: true,
-          maxItems: 3,
-        },
-      ],
-      consent: undefined,
-    }), fetchImpl)
+    const { root } = mountInto(
+      staticContractFixture({
+        styleVariant: 'diagnostic_premium',
+        fields: [
+          {
+            key: 'competitorsDeclared',
+            type: 'multiselect',
+            label: 'Competidores de referencia',
+            placeholder: 'Escribe una marca y presiona Enter',
+            freeEntry: true,
+            maxItems: 3
+          }
+        ],
+        consent: undefined
+      }),
+      fetchImpl
+    )
 
     const input = root.querySelector<HTMLInputElement>('[name="competitorsDeclared"].ghf-tag-entry')!
 
@@ -637,7 +685,10 @@ describe('growth-forms-renderer · FormRenderer', () => {
     input.value = 'Marca B'
     input.dispatchEvent(new KeyboardEvent('keydown', { key: ',', cancelable: true, bubbles: true }))
 
-    expect(Array.from(root.querySelectorAll('.ghf-tag-label')).map(node => node.textContent)).toEqual(['Marca A', 'Marca B'])
+    expect(Array.from(root.querySelectorAll('.ghf-tag-label')).map(node => node.textContent)).toEqual([
+      'Marca A',
+      'Marca B'
+    ])
 
     root.querySelector<HTMLButtonElement>('.ghf-tag-remove')!.click()
     expect(Array.from(root.querySelectorAll('.ghf-tag-label')).map(node => node.textContent)).toEqual(['Marca B'])

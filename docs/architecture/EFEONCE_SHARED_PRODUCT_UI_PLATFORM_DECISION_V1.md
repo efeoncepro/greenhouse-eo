@@ -58,6 +58,27 @@ desplegará como proyecto Vercel independiente, inicialmente en modo internal-on
 crea un runtime Cloud Run para el Lab mientras no exista una necesidad de backend,
 persistencia o jobs.
 
+## Delta 2026-09-14 — intención portable de selección colaborativa
+
+AXIS incorpora `efeonce.collaboration-selection` `0.2.0` como contrato `candidate` para representar una
+selección activa, un cursor local y presencia multiplayer en publicidad, editorial y futuras superficies del
+ecosistema. El contrato no distribuye un componente pintado: distribuye vocabulario, defaults, validación y el
+manifest normalizado `axis.collaboration-selection-composition.v1`. El primer adapter conformante es la
+referencia Creative Selection Language del Lab.
+
+La frontera de autoría es semántica. Un agente declara el `targetId`, si selecciona texto, objeto o grupo, la
+gramática del bounding box, aire interno, overlay y cursores. El resolver de AXIS deriva dirección, acción y
+posición del puntero respecto de la placa multiplayer; rechaza relaciones contradictorias antes de pintar. El
+adapter de cada superficie debe enlazar ese target a un objeto real, medir sus bounds intrínsecos y verificar la
+geometría en sus formatos soportados. No puede copiar el Astro/CSS del Lab, fijar ancho/alto portable ni degradar
+a coordenadas decorativas.
+
+La portabilidad no equivale a disponibilidad runtime. Mientras `@efeoncepro/axis-ui-contracts` publicado siga
+en `0.1.5`, esta capacidad existe sólo en el source del repo AXIS y su Lab local; Greenhouse, Globe, Artifact
+Composer, Campaign Layout Compiler, motion y otros consumidores siguen necesitando un adapter y una versión
+publicada compatible. Un agente debe reportar ese estado como pendiente o no soportado, nunca afirmar adopción
+cross-runtime por la existencia del contrato o del primer adapter.
+
 ## Estado verificable de distribución, autenticación y adapters — 2026-07-30
 
 - Los paquetes privados publicados en GitHub Packages son `@efeoncepro/axis-tokens`,

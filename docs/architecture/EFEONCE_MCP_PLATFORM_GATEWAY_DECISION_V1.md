@@ -107,6 +107,12 @@ duplica lógica de negocio.
    Desde 2026-09-10 incluye el write de servicios de cliente `efeonce.mcp.client_services.write` (TASK-1852),
    exigido por las tres tools del provider `greenhouse-client-services` —preview incluido— y comunicado sólo
    por el challenge `403 insufficient_scope`; la autoridad la relee Greenhouse por persona en cada llamada.
+   Desde 2026-09-15 incluye el write de Efeonce Insights `efeonce.mcp.insights.write` (TASK-1845), exigido
+   sólo por `create_insight_edition` del provider `greenhouse-insights` (las tres lecturas —catálogo, lista y
+   detalle de ediciones— van con el scope base). Declarado en el gateway `v1.5.0` y en el registro de paridad
+   de Greenhouse; creado en la app recurso de Entra el 2026-09-15 (round-trip 6→7 verificado, cliente PKCE
+   compartido intacto) y desplegado el mismo día (revisión `efeonce-mcp-gateway-00053-dsk`). Ningún cliente lo
+   porta todavía, así que la tool escribe cerrada con `insufficient_scope` hasta un grant gobernado.
 
    🔴 **Granularidad canónica: un scope por CLASE DE BLAST-RADIUS, nunca uno por capability.** Un scope por
    capability convierte esta lista en un **espejo del `capabilities_registry` de Greenhouse** — un registry

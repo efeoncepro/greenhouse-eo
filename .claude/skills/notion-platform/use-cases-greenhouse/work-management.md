@@ -13,6 +13,15 @@ one or several Projects/Campaigns. When both concepts apply, resolve the Project
 `docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md`; do not create a second project class to
 represent the contract.
 
+## Referente estacional frente a calendario de contenidos
+
+El calendario «Social Media 2026» preparado por Metricool en Notion es únicamente un referente de
+seasonalities para Efeonce y clientes. No es el calendario editorial ni una fuente de tareas,
+aprobaciones o publicaciones programadas. Resolver la marca/espacio y el destino editorial antes de
+crear una pieza; nunca escribir estados de producción dentro del referente ni copiar todos sus eventos.
+Identidades, lectura de la base con múltiples fuentes y validación de fechas:
+[referencia canónica Social Media Studio](../../social-media-studio/references/seasonality-reference-calendar.md).
+
 ## Hierarchy invariants
 
 - Parent and child belong to the same Greenhouse `space_id` and Tasks data source.

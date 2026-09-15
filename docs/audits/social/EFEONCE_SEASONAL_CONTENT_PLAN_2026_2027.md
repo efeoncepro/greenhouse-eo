@@ -19,6 +19,14 @@ las asignaciones ni los estados de las páginas. Releerlos antes de producir, re
 > editorial). Si no hay argumento propio, la pieza se queda en Instagram. Alcance, fechas, responsables y
 > entregas de este plan **no cambian**.
 
+## Fuente de inspiración separada
+
+El [Calendario Social Media 2026 preparado por Metricool](../../../.codex/skills/social-media-studio/references/seasonality-reference-calendar.md)
+es sólo un referente de seasonalities para Efeonce y clientes. No es este plan ni nuestro calendario
+editorial. Las [oportunidades adicionales evaluadas el 2026-09-13](2026-09-13-seasonality-reference-opportunities.md)
+son propuestas; no modifican las 13 piezas ni sus fechas. El destino editorial se releyó el 2026-09-13:
+conserva el ID listado abajo y ahora muestra el título «Calendario de Contenidos».
+
 ## Destinos verificados
 
 - Proyecto [content - q4](https://www.notion.so/3d639c2fefe78153843af99129069273).
@@ -35,8 +43,11 @@ las asignaciones ni los estados de las páginas. Releerlos antes de producir, re
 ## Piezas y fechas observadas
 
 La fecha enlazada es publicación; la entrega corresponde a la propiedad de la tarea.
-Todas las tareas están en **Brief listo**; las 13 entradas del calendario en **Sin empezar**,
-con aprobación desmarcada. No hay evidencia de producción terminada ni programación/publicación en redes.
+En el corte Notion del 2026-09-09, todas las tareas estaban en **Brief listo** y las 13 entradas del calendario
+en **Sin empezar**, con aprobación desmarcada. Ese corte no contenía evidencia de producción/programación.
+Actualización operativa 2026-09-13: Fiestas Patrias y Día de Muertos quedaron programadas en Metricool
+con autorización del operador; [caso, versiones, fechas e IDs](../../operations/social/2026-09-13-fiestas-patrias-production-method.md).
+No se actualizó ni releyó Notion durante esa programación; no inferir que cambió el estado de sus páginas.
 
 | Tarea | Publicación | Entrega de tarea | Responsable de tarea |
 |---|---|---|---|

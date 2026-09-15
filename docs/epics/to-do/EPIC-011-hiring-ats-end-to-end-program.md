@@ -177,6 +177,8 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-354` — Public careers landing and apply intake. **✓ complete; residual de datos absorbido por TASK-1688 (2026-08-11).**
 - `TASK-355` — Internal Hiring Desk, pipeline and publication governance. **✓ complete.**
 - `TASK-1688` — Careers application contact completeness: persistencia/lectura de teléfono, residencia y mensaje con un único command de Hiring.
+- `TASK-1873` — Intake tolerante con memoria: warnings estructurados (`intake_warnings`) cuando el parser descarta un enlace opcional, en los dos carriles públicos (ISSUE-172, 2026-09-12).
+- `TASK-1874` — Application 360: aviso del enlace descartado y empty state honesto de «Portafolio y enlaces» (ui-ux; bloqueada por `TASK-1873`).
 - `TASK-1714` — Reveal auditado del documento de identidad de un **candidato** (no existía: el de TASK-784 se ancla a `memberId`). **✓ complete (2026-08-15).**
 - `TASK-1715` — Application 360 · panel de Documentos real: cablea el reader, el CV se lee dentro del portal y el candado queda sólo en la identidad. **✓ complete (2026-08-15).**
 - `TASK-1718` — Candidate Review Packet + reader MCP delegado: lectura interna agent-safe de postulación/CV sobre App API, con identidad humana delegada, minimización, audit y provider read-only OFF por defecto.

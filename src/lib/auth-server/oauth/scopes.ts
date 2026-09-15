@@ -30,11 +30,18 @@ export const EFEONCE_MCP_READ_SCOPES = [
  * clase. Hoy se ejerce por el issuer Entra (RFC 8693 → `client_services.enablement.write`); el contexto interno v2
  * de Efeonce ID sigue base-only (D9), así que aquí se declara la clase y NO se publica como mínimo.
  */
+/**
+ * `efeonce.mcp.insights.write` (TASK-1845): clase «crear una edición de Efeonce Insights» — la única escritura del
+ * dominio hoy (`create_insight_edition`). Autoridad real en Greenhouse (`insights.edition.create` sobre la
+ * organización con `insights_v1` asignado, releída por llamada); el scope sólo responde si ESTE cliente puede pedir
+ * esa clase. Las lecturas del catálogo y de ediciones viajan con el scope base.
+ */
 export const EFEONCE_MCP_WRITE_SCOPES = [
   'efeonce.mcp.globe.credits.funding.ensure',
   'efeonce.mcp.seo.write',
   'efeonce.mcp.identity.write',
-  'efeonce.mcp.client_services.write'
+  'efeonce.mcp.client_services.write',
+  'efeonce.mcp.insights.write'
 ] as const
 
 export const EFEONCE_MCP_SCOPES = [...EFEONCE_MCP_READ_SCOPES, ...EFEONCE_MCP_WRITE_SCOPES] as const

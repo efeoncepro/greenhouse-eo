@@ -1,0 +1,110 @@
+version: campaign-layout-compiler.v1
+campaign_id: axis-advertising-harness-smoke
+run_root: ..
+
+anchor:
+  id: neutral-generated-harness-plate
+  revision: 1
+  asset: work/plates/neutral-generated-plate.png
+  status: approved
+  locks:
+    - abstract neutral background
+    - navy and cobalt palette
+    - central-left copy field
+
+brand_mode: branded
+channel_mode: digital-static
+
+message:
+  kicker: AXIS HARNESS
+  headline:
+    - SYSTEM CHECK
+  support:
+    composition: supportingTagline
+    reference: primary-lockup-inline-size
+    segments:
+      - { text: 'La imagen', role: base }
+      - { text: 'propone', role: growth }
+      - { text: 'el sistema compone', role: base }
+      - { text: 'con criterio', role: intervention }
+  url: efeoncepro.com
+
+brand:
+  logo: ../../public/branding/logo-negative.svg
+  url_bubble: ../../src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg
+  fonts:
+    regular: ../../src/assets/fonts/Poppins-Regular.ttf
+    medium: ../../src/assets/fonts/Poppins-Medium.ttf
+    bold: ../../src/assets/fonts/Poppins-Bold.ttf
+    bold_italic: ../../src/assets/fonts/Poppins-BoldItalic.ttf
+    extra_bold: ../../src/assets/fonts/Poppins-ExtraBold.ttf
+  colors:
+    background: '#023C70'
+    foreground: '#FFFFFF'
+    support: '#FFFFFF'
+    muted: '#CFE4FA'
+    accent: '#7ED600'
+    accent_secondary: '#FF6500'
+
+visual_system:
+  underlay:
+    color: '#023C70'
+    copy_opacity_start: 0.58
+    copy_opacity_mid: 0.28
+    top_opacity: 0.18
+    vignette_opacity: 0.2
+  hook:
+    type: none
+    colors: ['#0375DB', '#7ED600']
+
+collaboration_selection:
+  intent: brief/collaboration-selection-intent.json
+  target_binding: headline
+
+composition:
+  renderer: sharp-fontkit
+  output_format: png
+  quality: 94
+  max_bytes: 5242880
+  contact_sheet_columns: 1
+
+approvals:
+  layout: approved
+  human_release: pending
+  anchor_owner: harness-test
+  release_owner: not-applicable
+
+artifacts:
+  plan_manifest: manifests/layout-compiler-plan.json
+  composition_manifest: manifests/layout-compiler-composition.json
+  qa_report: qa/layout-compiler-technical.json
+  contact_sheet: review/layout-compiler-contact-sheet.jpg
+  editable_dir: work/layout-compiler/editable
+
+formats:
+  - id: feed-4x5
+    ratio: '4:5'
+    canvas: { width: 1080, height: 1350 }
+    grid: { columns: 6, margin_pct: 7.5, gutter_pct: 3 }
+    source_plate: work/plates/neutral-generated-plate.png
+    finished_plate: work/finished/neutral-generated-finish.png
+    output: delivery/feed-4x5.png
+    copy_field: { x: 0.075, y: 0.22, width: 0.85, height: 0.46 }
+    safe_zones: { top: 0.06, right: 0.075, bottom: 0.06, left: 0.075 }
+    finish:
+      status: approved
+      executor: built-in-imagegen
+      delta: neutral clean plate accepted unchanged for harness smoke
+      input_policy: clean plate only; no final copy, logo, CTA or legal
+    layout:
+      copy_fade_mid: 0.55
+      copy_fade_end: 0.88
+      logo: { left: 81, top: 81, width: 220 }
+      kicker: { x: 108, y: 350, size: 24, tracking: 2 }
+      hook: { x: 81, y: 330, width: 5, height: 210 }
+      headline: { x: 108, y: 570, size: 92, gap: 100, tracking: -1.5 }
+      support: { x: 108, y: 710, size: 30, min_size: 22, max_size: 38, max_width: 760, gap: 42, tracking: 0 }
+      url: { x: 360, y: 1190, width: 360, size: 25, tracking: 0 }
+      rule: { x: 81, y: 1205, width: 250, height: 2, visible: false }
+
+gates: [anchor, layout, finish, craft, format, technical, human_release]

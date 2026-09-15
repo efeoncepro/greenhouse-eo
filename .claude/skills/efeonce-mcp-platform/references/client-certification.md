@@ -25,6 +25,10 @@ demás.
   porque retirarlo dejaría al helper borrar hijos de otros sujetos por `client_id`. No lo allowlistees ni marques
   el CIMD como run-owned: primero parte planner/delete/readback, añade una comprobación de preservación del
   cliente/hijos ajenos y prueba ambos caminos. Hasta entonces, no hay cleanup seguro aunque venza la ventana.
+- Una señal de `refresh_reuse` agregada por `client_id` compartido no demuestra actividad canary. Antes de usarla
+  como blocker de steady, correlaciona `subject_hash`, `grant_id`, familia y `profile.data_origin` con los sujetos
+  exactos de la corrida. Conserva y atiende la actividad de otros sujetos como señal operacional separada, pero
+  no reinicies por ella la ventana canary.
 
 ## Discovery después de TASK-1813
 

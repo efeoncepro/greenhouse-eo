@@ -19,6 +19,21 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // La orquestación publicitaria debe activar las mismas fuentes, gates y límites de publicación
+    // en Codex y Claude. Un drift aquí vuelve a producir dos criterios de marca.
+    id: 'efeonce-advertising-creative',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-advertising-creative',
+    claude: '.claude/skills/efeonce-advertising-creative',
+  },
+  {
+    // Idea, producción y revisión social deben conservar el mismo contrato en ambos agentes.
+    id: 'social-media-studio',
+    mode: 'byte-identical',
+    codex: '.codex/skills/social-media-studio',
+    claude: '.claude/skills/social-media-studio',
+  },
+  {
     id: 'report-studio',
     mode: 'shared-files',
     agentLocal: ['agents/openai.yaml'],
@@ -80,6 +95,15 @@ const mirroredSkills = [
     mode: 'byte-identical',
     codex: '.codex/skills/greenhouse-globe-model-fleet',
     claude: '.claude/skills/greenhouse-globe-model-fleet',
+  },
+  {
+    // TASK-1845 — Efeonce Insights: los dos harness deben enseñar el mismo ciclo (encargo → fases →
+    // evidencia → gate humano) y las mismas invariantes de autorización; un drift produciría dos
+    // criterios sobre qué puede emitir una máquina.
+    id: 'efeonce-insights',
+    mode: 'byte-identical',
+    codex: '.codex/skills/efeonce-insights',
+    claude: '.claude/skills/efeonce-insights',
   },
   {
     // La operación de imágenes comparte código, modelos y restricciones de formato. Una divergencia

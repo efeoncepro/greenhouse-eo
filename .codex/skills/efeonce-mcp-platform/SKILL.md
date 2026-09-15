@@ -135,12 +135,18 @@ The relying-party boundary is fixed by
   which does not certify external client eligibility or canaries (`TASK-1832`). Determine those from
   current canonical readers and the rollout record, not from the presence of an issuer or internal pilot.
   No vendor gets provisioned: WorkOS was discarded by the native ADR.
-  The gateway enforces **seven** scope classes: base `efeonce.mcp.read`, Globe reader
+  The gateway enforces **eight** scope classes: base `efeonce.mcp.read`, Globe reader
   `efeonce.mcp.globe.read`, the flag-gated internal write `efeonce.mcp.globe.credits.funding.ensure`, the
   flag-gated SEO write `efeonce.mcp.seo.write` (TASK-1308), the flag-gated identity write
-  `efeonce.mcp.identity.write` (TASK-1837), the flag-gated Hiring reader `efeonce.mcp.hiring.read`, and — since
-  2026-09-10 — the flag-gated client-services write `efeonce.mcp.client_services.write` (TASK-1852; required by
-  all three enablement tools, preview included).
+  `efeonce.mcp.identity.write` (TASK-1837), the flag-gated Hiring reader `efeonce.mcp.hiring.read`, since
+  2026-09-10 the flag-gated client-services write `efeonce.mcp.client_services.write` (TASK-1852; required by
+  all three enablement tools, preview included), and — since 2026-09-15 — the flag-gated Insights write
+  `efeonce.mcp.insights.write` (TASK-1845; only `create_insight_edition`; the three Insights readers ride the
+  base scope). The Insights scope exists in the gateway (`v1.5.0`, PR #12 `cad57b31d`, deployed 2026-09-15 as
+  revision `efeonce-mcp-gateway-00053-dsk`, front door 200/200/401), in Greenhouse's parity registry
+  (`src/lib/auth-server/oauth/scopes.ts`) and in the Entra resource app «Efeonce MCP Resource» (Admin scope,
+  added 2026-09-15 with a verified 6→7 round-trip; the shared PKCE client was not touched). No client carries it
+  yet, so `create_insight_edition` still answers `insufficient_scope` until a governed grant/consent exists.
   The PRM intentionally announces only the base scope; read the others from the exact 403 challenge and policy,
   never from a cached catalog count.
   Scope granularity is **one scope per blast-radius class, never one per capability**: a per-capability list turns

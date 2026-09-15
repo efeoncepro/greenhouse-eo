@@ -61,6 +61,8 @@ export interface RendererFieldOption {
   value: string
   label?: string
   copyRef?: string
+  /** ISO 3166-1 alpha-2 para la bandera vectorial decorativa del selector de país. */
+  countryCode?: string
 }
 
 export type RendererFieldPresentationIcon =
@@ -96,6 +98,8 @@ export interface RendererFileUploadPolicy {
 
 export interface RendererFieldPresentation {
   icon?: RendererFieldPresentationIcon
+  /** Opt-in de control especializado; conserva el valor y la semántica en el renderer. */
+  control?: 'country_select'
 }
 
 export interface RendererFieldDefinition {
@@ -141,24 +145,13 @@ export interface RendererConsentDisplay {
   checkboxes?: RendererConsentCheckbox[]
 }
 
-export type RendererSuccessKind =
-  | 'inline_message'
-  | 'redirect'
-  | 'asset_access'
-  | 'review_pending'
-  | 'tokenized_report'
+export type RendererSuccessKind = 'inline_message' | 'redirect' | 'asset_access' | 'review_pending' | 'tokenized_report'
 
 // Success card capability (TASK-1319) — espejo de tipos browser-safe. La SoT
 // (`successBehaviorSchema`) valida/acota; acá vive sólo el shape que el renderer consume.
 export type RendererSuccessPresentation = 'inline_message' | 'success_card'
 export type RendererSuccessActionKind = 'external_link' | 'download' | 'asset_access' | 'schedule'
-export type RendererSuccessRewardKind =
-  | 'none'
-  | 'ebook'
-  | 'guide'
-  | 'template'
-  | 'report_preview'
-  | 'surprise'
+export type RendererSuccessRewardKind = 'none' | 'ebook' | 'guide' | 'template' | 'report_preview' | 'surprise'
 
 export interface RendererSuccessCardAction {
   kind: RendererSuccessActionKind

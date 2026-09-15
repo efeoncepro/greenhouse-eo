@@ -40,12 +40,19 @@ Efeonce.** Cárgalo antes de proponer formato, calendario o distribución en can
 Behind the Build → Instagram · Versus → YouTube + Blog · Educativo → LinkedIn · Glitch → email ·
 Trendjacking → Threads + Instagram · Casos de Éxito → Blog · **Seasonalities → Instagram**.
 
-**Seasonalities** (PDR-020 §4.4) es línea propia permanente: la **temporada** contada como demostración de una
-disciplina de la casa, **nunca un saludo**. **NO son efemérides:** la unidad de trabajo es la ventana por
-mercado, no el día — por eso Navidad se entrega en octubre. Métrica sends + saves. LinkedIn recibe el argumento
-profesional desarrollado, no la misma pieza con otro caption. No se fusiona con Trendjacking: misma familia
-cultural, economía de producción opuesta (se conoce con un año de anticipación vs ventana de horas). Plan vigente:
-`docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md`.
+**Seasonalities** (PDR-020 §4.4) es una línea permanente: ventana previsible por mercado, desarrollada desde
+una disciplina de la casa. Una efeméride puede ser su detonante, pero no sustituye la investigación del
+comportamiento. **Trendjacking** responde a una conversación emergente verificada; no imponer una duración
+universal de horas ni tratar toda ocasión cultural como tendencia. Una reacción imprevista dentro de una
+temporada se clasifica y evalúa por separado. Sends/saves son señales, no prueba de recuerdo ni negocio.
+LinkedIn requiere argumento profesional propio. Plan fechado: `docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md`.
+
+**Marca:** declarar papel estratégico y atribución visual. Una firma editorial no es product placement;
+una marca física necesita soporte plausible, acabado, perspectiva y revisión de identidad. Un color o cinta
+aprobados no garantizan reconocimiento sin evidencia. No forzar objeto corporativo ni CTA. Mantener la marca
+fuera de objetos rituales sin revisión cultural específica. El procedimiento y los criterios por formato viven
+en [SEASONAL_CONTENT.md](SEASONAL_CONTENT.md) y
+[brand-in-scene](../references/brand-in-scene.md); cargar ambos al producir una seasonality con marca física.
 
 ### Reglas duras de canal propio
 
@@ -116,7 +123,7 @@ la operación para un cliente internacional futuro. Para Social Media actual bas
 
 | Archivo | Qué cubre |
 |---|---|
-| `SEASONAL_CONTENT.md` | **Seasonalities** (temporadas, no efemérides) por mercado, conceptos visuales, briefs ejecutables y producción anticipada; relación con tareas/calendario Notion. |
+| `SEASONAL_CONTENT.md` | **Seasonalities** (ventanas previsibles, con efemérides como posibles detonantes) por mercado, conceptos visuales, briefs ejecutables y producción anticipada; relación con tareas/calendario Notion. |
 | `STUDIO_TOOLING.md` | El pipeline real de ejecución: Metricool + Higgsfield + AI-image + Figma/Express + hand-offs. |
 | `SOCIAL_BOUNDARY.md` | La costura completa vs digital-marketing / growth-marketing-cro / copywriting / seo-aeo / efeonce-agency / generadores. Regla de precedencia. |
 | `CLIENT_DELIVERY.md` | Adaptador futuro para clientes internacionales: multi-marca, aprobaciones y reporting. No implica disponibilidad de Globe. |

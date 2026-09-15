@@ -1,6 +1,6 @@
 ---
 name: axis-design-system
-description: "Use for any task involving the Efeonce AXIS design-system packages: tokens, contracts, registry, versioning, adapters, private-package consumption, canaries, release gates, rollback, or distribution credentials."
+description: "Use for Efeonce AXIS tokens, contracts, registry, adapters and releases, including portable advertising typography and semantic collaboration-selection intents with adaptive bounding boxes, local cursors and multiplayer presence."
 ---
 
 # AXIS Design System
@@ -63,6 +63,59 @@ packages and ADRs.
 When token values change, run `pnpm design:generate` in the AXIS repository and verify
 `pnpm design:check`. Do not edit generated frontmatter by hand. Do not treat the AXIS guide as a replacement
 for Greenhouse's root `DESIGN.md`, which remains the product-specific MUI/Vuexy contract.
+
+### Advertising typography
+
+AXIS owns `axisAdvertising` and `efeonce.advertising-typography`; the consumer owns only the translation to
+Tailwind, CSS, canvas or motion. For an advertising/social piece, compose this skill with
+`efeonce-advertising-creative` and the active typography skill. Read the sibling guide at
+`../axis-design-system/docs/creative-applications/advertising-social/DESIGN.md` instead of copying recipes into
+Greenhouse. The contract remains `trial`: do not claim stable or make its Lab adapter global before a second
+consumer and cross-runtime evidence exist.
+
+Use the sources in this order for every piece with advertising text:
+
+1. Read the sibling guide and the current `axisAdvertising` contract to establish roles, allowed ranges and
+   hard limits. The versioned contract remains the source of truth.
+2. Open the public [Creative Typography Workbench](https://axis.efeonce.org/references/creative-typography/)
+   and use its adviser with the real support, title length and intention. Treat the resulting Bricolage weight,
+   Poppins role, optional Guttery gesture, rhythm, safe area and comparison case as a candidate recipe.
+3. Resolve the exact values from the contract, compose with the real licensed files supplied by the consumer
+   and validate the final pixels. If the Workbench and contract diverge, stop and report the drift; never copy
+   the visual projection back into tokens by eye.
+
+The Workbench is the guided visual projection of the guide, not another source of truth and not creative
+approval. Its recommendation does not authorize a brand decision, client delivery, scheduling or publication.
+Do not make its adapter, families or recipes global, and do not package licensed font files with AXIS.
+
+For a support sentence tied to a primary lockup, consume
+`axisAdvertising.compositions.supportingTagline`. It defines a continuous ordered sentence, Poppins structural
+base, uniform fitting to the lockup inline measure, natural word spacing, balanced-wrap fallback and at most two
+semantic emphasis segments. `growth` and `intervention` describe intent, not reserved words. The Lab sentence is
+fixture evidence only; adapters accept arbitrary copy and must measure their own rendered result.
+
+### Collaboration selection
+
+AXIS source owns the candidate `efeonce.collaboration-selection` contract and
+`axis.collaboration-selection-composition.v1` manifest. Agents author semantic intent rather than pixels:
+`targetId`, `targetKind`, selection variant, proportional padding, overlay and cursor relationships. Normalize it
+from the sibling AXIS repository with:
+
+```bash
+pnpm collaboration:resolve -- \
+  --input docs/examples/collaboration-selection-intent.json \
+  --out /absolute/path/collaboration-selection.manifest.json
+```
+
+The command validates and resolves defaults, cursor direction/action and multiplayer attachment. It does not
+render, call a model, approve or publish. A surface adapter consumes only the normalized manifest, binds
+`target.id` to real text/object/group geometry and verifies the hotspot/selection relationship at narrow and wide
+formats. Never copy the Lab Astro/CSS or fall back to free `top`/`left` coordinates. If no adapter exists, report
+the capability as pending.
+
+The portable advertising and collaboration contracts are published in the AXIS `0.2.5` package set. Greenhouse
+pins that exact set and its Campaign Layout Compiler implements the first non-Lab adapter for
+`headline|support|hook|lockup`; this evidence does not imply that Globe or another runtime has adopted it.
 
 ### AXIS Lab
 

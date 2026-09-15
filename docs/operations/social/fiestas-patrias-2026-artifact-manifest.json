@@ -1,0 +1,117 @@
+{
+  "observedDate": "2026-09-13",
+  "scope": "Local approved deliverables and reproducible source identifiers. Sources stay in local captures; media delivered to OneDrive.",
+  "audioPayloadSha256": "e85b016506bed5ceb39a9d47a04b327e00c7717c063b9c260df565053380bd5a",
+  "files": [
+    {
+      "localSource": ".captures/fiestas-patrias-2026-v09/efeonce-fiestas-patrias-v09-4x5.mp4",
+      "bytes": 2166526,
+      "sha256": "f6ecf8b8ba2fc34eba0b8e1461a2f497cb993abce74b4e8eed61d9455b92f5e5"
+    },
+    {
+      "localSource": ".captures/fiestas-patrias-2026-v10-reel/efeonce-fiestas-patrias-reel-9x16.mp4",
+      "bytes": 3291361,
+      "sha256": "d4d2ac4d1aaf84c1512cdec91e3ba10a7dfb50284c6463b86f5f67168f8b6e7f"
+    },
+    {
+      "localSource": ".captures/fiestas-patrias-2026-v10-reel/portada-linkedin-4x5.png",
+      "bytes": 2617900,
+      "sha256": "c94114b07567e1d95a6c0b7927ead5b031790b203524e55af0f36e72081cfd61"
+    },
+    {
+      "localSource": ".captures/fiestas-patrias-2026-v10-reel/portada-linkedin-4x5.jpg",
+      "bytes": 532240,
+      "sha256": "e2837c1678a3a01fd3f6d9665d97927f06ebb8b24ae1ad39a161af980622e8be"
+    },
+    {
+      "localSource": ".captures/fiestas-patrias-2026-v10-reel/portada-reel-9x16.png",
+      "bytes": 3227766,
+      "sha256": "f212db05b5ca4b32c3e4e416615d7231c2ccf6b44982d87b67a5fa1e0985450b"
+    },
+    {
+      "localSource": ".captures/fiestas-patrias-2026-v10-reel/portada-reel-9x16.jpg",
+      "bytes": 631683,
+      "sha256": "547f816071f4d40e3f5122991e160ac1ece970895aa077e6cc9549c1e53a96af"
+    },
+    {
+      "localSource": ".captures/fiestas-patrias-2026-v10-reel/render-reel.cjs",
+      "bytes": 4536,
+      "sha256": "7c29a512271ef6384c6fa295d43b592d9da64afd578e087fd8dc57b257a93d08"
+    },
+    {
+      "localSource": ".captures/fiestas-patrias-2026-v10-reel/portada.cjs",
+      "bytes": 2794,
+      "sha256": "f89796d2386792d399ef5e72ae7943ba7809996ed1352a2cf13ecbc2bf2c0c65"
+    },
+    {
+      "localSource": ".captures/fiestas-patrias-2026-v10-reel/portada-linkedin.cjs",
+      "bytes": 2644,
+      "sha256": "ba8eae9d1d6d7cf567dee8818eef411d112e014090bc9c44a9e3f577b301742c"
+    },
+    {
+      "localSource": ".captures/fiestas-patrias-2026-v10-reel/finish-reel.filter",
+      "bytes": 743,
+      "sha256": "a5aaac074e856b6491d65f0f813a28a1b664d67e14445b8b8ed99a4a1b94bdb5"
+    },
+    {
+      "localSource": ".captures/fiestas-patrias-2026-v09/render-overlays.cjs",
+      "bytes": 4531,
+      "sha256": "4c18ba1852c21ba764c57b3173cd0edc66dae5f1c9d45acc242c624d3f2e4622"
+    },
+    {
+      "localSource": ".captures/fiestas-patrias-2026-v09/finish.filter",
+      "bytes": 792,
+      "sha256": "d11d6d72f3de251d0b6bcdef935462da682e980b36dff01bba6c8ac865a28d3f"
+    }
+  ],
+  "technicalQA": {
+    "v09": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1080,
+          "height": 1350,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "216"
+        },
+        {
+          "codec_name": "aac",
+          "sample_rate": "48000",
+          "channels": 2,
+          "r_frame_rate": "0/0",
+          "nb_read_frames": "422"
+        }
+      ],
+      "format": {
+        "duration": "9.000000",
+        "size": "2166526"
+      }
+    },
+    "v10": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "216"
+        },
+        {
+          "codec_name": "aac",
+          "sample_rate": "48000",
+          "channels": 2,
+          "r_frame_rate": "0/0",
+          "nb_read_frames": "422"
+        }
+      ],
+      "format": {
+        "duration": "9.000000",
+        "size": "3291361"
+      }
+    }
+  }
+}

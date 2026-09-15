@@ -1,5 +1,11 @@
 # Operar Careers públicas
 
+> **Tipo de documento:** Manual de uso (operador del portal)
+> **Versión:** 1.1
+> **Creado:** previo al registro de metadatos
+> **Última actualización:** 2026-09-12 por Claude (ISSUE-171/172/173: enlaces del candidato, pipeline vacío y recuperación gobernada)
+> **Documentación funcional:** [Careers públicas](../../documentation/hr/careers-publicas.md) · [Hiring Desk](../../documentation/hr/hiring-desk.md)
+
 ## Antes de empezar
 
 Confirma:
@@ -355,7 +361,9 @@ instancia en Hiring Desk.
 3. Completa nombre, apellido, email y consentimiento.
 4. Sube un CV PDF de prueba si aplica. El límite visible es 10 MB y no deben
    aceptarse DOC, DOCX ni ZIP.
-5. Completa portafolio/LinkedIn solo con URLs `https://` si aplica.
+5. Completa portafolio/LinkedIn si aplica. Desde el 2026-09-12 no hace falta escribir
+   `https://`: el servidor lo agrega; un enlace ilegible se descarta sin bloquear el
+   envío (ver §Enlaces del candidato).
 6. Envía.
 7. La respuesta visible debe ser genérica, tanto para envío aceptado como para
    dedupe seguro.
@@ -465,6 +473,69 @@ al operar/verificar:
   backfillea.
 - El mismo contrato aplica al Growth Form nativo: si un campo aparece en una superficie y no en
   la otra, es un bug de paridad (reportar como issue).
+
+## Enlaces del candidato (ISSUE-172, desde 2026-09-12)
+
+Los campos LinkedIn y portafolio del apply son opcionales y **nunca bloquean la postulación**:
+
+- Un enlace sin `https://` (`linkedin.com/in/ada`) o con `http://` se guarda como `https://…`, en su forma canónica
+  (sin barra final cuando es sólo un dominio).
+- Un enlace ilegible o peligroso (`javascript:`, `data:`, un texto sin dominio) se **descarta**: el campo queda vacío y
+  la postulación entra igual. Nunca se guarda un enlace con un esquema distinto de `https`.
+- Hoy ese descarte **no se avisa al recruiter**: la Postulación 360 muestra «Sin enlaces públicos informados» aunque la
+  persona sí escribió algo. Es un follow-up registrado (Delta 2026-09-12 de la arquitectura, follow-up 2). Si el
+  enlace importa para el proceso, pídelo en el primer contacto.
+
+Antes de este cambio, dos personas reales quedaron fuera por escribir su LinkedIn sin `https://`; ambas fueron
+recuperadas el 2026-09-12.
+
+## Si el pipeline se ve vacío o faltan postulaciones
+
+Desde el 2026-09-12 el tablero ya no debería mostrar «Sin resultados» al cambiar de vacante (ISSUE-171). Si vuelve a
+pasar, o si el Demand Desk muestra más postulaciones de las que llegan al tablero o al Banco de Talento, el orden es
+este:
+
+1. **Descarta la copia vieja en pantalla**: recarga la página. Si con la recarga aparecen, es un defecto del tablero
+   (repórtalo como issue), no pérdida de datos. Recuerda también que el tablero embarca como máximo 120 postulaciones
+   por carga y no lo avisa; la cifra confiable es la del Demand Desk.
+2. **Mira el circuito del intake antes que la base.** En `/admin/ops-health`, la señal `sync.reactive.circuit_open`
+   dice si el proceso que crea postulaciones (`growth_hiring_application_from_submission`) tiene su interruptor abierto
+   (`error`) o al handler degradado (`warning`). Con el interruptor abierto **no se crea ninguna postulación** y no
+   queda rastro en el ledger de reintentos: ninguna otra señal lo ve.
+3. **No cuentes filas: reconcilia.** La prueba de que nadie quedó fuera es cruzar los envíos del formulario
+   `efeonce-careers-application` por correo + vacante contra las postulaciones de esa vacante y obtener 0 sin
+   postulación. La tabla `hiring_application_intake_events` **no sirve** para esto: sólo registra el endpoint directo,
+   que el formulario público ya no usa (7 filas históricas contra 281 envíos al 2026-09-12).
+4. **Recupera por las vías gobernadas** (requieren autorización del operador; nunca SQL sobre postulaciones):
+
+   ```bash
+   # a) Envíos que quedaron en retry/dead-letter del handler (primero con --dry-run)
+   pnpm reactive:backfill --replay-failed-handlers \
+     --handler=growth_hiring_application_from_submission:growth.forms.submission_accepted
+
+   # b) Envíos que el interruptor abierto saltó y que el drain del dominio NO recoge (ISSUE-173):
+   #    drain acotado a ese handler; repetir tras cada apertura de circuito
+   pnpm reactive:backfill \
+     --handler=growth_hiring_application_from_submission:growth.forms.submission_accepted
+
+   # c) Correos: el cron reenvía los `failed`
+   gcloud scheduler jobs run ops-email-delivery-retry --location=us-east4
+   ```
+
+   Un correo en `dead_letter` se revive con `POST /api/admin/ops/email-delivery-retry` y cuerpo
+   `{ "reviveDeadLetter": { "reason": "<motivo de al menos 10 caracteres>", "emailTypes": [...] } }` (o `deliveryIds`);
+   vuelve la fila a `failed` para que el cron la tome, no envía nada por sí mismo.
+5. **Cuenta los correos antes de reprocesar.** Cada postulación recuperada dispara un acuse al candidato y una alerta
+   interna; son legítimos pero llegan tarde. El 2026-09-12 la ráfaga agotó la cuota diaria del proveedor (plan Free,
+   100/día) y el operador subió a Pro; mira plan y cuota antes de correr un replay grande.
+6. **Declara lo que hiciste.** `pnpm reactive:backfill` ejecuta el código de tu árbol local contra la única base
+   (dev/staging/prod): sirve como recuperación y como canary, pero escribe producción con código no desplegado.
+   Regístralo en el handoff.
+
+Runbook completo y contratos: Delta 2026-09-12 en `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`; fichas
+`docs/issues/resolved/ISSUE-171-hiring-pipeline-empty-stale-client-snapshot.md`,
+`docs/issues/resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md` y
+`docs/issues/open/ISSUE-173-reactive-consumer-strands-breaker-skipped-handler-events.md`.
 
 ## Smoke E2E recomendado
 

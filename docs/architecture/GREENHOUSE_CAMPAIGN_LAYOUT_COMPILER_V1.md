@@ -2,7 +2,7 @@
 
 > **Estado:** operativo para producción creativa out-of-band
 >
-> **Última validación:** 2026-07-19
+> **Última validación:** 2026-09-14
 >
 > **Owner:** Creative Production / Design Studio
 >
@@ -45,6 +45,9 @@ forma reversible el contrato ya aceptado, sin cambiar source of truth, runtime, 
 | anchor y locks            | `anchor.id`, `anchor.revision`, `anchor.asset`, `anchor.locks`                |
 | source y finish por ratio | `formats[].source_plate`, `formats[].finished_plate` + hashes y finish        |
 | composición exacta        | `formats[].layout`, `message`, `brand`, `visual_system`                       |
+| receta publicitaria       | `@efeoncepro/axis-tokens@0.2.5` + `message.support` estructurado              |
+| selección colaborativa    | `@efeoncepro/axis-ui-contracts@0.2.5` + intent semántico                      |
+| firma URL                 | `brand.url_bubble` → SVG canónico de Artifact Composer                       |
 | aprobación                | `anchor.status`, `approvals.layout`, `formats[].finish.status`, human release |
 | output y lineage          | composition manifest + SHA-256                                                |
 | release creativo          | QA técnico aprobado + `approvals.human_release=approved`                      |
@@ -73,9 +76,11 @@ obligatorios son:
 
 - `anchor`: asset, revisión, locks y aprobación;
 - `brand_mode` y `channel_mode`;
-- `message`: kicker, hasta cuatro líneas de headline, support, URL y opcionalmente CTA/legal;
-- `brand`: logo, tres pesos de fuente y paleta;
+- `message`: kicker, hasta cuatro líneas de headline, support, URL y opcionalmente CTA/legal. `support` acepta
+  el string V1 original o la composición `supportingTagline` con segmentos `base|growth|intervention`;
+- `brand`: logo, tres pesos base, opcionalmente Poppins Regular/Bold Italic, paleta y `url_bubble` canónico;
 - `visual_system`: underlay óptico y hook `frequency-rail|none`;
+- `collaboration_selection` opcional: ruta del intent y binding `headline|support|hook|lockup`;
 - `composition`: renderer, formato, calidad, peso máximo y columnas del contact sheet;
 - `approvals` y `gates`;
 - `artifacts`: rutas de plan, manifest, QA, contact sheet y fuentes editables;
@@ -99,6 +104,35 @@ Por formato se generan:
 Por set se generan además plan, QA JSON y contact sheet. El SVG enlaza el plate aprobado; es una fuente vectorial
 editable e interoperable, no un PSD ni un sustituto de Figma/Adobe para artes con lógica más compleja.
 
+Cuando `brand.url_bubble` está declarado, `message.url` debe ser exactamente `efeoncepro.com` y cada formato debe
+declarar `layout.url.width`. El compiler incrusta la geometría del SVG canónico —no texto, un pill CSS ni una
+aproximación— y conserva `opacity: 0.72`. En la fuente editable declara `mix-blend-mode: luminosity`; en el master
+raster aplica matemáticamente el blend no separable contra el canvas ya compuesto, sin depender de que librsvg
+interprete CSS blend modes. El plan y el manifest registran su SHA-256; el QA exige el marcador vectorial y una
+comparación contra un render idéntico sin la burbuja que demuestre que la firma realmente pintó píxeles.
+
+### Adapter AXIS publicitario
+
+Greenhouse fija `@efeoncepro/axis-tokens`, `@efeoncepro/axis-ui-contracts` y
+`@efeoncepro/axis-ui-registry` en `0.2.5`. El adapter `axis-advertising.mjs` consume, sin duplicarlos:
+
+- `axisAdvertising.compositions.supportingTagline`: conserva una oración continua, espacios naturales y orden;
+  mide glifos reales, escala uniformemente al ancho del lockup y sólo usa salto balanceado si el piso legible lo
+  exige. Los énfasis son intención arbitraria, con máximo dos segmentos;
+- `efeonce.collaboration-selection@0.2.0`: resuelve `targetId`, tipo, aire, overlay, estado, acción, dirección,
+  anclaje y attachment. El renderer deriva el bounding box del contenido pintado; no acepta coordenadas libres de
+  cursor y registra hotspot, relación con el target y límites del canvas como evidencia.
+
+Los bindings soportados son `headline → text`, `support → text`, `hook → object` y `lockup → group`. Una
+combinación distinta falla antes de producir el master. El resolver independiente se invoca con:
+
+```bash
+pnpm creative:collaboration:resolve -- --input <intent.json> --out <manifest.json>
+```
+
+Los assets Poppins Regular y Bold Italic son responsabilidad del consumidor y viven versionados en
+`src/assets/fonts/`; AXIS no distribuye binarios tipográficos.
+
 ## Gates y estados
 
 | Gate          | Dueño                | Bloquea `compile`     | Qué prueba                                             |
@@ -115,7 +149,8 @@ vendor, ICC, bleed y rollout siguen siendo workflows separados.
 
 ## Extensión segura
 
-V1 implementa `frequency-rail` y `none`. Un hook nuevo debe añadir schema, renderer, fixture, QA y documentación;
+V1 implementa `frequency-rail`, `none`, supporting tagline y selección colaborativa. Un hook o binding nuevo debe
+añadir schema, renderer, fixture, QA y documentación;
 no debe entrar como SVG libre sin validación. Cambios de compositor deben preservar:
 
 1. contrato declarativo versionado;
@@ -135,8 +170,17 @@ vive en [`ai-generations/2026-07-18_high-frequency-campaign-e2e/`](../../ai-gene
 ## Límites V1
 
 - Un solo sistema de mensajes por contrato; variantes de copy se modelan como contratos/runs separados.
-- Layout por coordenadas explícitas; no hay editor visual ni auto-layout semántico.
+- El layout editorial primario usa coordenadas explícitas; la selección y los cursores se derivan sólo de bindings,
+  anclajes y regiones semánticas.
 - No genera ni aprueba finishes.
 - No evalúa calidad artística por sí solo; el QA automatizado complementa, no sustituye, el scorecard humano.
 - No hace prepress final sin especificaciones del proveedor.
 - No empaqueta ni publica medios.
+
+## Supporting tagline
+
+El supporting tagline se mide como una sola secuencia de glifos y espacios naturales, y se escala de forma
+uniforme contra el ancho de referencia. Si no conserva el piso legible en una línea, puede usar un wrap semántico
+balanceado de dos líneas. Los roles `growth` e `intervention` cambian estilo, no flujo: el renderer debe conservar
+la oración completa; nunca separa palabras con `space-between`, márgenes independientes ni coordenadas libres.
+Contraste, ritmo y ancho se verifican después de componer sobre los píxeles finales.

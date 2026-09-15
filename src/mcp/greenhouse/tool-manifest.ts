@@ -37,7 +37,7 @@
 import { GREENHOUSE_MCP_SKILL_MANIFEST, type GreenhouseMcpSkillManifestEntry } from './skill-manifest'
 
 /** Dominio dueño de la capacidad. No es routing: es a quién le pertenece el contrato. */
-export type GreenhouseMcpToolDomain = 'platform' | 'webhooks' | 'knowledge' | 'commercial' | 'seo'
+export type GreenhouseMcpToolDomain = 'platform' | 'webhooks' | 'knowledge' | 'commercial' | 'seo' | 'insights'
 
 /** La tool que sirve los manuales (TASK-1804). Las `instructions` rutean a ella sólo si está en el inventario. */
 export const GREENHOUSE_MCP_SKILL_TOOL_NAME = 'get_greenhouse_skill'
@@ -399,6 +399,35 @@ export const GREENHOUSE_MCP_TOOL_MANIFEST: readonly GreenhouseMcpToolManifestEnt
     writes: true,
     spendsProviderBudget: true,
     purpose: 'Corre un diagnóstico one-shot de un dominio prospecto. Gasta dinero real por corrida.'
+  },
+  // ── Efeonce Insights (TASK-1845) — ediciones congeladas deck/A4/web por organización ──
+  {
+    name: 'get_insights_catalog',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Catálogo elegible de Insights para una organización: módulos disponibles, salidas, audiencias y límites.'
+  },
+  {
+    name: 'list_insight_editions',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Ediciones de Insights de una organización con estado proyectado por audiencia.'
+  },
+  {
+    name: 'get_insight_edition',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Una edición con su evidencia sellada, plan congelado e historial (según audiencia).'
+  },
+  {
+    name: 'create_insight_edition',
+    domain: 'insights',
+    writes: true,
+    spendsProviderBudget: false,
+    purpose: 'Crea una edición (reporte + encargo) y corre la generación por fases; no emite ni renderiza.'
   }
 ] as const
 

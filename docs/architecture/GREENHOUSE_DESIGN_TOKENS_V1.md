@@ -95,6 +95,14 @@ de Globe siguen limitados a Poppins + Geist. Bricolage requiere una composición
 como tercera familia en una surface de producto. En una pieza creativa, elige una sola voz display dominante; Poppins
 y Bricolage no deben competir en el mismo headline.
 
+En las seasonalities de Efeonce, Bricolage Grotesque lleva la idea display; Poppins se usa sólo si hace falta
+apoyo. La atribución reconocible puede resolverse mediante firma editorial, integración física plausible o
+activo distintivo aprobado con evidencia de reconocimiento. Firma gráfica no equivale a product placement;
+un color aislado no demuestra atribución. El canon de producción y contexto cultural vive en
+[SEASONAL_CONTENT.md](../../.codex/skills/social-media-studio/efeonce/SEASONAL_CONTENT.md) y
+[brand-in-scene.md](../../.codex/skills/social-media-studio/references/brand-in-scene.md).
+Estas reglas creativas no activan Bricolage ni nuevos tokens en la UI.
+
 ### 3.2 Type scale
 
 Base root font: `13.125px` (0.82rem, non-standard per Vuexy template). All other sizes are relative.

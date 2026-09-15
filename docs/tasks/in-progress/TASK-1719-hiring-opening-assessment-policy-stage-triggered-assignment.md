@@ -198,7 +198,7 @@ vacante pública de que el proceso incluye evaluación.
 - Motion: `none`
 - Backend impact: `command|sync`
 - Epic: `EPIC-011`
-- Status real: `Delta D4 2026-09-13: implementado localmente, migración aplicada y pruebas live passed; release y smoke desplegado pendientes. El estado siguiente corresponde a slices previos. EN PRODUCCIÓN desde 2026-08-18, no «Diseño» (línea corregida 2026-08-26 tras verificación contra runtime). Slices 0-5 implementados y desplegados; HIRING_STAGE_TEST_ASSIGNMENT_ENABLED=true en el ops-worker (declarado en deploy.sh, re-verificado en la revisión activa ops-worker-00594-2tp); backlog drenado 17-ago y policy del canary EO-OPN-0009 en on_stage_entry+enabled. Falta SÓLO escribir la evidencia del monitor de 7 días: la ventana ya transcurrió. TASK-1603 es ajena y ya declarada no-bloqueante`
+- Status real: `D4 implementado y desplegado el 2026-09-13 en el release cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9 (manifest released, orquestador 34754161855). El canary de producción verificó preguntas activas, frontera canAssign=true y cero efectos; no se creó una instancia sintética. La policy SEO EO-OPN-0674 queda enabled/manual. La automatización por etapa, su recorrido sintético y la calibración independiente siguen pendientes. Los Slices 0-5 previos y su canary histórico conservan su estado operativo separado; TASK-1603 sigue siendo consumidora no bloqueante del binding.`
 - Rank: `TBD`
 - Domain: `hr|data|ops`
 - Blocked by: `none`
@@ -714,13 +714,14 @@ automatización queda bloqueada sin assessment, no se promete test.
 - [x] Cancelación invalida token sólo pre-inicio, preserva audit y exige razón/actor. **Y libera el cupo de unicidad** — verificado contra PG real: cancelar → re-asignar la misma plantilla funciona.
 - [x] Stage trigger exitoso genera sólo email de test, no email genérico adicional.
 - [x] Assignment bloqueado no comunica un test inexistente. (Degrada al genérico en la misma ejecución.)
-- [x] Worker flag está en deploy.sh/ledger — **falta la evidencia de apagado/encendido en staging** (parte del rollout pendiente, no del código).
+- [x] Worker flag y su estado operativo histórico están documentados en deploy.sh/ledger; este slice no
+  enciende la automatización por etapa para `EO-OPN-0674`.
 - [x] Reconciliation detecta trigger sin terminal outcome y permite retry gobernado. (Readers + `GET .../assessment-policy/reconciliation` + señal `hiring.assessment.assignment_health`.)
 - [x] Tests prueban que score/completion no mueve stage ni decide. (`selection-boundary.test.ts`, verificación estática sobre todo el dominio assessment.)
 - [ ] TASK-1603 consume la policy y no crea binding/table duplicada. **Pendiente**: `TASK-1603` sigue bloqueada por `TASK-1602`; el binding canónico ya existe para cuando la tome.
 - [x] Manuales, arquitectura, evento y operación de email quedan actualizados.
 
-**Estado honesto:** `code complete, rollout pendiente`. Todo el código de los Slices 0-5 está
+**Estado honesto del programa completo:** `code complete, rollout pendiente`. Todo el código de los Slices 0-5 está
 implementado, testeado y con SQL ejercitado contra PostgreSQL real. Lo que falta es
 **operacional y no se puede hacer desde el repo**: declarar la policy en la vacante del canary,
 drenar el backlog del consumer nuevo, encender el flag en el ops-worker y monitorear 7 días con
@@ -815,6 +816,8 @@ postulantes reales. Secuencial, develop compartido. Plan:
 `docs/audits/hiring/2026-09-13-seo-assignment-readiness.md`.
 
 - [x] Captura atómica de preguntas, competencias, pesos, orden, claves y rúbricas; DB impide su modificación (questionnaire.live.test.ts, 13/09).
-- [x] Lectura pública y corrección humana/objetiva/IA consumen la misma versión en código local; fallback sólo legado (594 focales, dos live passed; sin afirmar deploy).
+- [x] Lectura pública y corrección humana/objetiva/IA consumen la misma versión; fallback sólo legado
+  (594 focales, dos live passed y canary productivo bajo el release `cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9`).
 - [x] Tests prueban cambio/retiro del banco, no leakage, rechazo de pregunta ajena y replay sin duplicación (questionnaire.live.test.ts y contract).
-- [ ] Migración, consumidores desplegados y recorrido sintético verificados.
+- [x] Migración y consumidores desplegados verificados en el release `cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9`; canary de producción sin efectos y con `canAssign=true`.
+- [ ] Recorrido sintético completo con snapshot capturado, lectura, respuesta y entrega verificado en runtime.

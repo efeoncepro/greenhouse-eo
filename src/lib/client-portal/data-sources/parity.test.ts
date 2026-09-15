@@ -122,11 +122,12 @@ describe('compareDataSourcesParity', () => {
 })
 
 describe('CLIENT_PORTAL_DATA_SOURCE_VALUES guard', () => {
-  it('matchea la cardinalidad del TS union (17 values esperados en V1.0)', () => {
+  it('matchea la cardinalidad del TS union (21 values: 17 de V1.0 + proposals + growth×2 + insights)', () => {
     // Drift detection: si alguien agrega/quita un value del TS union sin
     // actualizar este array, el conteo cambia y este test falla loud.
     // Cambiar SOLO cuando deliberadamente se extiende el catalog.
-    expect(CLIENT_PORTAL_DATA_SOURCE_VALUES.length).toBe(17)
+    // 2026-09-15 (TASK-1845): +commercial.proposals (TASK-1392), +growth.ai_visibility/growth.seo, +insights.editions.
+    expect(CLIENT_PORTAL_DATA_SOURCE_VALUES.length).toBe(21)
   })
 
   it('no tiene duplicados (cada value aparece una sola vez)', () => {
@@ -146,7 +147,9 @@ describe('CLIENT_PORTAL_DATA_SOURCE_VALUES guard', () => {
       'account_360.',
       'delivery.',
       'assigned_team.',
-      'identity.'
+      'identity.',
+      'growth.',
+      'insights.'
     ]
 
     let lastSeenIdx = -1

@@ -111,6 +111,7 @@ export const RENDERER_CSS = `
     transform-origin: 50% 0%;
     animation: ghf-step-surface-in 200ms cubic-bezier(0.2, 0, 0, 1);
   }
+  .ghf-fields:has(.ghf-field[data-overlay-open="true"]) { position: relative; z-index: 80; }
   .ghf-sr-only {
     position: absolute;
     width: 1px;
@@ -331,7 +332,9 @@ export const RENDERER_CSS = `
     display: grid;
     place-items: center;
     border: 0;
-    transform: none;
+    transform: rotate(0deg);
+    transform-origin: center;
+    transition: transform 160ms cubic-bezier(.2,.8,.2,1);
     margin: 0;
   }
   .ghf-select-trigger .ghf-select-icon::before {
@@ -341,7 +344,7 @@ export const RENDERER_CSS = `
     border-inline-end: 2px solid var(--ghf-muted);
     border-block-end: 2px solid var(--ghf-muted);
     transform: translateY(-2px) rotate(45deg);
-    transition: transform 140ms ease, border-color 140ms ease;
+    transition: border-color 140ms ease;
   }
   .ghf-select-composite[data-open="true"] .ghf-select-trigger {
     border-color: var(--ghf-focus);
@@ -349,16 +352,30 @@ export const RENDERER_CSS = `
   }
   .ghf-select-composite[data-open="true"] .ghf-select-icon {
     border-color: transparent;
+    transform: rotate(180deg);
   }
   .ghf-select-composite[data-open="true"] .ghf-select-icon::before {
     border-color: var(--ghf-accent);
-    transform: translateY(2px) rotate(225deg);
   }
   .ghf-select-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .ghf-select-value-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ghf-country-flag {
+    display: block;
+    flex: 0 0 auto;
+    inline-size: 26px;
+    block-size: 26px;
+    border: 1px solid color-mix(in srgb, var(--ghf-border) 72%, transparent);
+    border-radius: 999px;
+    object-fit: cover;
+    box-shadow: none;
   }
   .ghf-select-trigger[data-placeholder="true"] .ghf-select-value {
     color: var(--ghf-muted);
@@ -384,6 +401,7 @@ export const RENDERER_CSS = `
     min-height: 40px;
     display: flex;
     align-items: center;
+    gap: 10px;
     padding: 9px 12px 9px 34px;
     border-radius: 9px;
     color: var(--ghf-fg);
@@ -393,6 +411,7 @@ export const RENDERER_CSS = `
     user-select: none;
     transition: background-color 120ms ease, color 120ms ease, transform 120ms ease;
   }
+  .ghf-select-option .ghf-country-flag { inline-size: 28px; block-size: 28px; margin-inline-start: -20px; }
   .ghf-select-option::before {
     content: "";
     position: absolute;

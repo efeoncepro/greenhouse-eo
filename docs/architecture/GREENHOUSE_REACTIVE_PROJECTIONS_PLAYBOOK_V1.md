@@ -2,6 +2,62 @@
 
 > **STATUS: SUPERSEDED por V2.** Este documento queda como referencia historica. Ver [GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md](./GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md) para el playbook vigente. Cierre: 2026-04-13 via TASK-379.
 
+## Delta 2026-09-12 — ISSUE-173
+
+> Playbook vigente: [V2](./GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md). Este delta queda acá porque V1 sigue
+> siendo la referencia del contrato fetch/ack del consumer (`src/lib/sync/reactive-consumer.ts`) que produce el
+> hueco. Invariantes operativos: `agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md` → «Consumer reactivo:
+> breaker, huérfanos y señal de circuito». Diseño del fix (decisión, trampa, tests, rollout):
+> `docs/issues/open/ISSUE-173-reactive-consumer-strands-breaker-skipped-handler-events.md` — **no se re-diseña acá**.
+
+**Defecto:** el consumer V2 deja huérfanos, para siempre respecto del drain programado, los eventos que un breaker
+saltó cuando otro handler del mismo evento ya escribió su fila.
+
+**Predicado exacto de Phase A que produce el hueco** (`reactive-consumer.ts`, fetch; verificado 2026-09-12):
+
+```sql
+SELECT e.event_id, e.aggregate_type, e.aggregate_id, e.event_type, e.payload_json, e.occurred_at
+  FROM greenhouse_sync.outbox_events e
+ WHERE e.status = 'published'
+   AND e.event_type = ANY($1)
+   AND (
+     NOT EXISTS (
+       SELECT 1
+         FROM greenhouse_sync.outbox_reactive_log r
+        WHERE r.event_id = e.event_id
+          AND r.handler = ANY($2)      -- $2 = TODAS las handler keys del dominio
+     )
+     -- OR EXISTS (… r.result IN ('retry','dead-letter') …)   sólo con --replay-failed-handlers
+   )
+ ORDER BY e.occurred_at ASC
+ LIMIT $3
+```
+
+`$2` sale de `getProjectionsForEvent(eventType, domain)` para todos los tipos del dominio, o de `scopedHandlerKeys`
+cuando el llamador acota por handler. Un evento se considera procesado si **cualquier** handler del lote tiene fila.
+Phase C, cuando `evaluateCircuit(projection).allow === false`, hace `continue` **sin escribir fila** en
+`outbox_reactive_log` (el comentario del código: «leave events unmarked so they are re-fetched»); ese re-fetch sólo
+ocurre cuando el evento tiene un único handler registrado.
+
+**Reproducción (2026-09-12):** `growth.forms.submission_accepted` tiene 4 projections registradas
+(`growth_hiring_application_from_submission`, `growth_grader_run_from_submission`,
+`growth_aeo_diagnostic_grader_run_from_submission`, `growth_ebook_delivery_from_submission`). Con el circuito de la
+primera abierto (12:15:03Z → `closed` solo a las 12:50:02Z, ISSUE-172), las otras tres escribieron `no-op` en la
+misma corrida. Ya con el circuito cerrado: drain programado del dominio `growth` → `0 processed` para esas
+submissions; drain acotado
+`pnpm reactive:backfill --handler=growth_hiring_application_from_submission:growth.forms.submission_accepted` →
+`6/6 ok`. Sin fila `retry`, sin dead-letter: `--replay-failed-handlers` tampoco los ve. Recuento final del incidente
+(14:46Z): 281 submissions del form `efeonce-careers-application`, 0 sin postulación.
+
+**Mitigación (manual, vigente hasta el fix):** tras cada apertura de circuito de una projection que comparta tipo de
+evento con otras, correr el drain acotado por handler para esa projection y verificar **por contenido** que el
+residuo es 0. La señal `sync.reactive.circuit_open` (ISSUE-172) muestra el circuito abierto, **no** el residuo que
+deja al cerrar. Recordatorio: `pnpm reactive:backfill` corre el árbol LOCAL contra la única base (dev/staging/prod).
+
+**Fix:** pendiente, task propia. Opción aceptada en la ficha: pendiente POR handler en Phase A emparejando
+`handler ↔ event_type`, sin migración ni flag; señal `sync.reactive.handler_orphan_residue`; test de regresión del
+consumer; inventario previo de huérfanos históricos. Detalle en la ficha de ISSUE-173.
+
 ## Delta 2026-03-31
 
 - En código ya existen routes particionadas por dominio:

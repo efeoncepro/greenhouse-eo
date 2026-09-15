@@ -1,5 +1,11 @@
 # TASK-1403 — `/servicios/hubspot/agentes/` — Flow Contract
 
+> ⚠️ **Delta 2026-09-13 — contenido superado; se rehace en TASK-1403 Slice 1. No implementar desde esta versión.**
+> La página pasa a ser la **landing del servicio de agentes** (diseño, construcción, despliegue y operación
+> gestionada) y su conversión primaria es la **evaluación inicial sin costo**. El Customer Agent de ANAM está
+> **activo y en producción**; el estado de contenido «caso con/sin autorización» sigue vigente. La URL padre del hub
+> está por decidir. El recorrido y los disparadores de este documento describen la versión anterior.
+
 > Cluster 3 de 4 del hub HubSpot. Pillar: **TASK-1352**.
 > Fuente: **[SPEC del hub](../../public-site/HUBSPOT_HUB_LANDINGS_SPEC.md) § 3** +
 > `docs/ui/wireframes/TASK-1403-landing-hubspot-agentes.md` + `hubspot-solutions-partner/modules/13_AGENTES.md`.

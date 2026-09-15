@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
 > **Versión:** 1.3
 > **Creado:** 2026-08-17 por Claude (TASK-1719)
-> **Última actualización:** 2026-08-23 por Claude (TASK-1771 — el carril automático también se puede desatascar)
+> **Última actualización:** 2026-09-13 por Codex (TASK-1719 / TASK-1604 — snapshot inmutable del cuestionario en producción)
 > **Documentación técnica:** [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](../../architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md)
 > **Manual de uso:** [`operar-asignacion-de-tests.md`](../../manual-de-uso/hr/operar-asignacion-de-tests.md)
 
@@ -16,6 +16,17 @@ rindieron exámenes diferentes no significa nada.
 
 Ahora **la vacante declara su prueba una sola vez**, y a partir de ahí la plataforma la resuelve
 sola. Quien asigna ya no elige plantilla: confirma.
+
+### Estado vigente del piloto SEO
+
+La vacante `EO-OPN-0674` tiene una policy `enabled/manual` y sólo permite asignación humana mediante
+propose → confirm. Usa la plantilla `atpl-6621f306-cb50-4286-a41d-969927a579e3`, versión 1, con 75
+minutos y cap de cinco asignaciones por hora. El release D4 está en producción y captura el cuestionario
+exacto dentro de cada instancia nueva; las instancias históricas sin captura mantienen el fallback legado.
+
+La calibración independiente de las nueve preguntas sigue pendiente y la automatización por etapa permanece
+apagada. El canary productivo comprobó el banco activo y `canAssign=true` sin crear propuestas, instancias
+ni correos. Para operar una asignación concreta, sigue el flujo manual descrito abajo.
 
 ## En qué etapa se manda la prueba
 
@@ -75,6 +86,18 @@ aprobó. Y una propuesta caduca a los 30 minutos: si alguien abre la pantalla, s
 más tarde, tiene que volver a mirar antes de mandarle un correo a un candidato.
 
 Confirmar dos veces no manda dos pruebas. La segunda vez responde que ya estaba hecho.
+
+### El cuestionario queda congelado por instancia
+
+Desde el release de `TASK-1719` / `TASK-1604` del 2026-09-13, al confirmar una asignación la plataforma
+guarda en la misma transacción la lista exacta de preguntas, competencias, pesos, orden y pautas que
+corresponden a esa persona. Si después cambia o se archiva una pregunta del banco, esa evaluación no
+cambia: el candidato rinde el instrumento que se aprobó para su instancia. El snapshot no incluye las
+pautas en la vista pública.
+
+Las instancias creadas antes de este cambio pueden no tener snapshot y conservan un fallback legacy
+declarado; no se hace backfill histórico. La evidencia del piloto SEO y del release está en
+[`2026-09-13-seo-assignment-readiness.md`](../../audits/hiring/2026-09-13-seo-assignment-readiness.md).
 
 ## Qué recibe el candidato
 

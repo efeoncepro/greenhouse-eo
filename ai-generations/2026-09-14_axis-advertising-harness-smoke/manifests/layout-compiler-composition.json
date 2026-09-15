@@ -1,0 +1,370 @@
+{
+  "schema": "campaign-layout-composition.v1",
+  "compiledAt": "2026-09-14T15:40:28.955Z",
+  "campaignId": "axis-advertising-harness-smoke",
+  "compiler": "scripts/creative/layout-compiler",
+  "mode": "deterministic-no-provider-calls",
+  "contractSha256": "6e2d0f97cdeae7e212b1758807c212c9d4e977e932fee606b999d368f2baad8f",
+  "planManifest": "manifests/layout-compiler-plan.json",
+  "renderer": "sharp + fontkit outlined typography",
+  "logo": "../../public/branding/logo-negative.svg",
+  "logoSha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f",
+  "urlBubble": "../../src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg",
+  "urlBubbleSha256": "a790de41e7140f9e9f33c5b14e0f43556e4813f3afffe8614d9f8a19f1383dc1",
+  "contactSheet": "review/layout-compiler-contact-sheet.jpg",
+  "contactSheetSha256": "057559e51e398961da15ce9712d156f70358b4a56cc983cbddb749264bfa27de",
+  "checkpoints": {
+    "anchor": "approved",
+    "layout": "approved",
+    "finishes": {
+      "feed-4x5": "approved"
+    },
+    "humanRelease": "pending"
+  },
+  "collaborationSelection": {
+    "schema": "axis.collaboration-selection-composition.v1",
+    "contract": {
+      "id": "efeonce.collaboration-selection",
+      "version": "0.2.0"
+    },
+    "target": {
+      "id": "harness-primary-headline",
+      "kind": "text"
+    },
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "paddingRatio": {
+        "inline": 0.012,
+        "block": 0.01
+      },
+      "overlay": "subtle",
+      "overlayOpacity": 0.1,
+      "overlayBlendMode": "luminosity"
+    },
+    "cursors": [
+      {
+        "id": "local-cursor",
+        "kind": "local",
+        "targetId": "harness-primary-headline",
+        "anchor": "bottom-center",
+        "action": "select",
+        "orientation": "screen-fixed",
+        "direction": "north-west"
+      },
+      {
+        "id": "creative-operations",
+        "kind": "collaborator",
+        "targetId": "harness-primary-headline",
+        "anchor": "top-end",
+        "action": "resize",
+        "label": "Creative Ops",
+        "participantKind": "department",
+        "state": "acting",
+        "direction": "south-west",
+        "attachment": "south-west"
+      },
+      {
+        "id": "camila-acting",
+        "kind": "collaborator",
+        "targetId": "harness-primary-headline",
+        "anchor": "bottom-end",
+        "action": "rotate",
+        "label": "Camila",
+        "participantKind": "person",
+        "state": "acting",
+        "direction": "north-west",
+        "attachment": "north-west"
+      }
+    ]
+  },
+  "status": "masters_compiled_human_release_pending",
+  "results": [
+    {
+      "id": "feed-4x5",
+      "ratio": "4:5",
+      "anchorId": "neutral-generated-harness-plate",
+      "anchorRevision": 1,
+      "topology": {
+        "kind": "star",
+        "derivationParent": "anchor"
+      },
+      "brandMode": "branded",
+      "channelMode": "digital-static",
+      "sourcePlate": "work/plates/neutral-generated-plate.png",
+      "sourcePlateSha256": "225e1f5a0c518a8057672f25d7dbbe60722a9138928059e80b14f790dfe88771",
+      "finishedPlate": "work/finished/neutral-generated-finish.png",
+      "finishedPlateSha256": "225e1f5a0c518a8057672f25d7dbbe60722a9138928059e80b14f790dfe88771",
+      "finish": {
+        "status": "approved",
+        "executor": "built-in-imagegen",
+        "delta": "neutral clean plate accepted unchanged for harness smoke",
+        "input_policy": "clean plate only; no final copy, logo, CTA or legal"
+      },
+      "editableSource": "work/layout-compiler/editable/feed-4x5-layout-source.svg",
+      "vectorOverlay": "work/layout-compiler/editable/feed-4x5-overlay.svg",
+      "underlay": "work/layout-compiler/editable/feed-4x5-underlay.png",
+      "output": "delivery/feed-4x5.png",
+      "width": 1080,
+      "height": 1350,
+      "format": "png",
+      "colourspace": "srgb",
+      "bytes": 2181174,
+      "sha256": "2e8833f35b726455dbc5beb3b06dbed8cb2d98d78caccad2acaf1e15512186b7",
+      "logoSha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f",
+      "urlBubbleSha256": "a790de41e7140f9e9f33c5b14e0f43556e4813f3afffe8614d9f8a19f1383dc1",
+      "urlBubbleRasterEvidence": {
+        "method": "non-separable-luminosity",
+        "backdrop": "composed-master-before-url-bubble",
+        "opacity": 0.72,
+        "region": {
+          "left": 360,
+          "top": 1190,
+          "width": 360,
+          "height": 71
+        },
+        "changedChannels": 22035,
+        "maxChannelDelta": 81,
+        "visible": true
+      },
+      "exactCopy": {
+        "kicker": "AXIS HARNESS",
+        "headline": [
+          "SYSTEM CHECK"
+        ],
+        "support": {
+          "composition": "supportingTagline",
+          "reference": "primary-lockup-inline-size",
+          "segments": [
+            {
+              "text": "La imagen",
+              "role": "base"
+            },
+            {
+              "text": "propone",
+              "role": "growth"
+            },
+            {
+              "text": "el sistema compone",
+              "role": "base"
+            },
+            {
+              "text": "con criterio",
+              "role": "intervention"
+            }
+          ]
+        },
+        "url": "efeoncepro.com"
+      },
+      "supportLayout": {
+        "copy": "La imagen propone el sistema compone con criterio",
+        "mode": "single-line",
+        "size": 26.25,
+        "lines": [
+          {
+            "words": [
+              {
+                "text": "La",
+                "role": "base",
+                "x": 0,
+                "width": 29.085
+              },
+              {
+                "text": "imagen",
+                "role": "base",
+                "x": 36.094,
+                "width": 102.061
+              },
+              {
+                "text": "propone",
+                "role": "growth",
+                "x": 145.164,
+                "width": 114.189
+              },
+              {
+                "text": "el",
+                "role": "base",
+                "x": 266.362,
+                "width": 22.733
+              },
+              {
+                "text": "sistema",
+                "role": "base",
+                "x": 296.104,
+                "width": 104.476
+              },
+              {
+                "text": "compone",
+                "role": "base",
+                "x": 407.589,
+                "width": 127.393
+              },
+              {
+                "text": "con",
+                "role": "intervention",
+                "x": 541.991,
+                "width": 50.296
+              },
+              {
+                "text": "criterio",
+                "role": "intervention",
+                "x": 599.295,
+                "width": 97.389
+              }
+            ],
+            "width": 696.684
+          }
+        ],
+        "referenceWidth": 696.684,
+        "recipe": {
+          "baseRecipe": "structureTagline",
+          "readingOrder": "source-order",
+          "layout": "continuous-inline-sentence",
+          "referenceMeasure": "primary-lockup-inline-size",
+          "fitStrategy": "uniform-scale-to-reference",
+          "preferredLines": 1,
+          "overflowFallback": "balanced-whole-sentence-wrap",
+          "wordSpacing": "natural",
+          "maxEmphasisSegments": 2,
+          "emphasisRoles": {
+            "growth": {
+              "weight": 700,
+              "style": "normal",
+              "color": "growthOnDark"
+            },
+            "intervention": {
+              "weight": 700,
+              "style": "italic",
+              "color": "accentSurface"
+            }
+          },
+          "constraints": [
+            "copy-is-arbitrary-not-fixture-bound",
+            "segments-preserve-source-order",
+            "scale-the-sentence-never-distribute-words",
+            "measure-rendered-contrast-after-fitting"
+          ]
+        }
+      },
+      "collaborationSelection": {
+        "schema": "axis.collaboration-selection-composition.v1",
+        "contract": {
+          "id": "efeonce.collaboration-selection",
+          "version": "0.2.0"
+        },
+        "target": {
+          "id": "harness-primary-headline",
+          "kind": "text"
+        },
+        "selection": {
+          "variant": "eight-handles",
+          "padding": "standard",
+          "paddingRatio": {
+            "inline": 0.012,
+            "block": 0.01
+          },
+          "overlay": "subtle",
+          "overlayOpacity": 0.1,
+          "overlayBlendMode": "luminosity"
+        },
+        "cursorEvidence": [
+          {
+            "id": "local-cursor",
+            "state": "acting",
+            "action": "select",
+            "direction": "north-west",
+            "anchor": "bottom-center",
+            "hotspot": {
+              "x": 456.342,
+              "y": 599.2
+            },
+            "touchesTarget": true
+          },
+          {
+            "id": "creative-operations",
+            "state": "acting",
+            "action": "resize",
+            "direction": "south-west",
+            "anchor": "top-end",
+            "hotspot": {
+              "x": 817.644,
+              "y": 467.2
+            },
+            "touchesTarget": true,
+            "label": "Creative Ops",
+            "participantKind": "department",
+            "attachment": "south-west",
+            "labelGap": 4.32,
+            "labelBounds": {
+              "left": 850.044,
+              "top": 406.936,
+              "right": 957.132,
+              "bottom": 434.8
+            }
+          },
+          {
+            "id": "camila-acting",
+            "state": "acting",
+            "action": "rotate",
+            "direction": "north-west",
+            "anchor": "bottom-end",
+            "hotspot": {
+              "x": 817.644,
+              "y": 599.2
+            },
+            "touchesTarget": true,
+            "label": "Camila",
+            "participantKind": "person",
+            "attachment": "north-west",
+            "labelGap": 4.32,
+            "labelBounds": {
+              "left": 850.044,
+              "top": 631.6,
+              "right": 919.626,
+              "bottom": 659.464
+            }
+          }
+        ],
+        "noFreeCoordinates": true,
+        "targetGeometrySource": "rendered-content-bounds",
+        "withinCanvas": true
+      },
+      "copyField": {
+        "x": 0.075,
+        "y": 0.22,
+        "width": 0.85,
+        "height": 0.46
+      },
+      "contentBounds": {
+        "left": 81,
+        "top": 81,
+        "right": 804.684,
+        "bottom": 1260.8547778454047
+      },
+      "safeBounds": {
+        "left": 81,
+        "top": 81,
+        "right": 999,
+        "bottom": 1269
+      },
+      "contrast": {
+        "foregroundP95": 14.13,
+        "accentP95": 7.74
+      },
+      "baselineComparison": null,
+      "assertions": {
+        "dimensions": true,
+        "format": true,
+        "srgb": true,
+        "maxBytes": true,
+        "finishApproved": true,
+        "inputPolicyClean": true,
+        "contentInSafeZone": true,
+        "foregroundContrastP95": true,
+        "accentContrastP95": true,
+        "urlBubbleVisible": true
+      },
+      "pass": true
+    }
+  ]
+}

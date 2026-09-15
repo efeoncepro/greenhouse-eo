@@ -5,7 +5,7 @@ import {
   TELEMETRY_ALLOWED_PAYLOAD_KEYS,
   TELEMETRY_FORBIDDEN_PAYLOAD_KEYS,
   publicSubmitInputSchema,
-  sanitizeRenderCopy,
+  sanitizeRenderCopy
 } from '../contracts'
 import { compileFormVersion } from '../policy-compiler'
 import type { FormDefinitionRow, FormDestinationRow, FormVersionRow } from '../store'
@@ -24,7 +24,7 @@ const definition = (overrides: Partial<FormDefinitionRow> = {}): FormDefinitionR
   created_by: null,
   created_at: new Date(),
   updated_at: new Date(),
-  ...overrides,
+  ...overrides
 })
 
 const version = (overrides: Partial<FormVersionRow> = {}): FormVersionRow => ({
@@ -47,7 +47,7 @@ const version = (overrides: Partial<FormVersionRow> = {}): FormVersionRow => ({
   commercial_handoff_policy_json: {},
   published_at: null,
   created_at: new Date(),
-  ...overrides,
+  ...overrides
 })
 
 const destination = (overrides: Partial<FormDestinationRow> = {}): FormDestinationRow => ({
@@ -63,7 +63,7 @@ const destination = (overrides: Partial<FormDestinationRow> = {}): FormDestinati
   consent_requirements_json: {},
   retry_policy_json: {},
   created_at: new Date(),
-  ...overrides,
+  ...overrides
 })
 
 describe('compileFormVersion — publication gate', () => {
@@ -77,7 +77,7 @@ describe('compileFormVersion — publication gate', () => {
 
   it('bloquea sin consent_policy_version', () => {
     const result = compileFormVersion(definition(), version({ consent_policy_version: null }), [destination()], {
-      forPublication: true,
+      forPublication: true
     })
 
     expect(result.ok).toBe(false)
@@ -86,7 +86,7 @@ describe('compileFormVersion — publication gate', () => {
 
   it('bloquea sin retention policy', () => {
     const result = compileFormVersion(definition(), version({ retention_policy_json: {} }), [destination()], {
-      forPublication: true,
+      forPublication: true
     })
 
     expect(result.ok).toBe(false)
@@ -95,7 +95,7 @@ describe('compileFormVersion — publication gate', () => {
 
   it('bloquea con field schema vacío', () => {
     const result = compileFormVersion(definition(), version({ field_schema_json: [] }), [destination()], {
-      forPublication: true,
+      forPublication: true
     })
 
     expect(result.ok).toBe(false)
@@ -103,7 +103,7 @@ describe('compileFormVersion — publication gate', () => {
 
   it('bloquea con success_behavior inválido', () => {
     const result = compileFormVersion(definition(), version({ success_behavior_json: {} }), [destination()], {
-      forPublication: true,
+      forPublication: true
     })
 
     expect(result.ok).toBe(false)
@@ -111,6 +111,32 @@ describe('compileFormVersion — publication gate', () => {
 })
 
 describe('render_contract — browser-safe', () => {
+  it('preserves the browser-safe country selector presentation and flag metadata', () => {
+    const result = compileFormVersion(
+      definition({ form_kind: 'contact' }),
+      version({
+        style_variant: 'hubspot_pillar',
+        field_schema_json: [
+          {
+            key: 'country',
+            type: 'select',
+            label: 'País',
+            presentation: { icon: 'globe', control: 'country_select' },
+            options: [{ value: 'Chile', label: 'Chile', countryCode: 'CL' }]
+          }
+        ]
+      }),
+      [destination()],
+      { forPublication: true }
+    )
+
+    expect(result.ok).toBe(true)
+    expect(result.renderContract?.fields[0]).toMatchObject({
+      presentation: { icon: 'globe', control: 'country_select' },
+      options: [{ value: 'Chile', label: 'Chile', countryCode: 'CL' }]
+    })
+  })
+
   it('NUNCA expone destination mapping ni el property name de HubSpot', () => {
     const result = compileFormVersion(definition(), version(), [destination()], { forPublication: true })
     const serialized = JSON.stringify(result.renderContract)
@@ -137,13 +163,13 @@ describe('render_contract — browser-safe', () => {
               required: true,
               mode: 'invisible',
               siteKey: '0x-public-site-key',
-              execution: 'submit',
-            },
-          },
-        },
+              execution: 'submit'
+            }
+          }
+        }
       }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.ok).toBe(true)
@@ -152,7 +178,7 @@ describe('render_contract — browser-safe', () => {
       required: true,
       mode: 'invisible',
       siteKey: '0x-public-site-key',
-      execution: 'submit',
+      execution: 'submit'
     })
     expect(JSON.stringify(result.renderContract).toLowerCase()).not.toContain('secret')
   })
@@ -176,14 +202,14 @@ describe('render_contract — browser-safe', () => {
               maxBytes: 10 * 1024 * 1024,
               multiple: false,
               storageContext: 'hiring_application_cv_draft',
-              scanPolicy: 'scan_required',
-            },
-          },
+              scanPolicy: 'scan_required'
+            }
+          }
         ],
-        destination_policy_json: null,
+        destination_policy_json: null
       }),
       [],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.ok).toBe(true)
@@ -195,8 +221,8 @@ describe('render_contract — browser-safe', () => {
       uploadPolicy: {
         acceptedMimeTypes: ['application/pdf'],
         storageContext: 'hiring_application_cv_draft',
-        scanPolicy: 'scan_required',
-      },
+        scanPolicy: 'scan_required'
+      }
     })
     expect(JSON.stringify(result.renderContract)).not.toContain('hubspot_prop')
     expect(JSON.stringify(result.renderContract).toLowerCase()).not.toContain('mapping_json')
@@ -211,25 +237,25 @@ describe('render_contract — multi_step_light composition', () => {
       version({
         field_schema_json: [
           { key: 'brandName', type: 'text', required: true },
-          { key: 'email', type: 'email', required: true },
+          { key: 'email', type: 'email', required: true }
         ],
         ui_policy_json: {
           composition: 'multi_step_light',
           steps: [
             { key: 'brand', label: 'Tu marca', fieldKeys: ['brandName'] },
-            { key: 'contact', label: 'Tus datos', fieldKeys: ['email'] },
-          ],
-        },
+            { key: 'contact', label: 'Tus datos', fieldKeys: ['email'] }
+          ]
+        }
       }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.ok).toBe(true)
     expect(result.renderContract?.composition).toBe('multi_step_light')
     expect(result.renderContract?.steps).toEqual([
       { key: 'brand', label: 'Tu marca', fieldKeys: ['brandName'] },
-      { key: 'contact', label: 'Tus datos', fieldKeys: ['email'] },
+      { key: 'contact', label: 'Tus datos', fieldKeys: ['email'] }
     ])
   })
 
@@ -240,11 +266,11 @@ describe('render_contract — multi_step_light composition', () => {
         field_schema_json: [{ key: 'email', type: 'email', required: true }],
         ui_policy_json: {
           composition: 'multi_step_light',
-          steps: [{ key: 'contact', label: 'Tus datos', fieldKeys: ['email', 'missingField'] }],
-        },
+          steps: [{ key: 'contact', label: 'Tus datos', fieldKeys: ['email', 'missingField'] }]
+        }
       }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.ok).toBe(false)
@@ -258,7 +284,7 @@ describe('render_contract — formKey + copy gate (TASK-1297)', () => {
       definition({ form_key: '11111111-1111-4111-8111-111111111111' }),
       version(),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.renderContract?.form.formKey).toBe('11111111-1111-4111-8111-111111111111')
@@ -269,7 +295,7 @@ describe('render_contract — formKey + copy gate (TASK-1297)', () => {
       definition(),
       version({ copy_refs_json: { copy: { submit: 'Solicitar diagnóstico gratis →' } } }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.renderContract?.copy).toEqual({ submit: 'Solicitar diagnóstico gratis →' })
@@ -284,12 +310,12 @@ describe('render_contract — formKey + copy gate (TASK-1297)', () => {
             submit: 'Enviar',
             leaked: { portalId: '48713323', formGuid: 'secret' } as unknown as string,
             count: 42 as unknown as string,
-            huge: 'x'.repeat(COPY_VALUE_MAX + 1),
-          },
-        },
+            huge: 'x'.repeat(COPY_VALUE_MAX + 1)
+          }
+        }
       }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.renderContract?.copy).toEqual({ submit: 'Enviar' })
@@ -315,10 +341,10 @@ describe('success card capability (TASK-1319)', () => {
     reward: {
       kind: 'ebook',
       titleCopyRef: 'reward.ebook.title',
-      action: { kind: 'download', href: 'https://efeoncepro.com/recursos/aeo.pdf', target: '_blank' },
+      action: { kind: 'download', href: 'https://efeoncepro.com/recursos/aeo.pdf', target: '_blank' }
     },
     actions: [{ kind: 'schedule', labelCopyRef: 'action.schedule', href: 'https://cal.efeoncepro.com/aeo' }],
-    supportingNoteCopyRef: 'support.note',
+    supportingNoteCopyRef: 'support.note'
   }
 
   it('compila y expone la success-card metadata browser-safe en el render contract', () => {
@@ -326,7 +352,7 @@ describe('success card capability (TASK-1319)', () => {
       definition(),
       version({ success_behavior_json: successCardBehavior }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.ok).toBe(true)
@@ -347,11 +373,11 @@ describe('success card capability (TASK-1319)', () => {
           kind: 'redirect',
           presentation: 'success_card',
           redirectUrl: 'https://efeoncepro.com/gracias',
-          titleCopyRef: 'success.title',
-        },
+          titleCopyRef: 'success.title'
+        }
       }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.ok).toBe(true)
@@ -366,11 +392,11 @@ describe('success card capability (TASK-1319)', () => {
         success_behavior_json: {
           kind: 'inline_message',
           presentation: 'success_card',
-          actions: [{ kind: 'external_link', href: 'javascript:alert(1)' }],
-        },
+          actions: [{ kind: 'external_link', href: 'javascript:alert(1)' }]
+        }
       }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.ok).toBe(false)
@@ -385,11 +411,11 @@ describe('success card capability (TASK-1319)', () => {
           success_behavior_json: {
             kind: 'inline_message',
             presentation: 'success_card',
-            actions: [{ kind: 'external_link', href }],
-          },
+            actions: [{ kind: 'external_link', href }]
+          }
         }),
         [destination()],
-        { forPublication: true },
+        { forPublication: true }
       )
 
       expect(result.ok, `href ${href} debería bloquear`).toBe(false)
@@ -405,12 +431,12 @@ describe('success card capability (TASK-1319)', () => {
           presentation: 'success_card',
           actions: [
             { kind: 'schedule', href: 'https://cal.efeoncepro.com/aeo' },
-            { kind: 'download', href: '/recursos/aeo.pdf' },
-          ],
-        },
+            { kind: 'download', href: '/recursos/aeo.pdf' }
+          ]
+        }
       }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.ok).toBe(true)
@@ -423,11 +449,11 @@ describe('success card capability (TASK-1319)', () => {
         success_behavior_json: {
           kind: 'inline_message',
           presentation: 'success_card',
-          steps: Array.from({ length: 5 }, (_, i) => ({ copyRef: `s.${i}` })),
-        },
+          steps: Array.from({ length: 5 }, (_, i) => ({ copyRef: `s.${i}` }))
+        }
       }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(tooManySteps.ok).toBe(false)
@@ -438,11 +464,11 @@ describe('success card capability (TASK-1319)', () => {
         success_behavior_json: {
           kind: 'inline_message',
           presentation: 'success_card',
-          actions: Array.from({ length: 3 }, () => ({ kind: 'external_link', href: 'https://efeoncepro.com' })),
-        },
+          actions: Array.from({ length: 3 }, () => ({ kind: 'external_link', href: 'https://efeoncepro.com' }))
+        }
       }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(tooManyActions.ok).toBe(false)
@@ -453,7 +479,7 @@ describe('success card capability (TASK-1319)', () => {
       definition(),
       version({ success_behavior_json: { kind: 'inline_message', message: 'Gracias' } }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(inline.ok).toBe(true)
@@ -467,9 +493,11 @@ describe('tokenized_report handoff (TASK-1336)', () => {
   it('compila y expone el statusPathTemplate browser-safe en el render contract', () => {
     const result = compileFormVersion(
       definition(),
-      version({ success_behavior_json: { kind: 'tokenized_report', tokenizedReport: { statusPathTemplate: STATUS_TEMPLATE } } }),
+      version({
+        success_behavior_json: { kind: 'tokenized_report', tokenizedReport: { statusPathTemplate: STATUS_TEMPLATE } }
+      }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.ok).toBe(true)
@@ -482,13 +510,13 @@ describe('tokenized_report handoff (TASK-1336)', () => {
       'https://evil.example.com/run/{handle}', // absoluta
       '//evil.example.com/run/{handle}', // protocol-relative
       '/api/admin/growth/run/{handle}', // fuera de /api/public/
-      '/api/public/growth/ai-visibility/run/latest', // sin placeholder {handle}
+      '/api/public/growth/ai-visibility/run/latest' // sin placeholder {handle}
     ]) {
       const result = compileFormVersion(
         definition(),
         version({ success_behavior_json: { kind: 'tokenized_report', tokenizedReport: { statusPathTemplate } } }),
         [destination()],
-        { forPublication: true },
+        { forPublication: true }
       )
 
       expect(result.ok, `statusPathTemplate ${statusPathTemplate} debería bloquear`).toBe(false)
@@ -501,7 +529,7 @@ describe('tokenized_report handoff (TASK-1336)', () => {
       definition(),
       version({ success_behavior_json: { kind: 'tokenized_report' } }),
       [destination()],
-      { forPublication: true },
+      { forPublication: true }
     )
 
     expect(result.ok).toBe(true)
@@ -538,7 +566,7 @@ describe('publicSubmitInputSchema', () => {
     const parsed = publicSubmitInputSchema.safeParse({
       formSlug: 'test-form',
       fields: { email: 'a@b.com' },
-      consent: true,
+      consent: true
     })
 
     expect(parsed.success).toBe(true)

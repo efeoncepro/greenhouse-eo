@@ -1,0 +1,61 @@
+{
+  "observedDate": "2026-09-13",
+  "brandId": 3961547,
+  "source": "Metricool getScheduledPosts MCP readback; sanitized",
+  "posts": [
+    {
+      "id": 375161528,
+      "uuid": "-629866128707793216",
+      "publicationDate": {
+        "dateTime": "2026-09-18T11:00:00",
+        "timezone": "America/Santiago"
+      },
+      "providers": [
+        {
+          "network": "linkedin",
+          "status": "PENDING",
+          "detailedStatus": "Pending"
+        }
+      ],
+      "text": "Hoy tenemos una sola observación: que alcance para repetir.\n\nHay cosas que no necesitan rediseño. Una empanada bien hecha, una cueca de fondo y una mesa donde siempre cabe alguien más.\n\nQue estas Fiestas Patrias nos den tiempo para compartir, brindar y alargar la sobremesa.\n\n¡Felices Fiestas Patrias! 🇨🇱\n\n#FiestasPatrias #Efeonce",
+      "media": [
+        "https://static.metricool.com/planner/202609/3961547-file-3161738544383717002.mp4"
+      ],
+      "videoThumbnailUrl": "https://static.metricool.com/planner/202609/3961547-file-14164459427086619962.jpeg",
+      "autoPublish": true,
+      "draft": false,
+      "linkedinData": {
+        "previewIncluded": false,
+        "type": "POST"
+      }
+    },
+    {
+      "id": 375161568,
+      "uuid": "3955060729052676309",
+      "publicationDate": {
+        "dateTime": "2026-09-18T19:00:00",
+        "timezone": "America/Santiago"
+      },
+      "providers": [
+        {
+          "network": "instagram",
+          "status": "PENDING",
+          "detailedStatus": "Pending"
+        }
+      ],
+      "text": "Nuestra única observación: que alcance para repetir.\n\n¡Felices Fiestas Patrias! 🇨🇱",
+      "media": [
+        "https://static.metricool.com/planner/202609/3961547-file-5032230262594364140.mp4"
+      ],
+      "videoThumbnailUrl": "https://static.metricool.com/planner/202609/3961547-file-7348959612589332772.jpeg",
+      "autoPublish": true,
+      "draft": false,
+      "instagramData": {
+        "autoPublish": true,
+        "type": "REEL",
+        "showReelOnFeed": true,
+        "isAiGenerated": true
+      }
+    }
+  ]
+}

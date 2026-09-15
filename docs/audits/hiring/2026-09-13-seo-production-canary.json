@@ -1,0 +1,48 @@
+{
+  "observedAt": "2026-09-13T11:36:43Z",
+  "environment": "production",
+  "targetSha": "cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9",
+  "releaseId": "cc3ec449495b-58fdc69f-3223-4348-8767-382008593b54",
+  "workflowRunId": "34754161855",
+  "checks": [
+    {
+      "url": "https://greenhouse.efeoncepro.com/api/hiring/assessments/questions",
+      "method": "GET",
+      "status": 200,
+      "assertions": {
+        "revisionAuthorMarker": "codex:TASK-1604:seo-editorial-revision",
+        "activeRevisionCount": 8,
+        "allActive": true,
+        "questionIds": [
+          "qst-476eccae-4c29-40a9-aaef-d92523fd7c90",
+          "qst-3b1ba759-481c-4e64-b65e-5e8067facb2e",
+          "qst-4ac23c1f-0c5d-4528-a963-325a6840b8be",
+          "qst-5b4a6088-4847-42c4-891e-03e89fe556f3",
+          "qst-a1d6f6e4-18af-4cf5-9027-4cc91f870cc2",
+          "qst-11466558-3cd1-4a20-bdfe-9c405208527a",
+          "qst-df5553f2-712d-4cf5-8bf7-8685b559c8ec",
+          "qst-147dc81b-c4ea-4722-8911-b2716db19060"
+        ]
+      }
+    },
+    {
+      "url": "https://greenhouse.efeoncepro.com/api/hiring/applications/happ-4aeb0eb2-4236-450a-8825-fb360705f6c2/assessment-assignment",
+      "method": "GET",
+      "status": 200,
+      "assertions": {
+        "canAssign": true,
+        "proposal": null,
+        "sideEffects": "none"
+      }
+    },
+    {
+      "url": "https://greenhouse.efeoncepro.com/api/auth/health",
+      "method": "GET",
+      "status": 200,
+      "assertions": {
+        "overallStatus": "ready"
+      }
+    }
+  ],
+  "scopeNote": "El canary ejercita la superficie interna desplegada y demuestra que las revisiones SEO activas y la capacidad de asignación están disponibles. No crea propuestas, instancias ni correos; la captura de snapshot D4 sólo ocurre al asignar y queda pendiente de un recorrido sintético autorizado."
+}

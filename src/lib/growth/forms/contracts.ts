@@ -27,7 +27,7 @@ export const FORM_KINDS = [
   'event_registration',
   'survey',
   'preference',
-  'application',
+  'application'
 ] as const
 export type FormKind = (typeof FORM_KINDS)[number]
 
@@ -49,7 +49,7 @@ export const SUBMISSION_STATUSES = [
   'delivered',
   'destination_failed',
   'retrying',
-  'dead_letter',
+  'dead_letter'
 ] as const
 export type SubmissionStatus = (typeof SUBMISSION_STATUSES)[number]
 
@@ -78,11 +78,16 @@ export const COMPOSITION_MODES = [
   'multi_step_light',
   'computed_result',
   'async_result',
-  'authenticated_or_tokenized',
+  'authenticated_or_tokenized'
 ] as const
 export type CompositionMode = (typeof COMPOSITION_MODES)[number]
 
-export const PERSISTENCE_MODES = ['normalized_only', 'raw_with_ttl', 'greenhouse_only', 'external_after_review'] as const
+export const PERSISTENCE_MODES = [
+  'normalized_only',
+  'raw_with_ttl',
+  'greenhouse_only',
+  'external_after_review'
+] as const
 export type PersistenceMode = (typeof PERSISTENCE_MODES)[number]
 
 export const FIELD_DATA_CLASSES = [
@@ -93,7 +98,7 @@ export const FIELD_DATA_CLASSES = [
   'financial_hint',
   'file_metadata',
   'uploaded_file',
-  'consent_evidence',
+  'consent_evidence'
 ] as const
 export type FieldDataClass = (typeof FIELD_DATA_CLASSES)[number]
 
@@ -112,7 +117,7 @@ export const FIELD_TYPES = [
   'date',
   'file',
   'hidden',
-  'consent',
+  'consent'
 ] as const
 export type FieldType = (typeof FIELD_TYPES)[number]
 
@@ -127,7 +132,7 @@ export const FIELD_PRESENTATION_ICONS = [
   'clock',
   'message',
   'file',
-  'globe',
+  'globe'
 ] as const
 export type FieldPresentationIcon = (typeof FIELD_PRESENTATION_ICONS)[number]
 
@@ -140,10 +145,14 @@ export type FileUploadScanPolicy = (typeof FILE_UPLOAD_SCAN_POLICIES)[number]
 export const fileUploadPolicySchema = z
   .object({
     acceptedMimeTypes: z.array(z.string().min(1).max(120)).min(1).max(12),
-    maxBytes: z.number().int().positive().max(10 * 1024 * 1024),
+    maxBytes: z
+      .number()
+      .int()
+      .positive()
+      .max(10 * 1024 * 1024),
     multiple: z.literal(false).default(false),
     storageContext: z.enum(FILE_UPLOAD_STORAGE_CONTEXTS),
-    scanPolicy: z.enum(FILE_UPLOAD_SCAN_POLICIES).default('scan_required'),
+    scanPolicy: z.enum(FILE_UPLOAD_SCAN_POLICIES).default('scan_required')
   })
   .strict()
 export type FileUploadPolicy = z.infer<typeof fileUploadPolicySchema>
@@ -151,6 +160,7 @@ export type FileUploadPolicy = z.infer<typeof fileUploadPolicySchema>
 export const fieldPresentationSchema = z
   .object({
     icon: z.enum(FIELD_PRESENTATION_ICONS).optional(),
+    control: z.enum(['country_select']).optional()
   })
   .strict()
 export type FieldPresentation = z.infer<typeof fieldPresentationSchema>
@@ -168,7 +178,7 @@ export const TELEMETRY_EVENT_NAMES = [
   'destination_delivered',
   'destination_failed',
   'asset_accessed',
-  'report_viewed',
+  'report_viewed'
 ] as const
 export type TelemetryEventName = (typeof TELEMETRY_EVENT_NAMES)[number]
 
@@ -185,7 +195,7 @@ export const GTM_EVENT_NAMES = [
   // TASK-1319 success card capability — eventos render-only (browser/GTM), sin equivalente
   // server-side en TELEMETRY_EVENT_NAMES (no hay round-trip: la card se ve/clickea en el cliente).
   'gh_form_success_viewed',
-  'gh_form_success_action_clicked',
+  'gh_form_success_action_clicked'
 ] as const
 export type GtmEventName = (typeof GTM_EVENT_NAMES)[number]
 
@@ -223,7 +233,7 @@ export const TELEMETRY_ALLOWED_PAYLOAD_KEYS = [
   // TASK-1375 asset download handoff — URL pública GATED de descarga del asset (ebook) con el
   // handle (submissionId) ya embebido. browser-safe: es la API pública canónica; sin form
   // completado no hay handle. NUNCA lleva object_name, bucket ni signed-URL.
-  'download_url',
+  'download_url'
 ] as const
 export type TelemetryAllowedPayloadKey = (typeof TELEMETRY_ALLOWED_PAYLOAD_KEYS)[number]
 
@@ -241,14 +251,14 @@ export const TELEMETRY_FORBIDDEN_PAYLOAD_KEYS = [
   'hubspot_form_guid',
   'private_url',
   'token',
-  'raw_value',
+  'raw_value'
 ] as const
 
 export const telemetryPolicySchema = z.object({
   enabled: z.boolean().default(true),
   allowedEvents: z.array(z.enum(TELEMETRY_EVENT_NAMES)).default([...TELEMETRY_EVENT_NAMES]),
   gtmDataLayer: z.boolean().default(true),
-  fieldLevelAnalyticsDisabled: z.boolean().default(true),
+  fieldLevelAnalyticsDisabled: z.boolean().default(true)
 })
 export type TelemetryPolicy = z.infer<typeof telemetryPolicySchema>
 
@@ -257,7 +267,7 @@ export type TelemetryPolicy = z.infer<typeof telemetryPolicySchema>
 export const fieldConditionSchema = z.object({
   field: z.string().min(1),
   equals: z.union([z.string(), z.number(), z.boolean()]).optional(),
-  includes: z.string().optional(),
+  includes: z.string().optional()
 })
 export type FieldCondition = z.infer<typeof fieldConditionSchema>
 
@@ -268,7 +278,19 @@ export const fieldDefinitionSchema = z.object({
   copyRef: z.string().max(200).optional(),
   placeholder: z.string().max(200).optional(),
   required: z.boolean().default(false),
-  options: z.array(z.object({ value: z.string(), label: z.string().optional(), copyRef: z.string().optional() })).optional(),
+  options: z
+    .array(
+      z.object({
+        value: z.string(),
+        label: z.string().optional(),
+        copyRef: z.string().optional(),
+        countryCode: z
+          .string()
+          .regex(/^[A-Z]{2}$/)
+          .optional()
+      })
+    )
+    .optional(),
   freeEntry: z.boolean().optional(),
   maxItems: z.number().int().positive().max(50).optional(),
   maxLength: z.number().int().positive().max(10_000).optional(),
@@ -285,7 +307,7 @@ export const fieldDefinitionSchema = z.object({
   validatorParams: z.object({ country: z.string().length(2).optional() }).optional(),
   // Reglas declarativas, NO JavaScript arbitrario (Arch §11.1).
   visibleWhen: z.array(fieldConditionSchema).optional(),
-  requiredWhen: z.array(fieldConditionSchema).optional(),
+  requiredWhen: z.array(fieldConditionSchema).optional()
 })
 export type FieldDefinition = z.infer<typeof fieldDefinitionSchema>
 
@@ -327,8 +349,15 @@ export const consentDisplaySchema = z.object({
   noticeCopyRef: z.string().optional(),
   privacyUrl: z.string().url().optional(),
   checkboxes: z
-    .array(z.object({ key: z.string(), label: z.string().optional(), copyRef: z.string().optional(), required: z.boolean().default(true) }))
-    .default([]),
+    .array(
+      z.object({
+        key: z.string(),
+        label: z.string().optional(),
+        copyRef: z.string().optional(),
+        required: z.boolean().default(true)
+      })
+    )
+    .default([])
 })
 export type ConsentDisplay = z.infer<typeof consentDisplaySchema>
 
@@ -385,13 +414,9 @@ export const isBrowserSafeSuccessHref = (value: string): boolean => {
   }
 }
 
-export const successCardHrefSchema = z
-  .string()
-  .trim()
-  .max(SUCCESS_HREF_MAX)
-  .refine(isBrowserSafeSuccessHref, {
-    message: 'href debe ser https (o path same-origin `/`); sin javascript:/data:/non-https externa',
-  })
+export const successCardHrefSchema = z.string().trim().max(SUCCESS_HREF_MAX).refine(isBrowserSafeSuccessHref, {
+  message: 'href debe ser https (o path same-origin `/`); sin javascript:/data:/non-https externa'
+})
 
 export const successCardActionSchema = z.object({
   kind: z.enum(SUCCESS_ACTION_KINDS),
@@ -399,7 +424,7 @@ export const successCardActionSchema = z.object({
   labelCopyRef: z.string().max(120).optional(),
   href: successCardHrefSchema.optional(),
   target: z.enum(['_self', '_blank']).optional(),
-  telemetryKey: z.string().max(80).optional(),
+  telemetryKey: z.string().max(80).optional()
 })
 export type SuccessCardAction = z.infer<typeof successCardActionSchema>
 
@@ -409,13 +434,13 @@ export const successCardRewardSchema = z.object({
   titleCopyRef: z.string().max(120).optional(),
   body: z.string().max(600).optional(),
   bodyCopyRef: z.string().max(120).optional(),
-  action: successCardActionSchema.optional(),
+  action: successCardActionSchema.optional()
 })
 export type SuccessCardReward = z.infer<typeof successCardRewardSchema>
 
 export const successCardStepSchema = z.object({
   label: z.string().max(160).optional(),
-  copyRef: z.string().max(120).optional(),
+  copyRef: z.string().max(120).optional()
 })
 
 /**
@@ -436,14 +461,14 @@ export const tokenizedReportBehaviorSchema = z
       .min(1)
       .max(300)
       .refine(value => value.startsWith('/api/public/'), {
-        message: 'statusPathTemplate debe ser una ruta relativa bajo /api/public/',
+        message: 'statusPathTemplate debe ser una ruta relativa bajo /api/public/'
       })
       .refine(value => !value.includes('//') && !/\s/.test(value), {
-        message: 'statusPathTemplate no puede ser protocol-relative ni contener espacios',
+        message: 'statusPathTemplate no puede ser protocol-relative ni contener espacios'
       })
       .refine(value => value.includes('{handle}'), {
-        message: 'statusPathTemplate debe contener el placeholder {handle}',
-      }),
+        message: 'statusPathTemplate debe contener el placeholder {handle}'
+      })
   })
   .strict()
 export type TokenizedReportBehavior = z.infer<typeof tokenizedReportBehaviorSchema>
@@ -462,14 +487,14 @@ export const assetDownloadBehaviorSchema = z
       .min(1)
       .max(300)
       .refine(value => value.startsWith('/api/public/'), {
-        message: 'downloadPathTemplate debe ser una ruta relativa bajo /api/public/',
+        message: 'downloadPathTemplate debe ser una ruta relativa bajo /api/public/'
       })
       .refine(value => !value.includes('//') && !/\s/.test(value), {
-        message: 'downloadPathTemplate no puede ser protocol-relative ni contener espacios',
+        message: 'downloadPathTemplate no puede ser protocol-relative ni contener espacios'
       })
       .refine(value => value.includes('{handle}'), {
-        message: 'downloadPathTemplate debe contener el placeholder {handle}',
-      }),
+        message: 'downloadPathTemplate debe contener el placeholder {handle}'
+      })
   })
   .strict()
 export type AssetDownloadBehavior = z.infer<typeof assetDownloadBehaviorSchema>
@@ -495,7 +520,7 @@ export const successBehaviorSchema = z.object({
   actions: z.array(successCardActionSchema).max(SUCCESS_ACTIONS_MAX).optional(),
   supportingNote: z.string().max(400).optional(),
   supportingNoteCopyRef: z.string().max(120).optional(),
-  redirectUrl: z.string().url().optional(),
+  redirectUrl: z.string().url().optional()
 })
 export type SuccessBehavior = z.infer<typeof successBehaviorSchema>
 
@@ -504,19 +529,19 @@ export const captchaSecuritySchema = z.object({
   required: z.boolean().default(true),
   mode: z.literal('invisible').default('invisible'),
   siteKey: z.string().min(1).max(200),
-  execution: z.literal('submit').default('submit'),
+  execution: z.literal('submit').default('submit')
 })
 export type CaptchaSecurity = z.infer<typeof captchaSecuritySchema>
 
 export const renderSecuritySchema = z.object({
-  captcha: captchaSecuritySchema.optional(),
+  captcha: captchaSecuritySchema.optional()
 })
 export type RenderSecurity = z.infer<typeof renderSecuritySchema>
 
 export const renderStepSchema = z.object({
   key: z.string(),
   label: z.string().optional(),
-  fieldKeys: z.array(z.string()),
+  fieldKeys: z.array(z.string())
 })
 export type RenderStep = z.infer<typeof renderStepSchema>
 
@@ -530,7 +555,7 @@ export const renderContractSchema = z.object({
     formVersionId: z.string(),
     version: z.number().int(),
     locale: z.string(),
-    formKind: z.enum(FORM_KINDS),
+    formKind: z.enum(FORM_KINDS)
   }),
   composition: z.enum(COMPOSITION_MODES),
   fields: z.array(fieldDefinitionSchema),
@@ -543,10 +568,10 @@ export const renderContractSchema = z.object({
   surfacePolicy: z.object({
     surfaceId: z.string().optional(),
     allowedOrigins: z.array(z.string()).default([]),
-    rendererChannel: z.enum(RENDERER_CHANNELS).default('stable'),
+    rendererChannel: z.enum(RENDERER_CHANNELS).default('stable')
   }),
   security: renderSecuritySchema.optional(),
-  telemetryPolicy: telemetryPolicySchema,
+  telemetryPolicy: telemetryPolicySchema
 })
 export type RenderContract = z.infer<typeof renderContractSchema>
 
@@ -562,10 +587,10 @@ export const submissionContractSchema = z.object({
     honeypotField: z.string().default('company_website'),
     perEmailPerDay: z.number().int().positive().optional(),
     perIpPerDay: z.number().int().positive().optional(),
-    maxPayloadBytes: z.number().int().positive().default(64_000),
+    maxPayloadBytes: z.number().int().positive().default(64_000)
   }),
   consentRequired: z.boolean().default(true),
-  consentPolicyVersion: z.string().optional(),
+  consentPolicyVersion: z.string().optional()
 })
 export type SubmissionContract = z.infer<typeof submissionContractSchema>
 
@@ -584,7 +609,7 @@ export type EmailPolicyMode = (typeof EMAIL_POLICY_MODES)[number]
 export const emailPolicySchema = z.object({
   mode: z.enum(EMAIL_POLICY_MODES).default('off'),
   /** Campo del form que lleva el email a gatear. */
-  field: z.string().default('email'),
+  field: z.string().default('email')
 })
 export type EmailPolicy = z.infer<typeof emailPolicySchema>
 
@@ -614,14 +639,17 @@ export const destinationPlanEntrySchema = z.object({
   // cada adapter valida su mapping (HubSpot: portalId/formGuid/fieldMapping anidado).
   mapping: z.record(z.string(), z.unknown()).default({}),
   retryPolicy: z
-    .object({ maxRetries: z.number().int().min(0).max(10).default(5), backoffSeconds: z.number().int().positive().default(60) })
-    .default({ maxRetries: 5, backoffSeconds: 60 }),
+    .object({
+      maxRetries: z.number().int().min(0).max(10).default(5),
+      backoffSeconds: z.number().int().positive().default(60)
+    })
+    .default({ maxRetries: 5, backoffSeconds: 60 })
 })
 export type DestinationPlanEntry = z.infer<typeof destinationPlanEntrySchema>
 
 export const destinationPlanSchema = z.object({
   formVersionId: z.string(),
-  destinations: z.array(destinationPlanEntrySchema),
+  destinations: z.array(destinationPlanEntrySchema)
 })
 export type DestinationPlan = z.infer<typeof destinationPlanSchema>
 
@@ -640,7 +668,7 @@ export const publicSubmitInputSchema = z.object({
   referrer: z.string().max(2000).optional(),
   // Honeypot anti-bot: si viene con valor, se rechaza silenciosamente.
   honeypot: z.string().optional(),
-  idempotencyKey: z.string().max(200).optional(),
+  idempotencyKey: z.string().max(200).optional()
 })
 export type PublicSubmitInput = z.infer<typeof publicSubmitInputSchema>
 
@@ -658,7 +686,7 @@ export const PUBLIC_SUBMIT_OUTCOMES = [
   // TASK-1255 — fail-closed: el motor no pudo procesar de forma segura (p.ej. cifrado de
   // PII habilitado pero la key no está disponible). NUNCA se persiste PII en claro creyendo
   // cifrarla; se rechaza el submit y se reintenta al resolver la causa.
-  'error',
+  'error'
 ] as const
 export type PublicSubmitOutcome = (typeof PUBLIC_SUBMIT_OUTCOMES)[number]
 

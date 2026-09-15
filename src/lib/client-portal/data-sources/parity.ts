@@ -151,6 +151,8 @@ export const CLIENT_PORTAL_DATA_SOURCE_VALUES = [
   'commercial.engagements',
   'commercial.deals',
   'commercial.quotes',
+  // TASK-1392 — Proposal Studio (seed `proposal_studio_v1`); faltaba aquí (drift medido 2026-09-15).
+  'commercial.proposals',
   'finance.invoices',
   'finance.payments',
   'agency.ico',
@@ -164,7 +166,13 @@ export const CLIENT_PORTAL_DATA_SOURCE_VALUES = [
   'delivery.tasks',
   'delivery.projects',
   'assigned_team.assignments',
-  'identity.organizations'
+  'identity.organizations',
+  // Drift medido 2026-09-15 (TASK-1845): `growth.*` ya vivía en el seed DB y en el union
+  // `ClientPortalDataSource` pero faltaba aquí, así que el live parity fallaba en silencio
+  // (skipped sin proxy). `insights.editions` nace con el módulo `insights_v1`.
+  'growth.ai_visibility',
+  'growth.seo',
+  'insights.editions'
 ] as const satisfies readonly ClientPortalDataSource[]
 
 /**

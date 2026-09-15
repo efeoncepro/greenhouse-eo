@@ -7,6 +7,7 @@
 > **Aprobación cliente:** [confirmada; registro interno](./HUBSPOT_CUSTOMER_AGENT_ANAM_APPROVAL_RECORD_V1.md).
 > **Manifest:** [HUBSPOT_CUSTOMER_AGENT_ANAM_VISUAL_ASSET_MANIFEST_V1.json](./HUBSPOT_CUSTOMER_AGENT_ANAM_VISUAL_ASSET_MANIFEST_V1.json).
 > **Regla:** ningún activo debe insinuar que el agente está activo, operativo o resolviendo conversaciones reales.
+> **Delta 2026-09-13:** esa regla describe el corte del 2026-07-17. El agente ya está activo y en producción; piezas nuevas no la heredan.
 
 ## Decisión
 

@@ -4,6 +4,96 @@
   "fallbackSnapshot": "docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md",
   "domains": [
     {
+      "id": "advertising-creative-production",
+      "triggers": [
+        "pieza publicitaria",
+        "publicidad con texto",
+        "post 4:5",
+        "story 9:16",
+        "reel",
+        "cover 16:9",
+        "key visual",
+        "banner",
+        "portada de brochure",
+        "OOH",
+        "texto sobre imagen",
+        "Bricolage",
+        "Poppins",
+        "Guttery",
+        "contraste tipográfico",
+        "peso tipográfico",
+        "tracking",
+        "leading"
+      ],
+      "skills": [
+        "efeonce-advertising-creative",
+        "axis-design-system"
+      ],
+      "sources": [
+        "docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md",
+        "docs/architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md",
+        ".codex/skills/greenhouse-typography-accessibility/references/campaign-ink-metrics-and-hierarchy.md",
+        ".codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md"
+      ]
+    },
+    {
+      "id": "axis-collaboration-selection",
+      "triggers": [
+        "selección colaborativa",
+        "collaboration selection",
+        "cursor multiplayer",
+        "puntero multiplayer",
+        "bounding box adaptativo",
+        "cursor semántico",
+        "presencia multiplayer"
+      ],
+      "skills": [
+        "axis-design-system",
+        "efeonce-advertising-creative"
+      ],
+      "sources": [
+        "docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md",
+        "docs/operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md",
+        "docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md"
+      ]
+    },
+    {
+      "id": "social-creative-production",
+      "triggers": [
+        "seasonality",
+        "seasonalities",
+        "temporada",
+        "efeméride",
+        "trendjacking",
+        "trendjack",
+        "newsjacking",
+        "meme de marca",
+        "pieza social",
+        "product placement",
+        "logo en relieve",
+        "branding en escena",
+        "mecanismos creativos",
+        "conexión emocional",
+        "heurísticas creativas",
+        "sesgos en publicidad",
+        "neurociencia y creatividad"
+      ],
+      "skills": [
+        "efeonce-advertising-creative",
+        "social-media-studio",
+        "design-studio",
+        "copywriting",
+        "efeonce-brand-studio"
+      ],
+      "sources": [
+        "docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md",
+        ".codex/skills/social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md",
+        ".codex/skills/social-media-studio/references/brand-in-scene.md",
+        ".codex/skills/social-media-studio/efeonce/SEASONAL_CONTENT.md",
+        ".codex/skills/social-media-studio/modules/12_CREATIVE_REASONING_AND_EMOTIONAL_DESIGN.md"
+      ]
+    },
+    {
       "id": "report-production",
       "triggers": [
         "informe",

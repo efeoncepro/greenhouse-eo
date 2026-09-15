@@ -1,7 +1,8 @@
 # Efeonce Insights — Architecture V1
 
-> Status: **Diseño para implementación**, 2026-09-08. Dirección aprobada; nada de este documento acredita
-> código, migraciones, configuración ni runtime nuevos. Owner: Platform + Client Experience.
+> Status: **Foundation implementada (TASK-1845, 2026-09-15; ver §14)**; render, sharing/delivery y UI siguen
+> en diseño (TASK-1846–1849). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime.
+> Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
 
 ## 1. Producto y alcance inicial
@@ -60,12 +61,14 @@ flowchart TD
   Outbox --> Worker[Artifact Worker / Composer]
   Worker --> Outputs[Assets privados y validacion]
   Outputs --> Edition[Edicion emitida]
-  Edition --> Web[Vista web por grant]
+  Edition --> Share[Grant por token + InsightWebModelV1]
+  Share --> Think[think.efeoncepro.com · render Astro tonto]
   Edition --> Delivery[Correo centralizado]
 ```
 
 Los módulos gobiernan hechos y permisos; Insights gobierna edición y distribución; Composer gobierna
-composición; Platform gobierna job/asset; Email gobierna transporte. API/MCP/UI no consultan fuentes por su cuenta.
+composición; Platform gobierna job/asset; Email gobierna transporte; **Think (`efeonce-think`) gobierna sólo la
+presentación de la vista web compartida** (delta ADR 2026-09-15). API/MCP/UI no consultan fuentes por su cuenta.
 
 ## 4. Modelo de dominio
 
@@ -150,7 +153,9 @@ pareadas; no causalidad automática; gaps reales no se interpolan silenciosament
   según norma de informes. Índice, enlaces y texto seleccionable se verifican en el PDF final.
 - **Web:** navegación por capítulos, tablas equivalentes, tooltips/selección accesibles, responsive y downloads.
   Sólo filtra el dataset congelado incluido; cambiar período o consultar otro módulo requiere nueva edición
-  y autoridad. No replica el PDF como imagen ni convierte el snapshot en un dashboard vivo.
+  y autoridad. No replica el PDF como imagen ni convierte el snapshot en un dashboard vivo. **La vista
+  compartida por token se renderiza en `think.efeoncepro.com` (Astro) desde `InsightWebModelV1`; la
+  biblioteca autenticada del portal usa los mismos DTOs en Greenhouse** (§8, delta ADR 2026-09-15).
 
 Composer resuelve intención `contentType` a plantilla; autoría no elige CSS ni geometría. La paginación vertical
 se resuelve mediante un plan de páginas determinista del catálogo; si un límite genuino exige extender el motor,
@@ -229,7 +234,18 @@ Mostrar URL secreta sólo al crear; después regenerar significa un grant nuevo.
 necesite retry conserva el secreto únicamente cifrado y efímero dentro del carril sensible canónico, con
 retención mínima; no lo copia en outbox genérico, logs, analytics ni errores. Resolver asset y auth en servidor.
 
-Ruta propuesta `/insights/shared/<token>`: excluir de indexación, `Referrer-Policy: no-referrer`, CSP sin
+**Dónde se renderiza (delta ADR 2026-09-15):** la vista compartida vive en el hub público `efeonce-think`
+(`think.efeoncepro.com`; ruta propuesta `/insights/r/<token>`, hermana de `/brand-visibility/r/<token>` del
+Grader). Greenhouse expone dos endpoints públicos sin sesión que TASK-1848 materializa: `resolveSharedEdition`
+(`GET /api/public/insights/shared/[token]` → `InsightWebModelV1`, proyección client-facing versionada del plan
+y el snapshot: capítulos, claims, `ChartSpecV1`, tablas, límites, metodología, referencias; nunca evidencia
+interna, prompts ni ids de actor) y `downloadSharedOutput` (proxy de PDF con chequeo de revocación). Think hace
+fetch **server-side por request** (el token no llega al browser, no hay pre-render ni cache), no re-deriva
+cifras ni consulta productores, y responde `not_found`/`gone` con pantallas seguras sin nombre de cliente.
+Contrato de marca: tokens AXIS en Tailwind (mismo mecanismo del Grader), sin MUI. Cambiar el modelo web es
+bump de `modelVersion` con compatibilidad hacia atrás, como el `ReportArtifactModel` público del Grader.
+
+Cabeceras y política, en Greenhouse y en Think: excluir de indexación, `Referrer-Policy: no-referrer`, CSP sin
 terceros ni tracking de enlace del proveedor email, redacción del path en observabilidad y
 `Cache-Control: private, no-store`. Revocación se comprueba en cada lectura y descarga; no entregar una URL
 de storage duradera que permita saltársela. Download por proxy autorizado o mecanismo equivalente con prueba
@@ -369,8 +385,9 @@ Definir duración efectiva y cleanup verificable en TASK-1845/1848 antes de prim
 | TASK-1845 | Dominio, snapshots, adaptadores SEO/AEO/ICO, plan editorial, API/MCP y permisos | Ninguna task abierta obligatoria; verificar readers y gates |
 | TASK-1846 | Render durable multi-consumer, outputs, assets y recuperación sobre Artifact Worker | TASK-1845 |
 | TASK-1847 | Biblioteca ChartSpec y catálogos deck/A4 premium; contratos visuales | TASK-1845; integra worker tras TASK-1846 |
-| TASK-1848 | Sharing por token, correo, recurrencia y contratos programáticos | TASK-1845, TASK-1846 |
-| TASK-1849 | Biblioteca/encargo/revisión en portal, vista web compartida y presentación email | TASK-1845/1846/1847/1848 |
+| TASK-1848 | Sharing por token (grants + `resolveSharedEdition`/`downloadSharedOutput` + `InsightWebModelV1`), correo, recurrencia y contratos programáticos | TASK-1845, TASK-1846 |
+| TASK-1849 | Biblioteca/encargo/revisión en el portal Greenhouse y presentación email | TASK-1845/1846/1847/1848 |
+| TASK-1875 | Vista web compartida por token **renderizada en `efeonce-think`** (`/insights/r/<token>`, render tonto de `InsightWebModelV1`, revocación por request, GVC del hub) | TASK-1848 |
 
 Cinco nuevas unidades; cada una tiene slices, pruebas y rollout propios. TASK-1672/1673 son dos integraciones
 especializadas ya en backlog: se coordinan, no se cuentan como nuevas ni se borran. No bloquean un informe
@@ -441,3 +458,54 @@ Versionar manual con los contratos y catálogos que enseña. Cada cambio de tool
 su receta y sus evaluaciones en el mismo cambio; checks de manifest/referencias/mirrors y canary servido
 impiden publicar documentación de capacidades inexistentes. Report Studio, Deck Studio y las skills de
 módulo aportan oficio; la skill Insights enseña a operar el producto sin duplicar sus fórmulas ni sus contratos.
+
+## 14. Estado de implementación — TASK-1845 (2026-09-15)
+
+Lo que existe en `develop` (sin push ni release en esta sesión) y lo que sigue diseñado. Fuente:
+commits `e6e8a5dfe` (Slice 1), `a21e424fa` (Slice 2), `ca17c93da` (Slice 3).
+
+**Schema `greenhouse_insights`** (migración `20260915100154428_task-1845-insights-foundation.sql`,
+aplicada y verificada por readback en la instancia compartida): `insight_reports` (código legible
+`EO-INS-000001` por secuencia + `lpad(n, GREATEST(6, len))`, sin truncado), `insight_editions`
+(versión por reporte bajo lock; `request_json` + `request_hash`; UNIQUE parcial
+`(organization_id, idempotency_key)`; ventana en zona IANA y UTC; emitida sólo puede retirarse),
+`insight_edition_state_matrix` (14 transiciones, paridad con `edition-state-machine.ts`),
+`insight_edition_transitions` (append-only; gate humano exige `member`/`client_user` con `actor_user_id`),
+`insight_evidence_snapshots` (uno por edición; inmutable al sellar; `facts/sources/rejections_json`),
+`insight_editorial_plans` (uno por edición sobre snapshot SELLADO; congelado con hash; provenance IA),
+`insight_retention_classes` (3 clases, 1095 días). Decisión del operador: prefijo `greenhouse_` como
+los otros 18 schemas; la marca vive en el código, el módulo `insights_v1` y la skill.
+
+**Dominio `src/lib/efeonce-insights/`** (path con marca; `insights` a secas colisiona con Nexa):
+contratos browser-safe (`InsightRequestV1`, `EvidenceFactV1`, `ChartSpecV1`, `EditorialPlanV1`),
+ventanas (`window.ts`: DST en dos pasadas, mes anterior ≠ 30 días, 29-feb → 28-feb, parcial),
+adapters `seo`/`aeo`/`ico` sobre readers dueños (SEO: `readSeoOverviewKpisForWindow` nuevo en el
+dueño con la misma agregación; AEO: sólo un run cuyo `asOfDate` cae en la ventana; ICO: spaces por
+org, meses completos, hereda supresión RpA y numerador/denominador OTD), registry con fixture,
+planner determinista + validación de cifras + IA acotada tras flag, authz de tres planos, catálogo
+elegible, commands (`validate/create/revise/issue/withdraw/recover`) con generación por fases y
+readers con proyección por audiencia. Puertos `InsightOutputsPort` (TASK-1846) e `InsightSharePort`
+(TASK-1848) declarados y sin conectar: **emitir falla cerrado (`not_ready`) hasta que el render
+valide outputs**.
+
+**Superficies:** 16 rutas `platform/app/insights/**` y `platform/ecosystem/insights/**` (misma tabla
+de errores); tools MCP `get_insights_catalog`, `list_insight_editions`, `get_insight_edition`,
+`create_insight_edition` (writes; sólo bindings internos; ningún binding emite); manual servido
+`efeonce-insights` (audiencia interna) + skill local espejada. Capabilities `insights.report.read`,
+`insights.edition.create`, `insights.edition.review`, `insights.edition.issue` con grants por rol;
+módulo per-ORG `insights_v1` (nadie asignado hoy). Reliability: módulo `insights`, señales
+`insights.editions.failed_recent` y `insights.editions.stuck_generation` (steady 0; ambas `ok`).
+
+**Flags** `INSIGHTS_GENERATION_ENABLED`, `INSIGHTS_ISSUANCE_ENABLED`, `INSIGHTS_AUTHORING_AI_ENABLED`:
+declarados, OFF en todos los targets, leídos hoy sólo en Vercel (ledger).
+
+**Decisión posterior (2026-09-15, delta ADR):** la vista web compartida se renderiza en `efeonce-think`
+desde `InsightWebModelV1` (§8); no afecta la foundation: los DTOs de `readers/projection.ts` son la base de
+esa proyección y el token sigue siendo autoridad de Greenhouse.
+
+**Pendiente de la propia task (rollout):** canary sintético de dos organizaciones en staging con
+flags ON, federación de las 4 tools en `efeonce-mcp` (+ scope de escritura), evaluación con agente
+sin historial, release por control plane. **Pendiente de otras unidades:** render/outputs
+(TASK-1846), catálogos visuales (TASK-1847), share/delivery/schedules (TASK-1848), portal (TASK-1849).
+Pendientes de §12 resueltos aquí: DDL exacto (arriba), retención por clase (1095 días), mapa de
+primitives/rutas (arriba). Siguen pendientes: límites medidos/costo y library de charts (TASK-1847).

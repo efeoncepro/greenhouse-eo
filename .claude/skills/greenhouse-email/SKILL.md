@@ -112,6 +112,33 @@ permiso para leer algo que nadie está leyendo—. Caso fuente 2026-09-05: `serv
 declaraba `RESEND_API_KEY_SECRET_REF` con su binding pero nunca montaba el secreto, y el magic link del
 authorization server llevaba días fallando en producción con `RESEND_API_KEY is not configured`.
 
+## Delta 2026-09-12 — entregas muertas, cuota del proveedor y cierre incierto (ISSUE-172)
+
+Lo que cambió en `src/lib/email/delivery.ts` y afecta a cualquier correo del catálogo (ficha:
+`docs/issues/resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md`; operación del proveedor en
+`resend-email-platform` → «Delta 2026-09-12»; procedimiento en
+`docs/operations/runbooks/resend-email-lifecycle-rollout.md` → «Revivir entregas dead_letter (gobernado)»):
+
+- **`email_deliveries.error_message` ahora dice por qué rechazó el proveedor**: `Email provider rejected dispatch
+  (daily_quota_exceeded).` — el `name` del error de Resend viaja; el `message` no (cita direcciones). Si tu
+  verificación lee la fila (y debe), ya no necesita el panel del proveedor para distinguir cuota agotada de
+  dirección inválida (`validation_error`) o rate limit (`rate_limit_exceeded`).
+- **El proveedor tiene cuota y un replay la consume.** El 2026-09-12 el plan Free (100/día) se agotó a las
+  12:58:11Z por los acuses de una recuperación de postulaciones; desde ~13:05Z es Pro (diario ilimitado,
+  50 000/mes). Un consumer reactivo que se re-drena emite sus correos: antes de un replay, contar cuántos y mirar
+  plan/cuota.
+- **`dead_letter` tiene camino gobernado de vuelta**: `reviveDeadLetterEmailDeliveries({ reason ≥10, deliveryIds? |
+  emailTypes?, sinceHours?, limit? })` o `POST /api/admin/ops/email-delivery-retry` con cuerpo `{ reviveDeadLetter }`.
+  Vuelve la fila a `failed` (`attempt_number = 0`, motivo en `resend_reason`) y el cron `ops-email-delivery-retry`
+  reenvía. **Nunca** revive tipos token-sensitive (`TOKEN_SENSITIVE_EMAIL_TYPES`: un bearer muerto se rota por su
+  propio contrato), `persistence.retryable=false`, cierres inciertos ni buzones bloqueados. Sin `UPDATE` a mano.
+- **`dispatchOutcome:'unknown'` ya deja huella**: `resend_id` + `error_class='dispatch_unknown'` + `status='failed'`.
+  Ni el reintento automático ni el revive lo toman (el correo ya salió). Si un caller hace side effects después
+  de `sendEmail`, cuenta con que el resultado puede ser `unknown` y no lo trates como `failed` ordinario.
+- **Buzones bloqueados** (`bounced|complained|suppressed`): el predicado canónico es `providerBlockedConditionSql`
+  en `src/lib/email/provider-block.ts` (`src/lib/hiring/assessment/access-recovery/provider-block.ts` sólo
+  re-exporta). Reintento y revive lo excluyen; ningún template ni caller redefine ese predicado.
+
 ## Verificación mínima
 
 Selecciona gates proporcionales al diff:

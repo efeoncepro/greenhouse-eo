@@ -37,6 +37,15 @@ resolución de roles— permanecen en los packages y contratos de AXIS.
 La distinción operativa queda así: el `DESIGN.md` raíz de Greenhouse describe el producto MUI/Vuexy; el
 `DESIGN.md` del repo AXIS describe la especificación visual portable compartida. Ninguno reemplaza al otro.
 
+## Actualización — 2026-09-14: contrato source-only de selección colaborativa
+
+AXIS añadió en su checkout source el contrato `efeonce.collaboration-selection` `0.2.0` (`candidate`), un
+normalizador agent-facing y el primer adapter en Lab. El handoff portable es
+`axis.collaboration-selection-composition.v1`: los consumidores enlazan su `target.id` con geometría real y no
+copian la implementación visual del Lab. La versión privada publicada continúa en `0.1.5`; por tanto no existe
+adopción runtime en Greenhouse, Globe o los compositores hasta completar release, adapter y evidencia de cada
+consumer. El runbook de consumo conserva la secuencia autorizada y este mapa no autoriza bump ni promoción.
+
 ---
 
 ## 0. Los cuatro actores, y por qué confundirlos es caro

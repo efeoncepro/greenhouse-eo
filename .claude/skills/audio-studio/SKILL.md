@@ -174,3 +174,9 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
 - `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `AUDIO_BOUNDARY.md`, `CLIENT_DELIVERY.md`.
 - `modules/11_STUDIO_CREDITS_AND_RIGHTS.md` — frontera económica de audio, lifecycle, ejemplos por pieza,
   retry vs cambio creativo, modos y rights fuera de credits.
+
+## Música aprobada entre versiones y formatos
+
+Al adaptar un video cuya música ya fue aceptada, cargar
+`efeonce/APPROVED_MUSIC_CONTINUITY.md`: conservar la aprobación, procedencia y licencia; copiar el
+stream cuando procede y verificar audio/sincronía. La adaptación visual no exige regenerar música.
