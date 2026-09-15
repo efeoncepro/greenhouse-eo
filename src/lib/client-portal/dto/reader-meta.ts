@@ -43,6 +43,11 @@ export type ClientPortalDataSource =
   | 'identity.organizations'
   | 'growth.ai_visibility'
   | 'growth.seo'
+  // TASK-1392 — Proposal Studio (seed `proposal_studio_v1`); faltaba en el union (drift 2026-09-15).
+  | 'commercial.proposals'
+  // TASK-1845 — Efeonce Insights: ediciones (deck/A4/web) de la organización, producidas por
+  // greenhouse_insights; el portal cliente sólo consume el reader del dominio, nunca las tablas.
+  | 'insights.editions'
 
 /**
  * Closed enumeration of producer domains that may *own* a BFF curated

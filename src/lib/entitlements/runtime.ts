@@ -3084,6 +3084,65 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1845 — Efeonce Insights. La PUERTA real es el entitlement per-ORG
+  // (module_assignments: insights_v1) que verifica el command; estos grants autorizan
+  // DENTRO de una org habilitada y el target se revalida en cada command. Admin + Account
+  // operan el ciclo completo (crear, revisar, emitir/retirar); Operations prepara y revisa
+  // pero NO emite; el cliente lee y solicita/genera plantillas permitidas de SU org (scope
+  // 'own'); la emisión cliente no nace concedida (policy de EPIC-046 P01 la decide).
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)) {
+    for (const grant of [
+      { capability: 'insights.report.read', action: 'read' },
+      { capability: 'insights.edition.create', action: 'create' },
+      { capability: 'insights.edition.review', action: 'update' },
+      { capability: 'insights.edition.issue', action: 'approve' }
+    ] as const) {
+      addEntitlement(entries, {
+        module: 'insights',
+        capability: grant.capability,
+        action: grant.action,
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)) {
+    for (const grant of [
+      { capability: 'insights.report.read', action: 'read' },
+      { capability: 'insights.edition.create', action: 'create' },
+      { capability: 'insights.edition.review', action: 'update' }
+    ] as const) {
+      addEntitlement(entries, {
+        module: 'insights',
+        capability: grant.capability,
+        action: grant.action,
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+  }
+
+  if (subject.tenantType === 'client') {
+    addEntitlement(entries, {
+      module: 'insights',
+      capability: 'insights.report.read',
+      action: 'read',
+      scope: 'own',
+      source: 'role'
+    })
+
+    if (hasRole(subject, ROLE_CODES.CLIENT_EXECUTIVE) || hasRole(subject, ROLE_CODES.CLIENT_MANAGER)) {
+      addEntitlement(entries, {
+        module: 'insights',
+        capability: 'insights.edition.create',
+        action: 'create',
+        scope: 'own',
+        source: 'role'
+      })
+    }
+  }
+
   // TASK-910 — Notion Demo Teamspace Sandbox capabilities (canonical defense in depth).
   // Demo teamspace sirve como gate canonical pre-Fase 1 del ADR
   // GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1. Acceso restringido per

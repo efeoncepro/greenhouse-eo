@@ -164,7 +164,14 @@ export const CLIENT_PORTAL_DATA_SOURCE_VALUES = [
   'delivery.tasks',
   'delivery.projects',
   'assigned_team.assignments',
-  'identity.organizations'
+  'identity.organizations',
+  // Drift medido 2026-09-15 (TASK-1845): estos tres ya vivían en el seed DB y en el union
+  // `ClientPortalDataSource` pero faltaban aquí, así que el live parity fallaba en silencio
+  // (skipped sin proxy). `commercial.proposals` se agrega también al union (TASK-1392).
+  'commercial.proposals',
+  'growth.ai_visibility',
+  'growth.seo',
+  'insights.editions'
 ] as const satisfies readonly ClientPortalDataSource[]
 
 /**

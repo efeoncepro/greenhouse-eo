@@ -10115,6 +10115,111 @@ export interface GreenhouseHrWorkRelationshipOnboardingCases {
   user_id: string | null;
 }
 
+export interface GreenhouseInsightsInsightEditions {
+  audience: string;
+  created_at: Generated<Timestamp>;
+  created_by_actor_kind: string;
+  created_by_member_id: string | null;
+  created_by_user_id: string | null;
+  edition_id: Generated<string>;
+  failed_phase: string | null;
+  idempotency_key: string | null;
+  issued_at: Timestamp | null;
+  issued_by_user_id: string | null;
+  issued_hash: string | null;
+  modules: string[];
+  organization_id: string;
+  outputs: string[];
+  period_end_utc: Timestamp;
+  period_start_utc: Timestamp;
+  period_time_zone: string;
+  report_id: string;
+  request_hash: string;
+  request_json: Json;
+  review_owner_user_id: string | null;
+  state: Generated<string>;
+  supersedes_edition_id: string | null;
+  updated_at: Generated<Timestamp>;
+  version: number;
+  withdrawn_at: Timestamp | null;
+}
+
+export interface GreenhouseInsightsInsightEditionStateMatrix {
+  from_state: string;
+  requires_human_gate: Generated<boolean>;
+  to_state: string;
+}
+
+export interface GreenhouseInsightsInsightEditionTransitions {
+  actor_kind: string;
+  actor_member_id: string | null;
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  edition_id: string;
+  from_state: string;
+  metadata_json: Generated<Json>;
+  organization_id: string;
+  reason: string;
+  requires_human_gate: Generated<boolean>;
+  to_state: string;
+  transition_id: Generated<string>;
+}
+
+export interface GreenhouseInsightsInsightEditorialPlans {
+  authoring_mode: string;
+  created_at: Generated<Timestamp>;
+  edition_id: string;
+  frozen_at: Timestamp | null;
+  model_id: string | null;
+  model_usage_json: Generated<Json>;
+  organization_id: string;
+  plan_hash: string | null;
+  plan_id: Generated<string>;
+  plan_json: Json;
+  prompt_version: string | null;
+  retention_class: Generated<string>;
+  snapshot_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseInsightsInsightEvidenceSnapshots {
+  as_of_max: Timestamp | null;
+  as_of_min: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  edition_id: string;
+  facts_json: Generated<Json>;
+  organization_id: string;
+  rejections_json: Generated<Json>;
+  retention_class: Generated<string>;
+  sealed_at: Timestamp | null;
+  snapshot_hash: string | null;
+  snapshot_id: Generated<string>;
+  sources_json: Generated<Json>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseInsightsInsightReports {
+  created_at: Generated<Timestamp>;
+  created_by_actor_kind: string;
+  created_by_member_id: string | null;
+  created_by_user_id: string | null;
+  organization_id: string;
+  purpose: string;
+  report_code: Generated<string>;
+  report_id: Generated<string>;
+  status: Generated<string>;
+  title: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseInsightsInsightRetentionClasses {
+  applies_to: string;
+  effective_from: Generated<Timestamp>;
+  notes: string;
+  retention_class: string;
+  retention_days: number;
+}
+
 export interface GreenhouseKnowledgeKnowledgeChunks {
   agentic_policy: Generated<string>;
   allowed_scopes: Generated<string[]>;
@@ -13775,6 +13880,13 @@ export interface DB {
   "greenhouse_hr.workforce_contracting_case_events": GreenhouseHrWorkforceContractingCaseEvents;
   "greenhouse_hr.workforce_contracting_cases": GreenhouseHrWorkforceContractingCases;
   "greenhouse_hr.workforce_contracting_drafts": GreenhouseHrWorkforceContractingDrafts;
+  "greenhouse_insights.insight_edition_state_matrix": GreenhouseInsightsInsightEditionStateMatrix;
+  "greenhouse_insights.insight_edition_transitions": GreenhouseInsightsInsightEditionTransitions;
+  "greenhouse_insights.insight_editions": GreenhouseInsightsInsightEditions;
+  "greenhouse_insights.insight_editorial_plans": GreenhouseInsightsInsightEditorialPlans;
+  "greenhouse_insights.insight_evidence_snapshots": GreenhouseInsightsInsightEvidenceSnapshots;
+  "greenhouse_insights.insight_reports": GreenhouseInsightsInsightReports;
+  "greenhouse_insights.insight_retention_classes": GreenhouseInsightsInsightRetentionClasses;
   "greenhouse_knowledge.knowledge_chunks": GreenhouseKnowledgeKnowledgeChunks;
   "greenhouse_knowledge.knowledge_document_versions": GreenhouseKnowledgeKnowledgeDocumentVersions;
   "greenhouse_knowledge.knowledge_documents": GreenhouseKnowledgeKnowledgeDocuments;

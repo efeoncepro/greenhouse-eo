@@ -57,7 +57,12 @@ export const ENTITLEMENT_MODULES = [
   // TalentDemand → HiringOpening → CandidateFacet → HiringApplication → handoff).
   // Distinto de `hr` (persona ya incorporada), `people` (directorio) y `agency`
   // (staff augmentation vendido). 8 capabilities: hiring.{demand,opening,application}.*.
-  'hiring'
+  'hiring',
+  // TASK-1845 — namespace de Efeonce Insights (EPIC-045): biblioteca de entregas
+  // congeladas (deck/A4/web) por organización y ventana. Distinto de `growth`
+  // (produce los hechos SEO/AEO) y `delivery` (ICO): Insights sólo congela y emite.
+  // La PUERTA per-ORG es el módulo `insights_v1` (module_assignments).
+  'insights'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -2428,7 +2433,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   { key: 'hiring.talent_pool.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'hiring.candidate.review.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'hiring.talent_pool.manage', module: 'hiring', actions: ['update'] as const, defaultScope: 'tenant' },
-  { key: 'hiring.talent_pool.invite', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' }
+  { key: 'hiring.talent_pool.invite', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1845 — Efeonce Insights. Crear y emitir son autoridades DISTINTAS (arquitectura
+  // §7.1); `review` es interno (preparar/revisar/recuperar fases). Scope `own` = la org del
+  // actor cliente derivada server-side; `tenant` = colaborador interno sobre cuentas a cargo,
+  // revalidadas por target en cada command (ser interno no concede todas las cuentas).
+  { key: 'insights.report.read', module: 'insights', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'insights.edition.create', module: 'insights', actions: ['create'] as const, defaultScope: 'tenant' },
+  { key: 'insights.edition.review', module: 'insights', actions: ['update'] as const, defaultScope: 'tenant' },
+  { key: 'insights.edition.issue', module: 'insights', actions: ['approve'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

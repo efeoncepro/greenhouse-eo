@@ -128,6 +128,9 @@ export const AGGREGATE_TYPES = {
   quotation: 'quotation',
   // Proposal Studio (TASK-1392 F0): el aggregate de la oferta que Efeonce construye
   proposal: 'proposal',
+  // Efeonce Insights (TASK-1845): biblioteca de entregas congeladas por org
+  insightReport: 'insight_report',
+  insightEdition: 'insight_edition',
   quotationLineItem: 'quotation_line_item',
   quotationLineCostOverride: 'quotation_line_cost_override',
   commercialCapacity: 'commercial_capacity',
@@ -598,6 +601,13 @@ export const EVENT_TYPES = {
   proposalRenderRequested: 'commercial.proposal.render_requested',
   proposalRenderCompleted: 'commercial.proposal.render_completed',
   proposalRenderFailed: 'commercial.proposal.render_failed',
+  // Efeonce Insights (TASK-1845) — payloads v1 redactados (ids, versión, estado, hashes,
+  // módulos, ventana): nunca hechos, evidencia, narrativa ni bearer.
+  insightReportCreated: 'insights.report.created',
+  insightEditionCreated: 'insights.edition.created',
+  insightEditionStateTransitioned: 'insights.edition.state_transitioned',
+  insightEvidenceSealed: 'insights.evidence.sealed',
+  insightEditionIssued: 'insights.edition.issued',
   quotationDiscountHealthAlert: 'commercial.discount.health_alert',
 
   // Commercial Deals (TASK-453)
