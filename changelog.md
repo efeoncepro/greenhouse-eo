@@ -31,8 +31,9 @@ gobernado. El ensayo de `migrate:down` no se ejecutó.
 Release a producción la misma noche: PR #236 (`9c0946883`) promovido por el orquestador `35032358217` en un solo
 intento (manifest `9c094688309d-500ec9e7` released 22:55Z, watchdog ok, cinco servicios sincronizados o con skip
 legítimo). El canary de contrato por el lane ecosystem muestra las rutas de Insights ejecutando en producción con
-create en `generation_disabled`: el flag de Production queda como último paso, delegado porque el clasificador de
-permisos bloquea `vercel env add` al agente.
+create en `generation_disabled` hasta que Codex prendió el flag en Production (valor verificado, redeploy Ready) y el
+mismo canary creó `EO-INS-000014` con 202. Efeonce Insights genera ediciones en producción para la organización
+sintética; emisión e IA de autoría siguen apagadas hasta TASK-1846.
 
 ## 2026-09-15 — Contacto publica metadata y grafo SEO/AEO coherentes
 
