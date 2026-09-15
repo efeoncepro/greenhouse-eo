@@ -53,6 +53,9 @@ banderas. La v3 de `efeonce-contacto` (`fver-c00955ca-863a-4e7d-99c7-c09706660a3
 localizadas, typeahead/listbox accesible y chevron con orientación cerrada/abierta verificada; la v2 fue
 deprecada conservando el destino existente.
 
+Queda pendiente para el próximo release del renderer el hotfix `e5d4a0fb2`: reemplaza el glifo `↗` que aún puede
+aparecer junto a “País” por el ícono geográfico SVG. No requiere una nueva versión del formulario.
+
 ## 2026-09-15 — TASK-1845: foundation de Efeonce Insights en develop (code complete, rollout pendiente)
 
 Nace el dominio Efeonce Insights: schema `greenhouse_insights` (reportes con código `EO-INS-…`, ediciones

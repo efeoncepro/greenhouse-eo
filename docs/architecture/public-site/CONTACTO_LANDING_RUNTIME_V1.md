@@ -31,8 +31,8 @@ Careers y no recibe postulaciones en este formulario.
 ## Evidencia y límites
 
 La verificación pública cubrió contenido, formulario, Careers, agenda, datos institucionales, SEO/schema y
-overflow en desktop/mobile. El candidato responsive y el selector de país son artefactos locales hasta que un
-rollout gobernado los publique; no se afirma despliegue adicional. El footer global de Ohio conserva una
+overflow en desktop/mobile. El selector de país está publicado; queda pendiente promover el hotfix del renderer
+que reemplaza el glifo erróneo `↗` del ícono de país por su SVG geográfico. El footer global de Ohio conserva una
 dirección legacy fuera del ownership page-scoped de esta landing. Routing operativo por motivo, SLA, booking
 end-to-end y entregabilidad de cada destino requieren una unidad posterior con sus owners y evidencia propia.
 
@@ -51,3 +51,9 @@ Evidencia: renderer y bandera responden HTTP 200; el readback API devuelve `coun
 `presentation.control=country_select`, placeholder `Selecciona tu país` y 250 opciones; el árbol de accesibilidad
 del navegador muestra el combo `ghf-1-country`. El rollback conserva la v2 como referencia y permite deprecar la v3
 sin borrar submissions.
+
+### Pendiente para el próximo release del renderer
+
+Commit preparado: `e5d4a0fb2`. No requiere crear otra versión de Growth Forms ni repetir la activación de países.
+Debe promoverse por el flujo de producción para que `efeoncepro.com` deje de servir el bundle anterior; hasta
+entonces el runtime puede mostrar `↗ País` aunque el contrato v3 y el combo funcionen correctamente.
