@@ -19,9 +19,9 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `command`
+- Backend impact: `migration`
 - Epic: `EPIC-045`
-- Status real: `Discovery cerrada 2026-09-15; plan en checkpoint humano (P1); sin código aún`
+- Status real: `Code complete 2026-09-15 (Slices 1–4 en develop: e6e8a5dfe, a21e424fa, ca17c93da + docs); rollout pendiente — flags OFF, módulo insights_v1 sin asignar, canary staging y federación efeonce-mcp sin ejecutar`
 - Rank: `TBD`
 - Domain: `platform|data`
 - Blocked by: `none`
@@ -170,8 +170,8 @@ Los modelos por módulo no ofrecen un encargo transversal reproducible por venta
 
 ### Acceptance criteria additions
 
-- [ ] Capability/registry/grant en mismo PR, fine-grained auth, API/MCP, auditoría y errores equivalentes verificados.
-- [ ] Source of truth, tenant boundary, concurrencia, migración/rollback y evidencia live de esta unidad pasan antes del cierre.
+- [x] Capability/registry/grant en mismo PR, fine-grained auth, API/MCP, auditoría y errores equivalentes verificados. — Evidencia: migración seed + `entitlements-catalog.ts` + `runtime.ts` (Slice 1, `capability-grant-coverage.test` verde); `insights-lanes.test.ts` (misma tabla de errores en app/ecosystem); manifest MCP regenerado.
+- [ ] Source of truth, tenant boundary, concurrencia, migración/rollback y evidencia live de esta unidad pasan antes del cierre. — Parcial: migración aplicada + readback y `stores.live.test.ts` contra PG real (aislamiento por org, triggers, matriz, idempotencia) verdes; **falta** canary live en staging con flags ON (no ejecutado: flags OFF por diseño hasta autorización).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -267,20 +267,20 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 ## Acceptance Criteria
 
-- [ ] Cliente e interno usan el mismo catálogo/commands con autorización por acción, organización, módulos y audiencia: cliente genera sólo plantillas/evidencia permitidas de su cuenta; ser interno no concede todas las cuentas. URL/API/MCP niegan target o audience manipulados.
-- [ ] Cliente ve sus solicitudes con estado redactado y ediciones elegibles; drafts internos no aparecen por compartir org. Crear y emitir son autoridades distintas; el estado ready_for_review tiene owner cuando la policy lo exige.
-- [ ] Berel SEO/contenidos y Sky diseño/ICO se integran con EPIC-046 consumiendo readers de los productores, nunca el BFF client-portal; conservar unidad, período, frescura y proyección en snapshot/identidad de reutilización.
-- [ ] Skill efeonce-insights autosuficiente para MCP, ligada a tools reales en skill-manifest y accesible por catálogo/reader autorizado; ejemplos de generación/ventana/recuperación ejecutados sin contexto previo, sin fuga de instrucciones internas.
+- [x] Cliente e interno usan el mismo catálogo/commands con autorización por acción, organización, módulos y audiencia: cliente genera sólo plantillas/evidencia permitidas de su cuenta; ser interno no concede todas las cuentas. URL/API/MCP niegan target o audience manipulados. — Evidencia: `authz.ts` + `commands.test.ts` (target ajeno = not_found, `audience=internal` rechazada al cliente, sin módulo = not_found) + `insights-lanes.test.ts` (binding org-scoped ↔ otra org 404; internal sin org 400).
+- [x] Cliente ve sus solicitudes con estado redactado y ediciones elegibles; drafts internos no aparecen por compartir org. Crear y emitir son autoridades distintas; el estado ready_for_review tiene owner cuando la policy lo exige. — Evidencia: `readers/projection.ts` + test de proyección (in_progress/in_review; edición `internal` invisible al cliente); `insights.edition.issue` distinta de `create` (Operations no emite, test).
+- [ ] Berel SEO/contenidos y Sky diseño/ICO se integran con EPIC-046 consumiendo readers de los productores, nunca el BFF client-portal; conservar unidad, período, frescura y proyección en snapshot/identidad de reutilización. — Parcial: adapters consumen sólo readers dueños (boundary test prohíbe `client-portal`); la integración con Berel/Sky reales exige módulo asignado + canary (pendiente, EPIC-046 P01).
+- [ ] Skill efeonce-insights autosuficiente para MCP, ligada a tools reales en skill-manifest y accesible por catálogo/reader autorizado; ejemplos de generación/ventana/recuperación ejecutados sin contexto previo, sin fuga de instrucciones internas. — Parcial: manual `docs/mcp/skills/efeonce-insights/SKILL.md` registrado (`appliesTo` a las 4 tools; test de fuga verde) + skill local espejada; **falta** la evaluación con agente sin historial por MCP servido (requiere federación en `efeonce-mcp` + flags ON).
 
-- [ ] Report/edition/snapshot se persisten con ownership por org, código único bajo concurrencia y snapshots sellados inmutables; corrección crea una versión nueva.
-- [ ] Los tres adapters producen hechos con evidencia, unidad, población, cobertura, asOf y metodología; no duplican fórmulas de SEO/AEO/ICO.
-- [ ] Ventanas DST, mes anterior, año bisiesto, comparaciones incompatibles, nulo/cero, RpA suppressed y OTD con denominador tienen pruebas funcionales; unsupported_window no se convierte en dato actual.
-- [ ] Cambiar el módulo se resuelve por registry/adapter; un cuarto adapter de fixture se integra sin editar el orquestador ni Composer.
-- [ ] Plan determinista y autoría IA bounded prueban que ninguna cifra cambia; salidas del modelo no emiten ni envían, y replay usa narrativa congelada.
-- [ ] Idempotency key repetida devuelve la misma edición; payload distinto da conflicto; eventos y estado son atómicos.
-- [ ] API interna, App/Ecosystem y MCP ejercitan allow/deny y misma semántica; base-only read no permite crear ni emitir.
-- [ ] Retención, allowlist, errores sanitizados y señales de calidad/autoría quedan registrados; metadata/prompt no filtran contenido interno.
-- [ ] Migración/readback, pruebas live serializadas cuando corresponda, flags y rollback se verifican antes de activación; issue permanece bloqueado sin outputs validados.
+- [x] Report/edition/snapshot se persisten con ownership por org, código único bajo concurrencia y snapshots sellados inmutables; corrección crea una versión nueva. — Evidencia: migración (secuencia + `GREATEST`, triggers de inmutabilidad, versión bajo lock) + `stores.live.test.ts` contra PG real.
+- [x] Los tres adapters producen hechos con evidencia, unidad, población, cobertura, asOf y metodología; no duplican fórmulas de SEO/AEO/ICO. — Evidencia: `adapters.test.ts`; la agregación GSC por ventana se agregó en el dueño (`readSeoOverviewKpisForWindow`), no en el adapter.
+- [x] Ventanas DST, mes anterior, año bisiesto, comparaciones incompatibles, nulo/cero, RpA suppressed y OTD con denominador tienen pruebas funcionales; unsupported_window no se convierte en dato actual. — Evidencia: `window.test.ts` (Santiago -04/-03, mes anterior, 29-feb, custom solapado) + `adapters.test.ts` (AEO fuera de ventana ⇒ unsupported_window, RpA suppressed, OTD sin denominador, no_data ≠ 0).
+- [x] Cambiar el módulo se resuelve por registry/adapter; un cuarto adapter de fixture se integra sin editar el orquestador ni Composer. — Evidencia: `registry.test.ts` (fixture consumido por `collectInsightEvidence`).
+- [x] Plan determinista y autoría IA bounded prueban que ninguna cifra cambia; salidas del modelo no emiten ni envían, y replay usa narrativa congelada. — Evidencia: `editorial.test.ts` (cifra alterada ⇒ fallback determinista tras una reparación; provenance modelo/prompt); plan congelado con hash en DB.
+- [x] Idempotency key repetida devuelve la misma edición; payload distinto da conflicto; eventos y estado son atómicos. — Evidencia: `commands.test.ts` + UNIQUE parcial en DB + outbox en la misma tx (`publishOutboxEvent(event, client)`).
+- [ ] API interna, App/Ecosystem y MCP ejercitan allow/deny y misma semántica; base-only read no permite crear ni emitir. — Parcial: `insights-lanes.test.ts` (app + ecosystem con mocks; binding org-scoped no crea; ningún binding emite) y manifest MCP; **falta** ejercitar las rutas contra un deployment real (staging) y el gateway federado.
+- [x] Retención, allowlist, errores sanitizados y señales de calidad/autoría quedan registrados; metadata/prompt no filtran contenido interno. — Evidencia: `insight_retention_classes` (1095 d), `boundary-domain.test.ts`, `insights-errors.ts` (raw ⇒ `internal_error` sin mensaje), historial redactado (`redact()` en generation), señales `insights.editions.*` (`ok` en PG real).
+- [ ] Migración/readback, pruebas live serializadas cuando corresponda, flags y rollback se verifican antes de activación; issue permanece bloqueado sin outputs validados. — Parcial: migración aplicada + readback, `test:live` verde, flags registrados OFF, `issue` bloqueado por puerto (test); **falta** ensayo de rollback (`migrate:down` no ejecutado en la instancia compartida) y activación por lane.
 
 ## Verification
 
@@ -297,6 +297,19 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [ ] Arquitectura técnica, documentación funcional y manual/runbook actualizados proporcionalmente.
 - [ ] Handoff/changelog y contratos UI/API/MCP reflejan disponibilidad real.
 - [ ] Regresiones, señales, rollback y gates documentales pasan; no commit/push/deploy automático.
+
+## Delta 2026-09-15 — implementación (Claude, develop, sin push)
+
+Slices 1–4 implementados y commiteados en `develop` (`e6e8a5dfe`, `a21e424fa`, `ca17c93da` + docs).
+Decisiones de ejecución registradas: schema `greenhouse_insights` (prefijo canónico; marca en código
+`EO-INS-…`, módulo `insights_v1`, skill `efeonce-insights`); path `src/lib/efeonce-insights/` (evita
+colisión con Nexa Insights); `catalog` es reader del dominio bajo el mismo lane (no ruta aparte);
+`ChartSpecV1` nace aquí como contrato de datos (librería visual en TASK-1847); agregación GSC por
+ventana añadida en el dueño (`readSeoOverviewKpisForWindow`); generación por fases síncrona tras el
+commit (TASK-1846 la mueve al worker); ecosystem lane: binding org-scoped sólo lee, internal crea,
+ningún binding emite. Estado real: **code complete, rollout pendiente** (ver Status real y criterios
+sin tildar). Drift ajeno observado: 3 capabilities `identity.internal_access.*` en TS sin seed en DB
+(parity live rojo preexistente, no tocado).
 
 ## Delta 2026-09-09 — dos poblaciones autenticadas, EPIC-046
 

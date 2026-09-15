@@ -1,7 +1,8 @@
 # Efeonce Insights — Architecture V1
 
-> Status: **Diseño para implementación**, 2026-09-08. Dirección aprobada; nada de este documento acredita
-> código, migraciones, configuración ni runtime nuevos. Owner: Platform + Client Experience.
+> Status: **Foundation implementada (TASK-1845, 2026-09-15; ver §14)**; render, sharing/delivery y UI siguen
+> en diseño (TASK-1846–1849). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime.
+> Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
 
 ## 1. Producto y alcance inicial
@@ -441,3 +442,50 @@ Versionar manual con los contratos y catálogos que enseña. Cada cambio de tool
 su receta y sus evaluaciones en el mismo cambio; checks de manifest/referencias/mirrors y canary servido
 impiden publicar documentación de capacidades inexistentes. Report Studio, Deck Studio y las skills de
 módulo aportan oficio; la skill Insights enseña a operar el producto sin duplicar sus fórmulas ni sus contratos.
+
+## 14. Estado de implementación — TASK-1845 (2026-09-15)
+
+Lo que existe en `develop` (sin push ni release en esta sesión) y lo que sigue diseñado. Fuente:
+commits `e6e8a5dfe` (Slice 1), `a21e424fa` (Slice 2), `ca17c93da` (Slice 3).
+
+**Schema `greenhouse_insights`** (migración `20260915100154428_task-1845-insights-foundation.sql`,
+aplicada y verificada por readback en la instancia compartida): `insight_reports` (código legible
+`EO-INS-000001` por secuencia + `lpad(n, GREATEST(6, len))`, sin truncado), `insight_editions`
+(versión por reporte bajo lock; `request_json` + `request_hash`; UNIQUE parcial
+`(organization_id, idempotency_key)`; ventana en zona IANA y UTC; emitida sólo puede retirarse),
+`insight_edition_state_matrix` (14 transiciones, paridad con `edition-state-machine.ts`),
+`insight_edition_transitions` (append-only; gate humano exige `member`/`client_user` con `actor_user_id`),
+`insight_evidence_snapshots` (uno por edición; inmutable al sellar; `facts/sources/rejections_json`),
+`insight_editorial_plans` (uno por edición sobre snapshot SELLADO; congelado con hash; provenance IA),
+`insight_retention_classes` (3 clases, 1095 días). Decisión del operador: prefijo `greenhouse_` como
+los otros 18 schemas; la marca vive en el código, el módulo `insights_v1` y la skill.
+
+**Dominio `src/lib/efeonce-insights/`** (path con marca; `insights` a secas colisiona con Nexa):
+contratos browser-safe (`InsightRequestV1`, `EvidenceFactV1`, `ChartSpecV1`, `EditorialPlanV1`),
+ventanas (`window.ts`: DST en dos pasadas, mes anterior ≠ 30 días, 29-feb → 28-feb, parcial),
+adapters `seo`/`aeo`/`ico` sobre readers dueños (SEO: `readSeoOverviewKpisForWindow` nuevo en el
+dueño con la misma agregación; AEO: sólo un run cuyo `asOfDate` cae en la ventana; ICO: spaces por
+org, meses completos, hereda supresión RpA y numerador/denominador OTD), registry con fixture,
+planner determinista + validación de cifras + IA acotada tras flag, authz de tres planos, catálogo
+elegible, commands (`validate/create/revise/issue/withdraw/recover`) con generación por fases y
+readers con proyección por audiencia. Puertos `InsightOutputsPort` (TASK-1846) e `InsightSharePort`
+(TASK-1848) declarados y sin conectar: **emitir falla cerrado (`not_ready`) hasta que el render
+valide outputs**.
+
+**Superficies:** 16 rutas `platform/app/insights/**` y `platform/ecosystem/insights/**` (misma tabla
+de errores); tools MCP `get_insights_catalog`, `list_insight_editions`, `get_insight_edition`,
+`create_insight_edition` (writes; sólo bindings internos; ningún binding emite); manual servido
+`efeonce-insights` (audiencia interna) + skill local espejada. Capabilities `insights.report.read`,
+`insights.edition.create`, `insights.edition.review`, `insights.edition.issue` con grants por rol;
+módulo per-ORG `insights_v1` (nadie asignado hoy). Reliability: módulo `insights`, señales
+`insights.editions.failed_recent` y `insights.editions.stuck_generation` (steady 0; ambas `ok`).
+
+**Flags** `INSIGHTS_GENERATION_ENABLED`, `INSIGHTS_ISSUANCE_ENABLED`, `INSIGHTS_AUTHORING_AI_ENABLED`:
+declarados, OFF en todos los targets, leídos hoy sólo en Vercel (ledger).
+
+**Pendiente de la propia task (rollout):** canary sintético de dos organizaciones en staging con
+flags ON, federación de las 4 tools en `efeonce-mcp` (+ scope de escritura), evaluación con agente
+sin historial, release por control plane. **Pendiente de otras unidades:** render/outputs
+(TASK-1846), catálogos visuales (TASK-1847), share/delivery/schedules (TASK-1848), portal (TASK-1849).
+Pendientes de §12 resueltos aquí: DDL exacto (arriba), retención por clase (1095 días), mapa de
+primitives/rutas (arriba). Siguen pendientes: límites medidos/costo y library de charts (TASK-1847).

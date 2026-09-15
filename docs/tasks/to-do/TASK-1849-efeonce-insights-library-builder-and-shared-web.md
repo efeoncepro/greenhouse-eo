@@ -1,5 +1,9 @@
 # TASK-1849 — Efeonce Insights: biblioteca, creación y experiencia web compartida
 
+## Delta 2026-09-15
+
+- Los DTOs de UI ya existen: `InsightEditionDto`/`InsightReportDto` (`readers/projection.ts`, browser-safe) con estado redactado por audiencia; lane app `platform/app/insights/**` completo (catálogo, reportes, ediciones, create/revise/issue/withdraw/recover). Esta task consume esos readers/commands; no escribe backend. — por TASK-1845
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

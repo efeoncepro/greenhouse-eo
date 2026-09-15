@@ -1,5 +1,9 @@
 # TASK-1848 — Efeonce Insights: acceso compartido, correo y recurrencia gobernados
 
+## Delta 2026-09-15
+
+- Existe `InsightSharePort` declarado (`ports.ts`, `implemented: false`) y el evento `insights.edition.issued` con `issuedHash`; la proyección por audiencia (`readers/projection.ts`) y `canViewEvidence` ya distinguen emitida/no emitida. El manual servido `efeonce-insights` reserva sus recetas de distribución a esta task. — por TASK-1845
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

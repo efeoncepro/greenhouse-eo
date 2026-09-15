@@ -144,6 +144,15 @@ export const GREENHOUSE_MCP_SKILL_MANIFEST: readonly GreenhouseMcpSkillManifestE
     audience: 'internal',
     sourcePath: `${GREENHOUSE_MCP_SKILLS_ROOT}/seo-prospect-diagnostic/SKILL.md`,
     appliesTo: ['run_seo_prospect_diagnostic', 'get_seo_prospect_diagnostic']
+  },
+  {
+    // TASK-1845 — Efeonce Insights: operar ediciones congeladas por MCP (catálogo → encargo →
+    // fases → evidencia). Audiencia interna: los bindings org-scoped leen las tools pero el manual
+    // describe el ciclo completo (incluida la creación) y no se publica a clientes todavía.
+    name: 'efeonce-insights',
+    audience: 'internal',
+    sourcePath: `${GREENHOUSE_MCP_SKILLS_ROOT}/efeonce-insights/SKILL.md`,
+    appliesTo: ['get_insights_catalog', 'list_insight_editions', 'get_insight_edition', 'create_insight_edition']
   }
 ] as const
 
