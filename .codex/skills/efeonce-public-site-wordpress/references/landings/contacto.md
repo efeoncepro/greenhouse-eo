@@ -81,6 +81,9 @@ en `efeonce-public-site-runtime/.../assets/css/contact-landing.css` y no altera 
 Canon de producto: `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`. Task cerrada:
 `docs/tasks/complete/TASK-1801-contacto-multistakeholder-form-agenda.md`.
 
+Capas documentales: contrato técnico `docs/architecture/public-site/CONTACTO_LANDING_RUNTIME_V1.md`,
+funcional `docs/documentation/public-site/contacto.md` y manual `docs/manual-de-uso/public-site/contacto.md`.
+
 Guardrails: descubrir ID/hash antes de escribir; snapshot + ownership guard + `Document::save`; Ohio header/footer;
 Growth Forms y Meetings como dueños de interacción/routing; no secretos/mapping en WordPress; no Las Bellotas,
 teléfono antiguo, WhatsApp, horario u oficina por país sin verificación; coverage actual CL/US/CO/MX/PE no amplía
