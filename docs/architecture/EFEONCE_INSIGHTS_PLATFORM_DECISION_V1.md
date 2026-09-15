@@ -1,12 +1,12 @@
 # Efeonce Insights — dominio de inteligencia editorial multiformato
 
-- Status: **Accepted for planning** — dirección de producto y ubicación aprobadas por el operador en esta conversación; implementación, migraciones y rollout requieren las tasks y sus gates.
+- Status: **Accepted** — dirección de producto y ubicación aprobadas por el operador (2026-09-08); la foundation (TASK-1845) está **en producción desde 2026-09-15** con generación habilitada y emisión/IA apagadas (ver delta 2026-09-15 «foundation en producción»); render, sharing/delivery, UI y vista web en Think siguen por sus tasks y gates.
 - Date: 2026-09-08
 - Owner: Platform / Architecture + Client Experience; Julio Reyes como autoridad de producto.
 - Scope: Greenhouse, Artifact Composer/Worker, SEO/AEO/ICO, entrega web/PDF/email y API/MCP.
 - Reversibility: two-way-but-slow; los snapshots emitidos y archivos ya distribuidos no se reescriben.
 - Confidence: alta en ownership y reuso; media en capacidad y costo hasta benchmark.
-- Validated as of: 2026-09-08, inspección del checkout `develop`; sin verificación live en este trabajo documental.
+- Validated as of: 2026-09-15 — decisión validada con rollout real de la foundation en staging y producción (canarios por lane app y ecosystem, gateway federado desplegado); los deltas de diseño posteriores (vista web en Think) siguen sin código.
 - Program: [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
 - Technical contract: [arquitectura](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md).
 
@@ -154,3 +154,27 @@ aplica `noindex`, `no-referrer` y `no-store`. Ambos renderers (Composer y Astro)
 demuestra. Ownership: TASK-1848 expone el resolver público y el modelo web; TASK-1849 conserva la
 experiencia compartida, cuya materialización vive en el repo `efeonce-think` (como TASK-1325 para el
 Grader). Sin código ni rollout en este delta.
+
+## Delta 2026-09-15 — foundation en producción (estado de implementación)
+
+**Hecho, no plan.** La decisión 1 («producto dentro de Greenhouse»), la 4 («métricas en su dueño»), la 5 («IA
+acotada a autoría») y la 7 («Full API parity desde nacimiento») ya están materializadas y **desplegadas en
+producción** por TASK-1845 el 2026-09-15: schema `greenhouse_insights` (migración aplicada en la única instancia
+Cloud SQL), dominio `src/lib/efeonce-insights/**`, lanes `app` y `ecosystem` del API Platform, cuatro tools MCP
+internas federadas en el gateway `efeonce-mcp` (1.5.0, 47 tools, 8 clases de scope, revisión Cloud Run al
+100 %), scope `efeonce.mcp.insights.write` creado en Entra, módulo per-ORG `insights_v1` y flags multi-gate.
+Release por control plane (PR #236 → `main` `9c094688…`, manifest `released` 22:55:13Z); flag
+`INSIGHTS_GENERATION_ENABLED=true` en staging y producción (Vercel, con redeploy); emisión e IA **OFF**.
+
+**Evidencia:** ediciones `EO-INS-000012`/`000013` en staging (lanes app y ecosystem sobre una org sintética con
+el módulo asignado; replay idempotente, `409` por conflicto de payload, `404` anti-oracle sobre org sin módulo) y
+`EO-INS-000014` en producción por lane ecosystem, todas `ready_for_review`.
+
+**Límites honestos que la decisión NO convierte en promesa:** la evidencia del canary tiene 0 hechos (la org
+sintética no tiene snapshots ICO en la ventana; 4 rechazos `no_data` declarados); el cliente sólo ve
+evidencia/plan de ediciones emitidas y hoy ninguna puede emitirse (`issue` falla cerrado `not_ready` hasta
+TASK-1846); `create_insight_edition` por el gateway responde `insufficient_scope` hasta un grant gobernado del
+scope; ningún PDF, vista web, enlace, correo ni recurrencia existe todavía (decisiones 2, 3, 6 y el delta de
+Think siguen en diseño: TASK-1846–1849 y TASK-1875). TASK-1845 sigue `in-progress` por dos evidencias
+pendientes (ensayo de `migrate:down` en la instancia compartida y `tools/list` por una sesión MCP humana).
+Detalle verificado: [arquitectura §14](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md#14-estado-de-implementación-y-rollout--task-1845-2026-09-15).

@@ -889,3 +889,35 @@ WHERE updated_by = 'migration:TASK-XXX';
 - **SIEMPRE** incluir DO block anti pre-up-marker check (TASK-838 pattern) en migrations que seedean view_registry/role_view_assignments, validando COUNT esperado post-INSERT.
 
 **Spec canónica**: `docs/tasks/complete/TASK-827-client-portal-composition-layer-ui.md` Slice 0 + incident hardening commit `2fd8a60c` (seed 44 filas, 11 viewCodes × 4 roles client_executive/client_manager/client_specialist/efeonce_admin).
+
+### Efeonce Insights — módulo per-ORG + capabilities por rol (TASK-1845, desde 2026-09-15)
+
+Insights es el caso canónico de **entitlement en dos capas ortogonales**: la **puerta** es el módulo
+`insights_v1` asignado a la organización (`greenhouse_client_portal.module_assignments`, vía
+`enableClientPortalModule`); el **permiso** es la capability del actor. Ninguna reemplaza a la otra: sin
+módulo, un `efeonce_admin` con las 4 capabilities recibe `not_found` (404 anti-oracle); con módulo, un
+`client_specialist` sólo lee.
+
+Catálogo (`src/config/entitlements-catalog.ts`, módulo `insights`; seed en `capabilities_registry` por
+`20260915100154428_task-1845-insights-foundation.sql`) y grants (`src/lib/entitlements/runtime.ts`, mismo commit —
+patrón TASK-873/935):
+
+| Capability | Action | `efeonce_admin` · `efeonce_account` | `efeonce_operations` | `client_executive` · `client_manager` | `client_specialist` |
+|---|---|---|---|---|---|
+| `insights.report.read` | `read` | ✅ tenant | ✅ tenant | ✅ own | ✅ own |
+| `insights.edition.create` | `create` | ✅ tenant | ✅ tenant | ✅ own | — |
+| `insights.edition.review` | `update` | ✅ tenant | ✅ tenant | — | — |
+| `insights.edition.issue` | `approve` | ✅ tenant | — | — | — |
+
+- Admin y Account operan el ciclo completo (crear, revisar, emitir/retirar); Operations prepara y revisa pero
+  **no emite**; el cliente lee y (ejecutivo/manager) encarga ediciones de SU organización con `scope='own'`.
+  La emisión cliente **no nace concedida**: la policy P01 de EPIC-046 la decide.
+- El check es de **tres planos** en cada command (`assertInsightsAccess`): módulo asignado + capability +
+  audiencia (`internal` prohibida al cliente). El target se revalida en cada command, no sólo al entrar.
+- El lane ecosystem (MCP) añade un cuarto filtro: binding `sister_platform_bindings` de scope interno +
+  `organizationId` explícito; la tool `create_insight_edition` exige además el scope OAuth de clase
+  `efeonce.mcp.insights.write` (`src/lib/auth-server/oauth/scopes.ts`); ningún binding emite ni retira.
+- **NUNCA** conceder `insights.*` a un rol nuevo sin actualizar esta tabla y el comentario `// TASK-…` en
+  `runtime.ts`; el guard `capability-grant-coverage.test.ts` sólo prueba que exista ≥1 grant, no que la matriz
+  sea la correcta.
+

@@ -1,9 +1,9 @@
 # Production Release Incident Playbook V1
 
 > **Tipo de documento:** Playbook operativo canónico
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-05-12 por Claude Opus 4.7 (post incidente TASK-870)
-> **Ultima actualizacion:** 2026-09-06 por Claude (anti-patterns #19 autorizacion de mutaciones externas pedida tarde y #20 arboles identicos vs SHA distinto; caso positivo `b3e324cb5c8d`)
+> **Ultima actualizacion:** 2026-09-15 por Claude (anti-pattern #21 cambiar la forma de un comando ya autorizado; caso positivo `9c094688309d`)
 > **Audience:** Cualquier agente AI (Claude, Codex, Cursor) y operadores humanos que enfrenten un `Production Release Orchestrator` fallando
 
 ---
@@ -660,6 +660,26 @@ nada".
 Árboles idénticos cierran el caso sin depender de ninguna lista de rutas; árboles distintos lo abren
 aunque el gate haya reportado `deploy_needed=false`.
 
+### 21. Cambiar la forma de un comando ya autorizado (redirigir, encadenar) y volver a caer en el clasificador
+
+**Release 2026-09-15, `9c094688309d`:** la autorización de todas las mutaciones se pidió al abrir el release
+(#19), y aun así se perdieron ~12 de los ~62 min del agente en bloqueos del clasificador. El POST de aprobación
+pasó en el **primer** gate y quedó bloqueado en el **segundo** con el mismo `gh api … -X POST`: la diferencia
+fue la forma —en el segundo iba con la salida redirigida a un archivo o encadenado a otro comando—. Lo mismo
+con un loop de espera de `gh pr checks` envuelto en `tee`/`exit`. Y `vercel env add … production` +
+`vercel redeploy` de Production siguieron bloqueados aunque los de staging pasaron.
+
+El clasificador no evalúa «qué comando» sino «qué línea»: una mutación autorizada como llamada suelta deja de
+estarlo cuando se le agrega redirección, pipe, `&&` o `exit`. Los gotchas #15/#16 de la skill ya dicen
+«separa lectura de mutación y no encadenes»; lo que agrega este caso es que **la forma que pasó una vez es la
+forma que hay que repetir literalmente**, y que el error cosmético que esa forma imprime (el `jq` del POST de
+aprobación) no se arregla cambiándola.
+
+**Regla:** la mutación autorizada se ejecuta como llamada suelta, con la misma forma exacta que ya pasó, sin
+redirección ni encadenamiento; las esperas van aparte y en background (`gh pr checks <n> --watch`,
+`gh run watch <id> --exit-status`); y un flip de Production bloqueado se delega de inmediato al operador o a
+Codex, sin gastar intentos en variantes.
+
 ## Caso positivo 2026-08-06 — el release que no generó incidente
 
 Hasta esta versión, este playbook sólo documentaba incidentes. Eso deja un sesgo:
@@ -875,6 +895,36 @@ Lo que salió bien, en orden:
 **Lo que costó tiempo fue una sola cosa, y no fue técnica:** 64 minutos esperando la autorización humana
 para el dispatch con toda la evidencia ya verde (§19). Fases y números:
 `PRODUCTION_RELEASE_TIMING_LEDGER.md`, fila 2026-09-06.
+
+## Caso positivo 2026-09-15 — tercer run único consecutivo, y el reloj lo siguió cobrando el clasificador
+
+El release `9c094688309d345b9780b563968ecd1c5c96afd4` (PR #236 squash: Efeonce Insights foundation TASK-1845 +
+landing de contacto TASK-1801 + scope `insights.write`; run `35032358217`; dispatch `22:43:24Z`; manifest
+`9c094688309d-500ec9e7-3f22-4229-b152-e70a197ee1af` `released` `22:55:13Z`, **12 min** de workflow) cerró en
+**un solo run, sin retry**. Agente E2E ~**62 min**.
+
+Lo que se repitió de los casos anteriores (y por eso no se explica de nuevo): break-glass planificado con
+`bypass_preflight_reason` sobre hechos comprobables (la migración `…_task-1845-insights-foundation` ya aplicada en
+la instancia única; `auth_access` = paridad de scopes + grants gateados por módulo); smoke de `main` producido, no
+bypasseado (run `35030816814`); merge canónico `-s ours`; `ops-worker` y `auth-server` change-gated con árbol
+docs-only idéntico (§20); Azure `no_infra_diff`; watchdog `ok`, 5/5 synced; Vercel `greenhouse-e8i8fkqbd` READY;
+`/api/auth/health` 200.
+
+Lo nuevo, en orden de costo:
+
+- **~12 min en bloqueos del clasificador con la autorización ya pedida por adelantado** (§21): segundo gate con
+  POST redirigido/encadenado, loop de `gh pr checks` con `tee`/`exit`, y `vercel env add`/`redeploy` de Production.
+  El flip de `INSIGHTS_GENERATION_ENABLED` en Production lo ejecutó Codex/el operador (`greenhouse-h2030d3bz`
+  Ready ~`23:10Z`, valor verificado con `vercel env pull --environment=production`).
+- **Gotcha #11 de la skill usado como camino, no sufrido:** el staging quedó `Canceled` por el merge canónico +
+  commit docs-only, y el build se produjo tocando el ledger de flags (set `deployControlDocs`), que de todos modos
+  había que actualizar.
+- **Canary de contrato en producción por el lane ecosystem** con el par que sólo el contrato nuevo produce:
+  `POST …/ecosystem/insights/editions` → `503 generation_disabled` antes del flag, `202` `EO-INS-000014`
+  (`ready_for_review`) después; catálogo `200`; org sin módulo `404` anti-oracle; replay idempotente.
+
+Fases y números: `PRODUCTION_RELEASE_TIMING_LEDGER.md`, fila 2026-09-15. Comandos exactos: runbook §2.4 →
+Delta 2026-09-15 y §4.3.
 
 ## Decisión: ¿cuándo eliminar / relajar el preflight?
 

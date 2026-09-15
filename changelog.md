@@ -35,6 +35,12 @@ create en `generation_disabled` hasta que Codex prendió el flag en Production (
 mismo canary creó `EO-INS-000014` con 202. Efeonce Insights genera ediciones en producción para la organización
 sintética; emisión e IA de autoría siguen apagadas hasta TASK-1846.
 
+Barrido documental de cierre con cinco agentes: nace `EFEONCE_INSIGHTS_IMPLEMENTATION_RECORD_V1.md` (registro de
+construcción y despliegue archivo por archivo), y se alinean arquitectura, ADR, doc funcional, manual, skills
+(`efeonce-insights`, `efeonce-mcp-platform`, `greenhouse-production-release`), router de `CLAUDE.md` con regla
+auto-load, reliability, client portal, entitlements, catálogo API/MCP, runbook del gateway y las tasks que
+declaraban bloqueo por TASK-1845 (1846–1849, 1672), ahora desbloqueadas.
+
 ## 2026-09-15 — Contacto publica metadata y grafo SEO/AEO coherentes
 
 `TASK-1801` queda cerrada por aprobación explícita del operador sobre la landing pública. El cierre acredita la

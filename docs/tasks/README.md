@@ -38,8 +38,9 @@ Siguiente ID libre `TASK-1876`. Insights TASK-1845–1849 (+ TASK-1875, vista we
 ## Programa Efeonce Insights: EPIC-045
 
 [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md) registra **cinco tareas nuevas**,
-todas `to-do`, P1/Alto. Dominio Greenhouse + Artifact Worker; tres salidas iniciales: deck, informe A4 y web.
-TASK-1672/1673 conservan la auditoría técnica SEO y su distribución como consumers. Sin implementación ni rollout.
+P1/Alto. Dominio Greenhouse + Artifact Worker; tres salidas iniciales: deck, informe A4 y web.
+TASK-1672/1673 conservan la auditoría técnica SEO y su distribución como consumers. La foundation (TASK-1845) está
+en producción desde 2026-09-15 (generación ON en staging y producción; emisión/IA OFF); el resto sigue en diseño.
 Desde 2026-09-09, [EPIC-046](../epics/to-do/EPIC-046-client-services-visibility-and-self-service.md)
 integra autogestión cliente y gestión de colaboradores internos. TASK-1845/1846/1848/1849 incorporan
 autoridad por población, render/entrega segura y las dos experiencias; mismos IDs y owners, sin duplicados.
@@ -48,7 +49,7 @@ TASK-690–693 para Hub/preferencias y TASK-303/387/694 para audiencia/digest/me
 
 | Task | Resultado | Estado |
 |---|---|---|
-| [TASK-1845](in-progress/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO | in-progress |
+| [TASK-1845](in-progress/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO — code complete y **en producción** (2026-09-15: schema `greenhouse_insights`, lanes app/ecosystem, 4 tools MCP federadas en `efeonce-mcp` 1.5.0, scope Entra, `INSIGHTS_GENERATION_ENABLED` ON en staging+producción, emisión/IA OFF; ediciones `EO-INS-000012/13` staging y `000014` prod); faltan ensayo `migrate:down` y sesión MCP humana | in-progress |
 | [TASK-1846](to-do/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor | to-do |
 | [TASK-1847](to-do/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md) | gráficos y catálogos premium para deck e informe vertical | to-do |
 | [TASK-1848](to-do/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados | to-do |

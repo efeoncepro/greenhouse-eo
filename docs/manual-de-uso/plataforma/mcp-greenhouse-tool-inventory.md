@@ -1,9 +1,9 @@
 # MCP Greenhouse — Inventario de Tools
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 3.2
+> **Version:** 3.3
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-09-02 por Claude (TASK-1804: la superficie sirve sus propios manuales de uso — tool `get_greenhouse_skill` + recurso `skill://efeonce/{name}/SKILL.md`, §9; 44 tools medidas en el manifiesto; delta previo 2026-08-31 TASK-1780: el archivo dejó de llamarse read-only porque el servidor no lo es; las cifras de superficie se leen del manifiesto, no de este texto)
+> **Ultima actualizacion:** 2026-09-15 por Claude (TASK-1845: dominio `insights` con 4 tools —una escribe—, §10; **51 tools medidas en el manifiesto** (`toolCount` del artefacto generado, hash `4089283477991d…`); manuales servidos: ocho; delta previo 2026-09-02 TASK-1804: la superficie sirve sus propios manuales de uso — tool `get_greenhouse_skill` + recurso `skill://efeonce/{name}/SKILL.md`, §9; 44 tools medidas en el manifiesto; delta previo 2026-08-31 TASK-1780: el archivo dejó de llamarse read-only porque el servidor no lo es; las cifras de superficie se leen del manifiesto, no de este texto)
 > **Actualización de acceso:** 2026-09-08, TASK-1844: Efeonce ID, lectura interna v2 por objetivo y manual diario canónico.
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
@@ -362,10 +362,12 @@ Tres caminos al mismo byte:
 - lane `GET /api/platform/ecosystem/mcp/skills[/{name}]` — lo que los dos anteriores consultan por debajo
   (`ETag`/`304`).
 
-Seis manuales hoy, todos de audiencia `internal`:
+Ocho manuales hoy (medidos en `skill-manifest.ts` al 2026-09-15), todos de audiencia `internal`:
 
 | Manual | Gobierna | Cuándo cargarlo |
 |---|---|---|
+| `client-service-enablement` | `preview_` / `apply_` / `rollback_client_service_enablement` (TASK-1852) | Antes de habilitar o revertir servicios de un cliente |
+| `efeonce-insights` | `get_insights_catalog`, `list_insight_editions`, `get_insight_edition`, `create_insight_edition` (TASK-1845): catálogo → encargo → fases → evidencia; nunca emitir por MCP | Antes de leer o encargar una edición de Insights |
 | `seo-spend-discipline` | `track_seo_keywords` / `untrack_seo_keywords`, `declare_seo_competitors` / `retire_seo_competitors`, `discover_seo_keywords`, `run_seo_prospect_diagnostic`, `get_seo_entitlement` | **Antes de cualquier tool que comprometa gasto** |
 | `seo-visibility-reading` | Las lecturas de visibilidad: lentes ● medida / ◑ estimada, ausencias honestas, cadena de readers, la work queue como única autoridad de orden | Antes de interpretar o reportar un dato SEO |
 | `competitor-loop` | observar → proponer → confirmar → declarar con `proposalRef` → cubrir → leer gap → retirar | Antes de tocar competidores |
@@ -388,6 +390,33 @@ Reglas:
 - 🔴 **NUNCA `node:fs` en un módulo alcanzable desde una ruta**: Turbopack incluyó el proyecto entero en la función
   (397 MB, tres builds fallidos). Por eso los manuales viajan como artefacto generado, no se leen del disco en runtime.
 
+### 10. Efeonce Insights (TASK-1845)
+
+Desde el 2026-09-15 el manifiesto tiene un sexto dominio, `insights`, con **cuatro tools** que delegan en el lane
+ecosystem `/api/platform/ecosystem/insights/**`. Tres leen y **una escribe**:
+
+| Tool | Qué hace | Escribe |
+|---|---|---|
+| `get_insights_catalog` | Módulos elegibles para la organización (`seo`/`aeo`/`ico`, con la razón si no están: `module_not_assigned`, sin datos…), salidas, audiencias y límites | no |
+| `list_insight_editions` | Ediciones de la organización, paginadas; filtros `reportId` y `state`; estado proyectado por audiencia (un binding de cliente nunca ve borradores internos) | no |
+| `get_insight_edition` | Una edición con su historial de transiciones; con `includeEvidence` agrega el snapshot sellado y el plan congelado (para un binding de cliente, sólo si la edición está emitida) | no |
+| `create_insight_edition` | Crea reporte + edición y corre la generación por fases hasta `ready_for_review` (o `failed` con `failedPhase`). Idempotente por `idempotencyKey` del encargo (misma clave + mismo payload ⇒ misma edición; payload distinto ⇒ `idempotency_conflict`). **No gasta proveedor, no emite ni renderiza** | **sí** (`writes: true`) |
+
+Reglas:
+
+- **Sólo bindings `internal` crean, revisan o recuperan** (con `organizationId` explícito). Un binding org-scoped usa
+  la organización de su binding y sólo lee. Emitir y retirar no existen por MCP: son actos humanos en el portal.
+- **Una organización sin el módulo `insights_v1`** responde `404` anti-oráculo en las cuatro. Asignarlo:
+  `scripts/insights/assign-insights-module.ts --org=<id> --apply` (dry-run por defecto).
+- **Con `INSIGHTS_GENERATION_ENABLED` apagado** la creación responde `503` (`generation_disabled`); las lecturas
+  siguen funcionando. Hoy está ON en Production y staging; emisión e IA de autoría siguen OFF.
+- **Federación:** las cuatro viajan al gateway `efeonce-mcp` (`1.5.0`, provider `greenhouse-insights` sobre la config
+  SEO). Allá las lecturas van con `efeonce.mcp.read` y la creación exige `efeonce.mcp.insights.write`, que ningún
+  cliente porta todavía (`insufficient_scope` hasta un consentimiento gobernado).
+- **Manual servido:** `efeonce-insights` vía `get_greenhouse_skill` (§9). Paso a paso por API y MCP en
+  [Operar Efeonce Insights por API y MCP](../insights/operar-efeonce-insights-api-mcp.md); funcionamiento en
+  [Dominio y ediciones](../../documentation/insights/efeonce-insights-dominio-ediciones.md).
+
 ## Que no puede hacer
 
 Este MCP no hace lo siguiente:
@@ -395,7 +424,7 @@ Este MCP no hace lo siguiente:
 - no crea subscriptions
 - no actualiza subscriptions
 - no reintenta deliveries
-- no hace writes **salvo** las **siete** excepciones gobernadas del §8 (`track_seo_keywords` / `untrack_seo_keywords`, TASK-1308; `declare_seo_competitors` / `retire_seo_competitors`, TASK-1662; `discover_seo_keywords`, TASK-1664; `prepare_seo_grounded_queries`, TASK-1666; `run_seo_prospect_diagnostic`, TASK-1709), que exigen binding `internal`, entitlement y sus disclosures propios (techo de capacidad e idempotencia en track/untrack y en declare/retire; preview + confirmación de costo en discover; draft-nunca-activa en prepare; confirmación humana + tope duro por diagnóstico en run_prospect); fuera de esas siete, este MCP no escribe nada. La cifra no se mantiene a mano: sale del manifiesto y el propio servidor la anuncia en sus `instructions`
+- no hace writes **salvo** las **diez** excepciones gobernadas (medidas en el manifiesto al 2026-09-15): las **siete** del §8 (`track_seo_keywords` / `untrack_seo_keywords`, TASK-1308; `declare_seo_competitors` / `retire_seo_competitors`, TASK-1662; `discover_seo_keywords`, TASK-1664; `prepare_seo_grounded_queries`, TASK-1666; `run_seo_prospect_diagnostic`, TASK-1709), que exigen binding `internal`, entitlement y sus disclosures propios (techo de capacidad e idempotencia en track/untrack y en declare/retire; preview + confirmación de costo en discover; draft-nunca-activa en prepare; confirmación humana + tope duro por diagnóstico en run_prospect); las **dos** de habilitación de servicios (`apply_` / `rollback_client_service_enablement`, TASK-1852, autoridad humana delegada); y **`create_insight_edition`** (§10, TASK-1845: crea una edición idempotente, sin gasto de proveedor, sólo binding `internal`). Fuera de esas diez, este MCP no escribe nada. La cifra no se mantiene a mano: sale del manifiesto y el propio servidor la anuncia en sus `instructions`
 - no consulta rutas legacy como source primaria
 - no expone OAuth hosted/multiusuario
 - no expone ICO por MCP todavía

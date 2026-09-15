@@ -456,6 +456,7 @@ When this architecture is adopted:
 ### Confirmed Operational
 - PostgreSQL instance `greenhouse-pg-dev` deployed (Postgres 16, us-east4, db-custom-1-3840)
 - Database: `greenhouse_app` with schemas: greenhouse_core, greenhouse_serving, greenhouse_sync, greenhouse_hr, greenhouse_payroll, greenhouse_finance, greenhouse_delivery, greenhouse_crm, greenhouse_ai
+  - Delta 2026-09-15: `greenhouse_insights` (Efeonce Insights, TASK-1845) — 7 tablas OLTP + `next_insight_report_code()`; runtime-first, sin réplica BigQuery propia (los eventos `insights.*` viajan por el outbox). Inventario: `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md` §4.
 - Outbox consumer operational (Vercel cron every 5 min, publishes to `greenhouse_raw.postgres_outbox_events`)
 - Outbox marts deployed: `greenhouse_marts` with 5 views (fin_accounts, fin_expenses, payroll_entries from outbox)
 - `greenhouse_raw` dataset exists with 11 tables (Notion + HubSpot snapshots + outbox events)

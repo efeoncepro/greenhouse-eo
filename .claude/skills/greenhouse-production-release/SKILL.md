@@ -379,6 +379,31 @@ smoke, `gh workflow run` del orquestador, POST de aprobación de los dos gates, 
 `vercel redeploy` de los flags). Pedirla comando por comando corta el flujo justo donde corre el reloj
 del ledger. Ver gotchas #15/#16 y el playbook, anti-pattern #19.
 
+### Delta 2026-09-15 (release `9c094688309d`) — un solo run, 12 min, y el clasificador cobra por la forma
+
+Tercer caso positivo consecutivo: PR #236, run `35032358217`, dispatch `22:43:24Z`, manifest `released`
+`22:55:13Z` (**12 min**), sin retry, dos gates aprobados, watchdog `ok` 5/5, smoke de `main` producido
+(run `35030816814`), break-glass con razón sobre hechos (migración ya aplicada en la instancia única; `auth_access`
+= paridad de scopes + grants gateados por módulo). Agente E2E ~**62 min**, ~**12 min** perdidos en bloqueos del
+clasificador **con la autorización ya pedida por adelantado**:
+
+- **El POST de aprobación pasó en el primer gate y se bloqueó en el segundo** porque iba con redirección a
+  archivo o encadenado. Forma exacta que pasa, como llamada suelta:
+  `gh api "repos/efeoncepro/greenhouse-eo/actions/runs/<run_id>/pending_deployments" -X POST -f state=approved -F "environment_ids[]=<id>" -f comment="<razon>" --jq '.[] | .environment.name'`.
+  El error de `jq` al final es **inofensivo** (el POST ya se aplicó); no lo arregles cambiando la forma.
+- **Loop de espera de `gh pr checks` con `tee`/`exit` bloqueado.** Usar `gh pr checks <n> --watch` o
+  `gh run watch <id> --exit-status` en background; leer el veredicto después.
+- **`vercel env add … production` y `vercel redeploy` de Production bloqueados** (staging pasó). El flip de
+  `INSIGHTS_GENERATION_ENABLED` lo ejecutó Codex/el operador (`greenhouse-h2030d3bz` Ready ~`23:10Z`, verificado con
+  `vercel env pull --environment=production`). Delegar de inmediato, sin gastar intentos en variantes.
+- **Gotcha #11 confirmado como camino válido:** merge canónico `-s ours` + commit docs-only ⇒ staging `Canceled`;
+  el build se produjo tocando el ledger de flags (`deployControlDocs`), que había que actualizar igual.
+- **Canary de contrato por el lane ecosystem** (runbook §4.3): `catalog` `200` · org sin módulo `404` anti-oracle ·
+  `create` `503 generation_disabled` antes del flag → `202 EO-INS-000014` después; replay idempotente.
+
+Regla nueva (playbook, anti-pattern #21): **la mutación autorizada se repite con la forma literal que ya pasó**
+—sin redirección, pipe, `&&` ni `exit`—; las esperas van aparte y en background.
+
 ## Gotchas conocidos del release (verificados 2026-07-03 #139 y 2026-08-06 #177/#178; fix de raíz de #2 = ISSUE-114)
 
 El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas reales. No las persigas como bugs; aplica la mitigación:
@@ -604,6 +629,12 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
       `gh pr checks --watch && gh pr merge && gh workflow run` aunque cada uno suelto pase.** Separar lectura
       de mutación y no encadenar: el `--watch` (lectura) por un lado, y cada mutación (`gh pr merge`,
       `gh workflow run`) como llamada suelta, ya autorizada por adelantado.
+    - **Delta 2026-09-15 (release `9c094688309d`): la FORMA decide, incluso con autorización previa.** El
+      mismo `gh api … -X POST` de aprobación pasó en el primer gate y quedó bloqueado en el segundo por ir con
+      redirección a archivo/encadenado; un loop de `gh pr checks` con `tee`/`exit` también cayó; y
+      `vercel env add … production` + `vercel redeploy` de Production siguieron bloqueados aunque los de
+      staging pasaron. Repetir la forma literal que ya pasó (ver Delta 2026-09-15 arriba) y delegar el flip
+      de Production sin reintentar variantes.
 
 17. **Tres delta del release `e1718a359575` (2026-08-29, 4.º del día).** (a) "Confirmar `develop`
     verde" se verifica sobre el run del **HEAD actual Y los rojos/cancelados de la ráfaga**:

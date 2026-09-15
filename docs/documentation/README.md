@@ -145,7 +145,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Efeonce Insights
 
-- [Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)](insights/efeonce-insights-dominio-ediciones.md) — qué es una edición (informe congelado por período con versión e identidad `EO-INS-…`), cómo se genera por fases (recolectar evidencia de SEO/AEO/ICO con unidad, cobertura y corte → plan determinista con cifras que referencian hechos → validación), qué ve cada audiencia, por qué **ausente no es cero**, y el estado honesto a 2026-09-15: núcleo en código, flags OFF, sin render ni emisión hasta TASK-1846. TASK-1845, EPIC-045.
+- [Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)](insights/efeonce-insights-dominio-ediciones.md) — qué es una edición (informe congelado por período con versión e identidad `EO-INS-…`), cómo se genera por fases (recolectar evidencia de SEO/AEO/ICO con unidad, cobertura y corte → plan determinista con cifras que referencian hechos → validación), qué ve cada audiencia, por qué **ausente no es cero**, qué ve cada persona (cliente vs interno vs agente), cómo se habilita una organización (módulo `insights_v1`) y el estado honesto a 2026-09-15: **en producción** con generación encendida (staging y producción), emisión e IA apagadas, sin render ni emisión hasta TASK-1846. TASK-1845, EPIC-045.
 
 ### Growth
 

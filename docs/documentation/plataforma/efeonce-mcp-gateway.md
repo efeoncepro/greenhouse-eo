@@ -74,8 +74,20 @@ conexión de Efeonce ID —interna v2 o externa— las recibe denegadas. El prov
 `CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED`. Detalle operativo en el
 [runbook de habilitación de servicios](../../operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md).
 
+Desde el 15 de septiembre de 2026 hay una **sexta capacidad**: **Efeonce Insights** (`TASK-1845`). Un cliente MCP
+puede leer el catálogo de informes disponibles para una organización (`get_insights_catalog`), listar sus ediciones
+(`list_insight_editions`), leer una edición con su evidencia sellada y su plan congelado (`get_insight_edition`) y
+encargar una edición nueva (`create_insight_edition`). Las tres lecturas van con el permiso base; encargar exige un
+permiso propio (`efeonce.mcp.insights.write`) que hoy no tiene concedido ningún cliente, así que responde
+`insufficient_scope` hasta que exista un consentimiento gobernado. Es una escritura que **no gasta proveedor**: crea
+una edición y corre su generación por fases hasta «lista para revisión»; nunca la emite al cliente ni la renderiza —
+emitir y retirar son actos humanos que sólo existen en el portal. Una organización sin el módulo contratado recibe
+«no existe», nunca una pista. Comparte interruptor, identidad y consumer con los providers SEO, de manuales y de
+identidad, porque es la misma lane. Manual: [Operar Efeonce Insights por API y
+MCP](../../manual-de-uso/insights/operar-efeonce-insights-api-mcp.md).
+
 El snapshot de TASK-1837 registró 39 tools; TASK-1844 agregó discovery organizacional propio del gateway;
-TASK-1852 (`1.4.0`, 2026-09-10) llevó la superficie a 43 tools.
+TASK-1852 (`1.4.0`, 2026-09-10) llevó la superficie a 43 tools; TASK-1845 (`1.5.0`, 2026-09-15) la llevó a 47.
 El inventario vigente se lee del servidor y de `surface-baseline.json` en `efeonce-mcp`. Lo que ve un cliente
 concreto depende de su emisor, población, permisos y flags. El catálogo global no equivale a autoridad universal.
 
@@ -193,7 +205,8 @@ Disponible hoy:
   (`get_seo_provider_spend`, `get_seo_keyword_gap`, `get_seo_serp_top_results`, `get_seo_competitor_candidates`)
   que sólo responden a conexiones internas de Efeonce: una conexión de cliente recibe un "no existe", nunca una
   pista de que el dato está ahí. Inventario exacto en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) §8.
-- `get_greenhouse_skill` para leer los manuales de uso de esa superficie (hoy seis, todos internos). Una conexión
+- `get_greenhouse_skill` para leer los manuales de uso de esa superficie (hoy ocho, todos internos; incluye
+  `client-service-enablement` y, desde el 2026-09-15, `efeonce-insights`). Una conexión
   que no sea interna recibe un catálogo vacío y un "no existe" por nombre, nunca un "prohibido".
 - `identity.invitations.list` e `identity.invitation.create` para que el administrador designado de una
   organización cliente administre a las personas de su propia organización con Efeonce ID. Sólo responden a una
@@ -206,6 +219,12 @@ Disponible hoy:
   internas con permiso de habilitar módulos y un token corporativo Entra que porte
   `efeonce.mcp.client_services.write`. Están desplegadas y el estado del gateway las reporta como habilitadas;
   todavía no se ha ejecutado ninguna habilitación real por este canal (falta el primer canary con una persona).
+- `get_insights_catalog`, `list_insight_editions`, `get_insight_edition` y `create_insight_edition` para operar
+  Efeonce Insights: leer qué informes puede recibir una organización, sus ediciones y la evidencia de cada una, y
+  encargar una edición nueva. Las lecturas van con el permiso base; encargar exige `efeonce.mcp.insights.write`,
+  que ningún cliente tiene concedido todavía. Ni el gateway ni una conexión de máquina emiten o retiran ediciones.
+  Desplegadas el 2026-09-15 y verificadas por canary de lectura; el manual `efeonce-insights` se sirve por
+  `get_greenhouse_skill`.
 
 No disponible:
 

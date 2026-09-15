@@ -74,6 +74,43 @@ Served MCP manual (same operating recipes, machine audience): `docs/mcp/skills/e
 - **Federation**: registering an MCP tool here is not enough — the gateway in `efeonce-mcp` needs its
   pieces (and a scope for writes). Skill: `efeonce-mcp-platform`.
 
+## Operating state (as of 2026-09-15) — what is live and what is not
+
+- **In production.** Foundation released 2026-09-15 through the release control plane (PR #236 → `main`).
+  Schema applied on the single shared Cloud SQL instance (dev/staging/prod). Editions created:
+  `EO-INS-000012` (app lane, staging), `EO-INS-000013` (ecosystem lane, staging), `EO-INS-000014`
+  (ecosystem lane, production) — all `ready_for_review` on the synthetic Greenhouse Demo organization.
+- **Flags (read only in Vercel; ledger `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`):**
+  `INSIGHTS_GENERATION_ENABLED` **ON** in `staging` and `production`, OFF in Preview;
+  `INSIGHTS_ISSUANCE_ENABLED` and `INSIGHTS_AUTHORING_AI_ENABLED` **OFF everywhere**. Without generation the
+  create path answers `503 service_unavailable` with `details.code = generation_disabled`.
+- **Vercel trap:** a deployment built before the env var existed does not see it — after `vercel env add`
+  you must `vercel redeploy` the target (it happened in both staging and production). Verify with
+  `vercel env pull --environment=<target>`, then exercise the real create path.
+- **Module assignment** is the per-org gate: `npx tsx --require ./scripts/lib/server-only-shim.cjs
+  scripts/insights/assign-insights-module.ts --org=<organization_id> [--apply]` (dry-run by default; goes
+  through `enableClientPortalModule`, audit + outbox, idempotent). Without `insights_v1` the org is `404`
+  for everyone, internal actors included.
+- **Canary by lane (no secrets in docs):** with the gateway consumer's token (internal binding riding the
+  SEO provider config), call ecosystem `catalog` → `editions` (create, `202`) → same request again (`202`,
+  `idempotent: true`) → same key with another `depth` (`409 idempotency_conflict`) → `editions/<id>?include=evidence`
+  → an org without the module (`404`). The app lane was exercised with the `agent-client` persona
+  (`client_executive`): the client sees `evidence`/`plan` as `null` until issued — by design.
+- **Gateway `efeonce-mcp`:** version 1.5.0, 47 tools, 8 scope classes (`read`, `globe.read`, `hiring.read`,
+  `globe.credits.funding.ensure`, `seo.write`, `identity.write`, `client_services.write`, `insights.write`).
+  Provider `greenhouse-insights` federates the 4 tools; reads use `efeonce.mcp.read`, `create_insight_edition`
+  requires `efeonce.mcp.insights.write` (created in Entra 2026-09-15 on the MCP resource app; **no client
+  carries it yet ⇒ `insufficient_scope`** until a governed grant). Native-authority policies for the 4 tools are
+  `unsupported` (fail-closed). Read-only canary: `scripts/greenhouse-insights-canary.mjs` in that repo.
+- **Known limits:** canary evidence has **0 facts** (synthetic org has no ICO snapshots in 2026-07/08 → 4
+  `no_data` rejections; the honest-absence path is what got verified, not a report with real figures);
+  `issue` fails closed `not_ready` until TASK-1846; `renderableOutputs` is `[]`; `plan.limits` repeats
+  «ico: sin datos.» once per rejection (dedupe owed by TASK-1846); no PDF/web/share/email/schedule exists.
+- **Still missing to move TASK-1845 to `complete`:** a `migrate:down` rehearsal on the shared instance
+  (keep `pgmigrations.run_on` and the editions intact) and a `tools/list` through a served MCP session with a
+  human token (evidence of 47 tools + the `efeonce-insights` skill from a real client). Until then the honest
+  state is *code complete + in production, closure pending*.
+
 ## Verification that counts
 
 `pnpm vitest run --project unit src/lib/efeonce-insights src/lib/api-platform/resources/insights-lanes.test.ts src/mcp`

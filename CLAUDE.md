@@ -48,6 +48,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Secret hygiene / rotación | `greenhouse-secret-hygiene` | inline (Secret Manager Hygiene) |
 | Gcloud auth | `greenhouse-gcloud-auth-playwright` | `gcloud-auth-playwright.md` |
 | Sitio público (landings/posicionamiento/roadmap/blogposts agentic) | `efeonce-public-site-wordpress` + `seo-aeo`/`commercial-expert` | `docs/public-site/` + `architecture/agent-invariants/PUBLIC_SITE_KINSTA_ACCESS_AGENT_INVARIANTS.md` (`ssh-check` primero; API y SSH son carriles independientes) + `docs/operations/public-site-content-factory/AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md` (private por defecto; publish con autorización, snapshot, rollback y QA live) |
+| Efeonce Insights (`src/lib/efeonce-insights/**`, `greenhouse_insights`, lanes `/api/platform/*/insights/**`, tools MCP `*_insight*`) | `efeonce-insights` (+ `efeonce-mcp-platform` para federar) | `architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`: ventanas `[start,end)` IANA; idempotencia `(org,key)`+hash; adapters SÓLO sobre readers dueños, NUNCA client-portal; snapshot/plan inmutables; emitir exige outputs validados + gate humano; flags multi-gate |
 | Licitaciones / RFP-RFQ · **Artifact Composer** (motor de composición domain-free; catálogos deck/carrusel) + aggregate `Proposal` (`src/lib/commercial/tenders/**` → `artifact-composer/**`) | `greenhouse-public-private-tenders` (+ `commercial-expert`) | `architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md` |
 | Informes (HTML→PDF) | `report-studio` | `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` |
 | **Decks / presentaciones / láminas** (cualquier deck: oferta a comité · pitch · QBR · board · readout · webinar) — **domain-free** | `deck-studio` (+ `copywriting`/`dataviz-design`/`typography-design`) | inline (craft del oficio; la skill de licitaciones es **consumer**, no dueña) |
@@ -91,7 +92,7 @@ Vercel/`ops-worker`/Cloud Run directo).
 - **PostgreSQL** (Cloud SQL `greenhouse-pg-dev`, Postgres 16, `us-east4`) — OLTP, workflows mutables, runtime-first
 - **BigQuery** (`efeonce-group`) — raw snapshots, conformed analytics, marts, histórico
 - Patrón de lectura: **Postgres first, BigQuery fallback**
-- Schemas PostgreSQL activos: `greenhouse_core`, `greenhouse_serving`, `greenhouse_sync`, `greenhouse_payroll`, `greenhouse_finance`, `greenhouse_hr`, `greenhouse_crm`, `greenhouse_delivery`, `greenhouse_ai`
+- Schemas PostgreSQL activos: `greenhouse_core`, `greenhouse_serving`, `greenhouse_sync`, `greenhouse_payroll`, `greenhouse_finance`, `greenhouse_hr`, `greenhouse_crm`, `greenhouse_delivery`, `greenhouse_ai`, `greenhouse_insights`
 
 ### BigQuery DML Struct Timestamp Hard Rules (ISSUE-082 / TASK-941)
 

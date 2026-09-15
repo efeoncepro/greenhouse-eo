@@ -1,6 +1,7 @@
 # Greenhouse Client Portal Domain Architecture V1
 
-> **Version:** 1.6
+> **Version:** 1.7
+> **Updated:** 2026-09-15 por Claude — V1.7: módulo per-ORG `insights_v1` (Efeonce Insights, TASK-1845) como puerta facturable de un dominio hermano; regla de tres planos y 404 anti-oracle; data source `insights.editions` (cardinalidad 21).
 > **Created:** 2026-05-07 por Claude (Opus 4.7)
 > **Updated:** 2026-08-09 por Claude (Opus 5) — V1.6: el carril de acceso queda cableado y descrito como es. §12.1 menú module-driven en runtime + lint `no-untokenized-business-line-branching` en `error` (TASK-1675/1680), §12.2 la forma real del guard (llave = organización, `redirect()` fuera del `try`, 3 vistas base, un viewCode por ruta — TASK-1679 / ISSUE-146), §6 allowlist de vistas base en `hasViewCodeAccess`, §13 las 2 señales del carril de acceso, §16 tres reglas anti-regresión nuevas.
 > **Updated:** 2026-05-13 por Claude (Opus 4.7) — V1.5 (§11 cascade contract canonizado post arch-architect review TASK-828: G-1 instantiate inline, G-2 audit+signal inmediato, G-3 filter upstream, G-5 sourceRefJson canónico, +2 reliability signals, +listActiveAssignmentsForOrganization reader). V1.4 (§5.5 seed contract, 2026-05-12). V1.3 (§5.2 + §5.3 type/FK drift). V1.2 (§5.1 TASK-824). V1.1 (§3.1 + §3.2 TASK-822).
@@ -9,6 +10,43 @@
 > **Supersedes:** este spec NO supersede `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` V3.0 — coexisten: V3.0 describe la experiencia funcional y los 16 cards Creative Hub; este V1 (Domain) canoniza la **estructura del dominio** y el modelo de módulos on-demand. V3.0 sigue siendo lectura obligatoria para entender qué se compone.
 
 ---
+
+## Delta 2026-09-15 — módulo `insights_v1`: la puerta per-ORG de Efeonce Insights (TASK-1845)
+
+Efeonce Insights (`src/lib/efeonce-insights/**`, schema `greenhouse_insights`; contrato en
+`EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`) NO es una superficie del portal todavía (la página la construye
+TASK-1849): es un dominio hermano que usa el catálogo de módulos del portal **como entitlement facturable
+por organización**. La migración `20260915100154428_task-1845-insights-foundation.sql` seedea en
+`greenhouse_client_portal.modules`:
+
+| `module_key` | label interno | label cliente | `applicability_scope` | `tier` | `view_codes` | `capabilities` | `data_sources` | `pricing_kind` |
+|---|---|---|---|---|---|---|---|---|
+| `insights_v1` | Efeonce Insights (informes por edición: deck, A4 y web) | Insights | `cross` | `addon` | `[]` | `[]` | `['insights.editions']` | `addon_fixed` |
+
+Consecuencias que se desprenden del seed, no de una intención:
+
+- **`view_codes=[]` ⇒ ningún ítem de menú ni page guard** hasta TASK-1849. Asignar el módulo hoy habilita
+  los lanes `api/platform/app/insights/**` y `api/platform/ecosystem/insights/**` + las tools MCP, no una
+  pantalla.
+- **`capabilities=[]` ⇒ el grant implícito de §8 no aplica.** Las 4 capabilities `insights.*` se conceden
+  por rol en `src/lib/entitlements/runtime.ts` (ver `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+  → §Efeonce Insights). El módulo es la puerta; la capability es el permiso dentro de una org habilitada.
+- **Asignación:** exclusivamente por `enableClientPortalModule` (INSERT + audit + outbox en una transacción,
+  valida `applicability_scope` contra las business lines de la org, invalida el cache del resolver).
+  Script operativo: `scripts/insights/assign-insights-module.ts --org=<id> [--reason=…] [--apply]`
+  (dry-run por defecto; idempotente). **NUNCA** por SQL.
+- **Tres planos en cada command** (`assertInsightsAccess`, `src/lib/efeonce-insights/authz.ts`): módulo
+  `insights_v1` asignado a la org + capability `insights.*` del actor + audiencia permitida (`internal`
+  prohibida al cliente). **Org sin módulo ⇒ `not_found` 404 anti-oracle**, no 403: un consumer externo no
+  puede enumerar qué organizaciones tienen Insights contratado. Verificado en staging 2026-09-15 (org
+  sintética con módulo → 202; org sin módulo → 404).
+- **Data source `insights.editions`** en `src/lib/client-portal/dto/reader-meta.ts` + `data-sources/parity.ts`
+  (cardinalidad 21). El portal consume SOLO el reader del dominio (`readers/projection.ts`, que oculta
+  evidencia y plan al cliente hasta que la edición está EMITIDA), nunca las tablas — y el dominio Insights,
+  a la inversa, tiene prohibido importar `@/lib/client-portal/*` (hoja del DAG, §16).
+
+Estado 2026-09-15: en producción (release `9c094688309d`); `insights_v1` asignado sólo a la org sintética
+Greenhouse Demo en la instancia compartida. Emitir sigue cerrado (`not_ready`) hasta TASK-1846.
 
 ## Delta 2026-05-13 — TASK-827 Composition Layer cerrada
 

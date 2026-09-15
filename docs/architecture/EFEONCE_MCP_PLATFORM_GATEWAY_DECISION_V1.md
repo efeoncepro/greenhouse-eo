@@ -696,6 +696,35 @@ provider nuevo se reporta en el status en el MISMO PR (`MCP_TOOL_SURFACE_INVARIA
 interactivo). Ningún `apply` se ha ejecutado por este canal. La certificación de superficie no es customer
 access ni cierre de EPIC-046.
 
+### Delta 2026-09-15 — `efeonce.mcp.insights.write`: primer dominio nuevo federado desde el manifiesto (TASK-1845, gateway `1.5.0`)
+
+`TASK-1845` federó el dominio `insights` del MCP interno de Greenhouse: `get_insights_catalog`, `list_insight_editions`,
+`get_insight_edition` (lecturas, scope base) y `create_insight_edition` (write, clase propia
+`efeonce.mcp.insights.write`). Provider `greenhouse-insights` (`src/providers/greenhouse-insights.ts`), adapter tonto
+sobre `/api/platform/ecosystem/insights/**` que **cabalga la config del provider SEO** (`GreenhouseSeoConfig`: misma
+lane, misma service identity, mismo interruptor `GREENHOUSE_SEO_PROVIDER_ENABLED`; cero variables nuevas en
+`deploy.yml`), como `greenhouse-skills` y `greenhouse-identity`. PR #12 → `main` `cad57b31d`, `1.4.0` → **`1.5.0`**
+(aditivo), superficie **43 → 47 tools**, `surface-baseline.json` regenerado, `pnpm check` 184/184; las cuatro
+entradas en `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` con razón; policy nativa `unsupported`
+(`insights_native_policy_missing`) para las cuatro.
+
+**Por qué clase propia y no `seo.write`.** La regla del punto 7 —un scope por clase de blast-radius— corta por
+dominio, no por gasto: crear una edición no compromete presupuesto del proveedor ni mueve dinero, pero produce un
+artefacto con ciclo de vida propio (snapshot sellado, plan congelado, transiciones append-only) que después puede
+emitirse a un cliente. Meterla en `seo.write` haría que un token con autoridad para seguir keywords pudiera encargar
+informes, y viceversa. El scope responde «¿este cliente puede pedir esta clase?»; `insights.edition.create` sobre una
+organización con `insights_v1` responde «¿este actor, sobre esta org?» y lo decide Greenhouse por llamada.
+
+**Estado.** Desplegado el 2026-09-15 21:46Z (run `35027446001`, revisión `efeonce-mcp-gateway-00053-dsk` al 100 %,
+front door PRM 200 / `/health` 200 / `/mcp` sin token 401); canary del provider real contra staging verde
+(`scripts/greenhouse-insights-canary.mjs`: catálogo, lista, detalle con evidencia, deny 404 anti-oracle; nunca crea).
+Scope creado el mismo día en la app recurso de Entra (Admin; round-trip 6→7, cliente PKCE compartido intacto) y en
+paridad en Greenhouse. **Ningún cliente lo porta**: `create_insight_edition` responde `insufficient_scope` hasta un
+grant/consentimiento gobernado, y no hay cliente de exchange RFC 8693 (a diferencia de `client_services.write`).
+Pendiente declarado: `tools/list` desde una sesión MCP con token humano. Emitir y retirar no existen en el ecosystem
+por diseño; emitir en Greenhouse sigue cerrado (`not_ready`) hasta `TASK-1846`. Contrato del dominio:
+`EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`; MCP interno: `GREENHOUSE_MCP_ARCHITECTURE_V1.md` §26.
+
 ## References
 
 - [MCP Specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28)
@@ -750,3 +779,9 @@ recurso de Entra (consentimiento Admin) y **no** se agregó al cliente PKCE comp
 intercambio RFC 8693 por el cliente confidencial `efeonce-mcp-client-services`, donde el lane App relee la
 capability de la persona en cada llamada; cerrar un `insufficient_scope` de estas tools ampliando el cliente
 compartido abriría la habilitación de módulos a todo el tenant.
+
+**Delta 2026-09-15 (TASK-1845).** `efeonce.mcp.insights.write` repite la postura: existe en la app de recurso de
+Entra (consentimiento Admin, 2026-09-15) y **no** se agregó al cliente PKCE compartido ni a ningún cliente. Su vía
+legítima es un consentimiento/grant gobernado por cliente; cerrar el `insufficient_scope` de `create_insight_edition`
+ampliando el cliente compartido permitiría encargar ediciones de Insights a cualquier organización con módulo desde
+cualquier persona del tenant.

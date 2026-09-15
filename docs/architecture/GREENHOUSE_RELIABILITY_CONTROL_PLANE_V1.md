@@ -1365,3 +1365,24 @@ Date-math segura (timestamptz − timestamptz vía `make_interval`, nunca `EXTRA
 - `growth.ai_visibility.public_delivery_inconsistent` (data_quality, steady=0) — invariante `public_delivery_state='ready' ⟹ existe snapshot publicable`; una fila `ready` sin snapshot es corrupción del estado materializado.
 
 DB vacía / pre-launch → steady ok. Error de lectura → degradación honesta (severity unknown). Spec: `docs/tasks/complete/TASK-1245-growth-ai-visibility-public-run-status-delivery-orchestrator.md`.
+
+## Delta 2026-09-15 — módulo `insights` (Efeonce Insights, TASK-1845)
+
+Nuevo módulo de reliability **`insights`** (label `Efeonce Insights`, domain `platform`, incidentDomainTag `insights`) registrado en `registry.ts` y en la union `ReliabilityModuleKey` (`src/types/reliability.ts`). Sujeto: la biblioteca de entregas congeladas por organización y ventana (`greenhouse_insights`), cuya generación corre por fases síncronas `collecting → composing → validating → ready_for_review`.
+
+- **APIs vigiladas:** `/api/platform/app/insights/editions` (app lane) y `/api/platform/ecosystem/insights/editions` (ecosystem/MCP lane). Sin rutas de portal (`routes: []`) ni smoke lane todavía: la página del portal es TASK-1849.
+- **Dependencias declaradas:** `greenhouse_insights.insight_reports`, `insight_editions`, `insight_edition_transitions`, `insight_evidence_snapshots`, `insight_editorial_plans`, `greenhouse_client_portal.module_assignments (insights_v1)` y `greenhouse_sync.outbox_events (insights.*)`.
+- **`expectedSignalKinds`:** `data_quality` + `lag`. `filesOwned`: `src/lib/efeonce-insights/**` + el reader de señales.
+
+2 señales (reader `src/lib/reliability/queries/insights-edition-signals.ts`, wired en `get-reliability-overview.ts` como source `insightsEditionSignals`), ambas steady = 0:
+
+| Signal | Kind | Qué cuenta | Severidad |
+|---|---|---|---|
+| `insights.editions.failed_recent` | data_quality | ediciones en `state='failed'` con `updated_at` en los últimos 7 días. Cada una lleva fase y código en su historial: un valor > 0 es una decisión humana pendiente (recuperar o encargar de nuevo), no ruido | 0 → `ok` · 1–4 → `warning` · ≥5 → `error` |
+| `insights.editions.stuck_generation` | lag | ediciones en `collecting`/`composing`/`validating` sin transición hace más de 30 minutos (la fase no cerró: proceso caído o timeout; se recupera desde la fase) | 0 → `ok` · 1–2 → `warning` · ≥3 → `error` |
+
+Cuando TASK-1846 mueva la generación al worker, el umbral de `stuck_generation` pasa a ser el del job. Si la consulta falla, el reader degrada honesto: devuelve sólo `failed_recent` con `severity='unknown'` y `captureWithDomain(error, 'insights', …)`. DB vacía / flags `INSIGHTS_*_ENABLED` OFF → ambas `ok`.
+
+**Incident mapping (`incident-mapping.ts`):** keywords `insight_edition`, `insight_report`, `greenhouse_insights`, `insights.edition`, `efeonce insights`; prioridad de tie-break **17** — por encima de `growth`/`knowledge` (16), porque Insights consume readers de growth/delivery pero un incidente `insights_*` es suyo, y por debajo de `hiring`/`workforce` (18). Observabilidad: dominio `insights` en `captureWithDomain`.
+
+Contrato del dominio: `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` (§10 gates, §14 estado). Estado 2026-09-15: en producción (release `9c094688309d`), `INSIGHTS_GENERATION_ENABLED=true` en Vercel Production y staging; emisión e IA OFF.

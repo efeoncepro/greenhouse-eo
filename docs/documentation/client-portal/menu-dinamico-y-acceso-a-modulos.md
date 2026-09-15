@@ -1,9 +1,9 @@
 # Menu dinamico y acceso a modulos del Portal Cliente
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-05-13 por Claude (TASK-827)
-> **Ultima actualizacion:** 2026-09-10 por Claude (TASK-1852: los modulos incluidos en el servicio se declaran y validan al escribir los terminos comerciales)
+> **Ultima actualizacion:** 2026-09-15 por Claude (TASK-1845: modulo `insights_v1` de Efeonce Insights — puerta por organizacion sin pagina todavia)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md), [GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md)
 
 ---
@@ -159,6 +159,10 @@ Cuando comercial vende un modulo a un cliente:
 Tambien se puede activar automaticamente via **cascade desde el ciclo de vida del cliente** (TASK-828, pendiente): cuando se completa el onboarding de un cliente, los modulos que su `engagement_commercial_terms` declara como `bundled_modules[]` se materializan solos.
 
 > **Delta 2026-09-10 (TASK-1852):** desde hoy los modulos incluidos en un servicio **si se declaran** al registrar sus terminos comerciales (`bundledModules`), y Greenhouse rechaza cualquier clave que no exista activa en el catalogo. Berel quedo con `seo_v2` + `ai_visibility_v1` y Sky con `creative_hub_globe_v1`. Esa declaracion es la unica evidencia de "modulo contratado" que usa la habilitacion de servicios; la asignacion al cliente sigue siendo un paso aparte (manual o, cuando exista, el cascade de TASK-828). La pagina `/creative-hub` de Sky aun no existe: la construye TASK-1857.
+
+> **Delta 2026-09-15 (TASK-1845):** existe un modulo nuevo en el catalogo, **Insights** (`insights_v1`, addon transversal a todas las lineas de negocio). Es distinto a los demas: **no agrega ninguna pagina ni enlace al menu todavia** (la pantalla del portal llega con TASK-1849). Lo que enciende es la posibilidad de que esa organizacion encargue, revise y lea **informes por edicion** (deck, A4 y web) por la API y por los agentes MCP de Efeonce. Si una organizacion no lo tiene asignado, cualquier intento de usar Insights responde "no existe" (404), a proposito: ni un agente externo puede adivinar que clientes lo contrataron. Se asigna igual que cualquier modulo (Admin Center o el comando canonico); hoy solo lo tiene una organizacion sintetica de pruebas. Emitir una edicion al cliente sigue apagado hasta TASK-1846.
+>
+> Detalle tecnico: [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md → Delta 2026-09-15](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md) y [efeonce-insights-dominio-ediciones.md](../insights/efeonce-insights-dominio-ediciones.md).
 
 ---
 

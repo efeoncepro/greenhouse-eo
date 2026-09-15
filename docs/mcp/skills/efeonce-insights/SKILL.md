@@ -87,6 +87,19 @@ frozen and hashed; both are immutable. Every figure in the plan references a fac
   human/commercial decision (client service enablement), not something to retry.
 - `service_unavailable` on create means the generation flag is off in this runtime. Report it and stop.
 
+## Responses you must interpret correctly
+
+| You see | It means | What to do |
+| --- | --- | --- |
+| `service_unavailable` with code `generation_disabled` on create | The generation flag is off in this runtime | Report it and stop; a human enables it per runtime |
+| `insufficient_scope` on `create_insight_edition` | Your MCP client does not carry the write scope this tool requires; reads are unaffected | Do not retry with another token; ask a human for a governed grant |
+| A catalog module with `available: false` and `module_not_assigned` | That producer module is not enabled for the organization | Leave it out of `modules`; enabling it is a commercial decision |
+| Same `idempotencyKey` and same request answered again with `idempotent: true` | Safe replay: you got the existing edition, nothing was duplicated | Continue with that edition |
+| Same `idempotencyKey` with a different request → conflict | The key is already bound to another request | Use a new key for a genuinely new request |
+| `not_found` for an organization you believe exists | Either it does not exist for your binding or it has no Insights module | Do not infer anything else; report it as not available |
+| `evidence` and `plan` come back `null` for a client-audience read | The edition is not issued yet; clients only see evidence and plan of issued editions | Say the edition is in review and figures are not yet visible for the client |
+| Issuing answers `not_ready` | Rendering of the requested outputs is not connected yet; issuing is closed by design | Do not work around it |
+
 ## Recipes
 
 Monthly SEO + ICO edition for a client, previous month comparison:

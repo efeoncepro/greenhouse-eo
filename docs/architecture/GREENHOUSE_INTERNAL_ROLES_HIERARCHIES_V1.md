@@ -646,6 +646,10 @@ Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_re
 
 **Reflejo canonical antes de citar cualquier rol** (TASK-947 follow-up 2026-05-29): cuando un agente o spec mencione un rol, DEBE verificarlo primero contra el snapshot canonical de abajo (single source of truth: `src/config/role-codes.ts`, `ROLE_CODES` const). El guard `capability-grant-coverage.test.ts` atrapa el bug en CI cuando hay capability sin grant, pero el daño documental (specs/CLAUDE.md/AGENTS.md confusos) NO lo atrapa el guard. Esta regla cubre el lado documental.
 
+#### Delta 2026-09-15 — grants `insights.*` (TASK-1845)
+
+Cuatro capabilities nuevas del módulo `insights` con grant en `runtime.ts` en el mismo commit que el seed: `insights.report.read` (read) → `efeonce_admin`, `efeonce_account`, `efeonce_operations` (tenant) y los tres roles `client_*` (own); `insights.edition.create` (create) → los tres internos anteriores (tenant) + `client_executive`/`client_manager` (own); `insights.edition.review` (update) → `efeonce_admin`, `efeonce_account`, `efeonce_operations`; `insights.edition.issue` (approve) → sólo `efeonce_admin` y `efeonce_account`. Ningún rol fantasma: la matriz usa exclusivamente los 14 `ROLE_CODES` de abajo. La puerta real es el módulo per-ORG `insights_v1` (org sin módulo ⇒ 404 aunque el rol tenga las 4). Matriz completa: `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` → §Efeonce Insights.
+
 #### ROLE_CODES vigentes (snapshot 2026-06-10, V1.1 canonical)
 
 **14 roles reales** — son los ÚNICOS valores legítimos para `roleCodes`/`primaryRoleCode` en `TenantContext` / `TenantEntitlementSubject`. Cualquier mención fuera de esta tabla es bug documental. Fuente: `src/config/role-codes.ts` + `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` §"Role codes internos actuales" + `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`. (TASK-1072 agregó `designer` → 13→14.)

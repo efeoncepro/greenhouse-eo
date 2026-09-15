@@ -224,6 +224,7 @@ pnpm test:e2e:staging -- tests/e2e/smoke/finance-cash-out-bank-reflection.spec.t
 | Script finds no bypass entry  | `protectionBypass` empty in API response   | SSO Protection may be disabled — verify in Vercel project settings                      |
 | Bypass works but auth fails   | Agent user not in PG                       | Verify `user-agent-e2e-001` exists in `greenhouse_core.users` on staging DB             |
 | Staging serves OLD code       | Alias `env-staging` pinned (ISSUE-123)     | Tooling auto-resolves latest deployment; NEVER "fix" with `vercel alias set` (see below) |
+| Env var added but runtime ignores it (e.g. flag still `disabled`/503) | Deployment was built BEFORE `vercel env add` — Vercel freezes env vars at build time | `vercel redeploy <deployment-url> --scope efeonce-7670142f` and re-verify against the NEW deployment; verified 2026-09-15 with `INSIGHTS_GENERATION_ENABLED` in `staging` (and again in Production). A docs-only redeploy can be canceled by the Ignored Build Step — see release skill gotcha #11 |
 
 ## 10. Delta 2026-07-18 — ISSUE-123: resolución por deployment vigente (el alias ya no es la verdad)
 

@@ -1,5 +1,9 @@
 # TASK-1875 — Efeonce Insights: vista web compartida renderizada en Think (efeonce-think)
 
+## Delta 2026-09-15
+
+- **Rollout 2026-09-15 (TASK-1845):** la foundation de la que deriva `InsightWebModelV1` (contratos `EditorialPlanV1`/`ChartSpecV1`/`EvidenceFactV1` y la proyección por audiencia) ya corre **en producción** con `INSIGHTS_GENERATION_ENABLED=true` en staging y producción (emisión e IA OFF); ediciones reales `EO-INS-000012/13` (staging) y `EO-INS-000014` (producción) quedaron `ready_for_review`. El gateway `efeonce-mcp` 1.5.0 federa las 4 tools (47 tools, 8 clases de scope) y el scope `efeonce.mcp.insights.write` existe en Entra (sin cliente que lo porte ⇒ `insufficient_scope` al crear). Detalle: arquitectura §14. Sigue bloqueada por TASK-1848 (resolver público); no hay edición emitida ni grant, así que el primer render se hace sobre fixture del modelo.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

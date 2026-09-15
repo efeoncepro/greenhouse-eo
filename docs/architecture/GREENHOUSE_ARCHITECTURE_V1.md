@@ -1,5 +1,14 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-09-15 — Efeonce Insights es dominio canónico con arquitectura propia (TASK-1845)
+
+- Nuevo dominio `Efeonce Insights`: biblioteca de informes por edición (deck, A4 y web) generados por fases sobre la evidencia SEO/AEO/ICO de cada organización, con snapshot sellado y plan editorial congelados, gate humano para emitir y entitlement per-ORG `insights_v1`.
+- Fuente canónica:
+  - `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` (+ `EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md`, EPIC-045)
+- Placement: `src/lib/efeonce-insights/**` (el path lleva marca porque `insights` a secas colisiona con Nexa Insights), schema `greenhouse_insights`, lanes `api/platform/{app,ecosystem}/insights/**`, tools MCP `*_insight*`, módulo de reliability `insights`.
+- Regla arquitectónica: los adapters de evidencia consumen SOLO readers dueños de cada dominio (SEO/AEO/ICO) y nunca `@/lib/client-portal/*`; el portal cliente consume el reader de proyección de Insights, nunca sus tablas.
+- Estado: en producción desde el release `9c094688309d` con generación habilitada; emisión (TASK-1846), share/delivery (TASK-1848) y portal (TASK-1849) pendientes.
+
 ## Delta 2026-04-25 — API Platform ahora tiene arquitectura canónica propia
 
 - Greenhouse ya no debe tratar sus contratos API como una suma de rutas sueltas o como documentación repartida solo en `docs/api/*`.

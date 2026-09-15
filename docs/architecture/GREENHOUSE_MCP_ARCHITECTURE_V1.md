@@ -853,3 +853,54 @@ decide es Greenhouse, releyendo sus derechos en cada llamada.
   `apply` se ha ejecutado por este canal. Contrato del dominio:
   `GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md` §Delta 2026-09-10 y
   `docs/operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md`.
+
+## 26. Delta 2026-09-15 — TASK-1845: dominio `insights` en el MCP interno y federación en el gateway `1.5.0`
+
+§25 federó escrituras con autoridad humana delegada por exchange. TASK-1845 agrega el primer **dominio nuevo** del
+manifiesto desde que existe (§22): `insights`, con una escritura que **no gasta proveedor** y cuya autoridad es la
+del binding, releída por Greenhouse en cada llamada.
+
+- **Manifiesto interno:** `GreenhouseMcpToolDomain` suma `insights`. Cuatro tools: `get_insights_catalog`,
+  `list_insight_editions`, `get_insight_edition` (lecturas) y `create_insight_edition` (`writes: true`,
+  `spendsProviderBudget: false`). El artefacto `tool-manifest.generated.json` quedó en **51 tools**
+  (`manifestHash` `4089283477991d676a30c4123e1c5c55e54f392d1c530d38d425a64555d525ac`); la cifra se lee del artefacto,
+  nunca de este texto. Las cuatro delegan en el lane ecosystem `/api/platform/ecosystem/insights/**`
+  (`src/lib/api-platform/resources/ecosystem-insights.ts`): el servidor sigue siendo downstream del lane.
+- **Manual servido (§23):** `efeonce-insights` (`audience: internal`, `appliesTo` las cuatro tools), declarado en
+  `skill-manifest.ts` y publicado en `docs/mcp/skills/efeonce-insights/SKILL.md`; el test de fuga sigue aplicando
+  (sin task ids, rutas de repo, UUIDs ni secretos en el cuerpo).
+- **Federación (`efeonce-mcp`):** provider `greenhouse-insights` (`src/providers/greenhouse-insights.ts`) que
+  **cabalga la config del provider SEO** (`GreenhouseSeoConfig`: misma lane ecosystem, misma service identity —
+  consumer `EO-SPK-0004` / binding `EO-SPB-0004` de scope `internal`— y el mismo interruptor
+  `GREENHOUSE_SEO_PROVIDER_ENABLED`), igual que `greenhouse-skills` y `greenhouse-identity`: cero variables nuevas en
+  `deploy.yml`. Las cuatro entradas viven en `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` con razón. La creación viaja como
+  command del lane con header `idempotency-key` `insights-create-<idempotencyKey del encargo>`, así que un reintento
+  del gateway sobre un timeout no duplica la edición. PR #12 → `main` `cad57b31d`, versión `1.4.0` → **`1.5.0`**
+  (aditivo), superficie **43 → 47 tools** (`surface-baseline.json` regenerado), `pnpm check` 184/184.
+- **Scope:** las tres lecturas van con el scope base `efeonce.mcp.read`; `create_insight_edition` exige la clase
+  propia **`efeonce.mcp.insights.write`** («crear una edición de Efeonce Insights»; `INSIGHTS_WRITE_SCOPE` en
+  `src/config.ts` del gateway). Es la **octava clase** del gateway (read, globe.read, hiring.read,
+  globe.credits.funding.ensure, seo.write, identity.write, client_services.write, insights.write) y la quinta de
+  escritura en paridad en `src/lib/auth-server/oauth/scopes.ts` (`EFEONCE_MCP_WRITE_SCOPES` + snapshot del test). Un
+  scope por clase de blast-radius, nunca por capability (§18): la autoridad real es `insights.edition.create` sobre
+  una organización con `insights_v1` asignado, y la decide Greenhouse.
+- **Policy nativa:** las cuatro tools son `unsupported` para el emisor nativo/v2
+  (`nativeUnsupportedReason: insights_native_policy_missing`, `src/auth/tool-policy.ts`): fail-closed por razón
+  explícita, no por olvido. El contexto interno v2 sigue delegando sólo `growth.seo.observation.read` (D9).
+- **Entra:** el scope `efeonce.mcp.insights.write` se creó el 2026-09-15 en la app recurso «Efeonce MCP Resource»
+  (type Admin); readback 7 scopes con los 6 previos intactos; el cliente PKCE compartido no se tocó. **Ningún cliente
+  lo porta**, así que `create_insight_edition` responde `insufficient_scope` hasta un consentimiento/grant gobernado
+  (misma postura que `seo.write` y `client_services.write`: nunca se cierra ampliando el cliente compartido).
+- **Despliegue:** 2026-09-15 21:46Z, run `35027446001` success, revisión Cloud Run `efeonce-mcp-gateway-00053-dsk`
+  al 100 % del tráfico (`Ready=True`); front door `/.well-known/oauth-protected-resource` 200, `/health` 200, `/mcp`
+  sin token 401. Canary del provider real contra staging: `scripts/greenhouse-insights-canary.mjs` (catálogo, lista,
+  detalle con evidencia y deny 404 anti-oracle; **nunca crea**). Receta en
+  `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md` §Provider Greenhouse-Insights.
+- **Estado honesto:** federado, desplegado y verificado en superficie y por canary del provider. Falta el
+  `tools/list` de una sesión MCP servida con token humano (evidencia de 47 tools + manual `efeonce-insights` desde un
+  cliente real) — pendiente declarado para el cierre de TASK-1845. Emitir sigue bloqueado hasta TASK-1846
+  (`issue` falla cerrado `not_ready`), y el ecosystem no emite ni retira por diseño.
+- **Contrato del dominio:** `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`, lanes en
+  `docs/api/GREENHOUSE_API_PLATFORM_V1.md` §Efeonce Insights, manual
+  `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, invariantes en
+  `agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §TASK-1845.
