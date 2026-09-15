@@ -468,11 +468,16 @@ esta org?"* y ya se enforcea abajo: binding `internal` en el lane + entitlement 
 command. Corolario operativo: **federar la escritura N+1 de un dominio que ya tiene su scope no requiere tocar
 Entra**, y por lo tanto no puede quedar bloqueada por eso.
 
-Con esto el gateway declara **siete** scopes cuando todos los providers gateados están activos: `efeonce.mcp.read`, `efeonce.mcp.globe.read`,
+Con esto el gateway declara **ocho** scopes cuando todos los providers gateados están activos: `efeonce.mcp.read`, `efeonce.mcp.globe.read`,
 `efeonce.mcp.globe.credits.funding.ensure` (sólo con `globeCreditFunding.enabled` ON) y `efeonce.mcp.seo.write`
 (sólo con `greenhouseSeo.enabled` ON), `efeonce.mcp.hiring.read` (sólo con `greenhouseHiring.enabled` ON),
-`efeonce.mcp.identity.write` para la lane delegada y `efeonce.mcp.client_services.write` (sólo con
-`greenhouseClientServices.enabled` ON; TASK-1852, registrado en Entra con consentimiento Admin el 2026-09-10).
+`efeonce.mcp.identity.write` para la lane delegada, `efeonce.mcp.client_services.write` (sólo con
+`greenhouseClientServices.enabled` ON; TASK-1852, registrado en Entra con consentimiento Admin el 2026-09-10) y,
+desde 2026-09-15, `efeonce.mcp.insights.write` (sólo con `greenhouseInsights.enabled` ON; TASK-1845, exigido
+únicamente por `create_insight_edition`; las tres lecturas de Insights van con el scope base). Este último está
+declarado en el gateway `v1.5.0` y en el registro de paridad de Greenhouse, pero **no existe todavía en Entra**:
+crearlo es una mutación externa que requiere autorización explícita del operador; hasta entonces la tool de
+escritura falla cerrada con `insufficient_scope`.
 
 El cliente público compartido `32617b87-e7ef-493a-838f-1ff3f0213b93` solicita base + Globe read + Hiring read.
 El cliente canario base-only `66985833-14e9-438e-add4-b740e84e9a64` conserva únicamente base + Globe read y existe

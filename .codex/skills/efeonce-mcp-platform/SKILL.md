@@ -135,12 +135,16 @@ The relying-party boundary is fixed by
   which does not certify external client eligibility or canaries (`TASK-1832`). Determine those from
   current canonical readers and the rollout record, not from the presence of an issuer or internal pilot.
   No vendor gets provisioned: WorkOS was discarded by the native ADR.
-  The gateway enforces **seven** scope classes: base `efeonce.mcp.read`, Globe reader
+  The gateway enforces **eight** scope classes: base `efeonce.mcp.read`, Globe reader
   `efeonce.mcp.globe.read`, the flag-gated internal write `efeonce.mcp.globe.credits.funding.ensure`, the
   flag-gated SEO write `efeonce.mcp.seo.write` (TASK-1308), the flag-gated identity write
-  `efeonce.mcp.identity.write` (TASK-1837), the flag-gated Hiring reader `efeonce.mcp.hiring.read`, and — since
-  2026-09-10 — the flag-gated client-services write `efeonce.mcp.client_services.write` (TASK-1852; required by
-  all three enablement tools, preview included).
+  `efeonce.mcp.identity.write` (TASK-1837), the flag-gated Hiring reader `efeonce.mcp.hiring.read`, since
+  2026-09-10 the flag-gated client-services write `efeonce.mcp.client_services.write` (TASK-1852; required by
+  all three enablement tools, preview included), and — since 2026-09-15 — the flag-gated Insights write
+  `efeonce.mcp.insights.write` (TASK-1845; only `create_insight_edition`; the three Insights readers ride the
+  base scope). The Insights scope is declared in the gateway (`v1.5.0`) and in Greenhouse's parity registry
+  (`src/lib/auth-server/oauth/scopes.ts`) but NOT yet created in Entra: the write tool fails closed
+  (`insufficient_scope`) until an operator authorizes that external mutation.
   The PRM intentionally announces only the base scope; read the others from the exact 403 challenge and policy,
   never from a cached catalog count.
   Scope granularity is **one scope per blast-radius class, never one per capability**: a per-capability list turns

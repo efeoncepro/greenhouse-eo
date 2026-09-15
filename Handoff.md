@@ -10,19 +10,7 @@ blend raster `luminosity` `0.72` verificado. Templates: `efeonce-advertising-cre
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
 no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
 
-**Efeonce Insights — TASK-1845 code complete (2026-09-15, Claude, `develop`, sin push):** Slices 1–4 en
-`e6e8a5dfe`/`a21e424fa`/`ca17c93da`/`12f985d8a`: schema `greenhouse_insights` aplicado y verificado
-(prefijo canónico por decisión del operador), dominio `src/lib/efeonce-insights/`, adapters SEO/AEO/ICO,
-plan editorial + IA acotada, commands/readers, lanes app+ecosystem, 4 tools MCP, skill `efeonce-insights`
-(servida + espejada), módulo `insights` de reliability. **Rollout pendiente:** flags `INSIGHTS_*` OFF en
-todos los targets, `insights_v1` sin asignar a ninguna org, canary staging (dos orgs sintéticas) y
-federación en `efeonce-mcp` sin ejecutar, `pnpm build` no corrido (autorización), `migrate:down` no
-ensayado. Emitir falla cerrado (`not_ready`) hasta TASK-1846. Drift ajeno visto: 3 capabilities
-`identity.internal_access.*` en TS sin seed DB (parity live rojo preexistente). WIP creativo ajeno en el
-árbol intacto. Decisión del mismo día (delta ADR): la vista web compartida se renderiza en `efeonce-think` desde
-`InsightWebModelV1` (TASK-1848 expone resolver/proxy; TASK-1849 ejecuta el render allá). **TASK-1875** creada (vista web
-compartida en Think, bloqueada por 1848; master flow `EPIC-045-efeonce-insights-UI-FLOW.md`). Próximo: autorizar canary
-staging con flags ON, luego TASK-1846.
+**Efeonce Insights — TASK-1845 code complete + canary staging verde (2026-09-15, Claude, `develop` `8844a3d5c` pushed; CI y deploys de workers verdes):** dominio `src/lib/efeonce-insights/`, schema `greenhouse_insights`, adapters SEO/AEO/ICO, lanes app+ecosystem, 4 tools MCP, skill `efeonce-insights`. **Staging:** `INSIGHTS_GENERATION_ENABLED=true` sólo ahí, `insights_v1` asignado a la org sintética `Greenhouse Demo` (`scripts/insights/assign-insights-module.ts --apply`); app lane creó `EO-INS-000012` (202 `ready_for_review`, replay idempotente, 409 con payload distinto); ecosystem lane leyó catálogo/lista/evidencia (0 hechos, 4 `no_data`: sin snapshots ICO en esa org), creó `EO-INS-000013` y recibió 404 anti-oracle sin módulo. Detalle en la sección «Rollout evidence» de la task. **Gateway `efeonce-mcp`:** rama `feat/task-1845-insights-federation` `a37d526` (4 tools, scope `efeonce.mcp.insights.write` sólo para crear, fail-closed, v1.5.0, 47 tools); provider real verde contra staging; paridad del scope y docs (ocho clases) en Greenhouse. Emitir sigue cerrado hasta TASK-1846. **Pendiente con autorización explícita:** PR/merge/deploy del gateway, scope en Entra, flag en Production, `migrate:down`. Próximo: TASK-1846.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
 TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con

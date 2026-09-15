@@ -19,7 +19,8 @@ const SNAPSHOT = [
   'efeonce.mcp.globe.credits.funding.ensure',
   'efeonce.mcp.seo.write',
   'efeonce.mcp.identity.write',
-  'efeonce.mcp.client_services.write'
+  'efeonce.mcp.client_services.write',
+  'efeonce.mcp.insights.write'
 ]
 
 const SIBLING_CONFIG = join(process.cwd(), '..', 'efeonce-mcp', 'src', 'config.ts')

@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-045`
-- Status real: `Code complete 2026-09-15 (Slices 1–4 en develop: e6e8a5dfe, a21e424fa, ca17c93da + docs); rollout pendiente — flags OFF, módulo insights_v1 sin asignar, canary staging y federación efeonce-mcp sin ejecutar`
+- Status real: `Code complete + canary staging verde 2026-09-15 (develop 8844a3d5c pushed, CI/workers verdes; INSIGHTS_GENERATION_ENABLED=true sólo en staging; insights_v1 asignado a la org sintética Greenhouse Demo; ediciones EO-INS-000012/000013 creadas por app y ecosystem; federación efeonce-mcp v1.5.0 commiteada en rama feat/task-1845-insights-federation). Rollout pendiente: PR/merge/deploy del gateway, scope Entra efeonce.mcp.insights.write, flag en producción y ensayo de rollback — todos con autorización explícita`
 - Rank: `TBD`
 - Domain: `platform|data`
 - Blocked by: `none`
@@ -171,7 +171,7 @@ Los modelos por módulo no ofrecen un encargo transversal reproducible por venta
 ### Acceptance criteria additions
 
 - [x] Capability/registry/grant en mismo PR, fine-grained auth, API/MCP, auditoría y errores equivalentes verificados. — Evidencia: migración seed + `entitlements-catalog.ts` + `runtime.ts` (Slice 1, `capability-grant-coverage.test` verde); `insights-lanes.test.ts` (misma tabla de errores en app/ecosystem); manifest MCP regenerado.
-- [ ] Source of truth, tenant boundary, concurrencia, migración/rollback y evidencia live de esta unidad pasan antes del cierre. — Parcial: migración aplicada + readback y `stores.live.test.ts` contra PG real (aislamiento por org, triggers, matriz, idempotencia) verdes; **falta** canary live en staging con flags ON (no ejecutado: flags OFF por diseño hasta autorización).
+- [x] Source of truth, tenant boundary, concurrencia, migración/rollback y evidencia live de esta unidad pasan antes del cierre. — Evidencia: migración aplicada + readback y `stores.live.test.ts` contra PG real (aislamiento por org, triggers, matriz, idempotencia) verdes; canary live en staging 2026-09-15 con `INSIGHTS_GENERATION_ENABLED=true` (sección «Rollout evidence»): create 202 → `ready_for_review`, replay idempotente, 409 por payload distinto, 404 anti-oracle en org sin módulo. El ensayo de `migrate:down` queda registrado como pendiente en el criterio de rollback.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -278,9 +278,20 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [x] Cambiar el módulo se resuelve por registry/adapter; un cuarto adapter de fixture se integra sin editar el orquestador ni Composer. — Evidencia: `registry.test.ts` (fixture consumido por `collectInsightEvidence`).
 - [x] Plan determinista y autoría IA bounded prueban que ninguna cifra cambia; salidas del modelo no emiten ni envían, y replay usa narrativa congelada. — Evidencia: `editorial.test.ts` (cifra alterada ⇒ fallback determinista tras una reparación; provenance modelo/prompt); plan congelado con hash en DB.
 - [x] Idempotency key repetida devuelve la misma edición; payload distinto da conflicto; eventos y estado son atómicos. — Evidencia: `commands.test.ts` + UNIQUE parcial en DB + outbox en la misma tx (`publishOutboxEvent(event, client)`).
-- [ ] API interna, App/Ecosystem y MCP ejercitan allow/deny y misma semántica; base-only read no permite crear ni emitir. — Parcial: `insights-lanes.test.ts` (app + ecosystem con mocks; binding org-scoped no crea; ningún binding emite) y manifest MCP; **falta** ejercitar las rutas contra un deployment real (staging) y el gateway federado.
+- [ ] API interna, App/Ecosystem y MCP ejercitan allow/deny y misma semántica; base-only read no permite crear ni emitir. — Parcial: `insights-lanes.test.ts` (app + ecosystem con mocks) y, en staging real 2026-09-15, app (persona `agent-client`, 200 catálogo / 202 create / 202 idempotente / 409 conflicto) y ecosystem (consumer del gateway: catálogo, lista, detalle con evidencia, 202 create, 404 deny) con la misma tabla de errores; el provider REAL del gateway (`dist`, `scripts/greenhouse-insights-canary.mjs`) pasó contra staging. **Falta** la sesión MCP servida por el gateway desplegado (requiere PR/merge/deploy de `efeonce-mcp` y el scope Entra).
 - [x] Retención, allowlist, errores sanitizados y señales de calidad/autoría quedan registrados; metadata/prompt no filtran contenido interno. — Evidencia: `insight_retention_classes` (1095 d), `boundary-domain.test.ts`, `insights-errors.ts` (raw ⇒ `internal_error` sin mensaje), historial redactado (`redact()` en generation), señales `insights.editions.*` (`ok` en PG real).
-- [ ] Migración/readback, pruebas live serializadas cuando corresponda, flags y rollback se verifican antes de activación; issue permanece bloqueado sin outputs validados. — Parcial: migración aplicada + readback, `test:live` verde, flags registrados OFF, `issue` bloqueado por puerto (test); **falta** ensayo de rollback (`migrate:down` no ejecutado en la instancia compartida) y activación por lane.
+- [ ] Migración/readback, pruebas live serializadas cuando corresponda, flags y rollback se verifican antes de activación; issue permanece bloqueado sin outputs validados. — Parcial: migración aplicada + readback, `test:live` verde, flags registrados (generación ON sólo en staging desde 2026-09-15; emisión e IA OFF), activación por lane verificada en staging, `issue` bloqueado por puerto (test); **falta** ensayo de rollback (`migrate:down` no ejecutado en la instancia compartida: una sola instancia dev/staging/prod).
+
+## Rollout evidence 2026-09-15 (staging)
+
+- `develop` `8844a3d5c` pushed (incluye Slices 1–4, docs y el WIP ajeno de TASK-1801); CI, Playwright smoke y los 5 deploys de workers/auth-server en `success`.
+- Vercel `greenhouse-eo`: `INSIGHTS_GENERATION_ENABLED=true` creado sólo en el environment `staging`; redeploy `greenhouse-b80oa2ilb` (la deployment previa respondía `generation_disabled` porque nació antes del env var).
+- Módulo `insights_v1` asignado a la org sintética `Greenhouse Demo` (`org-6c09b3a7-cbab-48a9-869e-61d03d1c6291`, dueña de `spc-agent-client-sandbox`) vía `scripts/insights/assign-insights-module.ts --apply` (command canónico `enableClientPortalModule`, assignment `cpma-805e1a0c…`).
+- App lane (persona `agent-client@…`, `client_executive`): `GET /api/platform/app/insights/catalog` 200 (seo/aeo `module_not_assigned`, ico disponible); `POST /editions` 202 → `EO-INS-000012` / `insed-43025fc1…` en `ready_for_review` (draft→collecting→composing→validating→ready_for_review); mismo payload → 202 `idempotent: true`; misma key con `depth` distinto → 409 `idempotency_conflict`; evidencia/plan `null` para el cliente (sólo en ediciones emitidas, por diseño).
+- Ecosystem lane (consumer `EO-SPK-0004`, binding interno): catálogo, lista (1 edición), detalle con evidencia (snapshot sellado `inssn-9ee4349b…`, 0 hechos, 4 rechazos `no_data` — sin snapshot ICO de esa org en 2026-07/08 —, plan determinista congelado con `limits` visibles), `POST /editions` 202 → `EO-INS-000013`; org sin módulo → 404 anti-oracle.
+- Gateway `efeonce-mcp` (rama `feat/task-1845-insights-federation`, `a37d526`, v1.5.0, 47 tools, `pnpm check` 184/184): `scripts/greenhouse-insights-canary.mjs` con el provider REAL contra staging: catalog ✓ list ✓ edition ✓ deny ✓.
+- Hallazgo menor: `plan.limits` repite «ico: sin datos.» por cada rechazo (4 líneas iguales); dedupe cosmético para TASK-1846.
+- Pendiente con autorización explícita: PR/merge/deploy del gateway, crear `efeonce.mcp.insights.write` en Entra (hasta entonces `create_insight_edition` falla cerrada), flag en Production, `migrate:down`.
 
 ## Verification
 

@@ -7,6 +7,22 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-15 — TASK-1845: canary de Efeonce Insights verde en staging y federación MCP lista en rama
+
+`develop` `8844a3d5c` quedó empujado con la foundation de Insights y CI/workers verdes. En staging se prendió sólo
+`INSIGHTS_GENERATION_ENABLED` (redeploy necesario: la deployment anterior nació sin el env var) y se asignó
+`insights_v1` a la org sintética Greenhouse Demo por el command canónico. El canary cubrió los dos lanes contra el
+deployment real: la persona cliente creó `EO-INS-000012` (202 → `ready_for_review`, replay idempotente, 409 con
+payload distinto) y el consumer del gateway leyó catálogo/lista/detalle con evidencia, creó `EO-INS-000013` y recibió
+404 anti-oracle en una org sin módulo. La evidencia fue honesta: 0 hechos y 4 rechazos `no_data` porque esa org no
+tiene snapshots ICO, con los límites visibles en el plan determinista.
+
+El gateway `efeonce-mcp` federa las 4 tools en la rama `feat/task-1845-insights-federation` (v1.5.0, 47 tools,
+scope `efeonce.mcp.insights.write` sólo para crear, políticas nativas fail-closed); Greenhouse registra el scope en
+su paridad y los docs del gateway pasan a ocho clases. PR/merge/deploy del gateway, el scope en Entra y el flag en
+producción siguen pendientes de autorización explícita. Se integró además el WIP ajeno de la landing de contacto
+(TASK-1801 → complete) tras `eslint --fix`, y se añadió `scripts/insights/assign-insights-module.ts`.
+
 ## 2026-09-15 — Contacto publica metadata y grafo SEO/AEO coherentes
 
 `TASK-1801` queda cerrada por aprobación explícita del operador sobre la landing pública. El cierre acredita la
@@ -1003,21 +1019,3 @@ flags default OFF. **Migración aplicada 2026-09-06 y verificada; smoke live `--
 producción ✔.** Pendiente: binding externo real + flag en staging + correo real (decisión del operador) y
 federación de la lane delegada en el gateway. Skills actualizadas (espejo `.claude`/`.codex`): `efeonce-mcp-platform`
 (SKILL + native-authority + verification-matrix) y `greenhouse-qa-release-auditor/security-qa`. Commits `5518d868e…db5a0adf3`.
-
-## 2026-09-05 — Efeonce ID: acceso Microsoft y publicación certificados
-
-Corrección posterior `21aa12608` promovida por PR226 a main `456d9accf`, auth `00032-h45` y
-manifest `456d9accffb6-3b09047e-c37f-4ac7-acbc-0e463e1610fd` released (run `34005056894` success):
-`/login` directo reutiliza el botón de Claude y retorna a sesión autenticada; 235 pruebas pasan.
-Botón visible y clic hacia Microsoft verificados en público a1440/390; nuevo canary humano directo
-pendiente. Un primer run quedó aborted por deploys concurrentes de develop; el retry cerró sin bypass,
-cinco servicios con el SHA exacto y watchdog `ok`. Barrido de tres subagentes consolida TASK1836+1831 en ADRs, docs
-funcionales, manuales, runbook, tasks/epic, skills espejo e invariantes. [Evidencia y límites](docs/audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
-
-PR225 integra las reparaciones OIDC, lector de consentimiento interno y origen/CSP del formulario.
-Release `08acfb2c6`, run `34000876213`, manifest `released` sin override. CI, Deep, smoke,
-Vercel Production y health aprobados; watchdog operativo 5/5, drift0. Canary final sobre gateway36:
-emisión de token, lectura propia, rechazo de otra organización y revocación efectiva en6.633s.
-El piloto conserva gv5 y su vencimiento original; todos los tokens de prueba quedaron revocados.
-No se declaran completas las matrices externas/multicontexto ni UI/WebKit. Evidencia:
-[TASK-1836](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md).
