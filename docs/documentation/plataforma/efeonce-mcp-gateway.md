@@ -227,8 +227,9 @@ lectura de Hiring, el permiso de escritura de identidad (`efeonce.mcp.identity.w
 propia organización), desde el 2026-09-10 el permiso de habilitación de servicios de cliente
 (`efeonce.mcp.client_services.write`, exigido también por la previsualización) y, desde el 2026-09-15, el permiso
 de creación de ediciones de Efeonce Insights (`efeonce.mcp.insights.write`; leer el catálogo y las ediciones va
-con el permiso base). Este último todavía no existe en Entra, así que crear una edición por MCP responde
-`insufficient_scope` hasta que un operador autorice crearlo. El PRM publica sólo el permiso base; los demás se descubren en el `403 insufficient_scope`
+con el permiso base). El gateway lo sirve desde el 2026-09-15 y el permiso ya existe en Entra; ningún cliente lo
+tiene concedido todavía, así que crear una edición por MCP responde `insufficient_scope` hasta que exista un
+consentimiento gobernado. El PRM publica sólo el permiso base; los demás se descubren en el `403 insufficient_scope`
 de la tool exacta y siguen sujetos a sus flags, policy, capability y autoridad downstream.
 
 Los entitlements por organización/persona ya existen, el gateway multi-issuer está construido y la matriz

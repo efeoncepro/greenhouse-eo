@@ -23,6 +23,11 @@ su paridad y los docs del gateway pasan a ocho clases. PR/merge/deploy del gatew
 producción siguen pendientes de autorización explícita. Se integró además el WIP ajeno de la landing de contacto
 (TASK-1801 → complete) tras `eslint --fix`, y se añadió `scripts/insights/assign-insights-module.ts`.
 
+Más tarde el mismo día: el gateway quedó mergeado (PR #12) y desplegado como revisión `00053-dsk` con front door
+verificado, y el scope `efeonce.mcp.insights.write` existe en la app recurso de Entra con los seis scopes previos
+intactos. Ningún cliente lo porta todavía, así que la escritura por MCP sigue cerrada hasta un consentimiento
+gobernado. El ensayo de `migrate:down` no se ejecutó y el release a producción queda como siguiente paso.
+
 ## 2026-09-15 — Contacto publica metadata y grafo SEO/AEO coherentes
 
 `TASK-1801` queda cerrada por aprobación explícita del operador sobre la landing pública. El cierre acredita la

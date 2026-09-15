@@ -142,9 +142,11 @@ The relying-party boundary is fixed by
   2026-09-10 the flag-gated client-services write `efeonce.mcp.client_services.write` (TASK-1852; required by
   all three enablement tools, preview included), and — since 2026-09-15 — the flag-gated Insights write
   `efeonce.mcp.insights.write` (TASK-1845; only `create_insight_edition`; the three Insights readers ride the
-  base scope). The Insights scope is declared in the gateway (`v1.5.0`) and in Greenhouse's parity registry
-  (`src/lib/auth-server/oauth/scopes.ts`) but NOT yet created in Entra: the write tool fails closed
-  (`insufficient_scope`) until an operator authorizes that external mutation.
+  base scope). The Insights scope exists in the gateway (`v1.5.0`, PR #12 `cad57b31d`, deployed 2026-09-15 as
+  revision `efeonce-mcp-gateway-00053-dsk`, front door 200/200/401), in Greenhouse's parity registry
+  (`src/lib/auth-server/oauth/scopes.ts`) and in the Entra resource app «Efeonce MCP Resource» (Admin scope,
+  added 2026-09-15 with a verified 6→7 round-trip; the shared PKCE client was not touched). No client carries it
+  yet, so `create_insight_edition` still answers `insufficient_scope` until a governed grant/consent exists.
   The PRM intentionally announces only the base scope; read the others from the exact 403 challenge and policy,
   never from a cached catalog count.
   Scope granularity is **one scope per blast-radius class, never one per capability**: a per-capability list turns
