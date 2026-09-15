@@ -651,6 +651,33 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     expectedSignalKinds: ['data_quality', 'runtime', 'cost_guard', 'posture', 'test_lane', 'drift'],
     incidentDomainTag: 'growth'
+  },
+  {
+    moduleKey: 'insights',
+    label: 'Efeonce Insights',
+    description:
+      'Dominio Insights (TASK-1845, EPIC-045): biblioteca de entregas congeladas por organización y ventana. Un encargo crea reporte + edición; la generación corre por fases (collecting → composing → validating → ready_for_review) sobre adapters que consumen los readers dueños de SEO/AEO/ICO; snapshot sellado y plan congelado inmutables; emisión con gate humano y outputs validados (TASK-1846). Flags default OFF.',
+    domain: 'platform',
+    routes: [],
+    apis: [
+      { path: '/api/platform/app/insights/editions', label: 'Insights editions (app lane)' },
+      { path: '/api/platform/ecosystem/insights/editions', label: 'Insights editions (ecosystem/MCP lane)' }
+    ],
+    dependencies: [
+      'greenhouse_insights.insight_reports',
+      'greenhouse_insights.insight_editions',
+      'greenhouse_insights.insight_edition_transitions',
+      'greenhouse_insights.insight_evidence_snapshots',
+      'greenhouse_insights.insight_editorial_plans',
+      'greenhouse_client_portal.module_assignments (insights_v1)',
+      'greenhouse_sync.outbox_events (insights.*)'
+    ],
+    smokeTests: [],
+    filesOwned: ['src/lib/efeonce-insights/**', 'src/lib/reliability/queries/insights-edition-signals.ts'],
+    // TASK-1845 — dos señales steady 0: ediciones `failed` recientes (data_quality; una fase que
+    // rechazó evidencia o un adapter caído) y ediciones atascadas en una fase de generación (lag).
+    expectedSignalKinds: ['data_quality', 'lag'],
+    incidentDomainTag: 'insights'
   }
 ]
 

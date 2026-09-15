@@ -213,6 +213,10 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getSeoProspectDiagnostic'
   | 'runSeoProspectDiagnostic'
   | 'getMcpSkills'
+  | 'getInsightsCatalog'
+  | 'listInsightEditions'
+  | 'getInsightEdition'
+  | 'createInsightEdition'
   | 'getMcpSkill'
 >) => ({
   /**
@@ -642,6 +646,49 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )} across ${count} keywords (${result.requestId}).`
       },
       () => client.getSeoVisibility360(input)
+    )
+  },
+  // ── TASK-1845 — Efeonce Insights ─────────────────────────────────────────
+  async getInsightsCatalog(input: { organizationId?: string }) {
+    return callTool(
+      result => {
+        const data = result.data as { modules?: Array<{ module: string; available: boolean; reason?: string | null }>; renderableOutputs?: string[] }
+        const modules = (data.modules ?? []).map(entry => `${entry.module}:${entry.available ? 'available' : `unavailable(${String(entry.reason ?? 'unknown')})`}`)
+
+        return `Insights catalog: ${modules.join(', ') || 'no modules'}; renderableOutputs=${String((data.renderableOutputs ?? []).length)} (${result.requestId}).`
+      },
+      () => client.getInsightsCatalog(input)
+    )
+  },
+  async listInsightEditions(input: { organizationId?: string; reportId?: string; state?: string; page?: number; pageSize?: number }) {
+    return callTool(
+      result => {
+        const items = Array.isArray(result.data) ? (result.data as Array<{ editionId: string; status: string }>) : []
+
+        return `Insights editions: ${String(items.length)} returned (${result.requestId}).`
+      },
+      () => client.listInsightEditions(input)
+    )
+  },
+  async getInsightEdition(input: { organizationId?: string; editionId: string; includeEvidence?: boolean }) {
+    return callTool(
+      result => {
+        const data = result.data as { edition?: { editionId?: string; status?: string; version?: number }; evidence?: { facts?: unknown[]; rejections?: unknown[] } | null }
+
+        return `Insight edition ${String(data.edition?.editionId ?? input.editionId)} v${String(data.edition?.version ?? '?')} status=${String(data.edition?.status ?? 'unknown')}${data.evidence ? ` facts=${String(data.evidence.facts?.length ?? 0)} rejections=${String(data.evidence.rejections?.length ?? 0)}` : ''} (${result.requestId}).`
+      },
+      () => client.getInsightEdition(input)
+    )
+  },
+  async createInsightEdition(input: { organizationId?: string; request: Record<string, unknown> }) {
+    return callTool(
+      result => {
+        const data = result.data as { edition?: { editionId?: string; status?: string }; idempotent?: boolean; generation?: { outcome?: string; failedPhase?: string | null; failureCode?: string | null } | null }
+        const generation = data.generation ? `${String(data.generation.outcome)}${data.generation.failedPhase ? ` at ${data.generation.failedPhase} (${String(data.generation.failureCode)})` : ''}` : 'not run'
+
+        return `Insight edition ${String(data.edition?.editionId ?? 'unknown')} ${data.idempotent ? 'already existed (idempotent)' : 'created'}; status=${String(data.edition?.status ?? 'unknown')}; generation=${generation}. Issuing is a separate human decision (${result.requestId}).`
+      },
+      () => client.createInsightEdition(input)
     )
   },
   async getSeoEntitlement(input: { organizationId?: string }) {

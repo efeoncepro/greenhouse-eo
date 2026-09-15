@@ -63,6 +63,10 @@ describe('createGreenhouseMcpHandlers', () => {
       getSeoDualLensVisibility: vi.fn(),
       getMcpSkills: vi.fn(),
       getMcpSkill: vi.fn(),
+      getInsightsCatalog: vi.fn(),
+      listInsightEditions: vi.fn(),
+      getInsightEdition: vi.fn(),
+      createInsightEdition: vi.fn(),
       previewClientServiceEnablement: vi.fn(),
       applyClientServiceEnablement: vi.fn(),
       rollbackClientServiceEnablement: vi.fn()
@@ -174,6 +178,10 @@ describe('createGreenhouseMcpHandlers', () => {
       getSeoDualLensVisibility: vi.fn(),
       getMcpSkills: vi.fn(),
       getMcpSkill: vi.fn(),
+      getInsightsCatalog: vi.fn(),
+      listInsightEditions: vi.fn(),
+      getInsightEdition: vi.fn(),
+      createInsightEdition: vi.fn(),
       previewClientServiceEnablement: vi.fn(),
       applyClientServiceEnablement: vi.fn(),
       rollbackClientServiceEnablement: vi.fn()

@@ -29,6 +29,7 @@ export type ReliabilityModuleKey =
   | 'knowledge' // TASK-1082 — Knowledge Platform ingestion (corpus + chunks + sanitize/quarantine)
   | 'growth' // TASK-1226 — Growth AI Visibility Grader (provider adapters, runs, observations)
   | 'hiring' // TASK-356 — Hiring/ATS (handoff decisión→downstream + candidate docs/asset scan de TASK-1362)
+  | 'insights' // TASK-1845 — Efeonce Insights (ediciones congeladas deck/A4/web; generación por fases)
 
 export type ReliabilityModuleDomain =
   | 'platform'

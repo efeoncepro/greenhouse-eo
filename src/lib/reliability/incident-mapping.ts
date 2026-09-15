@@ -137,7 +137,9 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
     'talent_demand',
     'candidate_facet',
     'greenhouse_hiring'
-  ]
+  ],
+  // TASK-1845 — Efeonce Insights: ediciones congeladas (schema greenhouse_insights, eventos insights.*).
+  insights: ['insight_edition', 'insight_report', 'greenhouse_insights', 'insights.edition', 'efeonce insights']
 }
 
 /**
@@ -169,6 +171,8 @@ const MODULE_PRIORITY: Record<ReliabilityModuleKey, number> = {
   knowledge: 16,
   // TASK-1226 — growth AI Visibility: prioridad media (dueño del grader/observations).
   growth: 16,
+  // TASK-1845 — Efeonce Insights: consume growth/delivery, pero un incidente insights_* es suyo.
+  insights: 17,
   home: 15,
   // TASK-773 — sync infraestructure: prioridad media-baja. Si un incident
   // matchea ambos `outbox` y `finance`, finance gana (el outbox es el medium,

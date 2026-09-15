@@ -2,8 +2,8 @@
   "$comment": "GENERADO por pnpm mcp:manifest:generate (TASK-1780). NO editar a mano: el hash y el gate de Greenhouse lo detectan. Greenhouse declara que EXISTE; el gateway decide que CRUZA.",
   "source": "greenhouse-eo/src/mcp/greenhouse/tool-manifest.ts",
   "generator": "pnpm mcp:manifest:generate",
-  "manifestHash": "ad9abe7ee99c0f4136c1f0724220c5bb6d14fb95bb08168f1bead1ce1add442b",
-  "toolCount": 47,
+  "manifestHash": "4089283477991d676a30c4123e1c5c55e54f392d1c530d38d425a64555d525ac",
+  "toolCount": 51,
   "tools": [
     {
       "name": "preview_client_service_enablement",
@@ -683,6 +683,61 @@
       ],
       "description": "Run a ONE-SHOT SEO diagnostic of a prospect domain (no client access needed). THIS SPENDS REAL MONEY (~USD 0.25 per run, hard per-diagnostic ceiling + daily per-actor cap enforced server-side). Propose the exact domain and market to the human and get explicit confirmation BEFORE calling — never trigger this on your own initiative. Idempotent per domain/market/day: repeating the same subject the same day returns the existing diagnostic with USD 0 spent. There is NO recurring capture on prospects: re-running another day is a new human decision that passes every ceiling again.",
       "descriptionHash": "34ac0285cd0e9b94146ac387538d22899b384ffcb7b633e739bcc2367e682769"
+    },
+    {
+      "name": "get_insights_catalog",
+      "domain": "insights",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Catálogo elegible de Insights para una organización: módulos disponibles, salidas, audiencias y límites.",
+      "inputKeys": [
+        "organizationId"
+      ],
+      "description": "Read what Efeonce Insights can produce for an organization: which modules (seo, aeo, ico) are available and why not when they are not, allowed outputs (deck_pdf, report_pdf, web), audiences, depths, locales and window limits. Call this BEFORE create_insight_edition to build a valid request. renderableOutputs is empty until durable rendering (TASK-1846) is connected: editions can be created and reviewed, but not issued. Requires the organization to have the insights_v1 module assigned; otherwise the resource is not found.",
+      "descriptionHash": "82089f952762578e4cacc4165a02aa46dc223901296eb87e71f1df1b96fb6b2d"
+    },
+    {
+      "name": "list_insight_editions",
+      "domain": "insights",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Ediciones de Insights de una organización con estado proyectado por audiencia.",
+      "inputKeys": [
+        "organizationId",
+        "page",
+        "pageSize",
+        "reportId",
+        "state"
+      ],
+      "description": "List Efeonce Insights editions of an organization, newest first, with status projected for the caller audience (internal bindings see the real lifecycle state: draft, collecting, composing, validating, ready_for_review, issued, failed, withdrawn; org-scoped bindings see in_progress, in_review, issued, needs_attention, withdrawn and never see internal drafts). Filter by reportId or repeated state params. Paginated (page, pageSize).",
+      "descriptionHash": "b5f36f873c151a826a9ccb157f56a68533bb1ea77c2349346b95f892c3350d68"
+    },
+    {
+      "name": "get_insight_edition",
+      "domain": "insights",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Una edición con su evidencia sellada, plan congelado e historial (según audiencia).",
+      "inputKeys": [
+        "editionId",
+        "includeEvidence",
+        "organizationId"
+      ],
+      "description": "Read one Efeonce Insights edition: request (modules, period [start, endExclusive) in its IANA time zone, comparison rule, audience, outputs), lifecycle status and, with includeEvidence=true, the SEALED evidence snapshot (facts with unit, population, coverage, asOf and method; rejections that explain every absence) and the FROZEN editorial plan whose figures all reference facts. For org-scoped bindings evidence is only available on issued editions. Report absences as absences: a rejection such as unsupported_window or suppressed is never a zero. Internal bindings also get the append-only transition history.",
+      "descriptionHash": "680aeaf8bb05daa58c1164e5572a3a74b9ac6d2c7677afe277bd54bd54b84060"
+    },
+    {
+      "name": "create_insight_edition",
+      "domain": "insights",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Crea una edición (reporte + encargo) y corre la generación por fases; no emite ni renderiza.",
+      "inputKeys": [
+        "organizationId",
+        "request"
+      ],
+      "description": "Create an Efeonce Insights edition for an organization and run its generation (collect evidence from the SEO/AEO/ICO owners for the requested window, seal the snapshot, author and freeze the editorial plan, validate figures) up to ready_for_review. THIS WRITES (no provider spend: readers only, never a billable refresh). Only internal bindings may call it; org-scoped bindings are read-only. It does NOT issue: issuing is a separate human decision with its own capability and requires validated outputs (TASK-1846), and it does NOT render. Pass a request with modules (subset of the catalog), period {start, endExclusive, timeZone}, comparison {kind: none|previous_period|previous_year|custom}, audience (client|internal), outputs, locale, depth and an idempotencyKey (8-200 chars): the same key with the same request returns the same edition; the same key with a different request is a 409 conflict. Read generation.outcome: failed editions keep their failedPhase and are recoverable; a module with no evidence blocks readiness unless policy.allowPartial is explicitly true. Ask get_insights_catalog first and propose the exact request to the human before calling.",
+      "descriptionHash": "4dde0b5994c9606abf9995d510375233d2e65fb991489c429f73b2b335498584"
     }
   ]
 }

@@ -857,6 +857,73 @@ export const createGreenhouseMcpServer = (
     async args => handlers.runSeoProspectDiagnostic(args)
   )
 
+  // TASK-1845 — Efeonce Insights: ediciones congeladas (deck/A4/web) por organización y ventana.
+  // Entitlement per-org `insights_v1`, anti-oracle y resolución de org por binding se aplican
+  // SERVER-SIDE. Bindings org-scoped sólo leen; los writes exigen binding interno; emitir NUNCA
+  // ocurre por MCP (gate humano).
+  collector.registerTool(
+    'get_insights_catalog',
+    {
+      title: 'Get Insights Catalog',
+      description:
+        'Read what Efeonce Insights can produce for an organization: which modules (seo, aeo, ico) are available and why not when they are not, allowed outputs (deck_pdf, report_pdf, web), audiences, depths, locales and window limits. Call this BEFORE create_insight_edition to build a valid request. renderableOutputs is empty until durable rendering (TASK-1846) is connected: editions can be created and reviewed, but not issued. Requires the organization to have the insights_v1 module assigned; otherwise the resource is not found.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getInsightsCatalog(args)
+  )
+
+  collector.registerTool(
+    'list_insight_editions',
+    {
+      title: 'List Insight Editions',
+      description:
+        'List Efeonce Insights editions of an organization, newest first, with status projected for the caller audience (internal bindings see the real lifecycle state: draft, collecting, composing, validating, ready_for_review, issued, failed, withdrawn; org-scoped bindings see in_progress, in_review, issued, needs_attention, withdrawn and never see internal drafts). Filter by reportId or repeated state params. Paginated (page, pageSize).',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        reportId: z.string().trim().min(1).optional(),
+        state: z.string().trim().min(1).optional(),
+        page: z.number().int().min(1).optional(),
+        pageSize: z.number().int().min(1).max(100).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.listInsightEditions(args)
+  )
+
+  collector.registerTool(
+    'get_insight_edition',
+    {
+      title: 'Get Insight Edition',
+      description:
+        'Read one Efeonce Insights edition: request (modules, period [start, endExclusive) in its IANA time zone, comparison rule, audience, outputs), lifecycle status and, with includeEvidence=true, the SEALED evidence snapshot (facts with unit, population, coverage, asOf and method; rejections that explain every absence) and the FROZEN editorial plan whose figures all reference facts. For org-scoped bindings evidence is only available on issued editions. Report absences as absences: a rejection such as unsupported_window or suppressed is never a zero. Internal bindings also get the append-only transition history.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        editionId: z.string().trim().min(1),
+        includeEvidence: z.boolean().optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getInsightEdition(args)
+  )
+
+  collector.registerTool(
+    'create_insight_edition',
+    {
+      title: 'Create Insight Edition',
+      description:
+        'Create an Efeonce Insights edition for an organization and run its generation (collect evidence from the SEO/AEO/ICO owners for the requested window, seal the snapshot, author and freeze the editorial plan, validate figures) up to ready_for_review. THIS WRITES (no provider spend: readers only, never a billable refresh). Only internal bindings may call it; org-scoped bindings are read-only. It does NOT issue: issuing is a separate human decision with its own capability and requires validated outputs (TASK-1846), and it does NOT render. Pass a request with modules (subset of the catalog), period {start, endExclusive, timeZone}, comparison {kind: none|previous_period|previous_year|custom}, audience (client|internal), outputs, locale, depth and an idempotencyKey (8-200 chars): the same key with the same request returns the same edition; the same key with a different request is a 409 conflict. Read generation.outcome: failed editions keep their failedPhase and are recoverable; a module with no evidence blocks readiness unless policy.allowPartial is explicitly true. Ask get_insights_catalog first and propose the exact request to the human before calling.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        request: z.record(z.string(), z.unknown())
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.createInsightEdition(args as { organizationId?: string; request: Record<string, unknown> })
+  )
+
   // ── El registro: una pasada por el manifiesto, en su orden ────────────────
   const coverage = computeGreenhouseMcpToolCoverage({
     manifest: GREENHOUSE_MCP_TOOL_MANIFEST,
