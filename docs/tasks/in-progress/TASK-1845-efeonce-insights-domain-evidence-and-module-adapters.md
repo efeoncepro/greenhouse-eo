@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `Diseno`
+- Status real: `Discovery cerrada 2026-09-15; plan en checkpoint humano (P1); sin código aún`
 - Rank: `TBD`
 - Domain: `platform|data`
 - Blocked by: `none`
