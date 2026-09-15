@@ -61,6 +61,7 @@ implícita. Es una recomendación de reparto, no una certificación comparativa 
 | TASK-1847 | Claude · Opus 5 | xhigh | Gráficos/catálogos: composición editorial, geometría y calidad del archivo final |
 | TASK-1848 | Codex · GPT-6 Astra | xhigh | Sharing, revocación, correo/recurrencia y prevención de duplicados |
 | TASK-1849 | Claude · Opus 5 | xhigh | Biblioteca/builder/visor: recorridos cliente/interno, responsive y GVC |
+| TASK-1875 | Claude · Opus 5 | xhigh | Render Astro en `efeonce-think`: fidelidad de cifras, no-leak, revocación por request, GVC del hub |
 
 **Orden:** TASK-1845 → TASK-1846/1847 → TASK-1848 → TASK-1849, respetando las dependencias de la tabla
 Child Tasks. TASK-1847 prepara catálogos tras 1845; su export final depende de 1846. Preparar 1845 durante
@@ -89,6 +90,7 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 | U03 | [TASK-1847](../../tasks/to-do/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md) | gráficos y catálogos premium para deck e informe vertical | TASK-1845 |
 | U04 | [TASK-1848](../../tasks/to-do/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados | TASK-1845, TASK-1846 |
 | U05 | [TASK-1849](../../tasks/to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca, creación y experiencia web compartida | TASK-1845, TASK-1846, TASK-1847, TASK-1848 |
+| U06 | [TASK-1875](../../tasks/to-do/TASK-1875-efeonce-insights-shared-web-render-think.md) | vista web compartida por token renderizada en `efeonce-think` (nodo S6; decisión 2026-09-15) | TASK-1848 |
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
 TASK-1849 es consumer UI, backend none; si encuentra un gap de command vuelve a la dueña backend.
@@ -120,7 +122,7 @@ necesita esperar esa sección; la biblioteca debe mostrar disponibilidad honesta
 1. TASK-1845 fija la fuente, permisos y comandos; no emite nada incompleto.
 2. TASK-1846 habilita ejecución durable; TASK-1847 produce catálogos y gráficos sobre ese contrato.
 3. TASK-1848 añade compartir/correo/recurrencia con gates independientes.
-4. TASK-1849 completa el recorrido y verifica paridad entre las tres entradas y salidas.
+4. TASK-1849 completa el recorrido y verifica paridad entre las tres entradas y salidas; TASK-1875 materializa la vista compartida en Think sobre el contrato de TASK-1848 (puede correr en paralelo a la UI del portal). Master flow: `docs/ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md`.
 5. Cada dueña certifica su rollout; el cierre del epic integra esa evidencia, sin task de QA artificial.
 
 Registrar plan por task sólo al tomarla: /goal explícito + codex:task-hook y checkpoint aplicable. Este registro

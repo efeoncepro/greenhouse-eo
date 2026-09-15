@@ -2,7 +2,7 @@
 
 ## Delta 2026-09-15
 
-- **Decisión del operador (ADR delta 2026-09-15):** la vista web compartida NO se construye en Greenhouse: se renderiza en `efeonce-think` desde `InsightWebModelV1` (endpoint público de TASK-1848). Esta task conserva biblioteca/builder/detalle del portal + presentación email en Greenhouse, y la experiencia compartida como slice ejecutado en el repo `efeonce-think` (mismo modelo de trabajo que TASK-1325). Los criterios de GVC/estados (expirado/revocado/unknown) aplican allá; el `StatusScreen` de Think ya cubre `not_found`/`gone`.
+- **Decisión del operador (ADR delta 2026-09-15):** la vista web compartida NO se construye en Greenhouse: se renderiza en `efeonce-think` desde `InsightWebModelV1` (endpoint público de TASK-1848). Esta task conserva biblioteca/builder/detalle del portal + presentación email en Greenhouse, y la experiencia compartida como slice ejecutado en el repo `efeonce-think` (mismo modelo de trabajo que TASK-1325). Los criterios de GVC/estados (expirado/revocado/unknown) aplican allá; el `StatusScreen` de Think ya cubre `not_found`/`gone`. **Ese slice tiene ID propio: TASK-1875** (nodo S6 del master flow `docs/ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md`); esta task conserva S1–S5 y S7 y el botón «Copiar enlace» apunta a la URL de 1875.
 - Los DTOs de UI ya existen: `InsightEditionDto`/`InsightReportDto` (`readers/projection.ts`, browser-safe) con estado redactado por audiencia; lane app `platform/app/insights/**` completo (catálogo, reportes, ediciones, create/revise/issue/withdraw/recover). Esta task consume esos readers/commands; no escribe backend. — por TASK-1845
 
 <!-- ═══════════════════════════════════════════════════════════

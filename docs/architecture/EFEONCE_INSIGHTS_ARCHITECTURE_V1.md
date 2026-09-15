@@ -386,7 +386,8 @@ Definir duración efectiva y cleanup verificable en TASK-1845/1848 antes de prim
 | TASK-1846 | Render durable multi-consumer, outputs, assets y recuperación sobre Artifact Worker | TASK-1845 |
 | TASK-1847 | Biblioteca ChartSpec y catálogos deck/A4 premium; contratos visuales | TASK-1845; integra worker tras TASK-1846 |
 | TASK-1848 | Sharing por token (grants + `resolveSharedEdition`/`downloadSharedOutput` + `InsightWebModelV1`), correo, recurrencia y contratos programáticos | TASK-1845, TASK-1846 |
-| TASK-1849 | Biblioteca/encargo/revisión en el portal Greenhouse, presentación email, y la vista web compartida **renderizada en `efeonce-think`** (repo hermano; slice propio con su GVC) | TASK-1845/1846/1847/1848 |
+| TASK-1849 | Biblioteca/encargo/revisión en el portal Greenhouse y presentación email | TASK-1845/1846/1847/1848 |
+| TASK-1875 | Vista web compartida por token **renderizada en `efeonce-think`** (`/insights/r/<token>`, render tonto de `InsightWebModelV1`, revocación por request, GVC del hub) | TASK-1848 |
 
 Cinco nuevas unidades; cada una tiene slices, pruebas y rollout propios. TASK-1672/1673 son dos integraciones
 especializadas ya en backlog: se coordinan, no se cuentan como nuevas ni se borran. No bloquean un informe

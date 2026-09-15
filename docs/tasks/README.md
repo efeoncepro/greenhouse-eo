@@ -33,7 +33,7 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1873](to-do/TASK-1873-hiring-intake-discarded-link-warnings.md) | Intake de postulaciones: el enlace descartado por el parser queda visible como `intakeWarnings` application-scoped (sin el raw) en `hiring_application` y en el reader canónico; migración expand-only (EPIC-011) | none |
 | [TASK-1874](to-do/TASK-1874-application-360-discarded-link-notice.md) | Application 360: aviso «Envió un enlace de LinkedIn/portafolio que no pudimos leer; pídelo en el primer contacto» en «Perfil del candidato» y empty state coherente en «Portafolio y enlaces»; copy en diccionarios es-CL/en-US, `Alert info` reutilizado (EPIC-011) | TASK-1873 |
 
-Siguiente ID libre `TASK-1875`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1876`. Insights TASK-1845–1849 (+ TASK-1875, vista web compartida en Think) y notificaciones conservan sus dueñas.
 
 ## Programa Efeonce Insights: EPIC-045
 
@@ -53,6 +53,7 @@ TASK-690–693 para Hub/preferencias y TASK-303/387/694 para audiencia/digest/me
 | [TASK-1847](to-do/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md) | gráficos y catálogos premium para deck e informe vertical | to-do |
 | [TASK-1848](to-do/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados | to-do |
 | [TASK-1849](to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca, creación y experiencia web compartida | to-do |
+| [TASK-1875](to-do/TASK-1875-efeonce-insights-shared-web-render-think.md) | vista web compartida por token renderizada en Think (`efeonce-think`) | to-do |
 
 ## Proveedor de imagen OpenAI
 
