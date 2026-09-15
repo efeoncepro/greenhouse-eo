@@ -7,14 +7,16 @@ demás runtimes quedan `pending adapter`; release y promoción no están autoriz
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
 no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
 
-**Efeonce Insights — TASK-1845 tomada (2026-09-15, Claude, `develop`, sin push):** Discovery cerrada contra el
-checkout y PG real (proxy `15432`, migraciones al día, cero tablas/schema Insights). Plan de 4 slices en
-checkpoint humano (P1): schema `greenhouse_insights` nuevo (report/edition/evidence_snapshot/editorial_plan +
-transiciones append-only + `next_insight_report_code()` patrón ISSUE-172), adapters sobre readers canónicos
-(`readSeoOverviewKpis`/`readSeoPerformance`/`readRankEvolution`, `readClientGraderReport`, `readSpaceMetrics`
-vía `spaces.organization_id`), commands + lanes `platform/{app,ecosystem}/insights` + tools MCP, flags
-`INSIGHTS_GENERATION_ENABLED`/`INSIGHTS_ISSUANCE_ENABLED` default OFF. Sin código aún; WIP creativo ajeno en el
-árbol se preserva. Próximo paso: aprobación del plan → Slice 1 (migration) → `/goal`.
+**Efeonce Insights — TASK-1845 code complete (2026-09-15, Claude, `develop`, sin push):** Slices 1–4 en
+`e6e8a5dfe`/`a21e424fa`/`ca17c93da`/`12f985d8a`: schema `greenhouse_insights` aplicado y verificado
+(prefijo canónico por decisión del operador), dominio `src/lib/efeonce-insights/`, adapters SEO/AEO/ICO,
+plan editorial + IA acotada, commands/readers, lanes app+ecosystem, 4 tools MCP, skill `efeonce-insights`
+(servida + espejada), módulo `insights` de reliability. **Rollout pendiente:** flags `INSIGHTS_*` OFF en
+todos los targets, `insights_v1` sin asignar a ninguna org, canary staging (dos orgs sintéticas) y
+federación en `efeonce-mcp` sin ejecutar, `pnpm build` no corrido (autorización), `migrate:down` no
+ensayado. Emitir falla cerrado (`not_ready`) hasta TASK-1846. Drift ajeno visto: 3 capabilities
+`identity.internal_access.*` en TS sin seed DB (parity live rojo preexistente). WIP creativo ajeno en el
+árbol intacto. Próximo: autorizar canary staging con flags ON, luego TASK-1846.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
 TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con

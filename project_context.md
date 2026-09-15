@@ -113,8 +113,8 @@ ETV de DataForSEO Labs se versiona por metodología; desde 2026-09-03 producció
 `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md` ·
 [auditoría](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
 
-Efeonce Insights: [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md), EPIC-045.
-Diseño de deck/A4/web por edición; implementación pendiente en TASK-1845–1849.
+Efeonce Insights: [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) (§14 = estado real), EPIC-045.
+Foundation TASK-1845 en develop (schema `greenhouse_insights`, `src/lib/efeonce-insights/`, lanes + MCP; flags OFF); render/share/UI pendientes en TASK-1846–1849.
 
 Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
 Seasonalities: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.

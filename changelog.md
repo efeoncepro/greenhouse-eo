@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-15 — TASK-1845: foundation de Efeonce Insights en develop (code complete, rollout pendiente)
+
+Nace el dominio Efeonce Insights: schema `greenhouse_insights` (reportes con código `EO-INS-…`, ediciones
+versionadas e inmutables al emitir, historial append-only, snapshots sellados y planes congelados),
+adapters SEO/AEO/ICO sobre los readers dueños con ventanas en zona IANA y ausencias declaradas (nunca
+cero), plan editorial determinista con validación de cifras e IA acotada tras flag, commands con
+autorización de tres planos e idempotencia por encargo, 16 rutas en los lanes app/ecosystem, 4 tools MCP,
+manual servido `efeonce-insights` + skill espejada, módulo `insights` de reliability con dos señales y
+flags `INSIGHTS_*` OFF. Emitir queda bloqueado hasta el render durable (TASK-1846); canary staging,
+federación en `efeonce-mcp` y release no ejecutados. Commits `e6e8a5dfe`, `a21e424fa`, `ca17c93da`, `12f985d8a`.
+
 ## 2026-09-14 — TASK-1832 corrige la atribución de señales del CIMD compartido
 
 La revisión por sujeto/familia confirmó que la actividad `refresh_reuse` agregada de Codex pertenecía a una
