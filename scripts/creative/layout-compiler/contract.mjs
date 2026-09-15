@@ -28,6 +28,19 @@ const positionedText = z.object({
   tracking: z.number().default(0)
 })
 
+const supportingTagline = z.object({
+  composition: z.literal('supportingTagline'),
+  reference: z.literal('primary-lockup-inline-size').default('primary-lockup-inline-size'),
+  segments: z
+    .array(
+      z.object({
+        text: z.string().trim().min(1),
+        role: z.enum(['base', 'growth', 'intervention']).default('base')
+      })
+    )
+    .min(1)
+})
+
 const contractSchema = z
   .object({
     version: z.literal('campaign-layout-compiler.v1'),
@@ -45,16 +58,19 @@ const contractSchema = z
     message: z.object({
       kicker: z.string(),
       headline: z.array(z.string().min(1)).min(1).max(4),
-      support: z.string(),
+      support: z.union([z.string(), supportingTagline]),
       url: z.string(),
       cta: z.string().optional(),
       legal: z.string().optional()
     }),
     brand: z.object({
       logo: z.string().min(1),
+      url_bubble: z.string().min(1).optional(),
       fonts: z.object({
+        regular: z.string().min(1).optional(),
         medium: z.string().min(1),
         bold: z.string().min(1),
+        bold_italic: z.string().min(1).optional(),
         extra_bold: z.string().min(1)
       }),
       colors: z.object({
@@ -79,6 +95,12 @@ const contractSchema = z
         colors: z.array(hexColor).min(2).max(4)
       })
     }),
+    collaboration_selection: z
+      .object({
+        intent: z.string().min(1),
+        target_binding: z.enum(['headline', 'support', 'hook', 'lockup'])
+      })
+      .optional(),
     composition: z.object({
       renderer: z.literal('sharp-fontkit'),
       output_format: z.enum(['jpeg', 'png']).default('jpeg'),
@@ -144,13 +166,19 @@ const contractSchema = z
               height: z.number().positive()
             }),
             headline: positionedText.extend({ gap: z.number().positive() }),
-            support: positionedText.extend({ max_width: z.number().positive(), gap: z.number().positive() }),
-            url: positionedText,
+            support: positionedText.extend({
+              max_width: z.number().positive(),
+              gap: z.number().positive(),
+              min_size: z.number().positive().optional(),
+              max_size: z.number().positive().optional()
+            }),
+            url: positionedText.extend({ width: z.number().positive().optional() }),
             rule: z.object({
               x: z.number().nonnegative(),
               y: z.number().nonnegative(),
               width: z.number().positive(),
-              height: z.number().positive()
+              height: z.number().positive(),
+              visible: z.boolean().default(true)
             })
           })
         })
@@ -161,6 +189,53 @@ const contractSchema = z
   .superRefine((contract, context) => {
     const ids = new Set()
     const outputs = new Set()
+
+    if (typeof contract.message.support !== 'string') {
+      if (contract.brand.fonts.regular === undefined) {
+        context.addIssue({
+          code: 'custom',
+          path: ['brand', 'fonts', 'regular'],
+          message: 'supportingTagline requires the real Poppins Regular font asset'
+        })
+      }
+
+      if (
+        contract.message.support.segments.some(segment => segment.role === 'intervention') &&
+        contract.brand.fonts.bold_italic === undefined
+      ) {
+        context.addIssue({
+          code: 'custom',
+          path: ['brand', 'fonts', 'bold_italic'],
+          message: 'supportingTagline intervention requires a real bold italic font asset'
+        })
+      }
+
+      const emphasisCount = contract.message.support.segments.filter(segment => segment.role !== 'base').length
+
+      if (emphasisCount > 2) {
+        context.addIssue({
+          code: 'custom',
+          path: ['message', 'support', 'segments'],
+          message: 'supportingTagline accepts at most two semantic emphasis segments'
+        })
+      }
+    }
+
+    if (contract.brand.url_bubble && contract.message.url !== 'efeoncepro.com') {
+      context.addIssue({
+        code: 'custom',
+        path: ['message', 'url'],
+        message: 'The canonical Efeonce URL Bubble carries the fixed signature efeoncepro.com'
+      })
+    }
+
+    if (contract.brand.url_bubble && contract.formats.some(format => format.layout.url.width === undefined)) {
+      context.addIssue({
+        code: 'custom',
+        path: ['formats'],
+        message: 'Each format requires layout.url.width when brand.url_bubble is configured'
+      })
+    }
 
     contract.formats.forEach((format, index) => {
       if (ids.has(format.id))

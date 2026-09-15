@@ -1,0 +1,28 @@
+{
+  "schema": "campaign-layout-qa.v1",
+  "checkedAt": "2026-09-14T15:40:29.162Z",
+  "campaignId": "axis-advertising-harness-smoke",
+  "manifest": "manifests/layout-compiler-composition.json",
+  "humanRelease": "pending",
+  "pass": true,
+  "checks": [
+    {
+      "id": "feed-4x5",
+      "output": "delivery/feed-4x5.png",
+      "assertions": {
+        "rendererAssertions": true,
+        "dimensions": true,
+        "format": true,
+        "srgb": true,
+        "exactCopyInVectorSource": true,
+        "outputHash": true,
+        "logoHash": true,
+        "urlBubbleAsset": true,
+        "editableSourcePresent": true,
+        "collaborationSelectionResolved": true,
+        "collaborationTargetBound": true
+      },
+      "pass": true
+    }
+  ]
+}

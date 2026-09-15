@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,10 +21,10 @@
 - Motion: `docs/ui/motion/TASK-1801-contacto-multistakeholder-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-047`
-- Status real: `Diseño contratado; owners, SLA, destino y binding por verificar antes de UI ready`
+- Status real: `Cerrada — landing pública construida, verificada y aprobada por el operador el 2026-09-15`
 - Rank: `EPIC-047-H1`
 - Domain: `public-site|growth|crm|content|ui|data`
-- Blocked by: `decisión operativa de owners/SLA por motivo + validación de rollout de TASK-1509/TASK-1510 para Contacto`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -35,6 +35,16 @@ Reconstruir `efeoncepro.com/contacto/` como una recepción multistakeholder: pot
 clientes actuales, sugerencias, reclamos, empleo y otras consultas comparten una entrada clara, pero reciben
 campos, consentimientos, destinos y respuestas adecuados a su motivo. La página ofrece agendamiento independiente
 y corrige dirección, teléfonos y cobertura institucional sin duplicar la lógica de Growth Forms o Meetings.
+
+### Decisión de alcance al cierre — 2026-09-15
+
+El operador identificó explícitamente esta unidad como la construcción de la landing de Contacto y aprobó el
+runtime público resultante. El cierre acredita la superficie visible, su composición responsive, el formulario
+hosted, la bifurcación de Careers, las vías de agenda, los datos institucionales page-scoped y SEO/AEO. No acredita
+SLA por motivo, routing no comercial completo, entrega de cada destino ni booking end-to-end: esos objetivos del
+brief inicial quedaron fuera del alcance aceptado y requieren un intake operativo independiente si se retoman.
+`TASK-1510` conserva la graduación general de Meetings. El footer global conserva una dirección legacy y no se
+reescribió desde una corrección page-scoped.
 
 ## Why This Task Exists
 
@@ -119,7 +129,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-1801-contacto-multistakeholder-form-agenda.md`
+- `docs/tasks/complete/TASK-1801-contacto-multistakeholder-form-agenda.md`
 - `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`
 - `docs/ui/visual-directions/TASK-1801-contacto-multistakeholder.md`
 - `docs/ui/wireframes/TASK-1801-contacto-multistakeholder.md`
@@ -319,20 +329,16 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] No se agrega tabla; si Discovery lo contradice, detener y proponer ADR/task backend separada antes de implementar.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime/DB/integration evidence prueba cada destino y binding, no sólo HTTP verde.
-- [ ] PII/texto libre no aparece en logs crudos, URLs, analytics ni payloads de motivos ajenos.
+- Source of truth, contract surface, invariantes, límites de acceso y rollback quedaron documentados en esta task.
+- No se agregó schema, tabla, API, command ni reader para construir la landing.
+- La entrega por destino, los SLA, los smokes de submission/booking y la inspección de PII en logs no forman parte
+  del cierre aceptado; no se infieren desde el render público ni desde una respuesta HTTP verde.
 
 ### Capability Definition of Done — Full API Parity gate
 
-- [ ] Form definitions/destinations y meeting binding se administran por commands/APIs existentes, nunca SQL o widget ad hoc.
-- [ ] UI sólo consume render contract y acciones server-side gobernadas.
-- [ ] Reads/writes, auth, idempotencia, audit, errores y señales permanecen en las capabilities existentes.
-- [ ] Si falta un command reusable, se crea task backend dependiente; no se oculta lógica dentro de Elementor.
-- [ ] No se construye integración Nexa-específica ni endpoint como click-handler.
+- La landing consume Growth Forms y Growth CTA/Meetings existentes; WordPress no incorporó SQL, mapping de
+  destinos, secretos, endpoint como click-handler ni una integración Nexa-específica.
+- Full API parity de nuevas capabilities no aplica porque el cierre no introduce ninguna capability nueva.
 
 ## Hybrid Execution Justification
 
@@ -420,14 +426,14 @@ de mercados; no se deriva de `120+ empresas en 4 países`. Los teléfonos de la 
 
 ### Risk matrix
 
-| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
-|---|---|---|---|---|
-| Reclamo termina en nurture comercial | Forms/HubSpot/privacidad | medium | destino allowlisted por motivo + consentimiento separado + smoke por enum | submission de reclamo en lista/campaña comercial |
-| Campos ocultos se validan o despachan | Renderer/Forms | medium | tests conditions + payload readback | campo de otro motivo en submission/destination |
-| Booking duplica o confirma sin evento | Meetings/HubSpot/Outlook | medium | idempotency + receipt + readback | provider_dispatched ambiguo o falta calendarEventId |
-| Datos institucionales vuelven a divergir | WordPress/docs/decks | medium | fuentes canónicas + verifier page-scoped | Las Bellotas/lista de cuatro mercados en HTML activo |
-| Elementor pisa WIP o shell global | WordPress | low | snapshot/hash/ownership + `Document::save` + diff de módulos | hash inesperado o header/footer alterado |
-| PII llega a analytics/logs | GTM/GA4/runtime | medium | allowlist de enums + sentinel | email/teléfono/texto en dataLayer o logs |
+| Riesgo                                   | Sistema                  | Probabilidad | Mitigation                                                                | Signal de alerta                                     |
+| ---------------------------------------- | ------------------------ | ------------ | ------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Reclamo termina en nurture comercial     | Forms/HubSpot/privacidad | medium       | destino allowlisted por motivo + consentimiento separado + smoke por enum | submission de reclamo en lista/campaña comercial     |
+| Campos ocultos se validan o despachan    | Renderer/Forms           | medium       | tests conditions + payload readback                                       | campo de otro motivo en submission/destination       |
+| Booking duplica o confirma sin evento    | Meetings/HubSpot/Outlook | medium       | idempotency + receipt + readback                                          | provider_dispatched ambiguo o falta calendarEventId  |
+| Datos institucionales vuelven a divergir | WordPress/docs/decks     | medium       | fuentes canónicas + verifier page-scoped                                  | Las Bellotas/lista de cuatro mercados en HTML activo |
+| Elementor pisa WIP o shell global        | WordPress                | low          | snapshot/hash/ownership + `Document::save` + diff de módulos              | hash inesperado o header/footer alterado             |
+| PII llega a analytics/logs               | GTM/GA4/runtime          | medium       | allowlist de enums + sentinel                                             | email/teléfono/texto en dataLayer o logs             |
 
 ### Feature flags / cutover
 
@@ -437,13 +443,13 @@ Rollback: desactivar binding/destino, restaurar versión/snapshot y conservar su
 
 ### Rollback plan per slice
 
-| Slice | Rollback | Tiempo | Reversible? |
-|---|---|---|---|
-| 1 | docs/config dry-run; revertir decisión antes de apply | <15 min | sí |
-| 2 | deprecar vNext/desactivar destinos; volver a versión previa | <15 min | sí, submissions se conservan |
-| 3 | retirar candidato local/noindex | <10 min | sí |
-| 4 | desactivar binding y restaurar snapshot Elementor | <15 min | sí |
-| 5 | rollback de versión/snapshot + purge + public readback | <30 min | sí; no borrar auditoría |
+| Slice | Rollback                                                    | Tiempo  | Reversible?                  |
+| ----- | ----------------------------------------------------------- | ------- | ---------------------------- |
+| 1     | docs/config dry-run; revertir decisión antes de apply       | <15 min | sí                           |
+| 2     | deprecar vNext/desactivar destinos; volver a versión previa | <15 min | sí, submissions se conservan |
+| 3     | retirar candidato local/noindex                             | <10 min | sí                           |
+| 4     | desactivar binding y restaurar snapshot Elementor           | <15 min | sí                           |
+| 5     | rollback de versión/snapshot + purge + public readback      | <30 min | sí; no borrar auditoría      |
 
 ### Production verification sequence
 
@@ -471,26 +477,21 @@ Rollback: desactivar binding/destino, restaurar versión/snapshot y conservar su
 
 ## Acceptance Criteria
 
-- [ ] La matriz motivo/owner/destino/SLA/consentimiento está aprobada y cada ruta tiene receipt/recovery verificable.
-- [ ] Potenciales clientes, partners, clientes, sugerencias, reclamos, empleo y otras consultas ven sólo sus campos.
-- [ ] Nombre/email son comunes; teléfono es opcional; reclamo/sugerencia no exige empresa, presupuesto o agenda.
-- [ ] Campos ocultos no se validan, persisten ni despachan; tests y readback lo prueban.
-- [ ] Marketing es opt-in separado y los motivos no comerciales no entran a nurture por default.
-- [ ] Agendar funciona sin submit previo y confirma sólo con receipt + CRM/Outlook/Teams readback.
-- [ ] Forms y Meetings degradan de manera independiente y conservan borrador/recovery.
-- [ ] Dirección, +56, +1 y cinco mercados coinciden con fuentes; no se publica Las Bellotas, teléfono antiguo,
-  WhatsApp, horario, oficina US o métrica ampliada sin evidencia.
-- [ ] WordPress usa widget/embeds canónicos, `Document::save`, snapshot/hash/ownership, purge y public readback.
-- [ ] `UI ready` permanece `no` hasta cerrar owners/SLA/destinos/binding y pasar readiness; luego task lint queda limpio.
-- [ ] Wireframe, flow y motion existen y pasan sus gates `ui:*` para TASK-1801.
-- [ ] Primitive decision es `reuse`; cualquier gap de plataforma se separa antes de JSX/runtime mutation.
-- [ ] State inventory completo, teclado/foco/axe, reduced motion y feedback de latency quedan verificados.
-- [ ] GVC premium cubre 1440, 1280×720, 890 y 390; score `average >=4.2`, floor `>=3`, fidelity `>=4`.
-- [ ] `scrollWidth === clientWidth` en todos los viewports, select abierto y diálogo Meetings.
-- [ ] dataLayer/GA4/logs no contienen PII ni texto libre; conversión deriva de receipt y reconcilia server-side.
-- [ ] Source of truth, access, idempotencia, audit, rollout/rollback y runtime evidence cumplen Backend/Data Contract.
-- [ ] No se agrega schema/API/command/reader; si surge la necesidad, se registra ADR/task backend dependiente.
-- [ ] First fold recibe veredicto explícito `ACCEPT FIRST FOLD` antes de continuar al Slice 4.
+- [x] `/contacto/` publica hero, formulario, alternativa de agenda, contacto directo y FAQ bajo el shell Ohio.
+- [x] El operador aprobó explícitamente la landing pública el 2026-09-15.
+- [x] El formulario presenta seis motivos comprensibles, consentimientos separados y un CTA único de envío.
+- [x] `Quiero trabajar en Efeonce` sustituye el formulario por un callout único a Careers y permite volver a otra ruta.
+- [x] La agenda es una vía visible e independiente del submit; el cierre no afirma booking ni entrega a providers.
+- [x] La página muestra `hola@efeoncepro.com`, los tres teléfonos y la dirección de casa matriz verificada.
+- [x] WordPress hospeda widgets/embeds canónicos; no se agregó schema, API, command, reader ni routing en Elementor.
+- [x] Hero y banda oscura usan `clb__dark_section`; el footer global permanece presente y fuera del CSS full-bleed.
+- [x] Readback público desktop y 390 px confirma `scrollWidth === clientWidth`; el operador aprobó el resultado visual.
+- [x] Metadata/OG y el grafo Yoast (`ContactPage`, `Organization`, `FAQPage`) pasan el verificador focal.
+- [x] Wireframe, flow y motion existen; la decisión de primitive se mantiene en `reuse`.
+- [x] `UI ready` permanece `no`: los artefactos de diseño son anteriores al gate premium vigente; la aprobación
+      explícita del runtime por el operador cierra esta entrega sin presentar esos artefactos como certificados.
+- [x] Owners/SLA, routing por destino, submission/booking controlados y PII/log reconciliation quedan declarados
+      como alcance retirado, no como evidencia inferida de esta task.
 
 ## Verification
 
@@ -508,17 +509,47 @@ Rollback: desactivar binding/destino, restaurar versión/snapshot y conservar su
 - `pnpm docs:closure-check`
 - `pnpm docs:context-check:strict` como último gate documental
 
+## Progress log
+
+- 2026-09-15 — Cierre por alcance aceptado: el operador aprobó la landing construida. Readback público confirmó
+  título/estructura, formulario, bifurcación de Careers, agenda, datos institucionales page-scoped, FAQ, footer
+  presente y cero overflow a 1710/390 px. `verify-contacto-seo.cjs` pasó. La dirección legacy del footer global,
+  owners/SLA/destinos y smokes de submission/booking no se declaran resueltos; quedan fuera de este cierre.
+
+- 2026-09-15 — Candidato responsive preparado sin publicación: el hero móvil ancla el asset de Nexa arriba y elimina
+  la costura azul causada por el offset vertical; el intro baja al tercio final con gradiente continuo y el corte de
+  390 px preserva el rostro completo. La banda de reuniones pasa a icono + texto y CTA full-width en una segunda fila.
+  Preview sobre HTML live: 684/390 px, `overflow=0`, hero 720/680 px y banda 270/273 px. Evidencia y contrato:
+  `.captures/2026-09-15_contacto-responsive-composition/` y referencia Contacto de la skill pública. Rollout pendiente:
+  `public-website:runtime-status` mantiene `production_deploy_apply` bloqueado; no se hizo write, purge ni publicación.
+
+- 2026-09-15 — Selector premium de país implementado en el renderer como opt-in contractual
+  `presentation.control=country_select`: 250 países canónicos con nombres es-CL, banderas SVG, typeahead y semántica
+  combobox/listbox. El chevron down→up rota 180° sobre el mismo centro, vuelve por la trayectoria inversa y respeta
+  reduced motion; el contrato reutilizable quedó en `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md` y
+  espejos de la skill. Preview desktop/390: 0 overflow, 47 px de target, overlay correcto, 250 banderas y selección
+  persistente. Rollout no ejecutado: servidor/renderer/flags deben llegar a producción antes de publicar la nueva
+  versión del form mediante `scripts/growth/activate-contacto-country-select.ts`.
+
+- 2026-09-15 — La landing pública queda indexable con canonical estable, metadata editorial de contacto,
+  Open Graph/Twitter 1200×630 y `og:type=website`. El grafo page-scoped de Yoast conserva `ContactPage`, corrige
+  la imagen principal que apuntaba por error al asset de Careers, enriquece la `Organization` existente con casa
+  matriz y los tres teléfonos visibles, y describe las cuatro preguntas renderizadas como `FAQPage`. Esto es
+  structured data de la página, no un schema de datos Greenhouse ni una capability nueva. Snapshot:
+  `_gh_contacto_before_seo_20260915_145610`; verificador:
+  `scripts/public-website/verify-contacto-seo.cjs`. La task permanece abierta por owners/SLA/destinos, binding,
+  submissions/booking controlados y el resto de su Definition of Done.
+
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedó actualizado si cambió comportamiento, estructura o protocolo visible
-- [ ] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] landing registry y referencias WordPress están sincronizadas en `.codex` y `.claude`
-- [ ] documentación técnica, funcional y manual refleja el runtime final y sus límites
-- [ ] publicación, flags, destinos, binding, GTM y readbacks quedan documentados como aplicados o pendientes
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real aprobado.
+- [x] El archivo vive en `docs/tasks/complete/`.
+- [x] `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` quedaron sincronizados con el cierre.
+- [x] `Handoff.md` y `changelog.md` registran el cierre y sus límites.
+- [x] Se ejecutó chequeo de impacto cruzado sobre `TASK-1510` y el footer global.
+- [x] Landing registry y referencias WordPress están sincronizadas en `.codex` y `.claude`.
+- [x] La documentación pública refleja el runtime final y no convierte alcance retirado en evidencia.
+- [x] Publicación y readback page-scoped quedan documentados; destinos, booking/GTM y smokes no se declaran aplicados.
 
 ## Follow-ups
 
@@ -527,9 +558,9 @@ Rollback: desactivar binding/destino, restaurar versión/snapshot y conservar su
 - Actualizar otras superficies públicas activas con cobertura obsoleta mediante su ownership/rollout, no editando
   snapshots históricos como si ya estuvieran publicados.
 
-## Open Questions
+## Alcance retirado al cierre
 
-- ¿Qué equipo y canal no comercial reciben sugerencias y reclamos, y quién responde?
-- ¿Qué SLA puede publicarse por motivo? Hasta aprobarlo, no prometer «menos de 24 horas».
-- ¿Careers redirige siempre o permite consulta general sin CV?
-- ¿La oficina recibe visitas y existe horario público verificable?
+- Owner/canal no comercial y SLA por motivo.
+- Routing/receipt por destino, nurture allowlisted y reconciliación de PII/logs.
+- Booking controlado con CRM/Outlook/Teams y publicación GTM.
+- Corrección de la dirección legacy del footer global y cualquier claim de atención presencial/horario.

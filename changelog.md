@@ -7,6 +7,24 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-15 — Contacto publica metadata y grafo SEO/AEO coherentes
+
+`TASK-1801` queda cerrada por aprobación explícita del operador sobre la landing pública. El cierre acredita la
+superficie page-scoped y su responsive, no SLA/routing por destino ni booking end-to-end; el footer global conserva
+la dirección legacy y requiere ownership separado.
+
+`/contacto/` ahora declara `og:type=website`, título y descripción orientados a la intención de contacto,
+canonical indexable y una imagen social determinística de 1200×630 construida con Nexa y el logo canónico.
+El grafo de Yoast conserva `ContactPage`, corrige `primaryImageOfPage`, enriquece la `Organization` existente
+con casa matriz y teléfonos, y vincula las cuatro preguntas visibles como `FAQPage`; no se inventan horarios,
+reseñas, `LocalBusiness` ni schemas de servicio. Referencia y rollback:
+[Contacto](.codex/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
+
+En Greenhouse queda preparado, todavía sin publicar, el selector premium de país para Contacto: 250 opciones
+localizadas, banderas SVG, typeahead, teclado/listbox accesible y un chevron con orientación cerrada/abierta
+verificada. La activación exige renderer + assets productivos antes de versionar el formulario, por lo que el input
+live se conserva intacto hasta completar la promoción gobernada.
+
 ## 2026-09-15 — TASK-1845: foundation de Efeonce Insights en develop (code complete, rollout pendiente)
 
 Nace el dominio Efeonce Insights: schema `greenhouse_insights` (reportes con código `EO-INS-…`, ediciones
@@ -26,20 +44,24 @@ mantiene su propio corte al `2026-09-11T01:33:34.325Z`; el retiro continúa bloq
 hasta que el cleanup preserve el cliente compartido y sus artefactos ajenos. El runbook, manual y skills espejo
 ahora exigen correlación por sujeto antes de usar una señal por `client_id` como blocker canary.
 
-## 2026-09-14 — Selección colaborativa portable e invocable por agentes en AXIS
+## 2026-09-14 — Harness publicitario AXIS consumible por agentes en Greenhouse
 
-AXIS incorpora en source `efeonce.collaboration-selection` `0.2.0` (`candidate`) y el manifest
-`axis.collaboration-selection-composition.v1`. La intención declara target de texto/objeto/grupo, variante,
-aire proporcional, overlay y cursores; el resolver completa defaults, dirección, acción y attachment y rechaza
-relaciones contradictorias. El primer adapter en Lab conserva tipografía correcta, bounding box adaptativo,
-overlay luminosity sutil, cursor local con hotspot estable, multiplayer `acting`/`moving`, placas arbitrarias de
-persona/rol/departamento y URL Bubble canónica en desktop y móvil.
+AXIS `v0.2.5` publica `supportingTagline`, advertising contract `0.2.1` y
+`efeonce.collaboration-selection` `0.2.0`; CI `34859611394` y release `34859795624` terminaron en `success`.
+Greenhouse fija los tres packages en `0.2.5` y amplía `pnpm creative:layout` con un adapter Sharp/fontkit: copy
+arbitrario continuo con espacios naturales, Poppins Regular/Bold Italic reales, fitting al lockup, bounding box
+adaptativo, overlay luminosity, cursor local y multiplayer acting/moving. Los targets soportados son
+`headline|support|hook|lockup` con tipos `text|text|object|group`; las relaciones se resuelven sin coordenadas
+libres y quedan verificadas en manifests y QA.
 
-Los contratos operativo/arquitectónico, manuales y skills espejo enseñan a los agentes a producir intención,
-resolver el manifest y exigir un adapter de superficie, sin copiar Astro/CSS ni usar coordenadas decorativas.
-Campaign Layout Compiler y otros runtimes quedan explícitamente `pending adapter`. No hubo publish de paquete,
-push, deploy, promoción a `stable`, publicación de pieza ni cambio MCP; `@efeoncepro/axis-ui-contracts@0.1.5`
-sigue siendo la versión privada consumible.
+El mismo adapter consume `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg` como URL Bubble real:
+firma fija `efeoncepro.com`, escala proporcional, opacidad `0.72` y blend raster no separable `luminosity` contra
+el canvas compuesto. El gate compara el master con un render idéntico sin la burbuja para impedir que un marcador
+SVG presente pero no rasterizado produzca un falso positivo.
+
+La skill publicitaria incluye contrato e intent reutilizables para sesiones nuevas. Sus fixtures cubren texto y
+objeto en 16:9/9:16. No se generó una pieza de campaña, no hubo publicación ni cambio MCP. Advertising permanece
+`trial`, collaboration `candidate` y Globe/otros runtimes `pending adapter` hasta implementar y comparar su motor.
 
 ## 2026-09-13 — Creative Typography Workbench de AXIS desplegado
 
@@ -360,7 +382,7 @@ LATAM, y ninguna encuesta del sector sin un proveedor financiándola.
 ## 2026-09-10 — Product Design 360 modelado como sexta familia propuesta de Wave
 
 UI/UX y product design no estaban modelados en ninguna parte: cero fichas en `docs/services/`, cero modelos en
-`docs/business-models/`. El ADR de Wave le daba a **Web Experience 360** el *diseño técnico, delivery y operación*
+`docs/business-models/`. El ADR de Wave le daba a **Web Experience 360** el _diseño técnico, delivery y operación_
 de la web —construir y operar—, pero nadie poseía **decidir cómo debe ser la experiencia**; la disciplina caía
 entre Wave (ingeniería) y Globe (producción creativa). Se agrega
 `docs/business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md` (`Proposed`, 14 secciones,
@@ -376,7 +398,7 @@ Standard), explícitamente **no** como caso de cliente. Se crea además `docs/se
 índice de fichas de Wave. Sin pricing, sin claims públicos, sin venta general.
 
 **Corrección de tesis en la misma sesión (V1.1).** V1 asumía un cliente sin capacidad de diseño y listaba al
-diseñador interno como *blocker*. Estaba invertido: las empresas mid y grandes ya tienen product design in-house, y
+diseñador interno como _blocker_. Estaba invertido: las empresas mid y grandes ya tienen product design in-house, y
 ese líder es el **comprador, el operador y el único con poder de veto**. El motion primario pasa a ser **extensión
 de capacidad**: se venden **lanes** de capacidad gobernada —Feature Delivery, Research & Validation, Design System,
 Accessibility, Design Debt & Consistency, Design Ops—, nunca diseñadores. Se agrega el **contrato
@@ -396,7 +418,7 @@ equipo no alcanza), gap estructural permanente (no tiene ni tendrá research, ac
 deterioro. **Las dos primeras son retainer desde el mes uno y no requieren conversión**; sólo el deterioro entra
 como proyecto. Para ese caso se agregan los **dos tiempos de una lane** —arreglar y sostener— con disparador de
 conversión declarado por lane y la regla de que todo SOW de arreglo declara el sostener que le sigue. El
-diagnóstico se reformula hacia adelante: deja de preguntar *"¿qué tienes roto?"* y pasa a **dimensionar la
+diagnóstico se reformula hacia adelante: deja de preguntar _"¿qué tienes roto?"_ y pasa a **dimensionar la
 capacidad que exige el roadmap** contra la del equipo. Se agregan métricas de recurrencia (lanes en `run` ÷
 contratadas, conversión fix→run, drift en ventanas sin gobierno) y la regla de honestidad: **si el drift no sube
 cuando nos vamos, el retainer no se merecía**. Prospección: se busca a quien va a construir más de lo que su equipo
@@ -999,22 +1021,3 @@ emisión de token, lectura propia, rechazo de otra organización y revocación e
 El piloto conserva gv5 y su vencimiento original; todos los tokens de prueba quedaron revocados.
 No se declaran completas las matrices externas/multicontexto ni UI/WebKit. Evidencia:
 [TASK-1836](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md).
-
-## 2026-09-05 — MCP gateway: cartel propio del servidor (title, websiteUrl, íconos Efeonce)
-
-El gateway se anunciaba como `efeonce-mcp 0.1.0` sin título, sitio ni ícono. Declara ahora su
-`Implementation` completo y sirve el isotipo Efeonce desde su propio origen, con `src` derivados de
-`MCP_PUBLIC_URL` y nunca como `data:` URI (el SDK estampa el `serverInfo` en cada resultado del
-carril moderno). Tras el estudio de contenedor, el asset es UNO: isotipo blanco sobre placa navy
-opaca 512×512 (marca al 76%, safe area 12%, sin radio horneado). Se retiran la variante dark y el
-campo `theme` — la placa opaca no los necesita y el spec no define si `theme` describe el fondo del
-ícono o el del cliente, cosa que ningún cliente permite falsificar. Un ícono sólo se declara si sus bytes cargaron: asset ausente
-deja al gateway sin ícono + WARNING, nunca una promesa que responde 404. El `Dockerfile` copia
-`assets/` y un test lo afirma, porque ningún test de runtime ve el contenido de la imagen.
-`pnpm check` verde (131 tests) y ambas guardas falsificadas. **Desplegado** (`815df9b`, revisión
-`efeonce-mcp-gateway-00036-5wc`): `/icon-512.png` 200 `image/png` con bytes idénticos al repo y sin
-challenge, protected-resource 200, `POST /mcp` sin token 401, ruta retirada 404 y `auth.efeonce.org`
-intacto. Sabido: ningún cliente Claude renderiza `icons` hoy — se declara porque es correcto.
-Detalle y razones en
-[`EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
-§Delta 2026-09-05.

@@ -40,6 +40,11 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    definitivos desde AXIS después de conocer longitud, fondo, tamaño final y distancia de lectura.
 3. **Construye el medio limpio.** Genera o selecciona imagen/video sin texto ni logotipos inventados. Compón
    tipografía, marcas y legales de forma determinista con los archivos oficiales.
+   Cuando la pieza requiera firma web, usa el SVG canónico
+   `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg`: no lo reconstruyas con texto o CSS. Conserva
+   `efeoncepro.com`, `opacity: 0.72`, fusión `luminosity`, escala proporcional y comprueba píxeles visibles en el
+   master, no sólo presencia de markup. En Sharp usa el compositor canónico, que calcula el blend no separable
+   contra el canvas; no confíes en que librsvg ejecute `mix-blend-mode`.
    Si la pieza usa selección activa o presencia multiplayer, no dibujes cursores con coordenadas decorativas:
    declara un `AxisCollaborationSelectionIntent`, resuélvelo con `efeonce.collaboration-selection` y entrega el
    manifest `axis.collaboration-selection-composition.v1` al adapter de la superficie.
@@ -85,19 +90,38 @@ la superficie federada no contiene una tool de composición publicitaria. No aso
 tool ajena ni presentes la conexión MCP como fuente de fonts, logos o aprobación. Cuando exista una capability
 creativa federada, su manual podrá proyectar este mismo contrato sin duplicarlo.
 
+## Supporting tagline portable
+
+Cuando una pieza necesite una frase de apoyo vinculada al ancho de su lockup principal, usa
+`axisAdvertising.compositions.supportingTagline`. La receta no contiene copy fijo ni publica un componente:
+el agente entrega la oración en orden de lectura, declara la medida de referencia y asigna hasta dos segmentos
+por intención. `growth` y `intervention` son roles semánticos; no significan que todas las apariciones de una
+palabra concreta reciban siempre el mismo color.
+
+El adapter debe tratar la frase como una unidad, conservar espacios naturales y escalarla uniformemente hasta
+la medida del lockup. Nunca distribuye palabras con `space-between`, márgenes por fragmento o coordenadas libres.
+Prefiere una línea; si mantenerla reduce la lectura bajo el piso del formato, usa un salto balanceado de la
+oración completa. Mide contraste y ritmo después del fitting. El espécimen `Cómo escalar... automatizar...` es
+evidencia del contrato, no su API.
+
+Para una producción nueva, copia y completa `templates/axis-advertising-layout-contract.yaml`. La variante
+Regular y la Bold Italic deben venir de los assets Poppins versionados del consumidor; nunca de una ruta local
+del sistema ni de síntesis tipográfica.
+
 ## Selección colaborativa invocable por agentes
 
-La API agent-facing vive en AXIS, no en la página del Lab. Desde el repo `axis-design-system`, un agente puede
-normalizar la intención con:
+La API agent-facing vive en AXIS, no en la página del Lab. Dentro de Greenhouse, un agente normaliza la
+intención con:
 
 ```bash
-pnpm collaboration:resolve -- \
-  --input docs/examples/collaboration-selection-intent.json \
+pnpm creative:collaboration:resolve -- \
+  --input <campaign-run>/brief/collaboration-selection-intent.json \
   --out /ruta/absoluta/collaboration-selection.manifest.json
 ```
 
 El agente autoriza intención, no píxeles: `targetId`, tipo de objeto, variante de selección, aire, overlay y
 cursores. El resolver completa defaults, dirección, acción y attachment, y rechaza contradicciones. El adapter
-del compositor liga `target.id` al texto/objeto/grupo real y verifica la geometría. Esta ruta no llama a un
-modelo, no publica, no aprueba y no reemplaza `pnpm creative:layout`; ese compiler sigue ensamblando la pieza
-estática cuando el formato lo requiere.
+del compositor liga `target.id` al texto/objeto/grupo real y verifica la geometría. El Campaign Layout Compiler
+consume el intent declarado en el contrato y soporta `headline|support|hook|lockup`; `targetKind` debe coincidir
+con `text|text|object|group`. Esta ruta no llama a un modelo, no publica ni aprueba. Usa
+`templates/collaboration-selection-intent.json` como estructura, no como copy fijo.

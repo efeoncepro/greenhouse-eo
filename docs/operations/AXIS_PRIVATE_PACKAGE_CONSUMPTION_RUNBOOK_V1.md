@@ -6,14 +6,14 @@ This runbook describes how Greenhouse, Globe and future Efeonce products consume
 private AXIS packages without coupling runtimes or placing personal credentials in
 source control.
 
-## Current state — 2026-07-30
+## Current state — 2026-09-14
 
 - Package repository: `efeoncepro/axis-design-system`.
 - Agent-facing visual guide: [`DESIGN.md`](https://github.com/efeoncepro/axis-design-system/blob/main/DESIGN.md), generated from `packages/tokens` and checked with `pnpm design:check` in the AXIS repository. It is a projection for agents, not a second token source of truth.
 - Lab runtime: `apps/lab` is Astro `7.1.6`, `output: 'static'`, public Vercel delivery, and builds to
   `apps/lab/dist`; its HTML reference consumes AXIS registry/tokens and does not import Greenhouse/Globe adapters.
-- Private packages published at version `0.1.5` (was `0.1.4` until 2026-07-29; the bump corrected
-  the `warning`/`danger` token drift and was the first release gated by CI):
+- Private packages published at version `0.2.5` (the three packages converge on this version for the
+  advertising composition release; they remain independently versioned):
   - `@efeoncepro/axis-tokens`
   - `@efeoncepro/axis-ui-contracts`
   - `@efeoncepro/axis-ui-registry`
@@ -57,17 +57,17 @@ source control.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
 
-## Delta de source — 2026-09-14: selección colaborativa agent-facing
+## Delta 2026-09-14 — composición publicitaria y selección colaborativa publicadas
 
-El repo AXIS contiene en source `efeonce.collaboration-selection` `0.2.0` con lifecycle `candidate`, el resolver
-`resolveCollaborationSelectionIntent()` y el schema normalizado
-`axis.collaboration-selection-composition.v1`. El Lab es su primer adapter. Los agentes pueden validar y resolver
-un intent localmente con `pnpm collaboration:resolve -- --input <intent.json> --out <manifest.json>`.
+El tag `v0.2.5` publicó `axisAdvertising.compositions.supportingTagline`,
+`efeonce.advertising-typography@0.2.1` y `efeonce.collaboration-selection@0.2.0` en los tres paquetes. Evidencia:
+commit AXIS `179aeb9e10ad6a017424ba534a1393afc1add766`, CI `34859611394` y release
+`34859795624`, ambos `success`.
 
-Este delta **no está publicado** en `@efeoncepro/axis-ui-contracts@0.1.5` y no habilita por sí solo Greenhouse,
-Globe, Artifact Composer, Campaign Layout Compiler u otro runtime. Para consumirlo se requiere release AXIS
-normal, versión exacta fijada, adapter nativo, fixture, evidencia responsive/cross-runtime y registro del consumer.
-No se debe copiar el adapter Astro/CSS del Lab ni describir la capacidad como desplegada antes de ese ciclo.
+Greenhouse fija los tres paquetes en `0.2.5` e implementa un adapter nativo en el Campaign Layout Compiler. Sus
+fixtures prueban Poppins real, copy arbitrario, fitting continuo, targets de texto/objeto, cursor local y
+multiplayer acting/moving en 16:9 y 9:16. Globe y otros runtimes permanecen `pending adapter`; la publicación del
+contrato no equivale a adopción. No se copia el adapter Astro/CSS del Lab.
 
 ## Delta 2026-08-29 — la credencial venció, bloqueó un release, y el detector SÍ había avisado
 

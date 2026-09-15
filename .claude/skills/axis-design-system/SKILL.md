@@ -88,6 +88,12 @@ The Workbench is the guided visual projection of the guide, not another source o
 approval. Its recommendation does not authorize a brand decision, client delivery, scheduling or publication.
 Do not make its adapter, families or recipes global, and do not package licensed font files with AXIS.
 
+For a support sentence tied to a primary lockup, consume
+`axisAdvertising.compositions.supportingTagline`. It defines a continuous ordered sentence, Poppins structural
+base, uniform fitting to the lockup inline measure, natural word spacing, balanced-wrap fallback and at most two
+semantic emphasis segments. `growth` and `intervention` describe intent, not reserved words. The Lab sentence is
+fixture evidence only; adapters accept arbitrary copy and must measure their own rendered result.
+
 ### Collaboration selection
 
 AXIS source owns the candidate `efeonce.collaboration-selection` contract and
@@ -105,9 +111,11 @@ The command validates and resolves defaults, cursor direction/action and multipl
 render, call a model, approve or publish. A surface adapter consumes only the normalized manifest, binds
 `target.id` to real text/object/group geometry and verifies the hotspot/selection relationship at narrow and wide
 formats. Never copy the Lab Astro/CSS or fall back to free `top`/`left` coordinates. If no adapter exists, report
-the capability as pending. The source contract is `candidate` and is not in the currently published `0.1.5`
-package; do not claim Greenhouse, Globe or another runtime has adopted it until package release and consumer
-evidence are recorded.
+the capability as pending.
+
+The portable advertising and collaboration contracts are published in the AXIS `0.2.5` package set. Greenhouse
+pins that exact set and its Campaign Layout Compiler implements the first non-Lab adapter for
+`headline|support|hook|lockup`; this evidence does not imply that Globe or another runtime has adopted it.
 
 ### AXIS Lab
 

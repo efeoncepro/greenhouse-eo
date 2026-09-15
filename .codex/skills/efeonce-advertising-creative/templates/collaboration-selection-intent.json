@@ -1,0 +1,34 @@
+{
+  "targetId": "primary-lockup-headline",
+  "targetKind": "text",
+  "variant": "eight-handles",
+  "padding": "standard",
+  "overlay": "subtle",
+  "cursors": [
+    {
+      "id": "local-cursor",
+      "kind": "local",
+      "targetId": "primary-lockup-headline",
+      "anchor": "bottom-center",
+      "action": "select"
+    },
+    {
+      "id": "creative-team",
+      "kind": "collaborator",
+      "targetId": "primary-lockup-headline",
+      "anchor": "top-end",
+      "action": "resize",
+      "label": "Equipo creativo",
+      "participantKind": "department"
+    },
+    {
+      "id": "camila-acting",
+      "kind": "collaborator",
+      "targetId": "primary-lockup-headline",
+      "anchor": "bottom-end",
+      "action": "rotate",
+      "label": "Camila",
+      "participantKind": "person"
+    }
+  ]
+}

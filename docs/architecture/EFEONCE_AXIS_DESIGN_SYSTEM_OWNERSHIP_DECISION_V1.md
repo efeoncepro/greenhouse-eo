@@ -442,6 +442,17 @@ La decisión aplica sin cambiar la frontera de este ADR:
   licencia y conserva `font-synthesis: none`.
 - La promoción a `stable` requiere un segundo consumidor real y comparación visual cross-runtime.
 
+## Delta 2026-09-14 — recetas de composición y segundo adapter
+
+AXIS `0.2.5` publica la composición `supportingTagline` y el contrato
+`efeonce.collaboration-selection@0.2.0`. La frontera del ADR no cambia: AXIS entrega datos, relaciones e
+invariantes agnósticos del motor; cada consumidor mide y pinta su geometría.
+
+Greenhouse fija esa versión e incorpora un adapter Sharp/fontkit en el Campaign Layout Compiler. El adapter
+consume copy arbitrario, assets Poppins reales y targets semánticos de texto/objeto/grupo; no importa CSS ni
+componentes del Lab. Sus fixtures constituyen evidencia de un segundo motor, pero no una comparación visual
+cross-runtime aprobada. Por eso advertising continúa `trial` y collaboration selection continúa `candidate`.
+
 ## Open questions
 
 - **Cuánto divergen hoy los dos adapters de `efeonce.status`.** Es medible el primer día del eje 3 y

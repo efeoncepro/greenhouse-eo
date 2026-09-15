@@ -110,10 +110,10 @@ renderer es el manifest `axis.collaboration-selection-composition.v1`, no el CSS
 El adapter liga `target.id` a la capa real del compositor, mide texto/objeto/grupo, agrega aire proporcional y
 sitúa cada hotspot según su anclaje semántico.
 
-El Campaign Layout Compiler V1 todavía no consume ese manifest. Hasta que exista un adapter con fixture y QA,
-declara la capa `pending adapter`; no la hornees en el plate generativo, no inventes campos del contrato YAML y no
-aproximes la metáfora con coordenadas. El resolver AXIS no sustituye `creative:layout`: uno normaliza relaciones
-semánticas y el otro ensambla el set estático.
+El Campaign Layout Compiler consume el intent desde `collaboration_selection`, ejecuta el resolver AXIS y liga
+su target a `headline|support|hook|lockup` con geometría renderizada. Su fixture prueba texto y objeto en formatos
+estrecho/ancho, cursores acting/moving, labels arbitrarios y ausencia de coordenadas libres. Si otro compositor no
+tiene adapter, declara `pending adapter`; no hornees la escena en el plate generativo ni copies el CSS del Lab.
 
 ## Gates
 

@@ -9,7 +9,7 @@
  * Los wrappers de host (WordPress/Astro) pinean la URL del canal. Sin deps externas
  * en el bundle (no React/Lit). Uso: `pnpm renderer:build [--channel=preview|beta|stable]`.
  */
-import { mkdir, writeFile, copyFile } from 'node:fs/promises'
+import { mkdir, writeFile, copyFile, readdir } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -46,17 +46,28 @@ const result = await build({
   metafile: true,
   legalComments: 'none',
   outfile: outFile,
-  banner: { js: `/* Greenhouse Growth Forms renderer · channel=${channel} · TASK-1231 */` },
+  banner: { js: `/* Greenhouse Growth Forms renderer · channel=${channel} · TASK-1231 */` }
 })
 
 // Alias mutable que apunta al último build (útil para el preview local).
 await copyFile(outFile, resolve(outDir, 'renderer-latest.js'))
 
+// El selector premium de país usa las mismas banderas vectoriales de Careers. Se
+// publican como assets separados para no inflar el bundle ni depender de un CDN.
+const flagSourceDir = resolve(repoRoot, 'node_modules/circle-flags/flags')
+const flagOutDir = resolve(outDir, 'flags')
+
+await mkdir(flagOutDir, { recursive: true })
+
+for (const name of await readdir(flagSourceDir)) {
+  if (/^[a-z]{2}\.svg$/.test(name)) await copyFile(resolve(flagSourceDir, name), resolve(flagOutDir, name))
+}
+
 const bytes = Object.values(result.metafile.outputs)[0]?.bytes ?? 0
 
 await writeFile(
   resolve(outDir, 'BUILDINFO.json'),
-  `${JSON.stringify({ channel, bytes, builtFrom: 'src/growth-forms-renderer/index.ts', task: 'TASK-1231' }, null, 2)}\n`,
+  `${JSON.stringify({ channel, bytes, builtFrom: 'src/growth-forms-renderer/index.ts', task: 'TASK-1231' }, null, 2)}\n`
 )
 
 console.log(`[renderer:build] OK → public/growth-forms/renderer-${channel}.js (${(bytes / 1024).toFixed(1)} KB)`)

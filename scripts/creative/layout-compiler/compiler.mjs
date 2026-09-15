@@ -4,8 +4,11 @@ import path from 'node:path'
 
 import * as fontkit from 'fontkit'
 import sharp from 'sharp'
+import { resolveCollaborationSelectionIntent } from '@efeoncepro/axis-ui-contracts'
+import { axisAdvertising } from '@efeoncepro/axis-tokens'
 
 import { loadLayoutContract, resolveRunPath, resolveRunRoot } from './contract.mjs'
+import { renderCollaborationSelection, resolveSupportingTagline, supportingTaglineCopy } from './axis-advertising.mjs'
 
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex')
 
@@ -42,6 +45,14 @@ export const buildLayoutPlan = async contractPathInput => {
   const anchorPath = resolveRunPath(contractPath, contract, contract.anchor.asset)
   const logoPath = resolveRunPath(contractPath, contract, contract.brand.logo)
 
+  const urlBubblePath = contract.brand.url_bubble
+    ? resolveRunPath(contractPath, contract, contract.brand.url_bubble)
+    : null
+
+  const collaborationIntentPath = contract.collaboration_selection
+    ? resolveRunPath(contractPath, contract, contract.collaboration_selection.intent)
+    : null
+
   const fontPaths = Object.fromEntries(
     Object.entries(contract.brand.fonts).map(([key, value]) => [key, resolveRunPath(contractPath, contract, value)])
   )
@@ -74,12 +85,16 @@ export const buildLayoutPlan = async contractPathInput => {
   const missingRequiredInputs = [
     ['anchor', await portableEvidence(anchorPath)],
     ['logo', await portableEvidence(logoPath)],
+    ...(urlBubblePath ? [['brand:url_bubble', await portableEvidence(urlBubblePath)]] : []),
     ...(await Promise.all(
       Object.entries(fontPaths).map(async ([key, filePath]) => [`font:${key}`, await portableEvidence(filePath)])
     )),
     ...formatPlans.map(format => [`source_plate:${format.id}`, format.sourcePlate]),
     ...formatPlans.map(format => [`finished_plate:${format.id}`, format.finishedPlate]),
-    ...formatPlans.filter(format => format.baseline).map(format => [`baseline:${format.id}`, format.baseline])
+    ...formatPlans.filter(format => format.baseline).map(format => [`baseline:${format.id}`, format.baseline]),
+    ...(collaborationIntentPath
+      ? [['collaboration_selection:intent', await portableEvidence(collaborationIntentPath)]]
+      : [])
   ]
     .filter(([, evidence]) => !evidence.exists)
     .map(([id, evidence]) => ({ id, path: evidence.path }))
@@ -119,6 +134,7 @@ export const buildLayoutPlan = async contractPathInput => {
     brand: {
       mode: contract.brand_mode,
       logo: await portableEvidence(logoPath),
+      urlBubble: urlBubblePath ? await portableEvidence(urlBubblePath) : null,
       fonts: Object.fromEntries(
         await Promise.all(
           Object.entries(fontPaths).map(async ([key, filePath]) => [key, await portableEvidence(filePath)])
@@ -126,6 +142,12 @@ export const buildLayoutPlan = async contractPathInput => {
       )
     },
     channelMode: contract.channel_mode,
+    collaborationSelection: collaborationIntentPath
+      ? {
+          targetBinding: contract.collaboration_selection.target_binding,
+          intent: await portableEvidence(collaborationIntentPath)
+        }
+      : null,
     checkpoints,
     missingRequiredInputs,
     formats: formatPlans,
@@ -141,14 +163,23 @@ export const buildLayoutPlan = async contractPathInput => {
   return { contract, contractPath, plan, planPath }
 }
 
-const loadFonts = (contractPath, contract) => ({
-  500: fontkit.openSync(resolveRunPath(contractPath, contract, contract.brand.fonts.medium)),
-  700: fontkit.openSync(resolveRunPath(contractPath, contract, contract.brand.fonts.bold)),
-  800: fontkit.openSync(resolveRunPath(contractPath, contract, contract.brand.fonts.extra_bold))
-})
+const loadFonts = (contractPath, contract) => {
+  const fonts = {
+    500: fontkit.openSync(resolveRunPath(contractPath, contract, contract.brand.fonts.medium)),
+    700: fontkit.openSync(resolveRunPath(contractPath, contract, contract.brand.fonts.bold)),
+    800: fontkit.openSync(resolveRunPath(contractPath, contract, contract.brand.fonts.extra_bold))
+  }
 
-const glyphPaths = (fonts, { value, x, y, size, weight, fill, tracking = 0, opacity = 1 }) => {
-  const font = fonts[weight]
+  if (contract.brand.fonts.regular)
+    fonts[400] = fontkit.openSync(resolveRunPath(contractPath, contract, contract.brand.fonts.regular))
+  if (contract.brand.fonts.bold_italic)
+    fonts['700-italic'] = fontkit.openSync(resolveRunPath(contractPath, contract, contract.brand.fonts.bold_italic))
+
+  return fonts
+}
+
+const glyphPaths = (fonts, { value, x, y, size, weight, fontKey = weight, fill, tracking = 0, opacity = 1 }) => {
+  const font = fonts[fontKey]
   const run = font.layout(value)
   const scale = size / font.unitsPerEm
   let cursor = 0
@@ -170,8 +201,8 @@ const glyphPaths = (fonts, { value, x, y, size, weight, fill, tracking = 0, opac
   return `<g data-copy="${escapeXml(value)}" transform="translate(${x} ${y})" fill="${fill}" opacity="${opacity}">${paths}</g>`
 }
 
-const measureText = (fonts, { value, size, weight, tracking = 0 }) => {
-  const font = fonts[weight]
+const measureText = (fonts, { value, size, weight, fontKey = weight, tracking = 0 }) => {
+  const font = fonts[fontKey]
   const run = font.layout(value)
   const scale = size / font.unitsPerEm
 
@@ -202,7 +233,7 @@ const wrapText = (fonts, { value, size, weight, tracking = 0, maxWidth }) => {
   return lines
 }
 
-const underlayMarkup = (contract, format) => {
+const underlayMarkup = (contract, format, selectionTargetId = null) => {
   const { width, height } = format.canvas
   const underlay = contract.visual_system.underlay
   const hook = format.layout.hook
@@ -210,7 +241,7 @@ const underlayMarkup = (contract, format) => {
 
   const hookMarkup =
     contract.visual_system.hook.type === 'frequency-rail'
-      ? `<g data-layer="campaign_hook">
+      ? `<g data-layer="campaign_hook" data-axis-layout-element="hook"${selectionTargetId ? ` data-axis-selection-target="${escapeXml(selectionTargetId)}"` : ''}>
       <rect x="${hook.x}" y="${hook.y}" width="${hook.width}" height="${hook.height}" rx="${hook.width / 2}" fill="url(#campaignHook)"/>
       <circle cx="${hook.x + hook.width / 2}" cy="${hook.y + hook.height + 18}" r="${hook.width / 2}" fill="${hookColors[1]}" opacity="0.72"/>
       <circle cx="${hook.x + hook.width / 2}" cy="${hook.y + hook.height + 31}" r="${hook.width / 3}" fill="${hookColors[0]}" opacity="0.48"/>
@@ -243,12 +274,39 @@ const underlayMarkup = (contract, format) => {
   ${hookMarkup}`
 }
 
-const buildVectorLayers = (fonts, contract, format) => {
+const unionBounds = (...boundsList) => ({
+  left: Math.min(...boundsList.map(bounds => bounds.left)),
+  top: Math.min(...boundsList.map(bounds => bounds.top)),
+  right: Math.max(...boundsList.map(bounds => bounds.right)),
+  bottom: Math.max(...boundsList.map(bounds => bounds.bottom))
+})
+
+const inlineCanonicalUrlBubble = (bytes, layout) => {
+  const source = bytes.toString('utf8').replace(/^<\?xml[^>]*>\s*/u, '')
+  const openingEnd = source.indexOf('>')
+  const closingStart = source.lastIndexOf('</svg>')
+
+  if (!source.startsWith('<svg') || openingEnd < 0 || closingStart < openingEnd)
+    throw new Error('Canonical URL Bubble asset is not a valid SVG document')
+
+  const opening = source.slice(0, openingEnd + 1)
+  const viewBox = opening.match(/viewBox="([^"]+)"/u)?.[1]
+
+  if (!viewBox) throw new Error('Canonical URL Bubble asset requires a viewBox')
+
+  const width = layout.url.width
+  const height = width * (242.53 / 1232.25)
+  const body = source.slice(openingEnd + 1, closingStart)
+
+  return `<svg data-axis-brand-primitive="url-bubble" data-copy="efeoncepro.com" x="${layout.url.x}" y="${layout.url.y}" width="${width}" height="${height}" viewBox="${viewBox}" opacity="0.72" style="mix-blend-mode:luminosity">${body}</svg>`
+}
+
+const buildVectorLayers = (fonts, contract, format, collaborationManifest = null, urlBubbleMarkup = null) => {
   const colors = contract.brand.colors
   const layout = format.layout
   const message = contract.message
 
-  const headline = message.headline
+  const headlineMarkup = message.headline
     .map((line, index) =>
       glyphPaths(fonts, {
         value: line,
@@ -258,26 +316,6 @@ const buildVectorLayers = (fonts, contract, format) => {
         weight: 800,
         fill: index === 0 ? colors.foreground : colors.accent,
         tracking: layout.headline.tracking
-      })
-    )
-    .join('\n')
-
-  const supportLines = wrapText(fonts, {
-    value: message.support,
-    size: layout.support.size,
-    weight: 500,
-    maxWidth: layout.support.max_width
-  })
-
-  const support = supportLines
-    .map((line, index) =>
-      glyphPaths(fonts, {
-        value: line,
-        x: layout.support.x,
-        y: layout.support.y + layout.support.gap * index,
-        size: layout.support.size,
-        weight: 500,
-        fill: colors.support
       })
     )
     .join('\n')
@@ -293,6 +331,169 @@ const buildVectorLayers = (fonts, contract, format) => {
     )
   )
 
+  const headlineBounds = {
+    left: layout.headline.x,
+    top: layout.headline.y - layout.headline.size,
+    right: layout.headline.x + maxHeadlineWidth,
+    bottom: layout.headline.y + layout.headline.gap * (message.headline.length - 1) + layout.headline.size * 0.2
+  }
+
+  let supportMarkup
+  let supportLines
+  let supportBounds
+  let supportLayout
+
+  if (typeof message.support === 'string') {
+    supportLines = wrapText(fonts, {
+      value: message.support,
+      size: layout.support.size,
+      weight: 500,
+      tracking: layout.support.tracking,
+      maxWidth: layout.support.max_width
+    })
+
+    const widths = supportLines.map(line =>
+      measureText(fonts, {
+        value: line,
+        size: layout.support.size,
+        weight: 500,
+        tracking: layout.support.tracking
+      })
+    )
+
+    supportMarkup = supportLines
+      .map((line, index) =>
+        glyphPaths(fonts, {
+          value: line,
+          x: layout.support.x,
+          y: layout.support.y + layout.support.gap * index,
+          size: layout.support.size,
+          weight: 500,
+          fill: colors.support,
+          tracking: layout.support.tracking
+        })
+      )
+      .join('\n')
+    supportBounds = {
+      left: layout.support.x,
+      top: layout.support.y - layout.support.size,
+      right: layout.support.x + Math.max(...widths),
+      bottom: layout.support.y + layout.support.gap * (supportLines.length - 1) + layout.support.size * 0.2
+    }
+    supportLayout = { mode: 'legacy-wrap', size: layout.support.size, lines: supportLines, copy: message.support }
+  } else {
+    const roleAppearance = {
+      base: { fontKey: 400, weight: 400, fill: colors.support },
+      growth: { fontKey: 700, weight: 700, fill: axisAdvertising.color.growthOnDark },
+      intervention: { fontKey: '700-italic', weight: 700, fill: axisAdvertising.color.accentSurface }
+    }
+
+    const measureWord = (word, size) => {
+      const appearance = roleAppearance[word.role]
+
+      return measureText(fonts, {
+        value: word.text,
+        size,
+        weight: appearance.weight,
+        fontKey: appearance.fontKey,
+        tracking: layout.support.tracking
+      })
+    }
+
+    const measureSpace = size =>
+      measureText(fonts, { value: ' ', size, weight: 400, fontKey: 400, tracking: layout.support.tracking })
+
+    supportLayout = resolveSupportingTagline({
+      support: message.support,
+      referenceWidth: maxHeadlineWidth,
+      requestedSize: layout.support.size,
+      minSize: layout.support.min_size ?? layout.support.size * 0.7,
+      maxSize: layout.support.max_size ?? layout.support.size * 2,
+      measureWord,
+      measureSpace
+    })
+    supportLines = supportLayout.lines.map(line => line.words.map(word => word.text).join(' '))
+    supportMarkup = supportLayout.lines
+      .map((line, lineIndex) => {
+        const lineX = layout.support.x + (supportLayout.referenceWidth - line.width) / 2
+
+        return line.words
+          .map(word => {
+            const appearance = roleAppearance[word.role]
+
+            return `<g data-axis-ad-emphasis="${word.role}">${glyphPaths(fonts, {
+              value: word.text,
+              x: lineX + word.x,
+              y: layout.support.y + layout.support.gap * lineIndex,
+              size: supportLayout.size,
+              weight: appearance.weight,
+              fontKey: appearance.fontKey,
+              fill: appearance.fill,
+              tracking: layout.support.tracking
+            })}</g>`
+          })
+          .join('')
+      })
+      .join('\n')
+    const maxSupportWidth = Math.max(...supportLayout.lines.map(line => line.width))
+
+    supportBounds = {
+      left: layout.support.x + (supportLayout.referenceWidth - maxSupportWidth) / 2,
+      top: layout.support.y - supportLayout.size,
+      right: layout.support.x + (supportLayout.referenceWidth + maxSupportWidth) / 2,
+      bottom: layout.support.y + layout.support.gap * (supportLayout.lines.length - 1) + supportLayout.size * 0.2
+    }
+  }
+
+  const lockupBounds = unionBounds(headlineBounds, supportBounds)
+
+  const hookBounds = {
+    left: layout.hook.x,
+    top: layout.hook.y,
+    right: layout.hook.x + layout.hook.width,
+    bottom: layout.hook.y + layout.hook.height
+  }
+
+  const targetBoundsByBinding = {
+    headline: headlineBounds,
+    support: supportBounds,
+    hook: hookBounds,
+    lockup: lockupBounds
+  }
+
+  const selectedTargetBounds = contract.collaboration_selection
+    ? targetBoundsByBinding[contract.collaboration_selection.target_binding]
+    : headlineBounds
+
+  const collaboration = collaborationManifest
+    ? renderCollaborationSelection({
+        manifest: collaborationManifest,
+        targetBounds: selectedTargetBounds,
+        canvas: format.canvas,
+        measureLabel: (value, size) => measureText(fonts, { value, size, weight: 700 })
+      })
+    : null
+
+  const selectedTargetId = collaborationManifest?.target.id
+  const headlineTarget = contract.collaboration_selection?.target_binding === 'headline' ? selectedTargetId : null
+  const supportTarget = contract.collaboration_selection?.target_binding === 'support' ? selectedTargetId : null
+  const lockupTarget = contract.collaboration_selection?.target_binding === 'lockup' ? selectedTargetId : null
+  const urlBubbleWidth = layout.url.width ?? 0
+  const urlBubbleHeight = urlBubbleWidth * (242.53 / 1232.25)
+
+  const urlMarkup =
+    urlBubbleMarkup === null
+      ? glyphPaths(fonts, {
+          value: message.url,
+          x: layout.url.x,
+          y: layout.url.y,
+          size: layout.url.size,
+          weight: 700,
+          fill: colors.foreground,
+          tracking: layout.url.tracking
+        })
+      : urlBubbleMarkup
+
   const contentBounds = {
     left: Math.min(
       layout.logo.left,
@@ -301,7 +502,7 @@ const buildVectorLayers = (fonts, contract, format) => {
       layout.headline.x,
       layout.support.x,
       layout.url.x,
-      layout.rule.x
+      layout.rule.visible ? layout.rule.x : Number.POSITIVE_INFINITY
     ),
     top: Math.min(layout.logo.top, layout.kicker.y - layout.kicker.size, layout.headline.y - layout.headline.size),
     right: Math.max(
@@ -313,21 +514,30 @@ const buildVectorLayers = (fonts, contract, format) => {
           weight: 700,
           tracking: layout.kicker.tracking
         }),
-      layout.headline.x + maxHeadlineWidth,
-      layout.support.x + layout.support.max_width,
-      layout.url.x +
-        measureText(fonts, { value: message.url, size: layout.url.size, weight: 700, tracking: layout.url.tracking }),
-      layout.rule.x + layout.rule.width
+      headlineBounds.right,
+      supportBounds.right,
+      urlBubbleMarkup
+        ? layout.url.x + urlBubbleWidth
+        : layout.url.x +
+            measureText(fonts, {
+              value: message.url,
+              size: layout.url.size,
+              weight: 700,
+              tracking: layout.url.tracking
+            }),
+      layout.rule.visible ? layout.rule.x + layout.rule.width : Number.NEGATIVE_INFINITY
     ),
     bottom: Math.max(
-      layout.url.y,
-      layout.rule.y + layout.rule.height,
-      layout.support.y + layout.support.gap * (supportLines.length - 1)
+      urlBubbleMarkup ? layout.url.y + urlBubbleHeight : layout.url.y,
+      layout.rule.visible ? layout.rule.y + layout.rule.height : Number.NEGATIVE_INFINITY,
+      supportBounds.bottom
     )
   }
 
   return {
     contentBounds,
+    supportLayout,
+    collaborationEvidence: collaboration?.evidence ?? null,
     markup: `<g data-layer="type">
       ${glyphPaths(fonts, {
         value: message.kicker,
@@ -339,18 +549,14 @@ const buildVectorLayers = (fonts, contract, format) => {
         tracking: layout.kicker.tracking,
         opacity: 0.92
       })}
-      ${headline}
-      <g data-full-copy="${escapeXml(message.support)}">${support}</g>
-      <rect x="${layout.rule.x}" y="${layout.rule.y}" width="${layout.rule.width}" height="${layout.rule.height}" rx="${layout.rule.height / 2}" fill="${colors.muted}" opacity="0.38"/>
-      ${glyphPaths(fonts, {
-        value: message.url,
-        x: layout.url.x,
-        y: layout.url.y,
-        size: layout.url.size,
-        weight: 700,
-        fill: colors.foreground,
-        tracking: layout.url.tracking
-      })}
+      ${collaboration ? `<g data-layer="selection-wash">${collaboration.underlay}</g>` : ''}
+      <g data-axis-layout-element="lockup"${lockupTarget ? ` data-axis-selection-target="${escapeXml(lockupTarget)}"` : ''}>
+        <g data-axis-layout-element="headline"${headlineTarget ? ` data-axis-selection-target="${escapeXml(headlineTarget)}"` : ''}>${headlineMarkup}</g>
+        <g data-axis-layout-element="support"${supportTarget ? ` data-axis-selection-target="${escapeXml(supportTarget)}"` : ''} data-axis-ad-composition="${typeof message.support === 'string' ? 'legacy-support' : 'supportingTagline'}" data-full-copy="${escapeXml(supportingTaglineCopy(message.support))}">${supportMarkup}</g>
+      </g>
+      ${layout.rule.visible ? `<rect x="${layout.rule.x}" y="${layout.rule.y}" width="${layout.rule.width}" height="${layout.rule.height}" rx="${layout.rule.height / 2}" fill="${colors.muted}" opacity="0.38"/>` : ''}
+      ${urlMarkup}
+      ${collaboration ? `<g data-layer="selection-controls">${collaboration.overlay}</g>` : ''}
     </g>`
   }
 }
@@ -428,7 +634,108 @@ const copyFieldContrast = async (underlayPath, format, colors) => {
   }
 }
 
-const renderFormat = async ({ contract, contractPath, fonts, format, logoBytes, logoSha256 }) => {
+const pixelLuminosity = ([red, green, blue]) => 0.3 * red + 0.59 * green + 0.11 * blue
+
+const clipBlendColor = color => {
+  const luminosity = pixelLuminosity(color)
+  const minimum = Math.min(...color)
+  const maximum = Math.max(...color)
+  let clipped = color
+
+  if (minimum < 0) {
+    clipped = clipped.map(channel => luminosity + ((channel - luminosity) * luminosity) / (luminosity - minimum))
+  }
+
+  if (maximum > 255) {
+    clipped = clipped.map(
+      channel => luminosity + ((channel - luminosity) * (255 - luminosity)) / (maximum - luminosity)
+    )
+  }
+
+  return clipped
+}
+
+const setPixelLuminosity = (color, targetLuminosity) => {
+  const delta = targetLuminosity - pixelLuminosity(color)
+
+  return clipBlendColor(color.map(channel => channel + delta))
+}
+
+const compositeLuminosity = async ({ backdropBytes, sourceBytes, left, top, width, opacity }) => {
+  const { data: backdrop, info } = await sharp(backdropBytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+
+  const { data: source, info: sourceInfo } = await sharp(sourceBytes)
+    .resize({ width })
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true })
+
+  let changedChannels = 0
+  let maxChannelDelta = 0
+
+  for (let sourceY = 0; sourceY < sourceInfo.height; sourceY += 1) {
+    const targetY = top + sourceY
+
+    if (targetY < 0 || targetY >= info.height) continue
+
+    for (let sourceX = 0; sourceX < sourceInfo.width; sourceX += 1) {
+      const targetX = left + sourceX
+
+      if (targetX < 0 || targetX >= info.width) continue
+
+      const sourceIndex = (sourceY * sourceInfo.width + sourceX) * sourceInfo.channels
+      const alpha = (source[sourceIndex + 3] / 255) * opacity
+
+      if (alpha === 0) continue
+
+      const targetIndex = (targetY * info.width + targetX) * info.channels
+      const backdropColor = [backdrop[targetIndex], backdrop[targetIndex + 1], backdrop[targetIndex + 2]]
+      const sourceColor = [source[sourceIndex], source[sourceIndex + 1], source[sourceIndex + 2]]
+      const blended = setPixelLuminosity(backdropColor, pixelLuminosity(sourceColor))
+
+      for (let channel = 0; channel < 3; channel += 1) {
+        const before = backdrop[targetIndex + channel]
+        const after = Math.round(before * (1 - alpha) + blended[channel] * alpha)
+        const delta = Math.abs(after - before)
+
+        backdrop[targetIndex + channel] = after
+        if (delta > 10) changedChannels += 1
+        if (delta > maxChannelDelta) maxChannelDelta = delta
+      }
+    }
+  }
+
+  const output = await sharp(backdrop, {
+    raw: { width: info.width, height: info.height, channels: info.channels }
+  })
+    .png()
+    .toBuffer()
+
+  return {
+    output,
+    evidence: {
+      method: 'non-separable-luminosity',
+      backdrop: 'composed-master-before-url-bubble',
+      opacity,
+      region: { left, top, width: sourceInfo.width, height: sourceInfo.height },
+      changedChannels,
+      maxChannelDelta,
+      visible: changedChannels > 500
+    }
+  }
+}
+
+const renderFormat = async ({
+  contract,
+  contractPath,
+  fonts,
+  format,
+  logoBytes,
+  logoSha256,
+  urlBubbleBytes,
+  urlBubbleSha256,
+  collaborationManifest
+}) => {
   const { width, height } = format.canvas
   const sourcePlatePath = resolveRunPath(contractPath, contract, format.source_plate)
   const finishedPlatePath = resolveRunPath(contractPath, contract, format.finished_plate)
@@ -447,9 +754,20 @@ const renderFormat = async ({ contract, contractPath, fonts, format, logoBytes, 
     .png()
     .toBuffer()
 
-  const underlayBody = underlayMarkup(contract, format)
+  const hookSelectionTarget =
+    contract.collaboration_selection?.target_binding === 'hook' ? (collaborationManifest?.target.id ?? null) : null
+
+  const underlayBody = underlayMarkup(contract, format, hookSelectionTarget)
   const underlaySvg = svgDocument(width, height, underlayBody)
-  const { markup: vectorMarkup, contentBounds } = buildVectorLayers(fonts, contract, format)
+  const urlBubbleMarkup = urlBubbleBytes ? inlineCanonicalUrlBubble(urlBubbleBytes, format.layout) : null
+
+  const {
+    markup: vectorMarkup,
+    contentBounds,
+    supportLayout,
+    collaborationEvidence
+  } = buildVectorLayers(fonts, contract, format, collaborationManifest, urlBubbleMarkup)
+
   const overlaySvg = svgDocument(width, height, `${underlayBody}${vectorMarkup}`)
   const logoDataUri = `data:image/svg+xml;base64,${logoBytes.toString('base64')}`
   const relativePlatePath = path.relative(editableDir, finishedPlatePath).split(path.sep).join('/')
@@ -482,14 +800,34 @@ const renderFormat = async ({ contract, contractPath, fonts, format, logoBytes, 
   ])
 
   const logoRaster = await sharp(logoBytes).resize({ width: format.layout.logo.width }).png().toBuffer()
-  let pipeline = sharp(underlayBytes)
+
+  const rasterVectorMarkup = urlBubbleBytes
+    ? buildVectorLayers(fonts, contract, format, collaborationManifest, '').markup
+    : vectorMarkup
+
+  const composedWithoutUrlBubble = await sharp(underlayBytes)
     .composite([
-      { input: svgDocument(width, height, vectorMarkup), left: 0, top: 0 },
+      { input: svgDocument(width, height, rasterVectorMarkup), left: 0, top: 0 },
       { input: logoRaster, left: format.layout.logo.left, top: format.layout.logo.top }
     ])
     .flatten({ background: contract.brand.colors.background })
     .toColourspace('srgb')
-    .withMetadata({ density: 72 })
+    .png()
+    .toBuffer()
+
+  const urlBubbleComposite = urlBubbleBytes
+    ? await compositeLuminosity({
+        backdropBytes: composedWithoutUrlBubble,
+        sourceBytes: urlBubbleBytes,
+        left: Math.round(format.layout.url.x),
+        top: Math.round(format.layout.url.y),
+        width: Math.round(format.layout.url.width),
+        opacity: 0.72
+      })
+    : null
+
+  const composedBytes = urlBubbleComposite?.output ?? composedWithoutUrlBubble
+  let pipeline = sharp(composedBytes).toColourspace('srgb').withMetadata({ density: 72 })
 
   pipeline =
     contract.composition.output_format === 'png'
@@ -532,6 +870,8 @@ const renderFormat = async ({ contract, contractPath, fonts, format, logoBytes, 
     accentContrastP95: contrastEvidence.accentP95 >= 3
   }
 
+  if (urlBubbleBytes) assertions.urlBubbleVisible = urlBubbleComposite.evidence.visible
+
   if (format.baseline) {
     assertions.baselineWithinTolerance = baselineComparison.normalizedMae <= format.baseline.max_normalized_mae
   }
@@ -560,7 +900,11 @@ const renderFormat = async ({ contract, contractPath, fonts, format, logoBytes, 
     bytes: outputBytes.length,
     sha256: sha256(outputBytes),
     logoSha256,
+    urlBubbleSha256,
+    urlBubbleRasterEvidence: urlBubbleComposite?.evidence ?? null,
     exactCopy: contract.message,
+    supportLayout,
+    collaborationSelection: collaborationEvidence,
     copyField: format.copy_field,
     contentBounds,
     safeBounds,
@@ -642,10 +986,52 @@ export const compileLayoutCampaign = async contractPathInput => {
   const logoPath = resolveRunPath(contractPath, contract, contract.brand.logo)
   const logoBytes = await readFile(logoPath)
   const logoSha256 = sha256(logoBytes)
+
+  const urlBubblePath = contract.brand.url_bubble
+    ? resolveRunPath(contractPath, contract, contract.brand.url_bubble)
+    : null
+
+  const urlBubbleBytes = urlBubblePath ? await readFile(urlBubblePath) : null
+  const urlBubbleSha256 = urlBubbleBytes ? sha256(urlBubbleBytes) : null
+  let collaborationManifest = null
+
+  if (contract.collaboration_selection) {
+    const intentPath = resolveRunPath(contractPath, contract, contract.collaboration_selection.intent)
+    const intent = JSON.parse(await readFile(intentPath, 'utf8'))
+
+    collaborationManifest = resolveCollaborationSelectionIntent(intent)
+
+    const expectedTargetKinds = {
+      headline: 'text',
+      support: 'text',
+      hook: 'object',
+      lockup: 'group'
+    }
+
+    const expectedTargetKind = expectedTargetKinds[contract.collaboration_selection.target_binding]
+
+    if (collaborationManifest.target.kind !== expectedTargetKind)
+      throw new Error(
+        `Collaboration target kind ${collaborationManifest.target.kind} does not match binding ${contract.collaboration_selection.target_binding} (${expectedTargetKind})`
+      )
+  }
+
   const results = []
 
   for (const format of contract.formats) {
-    results.push(await renderFormat({ contract, contractPath, fonts, format, logoBytes, logoSha256 }))
+    results.push(
+      await renderFormat({
+        contract,
+        contractPath,
+        fonts,
+        format,
+        logoBytes,
+        logoSha256,
+        urlBubbleBytes,
+        urlBubbleSha256,
+        collaborationManifest
+      })
+    )
   }
 
   const contactSheet = await buildContactSheet({ contract, contractPath, results })
@@ -661,9 +1047,12 @@ export const compileLayoutCampaign = async contractPathInput => {
     renderer: 'sharp + fontkit outlined typography',
     logo: relativeToRun(contractPath, contract, logoPath),
     logoSha256,
+    urlBubble: urlBubblePath ? relativeToRun(contractPath, contract, urlBubblePath) : null,
+    urlBubbleSha256,
     contactSheet: relativeToRun(contractPath, contract, contactSheet.path),
     contactSheetSha256: contactSheet.sha256,
     checkpoints: plan.checkpoints,
+    collaborationSelection: collaborationManifest,
     status:
       contract.approvals.human_release === 'approved'
         ? 'creative_release_candidate'
@@ -707,7 +1096,7 @@ export const verifyCompiledCampaign = async (contractPathInput, compiled) => {
     const copyPresent =
       [contract.message.kicker, ...contract.message.headline, contract.message.url].every(value =>
         overlay.includes(`data-copy="${escapeXml(value)}"`)
-      ) && overlay.includes(`data-full-copy="${escapeXml(contract.message.support)}"`)
+      ) && overlay.includes(`data-full-copy="${escapeXml(supportingTaglineCopy(contract.message.support))}"`)
 
     const assertions = {
       rendererAssertions: result.pass && Object.values(result.assertions).every(Boolean),
@@ -717,7 +1106,26 @@ export const verifyCompiledCampaign = async (contractPathInput, compiled) => {
       exactCopyInVectorSource: copyPresent,
       outputHash: sha256(outputBytes) === result.sha256,
       logoHash: result.logoSha256 === manifest.logoSha256,
-      editableSourcePresent: await exists(resolveRunPath(contractPath, contract, result.editableSource))
+      urlBubbleAsset:
+        !contract.brand.url_bubble ||
+        (result.urlBubbleSha256 === manifest.urlBubbleSha256 &&
+          result.urlBubbleRasterEvidence?.method === 'non-separable-luminosity' &&
+          result.urlBubbleRasterEvidence?.visible === true &&
+          overlay.includes('data-axis-brand-primitive="url-bubble"') &&
+          overlay.includes('style="mix-blend-mode:luminosity"') &&
+          overlay.includes('opacity="0.72"')),
+      editableSourcePresent: await exists(resolveRunPath(contractPath, contract, result.editableSource)),
+      collaborationSelectionResolved:
+        !contract.collaboration_selection ||
+        (result.collaborationSelection?.schema === 'axis.collaboration-selection-composition.v1' &&
+          result.collaborationSelection.noFreeCoordinates === true &&
+          result.collaborationSelection.withinCanvas === true &&
+          result.collaborationSelection.cursorEvidence.every(cursor =>
+            cursor.state === 'moving' ? cursor.clearOfTarget === true : cursor.touchesTarget === true
+          )),
+      collaborationTargetBound:
+        !contract.collaboration_selection ||
+        overlay.includes(`data-axis-selection-target="${escapeXml(manifest.collaborationSelection.target.id)}"`)
     }
 
     checks.push({ id: result.id, output: result.output, assertions, pass: Object.values(assertions).every(Boolean) })

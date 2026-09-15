@@ -88,9 +88,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg'
  * lo que el fallback mantiene funcional el DOM patching sin depender del global.
  */
 const escapeSelectorValue = (value: string): string =>
-  typeof CSS !== 'undefined' && typeof CSS.escape === 'function'
-    ? CSS.escape(value)
-    : value.replace(/["\\\]]/g, '\\$&')
+  typeof CSS !== 'undefined' && typeof CSS.escape === 'function' ? CSS.escape(value) : value.replace(/["\\\]]/g, '\\$&')
 
 type PresentationIcon = NonNullable<NonNullable<RendererFieldDefinition['presentation']>['icon']>
 type RendererIconName = PresentationIcon | 'send' | 'spinner'
@@ -369,7 +367,12 @@ export class FormRenderer {
     bar.style.width = `${percent}%`
     meta.appendChild(el(this.doc, 'span', {}, 'Completa tu postulación'))
     meta.appendChild(
-      el(this.doc, 'span', { class: 'ghf-careers-progress-percent', 'data-ghf-careers-progress-percent': 'true' }, `${percent}%`)
+      el(
+        this.doc,
+        'span',
+        { class: 'ghf-careers-progress-percent', 'data-ghf-careers-progress-percent': 'true' },
+        `${percent}%`
+      )
     )
     track.appendChild(bar)
     shell.appendChild(meta)
@@ -415,7 +418,10 @@ export class FormRenderer {
   }
 
   private renderCareersStaticFields(): HTMLElement {
-    const visibleFields = this.fieldsForStep().filter(field => field.type !== 'hidden' && isFieldVisible(field, this.values))
+    const visibleFields = this.fieldsForStep().filter(
+      field => field.type !== 'hidden' && isFieldVisible(field, this.values)
+    )
+
     const byKey = new Map(visibleFields.map(field => [field.key, field]))
     const consumed = new Set<string>()
     const shell = el(this.doc, 'div', { class: 'ghf-careers-fields' })
@@ -423,13 +429,19 @@ export class FormRenderer {
     const sections = [
       // TASK-1688 — residenceCountryCode va tras email y antes de phone (wireframe: el país es
       // dato personal explícito; nunca queda relegado al fallback "Datos adicionales").
-      { marker: '01', title: 'Tus datos', fieldKeys: ['firstName', 'lastName', 'email', 'residenceCountryCode', 'phone'] },
+      {
+        marker: '01',
+        title: 'Tus datos',
+        fieldKeys: ['firstName', 'lastName', 'email', 'residenceCountryCode', 'phone']
+      },
       { marker: '02', title: 'Tu perfil', fieldKeys: ['portfolioUrl', 'linkedinUrl', 'availability', 'cvFile'] },
       { marker: '03', title: 'Cuéntanos más', fieldKeys: ['message'] }
     ]
 
     for (const section of sections) {
-      const fields = section.fieldKeys.map(key => byKey.get(key)).filter((field): field is RendererFieldDefinition => Boolean(field))
+      const fields = section.fieldKeys
+        .map(key => byKey.get(key))
+        .filter((field): field is RendererFieldDefinition => Boolean(field))
 
       if (fields.length === 0) continue
       fields.forEach(field => consumed.add(field.key))
@@ -474,25 +486,51 @@ export class FormRenderer {
       shell.appendChild(heading)
       const progress = el(this.doc, 'div', { class: 'ghf-content-step-progress' })
 
-      progress.appendChild(el(this.doc, 'span', { class: 'ghf-progress', 'aria-live': 'polite', tabindex: '-1' }, this.copy.stepProgress(this.currentStep + 1, steps.length)))
+      progress.appendChild(
+        el(
+          this.doc,
+          'span',
+          { class: 'ghf-progress', 'aria-live': 'polite', tabindex: '-1' },
+          this.copy.stepProgress(this.currentStep + 1, steps.length)
+        )
+      )
       const dots = el(this.doc, 'span', { class: 'ghf-content-step-dots', 'aria-hidden': 'true' })
 
-      steps.forEach((_, index) => dots.appendChild(el(this.doc, 'span', { 'data-state': index < this.currentStep ? 'done' : index === this.currentStep ? 'current' : 'upcoming' })))
+      steps.forEach((_, index) =>
+        dots.appendChild(
+          el(this.doc, 'span', {
+            'data-state': index < this.currentStep ? 'done' : index === this.currentStep ? 'current' : 'upcoming'
+          })
+        )
+      )
       progress.appendChild(dots)
       shell.appendChild(progress)
 
-return shell
+      return shell
     }
 
     if (this.contract.styleVariant === 'hubspot_pillar') {
       const heading = el(this.doc, 'div', { class: 'ghf-pillar-step-heading' })
 
       heading.appendChild(el(this.doc, 'span', { class: 'ghf-pillar-step-title' }, currentLabel ?? ''))
-      heading.appendChild(el(this.doc, 'span', { class: 'ghf-progress', 'aria-live': 'polite', tabindex: '-1' }, this.copy.stepProgress(this.currentStep + 1, steps.length)))
+      heading.appendChild(
+        el(
+          this.doc,
+          'span',
+          { class: 'ghf-progress', 'aria-live': 'polite', tabindex: '-1' },
+          this.copy.stepProgress(this.currentStep + 1, steps.length)
+        )
+      )
       shell.appendChild(heading)
       const track = el(this.doc, 'div', { class: 'ghf-pillar-step-track', 'aria-hidden': 'true' })
 
-      steps.forEach((_, index) => track.appendChild(el(this.doc, 'span', { 'data-state': index < this.currentStep ? 'done' : index === this.currentStep ? 'current' : 'upcoming' })))
+      steps.forEach((_, index) =>
+        track.appendChild(
+          el(this.doc, 'span', {
+            'data-state': index < this.currentStep ? 'done' : index === this.currentStep ? 'current' : 'upcoming'
+          })
+        )
+      )
       shell.appendChild(track)
 
       return shell
@@ -613,7 +651,7 @@ return shell
       class: `ghf-field${fullWidth ? ' ghf-field--full' : ''}`,
       'data-invalid': error ? 'true' : 'false',
       'data-status': this.fieldStatus.get(field.key) ?? 'neutral',
-      'data-ghf-field-key': field.key,
+      'data-ghf-field-key': field.key
     })
 
     const label = this.fieldLabel(field)
@@ -689,7 +727,8 @@ return shell
     } else if (this.shouldRenderControlIcon(field)) {
       const controlWrap = el(this.doc, 'div', { class: 'ghf-control ghf-control--textarea ghf-control--with-icon' })
 
-      if (field.presentation?.icon) controlWrap.appendChild(this.renderIcon(field.presentation.icon, 'ghf-control-icon'))
+      if (field.presentation?.icon)
+        controlWrap.appendChild(this.renderIcon(field.presentation.icon, 'ghf-control-icon'))
       controlWrap.appendChild(control)
       wrap.appendChild(controlWrap)
     } else {
@@ -770,7 +809,11 @@ return shell
 
     const current = this.values[field.key]
 
-    if (this.contract.styleVariant === 'hubspot_pillar' && ['radio', 'select', 'multiselect'].includes(field.type)) {
+    if (
+      this.contract.styleVariant === 'hubspot_pillar' &&
+      ['radio', 'select', 'multiselect'].includes(field.type) &&
+      !this.usesPremiumSelect(field)
+    ) {
       return this.renderChoiceGroup(field, fieldId, required, describedBy)
     }
 
@@ -787,7 +830,7 @@ return shell
       }
 
       case 'select':
-        if (this.usesPremiumSelect()) return this.renderPremiumSelectControl(field, common)
+        if (this.usesPremiumSelect(field)) return this.renderPremiumSelectControl(field, common)
 
       case 'multiselect': {
         if (field.type === 'multiselect' && field.freeEntry) return this.renderTagMultiSelectControl(field, common)
@@ -865,7 +908,12 @@ return shell
   }
 
   /** Contract-owned choices: native inputs keep keyboard, validation and preserved step state. */
-  private renderChoiceGroup(field: RendererFieldDefinition, fieldId: string, required: boolean, describedBy: string): HTMLElement {
+  private renderChoiceGroup(
+    field: RendererFieldDefinition,
+    fieldId: string,
+    required: boolean,
+    describedBy: string
+  ): HTMLElement {
     const multiple = field.type === 'multiselect'
 
     const group = el(this.doc, 'div', {
@@ -883,14 +931,22 @@ return shell
 
     for (const [index, option] of (field.options ?? []).entries()) {
       const label = el(this.doc, 'label', { class: 'ghf-choice' })
-      const input = el(this.doc, 'input', { id: `${fieldId}-${index}`, name: field.key, type: multiple ? 'checkbox' : 'radio', value: option.value })
+
+      const input = el(this.doc, 'input', {
+        id: `${fieldId}-${index}`,
+        name: field.key,
+        type: multiple ? 'checkbox' : 'radio',
+        value: option.value
+      })
 
       input.checked = multiple ? Array.isArray(selected) && selected.includes(option.value) : selected === option.value
       input.addEventListener('change', () => {
         if (multiple) {
-          const values = Array.isArray(this.values[field.key]) ? this.values[field.key] as string[] : []
+          const values = Array.isArray(this.values[field.key]) ? (this.values[field.key] as string[]) : []
 
-          this.values[field.key] = input.checked ? [...new Set([...values, option.value])] : values.filter(value => value !== option.value)
+          this.values[field.key] = input.checked
+            ? [...new Set([...values, option.value])]
+            : values.filter(value => value !== option.value)
         } else {
           this.values[field.key] = option.value
         }
@@ -906,8 +962,12 @@ return shell
     return group
   }
 
-  private usesPremiumSelect(): boolean {
-    return this.contract.styleVariant === 'diagnostic_premium' || this.contract.styleVariant === 'careers-html-fidelity'
+  private usesPremiumSelect(field?: RendererFieldDefinition): boolean {
+    return (
+      field?.presentation?.control === 'country_select' ||
+      this.contract.styleVariant === 'diagnostic_premium' ||
+      this.contract.styleVariant === 'careers-html-fidelity'
+    )
   }
 
   private usesInlineControlIcons(): boolean {
@@ -1030,7 +1090,7 @@ return shell
     }
   }
 
-  private selectOptionsFor(field: RendererFieldDefinition): { value: string; label: string }[] {
+  private selectOptionsFor(field: RendererFieldDefinition): { value: string; label: string; countryCode?: string }[] {
     const hasBlankOption = field.options?.some(opt => opt.value === '') ?? false
     const options = [...(field.options ?? [])]
 
@@ -1040,6 +1100,7 @@ return shell
 
     return options.map(option => ({
       value: option.value,
+      countryCode: option.countryCode,
       label:
         option.copyRef && this.contract.copy?.[option.copyRef]
           ? this.contract.copy[option.copyRef]
@@ -1055,6 +1116,8 @@ return shell
     const listId = `${common.id}-listbox`
     let activeIndex = initialIndex
     let open = false
+    let typeahead = ''
+    let typeaheadTimer: ReturnType<typeof setTimeout> | null = null
 
     const wrap = el(this.doc, 'div', { class: 'ghf-select-composite' })
 
@@ -1072,15 +1135,31 @@ return shell
     const icon = el(this.doc, 'span', { class: 'ghf-select-icon', 'aria-hidden': 'true' })
     const list = el(this.doc, 'div', { class: 'ghf-select-list', id: listId, role: 'listbox', hidden: 'hidden' })
 
+    const appendCountryFlag = (parent: HTMLElement, countryCode?: string) => {
+      if (!countryCode) return
+
+      const flag = el(this.doc, 'img', {
+        class: 'ghf-country-flag',
+        src: `${this.api.baseUrl.replace(/\/$/, '')}/growth-forms/flags/${countryCode.toLowerCase()}.svg`,
+        alt: '',
+        'aria-hidden': 'true',
+        decoding: 'async'
+      })
+
+      parent.appendChild(flag)
+    }
+
     const renderSelected = () => {
       const selected = options.find(option => option.value === this.values[field.key])
+
+      valueText.replaceChildren()
 
       // TASK-1688 — sin valor seteado, el trigger muestra el placeholder REAL (no la primera
       // opción como si estuviera elegida): un select requerido que "muestra Chile" con valor
       // vacío deja pasar al submit y revienta con un error genérico confuso. Sin placeholder
       // declarado se conserva el fallback legacy a options[0].
       if (!selected && field.placeholder) {
-        valueText.textContent = field.placeholder
+        valueText.appendChild(el(this.doc, 'span', { class: 'ghf-select-value-label' }, field.placeholder))
         trigger.dataset.placeholder = 'true'
 
         return
@@ -1088,7 +1167,8 @@ return shell
 
       const shown = selected ?? options[0]
 
-      valueText.textContent = shown?.label ?? ''
+      appendCountryFlag(valueText, shown?.countryCode)
+      valueText.appendChild(el(this.doc, 'span', { class: 'ghf-select-value-label' }, shown?.label ?? ''))
       trigger.dataset.placeholder = selected ? 'false' : 'true'
     }
 
@@ -1135,7 +1215,7 @@ return shell
       this.touched.add(field.key)
       renderSelected()
       list.querySelectorAll<HTMLElement>('.ghf-select-option').forEach((item, optionIndex) => {
-        item.setAttribute('aria-selected', optionIndex === index ? 'true' : 'false')
+        item.setAttribute('aria-selected', optionIndex === index && options[index]?.value !== '' ? 'true' : 'false')
       })
       setActive(index)
       setOpen(false)
@@ -1153,10 +1233,11 @@ return shell
         id: `${common.id}-option-${index}`,
         class: 'ghf-select-option',
         role: 'option',
-        'aria-selected': index === initialIndex ? 'true' : 'false',
+        'aria-selected': index === initialIndex && option.value !== '' ? 'true' : 'false',
         'data-value': option.value
       })
 
+      appendCountryFlag(item, option.countryCode)
       item.appendChild(el(this.doc, 'span', { class: 'ghf-select-option-label' }, option.label))
       item.addEventListener('mousedown', event => event.preventDefault())
       item.addEventListener('click', () => choose(index))
@@ -1194,6 +1275,27 @@ return shell
           event.preventDefault()
           setOpen(false)
         }
+      } else if (event.key.length === 1 && /[\p{L}\p{N}]/u.test(event.key)) {
+        event.preventDefault()
+        typeahead += event.key.toLocaleLowerCase(this.contract.form.locale)
+        if (typeaheadTimer) clearTimeout(typeaheadTimer)
+        typeaheadTimer = setTimeout(() => {
+          typeahead = ''
+        }, 700)
+
+        const normalized = (value: string) =>
+          value
+            .normalize('NFD')
+            .replace(/\p{Diacritic}/gu, '')
+            .toLocaleLowerCase(this.contract.form.locale)
+
+        const query = normalized(typeahead)
+        const match = options.findIndex(option => normalized(option.label).startsWith(query))
+
+        if (match >= 0) {
+          if (!open) setOpen(true)
+          setActive(match)
+        }
       }
     })
 
@@ -1216,7 +1318,7 @@ return shell
       type: 'text',
       class: 'ghf-tag-entry',
       autocomplete: 'off',
-      inputmode: 'text',
+      inputmode: 'text'
     })
 
     if (field.placeholder) input.setAttribute('placeholder', field.placeholder)
@@ -1242,17 +1344,22 @@ return shell
       wrap.dataset.maxed = values.length >= maxItems ? 'true' : 'false'
       input.disabled = values.length >= maxItems
       input.setAttribute('aria-disabled', input.disabled ? 'true' : 'false')
-      input.setAttribute('placeholder', values.length >= maxItems ? `Máximo ${maxItems}` : field.placeholder ?? '')
+      input.setAttribute('placeholder', values.length >= maxItems ? `Máximo ${maxItems}` : (field.placeholder ?? ''))
 
       values.forEach((value, index) => {
         const chip = el(this.doc, 'span', { class: 'ghf-tag-chip' })
         const label = el(this.doc, 'span', { class: 'ghf-tag-label' }, value)
 
-        const remove = el(this.doc, 'button', {
-          type: 'button',
-          class: 'ghf-tag-remove',
-          'aria-label': `Quitar ${value}`,
-        }, '×')
+        const remove = el(
+          this.doc,
+          'button',
+          {
+            type: 'button',
+            class: 'ghf-tag-remove',
+            'aria-label': `Quitar ${value}`
+          },
+          '×'
+        )
 
         remove.addEventListener('click', () => {
           setValues(currentValues().filter((_, itemIndex) => itemIndex !== index))
@@ -1440,7 +1547,9 @@ return shell
     )
 
     if (policy?.maxBytes) {
-      copyWrap.appendChild(el(this.doc, 'span', { class: 'ghf-file-dropzone-hint' }, this.copy.fileHint(policy.maxBytes)))
+      copyWrap.appendChild(
+        el(this.doc, 'span', { class: 'ghf-file-dropzone-hint' }, this.copy.fileHint(policy.maxBytes))
+      )
     }
 
     dropzone.appendChild(this.renderIcon(field.presentation?.icon ?? 'file', 'ghf-file-dropzone-icon'))

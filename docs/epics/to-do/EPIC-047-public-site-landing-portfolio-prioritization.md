@@ -77,7 +77,7 @@ Una landing publicada que **daña** (URL duplicada indexable, promesa sin prueba
 
 | Rank | Task | Superficie | Por qué importa | Qué la destraba |
 | --- | --- | --- | --- | --- |
-| `H1` | [TASK-1801](../../tasks/to-do/TASK-1801-contacto-multistakeholder-form-agenda.md) | Contacto | Es a donde llegan los CTA de todas las landings | Owners y SLA por motivo (decisión del operador) + rollout de TASK-1509/1510 |
+| `H1` | [TASK-1801](../../tasks/complete/TASK-1801-contacto-multistakeholder-form-agenda.md) ✅ | Contacto | Landing pública aprobada y cerrada 2026-09-15 | Hardening operativo fuera del alcance cerrado; Meetings sigue en TASK-1510 |
 
 ### Artículos del hub HubSpot (fuera del ranking de landings)
 
@@ -118,7 +118,8 @@ Ya están en ejecución; no compiten por prioridad, sólo tienen que cerrarse.
       `/servicios/hubspot/`, que hoy responde `301` hacia `/hubspot/hubspot-marketing-ventas/` (un post antiguo).
       Precios (`/servicios/hubspot/precios/`) y Agentes (`/servicios/hubspot/agentes/`) cuelgan de esa URL.
 - [ ] Elegir la URL final de Agencia Creativa y aprobar el 301 de la otra.
-- [ ] Definir owners y SLA por motivo de Contacto (TASK-1801).
+- Owners/SLA por motivo quedaron fuera del cierre aprobado de TASK-1801; si se retoman, requieren intake operativo
+  propio y no reabren por inferencia la landing cerrada.
 - [ ] Confirmar si la aprobación ANAM del 2026-07-17 cubre la landing del servicio de agentes (TASK-1403).
 - [ ] Autorizar la actualización del artículo publicado del caso ANAM (`/hubspot/ia-atencion-cliente-caso-anam/`),
       que todavía dice que el agente no está operativo.

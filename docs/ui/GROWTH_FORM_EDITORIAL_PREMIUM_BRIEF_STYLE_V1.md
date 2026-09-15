@@ -35,11 +35,11 @@ Rejected directions:
 
 ## Ownership boundary
 
-| Layer | Owns | Must not own |
-| --- | --- | --- |
-| Growth Form definition/version | fields, labels, placeholders, help, validation, consent, success behavior, `styleVariant` | landing layout, decorative chrome |
-| Portable renderer | control semantics, custom listbox state, keyboard, focus, errors, pending, Turnstile, telemetry, success rendering | page headline, card shell, landing-specific icons |
-| Host | the single exterior card, header, trust strip, responsive placement, scoped token values and semantic decoration | values, validation, submit bridge, mapping, destinations, PII or duplicate selects |
+| Layer                          | Owns                                                                                                               | Must not own                                                                       |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Growth Form definition/version | fields, labels, placeholders, help, validation, consent, success behavior, `styleVariant`                          | landing layout, decorative chrome                                                  |
+| Portable renderer              | control semantics, custom listbox state, keyboard, focus, errors, pending, Turnstile, telemetry, success rendering | page headline, card shell, landing-specific icons                                  |
+| Host                           | the single exterior card, header, trust strip, responsive placement, scoped token values and semantic decoration   | values, validation, submit bridge, mapping, destinations, PII or duplicate selects |
 
 If a behavior or state repeats across hosts, promote it to the renderer. If the treatment only explains the
 landing context, keep it in the host.
@@ -77,13 +77,13 @@ Use exactly two roles:
 
 Reference hierarchy:
 
-| Element | Role |
-| --- | --- |
-| Overline | Geist 600, compact uppercase, deliberate tracking |
-| Card title | Poppins 700, line-height about 1.2 |
-| Explanation and trust | Geist 400, line-height at least 1.5 |
-| Labels and submit | Geist 600 |
-| Input value | Geist 400, minimum browser-safe 16 px on public forms |
+| Element                   | Role                                                            |
+| ------------------------- | --------------------------------------------------------------- |
+| Overline                  | Geist 600, compact uppercase, deliberate tracking               |
+| Card title                | Poppins 700, line-height about 1.2                              |
+| Explanation and trust     | Geist 400, line-height at least 1.5                             |
+| Labels and submit         | Geist 600                                                       |
+| Input value               | Geist 400, minimum browser-safe 16 px on public forms           |
 | Help, counter and privacy | Geist 400, secondary ink, never reduced to illegible fine print |
 
 Do not use intermediate invented weights such as 650. Iconography never replaces the visible label.
@@ -120,6 +120,12 @@ The listbox is the renderer's `diagnostic_premium` combobox. The host may decora
 own the selected value or input events.
 
 - One caret per trigger; never add a host pseudo-caret.
+- The closed caret points down. Opening rotates that same caret 180 degrees around its optical center so it points
+  up; closing follows the exact inverse path and returns to the original geometry. Never animate the pseudo-element
+  and its container independently or change vertical translation between states: that produces a jump or the wrong
+  perceived rotation.
+- Caret state is derived from the renderer-owned `aria-expanded`/`data-open` state. Use restrained motion
+  (140–180 ms with a decelerating ease); `prefers-reduced-motion` reaches the same orientation immediately.
 - Option targets are at least 46 px high.
 - Selected state uses a check plus tonal surface; color is not the only signal.
 - Listbox stacking, `aria-expanded`, `role=listbox`, `role=option`, focus and keyboard stay renderer-owned.
@@ -156,6 +162,7 @@ semantic option metadata in the form/render contract and renderer.
 - Local errors with `aria-invalid` and `aria-describedby`; global summary/focus only when the renderer contract
   provides it.
 - Keyboard-operable listboxes with visible focus and honest `aria-expanded`.
+- Dropdown verification covers both directions: closed/down → open/up, then selection or Escape → closed/down.
 - Privacy copy is a sentence with a descriptive link, not a naked URL.
 - Icon-only decoration is `aria-hidden`; adjacent text carries meaning.
 - Information is never conveyed only by color, flag or icon.

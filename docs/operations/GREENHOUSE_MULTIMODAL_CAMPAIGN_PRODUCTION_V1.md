@@ -114,9 +114,11 @@ anchor aprobado; no se encadenan derivados como `v1 → v2 → v3`.
 Cuando una pieza aprobada usa la metáfora de selección activa o multiplayer, esa geometría pertenece al
 postproceso determinista, nunca al plate generativo. El agente normaliza un `AxisCollaborationSelectionIntent`
 con `efeonce.collaboration-selection` y entrega el manifest
-`axis.collaboration-selection-composition.v1` al adapter del compositor. Si ese adapter no existe, la capa queda
-`pending adapter`: no se inventan coordenadas ni se devuelve la pieza compuesta al modelo para simularla. El
-manifest de selección complementa el manifest de campaña; no reemplaza lineage, gates ni aprobación humana.
+`axis.collaboration-selection-composition.v1` al adapter del compositor. Greenhouse ya implementa este paso en
+`pnpm creative:layout`: liga el target a `headline|support|hook|lockup`, deriva bounds del contenido pintado y
+verifica acting/moving, hotspot, labels y canvas. En otro motor sin adapter, la capa queda `pending adapter`: no se
+inventan coordenadas ni se devuelve la pieza al modelo para simularla. El manifest de selección complementa el de
+campaña; no reemplaza lineage, gates ni aprobación humana.
 
 ## Gobernanza arquitectónica
 

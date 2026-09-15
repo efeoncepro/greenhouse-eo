@@ -1,6 +1,6 @@
 # Contacto Efeonce — brief de reconstrucción V1
 
-Estado: `TASK-1801` registrada en `to-do`; implementación y rollout pendientes
+Estado: `TASK-1801` cerrada el 2026-09-15; landing pública construida y aprobada por el operador
 Fecha: 2026-08-31
 Superficie objetivo: `https://efeoncepro.com/contacto/`
 Runtime: WordPress/Elementor como host; Growth Forms y Meetings como contratos canónicos
@@ -78,13 +78,12 @@ operativo verificable.
 
 ## Estado, alcance y verificación
 
-Este brief actualiza fuentes del repo; **no publica WordPress ni cambia el runtime**. Antes de implementar la task hay
-que confirmar owners por motivo, SLA de respuesta, atención presencial/horarios, tratamiento de Careers y política
-de reclamos. La implementación debe probar routing completo, validación/condiciones, consentimientos, no-PII en
-telemetría, recovery/idempotencia, booking y receipt reales, teclado, lector de pantalla, reduced motion, 390 px,
-`scrollWidth === clientWidth`, SEO/canonical y todos los enlaces que hoy llegan a `/contacto/`.
+La landing page-scoped está publicada en WordPress y fue aprobada por el operador el 2026-09-15. El runtime muestra
+el formulario hosted, la bifurcación a Careers, dos entradas de agenda, datos institucionales, FAQ y metadata/OG con
+schema de `ContactPage`; el readback desktop/390 px no presenta overflow. `TASK-1801` cerró por este alcance visible.
 
-El rollout debe corregir la página pública que todavía muestra Las Bellotas 199, el teléfono anterior, cuatro
-mercados o una narrativa de Estados Unidos sólo como futuro. También debe revisar los consumidores públicos de
-la lista histórica de cuatro mercados; una cifra histórica como «120+ empresas en 4 países» conserva su alcance y
-no se convierte automáticamente en una prueba de clientes en cinco países.
+El brief inicial incluía además owners/SLA por motivo, routing no comercial, smokes de destinos, booking real y
+reconciliación de PII/analytics. Esos objetivos no se acreditan con la aprobación visual ni con el HTML público y
+quedaron retirados del cierre; requieren intake independiente si se retoman. La dirección antigua de Las Bellotas
+sigue apareciendo en el footer global, fuera del ownership page-scoped de esta landing. Una cifra histórica como
+«120+ empresas en 4 países» conserva su alcance y no prueba clientes en cinco países.

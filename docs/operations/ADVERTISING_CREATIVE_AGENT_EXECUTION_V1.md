@@ -48,14 +48,26 @@ un brief ya resuelto ni delega el ownership del resultado.
 6. Medir contraste local de texto y marca; revisar al tamaño final, en miniatura y en frames críticos.
 7. Emitir pieza, fuente/export, ficha tipográfica, provenance, gate `PASS | REWORK | DON’T` y estado honesto.
 
+## Supporting tagline: intención → receta → adapter
+
+Una frase de apoyo que acompaña un lockup usa `axisAdvertising.compositions.supportingTagline`. AXIS posee la
+receta base `structureTagline`, la relación con la medida principal, los roles de énfasis y los invariantes de
+fitting. El agente aporta copy arbitrario en orden de lectura y marca hasta dos segmentos por intención:
+`growth` o `intervention`. El ejemplo del Lab no forma parte del contrato.
+
+El adapter de cada superficie conserva la frase como unidad, usa espacios naturales y escala uniformemente
+contra el ancho inline del lockup. Si una sola línea cae bajo el piso de lectura, aplica un salto balanceado de
+la oración completa; nunca separa palabras con `space-between`, márgenes independientes ni coordenadas libres.
+Contraste, ritmo y ancho se verifican después de componer sobre los píxeles finales.
+
 ## Selección colaborativa: intención → manifest → adapter
 
 Cuando la dirección de arte use bounding box, cursor local o participantes multiplayer, el agente no dibuja la
-escena por coordenadas. Declara `AxisCollaborationSelectionIntent` y normaliza desde el repo AXIS:
+escena por coordenadas. Declara `AxisCollaborationSelectionIntent` y normaliza desde Greenhouse:
 
 ```bash
-pnpm collaboration:resolve -- \
-  --input docs/examples/collaboration-selection-intent.json \
+pnpm creative:collaboration:resolve -- \
+  --input <campaign-run>/brief/collaboration-selection-intent.json \
   --out /ruta/absoluta/collaboration-selection.manifest.json
 ```
 
@@ -74,9 +86,10 @@ El manifest resuelto es el único handoff portable. El adapter de la superficie 
 
 El texto de la placa acepta una persona, rol o departamento arbitrario; `Devs` y `Designer` son sólo copy de un
 caso. La URL Bubble es otro componente canónico y no se reemplaza por un rectángulo con texto. El resolver no
-llama a modelos, no compone el anuncio completo, no publica y no aprueba. Si el motor no tiene adapter, el agente
-reporta `unsupported/pending adapter`; no copia `CollaborationSelection.astro`, no inventa campos y no simula la
-capacidad con `top`/`left`.
+llama a modelos, no compone el anuncio completo, no publica y no aprueba. El adapter Greenhouse liga
+`headline|support|hook|lockup` con `text|text|object|group`, respectivamente. Si otro motor no tiene adapter, el
+agente reporta `unsupported/pending adapter`; no copia `CollaborationSelection.astro`, no inventa campos y no
+simula la capacidad con `top`/`left`.
 
 ## Invariantes
 

@@ -32,8 +32,19 @@ proyección didáctica del contrato `trial`; AXIS conserva el SSOT y cada pieza 
 La misma entrada puede orquestar `efeonce.collaboration-selection` cuando el concepto muestra selección activa o
 presencia multiplayer. El agente describe relaciones —qué texto/objeto/grupo está seleccionado, qué cursor actúa
 en qué anclaje y quién sólo se mueve por el canvas— y AXIS las normaliza en un manifest independiente del motor.
-Cada superficie necesita un adapter que mida el objeto real. La primera implementación vive en AXIS Lab; que el
-contrato exista no significa que Greenhouse, Globe o los compositores ya lo pinten.
+Cada superficie necesita un adapter que mida el objeto real. AXIS Lab proyecta el espécimen y el Campaign Layout
+Compiler de Greenhouse ya pinta `headline`, `support`, `hook` o `lockup` desde el intent portable. Esta adopción
+no significa que Globe u otro compositor ya tenga adapter.
+
+Para frases de apoyo, `axisAdvertising.compositions.supportingTagline` aporta una receta portable separada del
+espécimen: Poppins estructural, una oración continua, fitting uniforme contra el lockup principal, espacios
+naturales y hasta dos énfasis semánticos. El agente puede sustituir todo el copy y asignar `growth` o
+`intervention` a otros fragmentos sin copiar el HTML/CSS del Lab. Cada adapter conserva la medición y el QA de
+su propio motor.
+
+La firma web usa el asset fijo de Artifact Composer `assets/url-lum.svg`, no una placa textual. Greenhouse lo
+compone contra el fondo final con el blend no separable `luminosity` y opacidad `0.72`; su QA comprueba hash,
+geometría vectorial y diferencia raster visible. Por eso un SVG declarado pero invisible no cuenta como entrega.
 
 ## Qué evita
 
@@ -47,6 +58,7 @@ contrato exista no significa que Greenhouse, Globe o los compositores ya lo pint
 - tres voces tipográficas compitiendo al mismo tiempo.
 - cursores decorativos separados de su identidad o que no señalan semánticamente al objeto seleccionado;
 - bounding boxes fijos que cambian el aire al variar el copy o el formato.
+- taglines partidos en fragmentos independientes, con palabras pegadas o huecos creados para llenar el ancho;
 
 ## Relación con MCP
 
