@@ -149,6 +149,7 @@ export const RENDERER_CSS = `
     letter-spacing: 0;
     line-height: 1;
   }
+  .ghf-field-icon svg { inline-size: 14px; block-size: 14px; stroke: currentColor; }
   .ghf-required { color: var(--ghf-error); margin-inline-start: 2px; }
   .ghf-optional { color: var(--ghf-muted); font-weight: 400; margin-inline-start: 4px; }
   .ghf-help { font-size: 0.8125rem; color: var(--ghf-muted); line-height: 1.4; }

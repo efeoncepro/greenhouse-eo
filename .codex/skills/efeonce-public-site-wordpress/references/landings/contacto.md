@@ -61,7 +61,7 @@ page-scoped: no inferir owners/SLA, destinos, booking end-to-end ni graduación 
 implementación visual y su readback público. La dirección legacy del footer global tampoco queda corregida por esta
 unidad.
 
-## Candidato responsive 2026-09-15 — preparado, no publicado
+## Selector premium de países — publicado 2026-09-15
 
 La siguiente iteración elimina en anchos de hasta 767 px la costura horizontal que aparecía porque el asset de Nexa
 comenzaba 150–175 px debajo del hero. El retrato se ancla al borde superior, el gradiente pasa a ser continuo y el
@@ -74,9 +74,9 @@ live: `.captures/2026-09-15_contacto-responsive-composition/`; 684 y 390 px tien
 560/358 px y banda menor a 274 px. Verificador:
 `scripts/public-website/verify-contacto-responsive-composition.ts`.
 
-Rollout pendiente. `public-website:runtime-status` mantiene `production_deploy_apply` bloqueado mientras no exista el
-control de backup/cache requerido; no saltar esa guarda con un write WP-CLI directo. El cambio local vive únicamente
-en `efeonce-public-site-runtime/.../assets/css/contact-landing.css` y no altera desktop ni el footer.
+El renderer y las banderas fueron publicados y la versión v3 de `efeonce-contacto` quedó activa mediante el comando
+gobernado. Readback público: `country_select`, placeholder `Selecciona tu país` y 250 opciones. La activación no
+requiere mutar Elementor; no saltar las guardas con un write WP-CLI directo.
 
 Canon de producto: `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`. Task cerrada:
 `docs/tasks/complete/TASK-1801-contacto-multistakeholder-form-agenda.md`.

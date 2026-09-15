@@ -48,10 +48,10 @@ con casa matriz y teléfonos, y vincula las cuatro preguntas visibles como `FAQP
 reseñas, `LocalBusiness` ni schemas de servicio. Referencia y rollback:
 [Contacto](.codex/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
 
-En Greenhouse queda preparado, todavía sin publicar, el selector premium de país para Contacto: 250 opciones
-localizadas, banderas SVG, typeahead, teclado/listbox accesible y un chevron con orientación cerrada/abierta
-verificada. La activación exige renderer + assets productivos antes de versionar el formulario, por lo que el input
-live se conserva intacto hasta completar la promoción gobernada.
+El selector premium de país quedó publicado y verificado el 2026-09-15 tras el release del renderer y las
+banderas. La v3 de `efeonce-contacto` (`fver-c00955ca-863a-4e7d-99c7-c09706660a3a`) entrega 250 opciones
+localizadas, typeahead/listbox accesible y chevron con orientación cerrada/abierta verificada; la v2 fue
+deprecada conservando el destino existente.
 
 ## 2026-09-15 — TASK-1845: foundation de Efeonce Insights en develop (code complete, rollout pendiente)
 

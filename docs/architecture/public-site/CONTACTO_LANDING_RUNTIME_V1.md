@@ -39,14 +39,15 @@ end-to-end y entregabilidad de cada destino requieren una unidad posterior con s
 Fuentes: [brief aprobado](../../public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md) y [referencia operativa de la
 skill](../../../.codex/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
 
-## Release pendiente: selector premium de países
+## Release aplicado: selector premium de países
 
-El selector con banderas está implementado en el repositorio, pero todavía no está publicado. El release debe
-promover el renderer productivo (`growth-forms/renderer-latest.js`) y los assets SVG de banderas. Después se debe
-ejecutar `scripts/growth/activate-contacto-country-select.ts --apply`: el comando crea, revisa y publica una nueva
-versión de `efeonce-contacto`, conserva destinos/consentimientos, depreca la anterior y verifica el contrato leído
-por el runtime público. Es una mutación gobernada de Growth Forms, no sólo un cambio visual de WordPress.
+El release del renderer productivo (`growth-forms/renderer-latest.js`) y de los assets SVG de banderas fue verificado
+en producción el 2026-09-15. Luego se ejecutó `scripts/growth/activate-contacto-country-select.ts --apply`: creó,
+revisó y publicó la versión `fver-c00955ca-863a-4e7d-99c7-c09706660a3a` (v3), conservó el destino existente,
+deprecó la v2 y verificó el contrato leído por el runtime público. Es una mutación gobernada de Growth Forms,
+no sólo un cambio visual de WordPress.
 
-Prechecks obligatorios: renderer y bandera responden en producción, snapshot/rollback disponible, revisión de la
-nueva versión, readback API y GVC desktop/mobile con teclado y `scrollWidth === clientWidth`. Si falla cualquiera,
-mantener la versión actual de texto y declarar `code complete, rollout pendiente`.
+Evidencia: renderer y bandera responden HTTP 200; el readback API devuelve `country.type=select`,
+`presentation.control=country_select`, placeholder `Selecciona tu país` y 250 opciones; el árbol de accesibilidad
+del navegador muestra el combo `ghf-1-country`. El rollback conserva la v2 como referencia y permite deprecar la v3
+sin borrar submissions.

@@ -42,14 +42,13 @@ Para un cambio Elementor, restaura el snapshot gobernado y purga la caché Kinst
 Meetings, revierte la versión/binding mediante sus comandos canónicos; no borres submissions. Si el runtime no
 coincide con el repo, registra `code complete, rollout pendiente` y escala al owner de Public Site/Growth Forms.
 
-## Checklist antes del release de países
+## Release aplicado del selector de países
 
-1. Publica el renderer y las banderas en el runtime Greenhouse/Vercel.
-2. Comprueba ambos recursos en producción antes de ejecutar el apply.
-3. Ejecuta `pnpm tsx scripts/growth/activate-contacto-country-select.ts --apply` con snapshot y rollback
-   disponibles; nunca edites la versión publicada directamente.
-4. Lee de nuevo `/api/public/growth/forms/efeonce-contacto` y confirma `country_select`, opciones y versión nueva.
-5. Revisa `/contacto/` en desktop y 390 px, incluyendo teclado, giro del chevron y ausencia de overflow.
+El release quedó aplicado el 2026-09-15. La versión activa es `fver-c00955ca-863a-4e7d-99c7-c09706660a3a` (v3).
+El readback público confirma 250 países y el navegador confirma el combo `ghf-1-country`.
 
-Hasta completar estos pasos, el campo de país de producción debe permanecer como texto y no debe anunciarse el
-selector como disponible.
+Para una futura modificación, repite el precheck de renderer/banderas, toma snapshot, ejecuta el comando gobernado
+con `--apply`, verifica el readback y revisa desktop/390 px, teclado, giro del chevron y ausencia de overflow.
+
+No edites directamente la versión publicada ni borres la versión anterior: el rollback debe hacerse mediante los
+comandos canónicos de Growth Forms.

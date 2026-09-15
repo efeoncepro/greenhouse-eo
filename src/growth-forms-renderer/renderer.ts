@@ -660,13 +660,18 @@ export class FormRenderer {
       const labelEl = el(this.doc, 'label', { class: 'ghf-label', for: fieldId })
 
       if (field.presentation?.icon && !this.usesInlineControlIcons()) {
+        // Country fields use the semantic globe SVG. The legacy text glyph for
+        // `globe` was the external-link arrow (↗), which made “País” look like
+        // a broken link in the public Contacto form.
         labelEl.appendChild(
-          el(
-            this.doc,
-            'span',
-            { class: 'ghf-field-icon', 'aria-hidden': 'true', 'data-icon': field.presentation.icon },
-            this.fieldIconGlyph(field.presentation.icon)
-          )
+          field.presentation.icon === 'globe'
+            ? this.renderIcon('globe', 'ghf-field-icon')
+            : el(
+                this.doc,
+                'span',
+                { class: 'ghf-field-icon', 'aria-hidden': 'true', 'data-icon': field.presentation.icon },
+                this.fieldIconGlyph(field.presentation.icon)
+              )
         )
       }
 
