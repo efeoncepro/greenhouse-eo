@@ -130,6 +130,84 @@ const EMPTY_KPIS = (rangeDays: number): SeoOverviewKpis => ({
   provenance: GSC_PROVENANCE(null)
 })
 
+/**
+ * TASK-1845 — la MISMA agregación (posición ponderada por impresiones, CTR del período) sobre
+ * una ventana civil EXPLÍCITA `[from, toExclusive)` en `capture_date`, para consumers que
+ * congelan evidencia por período (Efeonce Insights) y no pueden usar "los últimos N días al
+ * ancla". La fórmula vive aquí, en su dueño; el consumer sólo declara la ventana.
+ *
+ * `servedTo` es el último `capture_date` materializado dentro de la ventana: si es menor que
+ * `toExclusive - 1`, la fuente aún no cubre el período completo y el consumer lo etiqueta
+ * parcial en vez de rellenar con hoy.
+ */
+export interface SeoOverviewWindowKpis {
+  totals: SeoOverviewKpiTotals
+  series: SeoOverviewSeriesPoint[]
+  /** Primer y último `capture_date` con datos dentro de la ventana; null sin datos. */
+  servedFrom: string | null
+  servedTo: string | null
+  /** Días con captura dentro de la ventana (cobertura = coveredDays / días de la ventana). */
+  coveredDays: number
+  provenance: SeoProvenance[]
+}
+
+export const readSeoOverviewKpisForWindow = async (
+  organizationId: string,
+  window: { from: string; toExclusive: string }
+): Promise<SeoOverviewWindowKpis> => {
+  if (!isSeoModuleEnabled()) {
+    return { totals: { clicks: 0, impressions: 0, position: null, ctr: null }, series: [], servedFrom: null, servedTo: null, coveredDays: 0, provenance: GSC_PROVENANCE(null) }
+  }
+
+  const [totalsRows, seriesRows] = await Promise.all([
+    runGreenhousePostgresQuery<TotalsRow>(
+      `SELECT COALESCE(SUM(clicks), 0)::int AS clicks,
+              COALESCE(SUM(impressions), 0)::bigint AS impressions,
+              CASE WHEN COALESCE(SUM(impressions), 0) > 0
+                   THEN SUM(position * impressions) / SUM(impressions)
+                   ELSE NULL
+              END AS weighted_position
+         FROM greenhouse_growth.seo_gsc_daily
+        WHERE organization_id = $1
+          AND capture_date >= $2::date
+          AND capture_date < $3::date`,
+      [organizationId, window.from, window.toExclusive]
+    ),
+    runGreenhousePostgresQuery<SeriesRow>(
+      `SELECT capture_date::text AS capture_date,
+              COALESCE(SUM(clicks), 0)::int AS clicks,
+              COALESCE(SUM(impressions), 0)::bigint AS impressions,
+              CASE WHEN COALESCE(SUM(impressions), 0) > 0
+                   THEN SUM(position * impressions) / SUM(impressions)
+                   ELSE NULL
+              END AS weighted_position
+         FROM greenhouse_growth.seo_gsc_daily
+        WHERE organization_id = $1
+          AND capture_date >= $2::date
+          AND capture_date < $3::date
+        GROUP BY capture_date
+        ORDER BY capture_date`,
+      [organizationId, window.from, window.toExclusive]
+    )
+  ])
+
+  const series = seriesRows.map(row => ({
+    date: row.capture_date,
+    clicks: toNumber(row.clicks),
+    impressions: toNumber(row.impressions),
+    position: toNullableNumber(row.weighted_position)
+  }))
+
+  return {
+    totals: buildTotals(totalsRows[0]) ?? { clicks: 0, impressions: 0, position: null, ctr: null },
+    series,
+    servedFrom: series[0]?.date ?? null,
+    servedTo: series[series.length - 1]?.date ?? null,
+    coveredDays: series.length,
+    provenance: GSC_PROVENANCE(resolveSeoAsOf(series.map(point => point.date)))
+  }
+}
+
 export const readSeoOverviewKpis = async (organizationId: string, rangeDays = 28): Promise<SeoOverviewKpis> => {
   // Consistencia con el dominio: módulo apagado ⇒ no se leen métricas.
   if (!isSeoModuleEnabled()) {
