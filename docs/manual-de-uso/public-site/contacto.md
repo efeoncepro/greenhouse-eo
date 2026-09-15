@@ -41,3 +41,15 @@ publicados sin readback del runtime, purge y evidencia GVC.
 Para un cambio Elementor, restaura el snapshot gobernado y purga la caché Kinsta. Para un cambio Growth Forms o
 Meetings, revierte la versión/binding mediante sus comandos canónicos; no borres submissions. Si el runtime no
 coincide con el repo, registra `code complete, rollout pendiente` y escala al owner de Public Site/Growth Forms.
+
+## Checklist antes del release de países
+
+1. Publica el renderer y las banderas en el runtime Greenhouse/Vercel.
+2. Comprueba ambos recursos en producción antes de ejecutar el apply.
+3. Ejecuta `pnpm tsx scripts/growth/activate-contacto-country-select.ts --apply` con snapshot y rollback
+   disponibles; nunca edites la versión publicada directamente.
+4. Lee de nuevo `/api/public/growth/forms/efeonce-contacto` y confirma `country_select`, opciones y versión nueva.
+5. Revisa `/contacto/` en desktop y 390 px, incluyendo teclado, giro del chevron y ausencia de overflow.
+
+Hasta completar estos pasos, el campo de país de producción debe permanecer como texto y no debe anunciarse el
+selector como disponible.
