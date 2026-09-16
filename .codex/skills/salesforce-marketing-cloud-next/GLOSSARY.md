@@ -6,6 +6,9 @@
 - **Data 360:** nombre vigente de la plataforma antes conocida como Data Cloud; fundamento de ingestión, modelado, identidad, segmentación y activación.
 - **Marketing Flow:** Flow con elementos de marketing para orquestar acciones, decisiones y mensajes.
 - **Agentforce Marketing:** capacidades agentic aplicadas al trabajo de marketing; no prueba una edición, licencia ni disponibilidad determinada.
+- **AIforce:** capa de interfaz de Salesforce para exponer contexto, workflows, permisos y acciones a interfaces como Claude, Slack, Coworker, Amazon Quick o Gemini; no es una edición de Marketing Cloud Next.
+- **Claudeforce / Slackforce:** superficies de AIforce para Claude y Slack. Su beta, GA, skills, permisos y consumo se verifican por separado.
+- **Model choice:** selección del modelo por tarea, coste, precisión, gobierno y sensibilidad de datos; Koa, Gemini, Claude y Bedrock no son intercambiables por defecto.
 - **Salesforce Foundations:** entitlement/plataforma base que puede habilitar acceso a capacidades; no implica consumo ilimitado ni todos los productos.
 - **Engagement+:** acceso que preserva Marketing Cloud Engagement y añade capacidades de Next según contrato.
 - **Account Engagement+:** forma abreviada en esta skill para coexistencia de Account Engagement con capacidades next-gen; confirma el nombre comercial exacto del SKU.

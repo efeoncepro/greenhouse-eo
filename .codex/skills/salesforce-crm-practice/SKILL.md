@@ -37,6 +37,13 @@ Lee [references/operate.md](references/operate.md). Produce evidencia del estado
 
 Lee [references/sell.md](references/sell.md) y usa [templates/discovery-guide.md](templates/discovery-guide.md), [templates/fit-assessment.md](templates/fit-assessment.md) o [templates/proposal.md](templates/proposal.md) según el entregable. Recomienda Salesforce sólo cuando el problema, complejidad y capacidad de adopción lo justifican; permite una conclusión `no-fit`, HubSpot-first o híbrida.
 
+## Actualización Dreamforce 2026
+
+Para lanzamientos de septiembre de 2026, estados de disponibilidad, integraciones y límites de claim, lee
+[references/dreamforce-2026.md](references/dreamforce-2026.md). AIforce, Claudeforce, Slackforce, Koa y las
+alianzas AWS/Google/NVIDIA son superficies con estados distintos; no las trates como una sola licencia ni como
+GA universal.
+
 ## Fuentes
 
 Antes de afirmar capacidades o condiciones comerciales perecibles, consulta [SOURCES.md](SOURCES.md). Usa [GLOSSARY.md](GLOSSARY.md) para nomenclatura y [ANTIPATTERNS.md](ANTIPATTERNS.md) durante revisión.

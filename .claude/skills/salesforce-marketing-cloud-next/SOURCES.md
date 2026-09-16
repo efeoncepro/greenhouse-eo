@@ -1,6 +1,6 @@
 # Fuentes y vigencia
 
-Fecha de revisión: **2026-08-27**. Abre la fuente primaria antes de convertir un dato perecible en claim, propuesta o diseño.
+Fecha de revisión: **2026-09-16**. Abre la fuente primaria antes de convertir un dato perecible en claim, propuesta o diseño.
 
 | Tema | Fuente primaria | Uso |
 |---|---|---|
@@ -13,6 +13,10 @@ Fecha de revisión: **2026-08-27**. Abre la fuente primaria antes de convertir u
 | Pricing público | https://www.salesforce.com/marketing/pricing/ | Precio inicial, edición y add-ons; validar país/moneda/fecha |
 | Release notes | https://help.salesforce.com/s/articleView?id=release-notes.rn_marketing.htm | Estado GA/preview por release |
 | Account Engagement + Next | https://help.salesforce.com/s/articleView?id=sf.mcae_mc_campaigns_dc_prereqs.htm&type=5 | Prerrequisitos, Connected Campaigns, Data 360 y entitlements |
+| Dreamforce 2026 y AIforce | https://www.salesforce.com/news/stories/aiforce-announcement/ | Interfaces externas, gobernanza y estados de Claudeforce/Slackforce/Coworker |
+| Agentforce job-ready agents | https://www.salesforce.com/ap/news/press-releases/2026/09/14/ph-salesforce-expands-agentforce-with-a-new-portfolio-of-ai-agents-built-for-high-value-work/ | Agentes de marketing/ventas y long-horizon runtime; separar GA, piloto y roadmap |
+| AWS y Salesforce | https://www.salesforce.com/news/stories/aws-salesforce-enterprise-ai-expansion/ | Bedrock, Amazon Quick, zero-copy, voz y estados de disponibilidad |
+| Google Cloud y Salesforce | https://www.salesforce.com/news/stories/salesforce-google-cloud-unify-infrastructure-and-agents/ | Gemini Enterprise, Hyperforce, MCP, Tableau y estados de disponibilidad |
 
 ## Jerarquía
 

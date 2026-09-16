@@ -1,5 +1,12 @@
 # changelog.md
 
+## 2026-09-16 — Skills Salesforce alineadas con Dreamforce 2026
+
+Las skills espejo de CRM, Marketing Cloud Next y Marketing Cloud Engagement incorporan el ledger de AIforce,
+Claudeforce, Slackforce, Koa, Agentforce long-horizon y las integraciones AWS/Google/NVIDIA/Siemens. Cada claim
+conserva su estado `GA`, beta, piloto, preview o roadmap; la actualización no cambia entitlements, contratos,
+orgs ni rollout.
+
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 > inicio ni usar una entrada histórica como contrato vigente sin contrastarla.

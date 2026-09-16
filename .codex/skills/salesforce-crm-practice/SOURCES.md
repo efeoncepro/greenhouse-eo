@@ -1,8 +1,10 @@
 # Fuentes oficiales
 
-Última revisión de esta lista: `2026-08-27`. La fecha indica cuándo se revisó el índice, no garantiza que una capacidad o condición siga vigente.
+Última revisión de esta lista: `2026-09-16`. La fecha indica cuándo se revisó el índice, no garantiza que una capacidad o condición siga vigente.
 
 ## Producto y arquitectura
+
+- [Dreamforce 2026 — ledger de lanzamientos](references/dreamforce-2026.md): AIforce, Koa, Agentforce, interoperabilidad y estados de disponibilidad verificados el 2026-09-16.
 
 - [What Is Salesforce?](https://help.salesforce.com/s/articleView?id=sf.overview.htm&language=en_US): límites generales de la plataforma y dependencia de edición.
 - [What is Sales Cloud?](https://help.salesforce.com/s/articleView?id=000372249&language=en_US&type=3): definición de Sales Cloud.
