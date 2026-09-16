@@ -134,6 +134,21 @@ export const CHANGE_GATED_RUNTIME_PATHS: Readonly<Record<string, readonly string
     'src/components',
     'src/i18n',
     'src/@core'
+  ],
+  // TASK-1846 — Cloud Run JOB (tsx sobre el árbol fuente, sin bundle: por eso vendor y scripts/lib).
+  'artifact-worker': [
+    'package.json',
+    'pnpm-lock.yaml',
+    'tsconfig.json',
+    'vendor',
+    'scripts/lib',
+    'services/artifact-worker',
+    'services/_shared',
+    'src/lib',
+    'src/emails',
+    'src/types',
+    'src/config',
+    'src/i18n'
   ]
 }
 
@@ -349,11 +364,31 @@ const buildRecommendedAction = (record: {
  */
 const resolveCloudRunRevisionSha = async (
   service: string,
-  region: string
+  region: string,
+  kind: 'service' | 'job' = 'service'
 ): Promise<string | null> => {
   // Defense in depth: validate inputs even though they come from canonical allowlist.
   if (!/^[a-z0-9-]+$/.test(service) || !/^[a-z0-9-]+$/.test(region)) {
     return null
+  }
+
+  // TASK-1846 — un Job no tiene revisiones ni env GIT_SHA en su template: su SHA servido es la
+  // etiqueta `git-sha` que su deploy.sh fija y verifica. `services describe` sobre un Job falla y
+  // caería a data_missing permanente (silencio, no detección).
+  if (kind === 'job') {
+    try {
+      const { stdout } = await execFileAsync(
+        'gcloud',
+        ['run', 'jobs', 'describe', service, `--region=${region}`, '--project=efeonce-group', '--format=json'],
+        { timeout: 10_000 }
+      )
+
+      const parsed = JSON.parse(stdout) as { metadata?: { labels?: Record<string, string> } }
+
+      return normalizeSha(parsed.metadata?.labels?.['git-sha'] ?? null)
+    } catch {
+      return null
+    }
   }
 
   try {
@@ -433,7 +468,7 @@ const checkWorker = async (
 
   const [canonicalSha, runSha] = await Promise.all([
     resolveCanonicalReleaseSha(token, workflow.workflowName).catch(() => null),
-    resolveCloudRunRevisionSha(cloudRunService, cloudRunRegion)
+    resolveCloudRunRevisionSha(cloudRunService, cloudRunRegion, workflow.cloudRunResourceKind ?? 'service')
   ])
 
   const ghSha = canonicalSha?.compareSha ?? null

@@ -1,16 +1,21 @@
 name: Artifact Worker Deploy
 
-# TASK-1391 — PRIMER Cloud Run JOB del ecosistema (frontera autorizada 2026-07-12,
-# excepción documentada EPIC-027). Renderiza artefactos del Artifact Composer
-# (proposal_render_jobs) con Chromium pinneado. Sin endpoint HTTP.
+# TASK-1391 — PRIMER Cloud Run JOB del ecosistema (frontera autorizada 2026-07-12, excepción documentada
+# EPIC-027). Renderiza artefactos del Artifact Composer con Chromium pinneado. Sin endpoint HTTP.
 #
-# ⚠️ STAGING-ONLY por ahora: la promoción a production requiere (a) staging smoke con
-# evidencia, (b) sign-off del operador, (c) integrar este workflow al orquestador
-# production-release.yml + RELEASE_DEPLOY_WORKFLOWS ANTES del primer deploy productivo
-# (regla del release control plane). No agregar trigger de production sin eso.
+# TASK-1846 — multiconsumidor (Proposal + Efeonce Insights) e INTEGRADO al release control plane:
+# mismo contrato que auth-server/ops-worker. Pushes a `develop` que tocan su superficie despliegan
+# staging; producción la despliega `production-release.yml` vía workflow_call (registrado en
+# `RELEASE_DEPLOY_WORKFLOWS` ANTES del primer deploy productivo); workflow_dispatch queda para
+# break-glass auditado.
 #
-# ⚠️ paths: cada src/lib/** que el worker consume DEBE estar listado o el worker
-# queda stale en silencio (bug class documentada en ops-worker-deploy.yml).
+# ⚠️ El Job es ÚNICO (no hay artifact-worker de producción aparte): staging y producción despliegan el
+# mismo recurso, igual que el ops-worker. Por eso `deploy.sh` fija todo lo que NO debe depender del
+# carril (bucket de assets, flags): si dependiera, el último deploy — develop o main — lo cambiaría.
+#
+# ⚠️ paths: el Job corre con tsx sobre el árbol fuente y su grafo de imports arrastra src/lib de forma
+# transitiva. Las rutas van amplias a propósito (mismo criterio que auth-server) y las custodia
+# `pnpm worker:deploy-path-gate`: una ruta del grafo real sin cobertura rompe CI.
 
 on:
   push:
@@ -20,35 +25,51 @@ on:
       - '.github/workflows/artifact-worker-deploy.yml'
       - 'services/artifact-worker/**'
       - 'services/_shared/**'
-      - 'src/lib/artifact-composer/**'
-      - 'src/lib/commercial/tenders/**'
-      - 'src/lib/storage/greenhouse-assets.ts'
-      - 'src/lib/postgres/**'
-      - 'src/lib/db.ts'
-      - 'src/lib/sync/event-catalog.ts'
-      - 'src/lib/sync/publish-event.ts'
-      - 'src/lib/observability/**'
-      - 'src/lib/secrets/**'
-      - 'src/types/db.d.ts'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - '.dockerignore'
       - '.gcloudignore'
       - 'vendor/**'
       - 'tsconfig.json'
+      - 'scripts/lib/**'
+      - 'src/lib/**'
+      - 'src/emails/**'
+      - 'src/types/**'
+      - 'src/config/**'
+      - 'src/i18n/**'
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment (production requiere sign-off + release control plane)'
+        description: 'Target environment (production = break-glass auditado; el camino normal es production-release.yml)'
         type: choice
         required: true
         default: staging
         options:
           - staging
+          - production
+      expected_sha:
+        description: 'Expected git SHA (default: github.sha). El orquestador pasa target_sha.'
+        type: string
+        required: false
+        default: ''
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target environment (staging | production)'
+        type: string
+        required: true
+      expected_sha:
+        description: 'Target git SHA the orchestrator wants deployed'
+        type: string
+        required: true
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER:
+        required: true
 
+# Dynamic cancel-in-progress (TASK-848 Slice 3 / TASK-931) — never revert to a literal false.
 concurrency:
   group: artifact-worker-deploy-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref == 'refs/heads/develop' }}
+  cancel-in-progress: ${{ github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_call' && inputs.environment == 'production') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') }}
 
 permissions:
   contents: read
@@ -58,18 +79,34 @@ jobs:
   deploy:
     name: Deploy artifact-worker Cloud Run Job
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
 
-    environment: staging
+    environment: >-
+      ${{
+        github.event_name == 'workflow_call'
+          && inputs.environment
+          || (github.event_name == 'workflow_dispatch'
+              && github.event.inputs.environment
+              || 'staging')
+      }}
 
     env:
-      ENV: staging
-      # TASK-1846 — flag del render de Insights, ON en STAGING. Va acá y no sólo con
-      # `--update-env-vars` porque `deploy.sh` usa `--set-env-vars` (destructivo): una var aplicada
-      # en vivo desaparece en el próximo deploy, en silencio. El default del SoT sigue siendo
-      # `false`, así que el día que este workflow gane un camino a production, production NO lo
-      # hereda: tendrá que declararlo explícitamente en su propio gate (regla del control plane).
-      INSIGHTS_RENDER_ENABLED: 'true'
+      ENV: >-
+        ${{
+          github.event_name == 'workflow_call'
+            && inputs.environment
+            || (github.event_name == 'workflow_dispatch'
+                && github.event.inputs.environment
+                || 'staging')
+        }}
+      RAW_EXPECTED_SHA: >-
+        ${{
+          github.event_name == 'workflow_call'
+            && inputs.expected_sha
+            || (github.event_name == 'workflow_dispatch'
+                && github.event.inputs.expected_sha
+                || github.sha)
+        }}
       GCP_PROJECT_ID: efeonce-group
       GCP_REGION: us-east4
       DEPLOYER_SERVICE_ACCOUNT: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
@@ -77,6 +114,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Resolve expected SHA
+        id: resolve-sha
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -n "${RAW_EXPECTED_SHA}" ]; then
+            RESOLVED_SHA="$(git rev-parse --verify "${RAW_EXPECTED_SHA}^{commit}")"
+          else
+            RESOLVED_SHA="${GITHUB_SHA}"
+          fi
+
+          # El Job se construye desde el árbol de trabajo: el árbol TIENE que ser el SHA que se va a
+          # etiquetar, o la etiqueta `git-sha` del Job mentiría sobre el código que corre.
+          git checkout --quiet --detach "${RESOLVED_SHA}"
+
+          echo "EXPECTED_SHA=${RESOLVED_SHA}" >> "${GITHUB_ENV}"
+          echo "expected_sha=${RESOLVED_SHA}" >> "${GITHUB_OUTPUT}"
+          echo "Resolved artifact-worker expected SHA: ${RESOLVED_SHA}"
 
       - name: Authenticate to Google Cloud
         id: auth
@@ -90,5 +149,90 @@ jobs:
         with:
           project_id: ${{ env.GCP_PROJECT_ID }}
 
+      - name: Check deployed job drift
+        id: worker-drift
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Espejo EXACTO en src/lib/reliability/queries/release-worker-revision-drift.ts
+          # (CHANGE_GATED_RUNTIME_PATHS['artifact-worker']); la paridad la custodia
+          # release-worker-change-gate-parity.test.ts.
+          WORKER_RUNTIME_PATHS=(
+            package.json
+            pnpm-lock.yaml
+            tsconfig.json
+            vendor
+            scripts/lib
+            services/artifact-worker
+            services/_shared
+            src/lib
+            src/emails
+            src/types
+            src/config
+            src/i18n
+          )
+
+          # Un Job no tiene revisiones: el SHA servido es la etiqueta `git-sha` que deploy.sh fija y
+          # verifica en cada deploy.
+          CURRENT_GIT_SHA="$(gcloud run jobs describe artifact-worker \
+            --project="${GCP_PROJECT_ID}" \
+            --region="${GCP_REGION}" \
+            --format='value(metadata.labels.git-sha)' 2>/dev/null || true)"
+
+          if [ "${CURRENT_GIT_SHA}" = "${EXPECTED_SHA}" ]; then
+            DEPLOY_NEEDED="false"
+            echo "artifact-worker already serves EXPECTED_SHA=${EXPECTED_SHA}; skipping build/deploy."
+          elif [ -n "${CURRENT_GIT_SHA}" ] \
+            && git cat-file -e "${CURRENT_GIT_SHA}^{commit}" 2>/dev/null \
+            && git diff --quiet "${EXPECTED_SHA}..${CURRENT_GIT_SHA}" -- "${WORKER_RUNTIME_PATHS[@]}"; then
+            DEPLOY_NEEDED="false"
+            echo "artifact-worker serves ${CURRENT_GIT_SHA}; runtime paths unchanged since EXPECTED_SHA=${EXPECTED_SHA}; skipping build/deploy."
+          else
+            DEPLOY_NEEDED="true"
+            echo "artifact-worker deploy required: current_git_sha=${CURRENT_GIT_SHA:-none}, expected_sha=${EXPECTED_SHA}"
+          fi
+
+          echo "deploy_needed=${DEPLOY_NEEDED}" >> "${GITHUB_OUTPUT}"
+          echo "current_git_sha=${CURRENT_GIT_SHA}" >> "${GITHUB_OUTPUT}"
+
       - name: Deploy Cloud Run Job
+        if: steps.worker-drift.outputs.deploy_needed == 'true'
         run: bash services/artifact-worker/deploy.sh
+        env:
+          ENV: ${{ env.ENV }}
+          EXPECTED_SHA: ${{ steps.resolve-sha.outputs.expected_sha }}
+
+      - name: Verify job Ready and served SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEADLINE=$((SECONDS + 300))
+          while [ ${SECONDS} -lt ${DEADLINE} ]; do
+            READY="$(gcloud run jobs describe artifact-worker \
+              --project="${GCP_PROJECT_ID}" \
+              --region="${GCP_REGION}" \
+              --format='value(status.conditions[0].status)')"
+            if [ "${READY}" = "True" ]; then
+              break
+            fi
+            echo "  waiting Ready=True (current=${READY}, elapsed=${SECONDS}s)"
+            sleep 10
+          done
+
+          if [ "${READY}" != "True" ]; then
+            echo "ERROR: artifact-worker did not reach Ready=True within 300s"
+            exit 1
+          fi
+
+          SERVED_SHA="$(gcloud run jobs describe artifact-worker \
+            --project="${GCP_PROJECT_ID}" \
+            --region="${GCP_REGION}" \
+            --format='value(metadata.labels.git-sha)')"
+          echo "✓ artifact-worker Ready=True, serves git-sha=${SERVED_SHA}"
+
+      - name: Record deployment commit
+        run: |
+          echo "Expected commit: ${{ steps.resolve-sha.outputs.expected_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deploy needed: ${{ steps.worker-drift.outputs.deploy_needed }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Environment: ${{ env.ENV }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Triggered by: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"

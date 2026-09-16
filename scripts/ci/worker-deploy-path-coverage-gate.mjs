@@ -59,6 +59,14 @@ const WORKERS = [
     name: 'auth-server',
     entry: 'services/auth-server/server.ts',
     workflow: '.github/workflows/auth-server-deploy.yml'
+  },
+  {
+    // TASK-1846 — Cloud Run JOB multiconsumidor (Proposal + Insights). Corre con tsx sobre el árbol
+    // fuente, sin bundle; el metafile de esbuild igual describe su grafo de imports `.ts`. Los assets
+    // no-TS del catálogo (templates, fuentes) los cubre el prefijo del composer, no este gate.
+    name: 'artifact-worker',
+    entry: 'services/artifact-worker/main.ts',
+    workflow: '.github/workflows/artifact-worker-deploy.yml'
   }
 ]
 

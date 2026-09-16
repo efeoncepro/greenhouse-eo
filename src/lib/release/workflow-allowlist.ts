@@ -27,6 +27,16 @@ export interface ReleaseDeployWorkflow {
   cloudRunService?: string
   /** Optional: Cloud Run region del service. Default us-east4. */
   cloudRunRegion?: string
+  /**
+   * Optional: tipo de recurso Cloud Run. Default `service`.
+   *
+   * TASK-1846 — un **Job** no tiene revisiones ni tráfico: su SHA servido es la etiqueta
+   * `metadata.labels.git-sha` que su `deploy.sh` fija y verifica, y su rollback es re-apuntar la
+   * imagen (`gcloud run jobs update --image`), no `update-traffic`. Todo lector de drift, del CLI de
+   * workers y de rollback DEBE ramificar por este campo: `services describe` sobre un Job falla y
+   * se degradaría a `data_missing` permanente, que es silencio, no detección.
+   */
+  cloudRunResourceKind?: 'service' | 'job'
 }
 
 export const RELEASE_DEPLOY_WORKFLOWS: readonly ReleaseDeployWorkflow[] = [
@@ -59,6 +69,16 @@ export const RELEASE_DEPLOY_WORKFLOWS: readonly ReleaseDeployWorkflow[] = [
     workflowName: 'Auth Server Deploy',
     cloudRunService: 'auth-server',
     cloudRunRegion: 'us-east4'
+  },
+  {
+    // TASK-1846 — Cloud Run JOB `artifact-worker` (render del Artifact Composer para Proposal y
+    // Efeonce Insights). Registrado ANTES de su primer deploy production, como exige la regla dura
+    // del control plane. Es ÚNICO para staging y producción (como el ops-worker) y change-gated:
+    // el watchdog lo clasifica por el espejo de `WORKER_RUNTIME_PATHS` de su workflow.
+    workflowName: 'Artifact Worker Deploy',
+    cloudRunService: 'artifact-worker',
+    cloudRunRegion: 'us-east4',
+    cloudRunResourceKind: 'job'
   },
   {
     // TASK-1378 — Scanner de firmas de assets de candidato. Registrado ANTES

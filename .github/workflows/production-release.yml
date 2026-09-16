@@ -375,6 +375,20 @@ jobs:
     secrets:
       GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
 
+  # TASK-1846 — Cloud Run JOB artifact-worker (render del Artifact Composer: Proposal + Efeonce
+  # Insights). Único para staging y producción, change-gated como auth-server/ops-worker: el workflow
+  # compara la etiqueta `git-sha` del Job contra target_sha y salta el build si las rutas runtime no
+  # cambiaron. Sus flags y su bucket viven fijos en deploy.sh (no dependen del carril).
+  deploy-artifact-worker:
+    name: Deploy artifact-worker
+    needs: [approval-gate]
+    uses: ./.github/workflows/artifact-worker-deploy.yml
+    with:
+      environment: production
+      expected_sha: ${{ inputs.target_sha }}
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+
   # TASK-853 — Azure infra release gating.
   # Health check Azure corre SIEMPRE (preflight-style); Bicep apply real
   # gated por diff infra/azure/<sub>/** o force_infra_deploy=true input.
@@ -470,6 +484,7 @@ jobs:
       - deploy-ico-batch
       - deploy-hubspot-integration
       - deploy-auth-server
+      - deploy-artifact-worker
       - deploy-azure-teams-notifications
       - deploy-azure-teams-bot
       - wait-vercel
@@ -597,6 +612,7 @@ jobs:
       - deploy-ico-batch
       - deploy-hubspot-integration
       - deploy-auth-server
+      - deploy-artifact-worker
       - deploy-azure-teams-notifications
       - deploy-azure-teams-bot
       - wait-vercel
@@ -627,6 +643,7 @@ jobs:
             echo "| ico-batch-worker | ${{ needs.deploy-ico-batch.result }} |"
             echo "| hubspot-integration | ${{ needs.deploy-hubspot-integration.result }} |"
             echo "| auth-server | ${{ needs.deploy-auth-server.result }} |"
+            echo "| artifact-worker (job) | ${{ needs.deploy-artifact-worker.result }} |"
             echo "| azure-teams-notifications (gated) | ${{ needs.deploy-azure-teams-notifications.result }} |"
             echo "| azure-teams-bot (gated) | ${{ needs.deploy-azure-teams-bot.result }} |"
             echo "| Vercel ready | ${{ needs.wait-vercel.result }} |"

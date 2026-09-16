@@ -1,4 +1,8 @@
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
+import { parse } from 'yaml'
 
 import {
   RELEASE_DEPLOY_WORKFLOWS,
@@ -7,10 +11,11 @@ import {
   findWorkflow
 } from './workflow-allowlist'
 
-describe('workflow-allowlist — canonical 9 workflows (7 deploy workers + orchestrator + watchdog)', () => {
-  it('contains exactly the 9 production release workflows', () => {
+describe('workflow-allowlist — canonical 11 workflows (9 deploy workflows + orchestrator + watchdog)', () => {
+  it('contains exactly the 11 production release workflows', () => {
     expect(RELEASE_DEPLOY_WORKFLOWS.map((w) => w.workflowName).sort()).toEqual(
       [
+        'Artifact Worker Deploy',
         'Auth Server Deploy',
         'Azure Teams Bot Deploy',
         'Azure Teams Deploy',
@@ -31,7 +36,7 @@ describe('workflow-allowlist — canonical 9 workflows (7 deploy workers + orche
   })
 
   it('Set is read-only (preserve canonical immutability)', () => {
-    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(10)
+    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(11)
   })
 
   // Anti-regression: el orchestrator DEBE estar en el allowlist para que
@@ -71,8 +76,46 @@ describe('workflow-allowlist — canonical 9 workflows (7 deploy workers + orche
 })
 
 describe('workflow-allowlist — Cloud Run drift detection mapping', () => {
-  it('maps 4 workflows to Cloud Run services', () => {
-    expect(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION).toHaveLength(5)
+  it('maps 6 workflows to Cloud Run resources (5 services + 1 job)', () => {
+    expect(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION).toHaveLength(6)
+    expect(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION.filter((w) => w.cloudRunResourceKind === 'job').map((w) => w.cloudRunService)).toEqual([
+      'artifact-worker'
+    ])
+  })
+
+  // TASK-1846 — paridad REAL contra el orquestador: todo workflow con recurso Cloud Run mapeado lo
+  // despliega production-release.yml vía `uses:`, y viceversa. Sin esto, un worker podía registrarse
+  // en el allowlist (el watchdog lo mide) sin que el release lo desplegara nunca — drift garantizado —,
+  // o desplegarse por el orquestador sin que ningún lector de drift lo mirara.
+  it('every Cloud Run-mapped workflow is deployed by the orchestrator, and nothing else Cloud Run is', () => {
+    const repoRoot = join(import.meta.dirname, '..', '..', '..')
+    const workflowsDir = join(repoRoot, '.github', 'workflows')
+
+    const nameByFile = new Map(
+      readdirSync(workflowsDir)
+        .filter((file) => file.endsWith('.yml'))
+        .map((file) => [file, (parse(readFileSync(join(workflowsDir, file), 'utf8')) as { name?: string }).name ?? ''])
+    )
+
+    const orchestrator = parse(readFileSync(join(workflowsDir, 'production-release.yml'), 'utf8')) as {
+      jobs: Record<string, { uses?: string }>
+    }
+
+    const orchestratedNames = Object.values(orchestrator.jobs)
+      .map((job) => job.uses?.match(/^\.\/\.github\/workflows\/(.+\.yml)$/)?.[1])
+      .filter((file): file is string => Boolean(file))
+      .map((file) => nameByFile.get(file))
+
+    const mappedNames = WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION.map((w) => w.workflowName)
+
+    for (const name of mappedNames) {
+      expect(orchestratedNames, `${name} está mapeado a Cloud Run pero el orquestador no lo despliega`).toContain(name)
+    }
+
+    // Azure es la única familia orquestada sin recurso Cloud Run (no participa en revision drift).
+    const orchestratedCloudRun = orchestratedNames.filter((name) => name && !name.startsWith('Azure '))
+
+    expect([...orchestratedCloudRun].sort()).toEqual([...mappedNames].sort())
   })
 
   // TASK-1378 — El scanner está en el allowlist (lo necesita para ci_green y

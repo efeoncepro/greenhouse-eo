@@ -28,7 +28,9 @@ const WORKER_WORKFLOWS = [
   '.github/workflows/ops-worker-deploy.yml',
   '.github/workflows/commercial-cost-worker-deploy.yml',
   '.github/workflows/ico-batch-deploy.yml',
-  '.github/workflows/hubspot-greenhouse-integration-deploy.yml'
+  '.github/workflows/hubspot-greenhouse-integration-deploy.yml',
+  // TASK-1846 — Cloud Run Job orquestado; mismo contrato de concurrencia y workflow_call.
+  '.github/workflows/artifact-worker-deploy.yml'
 ] as const
 
 interface WorkflowDoc {

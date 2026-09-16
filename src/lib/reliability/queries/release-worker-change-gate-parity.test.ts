@@ -29,7 +29,8 @@ const parseWorkflowRuntimePaths = (workflowFile: string): string[] => {
 
 const WORKFLOW_BY_SERVICE: Record<string, string> = {
   'ops-worker': 'ops-worker-deploy.yml',
-  'auth-server': 'auth-server-deploy.yml'
+  'auth-server': 'auth-server-deploy.yml',
+  'artifact-worker': 'artifact-worker-deploy.yml'
 }
 
 describe('watchdog change-gate mirror ↔ deploy workflows (release 9100bbd2765d, 2026-09-04)', () => {

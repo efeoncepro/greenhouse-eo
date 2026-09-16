@@ -54,11 +54,22 @@ describe('artifact-worker · deploy.sh (SoT de env vars del Job)', () => {
     expect(deploySh).toMatch(/ENV_VARS="\$\{ENV_VARS\},ARTIFACT_RENDER_JOBS_ENABLED=/)
   })
 
-  it('el flag INSIGHTS_RENDER_ENABLED está DECLARADO y su default es OFF (TASK-1846)', () => {
+  it('el flag INSIGHTS_RENDER_ENABLED está DECLARADO con default ON en el Job único (TASK-1846)', () => {
     // Misma bug class que GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED (revisión 00473): un flag aplicado
-    // sólo con --update-env-vars desaparece en el próximo deploy destructivo, sin ruido.
+    // sólo con --update-env-vars desaparece en el próximo deploy destructivo, sin ruido. Y el default
+    // es ON porque el Job es único: con OFF, el primer deploy de release apagaría el reclamo en staging.
     expect(deploySh).toMatch(/ENV_VARS="\$\{ENV_VARS\},INSIGHTS_RENDER_ENABLED=/)
-    expect(deploySh).toMatch(/INSIGHTS_RENDER_ENABLED:-false/)
+    expect(deploySh).toMatch(/INSIGHTS_RENDER_ENABLED:-true/)
+  })
+
+  it('el bucket de assets NO depende del carril: el Job es único y no puede darse vuelta por deploy (TASK-1846)', () => {
+    expect(deploySh).toMatch(/^STORAGE_ENV="staging"$/m)
+    expect(deploySh).not.toMatch(/if \[\[ "\$\{ENV\}" == "production" \]\]; then\s+STORAGE_ENV=/)
+  })
+
+  it('etiqueta el Job con EXPECTED_SHA y aborta si el árbol no es ese SHA (TASK-1846)', () => {
+    expect(deploySh).toContain('GIT_SHA="${EXPECTED_SHA:-${HEAD_SHA}}"')
+    expect(deploySh).toMatch(/if \[\[ "\$\{GIT_SHA\}" != "\$\{HEAD_SHA\}" \]\]; then[\s\S]*?exit 1/)
   })
 
   it('el SELFTEST de imagen corre en Cloud Build ANTES del deploy (la imagen se prueba a sí misma)', () => {
@@ -72,21 +83,19 @@ describe('artifact-worker · deploy.sh (SoT de env vars del Job)', () => {
 })
 
 describe('artifact-worker · workflow (anti-stale)', () => {
-  it('los paths incluyen cada src/lib/** que el worker consume (sin esto queda stale en silencio)', () => {
-    for (const p of [
-      'services/artifact-worker/**',
-      'services/_shared/**',
-      'src/lib/artifact-composer/**',
-      'src/lib/commercial/tenders/**',
-      'src/lib/storage/greenhouse-assets.ts',
-      'src/lib/postgres/**'
-    ]) {
+  it('los paths cubren la superficie del worker (la cobertura exacta la exige worker:deploy-path-gate)', () => {
+    for (const p of ['services/artifact-worker/**', 'services/_shared/**', 'scripts/lib/**', 'src/lib/**']) {
       expect(workflow, `falta el path ${p}`).toContain(`'${p}'`)
     }
   })
 
-  it('NO tiene trigger de production (exige release control plane + RELEASE_DEPLOY_WORKFLOWS primero)', () => {
-    expect(workflow).not.toMatch(/environment:\s*production/)
+  it('producción sólo entra por workflow_call del orquestador, con SHA esperado (TASK-1846)', () => {
+    expect(workflow).toMatch(/^\s{2}workflow_call:\n\s{4}inputs:\n\s{6}environment:/m)
+    expect(workflow).toContain('expected_sha:')
+    // Sin trigger de push a main: los workers nunca despliegan producción por push.
+    expect(workflow).not.toMatch(/branches:\s*\n\s*-\s*main/)
+    // Ningún flag por ambiente en el workflow: el SoT es deploy.sh (el Job es único).
+    expect(workflow).not.toMatch(/INSIGHTS_RENDER_ENABLED:\s*'/)
   })
 })
 
