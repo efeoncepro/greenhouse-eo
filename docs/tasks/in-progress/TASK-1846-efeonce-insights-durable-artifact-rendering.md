@@ -228,6 +228,72 @@ append-only, drift check byte a byte del manifest. El Slice 1 es generalización
 - **`plan.limits` duplicado**: el dedupe está asignado acá (arquitectura §14.3); confirmar si entra como slice
   propio o como parte del Slice 1.
 
+## Design Decision — alcance del lease/fencing (2026-09-16)
+
+Decidido con `arch-architect` (4 pilares + reversibilidad×blast radius) y `efeonce-insights`.
+Delegado por el operador; queda registrado acá porque cambia el orden de los slices.
+
+**Decisión: opción B — mecanismo compartido, additive, con el reclaim de Proposal APAGADO tras flag.**
+
+Rechazadas: (A) sólo Insights — deja dos semánticas de recuperación sobre el mismo motor "generalizado" y
+conserva en Proposal el job que queda colgado en `running` para siempre; (C) arreglar Proposal activamente en
+esta task — contradice su acceptance y no tiene presupuesto de regresión acá.
+
+### Cómo se reconcilia con "keep Proposal untouched"
+
+El hand-off de 1845 y el routing de la skill dicen *keep Proposal untouched in the Artifact Worker*. Se cumple:
+lo intocado es el **comportamiento** (Proposal no reclama, no vence lease, no cambia su máquina de estados ni
+sus outputs). El **código** sí pasa a ser compartido, que es lo que la propia task autoriza en `Files owned`
+(«`render-jobs.ts` (adapter compatible, sin cambiar negocio Proposal)»). Sin esa lectura, "untouched" y
+"adapter compatible" se contradicen.
+
+### Cuadrante (reversibilidad × blast radius)
+
+Columnas nullable additive sobre una tabla con evidencia emitida, en la instancia única que sirve producción:
+**two-way door × blast radius medio ⇒ MOVE WITH CARE** — rollout escalonado, flag y plan de reversibilidad.
+Eso es exactamente la opción B; no es una preferencia de estilo, es el cuadrante.
+
+### Consecuencia dura sobre el orden
+
+`lease` y `fencing` entran **en el mismo slice (2)**, nunca separados: el lease habilita el reclamo y el reclamo
+abre la ventana de doble finalización que hoy no existe. El Scope ya los agrupaba; esta decisión lo confirma y
+prohíbe dividirlos.
+
+### 4 pilares
+
+- **Safety** — el fence token es el gate: finalizar exige `WHERE fence_token = <el mío>`; un worker viejo pierde
+  sin efecto. Blast radius si falla: una edición con dos PDFs finales, contenida por org. Riesgo residual
+  aceptado: un worker particionado puede subir bytes al asset store antes de perder el fence; esos assets quedan
+  huérfanos y los limpia la reconciliación del Slice 3, no el fencing.
+- **Robustness** — claim atómico ya existente (`FOR UPDATE SKIP LOCKED`) + `fence_token` monotónico + CHECK de
+  transición; finalización idempotente por `(run, output_target)`. Se prueban dos workers concurrentes y un lease
+  vencido, no sólo el happy path.
+- **Resilience** — dead letter ya existe por intentos agotados; falta el huérfano en `running`, que es el hueco
+  real de hoy. Señal nueva `insights_render_orphaned` (steady=0) y reconciliación idempotente.
+- **Scalability** — el claim es O(log n) con índice por `(state, deadline, created_at)`; la cuota por org y el
+  fairness con Proposal entran en el Slice 3 para que una org no monopolice el Job.
+
+### Trampa de deploy que hereda esta task
+
+`services/artifact-worker/deploy.sh` usa `--set-env-vars`, que es **destructivo**, y
+`deploy-contract.test.ts:53` ya lo custodia para `ARTIFACT_RENDER_JOBS_ENABLED`. `INSIGHTS_RENDER_ENABLED` debe
+declararse en `deploy.sh` **y** sumarse a ese test en el mismo slice; si sólo se aplica en vivo con
+`--update-env-vars`, el próximo deploy lo borra en silencio. No es hipotético: le pasó a
+`GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` (revisión 00473).
+
+### Decisión menor cerrada
+
+El dedupe de `plan.limits` va en el **renderer**, no en el planner: los planes se congelan e inmutabilizan y su
+contenido alimenta el `issued_hash`, así que arreglar en el planner no limpia los ya congelados y sí cambia el
+hash para entradas idénticas. Entra en el Slice 1. Que el planner emita duplicados
+([`deterministic-planner.ts:145`](../../../src/lib/efeonce-insights/editorial/deterministic-planner.ts)) queda
+como apunte para el dueño del planner, fuera de esta task.
+
+### Deliberadamente NO decidido
+
+Cuándo se prende el reclaim de Proposal. Esta task deja el mecanismo y el flag apagado; encenderlo es una
+decisión con su propia evidencia de regresión y no se toma acá.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      "Que construyo exactamente, slice por slice?"
