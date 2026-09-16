@@ -202,6 +202,18 @@ metáfora, manos, interfaz o fondo de otro artículo.
 Dos pruebas de calibración: si al retirar el logo la pieza deja de sentirse de la marca, falta sistema visual;
 si el logo domina la lectura, la firma está sobredimensionada.
 
+### Motor de IA: cómo elegir (as-of 2026-09-16)
+
+Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`; árbol y costos en `greenhouse-ai-image-generator` §Elegir modelo.
+
+- Si el contrato del artículo fija `gpt-image-2`, la evidencia debe mostrar ese modelo; no lo cambies en silencio.
+- Sin contrato fijo: portada o imagen cotidiana → GPT Image 2.5 Flare; edición precisa o master final → 2.5
+  Sunburst (`pnpm ai:image --model …`). Explora en `low`/`medium` y reserva `xhigh`/`max` para el master.
+- El costo de 2.5 se estima antes de gastar (fórmula oficial); el `usage` que imprime el CLI es la confirmación.
+- Atmósfera o materialidad que GPT no logra → Seedream 5 Pro (`pnpm ai:fal`, máx. 2048², JPEG por defecto: pasa
+  `--format png`); divergencia barata de metáforas → Seedream 5 Lite.
+- Texto, cifras, labels y logos nunca van en el raster, con ningún modelo.
+
 ### Paso 4: escribir prompts rigurosos para GPT Image 2
 
 Guardar cada prompt **verbatim** en el manifest. Un prompt operativo debe declarar, en este orden:

@@ -1,9 +1,9 @@
 # Operar el CLI de fal: Seedream 5, Seedance 2.5/2.0, Minimax H3, Flux 3 y Wan 3.0
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-09-16 por agente
-> **Ultima actualizacion:** 2026-09-16 por Claude — limpieza de estados superados: el bloqueo por saldo quedó resuelto con dos cuentas (`--balance`, `--detach`/`--status`), Wan 3.0 y Seedance 2.5 video a video verificados, espera de video 30 min; antes, Wan 3.0 y Wan 3.0 Prime (texto, imagen y referencias a video; `--duration auto`, `--thinking` con `--web-url`/`--file`, `--no-prompt-expansion`, `--seed`), advertencia de saldo agotado en fal y 403 `Exhausted balance`; antes, Flux 3 (draft → enhance, primer/ultimo cuadro, keyframes, edit y extend) y video a video con Seedance 2.5 (`--task editing|extension`, sin verificar); antes, Minimax H3 (video, camera-controls, LoRA y entrenamiento), retome por `--request-id` y cierre de la brecha de `--task`
+> **Ultima actualizacion:** 2026-09-16 por Claude — nuevo paso «Elige el modelo antes de correr» con enlace a la guía canónica de selección; costos por escalón de resolución (Wan 3.0 1080p y H3 base 2K por defecto; Wan 3.0 Prime más cara; Flux 3 publicado al doble; fórmula de tokens de Seedance); piso de 100 steps en LoRA; brechas conocidas del CLI (JPEG con `.png` en Seedream Pro sin `--format`, `--seed` en endpoints que no lo declaran, más de 10 `--image`). Antes: limpieza de estados superados: el bloqueo por saldo quedó resuelto con dos cuentas (`--balance`, `--detach`/`--status`), Wan 3.0 y Seedance 2.5 video a video verificados, espera de video 30 min; antes, Wan 3.0 y Wan 3.0 Prime (texto, imagen y referencias a video; `--duration auto`, `--thinking` con `--web-url`/`--file`, `--no-prompt-expansion`, `--seed`), advertencia de saldo agotado en fal y 403 `Exhausted balance`; antes, Flux 3 (draft → enhance, primer/ultimo cuadro, keyframes, edit y extend) y video a video con Seedance 2.5 (`--task editing|extension`, sin verificar); antes, Minimax H3 (video, camera-controls, LoRA y entrenamiento), retome por `--request-id` y cierre de la brecha de `--task`
 > **Modulo:** AI Tooling / Asset Generation
 > **Comando:** `pnpm ai:fal`
 > **Documentacion tecnica:** [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo
@@ -48,7 +48,30 @@ pnpm ai:fal --list
 
 ## Paso a paso
 
-### 1. Elige la capacidad
+### 1. Elige el modelo antes de correr
+
+Cada corrida cuesta, así que decide el modelo **antes** de escribir el comando. La guía canónica para decidir qué
+modelo usar, cuándo y cómo (imagen y video, `pnpm ai:image` y `pnpm ai:fal`) es
+[GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md).
+Léela primero; este manual sólo explica cómo operar el comando.
+
+Antes de correr, confirma también el **costo a la resolución que vas a pedir**:
+
+- **fal cobra por escalón de resolución.** Los precios de las tablas de abajo (y del registro) son el escalón **más
+  bajo**, no el de la resolución por defecto. Tabla completa: catálogo técnico §Precios por escalón de resolución.
+- ⚠️ **Wan 3.0 sale en 1080p si no pasas `--resolution`**: USD 0,20/s en base y 0,28/s en Prime (4× el
+  480p de cada línea). Un clip de 30 s a 1080p en base cuesta USD 6,00.
+- ⚠️ **H3 base sale en 2K si no pasas `--resolution`**: USD 0,13/s (2,6× lo de 480P). Además su 2K y 4K son
+  reescalados desde 768P, no nativos.
+- **Flux 3:** fal y Black Forest Labs publican el doble de lo registrado (final 0,17/s a 720p, borrador 0,06/s,
+  extend 0,41/s a 720p). Presupuesta con el publicado.
+- **Seedance:** calcula con la fórmula de fal, que calzó con el gasto real:
+  `tokens = alto × ancho × segundos × 24 / 1024` y `costo = tokens × precio_por_1000 / 1000` (por 1.000 tokens: 2.5
+  USD 0,0214 · 2.0 base 0,014 · fast 0,0112 · mini 0,007 · us 0,0168). La equivalencia de OpenArt subestima ~2×.
+- Cuando el precio no esté confirmado, corre una prueba corta y mira `pnpm ai:fal --balance` antes y después. El
+  comando **no estima el costo** antes de gastar.
+
+### 2. Elige la capacidad
 
 `--list` agrupa las capacidades en IMAGE, VIDEO y TRAINING, y muestra cada `id`, su slug y si esta
 `verificada <fecha>`, `SIN VERIFICAR` o `[NO OPERABLE POR COLA]`.
@@ -93,11 +116,11 @@ Seedance es **4 s**: `--duration 3` falla en local.
 
 Minimax H3 tiene otros limites y otra forma de escribirlos:
 
-| Familia H3 | Duracion | Resoluciones (en mayusculas) | Precio fal 2026-09-16 |
+| Familia H3 | Duracion | Resoluciones (en mayusculas) | Precio fal 2026-09-16 (USD / s por resolucion) |
 |---|---|---|---|
-| H3 base (`h3-*`) | 5 a 15 s, entero, sin `auto` | `480P`, `768P`, `2K`, `4K` (default `2K`) | USD 0,05 / s (con LoRA 0,0625 / s) |
-| H3 Max (`h3max-*`) | 5 a 15 s | `480P`, `768P`, `1080P` (default `768P`; camera-controls `480P`) | USD 0,025 / s |
-| H3 Max Turbo (`h3turbo-*`) | 5 a 15 s | `480P`, `768P`, `1080P` (default `768P`) | USD 0,0125 / s |
+| H3 base (`h3-*`) | 5 a 15 s, entero, sin `auto` | `480P`, `768P`, `2K`, `4K` (**default `2K`**; 2K y 4K reescalados desde 768P) | 480P 0,05 · 768P 0,06 · **2K 0,13** · 4K 0,16 (con LoRA el registro dice 0,0625 como minimo) |
+| H3 Max (`h3max-*`) | 5 a 15 s | `480P`, `768P`, `1080P` (default `768P`; camera-controls `480P`; 1080P refinado desde 768P) | 480P 0,025 · 768P 0,04 · 1080P 0,08 (rotulados «50% off»: sin dato si es promocion) |
+| H3 Max Turbo (`h3turbo-*`) | 5 a 15 s | `480P`, `768P`, `1080P` (default `768P`) | registro 0,0125; publicado 768P 0,02 · 1080P 0,04 (promo 0,01 / 0,02): medir |
 
 - Aspectos H3 en texto a video: `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16` (default `16:9`); en referencias se
   agrega `adaptive` (default). **Image-to-video no acepta `--aspect`**: el encuadre sale de la imagen.
@@ -105,11 +128,11 @@ Minimax H3 tiene otros limites y otra forma de escribirlos:
 - H3 **no** acepta `--bitrate` ni `--no-audio`, y el video **sale con sonido** (ambiente o musica).
 - `--prompt-expansion`: en H3 base es opcional (`disabled|fast|balanced|quality`); en Max y Turbo es obligatorio
   y sólo acepta `disabled|balanced|quality`. Si no lo pasas en Max o Turbo, el comando envia `balanced`.
-- Precios consultados el 2026-09-16; confirmalos antes de un lote.
+- Precios consultados el 2026-09-16; confirmalos antes de un lote. H3 Max es un post-entrenamiento de fal sobre H3, no un modelo de MiniMax.
 
 Flux 3 (video, no imagen) tiene su propio contrato:
 
-| Flux 3 | Duracion | `--resolution` | `--aspect` | Precio fal 2026-09-16 |
+| Flux 3 | Duracion | `--resolution` | `--aspect` | Precio registrado 2026-09-16 (publicado: el doble, ver nota) |
 |---|---|---|---|---|
 | `flux3-t2v`, `flux3-i2v` | `auto` o 5 a 20 s | `720p` o `1080p` (default `720p`) | si | USD 0,085 / s |
 | `flux3-flf`, `flux3-keyframes` | 5 a 20 s, **sin** `auto` (default 5) | `720p` o `1080p` | si | USD 0,085 / s |
@@ -121,16 +144,23 @@ Flux 3 (video, no imagen) tiene su propio contrato:
 - Aspectos Flux 3: `auto`, `21:9`, `2:1`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16` (default `auto`).
 - Sale con sonido por defecto; `--no-audio` lo apaga. No acepta `--bitrate`.
 - `--safety-tolerance` de 0 a 4 (default 2).
+- ⚠️ **Precio publicado distinto del registrado:** fal y Black Forest Labs publican final 0,17/s a 720p (0,29 a
+  1080p), borradores 0,06/s y extend 0,41/s a 720p (0,53 a 1080p); edit coincide (0,03). Presupuesta con el
+  publicado y confirma con `--balance` antes y despues.
 - Los 12 endpoints estan verificados con corridas reales (2026-09-16). Son **mas lentos que H3**: entre 40 s y
   4 min por video.
 
-Wan 3.0 y Wan 3.0 Prime comparten contrato y precio (OpenAPI y pricing de fal, 2026-09-16):
+Wan 3.0 y Wan 3.0 Prime comparten contrato (OpenAPI de fal, 2026-09-16), **no precio**:
 
-| Wan 3.0 | Duracion | `--resolution` | `--aspect` | Precio fal 2026-09-16 |
+| Wan 3.0 | Duracion | `--resolution` | `--aspect` | Precio fal 2026-09-16 (USD / s) |
 |---|---|---|---|---|
-| `wan3-*`, `wan3prime-*` | 2 a 30 s (entero) o `auto` (default 5) | `480p`, `720p`, `1080p` (**default `1080p`**) | `adaptive` (default), `16:9`, `4:3`, `1:1`, `3:4`, `9:16` | USD 0,05 / s |
+| `wan3-*` | 2 a 30 s (entero) o `auto` (default 5) | `480p`, `720p`, `1080p` (**default `1080p`**) | `adaptive` (default), `16:9`, `4:3`, `1:1`, `3:4`, `9:16` | 480p 0,05 · 720p 0,10 · **1080p 0,20** |
+| `wan3prime-*` | igual | igual | igual | 480p 0,068 · 720p 0,14 · **1080p 0,28** |
 
-- ⚠️ **Si no pasas `--resolution`, sale en 1080p**, que es la opcion mas lenta. Para explorar, pide `480p` o `720p`.
+- ⚠️ **Si no pasas `--resolution`, sale en 1080p**, que es la opcion mas lenta y **4× mas cara** que 480p. Para
+  explorar, pide `480p` o `720p`.
+- Prime es la version **acelerada** segun Alibaba y cuesta mas que base; que tenga mejor calidad no esta medido.
+  Salida a 30 fps.
 - `--duration auto` deja que el modelo elija el largo segun el prompt y las referencias (en la corrida verificada
   eligio 5,04 s).
 - Sale con sonido por defecto; `--no-audio` lo apaga. No acepta `--bitrate` ni `--prompt-expansion <modo>`.
@@ -140,20 +170,28 @@ Wan 3.0 y Wan 3.0 Prime comparten contrato y precio (OpenAPI y pricing de fal, 2
   15 s). Se citan en el prompt por posicion: «the subject in Image 1 walks past Video 1».
 - Estado: las 6 capacidades verificadas el 2026-09-16 (`wan3-t2v` primero; las otras 5 con la segunda cuenta de fal).
 
-### 2. Corre el comando
+### 3. Corre el comando
 
 Imagen desde texto:
 
 ```bash
-pnpm ai:fal --capability seedream5-pro --prompt "<descripcion>" --out ai-generations/2026-09-16_mi-pieza/kv.png
+pnpm ai:fal --capability seedream5-pro --prompt "<descripcion>" --format png --out ai-generations/2026-09-16_mi-pieza/kv.png
 ```
 
 Edicion con referencias (los archivos locales se suben solos al storage de fal):
 
 ```bash
 pnpm ai:fal --capability seedream5-pro-edit --image base.png --image referencia.png \
-  --prompt "<que cambia; conserva el resto>" --out ai-generations/2026-09-16_mi-pieza/kv-v2.png
+  --prompt "<que cambia; conserva el resto>" --format png --out ai-generations/2026-09-16_mi-pieza/kv-v2.png
 ```
+
+- ⚠️ **Seedream 5 Pro entrega JPEG por defecto.** Sin `--format png`, `--out kv.png` guarda un JPEG con extension
+  `.png` (brecha conocida). Pasa `--format png` o nombra el archivo `.jpg`.
+- **Seedream 5 Pro llega hasta 2048×2048, no a 4K.** Para mas area usa `seedream5-lite` (hasta 4096² segun el
+  schema; la ficha dice 3072²).
+- ⚠️ **Con mas de 10 `--image`, fal usa solo las ultimas 10** sin avisar (y Pro cobra USD 0,0045 por cada
+  referencia adicional). Ordena las referencias pensando en eso.
+- Layerize se cobra **por capa**: USD 0,03375 por capa hasta 1536² y 0,0675 por capa sobre eso.
 
 Separacion por capas:
 
@@ -214,8 +252,10 @@ pnpm ai:fal --capability h3-t2v-lora --prompt "<escena>" \
   --lora https://<url-de-la-lora>@1 --out ai-generations/2026-09-16_mi-pieza/h3-lora.mp4
 ```
 
-Entrenamiento de una LoRA (se cobra por paso: `h3-train-t2v` con 2000 pasos ronda USD 10; `h3-train-ref2va`,
-USD 30):
+Entrenamiento de una LoRA (se cobra por paso, con **minimo de 100 pasos**: aunque pidas 10, pagas 100, desde USD
+0,50 en `h3-train-t2v`; con 2000 pasos ronda USD 10; `h3-train-ref2va`, USD 30). En t2v cada clip del zip necesita un
+`.txt` con su descripcion (o `--trigger` como respaldo), y **los clips de menos de 73 cuadros (~3 s) se descartan sin
+aviso**. `number_of_frames` (por `--input`) debe ser 22, 39, 56, 73, 90, 107 o 124; el CLI no lo valida:
 
 ```bash
 pnpm ai:fal --capability h3-train-t2v --training-data dataset.zip --steps 1500 --rank 32 \
@@ -364,10 +404,10 @@ pnpm ai:fal --capability wan3-t2v --prompt "<texto exacto>" --no-prompt-expansio
   --duration 5 --resolution 480p --out ai-generations/2026-09-16_mi-pieza/wan3-exacto.mp4
 ```
 
-- Para Wan 3.0 Prime, cambia `wan3-` por `wan3prime-`: mismas opciones y mismo precio.
+- Para Wan 3.0 Prime, cambia `wan3-` por `wan3prime-`: mismas opciones, **precio mayor** (ver tabla del paso 2).
 - `--web-url` y `--file` **sólo** funcionan en `wan3-r2v` y `wan3prime-r2v`, y siempre con `--thinking`.
-- La via web/documento, i2v, r2v y toda la linea Prime **no tienen corrida real**; el comando advierte antes de
-  gastar. Si una funciona, anota la fecha en `src/lib/ai/fal-capabilities.ts`.
+- Las 6 capacidades de Wan estan verificadas (2026-09-16), incluida la via web (`wan3prime-r2v`); la via
+  **documento** (`--file`) todavia no tiene corrida real.
 
 Opciones generales: `--prompt-file <path>` para prompts largos, `--size` (enum del proveedor o `WxH`), `--count`,
 `--format jpeg|png`, `--timeout <ms>`, `--json` para ver la respuesta cruda y `--request-id <id>` para retomar un
@@ -379,7 +419,7 @@ Un modelo de fal que no esta en el registro se puede correr por su slug, con los
 pnpm ai:fal --model <slug/de/fal> --prompt "<texto>" --input '{"campo":"valor"}'
 ```
 
-### 3. Espera (y retoma si hace falta)
+### 4. Espera (y retoma si hace falta)
 
 El comando imprime `→ <slug> · hasta Ns de espera` y, apenas fal acepta el trabajo,
 `⋯ encolado · request_id <id>`. **Anota ese `request_id`.** Limites por defecto: imagen 3 min (las corridas
@@ -398,7 +438,7 @@ verifico que el archivo sale identico). Funciona para todas las capacidades, no 
 Ojo: esa prueba se hizo con un video de H3 Max Turbo; con Seedream y Seedance todavia no se ha retomado un
 trabajo real.
 
-### 4. Revisa lo que entrego
+### 5. Revisa lo que entrego
 
 - Imagen o video: `✓ <KB> · <ruta>` por archivo y al final `done · <ms> · N asset(s) · request_id <id>`.
 - Borrador de Flux 3: ademas del video, `draft_cache: <url>` y la linea `mejóralo con: …`. Copiala para mejorarlo.
@@ -482,7 +522,10 @@ descargar el resultado cuando esté listo. Sirve para dejar varios videos encola
 - **No marques una capacidad como verificada** en el registro sin haberla corrido de verdad.
 - **No uses este comando para Gemini Omni ni para Nano Banana Pro.** Los dos se conectan directo con Google, no por
   fal, aunque fal los liste (decision del operador, 2026-09-16).
-- **No dejes Wan 3.0 en su resolucion por defecto para explorar.** Sin `--resolution` sale en 1080p.
+- **No dejes Wan 3.0 ni H3 base en su resolucion por defecto para explorar.** Sin `--resolution` Wan sale en 1080p
+  (4× el costo de 480p) y H3 base en 2K (2,6×).
+- **No presupuestes con el precio del registro sin mirar la resolucion.** Es el escalon mas bajo.
+- **No planees probar una LoRA con 10 steps.** fal cobra minimo 100.
 - **No lo conectes al portal.** Es produccion fuera de linea; el runtime de imagen del producto es otro.
 - **No guardes las URLs temporales de fal** en manifests ni documentos; guarda los archivos descargados.
 - No dejes exploraciones en `public/images/generated/` ni en `.captures/`.
@@ -558,8 +601,22 @@ Si ves `HTTP 408`, el trabajo sigue en fal. Consulta con el comando `--status` q
   en vez de `--out-dir`, busca `layers.json` en `public/images/generated/`.
 - **Una capacidad sin verificar devolvio otra forma.** Corre con `--json`, revisa la clave real y ajusta el registro.
 
+### Brechas conocidas del comando (2026-09-16)
+
+No son errores tuyos; estan registradas para corregirse. Mientras tanto:
+
+- **Seedream 5 Pro con `--out x.png` y sin `--format png` guarda un JPEG con extension `.png`.** Pasa `--format png`.
+- **`--seed` se envia a endpoints que no lo declaran** (Seedream 5 y Seedance desde texto o imagen). Que pasa (error o
+  semilla ignorada) no esta probado: no cuentes con reproducir un resultado en esos modelos.
+- **Con mas de 10 `--image`, fal usa solo las ultimas 10** sin avisar.
+- **No hay flag** para `weight_name` de una LoRA, `split_input_duration_threshold` de los entrenadores ni la regla de
+  cuadros del entrenador; usa `--input '<json>'`.
+- **`--size` y `--count` de imagen no se validan** contra el contrato antes de gastar.
+- **No hay estimacion de costo previa.** Calcula con el paso 1 y confirma con `--balance`.
+
 ## Referencias tecnicas
 
+- Guia canonica de seleccion de modelos: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`
 - CLI: `scripts/ai/fal-image.ts` (`pnpm ai:fal`)
 - Registro de capacidades: `src/lib/ai/fal-capabilities.ts`
 - Cliente canonico: `src/lib/ai/fal.ts` (`runFalModel`, `uploadFalFile`)

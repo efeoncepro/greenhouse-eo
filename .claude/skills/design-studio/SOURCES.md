@@ -42,19 +42,50 @@ Guía de arquitectura y compras, no tarifario. Verificar endpoint, región, cuot
 | Capability | Ruta preferida | Decisión |
 |---|---|---|
 | Seedance 2.0 / Seedream | BytePlus/ModelArk directo en producción; Fal en prototipo/gateway | Directo suele ser más barato; Fal aporta conveniencia. Validar soporte, derechos y portabilidad. |
-| Minimax H3 | Fal (`pnpm ai:fal`, out-of-band) | Conectado y verificado 2026-09-16 (OpenAPI de fal por endpoint + API de pricing + 9 corridas reales): Max Turbo 0,0125 USD/s · Max 0,025/s · base 0,05/s (2K/4K) · LoRA 0,0625/s; LoRA y entrenadores sin verificar; `director` no operable por cola. |
-| Seedance 2.5 | Fal T2V/I2V/R2V como superficie provider-supported; Globe permanece gated | El contrato Fal está vivo y documenta 480p/720p/1080p, 4–30 s, audio y R2V multimodal; la API directa BytePlus 2.5 no tiene contrato público verificable. En `pnpm ai:fal` los 15 endpoints Seedance (2.0 y 2.5, incluido r2v `editing`/`extension`) quedaron verificados en real 2026-09-16; costo medido ~2× la estimación por tokens y el filtro de ByteDance rechaza marcas y personas reales **tras encolar y cobra**. |
+| Minimax H3 | Fal (`pnpm ai:fal`, out-of-band) | Conectado y verificado 2026-09-16 (OpenAPI de fal por endpoint + API de pricing + 9 corridas reales): precios del registro = escalón más bajo (Max Turbo 0,0125 USD/s · Max 0,025/s · base 0,05/s · LoRA 0,0625/s); publicados por resolución: base 2K 0,13 (default), Max 1080P 0,08; 2K/4K de base reescalados desde 768P; LoRA mínimo 100 steps; LoRA y entrenadores sin verificar; `director` no operable por cola. |
+| Seedance 2.5 | Fal T2V/I2V/R2V como superficie provider-supported; Globe permanece gated | El contrato Fal está vivo y documenta 480p/720p/1080p, 4–30 s, audio y R2V multimodal; la API directa BytePlus 2.5 no tiene contrato público verificable. En `pnpm ai:fal` los 15 endpoints Seedance (2.0 y 2.5, incluido r2v `editing`/`extension`) quedaron verificados en real 2026-09-16; costo estimable con la fórmula de tokens de fal (calzó con lo medido; la equivalencia de OpenArt subestima ~2×) y el filtro de ByteDance rechaza marcas y personas reales **tras encolar y cobra**. |
 | FLUX.2 | BFL directo o Fal | Paridad pública en los endpoints comparados; decidir por SLA, auth y observabilidad. |
 | Recraft v4 | Recraft directo o Fal | Paridad pública en los endpoints comparados; directo si pesa el control contractual. |
-| GPT Image 2 | OpenAI directo | Ruta canónica; Fal sólo para pruebas o gateway explícitamente justificado. |
+| GPT Image 2 / 2.5 (Sunburst, Flare) | OpenAI directo (`pnpm ai:image`) | Ruta canónica; Fal sólo para pruebas o gateway explícitamente justificado. 2.5 sin Batch; costo estimable por fórmula oficial y rate limits publicados (iguales a GPT Image 2). |
 | Nano Banana / Gemini | Google AI Studio o Vertex directo | Google nativo nunca por Fal; separar API, Batch, región y cuotas. Estado 2026-09-16: **Nano Banana 2** (`gemini-3.1-flash-image`) es el default del provider `google-gemini-image` del producto; **Nano Banana Pro** (`gemini-3-pro-image`) está disponible en nuestro Vertex (`models.get`, location `global`) pero **ninguna superficie lo usa**; no hay CLI de Gemini Image. Gemini Omni Flash también va directo aunque fal lo ofrezca. |
-| Wan 3.0 / Prime | Fal (`pnpm ai:fal`, out-of-band) | Conectado 2026-09-16: 6 endpoints de video `alibaba/wan-3.0{,-prime}/*` (t2v/i2v/r2v), USD 0,05/s (API de pricing). Los 6 verificados en real 2026-09-16. Sin edición ni imagen en 3.0. #2 video y #1 Video Editing en OpenArt Arena 2026-09-16 (ranking externo). |
+| Wan 3.0 / Prime | Fal (`pnpm ai:fal`, out-of-band) | Conectado 2026-09-16: 6 endpoints de video `alibaba/wan-3.0{,-prime}/*` (t2v/i2v/r2v); USD/s por resolución base 0,05 · 0,10 · **0,20 a 1080p (default)**, Prime 0,068 · 0,14 · 0,28; 30 fps. Los 6 verificados en real 2026-09-16. Sin edición ni imagen en 3.0. #2 video y #1 Video Editing en OpenArt Arena 2026-09-16 (ranking externo). |
 | Kling 3 · Grok Imagine | Fal (evaluado, **no conectado**) | Revisión de catálogo/OpenAPI 2026-09-16, sin corridas: Kling O3 0,14 USD/s (4k 0,42/s; multi-shot, elements con voz, motion-control, 4K); Grok Imagine video v1.5 0,01/s (#10 OpenArt), imagen v2.0 (#4 OpenArt). Conectarlos es decisión del operador. |
-| Flux 3 | Fal (`pnpm ai:fal`, out-of-band) | Anunciado por BFL el 2026-07-23. En Fal es un modelo de **video** (no de imagen): 12 endpoints `blackforestlabs/flux-3/*` conectados y verificados en real 2026-09-16 (catálogo y OpenAPI de fal + API de pricing + corridas reales): finales 0,085 USD/s · drafts 0,03/s · edit 0,03/s · extend 0,205/s. Ruta directa BFL sin evaluar. |
+| Flux 3 | Fal (`pnpm ai:fal`, out-of-band) | Anunciado por BFL el 2026-07-23. En Fal es un modelo de **video** (no de imagen): 12 endpoints `blackforestlabs/flux-3/*` conectados y verificados en real 2026-09-16 (catálogo y OpenAPI de fal + API de pricing + corridas reales): registro finales 0,085 USD/s · drafts 0,03/s · edit 0,03/s · extend 0,205/s; **publicado por BFL/fal: final 0,17 (720p) / 0,29 (1080p), draft 0,06, extend 0,41** → confirmar con `pnpm ai:fal --balance`. Ruta directa BFL sin evaluar. |
 
 **Regla:** `prototype` → Fal si reduce tiempo; `production-scale` → directo cuando hay ahorro, SLA o control de
 datos; `fallback` → Fal sólo con slug/schema verificados y salida normalizada. Registrar fecha, resolución,
 duración, reintentos y costo efectivo por output.
+
+## Matriz de disponibilidad real en Greenhouse (as-of 2026-09-16)
+
+Guía canónica de qué modelo elegir, cuándo y cómo: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Esta matriz separa lo que **se puede
+producir hoy** de lo que sólo está evaluado; la tabla de "Fuentes base" de abajo es un mapa de fortalezas, no de
+disponibilidad.
+
+| Estado | Imagen | Video |
+|---|---|---|
+| **Disponible en CLI** (out-of-band, gasta) | `pnpm ai:image`: GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare (`xhigh`/`max` sólo en 2.5). `pnpm ai:fal`: Seedream 5 Pro, Pro edit, Pro layerize, Lite, Lite edit | `pnpm ai:fal`: Seedance 2.5 y 2.0 (base/fast/mini/us), Minimax H3 (base/Max/Max Turbo/camera; LoRA y entrenadores sin verificar; Director no operable), Flux 3 (12), Wan 3.0 y Prime |
+| **Directo, sin CLI** | Nano Banana 2 (default del runtime `google-gemini-image`); Nano Banana Pro disponible en Vertex **sin superficie**; Recraft V4.1 SVG vía Higgsfield CLI (**sin sesión** 2026-09-16) | Gemini Omni Flash (directo por Google, nunca fal [decisión]); Veo 3.1 (Vertex) |
+| **Evaluado, no conectado** | Grok Imagine imagen v2.0, Qwen Image 3, Flux.2 Pro, Kling imagen O3, Recraft por fal (23 endpoints) | Kling 3 (O3/V3), Grok Imagine video, Wan 2.7 (edición), HappyHorse 1.1, PixVerse V6 |
+| **Workbench watch** | Midjourney, Ideogram, Adobe Firefly, Magnific (upscale) | Higgsfield (Seedance 2.5 `omni_reference`, Kling, Soul ID), Runway |
+
+**Rankings de imagen: con fecha y fuente, sin elegir uno como verdad [tercero].**
+
+| Leaderboard (fecha) | Seedream 5 Pro | GPT Image 2.5 Sunburst / Flare | GPT Image 2 | Nano Banana Pro |
+|---|---|---|---|---|
+| OpenArt Arena imagen v1.0 (2026-09-16) | **#1** | no listados | #2 | #3 |
+| Arena texto a imagen / edición (act. 2026-09-07) | #10 / #8 | **#1 / #2** en ambas (Sunburst gana edición) | #3 / #3 | — |
+| Artificial Analysis texto a imagen / edición (leído 2026-09-16) | #15 / #9 | #2 y #1 / #1 y #2 | #3 / #5 | — |
+
+Los rankings **se contradicen**: el #1 de Seedream en OpenArt no se replica en Arena ni AA, y 2.5 tiene pocos votos.
+Video: OpenArt pone Seedance 2.5 #1 y H3 última de las conectadas; Artificial Analysis pone Wan 3.0 #1 en texto a
+video con audio y H3 Max (post-entrenado por fal) #1 en imagen a video con audio. Manda la prueba contra el brief.
+
+**Correcciones que cambian la elección (2026-09-16):** Seedream 5 Pro en fal **no es 4K** (área máx. 2048²; Lite sí
+admite área mayor); el costo de GPT Image 2.5 **sí se estima antes de gastar** (fórmula en
+`greenhouse-ai-image-generator` §Elegir modelo); fal cobra video **por escalón de resolución** (Wan 1080p 0,20 USD/s,
+Prime 0,28, H3 base 2K 0,13; Flux 3 publicado = el doble del registrado); Seedance se presupuesta con la fórmula de
+tokens de fal (lo que subestimaba ~2× era la equivalencia de OpenArt).
 
 ## Fuentes base (as-of 2026-07)
 
@@ -123,9 +154,10 @@ duración, reintentos y costo efectivo por output.
 | **Gemini 3.1 Flash Image** (Vertex) | contexto/multirreferencia, core estratégico | base GA; 4K/video-input pueden ser preview | directo GCP; eval antes de production approval |
 | **Gemini 3 Pro Image** (Vertex) | acabado premium/edición razonada | mayor costo/latencia | specialist directo GCP |
 | **Gemini 3.1 Flash Lite Image** (Vertex) | escala y baja latencia | lifecycle corto | scale directo GCP + refresh gate |
-| **GPT Image 2** (OpenAI) | realismo, fidelidad al prompt, edición, texto, publishing diario (top general) | estilo cinematográfico < MJ | default realista y de uso diario; el repo ya lo usa (personaje Nexa) |
+| **GPT Image 2** (OpenAI) | realismo, fidelidad al prompt, edición, texto, publishing diario | estilo cinematográfico < MJ | default del CLI; único con Batch; el repo ya lo usa (personaje Nexa) |
+| **GPT Image 2.5 Sunburst / Flare** (OpenAI, 2026-09-08) | Sunburst: edición precisa y pieza final (`xhigh`/`max`); Flare: generación cotidiana, ~1,5–1,75× más rápido, mismo costo | texto en imagen, consistencia de personaje y layout fijo siguen declarados como limitación | #1/#2 en Arena y AA (2026-09-07/16); recomendado por OpenAI para integraciones nuevas; `pnpm ai:image --model` |
 | **Seedream 5 Lite** (ByteDance/fal.ai) | divergencia de medios/materiales a USD 0,035 por output publicado | continuidad/anatomía antes del anchor | abrir territorios en paralelo y curar antes de Pro |
-| **Seedream 5 Pro** (ByteDance/fal.ai) | material/color/atmósfera, multirreferencia, edición regional semántica | Edit devuelve raster plano sin máscara (las capas separables salen del endpoint aparte `pro/layerize`, vía `pnpm ai:fal`); layout extremo puede requerir otra pasada | desarrollar el mundo visual; relevar a GPT para system extension cuando aplique |
+| **Seedream 5 Pro** (ByteDance/fal.ai) | material/color/atmósfera, multirreferencia, edición regional semántica | **no es 4K en fal** (máx. 2048²); Edit devuelve raster plano sin máscara (las capas separables salen del endpoint aparte `pro/layerize`, vía `pnpm ai:fal`); layout extremo puede requerir otra pasada | desarrollar el mundo visual; relevar a GPT para system extension cuando aplique |
 | **Midjourney v7** | **estética/dirección de arte**, cinematográfico, surreal/pictórico, concept art | texto en imagen, control preciso | mood boards, editorial, hero de alto concepto |
 | **FLUX.2 Pro / 1.1 Pro** | calidad técnica, realismo, velocidad (~4.5s), **params de cámara** (focal/DoF/ángulo) | — | pre-viz de film/VFX, storyboard, realismo comercial; open-weight |
 | **Ideogram 4** | lettering/poster y texto-en-imagen conceptual | texto legal/final | exploración tipográfica; release determinístico |
@@ -155,9 +187,9 @@ duración, reintentos y costo efectivo por output.
 
 - Tendencias 2026: identidad kinética · sistemas flexibles/adaptativos · imperfección/autenticidad
   (grano, xerox, analógico) · layering/mixed-media · color audaz + surrealismo · texturas táctiles.
-- Selección de modelo por tarea: **texto en imagen → Nano Banana Pro / Ideogram**; **estética/concepto
+- Selección de modelo por tarea: **texto en imagen → Nano Banana Pro / Ideogram** (ambos sin superficie operativa hoy: Nano Banana Pro sin CLI, Ideogram watch; texto final siempre determinístico); **estética/concepto
   → Midjourney**; **vector/logo escalable → Recraft**; **realismo/cámara → FLUX.2**; **realista diario →
-  GPT Image 2**; **divergencia de campaña → Seedream 5 Lite**; **material/color/región semántica →
+  GPT Image 2.5 Flare; edición precisa/pieza final → 2.5 Sunburst; Batch → GPT Image 2**; **divergencia de campaña → Seedream 5 Lite**; **material/color/región semántica →
   Seedream 5 Pro**; **secuencia híbrida → módulo 12 + anchor/handoff**; **Photoshop/Firefly → workbench watch tras rights review**; **video con control por referencias → Seedance**;
   **broadcast/cine → Veo**; **económico simple → Kling**; **edición conversacional → Gemini Omni**;
   **draft barato de video → enhance, trayectoria por cuadros o video a video → Flux 3 (Fal; en Fal es video, no imagen)**;

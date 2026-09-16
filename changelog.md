@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — Guía para elegir modelo de IA: qué usar, cuándo, cómo y cuánto cuesta cada uno
+
+Todos los modelos que hoy se pueden correr desde `pnpm ai:image` y `pnpm ai:fal` quedaron descritos en una sola guía
+(`docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`): árboles de decisión para imagen y video, fichas
+por modelo con capacidades, límites, comandos y trampas, recetas por caso de uso con costo, y rankings externos con sus
+contradicciones a la vista. Cada dato indica si viene de una corrida real, del contrato del proveedor, de su
+documentación o de un tercero.
+
+Investigar para escribirla corrigió varias cosas que dábamos por ciertas. fal cobra según la resolución: Wan 3.0 a
+1080p, su valor por defecto, cuesta cuatro veces lo registrado, y Prime es más cara que la base. Seedream 5 Pro en fal
+no llega a 4K, y el 2K y 4K de H3 son reescalados. La fórmula de tokens de Seedance sí calza con lo que pagamos, y el
+costo de GPT Image 2.5 se puede estimar antes de gastar. La guía, el catálogo, los manuales y las skills creativas
+quedaron alineados, y las fallas del CLI detectadas quedan para una tarea aparte.
+
 ## 2026-09-16 — `pnpm ai:fal` trabaja con dos cuentas de fal y ya puede encolar sin esperar
 
 El CLI de fal ahora conoce dos cuentas. Elige la que tiene más saldo y, si fal bloquea una por falta de fondos, pasa sola a
@@ -907,13 +921,3 @@ PKCE/refresh y rechaza JWT bearer; OAuth 150 passed. PR 230/main `45f6910e3`, or
 success, manifest released, Vercel exacto y watchdog 5/5. Fixtures retiradas; conexiones definitivas conservadas.
 [QA y límites](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
 Manual interno, documentación funcional/técnica, API, runbooks y skills Codex/Claude reconciliados; [cobertura](docs/audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).
-
-## 2026-09-08 — Berel cierra la doctrina de recuperación y QA editorial preventivo
-
-La skill Berel y el gate client-visible incorporan el barrido obligatorio de todo el mes aun sin comentarios,
-rechazo de links Notion/metadatos operativos en la zona vigente, preservación de análisis y specs congeladas,
-edición/restauración segura y verificación del propio reporte. La
-[auditoría fechada](docs/audits/seo/BEREL_CONTENT_HUB_EDITORIAL_LEAK_RECOVERY_2026-09-08.md) consolida octubre,
-noviembre y diciembre, distingue el typo `segundasegunda` del contenido real y documenta `pintura sana` como
-problema de claridad —no como palabra inexistente en México—. El contrato genérico de Notion añade baseline y
-readback de discusiones para reemplazos/restauraciones; no hubo nuevas escrituras en Notion, Drupal ni Frame.io.

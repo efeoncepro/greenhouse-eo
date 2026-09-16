@@ -49,6 +49,13 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 > ranking eterno. La **matriz completa y canónica vive en `modules/14_ENTERPRISE_CREATIVE_MODEL_ROUTING.md`**
 > y en su registry machine-readable;
 > acá va la versión de trabajo. Antes de recomendar un modelo, reverifica.
+>
+> **Qué se puede producir HOY y cómo elegir (2026-09-16):** guía canónica
+> `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`; matriz disponible en CLI / directo /
+> evaluado + rankings fechados en `SOURCES.md`; árbol de imagen y costo en `greenhouse-ai-image-generator`
+> §Elegir modelo; video en `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`. Los
+> rankings **se contradicen** (OpenArt: Seedream 5 Pro #1; Arena y Artificial Analysis: GPT Image 2.5 Sunburst y
+> Flare #1/#2, Seedream 5 Pro #8–#15): preséntalos con fecha y fuente, nunca como verdad única.
 
 ### 2.1 Modelos de IMAGEN
 
@@ -58,9 +65,10 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 | **Gemini 3.1 Flash Image** (Vertex) | contexto/multirreferencia con calidad/latencia | modelo base GA; 4K/video-input pueden seguir preview | `core` estratégico tras eval; directo GCP |
 | **Gemini 3 Pro Image** (Vertex) | edición razonada/acabado premium | mayor coste/latencia | specialist premium directo GCP |
 | **Gemini 3.1 Flash Lite Image** (Vertex) | volumen y baja latencia | lifecycle corto | scale directo GCP con refresh gate |
-| **GPT Image 2** (OpenAI) | realismo, fidelidad al prompt, edición, texto, uso diario (top general) | estilo cinematográfico < MJ | default realista y de publishing diario; el repo ya lo usa (personaje Nexa) |
+| **GPT Image 2** (OpenAI) | realismo, fidelidad al prompt, edición, texto, uso diario | estilo cinematográfico < MJ | default del CLI `pnpm ai:image`; único con Batch; el repo ya lo usa (personaje Nexa) |
+| **GPT Image 2.5 Sunburst / Flare** (OpenAI, 2026-09-08) | Sunburst: edición precisa, máscara, pieza final (`xhigh`/`max`); Flare: generación cotidiana, más rápida, mismo costo | texto en imagen, consistencia y layout fijo siguen como limitación declarada | `pnpm ai:image --model gpt-image-2.5-sunburst` / `-flare`; costo estimable antes de gastar |
 | **Seedream 5 Lite** (ByteDance vía fal.ai) | divergencia material rápida y barata, refs/edición de volumen | continuidad/anatomía de campaña antes del anchor | abrir 8–16 territorios y descartar barato |
-| **Seedream 5 Pro** (ByteDance vía fal.ai) | riqueza material, color, atmósfera, fusión multirreferencia y edición regional semántica | layout extremo menos obediente en el benchmark; Edit sin máscara (devuelve raster plano) | desarrollar el mundo visual y hacer art direction regional |
+| **Seedream 5 Pro** (ByteDance vía fal.ai) | riqueza material, color, atmósfera, fusión multirreferencia y edición regional semántica | **no es 4K en fal** (máx. 2048²; > 2K nativo → Lite o GPT Image); layout extremo menos obediente en el benchmark; Edit sin máscara (devuelve raster plano) | desarrollar el mundo visual y hacer art direction regional |
 | **Midjourney v7** | **estética/dirección de arte**, cinematográfico, surreal/pictórico, concept | texto-en-imagen, control literal | mood boards, editorial, hero de alto concepto |
 | **FLUX.2 Pro / 1.1 Pro** | calidad técnica, realismo, velocidad (~4.5s), **params de cámara** (focal/DoF/ángulo) | estética "de autor" | pre-viz de film/VFX, storyboard, realismo comercial; open-weight/self-host |
 | **Ideogram 4** | **texto-en-imagen** (posters, thumbnails, headlines) | fotorrealismo fino | explorar lettering; el release tipográfico sigue siendo determinístico |
@@ -90,11 +98,14 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 | **`greenhouse-digital-brand-asset-designer`** | logos reales de terceros (nunca dibujar de memoria) |
 
 **Regla de encaje (imagen):**
-- **Marketing con copy dentro de la imagen** → Nano Banana Pro (o Ideogram si es puro headline).
+- **Marketing con copy dentro de la imagen** → concepto con Nano Banana Pro (o Ideogram si es puro headline);
+  ojo: Nano Banana Pro no tiene superficie operativa hoy (sin CLI) y Seedream 5 Pro declara texto multilingüe.
+  El copy final siempre se compone de forma determinística.
 - **Explorar dirección / mood / editorial** → Midjourney.
 - **Vector/logo/icono/mascota escalable y editable** → Recraft.
 - **Realismo + control de cámara / storyboard** → FLUX.2.
-- **Realista diario / edición fiel** → GPT Image 2.
+- **Realista diario** → GPT Image 2.5 Flare. **Edición fiel / máscara / pieza final** → GPT Image 2.5 Sunburst.
+  **Batch** → GPT Image 2.
 - **Divergencia de campaña barata** → Seedream 5 Lite.
 - **Material/color/atmósfera o región semántica** → Seedream 5 Pro.
   Ambos Seedream se producen con `pnpm ai:fal` (ver `greenhouse-ai-image-generator`).
@@ -106,6 +117,9 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 - **UI de Greenhouse** → nada de esto: `greenhouse-ai-image-generator`.
 
 **Regla de encaje (video):**
+- **Motores de `pnpm ai:fal` (Seedance, Minimax H3, Flux 3, Wan 3.0)** → elegir por necesidad (explorar, hero,
+  larga, 4K, cámara, inicio/fin, keyframes, editar/extender con o sin personas, referencias, web/documento) y
+  presupuestar **por resolución** con `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`.
 - **Control por referencias / social punchy / económico** → Seedance (vía `pnpm ai:fal`; endpoint por
   duración/4K/costo en `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`).
 - **Broadcast / cine** → Veo 3.1.

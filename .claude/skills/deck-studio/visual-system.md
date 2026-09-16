@@ -179,6 +179,16 @@ paleta, objeto único, **cero texto/letras/números/logos**. Recorte con `pnpm a
 — **nunca** color-key ni `trim` (dejan halo). Ojo: **el matting devora los objetos blancos** sobre
 fondo claro.
 
+**Motor de IA: cómo elegir (as-of 2026-09-16).** Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`; árbol y costos en
+`greenhouse-ai-image-generator` §Elegir modelo.
+- Objeto de lámina con transparencia → `pnpm ai:image --model gpt-image-2.5-flare --background transparent`
+  (transparencia plena en 2.5; en GPT Image 2 es preview). Valida el alfa decodificando bytes.
+- Retoque preciso con máscara → `--model gpt-image-2.5-sunburst`. Explorar en `low`/`medium`; `xhigh`/`max` sólo
+  para el asset final (2.5 `max` ≈ lo mismo que el default del CLI `gpt-image-2 · high`).
+- Estima el costo antes de gastar con la fórmula de tokens de la skill; `--count N` son N pedidos pagados.
+- Capas editables de una ilustración aprobada → `pnpm ai:fal --capability seedream5-pro-layerize`, sin regenerar.
+- El CLI siempre guarda PNG y no valida `--size`: usa tamaños de la grilla documentada y `--out` fuera de `public/`.
+
 **Arreglar un detalle sin rehacer el asset:** `pnpm ai:image --image base.png --mask mask.png --prompt
 "…" --out out.png` reemplaza sólo lo que la máscara marca en **transparente** (mismo formato y
 dimensiones que la `--image`; sin `--image` aborta). Pero **editar no abarata**: el modelo devuelve la

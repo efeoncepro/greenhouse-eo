@@ -36,6 +36,9 @@ rituales sin revisión cultural específica. No añadir nombre de ocasión/fecha
 
 Read only what the task needs:
 
+- `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md` — **guía canónica de qué modelo elegir,
+  cuándo y cómo** (todos los modelos de `pnpm ai:image` y `pnpm ai:fal`). El resumen operativo está abajo en
+  §Elegir modelo; ante duda o conflicto, manda la guía.
 - `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md`
 - `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`
 - `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md` whenever the task
@@ -68,6 +71,125 @@ For assets that will live in Greenhouse, use the canonical helper when possible:
 
 Do not call image providers from parallel scripts if the helper covers the case.
 
+## Elegir modelo (leer ANTES de generar)
+
+Resumen operativo de la guía canónica `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`
+(as-of 2026-09-16). Etiquetas: **[verificado]** corrida real del repo · **[oficial]** proveedor · **[tercero]**
+ranking fechado · **[decisión]** del operador · **sin dato** = no existe evidencia, no se rellena.
+
+### Carriles: dónde vive cada motor
+
+| Carril | Superficie | Motores |
+|---|---|---|
+| OpenAI directo | `pnpm ai:image` (out-of-band) · runtime `generateImage` provider `openai-image` (default del producto) | GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare |
+| Google directo (Vertex, `global`) | **sólo** runtime `generateImage` provider `google-gemini-image`; **no hay CLI** | Nano Banana 2 (`gemini-3.1-flash-image`, default); Nano Banana Pro (`gemini-3-pro-image`) disponible pero **sin superficie** |
+| Higgsfield CLI (out-of-band) | `higgsfield` | Recraft V4.1, **vectores SVG reales**. Estado 2026-09-16: `Not authenticated` → sin vía hasta que una persona corra `higgsfield auth login` |
+| fal.ai (out-of-band, NUNCA runtime) | `pnpm ai:fal` | Seedream 5 Pro/Lite/edit/layerize (imagen); Seedance, Minimax H3, Flux 3, Wan 3.0 (video) |
+
+Nano Banana Pro y Gemini Omni Flash van **siempre directo por Google, nunca por fal** [decisión]. Recraft por fal
+(23 endpoints) no está conectado.
+
+### Árbol de decisión — imagen
+
+1. **¿Necesitas vector real (SVG)?** → Recraft V4.1 vía Higgsfield. GPT Image y Seedream son **raster siempre**.
+2. **¿La pieza lleva copy, logo, CTA, precio o legal finales?** → el modelo entrega **sólo el clean plate**;
+   texto y marca se componen de forma determinística. Esto no cambia con ningún modelo.
+3. **¿Edición donde la precisión manda, zona protegida con máscara o entregable final?** →
+   `gpt-image-2.5-sunburst` en `xhigh`/`max`, con `--mask` si hay zona protegida. Sunburst es #1 en edición en
+   Arena y Artificial Analysis [tercero, 2026-09-07/16]; la máscara alfa tuvo menos deriva protegida que la
+   edición semántica de Seedream (MAE 0,0308 vs 0,0458, medido con GPT Image 2) [verificado 2026-07-18].
+4. **¿Generación cotidiana, social, asset de UI, volumen, transparencia?** → `gpt-image-2.5-flare` en
+   `medium`/`high`. Mismo costo que Sunburst para igual `quality × size`; los separa la latencia (en `max`, Flare
+   46,0 s vs Sunburst 80,6 s) [verificado 2026-09-16]. Transparencia: soporte pleno en 2.5, preview en GPT Image 2.
+   OpenAI recomienda 2.5 para integraciones nuevas [oficial].
+5. **¿Necesitas Batch API (mitad de precio) o el contrato fija `gpt-image-2`?** → `gpt-image-2` (único con Batch;
+   el CLI no usa Batch). Ojo: el default del CLI (`gpt-image-2 · high · 1536x1024` ≈ USD 0,165) cuesta lo mismo
+   que 2.5 en `max`.
+6. **¿Abrir muchos territorios barato o una serie relacionada?** → `seedream5-lite` (USD 0,035/imagen;
+   `max_images` 1–6 vía `--input`).
+7. **¿Materialidad, atmósfera, color, look development, fusión multirreferencia orientada a material, cambio
+   regional sin máscara?** → `seedream5-pro` / `seedream5-pro-edit` (edit hasta 10 referencias).
+8. **¿Separar una pieza aprobada en capas editables?** → `seedream5-pro-layerize` (hasta 16 capas PNG con alfa +
+   `layers.json`, sin prompt). No regeneres.
+9. **¿Resolución nativa sobre 2K?** → `seedream5-lite` (área hasta 4096² según schema; la ficha dice 3072²) o GPT
+   Image (hasta 3840×2160; sobre 2560×1440 es experimental). 🔴 **Seedream 5 Pro en fal NO es 4K**: área máxima
+   2048×2048 (la nota "Hasta 4K" del registro era incorrecta).
+10. **¿Formato más extremo que 3:1?** → Seedream (aspecto 1/16–16). GPT Image tope 3:1.
+11. **¿Texto multilingüe dentro de la imagen, sólo para concepto?** → Seedream 5 Pro lo declara [oficial]; OpenAI no
+    declara nada para 2.5. Igual va a composición determinística al release.
+12. **¿Continuidad con un carril `google-gemini-image` ya en producto?** → Nano Banana 2 por el runtime; no hay CLI y
+    no cambies `GOOGLE_GEMINI_IMAGE_MODEL` para probar Pro (cambia todo el carril).
+
+**Rankings: preséntalos con fecha y fuente, sin elegir uno como verdad.** OpenArt Arena imagen (2026-09-16):
+Seedream 5 Pro #1, GPT Image 2 #2, Nano Banana Pro #3. Arena y Artificial Analysis (2026-09-07/16): Sunburst y
+Flare #1/#2 en texto a imagen y en edición (Sunburst gana edición), Seedream 5 Pro entre #8 y #15. Los rankings
+**se contradicen**; manda la prueba contra el brief.
+
+### Costo de imagen: estímalo ANTES de gastar
+
+- **GPT Image 2.5 SÍ es estimable** (corrige la regla anterior de "sólo midiendo"). Fórmula de la calculadora
+  oficial de OpenAI, que reprodujo **exactamente** las mediciones del repo (196 / 1 756 / 7 024 tokens en
+  `low`/`high`/`max` a 1024²) [oficial + verificado 2026-09-16]:
+
+  ```text
+  G = gpt-image-2:   low 16 · medium 48 · high 96
+      gpt-image-2.5: low 16 · medium 24 · high 48 · xhigh 64 · max 96
+  lado_corto   = redondeo(G / (lado_mayor_px / lado_menor_px))     # .5 redondea a par
+  tokens_salida = ceil(G × lado_corto × (2 000 000 + ancho × alto) / 4 000 000)
+  costo_salida  = tokens_salida × USD 30 / 1 000 000                # + texto e imágenes de entrada
+  ```
+
+  | Calidad (salida de imagen, USD) | 1024×1024 | 1536×1024 | 2048×2048 | 3840×2160 |
+  |---|---:|---:|---:|---:|
+  | 2.5 `low` (= GPT Image 2 `low`) | 0,0059 | 0,0047 | 0,0119 | 0,0111 |
+  | 2.5 `medium` | 0,0132 | 0,0103 | 0,0268 | 0,0260 |
+  | 2.5 `high` (= GPT Image 2 `medium`) | 0,0527 | 0,0412 | 0,1070 | 0,1001 |
+  | 2.5 `xhigh` | 0,0937 | 0,0738 | 0,1903 | 0,1779 |
+  | 2.5 `max` (= GPT Image 2 `high`) | 0,2107 | 0,1646 | 0,4282 | 0,4003 |
+
+  Tabla derivada de la fórmula [inferencia sobre oficial]. `auto` no es estimable. Un tamaño no cuadrado mayor
+  puede costar menos que uno cuadrado menor. Editar suma la imagen base como entrada (2,3× en `low`, ~1,04× en
+  `max`) [verificado]. Sigue la regla: ninguna cifra entra a una propuesta sin re-medir.
+- **Rate limits de 2.5 publicados, iguales a `gpt-image-2`** [oficial 2026-09-16]: Tier 1 100 000 TPM / 5 IPM ·
+  T2 250 000 / 20 · T3 800 000 / 50 · T4 3 000 000 / 150 · T5 8 000 000 / 250.
+- **Seedream en fal** [oficial fal, 2026-09-16]: Pro USD 0,0675 (área ≤ 1536²) · 0,135 (hasta 2048²) + 0,0045 por
+  referencia adicional en edit · Lite USD 0,035 por imagen efectiva · Layerize USD 0,03375 por capa (≤ 1536²) o
+  0,0675 por capa. fal no devuelve `usage`: mide con `pnpm ai:fal --balance` antes y después.
+
+### Video: resumen (la elección vive en `motion-design-studio`)
+
+Toda elección de video se hace con `motion-design-studio` → `workflows/engine-selection-by-fidelity-contract.md`
+(contrato de fidelidad por toma). Lo mínimo que debes saber desde esta skill:
+
+| Necesidad | Motor (`pnpm ai:fal --capability …`) |
+|---|---|
+| Explorar barato y rápido | `h3turbo-t2v/i2v` 480P · `flux3-*-draft` → `flux3-enhance` sólo del elegido · `seedance20-mini-*` 480p |
+| Toma hero de máxima calidad | `seedance25-*` (hasta 30 s; su 1080p está sin verificar) · 4K → `seedance20-*` base |
+| Toma larga (> 15 s) | `seedance25-*` (≤ 30) · `wan3-*` (≤ 30) · `flux3-*` (≤ 20) |
+| Cámara precisa sobre imagen fija | `h3max-camera` |
+| Principio y fin exactos / varios cuadros clave | `flux3-flf` · `wan3-i2v --end-image` · `seedance25-i2v --end-image` / `flux3-keyframes` (≤ 10) |
+| Editar o extender un video | sin personas ni marcas: `seedance25-r2v --task editing` o `--task extension` · con personas: `flux3-edit` / `flux3-extend` (origen con audio) |
+| Video basado en una web o documento | `wan3-r2v --thinking --web-url <url>` / `--file <doc>` + prompt con guion |
+
+🔴 **fal cobra por escalón de resolución**: el precio del registro es el escalón **más bajo**. Wan 3.0 a 1080p
+(su default) USD 0,20/s, Wan 3.0 Prime 0,28/s (más cara que base), H3 base a 2K (su default) 0,13/s; Flux 3
+publicado ≠ registrado (0,17/s final, 0,06 draft, 0,41 extend, el doble) → confirma con `--balance`. Seedance sí
+se estima con la fórmula de fal: `tokens = alto × ancho × segundos × 24 / 1024`; `costo = tokens × precio_por_1000
+/ 1000` (calzó con lo medido dentro de ~5 %; la equivalencia de OpenArt subestima ~2×). Filtro de Seedance:
+rechaza marcas y personas reales **después de cobrar**.
+
+### Brechas conocidas de los CLIs (documentadas; follow-up abierto por el orquestador)
+
+- `pnpm ai:image`: **no valida** `--size` ni `--background` (llegan tal cual al API; si OpenAI rechaza antes de
+  cobrar: sin dato); formato **siempre PNG** (no hay `--format`); `--count N` = **N pedidos pagados** de una
+  imagen; `--input-fidelity` con 2.5 o 2 se **ignora en silencio**; no hay `--moderation`; salida por defecto
+  `public/images/generated` (usa `--out` hacia `ai-generations/` o scratchpad).
+- `pnpm ai:fal`: `seedream5-pro` con `--out x.png` sin `--format png` guarda **JPEG con extensión `.png`**;
+  `--seed` se envía a endpoints que no lo declaran (Seedream, Seedance t2v/i2v): efecto no probado, no confíes en
+  él; con más de 10 `--image` fal usa **sólo las últimas 10** sin aviso; faltan flags para `weight_name` (LoRA),
+  `split_input_duration_threshold` y la regla de cuadros del entrenador (usa `--input`); **no hay estimación de
+  costo previa** en el CLI.
+
 ## GPT Image 2.5 — Sunburst y Flare (delta de proveedor 2026-09-08)
 
 OpenAI publicó `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare` (snapshots `…-2026-09-08`). Contrato completo,
@@ -80,7 +202,7 @@ Cárgala antes de fijar modelo, tamaño, calidad o costo. Lo que esta skill nece
 |---|---|---|
 | Edición donde la precisión manda; entregable final de campaña o producto | `gpt-image-2.5-sunburst` | OpenAI lo posiciona para "workflows where editing precision matters most" |
 | Generación cotidiana, exploración, social, volumen | `gpt-image-2.5-flare` | el más rápido; el anuncio lo llama "the default choice for most applications" |
-| Necesitas Batch API, costo por imagen estimable **antes** de gastar, o rate limits conocidos | `gpt-image-2` | 2.5 no tiene Batch, ni calculadora de costo, ni tabla de rate limits publicada |
+| Necesitas Batch API (mitad de precio) | `gpt-image-2` | 2.5 no tiene Batch. ⚠️ Corregido 2026-09-16: el costo de 2.5 **sí** es estimable antes de gastar y sus rate limits **sí** están publicados (ver §Elegir modelo) |
 
 **Calidad — el techo subió.** `low · medium · high · xhigh · max · auto` (default `auto`). `xhigh` y `max`
 existen **sólo** en 2.5. Regla de la casa: `low` para exploración, `high` como piso para texto pequeño,
@@ -100,8 +222,9 @@ lista de invariantes repetida en cada turno (patrón abajo).
 sólido, checkerboard y sombras; en cada edición, repetir "preserve the transparent background". Validar alfa
 decodificando bytes, nunca por metadata ni por ver un checkerboard.
 
-**Costo: ya está medido (2026-09-16).** OpenAI declara verbatim que la calculadora de GPT Image 2 **no** estima
-el consumo de 2.5, así que la única fuente es `usage` de respuestas reales — y esa medición ya existe:
+**Costo: ya está medido (2026-09-16) y además es estimable.** La ficha de 2.5 todavía dice que la calculadora no
+lo estima, pero la calculadora de la guía oficial ya cubre 2.5 y su fórmula reproduce exactamente estas
+mediciones (contradicción oficial vigente; fórmula en §Elegir modelo). La medición real existe:
 `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/` (manifest por corrida, salida cruda, instrumento
 reproducible). A `1024x1024`, output tokens **196** (`low`) / **1 756** (`high`) / **7 024** (`max`),
 **idénticos entre Flare y Sunburst** → USD **0,0061** / **0,0529** / **0,2110** por imagen con las tarifas
@@ -248,7 +371,7 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
 fondo de una imagen que ya existe, usa `pnpm ai:image:rmbg` (local, cero costo de proveedor), no un edit.
 El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de costo real de 2.5.
 
-- El cliente acepta hasta **10** `--image` por request y conserva su orden. Cada referencia debe declarar en el
+- El cliente acepta hasta **16** `--image` por request (`MAX_OPENAI_IMAGE_INPUTS = 16`, < 50 MB c/u) y conserva su orden. Cada referencia debe declarar en el
   prompt su rol: estructura, paleta, identidad, activo oficial o anti-referencia.
 - Una **anti-referencia** no tiene peso negativo nativo: es una instrucción semántica. Nombrar el rasgo excluido
   y revisar contaminación en la salida; si persiste, retirar la referencia o cambiar de método.
@@ -329,8 +452,8 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
 - Use `openai-image` for higher prompt fidelity, complex composition, reference-guided edits, UI assets, icon sets, and transparent PNG batches.
 - **OpenAI model targeting (delta 2026-09-08).** La frontera del proveedor es la familia **2.5**
   (`gpt-image-2.5-flare` por defecto, `gpt-image-2.5-sunburst` para precisión de edición). `gpt-image-2`
-  **no** está deprecado y sigue siendo la elección correcta cuando necesitas Batch, costo por imagen estimable
-  antes de gastar, o rate limits publicados: 2.5 no tiene ninguno de los tres. Desde 2026-09-16 el helper
+  **no** está deprecado y sigue siendo la elección correcta cuando necesitas Batch (2.5 no lo tiene). Corregido
+  2026-09-16: el costo de 2.5 sí se estima antes de gastar y sus rate limits sí están publicados. Desde 2026-09-16 el helper
   transporta **ambas** familias, así que la elección ya es de necesidad, no de lo que el código soporta.
   `organization-logo-generation.ts` fija `gpt-image-2` a propósito y no se toca sin decisión explícita.
   Nunca rutees trabajo nuevo a `gpt-image-1.5`, `gpt-image-1`, `gpt-image-1-mini` ni `chatgpt-image-latest`:
@@ -421,8 +544,8 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   `--size`, `--count`, `--format jpeg|png`, `--out|--out-dir`, `--timeout`, `--json`. Video (`--duration`,
   `--resolution`, `--aspect`, `--bitrate`, `--task`, `--no-audio`, `--end-image`, `--audio`, `--video`,
   `--prompt-expansion`, `--no-prompt-expansion`, `--thinking`, `--web-url`, `--file`, `--lora`,
-  `--camera-trajectory`, `--keyframe`, `--safety-tolerance`, `--draft-cache`), `--seed <n>` (entero ≥ 0, en todo
-  endpoint que lo acepte),
+  `--camera-trajectory`, `--keyframe`, `--safety-tolerance`, `--draft-cache`), `--seed <n>` (entero ≥ 0; ⚠️ el CLI
+  lo envía a cualquier endpoint sin revisar el esquema, incluidos Seedream y Seedance t2v/i2v que no lo declaran),
   entrenamiento (`--training-data`, `--steps`, `--rank`, `--learning-rate`, `--trigger`) y la elección entre
   Seedance, H3, Flux 3 y Wan 3.0 (incluido video a video) viven en `motion-design-studio`
   (`workflows/engine-selection-by-fidelity-contract.md`). El CLI valida cada flag contra el contrato del endpoint
@@ -430,7 +553,9 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   `--task` quedó corregido: **sólo** Seedance 2.5 reference-to-video lo acepta (antes Seedance 2.0 lo rechazaba
   después de encolar; verificado en local (el CLI rechaza `--task` en `seedance20-r2v` sin encolar); `seedance25-r2v` con `--task reference|editing|extension` quedó verificado en real 2026-09-16.) `--list` agrupa IMAGE / VIDEO / TRAINING y marca `[NO OPERABLE POR COLA]`.
 - 🔴 Todo `--capability`/`--model` sin `--list` **gasta dinero**. fal no devuelve `usage`: el CLI no reporta
-  costo por corrida; no inventes precios. Si la capacidad figura SIN VERIFICAR, el CLI lo advierte antes de gastar.
+  costo por corrida ni lo estima antes; no inventes precios. fal cobra **por escalón de resolución** y el precio
+  del registro es el escalón más bajo: estima con la tabla por resolución de `motion-design-studio` y confirma con
+  `--balance` antes y después. Si la capacidad figura SIN VERIFICAR, el CLI lo advierte antes de gastar.
 - 🔴 **Bloqueo por saldo:** un 403 **`User is locked. Reason: Exhausted balance`** (o `TOP_UP`) ocurre antes de encolar
   (sin costo). El CLI ya hace failover a la otra cuenta; si **todas** están bloqueadas, recargar en
   `fal.ai/dashboard/billing` lo hace una persona (el operador), nunca el agente. No reintentes en loop.
@@ -441,7 +566,9 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
 - **Sin esperar:** `--detach` encola y termina (imprime `request_id`, cuenta y comandos); `--status --request-id <id>`
   consulta una vez sin costo. Webhooks de fal no se usan en el CLI (exigen URL pública).
 - **Filtro de Seedance:** ByteDance rechaza tras encolar (y cobrar) referencias con marcas y material con personas reales.
-  Para video a video con personas, Flux 3 o Wan 3.0. Costo medido: Seedance salió ~2× la estimación por tokens.
+  Para video a video con personas, Flux 3 o Wan 3.0. Costo: la fórmula de tokens de fal
+  (`alto × ancho × segundos × 24 / 1024`) calzó con lo medido dentro de ~5 %; lo que subestimaba ~2× era la
+  equivalencia de OpenArt (corregido 2026-09-16).
 - **Pendientes:** LoRA de H3 (postergada por decisión del operador) y Recraft sin vía operativa (Higgsfield CLI sin sesión).
 - **Retome (request_id):** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408)
   el trabajo **sigue corriendo y cobrando** en fal: no relances; usa el comando de retome que imprime el CLI
@@ -460,7 +587,8 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   `flux3-enhance` lo acepta (y lo exige). `extend` exige pista de audio en el origen (el CLI lo revisa con
   `ffprobe` en archivos locales) y entrega sólo la continuación. Precios y elección en `motion-design-studio`.
 - **Wan 3.0 / Wan 3.0 Prime** (6 endpoints `alibaba/wan-3.0/*` y `alibaba/wan-3.0-prime/*`, **sin** `fal-ai/`;
-  conectados 2026-09-16): **video** t2v / i2v / r2v, USD 0,05/s. Los 6 están **verificados en real** (2026-09-16;
+  conectados 2026-09-16): **video** t2v / i2v / r2v. Precio **por resolución**: base 480p 0,05 · 720p 0,10 ·
+  **1080p 0,20 USD/s**; Prime 0,068 · 0,14 · **0,28** (Prime es más cara, no igual). Los 6 están **verificados en real** (2026-09-16;
   los 5 que había bloqueado el 403 de saldo se corrieron con la cuenta B). No hay edición ni imagen en Wan 3.0 (la edición de Wan es la
   2.7, no conectada). Flags propios: `--duration auto` (se envía `null`: duración inteligente; o entero 2–30),
   `--no-audio` (campo `audio`), `--no-prompt-expansion` (booleano; distinto del `--prompt-expansion <modo>` de H3),

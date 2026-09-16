@@ -356,7 +356,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'images',
     verifiedAt: '2026-09-16',
-    notes: 'Materialidad, atmósfera y desarrollo de look. Hasta 4K según el proveedor.'
+    notes: 'Materialidad, atmósfera y desarrollo de look. En fal el área máxima es 2048×2048 (no 4K: el schema lo limita, aunque ByteDance lo publique). JPEG por defecto: pasa --format png si guardas .png.'
   },
   {
     id: 'seedream5-pro-edit',
@@ -637,7 +637,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     outputKey: 'video',
     verifiedAt: '2026-09-16',
     video: H3_BASE,
-    notes: '5–15 s · 480P/768P/2K/4K · expansión de prompt opcional (incluye fast)'
+    notes: '5–15 s · 480P/768P nativos; 2K (default) y 4K son reescalados desde 768P · USD 0,05/s en el escalón más bajo, 2K ≈ 0,13/s · expansión de prompt opcional (incluye fast)'
   },
   {
     id: 'h3-i2v',
@@ -651,7 +651,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     outputKey: 'video',
     verifiedAt: '2026-09-16',
     video: h3I2V(H3_BASE),
-    notes: '5–15 s · hasta 4K · sin aspect ratio · admite end_image_url'
+    notes: '5–15 s · 2K/4K reescalados desde 768P · sin aspect ratio · admite end_image_url'
   },
   {
     id: 'h3-r2v',
@@ -665,7 +665,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     outputKey: 'video',
     verifiedAt: '2026-09-16',
     video: h3R2V(H3_BASE),
-    notes: '5–15 s · hasta 4K · hasta 9 imágenes, 3 videos y 3 audios de referencia'
+    notes: '5–15 s · 2K/4K reescalados desde 768P · hasta 9 imágenes, 3 videos y 3 audios de referencia'
   },
   {
     id: 'h3-t2v-lora',
@@ -679,7 +679,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     outputKey: 'video',
     verifiedAt: null,
     video: { ...H3_BASE, loras: H3_LORAS },
-    notes: 'exige --lora (hasta 3) · 5–15 s · hasta 4K'
+    notes: 'exige --lora (hasta 3) · 5–15 s · 2K/4K reescalados desde 768P'
   },
   {
     id: 'h3-i2v-lora',
@@ -880,7 +880,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     outputKey: 'video',
     verifiedAt: '2026-09-16',
     video: FLUX3,
-    notes: 'auto o 5–20 s · 720p/1080p · USD 0,085/s'
+    notes: 'auto o 5–20 s · 720p/1080p · USD 0,085/s registrado; BFL/fal publican 0,17/s: confirma con --balance'
   },
   {
     id: 'flux3-t2v-draft',
@@ -894,7 +894,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     outputKey: 'video',
     verifiedAt: '2026-09-16',
     video: flux3Draft(FLUX3),
-    notes: 'borrador barato (USD 0,03/s) · devuelve draft_cache para flux3-enhance'
+    notes: 'borrador barato (0,03/s registrado; publicado 0,06/s) · devuelve draft_cache para flux3-enhance'
   },
   {
     id: 'flux3-i2v',
@@ -1006,7 +1006,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     outputKey: 'video',
     verifiedAt: '2026-09-16',
     video: { ...FLUX3, requiresSourceAudio: true },
-    notes: '--video con pista de audio · entrega SÓLO la continuación (--duration = segundos nuevos); unir en post · USD 0,205/s'
+    notes: '--video con pista de audio (usa hasta 4 s de video y audio como contexto) · entrega SÓLO la continuación (--duration = segundos nuevos); unir en post · 0,205/s registrado; publicado 0,41/s'
   },
   {
     id: 'flux3-extend-draft',
@@ -1050,7 +1050,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     outputKey: 'video',
     verifiedAt: '2026-09-16',
     video: WAN3,
-    notes: '2–30 s o auto · hasta 1080p (default) · --thinking · USD 0,05/s'
+    notes: '2–30 s o auto · 30 fps · USD 0,05/s a 480p; el default 1080p ≈ 0,20/s: pasa --resolution para explorar · --thinking'
   },
   {
     id: 'wan3-i2v',
@@ -1092,7 +1092,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     outputKey: 'video',
     verifiedAt: '2026-09-16',
     video: WAN3,
-    notes: '2–30 s o auto · hasta 1080p (default) · --thinking · USD 0,05/s'
+    notes: '2–30 s o auto · 30 fps · versión acelerada según Alibaba (calidad vs base sin medir) · más cara que base: ≈ 0,28/s a 1080p (default) · --thinking'
   },
   {
     id: 'wan3prime-i2v',

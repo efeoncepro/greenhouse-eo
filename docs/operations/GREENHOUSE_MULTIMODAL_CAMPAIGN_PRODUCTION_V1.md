@@ -4,6 +4,8 @@
 > Layout Design & Finishing sobre Seedream 5 Lite/Pro,
 > GPT Image 2, Gemini Omni Flash y post determinístico. Seedance 2.0 queda como fallback condicionado;
 > no fue necesario para el release validado. No modifica el runtime del portal.
+> Ultima actualizacion: 2026-09-16 por Claude — puntero a la guía canónica de selección de modelos y correcciones
+> de costo y ranking (precios de fal por escalón de resolución, rankings externos contradictorios).
 
 ## Propósito
 
@@ -32,6 +34,17 @@ usar todos los proveedores del piloto histórico. Aplicar:
 Los modelos y parámetros del «router validado» registran una corrida histórica, **no disponibilidad vigente ni
 ranking universal**. Para otra corrida, descubrir schema y seleccionar por delta según
 [conectores sociales](../../.codex/skills/social-media-studio/references/social-production-connectors.md).
+
+> **➡️ Qué modelo elegir hoy, cuándo y cómo:** la guía canónica es
+> [GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md](../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md)
+> (todos los modelos de `pnpm ai:image` y `pnpm ai:fal`). Este documento conserva el flujo de campaña, las manos y los
+> gates; la selección vigente de motor vive allá. Dos correcciones del 2026-09-16 que afectan a este flujo: (1) los
+> rankings externos no coinciden — OpenArt pone a Seedream 5 Pro #1 en imagen, mientras Arena (2026-09-07) y
+> Artificial Analysis (2026-09-16) ponen a GPT Image 2.5 Sunburst y Flare #1/#2 y a Seedream 5 Pro entre #8 y #15;
+> ninguno reemplaza la prueba con el brief; (2) el costo de video en fal depende del **escalón de resolución** y el
+> precio registrado es el más bajo (Wan 3.0 sale en 1080p por defecto a USD 0,20/s, H3 base en 2K a 0,13/s, Flux 3
+> publica el doble de lo registrado); Seedance se presupuesta con `tokens = alto × ancho × segundos × 24 / 1024`.
+> Detalle: [catálogo Fal §Precios por escalón de resolución](../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md).
 
 ## Dos ejes que no deben confundirse
 
@@ -160,7 +173,9 @@ out-of-band son Seedance, Minimax H3, Flux 3 y Wan 3.0. **Delta 2026-09-16:** el
 mismo día quedó superado: el cliente usa dos cuentas de Fal, elige la de más saldo y cambia sola ante un 403 por
 saldo (`pnpm ai:fal --balance` muestra los saldos). El registro quedó con 47 de 55 capacidades verificadas, incluidas
 las de Wan 3.0 y Seedance. Ojo con Seedance 2.5 en video a video: su filtro rechaza marcas y personas reales
-**después** de encolar y cobra el intento; con personas o marcas, usar Flux 3 o Wan 3.0. Ver [catálogo Fal §Cuentas, saldo y operación del CLI](../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md).
+**después** de encolar y cobra el intento; con personas o marcas, usar Flux 3 o Wan 3.0. Seedream 5 Pro en fal llega
+a 2048² (no a 4K) y entrega JPEG por defecto: si se necesita más área,
+Seedream 5 Lite la ofrece (hasta 4096² según su schema). Ver [catálogo Fal §Cuentas, saldo y operación del CLI](../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md).
 
 ### Patrón motion validado: single-shot → familia profesional
 

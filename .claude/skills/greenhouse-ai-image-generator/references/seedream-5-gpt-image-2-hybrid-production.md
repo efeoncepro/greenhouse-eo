@@ -7,6 +7,11 @@
 > **As-of:** 2026-07-18 · **Delta 2026-09-16:** slugs re-verificados, endpoint `layerize` y CLI `pnpm ai:fal`
 > como mano de producción. Las capacidades, schemas y precios son volátiles: verificar las páginas oficiales antes
 > de presupuestar o convertir límites en contrato.
+>
+> **Delta 2026-09-16 (b) — correcciones de selección.** Seedream 5 **Pro** en fal **no llega a 4K** (área máxima
+> `2048×2048`; la nota "Hasta 4K" del registro era incorrecta); **Lite** sí admite área mayor. Los rankings externos
+> **no coinciden** entre sí (ver §Rankings externos). GPT Image 2.5 **sí** es estimable antes de gastar. Guía canónica
+> de selección: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`.
 
 ## Propósito
 
@@ -61,7 +66,13 @@ Hechos operativos:
 - Edit acepta hasta 10 `image_urls`; al excederlas conserva las últimas diez.
 - Devuelve raster `images[]` y `seed`.
 - Precio publicado: USD 0,035 por imagen.
-- Existe drift entre la ficha comercial y el schema sobre la resolución máxima. Tratar el límite como volátil y ejecutar contract test.
+- Existe drift entre la ficha comercial y el schema sobre la resolución máxima: el OpenAPI de fal admite un área
+  entre `2560×1440` y `4096×4096` (`auto_2K`, `auto_3K`, `auto_4K`; default `auto_2K`) y la ficha comercial dice
+  máx. `3072×3072` [oficial fal, leído 2026-09-16]. Tratar el límite como volátil y ejecutar contract test. Si el
+  tamaño pedido no cumple el área, fal **reescala solo**.
+- Entrega PNG (no expone `output_format`; qué hace fal si el CLI le manda `--format`: sin dato).
+- `max_images` 1–6 genera **series relacionadas** por pedido (sin flag propio: `--input '{"max_images":4}'`); se cobra
+  por imagen efectiva.
 - El laboratorio verificó `1792×2240`.
 - El endpoint observado devuelve seed pero no documenta un seed de entrada: no prometer reproducción determinística.
 
@@ -81,7 +92,13 @@ Endpoints:
 Hechos operativos:
 
 - Área documentada entre el equivalente a `1024×1024` y `2048×2048`; relaciones entre `1:16` y `16:1`.
-- `output_format`: `jpeg | png`; default `jpeg`.
+  🔴 **No es 4K en fal** (presets `auto_1K`/`auto_2K`): la nota "Hasta 4K según el proveedor" del registro estaba
+  contradicha por el schema. Si necesitas resolución nativa > 2K, usa Lite (hasta 4096² de área según schema) o
+  GPT Image (hasta 3840×2160; experimental sobre 2560×1440).
+- `output_format`: `jpeg | png`; default `jpeg`. 🔴 Trampa del CLI: `pnpm ai:fal --capability seedream5-pro --out
+  x.png` **sin** `--format png` guarda un JPEG con extensión `.png`. Pasa siempre `--format png` o nombra `.jpg`.
+- No devuelve `seed` ni acepta seed de entrada (el CLI envía `--seed` igual; efecto no probado: no lo uses).
+- Sin `max_images`: una generación = una pieza (usa `--count` → `num_images` 1–6).
 - Edit acepta hasta 10 referencias.
 - Primera referencia sin recargo; referencias adicionales: USD 0,0045 cada una.
 - Precio publicado: USD 0,0675 por output hasta el área de `1536×1536`; USD 0,135 hasta `2048×2048`.
@@ -91,7 +108,11 @@ Hechos operativos:
   hasta 16 capas ordenadas por `z_index`, cada una con `name`, `description`, `bounding_box` y recorte PNG con alfa
   real (reconstruye lo ocluido). No es PSD/SVG. Verificado sobre un key visual: 8 capas, alfa limpio incluso en
   huecos internos. `pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ./capas` guarda
-  `NN-<nombre>.png` + `layers.json`.
+  `NN-<nombre>.png` + `layers.json`. Precio publicado: USD 0,03375 **por capa** si el área es ≤ `1536×1536` y USD
+  0,0675 por capa sobre ese umbral (una pieza de 8 capas a 2K ≈ USD 0,54 [inferencia]; si la base se cobra como
+  capa: sin dato). `image_size` admite `auto|auto_1K|auto_1.5K|auto_2K`; entrada 512²–6000², ≤ 30 MB.
+- Edit: con más de 10 `--image`, fal usa **sólo las últimas 10 sin aviso** (y en Pro cobra USD 0,0045 por cada
+  adicional). Ordena las referencias pensando en eso.
 
 Fuentes:
 
@@ -119,10 +140,12 @@ Fuentes:
 > **Delta 2026-09-08 — existe GPT Image 2.5.** OpenAI publicó `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare`.
 > Para el tramo GPT de una campaña nueva, la elección por defecto pasa a **Flare** (rápido, cotidiano) y
 > **Sunburst** (precisión de edición, pieza final). `gpt-image-2` **no** quedó deprecado y sigue siendo la
-> elección correcta cuando el flujo necesita **Batch** o **costo por imagen estimable antes de gastar** — 2.5 no
-> tiene ninguno de los dos, y OpenAI declara que su costo por imagen sólo se conoce midiendo `usage` real.
-> Dos reglas duras para 2.5: **nunca enviar `input_fidelity`** (la guía lo excluye de Sunburst/Flare) y **nunca
-> presupuestar una campaña con una tabla de costo por imagen**. Contrato completo y trampas del helper local:
+> elección correcta cuando el flujo necesita **Batch** (mitad de precio; 2.5 no lo tiene).
+> ⚠️ **Corregido 2026-09-16:** el costo de 2.5 **sí** se estima antes de gastar con la fórmula de la calculadora
+> oficial (reprodujo exactamente las mediciones del repo) y sus rate limits ya están publicados (iguales a
+> `gpt-image-2`). En tokens, 2.5 `high` ≈ GPT Image 2 `medium` y 2.5 `max` ≈ GPT Image 2 `high`. Fórmula y tabla:
+> `greenhouse-ai-image-generator/SKILL.md` §Elegir modelo. Regla dura que sigue: **nunca enviar `input_fidelity`**
+> a 2.5, y ninguna cifra de costo entra a una propuesta sin re-medir. Contrato completo:
 > `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
 
 Modelo y APIs:
@@ -149,6 +172,21 @@ Fuentes:
 - https://developers.openai.com/api/docs/guides/image-generation
 - https://developers.openai.com/api/docs/pricing
 - `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`
+
+## Rankings externos: no coinciden, no eligen por ti
+
+| Leaderboard (fecha) | Seedream 5 Pro | Seedream 5 Lite | GPT Image 2.5 Sunburst / Flare | GPT Image 2 |
+|---|---|---|---|---|
+| OpenArt Arena imagen v1.0 (2026-09-16) | **#1** (1051) | no listado | no listados | #2 (1047) |
+| Arena texto a imagen (act. 2026-09-07) | #10 | #37 | **#1 / #2** | #3 |
+| Arena edición (act. 2026-09-07) | #8 | #26 | **#1 / #2** (Sunburst gana) | #3 |
+| Artificial Analysis texto a imagen (leído 2026-09-16) | #15 | #43 | #2 / **#1** | #3 |
+| Artificial Analysis edición (leído 2026-09-16) | #9 | #20 | **#1** / #2 | #5 |
+
+[tercero; cifras de Arena y AA leídas con resumidor, revalidar a mano antes de citarlas fuera]. El #1 de Seedream
+en OpenArt **no se replica** en Arena ni en Artificial Analysis, y 2.5 tiene pocos votos (≈3–7 mil). Ningún
+ranking reemplaza la prueba con el brief propio; el router por operación de arriba se sostiene en evidencia de
+laboratorio, no en rankings.
 
 ## Flujo canónico
 

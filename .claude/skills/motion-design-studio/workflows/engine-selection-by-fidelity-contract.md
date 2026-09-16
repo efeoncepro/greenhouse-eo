@@ -1,6 +1,8 @@
 # Selección de motor por contrato de fidelidad — no por canal
 
-> **Estado:** evidencia operativa limitada — 2026-07-11 (operación de Flux 3, Wan 3.0, video a video, verificación completa de Seedance/Wan, costo real, filtro de contenido y candidatos no conectados actualizada 2026-09-16). No declara un ganador universal ni sustituye el gate de revisión humana.
+> **Estado:** evidencia operativa limitada — 2026-07-11 (operación de Flux 3, Wan 3.0, video a video, verificación completa de Seedance/Wan, costo real, filtro de contenido y candidatos no conectados actualizada 2026-09-16; **árbol por necesidad, costos por resolución y correcciones de precio/fórmula/H3/LoRA 2026-09-16 (b)**). No declara un ganador universal ni sustituye el gate de revisión humana.
+>
+> **Guía canónica de selección (imagen + video, todos los modelos de `pnpm ai:image` y `pnpm ai:fal`):** `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Este workflow es su aplicación al video; ante conflicto, manda la guía.
 >
 > **Evidencia empírica:** [`Social Wall`](../../../../ai-generations/2026-07-08_social-wall-assets/README.md) (paquete de key visuals con `gpt-image-2` → Gemini Omni image-to-video, publicado) y [`Glitch`](../../../../ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-seedance-source-keyvisual-review.md) (Seedance retuvo el set, pero el take aún se rechazó por actuación/foley).
 
@@ -23,6 +25,78 @@ La plataforma o canal es un dato de formato; la **fidelidad permitida**, la pres
 continuidad—, no porque una edición existente necesite arreglo. Si la acción ya existe, termina en NLE/composite/
 audio. Si no existe y es el significado del plano, reabre producción de toma integral y vuelve al animatic.
 
+## Árbol de decisión por necesidad (después de fijar el contrato de fidelidad)
+
+La regla de arriba decide **si** generar y con qué tolerancia; este árbol decide **qué endpoint** de `pnpm ai:fal`.
+Etiquetas: [verificado] corrida real 2026-09-16 · [oficial] fal/fabricante · [tercero] ranking fechado · sin dato.
+
+| Necesidad | Primera mano | Alternativa | Lo que decide |
+| --- | --- | --- | --- |
+| **Explorar** movimiento/actuación barato y rápido | `h3turbo-t2v`/`-i2v` a 480P (latencia 2,7–8 s [verificado]) | `flux3-*-draft` → `flux3-enhance` sólo del elegido · `seedance20-mini-*` a 480p | Subir de tier sólo con el take aprobado; no asumir que Turbo rinde como Max (diferencia técnica: sin dato) |
+| **Hero** de máxima calidad | `seedance25-*` (lidera OpenArt en adherencia, estética, física y consistencia [tercero 2026-09-16]) | `h3max-i2v` (#1 imagen a video con audio en Artificial Analysis [tercero 2026-09-16]) · `wan3-*` | Los rankings **no coinciden**: probar con un take corto. El 1080p de Seedance 2.5 está **sin verificar** (fuentes contradictorias; podría ser reescalado) |
+| **Toma larga** (> 15 s) | `seedance25-*` (≤ 30 s, toma continua) | `wan3-*` (≤ 30 s o `auto`; un job de 30 s **puede cortar** entre encuadres [tercero]) · `flux3-*` (≤ 20 s) | Seedance 2.5 se vende como toma sin cortes; para multi-shot con cortes, Wan o Flux 3 |
+| **4K** | `seedance20-*` base (3840×2160 [verificado]; nativo o reescalado: sin dato) | `h3-*` base 4K | H3 base 2K/4K son **reescalados desde 768P** [oficial fal]; Flux 3 4K sólo en BFL directo (no conectado; fal llega a 1080p) |
+| **Cámara** precisa sobre una imagen fija | `h3max-camera` (≤ 12 keyframes; empezar y terminar en el encuadre original [oficial]) | — | La escena queda congelada: si el sujeto debe actuar, no sirve |
+| **Inicio y fin** exactos | `flux3-flf` (ambos obligatorios) | `wan3-i2v --end-image` · `seedance25-i2v --end-image` · `h3*-i2v --end-image` | Flux 3 flf no acepta `auto` |
+| Pasar por **varios cuadros clave** | `flux3-keyframes` (1–10 `--keyframe img@frame_index`) | — | fal expone índice de cuadro; timestamps en segundos sólo en BFL directo |
+| **Editar** un video **sin** personas ni marcas | `seedance25-r2v --task editing --video` | `flux3-edit` | Filtro de ByteDance cobra el rechazo |
+| **Editar** un video **con** personas o marcas | `flux3-edit` (USD 0,03/s, conserva movimiento y encuadre; salida 720p) | — | Si conserva el audio: sin dato |
+| **Extender** un video | sin personas/marcas: `seedance25-r2v --task extension --video` | con personas: `flux3-extend` | Flux 3 extend usa **hasta 4 s del video y su audio** como contexto [oficial BFL] → origen mudo = 422; entrega sólo la continuación |
+| **Muchas referencias** multimodales | `seedance25-r2v` (30 img / 10 video / 10 audio) | `wan3-r2v` (10/5/5) · `h3*-r2v` (9/3/3) · `seedance20-*-r2v` (9/3/3, video sólo guía) | Con videos de referencia, Seedance 2.5 r2v cobra también la duración del video de entrada [oficial] |
+| Video basado en una **web o documento** | `wan3-r2v --thinking --web-url <url>` / `--file <doc>` | — | Único conectado; exige prompt con guion (sin guion salió animación de la portada [verificado]). `--file`: sin corrida real |
+| **Consistencia** de personaje/producto entre tomas | referencias `r2v` (Seedance / Wan / H3) | LoRA de H3 (sin verificar, postergada [decisión]) · Kling `elements` (no conectado) · Higgsfield Soul ID (otro carril) | Anclar siempre al mismo canónico |
+| Cliente exige procesamiento en **EE. UU.** | `seedance20-us-*` | — | Hospedada en EE. UU., +20 % por token, techo 720p. Sin otra razón para elegirla |
+
+**Audio:** Seedance (`--no-audio`, campo `generate_audio`), Wan (`--no-audio`, campo `audio`) y Flux 3
+(`--no-audio`) lo generan y se puede apagar; **H3 no se puede apagar** y siempre entrega pista. Trátalo como
+provisional si hay diseño sonoro. Detalle en `audio-studio/SOURCES.md`.
+
+**fps de salida:** Wan 3.0 / Prime **30 fps**; Seedance, H3 y Flux 3 **24 fps** [oficial]. Declara el fps al montar
+en NLE para no introducir judder al mezclar motores.
+
+## Costo por resolución: fal cobra por escalón
+
+🔴 **El precio del registro (`fal-capabilities.ts`, API de pricing) es el escalón MÁS BAJO**, no el de la resolución
+por defecto. Presupuesta por la resolución que realmente pides y confirma con `pnpm ai:fal --balance` antes y después
+de la corrida. USD por segundo de salida, publicado 2026-09-16 [oficial fal/BFL]:
+
+| Familia | 480p / 480P | 720p / 768P | 1080p / 1080P | 2K | 4K | Default del endpoint |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Wan 3.0 | 0,05 | 0,10 | **0,20** | — | — | **1080p** (4× lo registrado) |
+| Wan 3.0 Prime | 0,068 | 0,14 | **0,28** | — | — | 1080p (**más cara** que base en fal) |
+| H3 base | 0,05 | 0,06 (768P) | — | **0,13** | 0,16 | **2K** (2,6× lo registrado) |
+| H3 Max (fal rotula "50% off") | 0,025 | 0,04 (768P) | 0,08 | — | — | 768P; si es promo o lista: ambiguo |
+| H3 Max Turbo | no listado | 0,02 (promo 0,01) | 0,04 (promo 0,02) | — | — | registro 0,0125 no calza → medir |
+| Flux 3 final (t2v/i2v/flf/keyframes) | — | 0,17 | 0,29 | — | — | 720p |
+| Flux 3 extend | — | 0,41 | 0,53 | — | — | 720p · drafts 0,06 (sin resolución) · edit 0,03 (720p) |
+| Seedance 2.5 | ≈0,2205 | ≈0,4730 | ≈1,164 (sin verificar) | — | — | r2v con videos de referencia: 480p ≈0,1323, 720p ≈0,2838 |
+| Seedance 2.0 base · fast · mini · us | mini ≈0,0721 · us 0,1731 | base 0,3024 · fast 0,2419 · mini ≈0,1547 · us 0,37 | por fórmula | — | por fórmula | — |
+
+⚠️ **Flux 3: precio publicado ≠ registrado.** BFL y fal publican 0,17/s final, 0,06 draft y 0,41 extend; el registro
+dice 0,085 / 0,03 / 0,205 (exactamente la mitad). Por qué: sin dato. Hasta medir, presupuesta con el publicado.
+
+**Seedance se estima con la fórmula de fal** (corrige "estimar por tokens falla ~2×"; lo que fallaba era la
+equivalencia de OpenArt, que subestima ~2×):
+
+```text
+tokens = alto × ancho × segundos × 24 / 1024
+costo  = tokens × precio_por_1000 / 1000        # 2.5 0,0214 · 2.0 0,014 · fast 0,0112 · mini 0,007 · us 0,0168
+```
+
+Comprobado contra el gasto real de la cuenta B [verificado 2026-09-16]: 3 × `seedance20-fast` 864×496 × 4,13 s →
+~1,39 calculado vs 1,37 medido; tanda 2.0 base i2v+r2v (4,06 s) + 2 Wan 480p de 2 s → ~1,33 vs 1,37.
+
+**Costo por clip de 10 s a la resolución indicada** [inferencia sobre los precios publicados; confirmar con
+`--balance`]: H3 Turbo 768P 0,20 (lista) · H3 Max 768P 0,40 · Wan 480p 0,50 · Flux 3 draft 0,60 · Seedance mini
+480p ≈0,72 · H3 base 2K 1,30 · Flux 3 final 720p 1,70 · Wan 1080p 2,00 · Seedance 2.5 480p ≈2,21 · Wan Prime
+1080p 2,80 · Flux 3 extend 720p 4,10 · Seedance 2.5 720p ≈4,73. Estrategia: explorar en el escalón barato y
+generar el final sólo de la toma aprobada.
+
+**Entrenamiento LoRA H3:** 0,005/step en t2v con **mínimo 100 steps facturables** (USD 0,50; i2v/flf2v ≥ USD 1,00
+y ref2va ≥ USD 1,50 con los precios del registro). El plan "10 steps ≈ USD 0,40" es imposible. Además: subtítulos
+por clip obligatorios en t2v (`.txt` con el mismo nombre, o `--trigger` como respaldo) y los clips de **menos de 73
+cuadros se descartan en silencio**.
+
 ## Operar Seedance: `pnpm ai:fal` y elección de endpoint
 
 Seedance se opera con el CLI `pnpm ai:fal` (`scripts/ai/fal-image.ts`, registro en `src/lib/ai/fal-capabilities.ts`),
@@ -44,7 +118,7 @@ v1/v1.5 sí lo llevan: el prefijo depende del endpoint). Los límites difieren *
 | --- | --- | --- | --- |
 | 2.5 (`seedance25-*`) | 4–30 s o `auto` | 480p · 720p · 1080p | Sin 4K. Sólo su `r2v` acepta `--task reference\|editing\|extension` (los tres verificados en real 2026-09-16) |
 | 2.0 base (`seedance20-*`) | 4–15 s o `auto` | 480p · 720p · 1080p · 4k | Único con 4K (verificado: 3840×2160 real) |
-| 2.0 `fast` / `us` | 4–15 s o `auto` | 480p · 720p | — |
+| 2.0 `fast` / `us` | 4–15 s o `auto` | 480p · 720p | `us` = hospedada en EE. UU., +20 % por token: sólo si un cliente exige procesamiento en EE. UU. |
 | 2.0 `mini` | 4–15 s o `auto` | 480p · 720p | Sin `--bitrate` (no expone `bitrate_mode`) |
 
 La duración mínima es **4 s** en todos (el registro decía 1 hasta 2026-09-16; ya está corregido y el CLI lo valida).
@@ -63,8 +137,8 @@ La duración mínima es **4 s** en todos (el registro decía 1 hasta 2026-09-16;
 - **Los 15 verificados en real 2026-09-16:** `seedance25-t2v`, `seedance25-i2v` (con upload de imagen local),
   `seedance20-t2v` (4K), `seedance20-i2v`, `seedance20-r2v`, los 9 `seedance20-{fast,mini,us}-{t2v,i2v,r2v}` y
   `seedance25-r2v` con `--task reference`, `editing` y `extension`.
-- **Costo real, no estimado:** Seedance costó ~2× lo que daba la equivalencia de tokens de OpenArt; esa equivalencia
-  **no sirve para presupuestar**. Referencias medidas: 3 corridas `seedance20-fast` de 4 s a 480p ≈ USD 1,37; 3 `mini`
+- **Costo:** la equivalencia de tokens de OpenArt subestima ~2× y **no sirve para presupuestar**; la fórmula de fal
+  (`alto × ancho × segundos × 24 / 1024`, ver §Costo por resolución) sí calzó con lo medido. Referencias medidas: 3 corridas `seedance20-fast` de 4 s a 480p ≈ USD 1,37; 3 `mini`
   ≈ USD 0,85. La tanda completa de verificación (17 corridas, incluidas 3 rechazadas) costó USD 7,71.
 - **Filtro de contenido de ByteDance:** rechaza **después de encolar, y se cobra** (422 `content_policy_violation`,
   `partner_validation_failed`). Casos medidos: referencia con el isotipo de Efeonce → "potential copyright violation";
@@ -95,11 +169,11 @@ pnpm ai:fal --capability h3max-camera --image kv.png --camera-trajectory '[{"dis
 
 | Familia (ids) | Resoluciones | USD fal (2026-09-16) | Cuándo elegirla |
 | --- | --- | --- | --- |
-| **Max Turbo** (`h3turbo-t2v`, `h3turbo-i2v`) | 480P · 768P · 1080P | 0,0125 / s (la más barata) | Divergencia barata y rápida: explorar movimiento/actuación antes de subir de tier |
-| **Max** (`h3max-t2v`, `h3max-i2v`, `h3max-r2v`, `h3max-camera`) | 480P · 768P · 1080P | 0,025 / s | `h3max-camera`: **control de cámara real sobre una imagen congelada** (la escena no se mueve, sólo la cámara; hasta 12 keyframes `{distance, elevation -90..90, azimuth, time 0..1}`) |
-| **Base** (`h3-t2v`, `h3-i2v`, `h3-r2v`) | 480P · 768P · **2K · 4K** (default 2K) | 0,05 / s | Única H3 con 2K/4K |
+| **Max Turbo** (`h3turbo-t2v`, `h3turbo-i2v`) | 480P · 768P · 1080P | registro 0,0125 / s; publicado 768P 0,02 · 1080P 0,04 (ver §Costo por resolución) | Divergencia barata y rápida: explorar movimiento/actuación antes de subir de tier |
+| **Max** (`h3max-t2v`, `h3max-i2v`, `h3max-r2v`, `h3max-camera`) — post-entrenado **por fal** (2026-08-27), no un modelo de MiniMax; su 1080P se refina desde 768P | 480P · 768P · 1080P | 0,025 / s en 480P; 768P 0,04 · 1080P 0,08 | `h3max-camera`: **control de cámara real sobre una imagen congelada** (la escena no se mueve, sólo la cámara; hasta 12 keyframes `{distance, elevation -90..90, azimuth, time 0..1}`) |
+| **Base** (`h3-t2v`, `h3-i2v`, `h3-r2v`) | 480P · 768P · **2K · 4K** (default 2K) | 0,05 / s en 480P; **2K 0,13** · 4K 0,16 | Única H3 con 2K/4K, pero **reescalados desde 768P** (no nativos) |
 | **LoRA** (`h3-{t2v,i2v,r2v}-lora`) | como base | 0,0625 / s | Consistencia de marca/personaje con una LoRA propia (`--lora <path[@scale]>`, hasta 3, scale 0–4). **Sin verificar** |
-| **Entrenadores** (`h3-train-{t2v,i2v,flf2v,ref2va}`) | — | t2v 0,005 / step (2000 ≈ USD 10) · ref2va 0,015 / step (≈ USD 30) | Producir esa LoRA: `--training-data <zip\|url>`, `--steps`, `--rank`, `--learning-rate`, `--trigger`. **Sin verificar**; timeout default 3 h |
+| **Entrenadores** (`h3-train-{t2v,i2v,flf2v,ref2va}`) | — | t2v 0,005 / step (2000 ≈ USD 10) · ref2va 0,015 / step (≈ USD 30); **mínimo 100 steps facturables** | Producir esa LoRA: `--training-data <zip\|url>`, `--steps`, `--rank`, `--learning-rate`, `--trigger`. **Sin verificar**; timeout default 3 h. Sin flag para `weight_name`, `split_input_duration_threshold` ni la regla `number_of_frames % 17 == 5`: usar `--input` |
 
 Límites que cambian la decisión (difieren de Seedance en la **forma** de los campos; el CLI valida antes de gastar):
 
@@ -131,12 +205,12 @@ están conectados al CLI). Son 12 endpoints con slugs **sin** `fal-ai/` (`blackf
 
 | Modo | ids | USD fal (2026-09-16) | Cuándo elegirlo |
 | --- | --- | --- | --- |
-| Texto a video | `flux3-t2v` · `flux3-t2v-draft` | 0,085 / s · draft 0,03 / s | Explorar barato en draft y subir sólo el take aprobado con `flux3-enhance` |
+| Texto a video | `flux3-t2v` · `flux3-t2v-draft` | registro 0,085 / s · draft 0,03 / s (**publicado: 0,17 · 0,06**) | Explorar barato en draft y subir sólo el take aprobado con `flux3-enhance` |
 | Imagen a video | `flux3-i2v` · `flux3-i2v-draft` | 0,085 / s · draft 0,03 / s | Animar un KV con el mismo flujo draft → enhance |
 | Primer y último cuadro | `flux3-flf` · `flux3-flf-draft` | 0,085 / s · draft 0,03 / s | Controlar dónde arranca y dónde termina la toma: `--image` (primer cuadro) y `--end-image` (último), ambos obligatorios |
 | Keyframes | `flux3-keyframes` · `flux3-keyframes-draft` | 0,085 / s · draft 0,03 / s | Controlar la trayectoria con 1 a 10 `--keyframe <imagen>@<frame_index>` (índice entero ≥ 0; probado con `@0` y `@96` en 5 s a 24 fps). No acepta `--image` |
 | Edición | `flux3-edit` | 0,03 / s | Re-renderizar un video existente por prompt **conservando movimiento, timing y encuadre** (`--video`) |
-| Extensión | `flux3-extend` · `flux3-extend-draft` | 0,205 / s · draft 0,06 / s | Continuar un video (`--video`); ver las dos trampas abajo |
+| Extensión | `flux3-extend` · `flux3-extend-draft` | registro 0,205 / s (**publicado 720p 0,41**) · draft 0,06 / s | Continuar un video (`--video`); ver las dos trampas abajo |
 | Mejora de draft | `flux3-enhance` | 0,085 / s | Convertir un draft en la versión final (`--draft-cache`; verificado: entregó 1920×1088 conservando la escena) |
 
 ```bash
@@ -160,7 +234,8 @@ Contrato (el CLI lo valida antes de gastar):
 
 **Las dos trampas de `extend`** (aisladas con corridas reales):
 
-1. **Exige pista de audio en el video de origen.** Con un origen sin audio (por ejemplo, generado con `--no-audio`),
+1. **Exige pista de audio en el video de origen**, porque la continuación usa **hasta 4 s del video y de su audio**
+   como contexto [oficial BFL] (un origen de más de 4 s no aporta más contexto [inferencia]). Con un origen sin audio (por ejemplo, generado con `--no-audio`),
    fal encola el trabajo y después lo rechaza con un 422 genérico `Invalid request parameters`, con cualquier
    duración. El CLI revisa con `ffprobe` los archivos locales y corta antes de subir; con URL remota o sin `ffprobe`
    sólo avisa. Si el origen es mudo, agrégale una pista (aunque sea silencio) antes de extender.
@@ -195,8 +270,10 @@ pnpm ai:fal --capability wan3-r2v --web-url https://ejemplo.com/lanzamiento --th
 
 Contrato (leído del OpenAPI 2026-09-16, igual en base y Prime; el CLI valida antes de gastar):
 
-- **Precio:** USD 0,05/s en ambas líneas (API de pricing). El registro no documenta una diferencia de contrato entre
-  base y Prime: compara con un take corto antes de asumir que Prime rinde más.
+- **Precio (corregido 2026-09-16):** fal cobra por resolución — base 480p 0,05 · 720p 0,10 · **1080p 0,20 USD/s**;
+  Prime 0,068 · 0,14 · **0,28** (más cara, no igual). Alibaba define Prime como versión **acelerada**; calidad frente
+  a base: sin medir. Compara con un take corto antes de asumir que Prime rinde más. **30 fps** (el resto, 24).
+  Alibaba ofrece edición, extensión y multi-shot de Wan 3.0, pero **fal no los expone**.
 - **Duración:** entero 2–30 s (default 5) o `--duration auto` (se envía `null`: **duración inteligente**, el modelo
   elige el largo según prompt y referencias).
 - **Resolución:** `480p` | `720p` | `1080p`, **default 1080p** (el más caro de explorar: pasa `--resolution 480p` al

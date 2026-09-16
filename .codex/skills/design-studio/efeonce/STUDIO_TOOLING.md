@@ -26,9 +26,15 @@
 - **¿Es imagen de marketing/marca (KV, hero, poster, social)?** → elige el modelo por tarea
   (matriz en `SOURCES.md`): volumen GCP → Gemini 3.1 Flash Lite Image; contexto/multirreferencia →
   Gemini 3.1 Flash Image; acabado premium → Gemini 3 Pro Image; texto conceptual → Ideogram;
-  vector escalable → Recraft; realismo/cámara → FLUX.2; composición/máscara → GPT Image 2;
+  vector escalable → Recraft (vía Higgsfield, hoy sin sesión); realismo/cámara → FLUX.2; edición precisa,
+  máscara o pieza final → GPT Image 2.5 Sunburst; generación cotidiana → GPT Image 2.5 Flare; Batch → GPT Image 2
+  (los tres con `pnpm ai:image --model`);
   divergencia barata → Seedream 5 Lite; material/color/atmósfera o región semántica → Seedream 5 Pro
-  (ambos con `pnpm ai:fal`, CLI out-of-band; `pnpm ai:fal --list` es gratis, toda corrida gasta).
+  (ambos con `pnpm ai:fal`, CLI out-of-band; `pnpm ai:fal --list` es gratis, toda corrida gasta; **Pro no es 4K
+  en fal**: resolución nativa > 2K → Lite o GPT Image).
+  🔴 Antes de elegir: árbol de decisión y costos en `greenhouse-ai-image-generator` §Elegir modelo y guía canónica
+  `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`; la matriz de disponibilidad real
+  (CLI / directo / evaluado) vive en `SOURCES.md`.
   Midjourney, Firefly, Higgsfield y Magnific son workbenches `watch/out-of-band`, no rutas enterprise
   allowlisted hasta completar términos, schemas y evals. Si una campaña requiere varias
   fortalezas, cargar `../modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` y diseñar una secuencia
@@ -40,7 +46,8 @@
 - **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Minimax H3 (Fal, conectado 2026-09-16: Max Turbo exploración barata · Max `camera-controls` cámara sobre imagen congelada · base 2K/4K) / Flux 3 (Fal, conectado y verificado 2026-09-16: video, no imagen; draft → enhance · primer/último cuadro y keyframes · edit y extend para video a video) / Wan 3.0 (Fal, conectado y verificado 2026-09-16: hasta 30 s con duración inteligente · video desde una web o documento) / Veo 3.1 (premium, Vertex) /
   PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal; **evaluado, no conectado**) / Grok Imagine video (Fal; **evaluado, no conectado**) / Gemini Omni (canary, Vertex directo, nunca Fal);
   Seedance, H3, Flux 3 y Wan 3.0 se operan con `pnpm ai:fal` y el endpoint (Seedance 2.5 larga · 2.0 base 4K · H3 Turbo exploración · Flux 3 draft/edit/extend · Wan 3.0 duración `auto`/web/documento) se elige en
-  `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md` (Seedance: sin marcas ni personas reales,
+  `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md` (árbol por necesidad + costos por
+  resolución: fal cobra por escalón y el precio registrado es el más bajo; Seedance: sin marcas ni personas reales,
   su filtro rechaza tras encolar y cobra); el CLI usa dos cuentas de fal con failover por saldo
   (`docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`);
   producción y formato social →

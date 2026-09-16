@@ -99,6 +99,51 @@ violation"; video con una persona → "likenesses of real people". Operación (`
 espera de video 30 min): `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` § "Cuentas, saldo y operación del
 CLI (2026-09-16)".
 
+**Delta 2026-09-16 (b) — correcciones de selección y costo (prevalecen sobre los párrafos de arriba).**
+Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`; aplicación a video:
+`workflows/engine-selection-by-fidelity-contract.md` §"Árbol de decisión por necesidad" y §"Costo por resolución".
+
+- **Precio por escalón:** la API de pricing de fal devuelve el escalón **más bajo**. Publicado por resolución
+  [oficial fal/BFL, 2026-09-16]: Wan 3.0 480p 0,05 · 720p 0,10 · **1080p 0,20 USD/s** (default); Prime 0,068 · 0,14 ·
+  **0,28** (más cara que base, no "mismo precio"); H3 base 480P 0,05 · 768P 0,06 · **2K 0,13** (default) · 4K 0,16;
+  H3 Max 480P 0,025 · 768P 0,04 · 1080P 0,08 (rotulado "50% off"); H3 Turbo 768P 0,02 · 1080P 0,04 (promo a la
+  mitad; el registro 0,0125 no calza → medir). **Flux 3 publicado = el doble del registrado**: final 0,17 (720p) /
+  0,29 (1080p), draft 0,06, extend 0,41 (720p); edit 0,03 coincide → confirmar con `--balance`. Nuestras corridas
+  de Wan fueron a 480p (coherente con 0,05/s).
+- **Seedance sí se presupuesta por tokens** con la fórmula de fal `tokens = alto × ancho × segundos × 24 / 1024`;
+  `costo = tokens × precio_por_1000 / 1000`. Comprobado con el gasto real de la cuenta B: 3 × 2.0 fast 864×496 ×
+  4,13 s → ~1,39 vs 1,37 medido. Lo que subestima ~2× es la **equivalencia de OpenArt** (54 000 tokens por 5 s a
+  720p), no la fórmula.
+- **H3:** 2K/4K de base son **reescalados desde 768P**; el 1080P de Max se refina desde 768P [openapi]. **H3 Max es
+  post-entrenamiento de fal** (2026-08-27), no un modelo de MiniMax. LoRA: **mínimo 100 steps facturables** (t2v ≥
+  USD 0,50), subtítulos por clip obligatorios, clips < 73 cuadros descartados en silencio.
+- **Wan 3.0 Prime:** Alibaba la define como versión **acelerada**; calidad vs base sin medir. Alibaba ofrece
+  edición, extensión y multi-shot de Wan 3.0; fal no los expone.
+- **fps:** Wan 3.0 30 fps; Seedance, H3 y Flux 3 24 fps.
+- **Flux 3 extend** usa hasta 4 s del video **y su audio** como contexto (explica el 422 con origen mudo). BFL
+  directo llega a 4K; fal a 1080p.
+- **Seedance 2.0 us:** hospedada en EE. UU., +20 % por token, techo 720p; sólo si un cliente exige procesamiento en
+  EE. UU.
+- **Seedance 2.5 1080p:** sin verificar; fuentes contradictorias (fal lo cobra ≈1,164 USD/s pero no lo lista; prensa
+  dice 4K nativo; terceros dicen tope nativo 720p).
+- **Rankings Artificial Analysis (leído 2026-09-16) [tercero]**, que **no coinciden** con OpenArt: texto a video con
+  audio 1 Wan 3.0 · 2 Gemini Omni Flash · 3 H3 Max (fal) · 4 MiniMax H3 · 5 Seedance 2.0 720p; imagen a video con
+  audio 1 **H3 Max** · 2 Seedance 2.0 720p · 3 H3 · 5 Omni Flash · 6 Wan 3.0. No incluye Seedance 2.5 ni Flux 3.
+  OpenArt pone H3 última de las conectadas; AA pone H3 Max #1 en imagen a video con audio.
+
+Fuentes del delta [consultadas 2026-09-16]:
+- fal — Wan 3.0 / Prime — https://fal.ai/models/alibaba/wan-3.0/text-to-video · https://fal.ai/models/alibaba/wan-3.0-prime/text-to-video
+- Alibaba — Wan 3.0 blog (2026-08-13) — https://www.alibabacloud.com/blog/wan3-0-30-second-ai-video-generation-from-any-input_603452
+- Alibaba — Wan 3.0 / Prime guide — https://www.alibabacloud.com/help/en/model-studio/wan3-video-generation-guide · https://www.alibabacloud.com/help/en/model-studio/wan3-0-video-prime
+- fal — H3 base / Max / Max Turbo / Director / trainer / camera-controls — https://fal.ai/models/minimax/h3/text-to-video · https://fal.ai/models/minimax/h3-max/text-to-video · https://fal.ai/models/minimax/h3-max-turbo/text-to-video · https://fal.ai/models/minimax/h3-max/director · https://fal.ai/models/minimax/h3/t2v/trainer · https://fal.ai/models/minimax/h3-max/camera-controls
+- fal — H3 Max by fal — https://blog.fal.ai/introducing-h3-max-by-fal/
+- MiniMax — H3 — https://www.minimax.io/blog/minimax-h3
+- BFL — Flux 3 video + docs — https://bfl.ai/blog/flux-3-video · https://docs.bfl.ml/flux_3/flux3_overview
+- fal — Flux 3 t2v / draft / extend / edit — https://fal.ai/models/blackforestlabs/flux-3/text-to-video · https://fal.ai/models/blackforestlabs/flux-3/text-to-video/draft · https://fal.ai/models/blackforestlabs/flux-3/extend-video · https://fal.ai/models/blackforestlabs/flux-3/edit-video
+- fal — Seedance 2.5 / 2.0 mini / us / fast — https://fal.ai/models/bytedance/seedance-2.5/text-to-video · https://fal.ai/models/bytedance/seedance-2.0/mini/text-to-video · https://fal.ai/models/bytedance/seedance-2.0/us/text-to-video · https://fal.ai/models/bytedance/seedance-2.0/fast/image-to-video
+- Artificial Analysis — video leaderboards — https://artificialanalysis.ai/video/leaderboard/text-to-video · https://artificialanalysis.ai/video/leaderboard/image-to-video
+- OpenArt Arena — https://openart.ai/arena/leaderboard
+
 ## Fuentes base (as-of 2026-07)
 
 **Tendencias motion / animación 2026**
