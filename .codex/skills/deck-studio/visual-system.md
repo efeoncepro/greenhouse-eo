@@ -179,6 +179,15 @@ paleta, objeto único, **cero texto/letras/números/logos**. Recorte con `pnpm a
 — **nunca** color-key ni `trim` (dejan halo). Ojo: **el matting devora los objetos blancos** sobre
 fondo claro.
 
+**Arreglar un detalle sin rehacer el asset:** `pnpm ai:image --image base.png --mask mask.png --prompt
+"…" --out out.png` reemplaza sólo lo que la máscara marca en **transparente** (mismo formato y
+dimensiones que la `--image`; sin `--image` aborta). Pero **editar no abarata**: el modelo devuelve la
+imagen completa y la base entra como input, así que en `low` una edición cuesta ~2,3× una generación
+(se diluye al subir calidad). El CLI imprime `usage` por corrida — esa es la fuente real de costo. Y
+el recorte de fondo de algo que **ya existe** va por `ai:image:rmbg` (matting local, costo cero):
+pedírselo al modelo se paga como imagen nueva. Detalle y evidencia:
+skill `greenhouse-ai-image-generator` + `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
+
 ### El muro de logos de clientes — la confianza, y los gotchas de SVG
 
 Un muro de *"quiénes confían en nosotros"* es prueba social ante el comité. Mismo guardrail que las

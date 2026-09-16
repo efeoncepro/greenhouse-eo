@@ -38,6 +38,13 @@
   `social-media-studio`. Un clip de duración mínima sólo valida el endpoint: el release profesional exige
   master + cutdown por ratio, end card, poster, audio/captions y QA temporal.
 - **¿Es un logo real de tercero?** → `greenhouse-digital-brand-asset-designer`.
+- **¿Es retoque de una zona de una imagen que ya existe?** → el CLI canónico ya trae máscara:
+  `pnpm ai:image --image base.png --mask mask.png --prompt "…" --out out.png` (la máscara marca en
+  **transparente** lo que se reemplaza). **Editar no abarata** — en `low` cuesta ~2,3× una generación,
+  porque el modelo devuelve la imagen completa y la base entra como input; el `usage` que imprime el
+  CLI es la fuente real de costo. Y el recorte de fondo de un asset existente va por
+  `pnpm ai:image:rmbg` (matting local, costo cero), nunca pidiéndoselo al modelo. Detalle y evidencia:
+  `greenhouse-ai-image-generator` + `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
 - **¿El craft final lo hace una persona** (retoque, ilustración propietaria, print)? → handoff con
   `templates/asset-delivery-spec.md` + referencias; no fuerces IA.
 

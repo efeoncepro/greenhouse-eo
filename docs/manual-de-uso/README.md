@@ -194,6 +194,7 @@ La diferencia con otras capas de documentacion:
 ### Herramientas IA
 
 - [Operar AI Tooling, Content y Assets](ai-tooling/operar-ai-tooling-content-assets.md) — administrar catalogo de herramientas IA, licencias, wallets, credit ledger y generacion interna de imagenes/animaciones sin confundirlo con facturacion ni publicacion del Public Site.
+- [Editar solo una zona de una imagen](ai-tooling/editar-una-zona-de-una-imagen.md) — inpainting con mascara desde `pnpm ai:image`: como crear la mascara, como leer el `usage` que imprime el comando y por que editar NO sale mas barato que generar de nuevo.
 - [Operar pilotos de Creative Workflow](ai-tooling/operar-pilotos-creative-workflow.md) — seleccionar motor por contrato de fidelidad, ejecutar una prueba controlada y revisar evidencia; incluye la condición para probar previs 3D exportada como referencia de video, sin tratarla como un render 3D.
 - [Producir un set con Layout Design & Finishing](ai-tooling/producir-layout-design-y-finishing.md) — diseñar
   grillas por ratio, terminar clean plates con Seedream/GPT y componer copy/marca de forma determinística.

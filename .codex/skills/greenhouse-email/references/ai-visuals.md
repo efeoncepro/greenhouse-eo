@@ -36,6 +36,14 @@ pnpm ai:image \
 Para un objeto reutilizable sin fondo cambia a `--background transparent`. Esa capacidad de GPT Image 2 está en
 preview y requiere PNG. El helper conserva el modelo exacto y rechaza JPEG transparente antes de llamar a OpenAI.
 
+Para retocar una zona de un hero ya generado hay `--mask`: `pnpm ai:image --image base.png --mask mask.png
+--prompt "…" --out out.png` reemplaza sólo lo que la máscara marca en **transparente** (mismo formato y
+dimensiones que la `--image`; sin `--image` aborta). **Editar no abarata**: el modelo devuelve la imagen completa
+y la base entra como input, así que en `low` una edición cuesta ~2,3× una generación (se diluye al subir
+calidad). Y si lo que necesitas es sacarle el fondo a un asset que **ya existe**, usa `pnpm ai:image:rmbg`
+(matting local, costo cero) en vez de pedírselo al modelo. Detalle y evidencia: skill
+`greenhouse-ai-image-generator` + `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
+
 ## Transparencia y master de email
 
 El source alfa y el master entregado son artefactos distintos:
@@ -73,6 +81,7 @@ GPT Image 2 produce raster. Copy, cifras, logo, CTA y legal se agregan determin�
 
 ## Evidencia mínima
 
-Registra: prompt final, modelo exacto, provider, tamaño/calidad/fondo solicitados, formato, path del source,
+Registra: prompt final, modelo exacto, provider, tamaño/calidad/fondo solicitados, el `usage` que imprime el CLI
+por corrida (la única fuente real de costo), formato, path del source,
 resultado de QA alfa cuando aplique, master optimizado, URL/bucket solo si hubo upload autorizado y preview del
 template en desktop/móvil. Provider support o un archivo local no demuestran rollout.

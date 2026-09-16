@@ -242,6 +242,15 @@ misma paleta, objeto único, **cero texto/letras/números/logos** en la imagen. 
 `pnpm ai:image:rmbg` (matting AI) — **nunca** color-key ni `trim` (dejan halo), y ojo: **el matting
 devora los objetos blancos** sobre fondo claro (si el asset es blanco, genéralo en color).
 
+**Arreglar un detalle sin rehacer el asset:** `pnpm ai:image --image base.png --mask mask.png --prompt
+"…" --out out.png` reemplaza sólo lo que la máscara marca en **transparente** (mismo formato y
+dimensiones que la `--image`; sin `--image` aborta). Pero **editar no abarata**: el modelo devuelve la
+imagen completa y la base entra como input, así que en `low` una edición cuesta ~2,3× una generación
+(se diluye al subir calidad). El CLI imprime `usage` por corrida — esa es la fuente real de costo. Y
+el recorte de fondo de algo que **ya existe** va por `ai:image:rmbg` (matting local, costo cero):
+pedírselo al modelo se paga como imagen nueva. Detalle y evidencia:
+skill `greenhouse-ai-image-generator` + `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
+
 **Set V1 (9 assets)** en `tender-deck-composer-prototypes/assets/clay3d/`: `ai-visibility` ·
 `guarantee-shield` · `method-steps` · `timeline-schedule` · `requirements-matrix` ·
 `search-visibility` · `compliance-certificate` · `metrics-analysis` · `results-board`.
