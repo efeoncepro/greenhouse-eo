@@ -163,13 +163,25 @@ export const getInsightOutputManifest = async (
  */
 export const DEFAULT_INSIGHT_RENDER_LEASE_MINUTES = 15
 
+/**
+ * Cuota de concurrencia por organización. Sin esto, una org que encola veinte outputs monopoliza
+ * el Job y deja a las demás —y a Proposal— esperando detrás. El límite se aplica EN EL CLAIM, no
+ * en el enqueue: encolar es barato y legítimo; lo que se raciona es el worker.
+ *
+ * El valor definitivo sale del benchmark del Slice 4; 2 es un piso conservador hasta tener la
+ * medición, no un número elegido a ojo que vaya a quedarse.
+ */
+export const DEFAULT_INSIGHT_RENDER_ORG_CONCURRENCY = 2
+
 export const claimNextInsightOutputForExecution = async (input?: {
   agingMinutes?: number
   leaseMinutes?: number
+  orgConcurrency?: number
   client?: InsightsDbClient
 }): Promise<InsightOutputRecord | null> => {
   const agingMinutes = input?.agingMinutes ?? 30
   const leaseMinutes = input?.leaseMinutes ?? DEFAULT_INSIGHT_RENDER_LEASE_MINUTES
+  const orgConcurrency = input?.orgConcurrency ?? DEFAULT_INSIGHT_RENDER_ORG_CONCURRENCY
 
   return withClient(input?.client, async client => {
     const candidate = await client.query<{ insight_output_id: string; organization_id: string; render_run_id: string; state: string }>(
@@ -184,6 +196,18 @@ export const claimNextInsightOutputForExecution = async (input?: {
             OR (state = 'running' AND lease_expires_at IS NOT NULL AND lease_expires_at < now())
           )
           AND (deadline IS NULL OR deadline > now())
+          -- Cuota por organización: se cuentan los outputs que ESA org tiene corriendo con lease
+          -- vigente. Los de lease vencido no ocupan cupo (nadie los está trabajando) y los
+          -- huérfanos sin lease tampoco, para que un colgado histórico no bloquee a su org para
+          -- siempre.
+          AND (
+            SELECT count(*)
+              FROM greenhouse_insights.insight_outputs AS activos
+             WHERE activos.organization_id = greenhouse_insights.insight_outputs.organization_id
+               AND activos.state = 'running'
+               AND activos.lease_expires_at IS NOT NULL
+               AND activos.lease_expires_at > now()
+          ) < $2
         ORDER BY
           LEAST(
             COALESCE(deadline, 'infinity'::timestamptz),
@@ -192,7 +216,7 @@ export const claimNextInsightOutputForExecution = async (input?: {
           created_at ASC
         LIMIT 1
         FOR UPDATE SKIP LOCKED`,
-      [agingMinutes]
+      [agingMinutes, orgConcurrency]
     )
 
     const row = candidate.rows[0]
@@ -388,3 +412,138 @@ export const markInsightOutputFailed = async (input: {
     detail: { failureCode: input.failureCode, terminal }
   })
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Slice 3 — recuperación gobernada (retry, cancelación, huérfanos)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Reintenta los outputs de un run SIN tocar los que ya salieron bien.
+ *
+ * Es la forma del criterio "fallar report_pdf conserva deck_pdf exitoso; retry no duplica":
+ * como la unidad es el output y su identidad es `(org, edición, target, audiencia)`, re-encolar
+ * un `failed` reusa SU fila. Nunca se crea una segunda, y un `completed` ni se mira.
+ *
+ * `dead_letter` NO se reintenta acá: es terminal por diseño (intentos agotados o fallo no
+ * reintentable). Resucitarlo es una decisión humana con su propio command, no un retry genérico.
+ */
+export const retryFailedInsightOutputs = async (input: {
+  organizationId: string
+  renderRunId: string
+  client?: InsightsDbClient
+}): Promise<InsightOutputRecord[]> =>
+  withClient(input.client, async client => {
+    const failed = await client.query<Record<string, unknown>>(
+      `SELECT ${OUTPUT_COLUMNS} FROM greenhouse_insights.insight_outputs
+        WHERE organization_id = $1 AND render_run_id = $2 AND state = 'failed'
+        FOR UPDATE`,
+      [input.organizationId, input.renderRunId]
+    )
+
+    const requeued: InsightOutputRecord[] = []
+
+    for (const row of failed.rows) {
+      const outputId = row.insight_output_id as string
+
+      const updated = await client.query<Record<string, unknown>>(
+        `UPDATE greenhouse_insights.insight_outputs
+            SET state = 'queued',
+                lease_expires_at = NULL,
+                failure_code = NULL,
+                failure_detail = NULL,
+                started_at = NULL,
+                finished_at = NULL,
+                updated_at = now()
+          WHERE insight_output_id = $1
+          RETURNING ${OUTPUT_COLUMNS}`,
+        [outputId]
+      )
+
+      await client.query(
+        `INSERT INTO greenhouse_insights.insight_render_events
+           (insight_output_id, render_run_id, organization_id, from_state, to_state, detail, actor_kind)
+         VALUES ($1, $2, $3, 'failed', 'queued', $4, 'system')`,
+        [outputId, input.renderRunId, input.organizationId, JSON.stringify({ retry: 'requeued' })]
+      )
+
+      requeued.push(mapOutputRow(updated.rows[0]!))
+    }
+
+    if (requeued.length > 0) {
+      await client.query(
+        `UPDATE greenhouse_insights.insight_render_runs
+            SET state = 'running', finished_at = NULL, updated_at = now()
+          WHERE render_run_id = $1`,
+        [input.renderRunId]
+      )
+    }
+
+    return requeued
+  })
+
+/**
+ * Cancela el trabajo RESTANTE de un run.
+ *
+ * Honesto por diseño: cancela lo que todavía no empezó (`queued`) y lo que falló, pero NO miente
+ * sobre un output que ya está renderizando — no podemos matar el proceso del worker, y marcarlo
+ * `cancelled` diría que no va a producir bytes cuando puede producirlos. Ése termina solo: su
+ * finalización queda gobernada por el fence y el run refleja el resultado real.
+ */
+export const cancelInsightRenderRun = async (input: {
+  organizationId: string
+  renderRunId: string
+  client?: InsightsDbClient
+}): Promise<{ cancelled: number; stillRunning: number }> =>
+  withClient(input.client, async client => {
+    const targets = await client.query<{ insight_output_id: string; state: string }>(
+      `SELECT insight_output_id, state FROM greenhouse_insights.insight_outputs
+        WHERE organization_id = $1 AND render_run_id = $2 AND state IN ('queued', 'failed', 'running')
+        FOR UPDATE`,
+      [input.organizationId, input.renderRunId]
+    )
+
+    let cancelled = 0
+    let stillRunning = 0
+
+    for (const row of targets.rows) {
+      if (row.state === 'running') {
+        stillRunning += 1
+        continue
+      }
+
+      await client.query(
+        `UPDATE greenhouse_insights.insight_outputs
+            SET state = 'cancelled', failure_code = 'cancelled',
+                failure_detail = 'Cancelado por solicitud sobre el run.',
+                finished_at = now(), updated_at = now()
+          WHERE insight_output_id = $1`,
+        [row.insight_output_id]
+      )
+
+      await client.query(
+        `INSERT INTO greenhouse_insights.insight_render_events
+           (insight_output_id, render_run_id, organization_id, from_state, to_state, detail, actor_kind)
+         VALUES ($1, $2, $3, $4, 'cancelled', $5, 'system')`,
+        [
+          row.insight_output_id,
+          input.renderRunId,
+          input.organizationId,
+          row.state,
+          JSON.stringify({ cancel: 'run_scope' })
+        ]
+      )
+
+      cancelled += 1
+    }
+
+    if (stillRunning === 0) {
+      await client.query(
+        `UPDATE greenhouse_insights.insight_render_runs
+            SET state = 'cancelled', cancelled_at = now(), finished_at = now(), updated_at = now()
+          WHERE render_run_id = $1`,
+        [input.renderRunId]
+      )
+    }
+
+    return { cancelled, stillRunning }
+  })
