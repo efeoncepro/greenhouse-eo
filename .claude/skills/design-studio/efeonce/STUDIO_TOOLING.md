@@ -26,18 +26,41 @@
 - **¿Es imagen de marketing/marca (KV, hero, poster, social)?** → elige el modelo por tarea
   (matriz en `SOURCES.md`): volumen GCP → Gemini 3.1 Flash Lite Image; contexto/multirreferencia →
   Gemini 3.1 Flash Image; acabado premium → Gemini 3 Pro Image; texto conceptual → Ideogram;
-  vector escalable → Recraft; realismo/cámara → FLUX.2; composición/máscara → GPT Image 2;
-  divergencia barata → Seedream 5 Lite; material/color/atmósfera o región semántica → Seedream 5 Pro.
+  vector escalable → Recraft (vía Higgsfield, hoy sin sesión); realismo/cámara → FLUX.2; edición precisa,
+  máscara o pieza final → GPT Image 2.5 Sunburst; generación cotidiana → GPT Image 2.5 Flare; Batch → GPT Image 2
+  (los tres con `pnpm ai:image --model`);
+  divergencia barata → Seedream 5 Lite; material/color/atmósfera o región semántica → Seedream 5 Pro
+  (ambos con `pnpm ai:fal`, CLI out-of-band; `pnpm ai:fal --list` es gratis, toda corrida gasta; **Pro no es 4K
+  en fal**: resolución nativa > 2K → Lite o GPT Image).
+  🔴 Antes de elegir: árbol de decisión y costos en `greenhouse-ai-image-generator` §Elegir modelo y guía canónica
+  `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`; la matriz de disponibilidad real
+  (CLI / directo / evaluado) vive en `SOURCES.md`.
   Midjourney, Firefly, Higgsfield y Magnific son workbenches `watch/out-of-band`, no rutas enterprise
   allowlisted hasta completar términos, schemas y evals. Si una campaña requiere varias
   fortalezas, cargar `../modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` y diseñar una secuencia
   de manos con anchor/handoff, no un torneo de modelos.
-- **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Veo 3.1 (premium, Vertex) /
-  PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal) / Gemini Omni (canary, Vertex);
+- **¿Hay que recomponer, retocar o animar por partes un KV ya aprobado?** → no regeneres:
+  `pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ./capas` devuelve hasta 16 capas
+  con alfa real + `layers.json`. Es dirección de arte sobre capas; el logo oficial y el copy final siguen
+  saliendo del vector y de la composición determinística.
+- **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Minimax H3 (Fal, conectado 2026-09-16: Max Turbo exploración barata · Max `camera-controls` cámara sobre imagen congelada · base 2K/4K) / Flux 3 (Fal, conectado y verificado 2026-09-16: video, no imagen; draft → enhance · primer/último cuadro y keyframes · edit y extend para video a video) / Wan 3.0 (Fal, conectado y verificado 2026-09-16: hasta 30 s con duración inteligente · video desde una web o documento) / Veo 3.1 (premium, Vertex) /
+  PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal; **evaluado, no conectado**) / Grok Imagine video (Fal; **evaluado, no conectado**) / Gemini Omni (canary, Vertex directo, nunca Fal);
+  Seedance, H3, Flux 3 y Wan 3.0 se operan con `pnpm ai:fal` y el endpoint (Seedance 2.5 larga · 2.0 base 4K · H3 Turbo exploración · Flux 3 draft/edit/extend · Wan 3.0 duración `auto`/web/documento) se elige en
+  `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md` (árbol por necesidad + costos por
+  resolución: fal cobra por escalón y el precio registrado es el más bajo; Seedance: sin marcas ni personas reales,
+  su filtro rechaza tras encolar y cobra); el CLI usa dos cuentas de fal con failover por saldo
+  (`docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`);
   producción y formato social →
   `social-media-studio`. Un clip de duración mínima sólo valida el endpoint: el release profesional exige
   master + cutdown por ratio, end card, poster, audio/captions y QA temporal.
 - **¿Es un logo real de tercero?** → `greenhouse-digital-brand-asset-designer`.
+- **¿Es retoque de una zona de una imagen que ya existe?** → el CLI canónico ya trae máscara:
+  `pnpm ai:image --image base.png --mask mask.png --prompt "…" --out out.png` (la máscara marca en
+  **transparente** lo que se reemplaza). **Editar no abarata** — en `low` cuesta ~2,3× una generación,
+  porque el modelo devuelve la imagen completa y la base entra como input; el `usage` que imprime el
+  CLI es la fuente real de costo. Y el recorte de fondo de un asset existente va por
+  `pnpm ai:image:rmbg` (matting local, costo cero), nunca pidiéndoselo al modelo. Detalle y evidencia:
+  `greenhouse-ai-image-generator` + `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
 - **¿El craft final lo hace una persona** (retoque, ilustración propietaria, print)? → handoff con
   `templates/asset-delivery-spec.md` + referencias; no fuerces IA.
 
@@ -57,7 +80,9 @@ fuera del router hasta registrar endpoint/modelo exacto, términos, residencia/r
 ## Política de providers y portafolio enterprise
 
 - **Google nativo → Google Cloud/Vertex directo**, nunca Fal: Gemini Image, Veo, Gemini Omni, Lyria,
-  Gemini/Chirp TTS, Chirp STT y Translation.
+  Gemini/Chirp TTS, Chirp STT y Translation. Gemini Image hoy: Nano Banana 2 (`gemini-3.1-flash-image`) es el
+  default del provider `google-gemini-image`; Nano Banana Pro (`gemini-3-pro-image`) está disponible en Vertex pero
+  ninguna superficie lo usa y no hay CLI de Gemini Image (revisión 2026-09-16).
 - **Fal → sólo modelos no-Google y utilidades allowlisted.**
 - **OpenAI → directo.**
 - **Post/composición exacta → runtime determinístico/humano.**

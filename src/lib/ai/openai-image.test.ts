@@ -5,6 +5,7 @@ import {
   generateOpenAIImage,
   getOpenAIImageModel,
   isOpenAIImageModel,
+  isOpenAIImageQuality,
   resolveOpenAIImageBackground,
   resolveOpenAIImageRequestModel,
   resolveOpenAIImageSize,
@@ -27,9 +28,35 @@ afterEach(() => {
 describe('openai-image helpers', () => {
   const testEnv = (env: Record<string, string | undefined>) => env as unknown as NodeJS.ProcessEnv
 
-  it('defaults to gpt-image-2 when OPENAI_IMAGE_MODEL is unset or unsupported', () => {
+  it('defaults to gpt-image-2 when OPENAI_IMAGE_MODEL is unset', () => {
     expect(getOpenAIImageModel({} as NodeJS.ProcessEnv)).toBe('gpt-image-2')
-    expect(getOpenAIImageModel(testEnv({ OPENAI_IMAGE_MODEL: 'dall-e-3' }))).toBe('gpt-image-2')
+  })
+
+  // TASK-1851: este caso afirmaba la degradación silenciosa como comportamiento correcto.
+  // Devolver el default ante un valor desconocido hacía que pedir 2.5 generara —y cobrara— gpt-image-2.
+  it('throws instead of silently downgrading an unknown OPENAI_IMAGE_MODEL', () => {
+    expect(() => getOpenAIImageModel(testEnv({ OPENAI_IMAGE_MODEL: 'dall-e-3' }))).toThrow(
+      /not a supported OpenAI image model/
+    )
+
+    // Una familia sin variante es el typo plausible: el mensaje tiene que ofrecer las válidas.
+    expect(() => getOpenAIImageModel(testEnv({ OPENAI_IMAGE_MODEL: 'gpt-image-2.5' }))).toThrow(
+      /gpt-image-2\.5-flare/
+    )
+  })
+
+  it('validates quality identifiers for the CLI gate', () => {
+    expect(isOpenAIImageQuality('max')).toBe(true)
+    expect(isOpenAIImageQuality('xhigh')).toBe(true)
+    expect(isOpenAIImageQuality('ultra')).toBe(false)
+    expect(isOpenAIImageQuality('')).toBe(false)
+  })
+
+  it('accepts the 2.5 family from env', () => {
+    expect(getOpenAIImageModel(testEnv({ OPENAI_IMAGE_MODEL: 'gpt-image-2.5-flare' }))).toBe('gpt-image-2.5-flare')
+    expect(getOpenAIImageModel(testEnv({ OPENAI_IMAGE_MODEL: 'gpt-image-2.5-sunburst-2026-09-08' }))).toBe(
+      'gpt-image-2.5-sunburst-2026-09-08'
+    )
   })
 
   it('accepts supported GPT Image models from env', () => {
@@ -214,5 +241,124 @@ describe('editOpenAIImage multi-reference requests', () => {
     })).rejects.toThrow('OpenAI image mask must use the same format as the first image input.')
 
     expect(fetchMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('GPT Image 2.5 family contract (TASK-1851)', () => {
+  const jsonResponse = () =>
+    new Response(JSON.stringify({ data: [{ b64_json: 'aW1hZ2U=' }] }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    })
+
+  it.each([
+    'gpt-image-2.5-flare',
+    'gpt-image-2.5-flare-2026-09-08',
+    'gpt-image-2.5-sunburst',
+    'gpt-image-2.5-sunburst-2026-09-08'
+  ])('recognizes %s as a supported model', model => {
+    expect(isOpenAIImageModel(model)).toBe(true)
+  })
+
+  it.each([
+    ['1:1', '2048x2048'],
+    ['16:9', '2048x1152'],
+    ['9:16', '1152x2048'],
+    ['4:3', '2048x1536'],
+    ['3:4', '1536x2048']
+  ] as const)('resolves the 2.5 family %s to the extended size grid, not the legacy one', (aspectRatio, expectedSize) => {
+    expect(resolveOpenAIImageSize({ model: 'gpt-image-2.5-flare', aspectRatio })).toBe(expectedSize)
+    expect(resolveOpenAIImageSize({ model: 'gpt-image-2.5-sunburst', aspectRatio })).toBe(expectedSize)
+  })
+
+  it('keeps an explicit extended size for the 2.5 family instead of collapsing it to auto', () => {
+    expect(resolveOpenAIImageSize({ model: 'gpt-image-2.5-flare', size: '2048x2048' })).toBe('2048x2048')
+    expect(resolveOpenAIImageSize({ model: 'gpt-image-2.5-sunburst', size: '2048x1152' })).toBe('2048x1152')
+  })
+
+  it('never sends input_fidelity with a 2.5 model', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse())
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await editOpenAIImage({
+      prompt: 'Change only the background colour, keep everything else the same.',
+      image: { bytes: new Uint8Array([1, 2, 3]), filename: 'anchor.png', mimeType: 'image/png' },
+      model: 'gpt-image-2.5-sunburst',
+      inputFidelity: 'high'
+    })
+
+    const [, request] = fetchMock.mock.calls[0] as [string, RequestInit]
+    const body = request.body as FormData
+
+    expect(body.get('model')).toBe('gpt-image-2.5-sunburst')
+    expect(body.get('input_fidelity')).toBeNull()
+  })
+
+  it('still sends input_fidelity for the earlier models that document it', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse())
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await editOpenAIImage({
+      prompt: 'Keep the subject identical.',
+      image: { bytes: new Uint8Array([1, 2, 3]), filename: 'anchor.png', mimeType: 'image/png' },
+      model: 'gpt-image-1.5',
+      inputFidelity: 'high'
+    })
+
+    const [, request] = fetchMock.mock.calls[0] as [string, RequestInit]
+
+    expect((request.body as FormData).get('input_fidelity')).toBe('high')
+  })
+
+  it.each(['xhigh', 'max'] as const)('rejects quality %s on a pre-2.5 model before any network call', async quality => {
+    const fetchMock = vi.fn()
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(
+      generateOpenAIImage({ prompt: 'An icon.', model: 'gpt-image-2', quality })
+    ).rejects.toThrow(/only exists on the GPT Image 2.5 family/)
+
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it.each(['xhigh', 'max'] as const)('accepts quality %s on the 2.5 family', async quality => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse())
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await generateOpenAIImage({ prompt: 'An icon.', model: 'gpt-image-2.5-flare', quality })
+
+    const [, request] = fetchMock.mock.calls[0] as [string, RequestInit]
+
+    expect(JSON.parse(String(request.body))).toMatchObject({ model: 'gpt-image-2.5-flare', quality })
+  })
+
+  it('leaves the gpt-image-2 request body byte-for-byte unchanged by this task', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse())
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await generateOpenAIImage({
+      prompt: 'A reusable icon.',
+      model: 'gpt-image-2',
+      aspectRatio: '16:9',
+      quality: 'high',
+      format: 'png'
+    })
+
+    const [url, request] = fetchMock.mock.calls[0] as [string, RequestInit]
+
+    expect(url).toBe('https://api.openai.com/v1/images/generations')
+    expect(JSON.parse(String(request.body))).toEqual({
+      model: 'gpt-image-2',
+      prompt: 'A reusable icon.',
+      n: 1,
+      size: '2048x1152',
+      quality: 'high',
+      output_format: 'png'
+    })
   })
 })

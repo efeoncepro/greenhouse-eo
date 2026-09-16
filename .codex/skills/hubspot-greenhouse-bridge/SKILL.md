@@ -11,7 +11,7 @@ Operate the Cloud Run service that bridges HubSpot CRM writes/webhooks ↔ `gree
 
 | System                                                                                      | Lives in                                                                                          | Canonical authority                                                                                                                                 |
 | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **HubSpot portal app** (v2025.2): OAuth scopes, webhook URL config, private app tokens      | `cesargrowth11/hubspot-bigquery/hsproject.json` + `src/app/` (sibling, **NOT moved** by TASK-574) | HubSpot Developer Platform                                                                                                                          |
+| **HubSpot portal app** (project-based; target platform `2026.09`): OAuth scopes, webhook URL config, private app tokens | `cesargrowth11/hubspot-bigquery/hsproject.json` + `src/app/` (sibling, **NOT moved** by TASK-574) | HubSpot Developer Platform |
 | **HubSpot → BigQuery CRM sync** (Cloud Function `hubspot-bq-sync`, `main.py`)               | `cesargrowth11/hubspot-bigquery/main.py` + `deploy.sh` (sibling, **NOT moved**)                   | GCP Cloud Function + BigQuery `hubspot_crm.*`                                                                                                       |
 | **HubSpot write bridge + webhooks** (Cloud Run `hubspot-greenhouse-integration`, 23 routes) | `greenhouse-eo/services/hubspot_greenhouse_integration/`                                          | **this skill** owns this system                                                                                                                     |
 | **Greenhouse runtime** (Next.js on Vercel)                                                  | `greenhouse-eo/src/**`                                                                            | `src/lib/integrations/hubspot-greenhouse-service.ts` is the canonical client                                                                        |
@@ -20,6 +20,95 @@ Operate the Cloud Run service that bridges HubSpot CRM writes/webhooks ↔ `gree
 | **Kortex HubSpot CMS / Content Hub operations**                                             | `greenhouse-eo/docs/architecture/kortex/hubspot-cms/` + Kortex control plane                      | Kortex OAuth runtime + HubSpot Developer Platform; this skill only cross-links                                                                      |
 
 Confusing ownership is the #1 bug source. Always ask: "which system above owns this change?" before touching code or config.
+
+## HubSpot Developer Platform 2026.09 (verified 2026-09-16)
+
+Developer Platform Projects version `2026.09` is generally available with an 18-month support window. Set
+`platformVersion: "2026.09"` in a project configuration to opt into the platform release. **GA availability is
+not portal entitlement**: every proposed integration must still verify the target portal's hub/tier, feature
+enrollment, user role and object/field permissions, app distribution/allowlist policy, granted scopes, and live
+API response before calling a capability available. Do not infer access from the Developer Platform release or
+from documentation alone.
+
+### Authentication and app selection
+
+- **User-level apps (GA):** opt in with `isUserLevel: true`. OAuth access is evaluated for the acting user at
+  runtime, as the intersection of app grants and that user's object, field, role and action permissions. A user
+  who cannot perform a write in HubSpot cannot perform it through the integration. Use this model when attribution
+  and per-user least privilege matter; it does not widen the portal's entitlements.
+- **Service Keys (public beta):** the preferred replacement for new account-level, system-to-system REST API
+  integrations that do not need OAuth, webhooks, UI extensions, MCP or other platform features. They are scoped
+  to object permissions, can be logged and rotated, and creation/management requires Super Admin or Developer
+  tools access. A key cannot authenticate HubSpot webhooks or invoke UI-extension functionality. Treat beta
+  behavior and limits as changeable; do not replace the bridge's webhook-capable app with a Service Key by
+  inference.
+- **Project-based apps:** remain the route for OAuth, webhooks, UI extensions, Marketplace/multi-portal
+  distribution and other app capabilities. Keep the bridge's existing secret and webhook ownership explicit
+  until a separately approved migration proves parity.
+- **Connected Apps ownership and audit:** the portal now assigns an owner (initially the installer), allows
+  permitted admins to reassign it, warns when an owner/installer/authenticated user is deactivated, and exposes
+  Activity, Events/Records and Automation insights. Review owner, install/authentication status, permission
+  events, ownership changes and record-level activity before diagnosing a broken integration. Ownership or audit
+  visibility is not authorization to change data.
+
+### MCP configuration, writes and reauthentication
+
+The remote HubSpot MCP server is GA and uses MCP Auth Apps plus OAuth 2.1, PKCE and rotating refresh tokens.
+MCP permissions are not a blanket grant: available tools and the permissions selected by the user at install,
+combined with that user's live HubSpot permissions, determine access. The server supports reads and writes for
+selected CRM records and activities; its 2026.09 configuration layer can also manage custom properties and
+pipeline/stage configuration. Those writes are attributed in HubSpot's Audit Log and remain subject to the
+acting user's permissions and portal controls.
+
+Treat MCP write access as a separate approval-gated lane. Before any mutation, use `propose → confirm → write →
+readback`; confirm the exact target, intended fields, user authority, portal entitlement, app/connector approval,
+and least-privilege write permission. Never interpret the presence of an MCP tool as permission to create,
+update, publish, delete, or reconfigure HubSpot data.
+
+After HubSpot adds tools, objects, configuration scopes or other permissions, an existing connection may require
+reconnection/reinstallation and can surface `REQUIRES_REAUTHORIZATION`. Reauthenticate only after reviewing the
+new permission set and obtaining the required approval; then verify availability with the MCP user-details/read
+path before attempting a write. Preserve PKCE, refresh-token rotation and redirect-URL checks. Sensitive Data
+settings can further restrict MCP access even when the API or tool is documented as available.
+
+### API availability that can affect this bridge
+
+The following 2026.09 surfaces are GA or materially expanded and may be relevant to future bridge work, but none
+is automatically part of the bridge contract:
+
+- Conversations API: Inbox/Help Desk threads, messages, assignments, statuses and webhooks, with
+  `conversations.read`/`conversations.write`.
+- Price Books, Payment Links, Payments Account Read, Pipeline Rules, Object Tags, Task Series and Forecasts
+  APIs; each retains its own product-tier and scope requirements, and write-capable surfaces remain approval
+  gated.
+- Notetaker Conversation Recap, Teams and User/seat-management APIs; the latter includes seat reads and billing
+  writes with separate permissions.
+- Expanded Sequences CRUD and Email Templates; both require user-level authorization for their full behavior.
+  Datasource Ingestion and File Manager sensitive-file download are also available for eligible private apps and
+  scopes, but are not bridge capabilities by default.
+
+New public betas in 2026.09 include Lead Scoring, Contracts, AEO, Marketing Forms, Automation Workflows,
+Scheduler, Subscriptions Lifecycle, and Activity Auto Associations APIs, plus UI-extension App Actions. A beta
+must be treated as opt-in, portal- and scope-dependent, and non-contractual until separately evaluated; do not
+use it to justify a production write or an entitlement claim.
+
+### Legacy migration deadline
+
+Plan migration now. Numbered API versions `/v1/`, `/v2/` and `/v3/` become unsupported with enforcement in
+September 2027; v4 has a separate end-of-support date of 2027-03-30. Migrate directly to date-based APIs, not
+through v3/v4 as an intermediate step, and validate response-shape changes at runtime. Legacy public apps
+created before 2026-06-23 and pre-Projects legacy private apps also require migration to Projects-based apps by
+September 2027. New legacy private-app creation is disabled for new accounts on 2026-09-28 and existing accounts
+on 2026-10-26. Existing legacy apps continue to work for now, but are unsupported-risk and cannot be treated as
+the forward path. Check HubSpot Developer Home's runtime API-usage task card and Connected Apps rather than
+searching source code only; Marketplace certification and delisting requirements apply independently to API
+version and app architecture.
+
+Primary references: [2026.09 Developer Platform and API rollup](https://developers.hubspot.com/changelog/fall-2026-spotlight),
+[MCP server](https://developers.hubspot.com/docs/apps/developer-platform/build-apps/integrate-with-the-remote-hubspot-mcp-server),
+[Service Keys](https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/account-service-keys),
+[legacy API/app migration](https://developers.hubspot.com/changelog/legacy-apis-and-legacy-apps-whats-going-unsupported-and-when),
+and [CRM write-validation enforcement](https://developers.hubspot.com/changelog/crm-api-write-validation-enforcement).
 
 ## Registro operativo general de negocios
 

@@ -22,6 +22,17 @@ USD 162k vs USD 189k a 3 años = **solo 17%**. El resto son implementación + 1 
 **Si el prospecto ya tiene admin de Salesforce en planilla y no lo va a despedir, medio argumento se cae.**
 **Pregúntalo en discovery, no lo descubras en la propuesta.**
 
+### La liga correcta: solapamiento, no equivalencia
+
+HubSpot y Salesforce todavía compiten en el mid-market alto, en proyectos de agentes y en arquitecturas híbridas,
+pero su centro de gravedad es distinto. HubSpot-first es la hipótesis inicial para crecimiento B2B, equipos que
+priorizan adopción/time-to-value y una operación GTM integrada. Salesforce-first gana peso con una org instalada,
+procesos enterprise multi-equipo, service complejo, gobierno granular, extensibilidad profunda o un ecosistema de
+integración mayor. Es una posición de Efeonce, no una afirmación de que exista una frontera rígida de mercado.
+
+La salida de discovery siempre puede ser `HubSpot-first`, `Salesforce-first`, `híbrida` o `no-fit`. Nunca uses esta
+distinción para evitar comparar el problema real, el TCO, la capacidad del equipo o el contrato vigente.
+
 ---
 
 ## 1. Tabla maestra — TCO 3 años

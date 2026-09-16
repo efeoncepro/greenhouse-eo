@@ -1,0 +1,344 @@
+{
+  "task": "TASK-1851",
+  "purpose": "Consumo real de tokens de la familia GPT Image 2.5, medido con `usage` de respuestas reales.",
+  "measuredAt": "2026-09-16",
+  "disclaimer": "EVIDENCIA FECHADA, NO CONTRATO. OpenAI declara que la calculadora de GPT Image 2 no estima el consumo de 2.5 y que tarifas por token iguales no implican costo por imagen igual. Estas cifras se releen antes de presupuestar; no se convierten en tarifa estable ni entran a una propuesta comercial sin revalidar.",
+  "rates": {
+    "imageInPerMillionUsd": 8.0,
+    "textInPerMillionUsd": 5.0,
+    "outputImagePerMillionUsd": 30.0,
+    "ratesObservedAt": "2026-09-16",
+    "note": "Corregido 2026-09-16: la primera versión derivó los USD aplicando 8,00/1M a los tokens de TEXTO de entrada. 8,00 es la tarifa de IMAGEN de entrada; la de texto es 5,00. El consumo medido (tokens) nunca cambió: sólo la derivación a dinero."
+  },
+  "authorizedScope": "7 piezas, tope fijado por el operador en piezas (no en USD, porque el costo por imagen no es estimable de antemano). Corrida en serie, escalón por escalón.",
+  "findings": [
+    "El consumo por imagen es IDÉNTICO entre gpt-image-2.5-flare y gpt-image-2.5-sunburst para el mismo quality y size: 196 / 1756 / 7024 tokens de output en low / high / max a 1024x1024. El costo lo fija el quality, no el modelo.",
+    "Lo que separa a los dos modelos es la latencia, y la brecha crece con el quality: high 18,7s (flare) vs 29,1s (sunburst); max 46,0s (flare) vs 80,6s (sunburst), 1,75x. Coincide con el posicionamiento de OpenAI (flare = el más rápido) y lo cuantifica.",
+    "background: transparent no tuvo costo adicional: mismos 1756 tokens de output que high opaco. Alfa verificada desde los bytes decodificados (canal alfa presente y píxel no opaco), no por metadata.",
+    "El API resolvió exactamente el quality, size y background pedidos en las 7 corridas: ninguna degradó en silencio.",
+    "La escalera de costo a 1024x1024 es ~9x de low a high y ~4x de high a max (36x de punta a punta)."
+  ],
+  "runs": [
+    {
+      "caseId": "flare-low",
+      "requested": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "low",
+        "size": "1024x1024",
+        "background": null
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "low",
+        "size": "1024x1024",
+        "background": "opaque"
+      },
+      "usage": {
+        "input_tokens": 49,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 49
+        },
+        "output_tokens": 196,
+        "output_tokens_details": {
+          "image_tokens": 196,
+          "text_tokens": 0
+        },
+        "total_tokens": 245
+      },
+      "derivedCostUsd": 0.006125,
+      "latencyMs": 13275,
+      "image": {
+        "bytes": 905375,
+        "width": 1024,
+        "height": 1024,
+        "channels": 3
+      },
+      "alpha": null,
+      "observedAt": "2026-09-16T01:04:22.091Z"
+    },
+    {
+      "caseId": "flare-high",
+      "requested": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "high",
+        "size": "1024x1024",
+        "background": null
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "high",
+        "size": "1024x1024",
+        "background": "opaque"
+      },
+      "usage": {
+        "input_tokens": 49,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 49
+        },
+        "output_tokens": 1756,
+        "output_tokens_details": {
+          "image_tokens": 1756,
+          "text_tokens": 0
+        },
+        "total_tokens": 1805
+      },
+      "derivedCostUsd": 0.052925,
+      "latencyMs": 18748,
+      "image": {
+        "bytes": 895298,
+        "width": 1024,
+        "height": 1024,
+        "channels": 3
+      },
+      "alpha": null,
+      "observedAt": "2026-09-16T01:04:52.284Z"
+    },
+    {
+      "caseId": "flare-max",
+      "requested": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "max",
+        "size": "1024x1024",
+        "background": null
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "max",
+        "size": "1024x1024",
+        "background": "opaque"
+      },
+      "usage": {
+        "input_tokens": 49,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 49
+        },
+        "output_tokens": 7024,
+        "output_tokens_details": {
+          "image_tokens": 7024,
+          "text_tokens": 0
+        },
+        "total_tokens": 7073
+      },
+      "derivedCostUsd": 0.210965,
+      "latencyMs": 46038,
+      "image": {
+        "bytes": 894026,
+        "width": 1024,
+        "height": 1024,
+        "channels": 3
+      },
+      "alpha": null,
+      "observedAt": "2026-09-16T01:05:43.776Z"
+    },
+    {
+      "caseId": "sunburst-low",
+      "requested": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "low",
+        "size": "1024x1024",
+        "background": null
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "low",
+        "size": "1024x1024",
+        "background": "opaque"
+      },
+      "usage": {
+        "input_tokens": 49,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 49
+        },
+        "output_tokens": 196,
+        "output_tokens_details": {
+          "image_tokens": 196,
+          "text_tokens": 0
+        },
+        "total_tokens": 245
+      },
+      "derivedCostUsd": 0.006125,
+      "latencyMs": 11608,
+      "image": {
+        "bytes": 947154,
+        "width": 1024,
+        "height": 1024,
+        "channels": 3
+      },
+      "alpha": null,
+      "observedAt": "2026-09-16T01:06:04.137Z"
+    },
+    {
+      "caseId": "sunburst-high",
+      "requested": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "high",
+        "size": "1024x1024",
+        "background": null
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "high",
+        "size": "1024x1024",
+        "background": "opaque"
+      },
+      "usage": {
+        "input_tokens": 49,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 49
+        },
+        "output_tokens": 1756,
+        "output_tokens_details": {
+          "image_tokens": 1756,
+          "text_tokens": 0
+        },
+        "total_tokens": 1805
+      },
+      "derivedCostUsd": 0.052925,
+      "latencyMs": 29071,
+      "image": {
+        "bytes": 907501,
+        "width": 1024,
+        "height": 1024,
+        "channels": 3
+      },
+      "alpha": null,
+      "observedAt": "2026-09-16T01:06:33.208Z"
+    },
+    {
+      "caseId": "sunburst-max",
+      "requested": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "max",
+        "size": "1024x1024",
+        "background": null
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "max",
+        "size": "1024x1024",
+        "background": "opaque"
+      },
+      "usage": {
+        "input_tokens": 49,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 49
+        },
+        "output_tokens": 7024,
+        "output_tokens_details": {
+          "image_tokens": 7024,
+          "text_tokens": 0
+        },
+        "total_tokens": 7073
+      },
+      "derivedCostUsd": 0.210965,
+      "latencyMs": 80569,
+      "image": {
+        "bytes": 951823,
+        "width": 1024,
+        "height": 1024,
+        "channels": 3
+      },
+      "alpha": null,
+      "observedAt": "2026-09-16T01:07:53.778Z"
+    },
+    {
+      "caseId": "flare-transparent",
+      "requested": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "high",
+        "size": "1024x1024",
+        "background": "transparent"
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "high",
+        "size": "1024x1024",
+        "background": "transparent"
+      },
+      "usage": {
+        "input_tokens": 52,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 52
+        },
+        "output_tokens": 1756,
+        "output_tokens_details": {
+          "image_tokens": 1756,
+          "text_tokens": 0
+        },
+        "total_tokens": 1808
+      },
+      "derivedCostUsd": 0.05294,
+      "latencyMs": 21022,
+      "image": {
+        "bytes": 976966,
+        "width": 1024,
+        "height": 1024,
+        "channels": 4
+      },
+      "alpha": {
+        "hasAlphaChannel": true,
+        "hasNonOpaquePixel": true
+      },
+      "observedAt": "2026-09-16T01:08:14.801Z"
+    }
+  ],
+  "totals": {
+    "pieces": 7,
+    "derivedCostUsd": 0.593
+  },
+  "editBaseline": {
+    "measuredAt": "2026-09-16",
+    "purpose": "Qué cuesta editar (con y sin máscara) frente a generar, medido con usage real.",
+    "model": "gpt-image-2.5-flare",
+    "quality": "low",
+    "size": "1024x1024",
+    "runs": [
+      {
+        "case": "generate",
+        "inputTokens": 37,
+        "imageTokens": 0,
+        "textTokens": 37,
+        "outputTokens": 196,
+        "totalTokens": 233,
+        "derivedCostUsd": 0.006065
+      },
+      {
+        "case": "edit-with-mask",
+        "inputTokens": 1056,
+        "imageTokens": 1024,
+        "textTokens": 32,
+        "outputTokens": 196,
+        "totalTokens": 1252,
+        "derivedCostUsd": 0.014232
+      },
+      {
+        "case": "edit-without-mask",
+        "inputTokens": 1056,
+        "imageTokens": 1024,
+        "textTokens": 32,
+        "outputTokens": 196,
+        "totalTokens": 1252,
+        "derivedCostUsd": 0.014232
+      }
+    ],
+    "findings": [
+      "Editar NO abarata: el output se cobra idéntico a una generación (196 tokens en low), porque el modelo devuelve la imagen COMPLETA aunque la máscara acote qué cambia.",
+      "El edit SUMA la imagen base como tokens de entrada: 1024 image tokens por una imagen de 1024x1024. En low el edit costó 2,3x una generación equivalente.",
+      "La máscara NO suma tokens: el edit con máscara y sin máscara midieron exactamente lo mismo (1056 in / 196 out). La máscara es gratis; lo que se paga es la imagen base.",
+      "El sobrecosto relativo cae al subir la calidad, porque el output domina: en low el edit es ~2,3x una generación; en high ~1,15x; en max ~1,04x (derivado de la tabla de output del canary).",
+      "Verificación visual: el inpainting funcionó y preservó el resto (diferencia media fuera de la zona 2,4/255 con máscara y 2,8/255 sin ella). La diferencia media NO sirve para juzgar un objeto pequeño: con la taza puesta, el promedio dentro de la zona fue apenas 4,3/255 — hubo que mirar la imagen."
+    ],
+    "rates": {
+      "imageInPerMillionUsd": 8.0,
+      "textInPerMillionUsd": 5.0,
+      "outputImagePerMillionUsd": 30.0
+    }
+  }
+}

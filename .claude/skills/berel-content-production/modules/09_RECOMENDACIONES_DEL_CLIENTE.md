@@ -48,7 +48,7 @@ resuelvas en silencio a favor del documento más viejo.
 - 🔴 **Formato de color: familia + color + código.** *el rosa Pitaya 2-3605D*, *el gris Comal
   4-2103T*. **No mezclar formas:** evitar la familia genérica con el nombre entre paréntesis
   ("los tonos terracota (Huarache)").
-- **Color del Año Berel:** **2026 = Pitaya 2-3605D** · **2025 = Maíz 2-1403T**. Al recomendarlos,
+- **Color del Año Berel:** **2027 = Bien y de Buenas 1-3404D** · **2026 = Pitaya 2-3605D** · **2025 = Maíz 2-1403T**. Al recomendarlos,
   destacar **en voz de marca** que es *nuestro* Color del Año.
 - **Paletas y cuerpo evergreen — regla actualizada el 2026-09-07:** no mencionar meses, vigencia,
   trimestre ni etiquetas como `última paleta de temporada`, `paleta vigente` o `temporada actual`.
@@ -90,6 +90,24 @@ resuelvas en silencio a favor del documento más viejo.
 
 **Rige la petición del cliente** (es posterior y explícita): sin series en el cuerpo. La guía de voz
 quedó desactualizada en ese punto y hay que corregirla en Notion.
+
+### Colores de Temporada 2027 — confirmado el 2026-09-16
+
+Fuente: presentación *Paletas de Color Berel 2027* (Wiki de Berel › `🌈 Color del año 2027`,
+`3d539c2fefe7800188f6f47d30979372`). **Al lanzar se presentan las cuatro paletas completas: aprobado por Berel**
+(palabra del operador). Esa decisión reemplaza la regla anterior de no desarrollar paletas antes de su trimestre;
+los artículos de cada paleta conservan su propio calendario y profundidad.
+
+| Paleta | Temporada | Expertos | Colores (además de Bien y de Buenas 1-3404D) |
+|---|---|---|---|
+| Raíces de la piel | oct–dic 2026 | Gabriela Guajardo, fotógrafa · Armando Martínez, arquitecto | Coyotito 301N · Agradecimiento 4-0309D · Bella Venus 1-0609D · Sendero al Río 1-1102P · Ruiseñor 1-2902P |
+| Umbral Vivo | ene–mar 2027 | Indira Sánchez, educación y arte · Juan Rubio, líder de marketing | Ximena 1-3505D · Ultravioleta 3-3703T · Conciencia 1-3301P · Paradisíaco 3-2002P · Fusión 4-1104D |
+| Algarabía Folclórica | abr–jun 2027 | Selene Velázquez, arquitecta · Angélica Rubio, diseñadora gráfica | Esquite 2-0904T · Violeta Armoniosa 434N · Labios de Menta 422N · Calabaza en Tacha 2-1705D · Cardenal 335N |
+| Esencia del mañana | jul–sep 2027 | Alejandro Guerrero “Chanate”, muralista · Andrés Lhima, diseño industrial | Me lo Dijo un Pajarito 2-0502P · Tallo Seco 1-0908T · Vientos de Cambio 4-1503T · Salsa Martajada 4-0704D · Conejo Pardo 4-2204T |
+
+El Canva trae erratas en los textos de inspiración: se usan para el concepto, nunca literales. No trae roles
+cromáticos, combinaciones, productos, acabados ni bios; no se infieren. «Experto» es el crédito que declara el
+material: no convertirlo en «en colaboración con» sin confirmación.
 
 ## Redacción y estructura de borradores
 

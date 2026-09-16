@@ -2,8 +2,8 @@
   "$comment": "GENERADO por pnpm mcp:manifest:generate (TASK-1780). NO editar a mano: el hash y el gate de Greenhouse lo detectan. Greenhouse declara que EXISTE; el gateway decide que CRUZA.",
   "source": "greenhouse-eo/src/mcp/greenhouse/tool-manifest.ts",
   "generator": "pnpm mcp:manifest:generate",
-  "manifestHash": "4089283477991d676a30c4123e1c5c55e54f392d1c530d38d425a64555d525ac",
-  "toolCount": 51,
+  "manifestHash": "44680f1d3543bda8bf03eac68bf00f17fa09fee24f01a238a893c785fa0eba5f",
+  "toolCount": 55,
   "tools": [
     {
       "name": "preview_client_service_enablement",
@@ -693,8 +693,8 @@
       "inputKeys": [
         "organizationId"
       ],
-      "description": "Read what Efeonce Insights can produce for an organization: which modules (seo, aeo, ico) are available and why not when they are not, allowed outputs (deck_pdf, report_pdf, web), audiences, depths, locales and window limits. Call this BEFORE create_insight_edition to build a valid request. renderableOutputs is empty until durable rendering (TASK-1846) is connected: editions can be created and reviewed, but not issued. Requires the organization to have the insights_v1 module assigned; otherwise the resource is not found.",
-      "descriptionHash": "82089f952762578e4cacc4165a02aa46dc223901296eb87e71f1df1b96fb6b2d"
+      "description": "Read what Efeonce Insights can produce for an organization: which modules (seo, aeo, ico) are available and why not when they are not, allowed outputs (deck_pdf, report_pdf, web), audiences, depths, locales and window limits. Call this BEFORE create_insight_edition to build a valid request. renderableOutputs lists what the render engine can produce today (deck_pdf; the A4 report and the web model arrive later): an edition can be issued only after every requested output has been rendered and validated. Requires the organization to have the insights_v1 module assigned; otherwise the resource is not found.",
+      "descriptionHash": "2e0663ec8897ae7c2031c8440b83f54b8b8848d67826d5e21c5faeebf324a0c6"
     },
     {
       "name": "list_insight_editions",
@@ -738,6 +738,59 @@
       ],
       "description": "Create an Efeonce Insights edition for an organization and run its generation (collect evidence from the SEO/AEO/ICO owners for the requested window, seal the snapshot, author and freeze the editorial plan, validate figures) up to ready_for_review. THIS WRITES (no provider spend: readers only, never a billable refresh). Only internal bindings may call it; org-scoped bindings are read-only. It does NOT issue: issuing is a separate human decision with its own capability and requires validated outputs (TASK-1846), and it does NOT render. Pass a request with modules (subset of the catalog), period {start, endExclusive, timeZone}, comparison {kind: none|previous_period|previous_year|custom}, audience (client|internal), outputs, locale, depth and an idempotencyKey (8-200 chars): the same key with the same request returns the same edition; the same key with a different request is a 409 conflict. Read generation.outcome: failed editions keep their failedPhase and are recoverable; a module with no evidence blocks readiness unless policy.allowPartial is explicitly true. Ask get_insights_catalog first and propose the exact request to the human before calling.",
       "descriptionHash": "4dde0b5994c9606abf9995d510375233d2e65fb991489c429f73b2b335498584"
+    },
+    {
+      "name": "request_insight_render",
+      "domain": "insights",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Encola el render de los outputs de una edición en ready_for_review (hoy deck_pdf); asíncrono, no espera a Chromium.",
+      "inputKeys": [
+        "editionId",
+        "organizationId",
+        "outputs"
+      ],
+      "description": "Queue the durable rendering of an Efeonce Insights edition that is in ready_for_review. THIS WRITES (no provider spend). Only internal bindings may call it. Pass editionId and optionally outputs (a subset of the edition outputs; today only deck_pdf is renderable — report_pdf and web are rejected with render_rejected, never queued for later). Returns 202 with the run and one output per target in state queued; the same request on a live run returns it again with idempotent=true and status 200. Rendering happens in a worker: poll get_insight_render_run. A service_unavailable with code render_disabled means rendering is off in this runtime — report it and stop.",
+      "descriptionHash": "7548bbd3fec7fdbcbeb1a9de6164249ee442d2eeb7eabcf320d26fe3d0f5a2b8"
+    },
+    {
+      "name": "get_insight_render_run",
+      "domain": "insights",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Estado de un run de render y de cada output (queued/running/completed/failed/dead_letter/cancelled) con su asset id.",
+      "inputKeys": [
+        "organizationId",
+        "renderRunId"
+      ],
+      "description": "Read one render run of an Efeonce Insights edition: run state (pending, running, completed, partial_failed, failed, cancelled) and every output with its own state (queued, running, completed, failed, dead_letter, cancelled), attempts, failureCode and outputAssetId when completed. partial_failed means at least one output succeeded and another did not: report both, never collapse them. The asset id is not a download link; sharing and delivery are separate governed steps.",
+      "descriptionHash": "03162f26e33845d68934c8ffb32ff90a3dc3dda689187fe8101602f266f46267"
+    },
+    {
+      "name": "retry_insight_render",
+      "domain": "insights",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Re-encola SÓLO los outputs fallidos de un run; los completados no se repiten ni se duplican.",
+      "inputKeys": [
+        "organizationId",
+        "renderRunId"
+      ],
+      "description": "Re-queue ONLY the failed outputs of a render run. THIS WRITES. Completed outputs are never re-rendered nor duplicated; dead_letter outputs (attempts exhausted or a non-retryable failure such as manifest_drift) are not retried by this tool — they need a human decision. Only internal bindings may call it. Returns idempotent=true when nothing was failed.",
+      "descriptionHash": "db188350075a161853ba97fa72adc7434db30075ae47ac67881e0225ea01fa22"
+    },
+    {
+      "name": "cancel_insight_render",
+      "domain": "insights",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Cancela el trabajo pendiente de un run; lo que ya está renderizando termina solo y se reporta honesto.",
+      "inputKeys": [
+        "organizationId",
+        "renderRunId"
+      ],
+      "description": "Cancel the pending work of a render run. THIS WRITES. Queued and failed outputs become cancelled; an output that is already rendering cannot be killed and keeps running until it finishes — the response reports cancelled and stillRunning separately, and the run is not marked cancelled while something still runs. Only internal bindings may call it.",
+      "descriptionHash": "3d5bd5f8e4e2f7d50a1d7929ffd662f316a6e981630506d5b9fb3c3903cb0e70"
     }
   ]
 }

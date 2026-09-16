@@ -88,6 +88,14 @@ const CANONICAL_WORKER_SERVICES = [
 
 const CANONICAL_HUBSPOT_INTEGRATION_SERVICE = 'hubspot-greenhouse-integration'
 
+/**
+ * TASK-1846 — Cloud Run JOB. No tiene revisiones ni tráfico: rollback = re-apuntar la imagen al SHA
+ * previo (la imagen se etiqueta por SHA en deploy.sh) y re-etiquetar `git-sha` para que el watchdog
+ * compare contra lo que de verdad corre. Las env vars del Job no cambian con `jobs update --image`.
+ */
+const CANONICAL_ARTIFACT_WORKER_JOB = 'artifact-worker'
+const ARTIFACT_WORKER_IMAGE_REPO = 'us-east4-docker.pkg.dev/efeonce-group/cloud-run-source-deploy/artifact-worker'
+
 const GCP_PROJECT_ID = 'efeonce-group'
 const GCP_REGION_DEFAULT = 'us-east4'
 const GCP_REGION_HUBSPOT = 'us-central1' // bridge corre en us-central1 (CLAUDE.md)
@@ -161,7 +169,8 @@ const loadRollbackPlan = async (
   console.log('  4. Exportar PREV_COMMERCIAL_COST_WORKER_REVISION=<from JSONB>')
   console.log('  5. Exportar PREV_ICO_BATCH_WORKER_REVISION=<from JSONB>')
   console.log('  6. Exportar PREV_HUBSPOT_INTEGRATION_REVISION=<from JSONB>')
-  console.log('  7. Re-correr este script')
+  console.log('  7. Exportar PREV_ARTIFACT_WORKER_SHA=<git-sha de 40 chars servido antes del release> (Cloud Run Job)')
+  console.log('  8. Re-correr este script')
   console.log('')
 
   const vercelTargetUrl = process.env.PREV_VERCEL_URL ?? null
@@ -181,6 +190,10 @@ const loadRollbackPlan = async (
 
   if (process.env.PREV_HUBSPOT_INTEGRATION_REVISION) {
     workerRevisions[CANONICAL_HUBSPOT_INTEGRATION_SERVICE] = process.env.PREV_HUBSPOT_INTEGRATION_REVISION
+  }
+
+  if (process.env.PREV_ARTIFACT_WORKER_SHA) {
+    workerRevisions[CANONICAL_ARTIFACT_WORKER_JOB] = process.env.PREV_ARTIFACT_WORKER_SHA
   }
 
   return {
@@ -266,6 +279,43 @@ const rollbackCloudRunService = async (
   }
 }
 
+const rollbackCloudRunJob = async (
+  jobName: string,
+  targetSha: string,
+  region: string,
+  plan: RollbackPlan
+): Promise<RollbackResult> => {
+  if (!/^[0-9a-f]{40}$/.test(targetSha)) {
+    return {
+      step: 'cloud-run-worker',
+      status: 'failed',
+      detail: `PREV_ARTIFACT_WORKER_SHA debe ser un SHA de 40 caracteres hex (recibido: ${targetSha})`
+    }
+  }
+
+  const cmd = `gcloud run jobs update ${jobName} --project=${GCP_PROJECT_ID} --region=${region} --image=${ARTIFACT_WORKER_IMAGE_REPO}:${targetSha} --update-labels=git-sha=${targetSha}`
+
+  if (plan.dryRun) {
+    return { step: 'cloud-run-worker', status: 'dry-run', detail: cmd }
+  }
+
+  try {
+    execSync(cmd, { stdio: 'inherit' })
+
+    return {
+      step: 'cloud-run-worker',
+      status: 'success',
+      detail: `Cloud Run job ${jobName} image -> ${targetSha}`
+    }
+  } catch (error) {
+    return {
+      step: 'cloud-run-worker',
+      status: 'failed',
+      detail: `Cloud Run job ${jobName} image rollback fallo: ${String(error)}`
+    }
+  }
+}
+
 const rollbackWorkers = async (plan: RollbackPlan): Promise<RollbackResult[]> => {
   if (plan.skipWorkers) {
     return [
@@ -293,6 +343,14 @@ const rollbackWorkers = async (plan: RollbackPlan): Promise<RollbackResult[]> =>
 
     results.push(await rollbackCloudRunService(worker, targetRevision, GCP_REGION_DEFAULT, plan))
   }
+
+  const artifactWorkerSha = plan.workerRevisions[CANONICAL_ARTIFACT_WORKER_JOB]
+
+  results.push(
+    artifactWorkerSha
+      ? await rollbackCloudRunJob(CANONICAL_ARTIFACT_WORKER_JOB, artifactWorkerSha, GCP_REGION_DEFAULT, plan)
+      : { step: 'cloud-run-worker', status: 'skipped', detail: 'Sin PREV_ARTIFACT_WORKER_SHA — sin target declarado' }
+  )
 
   return results
 }

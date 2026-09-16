@@ -428,6 +428,35 @@ export const GREENHOUSE_MCP_TOOL_MANIFEST: readonly GreenhouseMcpToolManifestEnt
     writes: true,
     spendsProviderBudget: false,
     purpose: 'Crea una edición (reporte + encargo) y corre la generación por fases; no emite ni renderiza.'
+  },
+  // ── Efeonce Insights (TASK-1846) — render durable: encargo asíncrono de outputs sobre el Artifact Worker ──
+  {
+    name: 'request_insight_render',
+    domain: 'insights',
+    writes: true,
+    spendsProviderBudget: false,
+    purpose: 'Encola el render de los outputs de una edición en ready_for_review (hoy deck_pdf); asíncrono, no espera a Chromium.'
+  },
+  {
+    name: 'get_insight_render_run',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Estado de un run de render y de cada output (queued/running/completed/failed/dead_letter/cancelled) con su asset id.'
+  },
+  {
+    name: 'retry_insight_render',
+    domain: 'insights',
+    writes: true,
+    spendsProviderBudget: false,
+    purpose: 'Re-encola SÓLO los outputs fallidos de un run; los completados no se repiten ni se duplican.'
+  },
+  {
+    name: 'cancel_insight_render',
+    domain: 'insights',
+    writes: true,
+    spendsProviderBudget: false,
+    purpose: 'Cancela el trabajo pendiente de un run; lo que ya está renderizando termina solo y se reporta honesto.'
   }
 ] as const
 

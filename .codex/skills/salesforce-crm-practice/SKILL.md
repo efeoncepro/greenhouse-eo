@@ -18,6 +18,14 @@ Incluye Sales Cloud, Agentforce Service —también documentado históricamente 
 
 Excluye Marketing Cloud Engagement, Marketing Cloud Next, Account Engagement y la operación de campañas o journeys. Para decidir el límite exacto, lee [references/product-boundaries.md](references/product-boundaries.md).
 
+## Provider-fit boundary
+
+Salesforce is the first candidate for complex installed orgs, enterprise governance, multi-team or multi-country
+processes, high-scale service, deep extensibility, and broad integration estates. HubSpot remains a first-class
+candidate for growth-oriented B2B, mid-market teams, and faster time-to-value. Treat this as Efeonce positioning,
+not a rigid vendor market boundary: discovery must be able to conclude `Salesforce-first`, `HubSpot-first`,
+`híbrida` or `no-fit`, with TCO, adoption, data, governance and contract evidence.
+
 ## Reglas obligatorias
 
 1. No presentes a Efeonce como Consulting Partner vigente, reseller, especialista certificado ni poseedor de una credencial sin readback primario actual. Lee [references/partner-and-claims.md](references/partner-and-claims.md).
@@ -36,6 +44,14 @@ Lee [references/operate.md](references/operate.md). Produce evidencia del estado
 ## Modo `sell`
 
 Lee [references/sell.md](references/sell.md) y usa [templates/discovery-guide.md](templates/discovery-guide.md), [templates/fit-assessment.md](templates/fit-assessment.md) o [templates/proposal.md](templates/proposal.md) según el entregable. Recomienda Salesforce sólo cuando el problema, complejidad y capacidad de adopción lo justifican; permite una conclusión `no-fit`, HubSpot-first o híbrida.
+
+## Actualización Dreamforce 2026
+
+Para lanzamientos de septiembre de 2026, estados de disponibilidad, integraciones y límites de claim, lee
+[references/dreamforce-2026.md](references/dreamforce-2026.md). AIforce, Claudeforce, Slackforce, Koa,
+Missionforce y las alianzas AWS/Google/NVIDIA/OpenAI son superficies con estados y fechas distintos; no las trates
+como una sola licencia ni como GA universal. Koa corresponde al 15/09; AIforce y Missionforce tienen publicaciones
+del 16/09, con una diferencia de fecha visible entre páginas regionales y la newsroom USA.
 
 ## Fuentes
 

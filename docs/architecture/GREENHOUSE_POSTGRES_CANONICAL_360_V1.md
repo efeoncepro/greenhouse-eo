@@ -169,6 +169,20 @@ Domain workflows extend the canonical core from dedicated schemas instead of pus
 - `payroll_entries` — per-member calculation snapshots (compensation + KPIs + deductions)
 - `payroll_bonus_config` — global bonus qualification thresholds
 
+#### `greenhouse_insights` (Efeonce Insights, TASK-1845 — 2026-09-15)
+
+Biblioteca de entregas congeladas por organización y ventana; migración `20260915100154428_task-1845-insights-foundation.sql`. Contrato: `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` §5/§14.
+
+- `insight_retention_classes` — 3 clases, retención 1095 días
+- `insight_reports` — un reporte por (org, encargo); código público `EO-INS-` + `next_insight_report_code()` (secuencia `insight_report_code_seq`, `lpad(n, GREATEST(6, len))`, sin truncado)
+- `insight_edition_state_matrix` — 14 transiciones (paridad TS↔DB con `edition-state-machine.ts`)
+- `insight_editions` — versión por reporte; `request_json` + `request_hash`; UNIQUE parcial `(organization_id, idempotency_key)`; ventana `[start, end)` en zona IANA y UTC
+- `insight_edition_transitions` — historial append-only; el gate humano exige actor `member`/`client_user`
+- `insight_evidence_snapshots` — uno por edición; inmutable al sellar (trigger)
+- `insight_editorial_plans` — uno por edición sobre snapshot sellado; congelado con hash
+
+FK a `greenhouse_core.organizations`; triggers de inmutabilidad y no-delete; el entitlement per-ORG vive en `greenhouse_client_portal.modules` (`insights_v1`).
+
 Rule:
 - domain tables reference `greenhouse_core` anchors via FK
 - write-heavy workflows live here

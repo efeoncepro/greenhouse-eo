@@ -19,6 +19,15 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // La barra creativa no puede depender de qué agente atienda. Si Codex y Claude sostienen criterios
+    // distintos para juzgar una idea, el cliente recibe dos estándares con la misma firma — y el drift
+    // es invisible porque nadie compara dos juicios subjetivos. Va byte-identical desde su nacimiento.
+    id: 'creative-direction',
+    mode: 'byte-identical',
+    codex: '.codex/skills/creative-direction',
+    claude: '.claude/skills/creative-direction',
+  },
+  {
     // La orquestación publicitaria debe activar las mismas fuentes, gates y límites de publicación
     // en Codex y Claude. Un drift aquí vuelve a producir dos criterios de marca.
     id: 'efeonce-advertising-creative',

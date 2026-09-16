@@ -10,6 +10,13 @@ const deployScript = () =>
 const deployWorkflow = () =>
   readFileSync(resolve(process.cwd(), '.github/workflows/ops-worker-deploy.yml'), 'utf8')
 
+describe('ops-worker deploy render dispatch contract', () => {
+  it('declares INSIGHTS_RENDER_ENABLED ON: the shared dispatcher drains the Insights queue (TASK-1846)', () => {
+    // Sin el flag declarado, dispatchNextInsightRender lo ve OFF y ningún output encolado lanza el Job.
+    expect(deployScript()).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_RENDER_ENABLED=${INSIGHTS_RENDER_ENABLED:-true}"')
+  })
+})
+
 describe('ops-worker deploy Nubox contract', () => {
   it('declares Nubox env vars because deploy.sh uses destructive --set-env-vars', () => {
     const script = deployScript()

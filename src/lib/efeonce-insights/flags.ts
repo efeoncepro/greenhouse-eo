@@ -1,7 +1,8 @@
 /**
  * TASK-1845 — flags de runtime de Efeonce Insights (default OFF; fila en
  * `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`). Cada runtime declara su lectura:
- * hoy sólo Vercel (commands/API/MCP); el worker de render (TASK-1846) declarará la suya.
+ * Vercel (commands/API/MCP) y el artifact-worker (Cloud Run Job) para el render (TASK-1846):
+ * `INSIGHTS_RENDER_ENABLED` se declara en `services/artifact-worker/deploy.sh` (SoT) y en Vercel.
  * No interpretar NODE_ENV como entorno.
  */
 
@@ -15,3 +16,10 @@ export const isInsightsIssuanceEnabled = (env: NodeJS.ProcessEnv = process.env):
 
 /** Habilita la autoría IA acotada del plan editorial; OFF ⇒ fallback determinista. */
 export const isInsightsAuthoringAiEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.INSIGHTS_AUTHORING_AI_ENABLED)
+
+/**
+ * Habilita el render durable (encolar outputs y que el artifact-worker los reclame). SEPARADO de
+ * `ARTIFACT_RENDER_JOBS_ENABLED`: encender Insights jamás enciende Proposal ni al revés. Se lee en
+ * DOS runtimes — Vercel (command de encolado) y el artifact-worker (claim) — y debe estar ON en ambos.
+ */
+export const isInsightsRenderEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.INSIGHTS_RENDER_ENABLED)

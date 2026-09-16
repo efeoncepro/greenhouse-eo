@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-09-04 por Claude (release `9100bbd2765d`: 5 servicios Cloud Run con `auth-server`, dos gates `Production` y su nombre con mayúscula, change-gate `ops-worker` + `auth-server`)
+> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846: el Cloud Run Job `artifact-worker` entra al orquestador — 6 recursos Cloud Run; verificación por etiqueta `git-sha`)
 > **Documentacion tecnica:** [CLAUDE.md §Production Release Orchestrator invariants (TASK-851)](../../../CLAUDE.md), [Spec TASK-851](../../tasks/complete/TASK-851-production-release-orchestrator-workflow.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Production Release Orchestrator
@@ -30,7 +30,7 @@ separadas.
 - Si eres agente, primero carga `greenhouse-production-release` y relee el
   runbook. Muchas señales del release son comunes: no abras una investigación
   nueva para approvals, warnings del squash commit, workers lentos,
-  `no_infra_diff`, `ops-worker`/`auth-server` change-gated o runner queue final.
+  `no_infra_diff`, `ops-worker`/`auth-server`/`artifact-worker` change-gated o runner queue final.
 - Si eres agente, abre cronómetro en la primera acción de release, incluyendo
   revisar/analizar. Antes de cerrar, registra tiempos en
   `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`: agente, fecha,
@@ -66,17 +66,19 @@ El job `preflight` corre `pnpm release:preflight --json --fail-on-error` con los
 
 El job `approval-gate` queda en `waiting` hasta que un required reviewer (configurado en repo settings) la apruebe desde la UI de GitHub Actions. Timeout 3 días.
 
-Son **dos aprobaciones** del mismo environment: la primera libera los 5 servicios Cloud Run; la segunda aparece cuando esos deploys terminan y libera los jobs Azure. Aprobar una sola vez deja el release a medio camino (spec Lesson 4).
+Son **dos aprobaciones** del mismo environment: la primera libera los 6 recursos Cloud Run (5 services + el Job `artifact-worker`); la segunda aparece cuando esos deploys terminan y libera los jobs Azure. Aprobar una sola vez deja el release a medio camino (spec Lesson 4).
 
 Si apruebas por API (`gh api …/pending_deployments`), el environment se llama **`Production` con mayúscula**. Un loop que filtre `.environment.name=="production"` en minúscula no encuentra nada y espera en silencio: el 2026-09-04 el primer gate esperó 21 minutos por eso. Compara con `(.environment.name|ascii_downcase)=="production"` y deja una línea visible por iteración. (Es la convención contraria a `vercel env add`, que exige `production` en minúscula.)
 
 ### 4) Confirmar workers + Vercel ready
 
-Los jobs `deploy-{ops-worker, commercial-cost-worker, ico-batch, hubspot-integration, auth-server}` corren en paralelo via `workflow_call` (`deploy-auth-server` desde TASK-1828; primer release con los 5: `9100bbd2765d`, 2026-09-04). Cada servicio:
+Los jobs `deploy-{ops-worker, commercial-cost-worker, ico-batch, hubspot-integration, auth-server, artifact-worker}` corren en paralelo via `workflow_call` (`deploy-auth-server` desde TASK-1828; primer release con los 5: `9100bbd2765d`, 2026-09-04; `deploy-artifact-worker` desde TASK-1846, 2026-09-16, primer deploy productivo en el siguiente release). Cada servicio:
 
 1. Hace deploy via `bash services/<worker>/deploy.sh` con `EXPECTED_SHA=<target_sha>`.
 2. `deploy.sh` verifica post-deploy que `gcloud run revisions describe <latest>` matchea `GIT_SHA=EXPECTED_SHA`. Mismatch → exit 1 fail-loud.
 3. Workflow agrega step "Poll Ready=True bounded" hasta 300s.
+
+`artifact-worker` es un Cloud Run **Job**, no un service: no tiene revisiones ni tráfico. Su deploy verifica `Ready=True` y la etiqueta `metadata.labels.git-sha` del Job contra `EXPECTED_SHA` (~8 min cuando construye). Su rollback no es un traffic split: se apunta el Job a la imagen previa (`PREV_ARTIFACT_WORKER_SHA`, runbook §5).
 
 En paralelo `wait-vercel` polea Vercel API hasta encontrar deployment production con `meta.githubCommitSha === target_sha` y `state=READY`. Timeout 900s.
 
@@ -84,15 +86,15 @@ Production de workers no se despliega automaticamente por `push:main`. Los
 pushes de worker siguen sirviendo staging (`develop`); production normal vive
 en este orquestador y `workflow_dispatch` queda solo como break-glass auditado.
 
-Para mirar los 5 servicios Cloud Run de un vistazo, sin recordar regiones ni flags de `gcloud`:
+Para mirar los 6 recursos Cloud Run de un vistazo (5 services + el Job `artifact-worker`), sin recordar regiones ni flags de `gcloud`:
 
 ```bash
 pnpm release:workers --expected-sha=<target_sha>
 ```
 
-Imprime una línea por servicio con `Ready` y `GIT_SHA`, y marca los que difieren del
-SHA esperado. Un SHA distinto **no es drift por sí solo**: `ops-worker` y
-`auth-server` son change-gated y conservan el SHA del último deploy que sí tocó
+Imprime una línea por recurso con `Ready` y `GIT_SHA` (en el Job, la etiqueta `git-sha` y la última ejecución), y marca los que difieren del
+SHA esperado. Un SHA distinto **no es drift por sí solo**: `ops-worker`,
+`auth-server` y `artifact-worker` son change-gated y conservan el SHA del último deploy que sí tocó
 código del servicio cuando las rutas runtime no cambiaron (runbook §4.1.1). Lo que
 decide es el diff de árbol completo entre el SHA servido y el target; si es vacío, el
 watchdog lo muestra como `change-gated`, no como `DRIFT`.
@@ -152,7 +154,7 @@ Desde 2026-06-30 existe el slash command **`/release`** ([.claude/commands/relea
 | `/release <sha>` | Release apuntando a un SHA específico |
 | `/release rollback` | Modo rollback (decision tree severidad → `pnpm release:rollback` con dry-run primero) |
 | `/release watchdog` | Corre `pnpm release:watchdog --json` y reporta drift |
-| `/release workers` | Corre `pnpm release:workers` — estado + `GIT_SHA` de los 5 Cloud Run |
+| `/release workers` | Corre `pnpm release:workers` — estado + `GIT_SHA` de los 6 recursos Cloud Run (5 services + Job `artifact-worker`) |
 | `/release drift` | Diagnóstico de `worker_revision_drift` + re-intento del orquestador |
 | `/release break-glass <razón>` | Modo incidente (requiere tu aprobación explícita + razón + plan documentado) |
 
@@ -192,8 +194,8 @@ Codex **no usa archivos de slash command** `.md`. Sus alias slash (`/implement-t
 - Workflow: [.github/workflows/production-release.yml](../../../.github/workflows/production-release.yml)
 - CLI scripts: [scripts/release/orchestrator-record-started.ts](../../../scripts/release/orchestrator-record-started.ts), [scripts/release/orchestrator-transition-state.ts](../../../scripts/release/orchestrator-transition-state.ts)
 - Helpers: [src/lib/release/manifest-store.ts](../../../src/lib/release/manifest-store.ts), [src/lib/release/state-machine.ts](../../../src/lib/release/state-machine.ts)
-- Worker workflows: `.github/workflows/{ops-worker, commercial-cost-worker, ico-batch, hubspot-greenhouse-integration, auth-server}-deploy.yml`
-- Worker deploy.sh: `services/{ops-worker, commercial-cost-worker, ico-batch, hubspot_greenhouse_integration, auth-server}/deploy.sh`
+- Worker workflows: `.github/workflows/{ops-worker, commercial-cost-worker, ico-batch, hubspot-greenhouse-integration, auth-server, artifact-worker}-deploy.yml`
+- Worker deploy.sh: `services/{ops-worker, commercial-cost-worker, ico-batch, hubspot_greenhouse_integration, auth-server, artifact-worker}/deploy.sh`
 - CLAUDE.md sección "Production Release Orchestrator invariants (TASK-851)"
 - Doc funcional: [release-orchestrator.md](../../documentation/plataforma/release-orchestrator.md)
 - Runbook production-release: [production-release.md](../../operations/runbooks/production-release.md)

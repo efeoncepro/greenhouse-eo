@@ -1,6 +1,6 @@
 # Usar MCP interno con varias organizaciones
 
-> **Tipo:** manual de uso · **Actualización:** 2026-09-10 (TASK-1852: tools de habilitación de servicios); base TASK-1844 (2026-09-08)
+> **Tipo:** manual de uso · **Actualización:** 2026-09-15 (TASK-1845: tools de Efeonce Insights); 2026-09-10 (TASK-1852: tools de habilitación de servicios); base TASK-1844 (2026-09-08)
 > **Para:** personas internas enroladas y operadores que les dan soporte
 > **Endpoint:** `https://mcp.efeonce.org/mcp`
 > **Funcionamiento:** [Acceso MCP interno multiorganización](../../documentation/identity/acceso-mcp-interno-multiorganizacion.md)
@@ -146,6 +146,7 @@ contratar o habilitar el módulo es una decisión distinta.
 | «Needs authentication», «needs-auth», `invalid_token` o `invalid_grant` | Puede haber revocación, sesión no válida o gates apagados. Soporte confirma el servicio y el estado de autorización; después inicia login desde el cliente si corresponde. No reutilices callbacks. |
 | Error de resolución DNS, timeout o reader no disponible | Verifica conectividad y salud con soporte. Una ronda sin llamadas reales no demuestra un problema de permisos ni justifica crear credenciales nuevas. |
 | Quieres habilitar o revertir servicios de un cliente (`preview_`/`apply_`/`rollback_client_service_enablement`) | No forman parte de esta conexión: exigen un token corporativo Entra con el permiso `efeonce.mcp.client_services.write` y el permiso interno de habilitar módulos; con Efeonce ID se deniegan (`provider_delegation_required`). No amplíes scopes ni reconectes para «destrabarlas»: sigue el [runbook de habilitación de servicios](../../operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md). |
+| Quieres leer o encargar ediciones de Efeonce Insights (`get_insights_catalog`, `list_insight_editions`, `get_insight_edition`, `create_insight_edition`) | Desde el 2026-09-15 están en el gateway, pero **no responden a esta conexión** (Efeonce ID interna v2): las cuatro están marcadas como no soportadas para este emisor (`insights_native_policy_missing`), y no es un olvido. Las lecturas van con el permiso base en el carril corporativo; encargar una edición exige además `efeonce.mcp.insights.write`, que hoy no está concedido a ningún cliente (`insufficient_scope`). No amplíes scopes ni reconectes para «destrabarla»; opera por el portal o la API según el [manual de Insights](../insights/operar-efeonce-insights-api-mcp.md). |
 
 La renovación requiere familia, contexto y autoridad vigentes, y sesión no revocada. El vencimiento de la
 cookie del navegador no equivale por sí solo al retiro de una familia ya consentida.

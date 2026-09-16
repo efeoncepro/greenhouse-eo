@@ -131,7 +131,7 @@ sus gates. TASK-1718 conserva firmas y pruebas revoked/base-only/rollback como d
 | `GREENHOUSE_API_URL` | no | origin Greenhouse exacto para el command de funding |
 | `GREENHOUSE_TOKEN_EXCHANGE_URL` | no | endpoint RFC 8693 exacto y audience del ID token WIF |
 | `GREENHOUSE_VERCEL_BYPASS_SECRET` | sí | inyectado desde `greenhouse-vercel-automation-bypass` en GCP Secret Manager; nunca GitHub var/env file. Es sólo bypass de transporte para el hop interno exacto token-exchange/command; nunca identidad/autorización, discovery, respuesta MCP, cliente o provider externo. |
-| `GREENHOUSE_SEO_PROVIDER_ENABLED` | no | default `false`; `true` sólo con lane Greenhouse verde y canary aprobado. **Gobierna tres providers, no uno**: SEO, `greenhouse-skills` (manuales) y `greenhouse-identity` (invitaciones delegadas, TASK-1837) comparten interruptor, config y consumer porque son la MISMA lane ecosystem. Apagarlo por un incidente de SEO también apaga los manuales y la identidad delegada |
+| `GREENHOUSE_SEO_PROVIDER_ENABLED` | no | default `false`; `true` sólo con lane Greenhouse verde y canary aprobado. **Gobierna cuatro providers, no uno**: SEO, `greenhouse-skills` (manuales), `greenhouse-identity` (invitaciones delegadas, TASK-1837) y, desde 2026-09-15, `greenhouse-insights` (Efeonce Insights, TASK-1845) comparten interruptor, config y consumer porque son la MISMA lane ecosystem. Apagarlo por un incidente de SEO también apaga los manuales, la identidad delegada e Insights |
 | `GREENHOUSE_ECOSYSTEM_API_URL` | no | origin Greenhouse exacto del lane ecosystem; en producción `https://greenhouse.efeoncepro.com` |
 | `GREENHOUSE_ECOSYSTEM_TOKEN` | sí | inyectado desde `efeonce-mcp-gateway-greenhouse-token` en GCP Secret Manager; nunca valor plano en `vars`, workflow ni env file |
 | `GREENHOUSE_HIRING_PROVIDER_ENABLED` | no | default `false`; sólo `true` después de Greenhouse `HIRING_TALENT_POOL_SEARCH_ENABLED` + `HIRING_TALENT_POOL_MCP_ENABLED`, grant Entra y canary aprobados |
@@ -639,6 +639,58 @@ Nunca resuelvas un problema del provider ampliando el scope, quitando el entitle
   `gcloud run revisions list --service=efeonce-mcp-gateway --region=southamerica-west1 --project=efeonce-group`
   antes de necesitarla.
 
+## Provider Greenhouse-Insights (Efeonce Insights)
+
+> Task dueña: `TASK-1845` (foundation del dominio + lane ecosystem + federación). Desplegado en producción el
+> 2026-09-15 (gateway `1.5.0`, revisión `efeonce-mcp-gateway-00053-dsk`).
+
+El provider `greenhouse-insights` (`src/providers/greenhouse-insights.ts`) es un adapter delgado sobre el lane
+ecosystem `/api/platform/ecosystem/insights/**`. **No tiene interruptor, config ni secreto propios**: cabalga
+`GreenhouseSeoConfig` (mismo `GREENHOUSE_SEO_PROVIDER_ENABLED`, mismo `GREENHOUSE_ECOSYSTEM_API_URL`, mismo
+`GREENHOUSE_ECOSYSTEM_TOKEN`), como `greenhouse-skills` y `greenhouse-identity`, así que `deploy.yml` no cambió.
+Greenhouse resuelve la organización por binding (`internal` ⇒ `organizationId` obligatorio), el módulo per-org
+`insights_v1` (404 anti-oracle) y la capability; el gateway no conoce módulos, ventanas ni evidencia.
+
+Tools: `get_insights_catalog`, `list_insight_editions`, `get_insight_edition` (lecturas, scope base
+`efeonce.mcp.read`) y `create_insight_edition` (write sin gasto de proveedor, scope `efeonce.mcp.insights.write`;
+viaja como command del lane con header `idempotency-key` `insights-create-<idempotencyKey del encargo>`, así que un
+reintento del gateway por timeout no duplica la edición). El lane ecosystem no emite ni retira ediciones por diseño.
+Policy nativa: las cuatro `unsupported` (`insights_native_policy_missing`).
+
+### Canary del provider contra el lane
+
+Ejercita el provider **real** (compilado) con la service identity del gateway, sin OAuth ni front door: catálogo,
+listado, lectura de una edición (opcional) y el deny anti-oracle de una organización sin módulo. **Nunca crea
+ediciones**: el write se prueba a mano con un token humano que porte `efeonce.mcp.insights.write`. Requiere
+`pnpm build` previo.
+
+```bash
+cd ~/Documents/efeonce-mcp
+pnpm build
+GREENHOUSE_ECOSYSTEM_API_URL=https://<entorno-greenhouse> \
+GREENHOUSE_ECOSYSTEM_TOKEN=$(gcloud secrets versions access latest \
+  --secret=efeonce-mcp-gateway-greenhouse-token --project=efeonce-group) \
+GREENHOUSE_ECOSYSTEM_VERCEL_BYPASS_SECRET=<solo entornos con Deployment Protection> \
+node scripts/greenhouse-insights-canary.mjs <orgConModulo> [--deny <orgSinModulo>] [--edition <editionId>]
+```
+
+El script nunca imprime el token ni el bypass. Resultado esperado: `catalog ✓` con cada módulo `ok` o su razón
+(`module_not_assigned`, etc.) y `renderable=N`; `list ✓ editions=N`; con `--edition`, `edition ✓ status=<estado>
+facts=<n>` (evidencia sólo de ediciones que el binding puede ver); con `--deny`, `deny ✓ 404 anti-oracle`. Un
+`deny ✗ la org sin módulo respondió 200` es una regresión del lane, no del gateway. Contra staging el bypass es el
+secret system-managed de Vercel; nunca lo envíes a otro origin ni lo dejes en logs.
+
+Corrida de certificación 2026-09-15 contra staging (antes del deploy `00053-dsk`): catálogo, listado y detalle con
+evidencia verdes sobre la organización sintética con `insights_v1` asignado; deny `404` sobre una organización sin
+módulo. Después del deploy: front door 200/200/401 y `efeonce.gateway.status` listando el provider.
+
+### Rollback del provider
+
+No tiene interruptor propio: apagar `GREENHOUSE_SEO_PROVIDER_ENABLED` retira las cuatro tools junto con SEO,
+manuales e identidad delegada. Para retirar sólo Insights, revertir el PR de federación (`cad57b31d`) y redeploy
+(baja de `1.5.0` con bump de versión y baseline regenerado). En Greenhouse, `INSIGHTS_GENERATION_ENABLED=false`
+convierte la creación en `503 generation_disabled` (`policy_blocked` en el gateway) sin tocar las lecturas.
+
 ## Front door and DNS
 
 1. Aplica el módulo front door con `enable_front_door=true` después de existir Cloud Run.
@@ -889,11 +941,12 @@ Tres cosas que cuestan una sesión si no se saben:
 
 Si el proceso conserva un catálogo anterior, abrir una sesión nueva del cliente y comprobar sus eventos de herramientas. `Connected`, exit 0 o una respuesta del modelo no acreditan dispatch: verificar nombre, argumentos y Request/Response/Error reales. La ronda TASK-1844 con cero calls por DNS local no se contó como certificación. Una lista antigua puede requerir nueva consulta o proceso, sin repetir OAuth por cada organización.
 
-### Inventario del servidor — 43 tools (as-of 2026-09-10)
+### Inventario del servidor — 47 tools (as-of 2026-09-15)
 
-Cifra **medida**, no contada a mano: sale de `surface-baseline.json` en `origin/main` de `efeonce-mcp` (`5c28a7a`),
-que fotografía la superficie del servidor **construido** con todos los providers habilitados a propósito. Es el
-techo del catálogo, no lo que ve un token concreto: lo alcanzable depende del emisor, los scopes y los flags.
+Cifra **medida**, no contada a mano: sale de `surface-baseline.json` en `origin/main` de `efeonce-mcp` (`cad57b31d`,
+versión `1.5.0`), que fotografía la superficie del servidor **construido** con todos los providers habilitados a
+propósito. Es el techo del catálogo, no lo que ve un token concreto: lo alcanzable depende del emisor, los scopes y
+los flags.
 
 | Grupo | Nº | Tools |
 | --- | --- | --- |
@@ -903,6 +956,7 @@ techo del catálogo, no lo que ve un token concreto: lo alcanzable depende del e
 | Hiring | 4 | `hiring.talent_pool.search`, `hiring.talent_pool.profile.get`, `hiring.applications.review.list`, `hiring.application.review_packet.get` |
 | Identidad delegada (TASK-1837) | 2 | `identity.invitations.list`, `identity.invitation.create` (write, scope `efeonce.mcp.identity.write`) |
 | Habilitación de servicios cliente (TASK-1852) | 3 | `preview_client_service_enablement`, `apply_client_service_enablement`, `rollback_client_service_enablement` (writes de autoridad humana delegada; scope `efeonce.mcp.client_services.write`; provider `greenhouse-client-services`; live desde 2026-09-10 rev `00052-slt`) |
+| Efeonce Insights (TASK-1845) | 4 | `get_insights_catalog`, `list_insight_editions`, `get_insight_edition` (lecturas, scope base) y `create_insight_edition` (write **sin gasto de proveedor**; scope `efeonce.mcp.insights.write`; provider `greenhouse-insights` sobre la config SEO; live desde 2026-09-15 rev `00053-dsk`; las cuatro `unsupported` para el emisor nativo) |
 | SEO / Search Visibility 360 | 28 | reads + writes (detalle en §Provider Greenhouse-SEO) |
 
 Las **dos de identidad son propias del gateway**, no federadas desde el manifiesto de Greenhouse: no existen como
@@ -912,9 +966,11 @@ tool interna y el provider `greenhouse-identity` resuelve contra la ruta HTTP de
 mordió: llevaron el servidor de 37 a 39 con el `manifestHash` de Greenhouse IDÉNTICO, así que el gate viejo —
 anclado a ese hash — las dejó pasar con `version` congelada. Lo cierra `src/surface.ts` (§`Bump de versión`).
 
-En la práctica el gateway es hoy **un operador de SEO con anexos de Hiring, Globe e identidad delegada**. Los tres
-scopes de escritura (`efeonce.mcp.seo.write`, `efeonce.mcp.globe.credits.funding.ensure`,
-`efeonce.mcp.identity.write`) siguen **live-but-fail-closed**: registrados y verificables, sin token que los abra.
+En la práctica el gateway es hoy **un operador de SEO con anexos de Hiring, Globe, identidad delegada, habilitación
+de servicios e Insights**. Cuatro scopes de escritura (`efeonce.mcp.seo.write`,
+`efeonce.mcp.globe.credits.funding.ensure`, `efeonce.mcp.identity.write` y, desde 2026-09-15,
+`efeonce.mcp.insights.write`) siguen **live-but-fail-closed**: registrados y verificables, sin token que los abra
+(el de Insights existe en Entra y en el registro de paridad de Greenhouse; ningún cliente lo porta a propósito).
 Para los dos primeros, hasta EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant
 revocable ya existe desde TASK-1631, 2026-09-04). Para el de identidad, hasta que exista la primera persona de un
 cliente real —decisión comercial, no técnica—, porque sólo la alcanza una persona `native-external` que además sea
@@ -922,11 +978,11 @@ administrador designado.
 
 ### Cobertura de federación vs el MCP interno de Greenhouse
 
-`src/mcp/greenhouse/tool-manifest.ts` declara **44 tools** (as-of 2026-09-02; la cifra se lee del manifiesto, nunca de acá); el gateway registra **39** (as-of 2026-09-06, medidas de `surface-baseline.json`). Comparar las dos cifras de frente no significa nada: 2 de las 39 —las de identidad delegada— **no salen del manifiesto**, exactamente como `get_seo_provider_spend`. El delta no es homogéneo:
+`src/mcp/greenhouse/tool-manifest.ts` declara **51 tools** (as-of 2026-09-15, `toolCount` del artefacto generado; la cifra se lee del manifiesto, nunca de acá); el gateway registra **47** (as-of 2026-09-15, `surface-baseline.json` en `1.5.0`). Comparar las dos cifras de frente no significa nada: 2 de las 47 —las de identidad delegada— **no salen del manifiesto**, exactamente como `get_seo_provider_spend`. El delta no es homogéneo:
 
 - **Dominio SEO: paridad completa.** Las 26 SEO internas están federadas, con el guard bidireccional de `TASK-1658`
   vigilándolo y `GREENHOUSE_SEO_TOOL_EXCLUSIONS` vacío (ninguna exclusión declarada).
-- **`get_greenhouse_skill` (plataforma) federada por TASK-1804** con su entrada en `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` — el guard SEO está anclado al dominio, así que las tools no-SEO federadas tienen su propia lista con razón.
+- **`get_greenhouse_skill` (plataforma) federada por TASK-1804** con su entrada en `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` — el guard SEO está anclado al dominio, así que las tools no-SEO federadas tienen su propia lista con razón. Esa lista suma las tres `*_client_service_enablement` (TASK-1852) y, desde 2026-09-15, las **cuatro de Insights** (`get_insights_catalog`, `list_insight_editions`, `get_insight_edition`, `create_insight_edition`; TASK-1845): dominio `insights` completo federado, con paridad de schema y `annotations` (`readOnlyHint: false` en la creación).
 - **15 tools NO-SEO fuera del alcance federado, y sin declarar**: `get_context`, `get_organization`,
   `list_organizations`, `get_platform_health`, `get_integration_readiness`, `list_capabilities`, `list_event_types`,
   `search_knowledge`, `get_knowledge_document`, `search_services`, `quote_price`, `get_webhook_subscription`,
@@ -934,7 +990,8 @@ administrador designado.
 
 ⚠️ **Esas 15 siguen fuera del alcance federado, pero ya no son invisibles.** Desde
 [`TASK-1780`](../tasks/complete/TASK-1780-mcp-tool-inventory-canonical-manifest.md) **existen declaradas**: el
-manifiesto canónico `src/mcp/greenhouse/tool-manifest.ts` censa las 43 tools con su dominio, y el artefacto generado
+manifiesto canónico `src/mcp/greenhouse/tool-manifest.ts` censa las tools con su dominio (51 as-of 2026-09-15; seis
+dominios: `platform`, `webhooks`, `knowledge`, `commercial`, `seo`, `insights`), y el artefacto generado
 que consume el guard viaja con todas. Lo que sigue siendo SEO-only es el **allowlist de federación** del gateway, que
 es una decisión de frontera con revisión humana por tool y no cambia con esta task. La diferencia práctica: un
 operador que conecta el MCP esperando "el 360 de Greenhouse" y encuentra sólo SEO ahora puede leer el alcance real en
@@ -943,9 +1000,10 @@ un archivo, en vez de deducirlo de una ausencia.
 ### Manuales de uso servidos por el protocolo (TASK-1804)
 
 `get_greenhouse_skill` entrega bajo demanda el catálogo y el cuerpo de los manuales declarados en
-`src/mcp/greenhouse/skill-manifest.ts` (hoy seis, todos `internal`: `seo-spend-discipline`,
+`src/mcp/greenhouse/skill-manifest.ts` (hoy ocho, todos `internal`: `seo-spend-discipline`,
 `seo-visibility-reading`, `competitor-loop`, `seo-discovery-to-tracking`, `seo-technical-health`,
-`seo-prospect-diagnostic`; la cifra vigente se lee del manifiesto, nunca de acá). El gateway delega en la lane
+`seo-prospect-diagnostic`, `client-service-enablement` (TASK-1852) y `efeonce-insights` (TASK-1845, gobierna las
+cuatro tools de Insights); la cifra vigente se lee del manifiesto, nunca de acá). El gateway delega en la lane
 `/api/platform/ecosystem/mcp/skills[/{name}]` y no embebe contenido.
 
 Smoke (lane, con el consumer del gateway; también incorporado a `scripts/greenhouse-seo-canary.mjs`):

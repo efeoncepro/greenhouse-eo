@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.3
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-15 por Claude (TASK-1845)
+> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846, render del deck vivo en staging; producción pendiente)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -45,12 +45,78 @@ validadas, **hoy ninguna edición puede emitirse**: llega hasta `ready_for_revie
   rechaza.
 - **La IA no calcula ni emite.** Sólo puede reescribir frases; si cambia una cifra se descarta.
 
-## Estado de disponibilidad (2026-09-15)
+## Qué ve cada persona
 
-Código en `develop`, sin release. Flags de generación, emisión e IA **apagados** en todos los
-entornos; ninguna organización tiene el módulo asignado. Estado honesto: **code complete, rollout
-pendiente**.
+| Quién | Qué puede hacer | Qué ve de una edición |
+| --- | --- | --- |
+| Cliente (roles executive/manager de su organización) | Ver el catálogo y sus ediciones; pedir una edición sobre su propia cuenta | Estado resumido (`in_progress`, `in_review`, `issued`, `needs_attention`, `withdrawn`). **La evidencia y el plan aparecen sólo cuando la edición está emitida**; antes vienen vacíos, y no es un error |
+| Cliente (rol specialist) | Sólo lectura | Igual que arriba, sin poder pedir ediciones |
+| Interno (Admin, Account) | Todo: catálogo, pedir, revisar, corregir, emitir, retirar, recuperar | Ciclo completo, evidencia sellada con hechos y rechazos, plan congelado con sus límites, historial de transiciones |
+| Interno (Operations) | Catálogo, pedir, revisar y recuperar; **no emite** | Igual que Admin/Account en lectura |
+| Agente por MCP | Catálogo, listar, leer y (con permiso de escritura) pedir; **nunca emite** | Lo que su vínculo con la organización permita |
 
-> Detalle técnico: arquitectura §14; dominio `src/lib/efeonce-insights/**`; rutas
+Como emitir todavía no es posible, hoy un cliente que pide una edición la verá quedar en `in_review` sin
+cifras visibles: eso es lo esperado hasta que su deck esté renderizado y un interno la emita (hoy el render sólo
+corre en staging y la emisión está apagada en todos los ambientes).
+
+## Estado de disponibilidad (2026-09-16)
+
+**Disponible en producción** desde el 2026-09-15 para las organizaciones que tengan el módulo `insights_v1`
+asignado. Lo que está encendido y lo que no:
+
+| Capacidad | Estado | Nota |
+| --- | --- | --- |
+| Pedir una edición y generarla hasta `ready_for_review` | **Encendida** en staging y producción | Flag `INSIGHTS_GENERATION_ENABLED=true` en Vercel (staging y producción); en Preview sigue apagada |
+| Emitir una edición | Apagada y bloqueada | Flag `INSIGHTS_ISSUANCE_ENABLED` OFF en todos los ambientes; además exige que todos los outputs pedidos estén renderizados y validados |
+| Redacción asistida por IA | Apagada | Flag `INSIGHTS_AUTHORING_AI_ENABLED` OFF; el plan sale del redactor determinista |
+| Pedir el render del **deck PDF** de una edición | **Encendido en staging**; **apagado en producción** | Staging: probado el 2026-09-16 con cinco decks reales, un reintento y una cancelación. Producción: falta el release de Greenhouse, prender el flag en Vercel Production y desplegar el gateway MCP. Ver «Pedir el deck de una edición» |
+| Informe A4, vista web, enlace compartido, correo, recurrencia | No existen todavía | TASK-1847, 1848, 1849 y 1875 |
+| Pedir una edición desde un agente externo por el gateway MCP | Lectura sí; escritura todavía no | Las cuatro herramientas están publicadas; crear exige un permiso de escritura que ningún cliente tiene aún (`insufficient_scope`) |
+
+**Pedir el deck de una edición (render).** Cuando una edición está `ready_for_review`, quien tenga permiso sobre
+esa organización puede pedir su deck PDF. El pedido no devuelve el archivo al instante: queda **en cola** y un
+proceso en segundo plano lo produce.
+
+- **Cuánto tarda.** El proceso revisa la cola cada 2 minutos y produce **un deck por vuelta**. Un deck pedido solo quedó listo
+  en unos 3 a 4 minutos en lo medido (algo más si el proceso arranca en frío); si se piden varios juntos, cuentan como una fila: cinco decks tardaron unos 11 minutos en
+  quedar todos listos (medido en staging). Regla práctica: N decks ≈ 2·N minutos. Dibujar el deck en sí toma unos
+  7 segundos; el resto es espera en la cola y arranque del proceso. Si hay propuestas comerciales en cola, pasan
+  primero.
+- **Estados.** El pedido (run) y cada archivo (output) pasan por `queued`/`running` y terminan en `completed`,
+  `failed`, `dead_letter` (se agotaron los intentos o el fallo no se arregla reintentando) o `cancelled`.
+  `partial_failed` significa que un archivo salió y otro no.
+- **Si falla.** Se puede reintentar: sólo se vuelven a poner en cola los archivos fallidos; lo que ya salió no se
+  toca. Un fallo por causa del contenido (por ejemplo, un texto que no cabe en la lámina) vuelve a fallar con la
+  misma causa: nada se recorta en silencio y hay que corregir la edición.
+- **Cancelar.** Cancela lo que todavía no empezó. Un pedido cancelado es definitivo: reintentarlo no lo reactiva; si
+  se quiere el deck, se pide de nuevo.
+- **Quién ve qué.** Un cliente no puede pedir ni consultar el render de una edición interna: para él esa edición
+  "no existe" (no encontrado) y no se crea nada.
+- **Registro.** Cada pedido, reintento y cancelación queda a nombre de la persona que lo hizo, también si es un
+  usuario cliente (antes todo quedaba como "sistema").
+- **Qué no hace todavía.** Sólo existe el deck. El informe A4 y la vista web se rechazan al pedirlos. Tener el deck
+  no lo envía ni lo comparte: descargarlo, compartirlo y emitir siguen siendo pasos aparte.
+
+**Cómo se habilita una organización.** Un interno asigna el módulo `insights_v1` a la organización con el
+script `scripts/insights/assign-insights-module.ts --org=<id>` (primero sin `--apply` para ver qué haría;
+con `--apply` para asignarlo). Pasa por el mismo camino que cualquier módulo del portal cliente (con auditoría),
+y es idempotente: si ya estaba, no duplica. Sin el módulo, la organización simplemente "no existe" para
+Insights.
+
+**Qué se probó.** En staging, una organización sintética con el módulo asignado pidió ediciones desde el portal
+(`EO-INS-000012`) y desde un consumer del ecosistema (`EO-INS-000013`); repetir el mismo encargo devolvió la
+misma edición; cambiar el encargo con la misma clave fue rechazado; una organización sin módulo respondió "no
+encontrado". En producción se repitió el pedido por el ecosistema (`EO-INS-000014`). En los tres casos la
+edición quedó `ready_for_review` **con evidencia de cero hechos**: la organización sintética no tenía datos
+ICO en los meses pedidos, así que el snapshot declara cuatro rechazos "sin datos" y el plan lo dice en sus
+límites. Es decir: se verificó que la ausencia se declara con honestidad, no todavía un informe con cifras
+reales de un cliente.
+
+**Qué falta para cerrar TASK-1845.** Dos evidencias operativas (ensayo de reversión de la migración en la base
+compartida y una sesión MCP con un usuario humano que liste las herramientas publicadas). Hasta entonces la
+task sigue `in-progress`, aunque la capacidad ya esté en producción.
+
+> Detalle técnico: arquitectura §14 (estado, rollout, límites e invariantes); dominio `src/lib/efeonce-insights/**`; rutas
 > `src/app/api/platform/{app,ecosystem}/insights/**`; migración
-> `migrations/20260915100154428_task-1845-insights-foundation.sql`.
+> `migrations/20260915100154428_task-1845-insights-foundation.sql`; script
+> `scripts/insights/assign-insights-module.ts`; flags en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.

@@ -425,3 +425,34 @@ estampando `authority.kind=delegated_oauth` en el recibo. Para el emisor nativo 
 a escrituras por diseño. Un `403 insufficient_scope` de estas tools se cierra con un token humano que porte
 `efeonce.mcp.client_services.write`, nunca ampliando el cliente PKCE compartido ni el contexto v2. El scope se
 exige también en el preview: el inventario administrativo es parte del mismo acto.
+
+### Escritura de dominio con clase propia y policy nativa `unsupported` — TASK-1845
+
+`get_insights_catalog`, `list_insight_editions`, `get_insight_edition` y `create_insight_edition` (dominio `insights`
+del manifiesto, 51 tools; gateway `1.5.0`, 47 tools) delegan en el lane ecosystem `/api/platform/ecosystem/insights/**`.
+Las tres lecturas viajan con el scope base; la creación exige la clase propia `efeonce.mcp.insights.write` —
+**octava clase de blast-radius del gateway** (read, globe.read, hiring.read, globe.credits.funding.ensure, seo.write,
+identity.write, client_services.write, insights.write), declarada en paridad en `src/lib/auth-server/oauth/scopes.ts`—
+porque una edición es un artefacto con ciclo de vida propio, no una lectura. La clase no gasta proveedor y no mueve
+dinero; sigue siendo escritura. Para el emisor nativo las cuatro son `unsupported`
+(`insights_native_policy_missing`): fail-closed con razón, nunca por ausencia.
+
+- **SIEMPRE** que un dominio nuevo entre al manifiesto, sus tools federadas se declaran en
+  `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` con razón sustantiva (las cuatro de Insights lo están: catálogo por
+  organización con 404 anti-oráculo; lista proyectada por audiencia; edición con snapshot sellado y plan congelado;
+  creación idempotente sin gasto, sólo bindings internos, nunca emite ni renderiza). El guard SEO está anclado al
+  dominio: una tool no-SEO ausente de esa lista no es «no federada», es drift.
+- **NUNCA** cierres un `insufficient_scope` de `create_insight_edition` ampliando el cliente PKCE compartido ni el
+  contexto v2: el scope existe en Entra desde 2026-09-15 y ningún cliente lo porta a propósito hasta un
+  consentimiento gobernado.
+- **NUNCA** infieras autoridad de Insights desde el scope: la decide Greenhouse por llamada (`insights_v1`
+  asignado a la organización + `insights.edition.create`); una org sin módulo responde `404`, y el binding
+  org-scoped del ecosystem sólo lee. Emitir y retirar no existen en el lane ecosystem por diseño.
+- **SIEMPRE** que un provider cabalgue la config de otro (`greenhouse-insights` sobre `GreenhouseSeoConfig`, como
+  `greenhouse-skills` e `greenhouse-identity`), declara que **comparte interruptor**: apagar
+  `GREENHOUSE_SEO_PROVIDER_ENABLED` apaga los cuatro providers, y ninguno trae variable nueva en `deploy.yml`.
+- **SIEMPRE** verifica el provider con su canary de lectura (`scripts/greenhouse-insights-canary.mjs`: catálogo,
+  lista, detalle, deny) antes de declarar federación; el write se prueba sólo con un token humano que porte la clase.
+
+Canon: `GREENHOUSE_MCP_ARCHITECTURE_V1.md` §26 · `EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` §Delta 2026-09-15 ·
+`EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`.

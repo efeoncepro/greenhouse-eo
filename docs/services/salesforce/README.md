@@ -21,6 +21,16 @@ La práctica tiene tres superficies distintas:
 3. **Marketing Cloud Next:** marketing nativo sobre Salesforce Platform y Data 360, con Flow, Agentforce y
    ediciones Growth/Advanced.
 
+### Posicionamiento frente a HubSpot
+
+Salesforce y HubSpot compiten en una zona de solapamiento, especialmente en el mid-market alto, agentes e
+integraciones, pero no tienen el mismo centro de gravedad. Salesforce es el candidato principal cuando el cliente
+necesita una org instalada compleja, gobierno enterprise, procesos multi-equipo o multi-país, service a escala,
+extensibilidad profunda o un ecosistema de integración amplio. HubSpot puede ser mejor punto de partida para
+crecimiento B2B, equipos mid-market y time-to-value. Esta es una inferencia de posicionamiento de Efeonce basada en
+las capacidades y anuncios vigentes, no una frontera exclusiva de los proveedores. El diagnóstico debe poder
+concluir `Salesforce-first`, `HubSpot-first`, `híbrida` o `no-fit`.
+
 No se usa “Marketing Cloud” sin identificar producto, edición, tenant y runtime. Engagement no está deprecado y
 Next no lo reemplaza automáticamente. Engagement+, Account Engagement+ y una migración selectiva son decisiones de
 coexistencia, no pruebas de paridad.

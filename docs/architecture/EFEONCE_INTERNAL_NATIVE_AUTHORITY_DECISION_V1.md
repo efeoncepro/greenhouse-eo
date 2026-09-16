@@ -379,3 +379,17 @@ de v2: la clase `efeonce.mcp.client_services.write` se ejerce hoy por el issuer 
 relee por persona, en cada llamada, `client_portal.module.{read_assignment,enable,pause}`. El contexto interno v2 sigue
 delegando sólo `growth.seo.observation.read`; incorporar esta clase a v2 exigiría autorización nueva (D10), no un flag ni
 una lista de tools. `src/lib/auth-server/oauth/scopes.ts` declara la clase en paridad y NO la publica como mínimo.
+
+### Delta 2026-09-15 — D9 se sostiene ante la clase `efeonce.mcp.insights.write` (TASK-1845)
+
+`get_insights_catalog`, `list_insight_editions`, `get_insight_edition` y `create_insight_edition` (`efeonce-mcp` `1.5.0`,
+provider `greenhouse-insights`) declaran para el emisor nativo la política `unsupported`
+(`nativeUnsupportedReason: insights_native_policy_missing`), las cuatro — lecturas incluidas. No es un hueco de v2 sino
+una razón explícita: el contexto interno v2 sigue delegando sólo `growth.seo.observation.read`, y Insights no tiene
+todavía una capability de lectura declarada para ese contexto. La clase de escritura `efeonce.mcp.insights.write`
+(«crear una edición de Efeonce Insights», exigida sólo por `create_insight_edition`; las lecturas van con el scope base)
+se declara en paridad en `src/lib/auth-server/oauth/scopes.ts` (quinta de `EFEONCE_MCP_WRITE_SCOPES`, octava clase del
+gateway) y NO se publica como mínimo. Existe en la app recurso de Entra desde el 2026-09-15 y ningún cliente la porta;
+a diferencia de TASK-1852, no hay cliente de exchange RFC 8693: el provider usa la service identity del lane ecosystem
+y la autoridad la relee Greenhouse por organización (`insights_v1`) y capability en cada llamada. Incorporar Insights a
+v2 —lectura o escritura— exigiría autorización nueva (D10), no un flag ni una lista de tools.

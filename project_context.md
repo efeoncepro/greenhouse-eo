@@ -2,11 +2,16 @@
 
 ## Estado vigente para agentes
 
-Greenhouse: plataforma operativa Efeonce Group, Next.js 16/MUI 7/Vuexy starter-kit/TypeScript.
-Estado: `Handoff.md`. Historia:
+## Actualización documental reciente
+
+El 2026-09-16 se actualizaron las skills CRM: Dreamforce 2026 (ledger Salesforce, estados por capacidad) y HubSpot
+Fall Spotlight/UNBOUND (`docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`). El
+provider-fit usa `HubSpot-first`, `Salesforce-first`, `híbrida` o `no-fit`; el detalle vive en esas referencias.
+
+Greenhouse: plataforma operativa Efeonce Group (Next.js 16/MUI 7/Vuexy/TS). Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-Reingresos e identidad: [contrato canónico](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
+Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 
 TeamBot usa `pnpm teams:announce` para grupos: menciones explícitas, no `@todos` ni DMs. Un 1:1 manual aprobado exige dispatcher/audit canónicos, Entra revalidada e idempotencia; lo recurrente converge a Notification Hub. En Performance Reports, volumen no prueba sobrecarga y el mensaje publicado verifica la mención. Contrato: `docs/operations/manual-teams-announcements.md`.
 
@@ -108,15 +113,13 @@ y federado en `mcp.efeonce.org`, fail-closed por organización. `GROWTH_SEO_ENAB
 `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` e
 `docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`.
 
-ETV de DataForSEO Labs se versiona por metodología; desde 2026-09-03 producción sirve
-`improved_layout_clickstream_v2` y legacy queda sólo como rollback pre-corte. Contrato, corte, provenance:
+ETV DataForSEO: producción sirve `improved_layout_clickstream_v2` desde 2026-09-03 (legacy = rollback pre-corte):
 `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md` ·
 [auditoría](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
 
-Efeonce Insights: [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) (§14 = estado real), EPIC-045.
-Foundation TASK-1845 en develop (schema `greenhouse_insights`, `src/lib/efeonce-insights/`, lanes + MCP; flags OFF); render/share/UI pendientes en TASK-1846–1849.
+Efeonce Insights (EPIC-045): [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14 = estado real.
 
-Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
+Informes: skill `report-studio` (evidencia, diseño, QA PDF).
 Seasonalities: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.
 [Referente Metricool](.codex/skills/social-media-studio/references/seasonality-reference-calendar.md): inspiración para Efeonce/clientes; separado del calendario editorial y del scheduler.
 Producción seasonality/trendjacking: [protocolo de agentes](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md); canon en skills espejo `social-media-studio` (idea, marca, dirección, producción y QA).
@@ -206,7 +209,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo gobernar derechos, consentimiento, provenance, providers, no-training, retención, contratos y entrega enterprise de creatividad generativa | `docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md` + `.codex/skills/greenhouse-ai-creative-rights-governance/SKILL.md` + `.codex/skills/greenhouse-ai-creative-rights-governance/references/` + Creative Services/Creative Studio docs + `legal-privacy-ip-operator` |
 | Cómo se estructura, vende y opera Social Media: beachhead B2B experto, Social Search + SEO/AEO y squad humano | `docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md` + `docs/services/creative-services/EFEONCE_SOCIAL_MEDIA_PRODUCT_SERVICE_CONTRACT_V1.md` + `.codex/skills/social-media-studio/SKILL.md` |
 | Cómo se estructura y vende Media & Distribution: tres soluciones, Performance & Commerce, capacidades de delivery, Influencers/UGC y rol de Reach | `docs/services/media-distribution/README.md` + `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md` + `docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md` + `docs/audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md` |
-| Cómo vender Revenue Operations & CRM y elegir HubSpot-first, Salesforce-first o híbrido | `docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md` + `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md` + `docs/services/salesforce/README.md` + skills del provider; claims y reventa exigen evidencia vigente |
+| Cómo vender Revenue Operations & CRM y elegir HubSpot-first, Salesforce-first o híbrido | `docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md` + `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md` + `docs/services/salesforce/README.md` + skills del provider + `.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md`; claims y reventa exigen evidencia vigente |
 | Cómo operar y entregar la landing, Customer Agent y handoff de Emma para ANAM | Skill `hubspot-as-a-service` → `anam-case.md` + canon CMS `anam-chat-landing.md` + entrega/soporte `anam-entrega-documentacion-y-soporte-2026-09-02.md`; cada superficie conserva ownership y readback separados |
 | Licitaciones y Proposal versionada | `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md` + `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md` + `docs/architecture/GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md` + `docs/audits/commercial/EFEONCE_SERVICE_PRICING_LEARNINGS_AND_GUARDRAILS_2026-07-31.md` + expedientes aprobados + skills `greenhouse-public-private-tenders` y `deck-studio`; quote congelado, IVA, `pnpm tender:canonical-gate <slug>`, sin stubs/HOLD |
 | Cómo descubrir y calificar licitaciones públicas de LicitaLAB | skill espejo `greenhouse-public-private-tenders` → `licitalab-radar-playwright.md` + `licitalab-mcp.md`; LicitaLAB sólo ve contratación pública. El radar entrega códigos al MCP documental. La promoción manual usa MCP HubSpot con confirmación, búsqueda por ID exacto + llave de idempotencia cuando esté poblada, asociaciones y readback; `gh_deal_origin` queda vacío mientras su enum sólo admita `greenhouse_quote_builder`. El bridge pendiente afecta automatización, no cargas manuales |
@@ -262,8 +265,8 @@ Todo trabajo formal sigue `intake -> taxonomy -> plan -> execution -> verificati
 - No declarar cierre si faltan flags, secrets, deploy, migración, backfill, worker/cron/webhook, datos reales o verificación runtime.
 - Copy reutilizable vive en `src/lib/copy/*`; nomenclatura institucional en `src/config/greenhouse-nomenclature.ts`.
 - Seguridad: no imprimir secretos/raw errors, no improvisar accesos, preferir CLIs autenticados con guardrails.
-- Auditorías son evidencia fechada, no verdad permanente: revalidar contra código y runtime.
-- Trabajo nuevo durante EPIC-027 nace extraction-ready y declara placement sin crear deployables por anticipado. Canon: build-unit decision + modular migration operating model.
+- Auditorías = evidencia fechada, no verdad permanente; revalidar contra código y runtime.
+- Trabajo nuevo durante EPIC-027 nace extraction-ready y declara placement sin crear deployables por anticipado (canon: build-unit decision + modular migration operating model).
 
 ## Contexto por dominio
 
@@ -273,12 +276,10 @@ invariantes, arquitectura, task). Su versión machine-readable vive en
 
 1. buscar keyword en arquitectura, operations y skills;
 2. buscar en el snapshot `docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md`;
-3. contrastar con código/runtime;
-4. corregir el router o el documento canónico antes de depender de memoria histórica.
+3. contrastar con código/runtime y corregir el router o el doc canónico antes de fiarse de memoria histórica.
 
 ## Memoria histórica e integridad
 
 - Snapshot íntegro del contexto anterior: [índice 2026-07-19](docs/operations/agent-context-history/2026-07-19/README.md).
-- El manifest SHA-256 prueba que no se perdió texto original en la compactación.
-- Los snapshots no gobiernan comportamiento vigente y no deben editarse.
+- Los snapshots no gobiernan comportamiento vigente ni se editan.
 - `project_context.md` no acepta secciones `## Delta YYYY-MM-DD`; los cambios históricos van a changelog, tasks/issues/ADRs o archivo, según ownership.

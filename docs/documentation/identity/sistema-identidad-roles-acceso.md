@@ -1,9 +1,9 @@
 # Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.10
+> **Version:** 1.11
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Ultima actualizacion:** 2026-09-04 por Claude (TASK-1631: puerta MCP para clientes externos — environment, binding, invitacion y persona ligada por subject; el login del portal cliente no cambia)
+> **Ultima actualizacion:** 2026-09-15 por Claude (TASK-1845: quien puede encargar, revisar y emitir informes de Efeonce Insights)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md), [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md)
 
 ---
@@ -582,6 +582,28 @@ Desde **TASK-874**, la validacion automatica de readiness vive en `/hr/workforce
 La cola `/admin/workforce/activation` queda como surface admin governance / transitional. El entrypoint operativo para HR/Ops es `/hr/workforce/activation` con view code `equipo.workforce_activation`.
 
 > **Detalle tecnico:** Spec backend canonica: [`TASK-872`](../../tasks/complete/TASK-872-scim-internal-collaborator-provisioning.md). Spec UI canonica: TASK-873 (en cierre 2026-05-14). Endpoint canonical: `POST /api/admin/workforce/members/[memberId]/complete-intake`. Manual operador: [`completar-ficha-laboral.md`](../../manual-de-uso/hr/completar-ficha-laboral.md).
+
+---
+
+## Efeonce Insights: quien puede encargar, revisar y emitir (TASK-1845)
+
+Efeonce Insights genera **informes por edicion** (deck, A4 y web) a partir de la evidencia SEO, AEO e ICO de cada cliente. El acceso se decide con **tres preguntas a la vez**, y las tres tienen que dar si:
+
+1. **¿La organizacion tiene contratado el modulo?** El modulo `insights_v1` se asigna por organizacion, como cualquier modulo del portal cliente. Si no esta asignado, Insights responde "no existe" para esa organizacion, aunque quien pregunte sea Superadministrador. Es a proposito: nadie puede deducir desde afuera que clientes lo contrataron.
+2. **¿Tu rol te permite esa accion?**
+
+| Accion | Superadministrador y Lider de Cuenta | Operaciones | Cliente Ejecutivo y Cliente Manager | Cliente Specialist |
+|---|---|---|---|---|
+| Leer informes y ediciones | Si, de cualquier organizacion | Si, de cualquier organizacion | Si, solo de su organizacion | Si, solo de su organizacion |
+| Encargar una edicion nueva | Si | Si | Si, solo de su organizacion | No |
+| Revisar una edicion (aprobar el borrador o pedir otra version) | Si | Si | No | No |
+| Emitir (publicarla al cliente) o retirarla | Si | **No** | No (por ahora) | No |
+
+3. **¿La audiencia del informe es la tuya?** Un informe de audiencia interna nunca se le muestra a un usuario cliente, y el cliente ve la evidencia y el plan editorial de una edicion **solo cuando ya fue emitida**.
+
+Mientras la emision no este habilitada (depende de TASK-1846), nadie puede emitir: el sistema responde "aun no listo". Desde el 2026-09-15 la generacion esta encendida en produccion, pero el unico cliente con el modulo asignado es una organizacion de pruebas.
+
+> **Detalle tecnico:** capabilities `insights.report.read` / `insights.edition.create` / `insights.edition.review` / `insights.edition.issue` con grants por rol en `src/lib/entitlements/runtime.ts`; chequeo de tres planos en `src/lib/efeonce-insights/authz.ts`; matriz completa en [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md → Efeonce Insights](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md). Manual de operacion: [operar-efeonce-insights-api-mcp.md](../../manual-de-uso/insights/operar-efeonce-insights-api-mcp.md).
 
 ---
 

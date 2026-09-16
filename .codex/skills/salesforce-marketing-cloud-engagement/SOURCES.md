@@ -4,6 +4,8 @@ Usa documentación oficial de Salesforce como autoridad primaria. Verifica en vi
 
 ## Autoridades
 
+La investigación de Dreamforce 2026 se conserva en la skill CRM: [ledger de lanzamientos](../../salesforce-crm-practice/references/dreamforce-2026.md). Sus anuncios no sustituyen las autoridades específicas de Engagement ni cambian sus fronteras.
+
 - Marketing Cloud Engagement: https://help.salesforce.com/s/articleView?id=sf.mc_overview_marketing_cloud.htm&type=5
 - Journey Builder: https://help.salesforce.com/s/articleView?id=sf.mc_jb_journey_builder.htm&type=5
 - Automation Studio: https://help.salesforce.com/s/articleView?id=sf.mc_as_automation_studio.htm&type=5

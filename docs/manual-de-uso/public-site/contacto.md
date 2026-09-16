@@ -42,14 +42,60 @@ Para un cambio Elementor, restaura el snapshot gobernado y purga la caché Kinst
 Meetings, revierte la versión/binding mediante sus comandos canónicos; no borres submissions. Si el runtime no
 coincide con el repo, registra `code complete, rollout pendiente` y escala al owner de Public Site/Growth Forms.
 
-## Checklist antes del release de países
+## Release aplicado del selector de países
 
-1. Publica el renderer y las banderas en el runtime Greenhouse/Vercel.
-2. Comprueba ambos recursos en producción antes de ejecutar el apply.
-3. Ejecuta `pnpm tsx scripts/growth/activate-contacto-country-select.ts --apply` con snapshot y rollback
-   disponibles; nunca edites la versión publicada directamente.
-4. Lee de nuevo `/api/public/growth/forms/efeonce-contacto` y confirma `country_select`, opciones y versión nueva.
-5. Revisa `/contacto/` en desktop y 390 px, incluyendo teclado, giro del chevron y ausencia de overflow.
+El release quedó aplicado el 2026-09-15. La versión activa es `fver-c00955ca-863a-4e7d-99c7-c09706660a3a` (v3).
+El readback público confirma 250 países y el navegador confirma el combo `ghf-1-country`.
 
-Hasta completar estos pasos, el campo de país de producción debe permanecer como texto y no debe anunciarse el
-selector como disponible.
+Pendiente para el próximo release del renderer: promover `e5d4a0fb2`, que corrige el glifo `↗` mostrado junto a
+“País” y lo reemplaza por el SVG geográfico. No se debe crear otra versión del formulario; la v3 ya está activa.
+
+Para una futura modificación, repite el precheck de renderer/banderas, toma snapshot, ejecuta el comando gobernado
+con `--apply`, verifica el readback y revisa desktop/390 px, teclado, giro del chevron y ausencia de overflow.
+
+No edites directamente la versión publicada ni borres la versión anterior: el rollback debe hacerse mediante los
+comandos canónicos de Growth Forms.
+
+## Release aplicado del copy de cobertura y la banda de reuniones (2026-09-16)
+
+Se ejecutó por el carril SSH/WP-CLI sobre la página `20729`, sin token de Kinsta. Tres pasos, en este orden:
+
+```bash
+# 1. Exporta el código que está vivo hoy. Ése es el baseline del release.
+pnpm public-website:export-live-code
+
+# 2. Arma el paquete acotado contra ese baseline.
+node scripts/public-website/build-contacto-elementor-package.cjs <baseline>
+
+# 3. Instálalo. Responde {"status":"scoped_package_installed","files":9}.
+pnpm public-website:wpcli -- --eval-file scripts/public-website/deploy-contacto-elementor-package.php \
+  --input-file tmp/contacto-elementor-release/package.zip \
+  --input-file tmp/contacto-elementor-release/manifest.json --wp-user 12
+```
+
+No saltees el paso 1. El manifest guarda el hash del archivo vivo (`previousSha256`) y el instalador aborta si
+alguien lo tocó entre el export y el deploy.
+
+Antes de instalar, mira el diff contra el baseline: el paquete arrastra todo lo que esté en el repo y no esté
+vivo, no sólo lo que quieres cambiar. En este release, el CSS tuvo 488 líneas cambiadas y sólo 12 eran del cambio
+pedido; el resto eran iteraciones del día anterior que tampoco estaban desplegadas. Declara en el cierre la
+superficie que efectivamente saliste a publicar.
+
+### Cómo verificar
+
+No hace falta purgar caché: el plugin versiona el CSS por `filemtime` y el `?ver=` sube solo (acá pasó de
+`1789484153` a `1789560441`). **Pide siempre la URL versionada que aparece en el HTML, no la URL desnuda del
+CSS** — sin query string sigue respondiendo una variante cacheada vieja y vas a concluir que el deploy no salió.
+Ese matiz hace perder tiempo si no lo tienes presente.
+
+Sobre el HTML vivo puedes correr `scripts/public-website/verify-contacto-responsive-composition.ts`, y después
+revisa a ojo 390 px y 1440 px: titular de la banda en dos líneas en teléfono y en una en desktop, curva
+decorativa por debajo del botón, CTA en la misma fila en desktop y `scrollWidth === clientWidth`.
+
+### Rollback
+
+El deploy deja un backup en el servidor antes de escribir; el de este release es
+`/tmp/eo-contacto-widgets-before-20260916-120717.tar`. Para revertir, restaura ese tar sobre el directorio del
+plugin por el mismo carril SSH: al reescribir los archivos el `filemtime` sube y el `?ver=` cambia solo, así que
+tampoco necesitas purga. No edites los archivos vivos a mano; si el cambio es nuevo, vuelve a exportar el
+baseline y arma otro paquete.

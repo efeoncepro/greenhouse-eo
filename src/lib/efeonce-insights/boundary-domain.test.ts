@@ -37,6 +37,12 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_insights.insight_edition_transitions',
   'greenhouse_insights.insight_evidence_snapshots',
   'greenhouse_insights.insight_editorial_plans',
+  // TASK-1846 — render durable: solicitud por edición, unidad reclamable por target y su
+  // historial append-only. Siguen siendo tablas DEL dominio: el boundary no se ensancha
+  // hacia módulos productores, que se siguen leyendo y nunca escribiendo.
+  'greenhouse_insights.insight_render_runs',
+  'greenhouse_insights.insight_outputs',
+  'greenhouse_insights.insight_render_events',
   // Outbox canónico (vía publishOutboxEvent; el literal no aparece aquí, se lista por completitud).
   'greenhouse_sync.outbox_events'
 ])

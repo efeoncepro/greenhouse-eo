@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-25 por agente (TASK-638)
-> **Ultima actualizacion:** 2026-06-22
+> **Ultima actualizacion:** 2026-09-15 por Claude (TASK-1845: modulo Efeonce Insights y sus dos señales)
 > **Documentacion tecnica:** [GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md)
 
 ---
@@ -46,6 +46,10 @@ El registry interno declara cuatro modulos canonicos:
 | **Delivery** | Notificaciones, email transaccional, projection queue, reactive workers |
 
 Cada modulo declara que **rutas operativas** posee, que **APIs** expone, que **dependencias externas** consume y cuales son las **señales que se esperan** ver en su panel (por ejemplo: Finance espera tener al menos `runtime`, `test_lane` y `data_quality` activas).
+
+> **Delta 2026-09-15 (TASK-1845):** los cuatro de la tabla son los modulos historicos; el registry hoy declara **17** (entre otros Payroll, Identity, Hiring, Growth, Knowledge, Commercial, Workforce, Documents, Sync, Home, Platform). El mas nuevo es **Efeonce Insights** (`insights`): vigila la biblioteca de informes por edicion (deck, A4 y web) que se generan por fases sobre la evidencia SEO/AEO/ICO de cada cliente. Tiene dos señales, ambas sanas cuando valen 0: **ediciones fallidas en los ultimos 7 dias** (`insights.editions.failed_recent`, calidad de datos: cada una espera una decision humana — recuperar o encargar de nuevo) y **ediciones atascadas en generacion** (`insights.editions.stuck_generation`, retraso: mas de 30 minutos en una fase sin cerrar). Un incidente Sentry que mencione `insight_edition`, `insight_report` o `greenhouse_insights` se atribuye a este modulo, no a Growth ni a Delivery.
+>
+> Detalle tecnico: [GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md → Delta 2026-09-15](../../architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md#delta-2026-09-15--módulo-insights-efeonce-insights-task-1845) y `src/lib/reliability/queries/insights-edition-signals.ts`.
 
 ### Tipos de señales (`signal kinds`)
 

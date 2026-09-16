@@ -11,7 +11,8 @@
 # docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
 #
 # Uso: ENV=staging bash services/artifact-worker/deploy.sh
-#      (production se habilita sólo tras staging smoke + sign-off — ver runbook)
+#      Producción la despliega `production-release.yml` vía workflow_call (TASK-1846), con
+#      EXPECTED_SHA = target_sha del release. Nunca a mano salvo break-glass auditado.
 
 set -euo pipefail
 
@@ -42,16 +43,28 @@ if [[ "${ENV}" != "staging" && "${ENV}" != "production" ]]; then
   exit 1
 fi
 
-if [[ "${ENV}" == "production" ]]; then
-  STORAGE_ENV="prod"
-else
-  STORAGE_ENV="staging"
-fi
+# TASK-1846 — el bucket de assets NO depende del carril. El Job es ÚNICO (staging y producción
+# despliegan el mismo recurso): si el bucket siguiera a ENV, cada deploy — develop o release — lo daría
+# vuelta y los outputs quedarían repartidos entre dos buckets según quién desplegó último. Se fija en el
+# valor que el Job YA servía (`staging`, verificado en vivo 2026-09-16) para que integrar el Job al
+# release no cambie dónde caen los assets de Proposal ni de Insights. Los assets conservan su
+# `bucket_name` por fila y la lectura nunca deriva el bucket del entorno. Mover el Job a `prod` es una
+# decisión aparte (mismo IAM y lifecycle en ambos buckets), no un efecto colateral del release.
+STORAGE_ENV="staging"
 
 PG_PASSWORD_REF="${PG_PASSWORD_REF:-greenhouse-pg-dev-app-password:latest}"
 PG_INSTANCE="${PG_INSTANCE:-efeonce-group:us-east4:greenhouse-pg-dev}"
 
-GIT_SHA="$(git -C "${REPO_ROOT}" rev-parse HEAD)"
+HEAD_SHA="$(git -C "${REPO_ROOT}" rev-parse HEAD)"
+# TASK-1846 — el orquestador pasa EXPECTED_SHA (= target_sha). El Job se construye desde el árbol de
+# trabajo, así que el árbol TIENE que ser ese SHA: si no, la etiqueta `git-sha` mentiría sobre el
+# código que corre y el watchdog compararía contra un fantasma.
+GIT_SHA="${EXPECTED_SHA:-${HEAD_SHA}}"
+
+if [[ "${GIT_SHA}" != "${HEAD_SHA}" ]]; then
+  echo "❌ EXPECTED_SHA (${GIT_SHA}) ≠ HEAD del árbol (${HEAD_SHA}); abortando antes de construir" >&2
+  exit 1
+fi
 IMAGE="us-east4-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy/${JOB_NAME}:${GIT_SHA}"
 
 echo "── artifact-worker deploy ── ENV=${ENV} SHA=${GIT_SHA:0:9}"
@@ -120,6 +133,16 @@ ENV_VARS="${ENV_VARS},GOOGLE_CLOUD_PROJECT=${PROJECT_ID}"
 # proposal_render_jobs que el dispatcher le pasa: con el enqueue apagado en Vercel PROD, el
 # único trabajo posible viene de staging/CLI. Ledger: FEATURE_FLAG_STATE_LEDGER.md
 ENV_VARS="${ENV_VARS},ARTIFACT_RENDER_JOBS_ENABLED=${ARTIFACT_RENDER_JOBS_ENABLED:-true}"
+
+# 🚩 TASK-1846 — flag del render de Efeonce Insights. SEPARADO a propósito: encender Insights jamás
+# puede encender Proposal ni al revés. Default ON en el Job (lado RECLAMO), mismo criterio que
+# ARTIFACT_RENDER_JOBS_ENABLED: el Job es único para staging y producción, y la puerta de producto
+# por ambiente es el ENCOLADO en Vercel (`requestInsightRender`); sin encolado no hay nada que reclamar.
+# Con default OFF, el primer deploy de release apagaría el reclamo de staging en silencio.
+# Declararlo ACÁ es obligatorio, no opcional — `--set-env-vars` de abajo es DESTRUCTIVO y borra
+# toda variable agregada out-of-band; aplicarlo sólo con `--update-env-vars` en vivo lo hace
+# desaparecer en el próximo deploy, en silencio. Ledger: FEATURE_FLAG_STATE_LEDGER.md
+ENV_VARS="${ENV_VARS},INSIGHTS_RENDER_ENABLED=${INSIGHTS_RENDER_ENABLED:-true}"
 
 SECRETS="GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
 

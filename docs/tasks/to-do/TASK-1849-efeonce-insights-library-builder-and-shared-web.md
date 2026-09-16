@@ -4,6 +4,8 @@
 
 - **Decisión del operador (ADR delta 2026-09-15):** la vista web compartida NO se construye en Greenhouse: se renderiza en `efeonce-think` desde `InsightWebModelV1` (endpoint público de TASK-1848). Esta task conserva biblioteca/builder/detalle del portal + presentación email en Greenhouse, y la experiencia compartida como slice ejecutado en el repo `efeonce-think` (mismo modelo de trabajo que TASK-1325). Los criterios de GVC/estados (expirado/revocado/unknown) aplican allá; el `StatusScreen` de Think ya cubre `not_found`/`gone`. **Ese slice tiene ID propio: TASK-1875** (nodo S6 del master flow `docs/ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md`); esta task conserva S1–S5 y S7 y el botón «Copiar enlace» apunta a la URL de 1875.
 - Los DTOs de UI ya existen: `InsightEditionDto`/`InsightReportDto` (`readers/projection.ts`, browser-safe) con estado redactado por audiencia; lane app `platform/app/insights/**` completo (catálogo, reportes, ediciones, create/revise/issue/withdraw/recover). Esta task consume esos readers/commands; no escribe backend. — por TASK-1845
+- **Rollout 2026-09-15 (TASK-1845):** el puerto de outputs y el pipeline por fases ya corren **en producción** con `INSIGHTS_GENERATION_ENABLED=true` en staging y producción (emisión e IA OFF); ediciones sintéticas (org sandbox «Greenhouse Demo»; «producción» nombra el runtime, no el dato) `EO-INS-000012/13` (staging) y `EO-INS-000014` (producción) quedaron `ready_for_review`. El gateway `efeonce-mcp` 1.5.0 federa las 4 tools (47 tools, 8 clases de scope) y el scope `efeonce.mcp.insights.write` existe en Entra (sin cliente que lo porte ⇒ `insufficient_scope` al crear). Detalle: arquitectura §14. La biblioteca del portal puede probarse contra ediciones sintéticas (org sandbox «Greenhouse Demo»; «producción» nombra el runtime, no el dato) en staging (persona `agent-client`, `client_executive`, ve `evidence`/`plan` `null` hasta emitir: la UI debe representar ese estado como «en revisión», no como error ni como vacío).
+- Desbloqueada de TASK-1845 (2026-09-15): la foundation de Efeonce Insights está en producción (release `9c094688309d`, generación ON en Vercel, gateway v1.5.0 federado, scope en Entra); TASK-1845 sigue `in-progress` sólo por dos evidencias de cierre (ensayo `migrate:down` y sesión MCP con token humano) que no condicionan este trabajo. — cerrado por rollout de TASK-1845
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -29,7 +31,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui|agency`
-- Blocked by: `TASK-1845, TASK-1846, TASK-1847, TASK-1848`
+- Blocked by: `TASK-1846, TASK-1847, TASK-1848`
 - Branch: `Greenhouse develop; sin branch dedicada ni worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -354,6 +356,7 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [ ] Arquitectura técnica, documentación funcional y manual/runbook actualizados proporcionalmente.
 - [ ] Handoff/changelog y contratos UI/API/MCP reflejan disponibilidad real.
 - [ ] Regresiones, señales, rollback y gates documentales pasan; no commit/push/deploy automático.
+- [ ] Actualizar la skill viva `efeonce-insights` (`references/program-ledger.md`, `architecture-map.md`, `contracts.md`, `operations.md`, `lessons.md`) y espejar a `.codex/` con `pnpm skills:mirrors` verde — contrato de EPIC-045; sin esto la task no pasa a complete.
 
 ## Delta 2026-09-09 — Insights dentro de la experiencia cliente e interna
 

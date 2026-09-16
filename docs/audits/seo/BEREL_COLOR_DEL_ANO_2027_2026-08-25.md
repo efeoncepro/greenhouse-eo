@@ -2,6 +2,7 @@
 
 ## Estado
 
+- **Delta 2026-09-16:** la presentación oficial *Paletas de Color Berel 2027* (Wiki de Berel › Color del año 2027) confirma **Bien y de Buenas 1-3404D** y sus cuatro paletas; ya no se trata como candidato. Ciclo, research y artículo de Colores de Temporada 2027 en [`BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md`](BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md).
 - Tipo: auditoría de cliente — research de una **pieza-hito anual** (color del año), su ángulo editorial, su mapa competitivo y su plan de lanzamiento
 - Cliente: **Berel** (`berel.com`), fabricante mexicano de pintura arquitectónica. Efeonce le opera el blog.
 - Fecha: 2026-08-25 · Versión: **1.1** (2026-08-25 — se corrige §8.1: el eslabón editorial 2025 → 2026 **no existe**, era el pie de página global; se agrega el enlace al documento de arquitectura de autoridad, que mide el grafo y el estado de la entidad. El resto del cuerpo no cambió)

@@ -8,6 +8,7 @@
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import type { InsightAudience } from './contracts/request'
 import type { InsightActorKind, InsightEditionState } from './contracts/states'
 
 type OutboxClient = Parameters<typeof publishOutboxEvent>[1]
@@ -103,3 +104,50 @@ export const publishInsightEditionIssued = (client: OutboxClient, payload: Insig
     { aggregateType: AGGREGATE_TYPES.insightEdition, aggregateId: payload.editionId, eventType: EVENT_TYPES.insightEditionIssued, payload },
     client
   )
+
+// ── TASK-1846 — render durable ──────────────────────────────────────────────────────────────
+
+export type InsightRenderRequestedPayload = {
+  version: 1
+  renderRunId: string
+  editionId: string
+  organizationId: string
+  audience: InsightAudience
+  outputs: string[]
+  manifestHash: string
+  actorKind: InsightActorKind
+}
+
+export type InsightRenderOutputPayload = {
+  version: 1
+  renderRunId: string
+  insightOutputId: string
+  editionId: string
+  organizationId: string
+  output: string
+  audience: InsightAudience
+  state: string
+  attempts: number
+  failureCode: string | null
+  /** Sólo en completed: el asset privado producido (id, nunca bytes ni URL firmada). */
+  outputAssetId: string | null
+}
+
+export const publishInsightRenderRequested = (client: OutboxClient, payload: InsightRenderRequestedPayload) =>
+  publishOutboxEvent(
+    { aggregateType: AGGREGATE_TYPES.insightRenderRun, aggregateId: payload.renderRunId, eventType: EVENT_TYPES.insightRenderRequested, payload },
+    client
+  )
+
+export const publishInsightRenderOutputCompleted = (client: OutboxClient, payload: InsightRenderOutputPayload) =>
+  publishOutboxEvent(
+    { aggregateType: AGGREGATE_TYPES.insightRenderRun, aggregateId: payload.renderRunId, eventType: EVENT_TYPES.insightRenderOutputCompleted, payload },
+    client
+  )
+
+export const publishInsightRenderOutputFailed = (client: OutboxClient, payload: InsightRenderOutputPayload) =>
+  publishOutboxEvent(
+    { aggregateType: AGGREGATE_TYPES.insightRenderRun, aggregateId: payload.renderRunId, eventType: EVENT_TYPES.insightRenderOutputFailed, payload },
+    client
+  )
+

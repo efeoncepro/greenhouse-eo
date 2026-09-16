@@ -1,84 +1,119 @@
 ---
 name: efeonce-insights
-description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), sharing/delivery (TASK-1848) or the portal UI (TASK-1849), or when a human asks how an Insights figure was produced. Routes rendering to artifact-composer, metrics to their owner modules and MCP exposure to efeonce-mcp-platform.
+description: Operate and extend Efeonce Insights (EPIC-045) — the frozen-edition library (deck/A4/web) over SEO/AEO/ICO evidence, live in production since 2026-09-15. Use when creating or reading Insights editions through API/MCP, when adding a module adapter, when wiring rendering (TASK-1846), charts/catalogs (TASK-1847), sharing/delivery (TASK-1848), the portal UI (TASK-1849) or the Think web render (TASK-1875), when rolling out or rolling back the domain, or when a human asks how an Insights figure was produced. Every EPIC-045 task MUST update this skill at closure (see Skill Maintenance Contract).
 ---
 
-# Efeonce Insights (harness skill)
+# Efeonce Insights (living skill)
 
 Efeonce Insights is a **commercial capability inside Greenhouse**: one request per organization and
 window produces a versioned, immutable edition whose evidence, plan and (later) outputs share the same
 facts. Greenhouse owns library, request, permissions and lifecycle; the Composer owns composition; the
-producer modules (SEO, AEO, ICO) own their metrics; Email owns transport.
+producer modules (SEO, AEO, ICO) own their metrics; Email owns transport; Think renders the shared web.
 
-Canon: `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` (+ ADR
-`EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md`, `EPIC-045`). Runtime built by TASK-1845 (foundation).
-Served MCP manual (same operating recipes, machine audience): `docs/mcp/skills/efeonce-insights/SKILL.md`.
+This skill is the **accumulated operating knowledge of the program**, not a copy of the docs. The
+architecture and the ADR say what the domain *is*; this skill says what an agent must know to *work on
+it without repeating what already cost a day*. It grows with every task: see the maintenance contract.
 
-## Where things live
+## Read order
 
-| Concern | Path |
-| --- | --- |
-| Browser-safe contracts (request, evidence facts, ChartSpecV1, plan, states, retention) | `src/lib/efeonce-insights/contracts/**` |
-| Window resolution (IANA, DST, calendar comparison rules) | `src/lib/efeonce-insights/window.ts` |
-| Module adapters + registry + orchestrator | `src/lib/efeonce-insights/adapters/**` |
-| Editorial plan (deterministic planner, figure validation, bounded AI) | `src/lib/efeonce-insights/editorial/**` |
-| Authorization (capability × target × per-org module) and eligible catalog | `authz.ts`, `catalog.ts` |
-| Commands (validate/create/revise/issue/withdraw/recover + phased generation) | `src/lib/efeonce-insights/commands/**` |
-| Readers with audience projection | `src/lib/efeonce-insights/readers/**` |
-| Stores (raw SQL, tx-composable) and outbox events | `stores/**`, `events.ts` |
-| Ports to later units (outputs → TASK-1846, share → TASK-1848) | `ports.ts` |
-| API Platform lanes | `src/app/api/platform/{app,ecosystem}/insights/**`, `src/lib/api-platform/resources/{app,ecosystem}-insights.ts` |
-| MCP tools | `src/mcp/greenhouse/{tool-manifest,server,tools,http-client}.ts` (`get_insights_catalog`, `list_insight_editions`, `get_insight_edition`, `create_insight_edition`) |
-| Schema | `greenhouse_insights` (migration `20260915100154428_task-1845-insights-foundation.sql`) |
-| Flags (all default OFF) | `INSIGHTS_GENERATION_ENABLED`, `INSIGHTS_ISSUANCE_ENABLED`, `INSIGHTS_AUTHORING_AI_ENABLED` (`flags.ts`, ledger) |
-| Reliability | module `insights`; signals `insights.editions.failed_recent`, `insights.editions.stuck_generation` |
+1. This file (rules + routing).
+2. [`references/program-ledger.md`](references/program-ledger.md) — what each task built, what is
+   live where, what it left for the next one. **Start here to know the current state.**
+3. [`references/architecture-map.md`](references/architecture-map.md) — where every piece lives.
+4. [`references/contracts.md`](references/contracts.md) — request, responses, errors, idempotency.
+5. [`references/operations.md`](references/operations.md) — flags, module assignment, canaries,
+   rollback, deploy traps.
+6. [`references/lessons.md`](references/lessons.md) — the traps that already bit someone.
+7. Canon docs only when you need the full contract:
+   `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` (§5 windows, §7 API/MCP/authz, §10 gates,
+   §14 state), `EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md` (ADR), and the exhaustive
+   `EFEONCE_INSIGHTS_IMPLEMENTATION_RECORD_V1.md` (file-by-file record of the foundation).
 
-## Invariants you must keep
+## Hard rules (verbatim in `.claude/rules/efeonce-insights.md`, auto-loaded by path)
 
-- **Metrics stay with their owner.** Adapters consume public readers of `growth/seo`,
-  `growth/ai-visibility` and `ico-engine`; they never recompute formulas, never import
-  `client-portal` (DAG leaf) nor AEO `probes/**`. If an owner reader cannot serve a window exactly,
-  the adapter declares `unsupported_window` (with an alternative granularity when one exists) — it
-  never uses the current value as history. Absence ≠ zero: declare a `rejection`.
-- **One snapshot per edition, sealed and hashed; one plan, frozen and hashed.** Correcting means a
-  new version (`reviseInsightEdition`), never mutating. Issued editions can only be withdrawn. DB
-  triggers enforce it; the TS state machine (`edition-state-machine.ts`) mirrors the DB matrix and the
-  parity test parses the migration — change both together, with a new migration.
-- **Every figure in the plan references a fact.** `validateEditorialPlan` rejects any number in a
-  claim that is not derived from a referenced fact (value, numerator/denominator, delta). Bounded AI
-  may only rewrite claim text and is discarded on any violation (one repair max); it never computes,
-  issues or sends.
-- **Three authorization planes, one door** (`assertInsightsAccess`): capability by action
-  (`insights.report.read`, `insights.edition.create`, `insights.edition.review`,
-  `insights.edition.issue` — grants in `runtime.ts`), target by actor (client = own organization,
-  anti-oracle 404 elsewhere; internal = target revalidated per command), and per-org module
-  `insights_v1`. `audience` is a dimension separate from the actor; a client never gets `internal`.
-- **Idempotency at the domain**: `(organization_id, idempotency_key)` unique + `request_hash`; same
-  key + different payload ⇒ `idempotency_conflict`. Lanes add transport idempotency on top.
-- **Issuing is a human gate with validated outputs.** The outputs port is not connected until
-  TASK-1846; `issueInsightEdition` fails closed with `not_ready`. Machine consumers (MCP internal
-  bindings) create but never issue.
-- **Write allowlist**: `boundary-domain.test.ts` lists the only tables this domain writes. New stores
-  are declared there in the same PR.
+- **Windows are `[start, endExclusive)` civil dates in an IANA zone**, resolved only by `window.ts`
+  (DST two-pass, "previous month" is not 30 days, Feb 29 → Feb 28, max 400 days, never starts in the
+  future). NEVER recompute a window inline in an adapter, lane or renderer.
+- **Idempotency is `(organization_id, idempotency_key)` + `request_hash`**: same key + same request ⇒
+  same edition (`200`, `idempotent: true`); different request ⇒ `409 idempotency_conflict`. NEVER
+  create a second edition "to retry"; failed editions are recovered from their phase.
+- **Adapters consume only the owner readers** (`readSeoOverviewKpisForWindow`, the AEO run whose
+  `asOfDate` falls in the window, the ICO materializers). NEVER import `@/lib/client-portal/*` from
+  the domain (it is a leaf of the DAG; lint enforces it) and NEVER read producer tables directly.
+- **Sealed snapshot and frozen plan are immutable** (no-update/no-delete triggers, hashes). A
+  correction is `revise` → new edition version. NEVER `UPDATE` them, never re-author a frozen plan.
+- **Issuing needs validated outputs + a human gate.** The real `InsightOutputsPort` (TASK-1846, wired when
+  `commands/index.ts` loads) validates only outputs `completed` with an asset for the SAME audience as the
+  edition; a missing one is `not_ready` with `missing`. Ecosystem/MCP actors never issue nor withdraw.
+- **Durable rendering is asynchronous and fail-closed** (`render/**`): only `INSIGHT_RENDERABLE_OUTPUTS`
+  (today `deck_pdf`) can be queued; another target is `render_rejected`, never "for later". The mapper NEVER
+  truncates a figure or a claim to fit a slot (it rejects with the cause). Lease and fencing ship together:
+  finalization presents the `fence_token` or writes nothing. `INSIGHTS_RENDER_ENABLED` is read in THREE runtimes
+  (Vercel to queue, the `ops-worker` dispatcher that launches the Job, the `artifact-worker` Job to claim) and must
+  be ON in all three. Job and ops-worker are single instances shared by staging and production: the per-environment
+  product gate is the Vercel enqueue, never a lane-dependent Job config. Throughput is 1 output per 2-min tick.
+- **Three access planes on every command** (`authz.ts`): module `insights_v1` assigned per organization
+  + capability `insights.*` + audience. An organization without the module is `not_found` (404
+  anti-oracle), never `403`. Clients see evidence/plan only of issued editions.
+- **Flags are multi-gate and default OFF**: `INSIGHTS_GENERATION_ENABLED` (create/revise),
+  `INSIGHTS_ISSUANCE_ENABLED` (issue), `INSIGHTS_AUTHORING_AI_ENABLED` (Gemini). Read only in Vercel
+  today; a worker that reads one must declare it in its `deploy.sh`. A Vercel deployment created
+  before `vercel env add` does not see the variable: redeploy.
+- **Figures are never invented, never "0" when absent.** `no_data`, `unsupported_window`,
+  `insufficient_data` are rejections recorded in the snapshot and shown as limits in the plan. The AI
+  author only rewrites validated text; if a figure changes, the deterministic plan wins.
+- **Federating an MCP tool is part of "done"**: manifest entry in Greenhouse → sync to the gateway →
+  policy + scope class → parity test → surface baseline → version bump → canary. A write tool gets a
+  blast-radius scope class (`efeonce.mcp.insights.write` exists; never wire it into the shared PKCE client).
+- **Vocabulary**: editions created by canaries are **synthetic** (org sandbox "Greenhouse Demo");
+  "production" names the runtime, not the nature of the data. Never write "real editions in production"
+  for them — it made a peer session stop a rehearsal.
 
-## Extending
+## Routing
 
-- **New module**: implement `ModuleReportAdapterV1` (`adapters/contract.ts`), register it in
-  `adapters/registry.ts`, declare its availability rule in `catalog.ts`. The orchestrator and the
-  Composer are not touched. Cover: unsupported window, absence reasons, comparison linkage.
-- **New verb / lane**: add the command in `commands/**` first (Full API Parity), then thin adapters in
-  both lanes and the MCP trio; map errors through `resources/insights-errors.ts`.
-- **Rendering (TASK-1846)**: implement `InsightOutputsPort` and register it with
-  `setInsightOutputsPort`; move `runInsightGeneration` phases to the worker; declare the worker's
-  reading of the flags in the ledger.
-- **Federation**: registering an MCP tool here is not enough — the gateway in `efeonce-mcp` needs its
-  pieces (and a scope for writes). Skill: `efeonce-mcp-platform`.
+- Rendering, PDF/deck, Artifact Worker → `references/program-ledger.md` § TASK-1846 + `artifact-composer` docs; Proposal stays a compatible consumer adapter (behaviour untouched).
+- Charts/catalogs → `dataviz-design` + `deck-studio` + TASK-1847.
+- Sharing/email/schedules → `resend-email-platform`, `greenhouse-email` + TASK-1848.
+- Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).
+- Shared web render → `efeonce-think` repo + `astro` skill + TASK-1875 (headless model, token server-side).
+- Metrics semantics → `greenhouse-ico`, `seo-aeo`, growth SEO docs; never re-derive a formula here.
+- MCP exposure/federation → `efeonce-mcp-platform` + `mcp-craft`.
+- Release/rollback → `greenhouse-production-release` (+ `references/operations.md` here for the domain specifics).
+
+## Skill Maintenance Contract (binding for every EPIC-045 task and every session that builds Insights)
+
+A task of EPIC-045 (TASK-1846, 1847, 1848, 1849, 1875 and any future child) is **not closable** until
+this skill reflects what it built. At closure, in the same commit as the task's lifecycle change:
+
+1. `references/program-ledger.md`: fill your task's row and section — what exists, commits/SHAs,
+   what is deployed where (runtime × component × state × evidence), flags and their state, what you
+   deliberately left out, and the exact hand-off to the next task.
+2. `references/architecture-map.md`: add/adjust every new file, table, route, tool, worker, event,
+   signal or flag with one line of responsibility.
+3. `references/contracts.md`: any new/changed field, enum, error code, HTTP status, idempotency rule,
+   projection rule or tool input shape. Keep the "verified against" date.
+4. `references/operations.md`: any new flag (and its runtime), env var, canary recipe, rollback step,
+   assignment/provisioning step, or deploy trap.
+5. `references/lessons.md`: every trap that cost more than 15 minutes, with the date, the symptom and
+   the rule that avoids it. Traps are the most valuable content of this skill.
+6. `SKILL.md`: update the description/frontmatter if the trigger surface changed; add a hard rule only
+   if a new invariant was born (verified in code, not aspirational).
+7. Mirror to `.codex/skills/efeonce-insights/` (`rsync -a --delete .claude/skills/efeonce-insights/ .codex/skills/efeonce-insights/`), run
+   `pnpm skills:mirrors`, and if `docs/mcp/skills/efeonce-insights/SKILL.md` (the MCP-served manual)
+   needs the same knowledge for an external agent, update it too and regenerate with
+   `pnpm mcp:skills:generate` + `pnpm mcp:skills:check` (no TASK ids, paths, UUIDs, org ids, secrets).
+
+Sessions that do partial work (a slice, a canary, an incident) append to `references/lessons.md`
+and to the ledger's "sessions" list immediately, not at task closure. Codex, Claude and Cursor all
+own this contract; the `.codex/` mirror is the same file, so edit `.claude/` and mirror.
 
 ## Verification that counts
 
-`pnpm vitest run --project unit src/lib/efeonce-insights src/lib/api-platform/resources/insights-lanes.test.ts src/mcp`
-(contracts, windows, adapters with mocked readers, planner + validation + AI fallback, commands
-allow/deny/idempotency, lanes, manifest) and `pnpm test:live src/lib/efeonce-insights` (stores against
-real PostgreSQL inside a rolled-back transaction: ownership, immutability triggers, state matrix,
-idempotency). New embedded SQL is exercised once against real PG before commit. Flags stay OFF until
-a staging canary with two synthetic organizations and a release authorization.
+- Unit: `pnpm vitest run src/lib/efeonce-insights src/lib/api-platform/resources` (+ MCP tests
+  `src/mcp/greenhouse`) — states/matrix parity, windows (DST, Feb 29, custom overlap), adapters
+  (unsupported_window, no_data ≠ 0, RpA suppressed, OTD denominator), editorial (figure guard),
+  commands (idempotency, authz, three planes), lanes (same error table), manifest/skill leak tests.
+- Live: `pnpm test:live` for `stores.live.test.ts` (org isolation, triggers, code sequence).
+- Runtime: the canaries in `references/operations.md` against staging and production, per lane, with
+  the synthetic organization; a deny (404) on an organization without the module is part of every canary.
+- Docs: `pnpm task:lint`, `pnpm docs:context-check:strict`, `pnpm skills:mirrors`, `pnpm mcp:skills:check`.

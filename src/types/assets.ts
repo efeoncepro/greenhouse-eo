@@ -80,6 +80,9 @@ export type GreenhouseAssetContext =
   | 'proposal_rfp'
   | 'proposal_deliverable_draft'
   | 'proposal_deliverable'
+  // TASK-1846 — outputs de una edición de Efeonce Insights (deck/informe). System-generated:
+  // nunca los sube una persona, por eso NO entra en DraftUploadContext.
+  | 'insight_output'
 
 export interface GreenhouseAssetRecord {
   assetId: string

@@ -27,9 +27,23 @@ superficie.
 - Estados Unidos: `+1 (239) 235-2073`.
 - Casa matriz: Santiago de Chile; la dirección exacta se mantiene como dato editorial page-scoped validado en el
   brief y no se replica en el footer global.
+- Cobertura: trabajamos con organizaciones en Chile, Estados Unidos, Colombia, México y Perú. Es cobertura de
+  trabajo, no oficinas: la única sede que la página publica es la casa matriz de Santiago.
 
 ## Alcance honesto
 
 Esta documentación describe la experiencia pública aprobada, no promete un SLA ni confirma el destino operativo
 de cada motivo. La entrega de submissions, booking y routing deben verificarse en sus contratos Growth Forms y
 Meetings; una pantalla de éxito no sustituye un receipt server-side.
+
+## Qué cambió el 2026-09-16
+
+- La entrada «Cobertura» dejó de decir «Chile y otros mercados» y ahora nombra los cinco: Chile, Estados Unidos,
+  Colombia, México y Perú. La persona ya no tiene que adivinar cuáles son «los otros».
+- La banda que invita a agendar una reunión se lee bien en el teléfono: el titular entra en dos líneas en vez de
+  tres, hay aire arriba y abajo, y la curva decorativa ya no cruza por encima del botón. En computador se ve
+  igual que antes.
+
+Una nota honesta sobre el segundo punto: ese arreglo del teléfono estaba escrito y revisado desde el día
+anterior, y esta documentación decía que ya estaba publicado. No lo estaba. La página en vivo siguió mostrando la
+versión antigua hasta que se desplegó el 2026-09-16.

@@ -3,6 +3,8 @@
 > **Tipo:** investigación de proveedor y contrato de integración
 > **Estado:** Accepted como evidencia de proveedor; no autoriza rollout
 > **Validado:** 2026-09-08 (familia 2.5, ciclo de vida, precios, tamaños, streaming, provenance).
+> El contrato transportado por el helper, la máscara del CLI y las líneas base de consumo medido — generar y
+> editar — se validaron el 2026-09-16.
 > Las secciones de transparencia GPT Image 2 y el mapeo Globe conservan su validación del 2026-08-21.
 > **Owner:** Greenhouse AI Image Generator + Globe Model Fleet
 > **Revalidación:** antes de implementar, cambiar precios, promover una ruta o usar una capacidad en preview
@@ -50,8 +52,14 @@ falsamente la existencia de `input_fidelity`.
 - Image API permite elegir el modelo exacto. Responses API elige un modelo principal compatible y la herramienta
   `image_generation` administra su propia selección GPT Image; para 2.5 sí se puede fijar `model` **dentro del
   tool**, pero no como modelo top-level de `/v1/responses`.
-- El helper Greenhouse **todavía no transporta la familia 2.5** y falla de dos formas silenciosas distintas.
-  Ver §Mapeo contra Greenhouse y Globe antes de intentar usarla.
+- El helper Greenhouse **ya transporta la familia 2.5** y decide el contrato por capacidad declarada, no por
+  literales de modelo. Ver §Mapeo contra Greenhouse y Globe para el contrato exacto.
+- **Consumo medido, no estimado.** El costo por imagen de 2.5 sigue sin ser estimable desde la documentación,
+  pero existe una línea base propia con `usage` de respuestas reales: mismo consumo entre Flare y Sunburst para
+  el mismo `quality`, y la diferencia entre modelos es de latencia. Ver §Precios.
+- **Editar no abarata.** Medido el 2026-09-16: un edit devuelve la imagen completa aunque la máscara acote qué
+  cambia, así que el `output` se cobra igual que una generación y la imagen base se suma como input — en `low`,
+  **2,3× generar**. La máscara en sí es gratis. Ver §Qué cuesta editar frente a generar.
 
 ## Familia y ciclo de vida
 
@@ -91,6 +99,11 @@ Los modelos DALL·E no pertenecen a la familia GPT Image. Sus snapshots fueron r
 | `POST /v1/images/edits` | GPT Image directo | No | Sí, hasta 16 imágenes | Sí | Sí, `partial_images: 0..3` | Sí | Sí |
 | Responses API + `image_generation` | modelo principal GPT-5+; el tool admite `model` explícito | Sí | Sí, multi-turn | Sí, `input_image_mask` | Sí | Sí dentro del tool | Sí |
 | Batch API | endpoint Images embebido | Sí | Sí | Sí, según endpoint | resultado diferido, no SSE | Sí en el body del request | **No** |
+
+La columna **Máscara** describe la superficie del proveedor, no lo que Greenhouse transporta. `/v1/images/edits`
+acepta máscara desde siempre; lo que cambió el **2026-09-16** es que el CLI `pnpm ai:image` la expone con
+`--mask`, así que el inpainting ya es alcanzable desde la terminal y no sólo llamando `editOpenAIImage()`.
+Ver §Mapeo contra Greenhouse y Globe.
 
 Las fichas de modelo marcan `Streaming: Not supported`, mientras la guía y el API reference documentan streaming
 de Image API y Responses API. Para la integración se toma el contrato específico del endpoint como autoridad y se
@@ -167,6 +180,10 @@ como `background: "transparent" | "opaque"`; debe conservarse en provenance/read
 - **Los formatos aceptados como imagen de entrada del endpoint de edits NO están documentados.** La tabla
   PNG/JPEG/WEBP/GIF de "Image input requirements" pertenece a la guía de visión de Responses/Chat y **no debe
   extrapolarse** a `/v1/images/edits`.
+- **La máscara acota el resultado, no el gasto.** Medido el 2026-09-16: el `usage` de un edit con máscara y uno
+  sin máscara fue **idéntico**, y su `output` fue el mismo que el de una generación desde cero — el modelo
+  devuelve la imagen completa aunque la máscara limite qué cambia. Lo que encarece un edit es la imagen base,
+  que se paga como tokens de entrada. Ver §Qué cuesta editar frente a generar.
 
 ### Respuesta y medición
 
@@ -324,6 +341,77 @@ gasto que hoy derive el costo de una imagen desde una tabla `quality × size` **
 vía documentada es leer `usage` de la respuesta real y persistirlo. Cualquier cifra de costo por imagen de 2.5
 publicada en prensa o blogs de terceros **no es verificable contra doc oficial** y no debe entrar a un contrato.
 
+### Línea base de consumo medido — evidencia fechada, NO contrato
+
+Como la documentación no permite estimar, la única vía es medir. Esta tabla es el `usage` real de 7 piezas
+generadas el **2026-09-16**, todas `1024x1024` PNG, contra el snapshot **`…-2026-09-08`**.
+
+| Pieza | Input tokens | Output tokens | Total | Latencia |
+|---|---:|---:|---:|---:|
+| `flare` · `low` | 49 | 196 | 245 | 13,3 s |
+| `flare` · `high` | 49 | 1.756 | 1.805 | 18,7 s |
+| `flare` · `max` | 49 | 7.024 | 7.073 | 46,0 s |
+| `sunburst` · `low` | 49 | 196 | 245 | 11,6 s |
+| `sunburst` · `high` | 49 | 1.756 | 1.805 | 29,1 s |
+| `sunburst` · `max` | 49 | 7.024 | 7.073 | 80,6 s |
+| `flare` · `high` · `background: transparent` | 52 | 1.756 | 1.808 | 21,0 s |
+
+Costo derivado del total: **USD 0,593** por las 7 piezas, aplicando las tarifas de la tabla anterior
+(output de imagen USD 30,00/1M; texto de entrada USD 5,00/1M — la tarifa de 8,00 es para IMAGEN de entrada, que en una generación pura no aplica).
+
+**Lo que la medición muestra:**
+
+1. **El modelo no fija el costo; lo fija `quality × size`.** El consumo es **idéntico** entre Flare y Sunburst
+   para el mismo `quality`. Elegir Sunburst sobre Flare no encarece la pieza.
+2. **Lo que separa a los modelos es la latencia, y la brecha crece con la calidad.** En `max`, 46,0 s contra
+   80,6 s — **1,75x**. En `low` la diferencia es marginal.
+3. **`background: transparent` no tuvo costo adicional.** Los 3 tokens de input extra vienen del prompt más
+   largo, no de la transparencia.
+4. **Ninguna de las 7 corridas degradó:** todas resolvieron exactamente el `quality`, `size` y `background`
+   pedidos.
+
+🔴 **Esta tabla es evidencia fechada, no una tarifa estable ni un contrato.** El consumo por nivel de calidad
+puede cambiar sin aviso del lado de OpenAI, y sólo cubre `1024x1024`. **Releerla y volver a medir antes de
+presupuestar**, y nunca extrapolarla linealmente a otros tamaños. Evidencia completa (README, manifest, `usage`
+crudo por corrida y el canary reproducible): `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
+
+### Qué cuesta editar frente a generar — evidencia fechada, NO contrato
+
+Medición del **2026-09-16** con `gpt-image-2.5-flare`, `quality=low`, `1024x1024`, leyendo `usage` real. Los dos
+edits comparten prompt e imagen base y sólo se diferencian en la máscara; la fila "Generar" es el control, con la
+misma calidad y el mismo tamaño pero sin imagen base.
+
+| Caso | Input (img / txt) | Output | Total | USD derivado |
+|---|---:|---:|---:|---:|
+| Generar | 37 (0 / 37) | 196 | 233 | 0,0061 |
+| Editar **con** máscara | 1.056 (1.024 / 32) | 196 | 1.252 | 0,0142 |
+| Editar **sin** máscara | 1.056 (1.024 / 32) | 196 | 1.252 | 0,0142 |
+
+Tarifas aplicadas: image in USD 8,00/1M · text in USD 5,00/1M · image out USD 30,00/1M.
+
+**Lo que la medición muestra — y es contraintuitivo:**
+
+1. **Editar NO abarata.** El modelo devuelve la imagen **completa** aunque la máscara acote qué cambia, así que
+   el `output` se cobra idéntico a una generación (196 tokens en los tres casos). La máscara controla el
+   resultado, no el gasto.
+2. **La imagen base se paga como entrada:** 1.024 tokens de imagen por una imagen de `1024x1024`. En `low`,
+   editar costó **2,3× generar**.
+3. **La máscara es gratis.** El `usage` fue idéntico con y sin ella. Lo que se cobra es la imagen base.
+4. **El sobrecosto relativo se diluye al subir la calidad**, porque el output domina: ~2,3× en `low`, ~1,15× en
+   `high` y ~1,04× en `max`, derivado de los outputs ya publicados arriba (196 / 1.756 / 7.024).
+5. 🔴 **Corolario operativo: para recortar el fondo de una imagen que ya existe, usar `pnpm ai:image:rmbg`**
+   (matting local, cero costo de proveedor). Pedirle el recorte al modelo cuesta como una imagen nueva.
+6. **El inpainting hizo lo que se le pidió:** puso el objeto y preservó el resto — diferencia media fuera de la
+   zona de 2,4/255 con máscara y 2,8/255 sin ella.
+
+El `input` de la fila "Generar" difiere de la tabla anterior porque el prompt es otro; el `output`, que es lo que
+fija el costo de la pieza, es el mismo 196.
+
+🔴 **Esta tabla es evidencia fechada, no una tarifa estable ni un contrato.** Cubre un solo `quality` y un solo
+tamaño, y el consumo puede cambiar sin aviso del lado de OpenAI. **Volver a medir antes de presupuestar.**
+Evidencia completa y reproducible: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/` (§"Qué cuesta
+EDITAR frente a generar" del README y bloque `editBaseline` de `manifest.json`).
+
 ### Costo por imagen — modelos con calculadora oficial (NO aplica a 2.5)
 
 | Modelo | Quality | 1024×1024 | 1024×1536 | 1536×1024 |
@@ -421,9 +509,12 @@ La verificación de provenance complementa, pero no reemplaza, el lineage intern
 | Capa | Estado observado | Consecuencia |
 |---|---|---|
 | OpenAI | familia 2.5 activa con transparencia plena y `xhigh`/`max` | provider-supported desde 2026-09-08 |
-| Greenhouse helper | **NO conoce la familia 2.5** | ver las dos trampas silenciosas abajo |
-| Greenhouse helper | conserva GPT Image 2 y rechaza JPEG transparente antes de red | implementado local; aceptar el asset sigue exigiendo QA alfa |
-| Greenhouse CLI | conserva el modelo exacto y no activa fallback a 1.5 | canary local facturable aprobado 2026-08-21: `gpt-image-2`, PNG 1024×1024, `quality=low`, `background=transparent`, canal alfa y 470.164 píxeles totalmente transparentes; no demuestra el runtime Globe |
+| Greenhouse helper | **transporta la familia 2.5**, con contrato decidido por capacidad declarada | ver §El contrato transportado abajo |
+| Greenhouse helper | conserva el modelo exacto y rechaza JPEG transparente antes de red | implementado local; aceptar el asset sigue exigiendo QA alfa |
+| Greenhouse CLI | valida `--model` y `--quality` contra el allowlist antes de cualquier I/O | canary local facturable aprobado 2026-08-21: `gpt-image-2`, PNG 1024×1024, `quality=low`, `background=transparent`, canal alfa y 470.164 píxeles totalmente transparentes; no demuestra el runtime Globe |
+| Greenhouse CLI | **expone máscara: `--mask <path>` (inpainting)** desde 2026-09-16 | conecta el soporte de máscara que `editOpenAIImage()` ya tenía y el CLI no ofrecía; `--mask` sin `--image` **aborta antes de cualquier I/O** — sin esa guarda el request habría salido como generación desde cero, ignorando la máscara en silencio |
+| Greenhouse CLI | **imprime `usage` en cada corrida** (`usage: in N (img N · txt N) · out N · total N`) | para 2.5 el `usage` real es la única fuente documentada de costo; el instrumento que gasta ahora lo muestra |
+| Greenhouse helper | línea base de `usage` real de la familia 2.5 | medida 2026-09-16 sobre 7 piezas (generación) y sobre el par editar/generar; ver §Línea base de consumo medido y §Qué cuesta editar frente a generar |
 | Greenhouse helper singular | fija `n=1` y rechaza `numberOfImages != 1` | evita pagar outputs que el contrato singular descartaría |
 | Greenhouse Responses helper | rechaza `partialImages > 0` mientras no exista parser SSE | no promete parciales desde un camino no streaming |
 | Globe `ImageOutputShapeV1` | `backgroundMode` aditivo, default canónico por ruta | implementado local; snapshots legacy leen `auto` |
@@ -432,30 +523,54 @@ La verificación de provenance complementa, pero no reemplaza, el lineage intern
 | Globe ruta `ref/still/openai-v2` | generación prompt-only con `auto` / `opaque` / `transparent`; edit deferred | implementado local; promoción/canary pendientes |
 | Globe familia 2.5 | **sin ruta, sin binding, sin readiness** | Globe está `hibernated` desde 2026-09-02; no hay promoción posible hoy |
 
-### 🔴 Las dos trampas silenciosas del helper Greenhouse con 2.5
+### El contrato transportado de la familia 2.5
 
-Verificado leyendo `src/lib/ai/openai-image.ts` el 2026-09-08. La familia 2.5 no está en el tipo
-`OpenAIImageModel` ni en el set `OPENAI_IMAGE_MODELS`, y el resultado **no es un error legible**:
+Verificado leyendo `src/lib/ai/openai-image.ts`. Los cuatro identificadores viven en el tipo `OpenAIImageModel`
+y en el allowlist: `gpt-image-2.5-flare`, `gpt-image-2.5-flare-2026-09-08`, `gpt-image-2.5-sunburst` y
+`gpt-image-2.5-sunburst-2026-09-08`.
 
-1. **Por env var → degradación de modelo, en silencio.** `OPENAI_IMAGE_MODEL=gpt-image-2.5-flare` no pasa el
-   allowlist de `getOpenAIImageModel()`, que devuelve el default `gpt-image-2` sin advertir. Se cree estar
-   generando con 2.5 y se paga GPT Image 2.
-2. **Por flag CLI → degradación de resolución y parámetro prohibido, en silencio.** `pnpm ai:image --model
-   gpt-image-2.5-flare` castea el valor sin validarlo, así que el modelo **sí viaja** al API; pero
-   `resolveOpenAIImageSize()` ramifica por `model === 'gpt-image-2'` y manda todo lo demás a la rama legacy:
-   el default por aspect ratio cae de `2048x1152` a `1536x1024`, y un `--size` moderno explícito se resuelve a
-   `auto`. Además `editOpenAIImage()` inyecta `input_fidelity` para todo modelo `!== 'gpt-image-2'`, un
-   parámetro cuyo comportamiento en 2.5 no está documentado.
+**El contrato se decide por capacidad declarada, no por literales de modelo.**
+`OPENAI_IMAGE_MODEL_CAPABILITIES` es un `Record<OpenAIImageModel, …>` con tres capacidades por modelo
+—`extendedSizeGrid`, `premiumQualityTiers`, `inputFidelity`— y ser un `Record` es la defensa: el compilador
+obliga a declarar las capacidades de todo modelo nuevo, así que agregar uno **no puede volver a degradar en
+silencio** por olvidar un literal en una rama. Esa era exactamente la forma de la falla anterior.
 
-**Reglas duras mientras el helper no se actualice:**
+| Capacidad | Qué gobierna | Familia 2.5 | `gpt-image-2` | 1.5 / 1 / 1-mini |
+|---|---|---|---|---|
+| `extendedSizeGrid` | grilla moderna (`2048x1152`, `2048x2048`, …) en vez de la legacy de tres tamaños | sí | sí | no |
+| `premiumQualityTiers` | escalones `xhigh` y `max` | sí | no | no |
+| `inputFidelity` | envío de `input_fidelity` en `/v1/images/edits` | **no** | no | sí |
 
-- **NUNCA** setear `OPENAI_IMAGE_MODEL` a un id de la familia 2.5: no genera con 2.5, genera con GPT Image 2.
-- **NUNCA** documentar ni recomendar `pnpm ai:image --model gpt-image-2.5-*` como camino disponible: el modelo
-  llega, pero la resolución se degrada y `input_fidelity` se inyecta sin contrato.
-- Habilitar 2.5 exige, en el mismo cambio: extender el tipo y el allowlist, extender `OpenAIImageQuality` con
-  `xhigh`/`max` gated a 2.5, mover 2.5 a la rama moderna de `resolveOpenAIImageSize`, dejar de inyectar
-  `input_fidelity` sin evidencia, y **un canary facturable con readback de `usage` real** — porque el costo por
-  imagen de 2.5 no se puede estimar antes de gastarlo.
+Consecuencias verificadas en el código:
+
+- **`quality` acepta `auto | low | medium | high | xhigh | max`.** `xhigh` y `max` existen sólo en 2.5;
+  pedirlos a un modelo anterior **lanza antes de la red** (`assertOpenAIImageQualitySupported`), en vez de
+  gastar un request que el proveedor rechaza.
+- **`input_fidelity` ya no viaja con modelos 2.5.** `editOpenAIImage()` lo envía sólo cuando el modelo declara
+  la capacidad, así que sigue enviándose con `gpt-image-1.5`, `gpt-image-1` y `gpt-image-1-mini`, y nunca con
+  2.5. `gpt-image-2` tampoco lo envía, igual que antes.
+- **`resolveOpenAIImageSize()` dejó de ramificar por `model === 'gpt-image-2'`** y pregunta por
+  `extendedSizeGrid`. La familia 2.5 resuelve a la grilla moderna: `16:9` → `2048x1152`.
+
+**Las tres puertas de entrada fallan ruidoso:**
+
+1. **Env var.** Un `OPENAI_IMAGE_MODEL` desconocido **lanza** y nombra los modelos válidos, en vez de devolver
+   el default en silencio. La falla aparece al arranque del consumer, que es donde se quiere descubrir una env
+   mal escrita.
+2. **CLI.** `pnpm ai:image` valida `--model` y `--quality` contra el allowlist **antes de cualquier I/O**.
+3. **Combinación.** El par `model × quality` se valida una sola vez al arrancar el CLI, no por pieza: con
+   `--count 5`, validarlo dentro del loop repetiría el mismo error cinco veces y ya habría creado directorios
+   de salida.
+
+**Reglas duras vigentes:**
+
+- **NUNCA** enviar `input_fidelity` con un modelo 2.5. La preservación de identidad en 2.5 se pide **por
+  prompt** (lista de invariantes repetida en cada turno). El helper ya lo impide; la regla aplica a cualquier
+  camino que hable con el API sin pasar por él.
+- **NUNCA** agregar un modelo nuevo al tipo sin declarar sus capacidades en el `Record`. El compilador lo
+  exige; sortearlo con un cast reabre el bug class.
+- **NUNCA** presupuestar una pieza 2.5 desde la calculadora de GPT Image 2. Medir con `usage` real — hay línea
+  base fechada en §Precios.
 
 ### Contrato local implementado para transparencia en Globe
 

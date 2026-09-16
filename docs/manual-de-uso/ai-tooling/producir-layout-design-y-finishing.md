@@ -4,7 +4,7 @@
 >
 > **Estado:** Aplicable a producción creativa out-of-band
 >
-> **Última actualización:** 2026-07-19
+> **Última actualización:** 2026-09-16 por Claude (nota de cuentas de Fal en el ejemplo ejecutable)
 >
 > **Documentación funcional:** [Layout Design & Finishing](../../documentation/ai-tooling/layout-design-and-finishing.md)
 
@@ -110,6 +110,11 @@ pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs \
 node ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/12-compose-layout-design-pilot.mjs
 node ai-generations/2026-07-18_high-frequency-campaign-e2e/scripts/13-qa-layout-design-pilot.mjs
 ```
+
+El prefijo `FAL_API_KEY_SECRET_REF` nombra sólo la cuenta A de Fal. Desde 2026-09-16 el cliente también usa la cuenta
+B si `FAL_API_KEY_B_SECRET_REF` está en `.env.local` (el script lo carga) y cambia sola si una se queda sin saldo;
+revisa los saldos con `pnpm ai:fal --balance`. Detalle:
+[catálogo Fal §Cuentas, saldo y operación del CLI](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md).
 
 El script `11` consume presupuesto. Los scripts `12` y `13` son determinísticos y repetibles sin costo de
 modelo.

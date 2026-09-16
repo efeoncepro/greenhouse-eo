@@ -188,19 +188,22 @@ describe('release-worker-revision-drift signal', () => {
       const service = Array.isArray(args) ? String(args[3]) : ''
       const value = service === 'hubspot-greenhouse-integration' ? oldHubspotSha : targetSha
 
-      const stdout = JSON.stringify({
-        spec: {
-          template: {
-            spec: {
-              containers: [
-                {
-                  env: [{ name: 'GIT_SHA', value }]
+      const stdout =
+        Array.isArray(args) && args[1] === 'jobs'
+          ? JSON.stringify({ metadata: { labels: { 'git-sha': value } } })
+          : JSON.stringify({
+              spec: {
+                template: {
+                  spec: {
+                    containers: [
+                      {
+                        env: [{ name: 'GIT_SHA', value }]
+                      }
+                    ]
+                  }
                 }
-              ]
-            }
-          }
-        }
-      })
+              }
+            })
 
       if (cb) cb(null, { stdout, stderr: '' }, '')
     })
@@ -226,6 +229,47 @@ describe('release-worker-revision-drift signal', () => {
     expect(recommendedAction).toContain('/contract')
     expect(recommendedAction).toContain('drift_count=0')
     expect(recommendedAction).toContain('Do not edit greenhouse_sync.release_manifests by SQL')
+  })
+
+  // TASK-1846 — un Cloud Run JOB se lee por `jobs describe` + etiqueta `git-sha`. Si el lector
+  // siguiera usando `services describe`, el Job quedaría en data_missing para siempre: un detector
+  // que nunca puede ver drift.
+  it('reads a Cloud Run job SHA from its git-sha label and reports its drift', async () => {
+    process.env.GITHUB_RELEASE_OBSERVER_TOKEN = 'fake-token'
+
+    const targetSha = '4591bd8b28c8a18eb0aa15cfc8e092eeec814467'
+    const oldJobSha = '1111111111111111111111111111111111111111'
+    const calls: string[][] = []
+
+    postgresMock.runGreenhousePostgresQuery.mockResolvedValue([{ target_sha: targetSha }])
+
+    childProcessMock.execFile.mockImplementation((cmd, args, _opts, callback) => {
+      const cb = typeof _opts === 'function' ? _opts : callback
+
+      if (cmd === 'git') {
+        // Sin checkout del repo: el change-gate no puede probar equivalencia y no debe inventarla.
+        if (cb) cb(new Error('not a git repository'), { stdout: '', stderr: '' }, '')
+
+        return
+      }
+
+      calls.push(Array.isArray(args) ? args.map(String) : [])
+
+      const stdout =
+        Array.isArray(args) && args[1] === 'jobs'
+          ? JSON.stringify({ metadata: { labels: { 'git-sha': oldJobSha } } })
+          : JSON.stringify({ spec: { template: { spec: { containers: [{ env: [{ name: 'GIT_SHA', value: targetSha }] }] } } } })
+
+      if (cb) cb(null, { stdout, stderr: '' }, '')
+    })
+
+    const signal = await getReleaseWorkerRevisionDriftSignal()
+
+    expect(calls.some((args) => args[1] === 'jobs' && args[2] === 'describe' && args[3] === 'artifact-worker')).toBe(true)
+    expect(calls.some((args) => args[1] === 'services' && args[3] === 'artifact-worker')).toBe(false)
+    expect(signal.severity).toBe('error')
+    expect(signal.evidence?.find((e) => e.label === 'drift_count')?.value).toBe('1')
+    expect(signal.evidence?.find((e) => e.label === 'detail')?.value ?? '').toContain('artifact-worker: gh=4591bd8b28c8 != run=111111111111')
   })
 
   it('signal kind is drift (matches subsystem Platform Release contract)', async () => {

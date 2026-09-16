@@ -7,6 +7,208 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — Efeonce Insights renderiza solo en staging y el worker de render entra al release
+
+El render de Insights ya funciona de punta a punta en staging sin intervención: se encarga por API o MCP, el despacho
+lanza el worker y el deck queda como asset privado. La prueba que lo dejó así destapó que el despachador nunca había
+leído su flag: el primer canary había funcionado porque el worker se lanzó a mano. Con una ráfaga de cinco renders
+medimos el ritmo real: un output cada dos minutos, siete segundos de render cada uno. Retry, cancelación y el bloqueo
+de un cliente sobre una edición interna se probaron contra el runtime, y un render pedido por un cliente ahora queda
+auditado como `client_user` y no como `system`. El worker de render, un Cloud Run Job, quedó integrado al orquestador
+de producción con su propia lectura de drift y rollback. Producción recibe todo esto con el próximo release.
+
+## 2026-09-16 — Guía para elegir modelo de IA: qué usar, cuándo, cómo y cuánto cuesta cada uno
+
+Todos los modelos que hoy se pueden correr desde `pnpm ai:image` y `pnpm ai:fal` quedaron descritos en una sola guía
+(`docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`): árboles de decisión para imagen y video, fichas
+por modelo con capacidades, límites, comandos y trampas, recetas por caso de uso con costo, y rankings externos con sus
+contradicciones a la vista. Cada dato indica si viene de una corrida real, del contrato del proveedor, de su
+documentación o de un tercero.
+
+Investigar para escribirla corrigió varias cosas que dábamos por ciertas. fal cobra según la resolución: Wan 3.0 a
+1080p, su valor por defecto, cuesta cuatro veces lo registrado, y Prime es más cara que la base. Seedream 5 Pro en fal
+no llega a 4K, y el 2K y 4K de H3 son reescalados. La fórmula de tokens de Seedance sí calza con lo que pagamos, y el
+costo de GPT Image 2.5 se puede estimar antes de gastar. La guía, el catálogo, los manuales y las skills creativas
+quedaron alineados, y las fallas del CLI detectadas quedan para una tarea aparte.
+
+## 2026-09-16 — `pnpm ai:fal` trabaja con dos cuentas de fal y ya puede encolar sin esperar
+
+El CLI de fal ahora conoce dos cuentas. Elige la que tiene más saldo y, si fal bloquea una por falta de fondos, pasa sola a
+la otra antes de gastar. `--balance` muestra ambos saldos, y cada corrida dice qué cuenta usó. También se puede encolar un
+video y seguir trabajando: `--detach` deja el trabajo en fal y `--status` avisa cuándo está listo, sin necesidad de montar
+un webhook. Con la cuenta con saldo se terminaron de verificar Wan 3.0 y todas las variantes de Seedance (47 de 55
+capacidades). Las pruebas costaron USD 7,71, el doble de lo estimado para Seedance, y mostraron que su filtro rechaza
+material con marcas o personas reales después de cobrar. Queda pendiente rotar la clave nueva, que se compartió por chat.
+
+## 2026-09-16 — La recarga de fal no llegó a la cuenta de la clave; `pnpm ai:fal --balance` lo muestra en segundos
+
+Después de recargar USD 50, el CLI seguía bloqueado por saldo. La cuenta de fal dueña de la clave que usamos tenía
+−3,86 USD: la recarga no estaba ahí. Se descartó que otro sistema estuviera gastando: Globe usa la misma clave, pero no
+hubo llamadas a fal desde ningún servidor en una semana. Ahora `pnpm ai:fal --balance` muestra ese saldo sin costo y el
+CLI lo imprime solo cuando fal bloquea una corrida. Wan 3.0 sumó tres verificaciones; quedan documentados como
+pendientes las pruebas de Seedance, el entrenamiento de LoRA de H3 (postergado) y Recraft, que hoy no tiene vía
+operativa porque la CLI de Higgsfield perdió la sesión.
+
+## 2026-09-16 — Wan 3.0 entra a `pnpm ai:fal`; Nano Banana Pro está disponible pero nadie lo usa
+
+Wan 3.0 y Wan 3.0 Prime, segundo del ranking de video de OpenArt Arena y primero en edición, quedaron en el CLI
+con sus seis endpoints: texto, imagen y referencias a video. Traen dos novedades: la duración puede quedar en
+manos del modelo (hasta 30 s) y el video por referencias puede basarse en una página web o un documento si se
+activa el razonamiento. Sólo el texto a video alcanzó a probarse: a mitad de las pruebas se agotó el saldo de
+fal y el resto quedó declarado, sin verificar, hasta recargar.
+
+Al revisar Nano Banana Pro apareció que no está conectado en ninguna parte. Nuestro proyecto de Vertex ya lo
+tiene habilitado (`gemini-3-pro-image`), pero el generador del producto usa Nano Banana 2 y no hay un CLI de
+Gemini Image. Se mantiene por Google directo, igual que Gemini Omni Flash. Kling 3 y Grok Imagine quedaron
+revisados y documentados como candidatos, sin conectar.
+
+## 2026-09-16 — Berel: Colores de Temporada 2027 sin canibalizar el ciclo 2026
+
+El nuevo ciclo nace en su propia página (`/articulos/colores-de-temporada-2027`) y la página genérica existente
+queda como el ciclo 2026 sin cambios, porque el layout de pillar todavía no existe. La separación se sostiene con
+Search Console de 16 meses: la página actual vive de marca y catálogo y no gana clics por «colores de temporada».
+En el Content Hub quedaron research (material oficial de las cuatro paletas, Semrush y Search Console), plan
+editorial y SEO, el artículo N61 en revisión con fichas N1–N4 y un desplegable aparte de notas internas; el gate de
+copy visible pasó sobre la página releída. La skill `berel-content-production` (espejo `.claude`/`.codex`) suma
+Color del Año 2027, las paletas, la regla de página de ciclo anual y la de notas internas.
+[Detalle](docs/audits/seo/BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md)
+
+## 2026-09-16 — HubSpot y Salesforce: provider-fit por segmento
+
+La posición comercial deja de tratarlos como sustitutos universales: HubSpot-first parte como hipótesis para
+crecimiento B2B, mid-market y time-to-value; Salesforce-first gana peso con org instalada compleja, gobierno,
+service a escala, extensibilidad e integración enterprise. La zona de solapamiento sigue incluyendo mid-market
+alto, agentes y coexistencia. El diagnóstico conserva las salidas `HubSpot-first`, `Salesforce-first`, `híbrida` y
+`no-fit`, siempre condicionadas a TCO, datos, adopción, entitlements y contrato.
+
+## 2026-09-16 — Dreamforce: AIforce, Missionforce y marketing agentic
+
+El ledger de Salesforce y sus skills espejo separan los anuncios del 15/09 de las publicaciones del 16/09.
+AIforce queda documentado como capa de interfaz/headless —no SKU— para llevar contexto, workflows, permisos,
+gobierno y acciones a interfaces como Claude y Slack. Missionforce suma capacidades para gobierno y entornos
+regulados con OpenAI/NVIDIA. Marketing Cloud Next incorpora Campaign Agent, Headless Marketing/MCP, Palmata,
+Data Guardian, Budget Optimization y otras capacidades con estados GA/fechas separados. Koa se conserva como
+lanzamiento del 15/09 en pilotos seleccionados. [Ledger](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md)
+
+## 2026-09-16 — HubSpot actualizado con Fall Spotlight y UNBOUND 2026
+
+Las skills espejo y el catálogo HubSpot incorporan ChatGPT Ads en beta pública, la expansión del MCP/Claude,
+Agent Hub, Agent Builder, Breeze y Scheduled Prompts, además de Developer Platform 2026.09, sus APIs GA y betas.
+Se documentan requisitos de portal, plan, créditos, permisos, consentimiento, Audit Log y la separación entre
+capacidad anunciada, elegibilidad y runtime. También queda registrada la deprecación de APIs y apps legacy, con
+enforcement previsto para septiembre de 2027. [Detalle](docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md)
+
+## 2026-09-16 — Flux 3 entra a `pnpm ai:fal`, y Seedance ya sabe hacer video a video sin sorpresas
+
+Flux 3 llegó al CLI completo y con sus 12 endpoints probados en real. En fal no es un modelo de imagen sino
+de video: texto, imagen, primer y último cuadro, y keyframes a video; edición y extensión de un clip
+existente; y un flujo de borrador que cuesta USD 0,03 por segundo y después se sube a calidad final sin volver
+a generar la toma. Las pruebas destaparon dos trampas de la extensión: el clip de origen tiene que traer pista
+de audio (sin ella fal acepta el trabajo y lo rechaza después) y lo que devuelve es sólo la continuación, no el
+clip completo. El CLI ahora revisa el audio antes de subir.
+
+Al revisar cómo hace video a video Seedance, apareció que no tiene un endpoint propio: la 2.5 edita y extiende
+dentro de reference-to-video con `--task`, y la 2.0 sólo usa el video como guía. El registro tenía mal la
+duración mínima (4 s, no 1) y no declaraba cuántas referencias acepta cada versión; ambas cosas quedaron
+corregidas y validadas antes de encolar. La edición y extensión con Seedance 2.5 siguen sin probarse en real.
+
+## 2026-09-16 — Minimax H3 entra a `pnpm ai:fal`: video en segundos, control de cámara y LoRAs
+
+El CLI de fal suma los 17 endpoints de Minimax H3. Nueve quedaron verificados con corridas reales: texto,
+imagen y referencias a video en sus tres variantes (base, Max y Max Turbo) y el control de cámara, que
+congela la escena y sólo mueve el encuadre. Max Turbo cuesta USD 0,0125 por segundo y cada corrida volvió
+en menos de 10 segundos, así que sirve para explorar antes de gastar en Seedance. Las variantes con LoRA y
+los cuatro entrenadores quedan declarados pero sin probar (exigen una LoRA o se cobran por step), y el
+Director se lista como no operable: es un stream en tiempo real, no un trabajo de cola.
+
+H3 no se parece a Seedance en la forma de los pedidos (duración entera, resolución en mayúsculas,
+image-to-video sin aspect ratio, expansión de prompt obligatoria en Max), y el CLI lo valida antes de
+encolar. Dos mejoras alcanzan a todos los modelos: el `request_id` se imprime apenas fal acepta el trabajo
+y `--request-id` retoma uno que siguió corriendo tras un timeout, sin volver a cobrarlo. De paso se corrigió
+`--task`, que sólo acepta Seedance 2.5 y hasta ahora se dejaba pasar a la 2.0.
+
+## 2026-09-16 — `pnpm ai:fal`: Seedream 5 con capas editables y Seedance 2.5/2.0 desde la terminal
+
+El cliente fal.ai existía desde julio sin un solo consumidor. Ahora lo usa un CLI hermano de `ai:image`, sobre un
+registro de capacidades model-agnostic (`src/lib/ai/fal-capabilities.ts`) donde cada endpoint declara su slug
+literal, sus campos y sus límites. Seedream 5 quedó completo y verificado —incluido **layerize**, que descompone
+una pieza en hasta 16 capas con alfa real, nombre y bounding box— y los 15 endpoints de Seedance 2.5/2.0 quedan
+operables, con límites validados **antes** de encolar: 2.5 llega a 30 s pero topa en 1080p, y sólo 2.0 base
+entrega 4K (verificado: 3840×2160). Gemini Omni salió del carril: irá directo por Google.
+
+Dos correcciones que venían mal documentadas: el prefijo `fal-ai/` depende del endpoint y no del proveedor
+(Seedream 5 sin él, Seedream 4/4.5 con él), y la subida de archivos es `uploadFalFile`, no un CDN temporal.
+Tres capas documentales y las skills de imagen, video y dirección de arte actualizadas.
+
+## 2026-09-16 — Efeonce Insights: render durable (TASK-1846, code complete, rollout pendiente)
+
+- Artifact Worker despacha por `RenderConsumer` (Proposal intacto: `composer:visual-gate` 61 frames a cero píxeles);
+  tablas `insight_render_runs`/`insight_outputs`/`insight_render_events`; lease + fencing (columnas additive
+  también en `proposal_render_jobs`, reclamo de Proposal apagado); cuota por org, retry sin duplicar, cancelación
+  honesta, señal `insights.render.orphaned_output`.
+- `requestInsightRender` + `InsightOutputsPort` real; lanes `…/insights/editions/{id}/render` y `…/render-runs/{id}`
+  (app + ecosystem); tools MCP `request/get/retry/cancel_insight_render`; eventos `insights.render.*`; errores
+  `render_disabled`/`render_rejected`; `renderableOutputs: ['deck_pdf']`.
+- Flag `INSIGHTS_RENDER_ENABLED` (OFF; dos runtimes). Hash del manifest domain-free en el composer.
+  Sin deploy, sin push, sin canary: exigen autorización.
+
+## 2026-09-16 — Skills Salesforce alineadas con Dreamforce 2026
+
+Las skills espejo de CRM, Marketing Cloud Next y Marketing Cloud Engagement incorporan el ledger de AIforce,
+Claudeforce, Slackforce, Koa, Agentforce long-horizon y las integraciones AWS/Google/NVIDIA/Siemens. Cada claim
+conserva su estado `GA`, beta, piloto, preview o roadmap; la actualización no cambia entitlements, contratos,
+orgs ni rollout.
+
+## 2026-09-16 — El CLI de imágenes gana inpainting por máscara y reporta `usage`
+
+`pnpm ai:image` ya puede editar **solo una zona** de una imagen: `--mask` conecta el soporte de máscara que
+el cliente canónico ya tenía y nadie podía usar, con su validación de formato y dimensiones y un guardarraíl
+que aborta si se pasa una máscara sin imagen base. El CLI además imprime ahora el `usage` de cada corrida:
+para la familia 2.5 esa es la **única** fuente documentada de costo, y el instrumento que gasta no lo mostraba.
+
+Medido en el mismo movimiento, contra la intuición: **editar no abarata**. El modelo devuelve la imagen
+completa aunque la máscara acote qué cambia, así que el output se cobra idéntico a una generación (196 tokens
+en `low`) y encima la imagen base entra como 1 024 tokens de input — editar costó 2,3× generar en `low`, y el
+sobrecosto se diluye al subir calidad. **La máscara es gratis**: con y sin ella el `usage` fue idéntico.
+Corolario: para recortar el fondo de una imagen existente, `pnpm ai:image:rmbg` (local, sin costo de
+proveedor) en vez de un edit. Evidencia: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
+
+## 2026-09-16 — GPT Image 2.5 transportado, y el carril Google migrado porque su modelo estaba apagado
+
+`src/lib/ai/` ya reconoce `gpt-image-2.5-flare` y `gpt-image-2.5-sunburst` con su contrato correcto
+(`xhigh`/`max`, grilla de tamaños moderna, sin `input_fidelity`). El contrato se decide por **capacidad
+declarada** y no por literales de modelo, así que agregar uno nuevo sin declarar sus capacidades ya no
+compila — la degradación silenciosa deja de ser posible por olvido. Cinco puertas que antes elegían otro
+motor sin avisar ahora fallan ruidoso, incluida la ruta interna, que respondía con el default cuando recibía
+un campo inválido: pedir `quality: "max"` devolvía `medium`.
+
+El carril `google-imagen` no estaba bloqueado sino **apagado**: un probe propio devolvió `404 NOT_FOUND` para
+`imagen-4.0-generate-001`, retirado por Google, y era el **default** del helper. Se migró de provider —no de
+string— a `gemini-3.1-flash-image` sobre `generateContent`, y el default pasó a `openai-image`.
+
+Queda además la primera medición propia del costo de 2.5, que OpenAI no publica y declara no estimable:
+el consumo es **idéntico entre Flare y Sunburst** (196/1756/7024 tokens en `low`/`high`/`max`), así que el
+costo lo fija `quality × size` y no el modelo; lo que los separa es la latencia (`max`: 46,0 s vs 80,6 s).
+Evidencia fechada, no tarifa: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
+
+## 2026-09-16 — Skill viva `efeonce-insights` para Claude y Codex, con contrato de mantenimiento
+
+La skill pasa de un resumen a una memoria operativa del programa: `references/program-ledger.md` (qué construyó
+cada task y dónde corre), `architecture-map.md`, `contracts.md`, `operations.md` y `lessons.md`, espejada en
+`.codex/` con su `agents/openai.yaml`. Contrato obligatorio: cada task de EPIC-045 la actualiza al cerrar
+(registrado en CLAUDE.md, AGENTS.md, la regla auto-load, EPIC-045 y los closing protocols de 1847–1849/1875;
+TASK-1846 lo asume por coordinación entre sesiones).
+
+## 2026-09-16 — TASK-1845 complete: rollback ensayado en la instancia compartida
+
+El ensayo de `migrate:down` reveló dos defectos del Down original (borraba el módulo con asignaciones vigentes y luego
+exigía borrar una auditoría append-only); el Down definitivo retira sólo el schema y depreca las capabilities, y el
+Up restaura el estado vigente. Con permisos habilitados por el operador, el ensayo corrió de punta a punta con
+readbacks (down 00:24Z, up 00:25:31Z) y los canaries posteriores crearon `EO-INS-000002` en staging y
+`EO-INS-000003` en producción. Las cuatro ediciones sintéticas previas se perdieron por diseño. TASK-1845 pasa a
+`complete`; la integración con Berel/Sky reales queda diferida a EPIC-046 P01. La sesión que lleva TASK-1846 fue
+avisada y corroboró el estado contra la base.
+
 ## 2026-09-15 — TASK-1845: canary de Efeonce Insights verde en staging y federación MCP lista en rama
 
 `develop` `8844a3d5c` quedó empujado con la foundation de Insights y CI/workers verdes. En staging se prendió sólo
@@ -26,7 +228,22 @@ producción siguen pendientes de autorización explícita. Se integró además e
 Más tarde el mismo día: el gateway quedó mergeado (PR #12) y desplegado como revisión `00053-dsk` con front door
 verificado, y el scope `efeonce.mcp.insights.write` existe en la app recurso de Entra con los seis scopes previos
 intactos. Ningún cliente lo porta todavía, así que la escritura por MCP sigue cerrada hasta un consentimiento
-gobernado. El ensayo de `migrate:down` no se ejecutó y el release a producción queda como siguiente paso.
+gobernado. El ensayo de `migrate:down` no se ejecutó.
+
+Release a producción la misma noche: PR #236 (`9c0946883`) promovido por el orquestador `35032358217` en un solo
+intento (manifest `9c094688309d-500ec9e7` released 22:55Z, watchdog ok, cinco servicios sincronizados o con skip
+legítimo). El canary de contrato por el lane ecosystem muestra las rutas de Insights ejecutando en producción con
+create en `generation_disabled` hasta que Codex prendió el flag en Production (valor verificado, redeploy Ready) y el
+mismo canary creó `EO-INS-000014` con 202. Efeonce Insights genera ediciones en producción para la organización
+sintética; emisión e IA de autoría siguen apagadas hasta TASK-1846.
+
+Barrido documental de cierre con cinco agentes: nace `EFEONCE_INSIGHTS_IMPLEMENTATION_RECORD_V1.md` (registro de
+construcción y despliegue archivo por archivo), y se alinean arquitectura, ADR, doc funcional, manual, skills
+(`efeonce-insights`, `efeonce-mcp-platform`, `greenhouse-production-release`), router de `CLAUDE.md` con regla
+auto-load, reliability, client portal, entitlements, catálogo API/MCP, runbook del gateway y las tasks que
+declaraban bloqueo por TASK-1845 (1846–1849, 1672), ahora desbloqueadas. La skill servida se verificó en producción
+(manual idéntico al artefacto, 404 anti-oracle) y un agente sin contexto construyó con ella un encargo válido; sus once
+dudas se cerraron en el manual.
 
 ## 2026-09-15 — Contacto publica metadata y grafo SEO/AEO coherentes
 
@@ -41,10 +258,13 @@ con casa matriz y teléfonos, y vincula las cuatro preguntas visibles como `FAQP
 reseñas, `LocalBusiness` ni schemas de servicio. Referencia y rollback:
 [Contacto](.codex/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
 
-En Greenhouse queda preparado, todavía sin publicar, el selector premium de país para Contacto: 250 opciones
-localizadas, banderas SVG, typeahead, teclado/listbox accesible y un chevron con orientación cerrada/abierta
-verificada. La activación exige renderer + assets productivos antes de versionar el formulario, por lo que el input
-live se conserva intacto hasta completar la promoción gobernada.
+El selector premium de país quedó publicado y verificado el 2026-09-15 tras el release del renderer y las
+banderas. La v3 de `efeonce-contacto` (`fver-c00955ca-863a-4e7d-99c7-c09706660a3a`) entrega 250 opciones
+localizadas, typeahead/listbox accesible y chevron con orientación cerrada/abierta verificada; la v2 fue
+deprecada conservando el destino existente.
+
+Queda pendiente para el próximo release del renderer el hotfix `e5d4a0fb2`: reemplaza el glifo `↗` que aún puede
+aparecer junto a “País” por el ícono geográfico SVG. No requiere una nueva versión del formulario.
 
 ## 2026-09-15 — TASK-1845: foundation de Efeonce Insights en develop (code complete, rollout pendiente)
 
@@ -700,327 +920,3 @@ TASK-1845–1849: evidencia/adapters, render durable, catálogos deck/A4, acceso
 ADR y arquitectura fijan dominio Greenhouse + Artifact Worker, tres salidas de primera clase, snapshots,
 API/UI/MCP, co-branding y grants revocables. TASK-1672/1673 conservan integración de auditoría técnica SEO.
 Sólo planificación autorizada; sin implementación, emisión de reportes ni rollout.
-
-## 2026-09-08 — TASK-1844: autoridad interna multiorganización activada
-
-Greenhouse resuelve autoridad por objetivo con consentimiento v2; gateway 1.3.0 descubre organizaciones
-permitidas y revalida cada llamada sin ampliar `efeonce.mcp.read`. Expand/contract aplicadas y cohorte de
-una persona ON. Codex, Claude Code, Claude hospedado/Desktop: A/B, negativos, refresh y revocación verificados.
-Rollback/restore servido probado; Claude Code requiere login tras OFF. CIMD extendido de Claude admite
-PKCE/refresh y rechaza JWT bearer; OAuth 150 passed. PR 230/main `45f6910e3`, orquestador `34281143424`
-success, manifest released, Vercel exacto y watchdog 5/5. Fixtures retiradas; conexiones definitivas conservadas.
-[QA y límites](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
-Manual interno, documentación funcional/técnica, API, runbooks y skills Codex/Claude reconciliados; [cobertura](docs/audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).
-
-## 2026-09-08 — Berel cierra la doctrina de recuperación y QA editorial preventivo
-
-La skill Berel y el gate client-visible incorporan el barrido obligatorio de todo el mes aun sin comentarios,
-rechazo de links Notion/metadatos operativos en la zona vigente, preservación de análisis y specs congeladas,
-edición/restauración segura y verificación del propio reporte. La
-[auditoría fechada](docs/audits/seo/BEREL_CONTENT_HUB_EDITORIAL_LEAK_RECOVERY_2026-09-08.md) consolida octubre,
-noviembre y diciembre, distingue el typo `segundasegunda` del contenido real y documenta `pintura sana` como
-problema de claridad —no como palabra inexistente en México—. El contrato genérico de Notion añade baseline y
-readback de discusiones para reemplazos/restauraciones; no hubo nuevas escrituras en Notion, Drupal ni Frame.io.
-
-## 2026-09-08 — Berel adopta una propuesta de colaboración mensual y canales con función única
-
-Efeonce aprobó internamente proponer desde septiembre una dinámica simplificada para Berel: Notion como fuente
-central del trabajo, Frame.io para revisión visual/audiovisual, Teams para avisos y bloqueos, y correo para informe
-mensual y cierre formal. Dos cortes mensuales alimentan una reunión de 45 minutos dentro de los primeros siete días
-hábiles del mes siguiente; no se impone un SLA genérico de tres días para feedback. El contrato, módulo 19 y skills
-espejo dejan separado lo aprobado internamente de la aceptación pendiente del cliente; no hubo cambio en Notion,
-envío de correo, calendario ni alcance contratado.
-
-## 2026-09-07 — Berel: comentarios, recuperación de octubre y contrato visual corregido
-
-La skill espejo `berel-content-production` incorpora el delta del Playbook vivo para comentarios: claridad antes
-que ingenio, una sección por intención, reubicación con costura, contenido evergreen y evaluación del diagnóstico
-del cliente sin aceptar mecánicamente su remedio. `Atendido` queda separado de `resolved`; Efeonce prueba
-decisión/cambio + respuesta + readback y el cliente cierra el hilo. Las 25 observaciones del lote se clasificaron
-por causa primaria: claridad/estructura 10, precisión de producto 7, voz/localización 5 y alcance editorial 3.
-
-El barrido preventivo de los diez artículos de octubre reveló una regresión propia: al retirar notas internas se
-habían eliminado fichas visuales contextuales y reescrito copy no solicitado. Se restauraron byte a byte los siete
-artículos sin comentarios; en los tres comentados se recuperaron historia y fichas sin deshacer títulos ni cambios
-justificados. La lectura final de esos diez y del artículo centinela de herrería confirmó 44 fichas N1–N4 intactas,
-30 hilos conservados y 59 comentarios, incluida la respuesta que faltaba. De las zonas editoriales se retiraron
-solo notas de agente y operación ajena a la narrativa; no se modificaron assets, Frame.io ni Drupal.
-
-Aclaración del operador del 2026-09-08: los toggles de Research/análisis/plan son evidencia obligatoria y siempre
-permanecen en la página. La limpieza se limita al toggle editorial de artículo, reescritura o tutorial, donde no
-pueden colarse notas de agente o texto ajeno a la narrativa. Skills y gate se alinearon con esta frontera; las
-specs contextuales siguen protegidas y el análisis no se vuelve a tratar como fuga.
-
-Segunda revisión preventiva: 11/11 páginas conservaron evidencia, 44 fichas N1–N4 y 12 fotos de paso; 30 hilos
-y 59 comentarios permanecieron íntegros. Se corrigieron ocho fragmentos de planificación fuera de lugar en Día
-de Muertos, Psicología del color y App Color Berel mediante reemplazos quirúrgicos; la delimitación de cluster
-se movió al análisis. Gate final 11/11, sin cambios en arte, tareas, estados, Frame.io ni Drupal.
-
-La causa raíz también quedó cerrada en los espejos Claude/Codex: las fichas N1–N4 son parte obligatoria del
-artículo y se copian literalmente a las tareas visuales. Una vez producido el arte, composición, copy, ALT,
-archivo, formato y posición quedan congelados hasta una conciliación explícita con diseño. El gate distingue
-fichas de notas internas, exige exactamente N1–N4 completas y conserva la jerarquía de toggles.
-
-## 2026-09-07 — TASK-1813 despliega discovery OAuth nativo/base-only y ensaya rollback
-
-`efeonce-mcp` `1.2.0` deja Efeonce ID como único authorization server anunciado cuando el carril nativo está
-activo, fija el bootstrap en `efeonce.mcp.read` y entrega scopes adicionales por challenge 403. Retira el shim
-DCR/metadata AS del gateway, `OAUTH_PUBLIC_CLIENT_ID` y `MCP_REQUIRED_SCOPES` como controles de deploy, sin
-retirar validación Entra legacy ni modificar grants, providers o tool surface. El harness conductual pasa
-154/154 sin omitidos; CI `34162827740` construyó además el contenedor. El deploy manual `34162885950` dejó
-`cd229069` en `efeonce-mcp-gateway-00047-8b5` / `sha256:608a4789…b29e`, 100 % Ready. El canary productivo
-confirmó PRM root/path base-only, shim `404`, `/register` `404` y MCP anónimo `401`. El rollback movió 100 % a
-`00046-6n2`, reprodujo el contrato anterior, restauró 100 % a `00047-8b5` y repitió los asserts nuevos.
-Claude Code `2.1.263` refrescó con scope base único e invocó una lectura sin gasto. Codex `0.153.4` canary emitió
-un token CIMD externo sólo con `efeonce.mcp.read` y ejecutó status + lectura SEO sin gasto; Claude.ai repitió una
-lectura hospedada base-only con `no_entitlement` y uso cero. Claude Desktop `1.46388.4` y ChatGPT hospedado
-repitieron `get_seo_entitlement` post-cutover: respuesta visible `ok=true`, `no_entitlement`, allowance/presupuesto
-cero; sus familias renovaron con scope único y Cloud Run correlacionó `POST /mcp` 200 contra `00047-8b5`. En un
-flujo separado, `jreyes@efeoncepro.com` autenticó con Microsoft y llegó al consentimiento corporativo sólo para
-`Efeonce`; el code expiró sin intercambio, token ni dispatch. La autoridad interna multiorganización queda en
-TASK-1844/U19. No hubo cambios Entra ni widening. La skill MCP y sus referencias Claude/Codex quedaron alineadas
-con el rollout servido y ese límite. [Task y evidencia](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md).
-
-## 2026-09-07 — EPIC-044 asume entrada multiproducto y consentimiento por relying party
-
-La dirección descubierta en TASK-1834 dejó de ser un supuesto local de Greenhouse. El nuevo ADR Accepted
-`EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` fija el contrato de EPIC-044: cada producto conserva
-URL, contexto, destino, sesión y autorización; una cohorte first-party habilitada redirige server-side al único
-login visible de Efeonce ID y puede usar fast path si la sesión satisface assurance. Sólo una clasificación
-`first_party_sign_in` registrada y server-owned omite consentimiento delegado para establecer identidad. MCP y
-terceros conservan consentimiento por cliente/scope, step-up, grants y tokens/audiencias propios.
-
-EPIC-044 y TASK-1829/1830/1831/1833/1834/1840/1841/1842 quedaron sincronizadas según su ownership; TASK-1834
-permanece como primer consumer Greenhouse y no como dueña de la policy transversal. Las skills MCP y Design
-Studio apuntan al ADR y preservan las prohibiciones de iframe, quinto provider, vestíbulo y contexto controlado
-por el browser. El ADR nativo anterior mantiene su historia y sólo agrega un delta fechado. Este cambio es
-documental: no implementa OIDC first-party, no cambia login, flags, datos ni runtime, y no hizo commit, push ni
-deploy.
-
-## 2026-09-07 — TASK-1832: Claude Code y Claude.ai completan OAuth y lectura real
-
-La falla de Claude Code quedó atribuida a `2.1.186`: esa versión pedía el catálogo completo descubierto.
-Anthropic corrigió el comportamiento desde `2.1.196`; el CLI local quedó en `2.1.263` con
-`oauth.scopes="efeonce.mcp.read"`. Un login nuevo completó PKCE S256, consentimiento de la organización canary,
-catálogo de dos tools read-only y `get_seo_entitlement=no_entitlement`; el write no estuvo disponible. Una
-repetición posterior al TTL rotó la familia sin widening: dos access/refresh, uno rotado y uno activo. El warning
-SEP-2352 del cliente sobre una credencial aún sin sello `issuer` se conserva como observación no bloqueante.
-
-Claude.ai agregó el custom connector remoto con un segundo DCR público exclusivo, `software_id=run_id`, callback
-hospedado exacto, secret vacío, OAuth siempre requerido y Streamable HTTP. Se eligió el cliente propio en vez del
-CIMD compartido detectado por Anthropic para preservar el contrato de borrado. El consentimiento fue base-only,
-las mismas dos tools quedaron visibles y una llamada aprobada devolvió `no_entitlement` con todos los contadores
-en cero. La repetición post-TTL rotó una vez y conservó el scope. Claude Desktop `1.46388.4` abrió el chat desde
-la app nativa, pidió aprobación propia y ejecutó la misma lectura sobre el conector remoto.
-
-El dry-run incorporó ambos DCR: 22 clientes, 21 codes/consents, 29 access/refresh, 18 sesiones, 14 magic links,
-2 passkeys, 5 challenges y 4 contexts; `unexpectedRefs=0`. La documentación y las skills MCP ahora distinguen
-versión/local/hospedado, DCR run-owned frente a CIMD compartido, serialización observable de
-schemas/annotations/security, probe vacío 401/400 y refresh real post-TTL. TASK-1832 continúa en observación y no
-se cierra antes del cleanup/readback cero. La matriz técnica cliente quedó completa; sólo siguen abiertos la
-ventana de observación y el retiro controlado.
-
-Un barrido documental posterior eliminó estados vivos que todavía presentaban Claude, el emisor o la
-federación como pendientes y dejó los detalles mutables en el manifest. Las skills espejadas ahora exigen
-monitoreo read-only, distinguen superficies Claude compartidas de clientes OAuth persistidos y prohíben
-adelantar el cleanup antes de `delete_after`. La muestra de observación de 12:09:54Z mantuvo `unexpectedRefs=0`,
-cero contaminación 360/comercial y sólo los blockers esperados de la ventana; no cambió runtime ni flags.
-
-## 2026-09-07 — TASK-1832: ChatGPT completa el OAuth hospedado y el gateway endurece el probe vacío
-
-ChatGPT ya funciona de punta a punta con el authorization server y el gateway productivos. La app hospedada
-`Efeonce` se registró por DCR, mostró la organización canary exacta y autorizó sólo `efeonce.mcp.read`. Tras
-actualizar su definición importó exactamente dos tools read-only —estado del gateway y entitlement SEO— y
-ejecutó ambas: `ready` y `no_entitlement` con presupuesto cero, sin ninguna escritura. La familia OAuth rotó dos
-veces después del TTL inicial y mantuvo siempre el scope base; el cliente terminó con dos refresh usados y uno
-activo. Esto sustituye la hipótesis de que la ausencia de `offline_access` impediría continuidad: el
-comportamiento hospedado real no lo solicitó ni lo necesitó.
-
-La primera actualización de ChatGPT reveló un borde de protocolo: su `POST /mcp` con JSON vacío fallaba en el
-parser de Fastify antes de autenticar y el handler global lo convertía en 500. El gateway `v1.1.2`, commit
-`171965c99034`, ahora autentica primero ese probe y devuelve 401 con el challenge canónico sin bearer, o 400
-`invalid_request` con bearer válido. `pnpm check` pasó 153/153, CI `34111553554` y deploy `34111643880`
-terminaron verdes; `efeonce-mcp-gateway-00046-6n2` sirve 100 % y la repetición hospedada respondió 200 sin nuevos 500. El gateway usa los paquetes MCP v2 estables `2.0.0`; no se hizo downgrade al paquete monolítico v1.
-
-El dry-run posterior agregó el DCR de ChatGPT al contrato de retiro: 20 clientes, 19 codes/consents, 25
-access/refresh tokens, 18 sesiones, 14 magic links, 2 passkeys, 5 challenges y 4 contexts;
-`unexpectedRefs=0`, sin contaminación comercial/360. Claude Code continúa fail-closed por scopes adicionales y
-de escritura en `TASK-1813`; Claude Desktop/web no está certificado. TASK-1832 sigue en observación hasta los
-siete días, cleanup/readback cero desde `2026-09-13T19:43:30Z` y apagado de ambos gates.
-
-## 2026-09-06 — TASK-1832 entra en observación productiva con retiro verificable
-
-La organización canary dedicada ya recorre el mismo emisor y gateway productivos que usaría un cliente, pero
-sigue fuera de Account/Person 360 y de toda superficie comercial. Vercel/auth-server sirven `fb5fc082aa92`; el
-gateway sirve `8438c5fa87ed`; ambos gates canary están ON. M365, Gmail personal autorizado, magic link, passkey
-Chrome/Safari, consentimiento, PKCE, refresh, revocación de familia, base-only, internal-only y revocación de
-authority en `19.272 s` tienen evidencia live. Codex 0.153.4 completó una lectura MCP real sin gasto.
-El E2E Playwright productivo pasó `1/1` en Chrome con listener loopback real: DCR+PKCE, consentimiento, JWT,
-MCP initialize/list/call, refresh, revocación y logout `401`, sin persistir storage state ni tokens.
-
-Claude Code 2.1.186 pidió scopes desconocidos y de escritura antes del consentimiento; el emisor lo rechazó y
-el defecto volvió a TASK-1813. No se amplió la allowlist. La expiración natural recibió `401 invalid_token`
-después de `899 s`, antes de rotar o revocar la familia; otra ceremonia exigió el `organization_id` exacto y
-confirmó el fixture servido. Los clientes hospedados siguen abiertos, igual que siete días de observación y el
-cleanup final. El dry-run post-Playwright enumera 19 DCR y todo el grafo auth/identity, con
-`unexpectedRefs=0`; se niega correctamente mientras authority/auth están activas. Los cuatro DCR usados por
-error con una sesión interna siguen siendo run-owned y el cleanup conserva esa identidad compartida. El wordmark
-ausente del correo se restauró como asset público compartido y quedó visible en Gmail; no se eliminará con el
-fixture. El readback dejó las sesiones humanas canary activas en cero y conserva sólo la passkey necesaria para
-la observación. Quedó activa una automatización diaria silenciosa para vigilar la ventana y ejecutar el retiro
-sólo desde `delete_after` con todas las precondiciones verdes.
-Los cinco consentimientos Playwright y las dos familias emitidas durante los intentos se revocaron por el store
-canónico; los cinco DCR quedaron en el manifest para el cleanup final.
-
-El preflight del cliente hospedado agregó un riesgo específico a TASK-1813: el emisor anuncia y entrega refresh
-tokens rotativos, pero discovery no publica `offline_access`, recomendado por OpenAI para conservar la conexión.
-No se alteró runtime ni se amplió el catálogo; la fila ChatGPT exige ceremonia hospedada y renovación post-TTL.
-
-El push de endurecimiento `b69f5297d` mostró una colisión real del entorno compartido: el workflow staging
-`34071542507` desplegó `auth-server-00042-hp5` con el gate canary OFF sobre el Cloud Run único. El intervalo
-fail-closed duró desde 01:07:25Z hasta 01:15:47Z y no concedió acceso. El dispatch production `34072064873`,
-fijado al SHA released `fb5fc082aa92`, restauró `auth-server-00043-ndg`, 100 % de tráfico, `Ready=True`, gate ON;
-`readyz` y preflight OAuth/MCP pasaron. Para evitar repetición durante la observación, se eliminaron los overrides
-staging/production y quedó una sola variable GitHub de repositorio en `true`; Vercel staging continúa OFF. El
-cleanup final debe apagar esa variable y Vercel Production antes del readback de gates.
-
-Una lectura posterior del control plane mostró que esa última afirmación documental era falsa: la variable
-Vercel del environment custom staging estaba en `true`. Se corrigió su valor exacto a `false`; el primer
-redeploy de recuperación fue `dpl_6UUXxsT7eS4EL44kkLWuDrHFqKDT` y la build final de `develop@c75a07f`,
-`dpl_D9mkjQLE1a26H4TXQ2HX7wXWMpLf`, quedó READY desde `2026-09-07T02:03:16.160Z`, tomó los aliases de staging
-y respondió 200 en `/api/auth/session`. Production permaneció `true` y no se redeployó. La evidencia cubre
-config/build; el deny flow-level de staging no se infiere.
-
-## 2026-09-06 — TASK-1835 completa: Efeonce ID tiene cara, y el gate de accesibilidad estaba ciego
-
-`auth.efeonce.org` sirve su experiencia visible: login con passkey, Microsoft y enlace por correo;
-consentimiento que dice a qué dominio viaja el código; step-up, alta de segundo factor, recuperación,
-sesión y errores. Desplegado y verificado en vivo.
-
-Tres hallazgos valieron más que el trabajo planificado:
-
-- **El login por passkey no existía.** Backend completo y copy escrito desde el 2026-09-04, con los
-  cuatro ids `login_passkey_*` huérfanos: ninguna pantalla ofrecía el método.
-- 🔴 **El gate de accesibilidad reportaba `violations: 0` sin medir nada.** axe devuelve todo en
-  `incomplete` cuando el fondo es un degradado con pseudo-elemento, y el gate lo informaba como cero.
-  Debajo había texto a **1.53:1** en la ficha de aplicación del consentimiento — justo lo que tiene
-  que leerse. Causa raíz: una clase de texto compartida entre el lienzo oscuro y la tarjeta clara.
-  **Aplica a cualquier superficie con fondo compuesto, no sólo al emisor.**
-- **El servidor contaba los códigos de respaldo restantes y la pantalla los ignoraba.** Alguien podía
-  quemar el último y enterarse el día que perdiera el teléfono.
-
-Un cuarto hallazgo fue mío y lo corregí el mismo día: agregué al pie de todas las pantallas un enlace
-a las licencias de las fuentes, porque su id de copy estaba huérfano. Construir una interfaz para
-justificar un copy muerto es el razonamiento al revés —el copy se borra—, y encima el lugar era la
-pantalla donde alguien decide si confía para entrar. Retirado; los `.txt` se siguen sirviendo, que es
-donde la licencia se cumple.
-
-Mecanismos que quedan corriendo: `pnpm auth-server:verify-contrast` (mide sobre los píxeles
-renderizados; 365 textos, 0 bajo el piso WCAG) y `pnpm auth-server:verify-passkey` (14/14 en navegador
-real). El patrón «runtime sin React» queda registrado en `ui-platform/PATTERNS.md` para que ningún
-otro servicio Efeonce arranque un segundo sistema visual.
-
-GVC premium 29 fixtures × 2 viewports (58 capturas); scorecard 4.63 / piso 4.5; los cuatro gates
-`ui:*` PASS; suite del emisor 427.
-
-Follow-up abierto: **`TASK-1842`** — ninguna persona puede crear una passkey todavía, así que el botón
-nuevo le queda inerte y cada entrada sigue siendo un correo. Bloqueada por `TASK-1834`.
-
-## 2026-09-06 — TASK-1832: schema canary aplicado fuera del checkpoint, sin fixture
-
-`pnpm pg:connect:migrate` se ejecutó por error como si sólo levantara el proxy y aplicó las dos migraciones de
-TASK-1832. El readback inmediato confirmó registry/bindings canary en cero, purpose sin drift y los 30 perfiles
-`smoke_test` preservados en identidad pero excluidos de Person 360. No se crearon organización, cuentas, grants,
-sesiones ni tokens; flags OFF/default, sin push/deploy. Se detuvieron nuevas mutaciones externas y quedó
-documentada la decisión pendiente de conservar el schema adelantado o autorizar una migración compensatoria.
-La implementación local pasó 144/144 tests focales, typecheck, lint sin errores y build; el gateway hermano pasó
-152/152 tests sin skips y build. `secrets:audit` local no acredita runtime: 6/8 saludables, con `NEXTAUTH_URL`
-local inválida y `CRON_SECRET` ausente; TASK-1832 no cambió secretos.
-[Evidencia](docs/audits/mcp/TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md).
-
-**Decisión posterior:** el operador resolvió conservar el schema aditivo y autorizó completar el rollout
-sintético: commit/push, promoción, deploys, gates, fixture dedicado, buzones controlados, sesiones canary,
-revocación y cleanup. La autorización no incorpora clientes ni habilita writes; la task sigue pendiente hasta
-matriz runtime, retiro demostrable y siete días de señales estables.
-
-## 2026-09-06 — TASK-1832: carril oscuro desplegado y fixture removible iniciado
-
-Greenhouse `develop` y el gateway MCP ya sirven consumers compatibles con los dos gates canary apagados. El
-auth-server quedó en `auth-server-00034-85c` y el gateway en `efeonce-mcp-gateway-00041-7dq`; metadata/readyz y
-los SHAs servidos fueron releídos. Antes del primer write se versionó el manifiesto con IDs exactos. Después, los
-commands crearon una organización dedicada `inactive/other/disqualified`, su registro temporal y un binding
-`canary`; el readback da `1/1`, purpose drift cero y ninguna persona `smoke_test` visible en Person 360. El dry-run
-de retiro encontró sólo las referencias esperadas y se negó mientras root/authority siguen activos.
-
-Para M365, el operador eligió un alias preexistente compartido. No colisiona con perfiles; la invitación definitiva
-fue entregada, quedó visible y se aceptó mediante el POST scanner-safe. El profile resultante es exclusivamente
-`smoke_test`, permanece fuera de Person 360 y recibió el único grant read-only permitido, personal y expirante con
-el binding. El magic link también fue entregado, pero no se consumió todavía porque el Mac quedó bloqueado. Una
-invitación preparatoria a plus-address se revocó sin aceptación y permanece inventariada para el cleanup. El gate
-sigue OFF y producción no se promueve antes de completar correo Google, sesión/passkey y negativas en staging. La
-primera CI del commit falló en el gate de navegación porque el smoke OAuth usaba `page.goto` directo; el fix local
-ya usa el helper transitorio compartido y pasa el gate focal. Durante una consulta, el CLI de Vercel imprimió un
-cursor sensible: no se reutilizó ni se conserva en evidencia; su posible rotación queda como acción de higiene.
-
-## 2026-09-06 — La certificación sintética se separa del primer piloto cliente
-
-TASK-1832 ya no usa a una organización cliente real para descubrir defectos. La certificación técnica externa
-se ejecutará con cuentas controladas por Efeonce, personas marcadas `smoke_test`, una organización canary no
-cliente y un binding de propósito explícito, recorriendo el mismo issuer, invitación, sesión, consentimiento,
-PKCE, token, gateway y autorización que producción. La matriz conserva clientes MCP reales, M365/Google,
-Chrome/Safari y casos negativos; su resultado demuestra preparación técnica, no adopción comercial.
-
-TASK-1841 queda como unidad separada para el primer piloto consentido: una organización ya existente en Account
-360, un administrador y una capability read-only vigente, sólo después de cerrar certificación, assurance y UI.
-El cliente recibe onboarding y soporte normales, no tareas de QA, y nunca debe entregar tokens o logs. Esa
-decisión documental inicial no creó correos, cuentas, bindings, migraciones, invitaciones, flags ni rollout; el
-apply de schema posterior queda registrado por separado en la entrada anterior.
-
-## 2026-09-06 — El gate de versión del gateway medía media superficie, y el scope nuevo no se anunciaba entero
-
-Dos defectos que sólo aparecieron al revisar lo construido, y que compartían la misma forma: un mecanismo que protegía menos de lo que su nombre sugería.
-
-El gate que obliga a mover la versión del gateway cuando cambia su lista de herramientas comparaba únicamente las que vienen federadas desde Greenhouse. Las que el gateway define por su cuenta no lo movían, así que dos herramientas nuevas crecieron el servidor con el gate en verde y la versión congelada. Ahora la medición se toma del servidor construido y cubre nombres y descripciones, porque editar una descripción cambia qué decide llamar un agente. Se probó viéndolo fallar en los dos casos, no viéndolo pasar.
-
-El segundo: al agregar el permiso para administrar personas de una organización, quedó anunciado sólo en una de sus dos formas. La que faltaba es justamente la que otorga el emisor propio, del que dependen las herramientas delegadas, así que un cliente que armara su solicitud desde el descubrimiento nunca habría pedido el permiso.
-
-## 2026-09-06 — Efeonce ID: la invitación externa y la autoridad delegada del cliente, en producción
-
-Quien invita a una persona externa ya no le pasa el enlace a mano: el sistema manda el correo en el mismo acto en que genera el token, la respuesta deja de traerlo salvo una revelación gobernada de una hora que queda auditada, y el ciclo de vida es observable (reenviar rota el token anterior, el rebote se registra, la caducidad se ve, tres señales nuevas). El administrador designado de una organización cliente pasa a tener autoridad real sobre su propia gente por una lane del ecosistema, mediada por el gateway y decidida siempre por Greenhouse, nunca por lo que diga la llamada. La página de consentimiento del autorizador ahora muestra a qué host va a volver la persona.
-
-Release `b3e324cb5c8d-3cfce865`, un solo intento. Ambos flags encendidos en producción con redeploy, y un canary contra la superficie real: la misma llamada pasó de responder «no existe» a pedir el binding y a negar por falta de autoridad. La federación de las dos herramientas nuevas quedó desplegada en el gateway, que subió a la versión 1.1.0.
-
-## 2026-09-06 — Efeonce ID: follow-ups de TASK-1837 cerrados y lane delegada federada en PR (gateway)
-
-Revocar un binding limpia y audita al administrador designado; el dominio `external-access` tiene boundary test
-de escrituras; el emisor declara el scope `efeonce.mcp.identity.write` (clase «administrar a las personas de mi
-organización», step-up); la lane delegada acepta `organizationId` y suma reenviar/revocar delegados (nunca a sí
-mismo; una persona ligada se revoca como miembro). En `efeonce-mcp` quedó abierto el PR #3 con las tools
-`identity.invitations.list` / `identity.invitation.create` (sólo issuer nativo, población externa). Tasks
-derivadas: TASK-1838 (consola del administrador del cliente) y TASK-1839 (convergencia con la invitación del
-portal). Producción sigue esperando el release.
-
-## 2026-09-06 — Efeonce ID: invitación externa verificada end-to-end en staging (TASK-1837)
-
-Con los flags ON en Vercel staging y un binding de prueba sobre el emisor real, el recorrido completo corrió sin que
-nadie tocara el token: correo real en Outlook, aceptación en `auth.efeonce.org`, persona externa nueva con admin
-designado, magic link y sesión viva; rebote forzado con `bounced@resend.dev` marcado `bounced` y la señal
-`identity.external_invitation.undelivered` observada encendiéndose; reenvío que rota, revelación de 1 h, y la lane
-delegada ejercitada con el token del gateway (200/403/422/201, correo real). Al cierre el binding se revocó y la
-sesión murió (401). Producción espera el release y el flip de flags; la federación de la lane en `efeonce-mcp` sigue
-pendiente. [Evidencia](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md).
-
-## 2026-09-06 — Efeonce ID: el sistema entrega la invitación externa; autoridad delegada del cliente (TASK-1837)
-
-`issueExternalInvitation` envía el correo (`external_access_invitation`, token_sensitive, marca Efeonce) después
-de confirmar la transacción y devuelve `delivery` en vez de exponer el secreto; la URL de aceptación se deriva del
-`issuer_url` del environment (`/i/<token>`), nunca de una env var. Reenviar rota el token; revelarlo es una
-excepción auditada de 1 h con capability propia. El rebote de Resend deja `delivery_status='bounced'` por una
-proyección reactiva y tres señales nuevas vuelven observable el ciclo de vida. `designated_admin` pasa a conferir
-autoridad real: un solo admin vigente por binding y una lane ecosystem para que invite a su propia gente (403/422
-fail-closed). El consentimiento muestra el host del `redirect_uri` (MUST del protocolo). Migración additive y dos
-flags default OFF. **Migración aplicada 2026-09-06 y verificada; smoke live `--apply` verde contra PG real
-(reenvío, revelación, entrega fallida, delegada, admin cleared; `token_revealed` encendida ok→warning); build de
-producción ✔.** Pendiente: binding externo real + flag en staging + correo real (decisión del operador) y
-federación de la lane delegada en el gateway. Skills actualizadas (espejo `.claude`/`.codex`): `efeonce-mcp-platform`
-(SKILL + native-authority + verification-matrix) y `greenhouse-qa-release-auditor/security-qa`. Commits `5518d868e…db5a0adf3`.

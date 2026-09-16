@@ -19,6 +19,15 @@ Treat brochures as historical commercial input only; the review and quarantine r
 `docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`. Do not import brochure claims, pricing, bundles or
 feature availability without current primary-source verification and an `as-of` date.
 
+## Provider-fit boundary
+
+HubSpot is the default candidate for growth-oriented B2B, mid-market teams and faster adoption, not a universal
+enterprise substitute. Salesforce remains a first-class candidate when the client needs a complex installed org,
+multi-team or multi-country governance, deep extensibility, high-scale service, or a broader enterprise integration
+estate. Treat this as Efeonce positioning, not as a vendor-exclusive market claim. Discovery must be able to return
+`HubSpot-first`, `Salesforce-first`, `híbrida` or `no-fit`; a HubSpot Marketing + Salesforce CRM design requires
+explicit source of truth, lifecycle, consent, attribution, deduplication and sync contracts.
+
 ## Load first
 
 1. Read `project_context.md`, `Handoff.md`, `docs/context/00_INDEX.md`, and client-specific context.
@@ -35,6 +44,8 @@ feature availability without current primary-source verification and an `as-of` 
      de esos documentos.
    - Offer/sector qualification: `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md`
 4. When the work derives from a sold implementation, read `../hubspot-solutions-partner/modules/12_IMPLEMENTACION.md`; for agents, also read `../hubspot-solutions-partner/modules/13_AGENTES.md`. Product claims and prices remain owned by that skill's `hubspot-solutions-partner` → `SOURCES.md`.
+
+For Fall 2026 / UNBOUND 2026 product changes, read [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](../../../docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md) before qualifying ChatGPT Ads, MCP/Claude, Agent Hub, Breeze or Scheduled Prompts. It is a dated evidence register, not proof of portal eligibility, regional availability, pricing or runtime.
 
 ## Boundary router
 
@@ -80,6 +91,8 @@ Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> exe
 - Keep Customer Agent knowledge sources in Markdown when this service owns the content.
 - Do not promise API parity. Verify whether a setting is available through CRM APIs, Customer Agent APIs, Agent CLI, CMS APIs or only the authenticated UI.
 - Do not publish, activate workflows, change licenses/permissions, or perform destructive writes without explicit approval.
+- Treat ChatGPT Ads in HubSpot as a public beta: require Super Admin opt-in, Ads publishing permission, an active OpenAI Ads account, country/account eligibility, consent for every contact shared in conversion matching, and readback of UTMs, pixel, event state and delivery. Keep HubSpot event caps (Starter 5 / Pro 50 / Enterprise 100) and OpenAI budget caps explicit; never infer pricing or Chile availability.
+- Treat the HubSpot connector for Claude/MCP, Agent Hub, Agent Builder, Breeze and Scheduled Prompts with the availability ladder. Reauthentication may be required for new Claude scopes; connector writes need approval and validation because bulk limits and HubSpot custom validation behavior apply. A UNBOUND session or vendor announcement is first-look evidence, not GA or runtime evidence.
 - Do not report a conversational test as passed from one prompt. Test multi-turn memory, natural phrasing, technical accuracy, escalation and failure modes.
 - Native HubSpot transfer/system messages can pre-empt trained answers. Record this as a platform behavior and improve the transfer copy; do not hide it.
 - All client-facing metrics require period, baseline, denominator, definition and evidence. ANAM naming in external case studies requires authorization.

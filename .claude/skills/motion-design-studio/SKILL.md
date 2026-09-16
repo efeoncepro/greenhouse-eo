@@ -10,7 +10,7 @@ description: >-
   + tipografía kinética + title sequences, edición/montaje/pacing, sound design + sync a
   música, color grading + finishing, VFX/compositing — keying/roto/tracking/CGI/simulaciones),
   y (2) capacidad de ejecución (dirige el pipeline IA
-  — Higgsfield Cinema Studio/Soul ID vía MCP + Runway Gen-4.5 / Seedance / Veo / Kling /
+  — Higgsfield Cinema Studio/Soul ID vía MCP + Runway Gen-4.5 / Seedance / Minimax H3 / Flux 3 / Wan 3.0 / Veo / Kling /
   Gemini Omni —, integra craft humano AE/Blender/DaVinci, y hace handoff), cerrando el loop
   idear→storyboard→animatic→producir→editar→finalizar→entregar. Es "humano + IA": el craft
   (módulos 01-08) aplica anime quien anime; el pipeline IA (09) y la orquestación híbrida
@@ -30,7 +30,7 @@ description: >-
   "animación de logo", "tipografía kinética", "kinetic typography", "cinematográfico",
   "cinematic", "cámara", "storyboard", "animatic", "previs", "edición", "montaje", "corte",
   "color grading", "grade", "sound design", "diseño sonoro", "banda sonora", "render",
-  "video IA", "AI video", "Higgsfield", "Runway", "Seedance", "Veo", "Kling", "Gemini Omni",
+  "video IA", "AI video", "Higgsfield", "Runway", "Seedance", "Minimax", "Minimax H3", "Flux 3", "Wan 3.0", "video a video", "extender video", "Veo", "Kling", "Gemini Omni",
   "image-to-video", "Soul ID", "consistencia de personaje", "After Effects", "Blender",
   "DaVinci", "VFX", "efectos visuales", "compositing", "rotoscoping", "roto", "green screen",
   "chroma", "keying", "tracking", "matchmove", "CGI", "Nuke", "Fusion", "Mocha", "Houdini",
@@ -133,14 +133,35 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
 - **Dirigir**: brief + storyboard + animatic + shotlist (`modules/04` + `templates/`).
 - **Producir (IA)**: elige el modelo por toma (`modules/09`): **Higgsfield** (Cinema Studio para
   cámara/lente/focal, Soul ID para consistencia de personaje, LipSync — vía MCP), **Runway Gen-4.5**
-  (cine dirigido, beats/coreografía de cámara), **Seedance** (refs + camera moves), **Kling** (Voice
-  Binding), **Veo** (broadcast), **Gemini Omni** (edición conversacional).
+  (cine dirigido, beats/coreografía de cámara), **Seedance 2.5/2.0** (refs + camera moves; se opera con
+  `pnpm ai:fal` y el endpoint se elige por duración/4K/costo en
+  `workflows/engine-selection-by-fidelity-contract.md`; los 15 endpoints verificados 2026-09-16, incluido 2.5
+  `editing`/`extension`; su filtro rechaza **tras encolar y cobra** marcas y personas reales; el costo se estima
+  con la fórmula de fal `alto × ancho × segundos × 24 / 1024` tokens, que calzó con lo medido —la equivalencia de
+  OpenArt subestima ~2×—), **Minimax H3** (también con `pnpm ai:fal`: Max Turbo =
+  divergencia barata y rápida; Max `camera-controls` = cámara real sobre imagen congelada; base = única H3 con
+  2K/4K, **reescalados desde 768P**; Max es post-entrenado por fal; LoRA/entrenadores = consistencia de
+  marca/personaje, sin verificar, mínimo 100 steps facturables; 5–15 s, entrega audio sin toggle),
+  **Flux 3** (también con `pnpm ai:fal`; en fal es **video**, 12 endpoints verificados 2026-09-16: draft barato →
+  `enhance` sólo del take aprobado; primer/último cuadro y keyframes para fijar la trayectoria; `edit` re-renderiza
+  conservando movimiento; `extend` exige audio en el origen y entrega sólo la continuación; la elección de video a
+  video Flux 3 vs Seedance 2.5 vive en el mismo workflow),
+  **Wan 3.0 / Wan 3.0 Prime** (también con `pnpm ai:fal`, conectado 2026-09-16; los 6 verificados en real: 2–30 s o `auto` = duración inteligente, hasta 1080p (default y escalón caro: 0,20 USD/s; 480p 0,05; Prime 0,28 a 1080p), 30 fps, R2V con
+  10 imágenes / 5 videos / 5 audios, video basado en una web o documento con `--web-url`/`--file` + `--thinking`;
+  #2 en video y #1 en Video Editing en OpenArt Arena 2026-09-16, pero **sin endpoint de edición** en fal),
+  **Kling** (Voice
+  Binding vía Higgsfield; Kling 3 vía fal y Grok Imagine video **evaluados, no conectados** — ver el workflow),
+  **Veo** (broadcast), **Gemini Omni** (edición conversacional; **directo por Google, nunca por fal**).
+- 🔴 **Antes de elegir motor de video**: aplicar el contrato de fidelidad y luego el **árbol por necesidad +
+  costos por resolución** de `workflows/engine-selection-by-fidelity-contract.md` (fal cobra por escalón: el precio
+  registrado es el más bajo; Flux 3 publicado es el doble del registrado → confirmar con `pnpm ai:fal --balance`).
+  Guía canónica imagen + video: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`.
 - **Producir (humano)**: After Effects (mograph/compositing), Blender/C4D (3D), Nuke/Fusion
   (compositing/VFX), Mocha (tracking), Houdini (FX/simulaciones) — handoff con spec (`modules/11`).
 - **Editar + finalizar**: montaje, sonido, color grade, render, entrega (`modules/06`, `07`, `08`, `10`).
 - **Profusionar una campaña motion**: desde un clean shot aprobado, construir 15/10/6 como tres argumentos
   editoriales con copy/logo exactos y audio medido (`workflows/single-shot-to-deterministic-campaign-hero.md`).
-  Omni sirve para microescena reinterpretada; Seedance 2.0 sólo para una toma/acción/continuidad nueva que
+  Omni sirve para microescena reinterpretada; Seedance 2.x sólo para una toma/acción/continuidad nueva que
   preserve el mundo. Timing, crop, safe zone, copy/logo, grade, foley y mezcla pertenecen a post.
 
 > **Regla dura (director, no dictador).** El estudio **decide y dirige**. Las **operaciones

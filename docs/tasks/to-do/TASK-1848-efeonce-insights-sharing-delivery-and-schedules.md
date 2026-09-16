@@ -4,6 +4,8 @@
 
 - **Decisión del operador (ADR delta 2026-09-15):** la vista web compartida se renderiza en `efeonce-think` (`think.efeoncepro.com/insights/r/<token>`, patrón headless del Grader). Esta task expone el resolver público por token (`GET /api/public/insights/shared/[token]` → `InsightWebModelV1`, proyección client-facing versionada del plan + snapshot) y el proxy de descarga con chequeo de revocación; Think resuelve por request, sin pre-render ni cache. Arquitectura §8. El render es **TASK-1875** (bloqueada por esta task): el correo con ShareGrant enlaza a `think.efeoncepro.com/insights/r/<token>`; el contrato de respuesta esperado por 1875 está en su `## Detailed Spec` (200/404/410/429 + `downloads[]` con `available|unavailable`).
 - Existe `InsightSharePort` declarado (`ports.ts`, `implemented: false`) y el evento `insights.edition.issued` con `issuedHash`; la proyección por audiencia (`readers/projection.ts`) y `canViewEvidence` ya distinguen emitida/no emitida. El manual servido `efeonce-insights` reserva sus recetas de distribución a esta task. — por TASK-1845
+- **Rollout 2026-09-15 (TASK-1845):** el puerto de outputs y el pipeline por fases ya corren **en producción** con `INSIGHTS_GENERATION_ENABLED=true` en staging y producción (emisión e IA OFF); ediciones sintéticas (org sandbox «Greenhouse Demo»; «producción» nombra el runtime, no el dato) `EO-INS-000012/13` (staging) y `EO-INS-000014` (producción) quedaron `ready_for_review`. El gateway `efeonce-mcp` 1.5.0 federa las 4 tools (47 tools, 8 clases de scope) y el scope `efeonce.mcp.insights.write` existe en Entra (sin cliente que lo porte ⇒ `insufficient_scope` al crear). Detalle: arquitectura §14. El resolver público por token y `InsightWebModelV1` de esta task nacen sobre un dominio que ya tiene ediciones persistidas en producción; la proyección client-facing existente (`evidence`/`plan` sólo de emitidas) es la base que no puede relajarse.
+- Desbloqueada de TASK-1845 (2026-09-15): la foundation de Efeonce Insights está en producción (release `9c094688309d`, generación ON en Vercel, gateway v1.5.0 federado, scope en Entra); TASK-1845 sigue `in-progress` sólo por dos evidencias de cierre (ensayo `migrate:down` y sesión MCP con token humano) que no condicionan este trabajo. — cerrado por rollout de TASK-1845
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -29,7 +31,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `platform|identity|ops|data`
-- Blocked by: `TASK-1845, TASK-1846`
+- Blocked by: `TASK-1846`
 - Branch: `Greenhouse develop; sin branch dedicada ni worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -306,6 +308,7 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [ ] Arquitectura técnica, documentación funcional y manual/runbook actualizados proporcionalmente.
 - [ ] Handoff/changelog y contratos UI/API/MCP reflejan disponibilidad real.
 - [ ] Regresiones, señales, rollback y gates documentales pasan; no commit/push/deploy automático.
+- [ ] Actualizar la skill viva `efeonce-insights` (`references/program-ledger.md`, `architecture-map.md`, `contracts.md`, `operations.md`, `lessons.md`) y espejar a `.codex/` con `pnpm skills:mirrors` verde — contrato de EPIC-045; sin esto la task no pasa a complete.
 
 ## Delta 2026-09-09 — distribución para autogestión y gestión
 

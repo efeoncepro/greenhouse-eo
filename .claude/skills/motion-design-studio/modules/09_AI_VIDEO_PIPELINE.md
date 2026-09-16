@@ -30,11 +30,12 @@ No hay "el mejor modelo" — hay **el mejor modelo para ESTA toma**. Elige por l
 | **Higgsfield Soul ID** | **Consistencia de personaje** | Subir 3–5 fotos, entrenar ~5–10 min, reusar el mismo rostro en todas las tools. EL diferenciador |
 | **Runway Gen-4.5** | **Cine dirigido** | Entiende beats y coreografía de cámara (pan/truck/handheld). Fuerte para narrativa dirigida |
 | **Seedance 2.0** | Briefs detallados + refs multimodales | Reference-to-video con hasta 9 imágenes + 3 videos + 3 audios; 4–15 s; native audio. Puede usar previs 3D como **video exportado**; no recibe `.blend`. |
-| **Seedance 2.5 vía Fal** | T2V, I2V y R2V; briefs largos, audio nativo y muchas refs | OpenAPI actual: 480p/720p, 4–30 s; I2V acepta `image_url` y `end_image_url`; R2V admite hasta 30 imágenes, 10 videos, 10 audios y 50 archivos totales, con audio condicionado a imagen/video. No declara 4K, máscara, storyboard, shots ni precio fijo; el costo publicado es una fórmula de Fal y debe refrescarse. |
+| **Seedance 2.5 vía Fal** | T2V, I2V y R2V; briefs largos, audio nativo y muchas refs | OpenAPI (releído 2026-09-16): 480p/720p/1080p, sin 4K, 4–30 s; I2V acepta `image_url` y `end_image_url`; R2V admite hasta 30 imágenes, 10 videos, 10 audios y 50 archivos totales, con audio condicionado a imagen/video. No declara 4K, máscara, storyboard, shots ni precio fijo; el costo publicado es una fórmula de Fal y debe refrescarse. Verificado en real 2026-09-16 (t2v, i2v y r2v en `reference`/`editing`/`extension`); costo estimable con la fórmula de fal `alto × ancho × segundos × 24 / 1024` tokens (calzó con lo medido; la equivalencia de OpenArt subestima ~2×); precio publicado 480p ≈0,22 · 720p ≈0,47 USD/s; 1080p sin verificar; el filtro de ByteDance rechaza marcas y personas reales **tras encolar y cobra**. |
 | **Seedance 2.5 vía Higgsfield MCP** (`seedance_2_5`) | UI legible en la pantalla de un dispositivo, producto y refs indexadas; el operador lo indicó como el más potente para esto | `generate_video` con `mode: omni_reference` y roles `start_image`, `end_image`, `image_references`, `video_references`, `audio_references`; 4–30 s; 480p/720p/1080p; `bitrate_mode` standard/high; `generate_audio`. Medido 2026-09-11: **72 créditos Higgsfield por 8 s a 1080p**, ~4–5 min por render. Mecánica del MCP en `efeonce/STUDIO_TOOLING.md`; receta de pantallas en §7. |
-| **Kling 3.0** | **Storyboarding multi-shot + Voice Binding** | Voz consistente en 6 cortes / 5 idiomas. Económico |
+| **Kling 3.0** (vía Higgsfield; Kling 3 vía fal = evaluado, no conectado) | **Storyboarding multi-shot + Voice Binding** | Voz consistente en 6 cortes / 5 idiomas. Económico |
+| **Wan 3.0 / Prime vía Fal** (`pnpm ai:fal`, conectado 2026-09-16) | Tomas de hasta 30 s con **duración inteligente** (`auto`); video basado en una **web o documento** | 2–30 s, hasta 1080p (default 1080p: explora a 480p), audio apagable, 30 fps; USD/s por resolución 480p 0,05 · 720p 0,10 · 1080p 0,20 (Prime 0,068 · 0,14 · 0,28); R2V con 10 imágenes / 5 videos / 5 audios citados por posición (`Image 1`); `--web-url`/`--file` exigen `--thinking`. Los 6 endpoints verificados en real 2026-09-16. Sin edición en fal. #2 video / #1 Video Editing en OpenArt Arena (2026-09-16, ranking externo) |
 | **Veo 3.1** | **Broadcast** | Frame rate de cine, sync audio-visual nativo. ~$0.10/s |
-| **Gemini Omni** | **Edición conversacional multi-turn** | Multimodal, consistencia entre turnos. Vertex (proyecto efeonce-group) |
+| **Gemini Omni** | **Edición conversacional multi-turn** | Multimodal, consistencia entre turnos. Vertex (proyecto efeonce-group). **Directo por Google, nunca por fal** aunque fal lo ofrezca |
 | **Sora 2** | Consistencia temporal/física (líder) | ⚠️ **API deprecada 2026-03-24, shutdown 2026-09-24** → **NO basar nada nuevo**. Sigue accesible vía agregadores (Higgsfield) |
 | **Magnific** (MCP + API) | **Upscale / enhance / finish** | Video Sequence Enhancement (frame-consistent), Precision API (detalle fiel), 2x–16x/8K. Paso de finishing, no de generación. Detalle en `modules/08 §8` |
 
@@ -45,7 +46,14 @@ No hay "el mejor modelo" — hay **el mejor modelo para ESTA toma**. Elige por l
 - Muchas refs de producto/personaje + económico → **Seedance**.
 - Broadcast con sync de audio → **Veo 3.1**.
 - Iterar por conversación → **Gemini Omni**.
+- Toma larga con duración decidida por el modelo, o video explicativo desde una web/documento → **Wan 3.0** (`pnpm ai:fal`).
 - Subir resolución / limpiar → **Magnific** (después del grade).
+
+> **Motores de `pnpm ai:fal` (Seedance, Minimax H3, Flux 3, Wan 3.0): elegir con el árbol por necesidad**
+> (explorar, hero, larga, 4K, cámara, inicio/fin, keyframes, editar con/sin personas, extender, referencias,
+> web/documento, consistencia) y **presupuestar con la tabla de costo por resolución** de
+> `workflows/engine-selection-by-fidelity-contract.md`. Guía canónica imagen + video:
+> `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`.
 
 ---
 
@@ -228,7 +236,10 @@ dirigir (shot list + prompt sheet)
 
 **Producir/renderizar/upscalear con IA cuesta créditos.** Antes de correr sobre toda la pieza:
 
-- **Dimensiona primero:** estima segundos totales × costo/s del modelo elegido (§1) + upscales. Una
+- **Dimensiona primero:** estima segundos totales × costo/s del modelo elegido **a la resolución que pedirás**
+  (fal cobra por escalón y el precio registrado es el más bajo: Wan 1080p 0,20/s, Prime 0,28, H3 base 2K 0,13; Flux 3
+  publicado ≠ registrado; Seedance por fórmula de tokens — tabla en `workflows/engine-selection-by-fidelity-contract.md`)
+  + upscales. Confirma con `pnpm ai:fal --balance` antes y después de la primera toma. Una
   pieza de 30s a ~$0.10/s con 4 variantes por toma escala rápido.
 - **Prueba en una toma**, valida calidad/consistencia, **recién ahí** genera el volumen.
 - **Chunks, no clips largos** (§7) — también controla el gasto de re-tiradas.

@@ -1,5 +1,42 @@
 # Greenhouse API Platform Architecture V1
 
+## Delta 2026-09-15 — lanes App y Ecosystem de Efeonce Insights (TASK-1845)
+
+Efeonce Insights nace con las dos lanes gobernadas antes que su UI (parity-first, como TASK-1631): App
+`/api/platform/app/insights/**` y Ecosystem `/api/platform/ecosystem/insights/**`, adapters delgados
+(`src/lib/api-platform/resources/app-insights.ts`, `ecosystem-insights.ts`) sobre los commands y readers de
+`src/lib/efeonce-insights/**`. Lo que decide la forma:
+
+- **Una tabla de errores para las dos lanes** (`insights-errors.ts`): el `InsightsError` del dominio se traduce una
+  sola vez a `ApiPlatformError`; `details.code` conserva la causa (`not_found`, `idempotency_conflict`,
+  `generation_disabled`, `issuance_disabled`, `not_ready`, `invalid_transition`, `invalid_window`, …) y el mensaje es
+  del dominio, sin evidencia. Códigos de la plataforma: `not_found` 404 anti-oracle (org sin módulo `insights_v1`,
+  edición ajena), `idempotency_conflict` 409, `service_unavailable` 503 para los flags apagados
+  (`generation_disabled` / `issuance_disabled`), `bad_request` 409 para `not_ready` (emitir falla cerrado hasta
+  TASK-1846) e `invalid_transition`, `forbidden` 403 para audiencia interna pedida por un cliente y gate humano,
+  `rate_limited` 429 para cuota.
+- **El sujeto se deriva distinto por lane, la autoridad se decide igual.** App: tenant cliente ⇒ organización del
+  tenant, nunca del payload; interno ⇒ `organizationId` obligatorio (400 si falta). Ecosystem: binding org-scoped ⇒
+  la organización ES la del binding, el consumer se modela como cliente de esa org (`CLIENT_SPECIALIST`, sólo lee;
+  otra org ⇒ 404); binding `internal` ⇒ `organizationId` obligatorio, se modela como operador de sistema
+  (`EFEONCE_ACCOUNT`: lee, crea, revisa, recupera). En ambos casos `assertInsightsAccess` relee los tres planos por
+  llamada. Además de `externalScopeType`/`externalScopeId`, el ecosystem exige el binding interno para escribir.
+- **El ecosystem NO emite ni retira**: `issue`/`withdraw` sólo existen en App (capability `insights.edition.issue`),
+  porque una máquina no tiene autoridad de emisión; con `INSIGHTS_ISSUANCE_ENABLED` OFF, App responde 503
+  `issuance_disabled`. El gateway MCP (`efeonce-mcp` `1.5.0`, provider `greenhouse-insights`) consume sólo el
+  ecosystem y hereda ese límite.
+- **Idempotencia en dos capas.** Dominio: `(organization_id, idempotency_key)` + `request_hash` — misma clave y
+  mismo payload ⇒ misma edición con `idempotent: true` (el adapter responde 200; la primera creación 202); payload
+  distinto ⇒ 409 `idempotency_conflict`. Lane: el header `idempotency-key` del command harness (el gateway envía
+  `insights-create-<idempotencyKey>`) devuelve la respuesta cacheada ante un reintento de transporte.
+- **`?include=evidence`** en el detalle agrega el snapshot sellado y el plan congelado; un actor cliente los recibe
+  `null` hasta que la edición esté emitida (proyección por audiencia en `readers/projection.ts`).
+
+Estado 2026-09-15: ambas lanes en producción (release `9c094688309d`), `INSIGHTS_GENERATION_ENABLED=true` en
+Production y staging (runtime único Vercel), emisión e IA OFF; canary por ecosystem en producción creó
+`EO-INS-000014` en `ready_for_review`. Contrato desarrollador: `docs/api/GREENHOUSE_API_PLATFORM_V1.md` §Efeonce
+Insights; dominio: `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`.
+
 ## Product API humano para recovery de assessment (TASK-1746/1747)
 
 `POST /api/hiring/assessments/[id]/access-recovery` es un adapter Product API interno y delgado sobre

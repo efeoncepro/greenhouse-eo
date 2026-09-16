@@ -1,5 +1,9 @@
 # TASK-1875 — Efeonce Insights: vista web compartida renderizada en Think (efeonce-think)
 
+## Delta 2026-09-15
+
+- **Rollout 2026-09-15 (TASK-1845):** la foundation de la que deriva `InsightWebModelV1` (contratos `EditorialPlanV1`/`ChartSpecV1`/`EvidenceFactV1` y la proyección por audiencia) ya corre **en producción** con `INSIGHTS_GENERATION_ENABLED=true` en staging y producción (emisión e IA OFF); ediciones sintéticas (org sandbox «Greenhouse Demo»; «producción» nombra el runtime, no el dato) `EO-INS-000012/13` (staging) y `EO-INS-000014` (producción) quedaron `ready_for_review`. El gateway `efeonce-mcp` 1.5.0 federa las 4 tools (47 tools, 8 clases de scope) y el scope `efeonce.mcp.insights.write` existe en Entra (sin cliente que lo porte ⇒ `insufficient_scope` al crear). Detalle: arquitectura §14. Sigue bloqueada por TASK-1848 (resolver público); no hay edición emitida ni grant, así que el primer render se hace sobre fixture del modelo.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -516,6 +520,7 @@ La prueba `verify-insights-report.mjs` compara el DOM con el fixture, no con cá
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1848 URL del correo, TASK-1849 botón copiar enlace, EPIC-045 nodo S6)
 - [ ] dossier GVC + scorecard copiados a Greenhouse; docs de Think actualizados; commit del hub referenciado en el Delta de cierre
+- [ ] Actualizar la skill viva `efeonce-insights` (`references/program-ledger.md`, `architecture-map.md`, `contracts.md`, `operations.md`, `lessons.md`) y espejar a `.codex/` con `pnpm skills:mirrors` verde — contrato de EPIC-045; sin esto la task no pasa a complete.
 
 ## Follow-ups
 

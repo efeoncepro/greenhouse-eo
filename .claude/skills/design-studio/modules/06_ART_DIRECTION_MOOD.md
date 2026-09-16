@@ -167,6 +167,8 @@ por eje → mood board que las evidencia (§2) → concepto del KV (`modules/04`
 1. **Lee/completa el brief** (§1); reutilizar contexto y resolver sólo faltantes necesarios.
 2. **Define emoción objetivo** y tradúcela a ejes visuales (§4–§5).
 3. **Compara direcciones cuando están abiertas** (§2), con referencias anotadas. No reabrir concepto fijado.
+   El concepto lo fija `creative-direction` (su Plataforma Creativa, `templates/plataforma-creativa.md`).
+   Acá se diverge en **cómo se ve**, nunca en **qué es**: si no hay plataforma, el concepto está abierto.
 4. **Elige el medio** por tarea (§3) — foto/ilustración/3D/IA/mixed.
 5. **Fija el look & feel** en variables concretas (§4), defendibles contra el brief.
 6. **Sintetiza el concepto** y pásalo a la construcción del KV (`modules/04` §8).
@@ -179,7 +181,7 @@ por eje → mood board que las evidencia (§2) → concepto del KV (`modules/04`
 ## 8. Checklist de cierre de dirección de arte
 
 - [ ] Brief con mensaje núcleo en una frase, público, emoción y canales.
-- [ ] Alternativas comparadas si el encargo está abierto; concepto fijado respetado.
+- [ ] Alternativas comparadas si el encargo está abierto; concepto fijado respetado (lo fija `creative-direction`).
 - [ ] Cada referencia del board entra por una razón anotada.
 - [ ] Medio elegido por tarea (foto/ilustración/3D/IA/mixed) y justificado.
 - [ ] Look & feel traducido a variables concretas (luz, textura, color, encuadre…).

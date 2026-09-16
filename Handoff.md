@@ -1,5 +1,26 @@
 # Handoff activo
 
+**Posicionamiento CRM actualizado (2026-09-16, documental):** HubSpot y Salesforce se mantienen como proveedores
+con una zona de solapamiento —mid-market alto, agentes e integraciones— pero con centros de gravedad distintos.
+HubSpot-first parte para crecimiento B2B, mid-market y time-to-value; Salesforce-first para org instalada compleja,
+gobierno, service a escala, extensibilidad e integración enterprise. La práctica usa `HubSpot-first`,
+`Salesforce-first`, `híbrida` o `no-fit`; no es una decisión automática ni una afirmación de segmentación exclusiva.
+
+**Dreamforce 2026 — delta 16/09 (documental):** el ledger y las skills Salesforce quedaron actualizados con AIforce
+como capa de interfaz/headless gobernada; Missionforce con OpenAI/NVIDIA para government y entornos regulados; y
+las novedades de Marketing Cloud Next (Campaign Agent, Headless Marketing/MCP, Palmata, Data Guardian, Budget
+Optimization, Adaptive Web, Personalized Paths y otras) con disponibilidad separada por capacidad. Koa pertenece
+al anuncio del 15/09 y sigue en pilotos seleccionados. No se cambió ninguna org, entitlement ni contrato. Detalle:
+[`Dreamforce 2026`](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md).
+
+**HubSpot Fall Spotlight / UNBOUND 2026 (2026-09-16, documental):** las skills espejo de HubSpot as a Service,
+Solutions Partner y HubSpot-Greenhouse bridge, junto con el catálogo de oferta, incorporan ChatGPT Ads beta,
+MCP/Claude con writes gobernados, Agent Hub/Builder/Breeze, Developer Platform 2026.09 y la deprecación de APIs/apps
+legacy para septiembre de 2027. El detalle y la matriz de disponibilidad están en
+[`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md).
+No se activó ningún beta, permiso, campaña, conexión ni write de portal; falta verificar elegibilidad por cliente antes
+de vender o implementar.
+
 **Contacto:** TASK-1801 cerrada; [alcance y evidencia](.codex/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
 
 **Creative/social 14/09:** AXIS `v0.2.5` publicó `supportingTagline` y selección colaborativa; Greenhouse fija
@@ -10,7 +31,8 @@ blend raster `luminosity` `0.72` verificado. Templates: `efeonce-advertising-cre
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
 no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
 
-**Efeonce Insights — TASK-1845 code complete + canary staging verde (2026-09-15, Claude, `develop` `8844a3d5c` pushed; CI y deploys de workers verdes):** dominio `src/lib/efeonce-insights/`, schema `greenhouse_insights`, adapters SEO/AEO/ICO, lanes app+ecosystem, 4 tools MCP, skill `efeonce-insights`. **Staging:** `INSIGHTS_GENERATION_ENABLED=true` sólo ahí, `insights_v1` asignado a la org sintética `Greenhouse Demo`; ambos lanes crearon/leyeron ediciones sintéticas (`EO-INS-000012/13`, 0 hechos por falta de snapshots ICO) y el deny fue 404. Detalle en «Rollout evidence» de la task. **Gateway `efeonce-mcp`:** rama `feat/task-1845-insights-federation` `a37d526` (4 tools, scope `efeonce.mcp.insights.write` sólo para crear, fail-closed, v1.5.0, 47 tools); provider real verde contra staging. **Después (mutaciones ejecutadas por Codex):** gateway PR #12 → `cad57b31d`, desplegado como revisión `efeonce-mcp-gateway-00053-dsk` (front door 200/200/401); scope `efeonce.mcp.insights.write` creado en la app recurso de Entra (round-trip 6→7). **Pendiente:** release develop→main + `INSIGHTS_GENERATION_ENABLED` en Production (preflight local: `requires_break_glass`; migración ya aplicada, `auth_access` = paridad de scopes); `migrate:down` sin ensayar; `tools/list` por sesión MCP humana. Próximo: TASK-1846.
+**Efeonce Insights — TASK-1845 COMPLETE (2026-09-16):** foundation en producción desde 2026-09-15 (generación ON,
+emisión/IA OFF, gateway v1.5.0, rollback ensayado). Detalle: la task, arquitectura §14 y la skill `efeonce-insights`.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
 TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con
@@ -162,14 +184,13 @@ P01/P09 incluyen destinatarios/canales; TASK-1848/1849 distribución/experiencia
 preferencias. UI TASK-1854/1856: ocho docs detallados (dirección/wireframe/flow/motion), requisitos en 1853/1855; UI ready no, GVC pendiente.
 Primer email/in-app acompaña apertura cliente; Teamsbot por destino verificado. Reusar dueñas, sin otro Hub.
 
-**GPT Image 2.5 + contrato de proveedores de imagen (2026-09-08):** doc y skills al día; sólo documentación,
-cero código y cero llamadas al proveedor. El trabajo quedó en
-[`TASK-1851`](docs/tasks/to-do/TASK-1851-openai-image-provider-contract-consolidation.md), que supersede a
-`TASK-1850` (cerrada sin ejecutar) y suma el segundo defecto de la misma forma: `DEFAULT_IMAGE_PROVIDER`
-apunta a `imagen-4.0-generate-001`, declarado bloqueado. Bloqueador que decide el diseño: 2.5 no tiene
-calculadora de costo por imagen, así que la reserva previa de créditos de Globe no tiene fuente. `gpt-image-2`
-NO está deprecado. Detalle:
-[matriz](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
+**GPT Image 2.5 + contrato de imagen — TASK-1851 EJECUTADA (2026-09-16), NO cerrada.** El helper transporta la
+familia 2.5 y decide por **capacidad declarada**, no por literales. Cinco puertas dejaron de degradar en silencio.
+🔴 **El carril `google-imagen` estaba MUERTO, no "bloqueado"** (probe `404`) y era el default: migrado de
+**provider** a `gemini-3.1-flash-image`/`generateContent`, default → `openai-image`. Primera medición propia del
+costo de 2.5 (ver changelog).
+**Gates:** test y build verdes. **Pendiente:** los dos entregables de Globe, **sin hacer
+por instrucción del operador** (hibernado). Todo en [`TASK-1851`](docs/tasks/in-progress/TASK-1851-openai-image-provider-contract-consolidation.md).
 
 **TASK-1844 COMPLETE (2026-09-08):** producción ON para una identidad; SQL aplicada y fixtures retiradas.
 Codex y Claude Code/hospedado/Desktop certificados, rollback probado (Claude Code exige login tras OFF).
@@ -270,7 +291,9 @@ flag, commit, push ni deploy. Siguiente paso si se ejecuta: confirmar `/goal`, c
 `pnpm codex:task-hook TASK-1834` y planificar Slice 0; Slices 1–3 detrás de flags OFF antes de cualquier first fold
 visible.
 
-**TASK-1837 (EPIC-044 U12) — `EN PRODUCCIÓN 2026-09-06, COMPLETE`.** Release `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf` (run `34029501838`, PR #227, target `b3e324cb5c8d`), manifest `released` 11:23:09Z en un solo intento. Break-glass con hechos (la migración `20260906004450748` ya estaba aplicada en la instancia única, `run_on 04:27:58Z`); el smoke de `main` se PRODUJO en vez de bypassearse. Cinco servicios Cloud Run OK: `ops-worker` y `auth-server` quedaron en `2b385284d594` con **hash de árbol IDÉNTICO** al target (`d3a1432a1f71`) — no-op legítimo probado por identidad de árbol, no por el change-gate; watchdog `drift_count=0`. Ambos flags `EXTERNAL_INVITATION_*` ON en Production (valor live leído con `vercel env pull`) + redeploy obligatorio `greenhouse-j7aix61yk`. **Canary de contrato contra producción**: la misma llamada a la lane delegada pasó de `404` anti-oráculo a `422 field=bindingId`, y con `organizationId` a `403 forbidden` — la lane ejecuta la resolución de autoridad, no sólo existe. Federación mergeada en `efeonce-mcp` (PR #3 → `65ae1d5`, revisión `00038-8jj`); ese repo **NO** despliega en push a `main`, va por dispatch de `deploy.yml`.
+**TASK-1837 (EPIC-044 U12) — COMPLETE, en producción 2026-09-06** (release `b3e324cb5c8d`, flags
+`EXTERNAL_INVITATION_*` ON, canary de contrato y federación MCP verificados). Evidencia completa:
+[la task](docs/tasks/complete/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md).
 
 **Pendiente real (no bloqueante):** (1) la **primera persona CLIENTE real** es decisión comercial tuya — hasta que exista, el flujo delegado de punta a punta y las dos tools del gateway sólo están probados en staging y por los negativos del canary; (2) la señal `identity.external_invitation.token_revealed` marca 3 por las revelaciones de prueba y **se apaga sola** al vencer su ventana de 24 h; (3) **punto ciego abierto en el gate de versión del gateway**: `test/version.test.ts` sólo compara el hash de las tools FEDERADAS desde Greenhouse, así que las tools propias del gateway crecieron la superficie de 37 a 39 con el test verde y `version` congelada — se subió a `1.1.0` a mano, pero la próxima volverá a pasar sin bump.
 
@@ -406,12 +429,11 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
-## 2026-09-03 — EPIC-043: Payroll confiable y operable desde chat
+## 2026-09-16 — TASK-1846: render durable — staging verificado, producción espera el release
 
-[EPIC-043](docs/epics/to-do/EPIC-043-payroll-reliability-and-agentic-api-parity.md), `to-do`, P0: doce tasks
-TASK-1816–TASK-1827, con contratos y dependencias por unidad. Por instrucción del operador, TASK-731/1214/1215/730
-quedaron `complete` por supersesión documental hacia TASK-1820/1821/1825/1827; sin certificar implementación.
-TASK-1625/ISSUE-129–134 conservan trazabilidad; OAuth TASK-1813 e identidad TASK-1631 son dependencias compartidas.
-Primer paso: plan y ADR acotado de TASK-1816, cálculo atómico/aprobación de versión.
-[Baseline](docs/audits/payroll/PAYROLL_RELIABILITY_API_PARITY_PROGRAM_BASELINE_2026-09-03.md).
-Sólo planificación/documentación; sin código, migraciones, envíos, pagos ni deploy.
+[TASK-1846](docs/tasks/in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md) sigue `in-progress`
+sólo por producción. Staging verificado: flag ON en Vercel staging, Job y `ops-worker-00690-xhl` (el dispatcher no
+lo leía; corregido en `d9da99df8`), benchmark 1 output por tick de 2 min, auditoría `client_user` (`1875fdd32`).
+Job en el release control plane; gateway `efeonce-mcp#14` mergeado sin desplegar. **Pendiente (tras autorizar
+release):** release develop→main, `INSIGHTS_RENDER_ENABLED` en Vercel Production + redeploy, deploy del gateway
+v1.6.0 y canary productivo en la org sandbox. Evidencia: la task y la skill `efeonce-insights`.

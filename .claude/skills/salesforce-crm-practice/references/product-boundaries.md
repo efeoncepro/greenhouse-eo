@@ -9,13 +9,14 @@
 | Salesforce Platform | Objetos, seguridad, Flow, Apex, Lightning, Experience Cloud, APIs, eventos, ALM e integraciones | ¿Es extensión mantenible o deuda accidental? |
 | Data 360 | Ingesta/federación, modelado, identidad, calculated insights y activación para CRM | ¿Existe un problema de datos que justifica la plataforma y su consumo? |
 | Agentforce | Agentes y acciones sobre procesos CRM, con datos, permisos, evaluación y supervisión gobernados | ¿Qué puede decidir, qué puede ejecutar y quién responde por el resultado? |
+| AIforce / Headless 360 | Interfaz y exposición de contexto, lógica y acciones CRM hacia otras interfaces y agentes | ¿La superficie está disponible, gobernada y autorizada, o sólo anunciada/beta/piloto? |
 
 ## Fuera de alcance
 
 - Marketing Cloud Engagement: Journey Builder, Automation Studio, Content Builder, Contact Builder, Mobile y deliverability.
 - Marketing Cloud Next y sus campañas, canales y operación de marketing.
 - Account Engagement/Pardot.
-- Commerce, MuleSoft, Tableau, Slack o productos de industria como práctica completa; pueden ser dependencias con owner especializado.
+- Commerce, MuleSoft, Tableau, Slack, AWS, Google Cloud, NVIDIA o productos de industria como práctica completa; pueden ser dependencias con owner especializado. AIforce no elimina esos límites.
 - Asesoría legal, tributaria o regulatoria.
 
 ## Casos híbridos

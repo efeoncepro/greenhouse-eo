@@ -217,6 +217,10 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'listInsightEditions'
   | 'getInsightEdition'
   | 'createInsightEdition'
+  | 'requestInsightRender'
+  | 'getInsightRenderRun'
+  | 'retryInsightRender'
+  | 'cancelInsightRender'
   | 'getMcpSkill'
 >) => ({
   /**
@@ -689,6 +693,49 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         return `Insight edition ${String(data.edition?.editionId ?? 'unknown')} ${data.idempotent ? 'already existed (idempotent)' : 'created'}; status=${String(data.edition?.status ?? 'unknown')}; generation=${generation}. Issuing is a separate human decision (${result.requestId}).`
       },
       () => client.createInsightEdition(input)
+    )
+  },
+  // ── TASK-1846 — render durable ───────────────────────────────────────────
+  async requestInsightRender(input: { organizationId?: string; editionId: string; outputs?: string[] }) {
+    return callTool(
+      result => {
+        const data = result.data as { run?: { renderRunId?: string; state?: string }; outputs?: Array<{ output: string; state: string }>; idempotent?: boolean }
+        const outputs = (data.outputs ?? []).map(o => `${o.output}:${o.state}`).join(', ')
+
+        return `Render run ${String(data.run?.renderRunId ?? 'unknown')} ${data.idempotent ? 'already live (idempotent)' : 'queued'}; state=${String(data.run?.state ?? 'unknown')}; outputs=[${outputs}]. Poll get_insight_render_run (${result.requestId}).`
+      },
+      () => client.requestInsightRender(input)
+    )
+  },
+  async getInsightRenderRun(input: { organizationId?: string; renderRunId: string }) {
+    return callTool(
+      result => {
+        const data = result.data as { renderRunId?: string; state?: string; outputs?: Array<{ output: string; state: string; failureCode?: string | null; outputAssetId?: string | null }> }
+        const outputs = (data.outputs ?? []).map(o => `${o.output}:${o.state}${o.failureCode ? `(${o.failureCode})` : ''}${o.outputAssetId ? ' asset' : ''}`).join(', ')
+
+        return `Render run ${String(data.renderRunId ?? input.renderRunId)} state=${String(data.state ?? 'unknown')}; outputs=[${outputs}] (${result.requestId}).`
+      },
+      () => client.getInsightRenderRun(input)
+    )
+  },
+  async retryInsightRender(input: { organizationId?: string; renderRunId: string }) {
+    return callTool(
+      result => {
+        const data = result.data as { run?: { state?: string }; outputs?: Array<{ output: string; state: string }>; idempotent?: boolean }
+
+        return `Render run ${input.renderRunId} ${data.idempotent ? 'had nothing failed to retry' : 're-queued its failed outputs'}; state=${String(data.run?.state ?? 'unknown')}; outputs=[${(data.outputs ?? []).map(o => `${o.output}:${o.state}`).join(', ')}] (${result.requestId}).`
+      },
+      () => client.retryInsightRender(input)
+    )
+  },
+  async cancelInsightRender(input: { organizationId?: string; renderRunId: string }) {
+    return callTool(
+      result => {
+        const data = result.data as { run?: { state?: string }; cancelled?: number; stillRunning?: number }
+
+        return `Render run ${input.renderRunId}: cancelled=${String(data.cancelled ?? 0)}, stillRunning=${String(data.stillRunning ?? 0)}; state=${String(data.run?.state ?? 'unknown')} (${result.requestId}).`
+      },
+      () => client.cancelInsightRender(input)
     )
   },
   async getSeoEntitlement(input: { organizationId?: string }) {

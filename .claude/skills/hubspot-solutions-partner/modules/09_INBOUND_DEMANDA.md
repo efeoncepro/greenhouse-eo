@@ -1,5 +1,8 @@
 # 09 · Inbound, directorio y partner matching
 
+> **Refresh Fall Spotlight/UNBOUND 2026 — 2026-09-16.** El enablement del vendor es una entrada de canal,
+> no evidencia de elegibilidad individual ni autorización para publicar.
+
 > **Antes de invertir un peso en inbound, corre la Lente 1 de `modules/06`.**
 > En Chile, `hubspot partner` tiene **20 búsquedas al mes**. Rankear #1 ahí es plata quemada.
 > En mercados sin demanda de categoría, **el directorio y el partner matching *son* el canal.**
@@ -63,6 +66,19 @@ Ese es el costo real de quedarse en Gold, **y no aparece en ninguna tabla de ben
 ---
 
 ## 3. Co-marketing con HubSpot
+
+### Fall Spotlight: enablement e incentivos
+
+El kit para Solutions Partners ofrece eLearnings, un GTM kit y deep dives de Agent Hub/Agent Builder y Marketing
+Studio. El kit también anuncia incentivos promocionales para agentes, Credits y payments durante **2026-07-01 a
+2026-12-31**. Es material de enablement y una señal de demanda del vendor; **no afirmar que Efeonce sea elegible**
+para ningún incentivo, reward, bonus point, comisión promocional o training cerrado. Confirmar cuenta, tier, SKU,
+mercado, fechas y términos con el PDM/portal.
+
+ChatGPT Ads entra como piloto de paid AI discovery: conexión, creación/publicación, reporting y conversion events
+están documentados en beta; requiere permiso `Ads publishing` y opt-in de Super Admin. El bundle AI Growth es una
+oferta condicionada, no un paquete permanente ni una promesa de descuento: solo usarlo después de confirmar la
+oferta vigente y su elegibilidad por cliente.
 
 | Programa | Tier | Qué es |
 |---|---|---|

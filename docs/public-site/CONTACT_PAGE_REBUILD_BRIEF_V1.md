@@ -87,3 +87,13 @@ reconciliación de PII/analytics. Esos objetivos no se acreditan con la aprobaci
 quedaron retirados del cierre; requieren intake independiente si se retoman. La dirección antigua de Las Bellotas
 sigue apareciendo en el footer global, fuera del ownership page-scoped de esta landing. Una cifra histórica como
 «120+ empresas en 4 países» conserva su alcance y no prueba clientes en cinco países.
+
+## Delta 2026-09-16 — el copy live ya coincide con este brief
+
+Los cinco mercados declarados arriba como dato institucional vigente (Chile, Estados Unidos, Colombia, México y
+Perú) ya estaban aprobados acá; lo que faltaba era la implementación. El 2026-09-16 la entrada «Cobertura» del
+directorio de contacto directo dejó de decir «Chile y otros mercados» y pasa a nombrarlos, tomándolos del SSOT
+`EFEONCE_OPERATING_MARKETS` de `src/config/efeonce-brand.ts`. Se conservó el verbo «trabajamos con organizaciones
+en», que expresa cobertura y no sedes: la entrada vecina muestra la dirección postal de la casa matriz y este
+brief prohíbe implicar oficina o entidad legal por mercado. La cifra «120+ empresas en 4 países» conserva su
+alcance y sigue sin probar clientes en cinco países.

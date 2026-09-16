@@ -22,6 +22,10 @@ Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que 
 
 ## Auditorías
 
+- [Berel — Colores de Temporada 2027: arquitectura, research y artículo N61 — 2026-09-16](BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md) —
+  página de ciclo 2027 complementaria a la página actual (ciclo 2026) mientras no exista el layout de pillar;
+  Semrush (ESTIMADO) y Search Console de 16 meses (MEDIDO): la genérica no gana clics y la página actual vive de
+  marca y catálogo; material oficial de las cuatro paletas, artículo en revisión con N1–N4 y gate PASS.
 - [Berel — recuperación de fugas editoriales en Content Hub — 2026-09-08](BEREL_CONTENT_HUB_EDITORIAL_LEAK_RECOVERY_2026-09-08.md) —
   incidente centinela, recuperación de octubre y barridos preventivos de noviembre/diciembre; preserva análisis,
   comentarios y specs, formaliza edición quirúrgica y separa readback de Notion, arte y publicación Drupal.

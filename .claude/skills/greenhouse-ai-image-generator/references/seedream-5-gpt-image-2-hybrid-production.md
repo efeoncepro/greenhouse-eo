@@ -4,7 +4,14 @@
 > client-brand, cargar además `docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md`. Este archivo
 > gobierna el tramo still; el documento operativo gobierna la bifurcación still→motion y el release multi-canal.
 
-> **As-of:** 2026-07-18. Las capacidades, schemas y precios son volátiles: verificar las páginas oficiales antes de presupuestar o convertir límites en contrato.
+> **As-of:** 2026-07-18 · **Delta 2026-09-16:** slugs re-verificados, endpoint `layerize` y CLI `pnpm ai:fal`
+> como mano de producción. Las capacidades, schemas y precios son volátiles: verificar las páginas oficiales antes
+> de presupuestar o convertir límites en contrato.
+>
+> **Delta 2026-09-16 (b) — correcciones de selección.** Seedream 5 **Pro** en fal **no llega a 4K** (área máxima
+> `2048×2048`; la nota "Hasta 4K" del registro era incorrecta); **Lite** sí admite área mayor. Los rankings externos
+> **no coinciden** entre sí (ver §Rankings externos). GPT Image 2.5 **sí** es estimable antes de gastar. Guía canónica
+> de selección: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`.
 
 ## Propósito
 
@@ -20,6 +27,7 @@ Usar este documento cuando una campaña combine Seedream 5 Lite/Pro en fal.ai co
 | Organizar una fusión o imponer safe zones | GPT Image 2 | Mayor cumplimiento de layout a primer intento |
 | Derivar 1:1, 4:5, 9:16, 16:9 y 3:1 | GPT Image 2 | Mejor recomposición de formatos extremos observada |
 | Cambio regional exploratorio sin máscara | Seedream 5 Pro Edit | Buena localidad semántica sin preparar matte |
+| Descomponer un anchor aprobado en capas editables | Seedream 5 Pro Layerize | Capas con alfa real y fondo reconstruido, sin regenerar |
 | Proteger rostro, producto o packaging | GPT Image 2 Edit + máscara alfa | Menor deriva medida fuera de la región |
 | Mockup con headline | Cualquiera, concept-only | Ambos acertaron una frase española en el benchmark |
 | Copy, logo, CTA, precio o legal de release | Composición determinística | Exactitud, accesibilidad y localización |
@@ -28,10 +36,18 @@ El router es un default informado, no una ley. Revisar cada salida contra el bri
 
 ## Contratos confirmados
 
-> **Regla dura de slug ByteDance (reverificado en vivo 2026-07-19, end-to-end con hash real):** los slugs de
-> Seedream van **SIN** el prefijo `fal-ai/` — `bytedance/seedream/v5/{pro,lite}/{text-to-image,edit}`. Con
-> `fal-ai/bytedance/...` el submit responde 200 pero el *result* da **404** (`Path /... not found`) con
-> `inference_time` ≈ 0.02s y no genera nada. FLUX, Recraft, GPT Image y Topaz **sí** llevan `fal-ai/`.
+> **Regla dura de slug (reverificada 2026-09-16): el prefijo `fal-ai/` depende del ENDPOINT, no del proveedor.**
+> Seedream 5 va **SIN** prefijo — `bytedance/seedream/v5/pro/{text-to-image,edit,layerize}` y
+> `bytedance/seedream/v5/lite/{text-to-image,edit}` —, igual que Seedance 2.x. Seedream 4/4.5 y Seedance v1/v1.5
+> van **CON** prefijo (p. ej. `fal-ai/bytedance/seedream/v4.5/text-to-image`); FLUX, Recraft, GPT Image y Topaz
+> también. Con el prefijo equivocado el submit responde 200 pero el *result* da **404** (`Path /... not found`,
+> `inference_time` ≈ 0.02s) y no genera nada: falla silenciosa. No componer slugs; tomarlos enteros de
+> `src/lib/ai/fal-capabilities.ts` (`pnpm ai:fal --list`, gratis).
+>
+> **Mano de producción:** `pnpm ai:fal --capability <id>` (`scripts/ai/fal-image.ts`), out-of-band, nunca runtime.
+> Ids: `seedream5-lite`, `seedream5-lite-edit`, `seedream5-pro`, `seedream5-pro-edit`, `seedream5-pro-layerize`
+> (las cinco verificadas 2026-09-16; no existe 5.1 a esa fecha). Toda corrida fuera de `--list` gasta, y fal no
+> devuelve `usage`: el CLI no reporta costo, así que presupuestar con la ficha oficial vigente.
 >
 > **Método barato para verificar un slug (sin gastar):** `POST {}` (body vacío) a `https://fal.run/<slug>` →
 > **404** = la app no existe · **422** = la app existe (falló la validación de input por falta de campos).
@@ -50,7 +66,13 @@ Hechos operativos:
 - Edit acepta hasta 10 `image_urls`; al excederlas conserva las últimas diez.
 - Devuelve raster `images[]` y `seed`.
 - Precio publicado: USD 0,035 por imagen.
-- Existe drift entre la ficha comercial y el schema sobre la resolución máxima. Tratar el límite como volátil y ejecutar contract test.
+- Existe drift entre la ficha comercial y el schema sobre la resolución máxima: el OpenAPI de fal admite un área
+  entre `2560×1440` y `4096×4096` (`auto_2K`, `auto_3K`, `auto_4K`; default `auto_2K`) y la ficha comercial dice
+  máx. `3072×3072` [oficial fal, leído 2026-09-16]. Tratar el límite como volátil y ejecutar contract test. Si el
+  tamaño pedido no cumple el área, fal **reescala solo**.
+- Entrega PNG (no expone `output_format`; qué hace fal si el CLI le manda `--format`: sin dato).
+- `max_images` 1–6 genera **series relacionadas** por pedido (sin flag propio: `--input '{"max_images":4}'`); se cobra
+  por imagen efectiva.
 - El laboratorio verificó `1792×2240`.
 - El endpoint observado devuelve seed pero no documenta un seed de entrada: no prometer reproducción determinística.
 
@@ -65,16 +87,32 @@ Endpoints:
 
 - `bytedance/seedream/v5/pro/text-to-image`
 - `bytedance/seedream/v5/pro/edit`
+- `bytedance/seedream/v5/pro/layerize`
 
 Hechos operativos:
 
 - Área documentada entre el equivalente a `1024×1024` y `2048×2048`; relaciones entre `1:16` y `16:1`.
-- `output_format`: `jpeg | png`; default `jpeg`.
+  🔴 **No es 4K en fal** (presets `auto_1K`/`auto_2K`): la nota "Hasta 4K según el proveedor" del registro estaba
+  contradicha por el schema. Si necesitas resolución nativa > 2K, usa Lite (hasta 4096² de área según schema) o
+  GPT Image (hasta 3840×2160; experimental sobre 2560×1440).
+- `output_format`: `jpeg | png`; default `jpeg`. 🔴 Trampa del CLI: `pnpm ai:fal --capability seedream5-pro --out
+  x.png` **sin** `--format png` guarda un JPEG con extensión `.png`. Pasa siempre `--format png` o nombra `.jpg`.
+- No devuelve `seed` ni acepta seed de entrada (el CLI envía `--seed` igual; efecto no probado: no lo uses).
+- Sin `max_images`: una generación = una pieza (usa `--count` → `num_images` 1–6).
 - Edit acepta hasta 10 referencias.
 - Primera referencia sin recargo; referencias adicionales: USD 0,0045 cada una.
 - Precio publicado: USD 0,0675 por output hasta el área de `1536×1536`; USD 0,135 hasta `2048×2048`.
-- Pro Edit entiende regiones/elementos por lenguaje, pero el API público no expone máscara, caja, polígono, layers editables ni salida PSD/SVG.
-- «Región/capa» significa comprensión semántica de un raster; no significa entregable por capas.
+- Pro Edit entiende regiones/elementos por lenguaje, pero no expone máscara, caja ni polígono de entrada y devuelve un raster aplanado.
+- «Región/capa» en Edit significa comprensión semántica de un raster; no significa entregable por capas.
+- **Layerize** es un endpoint aparte: recibe UNA imagen (`image_url`), sin prompt obligatorio, y devuelve la base +
+  hasta 16 capas ordenadas por `z_index`, cada una con `name`, `description`, `bounding_box` y recorte PNG con alfa
+  real (reconstruye lo ocluido). No es PSD/SVG. Verificado sobre un key visual: 8 capas, alfa limpio incluso en
+  huecos internos. `pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ./capas` guarda
+  `NN-<nombre>.png` + `layers.json`. Precio publicado: USD 0,03375 **por capa** si el área es ≤ `1536×1536` y USD
+  0,0675 por capa sobre ese umbral (una pieza de 8 capas a 2K ≈ USD 0,54 [inferencia]; si la base se cobra como
+  capa: sin dato). `image_size` admite `auto|auto_1K|auto_1.5K|auto_2K`; entrada 512²–6000², ≤ 30 MB.
+- Edit: con más de 10 `--image`, fal usa **sólo las últimas 10 sin aviso** (y en Pro cobra USD 0,0045 por cada
+  adicional). Ordena las referencias pensando en eso.
 
 Fuentes:
 
@@ -94,17 +132,20 @@ Fuentes:
 - Una URL firmada temporal de GCS es alternativa válida si la identidad firmante tiene
   `iam.serviceAccounts.signBlob`; si falla, borrar el objeto exacto y no ampliar IAM ni volverlo público por conveniencia.
 - No volver público permanentemente un bucket u objeto sólo para alimentar el modelo.
-- Usar `src/lib/ai/fal.ts`; respetar los `status_url` y `response_url` devueltos por la cola. Nunca reconstruir polling URLs desde un slug con subruta.
+- `pnpm ai:fal --image <archivo local>` ya hace el upload al storage de fal; usarlo en vez de armar el puente a mano.
+- Por debajo, `src/lib/ai/fal.ts`: respetar los `status_url` y `response_url` devueltos por la cola. Nunca reconstruir polling URLs desde un slug con subruta.
 
 ### GPT Image 2
 
 > **Delta 2026-09-08 — existe GPT Image 2.5.** OpenAI publicó `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare`.
 > Para el tramo GPT de una campaña nueva, la elección por defecto pasa a **Flare** (rápido, cotidiano) y
 > **Sunburst** (precisión de edición, pieza final). `gpt-image-2` **no** quedó deprecado y sigue siendo la
-> elección correcta cuando el flujo necesita **Batch** o **costo por imagen estimable antes de gastar** — 2.5 no
-> tiene ninguno de los dos, y OpenAI declara que su costo por imagen sólo se conoce midiendo `usage` real.
-> Dos reglas duras para 2.5: **nunca enviar `input_fidelity`** (la guía lo excluye de Sunburst/Flare) y **nunca
-> presupuestar una campaña con una tabla de costo por imagen**. Contrato completo y trampas del helper local:
+> elección correcta cuando el flujo necesita **Batch** (mitad de precio; 2.5 no lo tiene).
+> ⚠️ **Corregido 2026-09-16:** el costo de 2.5 **sí** se estima antes de gastar con la fórmula de la calculadora
+> oficial (reprodujo exactamente las mediciones del repo) y sus rate limits ya están publicados (iguales a
+> `gpt-image-2`). En tokens, 2.5 `high` ≈ GPT Image 2 `medium` y 2.5 `max` ≈ GPT Image 2 `high`. Fórmula y tabla:
+> `greenhouse-ai-image-generator/SKILL.md` §Elegir modelo. Regla dura que sigue: **nunca enviar `input_fidelity`**
+> a 2.5, y ninguna cifra de costo entra a una propuesta sin re-medir. Contrato completo:
 > `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
 
 Modelo y APIs:
@@ -131,6 +172,21 @@ Fuentes:
 - https://developers.openai.com/api/docs/guides/image-generation
 - https://developers.openai.com/api/docs/pricing
 - `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`
+
+## Rankings externos: no coinciden, no eligen por ti
+
+| Leaderboard (fecha) | Seedream 5 Pro | Seedream 5 Lite | GPT Image 2.5 Sunburst / Flare | GPT Image 2 |
+|---|---|---|---|---|
+| OpenArt Arena imagen v1.0 (2026-09-16) | **#1** (1051) | no listado | no listados | #2 (1047) |
+| Arena texto a imagen (act. 2026-09-07) | #10 | #37 | **#1 / #2** | #3 |
+| Arena edición (act. 2026-09-07) | #8 | #26 | **#1 / #2** (Sunburst gana) | #3 |
+| Artificial Analysis texto a imagen (leído 2026-09-16) | #15 | #43 | #2 / **#1** | #3 |
+| Artificial Analysis edición (leído 2026-09-16) | #9 | #20 | **#1** / #2 | #5 |
+
+[tercero; cifras de Arena y AA leídas con resumidor, revalidar a mano antes de citarlas fuera]. El #1 de Seedream
+en OpenArt **no se replica** en Arena ni en Artificial Analysis, y 2.5 tiene pocos votos (≈3–7 mil). Ningún
+ranking reemplaza la prueba con el brief propio; el router por operación de arriba se sostiene en evidencia de
+laboratorio, no en rankings.
 
 ## Flujo canónico
 
@@ -188,6 +244,11 @@ Usar cuando la campaña nace de material, atmósfera o gesto visual:
 5. GPT deriva ratios desde el mismo anchor.
 6. GPT + máscara repara áreas protegidas.
 7. Composición determinística libera masters.
+
+Si el anchor aprobado debe recomponerse por ratio, retocarse por elemento o animarse por planos, pasar el
+**anchor** (no el anuncio compuesto) por `seedream5-pro-layerize` y trabajar sobre sus capas en vez de regenerar.
+Las capas de texto o marca que devuelva sirven de guía de posición: copy final y logo oficial siguen saliendo del
+compositor y del vector.
 
 ### GPT → Seedream Pro (→ GPT opcional)
 
@@ -260,8 +321,9 @@ Reglas:
 - Escribir `LOCK EVERYTHING ELSE` y enumerar identidad, crop, luz, fondo y safe zones.
 - Usar para color, material y atmósfera.
 - Comparar fuera de región; no asumir layer ni preservación bit-perfect.
-- «Regiones/capas» describe comprensión semántica sobre un único raster aplanado. Pro no devuelve
+- «Regiones/capas» describe comprensión semántica sobre un único raster aplanado. Pro Edit no devuelve
   masks, layer IDs, PSD/SVG ni controles posteriores para ocultar, reordenar o editar capas por separado.
+  Si hacen falta capas separables, es otra operación: `seedream5-pro-layerize` sobre la pieza aprobada.
 
 ### GPT Image 2 mask
 
@@ -298,7 +360,8 @@ GPT mostró 32,6% menos deriva pixel-level protegida. La revisión visual sigue 
 | OOH | fragmento semántico dominante, no un feed ad miniaturizado | headline/firma/URL finales |
 
 Cuando el clean shot continúe a la familia 15/10/6, delegar el montaje y router Omni/Seedance a
-`../../motion-design-studio/workflows/single-shot-to-deterministic-campaign-hero.md`. Seedance 2.0 se reserva
+`../../motion-design-studio/workflows/single-shot-to-deterministic-campaign-hero.md`. Seedance (2.5/2.0 vía
+`pnpm ai:fal`; elección de endpoint en `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`) se reserva
 para una toma, acción, ángulo o continuidad nuevos que deban conservar el mundo; timing, crop, texto/logo,
 grade, foley, mezcla y otros defectos editoriales pertenecen a post determinístico.
 
@@ -329,7 +392,7 @@ Usar estos datos para routing y presupuesto exploratorio, no como SLA.
 2. Cambiar anatomía, crop, material, texto y luz en un mismo pase.
 3. Pedir «combina estas imágenes» sin roles ni precedencia.
 4. Anclar cada derivado a la última generación.
-5. Confundir edición semántica con PSD/layers.
+5. Confundir edición semántica (Pro Edit) con capas; si hacen falta, usar Layerize, que tampoco entrega PSD/SVG.
 6. Confiar en máscara como frontera matemática.
 7. Derivar por crop ciego.
 8. Usar Pro para territorios que aún serán descartados.

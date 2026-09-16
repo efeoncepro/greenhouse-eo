@@ -1,6 +1,6 @@
 # 14 · Narrativa agéntica y motion comercial 2026
 
-> **Verificado al 2026-08-30.** Cargar este módulo cuando la pregunta sea cómo posicionar, prospectar,
+> **Verificado al 2026-09-16.** Cargar este módulo cuando la pregunta sea cómo posicionar, prospectar,
 > demostrar o empaquetar HubSpot en la etapa Agentic Customer Platform. Para implementación y gobierno
 > técnico de agentes, cargar además `13_AGENTES.md`. Para cualquier cifra o vigencia, abrir `../SOURCES.md`.
 
@@ -50,6 +50,9 @@ por sí solo por qué se ganó un deal, cuándo escalar un ticket o qué excepci
 | **Help Desk + Customer Agent** | Capacidad comercial principal | Intake, routing, resolución, handoff y medición | Soporte saturado, tiempos altos, preguntas repetitivas |
 | **Agent Hub / Agent Builder** | **Agent Hub beta**; elegibilidad y catálogo cambian | Administrar agentes prebuilt/custom, workflows, instrucciones, tools y context | Readiness, gobierno, piloto y Managed Agentic Operations; sin SLA sobre beta |
 | **Agent CLI** | **Beta pública** desde 2026-06-23 | Operaciones repetitivas, masivas, programadas y de background | RevOps/CRM Ops operado con agentes, con OAuth, `--dry-run` y auditoría |
+| **ChatGPT Ads** | **Beta**; opt-in de Super Admin y permiso `Ads publishing` | Crear/publicar campañas, medir, atribuir y sincronizar conversion events | Piloto de paid AI discovery; no prometer acceso ni performance |
+| **Lead scoring + AI insights** | Scoring disponible en Marketing/Sales Pro/Enterprise; AI insights documentado con permiso de edición | Priorizar contactos, compañías y deals según fit, engagement y eventos de conversión | Alinear scoring con lifecycle, consentimiento y handoff; validar objetos y reglas por portal |
+| **MCP remoto** | **GA** para reads/writes acotados; permisos existentes y Audit Log | Conectar agentes a contexto y ejecutar acciones gobernadas | Least privilege, OAuth/PKCE, auditoría, reautorización y readback; no paridad completa |
 
 **No confundir Marketing Studio con Campaigns o Journey Automation:** Studio construye y coordina; Campaigns
 mide después; Journey Automation orquesta journeys complejos. **No confundir MCP con Agent CLI:** MCP/conectores
@@ -164,18 +167,21 @@ El **Guide to Services for Loop Marketing** de HubSpot valida paquetes de Brand 
 Personalization, Channel Amplification y Campaign Velocity, además de retainers completos de Loop. Sus rangos
 son **sugerencias del vendor, no tarifario de Efeonce**: dimensionar con scope, margen, complejidad y mercado.
 
-## 8. Incentivos H2 2026 — señal interna, no headline para el cliente
+## 8. Fall Spotlight / UNBOUND e incentivos H2 2026 — señal interna, no headline para el cliente
 
-HubSpot publicó incentivos para activar agentes, crecer consumo de Credits y demostrar outcomes:
+HubSpot publicó el kit de Fall Spotlight y una ventana promocional para activar agentes, crecer consumo de Credits
+y demostrar outcomes:
 
-- Primeras activaciones elegibles con consumo real: rewards por agente; top performers reciben un reward mayor.
-- Concurso con premio de **USD 100.000** para una historia real de transformación presentada en UNBOUND.
-- Comisión elevada al **40%** para SKUs elegibles de Credits durante la ventana promocional.
+- Primeras activaciones elegibles con consumo real: rewards por agente; el kit muestra **USD 1K–USD 10K por agente**
+  activado bajo sus condiciones.
+- El kit anuncia **40% de comisión** sobre ventas de Credits durante la ventana promocional, más posibles bonus
+  points por consumo/activación según los términos aplicables.
+- El kit ofrece enablement específico para Solutions Partners, no Providers, y deep dives posteriores a UNBOUND.
 - Bonus tier points por crecimiento de uso de Credits y activación de payments.
 
 🔴 **Usarlos para priorizar cartera, no para torcer el diagnóstico.** Nunca recomendar consumo innecesario para
-obtener comisión o puntos. La página pública contiene fechas de cutoff que deben confirmarse con el PDM antes
-de prometer elegibilidad; los bonus points expiran después de la recalibración de tier.
+obtener comisión o puntos. **Nada de esto afirma elegibilidad de Efeonce**: confirmar PDM/portal, cuenta, tier,
+mercado, SKU, cutoff y términos antes de forecast, propuesta o comunicación al cliente.
 
 ## 9. Prueba y límites
 

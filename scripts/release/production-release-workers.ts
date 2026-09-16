@@ -62,7 +62,48 @@ const parseArg = (flag: string): string | null => {
  * cambios del CLI y fallan de formas difíciles de leer. Pedir JSON y proyectar acá
  * mueve esa lógica a un lugar que los tests y el uso diario ejercitan.
  */
-const readWorker = async (service: string, region: string): Promise<WorkerStatus> => {
+const readWorker = async (
+  service: string,
+  region: string,
+  kind: 'service' | 'job' = 'service'
+): Promise<WorkerStatus> => {
+  // TASK-1846 — un Cloud Run JOB no tiene revisiones: su SHA servido es la etiqueta `git-sha` y en
+  // lugar de revisión se reporta la última ejecución creada.
+  if (kind === 'job') {
+    try {
+      const { stdout } = await execFileAsync(
+        'gcloud',
+        ['run', 'jobs', 'describe', service, `--region=${region}`, `--project=${GCP_PROJECT}`, '--format=json'],
+        { timeout: GCLOUD_TIMEOUT_MS, maxBuffer: 10 * 1024 * 1024 }
+      )
+
+      const payload = JSON.parse(stdout) as {
+        metadata?: { labels?: Record<string, string> }
+        status?: {
+          conditions?: readonly { type?: string; status?: string }[]
+          latestCreatedExecution?: { name?: string }
+        }
+      }
+
+      return {
+        service,
+        region,
+        ready: payload.status?.conditions?.find(c => c.type === 'Ready')?.status ?? 'Unknown',
+        gitSha: payload.metadata?.labels?.['git-sha'] ?? null,
+        revision: payload.status?.latestCreatedExecution?.name ? `job · última ejecución ${payload.status.latestCreatedExecution.name}` : 'job'
+      }
+    } catch (error) {
+      return {
+        service,
+        region,
+        ready: 'Unknown',
+        gitSha: null,
+        revision: null,
+        error: error instanceof Error ? error.message.split('\n')[0] : String(error)
+      }
+    }
+  }
+
   try {
     const { stdout } = await execFileAsync(
       'gcloud',
@@ -123,7 +164,7 @@ const main = async (): Promise<void> => {
   )
 
   const results = await Promise.all(
-    mapped.map(w => readWorker(w.cloudRunService, w.cloudRunRegion ?? 'us-east4'))
+    mapped.map(w => readWorker(w.cloudRunService, w.cloudRunRegion ?? 'us-east4', w.cloudRunResourceKind ?? 'service'))
   )
 
   if (asJson) {

@@ -255,6 +255,13 @@ ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_USER=greenhouse_app"
 # La puerta real de producción sigue siendo Vercel PROD, que NO tiene la var (nadie encola desde
 # prod) + el entitlement per-ORG `proposal_studio_v1`. Ledger: FEATURE_FLAG_STATE_LEDGER.md
 ENV_VARS="${ENV_VARS},ARTIFACT_RENDER_JOBS_ENABLED=${ARTIFACT_RENDER_JOBS_ENABLED:-true}"
+# 🚩 TASK-1846 — el mismo endpoint `/artifact-render/dispatch` drena TAMBIÉN la cola de Efeonce
+# Insights (`dispatchNextInsightRender`), que lee su propio flag. Sin declararlo acá el dispatcher lo
+# ve OFF y un output encolado NUNCA lanza el Job: el render de Insights queda muerto aunque Vercel
+# encole y el worker sepa reclamar (hallazgo 2026-09-16: el canary de staging se lanzó a mano).
+# Default ON por la misma razón que el flag de Proposal: el ops-worker es un servicio ÚNICO, y la
+# puerta de producto por ambiente es el ENCOLADO en Vercel (`requestInsightRender`), no el dispatch.
+ENV_VARS="${ENV_VARS},INSIGHTS_RENDER_ENABLED=${INSIGHTS_RENDER_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF=${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"

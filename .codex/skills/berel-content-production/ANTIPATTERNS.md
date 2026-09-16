@@ -302,6 +302,21 @@
 - 🔴 **Copiar las credenciales del CMS fuera de Notion** — a este repo, a un log, a un commit o a un
   prompt. **Nunca.** (→ `08`)
 
+## Ciclos anuales de Colores de Temporada — 2026-09-16
+
+- **Reescribir el hub genérico para lanzar un año nuevo cuando la pillar no existe.** Pierde la página que ya
+  posiciona por marca y catálogo; el año nuevo nace en su propia URL. (→ `03`)
+- **Crear una página del año que compita con el Color del Año o con las paletas.** Sin un valor propio
+  (calendario y elección entre paletas) repite dos artículos y los canibaliza. (→ `03`)
+- **Enlazar el artículo del Color del Año o de una paleta antes de que exista en vivo.** Hoy esas rutas devuelven
+  el shell soft-404; el enlace se registra en notas internas y se activa al publicar. (→ `03`, `07`)
+- **Asignar roles, temperatura o emoción a un color por su nombre o por el chip del Canva.** Solo entra lo que el
+  material oficial declara de la paleta. (→ `09`)
+- **Dejar pendientes o bloqueos dentro del research o el plan de una página que ve Berel.** Van en el desplegable
+  `🗒️ Notas internas de producción`. (→ `07`)
+- **Confiar en Semrush para la consulta genérica de la marca.** No ubicaba a berel.com en el top 10 de «colores
+  de temporada» mientras Search Console medía la posición real. (→ `14`)
+
 ## Selección de tema y medición
 
 - 🔴 **Descartar un tema porque no tiene impresiones.** *Caso real:* el tema de sala tenía **147

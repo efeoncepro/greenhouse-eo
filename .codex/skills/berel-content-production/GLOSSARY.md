@@ -11,7 +11,9 @@
 | **BerelTip** | Consejo práctico de oficio dentro del contenido |
 | **Tienda de Pintura Berel** | Nombre oficial del punto de venta. CTA a `/ubica-tienda` |
 | **App Color Berel** | Nombre exacto de la app |
-| **Color del Año** | 2026 = Pitaya 2-3605D; 2025 = Maíz 2-1403T |
+| **Color del Año** | 2027 = Bien y de Buenas 1-3404D; 2026 = Pitaya 2-3605D; 2025 = Maíz 2-1403T |
+| **Colores de Temporada 2027** | Cuatro paletas trimestrales alrededor de Bien y de Buenas 1-3404D: Raíces de la piel (oct–dic 2026) · Umbral Vivo (ene–mar 2027) · Algarabía Folclórica (abr–jun 2027) · Esencia del mañana (jul–sep 2027). Colores, expertos y fuente: módulo 09 |
+| **Página de ciclo anual** | `/articulos/colores-de-temporada-AAAA`: presenta y compara las paletas de un año mientras no exista la pillar; no reemplaza al hub genérico ni al artículo del Color del Año |
 | **Catálogo RGB** | Base interna para diseño. RGB/HEX no salen al cuerpo publicable |
 | **Código alfanumérico** | Identificador público del color; se usa junto al nombre |
 | **Ficha técnica** | Documento técnico oficial que respalda prestaciones, condiciones y cifras; no es la URL editorial del producto |

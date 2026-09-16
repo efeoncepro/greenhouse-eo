@@ -7,10 +7,15 @@ email.
 ## Verdad de modelo
 
 - La skill heredada fijaba **Imagen 4**, no GPT Image 1.5.
+- **Imagen 4 ya no es una opción (TASK-1851, 2026-09-16):** `imagen-4.0-generate-001` fue retirado por Google y
+  responde 404, y el provider `google-imagen` dejó de existir — se renombró a `google-gemini-image` sobre
+  `gemini-3.1-flash-image`. El default del helper es `openai-image`. Un provider o modelo desconocido falla
+  ruidoso; no cae al default en silencio.
 - Para trabajo OpenAI nuevo usa `gpt-image-2` o su snapshot exacto. GPT Image 1.5 está deprecated y se retira el
   2026-12-01; no es fallback de transparencia.
-- Conserva Imagen 4 cuando el objetivo sea igualar deliberadamente una familia existente generada con Imagen.
-  No regeneres heroes aprobados solo para cambiar la etiqueta del modelo.
+- Los heroes ya generados con Imagen 4 conservan su provenance y **no** se regeneran solo por cambiar la etiqueta
+  del modelo. Para igualar una familia existente de ese carril, usa `google-gemini-image` y valida el match a
+  ojo: no hay forma de reproducir Imagen 4.
 - La identidad del modelo debe venir del helper/CLI. No la infieras por apariencia.
 
 ## Elección y generación
@@ -30,6 +35,14 @@ pnpm ai:image \
 
 Para un objeto reutilizable sin fondo cambia a `--background transparent`. Esa capacidad de GPT Image 2 está en
 preview y requiere PNG. El helper conserva el modelo exacto y rechaza JPEG transparente antes de llamar a OpenAI.
+
+Para retocar una zona de un hero ya generado hay `--mask`: `pnpm ai:image --image base.png --mask mask.png
+--prompt "…" --out out.png` reemplaza sólo lo que la máscara marca en **transparente** (mismo formato y
+dimensiones que la `--image`; sin `--image` aborta). **Editar no abarata**: el modelo devuelve la imagen completa
+y la base entra como input, así que en `low` una edición cuesta ~2,3× una generación (se diluye al subir
+calidad). Y si lo que necesitas es sacarle el fondo a un asset que **ya existe**, usa `pnpm ai:image:rmbg`
+(matting local, costo cero) en vez de pedírselo al modelo. Detalle y evidencia: skill
+`greenhouse-ai-image-generator` + `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
 
 ## Transparencia y master de email
 
@@ -68,6 +81,7 @@ GPT Image 2 produce raster. Copy, cifras, logo, CTA y legal se agregan determin�
 
 ## Evidencia mínima
 
-Registra: prompt final, modelo exacto, provider, tamaño/calidad/fondo solicitados, formato, path del source,
+Registra: prompt final, modelo exacto, provider, tamaño/calidad/fondo solicitados, el `usage` que imprime el CLI
+por corrida (la única fuente real de costo), formato, path del source,
 resultado de QA alfa cuando aplique, master optimizado, URL/bucket solo si hubo upload autorizado y preview del
 template en desktop/móvil. Provider support o un archivo local no demuestran rollout.

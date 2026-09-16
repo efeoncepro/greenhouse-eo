@@ -866,7 +866,7 @@ export const createGreenhouseMcpServer = (
     {
       title: 'Get Insights Catalog',
       description:
-        'Read what Efeonce Insights can produce for an organization: which modules (seo, aeo, ico) are available and why not when they are not, allowed outputs (deck_pdf, report_pdf, web), audiences, depths, locales and window limits. Call this BEFORE create_insight_edition to build a valid request. renderableOutputs is empty until durable rendering (TASK-1846) is connected: editions can be created and reviewed, but not issued. Requires the organization to have the insights_v1 module assigned; otherwise the resource is not found.',
+        'Read what Efeonce Insights can produce for an organization: which modules (seo, aeo, ico) are available and why not when they are not, allowed outputs (deck_pdf, report_pdf, web), audiences, depths, locales and window limits. Call this BEFORE create_insight_edition to build a valid request. renderableOutputs lists what the render engine can produce today (deck_pdf; the A4 report and the web model arrive later): an edition can be issued only after every requested output has been rendered and validated. Requires the organization to have the insights_v1 module assigned; otherwise the resource is not found.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional()
       },
@@ -922,6 +922,69 @@ export const createGreenhouseMcpServer = (
       outputSchema: greenhouseMcpToolOutputSchema
     },
     async args => handlers.createInsightEdition(args as { organizationId?: string; request: Record<string, unknown> })
+  )
+
+  // TASK-1846 — render durable. Los writes exigen binding interno (mismo gate que create); ningún
+  // binding emite. El encargo es asíncrono: la respuesta trae el run y sus outputs en cola.
+  collector.registerTool(
+    'request_insight_render',
+    {
+      title: 'Request Insight Render',
+      description:
+        'Queue the durable rendering of an Efeonce Insights edition that is in ready_for_review. THIS WRITES (no provider spend). Only internal bindings may call it. Pass editionId and optionally outputs (a subset of the edition outputs; today only deck_pdf is renderable — report_pdf and web are rejected with render_rejected, never queued for later). Returns 202 with the run and one output per target in state queued; the same request on a live run returns it again with idempotent=true and status 200. Rendering happens in a worker: poll get_insight_render_run. A service_unavailable with code render_disabled means rendering is off in this runtime — report it and stop.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        editionId: z.string().trim().min(1),
+        outputs: z.array(z.string().trim().min(1)).min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.requestInsightRender(args as { organizationId?: string; editionId: string; outputs?: string[] })
+  )
+
+  collector.registerTool(
+    'get_insight_render_run',
+    {
+      title: 'Get Insight Render Run',
+      description:
+        'Read one render run of an Efeonce Insights edition: run state (pending, running, completed, partial_failed, failed, cancelled) and every output with its own state (queued, running, completed, failed, dead_letter, cancelled), attempts, failureCode and outputAssetId when completed. partial_failed means at least one output succeeded and another did not: report both, never collapse them. The asset id is not a download link; sharing and delivery are separate governed steps.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        renderRunId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getInsightRenderRun(args as { organizationId?: string; renderRunId: string })
+  )
+
+  collector.registerTool(
+    'retry_insight_render',
+    {
+      title: 'Retry Insight Render',
+      description:
+        'Re-queue ONLY the failed outputs of a render run. THIS WRITES. Completed outputs are never re-rendered nor duplicated; dead_letter outputs (attempts exhausted or a non-retryable failure such as manifest_drift) are not retried by this tool — they need a human decision. Only internal bindings may call it. Returns idempotent=true when nothing was failed.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        renderRunId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.retryInsightRender(args as { organizationId?: string; renderRunId: string })
+  )
+
+  collector.registerTool(
+    'cancel_insight_render',
+    {
+      title: 'Cancel Insight Render',
+      description:
+        'Cancel the pending work of a render run. THIS WRITES. Queued and failed outputs become cancelled; an output that is already rendering cannot be killed and keeps running until it finishes — the response reports cancelled and stillRunning separately, and the run is not marked cancelled while something still runs. Only internal bindings may call it.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        renderRunId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.cancelInsightRender(args as { organizationId?: string; renderRunId: string })
   )
 
   // ── El registro: una pasada por el manifiesto, en su orden ────────────────

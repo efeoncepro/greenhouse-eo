@@ -383,6 +383,21 @@ nativo. Consentimiento Admin en la app de recurso MCP de Entra; el cliente PKCE 
 `efeonce-mcp` `1.4.0` (43 tools), revisión `efeonce-mcp-gateway-00052-slt`. Llevar esta clase a Efeonce ID exigiría
 autorización v2 nueva (D10), no un flag.
 
+## Delta 2026-09-15 — quinta clase de escritura en el emisor: `efeonce.mcp.insights.write` (TASK-1845, EPIC-045)
+
+Tampoco es unidad de este epic, pero vuelve a tocar su inventario: `src/lib/auth-server/oauth/scopes.ts` declara ahora
+cinco clases de escritura (`globe.credits.funding.ensure`, `seo.write`, `identity.write`, `client_services.write`,
+`insights.write`) en paridad con `efeonce-mcp/src/config.ts` (`INSIGHTS_WRITE_SCOPE`; `scopes.test.ts` y su snapshot
+verdes; llegó a producción en el release `9c094688309d` del mismo día). El gateway `efeonce-mcp` **`1.5.0`** (PR #12
+`cad57b31d`, 47 tools, revisión `efeonce-mcp-gateway-00053-dsk`) suma así la **octava clase de scope** del inventario
+(read, globe.read, hiring.read, globe.credits.funding.ensure, seo.write, identity.write, client_services.write,
+insights.write). La exige sólo `create_insight_edition` del provider `greenhouse-insights`; las tres lecturas de
+Insights van con el scope base. Sin cliente de exchange RFC 8693 (el provider usa la service identity del lane
+ecosystem) y sin cliente que porte la clase: consentimiento Admin en la app de recurso MCP de Entra el 2026-09-15
+(readback 7 scopes, los 6 previos intactos), cliente PKCE compartido sin tocar. Las cuatro tools son `unsupported`
+para el emisor nativo (`insights_native_policy_missing`): el contexto interno v2 (U19) sigue base-only y llevar
+Insights a Efeonce ID exigiría autorización v2 nueva (D10), no un flag.
+
 ## Snapshot histórico anterior al cierre del acceso interno
 
 El siguiente estado se conserva como historia; el estado vigente está en `Status` y en TASK-1836.

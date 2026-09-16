@@ -265,6 +265,27 @@ lane relee sus derechos en cada llamada. Lo que sigue vedado es el agente de ten
 ecosystem. Contrato: `GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md` §Delta 2026-09-10 ·
 `docs/operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md`.
 
+## Delta 2026-09-15 — TASK-1845: Efeonce Insights nace ✅ governed (API app+ecosystem vivo, MCP federado; UI pendiente)
+
+Parity-first, como TASK-1631: el dominio salió a producción con sus contratos programáticos y sin superficie visible.
+
+| Capa | Contrato |
+| --- | --- |
+| Primitives | `createInsightEdition`, `reviseInsightEdition`, `issueInsightEdition`, `withdrawInsightEdition`, `recoverInsightEdition` (`src/lib/efeonce-insights/commands/**`; generación por fases draft→collecting→composing→validating→ready_for_review, fallo ⇒ `failed` con `failedPhase`) + readers `readInsightsCatalog`, `readInsightReports`, `readInsightReport`, `readInsightEditions`, `readInsightEdition` (proyección por audiencia); idempotencia `(organization_id, idempotency_key)` + `request_hash`; máquina de 14 transiciones con paridad TS↔DB; schema `greenhouse_insights` (migración `20260915100154428`, aplicada) |
+| Capabilities | `insights.report.read`, `insights.edition.create`, `insights.edition.review`, `insights.edition.issue` (módulo `insights`, `src/config/entitlements-catalog.ts`; grants en `runtime.ts`: EFEONCE_ADMIN/EFEONCE_ACCOUNT las 4, EFEONCE_OPERATIONS read+create+review, roles cliente `report.read`, CLIENT_EXECUTIVE/CLIENT_MANAGER además `edition.create`) gateadas por el módulo per-org `insights_v1` (`enableClientPortalModule`; CLI `scripts/insights/assign-insights-module.ts`) |
+| App lane | ✅ `/api/platform/app/insights/{catalog, reports, reports/[id], editions, editions/[id], editions/[id]/{issue,revise,withdraw,recover}}` (`app-insights.ts`) — la única lane que emite y retira |
+| Ecosystem lane | ✅ `/api/platform/ecosystem/insights/{catalog, reports, reports/[id], editions, editions/[id], editions/[id]/{revise,recover}}` (`ecosystem-insights.ts`); binding `internal` crea/revisa/recupera con `organizationId` explícito, binding org-scoped sólo lee; **no emite ni retira** por diseño |
+| Flags | `INSIGHTS_GENERATION_ENABLED` ON en Production y staging (runtime único Vercel); `INSIGHTS_ISSUANCE_ENABLED` e `INSIGHTS_AUTHORING_AI_ENABLED` OFF (ledger `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`) |
+| Nexa | Pendiente — sin action en `src/lib/nexa/actions/registry.ts`; los readers y commands ya existen para cablearla |
+| MCP | ✅ **Federado** — MCP interno dominio `insights` (4 tools: `get_insights_catalog`, `list_insight_editions`, `get_insight_edition`, `create_insight_edition` con `writes: true`; manifiesto 51 tools) + gateway `efeonce-mcp` `1.5.0` (PR #12 `cad57b31d`, provider `greenhouse-insights`, 47 tools, rev `efeonce-mcp-gateway-00053-dsk`, 2026-09-15). Lecturas con scope base; `create_insight_edition` exige `efeonce.mcp.insights.write` (en Entra desde 2026-09-15, sin cliente que lo porte ⇒ `insufficient_scope` hasta un grant gobernado). Canary del provider contra staging verde; falta `tools/list` con token humano |
+| UI (portal) | Pendiente — biblioteca y creación en el portal: TASK-1847 (interna/cliente) y vista web compartida renderizada en `efeonce-think` (TASK-1848 resolver/proxy, TASK-1849/TASK-1875 render). Emitir sigue bloqueado hasta el render de TASK-1846 (`issue` falla cerrado `not_ready`) |
+
+Verificación 2026-09-15: staging App (create 202 → `EO-INS-000012`, replay idempotente, 409 con payload distinto,
+cliente ve evidencia `null` hasta emitir) y Ecosystem (create 202 → `EO-INS-000013`, org sin módulo 404); producción
+por ecosystem (`EO-INS-000014` `ready_for_review`, release `9c094688309d`). Contrato:
+[`EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · lanes en
+[`docs/api/GREENHOUSE_API_PLATFORM_V1.md`](../api/GREENHOUSE_API_PLATFORM_V1.md) §Efeonce Insights.
+
 ## Related
 
 - [`GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`](GREENHOUSE_FULL_API_PARITY_DECISION_V1.md) — criterio

@@ -16,9 +16,9 @@ import 'server-only'
 import type { ApiPlatformRequestContext, ApiPlatformSuccessResult } from '@/lib/api-platform/core/context'
 import { ApiPlatformError } from '@/lib/api-platform/core/errors'
 import { buildApiPlatformPaginationMeta, parseApiPlatformPaginationParams } from '@/lib/api-platform/core/pagination'
-import { createInsightEdition, recoverInsightEdition, reviseInsightEdition } from '@/lib/efeonce-insights/commands'
+import { cancelInsightRender, createInsightEdition, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition } from '@/lib/efeonce-insights/commands'
 import { isInsightEditionState, type InsightEditionState } from '@/lib/efeonce-insights/contracts/states'
-import { readInsightEdition, readInsightEditions, readInsightReport, readInsightReports, readInsightsCatalog } from '@/lib/efeonce-insights/readers'
+import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsightRenderRuns, readInsightReport, readInsightReports, readInsightsCatalog } from '@/lib/efeonce-insights/readers'
 import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { ROLE_CODES } from '@/config/role-codes'
 
@@ -141,3 +141,51 @@ export const recoverEcosystemInsightEditionPayload = async ({ context, request, 
 
     return { data: { edition: result.edition, generation: { outcome: result.outcome, failedPhase: result.failedPhase, failureCode: result.failureCode } }, status: 202 }
   })
+
+// ── TASK-1846 — render durable por el lane ecosystem. Bindings org-scoped SÓLO leen runs de su
+// audiencia; encolar/reintentar/cancelar exige binding interno. Nunca espera a Chromium (202). ──
+
+export const requestEcosystemInsightRenderPayload = async ({ context, request, body, editionId }: { context: ApiPlatformRequestContext; request: Request; body: unknown; editionId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => {
+    const scope = resolveScope(context, request, body)
+
+    assertWrite(scope)
+
+    const result = await requestInsightRender({ ...scope, editionId, outputs: isRecord(body) ? body.outputs : undefined })
+
+    return { data: { run: result.run, outputs: result.outputs, idempotent: result.idempotent }, status: result.idempotent ? 200 : 202 }
+  })
+
+export const listEcosystemInsightRenderRunsPayload = async ({ context, request, editionId }: { context: ApiPlatformRequestContext; request: Request; editionId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => {
+    const pagination = parseApiPlatformPaginationParams(request)
+    const result = await readInsightRenderRuns({ ...resolveScope(context, request), editionId, limit: pagination.pageSize, offset: pagination.offset })
+
+    return { data: result.items, meta: buildApiPlatformPaginationMeta({ ...pagination, total: result.total, count: result.items.length }) }
+  })
+
+export const getEcosystemInsightRenderRunPayload = async ({ context, request, renderRunId }: { context: ApiPlatformRequestContext; request: Request; renderRunId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => ({ data: await readInsightRenderRun({ ...resolveScope(context, request), renderRunId }) }))
+
+export const retryEcosystemInsightRenderPayload = async ({ context, request, body, renderRunId }: { context: ApiPlatformRequestContext; request: Request; body: unknown; renderRunId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => {
+    const scope = resolveScope(context, request, body)
+
+    assertWrite(scope)
+
+    const result = await retryInsightRender({ ...scope, renderRunId })
+
+    return { data: { run: result.run, outputs: result.outputs, idempotent: result.idempotent }, status: result.idempotent ? 200 : 202 }
+  })
+
+export const cancelEcosystemInsightRenderPayload = async ({ context, request, body, renderRunId }: { context: ApiPlatformRequestContext; request: Request; body: unknown; renderRunId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => {
+    const scope = resolveScope(context, request, body)
+
+    assertWrite(scope)
+
+    const result = await cancelInsightRender({ ...scope, renderRunId })
+
+    return { data: { run: result.run, outputs: result.outputs, cancelled: result.cancelled, stillRunning: result.stillRunning, idempotent: result.idempotent }, status: 200 }
+  })
+

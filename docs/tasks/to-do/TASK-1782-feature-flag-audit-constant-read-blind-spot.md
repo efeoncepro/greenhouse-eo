@@ -1,5 +1,16 @@
 # TASK-1782 — El auditor de flags no ve los flags que se leen por constante
 
+
+## Delta 2026-09-16
+
+- **Instancia nueva del Eje 2, con una forma que los ejemplos de esta task no cubren** — detectada por trabajo
+  en `TASK-1851`. El flag `ENABLE_ASSET_GENERATOR` usa **prefijo `ENABLE_*`**, no el sufijo `*_ENABLED` que
+  asume el detector, y gatea dos rutas reales (`/api/internal/generate-image`,
+  `/api/internal/generate-animation`). El auditor no lo veía y por eso nunca había tenido fila en el ledger.
+- `TASK-1851` **no toca el detector** —ese bug class es de esta task—: sólo registró la fila del flag que gatea
+  su superficie, con su runtime verificado (se lee **sólo en Vercel**; ningún Cloud Run lo lee) y su estado real
+  (no definido en ningún entorno Vercel, es decir OFF por ausencia).
+
 ## Delta 2026-09-08
 
 Instancia nueva del **Eje 2**, con una forma que los ejemplos actuales no cubren: **prefijo**, no sufijo.

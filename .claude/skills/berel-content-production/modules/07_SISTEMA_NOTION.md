@@ -364,6 +364,14 @@ Misma advertencia con la **longitud**: el Playbook y piezas históricas conserva
 comunicado por el operador el 2026-09-03 es **3.000–5.000 palabras**, salvo excepción explícita del
 formato/brief y sin rellenar con contenido inventado.
 
+### Notas internas visibles para Berel — decisión del operador 2026-09-16
+
+La página del Content Hub la ve el cliente. Research y Plan editorial y SEO **no llevan pendientes, bloqueos ni
+tareas por hacer**: solo evidencia, fuentes y decisiones. Lo operativo que sí debe quedar en la página (enlaces
+que se activan al publicar, fichas que se copian a tareas visuales, recordatorios de formato) va en un desplegable
+propio `🗒️ Notas internas de producción`, **debajo** de `✍️ Versión vigente para revisión`, en redacción
+profesional y sin secretos, prompts ni conversación entre agentes. Nunca dentro del cuerpo del artículo.
+
 ## Cross-links
 
 - Qué se llena en cada fase → [`01_CICLO_MENSUAL.md`](01_CICLO_MENSUAL.md)

@@ -691,3 +691,11 @@ El exchange no confiere autoridad: la decide el lane destino releyendo los derec
 su recibo `authority.kind='delegated_oauth'` con `clientId`, `accessTokenId` y `correlationId`; el lane ecosystem
 responde `403 invalid_delegated_context` a escrituras por diseño. Registro operativo del gateway:
 `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`.
+
+**Delta 2026-09-15 (TASK-1845).** La clase `efeonce.mcp.insights.write` (gateway `1.5.0`, provider
+`greenhouse-insights`) **no tiene fila en esta tabla porque no usa exchange RFC 8693**: el provider cabalga la
+service identity del lane ecosystem (consumer `EO-SPK-0004` / binding `EO-SPB-0004`, scope `internal`, la misma del
+provider SEO) y llama `/api/platform/ecosystem/insights/**`; la autoridad la decide Greenhouse por organización
+(`insights_v1`) y capability (`insights.edition.create`) en cada llamada, y el ecosystem nunca emite ni retira. El
+scope sólo responde si el cliente MCP puede pedir la clase; hoy ningún cliente lo porta. Un consumer de exchange para
+Insights nacería como fila nueva de esta tabla, nunca reutilizando `efeonce-mcp-client-services`.

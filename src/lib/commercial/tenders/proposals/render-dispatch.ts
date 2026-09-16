@@ -20,8 +20,7 @@ import 'server-only'
  *     de carga reales, no a ojo).
  */
 
-import { GoogleAuth } from 'google-auth-library'
-
+import { runArtifactWorkerJob } from '@/lib/render-dispatch/job-runner'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import {
@@ -32,9 +31,6 @@ import {
   selectNextRenderJobForDispatch
 } from './render-jobs'
 
-const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT || 'efeonce-group'
-const REGION = process.env.ARTIFACT_WORKER_REGION || 'us-east4'
-const JOB_NAME = process.env.ARTIFACT_WORKER_JOB_NAME || 'artifact-worker'
 
 export interface RenderDispatchResult {
   skipped?: 'flag_off'
@@ -42,29 +38,6 @@ export interface RenderDispatchResult {
   dispatched: Array<{ renderJobId: string; executionName: string }>
   /** Jobs en cola que ESTE tick pospuso (visibilidad anti-descarte-silencioso). */
   postponed: Array<{ renderJobId: string; state: string; deadline: string | null }>
-}
-
-/**
- * Lanza una ejecución del Cloud Run Job — SIN overrides de env.
- *
- * ⚠️ Deliberado: `runWithOverrides` exige un permiso IAM que `run.invoker` NO incluye. En vez de
- * escalar el privilegio del dispatcher, el WORKER hace el claim atómico del próximo job
- * (`claimNextRenderJobForExecution`, FOR UPDATE SKIP LOCKED). El dispatcher decide CUÁNDO hay que
- * ejecutar; el worker decide CUÁL toma — sin riesgo de doble-ejecución.
- */
-const runArtifactWorkerJob = async (): Promise<string> => {
-  const auth = new GoogleAuth({ scopes: ['https://www.googleapis.com/auth/cloud-platform'] })
-  const client = await auth.getClient()
-
-  const url = `https://run.googleapis.com/v2/projects/${PROJECT_ID}/locations/${REGION}/jobs/${JOB_NAME}:run`
-
-  const response = await client.request<{ metadata?: { name?: string }; name?: string }>({
-    url,
-    method: 'POST'
-  })
-
-  // La operación devuelve el nombre de la ejecución (…/executions/<name>).
-  return response.data.metadata?.name ?? response.data.name ?? 'unknown-execution'
 }
 
 export const dispatchNextRenderJob = async (): Promise<RenderDispatchResult> => {

@@ -81,6 +81,12 @@ Endpoints:
   el binding acredita una máquina y responde `403 invalid_delegated_context`. La autoridad humana delegada
   no viaja por este lane: viaja por el lane App con un bearer sister-platform emitido para la persona
   (`client_services.enablement.write`, RFC 8693), ver §Habilitación de servicios.
+- `GET /api/platform/ecosystem/insights/catalog`, `GET …/insights/reports`, `GET …/insights/reports/:reportId`,
+  `GET …/insights/editions`, `GET …/insights/editions/:editionId[?include=evidence]`,
+  `POST …/insights/editions`, `POST …/insights/editions/:editionId/revise|recover` — Efeonce Insights (TASK-1845).
+  Además de `externalScopeType`/`externalScopeId`, un binding `internal` declara `organizationId` obligatorio
+  (query o body); un binding org-scoped usa la organización del binding y **sólo lee** (otra org ⇒ `404`).
+  **El ecosystem no emite ni retira**: no existen `issue`/`withdraw` en este lane. Detalle en §Efeonce Insights.
 
 ### Reader de identidad y autoridad MCP
 
@@ -196,6 +202,52 @@ Endpoints:
 - `POST /api/platform/app/client-services/enablement/preview|apply|rollback`
 - `GET|POST /api/platform/app/commercial/services/:serviceId/terms` — términos comerciales vigentes y su
   declaración (`bundledModules` = mapping servicio → módulos del portal), TASK-1852.
+- `GET /api/platform/app/insights/catalog`, `GET …/insights/reports`, `GET …/insights/reports/:reportId`,
+  `GET …/insights/editions`, `GET …/insights/editions/:editionId[?include=evidence]`,
+  `POST …/insights/editions`, `POST …/insights/editions/:editionId/issue|revise|withdraw|recover` — Efeonce
+  Insights (TASK-1845), ver §Efeonce Insights.
+
+#### Efeonce Insights (TASK-1845)
+
+Las lanes App y Ecosystem son adapters delgados sobre los mismos commands/readers de `src/lib/efeonce-insights/**`
+(`src/lib/api-platform/resources/{app-insights,ecosystem-insights}.ts`) y comparten **una sola tabla de errores**
+(`insights-errors.ts`): misma causa ⇒ mismo código y status en ambas.
+
+| Lane | Sujeto y organización objetivo | Verbos |
+|---|---|---|
+| App (`/api/platform/app/insights/**`) | persona autenticada (cookie o bearer first-party). Tenant cliente: la organización es la del tenant (nunca del payload). Interno: `organizationId` obligatorio por query/body, si falta `400 bad_request` | lee, crea, revisa, **emite**, **retira**, recupera (cada una con su capability: `insights.report.read` / `insights.edition.create` / `.review` / `.issue`) |
+| Ecosystem (`/api/platform/ecosystem/insights/**`) | consumer + binding (`externalScopeType`/`externalScopeId`). Binding org-scoped: la organización ES la del binding, actúa como cliente y sólo lee (`organizationId` distinto ⇒ `404`). Binding `internal` (gateway MCP, máquina): `organizationId` obligatorio, actúa como operador de sistema | lee, crea, revisa, recupera. **Nunca emite ni retira**: una máquina no tiene autoridad de emisión (gate humano) |
+
+Lecturas: `catalog` (módulos disponibles por organización y por qué no, salidas, audiencias, límites); `reports`
+y `editions` paginados (`state` repetible y `reportId` como filtros; App acepta además `audience=client|internal`);
+`editions/:editionId?include=evidence` agrega el snapshot sellado y el plan congelado — para un actor cliente sólo si
+la edición está **emitida** (antes llegan `null`, por diseño).
+
+Commands: `POST …/editions` con el `InsightRequestV1` (`organizationId`, `modules`, `period`, `comparison`,
+`audience`, `locale`, `depth`, `outputs`, `idempotencyKey` 8–200, …) responde **`202`** con `report`, `edition`,
+`idempotent` y el resultado de la generación por fases (`ready_for_review` o `failed` con `failedPhase`); la
+repetición con la **misma clave y el mismo payload** devuelve la misma edición con `idempotent: true` (el adapter
+responde `200` en ese caso). `revise` recorre el mismo camino sobre una edición existente; `recover` reintenta una
+edición `failed` (`202`).
+
+Errores canónicos (envelope de la plataforma; `details.code` conserva la causa del dominio):
+
+| Situación | Status | `error.code` | `details.code` |
+|---|---|---|---|
+| organización sin módulo `insights_v1`, edición ajena o inexistente (anti-oracle: nunca `403` por existencia) | `404` | `not_found` | `not_found` |
+| misma `idempotencyKey` con payload distinto | `409` | `idempotency_conflict` | `idempotency_conflict` |
+| `INSIGHTS_GENERATION_ENABLED` OFF (crear/revisar) | `503` | `service_unavailable` | `generation_disabled` |
+| `INSIGHTS_ISSUANCE_ENABLED` OFF (emitir, sólo App) | `503` | `service_unavailable` | `issuance_disabled` |
+| emitir sin outputs listos (falla cerrado hasta TASK-1846) o transición inválida | `409` | `bad_request` | `not_ready` / `invalid_transition` |
+| ventana inválida / no soportada, datos insuficientes, evidencia rechazada | `400`/`422` | `bad_request` | `invalid_window` / `unsupported_window` / `insufficient_data` / `evidence_rejected` |
+| audiencia `internal` pedida por un cliente, o gate humano | `403` | `forbidden` | `forbidden` / `human_gate_required` |
+| binding org-scoped intentando crear/revisar/recuperar (ecosystem) | `403` | `scope_not_allowed` | — |
+| cuota | `429` | `rate_limited` | `quota_exceeded` |
+
+Estado (2026-09-15): ambas lanes en producción (release `9c094688309d`), `INSIGHTS_GENERATION_ENABLED=true` en
+Production y staging (runtime único Vercel), emisión e IA de autoría OFF; MCP interno (dominio `insights`, 4 tools)
+y gateway `efeonce-mcp` `1.5.0` (provider `greenhouse-insights`) consumen la lane Ecosystem. Manual:
+`docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`; contrato: `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`.
 
 #### Habilitación de servicios (TASK-1852)
 
@@ -335,7 +387,9 @@ Do not treat `integrations/v1` as the source of truth for new platform surfaces.
 
 - `api/platform/*` is authenticated and controlled; it is not an anonymous open API.
 - No general ecosystem-facing write surface exists yet; las rutas mutantes de TASK-1852 se sirven únicamente
-  para denegar de forma explícita mientras falta autoridad humana delegada.
+  para denegar de forma explícita mientras falta autoridad humana delegada. Las escrituras del ecosystem que sí
+  existen son de dominio y acotadas: los commands SEO (TASK-1308) y, desde 2026-09-15, crear/revisar/recuperar
+  ediciones de Insights sólo para bindings `internal` (TASK-1845); emitir y retirar nunca viajan por este lane.
 - Cross-lane idempotency for commands is still a follow-up.
 - OpenAPI for platform lanes is a preview artifact in this cut; schema generation is a follow-up.
 - MCP remains downstream of stable API contracts.

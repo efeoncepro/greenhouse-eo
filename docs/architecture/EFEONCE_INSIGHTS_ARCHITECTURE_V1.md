@@ -1,7 +1,9 @@
 # Efeonce Insights — Architecture V1
 
-> Status: **Foundation implementada (TASK-1845, 2026-09-15; ver §14)**; render, sharing/delivery y UI siguen
-> en diseño (TASK-1846–1849). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime.
+> Status: **Foundation implementada y en producción (TASK-1845, 2026-09-15; ver §14)** — generación habilitada en
+> staging y producción, emisión e IA apagadas; render, sharing/delivery, UI y vista web en Think siguen en diseño
+> (TASK-1846–1849, TASK-1875). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
+> rollout verificado, sus límites honestos y las invariantes que un agente debe respetar al tocar el dominio.
 > Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
 
@@ -170,7 +172,7 @@ Superficie **propuesta**, naming final de rutas/capabilities se registra durante
 | Operación canónica | API / MCP | Dueña |
 |---|---|---|
 | list/get/catalog/validateRequest/createEdition/revise/issue | Thin adapters App/Ecosystem; listado paginado y estados compactos | TASK-1845 |
-| requestOutputs/getRun/retryOutput/cancelRun | Requests asíncronos, sin esperar Chromium | TASK-1846 |
+| requestOutputs/getRun/retryOutput/cancelRun | Requests asíncronos, sin esperar Chromium. **Registrado 2026-09-16:** `POST/GET …/insights/editions/{editionId}/render`, `GET …/insights/render-runs/{renderRunId}`, `POST …/render-runs/{renderRunId}/retry`, `POST …/render-runs/{renderRunId}/cancel` en los lanes app y ecosystem; tools MCP `request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render`. Errores nuevos `render_disabled` (503) y `render_rejected` (422). | TASK-1846 |
 | createShare/revokeShare/getShare/withdrawEdition | Writes gobernados; token sólo al emitir enlace autorizado | TASK-1848 |
 | requestDelivery/getDelivery/createSchedule/pauseSchedule | Autorización exacta por destinatario, modalidad y recurrencia | TASK-1848 |
 | resolveSharedEdition/downloadSharedOutput | Token de lectura limitado, sin OAuth ni discovery de módulos | TASK-1848 |
@@ -459,53 +461,229 @@ su receta y sus evaluaciones en el mismo cambio; checks de manifest/referencias/
 impiden publicar documentación de capacidades inexistentes. Report Studio, Deck Studio y las skills de
 módulo aportan oficio; la skill Insights enseña a operar el producto sin duplicar sus fórmulas ni sus contratos.
 
-## 14. Estado de implementación — TASK-1845 (2026-09-15)
+## 14. Estado de implementación y rollout — TASK-1845 (2026-09-15)
 
-Lo que existe en `develop` (sin push ni release en esta sesión) y lo que sigue diseñado. Fuente:
-commits `e6e8a5dfe` (Slice 1), `a21e424fa` (Slice 2), `ca17c93da` (Slice 3).
+> Registro exhaustivo de construcción y despliegue (inventario archivo por archivo, schema tabla por tabla, contratos, superficies, verificación y matriz «qué corre dónde»): [EFEONCE_INSIGHTS_IMPLEMENTATION_RECORD_V1.md](EFEONCE_INSIGHTS_IMPLEMENTATION_RECORD_V1.md). Esta sección es el resumen; ante duda, manda el registro.
 
-**Schema `greenhouse_insights`** (migración `20260915100154428_task-1845-insights-foundation.sql`,
-aplicada y verificada por readback en la instancia compartida): `insight_reports` (código legible
-`EO-INS-000001` por secuencia + `lpad(n, GREATEST(6, len))`, sin truncado), `insight_editions`
-(versión por reporte bajo lock; `request_json` + `request_hash`; UNIQUE parcial
-`(organization_id, idempotency_key)`; ventana en zona IANA y UTC; emitida sólo puede retirarse),
-`insight_edition_state_matrix` (14 transiciones, paridad con `edition-state-machine.ts`),
-`insight_edition_transitions` (append-only; gate humano exige `member`/`client_user` con `actor_user_id`),
-`insight_evidence_snapshots` (uno por edición; inmutable al sellar; `facts/sources/rejections_json`),
-`insight_editorial_plans` (uno por edición sobre snapshot SELLADO; congelado con hash; provenance IA),
-`insight_retention_classes` (3 clases, 1095 días). Decisión del operador: prefijo `greenhouse_` como
-los otros 18 schemas; la marca vive en el código, el módulo `insights_v1` y la skill.
+Qué existe en código y en runtime, con la evidencia del rollout, qué límites tiene hoy y qué sigue diseñado.
+Fuente de código: commits `e6e8a5dfe` (Slice 1), `a21e424fa` (Slice 2), `ca17c93da` (Slice 3) en `develop`;
+release a producción el 2026-09-15 por el control plane (§14.2). TASK-1845 sigue `in-progress` por dos
+evidencias pendientes (§14.3); el estado honesto es **code complete + en producción, cierre pendiente**.
 
-**Dominio `src/lib/efeonce-insights/`** (path con marca; `insights` a secas colisiona con Nexa):
-contratos browser-safe (`InsightRequestV1`, `EvidenceFactV1`, `ChartSpecV1`, `EditorialPlanV1`),
-ventanas (`window.ts`: DST en dos pasadas, mes anterior ≠ 30 días, 29-feb → 28-feb, parcial),
-adapters `seo`/`aeo`/`ico` sobre readers dueños (SEO: `readSeoOverviewKpisForWindow` nuevo en el
-dueño con la misma agregación; AEO: sólo un run cuyo `asOfDate` cae en la ventana; ICO: spaces por
-org, meses completos, hereda supresión RpA y numerador/denominador OTD), registry con fixture,
-planner determinista + validación de cifras + IA acotada tras flag, authz de tres planos, catálogo
-elegible, commands (`validate/create/revise/issue/withdraw/recover`) con generación por fases y
-readers con proyección por audiencia. Puertos `InsightOutputsPort` (TASK-1846) e `InsightSharePort`
-(TASK-1848) declarados y sin conectar: **emitir falla cerrado (`not_ready`) hasta que el render
-valide outputs**.
+### 14.1 Qué existe (código y runtime)
 
-**Superficies:** 16 rutas `platform/app/insights/**` y `platform/ecosystem/insights/**` (misma tabla
-de errores); tools MCP `get_insights_catalog`, `list_insight_editions`, `get_insight_edition`,
-`create_insight_edition` (writes; sólo bindings internos; ningún binding emite); manual servido
-`efeonce-insights` (audiencia interna) + skill local espejada. Capabilities `insights.report.read`,
-`insights.edition.create`, `insights.edition.review`, `insights.edition.issue` con grants por rol;
-módulo per-ORG `insights_v1` (nadie asignado hoy). Reliability: módulo `insights`, señales
-`insights.editions.failed_recent` y `insights.editions.stuck_generation` (steady 0; ambas `ok`).
+**Schema `greenhouse_insights`** (migración `20260915100154428_task-1845-insights-foundation.sql`, aplicada
+el 2026-09-15 10:06Z en la única instancia Cloud SQL, compartida por dev/staging/prod, y verificada por readback):
+`insight_reports` (código legible `EO-INS-000001` por secuencia `insight_report_code_seq` + función
+`next_insight_report_code()` con `lpad(n, GREATEST(6, len))`, sin truncado), `insight_editions` (versión por
+reporte bajo lock; `request_json` + `request_hash`; UNIQUE parcial `(organization_id, idempotency_key)`; ventana
+en zona IANA y UTC; emitida sólo puede retirarse), `insight_edition_state_matrix` (14 transiciones, paridad con
+`edition-state-machine.ts`), `insight_edition_transitions` (append-only; gate humano exige `member`/`client_user`
+con `actor_user_id`), `insight_evidence_snapshots` (uno por edición; inmutable al sellar;
+`facts/sources/rejections_json`), `insight_editorial_plans` (uno por edición sobre snapshot SELLADO; congelado con
+hash; provenance IA), `insight_retention_classes` (3 clases, 1095 días). Triggers de inmutabilidad y no-delete.
+Decisión del operador: prefijo `greenhouse_` como los otros 18 schemas; la marca vive en el código, el módulo
+`insights_v1` y la skill.
 
-**Flags** `INSIGHTS_GENERATION_ENABLED`, `INSIGHTS_ISSUANCE_ENABLED`, `INSIGHTS_AUTHORING_AI_ENABLED`:
-declarados, OFF en todos los targets, leídos hoy sólo en Vercel (ledger).
+**Dominio `src/lib/efeonce-insights/`** (path con marca; `insights` a secas colisiona con Nexa): contratos
+browser-safe (`InsightRequestV1` `insight_request_v1`, `EvidenceFactV1`, `ChartSpecV1`, `EditorialPlanV1`),
+ventanas (`window.ts`: `[start, endExclusive)` en zona IANA, DST en dos pasadas, mes anterior ≠ 30 días,
+29-feb → 28-feb, máximo `MAX_INSIGHT_WINDOW_DAYS = 400`, sin inicio en el futuro), adapters `seo`/`aeo`/`ico`
+sobre readers dueños (SEO: `readSeoOverviewKpisForWindow` nuevo en `src/lib/growth/seo/overview/read-overview-kpis.ts`
+con la misma agregación; AEO: sólo un run cuyo `asOfDate` cae en la ventana; ICO: spaces por org, meses completos,
+hereda supresión RpA y numerador/denominador OTD), registry con fixture, planner determinista + validación de
+cifras + IA acotada (Gemini) tras flag con fallback determinista, authz de tres planos (`assertInsightsAccess`),
+catálogo elegible, commands (`validate/create/revise/issue/withdraw/recover`) con generación por fases
+`draft → collecting → composing → validating → ready_for_review` (fallo ⇒ `failed` con `failedPhase`) y readers
+con proyección por audiencia (`readers/projection.ts`: el cliente ve evidencia/plan sólo de ediciones EMITIDAS;
+el interno siempre). Idempotencia en el dominio: `(organization_id, idempotency_key)` + `request_hash`; misma
+key + mismo payload ⇒ misma edición con `idempotent: true`; payload distinto ⇒ `409 idempotency_conflict`.
+Puertos `InsightOutputsPort` (TASK-1846) e `InsightSharePort` (TASK-1848) declarados y sin conectar: **emitir
+falla cerrado (`not_ready`) hasta que el render valide outputs**.
 
-**Decisión posterior (2026-09-15, delta ADR):** la vista web compartida se renderiza en `efeonce-think`
-desde `InsightWebModelV1` (§8); no afecta la foundation: los DTOs de `readers/projection.ts` son la base de
-esa proyección y el token sigue siendo autoridad de Greenhouse.
+**Superficies:** lanes `app` y `ecosystem` con la misma tabla de errores
+(`src/lib/api-platform/resources/{app-insights,ecosystem-insights,insights-errors}.ts`). Rutas
+`platform/app/insights/{catalog, reports, reports/[id], editions, editions/[id], editions/[id]/{issue,revise,withdraw,recover}}`
+y `platform/ecosystem/insights/{catalog, reports, reports/[id], editions, editions/[id], editions/[id]/{revise,recover}}`
+(ecosystem NO emite ni retira; exige `externalScopeType`/`externalScopeId` + `organizationId` para bindings
+internos). Detalle con `?include=evidence`. MCP interno (`src/mcp/greenhouse/`): dominio `insights`, tools
+`get_insights_catalog`, `list_insight_editions`, `get_insight_edition`, `create_insight_edition` (`writes: true`;
+ningún binding emite); manifest de 51 tools. Manual servido `efeonce-insights` (audiencia interna; test de fuga)
++ skill local espejada (`.claude/` = `.codex/`). Capabilities `insights.report.read`, `insights.edition.create`,
+`insights.edition.review`, `insights.edition.issue` con grants en `src/lib/entitlements/runtime.ts`
+(EFEONCE_ADMIN/EFEONCE_ACCOUNT las cuatro; EFEONCE_OPERATIONS read+create+review; roles cliente `report.read`;
+CLIENT_EXECUTIVE/CLIENT_MANAGER además `edition.create`); catálogo `src/config/entitlements-catalog.ts` módulo
+`insights`. Módulo per-ORG `insights_v1` (seed en la migración) asignado por `enableClientPortalModule`; script
+operativo `scripts/insights/assign-insights-module.ts --org=<id> [--apply]` (dry-run por defecto). Scope de
+escritura `efeonce.mcp.insights.write` en `EFEONCE_MCP_WRITE_SCOPES` (`src/lib/auth-server/oauth/scopes.ts`).
 
-**Pendiente de la propia task (rollout):** canary sintético de dos organizaciones en staging con
-flags ON, federación de las 4 tools en `efeonce-mcp` (+ scope de escritura), evaluación con agente
-sin historial, release por control plane. **Pendiente de otras unidades:** render/outputs
-(TASK-1846), catálogos visuales (TASK-1847), share/delivery/schedules (TASK-1848), portal (TASK-1849).
-Pendientes de §12 resueltos aquí: DDL exacto (arriba), retención por clase (1095 días), mapa de
-primitives/rutas (arriba). Siguen pendientes: límites medidos/costo y library de charts (TASK-1847).
+**Eventos y observabilidad:** 5 eventos `insights.*` en `src/lib/sync/event-catalog.ts` (incluye
+`insights.edition.created`, `insights.evidence.sealed`, `insights.edition.issued`); dominio `insights` en
+`captureWithDomain`; módulo `insights` en el registry de reliability con señales
+`insights.editions.failed_recent` y `insights.editions.stuck_generation`
+(`src/lib/reliability/queries/insights-edition-signals.ts`, steady 0); data source `insights` en el
+reader-meta/parity del client portal.
+
+**Federación en el gateway `efeonce-mcp`:** provider `greenhouse-insights` cabalga la configuración del provider
+SEO (misma lane ecosystem y service identity, binding de scope `internal`); versión 1.4.0 → 1.5.0 (aditivo),
+superficie 43 → 47 tools, 8 clases de scope (`read`, `globe.read`, `hiring.read`, `globe.credits.funding.ensure`,
+`seo.write`, `identity.write`, `client_services.write`, `insights.write`). Las tres de lectura usan el scope base
+`efeonce.mcp.read`; `create_insight_edition` exige la clase `efeonce.mcp.insights.write` y viaja con header de
+idempotencia `insights-create-<key>`. Políticas de autoridad nativa: las 4 tools `unsupported`
+(`insights_native_policy_missing`) ⇒ fail-closed para autoridad nativa/v2. Canary de lectura
+`scripts/greenhouse-insights-canary.mjs` (catálogo/lista/edición + negativo; nunca crea). Scope
+`efeonce.mcp.insights.write` creado en Entra el 2026-09-15 en la app recurso «Efeonce MCP Resource» (readback: 7
+scopes, los 6 previos intactos); ningún cliente lo porta todavía.
+
+**Flags** (default OFF; ledger `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`; leídos sólo en Vercel):
+`INSIGHTS_GENERATION_ENABLED` (crear/revisar; sin él, `503 service_unavailable` / `generation_disabled`),
+`INSIGHTS_ISSUANCE_ENABLED` (emitir), `INSIGHTS_AUTHORING_AI_ENABLED` (Gemini). Estado real por target en §14.2.
+
+### 14.2 Rollout verificado (2026-09-15)
+
+| Target | Generación | Emisión | IA | Evidencia |
+|---|---|---|---|---|
+| Staging (Vercel `staging`) | **ON** (~20:00Z; requirió `vercel redeploy` porque la deployment previa nació antes del env var) | OFF | OFF | `insights_v1` asignado a la org sintética Greenhouse Demo. Lane app: catálogo 200 (`seo`/`aeo` `module_not_assigned`, `ico` disponible); create `202` → `EO-INS-000012` `ready_for_review`; replay `200` `idempotent: true`; `409 idempotency_conflict` con `depth` distinto; el cliente ve `evidence`/`plan` `null` por diseño. Lane ecosystem: catálogo/lista/detalle con evidencia (snapshot sellado, plan congelado, 4 transiciones); create `202` → `EO-INS-000013`; org sin módulo ⇒ `404` anti-oracle. |
+| Producción (Vercel `production`) | **ON** (`vercel env add` + `vercel redeploy` → deployment `greenhouse-h2030d3bz` Ready ~23:10Z; valor verificado con `vercel env pull`) | OFF | OFF | Release PR #236 → `main` `9c094688309d345b9780b563968ecd1c5c96afd4`, orquestador run 35032358217 (un intento, dos gates Production aprobados), manifest `9c094688309d-500ec9e7-3f22-4229-b152-e70a197ee1af` `released` 22:55:13Z; Vercel `greenhouse-e8i8fkqbd` READY; watchdog `ok`, 5/5 workers synced (ops-worker y auth-server retienen `0a05c8dc8267`, diff docs-only, skip legítimo). Canary por lane ecosystem: create `202` → `EO-INS-000014` `ready_for_review`; replay con la misma idempotency-key de lane devuelve la misma edición. |
+| Preview | OFF | OFF | OFF | Sin canary. |
+| Gateway `efeonce-mcp` | — | — | — | PR #12 → `main` `cad57b31d`; deploy 21:46Z (run 35027446001 success), revisión Cloud Run `efeonce-mcp-gateway-00053-dsk` al 100 %; PRM 200, `/health` 200, `/mcp` 401 sin token. |
+
+Las mutaciones que el clasificador de permisos bloquea al agente Claude (Entra vía `az rest`, push/PR/merge/dispatch
+en `efeonce-mcp`, `vercel env add`/`redeploy` en Production) las ejecutó Codex; el resto (push HTTPS, PR/merge en
+greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en staging) lo ejecutó Claude.
+
+### 14.3 Límites honestos y pendientes
+
+- **La evidencia del canary tiene 0 hechos.** La org sintética no tiene snapshots ICO en 2026-07/08: el snapshot
+  sellado trae 4 rechazos `no_data` y el plan congelado declara los límites. Se ejercitó el camino "sin datos
+  declarados", no el de un cliente con datos reales.
+- **El cliente ve `evidence`/`plan` `null` hasta emitir.** Desde 2026-09-16 `InsightOutputsPort` está conectado
+  (TASK-1846): `issue` ya no falla por "puerto sin conectar" sino por **outputs sin completar** (`not_ready` con
+  `missing`/`pending`); `renderableOutputs` del catálogo declara `deck_pdf`. Ninguna edición se ha emitido aún:
+  el render está **vivo en staging y pendiente en producción** (§14.5, delta 2026-09-16).
+- **`create_insight_edition` por el gateway responde `insufficient_scope`** hasta que un consentimiento/grant
+  gobernado otorgue `efeonce.mcp.insights.write` a un cliente; el cliente PKCE compartido no se tocó.
+- `plan.limits` repite «ico: sin datos.» una vez por rechazo en el plan CONGELADO (fiel al snapshot); el render lo deduplica (TASK-1846, `render/plan-limits.ts`) sin tocar el plan ni su hash.
+- Pendientes para mover TASK-1845 a `complete`: ensayo de `migrate:down` en la instancia compartida (conservando
+  `pgmigrations.run_on` original y las ediciones intactas) y `tools/list` por una sesión MCP servida con token
+  humano (evidencia de 47 tools + skill `efeonce-insights` desde un cliente real).
+- Pendiente de otras unidades: render/outputs (TASK-1846), catálogos visuales (TASK-1847), share/delivery/schedules
+  y resolver público `InsightWebModelV1` (TASK-1848), biblioteca/portal (TASK-1849), render en Think (TASK-1875).
+  Pendientes de §12 resueltos aquí: DDL exacto, retención por clase (1095 días), mapa de primitives/rutas. Siguen
+  pendientes: límites medidos/costo y library de charts (TASK-1847).
+
+### 14.4 Invariantes operativos para agentes
+
+- **NUNCA** derivar una ventana a mano: toda ventana es `[start, endExclusive)` en zona IANA resuelta por
+  `window.ts` (DST, mes anterior ≠ 30 días, 29-feb, máximo 400 días, sin futuro). Una fuente que no sirve el
+  grano declara `unsupported_window`; ausencia ≠ cero (rechazo con motivo).
+- **NUNCA** crear una edición fuera de la idempotencia del dominio `(organization_id, idempotency_key)` +
+  `request_hash`; misma key + payload distinto es `409 idempotency_conflict` por diseño, no un bug a rodear.
+- **NUNCA** un adapter recalcula fórmulas ni lee tablas del productor: consume SOLO readers dueños
+  (`growth/seo`, `growth/ai-visibility`, `ico-engine`), nunca `client-portal` (hoja del DAG) ni `probes/**`.
+- **NUNCA** mutar `insight_evidence_snapshots` ni `insight_editorial_plans` sellados/congelados: corregir es
+  `revise` (versión nueva); una emitida sólo se retira. Cambiar la matriz de estados exige migración + TS juntos.
+- **NUNCA** cruzar un gate de flag desde un solo runtime ni asumir que un env var nuevo llega a una deployment
+  ya construida: generación, emisión e IA son gates independientes que se prenden por target en Vercel y
+  **requieren `vercel redeploy`**. `INSIGHTS_RENDER_ENABLED` (TASK-1846) se lee en **TRES runtimes** — Vercel
+  (encolar, `requestInsightRender`), el artifact-worker Cloud Run Job (reclamar) y el `ops-worker` (dispatcher
+  `/artifact-render/dispatch` que lanza el Job) — y debe estar ON en los tres; en Cloud Run el SoT es el
+  `deploy.sh` de cada servicio (`--set-env-vars` destructivo). Job y ops-worker son únicos para staging y
+  producción: la puerta de producto por ambiente es el encolado en Vercel. El ledger registra el estado.
+- **NUNCA** responder `403` a una org sin módulo `insights_v1` ni a un cliente que apunta a otra org: es `404`
+  anti-oracle (`assertInsightsAccess`); `audience=internal` nunca se concede a un cliente.
+- **NUNCA** emitir desde una máquina ni saltar `InsightOutputsPort`: emitir es gate humano con
+  `insights.edition.issue`, `INSIGHTS_ISSUANCE_ENABLED` y outputs validados. El puerto real (TASK-1846) valida
+  SÓLO outputs `completed` con asset de la MISMA audiencia de la edición: un output interno jamás valida una
+  edición de cliente; faltar uno es `not_ready` con `missing`.
+- **NUNCA** encolar un output que el motor no puede producir (`INSIGHT_RENDERABLE_OUTPUTS`, hoy `deck_pdf`):
+  se rechaza `render_rejected`, nunca "queda para después". **NUNCA** truncar una cifra o una afirmación para
+  que quepa en un slot del catálogo: el mapper rechaza con causa; sólo un label/título se acorta con elipsis.
+- **NUNCA** separar lease de fencing en el motor de render: el reclamo por lease vencido abre una ventana de
+  doble finalización que hoy no existe y el fence token es el único candado (`InsightRenderFenceLostError`).
+- **SIEMPRE** que se agregue una tool MCP interna, federarla en `efeonce-mcp` (provider + paridad + política de
+  autoridad nativa + scope si escribe) y verificar el gateway construido; registrar una tool aquí no la publica.
+
+### 14.5 Estado de TASK-1846 — render durable (2026-09-16, vivo en staging, rollout productivo pendiente)
+
+> Los párrafos siguientes describen el cierre del código; el estado de runtime vigente (flag en tres runtimes,
+> worker desplegado en staging, benchmark medido) está en el **Delta 2026-09-16** al final de esta sección y
+> prevalece sobre las menciones a "sin deploy" o "flag OFF".
+
+**Existe en código (develop):**
+- Schema: `insight_render_runs` (solicitud por edición), `insight_outputs` (unidad reclamable por target, UNIQUE
+  `(org, edición, output, audiencia)`), `insight_render_events` (append-only); columnas `lease_expires_at` +
+  `fence_token` en `insight_outputs` **y** en `proposal_render_jobs` (additive; el reclamo de Proposal queda apagado).
+- Motor: `services/artifact-worker` despacha por `RenderConsumer` (registry con Proposal e Insights); claim
+  atómico con lease, reclamo de lease vencido, fencing en la finalización, cuota por org, retry sólo de fallidos,
+  cancelación honesta, señal `insights.render.orphaned_output` (steady 0).
+- Entrada/salida: `requestInsightRender` (+ retry/cancel, readers de runs) y `InsightOutputsPort` real conectado
+  al barrel de commands. Lanes app/ecosystem y 4 tools MCP (manifiesto 55 tools). Eventos `insights.render.*`.
+- Mapper V1 plan congelado → `deck-axis` (`render/deck-mapper.ts`); el catálogo A4 y los gráficos son TASK-1847.
+
+**Verificado:** 5 live tests contra PostgreSQL real (fencing rechaza la finalización vieja sin escribir; retry no
+duplica; cancelación no miente; SQL de señal y de encolado), 1006 unitarios, `composer:visual-gate` 61 frames a
+cero píxeles (Proposal intacto), `pnpm test` completo y `pnpm build` de producción con estos cambios en el árbol.
+
+**NO hecho / límites honestos:** target `web` y catálogo A4 (1847/1848); descarga autorizada del asset (1848); nada
+corre en producción (ver delta); el defecto visual del slot `unit` de `MetricsSplit` es anterior y afecta decks ya entregados (issue aparte).
+
+#### Delta 2026-09-16 — runtime real, benchmark en Cloud Run y auditoría del actor
+
+> Estado honesto: **vivo en staging, pendiente en producción**. Nada de lo que sigue corre aún en producción.
+
+**Runtime de despacho (verificado en código y en staging).** El artifact-worker es un Cloud Run **Job**, no un
+servicio que escucha la cola: lo lanza el dispatcher `src/lib/efeonce-insights/render/dispatch.ts`, invocado por
+el `ops-worker` en `/artifact-render/dispatch` desde Cloud Scheduler `ops-artifact-render-dispatch` **cada 2
+minutos**. El lanzador del Job es domain-free (`src/lib/render-dispatch/job-runner.ts`). En un mismo tick Proposal
+tiene prioridad: si Proposal lanzó una ejecución, Insights espera al tick siguiente. El consumer Insights del Job
+es `services/artifact-worker/consumers/insights.ts`. El Job quedó integrado al release control plane de producción;
+su primer deploy productivo ocurre en el próximo release. El bucket de assets del Job está fijo en `staging`
+(`efeonce-group-greenhouse-private-assets-staging`); cada asset guarda `bucket_name` por fila, así que un cambio de
+bucket no rompe la lectura de assets previos.
+
+**Flag en tres runtimes — estado vivo 2026-09-16:**
+
+| Runtime | Rol | Estado |
+|---|---|---|
+| Vercel `staging` | encolar (`requestInsightRender`) | ON |
+| Vercel Production | encolar | OFF (la variable no existe) |
+| Cloud Run Job `artifact-worker` | reclamar y renderizar | ON (default `true` en `deploy.sh`) |
+| Cloud Run `ops-worker` | dispatcher | ON desde la revisión `ops-worker-00690-xhl` (default `true` en `deploy.sh`) |
+
+Hallazgo: antes del 2026-09-16 el `ops-worker` no tenía el flag. El canary de las 13:00Z se lanzó ejecutando el Job
+a mano y ocultó la falta: los logs del dispatcher de las 13:02Z muestran `insightsQueued=0` con un output en cola.
+
+**Lanes y MCP (código en `origin/develop`).** `POST …/insights/editions/{editionId}/render` (202, o 200 idempotente),
+`GET …/render-runs/{id}`, `POST …/render-runs/{id}/retry|cancel`; errores `render_disabled` 503, `render_rejected`
+422 (hoy sólo `deck_pdf` es renderizable; `report_pdf` → TASK-1847, `web` → TASK-1848) y 404 anti-oráculo. Cuatro
+tools MCP (`request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render`).
+Gateway `efeonce-mcp`: PR #14 mergeado (`da8295a`), v1.6.0, 51 tools, escrituras con scope
+`efeonce.mcp.insights.write`; **no desplegado** (el deploy del gateway va después del release de Greenhouse).
+
+**Auditoría del actor.** Migración `20260916201127095_task-1846-insights-render-client-user-actor` (expand,
+aplicada): runs y eventos aceptan `client_user`, y el actor humano viaja al run, al evento de encolado, al retry y
+a la cancelación. Antes todo quedaba registrado como `system`.
+
+**Benchmark en Cloud Run staging (2026-09-16, org sandbox `Greenhouse Demo`, persona `agent-client`).**
+
+| Medición | Resultado |
+|---|---|
+| Ráfaga | 5 ediciones seo+ico, `deck_pdf`, encoladas 20:09:33–20:09:41Z; arranques 20:12:51, 20:14:49, 20:16:46, 20:18:45, 20:20:51; las 5 `completed` al primer intento |
+| Render (started → finished) | 6,3–7,3 s; PDF ~330 KB |
+| Edad en cola | 3m18s → 11m10s |
+| **Throughput** | **1 output por tick de 2 min** (una ejecución por tick, Job `parallelism=1`): una ráfaga de N outputs tarda ≈ 2·N min |
+| Arranque de la ejecución | 3,9 s en caliente; 42 s la primera tras un deploy; 154 s en frío (13:00Z) |
+| Duración total de la tarea | 50–58 s (Chromium + claim + render + upload) |
+| Retry real | Un output fallido con manifest sellado antes del fix: el dispatcher lo lanzó solo en el tick de 20:10, volvió a fallar honesto `render_error` (validación de slots `sectionItems`), intentos 1 → 2 de 3; los outputs completados no se tocaron |
+| Cancelación real | Run encolado → `cancel` 200 → run y output `cancelled`, 0 intentos, nunca arrancó; `retry` sobre un cancelado responde 200 sin re-encolar (cancelado es terminal: se re-encarga) |
+| Negativo de audiencia | Edición `internal` creada por superadmin; `agent-client` pide render → 404 y GET → 404; 0 outputs creados |
+| Live tests | `pnpm test:live src/lib/efeonce-insights/render` 4/4 contra PostgreSQL real |
+
+Benchmark **local** previo: 15 láminas 4,44–4,72 s (RSS 300–328 MB, PDF 5,4 MB); 25 láminas 7,07–7,42 s (RSS
+355–365 MB, PDF 12,6 MB); ráfaga 5×15 en 23,3 s. No medido: A4 de 10/30 páginas (TASK-1847) ni la competencia de
+cola con Proposal activo (por diseño Proposal gana el tick).
+
+**Pendiente (no verificado):** release de Greenhouse a producción → `vercel env add INSIGHTS_RENDER_ENABLED
+production` + redeploy → deploy del gateway v1.6.0 → canary productivo. `INSIGHTS_ISSUANCE_ENABLED` sigue OFF.
+Los huérfanos en `running` sin lease requieren decisión humana (señal `insights.render.orphaned_output`, steady 0).

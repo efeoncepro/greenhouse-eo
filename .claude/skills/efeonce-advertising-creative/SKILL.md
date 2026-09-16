@@ -29,6 +29,21 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
 5. Usa [brief y gate de calidad](references/creative-brief-and-qa.md) para registrar la decisión y revisar
    el archivo final.
 
+### Motor de IA: cómo elegir (as-of 2026-09-16)
+
+Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Detalle de imagen en `greenhouse-ai-image-generator` §Elegir modelo y de video en
+`motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`.
+
+- El modelo entrega **sólo el medio limpio**; texto, logo, CTA y legal se componen con AXIS, nunca se generan.
+- Plate cotidiano → GPT Image 2.5 Flare; edición precisa, máscara o master final → 2.5 Sunburst
+  (`pnpm ai:image --model gpt-image-2.5-sunburst`); material/atmósfera → Seedream 5 Pro; divergencia barata →
+  Seedream 5 Lite (`pnpm ai:fal`).
+- Resolución nativa > 2K (OOH, print proof) → Seedream 5 Lite o GPT Image (hasta 3840×2160, experimental sobre
+  2560×1440); Seedream 5 Pro en fal **no pasa de 2048²**.
+- Formato más extremo que 3:1 → Seedream (1/16–16); GPT Image tope 3:1.
+- Motion con marca o personas → Flux 3 o Wan 3.0, no Seedance (su filtro rechaza tras cobrar); presupuesta por
+  resolución y confirma con `pnpm ai:fal --balance`.
+
 ## Bucle de trabajo
 
 1. **Resuelve el encargo.** Define marca/cliente, objetivo, soporte, dimensiones, audiencia, copy literal,

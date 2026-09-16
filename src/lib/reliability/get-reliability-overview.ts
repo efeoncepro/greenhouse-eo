@@ -183,6 +183,7 @@ import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-com
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
 import { getAuthServerSignals } from './queries/auth-server-signals'
 import { getInsightsEditionSignals } from './queries/insights-edition-signals'
+import { getInsightsRenderOrphanedSignal } from './queries/insights-render-orphaned'
 import { getGlobeCreditFundingStaleProposalsSignal } from './queries/globe-credit-funding-stale-proposals'
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
@@ -700,6 +701,8 @@ interface ReliabilityOverviewSources {
   authServerSignals?: ReliabilitySignal[] | null
   /** TASK-1845 — insights.editions.failed_recent + insights.editions.stuck_generation (steady 0). */
   insightsEditionSignals?: ReliabilitySignal[] | null
+  /** TASK-1846 — insights.render.orphaned_output: outputs en running que nadie va a retomar (steady 0). */
+  insightsRenderOrphanedSignal?: ReliabilitySignal | null
   globeCreditFundingStaleProposals?: ReliabilitySignal | null
   growthAiVisibility?: ReliabilitySignal[] | null
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
@@ -1285,6 +1288,8 @@ export const buildReliabilityOverview = (
     ...(sources.authServerSignals ?? []),
     // TASK-1845 — Efeonce Insights: ediciones fallidas recientes + atascadas en generación.
     ...(sources.insightsEditionSignals ?? []),
+    // TASK-1846 — Efeonce Insights: outputs de render huérfanos.
+    ...(sources.insightsRenderOrphanedSignal ? [sources.insightsRenderOrphanedSignal] : []),
     ...(sources.globeCreditFundingStaleProposals ? [sources.globeCreditFundingStaleProposals] : []),
     // TASK-1082 — Knowledge ingestion: quarantine count + failed sync source.
     ...(sources.knowledgeQuarantineCount ? [sources.knowledgeQuarantineCount] : []),
@@ -1997,6 +2002,12 @@ export const getReliabilityOverview = async (
     preloadedSources.insightsEditionSignals !== undefined
       ? preloadedSources.insightsEditionSignals
       : await getInsightsEditionSignals().catch(() => null)
+
+  // TASK-1846 — render durable: un output huérfano es un informe pedido que nunca va a llegar.
+  const insightsRenderOrphanedSignal =
+    preloadedSources.insightsRenderOrphanedSignal !== undefined
+      ? preloadedSources.insightsRenderOrphanedSignal
+      : await getInsightsRenderOrphanedSignal().catch(() => null)
 
   // TASK-1566 — propuestas de fondeo de Globe sin confirmar. Steady=0: un valor > 0 es una decision
   // humana pendiente, no un fallo del sistema, y por eso escala por ANTIGUEDAD y no por cantidad.
@@ -3000,6 +3011,7 @@ export const getReliabilityOverview = async (
     workforceUnlinkedInternalUsers,
     authServerSignals,
     insightsEditionSignals,
+    insightsRenderOrphanedSignal,
     globeCreditFundingStaleProposals,
     knowledgeQuarantineCount,
     assetScanOpenQuarantine,

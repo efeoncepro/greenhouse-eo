@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 in-progress (render durable: staging verificado 2026-09-16, producción espera el release); TASK-1847–1849 y TASK-1875 en diseño`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery|ui|cross-domain`
 - Owner: `Platform / Client Experience; Julio Reyes (producto)`
@@ -78,6 +78,10 @@ gates de findings/rollout; no otro motor ni sender. La matriz dueña está en
 Las dependencias de Hub/transporte/preferencias están asignadas en
 [EPIC-046](EPIC-046-client-services-visibility-and-self-service.md#matriz-de-comunicación-y-retorno-al-portal).
 
+## Contrato de la skill `efeonce-insights` (obligatorio para cada hija)
+
+La skill `.claude/skills/efeonce-insights/` (espejo `.codex/`) es la memoria operativa del programa. Cada task hija actualiza al cerrar, en el mismo commit del cambio de lifecycle: `references/program-ledger.md` (qué construyó, dónde corre, qué deja a la siguiente), `architecture-map.md`, `contracts.md`, `operations.md` y `lessons.md`; espeja a `.codex/` y deja `pnpm skills:mirrors` verde. Sin esa actualización la task no pasa a `complete`. TASK-1845 dejó la versión inicial el 2026-09-16.
+
 ## Child Tasks
 
 **Cinco tasks nuevas de implementación.** Son unidades de ownership con varios slices, no cinco cambios
@@ -85,7 +89,7 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 
 | Unidad | Task | Resultado | Blocked by |
 |---|---|---|---|
-| U01 | [TASK-1845](../../tasks/to-do/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO | none |
+| U01 | [TASK-1845](../../tasks/complete/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO — **complete 2026-09-16: en producción desde 2026-09-15, rollback ensayado** | none |
 | U02 | [TASK-1846](../../tasks/to-do/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor | TASK-1845 |
 | U03 | [TASK-1847](../../tasks/to-do/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md) | gráficos y catálogos premium para deck e informe vertical | TASK-1845 |
 | U04 | [TASK-1848](../../tasks/to-do/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados | TASK-1845, TASK-1846 |
@@ -128,6 +132,27 @@ necesita esperar esa sección; la biblioteca debe mostrar disponibilidad honesta
 Registrar plan por task sólo al tomarla: /goal explícito + codex:task-hook y checkpoint aplicable. Este registro
 no ejecuta tasks ni autoriza multiagente, datos de clientes para pruebas, envíos, migraciones o deploy.
 
+## Rollout de la foundation — 2026-09-15 (TASK-1845)
+
+Resumen del estado real; el detalle verificado vive en
+[arquitectura §14](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md#14-estado-de-implementación-y-rollout--task-1845-2026-09-15).
+
+- **Producción:** release por control plane (PR #236 → `main` `9c094688…`, manifest `released` 22:55:13Z,
+  Vercel READY, watchdog `ok`); migración `greenhouse_insights` aplicada en la única instancia Cloud SQL;
+  `INSIGHTS_GENERATION_ENABLED=true` en staging y producción (con `vercel redeploy`); `INSIGHTS_ISSUANCE_ENABLED`
+  e `INSIGHTS_AUTHORING_AI_ENABLED` OFF en todos los targets; Preview OFF.
+- **Evidencia:** `EO-INS-000012` (lane app, staging), `EO-INS-000013` (lane ecosystem, staging) y
+  `EO-INS-000014` (lane ecosystem, producción), todas `ready_for_review` sobre la org sintética Greenhouse Demo con
+  `insights_v1` asignado; replay idempotente, `409` por conflicto de payload y `404` anti-oracle verificados.
+- **Federación:** gateway `efeonce-mcp` 1.5.0 (47 tools, 8 clases de scope) desplegado; scope
+  `efeonce.mcp.insights.write` creado en Entra; ningún cliente lo porta ⇒ `create_insight_edition` responde
+  `insufficient_scope` hasta un grant gobernado.
+- **Límites honestos:** la evidencia del canary tiene 0 hechos (4 rechazos `no_data`; la org sintética no tiene
+  snapshots ICO en la ventana); el cliente ve evidencia/plan sólo de emitidas y hoy ninguna puede emitirse
+  (`not_ready` hasta TASK-1846); `plan.limits` repite «ico: sin datos.» por rechazo (dedupe → TASK-1846).
+- **Para cerrar TASK-1845:** ensayo de `migrate:down` en la instancia compartida y `tools/list` por una sesión
+  MCP servida con token humano. Ninguna otra hija tiene código.
+
 ## Exit Criteria
 
 - [ ] Edición emitida produce email con resumen útil y deep link al portal autenticado, aviso in-app y Teamsbot para destinos habilitados, con resultado por canal; token compartido sigue siendo un carril explícito separado.
@@ -159,7 +184,8 @@ ni pushes como parte automática del registro documental.
 
 2026-09-08: usuario aprobó ubicación, tres formatos, nombre y creación de epic/ADR/arquitectura/tasks.
 Inspección de código verificó worker ligado a Proposal, ChartSplit limitado y un enlace activo por reporte
-Grader. Sólo planificación local en checkout compartido; runtime de Insights aún no construido.
+Grader. Sólo planificación local en checkout compartido; runtime de Insights aún no construido en esa fecha.
+2026-09-15: la foundation (TASK-1845) quedó construida y en producción (sección «Rollout de la foundation»).
 
 ## Verification of Planning
 

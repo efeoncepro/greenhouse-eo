@@ -2,13 +2,22 @@
 
 > **Estado:** `Approved for validation`
 > **Owner:** Revenue Operations & CRM + Marketing Operations
-> **As-of:** 2026-08-27
+> **As-of:** 2026-09-16
 > **Uso:** routing de discovery, skills, scope y propuestas; no reemplaza contrato ni entitlement live.
 
 La arquitectura comercial de la práctica —incluidos customer model, lifecycle, ofertas, delivery y gates de
 madurez— vive en
 [`Efeonce Salesforce Service Offer Architecture V1`](EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md). Este
 documento conserva únicamente el mapa de productos, boundaries y routing por problema.
+
+## Posicionamiento provider-fit
+
+Salesforce y HubSpot no son sustitutos universales ni pertenecen al mismo centro de gravedad. Salesforce-first
+adquiere sentido con una org instalada compleja, gobierno enterprise, service o procesos multi-equipo a escala,
+extensibilidad profunda e integración amplia. HubSpot-first puede ser preferible para crecimiento B2B, equipos
+mid-market y time-to-value. La zona de solapamiento incluye mid-market alto, agentes, integraciones y coexistencia.
+Esta es una inferencia de Efeonce para discovery; no reemplaza la evidencia del cliente ni la cotización de ningún
+proveedor. Las salidas válidas son `Salesforce-first`, `HubSpot-first`, `híbrida` y `no-fit`.
 
 ## Mapa de productos
 
@@ -19,11 +28,31 @@ documento conserva únicamente el mapa de productos, boundaries y routing por pr
 | Salesforce Platform                | metadata del core org                       | objetos, permisos, Flow, Apex, LWC, eventos, APIs y ALM                                        | `salesforce-crm-practice`                          |
 | Data 360                           | Salesforce Platform/data services           | ingest/connect, harmonización, identity resolution, segmentación y activación                  | skill del caso consumidor; no es “la base del CRM” |
 | Agentforce                         | capa transversal                            | agentes gobernados por permisos, grounding, acciones, pruebas y consumo                        | skill del producto donde actúa                     |
+| AIforce                           | capa de interfaz / arquitectura headless    | expone contexto, datos, workflows, lógica, permisos, gobierno y acciones a interfaces y agentes | `salesforce-crm-practice`; skill dueña del producto consumidor |
 | Marketing Cloud Engagement         | tenant Engagement, EID/MID y Business Units | Journey Builder, Automation Studio, Email/Content/Contact/Mobile Studio, CloudPages, REST/SOAP | `salesforce-marketing-cloud-engagement`            |
 | Marketing Cloud Next               | Salesforce Platform + Data 360              | campañas, Flow, contenido, segmentos, canales y Agentforce; ediciones Growth/Advanced          | `salesforce-marketing-cloud-next`                  |
 | Marketing Cloud Account Engagement | producto B2B separado, antes Pardot         | prospects, lists, Engagement Studio y builders propios                                         | fuera de V1; se enruta explícitamente              |
 | Marketing Cloud Personalization    | producto/licencia separada                  | decisioning y personalización en tiempo real                                                   | fuera de V1 salvo integración acotada              |
 | Marketing Cloud Intelligence       | producto analítico separado                 | ingest, armonización y analytics de marketing                                                  | fuera de V1 salvo integración acotada              |
+
+## Delta Dreamforce 2026 — 2026-09-16
+
+Salesforce está moviendo el punto de acceso de la plataforma: AIforce lleva el contexto gobernado, los workflows y
+las acciones a interfaces como Claude, Slack y otras superficies, de modo que el usuario o un agente no siempre debe
+entrar a Salesforce para operar. Esto no crea una edición única ni reemplaza Lightning, Marketing Cloud Engagement,
+Marketing Cloud Next o los productos de datos; la disponibilidad se determina por superficie, producto, región,
+permisos y contrato.
+
+Para Marketing Cloud Next, la actualización de Dreamforce añade una agenda de capacidades agentic y headless:
+Campaign Agent (GA anunciada para octubre de 2026), Headless Marketing con MCP, Data Guardian, Budget Optimization,
+Palmata/discoverability, Adaptive Web: Quick Setup, Personalized Paths, Account Discovery y Account-Based
+Recommendations. RCS Messaging aparece como GA ahora; Mobile Flash Sending y Event Management tienen fechas
+posteriores. Cada capacidad debe evaluarse por separado y no entra automáticamente en una oferta o SOW.
+
+Koa es un lanzamiento del 15/09, no del 16/09: modelo de razonamiento CRM de Salesforce/NVIDIA para Agentforce,
+en pilotos seleccionados y con GA prevista para invierno de 2026 en regiones de EE. UU. Missionforce/OpenAI y la
+expansión de Missionforce son anuncios del 16/09 orientados a gobierno y entornos regulados; no se extrapolan al CRM
+estándar.
 
 ## Reglas de coexistencia
 

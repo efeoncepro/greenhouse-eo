@@ -7,8 +7,13 @@ import { spawn } from 'node:child_process'
 import { config as loadEnv } from 'dotenv'
 
 import {
+  assertOpenAIImageQualitySupported,
   editOpenAIImage,
   generateOpenAIImage,
+  isOpenAIImageModel,
+  isOpenAIImageQuality,
+  OPENAI_IMAGE_MODEL_IDS,
+  OPENAI_IMAGE_QUALITIES,
   type OpenAIImageBackground,
   type OpenAIImageInputFidelity,
   type OpenAIImageModel,
@@ -43,14 +48,23 @@ loadEnv({ path: join(process.cwd(), '.env.local') })
  *   --image <path>          Reference image to EDIT (repeatable). Switches to image-to-image
  *                           via editOpenAIImage — preserves the reference (identity, style, logo)
  *                           while the prompt changes only the requested delta.
+ *   --mask <path>           Máscara PNG que marca QUÉ zona se edita (inpainting). Requiere --image.
+ *                           Mismo formato y mismas dimensiones que la primera --image; las zonas
+ *                           TRANSPARENTES de la máscara son las que el modelo reemplaza.
+ *                           OJO: no abarata la corrida. El modelo devuelve la imagen COMPLETA, así que
+ *                           el output se cobra igual que una generación, y encima suma la imagen y la
+ *                           máscara como tokens de entrada.
  *   --input-fidelity <f>    low | high — how strictly to preserve the reference (edit mode).
- *                           Only applies to models ≠ gpt-image-2 (e.g. gpt-image-1.5).
+ *                           Sólo lo transportan gpt-image-1.5 / 1 / 1-mini. En la familia 2.5 la guía de
+ *                           OpenAI lo excluye explícitamente: se ignora y la identidad se pide por prompt.
  *   --out <path>            Output file path (single prompt). Default: <out-dir>/<slug>-<ts>.png
  *   --out-dir <dir>         Output directory. Default: public/images/generated
  *   --size <WxH>            1024x1024 | 1536x1024 | 1024x1536 | 2048x... (default 1536x1024)
  *   --quality <q>           low | medium | high | auto (default high)
+ *                           xhigh | max — sólo en la familia GPT Image 2.5
  *   --background <b>        opaque | transparent (default opaque; GPT Image 2 transparency is preview)
- *   --model <m>             gpt-image-2 | gpt-image-1.5 | gpt-image-1 | gpt-image-1-mini (default gpt-image-2)
+ *   --model <m>             gpt-image-2.5-flare | gpt-image-2.5-sunburst (+ snapshots -2026-09-08)
+ *                           gpt-image-2 (default) | gpt-image-1.5 | gpt-image-1 | gpt-image-1-mini
  *   --count <n>             Images per prompt (default 1)
  *   --timeout <ms>          Per-image timeout (default 280000; gpt-image-2 high can exceed 125s)
  *   --open                  Open the result(s) in the default viewer (macOS `open`)
@@ -67,6 +81,7 @@ interface CliArgs {
   batch?: string
   image?: string[]
   inputFidelity?: OpenAIImageInputFidelity
+  mask?: string
   out?: string
   outDir?: string
   concept?: string
@@ -81,15 +96,18 @@ interface CliArgs {
   help: boolean
 }
 
-const HELP = `Greenhouse AI image CLI — OpenAI gpt-image-2
+const HELP = `Greenhouse AI image CLI — OpenAI GPT Image (2.5 family + gpt-image-2)
 
   pnpm ai:image --prompt "<text>" [--out <path>] [--size 1536x1024] [--quality high]
                 [--background opaque|transparent] [--model gpt-image-2] [--count 1]
+                # --model gpt-image-2.5-flare|gpt-image-2.5-sunburst · --quality xhigh|max (sólo 2.5)
                 [--timeout 280000] [--open]
   pnpm ai:image --prompt-file <path> ...
   pnpm ai:image --batch <json>          # [{ "filename": "a.png", "prompt": "…" }, …]
   pnpm ai:image --concept <loop> --batch <json> [--task TASK-###]   # conceptos del design-loop
   pnpm ai:image --image <ref.png> --prompt "<delta>" --out <out.png>   # EDIT image-to-image (consistencia)
+  pnpm ai:image --image <base.png> --mask <mask.png> --prompt "<qué va en la zona>" --out <out.png>
+                                        # INPAINTING: sólo se reemplaza la zona transparente de la máscara
 
 Edit mode (--image):
   Edita la imagen de referencia en vez de generar desde cero (editOpenAIImage). Preserva
@@ -139,6 +157,10 @@ const parseArgs = (argv: string[]): CliArgs => {
         break
       }
 
+      case '--mask':
+        args.mask = next()
+        break
+
       case '--input-fidelity':
         args.inputFidelity = next() as OpenAIImageInputFidelity
         break
@@ -157,15 +179,36 @@ const parseArgs = (argv: string[]): CliArgs => {
       case '--size':
         args.size = next() as OpenAIImageSize
         break
-      case '--quality':
-        args.quality = next() as OpenAIImageQuality
+
+      case '--quality': {
+        const value = next()
+
+        if (!isOpenAIImageQuality(value)) {
+          throw new Error(
+            `--quality "${value}" is not valid. Valid qualities: ${OPENAI_IMAGE_QUALITIES.join(' | ')}. ` +
+              'Note that "xhigh" and "max" only exist on the GPT Image 2.5 family.'
+          )
+        }
+
+        args.quality = value
         break
+      }
+
       case '--background':
         args.background = next() as OpenAIImageBackground
         break
-      case '--model':
-        args.model = next() as OpenAIImageModel
+
+      case '--model': {
+        const value = next()
+
+        if (!isOpenAIImageModel(value)) {
+          throw new Error(`--model "${value}" is not valid. Valid models: ${OPENAI_IMAGE_MODEL_IDS.join(' | ')}.`)
+        }
+
+        args.model = value
         break
+      }
+
       case '--count':
         args.count = Math.max(1, Number(next()) || 1)
         break
@@ -277,6 +320,7 @@ const generateOne = async (item: GenItem, args: CliArgs): Promise<void> => {
           format: 'png',
           numberOfImages: 1,
           timeoutMs: args.timeoutMs,
+          ...(args.mask ? { mask: { path: resolvePath(args.mask) } } : {}),
           ...(args.inputFidelity ? { inputFidelity: args.inputFidelity } : {})
         })
       : await generateOpenAIImage({
@@ -296,7 +340,19 @@ const generateOne = async (item: GenItem, args: CliArgs): Promise<void> => {
 
     const fallback = result.modelFallbackReason ? ` (fallback: ${result.requestedModel} → ${result.model}: ${result.modelFallbackReason})` : ''
 
-    process.stdout.write(`  ✓ ${Math.round(buffer.length / 1024)}KB · ${result.model} · ${result.size}${fallback}\n`)
+    process.stdout.write(`  ✓ ${Math.round(buffer.length / 1024)}KB · ${result.model} · ${result.size} · ${result.quality}${fallback}\n`)
+
+    // El costo por imagen de la familia 2.5 NO es estimable desde la documentación: la única vía documentada
+    // es leer `usage` de la respuesta real. Si el instrumento que gasta no lo muestra, nadie lo mide.
+    if (result.usage) {
+      const { input_tokens: inputTokens, output_tokens: outputTokens } = result.usage
+      const imageIn = result.usage.input_tokens_details?.image_tokens ?? 0
+      const textIn = result.usage.input_tokens_details?.text_tokens ?? 0
+
+      process.stdout.write(
+        `    usage: in ${inputTokens} (img ${imageIn} · txt ${textIn}) · out ${outputTokens} · total ${result.usage.total_tokens}\n`
+      )
+    }
 
     if (args.open) openInViewer(target)
   }
@@ -308,6 +364,16 @@ const main = async () => {
   if (args.help || (!args.prompt && !args.promptFile && !args.batch)) {
     process.stdout.write(`${HELP}\n`)
     process.exit(args.help ? 0 : 1)
+  }
+
+  // La combinación model × quality se valida acá y no por pieza: dentro del loop, un --count 5 repetiría
+  // el mismo error cinco veces y ya habría creado directorios de salida.
+  assertOpenAIImageQualitySupported({ model: args.model, quality: args.quality })
+
+  // Una máscara sin imagen base no tiene a qué aplicarse: /v1/images/edits exige la imagen, y sin este
+  // guardarraíl el request saldría como una generación desde cero, ignorando la máscara en silencio.
+  if (args.mask && !args.image?.length) {
+    throw new Error('--mask requires --image: the mask marks the area to edit on a base image.')
   }
 
   // --concept <loop> rutea a la taxonomía de conceptos de GVC (gitignored, trazable,

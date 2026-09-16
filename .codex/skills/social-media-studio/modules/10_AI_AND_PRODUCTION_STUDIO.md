@@ -57,6 +57,22 @@ presencia de un conector no garantiza una capacidad. Confirmar schema, sesión e
 | Falta duración o secuencia | montaje; generación sólo si falta una acción/toma | narrativa completa, continuidad y cierre |
 | Falta formato | recomposición del layout por destino | jerarquía y lectura preservadas; no mero recorte |
 
+### Motor de IA: cómo elegir (as-of 2026-09-16)
+
+Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Imagen → `greenhouse-ai-image-generator` §Elegir modelo; video →
+`motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`.
+
+1. **Escena o plate de imagen:** generación cotidiana → GPT Image 2.5 Flare; edición precisa, máscara o pieza final →
+   2.5 Sunburst (`pnpm ai:image --model …`); abrir territorios barato → Seedream 5 Lite; material, luz y atmósfera →
+   Seedream 5 Pro (`pnpm ai:fal`). Seedream 5 Pro en fal **no es 4K** (máx. 2048²).
+2. **Toma de video:** explorar en el escalón barato (H3 Max Turbo 480P, Flux 3 draft o Seedance 2.0 mini 480p) y
+   generar el final sólo de la toma aprobada; hero → Seedance 2.5; con personas o marcas → Flux 3 o Wan 3.0 (el
+   filtro de Seedance rechaza **después de cobrar**).
+3. **Presupuesta por resolución:** fal cobra por escalón y el precio registrado es el más bajo (Wan 1080p 0,20
+   USD/s; H3 base 2K 0,13; Flux 3 publicado = el doble del registrado). Confirma con `pnpm ai:fal --balance`.
+4. **Copy, logo, CTA y legal nunca salen del modelo**: se componen de forma determinística sobre el plate.
+5. **Rankings con fecha y fuente**: OpenArt, Arena y Artificial Analysis se contradicen; manda la prueba contra el brief.
+
 ### Secuencia mínima y condiciones de avance
 
 1. **Oportunidad:** registrar clasificación, audiencia, objetivo, evidencia y vigencia. En trendjacking,

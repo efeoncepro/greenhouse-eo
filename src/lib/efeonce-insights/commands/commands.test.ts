@@ -204,7 +204,8 @@ describe('TASK-1845 — issue / withdraw / recover', () => {
     stores.getInsightEditionById.mockResolvedValue(edition({ state: 'ready_for_review' }))
     await expect(issueInsightEdition({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', editionId: 'insed-1', reason: 'aprobado por el account', env: {} as NodeJS.ProcessEnv })).rejects.toMatchObject({ code: 'issuance_disabled' })
     await expect(issueInsightEdition({ subject: opsSubject, actorOrganizationId: null, organizationId: 'org-a', editionId: 'insed-1', reason: 'aprobado por ops', env: ENV_ON })).rejects.toMatchObject({ code: 'forbidden' })
-    // Puerto de outputs sin conectar (TASK-1846): emitir queda bloqueado con causa explícita.
+    // Este test importa `./lifecycle` directo (sin el barrel que cablea el puerto real, TASK-1846):
+    // el puerto queda en su estado no conectado y emitir sigue bloqueado con causa explícita.
     await expect(issueInsightEdition({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', editionId: 'insed-1', reason: 'aprobado por el account', env: ENV_ON })).rejects.toMatchObject({ code: 'not_ready' })
     expect(stores.transitionInsightEditionState).not.toHaveBeenCalled()
   })

@@ -38,8 +38,9 @@ Siguiente ID libre `TASK-1876`. Insights TASK-1845–1849 (+ TASK-1875, vista we
 ## Programa Efeonce Insights: EPIC-045
 
 [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md) registra **cinco tareas nuevas**,
-todas `to-do`, P1/Alto. Dominio Greenhouse + Artifact Worker; tres salidas iniciales: deck, informe A4 y web.
-TASK-1672/1673 conservan la auditoría técnica SEO y su distribución como consumers. Sin implementación ni rollout.
+P1/Alto. Dominio Greenhouse + Artifact Worker; tres salidas iniciales: deck, informe A4 y web.
+TASK-1672/1673 conservan la auditoría técnica SEO y su distribución como consumers. La foundation (TASK-1845) está
+**complete** (2026-09-16): en producción desde 2026-09-15 (generación ON en staging y producción; emisión/IA OFF), rollback ensayado; TASK-1846 en ejecución y el resto en diseño.
 Desde 2026-09-09, [EPIC-046](../epics/to-do/EPIC-046-client-services-visibility-and-self-service.md)
 integra autogestión cliente y gestión de colaboradores internos. TASK-1845/1846/1848/1849 incorporan
 autoridad por población, render/entrega segura y las dos experiencias; mismos IDs y owners, sin duplicados.
@@ -48,8 +49,8 @@ TASK-690–693 para Hub/preferencias y TASK-303/387/694 para audiencia/digest/me
 
 | Task | Resultado | Estado |
 |---|---|---|
-| [TASK-1845](in-progress/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO | in-progress |
-| [TASK-1846](to-do/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor | to-do |
+| [TASK-1845](in-progress/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO — code complete y **en producción** (2026-09-15: schema `greenhouse_insights`, lanes app/ecosystem, 4 tools MCP federadas en `efeonce-mcp` 1.5.0, scope Entra, `INSIGHTS_GENERATION_ENABLED` ON en staging+producción, emisión/IA OFF; ediciones `EO-INS-000012/13` staging y `000014` prod); faltan ensayo `migrate:down` y sesión MCP humana | in-progress |
+| [TASK-1846](in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor — **staging verificado, producción pendiente del release** (2026-09-16): flag ON en los 3 runtimes de staging (dispatcher corregido), benchmark Cloud Run (1 output por tick de 2 min), retry/cancel/audiencia por API real, auditoría `client_user`, Job en el release control plane, gateway v1.6.0 mergeado sin deploy | in-progress |
 | [TASK-1847](to-do/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md) | gráficos y catálogos premium para deck e informe vertical | to-do |
 | [TASK-1848](to-do/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados | to-do |
 | [TASK-1849](to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca, creación y experiencia web compartida | to-do |
@@ -59,7 +60,7 @@ TASK-690–693 para Hub/preferencias y TASK-303/387/694 para audiencia/digest/me
 
 | Task | Resultado | Estado |
 |---|---|---|
-| [TASK-1851](to-do/TASK-1851-openai-image-provider-contract-consolidation.md) | GPT Image 2.5, default Imagen bloqueado, falla ruidosa y medición de `usage` real | to-do |
+| [TASK-1851](in-progress/TASK-1851-openai-image-provider-contract-consolidation.md) | GPT Image 2.5, carril Imagen retirado, falla ruidosa y medición de `usage` real | in-progress |
 | [TASK-1850](complete/TASK-1850-openai-gpt-image-2-5-helper-enablement.md) | supersedida por TASK-1851; cerrada sin ejecutar | complete |
 
 ## Programa Payroll: EPIC-043

@@ -1,6 +1,7 @@
-# 01 · El producto que vendes hoy — as-of 2026-08-30
+# 01 · El producto que vendes hoy — as-of 2026-09-16
 
-> Todo con marca ✅/⚠️/❌ en `SOURCES.md`. **Refresh obligatorio antes de UNBOUND (16-18 sep 2026).**
+> Todo con marca ✅/⚠️/❌ en `SOURCES.md`. **Fall Spotlight/UNBOUND 2026 está en curso: verifica portal, tier,
+> seat, permisos y estado antes de cotizar.**
 
 ---
 
@@ -12,6 +13,17 @@
 | Commerce Hub | **Revenue Hub** ✅ | No es cosmético: ahora es **quote-to-cash completo con CPQ** |
 | INBOUND | **UNBOUND** ✅ | *"After fifteen years as HubSpot's flagship event, INBOUND is now UNBOUND."* 16-18 sep 2026, Boston |
 | Breeze Copilot | **Breeze Assistant** ⚠️ | El KB solo nombra "Breeze Assistant" |
+
+### Fall Spotlight / UNBOUND 2026 — lanzamientos que sí cambian la conversación
+
+| Superficie | Estado verificable | Regla comercial |
+|---|---|---|
+| **ChatGPT Ads en HubSpot** | **Beta**; conexión, creación/publicación, reporting/atribución y conversion events documentados. Requiere `Ads publishing` y opt-in de Super Admin | Vender como piloto de paid AI discovery; no prometer disponibilidad, performance ni acceso sin validar el portal |
+| **AI Growth Bundle** | **Oferta promocional condicionada**: Starter + Credits, ChatGPT Business y match de gasto de ChatGPT Ads; condiciones, fechas, mercado y elegibilidad se deben leer en la oferta vigente | No es SKU permanente ni promesa de precio/ahorro; confirmar por escrito con HubSpot antes de presentarlo |
+| **Agentic team** | Narrativa Fall: agentes para cada motion GTM sobre el mismo Growth Context | Vender outcomes y contexto compartido, no una flota fija |
+| **Lead scoring con AI insights** | Documentado para Marketing/Sales Professional y Enterprise; permisos de edición de Lead Scoring requeridos | Es una capacidad de calificación; no confundir la disponibilidad del scoring base con cualquier beta de insight o recomendación |
+
+✅/⚠️ Detalle y URLs: `SOURCES.md` § Fall Spotlight / UNBOUND 2026.
 
 ---
 

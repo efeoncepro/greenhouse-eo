@@ -263,6 +263,15 @@ Plantillas ......................................................... templates/
     texto público y specs contextuales.
 63. 🔴 **El reporte también se verifica contra la fuente.** No atribuir al artículo un typo que existe solo en
     el mensaje del agente. Corregir la respuesta, no Notion; cualquier cambio declarado cita el readback fresco.
+64. 🔴 **Pendientes y notas internas nunca en research, plan ni artículo.** Decisión del operador (2026-09-16):
+    la página del Content Hub la ve Berel; research y plan exponen solo evidencia y decisiones. Lo operativo
+    (enlaces que se activan al publicar, fichas por copiar, controles) va en un desplegable aparte
+    `🗒️ Notas internas de producción`, debajo de la versión vigente y redactado de forma profesional.
+65. 🔴 **Ciclo anual sin pillar construida = página propia del año, no reescritura del hub.** Mientras no exista el
+    layout de pillar, un ciclo nuevo de Colores de Temporada nace en `/articulos/colores-de-temporada-AAAA` y la
+    página genérica existente no se toca. Año al inicio de title/H1/slug; nada reutilizado del ciclo anterior;
+    el Color del Año vive en una sola URL; catálogo a `/colores`; sin enlaces a páginas aún no publicadas.
+    Caso y evidencia: módulo 03 y [auditoría 2026-09-16](../../../docs/audits/seo/BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md).
 
 ## Lo que no se toca
 

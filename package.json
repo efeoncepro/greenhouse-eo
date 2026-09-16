@@ -289,6 +289,7 @@
     "public-website:wpcli": "tsx scripts/public-website/wpcli-remote.ts",
     "auth:audit-azure-app": "tsx scripts/auth/audit-azure-app.ts",
     "ai:image": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts",
+    "ai:fal": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/fal-image.ts",
     "ai:image:rmbg": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/remove-bg.ts",
     "tender:new": "node scripts/commercial/new-tender.mjs",
     "tender:canonical-gate": "node scripts/commercial/canonical-tender-gate.mjs",
