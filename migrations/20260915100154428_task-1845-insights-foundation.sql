@@ -689,14 +689,12 @@ DROP SEQUENCE IF EXISTS greenhouse_insights.insight_report_code_seq;
 DROP SCHEMA IF EXISTS greenhouse_insights;
 UPDATE greenhouse_core.capabilities_registry SET deprecated_at = NOW()
   WHERE capability_key IN ('insights.report.read', 'insights.edition.create', 'insights.edition.review', 'insights.edition.issue');
--- Ensayo 2026-09-15 en la instancia compartida: el DELETE del módulo violaba
--- module_assignments_module_key_fkey mientras hubiera una asignación vigente (la org sintética
--- del canary) y la transacción se revertía entera. El rollback retira primero los eventos y las
--- asignaciones de insights_v1 (datos propios del módulo; grader_runs nunca referencia una
--- asignación de Insights). Sólo se edita la sección Down: nunca corrió y el Up no cambia.
-DELETE FROM greenhouse_client_portal.module_assignment_events
-  WHERE assignment_id IN (
-    SELECT assignment_id FROM greenhouse_client_portal.module_assignments WHERE module_key = 'insights_v1'
-  );
-DELETE FROM greenhouse_client_portal.module_assignments WHERE module_key = 'insights_v1';
-DELETE FROM greenhouse_client_portal.modules WHERE module_key = 'insights_v1';
+-- Ensayos 2026-09-15 en la instancia compartida (dos intentos, transacción revertida entera,
+-- base intacta): (1) borrar el módulo violaba module_assignments_module_key_fkey con una
+-- asignación vigente; (2) borrar las asignaciones exige borrar module_assignment_events, que es
+-- append-only por gobernanza (trigger). Decisión: el rollback NO toca el catálogo del módulo ni
+-- sus asignaciones/auditoría (datos gobernados que sobreviven a un rollback); basta con retirar el
+-- schema y deprecar las capabilities: sin schema las rutas no operan y sin capability `can()`
+-- deniega. El Up re-siembra las capabilities (deprecated_at = NULL) y deja el módulo (DO NOTHING),
+-- así que un down/up vuelve exactamente al estado vigente. Sólo se edita la sección Down: nunca
+-- corrió y el Up no cambia.
