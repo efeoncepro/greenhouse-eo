@@ -708,9 +708,14 @@ Checklist concreto cuando el operador pregunta si un worker "se skippeo":
 ```bash
 GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
 
-# Estado + GIT_SHA de los 4 workers, uno por línea. Con --expected-sha marca los que
-# difieren (que NO es lo mismo que drift: ver la tabla de arriba).
+# Estado + GIT_SHA de los 6 recursos Cloud Run (5 services + el Job artifact-worker), uno
+# por línea. Con --expected-sha marca los que difieren (que NO es lo mismo que drift: ver
+# la tabla de arriba). Para el Job muestra Ready, la etiqueta git-sha y la última ejecución.
 pnpm release:workers --expected-sha=<target_sha>
+
+# Último recurso para el Job (no tiene revisiones ni GIT_SHA en env: el SHA es la etiqueta)
+gcloud run jobs describe artifact-worker --project=efeonce-group --region=us-east4 \
+  --format='value(metadata.labels.git-sha)'
 ```
 
 **Por qué acá va un wrapper y no `gcloud` crudo (TASK-1676).** En el release del
@@ -740,6 +745,7 @@ Interpretacion:
 - `ico-batch-worker` con deploy job ejecutado, health OK, `Ready=True` y watchdog synced = NO fue skippeado.
 - `auth-server` (`us-east4`, TASK-1828 / EPIC-044) entra al orquestador desde 2026-09-04 por `auth-server-deploy.yml` (`workflow_call`, change-gated como los demás). Los flags variables por environment deben aparecer en el `env` del paso de deploy: `deploy.sh` publica el conjunto completo con `--set-env-vars`, por lo que una variable no transportada queda en su default. `EXTERNAL_IDENTITY_CANARY_ENABLED` se lee de `vars.*` y conserva default `false`; la revisión servida es el readback. Su `/healthz` es público vía `auth.efeonce.org` y `/readyz` responde 503 si el flag maestro está OFF — eso NO es un deploy fallido.
 - El change-gate de `auth-server` compara el SHA y los valores servidos de `AUTH_SERVER_INTERNAL_AUTH_ENABLED`, `EXTERNAL_IDENTITY_CANARY_ENABLED`, `AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED` y `AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS` contra el GitHub Environment objetivo (TASK-1844; [fases y rollback](../TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md)). Si cambia sólo uno de esos knobs, `deploy_needed=true`; no se debe forzar un cambio de código para transportar configuración.
+- `artifact-worker` (`us-east4`, TASK-1846, desde 2026-09-16) es un Cloud Run **Job**, no un service: entra por `artifact-worker-deploy.yml` (`workflow_call`, change-gated por `WORKER_RUNTIME_PATHS`) como `deploy-artifact-worker`. Sin revisiones ni tráfico: su SHA servido es la etiqueta `metadata.labels.git-sha` y el deploy verifica `Ready=True` + esa etiqueta. Un SHA distinto con diff de árbol completo vacío es change-gate legítimo, igual que `ops-worker`. El Job es único para staging y producción; `INSIGHTS_RENDER_ENABLED` y `ARTIFACT_RENDER_JOBS_ENABLED` quedan ON en él (default `true` en `deploy.sh`) y la puerta de producto por ambiente es el encolado en Vercel.
 - `ops-worker` con workflow que salta deploy por diff runtime y `GIT_SHA` viejo puede ser cierre valido **solo si el diff de árbol completo entre el SHA servido y el target es vacío** (§4.1.1). No forzar redeploy solo para alinear el label — pero tampoco cerrar con el diff acotado a las rutas del gate, que fue el error del release `64bdd105c737`.
 - La recuperacion canonica para drift real es rerun del orquestador para el mismo `target_sha`; si el orquestador esta bloqueado, usar workflow individual como break-glass aprobado. Direct `gcloud run deploy` local es ultimo recurso break-glass y debe quedar documentado con target SHA, revision, verificacion y watchdog final.
 
@@ -880,7 +886,7 @@ curl https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app/contract
 GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json
 ```
 
-Steady state esperado: `drift_count=0` y `4/4 workers synced`.
+Steady state esperado: `drift_count=0` y `6/6 workers synced` (4/4 antes de TASK-1828 y TASK-1846; el denominador sale del allowlist).
 
 Hard rules:
 
@@ -945,6 +951,10 @@ export PREV_OPS_WORKER_REVISION='ops-worker-00174-abc'
 export PREV_COMMERCIAL_COST_WORKER_REVISION='commercial-cost-worker-00098-xyz'
 export PREV_ICO_BATCH_WORKER_REVISION='ico-batch-worker-00045-def'
 export PREV_HUBSPOT_INTEGRATION_REVISION='hubspot-greenhouse-integration-00067-ghi'
+# Cloud Run Job (TASK-1846): SHA de 40 chars servido antes del release, no una revisión.
+# Leerlo ANTES del release con: gcloud run jobs describe artifact-worker --project=efeonce-group \
+#   --region=us-east4 --format='value(metadata.labels.git-sha)'
+export PREV_ARTIFACT_WORKER_SHA='<git-sha de 40 caracteres>'
 ```
 
 ### 5.3. Dry-run primero
@@ -973,6 +983,7 @@ El CLI:
 1. Vercel alias swap: `vercel alias set <PREV_VERCEL_URL> greenhouse.efeoncepro.com`
 2. Cloud Run workers traffic split: per worker, `gcloud run services update-traffic ... --to-revisions=<prev>=100`
 3. HubSpot integration mismo patron
+4. Job `artifact-worker` (si hay `PREV_ARTIFACT_WORKER_SHA`): `gcloud run jobs update artifact-worker --image=us-east4-docker.pkg.dev/efeonce-group/cloud-run-source-deploy/artifact-worker:<sha> --update-labels=git-sha=<sha>`. Un Job no tiene traffic split: se revierte apuntando a la imagen previa (etiquetada con el SHA). Las env vars del Job no cambian con este comando. Verificar después con `pnpm release:workers` que la etiqueta `git-sha` sea la previa.
 
 ### 5.5. Post-rollback verification
 

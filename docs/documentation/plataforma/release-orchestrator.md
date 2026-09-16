@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-09-04 por Claude (release `9100bbd2765d`: primer release con 5 servicios Cloud Run, las dos aprobaciones `Production`, change-gate por servicio)
+> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846: el Cloud Run Job `artifact-worker` entra al orquestador — 6 recursos Cloud Run)
 > **Documentacion tecnica:** [TASK-851](../../tasks/complete/TASK-851-production-release-orchestrator-workflow.md), [CLAUDE.md §Production Release Orchestrator invariants](../../../CLAUDE.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Orquestador de Release a Producción
@@ -38,12 +38,13 @@ workflow_dispatch (operator: target_sha + opcionalmente bypass_reason)
    ├────────────────────────────────────────┤
    │  3. Approval gate (Production env)     │ → required reviewers
    ├────────────────────────────────────────┤
-   │  4. Workers deploy (parallel × 5)      │
+   │  4. Workers deploy (parallel × 6)      │
    │     - ops-worker                       │
    │     - commercial-cost-worker           │ → cada uno verifica GIT_SHA
    │     - ico-batch-worker                 │   matches EXPECTED_SHA
    │     - hubspot-greenhouse-integration   │
    │     - auth-server (TASK-1828)          │
+   │     - artifact-worker JOB (TASK-1846)  │
    ├────────────────────────────────────────┤
    │  5. Wait Vercel READY                  │ → poll API hasta encontrar deploy
    ├────────────────────────────────────────┤
@@ -82,7 +83,7 @@ El orquestador toma decisiones binarias claras en cada job:
 - **Vercel timeout 900s** → abortar
 - **Health soft-fail (exit 78)** → release `degraded` (operador decide rollback o forward-fix), NO aborta el orquestador
 
-Para verificar a mano en qué SHA quedaron los 5 servicios Cloud Run (los 4 workers + `auth-server`, que entró al orquestador con TASK-1828 y se desplegó por primera vez con el release `9100bbd2765d` del 2026-09-04) existe `pnpm release:workers` (con `--expected-sha=<sha>` compara contra el target). Dos de ellos, `ops-worker` y `auth-server`, son *change-gated*: si el release no tocó ninguna ruta de su runtime, el workflow salta el deploy y el servicio conserva el SHA anterior; eso no es drift, y desde ese mismo día el watchdog lo etiqueta como `change-gated` en vez de `DRIFT` (cada servicio change-gated tiene su lista de rutas espejada en el reader y un test de paridad contra el workflow real). Reemplaza el comando `gcloud` crudo que el runbook documentaba, que dejó de funcionar sin que nadie lo notara hasta que un release lo ejecutó.
+Para verificar a mano en qué SHA quedaron los 6 recursos Cloud Run (los 4 workers + `auth-server`, que entró al orquestador con TASK-1828 y se desplegó por primera vez con el release `9100bbd2765d` del 2026-09-04, + el Job `artifact-worker`, que entró con TASK-1846 el 2026-09-16 y se despliega a producción por primera vez en el siguiente release) existe `pnpm release:workers` (con `--expected-sha=<sha>` compara contra el target). Tres de ellos, `ops-worker`, `auth-server` y `artifact-worker`, son *change-gated*: si el release no tocó ninguna ruta de su runtime, el workflow salta el deploy y el servicio conserva el SHA anterior; eso no es drift, y desde ese mismo día el watchdog lo etiqueta como `change-gated` en vez de `DRIFT` (cada servicio change-gated tiene su lista de rutas espejada en el reader y un test de paridad contra el workflow real). El comando `pnpm release:workers` reemplaza al `gcloud` crudo que el runbook documentaba, que dejó de funcionar sin que nadie lo notara hasta que un release lo ejecutó. `artifact-worker` es distinto por ser un *Job* (un proceso que corre por lotes, sin tráfico): no tiene revisiones, su SHA se lee en una etiqueta del Job y, si hay que volver atrás, se apunta el Job a la imagen anterior en vez de mover tráfico.
 
 Desde el hardening 2026-05-11, los workers Cloud Run no hacen production deploy
 automatico por `push:main`. `push:develop` sigue actualizando staging; production
@@ -91,7 +92,7 @@ normal se ejecuta via `workflow_call` dentro de `production-release.yml`.
 
 ## Las dos aprobaciones de `Production`
 
-El environment `Production` se aprueba **dos veces** en cada corrida: la primera libera los 5 servicios Cloud Run, la segunda (que aparece cuando esos deploys terminan) libera los despliegues Azure. Cada una crea un `pending_deployment` distinto, así que aprobar una sola vez deja el release a medio camino. Un detalle que cuesta tiempo si no se sabe: en la API de GitHub (`pending_deployments`) el environment se llama **`Production`, con mayúscula**. Un script que busque `production` en minúscula no encuentra nada y se queda esperando sin error — el 2026-09-04 el primer gate esperó 21 minutos por eso, y el segundo se aprobó en segundos apenas se comparó el nombre sin distinguir mayúsculas. Es la convención contraria a la de Vercel, donde `vercel env add` exige `production` en minúscula; las dos son ciertas, cada una en su API.
+El environment `Production` se aprueba **dos veces** en cada corrida: la primera libera los 6 recursos Cloud Run, la segunda (que aparece cuando esos deploys terminan) libera los despliegues Azure. Cada una crea un `pending_deployment` distinto, así que aprobar una sola vez deja el release a medio camino. Un detalle que cuesta tiempo si no se sabe: en la API de GitHub (`pending_deployments`) el environment se llama **`Production`, con mayúscula**. Un script que busque `production` en minúscula no encuentra nada y se queda esperando sin error — el 2026-09-04 el primer gate esperó 21 minutos por eso, y el segundo se aprobó en segundos apenas se comparó el nombre sin distinguir mayúsculas. Es la convención contraria a la de Vercel, donde `vercel env add` exige `production` en minúscula; las dos son ciertas, cada una en su API.
 
 ## Que mira el gate del batch (y que pasa cuando no mira nada)
 
@@ -176,7 +177,7 @@ Reusa capabilities ya existentes (least-privilege per TASK-848):
 ## Costos
 
 - Workflow run total: ~5-15 min P95 (preflight 1-2min + approval variable + workers 5-10min parallel + vercel wait 1-3min + health 30s + transitions 30s)
-- GitHub Actions minutos: ~30-60 min compute aggregate (1 orchestrator + 5 servicios Cloud Run en paralelo)
+- GitHub Actions minutos: ~30-60 min compute aggregate (1 orchestrator + 6 recursos Cloud Run en paralelo)
 - Vercel API: 30 polls @ 30s = 1 request/30s during wait window
 - GCP API: ~12 gcloud run revisions describe calls per release
 - Sin costos persistentes — el manifest row ocupa <1KB en PG
