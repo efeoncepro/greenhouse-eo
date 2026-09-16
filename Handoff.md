@@ -406,12 +406,12 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
-## 2026-09-03 — EPIC-043: Payroll confiable y operable desde chat
+## 2026-09-15 — TASK-1846: render durable de Insights sobre Artifact Worker
 
-[EPIC-043](docs/epics/to-do/EPIC-043-payroll-reliability-and-agentic-api-parity.md), `to-do`, P0: doce tasks
-TASK-1816–TASK-1827, con contratos y dependencias por unidad. Por instrucción del operador, TASK-731/1214/1215/730
-quedaron `complete` por supersesión documental hacia TASK-1820/1821/1825/1827; sin certificar implementación.
-TASK-1625/ISSUE-129–134 conservan trazabilidad; OAuth TASK-1813 e identidad TASK-1631 son dependencias compartidas.
-Primer paso: plan y ADR acotado de TASK-1816, cálculo atómico/aprobación de versión.
-[Baseline](docs/audits/payroll/PAYROLL_RELIABILITY_API_PARITY_PROGRAM_BASELINE_2026-09-03.md).
-Sólo planificación/documentación; sin código, migraciones, envíos, pagos ni deploy.
+[TASK-1846](docs/tasks/in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md) en `in-progress`
+sobre `develop`. Discovery y auditoría cerrados; plan por slices en checkpoint humano (P1, blast sobre Proposal).
+Sin código. Hallazgos y decisiones abiertas viven en `## Discovery Findings` de la task.
+
+`greenhouse-eo-96` cerró la migración de 1845 (`2ec9073af`, pusheado). Le queda un ensayo `migrate:down`/`up` que
+borra `greenhouse_insights` y las ediciones `EO-INS-000012..15` unos segundos: **no correr `test:live` de Insights
+en esa ventana**; avisa antes por el canal.

@@ -2175,7 +2175,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-1845` | `in-progress` | **Efeonce Insights: dominio, evidencia y adaptadores SEO/AEO/ICO.** EPIC-045; P1/Alto/Alto; backend-data, UI none, backend command. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/in-progress/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md` |
 
-| `TASK-1846` | `to-do` | **Efeonce Insights: render durable y Artifact Worker multiconsumidor.** EPIC-045; P1/Alto/Alto; backend-data, UI none, backend integration. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/to-do/TASK-1846-efeonce-insights-durable-artifact-rendering.md` |
+| `TASK-1846` | `in-progress` | **Efeonce Insights: render durable y Artifact Worker multiconsumidor.** EPIC-045; P1/Alto/Alto; backend-data, UI none, backend integration. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md` |
 
 | `TASK-1847` | `to-do` | **Efeonce Insights: gráficos y catálogos premium para deck e informe vertical.** EPIC-045; P1/Alto/Alto; ui-ux, UI layout, backend none. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/to-do/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md` |
 

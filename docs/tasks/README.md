@@ -50,7 +50,7 @@ TASK-690–693 para Hub/preferencias y TASK-303/387/694 para audiencia/digest/me
 | Task | Resultado | Estado |
 |---|---|---|
 | [TASK-1845](in-progress/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO — code complete y **en producción** (2026-09-15: schema `greenhouse_insights`, lanes app/ecosystem, 4 tools MCP federadas en `efeonce-mcp` 1.5.0, scope Entra, `INSIGHTS_GENERATION_ENABLED` ON en staging+producción, emisión/IA OFF; ediciones `EO-INS-000012/13` staging y `000014` prod); faltan ensayo `migrate:down` y sesión MCP humana | in-progress |
-| [TASK-1846](to-do/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor | to-do |
+| [TASK-1846](in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor — discovery/auditoría cerrados 2026-09-15; plan en checkpoint humano | in-progress |
 | [TASK-1847](to-do/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md) | gráficos y catálogos premium para deck e informe vertical | to-do |
 | [TASK-1848](to-do/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados | to-do |
 | [TASK-1849](to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca, creación y experiencia web compartida | to-do |

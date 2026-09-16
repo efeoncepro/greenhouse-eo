@@ -15,7 +15,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -28,7 +28,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-045`
-- Status real: `Diseno`
+- Status real: `Discovery/audit cerrados 2026-09-15; plan en checkpoint humano (P1). Sin codigo aun.`
 - Rank: `TBD`
 - Domain: `platform|ops|data`
 - Blocked by: `none`
@@ -179,6 +179,53 @@ El Composer es reusable, pero el worker y los render jobs importan Proposal y re
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Discovery Findings — 2026-09-15
+
+Auditoría read-only sobre el runtime real. Cada ítem cita dónde se verificó.
+
+### 1. No existe lease ni fencing — y esta task introduce el riesgo que su acceptance describe
+
+`claimNextRenderJobForExecution` (`render-jobs.ts:674`) hace un claim atómico con `FOR UPDATE SKIP LOCKED` +
+`state='running'` + evento. Es correcto contra claims concurrentes. Pero **no hay `lease_expires_at`, ni fencing
+token, ni heartbeat** en el store ni en la migración (grep sobre `lease|fencing|fence_token|heartbeat`: cero
+coincidencias), y `markRenderJobCompleted` (`render-jobs.ts:541`) sólo valida `expectFromStates: ['running']`
+— no comprueba que quien finaliza siga siendo el dueño del claim.
+
+Consecuencia hoy: **no hay doble ejecución** (nada re-reclama), pero un worker que muere con el job en `running`
+lo deja colgado para siempre. `listExpiredQueuedRenderJobs` (`render-jobs.ts:720`) sólo cubre `queued` con
+deadline vencido, nunca `running` estancado. Es una brecha latente de Proposal, no de Insights.
+
+Consecuencia de diseño: el criterio *"dos workers y un lease vencido no crean dos outputs finales; fencing impide
+finalización vieja"* describe un hazard que **aparece cuando esta task agrega reclamo por lease**. Por lo tanto
+**lease y fencing deben entrar en el mismo slice**; separarlos abre una ventana de doble finalización que hoy no
+existe. Esto reordena el Scope: el fencing no es parte del Slice 3, es parte del Slice 2.
+
+### 2. El worker es un Cloud Run Job, no un servicio
+
+`services/artifact-worker/main.ts` — una ejecución = un artefacto (`tasks=1`, `parallelism=1`, `max-retries=0`);
+el retry es del dominio, no de Cloud Run. El dispatcher sólo hace `jobs.run` sin overrides (evita el permiso
+`run.jobs.runWithOverrides`) y el worker elige por claim. Cualquier diseño de cola para Insights hereda esa forma.
+
+### 3. Puntos de acoplamiento a Proposal, enumerados
+
+En `main.ts`: import de `attachProposalAsset`; import del store completo `proposals/render-jobs`;
+`ownerAggregateType: 'proposal_deliverable'` y `ownerAggregateId: job.proposalId`; `captureWithDomain(…, 'commercial', …)`;
+`isArtifactRenderJobsEnabled()` como flag único; `CATALOGS` con un solo catálogo. Son seis costuras, todas
+reemplazables por un registry de consumers tipado — no hay lógica de negocio Proposal dentro del render.
+
+### 4. Lo que ya está resuelto y no hay que reinventar
+
+State machine (`queued|dispatched|running|completed|failed|dead_letter`), taxonomía de `RenderJobFailureCode`,
+dead-letter por intentos agotados o fallo no reintentable, prioridad por deadline con aging, tabla de eventos
+append-only, drift check byte a byte del manifest. El Slice 1 es generalización, no diseño nuevo.
+
+### 5. Decisiones abiertas para el checkpoint
+
+- **Alcance del lease/fencing**: ¿sólo Insights, o se corrige también Proposal? Corregir ambos cierra una brecha
+  real pero amplía el blast radius de una task que declara "preservar Proposal".
+- **`plan.limits` duplicado**: el dedupe está asignado acá (arquitectura §14.3); confirmar si entra como slice
+  propio o como parte del Slice 1.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
