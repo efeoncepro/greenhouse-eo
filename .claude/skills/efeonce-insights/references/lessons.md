@@ -1,5 +1,11 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-16 · A cold Job start makes the dispatcher launch twice for one output.** Production canary: the Job took
+  ~2 min to start, so the next 2-min tick (22:14) still saw the `deck_pdf` output `queued` and launched a second
+  execution after the 22:12 one. Only one finalized (atomic claim + fencing); the other found no work. Rule: count
+  executions per output as "≥1", never "exactly 1"; integrity lives in claim + fence, not in the dispatcher. Two Job
+  executions for one output after a cold start are expected, not a double render — do not retry or cancel. If the
+  cost ever matters, the fix is for the dispatcher to account for Job executions still running before launching.
 - **2026-09-16 · A hand-launched canary hid the dispatcher's missing flag.** The 13:00Z render canary executed the
   `artifact-worker` Job manually and passed; the `ops-worker` dispatcher did not have `INSIGHTS_RENDER_ENABLED`
   (logs 13:02Z `insightsQueued=0` with an output queued), so nothing would have drained on its own. Rule: a canary

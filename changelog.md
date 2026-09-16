@@ -16,6 +16,14 @@ valor caro por defecto de algunos proveedores. También dejó de guardar archivo
 ai:image` valida tamaño, fondo y formato antes de llamar a OpenAI, permite elegir PNG, JPEG o WebP, y muestra el
 costo estimado con la fórmula oficial. Guía, catálogo, manuales y skills quedaron al día.
 
+## 2026-09-16 — Efeonce Insights ya entrega decks en producción
+
+El render de Insights quedó en producción: una edición pedida por API o MCP produce su deck descargable sin
+intervención, y el gateway de MCP de Efeonce ya expone las cuatro herramientas de render. El release llevó por primera
+vez al orquestador de producción un Cloud Run Job, el worker de render, que el watchdog y el rollback ya saben leer.
+La prueba final en producción siguió el camino real: el despacho automático lanzó el worker y el deck quedó listo al
+primer intento. Emitir la edición al cliente sigue apagado y es el siguiente paso de EPIC-045.
+
 ## 2026-09-16 — Efeonce Insights renderiza solo en staging y el worker de render entra al release
 
 El render de Insights ya funciona de punta a punta en staging sin intervención: se encarga por API o MCP, el despacho
@@ -891,32 +899,3 @@ Asignación Claude/Codex documentada en EPIC-022/045/046: modelo, esfuerzo y rev
 Astra para fronteras críticas, Sol para integración, Opus para UI/editorial y Fable para TASK-1669.
 Reglas comunes en EPIC-046: un editor por archivos, continuidad de owner y sin ejecución/rollout implícitos.
 Commit completo autorizado: incluye el movimiento previo de TASK-1690 a in-progress; lifecycle, registro y README conciliados, sin avance de implementación.
-
-## 2026-09-08 — GPT Image 2.5 entra a la doc como capacidad de proveedor, no como camino disponible
-
-OpenAI publicó `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare`. La matriz de capacidades, la spec del
-generador visual, el doc operativo, el ledger de la flota Globe y cuatro skills espejadas quedaron al
-día contra la doc oficial, no contra la prensa.
-
-Lo que cambia el trabajo real: OpenAI declara que **la calculadora de GPT Image 2 no estima el consumo
-de 2.5** y que tarifas por token iguales no implican costo por imagen igual. Eso rompe la estimación
-previa al gasto — el compiler de Globe reserva créditos ANTES de generar, y con 2.5 esa reserva no
-tiene fuente documentada. Quedó registrado como bloqueador de integración, no como detalle de pricing.
-Tampoco hay Batch ni rate limits publicados, así que `gpt-image-2` no se retira.
-
-Se documentaron dos trampas silenciosas del helper local, verificadas leyendo el código: por env var,
-`OPENAI_IMAGE_MODEL=gpt-image-2.5-*` no pasa el allowlist y cae a `gpt-image-2` sin avisar; por flag
-CLI, `--model` se castea sin validar, así que el modelo sí viaja pero la resolución se degrada a la
-rama legacy y se inyecta `input_fidelity`, que la guía de OpenAI excluye de Sunburst y Flare.
-
-Inventariando el dominio apareció un tercer defecto de la misma forma: `DEFAULT_IMAGE_PROVIDER` apunta
-a `imagen-4.0-generate-001`, que la arquitectura declara bloqueado. `TASK-1850` se creó y se supersedió
-el mismo día por `TASK-1851`, que toma el contrato entero: partirlo habría dejado el mismo archivo con
-dos dueños y el mismo invariante declarado en dos lugares. El hallazgo del auditor de flags —ciego a
-`ENABLE_ASSET_GENERATOR` porque su patrón exige sufijo `_ENABLED` y éste lleva prefijo `ENABLE_`— NO
-generó task: `TASK-1782` ya posee ese bug class y recibió un Delta. `TASK-278` recibió otro: sus
-entregables existen en el repo con 0 de 11 criterios tildados.
-
-También quedó por escrito lo que 2.5 NO mejora: OpenAI no afirma mejora de tipografía ni de texto
-multilingüe, las cuatro limitaciones declaradas siguen vigentes, y el system card mide una mejora de
-seguridad sin significancia estadística con Abuse peor que 2.0.

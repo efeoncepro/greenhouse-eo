@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846, render vivo en staging, benchmark y canary)
+> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846 complete: render en producción y canary productivo)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -108,7 +108,7 @@ lectura con el scope base `efeonce.mcp.read`; `create_insight_edition` exige la 
 `insufficient_scope` hasta un consentimiento/grant gobernado. Canary de lectura del gateway:
 `scripts/greenhouse-insights-canary.mjs` en el repo `efeonce-mcp` (nunca crea).
 
-## Pedir el render de una edición (TASK-1846 — vivo en staging, pendiente en producción)
+## Pedir el render de una edición (TASK-1846 — vivo en staging y producción desde 2026-09-16)
 
 Cuando una edición está en `ready_for_review`, se puede encargar su **deck PDF**. El encargo es
 asíncrono: la respuesta es un `run` con un `output` por target en cola; el archivo lo produce el
@@ -153,24 +153,42 @@ y Insights espera al siguiente.
 
 No consultar el run en bucle cerrado: con esta cadencia, una consulta cada 30–60 s basta.
 
-### Estado por runtime (2026-09-16)
+### Estado por runtime (2026-09-16, tras el release)
 
 `INSIGHTS_RENDER_ENABLED` se lee en **tres** runtimes y debe estar ON en los tres:
 
 | Runtime | Rol | Estado |
 | --- | --- | --- |
 | Vercel `staging` | encolar | **ON** |
-| Vercel Production | encolar | **OFF** (la variable no existe): en producción el encargo responde `503 render_disabled` |
+| Vercel Production | encolar | **ON** desde 2026-09-16 (redeploy `greenhouse-d6l33zils`) |
 | Cloud Run Job `artifact-worker` | reclamar y renderizar | ON (default `true` en su `deploy.sh`) |
 | Cloud Run `ops-worker` | dispatcher | ON desde la revisión `ops-worker-00690-xhl` (default `true` en su `deploy.sh`) |
 
 El Job y el `ops-worker` son **únicos** para staging y producción: la puerta por ambiente es el encolado en Vercel.
 El bucket de assets del Job está fijo en `efeonce-group-greenhouse-private-assets-staging` (cada asset guarda su
-`bucket_name`). Las 4 tools de render están en el gateway `efeonce-mcp` v1.6.0 (mergeado, **no desplegado**).
+`bucket_name`). Las 4 tools de render están en el gateway `efeonce-mcp` v1.6.0, **desplegado el 2026-09-16** (revisión
+`efeonce-mcp-gateway-00054-n78`, 51 tools). El Job recibió su primer deploy productivo con el release `917491fd02e4`
+(change-gated por el control plane). `INSIGHTS_ISSUANCE_ENABLED` sigue OFF.
 
-Orden pendiente para producción (no ejecutado): release de Greenhouse (primer deploy productivo del Job) →
-`vercel env add INSIGHTS_RENDER_ENABLED production` + `vercel redeploy` → deploy del gateway v1.6.0 → canary
-productivo sobre la org sintética. `INSIGHTS_ISSUANCE_ENABLED` sigue OFF.
+**Doble ejecución en frío (comportamiento conocido).** Si el Job arranca en frío (~2 min), el tick siguiente del
+dispatcher puede ver el output todavía `queued` y lanzar una segunda ejecución. Sólo una lo reclama y finaliza
+(claim atómico + fencing); la otra termina sin trabajo. No es un output duplicado ni un fallo: no reintentar ni
+cancelar por ver dos ejecuciones del Job para un mismo output.
+
+### Canary de render en producción (receta usada el 2026-09-16)
+
+Por el lane ecosystem, con el token consumer del gateway y la org sintética «Greenhouse Demo» (misma receta de
+credenciales que «Canary por lane ecosystem»):
+
+1. `POST /api/platform/ecosystem/insights/editions` → `202` (edición `ready_for_review`).
+2. `POST /api/platform/ecosystem/insights/editions/<editionId>/render` → `202` con el run (`requestedByKind: member`)
+   y un output `deck_pdf` `queued`.
+3. **Esperar al dispatcher** (no lanzar el Job a mano) y consultar `GET …/render-runs/<renderRunId>` cada 30–60 s
+   hasta `completed` con `outputAssetId`. El 2026-09-16: `deck_pdf` `completed` al primer intento, render
+   22:14:46→22:14:52Z.
+4. Negativo: pedir `outputs: ["web"]` → `422 render_rejected`, sin encolar.
+5. Gateway: en el repo `efeonce-mcp`, `scripts/greenhouse-insights-canary.mjs --render-run` → catalog (renderable=1),
+   list, render run `completed` y deny `404` verdes.
 
 ### Canary de render en staging (receta usada el 2026-09-16)
 

@@ -63,7 +63,7 @@ runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-0
 | Composer | `src/lib/artifact-composer/manifest-hash.ts` | `hashResolvedManifest` domain-free (re-exported by Proposal `render-jobs.ts`) |
 | Worker | `services/artifact-worker/consumer-contract.ts`, `consumers/{proposal,insights,index}.ts`, `main.ts` | registry dispatch; `INSIGHTS_RENDER_ENABLED` in `deploy.sh` (+ `deploy-contract.test.ts`) |
 | Lanes | `src/lib/api-platform/resources/{app,ecosystem}-insights.ts` + routes `…/insights/editions/[editionId]/render`, `…/insights/render-runs/[renderRunId]{,/retry,/cancel}` | request/list/get/retry/cancel |
-| MCP | `src/mcp/greenhouse/{tool-manifest,server,tools,http-client}.ts` | 4 render tools (federated in gateway v1.6.0, not deployed) |
+| MCP | `src/mcp/greenhouse/{tool-manifest,server,tools,http-client}.ts` | 4 render tools (federated in gateway v1.6.0, deployed 2026-09-16) |
 | Reliability | `src/lib/reliability/queries/insights-render-orphaned.ts` (`insights.render.orphaned_output`) | orphan detection, steady 0 |
 | Asset context | `insight_output` (`src/types/assets.ts`, retention `commercial_engagement_report`) | system-generated, not a draft upload |
 | Dispatcher | `src/lib/efeonce-insights/render/dispatch.ts` | decides whether Insights launches the Job this tick (after Proposal); reads `INSIGHTS_RENDER_ENABLED` |
@@ -71,5 +71,5 @@ runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-0
 | Job launcher | `src/lib/render-dispatch/job-runner.ts` | domain-free Cloud Run Job execution launcher |
 | Worker consumer | `services/artifact-worker/consumers/insights.ts` | claim + render + upload for Insights outputs; Job `parallelism=1`; assets bucket fixed to staging bucket, `bucket_name` per row |
 | Migration | `20260916201127095_task-1846-insights-render-client-user-actor` | runs/events accept `client_user`; human actor on run, enqueue event, retry, cancel |
-| Gateway | `efeonce-mcp` v1.6.0 (PR #14 `da8295a`, 51 tools) | 4 render tools federated; writes need `efeonce.mcp.insights.write`; merged, not deployed |
-| Release plane | artifact-worker Job in the production release control plane | first productive deploy on the next release |
+| Gateway | `efeonce-mcp` v1.6.0 (PR #14 `da8295a`, 51 tools) | 4 render tools federated; writes need `efeonce.mcp.insights.write`; deployed 2026-09-16 (revision `00054-n78`) |
+| Release plane | artifact-worker Job in the production release control plane | first productive deploy in release `917491fd02e4` (2026-09-16, change-gated) |

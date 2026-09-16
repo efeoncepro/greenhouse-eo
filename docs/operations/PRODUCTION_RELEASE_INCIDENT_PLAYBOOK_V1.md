@@ -1,9 +1,9 @@
 # Production Release Incident Playbook V1
 
 > **Tipo de documento:** Playbook operativo canónico
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-05-12 por Claude Opus 4.7 (post incidente TASK-870)
-> **Ultima actualizacion:** 2026-09-15 por Claude (anti-pattern #21 cambiar la forma de un comando ya autorizado; caso positivo `9c094688309d`)
+> **Ultima actualizacion:** 2026-09-16 por Claude (caso positivo `917491fd02e4`: primer Cloud Run Job en el orquestador)
 > **Audience:** Cualquier agente AI (Claude, Codex, Cursor) y operadores humanos que enfrenten un `Production Release Orchestrator` fallando
 
 ---
@@ -925,6 +925,25 @@ Lo nuevo, en orden de costo:
 
 Fases y números: `PRODUCTION_RELEASE_TIMING_LEDGER.md`, fila 2026-09-15. Comandos exactos: runbook §2.4 →
 Delta 2026-09-15 y §4.3.
+
+## Caso positivo 2026-09-16 — el primer Cloud Run Job del orquestador, y sin bloqueos del clasificador
+
+El release `917491fd02e4e2dac5ec1668192de59bdd6b20dd` (PR #237 squash: TASK-1846 render durable de Efeonce Insights;
+run `35154555317`; manifest `917491fd02e4-9231b87b-20da-43c3-abce-4348dccdda99` `released` `22:02:41Z`, **12m20s** de
+workflow) cerró en **un solo run, sin retry**, con el **primer Cloud Run Job** (`artifact-worker`) desplegado por
+`workflow_call`. Agente E2E ~1h40m, casi todo espera de CI.
+
+- **El Job se verificó igual que un service, por su contrato propio:** `pnpm release:workers` y el watchdog leyeron la
+  etiqueta `git-sha` (6/6 synced); quedó change-gated en `f6551157e` con diff de árbol completo sólo en
+  `Handoff.md`/`project_context.md` (§13/§20). Integrarlo exigió en el mismo PR allowlist
+  (`cloudRunResourceKind: 'job'`), espejo de change-gate y test de paridad allowlist ↔ orquestador (§18).
+- **Autorización completa por adelantado y forma suelta de cada mutación (§19/§21):** merge, dispatch, los dos POST de
+  gates, `vercel env add … production` y `vercel redeploy` pasaron a la primera. Cero minutos perdidos en el clasificador.
+- **Canary de contrato por el camino real, no por un atajo:** render `202` por el lane ecosystem → el dispatcher del
+  `ops-worker` lanzó el Job solo → `completed` al primer intento. En staging, el primer canary se había lanzado a mano y
+  eso escondió que el dispatcher no leía el flag: **un canary que usa un atajo prueba el atajo, no el producto**.
+- Observado: con arranque en frío (~2 min) el dispatcher lanzó dos ejecuciones para un output; el claim atómico y el
+  fencing lo absorbieron. Fases y números: `PRODUCTION_RELEASE_TIMING_LEDGER.md`, fila 2026-09-16.
 
 ## Decisión: ¿cuándo eliminar / relajar el preflight?
 

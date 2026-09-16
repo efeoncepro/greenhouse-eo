@@ -52,6 +52,9 @@ it without repeating what already cost a day*. It grows with every task: see the
   (Vercel to queue, the `ops-worker` dispatcher that launches the Job, the `artifact-worker` Job to claim) and must
   be ON in all three. Job and ops-worker are single instances shared by staging and production: the per-environment
   product gate is the Vercel enqueue, never a lane-dependent Job config. Throughput is 1 output per 2-min tick.
+  Live in staging AND production since 2026-09-16 (release `917491fd02e4`, flag ON in the three runtimes, gateway
+  v1.6.0). A cold Job start can make the dispatcher launch TWO executions for one output; claim + fencing let only
+  one finalize — expected, not a double render.
 - **Three access planes on every command** (`authz.ts`): module `insights_v1` assigned per organization
   + capability `insights.*` + audience. An organization without the module is `not_found` (404
   anti-oracle), never `403`. Clients see evidence/plan only of issued editions.

@@ -831,9 +831,9 @@ Diferencias de un Job frente a un service, que cambian cómo se verifica y se re
   también `INSIGHTS_RENDER_ENABLED` (default `true`) para que el dispatcher `/artifact-render/dispatch` drene la cola
   de Insights.
 
-Consecuencia operativa: los runtimes con env vars independientes pasan a **7** (Vercel + 6 Cloud Run). Estado: code
-complete en `develop`; nada desplegado a producción todavía — el primer deploy productivo del Job ocurre en el
-próximo release.
+Consecuencia operativa: los runtimes con env vars independientes pasan a **7** (Vercel + 6 Cloud Run). Estado: en producción — el primer deploy productivo del Job ocurrió en el release `917491fd02e4` (2026-09-16,
+manifest `917491fd02e4-9231b87b-20da-43c3-abce-4348dccdda99` `released` en un intento), change-gated: sirve
+`f6551157e`, cuyo árbol difiere del target sólo en `Handoff.md`/`project_context.md`.
 
 ## Delta 2026-09-04 — Release `9100bbd2765d`: primer release con 5 servicios, change-gate por servicio en el watchdog y gate `Production` case-sensitive
 
@@ -1311,7 +1311,7 @@ arquitectura/runbooks/docs vivas aplicables.
 1. `preflight` — `pnpm release:preflight --json --fail-on-error`. `bypass_preflight_reason >=20 chars` → `--override-batch-policy` flag pass-through. Artifact `preflight-result.json` para audit.
 2. `record-started` — `pnpm release:orchestrator-record-started` (CLI Slice 0) → `release_id` stdout. Auth WIF + Cloud SQL Connector. Emite outbox `platform.release.started v1` + audit row en misma tx.
 3. `approval-gate` — `environment: production` (required reviewers en repo settings). Timeout 3 dias.
-4. `deploy-{ops-worker, commercial-cost-worker, ico-batch, hubspot-integration, auth-server, artifact-worker}` — parallel matrix `uses: ./.github/workflows/<worker>-deploy.yml@<sha>` con `expected_sha` + `environment` inputs (`deploy-auth-server` desde TASK-1828, 2026-09-04; primer release con los 5: `9100bbd2765d`; `deploy-artifact-worker` — Cloud Run Job — desde TASK-1846, 2026-09-16, su primer deploy productivo ocurre en el siguiente release).
+4. `deploy-{ops-worker, commercial-cost-worker, ico-batch, hubspot-integration, auth-server, artifact-worker}` — parallel matrix `uses: ./.github/workflows/<worker>-deploy.yml@<sha>` con `expected_sha` + `environment` inputs (`deploy-auth-server` desde TASK-1828, 2026-09-04; primer release con los 5: `9100bbd2765d`; `deploy-artifact-worker` — Cloud Run Job — desde TASK-1846, 2026-09-16, su primer deploy productivo ocurrió en el release `917491fd02e4`, 2026-09-16, change-gated).
 5. `wait-vercel` — poll Vercel API `/v6/deployments?target=production` hasta encontrar deployment con `meta.githubCommitSha === target_sha` y `state=READY`. Timeout 900s.
 6. `post-release-health` — ping `https://greenhouse.efeoncepro.com/api/auth/health`. Soft-fail (exit 78) → release `degraded` en lugar de `aborted`.
 7. `transition-released` — 4 state machine transitions (`preflight→ready→deploying→verifying→released|degraded`) via CLI Slice 0. Si post-release-health success → `released`, sino → `degraded`.

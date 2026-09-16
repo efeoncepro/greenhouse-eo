@@ -5,7 +5,7 @@
 | Flag | Gates | Read in | State 2026-09-16 |
 | --- | --- | --- | --- |
 | `INSIGHTS_GENERATION_ENABLED` | create / revise / evidence collection | Vercel only (`flags.ts`) | ON staging + Production; Preview OFF |
-| `INSIGHTS_ISSUANCE_ENABLED` | issue (plus human gate and validated outputs) | Vercel | OFF everywhere (until TASK-1846) |
+| `INSIGHTS_ISSUANCE_ENABLED` | issue (plus human gate and validated outputs) | Vercel | OFF everywhere (render is live since 2026-09-16; turning issuance on is a product decision) |
 | `INSIGHTS_AUTHORING_AI_ENABLED` | Gemini rewrite of the plan | Vercel | OFF everywhere |
 
 Flip = `vercel env add <FLAG> <env>` (`production` lowercase for the standard env; custom `staging` literal) **+
@@ -58,11 +58,18 @@ flag, 202 after.
   --update-env-vars` AND keep it in `deploy.sh`. Vercel: `vercel env add` + redeploy.
 - Job and ops-worker are SINGLE for staging and production. The per-environment product gate is the Vercel enqueue.
   The Job's assets bucket is fixed to `efeonce-group-greenhouse-private-assets-staging` (assets store `bucket_name` per row).
-- State 2026-09-16: Vercel staging ON · Vercel Production OFF (absent) · Job ON · ops-worker ON (revision
-  `ops-worker-00690-xhl`). The Job is in the production release control plane; first productive deploy on next release.
-- Production rollout order (NOT executed): Greenhouse release → `vercel env add INSIGHTS_RENDER_ENABLED production` +
-  `vercel redeploy` → deploy gateway `efeonce-mcp` v1.6.0 (merged, PR #14) → production canary on the synthetic org →
-  only then consider `INSIGHTS_ISSUANCE_ENABLED` (OFF).
+- State 2026-09-16 (after release `917491fd02e4`): Vercel staging ON · Vercel Production ON (redeploy
+  `greenhouse-d6l33zils`) · Job ON (first productive deploy by the release control plane, change-gated) · ops-worker ON
+  (revision `ops-worker-00690-xhl`) · gateway `efeonce-mcp` v1.6.0 deployed (revision `00054-n78`, 51 tools).
+  `INSIGHTS_ISSUANCE_ENABLED` stays OFF.
+- Production canary (executed 2026-09-16): ecosystem lane with the gateway consumer token on the synthetic org →
+  create 202 → `POST …/editions/<id>/render` 202 → wait for the dispatcher (never launch the Job by hand) → poll
+  `GET …/render-runs/<id>` every 30–60 s until `completed` with `outputAssetId` → negative `outputs:["web"]` → 422
+  `render_rejected`. Gateway side: `scripts/greenhouse-insights-canary.mjs --render-run` in `efeonce-mcp`
+  (catalog, list, render run, deny 404).
+- Cold start double execution: with a cold Job (~2 min) the next dispatcher tick still sees the output `queued` and
+  launches a second execution; only one claims/finalizes (atomic claim + fencing), the other exits with no work.
+  Harmless; do not retry or cancel because of it.
 - Throughput (Cloud Run staging 2026-09-16): 1 output per 2-min tick (one execution per tick, `parallelism=1`; Proposal
   wins the tick). A burst of N ≈ 2·N min. Render 6.3–7.3 s, PDF ~330 KB; execution start 3.9 s warm / 42 s first after
   deploy / 154 s cold; task total 50–58 s. Local: 15 slides ~4.6 s, 25 slides ~7.2 s, RSS ≤ 365 MB.

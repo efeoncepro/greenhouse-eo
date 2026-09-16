@@ -429,11 +429,11 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
-## 2026-09-16 — TASK-1846: render durable — staging verificado, producción espera el release
+## 2026-09-16 — TASK-1846 COMPLETE: render durable de Efeonce Insights en producción
 
-[TASK-1846](docs/tasks/in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md) sigue `in-progress`
-sólo por producción. Staging verificado: flag ON en Vercel staging, Job y `ops-worker-00690-xhl` (el dispatcher no
-lo leía; corregido en `d9da99df8`), benchmark 1 output por tick de 2 min, auditoría `client_user` (`1875fdd32`).
-Job en el release control plane; gateway `efeonce-mcp#14` mergeado sin desplegar. **Pendiente (tras autorizar
-release):** release develop→main, `INSIGHTS_RENDER_ENABLED` en Vercel Production + redeploy, deploy del gateway
-v1.6.0 y canary productivo en la org sandbox. Evidencia: la task y la skill `efeonce-insights`.
+Release `917491fd02e4` (PR #237, run `35154555317`, manifest `917491fd02e4-9231b87b-20da-43c3-abce-4348dccdda99`
+`released` 22:02:41Z, un solo intento; watchdog `ok` 6/6, primer Job `artifact-worker` en el orquestador).
+`INSIGHTS_RENDER_ENABLED` ON en Vercel Production (redeploy `greenhouse-d6l33zils`) + Job + `ops-worker`. Gateway
+`efeonce-mcp` v1.6.0 desplegado (`00054-n78`). Canary productivo: render `202` → dispatcher automático → `completed`.
+Siguiente de EPIC-045: `INSIGHTS_ISSUANCE_ENABLED` sigue OFF; `report_pdf`/`web` en TASK-1847/1848. Detalle: la task
+(complete), ledgers de flags y tiempos, y la skill `efeonce-insights`.

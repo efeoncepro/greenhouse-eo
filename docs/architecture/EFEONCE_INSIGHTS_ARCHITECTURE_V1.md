@@ -560,7 +560,7 @@ greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en s
 - **El cliente ve `evidence`/`plan` `null` hasta emitir.** Desde 2026-09-16 `InsightOutputsPort` está conectado
   (TASK-1846): `issue` ya no falla por "puerto sin conectar" sino por **outputs sin completar** (`not_ready` con
   `missing`/`pending`); `renderableOutputs` del catálogo declara `deck_pdf`. Ninguna edición se ha emitido aún:
-  el render está **vivo en staging y pendiente en producción** (§14.5, delta 2026-09-16).
+  el render está **vivo en staging y en producción** desde 2026-09-16 (§14.5, delta de producción).
 - **`create_insight_edition` por el gateway responde `insufficient_scope`** hasta que un consentimiento/grant
   gobernado otorgue `efeonce.mcp.insights.write` a un cliente; el cliente PKCE compartido no se tocó.
 - `plan.limits` repite «ico: sin datos.» una vez por rechazo en el plan CONGELADO (fiel al snapshot); el render lo deduplica (TASK-1846, `render/plan-limits.ts`) sin tocar el plan ni su hash.
@@ -604,11 +604,11 @@ greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en s
 - **SIEMPRE** que se agregue una tool MCP interna, federarla en `efeonce-mcp` (provider + paridad + política de
   autoridad nativa + scope si escribe) y verificar el gateway construido; registrar una tool aquí no la publica.
 
-### 14.5 Estado de TASK-1846 — render durable (2026-09-16, vivo en staging, rollout productivo pendiente)
+### 14.5 Estado de TASK-1846 — render durable (complete 2026-09-16, en producción)
 
-> Los párrafos siguientes describen el cierre del código; el estado de runtime vigente (flag en tres runtimes,
-> worker desplegado en staging, benchmark medido) está en el **Delta 2026-09-16** al final de esta sección y
-> prevalece sobre las menciones a "sin deploy" o "flag OFF".
+> Los párrafos siguientes describen el cierre del código; el estado de runtime vigente está en el **Delta
+> 2026-09-16 — producción** al final de esta sección y prevalece sobre las menciones a "sin deploy", "flag OFF"
+> o "pendiente en producción" de los bloques anteriores, que se conservan como historia del staging.
 
 **Existe en código (develop):**
 - Schema: `insight_render_runs` (solicitud por edición), `insight_outputs` (unidad reclamable por target, UNIQUE
@@ -625,12 +625,13 @@ greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en s
 duplica; cancelación no miente; SQL de señal y de encolado), 1006 unitarios, `composer:visual-gate` 61 frames a
 cero píxeles (Proposal intacto), `pnpm test` completo y `pnpm build` de producción con estos cambios en el árbol.
 
-**NO hecho / límites honestos:** target `web` y catálogo A4 (1847/1848); descarga autorizada del asset (1848); nada
-corre en producción (ver delta); el defecto visual del slot `unit` de `MetricsSplit` es anterior y afecta decks ya entregados (issue aparte).
+**NO hecho / límites honestos:** target `web` y catálogo A4 (1847/1848); descarga autorizada del asset (1848); el render
+corre en producción desde 2026-09-16 (ver delta de producción); el defecto visual del slot `unit` de `MetricsSplit` es anterior y afecta decks ya entregados (issue aparte).
 
 #### Delta 2026-09-16 — runtime real, benchmark en Cloud Run y auditoría del actor
 
-> Estado honesto: **vivo en staging, pendiente en producción**. Nada de lo que sigue corre aún en producción.
+> Estado al escribir este bloque: vivo en staging, pendiente en producción. **Superado** por el delta de producción
+> al final de la sección: hoy todo lo que sigue corre también en producción.
 
 **Runtime de despacho (verificado en código y en staging).** El artifact-worker es un Cloud Run **Job**, no un
 servicio que escucha la cola: lo lanza el dispatcher `src/lib/efeonce-insights/render/dispatch.ts`, invocado por
@@ -638,16 +639,16 @@ el `ops-worker` en `/artifact-render/dispatch` desde Cloud Scheduler `ops-artifa
 minutos**. El lanzador del Job es domain-free (`src/lib/render-dispatch/job-runner.ts`). En un mismo tick Proposal
 tiene prioridad: si Proposal lanzó una ejecución, Insights espera al tick siguiente. El consumer Insights del Job
 es `services/artifact-worker/consumers/insights.ts`. El Job quedó integrado al release control plane de producción;
-su primer deploy productivo ocurre en el próximo release. El bucket de assets del Job está fijo en `staging`
+su primer deploy productivo ocurrió en el release `917491fd02e4` del 2026-09-16 (change-gated). El bucket de assets del Job está fijo en `staging`
 (`efeonce-group-greenhouse-private-assets-staging`); cada asset guarda `bucket_name` por fila, así que un cambio de
 bucket no rompe la lectura de assets previos.
 
-**Flag en tres runtimes — estado vivo 2026-09-16:**
+**Flag en tres runtimes — estado vivo 2026-09-16 (tras el release; staging y producción):**
 
 | Runtime | Rol | Estado |
 |---|---|---|
 | Vercel `staging` | encolar (`requestInsightRender`) | ON |
-| Vercel Production | encolar | OFF (la variable no existe) |
+| Vercel Production | encolar | ON desde 2026-09-16 (redeploy `greenhouse-d6l33zils`) |
 | Cloud Run Job `artifact-worker` | reclamar y renderizar | ON (default `true` en `deploy.sh`) |
 | Cloud Run `ops-worker` | dispatcher | ON desde la revisión `ops-worker-00690-xhl` (default `true` en `deploy.sh`) |
 
@@ -659,7 +660,7 @@ a mano y ocultó la falta: los logs del dispatcher de las 13:02Z muestran `insig
 422 (hoy sólo `deck_pdf` es renderizable; `report_pdf` → TASK-1847, `web` → TASK-1848) y 404 anti-oráculo. Cuatro
 tools MCP (`request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render`).
 Gateway `efeonce-mcp`: PR #14 mergeado (`da8295a`), v1.6.0, 51 tools, escrituras con scope
-`efeonce.mcp.insights.write`; **no desplegado** (el deploy del gateway va después del release de Greenhouse).
+`efeonce.mcp.insights.write`; **desplegado en producción el 2026-09-16** (revisión `efeonce-mcp-gateway-00054-n78`).
 
 **Auditoría del actor.** Migración `20260916201127095_task-1846-insights-render-client-user-actor` (expand,
 aplicada): runs y eventos aceptan `client_user`, y el actor humano viaja al run, al evento de encolado, al retry y
@@ -684,6 +685,33 @@ Benchmark **local** previo: 15 láminas 4,44–4,72 s (RSS 300–328 MB, PDF 5,4
 355–365 MB, PDF 12,6 MB); ráfaga 5×15 en 23,3 s. No medido: A4 de 10/30 páginas (TASK-1847) ni la competencia de
 cola con Proposal activo (por diseño Proposal gana el tick).
 
-**Pendiente (no verificado):** release de Greenhouse a producción → `vercel env add INSIGHTS_RENDER_ENABLED
-production` + redeploy → deploy del gateway v1.6.0 → canary productivo. `INSIGHTS_ISSUANCE_ENABLED` sigue OFF.
-Los huérfanos en `running` sin lease requieren decisión humana (señal `insights.render.orphaned_output`, steady 0).
+**Pendiente al escribir este bloque** (hecho en el delta siguiente): release, flag en Vercel Production, gateway y
+canary productivo. Los huérfanos en `running` sin lease requieren decisión humana (señal
+`insights.render.orphaned_output`, steady 0).
+
+#### Delta 2026-09-16 — producción
+
+- **Release:** PR #237 → `main` `917491fd02e4`, orquestador run `35154555317`, manifest
+  `917491fd02e4-9231b87b-20da-43c3-abce-4348dccdda99` `released` 22:02:41Z en un intento (break-glass planificado:
+  las migraciones Insights ya estaban aplicadas; `cloud_release`). **Primer deploy productivo del Cloud Run Job
+  `artifact-worker`** vía `deploy-artifact-worker`, change-gated (sirve `f6551157e`: su árbol difiere del target sólo
+  en `Handoff.md`/`project_context.md`). Watchdog `ok` 6/6 synced.
+- **Flag:** `INSIGHTS_RENDER_ENABLED=true` en Vercel Production (leído con `vercel env pull`) + redeploy
+  `greenhouse-d6l33zils` aliased a `greenhouse.efeoncepro.com`. Job y `ops-worker` ya lo tenían ON. Queda **ON en
+  los tres runtimes lectores, en staging y producción** (tabla de arriba). `pnpm flags:audit --strict`: 0 flags ON
+  en Production sin código en `main`, 0 con lector distinto.
+- **Gateway:** `efeonce-mcp` v1.6.0 desplegado (run `35156353046`, revisión `efeonce-mcp-gateway-00054-n78` al 100 %,
+  `/health` ok, 51 tools).
+- **Canary productivo** (lane ecosystem con el token consumer del gateway, org sandbox `Greenhouse Demo`): create
+  `202` (`insed-83c23534…`) → `POST …/render` `202` (run `irun-e275767b-a6a8-4587-9579-d9bbba713181`,
+  `requestedByKind: member`) → el dispatcher del `ops-worker` lanzó el Job solo → `deck_pdf` `completed` al primer
+  intento (render 22:14:46→22:14:52Z, asset `asset-acf726a0-3c02-4172-b0cd-1141468a8a97`); pedir `web` → `422
+  render_rejected`. Canary del provider en `efeonce-mcp` (`scripts/greenhouse-insights-canary.mjs --render-run`):
+  catalog (renderable=1), list, render run `completed` y deny `404` verdes.
+- **Comportamiento conocido — doble ejecución en frío:** con el Job en frío (~2 min de arranque) el dispatcher lanzó
+  **dos ejecuciones para un solo output** (ticks 22:12 y 22:14): la primera aún no había reclamado cuando llegó el
+  tick siguiente, que vio el output todavía en cola. Una sola finalizó (claim atómico `FOR UPDATE SKIP LOCKED` +
+  fencing) y la otra no encontró trabajo y terminó. Inocuo para la integridad; costo menor (una ejecución de Job
+  vacía). No es un bug de doble finalización; si el costo importara, la corrección es que el dispatcher cuente las
+  ejecuciones del Job aún en curso antes de lanzar otra.
+- **Sigue fuera:** `INSIGHTS_ISSUANCE_ENABLED` OFF (paso de producto); `report_pdf` → TASK-1847; `web` → TASK-1848.

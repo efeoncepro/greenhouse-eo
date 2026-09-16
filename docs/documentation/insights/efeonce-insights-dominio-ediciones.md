@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846, render del deck vivo en staging; producción pendiente)
+> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846 complete, render del deck en producción)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -56,8 +56,8 @@ validadas, **hoy ninguna edición puede emitirse**: llega hasta `ready_for_revie
 | Agente por MCP | Catálogo, listar, leer y (con permiso de escritura) pedir; **nunca emite** | Lo que su vínculo con la organización permita |
 
 Como emitir todavía no es posible, hoy un cliente que pide una edición la verá quedar en `in_review` sin
-cifras visibles: eso es lo esperado hasta que su deck esté renderizado y un interno la emita (hoy el render sólo
-corre en staging y la emisión está apagada en todos los ambientes).
+cifras visibles: eso es lo esperado hasta que su deck esté renderizado y un interno la emita (el render del deck
+ya corre en staging y producción, pero la emisión sigue apagada en todos los ambientes).
 
 ## Estado de disponibilidad (2026-09-16)
 
@@ -69,9 +69,9 @@ asignado. Lo que está encendido y lo que no:
 | Pedir una edición y generarla hasta `ready_for_review` | **Encendida** en staging y producción | Flag `INSIGHTS_GENERATION_ENABLED=true` en Vercel (staging y producción); en Preview sigue apagada |
 | Emitir una edición | Apagada y bloqueada | Flag `INSIGHTS_ISSUANCE_ENABLED` OFF en todos los ambientes; además exige que todos los outputs pedidos estén renderizados y validados |
 | Redacción asistida por IA | Apagada | Flag `INSIGHTS_AUTHORING_AI_ENABLED` OFF; el plan sale del redactor determinista |
-| Pedir el render del **deck PDF** de una edición | **Encendido en staging**; **apagado en producción** | Staging: probado el 2026-09-16 con cinco decks reales, un reintento y una cancelación. Producción: falta el release de Greenhouse, prender el flag en Vercel Production y desplegar el gateway MCP. Ver «Pedir el deck de una edición» |
+| Pedir el render del **deck PDF** de una edición | **Encendido en staging y producción** (desde 2026-09-16) | Staging: probado con cinco decks reales, un reintento y una cancelación. Producción: probado el 2026-09-16 en la organización de prueba — el deck salió solo, al primer intento, y pedir la vista web fue rechazado como corresponde. Ver «Pedir el deck de una edición» |
 | Informe A4, vista web, enlace compartido, correo, recurrencia | No existen todavía | TASK-1847, 1848, 1849 y 1875 |
-| Pedir una edición desde un agente externo por el gateway MCP | Lectura sí; escritura todavía no | Las cuatro herramientas están publicadas; crear exige un permiso de escritura que ningún cliente tiene aún (`insufficient_scope`) |
+| Pedir una edición desde un agente externo por el gateway MCP | Lectura sí; escritura todavía no | Las herramientas de ediciones y de render están publicadas (gateway v1.6.0, 2026-09-16); crear exige un permiso de escritura que ningún cliente tiene aún (`insufficient_scope`) |
 
 **Pedir el deck de una edición (render).** Cuando una edición está `ready_for_review`, quien tenga permiso sobre
 esa organización puede pedir su deck PDF. El pedido no devuelve el archivo al instante: queda **en cola** y un
@@ -81,7 +81,8 @@ proceso en segundo plano lo produce.
   en unos 3 a 4 minutos en lo medido (algo más si el proceso arranca en frío); si se piden varios juntos, cuentan como una fila: cinco decks tardaron unos 11 minutos en
   quedar todos listos (medido en staging). Regla práctica: N decks ≈ 2·N minutos. Dibujar el deck en sí toma unos
   7 segundos; el resto es espera en la cola y arranque del proceso. Si hay propuestas comerciales en cola, pasan
-  primero.
+  primero. Cuando el proceso arranca en frío puede lanzarse dos veces para un mismo deck: sólo una lo produce y la
+  otra termina sin hacer nada; no aparece un deck duplicado.
 - **Estados.** El pedido (run) y cada archivo (output) pasan por `queued`/`running` y terminan en `completed`,
   `failed`, `dead_letter` (se agotaron los intentos o el fallo no se arregla reintentando) o `cancelled`.
   `partial_failed` significa que un archivo salió y otro no.

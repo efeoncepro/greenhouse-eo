@@ -1,5 +1,14 @@
 # TASK-1846 — Efeonce Insights: render durable y Artifact Worker multiconsumidor
 
+## Delta 2026-09-16 — en producción
+
+- **Release:** PR #237 squash `917491fd02e4e2dac5ec1668192de59bdd6b20dd`, orquestador run `35154555317`, manifest `917491fd02e4-9231b87b-20da-43c3-abce-4348dccdda99` `released` 22:02:41Z en un intento (break-glass planificado: migraciones Insights ya aplicadas; `cloud_release`). Primer deploy productivo del Cloud Run Job `artifact-worker` vía `deploy-artifact-worker` (change-gated: sirve `f6551157e`, árbol idéntico al target salvo `Handoff.md`/`project_context.md`). Watchdog `ok` 6/6 synced.
+- **Flag:** `INSIGHTS_RENDER_ENABLED=true` en Vercel Production (leído con `vercel env pull`) + redeploy `greenhouse-d6l33zils` aliased a `greenhouse.efeoncepro.com`; Job y `ops-worker` ya lo tenían ON (default en `deploy.sh`). ON en los tres runtimes lectores en staging y producción. `pnpm flags:audit --strict`: 0 flags ON sin código en main, 0 con lector distinto.
+- **Gateway:** `efeonce-mcp` v1.6.0 desplegado (run `35156353046`, revisión `efeonce-mcp-gateway-00054-n78` 100 % tráfico, `/health` ok, 51 tools).
+- **Canary productivo** (lane ecosystem, token consumer del gateway, org sandbox `Greenhouse Demo`): create `202` (`insed-83c23534…`) → `POST …/render` `202` (run `irun-e275767b-a6a8-4587-9579-d9bbba713181`, `requestedByKind: member`) → el dispatcher del `ops-worker` lanzó el Job solo → `deck_pdf` `completed` al 1er intento (render 22:14:46→22:14:52Z, asset `asset-acf726a0-3c02-4172-b0cd-1141468a8a97`); pedir `web` → `422 render_rejected`. Canary del provider en `efeonce-mcp` (`--render-run`): catalog, list, render run `completed` y deny `404` verdes.
+- **Comportamiento conocido:** con arranque en frío (~2 min) el dispatcher lanzó dos ejecuciones para un solo output (ticks 22:12 y 22:14); una finalizó (claim atómico + fencing) y la otra no encontró trabajo. Inocuo; costo menor.
+- Sigue OFF `INSIGHTS_ISSUANCE_ENABLED` (paso de producto, fuera de esta task). `report_pdf` → TASK-1847; `web` → TASK-1848.
+
 ## Delta 2026-09-16 — cierre pre-release
 
 - **Hallazgo:** el `ops-worker` (dispatcher `/artifact-render/dispatch`) no tenía `INSIGHTS_RENDER_ENABLED`; ningún render encolado se lanzaba solo. Corregido en `services/ops-worker/deploy.sh` (default ON) y verificado en `ops-worker-00690-xhl`. El flag se lee en **tres** runtimes.
@@ -23,7 +32,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -36,7 +45,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-045`
-- Status real: `code complete + rollout STAGING verificado (2026-09-16); producción pendiente del release. Staging: flag ON en los TRES runtimes lectores (Vercel encola, Job reclama, ops-worker despacha — el dispatcher no lo tenía y se corrigió), benchmark Cloud Run (5/5 al 1er intento, 1 output por tick de 2 min), retry/cancel/negativo de audiencia por API real, auditoría client_user (migración expand aplicada). Job integrado al release control plane; gateway efeonce-mcp v1.6.0 mergeado (PR #14) sin desplegar. Falta: release develop→main, INSIGHTS_RENDER_ENABLED en Vercel Production + redeploy, deploy del gateway, canary productivo; report_pdf/web dependen de 1847/1848.`
+- Status real: `EN PRODUCCIÓN 2026-09-16. Release develop→main 917491fd02e4 (manifest released 22:02:41Z, primer deploy productivo del Job artifact-worker, change-gated); INSIGHTS_RENDER_ENABLED ON en los tres runtimes lectores (Vercel, Job, ops-worker) en staging y producción; gateway efeonce-mcp v1.6.0 desplegado (revisión 00054-n78, 51 tools); canary productivo en org sandbox verde (deck_pdf completed al 1er intento por el dispatcher automático; web → 422 render_rejected). Parcial declarado: report_pdf (TASK-1847) y web (TASK-1848) se rechazan al encargar; huérfano tras upload se detecta pero no se reconcilia solo. INSIGHTS_ISSUANCE_ENABLED sigue OFF (paso de producto).`
 - Rank: `TBD`
 - Domain: `platform|ops|data`
 - Blocked by: `none`
@@ -406,9 +415,9 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [x] Fallar report_pdf conserva deck_pdf exitoso; retry no duplica; cancelación impide iniciar trabajo restante y tiene estado terminal honesto. — probado contra PG real: el retry re-encola sólo el fallido reusando su fila (una sola fila por target), el completado no se toca, y la cancelación deja `stillRunning` sin mentir y no declara el run cancelado mientras algo corra. **Runtime staging 2026-09-16:** retry por API de un output fallido → el dispatcher lo lanzó solo, volvió a fallar honesto (`render_error`, manifest sellado pre-fix), attempts 1→2 de 3, completados intactos; cancel de un run en cola → run y output `cancelled`, 0 intentos, nunca arrancó; retry sobre cancelado no re-encola (200, terminal).
 - [x] Cuota por organización en el claim, dead letter y señal de huérfanos steady 0. **Medido en Cloud Run staging 2026-09-16** (ráfaga de 5 `deck_pdf`, org sandbox): 5/5 `completed` al 1er intento; render 6,3–7,3 s; tarea Cloud Run 50–58 s; arranque 3,9 s caliente / 42 s tras deploy / 154 s frío; **queue age 3m18s → 11m10s: throughput = 1 output por tick de 2 min** (una ejecución por tick, `parallelism=1`) ⇒ ráfaga de N ≈ 2·N min. Retry budget: `max_attempts=3`, un retry consume un tick. Límites fijados: `maxPdfMb` 20 (default del composer); cuota por org 2 (`DEFAULT_INSIGHT_RENDER_ORG_CONCURRENCY`) — hoy no es la restricción: la concurrencia efectiva es 1 por el despacho de una ejecución por tick; re-medir si el despacho cambia. Competencia con Proposal: por diseño Proposal gana el tick (no medido con Proposal activo; sin tráfico Proposal hoy).
 - [~] **Parcial** — `deck_pdf` se contabiliza por edición vía el Composer con manifest sellado y drift check; **`report_pdf` y `web` se rechazan al encargar** (`render_rejected`, nunca se encolan): el catálogo A4 es TASK-1847 y el modelo web es TASK-1848.
-- [x] API/MCP request/get/retry/cancel pasan policy, idempotencia y error parity; no esperan la generación en request-response. — lanes app + ecosystem (`…/editions/{id}/render`, `…/render-runs/{id}[/retry|/cancel]`), misma tabla de errores + `render_disabled`/`render_rejected`; 4 tools MCP (manifiesto 55, `mcp:manifest:check` al día); 202 al encolar / 200 idempotente; tests de paridad en `insights-lanes.test.ts`. **Federación mergeada** en `efeonce-mcp` (PR #14 → `da8295a`, v1.6.0, 51 tools, escrituras con `efeonce.mcp.insights.write`); **deploy del gateway pendiente** hasta que el release lleve las rutas a producción.
+- [x] API/MCP request/get/retry/cancel pasan policy, idempotencia y error parity; no esperan la generación en request-response. — lanes app + ecosystem (`…/editions/{id}/render`, `…/render-runs/{id}[/retry|/cancel]`), misma tabla de errores + `render_disabled`/`render_rejected`; 4 tools MCP (manifiesto 55, `mcp:manifest:check` al día); 202 al encolar / 200 idempotente; tests de paridad en `insights-lanes.test.ts`. **Federación mergeada** en `efeonce-mcp` (PR #14 → `da8295a`, v1.6.0, 51 tools, escrituras con `efeonce.mcp.insights.write`); **gateway desplegado en producción 2026-09-16** (run `35156353046`, revisión `efeonce-mcp-gateway-00054-n78`).
 - [~] **Parcial (LOCAL + Cloud Run deck)** — matriz ejecutada el 2026-09-16 con el catálogo real vía `pnpm deck:compose` (plan SKY recortado), secuencial, `/usr/bin/time -l`: **15 láminas** 4,44–4,72 s, RSS máx 300–328 MB, PDF 5,4 MB; **25 láminas** 7,07–7,42 s, RSS máx 355–365 MB, PDF 12,6 MB; **ráfaga 5×15** back-to-back 23,3 s totales (4,58–4,72 s cada una, sin degradación). Páginas A4 10/30: **no medible** (el catálogo A4 no existe, TASK-1847). Competencia de cola con Proposal y budgets de Cloud Run: **no medidos** (worker sin desplegar; el Job es `parallelism=1`). **Cloud Run staging 2026-09-16:** deck real (edición seo+ico) 6,3–7,3 s de render, PDF ~330 KB; A4 sigue sin catálogo (TASK-1847).
-- [~] **Parcial: staging ejecutado, producción pendiente del release.** Staging 2026-09-16: Job desplegado (`d9da99df8`), flag ON en Vercel staging + Job + `ops-worker-00690-xhl` (el dispatcher no leía el flag: el canary de las 13:00Z se lanzó a mano — logs `insightsQueued=0` con output en cola —, corregido declarándolo en `services/ops-worker/deploy.sh`), canary por el camino real (dispatcher automático) verde. Job integrado a `production-release.yml` + `RELEASE_DEPLOY_WORKFLOWS` (`cloudRunResourceKind:'job'`), lectores de drift/workers/rollback para Jobs, `worker:deploy-path-gate` lo mide. Producción: release develop→main, `vercel env add INSIGHTS_RENDER_ENABLED production` + redeploy, deploy del gateway v1.6.0 y canary productivo en org sandbox.
+- [x] **Staging y producción ejecutados.** **Producción 2026-09-16:** release `917491fd02e4` (manifest `917491fd02e4-9231b87b-…` `released` 22:02:41Z, Job `artifact-worker` desplegado por el control plane, watchdog 6/6 synced); `INSIGHTS_RENDER_ENABLED=true` en Vercel Production + redeploy `greenhouse-d6l33zils`; gateway v1.6.0 desplegado (`efeonce-mcp-gateway-00054-n78`); canary por el lane ecosystem en org sandbox: render `202` → dispatcher automático → `deck_pdf` `completed` 1 intento (asset `asset-acf726a0-…`), `web` → `422 render_rejected`; canary del provider MCP verde (catalog/list/render run/deny). Staging 2026-09-16: Job desplegado (`d9da99df8`), flag ON en Vercel staging + Job + `ops-worker-00690-xhl` (el dispatcher no leía el flag: el canary de las 13:00Z se lanzó a mano — logs `insightsQueued=0` con output en cola —, corregido declarándolo en `services/ops-worker/deploy.sh`), canary por el camino real (dispatcher automático) verde. Job integrado a `production-release.yml` + `RELEASE_DEPLOY_WORKFLOWS` (`cloudRunResourceKind:'job'`), lectores de drift/workers/rollback para Jobs, `worker:deploy-path-gate` lo mide. Producción: release develop→main, `vercel env add INSIGHTS_RENDER_ENABLED production` + redeploy, deploy del gateway v1.6.0 y canary productivo en org sandbox.
 
 ## Verification
 
@@ -423,12 +432,12 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 ## Closing Protocol
 
-- [ ] Lifecycle, carpeta, Status real y acceptance actualizados con evidencia; sin rollout no se declara complete.
-- [ ] TASK_ID_REGISTRY, README y EPIC-045 sincronizados; remover blockers obsoletos en dependientes.
-- [ ] Arquitectura técnica, documentación funcional y manual/runbook actualizados proporcionalmente.
-- [ ] Handoff/changelog y contratos UI/API/MCP reflejan disponibilidad real.
-- [ ] Regresiones, señales, rollback y gates documentales pasan; no commit/push/deploy automático.
-- [ ] Actualizar la skill viva `efeonce-insights` (`references/program-ledger.md`, `architecture-map.md`, `contracts.md`, `operations.md`, `lessons.md`) y espejar a `.codex/` con `pnpm skills:mirrors` verde — contrato de EPIC-045; sin esto la task no pasa a complete.
+- [x] Lifecycle, carpeta, Status real y acceptance actualizados con evidencia; sin rollout no se declara complete. — rollout productivo verificado 2026-09-16 (release `917491fd02e4` + flag + gateway + canary).
+- [x] TASK_ID_REGISTRY, README y EPIC-045 sincronizados; remover blockers obsoletos en dependientes.
+- [x] Arquitectura técnica, documentación funcional y manual/runbook actualizados proporcionalmente. — arquitectura §14, doc funcional, manual API/MCP y runbook de release con delta de producción.
+- [x] Handoff/changelog y contratos UI/API/MCP reflejan disponibilidad real. — Handoff/changelog 2026-09-16 (producción), gateway v1.6.0 desplegado.
+- [x] Regresiones, señales, rollback y gates documentales pasan; no commit/push/deploy automático. — live tests 4/4, watchdog `ok` 6/6, `docs:closure-check` y `docs:context-check:strict` verdes, rollback multi-runtime documentado en el ledger de flags; push/deploy sólo con autorización del operador.
+- [x] Actualizar la skill viva `efeonce-insights` (`references/program-ledger.md`, `architecture-map.md`, `contracts.md`, `operations.md`, `lessons.md`) y espejar a `.codex/` con `pnpm skills:mirrors` verde — contrato de EPIC-045; sin esto la task no pasa a complete.
 
 ## Follow-ups
 
