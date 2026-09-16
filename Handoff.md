@@ -31,7 +31,8 @@ blend raster `luminosity` `0.72` verificado. Templates: `efeonce-advertising-cre
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
 no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
 
-**Efeonce Insights — TASK-1845 code complete + canary staging verde (2026-09-15, Claude, `develop` `8844a3d5c` pushed; CI y deploys de workers verdes):** dominio `src/lib/efeonce-insights/`, schema `greenhouse_insights`, adapters SEO/AEO/ICO, lanes app+ecosystem, 4 tools MCP, skill `efeonce-insights`. **Staging:** `INSIGHTS_GENERATION_ENABLED=true` sólo ahí, `insights_v1` en la org sintética; ambos lanes crearon/leyeron ediciones sintéticas (`EO-INS-000012/13`, 0 hechos por falta de snapshots ICO) y el deny fue 404. Registro: `EFEONCE_INSIGHTS_IMPLEMENTATION_RECORD_V1.md`. **Gateway `efeonce-mcp`:** rama `feat/task-1845-insights-federation` `a37d526` (4 tools, scope `efeonce.mcp.insights.write` sólo para crear, fail-closed, v1.5.0, 47 tools). **Después:** gateway PR #12 desplegado (rev `00053-dsk`); scope `insights.write` creado en Entra. **Release a producción hecho** (PR #236 → `9c0946883`, run `35032358217`, manifest `9c094688309d-500ec9e7` released 22:55Z, watchdog ok, canary prod verde con create 503 hasta el flag). Flag ON en Production (redeploy `h2030d3bz`; create 202 `EO-INS-000014`). **TASK-1845 COMPLETE 2026-09-16:** rollback ensayado (down/up con readbacks; el Down definitivo no toca módulo/asignaciones/auditoría) y canaries posteriores (`EO-INS-000002` staging, `EO-INS-000003` prod; las ediciones sintéticas previas se perdieron por diseño). TASK-1846 la lleva otra sesión (greenhouse-eo-0d).
+**Efeonce Insights — TASK-1845 COMPLETE (2026-09-16):** foundation en producción desde 2026-09-15 (generación ON,
+emisión/IA OFF, gateway v1.5.0, rollback ensayado). Detalle: la task, arquitectura §14 y la skill `efeonce-insights`.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
 TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con
@@ -290,7 +291,9 @@ flag, commit, push ni deploy. Siguiente paso si se ejecuta: confirmar `/goal`, c
 `pnpm codex:task-hook TASK-1834` y planificar Slice 0; Slices 1–3 detrás de flags OFF antes de cualquier first fold
 visible.
 
-**TASK-1837 (EPIC-044 U12) — `EN PRODUCCIÓN 2026-09-06, COMPLETE`.** Release `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf` (run `34029501838`, PR #227, target `b3e324cb5c8d`), manifest `released` 11:23:09Z en un solo intento. Break-glass con hechos (la migración `20260906004450748` ya estaba aplicada en la instancia única, `run_on 04:27:58Z`); el smoke de `main` se PRODUJO en vez de bypassearse. Cinco servicios Cloud Run OK: `ops-worker` y `auth-server` quedaron en `2b385284d594` con **hash de árbol IDÉNTICO** al target (`d3a1432a1f71`) — no-op legítimo probado por identidad de árbol, no por el change-gate; watchdog `drift_count=0`. Ambos flags `EXTERNAL_INVITATION_*` ON en Production (valor live leído con `vercel env pull`) + redeploy obligatorio `greenhouse-j7aix61yk`. **Canary de contrato contra producción**: la misma llamada a la lane delegada pasó de `404` anti-oráculo a `422 field=bindingId`, y con `organizationId` a `403 forbidden` — la lane ejecuta la resolución de autoridad, no sólo existe. Federación mergeada en `efeonce-mcp` (PR #3 → `65ae1d5`, revisión `00038-8jj`); ese repo **NO** despliega en push a `main`, va por dispatch de `deploy.yml`.
+**TASK-1837 (EPIC-044 U12) — COMPLETE, en producción 2026-09-06** (release `b3e324cb5c8d`, flags
+`EXTERNAL_INVITATION_*` ON, canary de contrato y federación MCP verificados). Evidencia completa:
+[la task](docs/tasks/complete/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md).
 
 **Pendiente real (no bloqueante):** (1) la **primera persona CLIENTE real** es decisión comercial tuya — hasta que exista, el flujo delegado de punta a punta y las dos tools del gateway sólo están probados en staging y por los negativos del canary; (2) la señal `identity.external_invitation.token_revealed` marca 3 por las revelaciones de prueba y **se apaga sola** al vencer su ventana de 24 h; (3) **punto ciego abierto en el gate de versión del gateway**: `test/version.test.ts` sólo compara el hash de las tools FEDERADAS desde Greenhouse, así que las tools propias del gateway crecieron la superficie de 37 a 39 con el test verde y `version` congelada — se subió a `1.1.0` a mano, pero la próxima volverá a pasar sin bump.
 
@@ -429,14 +432,8 @@ no push/deploy ni mutación de Entra autorizados por esta creación. Incidente G
 ## 2026-09-16 — TASK-1846: render durable — staging verificado, producción espera el release
 
 [TASK-1846](docs/tasks/in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md) sigue `in-progress`
-sólo por el rollout productivo. En `develop` (pushed): `d9da99df8` (Job `artifact-worker` al release control plane
-+ `INSIGHTS_RENDER_ENABLED` declarado en el `ops-worker`) y `1875fdd32` (auditoría `client_user`, migración expand
-`20260916201127095` aplicada). **Hallazgo:** el dispatcher del `ops-worker` no leía el flag; el canary de las 13:00Z
-se lanzó a mano. Hoy el flag está ON en Vercel staging, Job y `ops-worker-00690-xhl`; Vercel Production OFF.
-Benchmark Cloud Run staging: 5/5 al primer intento, **1 output por tick de 2 min** (ráfaga de N ≈ 2·N min);
-retry, cancelación y negativo de audiencia verificados por API real. Gateway `efeoncepro/efeonce-mcp#14` mergeado
-(`da8295a`, v1.6.0) **sin desplegar**. Job único ⇒ bucket fijo `staging` y flags default ON en `deploy.sh`.
-**Próximos pasos (tras autorización de release):** release develop→main (primer deploy productivo del Job,
-`deploy-artifact-worker`), `vercel env add INSIGHTS_RENDER_ENABLED production` + redeploy, deploy del gateway
-v1.6.0, canary productivo en la org sandbox y cierre de la task. Aparte: `CLAUDE.md governance` está rojo desde
-`45ae955b4` por 2 líneas huérfanas de docs de IA (Higgsfield/Recraft, `generateImage()`), ajeno a 1846.
+sólo por producción. Staging verificado: flag ON en Vercel staging, Job y `ops-worker-00690-xhl` (el dispatcher no
+lo leía; corregido en `d9da99df8`), benchmark 1 output por tick de 2 min, auditoría `client_user` (`1875fdd32`).
+Job en el release control plane; gateway `efeonce-mcp#14` mergeado sin desplegar. **Pendiente (tras autorizar
+release):** release develop→main, `INSIGHTS_RENDER_ENABLED` en Vercel Production + redeploy, deploy del gateway
+v1.6.0 y canary productivo en la org sandbox. Evidencia: la task y la skill `efeonce-insights`.

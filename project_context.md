@@ -4,25 +4,14 @@
 
 ## Actualización documental reciente
 
-El 2026-09-16 se actualizaron las skills espejo y el mapa Salesforce con el delta de Dreamforce: AIforce como capa
-headless/interfaz, Missionforce/OpenAI/NVIDIA y las novedades agentic de Marketing Cloud Next. El ledger separa
-anuncios del 15/09 y 16/09, con estados GA, piloto y roadmap por capacidad.
+El 2026-09-16 se actualizaron las skills CRM: Dreamforce 2026 (ledger Salesforce, estados por capacidad) y HubSpot
+Fall Spotlight/UNBOUND (`docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`). El
+provider-fit usa `HubSpot-first`, `Salesforce-first`, `híbrida` o `no-fit`; el detalle vive en esas referencias.
 
-El 2026-09-16 se actualizaron las skills espejo de HubSpot as a Service, Solutions Partner y
-HubSpot-Greenhouse bridge con Fall Spotlight/UNBOUND 2026. La referencia operativa es
-`docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`; mantiene separadas beta,
-GA, first look, entitlement del portal y runtime.
-
-La posición provider-fit CRM también quedó alineada: HubSpot-first para crecimiento B2B, mid-market y time-to-value;
-Salesforce-first para complejidad enterprise, gobierno, service a escala, extensibilidad e integración profunda; la
-zona de solapamiento conserva mid-market alto, agentes y coexistencia. Las salidas de discovery son
-`HubSpot-first`, `Salesforce-first`, `híbrida` o `no-fit`.
-
-Greenhouse: plataforma operativa Efeonce Group, Next.js 16/MUI 7/Vuexy starter-kit/TypeScript.
-Estado: `Handoff.md`. Historia:
+Greenhouse: plataforma operativa Efeonce Group (Next.js 16/MUI 7/Vuexy/TS). Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-Reingresos e identidad: [contrato canónico](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
+Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 
 TeamBot usa `pnpm teams:announce` para grupos: menciones explícitas, no `@todos` ni DMs. Un 1:1 manual aprobado exige dispatcher/audit canónicos, Entra revalidada e idempotencia; lo recurrente converge a Notification Hub. En Performance Reports, volumen no prueba sobrecarga y el mensaje publicado verifica la mención. Contrato: `docs/operations/manual-teams-announcements.md`.
 
@@ -124,15 +113,13 @@ y federado en `mcp.efeonce.org`, fail-closed por organización. `GROWTH_SEO_ENAB
 `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` e
 `docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`.
 
-ETV de DataForSEO Labs se versiona por metodología; desde 2026-09-03 producción sirve
-`improved_layout_clickstream_v2` y legacy queda sólo como rollback pre-corte. Contrato, corte, provenance:
+ETV DataForSEO: producción sirve `improved_layout_clickstream_v2` desde 2026-09-03 (legacy = rollback pre-corte):
 `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md` ·
 [auditoría](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
 
-Efeonce Insights: [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) (§14 = estado real), EPIC-045.
-Foundation TASK-1845 COMPLETE (prod desde 2026-09-15: schema `greenhouse_insights`, `src/lib/efeonce-insights/`, lanes + MCP v1.5.0; generación ON, emisión/IA OFF, rollback ensayado); render/share/UI en TASK-1846–1849/1875.
+Efeonce Insights (EPIC-045): [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14 = estado real.
 
-Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
+Informes: skill `report-studio` (evidencia, diseño, QA PDF).
 Seasonalities: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.
 [Referente Metricool](.codex/skills/social-media-studio/references/seasonality-reference-calendar.md): inspiración para Efeonce/clientes; separado del calendario editorial y del scheduler.
 Producción seasonality/trendjacking: [protocolo de agentes](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md); canon en skills espejo `social-media-studio` (idea, marca, dirección, producción y QA).
