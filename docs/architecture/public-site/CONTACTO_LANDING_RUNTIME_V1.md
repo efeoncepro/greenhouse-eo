@@ -55,7 +55,7 @@ sin borrar submissions.
 
 ### Pendiente para el próximo release del renderer
 
-Commit preparado: `e5d4a0fb2`. No requiere crear otra versión de Growth Forms ni repetir la activación de países.
+Commits preparados: `e5d4a0fb2` y el hotfix final `d15bb9256`. No requiere crear otra versión de Growth Forms ni repetir la activación de países.
 Debe promoverse por el flujo de producción para que `efeoncepro.com` deje de servir el bundle anterior; hasta
 entonces el runtime puede mostrar `↗ País` aunque el contrato v3 y el combo funcionen correctamente.
 

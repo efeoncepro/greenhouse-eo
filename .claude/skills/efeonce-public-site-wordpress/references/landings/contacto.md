@@ -78,7 +78,7 @@ El renderer y las banderas fueron publicados y la versión v3 de `efeonce-contac
 gobernado. Readback público: `country_select`, placeholder `Selecciona tu país` y 250 opciones. La activación no
 requiere mutar Elementor; no saltar las guardas con un write WP-CLI directo.
 
-Pendiente para el próximo release del renderer: promover `e5d4a0fb2` para sustituir el glifo `↗` que aún puede
+Pendiente para el próximo release del renderer: promover `d15bb9256` (sobre `e5d4a0fb2`) para sustituir el glifo `↗` que aún puede
 aparecer junto a “País” por el SVG geográfico. No crear otra versión del formulario; la v3 ya está activa.
 
 Canon de producto: `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`. Task cerrada:

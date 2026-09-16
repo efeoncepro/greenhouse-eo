@@ -47,7 +47,7 @@ coincide con el repo, registra `code complete, rollout pendiente` y escala al ow
 El release quedó aplicado el 2026-09-15. La versión activa es `fver-c00955ca-863a-4e7d-99c7-c09706660a3a` (v3).
 El readback público confirma 250 países y el navegador confirma el combo `ghf-1-country`.
 
-Pendiente para el próximo release del renderer: promover `e5d4a0fb2`, que corrige el glifo `↗` mostrado junto a
+Pendiente para el próximo release del renderer: promover `d15bb9256` (que incluye `e5d4a0fb2`), que corrige el glifo `↗` mostrado junto a
 “País” y lo reemplaza por el SVG geográfico. No se debe crear otra versión del formulario; la v3 ya está activa.
 
 Para una futura modificación, repite el precheck de renderer/banderas, toma snapshot, ejecuta el comando gobernado
