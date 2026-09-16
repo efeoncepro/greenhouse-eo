@@ -49,4 +49,21 @@
   operational check is: `module_assignments WHERE module_key='insights_v1'` must return exactly the sandbox org, and
   `organizations.organization_name` confirms it is "Greenhouse Demo". That check survives a `down`/`up`; the rows
   themselves do not. Post-rollback you can prove "no real org had the module", never "what the deleted rows were".
+- **2026-09-16 · Un parámetro `$N` sin referenciar revienta en PostgreSQL, no se ignora.** Al agregar la
+  cuota por organización quedó `$2` sin usar en el SELECT del claim (usaba `$1` y `$3`): PG responde
+  `could not determine data type of parameter $2`. Numerar los `$N` consecutivos POR QUERY, no por la lista de
+  variables del TS. Lo destapó el live test; el typecheck no ve dentro del SQL.
+- **2026-09-16 · `zsh` NO hace word-splitting de `$VAR` sin comillas.** `P="a b c"; git add $P` pasa la cadena
+  entera como UN path y falla con `did not match any files`. En bash funcionaría. Usar rutas literales o `${=P}`.
+  Falló ruidoso, que es lo bueno; la variante silenciosa de esta clase es la que muerde.
+- **2026-09-16 · Un live test que falla con `invalid_rapt` NO es un bug de tu SQL: es la ADC de gcloud vencida.**
+  El stack apunta a `cloud-sql-connector`/`google-auth-library`, no a tu query. Se arregla con
+  `pnpm gcloud:auth:playwright -- --force` y se re-corre; perseguir el SQL es perder el rato.
+- **2026-09-16 · `pnpm build` de producción MODIFICA `tsconfig.json`** (le agrega includes con timestamp
+  `.next-local/build-<ts>/types/**`). Es un archivo versionado: commitear después de un build sin mirar
+  `git status` se lleva esa basura, distinta en cada corrida. Revertir con `git checkout -- tsconfig.json`.
+- **2026-09-16 · El guard de write-target del dominio atrapa tus tablas nuevas, y está bien.**
+  `boundary-domain.test.ts` falla con la lista de writes no registrados; la task lo exige en el mismo PR.
+  Registrarlas en `ALLOWED_WRITE_TARGETS` es la acción correcta — el boundary no se ensancha hacia módulos
+  productores, sólo reconoce tablas propias.
 

@@ -28,7 +28,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-045`
-- Status real: `Discovery/audit cerrados 2026-09-15; plan en checkpoint humano (P1). Sin codigo aun.`
+- Status real: `Slices 1-3 implementados y verificados contra PG real (6 commits locales, sin push). Slice 4 sin ejecutar. code complete parcial, rollout pendiente: worker sin desplegar y flag OFF.`
 - Rank: `TBD`
 - Domain: `platform|ops|data`
 - Blocked by: `none`
@@ -380,16 +380,16 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 ## Acceptance Criteria
 
-- [ ] Autogestión cliente y gestión interna de arquitectura §7.1 revalidan autoridad al ejecutar; reutilización/idempotencia de outputs conserva audiencia y proyección. Un job cliente nunca reutiliza bytes de un draft interno aunque coincidan org y período (integración EPIC-046).
-- [ ] Insights produce assets ligados a edición/org, nunca a Proposal ni proposal_deliverable; Proposal existente conserva sus jobs/outputs sin pérdida.
-- [ ] Worker no consulta ni calcula métricas; verifica manifest, catálogos, fuentes y assets fijados y rechaza manifest_drift.
-- [ ] Dos workers y un lease vencido no crean dos outputs finales; fencing impide finalización vieja; crash tras upload se reconcilia.
-- [ ] Fallar report_pdf conserva deck_pdf exitoso; retry no duplica; cancelación impide iniciar trabajo restante y tiene estado terminal honesto.
-- [ ] Límites, cuotas, queue age, retry budget, dead letter y señales de recuperación están operativos y aislados por org.
-- [ ] Los tres targets se contabilizan por edición; PDF usa Composer y web conserva el modelo congelado, sin screenshot como web.
-- [ ] API/MCP request/get/retry/cancel pasan policy, idempotencia y error parity; no esperan la generación en request-response.
-- [ ] Benchmark adjunta resultados observados y límites efectivos; prueba competencia de cola con Proposal y budgets de memoria/tiempo.
-- [ ] Staging y producción autorizada muestran render→asset privado→readback; rollback corta Insights y preserva Proposal; gates worker/build y secretos verificados.
+- [ ] **NO verificado** (Slice 4 / lanes pendientes) — Autogestión cliente y gestión interna de arquitectura §7.1 revalidan autoridad al ejecutar; reutilización/idempotencia de outputs conserva audiencia y proyección. Un job cliente nunca reutiliza bytes de un draft interno aunque coincidan org y período (integración EPIC-046).
+- [x] Insights produce assets ligados a edición/org, nunca a Proposal ni proposal_deliverable; Proposal existente conserva sus jobs/outputs sin pérdida. — contexto `insight_output` colgando de `edition_id` (`consumers/insights.ts`); Proposal delega en sus mismos commands y sus 11 tests de contrato siguen verdes; `pnpm test` completo de un peer con estos cambios: 14164 verdes.
+- [x] Worker no consulta ni calcula métricas; verifica manifest, catálogos, fuentes y assets fijados y rechaza manifest_drift. — el drift check byte a byte quedó intacto en `main.ts`; el consumer sólo persiste bytes. Un `report_pdf` con catálogo no empaquetado falla honesto como `manifest_drift`.
+- [~] **Parcial** — fencing PROBADO contra PG real (`render.live.test.ts`): A reclama fence 1, vence el lease, B reclama fence 2, la finalización de A se rechaza sin escribir, B finaliza; un solo output final. **El crash tras upload se DETECTA** (señal `insights.render.orphaned_output`) pero **no se reconcilia solo**: las filas sin lease requieren decisión humana a propósito, porque reclamarlas podría producir dos finalizaciones.
+- [x] Fallar report_pdf conserva deck_pdf exitoso; retry no duplica; cancelación impide iniciar trabajo restante y tiene estado terminal honesto. — probado contra PG real: el retry re-encola sólo el fallido reusando su fila (una sola fila por target), el completado no se toca, y la cancelación deja `stillRunning` sin mentir y no declara el run cancelado mientras algo corra.
+- [~] **Parcial** — cuota por organización aplicada en el claim, dead letter por intentos agotados o fallo no reintentable, y señal de huérfanos steady 0 cableada al overview. **Queue age y retry budget NO medidos**: sus valores salen del benchmark del Slice 4, que no se ejecutó.
+- [ ] **NO implementado** — el target `web` no tiene render y el catálogo A4 del informe llega con TASK-1847; hoy sólo `deck-axis` está empaquetado en el worker.
+- [ ] **NO implementado** — los commands existen en el store (retry/cancel gobernados), pero no hay lanes app/ecosystem ni entradas de manifest MCP todavía.
+- [ ] **NO ejecutado** — Slice 4. Requiere renders reales; la máquina es compartida con otras dos sesiones.
+- [ ] **NO ejecutado** — exige autorización explícita del operador para desplegar el worker, prender el flag y correr canary. Sin eso el estado honesto es `code complete, rollout pendiente`.
 
 ## Verification
 

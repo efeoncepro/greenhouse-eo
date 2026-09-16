@@ -56,8 +56,35 @@ UI, client grants of the write scope, real-client integration (Berel/Sky — def
 `deploy.sh`; `issuance` stays OFF until outputs are validated; keep Proposal untouched in the Artifact Worker.
 
 ## TASK-1846 — durable rendering (in-progress)
-_Fill at closure: RenderRun/InsightOutput tables, worker jobs, outputs port wiring, flags (which runtime), canaries,
-what stays for 1847/1848._
+
+**Built so far (local on `develop`, NOT pushed by this session, NOT deployed):**
+- Migrations `20260916004647239` (runs/outputs/events) and `20260916012422819` (lease + fence on BOTH
+  `insight_outputs` and `proposal_render_jobs`, additive/nullable). Applied to the shared instance and verified
+  against `information_schema`. **Their `down` is destructive on production** (`greenhouse-pg-dev` serves prod).
+- `src/lib/efeonce-insights/render/`: `contracts.ts` (states, failure taxonomy, transition matrix,
+  `InsightRenderFenceLostError`), `store.ts` (claim with lease+fence, reclaim of expired leases, per-org
+  concurrency quota, governed retry/cancel, run-state rollup incl. `partial_failed`), `plan-limits.ts` (dedupe
+  at RENDER, not planner — frozen plans feed `issued_hash`).
+- `services/artifact-worker/`: `consumer-contract.ts` + `consumers/{proposal,insights,index}.ts`. `main.ts` no
+  longer knows Proposal; it dispatches through the registry. Proposal behaviour unchanged (11 contract tests green).
+- Asset context `insight_output` (retention `commercial_engagement_report`, same class as `sample_sprint_report`
+  — an edition is a REPORT, not a contract like `quote_pdf`). System-generated: not in `DraftUploadContext`.
+- Reliability signal `insights.render.orphaned_output` (steady 0) wired into the overview under module `insights`.
+- Flag `INSIGHTS_RENDER_ENABLED` — **runtime: artifact-worker Cloud Run Job ONLY, verified by grep; NOT Vercel**.
+  Declared in `deploy.sh` (default `false`) and guarded by `deploy-contract.test.ts`. Ledger rows in all three sections.
+
+**Verified:** 3 live tests against real PostgreSQL — stale lease reclaim + fencing rejects the late finalization
+without writing (THE acceptance criterion), retry re-queues only failed without duplicating, cancel does not lie
+about what is already running, and the signal's SQL executes. 731 unit tests green; `local:check` 0 errors.
+A peer ran the full suite (14164 passed) and a production `pnpm build` with these changes in the tree.
+
+**Deliberately NOT done (needs operator authorization):** Slice 4 benchmark, worker deploy, flag flip, staging or
+production canary, and any `git push`. Status is `code complete, rollout pendiente` for what exists — the task
+is NOT complete: Slice 4 is unstarted.
+
+**Hand-off pending for 1847/1848:** the A4/report catalog is not packaged in the worker (only `deck-axis`), so a
+`report_pdf` queued with another catalog fails honestly as `manifest_drift`; `InsightOutputsPort` is still NOT
+connected, so `issue` keeps failing closed with `not_ready`.
 
 ## TASK-1847 — charts and catalogs (to-do)
 _Fill at closure._
@@ -72,6 +99,14 @@ _Fill at closure._
 _Fill at closure: Astro route, token handling, `no-store`, GVC evidence._
 
 ## Sessions (append as you go; newest first)
+
+- **2026-09-16 · greenhouse-eo-0d · TASK-1846 Slices 1-3 implemented (no rollout).** Commits `657591d6c`,
+  `a35fc708e`, `b4aa8f03e`, `50f17e4d4`, `804b3295f`, `6d438905f`. Key decision recorded in the task: lease and
+  fencing are ONE shared, additive mechanism with Proposal's reclaim left OFF — "keep Proposal untouched" is
+  honoured as behaviour, not as file ownership. The hazard the acceptance describes is introduced BY this task,
+  so the two can never ship in different slices. Three repo guardrails caught real mistakes (domain write-target
+  allowlist, exhaustive asset-context Records, and a silent `replace` no-op that typecheck exposed) — all in
+  `lessons.md`.
 
 - **2026-09-16 · greenhouse-eo-0d · TASK-1846 discovery + design decision (no code yet).** Audited the render engine
   against the real runtime: six Proposal seams in `services/artifact-worker/main.ts` (all replaceable by a typed
