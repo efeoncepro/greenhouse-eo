@@ -42,7 +42,22 @@ Always call `get_insights_catalog` first and propose the exact request to the hu
 - `idempotencyKey` (8–200 chars): the same key with the same request returns the same edition; the
   same key with a different request is a `409` conflict. Use one key per distinct human request.
 - `policy.allowPartial`: only when the human explicitly accepts visible omissions. Without it, a
-  requested module with no evidence stops the edition in `failed` at `validating`.
+  requested module with no evidence stops the edition in `failed` at `validating`. With it, an edition
+  whose modules all came back empty still reaches `ready_for_review`: the snapshot records each
+  rejection (`no_data`, `unsupported_window`, ...) and the plan lists them as visible limits — never as
+  zeros. Say "no evidence for X in this window", never "X was 0".
+- `title` (3–200 chars) and `purpose` (3–500 chars): optional; name the report in the library the
+  first time it is created. They are ignored when a later edition revises an existing report.
+- Window limits: `endExclusive` must be after `start`; the window cannot start in the future (a
+  window that ends in the future is accepted as partial); the maximum length is 400 days; `timeZone`
+  defaults to `America/Santiago`. Defaults when omitted: comparison `previous_period`, audience
+  `client`, locale `es-CL`, depth `standard`.
+- `comparison` `custom` shape: `{ "kind": "custom", "start": "YYYY-MM-DD", "endExclusive": "YYYY-MM-DD" }`;
+  it must not overlap the period.
+- Tool input shape: `create_insight_edition { organizationId, request }` where `request` is the object
+  above; `organizationId` is the identifier the organization list already gives you (internal
+  bindings must pass it; org-scoped bindings read their own organization only). Success answers
+  `202` for a new edition and `200` with `idempotent: true` for a safe replay.
 
 ## Following the generation
 
@@ -58,6 +73,15 @@ Always call `get_insights_catalog` first and propose the exact request to the hu
 States you will see: `draft → collecting → composing → validating → ready_for_review → issued`, plus
 `failed` (recoverable by phase) and `withdrawn` (terminal). Org-scoped bindings see a redacted
 projection: `in_progress`, `in_review`, `issued`, `needs_attention`, `withdrawn`.
+
+## Listing and reading editions
+
+`list_insight_editions { organizationId, state?, audience?, reportId?, pageSize?, cursor? }` returns
+the newest first with a cursor for the next page; `pageSize` is capped at 200. `get_insight_edition
+{ organizationId, editionId, includeEvidence: true }` adds the sealed snapshot, the frozen plan and
+the transition history when your binding may see them; `includeEvidence` is `false` by default and
+you get only the edition header. For a client-audience read, `evidence` and `plan` stay `null`
+until the edition is issued — that is not an error and not "0".
 
 ## Reading evidence honestly
 
