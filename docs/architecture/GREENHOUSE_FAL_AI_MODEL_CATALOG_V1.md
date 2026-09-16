@@ -1,6 +1,6 @@
 # Greenhouse — Fal.ai Model & Capability Catalog V1
 
-> **Tipo:** Referencia técnica agent-facing · **Version:** 1.5 · **Creado:** 2026-07-06 por Claude
+> **Tipo:** Referencia técnica agent-facing · **Version:** 1.6 · **Creado:** 2026-07-06 por Claude
 > **Última actualización:** 2026-09-16 por Claude — Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal` (6
 > endpoints de video; 1 verificado en real y 5 sin verificar porque el saldo de fal se agotó), revisión sin conexión
 > de Kling 3 y Grok Imagine, y decisión de mantener Gemini Omni Flash y Nano Banana Pro directo por Google. Antes
@@ -655,27 +655,47 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 
 ---
 
-## Pendientes operativos (2026-09-16)
+## Cuentas, saldo y operación del CLI (2026-09-16)
 
-### Bloqueo por saldo y `--balance`
-- **Incidente:** tras una recarga de USD 50, las corridas seguían en 403 `User is locked` (`Exhausted balance` o
-  `TOP_UP`) y la subida al storage también. `GET https://rest.alpha.fal.ai/billing/user_balance` con la clave del CLI
-  devolvió **−3,86 USD**: la recarga no estaba en la cuenta dueña de la clave (o no se había acreditado).
-- **Diagnóstico:** `pnpm ai:fal --balance` (gratis, clave normal). Ante un 403 de bloqueo el CLI imprime el saldo solo.
-  Si recargaste y sigue bajo cero, la recarga quedó en otra cuenta o equipo de fal.
-- **Descartado:** consumo de otro runtime. La clave `greenhouse-fal-api-key` (efeonce-group) es idéntica a
-  `globe-fal-api-key` (efeonce-globe, servicio `globe-api-internal`, `GLOBE_GOVERNED_FAL_ENABLED=false`), pero no hubo
-  llamadas a dominios de fal desde ningún runtime en 7 días ni tráfico de Globe en 24 h. El consumo es sólo del CLI.
-- **Detalle útil:** con la cuenta bloqueada, un POST vacío a `https://fal.run/<slug>` sigue devolviendo 422 (validación)
-  y no prueba que haya saldo. Mirar el saldo, no la validación.
+### Dos cuentas con failover
+- **Configuración:** `FAL_API_KEY` (secreto `greenhouse-fal-api-key`, cuenta A) y `FAL_API_KEY_B` (secreto
+  `greenhouse-fal-api-key-b`, cuenta B, con los mismos accesos: `greenhouse-portal@` y `julio.reyes@`). Sumar una cuenta =
+  agregar su nombre a `FAL_ACCOUNT_ENV_VARS` en `src/lib/ai/fal.ts` y su `*_SECRET_REF`.
+- **Selección:** por proceso, primero las cuentas con saldo positivo (mayor a menor) y después las demás en orden declarado.
+- **Failover:** si fal responde 403 `User is locked` (`Exhausted balance` o `TOP_UP`) al encolar o al subir un archivo, se
+  prueba la siguiente cuenta. Ese bloqueo ocurre antes de encolar y no cobra. Cualquier otro error no cambia de cuenta.
+- **Retome y estado:** un request sólo existe en la cuenta que lo creó; `--request-id` y `--status` lo buscan solos, y el CLI
+  imprime la cuenta en cada corrida y en los comandos de retome. `--fal-account` fuerza una cuenta sin failover.
+- **Saldo:** `pnpm ai:fal --balance` lista el saldo de cada cuenta (clave normal, sin costo). Si todas están bloqueadas, el
+  CLI lo dice con sus saldos.
+- **Incidente origen:** se recargaron USD 50 en la cuenta B mientras la clave configurada era la de A (−3,86). Descartado
+  consumo de otros runtimes: A es la misma clave que usa Globe (`globe-fal-api-key`), pero no hubo llamadas a fal desde
+  ningún servidor en 7 días. Con la cuenta bloqueada, un POST vacío igual devuelve 422: validar no prueba saldo.
+- **Rotación pendiente:** la clave B se compartió en una conversación; conviene rotarla en fal y publicar la nueva versión
+  del secreto (`printf %s "$VALOR" | gcloud secrets versions add greenhouse-fal-api-key-b --data-file=-`).
 
-### Verificaciones pendientes (bloqueadas por el saldo)
-- **Wan 3.0:** `wan3-i2v`, `wan3prime-i2v` (≈ USD 0,20 a 2 s).
-- **Seedance:** los 12 sin verificar: `seedance20-i2v`, `seedance20-r2v`, `seedance20-{fast,mini,us}-{t2v,i2v,r2v}` y
-  `seedance25-r2v` en `reference`, `editing` y `extension` (≈ USD 3,6 a 480p/4 s; editing/extension cobran además el video
-  de entrada, sin dato).
-- Precios Seedance en fal: por 1.000 tokens (2.5 0,0214 · 2.0 0,014 · fast 0,0112 · mini 0,007 · us 0,0168). La
-  equivalencia ~54.000 tokens por 5 s a 720p se infiere cruzando con OpenArt Arena; no está verificada.
+### `--detach` y `--status` (en vez de webhooks)
+- `--detach` encola, imprime `request_id`, cuenta y los comandos de estado y resultado, y termina. `--status` con
+  `--request-id` consulta una vez (IN_QUEUE / IN_PROGRESS / COMPLETED) sin esperar ni descargar. Verificado en real.
+- **Webhooks de fal:** no se usan en el CLI porque exigen una URL pública y consultar el estado no cobra. Para trabajos
+  largos o producción desde el runtime, el camino es un receptor en la API de Greenhouse sobre
+  `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, con verificación de firma (formato de firma a confirmar en la documentación de fal).
+- **Espera por defecto:** imagen 3 min, video 30 min (Seedance 2.5 referencias superó 15 min), entrenamiento 3 h.
+
+### Costo real de la verificación (cuenta B, USD 50,00 → 42,29)
+- 17 corridas de video (Wan 3.0 a 2 s; Seedance 2.0 base/fast/mini/us y 2.5 a 480p/4 s, incluidas las rechazadas por
+  filtro que igual se encolaron): **USD 7,71**. Seedance costó cerca del doble de la estimación hecha con la equivalencia
+  de tokens de OpenArt; esa equivalencia no sirve para presupuestar.
+- Referencia medida por tanda de 3 corridas de 4 s a 480p: Seedance 2.0 fast ≈ USD 1,37 · mini ≈ 0,85.
+
+### Filtro de contenido de Seedance (ByteDance)
+- Rechaza **después de encolar** (422 `content_policy_violation`, `partner_validation_failed`): referencias con marcas o
+  logotipos ("potential copyright violation") y videos o imágenes con personas reales ("likenesses of real people").
+- Para video a video con Seedance 2.5, partir de material sin personas identificables ni marcas; con personas, usar Flux 3
+  edit/extend o Wan 3.0.
+
+### Estado de verificación
+- **47 de 55 verificadas.** Sin verificar: 3 variantes LoRA de H3 y 4 entrenadores (postergados, abajo). No operable: H3 Director.
 
 ### LoRA de Minimax H3 — pendiente por decisión del operador
 - **Qué falta:** verificar los 4 entrenadores (`h3-train-{t2v,i2v,flf2v,ref2va}`) y las 3 variantes que la usan

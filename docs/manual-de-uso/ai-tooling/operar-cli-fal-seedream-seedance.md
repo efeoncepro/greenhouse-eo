@@ -1,7 +1,7 @@
 # Operar el CLI de fal: Seedream 5, Seedance 2.5/2.0, Minimax H3, Flux 3 y Wan 3.0
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-16 por agente
 > **Ultima actualizacion:** 2026-09-16 por Claude — Wan 3.0 y Wan 3.0 Prime (texto, imagen y referencias a video; `--duration auto`, `--thinking` con `--web-url`/`--file`, `--no-prompt-expansion`, `--seed`), advertencia de saldo agotado en fal y 403 `Exhausted balance`; antes, Flux 3 (draft → enhance, primer/ultimo cuadro, keyframes, edit y extend) y video a video con Seedance 2.5 (`--task editing|extension`, sin verificar); antes, Minimax H3 (video, camera-controls, LoRA y entrenamiento), retome por `--request-id` y cierre de la brecha de `--task`
 > **Modulo:** AI Tooling / Asset Generation
@@ -457,6 +457,15 @@ trabajo real.
 | `⚠ el output no trajo "<clave>"` | La respuesta tiene otra forma que la esperada. Repite con `--json` para verla. |
 | `✓ sin assets descargables` | El modelo respondio pero no habia archivos que bajar. |
 
+### Encolar sin esperar (`--detach`)
+
+```bash
+pnpm ai:fal --capability wan3-t2v --prompt "Paper boats on a rainy street" --duration 5 --resolution 480p --detach
+```
+
+El CLI imprime `request_id`, la cuenta y dos comandos: uno para consultar el estado (`--status`, sin costo) y otro para
+descargar el resultado cuando esté listo. Sirve para dejar varios videos encolados o para trabajos largos.
+
 ## Que no hacer
 
 - **No corras una capacidad para "ver si existe".** Cualquier corrida sin `--list` gasta. Para confirmar un slug
@@ -479,14 +488,30 @@ trabajo real.
 
 ## Problemas comunes
 
-### Recargaste saldo y sigue apareciendo `User is locked` (403)
+### Aparece `User is locked` (403) o quieres saber cuánto saldo queda
 
-1. Corre `pnpm ai:fal --balance`. Es gratis y muestra el saldo de la cuenta de fal **dueña de la clave** que usa el CLI.
-2. Si el número sigue bajo cero, la recarga quedó en otra cuenta o equipo de fal, o todavía no se acredita. Revisa en
-   fal.ai/dashboard/billing que la cuenta seleccionada sea la misma de la clave.
-3. No reintentes corridas para probar: con la cuenta bloqueada, fal igual valida los pedidos (422) y eso no demuestra saldo.
+1. Corre `pnpm ai:fal --balance`. Es gratis y lista el saldo de cada cuenta de fal configurada (`FAL_API_KEY` y
+   `FAL_API_KEY_B`).
+2. No tienes que elegir cuenta: el CLI usa la que tiene más saldo y, si fal bloquea una, pasa sola a la otra. Cada corrida
+   muestra `cuenta …`.
+3. Si el CLI dice que **todas** las cuentas están sin saldo, recarga en fal.ai/dashboard/billing la cuenta que corresponda.
+   Verifica en el selector de cuenta o equipo que sea una de las configuradas.
+4. Para forzar una cuenta: `--fal-account FAL_API_KEY_B`.
 
-Caso del 2026-09-16: tras recargar USD 50 el saldo de la cuenta de la clave seguía en −3,86 USD.
+Caso del 2026-09-16: se recargaron USD 50 en la cuenta B mientras el CLI sólo conocía la A (−3,86 USD). Desde entonces el
+CLI trabaja con las dos.
+
+### Seedance 2.5 rechaza el resultado con `content_policy_violation`
+
+El trabajo se encola (y se cobra) y ByteDance lo rechaza al final. Pasa con referencias que contienen marcas o logotipos
+("potential copyright violation") y con videos o imágenes de personas reales ("likenesses of real people"). Usa material
+sin personas identificables ni marcas, o edita con Flux 3 o Wan 3.0.
+
+### Un video tarda más que la espera del CLI
+
+Si ves `HTTP 408`, el trabajo sigue en fal. Consulta con el comando `--status` que imprime el CLI y, cuando diga
+`COMPLETED`, descárgalo con el comando `--request-id`. No lo relances: pagarías dos veces.
+
 
 - **`fal.ai no está configurado. Define FAL_API_KEY o FAL_API_KEY_SECRET_REF.`** Falta la referencia en
   `.env.local` o la sesion de Google Cloud vencio. Reautentica `gcloud` y vuelve a intentar.

@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — `pnpm ai:fal` trabaja con dos cuentas de fal y ya puede encolar sin esperar
+
+El CLI de fal ahora conoce dos cuentas. Elige la que tiene más saldo y, si fal bloquea una por falta de fondos, pasa sola a
+la otra antes de gastar. `--balance` muestra ambos saldos, y cada corrida dice qué cuenta usó. También se puede encolar un
+video y seguir trabajando: `--detach` deja el trabajo en fal y `--status` avisa cuándo está listo, sin necesidad de montar
+un webhook. Con la cuenta con saldo se terminaron de verificar Wan 3.0 y todas las variantes de Seedance (47 de 55
+capacidades). Las pruebas costaron USD 7,71, el doble de lo estimado para Seedance, y mostraron que su filtro rechaza
+material con marcas o personas reales después de cobrar. Queda pendiente rotar la clave nueva, que se compartió por chat.
+
 ## 2026-09-16 — La recarga de fal no llegó a la cuenta de la clave; `pnpm ai:fal --balance` lo muestra en segundos
 
 Después de recargar USD 50, el CLI seguía bloqueado por saldo. La cuenta de fal dueña de la clave que usamos tenía
@@ -47,6 +56,15 @@ crecimiento B2B, mid-market y time-to-value; Salesforce-first gana peso con org 
 service a escala, extensibilidad e integración enterprise. La zona de solapamiento sigue incluyendo mid-market
 alto, agentes y coexistencia. El diagnóstico conserva las salidas `HubSpot-first`, `Salesforce-first`, `híbrida` y
 `no-fit`, siempre condicionadas a TCO, datos, adopción, entitlements y contrato.
+
+## 2026-09-16 — Dreamforce: AIforce, Missionforce y marketing agentic
+
+El ledger de Salesforce y sus skills espejo separan los anuncios del 15/09 de las publicaciones del 16/09.
+AIforce queda documentado como capa de interfaz/headless —no SKU— para llevar contexto, workflows, permisos,
+gobierno y acciones a interfaces como Claude y Slack. Missionforce suma capacidades para gobierno y entornos
+regulados con OpenAI/NVIDIA. Marketing Cloud Next incorpora Campaign Agent, Headless Marketing/MCP, Palmata,
+Data Guardian, Budget Optimization y otras capacidades con estados GA/fechas separados. Koa se conserva como
+lanzamiento del 15/09 en pilotos seleccionados. [Ledger](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md)
 
 ## 2026-09-16 — HubSpot actualizado con Fall Spotlight y UNBOUND 2026
 
@@ -899,42 +917,3 @@ edición/restauración segura y verificación del propio reporte. La
 noviembre y diciembre, distingue el typo `segundasegunda` del contenido real y documenta `pintura sana` como
 problema de claridad —no como palabra inexistente en México—. El contrato genérico de Notion añade baseline y
 readback de discusiones para reemplazos/restauraciones; no hubo nuevas escrituras en Notion, Drupal ni Frame.io.
-
-## 2026-09-08 — Berel adopta una propuesta de colaboración mensual y canales con función única
-
-Efeonce aprobó internamente proponer desde septiembre una dinámica simplificada para Berel: Notion como fuente
-central del trabajo, Frame.io para revisión visual/audiovisual, Teams para avisos y bloqueos, y correo para informe
-mensual y cierre formal. Dos cortes mensuales alimentan una reunión de 45 minutos dentro de los primeros siete días
-hábiles del mes siguiente; no se impone un SLA genérico de tres días para feedback. El contrato, módulo 19 y skills
-espejo dejan separado lo aprobado internamente de la aceptación pendiente del cliente; no hubo cambio en Notion,
-envío de correo, calendario ni alcance contratado.
-
-## 2026-09-07 — Berel: comentarios, recuperación de octubre y contrato visual corregido
-
-La skill espejo `berel-content-production` incorpora el delta del Playbook vivo para comentarios: claridad antes
-que ingenio, una sección por intención, reubicación con costura, contenido evergreen y evaluación del diagnóstico
-del cliente sin aceptar mecánicamente su remedio. `Atendido` queda separado de `resolved`; Efeonce prueba
-decisión/cambio + respuesta + readback y el cliente cierra el hilo. Las 25 observaciones del lote se clasificaron
-por causa primaria: claridad/estructura 10, precisión de producto 7, voz/localización 5 y alcance editorial 3.
-
-El barrido preventivo de los diez artículos de octubre reveló una regresión propia: al retirar notas internas se
-habían eliminado fichas visuales contextuales y reescrito copy no solicitado. Se restauraron byte a byte los siete
-artículos sin comentarios; en los tres comentados se recuperaron historia y fichas sin deshacer títulos ni cambios
-justificados. La lectura final de esos diez y del artículo centinela de herrería confirmó 44 fichas N1–N4 intactas,
-30 hilos conservados y 59 comentarios, incluida la respuesta que faltaba. De las zonas editoriales se retiraron
-solo notas de agente y operación ajena a la narrativa; no se modificaron assets, Frame.io ni Drupal.
-
-Aclaración del operador del 2026-09-08: los toggles de Research/análisis/plan son evidencia obligatoria y siempre
-permanecen en la página. La limpieza se limita al toggle editorial de artículo, reescritura o tutorial, donde no
-pueden colarse notas de agente o texto ajeno a la narrativa. Skills y gate se alinearon con esta frontera; las
-specs contextuales siguen protegidas y el análisis no se vuelve a tratar como fuga.
-
-Segunda revisión preventiva: 11/11 páginas conservaron evidencia, 44 fichas N1–N4 y 12 fotos de paso; 30 hilos
-y 59 comentarios permanecieron íntegros. Se corrigieron ocho fragmentos de planificación fuera de lugar en Día
-de Muertos, Psicología del color y App Color Berel mediante reemplazos quirúrgicos; la delimitación de cluster
-se movió al análisis. Gate final 11/11, sin cambios en arte, tareas, estados, Frame.io ni Drupal.
-
-La causa raíz también quedó cerrada en los espejos Claude/Codex: las fichas N1–N4 son parte obligatoria del
-artículo y se copian literalmente a las tareas visuales. Una vez producido el arte, composición, copy, ALT,
-archivo, formato y posición quedan congelados hasta una conciliación explícita con diseño. El gate distingue
-fichas de notas internas, exige exactamente N1–N4 completas y conserva la jerarquía de toggles.
