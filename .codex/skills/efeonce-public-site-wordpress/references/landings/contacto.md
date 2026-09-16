@@ -61,7 +61,7 @@ page-scoped: no inferir owners/SLA, destinos, booking end-to-end ni graduación 
 implementación visual y su readback público. La dirección legacy del footer global tampoco queda corregida por esta
 unidad.
 
-## Selector premium de países — publicado 2026-09-15
+## Selector premium de países — 2026-09-15 (⚠️ desplegado recién el 2026-09-16; ver delta al final)
 
 La siguiente iteración elimina en anchos de hasta 767 px la costura horizontal que aparecía porque el asset de Nexa
 comenzaba 150–175 px debajo del hero. El retrato se ancla al borde superior, el gradiente pasa a ser continuo y el
@@ -92,3 +92,48 @@ Growth Forms y Meetings como dueños de interacción/routing; no secretos/mappin
 teléfono antiguo, WhatsApp, horario u oficina por país sin verificación; coverage actual CL/US/CO/MX/PE no amplía
 claims históricos. Publication requires owners/SLA/destinations, staging E2E, GVC 1440/1280/890/390, purge and
 public readback.
+
+## Delta 2026-09-16 — el rollout que la documentación daba por hecho
+
+🔴 **La composición responsive descrita arriba como «publicada el 2026-09-15» NO estaba en producción.**
+El sitio servía `contact-landing.css` con 30.960 bytes; el repo runtime tenía 32.820. El
+`clamp(27px, 5.5vw, 33px)` del titular de la banda aparecía **cero veces** en el archivo live. La
+evidencia local en `.captures/` era real y el verificador pasaba, pero el paquete nunca se desplegó:
+se declaró `code complete` como `operationally complete`. Es el *Runtime Rollout Completion Gate* de
+`CLAUDE.md`, y se detectó sólo porque el operador reportó que la banda se veía mal en su teléfono.
+
+**Lo que producción servía de verdad, medido a 390 px antes de desplegar:** `.gh-contact__band-inner`
+con `grid-template-columns: 56px 267px`, `padding-block: 0`, titular a 34 px partido en **tres**
+líneas, y la curva decorativa `::after` cruzando por encima del CTA. El overflow era 0 — por eso la
+verificación de la unidad anterior no lo atrapó: **medir overflow no es medir composición.**
+
+**Después del despliegue, medido en producción:** grid `40px 306px`, `padding-block: 25px / 27px`,
+titular a 27 px en dos líneas, curva por debajo del botón, overflow 0. Desktop 1440 sin regresión:
+grid `86px 864px 190px`, banda de 160 px, titular en una línea y CTA en la misma fila.
+
+**Copy de cobertura.** La entrada «Cobertura» del directorio decía `Trabajamos con organizaciones en
+Chile y otros mercados.` y ahora nombra los cinco: `Trabajamos con organizaciones en Chile, Estados
+Unidos, Colombia, México y Perú.` Salen de `EFEONCE_OPERATING_MARKETS` en `src/config/efeonce-brand.ts`.
+Se conserva el verbo «trabajamos con organizaciones **en**» a propósito: expresa cobertura y no sedes.
+La entrada vecina publica la dirección postal de la casa matriz, así que «estamos en» o «tenemos
+presencia en» habrían implicado oficina por mercado, que el brief prohíbe.
+
+**Alcance real del release, declarado.** El paquete acotado lleva 9 archivos y sólo 2 diferían del
+live. Pero el diff del CSS tenía **488 líneas cambiadas y sólo 12 eran de la banda**: viajó también el
+resto del set del 2026-09-15 que tampoco estaba desplegado (hero, columna de formulario, callout de
+Careers, FAQ, grid de canales, audio, notas de Nexa, wave y meeting card). Se verificó antes con
+`scripts/public-website/verify-contacto-responsive-composition.ts` sobre el HTML vivo —asserts en
+verde, banda de 273 px a 390 px— y se comprobó desktop después, pero la superficie desplegada fue
+mayor que los dos cambios pedidos.
+
+**Carril usado, sin token de Kinsta.** `export-live-code` → `build-contacto-elementor-package.cjs
+<baseline>` → `wpcli --eval-file deploy-contacto-elementor-package.php --input-file package.zip
+--input-file manifest.json --wp-user 12`. Resultado `scoped_package_installed`, 9 archivos, backup de
+rollback en el servidor: `/tmp/eo-contacto-widgets-before-20260916-120717.tar`. ⚠️ `production_deploy_apply`
+figura como capacidad bloqueada en `runtime-status` porque **la API de Kinsta no está configurada**; eso
+NO bloquea el deploy — SSH/WP-CLI es un carril independiente y es el que corresponde. Leerlo como
+bloqueo cuesta una sesión entera.
+
+**Verificación del asset, y la trampa.** No hace falta purgar caché: el plugin versiona por `filemtime`
+y el `?ver=` saltó solo de `1789484153` a `1789560441`. Pero pedir la URL del CSS **sin** query string
+devuelve una variante cacheada vieja: verificar siempre contra la URL versionada que pide el HTML.

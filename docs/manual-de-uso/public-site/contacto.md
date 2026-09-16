@@ -55,3 +55,47 @@ con `--apply`, verifica el readback y revisa desktop/390 px, teclado, giro del c
 
 No edites directamente la versión publicada ni borres la versión anterior: el rollback debe hacerse mediante los
 comandos canónicos de Growth Forms.
+
+## Release aplicado del copy de cobertura y la banda de reuniones (2026-09-16)
+
+Se ejecutó por el carril SSH/WP-CLI sobre la página `20729`, sin token de Kinsta. Tres pasos, en este orden:
+
+```bash
+# 1. Exporta el código que está vivo hoy. Ése es el baseline del release.
+pnpm public-website:export-live-code
+
+# 2. Arma el paquete acotado contra ese baseline.
+node scripts/public-website/build-contacto-elementor-package.cjs <baseline>
+
+# 3. Instálalo. Responde {"status":"scoped_package_installed","files":9}.
+pnpm public-website:wpcli -- --eval-file scripts/public-website/deploy-contacto-elementor-package.php \
+  --input-file tmp/contacto-elementor-release/package.zip \
+  --input-file tmp/contacto-elementor-release/manifest.json --wp-user 12
+```
+
+No saltees el paso 1. El manifest guarda el hash del archivo vivo (`previousSha256`) y el instalador aborta si
+alguien lo tocó entre el export y el deploy.
+
+Antes de instalar, mira el diff contra el baseline: el paquete arrastra todo lo que esté en el repo y no esté
+vivo, no sólo lo que quieres cambiar. En este release, el CSS tuvo 488 líneas cambiadas y sólo 12 eran del cambio
+pedido; el resto eran iteraciones del día anterior que tampoco estaban desplegadas. Declara en el cierre la
+superficie que efectivamente saliste a publicar.
+
+### Cómo verificar
+
+No hace falta purgar caché: el plugin versiona el CSS por `filemtime` y el `?ver=` sube solo (acá pasó de
+`1789484153` a `1789560441`). **Pide siempre la URL versionada que aparece en el HTML, no la URL desnuda del
+CSS** — sin query string sigue respondiendo una variante cacheada vieja y vas a concluir que el deploy no salió.
+Ese matiz hace perder tiempo si no lo tienes presente.
+
+Sobre el HTML vivo puedes correr `scripts/public-website/verify-contacto-responsive-composition.ts`, y después
+revisa a ojo 390 px y 1440 px: titular de la banda en dos líneas en teléfono y en una en desktop, curva
+decorativa por debajo del botón, CTA en la misma fila en desktop y `scrollWidth === clientWidth`.
+
+### Rollback
+
+El deploy deja un backup en el servidor antes de escribir; el de este release es
+`/tmp/eo-contacto-widgets-before-20260916-120717.tar`. Para revertir, restaura ese tar sobre el directorio del
+plugin por el mismo carril SSH: al reescribir los archivos el `filemtime` sube y el `?ver=` cambia solo, así que
+tampoco necesitas purga. No edites los archivos vivos a mano; si el cambio es nuevo, vuelve a exportar el
+baseline y arma otro paquete.
