@@ -33,8 +33,10 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
 - **Tres planos de acceso en cada command** (`authz.ts`): módulo per-ORG `insights_v1` asignado (vía
   `enableClientPortalModule`, script `scripts/insights/assign-insights-module.ts`) + capability `insights.*` + audiencia
   (`internal` prohibida al cliente). **Org sin módulo ⇒ 404 anti-oracle**, jamás 403.
-- **Flags multi-gate, default OFF**: `INSIGHTS_RENDER_ENABLED` se lee en DOS runtimes (Vercel para encolar, artifact-worker
-  para reclamar; SoT Cloud Run = `services/artifact-worker/deploy.sh`). Los demás sólo en Vercel: `INSIGHTS_GENERATION_ENABLED` (crear/revisar; ON en
+- **Flags multi-gate**: `INSIGHTS_RENDER_ENABLED` se lee en TRES runtimes — Vercel (encolar; la puerta de producto por
+  ambiente, default OFF), el Job `artifact-worker` (reclamar) y el `ops-worker` (despachar). Job y `ops-worker` son únicos
+  para staging y producción, así que declaran el flag default ON en su `deploy.sh` (SoT); omitirlo en el dispatcher deja
+  toda cola sin drenar (hallazgo 2026-09-16). Los demás sólo en Vercel: `INSIGHTS_GENERATION_ENABLED` (crear/revisar; ON en
   Production y staging desde 2026-09-15), `INSIGHTS_ISSUANCE_ENABLED`, `INSIGHTS_AUTHORING_AI_ENABLED` (Gemini acotada
   con validación de cifras y fallback determinista). Sin generación ⇒ `503 generation_disabled`. Registrar todo flip en
   `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.

@@ -7,7 +7,7 @@ description: How to operate Efeonce Insights through MCP — build a valid reque
 
 Efeonce Insights turns a client's evidence (SEO, AEO, ICO delivery metrics) into a frozen, versioned
 edition for a period. Greenhouse owns the library, the request, the permissions and the lifecycle.
-This manual teaches you to operate it correctly through the four MCP tools. It grants no permission:
+This manual teaches you to operate it correctly through its MCP tools (four for editions, four for rendering). It grants no permission:
 everything below is enforced server-side per binding and per organization.
 
 ## What exists today and what does not
@@ -26,6 +26,27 @@ edition can be created, generated and reviewed, but **it cannot be issued** unti
 output has been rendered and validated. Rendering is asynchronous and runs in a worker: request it,
 then poll the run. If the request answers `service_unavailable` with code `render_disabled`, rendering
 is switched off in this runtime — report it and stop. Never tell a human that a report "is ready to send".
+
+## Rendering: timing and semantics
+
+- **It is a queue, not a call.** The engine starts one render roughly every two minutes and produces one
+  output per turn. A single deck is typically ready three to four minutes after the request (longer on a
+  cold start); a batch of N outputs takes about 2·N minutes. Drawing the deck itself takes seconds — the
+  wait is the queue. Other document types may be served first. Poll `get_insight_render_run` every 30–60
+  seconds; do not poll in a tight loop and do not promise the human a delivery in seconds.
+- **States.** Outputs go `queued` → `running` → `completed` | `failed` | `dead_letter` | `cancelled`. A run
+  summarises them (`partial_failed` = one succeeded, another failed). A `completed` output carries
+  `outputAssetId`; that id is not a download link and the deck is not shared or sent.
+- **Retry** (`retry_insight_render`) re-queues only failed outputs; completed ones are never touched. A
+  failure caused by the content (for example text that does not fit a slide) fails again with the same
+  cause and, after its attempts are exhausted, becomes `dead_letter`. Report the cause; the fix is a
+  corrected edition, not more retries.
+- **Cancel** (`cancel_insight_render`) stops what has not started; what is already rendering finishes and
+  the answer says so (`stillRunning`). A cancelled run is **terminal**: retrying it answers successfully
+  but re-queues nothing. To get the deck after cancelling, request a new render.
+- **Audience.** Asking to render or read the render of an edition you cannot see answers `not_found`, and
+  nothing is created. Do not infer that the edition exists.
+- Every request, retry and cancel is recorded under the identity that made it.
 
 ## The request, field by field
 
@@ -129,6 +150,9 @@ frozen and hashed; both are immutable. Every figure in the plan references a fac
 | `request_insight_render` answers `render_rejected` | You asked for an output that cannot be rendered yet, or the frozen plan exceeds a slot budget of the catalog | Request only `deck_pdf`; nothing is truncated silently — report the cause |
 | A render run is `partial_failed` | One output succeeded and another failed | Report both states; `retry_insight_render` re-queues only the failed ones |
 | An output is `dead_letter` | Attempts exhausted or a non-retryable failure (for example the catalog changed since queuing) | Do not retry from MCP; a human decides |
+| An output stays `queued` for several minutes | Normal queue wait: one output per turn of about two minutes | Estimate about 2·N minutes by position; report it as queued, not as failed |
+| `retry_insight_render` on a cancelled run answers successfully but nothing changes | Cancelled is terminal | Request a new render with `request_insight_render` |
+| `not_found` when rendering an edition | The edition is not visible to your binding (for example an internal edition read by a client binding) | Do not retry; report it as not available |
 
 ## Recipes
 
@@ -141,6 +165,15 @@ Monthly SEO + ICO edition for a client, previous month comparison:
 3. `create_insight_edition { organizationId, request }` → read `generation.outcome`.
 4. `get_insight_edition { editionId, includeEvidence: true }` → summarize facts with units and as-of,
    list rejections as limits, and state that issuing is pending human review.
+
+Rendering the deck of an edition in review:
+
+1. `request_insight_render { organizationId, editionId, outputs: ["deck_pdf"] }` → note `renderRunId`.
+2. Tell the human the deck is queued and will take a few minutes.
+3. `get_insight_render_run { organizationId, renderRunId }` every 30–60 s until the output is `completed` (report
+   `outputAssetId`) or `failed`/`dead_letter` (report `failureCode`).
+4. If `failed` with a transient cause, `retry_insight_render { organizationId, renderRunId }` once; if the same cause
+   repeats, stop and hand off.
 
 Recovering after a failure: report `failedPhase` + `failureCode` and hand off to a human with
 `insights.edition.review` capability; do not re-create.

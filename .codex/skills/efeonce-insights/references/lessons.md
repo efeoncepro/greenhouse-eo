@@ -1,5 +1,21 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-16 · A hand-launched canary hid the dispatcher's missing flag.** The 13:00Z render canary executed the
+  `artifact-worker` Job manually and passed; the `ops-worker` dispatcher did not have `INSIGHTS_RENDER_ENABLED`
+  (logs 13:02Z `insightsQueued=0` with an output queued), so nothing would have drained on its own. Rule: a canary
+  exercises the production path (enqueue → scheduler tick → dispatcher → Job), never a shortcut. Map every runtime
+  that reads the flag with `grep` before declaring the rollout, including the one that only *launches* work.
+- **2026-09-16 · A single Job cannot carry lane-dependent config.** The `artifact-worker` Job and the `ops-worker` are one
+  instance each for staging AND production; the assets bucket is fixed to the staging bucket and assets keep
+  `bucket_name` per row. Rule: per-environment behaviour lives at the enqueue gate (Vercel per target), not in Job env;
+  never assume a flag or bucket on the Job can differ between staging and production.
+- **2026-09-16 · Audit the human actor on EVERY event, not only on the run.** Before migration
+  `20260916201127095`, runs and events of a client-requested render were recorded as `system` (the CHECK did not
+  accept `client_user`). Rule: when a command can be invoked by a human of any kind (`member`, `client_user`), the actor
+  travels to the run, the enqueue event, retry and cancel — and the CHECK accepts every actor kind the lanes allow.
+- **2026-09-16 · Throughput is the tick, not the render.** Rendering takes ~7 s but the dispatcher launches one Job
+  execution per 2-min tick (`parallelism=1`, Proposal first): a burst of 5 took 11 min. Promise ≈ 2·N min, not seconds.
+
 - **2026-09-16 · Down of a migration must respect governance tables.** Symptom: `migrate:down` failed twice
   (`module_assignments_module_key_fkey`, then `module_assignment_events is append-only`); node-pg-migrate rolled the
   whole transaction back (no damage). Rule: a domain's Down retires its own schema and deprecates capabilities; it

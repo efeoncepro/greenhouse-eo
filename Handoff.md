@@ -426,9 +426,17 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
-## 2026-09-16 — TASK-1846: render durable — code complete, rollout pendiente
+## 2026-09-16 — TASK-1846: render durable — staging verificado, producción espera el release
 
-[TASK-1846](docs/tasks/in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md) en `develop`, sin push
-ni deploy. Motor conectado (`requestInsightRender` + `InsightOutputsPort` real), lease+fencing probado en PG, lanes
-app/ecosystem, 4 tools MCP, benchmark local. Falta con autorización: deploy del worker, flag ON en Vercel y Cloud
-Run, canary, federación en `efeonce-mcp`. Detalle: la task y la skill viva `efeonce-insights`.
+[TASK-1846](docs/tasks/in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md) sigue `in-progress`
+sólo por el rollout productivo. En `develop` (pushed): `d9da99df8` (Job `artifact-worker` al release control plane
++ `INSIGHTS_RENDER_ENABLED` declarado en el `ops-worker`) y `1875fdd32` (auditoría `client_user`, migración expand
+`20260916201127095` aplicada). **Hallazgo:** el dispatcher del `ops-worker` no leía el flag; el canary de las 13:00Z
+se lanzó a mano. Hoy el flag está ON en Vercel staging, Job y `ops-worker-00690-xhl`; Vercel Production OFF.
+Benchmark Cloud Run staging: 5/5 al primer intento, **1 output por tick de 2 min** (ráfaga de N ≈ 2·N min);
+retry, cancelación y negativo de audiencia verificados por API real. Gateway `efeoncepro/efeonce-mcp#14` mergeado
+(`da8295a`, v1.6.0) **sin desplegar**. Job único ⇒ bucket fijo `staging` y flags default ON en `deploy.sh`.
+**Próximos pasos (tras autorización de release):** release develop→main (primer deploy productivo del Job,
+`deploy-artifact-worker`), `vercel env add INSIGHTS_RENDER_ENABLED production` + redeploy, deploy del gateway
+v1.6.0, canary productivo en la org sandbox y cierre de la task. Aparte: `CLAUDE.md governance` está rojo desde
+`45ae955b4` por 2 líneas huérfanas de docs de IA (Higgsfield/Recraft, `generateImage()`), ajeno a 1846.

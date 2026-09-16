@@ -51,11 +51,31 @@ flag, 202 after.
 
 ## Rendering (TASK-1846)
 
-- Flag `INSIGHTS_RENDER_ENABLED` — TWO runtimes: Vercel (queue via API/MCP) and the `artifact-worker` Cloud Run Job (claim).
-  Cloud Run SoT is `services/artifact-worker/deploy.sh` (destructive `--set-env-vars`; guarded by `deploy-contract.test.ts`);
-  apply live with `gcloud run jobs update … --update-env-vars` AND keep it in `deploy.sh`. Vercel: `vercel env add` + redeploy.
-- Rollout order (not executed yet): deploy the worker image → flag ON in the worker → flag ON in Vercel → canary on the
-  synthetic org (request deck_pdf, poll the run, expect `completed` + asset) → only then consider `INSIGHTS_ISSUANCE_ENABLED`.
+- Flag `INSIGHTS_RENDER_ENABLED` — THREE runtimes: Vercel (queue via API/MCP), `ops-worker` (dispatcher
+  `/artifact-render/dispatch`, called by Cloud Scheduler `ops-artifact-render-dispatch` every 2 min, launches the Job)
+  and the `artifact-worker` Cloud Run Job (claim/render). Cloud Run SoT is each service's `deploy.sh` (destructive
+  `--set-env-vars`; both default `true`); apply live with `gcloud run jobs update …`/`gcloud run services update …
+  --update-env-vars` AND keep it in `deploy.sh`. Vercel: `vercel env add` + redeploy.
+- Job and ops-worker are SINGLE for staging and production. The per-environment product gate is the Vercel enqueue.
+  The Job's assets bucket is fixed to `efeonce-group-greenhouse-private-assets-staging` (assets store `bucket_name` per row).
+- State 2026-09-16: Vercel staging ON · Vercel Production OFF (absent) · Job ON · ops-worker ON (revision
+  `ops-worker-00690-xhl`). The Job is in the production release control plane; first productive deploy on next release.
+- Production rollout order (NOT executed): Greenhouse release → `vercel env add INSIGHTS_RENDER_ENABLED production` +
+  `vercel redeploy` → deploy gateway `efeonce-mcp` v1.6.0 (merged, PR #14) → production canary on the synthetic org →
+  only then consider `INSIGHTS_ISSUANCE_ENABLED` (OFF).
+- Throughput (Cloud Run staging 2026-09-16): 1 output per 2-min tick (one execution per tick, `parallelism=1`; Proposal
+  wins the tick). A burst of N ≈ 2·N min. Render 6.3–7.3 s, PDF ~330 KB; execution start 3.9 s warm / 42 s first after
+  deploy / 154 s cold; task total 50–58 s. Local: 15 slides ~4.6 s, 25 slides ~7.2 s, RSS ≤ 365 MB.
+- Semantics seen live: `retry` re-queues only failed (completed untouched; content failures fail again, attempts →3 →
+  `dead_letter`); `cancel` on a queued run ⇒ `cancelled`, 0 attempts; `retry` on cancelled ⇒ 200, no re-queue.
+- Staging canary (recipe used 2026-09-16; synthetic org "Greenhouse Demo", persona `agent-client`):
+  1. `AGENT_AUTH_EMAIL=agent-client@greenhouse.efeonce.org pnpm staging:request POST /api/platform/app/insights/editions '<InsightRequestV1, outputs ["deck_pdf"]>'` → 202 `ready_for_review`.
+  2. `… pnpm staging:request POST /api/platform/app/insights/editions/<editionId>/render '{}'` → 202, output `queued`.
+  3. Do NOT execute the Job by hand. Wait for the dispatcher tick and poll `GET /api/platform/app/insights/render-runs/<id>`
+     until `completed` + `outputAssetId`. Queue age > ~2·position min ⇒ check ops-worker logs (`insightsQueued`).
+  4. Negatives: cancel a still-queued run (→ `cancelled`, 0 attempts) then retry it (→ 200, no re-queue); an `internal`
+     edition created by a superadmin, rendered/read by `agent-client` → 404, 0 outputs.
+  5. `pnpm test:live src/lib/efeonce-insights/render` (4/4 on 2026-09-16).
 - Orphans: signal `insights.render.orphaned_output` (steady 0). Rows `running` with `lease_expires_at IS NULL` are
   pre-fencing legacies and need a human decision; expired leases beyond 60 min mean the worker is not draining.
 - Live tests: `pnpm test:live src/lib/efeonce-insights/render` (rollback transaction; needs the proxy).

@@ -48,8 +48,10 @@ it without repeating what already cost a day*. It grows with every task: see the
 - **Durable rendering is asynchronous and fail-closed** (`render/**`): only `INSIGHT_RENDERABLE_OUTPUTS`
   (today `deck_pdf`) can be queued; another target is `render_rejected`, never "for later". The mapper NEVER
   truncates a figure or a claim to fit a slot (it rejects with the cause). Lease and fencing ship together:
-  finalization presents the `fence_token` or writes nothing. `INSIGHTS_RENDER_ENABLED` is read in TWO runtimes
-  (Vercel to queue, artifact-worker to claim) and must be ON in both.
+  finalization presents the `fence_token` or writes nothing. `INSIGHTS_RENDER_ENABLED` is read in THREE runtimes
+  (Vercel to queue, the `ops-worker` dispatcher that launches the Job, the `artifact-worker` Job to claim) and must
+  be ON in all three. Job and ops-worker are single instances shared by staging and production: the per-environment
+  product gate is the Vercel enqueue, never a lane-dependent Job config. Throughput is 1 output per 2-min tick.
 - **Three access planes on every command** (`authz.ts`): module `insights_v1` assigned per organization
   + capability `insights.*` + audience. An organization without the module is `not_found` (404
   anti-oracle), never `403`. Clients see evidence/plan only of issued editions.

@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — Efeonce Insights renderiza solo en staging y el worker de render entra al release
+
+El render de Insights ya funciona de punta a punta en staging sin intervención: se encarga por API o MCP, el despacho
+lanza el worker y el deck queda como asset privado. La prueba que lo dejó así destapó que el despachador nunca había
+leído su flag: el primer canary había funcionado porque el worker se lanzó a mano. Con una ráfaga de cinco renders
+medimos el ritmo real: un output cada dos minutos, siete segundos de render cada uno. Retry, cancelación y el bloqueo
+de un cliente sobre una edición interna se probaron contra el runtime, y un render pedido por un cliente ahora queda
+auditado como `client_user` y no como `system`. El worker de render, un Cloud Run Job, quedó integrado al orquestador
+de producción con su propia lectura de drift y rollback. Producción recibe todo esto con el próximo release.
+
 ## 2026-09-16 — Guía para elegir modelo de IA: qué usar, cuándo, cómo y cuánto cuesta cada uno
 
 Todos los modelos que hoy se pueden correr desde `pnpm ai:image` y `pnpm ai:fal` quedaron descritos en una sola guía
@@ -910,14 +920,3 @@ TASK-1845–1849: evidencia/adapters, render durable, catálogos deck/A4, acceso
 ADR y arquitectura fijan dominio Greenhouse + Artifact Worker, tres salidas de primera clase, snapshots,
 API/UI/MCP, co-branding y grants revocables. TASK-1672/1673 conservan integración de auditoría técnica SEO.
 Sólo planificación autorizada; sin implementación, emisión de reportes ni rollout.
-
-## 2026-09-08 — TASK-1844: autoridad interna multiorganización activada
-
-Greenhouse resuelve autoridad por objetivo con consentimiento v2; gateway 1.3.0 descubre organizaciones
-permitidas y revalida cada llamada sin ampliar `efeonce.mcp.read`. Expand/contract aplicadas y cohorte de
-una persona ON. Codex, Claude Code, Claude hospedado/Desktop: A/B, negativos, refresh y revocación verificados.
-Rollback/restore servido probado; Claude Code requiere login tras OFF. CIMD extendido de Claude admite
-PKCE/refresh y rechaza JWT bearer; OAuth 150 passed. PR 230/main `45f6910e3`, orquestador `34281143424`
-success, manifest released, Vercel exacto y watchdog 5/5. Fixtures retiradas; conexiones definitivas conservadas.
-[QA y límites](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
-Manual interno, documentación funcional/técnica, API, runbooks y skills Codex/Claude reconciliados; [cobertura](docs/audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).

@@ -58,6 +58,14 @@ Internal bindings must pass `organizationId`; org-scoped bindings read their own
   output DTO `{ insightOutputId, output, state, attempts, failureCode, outputAssetId, manifestHash, finishedAt }`.
 - `POST …/render-runs/{id}/retry` → re-queues only `failed` outputs (`idempotent:true` when none). `dead_letter` is terminal.
 - `POST …/render-runs/{id}/cancel` → `{ run, outputs, cancelled, stillRunning, idempotent }`; running outputs are not lied about.
+  `cancelled` is TERMINAL: `retry` on a cancelled run answers `200` without re-queuing (verified in staging 2026-09-16);
+  to get the deck, request a new render.
+- A failed output relaunched by `retry` keeps its sealed manifest: a content failure (e.g. `sectionItems` slot
+  validation) fails again honestly as `render_error`, attempts climb to max 3, then `dead_letter`. Completed outputs are untouched.
+- Audience: a client actor on an `internal` edition gets `404` on request and on GET, and no output is created.
+- Actor audit: runs and `insight_render_events` record the human actor (`member` or `client_user`) on request, enqueue
+  event, retry and cancel; `system` only for the worker/dispatcher.
+- Timing contract (observed, not an SLA): 1 output per 2-min dispatcher tick; poll every 30–60 s.
 - Run states: `pending|running|completed|partial_failed|failed|cancelled`. Output states: `queued|running|completed|failed|dead_letter|cancelled`.
 - Failure codes: `audience_violation, semantic_rejected, size_rejected, geometry_rejected, font_fallback_detected, missing_asset, blank_slide, manifest_drift, render_error, timeout, dispatch_error, cancelled`; non-retryable: `audience_violation, semantic_rejected, manifest_drift, cancelled`.
 - Errors: `render_disabled` → 503 `service_unavailable`; `render_rejected` → 422 `bad_request` (details carry the cause; nothing is truncated).

@@ -6,7 +6,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | Task | Scope | Lifecycle | Live where | Closed on |
 | --- | --- | --- | --- | --- |
 | TASK-1845 | Domain, evidence, adapters, lanes, MCP, gateway federation | **complete** | Cloud SQL (single instance), Vercel staging + Production (generation ON), gateway v1.5.0, Entra scope | 2026-09-16 |
-| TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | in-progress (session greenhouse-eo-0d) | — | — |
+| TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | in-progress | Cloud SQL (migrations applied), Vercel staging (render ON), Cloud Run Job `artifact-worker` + `ops-worker` dispatcher (flag ON, shared by staging/prod); Production pending | — |
 | TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | to-do | — | — |
 | TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | to-do (blocked by 1846) | — | — |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1846/1847/1848) | — | — |
@@ -55,7 +55,44 @@ UI, client grants of the write scope, real-client integration (Berel/Sky — def
 `plan.limits` (repeats "ico: sin datos." per rejection); any worker reading `INSIGHTS_*` must declare it in its
 `deploy.sh`; `issuance` stays OFF until outputs are validated; keep Proposal untouched in the Artifact Worker.
 
-## TASK-1846 — durable rendering (in-progress)
+## TASK-1846 — durable rendering (in-progress; live in staging, production pending)
+
+**Delta 2026-09-16 (late) — rollout in staging, Cloud Run benchmark, actor audit.** Supersedes the "not deployed /
+flag OFF / no Cloud Run measurement" statements below, which describe the earlier state.
+
+- Code on `origin/develop` (session commits `45ae955b4…9407df2d6`, plus `d9da99df8` release-plane integration and
+  `1875fdd32` client_user actor). Dispatcher `src/lib/efeonce-insights/render/dispatch.ts` invoked by `ops-worker`
+  `/artifact-render/dispatch` (Cloud Scheduler `ops-artifact-render-dispatch`, every 2 min; Proposal wins the tick);
+  domain-free launcher `src/lib/render-dispatch/job-runner.ts`; consumer `services/artifact-worker/consumers/insights.ts`.
+- Gateway `efeonce-mcp` PR #14 merged (`da8295a`), v1.6.0, 51 tools, render writes on `efeonce.mcp.insights.write`.
+  **NOT deployed**: gateway deploy goes after the Greenhouse release (render routes are not in production).
+- Migration `20260916201127095_task-1846-insights-render-client-user-actor` (expand, applied): runs/events accept
+  `client_user`; the human actor travels to run, enqueue event, retry and cancel (before: always `system`).
+
+| Runtime | Component | State 2026-09-16 | Evidence |
+| --- | --- | --- | --- |
+| Vercel `staging` | enqueue + `INSIGHTS_RENDER_ENABLED` | ON | burst of 5 renders, retry, cancel, audience deny |
+| Vercel Production | enqueue | OFF (variable absent) | — |
+| Cloud Run Job `artifact-worker` | claim/render | ON (default `true` in `deploy.sh`); integrated in the production release control plane, first productive deploy on the next release; assets bucket fixed to `efeonce-group-greenhouse-private-assets-staging` (`bucket_name` stored per row) | 5/5 `completed` |
+| Cloud Run `ops-worker` | dispatcher | ON since revision `ops-worker-00690-xhl` (default `true` in `deploy.sh`). Before that day it lacked the flag | logs 13:02Z `insightsQueued=0` with a queued output |
+| Gateway `mcp.efeonce.org` | 4 render tools | merged, not deployed | — |
+
+**Cloud Run staging benchmark (org sandbox `Greenhouse Demo`, persona `agent-client`):** 5 seo+ico `deck_pdf` queued
+20:09:33–20:09:41Z; starts 20:12:51 / 20:14:49 / 20:16:46 / 20:18:45 / 20:20:51; all `completed` first attempt; render
+6.3–7.3 s; PDF ~330 KB; queue age 3m18s → 11m10s ⇒ **1 output per 2-min tick** (one execution per tick, Job
+`parallelism=1`): a burst of N outputs takes ≈ 2·N min. Execution start 3.9 s warm, 42 s first after deploy, 154 s
+cold; task total 50–58 s. Real retry: a failed output with a pre-fix sealed manifest was relaunched by the dispatcher
+(20:10 tick), failed honestly `render_error` (`sectionItems` slot validation), attempts 1→2 of 3, completed outputs
+untouched. Real cancel: queued run → `cancel` 200 → run + output `cancelled`, 0 attempts; `retry` on cancelled →
+200 without re-queue (terminal). Audience negative: `internal` edition by superadmin, `agent-client` render → 404,
+GET → 404, 0 outputs. Live tests `pnpm test:live src/lib/efeonce-insights/render` 4/4.
+Earlier LOCAL benchmark: 15 slides 4.44–4.72 s RSS 300–328 MB PDF 5.4 MB; 25 slides 7.07–7.42 s RSS 355–365 MB PDF
+12.6 MB; burst 5×15 23.3 s. Not measured: A4 10/30 pages (TASK-1847), queue contention with Proposal active.
+
+**Pending (not verified):** Greenhouse release → `vercel env add INSIGHTS_RENDER_ENABLED production` + redeploy →
+gateway v1.6.0 deploy → production canary. `INSIGHTS_ISSUANCE_ENABLED` stays OFF. Orphans `running` without lease
+need a human decision (signal `insights.render.orphaned_output`, steady 0).
+
 
 **Built so far (local on `develop`, NOT pushed by this session, NOT deployed):**
 - Migrations `20260916004647239` (runs/outputs/events) and `20260916012422819` (lease + fence on BOTH
@@ -110,6 +147,10 @@ _Fill at closure._
 _Fill at closure: Astro route, token handling, `no-store`, GVC evidence._
 
 ## Sessions (append as you go; newest first)
+
+- **2026-09-16 · TASK-1846 staging rollout + Cloud Run benchmark.** Flag ON in Vercel staging, Job and ops-worker;
+  found the ops-worker lacked the flag (hidden by a hand-launched canary); client_user actor migration; burst of 5,
+  real retry, real cancel, audience deny; gateway v1.6.0 merged (not deployed). Production still pending.
 
 - **2026-09-16 · greenhouse-eo-0d · TASK-1846 Slices 1-3 implemented (no rollout).** Commits `657591d6c`,
   `a35fc708e`, `b4aa8f03e`, `50f17e4d4`, `804b3295f`, `6d438905f`. Key decision recorded in the task: lease and

@@ -161,8 +161,10 @@ export const DEFAULT_INSIGHT_RENDER_LEASE_MINUTES = 15
  * el Job y deja a las demás —y a Proposal— esperando detrás. El límite se aplica EN EL CLAIM, no
  * en el enqueue: encolar es barato y legítimo; lo que se raciona es el worker.
  *
- * El valor definitivo sale del benchmark del Slice 4; 2 es un piso conservador hasta tener la
- * medición, no un número elegido a ojo que vaya a quedarse.
+ * Fijado con el benchmark de Cloud Run staging (2026-09-16, ráfaga de 5): hoy el cuello de botella NO
+ * es esta cuota sino el despacho — una ejecución del Job por tick de 2 min con `parallelism=1` —, así
+ * que la concurrencia efectiva por org es 1 y 2 no limita nada todavía. Se mantiene en 2 como techo
+ * para el día que el despacho lance más de una ejecución por tick: ese cambio debe re-medir acá.
  */
 export const DEFAULT_INSIGHT_RENDER_ORG_CONCURRENCY = 2
 

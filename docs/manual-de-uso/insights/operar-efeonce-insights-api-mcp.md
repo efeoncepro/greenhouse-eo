@@ -1,17 +1,17 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846, render durable)
+> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846, render vivo en staging, benchmark y canary)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
 
 Crear y seguir ediciones de Efeonce Insights sin pantalla (la UI llega en TASK-1849): desde el
 portal autenticado (lane `app`), desde un consumer del ecosistema (lane `ecosystem`) o desde un
-agente por MCP. Hoy el flujo llega hasta `ready_for_review`; emitir queda bloqueado hasta que el
-render valide salidas (TASK-1846).
+agente por MCP. Hoy el flujo llega hasta `ready_for_review` y, en staging, hasta el deck PDF renderizado;
+emitir sigue apagado en todos los ambientes.
 
 ## Antes de empezar
 
@@ -58,13 +58,13 @@ Verificado el 2026-09-15 en staging (lanes app y ecosystem) y producción (lane 
 
 | Llamada | Respuesta | Qué significa |
 | --- | --- | --- |
-| `GET .../catalog` | `200` con módulos `available` o su razón (`module_not_assigned`, `no_active_spaces`), `renderableOutputs: []` | Sólo los `available` producen evidencia; `renderableOutputs` vacío hasta el render |
+| `GET .../catalog` | `200` con módulos `available` o su razón (`module_not_assigned`, `no_active_spaces`), `renderableOutputs: ["deck_pdf"]` (desde TASK-1846) | Sólo los `available` producen evidencia; `renderableOutputs` lista lo que el motor puede producir hoy |
 | `POST .../editions` (encargo nuevo) | `202` con `report.code` (`EO-INS-…`), `edition.state = ready_for_review` (o `failed` + `failedPhase`) y `generation.outcome` | La generación corre por fases tras el commit |
 | Mismo `POST` con la misma `idempotencyKey` y el mismo encargo | `200` con la **misma** edición e `idempotent: true` (el primer create responde `202`) | Replay seguro; en el lane ecosystem la respuesta cacheada por la lane también devuelve la misma edición |
 | Misma `idempotencyKey` con un encargo distinto (por ejemplo otro `depth`) | `409 idempotency_conflict` | Por diseño: una clave por encargo humano distinto |
 | Cualquier ruta sobre una org sin módulo, o un cliente apuntando a otra org | `404 not_found` | Anti-oráculo: no se distingue "no existe" de "no tiene módulo" |
 | `POST .../editions` con generación apagada en ese runtime | `503 service_unavailable` (`details.code = generation_disabled`) | Prender el flag en el target correcto y redeploy |
-| `POST .../editions/<id>/issue` | `409` (`details.code = not_ready`) | Esperado hasta TASK-1846; no hay outputs validados |
+| `POST .../editions/<id>/issue` | `409` (`details.code = not_ready`) | Faltan outputs `completed` de la misma audiencia (`missing`/`pending`); además la emisión sigue OFF |
 | `GET .../editions/<id>?include=evidence` como cliente sobre una no emitida | `200` con `evidence` y `plan` en `null` | Por diseño: el cliente ve evidencia/plan sólo de ediciones emitidas; el interno siempre |
 
 ## Qué ve un cliente y qué ve un interno
@@ -108,7 +108,7 @@ lectura con el scope base `efeonce.mcp.read`; `create_insight_edition` exige la 
 `insufficient_scope` hasta un consentimiento/grant gobernado. Canary de lectura del gateway:
 `scripts/greenhouse-insights-canary.mjs` en el repo `efeonce-mcp` (nunca crea).
 
-## Pedir el render de una edición (TASK-1846 — apagado hasta el rollout)
+## Pedir el render de una edición (TASK-1846 — vivo en staging, pendiente en producción)
 
 Cuando una edición está en `ready_for_review`, se puede encargar su **deck PDF**. El encargo es
 asíncrono: la respuesta es un `run` con un `output` por target en cola; el archivo lo produce el
@@ -124,17 +124,69 @@ worker de render y se consulta después. Hoy sólo `deck_pdf` es renderizable; p
 3. Si un output quedó `failed`: `POST …/render-runs/{renderRunId}/retry` re-encola **sólo** los
    fallidos. `dead_letter` (intentos agotados o `manifest_drift`) no se reintenta desde aquí.
 4. `POST …/render-runs/{renderRunId}/cancel` cancela lo pendiente; lo que ya está renderizando
-   termina solo y la respuesta lo dice (`stillRunning`).
+   termina solo y la respuesta lo dice (`stillRunning`). Un run cancelado es **terminal**: un `retry` sobre él
+   responde `200` sin re-encolar nada. Si se quiere el deck, se pide de nuevo con el paso 1.
 5. Con todos los outputs `completed`, `issue` deja de responder `not_ready` por outputs y pasa a
    depender sólo del flag de emisión y del gate humano.
 
 Por MCP: `request_insight_render`, `get_insight_render_run`, `retry_insight_render`,
 `cancel_insight_render` (las tres de escritura exigen binding interno).
 
-**Estado real (2026-09-16):** todo esto está en código y con tests, pero `INSIGHTS_RENDER_ENABLED`
-está **OFF** en todos los ambientes y el worker de render **no está desplegado**: hoy el encargo
-responde `503 render_disabled`. Prenderlo es multi-runtime — Vercel (encolar) **y** el
-`artifact-worker` en Cloud Run (reclamar), declarado en su `deploy.sh` — y requiere autorización.
+Un cliente que pide o consulta el render de una edición `internal` recibe `404` y no se crea ningún output
+(anti-oráculo). Cada encargo, retry y cancelación queda auditado con el actor humano (`member` o `client_user`),
+no como `system`.
+
+### Cuánto tarda (medido en Cloud Run staging, 2026-09-16)
+
+El worker no escucha la cola: Cloud Scheduler `ops-artifact-render-dispatch` llama cada **2 minutos** al
+`ops-worker` (`/artifact-render/dispatch`), que lanza **una** ejecución del Cloud Run Job `artifact-worker`
+(`parallelism=1`) y esa ejecución renderiza **un** output. Si en ese tick Proposal tenía trabajo, Proposal gana
+y Insights espera al siguiente.
+
+| Qué | Medido |
+| --- | --- |
+| Throughput | **1 output por tick de 2 min**: una ráfaga de N outputs tarda ≈ 2·N min |
+| Ráfaga de 5 `deck_pdf` | edad en cola de 3m18s (el primero) a 11m10s (el quinto); las 5 `completed` al primer intento |
+| Render (started → finished) | 6,3–7,3 s; PDF ~330 KB |
+| Arranque de la ejecución | 3,9 s en caliente · 42 s la primera tras un deploy · 154 s en frío |
+| Duración total de la tarea | 50–58 s (Chromium + claim + render + upload) |
+
+No consultar el run en bucle cerrado: con esta cadencia, una consulta cada 30–60 s basta.
+
+### Estado por runtime (2026-09-16)
+
+`INSIGHTS_RENDER_ENABLED` se lee en **tres** runtimes y debe estar ON en los tres:
+
+| Runtime | Rol | Estado |
+| --- | --- | --- |
+| Vercel `staging` | encolar | **ON** |
+| Vercel Production | encolar | **OFF** (la variable no existe): en producción el encargo responde `503 render_disabled` |
+| Cloud Run Job `artifact-worker` | reclamar y renderizar | ON (default `true` en su `deploy.sh`) |
+| Cloud Run `ops-worker` | dispatcher | ON desde la revisión `ops-worker-00690-xhl` (default `true` en su `deploy.sh`) |
+
+El Job y el `ops-worker` son **únicos** para staging y producción: la puerta por ambiente es el encolado en Vercel.
+El bucket de assets del Job está fijo en `efeonce-group-greenhouse-private-assets-staging` (cada asset guarda su
+`bucket_name`). Las 4 tools de render están en el gateway `efeonce-mcp` v1.6.0 (mergeado, **no desplegado**).
+
+Orden pendiente para producción (no ejecutado): release de Greenhouse (primer deploy productivo del Job) →
+`vercel env add INSIGHTS_RENDER_ENABLED production` + `vercel redeploy` → deploy del gateway v1.6.0 → canary
+productivo sobre la org sintética. `INSIGHTS_ISSUANCE_ENABLED` sigue OFF.
+
+### Canary de render en staging (receta usada el 2026-09-16)
+
+Con la org sintética «Greenhouse Demo» y la persona cliente:
+
+1. `AGENT_AUTH_EMAIL=agent-client@greenhouse.efeonce.org pnpm staging:request POST /api/platform/app/insights/editions '<InsightRequestV1 con outputs ["deck_pdf"]>'`
+   → `202`, edición `ready_for_review`.
+2. `AGENT_AUTH_EMAIL=agent-client@greenhouse.efeonce.org pnpm staging:request POST /api/platform/app/insights/editions/<editionId>/render '{}'`
+   → `202` con `run` y un output `queued`.
+3. **No lanzar el Job a mano.** El canary debe esperar al tick del dispatcher (hasta ~2 min, más arranque) y
+   consultar `GET /api/platform/app/insights/render-runs/<renderRunId>` hasta `completed` con `outputAssetId`.
+   Lanzarlo a mano ocultó que el `ops-worker` no tenía el flag.
+4. Negativos: `POST …/render-runs/<id>/cancel` sobre un run todavía encolado → `cancelled` con 0 intentos, y
+   `retry` sobre él → `200` sin re-encolar; render de una edición `internal` (creada por un interno) pedido por la
+   persona cliente → `404`, sin outputs.
+5. Contra PostgreSQL real: `pnpm test:live src/lib/efeonce-insights/render` (4/4 el 2026-09-16).
 
 ## Qué significan los estados
 
@@ -170,10 +222,13 @@ Códigos de rechazo de evidencia: `unsupported_window` (grano no servible; suele
 | `evidence`/`plan` en `null` leyendo como cliente | La edición no está emitida | Esperado; sólo el interno ve evidencia de no emitidas |
 | `insufficient_scope` en `create_insight_edition` por el gateway | El cliente MCP no porta `efeonce.mcp.insights.write` | Grant gobernado del scope; no rodear con otro token |
 | `plan.limits` repite «ico: sin datos.» varias veces | Un límite por rechazo `no_data` en el plan congelado | Esperado: el render lo deduplica; el plan sellado no se toca |
-| `503 service_unavailable` (`render_disabled`) al pedir el render | Flag `INSIGHTS_RENDER_ENABLED` OFF en ese runtime (hoy: en todos) | Rollout autorizado: prender en Vercel **y** en el `artifact-worker` (`deploy.sh` + revisión activa) |
+| `503 service_unavailable` (`render_disabled`) al pedir el render | Flag `INSIGHTS_RENDER_ENABLED` OFF en el Vercel de ese ambiente (hoy: Production) | Rollout autorizado: prender en Vercel + redeploy; verificar además el Job `artifact-worker` y el `ops-worker` (`deploy.sh` + revisión activa) |
+| Output `queued` que no arranca pasado varios ticks | Cola larga (1 output por tick de 2 min; Proposal gana el tick) **o** el `ops-worker` sin el flag (logs del dispatcher con `insightsQueued=0` y outputs en cola) | Calcular ≈ 2·N min por posición en la cola; si excede, revisar el flag en la revisión activa del `ops-worker` |
+| `retry` sobre un run `cancelled` responde `200` y no pasa nada | Cancelado es terminal | Pedir un render nuevo |
+| Output falla de nuevo tras `retry` con `render_error` | Causa de contenido (p. ej. validación de slots) que reintentar no arregla; `attempts` sube hasta 3 y termina en `dead_letter` | Corregir la edición (`revise`) y pedir el render de la nueva versión |
 | `422 render_rejected` al pedir el render | Output no renderizable todavía (`report_pdf`/`web`), o el plan excede un presupuesto del catálogo | Pedir sólo `deck_pdf`; si es presupuesto, la causa viene en `details` — no se trunca copy en silencio |
 | Run en `partial_failed` | Un output salió y otro falló | Leer cada output; `retry` re-encola sólo los fallidos |
-| Output `running` que no avanza | Worker caído o flag OFF en su revisión activa (señal `insights.render.orphaned_output`) | Verificar el Job y el flag en Cloud Run; los reclamos por lease vencido son automáticos si el worker corre |
+| Output `running` que no avanza | Worker caído o flag OFF en su revisión activa (señal `insights.render.orphaned_output`) | Verificar el Job y el flag en Cloud Run; los reclamos por lease vencido son automáticos si el worker corre. Un `running` **sin lease** no se reclama solo: decisión humana |
 | `failed` en `validating` con `evidence_rejected` | Un módulo requerido no aportó hechos | Revisar rechazos; pedir meses completos o `policy.allowPartial=true` explícito |
 | Edición > 30 min en una fase | Proceso caído (señal `insights.editions.stuck_generation`) | `recover` desde la fase |
 
