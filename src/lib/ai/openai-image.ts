@@ -219,6 +219,14 @@ const OPENAI_IMAGE_MODELS = new Set<OpenAIImageModel>(
 
 const PREMIUM_OPENAI_IMAGE_QUALITIES = new Set<OpenAIImageQuality>(['xhigh', 'max'])
 
+/** Fuente única de los identificadores válidos, para el allowlist, el CLI y los mensajes de error. */
+export const OPENAI_IMAGE_MODEL_IDS = Object.keys(OPENAI_IMAGE_MODEL_CAPABILITIES) as OpenAIImageModel[]
+
+export const OPENAI_IMAGE_QUALITIES: OpenAIImageQuality[] = ['auto', 'low', 'medium', 'high', 'xhigh', 'max']
+
+export const isOpenAIImageQuality = (value: string): value is OpenAIImageQuality =>
+  (OPENAI_IMAGE_QUALITIES as string[]).includes(value)
+
 export const getOpenAIImageModelCapabilities = (model: OpenAIImageModel): OpenAIImageModelCapabilities =>
   OPENAI_IMAGE_MODEL_CAPABILITIES[model]
 
@@ -254,10 +262,20 @@ const sanitizeEnvValue = (value: string | undefined) => value?.trim() || null
 export const isOpenAIImageModel = (value: string): value is OpenAIImageModel =>
   OPENAI_IMAGE_MODELS.has(value as OpenAIImageModel)
 
+/**
+ * Un `OPENAI_IMAGE_MODEL` desconocido **lanza**. Antes devolvía el default en silencio, así que pedir
+ * `gpt-image-2.5-flare` generaba con `gpt-image-2` y se pagaba otro modelo del que se creía. Fallar acá es
+ * ruidoso al arranque del consumer, que es exactamente donde se quiere descubrir una env mal escrita.
+ */
 export const getOpenAIImageModel = (env: NodeJS.ProcessEnv = process.env): OpenAIImageModel => {
   const requested = sanitizeEnvValue(env.OPENAI_IMAGE_MODEL)
 
-  return requested && isOpenAIImageModel(requested) ? requested : DEFAULT_OPENAI_IMAGE_MODEL
+  if (!requested) return DEFAULT_OPENAI_IMAGE_MODEL
+  if (isOpenAIImageModel(requested)) return requested
+
+  throw new Error(
+    `OPENAI_IMAGE_MODEL="${requested}" is not a supported OpenAI image model. Valid models: ${OPENAI_IMAGE_MODEL_IDS.join(', ')}.`
+  )
 }
 
 export const getOpenAIImageResponsesModel = (env: NodeJS.ProcessEnv = process.env): string =>

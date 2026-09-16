@@ -5,6 +5,7 @@ import {
   generateOpenAIImage,
   getOpenAIImageModel,
   isOpenAIImageModel,
+  isOpenAIImageQuality,
   resolveOpenAIImageBackground,
   resolveOpenAIImageRequestModel,
   resolveOpenAIImageSize,
@@ -27,9 +28,35 @@ afterEach(() => {
 describe('openai-image helpers', () => {
   const testEnv = (env: Record<string, string | undefined>) => env as unknown as NodeJS.ProcessEnv
 
-  it('defaults to gpt-image-2 when OPENAI_IMAGE_MODEL is unset or unsupported', () => {
+  it('defaults to gpt-image-2 when OPENAI_IMAGE_MODEL is unset', () => {
     expect(getOpenAIImageModel({} as NodeJS.ProcessEnv)).toBe('gpt-image-2')
-    expect(getOpenAIImageModel(testEnv({ OPENAI_IMAGE_MODEL: 'dall-e-3' }))).toBe('gpt-image-2')
+  })
+
+  // TASK-1851: este caso afirmaba la degradación silenciosa como comportamiento correcto.
+  // Devolver el default ante un valor desconocido hacía que pedir 2.5 generara —y cobrara— gpt-image-2.
+  it('throws instead of silently downgrading an unknown OPENAI_IMAGE_MODEL', () => {
+    expect(() => getOpenAIImageModel(testEnv({ OPENAI_IMAGE_MODEL: 'dall-e-3' }))).toThrow(
+      /not a supported OpenAI image model/
+    )
+
+    // Una familia sin variante es el typo plausible: el mensaje tiene que ofrecer las válidas.
+    expect(() => getOpenAIImageModel(testEnv({ OPENAI_IMAGE_MODEL: 'gpt-image-2.5' }))).toThrow(
+      /gpt-image-2\.5-flare/
+    )
+  })
+
+  it('validates quality identifiers for the CLI gate', () => {
+    expect(isOpenAIImageQuality('max')).toBe(true)
+    expect(isOpenAIImageQuality('xhigh')).toBe(true)
+    expect(isOpenAIImageQuality('ultra')).toBe(false)
+    expect(isOpenAIImageQuality('')).toBe(false)
+  })
+
+  it('accepts the 2.5 family from env', () => {
+    expect(getOpenAIImageModel(testEnv({ OPENAI_IMAGE_MODEL: 'gpt-image-2.5-flare' }))).toBe('gpt-image-2.5-flare')
+    expect(getOpenAIImageModel(testEnv({ OPENAI_IMAGE_MODEL: 'gpt-image-2.5-sunburst-2026-09-08' }))).toBe(
+      'gpt-image-2.5-sunburst-2026-09-08'
+    )
   })
 
   it('accepts supported GPT Image models from env', () => {
