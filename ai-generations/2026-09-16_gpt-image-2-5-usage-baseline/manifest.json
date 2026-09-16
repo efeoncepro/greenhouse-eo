@@ -1,0 +1,294 @@
+{
+  "task": "TASK-1851",
+  "purpose": "Consumo real de tokens de la familia GPT Image 2.5, medido con `usage` de respuestas reales.",
+  "measuredAt": "2026-09-16",
+  "disclaimer": "EVIDENCIA FECHADA, NO CONTRATO. OpenAI declara que la calculadora de GPT Image 2 no estima el consumo de 2.5 y que tarifas por token iguales no implican costo por imagen igual. Estas cifras se releen antes de presupuestar; no se convierten en tarifa estable ni entran a una propuesta comercial sin revalidar.",
+  "rates": {
+    "inputTextPerMillionUsd": 8.0,
+    "outputImagePerMillionUsd": 30.0,
+    "ratesObservedAt": "2026-09-16"
+  },
+  "authorizedScope": "7 piezas, tope fijado por el operador en piezas (no en USD, porque el costo por imagen no es estimable de antemano). Corrida en serie, escalón por escalón.",
+  "findings": [
+    "El consumo por imagen es IDÉNTICO entre gpt-image-2.5-flare y gpt-image-2.5-sunburst para el mismo quality y size: 196 / 1756 / 7024 tokens de output en low / high / max a 1024x1024. El costo lo fija el quality, no el modelo.",
+    "Lo que separa a los dos modelos es la latencia, y la brecha crece con el quality: high 18,7s (flare) vs 29,1s (sunburst); max 46,0s (flare) vs 80,6s (sunburst), 1,75x. Coincide con el posicionamiento de OpenAI (flare = el más rápido) y lo cuantifica.",
+    "background: transparent no tuvo costo adicional: mismos 1756 tokens de output que high opaco. Alfa verificada desde los bytes decodificados (canal alfa presente y píxel no opaco), no por metadata.",
+    "El API resolvió exactamente el quality, size y background pedidos en las 7 corridas: ninguna degradó en silencio.",
+    "La escalera de costo a 1024x1024 es ~9x de low a high y ~4x de high a max (36x de punta a punta)."
+  ],
+  "runs": [
+    {
+      "caseId": "flare-low",
+      "requested": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "low",
+        "size": "1024x1024",
+        "background": null
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "low",
+        "size": "1024x1024",
+        "background": "opaque"
+      },
+      "usage": {
+        "input_tokens": 49,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 49
+        },
+        "output_tokens": 196,
+        "output_tokens_details": {
+          "image_tokens": 196,
+          "text_tokens": 0
+        },
+        "total_tokens": 245
+      },
+      "derivedCostUsd": 0.006272,
+      "latencyMs": 13275,
+      "image": {
+        "bytes": 905375,
+        "width": 1024,
+        "height": 1024,
+        "channels": 3
+      },
+      "alpha": null,
+      "observedAt": "2026-09-16T01:04:22.091Z"
+    },
+    {
+      "caseId": "flare-high",
+      "requested": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "high",
+        "size": "1024x1024",
+        "background": null
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "high",
+        "size": "1024x1024",
+        "background": "opaque"
+      },
+      "usage": {
+        "input_tokens": 49,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 49
+        },
+        "output_tokens": 1756,
+        "output_tokens_details": {
+          "image_tokens": 1756,
+          "text_tokens": 0
+        },
+        "total_tokens": 1805
+      },
+      "derivedCostUsd": 0.053072,
+      "latencyMs": 18748,
+      "image": {
+        "bytes": 895298,
+        "width": 1024,
+        "height": 1024,
+        "channels": 3
+      },
+      "alpha": null,
+      "observedAt": "2026-09-16T01:04:52.284Z"
+    },
+    {
+      "caseId": "flare-max",
+      "requested": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "max",
+        "size": "1024x1024",
+        "background": null
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "max",
+        "size": "1024x1024",
+        "background": "opaque"
+      },
+      "usage": {
+        "input_tokens": 49,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 49
+        },
+        "output_tokens": 7024,
+        "output_tokens_details": {
+          "image_tokens": 7024,
+          "text_tokens": 0
+        },
+        "total_tokens": 7073
+      },
+      "derivedCostUsd": 0.211112,
+      "latencyMs": 46038,
+      "image": {
+        "bytes": 894026,
+        "width": 1024,
+        "height": 1024,
+        "channels": 3
+      },
+      "alpha": null,
+      "observedAt": "2026-09-16T01:05:43.776Z"
+    },
+    {
+      "caseId": "sunburst-low",
+      "requested": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "low",
+        "size": "1024x1024",
+        "background": null
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "low",
+        "size": "1024x1024",
+        "background": "opaque"
+      },
+      "usage": {
+        "input_tokens": 49,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 49
+        },
+        "output_tokens": 196,
+        "output_tokens_details": {
+          "image_tokens": 196,
+          "text_tokens": 0
+        },
+        "total_tokens": 245
+      },
+      "derivedCostUsd": 0.006272,
+      "latencyMs": 11608,
+      "image": {
+        "bytes": 947154,
+        "width": 1024,
+        "height": 1024,
+        "channels": 3
+      },
+      "alpha": null,
+      "observedAt": "2026-09-16T01:06:04.137Z"
+    },
+    {
+      "caseId": "sunburst-high",
+      "requested": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "high",
+        "size": "1024x1024",
+        "background": null
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "high",
+        "size": "1024x1024",
+        "background": "opaque"
+      },
+      "usage": {
+        "input_tokens": 49,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 49
+        },
+        "output_tokens": 1756,
+        "output_tokens_details": {
+          "image_tokens": 1756,
+          "text_tokens": 0
+        },
+        "total_tokens": 1805
+      },
+      "derivedCostUsd": 0.053072,
+      "latencyMs": 29071,
+      "image": {
+        "bytes": 907501,
+        "width": 1024,
+        "height": 1024,
+        "channels": 3
+      },
+      "alpha": null,
+      "observedAt": "2026-09-16T01:06:33.208Z"
+    },
+    {
+      "caseId": "sunburst-max",
+      "requested": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "max",
+        "size": "1024x1024",
+        "background": null
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-sunburst",
+        "quality": "max",
+        "size": "1024x1024",
+        "background": "opaque"
+      },
+      "usage": {
+        "input_tokens": 49,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 49
+        },
+        "output_tokens": 7024,
+        "output_tokens_details": {
+          "image_tokens": 7024,
+          "text_tokens": 0
+        },
+        "total_tokens": 7073
+      },
+      "derivedCostUsd": 0.211112,
+      "latencyMs": 80569,
+      "image": {
+        "bytes": 951823,
+        "width": 1024,
+        "height": 1024,
+        "channels": 3
+      },
+      "alpha": null,
+      "observedAt": "2026-09-16T01:07:53.778Z"
+    },
+    {
+      "caseId": "flare-transparent",
+      "requested": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "high",
+        "size": "1024x1024",
+        "background": "transparent"
+      },
+      "resolvedByApi": {
+        "model": "gpt-image-2.5-flare",
+        "quality": "high",
+        "size": "1024x1024",
+        "background": "transparent"
+      },
+      "usage": {
+        "input_tokens": 52,
+        "input_tokens_details": {
+          "image_tokens": 0,
+          "text_tokens": 52
+        },
+        "output_tokens": 1756,
+        "output_tokens_details": {
+          "image_tokens": 1756,
+          "text_tokens": 0
+        },
+        "total_tokens": 1808
+      },
+      "derivedCostUsd": 0.053096,
+      "latencyMs": 21022,
+      "image": {
+        "bytes": 976966,
+        "width": 1024,
+        "height": 1024,
+        "channels": 4
+      },
+      "alpha": {
+        "hasAlphaChannel": true,
+        "hasNonOpaquePixel": true
+      },
+      "observedAt": "2026-09-16T01:08:14.801Z"
+    }
+  ],
+  "totals": {
+    "pieces": 7,
+    "derivedCostUsd": 0.594
+  }
+}
