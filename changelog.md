@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — HubSpot y Salesforce: provider-fit por segmento
+
+La posición comercial deja de tratarlos como sustitutos universales: HubSpot-first parte como hipótesis para
+crecimiento B2B, mid-market y time-to-value; Salesforce-first gana peso con org instalada compleja, gobierno,
+service a escala, extensibilidad e integración enterprise. La zona de solapamiento sigue incluyendo mid-market
+alto, agentes y coexistencia. El diagnóstico conserva las salidas `HubSpot-first`, `Salesforce-first`, `híbrida` y
+`no-fit`, siempre condicionadas a TCO, datos, adopción, entitlements y contrato.
+
 ## 2026-09-16 — HubSpot actualizado con Fall Spotlight y UNBOUND 2026
 
 Las skills espejo y el catálogo HubSpot incorporan ChatGPT Ads en beta pública, la expansión del MCP/Claude,

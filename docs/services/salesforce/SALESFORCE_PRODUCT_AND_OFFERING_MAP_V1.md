@@ -10,6 +10,15 @@ madurez— vive en
 [`Efeonce Salesforce Service Offer Architecture V1`](EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md). Este
 documento conserva únicamente el mapa de productos, boundaries y routing por problema.
 
+## Posicionamiento provider-fit
+
+Salesforce y HubSpot no son sustitutos universales ni pertenecen al mismo centro de gravedad. Salesforce-first
+adquiere sentido con una org instalada compleja, gobierno enterprise, service o procesos multi-equipo a escala,
+extensibilidad profunda e integración amplia. HubSpot-first puede ser preferible para crecimiento B2B, equipos
+mid-market y time-to-value. La zona de solapamiento incluye mid-market alto, agentes, integraciones y coexistencia.
+Esta es una inferencia de Efeonce para discovery; no reemplaza la evidencia del cliente ni la cotización de ningún
+proveedor. Las salidas válidas son `Salesforce-first`, `HubSpot-first`, `híbrida` y `no-fit`.
+
 ## Mapa de productos
 
 | Producto                           | Base / identidad operativa                  | Capabilities principales                                                                       | Skill dueña                                        |

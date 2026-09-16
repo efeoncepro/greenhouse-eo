@@ -19,6 +19,15 @@ híbrida HubSpot Marketing Hub + Salesforce CRM exige source of truth, lifecycle
 deduplicación y sync explícitos. Canon de posicionamiento:
 [`CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md`](../../audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).
 
+### Posicionamiento provider-fit 2026
+
+HubSpot y Salesforce compiten en una zona de solapamiento, pero no tienen el mismo centro de gravedad. HubSpot se
+posiciona primero para crecimiento B2B, equipos mid-market y adopción rápida; Salesforce para organizaciones
+mid-market alto y enterprise con procesos multi-equipo, gobierno, escala, extensibilidad e integración profunda.
+Esta es una inferencia estratégica de Efeonce basada en la arquitectura y los anuncios vigentes, no un claim de
+segmentación exclusiva del proveedor. El diagnóstico debe poder concluir `HubSpot-first`, `Salesforce-first`,
+`híbrida` o `no-fit`.
+
 La arquitectura vigente se define en
 [`HUBSPOT_OFFER_ARCHITECTURE_V2.md`](HUBSPOT_OFFER_ARCHITECTURE_V2.md). Separa tres ejes que no deben colapsarse:
 

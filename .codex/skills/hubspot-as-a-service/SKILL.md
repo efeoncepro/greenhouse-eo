@@ -19,6 +19,15 @@ Treat brochures as historical commercial input only; the review and quarantine r
 `docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`. Do not import brochure claims, pricing, bundles or
 feature availability without current primary-source verification and an `as-of` date.
 
+## Provider-fit boundary
+
+HubSpot is the default candidate for growth-oriented B2B, mid-market teams and faster adoption, not a universal
+enterprise substitute. Salesforce remains a first-class candidate when the client needs a complex installed org,
+multi-team or multi-country governance, deep extensibility, high-scale service, or a broader enterprise integration
+estate. Treat this as Efeonce positioning, not as a vendor-exclusive market claim. Discovery must be able to return
+`HubSpot-first`, `Salesforce-first`, `híbrida` or `no-fit`; a HubSpot Marketing + Salesforce CRM design requires
+explicit source of truth, lifecycle, consent, attribution, deduplication and sync contracts.
+
 ## Load first
 
 1. Read `project_context.md`, `Handoff.md`, `docs/context/00_INDEX.md`, and client-specific context.

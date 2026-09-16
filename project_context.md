@@ -1,5 +1,7 @@
 # Contexto vigente del repositorio
 
+## Estado vigente para agentes
+
 ## Actualización documental reciente
 
 El 2026-09-16 se actualizaron las skills espejo de HubSpot as a Service, Solutions Partner y
@@ -7,7 +9,10 @@ HubSpot-Greenhouse bridge con Fall Spotlight/UNBOUND 2026. La referencia operati
 `docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`; mantiene separadas beta,
 GA, first look, entitlement del portal y runtime.
 
-## Estado vigente para agentes
+La posición provider-fit CRM también quedó alineada: HubSpot-first para crecimiento B2B, mid-market y time-to-value;
+Salesforce-first para complejidad enterprise, gobierno, service a escala, extensibilidad e integración profunda; la
+zona de solapamiento conserva mid-market alto, agentes y coexistencia. Las salidas de discovery son
+`HubSpot-first`, `Salesforce-first`, `híbrida` o `no-fit`.
 
 Greenhouse: plataforma operativa Efeonce Group, Next.js 16/MUI 7/Vuexy starter-kit/TypeScript.
 Estado: `Handoff.md`. Historia:
