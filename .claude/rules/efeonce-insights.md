@@ -23,13 +23,18 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
   desde este dominio ni leer tablas ajenas; y el portal consume `readers/projection.ts`, jamás `greenhouse_insights.*`.
 - **Snapshot sellado y plan congelado son inmutables** (triggers de no-update/no-delete; hash). Una corrección es
   `revise` → edición nueva, **NUNCA** un UPDATE.
-- **Emitir exige outputs validados + gate humano**: `issue` falla cerrado (`not_ready`) mientras el
-  `InsightOutputsPort` no esté conectado (TASK-1846); el actor del gate es `member`/`client_user`, nunca un binding
-  MCP (ecosystem no emite ni retira).
+- **Emitir exige outputs validados + gate humano**: el `InsightOutputsPort` real (TASK-1846, conectado al cargar
+  `commands/index.ts`) sólo valida outputs `completed` con asset de la MISMA audiencia; faltar uno es `not_ready`
+  con `missing`. El actor del gate es `member`/`client_user`, nunca un binding MCP (ecosystem no emite ni retira).
+- **Render durable (`render/**`)**: sólo `INSIGHT_RENDERABLE_OUTPUTS` (hoy `deck_pdf`) se encola; otro target es
+  `render_rejected`, nunca "para después". **NUNCA** truncar cifras/afirmaciones para caber en un slot (el mapper
+  rechaza con causa). **NUNCA** separar lease de fencing ni finalizar sin presentar el `fence_token`. El worker
+  despacha por `RenderConsumer` (`services/artifact-worker/consumers/*`): Proposal es un adapter compatible.
 - **Tres planos de acceso en cada command** (`authz.ts`): módulo per-ORG `insights_v1` asignado (vía
   `enableClientPortalModule`, script `scripts/insights/assign-insights-module.ts`) + capability `insights.*` + audiencia
   (`internal` prohibida al cliente). **Org sin módulo ⇒ 404 anti-oracle**, jamás 403.
-- **Flags multi-gate, default OFF y leídos hoy SÓLO en Vercel**: `INSIGHTS_GENERATION_ENABLED` (crear/revisar; ON en
+- **Flags multi-gate, default OFF**: `INSIGHTS_RENDER_ENABLED` se lee en DOS runtimes (Vercel para encolar, artifact-worker
+  para reclamar; SoT Cloud Run = `services/artifact-worker/deploy.sh`). Los demás sólo en Vercel: `INSIGHTS_GENERATION_ENABLED` (crear/revisar; ON en
   Production y staging desde 2026-09-15), `INSIGHTS_ISSUANCE_ENABLED`, `INSIGHTS_AUTHORING_AI_ENABLED` (Gemini acotada
   con validación de cifras y fallback determinista). Sin generación ⇒ `503 generation_disabled`. Registrar todo flip en
   `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.

@@ -66,4 +66,16 @@
   `boundary-domain.test.ts` falla con la lista de writes no registrados; la task lo exige en el mismo PR.
   Registrarlas en `ALLOWED_WRITE_TARGETS` es la acción correcta — el boundary no se ensancha hacia módulos
   productores, sólo reconoce tablas propias.
-
+- **2026-09-16 · A re-export does not bring the name into local scope.** Moving `hashResolvedManifest` to the composer and
+  writing `export { … } from` in `render-jobs.ts` broke its own internal use; the fix is `import` + `export { name }`.
+- **2026-09-16 · Two canonical-JSON implementations = two hashes.** `request-hash.ts` and `render-jobs.ts` each had one;
+  the worker's drift check would give false positives if enqueue and worker hashed differently. One domain-free
+  function in the composer, re-exported by Proposal, byte-identical (`composer:visual-gate` unaffected).
+- **2026-09-16 · `CoverFull` is proposal vocabulary.** Its `proposalKind` enum renders "Propuesta Técnica" / "Capacitación
+  HubSpot": an Insights deck must not emit it. The section divider opens the deck until TASK-1847 ships real catalogs.
+- **2026-09-16 · Slot budgets are tuned for tender copy** (title 32, KPI value 8, unit 8, qual 72). Insights copy from a
+  frozen plan will exceed them; the honest answer is `render_rejected` with the cause, never a silent truncation.
+- **2026-09-16 · The `unit` slot of `MetricsSplit` renders glued and wrapped** (`45–50por`/`mes`) in delivered tender
+  decks too — it is a catalog defect, invisible to slot validation and to the pixel gate (baselined). Separate issue.
+- **2026-09-16 · macOS `xargs` has no `-a`.** Use `git add --pathspec-from-file=<file>` / `git commit --pathspec-from-file`
+  for explicit-path commits in the shared checkout.

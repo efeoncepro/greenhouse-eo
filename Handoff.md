@@ -405,12 +405,9 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
-## 2026-09-15 — TASK-1846: render durable de Insights sobre Artifact Worker
+## 2026-09-16 — TASK-1846: render durable — code complete, rollout pendiente
 
-[TASK-1846](docs/tasks/in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md) en `in-progress`
-sobre `develop`. Discovery y auditoría cerrados; plan por slices en checkpoint humano (P1, blast sobre Proposal).
-Sin código. Hallazgos y decisiones abiertas viven en `## Discovery Findings` de la task.
-
-`greenhouse-eo-96` cerró la migración de 1845 (`2ec9073af`, pusheado). Le queda un ensayo `migrate:down`/`up` que
-borra `greenhouse_insights` y las ediciones `EO-INS-000012..15` unos segundos: **no correr `test:live` de Insights
-en esa ventana**; avisa antes por el canal.
+[TASK-1846](docs/tasks/in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md) en `develop`, sin push
+ni deploy. Motor conectado (`requestInsightRender` + `InsightOutputsPort` real), lease+fencing probado en PG, lanes
+app/ecosystem, 4 tools MCP, benchmark local. Falta con autorización: deploy del worker, flag ON en Vercel y Cloud
+Run, canary, federación en `efeonce-mcp`. Detalle: la task y la skill viva `efeonce-insights`.

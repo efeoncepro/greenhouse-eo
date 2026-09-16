@@ -78,13 +78,24 @@ without writing (THE acceptance criterion), retry re-queues only failed without 
 about what is already running, and the signal's SQL executes. 731 unit tests green; `local:check` 0 errors.
 A peer ran the full suite (14164 passed) and a production `pnpm build` with these changes in the tree.
 
-**Deliberately NOT done (needs operator authorization):** Slice 4 benchmark, worker deploy, flag flip, staging or
-production canary, and any `git push`. Status is `code complete, rollout pendiente` for what exists — the task
-is NOT complete: Slice 4 is unstarted.
+**Added 2026-09-16 (second pass, commit after `804b3295f`/`6d438905f`):** the engine is now plugged at both ends —
+`requestInsightRender` (+ retry/cancel, run readers) queues outputs for a `ready_for_review` edition with the
+manifest resolved by `resolvePlan(deckAxisCatalog, …)` and hashed with the composer's `hashResolvedManifest`
+(moved verbatim, domain-free); the real `InsightOutputsPort` is wired when the commands barrel loads. Lanes app +
+ecosystem (`…/editions/{id}/render`, `…/render-runs/{id}[/retry|/cancel]`), 4 MCP tools (manifest 55 tools:
+`request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render`), events
+`insights.render.*`, errors `render_disabled`/`render_rejected`, catalog `renderableOutputs: ['deck_pdf']`.
+Mapper V1 `render/deck-mapper.ts` (plan → deck-axis slides; no CoverFull; never truncates figures/claims).
+`INSIGHTS_RENDER_ENABLED` is now read in TWO runtimes (Vercel + artifact-worker).
 
-**Hand-off pending for 1847/1848:** the A4/report catalog is not packaged in the worker (only `deck-axis`), so a
-`report_pdf` queued with another catalog fails honestly as `manifest_drift`; `InsightOutputsPort` is still NOT
-connected, so `issue` keeps failing closed with `not_ready`.
+**Deliberately NOT done (needs operator authorization):** worker deploy, flag flip (both runtimes), staging or
+production canary, gateway federation of the 4 tools in `efeonce-mcp`, and any `git push`. Status:
+`code complete, rollout pendiente`. Slice 4 ran a bounded LOCAL benchmark (see task file); no Cloud Run measurement.
+
+**Hand-off pending for 1847/1848:** `report_pdf`/`web` are rejected at request time (`render_rejected`) until
+their catalogs/model exist; the asset id returned by the run is not a download — authorized download/share is
+TASK-1848. The `MetricsSplit` `unit` slot has a pre-existing visual defect (glued/wrapped) visible in delivered
+tender decks: separate issue for the catalog owner.
 
 ## TASK-1847 — charts and catalogs (to-do)
 _Fill at closure._

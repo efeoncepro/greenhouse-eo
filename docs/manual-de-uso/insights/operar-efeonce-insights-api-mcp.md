@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-15 por Claude (TASK-1845, rollout a producción)
+> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846, render durable)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -108,6 +108,34 @@ lectura con el scope base `efeonce.mcp.read`; `create_insight_edition` exige la 
 `insufficient_scope` hasta un consentimiento/grant gobernado. Canary de lectura del gateway:
 `scripts/greenhouse-insights-canary.mjs` en el repo `efeonce-mcp` (nunca crea).
 
+## Pedir el render de una edición (TASK-1846 — apagado hasta el rollout)
+
+Cuando una edición está en `ready_for_review`, se puede encargar su **deck PDF**. El encargo es
+asíncrono: la respuesta es un `run` con un `output` por target en cola; el archivo lo produce el
+worker de render y se consulta después. Hoy sólo `deck_pdf` es renderizable; pedir `report_pdf` o
+`web` responde `422 render_rejected` y no encola nada.
+
+1. `POST /api/platform/app/insights/editions/{editionId}/render` con `{ "organizationId": "…" }`
+   (interno) y opcionalmente `"outputs": ["deck_pdf"]`. Respuesta `202` con `run`, `outputs` e
+   `idempotent: false`; si ya había un run vivo para esos targets, `200` con `idempotent: true`.
+2. `GET /api/platform/app/insights/render-runs/{renderRunId}`: estado del run
+   (`pending|running|completed|partial_failed|failed|cancelled`) y de cada output
+   (`queued|running|completed|failed|dead_letter|cancelled`, `attempts`, `failureCode`, `outputAssetId`).
+3. Si un output quedó `failed`: `POST …/render-runs/{renderRunId}/retry` re-encola **sólo** los
+   fallidos. `dead_letter` (intentos agotados o `manifest_drift`) no se reintenta desde aquí.
+4. `POST …/render-runs/{renderRunId}/cancel` cancela lo pendiente; lo que ya está renderizando
+   termina solo y la respuesta lo dice (`stillRunning`).
+5. Con todos los outputs `completed`, `issue` deja de responder `not_ready` por outputs y pasa a
+   depender sólo del flag de emisión y del gate humano.
+
+Por MCP: `request_insight_render`, `get_insight_render_run`, `retry_insight_render`,
+`cancel_insight_render` (las tres de escritura exigen binding interno).
+
+**Estado real (2026-09-16):** todo esto está en código y con tests, pero `INSIGHTS_RENDER_ENABLED`
+está **OFF** en todos los ambientes y el worker de render **no está desplegado**: hoy el encargo
+responde `503 render_disabled`. Prenderlo es multi-runtime — Vercel (encolar) **y** el
+`artifact-worker` en Cloud Run (reclamar), declarado en su `deploy.sh` — y requiere autorización.
+
 ## Qué significan los estados
 
 | Estado (interno) | Cliente ve | Significa |
@@ -117,6 +145,10 @@ lectura con el scope base `efeonce.mcp.read`; `create_insight_edition` exige la 
 | `issued` | `issued` | Emitida con hash de aprobación; sólo puede retirarse |
 | `failed` (+ `failedPhase`) | `needs_attention` | Una fase falló; recuperable desde esa fase |
 | `withdrawn` | `withdrawn` | Retirada; terminal |
+
+Estados de un **run de render** y de sus **outputs** (TASK-1846): el run agrega a sus outputs y
+distingue `partial_failed` (uno salió y otro no) de `failed`; un output `dead_letter` es terminal por
+diseño; `cancelled` sólo se aplica a lo que aún no había empezado.
 
 Códigos de rechazo de evidencia: `unsupported_window` (grano no servible; suele traer alternativa
 `month`), `method_mismatch`, `insufficient_data`, `suppressed` (RpA), `review_required` (grader),
@@ -137,7 +169,11 @@ Códigos de rechazo de evidencia: `unsupported_window` (grano no servible; suele
 | `404 not_found` sobre una org que existe | Sin módulo `insights_v1`, o cliente apuntando a otra org | Asignar módulo con el script (`--apply`) / usar la org propia |
 | `evidence`/`plan` en `null` leyendo como cliente | La edición no está emitida | Esperado; sólo el interno ve evidencia de no emitidas |
 | `insufficient_scope` en `create_insight_edition` por el gateway | El cliente MCP no porta `efeonce.mcp.insights.write` | Grant gobernado del scope; no rodear con otro token |
-| `plan.limits` repite «ico: sin datos.» varias veces | Un límite por rechazo `no_data` | Cosmético; dedupe asignado a TASK-1846 |
+| `plan.limits` repite «ico: sin datos.» varias veces | Un límite por rechazo `no_data` en el plan congelado | Esperado: el render lo deduplica; el plan sellado no se toca |
+| `503 service_unavailable` (`render_disabled`) al pedir el render | Flag `INSIGHTS_RENDER_ENABLED` OFF en ese runtime (hoy: en todos) | Rollout autorizado: prender en Vercel **y** en el `artifact-worker` (`deploy.sh` + revisión activa) |
+| `422 render_rejected` al pedir el render | Output no renderizable todavía (`report_pdf`/`web`), o el plan excede un presupuesto del catálogo | Pedir sólo `deck_pdf`; si es presupuesto, la causa viene en `details` — no se trunca copy en silencio |
+| Run en `partial_failed` | Un output salió y otro falló | Leer cada output; `retry` re-encola sólo los fallidos |
+| Output `running` que no avanza | Worker caído o flag OFF en su revisión activa (señal `insights.render.orphaned_output`) | Verificar el Job y el flag en Cloud Run; los reclamos por lease vencido son automáticos si el worker corre |
 | `failed` en `validating` con `evidence_rejected` | Un módulo requerido no aportó hechos | Revisar rechazos; pedir meses completos o `policy.allowPartial=true` explícito |
 | Edición > 30 min en una fase | Proceso caído (señal `insights.editions.stuck_generation`) | `recover` desde la fase |
 

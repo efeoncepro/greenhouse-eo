@@ -262,8 +262,8 @@ Todo trabajo formal sigue `intake -> taxonomy -> plan -> execution -> verificati
 - No declarar cierre si faltan flags, secrets, deploy, migración, backfill, worker/cron/webhook, datos reales o verificación runtime.
 - Copy reutilizable vive en `src/lib/copy/*`; nomenclatura institucional en `src/config/greenhouse-nomenclature.ts`.
 - Seguridad: no imprimir secretos/raw errors, no improvisar accesos, preferir CLIs autenticados con guardrails.
-- Auditorías son evidencia fechada, no verdad permanente: revalidar contra código y runtime.
-- Trabajo nuevo durante EPIC-027 nace extraction-ready y declara placement sin crear deployables por anticipado. Canon: build-unit decision + modular migration operating model.
+- Auditorías = evidencia fechada, no verdad permanente; revalidar contra código y runtime.
+- Trabajo nuevo durante EPIC-027 nace extraction-ready y declara placement sin crear deployables por anticipado (canon: build-unit decision + modular migration operating model).
 
 ## Contexto por dominio
 
@@ -273,12 +273,10 @@ invariantes, arquitectura, task). Su versión machine-readable vive en
 
 1. buscar keyword en arquitectura, operations y skills;
 2. buscar en el snapshot `docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md`;
-3. contrastar con código/runtime;
-4. corregir el router o el documento canónico antes de depender de memoria histórica.
+3. contrastar con código/runtime y corregir el router o el doc canónico antes de fiarse de memoria histórica.
 
 ## Memoria histórica e integridad
 
 - Snapshot íntegro del contexto anterior: [índice 2026-07-19](docs/operations/agent-context-history/2026-07-19/README.md).
-- El manifest SHA-256 prueba que no se perdió texto original en la compactación.
-- Los snapshots no gobiernan comportamiento vigente y no deben editarse.
+- Los snapshots no gobiernan comportamiento vigente ni se editan.
 - `project_context.md` no acepta secciones `## Delta YYYY-MM-DD`; los cambios históricos van a changelog, tasks/issues/ADRs o archivo, según ownership.

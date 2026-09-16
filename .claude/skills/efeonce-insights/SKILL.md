@@ -42,8 +42,14 @@ it without repeating what already cost a day*. It grows with every task: see the
   the domain (it is a leaf of the DAG; lint enforces it) and NEVER read producer tables directly.
 - **Sealed snapshot and frozen plan are immutable** (no-update/no-delete triggers, hashes). A
   correction is `revise` → new edition version. NEVER `UPDATE` them, never re-author a frozen plan.
-- **Issuing needs validated outputs + a human gate.** `issue` fails closed with `not_ready` while the
-  `InsightOutputsPort` is not connected (TASK-1846). Ecosystem/MCP actors never issue nor withdraw.
+- **Issuing needs validated outputs + a human gate.** The real `InsightOutputsPort` (TASK-1846, wired when
+  `commands/index.ts` loads) validates only outputs `completed` with an asset for the SAME audience as the
+  edition; a missing one is `not_ready` with `missing`. Ecosystem/MCP actors never issue nor withdraw.
+- **Durable rendering is asynchronous and fail-closed** (`render/**`): only `INSIGHT_RENDERABLE_OUTPUTS`
+  (today `deck_pdf`) can be queued; another target is `render_rejected`, never "for later". The mapper NEVER
+  truncates a figure or a claim to fit a slot (it rejects with the cause). Lease and fencing ship together:
+  finalization presents the `fence_token` or writes nothing. `INSIGHTS_RENDER_ENABLED` is read in TWO runtimes
+  (Vercel to queue, artifact-worker to claim) and must be ON in both.
 - **Three access planes on every command** (`authz.ts`): module `insights_v1` assigned per organization
   + capability `insights.*` + audience. An organization without the module is `not_found` (404
   anti-oracle), never `403`. Clients see evidence/plan only of issued editions.
@@ -63,7 +69,7 @@ it without repeating what already cost a day*. It grows with every task: see the
 
 ## Routing
 
-- Rendering, PDF/deck, Artifact Worker → `artifact-composer` docs + TASK-1846; keep Proposal untouched.
+- Rendering, PDF/deck, Artifact Worker → `references/program-ledger.md` § TASK-1846 + `artifact-composer` docs; Proposal stays a compatible consumer adapter (behaviour untouched).
 - Charts/catalogs → `dataviz-design` + `deck-studio` + TASK-1847.
 - Sharing/email/schedules → `resend-email-platform`, `greenhouse-email` + TASK-1848.
 - Portal UI → `greenhouse-ux` + `greenhouse-ai-design-studio` + TASK-1849 (Composition Shell, GVC).

@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-15 por Claude (TASK-1845, rollout a producción)
+> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846, render durable code complete)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -58,7 +58,7 @@ validadas, **hoy ninguna edición puede emitirse**: llega hasta `ready_for_revie
 Como emitir todavía no es posible, hoy un cliente que pide una edición la verá quedar en `in_review` sin
 cifras visibles: eso es lo esperado hasta que exista el render (TASK-1846) y un interno la emita.
 
-## Estado de disponibilidad (2026-09-15)
+## Estado de disponibilidad (2026-09-16)
 
 **Disponible en producción** desde el 2026-09-15 para las organizaciones que tengan el módulo `insights_v1`
 asignado. Lo que está encendido y lo que no:
@@ -66,9 +66,10 @@ asignado. Lo que está encendido y lo que no:
 | Capacidad | Estado | Nota |
 | --- | --- | --- |
 | Pedir una edición y generarla hasta `ready_for_review` | **Encendida** en staging y producción | Flag `INSIGHTS_GENERATION_ENABLED=true` en Vercel (staging y producción); en Preview sigue apagada |
-| Emitir una edición | Apagada y bloqueada | Flag `INSIGHTS_ISSUANCE_ENABLED` OFF; además falla cerrado hasta que exista el render (TASK-1846) |
+| Emitir una edición | Apagada y bloqueada | Flag `INSIGHTS_ISSUANCE_ENABLED` OFF; además exige que todos los outputs pedidos estén renderizados y validados (hoy ninguno lo está, porque el render no está desplegado) |
 | Redacción asistida por IA | Apagada | Flag `INSIGHTS_AUTHORING_AI_ENABLED` OFF; el plan sale del redactor determinista |
-| PDF deck, informe A4, vista web, enlace compartido, correo, recurrencia | No existen todavía | TASK-1846, 1847, 1848, 1849 y 1875 |
+| Pedir el render del **deck PDF** de una edición | Construido, **apagado** en todos los ambientes | Flag `INSIGHTS_RENDER_ENABLED` OFF y el worker de render sin desplegar (TASK-1846: `code complete, rollout pendiente`). Cuando se encienda, el deck se produce en segundo plano y se consulta por su `run` |
+| Informe A4, vista web, enlace compartido, correo, recurrencia | No existen todavía | TASK-1847, 1848, 1849 y 1875 |
 | Pedir una edición desde un agente externo por el gateway MCP | Lectura sí; escritura todavía no | Las cuatro herramientas están publicadas; crear exige un permiso de escritura que ningún cliente tiene aún (`insufficient_scope`) |
 
 **Cómo se habilita una organización.** Un interno asigna el módulo `insights_v1` a la organización con el

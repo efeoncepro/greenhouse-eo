@@ -581,6 +581,16 @@ client_services.write, insights.write).
 
 ---
 
+### 8.x Superficies agregadas por TASK-1846 (2026-09-16)
+
+| Superficie | Ruta / tool | Notas |
+|---|---|---|
+| App lane | `POST/GET /api/platform/app/insights/editions/{editionId}/render` · `GET /api/platform/app/insights/render-runs/{renderRunId}` · `POST …/retry` · `POST …/cancel` | 202 al encolar, 200 idempotente; misma tabla de errores (`insights-errors.ts`) + `render_disabled`/`render_rejected` |
+| Ecosystem lane | mismas rutas bajo `/api/platform/ecosystem/insights/**` | bindings org-scoped sólo leen; escribir exige binding interno |
+| MCP | `request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render` | manifiesto 55 tools; las tres de escritura en la clase `writes` del gateway (federación en `efeonce-mcp` pendiente) |
+| Dominio | `src/lib/efeonce-insights/render/{contracts,store,commands,readers,outputs-port,deck-mapper,plan-limits}.ts` | store compone con `InsightsDbClient` (testeable en rollback) |
+| Worker | `services/artifact-worker/{consumer-contract.ts,consumers/*}` + `main.ts` por registry | Proposal = adapter compatible; `INSIGHTS_RENDER_ENABLED` en `deploy.sh` (default `false`) |
+
 ## 9. Verificación realizada
 
 | Capa | Evidencia | Fuente |
@@ -628,8 +638,8 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 
 | Ausencia | Detalle | Dueño |
 |---|---|---|
-| Outputs PDF/deck/web | `InsightOutputsPort` no conectado; `renderableOutputs: []`; `outputsAvailable: []` | TASK-1846 (render), TASK-1847 (charts/catálogos) |
-| Emisión | `INSIGHTS_ISSUANCE_ENABLED` OFF **y** el puerto responde `not_ready`: ninguna edición puede emitirse; `insights.edition.issued` nunca se ha publicado | TASK-1846 + policy EPIC-046 P01 |
+| Outputs PDF/deck/web | **Actualizado 2026-09-16 (TASK-1846):** `InsightOutputsPort` conectado; `renderableOutputs: ['deck_pdf']`; motor + lanes + MCP en código, **sin deploy y con `INSIGHTS_RENDER_ENABLED` OFF**; `report_pdf`/`web` siguen sin catálogo | TASK-1846 (rollout), TASK-1847 (A4/charts), TASK-1848 (web/descarga) |
+| Emisión | `INSIGHTS_ISSUANCE_ENABLED` OFF; el puerto (real desde 2026-09-16) responde `not_ready` mientras falte un output `completed` de la misma audiencia; `insights.edition.issued` nunca se ha publicado | rollout de TASK-1846 + policy EPIC-046 P01 |
 | IA de autoría | `INSIGHTS_AUTHORING_AI_ENABLED` OFF; todos los planes existentes son `deterministic` | medir costo/tokens en staging antes |
 | UI del portal (biblioteca, encargo, revisión) | no existe; sólo API/MCP | TASK-1849 |
 | Vista web compartida | resolver `InsightWebModelV1` + proxy (TASK-1848) y render en Think (TASK-1849/1875) sin código | EPIC-045 |
@@ -637,11 +647,11 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Grant del scope `insights.write` a clientes MCP | `create_insight_edition` por el gateway ⇒ `insufficient_scope` | consentimiento/grant gobernado |
 | Ensayo de `migrate:down` | ejecutado 2026-09-16 00:24–00:25Z con el Down definitivo (down OK, readback, up OK, readback; canaries posteriores `EO-INS-000002` staging / `EO-INS-000003` producción) | cerrado (§4.8) |
 | Sesión MCP con token humano | `tools/list` desde un cliente real (evidencia de 47 tools + skill) no obtenida | pendiente para `complete` |
-| Dedupe de `plan.limits` | repite «ico: sin datos.» por rechazo | TASK-1846 |
+| Dedupe de `plan.limits` | resuelto en el RENDER (`render/plan-limits.ts`, 2026-09-16); el plan congelado conserva un límite por rechazo a propósito | cerrado |
 | Clientes reales (Berel/Sky) | ninguna org real tiene `insights_v1`; sólo la sintética | EPIC-046 |
 | Job de retención | clases declaradas (1095 días); sin cleanup verificable | follow-up operativo |
 | Owner de revisión para encargos de cliente | `reviewOwnerUserId = null` cuando el creador no es `member` | policy EPIC-046 P01 |
-| Generación asíncrona | hoy síncrona en el request tras el commit | TASK-1846 (worker) |
+| Generación asíncrona | la GENERACIÓN sigue síncrona; el RENDER sí es asíncrono (cola + worker, 2026-09-16) | evaluar tras TASK-1847 |
 
 ---
 

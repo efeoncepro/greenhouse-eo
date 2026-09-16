@@ -48,3 +48,16 @@ The migration is already applied on the single instance, so `release_batch_polic
 irreversible: dispatch with a factual `bypass_preflight_reason` (applied migration + `auth_access` = scope parity).
 Contract canary on production after release: catalog 200 / deny 404 / create 503 `generation_disabled` before the
 flag, 202 after.
+
+## Rendering (TASK-1846)
+
+- Flag `INSIGHTS_RENDER_ENABLED` — TWO runtimes: Vercel (queue via API/MCP) and the `artifact-worker` Cloud Run Job (claim).
+  Cloud Run SoT is `services/artifact-worker/deploy.sh` (destructive `--set-env-vars`; guarded by `deploy-contract.test.ts`);
+  apply live with `gcloud run jobs update … --update-env-vars` AND keep it in `deploy.sh`. Vercel: `vercel env add` + redeploy.
+- Rollout order (not executed yet): deploy the worker image → flag ON in the worker → flag ON in Vercel → canary on the
+  synthetic org (request deck_pdf, poll the run, expect `completed` + asset) → only then consider `INSIGHTS_ISSUANCE_ENABLED`.
+- Orphans: signal `insights.render.orphaned_output` (steady 0). Rows `running` with `lease_expires_at IS NULL` are
+  pre-fencing legacies and need a human decision; expired leases beyond 60 min mean the worker is not draining.
+- Live tests: `pnpm test:live src/lib/efeonce-insights/render` (rollback transaction; needs the proxy).
+- Rollback: disable the flag in both runtimes; keep tables and assets; never `migrate:down` on the shared instance
+  without explicit operator authorization (it serves production).

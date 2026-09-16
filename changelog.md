@@ -1,18 +1,30 @@
 # changelog.md
 
-## 2026-09-16 — Skills Salesforce alineadas con Dreamforce 2026
-
-Las skills espejo de CRM, Marketing Cloud Next y Marketing Cloud Engagement incorporan el ledger de AIforce,
-Claudeforce, Slackforce, Koa, Agentforce long-horizon y las integraciones AWS/Google/NVIDIA/Siemens. Cada claim
-conserva su estado `GA`, beta, piloto, preview o roadmap; la actualización no cambia entitlements, contratos,
-orgs ni rollout.
-
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 > inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
 >
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
+
+## 2026-09-16 — Efeonce Insights: render durable (TASK-1846, code complete, rollout pendiente)
+
+- Artifact Worker despacha por `RenderConsumer` (Proposal intacto: `composer:visual-gate` 61 frames a cero píxeles);
+  tablas `insight_render_runs`/`insight_outputs`/`insight_render_events`; lease + fencing (columnas additive
+  también en `proposal_render_jobs`, reclamo de Proposal apagado); cuota por org, retry sin duplicar, cancelación
+  honesta, señal `insights.render.orphaned_output`.
+- `requestInsightRender` + `InsightOutputsPort` real; lanes `…/insights/editions/{id}/render` y `…/render-runs/{id}`
+  (app + ecosystem); tools MCP `request/get/retry/cancel_insight_render`; eventos `insights.render.*`; errores
+  `render_disabled`/`render_rejected`; `renderableOutputs: ['deck_pdf']`.
+- Flag `INSIGHTS_RENDER_ENABLED` (OFF; dos runtimes). Hash del manifest domain-free en el composer.
+  Sin deploy, sin push, sin canary: exigen autorización.
+
+## 2026-09-16 — Skills Salesforce alineadas con Dreamforce 2026
+
+Las skills espejo de CRM, Marketing Cloud Next y Marketing Cloud Engagement incorporan el ledger de AIforce,
+Claudeforce, Slackforce, Koa, Agentforce long-horizon y las integraciones AWS/Google/NVIDIA/Siemens. Cada claim
+conserva su estado `GA`, beta, piloto, preview o roadmap; la actualización no cambia entitlements, contratos,
+orgs ni rollout.
 
 ## 2026-09-16 — El CLI de imágenes gana inpainting por máscara y reporta `usage`
 
@@ -1036,17 +1048,3 @@ sigue OFF y producción no se promueve antes de completar correo Google, sesión
 primera CI del commit falló en el gate de navegación porque el smoke OAuth usaba `page.goto` directo; el fix local
 ya usa el helper transitorio compartido y pasa el gate focal. Durante una consulta, el CLI de Vercel imprimió un
 cursor sensible: no se reutilizó ni se conserva en evidencia; su posible rotación queda como acción de higiene.
-
-## 2026-09-06 — La certificación sintética se separa del primer piloto cliente
-
-TASK-1832 ya no usa a una organización cliente real para descubrir defectos. La certificación técnica externa
-se ejecutará con cuentas controladas por Efeonce, personas marcadas `smoke_test`, una organización canary no
-cliente y un binding de propósito explícito, recorriendo el mismo issuer, invitación, sesión, consentimiento,
-PKCE, token, gateway y autorización que producción. La matriz conserva clientes MCP reales, M365/Google,
-Chrome/Safari y casos negativos; su resultado demuestra preparación técnica, no adopción comercial.
-
-TASK-1841 queda como unidad separada para el primer piloto consentido: una organización ya existente en Account
-360, un administrador y una capability read-only vigente, sólo después de cerrar certificación, assurance y UI.
-El cliente recibe onboarding y soporte normales, no tareas de QA, y nunca debe entregar tokens o logs. Esa
-decisión documental inicial no creó correos, cuentas, bindings, migraciones, invitaciones, flags ni rollout; el
-apply de schema posterior queda registrado por separado en la entrada anterior.

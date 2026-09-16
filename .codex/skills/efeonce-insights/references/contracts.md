@@ -47,3 +47,19 @@ from that phase) and `withdrawn` (terminal). Client projection: `in_progress | i
 `get_insights_catalog {organizationId?}`, `list_insight_editions {organizationId?, state?, audience?, reportId?, pageSize?, cursor?}`,
 `get_insight_edition {organizationId?, editionId, includeEvidence?}`, `create_insight_edition {organizationId?, request}`.
 Internal bindings must pass `organizationId`; org-scoped bindings read their own org only and never create.
+
+## Rendering (TASK-1846) — verified against code 2026-09-16
+
+- `POST …/insights/editions/{editionId}/render` body `{ organizationId?, outputs?: InsightOutput[] }` → `202 { run, outputs, idempotent:false }`
+  or `200 { …, idempotent:true }` when a live run already covers the targets. Precondition: edition `ready_for_review`
+  with sealed snapshot + frozen plan; `outputs` ⊆ edition outputs and ⊆ `INSIGHT_RENDERABLE_OUTPUTS` (`deck_pdf`).
+- `GET …/insights/editions/{editionId}/render` (paginated runs) · `GET …/insights/render-runs/{renderRunId}` → run DTO
+  `{ renderRunId, editionId, audience, requestedOutputs, state, startedAt, finishedAt, cancelledAt, createdAt, outputs[] }`,
+  output DTO `{ insightOutputId, output, state, attempts, failureCode, outputAssetId, manifestHash, finishedAt }`.
+- `POST …/render-runs/{id}/retry` → re-queues only `failed` outputs (`idempotent:true` when none). `dead_letter` is terminal.
+- `POST …/render-runs/{id}/cancel` → `{ run, outputs, cancelled, stillRunning, idempotent }`; running outputs are not lied about.
+- Run states: `pending|running|completed|partial_failed|failed|cancelled`. Output states: `queued|running|completed|failed|dead_letter|cancelled`.
+- Failure codes: `audience_violation, semantic_rejected, size_rejected, geometry_rejected, font_fallback_detected, missing_asset, blank_slide, manifest_drift, render_error, timeout, dispatch_error, cancelled`; non-retryable: `audience_violation, semantic_rejected, manifest_drift, cancelled`.
+- Errors: `render_disabled` → 503 `service_unavailable`; `render_rejected` → 422 `bad_request` (details carry the cause; nothing is truncated).
+- Events: `insights.render.requested`, `insights.render.output_completed`, `insights.render.output_failed` (aggregate `insight_render_run`).
+- Port: `assertOutputsValidated(edition)` requires every `edition.outputs` `completed` with asset, same audience → `{ outputs: [{ output, assetId, manifestHash }] }`.

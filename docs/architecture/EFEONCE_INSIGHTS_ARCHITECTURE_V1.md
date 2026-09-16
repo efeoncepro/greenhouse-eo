@@ -172,7 +172,7 @@ Superficie **propuesta**, naming final de rutas/capabilities se registra durante
 | Operación canónica | API / MCP | Dueña |
 |---|---|---|
 | list/get/catalog/validateRequest/createEdition/revise/issue | Thin adapters App/Ecosystem; listado paginado y estados compactos | TASK-1845 |
-| requestOutputs/getRun/retryOutput/cancelRun | Requests asíncronos, sin esperar Chromium | TASK-1846 |
+| requestOutputs/getRun/retryOutput/cancelRun | Requests asíncronos, sin esperar Chromium. **Registrado 2026-09-16:** `POST/GET …/insights/editions/{editionId}/render`, `GET …/insights/render-runs/{renderRunId}`, `POST …/render-runs/{renderRunId}/retry`, `POST …/render-runs/{renderRunId}/cancel` en los lanes app y ecosystem; tools MCP `request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render`. Errores nuevos `render_disabled` (503) y `render_rejected` (422). | TASK-1846 |
 | createShare/revokeShare/getShare/withdrawEdition | Writes gobernados; token sólo al emitir enlace autorizado | TASK-1848 |
 | requestDelivery/getDelivery/createSchedule/pauseSchedule | Autorización exacta por destinatario, modalidad y recurrencia | TASK-1848 |
 | resolveSharedEdition/downloadSharedOutput | Token de lectura limitado, sin OAuth ni discovery de módulos | TASK-1848 |
@@ -557,12 +557,13 @@ greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en s
 - **La evidencia del canary tiene 0 hechos.** La org sintética no tiene snapshots ICO en 2026-07/08: el snapshot
   sellado trae 4 rechazos `no_data` y el plan congelado declara los límites. Se ejercitó el camino "sin datos
   declarados", no el de un cliente con datos reales.
-- **El cliente ve `evidence`/`plan` `null` hasta emitir**, y hoy ninguna edición puede emitirse: `issue` falla
-  cerrado `409 not_ready` hasta que TASK-1846 conecte `InsightOutputsPort` (`renderableOutputs` del catálogo
-  sigue vacío).
+- **El cliente ve `evidence`/`plan` `null` hasta emitir.** Desde 2026-09-16 `InsightOutputsPort` está conectado
+  (TASK-1846): `issue` ya no falla por "puerto sin conectar" sino por **outputs sin completar** (`not_ready` con
+  `missing`/`pending`); `renderableOutputs` del catálogo declara `deck_pdf`. Ninguna edición se ha emitido aún:
+  el render está `code complete, rollout pendiente` (worker sin desplegar, `INSIGHTS_RENDER_ENABLED` OFF).
 - **`create_insight_edition` por el gateway responde `insufficient_scope`** hasta que un consentimiento/grant
   gobernado otorgue `efeonce.mcp.insights.write` a un cliente; el cliente PKCE compartido no se tocó.
-- Hallazgo menor: `plan.limits` repite «ico: sin datos.» una vez por rechazo (dedupe asignado a TASK-1846).
+- `plan.limits` repite «ico: sin datos.» una vez por rechazo en el plan CONGELADO (fiel al snapshot); el render lo deduplica (TASK-1846, `render/plan-limits.ts`) sin tocar el plan ni su hash.
 - Pendientes para mover TASK-1845 a `complete`: ensayo de `migrate:down` en la instancia compartida (conservando
   `pgmigrations.run_on` original y las ediciones intactas) y `tools/list` por una sesión MCP servida con token
   humano (evidencia de 47 tools + skill `efeonce-insights` desde un cliente real).
@@ -583,11 +584,42 @@ greenhouse-eo, dispatch del orquestador, aprobación de gates, env/redeploy en s
 - **NUNCA** mutar `insight_evidence_snapshots` ni `insight_editorial_plans` sellados/congelados: corregir es
   `revise` (versión nueva); una emitida sólo se retira. Cambiar la matriz de estados exige migración + TS juntos.
 - **NUNCA** cruzar un gate de flag desde un solo runtime ni asumir que un env var nuevo llega a una deployment
-  ya construida: generación, emisión e IA son gates independientes, se prenden por target en Vercel (único
-  runtime lector hoy) y **requieren `vercel redeploy`**; el ledger registra el estado.
+  ya construida: generación, emisión e IA son gates independientes que se prenden por target en Vercel y
+  **requieren `vercel redeploy`**. `INSIGHTS_RENDER_ENABLED` (TASK-1846) se lee en **DOS runtimes** — Vercel
+  (encolar, `requestInsightRender`) y el artifact-worker Cloud Run Job (reclamar) — y debe estar ON en ambos; en
+  Cloud Run el SoT es `services/artifact-worker/deploy.sh` (`--set-env-vars` destructivo). El ledger registra el estado.
 - **NUNCA** responder `403` a una org sin módulo `insights_v1` ni a un cliente que apunta a otra org: es `404`
   anti-oracle (`assertInsightsAccess`); `audience=internal` nunca se concede a un cliente.
 - **NUNCA** emitir desde una máquina ni saltar `InsightOutputsPort`: emitir es gate humano con
-  `insights.edition.issue`, `INSIGHTS_ISSUANCE_ENABLED` y outputs validados; hasta TASK-1846 es `not_ready`.
+  `insights.edition.issue`, `INSIGHTS_ISSUANCE_ENABLED` y outputs validados. El puerto real (TASK-1846) valida
+  SÓLO outputs `completed` con asset de la MISMA audiencia de la edición: un output interno jamás valida una
+  edición de cliente; faltar uno es `not_ready` con `missing`.
+- **NUNCA** encolar un output que el motor no puede producir (`INSIGHT_RENDERABLE_OUTPUTS`, hoy `deck_pdf`):
+  se rechaza `render_rejected`, nunca "queda para después". **NUNCA** truncar una cifra o una afirmación para
+  que quepa en un slot del catálogo: el mapper rechaza con causa; sólo un label/título se acorta con elipsis.
+- **NUNCA** separar lease de fencing en el motor de render: el reclamo por lease vencido abre una ventana de
+  doble finalización que hoy no existe y el fence token es el único candado (`InsightRenderFenceLostError`).
 - **SIEMPRE** que se agregue una tool MCP interna, federarla en `efeonce-mcp` (provider + paridad + política de
   autoridad nativa + scope si escribe) y verificar el gateway construido; registrar una tool aquí no la publica.
+
+### 14.5 Estado de TASK-1846 — render durable (2026-09-16, `code complete, rollout pendiente`)
+
+**Existe en código (develop; sin deploy, flag OFF en todos los runtimes):**
+- Schema: `insight_render_runs` (solicitud por edición), `insight_outputs` (unidad reclamable por target, UNIQUE
+  `(org, edición, output, audiencia)`), `insight_render_events` (append-only); columnas `lease_expires_at` +
+  `fence_token` en `insight_outputs` **y** en `proposal_render_jobs` (additive; el reclamo de Proposal queda apagado).
+- Motor: `services/artifact-worker` despacha por `RenderConsumer` (registry con Proposal e Insights); claim
+  atómico con lease, reclamo de lease vencido, fencing en la finalización, cuota por org, retry sólo de fallidos,
+  cancelación honesta, señal `insights.render.orphaned_output` (steady 0).
+- Entrada/salida: `requestInsightRender` (+ retry/cancel, readers de runs) y `InsightOutputsPort` real conectado
+  al barrel de commands. Lanes app/ecosystem y 4 tools MCP (manifiesto 55 tools). Eventos `insights.render.*`.
+- Mapper V1 plan congelado → `deck-axis` (`render/deck-mapper.ts`); el catálogo A4 y los gráficos son TASK-1847.
+
+**Verificado:** 5 live tests contra PostgreSQL real (fencing rechaza la finalización vieja sin escribir; retry no
+duplica; cancelación no miente; SQL de señal y de encolado), 1006 unitarios, `composer:visual-gate` 61 frames a
+cero píxeles (Proposal intacto), `pnpm test` completo y `pnpm build` de producción con estos cambios en el árbol.
+
+**NO hecho / límites honestos:** target `web` y catálogo A4 (1847/1848); descarga autorizada del asset (1848); worker
+sin desplegar; ningún render real corrió en Cloud Run; `INSIGHTS_RENDER_ENABLED` OFF en Vercel y Cloud Run; el
+defecto visual del slot `unit` de `MetricsSplit` es anterior y afecta decks ya entregados (issue aparte).
+

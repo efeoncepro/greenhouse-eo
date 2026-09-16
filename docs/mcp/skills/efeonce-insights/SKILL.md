@@ -1,6 +1,6 @@
 ---
 name: efeonce-insights
-description: How to operate Efeonce Insights through MCP — build a valid request from the catalog, create an edition, follow its phases, read sealed evidence and the frozen plan honestly, and know what a machine cannot do (issue, share, send). Load it before creating or describing an Insights edition.
+description: How to operate Efeonce Insights through MCP — build a valid request from the catalog, create an edition, follow its phases, read sealed evidence and the frozen plan honestly, request and follow the rendering of its deck, and know what a machine cannot do (issue, share, send). Load it before creating, rendering or describing an Insights edition.
 ---
 
 # Operating Efeonce Insights
@@ -18,11 +18,14 @@ everything below is enforced server-side per binding and per organization.
 | List editions / read one edition with evidence and plan | `list_insight_editions`, `get_insight_edition` |
 | Create an edition and run its generation up to `ready_for_review` | `create_insight_edition` — internal bindings only |
 | Issue, withdraw, recover a failed edition | Not through MCP. Issuing is a human decision with its own capability |
-| Render deck/A4/web, share by link, send by email, schedule | Not yet: durable rendering and sharing/delivery arrive in later units of the program |
+| Request the rendering of an edition's deck and follow it | `request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render` — writes are internal bindings only; today only `deck_pdf` renders |
+| A4 report, web view, share by link, send by email, schedule | Not yet: they arrive in later units of the program |
 
-`renderableOutputs` in the catalog is empty until rendering is connected. An edition can be created,
-generated and reviewed, but **it cannot be issued** until its requested outputs exist and are validated.
-Never tell a human that a report "is ready to send".
+`renderableOutputs` in the catalog lists what the render engine can produce today (`deck_pdf`). An
+edition can be created, generated and reviewed, but **it cannot be issued** until every requested
+output has been rendered and validated. Rendering is asynchronous and runs in a worker: request it,
+then poll the run. If the request answers `service_unavailable` with code `render_disabled`, rendering
+is switched off in this runtime — report it and stop. Never tell a human that a report "is ready to send".
 
 ## The request, field by field
 
@@ -37,7 +40,7 @@ Always call `get_insights_catalog` first and propose the exact request to the hu
   months, the same number of months before), `previous_year` (same civil dates one year earlier, Feb 29
   becomes Feb 28) or `custom` with its own `start`/`endExclusive` that must not overlap.
 - `audience`: `client` or `internal`. An org-scoped binding can only read `client` editions.
-- `outputs`: one or more of `deck_pdf`, `report_pdf`, `web`. Declares intent; nothing renders yet.
+- `outputs`: one or more of `deck_pdf`, `report_pdf`, `web`. Declares intent. Only `deck_pdf` can be rendered today; requesting the rendering of another target is rejected, never queued for later.
 - `locale` (`es-CL` default, `en-US`), `depth` (`executive`, `standard`, `detailed`).
 - `idempotencyKey` (8–200 chars): the same key with the same request returns the same edition; the
   same key with a different request is a `409` conflict. Use one key per distinct human request.
@@ -122,7 +125,10 @@ frozen and hashed; both are immutable. Every figure in the plan references a fac
 | Same `idempotencyKey` with a different request → conflict | The key is already bound to another request | Use a new key for a genuinely new request |
 | `not_found` for an organization you believe exists | Either it does not exist for your binding or it has no Insights module | Do not infer anything else; report it as not available |
 | `evidence` and `plan` come back `null` for a client-audience read | The edition is not issued yet; clients only see evidence and plan of issued editions | Say the edition is in review and figures are not yet visible for the client |
-| Issuing answers `not_ready` | Rendering of the requested outputs is not connected yet; issuing is closed by design | Do not work around it |
+| Issuing answers `not_ready` | At least one requested output is not rendered and validated yet (the details name it) | Request or finish the rendering first; do not work around it |
+| `request_insight_render` answers `render_rejected` | You asked for an output that cannot be rendered yet, or the frozen plan exceeds a slot budget of the catalog | Request only `deck_pdf`; nothing is truncated silently — report the cause |
+| A render run is `partial_failed` | One output succeeded and another failed | Report both states; `retry_insight_render` re-queues only the failed ones |
+| An output is `dead_letter` | Attempts exhausted or a non-retryable failure (for example the catalog changed since queuing) | Do not retry from MCP; a human decides |
 
 ## Recipes
 

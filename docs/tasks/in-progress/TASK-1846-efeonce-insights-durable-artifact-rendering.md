@@ -28,7 +28,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-045`
-- Status real: `Slices 1-3 implementados y verificados contra PG real (6 commits locales, sin push). Slice 4 sin ejecutar. code complete parcial, rollout pendiente: worker sin desplegar y flag OFF.`
+- Status real: `code complete, rollout pendiente (2026-09-16). Motor conectado por las dos puntas: requestInsightRender + InsightOutputsPort real; lanes app/ecosystem y 4 tools MCP; benchmark local ejecutado. Falta: deploy del worker, flag ON en Vercel y Cloud Run, canary, federacion en efeonce-mcp; report_pdf/web dependen de 1847/1848.`
 - Rank: `TBD`
 - Domain: `platform|ops|data`
 - Blocked by: `none`
@@ -289,6 +289,17 @@ hash para entradas idénticas. Entra en el Slice 1. Que el planner emita duplica
 ([`deterministic-planner.ts:145`](../../../src/lib/efeonce-insights/editorial/deterministic-planner.ts)) queda
 como apunte para el dueño del planner, fuera de esta task.
 
+### Decisiones de la segunda pasada (2026-09-16)
+
+- **Mapper V1 en el dominio, no en el catálogo:** `render/deck-mapper.ts` traduce el plan congelado a láminas
+  `deck-axis` con el vocabulario que existe; TASK-1847 lo reemplaza por catálogos propios. Sin él, el puerto de
+  outputs no podía conectarse de verdad y `issue` seguía bloqueado por una razón falsa.
+- **No se emite `CoverFull`:** su `proposalKind` imprime «Propuesta Técnica»/«Capacitación HubSpot» en un informe.
+- **El hash del manifest es del composer** (`manifest-hash.ts`, domain-free; `render-jobs.ts` re-exporta): con dos
+  consumers tiene que ser UNA función o el drift check del worker daría falsos positivos.
+- **`INSIGHTS_RENDER_ENABLED` se lee en dos runtimes** (Vercel para encolar, worker para reclamar); el ledger lo dice.
+- **`src/lib/efeonce-insights/render/`** y no `src/lib/insights/` (propuesto en la spec): el dominio real ya vive ahí.
+
 ### Deliberadamente NO decidido
 
 Cuándo se prende el reclaim de Proposal. Esta task deja el mecanismo y el flag apagado; encenderlo es una
@@ -380,16 +391,16 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 ## Acceptance Criteria
 
-- [ ] **NO verificado** (Slice 4 / lanes pendientes) — Autogestión cliente y gestión interna de arquitectura §7.1 revalidan autoridad al ejecutar; reutilización/idempotencia de outputs conserva audiencia y proyección. Un job cliente nunca reutiliza bytes de un draft interno aunque coincidan org y período (integración EPIC-046).
+- [~] **Parcial** — `requestInsightRender`/retry/cancel revalidan los tres planos + audiencia (un cliente no encarga outputs de un draft interno: 404 anti-oracle; test `render/commands.test.ts`). La reutilización de outputs es por `(org, edición, target, audiencia)`: un job cliente nunca reutiliza bytes de un draft interno (UNIQUE + `findInsightOutputsForEdition` por audiencia, live test). **No verificado en runtime real** (worker sin desplegar). — Autogestión cliente y gestión interna de arquitectura §7.1 revalidan autoridad al ejecutar; reutilización/idempotencia de outputs conserva audiencia y proyección. Un job cliente nunca reutiliza bytes de un draft interno aunque coincidan org y período (integración EPIC-046).
 - [x] Insights produce assets ligados a edición/org, nunca a Proposal ni proposal_deliverable; Proposal existente conserva sus jobs/outputs sin pérdida. — contexto `insight_output` colgando de `edition_id` (`consumers/insights.ts`); Proposal delega en sus mismos commands y sus 11 tests de contrato siguen verdes; `pnpm test` completo de un peer con estos cambios: 14164 verdes.
 - [x] Worker no consulta ni calcula métricas; verifica manifest, catálogos, fuentes y assets fijados y rechaza manifest_drift. — el drift check byte a byte quedó intacto en `main.ts`; el consumer sólo persiste bytes. Un `report_pdf` con catálogo no empaquetado falla honesto como `manifest_drift`.
-- [~] **Parcial** — fencing PROBADO contra PG real (`render.live.test.ts`): A reclama fence 1, vence el lease, B reclama fence 2, la finalización de A se rechaza sin escribir, B finaliza; un solo output final. **El crash tras upload se DETECTA** (señal `insights.render.orphaned_output`) pero **no se reconcilia solo**: las filas sin lease requieren decisión humana a propósito, porque reclamarlas podría producir dos finalizaciones.
+- [~] **Parcial** — fencing PROBADO contra PG real (`render.live.test.ts`): A reclama fence 1, vence el lease, B reclama fence 2, la finalización de A se rechaza sin escribir, B finaliza; un solo output final. **El crash tras upload se DETECTA** (señal `insights.render.orphaned_output`) pero **no se reconcilia solo**: las filas sin lease requieren decisión humana a propósito, porque reclamarlas podría producir dos finalizaciones. Los assets subidos por un worker que perdió el fence quedan huérfanos en el store (riesgo residual declarado en la decisión).
 - [x] Fallar report_pdf conserva deck_pdf exitoso; retry no duplica; cancelación impide iniciar trabajo restante y tiene estado terminal honesto. — probado contra PG real: el retry re-encola sólo el fallido reusando su fila (una sola fila por target), el completado no se toca, y la cancelación deja `stillRunning` sin mentir y no declara el run cancelado mientras algo corra.
-- [~] **Parcial** — cuota por organización aplicada en el claim, dead letter por intentos agotados o fallo no reintentable, y señal de huérfanos steady 0 cableada al overview. **Queue age y retry budget NO medidos**: sus valores salen del benchmark del Slice 4, que no se ejecutó.
-- [ ] **NO implementado** — el target `web` no tiene render y el catálogo A4 del informe llega con TASK-1847; hoy sólo `deck-axis` está empaquetado en el worker.
-- [ ] **NO implementado** — los commands existen en el store (retry/cancel gobernados), pero no hay lanes app/ecosystem ni entradas de manifest MCP todavía.
-- [ ] **NO ejecutado** — Slice 4. Requiere renders reales; la máquina es compartida con otras dos sesiones.
-- [ ] **NO ejecutado** — exige autorización explícita del operador para desplegar el worker, prender el flag y correr canary. Sin eso el estado honesto es `code complete, rollout pendiente`.
+- [~] **Parcial** — cuota por organización en el claim, dead letter, señal de huérfanos steady 0. Benchmark LOCAL del Slice 4 ejecutado (abajo); **queue age y retry budget en Cloud Run NO medidos** (worker sin desplegar). Límite efectivo propuesto: `maxPdfMb` 20 se sostiene (25 láminas = 12,6 MB); cuota por org = 2 hasta medir en Cloud Run.
+- [~] **Parcial** — `deck_pdf` se contabiliza por edición vía el Composer con manifest sellado y drift check; **`report_pdf` y `web` se rechazan al encargar** (`render_rejected`, nunca se encolan): el catálogo A4 es TASK-1847 y el modelo web es TASK-1848.
+- [x] API/MCP request/get/retry/cancel pasan policy, idempotencia y error parity; no esperan la generación en request-response. — lanes app + ecosystem (`…/editions/{id}/render`, `…/render-runs/{id}[/retry|/cancel]`), misma tabla de errores + `render_disabled`/`render_rejected`; 4 tools MCP (manifiesto 55, `mcp:manifest:check` al día); 202 al encolar / 200 idempotente; tests de paridad en `insights-lanes.test.ts`. **Federación en `efeonce-mcp` pendiente** (autorización).
+- [~] **Parcial (LOCAL, no Cloud Run)** — matriz ejecutada el 2026-09-16 con el catálogo real vía `pnpm deck:compose` (plan SKY recortado), secuencial, `/usr/bin/time -l`: **15 láminas** 4,44–4,72 s, RSS máx 300–328 MB, PDF 5,4 MB; **25 láminas** 7,07–7,42 s, RSS máx 355–365 MB, PDF 12,6 MB; **ráfaga 5×15** back-to-back 23,3 s totales (4,58–4,72 s cada una, sin degradación). Páginas A4 10/30: **no medible** (el catálogo A4 no existe, TASK-1847). Competencia de cola con Proposal y budgets de Cloud Run: **no medidos** (worker sin desplegar; el Job es `parallelism=1`).
+- [ ] **NO ejecutado** — exige autorización explícita del operador para desplegar el worker, prender `INSIGHTS_RENDER_ENABLED` en **dos runtimes** (Vercel + artifact-worker) y correr canary. Sin eso el estado honesto es `code complete, rollout pendiente`.
 
 ## Verification
 

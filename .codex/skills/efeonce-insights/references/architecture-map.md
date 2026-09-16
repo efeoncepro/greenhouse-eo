@@ -48,3 +48,21 @@ Architecture `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`, ADR `EFEONCE_INSIGHTS_PLATFO
 `EFEONCE_INSIGHTS_IMPLEMENTATION_RECORD_V1.md`, functional `docs/documentation/insights/efeonce-insights-dominio-ediciones.md`,
 runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-045 + master UI flow
 `docs/ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md`, Think decision `docs/think/README.md`, flag ledger rows.
+
+## TASK-1846 — durable rendering (2026-09-16)
+
+| Piece | Where | Responsibility |
+| --- | --- | --- |
+| Tables | `greenhouse_insights.insight_render_runs`, `insight_outputs` (UNIQUE org+edition+output+audience; `lease_expires_at`, `fence_token`), `insight_render_events` | request per edition; claimable unit per target; append-only history |
+| Proposal columns | `greenhouse_commercial.proposal_render_jobs.lease_expires_at/fence_token` | additive, unused by Proposal (reclaim OFF) |
+| Domain | `src/lib/efeonce-insights/render/contracts.ts` | states, failure codes, transitions, `INSIGHT_RENDERABLE_OUTPUTS`, `InsightRenderFenceLostError` |
+| Domain | `render/store.ts` | claim (lease+fence+reclaim+org quota), transitions (+events), retry, cancel, inserts, readers by edition/run |
+| Domain | `render/commands.ts` · `render/readers.ts` | `requestInsightRender`, `retryInsightRender`, `cancelInsightRender`; `readInsightRenderRun(s)` |
+| Domain | `render/outputs-port.ts` | real `InsightOutputsPort` + `wireInsightOutputsPort()` (called from `commands/index.ts`) |
+| Domain | `render/deck-mapper.ts` · `render/plan-limits.ts` | frozen plan → deck-axis slides (V1); limits dedupe at render |
+| Composer | `src/lib/artifact-composer/manifest-hash.ts` | `hashResolvedManifest` domain-free (re-exported by Proposal `render-jobs.ts`) |
+| Worker | `services/artifact-worker/consumer-contract.ts`, `consumers/{proposal,insights,index}.ts`, `main.ts` | registry dispatch; `INSIGHTS_RENDER_ENABLED` in `deploy.sh` (+ `deploy-contract.test.ts`) |
+| Lanes | `src/lib/api-platform/resources/{app,ecosystem}-insights.ts` + routes `…/insights/editions/[editionId]/render`, `…/insights/render-runs/[renderRunId]{,/retry,/cancel}` | request/list/get/retry/cancel |
+| MCP | `src/mcp/greenhouse/{tool-manifest,server,tools,http-client}.ts` | 4 render tools (gateway federation pending) |
+| Reliability | `src/lib/reliability/queries/insights-render-orphaned.ts` (`insights.render.orphaned_output`) | orphan detection, steady 0 |
+| Asset context | `insight_output` (`src/types/assets.ts`, retention `commercial_engagement_report`) | system-generated, not a draft upload |
