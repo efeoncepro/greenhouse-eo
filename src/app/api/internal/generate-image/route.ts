@@ -3,14 +3,19 @@ import 'server-only'
 import { NextResponse } from 'next/server'
 
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
-import { generateImage, type GenerateImageOptions } from '@/lib/ai/image-generator'
+import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
+import { IMAGE_GENERATION_PROVIDERS, generateImage, type GenerateImageOptions } from '@/lib/ai/image-generator'
+import { OPENAI_IMAGE_QUALITIES } from '@/lib/ai/openai-image'
 
 export const dynamic = 'force-dynamic'
 
 const VALID_ASPECT_RATIOS = ['1:1', '16:9', '9:16', '4:3', '3:4'] as const
 const VALID_FORMATS = ['webp', 'png'] as const
-const VALID_PROVIDERS = ['google-imagen', 'openai-image'] as const
-const VALID_OPENAI_QUALITIES = ['auto', 'low', 'medium', 'high'] as const
+// provider y quality NO se redeclaran acá: sus dueños son image-generator.ts y openai-image.ts.
+// Duplicarlos ya había producido drift — esta lista todavía nombraba `google-imagen`, retirado, y se
+// quedaba en `high`, así que un `quality: "max"` legítimo se descartaba en silencio.
+const VALID_PROVIDERS = IMAGE_GENERATION_PROVIDERS
+const VALID_OPENAI_QUALITIES = OPENAI_IMAGE_QUALITIES
 const VALID_OPENAI_BACKGROUNDS = ['auto', 'opaque', 'transparent'] as const
 
 const VALID_OPENAI_SIZES = [
@@ -24,6 +29,31 @@ const VALID_OPENAI_SIZES = [
   '2048x1536',
   '2048x2048'
 ] as const
+
+/**
+ * Un campo ausente se omite; uno presente pero inválido responde 400 accionable.
+ *
+ * Antes, el patrón `if (body.x && VALID.includes(body.x))` descartaba el valor y seguía con el default:
+ * quien pedía `quality: "max"` recibía `medium` y una imagen que parecía correcta sin serlo.
+ */
+const readEnumField = <T extends string>(
+  field: string,
+  value: unknown,
+  allowed: readonly T[]
+): { ok: true; value: T | undefined } | { ok: false; response: ReturnType<typeof canonicalErrorResponse> } => {
+  if (value === undefined || value === null) return { ok: true, value: undefined }
+
+  if (typeof value === 'string' && (allowed as readonly string[]).includes(value)) {
+    return { ok: true, value: value as T }
+  }
+
+  return {
+    ok: false,
+    response: canonicalErrorResponse('invalid_request', {
+      extra: { field, received: typeof value === 'string' ? value : typeof value, allowed: [...allowed] }
+    })
+  }
+}
 
 export async function POST(request: Request) {
   // Production guard
@@ -54,28 +84,22 @@ export async function POST(request: Request) {
 
     const options: GenerateImageOptions = {}
 
-    if (body.aspectRatio && VALID_ASPECT_RATIOS.includes(body.aspectRatio)) {
-      options.aspectRatio = body.aspectRatio
-    }
+    const fields = [
+      ['aspectRatio', body.aspectRatio, VALID_ASPECT_RATIOS],
+      ['format', body.format, VALID_FORMATS],
+      ['provider', body.provider, VALID_PROVIDERS],
+      ['quality', body.quality, VALID_OPENAI_QUALITIES],
+      ['size', body.size, VALID_OPENAI_SIZES],
+      ['background', body.background, VALID_OPENAI_BACKGROUNDS]
+    ] as const
 
-    if (body.format && VALID_FORMATS.includes(body.format)) {
-      options.format = body.format
-    }
+    for (const [field, value, allowed] of fields) {
+      const parsed = readEnumField(field, value, allowed)
 
-    if (body.provider && VALID_PROVIDERS.includes(body.provider)) {
-      options.provider = body.provider
-    }
+      if (!parsed.ok) return parsed.response
+      if (parsed.value === undefined) continue
 
-    if (body.quality && VALID_OPENAI_QUALITIES.includes(body.quality)) {
-      options.quality = body.quality
-    }
-
-    if (body.size && VALID_OPENAI_SIZES.includes(body.size)) {
-      options.size = body.size
-    }
-
-    if (body.background && VALID_OPENAI_BACKGROUNDS.includes(body.background)) {
-      options.background = body.background
+      Object.assign(options, { [field]: parsed.value })
     }
 
     if (typeof body.filename === 'string' && body.filename.trim()) {

@@ -14,7 +14,7 @@ import {
 
 // ── Types ──
 
-export type ImageGenerationProvider = 'google-imagen' | 'openai-image'
+export type ImageGenerationProvider = 'google-gemini-image' | 'openai-image'
 
 export interface GenerateImageOptions {
   aspectRatio?: '1:1' | '16:9' | '9:16' | '4:3' | '3:4'
@@ -63,9 +63,21 @@ export interface GenerateAnimationResult {
 const IMAGES_OUTPUT_DIR = join(process.cwd(), 'public', 'images', 'generated')
 const ANIMATIONS_OUTPUT_DIR = join(process.cwd(), 'public', 'animations', 'generated')
 
-// Use the latest frontier model available. Falls back gracefully if not enabled in the GCP project.
-const IMAGEN_MODEL = process.env.IMAGEN_MODEL?.trim() || 'imagen-4.0-generate-001'
-const DEFAULT_IMAGE_PROVIDER: ImageGenerationProvider = 'google-imagen'
+/**
+ * Carril Google migrado de Imagen a Gemini Image (TASK-1851).
+ *
+ * `imagen-4.0-generate-001` fue retirado —discontinuación Vertex 2026-06-30, shutdown de la Gemini API
+ * 2026-08-17— y el probe del 2026-09-16 contra `efeonce-group` devolvió 404 NOT_FOUND. La migración es de
+ * PROVIDER, no de string: Imagen usaba `generateImages` (predict) y Gemini Image usa `generateContent` con
+ * partes de contenido. Sustituir sólo el ID habría dejado el mismo retiro esperando a la vuelta de la esquina.
+ */
+const GEMINI_IMAGE_MODEL = process.env.GOOGLE_GEMINI_IMAGE_MODEL?.trim() || 'gemini-3.1-flash-image'
+
+/**
+ * El default apunta al motor probado. No puede apuntar a un carril cuyo modelo esté retirado: antes de esta
+ * task, cualquier llamada sin `provider` explícito iba a Imagen y hoy habría fallado con 404.
+ */
+const DEFAULT_IMAGE_PROVIDER: ImageGenerationProvider = 'openai-image'
 
 const SVG_SYSTEM_PROMPT = `You are an SVG animation specialist for the Greenhouse EO portal.
 Generate a single valid SVG file with embedded CSS animations.
@@ -115,15 +127,27 @@ const ensureDir = async (dir: string) => {
   await mkdir(dir, { recursive: true })
 }
 
-const isImageGenerationProvider = (value: string): value is ImageGenerationProvider =>
-  value === 'google-imagen' || value === 'openai-image'
+/** Fuente única de los providers válidos: la consumen el guard, los mensajes de error y la ruta interna. */
+export const IMAGE_GENERATION_PROVIDERS: readonly ImageGenerationProvider[] = ['openai-image', 'google-gemini-image']
 
+export const isImageGenerationProvider = (value: string): value is ImageGenerationProvider =>
+  (IMAGE_GENERATION_PROVIDERS as readonly string[]).includes(value)
+
+/**
+ * Cuarta puerta de entrada del mismo bug class que TASK-1851 cierra: un `GREENHOUSE_IMAGE_PROVIDER` con un
+ * valor desconocido caía al default sin avisar, así que el motor real podía no ser el que el operador creía.
+ */
 export const getImageGenerationProvider = (requested?: ImageGenerationProvider): ImageGenerationProvider => {
   if (requested) return requested
 
   const envProvider = process.env.GREENHOUSE_IMAGE_PROVIDER?.trim()
 
-  return envProvider && isImageGenerationProvider(envProvider) ? envProvider : DEFAULT_IMAGE_PROVIDER
+  if (!envProvider) return DEFAULT_IMAGE_PROVIDER
+  if (isImageGenerationProvider(envProvider)) return envProvider
+
+  throw new Error(
+    `GREENHOUSE_IMAGE_PROVIDER="${envProvider}" is not a supported image provider. Valid providers: ${IMAGE_GENERATION_PROVIDERS.join(', ')}.`
+  )
 }
 
 // ── Image Generation ──
@@ -174,24 +198,35 @@ export const generateImage = async (
     }
   }
 
+  if (numberOfImages !== 1) {
+    throw new Error(
+      `The ${provider} lane returns one image per request; numberOfImages=${numberOfImages} is not supported. Issue one request per output.`
+    )
+  }
+
   const client = await getGoogleGenAIClient()
 
-  const response = await client.models.generateImages({
-    model: IMAGEN_MODEL,
-    prompt,
+  const response = await client.models.generateContent({
+    model: GEMINI_IMAGE_MODEL,
+    contents: prompt,
     config: {
-      numberOfImages,
-      aspectRatio
+      responseModalities: ['IMAGE'],
+      imageConfig: { aspectRatio }
     }
   })
 
-  const generated = response.generatedImages?.[0]
+  const inlineImage = response.candidates
+    ?.flatMap(candidate => candidate.content?.parts ?? [])
+    .find(part => part.inlineData?.data)?.inlineData
 
-  if (!generated?.image?.imageBytes) {
-    throw new Error('Imagen returned no image data. The prompt may have been filtered by safety controls.')
+  if (!inlineImage?.data) {
+    // Falla nombrando provider y modelo: un carril que no sirve nunca degrada a otro provider en silencio.
+    throw new Error(
+      `${provider} (${GEMINI_IMAGE_MODEL}) returned no image data. The prompt may have been filtered by safety controls.`
+    )
   }
 
-  const buffer = Buffer.from(generated.image.imageBytes, 'base64')
+  const buffer = Buffer.from(inlineImage.data, 'base64')
   const filename = makeFilename(prompt, userFilename, format)
 
   await ensureDir(IMAGES_OUTPUT_DIR)
@@ -206,8 +241,8 @@ export const generateImage = async (
     format,
     sizeBytes: buffer.length,
     provider,
-    model: IMAGEN_MODEL,
-    requestedModel: IMAGEN_MODEL,
+    model: GEMINI_IMAGE_MODEL,
+    requestedModel: GEMINI_IMAGE_MODEL,
     modelFallbackReason: null
   }
 }
