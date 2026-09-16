@@ -146,7 +146,7 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   `enhance` sólo del take aprobado; primer/último cuadro y keyframes para fijar la trayectoria; `edit` re-renderiza
   conservando movimiento; `extend` exige audio en el origen y entrega sólo la continuación; la elección de video a
   video Flux 3 vs Seedance 2.5 vive en el mismo workflow),
-  **Wan 3.0 / Wan 3.0 Prime** (también con `pnpm ai:fal`, conectado 2026-09-16; los 6 verificados en real: 2–30 s o `auto` = duración inteligente, hasta 1080p (default y escalón caro: 0,20 USD/s; 480p 0,05; Prime 0,28 a 1080p), 30 fps, R2V con
+  **Wan 3.0 / Wan 3.0 Prime** (también con `pnpm ai:fal`, conectado 2026-09-16; los 6 verificados en real: 2–30 s o `auto` = duración inteligente, hasta 1080p (escalón caro: 0,20 USD/s; 480p 0,05; Prime 0,28 a 1080p; sin `--resolution` el CLI envía 480p), 30 fps, R2V con
   10 imágenes / 5 videos / 5 audios, video basado en una web o documento con `--web-url`/`--file` + `--thinking`;
   #2 en video y #1 en Video Editing en OpenArt Arena 2026-09-16, pero **sin endpoint de edición** en fal),
   **Kling** (Voice
@@ -155,6 +155,9 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
 - 🔴 **Antes de elegir motor de video**: aplicar el contrato de fidelidad y luego el **árbol por necesidad +
   costos por resolución** de `workflows/engine-selection-by-fidelity-contract.md` (fal cobra por escalón: el precio
   registrado es el más bajo; Flux 3 publicado es el doble del registrado → confirmar con `pnpm ai:fal --balance`).
+  Desde 2026-09-16 `pnpm ai:fal` imprime `$ costo estimado` antes de encolar y pide `--yes` sobre el tope (USD 1,
+  `FAL_COST_CONFIRM_USD` o `--max-usd`); en video, sin `--resolution` usa el escalón más barato: pasa la
+  resolución de entrega explícita.
   Guía canónica imagen + video: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`.
 - **Producir (humano)**: After Effects (mograph/compositing), Blender/C4D (3D), Nuke/Fusion
   (compositing/VFX), Mocha (tracking), Houdini (FX/simulaciones) — handoff con spec (`modules/11`).

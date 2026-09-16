@@ -172,23 +172,35 @@ Toda elección de video se hace con `motion-design-studio` → `workflows/engine
 | Video basado en una web o documento | `wan3-r2v --thinking --web-url <url>` / `--file <doc>` + prompt con guion |
 
 🔴 **fal cobra por escalón de resolución**: el precio del registro es el escalón **más bajo**. Wan 3.0 a 1080p
-(su default) USD 0,20/s, Wan 3.0 Prime 0,28/s (más cara que base), H3 base a 2K (su default) 0,13/s; Flux 3
+USD 0,20/s, Wan 3.0 Prime 0,28/s (más cara que base), H3 base a 2K 0,13/s (defaults del proveedor; sin
+`--resolution` el CLI envía el escalón más barato y lo avisa); Flux 3
 publicado ≠ registrado (0,17/s final, 0,06 draft, 0,41 extend, el doble) → confirma con `--balance`. Seedance sí
 se estima con la fórmula de fal: `tokens = alto × ancho × segundos × 24 / 1024`; `costo = tokens × precio_por_1000
 / 1000` (calzó con lo medido dentro de ~5 %; la equivalencia de OpenArt subestima ~2×). Filtro de Seedance:
 rechaza marcas y personas reales **después de cobrar**.
 
-### Brechas conocidas de los CLIs (documentadas; follow-up abierto por el orquestador)
+### Brechas conocidas de los CLIs (corregidas 2026-09-16, commit `17196ead1`; lo abierto al final)
 
-- `pnpm ai:image`: **no valida** `--size` ni `--background` (llegan tal cual al API; si OpenAI rechaza antes de
-  cobrar: sin dato); formato **siempre PNG** (no hay `--format`); `--count N` = **N pedidos pagados** de una
-  imagen; `--input-fidelity` con 2.5 o 2 se **ignora en silencio**; no hay `--moderation`; salida por defecto
-  `public/images/generated` (usa `--out` hacia `ai-generations/` o scratchpad).
-- `pnpm ai:fal`: `seedream5-pro` con `--out x.png` sin `--format png` guarda **JPEG con extensión `.png`**;
-  `--seed` se envía a endpoints que no lo declaran (Seedream, Seedance t2v/i2v): efecto no probado, no confíes en
-  él; con más de 10 `--image` fal usa **sólo las últimas 10** sin aviso; faltan flags para `weight_name` (LoRA),
-  `split_input_duration_threshold` y la regla de cuadros del entrenador (usa `--input`); **no hay estimación de
-  costo previa** en el CLI.
+- `pnpm ai:image` **ya valida en local** `--size` (2/2.5: `auto` o WxH múltiplos de 16, borde ≤ 3840, relación ≤ 3:1,
+  área 655.360–8.294.400; 1.5/1/mini: `1024x1024`, `1536x1024`, `1024x1536` o `auto`) y `--background`; tiene
+  `--format png|jpeg|webp` (sin flag lo deduce de la extensión de `--out`; `transparent` + `jpeg` se rechaza); avisa
+  que `--count N` son **N pedidos pagados**; e imprime `$ costo estimado ≈ USD X (N × tokens × USD 30/1M; la
+  entrada suma aparte)` antes de pedir. **No pide confirmación**: sólo informa; sin estimación con `auto` o modelos
+  sin grilla.
+- `pnpm ai:fal` **estima antes de encolar** (`$ costo estimado ≈ USD X · base`) y, sobre el tope (USD 1;
+  `FAL_COST_CONFIRM_USD`; `--max-usd <n>`), se detiene y pide `--yes`; sin estimación posible avisa y no bloquea.
+  En Seedance pasa `--duration`: con `auto` estima el máximo del contrato. En video, sin `--resolution` envía la
+  resolución **más barata** y lo avisa: para entrega pásala explícita. Seedream Pro deriva el formato de la
+  extensión de `--out` y corrige la extensión si los bytes no coinciden (ya no hace falta `--format png`);
+  `--format` en Lite se rechaza; `--seed` sólo se acepta donde el OpenAPI lo declara (H3 de generación, Wan
+  3.0/Prime, `seedance25-r2v`); más de 10 `--image` en Seedream edit se rechaza; LoRA con
+  `--lora <path>[@escala][#weight_name]`; entrenadores con `--frames` (22–124, `% 17 == 5`) y `--split-threshold`
+  (1–60), validados también por `--input`.
+- **Sigue abierto:** `ai:image` ignora `--input-fidelity` con 2.5 o 2 en silencio, no hay `--moderation` y la salida
+  por defecto es `public/images/generated` (usa `--out` hacia `ai-generations/` o scratchpad). `ai:fal`: `--size`/
+  `--count` de imagen sin validar; número de capas de layerize y si la base se cobra: sin dato; la API de pricing
+  devuelve la mitad del precio publicado de Flux 3 (sin dato por qué); tablas de escalones al 2026-09-16, pueden
+  cambiar. Toda estimación es orientativa: `pnpm ai:fal --balance` antes y después.
 
 ## GPT Image 2.5 — Sunburst y Flare (delta de proveedor 2026-09-08)
 
@@ -541,12 +553,13 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
 ```
 
 - Flags: `--prompt|--prompt-file`, `--image` (repetible; los archivos locales se suben solos al storage de fal),
-  `--size`, `--count`, `--format jpeg|png`, `--out|--out-dir`, `--timeout`, `--json`. Video (`--duration`,
+  `--size`, `--count`, `--format jpeg|png` (sólo Seedream Pro), `--max-usd <n>`, `--yes`, `--out|--out-dir`,
+  `--timeout`, `--json`. Video (`--duration`,
   `--resolution`, `--aspect`, `--bitrate`, `--task`, `--no-audio`, `--end-image`, `--audio`, `--video`,
-  `--prompt-expansion`, `--no-prompt-expansion`, `--thinking`, `--web-url`, `--file`, `--lora`,
-  `--camera-trajectory`, `--keyframe`, `--safety-tolerance`, `--draft-cache`), `--seed <n>` (entero ≥ 0; ⚠️ el CLI
-  lo envía a cualquier endpoint sin revisar el esquema, incluidos Seedream y Seedance t2v/i2v que no lo declaran),
-  entrenamiento (`--training-data`, `--steps`, `--rank`, `--learning-rate`, `--trigger`) y la elección entre
+  `--prompt-expansion`, `--no-prompt-expansion`, `--thinking`, `--web-url`, `--file`, `--lora <path>[@escala][#weight_name]`,
+  `--camera-trajectory`, `--keyframe`, `--safety-tolerance`, `--draft-cache`), `--seed <n>` (entero ≥ 0; sólo en los
+  endpoints que lo declaran: H3 de generación, Wan 3.0/Prime y `seedance25-r2v`; en el resto el CLI lo rechaza),
+  entrenamiento (`--training-data`, `--steps`, `--rank`, `--learning-rate`, `--trigger`, `--frames`, `--split-threshold`) y la elección entre
   Seedance, H3, Flux 3 y Wan 3.0 (incluido video a video) viven en `motion-design-studio`
   (`workflows/engine-selection-by-fidelity-contract.md`). El CLI valida cada flag contra el contrato del endpoint
   **antes** de gastar: flags de video en una capacidad de imagen, o de entrenamiento fuera de un entrenador, fallan.
@@ -593,7 +606,7 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   2.7, no conectada). Flags propios: `--duration auto` (se envía `null`: duración inteligente; o entero 2–30),
   `--no-audio` (campo `audio`), `--no-prompt-expansion` (booleano; distinto del `--prompt-expansion <modo>` de H3),
   `--thinking`, y en r2v `--web-url <url pública>` / `--file <path|url>`, que **exigen `--thinking`**. Resolución
-  default **1080p**: explora a 480p. La salida trae `actual_prompt` y `seed`. Elección y ejemplos en
+  default del proveedor **1080p**; sin `--resolution` el CLI envía 480p y lo avisa (para entrega pasa `720p`/`1080p`). La salida trae `actual_prompt` y `seed`. Elección y ejemplos en
   `motion-design-studio`.
   ```bash
   pnpm ai:fal --capability wan3-t2v --prompt "…" --resolution 480p --duration auto --seed 7 --out explora.mp4

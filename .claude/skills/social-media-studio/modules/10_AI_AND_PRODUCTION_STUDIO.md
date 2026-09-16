@@ -69,7 +69,9 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    generar el final sólo de la toma aprobada; hero → Seedance 2.5; con personas o marcas → Flux 3 o Wan 3.0 (el
    filtro de Seedance rechaza **después de cobrar**).
 3. **Presupuesta por resolución:** fal cobra por escalón y el precio registrado es el más bajo (Wan 1080p 0,20
-   USD/s; H3 base 2K 0,13; Flux 3 publicado = el doble del registrado). Confirma con `pnpm ai:fal --balance`.
+   USD/s; H3 base 2K 0,13; Flux 3 publicado = el doble del registrado). `pnpm ai:fal` imprime `$ costo estimado` antes de encolar, pide
+   `--yes` sobre el tope (USD 1, `--max-usd`) y, sin `--resolution`, usa el escalón más barato: para el final pasa la
+   resolución explícita. Confirma con `pnpm ai:fal --balance`.
 4. **Copy, logo, CTA y legal nunca salen del modelo**: se componen de forma determinística sobre el plate.
 5. **Rankings con fecha y fuente**: OpenArt, Arena y Artificial Analysis se contradicen; manda la prueba contra el brief.
 

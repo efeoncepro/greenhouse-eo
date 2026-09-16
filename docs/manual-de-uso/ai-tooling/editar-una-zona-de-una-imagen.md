@@ -1,9 +1,9 @@
 # Editar solo una zona de una imagen (inpainting con mascara)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-16 por Claude — elección GPT Image 2 vs 2.5 Sunburst vs Flare con enlace a la guía canónica de selección; el costo de 2.5 sí se estima antes con la fórmula oficial; brechas conocidas del comando (`--size`/`--background` sin validar, PNG siempre, `--count` = N pedidos pagados)
+> **Ultima actualizacion:** 2026-09-16 por Claude — (1.2) brechas del comando corregidas (commit `17196ead1`): `--size` y `--background` se validan antes de gastar, nuevo `--format png|jpeg|webp`, aviso de `--count N` y línea `$ costo estimado` antes de pedir. Antes (1.1): elección GPT Image 2 vs 2.5 Sunburst vs Flare con enlace a la guía canónica de selección; el costo de 2.5 sí se estima antes con la fórmula oficial; brechas conocidas del comando (`--size`/`--background` sin validar, PNG siempre, `--count` = N pedidos pagados)
 > **Modulo:** AI Tooling / Asset Generation
 > **Comandos:** `pnpm ai:image --image ... --mask ...`, `pnpm ai:image:rmbg`
 > **Documentacion relacionada:** `docs/documentation/ai-tooling/generador-visual-assets.md`, `.claude/skills/greenhouse-ai-image-generator/SKILL.md`, `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`
@@ -72,6 +72,17 @@ pnpm ai:image --image BASE.png --mask MASK.png \
   --out RESULTADO.png
 ```
 
+Antes de pedir, el comando imprime la estimación con la fórmula oficial de tokens de salida:
+
+```
+  $ costo estimado ≈ USD 0.006 (1 × 196 tokens de salida × USD 30/1M; la entrada suma aparte)
+```
+
+Es sólo informativa (no pide confirmación) y no incluye la imagen base de entrada. Con `--size auto` o un modelo sin
+grilla publicada imprime `$ costo: sin estimación …`. El formato del resultado sale de `--format png|jpeg|webp` o, si
+no lo pasas, de la extensión de `--out` (`.jpg` → JPEG, `.webp` → WebP; si no, PNG), y el archivo se guarda con esa
+extensión. `--background transparent` con JPEG se rechaza.
+
 ### 3. Lee el `usage` que imprime
 
 ```
@@ -98,6 +109,10 @@ chico mueve muy poco el promedio y parece que no paso nada. Hay que mirar.
 | `OpenAI image mask must use the same format as the first image input` | La mascara y la imagen tienen formatos distintos (por ejemplo JPEG y PNG). |
 | Error de dimensiones | La mascara no mide exactamente lo mismo que la imagen base. |
 | `usage` con `img 0` | No viajo ninguna imagen: fue una generacion desde cero, no una edicion. |
+| `--size "…" no es válido…` / `"<modelo>" sólo acepta 1024x1024, 1536x1024, 1024x1536, auto…` | El tamaño no cumple la grilla del modelo. Se detuvo antes de gastar. |
+| `--background "…" no es válido…` / `--format "…" no es válido…` | Valor fuera de `auto|opaque|transparent` o de `png|jpeg|webp`. |
+| `$ costo estimado ≈ USD X (…)` | Estimación previa del output; la entrada suma aparte. No se cobró nada todavía. |
+| `⚠ --count N: son N pedidos separados…` | Vas a pagar N pedidos. |
 
 ## Que no hacer
 
@@ -113,13 +128,14 @@ chico mueve muy poco el promedio y parece que no paso nada. Hay que mirar.
 
 ## Brechas conocidas del comando (2026-09-16)
 
-Leídas en el código de `scripts/ai/generate-image.ts`; están registradas para corregirse:
+Corregidas el 2026-09-16 (commit `17196ead1`): `--size` se valida antes de gastar (GPT Image 2 y 2.5: `auto` o
+ANCHOxALTO con lados múltiplos de 16, borde ≤ 3840, relación ≤ 3:1 y área entre 655.360 y 8.294.400 px; modelos
+anteriores: sólo `1024x1024`, `1536x1024`, `1024x1536` o `auto`); `--background` se valida; existe
+`--format png|jpeg|webp`; el comando avisa que `--count N` son N pedidos pagados y estima el costo antes de pedir.
+Lo que sigue abierto:
 
-- **`--size` y `--background` no se validan** en el comando: un valor inválido llega tal cual al API. Si el API lo
-  rechaza antes de cobrar: sin dato. Revisa el valor antes de correr (tamaños con lados múltiplos de 16, relación
-  entre 1:3 y 3:1, borde ≤ 3840).
-- **El formato de salida es siempre PNG**: no hay `--format` ni compresión.
-- **`--count N` hace N pedidos separados de 1 imagen y pagas N veces.**
+- **`--count N` sigue haciendo N pedidos separados de 1 imagen y pagas N veces** (ahora con aviso).
+- La estimación no pide confirmación ni suma la imagen de entrada; no hay control de compresión.
 - `--input-fidelity` con 2.5 o 2 se ignora en silencio, y no hay `--moderation`.
 - Sin `--out` ni `--out-dir`, guarda en `public/images/generated/`: para exploraciones usa `--out` a
   `ai-generations/` o al scratchpad.

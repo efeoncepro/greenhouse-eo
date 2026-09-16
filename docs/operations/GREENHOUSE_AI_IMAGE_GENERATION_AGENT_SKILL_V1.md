@@ -3,7 +3,7 @@
 > **Tipo:** operating guide para agentes
 > **Estado:** Accepted
 > **Creado:** 2026-06-01
-> **Ultima actualizacion:** 2026-09-16 por Claude (puntero a la guía canónica de selección de modelos; correcciones: el costo de GPT Image 2.5 sí se estima antes, 2.5 publica rate limits, OpenAI recomienda 2.5 para integraciones nuevas, precios de fal por escalón de resolución, Wan 3.0 Prime más cara, fórmula de tokens de Seedance válida, Seedream 5 Pro tope 2048², brechas conocidas de ambos CLIs; antes, `pnpm ai:fal` con dos cuentas y failover por saldo, `--balance`, `--detach`/`--status`, registro 47 de 55 verificado, costo real y filtro de contenido de Seedance; antes, Wan 3.0 en `pnpm ai:fal`, estado real de Nano Banana Pro y Kling 3 / Grok Imagine revisados sin conectar; antes, Flux 3 en `pnpm ai:fal` —video, no imagen— y contrato real de Seedance video a video; antes, Minimax H3 en `pnpm ai:fal`, retome por `--request-id`, brecha de `--task` cerrada; antes, CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
+> **Ultima actualizacion:** 2026-09-16 por Claude (brechas de `pnpm ai:image` y `pnpm ai:fal` corregidas en el commit `17196ead1`: estimación de costo previa, `--yes`/`--max-usd` en `ai:fal`, resolución barata por defecto, `--format` en `ai:image`, validaciones locales; antes: puntero a la guía canónica de selección de modelos; correcciones: el costo de GPT Image 2.5 sí se estima antes, 2.5 publica rate limits, OpenAI recomienda 2.5 para integraciones nuevas, precios de fal por escalón de resolución, Wan 3.0 Prime más cara, fórmula de tokens de Seedance válida, Seedream 5 Pro tope 2048², brechas conocidas de ambos CLIs; antes, `pnpm ai:fal` con dos cuentas y failover por saldo, `--balance`, `--detach`/`--status`, registro 47 de 55 verificado, costo real y filtro de contenido de Seedance; antes, Wan 3.0 en `pnpm ai:fal`, estado real de Nano Banana Pro y Kling 3 / Grok Imagine revisados sin conectar; antes, Flux 3 en `pnpm ai:fal` —video, no imagen— y contrato real de Seedance video a video; antes, Minimax H3 en `pnpm ai:fal`, retome por `--request-id`, brecha de `--task` cerrada; antes, CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
 > **Fuentes externas verificadas:** OpenAI developer docs 2026-08-21 y fichas oficiales Fal.ai 2026-07-18
 
 ## Purpose
@@ -161,11 +161,11 @@ snapshots de modelo rotan sin aviso.
 | Logo real de marca externa | No generar desde IA | Usar `greenhouse-digital-brand-asset-designer` y fuente oficial |
 | SVG animado simple | `generateAnimation()` | Gemini via helper, no JavaScript, reduced-motion |
 | Separar una pieza plana en capas editables | `pnpm ai:fal --capability seedream5-pro-layerize` | Una imagen, sin prompt; devuelve base + hasta 16 capas PNG con alfa real + `layers.json` (nombre, z_index, bounding box) |
-| Divergencia o materialidad Seedream 5 | `pnpm ai:fal --capability seedream5-lite` / `seedream5-pro` (+ `-edit`) | Out-of-band; no hay `usage` por corrida. Pro: tope 2048² (no 4K), JPEG por defecto (pasar `--format png`), USD 0,0675/0,135; Lite: más área, PNG, series con `max_images`, USD 0,035 |
+| Divergencia o materialidad Seedream 5 | `pnpm ai:fal --capability seedream5-lite` / `seedream5-pro` (+ `-edit`) | Out-of-band; no hay `usage` por corrida. Pro: tope 2048² (no 4K), JPEG por defecto (el CLI deriva el formato de la extensión de `--out`), USD 0,0675/0,135; Lite: más área, PNG, series con `max_images`, USD 0,035 |
 | Video desde texto, imagen o referencias | `pnpm ai:fal --capability seedance25-*` / `seedance20-*` | 2.5 de 4 a 30 s y hasta 1080p (1080p sin verificar); 2.0 base de 4 a 15 s y única con 4K; presupuestar con `tokens = alto × ancho × segundos × 24 / 1024`; r2v exige imagen o video de referencia; el CLI valida límites antes de encolar |
 | Video desde primer/último cuadro o keyframes, borrador barato → final | `pnpm ai:fal --capability flux3-*` | Flux 3 es **video** en fal (no imagen); 12 endpoints verificados; draft (registrado USD 0,03/s; publicado 0,06/s, final 0,17/s a 720p) → `flux3-enhance --draft-cache` |
 | Editar o extender un video existente | `flux3-edit` / `flux3-extend` (verificados) · `seedance25-r2v --task editing\|extension` (verificados; el filtro de ByteDance rechaza marcas y personas reales y cobra el intento) | Flux 3 extend exige audio en el origen y entrega sólo la continuación; en Seedance 2.0 el video sólo guía |
-| Video de largo elegido por el modelo, o basado en una web o un documento | `pnpm ai:fal --capability wan3-*` / `wan3prime-*` | Wan 3.0: 2–30 s o `auto`, default **1080p** (USD 0,20/s base, 0,28/s Prime; 480p 0,05/0,068); r2v con `--thinking --web-url`/`--file`; las 6 verificadas |
+| Video de largo elegido por el modelo, o basado en una web o un documento | `pnpm ai:fal --capability wan3-*` / `wan3prime-*` | Wan 3.0: 2–30 s o `auto`, default del proveedor 1080p, el CLI envía 480p sin `--resolution` (USD 0,20/s base a 1080p, 0,28/s Prime; 480p 0,05/0,068); r2v con `--thinking --web-url`/`--file`; las 6 verificadas |
 
 ## Prompt Anatomy
 
@@ -456,8 +456,10 @@ pnpm ai:image --image base.png --mask mask.png --prompt "<qué va en la zona mar
   generación desde cero, ignorando la máscara en silencio.
 - El prompt describe **qué va en la zona marcada**, no la imagen completa.
 - El CLI imprime `usage` en cada corrida (`usage: in N (img N · txt N) · out N · total N`), que confirma el costo;
-  desde 2026-09-16 el de 2.5 también se estima antes con la fórmula oficial. Brechas conocidas de `pnpm ai:image`:
-  no valida `--size`/`--background`, siempre PNG, `--count N` = N pedidos pagados.
+  desde 2026-09-16 el de 2.5 también se estima antes con la fórmula oficial, y la CLI imprime esa estimación
+  (`$ costo estimado ≈ USD X …`, sólo informativa). Corregido en el commit `17196ead1`: `--size` y `--background` se
+  validan en local, existe `--format png|jpeg|webp` (o se deduce de la extensión de `--out`) y `--count N` avisa que
+  son N pedidos pagados.
 - 🔴 **Editar no abarata.** El output se cobra igual que una generación y la imagen base se suma como input —
   en `low`, 2,3× generar. **Si sólo necesitas recortar el fondo de una imagen que ya existe, usa
   `pnpm ai:image:rmbg`**, que es matting local y no gasta proveedor. Ver §Costo de la familia 2.5.
@@ -500,8 +502,8 @@ runtime de imagen del producto sigue en `src/lib/ai/image-generator.ts`. Manual 
 
 ```bash
 pnpm ai:fal --list                                                     # gratis: capacidades + estado de verificación
-pnpm ai:fal --capability seedream5-pro --prompt "<texto>" --format png --out out.png          # Pro entrega JPEG por defecto
-pnpm ai:fal --capability seedream5-pro-edit --image base.png --prompt "<delta>" --format png --out out.png
+pnpm ai:fal --capability seedream5-pro --prompt "<texto>" --out out.png          # .png pide PNG (Pro entrega JPEG por defecto)
+pnpm ai:fal --capability seedream5-pro-edit --image base.png --prompt "<delta>" --out out.png
 pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ai-generations/<fecha>_<slug>/capas
 pnpm ai:fal --capability seedance25-i2v --image plate.png --prompt "<movimiento>" \
   --duration 5 --resolution 720p --aspect 9:16 --out clip.mp4
@@ -510,24 +512,28 @@ pnpm ai:fal --model <slug/fal> --prompt "<texto>" --input '{"campo":"valor"}'   
 
 Flags: `--list` · `--capability <id>` · `--model <slug>` · `--prompt` / `--prompt-file` · `--image <path|url>`
 (repetible; los locales se suben al storage de fal con `uploadFalFile`) · `--size` (enum o `WxH`) · `--count` ·
-`--format jpeg|png` · `--input <json>` · `--out` / `--out-dir` · `--timeout <ms>` · `--json`. Video:
+`--format jpeg|png` (sólo Seedream Pro) · `--max-usd <n>` · `--yes` · `--input <json>` · `--out` / `--out-dir` · `--timeout <ms>` · `--json`. Video:
 `--duration <n|auto>` · `--resolution` · `--aspect` · `--bitrate standard|high` · `--task reference|editing|extension`
-· `--no-audio` · `--end-image <path|url>` · `--audio <path|url>` (repetible) · `--video <path|url>` (repetible).
+· `--no-audio` · `--end-image <path|url>` · `--audio <path|url>` (repetible) · `--video <path|url>` (repetible) · `--seed <n>`
+(sólo donde el endpoint lo declara). LoRA y entrenadores H3: `--lora <path>[@escala][#weight_name]` · `--frames <n>` · `--split-threshold <s>`.
 Timeout por defecto 180 s; sube solo a 30 min en capacidades de video (antes 15 min) y a 3 h en entrenamiento. Cuentas y
 cola: `--balance` · `--fal-account <FAL_API_KEY|FAL_API_KEY_B>` · `--detach` · `--status --request-id <id>` (ver delta de dos cuentas abajo).
 
 Reglas operativas:
 
-- 🔴 **Toda corrida sin `--list` (ni `--balance`) gasta dinero real.** fal no devuelve `usage` y el CLI no estima
-  costo: revisar el precio vigente **del escalón de resolución** que se va a pedir. El precio del registro es el
-  escalón más bajo: Wan 3.0 sale en 1080p por defecto (0,20/s; Prime 0,28/s), H3 base en 2K (0,13/s), y Flux 3
-  publica el doble de lo registrado. Tabla: catálogo fal §Precios por escalón de resolución. Con duda, medir con
+- 🔴 **Toda corrida sin `--list` (ni `--balance`) gasta dinero real.** fal no devuelve `usage`; desde el commit
+  `17196ead1` el CLI **estima antes de encolar** (`$ costo estimado ≈ USD X · <base>`) y, si supera el tope (USD 1,
+  `FAL_COST_CONFIRM_USD` o `--max-usd <n>`), se detiene y pide `--yes`. Sin estimación posible avisa y no bloquea. Leer
+  la estimación antes de confirmar; no poner `--yes` por costumbre. En video, sin `--resolution` envía la resolución
+  más barata y lo avisa (el proveedor usaría Wan 1080p a 0,20/s o H3 base 2K a 0,13/s): para entrega pasarla
+  explícita. Flux 3 publica el doble de lo registrado. Tabla: catálogo fal §Precios por escalón de resolución. Con duda, medir con
   `--balance` antes y después de una corrida aislada.
-- **Brechas conocidas de `pnpm ai:fal` (2026-09-16):** Seedream Pro con `--out x.png` sin `--format png` guarda JPEG con
-  extensión `.png`; `--seed` se envía a endpoints que no lo declaran (Seedream, Seedance t2v/i2v; efecto no probado);
-  con más de 10 `--image` fal usa sólo las últimas 10 sin aviso; sin flags para `weight_name` (LoRA),
-  `split_input_duration_threshold` ni la regla de cuadros del entrenador (usar `--input`). Detalle: catálogo fal
-  §Brechas conocidas del CLI.
+- **Brechas de `pnpm ai:fal` corregidas el 2026-09-16 (commit `17196ead1`):** Seedream Pro deriva el formato de la
+  extensión de `--out` y el CLI corrige la extensión si los bytes no coinciden; `--format` en Lite se rechaza; `--seed`
+  sólo en los 19 endpoints que lo declaran; más de 10 `--image` se rechaza; `--lora …#weight_name`, `--frames` y
+  `--split-threshold` validados (también por `--input`). Siguen abiertos: `--size`/`--count` de imagen sin validar,
+  capas de layerize y la mitad de precio que devuelve la API para Flux 3. Detalle: catálogo fal §Estimación de costo
+  y validaciones del CLI.
 - Sin `--out`/`--out-dir` la salida cae en `public/images/generated/`. Para exploración usar `--out-dir` bajo
   `ai-generations/`, fuera de `public/` y de `.captures/`.
 - Las validaciones fallan **en local, antes de encolar**: prompt faltante, `--image` faltante o sobrante, duración
@@ -555,7 +561,8 @@ Reglas operativas:
   USD 0,05/s según la API de pricing — **corregido:** es el escalón 480p de base; 1080p base 0,20/s y Prime 0,28/s, Prime más cara). Las 6 verificadas en real el 2026-09-16 (`wan3-t2v` primero; las otras 5 tras sumar la cuenta B). Flags:
   `--duration auto` (viaja como `null`), `--no-audio` (campo `audio`), `--no-prompt-expansion`, `--thinking`,
   `--seed <n>` (general) y, sólo en r2v, `--web-url`/`--file` (ambos exigen `--thinking`). Referencias: 10 imágenes,
-  5 videos, 5 audios. Default de resolución **1080p**: pasar `480p`/`720p` al explorar. Contrato: catálogo fal
+  5 videos, 5 audios. Default del proveedor **1080p**; desde el commit `17196ead1` el CLI envía `480p` si se omite
+  `--resolution` (pasar `720p`/`1080p` para entrega). Contrato: catálogo fal
   §Wan 3.0.
 - **Delta 2026-09-16 — Kling 3 y Grok Imagine revisados, no conectados:** Kling O3/V3 (multi-shot, `elements` con
   voz, 4K, motion-control; USD 0,112–0,42/s) y Grok Imagine (video v1.5 USD 0,01/s; edit/extend sólo en la versión

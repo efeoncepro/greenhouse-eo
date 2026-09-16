@@ -1,7 +1,10 @@
 # Greenhouse — Fal.ai Model & Capability Catalog V1
 
-> **Tipo:** Referencia técnica agent-facing · **Version:** 1.8 · **Creado:** 2026-07-06 por Claude
-> **Ultima actualizacion:** 2026-09-16 por Claude — correcciones de precio y contrato con la investigación del
+> **Tipo:** Referencia técnica agent-facing · **Version:** 1.9 · **Creado:** 2026-07-06 por Claude
+> **Ultima actualizacion:** 2026-09-16 por Claude — (1.9) brechas del CLI corregidas en el commit `17196ead1`:
+> estimación de costo antes de encolar con confirmación `--yes` sobre el tope, resolución más barata por defecto en
+> video, formato real de salida, `--seed` sólo donde el OpenAPI lo declara, tope de 10 `--image` en Seedream edit,
+> `--lora …#weight_name`, `--frames` y `--split-threshold` (§Estimación de costo y validaciones del CLI). Antes (1.8): correcciones de precio y contrato con la investigación del
 > 2026-09-16: fal cobra por **escalón de resolución** y el precio registrado es el escalón más bajo (§Precios por
 > escalón de resolución); Wan 3.0 Prime cuesta más que base; la fórmula de tokens de Seedance sí sirve; H3 2K/4K
 > reescalados y H3 Max post-entrenado por fal; LoRA con piso de 100 steps; Seedream 5 Pro tope 2048² (no 4K) y
@@ -106,10 +109,12 @@ out-of-band: el runtime de imagen del producto sigue siendo `src/lib/ai/image-ge
   `pnpm ai:fal --capability <id> --request-id <id>`. Retomar no reenvía ni vuelve a cobrar (verificado: el archivo
   descargado es idéntico byte a byte). El código aplica a todas las capacidades, no sólo a H3. Alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream y Seedance usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.
 - **Timeouts por defecto:** imagen 3 min, video 30 min (antes 15), entrenamiento 3 h (`--timeout <ms>` los sobrescribe).
-- **Costo:** fal **no devuelve `usage`** en estas respuestas, así que el CLI no reporta costo por corrida (a
-  diferencia de `ai:image`) y **no estima el costo antes de gastar** (brecha conocida). Consultar el precio vigente
-  **del escalón de resolución que vas a pedir** (§Precios por escalón de resolución) y medir con
-  `pnpm ai:fal --balance` antes y después de una corrida aislada cuando el precio no esté confirmado.
+- **Costo:** fal **no devuelve `usage`** en estas respuestas, así que el CLI no reporta costo real por corrida (a
+  diferencia de `ai:image`). Desde el 2026-09-16 **estima antes de encolar** e imprime
+  `$ costo estimado ≈ USD X · <base del cálculo>`; si supera el tope (USD 1 por defecto, `FAL_COST_CONFIRM_USD` o
+  `--max-usd <n>`) se detiene y pide `--yes` (§Estimación de costo y validaciones del CLI). La estimación es
+  orientativa: medir con `pnpm ai:fal --balance` antes y después de una corrida aislada cuando el precio no esté
+  confirmado.
 - **Qué NO va por aquí:** Gemini Omni (incluido Omni Flash) y Nano Banana Pro se conectan directo por las
   plataformas de Google, no por fal, aunque fal los liste (`google/gemini-omni-flash/*`, `fal-ai/nano-banana-pro`):
   decisión del operador del 2026-09-16 (por Google es más barato y la calidad es la misma). Omni fue retirado del
@@ -128,9 +133,9 @@ fabricantes leídas el 2026-09-16 [oficial]; volátiles.
 
 | Familia | Registrado (mínimo) | Publicado por resolución (USD por segundo) | Default del endpoint | Riesgo |
 |---|---|---|---|---|
-| Wan 3.0 | 0,05 | 480p 0,05 · 720p 0,10 · **1080p 0,20** | **1080p** | sin `--resolution`, un clip cuesta **4×** lo registrado (30 s a 1080p = USD 6,00, cifra de Alibaba) |
-| Wan 3.0 Prime | 0,05 | 480p 0,068 · 720p 0,14 · **1080p 0,28** | **1080p** | **más cara que base** (+36–40 % en fal); no es «mismo precio» |
-| Minimax H3 base | 0,05 | 480P 0,05 · 768P 0,06 · **2K 0,13** · 4K 0,16 | **2K** | sin `--resolution`, **2,6×** lo registrado |
+| Wan 3.0 | 0,05 | 480p 0,05 · 720p 0,10 · **1080p 0,20** | **1080p** (el CLI envía 480p si omites `--resolution`) | a 1080p un clip cuesta **4×** lo registrado (30 s a 1080p = USD 6,00, cifra de Alibaba) |
+| Wan 3.0 Prime | 0,05 | 480p 0,068 · 720p 0,14 · **1080p 0,28** | **1080p** (el CLI envía 480p si omites `--resolution`) | **más cara que base** (+36–40 % en fal); no es «mismo precio» |
+| Minimax H3 base | 0,05 | 480P 0,05 · 768P 0,06 · **2K 0,13** · 4K 0,16 | **2K** (el CLI envía 480P si omites `--resolution`) | a 2K, **2,6×** lo registrado |
 | Minimax H3 Max | 0,025 | 480P 0,025 · 768P 0,04 · 1080P 0,08 (la página los rotula «50% off»: sin dato si es precio promocional o de lista) | 768P | 1,6× a la resolución por defecto |
 | Minimax H3 Max Turbo | 0,0125 | 768P 0,02 (promo 0,01) · 1080P 0,04 (promo 0,02); 480P no listado | 768P | el registrado no calza con ningún escalón publicado: **medir** |
 | Minimax H3 Max Director | no registrado | 0,08 lista · 0,02 promo · 1080p = 2× · mínimo USD 1,20 por sesión | — | no operable por cola |
@@ -157,24 +162,54 @@ Precios por 1.000 tokens (API de pricing de fal, 2026-09-16): 2.5 USD 0,0214 · 
 tanda 2.0 base i2v + r2v (4,06 s) + 2 Wan 480p de 2 s → ≈ 1,33 vs 1,37 medido. Lo que falló (~2× por debajo) fue la
 **equivalencia de OpenArt** (54.000 tokens por 5 s a 720p), no la fórmula.
 
-### Brechas conocidas del CLI (2026-09-16; follow-up a cargo del orquestador)
+### Estimación de costo y validaciones del CLI (corregido 2026-09-16, commit `17196ead1`)
 
-Leídas en el código de `scripts/ai/fal-image.ts` y en el OpenAPI de fal; documentadas para no tropezar mientras
-no se corrijan:
+Lo que antes figuraba como «brechas conocidas del CLI» quedó corregido. Reglas puras en `src/lib/ai/fal-input-rules.ts`,
+estimador en `src/lib/ai/fal-pricing.ts`, tablas en `FAL_PRICING_RULES` y `FAL_SEED_CAPABILITY_IDS`
+(`src/lib/ai/fal-capabilities.ts`):
 
-- **Seedream 5 Pro guarda JPEG con extensión `.png`:** Pro devuelve `jpeg` por defecto y el CLI escribe en la ruta
-  de `--out` tal cual. Pasar `--format png` o nombrar el archivo `.jpg`.
-- **`--seed` se envía a cualquier endpoint**, también a los que no lo declaran en su OpenAPI (Seedream 5 y
-  Seedance t2v/i2v de 2.0 y 2.5; Seedance 2.5 r2v sí lo declara, y Wan 3.0 lo respetó en real). Efecto real en los
-  que no lo declaran (422 o semilla ignorada en silencio): no probado.
-- **Más de 10 `--image` en Seedream edit:** fal usa **sólo las últimas 10**, sin aviso; en Pro cobra USD 0,0045
-  por cada referencia adicional. Ordenar las referencias pensando en esto.
-- **Sin flag** para `loras[].weight_name` (LoRA de H3), `split_input_duration_threshold` de los entrenadores ni para
-  la regla de cuadros del entrenador (`number_of_frames % 17 == 5`: 22, 39, 56, 73, 90, 107, 124), que el CLI no
-  valida. Usar `--input '<json>'`. Tampoco hay flag para `max_images` ni `enhance_prompt_mode` de Seedream.
-- **`--size` y `--count` de imagen no se validan contra el contrato** (sí los de video); `--format` se envía a Lite,
-  que no declara `output_format` (qué hace fal con él: sin dato).
-- **No hay estimación de costo previa** ni confirmación con tope.
+- **Formato real de salida:** con Seedream 5 Pro el CLI deriva `output_format` de la extensión de `--out`
+  (`.png` → png, `.jpg`/`.jpeg` → jpeg; otra extensión → error local). Al descargar detecta el formato por los bytes
+  (PNG/JPEG/WEBP/GIF/MP4/MOV/ZIP) y, si no coincide con la extensión pedida, guarda con la extensión real y avisa
+  (`⚠ el archivo real no coincide…`). `--format` en Seedream Lite se rechaza: Lite no expone `output_format` y
+  entrega PNG.
+- **`--seed`** sólo se acepta donde el OpenAPI lo declara (leído para las 55 capacidades el 2026-09-16): 19 endpoints
+  = H3 de generación (base, LoRA, Max, camera, Turbo), Wan 3.0 y Prime (6) y `seedance25-r2v`. En Seedream,
+  Seedance t2v/i2v y 2.0 r2v, Flux 3 y entrenadores se rechaza en local.
+- **Seedream edit:** el tope de 10 `--image` se valida en local (antes fal usaba sólo las últimas 10 sin avisar).
+  Pro sigue cobrando USD 0,0045 por cada referencia adicional.
+- **LoRA y entrenadores H3:** `--lora <path>[@<escala>][#<weight_name>]` (weight_name elige el archivo de pesos en
+  un repo de Hugging Face); `--frames <n>` → `number_of_frames` (22–124 y `frames % 17 == 5`: 22, 39, 56, 73, 90,
+  107, 124); `--split-threshold <s>` → `split_input_duration_threshold` (1–60). Ambas reglas también se validan si
+  llegan por `--input`. El CLI avisa si pides menos de 100 steps (mínimo facturable).
+- **Resolución por defecto barata:** en video, sin `--resolution` el CLI envía la resolución más barata del endpoint y
+  lo avisa (`· sin --resolution: uso 480p…`). Antes Wan 3.0 salía a 1080p y H3 base a 2K por defecto del proveedor.
+  Para calidad final pasar `--resolution` explícito.
+- **Estimación antes de encolar** (`$ costo estimado ≈ USD X · base del cálculo`):
+  - Seedance: tokens = área de salida × segundos × 24 / 1024 × precio por 1.000 tokens de la API de pricing. Con
+    duración `auto` o sin `--duration`, cota superior con el máximo del contrato (2.5 = 30 s → 480p ≈ USD 6,45):
+    conviene pasar `--duration`.
+  - H3 base/Max/Turbo, Wan 3.0/Prime, Flux 3 final/draft/extend/edit: precio publicado por escalón de resolución;
+    donde no hay escalón publicado (camera-controls, LoRA, enhance, extend draft, Turbo 480P) usa el precio de la API
+    (escalón más bajo). Extend cobra los segundos nuevos de `--duration`; edit mide con `ffprobe` la duración del
+    video de origen local.
+  - Seedream: por imagen según área (Pro ≤ 1536² 0,0675 · mayor 0,135; + 0,0045 por referencia extra en edit; Lite
+    0,035). Layerize: precio por capa sin total (el número de capas lo decide el modelo).
+  - Entrenadores H3: steps × precio, con mínimo facturable de 100 steps.
+  - **Confirmación:** si la estimación supera el tope (default USD 1; env `FAL_COST_CONFIRM_USD`; flag
+    `--max-usd <n>`), el CLI se detiene antes de encolar y pide `--yes`. Sin estimación posible (slug fuera del
+    registro con `--model`, datos faltantes) avisa y **no** bloquea.
+  - Las subidas de archivos locales (`--image`, `--video`, …) ocurren antes de la estimación (subir no cobra).
+
+Lo que sigue abierto o sin dato:
+
+- `--size` y `--count` de imagen no se validan contra el contrato (sí los de video). Tampoco hay flag para
+  `max_images` ni `enhance_prompt_mode` de Seedream (usar `--input`).
+- Efecto real de `--seed` si se forzara por `--input` en un endpoint que no lo declara: sin dato.
+- Layerize: número de capas y si la base se cobra: sin dato.
+- Flux 3: por qué la API de pricing devuelve la mitad del precio publicado: sin dato (la estimación usa el publicado).
+- Las tablas de escalones son de las páginas de fal y los fabricantes al 2026-09-16: pueden cambiar. Toda
+  estimación es orientativa; la medida real es `pnpm ai:fal --balance` antes y después.
 
 Capacidades registradas al 2026-09-16:
 
@@ -302,7 +337,7 @@ Slugs **SIN** prefijo `fal-ai/`. La cola se direcciona por la app (`minimax/h3`,
 
 | id CLI | Slug | Estado | Contrato | Precio fal registrado (USD, escalón mínimo) |
 |---|---|---|---|---|
-| `h3-t2v` | `minimax/h3/text-to-video` | ✅ 2026-09-16 | 480P·768P·2K·4K (default 2K; 2K y 4K reescalados desde 768P) · aspect t2v | desde 0,05 / s (2K por defecto: 0,13) |
+| `h3-t2v` | `minimax/h3/text-to-video` | ✅ 2026-09-16 | 480P·768P·2K·4K (default del proveedor 2K; sin `--resolution` el CLI envía 480P; 2K y 4K reescalados desde 768P) · aspect t2v | desde 0,05 / s (2K: 0,13) |
 | `h3-i2v` | `minimax/h3/image-to-video` | ✅ 2026-09-16 | `image_url` + `end_image_url` opcional · sin aspect | 0,05 / s |
 | `h3-r2v` | `minimax/h3/reference-to-video` | ✅ 2026-09-16 (sólo imagen de referencia; video/audio sin ejercitar) | referencias imagen/video/audio · aspect + `adaptive` | 0,05 / s |
 | `h3-t2v-lora` | `minimax/h3/text-to-video/lora` | sin verificar (exige una LoRA) | como `h3-t2v` + `loras` | 0,0625 / s |
@@ -336,7 +371,7 @@ resolución más bajo** (ver §Precios por escalón de resolución: H3 base a 2K
 
 - **Duración:** entero de 5 a 15 s, default 5, sin `auto` (en Seedance es texto y admite `auto`).
 - **Resolución en mayúsculas.** H3 base: `480P|768P|2K|4K` (default `2K`). Max y Max Turbo: `480P|768P|1080P`
-  (default `768P`; camera-controls, `480P`). El CLI compara sin distinguir mayúsculas y envía el valor canónico.
+  (default `768P`; camera-controls, `480P`). El CLI compara sin distinguir mayúsculas y envía el valor canónico; sin `--resolution` envía la más barata (480P) y lo avisa.
 - **Aspect ratio:** t2v `21:9, 16:9, 4:3, 1:1, 3:4, 9:16` (default `16:9`); r2v agrega `adaptive` (default).
   Image-to-video **no** acepta aspect: el CLI lo rechaza porque el encuadre sale de la imagen.
 - **Image-to-video:** `image_url` + `end_image_url` opcional (`--end-image`).
@@ -360,10 +395,11 @@ resolución más bajo** (ver §Precios por escalón de resolución: H3 base a 2K
   `first_frame_conditioning_p` 0.5; flf2v first 0.2 / last 0.2 / first_last 0.4; ref2va
   `reference_conditioning_p` 0.9 + `resume_from_lora_url`. Salida: `lora_file`, `config_file`, `debug_dataset`
   (el CLI descarga `lora.*`, `config.*`, `debug-dataset.*`). Timeout por defecto 3 h.
-  **Reglas publicadas que el CLI no valida** [oficial fal, página del entrenador t2v, 2026-09-16]: cobro con **piso de
-  100 steps** aunque pidas menos; en t2v cada clip necesita subtítulo (un `.txt` del mismo nombre, o `trigger_phrase`
+  **Reglas publicadas** [oficial fal, página del entrenador t2v, 2026-09-16]: cobro con **piso de
+  100 steps** aunque pidas menos (el CLI lo avisa y lo usa en la estimación); en t2v cada clip necesita subtítulo (un `.txt` del mismo nombre, o `trigger_phrase`
   como respaldo); **clips de menos de 73 cuadros (~3 s a 24 fps) se descartan en silencio** salvo `auto_scale_input`;
-  `number_of_frames` debe cumplir `% 17 == 5`; dataset recomendado ≥ 10 clips (20–50 variados rinden mejor). El
+  `number_of_frames` debe cumplir `% 17 == 5` (el CLI lo valida con `--frames` y también por `--input`); captions y
+  largo mínimo de clip **no** los valida el CLI; dataset recomendado ≥ 10 clips (20–50 variados rinden mejor). El
   entrenador t2v entrena video + audio (`training_type: t2va`). La página publica hasta 6.000 steps y el OpenAPI de
   ref2va hasta 15.000: cuál rige, sin dato.
 - **Director (`h3max-director`):** fal lo lista activo, pero es un stream continuo con prompts en vivo, no un
@@ -454,7 +490,8 @@ endpoints Wan 3.0 que fal expone: texto, imagen y referencias a video. No hay ed
 **Precio (corregido 2026-09-16):** la API de pricing de fal devolvió USD 0,05/s para las dos líneas, pero ese es el
 escalón de **480p** de Wan 3.0 base. Publicado por fal: **base** 480p 0,05 · 720p 0,10 · **1080p 0,20**; **Prime**
 480p 0,068 · 720p 0,14 · **1080p 0,28**. **Prime es más cara que base** (+36–40 %), no «mismo precio». El default
-es 1080p: un clip sin `--resolution` cuesta 4× lo registrado en base. Volátil.
+del proveedor es 1080p (4× lo registrado en base); desde el 2026-09-16 el CLI envía 480p si omites `--resolution`
+y lo avisa. Volátil.
 
 **Base vs Prime:** Alibaba define Prime como la versión **acelerada** de Wan 3.0 (generación más rápida manteniendo
 calidad alta) [oficial]. Calidad Prime vs base: **sin medir** (Prime no figura en rankings). En fal, Prime = pagar
@@ -475,8 +512,8 @@ con la cuenta B.
 - **Duración:** entero de 2 a 30 s, default 5. `--duration auto` se envía como `null` («smart duration»: el modelo
   elige el largo según el prompt y las referencias). Por eso el contrato de duración del registro suma
   `autoValue`: `'auto'` (texto) en Seedance y Flux 3, `null` en Wan 3.0. Fuera de 2–30 el CLI falla en local.
-- **Resolución:** `480p|720p|1080p`, **default 1080p** (el más alto y el más lento: pasar `--resolution 480p` o
-  `720p` para explorar).
+- **Resolución:** `480p|720p|1080p`; default del proveedor 1080p (el más alto y el más lento). Sin `--resolution`
+  el CLI envía 480p y lo avisa; pasar `--resolution 720p` o `1080p` explícito para entrega.
 - **Aspect:** `adaptive` (default), `16:9`, `4:3`, `1:1`, `3:4`, `9:16`.
 - **Audio:** el campo es `audio` (no `generate_audio`), default `true`; `--no-audio` lo apaga. El registro lo
   declara con `audioField`.
@@ -484,8 +521,8 @@ con la cuenta B.
   (según el proveedor ahorra ~20–60 s, pero puede bajar la calidad). Es distinto de H3, que usa
   `--prompt-expansion <modo>`.
 - **Razonamiento:** `enable_thinking` (default `false`); `--thinking` lo activa.
-- **Semilla:** `--seed <n>` (entero ≥ 0), respetada en real en `wan3-t2v`. Es un flag general del CLI y hoy se envía
-  a **cualquier** endpoint, lo declare o no (ver §Brechas conocidas del CLI).
+- **Semilla:** `--seed <n>` (entero ≥ 0), respetada en real en `wan3-t2v`. El CLI sólo la acepta en los endpoints que
+  la declaran; en el resto la rechaza en local (ver §Estimación de costo y validaciones del CLI).
 - **Salida:** `video`, `actual_prompt` (el prompt reescrito), `duration` y `seed`. El CLI muestra un extracto del
   prompt reescrito (lo mismo hace con `expanded_prompt` de H3).
 - **Image-to-video:** `--image` es el primer cuadro (viaja como `start_image_url`) y `--end-image` es opcional. El
@@ -844,7 +881,7 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 - **Cómo (plan corregido 2026-09-16):** el plan anterior de «~10 steps ≈ USD 0,40» es **imposible**: fal cobra un
   **mínimo de 100 steps**. Probar el contrato cuesta al menos t2v USD 0,50 · i2v/flf2v ≈ 1,00 · ref2va ≈ 1,50 (precios
   por step del registro), con un zip de clips **de ≥ 73 cuadros y con subtítulo por clip** (los más cortos se descartan
-  en silencio). Luego usar esa LoRA en las 3 variantes a 5 s: a 480P ≈ 0,94; a 2K (default de H3 base) sube por
+  en silencio). Luego usar esa LoRA en las 3 variantes a 5 s: a 480P ≈ 0,94; a 2K (default del proveedor en H3 base; el CLI envía 480P si omites `--resolution`) sube por
   escalón (ver §Precios por escalón de resolución). Una LoRA útil para producción, ~2.000 steps, cuesta USD 10–30.
 - **Para qué:** consistencia de personaje, producto o estilo de marca entre tomas. Postergado el 2026-09-16.
 

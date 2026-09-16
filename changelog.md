@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — Los comandos de IA avisan cuánto van a costar antes de gastar
+
+`pnpm ai:fal` ahora calcula el costo antes de mandar un trabajo y se detiene si pasa de USD 1 (o del tope que
+indiques) hasta que confirmes con `--yes`. Sin `--resolution`, usa la resolución más barata del modelo en vez del
+valor caro por defecto de algunos proveedores. También dejó de guardar archivos con la extensión equivocada, rechaza
+`--seed` en los modelos que no lo aceptan y avisa antes de mandar más imágenes de las que el modelo usa. `pnpm
+ai:image` valida tamaño, fondo y formato antes de llamar a OpenAI, permite elegir PNG, JPEG o WebP, y muestra el
+costo estimado con la fórmula oficial. Guía, catálogo, manuales y skills quedaron al día.
+
 ## 2026-09-16 — Efeonce Insights renderiza solo en staging y el worker de render entra al release
 
 El render de Insights ya funciona de punta a punta en staging sin intervención: se encarga por API o MCP, el despacho
@@ -909,14 +918,3 @@ entregables existen en el repo con 0 de 11 criterios tildados.
 También quedó por escrito lo que 2.5 NO mejora: OpenAI no afirma mejora de tipografía ni de texto
 multilingüe, las cuatro limitaciones declaradas siguen vigentes, y el system card mide una mejora de
 seguridad sin significancia estadística con Abuse peor que 2.0.
-
-## 2026-09-08 — Efeonce Insights: arquitectura y programa multiformato
-
-Extensión: skill operativa y distribución MCP/harness exigibles al cierre, con fuente común, routing,
-versionado y evaluación de agente sin historial. Se integra en TASK-1845/1848/1849; no agrega tareas.
-
-[EPIC-045](docs/epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md) formaliza cinco tasks
-TASK-1845–1849: evidencia/adapters, render durable, catálogos deck/A4, acceso/correo/recurrencia y biblioteca/web.
-ADR y arquitectura fijan dominio Greenhouse + Artifact Worker, tres salidas de primera clase, snapshots,
-API/UI/MCP, co-branding y grants revocables. TASK-1672/1673 conservan integración de auditoría técnica SEO.
-Sólo planificación autorizada; sin implementación, emisión de reportes ni rollout.

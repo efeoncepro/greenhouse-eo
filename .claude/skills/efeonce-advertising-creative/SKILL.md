@@ -42,7 +42,8 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
   2560×1440); Seedream 5 Pro en fal **no pasa de 2048²**.
 - Formato más extremo que 3:1 → Seedream (1/16–16); GPT Image tope 3:1.
 - Motion con marca o personas → Flux 3 o Wan 3.0, no Seedance (su filtro rechaza tras cobrar); presupuesta por
-  resolución y confirma con `pnpm ai:fal --balance`.
+  resolución (el CLI estima antes de encolar y pide `--yes` sobre el tope; sin `--resolution` usa el escalón más
+  barato) y confirma con `pnpm ai:fal --balance`.
 
 ## Bucle de trabajo
 

@@ -185,9 +185,11 @@ fondo claro.
   (transparencia plena en 2.5; en GPT Image 2 es preview). Valida el alfa decodificando bytes.
 - Retoque preciso con máscara → `--model gpt-image-2.5-sunburst`. Explorar en `low`/`medium`; `xhigh`/`max` sólo
   para el asset final (2.5 `max` ≈ lo mismo que el default del CLI `gpt-image-2 · high`).
-- Estima el costo antes de gastar con la fórmula de tokens de la skill; `--count N` son N pedidos pagados.
+- El CLI imprime `$ costo estimado` antes de pedir (fórmula oficial de tokens; sólo informa, no confirma) y avisa
+  que `--count N` son N pedidos pagados: léelo antes de dejarlo correr.
 - Capas editables de una ilustración aprobada → `pnpm ai:fal --capability seedream5-pro-layerize`, sin regenerar.
-- El CLI siempre guarda PNG y no valida `--size`: usa tamaños de la grilla documentada y `--out` fuera de `public/`.
+- El CLI valida `--size` y `--background` antes de gastar y elige el formato con `--format png|jpeg|webp` o por la
+  extensión de `--out` (transparente exige PNG o WebP). Usa `--out` fuera de `public/`.
 
 **Arreglar un detalle sin rehacer el asset:** `pnpm ai:image --image base.png --mask mask.png --prompt
 "…" --out out.png` reemplaza sólo lo que la máscara marca en **transparente** (mismo formato y
