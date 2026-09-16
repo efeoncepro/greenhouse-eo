@@ -508,6 +508,7 @@ Reglas operativas:
   sobre el máximo, resolución/aspecto no soportados, `--bitrate` en mini y `--task` fuera de `seedance25-r2v`.
   **Delta 2026-09-16:** la brecha de `--task` está cerrada; sólo Seedance 2.5 reference-to-video lo acepta y el CLI
   lo rechaza en local en cualquier otra capacidad (antes, el r2v de 2.0 lo rechazaba después de encolar).
+  Verificado en local (el CLI rechaza `--task` en `seedance20-r2v` sin encolar); `seedance25-r2v` con `--task` no tiene corrida real y sigue sin verificar.
 - **Delta 2026-09-16 — Minimax H3 conectado** (`h3-*`, `h3max-*`, `h3turbo-*`, `h3-train-*`; 9 de 17 verificados).
   Flags propios: `--prompt-expansion`, `--lora <path[@scale]>`, `--camera-trajectory <json>` y, en entrenadores,
   `--training-data`/`--steps`/`--rank`/`--learning-rate`/`--trigger`. H3 exige duración entera 5–15 s, resolución
@@ -515,6 +516,7 @@ Reglas operativas:
   por cola. Contrato y precios: catálogo fal §Minimax H3; comandos: manual `operar-cli-fal-seedream-seedance.md`.
 - El CLI imprime el `request_id` al encolar. Ante `HTTP 408` el trabajo **sigue cobrando en fal**: retomarlo con
   `pnpm ai:fal --capability <id> --request-id <id>` (no reenvía ni vuelve a cobrar), nunca relanzarlo.
+  Alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream y Seedance usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.
 - Una capacidad con `verifiedAt: null` imprime una advertencia antes de gastar. Si la corrida funciona, anotar la
   fecha en `src/lib/ai/fal-capabilities.ts`; nunca marcarla sin haber corrido.
 - Layerize: el CLI escribe `NN-<nombre>.png` por capa (orden `z_index`) y `layers.json` con nombre, descripción,

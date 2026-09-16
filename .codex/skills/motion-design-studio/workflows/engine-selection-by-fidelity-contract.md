@@ -40,7 +40,7 @@ v1/v1.5 sí lo llevan: el prefijo depende del endpoint). Los límites difieren *
 
 | Endpoint | Duración máx. | Resoluciones | Notas |
 | --- | --- | --- | --- |
-| 2.5 (`seedance25-*`) | 30 s | 480p · 720p · 1080p | Sin 4K. Sólo su `r2v` acepta `--task reference\|editing\|extension` |
+| 2.5 (`seedance25-*`) | 30 s | 480p · 720p · 1080p | Sin 4K. Sólo su `r2v` acepta `--task reference\|editing\|extension` (rechazo verificado en local; uso real sin verificar) |
 | 2.0 base (`seedance20-*`) | 15 s | 480p · 720p · 1080p · 4k | Único con 4K (verificado: 3840×2160 real) |
 | 2.0 `fast` / `us` | 15 s | 480p · 720p | — |
 | 2.0 `mini` | 15 s | 480p · 720p | Sin `--bitrate` (no expone `bitrate_mode`) |
@@ -57,7 +57,7 @@ completo: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`.
 
 **Retome sin recobro:** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408), el
 trabajo **sigue corriendo y cobrando** en fal; no relances: `pnpm ai:fal --capability <id> --request-id <id>`
-recupera la salida sin reenviar ni cobrar (verificado: mismo archivo byte a byte). Aplica a Seedance, H3 y Seedream.
+recupera la salida sin reenviar ni cobrar (verificado: mismo archivo byte a byte). El código aplica a Seedance, H3 y Seedream. Alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream y Seedance usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.
 
 ## Operar Minimax H3: `pnpm ai:fal` (conectado 2026-09-16)
 

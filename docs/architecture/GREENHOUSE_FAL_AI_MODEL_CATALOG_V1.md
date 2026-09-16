@@ -80,11 +80,11 @@ out-of-band: el runtime de imagen del producto sigue siendo `src/lib/ai/image-ge
   fuera de un entrenador también. Llegar al proveedor con un valor inválido costaría la cola.
 - **`--task` (brecha cerrada 2026-09-16):** sólo Seedance 2.5 reference-to-video lo acepta. Antes el CLI lo dejaba
   pasar en todo reference-to-video y el r2v de Seedance 2.0 lo rechazaba **después** de encolar; ahora se rechaza en
-  local en cualquier otra capacidad.
+  local en cualquier otra capacidad. Verificado en local (el CLI rechaza `--task` en `seedance20-r2v` sin encolar); `seedance25-r2v` con `--task` no tiene corrida real y sigue sin verificar.
 - **`request_id` y retome:** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408),
   el trabajo **sigue corriendo y cobrando en fal**; el CLI imprime el comando de retome
   `pnpm ai:fal --capability <id> --request-id <id>`. Retomar no reenvía ni vuelve a cobrar (verificado: el archivo
-  descargado es idéntico byte a byte). Aplica a todas las capacidades, no sólo a H3.
+  descargado es idéntico byte a byte). El código aplica a todas las capacidades, no sólo a H3. Alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream y Seedance usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.
 - **Timeouts por defecto:** imagen 3 min, video 15 min, entrenamiento 3 h (`--timeout <ms>` los sobrescribe).
 - **Costo:** fal **no devuelve `usage`** en estas respuestas, así que el CLI no reporta costo por corrida (a
   diferencia de `ai:image`). Consultar el pricing vigente del proveedor, con fecha, antes de correr.

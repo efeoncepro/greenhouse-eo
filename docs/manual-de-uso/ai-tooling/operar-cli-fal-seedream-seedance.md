@@ -200,7 +200,9 @@ pnpm ai:fal --capability <id> --request-id <request_id> --out <ruta>
 ```
 
 Retomar **no reenvia el pedido ni vuelve a cobrar**: sólo espera el mismo trabajo y descarga el resultado (se
-verifico que el archivo sale identico). Funciona para todas las capacidades, no sólo H3.
+verifico que el archivo sale identico). Funciona para todas las capacidades, no sólo H3: el camino es el mismo.
+Ojo: esa prueba se hizo con un video de H3 Max Turbo; con Seedream y Seedance todavia no se ha retomado un
+trabajo real.
 
 ### 4. Revisa lo que entrego
 
