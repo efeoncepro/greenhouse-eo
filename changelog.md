@@ -14,6 +14,20 @@ orgs ni rollout.
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — El CLI de imágenes gana inpainting por máscara y reporta `usage`
+
+`pnpm ai:image` ya puede editar **solo una zona** de una imagen: `--mask` conecta el soporte de máscara que
+el cliente canónico ya tenía y nadie podía usar, con su validación de formato y dimensiones y un guardarraíl
+que aborta si se pasa una máscara sin imagen base. El CLI además imprime ahora el `usage` de cada corrida:
+para la familia 2.5 esa es la **única** fuente documentada de costo, y el instrumento que gasta no lo mostraba.
+
+Medido en el mismo movimiento, contra la intuición: **editar no abarata**. El modelo devuelve la imagen
+completa aunque la máscara acote qué cambia, así que el output se cobra idéntico a una generación (196 tokens
+en `low`) y encima la imagen base entra como 1 024 tokens de input — editar costó 2,3× generar en `low`, y el
+sobrecosto se diluye al subir calidad. **La máscara es gratis**: con y sin ella el `usage` fue idéntico.
+Corolario: para recortar el fondo de una imagen existente, `pnpm ai:image:rmbg` (local, sin costo de
+proveedor) en vez de un edit. Evidencia: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
+
 ## 2026-09-16 — GPT Image 2.5 transportado, y el carril Google migrado porque su modelo estaba apagado
 
 `src/lib/ai/` ya reconoce `gpt-image-2.5-flare` y `gpt-image-2.5-sunburst` con su contrato correcto
@@ -1036,17 +1050,3 @@ TASK-1841 queda como unidad separada para el primer piloto consentido: una organ
 El cliente recibe onboarding y soporte normales, no tareas de QA, y nunca debe entregar tokens o logs. Esa
 decisión documental inicial no creó correos, cuentas, bindings, migraciones, invitaciones, flags ni rollout; el
 apply de schema posterior queda registrado por separado en la entrada anterior.
-
-## 2026-09-06 — El gate de versión del gateway medía media superficie, y el scope nuevo no se anunciaba entero
-
-Dos defectos que sólo aparecieron al revisar lo construido, y que compartían la misma forma: un mecanismo que protegía menos de lo que su nombre sugería.
-
-El gate que obliga a mover la versión del gateway cuando cambia su lista de herramientas comparaba únicamente las que vienen federadas desde Greenhouse. Las que el gateway define por su cuenta no lo movían, así que dos herramientas nuevas crecieron el servidor con el gate en verde y la versión congelada. Ahora la medición se toma del servidor construido y cubre nombres y descripciones, porque editar una descripción cambia qué decide llamar un agente. Se probó viéndolo fallar en los dos casos, no viéndolo pasar.
-
-El segundo: al agregar el permiso para administrar personas de una organización, quedó anunciado sólo en una de sus dos formas. La que faltaba es justamente la que otorga el emisor propio, del que dependen las herramientas delegadas, así que un cliente que armara su solicitud desde el descubrimiento nunca habría pedido el permiso.
-
-## 2026-09-06 — Efeonce ID: la invitación externa y la autoridad delegada del cliente, en producción
-
-Quien invita a una persona externa ya no le pasa el enlace a mano: el sistema manda el correo en el mismo acto en que genera el token, la respuesta deja de traerlo salvo una revelación gobernada de una hora que queda auditada, y el ciclo de vida es observable (reenviar rota el token anterior, el rebote se registra, la caducidad se ve, tres señales nuevas). El administrador designado de una organización cliente pasa a tener autoridad real sobre su propia gente por una lane del ecosistema, mediada por el gateway y decidida siempre por Greenhouse, nunca por lo que diga la llamada. La página de consentimiento del autorizador ahora muestra a qué host va a volver la persona.
-
-Release `b3e324cb5c8d-3cfce865`, un solo intento. Ambos flags encendidos en producción con redeploy, y un canary contra la superficie real: la misma llamada pasó de responder «no existe» a pedir el binding y a negar por falta de autoridad. La federación de las dos herramientas nuevas quedó desplegada en el gateway, que subió a la versión 1.1.0.

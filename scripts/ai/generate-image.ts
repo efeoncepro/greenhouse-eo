@@ -48,6 +48,12 @@ loadEnv({ path: join(process.cwd(), '.env.local') })
  *   --image <path>          Reference image to EDIT (repeatable). Switches to image-to-image
  *                           via editOpenAIImage — preserves the reference (identity, style, logo)
  *                           while the prompt changes only the requested delta.
+ *   --mask <path>           Máscara PNG que marca QUÉ zona se edita (inpainting). Requiere --image.
+ *                           Mismo formato y mismas dimensiones que la primera --image; las zonas
+ *                           TRANSPARENTES de la máscara son las que el modelo reemplaza.
+ *                           OJO: no abarata la corrida. El modelo devuelve la imagen COMPLETA, así que
+ *                           el output se cobra igual que una generación, y encima suma la imagen y la
+ *                           máscara como tokens de entrada.
  *   --input-fidelity <f>    low | high — how strictly to preserve the reference (edit mode).
  *                           Sólo lo transportan gpt-image-1.5 / 1 / 1-mini. En la familia 2.5 la guía de
  *                           OpenAI lo excluye explícitamente: se ignora y la identidad se pide por prompt.
@@ -75,6 +81,7 @@ interface CliArgs {
   batch?: string
   image?: string[]
   inputFidelity?: OpenAIImageInputFidelity
+  mask?: string
   out?: string
   outDir?: string
   concept?: string
@@ -99,6 +106,8 @@ const HELP = `Greenhouse AI image CLI — OpenAI GPT Image (2.5 family + gpt-ima
   pnpm ai:image --batch <json>          # [{ "filename": "a.png", "prompt": "…" }, …]
   pnpm ai:image --concept <loop> --batch <json> [--task TASK-###]   # conceptos del design-loop
   pnpm ai:image --image <ref.png> --prompt "<delta>" --out <out.png>   # EDIT image-to-image (consistencia)
+  pnpm ai:image --image <base.png> --mask <mask.png> --prompt "<qué va en la zona>" --out <out.png>
+                                        # INPAINTING: sólo se reemplaza la zona transparente de la máscara
 
 Edit mode (--image):
   Edita la imagen de referencia en vez de generar desde cero (editOpenAIImage). Preserva
@@ -147,6 +156,10 @@ const parseArgs = (argv: string[]): CliArgs => {
         ;(args.image ??= []).push(path)
         break
       }
+
+      case '--mask':
+        args.mask = next()
+        break
 
       case '--input-fidelity':
         args.inputFidelity = next() as OpenAIImageInputFidelity
@@ -307,6 +320,7 @@ const generateOne = async (item: GenItem, args: CliArgs): Promise<void> => {
           format: 'png',
           numberOfImages: 1,
           timeoutMs: args.timeoutMs,
+          ...(args.mask ? { mask: { path: resolvePath(args.mask) } } : {}),
           ...(args.inputFidelity ? { inputFidelity: args.inputFidelity } : {})
         })
       : await generateOpenAIImage({
@@ -326,7 +340,19 @@ const generateOne = async (item: GenItem, args: CliArgs): Promise<void> => {
 
     const fallback = result.modelFallbackReason ? ` (fallback: ${result.requestedModel} → ${result.model}: ${result.modelFallbackReason})` : ''
 
-    process.stdout.write(`  ✓ ${Math.round(buffer.length / 1024)}KB · ${result.model} · ${result.size}${fallback}\n`)
+    process.stdout.write(`  ✓ ${Math.round(buffer.length / 1024)}KB · ${result.model} · ${result.size} · ${result.quality}${fallback}\n`)
+
+    // El costo por imagen de la familia 2.5 NO es estimable desde la documentación: la única vía documentada
+    // es leer `usage` de la respuesta real. Si el instrumento que gasta no lo muestra, nadie lo mide.
+    if (result.usage) {
+      const { input_tokens: inputTokens, output_tokens: outputTokens } = result.usage
+      const imageIn = result.usage.input_tokens_details?.image_tokens ?? 0
+      const textIn = result.usage.input_tokens_details?.text_tokens ?? 0
+
+      process.stdout.write(
+        `    usage: in ${inputTokens} (img ${imageIn} · txt ${textIn}) · out ${outputTokens} · total ${result.usage.total_tokens}\n`
+      )
+    }
 
     if (args.open) openInViewer(target)
   }
@@ -343,6 +369,12 @@ const main = async () => {
   // La combinación model × quality se valida acá y no por pieza: dentro del loop, un --count 5 repetiría
   // el mismo error cinco veces y ya habría creado directorios de salida.
   assertOpenAIImageQualitySupported({ model: args.model, quality: args.quality })
+
+  // Una máscara sin imagen base no tiene a qué aplicarse: /v1/images/edits exige la imagen, y sin este
+  // guardarraíl el request saldría como una generación desde cero, ignorando la máscara en silencio.
+  if (args.mask && !args.image?.length) {
+    throw new Error('--mask requires --image: the mask marks the area to edit on a base image.')
+  }
 
   // --concept <loop> rutea a la taxonomía de conceptos de GVC (gitignored, trazable,
   // protegida del garbage collector). Tiene prioridad sobre --out-dir.

@@ -290,5 +290,53 @@
   "totals": {
     "pieces": 7,
     "derivedCostUsd": 0.594
+  },
+  "editBaseline": {
+    "measuredAt": "2026-09-16",
+    "purpose": "Qué cuesta editar (con y sin máscara) frente a generar, medido con usage real.",
+    "model": "gpt-image-2.5-flare",
+    "quality": "low",
+    "size": "1024x1024",
+    "runs": [
+      {
+        "case": "generate",
+        "inputTokens": 37,
+        "imageTokens": 0,
+        "textTokens": 37,
+        "outputTokens": 196,
+        "totalTokens": 233,
+        "derivedCostUsd": 0.006065
+      },
+      {
+        "case": "edit-with-mask",
+        "inputTokens": 1056,
+        "imageTokens": 1024,
+        "textTokens": 32,
+        "outputTokens": 196,
+        "totalTokens": 1252,
+        "derivedCostUsd": 0.014232
+      },
+      {
+        "case": "edit-without-mask",
+        "inputTokens": 1056,
+        "imageTokens": 1024,
+        "textTokens": 32,
+        "outputTokens": 196,
+        "totalTokens": 1252,
+        "derivedCostUsd": 0.014232
+      }
+    ],
+    "findings": [
+      "Editar NO abarata: el output se cobra idéntico a una generación (196 tokens en low), porque el modelo devuelve la imagen COMPLETA aunque la máscara acote qué cambia.",
+      "El edit SUMA la imagen base como tokens de entrada: 1024 image tokens por una imagen de 1024x1024. En low el edit costó 2,3x una generación equivalente.",
+      "La máscara NO suma tokens: el edit con máscara y sin máscara midieron exactamente lo mismo (1056 in / 196 out). La máscara es gratis; lo que se paga es la imagen base.",
+      "El sobrecosto relativo cae al subir la calidad, porque el output domina: en low el edit es ~2,3x una generación; en high ~1,15x; en max ~1,04x (derivado de la tabla de output del canary).",
+      "Verificación visual: el inpainting funcionó y preservó el resto (diferencia media fuera de la zona 2,4/255 con máscara y 2,8/255 sin ella). La diferencia media NO sirve para juzgar un objeto pequeño: con la taza puesta, el promedio dentro de la zona fue apenas 4,3/255 — hubo que mirar la imagen."
+    ],
+    "rates": {
+      "imageInPerMillionUsd": 8.0,
+      "textInPerMillionUsd": 5.0,
+      "outputImagePerMillionUsd": 30.0
+    }
   }
 }

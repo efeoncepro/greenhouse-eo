@@ -68,6 +68,29 @@ A flat-style vector illustration of a single potted plant, isolated subject, ful
 Sujeto deliberadamente neutro: sin PII, sin nombres de clientes, sin marcas de terceros y sin texto — no se
 envía material sensible a un proveedor externo sólo para medir consumo.
 
+## Qué cuesta EDITAR frente a generar (medido 2026-09-16)
+
+La intuición dice que cambiar un detalle debería salir más barato que generar de cero. Es al revés.
+Todo a `gpt-image-2.5-flare` · `low` · `1024x1024`:
+
+| Caso | Input (img / txt) | Output | Total | USD |
+|---|---:|---:|---:|---:|
+| Generar | 37 (0 / 37) | 196 | 233 | 0,0061 |
+| Editar **con** máscara | 1 056 (1 024 / 32) | 196 | 1 252 | 0,0142 |
+| Editar **sin** máscara | 1 056 (1 024 / 32) | 196 | 1 252 | 0,0142 |
+
+1. **El output no baja.** El modelo devuelve la imagen **completa** aunque la máscara acote qué se
+   modifica: los mismos 196 tokens que una generación. La máscara controla el resultado, no el gasto.
+2. **La imagen base se paga como entrada:** 1 024 tokens de imagen. En `low`, editar costó **2,3× generar**.
+3. **La máscara es gratis.** Con y sin máscara el `usage` fue idéntico. Lo que se cobra es la imagen base.
+4. **El sobrecosto relativo se diluye al subir la calidad**, porque el output pasa a dominar: ~2,3× en
+   `low`, ~1,15× en `high`, ~1,04× en `max`.
+
+Verificación visual: el inpainting funcionó y preservó el resto (diferencia media fuera de la zona
+2,4/255 con máscara, 2,8/255 sin ella). Nota de método: la diferencia media **no** sirve para juzgar un
+objeto pequeño — con la taza ya puesta, el promedio dentro de la zona era 4,3/255. Hubo que mirar la
+imagen para confirmar que el edit había ocurrido.
+
 ## Archivos
 
 - `manifest.json` — una fila por corrida con `usage` completo, lo resuelto por el API, latencia y costo derivado.

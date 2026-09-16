@@ -107,6 +107,8 @@ reproducible). A `1024x1024`, output tokens **196** (`low`) / **1 756** (`high`)
 **idénticos entre Flare y Sunburst** → USD **0,0063** / **0,0531** / **0,2111** por imagen con las tarifas
 vigentes al medir (input texto USD 8,00 / 1M; output imagen USD 30,00 / 1M).
 
+El **edit** tiene su propia línea base en el mismo directorio (ver el bloque de `--mask` abajo): editar no abarata, suma la imagen base como input.
+
 Para qué sirve: **decidir `quality` y modelo en `pnpm ai:image` y en el helper**. Tres cosas que cambia: **(1)** el costo por imagen **no depende del modelo** — presupuesta
 por `quality × size`, nunca por Flare vs Sunburst; **(2)** lo que separa a los modelos es la **latencia**, y la
 brecha crece con la calidad (en `max`, Flare 46,0 s vs Sunburst 80,6 s = 1,75×): elegir Sunburst se paga en
@@ -231,10 +233,20 @@ Canonical path to make **consistent variants** of an existing character/asset (n
 ```bash
 pnpm ai:image --image <ref.png> --prompt "keep this exact <subject>, change ONLY <delta>" --out <out.png>
 #   --image <path>        reference to edit (repeatable) → switches to editOpenAIImage (image-to-image)
+#   --mask <path>         INPAINTING: PNG con las zonas a reemplazar en TRANSPARENTE. Requiere --image
+#                         (sin ella aborta), mismo formato y mismas dimensiones que la primera --image.
 #   --input-fidelity high strict reference preservation — SÓLO gpt-image-1.5 / gpt-image-1 / gpt-image-1-mini.
 #                         En 2.5 no se envía (la guía lo excluye); la identidad se pide por prompt.
 pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (AI matting, soft edges)
 ```
+
+🔴 **Editar NO abarata — medido 2026-09-16, `flare · low · 1024x1024`:** el modelo devuelve la imagen
+**completa** aunque la máscara acote qué cambia, así que el output se cobra **idéntico** a una generación
+(196 tokens), y encima la imagen base entra como **1 024 tokens de input**. Editar costó **2,3× generar** en
+`low`; el sobrecosto se diluye al subir calidad (~1,15× en `high`, ~1,04× en `max`) porque el output domina.
+**La máscara es gratis**: con y sin máscara el `usage` fue idéntico. Corolario operativo: para recortar un
+fondo de una imagen que ya existe, usa `pnpm ai:image:rmbg` (local, cero costo de proveedor), no un edit.
+El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de costo real de 2.5.
 
 - El cliente acepta hasta **10** `--image` por request y conserva su orden. Cada referencia debe declarar en el
   prompt su rol: estructura, paleta, identidad, activo oficial o anti-referencia.

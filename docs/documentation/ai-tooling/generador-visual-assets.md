@@ -95,6 +95,24 @@ Dos novedades de la familia 2.5 que se notan en el resultado:
 - **Fondo transparente con soporte pleno**, útil para íconos y assets recortados que se apoyan sobre
   cualquier color de fondo.
 
+## Editar solo una parte de una imagen (desde 2026-09-16)
+
+Se puede pedir que el sistema cambie **solo una zona** de una imagen que ya existe y deje el resto igual.
+Para eso se entrega la imagen original y una segunda imagen llamada **mascara**, que marca en transparente
+la zona que se quiere reemplazar. El resto queda protegido.
+
+Sirve, por ejemplo, para poner un objeto sobre una mesa vacia, cambiar un color puntual o corregir un
+detalle sin volver a generar la pieza completa.
+
+**Cuidado con una suposicion muy comun: editar no sale mas barato que generar de nuevo.** Aunque el cambio
+sea chico, el sistema devuelve la imagen completa, asi que se cobra lo mismo que una imagen nueva, y ademas
+se suma el costo de leer la imagen original. En calidad baja, editar costo **2,3 veces** lo que costo generar.
+La mascara en si no tiene costo.
+
+Por eso, para **quitar el fondo** de una imagen que ya existe conviene usar la herramienta local
+(`pnpm ai:image:rmbg`), que no le cobra nada al proveedor. Pedirle el recorte al modelo costaria como una
+imagen nueva.
+
 ## Cuánto cuesta generar una imagen
 
 Cifras **medidas el 2026-09-16**, en dólares y por imagen:
