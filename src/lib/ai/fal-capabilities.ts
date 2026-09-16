@@ -451,7 +451,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'many',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: seedanceR2V(SEEDANCE_25, true),
     notes: 'hasta 30 s · techo 1080p · admite audio_urls y video_urls · task reference|editing|extension'
   },
@@ -479,7 +479,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'one',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: seedanceI2V(SEEDANCE_20_BASE),
     notes: 'hasta 15 s · única familia con 4K · admite end_image_url (último cuadro)'
   },
@@ -493,7 +493,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'many',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: seedanceR2V(SEEDANCE_20_BASE),
     notes: 'hasta 15 s · única familia con 4K · admite audio_urls y video_urls'
   },
@@ -507,7 +507,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'none',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: SEEDANCE_20_LIGHT,
     notes: 'variante rápida · techo 720p'
   },
@@ -521,7 +521,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'one',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: seedanceI2V(SEEDANCE_20_LIGHT),
     notes: 'variante rápida · techo 720p · admite end_image_url (último cuadro)'
   },
@@ -535,7 +535,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'many',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: seedanceR2V(SEEDANCE_20_LIGHT),
     notes: 'variante rápida · techo 720p · admite audio_urls y video_urls'
   },
@@ -549,7 +549,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'none',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: SEEDANCE_20_MINI,
     notes: 'la más barata · sin bitrate_mode'
   },
@@ -563,7 +563,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'one',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: seedanceI2V(SEEDANCE_20_MINI),
     notes: 'la más barata · sin bitrate_mode · admite end_image_url (último cuadro)'
   },
@@ -577,7 +577,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'many',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: seedanceR2V(SEEDANCE_20_MINI),
     notes: 'la más barata · sin bitrate_mode · admite audio_urls y video_urls'
   },
@@ -591,7 +591,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'none',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: SEEDANCE_20_LIGHT,
     notes: 'región US · techo 720p'
   },
@@ -605,7 +605,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'one',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: seedanceI2V(SEEDANCE_20_LIGHT),
     notes: 'región US · techo 720p · admite end_image_url (último cuadro)'
   },
@@ -619,7 +619,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'many',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: seedanceR2V(SEEDANCE_20_LIGHT),
     notes: 'región US · techo 720p · admite audio_urls y video_urls'
   },
@@ -1062,7 +1062,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'one',
     requiresPrompt: false,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: WAN3_I2V,
     notes: '--image = primer cuadro · --end-image opcional · prompt opcional'
   },
@@ -1104,7 +1104,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'one',
     requiresPrompt: false,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: WAN3_I2V,
     notes: '--image = primer cuadro · --end-image opcional · prompt opcional'
   },

@@ -8,7 +8,14 @@ vi.mock('@/lib/secrets/secret-manager', () => ({
   resolveSecret: async ({ envVarName }: { envVarName: string }) => ({ value: secrets[envVarName] ?? null, source: 'env' })
 }))
 
-import { awaitFalRequest, getFalAccountBalances, isFalBalanceLock, resetFalAccountsForTests, runFalModel } from '@/lib/ai/fal'
+import {
+  awaitFalRequest,
+  getFalAccountBalances,
+  getFalRequestStatus,
+  isFalBalanceLock,
+  resetFalAccountsForTests,
+  runFalModel
+} from '@/lib/ai/fal'
 
 const KEY_A = 'a:aaaa'
 const KEY_B = 'b:bbbb'
@@ -148,5 +155,39 @@ describe('cliente fal con varias cuentas', () => {
 
     expect(result.ok).toBe(true)
     expect(result.account).toBe('FAL_API_KEY')
+  })
+
+  it('con detach encola y vuelve sin consultar estado ni descargar', async () => {
+    const calls = installFetch((url, key, init) => {
+      if (url.endsWith('/billing/user_balance')) return new Response('20', { status: 200 })
+      if (init?.method === 'POST') return json(200, { request_id: 'r6' })
+
+      return undefined
+    })
+
+    const result = await runFalModel({ model: 'alibaba/wan-3.0/text-to-video', input: { prompt: 'x' }, detach: true })
+
+    expect(result).toMatchObject({ ok: true, httpStatus: 202, requestId: 'r6', output: null })
+    expect(calls.some(call => call.url.includes('/requests/'))).toBe(false)
+  })
+
+  it('consulta el estado una vez en la cuenta que tiene el request', async () => {
+    installFetch((url, key) => {
+      if (url.endsWith('/billing/user_balance')) return new Response(key === KEY_A ? '10' : '5', { status: 200 })
+
+      if (url.endsWith('/requests/r7/status')) {
+        return key === KEY_B ? json(200, { status: 'IN_QUEUE', queue_position: 3 }) : json(404, { detail: 'Request not found' })
+      }
+
+      return undefined
+    })
+
+    expect(await getFalRequestStatus({ model: 'alibaba/wan-3.0/text-to-video', requestId: 'r7' })).toEqual({
+      status: 'IN_QUEUE',
+      queuePosition: 3,
+      httpStatus: 200,
+      account: 'FAL_API_KEY_B',
+      errorDetail: null
+    })
   })
 })

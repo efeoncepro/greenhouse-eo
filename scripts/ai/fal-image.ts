@@ -11,6 +11,7 @@ import {
   awaitFalRequest,
   FAL_ACCOUNT_ENV_VARS,
   getFalAccountBalances,
+  getFalRequestStatus,
   isFalBalanceLock,
   resolveFalQueueHandle,
   runFalModel,
@@ -45,8 +46,10 @@ import { FAL_CAPABILITIES, findFalCapability, type FalCapability, type FalRefere
  *   --image <path|url>   Entrada visual (o imagen de referencia en reference-to-video); repetible
  *   --input <json>       JSON extra que se fusiona con el input (escape hatch para campos no cubiertos)
  *   --out <path> | --out-dir <dir>
- *   --timeout <ms>       Presupuesto de polling (imagen 3 min · video 15 min · entrenamiento 3 h)
+ *   --timeout <ms>       Presupuesto de polling (imagen 3 min · video 30 min · entrenamiento 3 h)
  *   --request-id <id>    Retoma un trabajo ya encolado en vez de enviar uno nuevo
+ *   --detach             Encola, imprime request_id y cuenta, y termina sin esperar (recupéralo con --request-id)
+ *   --status             Con --request-id: consulta una vez si terminó, sin esperar ni descargar (no cobra)
  *   --json               Imprime el output crudo del modelo
  *   --fal-account <FAL_API_KEY|FAL_API_KEY_B>  Fuerza una cuenta. Omitido = la de más saldo, y si fal la bloquea por
  *                        saldo pasa sola a la otra (el bloqueo ocurre antes de encolar: no cobra)
@@ -66,8 +69,11 @@ loadEnv({ path: join(process.cwd(), '.env.local') })
 
 const DEFAULT_OUT_DIR = join(process.cwd(), 'public', 'images', 'generated')
 const DEFAULT_TIMEOUT_MS = 180_000
-/** El video tarda bastante más que una imagen; el default sube solo para capacidades de video. */
-const VIDEO_TIMEOUT_MS = 900_000
+/**
+ * El video tarda bastante más que una imagen; el default sube solo para capacidades de video. 30 min porque Seedance
+ * 2.5 referencias a video superó 15 min en la verificación del 2026-09-16 (y se recuperó con --request-id).
+ */
+const VIDEO_TIMEOUT_MS = 1_800_000
 /** Un entrenamiento de miles de steps corre por horas. */
 const TRAINING_TIMEOUT_MS = 10_800_000
 
@@ -113,12 +119,14 @@ interface CliArgs {
   json: boolean
   list: boolean
   balance: boolean
+  detach: boolean
+  status: boolean
   falAccount?: FalAccountName
   help: boolean
 }
 
 const parseArgs = (argv: string[]): CliArgs => {
-  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], keyframes: [], noAudio: false, thinking: false, noPromptExpansion: false, json: false, list: false, balance: false, help: false }
+  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], keyframes: [], noAudio: false, thinking: false, noPromptExpansion: false, json: false, list: false, balance: false, detach: false, status: false, help: false }
 
   let i = 0
 
@@ -173,6 +181,8 @@ const parseArgs = (argv: string[]): CliArgs => {
       case '--json': args.json = true; break
       case '--list': args.list = true; break
       case '--balance': args.balance = true; break
+      case '--detach': args.detach = true; break
+      case '--status': args.status = true; break
 
       case '--fal-account': {
         const value = next()
@@ -904,6 +914,26 @@ const main = async () => {
       account ? ` --fal-account ${account}` : ''
     }`
 
+  if (args.status) {
+    if (!args.requestId) throw new Error('--status necesita --request-id <id>.')
+
+    const state = await getFalRequestStatus({ model: slug, requestId: args.requestId, account: args.falAccount })
+
+    if (!state.status) {
+      throw new Error(`fal no encontró el request ${args.requestId} (HTTP ${state.httpStatus})${state.errorDetail ? `: ${state.errorDetail}` : ''}.`)
+    }
+
+    const position = state.queuePosition !== null ? ` · posición en cola ${state.queuePosition}` : ''
+
+    process.stdout.write(`${state.status}${position} · cuenta ${state.account}\n`)
+
+    if (state.status === 'COMPLETED') process.stdout.write(`  descárgalo con: ${resumeHint(args.requestId, state.account)}\n`)
+
+    process.exit(0)
+  }
+
+  if (args.detach && args.requestId) throw new Error('--detach es para encolar uno nuevo; con --request-id usa --status.')
+
   let result
 
   if (args.requestId) {
@@ -927,6 +957,7 @@ const main = async () => {
       input,
       pollTimeoutMs: timeoutMs,
       account: args.falAccount,
+      detach: args.detach,
       onEnqueued: handle => {
         process.stdout.write(`  ⋯ encolado · request_id ${handle.requestId} · cuenta ${handle.account}\n`)
 
@@ -965,6 +996,15 @@ const main = async () => {
     }
 
     process.exit(1)
+  }
+
+  if (args.detach && result.requestId) {
+    process.stdout.write(
+      `  desacoplado: el trabajo sigue en fal.\n  estado:   pnpm ai:fal ${capability ? `--capability ${capability.id}` : `--model ${slug}`} --request-id ${result.requestId} --status${
+        result.account ? ` --fal-account ${result.account}` : ''
+      }\n  resultado: ${resumeHint(result.requestId, result.account)}\n`
+    )
+    process.exit(0)
   }
 
   if (args.json) process.stdout.write(`${JSON.stringify(result.output, null, 2)}\n`)

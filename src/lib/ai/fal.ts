@@ -202,6 +202,12 @@ export const runFalModel = async <TOutput = unknown>(params: {
   onEnqueued?: (handle: FalQueueHandle & { account: FalAccountName }) => void
   /** Fuerza una cuenta (sin failover). Omitido = la de más saldo, con failover ante bloqueo por saldo. */
   account?: FalAccountName
+  /**
+   * Encola y vuelve sin esperar (HTTP 202, `output: null`). El trabajo sigue en fal; se recupera con
+   * `awaitFalRequest` o se consulta con `getFalRequestStatus`. Alternativa local al webhook de fal, que exigiría
+   * una URL pública.
+   */
+  detach?: boolean
 }): Promise<FalModelResult<TOutput>> => {
   const ranked = await rankFalAccounts()
   const candidates = params.account ? ranked.filter(item => item.name === params.account) : ranked
@@ -270,6 +276,20 @@ export const runFalModel = async <TOutput = unknown>(params: {
 
   params.onEnqueued?.({ ...handle, account: apiKey.name })
 
+  if (params.detach) {
+    return {
+      ok: true,
+      httpStatus: 202,
+      model,
+      requestId,
+      output: null,
+      errorDetail: null,
+      latencyMs: Date.now() - started,
+      secretSource: apiKey.source,
+      account: apiKey.name
+    }
+  }
+
   return pollFalRequest<TOutput>({
     model,
     handle,
@@ -278,6 +298,53 @@ export const runFalModel = async <TOutput = unknown>(params: {
     pollTimeoutMs: params.pollTimeoutMs ?? FAL_DEFAULT_POLL_TIMEOUT_MS,
     pollIntervalMs: params.pollIntervalMs ?? FAL_DEFAULT_POLL_INTERVAL_MS
   })
+}
+
+/** Un request sólo existe en la cuenta que lo creó: se prueba cada candidata hasta que su estado responda. */
+const findRequestAccount = async (handle: FalQueueHandle, candidates: FalAccount[], forced: boolean): Promise<FalAccount> => {
+  if (forced || candidates.length === 1) return candidates[0]
+
+  for (const account of candidates) {
+    const probe = await fetch(handle.statusUrl, { headers: authHeaders(account.value) })
+
+    if (probe.ok) return account
+  }
+
+  return candidates[0]
+}
+
+export interface FalRequestStatus {
+  /** IN_QUEUE · IN_PROGRESS · COMPLETED, o null si fal no lo encontró. */
+  status: string | null
+  queuePosition: number | null
+  httpStatus: number
+  account: FalAccountName
+  errorDetail: string | null
+}
+
+/** Consulta una vez el estado de un request encolado, sin esperar ni descargar. No cobra. */
+export const getFalRequestStatus = async (params: {
+  model: string
+  requestId: string
+  account?: FalAccountName
+}): Promise<FalRequestStatus> => {
+  const ranked = await rankFalAccounts()
+  const candidates = params.account ? ranked.filter(item => item.name === params.account) : ranked
+
+  if (!candidates.length) throw new Error(`La cuenta de fal ${params.account} no está configurada.`)
+
+  const handle = resolveFalQueueHandle(params.model.trim(), params.requestId.trim())
+  const account = await findRequestAccount(handle, candidates, Boolean(params.account))
+  const response = await fetch(handle.statusUrl, { headers: authHeaders(account.value) })
+  const body = (await response.json().catch(() => null)) as Record<string, unknown> | null
+
+  return {
+    status: response.ok && typeof body?.status === 'string' ? body.status : null,
+    queuePosition: typeof body?.queue_position === 'number' ? body.queue_position : null,
+    httpStatus: response.status,
+    account: account.name,
+    errorDetail: response.ok ? null : extractErrorDetail(body)
+  }
 }
 
 /**
@@ -300,18 +367,7 @@ export const awaitFalRequest = async <TOutput = unknown>(params: {
     throw new Error(`La cuenta de fal ${params.account} no está configurada.`)
   }
 
-  let apiKey = candidates[0]
-
-  if (!params.account && candidates.length > 1) {
-    for (const account of candidates) {
-      const probe = await fetch(handle.statusUrl, { headers: authHeaders(account.value) })
-
-      if (probe.ok) {
-        apiKey = account
-        break
-      }
-    }
-  }
+  const apiKey = await findRequestAccount(handle, candidates, Boolean(params.account))
 
   return pollFalRequest<TOutput>({
     model,
