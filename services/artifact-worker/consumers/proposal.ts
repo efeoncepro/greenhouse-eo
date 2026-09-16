@@ -22,6 +22,7 @@ import {
   type ProposalRenderJobRecord,
   type RenderJobFailureCode
 } from '@/lib/commercial/tenders/proposals/render-jobs'
+import { hashResolvedManifest } from '@/lib/artifact-composer/manifest-hash'
 import { storeSystemGeneratedPrivateAsset } from '@/lib/storage/greenhouse-assets'
 
 import type { RenderConsumer, RenderJobView, RenderedArtifact } from '../consumer-contract'
@@ -81,6 +82,15 @@ export const createProposalConsumer = (): RenderConsumer => {
     getManifest: jobId => getRenderJobManifest(jobId),
 
     getCatalog: name => CATALOGS.get(name) ?? null,
+
+    // Sin cambios respecto de TASK-1391: el manifest RESUELTO debe ser byte a byte el encolado.
+    verifyEmittedManifest: (view, emitted) => {
+      const emittedHash = hashResolvedManifest(emitted)
+
+      if (emittedHash === view.manifestHash) return null
+
+      return `El manifest re-resuelto (${emittedHash.slice(0, 12)}…) difiere del encolado (${view.manifestHash.slice(0, 12)}…): el catálogo cambió desde el enqueue.`
+    },
 
     storeOutputs: async (view, rendered: RenderedArtifact) => {
       const job = requireClaimed()

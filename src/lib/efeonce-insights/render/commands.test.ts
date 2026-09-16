@@ -37,11 +37,6 @@ vi.mock('../stores/snapshot-store', () => ({ getInsightEvidenceSnapshotByEdition
 vi.mock('../stores/plan-store', () => ({ getInsightEditorialPlanByEdition: stores.getInsightEditorialPlanByEdition }))
 vi.mock('./store', () => render)
 
-const composer = vi.hoisted(() => ({ resolvePlan: vi.fn(async (_c: unknown, input: { artifactId: string }) => ({ catalog: { name: 'deck-axis' }, artifactId: input.artifactId, input })) }))
-
-vi.mock('@/lib/artifact-composer', () => ({ resolvePlan: composer.resolvePlan }))
-vi.mock('@/lib/artifact-composer/catalogs/deck-axis', () => ({ deckAxisCatalog: { name: 'deck-axis' } }))
-
 const infra = vi.hoisted(() => ({ withTx: vi.fn(async (fn: (client: unknown) => Promise<unknown>) => fn({ query: vi.fn() })), pgQuery: vi.fn(), publish: vi.fn(async () => 'outbox-1') }))
 
 vi.mock('@/lib/postgres/client', () => ({ withGreenhousePostgresTransaction: infra.withTx, runGreenhousePostgresQuery: infra.pgQuery }))
@@ -101,7 +96,7 @@ describe('requestInsightRender', () => {
     expect(render.insertInsightRenderRun).not.toHaveBeenCalled()
   })
 
-  it('encola: manifest resuelto y hasheado, run + outputs en una tx, y publica insights.render.requested (202)', async () => {
+  it('encola: input sellado y hasheado, run + outputs en una tx, y publica insights.render.requested (202)', async () => {
     const { requestInsightRender } = await import('./commands')
 
     stores.getInsightEditionById.mockResolvedValue(edition())
@@ -111,12 +106,12 @@ describe('requestInsightRender', () => {
 
     expect(result.idempotent).toBe(false)
     expect(result.run.renderRunId).toBe('irun-1')
-    expect(composer.resolvePlan).toHaveBeenCalledTimes(1)
     const inserted = (render.insertInsightRenderRun.mock.calls[0] as unknown as [{ outputs: Array<{ manifestHash: string; catalogName: string }>; audience: string }])[0]
 
     expect(inserted.audience).toBe('client')
     expect(inserted.outputs[0]!.manifestHash).toMatch(/^[0-9a-f]{64}$/)
     expect(inserted.outputs[0]!.catalogName).toBe('deck-axis')
+    // El catálogo NO se importa acá: se sella el input canónico y el worker resuelve (bundle de Vercel).
     expect((infra.publish.mock.calls as unknown as Array<[{ eventType: string }]>).map(c => c[0].eventType)).toEqual(['insights.render.requested'])
   })
 

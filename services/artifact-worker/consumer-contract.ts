@@ -62,6 +62,17 @@ export interface RenderConsumer {
   getCatalog(catalogName: string): ArtifactCatalog | null
 
   /**
+   * Drift check, propio de cada dominio porque cada uno sella una cosa distinta:
+   * Proposal sella el MANIFEST RESUELTO (lo compuso un CLI, posiblemente días antes, con otra copia
+   * del catálogo) e Insights sella el INPUT canónico (el catálogo vive sólo acá, así que comparar el
+   * manifest resuelto contra sí mismo sería tautológico; lo que importa es que se compongan
+   * EXACTAMENTE las láminas selladas).
+   *
+   * Devuelve el detalle del drift, o `null` si el artefacto emitido corresponde a lo encolado.
+   */
+  verifyEmittedManifest(job: RenderJobView, emittedManifest: Record<string, unknown>): string | null
+
+  /**
    * Persiste los bytes producidos como assets privados del dominio y los vincula
    * semánticamente. Devuelve el id del asset principal (null si el target no produce PDF).
    */

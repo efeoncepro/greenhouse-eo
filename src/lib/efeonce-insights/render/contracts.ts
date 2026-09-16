@@ -18,6 +18,14 @@ import type { InsightAudience, InsightOutput } from '../contracts/request'
  * el modelo web llegan con TASK-1847/1848. Un encargo con un output fuera de esta lista se rechaza
  * fail-closed (`render_rejected`), nunca se encola "para después".
  */
+/**
+ * Catálogo que el worker tiene empaquetado. Es un STRING a propósito: importar el catálogo como
+ * valor desde un command arrastra sus 19 MB de fuentes y assets al bundle de Vercel (la función
+ * `insights/catalog` llegó a 434 MB y rompió el build de staging el 2026-09-16). El catálogo se
+ * resuelve donde vive: en el worker.
+ */
+export const INSIGHT_RENDER_CATALOG_NAME = 'deck-axis'
+
 export const INSIGHT_RENDERABLE_OUTPUTS = ['deck_pdf'] as const satisfies readonly InsightOutput[]
 
 /** Estado del run agregado. `partial_failed` existe porque un output puede caer sin arrastrar al resto. */

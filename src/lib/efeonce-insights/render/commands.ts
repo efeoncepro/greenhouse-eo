@@ -19,8 +19,6 @@ import 'server-only'
  * mientras su output no esté en `dead_letter`/`cancelled`; nunca produce un segundo asset final.
  */
 
-import { resolvePlan } from '@/lib/artifact-composer'
-import { deckAxisCatalog } from '@/lib/artifact-composer/catalogs/deck-axis'
 import { hashResolvedManifest } from '@/lib/artifact-composer/manifest-hash'
 import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
@@ -35,7 +33,7 @@ import { getInsightEditorialPlanByEdition } from '../stores/plan-store'
 import { getInsightReportById } from '../stores/report-store'
 import { getInsightEvidenceSnapshotByEdition } from '../stores/snapshot-store'
 
-import { INSIGHT_RENDERABLE_OUTPUTS, type InsightOutputRecord, type InsightRenderRunRecord } from './contracts'
+import { INSIGHT_RENDER_CATALOG_NAME, INSIGHT_RENDERABLE_OUTPUTS, type InsightOutputRecord, type InsightRenderRunRecord } from './contracts'
 import { buildInsightDeckPlanInput } from './deck-mapper'
 import {
   cancelInsightRenderRun,
@@ -142,22 +140,17 @@ export const requestInsightRender = async (input: RequestInsightRenderInput): Pr
   if (!snapshot?.sealedAt || !snapshot.snapshotHash) throw new InsightsNotReadyError('El snapshot de evidencia no está sellado', { editionId: edition.editionId })
   if (!plan?.frozenAt || !plan.planHash) throw new InsightsNotReadyError('El plan editorial no está congelado', { editionId: edition.editionId })
 
-  // El manifest se resuelve con el MISMO catálogo empaquetado en el worker; cualquier drift entre
-  // este momento y la ejecución lo detecta el worker por hash y no renderiza.
+  // Se sella el INPUT canónico del artefacto, no el manifest resuelto. El manifest lo resuelve el
+  // worker, que es quien tiene el catálogo empaquetado: importarlo acá arrastra 19 MB de fuentes y
+  // assets al bundle de Vercel (la función `insights/catalog` llegó a 434 MB y rompió staging el
+  // 2026-09-16). Es además el patrón de Proposal, cuyo command tampoco resuelve: recibe y hashea.
+  //
+  // Qué sigue garantizando el hash: que el worker componga EXACTAMENTE las láminas selladas. Si el
+  // input que emite el composer no coincide, es `manifest_drift` y no se publica. La validación
+  // autoritativa de slots/semántica corre en el worker contra los contratos reales del catálogo;
+  // el mapper ya rechaza acá lo que excede los presupuestos conocidos.
   const planInput = buildInsightDeckPlanInput({ edition, report, plan: plan.plan, snapshot })
-
-  let manifest: Record<string, unknown>
-
-  try {
-    manifest = (await resolvePlan(deckAxisCatalog, planInput)) as unknown as Record<string, unknown>
-  } catch (error) {
-    // Validación de slots/semántica del catálogo: causa visible, sin truncar nada.
-    throw new InsightsRenderRejectedError('El plan editorial no puede componerse con el catálogo actual', {
-      editionId: edition.editionId,
-      reason: error instanceof Error ? error.message.slice(0, 500) : String(error)
-    })
-  }
-
+  const manifest: Record<string, unknown> = { input: planInput as unknown as Record<string, unknown> }
   const manifestHash = hashResolvedManifest(manifest)
 
   return withGreenhousePostgresTransaction(async client => {
@@ -170,7 +163,7 @@ export const requestInsightRender = async (input: RequestInsightRenderInput): Pr
       requestedByKind: grant.actor.kind === 'member' ? 'member' : 'system',
       requestedByUserId: grant.actor.userId,
       requestedByMemberId: grant.actor.memberId,
-      outputs: outputs.map(output => ({ output, catalogName: deckAxisCatalog.name, manifest, manifestHash }))
+      outputs: outputs.map(output => ({ output, catalogName: INSIGHT_RENDER_CATALOG_NAME, manifest, manifestHash }))
     })
 
     await publishInsightRenderRequested(client as never, {

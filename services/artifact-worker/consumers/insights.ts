@@ -20,6 +20,7 @@ import {
   markInsightOutputFailed
 } from '@/lib/efeonce-insights/render/store'
 import type { InsightOutputRecord, InsightRenderFailureCode } from '@/lib/efeonce-insights/render/contracts'
+import { hashResolvedManifest } from '@/lib/artifact-composer/manifest-hash'
 import { storeSystemGeneratedPrivateAsset } from '@/lib/storage/greenhouse-assets'
 
 import type { RenderConsumer, RenderJobView, RenderedArtifact } from '../consumer-contract'
@@ -73,6 +74,17 @@ export const createInsightsConsumer = (): RenderConsumer => {
     getManifest: jobId => getInsightOutputManifest(jobId),
 
     getCatalog: name => CATALOGS.get(name) ?? null,
+
+    // Insights sella el INPUT canónico (el encolado no tiene el catálogo: importarlo en Vercel
+    // arrastra 19 MB de fuentes y assets). Lo que se verifica es que el composer haya compuesto
+    // EXACTAMENTE las láminas selladas desde el plan congelado.
+    verifyEmittedManifest: (view, emitted) => {
+      const emittedInputHash = hashResolvedManifest({ input: emitted.input })
+
+      if (emittedInputHash === view.manifestHash) return null
+
+      return `El input compuesto (${emittedInputHash.slice(0, 12)}…) difiere del sellado al encolar (${view.manifestHash.slice(0, 12)}…): el artefacto no corresponde al plan congelado.`
+    },
 
     storeOutputs: async (view, rendered: RenderedArtifact) => {
       const record = requireClaimed()

@@ -32,7 +32,6 @@ initSentryForService('artifact-worker')
 import { composeArtifact } from '@/lib/artifact-composer'
 import { SlideQualityError } from '@/lib/artifact-composer/quality-gates'
 import { SlideGeometryError, SlotFillError } from '@/lib/artifact-composer/render'
-import { hashResolvedManifest } from '@/lib/artifact-composer/manifest-hash'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import type { RenderConsumer, RenderJobView } from './consumer-contract'
@@ -105,13 +104,10 @@ const renderJob = async (consumer: RenderConsumer, job: RenderJobView): Promise<
       await fs.readFile(path.join(outDir, `${input.artifactId}.manifest.json`), 'utf8')
     ) as Record<string, unknown>
 
-    const emittedHash = hashResolvedManifest(emittedManifest)
+    const drift = consumer.verifyEmittedManifest(job, emittedManifest)
 
-    if (emittedHash !== job.manifestHash) {
-      await consumer.markFailed(job, {
-        failureCode: 'manifest_drift',
-        failureDetail: `El manifest re-resuelto (${emittedHash.slice(0, 12)}…) difiere del encolado (${job.manifestHash.slice(0, 12)}…): el catálogo cambió desde el enqueue.`
-      })
+    if (drift) {
+      await consumer.markFailed(job, { failureCode: 'manifest_drift', failureDetail: drift })
 
       return
     }
