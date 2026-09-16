@@ -161,6 +161,7 @@ import { purgeAssessmentPublicAccessRetention } from '@/lib/hiring/assessment/pu
 // descubre en la factura; un throw se descubre en desarrollo — contrato TASK-1300).
 import '@/lib/growth/seo/register-provider-spend'
 import { dispatchNextRenderJob } from '@/lib/commercial/tenders/proposals/render-dispatch'
+import { countClaimableInsightOutputs, dispatchNextInsightRender } from '@/lib/efeonce-insights/render/dispatch'
 import { isFormsDispatchEnabled } from '@/lib/growth/forms/flags'
 
 import { computeRollingRematerializationWindow } from './finance-rematerialize-seed'
@@ -1662,19 +1663,28 @@ const handleArtifactRenderDispatch = async (_req: IncomingMessage, res: ServerRe
   try {
     const result = await dispatchNextRenderJob()
 
-    if (result.skipped === 'flag_off') {
-      console.log('[ops-worker] /artifact-render/dispatch skip: flag OFF')
-      json(res, 200, { ok: true, skipped: 'flag_off' })
+    // TASK-1846 — el Job es multiconsumidor: Proposal e Insights tienen colas propias y cada
+    // dominio decide cuándo hay que ejecutar. Si Proposal no lanzó nada (cola vacía o flag OFF),
+    // Insights puede tener trabajo encolado: sin este tick su cola no se drena nunca.
+    const insights =
+      result.dispatched.length > 0
+        ? { skipped: 'proposal_dispatched' as const, queued: await countClaimableInsightOutputs(), executionName: null }
+        : await dispatchNextInsightRender()
+
+    if (result.skipped === 'flag_off' && (insights.skipped === 'flag_off' || insights.skipped === 'empty_queue')) {
+      console.log(`[ops-worker] /artifact-render/dispatch skip: proposal flag OFF, insights ${insights.skipped}`)
+      json(res, 200, { ok: true, skipped: 'flag_off', insights })
 
       return
     }
 
     console.log(
       `[ops-worker] /artifact-render/dispatch done — expiredClosed=${result.expiredClosed} ` +
-      `dispatched=${result.dispatched.length} postponed=${result.postponed.length}`
+      `dispatched=${result.dispatched.length} postponed=${result.postponed.length} ` +
+      `insightsQueued=${insights.queued} insightsExecution=${insights.executionName ?? 'none'}`
     )
 
-    json(res, 200, { ok: true, ...result })
+    json(res, 200, { ok: true, ...result, insights })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown dispatch error'
 
