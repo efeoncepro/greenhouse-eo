@@ -11,12 +11,14 @@ import 'server-only'
  * el Slice 2 cierra, y por eso el fencing entra con el lease y no después.
  */
 
-import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
+import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
 import type { InsightAudience, InsightOutput } from '../contracts/request'
+import { runInsightsQuery, type InsightsDbClient } from '../stores/db'
 
 import {
   INSIGHT_NON_RETRYABLE_FAILURES,
+  InsightRenderFenceLostError,
   isInsightOutputTransitionAllowed,
   type InsightOutputRecord,
   type InsightOutputState,
@@ -43,7 +45,18 @@ const RUN_COLUMNS = `
 const OUTPUT_COLUMNS = `
   insight_output_id, render_run_id, organization_id, edition_id, output, audience, catalog_name,
   manifest_hash, constraints, deadline, state, failure_code, failure_detail, attempts, max_attempts,
-  started_at, finished_at, execution_name, output_asset_id, output_report, created_at, updated_at`
+  started_at, finished_at, execution_name, output_asset_id, output_report,
+  lease_expires_at, fence_token, created_at, updated_at`
+
+/**
+ * Patrón canónico del dominio (`stores/db.ts`): si el caller ya tiene una transacción, se compone
+ * dentro; si no, se abre una propia. Es lo que permite ejercitar esto contra PostgreSQL REAL en un
+ * test que revierte al final — las tablas son append-only y no se pueden limpiar con DELETE.
+ */
+const withClient = async <T>(
+  client: InsightsDbClient | undefined,
+  fn: (c: InsightsDbClient) => Promise<T>
+): Promise<T> => (client ? fn(client) : withGreenhousePostgresTransaction(c => fn(c)))
 
 const asDate = (value: unknown): Date | null => (value ? new Date(value as string) : null)
 
@@ -85,6 +98,8 @@ const mapOutputRow = (row: Record<string, unknown>): InsightOutputRecord => ({
   executionName: (row.execution_name as string | null) ?? null,
   outputAssetId: (row.output_asset_id as string | null) ?? null,
   outputReport: (row.output_report as Record<string, unknown> | null) ?? null,
+  leaseExpiresAt: asDate(row.lease_expires_at),
+  fenceToken: Number(row.fence_token ?? 0),
   createdAt: new Date(row.created_at as string),
   updatedAt: new Date(row.updated_at as string)
 })
@@ -96,8 +111,10 @@ const mapOutputRow = (row: Record<string, unknown>): InsightOutputRecord => ({
 export const getInsightRenderRun = async (input: {
   organizationId: string
   renderRunId: string
+  client?: InsightsDbClient
 }): Promise<InsightRenderRunRecord | null> => {
-  const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(
+  const rows = await runInsightsQuery<Record<string, unknown>>(
+    input.client,
     `SELECT ${RUN_COLUMNS} FROM greenhouse_insights.insight_render_runs
       WHERE organization_id = $1 AND render_run_id = $2`,
     [input.organizationId, input.renderRunId]
@@ -109,8 +126,10 @@ export const getInsightRenderRun = async (input: {
 export const listInsightOutputsForRun = async (input: {
   organizationId: string
   renderRunId: string
+  client?: InsightsDbClient
 }): Promise<InsightOutputRecord[]> => {
-  const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(
+  const rows = await runInsightsQuery<Record<string, unknown>>(
+    input.client,
     `SELECT ${OUTPUT_COLUMNS} FROM greenhouse_insights.insight_outputs
       WHERE organization_id = $1 AND render_run_id = $2
       ORDER BY output`,
@@ -122,9 +141,11 @@ export const listInsightOutputsForRun = async (input: {
 
 /** El manifest completo no viaja en el record de lista: el worker lo pide explícito. */
 export const getInsightOutputManifest = async (
-  insightOutputId: string
+  insightOutputId: string,
+  client?: InsightsDbClient
 ): Promise<Record<string, unknown> | null> => {
-  const rows = await runGreenhousePostgresQuery<{ manifest: Record<string, unknown> }>(
+  const rows = await runInsightsQuery<{ manifest: Record<string, unknown> }>(
+    client,
     `SELECT manifest FROM greenhouse_insights.insight_outputs WHERE insight_output_id = $1`,
     [insightOutputId]
   )
@@ -140,16 +161,28 @@ export const getInsightOutputManifest = async (
  * Claim atómico del próximo output. Misma regla de prioridad que Proposal (deadline + aging):
  * `FOR UPDATE SKIP LOCKED` garantiza que dos ejecuciones concurrentes jamás tomen el mismo.
  */
+export const DEFAULT_INSIGHT_RENDER_LEASE_MINUTES = 15
+
 export const claimNextInsightOutputForExecution = async (input?: {
   agingMinutes?: number
+  leaseMinutes?: number
+  client?: InsightsDbClient
 }): Promise<InsightOutputRecord | null> => {
   const agingMinutes = input?.agingMinutes ?? 30
+  const leaseMinutes = input?.leaseMinutes ?? DEFAULT_INSIGHT_RENDER_LEASE_MINUTES
 
-  return withGreenhousePostgresTransaction(async client => {
-    const candidate = await client.query<{ insight_output_id: string; organization_id: string; render_run_id: string }>(
-      `SELECT insight_output_id, organization_id, render_run_id
+  return withClient(input?.client, async client => {
+    const candidate = await client.query<{ insight_output_id: string; organization_id: string; render_run_id: string; state: string }>(
+      `SELECT insight_output_id, organization_id, render_run_id, state
          FROM greenhouse_insights.insight_outputs
-        WHERE state = 'queued'
+        WHERE (
+            state = 'queued'
+            -- Reclamo por lease VENCIDO. Sólo filas CON lease: una fila legada en estado running con
+            -- lease NULL viene de un worker que no presenta fence al finalizar, así que
+            -- reclamarla sí podría producir dos finalizaciones. Esas son huérfanas y las resuelve
+            -- la reconciliación del Slice 3, no este claim.
+            OR (state = 'running' AND lease_expires_at IS NOT NULL AND lease_expires_at < now())
+          )
           AND (deadline IS NULL OR deadline > now())
         ORDER BY
           LEAST(
@@ -166,19 +199,32 @@ export const claimNextInsightOutputForExecution = async (input?: {
 
     if (!row) return null
 
+    // El fence SUBE en cada claim: cualquier ejecución anterior queda con un token viejo y su
+    // finalización no escribe nada. Sin esto, el reclamo de arriba produciría dos outputs finales.
     const updated = await client.query<Record<string, unknown>>(
       `UPDATE greenhouse_insights.insight_outputs
-          SET state = 'running', started_at = now(), attempts = attempts + 1, updated_at = now()
+          SET state = 'running',
+              started_at = now(),
+              attempts = attempts + 1,
+              lease_expires_at = now() + make_interval(mins => $2),
+              fence_token = fence_token + 1,
+              updated_at = now()
         WHERE insight_output_id = $1
         RETURNING ${OUTPUT_COLUMNS}`,
-      [row.insight_output_id]
+      [row.insight_output_id, leaseMinutes]
     )
 
     await client.query(
       `INSERT INTO greenhouse_insights.insight_render_events
          (insight_output_id, render_run_id, organization_id, from_state, to_state, detail, actor_kind)
-       VALUES ($1, $2, $3, 'queued', 'running', $4, 'worker')`,
-      [row.insight_output_id, row.render_run_id, row.organization_id, JSON.stringify({ claim: 'skip_locked' })]
+       VALUES ($1, $2, $3, $4, 'running', $5, 'worker')`,
+      [
+        row.insight_output_id,
+        row.render_run_id,
+        row.organization_id,
+        row.state,
+        JSON.stringify({ claim: 'skip_locked', reclaimed: row.state === 'running' })
+      ]
     )
 
     // El run entra en `running` con el primer output reclamado.
@@ -196,11 +242,18 @@ export const claimNextInsightOutputForExecution = async (input?: {
 const transitionOutput = async (input: {
   insightOutputId: string
   toState: InsightOutputState
+  /**
+   * Fence presentado por quien finaliza. Si no es el vigente, la fila ya fue reclamada por otra
+   * ejecución y esta finalización se DESCARTA sin escribir. Omitirlo sólo es legítimo para
+   * transiciones que no vienen de un worker (cancelación humana, reintento gobernado).
+   */
+  fenceToken?: number
   set?: string
   params?: unknown[]
   detail: Record<string, unknown>
+  client?: InsightsDbClient
 }): Promise<InsightOutputRecord> =>
-  withGreenhousePostgresTransaction(async client => {
+  withClient(input.client, async client => {
     const current = await client.query<Record<string, unknown>>(
       `SELECT ${OUTPUT_COLUMNS} FROM greenhouse_insights.insight_outputs
         WHERE insight_output_id = $1 FOR UPDATE`,
@@ -215,6 +268,13 @@ const transitionOutput = async (input: {
 
     if (!isInsightOutputTransitionAllowed(from, input.toState)) {
       throw new Error(`Transición ilegal de output: ${from} → ${input.toState}.`)
+    }
+
+    // FENCING. Éste es el candado que impide que un worker con lease vencido —vivo pero lento—
+    // finalice encima del que lo reemplazó. Sin él, el reclamo por lease produciría dos outputs
+    // finales para una misma edición.
+    if (input.fenceToken !== undefined && Number(row.fence_token ?? 0) !== input.fenceToken) {
+      throw new InsightRenderFenceLostError(input.insightOutputId, input.fenceToken)
     }
 
     const extra = input.set ? `, ${input.set}` : ''
@@ -286,11 +346,15 @@ const rollupRunState = async (
 
 export const markInsightOutputCompleted = (input: {
   insightOutputId: string
+  fenceToken: number
   outputAssetId: string
   outputReport: Record<string, unknown>
+  client?: InsightsDbClient
 }): Promise<InsightOutputRecord> =>
   transitionOutput({
+    client: input.client,
     insightOutputId: input.insightOutputId,
+    fenceToken: input.fenceToken,
     toState: 'completed',
     set: `finished_at = now(), output_asset_id = $3, output_report = $4`,
     params: [input.outputAssetId, JSON.stringify(input.outputReport)],
@@ -299,10 +363,14 @@ export const markInsightOutputCompleted = (input: {
 
 export const markInsightOutputFailed = async (input: {
   insightOutputId: string
+  /** Opcional: un fallo registrado por un worker desfasado no debe pisar al reclamante. */
+  fenceToken?: number
   failureCode: InsightRenderFailureCode
   failureDetail: string
+  client?: InsightsDbClient
 }): Promise<InsightOutputRecord> => {
-  const current = await runGreenhousePostgresQuery<{ attempts: number; max_attempts: number }>(
+  const current = await runInsightsQuery<{ attempts: number; max_attempts: number }>(
+    input.client,
     `SELECT attempts, max_attempts FROM greenhouse_insights.insight_outputs WHERE insight_output_id = $1`,
     [input.insightOutputId]
   )
@@ -311,7 +379,9 @@ export const markInsightOutputFailed = async (input: {
   const terminal = exhausted || INSIGHT_NON_RETRYABLE_FAILURES.has(input.failureCode)
 
   return transitionOutput({
+    client: input.client,
     insightOutputId: input.insightOutputId,
+    fenceToken: input.fenceToken,
     toState: terminal ? 'dead_letter' : 'failed',
     set: `finished_at = now(), failure_code = $3, failure_detail = $4`,
     params: [input.failureCode, input.failureDetail.slice(0, 2000)],

@@ -104,8 +104,28 @@ export interface InsightOutputRecord {
   executionName: string | null
   outputAssetId: string | null
   outputReport: Record<string, unknown> | null
+  /** Slice 2 — vencimiento del claim. NULL en filas legadas: ese es el estado "colgado para siempre". */
+  leaseExpiresAt: Date | null
+  /** Slice 2 — monotónico por fila. Finalizar exige presentar el token vigente. */
+  fenceToken: number
   createdAt: Date
   updatedAt: Date
+}
+
+/** Error de fencing: quien finaliza ya no es el dueño del claim. No es un fallo del render. */
+export class InsightRenderFenceLostError extends Error {
+  readonly insightOutputId: string
+  readonly presentedFence: number
+
+  constructor(insightOutputId: string, presentedFence: number) {
+    super(
+      `El output ${insightOutputId} fue reclamado por otra ejecución (fence ${presentedFence} ya no es el vigente): ` +
+        'esta finalización se descarta sin efecto.'
+    )
+    this.name = 'InsightRenderFenceLostError'
+    this.insightOutputId = insightOutputId
+    this.presentedFence = presentedFence
+  }
 }
 
 /**

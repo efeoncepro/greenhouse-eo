@@ -1483,7 +1483,9 @@ export interface GreenhouseCommercialProposalRenderJobs {
   execution_name: string | null;
   failure_code: string | null;
   failure_detail: string | null;
+  fence_token: Generated<Int8>;
   finished_at: Timestamp | null;
+  lease_expires_at: Timestamp | null;
   manifest: Json;
   manifest_hash: string;
   max_attempts: Generated<number>;
@@ -10209,8 +10211,10 @@ export interface GreenhouseInsightsInsightOutputs {
   execution_name: string | null;
   failure_code: string | null;
   failure_detail: string | null;
+  fence_token: Generated<Int8>;
   finished_at: Timestamp | null;
   insight_output_id: Generated<string>;
+  lease_expires_at: Timestamp | null;
   manifest: Json;
   manifest_hash: string;
   max_attempts: Generated<number>;

@@ -120,11 +120,14 @@ export const createInsightsConsumer = (): RenderConsumer => {
     },
 
     markCompleted: async (view, input) => {
+      const record = requireClaimed()
+
       // El CHECK de la tabla exige asset en `completed`: un output "completo" sin bytes es
       // justamente lo que el puerto de outputs no puede aceptar para emitir.
       if (!input.primaryAssetId) {
         await markInsightOutputFailed({
           insightOutputId: view.jobId,
+          fenceToken: record.fenceToken,
           failureCode: 'render_error',
           failureDetail: 'El render terminó sin producir el archivo principal del output.'
         })
@@ -132,8 +135,11 @@ export const createInsightsConsumer = (): RenderConsumer => {
         return
       }
 
+      // El fence del claim viaja hasta acá: si otra ejecución reclamó el output mientras
+      // renderizábamos, esta finalización se descarta sin escribir.
       await markInsightOutputCompleted({
         insightOutputId: view.jobId,
+        fenceToken: record.fenceToken,
         outputAssetId: input.primaryAssetId,
         outputReport: { ...input.report, previewAssetIds: input.previewAssetIds }
       })
@@ -142,6 +148,7 @@ export const createInsightsConsumer = (): RenderConsumer => {
     markFailed: async (view, input) => {
       await markInsightOutputFailed({
         insightOutputId: view.jobId,
+        fenceToken: claimed?.fenceToken,
         failureCode: input.failureCode as InsightRenderFailureCode,
         failureDetail: input.failureDetail
       })
