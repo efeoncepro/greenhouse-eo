@@ -3,7 +3,7 @@
 ## Delta 2026-09-15
 
 - Existe el puerto `InsightOutputsPort` (`src/lib/efeonce-insights/ports.ts`, `setInsightOutputsPort`) que `issueInsightEdition` invoca antes de emitir: hoy falla cerrado (`not_ready`). El pipeline por fases vive en `commands/generation.ts` (síncrono tras el commit); snapshot sellado y plan congelado en `greenhouse_insights.insight_evidence_snapshots`/`insight_editorial_plans`. Eventos `insights.edition.created`/`insights.evidence.sealed` ya se publican. — cerrado/preparado por TASK-1845
-- **Rollout 2026-09-15 (TASK-1845):** el puerto de outputs y el pipeline por fases ya corren **en producción** con `INSIGHTS_GENERATION_ENABLED=true` en staging y producción (emisión e IA OFF); ediciones reales `EO-INS-000012/13` (staging) y `EO-INS-000014` (producción) quedaron `ready_for_review`. El gateway `efeonce-mcp` 1.5.0 federa las 4 tools (47 tools, 8 clases de scope) y el scope `efeonce.mcp.insights.write` existe en Entra (sin cliente que lo porte ⇒ `insufficient_scope` al crear). Detalle: arquitectura §14. Al conectar `InsightOutputsPort`, esta task hereda un runtime vivo: cualquier cambio en `issue` se prueba contra ediciones ya persistidas, y `INSIGHTS_ISSUANCE_ENABLED` sigue OFF hasta que el render valide outputs. El worker debe declarar su propia lectura de los flags en el ledger (hoy sólo Vercel los lee).
+- **Rollout 2026-09-15 (TASK-1845):** el puerto de outputs y el pipeline por fases ya corren **en producción** con `INSIGHTS_GENERATION_ENABLED=true` en staging y producción (emisión e IA OFF); ediciones `EO-INS-000012/13` (staging) y `EO-INS-000014` (runtime de producción) quedaron `ready_for_review` — **todas sobre la organización sandbox `Greenhouse Demo` (`org-6c09b3a7…`), ninguna con dato de cliente**; «producción» es el runtime que las generó, no la naturaleza del dato. El gateway `efeonce-mcp` 1.5.0 federa las 4 tools (47 tools, 8 clases de scope) y el scope `efeonce.mcp.insights.write` existe en Entra (sin cliente que lo porte ⇒ `insufficient_scope` al crear). Detalle: arquitectura §14. Al conectar `InsightOutputsPort`, esta task hereda un runtime vivo: cualquier cambio en `issue` se prueba contra ediciones ya persistidas, y `INSIGHTS_ISSUANCE_ENABLED` sigue OFF hasta que el render valide outputs. El worker debe declarar su propia lectura de los flags en el ledger (hoy sólo Vercel los lee).
 - **Deuda heredada del canary:** `plan.limits` repite «ico: sin datos.» una vez por cada rechazo `no_data` del snapshot; **esta task debe deduplicar `plan.limits`** (mismo texto ⇒ una entrada) antes de que un límite llegue a un PDF. — hallazgo del canary de TASK-1845
 - Desbloqueada de TASK-1845 (2026-09-15): la foundation de Efeonce Insights está en producción (release `9c094688309d`, generación ON en Vercel, gateway v1.5.0 federado, scope en Entra); TASK-1845 sigue `in-progress` sólo por dos evidencias de cierre (ensayo `migrate:down` y sesión MCP con token humano) que no condicionan este trabajo. — cerrado por rollout de TASK-1845
 
@@ -353,3 +353,18 @@ unidad se resuelven en sus slices. TASK-1672/1673 conservan la integración espe
 
 Sin preguntas que bloqueen el registro. Confirmar límites, rutas y mapping propuestos en Discovery contra
 código/runtime; no inventar disponibilidad. Antes de implementar, /goal explícito y codex:task-hook.
+
+## Nota operativa — ensayo de rollback de TASK-1845 (2026-09-16 00:24–00:25Z)
+
+`greenhouse-eo-96` ejecutó el ensayo `migrate:down` + `migrate:up` de la migración de 1845 sobre la instancia
+compartida `efeonce-group:us-east4:greenhouse-pg-dev`, con autorización explícita del operador en su sesión.
+Verificado por esta sesión después del hecho: schema recreado con sus 7 tablas; **una sola** asignación de
+`insights_v1`, hacia `org-6c09b3a7-cbab-48a9-869e-61d03d1c6291` (`Greenhouse Demo`, sandbox) — ninguna
+organización real tenía el módulo, así que la ventana sin schema no pudo romper una generación de cliente.
+La secuencia de códigos volvió a `EO-INS-000001`.
+
+Límite honesto: el contenido previo al `down` ya no es verificable de forma independiente; lo comprobado es el
+estado posterior y la asignación única, esta última corroborada también por la salida que el operador pegó antes
+del ensayo. Para 1846 importa una cosa: **`greenhouse-pg-dev` sirve producción pese al nombre** (CLAUDE.md,
+ISSUE-161), así que cualquier `down` de las migraciones de esta task es destructivo sobre producción y necesita
+la misma autorización explícita.
