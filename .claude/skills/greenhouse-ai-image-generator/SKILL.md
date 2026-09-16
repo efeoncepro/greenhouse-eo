@@ -428,12 +428,12 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   (`workflows/engine-selection-by-fidelity-contract.md`). El CLI valida cada flag contra el contrato del endpoint
   **antes** de gastar: flags de video en una capacidad de imagen, o de entrenamiento fuera de un entrenador, fallan.
   `--task` quedó corregido: **sólo** Seedance 2.5 reference-to-video lo acepta (antes Seedance 2.0 lo rechazaba
-  después de encolar; verificado en local (el CLI rechaza `--task` en `seedance20-r2v` sin encolar); `seedance25-r2v` con `--task` no tiene corrida real y sigue sin verificar.) `--list` agrupa IMAGE / VIDEO / TRAINING y marca `[NO OPERABLE POR COLA]`.
+  después de encolar; verificado en local (el CLI rechaza `--task` en `seedance20-r2v` sin encolar); `seedance25-r2v` con `--task reference|editing|extension` quedó verificado en real 2026-09-16.) `--list` agrupa IMAGE / VIDEO / TRAINING y marca `[NO OPERABLE POR COLA]`.
 - 🔴 Todo `--capability`/`--model` sin `--list` **gasta dinero**. fal no devuelve `usage`: el CLI no reporta
   costo por corrida; no inventes precios. Si la capacidad figura SIN VERIFICAR, el CLI lo advierte antes de gastar.
-- 🔴 **Saldo de fal agotado al 2026-09-16.** Toda corrida nueva falla con **403 `User is locked. Reason: Exhausted
-  balance`** antes de encolar (sin costo). No es un bug del CLI ni de la key: hay que **recargar** en
-  `fal.ai/dashboard/billing`, y eso lo hace una persona (el operador), nunca el agente. No reintentes en loop.
+- 🔴 **Bloqueo por saldo:** un 403 **`User is locked. Reason: Exhausted balance`** (o `TOP_UP`) ocurre antes de encolar
+  (sin costo). El CLI ya hace failover a la otra cuenta; si **todas** están bloqueadas, recargar en
+  `fal.ai/dashboard/billing` lo hace una persona (el operador), nunca el agente. No reintentes en loop.
 - **Cuentas y saldo:** el CLI trabaja con dos cuentas de fal (`FAL_API_KEY`, `FAL_API_KEY_B`): usa la de más saldo y
   hace failover solo ante 403 `User is locked`. `pnpm ai:fal --balance` lista ambos saldos gratis; `--fal-account` fuerza
   una. Si todas están sin saldo, recarga una cuenta configurada (caso 2026-09-16: se recargó la B cuando el CLI sólo
@@ -445,8 +445,8 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
 - **Pendientes:** LoRA de H3 (postergada por decisión del operador) y Recraft sin vía operativa (Higgsfield CLI sin sesión).
 - **Retome (request_id):** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408)
   el trabajo **sigue corriendo y cobrando** en fal: no relances; usa el comando de retome que imprime el CLI
-  (verificado: mismo archivo byte a byte; alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream, Seedance y Flux 3 usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.) La cola se direcciona por APP (dos primeros segmentos del slug), no por
-  slug completo. Timeouts por defecto: imagen 3 min, video 15 min, entrenamiento 3 h.
+  (verificado: mismo archivo byte a byte; alcance de la verificación: el retome se probó en real con `h3turbo-t2v` y con un Seedance 2.5 r2v que superó la espera anterior; Seedream y Flux 3 usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.) La cola se direcciona por APP (dos primeros segmentos del slug), no por
+  slug completo. Timeouts por defecto: imagen 3 min, video 30 min (antes 15), entrenamiento 3 h.
 - Minimax H3 (17 endpoints, 9 verificados 2026-09-16): Max Turbo / Max / base + variantes LoRA y 4 entrenadores
   (sin verificar). `h3max-director` es stream realtime: el CLI se niega a operarlo por cola. Detalle y precios en
   `motion-design-studio`.
@@ -460,8 +460,8 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   `flux3-enhance` lo acepta (y lo exige). `extend` exige pista de audio en el origen (el CLI lo revisa con
   `ffprobe` en archivos locales) y entrega sólo la continuación. Precios y elección en `motion-design-studio`.
 - **Wan 3.0 / Wan 3.0 Prime** (6 endpoints `alibaba/wan-3.0/*` y `alibaba/wan-3.0-prime/*`, **sin** `fal-ai/`;
-  conectados 2026-09-16): **video** t2v / i2v / r2v, USD 0,05/s. Sólo `wan3-t2v` está **verificado en real**; los
-  otros 5 quedaron sin verificar por el 403 de saldo. No hay edición ni imagen en Wan 3.0 (la edición de Wan es la
+  conectados 2026-09-16): **video** t2v / i2v / r2v, USD 0,05/s. Los 6 están **verificados en real** (2026-09-16;
+  los 5 que había bloqueado el 403 de saldo se corrieron con la cuenta B). No hay edición ni imagen en Wan 3.0 (la edición de Wan es la
   2.7, no conectada). Flags propios: `--duration auto` (se envía `null`: duración inteligente; o entero 2–30),
   `--no-audio` (campo `audio`), `--no-prompt-expansion` (booleano; distinto del `--prompt-expansion <modo>` de H3),
   `--thinking`, y en r2v `--web-url <url pública>` / `--file <path|url>`, que **exigen `--thinking`**. Resolución

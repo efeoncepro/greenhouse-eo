@@ -156,8 +156,11 @@ Fal lista `google/gemini-omni-flash`, `/image-to-video`, `/reference-to-video` y
 opera Omni por Fal: se conecta directo por las plataformas de Google (el registro de `pnpm ai:fal` no lo incluye).
 **Reafirmado 2026-09-16 por el operador:** Omni Flash y Nano Banana Pro van directo por Google, nunca por Fal (por
 Google es más barato con la misma calidad). Los motores de video que sí operan por `pnpm ai:fal` como alternativa
-out-of-band son Seedance, Minimax H3, Flux 3 y Wan 3.0; al 2026-09-16 el saldo de Fal está agotado y toda corrida
-falla con 403 hasta recargarlo (ver catálogo Fal §Carril operativo).
+out-of-band son Seedance, Minimax H3, Flux 3 y Wan 3.0. **Delta 2026-09-16:** el bloqueo por saldo agotado de ese
+mismo día quedó superado: el cliente usa dos cuentas de Fal, elige la de más saldo y cambia sola ante un 403 por
+saldo (`pnpm ai:fal --balance` muestra los saldos). El registro quedó con 47 de 55 capacidades verificadas, incluidas
+las de Wan 3.0 y Seedance. Ojo con Seedance 2.5 en video a video: su filtro rechaza marcas y personas reales
+**después** de encolar y cobra el intento; con personas o marcas, usar Flux 3 o Wan 3.0. Ver [catálogo Fal §Cuentas, saldo y operación del CLI](../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md).
 
 ### Patrón motion validado: single-shot → familia profesional
 

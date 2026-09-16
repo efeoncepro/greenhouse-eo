@@ -1,6 +1,6 @@
 # Selección de motor por contrato de fidelidad — no por canal
 
-> **Estado:** evidencia operativa limitada — 2026-07-11 (operación de Flux 3, Wan 3.0, video a video y candidatos no conectados actualizada 2026-09-16). No declara un ganador universal ni sustituye el gate de revisión humana.
+> **Estado:** evidencia operativa limitada — 2026-07-11 (operación de Flux 3, Wan 3.0, video a video, verificación completa de Seedance/Wan, costo real, filtro de contenido y candidatos no conectados actualizada 2026-09-16). No declara un ganador universal ni sustituye el gate de revisión humana.
 >
 > **Evidencia empírica:** [`Social Wall`](../../../../ai-generations/2026-07-08_social-wall-assets/README.md) (paquete de key visuals con `gpt-image-2` → Gemini Omni image-to-video, publicado) y [`Glitch`](../../../../ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-seedance-source-keyvisual-review.md) (Seedance retuvo el set, pero el take aún se rechazó por actuación/foley).
 
@@ -28,6 +28,8 @@ audio. Si no existe y es el significado del plano, reabre producción de toma in
 Seedance se opera con el CLI `pnpm ai:fal` (`scripts/ai/fal-image.ts`, registro en `src/lib/ai/fal-capabilities.ts`),
 out-of-band y nunca runtime del producto. No armar scripts ad-hoc sobre `runFalModel`. `pnpm ai:fal --list` es
 gratis; cualquier corrida con `--capability` gasta, y fal no devuelve `usage`: el CLI no reporta costo por corrida.
+El CLI opera dos cuentas de fal con failover por saldo (`pnpm ai:fal --balance` las lista gratis); el detalle vive en
+`greenhouse-ai-image-generator` y en `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`.
 
 ```bash
 pnpm ai:fal --capability seedance25-i2v --image frame.png --prompt "…" --duration 5 --resolution 720p --no-audio --out shot.mp4
@@ -40,7 +42,7 @@ v1/v1.5 sí lo llevan: el prefijo depende del endpoint). Los límites difieren *
 
 | Endpoint | Duración | Resoluciones | Notas |
 | --- | --- | --- | --- |
-| 2.5 (`seedance25-*`) | 4–30 s o `auto` | 480p · 720p · 1080p | Sin 4K. Sólo su `r2v` acepta `--task reference\|editing\|extension` (validación verificada en local; uso real sin verificar) |
+| 2.5 (`seedance25-*`) | 4–30 s o `auto` | 480p · 720p · 1080p | Sin 4K. Sólo su `r2v` acepta `--task reference\|editing\|extension` (los tres verificados en real 2026-09-16) |
 | 2.0 base (`seedance20-*`) | 4–15 s o `auto` | 480p · 720p · 1080p · 4k | Único con 4K (verificado: 3840×2160 real) |
 | 2.0 `fast` / `us` | 4–15 s o `auto` | 480p · 720p | — |
 | 2.0 `mini` | 4–15 s o `auto` | 480p · 720p | Sin `--bitrate` (no expone `bitrate_mode`) |
@@ -49,7 +51,7 @@ La duración mínima es **4 s** en todos (el registro decía 1 hasta 2026-09-16;
 
 - Aspectos en todos: `auto`, `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16` (`--aspect`).
 - `i2v` acepta `--end-image` (último cuadro); `r2v` acepta `--image`, `--video` y `--audio` (repetibles). `--no-audio`
-  apaga el audio generado. Timeout de video por defecto: 900 s.
+  apaga el audio generado. Espera de video por defecto: 30 min (antes 15; Seedance 2.5 con referencias la superó).
 - `r2v` exige **al menos una referencia visual** (imagen o video): el audio solo no alcanza. Las referencias se citan
   en el prompt como `@Image1`, `@Video1`, `@Audio1`. Topes que el CLI valida antes de subir (leídos del OpenAPI):
   - **2.5:** hasta 30 imágenes, 10 videos (cada uno 1,8–30,2 s, ≤ 200 MB, 300–6000 px por lado, 24–60 fps;
@@ -58,8 +60,15 @@ La duración mínima es **4 s** en todos (el registro decía 1 hasta 2026-09-16;
     3 audios (≤ 15 s combinados); máximo 12 archivos.
 - `--task` (sólo `seedance25-r2v`): el CLI valida el valor; `editing` y `extension` exigen `--video`; `editing`
   rechaza `--duration` y `--aspect`, y `extension` rechaza `--aspect` (el proveedor los fuerza a `auto`).
-- Verificados 2026-09-16: `seedance25-t2v`, `seedance25-i2v` (con upload de imagen local) y `seedance20-t2v` (4K).
-  Los otros 12 están declarados sin verificar: el CLI lo advierte antes de gastar; la primera corrida es prueba.
+- **Los 15 verificados en real 2026-09-16:** `seedance25-t2v`, `seedance25-i2v` (con upload de imagen local),
+  `seedance20-t2v` (4K), `seedance20-i2v`, `seedance20-r2v`, los 9 `seedance20-{fast,mini,us}-{t2v,i2v,r2v}` y
+  `seedance25-r2v` con `--task reference`, `editing` y `extension`.
+- **Costo real, no estimado:** Seedance costó ~2× lo que daba la equivalencia de tokens de OpenArt; esa equivalencia
+  **no sirve para presupuestar**. Referencias medidas: 3 corridas `seedance20-fast` de 4 s a 480p ≈ USD 1,37; 3 `mini`
+  ≈ USD 0,85. La tanda completa de verificación (17 corridas, incluidas 3 rechazadas) costó USD 7,71.
+- **Filtro de contenido de ByteDance:** rechaza **después de encolar, y se cobra** (422 `content_policy_violation`,
+  `partner_validation_failed`). Casos medidos: referencia con el isotipo de Efeonce → "potential copyright violation";
+  video con una persona → "likenesses of real people". No mandes marcas ni personas identificables a Seedance.
 
 **Criterio de elección:** toma larga (más de 15 s) → **2.5**; entrega en **4K** → **2.0 base**; exploración barata
 de movimiento o actuación → **2.0 `mini`/`fast` a 480p**, y subir de tier sólo con el take aprobado. Catálogo
@@ -67,7 +76,12 @@ completo: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`.
 
 **Retome sin recobro:** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408), el
 trabajo **sigue corriendo y cobrando** en fal; no relances: `pnpm ai:fal --capability <id> --request-id <id>`
-recupera la salida sin reenviar ni cobrar (verificado: mismo archivo byte a byte). El código aplica a Seedance, H3, Flux 3 y Seedream. Alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream, Seedance y Flux 3 usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.
+recupera la salida sin reenviar ni cobrar (verificado: mismo archivo byte a byte; se usó también para recuperar un
+Seedance 2.5 con referencias que superó la espera anterior de 15 min). El código aplica a Seedance, H3, Flux 3 y Seedream. Alcance de la verificación: el retome se probó en real con `h3turbo-t2v` y con un Seedance 2.5 r2v (2026-09-16); Seedream y Flux 3 usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.
+
+**Trabajos largos sin esperar:** `--detach` encola, imprime `request_id`, cuenta y los comandos de estado/resultado,
+y termina; `pnpm ai:fal --capability <id> --status --request-id <id>` consulta una vez (cola/progreso/completado) sin
+costo; el resultado se baja con `--request-id`. Verificado en real 2026-09-16. Los webhooks de fal no se usan en el CLI.
 
 ## Operar Minimax H3: `pnpm ai:fal` (conectado 2026-09-16)
 
@@ -170,7 +184,7 @@ edición de video más reciente de Wan es la 2.7, **no conectada**).
 | ids | Estado |
 | --- | --- |
 | `wan3-t2v` | **Verificado en real** 2026-09-16: 480p, `--duration auto` → 5,04 s, `--seed 7` respetado, `--no-prompt-expansion` → `actual_prompt` null, 854×480 con audio |
-| `wan3-i2v`, `wan3-r2v`, `wan3prime-t2v`, `wan3prime-i2v`, `wan3prime-r2v` | **Sin verificar**: la corrida se intentó y fal respondió 403 `Exhausted balance` antes de encolar (sin costo). Pendiente recargar saldo y re-correr |
+| `wan3-i2v`, `wan3-r2v`, `wan3prime-t2v`, `wan3prime-i2v`, `wan3prime-r2v` | **Verificados en real** 2026-09-16 (con la cuenta B de fal, tras el bloqueo por saldo de la A) |
 
 ```bash
 pnpm ai:fal --capability wan3-t2v --prompt "…" --resolution 480p --duration auto --seed 7 --out explora.mp4
@@ -202,7 +216,7 @@ Contrato (leído del OpenAPI 2026-09-16, igual en base y Prime; el CLI valida an
 **Cuándo elegir Wan 3.0:** toma de **hasta 30 s con duración decidida por el modelo** (`auto`); **video explicativo
 basado en una web o un documento** (`--web-url`/`--file` + `--thinking`), que ningún otro motor conectado ofrece;
 **R2V que mezcla imagen, video y audio** con topes intermedios (10/5/5). Para 4K sigue Seedance 2.0 base o H3 base
-(Wan tope 1080p); para edición/extensión verificada, Flux 3. El #1 de OpenArt en edición **no se traduce** a edición
+(Wan tope 1080p); para edición/extensión, Flux 3 o Seedance 2.5 (esta última sólo sin personas ni marcas). El #1 de OpenArt en edición **no se traduce** a edición
 operable acá: Wan 3.0 no tiene endpoint de edición en fal.
 
 ## Video a video: qué motor
@@ -213,15 +227,16 @@ opciones con estado distinto:
 | Necesidad | Motor | Estado | Límites que deciden |
 | --- | --- | --- | --- |
 | **Editar** un clip existente | `flux3-edit` | **Verificado** (2026-09-16) | USD 0,03/s; conserva movimiento, timing y encuadre; origen MP4 < 50 MB y < 15 s (OpenAPI) |
-| **Editar** un clip existente | `seedance25-r2v --task editing --video` | **Sin verificar** (leído del OpenAPI) | El proveedor fuerza `aspect_ratio` y `duration` a `auto`; videos de referencia hasta 30,2 s combinados |
+| **Editar** un clip existente | `seedance25-r2v --task editing --video` | **Verificado** (2026-09-16: convirtió un viñedo en nieve conservando el encuadre) | El proveedor fuerza `aspect_ratio` y `duration` a `auto`; videos de referencia hasta 30,2 s combinados |
 | **Extender** un clip | `flux3-extend` | **Verificado** (2026-09-16) | Exige audio en el origen; entrega sólo la continuación (5–20 s o `auto`), que se une en post |
-| **Extender** un clip | `seedance25-r2v --task extension --video` | **Sin verificar** (leído del OpenAPI) | El proveedor fuerza `aspect_ratio` a `auto`; duración 4–30 s o `auto` |
-| Usar un video sólo como **guía** (cámara, blocking, ritmo) | `seedance20-*-r2v` (se cita como `@Video1`) o `seedance25-r2v --task reference` | Sin verificar con video | Seedance 2.0 no edita ni extiende: sólo condiciona la generación nueva |
-| Usar un video como **referencia** junto a imágenes y audio | `wan3-r2v` / `wan3prime-r2v` (se cita como `Video 1`) | **Sin verificar** (OpenAPI; bloqueado por saldo) | Hasta 5 videos ≤ 15 s en total, ≥ 16 fps; genera una toma nueva, no edita el clip |
+| **Extender** un clip | `seedance25-r2v --task extension --video` | **Verificado** (2026-09-16: siguió el movimiento y reveló los Andes) | El proveedor fuerza `aspect_ratio` a `auto`; duración 4–30 s o `auto` |
+| Usar un video sólo como **guía** (cámara, blocking, ritmo) | `seedance20-*-r2v` (se cita como `@Video1`) o `seedance25-r2v --task reference` | Endpoints verificados en real 2026-09-16 (`reference` incluido) | Seedance 2.0 no edita ni extiende: sólo condiciona la generación nueva |
+| Usar un video como **referencia** junto a imágenes y audio | `wan3-r2v` / `wan3prime-r2v` (se cita como `Video 1`) | Endpoint **verificado** en real 2026-09-16; topes leídos del OpenAPI | Hasta 5 videos ≤ 15 s en total, ≥ 16 fps; genera una toma nueva, no edita el clip |
 
-Mientras Seedance 2.5 `editing`/`extension` no tenga corrida real, la primera mano verificada es Flux 3. Antes de
-recomendar Seedance para video a video en una entrega, haz una corrida corta de `editing` y otra de `extension` y
-registra el resultado. Wan 3.0 **no edita** en fal (la edición de Wan es la 2.7, no conectada), aunque rankee #1 en
+**Regla del filtro:** Seedance 2.5 `editing`/`extension` ya está verificado, pero el filtro de ByteDance rechaza
+**después de encolar y cobra** el material con **marcas** o **personas reales identificables**. Úsalo sólo con
+material sin personas ni marcas (paisaje, producto genérico, ambiente); con personas, la mano es **Flux 3**
+(`flux3-edit`/`flux3-extend`) o **Wan 3.0** (r2v, toma nueva). Wan 3.0 **no edita** en fal (la edición de Wan es la 2.7, no conectada), aunque rankee #1 en
 Video Editing en OpenArt.
 
 ## Candidatos evaluados, no conectados (revisión 2026-09-16)
@@ -243,7 +258,7 @@ decisión del operador (más barato, misma calidad).
 
 Seedance recibe referencias de texto, imagen, audio y video; una previs se aporta como media exportada, no como `.blend` ni escena editable. El video puede orientar cámara, composición, blocking y ritmo, mientras una imagen alineada define el look final. Esto sigue siendo condicionamiento interpretativo: no garantiza cámara 3D, geometría, contactos, texto ni continuidad frame-perfect.
 
-Antes de probar, confirmar que el endpoint expone **video de referencia + imagen de referencia** (los `r2v` de `pnpm ai:fal` aceptan `--image` y `--video`; ninguno está verificado aún) y registrar modelo/tier, prompt, costo, metadata y rúbrica temporal. La fuente funcional, las referencias oficiales y el límite específico de Glitch viven en `docs/documentation/ai-tooling/previs-3d-y-referencias-seedance.md`. El blocking 3D Glitch fue rechazado por el operador: no reutilizarlo ni elevar esta capacidad a workflow validado sin un fixture nuevo autorizado.
+Antes de probar, confirmar que el endpoint expone **video de referencia + imagen de referencia** (los `r2v` de `pnpm ai:fal` aceptan `--image` y `--video`; los endpoints están verificados en real desde 2026-09-16, pero el flujo previs → Seedance no tiene corrida) y registrar modelo/tier, prompt, costo, metadata y rúbrica temporal. La fuente funcional, las referencias oficiales y el límite específico de Glitch viven en `docs/documentation/ai-tooling/previs-3d-y-referencias-seedance.md`. El blocking 3D Glitch fue rechazado por el operador: no reutilizarlo ni elevar esta capacidad a workflow validado sin un fixture nuevo autorizado.
 
 ## Caso validado: Redes Sociales
 
@@ -262,7 +277,7 @@ El PNG 4K ya contiene el micrófono, la cabina y el `ON AIR` como objeto físico
 1. Seedance es la primera mano razonable cuando el set debe mantenerse reconocible.
 2. Preservar el set no aprueba una actuación: `tap → rebote → aire → tap → rebote` y dos foleys reales siguen siendo gates independientes.
 
-El reintento T está documentado pero bloqueado por saldo Fal. No promocionar Seedance a receta “validada” hasta que pase esos gates.
+El reintento T quedó documentado y bloqueado por saldo Fal (desde 2026-09-16 hay saldo en la cuenta B; no consta re-corrida). No promocionar Seedance a receta “validada” hasta que pase esos gates.
 
 ## Preflight antes de gastar
 

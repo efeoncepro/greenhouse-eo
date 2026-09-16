@@ -37,10 +37,12 @@
   `pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ./capas` devuelve hasta 16 capas
   con alfa real + `layers.json`. Es dirección de arte sobre capas; el logo oficial y el copy final siguen
   saliendo del vector y de la composición determinística.
-- **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Minimax H3 (Fal, conectado 2026-09-16: Max Turbo exploración barata · Max `camera-controls` cámara sobre imagen congelada · base 2K/4K) / Flux 3 (Fal, conectado y verificado 2026-09-16: video, no imagen; draft → enhance · primer/último cuadro y keyframes · edit y extend para video a video) / Wan 3.0 (Fal, conectado 2026-09-16, sólo `wan3-t2v` verificado: hasta 30 s con duración inteligente · video desde una web o documento) / Veo 3.1 (premium, Vertex) /
+- **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Minimax H3 (Fal, conectado 2026-09-16: Max Turbo exploración barata · Max `camera-controls` cámara sobre imagen congelada · base 2K/4K) / Flux 3 (Fal, conectado y verificado 2026-09-16: video, no imagen; draft → enhance · primer/último cuadro y keyframes · edit y extend para video a video) / Wan 3.0 (Fal, conectado y verificado 2026-09-16: hasta 30 s con duración inteligente · video desde una web o documento) / Veo 3.1 (premium, Vertex) /
   PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal; **evaluado, no conectado**) / Grok Imagine video (Fal; **evaluado, no conectado**) / Gemini Omni (canary, Vertex directo, nunca Fal);
   Seedance, H3, Flux 3 y Wan 3.0 se operan con `pnpm ai:fal` y el endpoint (Seedance 2.5 larga · 2.0 base 4K · H3 Turbo exploración · Flux 3 draft/edit/extend · Wan 3.0 duración `auto`/web/documento) se elige en
-  `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`;
+  `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md` (Seedance: sin marcas ni personas reales,
+  su filtro rechaza tras encolar y cobra); el CLI usa dos cuentas de fal con failover por saldo
+  (`docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`);
   producción y formato social →
   `social-media-studio`. Un clip de duración mínima sólo valida el endpoint: el release profesional exige
   master + cutdown por ratio, end card, poster, audio/captions y QA temporal.

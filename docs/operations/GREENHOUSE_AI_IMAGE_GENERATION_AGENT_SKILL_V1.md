@@ -3,7 +3,7 @@
 > **Tipo:** operating guide para agentes
 > **Estado:** Accepted
 > **Creado:** 2026-06-01
-> **Ultima actualizacion:** 2026-09-16 por Claude (Wan 3.0 en `pnpm ai:fal` —1 de 6 verificado, resto bloqueado por saldo agotado de fal—, estado real de Nano Banana Pro y Kling 3 / Grok Imagine revisados sin conectar; antes, Flux 3 en `pnpm ai:fal` —video, no imagen— y contrato real de Seedance video a video; antes, Minimax H3 en `pnpm ai:fal`, retome por `--request-id`, brecha de `--task` cerrada; antes, CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
+> **Ultima actualizacion:** 2026-09-16 por Claude (`pnpm ai:fal` con dos cuentas y failover por saldo, `--balance`, `--detach`/`--status`, registro 47 de 55 verificado, costo real y filtro de contenido de Seedance; antes, Wan 3.0 en `pnpm ai:fal`, estado real de Nano Banana Pro y Kling 3 / Grok Imagine revisados sin conectar; antes, Flux 3 en `pnpm ai:fal` —video, no imagen— y contrato real de Seedance video a video; antes, Minimax H3 en `pnpm ai:fal`, retome por `--request-id`, brecha de `--task` cerrada; antes, CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
 > **Fuentes externas verificadas:** OpenAI developer docs 2026-08-21 y fichas oficiales Fal.ai 2026-07-18
 
 ## Purpose
@@ -152,7 +152,7 @@ snapshots de modelo rotan sin aviso.
 | Divergencia o materialidad Seedream 5 | `pnpm ai:fal --capability seedream5-lite` / `seedream5-pro` (+ `-edit`) | Out-of-band; no hay `usage` por corrida, consultar pricing vigente del proveedor |
 | Video desde texto, imagen o referencias | `pnpm ai:fal --capability seedance25-*` / `seedance20-*` | 2.5 de 4 a 30 s y 1080p; 2.0 base de 4 a 15 s y única con 4K; r2v exige imagen o video de referencia; el CLI valida límites antes de encolar |
 | Video desde primer/último cuadro o keyframes, borrador barato → final | `pnpm ai:fal --capability flux3-*` | Flux 3 es **video** en fal (no imagen); 12 endpoints verificados; draft USD 0,03/s → `flux3-enhance --draft-cache` |
-| Editar o extender un video existente | `flux3-edit` / `flux3-extend` (verificados) · `seedance25-r2v --task editing\|extension` (sin verificar) | Flux 3 extend exige audio en el origen y entrega sólo la continuación; en Seedance 2.0 el video sólo guía |
+| Editar o extender un video existente | `flux3-edit` / `flux3-extend` (verificados) · `seedance25-r2v --task editing\|extension` (verificados; el filtro de ByteDance rechaza marcas y personas reales y cobra el intento) | Flux 3 extend exige audio en el origen y entrega sólo la continuación; en Seedance 2.0 el video sólo guía |
 | Video de largo elegido por el modelo, o basado en una web o un documento | `pnpm ai:fal --capability wan3-*` / `wan3prime-*` | Wan 3.0: 2–30 s o `auto`, default **1080p**; r2v con `--thinking --web-url`/`--file`; sólo `wan3-t2v` verificado |
 
 ## Prompt Anatomy
@@ -500,7 +500,8 @@ Flags: `--list` · `--capability <id>` · `--model <slug>` · `--prompt` / `--pr
 `--format jpeg|png` · `--input <json>` · `--out` / `--out-dir` · `--timeout <ms>` · `--json`. Video:
 `--duration <n|auto>` · `--resolution` · `--aspect` · `--bitrate standard|high` · `--task reference|editing|extension`
 · `--no-audio` · `--end-image <path|url>` · `--audio <path|url>` (repetible) · `--video <path|url>` (repetible).
-Timeout por defecto 180 s; sube solo a 900 s en capacidades de video.
+Timeout por defecto 180 s; sube solo a 30 min en capacidades de video (antes 15 min) y a 3 h en entrenamiento. Cuentas y
+cola: `--balance` · `--fal-account <FAL_API_KEY|FAL_API_KEY_B>` · `--detach` · `--status --request-id <id>` (ver delta de dos cuentas abajo).
 
 Reglas operativas:
 
@@ -528,9 +529,9 @@ Reglas operativas:
 - **Delta 2026-09-16 — Seedance video a video:** no hay endpoint video-to-video; vive en reference-to-video. Sólo
   2.5 edita (`--task editing`, sin `--duration`/`--aspect`) o extiende (`--task extension`, sin `--aspect`), ambos con
   `--video`; en 2.0 el video sólo guía. Duración mínima 4 s; al menos una imagen o video de referencia; topes de
-  referencias validados en local. `seedance25-r2v` sigue sin corrida real (leído del OpenAPI).
+  referencias validados en local. ~~`seedance25-r2v` sigue sin corrida real~~ → verificado en real el 2026-09-16 en `reference`, `editing` y `extension` (ver delta de verificación completa).
 - **Delta 2026-09-16 — Wan 3.0 conectado** (`wan3-*`, `wan3prime-*`; slugs `alibaba/wan-3.0{,-prime}/…` sin prefijo;
-  USD 0,05/s). **Sólo `wan3-t2v` verificado en real**; los otros 5 quedaron sin verificar por el 403 de saldo. Flags:
+  USD 0,05/s). Las 6 verificadas en real el 2026-09-16 (`wan3-t2v` primero; las otras 5 tras sumar la cuenta B). Flags:
   `--duration auto` (viaja como `null`), `--no-audio` (campo `audio`), `--no-prompt-expansion`, `--thinking`,
   `--seed <n>` (general) y, sólo en r2v, `--web-url`/`--file` (ambos exigen `--thinking`). Referencias: 10 imágenes,
   5 videos, 5 audios. Default de resolución **1080p**: pasar `480p`/`720p` al explorar. Contrato: catálogo fal
@@ -539,17 +540,26 @@ Reglas operativas:
   voz, 4K, motion-control; USD 0,112–0,42/s) y Grok Imagine (video v1.5 USD 0,01/s; edit/extend sólo en la versión
   sin número; imagen v2.0). Correrlos hoy sería `--model` fuera del registro y sin verificación. Detalle: catálogo
   fal §Candidatos evaluados, no conectados.
-- 🔴 **Delta 2026-09-16 — saldo de fal agotado:** toda corrida responde 403 `User is locked. Reason: Exhausted
-  balance` antes de encolar (sin costo). No reintentar ni cambiar de capacidad: una persona con acceso a la
-  facturación de fal debe recargar saldo (`fal.ai/dashboard/billing`). El agente no recarga ni ingresa medios de
-  pago; reporta el bloqueo.
+- **~~Delta 2026-09-16 — saldo de fal agotado~~ (superado el mismo día):** el 403 `User is locked. Reason: Exhausted
+  balance` venía de la cuenta A en negativo; la recarga se había hecho en otra cuenta (B).
+- **Delta 2026-09-16 — dos cuentas con failover:** el cliente usa `FAL_API_KEY` (cuenta A) y `FAL_API_KEY_B` (secreto
+  `greenhouse-fal-api-key-b`, cuenta B). Elige la de más saldo y, ante 403 `User is locked` al encolar o subir, pasa a
+  la siguiente (ese bloqueo no cobra; otros errores no cambian de cuenta). `pnpm ai:fal --balance` lista saldos gratis.
+  `--request-id` y `--status` buscan el request en la cuenta que lo creó. Si **todas** están bloqueadas, el agente no
+  recarga ni ingresa medios de pago: reporta el bloqueo con los saldos. Rotación de la clave B pendiente (se compartió
+  en una conversación). Detalle: catálogo fal §"Cuentas, saldo y operación del CLI (2026-09-16)".
+- **Delta 2026-09-16 — verificación completa: 47 de 55.** Sin verificar sólo 3 variantes LoRA de H3 + 4 entrenadores;
+  no operable `h3max-director`. Costo real de la tanda: USD 7,71 por 17 corridas (3 rechazadas por filtro, cobradas);
+  Seedance costó ~2× lo estimado con la equivalencia de tokens de OpenArt: no usarla para presupuestar.
+  **Filtro de Seedance (ByteDance):** rechaza después de encolar (422 `content_policy_violation`) referencias con
+  marcas (isotipo de Efeonce) o personas reales. Video a video con personas o marcas → Flux 3 edit/extend o Wan 3.0.
 - **Nano Banana Pro:** nunca por fal (decisión del operador 2026-09-16). En Google, `gemini-3-pro-image` está
   disponible en Vertex pero ninguna superficie lo usa; el provider `google-gemini-image` corre Nano Banana 2
   (`gemini-3.1-flash-image`) y no hay CLI de Gemini Image (`pnpm ai:image` es sólo OpenAI). No cambiar
   `GOOGLE_GEMINI_IMAGE_MODEL` para probarlo: cambia todo el carril. Ver arquitectura del generador §Carril Google.
 - El CLI imprime el `request_id` al encolar. Ante `HTTP 408` el trabajo **sigue cobrando en fal**: retomarlo con
   `pnpm ai:fal --capability <id> --request-id <id>` (no reenvía ni vuelve a cobrar), nunca relanzarlo.
-  Alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream y Seedance usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.
+  Alcance de la verificación: el retome se probó en real con `h3turbo-t2v` y, el 2026-09-16, con Seedance 2.5 referencias (superó 15 min y se recuperó con `--request-id`); Seedream usa el mismo código (`awaitFalRequest`) sin corrida propia de retome. Para no bloquear la terminal, `--detach` encola y termina; `--status` consulta sin costo.
 - Una capacidad con `verifiedAt: null` imprime una advertencia antes de gastar. Si la corrida funciona, anotar la
   fecha en `src/lib/ai/fal-capabilities.ts`; nunca marcarla sin haber corrido.
 - Layerize: el CLI escribe `NN-<nombre>.png` por capa (orden `z_index`) y `layers.json` con nombre, descripción,

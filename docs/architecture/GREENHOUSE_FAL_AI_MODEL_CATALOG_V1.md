@@ -1,8 +1,10 @@
 # Greenhouse — Fal.ai Model & Capability Catalog V1
 
-> **Tipo:** Referencia técnica agent-facing · **Version:** 1.6 · **Creado:** 2026-07-06 por Claude
-> **Última actualización:** 2026-09-16 por Claude — Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal` (6
-> endpoints de video; 1 verificado en real y 5 sin verificar porque el saldo de fal se agotó), revisión sin conexión
+> **Tipo:** Referencia técnica agent-facing · **Version:** 1.7 · **Creado:** 2026-07-06 por Claude
+> **Última actualización:** 2026-09-16 por Claude — dos cuentas de fal con failover, `--balance`, `--detach`/`--status`,
+> verificación completa (47 de 55), costo real y filtro de Seedance (§Cuentas, saldo y operación del CLI); limpieza
+> de estados «sin verificar por saldo» ya superados. Antes (1.6): Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal` (6
+> endpoints de video), revisión sin conexión
 > de Kling 3 y Grok Imagine, y decisión de mantener Gemini Omni Flash y Nano Banana Pro directo por Google. Antes
 > (1.3): Flux 3 conectado a `pnpm ai:fal` (12 endpoints de **video**,
 > todos verificados en real; flujo draft → enhance; extend exige audio en el origen y entrega sólo la
@@ -52,7 +54,7 @@ const res = await runFalModel<{ images?: Array<{ url: string }> }>({
 ```
 
 - **Model-agnostic:** cambiar de capacidad = cambiar el `slug` + el `input`. El cliente hace submit → poll → result (queue API).
-- **Secreto** server-side vía `FAL_API_KEY_SECRET_REF=greenhouse-fal-api-key` (GCP Secret Manager). NUNCA hardcodear la key.
+- **Secreto** server-side vía `FAL_API_KEY_SECRET_REF=greenhouse-fal-api-key` (cuenta A) y `FAL_API_KEY_B_SECRET_REF=greenhouse-fal-api-key-b` (cuenta B, desde 2026-09-16; ver §Cuentas, saldo y operación del CLI) en GCP Secret Manager. NUNCA hardcodear la key.
 - **Out-of-band, NO runtime del producto:** el cliente Greenhouse es un puente de laboratorio. El runtime
   productivo futuro pertenece al repositorio separado de Creative Studio.
 - **Gotcha queue URLs:** para slugs con sub-path (`fal-ai/flux/schnell`), Fal.ai devuelve `status_url`/`response_url` en el **app padre** (`fal-ai/flux/requests/...`). `runFalModel` ya usa esas URLs; nunca reconstruirlas a mano (da HTTP 405). La cola se direcciona por **app** (los dos primeros segmentos del slug), no por el slug completo: `minimax/h3/text-to-video` → `queue.fal.run/minimax/h3/requests/<id>`. El único punto que reconstruye el handle es el retome por `--request-id` de `pnpm ai:fal`, que usa esa regla y **avisa** si no coincide con el `status_url` que devolvió fal.
@@ -89,12 +91,12 @@ out-of-band: el runtime de imagen del producto sigue siendo `src/lib/ai/image-ge
   (`reference|editing|extension`), `editing` y `extension` exigen `--video`, `editing` rechaza `--duration` y
   `--aspect`, y `extension` rechaza `--aspect` (ver §Seedance video a video). Antes el CLI lo dejaba
   pasar en todo reference-to-video y el r2v de Seedance 2.0 lo rechazaba **después** de encolar; ahora se rechaza en
-  local en cualquier otra capacidad. Verificado en local (el CLI rechaza `--task` en `seedance20-r2v` sin encolar); `seedance25-r2v` con `--task` no tiene corrida real y sigue sin verificar.
+  local en cualquier otra capacidad. Verificado en local (el CLI rechaza `--task` en `seedance20-r2v` sin encolar); `seedance25-r2v` con `--task editing|extension` quedó verificado en real el 2026-09-16.
 - **`request_id` y retome:** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408),
   el trabajo **sigue corriendo y cobrando en fal**; el CLI imprime el comando de retome
   `pnpm ai:fal --capability <id> --request-id <id>`. Retomar no reenvía ni vuelve a cobrar (verificado: el archivo
   descargado es idéntico byte a byte). El código aplica a todas las capacidades, no sólo a H3. Alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream y Seedance usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.
-- **Timeouts por defecto:** imagen 3 min, video 15 min, entrenamiento 3 h (`--timeout <ms>` los sobrescribe).
+- **Timeouts por defecto:** imagen 3 min, video 30 min (antes 15), entrenamiento 3 h (`--timeout <ms>` los sobrescribe).
 - **Costo:** fal **no devuelve `usage`** en estas respuestas, así que el CLI no reporta costo por corrida (a
   diferencia de `ai:image`). Consultar el pricing vigente del proveedor, con fecha, antes de correr.
 - **Qué NO va por aquí:** Gemini Omni (incluido Omni Flash) y Nano Banana Pro se conectan directo por las
@@ -114,24 +116,22 @@ Capacidades registradas al 2026-09-16:
 | `seedream5-pro-layerize` | `bytedance/seedream/v5/pro/layerize` | separación por capas | ✅ 2026-09-16 (83,2 s) |
 | `seedream5-lite` | `bytedance/seedream/v5/lite/text-to-image` | texto a imagen | ✅ 2026-09-16 (43,8 s) |
 | `seedream5-lite-edit` | `bytedance/seedream/v5/lite/edit` | edición por referencia | ✅ 2026-09-16 (53,5 s) |
-| `seedance25-t2v` · `-i2v` · `-r2v` | `bytedance/seedance-2.5/{text,image,reference}-to-video` | video | t2v ✅ · i2v ✅ · r2v sin verificar |
-| `seedance20-t2v` · `-i2v` · `-r2v` | `bytedance/seedance-2.0/{text,image,reference}-to-video` | video | t2v ✅ (4K real) · i2v, r2v sin verificar |
-| `seedance20-fast-*` · `-mini-*` · `-us-*` | `bytedance/seedance-2.0/{fast,mini,us}/{text,image,reference}-to-video` | video | sin verificar (9) |
-| `h3-*` · `h3max-*` · `h3turbo-*` · `h3-train-*` | `minimax/h3*/…` (17 endpoints) | video + entrenamiento | 9 ✅ · 7 sin verificar · 1 no operable (ver §Minimax H3) |
+| `seedance25-t2v` · `-i2v` · `-r2v` | `bytedance/seedance-2.5/{text,image,reference}-to-video` | video | t2v ✅ · i2v ✅ · r2v ✅ 2026-09-16 (`reference`, `editing`, `extension`) |
+| `seedance20-t2v` · `-i2v` · `-r2v` | `bytedance/seedance-2.0/{text,image,reference}-to-video` | video | t2v ✅ (4K real) · i2v ✅ · r2v ✅ 2026-09-16 |
+| `seedance20-fast-*` · `-mini-*` · `-us-*` | `bytedance/seedance-2.0/{fast,mini,us}/{text,image,reference}-to-video` | video | 9 ✅ 2026-09-16 |
+| `h3-*` · `h3max-*` · `h3turbo-*` · `h3-train-*` | `minimax/h3*/…` (17 endpoints) | video + entrenamiento | 9 ✅ · 7 sin verificar (3 LoRA + 4 entrenadores, postergados) · 1 no operable (ver §Minimax H3) |
 | `flux3-*` | `blackforestlabs/flux-3/…` (12 endpoints) | video (incluye editar y extender) | 12 ✅ 2026-09-16 (ver §Flux 3) |
-| `wan3-*` · `wan3prime-*` | `alibaba/wan-3.0{,-prime}/{text,image,reference}-to-video` (6 endpoints) | video | 1 ✅ (`wan3-t2v`) · 5 sin verificar por saldo agotado (ver §Wan 3.0) |
+| `wan3-*` · `wan3prime-*` | `alibaba/wan-3.0{,-prime}/{text,image,reference}-to-video` (6 endpoints) | video | 6 ✅ 2026-09-16 (ver §Wan 3.0) |
 
 **Conteo global al 2026-09-16:** 55 capacidades registradas (5 Seedream 5, 15 Seedance, 17 Minimax H3, 12 Flux 3,
-6 Wan 3.0); **30 verificadas** contra el API real (5 Seedream 5, 3 Seedance, 9 H3, 12 Flux 3, 1 Wan 3.0). Las
+6 Wan 3.0); **47 verificadas** contra el API real (5 Seedream 5, 15 Seedance, 9 H3, 12 Flux 3, 6 Wan 3.0). Las
 familias Kling 3 y Grok Imagine se revisaron y quedaron fuera del registro por ahora. `--list` agrupa IMAGE /
 VIDEO / TRAINING.
 
-> ⚠️ **Bloqueo operativo — saldo de fal agotado (medido 2026-09-16):** toda corrida nueva falla antes de encolar con
-> HTTP 403 `User is locked. Reason: Exhausted balance` (sin costo, porque no llega a la cola). Por eso 5 de los 6
-> endpoints de Wan 3.0 quedaron sin verificar. No es un bug del CLI ni del slug: hay que recargar saldo en
-> `fal.ai/dashboard/billing`, lo que hace una persona con acceso a la facturación de fal. Un agente no recarga
-> saldo ni ingresa medios de pago. Tras recargar, re-correr las capacidades pendientes y recién entonces marcar
-> `verifiedAt`.
+> **Bloqueo por saldo del 2026-09-16 — superado el mismo día.** La cuenta A quedó en negativo y fal respondía 403
+> `User is locked. Reason: Exhausted balance` antes de encolar (sin costo). La recarga estaba en otra cuenta (B); el
+> cliente ahora usa ambas con failover y con B se verificó lo pendiente. Un agente no recarga saldo ni ingresa medios
+> de pago. Ver §Cuentas, saldo y operación del CLI (2026-09-16).
 
 No existe Seedream 5.1 en fal al 2026-09-16.
 
@@ -161,7 +161,7 @@ Aspectos en todos: `auto`, `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16`. Image-to
 4,04 s, 97 cuadros), `seedance25-i2v` (194 s → h264 854x480, 4,04 s, con upload de imagen) y `seedance20-t2v`
 (4K real: 3840x2160, 4,04 s).
 
-### Seedance video a video (contrato leído del OpenAPI 2026-09-16; sin corridas)
+### Seedance video a video (contrato leído del OpenAPI 2026-09-16; corridas reales el mismo día)
 
 fal **no expone** un endpoint `video-to-video` de Seedance. De los 21 endpoints Seedance del catálogo, los
 registrados son text-, image- y reference-to-video de 2.0 (base, fast, mini, us) y 2.5; v1/v1.5 son legacy, van
@@ -185,12 +185,13 @@ Validación local en `pnpm ai:fal` (2026-09-16): topes de referencias declarados
 visual; `--task` valida el valor y sólo lo acepta `seedance25-r2v`; `editing` y `extension` exigen `--video`;
 `editing` rechaza `--duration` y `--aspect`; `extension` rechaza `--aspect`.
 
-**Estado:** `seedance25-r2v` **sigue sin verificar en real**, ni con `editing` ni con `extension`. Pendiente: una
-corrida corta de cada tarea antes de usarlo en producción.
+**Estado:** `seedance25-r2v` **verificado en real el 2026-09-16** en `reference`, `editing` (convirtió un viñedo en
+nieve conservando el encuadre) y `extension` (siguió el movimiento y reveló los Andes). Su filtro de contenido rechaza
+marcas y personas reales después de encolar y cobra el intento: ver §Filtro de contenido de Seedance.
 
 **Elegir video a video:**
 
-| Necesidad | Opción verificada | Opción sin verificar |
+| Necesidad | Flux 3 (verificado) | Seedance (verificado 2026-09-16; sin personas ni marcas) |
 |---|---|---|
 | Editar un clip existente | `flux3-edit` (USD 0,03/s; conserva movimiento, timing y encuadre) | `seedance25-r2v --task editing` |
 | Extender un clip | `flux3-extend` (exige audio en el origen; entrega sólo la continuación; hasta 20 s nuevos) | `seedance25-r2v --task extension` (hasta 30 s) |
@@ -325,18 +326,18 @@ endpoints Wan 3.0 que fal expone: texto, imagen y referencias a video. No hay ed
 | id CLI | Slug | Estado |
 |---|---|---|
 | `wan3-t2v` | `alibaba/wan-3.0/text-to-video` | ✅ 2026-09-16 |
-| `wan3-i2v` | `alibaba/wan-3.0/image-to-video` | sin verificar (saldo agotado) |
-| `wan3-r2v` | `alibaba/wan-3.0/reference-to-video` | sin verificar (saldo agotado) |
-| `wan3prime-t2v` | `alibaba/wan-3.0-prime/text-to-video` | sin verificar (saldo agotado) |
-| `wan3prime-i2v` | `alibaba/wan-3.0-prime/image-to-video` | sin verificar (saldo agotado) |
-| `wan3prime-r2v` | `alibaba/wan-3.0-prime/reference-to-video` | sin verificar (saldo agotado) |
+| `wan3-i2v` | `alibaba/wan-3.0/image-to-video` | ✅ 2026-09-16 (cuenta B) |
+| `wan3-r2v` | `alibaba/wan-3.0/reference-to-video` | ✅ 2026-09-16 (cuenta B) |
+| `wan3prime-t2v` | `alibaba/wan-3.0-prime/text-to-video` | ✅ 2026-09-16 (cuenta B) |
+| `wan3prime-i2v` | `alibaba/wan-3.0-prime/image-to-video` | ✅ 2026-09-16 (cuenta B) |
+| `wan3prime-r2v` | `alibaba/wan-3.0-prime/reference-to-video` | ✅ 2026-09-16 (cuenta B) |
 
 **Precio:** USD 0,05/s en las dos líneas (API de pricing de fal, 2026-09-16; volátil).
 
 **Evidencia de la verificación de `wan3-t2v`:** corrida real a 480p con `--duration auto` (el modelo eligió
 5,04 s), `--seed 7` respetado en la salida y `--no-prompt-expansion` (la salida trae `actual_prompt: null`). Video
-854×480 con pista de audio. Los otros 5 se intentaron el mismo día y fal respondió 403 `Exhausted balance` antes de
-encolar, sin costo.
+854×480 con pista de audio. Los otros 5 fallaron primero con 403 `Exhausted balance` (antes de encolar, sin costo) y se verificaron el mismo día
+con la cuenta B.
 
 **Contrato** (leído del OpenAPI 2026-09-16; igual en base y Prime):
 
@@ -363,7 +364,7 @@ encolar, sin costo.
   `--file <path|url>` → `file_url` (el CLI sube el archivo local). Ambos **exigen `--thinking`**: el proveedor
   necesita el razonamiento para leer la fuente y el CLI lo pide explícito para que el operador sepa que lo activa.
   Con `--web-url` o `--file` no hace falta ninguna referencia de medios. En cualquier otra capacidad el CLI los
-  rechaza. Esta vía **no tiene corrida real** (`wan3-r2v` sigue sin verificar).
+  rechaza. `--thinking` + `--web-url` verificado en real el 2026-09-16 con `wan3prime-r2v` (basado en efeoncepro.com); `--file` sin corrida real.
 - **`enable_safety_checker`:** existe en el esquema, pero desactivarlo requiere autorización de cuenta en fal. No se
   expone en el CLI.
 
@@ -419,7 +420,7 @@ real ni está en el registro.** Precios volátiles.
 
 **Conectar cualquiera de estos** exige lo mismo que las familias ya registradas: declarar el slug entero en
 `fal-capabilities.ts`, su contrato leído del OpenAPI, validación local en el CLI y una corrida real antes de marcar
-`verifiedAt`. Con el saldo agotado, hoy no se puede verificar nada.
+`verifiedAt`.
 
 ### Modelo de pricing (resumen)
 
@@ -565,7 +566,7 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 | Seedance 2.0 | `bytedance/seedance-2.0/image-to-video` · `/mini/...` · `/fast/...` · `/us/...` · `/reference-to-video` ✅ | reference-to-video fija personaje/producto; el video de referencia sólo guía |
 | Flux 3 | `blackforestlabs/flux-3/image-to-video` · `/first-last-frame-to-video` · `/keyframes-to-video` (+ `/draft`) ✅ | imagen, primer y último cuadro, o 1–10 keyframes con índice de cuadro; ver §Flux 3 |
 | Minimax H3 / Max / Max Turbo | `minimax/h3*/image-to-video` · `/reference-to-video` · `minimax/h3-max/camera-controls` ✅ | i2v con `end_image_url` y sin aspect; r2v hasta 9 imágenes, 3 videos, 3 audios; camera-controls con trayectoria |
-| Wan 3.0 / 3.0 Prime | `alibaba/wan-3.0{,-prime}/image-to-video` · `/reference-to-video` ✅ | i2v con `--end-image`; r2v hasta 10 imágenes, 5 videos, 5 audios y base en web/documento con `--thinking`; sin verificar por saldo agotado; ver §Wan 3.0 |
+| Wan 3.0 / 3.0 Prime | `alibaba/wan-3.0{,-prime}/image-to-video` · `/reference-to-video` ✅ | i2v con `--end-image`; r2v hasta 10 imágenes, 5 videos, 5 audios y base en web/documento con `--thinking`; verificados 2026-09-16; ver §Wan 3.0 |
 | Kling O3 / v3 Pro / Standard | `fal-ai/kling-video/o3/*/image-to-video` · `/reference-to-video` · `fal-ai/kling-video/v3/pro/image-to-video` · `/standard/...` ✅ | audio nativo; revisado, no conectado |
 | Kling 2.5 Turbo Pro | `fal-ai/kling-video/v2.5-turbo/pro/image-to-video` ✅ | |
 | PixVerse V6 | `fal-ai/pixverse/v6/image-to-video` ✅ | |
@@ -586,7 +587,7 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 | Editar / guiar con video | Kling O3 `fal-ai/kling-video/o3/{standard,pro,4k}/video-to-video/edit` · `/reference` ✅ | revisado, no conectado; `keep_audio` |
 | Transferir movimiento | Kling V3 `fal-ai/kling-video/v3/{standard,pro}/motion-control` ✅ | imagen + video de movimiento; revisado, no conectado |
 | Editar / extender (registrado) | Flux 3 `blackforestlabs/flux-3/edit-video` · `/extend-video` (+ `/draft`) ✅ | verificado en real; extend exige audio en el origen y entrega sólo la continuación; ver §Flux 3 |
-| Editar / extender (registrado) | Seedance 2.5 `bytedance/seedance-2.5/reference-to-video` con `task` `editing`/`extension` ✅ slug | sin corrida real; no existe endpoint `video-to-video` de Seedance; ver §Seedance video a video |
+| Editar / extender (registrado) | Seedance 2.5 `bytedance/seedance-2.5/reference-to-video` con `task` `editing`/`extension` ✅ slug | verificado en real 2026-09-16 (filtro rechaza marcas y personas reales); no existe endpoint `video-to-video` de Seedance; ver §Seedance video a video |
 | Render→real / restore | LTX 2.3 Quality: `render-to-real`, `deblur`, `colorization`, `day-to-night`, `decompression`, `water-simulation`, `instant-shave`, `cross-eyed` ✅ | familia de transforms LTX |
 | Upscale de video | `fal-ai/seedvr/upscale/video` 🔎 · Topaz-style upscalers 🔎 | |
 | Lipsync | `fal-ai/sync-lipsync` · `fal-ai/latentsync` · `fal-ai/musetalk` 🔎 | sincronía labial voz↔video |
@@ -715,7 +716,7 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 
 ## Reglas duras (recap)
 
-- **NUNCA** hardcodear la key (`<id>:<secret>`); resolver server-side vía `FAL_API_KEY_SECRET_REF=greenhouse-fal-api-key`.
+- **NUNCA** hardcodear la key (`<id>:<secret>`); resolver server-side vía `FAL_API_KEY_SECRET_REF=greenhouse-fal-api-key` y `FAL_API_KEY_B_SECRET_REF=greenhouse-fal-api-key-b`.
 - **NUNCA** instanciar un fetch/SDK paralelo a Fal en un módulo de dominio — extender `runFalModel`.
 - **NUNCA** cablear Fal a un flujo runtime del producto (out-of-band: generar + subir por uploader; runtime de imagen = `src/lib/ai/image-generator.ts`).
 - **NUNCA** reconstruir las polling URLs desde el slug (usar `status_url`/`response_url` del submit — da 405 si no). Única excepción: el retome por `--request-id`, que reconstruye por **app** (dos primeros segmentos) y avisa si no coincide.

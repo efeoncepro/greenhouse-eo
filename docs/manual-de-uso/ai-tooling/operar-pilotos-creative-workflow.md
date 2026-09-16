@@ -148,6 +148,10 @@ No se debe intentar desactivar filtros, ocultar contenido sensible ni presentar 
 
 ## Si Fal responde `403 User is locked — Exhausted balance`
 
+> **Delta 2026-09-16:** el cliente de Fal trabaja con dos cuentas y cambia sola cuando una está bloqueada por saldo. Este
+> 403 sólo llega si **todas** las cuentas están sin saldo o si forzaste una con `--fal-account`. Revisa los saldos con
+> `pnpm ai:fal --balance` (gratis). Detalle: [catálogo Fal §Cuentas, saldo y operación del CLI](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md).
+
 1. Detener el take: no existe candidato, request ID ni razón creativa que depurar.
 2. Guardar el error y el prompt planificado en el manifest; no declarar que hubo una segunda generación ni inferir cargo.
 3. Registrar `operativamente bloqueado` en Handoff con el titular de la cuenta como responsable de recargar saldo.

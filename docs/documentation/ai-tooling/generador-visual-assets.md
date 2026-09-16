@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-09-16 por Claude — Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
+> **Ultima actualizacion:** 2026-09-16 por Claude — `pnpm ai:fal` trabaja con dos cuentas de Fal y cambia sola si una se queda sin saldo, muestra el saldo con `--balance` y puede encolar sin esperar (`--detach` / `--status`); prueba completa: 47 de 55 opciones probadas, costo real medido y filtro de contenido de Seedance 2.5 (rechaza marcas y personas reales y cobra el intento); antes, Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 # Generador Visual de Assets con IA
@@ -145,7 +145,7 @@ Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recra
 
 - **Para que sirve:** producir contenido media de mayor variedad (sobre todo **video**) que los motores de imagen actuales no cubren, para piezas de marketing, campanas y exploracion visual.
 - **Como se usa:** con el comando de terminal `pnpm ai:fal` (ver la sección siguiente) o de forma programatica, con un cliente interno unico. El contenido se genera fuera del portal y se **sube** por el flujo normal de assets — no se genera en tiempo real para los usuarios del producto.
-- **Estado actual (2026-07-06):** **operativo.** La llave quedo guardada de forma segura (en el gestor de secretos) y se **verifico una generacion real de punta a punta** (se genero una imagen de prueba correctamente). La llave es temporal (se rotara mas adelante). Todavia no esta conectada a ninguna pantalla del producto — es acceso para generacion operada por el equipo/agente.
+- **Estado actual (2026-07-06):** **operativo.** La llave quedo guardada de forma segura (en el gestor de secretos) y se **verifico una generacion real de punta a punta** (se genero una imagen de prueba correctamente). La llave es temporal (se rotara mas adelante). Desde el 2026-09-16 hay **dos cuentas de Fal** configuradas (ver "Dos cuentas y saldo" más abajo). Todavia no esta conectada a ninguna pantalla del producto — es acceso para generacion operada por el equipo/agente.
 - **Costo:** se paga por segundo de video segun el modelo (ejemplo: un clip corto economico ronda los US$0.36; uno de mayor calidad, varios dolares). Siempre revisar el precio del modelo en `fal.ai/models` antes de generar.
 
 > Detalle tecnico: ver [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) para la API del generador, system prompts, contrato SVG, endpoints internos y la seccion "Fal.ai — agregador de generacion media".
@@ -258,14 +258,10 @@ OpenArt Arena (un ranking externo de preferencia de personas, que cambia seguido
 - **Instrucción tal cual:** por defecto Wan reescribe y amplía la instrucción; se puede apagar para que use el texto
   exacto (es más rápido, pero puede bajar la calidad).
 
-**Qué está probado:** sólo **Wan 3.0 desde texto**, con una generación real el 2026-09-16 (el modelo eligió un largo
-de 5 segundos, respetó la semilla y entregó video con sonido). Las otras cinco opciones (desde imagen, desde
-referencias y las tres de Prime), incluida la de basarse en una web o un documento, **no se pudieron probar**: el
-saldo de la cuenta de Fal se agotó ese mismo día.
-
-> **Mientras no se recargue el saldo de Fal, ningún modelo del comando puede generar.** Fal rechaza cada pedido con
-> un aviso de «saldo agotado» antes de empezar, así que no se cobra nada. Recargarlo es tarea de una persona con
-> acceso a la facturación de Fal.
+**Qué está probado:** las **seis opciones** de Wan 3.0 y Wan 3.0 Prime, con generaciones reales el 2026-09-16. La
+primera fue desde texto (el modelo eligió un largo de 5 segundos, respetó la semilla y entregó video con sonido); las
+otras cinco se probaron más tarde ese mismo día. El modo que se basa en una **página web** también se probó en real:
+Wan 3.0 Prime armó un teaser a partir de efeoncepro.com. El modo que parte de un **documento** todavía no se ha probado.
 
 ### Otros modelos revisados y no conectados
 
@@ -276,9 +272,9 @@ conectar** al comando.
 
 ### Video a video: editar o alargar un clip que ya existe
 
-Hay dos caminos, y hoy sólo uno está probado:
+Hay dos caminos, y los dos están probados (2026-09-16):
 
-| Quiero | Flux 3 (probado) | Seedance 2.5 (sin probar) |
+| Quiero | Flux 3 | Seedance 2.5 |
 |---|---|---|
 | Cambiar el aspecto de un clip | **Flux 3 edit**: conserva movimiento y encuadre | Seedance 2.5 desde referencias, en modo **edición** |
 | Alargar un clip | **Flux 3 extend**: exige sonido en el original y entrega sólo lo nuevo | Seedance 2.5 desde referencias, en modo **extensión** (hasta 30 segundos) |
@@ -290,23 +286,27 @@ Sobre Seedance, lo que conviene saber:
   resultado; no lo edita ni lo alarga.
 - Siempre hace falta al menos **una imagen o un video** de referencia; un audio solo no alcanza.
 - Los videos de Seedance duran **como mínimo 4 segundos**.
-- Estas reglas salen de la documentación técnica del proveedor; todavía **no se probó** una edición ni una
-  extensión real con Seedance 2.5.
+- Se probó en real el 2026-09-16: la **edición** convirtió un viñedo en paisaje nevado conservando el encuadre, y la
+  **extensión** siguió el movimiento de cámara y reveló la cordillera.
+- **Filtro de contenido del proveedor (ByteDance):** Seedance rechaza referencias con **marcas o logotipos** (pasó con
+  el isotipo de Efeonce) y con **personas reales** (pasó con un video de un barista). El rechazo llega **después** de
+  encolar, así que **el intento se cobra**. Para editar o alargar con Seedance 2.5, usar material sin personas
+  identificables ni marcas; si hay personas, usar Flux 3 o Wan 3.0.
 
 ### Qué está probado y qué no
 
 - Las cinco opciones de **Seedream 5** están probadas con generaciones reales (2026-09-16).
-- En video están probadas **Seedance 2.5** desde texto y desde imagen, y **Seedance 2.0** desde texto (entregó 4K
-  real). Las otras doce variantes de video están conectadas pero **sin probar**; el comando lo advierte antes de
-  gastar.
+- De **Seedance** están probadas **las 15 opciones** (2026-09-16): Seedance 2.5 desde texto, desde imagen y desde
+  referencias (incluidas edición y extensión), y Seedance 2.0 en sus versiones base (texto con 4K real, imagen y
+  referencias), fast, mini y us.
 - De **Minimax H3** están probadas 9 opciones: desde texto, desde imagen y desde referencias en H3 base y Max,
   control de cámara, y Max Turbo desde texto y desde imagen. En referencias sólo se probó con imágenes (no con
   videos ni audios). **Sin probar:** las tres variantes con LoRA y los cuatro entrenadores.
 - De **Flux 3** están probadas **las 12 opciones** (2026-09-16): desde texto, desde imagen, primer y último cuadro,
   keyframes, sus borradores, la mejora de borradores, editar y extender.
-- La edición y la extensión con **Seedance 2.5** están conectadas pero **sin probar**.
-- De **Wan 3.0** está probada sólo la opción desde texto; las otras cinco esperan a que se recargue el saldo de Fal.
-- En total: 55 opciones conectadas, 30 probadas con generaciones reales.
+- De **Wan 3.0** están probadas **las 6 opciones** (base y Prime).
+- En total: 55 opciones conectadas y **47 probadas** con generaciones reales. Faltan sólo las tres variantes con LoRA
+  y los cuatro entrenadores de H3 (postergados por decisión del equipo); el modo Director de H3 no se puede usar.
 - `pnpm ai:fal --list` muestra este estado en cualquier momento, y no cuesta nada.
 
 ### Lo que conviene saber
@@ -314,8 +314,26 @@ Sobre Seedance, lo que conviene saber:
 - **Cada uso cuesta dinero**, salvo `--list`. A diferencia de `ai:image`, este comando **no informa cuánto costó**
   cada corrida, porque Fal no entrega ese dato. Antes de un lote o de un video largo hay que revisar el precio
   vigente en la página del modelo.
+- **Costo real medido (2026-09-16):** la prueba completa de 17 videos cortos (de 2 a 4 segundos) costó **USD 7,71**,
+  incluidos 3 intentos que Seedance rechazó por su filtro y que igual se cobraron. Seedance salió cerca del **doble**
+  de lo estimado con la equivalencia de tokens de OpenArt, así que esa equivalencia no sirve para presupuestar. Como
+  referencia: 3 videos de Seedance 2.0 fast de 4 segundos a 480p costaron cerca de USD 1,37, y 3 de mini, USD 0,85.
 - Es producción **fuera del portal**: nada de esto se genera en tiempo real para los usuarios.
 - Gemini Omni (video de Google) y Nano Banana Pro (imagen de Google) **no** se usan por aquí: van directo con Google.
+
+### Dos cuentas y saldo (desde 2026-09-16)
+
+- El comando tiene configuradas **dos cuentas de Fal**. En cada uso elige la que tiene **más saldo** y, si Fal bloquea
+  una por falta de saldo, **pasa sola a la otra**. Ese bloqueo ocurre antes de empezar, así que no se cobra. Cada uso
+  muestra qué cuenta trabajó; nunca muestra las llaves.
+- **Ver el saldo:** `pnpm ai:fal --balance` muestra el saldo en dólares de cada cuenta, sin costo. Si todas se quedan
+  sin saldo, el comando lo dice; recargar es tarea de una persona con acceso a la facturación de Fal.
+- **Encolar sin esperar:** con `--detach` el comando deja el trabajo en la fila de Fal, muestra su identificador y los
+  comandos para consultarlo, y termina. Con `--status` se consulta cómo va (en fila, en proceso o listo), sin costo.
+  Sirve para dejar varios videos andando o para trabajos largos. La espera normal, sin `--detach`, es de hasta 30
+  minutos por video.
+- **Pendiente de seguridad:** la llave de la segunda cuenta se compartió en una conversación y conviene cambiarla
+  (rotarla). Lo hace una persona con acceso a Fal y al gestor de secretos.
 
 ## Nano Banana Pro: dónde está hoy (revisión 2026-09-16)
 
@@ -327,7 +345,7 @@ Sobre Seedance, lo que conviene saber:
 - Pasar todo el carril de Google a Nano Banana Pro cambiaría el motor para todos los que lo usan. Si se decide
   usarlo, lo correcto es poder elegirlo en cada pedido. Esa decisión está pendiente.
 
-> Detalle tecnico: [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo (registro de capacidades, contratos de video, subida de archivos) y el manual [Operar el CLI de fal (Seedream, Seedance, Minimax H3 y Flux 3)](../../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md). Código: `scripts/ai/fal-image.ts`, `src/lib/ai/fal-capabilities.ts`, `src/lib/ai/fal.ts`.
+> Detalle tecnico: [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo (registro de capacidades, contratos de video, subida de archivos) y el manual [Operar el CLI de fal (Seedream, Seedance, Minimax H3, Flux 3 y Wan 3.0)](../../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md). Código: `scripts/ai/fal-image.ts`, `src/lib/ai/fal-capabilities.ts`, `src/lib/ai/fal.ts`.
 
 ## Produccion de campañas con varias manos de IA
 

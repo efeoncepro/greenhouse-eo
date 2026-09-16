@@ -135,15 +135,16 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   cámara/lente/focal, Soul ID para consistencia de personaje, LipSync — vía MCP), **Runway Gen-4.5**
   (cine dirigido, beats/coreografía de cámara), **Seedance 2.5/2.0** (refs + camera moves; se opera con
   `pnpm ai:fal` y el endpoint se elige por duración/4K/costo en
-  `workflows/engine-selection-by-fidelity-contract.md`), **Minimax H3** (también con `pnpm ai:fal`: Max Turbo =
+  `workflows/engine-selection-by-fidelity-contract.md`; los 15 endpoints verificados 2026-09-16, incluido 2.5
+  `editing`/`extension`; su filtro rechaza **tras encolar y cobra** marcas y personas reales, y cuesta ~2× lo
+  estimado por tokens), **Minimax H3** (también con `pnpm ai:fal`: Max Turbo =
   divergencia barata y rápida; Max `camera-controls` = cámara real sobre imagen congelada; base = única H3 con
   2K/4K; LoRA/entrenadores = consistencia de marca/personaje, sin verificar; 5–15 s, entrega audio sin toggle),
   **Flux 3** (también con `pnpm ai:fal`; en fal es **video**, 12 endpoints verificados 2026-09-16: draft barato →
   `enhance` sólo del take aprobado; primer/último cuadro y keyframes para fijar la trayectoria; `edit` re-renderiza
   conservando movimiento; `extend` exige audio en el origen y entrega sólo la continuación; la elección de video a
   video Flux 3 vs Seedance 2.5 vive en el mismo workflow),
-  **Wan 3.0 / Wan 3.0 Prime** (también con `pnpm ai:fal`, conectado 2026-09-16; sólo `wan3-t2v` verificado, los
-  otros 5 bloqueados por saldo de fal: 2–30 s o `auto` = duración inteligente, hasta 1080p, USD 0,05/s, R2V con
+  **Wan 3.0 / Wan 3.0 Prime** (también con `pnpm ai:fal`, conectado 2026-09-16; los 6 verificados en real: 2–30 s o `auto` = duración inteligente, hasta 1080p, USD 0,05/s, R2V con
   10 imágenes / 5 videos / 5 audios, video basado en una web o documento con `--web-url`/`--file` + `--thinking`;
   #2 en video y #1 en Video Editing en OpenArt Arena 2026-09-16, pero **sin endpoint de edición** en fal),
   **Kling** (Voice
