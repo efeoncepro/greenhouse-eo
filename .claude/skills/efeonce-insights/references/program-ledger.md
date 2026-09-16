@@ -73,6 +73,18 @@ _Fill at closure: Astro route, token handling, `no-store`, GVC evidence._
 
 ## Sessions (append as you go; newest first)
 
+- **2026-09-16 · greenhouse-eo-0d · TASK-1846 discovery + design decision (no code yet).** Audited the render engine
+  against the real runtime: six Proposal seams in `services/artifact-worker/main.ts` (all replaceable by a typed
+  consumer registry, none of them business logic), and the missing lease/fencing described in `lessons.md`. Decision
+  recorded in the task: the lease/fencing mechanism is SHARED and additive, with Proposal's reclaim behind a flag
+  left OFF — "keep Proposal untouched" is honoured as behaviour, not as file ownership, which is what the task's own
+  `Files owned` ("adapter compatible") already authorises. `plan.limits` dedupe resolved to the RENDERER, not the
+  planner: plans are frozen and feed `issued_hash`, so a planner fix neither cleans frozen plans nor leaves the hash
+  stable. Inherited deploy trap confirmed: `deploy.sh` uses destructive `--set-env-vars` and `deploy-contract.test.ts:53`
+  already guards `ARTIFACT_RENDER_JOBS_ENABLED`; `INSIGHTS_RENDER_ENABLED` must be added to BOTH.
+  Also halted a peer's rollback rehearsal on a misreading of "real editions in production" — the rehearsal was safe;
+  the wording was not. Both outcomes are now rules.
+
 - 2026-09-15/16 · Claude (greenhouse-eo-96) · TASK-1845 build, staging canary, gateway federation, Entra scope,
   production release, flag flip, doc sweep (5 agents), rollback rehearsal, closure. Codex executed the mutations
   the permission classifier blocked until the operator added allow rules.

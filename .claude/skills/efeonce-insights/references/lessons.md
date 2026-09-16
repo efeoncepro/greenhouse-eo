@@ -29,3 +29,24 @@
   external agent; keep those in the local skill, never in `docs/mcp/skills/**`.
 - **2026-09-15 · ISSUE-172 pattern applied:** public codes use a plpgsql function with a single `nextval` and
   `lpad(n, GREATEST(6, length(n)), '0')`; never `to_char FM` nor a per-row DEFAULT in `INSERT … SELECT`.
+- **2026-09-16 · `proposal_render_jobs` has NO lease, fencing token or heartbeat.** The claim
+  (`claimNextRenderJobForExecution`) is atomic via `FOR UPDATE SKIP LOCKED`, and `markRenderJobCompleted` only
+  checks `expectFromStates:['running']` — it never verifies the finisher still owns the claim. Consequence today:
+  no double execution (nothing re-claims), but a worker that dies leaves the job in `running` forever;
+  `listExpiredQueuedRenderJobs` only covers `queued` past its deadline. TASK-1846's acceptance about "a stale lease
+  must not produce two final outputs" describes a hazard **that task itself introduces** by adding reclaim — so
+  lease and fencing must ship in the SAME slice. Never split them.
+- **2026-09-16 · In the shared checkout, another session's `git push` carries YOUR local commits.** Three
+  documentation commits of TASK-1846 reached `origin/develop` inside greenhouse-eo-96's push of TASK-1845, with no
+  action from the 1846 session. Local-first is not protection: if a commit must not leave the machine yet, it must
+  not be committed to `develop` yet. Verify after any peer push with `git merge-base --is-ancestor <sha> origin/develop`.
+- **2026-09-16 · `Handoff.md` budget: the gate counts TOKENS, the rotator works on SESSIONS.** `docs:context-rotate`
+  reported "2/20 sessions, 439/600 lines, nothing to rotate" while `docs:context-check:strict` failed at ~12411
+  tokens over a 12000 ceiling. Baseline was 11994 with a single session — six tokens of headroom, so ANY new entry
+  overflows it. Fixes, in order: `--max-sessions=N` to force rotation, and then trim your own entry to a pointer
+  (most of the file's bulk is not in dated sections, so rotation alone does not get you under).
+- **2026-09-16 · How to verify the synthetic-edition claim AFTER the fact.** The vocabulary trap is in SKILL.md; the
+  operational check is: `module_assignments WHERE module_key='insights_v1'` must return exactly the sandbox org, and
+  `organizations.organization_name` confirms it is "Greenhouse Demo". That check survives a `down`/`up`; the rows
+  themselves do not. Post-rollback you can prove "no real org had the module", never "what the deleted rows were".
+
