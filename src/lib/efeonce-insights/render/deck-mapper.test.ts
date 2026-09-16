@@ -56,6 +56,16 @@ describe('buildInsightDeckPlanInput', () => {
     expect(input.slides.map(s => s.contentType)).toEqual(['section-divider', 'several-kpis', 'narrative', 'narrative'])
     expect(input.slides.some(s => s.contentType === 'cover')).toBe(false)
 
+    // Regresión del canary 2026-09-16: `number` lo llena un resolver EN EL RENDER, pero el contrato
+    // de slots lo exige presente en la validación, que corre antes. Sin él: missing_required_field.
+    const sectionItems = (input.slides[0]!.slots as { sectionItems: Array<{ number: string; title: string }> }).sectionItems
+
+    expect(sectionItems.length).toBeGreaterThanOrEqual(2)
+
+    for (const [i, item] of sectionItems.entries()) {
+      expect(item.number).toBe(String(i + 1).padStart(2, '0'))
+    }
+
     const kpis = (input.slides[1]!.slots as { kpis: Array<{ value: string; evidenceRef: string; label: string }> }).kpis
 
     expect(kpis).toHaveLength(3)

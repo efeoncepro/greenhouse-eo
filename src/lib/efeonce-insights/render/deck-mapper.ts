@@ -195,10 +195,22 @@ export const buildInsightDeckPlanInput = ({ edition, report, plan: frozen, snaps
     throw new InsightsRenderRejectedError('El plan congelado no tiene capítulos: no hay nada que componer', { editionId: edition.editionId })
   }
 
-  const items = chapters.map(ch => ({ title: ellipsize(ch.title, 32), description: ellipsize(ch.claims[0]?.text ?? MODULE_TITLES[ch.module], 60) }))
+  // `number` viene del resolver `ordinal-number` en el RENDER, pero el contrato de slots lo exige
+  // PRESENTE en la validación — que corre antes. Omitirlo es `missing_required_field`, y lo
+  // descubrió el canary de staging (2026-09-16), no los unit tests: éstos no ejercitan los
+  // contratos reales del catálogo.
+  const items = chapters.map((ch, index) => ({
+    number: String(index + 1).padStart(2, '0'),
+    title: ellipsize(ch.title, 32),
+    description: ellipsize(ch.claims[0]?.text ?? MODULE_TITLES[ch.module], 60)
+  }))
 
   // El divisor exige entre 2 y 5 ítems: con un solo capítulo se agrega el de límites, que existe siempre.
-  const sectionItems = (items.length >= 2 ? items : [...items, { title: 'Límites y metodología', description: 'Qué no afirma esta edición y cómo se produjo' }]).slice(0, 5)
+  const sectionItems = (
+    items.length >= 2
+      ? items
+      : [...items, { number: String(items.length + 1).padStart(2, '0'), title: 'Límites y metodología', description: 'Qué no afirma esta edición y cómo se produjo' }]
+  ).slice(0, 5)
 
   const opener: CompositionPlanInput['slides'][number] = {
     slideId: 'slide.opener',
