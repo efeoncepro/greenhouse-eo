@@ -25,7 +25,9 @@ const MAP: Record<InsightsError['code'], { statusCode: number; errorCode: ApiPla
   idempotency_conflict: { statusCode: 409, errorCode: 'idempotency_conflict' },
   generation_disabled: { statusCode: 503, errorCode: 'service_unavailable' },
   issuance_disabled: { statusCode: 503, errorCode: 'service_unavailable' },
-  quota_exceeded: { statusCode: 429, errorCode: 'rate_limited' }
+  quota_exceeded: { statusCode: 429, errorCode: 'rate_limited' },
+  render_disabled: { statusCode: 503, errorCode: 'service_unavailable' },
+  render_rejected: { statusCode: 422, errorCode: 'bad_request' }
 }
 
 export const toInsightsApiPlatformError = (error: unknown): ApiPlatformError => {

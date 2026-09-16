@@ -67,6 +67,11 @@ describe('createGreenhouseMcpHandlers', () => {
       listInsightEditions: vi.fn(),
       getInsightEdition: vi.fn(),
       createInsightEdition: vi.fn(),
+      // TASK-1846 — render durable
+      requestInsightRender: vi.fn(),
+      getInsightRenderRun: vi.fn(),
+      retryInsightRender: vi.fn(),
+      cancelInsightRender: vi.fn(),
       previewClientServiceEnablement: vi.fn(),
       applyClientServiceEnablement: vi.fn(),
       rollbackClientServiceEnablement: vi.fn()
@@ -182,6 +187,11 @@ describe('createGreenhouseMcpHandlers', () => {
       listInsightEditions: vi.fn(),
       getInsightEdition: vi.fn(),
       createInsightEdition: vi.fn(),
+      // TASK-1846 — render durable
+      requestInsightRender: vi.fn(),
+      getInsightRenderRun: vi.fn(),
+      retryInsightRender: vi.fn(),
+      cancelInsightRender: vi.fn(),
       previewClientServiceEnablement: vi.fn(),
       applyClientServiceEnablement: vi.fn(),
       rollbackClientServiceEnablement: vi.fn()

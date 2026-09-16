@@ -13,6 +13,7 @@ import { listRegisteredInsightModules, resolveInsightAdapter } from './adapters/
 import type { AdapterDescriptor } from './adapters/contract'
 import { INSIGHT_DEPTHS, INSIGHT_LOCALES, INSIGHT_MODULES, INSIGHT_OUTPUTS, type InsightAudience, type InsightModule } from './contracts/request'
 import type { InsightsAccessGrant } from './authz'
+import { INSIGHT_RENDERABLE_OUTPUTS } from './render/contracts'
 import { MAX_INSIGHT_WINDOW_DAYS } from './window'
 
 export interface InsightsCatalogModule {
@@ -33,7 +34,7 @@ export interface InsightsCatalog {
   depths: readonly string[]
   locales: readonly string[]
   limits: { maxWindowDays: number; maxModulesPerEdition: number }
-  /** Salidas hoy renderizables. Vacío hasta TASK-1846: crear sí, emitir no. */
+  /** Salidas que el motor puede producir hoy (TASK-1846: `deck_pdf`; A4 y web llegan con 1847/1848). */
   renderableOutputs: readonly string[]
 }
 
@@ -104,6 +105,6 @@ export const getInsightsCatalog = async (grant: InsightsAccessGrant): Promise<In
     depths: INSIGHT_DEPTHS,
     locales: INSIGHT_LOCALES,
     limits: { maxWindowDays: MAX_INSIGHT_WINDOW_DAYS, maxModulesPerEdition: INSIGHT_MODULES.length },
-    renderableOutputs: []
+    renderableOutputs: INSIGHT_RENDERABLE_OUTPUTS
   }
 }

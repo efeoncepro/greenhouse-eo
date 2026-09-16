@@ -32,7 +32,7 @@ initSentryForService('artifact-worker')
 import { composeArtifact } from '@/lib/artifact-composer'
 import { SlideQualityError } from '@/lib/artifact-composer/quality-gates'
 import { SlideGeometryError, SlotFillError } from '@/lib/artifact-composer/render'
-import { hashResolvedManifest } from '@/lib/commercial/tenders/proposals/render-jobs'
+import { hashResolvedManifest } from '@/lib/artifact-composer/manifest-hash'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import type { RenderConsumer, RenderJobView } from './consumer-contract'

@@ -90,3 +90,6 @@ export const readInsightEdition = async (scope: ReaderScope & { editionId: strin
     history: history?.map(row => ({ transitionId: row.transitionId, fromState: row.fromState, toState: row.toState, requiresHumanGate: row.requiresHumanGate, actorKind: row.actorKind, reason: row.reason, createdAt: row.createdAt })) ?? null
   }
 }
+
+// TASK-1846 — readers del render durable (runs/outputs por edición y audiencia)
+export { readInsightRenderRun, readInsightRenderRuns, type InsightOutputDto, type InsightRenderRunDto } from '../render/readers'

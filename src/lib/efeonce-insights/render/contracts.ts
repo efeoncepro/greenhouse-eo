@@ -13,6 +13,13 @@ import 'server-only'
 
 import type { InsightAudience, InsightOutput } from '../contracts/request'
 
+/**
+ * Outputs que el motor puede producir HOY. Sólo `deck_pdf`: el catálogo A4 del informe vertical y
+ * el modelo web llegan con TASK-1847/1848. Un encargo con un output fuera de esta lista se rechaza
+ * fail-closed (`render_rejected`), nunca se encola "para después".
+ */
+export const INSIGHT_RENDERABLE_OUTPUTS = ['deck_pdf'] as const satisfies readonly InsightOutput[]
+
 /** Estado del run agregado. `partial_failed` existe porque un output puede caer sin arrastrar al resto. */
 export const INSIGHT_RENDER_RUN_STATES = [
   'pending',

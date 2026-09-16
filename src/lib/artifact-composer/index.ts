@@ -117,3 +117,6 @@ export {
   SlideQualityError,
   type SlideInkMetrics
 } from './quality-gates'
+
+// TASK-1846 — hash canónico del manifest (domain-free: lo comparten todos los consumers del worker)
+export { canonicalManifestJson, hashResolvedManifest } from './manifest-hash'

@@ -131,6 +131,8 @@ export const AGGREGATE_TYPES = {
   // Efeonce Insights (TASK-1845): biblioteca de entregas congeladas por org
   insightReport: 'insight_report',
   insightEdition: 'insight_edition',
+  // TASK-1846 — render durable: la solicitud de outputs de una edición
+  insightRenderRun: 'insight_render_run',
   quotationLineItem: 'quotation_line_item',
   quotationLineCostOverride: 'quotation_line_cost_override',
   commercialCapacity: 'commercial_capacity',
@@ -608,6 +610,10 @@ export const EVENT_TYPES = {
   insightEditionStateTransitioned: 'insights.edition.state_transitioned',
   insightEvidenceSealed: 'insights.evidence.sealed',
   insightEditionIssued: 'insights.edition.issued',
+  // TASK-1846 — render durable (payloads redactados: ids, target, hash, estado; nunca bytes ni plan)
+  insightRenderRequested: 'insights.render.requested',
+  insightRenderOutputCompleted: 'insights.render.output_completed',
+  insightRenderOutputFailed: 'insights.render.output_failed',
   quotationDiscountHealthAlert: 'commercial.discount.health_alert',
 
   // Commercial Deals (TASK-453)

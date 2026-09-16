@@ -21,6 +21,8 @@ export type InsightsErrorCode =
   | 'generation_disabled'
   | 'issuance_disabled'
   | 'quota_exceeded'
+  | 'render_disabled'
+  | 'render_rejected'
 
 export class InsightsError extends Error {
   readonly code: InsightsErrorCode
@@ -138,3 +140,21 @@ export class InsightsIssuanceDisabledError extends InsightsError {
 }
 
 export const isInsightsError = (error: unknown): error is InsightsError => error instanceof InsightsError
+
+/** TASK-1846 — el render durable no está habilitado en este runtime (`INSIGHTS_RENDER_ENABLED`). */
+export class InsightsRenderDisabledError extends InsightsError {
+  constructor() {
+    super('render_disabled', 'El render de Insights no está habilitado en este runtime', 503)
+  }
+}
+
+/**
+ * TASK-1846 — el encargo de render no puede componerse: output no renderizable todavía, plan que
+ * excede los presupuestos del catálogo, manifest inválido. Fail-closed y con causa: NUNCA se trunca
+ * copy en silencio para que "quepa".
+ */
+export class InsightsRenderRejectedError extends InsightsError {
+  constructor(message: string, details: Record<string, unknown> = {}) {
+    super('render_rejected', message, 422, details)
+  }
+}

@@ -243,4 +243,59 @@ describe.skipIf(!hasLiveDb)('TASK-1846 — lease y fencing del render (PostgreSQ
     expect(signal.severity).toBe('ok')
     expect(signal.summary).toContain('drena')
   })
+
+  it('encolado: insertInsightRenderRun + findInsightOutputsForEdition + listInsightRenderRuns ejecutan su SQL contra PG real', async () => {
+    const { withGreenhousePostgresTransaction } = await import('@/lib/postgres/client')
+    const { findInsightOutputsForEdition, insertInsightRenderRun, listInsightRenderRuns } = await import('./store')
+
+    let failure: unknown = null
+
+    try {
+      await withGreenhousePostgresTransaction(async client => {
+        const edition = await client.query<{ edition_id: string; organization_id: string; audience: 'client' | 'internal' }>(
+          `SELECT edition_id, organization_id, audience FROM greenhouse_insights.insight_editions LIMIT 1`
+        )
+
+        if (!edition.rows[0]) throw new RollbackSentinel('sin ediciones en la base')
+
+        const { edition_id: editionId, organization_id: organizationId, audience } = edition.rows[0]
+
+        const inserted = await insertInsightRenderRun({
+          client,
+          organizationId,
+          editionId,
+          audience,
+          requestedOutputs: ['deck_pdf'],
+          requestedByKind: 'system',
+          requestedByUserId: null,
+          requestedByMemberId: null,
+          outputs: [{ output: 'deck_pdf', catalogName: 'deck-axis', manifest: { input: { artifactId: editionId, slides: [] } }, manifestHash: 'd'.repeat(64) }]
+        })
+
+        expect(inserted.run.state).toBe('pending')
+        expect(inserted.outputs).toHaveLength(1)
+        expect(inserted.outputs[0]!.state).toBe('queued')
+        expect(inserted.outputs[0]!.fenceToken).toBe(0)
+
+        const found = await findInsightOutputsForEdition({ client, organizationId, editionId, audience })
+
+        expect(found.map(o => o.insightOutputId)).toContain(inserted.outputs[0]!.insightOutputId)
+        // La OTRA audiencia no ve este output: la audiencia es parte de la identidad.
+        const other = await findInsightOutputsForEdition({ client, organizationId, editionId, audience: audience === 'client' ? 'internal' : 'client' })
+
+        expect(other.map(o => o.insightOutputId)).not.toContain(inserted.outputs[0]!.insightOutputId)
+
+        const listed = await listInsightRenderRuns({ client, organizationId, editionId, limit: 10, offset: 0 })
+
+        expect(listed.items.map(r => r.renderRunId)).toContain(inserted.run.renderRunId)
+        expect(listed.total).toBeGreaterThanOrEqual(1)
+
+        throw new RollbackSentinel('rollback')
+      })
+    } catch (error) {
+      if (!(error instanceof RollbackSentinel)) failure = error
+    }
+
+    if (failure) throw failure
+  })
 })

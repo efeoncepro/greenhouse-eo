@@ -14,6 +14,7 @@ import 'server-only'
 import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
 import type { InsightAudience, InsightOutput } from '../contracts/request'
+import { publishInsightRenderOutputCompleted, publishInsightRenderOutputFailed } from '../events'
 import { runInsightsQuery, type InsightsDbClient } from '../stores/db'
 
 import {
@@ -26,16 +27,8 @@ import {
   type InsightRenderRunRecord
 } from './contracts'
 
-/**
- * Flag propio: NO reutiliza `ARTIFACT_RENDER_JOBS_ENABLED`. Encender Insights jamás debe encender
- * Proposal ni al revés.
- *
- * ⚠️ Multi-runtime. El SoT en Cloud Run es `services/artifact-worker/deploy.sh`, cuyo
- * `--set-env-vars` es DESTRUCTIVO: declararlo sólo con `--update-env-vars` en vivo lo borra en el
- * próximo deploy, en silencio (le pasó a GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED, revisión 00473).
- * `deploy-contract.test.ts` custodia esa declaración.
- */
-export const isInsightsRenderEnabled = (): boolean => process.env.INSIGHTS_RENDER_ENABLED === 'true'
+// El flag vive en `../flags` junto a los demás gates del dominio; se re-exporta para el worker.
+export { isInsightsRenderEnabled } from '../flags'
 
 const RUN_COLUMNS = `
   render_run_id, organization_id, edition_id, audience, requested_outputs, state,
@@ -327,7 +320,30 @@ const transitionOutput = async (input: {
 
     await rollupRunState(client, row.render_run_id as string)
 
-    return mapOutputRow(updated.rows[0]!)
+    const record = mapOutputRow(updated.rows[0]!)
+
+    // Evento en la MISMA transacción que el write (patrón canónico del dominio). Payload
+    // redactado: ids, target, estado, intentos, asset id — nunca bytes, plan ni evidencia.
+    if (input.toState === 'completed' || input.toState === 'failed' || input.toState === 'dead_letter') {
+      const payload = {
+        version: 1 as const,
+        renderRunId: record.renderRunId,
+        insightOutputId: record.insightOutputId,
+        editionId: record.editionId,
+        organizationId: record.organizationId,
+        output: record.output,
+        audience: record.audience,
+        state: record.state,
+        attempts: record.attempts,
+        failureCode: record.failureCode,
+        outputAssetId: record.outputAssetId
+      }
+
+      if (input.toState === 'completed') await publishInsightRenderOutputCompleted(client as never, payload)
+      else await publishInsightRenderOutputFailed(client as never, payload)
+    }
+
+    return record
   })
 
 /**
@@ -547,3 +563,157 @@ export const cancelInsightRenderRun = async (input: {
 
     return { cancelled, stillRunning }
   })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Altas y lecturas por edición (las usa el command de encolado y el puerto de outputs)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface InsertInsightRenderRunInput {
+  organizationId: string
+  editionId: string
+  audience: InsightAudience
+  requestedOutputs: InsightOutput[]
+  requestedByKind: 'member' | 'system' | 'cli'
+  requestedByUserId: string | null
+  requestedByMemberId: string | null
+  outputs: Array<{
+    output: InsightOutput
+    catalogName: string
+    manifest: Record<string, unknown>
+    manifestHash: string
+    constraints?: Record<string, unknown>
+    deadline?: Date | null
+  }>
+  client: InsightsDbClient
+}
+
+/**
+ * Inserta run + outputs en la transacción del caller. Un output por target; la UNIQUE
+ * `(org, edición, output, audiencia)` hace que un segundo encargo del mismo target reviente en DB
+ * en vez de duplicar bytes — el command lo resuelve ANTES leyendo lo existente.
+ */
+export const insertInsightRenderRun = async (
+  input: InsertInsightRenderRunInput
+): Promise<{ run: InsightRenderRunRecord; outputs: InsightOutputRecord[] }> => {
+  const run = await input.client.query<Record<string, unknown>>(
+    `INSERT INTO greenhouse_insights.insight_render_runs
+       (organization_id, edition_id, audience, requested_outputs, requested_by_kind,
+        requested_by_user_id, requested_by_member_id)
+     VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7)
+     RETURNING ${RUN_COLUMNS}`,
+    [
+      input.organizationId,
+      input.editionId,
+      input.audience,
+      JSON.stringify(input.requestedOutputs),
+      input.requestedByKind,
+      input.requestedByUserId,
+      input.requestedByMemberId
+    ]
+  )
+
+  const runRecord = mapRunRow(run.rows[0]!)
+  const outputs: InsightOutputRecord[] = []
+
+  for (const output of input.outputs) {
+    const row = await input.client.query<Record<string, unknown>>(
+      `INSERT INTO greenhouse_insights.insight_outputs
+         (render_run_id, organization_id, edition_id, output, audience, catalog_name,
+          manifest, manifest_hash, constraints, deadline)
+       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9::jsonb, $10)
+       RETURNING ${OUTPUT_COLUMNS}`,
+      [
+        runRecord.renderRunId,
+        input.organizationId,
+        input.editionId,
+        output.output,
+        input.audience,
+        output.catalogName,
+        JSON.stringify(output.manifest),
+        output.manifestHash,
+        JSON.stringify(output.constraints ?? {}),
+        output.deadline ?? null
+      ]
+    )
+
+    await input.client.query(
+      `INSERT INTO greenhouse_insights.insight_render_events
+         (insight_output_id, render_run_id, organization_id, from_state, to_state, detail, actor_kind)
+       VALUES ($1, $2, $3, NULL, 'queued', $4, $5)`,
+      [
+        row.rows[0]!.insight_output_id,
+        runRecord.renderRunId,
+        input.organizationId,
+        JSON.stringify({ manifestHash: output.manifestHash, catalogName: output.catalogName }),
+        input.requestedByKind === 'member' ? 'member' : 'system'
+      ]
+    )
+
+    outputs.push(mapOutputRow(row.rows[0]!))
+  }
+
+  return { run: runRecord, outputs }
+}
+
+/**
+ * Outputs de una edición para UNA audiencia. Es la lectura del puerto de outputs y la base de la
+ * idempotencia del encargo: la audiencia entra en la clave porque un job de cliente jamás reutiliza
+ * los bytes de un draft interno aunque coincidan organización y período.
+ */
+export const findInsightOutputsForEdition = async (input: {
+  organizationId: string
+  editionId: string
+  audience: InsightAudience
+  client?: InsightsDbClient
+}): Promise<InsightOutputRecord[]> => {
+  const rows = await runInsightsQuery<Record<string, unknown>>(
+    input.client,
+    `SELECT ${OUTPUT_COLUMNS} FROM greenhouse_insights.insight_outputs
+      WHERE organization_id = $1 AND edition_id = $2 AND audience = $3
+      ORDER BY created_at DESC`,
+    [input.organizationId, input.editionId, input.audience]
+  )
+
+  return rows.map(mapOutputRow)
+}
+
+export const listInsightRenderRuns = async (input: {
+  organizationId: string
+  editionId?: string | null
+  audience?: InsightAudience | null
+  limit: number
+  offset: number
+  client?: InsightsDbClient
+}): Promise<{ items: InsightRenderRunRecord[]; total: number }> => {
+  const where: string[] = ['organization_id = $1']
+  const params: unknown[] = [input.organizationId]
+
+  if (input.editionId) {
+    params.push(input.editionId)
+    where.push(`edition_id = $${params.length}`)
+  }
+
+  if (input.audience) {
+    params.push(input.audience)
+    where.push(`audience = $${params.length}`)
+  }
+
+  const total = await runInsightsQuery<{ n: string }>(
+    input.client,
+    `SELECT count(*)::text AS n FROM greenhouse_insights.insight_render_runs WHERE ${where.join(' AND ')}`,
+    params
+  )
+
+  params.push(input.limit, input.offset)
+
+  const rows = await runInsightsQuery<Record<string, unknown>>(
+    input.client,
+    `SELECT ${RUN_COLUMNS} FROM greenhouse_insights.insight_render_runs
+      WHERE ${where.join(' AND ')}
+      ORDER BY created_at DESC
+      LIMIT $${params.length - 1} OFFSET $${params.length}`,
+    params
+  )
+
+  return { items: rows.map(mapRunRow), total: Number(total[0]?.n ?? 0) }
+}

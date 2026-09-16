@@ -22,8 +22,6 @@ import 'server-only'
  * Re-solicitar devuelve el job existente; NUNCA un segundo asset final.
  */
 
-import crypto from 'node:crypto'
-
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
@@ -139,31 +137,11 @@ const mapJobRow = (row: Record<string, unknown>): ProposalRenderJobRecord => ({
   updatedAt: row.updated_at as string
 })
 
-/**
- * Serialización CANÓNICA (claves ordenadas, profunda). El manifest viaja por JSONB y PostgreSQL
- * normaliza el orden de claves de los objetos — un hash sensible al orden haría que el mismo
- * manifest nunca coincida tras el round-trip a DB (drift falso). Los arrays conservan su orden
- * (el orden de láminas SÍ es contenido).
- */
-const canonicalJson = (value: unknown): string => {
-  if (Array.isArray(value)) {
-    return `[${value.map(canonicalJson).join(',')}]`
-  }
+// TASK-1846 — el hash canónico se movió VERBATIM al composer (domain-free) y se re-exporta acá
+// para que ningún consumer histórico cambie: Proposal sigue produciendo los mismos hashes.
+import { hashResolvedManifest } from '@/lib/artifact-composer/manifest-hash'
 
-  if (value !== null && typeof value === 'object') {
-    const entries = Object.entries(value as Record<string, unknown>)
-      .filter(([, v]) => v !== undefined)
-      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-
-    return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${canonicalJson(v)}`).join(',')}}`
-  }
-
-  return JSON.stringify(value)
-}
-
-/** Hash canónico del manifest: sha256 de la serialización canónica (estable ante JSONB). */
-export const hashResolvedManifest = (manifest: unknown): string =>
-  crypto.createHash('sha256').update(canonicalJson(manifest)).digest('hex')
+export { hashResolvedManifest }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // requestProposalRender — EL command (la confirmación humana del agente ejecuta esto mismo)

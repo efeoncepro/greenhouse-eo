@@ -721,6 +721,32 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // ── TASK-1846 — render durable (lane ecosystem `/insights/**`) ──
+  async requestInsightRender(input: { organizationId?: string; editionId: string; outputs?: string[] }) {
+    return this.request(`/api/platform/ecosystem/insights/editions/${encodeURIComponent(input.editionId)}/render`, {}, {
+      method: 'POST',
+      body: { organizationId: input.organizationId, ...(input.outputs ? { outputs: input.outputs } : {}) }
+    })
+  }
+
+  async getInsightRenderRun(input: { organizationId?: string; renderRunId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/render-runs/${encodeURIComponent(input.renderRunId)}`, { organizationId: input.organizationId })
+  }
+
+  async retryInsightRender(input: { organizationId?: string; renderRunId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/render-runs/${encodeURIComponent(input.renderRunId)}/retry`, {}, {
+      method: 'POST',
+      body: { organizationId: input.organizationId }
+    })
+  }
+
+  async cancelInsightRender(input: { organizationId?: string; renderRunId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/render-runs/${encodeURIComponent(input.renderRunId)}/cancel`, {}, {
+      method: 'POST',
+      body: { organizationId: input.organizationId }
+    })
+  }
+
   private async request<TData>(
     path: string,
     query: QueryParams = {},

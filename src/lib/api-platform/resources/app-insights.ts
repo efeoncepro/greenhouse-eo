@@ -11,9 +11,9 @@ import type { AppPlatformRequestContext } from '@/lib/api-platform/core/app-auth
 import { ApiPlatformError } from '@/lib/api-platform/core/errors'
 import { buildApiPlatformPaginationMeta, parseApiPlatformPaginationParams } from '@/lib/api-platform/core/pagination'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
-import { createInsightEdition, issueInsightEdition, recoverInsightEdition, reviseInsightEdition, withdrawInsightEdition } from '@/lib/efeonce-insights/commands'
+import { cancelInsightRender, createInsightEdition, issueInsightEdition, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition, withdrawInsightEdition } from '@/lib/efeonce-insights/commands'
 import { isInsightEditionState, type InsightEditionState } from '@/lib/efeonce-insights/contracts/states'
-import { readInsightEdition, readInsightEditions, readInsightReport, readInsightReports, readInsightsCatalog } from '@/lib/efeonce-insights/readers'
+import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsightRenderRuns, readInsightReport, readInsightReports, readInsightsCatalog } from '@/lib/efeonce-insights/readers'
 
 import { withInsightsErrors } from './insights-errors'
 
@@ -107,3 +107,35 @@ export const recoverAppInsightEdition = async ({ context, request, body, edition
 
     return { data: { edition: result.edition, generation: { outcome: result.outcome, failedPhase: result.failedPhase, failureCode: result.failureCode } }, status: 202 }
   })
+
+// ── TASK-1846 — render durable: request/get/list/retry/cancel (asíncrono: 202, nunca espera a Chromium) ──
+
+const renderResult = (result: { run: unknown; outputs: unknown; idempotent: boolean }) => ({
+  data: { run: result.run, outputs: result.outputs, idempotent: result.idempotent },
+  status: result.idempotent ? 200 : 202
+})
+
+export const requestAppInsightRender = async ({ context, request, body, editionId }: { context: AppPlatformRequestContext; request: Request; body: unknown; editionId: string }) =>
+  withInsightsErrors(async () => renderResult(await requestInsightRender({ ...resolveScope(context, request, body), editionId, outputs: isRecord(body) ? body.outputs : undefined })))
+
+export const listAppInsightRenderRuns = async ({ context, request, editionId }: { context: AppPlatformRequestContext; request: Request; editionId: string }) =>
+  withInsightsErrors(async () => {
+    const pagination = parseApiPlatformPaginationParams(request)
+    const result = await readInsightRenderRuns({ ...resolveScope(context, request), editionId, limit: pagination.pageSize, offset: pagination.offset })
+
+    return { data: result.items, meta: buildApiPlatformPaginationMeta({ ...pagination, total: result.total, count: result.items.length }) }
+  })
+
+export const getAppInsightRenderRun = async ({ context, request, renderRunId }: { context: AppPlatformRequestContext; request: Request; renderRunId: string }) =>
+  withInsightsErrors(() => readInsightRenderRun({ ...resolveScope(context, request), renderRunId }))
+
+export const retryAppInsightRender = async ({ context, request, body, renderRunId }: { context: AppPlatformRequestContext; request: Request; body: unknown; renderRunId: string }) =>
+  withInsightsErrors(async () => renderResult(await retryInsightRender({ ...resolveScope(context, request, body), renderRunId })))
+
+export const cancelAppInsightRender = async ({ context, request, body, renderRunId }: { context: AppPlatformRequestContext; request: Request; body: unknown; renderRunId: string }) =>
+  withInsightsErrors(async () => {
+    const result = await cancelInsightRender({ ...resolveScope(context, request, body), renderRunId })
+
+    return { data: { run: result.run, outputs: result.outputs, cancelled: result.cancelled, stillRunning: result.stillRunning, idempotent: result.idempotent }, status: 200 }
+  })
+

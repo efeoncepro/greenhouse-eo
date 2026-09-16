@@ -20,7 +20,13 @@ const domain = vi.hoisted(() => ({
   reviseInsightEdition: vi.fn(),
   issueInsightEdition: vi.fn(async () => ({ edition: {}, idempotent: false })),
   withdrawInsightEdition: vi.fn(),
-  recoverInsightEdition: vi.fn()
+  recoverInsightEdition: vi.fn(),
+  // TASK-1846 — render durable
+  requestInsightRender: vi.fn(async (input: unknown) => ({ run: { renderRunId: 'irun-1', state: 'pending' }, outputs: [], idempotent: false, input })),
+  retryInsightRender: vi.fn(async () => ({ run: {}, outputs: [], idempotent: true })),
+  cancelInsightRender: vi.fn(async () => ({ run: {}, outputs: [], idempotent: true, cancelled: 0, stillRunning: 0 })),
+  readInsightRenderRun: vi.fn(),
+  readInsightRenderRuns: vi.fn(async () => ({ items: [], total: 0 }))
 }))
 
 vi.mock('@/lib/efeonce-insights/readers', () => domain)
@@ -91,4 +97,21 @@ describe('ecosystem lane — derivación del sujeto máquina', () => {
     expect(result.status).toBe(202)
     expect(domain.createInsightEdition).toHaveBeenCalledWith(expect.objectContaining({ organizationId: 'org-a', actorOrganizationId: null, subject: expect.objectContaining({ tenantType: 'efeonce_internal', userId: 'consumer:cons-1' }) }))
   })
+
+  it('render (TASK-1846): binding org-scoped no encola (scope_not_allowed) pero lista sus runs; binding interno encola y recibe 202', async () => {
+    const { listEcosystemInsightRenderRunsPayload, requestEcosystemInsightRenderPayload } = await import('./ecosystem-insights')
+    const orgScoped = ctx({ organizationId: 'org-a', greenhouseScopeType: 'organization' })
+
+    await expect(requestEcosystemInsightRenderPayload({ context: orgScoped, request: req('https://x/api'), body: {}, editionId: 'insed-1' })).rejects.toMatchObject({ errorCode: 'scope_not_allowed' })
+    expect(domain.requestInsightRender).not.toHaveBeenCalled()
+
+    await listEcosystemInsightRenderRunsPayload({ context: orgScoped, request: req('https://x/api'), editionId: 'insed-1' })
+    expect(domain.readInsightRenderRuns).toHaveBeenCalledWith(expect.objectContaining({ actorOrganizationId: 'org-a', organizationId: 'org-a', editionId: 'insed-1' }))
+
+    const result = await requestEcosystemInsightRenderPayload({ context: ctx({}), request: req('https://x/api'), body: { organizationId: 'org-a', outputs: ['deck_pdf'] }, editionId: 'insed-1' })
+
+    expect(result.status).toBe(202)
+    expect(domain.requestInsightRender).toHaveBeenCalledWith(expect.objectContaining({ actorOrganizationId: null, organizationId: 'org-a', editionId: 'insed-1', outputs: ['deck_pdf'] }))
+  })
 })
+
