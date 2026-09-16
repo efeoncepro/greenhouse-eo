@@ -434,6 +434,11 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
 - 🔴 **Saldo de fal agotado al 2026-09-16.** Toda corrida nueva falla con **403 `User is locked. Reason: Exhausted
   balance`** antes de encolar (sin costo). No es un bug del CLI ni de la key: hay que **recargar** en
   `fal.ai/dashboard/billing`, y eso lo hace una persona (el operador), nunca el agente. No reintentes en loop.
+- **Bloqueo por saldo (403 `User is locked`):** corre `pnpm ai:fal --balance` antes de reintentar. Muestra el saldo de la
+  cuenta dueña de la clave; si sigue bajo cero tras recargar, la recarga quedó en otra cuenta o equipo de fal (caso
+  2026-09-16: −3,86 USD tras recargar 50). Un 422 de validación no prueba saldo. Pendientes en el catálogo fal
+  §Pendientes operativos: LoRA de H3 (postergada por decisión del operador), Seedance sin verificar y Recraft sin vía
+  operativa (Higgsfield CLI `Not authenticated`).
 - **Retome (request_id):** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408)
   el trabajo **sigue corriendo y cobrando** en fal: no relances; usa el comando de retome que imprime el CLI
   (verificado: mismo archivo byte a byte; alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream, Seedance y Flux 3 usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.) La cola se direcciona por APP (dos primeros segmentos del slug), no por

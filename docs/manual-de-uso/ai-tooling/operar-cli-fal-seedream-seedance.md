@@ -1,7 +1,7 @@
 # Operar el CLI de fal: Seedream 5, Seedance 2.5/2.0, Minimax H3, Flux 3 y Wan 3.0
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-16 por agente
 > **Ultima actualizacion:** 2026-09-16 por Claude — Wan 3.0 y Wan 3.0 Prime (texto, imagen y referencias a video; `--duration auto`, `--thinking` con `--web-url`/`--file`, `--no-prompt-expansion`, `--seed`), advertencia de saldo agotado en fal y 403 `Exhausted balance`; antes, Flux 3 (draft → enhance, primer/ultimo cuadro, keyframes, edit y extend) y video a video con Seedance 2.5 (`--task editing|extension`, sin verificar); antes, Minimax H3 (video, camera-controls, LoRA y entrenamiento), retome por `--request-id` y cierre de la brecha de `--task`
 > **Modulo:** AI Tooling / Asset Generation
@@ -478,6 +478,15 @@ trabajo real.
 - No dejes exploraciones en `public/images/generated/` ni en `.captures/`.
 
 ## Problemas comunes
+
+### Recargaste saldo y sigue apareciendo `User is locked` (403)
+
+1. Corre `pnpm ai:fal --balance`. Es gratis y muestra el saldo de la cuenta de fal **dueña de la clave** que usa el CLI.
+2. Si el número sigue bajo cero, la recarga quedó en otra cuenta o equipo de fal, o todavía no se acredita. Revisa en
+   fal.ai/dashboard/billing que la cuenta seleccionada sea la misma de la clave.
+3. No reintentes corridas para probar: con la cuenta bloqueada, fal igual valida los pedidos (422) y eso no demuestra saldo.
+
+Caso del 2026-09-16: tras recargar USD 50 el saldo de la cuenta de la clave seguía en −3,86 USD.
 
 - **`fal.ai no está configurado. Define FAL_API_KEY o FAL_API_KEY_SECRET_REF.`** Falta la referencia en
   `.env.local` o la sesion de Google Cloud vencio. Reautentica `gcloud` y vuelve a intentar.

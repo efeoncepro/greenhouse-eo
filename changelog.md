@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — La recarga de fal no llegó a la cuenta de la clave; `pnpm ai:fal --balance` lo muestra en segundos
+
+Después de recargar USD 50, el CLI seguía bloqueado por saldo. La cuenta de fal dueña de la clave que usamos tenía
+−3,86 USD: la recarga no estaba ahí. Se descartó que otro sistema estuviera gastando: Globe usa la misma clave, pero no
+hubo llamadas a fal desde ningún servidor en una semana. Ahora `pnpm ai:fal --balance` muestra ese saldo sin costo y el
+CLI lo imprime solo cuando fal bloquea una corrida. Wan 3.0 sumó tres verificaciones; quedan documentados como
+pendientes las pruebas de Seedance, el entrenamiento de LoRA de H3 (postergado) y Recraft, que hoy no tiene vía
+operativa porque la CLI de Higgsfield perdió la sesión.
+
 ## 2026-09-16 — Wan 3.0 entra a `pnpm ai:fal`; Nano Banana Pro está disponible pero nadie lo usa
 
 Wan 3.0 y Wan 3.0 Prime, segundo del ranking de video de OpenArt Arena y primero en edición, quedaron en el CLI
@@ -929,23 +938,3 @@ La causa raíz también quedó cerrada en los espejos Claude/Codex: las fichas N
 artículo y se copian literalmente a las tareas visuales. Una vez producido el arte, composición, copy, ALT,
 archivo, formato y posición quedan congelados hasta una conciliación explícita con diseño. El gate distingue
 fichas de notas internas, exige exactamente N1–N4 completas y conserva la jerarquía de toggles.
-
-## 2026-09-07 — TASK-1813 despliega discovery OAuth nativo/base-only y ensaya rollback
-
-`efeonce-mcp` `1.2.0` deja Efeonce ID como único authorization server anunciado cuando el carril nativo está
-activo, fija el bootstrap en `efeonce.mcp.read` y entrega scopes adicionales por challenge 403. Retira el shim
-DCR/metadata AS del gateway, `OAUTH_PUBLIC_CLIENT_ID` y `MCP_REQUIRED_SCOPES` como controles de deploy, sin
-retirar validación Entra legacy ni modificar grants, providers o tool surface. El harness conductual pasa
-154/154 sin omitidos; CI `34162827740` construyó además el contenedor. El deploy manual `34162885950` dejó
-`cd229069` en `efeonce-mcp-gateway-00047-8b5` / `sha256:608a4789…b29e`, 100 % Ready. El canary productivo
-confirmó PRM root/path base-only, shim `404`, `/register` `404` y MCP anónimo `401`. El rollback movió 100 % a
-`00046-6n2`, reprodujo el contrato anterior, restauró 100 % a `00047-8b5` y repitió los asserts nuevos.
-Claude Code `2.1.263` refrescó con scope base único e invocó una lectura sin gasto. Codex `0.153.4` canary emitió
-un token CIMD externo sólo con `efeonce.mcp.read` y ejecutó status + lectura SEO sin gasto; Claude.ai repitió una
-lectura hospedada base-only con `no_entitlement` y uso cero. Claude Desktop `1.46388.4` y ChatGPT hospedado
-repitieron `get_seo_entitlement` post-cutover: respuesta visible `ok=true`, `no_entitlement`, allowance/presupuesto
-cero; sus familias renovaron con scope único y Cloud Run correlacionó `POST /mcp` 200 contra `00047-8b5`. En un
-flujo separado, `jreyes@efeoncepro.com` autenticó con Microsoft y llegó al consentimiento corporativo sólo para
-`Efeonce`; el code expiró sin intercambio, token ni dispatch. La autoridad interna multiorganización queda en
-TASK-1844/U19. No hubo cambios Entra ni widening. La skill MCP y sus referencias Claude/Codex quedaron alineadas
-con el rollout servido y ese límite. [Task y evidencia](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md).

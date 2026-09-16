@@ -1,6 +1,6 @@
 # Greenhouse — Fal.ai Model & Capability Catalog V1
 
-> **Tipo:** Referencia técnica agent-facing · **Version:** 1.4 · **Creado:** 2026-07-06 por Claude
+> **Tipo:** Referencia técnica agent-facing · **Version:** 1.5 · **Creado:** 2026-07-06 por Claude
 > **Última actualización:** 2026-09-16 por Claude — Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal` (6
 > endpoints de video; 1 verificado en real y 5 sin verificar porque el saldo de fal se agotó), revisión sin conexión
 > de Kling 3 y Grok Imagine, y decisión de mantener Gemini Omni Flash y Nano Banana Pro directo por Google. Antes
@@ -654,6 +654,44 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 | Wan / Hunyuan video LoRA trainer | `fal-ai/wan-trainer` · `fal-ai/hunyuan-video-lora-trainer` 🔎 | LoRA de video |
 
 ---
+
+## Pendientes operativos (2026-09-16)
+
+### Bloqueo por saldo y `--balance`
+- **Incidente:** tras una recarga de USD 50, las corridas seguían en 403 `User is locked` (`Exhausted balance` o
+  `TOP_UP`) y la subida al storage también. `GET https://rest.alpha.fal.ai/billing/user_balance` con la clave del CLI
+  devolvió **−3,86 USD**: la recarga no estaba en la cuenta dueña de la clave (o no se había acreditado).
+- **Diagnóstico:** `pnpm ai:fal --balance` (gratis, clave normal). Ante un 403 de bloqueo el CLI imprime el saldo solo.
+  Si recargaste y sigue bajo cero, la recarga quedó en otra cuenta o equipo de fal.
+- **Descartado:** consumo de otro runtime. La clave `greenhouse-fal-api-key` (efeonce-group) es idéntica a
+  `globe-fal-api-key` (efeonce-globe, servicio `globe-api-internal`, `GLOBE_GOVERNED_FAL_ENABLED=false`), pero no hubo
+  llamadas a dominios de fal desde ningún runtime en 7 días ni tráfico de Globe en 24 h. El consumo es sólo del CLI.
+- **Detalle útil:** con la cuenta bloqueada, un POST vacío a `https://fal.run/<slug>` sigue devolviendo 422 (validación)
+  y no prueba que haya saldo. Mirar el saldo, no la validación.
+
+### Verificaciones pendientes (bloqueadas por el saldo)
+- **Wan 3.0:** `wan3-i2v`, `wan3prime-i2v` (≈ USD 0,20 a 2 s).
+- **Seedance:** los 12 sin verificar: `seedance20-i2v`, `seedance20-r2v`, `seedance20-{fast,mini,us}-{t2v,i2v,r2v}` y
+  `seedance25-r2v` en `reference`, `editing` y `extension` (≈ USD 3,6 a 480p/4 s; editing/extension cobran además el video
+  de entrada, sin dato).
+- Precios Seedance en fal: por 1.000 tokens (2.5 0,0214 · 2.0 0,014 · fast 0,0112 · mini 0,007 · us 0,0168). La
+  equivalencia ~54.000 tokens por 5 s a 720p se infiere cruzando con OpenArt Arena; no está verificada.
+
+### LoRA de Minimax H3 — pendiente por decisión del operador
+- **Qué falta:** verificar los 4 entrenadores (`h3-train-{t2v,i2v,flf2v,ref2va}`) y las 3 variantes que la usan
+  (`h3-{t2v,i2v,r2v}-lora`). Hoy están declaradas sin verificar.
+- **Cómo:** entrenar con un zip mínimo de clips y ~10 steps (≈ USD 0,40, sirve sólo para probar el contrato), y usar esa
+  LoRA en las 3 variantes a 5 s (≈ USD 0,94). Una LoRA útil para producción, ~2.000 steps, cuesta USD 10–30.
+- **Para qué:** consistencia de personaje, producto o estilo de marca entre tomas. Postergado el 2026-09-16.
+
+### Recraft — sin vía operativa hoy
+- **Código:** ninguna integración directa (sin SDK, secreto ni registro en `ai:fal`).
+- **Carril documentado:** Higgsfield CLI (`~/.local/bin/higgsfield`, cuenta `mkt@efeoncepro.com`) con Recraft V4.1 para
+  vectores. El 2026-09-16 la CLI responde `Not authenticated`: hay que correr `higgsfield auth login` (lo hace una persona
+  en el navegador).
+- **Por fal (no conectado):** 23 endpoints, por ejemplo `fal-ai/recraft/v4.1/text-to-vector` (USD 0,08), `…/pro/text-to-vector`
+  (0,30), `fal-ai/recraft/vectorize` (0,01), `fal-ai/recraft/upscale/crisp` (0,004) y `recraft/v4/style/*` con estilos propios
+  (`recraft/v4/create-style`, 0,005).
 
 ## Reglas duras (recap)
 
