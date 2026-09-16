@@ -60,7 +60,7 @@ TASK-690–693 para Hub/preferencias y TASK-303/387/694 para audiencia/digest/me
 
 | Task | Resultado | Estado |
 |---|---|---|
-| [TASK-1851](to-do/TASK-1851-openai-image-provider-contract-consolidation.md) | GPT Image 2.5, default Imagen bloqueado, falla ruidosa y medición de `usage` real | to-do |
+| [TASK-1851](in-progress/TASK-1851-openai-image-provider-contract-consolidation.md) | GPT Image 2.5, carril Imagen retirado, falla ruidosa y medición de `usage` real | in-progress |
 | [TASK-1850](complete/TASK-1850-openai-gpt-image-2-5-helper-enablement.md) | supersedida por TASK-1851; cerrada sin ejecutar | complete |
 
 ## Programa Payroll: EPIC-043
