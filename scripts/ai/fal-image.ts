@@ -7,7 +7,16 @@ import { promisify } from 'node:util'
 
 import { config as loadEnv } from 'dotenv'
 
-import { awaitFalRequest, getFalBalance, resolveFalQueueHandle, runFalModel, uploadFalFile } from '@/lib/ai/fal'
+import {
+  awaitFalRequest,
+  FAL_ACCOUNT_ENV_VARS,
+  getFalAccountBalances,
+  isFalBalanceLock,
+  resolveFalQueueHandle,
+  runFalModel,
+  uploadFalFile,
+  type FalAccountName
+} from '@/lib/ai/fal'
 import { FAL_CAPABILITIES, findFalCapability, type FalCapability, type FalReferenceSlot } from '@/lib/ai/fal-capabilities'
 
 /**
@@ -22,7 +31,7 @@ import { FAL_CAPABILITIES, findFalCapability, type FalCapability, type FalRefere
  *
  * Uso:
  *   pnpm ai:fal --list
- *   pnpm ai:fal --balance                     (saldo USD de la cuenta dueña de la clave; gratis)
+ *   pnpm ai:fal --balance                     (saldo USD de cada cuenta de fal configurada; gratis)
  *   pnpm ai:fal --capability seedream5-pro --prompt "<texto>" --out out.png
  *   pnpm ai:fal --capability seedream5-pro-layerize --image poster.png --out-dir ./capas
  *   pnpm ai:fal --capability h3turbo-t2v --prompt "<texto>" --duration 5 --resolution 768P --out clip.mp4
@@ -39,6 +48,8 @@ import { FAL_CAPABILITIES, findFalCapability, type FalCapability, type FalRefere
  *   --timeout <ms>       Presupuesto de polling (imagen 3 min · video 15 min · entrenamiento 3 h)
  *   --request-id <id>    Retoma un trabajo ya encolado en vez de enviar uno nuevo
  *   --json               Imprime el output crudo del modelo
+ *   --fal-account <FAL_API_KEY|FAL_API_KEY_B>  Fuerza una cuenta. Omitido = la de más saldo, y si fal la bloquea por
+ *                        saldo pasa sola a la otra (el bloqueo ocurre antes de encolar: no cobra)
  *
  * Imagen:  --size <enum|WxH> · --count <n> · --format jpeg|png
  * Video:   --duration · --resolution · --aspect · --bitrate · --task · --no-audio · --end-image
@@ -102,6 +113,7 @@ interface CliArgs {
   json: boolean
   list: boolean
   balance: boolean
+  falAccount?: FalAccountName
   help: boolean
 }
 
@@ -161,6 +173,18 @@ const parseArgs = (argv: string[]): CliArgs => {
       case '--json': args.json = true; break
       case '--list': args.list = true; break
       case '--balance': args.balance = true; break
+
+      case '--fal-account': {
+        const value = next()
+
+        if (!(FAL_ACCOUNT_ENV_VARS as readonly string[]).includes(value)) {
+          throw new Error(`--fal-account debe ser uno de: ${FAL_ACCOUNT_ENV_VARS.join(', ')}.`)
+        }
+
+        args.falAccount = value as FalAccountName
+        break
+      }
+
       case '--help':
       case '-h': args.help = true; break
       default: throw new Error(`Argumento desconocido: ${argv[i]}`)
@@ -838,9 +862,10 @@ const main = async () => {
   }
 
   if (args.balance) {
-    const balance = await getFalBalance()
+    for (const { account, balance } of await getFalAccountBalances()) {
+      process.stdout.write(`${account.padEnd(14)} ${balance === null ? 'saldo no disponible' : `USD ${balance.toFixed(2)}`}\n`)
+    }
 
-    process.stdout.write(balance === null ? 'fal no devolvió el saldo.\n' : `Saldo de la cuenta de la clave: USD ${balance.toFixed(2)}\n`)
     process.exit(0)
   }
 
@@ -874,14 +899,16 @@ const main = async () => {
 
   const timeoutMs = args.timeoutMs ?? kindTimeout
 
-  const resumeHint = (requestId: string) =>
-    `pnpm ai:fal ${capability ? `--capability ${capability.id}` : `--model ${slug}`} --request-id ${requestId}`
+  const resumeHint = (requestId: string, account: FalAccountName | null) =>
+    `pnpm ai:fal ${capability ? `--capability ${capability.id}` : `--model ${slug}`} --request-id ${requestId}${
+      account ? ` --fal-account ${account}` : ''
+    }`
 
   let result
 
   if (args.requestId) {
     process.stdout.write(`↻ retomando ${slug} · request ${args.requestId}\n`)
-    result = await awaitFalRequest({ model: slug, requestId: args.requestId, pollTimeoutMs: timeoutMs })
+    result = await awaitFalRequest({ model: slug, requestId: args.requestId, pollTimeoutMs: timeoutMs, account: args.falAccount })
   } else {
     // Una capacidad declarada y nunca ejercitada puede fallar o devolver otra forma: se avisa ANTES de gastar.
     if (capability && !capability.verifiedAt) {
@@ -899,8 +926,9 @@ const main = async () => {
       model: slug,
       input,
       pollTimeoutMs: timeoutMs,
+      account: args.falAccount,
       onEnqueued: handle => {
-        process.stdout.write(`  ⋯ encolado · request_id ${handle.requestId}\n`)
+        process.stdout.write(`  ⋯ encolado · request_id ${handle.requestId} · cuenta ${handle.account}\n`)
 
         // La reconstrucción del retome debe coincidir con lo que fal devolvió; si no, el retome fallaría.
         const rebuilt = resolveFalQueueHandle(slug, handle.requestId)
@@ -915,13 +943,15 @@ const main = async () => {
   if (!result.ok) {
     process.stderr.write(`FATAL: ${slug} falló (HTTP ${result.httpStatus})${result.errorDetail ? `: ${result.errorDetail}` : ''}\n`)
 
-    // Un bloqueo por saldo se diagnostica mirando la cuenta DUEÑA de la clave: una recarga en otra cuenta no lo levanta.
-    if (result.httpStatus === 403 && /locked|balance|top.?up/i.test(result.errorDetail ?? '')) {
-      const balance = await getFalBalance().catch(() => null)
+    // Si llegó hasta acá bloqueado por saldo, ya se probaron TODAS las cuentas configuradas (o se forzó una).
+    if (isFalBalanceLock(result.httpStatus, result.errorDetail)) {
+      const balances = await getFalAccountBalances().catch(() => [])
 
       process.stderr.write(
-        `  saldo de la cuenta de esta clave: ${balance === null ? 'no disponible' : `USD ${balance.toFixed(2)}`}. ` +
-          'Si recargaste y sigue bajo cero, la recarga quedó en otra cuenta o equipo de fal.\n'
+        `  todas las cuentas de fal probadas están sin saldo: ${
+          balances.map(item => `${item.account} ${item.balance === null ? '?' : `USD ${item.balance.toFixed(2)}`}`).join(' · ') ||
+          'saldo no disponible'
+        }. Recarga la cuenta que corresponde en fal.ai/dashboard/billing.\n`
       )
     }
 
@@ -929,7 +959,9 @@ const main = async () => {
       process.stderr.write(`  request_id ${result.requestId}\n`)
 
       // Un timeout local NO detiene el trabajo en fal: sigue corriendo y se cobra. Se puede retomar.
-      if (result.httpStatus === 408) process.stderr.write(`  el trabajo sigue en fal; retómalo con:\n  ${resumeHint(result.requestId)}\n`)
+      if (result.httpStatus === 408) {
+        process.stderr.write(`  el trabajo sigue en fal; retómalo con:\n  ${resumeHint(result.requestId, result.account)}\n`)
+      }
     }
 
     process.exit(1)
@@ -990,7 +1022,9 @@ const main = async () => {
     process.stdout.write(`  ✓ metadata de capas → ${manifestPath.replace(process.cwd(), '.')}\n`)
   }
 
-  process.stdout.write(`done · ${result.latencyMs} ms · ${assets.length} asset(s) · request_id ${result.requestId}\n`)
+  process.stdout.write(
+    `done · ${result.latencyMs} ms · ${assets.length} asset(s) · request_id ${result.requestId} · cuenta ${result.account}\n`
+  )
 }
 
 void main().catch((error: unknown) => {

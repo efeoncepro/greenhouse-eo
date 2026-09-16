@@ -4,7 +4,8 @@ import { resolveSecret, type SecretResolutionSource } from '@/lib/secrets/secret
 
 // Canonical fal.ai client. Sibling of openai.ts / anthropic.ts / google-genai.ts /
 // perplexity.ts. NEVER instantiate a parallel fal.ai fetch inside a domain module —
-// extend this client. Secret resolves server-side via FAL_API_KEY / FAL_API_KEY_SECRET_REF.
+// extend this client. Secrets resolve server-side via FAL_API_KEY / FAL_API_KEY_SECRET_REF and, for the second
+// account, FAL_API_KEY_B / FAL_API_KEY_B_SECRET_REF (see "Cuentas" below).
 // No official SDK dependency → fetch wrapper against the queue API (canonical pattern).
 //
 // fal.ai keys are shaped `<key_id>:<key_secret>` and travel in `Authorization: Key <value>`.
@@ -29,26 +30,117 @@ export interface FalModelResult<TOutput = unknown> {
   errorDetail: string | null
   latencyMs: number
   secretSource: SecretResolutionSource
+  /** Cuenta que ejecutó (o intentó ejecutar) el trabajo. Nombre de la variable, nunca la clave. */
+  account: FalAccountName | null
+}
+
+// ── Cuentas ──────────────────────────────────────────────────────────────────────────────────────
+//
+// Greenhouse opera con más de una cuenta de fal. Incidente 2026-09-16: se recargaron USD 50 en una cuenta distinta
+// de la dueña de FAL_API_KEY, que quedó en −3,86 y bloqueada ("User is locked"). En vez de depender de recargar la
+// cuenta correcta, el cliente conoce todas las claves configuradas, las ordena por saldo y, si fal bloquea una
+// por saldo, pasa a la siguiente. Nunca expone ni loguea claves: sólo el nombre de la variable.
+
+/** Variables de clave en orden declarado. Sumar una cuenta = sumar su nombre acá y su `*_SECRET_REF`. */
+export const FAL_ACCOUNT_ENV_VARS = ['FAL_API_KEY', 'FAL_API_KEY_B'] as const
+
+export type FalAccountName = (typeof FAL_ACCOUNT_ENV_VARS)[number]
+
+interface FalAccount {
+  name: FalAccountName
+  value: string
+  source: SecretResolutionSource
+}
+
+const FAL_BALANCE_URL = 'https://rest.alpha.fal.ai/billing/user_balance'
+
+const resolveFalAccounts = async (): Promise<FalAccount[]> => {
+  const accounts: FalAccount[] = []
+
+  for (const name of FAL_ACCOUNT_ENV_VARS) {
+    try {
+      const resolution = await resolveSecret({ envVarName: name })
+
+      if (resolution.value) accounts.push({ name, value: resolution.value.trim(), source: resolution.source })
+    } catch {
+      // Una cuenta mal configurada no tumba a las demás; si no queda ninguna, falla abajo.
+    }
+  }
+
+  if (!accounts.length) {
+    throw new Error('fal.ai no está configurado. Define FAL_API_KEY o FAL_API_KEY_SECRET_REF (y opcional FAL_API_KEY_B).')
+  }
+
+  return accounts
 }
 
 export const isFalConfigured = async (): Promise<boolean> => {
   try {
-    const resolution = await resolveSecret({ envVarName: 'FAL_API_KEY' })
-
-    return Boolean(resolution.value)
+    return (await resolveFalAccounts()).length > 0
   } catch {
     return false
   }
 }
 
-const resolveFalApiKey = async () => {
-  const resolution = await resolveSecret({ envVarName: 'FAL_API_KEY' })
+/** Un 403 de fal por falta de saldo ("User is locked. Reason: Exhausted balance" o "TOP_UP"). */
+export const isFalBalanceLock = (httpStatus: number, detail: string | null | undefined): boolean =>
+  httpStatus === 403 && /locked|exhausted balance|top.?up/i.test(detail ?? '')
 
-  if (!resolution.value) {
-    throw new Error('fal.ai no está configurado. Define FAL_API_KEY o FAL_API_KEY_SECRET_REF.')
+const fetchAccountBalance = async (account: FalAccount): Promise<number | null> => {
+  try {
+    const response = await fetch(FAL_BALANCE_URL, { headers: authHeaders(account.value) })
+    const balance = Number((await response.text()).trim())
+
+    return response.ok && Number.isFinite(balance) ? balance : null
+  } catch {
+    return null
   }
+}
 
-  return { ...resolution, value: resolution.value }
+let rankedAccounts: Promise<FalAccount[]> | null = null
+
+/**
+ * Cuentas ordenadas para este proceso: primero las que tienen saldo positivo (de mayor a menor), después las
+ * demás en el orden declarado. Si el saldo no se puede leer, esa cuenta conserva su lugar declarado. Se calcula una
+ * vez por proceso: el CLI es de corta vida y el bloqueo real se maneja en caliente con `isFalBalanceLock`.
+ */
+const rankFalAccounts = (): Promise<FalAccount[]> => {
+  rankedAccounts ??= (async () => {
+    const accounts = await resolveFalAccounts()
+
+    if (accounts.length === 1) return accounts
+
+    const balances = await Promise.all(accounts.map(fetchAccountBalance))
+    const indexed = accounts.map((account, index) => ({ account, index, balance: balances[index] }))
+
+    const funded = indexed
+      .filter(item => item.balance !== null && item.balance > 0)
+      .sort((a, b) => (b.balance ?? 0) - (a.balance ?? 0))
+
+    const rest = indexed.filter(item => !funded.includes(item)).sort((a, b) => a.index - b.index)
+
+    return [...funded, ...rest].map(item => item.account)
+  })()
+
+  return rankedAccounts
+}
+
+/** Sólo tests: el orden de cuentas se memoiza por proceso. */
+export const resetFalAccountsForTests = () => {
+  rankedAccounts = null
+}
+
+export interface FalAccountBalance {
+  account: FalAccountName
+  balance: number | null
+}
+
+/** Saldo USD de cada cuenta configurada, en orden declarado. Funciona con claves normales (no ADMIN). */
+export const getFalAccountBalances = async (): Promise<FalAccountBalance[]> => {
+  const accounts = await resolveFalAccounts()
+  const balances = await Promise.all(accounts.map(fetchAccountBalance))
+
+  return accounts.map((account, index) => ({ account: account.name, balance: balances[index] }))
 }
 
 const authHeaders = (apiKey: string) => ({
@@ -107,23 +199,48 @@ export const runFalModel = async <TOutput = unknown>(params: {
   input: Record<string, unknown>
   pollTimeoutMs?: number
   pollIntervalMs?: number
-  onEnqueued?: (handle: FalQueueHandle) => void
+  onEnqueued?: (handle: FalQueueHandle & { account: FalAccountName }) => void
+  /** Fuerza una cuenta (sin failover). Omitido = la de más saldo, con failover ante bloqueo por saldo. */
+  account?: FalAccountName
 }): Promise<FalModelResult<TOutput>> => {
-  const apiKey = await resolveFalApiKey()
+  const ranked = await rankFalAccounts()
+  const candidates = params.account ? ranked.filter(item => item.name === params.account) : ranked
   const model = params.model.trim()
   const started = Date.now()
 
-  // 1. Enqueue the job.
-  const submitResponse = await fetch(`${FAL_QUEUE_BASE_URL}/${model}`, {
-    method: 'POST',
-    headers: authHeaders(apiKey.value),
-    body: JSON.stringify(params.input)
-  })
+  if (!candidates.length) {
+    throw new Error(`La cuenta de fal ${params.account} no está configurada.`)
+  }
 
-  const submitBody = (await submitResponse.json().catch(() => null)) as Record<string, unknown> | null
+  let apiKey = candidates[0]
+  let submitResponse: Response | null = null
+  let submitBody: Record<string, unknown> | null = null
 
-  if (!submitResponse.ok) {
-    return failure<TOutput>(model, submitResponse.status, null, extractErrorDetail(submitBody), started, apiKey.source)
+  // 1. Enqueue the job. Un bloqueo por saldo ocurre ANTES de encolar (no cobra): se prueba la siguiente cuenta.
+  for (const account of candidates) {
+    apiKey = account
+
+    submitResponse = await fetch(`${FAL_QUEUE_BASE_URL}/${model}`, {
+      method: 'POST',
+      headers: authHeaders(account.value),
+      body: JSON.stringify(params.input)
+    })
+
+    submitBody = (await submitResponse.json().catch(() => null)) as Record<string, unknown> | null
+
+    if (!isFalBalanceLock(submitResponse.status, extractErrorDetail(submitBody))) break
+  }
+
+  if (!submitResponse || !submitResponse.ok) {
+    return failure<TOutput>(
+      model,
+      submitResponse?.status ?? 0,
+      null,
+      extractErrorDetail(submitBody),
+      started,
+      apiKey.source,
+      apiKey.name
+    )
   }
 
   const requestId = typeof submitBody?.request_id === 'string' ? submitBody.request_id : null
@@ -135,7 +252,8 @@ export const runFalModel = async <TOutput = unknown>(params: {
       null,
       'fal.ai no devolvió request_id al encolar el trabajo.',
       started,
-      apiKey.source
+      apiKey.source,
+      apiKey.name
     )
   }
 
@@ -150,7 +268,7 @@ export const runFalModel = async <TOutput = unknown>(params: {
     resultUrl: typeof submitBody?.response_url === 'string' ? submitBody.response_url : fallback.resultUrl
   }
 
-  params.onEnqueued?.(handle)
+  params.onEnqueued?.({ ...handle, account: apiKey.name })
 
   return pollFalRequest<TOutput>({
     model,
@@ -170,13 +288,34 @@ export const awaitFalRequest = async <TOutput = unknown>(params: {
   requestId: string
   pollTimeoutMs?: number
   pollIntervalMs?: number
+  /** Cuenta donde se encoló. Omitido = se busca: el request sólo existe en la cuenta que lo creó. */
+  account?: FalAccountName
 }): Promise<FalModelResult<TOutput>> => {
-  const apiKey = await resolveFalApiKey()
+  const ranked = await rankFalAccounts()
   const model = params.model.trim()
+  const handle = resolveFalQueueHandle(model, params.requestId.trim())
+  const candidates = params.account ? ranked.filter(item => item.name === params.account) : ranked
+
+  if (!candidates.length) {
+    throw new Error(`La cuenta de fal ${params.account} no está configurada.`)
+  }
+
+  let apiKey = candidates[0]
+
+  if (!params.account && candidates.length > 1) {
+    for (const account of candidates) {
+      const probe = await fetch(handle.statusUrl, { headers: authHeaders(account.value) })
+
+      if (probe.ok) {
+        apiKey = account
+        break
+      }
+    }
+  }
 
   return pollFalRequest<TOutput>({
     model,
-    handle: resolveFalQueueHandle(model, params.requestId.trim()),
+    handle,
     apiKey,
     started: Date.now(),
     pollTimeoutMs: params.pollTimeoutMs ?? FAL_DEFAULT_POLL_TIMEOUT_MS,
@@ -190,7 +329,8 @@ const failure = <TOutput>(
   requestId: string | null,
   errorDetail: string | null,
   started: number,
-  secretSource: SecretResolutionSource
+  secretSource: SecretResolutionSource,
+  account: FalAccountName | null
 ): FalModelResult<TOutput> => ({
   ok: false,
   httpStatus,
@@ -199,13 +339,14 @@ const failure = <TOutput>(
   output: null,
   errorDetail,
   latencyMs: Date.now() - started,
-  secretSource
+  secretSource,
+  account
 })
 
 const pollFalRequest = async <TOutput>(params: {
   model: string
   handle: FalQueueHandle
-  apiKey: { value: string; source: SecretResolutionSource }
+  apiKey: FalAccount
   started: number
   pollTimeoutMs: number
   pollIntervalMs: number
@@ -213,7 +354,7 @@ const pollFalRequest = async <TOutput>(params: {
   const { model, handle, apiKey, started } = params
 
   const fail = (httpStatus: number, errorDetail: string | null) =>
-    failure<TOutput>(model, httpStatus, handle.requestId, errorDetail, started, apiKey.source)
+    failure<TOutput>(model, httpStatus, handle.requestId, errorDetail, started, apiKey.source, apiKey.name)
 
   // 2. Poll status until COMPLETED / failure / timeout.
   let completed = false
@@ -260,26 +401,9 @@ const pollFalRequest = async <TOutput>(params: {
     output: resultBody,
     errorDetail: null,
     latencyMs: Date.now() - started,
-    secretSource: apiKey.source
+    secretSource: apiKey.source,
+    account: apiKey.name
   }
-}
-
-const FAL_BALANCE_URL = 'https://rest.alpha.fal.ai/billing/user_balance'
-
-/**
- * Saldo en USD de la cuenta dueña de la clave. Funciona con una clave normal (no ADMIN); devuelve `null` si fal no
- * responde un número.
- *
- * Existe por el incidente del 2026-09-16: tras una recarga de USD 50 el CLI seguía recibiendo 403 "User is locked.
- * Exhausted balance", y esta consulta mostró −3,86: la recarga no estaba en la cuenta de la clave. Un 403 de
- * bloqueo se diagnostica primero acá, no reintentando corridas.
- */
-export const getFalBalance = async (): Promise<number | null> => {
-  const apiKey = await resolveFalApiKey()
-  const response = await fetch(FAL_BALANCE_URL, { headers: authHeaders(apiKey.value) })
-  const balance = Number((await response.text()).trim())
-
-  return response.ok && Number.isFinite(balance) ? balance : null
 }
 
 const FAL_UPLOAD_INITIATE_URL = 'https://rest.alpha.fal.ai/storage/upload/initiate'
@@ -287,6 +411,7 @@ const FAL_UPLOAD_INITIATE_URL = 'https://rest.alpha.fal.ai/storage/upload/initia
 export interface FalUploadResult {
   url: string
   secretSource: SecretResolutionSource
+  account: FalAccountName
 }
 
 /**
@@ -304,19 +429,29 @@ export const uploadFalFile = async (params: {
   fileName: string
   contentType: string
 }): Promise<FalUploadResult> => {
-  const apiKey = await resolveFalApiKey()
+  const ranked = await rankFalAccounts()
+  let apiKey = ranked[0]
+  let initiateResponse: Response | null = null
+  let initiateBody: Record<string, unknown> | null = null
 
-  const initiateResponse = await fetch(FAL_UPLOAD_INITIATE_URL, {
-    method: 'POST',
-    headers: authHeaders(apiKey.value),
-    body: JSON.stringify({ content_type: params.contentType, file_name: params.fileName })
-  })
+  // El storage también se bloquea por saldo (visto 2026-09-16 incluso con la cola ya habilitada): misma rotación.
+  for (const account of ranked) {
+    apiKey = account
 
-  const initiateBody = (await initiateResponse.json().catch(() => null)) as Record<string, unknown> | null
+    initiateResponse = await fetch(FAL_UPLOAD_INITIATE_URL, {
+      method: 'POST',
+      headers: authHeaders(account.value),
+      body: JSON.stringify({ content_type: params.contentType, file_name: params.fileName })
+    })
 
-  if (!initiateResponse.ok || typeof initiateBody?.upload_url !== 'string' || typeof initiateBody?.file_url !== 'string') {
+    initiateBody = (await initiateResponse.json().catch(() => null)) as Record<string, unknown> | null
+
+    if (!isFalBalanceLock(initiateResponse.status, extractErrorDetail(initiateBody))) break
+  }
+
+  if (!initiateResponse || !initiateResponse.ok || typeof initiateBody?.upload_url !== 'string' || typeof initiateBody?.file_url !== 'string') {
     throw new Error(
-      `fal upload initiate failed (HTTP ${initiateResponse.status})${
+      `fal upload initiate failed (HTTP ${initiateResponse?.status ?? 0}, cuenta ${apiKey.name})${
         extractErrorDetail(initiateBody) ? `: ${extractErrorDetail(initiateBody)}` : ''
       }`
     )
@@ -333,5 +468,5 @@ export const uploadFalFile = async (params: {
     throw new Error(`fal upload PUT failed (HTTP ${putResponse.status}) for ${params.fileName}`)
   }
 
-  return { url: initiateBody.file_url, secretSource: apiKey.source }
+  return { url: initiateBody.file_url, secretSource: apiKey.source, account: apiKey.name }
 }
