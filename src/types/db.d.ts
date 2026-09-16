@@ -10198,6 +10198,61 @@ export interface GreenhouseInsightsInsightEvidenceSnapshots {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseInsightsInsightOutputs {
+  attempts: Generated<number>;
+  audience: string;
+  catalog_name: string;
+  constraints: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  deadline: Timestamp | null;
+  edition_id: string;
+  execution_name: string | null;
+  failure_code: string | null;
+  failure_detail: string | null;
+  finished_at: Timestamp | null;
+  insight_output_id: Generated<string>;
+  manifest: Json;
+  manifest_hash: string;
+  max_attempts: Generated<number>;
+  organization_id: string;
+  output: string;
+  output_asset_id: string | null;
+  output_report: Json | null;
+  render_run_id: string;
+  started_at: Timestamp | null;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseInsightsInsightRenderEvents {
+  actor_kind: string;
+  created_at: Generated<Timestamp>;
+  detail: Generated<Json>;
+  from_state: string | null;
+  insight_output_id: string | null;
+  organization_id: string;
+  render_event_id: Generated<Int8>;
+  render_run_id: string;
+  to_state: string;
+}
+
+export interface GreenhouseInsightsInsightRenderRuns {
+  audience: string;
+  cancelled_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  edition_id: string;
+  finished_at: Timestamp | null;
+  organization_id: string;
+  render_run_id: Generated<string>;
+  requested_by_kind: string;
+  requested_by_member_id: string | null;
+  requested_by_user_id: string | null;
+  requested_outputs: Generated<Json>;
+  started_at: Timestamp | null;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseInsightsInsightReports {
   created_at: Generated<Timestamp>;
   created_by_actor_kind: string;
@@ -13885,6 +13940,9 @@ export interface DB {
   "greenhouse_insights.insight_editions": GreenhouseInsightsInsightEditions;
   "greenhouse_insights.insight_editorial_plans": GreenhouseInsightsInsightEditorialPlans;
   "greenhouse_insights.insight_evidence_snapshots": GreenhouseInsightsInsightEvidenceSnapshots;
+  "greenhouse_insights.insight_outputs": GreenhouseInsightsInsightOutputs;
+  "greenhouse_insights.insight_render_events": GreenhouseInsightsInsightRenderEvents;
+  "greenhouse_insights.insight_render_runs": GreenhouseInsightsInsightRenderRuns;
   "greenhouse_insights.insight_reports": GreenhouseInsightsInsightReports;
   "greenhouse_insights.insight_retention_classes": GreenhouseInsightsInsightRetentionClasses;
   "greenhouse_knowledge.knowledge_chunks": GreenhouseKnowledgeKnowledgeChunks;
