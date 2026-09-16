@@ -218,7 +218,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'none',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: SEEDANCE_20_BASE,
     notes: 'hasta 15 s · única familia con 4K'
   },
