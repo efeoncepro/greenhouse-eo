@@ -264,9 +264,9 @@ hay 4 capabilities vigentes, si falta el módulo `insights_v1`, o si el generado
 | `insight_reports`, `insight_editions`, `insight_evidence_snapshots`, `insight_editorial_plans` | SELECT, INSERT, UPDATE (sin DELETE; los triggers cierran lo demás) | S/I/U/D |
 | `insight_edition_transitions` | SELECT, INSERT (sin UPDATE/DELETE) | S/I/U/D |
 
-### 4.8 Down (líneas 654–692) y por qué no se ha ensayado
+### 4.8 Down (líneas 654–692): ensayado el 2026-09-16 tras dos hallazgos
 
-> **Delta 2026-09-15 (ensayo de rollback con Codex):** el Down original falló con `module_assignments_module_key_fkey` porque la organización sintética tiene `insights_v1` asignado; node-pg-migrate revirtió la transacción entera y la base quedó intacta. Un segundo intento mostró que retirar las asignaciones exige borrar `module_assignment_events`, append-only por gobernanza. Decisión: la sección Down (nunca ejecutada; el Up no cambia) ya no toca catálogo, asignaciones ni auditoría del módulo; retira el schema y depreca las capabilities, y el Up re-siembra capabilities y deja el módulo, así que down/up vuelve al estado vigente. El ensayo debe repetirse con este Down.
+> **Delta 2026-09-15 (ensayo de rollback con Codex):** el Down original falló con `module_assignments_module_key_fkey` porque la organización sintética tiene `insights_v1` asignado; node-pg-migrate revirtió la transacción entera y la base quedó intacta. Un segundo intento mostró que retirar las asignaciones exige borrar `module_assignment_events`, append-only por gobernanza. Decisión: la sección Down (nunca ejecutada; el Up no cambia) ya no toca catálogo, asignaciones ni auditoría del módulo; retira el schema y depreca las capabilities, y el Up re-siembra capabilities y deja el módulo, así que down/up vuelve al estado vigente. Tercer intento 2026-09-16 00:24–00:25:31Z con este Down: `migrate:down` OK (schema ausente, fila de `pgmigrations` ausente, módulo/asignación/auditoría intactos, 4 capabilities deprecadas), `migrate:up` OK (7 tablas, 14 transiciones, 13 triggers, 4 capabilities vivas, secuencia reiniciada); las 4 ediciones sintéticas previas se perdieron por diseño y los canaries posteriores crearon `EO-INS-000002` (staging) y `EO-INS-000003` (producción). Aclaración de vocabulario: todas las ediciones de esta task son SINTÉTICAS (org sandbox «Greenhouse Demo»); «producción» nombra el runtime que las generó, no la naturaleza del dato.
 
 El Down hace únicamente undo: 13 `DROP TRIGGER IF EXISTS`, 7 `DROP TABLE IF EXISTS` (en orden de
 dependencias), 10 `DROP FUNCTION IF EXISTS`, `DROP SEQUENCE`, `DROP SCHEMA` (sin CASCADE), marca las 4
@@ -635,7 +635,7 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Vista web compartida | resolver `InsightWebModelV1` + proxy (TASK-1848) y render en Think (TASK-1849/1875) sin código | EPIC-045 |
 | Share/delivery/schedules | `insightSharePort = { implemented: false }` | TASK-1848 |
 | Grant del scope `insights.write` a clientes MCP | `create_insight_edition` por el gateway ⇒ `insufficient_scope` | consentimiento/grant gobernado |
-| Ensayo de `migrate:down` | no ejecutado (instancia compartida; §4.8) | pendiente para `complete` |
+| Ensayo de `migrate:down` | ejecutado 2026-09-16 00:24–00:25Z con el Down definitivo (down OK, readback, up OK, readback; canaries posteriores `EO-INS-000002` staging / `EO-INS-000003` producción) | cerrado (§4.8) |
 | Sesión MCP con token humano | `tools/list` desde un cliente real (evidencia de 47 tools + skill) no obtenida | pendiente para `complete` |
 | Dedupe de `plan.limits` | repite «ico: sin datos.» por rechazo | TASK-1846 |
 | Clientes reales (Berel/Sky) | ninguna org real tiene `insights_v1`; sólo la sintética | EPIC-046 |

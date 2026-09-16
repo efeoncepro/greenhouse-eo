@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En ejecución — TASK-1845 (foundation) code complete y EN PRODUCCIÓN desde 2026-09-15 con generación ON (emisión/IA OFF), in-progress por dos evidencias pendientes; TASK-1846–1849 y TASK-1875 en diseño`
+- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 in-progress (render durable); TASK-1847–1849 y TASK-1875 en diseño`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery|ui|cross-domain`
 - Owner: `Platform / Client Experience; Julio Reyes (producto)`
@@ -85,7 +85,7 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 
 | Unidad | Task | Resultado | Blocked by |
 |---|---|---|---|
-| U01 | [TASK-1845](../../tasks/in-progress/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO — **in-progress: en producción desde 2026-09-15** (schema, dominio, lanes app/ecosystem, 4 tools MCP federadas en el gateway 1.5.0, scope Entra, generación ON en staging y producción; emisión e IA OFF); faltan el ensayo de `migrate:down` y una sesión MCP humana para cerrar | none |
+| U01 | [TASK-1845](../../tasks/complete/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO — **complete 2026-09-16: en producción desde 2026-09-15, rollback ensayado** | none |
 | U02 | [TASK-1846](../../tasks/to-do/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor | TASK-1845 |
 | U03 | [TASK-1847](../../tasks/to-do/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md) | gráficos y catálogos premium para deck e informe vertical | TASK-1845 |
 | U04 | [TASK-1848](../../tasks/to-do/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados | TASK-1845, TASK-1846 |

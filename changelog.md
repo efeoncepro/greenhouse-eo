@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — TASK-1845 complete: rollback ensayado en la instancia compartida
+
+El ensayo de `migrate:down` reveló dos defectos del Down original (borraba el módulo con asignaciones vigentes y luego
+exigía borrar una auditoría append-only); el Down definitivo retira sólo el schema y depreca las capabilities, y el
+Up restaura el estado vigente. Con permisos habilitados por el operador, el ensayo corrió de punta a punta con
+readbacks (down 00:24Z, up 00:25:31Z) y los canaries posteriores crearon `EO-INS-000002` en staging y
+`EO-INS-000003` en producción. Las cuatro ediciones sintéticas previas se perdieron por diseño. TASK-1845 pasa a
+`complete`; la integración con Berel/Sky reales queda diferida a EPIC-046 P01. La sesión que lleva TASK-1846 fue
+avisada y corroboró el estado contra la base.
+
 ## 2026-09-15 — TASK-1845: canary de Efeonce Insights verde en staging y federación MCP lista en rama
 
 `develop` `8844a3d5c` quedó empujado con la foundation de Insights y CI/workers verdes. En staging se prendió sólo
@@ -41,7 +51,7 @@ construcción y despliegue archivo por archivo), y se alinean arquitectura, ADR,
 auto-load, reliability, client portal, entitlements, catálogo API/MCP, runbook del gateway y las tasks que
 declaraban bloqueo por TASK-1845 (1846–1849, 1672), ahora desbloqueadas. La skill servida se verificó en producción
 (manual idéntico al artefacto, 404 anti-oracle) y un agente sin contexto construyó con ella un encargo válido; sus once
-dudas se cerraron en el manual. Queda sólo el ensayo de `migrate:down`, delegado.
+dudas se cerraron en el manual.
 
 ## 2026-09-15 — Contacto publica metadata y grafo SEO/AEO coherentes
 
@@ -1027,18 +1037,3 @@ designado, magic link y sesión viva; rebote forzado con `bounced@resend.dev` ma
 delegada ejercitada con el token del gateway (200/403/422/201, correo real). Al cierre el binding se revocó y la
 sesión murió (401). Producción espera el release y el flip de flags; la federación de la lane en `efeonce-mcp` sigue
 pendiente. [Evidencia](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md).
-
-## 2026-09-06 — Efeonce ID: el sistema entrega la invitación externa; autoridad delegada del cliente (TASK-1837)
-
-`issueExternalInvitation` envía el correo (`external_access_invitation`, token_sensitive, marca Efeonce) después
-de confirmar la transacción y devuelve `delivery` en vez de exponer el secreto; la URL de aceptación se deriva del
-`issuer_url` del environment (`/i/<token>`), nunca de una env var. Reenviar rota el token; revelarlo es una
-excepción auditada de 1 h con capability propia. El rebote de Resend deja `delivery_status='bounced'` por una
-proyección reactiva y tres señales nuevas vuelven observable el ciclo de vida. `designated_admin` pasa a conferir
-autoridad real: un solo admin vigente por binding y una lane ecosystem para que invite a su propia gente (403/422
-fail-closed). El consentimiento muestra el host del `redirect_uri` (MUST del protocolo). Migración additive y dos
-flags default OFF. **Migración aplicada 2026-09-06 y verificada; smoke live `--apply` verde contra PG real
-(reenvío, revelación, entrega fallida, delegada, admin cleared; `token_revealed` encendida ok→warning); build de
-producción ✔.** Pendiente: binding externo real + flag en staging + correo real (decisión del operador) y
-federación de la lane delegada en el gateway. Skills actualizadas (espejo `.claude`/`.codex`): `efeonce-mcp-platform`
-(SKILL + native-authority + verification-matrix) y `greenhouse-qa-release-auditor/security-qa`. Commits `5518d868e…db5a0adf3`.

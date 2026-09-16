@@ -40,7 +40,7 @@ Siguiente ID libre `TASK-1876`. Insights TASK-1845–1849 (+ TASK-1875, vista we
 [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md) registra **cinco tareas nuevas**,
 P1/Alto. Dominio Greenhouse + Artifact Worker; tres salidas iniciales: deck, informe A4 y web.
 TASK-1672/1673 conservan la auditoría técnica SEO y su distribución como consumers. La foundation (TASK-1845) está
-en producción desde 2026-09-15 (generación ON en staging y producción; emisión/IA OFF); el resto sigue en diseño.
+**complete** (2026-09-16): en producción desde 2026-09-15 (generación ON en staging y producción; emisión/IA OFF), rollback ensayado; TASK-1846 en ejecución y el resto en diseño.
 Desde 2026-09-09, [EPIC-046](../epics/to-do/EPIC-046-client-services-visibility-and-self-service.md)
 integra autogestión cliente y gestión de colaboradores internos. TASK-1845/1846/1848/1849 incorporan
 autoridad por población, render/entrega segura y las dos experiencias; mismos IDs y owners, sin duplicados.

@@ -114,7 +114,7 @@ ETV de DataForSEO Labs se versiona por metodología; desde 2026-09-03 producció
 [auditoría](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
 
 Efeonce Insights: [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) (§14 = estado real), EPIC-045.
-Foundation TASK-1845 EN PRODUCCIÓN 2026-09-15 (schema `greenhouse_insights`, `src/lib/efeonce-insights/`, lanes + MCP federado v1.5.0; generación ON, emisión/IA OFF); render/share/UI en TASK-1846–1849/1875.
+Foundation TASK-1845 COMPLETE (prod desde 2026-09-15: schema `greenhouse_insights`, `src/lib/efeonce-insights/`, lanes + MCP v1.5.0; generación ON, emisión/IA OFF, rollback ensayado); render/share/UI en TASK-1846–1849/1875.
 
 Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
 Seasonalities: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.
