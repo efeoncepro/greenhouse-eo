@@ -343,6 +343,20 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
   modelo muerto. **NUNCA** rutees a `google-imagen` ni prometas "continuidad con banners de Imagen": ese carril
   ya no genera. Usa `google-gemini-image` cuando la superficie ya use ese lenguaje visual.
   `generateAnimation()` y el carril SVG siguen intactos.
+- **Carril Google: Nano Banana 2 vs Nano Banana Pro (revisión 2026-09-16).** El default de `google-gemini-image` es
+  **Nano Banana 2** (`gemini-3.1-flash-image`, vía Vertex con `getGoogleGenAIClient`), sobreescribible con la env
+  `GOOGLE_GEMINI_IMAGE_MODEL`; vive sólo en el generador del producto. **No hay CLI de Gemini Image**: `pnpm ai:image`
+  habla sólo OpenAI. **Nano Banana Pro** (`gemini-3-pro-image`) está **disponible** en nuestro Vertex (`models.get`
+  en location `global`, 2026-09-16: `gemini-3-pro-image` y `gemini-3-pro-image-preview` OK, `gemini-3.1-flash-image`
+  OK, `gemini-3.1-pro-image` 404), pero **ninguna superficie lo usa**. No cambies la env global para probarlo:
+  cambiaría todo el carril `google-gemini-image` del producto; lo correcto sería exponerlo como modelo elegible por
+  pedido (no hecho, decisión del operador). Nano Banana Pro y Gemini Omni Flash van **directo por Google, nunca por
+  fal** (decisión del operador), aunque fal ofrezca Omni Flash (`google/gemini-omni-flash/*`). Referencia externa: OpenArt Arena imagen (2026-09-16) ubica a Nano Banana Pro #3 y
+  Nano Banana 2 #5.
+- **Grok Imagine imagen v2.0 (xAI): evaluado, no conectado.** `xai/grok-imagine-image/v2.0/{text-to-image,edit}`
+  en fal: `quality` low|medium, 1k/2k, 1–4 imágenes, aspectos amplios (incluye 19.5:9 y 20:9), devuelve
+  `revised_prompt`; precio publicado "0,01 USD/units" con unidad no aclarada por fal. #4 en imagen en OpenArt Arena
+  (2026-09-16), sobre Nano Banana 2. Conectarlo es decisión del operador.
 - Use Seedream 5 Lite out-of-band for inexpensive creative divergence and Seedream 5 Pro for
   material/color/atmosphere development or semantic regional edits; operate them with `pnpm ai:fal`
   (built on `src/lib/ai/fal.ts`), never a parallel fal client, ad-hoc script or product runtime wiring.
@@ -388,7 +402,7 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
   Credits or copy a point-in-time vendor price into a commercial offer.
 - **Full model & capability catalog** (13 categories, verified slugs): `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`.
 
-### CLI de fal: `pnpm ai:fal` (Seedream 5 + layerize, Seedance 2.5/2.0, Minimax H3, Flux 3)
+### CLI de fal: `pnpm ai:fal` (Seedream 5 + layerize, Seedance 2.5/2.0, Minimax H3, Flux 3, Wan 3.0)
 
 Hermano de `pnpm ai:image` (`scripts/ai/fal-image.ts`), **out-of-band, NUNCA runtime del producto**. Es la mano
 de producción de fal: no escribas scripts ad-hoc sobre `runFalModel`. El registro model-agnostic vive en
@@ -406,15 +420,20 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
 - Flags: `--prompt|--prompt-file`, `--image` (repetible; los archivos locales se suben solos al storage de fal),
   `--size`, `--count`, `--format jpeg|png`, `--out|--out-dir`, `--timeout`, `--json`. Video (`--duration`,
   `--resolution`, `--aspect`, `--bitrate`, `--task`, `--no-audio`, `--end-image`, `--audio`, `--video`,
-  `--prompt-expansion`, `--lora`, `--camera-trajectory`, `--keyframe`, `--safety-tolerance`, `--draft-cache`),
+  `--prompt-expansion`, `--no-prompt-expansion`, `--thinking`, `--web-url`, `--file`, `--lora`,
+  `--camera-trajectory`, `--keyframe`, `--safety-tolerance`, `--draft-cache`), `--seed <n>` (entero ≥ 0, en todo
+  endpoint que lo acepte),
   entrenamiento (`--training-data`, `--steps`, `--rank`, `--learning-rate`, `--trigger`) y la elección entre
-  Seedance, H3 y Flux 3 (incluido video a video) viven en `motion-design-studio`
+  Seedance, H3, Flux 3 y Wan 3.0 (incluido video a video) viven en `motion-design-studio`
   (`workflows/engine-selection-by-fidelity-contract.md`). El CLI valida cada flag contra el contrato del endpoint
   **antes** de gastar: flags de video en una capacidad de imagen, o de entrenamiento fuera de un entrenador, fallan.
   `--task` quedó corregido: **sólo** Seedance 2.5 reference-to-video lo acepta (antes Seedance 2.0 lo rechazaba
   después de encolar; verificado en local (el CLI rechaza `--task` en `seedance20-r2v` sin encolar); `seedance25-r2v` con `--task` no tiene corrida real y sigue sin verificar.) `--list` agrupa IMAGE / VIDEO / TRAINING y marca `[NO OPERABLE POR COLA]`.
 - 🔴 Todo `--capability`/`--model` sin `--list` **gasta dinero**. fal no devuelve `usage`: el CLI no reporta
   costo por corrida; no inventes precios. Si la capacidad figura SIN VERIFICAR, el CLI lo advierte antes de gastar.
+- 🔴 **Saldo de fal agotado al 2026-09-16.** Toda corrida nueva falla con **403 `User is locked. Reason: Exhausted
+  balance`** antes de encolar (sin costo). No es un bug del CLI ni de la key: hay que **recargar** en
+  `fal.ai/dashboard/billing`, y eso lo hace una persona (el operador), nunca el agente. No reintentes en loop.
 - **Retome (request_id):** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408)
   el trabajo **sigue corriendo y cobrando** en fal: no relances; usa el comando de retome que imprime el CLI
   (verificado: mismo archivo byte a byte; alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream, Seedance y Flux 3 usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.) La cola se direcciona por APP (dos primeros segmentos del slug), no por
@@ -431,6 +450,21 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   (default 2) y `--draft-cache <url>`: cada draft imprime su `draft_cache` y el comando listo, y sólo
   `flux3-enhance` lo acepta (y lo exige). `extend` exige pista de audio en el origen (el CLI lo revisa con
   `ffprobe` en archivos locales) y entrega sólo la continuación. Precios y elección en `motion-design-studio`.
+- **Wan 3.0 / Wan 3.0 Prime** (6 endpoints `alibaba/wan-3.0/*` y `alibaba/wan-3.0-prime/*`, **sin** `fal-ai/`;
+  conectados 2026-09-16): **video** t2v / i2v / r2v, USD 0,05/s. Sólo `wan3-t2v` está **verificado en real**; los
+  otros 5 quedaron sin verificar por el 403 de saldo. No hay edición ni imagen en Wan 3.0 (la edición de Wan es la
+  2.7, no conectada). Flags propios: `--duration auto` (se envía `null`: duración inteligente; o entero 2–30),
+  `--no-audio` (campo `audio`), `--no-prompt-expansion` (booleano; distinto del `--prompt-expansion <modo>` de H3),
+  `--thinking`, y en r2v `--web-url <url pública>` / `--file <path|url>`, que **exigen `--thinking`**. Resolución
+  default **1080p**: explora a 480p. La salida trae `actual_prompt` y `seed`. Elección y ejemplos en
+  `motion-design-studio`.
+  ```bash
+  pnpm ai:fal --capability wan3-t2v --prompt "…" --resolution 480p --duration auto --seed 7 --out explora.mp4
+  pnpm ai:fal --capability wan3-r2v --file brief.pdf --thinking --resolution 720p --out explicativo.mp4
+  ```
+- **Evaluados, no conectados (revisión 2026-09-16):** Kling 3 (`fal-ai/kling-video/{o3,v3}/…`, `fal-ai/kling-image/…`)
+  y Grok Imagine (`xai/grok-imagine-video/…`, `xai/grok-imagine-image/…`). No están en el registro: no los corras con
+  `--model` para una entrega sin decisión del operador. Detalle en `motion-design-studio` (video) y abajo (imagen).
 - Seedance (validaciones del CLI corregidas 2026-09-16, leídas del OpenAPI): duración mínima **4 s** (el registro
   decía 1); `r2v` exige al menos una referencia visual (imagen o video) y valida los topes por versión (2.5: 30
   imágenes, 10 videos, 10 audios, 50 archivos; 2.0: 9, 3, 3, 12); `--task` valida el valor, `editing`/`extension`

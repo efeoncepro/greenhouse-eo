@@ -1,9 +1,9 @@
-# Operar el CLI de fal: Seedream 5, Seedance 2.5/2.0, Minimax H3 y Flux 3
+# Operar el CLI de fal: Seedream 5, Seedance 2.5/2.0, Minimax H3, Flux 3 y Wan 3.0
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-16 por agente
-> **Ultima actualizacion:** 2026-09-16 por Claude — Flux 3 (draft → enhance, primer/ultimo cuadro, keyframes, edit y extend) y video a video con Seedance 2.5 (`--task editing|extension`, sin verificar); antes, Minimax H3 (video, camera-controls, LoRA y entrenamiento), retome por `--request-id` y cierre de la brecha de `--task`
+> **Ultima actualizacion:** 2026-09-16 por Claude — Wan 3.0 y Wan 3.0 Prime (texto, imagen y referencias a video; `--duration auto`, `--thinking` con `--web-url`/`--file`, `--no-prompt-expansion`, `--seed`), advertencia de saldo agotado en fal y 403 `Exhausted balance`; antes, Flux 3 (draft → enhance, primer/ultimo cuadro, keyframes, edit y extend) y video a video con Seedance 2.5 (`--task editing|extension`, sin verificar); antes, Minimax H3 (video, camera-controls, LoRA y entrenamiento), retome por `--request-id` y cierre de la brecha de `--task`
 > **Modulo:** AI Tooling / Asset Generation
 > **Comando:** `pnpm ai:fal`
 > **Documentacion tecnica:** [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo
@@ -20,7 +20,10 @@ Para generar desde la terminal, a traves de fal.ai:
   imagen, video con **LoRAs** y **entrenamiento de LoRAs** propias;
 - **video con Flux 3**: borrador barato que se mejora a version final, video desde texto, imagen, primer y ultimo
   cuadro o keyframes, y **video a video** (editar un clip o extenderlo);
-- **video a video con Seedance 2.5** (editar o extender un clip desde referencias), todavia sin verificar.
+- **video a video con Seedance 2.5** (editar o extender un clip desde referencias), todavia sin verificar;
+- **video con Wan 3.0 y Wan 3.0 Prime**: desde texto, desde una imagen (con ultimo cuadro opcional) o desde
+  referencias, de 2 a 30 s o con largo elegido por el modelo, y desde referencias puede **basarse en una pagina web
+  o un documento**. Sólo `wan3-t2v` esta verificado; el resto espera a que se recargue el saldo de fal.
 
 Es un comando **hermano** de `pnpm ai:image`, no su reemplazo: para GPT Image se sigue usando `ai:image`. Todo lo
 que produce es trabajo fuera del portal; nada se genera en tiempo real para usuarios.
@@ -29,6 +32,9 @@ que produce es trabajo fuera del portal; nada se genera en tiempo real para usua
 
 - Trabaja en la raiz del repo. El comando lee `.env.local` y resuelve la llave de fal desde Secret Manager
   (`FAL_API_KEY_SECRET_REF`); nunca pegues la llave en la terminal ni en un archivo.
+- 🔴 **Al 2026-09-16 el saldo de fal esta agotado:** toda corrida falla con HTTP 403 `Exhausted balance` antes de
+  encolar (no cobra). Hasta que una persona con acceso a la facturacion de fal recargue saldo, sólo funciona
+  `--list`. Ver "Problemas comunes".
 - 🔴 **Toda corrida cuesta dinero real, salvo `--list`.** El comando **no informa el costo** de cada corrida
   porque fal no devuelve ese dato. Antes de un lote o de un video largo, revisa el precio vigente en la pagina del
   modelo en `fal.ai/models` y anota la fecha en que lo consultaste.
@@ -69,6 +75,9 @@ pnpm ai:fal --list
 | Mejorar un borrador de Flux 3 | `flux3-enhance` | `--draft-cache <url>` (lo imprime el borrador) |
 | Editar un video existente | `flux3-edit` (verificado) o `seedance25-r2v --task editing` (sin verificar) | `--prompt` + `--video` |
 | Extender un video existente | `flux3-extend` / `flux3-extend-draft` (verificados) o `seedance25-r2v --task extension` (sin verificar) | `--prompt` + `--video` (en Flux 3, con pista de audio) |
+| Video Wan 3.0 desde texto | `wan3-t2v` (verificado) o `wan3prime-t2v` | `--prompt` |
+| Video Wan 3.0 desde una imagen | `wan3-i2v` o `wan3prime-i2v` (sin verificar) | un `--image` (primer cuadro); `--end-image` y `--prompt` opcionales |
+| Video Wan 3.0 desde referencias | `wan3-r2v` o `wan3prime-r2v` (sin verificar) | al menos una referencia (`--image`, `--video` o `--audio`) **o** `--web-url` / `--file` con `--thinking`; prompt opcional |
 
 Para video, elige la familia por sus limites:
 
@@ -114,6 +123,22 @@ Flux 3 (video, no imagen) tiene su propio contrato:
 - `--safety-tolerance` de 0 a 4 (default 2).
 - Los 12 endpoints estan verificados con corridas reales (2026-09-16). Son **mas lentos que H3**: entre 40 s y
   4 min por video.
+
+Wan 3.0 y Wan 3.0 Prime comparten contrato y precio (OpenAPI y pricing de fal, 2026-09-16):
+
+| Wan 3.0 | Duracion | `--resolution` | `--aspect` | Precio fal 2026-09-16 |
+|---|---|---|---|---|
+| `wan3-*`, `wan3prime-*` | 2 a 30 s (entero) o `auto` (default 5) | `480p`, `720p`, `1080p` (**default `1080p`**) | `adaptive` (default), `16:9`, `4:3`, `1:1`, `3:4`, `9:16` | USD 0,05 / s |
+
+- ⚠️ **Si no pasas `--resolution`, sale en 1080p**, que es la opcion mas lenta. Para explorar, pide `480p` o `720p`.
+- `--duration auto` deja que el modelo elija el largo segun el prompt y las referencias (en la corrida verificada
+  eligio 5,04 s).
+- Sale con sonido por defecto; `--no-audio` lo apaga. No acepta `--bitrate` ni `--prompt-expansion <modo>`.
+- `--no-prompt-expansion` hace que use tu prompt tal cual (segun el proveedor ahorra 20 a 60 s, pero puede bajar la
+  calidad). `--thinking` activa el razonamiento previo. `--seed <n>` (entero >= 0) fija la semilla.
+- Referencias (`r2v`): hasta 10 `--image`, 5 `--video` (sumados hasta 15 s, al menos 16 fps) y 5 `--audio` (hasta
+  15 s). Se citan en el prompt por posicion: «the subject in Image 1 walks past Video 1».
+- Estado: `wan3-t2v` verificado el 2026-09-16; los otros 5 **sin verificar** porque el saldo de fal se agoto.
 
 ### 2. Corre el comando
 
@@ -291,6 +316,58 @@ pnpm ai:fal --capability seedance25-r2v --task extension --video clip.mp4 \
   (sumados hasta 15 s), 12 archivos en total.
 - Si una corrida funciona, anota la fecha en `src/lib/ai/fal-capabilities.ts`; si no, guarda el error con `--json`.
 
+#### Wan 3.0
+
+Desde texto, dejando que el modelo elija el largo, en 480p para explorar (camino verificado):
+
+```bash
+pnpm ai:fal --capability wan3-t2v --prompt "<escena y accion>" --duration auto --resolution 480p \
+  --aspect 16:9 --out ai-generations/2026-09-16_mi-pieza/wan3-t2v.mp4
+```
+
+Desde una imagen, con ultimo cuadro opcional (el prompt tambien es opcional):
+
+```bash
+pnpm ai:fal --capability wan3-i2v --image inicio.png --end-image final.png \
+  --prompt "<transicion>" --duration 6 --resolution 720p --out ai-generations/2026-09-16_mi-pieza/wan3-i2v.mp4
+```
+
+Desde referencias (hasta 10 imagenes, 5 videos y 5 audios, citados por posicion):
+
+```bash
+pnpm ai:fal --capability wan3-r2v --image personaje.png --image producto.png --video movimiento.mp4 \
+  --prompt "the subject in Image 1 holds the product in Image 2 and moves like Video 1" \
+  --resolution 720p --out ai-generations/2026-09-16_mi-pieza/wan3-r2v.mp4
+```
+
+Basado en una pagina web publica (exige `--thinking`; no hace falta ninguna referencia de medios):
+
+```bash
+pnpm ai:fal --capability wan3-r2v --thinking --web-url https://<pagina-publica> \
+  --prompt "<que pieza quieres a partir de esa pagina>" --duration auto --resolution 720p \
+  --out ai-generations/2026-09-16_mi-pieza/wan3-web.mp4
+```
+
+Basado en un documento (local o URL; el comando sube el archivo local; tambien exige `--thinking`):
+
+```bash
+pnpm ai:fal --capability wan3-r2v --thinking --file brief.pdf \
+  --prompt "<que pieza quieres a partir del documento>" --resolution 720p \
+  --out ai-generations/2026-09-16_mi-pieza/wan3-doc.mp4
+```
+
+Prompt exacto, semilla fija y sin sonido:
+
+```bash
+pnpm ai:fal --capability wan3-t2v --prompt "<texto exacto>" --no-prompt-expansion --seed 7 --no-audio \
+  --duration 5 --resolution 480p --out ai-generations/2026-09-16_mi-pieza/wan3-exacto.mp4
+```
+
+- Para Wan 3.0 Prime, cambia `wan3-` por `wan3prime-`: mismas opciones y mismo precio.
+- `--web-url` y `--file` **sólo** funcionan en `wan3-r2v` y `wan3prime-r2v`, y siempre con `--thinking`.
+- La via web/documento, i2v, r2v y toda la linea Prime **no tienen corrida real**; el comando advierte antes de
+  gastar. Si una funciona, anota la fecha en `src/lib/ai/fal-capabilities.ts`.
+
 Opciones generales: `--prompt-file <path>` para prompts largos, `--size` (enum del proveedor o `WxH`), `--count`,
 `--format jpeg|png`, `--timeout <ms>`, `--json` para ver la respuesta cruda y `--request-id <id>` para retomar un
 trabajo ya encolado.
@@ -325,6 +402,8 @@ trabajo real.
 - Imagen o video: `✓ <KB> · <ruta>` por archivo y al final `done · <ms> · N asset(s) · request_id <id>`.
 - Borrador de Flux 3: ademas del video, `draft_cache: <url>` y la linea `mejóralo con: …`. Copiala para mejorarlo.
 - Extension de Flux 3: el archivo es **solo el tramo nuevo**; arranca en el ultimo cuadro del origen.
+- Wan 3.0: la respuesta trae `actual_prompt` (el prompt que el modelo reescribio), `duration` y `seed`; el comando
+  muestra un extracto del prompt reescrito. Con `--no-prompt-expansion`, `actual_prompt` viene vacio (`null`).
 - H3: el comando muestra un extracto de `prompt expandido` (lo que el modelo entendio, incluido el sonido que
   agrego); `--json` lo trae entero.
 - Entrenamiento: `lora.*` y `config.*` en la carpeta de salida. Guardalos juntos.
@@ -363,6 +442,11 @@ trabajo real.
 | `--task <tarea> necesita el video de origen por --video.` | `editing` y `extension` en `seedance25-r2v` requieren `--video`. |
 | `--task editing ignora --duration y --aspect…` / `--task extension ignora --aspect…` | El proveedor los fuerza a `auto`; quitalos. |
 | `"<id>" necesita al menos una imagen o un video de referencia; el audio solo no alcanza.` | Reference-to-video de Seedance con solo `--audio`. |
+| `--web-url exige --thinking …` / `--file exige --thinking …` | En Wan 3.0 referencias a video, la fuente web o documento necesita el razonamiento previo. Agrega `--thinking`. |
+| `"<id>" no acepta --web-url; sólo Wan 3.0 referencias a video se basa en una web o un documento.` | Usaste `--web-url` o `--file` fuera de `wan3-r2v` / `wan3prime-r2v`. |
+| `--web-url debe ser una URL pública http(s).` | La direccion no es `http(s)://`. |
+| `"<id>" no acepta --no-prompt-expansion; usa --prompt-expansion disabled.` | Usaste el flag de Wan en H3, que tiene modos. |
+| `--seed debe ser un entero >= 0.` | La semilla no es un entero positivo o cero. |
 | `"<id>" no se puede operar desde este CLI: …` | Capacidad marcada `[NO OPERABLE POR COLA]` (hoy, `h3max-director`). |
 | `⋯ encolado · request_id <id>` | fal acepto el trabajo; desde aqui cuenta como gasto. Anota el id. |
 | `⚠ --request-id no podrá retomar este trabajo: …` | La direccion de cola de ese modelo no sigue la regla habitual; si vence el tiempo, no se podra retomar con el comando. |
@@ -386,7 +470,9 @@ trabajo real.
 - **No uses Seedance 2.0 para editar o extender.** Su video de referencia solo guia; eso es de Seedance 2.5.
 - **No uses `h3max-director`.** No funciona por cola; no hay forma de operarlo con este comando.
 - **No marques una capacidad como verificada** en el registro sin haberla corrido de verdad.
-- **No uses este comando para Gemini Omni.** Omni se conecta directo con Google, no por fal.
+- **No uses este comando para Gemini Omni ni para Nano Banana Pro.** Los dos se conectan directo con Google, no por
+  fal, aunque fal los liste (decision del operador, 2026-09-16).
+- **No dejes Wan 3.0 en su resolucion por defecto para explorar.** Sin `--resolution` sale en 1080p.
 - **No lo conectes al portal.** Es produccion fuera de linea; el runtime de imagen del producto es otro.
 - **No guardes las URLs temporales de fal** en manifests ni documentos; guarda los archivos descargados.
 - No dejes exploraciones en `public/images/generated/` ni en `.captures/`.
@@ -395,7 +481,18 @@ trabajo real.
 
 - **`fal.ai no está configurado. Define FAL_API_KEY o FAL_API_KEY_SECRET_REF.`** Falta la referencia en
   `.env.local` o la sesion de Google Cloud vencio. Reautentica `gcloud` y vuelve a intentar.
-- **HTTP 403 con `Exhausted balance`.** La cuenta de fal no tiene saldo; lo resuelve quien administra la cuenta.
+- **HTTP 403 `User is locked. Reason: Exhausted balance`.** La cuenta de fal se quedo sin saldo (pasa desde el
+  2026-09-16). Falla antes de encolar, asi que no cobra. No es un error del comando ni del slug: no reintentes ni
+  cambies de capacidad. Lo resuelve una persona con acceso a la facturacion de fal recargando saldo en
+  `fal.ai/dashboard/billing`; un agente no recarga saldo ni ingresa medios de pago. Despues, re-corre lo que
+  quedo pendiente (por ejemplo los cinco Wan 3.0 sin verificar).
+- **`--web-url` o `--file` sin `--thinking`.** Wan 3.0 necesita el razonamiento previo para leer la fuente: agrega
+  `--thinking`.
+- **`--web-url` o `--file` en `wan3-t2v`, `wan3-i2v` u otra familia.** Sólo lo aceptan `wan3-r2v` y `wan3prime-r2v`.
+- **Wan 3.0 rechaza la duracion.** Acepta un entero de 2 a 30 s o `auto`: `--duration 1` falla por minimo y
+  `--duration 40` excede el maximo.
+- **`wan3-r2v` pide al menos una referencia.** Pasa un `--image`, `--video` o `--audio`, o usa `--web-url` / `--file`
+  con `--thinking`.
 - **Resultado 404 despues de encolar bien.** Casi siempre es el prefijo del slug equivocado (ver "Que no hacer").
 - **Timeout en video o entrenamiento.** No repitas el pedido: copia el comando de retome que imprimio el CLI
   (`--request-id`) y, si hace falta, agrega un `--timeout` mayor.
@@ -433,6 +530,6 @@ trabajo real.
 - Registro de capacidades: `src/lib/ai/fal-capabilities.ts`
 - Cliente canonico: `src/lib/ai/fal.ts` (`runFalModel`, `uploadFalFile`)
 - Catalogo y contratos: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` §Carril operativo, §Seedance video
-  a video, §Minimax H3 y §Flux 3
+  a video, §Minimax H3, §Flux 3, §Wan 3.0 y §Candidatos evaluados, no conectados (Kling 3, Grok Imagine)
 - Arquitectura del generador: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`
 - Guia operativa de agentes: `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md` §Generate via fal CLI

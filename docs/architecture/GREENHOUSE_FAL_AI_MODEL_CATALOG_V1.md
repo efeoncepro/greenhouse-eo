@@ -1,7 +1,10 @@
 # Greenhouse — Fal.ai Model & Capability Catalog V1
 
-> **Tipo:** Referencia técnica agent-facing · **Version:** 1.3 · **Creado:** 2026-07-06 por Claude
-> **Última actualización:** 2026-09-16 por Claude — Flux 3 conectado a `pnpm ai:fal` (12 endpoints de **video**,
+> **Tipo:** Referencia técnica agent-facing · **Version:** 1.4 · **Creado:** 2026-07-06 por Claude
+> **Última actualización:** 2026-09-16 por Claude — Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal` (6
+> endpoints de video; 1 verificado en real y 5 sin verificar porque el saldo de fal se agotó), revisión sin conexión
+> de Kling 3 y Grok Imagine, y decisión de mantener Gemini Omni Flash y Nano Banana Pro directo por Google. Antes
+> (1.3): Flux 3 conectado a `pnpm ai:fal` (12 endpoints de **video**,
 > todos verificados en real; flujo draft → enhance; extend exige audio en el origen y entrega sólo la
 > continuación) y contrato real de **Seedance video a video** (vive en reference-to-video; `--task
 > editing|extension` sólo en 2.5; duración mínima 4 s; referencia visual obligatoria). Antes (1.2): Minimax H3
@@ -94,8 +97,11 @@ out-of-band: el runtime de imagen del producto sigue siendo `src/lib/ai/image-ge
 - **Timeouts por defecto:** imagen 3 min, video 15 min, entrenamiento 3 h (`--timeout <ms>` los sobrescribe).
 - **Costo:** fal **no devuelve `usage`** en estas respuestas, así que el CLI no reporta costo por corrida (a
   diferencia de `ai:image`). Consultar el pricing vigente del proveedor, con fecha, antes de correr.
-- **Qué NO va por aquí:** Gemini Omni se conecta directo por las plataformas de Google, no por fal (fue retirado
-  del registro). Minimax H3 **sí** está conectado desde 2026-09-16 (ver §Minimax H3), salvo `h3max-director`, que
+- **Qué NO va por aquí:** Gemini Omni (incluido Omni Flash) y Nano Banana Pro se conectan directo por las
+  plataformas de Google, no por fal, aunque fal los liste (`google/gemini-omni-flash/*`, `fal-ai/nano-banana-pro`):
+  decisión del operador del 2026-09-16 (por Google es más barato y la calidad es la misma). Omni fue retirado del
+  registro. Kling 3 y Grok Imagine están **revisados pero no conectados** (ver §Candidatos evaluados, no
+  conectados). Wan 3.0 **sí** está conectado desde 2026-09-16 (ver §Wan 3.0). Minimax H3 **sí** está conectado desde 2026-09-16 (ver §Minimax H3), salvo `h3max-director`, que
   no es operable por cola. Flux 3 **también** está conectado desde 2026-09-16 (ver §Flux 3). Los Flux de **imagen**
   (`fal-ai/flux-2-pro`, `flux-2-max`, `flux-2-flex`, FLUX.1) no están en el registro: van por `--model`.
 
@@ -113,10 +119,19 @@ Capacidades registradas al 2026-09-16:
 | `seedance20-fast-*` · `-mini-*` · `-us-*` | `bytedance/seedance-2.0/{fast,mini,us}/{text,image,reference}-to-video` | video | sin verificar (9) |
 | `h3-*` · `h3max-*` · `h3turbo-*` · `h3-train-*` | `minimax/h3*/…` (17 endpoints) | video + entrenamiento | 9 ✅ · 7 sin verificar · 1 no operable (ver §Minimax H3) |
 | `flux3-*` | `blackforestlabs/flux-3/…` (12 endpoints) | video (incluye editar y extender) | 12 ✅ 2026-09-16 (ver §Flux 3) |
+| `wan3-*` · `wan3prime-*` | `alibaba/wan-3.0{,-prime}/{text,image,reference}-to-video` (6 endpoints) | video | 1 ✅ (`wan3-t2v`) · 5 sin verificar por saldo agotado (ver §Wan 3.0) |
 
-**Conteo global al 2026-09-16:** 49 capacidades registradas (5 Seedream 5, 15 Seedance, 17 Minimax H3, 12 Flux 3);
-**29 verificadas** contra el API real (5 Seedream 5, 3 Seedance, 9 H3, 12 Flux 3). No queda ninguna familia
-pendiente de conectar. `--list` agrupa IMAGE / VIDEO / TRAINING.
+**Conteo global al 2026-09-16:** 55 capacidades registradas (5 Seedream 5, 15 Seedance, 17 Minimax H3, 12 Flux 3,
+6 Wan 3.0); **30 verificadas** contra el API real (5 Seedream 5, 3 Seedance, 9 H3, 12 Flux 3, 1 Wan 3.0). Las
+familias Kling 3 y Grok Imagine se revisaron y quedaron fuera del registro por ahora. `--list` agrupa IMAGE /
+VIDEO / TRAINING.
+
+> ⚠️ **Bloqueo operativo — saldo de fal agotado (medido 2026-09-16):** toda corrida nueva falla antes de encolar con
+> HTTP 403 `User is locked. Reason: Exhausted balance` (sin costo, porque no llega a la cola). Por eso 5 de los 6
+> endpoints de Wan 3.0 quedaron sin verificar. No es un bug del CLI ni del slug: hay que recargar saldo en
+> `fal.ai/dashboard/billing`, lo que hace una persona con acceso a la facturación de fal. Un agente no recarga
+> saldo ni ingresa medios de pago. Tras recargar, re-correr las capacidades pendientes y recién entonces marcar
+> `verifiedAt`.
 
 No existe Seedream 5.1 en fal al 2026-09-16.
 
@@ -301,6 +316,111 @@ escena del draft.
 que H3). Costo aproximado ≈ USD 5, estimado por precio unitario e incluyendo extensiones de 15 y 5 s; no está
 confirmado si los intentos fallidos de extend se cobran.
 
+### Wan 3.0 y Wan 3.0 Prime (conectados 2026-09-16)
+
+Alibaba. Slugs **SIN** prefijo `fal-ai/`, bajo `alibaba/wan-3.0/` y `alibaba/wan-3.0-prime/`. Son **todos** los
+endpoints Wan 3.0 que fal expone: texto, imagen y referencias a video. No hay edición de video ni imagen en la línea
+3.0; la edición de video más reciente de Wan en fal es la 2.7 y no está conectada.
+
+| id CLI | Slug | Estado |
+|---|---|---|
+| `wan3-t2v` | `alibaba/wan-3.0/text-to-video` | ✅ 2026-09-16 |
+| `wan3-i2v` | `alibaba/wan-3.0/image-to-video` | sin verificar (saldo agotado) |
+| `wan3-r2v` | `alibaba/wan-3.0/reference-to-video` | sin verificar (saldo agotado) |
+| `wan3prime-t2v` | `alibaba/wan-3.0-prime/text-to-video` | sin verificar (saldo agotado) |
+| `wan3prime-i2v` | `alibaba/wan-3.0-prime/image-to-video` | sin verificar (saldo agotado) |
+| `wan3prime-r2v` | `alibaba/wan-3.0-prime/reference-to-video` | sin verificar (saldo agotado) |
+
+**Precio:** USD 0,05/s en las dos líneas (API de pricing de fal, 2026-09-16; volátil).
+
+**Evidencia de la verificación de `wan3-t2v`:** corrida real a 480p con `--duration auto` (el modelo eligió
+5,04 s), `--seed 7` respetado en la salida y `--no-prompt-expansion` (la salida trae `actual_prompt: null`). Video
+854×480 con pista de audio. Los otros 5 se intentaron el mismo día y fal respondió 403 `Exhausted balance` antes de
+encolar, sin costo.
+
+**Contrato** (leído del OpenAPI 2026-09-16; igual en base y Prime):
+
+- **Duración:** entero de 2 a 30 s, default 5. `--duration auto` se envía como `null` («smart duration»: el modelo
+  elige el largo según el prompt y las referencias). Por eso el contrato de duración del registro suma
+  `autoValue`: `'auto'` (texto) en Seedance y Flux 3, `null` en Wan 3.0. Fuera de 2–30 el CLI falla en local.
+- **Resolución:** `480p|720p|1080p`, **default 1080p** (el más alto y el más lento: pasar `--resolution 480p` o
+  `720p` para explorar).
+- **Aspect:** `adaptive` (default), `16:9`, `4:3`, `1:1`, `3:4`, `9:16`.
+- **Audio:** el campo es `audio` (no `generate_audio`), default `true`; `--no-audio` lo apaga. El registro lo
+  declara con `audioField`.
+- **Expansión de prompt:** booleana `enable_prompt_expansion` (default `true`); `--no-prompt-expansion` la apaga
+  (según el proveedor ahorra ~20–60 s, pero puede bajar la calidad). Es distinto de H3, que usa
+  `--prompt-expansion <modo>`.
+- **Razonamiento:** `enable_thinking` (default `false`); `--thinking` lo activa.
+- **Semilla:** `--seed <n>` (entero ≥ 0). Es un flag general del CLI para cualquier endpoint que acepte `seed`.
+- **Salida:** `video`, `actual_prompt` (el prompt reescrito), `duration` y `seed`. El CLI muestra un extracto del
+  prompt reescrito (lo mismo hace con `expanded_prompt` de H3).
+- **Image-to-video:** `--image` es el primer cuadro (viaja como `start_image_url`) y `--end-image` es opcional. El
+  prompt es opcional.
+- **Reference-to-video:** hasta 10 `--image`, 5 `--video` (≤ 15 s en total y ≥ 16 fps) y 5 `--audio` (≤ 15 s). Se
+  citan en el prompt por posición («the subject in Image 1 walks past Video 1»). Prompt opcional.
+- **Basarse en una web o un documento (sólo reference-to-video):** `--web-url <url pública http(s)>` → `web_url`, o
+  `--file <path|url>` → `file_url` (el CLI sube el archivo local). Ambos **exigen `--thinking`**: el proveedor
+  necesita el razonamiento para leer la fuente y el CLI lo pide explícito para que el operador sepa que lo activa.
+  Con `--web-url` o `--file` no hace falta ninguna referencia de medios. En cualquier otra capacidad el CLI los
+  rechaza. Esta vía **no tiene corrida real** (`wan3-r2v` sigue sin verificar).
+- **`enable_safety_checker`:** existe en el esquema, pero desactivarlo requiere autorización de cuenta en fal. No se
+  expone en el CLI.
+
+### Candidatos evaluados, no conectados (revisión 2026-09-16)
+
+**Contexto:** ranking **OpenArt Arena v1.0** (`openart.ai/arena/leaderboard`, leído 2026-09-16; ranking externo de
+preferencia humana, no una medición propia, y cambia seguido). Video: 1 Seedance 2.5 (1125), 2 Wan 3.0 (1047),
+3 Seedance 2.0, 4 Seedance 2.0 Mini, 5 Google Omni Flash, 6 Flux 3 Video, 7 MiniMax H3, 8 Kling 3.0 Omni,
+9 HappyHorse 1.1, 10 Grok Imagine 1.5, 11 PixVerse V6. Wan 3.0 es primero en la subcategoría Video Editing. Imagen:
+1 Seedream 5.0 Pro, 2 GPT Image 2, 3 Nano Banana Pro, 4 Grok Imagine 2.0, 5 Nano Banana 2, 6 Qwen Image 3.0,
+7 Flux.2 Pro.
+
+**Decisión del operador (2026-09-16):** Gemini Omni Flash y Nano Banana Pro van **directo por Google**
+(Vertex/Gemini), **nunca por fal**, aunque fal los ofrezca: por Google es más barato y la calidad es la misma.
+Estado real de Nano Banana Pro: `gemini-3-pro-image` responde en nuestro proyecto Vertex, pero ninguna superficie lo
+usa todavía (ver `GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`).
+
+Lo que sigue se leyó del catálogo, del OpenAPI y de la API de pricing de fal el 2026-09-16. **Nada tiene corrida
+real ni está en el registro.** Precios volátiles.
+
+#### Kling 3 (Kuaishou) — 31 endpoints, slugs **CON** prefijo `fal-ai/`
+
+- **Kling O3** (el «Kling 3.0 Omni» del ranking, #8):
+  `fal-ai/kling-video/o3/{standard,pro,4k}/{text-to-video,image-to-video,reference-to-video,video-to-video/edit,video-to-video/reference}`.
+  Precio: standard y pro USD 0,14/s; 4k USD 0,42/s (la API de pricing no distingue con o sin audio). Duración 3–15 s
+  (texto). Aspect `16:9|9:16|1:1`. `generate_audio` default `false`. `multi_prompt` (varios planos, cada uno con su
+  duración) y `shot_type` `customize|intelligent`. Reference-to-video: imagen inicial y final, `image_urls` y
+  `elements` (`frontal_image_url` + `reference_image_urls` + `video_url` + `voice_id`: personajes u objetos
+  consistentes, con voz). `video-to-video/edit` (con `keep_audio`) y `/reference`.
+- **Kling V3:** `fal-ai/kling-video/v3/{standard,pro,4k,turbo/standard,turbo/pro}/{text-to-video,image-to-video}` y
+  `fal-ai/kling-video/v3/{standard,pro}/motion-control` (imagen + video de movimiento, `character_orientation`
+  `image|video`; USD 0,126 y 0,168/s). Tiene `negative_prompt` y `cfg_scale` 0–1; `generate_audio` default `true`.
+  Turbo standard USD 0,112/s; turbo pro USD 0,14/s.
+- **Kling Image:** `fal-ai/kling-image/{o3,v3}/{text-to-image,image-to-image}`, USD 0,028/imagen. O3 llega a 4K,
+  tiene `result_type` `single|series` (series de 2–9 imágenes coherentes) y `elements`.
+- **Diferencial frente a lo conectado:** 4K nativo en video (Seedance 2.0 base también lo tiene), multi-shot por
+  `multi_prompt`, `elements` con voz para consistencia de personaje, motion-control (transferir el movimiento de un
+  video a una imagen) y series de imágenes coherentes. Más caro por segundo que H3, Wan 3.0 y Seedance mini.
+
+#### Grok Imagine (xAI) — 14 endpoints, slugs **SIN** prefijo (`xai/…`)
+
+- **Video v1.5** (el del ranking, #10): `xai/grok-imagine-video/v1.5/{text-to-video,image-to-video,reference-to-video}`.
+  USD 0,01/s, el más barato de todo lo revisado. Texto e imagen a video: 1–15 s, `480p|720p|1080p`. Referencias a
+  video: 1–15 s, `480p|720p`, 1 a 7 `reference_image_urls`. El esquema no trae control de audio.
+- **Video sin versión (anterior):** `xai/grok-imagine-video/{text-to-video,image-to-video,reference-to-video,edit-video,extend-video}`,
+  USD 0,05/s. `edit-video` (`480p|720p|auto`) y `extend-video` (2–10 s) **sólo existen en esta versión**, no en v1.5.
+- **Imagen v2.0** (#4 del ranking de imagen): `xai/grok-imagine-image/v2.0/{text-to-image,edit}` con `quality`
+  `low|medium`, 1k/2k, 1–4 imágenes y muchos aspect ratios (incluye `19.5:9` y `20:9`). Precio publicado «0,01
+  USD/units» (fal no aclara la unidad). También existen `xai/grok-imagine-image` base (USD 0,02/imagen) y
+  `/quality/*`. Devuelve `revised_prompt`.
+- **Diferencial:** precio muy bajo en video v1.5 para exploración masiva, con calidad menor según el ranking (#10).
+  La imagen v2.0 rankea por encima de Nano Banana 2 y Qwen Image 3.
+
+**Conectar cualquiera de estos** exige lo mismo que las familias ya registradas: declarar el slug entero en
+`fal-capabilities.ts`, su contrato leído del OpenAPI, validación local en el CLI y una corrida real antes de marcar
+`verifiedAt`. Con el saldo agotado, hoy no se puede verificar nada.
+
 ### Modelo de pricing (resumen)
 
 Fal.ai cobra **por uso**, con la unidad según la modalidad (siempre confirmar en la página del modelo):
@@ -350,12 +470,12 @@ Fal.ai cobra **por uso**, con la unidad según la modalidad (siempre confirmar e
 | FLUX | FLUX1.1 [pro] ultra | `fal-ai/flux-pro/v1.1-ultra` ✅ | alta resolución |
 | FLUX | FLUX LoRA | `fal-ai/flux-lora` ✅ | inferencia con LoRA custom |
 | FLUX | Flux 3 | — | **no es imagen en fal**: `blackforestlabs/flux-3/*` es video (ver §Flux 3 y §5–7) |
-| Nano Banana (Google) | Nano Banana 2 | `fal-ai/nano-banana-2` ✅ | |
-| Nano Banana | Nano Banana Pro | `fal-ai/nano-banana-pro` ✅ | |
+| Nano Banana (Google) | Nano Banana 2 | `fal-ai/nano-banana-2` ✅ | listado por fal, **no se opera por fal**: Google directo (`gemini-3.1-flash-image`) |
+| Nano Banana | Nano Banana Pro | `fal-ai/nano-banana-pro` ✅ | listado por fal, **no se opera por fal** (decisión 2026-09-16): Google directo (`gemini-3-pro-image`, disponible en Vertex, sin uso aún) |
 | Nano Banana | Nano Banana | `fal-ai/nano-banana` ✅ | |
 | Nano Banana | Nano Banana Lite | `google/nano-banana-lite` · `google/nano-banana-2-lite` ✅ | |
 | OpenAI | GPT Image 2 | `openai/gpt-image-2` ✅ | (misma familia que nuestro runtime OpenAI) |
-| xAI | Grok Imagine Image | `xai/grok-imagine-image` ✅ | |
+| xAI | Grok Imagine Image | `xai/grok-imagine-image` ✅ · v2.0 `xai/grok-imagine-image/v2.0/text-to-image` ✅ | revisado 2026-09-16, no conectado (ver §Candidatos evaluados) |
 | xAI | Grok Imagine Pro | `xai/grok-imagine-image/quality/text-to-image` ✅ | |
 | Seedream (ByteDance) | Seedream 4.5 | `fal-ai/bytedance/seedream/v4.5/text-to-image` ✅ | **CON** prefijo (sin él da 404; corregido 2026-09-16) |
 | Seedream | Seedream 4.0 | `fal-ai/bytedance/seedream/v4/text-to-image` ✅ | **CON** prefijo |
@@ -423,12 +543,13 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 | Seedance 1.0 / 1.5 Pro | `fal-ai/bytedance/seedance/v1/pro/...` · `fal-ai/bytedance/seedance/v1.5/pro/...` 🔎 | generación previa; **CON** prefijo |
 | Google Veo 3 | `fal-ai/veo3` · `fal-ai/veo3/fast` 🔎 | ~$0.20–0.40/s (std), ~$0.10–0.15/s (fast); 1080p |
 | Google Veo 2 | `fal-ai/veo2` 🔎 | |
-| Kling 3.0 / 2.5 | `fal-ai/kling-video/v3/*` · `v2.5-turbo/*` 🔎 | storyboarding multi-shot, Voice Binding |
-| Wan (Alibaba) 2.6 / 2.2 | `fal-ai/wan/*` 🔎 | T2V/I2V/R2V; soporta LoRAs |
+| Kling 3.0 (O3 y V3) / 2.5 | `fal-ai/kling-video/o3/*` · `fal-ai/kling-video/v3/*` ✅ · `v2.5-turbo/*` 🔎 | revisado 2026-09-16, no conectado: multi-shot (`multi_prompt`), `elements` con voz, 4K; ver §Candidatos evaluados |
+| Wan 3.0 / 3.0 Prime (Alibaba) | `alibaba/wan-3.0/text-to-video` · `alibaba/wan-3.0-prime/text-to-video` ✅ | **SIN** prefijo; 2–30 s o `auto`, hasta 1080p; `pnpm ai:fal --capability wan3-t2v` (verificado); ver §Wan 3.0 |
+| Wan (Alibaba) 2.6 / 2.2 | `fal-ai/wan/*` 🔎 | generación previa; T2V/I2V/R2V; soporta LoRAs |
 | Hunyuan Video (Tencent) | `fal-ai/hunyuan-video` 🔎 | modelo abierto |
 | LTX Video 2.3 | `fal-ai/ltx-2.3-*` 🔎 | rápido/económico |
 | PixVerse V6 | `fal-ai/pixverse/v6/*` ✅ | |
-| Grok Imagine | `xai/grok-imagine-video/text-to-video` ✅ | |
+| Grok Imagine | `xai/grok-imagine-video/text-to-video` · `/v1.5/text-to-video` ✅ | revisado 2026-09-16, no conectado; v1.5 USD 0,01/s |
 | Google Gemini Omni Flash | `google/gemini-omni-flash` ✅ | listado por fal, **no se opera por fal**: se conecta directo por Google |
 | Luma Dream Machine / Ray 2 | `fal-ai/luma-dream-machine/*` 🔎 | |
 | Minimax H3 / H3 Max / H3 Max Turbo | `minimax/h3/text-to-video` · `minimax/h3-max/...` · `minimax/h3-max-turbo/...` ✅ | **SIN** prefijo; `pnpm ai:fal --capability h3turbo-t2v` (la más barata); ver §Minimax H3 |
@@ -444,7 +565,8 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 | Seedance 2.0 | `bytedance/seedance-2.0/image-to-video` · `/mini/...` · `/fast/...` · `/us/...` · `/reference-to-video` ✅ | reference-to-video fija personaje/producto; el video de referencia sólo guía |
 | Flux 3 | `blackforestlabs/flux-3/image-to-video` · `/first-last-frame-to-video` · `/keyframes-to-video` (+ `/draft`) ✅ | imagen, primer y último cuadro, o 1–10 keyframes con índice de cuadro; ver §Flux 3 |
 | Minimax H3 / Max / Max Turbo | `minimax/h3*/image-to-video` · `/reference-to-video` · `minimax/h3-max/camera-controls` ✅ | i2v con `end_image_url` y sin aspect; r2v hasta 9 imágenes, 3 videos, 3 audios; camera-controls con trayectoria |
-| Kling v3 Pro / Standard | `fal-ai/kling-video/v3/pro/image-to-video` · `/standard/...` ✅ | audio nativo |
+| Wan 3.0 / 3.0 Prime | `alibaba/wan-3.0{,-prime}/image-to-video` · `/reference-to-video` ✅ | i2v con `--end-image`; r2v hasta 10 imágenes, 5 videos, 5 audios y base en web/documento con `--thinking`; sin verificar por saldo agotado; ver §Wan 3.0 |
+| Kling O3 / v3 Pro / Standard | `fal-ai/kling-video/o3/*/image-to-video` · `/reference-to-video` · `fal-ai/kling-video/v3/pro/image-to-video` · `/standard/...` ✅ | audio nativo; revisado, no conectado |
 | Kling 2.5 Turbo Pro | `fal-ai/kling-video/v2.5-turbo/pro/image-to-video` ✅ | |
 | PixVerse V6 | `fal-ai/pixverse/v6/image-to-video` ✅ | |
 | Happy Horse 1.1 (Alibaba) | `alibaba/happy-horse/v1.1/image-to-video` ✅ | |
@@ -460,7 +582,9 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 
 | Tarea | Modelo / Slug | Nota |
 |---|---|---|
-| Editar / extender | Grok Imagine `xai/grok-imagine-video/edit-video` · `/extend-video` ✅ | |
+| Editar / extender | Grok Imagine `xai/grok-imagine-video/edit-video` · `/extend-video` ✅ | sólo en la versión sin número (no en v1.5); revisado, no conectado |
+| Editar / guiar con video | Kling O3 `fal-ai/kling-video/o3/{standard,pro,4k}/video-to-video/edit` · `/reference` ✅ | revisado, no conectado; `keep_audio` |
+| Transferir movimiento | Kling V3 `fal-ai/kling-video/v3/{standard,pro}/motion-control` ✅ | imagen + video de movimiento; revisado, no conectado |
 | Editar / extender (registrado) | Flux 3 `blackforestlabs/flux-3/edit-video` · `/extend-video` (+ `/draft`) ✅ | verificado en real; extend exige audio en el origen y entrega sólo la continuación; ver §Flux 3 |
 | Editar / extender (registrado) | Seedance 2.5 `bytedance/seedance-2.5/reference-to-video` con `task` `editing`/`extension` ✅ slug | sin corrida real; no existe endpoint `video-to-video` de Seedance; ver §Seedance video a video |
 | Render→real / restore | LTX 2.3 Quality: `render-to-real`, `deblur`, `colorization`, `day-to-night`, `decompression`, `water-simulation`, `instant-shave`, `cross-eyed` ✅ | familia de transforms LTX |

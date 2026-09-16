@@ -3,7 +3,7 @@
 > **Tipo:** operating guide para agentes
 > **Estado:** Accepted
 > **Creado:** 2026-06-01
-> **Ultima actualizacion:** 2026-09-16 por Claude (Flux 3 en `pnpm ai:fal` —video, no imagen— y contrato real de Seedance video a video; antes, Minimax H3 en `pnpm ai:fal`, retome por `--request-id`, brecha de `--task` cerrada; antes, CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
+> **Ultima actualizacion:** 2026-09-16 por Claude (Wan 3.0 en `pnpm ai:fal` —1 de 6 verificado, resto bloqueado por saldo agotado de fal—, estado real de Nano Banana Pro y Kling 3 / Grok Imagine revisados sin conectar; antes, Flux 3 en `pnpm ai:fal` —video, no imagen— y contrato real de Seedance video a video; antes, Minimax H3 en `pnpm ai:fal`, retome por `--request-id`, brecha de `--task` cerrada; antes, CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
 > **Fuentes externas verificadas:** OpenAI developer docs 2026-08-21 y fichas oficiales Fal.ai 2026-07-18
 
 ## Purpose
@@ -153,6 +153,7 @@ snapshots de modelo rotan sin aviso.
 | Video desde texto, imagen o referencias | `pnpm ai:fal --capability seedance25-*` / `seedance20-*` | 2.5 de 4 a 30 s y 1080p; 2.0 base de 4 a 15 s y única con 4K; r2v exige imagen o video de referencia; el CLI valida límites antes de encolar |
 | Video desde primer/último cuadro o keyframes, borrador barato → final | `pnpm ai:fal --capability flux3-*` | Flux 3 es **video** en fal (no imagen); 12 endpoints verificados; draft USD 0,03/s → `flux3-enhance --draft-cache` |
 | Editar o extender un video existente | `flux3-edit` / `flux3-extend` (verificados) · `seedance25-r2v --task editing\|extension` (sin verificar) | Flux 3 extend exige audio en el origen y entrega sólo la continuación; en Seedance 2.0 el video sólo guía |
+| Video de largo elegido por el modelo, o basado en una web o un documento | `pnpm ai:fal --capability wan3-*` / `wan3prime-*` | Wan 3.0: 2–30 s o `auto`, default **1080p**; r2v con `--thinking --web-url`/`--file`; sólo `wan3-t2v` verificado |
 
 ## Prompt Anatomy
 
@@ -479,7 +480,7 @@ desde la terminal, o importar `./src/lib/ai/openai-image` cuando el flujo vive e
 ### Generate via fal CLI (`pnpm ai:fal`)
 
 CLI hermano de `pnpm ai:image` para Seedream 5 (imagen, edición y capas) y video con Seedance 2.5/2.0, Minimax H3 y
-Flux 3. No lo
+Flux 3 y Wan 3.0. No lo
 reemplaza: `ai:image` habla el contrato OpenAI y fal tiene un esquema de input por endpoint. Es out-of-band; el
 runtime de imagen del producto sigue en `src/lib/ai/image-generator.ts`. Manual paso a paso:
 `docs/manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md`.
@@ -528,6 +529,24 @@ Reglas operativas:
   2.5 edita (`--task editing`, sin `--duration`/`--aspect`) o extiende (`--task extension`, sin `--aspect`), ambos con
   `--video`; en 2.0 el video sólo guía. Duración mínima 4 s; al menos una imagen o video de referencia; topes de
   referencias validados en local. `seedance25-r2v` sigue sin corrida real (leído del OpenAPI).
+- **Delta 2026-09-16 — Wan 3.0 conectado** (`wan3-*`, `wan3prime-*`; slugs `alibaba/wan-3.0{,-prime}/…` sin prefijo;
+  USD 0,05/s). **Sólo `wan3-t2v` verificado en real**; los otros 5 quedaron sin verificar por el 403 de saldo. Flags:
+  `--duration auto` (viaja como `null`), `--no-audio` (campo `audio`), `--no-prompt-expansion`, `--thinking`,
+  `--seed <n>` (general) y, sólo en r2v, `--web-url`/`--file` (ambos exigen `--thinking`). Referencias: 10 imágenes,
+  5 videos, 5 audios. Default de resolución **1080p**: pasar `480p`/`720p` al explorar. Contrato: catálogo fal
+  §Wan 3.0.
+- **Delta 2026-09-16 — Kling 3 y Grok Imagine revisados, no conectados:** Kling O3/V3 (multi-shot, `elements` con
+  voz, 4K, motion-control; USD 0,112–0,42/s) y Grok Imagine (video v1.5 USD 0,01/s; edit/extend sólo en la versión
+  sin número; imagen v2.0). Correrlos hoy sería `--model` fuera del registro y sin verificación. Detalle: catálogo
+  fal §Candidatos evaluados, no conectados.
+- 🔴 **Delta 2026-09-16 — saldo de fal agotado:** toda corrida responde 403 `User is locked. Reason: Exhausted
+  balance` antes de encolar (sin costo). No reintentar ni cambiar de capacidad: una persona con acceso a la
+  facturación de fal debe recargar saldo (`fal.ai/dashboard/billing`). El agente no recarga ni ingresa medios de
+  pago; reporta el bloqueo.
+- **Nano Banana Pro:** nunca por fal (decisión del operador 2026-09-16). En Google, `gemini-3-pro-image` está
+  disponible en Vertex pero ninguna superficie lo usa; el provider `google-gemini-image` corre Nano Banana 2
+  (`gemini-3.1-flash-image`) y no hay CLI de Gemini Image (`pnpm ai:image` es sólo OpenAI). No cambiar
+  `GOOGLE_GEMINI_IMAGE_MODEL` para probarlo: cambia todo el carril. Ver arquitectura del generador §Carril Google.
 - El CLI imprime el `request_id` al encolar. Ante `HTTP 408` el trabajo **sigue cobrando en fal**: retomarlo con
   `pnpm ai:fal --capability <id> --request-id <id>` (no reenvía ni vuelve a cobrar), nunca relanzarlo.
   Alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream y Seedance usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.
@@ -574,7 +593,7 @@ digital/offline a escala, usar por defecto:
 - **Seedream 5 Lite:** divergencia rápida, búsqueda de familias visuales y variaciones de un lenguaje.
 - **Seedream 5 Pro:** desarrollo de materialidad, color, atmósfera, energía y continuidad visual de una dirección seleccionada.
 - **GPT Image 2:** organización espacial, instrucciones complejas, reparación localizada, adaptación de formatos y creación de campos de copy.
-- **Gemini Omni Flash:** motion 9:16/16:9 desde un clean plate, audio nativo y edición conversacional. Se conecta directo por las plataformas de Google, no por fal ni por `pnpm ai:fal`.
+- **Gemini Omni Flash:** motion 9:16/16:9 desde un clean plate, audio nativo y edición conversacional. Se conecta directo por las plataformas de Google, no por fal ni por `pnpm ai:fal`, aunque fal lo liste (reafirmado por el operador 2026-09-16: por Google es más barato con la misma calidad).
 - **Composición determinista:** texto, logos, claims, legal, grillas y exports finales. Un modelo generativo no es la fuente de verdad tipográfica.
 
 El paso `anchor` es obligatorio antes de escalar. Debe aprobar identidad, silueta, paleta, sistema de luz, fondo, zona de copy y invariantes protegidos. Desde ese anchor se derivan todas las piezas en una topología estrella; no se encadenan treinta derivados entre sí.

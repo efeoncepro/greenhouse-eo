@@ -37,9 +37,9 @@
   `pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ./capas` devuelve hasta 16 capas
   con alfa real + `layers.json`. Es dirección de arte sobre capas; el logo oficial y el copy final siguen
   saliendo del vector y de la composición determinística.
-- **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Minimax H3 (Fal, conectado 2026-09-16: Max Turbo exploración barata · Max `camera-controls` cámara sobre imagen congelada · base 2K/4K) / Flux 3 (Fal, conectado y verificado 2026-09-16: video, no imagen; draft → enhance · primer/último cuadro y keyframes · edit y extend para video a video) / Veo 3.1 (premium, Vertex) /
-  PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal) / Gemini Omni (canary, Vertex);
-  Seedance, H3 y Flux 3 se operan con `pnpm ai:fal` y el endpoint (Seedance 2.5 larga · 2.0 base 4K · H3 Turbo exploración · Flux 3 draft/edit/extend) se elige en
+- **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Minimax H3 (Fal, conectado 2026-09-16: Max Turbo exploración barata · Max `camera-controls` cámara sobre imagen congelada · base 2K/4K) / Flux 3 (Fal, conectado y verificado 2026-09-16: video, no imagen; draft → enhance · primer/último cuadro y keyframes · edit y extend para video a video) / Wan 3.0 (Fal, conectado 2026-09-16, sólo `wan3-t2v` verificado: hasta 30 s con duración inteligente · video desde una web o documento) / Veo 3.1 (premium, Vertex) /
+  PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal; **evaluado, no conectado**) / Grok Imagine video (Fal; **evaluado, no conectado**) / Gemini Omni (canary, Vertex directo, nunca Fal);
+  Seedance, H3, Flux 3 y Wan 3.0 se operan con `pnpm ai:fal` y el endpoint (Seedance 2.5 larga · 2.0 base 4K · H3 Turbo exploración · Flux 3 draft/edit/extend · Wan 3.0 duración `auto`/web/documento) se elige en
   `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`;
   producción y formato social →
   `social-media-studio`. Un clip de duración mínima sólo valida el endpoint: el release profesional exige
@@ -71,7 +71,9 @@ fuera del router hasta registrar endpoint/modelo exacto, términos, residencia/r
 ## Política de providers y portafolio enterprise
 
 - **Google nativo → Google Cloud/Vertex directo**, nunca Fal: Gemini Image, Veo, Gemini Omni, Lyria,
-  Gemini/Chirp TTS, Chirp STT y Translation.
+  Gemini/Chirp TTS, Chirp STT y Translation. Gemini Image hoy: Nano Banana 2 (`gemini-3.1-flash-image`) es el
+  default del provider `google-gemini-image`; Nano Banana Pro (`gemini-3-pro-image`) está disponible en Vertex pero
+  ninguna superficie lo usa y no hay CLI de Gemini Image (revisión 2026-09-16).
 - **Fal → sólo modelos no-Google y utilidades allowlisted.**
 - **OpenAI → directo.**
 - **Post/composición exacta → runtime determinístico/humano.**

@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-09-16 por Claude — Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
+> **Ultima actualizacion:** 2026-09-16 por Claude — Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 # Generador Visual de Assets con IA
@@ -141,7 +141,7 @@ claro** y no genera. Es preferible una falla visible a una imagen silenciosament
 
 ## Acceso a Fal.ai (imagen, video y audio por IA) — desde 2026-07-06
 
-Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recraft (vectores), Greenhouse tiene acceso a **Fal.ai**, un agregador que permite generar **imagen, video y audio** con muchos modelos a traves de una sola API (por ejemplo Seedance, Kling y Flux 3 para video; Seedream y los Flux anteriores para imagen). Los modelos de Google (Gemini, Veo, Omni) no se usan a través de Fal: se conectan directo con Google.
+Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recraft (vectores), Greenhouse tiene acceso a **Fal.ai**, un agregador que permite generar **imagen, video y audio** con muchos modelos a traves de una sola API (por ejemplo Seedance, Minimax H3, Flux 3 y Wan 3.0 para video; Seedream y los Flux anteriores para imagen). Los modelos de Google (Gemini, Veo, Omni y Nano Banana, incluido Nano Banana Pro) no se usan a través de Fal: se conectan directo con Google, aunque Fal los ofrezca, porque así sale más barato con la misma calidad.
 
 - **Para que sirve:** producir contenido media de mayor variedad (sobre todo **video**) que los motores de imagen actuales no cubren, para piezas de marketing, campanas y exploracion visual.
 - **Como se usa:** con el comando de terminal `pnpm ai:fal` (ver la sección siguiente) o de forma programatica, con un cliente interno unico. El contenido se genera fuera del portal y se **sube** por el flujo normal de assets — no se genera en tiempo real para los usuarios del producto.
@@ -153,7 +153,7 @@ Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recra
 ## El comando `pnpm ai:fal`: imágenes, capas y video (desde 2026-09-16)
 
 Es un comando de terminal que el equipo o el agente usa para trabajar con tres familias de modelos a través de
-Fal: Seedream, Seedance, Minimax H3 y Flux 3. Convive con `pnpm ai:image`: no lo reemplaza. `ai:image` sigue siendo el camino para GPT Image; `ai:fal`
+Fal: Seedream, Seedance, Minimax H3, Flux 3 y Wan 3.0. Convive con `pnpm ai:image`: no lo reemplaza. `ai:image` sigue siendo el camino para GPT Image; `ai:fal`
 es el camino para los modelos que viven en Fal.
 
 ### Qué permite hacer
@@ -169,6 +169,7 @@ es el camino para los modelos que viven en Fal.
 | Probar una idea de video barato y después pasarla a versión final | **Flux 3** (borrador + mejora) | Un borrador y, si gusta, su versión final |
 | Video entre un primer y un último cuadro, o pasando por varios cuadros clave | **Flux 3** | Un video corto |
 | Cambiar el aspecto de un video que ya existe, o alargarlo | **Flux 3 edit / extend** (o Seedance 2.5, sin probar) | El video editado, o sólo el tramo nuevo |
+| Un video de hasta 30 segundos donde el modelo decide el largo, o que se base en una página web o un documento | **Wan 3.0** (y Wan 3.0 Prime) | Un video corto, con sonido |
 
 ### La separación por capas, en simple
 
@@ -236,6 +237,43 @@ Aunque el nombre recuerde a los Flux de imagen, **Flux 3 en Fal es un modelo de 
 - **Con sonido** por defecto (se puede apagar).
 - **Más lento que H3:** en las pruebas tardó entre 40 segundos y 4 minutos por video.
 
+### Qué agrega Wan 3.0 (desde 2026-09-16)
+
+Wan 3.0 es el modelo de video de Alibaba. Al 2026-09-16 aparece **segundo** en el ranking público de video de
+OpenArt Arena (un ranking externo de preferencia de personas, que cambia seguido). Hay dos líneas, **Wan 3.0** y
+**Wan 3.0 Prime**, con las mismas opciones y el mismo precio (del orden de 5 centavos de dólar por segundo).
+
+- **Desde texto, desde una imagen o desde referencias.** Desde imagen se entrega el primer cuadro y, si se quiere,
+  también el último.
+- **De 2 a 30 segundos**, o dejar que **el modelo elija el largo** según lo que se pide.
+- **Hasta 1080p.** Ojo: si no se indica la calidad, usa **1080p**, que es la más cara y lenta. Para explorar
+  conviene pedir 480p o 720p.
+- **Con sonido** por defecto (se puede apagar).
+- **Referencias variadas:** hasta 10 imágenes, 5 videos y 5 audios, que se nombran en la instrucción por su orden
+  («la persona de la imagen 1…»).
+- **Puede basarse en una página web o en un documento.** En el modo desde referencias se le puede dar la dirección
+  de una web pública o un archivo, y el modelo lo lee antes de generar. Para eso hay que activar su modo de
+  **razonamiento previo**; el comando lo exige para que quede claro que se está usando.
+- **Repetible:** se puede fijar una **semilla** para obtener resultados parecidos al repetir.
+- **Instrucción tal cual:** por defecto Wan reescribe y amplía la instrucción; se puede apagar para que use el texto
+  exacto (es más rápido, pero puede bajar la calidad).
+
+**Qué está probado:** sólo **Wan 3.0 desde texto**, con una generación real el 2026-09-16 (el modelo eligió un largo
+de 5 segundos, respetó la semilla y entregó video con sonido). Las otras cinco opciones (desde imagen, desde
+referencias y las tres de Prime), incluida la de basarse en una web o un documento, **no se pudieron probar**: el
+saldo de la cuenta de Fal se agotó ese mismo día.
+
+> **Mientras no se recargue el saldo de Fal, ningún modelo del comando puede generar.** Fal rechaza cada pedido con
+> un aviso de «saldo agotado» antes de empezar, así que no se cobra nada. Recargarlo es tarea de una persona con
+> acceso a la facturación de Fal.
+
+### Otros modelos revisados y no conectados
+
+El 2026-09-16 también se revisaron **Kling 3** (video con varios planos en una sola pieza, personajes consistentes
+con voz, 4K y copiar el movimiento de un video a una imagen; más caro por segundo) y **Grok Imagine** (video muy
+barato para explorar en cantidad, con calidad menor según el ranking, e imágenes). Quedaron **documentados pero sin
+conectar** al comando.
+
 ### Video a video: editar o alargar un clip que ya existe
 
 Hay dos caminos, y hoy sólo uno está probado:
@@ -267,7 +305,8 @@ Sobre Seedance, lo que conviene saber:
 - De **Flux 3** están probadas **las 12 opciones** (2026-09-16): desde texto, desde imagen, primer y último cuadro,
   keyframes, sus borradores, la mejora de borradores, editar y extender.
 - La edición y la extensión con **Seedance 2.5** están conectadas pero **sin probar**.
-- En total: 49 opciones conectadas, 29 probadas con generaciones reales.
+- De **Wan 3.0** está probada sólo la opción desde texto; las otras cinco esperan a que se recargue el saldo de Fal.
+- En total: 55 opciones conectadas, 30 probadas con generaciones reales.
 - `pnpm ai:fal --list` muestra este estado en cualquier momento, y no cuesta nada.
 
 ### Lo que conviene saber
@@ -276,7 +315,17 @@ Sobre Seedance, lo que conviene saber:
   cada corrida, porque Fal no entrega ese dato. Antes de un lote o de un video largo hay que revisar el precio
   vigente en la página del modelo.
 - Es producción **fuera del portal**: nada de esto se genera en tiempo real para los usuarios.
-- Gemini Omni (video de Google) **no** se usa por aquí; se conectará directo con Google.
+- Gemini Omni (video de Google) y Nano Banana Pro (imagen de Google) **no** se usan por aquí: van directo con Google.
+
+## Nano Banana Pro: dónde está hoy (revisión 2026-09-16)
+
+- El generador del producto ya usa un motor de imagen de Google: **Nano Banana 2**. No es el motor por defecto (el
+  por defecto es GPT Image); se usa cuando se elige el carril de Google.
+- **Nano Banana Pro** está disponible en la cuenta de Google del equipo (se comprobó ese día), pero **ninguna
+  herramienta lo usa todavía**.
+- No hay un comando de terminal para las imágenes de Google: `pnpm ai:image` sólo trabaja con GPT Image.
+- Pasar todo el carril de Google a Nano Banana Pro cambiaría el motor para todos los que lo usan. Si se decide
+  usarlo, lo correcto es poder elegirlo en cada pedido. Esa decisión está pendiente.
 
 > Detalle tecnico: [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo (registro de capacidades, contratos de video, subida de archivos) y el manual [Operar el CLI de fal (Seedream, Seedance, Minimax H3 y Flux 3)](../../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md). Código: `scripts/ai/fal-image.ts`, `src/lib/ai/fal-capabilities.ts`, `src/lib/ai/fal.ts`.
 

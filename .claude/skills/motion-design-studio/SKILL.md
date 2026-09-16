@@ -10,7 +10,7 @@ description: >-
   + tipografía kinética + title sequences, edición/montaje/pacing, sound design + sync a
   música, color grading + finishing, VFX/compositing — keying/roto/tracking/CGI/simulaciones),
   y (2) capacidad de ejecución (dirige el pipeline IA
-  — Higgsfield Cinema Studio/Soul ID vía MCP + Runway Gen-4.5 / Seedance / Minimax H3 / Flux 3 / Veo / Kling /
+  — Higgsfield Cinema Studio/Soul ID vía MCP + Runway Gen-4.5 / Seedance / Minimax H3 / Flux 3 / Wan 3.0 / Veo / Kling /
   Gemini Omni —, integra craft humano AE/Blender/DaVinci, y hace handoff), cerrando el loop
   idear→storyboard→animatic→producir→editar→finalizar→entregar. Es "humano + IA": el craft
   (módulos 01-08) aplica anime quien anime; el pipeline IA (09) y la orquestación híbrida
@@ -30,7 +30,7 @@ description: >-
   "animación de logo", "tipografía kinética", "kinetic typography", "cinematográfico",
   "cinematic", "cámara", "storyboard", "animatic", "previs", "edición", "montaje", "corte",
   "color grading", "grade", "sound design", "diseño sonoro", "banda sonora", "render",
-  "video IA", "AI video", "Higgsfield", "Runway", "Seedance", "Minimax", "Minimax H3", "Flux 3", "video a video", "extender video", "Veo", "Kling", "Gemini Omni",
+  "video IA", "AI video", "Higgsfield", "Runway", "Seedance", "Minimax", "Minimax H3", "Flux 3", "Wan 3.0", "video a video", "extender video", "Veo", "Kling", "Gemini Omni",
   "image-to-video", "Soul ID", "consistencia de personaje", "After Effects", "Blender",
   "DaVinci", "VFX", "efectos visuales", "compositing", "rotoscoping", "roto", "green screen",
   "chroma", "keying", "tracking", "matchmove", "CGI", "Nuke", "Fusion", "Mocha", "Houdini",
@@ -142,8 +142,13 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   `enhance` sólo del take aprobado; primer/último cuadro y keyframes para fijar la trayectoria; `edit` re-renderiza
   conservando movimiento; `extend` exige audio en el origen y entrega sólo la continuación; la elección de video a
   video Flux 3 vs Seedance 2.5 vive en el mismo workflow),
+  **Wan 3.0 / Wan 3.0 Prime** (también con `pnpm ai:fal`, conectado 2026-09-16; sólo `wan3-t2v` verificado, los
+  otros 5 bloqueados por saldo de fal: 2–30 s o `auto` = duración inteligente, hasta 1080p, USD 0,05/s, R2V con
+  10 imágenes / 5 videos / 5 audios, video basado en una web o documento con `--web-url`/`--file` + `--thinking`;
+  #2 en video y #1 en Video Editing en OpenArt Arena 2026-09-16, pero **sin endpoint de edición** en fal),
   **Kling** (Voice
-  Binding), **Veo** (broadcast), **Gemini Omni** (edición conversacional).
+  Binding vía Higgsfield; Kling 3 vía fal y Grok Imagine video **evaluados, no conectados** — ver el workflow),
+  **Veo** (broadcast), **Gemini Omni** (edición conversacional; **directo por Google, nunca por fal**).
 - **Producir (humano)**: After Effects (mograph/compositing), Blender/C4D (3D), Nuke/Fusion
   (compositing/VFX), Mocha (tracking), Houdini (FX/simulaciones) — handoff con spec (`modules/11`).
 - **Editar + finalizar**: montaje, sonido, color grade, render, entrega (`modules/06`, `07`, `08`, `10`).

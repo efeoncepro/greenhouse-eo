@@ -45,7 +45,9 @@ Guía de arquitectura y compras, no tarifario. Verificar endpoint, región, cuot
 | FLUX.2 | BFL directo o Fal | Paridad pública en los endpoints comparados; decidir por SLA, auth y observabilidad. |
 | Recraft v4 | Recraft directo o Fal | Paridad pública en los endpoints comparados; directo si pesa el control contractual. |
 | GPT Image 2 | OpenAI directo | Ruta canónica; Fal sólo para pruebas o gateway explícitamente justificado. |
-| Nano Banana / Gemini | Google AI Studio o Vertex directo | Google nativo nunca por Fal; separar API, Batch, región y cuotas. |
+| Nano Banana / Gemini | Google AI Studio o Vertex directo | Google nativo nunca por Fal; separar API, Batch, región y cuotas. Estado 2026-09-16: **Nano Banana 2** (`gemini-3.1-flash-image`) es el default del provider `google-gemini-image` del producto; **Nano Banana Pro** (`gemini-3-pro-image`) está disponible en nuestro Vertex (`models.get`, location `global`) pero **ninguna superficie lo usa**; no hay CLI de Gemini Image. Gemini Omni Flash también va directo aunque fal lo ofrezca. |
+| Wan 3.0 / Prime | Fal (`pnpm ai:fal`, out-of-band) | Conectado 2026-09-16: 6 endpoints de video `alibaba/wan-3.0{,-prime}/*` (t2v/i2v/r2v), USD 0,05/s (API de pricing). Sólo `wan3-t2v` verificado en real; los otros 5 sin verificar por saldo de fal agotado (403). Sin edición ni imagen en 3.0. #2 video y #1 Video Editing en OpenArt Arena 2026-09-16 (ranking externo). |
+| Kling 3 · Grok Imagine | Fal (evaluado, **no conectado**) | Revisión de catálogo/OpenAPI 2026-09-16, sin corridas: Kling O3 0,14 USD/s (4k 0,42/s; multi-shot, elements con voz, motion-control, 4K); Grok Imagine video v1.5 0,01/s (#10 OpenArt), imagen v2.0 (#4 OpenArt). Conectarlos es decisión del operador. |
 | Flux 3 | Fal (`pnpm ai:fal`, out-of-band) | Anunciado por BFL el 2026-07-23. En Fal es un modelo de **video** (no de imagen): 12 endpoints `blackforestlabs/flux-3/*` conectados y verificados en real 2026-09-16 (catálogo y OpenAPI de fal + API de pricing + corridas reales): finales 0,085 USD/s · drafts 0,03/s · edit 0,03/s · extend 0,205/s. Ruta directa BFL sin evaluar. |
 
 **Regla:** `prototype` → Fal si reduce tiempo; `production-scale` → directo cuando hay ahorro, SLA o control de
@@ -137,7 +139,9 @@ duración, reintentos y costo efectivo por output.
 | **Seedance 2.5** (ByteDance vía Fal) | Tres endpoints activos: T2V, I2V y R2V; audio nativo, 4–30 s, 480p/720p/1080p; R2V admite hasta 50 archivos: 30 imágenes, 10 videos y 10 audios, con referencias `@ImageN`/`@VideoN`/`@AudioN` | Fal no expone 4K, máscaras, storyboard JSON, shots estructurados, keyframes intermedios ni stems; precio y output deben revalidarse | Provider-supported; Globe gated hasta contrato, adapter, rights, billing, eval y canary exactos |
 | **Minimax H3** (Fal, `pnpm ai:fal`) | Turbo barato y rápido; Max `camera-controls` mueve la cámara sobre imagen congelada; base única H3 con 2K/4K; LoRA/entrenadores para marca/personaje | 5–15 s; sin toggle de audio (entrega audio); I2V sin aspect; LoRA/entrenadores sin verificar | exploración de movimiento, cámara sobre KV aprobado; elección fina en `motion-design-studio` |
 | **Veo 3.1 / Fast** (Google Vertex) | premium/broadcast + ruta de escala | costo/cupo por endpoint | directo GCP; sustituye Veo 2/3.0 |
-| **Kling 3 Pro/4K** (Fal) | start/end, elements, multi-shot y 4K | límites de audio/idioma y concurrencia | especialista premium/4K |
+| **Wan 3.0 / Prime** (Alibaba, Fal, `pnpm ai:fal`) | T2V/I2V/R2V con audio apagable; 2–30 s o duración inteligente (`auto`); hasta 1080p; R2V 10 imágenes / 5 videos / 5 audios; video basado en web o documento (`--web-url`/`--file` + `--thinking`); USD 0,05/s | sin 4K ni edición en Fal; sólo `wan3-t2v` verificado (resto bloqueado por saldo) | toma larga decidida por el modelo o explicativo desde una fuente; detalle en `motion-design-studio` |
+| **Kling 3 Pro/4K** (Fal) — **evaluado, no conectado a `pnpm ai:fal`** (2026-09-16) | start/end, elements con voz, multi-shot, motion-control y 4K | límites de audio/idioma y concurrencia; O3 0,14 USD/s, 4k 0,42/s | especialista premium/4K si el operador lo conecta; Kling vía Higgsfield es otro carril |
+| **Grok Imagine video v1.5** (xAI, Fal) — **evaluado, no conectado** (2026-09-16) | exploración masiva a USD 0,01/s; 1–15 s hasta 1080p | #10 en OpenArt Arena; sin control de audio | candidato de exploración barata |
 | **PixVerse V6** (Fal) | 1080p, audio, cámara y costo de volumen | límites por resolución/duración | scale social/motion |
 | **Gemini Omni Flash** (Google Vertex) | reference/video edit + audio | preview, 720p, máx. 10 s | canary con fallback; nunca Fal |
 | **Flux 3** (Black Forest Labs, Fal) | video con audio: T2V/I2V, primer-último cuadro, keyframes, edit que conserva movimiento, extend, draft barato → enhance; 5–20 s, 720p/1080p | en Fal no genera imágenes; más lento que H3; `extend` exige audio en el origen y entrega sólo la continuación | explorar movimiento en draft, fijar trayectoria con cuadros, video a video verificado; detalle en `motion-design-studio` |
@@ -154,5 +158,6 @@ duración, reintentos y costo efectivo por output.
   GPT Image 2**; **divergencia de campaña → Seedream 5 Lite**; **material/color/región semántica →
   Seedream 5 Pro**; **secuencia híbrida → módulo 12 + anchor/handoff**; **Photoshop/Firefly → workbench watch tras rights review**; **video con control por referencias → Seedance**;
   **broadcast/cine → Veo**; **económico simple → Kling**; **edición conversacional → Gemini Omni**;
-  **draft barato de video → enhance, trayectoria por cuadros o video a video → Flux 3 (Fal; en Fal es video, no imagen)**.
+  **draft barato de video → enhance, trayectoria por cuadros o video a video → Flux 3 (Fal; en Fal es video, no imagen)**;
+  **toma de hasta 30 s con duración inteligente o video desde una web/documento → Wan 3.0 (Fal)**.
 - Sora 2 deprecado (shutdown 2026-09-24) — no basar nada nuevo en él.

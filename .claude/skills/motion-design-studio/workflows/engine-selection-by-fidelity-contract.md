@@ -1,6 +1,6 @@
 # Selección de motor por contrato de fidelidad — no por canal
 
-> **Estado:** evidencia operativa limitada — 2026-07-11 (operación de Flux 3 y video a video actualizada 2026-09-16). No declara un ganador universal ni sustituye el gate de revisión humana.
+> **Estado:** evidencia operativa limitada — 2026-07-11 (operación de Flux 3, Wan 3.0, video a video y candidatos no conectados actualizada 2026-09-16). No declara un ganador universal ni sustituye el gate de revisión humana.
 >
 > **Evidencia empírica:** [`Social Wall`](../../../../ai-generations/2026-07-08_social-wall-assets/README.md) (paquete de key visuals con `gpt-image-2` → Gemini Omni image-to-video, publicado) y [`Glitch`](../../../../ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-seedance-source-keyvisual-review.md) (Seedance retuvo el set, pero el take aún se rechazó por actuación/foley).
 
@@ -159,6 +159,52 @@ draft → enhance; para **fijar inicio/fin o una trayectoria** con cuadros concr
 para tomas de **más de 20 s**, Seedance 2.5; para **4K**, Seedance 2.0 base o H3 base. Ninguno es receta validada para
 actuación o física: aplican los gates de este contrato.
 
+## Operar Wan 3.0: `pnpm ai:fal` (conectado 2026-09-16)
+
+Wan 3.0 (Alibaba) entra porque es **#2 en video** del ranking externo OpenArt Arena v1.0 (Elo 1047, detrás de Seedance
+2.5) y **#1 en la subcategoría Video Editing** (leído en `openart.ai/arena/leaderboard` el 2026-09-16; es un ranking
+de preferencia, no evidencia interna). Son 6 endpoints, slugs **sin** `fal-ai/` (`alibaba/wan-3.0/<modo>` y
+`alibaba/wan-3.0-prime/<modo>`), y son todos los que fal tiene de Wan 3.0: **no hay edición ni imagen en 3.0** (la
+edición de video más reciente de Wan es la 2.7, **no conectada**).
+
+| ids | Estado |
+| --- | --- |
+| `wan3-t2v` | **Verificado en real** 2026-09-16: 480p, `--duration auto` → 5,04 s, `--seed 7` respetado, `--no-prompt-expansion` → `actual_prompt` null, 854×480 con audio |
+| `wan3-i2v`, `wan3-r2v`, `wan3prime-t2v`, `wan3prime-i2v`, `wan3prime-r2v` | **Sin verificar**: la corrida se intentó y fal respondió 403 `Exhausted balance` antes de encolar (sin costo). Pendiente recargar saldo y re-correr |
+
+```bash
+pnpm ai:fal --capability wan3-t2v --prompt "…" --resolution 480p --duration auto --seed 7 --out explora.mp4
+pnpm ai:fal --capability wan3-i2v --image kv.png --end-image cierre.png --resolution 720p --duration 8 --out toma.mp4
+pnpm ai:fal --capability wan3-r2v --image producto.png --video gesto.mp4 --prompt "the subject in Image 1 walks past Video 1" --resolution 720p --out ref.mp4
+pnpm ai:fal --capability wan3-r2v --web-url https://ejemplo.com/lanzamiento --thinking --resolution 720p --duration auto --out explicativo.mp4
+```
+
+Contrato (leído del OpenAPI 2026-09-16, igual en base y Prime; el CLI valida antes de gastar):
+
+- **Precio:** USD 0,05/s en ambas líneas (API de pricing). El registro no documenta una diferencia de contrato entre
+  base y Prime: compara con un take corto antes de asumir que Prime rinde más.
+- **Duración:** entero 2–30 s (default 5) o `--duration auto` (se envía `null`: **duración inteligente**, el modelo
+  elige el largo según prompt y referencias).
+- **Resolución:** `480p` | `720p` | `1080p`, **default 1080p** (el más caro de explorar: pasa `--resolution 480p` al
+  divergir). **Aspecto:** `adaptive` (default), `16:9`, `4:3`, `1:1`, `3:4`, `9:16`.
+- **Audio:** genera audio por defecto (campo `audio`, no `generate_audio`); `--no-audio` lo apaga.
+- **Expansión de prompt:** activa por defecto; `--no-prompt-expansion` la apaga (ahorra ~20–60 s, puede bajar calidad).
+  Es un booleano, distinto del `--prompt-expansion <modo>` de H3. La salida trae `actual_prompt` (prompt reescrito),
+  `duration` y `seed`; el CLI muestra un extracto.
+- **Razonamiento:** `--thinking` (default apagado). **Semilla:** `--seed <n>` (entero ≥ 0).
+- **`i2v`:** `--image` = primer cuadro, `--end-image` opcional, prompt opcional.
+- **`r2v`:** hasta **10 `--image`, 5 `--video`** (≤ 15 s en total, ≥ 16 fps) y **5 `--audio`** (≤ 15 s); se citan
+  **por posición** en el prompt (`Image 1`, `Video 1`), no con `@Image1` como Seedance. Prompt opcional. También puede
+  basar el video en una página (`--web-url <url pública>`) o un documento (`--file <path|url>`, el CLI lo sube); ambos
+  **exigen `--thinking`** y no necesitan referencias de medios.
+- El safety checker no se expone (desactivarlo exige autorización de cuenta).
+
+**Cuándo elegir Wan 3.0:** toma de **hasta 30 s con duración decidida por el modelo** (`auto`); **video explicativo
+basado en una web o un documento** (`--web-url`/`--file` + `--thinking`), que ningún otro motor conectado ofrece;
+**R2V que mezcla imagen, video y audio** con topes intermedios (10/5/5). Para 4K sigue Seedance 2.0 base o H3 base
+(Wan tope 1080p); para edición/extensión verificada, Flux 3. El #1 de OpenArt en edición **no se traduce** a edición
+operable acá: Wan 3.0 no tiene endpoint de edición en fal.
+
 ## Video a video: qué motor
 
 fal **no expone un endpoint video-to-video de Seedance**: su video a video vive en `reference-to-video`. Tres
@@ -171,10 +217,27 @@ opciones con estado distinto:
 | **Extender** un clip | `flux3-extend` | **Verificado** (2026-09-16) | Exige audio en el origen; entrega sólo la continuación (5–20 s o `auto`), que se une en post |
 | **Extender** un clip | `seedance25-r2v --task extension --video` | **Sin verificar** (leído del OpenAPI) | El proveedor fuerza `aspect_ratio` a `auto`; duración 4–30 s o `auto` |
 | Usar un video sólo como **guía** (cámara, blocking, ritmo) | `seedance20-*-r2v` (se cita como `@Video1`) o `seedance25-r2v --task reference` | Sin verificar con video | Seedance 2.0 no edita ni extiende: sólo condiciona la generación nueva |
+| Usar un video como **referencia** junto a imágenes y audio | `wan3-r2v` / `wan3prime-r2v` (se cita como `Video 1`) | **Sin verificar** (OpenAPI; bloqueado por saldo) | Hasta 5 videos ≤ 15 s en total, ≥ 16 fps; genera una toma nueva, no edita el clip |
 
 Mientras Seedance 2.5 `editing`/`extension` no tenga corrida real, la primera mano verificada es Flux 3. Antes de
 recomendar Seedance para video a video en una entrega, haz una corrida corta de `editing` y otra de `extension` y
-registra el resultado.
+registra el resultado. Wan 3.0 **no edita** en fal (la edición de Wan es la 2.7, no conectada), aunque rankee #1 en
+Video Editing en OpenArt.
+
+## Candidatos evaluados, no conectados (revisión 2026-09-16)
+
+No están en `pnpm ai:fal`: no los corras con scripts ad-hoc. Conectarlos es una decisión del operador; datos leídos
+del catálogo/OpenAPI de fal el 2026-09-16, sin corridas.
+
+| Modelo | Ranking OpenArt (2026-09-16) | Lo que aportaría | Precio fal |
+| --- | --- | --- | --- |
+| **Kling 3** — O3 (`fal-ai/kling-video/o3/{standard,pro,4k}/…`) y V3 (`fal-ai/kling-video/v3/…`) | O3 = "Kling 3.0 Omni", #8 video | **Multi-shot** (`multi_prompt`, varios planos con su duración), **`elements` con voz** (personaje/objeto consistente con `voice_id`), **motion-control** V3 (transferir movimiento de un video a una imagen), **4K nativo**, edición `video-to-video/edit`, series de 2–9 imágenes coherentes (`kling-image/o3`) | O3 standard/pro USD 0,14/s, 4k 0,42/s · V3 turbo 0,112–0,14/s · motion-control 0,126 y 0,168/s · imagen 0,028 |
+| **Grok Imagine video v1.5** (`xai/grok-imagine-video/v1.5/…`) | #10 video | Exploración masiva muy barata: t2v/i2v 1–15 s hasta 1080p; r2v 1–7 imágenes hasta 720p; sin control de audio. Edit/extend sólo en la versión anterior (USD 0,05/s) | USD 0,01/s (el más barato revisado) |
+
+Estos datos de Kling vía fal son un carril distinto de Kling vía Higgsfield (MCP): no los mezcles.
+
+**Gemini Omni Flash va directo por Google, nunca por fal**, aunque fal lo ofrezca (`google/gemini-omni-flash/*`):
+decisión del operador (más barato, misma calidad).
 
 ## Previs 3D → Seedance: capacidad investigada, no evidencia interna
 

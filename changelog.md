@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — Wan 3.0 entra a `pnpm ai:fal`; Nano Banana Pro está disponible pero nadie lo usa
+
+Wan 3.0 y Wan 3.0 Prime, segundo del ranking de video de OpenArt Arena y primero en edición, quedaron en el CLI
+con sus seis endpoints: texto, imagen y referencias a video. Traen dos novedades: la duración puede quedar en
+manos del modelo (hasta 30 s) y el video por referencias puede basarse en una página web o un documento si se
+activa el razonamiento. Sólo el texto a video alcanzó a probarse: a mitad de las pruebas se agotó el saldo de
+fal y el resto quedó declarado, sin verificar, hasta recargar.
+
+Al revisar Nano Banana Pro apareció que no está conectado en ninguna parte. Nuestro proyecto de Vertex ya lo
+tiene habilitado (`gemini-3-pro-image`), pero el generador del producto usa Nano Banana 2 y no hay un CLI de
+Gemini Image. Se mantiene por Google directo, igual que Gemini Omni Flash. Kling 3 y Grok Imagine quedaron
+revisados y documentados como candidatos, sin conectar.
+
 ## 2026-09-16 — Berel: Colores de Temporada 2027 sin canibalizar el ciclo 2026
 
 El nuevo ciclo nace en su propia página (`/articulos/colores-de-temporada-2027`) y la página genérica existente
@@ -936,19 +949,3 @@ flujo separado, `jreyes@efeoncepro.com` autenticó con Microsoft y llegó al con
 `Efeonce`; el code expiró sin intercambio, token ni dispatch. La autoridad interna multiorganización queda en
 TASK-1844/U19. No hubo cambios Entra ni widening. La skill MCP y sus referencias Claude/Codex quedaron alineadas
 con el rollout servido y ese límite. [Task y evidencia](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md).
-
-## 2026-09-07 — EPIC-044 asume entrada multiproducto y consentimiento por relying party
-
-La dirección descubierta en TASK-1834 dejó de ser un supuesto local de Greenhouse. El nuevo ADR Accepted
-`EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` fija el contrato de EPIC-044: cada producto conserva
-URL, contexto, destino, sesión y autorización; una cohorte first-party habilitada redirige server-side al único
-login visible de Efeonce ID y puede usar fast path si la sesión satisface assurance. Sólo una clasificación
-`first_party_sign_in` registrada y server-owned omite consentimiento delegado para establecer identidad. MCP y
-terceros conservan consentimiento por cliente/scope, step-up, grants y tokens/audiencias propios.
-
-EPIC-044 y TASK-1829/1830/1831/1833/1834/1840/1841/1842 quedaron sincronizadas según su ownership; TASK-1834
-permanece como primer consumer Greenhouse y no como dueña de la policy transversal. Las skills MCP y Design
-Studio apuntan al ADR y preservan las prohibiciones de iframe, quinto provider, vestíbulo y contexto controlado
-por el browser. El ADR nativo anterior mantiene su historia y sólo agrega un delta fechado. Este cambio es
-documental: no implementa OIDC first-party, no cambia login, flags, datos ni runtime, y no hizo commit, push ni
-deploy.

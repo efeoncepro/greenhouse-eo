@@ -29,6 +29,8 @@ Además de ElevenLabs MCP, Greenhouse tiene un **path API a Fal.ai** — agregad
 
 **Audio que llega pegado al video (2026-09-16).** Minimax H3 (`pnpm ai:fal --capability h3*`) no expone toggle de audio pero **entrega el video con pista de audio** (soundscape/música generados, descritos en `expanded_prompt`); verificado en 9 corridas reales. No es un motor de audio: si la pieza lleva mezcla, voz o música licenciada, trata esa pista como provisional y reemplázala en post. Fuentes: OpenAPI de fal por endpoint + corridas reales; detalle en `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`.
 
+**Wan 3.0 y la pista de audio (2026-09-16).** Wan 3.0 (`pnpm ai:fal --capability wan3-*`) genera audio por defecto con el campo `audio` (no `generate_audio`); `--no-audio` lo apaga. Verificado sólo en `wan3-t2v` (854×480 con audio); en r2v acepta hasta 5 `--audio` de referencia (≤ 15 s en total, leído del OpenAPI, sin verificar). Igual que en H3 y Flux 3, esa pista es provisional si la pieza lleva mezcla, voz o música licenciada. Detalle en `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`.
+
 **Flux 3 y la pista de audio (2026-09-16).** Flux 3 (`pnpm ai:fal --capability flux3-*`) genera audio por defecto (`--no-audio` lo apaga). **`flux3-extend` exige que el video de origen traiga pista de audio, aunque sea silencio:** con un origen mudo fal encola y luego rechaza con un 422 genérico (aislado en corridas reales). Si el origen salió con `--no-audio`, agrégale una pista silenciosa antes de extender; el audio generado sigue siendo provisional y se reemplaza en post.
 
 ## Fuentes base (as-of 2026-07)
