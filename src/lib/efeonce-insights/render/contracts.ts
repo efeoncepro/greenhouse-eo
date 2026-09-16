@@ -1,0 +1,127 @@
+import 'server-only'
+
+/**
+ * TASK-1846 — contratos del render durable de Insights.
+ *
+ * La unidad RECLAMABLE es el output, no el run: el worker ejecuta un artefacto por ejecución de
+ * Cloud Run Job, y la acceptance exige que fallar `report_pdf` conserve `deck_pdf` y que el retry
+ * no repita los exitosos.
+ *
+ * Lease y fencing llegan en el Slice 2 y entran JUNTOS (el lease habilita el reclamo, y el reclamo
+ * abre la ventana de doble finalización que hoy no existe). Ver `## Design Decision` de la task.
+ */
+
+import type { InsightAudience, InsightOutput } from '../contracts/request'
+
+/** Estado del run agregado. `partial_failed` existe porque un output puede caer sin arrastrar al resto. */
+export const INSIGHT_RENDER_RUN_STATES = [
+  'pending',
+  'running',
+  'completed',
+  'partial_failed',
+  'failed',
+  'cancelled'
+] as const
+
+export type InsightRenderRunState = (typeof INSIGHT_RENDER_RUN_STATES)[number]
+
+export const INSIGHT_OUTPUT_STATES = [
+  'queued',
+  'running',
+  'completed',
+  'failed',
+  'dead_letter',
+  'cancelled'
+] as const
+
+export type InsightOutputState = (typeof INSIGHT_OUTPUT_STATES)[number]
+
+/**
+ * Códigos de fallo canónicos. Espejan la taxonomía probada de Proposal salvo `audience_violation`
+ * y `cancelled`, que son propios de este dominio. NO se inventan códigos nuevos en los consumers:
+ * el CHECK de la tabla los enumera y un valor fuera de lista revienta el INSERT.
+ */
+export const INSIGHT_RENDER_FAILURE_CODES = [
+  'audience_violation',
+  'semantic_rejected',
+  'size_rejected',
+  'geometry_rejected',
+  'font_fallback_detected',
+  'missing_asset',
+  'blank_slide',
+  'manifest_drift',
+  'render_error',
+  'timeout',
+  'dispatch_error',
+  'cancelled'
+] as const
+
+export type InsightRenderFailureCode = (typeof INSIGHT_RENDER_FAILURE_CODES)[number]
+
+/** Fallos que NO se reintentan: reintentar produce exactamente el mismo rechazo. */
+export const INSIGHT_NON_RETRYABLE_FAILURES: ReadonlySet<InsightRenderFailureCode> = new Set([
+  'audience_violation',
+  'semantic_rejected',
+  'manifest_drift',
+  'cancelled'
+])
+
+export interface InsightRenderRunRecord {
+  renderRunId: string
+  organizationId: string
+  editionId: string
+  audience: InsightAudience
+  requestedOutputs: InsightOutput[]
+  state: InsightRenderRunState
+  requestedByKind: 'member' | 'system' | 'cli'
+  requestedByUserId: string | null
+  requestedByMemberId: string | null
+  startedAt: Date | null
+  finishedAt: Date | null
+  cancelledAt: Date | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface InsightOutputRecord {
+  insightOutputId: string
+  renderRunId: string
+  organizationId: string
+  editionId: string
+  output: InsightOutput
+  audience: InsightAudience
+  catalogName: string
+  manifestHash: string
+  constraints: Record<string, unknown>
+  deadline: Date | null
+  state: InsightOutputState
+  failureCode: InsightRenderFailureCode | null
+  failureDetail: string | null
+  attempts: number
+  maxAttempts: number
+  startedAt: Date | null
+  finishedAt: Date | null
+  executionName: string | null
+  outputAssetId: string | null
+  outputReport: Record<string, unknown> | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+/**
+ * Transiciones permitidas del output. Se declaran acá y el CHECK + los guards del store las
+ * enforcen; nunca se transiciona con un UPDATE suelto desde un consumer.
+ */
+export const INSIGHT_OUTPUT_TRANSITIONS: Readonly<Record<InsightOutputState, readonly InsightOutputState[]>> = {
+  queued: ['running', 'cancelled', 'failed', 'dead_letter'],
+  running: ['completed', 'failed', 'dead_letter'],
+  completed: [],
+  failed: ['queued', 'dead_letter', 'cancelled'],
+  dead_letter: [],
+  cancelled: []
+}
+
+export const isInsightOutputTransitionAllowed = (
+  from: InsightOutputState,
+  to: InsightOutputState
+): boolean => INSIGHT_OUTPUT_TRANSITIONS[from].includes(to)
