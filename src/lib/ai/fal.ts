@@ -174,3 +174,57 @@ export const runFalModel = async <TOutput = unknown>(params: {
     secretSource: apiKey.source
   }
 }
+
+const FAL_UPLOAD_INITIATE_URL = 'https://rest.alpha.fal.ai/storage/upload/initiate'
+
+export interface FalUploadResult {
+  url: string
+  secretSource: SecretResolutionSource
+}
+
+/**
+ * Sube bytes al storage de fal y devuelve la URL pública que los modelos aceptan como entrada.
+ *
+ * Hace falta porque los endpoints de edición y de layerize piden `image_url`/`image_urls`, no bytes: un
+ * archivo local no se puede mandar directo. Los data URI grandes resultaron poco confiables en el puente
+ * real, así que el camino canónico es este upload de ciclo corto.
+ *
+ * Contrato verificado el 2026-09-16: `POST /storage/upload/initiate` con `{content_type, file_name}`
+ * devuelve `{file_url, upload_url}`; los bytes van por `PUT` a `upload_url` y el modelo consume `file_url`.
+ */
+export const uploadFalFile = async (params: {
+  bytes: Uint8Array
+  fileName: string
+  contentType: string
+}): Promise<FalUploadResult> => {
+  const apiKey = await resolveFalApiKey()
+
+  const initiateResponse = await fetch(FAL_UPLOAD_INITIATE_URL, {
+    method: 'POST',
+    headers: authHeaders(apiKey.value),
+    body: JSON.stringify({ content_type: params.contentType, file_name: params.fileName })
+  })
+
+  const initiateBody = (await initiateResponse.json().catch(() => null)) as Record<string, unknown> | null
+
+  if (!initiateResponse.ok || typeof initiateBody?.upload_url !== 'string' || typeof initiateBody?.file_url !== 'string') {
+    throw new Error(
+      `fal upload initiate failed (HTTP ${initiateResponse.status})${
+        extractErrorDetail(initiateBody) ? `: ${extractErrorDetail(initiateBody)}` : ''
+      }`
+    )
+  }
+
+  const putResponse = await fetch(initiateBody.upload_url, {
+    method: 'PUT',
+    headers: { 'Content-Type': params.contentType },
+    // Buffer de Node satisface BodyInit por su vista subyacente; se copia para no exponer el pool.
+    body: new Uint8Array(params.bytes) as unknown as BodyInit
+  })
+
+  if (!putResponse.ok) {
+    throw new Error(`fal upload PUT failed (HTTP ${putResponse.status}) for ${params.fileName}`)
+  }
+
+  return { url: initiateBody.file_url, secretSource: apiKey.source }
+}
