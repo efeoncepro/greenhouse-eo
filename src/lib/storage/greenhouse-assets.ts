@@ -146,7 +146,10 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   proposal_rfp_draft: 'document_vault',
   proposal_rfp: 'document_vault',
   proposal_deliverable_draft: 'document_vault',
-  proposal_deliverable: 'document_vault'
+  proposal_deliverable: 'document_vault',
+  // TASK-1846 — una edición de Insights es un INFORME de engagement, no un contrato:
+  // misma clase que sample_sprint_report, no la de quote_pdf/master_agreement.
+  insight_output: 'commercial_engagement_report'
 }
 
 const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
@@ -194,7 +197,8 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   proposal_rfp_draft: 'proposal-rfps',
   proposal_rfp: 'proposal-rfps',
   proposal_deliverable_draft: 'proposal-deliverables',
-  proposal_deliverable: 'proposal-deliverables'
+  proposal_deliverable: 'proposal-deliverables',
+  insight_output: 'insight-outputs'
 }
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -881,7 +885,7 @@ export const upsertSystemGeneratedAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate' | 'proposal_deliverable'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate' | 'proposal_deliverable' | 'insight_output'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
