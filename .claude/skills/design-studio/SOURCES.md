@@ -40,6 +40,7 @@ Guía de arquitectura y compras, no tarifario. Verificar endpoint, región, cuot
 | Capability | Ruta preferida | Decisión |
 |---|---|---|
 | Seedance 2.0 / Seedream | BytePlus/ModelArk directo en producción; Fal en prototipo/gateway | Directo suele ser más barato; Fal aporta conveniencia. Validar soporte, derechos y portabilidad. |
+| Minimax H3 | Fal (`pnpm ai:fal`, out-of-band) | Conectado y verificado 2026-09-16 (OpenAPI de fal por endpoint + API de pricing + 9 corridas reales): Max Turbo 0,0125 USD/s · Max 0,025/s · base 0,05/s (2K/4K) · LoRA 0,0625/s; LoRA y entrenadores sin verificar; `director` no operable por cola. |
 | Seedance 2.5 | Fal T2V/I2V/R2V como superficie provider-supported; Globe permanece gated | El contrato Fal está vivo y documenta 480p/720p/1080p, 4–30 s, audio y R2V multimodal; la API directa BytePlus 2.5 no tiene contrato público verificable. |
 | FLUX.2 | BFL directo o Fal | Paridad pública en los endpoints comparados; decidir por SLA, auth y observabilidad. |
 | Recraft v4 | Recraft directo o Fal | Paridad pública en los endpoints comparados; directo si pesa el control contractual. |
@@ -134,6 +135,7 @@ duración, reintentos y costo efectivo por output.
 |---|---|---|---|
 | **Seedance 2.0** (ByteDance/Fal) | 9 imágenes + 3 videos + 3 audios, native audio, 4–15 s | QA físico/anatomía/continuidad | reference-to-video; identidad independiente de 2.5 |
 | **Seedance 2.5** (ByteDance vía Fal) | Tres endpoints activos: T2V, I2V y R2V; audio nativo, 4–30 s, 480p/720p/1080p; R2V admite hasta 50 archivos: 30 imágenes, 10 videos y 10 audios, con referencias `@ImageN`/`@VideoN`/`@AudioN` | Fal no expone 4K, máscaras, storyboard JSON, shots estructurados, keyframes intermedios ni stems; precio y output deben revalidarse | Provider-supported; Globe gated hasta contrato, adapter, rights, billing, eval y canary exactos |
+| **Minimax H3** (Fal, `pnpm ai:fal`) | Turbo barato y rápido; Max `camera-controls` mueve la cámara sobre imagen congelada; base única H3 con 2K/4K; LoRA/entrenadores para marca/personaje | 5–15 s; sin toggle de audio (entrega audio); I2V sin aspect; LoRA/entrenadores sin verificar | exploración de movimiento, cámara sobre KV aprobado; elección fina en `motion-design-studio` |
 | **Veo 3.1 / Fast** (Google Vertex) | premium/broadcast + ruta de escala | costo/cupo por endpoint | directo GCP; sustituye Veo 2/3.0 |
 | **Kling 3 Pro/4K** (Fal) | start/end, elements, multi-shot y 4K | límites de audio/idioma y concurrencia | especialista premium/4K |
 | **PixVerse V6** (Fal) | 1080p, audio, cámara y costo de volumen | límites por resolución/duración | scale social/motion |

@@ -10,7 +10,7 @@ description: >-
   + tipografía kinética + title sequences, edición/montaje/pacing, sound design + sync a
   música, color grading + finishing, VFX/compositing — keying/roto/tracking/CGI/simulaciones),
   y (2) capacidad de ejecución (dirige el pipeline IA
-  — Higgsfield Cinema Studio/Soul ID vía MCP + Runway Gen-4.5 / Seedance / Veo / Kling /
+  — Higgsfield Cinema Studio/Soul ID vía MCP + Runway Gen-4.5 / Seedance / Minimax H3 / Veo / Kling /
   Gemini Omni —, integra craft humano AE/Blender/DaVinci, y hace handoff), cerrando el loop
   idear→storyboard→animatic→producir→editar→finalizar→entregar. Es "humano + IA": el craft
   (módulos 01-08) aplica anime quien anime; el pipeline IA (09) y la orquestación híbrida
@@ -30,7 +30,7 @@ description: >-
   "animación de logo", "tipografía kinética", "kinetic typography", "cinematográfico",
   "cinematic", "cámara", "storyboard", "animatic", "previs", "edición", "montaje", "corte",
   "color grading", "grade", "sound design", "diseño sonoro", "banda sonora", "render",
-  "video IA", "AI video", "Higgsfield", "Runway", "Seedance", "Veo", "Kling", "Gemini Omni",
+  "video IA", "AI video", "Higgsfield", "Runway", "Seedance", "Minimax", "Minimax H3", "Veo", "Kling", "Gemini Omni",
   "image-to-video", "Soul ID", "consistencia de personaje", "After Effects", "Blender",
   "DaVinci", "VFX", "efectos visuales", "compositing", "rotoscoping", "roto", "green screen",
   "chroma", "keying", "tracking", "matchmove", "CGI", "Nuke", "Fusion", "Mocha", "Houdini",
@@ -135,7 +135,10 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   cámara/lente/focal, Soul ID para consistencia de personaje, LipSync — vía MCP), **Runway Gen-4.5**
   (cine dirigido, beats/coreografía de cámara), **Seedance 2.5/2.0** (refs + camera moves; se opera con
   `pnpm ai:fal` y el endpoint se elige por duración/4K/costo en
-  `workflows/engine-selection-by-fidelity-contract.md`), **Kling** (Voice
+  `workflows/engine-selection-by-fidelity-contract.md`), **Minimax H3** (también con `pnpm ai:fal`: Max Turbo =
+  divergencia barata y rápida; Max `camera-controls` = cámara real sobre imagen congelada; base = única H3 con
+  2K/4K; LoRA/entrenadores = consistencia de marca/personaje, sin verificar; 5–15 s, entrega audio sin toggle),
+  **Kling** (Voice
   Binding), **Veo** (broadcast), **Gemini Omni** (edición conversacional).
 - **Producir (humano)**: After Effects (mograph/compositing), Blender/C4D (3D), Nuke/Fusion
   (compositing/VFX), Mocha (tracking), Houdini (FX/simulaciones) — handoff con spec (`modules/11`).

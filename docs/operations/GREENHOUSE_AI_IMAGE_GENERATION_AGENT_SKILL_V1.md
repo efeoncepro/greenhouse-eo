@@ -3,7 +3,7 @@
 > **Tipo:** operating guide para agentes
 > **Estado:** Accepted
 > **Creado:** 2026-06-01
-> **Ultima actualizacion:** 2026-09-16 (CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
+> **Ultima actualizacion:** 2026-09-16 por Claude (Minimax H3 en `pnpm ai:fal`, retome por `--request-id`, brecha de `--task` cerrada; antes, CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
 > **Fuentes externas verificadas:** OpenAI developer docs 2026-08-21 y fichas oficiales Fal.ai 2026-07-18
 
 ## Purpose
@@ -505,9 +505,16 @@ Reglas operativas:
 - Sin `--out`/`--out-dir` la salida cae en `public/images/generated/`. Para exploración usar `--out-dir` bajo
   `ai-generations/`, fuera de `public/` y de `.captures/`.
 - Las validaciones fallan **en local, antes de encolar**: prompt faltante, `--image` faltante o sobrante, duración
-  sobre el máximo, resolución/aspecto no soportados, `--bitrate` en mini y `--task` fuera de reference-to-video.
-  Ojo: según su OpenAPI sólo el r2v de **2.5** acepta `task`; el CLI no bloquea `--task` en los r2v de 2.0, así
-  que no pasarlo ahí.
+  sobre el máximo, resolución/aspecto no soportados, `--bitrate` en mini y `--task` fuera de `seedance25-r2v`.
+  **Delta 2026-09-16:** la brecha de `--task` está cerrada; sólo Seedance 2.5 reference-to-video lo acepta y el CLI
+  lo rechaza en local en cualquier otra capacidad (antes, el r2v de 2.0 lo rechazaba después de encolar).
+- **Delta 2026-09-16 — Minimax H3 conectado** (`h3-*`, `h3max-*`, `h3turbo-*`, `h3-train-*`; 9 de 17 verificados).
+  Flags propios: `--prompt-expansion`, `--lora <path[@scale]>`, `--camera-trajectory <json>` y, en entrenadores,
+  `--training-data`/`--steps`/`--rank`/`--learning-rate`/`--trigger`. H3 exige duración entera 5–15 s, resolución
+  en mayúsculas, sin `--aspect` en image-to-video y sin `--bitrate`/`--no-audio`. `h3max-director` no es operable
+  por cola. Contrato y precios: catálogo fal §Minimax H3; comandos: manual `operar-cli-fal-seedream-seedance.md`.
+- El CLI imprime el `request_id` al encolar. Ante `HTTP 408` el trabajo **sigue cobrando en fal**: retomarlo con
+  `pnpm ai:fal --capability <id> --request-id <id>` (no reenvía ni vuelve a cobrar), nunca relanzarlo.
 - Una capacidad con `verifiedAt: null` imprime una advertencia antes de gastar. Si la corrida funciona, anotar la
   fecha en `src/lib/ai/fal-capabilities.ts`; nunca marcarla sin haber corrido.
 - Layerize: el CLI escribe `NN-<nombre>.png` por capa (orden `z_index`) y `layers.json` con nombre, descripción,

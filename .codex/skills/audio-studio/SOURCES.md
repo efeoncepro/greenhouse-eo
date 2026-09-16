@@ -27,6 +27,8 @@ Además de ElevenLabs MCP, Greenhouse tiene un **path API a Fal.ai** — agregad
 
 **Slugs de audio verificados en vivo (2026-07-19).** **Seed Audio** (ByteDance) NO vive en `bytedance/seed-audio` (da 404); vive en **`fal-ai/seed-audio`** — **CON** el prefijo `fal-ai/` (el prefijo depende del ENDPOINT, no del proveedor: Seedream 5 y Seedance 2.x van sin él; Seedream 4/4.5 y Seedance v1/v1.5, con él) y usa el campo **`prompt`**. **ElevenLabs** verificado en vivo: TTS **`fal-ai/elevenlabs/tts/multilingual-v2`**, **`fal-ai/elevenlabs/sound-effects`** y **`fal-ai/elevenlabs/music`** (todos con prefijo `fal-ai/`). **Método barato para chequear un slug sin gastar:** `POST {}` (body vacío) a `https://fal.run/<slug>` → **404** = la app no existe · **422** = la app existe (falló la validación de input por falta de campos).
 
+**Audio que llega pegado al video (2026-09-16).** Minimax H3 (`pnpm ai:fal --capability h3*`) no expone toggle de audio pero **entrega el video con pista de audio** (soundscape/música generados, descritos en `expanded_prompt`); verificado en 9 corridas reales. No es un motor de audio: si la pieza lleva mezcla, voz o música licenciada, trata esa pista como provisional y reemplázala en post. Fuentes: OpenAPI de fal por endpoint + corridas reales; detalle en `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`.
+
 ## Fuentes base (as-of 2026-07)
 
 **Música IA + licencia**

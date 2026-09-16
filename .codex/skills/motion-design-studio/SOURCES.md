@@ -45,6 +45,15 @@ en los endpoints comparados; decidir por SLA, auth, observabilidad y derechos. F
 2026-07-23, pero sigue en early access sin API pública general ni precio público: no usarlo como dependencia de
 producción ni asumir que está disponible en Fal.
 
+**Minimax H3 conectado a `pnpm ai:fal` (verificado 2026-09-16).** Fuentes: OpenAPI de fal **por endpoint** (17
+endpoints `minimax/h3/*`, `minimax/h3-max/*`, `minimax/h3-max-turbo/*`, sin prefijo `fal-ai/`), la **API de pricing
+de fal** (USD: base 0,05/s · `/lora` 0,0625/s · Max y camera-controls 0,025/s · Max Turbo 0,0125/s · trainer t2v
+0,005/step · ref2va 0,015/step; i2v/flf2v no consultados) y **9 corridas reales** (832×480, 5,18 s, con audio,
+2,7–8 s de latencia; ≈ USD 1,4). LoRA y entrenadores sin verificar. `minimax/h3-max/director` no es operable por cola
+(stream realtime; el OpenAPI de cola da 404). **Trampa de cola:** fal direcciona la cola por **APP** (dos primeros
+segmentos del slug): `minimax/h3/text-to-video` → `queue.fal.run/minimax/h3/requests/<id>`. Uso y límites:
+`workflows/engine-selection-by-fidelity-contract.md`.
+
 ## Fuentes base (as-of 2026-07)
 
 **Tendencias motion / animación 2026**
@@ -103,6 +112,7 @@ producción ni asumir que está disponible en Fal.
 | **Runway Gen-4.5** | cine dirigido, tomas controladas, entiende **beats + coreografía de cámara** (pan/truck/handheld) | atado a su plataforma | tomas cinematográficas dirigidas con control fino |
 | **Seedance 2.0** (ByteDance) | briefs detallados, camera moves, hasta **9 imágenes + 3 videos + 3 audios**, native audio, multi-shot, 4–15 s | QA físico/anatomía/continuidad; audio nativo sujeto a policy | anuncios, social punchy y tomas dirigidas por referencias; directo BytePlus para volumen, Fal para gateway |
 | **Seedance 2.5** (ByteDance vía Fal) | T2V, I2V y R2V; 4–30 s; 480p/720p/1080p; audio nativo; R2V con hasta 30 imágenes, 10 videos, 10 audios y 50 archivos totales, citables por posición | No hay 4K, máscaras, storyboard JSON, shots estructurados, stems ni seed de entrada en el OpenAPI actual; los claims de producto/API directa deben separarse | Fal provider-supported, Globe gated; usarlo solo con route card y evidencia exacta |
+| **Minimax H3** (vía Fal, `pnpm ai:fal`) | tres tiers: **Max Turbo** (0,0125 USD/s, divergencia rápida), **Max** (0,025/s; `camera-controls` mueve la cámara sobre una imagen congelada, hasta 12 keyframes), **base** (0,05/s, única H3 con 2K/4K); LoRA + entrenadores para marca/personaje; T2V/I2V/R2V (9 imágenes + 3 videos + 3 audios) | 5–15 s enteros; sin toggle de audio pero entrega audio; I2V sin aspect; LoRA/entrenadores sin verificar; `director` no operable por cola | exploración barata (Turbo 480P), cámara sobre KV aprobado (`h3max-camera`), 4K de hasta 15 s como alternativa a Seedance 2.0 base; verificado 2026-09-16 |
 | **Kling 3.0** | **storyboarding multi-shot + Voice Binding** (voz consistente 6 cortes/5 idiomas), económico | control fino | narrativas multi-corte con voz consistente; económico |
 | **Veo 3.1 / 3.0 Fast** (`veo-3.0-fast-generate-001`, Google) | broadcast-ready, frame rate de cine, **sync audio-visual integrado**, hasta 4K; render **one-shot** vía `predictLongRunning` (async) | **one-shot: sin edición conversacional** (regeneras); precio (~$0.10/s 720p) | entregable broadcast/cine, resolución alta o clip largo. Es el contraste de Omni: Omni edita hablándole (stateful), Veo no. Live-verificado para Globe |
 | **Gemini Omni** (`gemini-omni-flash-preview`, Google) | multimodal any-to-any; **edición conversacional stateful** (`previous_interaction_id`) = su superpoder vs. one-shot; audio nativo contextual; **live-verificado 2026-07-20** (t2v keyless Vertex + edit stateful Gemini-key, ambos `200 completed`) | **solo 720p · 3–10s**, no MCP (REST), **deforma texto/logos/UI**, personas RAI-gated, editar uploaded video bloqueado EEA/CH/UK | **Interactions API (NO `generateContent`, que da `400`)**, **dos superficies**: (1) **Vertex KEYLESS** (ADC, sin key) = solo generación; (2) **Gemini-key** (`generativelanguage`) = Interactions completa + edit stateful. text/i2v + **reference-chaining**; UI/logo NO con IA. **Refinar no es exclusivo de Omni (2026-07-20):** el stateful es **uno de dos paradigmas** — el **reference-based** re-inyecta el output del padre y permite **cross-model** (refinar un candidato de Omni con otro motor y viceversa); `reference_to_video` acepta sets **combinados imagen+vídeo** (verificado en ambas superficies) pero **exige ≥1 imagen o audio**. Contrato: `efeonce/GEMINI_OMNI_VERTEX.md §0/§4.6/§4.7` · capacidades: `GEMINI_OMNI_CAPABILITIES.md` |

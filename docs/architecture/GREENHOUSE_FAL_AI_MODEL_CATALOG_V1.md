@@ -1,8 +1,9 @@
 # Greenhouse — Fal.ai Model & Capability Catalog V1
 
-> **Tipo:** Referencia técnica agent-facing · **Version:** 1.1 · **Creado:** 2026-07-06 por Claude
-> **Última actualización:** 2026-09-16 por agente — CLI `pnpm ai:fal`, Seedream 5 layerize, Seedance 2.5 y
-> corrección de la regla del prefijo `fal-ai/`.
+> **Tipo:** Referencia técnica agent-facing · **Version:** 1.2 · **Creado:** 2026-07-06 por Claude
+> **Última actualización:** 2026-09-16 por Claude — Minimax H3 conectado a `pnpm ai:fal` (17 endpoints, 9
+> verificados), kind `training`, retome por `request_id`, direccionamiento de cola por app y cierre de la brecha
+> de `--task`. Antes (1.1): CLI `pnpm ai:fal`, Seedream 5 layerize, Seedance 2.5 y corrección del prefijo `fal-ai/`.
 > **Estado:** inventario histórico de discovery Greenhouse; no es allowlist productivo de Creative Studio.
 > **Última verificación parcial:** 2026-07-19.
 > **Fuente vigente de incorporación:** [Efeonce Creative Studio Enterprise Model Portfolio V1](EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md)
@@ -47,7 +48,7 @@ const res = await runFalModel<{ images?: Array<{ url: string }> }>({
 - **Secreto** server-side vía `FAL_API_KEY_SECRET_REF=greenhouse-fal-api-key` (GCP Secret Manager). NUNCA hardcodear la key.
 - **Out-of-band, NO runtime del producto:** el cliente Greenhouse es un puente de laboratorio. El runtime
   productivo futuro pertenece al repositorio separado de Creative Studio.
-- **Gotcha queue URLs:** para slugs con sub-path (`fal-ai/flux/schnell`), Fal.ai devuelve `status_url`/`response_url` en el **app padre** (`fal-ai/flux/requests/...`). `runFalModel` ya usa esas URLs; nunca reconstruirlas a mano (da HTTP 405).
+- **Gotcha queue URLs:** para slugs con sub-path (`fal-ai/flux/schnell`), Fal.ai devuelve `status_url`/`response_url` en el **app padre** (`fal-ai/flux/requests/...`). `runFalModel` ya usa esas URLs; nunca reconstruirlas a mano (da HTTP 405). La cola se direcciona por **app** (los dos primeros segmentos del slug), no por el slug completo: `minimax/h3/text-to-video` → `queue.fal.run/minimax/h3/requests/<id>`. El único punto que reconstruye el handle es el retome por `--request-id` de `pnpm ai:fal`, que usa esa regla y **avisa** si no coincide con el `status_url` que devolvió fal.
 - **⚠️ Gotcha del prefijo `fal-ai/` (corregido 2026-09-16 contra el API de modelos):** el prefijo **depende del endpoint y su versión, no del proveedor**. Dentro de ByteDance conviven ambos: **Seedream 5** va **SIN** prefijo (`bytedance/seedream/v5/pro/text-to-image`), pero **Seedream 4 y 4.5** van **CON** prefijo (`fal-ai/bytedance/seedream/v4.5/text-to-image`, `fal-ai/bytedance/seedream/v4/...`). Lo mismo en Seedance: **2.0 y 2.5 SIN** prefijo (`bytedance/seedance-2.5/text-to-video`), **v1 y v1.5 CON** prefijo (`fal-ai/bytedance/seedance/v1.5/pro/...`); y **Seed Audio** vive en `fal-ai/seed-audio` (`bytedance/seed-audio` da 404). La regla anterior («todo ByteDance va sin prefijo») era falsa. Lo que sí se mantiene: **el prefijo equivocado falla en silencio** — el submit responde 200, el result da 404 (`Path ... not found`) e `inference_time` ≈ 0.02s (no generó nada). Por eso el slug se declara **entero** y nunca se compone concatenando proveedor + versión. Fuente de verdad de slugs: el registro `src/lib/ai/fal-capabilities.ts` (con `verifiedAt`) para las capacidades registradas; para el resto, el método barato de abajo, no este catálogo.
 - **🔬 Método barato para verificar un slug (verificado en vivo 2026-07-19, sin generar ni gastar):** `POST {}` (body vacío) a `https://fal.run/<slug>` → **404** = la app no existe · **422** = la app existe (falló la validación de input por falta de campos). Confirma cualquier slug así antes de incorporarlo, sin correr una generación real.
 - **Dirección de arte:** video → skill `motion-design-studio`; audio → `audio-studio`; elección de modelo/estética → `design-studio`; still images de UI/marca → `greenhouse-ai-image-generator`.
@@ -59,26 +60,37 @@ CLI de terminal para operar fal sin escribir código. Es **hermano** de `pnpm ai
 out-of-band: el runtime de imagen del producto sigue siendo `src/lib/ai/image-generator.ts`.
 
 - **Registro model-agnostic** (`src/lib/ai/fal-capabilities.ts`): cada capacidad declara `id`, `slug` literal,
-  `kind` (`image|video`), `operation`, `inputMediaField` (`image_url|image_urls|null`), `inputMedia`
+  `kind` (`image|video|training`), `operation`, `inputMediaField` (`image_url|image_urls|null`), `inputMedia`
   (`none|one|many`), `requiresPrompt`, `outputKey` (`images|layers|video`), `verifiedAt` (fecha o `null`) y, en
   video, un contrato `video` (`maxDurationSeconds`, `resolutions`, `aspectRatios`, `supportsAudioToggle`,
-  `supportsBitrateMode`). `--model <slug>` acepta cualquier slug de fal aunque no esté registrado, con
+  `supportsBitrateMode`) y, en entrenadores, un contrato `training`. Una capacidad que no se puede operar por cola
+  declara `unsupportedReason` y el CLI se niega a correrla explicando por qué. `--model <slug>` acepta cualquier slug de fal aunque no esté registrado, con
   `--input '<json>'` como escape hatch para campos no cubiertos.
-- **Estado real:** `pnpm ai:fal --list` (gratis) imprime cada capacidad con su slug y `verificada <fecha>` o
-  `SIN VERIFICAR`. Ante una capacidad sin verificar el CLI **advierte antes de gastar**.
+- **Estado real:** `pnpm ai:fal --list` (gratis) agrupa las capacidades en IMAGE / VIDEO / TRAINING, imprime su
+  slug y `verificada <fecha>` o `SIN VERIFICAR`, y marca `[NO OPERABLE POR COLA]`. Ante una capacidad sin verificar
+  el CLI **advierte antes de gastar**.
 - **Entradas locales:** los endpoints de edit/layerize/i2v/r2v piden URLs, no bytes. `uploadFalFile` hace
   `POST https://rest.alpha.fal.ai/storage/upload/initiate` con `{content_type, file_name}` → `{file_url, upload_url}`,
   `PUT` de los bytes a `upload_url`, y el modelo consume `file_url`. El CLI lo hace solo con cada `--image`,
   `--end-image`, `--audio` y `--video` local; las URLs `https://` pasan tal cual. No usar data URI grandes (ya
   fallaron en el puente).
-- **Validación de video antes de encolar:** duración, resolución, aspecto y `--bitrate` se validan en local
-  contra el contrato del endpoint y fallan nombrando lo aceptado; `--task` se rechaza fuera de reference-to-video.
-  Llegar al proveedor con un valor inválido costaría la cola. Brecha conocida: el CLI no bloquea `--task` en los
-  r2v de 2.0, aunque según su OpenAPI sólo el r2v de 2.5 lo acepta.
+- **Validación antes de encolar:** cada flag se valida en local contra el contrato del endpoint y falla nombrando
+  lo aceptado: duración, resolución, aspecto, `--bitrate`, `--prompt-expansion`, LoRAs, trayectoria de cámara e
+  hiperparámetros de entrenamiento. Los flags de video en una capacidad de imagen fallan, y los de entrenamiento
+  fuera de un entrenador también. Llegar al proveedor con un valor inválido costaría la cola.
+- **`--task` (brecha cerrada 2026-09-16):** sólo Seedance 2.5 reference-to-video lo acepta. Antes el CLI lo dejaba
+  pasar en todo reference-to-video y el r2v de Seedance 2.0 lo rechazaba **después** de encolar; ahora se rechaza en
+  local en cualquier otra capacidad.
+- **`request_id` y retome:** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408),
+  el trabajo **sigue corriendo y cobrando en fal**; el CLI imprime el comando de retome
+  `pnpm ai:fal --capability <id> --request-id <id>`. Retomar no reenvía ni vuelve a cobrar (verificado: el archivo
+  descargado es idéntico byte a byte). Aplica a todas las capacidades, no sólo a H3.
+- **Timeouts por defecto:** imagen 3 min, video 15 min, entrenamiento 3 h (`--timeout <ms>` los sobrescribe).
 - **Costo:** fal **no devuelve `usage`** en estas respuestas, así que el CLI no reporta costo por corrida (a
   diferencia de `ai:image`). Consultar el pricing vigente del proveedor, con fecha, antes de correr.
 - **Qué NO va por aquí:** Gemini Omni se conecta directo por las plataformas de Google, no por fal (fue retirado
-  del registro). Flux 3 y Minimax H3 no están conectados.
+  del registro). Flux 3 no está conectado. Minimax H3 **sí** está conectado desde 2026-09-16 (ver §Minimax H3),
+  salvo `h3max-director`, que no es operable por cola.
 
 Capacidades registradas al 2026-09-16:
 
@@ -92,6 +104,10 @@ Capacidades registradas al 2026-09-16:
 | `seedance25-t2v` · `-i2v` · `-r2v` | `bytedance/seedance-2.5/{text,image,reference}-to-video` | video | t2v ✅ · i2v ✅ · r2v sin verificar |
 | `seedance20-t2v` · `-i2v` · `-r2v` | `bytedance/seedance-2.0/{text,image,reference}-to-video` | video | t2v ✅ (4K real) · i2v, r2v sin verificar |
 | `seedance20-fast-*` · `-mini-*` · `-us-*` | `bytedance/seedance-2.0/{fast,mini,us}/{text,image,reference}-to-video` | video | sin verificar (9) |
+| `h3-*` · `h3max-*` · `h3turbo-*` · `h3-train-*` | `minimax/h3*/…` (17 endpoints) | video + entrenamiento | 9 ✅ · 7 sin verificar · 1 no operable (ver §Minimax H3) |
+
+**Conteo global al 2026-09-16:** 37 capacidades registradas (5 Seedream 5, 15 Seedance, 17 Minimax H3); **17
+verificadas** contra el API real (5 Seedream 5, 3 Seedance, 9 H3). Pendiente de conectar: Flux 3.
 
 No existe Seedream 5.1 en fal al 2026-09-16.
 
@@ -117,6 +133,69 @@ Aspectos en todos: `auto`, `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16`. Image-to
 `reference|editing|extension`. Output: `video` + `seed`. Corridas reales: `seedance25-t2v` (147 s → h264 854x480,
 4,04 s, 97 cuadros), `seedance25-i2v` (194 s → h264 854x480, 4,04 s, con upload de imagen) y `seedance20-t2v`
 (4K real: 3840x2160, 4,04 s).
+
+### Minimax H3 (conectado 2026-09-16)
+
+Slugs **SIN** prefijo `fal-ai/`. La cola se direcciona por la app (`minimax/h3`, `minimax/h3-max`,
+`minimax/h3-max-turbo`), no por el slug completo.
+
+| id CLI | Slug | Estado | Contrato | Precio fal (USD) |
+|---|---|---|---|---|
+| `h3-t2v` | `minimax/h3/text-to-video` | ✅ 2026-09-16 | 480P·768P·2K·4K (default 2K) · aspect t2v | 0,05 / s |
+| `h3-i2v` | `minimax/h3/image-to-video` | ✅ 2026-09-16 | `image_url` + `end_image_url` opcional · sin aspect | 0,05 / s |
+| `h3-r2v` | `minimax/h3/reference-to-video` | ✅ 2026-09-16 (sólo imagen de referencia; video/audio sin ejercitar) | referencias imagen/video/audio · aspect + `adaptive` | 0,05 / s |
+| `h3-t2v-lora` | `minimax/h3/text-to-video/lora` | sin verificar (exige una LoRA) | como `h3-t2v` + `loras` | 0,0625 / s |
+| `h3-i2v-lora` | `minimax/h3/image-to-video/lora` | sin verificar | como `h3-i2v` + `loras` | 0,0625 / s |
+| `h3-r2v-lora` | `minimax/h3/reference-to-video/lora` | sin verificar | como `h3-r2v` + `loras` | 0,0625 / s |
+| `h3max-t2v` | `minimax/h3-max/text-to-video` | ✅ 2026-09-16 | 480P·768P·1080P (default 768P) | 0,025 / s |
+| `h3max-i2v` | `minimax/h3-max/image-to-video` | ✅ 2026-09-16 | como Max + `end_image_url` · sin aspect | 0,025 / s |
+| `h3max-r2v` | `minimax/h3-max/reference-to-video` | ✅ 2026-09-16 (sólo imagen de referencia) | como Max + referencias | 0,025 / s |
+| `h3max-camera` | `minimax/h3-max/camera-controls` | ✅ 2026-09-16 | imagen obligatoria · trayectoria de cámara · default 480P | 0,025 / s |
+| `h3turbo-t2v` | `minimax/h3-max-turbo/text-to-video` | ✅ 2026-09-16 | 480P·768P·1080P (default 768P) | 0,0125 / s (la más barata) |
+| `h3turbo-i2v` | `minimax/h3-max-turbo/image-to-video` | ✅ 2026-09-16 | como Turbo + `end_image_url` · sin aspect | 0,0125 / s |
+| `h3max-director` | `minimax/h3-max/director` | **NO OPERABLE POR COLA** | stream realtime con prompts en vivo | — |
+| `h3-train-t2v` | `minimax/h3/t2v/trainer` | sin verificar (se cobra por step) | entrenamiento LoRA | 0,005 / step (2000 steps ≈ 10) |
+| `h3-train-i2v` | `minimax/h3/i2v/trainer` | sin verificar | entrenamiento LoRA | no consultado |
+| `h3-train-flf2v` | `minimax/h3/flf2v/trainer` | sin verificar | entrenamiento LoRA | no consultado |
+| `h3-train-ref2va` | `minimax/h3/ref2va/trainer` | sin verificar | entrenamiento LoRA | 0,015 / step (≈ 30) |
+
+Precios consultados en la API de pricing de fal el 2026-09-16; son volátiles.
+
+**Contrato (difiere de Seedance en la forma de los campos):**
+
+- **Duración:** entero de 5 a 15 s, default 5, sin `auto` (en Seedance es texto y admite `auto`).
+- **Resolución en mayúsculas.** H3 base: `480P|768P|2K|4K` (default `2K`). Max y Max Turbo: `480P|768P|1080P`
+  (default `768P`; camera-controls, `480P`). El CLI compara sin distinguir mayúsculas y envía el valor canónico.
+- **Aspect ratio:** t2v `21:9, 16:9, 4:3, 1:1, 3:4, 9:16` (default `16:9`); r2v agrega `adaptive` (default).
+  Image-to-video **no** acepta aspect: el CLI lo rechaza porque el encuadre sale de la imagen.
+- **Image-to-video:** `image_url` + `end_image_url` opcional (`--end-image`).
+- **Reference-to-video:** `reference_image_urls` (máx. 9, `--image`), `reference_video_urls` (máx. 3, `--video`),
+  `reference_audio_urls` (máx. 3, `--audio`). Pide al menos una referencia de cualquier tipo.
+- **Audio:** no hay `bitrate_mode` ni `generate_audio`, pero el video **sale con pista de audio** (H3 genera
+  ambiente/música y lo describe en `expanded_prompt`).
+- **`prompt_expansion_mode` (`--prompt-expansion`):** base `disabled|fast|balanced|quality`, opcional. Max y Turbo
+  `disabled|balanced|quality` y **obligatorio**: si no se pasa, el CLI envía `balanced` explícito. La salida trae
+  `expanded_prompt` (el CLI muestra un extracto; `--json` lo trae entero).
+- **LoRA (`/lora`):** `loras` obligatorio, hasta 3, `--lora <path[@scale]>` repetible; `path` es URL o repo de
+  Hugging Face; `scale` de 0 a 4.
+- **Camera-controls:** `--image` obligatoria, prompt opcional (sin prompt: escena congelada, sólo se mueve la
+  cámara), `--camera-trajectory '<json>'` con un arreglo de hasta 12 keyframes `{distance, elevation (-90..90),
+  azimuth, time (0..1)}`.
+- **Entrenadores (`kind: 'training'`):** `--training-data <zip|url>` (el zip local se sube como `application/zip`)
+  → `training_data_url`; `--steps` 1–15000 (default 2000), `--rank` `8|16|32|64|128` (default 32),
+  `--learning-rate` 1e-6..1 (default 2e-4), `--trigger <frase>`. El resto de hiperparámetros va por `--input`:
+  `number_of_frames` 22–124, `frame_rate` 8–60, `resolution` `low|medium|high`, `aspect_ratio`,
+  `split_input_into_scenes`, `auto_scale_input`, `strict_dataset`, `debug_dataset`; condicionamiento: i2v
+  `first_frame_conditioning_p` 0.5; flf2v first 0.2 / last 0.2 / first_last 0.4; ref2va
+  `reference_conditioning_p` 0.9 + `resume_from_lora_url`. Salida: `lora_file`, `config_file`, `debug_dataset`
+  (el CLI descarga `lora.*`, `config.*`, `debug-dataset.*`). Timeout por defecto 3 h.
+- **Director (`h3max-director`):** fal lo lista activo, pero es un stream continuo con prompts en vivo, no un
+  trabajo de cola: su OpenAPI de cola da 404 y el POST responde `Application h3-max not found` (medido
+  2026-09-16). El CLI se niega y lo explica; operarlo necesitaría un cliente realtime.
+
+**Evidencia de verificación:** 9 corridas reales, todas 832x480, 5,18 s y con audio; latencias de 2,7 a 8 s. Se
+revisaron cuadros: cada salida corresponde a su pedido y camera-controls mueve la cámara sobre la escena
+congelada. Costo estimado por precio unitario: ≈ USD 1,4. La evidencia quedó fuera del repo y no se versiona.
 
 ### Modelo de pricing (resumen)
 
@@ -246,7 +325,8 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 | Grok Imagine | `xai/grok-imagine-video/text-to-video` ✅ | |
 | Google Gemini Omni Flash | `google/gemini-omni-flash` ✅ | listado por fal, **no se opera por fal**: se conecta directo por Google |
 | Luma Dream Machine / Ray 2 | `fal-ai/luma-dream-machine/*` 🔎 | |
-| Minimax Hailuo (Video 01) | `fal-ai/minimax/video-01*` 🔎 | |
+| Minimax H3 / H3 Max / H3 Max Turbo | `minimax/h3/text-to-video` · `minimax/h3-max/...` · `minimax/h3-max-turbo/...` ✅ | **SIN** prefijo; `pnpm ai:fal --capability h3turbo-t2v` (la más barata); ver §Minimax H3 |
+| Minimax Hailuo (Video 01) | `fal-ai/minimax/video-01*` 🔎 | generación previa |
 | Mochi 1 | `fal-ai/mochi-v1` 🔎 | abierto |
 | Pika | `fal-ai/pika/*` 🔎 | |
 
@@ -256,6 +336,7 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 |---|---|---|
 | Seedance 2.5 | `bytedance/seedance-2.5/image-to-video` · `/reference-to-video` ✅ | i2v admite `end_image_url`; r2v admite audio/video de referencia y `task` |
 | Seedance 2.0 | `bytedance/seedance-2.0/image-to-video` · `/mini/...` · `/fast/...` · `/us/...` · `/reference-to-video` ✅ | reference-to-video fija personaje/producto |
+| Minimax H3 / Max / Max Turbo | `minimax/h3*/image-to-video` · `/reference-to-video` · `minimax/h3-max/camera-controls` ✅ | i2v con `end_image_url` y sin aspect; r2v hasta 9 imágenes, 3 videos, 3 audios; camera-controls con trayectoria |
 | Kling v3 Pro / Standard | `fal-ai/kling-video/v3/pro/image-to-video` · `/standard/...` ✅ | audio nativo |
 | Kling 2.5 Turbo Pro | `fal-ai/kling-video/v2.5-turbo/pro/image-to-video` ✅ | |
 | PixVerse V6 | `fal-ai/pixverse/v6/image-to-video` ✅ | |
@@ -336,6 +417,7 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 | FLUX LoRA trainer | `fal-ai/flux-lora-fast-training` · `fal-ai/flux-lora-general-training` 🔎 | entrenar sujeto/estilo/personaje |
 | Krea 2 trainer | `fal-ai/krea-2-trainer` ✅ | LoRA sobre Krea 2 |
 | Trellis 2 LoRA trainer | `fal-ai/trellis-2-lora-trainer` ✅ | LoRA 3D |
+| Minimax H3 LoRA trainers | `minimax/h3/{t2v,i2v,flf2v,ref2va}/trainer` ✅ (sin verificar en corrida) | `pnpm ai:fal --capability h3-train-*`; cobro por step |
 | Wan / Hunyuan video LoRA trainer | `fal-ai/wan-trainer` · `fal-ai/hunyuan-video-lora-trainer` 🔎 | LoRA de video |
 
 ---
@@ -345,7 +427,8 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 - **NUNCA** hardcodear la key (`<id>:<secret>`); resolver server-side vía `FAL_API_KEY_SECRET_REF=greenhouse-fal-api-key`.
 - **NUNCA** instanciar un fetch/SDK paralelo a Fal en un módulo de dominio — extender `runFalModel`.
 - **NUNCA** cablear Fal a un flujo runtime del producto (out-of-band: generar + subir por uploader; runtime de imagen = `src/lib/ai/image-generator.ts`).
-- **NUNCA** reconstruir las polling URLs desde el slug (usar `status_url`/`response_url` del submit — da 405 si no).
+- **NUNCA** reconstruir las polling URLs desde el slug (usar `status_url`/`response_url` del submit — da 405 si no). Única excepción: el retome por `--request-id`, que reconstruye por **app** (dos primeros segmentos) y avisa si no coincide.
+- **NUNCA** tratar un timeout local (HTTP 408) como trabajo cancelado: sigue corriendo y cobrando en fal; retomar con `--request-id`.
 - **NUNCA** componer un slug concatenando proveedor + versión ni asumir el prefijo `fal-ai/` por proveedor: depende del endpoint, y el error es silencioso (submit 200, result 404).
 - **NUNCA** marcar `verifiedAt` en `fal-capabilities.ts` sin haber corrido la capacidad contra el API real.
 - **SIEMPRE** subir archivos locales con `uploadFalFile` (lo hace `pnpm ai:fal`), no como data URI.

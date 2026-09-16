@@ -55,6 +55,49 @@ v1/v1.5 sí lo llevan: el prefijo depende del endpoint). Los límites difieren *
 de movimiento o actuación → **2.0 `mini`/`fast` a 480p**, y subir de tier sólo con el take aprobado. Catálogo
 completo: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`.
 
+**Retome sin recobro:** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408), el
+trabajo **sigue corriendo y cobrando** en fal; no relances: `pnpm ai:fal --capability <id> --request-id <id>`
+recupera la salida sin reenviar ni cobrar (verificado: mismo archivo byte a byte). Aplica a Seedance, H3 y Seedream.
+
+## Operar Minimax H3: `pnpm ai:fal` (conectado 2026-09-16)
+
+H3 se opera con el mismo CLI. Son 17 endpoints en tres familias (slugs sin `fal-ai/`, p. ej.
+`minimax/h3/text-to-video`); `pnpm ai:fal --list` los agrupa en IMAGE / VIDEO / TRAINING.
+
+```bash
+pnpm ai:fal --capability h3turbo-t2v --prompt "…" --resolution 480P --out explora.mp4
+pnpm ai:fal --capability h3max-camera --image kv.png --camera-trajectory '[{"distance":1,"elevation":5,"azimuth":0,"time":0},{"distance":0.8,"elevation":10,"azimuth":40,"time":1}]' --out orbita.mp4
+```
+
+| Familia (ids) | Resoluciones | USD fal (2026-09-16) | Cuándo elegirla |
+| --- | --- | --- | --- |
+| **Max Turbo** (`h3turbo-t2v`, `h3turbo-i2v`) | 480P · 768P · 1080P | 0,0125 / s (la más barata) | Divergencia barata y rápida: explorar movimiento/actuación antes de subir de tier |
+| **Max** (`h3max-t2v`, `h3max-i2v`, `h3max-r2v`, `h3max-camera`) | 480P · 768P · 1080P | 0,025 / s | `h3max-camera`: **control de cámara real sobre una imagen congelada** (la escena no se mueve, sólo la cámara; hasta 12 keyframes `{distance, elevation -90..90, azimuth, time 0..1}`) |
+| **Base** (`h3-t2v`, `h3-i2v`, `h3-r2v`) | 480P · 768P · **2K · 4K** (default 2K) | 0,05 / s | Única H3 con 2K/4K |
+| **LoRA** (`h3-{t2v,i2v,r2v}-lora`) | como base | 0,0625 / s | Consistencia de marca/personaje con una LoRA propia (`--lora <path[@scale]>`, hasta 3, scale 0–4). **Sin verificar** |
+| **Entrenadores** (`h3-train-{t2v,i2v,flf2v,ref2va}`) | — | t2v 0,005 / step (2000 ≈ USD 10) · ref2va 0,015 / step (≈ USD 30) | Producir esa LoRA: `--training-data <zip\|url>`, `--steps`, `--rank`, `--learning-rate`, `--trigger`. **Sin verificar**; timeout default 3 h |
+
+Límites que cambian la decisión (difieren de Seedance en la **forma** de los campos; el CLI valida antes de gastar):
+
+- Duración **entera 5–15 s**, default 5, sin `auto`. Resolución en mayúsculas (el CLI acepta minúsculas y envía la canónica).
+- **Sin toggle de audio** (`--no-audio`/`--bitrate` no aplican), pero **entrega video con pista de audio** (soundscape/
+  música, descrito en `expanded_prompt`): si el audio va en post, reemplázalo; no asumas un clip mudo.
+- `i2v` **no acepta `--aspect`** (el encuadre sale de la imagen); acepta `--end-image`. `t2v`: 21:9…9:16 (default 16:9);
+  `r2v` agrega `adaptive`. `r2v`: hasta 9 `--image`, 3 `--video`, 3 `--audio` (verificado sólo con imagen).
+- `--prompt-expansion`: en Max/Turbo es obligatorio (si no lo pasas, el CLI envía `balanced`); la reescritura del
+  prompt es parte de la toma: revisa `expanded_prompt` (`--json` lo trae entero).
+- `h3max-director` **no es operable por cola** (stream realtime con prompts en vivo): el CLI se niega y lo explica.
+
+Verificados 2026-09-16 con 9 corridas reales (832×480, 5,18 s, con audio, latencias 2,7–8 s; cuadros revisados):
+`h3-t2v`, `h3-i2v`, `h3-r2v`, `h3max-t2v`, `h3max-i2v`, `h3max-r2v`, `h3max-camera`, `h3turbo-t2v`, `h3turbo-i2v`.
+LoRA y entrenadores siguen sin verificar: la primera corrida es prueba.
+
+**H3 vs Seedance:** toma de **más de 15 s** → Seedance 2.5 (hasta 30 s, tope 1080p). **4K** → Seedance 2.0 base
+(15 s) o H3 base (15 s): compara con un take corto antes de elegir. **Exploración barata** → H3 Max Turbo a 480P
+(más rápido y más barato por segundo que subir de tier). **Movimiento de cámara sobre un KV aprobado sin que la escena
+cambie** → `h3max-camera`. Seedance sigue siendo la mano para control de audio (`--no-audio`) y R2V con muchas
+referencias. Ninguno es receta validada para actuación/física: aplican los mismos gates de este contrato.
+
 ## Previs 3D → Seedance: capacidad investigada, no evidencia interna
 
 Seedance recibe referencias de texto, imagen, audio y video; una previs se aporta como media exportada, no como `.blend` ni escena editable. El video puede orientar cámara, composición, blocking y ritmo, mientras una imagen alineada define el look final. Esto sigue siendo condicionamiento interpretativo: no garantiza cámara 3D, geometría, contactos, texto ni continuidad frame-perfect.

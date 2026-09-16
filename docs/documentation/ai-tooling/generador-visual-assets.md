@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-09-16 por agente — nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
+> **Ultima actualizacion:** 2026-09-16 por Claude — Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 # Generador Visual de Assets con IA
@@ -152,8 +152,8 @@ Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recra
 
 ## El comando `pnpm ai:fal`: imágenes, capas y video (desde 2026-09-16)
 
-Es un comando de terminal que el equipo o el agente usa para trabajar con dos familias de modelos a través de
-Fal. Convive con `pnpm ai:image`: no lo reemplaza. `ai:image` sigue siendo el camino para GPT Image; `ai:fal`
+Es un comando de terminal que el equipo o el agente usa para trabajar con tres familias de modelos a través de
+Fal: Seedream, Seedance y Minimax H3. Convive con `pnpm ai:image`: no lo reemplaza. `ai:image` sigue siendo el camino para GPT Image; `ai:fal`
 es el camino para los modelos que viven en Fal.
 
 ### Qué permite hacer
@@ -164,6 +164,8 @@ es el camino para los modelos que viven en Fal.
 | Cambiar algo de una imagen usando referencias | **Seedream 5 edit** (Pro acepta hasta 10 referencias) | La imagen ajustada, conservando el resto |
 | **Separar una pieza terminada en capas** | **Seedream 5 Pro layerize** | Una capa por elemento, con fondo transparente, más un archivo que dice dónde va cada una |
 | Crear un video desde un texto, una imagen o referencias | **Seedance 2.5** o **Seedance 2.0** | Un video corto |
+| Crear un video rápido y barato, o mover la cámara sobre una escena | **Minimax H3** (base, Max y Max Turbo) | Un video corto, con sonido |
+| Entrenar un estilo o personaje propio para video | **Minimax H3 trainer** | Un archivo LoRA reutilizable |
 
 ### La separación por capas, en simple
 
@@ -189,12 +191,37 @@ el logo o el sujeto en otro formato, o armar variantes sin volver a generar todo
 Si se pide algo que el modelo elegido no hace (por ejemplo 4K a la 2.5, o 30 segundos a la 2.0), el comando
 **avisa y se detiene antes de cobrar**, indicando qué valores sí acepta.
 
+### Qué agrega Minimax H3 (desde 2026-09-16)
+
+- **Video rápido y barato.** En las pruebas reales cada video tardó entre 3 y 8 segundos en generarse. **H3 Max
+  Turbo** es la opción más barata de todo el comando (del orden de un centavo de dólar por segundo de video);
+  H3 Max cuesta el doble y H3 base, el cuádruple.
+- **Calidad según versión.** H3 base llega a **4K**; Max y Max Turbo llegan a 1080p.
+- **Duración** de 5 a 15 segundos (5 por defecto).
+- **Con sonido.** Aunque no se pida, H3 entrega el video con ambiente o música.
+- **Control de cámara.** Con una imagen de partida se puede describir el recorrido de la cámara (acercarse,
+  girar, subir) y la escena queda quieta mientras la cámara se mueve.
+- **Desde imagen**, con opción de indicar también el **último cuadro**, y **desde referencias** (imágenes, videos
+  o audios).
+- **LoRAs y entrenamiento.** Se puede aplicar hasta 3 LoRAs (estilos o personajes entrenados) a un video, y
+  entrenar una LoRA propia a partir de un paquete de material. El entrenamiento se cobra por paso: uno típico
+  ronda los USD 10 a 30 según el tipo.
+- **Un video que tarda demasiado no se pierde.** Si el comando deja de esperar, el trabajo sigue corriendo (y
+  cobrando) en Fal. El comando muestra cómo **retomarlo** para descargar el resultado sin volver a pagar. Esto
+  vale para todos los modelos del comando, no sólo H3.
+- **Lo que no se puede usar:** el modo **Director** de H3 Max (video en vivo guiado en tiempo real) no funciona
+  con este comando; el comando lo explica y se detiene.
+
 ### Qué está probado y qué no
 
 - Las cinco opciones de **Seedream 5** están probadas con generaciones reales (2026-09-16).
 - En video están probadas **Seedance 2.5** desde texto y desde imagen, y **Seedance 2.0** desde texto (entregó 4K
   real). Las otras doce variantes de video están conectadas pero **sin probar**; el comando lo advierte antes de
   gastar.
+- De **Minimax H3** están probadas 9 opciones: desde texto, desde imagen y desde referencias en H3 base y Max,
+  control de cámara, y Max Turbo desde texto y desde imagen. En referencias sólo se probó con imágenes (no con
+  videos ni audios). **Sin probar:** las tres variantes con LoRA y los cuatro entrenadores.
+- Flux 3 **no** está conectado todavía.
 - `pnpm ai:fal --list` muestra este estado en cualquier momento, y no cuesta nada.
 
 ### Lo que conviene saber
@@ -205,7 +232,7 @@ Si se pide algo que el modelo elegido no hace (por ejemplo 4K a la 2.5, o 30 seg
 - Es producción **fuera del portal**: nada de esto se genera en tiempo real para los usuarios.
 - Gemini Omni (video de Google) **no** se usa por aquí; se conectará directo con Google.
 
-> Detalle tecnico: [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo (registro de capacidades, contratos de video, subida de archivos) y el manual [Operar el CLI de fal (Seedream y Seedance)](../../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md). Código: `scripts/ai/fal-image.ts`, `src/lib/ai/fal-capabilities.ts`, `src/lib/ai/fal.ts`.
+> Detalle tecnico: [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo (registro de capacidades, contratos de video, subida de archivos) y el manual [Operar el CLI de fal (Seedream, Seedance y Minimax H3)](../../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md). Código: `scripts/ai/fal-image.ts`, `src/lib/ai/fal-capabilities.ts`, `src/lib/ai/fal.ts`.
 
 ## Produccion de campañas con varias manos de IA
 

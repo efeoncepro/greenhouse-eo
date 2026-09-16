@@ -37,9 +37,9 @@
   `pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ./capas` devuelve hasta 16 capas
   con alfa real + `layers.json`. Es dirección de arte sobre capas; el logo oficial y el copy final siguen
   saliendo del vector y de la composición determinística.
-- **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Veo 3.1 (premium, Vertex) /
+- **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Minimax H3 (Fal, conectado 2026-09-16: Max Turbo exploración barata · Max `camera-controls` cámara sobre imagen congelada · base 2K/4K) / Veo 3.1 (premium, Vertex) /
   PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal) / Gemini Omni (canary, Vertex);
-  Seedance se opera con `pnpm ai:fal` y el endpoint (2.5 larga · 2.0 base 4K · mini/fast exploración) se elige en
+  Seedance y H3 se operan con `pnpm ai:fal` y el endpoint (Seedance 2.5 larga · 2.0 base 4K · H3 Turbo exploración) se elige en
   `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`;
   producción y formato social →
   `social-media-studio`. Un clip de duración mínima sólo valida el endpoint: el release profesional exige

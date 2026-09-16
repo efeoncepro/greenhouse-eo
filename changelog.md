@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — Minimax H3 entra a `pnpm ai:fal`: video en segundos, control de cámara y LoRAs
+
+El CLI de fal suma los 17 endpoints de Minimax H3. Nueve quedaron verificados con corridas reales: texto,
+imagen y referencias a video en sus tres variantes (base, Max y Max Turbo) y el control de cámara, que
+congela la escena y sólo mueve el encuadre. Max Turbo cuesta USD 0,0125 por segundo y cada corrida volvió
+en menos de 10 segundos, así que sirve para explorar antes de gastar en Seedance. Las variantes con LoRA y
+los cuatro entrenadores quedan declarados pero sin probar (exigen una LoRA o se cobran por step), y el
+Director se lista como no operable: es un stream en tiempo real, no un trabajo de cola.
+
+H3 no se parece a Seedance en la forma de los pedidos (duración entera, resolución en mayúsculas,
+image-to-video sin aspect ratio, expansión de prompt obligatoria en Max), y el CLI lo valida antes de
+encolar. Dos mejoras alcanzan a todos los modelos: el `request_id` se imprime apenas fal acepta el trabajo
+y `--request-id` retoma uno que siguió corriendo tras un timeout, sin volver a cobrarlo. De paso se corrigió
+`--task`, que sólo acepta Seedance 2.5 y hasta ahora se dejaba pasar a la 2.0.
+
 ## 2026-09-16 — `pnpm ai:fal`: Seedream 5 con capas editables y Seedance 2.5/2.0 desde la terminal
 
 El cliente fal.ai existía desde julio sin un solo consumidor. Ahora lo usa un CLI hermano de `ai:image`, sobre un
@@ -1025,20 +1040,3 @@ GVC premium 29 fixtures × 2 viewports (58 capturas); scorecard 4.63 / piso 4.5;
 
 Follow-up abierto: **`TASK-1842`** — ninguna persona puede crear una passkey todavía, así que el botón
 nuevo le queda inerte y cada entrada sigue siendo un correo. Bloqueada por `TASK-1834`.
-
-## 2026-09-06 — TASK-1832: schema canary aplicado fuera del checkpoint, sin fixture
-
-`pnpm pg:connect:migrate` se ejecutó por error como si sólo levantara el proxy y aplicó las dos migraciones de
-TASK-1832. El readback inmediato confirmó registry/bindings canary en cero, purpose sin drift y los 30 perfiles
-`smoke_test` preservados en identidad pero excluidos de Person 360. No se crearon organización, cuentas, grants,
-sesiones ni tokens; flags OFF/default, sin push/deploy. Se detuvieron nuevas mutaciones externas y quedó
-documentada la decisión pendiente de conservar el schema adelantado o autorizar una migración compensatoria.
-La implementación local pasó 144/144 tests focales, typecheck, lint sin errores y build; el gateway hermano pasó
-152/152 tests sin skips y build. `secrets:audit` local no acredita runtime: 6/8 saludables, con `NEXTAUTH_URL`
-local inválida y `CRON_SECRET` ausente; TASK-1832 no cambió secretos.
-[Evidencia](docs/audits/mcp/TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md).
-
-**Decisión posterior:** el operador resolvió conservar el schema aditivo y autorizó completar el rollout
-sintético: commit/push, promoción, deploys, gates, fixture dedicado, buzones controlados, sesiones canary,
-revocación y cleanup. La autorización no incorpora clientes ni habilita writes; la task sigue pendiente hasta
-matriz runtime, retiro demostrable y siete días de señales estables.
