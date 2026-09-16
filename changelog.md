@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — Flux 3 entra a `pnpm ai:fal`, y Seedance ya sabe hacer video a video sin sorpresas
+
+Flux 3 llegó al CLI completo y con sus 12 endpoints probados en real. En fal no es un modelo de imagen sino
+de video: texto, imagen, primer y último cuadro, y keyframes a video; edición y extensión de un clip
+existente; y un flujo de borrador que cuesta USD 0,03 por segundo y después se sube a calidad final sin volver
+a generar la toma. Las pruebas destaparon dos trampas de la extensión: el clip de origen tiene que traer pista
+de audio (sin ella fal acepta el trabajo y lo rechaza después) y lo que devuelve es sólo la continuación, no el
+clip completo. El CLI ahora revisa el audio antes de subir.
+
+Al revisar cómo hace video a video Seedance, apareció que no tiene un endpoint propio: la 2.5 edita y extiende
+dentro de reference-to-video con `--task`, y la 2.0 sólo usa el video como guía. El registro tenía mal la
+duración mínima (4 s, no 1) y no declaraba cuántas referencias acepta cada versión; ambas cosas quedaron
+corregidas y validadas antes de encolar. La edición y extensión con Seedance 2.5 siguen sin probarse en real.
+
 ## 2026-09-16 — Minimax H3 entra a `pnpm ai:fal`: video en segundos, control de cámara y LoRAs
 
 El CLI de fal suma los 17 endpoints de Minimax H3. Nueve quedaron verificados con corridas reales: texto,
@@ -1005,38 +1019,3 @@ redeploy de recuperación fue `dpl_6UUXxsT7eS4EL44kkLWuDrHFqKDT` y la build fina
 `dpl_D9mkjQLE1a26H4TXQ2HX7wXWMpLf`, quedó READY desde `2026-09-07T02:03:16.160Z`, tomó los aliases de staging
 y respondió 200 en `/api/auth/session`. Production permaneció `true` y no se redeployó. La evidencia cubre
 config/build; el deny flow-level de staging no se infiere.
-
-## 2026-09-06 — TASK-1835 completa: Efeonce ID tiene cara, y el gate de accesibilidad estaba ciego
-
-`auth.efeonce.org` sirve su experiencia visible: login con passkey, Microsoft y enlace por correo;
-consentimiento que dice a qué dominio viaja el código; step-up, alta de segundo factor, recuperación,
-sesión y errores. Desplegado y verificado en vivo.
-
-Tres hallazgos valieron más que el trabajo planificado:
-
-- **El login por passkey no existía.** Backend completo y copy escrito desde el 2026-09-04, con los
-  cuatro ids `login_passkey_*` huérfanos: ninguna pantalla ofrecía el método.
-- 🔴 **El gate de accesibilidad reportaba `violations: 0` sin medir nada.** axe devuelve todo en
-  `incomplete` cuando el fondo es un degradado con pseudo-elemento, y el gate lo informaba como cero.
-  Debajo había texto a **1.53:1** en la ficha de aplicación del consentimiento — justo lo que tiene
-  que leerse. Causa raíz: una clase de texto compartida entre el lienzo oscuro y la tarjeta clara.
-  **Aplica a cualquier superficie con fondo compuesto, no sólo al emisor.**
-- **El servidor contaba los códigos de respaldo restantes y la pantalla los ignoraba.** Alguien podía
-  quemar el último y enterarse el día que perdiera el teléfono.
-
-Un cuarto hallazgo fue mío y lo corregí el mismo día: agregué al pie de todas las pantallas un enlace
-a las licencias de las fuentes, porque su id de copy estaba huérfano. Construir una interfaz para
-justificar un copy muerto es el razonamiento al revés —el copy se borra—, y encima el lugar era la
-pantalla donde alguien decide si confía para entrar. Retirado; los `.txt` se siguen sirviendo, que es
-donde la licencia se cumple.
-
-Mecanismos que quedan corriendo: `pnpm auth-server:verify-contrast` (mide sobre los píxeles
-renderizados; 365 textos, 0 bajo el piso WCAG) y `pnpm auth-server:verify-passkey` (14/14 en navegador
-real). El patrón «runtime sin React» queda registrado en `ui-platform/PATTERNS.md` para que ningún
-otro servicio Efeonce arranque un segundo sistema visual.
-
-GVC premium 29 fixtures × 2 viewports (58 capturas); scorecard 4.63 / piso 4.5; los cuatro gates
-`ui:*` PASS; suite del emisor 427.
-
-Follow-up abierto: **`TASK-1842`** — ninguna persona puede crear una passkey todavía, así que el botón
-nuevo le queda inerte y cada entrada sigue siendo un correo. Bloqueada por `TASK-1834`.

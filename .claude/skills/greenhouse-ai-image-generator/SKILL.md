@@ -379,7 +379,7 @@ the master plus featured, OG and card crops independently; the crop can change a
 
 ## Fal.ai API (video + media aggregator, out-of-band)
 
-Fal.ai is a programmatic media-generation aggregator — one API fronts many models: **video** (Seedance 2.5/2.0, Minimax H3, Kling v3, PixVerse, Veo, Grok Imagine, Runway, Luma Ray, Hailuo, Wan…; Gemini Omni does NOT run through fal — it goes direct via Google), **image** (flux, krea), **audio**, **3D**. Canonical client: `src/lib/ai/fal.ts` — `runFalModel({ model, input })` submits to the fal queue and polls to completion; model-agnostic (pass the fal slug, e.g. `bytedance/seedance-2.0/mini/image-to-video`). Secret resolves server-side via `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF` — never hardcode the `<id>:<secret>` key.
+Fal.ai is a programmatic media-generation aggregator — one API fronts many models: **video** (Seedance 2.5/2.0, Minimax H3, Flux 3, Kling v3, PixVerse, Veo, Grok Imagine, Runway, Luma Ray, Hailuo, Wan…; Gemini Omni does NOT run through fal — it goes direct via Google), **image** (Flux 2, krea — note: on fal, Flux 3 is a VIDEO model), **audio**, **3D**. Canonical client: `src/lib/ai/fal.ts` — `runFalModel({ model, input })` submits to the fal queue and polls to completion; model-agnostic (pass the fal slug, e.g. `bytedance/seedance-2.0/mini/image-to-video`). Secret resolves server-side via `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF` — never hardcode the `<id>:<secret>` key.
 
 - **Out-of-band, NOT runtime** (same rule as Higgsfield): generate here + upload via the canonical uploader; never wire fal into a product runtime flow (runtime image path stays `src/lib/ai/image-generator.ts`).
 - **Video is the headline** — for video art direction / model choice use `motion-design-studio`; audio → `audio-studio`; model/aesthetic pick → `design-studio`. THIS skill covers still-image asset craft.
@@ -388,7 +388,7 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
   Credits or copy a point-in-time vendor price into a commercial offer.
 - **Full model & capability catalog** (13 categories, verified slugs): `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`.
 
-### CLI de fal: `pnpm ai:fal` (Seedream 5 + layerize, Seedance 2.5/2.0, Minimax H3)
+### CLI de fal: `pnpm ai:fal` (Seedream 5 + layerize, Seedance 2.5/2.0, Minimax H3, Flux 3)
 
 Hermano de `pnpm ai:image` (`scripts/ai/fal-image.ts`), **out-of-band, NUNCA runtime del producto**. Es la mano
 de producción de fal: no escribas scripts ad-hoc sobre `runFalModel`. El registro model-agnostic vive en
@@ -406,8 +406,9 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
 - Flags: `--prompt|--prompt-file`, `--image` (repetible; los archivos locales se suben solos al storage de fal),
   `--size`, `--count`, `--format jpeg|png`, `--out|--out-dir`, `--timeout`, `--json`. Video (`--duration`,
   `--resolution`, `--aspect`, `--bitrate`, `--task`, `--no-audio`, `--end-image`, `--audio`, `--video`,
-  `--prompt-expansion`, `--lora`, `--camera-trajectory`), entrenamiento (`--training-data`, `--steps`, `--rank`,
-  `--learning-rate`, `--trigger`) y la elección entre Seedance y H3 viven en `motion-design-studio`
+  `--prompt-expansion`, `--lora`, `--camera-trajectory`, `--keyframe`, `--safety-tolerance`, `--draft-cache`),
+  entrenamiento (`--training-data`, `--steps`, `--rank`, `--learning-rate`, `--trigger`) y la elección entre
+  Seedance, H3 y Flux 3 (incluido video a video) viven en `motion-design-studio`
   (`workflows/engine-selection-by-fidelity-contract.md`). El CLI valida cada flag contra el contrato del endpoint
   **antes** de gastar: flags de video en una capacidad de imagen, o de entrenamiento fuera de un entrenador, fallan.
   `--task` quedó corregido: **sólo** Seedance 2.5 reference-to-video lo acepta (antes Seedance 2.0 lo rechazaba
@@ -416,11 +417,24 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   costo por corrida; no inventes precios. Si la capacidad figura SIN VERIFICAR, el CLI lo advierte antes de gastar.
 - **Retome (request_id):** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408)
   el trabajo **sigue corriendo y cobrando** en fal: no relances; usa el comando de retome que imprime el CLI
-  (verificado: mismo archivo byte a byte; alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream y Seedance usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.) La cola se direcciona por APP (dos primeros segmentos del slug), no por
+  (verificado: mismo archivo byte a byte; alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream, Seedance y Flux 3 usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.) La cola se direcciona por APP (dos primeros segmentos del slug), no por
   slug completo. Timeouts por defecto: imagen 3 min, video 15 min, entrenamiento 3 h.
 - Minimax H3 (17 endpoints, 9 verificados 2026-09-16): Max Turbo / Max / base + variantes LoRA y 4 entrenadores
   (sin verificar). `h3max-director` es stream realtime: el CLI se niega a operarlo por cola. Detalle y precios en
   `motion-design-studio`.
+- **Flux 3** (12 endpoints, los 12 verificados en real 2026-09-16; slugs `blackforestlabs/flux-3/*` **sin**
+  `fal-ai/`): en fal es un modelo de **VIDEO**, no de imagen. Los Flux 2 de imagen (`fal-ai/flux-2-pro`,
+  `flux-2-max`, `flux-2-flex`) son otros slugs y **no están conectados** al CLI: para ellos, `--model`.
+  Modos: t2v, i2v, primer/último cuadro (`--image` + `--end-image`, ambos obligatorios), keyframes
+  (`--keyframe <imagen>@<frame_index>`, repetible de 1 a 10; no acepta `--image`), `edit` y `extend` (origen por
+  `--video`) y `flux3-enhance`; t2v, i2v, primer/último cuadro, keyframes y extend tienen además su draft barato. Flags propios: `--safety-tolerance 0-4`
+  (default 2) y `--draft-cache <url>`: cada draft imprime su `draft_cache` y el comando listo, y sólo
+  `flux3-enhance` lo acepta (y lo exige). `extend` exige pista de audio en el origen (el CLI lo revisa con
+  `ffprobe` en archivos locales) y entrega sólo la continuación. Precios y elección en `motion-design-studio`.
+- Seedance (validaciones del CLI corregidas 2026-09-16, leídas del OpenAPI): duración mínima **4 s** (el registro
+  decía 1); `r2v` exige al menos una referencia visual (imagen o video) y valida los topes por versión (2.5: 30
+  imágenes, 10 videos, 10 audios, 50 archivos; 2.0: 9, 3, 3, 12); `--task` valida el valor, `editing`/`extension`
+  exigen `--video`, `editing` rechaza `--duration`/`--aspect` y `extension` rechaza `--aspect`.
 - Seedream 5 (las 5 verificadas 2026-09-16): `seedream5-lite` / `seedream5-lite-edit` (divergencia barata),
   `seedream5-pro` / `seedream5-pro-edit` (desarrollo; edit hasta 10 referencias) y `seedream5-pro-layerize`.
   No existe Seedream 5.1 al 2026-09-16.
@@ -439,8 +453,8 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   fusion and semantic regional art direction.
 - **The `fal-ai/` prefix depends on the ENDPOINT, not the provider — hard rule (re-verified 2026-09-16):**
   Seedream 5 and Seedance 2.x go **without** it (the slugs above are correct as-is); Seedream 4/4.5 and
-  Seedance v1/v1.5 go **with** it (e.g. `fal-ai/bytedance/seedream/v4.5/text-to-image`). FLUX, Recraft,
-  GPT Image, Topaz etc. keep `fal-ai/`. With the wrong prefix the submit is accepted (200) but the **result
+  Seedance v1/v1.5 go **with** it (e.g. `fal-ai/bytedance/seedream/v4.5/text-to-image`). FLUX 2, Recraft,
+  GPT Image, Topaz etc. keep `fal-ai/`; Flux 3 (`blackforestlabs/flux-3/*`) goes without it. With the wrong prefix the submit is accepted (200) but the **result
   404s** (`Path /... not found`, `inference_time` ≈ 0.02s) — a silent failure. Never compose a slug from
   provider + version: take it whole from `src/lib/ai/fal-capabilities.ts` or the catalog.
 - **Cheap slug check before generating (no spend):** `POST {}` (empty body) to `https://fal.run/<slug>`

@@ -1,6 +1,6 @@
 # Selección de motor por contrato de fidelidad — no por canal
 
-> **Estado:** evidencia operativa limitada — 2026-07-11. No declara un ganador universal ni sustituye el gate de revisión humana.
+> **Estado:** evidencia operativa limitada — 2026-07-11 (operación de Flux 3 y video a video actualizada 2026-09-16). No declara un ganador universal ni sustituye el gate de revisión humana.
 >
 > **Evidencia empírica:** [`Social Wall`](../../../../ai-generations/2026-07-08_social-wall-assets/README.md) (paquete de key visuals con `gpt-image-2` → Gemini Omni image-to-video, publicado) y [`Glitch`](../../../../ai-generations/2026-07-11_glitch-microphone-intro/review/take-s-seedance-source-keyvisual-review.md) (Seedance retuvo el set, pero el take aún se rechazó por actuación/foley).
 
@@ -38,16 +38,26 @@ Hay 15 endpoints: 2.5 y 2.0 × `t2v` / `i2v` / `r2v`, y 2.0 además en variantes
 v1/v1.5 sí lo llevan: el prefijo depende del endpoint). Los límites difieren **por endpoint** y el CLI los valida
 **antes** de gastar:
 
-| Endpoint | Duración máx. | Resoluciones | Notas |
+| Endpoint | Duración | Resoluciones | Notas |
 | --- | --- | --- | --- |
-| 2.5 (`seedance25-*`) | 30 s | 480p · 720p · 1080p | Sin 4K. Sólo su `r2v` acepta `--task reference\|editing\|extension` (rechazo verificado en local; uso real sin verificar) |
-| 2.0 base (`seedance20-*`) | 15 s | 480p · 720p · 1080p · 4k | Único con 4K (verificado: 3840×2160 real) |
-| 2.0 `fast` / `us` | 15 s | 480p · 720p | — |
-| 2.0 `mini` | 15 s | 480p · 720p | Sin `--bitrate` (no expone `bitrate_mode`) |
+| 2.5 (`seedance25-*`) | 4–30 s o `auto` | 480p · 720p · 1080p | Sin 4K. Sólo su `r2v` acepta `--task reference\|editing\|extension` (validación verificada en local; uso real sin verificar) |
+| 2.0 base (`seedance20-*`) | 4–15 s o `auto` | 480p · 720p · 1080p · 4k | Único con 4K (verificado: 3840×2160 real) |
+| 2.0 `fast` / `us` | 4–15 s o `auto` | 480p · 720p | — |
+| 2.0 `mini` | 4–15 s o `auto` | 480p · 720p | Sin `--bitrate` (no expone `bitrate_mode`) |
+
+La duración mínima es **4 s** en todos (el registro decía 1 hasta 2026-09-16; ya está corregido y el CLI lo valida).
 
 - Aspectos en todos: `auto`, `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16` (`--aspect`).
-- `i2v` acepta `--end-image` (último cuadro); `r2v` acepta `--audio` y `--video` (repetibles). `--no-audio` apaga el
-  audio generado. Timeout de video por defecto: 900 s.
+- `i2v` acepta `--end-image` (último cuadro); `r2v` acepta `--image`, `--video` y `--audio` (repetibles). `--no-audio`
+  apaga el audio generado. Timeout de video por defecto: 900 s.
+- `r2v` exige **al menos una referencia visual** (imagen o video): el audio solo no alcanza. Las referencias se citan
+  en el prompt como `@Image1`, `@Video1`, `@Audio1`. Topes que el CLI valida antes de subir (leídos del OpenAPI):
+  - **2.5:** hasta 30 imágenes, 10 videos (cada uno 1,8–30,2 s, ≤ 200 MB, 300–6000 px por lado, 24–60 fps;
+    combinados ≤ 30,2 s) y 10 audios (1,8–30,2 s c/u, ≤ 15 MB; combinados ≤ 30,2 s); máximo 50 archivos.
+  - **2.0 (base, fast, mini, us):** hasta 9 imágenes, 3 videos (combinados 2–15 s, < 50 MB, entre ~480p y ~720p) y
+    3 audios (≤ 15 s combinados); máximo 12 archivos.
+- `--task` (sólo `seedance25-r2v`): el CLI valida el valor; `editing` y `extension` exigen `--video`; `editing`
+  rechaza `--duration` y `--aspect`, y `extension` rechaza `--aspect` (el proveedor los fuerza a `auto`).
 - Verificados 2026-09-16: `seedance25-t2v`, `seedance25-i2v` (con upload de imagen local) y `seedance20-t2v` (4K).
   Los otros 12 están declarados sin verificar: el CLI lo advierte antes de gastar; la primera corrida es prueba.
 
@@ -57,7 +67,7 @@ completo: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`.
 
 **Retome sin recobro:** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408), el
 trabajo **sigue corriendo y cobrando** en fal; no relances: `pnpm ai:fal --capability <id> --request-id <id>`
-recupera la salida sin reenviar ni cobrar (verificado: mismo archivo byte a byte). El código aplica a Seedance, H3 y Seedream. Alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream y Seedance usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.
+recupera la salida sin reenviar ni cobrar (verificado: mismo archivo byte a byte). El código aplica a Seedance, H3, Flux 3 y Seedream. Alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream, Seedance y Flux 3 usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.
 
 ## Operar Minimax H3: `pnpm ai:fal` (conectado 2026-09-16)
 
@@ -97,6 +107,74 @@ LoRA y entrenadores siguen sin verificar: la primera corrida es prueba.
 (más rápido y más barato por segundo que subir de tier). **Movimiento de cámara sobre un KV aprobado sin que la escena
 cambie** → `h3max-camera`. Seedance sigue siendo la mano para control de audio (`--no-audio`) y R2V con muchas
 referencias. Ninguno es receta validada para actuación/física: aplican los mismos gates de este contrato.
+
+## Operar Flux 3: `pnpm ai:fal` (conectado 2026-09-16)
+
+En fal, **Flux 3 (Black Forest Labs) es un modelo de VIDEO**, no de imagen (los Flux 2 de imagen son otros slugs y no
+están conectados al CLI). Son 12 endpoints con slugs **sin** `fal-ai/` (`blackforestlabs/flux-3/<modo>`), y los
+**12 están verificados con corridas reales el 2026-09-16** (salidas 1280×704, 24 fps, 5,04 s; latencias de 40 s a
+4 min, bastante más lento que H3).
+
+| Modo | ids | USD fal (2026-09-16) | Cuándo elegirlo |
+| --- | --- | --- | --- |
+| Texto a video | `flux3-t2v` · `flux3-t2v-draft` | 0,085 / s · draft 0,03 / s | Explorar barato en draft y subir sólo el take aprobado con `flux3-enhance` |
+| Imagen a video | `flux3-i2v` · `flux3-i2v-draft` | 0,085 / s · draft 0,03 / s | Animar un KV con el mismo flujo draft → enhance |
+| Primer y último cuadro | `flux3-flf` · `flux3-flf-draft` | 0,085 / s · draft 0,03 / s | Controlar dónde arranca y dónde termina la toma: `--image` (primer cuadro) y `--end-image` (último), ambos obligatorios |
+| Keyframes | `flux3-keyframes` · `flux3-keyframes-draft` | 0,085 / s · draft 0,03 / s | Controlar la trayectoria con 1 a 10 `--keyframe <imagen>@<frame_index>` (índice entero ≥ 0; probado con `@0` y `@96` en 5 s a 24 fps). No acepta `--image` |
+| Edición | `flux3-edit` | 0,03 / s | Re-renderizar un video existente por prompt **conservando movimiento, timing y encuadre** (`--video`) |
+| Extensión | `flux3-extend` · `flux3-extend-draft` | 0,205 / s · draft 0,06 / s | Continuar un video (`--video`); ver las dos trampas abajo |
+| Mejora de draft | `flux3-enhance` | 0,085 / s | Convertir un draft en la versión final (`--draft-cache`; verificado: entregó 1920×1088 conservando la escena) |
+
+```bash
+pnpm ai:fal --capability flux3-i2v-draft --image kv.png --prompt "la cámara avanza lento hacia el producto" --out draft.mp4
+pnpm ai:fal --capability flux3-enhance --draft-cache "https://URL-DEL-DRAFT-CACHE" --out final.mp4
+pnpm ai:fal --capability flux3-keyframes --keyframe inicio.png@0 --keyframe final.png@96 --prompt "transición continua entre ambos cuadros" --duration 5 --out trayectoria.mp4
+pnpm ai:fal --capability flux3-edit --video toma.mp4 --prompt "misma toma, de noche con luces cálidas" --out edit.mp4
+```
+
+Contrato (el CLI lo valida antes de gastar):
+
+- **Duración:** `auto` o entero 5–20 s en t2v, i2v, extend y sus drafts; `flf` y `keyframes` entero 5–20 **sin** `auto`
+  (default 5). `edit` y `enhance` no aceptan duración (heredan la del origen).
+- **Resolución:** `720p` | `1080p` (default 720p) sólo en los finales (t2v, i2v, flf, keyframes, extend). Drafts,
+  `edit` y `enhance` no aceptan `--resolution`.
+- **Aspecto:** `auto`, `21:9`, `2:1`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16` (default `auto`); `edit` y `enhance` no lo aceptan.
+- Audio generado por defecto (`--no-audio` lo apaga; sin `--bitrate`). `--safety-tolerance 0-4` (default 2).
+- `edit`/`extend`: el origen va por `--video` (MP4, < 50 MB, < 15 s según el OpenAPI); no aceptan `--image`.
+- **Draft → enhance:** cada draft devuelve un `draft_cache` (archivo `.bin` de ~2 KB con URL) y el CLI imprime el
+  comando `flux3-enhance` listo para copiar. `--draft-cache` sólo lo acepta `flux3-enhance`, y ahí es obligatorio.
+
+**Las dos trampas de `extend`** (aisladas con corridas reales):
+
+1. **Exige pista de audio en el video de origen.** Con un origen sin audio (por ejemplo, generado con `--no-audio`),
+   fal encola el trabajo y después lo rechaza con un 422 genérico `Invalid request parameters`, con cualquier
+   duración. El CLI revisa con `ffprobe` los archivos locales y corta antes de subir; con URL remota o sin `ffprobe`
+   sólo avisa. Si el origen es mudo, agrégale una pista (aunque sea silencio) antes de extender.
+2. **Entrega sólo la continuación**, no el clip original más la extensión: la salida arranca en el último cuadro del
+   origen y `--duration` son los segundos nuevos (5 → 5 s; `auto` → 15 s). Hay que unir origen y continuación en post
+   (NLE o ffmpeg).
+
+**Flux 3 vs H3 vs Seedance:** para **explorar barato y subir sólo el take aprobado** sin regenerar la escena, Flux 3
+draft → enhance; para **fijar inicio/fin o una trayectoria** con cuadros concretos, `flux3-flf` o `flux3-keyframes`;
+para tomas de **más de 20 s**, Seedance 2.5; para **4K**, Seedance 2.0 base o H3 base. Ninguno es receta validada para
+actuación o física: aplican los gates de este contrato.
+
+## Video a video: qué motor
+
+fal **no expone un endpoint video-to-video de Seedance**: su video a video vive en `reference-to-video`. Tres
+opciones con estado distinto:
+
+| Necesidad | Motor | Estado | Límites que deciden |
+| --- | --- | --- | --- |
+| **Editar** un clip existente | `flux3-edit` | **Verificado** (2026-09-16) | USD 0,03/s; conserva movimiento, timing y encuadre; origen MP4 < 50 MB y < 15 s (OpenAPI) |
+| **Editar** un clip existente | `seedance25-r2v --task editing --video` | **Sin verificar** (leído del OpenAPI) | El proveedor fuerza `aspect_ratio` y `duration` a `auto`; videos de referencia hasta 30,2 s combinados |
+| **Extender** un clip | `flux3-extend` | **Verificado** (2026-09-16) | Exige audio en el origen; entrega sólo la continuación (5–20 s o `auto`), que se une en post |
+| **Extender** un clip | `seedance25-r2v --task extension --video` | **Sin verificar** (leído del OpenAPI) | El proveedor fuerza `aspect_ratio` a `auto`; duración 4–30 s o `auto` |
+| Usar un video sólo como **guía** (cámara, blocking, ritmo) | `seedance20-*-r2v` (se cita como `@Video1`) o `seedance25-r2v --task reference` | Sin verificar con video | Seedance 2.0 no edita ni extiende: sólo condiciona la generación nueva |
+
+Mientras Seedance 2.5 `editing`/`extension` no tenga corrida real, la primera mano verificada es Flux 3. Antes de
+recomendar Seedance para video a video en una entrega, haz una corrida corta de `editing` y otra de `extension` y
+registra el resultado.
 
 ## Previs 3D → Seedance: capacidad investigada, no evidencia interna
 

@@ -42,8 +42,8 @@ existe · **422** = la app existe (falló la validación de input por falta de c
 **Economía de provider (as-of 2026-07-26):** BytePlus/ModelArk directo es la ruta de volumen para Seedance 2.0;
 Fal sirve como gateway de prototipo/fallback, pero puede agregar markup. Para FLUX.2 y Recraft hay paridad pública
 en los endpoints comparados; decidir por SLA, auth, observabilidad y derechos. FLUX 3 fue anunciado por BFL el
-2026-07-23, pero sigue en early access sin API pública general ni precio público: no usarlo como dependencia de
-producción ni asumir que está disponible en Fal.
+2026-07-23 en early access; **desde 2026-09-16 está disponible en Fal y conectado a `pnpm ai:fal`** (ver abajo).
+Sigue sin evaluarse la ruta directa BFL.
 
 **Minimax H3 conectado a `pnpm ai:fal` (verificado 2026-09-16).** Fuentes: OpenAPI de fal **por endpoint** (17
 endpoints `minimax/h3/*`, `minimax/h3-max/*`, `minimax/h3-max-turbo/*`, sin prefijo `fal-ai/`), la **API de pricing
@@ -53,6 +53,20 @@ de fal** (USD: base 0,05/s · `/lora` 0,0625/s · Max y camera-controls 0,025/s 
 (stream realtime; el OpenAPI de cola da 404). **Trampa de cola:** fal direcciona la cola por **APP** (dos primeros
 segmentos del slug): `minimax/h3/text-to-video` → `queue.fal.run/minimax/h3/requests/<id>`. Uso y límites:
 `workflows/engine-selection-by-fidelity-contract.md`.
+
+**Flux 3 conectado a `pnpm ai:fal` (verificado 2026-09-16).** Fuentes: catálogo de modelos de fal y OpenAPI **por
+endpoint** (12 endpoints `blackforestlabs/flux-3/*`, sin prefijo `fal-ai/`; en fal es un modelo de **video**), la
+**API de pricing de fal** (USD por segundo: finales 0,085 · drafts 0,03 · `edit-video` 0,03 · `extend-video` 0,205 ·
+su draft 0,06 · `draft-enhance` 0,085) y **corridas reales de los 12** (1280×704, 24 fps, 5,04 s; `draft-enhance`
+entregó 1920×1088; latencias 40 s–4 min; ≈ USD 5 estimado por precio unitario). Hallazgos aislados en real:
+`extend-video` exige pista de audio en el origen (sin audio, 422 genérico tras encolar) y entrega sólo la
+continuación. Límite del origen de `edit`/`extend` (MP4 < 50 MB, < 15 s): leído del OpenAPI, no probado en el borde.
+
+**Seedance video a video (lectura del catálogo y OpenAPI de fal, 2026-09-16; sin corridas).** fal no expone un
+endpoint video-to-video de Seedance: vive en `reference-to-video`. Sólo 2.5 tiene `task` (`reference` · `editing` ·
+`extension`); 2.0 usa el video sólo como guía. Duración mínima 4 s en todos; referencia visual obligatoria; topes de
+referencias por versión. `editing`/`extension` **siguen sin verificar en real**. Uso y comparación con Flux 3:
+`workflows/engine-selection-by-fidelity-contract.md` § "Video a video: qué motor".
 
 ## Fuentes base (as-of 2026-07)
 
@@ -116,7 +130,7 @@ segmentos del slug): `minimax/h3/text-to-video` → `queue.fal.run/minimax/h3/re
 | **Kling 3.0** | **storyboarding multi-shot + Voice Binding** (voz consistente 6 cortes/5 idiomas), económico | control fino | narrativas multi-corte con voz consistente; económico |
 | **Veo 3.1 / 3.0 Fast** (`veo-3.0-fast-generate-001`, Google) | broadcast-ready, frame rate de cine, **sync audio-visual integrado**, hasta 4K; render **one-shot** vía `predictLongRunning` (async) | **one-shot: sin edición conversacional** (regeneras); precio (~$0.10/s 720p) | entregable broadcast/cine, resolución alta o clip largo. Es el contraste de Omni: Omni edita hablándole (stateful), Veo no. Live-verificado para Globe |
 | **Gemini Omni** (`gemini-omni-flash-preview`, Google) | multimodal any-to-any; **edición conversacional stateful** (`previous_interaction_id`) = su superpoder vs. one-shot; audio nativo contextual; **live-verificado 2026-07-20** (t2v keyless Vertex + edit stateful Gemini-key, ambos `200 completed`) | **solo 720p · 3–10s**, no MCP (REST), **deforma texto/logos/UI**, personas RAI-gated, editar uploaded video bloqueado EEA/CH/UK | **Interactions API (NO `generateContent`, que da `400`)**, **dos superficies**: (1) **Vertex KEYLESS** (ADC, sin key) = solo generación; (2) **Gemini-key** (`generativelanguage`) = Interactions completa + edit stateful. text/i2v + **reference-chaining**; UI/logo NO con IA. **Refinar no es exclusivo de Omni (2026-07-20):** el stateful es **uno de dos paradigmas** — el **reference-based** re-inyecta el output del padre y permite **cross-model** (refinar un candidato de Omni con otro motor y viceversa); `reference_to_video` acepta sets **combinados imagen+vídeo** (verificado en ambas superficies) pero **exige ≥1 imagen o audio**. Contrato: `efeonce/GEMINI_OMNI_VERTEX.md §0/§4.6/§4.7` · capacidades: `GEMINI_OMNI_CAPABILITIES.md` |
-| **FLUX 3** (Black Forest Labs) | modelo unificado de imagen, video y audio; hasta 20 s según anuncio | early access; sin API pública/precio general al corte | laboratorio estratégico, no producción ni fallback |
+| **Flux 3** (Black Forest Labs, vía Fal, `pnpm ai:fal`) | video con audio: T2V/I2V, primer-último cuadro, keyframes (hasta 10), `edit` que conserva movimiento/timing/encuadre, `extend`, drafts baratos (0,03 USD/s) + `enhance` a final; 5–20 s; 720p/1080p | más lento que H3 (40 s–4 min); `extend` exige audio en el origen y entrega sólo la continuación; sin 4K | explorar en draft y subir sólo el take aprobado; fijar trayectoria con cuadros; video a video verificado (edit/extend); 12 endpoints verificados 2026-09-16 |
 | ~~**Sora 2** (OpenAI)~~ | líder en consistencia temporal/física | **API deprecada 2026-03-24, shutdown 2026-09-24** | **NO** basar nada nuevo; sigue accesible vía agregadores (Higgsfield) pero con fecha de muerte |
 
 ### Upscale / enhance / finish

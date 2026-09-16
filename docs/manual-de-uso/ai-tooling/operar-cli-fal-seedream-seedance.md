@@ -1,9 +1,9 @@
-# Operar el CLI de fal: Seedream 5, Seedance 2.5/2.0 y Minimax H3
+# Operar el CLI de fal: Seedream 5, Seedance 2.5/2.0, Minimax H3 y Flux 3
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-16 por agente
-> **Ultima actualizacion:** 2026-09-16 por Claude — Minimax H3 (video, camera-controls, LoRA y entrenamiento), retome por `--request-id` y cierre de la brecha de `--task`
+> **Ultima actualizacion:** 2026-09-16 por Claude — Flux 3 (draft → enhance, primer/ultimo cuadro, keyframes, edit y extend) y video a video con Seedance 2.5 (`--task editing|extension`, sin verificar); antes, Minimax H3 (video, camera-controls, LoRA y entrenamiento), retome por `--request-id` y cierre de la brecha de `--task`
 > **Modulo:** AI Tooling / Asset Generation
 > **Comando:** `pnpm ai:fal`
 > **Documentacion tecnica:** [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo
@@ -17,7 +17,10 @@ Para generar desde la terminal, a traves de fal.ai:
 - **capas editables** a partir de una imagen plana (Seedream 5 Pro layerize);
 - **video** con Seedance 2.5 o 2.0, desde texto, desde una imagen o desde referencias;
 - **video rapido y barato** con Minimax H3 (base, Max y Max Turbo), incluido **control de camara** sobre una
-  imagen, video con **LoRAs** y **entrenamiento de LoRAs** propias.
+  imagen, video con **LoRAs** y **entrenamiento de LoRAs** propias;
+- **video con Flux 3**: borrador barato que se mejora a version final, video desde texto, imagen, primer y ultimo
+  cuadro o keyframes, y **video a video** (editar un clip o extenderlo);
+- **video a video con Seedance 2.5** (editar o extender un clip desde referencias), todavia sin verificar.
 
 Es un comando **hermano** de `pnpm ai:image`, no su reemplazo: para GPT Image se sigue usando `ai:image`. Todo lo
 que produce es trabajo fuera del portal; nada se genera en tiempo real para usuarios.
@@ -59,17 +62,25 @@ pnpm ai:fal --list
 | Mover la camara sobre una imagen | `h3max-camera` | un `--image` + `--camera-trajectory`; prompt opcional |
 | Video H3 con LoRA | `h3-t2v-lora`, `h3-i2v-lora`, `h3-r2v-lora` | lo mismo que su version sin LoRA + al menos un `--lora` |
 | Entrenar una LoRA de H3 | `h3-train-t2v`, `h3-train-i2v`, `h3-train-flf2v`, `h3-train-ref2va` | `--training-data` |
+| Video Flux 3 desde texto | `flux3-t2v` o su borrador `flux3-t2v-draft` | `--prompt` |
+| Video Flux 3 desde una imagen | `flux3-i2v` o `flux3-i2v-draft` | `--prompt` + un `--image` |
+| Video Flux 3 entre dos cuadros | `flux3-flf` o `flux3-flf-draft` | `--prompt` + `--image` (primer cuadro) + `--end-image` (ultimo), ambos obligatorios |
+| Video Flux 3 por keyframes | `flux3-keyframes` o `flux3-keyframes-draft` | `--prompt` + de 1 a 10 `--keyframe <imagen>@<frame_index>` |
+| Mejorar un borrador de Flux 3 | `flux3-enhance` | `--draft-cache <url>` (lo imprime el borrador) |
+| Editar un video existente | `flux3-edit` (verificado) o `seedance25-r2v --task editing` (sin verificar) | `--prompt` + `--video` |
+| Extender un video existente | `flux3-extend` / `flux3-extend-draft` (verificados) o `seedance25-r2v --task extension` (sin verificar) | `--prompt` + `--video` (en Flux 3, con pista de audio) |
 
 Para video, elige la familia por sus limites:
 
-| Familia | Duracion maxima | Resoluciones | `--bitrate` |
+| Familia | Duracion | Resoluciones | `--bitrate` |
 |---|---|---|---|
-| Seedance 2.5 | 30 s | 480p, 720p, 1080p | si |
-| Seedance 2.0 base | 15 s | 480p, 720p, 1080p, 4k | si |
-| Seedance 2.0 fast / us | 15 s | 480p, 720p | si |
-| Seedance 2.0 mini | 15 s | 480p, 720p | no |
+| Seedance 2.5 | 4 a 30 s o `auto` | 480p, 720p, 1080p | si |
+| Seedance 2.0 base | 4 a 15 s o `auto` | 480p, 720p, 1080p, 4k | si |
+| Seedance 2.0 fast / us | 4 a 15 s o `auto` | 480p, 720p | si |
+| Seedance 2.0 mini | 4 a 15 s o `auto` | 480p, 720p | no |
 
-Aspectos en todas las Seedance: `auto`, `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16`.
+Aspectos en todas las Seedance: `auto`, `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16`. La duracion minima de
+Seedance es **4 s**: `--duration 3` falla en local.
 
 Minimax H3 tiene otros limites y otra forma de escribirlos:
 
@@ -86,6 +97,23 @@ Minimax H3 tiene otros limites y otra forma de escribirlos:
 - `--prompt-expansion`: en H3 base es opcional (`disabled|fast|balanced|quality`); en Max y Turbo es obligatorio
   y sólo acepta `disabled|balanced|quality`. Si no lo pasas en Max o Turbo, el comando envia `balanced`.
 - Precios consultados el 2026-09-16; confirmalos antes de un lote.
+
+Flux 3 (video, no imagen) tiene su propio contrato:
+
+| Flux 3 | Duracion | `--resolution` | `--aspect` | Precio fal 2026-09-16 |
+|---|---|---|---|---|
+| `flux3-t2v`, `flux3-i2v` | `auto` o 5 a 20 s | `720p` o `1080p` (default `720p`) | si | USD 0,085 / s |
+| `flux3-flf`, `flux3-keyframes` | 5 a 20 s, **sin** `auto` (default 5) | `720p` o `1080p` | si | USD 0,085 / s |
+| `flux3-extend` | `auto` o 5 a 20 s (segundos **nuevos**) | `720p` o `1080p` | si | USD 0,205 / s |
+| Borradores `*-draft` | como su version final | **no** | si | USD 0,03 / s (extend: 0,06 / s) |
+| `flux3-edit` | **no** (hereda del origen) | **no** | **no** | USD 0,03 / s |
+| `flux3-enhance` | **no** (hereda del borrador) | **no** | **no** | USD 0,085 / s |
+
+- Aspectos Flux 3: `auto`, `21:9`, `2:1`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16` (default `auto`).
+- Sale con sonido por defecto; `--no-audio` lo apaga. No acepta `--bitrate`.
+- `--safety-tolerance` de 0 a 4 (default 2).
+- Los 12 endpoints estan verificados con corridas reales (2026-09-16). Son **mas lentos que H3**: entre 40 s y
+  4 min por video.
 
 ### 2. Corre el comando
 
@@ -175,6 +203,94 @@ pnpm ai:fal --capability h3-train-t2v --training-data dataset.zip --steps 1500 -
 - `h3max-director` **no se puede usar** con este comando: es video en vivo guiado en tiempo real, no un trabajo
   de cola. El comando lo explica y se detiene.
 
+#### Flux 3
+
+Borrador barato y despues version final. El borrador imprime su `draft_cache` y el comando listo para mejorarlo:
+
+```bash
+pnpm ai:fal --capability flux3-t2v-draft --prompt "<escena y accion>" --duration 5 --aspect 16:9 \
+  --out ai-generations/2026-09-16_mi-pieza/flux3-draft.mp4
+# el CLI imprime:
+#   draft_cache: <url>
+#   mejóralo con: pnpm ai:fal --capability flux3-enhance --draft-cache "<url>" --out <ruta>
+pnpm ai:fal --capability flux3-enhance --draft-cache "<url>" --out ai-generations/2026-09-16_mi-pieza/flux3-final.mp4
+```
+
+Copia el comando que imprime el CLI tal cual: `flux3-enhance` no acepta `--prompt`, `--duration`, `--resolution`
+ni `--aspect`; todo sale del borrador. En la prueba, el borrador salio 1280×704 y la mejora 1920×1088.
+
+Desde una imagen:
+
+```bash
+pnpm ai:fal --capability flux3-i2v --image plate.png --prompt "<movimiento>" \
+  --duration 5 --resolution 1080p --out ai-generations/2026-09-16_mi-pieza/flux3-i2v.mp4
+```
+
+Entre un primer y un ultimo cuadro (los dos son obligatorios; duracion sin `auto`):
+
+```bash
+pnpm ai:fal --capability flux3-flf --image inicio.png --end-image final.png \
+  --prompt "<transicion>" --duration 5 --out ai-generations/2026-09-16_mi-pieza/flux3-flf.mp4
+```
+
+Por keyframes (de 1 a 10; `@` separa la imagen del numero de cuadro, entero desde 0; se probo con `@0` y `@96` en
+un clip de 5 s a 24 fps):
+
+```bash
+pnpm ai:fal --capability flux3-keyframes --keyframe inicio.png@0 --keyframe clave.png@96 \
+  --prompt "<que pasa entre cuadros>" --duration 5 --out ai-generations/2026-09-16_mi-pieza/flux3-kf.mp4
+```
+
+Editar un video existente (conserva movimiento, ritmo y encuadre; sin `--duration`, `--resolution` ni `--aspect`):
+
+```bash
+pnpm ai:fal --capability flux3-edit --video clip.mp4 --prompt "<que cambia: estilo, luz, material>" \
+  --out ai-generations/2026-09-16_mi-pieza/flux3-edit.mp4
+```
+
+Extender un video (el origen **debe traer pista de audio**; la salida es **solo la continuacion**):
+
+```bash
+pnpm ai:fal --capability flux3-extend --video clip.mp4 --prompt "<como sigue la accion>" \
+  --duration 5 --out ai-generations/2026-09-16_mi-pieza/flux3-continuacion.mp4
+```
+
+- `--duration` son los segundos **nuevos** (5 → 5 s nuevos; `auto` entrego 15 s).
+- Para tener el clip completo, une origen y continuacion en tu editor o con `ffmpeg`.
+- El origen va por `--video` (MP4, menos de 50 MB y menos de 15 s segun el proveedor); edit y extend no aceptan
+  `--image`.
+- `--safety-tolerance 0-4` aplica a todos los Flux 3 si necesitas ajustar el filtro del proveedor.
+
+#### Video a video con Seedance 2.5 (sin verificar)
+
+Fal no tiene un endpoint "video a video" de Seedance: se hace con `seedance25-r2v` y `--task`. ⚠️ Estas corridas
+**no estan verificadas en real**; el comando advierte antes de gastar. Contrato leido del OpenAPI del proveedor:
+
+Editar un clip (el proveedor fuerza duracion y aspecto a `auto`, asi que no pases `--duration` ni `--aspect`):
+
+```bash
+pnpm ai:fal --capability seedance25-r2v --task editing --video clip.mp4 \
+  --prompt "Cambia @Video1 a <nuevo estilo>, conserva la accion" --out ai-generations/2026-09-16_mi-pieza/sd-edit.mp4
+```
+
+Extender un clip (sin `--aspect`; duracion de 4 a 30 s o `auto`):
+
+```bash
+pnpm ai:fal --capability seedance25-r2v --task extension --video clip.mp4 \
+  --prompt "Continua @Video1: <que pasa despues>" --duration 8 --out ai-generations/2026-09-16_mi-pieza/sd-extension.mp4
+```
+
+- `--task reference` (o no pasarlo) usa el video solo como guia. En **Seedance 2.0** (`seedance20-r2v` y sus
+  variantes) no existe `--task`: el video solo guia, no edita ni extiende.
+- Las referencias se citan en el prompt como `@Image1`, `@Video1`, `@Audio1`.
+- Siempre hace falta al menos un `--image` o un `--video`; el audio solo no alcanza.
+- Topes 2.5: hasta 30 imagenes, 10 videos (cada uno de 1,8 a 30,2 s, hasta 200 MB, de 300 a 6000 px por lado, de 24
+  a 60 fps; sumados hasta 30,2 s) y 10 audios (cada uno de 1,8 a 30,2 s, hasta 15 MB; sumados hasta 30,2 s), 50
+  archivos en total.
+- Topes 2.0: hasta 9 imagenes, 3 videos (sumados de 2 a 15 s, menos de 50 MB, entre ~480p y ~720p) y 3 audios
+  (sumados hasta 15 s), 12 archivos en total.
+- Si una corrida funciona, anota la fecha en `src/lib/ai/fal-capabilities.ts`; si no, guarda el error con `--json`.
+
 Opciones generales: `--prompt-file <path>` para prompts largos, `--size` (enum del proveedor o `WxH`), `--count`,
 `--format jpeg|png`, `--timeout <ms>`, `--json` para ver la respuesta cruda y `--request-id <id>` para retomar un
 trabajo ya encolado.
@@ -189,7 +305,7 @@ pnpm ai:fal --model <slug/de/fal> --prompt "<texto>" --input '{"campo":"valor"}'
 
 El comando imprime `→ <slug> · hasta Ns de espera` y, apenas fal acepta el trabajo,
 `⋯ encolado · request_id <id>`. **Anota ese `request_id`.** Limites por defecto: imagen 3 min (las corridas
-verificadas tardaron entre 44 y 116 s), video 15 min (Seedance tardo 147 a 194 s; H3, entre 3 y 8 s) y
+verificadas tardaron entre 44 y 116 s), video 15 min (Seedance tardo 147 a 194 s; H3, entre 3 y 8 s; Flux 3, de 40 s a 4 min) y
 entrenamiento 3 h. Si necesitas mas, usa `--timeout`.
 
 Si el tiempo de espera se acaba (`HTTP 408`), **el trabajo sigue corriendo y cobrando en fal**. El comando imprime
@@ -207,6 +323,8 @@ trabajo real.
 ### 4. Revisa lo que entrego
 
 - Imagen o video: `✓ <KB> · <ruta>` por archivo y al final `done · <ms> · N asset(s) · request_id <id>`.
+- Borrador de Flux 3: ademas del video, `draft_cache: <url>` y la linea `mejóralo con: …`. Copiala para mejorarlo.
+- Extension de Flux 3: el archivo es **solo el tramo nuevo**; arranca en el ultimo cuadro del origen.
 - H3: el comando muestra un extracto de `prompt expandido` (lo que el modelo entendio, incluido el sonido que
   agrego); `--json` lo trae entero.
 - Entrenamiento: `lora.*` y `config.*` en la carpeta de salida. Guardalos juntos.
@@ -232,6 +350,19 @@ trabajo real.
 | `"<id>" exige al menos un --lora …` / `no acepta --lora; usa su variante /lora.` | LoRA faltante en una variante `-lora`, o LoRA pasada a una variante sin LoRA. |
 | `--camera-trajectory …` | La trayectoria no es JSON valido, trae mas de 12 puntos o algun valor esta fuera de rango. |
 | `… sólo aplica a entrenamiento de LoRA.` | Usaste `--steps`, `--rank`, `--learning-rate`, `--trigger` o `--training-data` fuera de un entrenador. |
+| `"<id>" no acepta --resolution: los drafts salen a resolución fija; …` | Pasaste `--resolution` a un borrador de Flux 3. La resolucion final sale de `flux3-enhance`. |
+| `"<id>" no acepta --duration: hereda la del video de origen.` | `flux3-edit` o `flux3-enhance` no reciben duracion. Quitala. |
+| `"<id>" no acepta --duration auto; usa 5–20.` | `flux3-flf` y `flux3-keyframes` piden un entero. |
+| `"<id>" exige --end-image: el último cuadro es obligatorio.` | Falta el ultimo cuadro en `flux3-flf`. |
+| `"<id>" recibe las imágenes como --keyframe <imagen>@<frame_index>, no como --image.` | Usaste `--image` en `flux3-keyframes`. |
+| `--keyframe "…" debe tener la forma <imagen>@<frame_index>…` | Falta el `@` o el indice no es un entero >= 0. |
+| `"<id>" parte de un video: pásalo con --video, no con --image.` | `flux3-edit` y `flux3-extend` reciben el clip por `--video`. |
+| `"<id>" exige que el video de origen traiga pista de audio…` | Extension de Flux 3 con un origen local sin sonido. Se detuvo antes de subir. |
+| `⚠ no se pudo verificar la pista de audio del origen…` | El origen es una URL o no tienes `ffprobe`. Si no trae audio, fal lo rechazara despues de encolar. |
+| `"<id>" exige --draft-cache <url>…` / `no acepta --draft-cache…` | `flux3-enhance` necesita el `draft_cache` de un borrador; ninguna otra capacidad lo usa. |
+| `--task <tarea> necesita el video de origen por --video.` | `editing` y `extension` en `seedance25-r2v` requieren `--video`. |
+| `--task editing ignora --duration y --aspect…` / `--task extension ignora --aspect…` | El proveedor los fuerza a `auto`; quitalos. |
+| `"<id>" necesita al menos una imagen o un video de referencia; el audio solo no alcanza.` | Reference-to-video de Seedance con solo `--audio`. |
 | `"<id>" no se puede operar desde este CLI: …` | Capacidad marcada `[NO OPERABLE POR COLA]` (hoy, `h3max-director`). |
 | `⋯ encolado · request_id <id>` | fal acepto el trabajo; desde aqui cuenta como gasto. Anota el id. |
 | `⚠ --request-id no podrá retomar este trabajo: …` | La direccion de cola de ese modelo no sigue la regla habitual; si vence el tiempo, no se podra retomar con el comando. |
@@ -250,6 +381,9 @@ trabajo real.
   Seedance 2.0/2.5 van sin prefijo, Seedream 4/4.5 y Seedance 1/1.5 con prefijo. Con el prefijo equivocado el
   pedido parece aceptado y despues da 404, sin avisar.
 - **No relances un video que vencio por tiempo.** Retomalo con `--request-id`: relanzarlo paga dos veces.
+- **No extiendas con Flux 3 un clip generado con `--no-audio`.** Fal lo acepta en cola y despues lo rechaza.
+- **No esperes el clip completo de `flux3-extend`.** Entrega solo la continuacion; la union se hace en edicion.
+- **No uses Seedance 2.0 para editar o extender.** Su video de referencia solo guia; eso es de Seedance 2.5.
 - **No uses `h3max-director`.** No funciona por cola; no hay forma de operarlo con este comando.
 - **No marques una capacidad como verificada** en el registro sin haberla corrido de verdad.
 - **No uses este comando para Gemini Omni.** Omni se conecta directo con Google, no por fal.
@@ -272,6 +406,19 @@ trabajo real.
   que quieres.
 - **`--prompt-expansion fast` en Max o Turbo.** Esas familias sólo aceptan `disabled`, `balanced` o `quality`.
 - **Reference-to-video sin referencias.** H3 pide al menos una: `--image`, `--video` o `--audio`.
+- **Extender con Flux 3 falla con `422 Invalid request parameters` despues de encolar.** Casi siempre el origen no
+  trae pista de audio. Regeneralo sin `--no-audio` (camino verificado). El CLI tambien sugiere agregarle una pista
+  aunque sea de silencio (por ejemplo con `ffmpeg` y `anullsrc`); ese camino **no se ha probado** contra fal.
+- **`flux3-extend` entrego menos de lo que esperabas.** Es solo el tramo nuevo; une origen y continuacion en post.
+- **`--resolution` en un borrador de Flux 3.** Los borradores no la aceptan; pasa a `flux3-enhance` con el
+  `draft_cache` para la version final.
+- **`--image` en `flux3-keyframes`, `flux3-edit` o `flux3-extend`.** Keyframes usa `--keyframe img@indice`; edit y
+  extend usan `--video`.
+- **`--task editing` con `--duration` (o `--aspect`).** El proveedor fuerza ambos a `auto`; quitalos. En `extension`
+  solo sobra `--aspect`.
+- **Seedance con solo audio de referencia.** El audio es solo apoyo: agrega al menos un `--image` o un `--video`.
+- **Seedance rechaza `--duration 2` o `3`.** El minimo es 4 s (o `auto`).
+- **`--task` en `seedance20-r2v`.** Solo `seedance25-r2v` lo acepta.
 - **Querias usar el modo Director.** No es operable por cola; necesitaria un cliente en tiempo real que hoy no
   existe.
 - **Una variante con LoRA o un entrenador fallo o devolvio otra forma.** Estan sin verificar: corre con `--json` y
@@ -285,6 +432,7 @@ trabajo real.
 - CLI: `scripts/ai/fal-image.ts` (`pnpm ai:fal`)
 - Registro de capacidades: `src/lib/ai/fal-capabilities.ts`
 - Cliente canonico: `src/lib/ai/fal.ts` (`runFalModel`, `uploadFalFile`)
-- Catalogo y contratos: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` §Carril operativo y §Minimax H3
+- Catalogo y contratos: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` §Carril operativo, §Seedance video
+  a video, §Minimax H3 y §Flux 3
 - Arquitectura del generador: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`
 - Guia operativa de agentes: `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md` §Generate via fal CLI

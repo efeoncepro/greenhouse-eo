@@ -1,9 +1,13 @@
 # Greenhouse — Fal.ai Model & Capability Catalog V1
 
-> **Tipo:** Referencia técnica agent-facing · **Version:** 1.2 · **Creado:** 2026-07-06 por Claude
-> **Última actualización:** 2026-09-16 por Claude — Minimax H3 conectado a `pnpm ai:fal` (17 endpoints, 9
-> verificados), kind `training`, retome por `request_id`, direccionamiento de cola por app y cierre de la brecha
-> de `--task`. Antes (1.1): CLI `pnpm ai:fal`, Seedream 5 layerize, Seedance 2.5 y corrección del prefijo `fal-ai/`.
+> **Tipo:** Referencia técnica agent-facing · **Version:** 1.3 · **Creado:** 2026-07-06 por Claude
+> **Última actualización:** 2026-09-16 por Claude — Flux 3 conectado a `pnpm ai:fal` (12 endpoints de **video**,
+> todos verificados en real; flujo draft → enhance; extend exige audio en el origen y entrega sólo la
+> continuación) y contrato real de **Seedance video a video** (vive en reference-to-video; `--task
+> editing|extension` sólo en 2.5; duración mínima 4 s; referencia visual obligatoria). Antes (1.2): Minimax H3
+> conectado (17 endpoints, 9 verificados), kind `training`, retome por `request_id`, direccionamiento de cola por
+> app y cierre de la brecha de `--task`. Antes (1.1): CLI `pnpm ai:fal`, Seedream 5 layerize, Seedance 2.5 y
+> corrección del prefijo `fal-ai/`.
 > **Estado:** inventario histórico de discovery Greenhouse; no es allowlist productivo de Creative Studio.
 > **Última verificación parcial:** 2026-07-19.
 > **Fuente vigente de incorporación:** [Efeonce Creative Studio Enterprise Model Portfolio V1](EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md)
@@ -78,7 +82,9 @@ out-of-band: el runtime de imagen del producto sigue siendo `src/lib/ai/image-ge
   lo aceptado: duración, resolución, aspecto, `--bitrate`, `--prompt-expansion`, LoRAs, trayectoria de cámara e
   hiperparámetros de entrenamiento. Los flags de video en una capacidad de imagen fallan, y los de entrenamiento
   fuera de un entrenador también. Llegar al proveedor con un valor inválido costaría la cola.
-- **`--task` (brecha cerrada 2026-09-16):** sólo Seedance 2.5 reference-to-video lo acepta. Antes el CLI lo dejaba
+- **`--task` (brecha cerrada 2026-09-16):** sólo Seedance 2.5 reference-to-video lo acepta; además valida el valor
+  (`reference|editing|extension`), `editing` y `extension` exigen `--video`, `editing` rechaza `--duration` y
+  `--aspect`, y `extension` rechaza `--aspect` (ver §Seedance video a video). Antes el CLI lo dejaba
   pasar en todo reference-to-video y el r2v de Seedance 2.0 lo rechazaba **después** de encolar; ahora se rechaza en
   local en cualquier otra capacidad. Verificado en local (el CLI rechaza `--task` en `seedance20-r2v` sin encolar); `seedance25-r2v` con `--task` no tiene corrida real y sigue sin verificar.
 - **`request_id` y retome:** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408),
@@ -89,8 +95,9 @@ out-of-band: el runtime de imagen del producto sigue siendo `src/lib/ai/image-ge
 - **Costo:** fal **no devuelve `usage`** en estas respuestas, así que el CLI no reporta costo por corrida (a
   diferencia de `ai:image`). Consultar el pricing vigente del proveedor, con fecha, antes de correr.
 - **Qué NO va por aquí:** Gemini Omni se conecta directo por las plataformas de Google, no por fal (fue retirado
-  del registro). Flux 3 no está conectado. Minimax H3 **sí** está conectado desde 2026-09-16 (ver §Minimax H3),
-  salvo `h3max-director`, que no es operable por cola.
+  del registro). Minimax H3 **sí** está conectado desde 2026-09-16 (ver §Minimax H3), salvo `h3max-director`, que
+  no es operable por cola. Flux 3 **también** está conectado desde 2026-09-16 (ver §Flux 3). Los Flux de **imagen**
+  (`fal-ai/flux-2-pro`, `flux-2-max`, `flux-2-flex`, FLUX.1) no están en el registro: van por `--model`.
 
 Capacidades registradas al 2026-09-16:
 
@@ -105,9 +112,11 @@ Capacidades registradas al 2026-09-16:
 | `seedance20-t2v` · `-i2v` · `-r2v` | `bytedance/seedance-2.0/{text,image,reference}-to-video` | video | t2v ✅ (4K real) · i2v, r2v sin verificar |
 | `seedance20-fast-*` · `-mini-*` · `-us-*` | `bytedance/seedance-2.0/{fast,mini,us}/{text,image,reference}-to-video` | video | sin verificar (9) |
 | `h3-*` · `h3max-*` · `h3turbo-*` · `h3-train-*` | `minimax/h3*/…` (17 endpoints) | video + entrenamiento | 9 ✅ · 7 sin verificar · 1 no operable (ver §Minimax H3) |
+| `flux3-*` | `blackforestlabs/flux-3/…` (12 endpoints) | video (incluye editar y extender) | 12 ✅ 2026-09-16 (ver §Flux 3) |
 
-**Conteo global al 2026-09-16:** 37 capacidades registradas (5 Seedream 5, 15 Seedance, 17 Minimax H3); **17
-verificadas** contra el API real (5 Seedream 5, 3 Seedance, 9 H3). Pendiente de conectar: Flux 3.
+**Conteo global al 2026-09-16:** 49 capacidades registradas (5 Seedream 5, 15 Seedance, 17 Minimax H3, 12 Flux 3);
+**29 verificadas** contra el API real (5 Seedream 5, 3 Seedance, 9 H3, 12 Flux 3). No queda ninguna familia
+pendiente de conectar. `--list` agrupa IMAGE / VIDEO / TRAINING.
 
 No existe Seedream 5.1 en fal al 2026-09-16.
 
@@ -121,18 +130,56 @@ se guardaran los PNG.
 
 **Contratos Seedance por endpoint** (verificados en el OpenAPI de cada uno, 2026-09-16):
 
-| Familia | Duración máx. | Resoluciones | `bitrate_mode` |
+| Familia | Duración | Resoluciones | `bitrate_mode` |
 |---|---|---|---|
-| Seedance 2.5 (`seedance25-*`) | 30 s | 480p · 720p · 1080p (sin 4K) | sí |
-| Seedance 2.0 base (`seedance20-t2v/i2v/r2v`) | 15 s | 480p · 720p · 1080p · 4k (la única con 4K) | sí |
-| Seedance 2.0 fast / us | 15 s | 480p · 720p | sí |
-| Seedance 2.0 mini | 15 s | 480p · 720p | **no** |
+| Seedance 2.5 (`seedance25-*`) | 4–30 s o `auto` | 480p · 720p · 1080p (sin 4K) | sí |
+| Seedance 2.0 base (`seedance20-t2v/i2v/r2v`) | 4–15 s o `auto` | 480p · 720p · 1080p · 4k (la única con 4K) | sí |
+| Seedance 2.0 fast / us | 4–15 s o `auto` | 480p · 720p | sí |
+| Seedance 2.0 mini | 4–15 s o `auto` | 480p · 720p | **no** |
+
+**Corrección 2026-09-16:** la duración **mínima** de Seedance es **4 s** (el registro declaraba 1; leído del
+OpenAPI). El CLI ya la valida en local.
 
 Aspectos en todos: `auto`, `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16`. Image-to-video acepta `end_image_url`
 (último cuadro). Reference-to-video acepta `audio_urls` y `video_urls`; **sólo el r2v de 2.5** acepta `task`
 `reference|editing|extension`. Output: `video` + `seed`. Corridas reales: `seedance25-t2v` (147 s → h264 854x480,
 4,04 s, 97 cuadros), `seedance25-i2v` (194 s → h264 854x480, 4,04 s, con upload de imagen) y `seedance20-t2v`
 (4K real: 3840x2160, 4,04 s).
+
+### Seedance video a video (contrato leído del OpenAPI 2026-09-16; sin corridas)
+
+fal **no expone** un endpoint `video-to-video` de Seedance. De los 21 endpoints Seedance del catálogo, los
+registrados son text-, image- y reference-to-video de 2.0 (base, fast, mini, us) y 2.5; v1/v1.5 son legacy, van
+**CON** prefijo `fal-ai/` y no están registrados. El video a video vive en **reference-to-video**, y su alcance
+cambia por versión:
+
+| | Seedance 2.5 r2v (`seedance25-r2v`) | Seedance 2.0 r2v (`seedance20-r2v`, fast, mini, us) |
+|---|---|---|
+| `task` | `reference` · `editing` · `extension` | no existe |
+| Qué hace el video | `editing` modifica un video de referencia (el proveedor fuerza `aspect_ratio` y `duration` a `auto`); `extension` lo continúa (fuerza `aspect_ratio` a `auto`); `reference` sólo guía | sólo **guía** la generación (se cita como `@Video1`); no edita ni extiende |
+| Imágenes de referencia | hasta 30 | hasta 9 |
+| Videos de referencia | hasta 10; cada uno 1,8–30,2 s, ≤ 200 MB, 300–6000 px por lado, 24–60 fps; combinados ≤ 30,2 s | hasta 3; combinados 2–15 s, < 50 MB, entre ~480p y ~720p |
+| Audios de referencia | hasta 10; cada uno 1,8–30,2 s, ≤ 15 MB; combinados ≤ 30,2 s | hasta 3; ≤ 15 s combinados |
+| Total de archivos | 50 | 12 |
+| Duración | 4–30 s o `auto` | 4–15 s o `auto` |
+
+En todos: **al menos una imagen o un video de referencia es obligatorio** (el audio solo no alcanza) y las
+referencias se citan en el prompt como `@Image1`, `@Video1`, `@Audio1`.
+
+Validación local en `pnpm ai:fal` (2026-09-16): topes de referencias declarados y validados; se exige referencia
+visual; `--task` valida el valor y sólo lo acepta `seedance25-r2v`; `editing` y `extension` exigen `--video`;
+`editing` rechaza `--duration` y `--aspect`; `extension` rechaza `--aspect`.
+
+**Estado:** `seedance25-r2v` **sigue sin verificar en real**, ni con `editing` ni con `extension`. Pendiente: una
+corrida corta de cada tarea antes de usarlo en producción.
+
+**Elegir video a video:**
+
+| Necesidad | Opción verificada | Opción sin verificar |
+|---|---|---|
+| Editar un clip existente | `flux3-edit` (USD 0,03/s; conserva movimiento, timing y encuadre) | `seedance25-r2v --task editing` |
+| Extender un clip | `flux3-extend` (exige audio en el origen; entrega sólo la continuación; hasta 20 s nuevos) | `seedance25-r2v --task extension` (hasta 30 s) |
+| Guiar un video nuevo con uno existente | — | `seedance20-r2v` / `seedance25-r2v --task reference` |
 
 ### Minimax H3 (conectado 2026-09-16)
 
@@ -197,6 +244,63 @@ Precios consultados en la API de pricing de fal el 2026-09-16; son volátiles.
 revisaron cuadros: cada salida corresponde a su pedido y camera-controls mueve la cámara sobre la escena
 congelada. Costo estimado por precio unitario: ≈ USD 1,4. La evidencia quedó fuera del repo y no se versiona.
 
+### Flux 3 (conectado 2026-09-16)
+
+Flux 3 (Black Forest Labs) **en fal es un modelo de VIDEO, no de imagen**. Los Flux de imagen son otros slugs
+(`fal-ai/flux-2-pro`, `flux-2-max`, `flux-2-flex`, FLUX.1) y no están en el registro. Slugs bajo
+`blackforestlabs/flux-3/`, **SIN** prefijo `fal-ai/`. Los 12 endpoints quedaron **verificados con corridas reales
+el 2026-09-16**.
+
+| id CLI | Slug (tras `blackforestlabs/flux-3/`) | Qué hace | Contrato | Precio fal (USD) | Estado |
+|---|---|---|---|---|---|
+| `flux3-t2v` | `text-to-video` | texto a video | duración `auto` o 5–20 · 720p/1080p · aspect | 0,085 / s | ✅ 2026-09-16 |
+| `flux3-t2v-draft` | `text-to-video/draft` | borrador + `draft_cache` | duración `auto` o 5–20 · sin resolución · aspect | 0,03 / s | ✅ 2026-09-16 |
+| `flux3-i2v` | `image-to-video` | imagen a video | `--image` · como t2v | 0,085 / s | ✅ 2026-09-16 |
+| `flux3-i2v-draft` | `image-to-video/draft` | borrador | `--image` · sin resolución | 0,03 / s | ✅ 2026-09-16 |
+| `flux3-flf` | `first-last-frame-to-video` | primer y último cuadro a video | `--image` + `--end-image` obligatorios · 5–20 **sin** `auto` (default 5) · 720p/1080p | 0,085 / s | ✅ 2026-09-16 |
+| `flux3-flf-draft` | `first-last-frame-to-video/draft` | borrador | como flf, sin resolución | 0,03 / s | ✅ 2026-09-16 |
+| `flux3-keyframes` | `keyframes-to-video` | keyframes a video | 1–10 `--keyframe <img>@<frame_index>` · 5–20 **sin** `auto` · 720p/1080p · no acepta `--image` | 0,085 / s | ✅ 2026-09-16 |
+| `flux3-keyframes-draft` | `keyframes-to-video/draft` | borrador | como keyframes, sin resolución | 0,03 / s | ✅ 2026-09-16 |
+| `flux3-edit` | `edit-video` | «Flux 3 FAST Edit»: re-renderiza un video por prompt conservando movimiento, timing y encuadre | `--video` · sin duración, resolución ni aspect | 0,03 / s | ✅ 2026-09-16 |
+| `flux3-extend` | `extend-video` | continúa un video | `--video` con **pista de audio** · duración `auto` o 5–20 · 720p/1080p | 0,205 / s | ✅ 2026-09-16 |
+| `flux3-extend-draft` | `extend-video/draft` | borrador de la continuación | como extend, sin resolución | 0,06 / s | ✅ 2026-09-16 |
+| `flux3-enhance` | `draft-enhance` | convierte un draft en versión final | `--draft-cache` obligatorio · sin duración, resolución ni aspect | 0,085 / s | ✅ 2026-09-16 |
+
+Precios consultados en la API de pricing de fal el 2026-09-16; son volátiles.
+
+**Contrato común:**
+
+- **Duración:** `auto` o entero 5–20 s en t2v, i2v, extend y sus drafts. First-last-frame y keyframes: entero 5–20
+  **sin** `auto` (default 5). Edit y enhance **no** aceptan duración: heredan la del origen.
+- **Resolución:** `720p|1080p` (default `720p`) sólo en los endpoints finales (t2v, i2v, flf, keyframes, extend).
+  Drafts, edit y enhance **no** aceptan `--resolution`.
+- **Aspect:** `auto, 21:9, 2:1, 16:9, 4:3, 1:1, 3:4, 9:16` (default `auto`). Edit y enhance no lo aceptan.
+- **Audio:** `generate_audio` default `true` (`--no-audio` lo apaga); sin `bitrate_mode`.
+- **`safety_tolerance`:** 0–4 (default 2), por `--safety-tolerance`.
+- **Keyframes:** `--keyframe <imagen>@<frame_index>` repetible, de 1 a 10; `frame_index` entero ≥ 0 (probado con
+  `@0` y `@96` en un clip de 5 s a 24 fps).
+- **Edit / extend:** el origen va por `--video` (MP4, < 50 MB, < 15 s según el OpenAPI); no aceptan `--image`.
+
+**Flujo draft → enhance:** cada draft devuelve `draft_cache` (un `.bin` de ~2 KB con URL). El CLI lo imprime junto
+al comando listo: `pnpm ai:fal --capability flux3-enhance --draft-cache "<url>" --out <ruta>`. `--draft-cache` sólo
+lo acepta `flux3-enhance`, que lo exige. Medido: el draft sale 1280×704 y enhance entregó 1920×1088 conservando la
+escena del draft.
+
+**Hallazgos de extend (aislados con corridas reales):**
+
+1. **Exige pista de audio en el video de origen.** Con un origen sin audio (generado con `--no-audio`) fal acepta
+   el trabajo en cola y después lo rechaza con un 422 genérico `Invalid request parameters`, con duración 5, 10 o
+   `auto`. Con un origen con audio funcionó (`auto` y 5). El CLI revisa con `ffprobe` los archivos locales (en
+   `flux3-extend` y `flux3-extend-draft`) y corta antes de subir; con URL remota o sin `ffprobe` sólo avisa.
+2. **Entrega sólo la continuación**, no el clip original más la extensión: la salida arranca en el último cuadro
+   del origen. `--duration` son los segundos nuevos (5 → salida de 5 s; `auto` → 15 s). Origen y continuación se
+   unen en post (NLE o ffmpeg).
+
+**Evidencia de verificación:** finales y drafts salieron 1280×704 (720p), 24 fps, 5,04 s; enhance 1920×1088
+(1080p). Con audio salvo cuando el origen o el pedido eran sin audio. Latencias de 40 s a 4 min (bastante más lento
+que H3). Costo aproximado ≈ USD 5, estimado por precio unitario e incluyendo extensiones de 15 y 5 s; no está
+confirmado si los intentos fallidos de extend se cobran.
+
 ### Modelo de pricing (resumen)
 
 Fal.ai cobra **por uso**, con la unidad según la modalidad (siempre confirmar en la página del modelo):
@@ -245,6 +349,7 @@ Fal.ai cobra **por uso**, con la unidad según la modalidad (siempre confirmar e
 | FLUX | FLUX1.1 [pro] | `fal-ai/flux-pro/v1.1` ✅ | |
 | FLUX | FLUX1.1 [pro] ultra | `fal-ai/flux-pro/v1.1-ultra` ✅ | alta resolución |
 | FLUX | FLUX LoRA | `fal-ai/flux-lora` ✅ | inferencia con LoRA custom |
+| FLUX | Flux 3 | — | **no es imagen en fal**: `blackforestlabs/flux-3/*` es video (ver §Flux 3 y §5–7) |
 | Nano Banana (Google) | Nano Banana 2 | `fal-ai/nano-banana-2` ✅ | |
 | Nano Banana | Nano Banana Pro | `fal-ai/nano-banana-pro` ✅ | |
 | Nano Banana | Nano Banana | `fal-ai/nano-banana` ✅ | |
@@ -312,7 +417,8 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 
 | Familia | Slug | Nota |
 |---|---|---|
-| Seedance 2.5 (ByteDance) | `bytedance/seedance-2.5/text-to-video` ✅ | hasta 30 s, techo 1080p; `pnpm ai:fal --capability seedance25-t2v` |
+| Seedance 2.5 (ByteDance) | `bytedance/seedance-2.5/text-to-video` ✅ | 4–30 s, techo 1080p; `pnpm ai:fal --capability seedance25-t2v` |
+| Flux 3 (Black Forest Labs) | `blackforestlabs/flux-3/text-to-video` · `/draft` ✅ | **SIN** prefijo; 5–20 s, 720p/1080p; draft barato + `flux3-enhance`; ver §Flux 3 |
 | Seedance 2.0 (ByteDance) | `bytedance/seedance-2.0/text-to-video` · `/fast/...` · `/mini/...` · `/us/...` ✅ | audio nativo, camera control; base hasta 15 s y única con 4K, fast/mini/us techo 720p |
 | Seedance 1.0 / 1.5 Pro | `fal-ai/bytedance/seedance/v1/pro/...` · `fal-ai/bytedance/seedance/v1.5/pro/...` 🔎 | generación previa; **CON** prefijo |
 | Google Veo 3 | `fal-ai/veo3` · `fal-ai/veo3/fast` 🔎 | ~$0.20–0.40/s (std), ~$0.10–0.15/s (fast); 1080p |
@@ -335,7 +441,8 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 | Familia | Slug | Nota |
 |---|---|---|
 | Seedance 2.5 | `bytedance/seedance-2.5/image-to-video` · `/reference-to-video` ✅ | i2v admite `end_image_url`; r2v admite audio/video de referencia y `task` |
-| Seedance 2.0 | `bytedance/seedance-2.0/image-to-video` · `/mini/...` · `/fast/...` · `/us/...` · `/reference-to-video` ✅ | reference-to-video fija personaje/producto |
+| Seedance 2.0 | `bytedance/seedance-2.0/image-to-video` · `/mini/...` · `/fast/...` · `/us/...` · `/reference-to-video` ✅ | reference-to-video fija personaje/producto; el video de referencia sólo guía |
+| Flux 3 | `blackforestlabs/flux-3/image-to-video` · `/first-last-frame-to-video` · `/keyframes-to-video` (+ `/draft`) ✅ | imagen, primer y último cuadro, o 1–10 keyframes con índice de cuadro; ver §Flux 3 |
 | Minimax H3 / Max / Max Turbo | `minimax/h3*/image-to-video` · `/reference-to-video` · `minimax/h3-max/camera-controls` ✅ | i2v con `end_image_url` y sin aspect; r2v hasta 9 imágenes, 3 videos, 3 audios; camera-controls con trayectoria |
 | Kling v3 Pro / Standard | `fal-ai/kling-video/v3/pro/image-to-video` · `/standard/...` ✅ | audio nativo |
 | Kling 2.5 Turbo Pro | `fal-ai/kling-video/v2.5-turbo/pro/image-to-video` ✅ | |
@@ -354,6 +461,8 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 | Tarea | Modelo / Slug | Nota |
 |---|---|---|
 | Editar / extender | Grok Imagine `xai/grok-imagine-video/edit-video` · `/extend-video` ✅ | |
+| Editar / extender (registrado) | Flux 3 `blackforestlabs/flux-3/edit-video` · `/extend-video` (+ `/draft`) ✅ | verificado en real; extend exige audio en el origen y entrega sólo la continuación; ver §Flux 3 |
+| Editar / extender (registrado) | Seedance 2.5 `bytedance/seedance-2.5/reference-to-video` con `task` `editing`/`extension` ✅ slug | sin corrida real; no existe endpoint `video-to-video` de Seedance; ver §Seedance video a video |
 | Render→real / restore | LTX 2.3 Quality: `render-to-real`, `deblur`, `colorization`, `day-to-night`, `decompression`, `water-simulation`, `instant-shave`, `cross-eyed` ✅ | familia de transforms LTX |
 | Upscale de video | `fal-ai/seedvr/upscale/video` 🔎 · Topaz-style upscalers 🔎 | |
 | Lipsync | `fal-ai/sync-lipsync` · `fal-ai/latentsync` · `fal-ai/musetalk` 🔎 | sincronía labial voz↔video |

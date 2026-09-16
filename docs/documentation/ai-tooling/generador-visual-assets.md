@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-09-16 por Claude — Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
+> **Ultima actualizacion:** 2026-09-16 por Claude — Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 # Generador Visual de Assets con IA
@@ -141,7 +141,7 @@ claro** y no genera. Es preferible una falla visible a una imagen silenciosament
 
 ## Acceso a Fal.ai (imagen, video y audio por IA) — desde 2026-07-06
 
-Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recraft (vectores), Greenhouse tiene acceso a **Fal.ai**, un agregador que permite generar **imagen, video y audio** con muchos modelos a traves de una sola API (por ejemplo Seedance y Kling para video; Seedream y flux para imagen). Los modelos de Google (Gemini, Veo, Omni) no se usan a través de Fal: se conectan directo con Google.
+Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recraft (vectores), Greenhouse tiene acceso a **Fal.ai**, un agregador que permite generar **imagen, video y audio** con muchos modelos a traves de una sola API (por ejemplo Seedance, Kling y Flux 3 para video; Seedream y los Flux anteriores para imagen). Los modelos de Google (Gemini, Veo, Omni) no se usan a través de Fal: se conectan directo con Google.
 
 - **Para que sirve:** producir contenido media de mayor variedad (sobre todo **video**) que los motores de imagen actuales no cubren, para piezas de marketing, campanas y exploracion visual.
 - **Como se usa:** con el comando de terminal `pnpm ai:fal` (ver la sección siguiente) o de forma programatica, con un cliente interno unico. El contenido se genera fuera del portal y se **sube** por el flujo normal de assets — no se genera en tiempo real para los usuarios del producto.
@@ -153,7 +153,7 @@ Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recra
 ## El comando `pnpm ai:fal`: imágenes, capas y video (desde 2026-09-16)
 
 Es un comando de terminal que el equipo o el agente usa para trabajar con tres familias de modelos a través de
-Fal: Seedream, Seedance y Minimax H3. Convive con `pnpm ai:image`: no lo reemplaza. `ai:image` sigue siendo el camino para GPT Image; `ai:fal`
+Fal: Seedream, Seedance, Minimax H3 y Flux 3. Convive con `pnpm ai:image`: no lo reemplaza. `ai:image` sigue siendo el camino para GPT Image; `ai:fal`
 es el camino para los modelos que viven en Fal.
 
 ### Qué permite hacer
@@ -166,6 +166,9 @@ es el camino para los modelos que viven en Fal.
 | Crear un video desde un texto, una imagen o referencias | **Seedance 2.5** o **Seedance 2.0** | Un video corto |
 | Crear un video rápido y barato, o mover la cámara sobre una escena | **Minimax H3** (base, Max y Max Turbo) | Un video corto, con sonido |
 | Entrenar un estilo o personaje propio para video | **Minimax H3 trainer** | Un archivo LoRA reutilizable |
+| Probar una idea de video barato y después pasarla a versión final | **Flux 3** (borrador + mejora) | Un borrador y, si gusta, su versión final |
+| Video entre un primer y un último cuadro, o pasando por varios cuadros clave | **Flux 3** | Un video corto |
+| Cambiar el aspecto de un video que ya existe, o alargarlo | **Flux 3 edit / extend** (o Seedance 2.5, sin probar) | El video editado, o sólo el tramo nuevo |
 
 ### La separación por capas, en simple
 
@@ -212,6 +215,46 @@ Si se pide algo que el modelo elegido no hace (por ejemplo 4K a la 2.5, o 30 seg
 - **Lo que no se puede usar:** el modo **Director** de H3 Max (video en vivo guiado en tiempo real) no funciona
   con este comando; el comando lo explica y se detiene.
 
+### Qué agrega Flux 3 (desde 2026-09-16)
+
+Aunque el nombre recuerde a los Flux de imagen, **Flux 3 en Fal es un modelo de video**.
+
+- **Borrador barato y mejora.** Cada modo tiene una versión **borrador** que cuesta cerca de un tercio (USD 0,03
+  por segundo contra 0,085). Si el borrador gusta, se **mejora** a versión final sin volver a describir la escena:
+  el comando muestra el paso siguiente listo para copiar. En la prueba, la mejora entregó el mismo plano en 1080p.
+- **Desde texto o desde una imagen**, de 5 a 20 segundos, en 720p o 1080p.
+- **Primer y último cuadro.** Se entregan la imagen de inicio y la de término, y el video resuelve el paso entre
+  ambas.
+- **Cuadros clave (keyframes).** Se entregan de 1 a 10 imágenes y se indica en qué cuadro del video debe aparecer
+  cada una.
+- **Editar un video existente.** Vuelve a dibujar un clip según una instrucción (otro estilo, otra luz, otro
+  material) conservando el movimiento, el ritmo y el encuadre originales. Es la opción más barata de Flux 3.
+- **Extender un video.** Continúa un clip desde su último cuadro. Dos cosas importantes:
+  - el video de origen **tiene que traer sonido**; sin pista de audio Fal lo rechaza (el comando lo revisa antes
+    de subir cuando el archivo es local);
+  - entrega **sólo el tramo nuevo**, no el clip completo: hay que unir original y continuación en edición.
+- **Con sonido** por defecto (se puede apagar).
+- **Más lento que H3:** en las pruebas tardó entre 40 segundos y 4 minutos por video.
+
+### Video a video: editar o alargar un clip que ya existe
+
+Hay dos caminos, y hoy sólo uno está probado:
+
+| Quiero | Flux 3 (probado) | Seedance 2.5 (sin probar) |
+|---|---|---|
+| Cambiar el aspecto de un clip | **Flux 3 edit**: conserva movimiento y encuadre | Seedance 2.5 desde referencias, en modo **edición** |
+| Alargar un clip | **Flux 3 extend**: exige sonido en el original y entrega sólo lo nuevo | Seedance 2.5 desde referencias, en modo **extensión** (hasta 30 segundos) |
+
+Sobre Seedance, lo que conviene saber:
+
+- Fal **no tiene** un "video a video" de Seedance aparte: se hace desde la opción **desde referencias**.
+- Sólo **Seedance 2.5** puede editar o extender. En **Seedance 2.0** el video de referencia sólo **inspira** el
+  resultado; no lo edita ni lo alarga.
+- Siempre hace falta al menos **una imagen o un video** de referencia; un audio solo no alcanza.
+- Los videos de Seedance duran **como mínimo 4 segundos**.
+- Estas reglas salen de la documentación técnica del proveedor; todavía **no se probó** una edición ni una
+  extensión real con Seedance 2.5.
+
 ### Qué está probado y qué no
 
 - Las cinco opciones de **Seedream 5** están probadas con generaciones reales (2026-09-16).
@@ -221,7 +264,10 @@ Si se pide algo que el modelo elegido no hace (por ejemplo 4K a la 2.5, o 30 seg
 - De **Minimax H3** están probadas 9 opciones: desde texto, desde imagen y desde referencias en H3 base y Max,
   control de cámara, y Max Turbo desde texto y desde imagen. En referencias sólo se probó con imágenes (no con
   videos ni audios). **Sin probar:** las tres variantes con LoRA y los cuatro entrenadores.
-- Flux 3 **no** está conectado todavía.
+- De **Flux 3** están probadas **las 12 opciones** (2026-09-16): desde texto, desde imagen, primer y último cuadro,
+  keyframes, sus borradores, la mejora de borradores, editar y extender.
+- La edición y la extensión con **Seedance 2.5** están conectadas pero **sin probar**.
+- En total: 49 opciones conectadas, 29 probadas con generaciones reales.
 - `pnpm ai:fal --list` muestra este estado en cualquier momento, y no cuesta nada.
 
 ### Lo que conviene saber
@@ -232,7 +278,7 @@ Si se pide algo que el modelo elegido no hace (por ejemplo 4K a la 2.5, o 30 seg
 - Es producción **fuera del portal**: nada de esto se genera en tiempo real para los usuarios.
 - Gemini Omni (video de Google) **no** se usa por aquí; se conectará directo con Google.
 
-> Detalle tecnico: [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo (registro de capacidades, contratos de video, subida de archivos) y el manual [Operar el CLI de fal (Seedream, Seedance y Minimax H3)](../../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md). Código: `scripts/ai/fal-image.ts`, `src/lib/ai/fal-capabilities.ts`, `src/lib/ai/fal.ts`.
+> Detalle tecnico: [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo (registro de capacidades, contratos de video, subida de archivos) y el manual [Operar el CLI de fal (Seedream, Seedance, Minimax H3 y Flux 3)](../../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md). Código: `scripts/ai/fal-image.ts`, `src/lib/ai/fal-capabilities.ts`, `src/lib/ai/fal.ts`.
 
 ## Produccion de campañas con varias manos de IA
 

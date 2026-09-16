@@ -46,7 +46,7 @@ Guía de arquitectura y compras, no tarifario. Verificar endpoint, región, cuot
 | Recraft v4 | Recraft directo o Fal | Paridad pública en los endpoints comparados; directo si pesa el control contractual. |
 | GPT Image 2 | OpenAI directo | Ruta canónica; Fal sólo para pruebas o gateway explícitamente justificado. |
 | Nano Banana / Gemini | Google AI Studio o Vertex directo | Google nativo nunca por Fal; separar API, Batch, región y cuotas. |
-| FLUX 3 | Early access autorizado únicamente | Anunciado por BFL el 2026-07-23; al corte no hay API pública general ni precio público de producción. No usar Fal. |
+| Flux 3 | Fal (`pnpm ai:fal`, out-of-band) | Anunciado por BFL el 2026-07-23. En Fal es un modelo de **video** (no de imagen): 12 endpoints `blackforestlabs/flux-3/*` conectados y verificados en real 2026-09-16 (catálogo y OpenAPI de fal + API de pricing + corridas reales): finales 0,085 USD/s · drafts 0,03/s · edit 0,03/s · extend 0,205/s. Ruta directa BFL sin evaluar. |
 
 **Regla:** `prototype` → Fal si reduce tiempo; `production-scale` → directo cuando hay ahorro, SLA o control de
 datos; `fallback` → Fal sólo con slug/schema verificados y salida normalizada. Registrar fecha, resolución,
@@ -140,7 +140,7 @@ duración, reintentos y costo efectivo por output.
 | **Kling 3 Pro/4K** (Fal) | start/end, elements, multi-shot y 4K | límites de audio/idioma y concurrencia | especialista premium/4K |
 | **PixVerse V6** (Fal) | 1080p, audio, cámara y costo de volumen | límites por resolución/duración | scale social/motion |
 | **Gemini Omni Flash** (Google Vertex) | reference/video edit + audio | preview, 720p, máx. 10 s | canary con fallback; nunca Fal |
-| **FLUX 3** (Black Forest Labs) | imagen + video + audio en un modelo multimodal; hasta 20 s según anuncio | early access; sin API pública/precio general al corte | exploración estratégica únicamente |
+| **Flux 3** (Black Forest Labs, Fal) | video con audio: T2V/I2V, primer-último cuadro, keyframes, edit que conserva movimiento, extend, draft barato → enhance; 5–20 s, 720p/1080p | en Fal no genera imágenes; más lento que H3; `extend` exige audio en el origen y entrega sólo la continuación | explorar movimiento en draft, fijar trayectoria con cuadros, video a video verificado; detalle en `motion-design-studio` |
 | ~~**Sora 2** (OpenAI)~~ | físico/consistencia | **DEPRECADO**: API deprecada 2026-03-24, shutdown 2026-09-24 | **NO** usar para proyectos nuevos |
 
 > **Herramientas conectadas por MCP/skill:** `greenhouse-ai-image-generator` (assets UI Greenhouse, helper canónico), `higgsfield-*` (video/imagen/audio/avatares), Adobe Firefly (MCP Adobe), Magnific (upscale/enhance), Figma (design system/handoff). Detalle en `efeonce/STUDIO_TOOLING.md`.
@@ -154,5 +154,5 @@ duración, reintentos y costo efectivo por output.
   GPT Image 2**; **divergencia de campaña → Seedream 5 Lite**; **material/color/región semántica →
   Seedream 5 Pro**; **secuencia híbrida → módulo 12 + anchor/handoff**; **Photoshop/Firefly → workbench watch tras rights review**; **video con control por referencias → Seedance**;
   **broadcast/cine → Veo**; **económico simple → Kling**; **edición conversacional → Gemini Omni**;
-  **multimodal experimental imagen+video+audio → FLUX 3 sólo con acceso explícito**.
+  **draft barato de video → enhance, trayectoria por cuadros o video a video → Flux 3 (Fal; en Fal es video, no imagen)**.
 - Sora 2 deprecado (shutdown 2026-09-24) — no basar nada nuevo en él.

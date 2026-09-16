@@ -3,7 +3,7 @@
 > **Tipo:** operating guide para agentes
 > **Estado:** Accepted
 > **Creado:** 2026-06-01
-> **Ultima actualizacion:** 2026-09-16 por Claude (Minimax H3 en `pnpm ai:fal`, retome por `--request-id`, brecha de `--task` cerrada; antes, CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
+> **Ultima actualizacion:** 2026-09-16 por Claude (Flux 3 en `pnpm ai:fal` —video, no imagen— y contrato real de Seedance video a video; antes, Minimax H3 en `pnpm ai:fal`, retome por `--request-id`, brecha de `--task` cerrada; antes, CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
 > **Fuentes externas verificadas:** OpenAI developer docs 2026-08-21 y fichas oficiales Fal.ai 2026-07-18
 
 ## Purpose
@@ -150,7 +150,9 @@ snapshots de modelo rotan sin aviso.
 | SVG animado simple | `generateAnimation()` | Gemini via helper, no JavaScript, reduced-motion |
 | Separar una pieza plana en capas editables | `pnpm ai:fal --capability seedream5-pro-layerize` | Una imagen, sin prompt; devuelve base + hasta 16 capas PNG con alfa real + `layers.json` (nombre, z_index, bounding box) |
 | Divergencia o materialidad Seedream 5 | `pnpm ai:fal --capability seedream5-lite` / `seedream5-pro` (+ `-edit`) | Out-of-band; no hay `usage` por corrida, consultar pricing vigente del proveedor |
-| Video desde texto, imagen o referencias | `pnpm ai:fal --capability seedance25-*` / `seedance20-*` | 2.5 hasta 30 s y 1080p; 2.0 base hasta 15 s y única con 4K; el CLI valida límites antes de encolar |
+| Video desde texto, imagen o referencias | `pnpm ai:fal --capability seedance25-*` / `seedance20-*` | 2.5 de 4 a 30 s y 1080p; 2.0 base de 4 a 15 s y única con 4K; r2v exige imagen o video de referencia; el CLI valida límites antes de encolar |
+| Video desde primer/último cuadro o keyframes, borrador barato → final | `pnpm ai:fal --capability flux3-*` | Flux 3 es **video** en fal (no imagen); 12 endpoints verificados; draft USD 0,03/s → `flux3-enhance --draft-cache` |
+| Editar o extender un video existente | `flux3-edit` / `flux3-extend` (verificados) · `seedance25-r2v --task editing\|extension` (sin verificar) | Flux 3 extend exige audio en el origen y entrega sólo la continuación; en Seedance 2.0 el video sólo guía |
 
 ## Prompt Anatomy
 
@@ -476,7 +478,8 @@ desde la terminal, o importar `./src/lib/ai/openai-image` cuando el flujo vive e
 
 ### Generate via fal CLI (`pnpm ai:fal`)
 
-CLI hermano de `pnpm ai:image` para Seedream 5 (imagen, edición y capas) y Seedance 2.5/2.0 (video). No lo
+CLI hermano de `pnpm ai:image` para Seedream 5 (imagen, edición y capas) y video con Seedance 2.5/2.0, Minimax H3 y
+Flux 3. No lo
 reemplaza: `ai:image` habla el contrato OpenAI y fal tiene un esquema de input por endpoint. Es out-of-band; el
 runtime de imagen del producto sigue en `src/lib/ai/image-generator.ts`. Manual paso a paso:
 `docs/manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md`.
@@ -514,6 +517,17 @@ Reglas operativas:
   `--training-data`/`--steps`/`--rank`/`--learning-rate`/`--trigger`. H3 exige duración entera 5–15 s, resolución
   en mayúsculas, sin `--aspect` en image-to-video y sin `--bitrate`/`--no-audio`. `h3max-director` no es operable
   por cola. Contrato y precios: catálogo fal §Minimax H3; comandos: manual `operar-cli-fal-seedream-seedance.md`.
+- **Delta 2026-09-16 — Flux 3 conectado** (`flux3-*`, 12 de 12 verificados en real; slugs
+  `blackforestlabs/flux-3/…` sin prefijo). En fal es un modelo de **video**; los Flux de imagen (`fal-ai/flux-2-*`)
+  no están en el registro. Flags propios: `--keyframe <imagen>@<frame_index>` (1–10), `--safety-tolerance 0-4` y
+  `--draft-cache <url>` (sólo `flux3-enhance`). Duración `auto` o 5–20 s (flf y keyframes sin `auto`; edit y enhance
+  sin duración); `--resolution 720p|1080p` sólo en finales; flf exige `--image` + `--end-image`; edit/extend reciben
+  `--video`. `flux3-extend` exige pista de audio en el origen (con `--no-audio` fal devuelve 422 tras encolar) y
+  entrega sólo la continuación. Contrato: catálogo fal §Flux 3; comandos: manual `operar-cli-fal-seedream-seedance.md`.
+- **Delta 2026-09-16 — Seedance video a video:** no hay endpoint video-to-video; vive en reference-to-video. Sólo
+  2.5 edita (`--task editing`, sin `--duration`/`--aspect`) o extiende (`--task extension`, sin `--aspect`), ambos con
+  `--video`; en 2.0 el video sólo guía. Duración mínima 4 s; al menos una imagen o video de referencia; topes de
+  referencias validados en local. `seedance25-r2v` sigue sin corrida real (leído del OpenAPI).
 - El CLI imprime el `request_id` al encolar. Ante `HTTP 408` el trabajo **sigue cobrando en fal**: retomarlo con
   `pnpm ai:fal --capability <id> --request-id <id>` (no reenvía ni vuelve a cobrar), nunca relanzarlo.
   Alcance de la verificación: el retome se probó en real sólo con `h3turbo-t2v`; Seedream y Seedance usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.
