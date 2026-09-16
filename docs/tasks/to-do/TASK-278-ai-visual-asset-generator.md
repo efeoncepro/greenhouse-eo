@@ -1,5 +1,19 @@
 # TASK-278 — AI Visual Asset Generator: imagenes + animaciones SVG on-demand
 
+
+## Delta 2026-09-16
+
+- **El provider `google-imagen` que esta task describe ya no existe** — cerrado por trabajo en `TASK-1851`.
+  `imagen-4.0-generate-001` fue retirado por Google (discontinuación Vertex 2026-06-30, shutdown de la Gemini
+  API 2026-08-17) y un probe propio del 2026-09-16 contra `efeonce-group` devolvió `404 NOT_FOUND`. El carril
+  se migró de provider: `ImageGenerationProvider` pasó de `'google-imagen'` a `'google-gemini-image'`, sobre
+  `gemini-3.1-flash-image` con `generateContent` (antes `generateImages`/predict). El default del helper pasó a
+  `openai-image`. Toda referencia de esta task a Imagen 3/4 describe un motor apagado.
+- **Registro vs realidad:** los entregables que esta task prometía existen en el repo (`generateImage`,
+  `generateAnimation`, `/api/internal/generate-image`, `/api/internal/generate-animation`), pero la task muestra
+  **0 de 11** criterios tildados. `TASK-1851` **no la cierra ni tilda sus criterios**: hacerlo sin recorrer su
+  evidencia sería inventar avance. Queda como candidata a cierre con evidencia, no a re-ejecución.
+
 ## Delta 2026-09-08
 
 **Lo que esta task promete ya existe en el repo, y el registro no lo refleja.** Verificado hoy:

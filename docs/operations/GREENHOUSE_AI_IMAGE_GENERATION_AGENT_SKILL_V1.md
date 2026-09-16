@@ -3,7 +3,7 @@
 > **Tipo:** operating guide para agentes
 > **Estado:** Accepted
 > **Creado:** 2026-06-01
-> **Ultima actualizacion:** 2026-08-21
+> **Ultima actualizacion:** 2026-09-16 (TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
 > **Fuentes externas verificadas:** OpenAI developer docs 2026-08-21 y fichas oficiales Fal.ai 2026-07-18
 
 ## Purpose
@@ -34,16 +34,31 @@ Facts operativos vigentes al 2026-06-01:
 - Responses API es la opcion preferida para iterar sobre una imagen, usar contexto conversacional, o forzar `action: "generate" | "edit" | "auto"`.
 - **Delta 2026-09-08 — la familia `gpt-image-2.5` (Sunburst y Flare) es la frontera del proveedor.** Trae los
   niveles de calidad `xhigh` y `max` (antes el techo era `high`), transparencia con soporte pleno y hasta 16
-  referencias por edit. **No** soporta Batch, **no** publica rate limits y su costo por imagen **no es
-  estimable**: OpenAI declara que la calculadora de GPT Image 2 no aplica a 2.5 y que la única fuente es `usage`
-  de la respuesta real. **NUNCA enviar `input_fidelity` a un modelo 2.5** — la guía lo excluye explícitamente.
+  referencias por edit. **No** soporta Batch, **no** publica rate limits y su costo por imagen **no se estima**:
+  OpenAI declara que la calculadora de GPT Image 2 no aplica a 2.5 y que la única fuente es `usage` de la
+  respuesta real. **NUNCA enviar `input_fidelity` a un modelo 2.5** — la guía lo excluye explícitamente.
   Contrato completo: `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
-- 🔴 **La familia 2.5 NO está transportada por el helper Greenhouse.** `OPENAI_IMAGE_MODEL=gpt-image-2.5-*` cae
-  en silencio a `gpt-image-2`; `pnpm ai:image --model gpt-image-2.5-*` sí manda el modelo pero degrada la
-  resolución y agrega `input_fidelity`. No usar ninguno de los dos caminos hasta que el helper se actualice.
-- `gpt-image-2` **no** quedó deprecado: sigue siendo el reemplazo recomendado en la tabla de deprecations, es el
-  único de la familia con Batch y con costo por imagen estimable antes de gastar, y hoy es lo único que el
-  helper Greenhouse transporta de verdad.
+- ✅ **Delta 2026-09-16 (TASK-1851) — el helper Greenhouse YA transporta la familia 2.5.** Queda superseded el
+  bloqueo anterior, que decía que 2.5 no se podía probar por ninguno de los dos caminos. Estado real:
+  `src/lib/ai/openai-image.ts` acepta `gpt-image-2.5-flare` y `gpt-image-2.5-sunburst` (más sus snapshots
+  `…-2026-09-08`), verificados contra `GET /v1/models`; `pnpm ai:image --model gpt-image-2.5-flare` resuelve la
+  grilla de tamaños moderna (16:9 → `2048x1152`) y **no** envía `input_fidelity`; `--quality` acepta `xhigh` y
+  `max`.
+- 🔴 **Las tres puertas de entrada del modelo fallan ruidosamente, no en silencio.** Un `--model` o un
+  `--quality` inválido aborta **antes de cualquier I/O**, con mensaje accionable; pedir `xhigh`/`max` a un modelo
+  anterior a 2.5 aborta al arrancar el CLI; y un `OPENAI_IMAGE_MODEL` desconocido en el entorno **lanza** en vez
+  de degradar callado a `gpt-image-2`. Degradar en silencio era el modo de falla que hacía pagar un modelo
+  creyendo que se usaba otro.
+- **`input_fidelity` sólo lo transportan `gpt-image-1.5`, `gpt-image-1` y `gpt-image-1-mini`.** En 2.5 la guía de
+  OpenAI lo excluye y el helper ya no lo envía; la identidad se pide **por prompt**.
+- `gpt-image-2` **no** quedó deprecado: sigue siendo el reemplazo recomendado en la tabla de deprecations y el
+  único de la familia con Batch, con costo por imagen estimable antes de gastar y con rate limits publicados.
+  Eso, y no una limitación del helper, es lo que hoy lo hace la elección correcta cuando el trabajo necesita
+  cualquiera de los tres. `organization-logo-generation.ts` lo fija a propósito.
+- **Delta 2026-09-16 — el provider `google-imagen` DEJÓ DE EXISTIR.** Se renombró a `google-gemini-image` y se
+  migró a `gemini-3.1-flash-image` vía `generateContent`, porque `imagen-4.0-generate-001` fue retirado (probe
+  propio 2026-09-16 contra `efeonce-group`: HTTP 404 `NOT_FOUND`). El `DEFAULT_IMAGE_PROVIDER` pasó a
+  `openai-image`: antes apuntaba a un modelo muerto. `generateAnimation()` y el carril SVG siguen intactos.
 - `gpt-image-1` se apaga el **2026-10-23**; `gpt-image-1.5`, `gpt-image-1-mini` y `chatgpt-image-latest` el
   **2026-12-01**. No rutear trabajo nuevo a ninguno.
 - `gpt-image-2` soporta `background: "transparent"` en preview con PNG o WebP. El helper local conserva la
@@ -64,16 +79,45 @@ Facts operativos vigentes al 2026-06-01:
 - Para edicion con mascara, la mascara guia al modelo pero no garantiza una geometria exacta pixel-perfect.
 - Las keys de API son secreto de servidor. Nunca escribir `sk-*` en codigo, docs, logs, tests, prompts commiteados ni env examples con valor real.
 
+## Costo de la familia 2.5 — medido, no estimado (2026-09-16)
+
+La medición existe: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/` (manifest por corrida, salida
+cruda, instrumento reproducible). Sustituye a la instrucción anterior de "no lo estimes, mídelo" **sólo** en el
+sentido de que ya hay una medición que citar — no en el de que exista una tarifa estable.
+
+A `1024x1024`, PNG, leyendo `usage` de respuestas reales:
+
+| Quality | Output tokens | USD derivado por imagen | Latencia flare | Latencia sunburst |
+|---|---|---|---|---|
+| `low` | 196 | 0,0063 | 13,3 s | 11,6 s |
+| `high` | 1 756 | 0,0531 | 18,7 s | 29,1 s |
+| `max` | 7 024 | 0,2111 | 46,0 s | 80,6 s |
+
+Para qué sirve: **decidir `quality` y modelo en `pnpm ai:image` y en el helper canónico**. Lo que cambia:
+
+- **El costo por imagen no depende de cuál de los dos modelos elijas.** Flare y Sunburst consumieron
+  exactamente los mismos tokens en los tres escalones. Presupuesta por `quality × size`, nunca por modelo.
+- **Lo que separa a los modelos es la latencia, y la brecha crece con la calidad**: en `max`, Sunburst tardó
+  1,75× lo de Flare. Elegir Sunburst se paga en tiempo, no en dinero.
+- **`background: transparent` no costó extra**: los mismos 1 756 tokens que `high` opaco.
+- La escalera es ~9× de `low` a `high` y ~4× de `high` a `max`. Una pieza en `max` cuesta lo mismo que 36
+  exploraciones en `low`.
+
+🔴 **Esto es evidencia fechada, no una tarifa.** USD derivado con las tarifas vigentes al 2026-09-16 (input
+texto USD 8,00 / 1M; output imagen USD 30,00 / 1M). **Sigue vigente la regla:** ninguna cifra de costo de 2.5
+entra a una propuesta ni a un pricing sin volver a medir — precios, escalones y
+snapshots de modelo rotan sin aviso.
+
 ## Greenhouse Decision Matrix
 
 | Necesidad | Carril canonico | Opciones |
 |---|---|---|
-| Edicion de precision o pieza final de campana (fuera de banda) | `gpt-image-2.5-sunburst` por Image API | OpenAI lo posiciona para "workflows where editing precision matters most"; el helper aun no lo transporta |
-| Generacion cotidiana / volumen / social (fuera de banda) | `gpt-image-2.5-flare` por Image API | "default choice for most applications"; el helper aun no lo transporta |
+| Edicion de precision o pieza final de campana | `gpt-image-2.5-sunburst` | OpenAI lo posiciona para "workflows where editing precision matters most". Transportado por el helper y por `pnpm ai:image --model gpt-image-2.5-sunburst` desde TASK-1851. Cuesta lo mismo que Flare; se paga en latencia (ver linea base) |
+| Generacion cotidiana / volumen / social | `gpt-image-2.5-flare` | "default choice for most applications". Transportado por el helper y por `pnpm ai:image --model gpt-image-2.5-flare` desde TASK-1851 |
 | Batch, presupuesto por imagen estimable, o rate limits conocidos | `gpt-image-2` | 2.5 no tiene Batch, ni calculadora de costo, ni rate limits publicados |
 | Icono raster, sticker, elemento UI aislado | GPT Image 2 por Image API | `format: "png"`, `background: "transparent"`, `quality: "high"`; el helper conserva GPT Image 2 y falla cerrado para JPEG |
 | Lote de PNG transparentes | GPT Image 2 por Image API | Usar nombres deterministas, validar alfa real y controlar costo con lotes pequeños |
-| Banner, hero, thumbnail, empty state ilustrado | `generateImage()` | OpenAI para fidelidad/composicion, Imagen para continuidad con assets existentes |
+| Banner, hero, thumbnail, empty state ilustrado | `generateImage()` | `openai-image` (default) para fidelidad/composicion; `google-gemini-image` para continuidad con assets ya generados por ese carril. El provider `google-imagen` ya no existe |
 | Edicion de imagen existente | `editOpenAIImage()` | Referencias/mask server-only, maximo del helper vigente |
 | Iteracion multi-turn sobre una imagen | `runOpenAIImageTool()` | Mantener `responseId` o `imageGenerationCallId`; ideal para refinar direccion visual |
 | Concept art no versionable en chat | Tool nativo de imagen del entorno, si existe | Usarlo solo como exploracion; pasar el asset final por repo si se va a servir |
@@ -483,6 +527,13 @@ Canon y evidencia:
 - Do not include real people, clients, employee likenesses, or sensitive work data in prompts unless the task has explicit authorization and a safe data path.
 - Do not paste secrets into prompts or generated asset metadata.
 - Do not use generated images as source of truth for legal, finance, payroll, identity, medical, or compliance content.
+- **Las rutas internas de generación están gateadas en producción por `ENABLE_ASSET_GENERATOR`.**
+  `POST /api/internal/generate-image` y `/api/internal/generate-animation` responden **403** en producción salvo
+  que el flag valga `true`; hoy está **ausente en todos los environments de Vercel** (verificado 2026-09-16), y
+  ése es su estado diseñado, no un rollout pendiente. El guard sólo actúa con `NODE_ENV === 'production'`, así
+  que en local y en Preview esas rutas responden sin el flag. Se lee **sólo en Vercel** — ningún Cloud Run la
+  declara. La generación versionable de assets **no** depende de ese flag: pasa por `pnpm ai:image` y
+  `src/lib/ai/image-generator.ts`. Fila y runbook: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 - If generation is blocked by safety filters, reframe the request to a safe visual alternative and report the limitation.
 
 ## Closure Report

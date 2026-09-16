@@ -7,6 +7,24 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — GPT Image 2.5 transportado, y el carril Google migrado porque su modelo estaba apagado
+
+`src/lib/ai/` ya reconoce `gpt-image-2.5-flare` y `gpt-image-2.5-sunburst` con su contrato correcto
+(`xhigh`/`max`, grilla de tamaños moderna, sin `input_fidelity`). El contrato se decide por **capacidad
+declarada** y no por literales de modelo, así que agregar uno nuevo sin declarar sus capacidades ya no
+compila — la degradación silenciosa deja de ser posible por olvido. Cinco puertas que antes elegían otro
+motor sin avisar ahora fallan ruidoso, incluida la ruta interna, que respondía con el default cuando recibía
+un campo inválido: pedir `quality: "max"` devolvía `medium`.
+
+El carril `google-imagen` no estaba bloqueado sino **apagado**: un probe propio devolvió `404 NOT_FOUND` para
+`imagen-4.0-generate-001`, retirado por Google, y era el **default** del helper. Se migró de provider —no de
+string— a `gemini-3.1-flash-image` sobre `generateContent`, y el default pasó a `openai-image`.
+
+Queda además la primera medición propia del costo de 2.5, que OpenAI no publica y declara no estimable:
+el consumo es **idéntico entre Flare y Sunburst** (196/1756/7024 tokens en `low`/`high`/`max`), así que el
+costo lo fija `quality × size` y no el modelo; lo que los separa es la latencia (`max`: 46,0 s vs 80,6 s).
+Evidencia fechada, no tarifa: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`.
+
 ## 2026-09-16 — Skill viva `efeonce-insights` para Claude y Codex, con contrato de mantenimiento
 
 La skill pasa de un resumen a una memoria operativa del programa: `references/program-ledger.md` (qué construyó
@@ -1025,13 +1043,3 @@ El segundo: al agregar el permiso para administrar personas de una organización
 Quien invita a una persona externa ya no le pasa el enlace a mano: el sistema manda el correo en el mismo acto en que genera el token, la respuesta deja de traerlo salvo una revelación gobernada de una hora que queda auditada, y el ciclo de vida es observable (reenviar rota el token anterior, el rebote se registra, la caducidad se ve, tres señales nuevas). El administrador designado de una organización cliente pasa a tener autoridad real sobre su propia gente por una lane del ecosistema, mediada por el gateway y decidida siempre por Greenhouse, nunca por lo que diga la llamada. La página de consentimiento del autorizador ahora muestra a qué host va a volver la persona.
 
 Release `b3e324cb5c8d-3cfce865`, un solo intento. Ambos flags encendidos en producción con redeploy, y un canary contra la superficie real: la misma llamada pasó de responder «no existe» a pedir el binding y a negar por falta de autoridad. La federación de las dos herramientas nuevas quedó desplegada en el gateway, que subió a la versión 1.1.0.
-
-## 2026-09-06 — Efeonce ID: follow-ups de TASK-1837 cerrados y lane delegada federada en PR (gateway)
-
-Revocar un binding limpia y audita al administrador designado; el dominio `external-access` tiene boundary test
-de escrituras; el emisor declara el scope `efeonce.mcp.identity.write` (clase «administrar a las personas de mi
-organización», step-up); la lane delegada acepta `organizationId` y suma reenviar/revocar delegados (nunca a sí
-mismo; una persona ligada se revoca como miembro). En `efeonce-mcp` quedó abierto el PR #3 con las tools
-`identity.invitations.list` / `identity.invitation.create` (sólo issuer nativo, población externa). Tasks
-derivadas: TASK-1838 (consola del administrador del cliente) y TASK-1839 (convergencia con la invitación del
-portal). Producción sigue esperando el release.

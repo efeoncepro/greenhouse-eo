@@ -162,14 +162,13 @@ P01/P09 incluyen destinatarios/canales; TASK-1848/1849 distribución/experiencia
 preferencias. UI TASK-1854/1856: ocho docs detallados (dirección/wireframe/flow/motion), requisitos en 1853/1855; UI ready no, GVC pendiente.
 Primer email/in-app acompaña apertura cliente; Teamsbot por destino verificado. Reusar dueñas, sin otro Hub.
 
-**GPT Image 2.5 + contrato de proveedores de imagen (2026-09-08):** doc y skills al día; sólo documentación,
-cero código y cero llamadas al proveedor. El trabajo quedó en
-[`TASK-1851`](docs/tasks/to-do/TASK-1851-openai-image-provider-contract-consolidation.md), que supersede a
-`TASK-1850` (cerrada sin ejecutar) y suma el segundo defecto de la misma forma: `DEFAULT_IMAGE_PROVIDER`
-apunta a `imagen-4.0-generate-001`, declarado bloqueado. Bloqueador que decide el diseño: 2.5 no tiene
-calculadora de costo por imagen, así que la reserva previa de créditos de Globe no tiene fuente. `gpt-image-2`
-NO está deprecado. Detalle:
-[matriz](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
+**GPT Image 2.5 + contrato de imagen — TASK-1851 EJECUTADA (2026-09-16), NO cerrada.** El helper transporta la
+familia 2.5 y decide por **capacidad declarada**, no por literales. Cinco puertas dejaron de degradar en silencio.
+🔴 **El carril `google-imagen` estaba MUERTO, no "bloqueado"** (probe `404`) y era el default: migrado de
+**provider** a `gemini-3.1-flash-image`/`generateContent`, default → `openai-image`. Primera medición propia del
+costo de 2.5 (ver changelog).
+**Pendientes:** `build` de cierre; y los dos entregables de Globe, **sin hacer por instrucción del operador**
+(Globe hibernado). Todo en [`TASK-1851`](docs/tasks/in-progress/TASK-1851-openai-image-provider-contract-consolidation.md).
 
 **TASK-1844 COMPLETE (2026-09-08):** producción ON para una identidad; SQL aplicada y fixtures retiradas.
 Codex y Claude Code/hospedado/Desktop certificados, rollback probado (Claude Code exige login tras OFF).

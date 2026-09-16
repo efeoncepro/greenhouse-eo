@@ -61,7 +61,9 @@ For assets that will live in Greenhouse, use the canonical helper when possible:
 
 - `src/lib/ai/image-generator.ts`
 - output path: `public/images/generated/`
-- provider options: `google-imagen` or `openai-image`
+- provider options: `openai-image` (default) or `google-gemini-image`. 🔴 **`google-imagen` ya no existe**:
+  se renombró a `google-gemini-image` y se migró a `gemini-3.1-flash-image` el 2026-09-16 (TASK-1851),
+  porque `imagen-4.0-generate-001` fue retirado. El `DEFAULT_IMAGE_PROVIDER` pasó a `openai-image`.
 - transparent PNG: `format: 'png'`, `background: 'transparent'`
 
 Do not call image providers from parallel scripts if the helper covers the case.
@@ -98,10 +100,22 @@ lista de invariantes repetida en cada turno (patrón abajo).
 sólido, checkerboard y sombras; en cada edición, repetir "preserve the transparent background". Validar alfa
 decodificando bytes, nunca por metadata ni por ver un checkerboard.
 
-**Costo: no lo estimes, mídelo.** OpenAI declara verbatim que la calculadora de GPT Image 2 **no** estima el
-consumo de 2.5, y que tarifas iguales no implican costo por imagen igual. Antes de comprometer un presupuesto o
-créditos con un cliente, corre una pieza real y lee `usage` de la respuesta. Cualquier cifra de costo por imagen
-de 2.5 que venga de un blog **no entra a una propuesta**.
+**Costo: ya está medido (2026-09-16).** OpenAI declara verbatim que la calculadora de GPT Image 2 **no** estima
+el consumo de 2.5, así que la única fuente es `usage` de respuestas reales — y esa medición ya existe:
+`ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/` (manifest por corrida, salida cruda, instrumento
+reproducible). A `1024x1024`, output tokens **196** (`low`) / **1 756** (`high`) / **7 024** (`max`),
+**idénticos entre Flare y Sunburst** → USD **0,0063** / **0,0531** / **0,2111** por imagen con las tarifas
+vigentes al medir (input texto USD 8,00 / 1M; output imagen USD 30,00 / 1M).
+
+Para qué sirve: **decidir `quality` y modelo en `pnpm ai:image` y en el helper**. Tres cosas que cambia: **(1)** el costo por imagen **no depende del modelo** — presupuesta
+por `quality × size`, nunca por Flare vs Sunburst; **(2)** lo que separa a los modelos es la **latencia**, y la
+brecha crece con la calidad (en `max`, Flare 46,0 s vs Sunburst 80,6 s = 1,75×): elegir Sunburst se paga en
+tiempo, no en dinero; **(3)** `background: transparent` **no costó extra**. La escalera es ~9× de `low` a `high`
+y ~4× de `high` a `max`: una pieza en `max` cuesta lo mismo que 36 exploraciones en `low`.
+
+🔴 **Es evidencia fechada, no una tarifa estable.** La regla **sigue vigente**: ninguna cifra de costo de 2.5
+entra a una propuesta ni a un pricing sin volver a medir. Y cualquier cifra que
+venga de un blog **no entra** nunca.
 
 ### 🔴 Lo que 2.5 NO mejora — no lo prometas en un brief ni en una propuesta
 
@@ -166,31 +180,38 @@ assets repo-bound.
 - Disponible en todos los tiers, web/iOS/Android y Codex. **Los límites de generación por plan NO están
   publicados por OpenAI**; las cifras que circulan en blogs son rumor y no entran a una propuesta.
 
-## CLI: `pnpm ai:image` (gpt-image-2)
+## CLI: `pnpm ai:image` (familia GPT Image, 2.5 incluida)
 
 For terminal/operator-driven generation — `product-design-loop` concepts, mockup fixtures, icon/asset batches — use the canonical CLI instead of writing an ad-hoc `scripts/_gen-*.ts`:
 
 ```bash
-pnpm ai:image --prompt "<text>" [--out <path>] [--size 1024x1024|1536x1024|1024x1536|2048x...] \
-              [--quality low|medium|high|auto] [--background opaque|transparent] \
-              [--model gpt-image-2] [--count N] [--timeout 280000] [--open]
+pnpm ai:image --prompt "<text>" [--out <path>] [--size 1024x1024|1536x1024|1024x1536|2048x1152|WxH] \
+              [--quality low|medium|high|xhigh|max|auto] [--background opaque|transparent] \
+              [--model gpt-image-2|gpt-image-2.5-flare|gpt-image-2.5-sunburst] \
+              [--count N] [--timeout 280000] [--open]
 pnpm ai:image --prompt-file <path>          # long prompts
 pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": "…" }, …] — multiple
 ```
 
 - Wraps the canonical `generateOpenAIImage` (`src/lib/ai/openai-image.ts`). Self-contained: loads `.env.local`, resolves `OPENAI_API_KEY_SECRET_REF` server-side, never prints the secret.
-- 🔴 **El helper NO transporta todavía la familia 2.5, y falla en silencio de dos formas distintas**
-  (verificado leyendo `src/lib/ai/openai-image.ts` el 2026-09-08):
-  1. `OPENAI_IMAGE_MODEL=gpt-image-2.5-flare` **no pasa el allowlist** de `getOpenAIImageModel()`, que devuelve
-     el default `gpt-image-2` sin advertir. Crees generar con 2.5 y pagas GPT Image 2.
-  2. `pnpm ai:image --model gpt-image-2.5-flare` castea el valor **sin validarlo**: el modelo sí viaja al API,
-     pero `resolveOpenAIImageSize()` ramifica por `model === 'gpt-image-2'` y manda todo lo demás a la rama
-     legacy — el default por aspect ratio cae de `2048x1152` a `1536x1024` y un `--size` moderno se resuelve a
-     `auto`. Además `editOpenAIImage()` inyecta `input_fidelity`, que en 2.5 **no debe enviarse**.
-  **NUNCA** uses ninguno de los dos caminos para "probar 2.5": uno miente sobre el modelo y el otro degrada la
-  resolución y manda un parámetro fuera de contrato. Habilitarlo es un cambio de código con canary facturable
-  y readback de `usage` — no un flag. Detalle y checklist: §"Mapeo contra Greenhouse y Globe" de la matriz.
-- Defaults: `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` exceeds the 125s of the runtime `generateImage` helper).
+- ✅ **El helper YA transporta la familia 2.5** (delta 2026-09-16, TASK-1851). Queda **superseded** la
+  advertencia anterior de esta skill, que decía que 2.5 no se podía probar por ningún camino. Contrato real,
+  verificado en `src/lib/ai/openai-image.ts`:
+  1. `gpt-image-2.5-flare` y `gpt-image-2.5-sunburst` (más sus snapshots `…-2026-09-08`) están en el allowlist
+     canónico, verificados contra `GET /v1/models`.
+  2. `pnpm ai:image --model gpt-image-2.5-flare` resuelve la **grilla de tamaños moderna** (16:9 → `2048x1152`,
+     no `1536x1024`) y **no** envía `input_fidelity`.
+  3. `--quality` acepta `xhigh` y `max`, que existen **sólo** en 2.5.
+- 🔴 **Las tres puertas de entrada fallan RUIDOSAMENTE, y de eso depende que no pagues un modelo creyendo que
+  usas otro.** Un `--model` o un `--quality` inválido **aborta antes de cualquier I/O**; pedir `xhigh`/`max` a un
+  modelo anterior a 2.5 aborta al arrancar el CLI con mensaje accionable; y un `OPENAI_IMAGE_MODEL` desconocido
+  en el entorno **lanza** en vez de degradar callado a `gpt-image-2`. **NUNCA** reintroduzcas una degradación
+  silenciosa "por robustez": el modo de falla que esto cierra es facturable e invisible.
+- **`input_fidelity` sólo lo transportan `gpt-image-1.5`, `gpt-image-1` y `gpt-image-1-mini`.** En 2.5 la guía
+  de OpenAI lo excluye ("not Sunburst or Flare") y el helper ya no lo envía: la identidad se pide **por prompt**.
+- Defaults: `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated` — el default del
+  CLI **no** cambió con TASK-1851; 2.5 se pide explícito con `--model`. Timeout default **280s** (`high` excede
+  los 125s del helper runtime `generateImage`; `max` en 2.5 midió hasta ~81s, ver la línea base de costo).
 - OpenAI documents native `background: transparent` for `gpt-image-2` in **preview**, with PNG or WebP. The
   canonical helper/CLI preserves the requested GPT Image 2 identity, rejects transparent JPEG before network I/O
   and never falls back silently to deprecated `gpt-image-1.5`.
@@ -210,7 +231,8 @@ Canonical path to make **consistent variants** of an existing character/asset (n
 ```bash
 pnpm ai:image --image <ref.png> --prompt "keep this exact <subject>, change ONLY <delta>" --out <out.png>
 #   --image <path>        reference to edit (repeatable) → switches to editOpenAIImage (image-to-image)
-#   --input-fidelity high strict reference preservation (only models ≠ gpt-image-2)
+#   --input-fidelity high strict reference preservation — SÓLO gpt-image-1.5 / gpt-image-1 / gpt-image-1-mini.
+#                         En 2.5 no se envía (la guía lo excluye); la identidad se pide por prompt.
 pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (AI matting, soft edges)
 ```
 
@@ -296,11 +318,19 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
 - **OpenAI model targeting (delta 2026-09-08).** La frontera del proveedor es la familia **2.5**
   (`gpt-image-2.5-flare` por defecto, `gpt-image-2.5-sunburst` para precisión de edición). `gpt-image-2`
   **no** está deprecado y sigue siendo la elección correcta cuando necesitas Batch, costo por imagen estimable
-  antes de gastar, o rate limits publicados — y hoy es **lo único que el helper Greenhouse transporta de verdad**.
+  antes de gastar, o rate limits publicados: 2.5 no tiene ninguno de los tres. Desde 2026-09-16 el helper
+  transporta **ambas** familias, así que la elección ya es de necesidad, no de lo que el código soporta.
+  `organization-logo-generation.ts` fija `gpt-image-2` a propósito y no se toca sin decisión explícita.
   Nunca rutees trabajo nuevo a `gpt-image-1.5`, `gpt-image-1`, `gpt-image-1-mini` ni `chatgpt-image-latest`:
   todos deprecados, con apagado en octubre (`gpt-image-1`, **2026-10-23**) o diciembre 2026. Lee la matriz de
   capacidades antes de cambiar modelo, precios o constraints de salida.
-- Use `google-imagen` when matching existing Imagen-generated banners or when the current surface already uses that visual language.
+- 🔴 **`google-imagen` DEJÓ DE EXISTIR (2026-09-16, TASK-1851).** El provider se renombró a
+  `google-gemini-image` y se migró a `gemini-3.1-flash-image` vía `generateContent`, porque
+  `imagen-4.0-generate-001` fue retirado (probe propio contra `efeonce-group`: HTTP 404 `NOT_FOUND`). El
+  `DEFAULT_IMAGE_PROVIDER` pasó de `google-imagen` a **`openai-image`**: el default anterior apuntaba a un
+  modelo muerto. **NUNCA** rutees a `google-imagen` ni prometas "continuidad con banners de Imagen": ese carril
+  ya no genera. Usa `google-gemini-image` cuando la superficie ya use ese lenguaje visual.
+  `generateAnimation()` y el carril SVG siguen intactos.
 - Use Seedream 5 Lite out-of-band for inexpensive creative divergence and Seedream 5 Pro for
   material/color/atmosphere development or semantic regional edits; use `src/lib/ai/fal.ts`,
   never a parallel fal client or product runtime wiring.

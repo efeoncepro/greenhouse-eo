@@ -21,13 +21,48 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Slice 1 en curso — discovery cerrado, decisiones de operador tomadas 2026-09-16`
+- Status real: `Slices 1-5 ejecutados 2026-09-16. Code complete + evidencia de costo entregada. Dos entregables NO hechos por instrucción del operador (no tocar Globe, hibernado): ledger de flota y Delta en TASK-1553. Cierre documental bloqueado por un flag ajeno en el gate de flags.`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `TASK-1850`
 - GitHub Issue: `none`
+
+## Delta 2026-09-16 — ejecución
+
+Ejecutada en cinco slices sobre `develop`, local-first, sin push. Commits: `aeb55503c` (Slice 1),
+`acc0afd92` (2), `0e6505292` (3), `b1399e238` (4) y el de cierre documental.
+
+**Lo que se encontró y no estaba en la spec:**
+
+- El carril `google-imagen` no estaba "declarado bloqueado": estaba **muerto**. El probe propio del
+  2026-09-16 contra `efeonce-group` devolvió `404 NOT_FOUND` para `imagen-4.0-generate-001` (Google lo
+  discontinuó en Vertex el 2026-06-30 y apagó el endpoint de la Gemini API el 2026-08-17). Como era el
+  **default** del helper, toda llamada a `generateImage()` sin `provider` explícito fallaba.
+- Aparecieron **dos puertas silenciosas más** del mismo bug class, además de las tres que la spec
+  enumeraba: `GREENHOUSE_IMAGE_PROVIDER` con valor desconocido caía al default sin avisar, y la ruta
+  interna descartaba en silencio un campo presente pero inválido en **seis** campos — quien pedía
+  `quality: "max"` recibía `medium` y una imagen que parecía correcta. Ambas cerradas.
+- El riesgo "medium" del Slice 2 (romper un entorno que viva del fallback) **se disolvió con evidencia**:
+  los tres entornos Vercel traen `OPENAI_IMAGE_MODEL=gpt-image-2` (válido) y ninguno de los cinco Cloud Run
+  la define. Los tres traen además `GREENHOUSE_IMAGE_PROVIDER=openai-image`, lo que explica por qué nadie
+  sufría el carril muerto y por qué cambiar el default no movió ningún runtime.
+- El hallazgo de costo **invierte una expectativa**: el consumo es idéntico entre Flare y Sunburst
+  (196 / 1756 / 7024 tokens en `low`/`high`/`max`). El costo por imagen lo fija `quality × size`, **no** el
+  modelo; lo que los separa es la latencia (`max`: 46,0 s vs 80,6 s). Una política de reserva por modelo
+  reservaría de más o de menos sin razón.
+
+**Lo que NO se hizo, y por qué:**
+
+- **Nada de Globe.** El operador instruyó el 2026-09-16 no tocar Globe mientras esté hibernado. El ledger
+  de flota y el Delta de `TASK-1553` llegaron a escribirse y **se revirtieron antes de commitear**. Nunca
+  se tocó el repo `efeonce-globe`, ni runtime, ni se despertó nada, ni se corrió un canary de Globe.
+- **No hubo verificación productiva de la superficie Imagen**, y no se simula: las dos rutas internas
+  responden 403 en producción mientras `ENABLE_ASSET_GENERATOR` esté OFF, y esta task **no la prende**.
+  Lo que sí se ejercitó en local fue la validación (400 canónico, sin gasto) y la no-regresión de
+  `/api/internal/generate-animation` (201, SVG válido).
+- El canary se acotó a **7 piezas** (matriz reducida) por decisión explícita del operador sobre el tope.
 
 ## Summary
 
@@ -492,27 +527,27 @@ para un entorno mal configurado, un cambio de comportamiento. Por eso su mitigac
 
 ## Acceptance Criteria
 
-- [ ] `isOpenAIImageModel('gpt-image-2.5-flare')` y `isOpenAIImageModel('gpt-image-2.5-sunburst')` devuelven `true`.
-- [ ] `getOpenAIImageModel({ OPENAI_IMAGE_MODEL: 'modelo-inexistente' })` **lanza** en vez de devolver `gpt-image-2`.
-- [ ] `pnpm ai:image --model modelo-inexistente` aborta antes de cualquier I/O con mensaje que nombra el valor recibido y los válidos.
-- [ ] `pnpm ai:image --quality max --model gpt-image-2` aborta antes de la red, porque `max` no existe en ese modelo.
-- [ ] `resolveOpenAIImageSize({ model: 'gpt-image-2.5-flare', aspectRatio: '16:9' })` devuelve `2048x1152`, no `1536x1024`.
-- [ ] Un `editOpenAIImage` con un modelo 2.5 produce un `FormData` que **no** contiene la clave `input_fidelity`.
-- [ ] Un test fija que el body de un request `gpt-image-2` es idéntico al de antes de esta task.
-- [ ] Existe evidencia escrita de si el carril `google-imagen` responde hoy contra Vertex, con fecha.
-- [ ] `DEFAULT_IMAGE_PROVIDER` no apunta a ningún provider cuyo modelo esté declarado bloqueado en `GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
-- [ ] El carril `google-imagen` quedó migrado al provider Gemini Image `generateContent` **o** retirado del tipo y del código, con la razón escrita. No quedó en limbo.
-- [ ] Si se migró: la migración es de provider, no una sustitución del string `IMAGEN_MODEL`.
-- [ ] `POST /api/internal/generate-image` con `provider: 'openai-image'` explícito devuelve el mismo `provider` y `model` que antes de esta task.
-- [ ] `POST /api/internal/generate-animation` sigue respondiendo correctamente.
-- [ ] Existe `ai-generations/<fecha>_gpt-image-2-5-usage-baseline/manifest.json` con al menos una fila por combinación de la matriz declarada en el Slice 4, cada una con `usage` completo y el `quality`/`size` resueltos por el API.
-- [ ] La tabla de consumo publicada en la matriz de capacidades lleva fecha, snapshot de modelo y la advertencia de que es evidencia, no contrato.
-- [ ] La matriz de capacidades ya no describe las dos degradaciones silenciosas como estado vigente.
-- [ ] `ENABLE_ASSET_GENERATOR` tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` con estado por entorno y runtime donde se lee.
-- [ ] `GLOBE_MODEL_FLEET_STATUS.md` registra que el bloqueador de reserva de créditos tiene fuente medida y que `TASK-1553` es dueña de la decisión de ruta.
-- [ ] `TASK-278` y `TASK-1782` recibieron su `## Delta`.
-- [ ] `pnpm skills:mirrors` y `pnpm docs:closure-check` verdes.
-- [ ] Ningún archivo de evidencia, test o log contiene el valor del secreto ni PII.
+- [x] `isOpenAIImageModel('gpt-image-2.5-flare')` y `isOpenAIImageModel('gpt-image-2.5-sunburst')` devuelven `true`.
+- [x] `getOpenAIImageModel({ OPENAI_IMAGE_MODEL: 'modelo-inexistente' })` **lanza** en vez de devolver `gpt-image-2`.
+- [x] `pnpm ai:image --model modelo-inexistente` aborta antes de cualquier I/O con mensaje que nombra el valor recibido y los válidos.
+- [x] `pnpm ai:image --quality max --model gpt-image-2` aborta antes de la red, porque `max` no existe en ese modelo.
+- [x] `resolveOpenAIImageSize({ model: 'gpt-image-2.5-flare', aspectRatio: '16:9' })` devuelve `2048x1152`, no `1536x1024`.
+- [x] Un `editOpenAIImage` con un modelo 2.5 produce un `FormData` que **no** contiene la clave `input_fidelity`.
+- [x] Un test fija que el body de un request `gpt-image-2` es idéntico al de antes de esta task.
+- [x] Existe evidencia escrita de si el carril `google-imagen` responde hoy contra Vertex, con fecha.
+- [x] `DEFAULT_IMAGE_PROVIDER` no apunta a ningún provider cuyo modelo esté declarado bloqueado en `GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+- [x] El carril `google-imagen` quedó migrado al provider Gemini Image `generateContent` **o** retirado del tipo y del código, con la razón escrita. No quedó en limbo.
+- [x] Si se migró: la migración es de provider, no una sustitución del string `IMAGEN_MODEL`.
+- [ ] `POST /api/internal/generate-image` con `provider: 'openai-image'` explícito devuelve el mismo `provider` y `model` que antes de esta task. — **SIN VERIFICAR el camino feliz.** En vivo se ejercitó la ruta con `provider` inválido (400 canónico, sin gasto) y el handler tiene test propio, pero el POST con `provider: 'openai-image'` que **genera** una imagen no se corrió: habría gastado una pieza fuera del tope autorizado por el operador. El helper sí quedó ejercitado 7 veces en el canary del Slice 4.
+- [x] `POST /api/internal/generate-animation` sigue respondiendo correctamente.
+- [x] Existe `ai-generations/<fecha>_gpt-image-2-5-usage-baseline/manifest.json` con al menos una fila por combinación de la matriz declarada en el Slice 4, cada una con `usage` completo y el `quality`/`size` resueltos por el API.
+- [x] La tabla de consumo publicada en la matriz de capacidades lleva fecha, snapshot de modelo y la advertencia de que es evidencia, no contrato.
+- [x] La matriz de capacidades ya no describe las dos degradaciones silenciosas como estado vigente.
+- [x] `ENABLE_ASSET_GENERATOR` tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` con estado por entorno y runtime donde se lee.
+- [ ] `GLOBE_MODEL_FLEET_STATUS.md` registra que el bloqueador de reserva de créditos tiene fuente medida y que `TASK-1553` es dueña de la decisión de ruta. — **FUERA DE ALCANCE por instrucción del operador (2026-09-16): no tocar Globe mientras esté hibernado.** La edición llegó a hacerse y se revirtió antes de commitear; no queda rastro. La evidencia existe y está citada acá, pero el ledger de flota no la registra.
+- [x] `TASK-278` y `TASK-1782` recibieron su `## Delta`.
+- [ ] `pnpm skills:mirrors` y `pnpm docs:closure-check` verdes. — `pnpm skills:mirrors` **verde**. `pnpm docs:closure-check` **ROJO por causa ajena**: `pnpm flags:audit --strict` reclama `INSIGHTS_RENDER_ENABLED`, introducido por `a35fc708e` (TASK-1846, sesión paralela), que no tiene fila en el ledger. No se agrega desde acá: declarar un runtime que no se verificó es peor que no declararlo. Avisado a esa sesión.
+- [x] Ningún archivo de evidencia, test o log contiene el valor del secreto ni PII.
 
 ## Verification
 
@@ -529,14 +564,14 @@ para un entorno mal configurado, un cambio de comportamiento. Por eso su mitigac
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `TASK-1553` recibió un `## Delta` que nombra la evidencia de `usage` disponible y su path
-- [ ] el cierre declara explícitamente que NO hubo verificación productiva de la superficie Imagen, porque está apagada por flag — en vez de omitirlo o simularlo
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [ ] `TASK-1553` recibió un `## Delta` que nombra la evidencia de `usage` disponible y su path — **NO entregado, por la misma instrucción de no tocar Globe.** `TASK-1553` es una task de Globe; su Delta quedó escrito y revertido sin commitear.
+- [x] el cierre declara explícitamente que NO hubo verificación productiva de la superficie Imagen, porque está apagada por flag — en vez de omitirlo o simularlo
 
 ## Follow-ups
 

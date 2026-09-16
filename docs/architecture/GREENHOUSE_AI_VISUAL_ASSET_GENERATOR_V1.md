@@ -1,23 +1,26 @@
 # Greenhouse AI Visual Asset Generator V1
 
 > **Tipo de documento:** Spec de arquitectura
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-08-21
+> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1851 — familia GPT Image 2.5 transportada, carril Google migrado a Gemini Image)
 > **Task:** TASK-278 — AI Visual Asset Generator
 
 ---
 
 ## Purpose
 
-> **P0 runtime drift — 2026-07-19:** el helper Greenhouse aún referencia `imagen-4.0-generate-001`, retirado
-> del camino recomendado por Google. No usar esa ruta para trabajo nuevo. Migrar correctamente requiere un
-> provider Gemini Image basado en `generateContent`, smoke tests y golden bake-off; no es un cambio de ID sobre
-> `generateImages`. Este helper es tooling Greenhouse, no el runtime de Efeonce Creative Studio.
+> **Carril Google migrado — 2026-09-16 (TASK-1851):** `imagen-4.0-generate-001` está **retirado**
+> (discontinuación en Vertex el 2026-06-30, apagado del endpoint de Gemini API el 2026-08-17). El probe propio
+> del 2026-09-16 contra el proyecto `efeonce-group` devolvió **HTTP 404 NOT_FOUND**. La migración **ya ocurrió**
+> y fue de **provider**, no de string: el tipo `ImageGenerationProvider` pasó de `google-imagen` a
+> `google-gemini-image`, y la API pasó de `generateImages` (predict) a `generateContent` con partes de
+> contenido. Sustituir sólo el ID habría dejado el mismo retiro esperando a la vuelta de la esquina.
+> Este helper es tooling Greenhouse, no el runtime de Efeonce Creative Studio.
 
 Define el contrato, arquitectura y reglas del **AI Visual Asset Generator** — un módulo interno de toolchain
-para generar assets visuales on-demand durante el desarrollo de interfaces. GPT Image sigue disponible; la ruta
-Imagen legacy queda bloqueada hasta implementar el adapter Gemini Image correcto.
+para generar assets visuales on-demand durante el desarrollo de interfaces. Los dos carriles vigentes son
+**OpenAI GPT Image** (familia 2.5 y GPT Image 2) y **Google Gemini Image**.
 
 No es un feature para usuarios finales. Es infraestructura de productividad del agente.
 
@@ -30,9 +33,9 @@ Agent (Claude) durante desarrollo de UI
 [generateImage(prompt, options)]     o     [generateAnimation(prompt, options)]
     |                                            |
     v                                            v
-[Imagen 4 via Vertex AI]              [Gemini via Vertex AI]
+[OpenAI GPT Image via Image API]      [Gemini via Vertex AI]
     o
-[OpenAI GPT Image via Image API]
+[Gemini Image via generateContent]
     |                                            |
     v                                            v
 PNG/WebP → public/images/generated/   SVG+CSS → public/animations/generated/
@@ -48,10 +51,10 @@ git add + commit → asset servido por Vercel CDN
 
 | Canal | Motor | Modelo | Output | Uso |
 |-------|-------|--------|--------|-----|
-| Imágenes rasterizadas legacy | Imagen 4 | `imagen-4.0-generate-001` — **deprecated/bloqueado para trabajo nuevo** | PNG/WebP | Migrar a provider Gemini Image `generateContent`; no sustituir sólo el ID |
-| Imagenes rasterizadas opt-in | OpenAI GPT Image | `gpt-image-2` (configurable via `OPENAI_IMAGE_MODEL`) | PNG/WebP/JPEG | Assets de mayor fidelidad, composicion y adherencia a prompts |
-| Imagenes transparentes | OpenAI GPT Image | `gpt-image-2`, capacidad provider en preview | PNG/WebP con alfa | Helper/CLI locales conservan GPT Image 2 y rechazan JPEG; aceptar el asset exige QA de alfa |
-| GPT Image 2.5 (Sunburst/Flare) | OpenAI GPT Image | `gpt-image-2.5-sunburst` · `gpt-image-2.5-flare` — **provider-supported desde 2026-09-08, NO transportado por el helper** | — | Frontera del proveedor. El helper no la reconoce: ver la trampa silenciosa abajo antes de intentar usarla |
+| Imagenes rasterizadas (default) | OpenAI GPT Image | `gpt-image-2` (configurable via `OPENAI_IMAGE_MODEL`) | PNG/WebP/JPEG | Carril por defecto desde TASK-1851. Assets de mayor fidelidad, composicion y adherencia a prompts |
+| GPT Image 2.5 (Flare/Sunburst) | OpenAI GPT Image | `gpt-image-2.5-flare` · `gpt-image-2.5-sunburst` (+ snapshots `-2026-09-08`) — **transportado** | PNG/WebP/JPEG | Calidad `xhigh`/`max`, grilla de tamaños moderna y transparencia con soporte pleno |
+| Imagenes transparentes | OpenAI GPT Image | familia 2.5 (soporte pleno) · `gpt-image-2` (capacidad provider en preview) | PNG/WebP con alfa | Helper/CLI conservan el modelo exacto y rechazan JPEG; aceptar el asset exige QA de alfa |
+| Imagenes rasterizadas — carril Google | Gemini Image | `gemini-3.1-flash-image` (configurable via `GOOGLE_GEMINI_IMAGE_MODEL`) | PNG/WebP | Migrado de Imagen 4 por TASK-1851; usa `generateContent` y respeta el aspect ratio via `imageConfig` |
 | Animaciones SVG | Gemini | Resuelto via `resolveNexaModel()` | SVG con CSS keyframes | Loading spinners, iconos animados, empty states, micro-interacciones |
 | Produccion still hibrida out-of-band | Fal Seedream 5 Lite/Pro + OpenAI GPT Image 2 | Slugs verificados en el catalogo Fal y adapter OpenAI server-only | PNG/JPEG de trabajo; export gobernado posterior | Campanas multi-formato: exploracion/materialidad en Seedream, estructura/reparacion/adaptacion en GPT |
 
@@ -82,7 +85,7 @@ import { generateImage } from '@/lib/ai/image-generator'
 const result = await generateImage('tech banner blue gradient', {
   aspectRatio: '16:9',   // '1:1' | '16:9' | '9:16' | '4:3' | '3:4'
   format: 'png',         // 'webp' | 'png'
-  provider: 'openai-image', // optional; default env/default is google-imagen
+  provider: 'openai-image', // optional; default es openai-image (env GREENHOUSE_IMAGE_PROVIDER)
   quality: 'medium',     // optional for OpenAI
   filename: 'my-banner'  // optional
 })
@@ -130,28 +133,35 @@ rechaza `transparent + jpeg` antes de red y no usa `gpt-image-1.5` como fallback
 el canal alfa desde bytes decodificados. Matriz completa:
 `creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
 
-### Delta 2026-09-08 — GPT Image 2.5 es provider-supported, NO está transportado
+### GPT Image 2.5 — transportado, con contrato por capacidad
 
-OpenAI publicó `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare` (snapshots `…-2026-09-08`): calidad `xhigh`/`max`
-nuevas, transparencia con soporte pleno, hasta 16 referencias por edit, sin Batch y sin rate limits publicados.
-`gpt-image-2` **no** quedó deprecado y sigue siendo el único de la familia con Batch y con costo por imagen
-estimable antes de gastar — OpenAI declara explícitamente que la calculadora de GPT Image 2 **no** estima el
-consumo de 2.5.
+`src/lib/ai/openai-image.ts` transporta los cuatro identificadores de la familia: `gpt-image-2.5-flare`,
+`gpt-image-2.5-sunburst` y sus snapshots `-2026-09-08`. Traen calidad `xhigh`/`max`, transparencia con soporte
+pleno y hasta 16 referencias por edit; no tienen Batch ni rate limits publicados. `gpt-image-2` **no** quedó
+deprecado y sigue siendo el único de la familia con Batch y con costo por imagen estimable antes de gastar —
+OpenAI declara explícitamente que su calculadora **no** estima el consumo de 2.5.
 
-🔴 **`src/lib/ai/openai-image.ts` no conoce la familia 2.5 y falla en silencio de dos formas distintas:**
+**El contrato se decide por capacidad declarada, no por literales de modelo.**
+`OPENAI_IMAGE_MODEL_CAPABILITIES` es un `Record<OpenAIImageModel, …>` con `extendedSizeGrid`,
+`premiumQualityTiers` e `inputFidelity`. Al ser un `Record`, el compilador obliga a declarar las capacidades de
+todo modelo nuevo: agregar uno **no puede volver a degradar en silencio** por olvidar un literal en una rama.
 
-1. **Por env var → degradación de modelo.** `OPENAI_IMAGE_MODEL=gpt-image-2.5-flare` no pasa el allowlist de
-   `getOpenAIImageModel()`, que devuelve el default `gpt-image-2` sin advertir.
-2. **Por flag CLI → degradación de resolución + parámetro fuera de contrato.** `--model gpt-image-2.5-flare`
-   se castea sin validar, así que el modelo viaja al API; pero `resolveOpenAIImageSize()` ramifica por
-   `model === 'gpt-image-2'` y manda 2.5 a la rama legacy (default por aspect ratio `2048x1152` → `1536x1024`;
-   `--size` moderno → `auto`), y `editOpenAIImage()` inyecta `input_fidelity`, que la guía de OpenAI excluye
-   explícitamente de Sunburst y Flare.
+- `quality` acepta `auto | low | medium | high | xhigh | max`. `xhigh` y `max` existen sólo en 2.5; pedirlos a
+  un modelo anterior **lanza antes de la red** (`assertOpenAIImageQualitySupported`).
+- `input_fidelity` **ya no viaja con modelos 2.5** — la guía de OpenAI los excluye explícitamente. Se sigue
+  enviando con `gpt-image-1.5`, `gpt-image-1` y `gpt-image-1-mini`; `gpt-image-2` nunca lo envió.
+- `resolveOpenAIImageSize()` pregunta por `extendedSizeGrid` en vez de ramificar por `model === 'gpt-image-2'`:
+  la familia 2.5 resuelve a la grilla moderna (`16:9` → `2048x1152`).
 
-**NUNCA** usar ninguno de los dos caminos para "probar 2.5". Habilitar la familia exige, en el mismo cambio:
-extender `OpenAIImageModel` y su allowlist, extender `OpenAIImageQuality` con `xhigh`/`max` gated a 2.5, mover
-2.5 a la rama moderna de `resolveOpenAIImageSize`, dejar de inyectar `input_fidelity`, y **un canary facturable
-con readback de `usage` real** — porque el costo por imagen de 2.5 no se puede estimar antes de gastarlo.
+**Las tres puertas de entrada fallan ruidoso:** un `OPENAI_IMAGE_MODEL` desconocido lanza y nombra los modelos
+válidos; el CLI valida `--model` y `--quality` antes de cualquier I/O; y la combinación `model × quality` se
+valida una sola vez al arrancar el CLI, no por pieza.
+
+**Costo:** el de una pieza 2.5 **no se estima antes de gastarlo**, sólo se mide con `usage` de la respuesta
+real. Hay línea base fechada del 2026-09-16 (7 piezas, `1024x1024`) en
+`creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md` → §Línea base de consumo medido. Su hallazgo
+central: **el costo por imagen lo fija `quality × size`, no el modelo** — Flare y Sunburst consumen idéntico
+para el mismo `quality`, y lo que los separa es la latencia.
 
 ### `generateAnimation(prompt, options)`
 
@@ -240,7 +250,7 @@ Las animaciones SVG generadas por Gemini siguen estas reglas (enforced via syste
 - Override: `ENABLE_ASSET_GENERATOR=true` en env vars
 - Auth: `requireAdminTenantContext` — solo efeonce_admin con route group admin
 - OpenAI API key se resuelve solo server-side via `OPENAI_API_KEY` o `OPENAI_API_KEY_SECRET_REF`; nunca se hardcodea en repo ni se expone al cliente
-- Provider OpenAI es opt-in via `GREENHOUSE_IMAGE_PROVIDER=openai-image` o `options.provider='openai-image'`; el default conserva Imagen para no romper flujos existentes
+- El default es `openai-image`; el carril Google se pide explícitamente via `GREENHOUSE_IMAGE_PROVIDER=google-gemini-image` u `options.provider`. Un `GREENHOUSE_IMAGE_PROVIDER` con valor desconocido **lanza** y nombra los providers válidos, en vez de caer al default en silencio
 - Transparencia: el proveedor soporta `background='transparent'` en GPT Image 2 preview con PNG/WebP. El helper
   local conserva GPT Image 2, rechaza JPEG antes de red y exige verificar alfa real antes de aceptar el asset.
 - Inputs de edicion/referencia se limitan a 10 imagenes y 50MB por archivo antes de llamar a OpenAI
@@ -285,16 +295,17 @@ Zero dependencias nuevas.
 - Skill canonica para pedir, promptear, generar y QA assets visuales con IA: `.claude/skills/greenhouse-ai-image-generator/SKILL.md` (Codex mirror: `.codex/skills/greenhouse-ai-image-generator/SKILL.md`). Usarla cuando el usuario pida iconos, UI elements, empty states, banners, assets transparentes, OpenAI/GPT Image/Imagen/Nano Banana o mejora de prompts para imagenes.
 - La skill no solo opera el provider: debe actuar como direccion de arte, con brief visual, composicion, materiales/acabados, iluminacion, paleta, iteracion single-change y rubric de QA profesional. Guia compartida: `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md`.
 - Entry point canonico para assets visuales generados por agentes: `src/lib/ai/image-generator.ts`.
-- `generateImage()` soporta providers `google-imagen` y `openai-image`; no llamar APIs de imagen desde scripts paralelos si el helper cubre el caso.
-- **CLI canonica de generacion `pnpm ai:image` (gpt-image-2, desde 2026-06-10):** wrapper operativo del fn canonico `generateOpenAIImage` (`src/lib/ai/openai-image.ts`) para generar imagenes desde la terminal — conceptos del `product-design-loop`, fixtures de mockup, batches de iconos/assets. **NO crear scripts de generacion ad-hoc** (`scripts/_gen-*.ts`): usar esta CLI. Self-contained (carga `.env.local` solo; resuelve `OPENAI_API_KEY_SECRET_REF` server-side, nunca imprime el secreto). Default `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` supera los 125s del helper runtime `generateImage`, que NO pasa-through `timeoutMs` — por eso la CLI usa el fn de bajo nivel). Uso: `pnpm ai:image --prompt "<texto>" [--out <path>] [--size 1024x1024|1536x1024|1024x1536|2048x...] [--quality low|medium|high|auto] [--background opaque|transparent] [--model gpt-image-2] [--count N] [--timeout ms] [--open]`; `--prompt-file <path>` (prompts largos); `--batch <json>` (`[{ filename, prompt }, …]`, varios). La CLI preserva GPT Image 2 para transparencia, rechaza JPEG y no degrada a 1.5. **Sigue siendo raster** (PNG/WebP) — para vectores reales, Higgsfield + Recraft V4.1 (abajo). Para assets repo-bound que el runtime sirve, preferir el helper `generateImage()`; la CLI es para generacion operada por agente/operador. **Direccion de arte = invocar la skill `greenhouse-ai-image-generator`** (la CLI opera el modelo; la skill aporta brief/composicion/QA).
+- `generateImage()` soporta providers `openai-image` (default) y `google-gemini-image`; no llamar APIs de imagen desde scripts paralelos si el helper cubre el caso. El carril Google migró de Imagen a Gemini Image por TASK-1851: `imagen-4.0-generate-001` está retirado y responde 404.
+- **CLI canonica de generacion `pnpm ai:image` (gpt-image-2, desde 2026-06-10):** wrapper operativo del fn canonico `generateOpenAIImage` (`src/lib/ai/openai-image.ts`) para generar imagenes desde la terminal — conceptos del `product-design-loop`, fixtures de mockup, batches de iconos/assets. **NO crear scripts de generacion ad-hoc** (`scripts/_gen-*.ts`): usar esta CLI. Self-contained (carga `.env.local` solo; resuelve `OPENAI_API_KEY_SECRET_REF` server-side, nunca imprime el secreto). Default `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` supera los 125s del helper runtime `generateImage`, que NO pasa-through `timeoutMs` — por eso la CLI usa el fn de bajo nivel). Uso: `pnpm ai:image --prompt "<texto>" [--out <path>] [--size 1024x1024|1536x1024|1024x1536|2048x...] [--quality low|medium|high|xhigh|max|auto] [--background opaque|transparent] [--model gpt-image-2|gpt-image-2.5-flare|gpt-image-2.5-sunburst] [--count N] [--timeout ms] [--open]`; `--prompt-file <path>` (prompts largos); `--batch <json>` (`[{ filename, prompt }, …]`, varios). La CLI **valida `--model` y `--quality` contra el allowlist antes de cualquier I/O**, y valida la combinación `model × quality` una sola vez al arrancar (no por pieza): `xhigh` y `max` sólo existen en la familia 2.5. Preserva el modelo exacto para transparencia, rechaza JPEG y no degrada a 1.5. **Sigue siendo raster** (PNG/WebP) — para vectores reales, Higgsfield + Recraft V4.1 (abajo). Para assets repo-bound que el runtime sirve, preferir el helper `generateImage()`; la CLI es para generacion operada por agente/operador. **Direccion de arte = invocar la skill `greenhouse-ai-image-generator`** (la CLI opera el modelo; la skill aporta brief/composicion/QA).
 - `GREENHOUSE_IMAGE_PROVIDER` controla el default runtime, pero cada llamada puede pasar `provider`.
 - OpenAI usa `src/lib/ai/openai-image.ts` y resuelve la key solo server-side con `OPENAI_API_KEY` / `OPENAI_API_KEY_SECRET_REF`; el secreto canonico es `greenhouse-openai-api-key` en GCP Secret Manager. Nunca hardcodear `sk-*` en repo, Vercel env directo, logs, tests ni docs.
-- Para transparencia del proveedor, pedir GPT Image 2 con `format: 'png' | 'webp'` y
-  `background: 'transparent'`; el helper transporta ese contrato sin degradar a un modelo deprecated. La
-  aceptación exige canal alfa y al menos un píxel no opaco.
+- Para transparencia del proveedor, pedir `format: 'png' | 'webp'` y `background: 'transparent'`; el helper
+  transporta ese contrato sin degradar a un modelo deprecated y rechaza JPEG antes de red. El soporte es pleno
+  en la familia 2.5 y sigue en preview en `gpt-image-2`. La aceptación exige canal alfa y al menos un píxel no
+  opaco, en cualquiera de los dos.
 - Modos OpenAI disponibles: `generateOpenAIImage()` para text-to-image, `editOpenAIImage()` para imagenes de referencia/mascara, y `runOpenAIImageTool()` para Responses API multi-turn con `image_generation`.
 - **`gpt-image-*` es RASTER** (PNG/WebP/JPEG) — **NO genera SVG**. Si se necesita vector, vectorizar el raster como paso aparte (no hay helper canonico de vectorizacion hoy) o aceptar un SVG real via upload (el uploader hoy acepta PNG/JPG/WebP, no SVG).
-- **Vectores para implementacion de UI vía Higgsfield CLI + Recraft V4.1 (desde 2026-06-09):** la CLI `higgsfield` (binario en `~/.local/bin`, alias `hf`, cuenta `mkt@efeoncepro.com` plan Ultra, autenticada via `higgsfield auth login`) + el MCP Higgsfield exponen **Recraft V4.1** (`job_set_type: recraft_v4_1`) con `--model_type vector` → **salida vectorial real**, justo el hueco que `gpt-image` (raster-only) deja abierto. Es la herramienta para **producir assets vectoriales de UI/marca** (iconos, logos, ilustraciones de design-system, empty states) con **paleta controlada** (`--colors`, p.ej. pinear tonos AXIS) + `--background_color`, `--aspect_ratio`, `--resolution {1k,2k}`. Comando canonico: `higgsfield generate create recraft_v4_1 --prompt "…" --model_type vector --aspect_ratio 1:1 --resolution 2k --wait`. **Caveats duros:** (1) Higgsfield es **producción de assets out-of-band** (se generan acá y se SUBEN al portal vía el uploader canonico), **NO** el path runtime — el entrypoint runtime canonico sigue siendo `src/lib/ai/image-generator.ts` (OpenAI/Imagen); NUNCA cablear Higgsfield a un flujo runtime del producto. (2) Las skills (`higgsfield-generate`, `-product-photoshoot`, `-soul-id`, `-marketplace-cards`) aportan el craft (modelo correcto por tarea, modos, art direction); usarlas. (3) Verificar el **formato del archivo entregado (SVG)** en el primer uso real antes de asumirlo. (4) Aplica el contrato visual Greenhouse igual (tokens AXIS, no inventar hex) + revisar el asset producido con las skills de diseño antes de integrarlo.
+- **Vectores para implementacion de UI vía Higgsfield CLI + Recraft V4.1 (desde 2026-06-09):** la CLI `higgsfield` (binario en `~/.local/bin`, alias `hf`, cuenta `mkt@efeoncepro.com` plan Ultra, autenticada via `higgsfield auth login`) + el MCP Higgsfield exponen **Recraft V4.1** (`job_set_type: recraft_v4_1`) con `--model_type vector` → **salida vectorial real**, justo el hueco que `gpt-image` (raster-only) deja abierto. Es la herramienta para **producir assets vectoriales de UI/marca** (iconos, logos, ilustraciones de design-system, empty states) con **paleta controlada** (`--colors`, p.ej. pinear tonos AXIS) + `--background_color`, `--aspect_ratio`, `--resolution {1k,2k}`. Comando canonico: `higgsfield generate create recraft_v4_1 --prompt "…" --model_type vector --aspect_ratio 1:1 --resolution 2k --wait`. **Caveats duros:** (1) Higgsfield es **producción de assets out-of-band** (se generan acá y se SUBEN al portal vía el uploader canonico), **NO** el path runtime — el entrypoint runtime canonico sigue siendo `src/lib/ai/image-generator.ts` (OpenAI GPT Image / Gemini Image); NUNCA cablear Higgsfield a un flujo runtime del producto. (2) Las skills (`higgsfield-generate`, `-product-photoshoot`, `-soul-id`, `-marketplace-cards`) aportan el craft (modelo correcto por tarea, modos, art direction); usarlas. (3) Verificar el **formato del archivo entregado (SVG)** en el primer uso real antes de asumirlo. (4) Aplica el contrato visual Greenhouse igual (tokens AXIS, no inventar hex) + revisar el asset producido con las skills de diseño antes de integrarlo.
 - **OpenAI requiere `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key` en CADA entorno** (local `.env.local`, Vercel staging/prod, workers). Sin ese ref el resolver no sabe de que secret sacar la key y todo flujo OpenAI devuelve "not configured". Runtime Rollout Completion Gate: confirmar la env var en Vercel antes de declarar operativo un flujo OpenAI en deployado.
 - **Generacion de logo de organizacion con IA (TASK-999, desde 2026-06-09):** command server-only `generateOrganizationLogoDraft` (`src/lib/account-360/organization-logo-generation.ts`) → `POST /api/organizations/[id]/brand-assets/logo/generate`. Usa `gpt-image-2` fondo opaco, persiste como `organization_logo_draft` y reusa `attachOrganizationLogoAsset` (gate `organization.brand_asset` + fail-fast `is_operating_entity` ANTES de la llamada paga). **Excepcion canonizada al default de la skill** `greenhouse-ai-image-generator` ("nunca reproducir un trademark"): por decision explicita del operador, el prompt **recrea el logo real** del cliente desde el conocimiento del modelo (es aproximacion; el logo exacto va por upload/URL). NUNCA generar logos de operating-entity (Efeonce/legal). Fuente: ADR `GREENHOUSE_ORGANIZATION_BRAND_ASSET_DECISION_V1.md` Delta 2026-06-09.
 - Fuente canonica: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
@@ -314,7 +325,7 @@ separado de este helper Greenhouse.
 - **El secreto se resuelve solo server-side** vía `FAL_API_KEY` (env) o `FAL_API_KEY_SECRET_REF` (GCP Secret Manager). **NUNCA** hardcodear la key (shape `<id>:<secret>`) en repo, Vercel env directo, logs, tests ni docs. Secret canónico: `greenhouse-fal-api-key`.
 - **Estado 2026-07-06: OPERATIVO — key persistida + generación real verificada end-to-end.** El secret `greenhouse-fal-api-key` existe en GCP Secret Manager (project `efeonce-group`, v1, round-trip 69 chars sin newline) y `FAL_API_KEY_SECRET_REF=greenhouse-fal-api-key` está en `.env.local`. Verificación (Runtime Rollout Completion Gate): `runFalModel({ model: 'fal-ai/flux/schnell', … })` → `ok:true`, HTTP 200, `secretSource=secret_manager`, imagen real generada. (Antes del top-up daba 403 `Exhausted balance`; se resolvió al reflejarse los créditos comprados.) **Vercel NO tiene el ref** (out-of-band local; si se wirea a runtime cloud, agregar el ref en Vercel + `secretAccessor` a `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`). Key temporal, rotación pendiente por el operador (agregar nueva versión al mismo secret al rotar). Cliente aún NO wireado a ningún consumer.
 - **Gotcha de queue URLs (bug real atrapado por el test e2e 2026-07-06):** para modelos con sub-path (`fal-ai/flux/schnell`), fal devuelve `status_url`/`response_url` apuntando al **app padre** (`fal-ai/flux/requests/...`), NO al slug completo. Reconstruir las polling URLs desde el slug da **HTTP 405**. `runFalModel` usa las URLs del submit response; **NUNCA** reconstruirlas a mano desde `model`.
-- **Producción out-of-band, NO runtime** (misma regla que Higgsfield): generar acá + **subir el asset por el uploader canónico**; **NUNCA** cablear fal a un flujo runtime del producto — el entrypoint runtime de imagen sigue siendo `src/lib/ai/image-generator.ts` (OpenAI/Imagen).
+- **Producción out-of-band, NO runtime** (misma regla que Higgsfield): generar acá + **subir el asset por el uploader canónico**; **NUNCA** cablear fal a un flujo runtime del producto — el entrypoint runtime de imagen sigue siendo `src/lib/ai/image-generator.ts` (OpenAI GPT Image / Gemini Image).
 - **Dirección de arte por dominio:** video → skill `motion-design-studio`; audio → `audio-studio`; elección de modelo/estética → `design-studio`; still images de UI/marca → `greenhouse-ai-image-generator`. El cliente opera el modelo; las skills aportan brief/composición/QA.
 - **Pricing público por-segundo en la página del modelo** (verificar en `fal.ai/models` antes de correr — es volátil): ej. Seedance 2.0 Standard ~US$0.3024/s (10s ≈US$3.02, hasta 1080p), Fast ~US$0.2419/s (hasta 720p), Mini 480p ~US$0.0721/s (~US$0.36 los 5s). Audio incluido sin costo extra. El costo es lineal (`$/s × duración`); resolución y duración lo suben proporcionalmente.
 - **Catálogo completo de modelos y capacidades:** `GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` — las 13 categorías (imagen, edición, upscale, bg-removal, video t2v/i2v/v2v, TTS, música/SFX, STT/voice, 3D, LLM, training) con slugs verificados 2026-07-06.
