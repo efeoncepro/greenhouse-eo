@@ -86,8 +86,18 @@ emitir y retirar son actos humanos que sólo existen en el portal. Una organizac
 identidad, porque es la misma lane. Manual: [Operar Efeonce Insights por API y
 MCP](../../manual-de-uso/insights/operar-efeonce-insights-api-mcp.md).
 
+Desde el 16 de septiembre de 2026 (`TASK-1846`, versión `1.6.0`) esa capacidad también **renderiza**: un cliente MCP
+puede pedir el render de una edición lista para revisión (`request_insight_render`), consultar su avance
+(`get_insight_render_run`), reintentar lo que falló (`retry_insight_render`) o cancelar lo pendiente
+(`cancel_insight_render`). Consultar va con el permiso base; pedir, reintentar y cancelar exigen el mismo permiso de
+escritura de Insights, que sigue sin estar concedido a ningún cliente. Hoy sólo se renderiza el deck en PDF; pedir
+otra salida responde «solicitud inválida», y con el render apagado responde «bloqueado por política». Quedó
+desplegado ese día y su prueba de humo contra producción salió verde (un render completo y el «no existe» para una
+organización sin el módulo).
+
 El snapshot de TASK-1837 registró 39 tools; TASK-1844 agregó discovery organizacional propio del gateway;
-TASK-1852 (`1.4.0`, 2026-09-10) llevó la superficie a 43 tools; TASK-1845 (`1.5.0`, 2026-09-15) la llevó a 47.
+TASK-1852 (`1.4.0`, 2026-09-10) llevó la superficie a 43 tools; TASK-1845 (`1.5.0`, 2026-09-15) la llevó a 47;
+TASK-1846 (`1.6.0`, 2026-09-16) la llevó a 51.
 El inventario vigente se lee del servidor y de `surface-baseline.json` en `efeonce-mcp`. Lo que ve un cliente
 concreto depende de su emisor, población, permisos y flags. El catálogo global no equivale a autoridad universal.
 

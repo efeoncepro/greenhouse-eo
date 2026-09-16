@@ -456,3 +456,21 @@ dinero; sigue siendo escritura. Para el emisor nativo las cuatro son `unsupporte
 
 Canon: `GREENHOUSE_MCP_ARCHITECTURE_V1.md` §26 · `EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` §Delta 2026-09-15 ·
 `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`.
+
+**Delta 2026-09-16 — TASK-1846 (render durable, gateway `1.6.0`).** El dominio `insights` suma
+`request_insight_render`, `get_insight_render_run`, `retry_insight_render` y `cancel_insight_render` (manifiesto
+Greenhouse 55 tools; gateway `1.6.0`, 51 tools, desplegado en la revisión `efeonce-mcp-gateway-00054-n78`). No hay
+clase nueva: la lectura del run va con el scope base (`insights.report.read`) y las tres escrituras con
+`efeonce.mcp.insights.write` (`insights.edition.create`); las cuatro son `unsupported` para el emisor nativo
+(`insights_native_policy_missing`). Errores del lane: `503 render_disabled` ⇒ `policy_blocked`,
+`422 render_rejected` ⇒ `invalid_request`, `404` ⇒ anti-oráculo. Canary de producción 2026-09-16 verde (render run
+`completed`, deny `404`); ninguna escritura de render se ejercitó todavía a través del gateway.
+
+- **NUNCA** cierres un `insufficient_scope` de las escrituras de render ampliando el cliente PKCE compartido: aplica la
+  misma regla que a `create_insight_edition`.
+- **SIEMPRE** despliega el gateway DESPUÉS del release de Greenhouse que publica las rutas que federa; antes, las tools
+  responden `not_found`/`provider_unavailable` contra producción.
+- **SIEMPRE** que el canary de un provider verifique un recurso asíncrono, hazlo por lectura de un id existente
+  (`--render-run <id>`), nunca creando trabajo desde el canary.
+
+Canon: `GREENHOUSE_MCP_ARCHITECTURE_V1.md` §27.

@@ -36,7 +36,7 @@ Federated principal impersonates github-actions-deployer@efeonce-group
 | `commercial-cost-worker-deploy.yml` | Cloud Run `commercial-cost-worker` | path triggers cubren servicio + librerías compartidas que alteran su runtime |
 | `ico-batch-deploy.yml` | Cloud Run `ico-batch-worker` | |
 | `hubspot-greenhouse-integration-deploy.yml` | Cloud Run `hubspot-greenhouse-integration` | health check `/health` + `/contract` |
-| `artifact-worker-deploy.yml` | Cloud Run **Job** `artifact-worker` | **staging-only**; promoción a production exige integrarlo a `RELEASE_DEPLOY_WORKFLOWS` + sign-off |
+| `artifact-worker-deploy.yml` | Cloud Run **Job** `artifact-worker` | Delta 2026-09-16 (TASK-1846): **integrado al release control plane** — push `develop` (staging) + `workflow_call` (producción) + dispatch `staging\|production`; change-gate por etiqueta `git-sha`; `RELEASE_DEPLOY_WORKFLOWS` con `cloudRunResourceKind:'job'`; primer deploy productivo en el release `917491fd02e4`. Job único para ambos ambientes |
 | `azure-teams-bot-deploy.yml` | Azure (Teams Bot) | WIF Azure, no GCP |
 | `azure-teams-deploy.yml` | Azure Logic Apps (Teams notifications, Bicep) | WIF Azure, no GCP |
 

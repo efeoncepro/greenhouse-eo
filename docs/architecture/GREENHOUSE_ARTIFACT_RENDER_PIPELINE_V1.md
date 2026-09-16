@@ -15,6 +15,35 @@
 > en `GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md`. Este doc es **el medio**: cola, job
 > record, worker, gates, deploy, observabilidad.
 
+> **Delta 2026-09-16 — TASK-1846 (release `917491fd02e4`). Leer ANTES de §0–§9: varias filas quedaron atrás.**
+> - **Multiconsumidor.** El Job `artifact-worker` despacha por un registry tipado
+>   (`services/artifact-worker/consumer-contract.ts` + `consumers/proposal.ts` + `consumers/insights.ts`):
+>   Proposal (`proposal_render_jobs`) y Efeonce Insights (`greenhouse_insights.insight_outputs`). `main.ts`
+>   ya no contiene la lógica de Proposal: el map `CATALOGS` y el claim viven en cada consumer (§3.2, §7.1).
+>   Proposal conserva commands, tests y comportamiento; el reclaim por lease está en el mecanismo compartido
+>   pero apagado para Proposal.
+> - **Piezas movidas.** El hash del manifest es domain-free en `src/lib/artifact-composer/manifest-hash.ts`
+>   (Proposal re-exporta). El lanzador `jobs.run` salió del composer a `src/lib/render-dispatch/job-runner.ts`
+>   (server-only; el composer es primitive portable y su boundary lo rechaza); `render-dispatch.ts` de
+>   Proposal y `efeonce-insights/render/dispatch.ts` lo consumen (§2.3).
+> - **Dispatcher.** `POST /artifact-render/dispatch` drena Proposal primero y, si Proposal no lanzó nada,
+>   `dispatchNextInsightRender` (lee `INSIGHTS_RENDER_ENABLED`, declarado default `true` en
+>   `services/ops-worker/deploy.sh`). Throughput medido: 1 ejecución/output por tick de 2 min compartido; en
+>   frío (~2 min) puede lanzar 2 ejecuciones para 1 output (claim atómico + fencing lo absorben) (§4.2).
+> - **Release (cierra §9.1(a)).** El Job es único para staging y producción y quedó integrado al release
+>   control plane: `artifact-worker-deploy.yml` con push:develop + `workflow_call` + dispatch
+>   `staging|production`; change-gate por etiqueta `metadata.labels.git-sha`; `deploy.sh` etiqueta
+>   `EXPECTED_SHA` y aborta si `HEAD≠EXPECTED_SHA`; `GREENHOUSE_STORAGE_ENV` fijo `staging` (cada asset guarda
+>   su `bucket_name`); `ARTIFACT_RENDER_JOBS_ENABLED` e `INSIGHTS_RENDER_ENABLED` default `true` en su
+>   `deploy.sh`. `RELEASE_DEPLOY_WORKFLOWS` con `cloudRunResourceKind:'job'`; `pnpm release:workers`, watchdog
+>   y rollback (`PREV_ARTIFACT_WORKER_SHA` → `gcloud run jobs update --image`) leen Jobs; `worker:deploy-path-gate`
+>   lo cubre. Primer deploy productivo en el release `917491fd02e4` (change-gated). El test de contrato ahora exige
+>   que producción entre sólo por `workflow_call` del orquestador con SHA esperado (§4.1).
+> - **Lo que NO cambió / no está verificado.** La puerta de Proposal en producción sigue siendo el enqueue en
+>   Vercel Production + el entitlement per-ORG. `ARTIFACT_RENDER_JOBS_ENABLED` en Vercel Production: presencia
+>   verificada, valor no leído — no afirmar que el render de Proposal está activo en producción (§4.5).
+> - **Señal nueva** (dominio Insights): `insights.render.orphaned_output`, steady 0.
+
 ---
 
 ## §0 — Estado real (verificado contra el repo y contra Cloud Run, 2026-07-12)
@@ -33,7 +62,7 @@
 | 4 reliability signals `commercial` | ✅ Shipped | `src/lib/reliability/queries/commercial-proposal-signals.ts` |
 | Flag `ARTIFACT_RENDER_JOBS_ENABLED` | ✅ **ON en staging** (3 runtimes) · **OFF en Vercel production** | `services/{artifact-worker,ops-worker}/deploy.sh` (SoT) · `FEATURE_FLAG_STATE_LEDGER.md` |
 | UI / Nexa / MCP surface | ❌ No existe (F5) | — |
-| Deploy productivo del worker | ❌ **Gateado** — requiere release control plane + sign-off (§9) | — |
+| Deploy productivo del worker | ❌ **Gateado** — requiere release control plane + sign-off (§9) · **Delta 2026-09-16: ✅ integrado al release control plane; primer deploy productivo en el release `917491fd02e4` (TASK-1846)** | `.github/workflows/artifact-worker-deploy.yml` · `src/lib/release/workflow-allowlist.ts` |
 
 ### Evidencia de staging (renders reales en Cloud Run, 2026-07-12)
 
@@ -670,7 +699,8 @@ bug del worker** (fallo NO gobernado) → Sentry.
 1. Crear `src/lib/artifact-composer/catalogs/<nombre>/` con `registry.json`, plantillas `.html`,
    `*.slots.json`, resolvers, validadores semánticos y (opcional) brand pack + font pack. Un catálogo es
    **DATO**: **NO se toca el motor** (`catalog-extensibility.test.ts` lo prueba).
-2. Registrarlo en el `CATALOGS` map de `services/artifact-worker/main.ts` (hoy:
+2. *(Delta 2026-09-16: el map vive ahora en cada consumer, `services/artifact-worker/consumers/{proposal,insights}.ts`;
+   registrarlo en el consumer que lo vaya a renderizar.)* Registrarlo en el `CATALOGS` map de `services/artifact-worker/main.ts` (hoy:
    `new Map([[deckAxisCatalog.name, deckAxisCatalog]])`). Sin esto, un job con ese `catalog_name` falla
    con `manifest_drift` (por diseño: el worker no compone lo que no tiene empaquetado).
 3. Verificar que el `outputTarget` del catálogo esté en `IMPLEMENTED_OUTPUT_TARGETS`.
@@ -722,7 +752,7 @@ pierde el proceso.
 
 ## §9 — Follow-ups
 
-1. **Producción (gate duro).** Antes del **primer deploy productivo** del worker:
+1. **Producción (gate duro).** *(Delta 2026-09-16: (a) cerrado por TASK-1846 — ver el delta del encabezado.)* Antes del **primer deploy productivo** del worker:
    (a) integrar `.github/workflows/artifact-worker-deploy.yml` al orquestador `production-release.yml` y
    agregarlo a `RELEASE_DEPLOY_WORKFLOWS` (`src/lib/release/workflow-allowlist.ts`) — regla del release
    control plane; (b) **sign-off explícito del operador**. El workflow **no tiene** trigger de production

@@ -89,7 +89,7 @@ confirmado.
 | Aggregate `Proposal` + estados + evidencia + requisitos + API | ✅ funcionando, verificado en staging |
 | Motor Artifact Composer + catálogo `deck-axis` (29 plantillas) + brand pack | ✅ funcionando |
 | `artifact-worker` en la nube + cola + almacenamiento del PDF | ✅ verificado end-to-end en **staging** (la propuesta real de SKY produjo su PDF) |
-| **Producción** | ⛔ **apagada a propósito** — requiere sign-off e integración al control de releases |
+| **Producción** | ⛔ **apagada a propósito** — requiere sign-off e integración al control de releases. *Actualizado 2026-09-16:* la integración ya ocurrió (el `artifact-worker`, que ahora también sirve a Efeonce Insights, se despliega con cada release a producción desde el `917491fd02e4`); la puerta que queda es el valor de la variable en Vercel Production (existe; valor no leído) + el sign-off |
 | Pantalla en el portal / Nexa | ❌ todavía no existe (la capacidad se opera por API y línea de comandos) |
 
 Capacidad medida (no es un compromiso de servicio): un deck de 15 láminas tarda ~25 segundos y pesa

@@ -106,7 +106,7 @@
 | `ops-product-catalog-drift-detect` | `0 3 * * *` | `/product-catalog/drift-detect` |
 | `ops-product-catalog-reconcile-v2` | `0 6 * * 1` | `/product-catalog/reconcile-v2` |
 | `ops-nexa-weekly-digest` | `0 7 * * 1` | `/nexa/weekly-digest` |
-| `ops-artifact-render-dispatch` | `*/2 * * * *` | `/artifact-render/dispatch` |
+| `ops-artifact-render-dispatch` | `*/2 * * * *` | `/artifact-render/dispatch` — desde 2026-09-16 (TASK-1846) drena Proposal y, si Proposal no lanzó nada, Efeonce Insights; 1 ejecución del Job por tick |
 | `ops-globe-tenancy-reconcile` | `*/5 * * * *` | `/globe/tenancy/reconcile` |
 | `ops-reliability-ai-watch` | `0 */1 * * *` | `/reliability-ai-watch` |
 | `ops-cloud-cost-ai-watch` | `15 */6 * * *` | `/cloud-cost-ai-watch` |

@@ -70,9 +70,9 @@ el `ResolvedCompositionManifest` llega a render. Gates al tocar el dominio: `pnp
 a CERO píxeles (rebaseline sólo declarado en `BASELINE_DELTAS.md`) + suite del paquete. El aggregate
 `Proposal` (`greenhouse_commercial.proposal*`) opera con gates humanos en DB, entitlement per-ORG
 `proposal_studio_v1` y el loop propose → confirmación humana → command canónico: el LLM no escribe ni
-cruza gates; escrituras sólo vía `src/lib/commercial/tenders/proposals/**`. `TASK-1391` sólo renderiza
-ese manifest y sigue bloqueada por la frontera de deployable de `EPIC-027` (no autoriza
-Vercel/`ops-worker`/Cloud Run directo).
+cruza gates; escrituras sólo vía `src/lib/commercial/tenders/proposals/**`. El render corre sólo en el
+Cloud Run Job `artifact-worker` (Proposal + Insights, en el release control plane desde TASK-1846);
+nunca Chromium en Vercel ni `ops-worker`.
 
 ### Business Context Pack
 

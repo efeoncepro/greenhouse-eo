@@ -589,7 +589,7 @@ client_services.write, insights.write).
 | Ecosystem lane | mismas rutas bajo `/api/platform/ecosystem/insights/**` | bindings org-scoped sólo leen; escribir exige binding interno |
 | MCP | `request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render` | manifiesto 55 tools; las tres de escritura en la clase `writes` del gateway (federación en `efeonce-mcp` pendiente) |
 | Dominio | `src/lib/efeonce-insights/render/{contracts,store,commands,readers,outputs-port,deck-mapper,plan-limits}.ts` | store compone con `InsightsDbClient` (testeable en rollback) |
-| Worker | `services/artifact-worker/{consumer-contract.ts,consumers/*}` + `main.ts` por registry | Proposal = adapter compatible; `INSIGHTS_RENDER_ENABLED` en `deploy.sh` (default `false`) |
+| Worker | `services/artifact-worker/{consumer-contract.ts,consumers/*}` + `main.ts` por registry | Proposal = adapter compatible; `INSIGHTS_RENDER_ENABLED` en `deploy.sh` (default `false` al escribirse; **delta 2026-09-16: default `true`** en el `deploy.sh` del Job y del `ops-worker`, ambos únicos para staging y producción) |
 
 ## 9. Verificación realizada
 
@@ -638,7 +638,7 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 
 | Ausencia | Detalle | Dueño |
 |---|---|---|
-| Outputs PDF/deck/web | **Actualizado 2026-09-16 (TASK-1846):** `InsightOutputsPort` conectado; `renderableOutputs: ['deck_pdf']`; motor + lanes + MCP en código, **sin deploy y con `INSIGHTS_RENDER_ENABLED` OFF**; `report_pdf`/`web` siguen sin catálogo | TASK-1846 (rollout), TASK-1847 (A4/charts), TASK-1848 (web/descarga) |
+| Outputs PDF/deck/web | **Actualizado 2026-09-16 (TASK-1846):** `InsightOutputsPort` conectado; `renderableOutputs: ['deck_pdf']`; motor + lanes + MCP en código, **sin deploy y con `INSIGHTS_RENDER_ENABLED` OFF** (*delta 2026-09-16: ya desplegado — release `917491fd02e4`, Job `artifact-worker` integrado al release control plane y render ON en Vercel staging/Production, Job y `ops-worker`*); `report_pdf`/`web` siguen sin catálogo | TASK-1846 (rollout), TASK-1847 (A4/charts), TASK-1848 (web/descarga) |
 | Emisión | `INSIGHTS_ISSUANCE_ENABLED` OFF; el puerto (real desde 2026-09-16) responde `not_ready` mientras falte un output `completed` de la misma audiencia; `insights.edition.issued` nunca se ha publicado | rollout de TASK-1846 + policy EPIC-046 P01 |
 | IA de autoría | `INSIGHTS_AUTHORING_AI_ENABLED` OFF; todos los planes existentes son `deterministic` | medir costo/tokens en staging antes |
 | UI del portal (biblioteca, encargo, revisión) | no existe; sólo API/MCP | TASK-1849 |

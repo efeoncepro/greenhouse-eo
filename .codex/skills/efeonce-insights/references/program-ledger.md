@@ -86,7 +86,7 @@ flag OFF / no Cloud Run measurement" statements below, which describe the earlie
   `/artifact-render/dispatch` (Cloud Scheduler `ops-artifact-render-dispatch`, every 2 min; Proposal wins the tick);
   domain-free launcher `src/lib/render-dispatch/job-runner.ts`; consumer `services/artifact-worker/consumers/insights.ts`.
 - Gateway `efeonce-mcp` PR #14 merged (`da8295a`), v1.6.0, 51 tools, render writes on `efeonce.mcp.insights.write`.
-  **NOT deployed**: gateway deploy goes after the Greenhouse release (render routes are not in production).
+  ~~NOT deployed~~ → **deployed 2026-09-16** after release `917491fd02e4` (revision `efeonce-mcp-gateway-00054-n78`, provider canary green).
 - Migration `20260916201127095_task-1846-insights-render-client-user-actor` (expand, applied): runs/events accept
   `client_user`; the human actor travels to run, enqueue event, retry and cancel (before: always `system`).
 
@@ -144,7 +144,7 @@ ecosystem (`…/editions/{id}/render`, `…/render-runs/{id}[/retry|/cancel]`), 
 `request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render`), events
 `insights.render.*`, errors `render_disabled`/`render_rejected`, catalog `renderableOutputs: ['deck_pdf']`.
 Mapper V1 `render/deck-mapper.ts` (plan → deck-axis slides; no CoverFull; never truncates figures/claims).
-`INSIGHTS_RENDER_ENABLED` is now read in TWO runtimes (Vercel + artifact-worker).
+`INSIGHTS_RENDER_ENABLED` is now read in TWO runtimes (Vercel + artifact-worker) — superseded: THREE, the `ops-worker` dispatcher too (found in staging, fixed `d9da99df8`).
 
 **Deliberately NOT done (needs operator authorization):** worker deploy, flag flip (both runtimes), staging or
 production canary, gateway federation of the 4 tools in `efeonce-mcp`, and any `git push`. Status:

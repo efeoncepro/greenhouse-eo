@@ -121,8 +121,10 @@ deploy; usa la fuente que tengas a mano, el criterio no cambia.
   hermanos) y conserva lo que sí importa: `src/app/**`, `docs/**` y `tests/**` **no** redespliegan workers.
 - **No agregues la ruta a una sola lista.** Un hueco en cualquiera de las dos deja el worker atrás.
 - **No leas un skip como "no había cambios".** Es la lectura que dejó pasar el release `64bdd105c737`.
-- **No des por cubierto al `artifact-worker`.** Corre desde el código fuente con `tsx`, no como bundle de
-  esbuild, y **no** está registrado en este gate. Su lista de rutas sigue bajo revisión manual.
+- **Actualizado 2026-09-16 (TASK-1846): el `artifact-worker` ya está registrado en este gate.** Corre desde
+  el código fuente con `tsx`, pero el gate igual lee su grafo de imports `.ts`. No cubre los assets que no
+  son TypeScript (plantillas, fuentes del catálogo): esos entran por el prefijo grueso `src/lib/**`
+  declarado en el workflow.
 
 ## Problemas comunes
 

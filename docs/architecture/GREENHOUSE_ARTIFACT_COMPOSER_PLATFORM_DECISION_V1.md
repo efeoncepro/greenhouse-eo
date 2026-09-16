@@ -451,6 +451,16 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
 `packages/*` ni un deployable**. El único deployable nuevo previsto es el `tender-worker` de TASK-1391, y
 **sigue gateado por EPIC-027**.
 
+> **Delta 2026-09-16 — el párrafo anterior quedó atrás.** El deployable existe con otro nombre: Cloud Run
+> **Job** `artifact-worker` (TASK-1391, frontera autorizada por excepción documentada de EPIC-027 el
+> 2026-07-12). Desde TASK-1846 (release `917491fd02e4`) es **multiconsumidor** — Proposal + Efeonce Insights
+> vía registry tipado (`services/artifact-worker/consumers/*`), lo que confirma la tesis de este ADR: el motor
+> sirve a más de un dominio sin forkearse — y está **integrado al release control plane** (Job único para
+> staging y producción; primer deploy productivo en ese release). Dos piezas se ubicaron respetando la
+> frontera del primitive: el hash del manifest es domain-free en `src/lib/artifact-composer/manifest-hash.ts`,
+> y el lanzador del Job **no** vive en el composer sino en `src/lib/render-dispatch/job-runner.ts` (server-only;
+> el boundary del composer lo rechaza). Contrato: `GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`.
+
 ---
 
 ## Hard rules (NUNCA / SIEMPRE)

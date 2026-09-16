@@ -29,6 +29,22 @@ DB: greenhouse_commercial.proposals + proposal_{state_transitions,assets,evidenc
 > Operar inicialmente en **10–15 jobs/h**; el dispatcher tiene techo de **30 jobs/h** (uno cada dos
 > minutos). No extrapolar a concurrencia sostenida ni a `png-set` hasta que su command tenga datos propios.
 
+> **Delta 2026-09-16 (TASK-1846, release `917491fd02e4`) — el mapa de arriba cambió en tres puntos.**
+> (1) El Job `artifact-worker` es **multiconsumidor**: Proposal (`proposal_render_jobs`) + Efeonce Insights
+> (`greenhouse_insights.insight_outputs`) vía registry tipado (`services/artifact-worker/consumer-contract.ts`,
+> `consumers/proposal.ts`, `consumers/insights.ts`); `main.ts` ya no tiene la lógica de Proposal ni el map
+> `CATALOGS` (vive en cada consumer). Proposal conserva commands, tests y comportamiento; el reclaim por lease
+> está en el mecanismo compartido pero apagado para Proposal. (2) El hash del manifest es domain-free en
+> `src/lib/artifact-composer/manifest-hash.ts` (Proposal re-exporta) y el lanzador del Job salió del
+> composer a `src/lib/render-dispatch/job-runner.ts` (server-only; el boundary del composer lo rechaza).
+> (3) El dispatcher `/artifact-render/dispatch` drena Proposal primero y, si Proposal no lanzó nada, una
+> ejecución de Insights: **Proposal comparte el techo de 1 ejecución por tick de 2 min con Insights**. El
+> Job es único para staging y producción y quedó **integrado al release control plane**
+> (`artifact-worker-deploy.yml` push:develop + `workflow_call`, change-gate por etiqueta `git-sha`,
+> rollback con `gcloud run jobs update --image`); su primer deploy productivo fue ese release. Eso NO
+> prueba que el render de Proposal esté activo en producción: la puerta es el enqueue en Vercel Production
+> (`ARTIFACT_RENDER_JOBS_ENABLED`: presencia verificada, valor no leído) + el entitlement per-ORG.
+
 **Las 4 verdades que ordenan todo:**
 
 1. **El aggregate es `Proposal`** (no `Tender`): `origin ∈ {public_tender, private_rfp,
