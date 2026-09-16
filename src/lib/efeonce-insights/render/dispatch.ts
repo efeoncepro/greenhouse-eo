@@ -14,7 +14,7 @@ import 'server-only'
  * ejecución por tick (el Job es `parallelism=1`).
  */
 
-import { runArtifactWorkerJob } from '@/lib/artifact-composer/job-runner'
+import { runArtifactWorkerJob } from '@/lib/render-dispatch/job-runner'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 

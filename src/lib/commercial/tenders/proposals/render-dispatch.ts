@@ -20,7 +20,7 @@ import 'server-only'
  *     de carga reales, no a ojo).
  */
 
-import { runArtifactWorkerJob } from '@/lib/artifact-composer/job-runner'
+import { runArtifactWorkerJob } from '@/lib/render-dispatch/job-runner'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import {
