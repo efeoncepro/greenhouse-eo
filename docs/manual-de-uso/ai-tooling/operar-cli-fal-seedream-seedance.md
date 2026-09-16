@@ -1,9 +1,9 @@
 # Operar el CLI de fal: Seedream 5, Seedance 2.5/2.0, Minimax H3, Flux 3 y Wan 3.0
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-09-16 por agente
-> **Ultima actualizacion:** 2026-09-16 por Claude — (1.8) el comando estima el costo antes de encolar y pide `--yes` sobre el tope (`--max-usd`, `FAL_COST_CONFIRM_USD`); sin `--resolution` usa la resolución más barata; Seedream Pro guarda el formato real; `--seed` sólo donde el modelo lo declara; más de 10 `--image` se rechaza; flags nuevos `--lora …#weight_name`, `--frames`, `--split-threshold` (commit `17196ead1`). Antes (1.7): nuevo paso «Elige el modelo antes de correr» con enlace a la guía canónica de selección; costos por escalón de resolución (Wan 3.0 1080p y H3 base 2K por defecto; Wan 3.0 Prime más cara; Flux 3 publicado al doble; fórmula de tokens de Seedance); piso de 100 steps en LoRA; brechas conocidas del CLI (JPEG con `.png` en Seedream Pro sin `--format`, `--seed` en endpoints que no lo declaran, más de 10 `--image`). Antes: limpieza de estados superados: el bloqueo por saldo quedó resuelto con dos cuentas (`--balance`, `--detach`/`--status`), Wan 3.0 y Seedance 2.5 video a video verificados, espera de video 30 min; antes, Wan 3.0 y Wan 3.0 Prime (texto, imagen y referencias a video; `--duration auto`, `--thinking` con `--web-url`/`--file`, `--no-prompt-expansion`, `--seed`), advertencia de saldo agotado en fal y 403 `Exhausted balance`; antes, Flux 3 (draft → enhance, primer/ultimo cuadro, keyframes, edit y extend) y video a video con Seedance 2.5 (`--task editing|extension`, sin verificar); antes, Minimax H3 (video, camera-controls, LoRA y entrenamiento), retome por `--request-id` y cierre de la brecha de `--task`
+> **Ultima actualizacion:** 2026-09-16 por Claude — (1.9) el mismo comando opera **Higgsfield** (`--capability hf-*` o `--provider higgsfield`): 44 modelos, precio exacto antes de gastar, `--estimate`, `--cancel`; la cuenta de API todavía no tiene créditos. Antes (1.8) el comando estima el costo antes de encolar y pide `--yes` sobre el tope (`--max-usd`, `FAL_COST_CONFIRM_USD`); sin `--resolution` usa la resolución más barata; Seedream Pro guarda el formato real; `--seed` sólo donde el modelo lo declara; más de 10 `--image` se rechaza; flags nuevos `--lora …#weight_name`, `--frames`, `--split-threshold` (commit `17196ead1`). Antes (1.7): nuevo paso «Elige el modelo antes de correr» con enlace a la guía canónica de selección; costos por escalón de resolución (Wan 3.0 1080p y H3 base 2K por defecto; Wan 3.0 Prime más cara; Flux 3 publicado al doble; fórmula de tokens de Seedance); piso de 100 steps en LoRA; brechas conocidas del CLI (JPEG con `.png` en Seedream Pro sin `--format`, `--seed` en endpoints que no lo declaran, más de 10 `--image`). Antes: limpieza de estados superados: el bloqueo por saldo quedó resuelto con dos cuentas (`--balance`, `--detach`/`--status`), Wan 3.0 y Seedance 2.5 video a video verificados, espera de video 30 min; antes, Wan 3.0 y Wan 3.0 Prime (texto, imagen y referencias a video; `--duration auto`, `--thinking` con `--web-url`/`--file`, `--no-prompt-expansion`, `--seed`), advertencia de saldo agotado en fal y 403 `Exhausted balance`; antes, Flux 3 (draft → enhance, primer/ultimo cuadro, keyframes, edit y extend) y video a video con Seedance 2.5 (`--task editing|extension`, sin verificar); antes, Minimax H3 (video, camera-controls, LoRA y entrenamiento), retome por `--request-id` y cierre de la brecha de `--task`
 > **Modulo:** AI Tooling / Asset Generation
 > **Comando:** `pnpm ai:fal`
 > **Documentacion tecnica:** [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo
@@ -25,6 +25,10 @@ Para generar desde la terminal, a traves de fal.ai:
 - **video con Wan 3.0 y Wan 3.0 Prime**: desde texto, desde una imagen (con ultimo cuadro opcional) o desde
   referencias, de 2 a 30 s o con largo elegido por el modelo, y desde referencias puede **basarse en una pagina web
   o un documento**. Las 6 opciones estan verificadas (2026-09-16).
+
+Desde el 2026-09-16 el mismo comando habla también con **Higgsfield** (ver "Usar Higgsfield desde el mismo comando"):
+SOUL 2, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Recraft 4.1 (sólo raster), PixVerse 6, LTX 2.5,
+Happy Horse, Kling 3.0/Omni/O3, Grok Imagine y otra vía para Seedance, Wan y MiniMax.
 
 Es un comando **hermano** de `pnpm ai:image`, no su reemplazo: para GPT Image se sigue usando `ai:image`. Todo lo
 que produce es trabajo fuera del portal; nada se genera en tiempo real para usuarios.
@@ -540,6 +544,65 @@ trabajo real.
 | `⚠ el output no trajo "<clave>"` | La respuesta tiene otra forma que la esperada. Repite con `--json` para verla. |
 | `✓ sin assets descargables` | El modelo respondio pero no habia archivos que bajar. |
 
+### Usar Higgsfield desde el mismo comando
+
+**Antes de empezar.** La llave vive en Secret Manager (`greenhouse-higgsfield-api-key`) y se lee con
+`HIGGSFIELD_API_KEY_SECRET_REF=greenhouse-higgsfield-api-key` en `.env.local`. Si ves `Higgsfield no está configurado`,
+falta esa línea o tu usuario no tiene acceso al secreto.
+
+1. **Mira el catálogo (gratis).** Cada capacidad empieza con `hf-`:
+
+   ```bash
+   pnpm ai:fal --list --provider higgsfield
+   ```
+
+2. **Pide el precio sin gastar.** `--estimate` valida el pedido contra el esquema real del modelo, consulta el precio
+   al proveedor e imprime el cuerpo que se enviaría. No encola nada:
+
+   ```bash
+   pnpm ai:fal --capability hf-kling3-std-t2v --prompt "Paper boats on a rainy street" --duration 5 --estimate
+   ```
+
+3. **Genera.** Usa los mismos flags de siempre: `--prompt`, `--image`, `--end-image`, `--video`, `--audio`,
+   `--duration`, `--resolution`, `--aspect`, `--seed`, `--count`, `--format`, `--no-audio`, `--thinking`,
+   `--web-url`, `--file`, `--no-prompt-expansion`. El comando los traduce al campo que usa cada modelo. Lo propio de un
+   modelo (estilo de SOUL, tomas de Kling, movimiento de cámara de LTX, paleta de Recraft) va por `--input '{...}'`:
+
+   ```bash
+   pnpm ai:fal --capability hf-soul2 --prompt "Editorial portrait in window light" --aspect 3:4 --out ai-generations/2026-09-16_retrato/soul2.jpg
+   ```
+
+4. **Trabajos largos.** `--detach` encola y termina. Con el `request_id` consultas (`--status`), cancelas mientras siga
+   en cola (`--cancel`, se reembolsa) o descargas (`--request-id <id>` con la misma capacidad):
+
+   ```bash
+   pnpm ai:fal --provider higgsfield --request-id <id> --status
+   pnpm ai:fal --provider higgsfield --request-id <id> --cancel
+   pnpm ai:fal --capability hf-seedance25-i2v --request-id <id> --out clip.mp4
+   ```
+
+**Qué significan sus señales.**
+
+| Señal | Qué significa |
+|---|---|
+| `$ costo exacto del proveedor = USD …` | Precio que dio Higgsfield para ese pedido, con el descuento vigente. |
+| `$ costo ≈ USD … (cota)` | Seedance o Wan 3.0: el proveedor sólo da la fórmula; el comando la calcula antes de descuento. |
+| `sin monto calculable` | Falta un dato para la fórmula (la duración de un video remoto). Revisa la fórmula y confirma con `--yes`. |
+| `el cuerpo no cumple el esquema` | Lista todo lo que está mal en el pedido. No se envió nada. |
+| `Higgsfield rechazó el cuerpo al estimar` | El proveedor encontró otro problema. No se cobró. |
+| `403 not_enough_credits` | La cuenta de API no tiene créditos (son aparte de la suscripción de la app). No se cobró. |
+| `Maximum number of concurrent requests` | Llegaste al tope de trabajos simultáneos de la cuenta. Espera a que termine uno. No se cobró. |
+
+**Qué no hacer con Higgsfield.**
+
+- No pidas SVG a `hf-recraft41`: la API de Higgsfield sólo entrega jpg, png o webp.
+- No dejes un `--detach` sin descargar: el proveedor guarda la salida sólo unos 7 días.
+- No busques Veo 3.1, Sora 2 ni Nano Banana Pro por esta vía: la cuenta no los tiene habilitados.
+- No uses `--lora`, `--keyframe`, `--task`, `--size` ni `--fal-account`: son de fal y el comando los rechaza.
+
+**Estado (2026-09-16).** Las 44 capacidades pasaron la prueba de precio. **Ninguna generación real está verificada**
+porque la cuenta de API no tiene créditos: recárgalos en `console.higgsfield.ai/billing` antes de la primera corrida.
+
 ### Encolar sin esperar (`--detach`)
 
 ```bash
@@ -661,7 +724,9 @@ estimación de costo con confirmación y los defaults caros de resolución. Lo q
 ## Referencias tecnicas
 
 - Guia canonica de seleccion de modelos: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`
-- CLI: `scripts/ai/fal-image.ts` (`pnpm ai:fal`)
+- CLI: `scripts/ai/fal-image.ts` (`pnpm ai:fal`) · carril Higgsfield: `scripts/ai/higgsfield-lane.ts`
+- Higgsfield: cliente `src/lib/ai/higgsfield.ts`, catálogo `src/lib/ai/higgsfield-capabilities.ts`, esquemas
+  `src/lib/ai/higgsfield-schemas.json` (`pnpm ai:higgsfield:sync-schemas`), guía §5.8
 - Registro de capacidades: `src/lib/ai/fal-capabilities.ts`
 - Cliente canonico: `src/lib/ai/fal.ts` (`runFalModel`, `uploadFalFile`)
 - Catalogo y contratos: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` §Carril operativo, §Seedance video

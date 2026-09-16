@@ -85,6 +85,7 @@ ranking fechado · **[decisión]** del operador · **sin dato** = no existe evid
 | Google directo (Vertex, `global`) | **sólo** runtime `generateImage` provider `google-gemini-image`; **no hay CLI** | Nano Banana 2 (`gemini-3.1-flash-image`, default); Nano Banana Pro (`gemini-3-pro-image`) disponible pero **sin superficie** |
 | Higgsfield CLI (out-of-band) | `higgsfield` | Recraft V4.1, **vectores SVG reales**. Estado 2026-09-16: `Not authenticated` → sin vía hasta que una persona corra `higgsfield auth login` |
 | fal.ai (out-of-band, NUNCA runtime) | `pnpm ai:fal` | Seedream 5 Pro/Lite/edit/layerize (imagen); Seedance, Minimax H3, Flux 3, Wan 3.0 (video) |
+| Higgsfield API (out-of-band, NUNCA runtime) | `pnpm ai:fal --capability hf-*` | SOUL 2/Cinema, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Grok Image 2.0, Recraft 4.1 **raster (no SVG)**; video Kling/PixVerse/LTX/Happy Horse y otra vía para Seedance/Wan/H3. `--estimate` cotiza exacto sin cobrar. Estado 2026-09-16: 44/44 cotizan, **0 generaciones reales** (cuenta de API sin créditos). Guía §5.8 |
 
 Nano Banana Pro y Gemini Omni Flash van **siempre directo por Google, nunca por fal** [decisión]. Recraft por fal
 (23 endpoints) no está conectado.

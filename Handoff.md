@@ -1,5 +1,7 @@
 # Handoff activo
 
+**Higgsfield `ai:fal` (16/09):** sin créditos de API, 0 generaciones reales; guía §5.8.
+
 **Posicionamiento CRM actualizado (2026-09-16, documental):** HubSpot y Salesforce se mantienen como proveedores
 con una zona de solapamiento —mid-market alto, agentes e integraciones— pero con centros de gravedad distintos.
 HubSpot-first parte para crecimiento B2B, mid-market y time-to-value; Salesforce-first para org instalada compleja,

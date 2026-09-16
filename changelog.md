@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — `pnpm ai:fal` también trabaja con Higgsfield
+
+El mismo comando ahora opera la API de Higgsfield: 44 modelos que se eligen con `--capability hf-*`, entre ellos SOUL,
+Marketing Studio, Ideogram 4.0, Qwen Image 3, Kling Omni y O3, PixVerse 6, LTX 2.5 y Happy Horse. Antes de gastar,
+revisa el pedido contra las reglas reales de cada modelo y pide el precio exacto al proveedor, que no cobra por
+cotizar. En Seedance y Wan 3.0, que solo publican una fórmula, calcula un techo. `--estimate` cotiza sin generar y
+`--cancel` anula un trabajo que sigue en cola. La llave quedó en Secret Manager. Las 44 opciones cotizaron con la
+cuenta de Efeonce, pero todavía no se generó nada: la cuenta de la API de Higgsfield no tiene créditos. El Recraft de
+esta API entrega imágenes normales, no SVG, y Veo 3.1, Sora 2 y Nano Banana Pro no están disponibles por esta vía.
+
 ## 2026-09-16 — Los comandos de IA avisan cuánto van a costar antes de gastar
 
 `pnpm ai:fal` ahora calcula el costo antes de mandar un trabajo y se detiene si pasa de USD 1 (o del tope que
@@ -874,28 +884,3 @@ Social Media incorpora guía de efemérides, metáforas visuales y briefs; Notio
 del flujo existente a pares tarea/calendario, con fechas separadas y detección de divergencias.
 Skills espejadas Claude/Codex. Cuatro tareas tienen asignaciones nuevas aún no copiadas al calendario;
 se documenta el pendiente sin mutaciones Notion. Producción, aprobación y publicación siguen abiertas.
-
-## 2026-09-09 — Portal de servicios: EPIC-046 e integración con Efeonce Insights
-
-Registrados [EPIC-046](docs/epics/to-do/EPIC-046-client-services-visibility-and-self-service.md) y
-[ADR](docs/architecture/GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md): Berel SEO/marketing de
-contenidos y Sky diseño digital, primero visibilidad y después solicitudes/briefs. Cinco tasks nuevas
-registradas y tres existentes por reutilizar, sin cambiar asignaciones ni desplegar.
-Baseline fechado de catálogo, acceso y destinos 404; fuentes, permisos, contratación y estados separados.
-El operador aprueba la dirección y añade Insights como hito obligatorio: autogestión cliente y gestión
-interna comparten dominio/historial, con permisos distintos y token limitado a una edición. EPIC-045,
-arquitectura/ADR, TASK-1845/1846/1848/1849 y flow/wireframe sincronizados; sin otro builder o motor.
-Ampliación del operador: email de Insights con resumen/deep link, in-app y Teamsbot en esta fase;
-móvil posterior. Hito N/P09 reutiliza Hub y sus dueñas, distingue entrega/consulta/acción y exige
-preferencias, destino autorizado y dedupe. TASK-690/693/1848/1849 actualizadas; sin envíos reales.
-El operador autoriza el registro: TASK-1852–1856 creadas con templates, contratos UI/backend y
-criterios; TASK-1852 ↔ TASK-1834 enlazadas para identidad/contexto/deep links y rollout nativo
-condicional. Inicio por 1852 con login vigente probado; commit documental autorizado, sin implementación, push ni deploy.
-Diseño UI ampliado por pedido del operador: ocho documentos TASK-1854/1856 con pantallas H0/S1 y R0–R5,
-campos de contenidos/SEO/diseño, deep links, recovery, adjuntos, copy, responsive y motion causal.
-Primitives verificadas en código; tareas/backend/epic alineados. UI ready no hasta integración/primer fold/GVC;
-umbral premium vigente ≥4.5, sin declarar capturas, scorecard ni funcionalidad desplegada.
-Asignación Claude/Codex documentada en EPIC-022/045/046: modelo, esfuerzo y revisión por task/carril;
-Astra para fronteras críticas, Sol para integración, Opus para UI/editorial y Fable para TASK-1669.
-Reglas comunes en EPIC-046: un editor por archivos, continuidad de owner y sin ejecución/rollout implícitos.
-Commit completo autorizado: incluye el movimiento previo de TASK-1690 a in-progress; lifecycle, registro y README conciliados, sin avance de implementación.

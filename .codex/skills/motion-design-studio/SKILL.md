@@ -159,6 +159,10 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   `FAL_COST_CONFIRM_USD` o `--max-usd`); en video, sin `--resolution` usa el escalón más barato: pasa la
   resolución de entrega explícita.
   Guía canónica imagen + video: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`.
+  **Higgsfield API** en el mismo CLI (`--capability hf-*`, desde 2026-09-16): Kling 3.0 std/pro/4K/Turbo, Kling O3 y
+  Omni primer-último cuadro, PixVerse 6, LTX 2.5, Happy Horse, Hailuo 2.3, Grok Video 1.5 y otra vía para Seedance
+  2.5/2.0, Wan 3.0 y H3. Precio exacto por API (`--estimate`, no cobra); salida retenida ~7 días. Sin Veo 3.1 ni Sora 2
+  por esta vía. **Ninguna generación real verificada** hasta recargar créditos de API (guía §5.8).
 - **Producir (humano)**: After Effects (mograph/compositing), Blender/C4D (3D), Nuke/Fusion
   (compositing/VFX), Mocha (tracking), Houdini (FX/simulaciones) — handoff con spec (`modules/11`).
 - **Editar + finalizar**: montaje, sonido, color grade, render, entrega (`modules/06`, `07`, `08`, `10`).

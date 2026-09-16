@@ -25,8 +25,8 @@ export interface FalApiUnitPrice {
   unit: string
 }
 
-/** Área aproximada de salida por resolución de Seedance (medido: 480p 16:9 salió 864×496). */
-const SEEDANCE_AREA_BY_RESOLUTION: Readonly<Record<string, number>> = {
+/** Área aproximada de salida por resolución de Seedance (medido: 480p 16:9 salió 864×496). También la usa Higgsfield. */
+export const SEEDANCE_AREA_BY_RESOLUTION: Readonly<Record<string, number>> = {
   '480p': 864 * 496,
   '720p': 1280 * 720,
   '1080p': 1920 * 1080,

@@ -31,9 +31,12 @@ import {
   resolveImageOutputFormat
 } from '@/lib/ai/fal-input-rules'
 import { estimateFalCost, resolveFalCostCap } from '@/lib/ai/fal-pricing'
+import { findHiggsfieldCapability, HIGGSFIELD_CAPABILITY_PREFIX } from '@/lib/ai/higgsfield-capabilities'
+
+import { printHiggsfieldCapabilities, runHiggsfieldLane } from './higgsfield-lane'
 
 /**
- * CLI de fal.ai para Greenhouse — `pnpm ai:fal`.
+ * CLI de modelos de media para Greenhouse — `pnpm ai:fal`. Dos proveedores: fal.ai (default) y Higgsfield.
  *
  * Hermano de `pnpm ai:image`, NO su reemplazo. Son CLIs separados a propósito: `ai:image` habla el
  * contrato de OpenAI (model/quality/size) y fal tiene un esquema de input POR ENDPOINT. Mezclarlos
@@ -41,6 +44,13 @@ import { estimateFalCost, resolveFalCostCap } from '@/lib/ai/fal-pricing'
  *
  * Es model-agnostic por diseño: `--capability` resuelve un slug conocido del registro, y `--model`
  * acepta CUALQUIER slug de fal — incluidos los que el registro todavía no lista.
+ *
+ * Higgsfield (`--provider higgsfield`, implícito en cualquier `--capability hf-*`) vive en `higgsfield-lane.ts`: valida
+ * contra el JSON Schema del endpoint, pide el precio EXACTO a la API de estimación (que tampoco cobra) y comparte los
+ * flags de medios/video de abajo. Los flags propios de fal (LoRA, keyframes, --task, entrenamiento…) se rechazan.
+ *   pnpm ai:fal --capability hf-soul2 --prompt "<texto>" --aspect 3:4 --out retrato.jpg
+ *   pnpm ai:fal --capability hf-kling3-std-t2v --prompt "<texto>" --duration 5 --estimate
+ *   pnpm ai:fal --provider higgsfield --request-id <id> --status | --cancel
  *
  * Uso:
  *   pnpm ai:fal --list
@@ -65,6 +75,9 @@ import { estimateFalCost, resolveFalCostCap } from '@/lib/ai/fal-pricing'
  *   --json               Imprime el output crudo del modelo
  *   --yes                Confirma corridas cuya estimación supera el tope (default USD 1; env FAL_COST_CONFIRM_USD)
  *   --max-usd <n>        Tope de confirmación para esta corrida
+ *   --provider <fal|higgsfield>  Default fal; `--capability hf-*` implica higgsfield
+ *   --estimate           Valida e imprime el costo sin encolar (fal: estimación local · higgsfield: API del proveedor)
+ *   --cancel             Higgsfield, con --request-id: cancela mientras siga en cola (se reembolsa)
  *   --fal-account <FAL_API_KEY|FAL_API_KEY_B>  Fuerza una cuenta. Omitido = la de más saldo, y si fal la bloquea por
  *                        saldo pasa sola a la otra (el bloqueo ocurre antes de encolar: no cobra)
  *
@@ -144,11 +157,18 @@ interface CliArgs {
   detach: boolean
   status: boolean
   falAccount?: FalAccountName
+  provider?: MediaProvider
+  estimate: boolean
+  cancel: boolean
   help: boolean
 }
 
+const MEDIA_PROVIDERS = ['fal', 'higgsfield'] as const
+
+type MediaProvider = (typeof MEDIA_PROVIDERS)[number]
+
 const parseArgs = (argv: string[]): CliArgs => {
-  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], keyframes: [], noAudio: false, thinking: false, noPromptExpansion: false, json: false, list: false, balance: false, detach: false, status: false, yes: false, help: false }
+  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], keyframes: [], noAudio: false, thinking: false, noPromptExpansion: false, json: false, list: false, balance: false, detach: false, status: false, estimate: false, cancel: false, yes: false, help: false }
 
   let i = 0
 
@@ -209,6 +229,19 @@ const parseArgs = (argv: string[]): CliArgs => {
       case '--balance': args.balance = true; break
       case '--detach': args.detach = true; break
       case '--status': args.status = true; break
+      case '--estimate': args.estimate = true; break
+      case '--cancel': args.cancel = true; break
+
+      case '--provider': {
+        const value = next()
+
+        if (!(MEDIA_PROVIDERS as readonly string[]).includes(value)) {
+          throw new Error(`--provider debe ser uno de: ${MEDIA_PROVIDERS.join(', ')}.`)
+        }
+
+        args.provider = value as MediaProvider
+        break
+      }
 
       case '--fal-account': {
         const value = next()
@@ -959,27 +992,83 @@ const confirmEstimatedCost = async (params: {
   }
 }
 
+/**
+ * Proveedor de la corrida: `--provider` explícito, o Higgsfield si la capacidad es `hf-*`. Un `hf-*` con
+ * `--provider fal` es contradictorio y se rechaza en vez de adivinar.
+ */
+const resolveProvider = (args: CliArgs): MediaProvider => {
+  const isHiggsfieldId = Boolean(args.capability?.startsWith(HIGGSFIELD_CAPABILITY_PREFIX))
+
+  if (isHiggsfieldId && args.provider === 'fal') {
+    throw new Error(`--capability ${args.capability} es de Higgsfield; quita --provider fal.`)
+  }
+
+  if (isHiggsfieldId && args.capability && !findHiggsfieldCapability(args.capability)) {
+    throw new Error(`--capability "${args.capability}" no existe en Higgsfield. Ver pnpm ai:fal --list --provider higgsfield.`)
+  }
+
+  return args.provider ?? (isHiggsfieldId ? 'higgsfield' : 'fal')
+}
+
 const main = async () => {
   const args = parseArgs(process.argv.slice(2))
 
   if (args.help) {
     process.stdout.write('Ver el encabezado de scripts/ai/fal-image.ts para el detalle de flags.\n')
-    printCapabilities()
+    if (args.provider !== 'higgsfield') printCapabilities()
+    if (args.provider !== 'fal') printHiggsfieldCapabilities()
     process.exit(0)
   }
 
   if (args.balance) {
-    for (const { account, balance } of await getFalAccountBalances()) {
-      process.stdout.write(`${account.padEnd(14)} ${balance === null ? 'saldo no disponible' : `USD ${balance.toFixed(2)}`}\n`)
+    if (args.provider !== 'higgsfield') {
+      for (const { account, balance } of await getFalAccountBalances()) {
+        process.stdout.write(`${account.padEnd(14)} ${balance === null ? 'saldo no disponible' : `USD ${balance.toFixed(2)}`}\n`)
+      }
     }
+
+    // Higgsfield no documenta un endpoint de saldo: no se inventa uno.
+    if (args.provider !== 'fal') process.stdout.write(`${'HIGGSFIELD'.padEnd(14)} sin API de saldo documentada · console.higgsfield.ai/billing\n`)
 
     process.exit(0)
   }
 
   if (args.list) {
-    printCapabilities()
+    if (args.provider !== 'higgsfield') printCapabilities()
+    if (args.provider !== 'fal') printHiggsfieldCapabilities()
     process.exit(0)
   }
+
+  const provider = resolveProvider(args)
+
+  if (provider === 'higgsfield') {
+    const falOnly: [string, unknown][] = [
+      ['--bitrate', args.bitrate], ['--task', args.task], ['--prompt-expansion', args.promptExpansion],
+      ['--lora', args.loras.length || undefined], ['--camera-trajectory', args.cameraTrajectory],
+      ['--keyframe', args.keyframes.length || undefined], ['--safety-tolerance', args.safetyTolerance],
+      ['--draft-cache', args.draftCache], ['--training-data', args.trainingData], ['--steps', args.steps],
+      ['--rank', args.rank], ['--learning-rate', args.learningRate], ['--trigger', args.trigger],
+      ['--frames', args.frames], ['--split-threshold', args.splitThreshold], ['--size', args.size],
+      ['--fal-account', args.falAccount]
+    ]
+
+    await runHiggsfieldLane(
+      { ...args, falOnlyFlags: falOnly.filter(([, value]) => value !== undefined).map(([flag]) => flag) },
+      {
+        resolvePath,
+        isRemote,
+        mimeFor,
+        extractAssets: output => extractAssets(output, null),
+        downloadAsset,
+        probeDurationSeconds,
+        defaultOutDir: DEFAULT_OUT_DIR
+      }
+    )
+
+    return
+  }
+
+  if (args.cancel) throw new Error('--cancel sólo existe en Higgsfield: fal no expone cancelación en esta CLI.')
 
   if (!args.capability && !args.model) {
     throw new Error('Indica --capability <id> (ver --list) o --model <slug> para un slug directo.')
@@ -1048,6 +1137,11 @@ const main = async () => {
     const input = await buildInput(args, capability)
 
     await confirmEstimatedCost({ args, capability, slug, input })
+
+    if (args.estimate) {
+      process.stdout.write(`  (sólo estimación: no se encoló nada)\n  cuerpo: ${JSON.stringify(input)}\n`)
+      process.exit(0)
+    }
 
     process.stdout.write(`→ ${slug} · hasta ${Math.round(timeoutMs / 1000)}s de espera\n`)
 

@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.10
+> **Version:** 1.11
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-09-16 por Claude — (1.10) los comandos avisan cuánto costará antes de gastar; el de Fal pide confirmación si es caro y, en video, usa por defecto la resolución más barata; el formato del archivo sale del nombre que se le da. Antes: nueva sección «Qué modelo usar para cada cosa» con enlace a la guía técnica de selección; correcciones de costos: en video el precio sube con la resolución (Wan 3.0 y H3 usan por defecto la más cara), Wan 3.0 Prime cuesta más que Wan 3.0, Flux 3 publica precios del doble de lo registrado, el costo de Seedance y de GPT Image 2.5 sí se puede calcular antes; H3 2K/4K son reescalados; entrenar una LoRA cobra mínimo 100 pasos. Antes: `pnpm ai:fal` trabaja con dos cuentas de Fal y cambia sola si una se queda sin saldo, muestra el saldo con `--balance` y puede encolar sin esperar (`--detach` / `--status`); prueba completa: 47 de 55 opciones probadas, costo real medido y filtro de contenido de Seedance 2.5 (rechaza marcas y personas reales y cobra el intento); antes, Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
+> **Ultima actualizacion:** 2026-09-16 por Claude — (1.11) `pnpm ai:fal` también trabaja con **Higgsfield**: 44 modelos más (SOUL, Marketing Studio, Ideogram, Kling, PixVerse y otros), con precio exacto antes de gastar; todavía sin créditos para generar. Antes (1.10) los comandos avisan cuánto costará antes de gastar; el de Fal pide confirmación si es caro y, en video, usa por defecto la resolución más barata; el formato del archivo sale del nombre que se le da. Antes: nueva sección «Qué modelo usar para cada cosa» con enlace a la guía técnica de selección; correcciones de costos: en video el precio sube con la resolución (Wan 3.0 y H3 usan por defecto la más cara), Wan 3.0 Prime cuesta más que Wan 3.0, Flux 3 publica precios del doble de lo registrado, el costo de Seedance y de GPT Image 2.5 sí se puede calcular antes; H3 2K/4K son reescalados; entrenar una LoRA cobra mínimo 100 pasos. Antes: `pnpm ai:fal` trabaja con dos cuentas de Fal y cambia sola si una se queda sin saldo, muestra el saldo con `--balance` y puede encolar sin esperar (`--detach` / `--status`); prueba completa: 47 de 55 opciones probadas, costo real medido y filtro de contenido de Seedance 2.5 (rechaza marcas y personas reales y cobra el intento); antes, Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 # Generador Visual de Assets con IA
@@ -201,6 +201,29 @@ Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recra
 - **Costo:** se paga por segundo de video segun el modelo (ejemplo: un clip corto economico ronda los US$0.36; uno de mayor calidad, varios dolares). Siempre revisar el precio del modelo en `fal.ai/models` antes de generar.
 
 > Detalle tecnico: ver [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) para la API del generador, system prompts, contrato SVG, endpoints internos y la seccion "Fal.ai — agregador de generacion media".
+
+## Higgsfield dentro de `pnpm ai:fal` (desde 2026-09-16)
+
+Higgsfield es otro agregador de modelos, parecido a Fal, con modelos propios (SOUL para retratos realistas, Marketing
+Studio para piezas de campaña) y otros que Fal no ofrece (Ideogram 4.0, Qwen Image 3, Z-Image Turbo, PixVerse 6,
+LTX 2.5, Happy Horse, Kling Omni y O3). En vez de crear otro comando, se sumó al mismo `pnpm ai:fal`: las opciones de
+Higgsfield empiezan con `hf-`.
+
+| Qué cambia | Cómo funciona |
+|---|---|
+| Precio | Higgsfield dice el precio exacto antes de generar. El comando lo muestra y pide confirmar si pasa el tope. En Seedance y Wan 3.0 calcula un techo con la fórmula del proveedor. |
+| Revisión previa | El pedido se compara con las reglas reales de cada modelo antes de gastar, y el comando lista todo lo que falta o sobra. |
+| Solo cotizar | `--estimate` muestra el precio sin generar nada. |
+| Archivos | Higgsfield los guarda unos 7 días; el comando los descarga siempre. |
+| Vectores | El Recraft de Higgsfield entrega imágenes normales (jpg, png, webp), no SVG. |
+
+**Estado:** los 44 modelos respondieron con precio con la cuenta de Efeonce. **Todavía no se generó nada real**,
+porque la cuenta de la API de Higgsfield no tiene créditos (son aparte de la suscripción de la app). Veo 3.1, Sora 2 y
+Nano Banana Pro no están disponibles por esta vía.
+
+> Detalle técnico: [Guía de selección de modelos §5.8](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) ·
+> [Manual del comando](../../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md) · código en
+> `src/lib/ai/higgsfield.ts` y `scripts/ai/higgsfield-lane.ts`.
 
 ## El comando `pnpm ai:fal`: imágenes, capas y video (desde 2026-09-16)
 
