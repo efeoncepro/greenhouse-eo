@@ -197,9 +197,10 @@ lo deja colgado para siempre. `listExpiredQueuedRenderJobs` (`render-jobs.ts:720
 deadline vencido, nunca `running` estancado. Es una brecha latente de Proposal, no de Insights.
 
 Consecuencia de diseño: el criterio *"dos workers y un lease vencido no crean dos outputs finales; fencing impide
-finalización vieja"* describe un hazard que **aparece cuando esta task agrega reclamo por lease**. Por lo tanto
-**lease y fencing deben entrar en el mismo slice**; separarlos abre una ventana de doble finalización que hoy no
-existe. Esto reordena el Scope: el fencing no es parte del Slice 3, es parte del Slice 2.
+finalización vieja"* describe un hazard que **aparece cuando esta task agrega reclamo por lease** — hoy no puede
+ocurrir porque nada re-reclama. El Scope ya agrupa "claim/lease/fencing" en el Slice 2, y esta auditoría confirma
+que esa agrupación es **load-bearing, no estilística**: separar el lease del fencing durante la implementación
+abriría una ventana de doble finalización que hoy no existe. No dividir ese ítem del Slice 2.
 
 ### 2. El worker es un Cloud Run Job, no un servicio
 
