@@ -272,10 +272,10 @@ banderas. La v3 de `efeonce-contacto` (`fver-c00955ca-863a-4e7d-99c7-c09706660a3
 localizadas, typeahead/listbox accesible y chevron con orientación cerrada/abierta verificada; la v2 fue
 deprecada conservando el destino existente.
 
-Se aplicó una mitigación page-scoped en WordPress el 2026-09-16 (`ghf-country-icon-ohio-override-v1`, página
-20729, con snapshot `_gh_contacto_before_country_icon_override`) que oculta el glifo `globe ↗` sin otro release.
-El hotfix definitivo del renderer `d15bb9256` (sobre `e5d4a0fb2`) queda pendiente para el próximo release; no
-requiere una nueva versión del formulario.
+Se probó y revirtió el 2026-09-16 la mitigación page-scoped de WordPress (`ghf-country-icon-ohio-override-v1`, página
+20729, snapshot `_gh_contacto_before_country_icon_override`): el CSS no atraviesa el Shadow DOM y dejaba `globe`
+junto al SVG. No queda parche live. El hotfix definitivo del renderer `d15bb9256` (sobre `e5d4a0fb2`) queda
+preparado para el próximo release; no requiere una nueva versión del formulario.
 
 ## 2026-09-15 — TASK-1845: foundation de Efeonce Insights en develop (code complete, rollout pendiente)
 

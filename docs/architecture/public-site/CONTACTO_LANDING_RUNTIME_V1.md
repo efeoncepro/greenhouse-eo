@@ -55,12 +55,11 @@ sin borrar submissions.
 
 ### Pendiente para el próximo release del renderer
 
-Mitigación live aplicada el 2026-09-16 mediante CSS page-scoped `ghf-country-icon-ohio-override-v1` en la página
-20729, con snapshot `_gh_contacto_before_country_icon_override`. Los commits `e5d4a0fb2` y `d15bb9256` quedan
-preparados como hotfix definitivo del renderer. No requiere crear otra versión de Growth Forms ni repetir la
-activación de países.
-Debe promoverse por el flujo de producción para que `efeoncepro.com` deje de servir el bundle anterior; hasta
-entonces el runtime puede mostrar `↗ País` aunque el contrato v3 y el combo funcionen correctamente.
+El override page-scoped `ghf-country-icon-ohio-override-v1` se probó y se revirtió el 2026-09-16: el CSS no
+atraviesa el Shadow DOM del renderer y dejaba `globe` junto al SVG. Se restauró el snapshot
+`_gh_contacto_before_country_icon_override`; no queda mitigación live. Los commits `e5d4a0fb2` y `d15bb9256`
+contienen el hotfix correcto del renderer, preparado para el próximo release. No requiere crear otra versión de
+Growth Forms ni repetir la activación de países. Hasta promover ese bundle, el runtime puede mostrar `↗ País`.
 
 ## Release aplicado: cobertura y banda de reuniones (2026-09-16)
 
