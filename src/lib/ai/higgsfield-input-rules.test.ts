@@ -41,11 +41,16 @@ describe('catálogo Higgsfield', () => {
     }
   })
 
-  it('Recraft de Higgsfield es raster: el esquema no ofrece svg', () => {
+  it('Recraft: output_format sin svg (la API lo rechaza) y model_type de la app no se bloquea en local', () => {
+    // La API responde 400 a output_format svg (verificado 2026-09-16). Si model_type vector entrega SVG por la API está
+    // sin confirmar: esta guarda sólo asegura que la validación local no impida la prueba real.
     for (const endpoint of ['recraft/v4.1/text-to-image', 'recraft/v4.1/pro/text-to-image']) {
-      const format = (schemaOf(endpoint).properties as Record<string, { enum?: string[] }>).output_format
+      const schema = schemaOf(endpoint)
+      const format = (schema.properties as Record<string, { enum?: string[] }>).output_format
 
       expect(format.enum).not.toContain('svg')
+      expect(validateHiggsfieldInput(schema, { prompt: 'x', model_type: 'vector' })).toEqual([])
+      expect(validateHiggsfieldInput(schema, { prompt: 'x', model_type: 'banana' })).toHaveLength(1)
     }
   })
 })

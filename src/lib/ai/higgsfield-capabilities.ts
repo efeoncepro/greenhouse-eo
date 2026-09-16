@@ -73,9 +73,27 @@ const DOCUMENTED_SCHEMAS: Record<string, HiggsfieldJsonSchema> = {
   }
 }
 
+/**
+ * Campos que la app de Higgsfield expone pero el playground de la API no declara. Recraft V4.1 en la app acepta
+ * `model_type` (standard · vector · utility · utility_vector; verificado con el conector de la app 2026-09-16). La API
+ * no lo documenta y su estimación IGNORA campos desconocidos (`foo`, `model_type: "banana"` → 200), así que aceptar el
+ * campo acá sólo evita que la validación local lo bloquee: que la API lo respete —y si con `vector` entrega SVG— está
+ * SIN CONFIRMAR hasta una generación real.
+ */
+const APP_ONLY_PROPERTIES: Record<string, Record<string, HiggsfieldJsonSchema>> = {
+  'recraft/v4.1/text-to-image': { model_type: { type: 'string', enum: ['standard', 'vector', 'utility', 'utility_vector'] } },
+  'recraft/v4.1/pro/text-to-image': { model_type: { type: 'string', enum: ['standard', 'vector', 'utility', 'utility_vector'] } }
+}
+
 /** Esquema de entrada de un endpoint: snapshot del playground, o la transcripción documentada. `null` si no hay. */
-export const getHiggsfieldSchema = (endpoint: string): HiggsfieldJsonSchema | null =>
-  SNAPSHOT.schemas[endpoint] ?? DOCUMENTED_SCHEMAS[endpoint] ?? null
+export const getHiggsfieldSchema = (endpoint: string): HiggsfieldJsonSchema | null => {
+  const base = SNAPSHOT.schemas[endpoint] ?? DOCUMENTED_SCHEMAS[endpoint] ?? null
+  const extra = APP_ONLY_PROPERTIES[endpoint]
+
+  if (!base || !extra) return base
+
+  return { ...base, properties: { ...((base.properties ?? {}) as Record<string, HiggsfieldJsonSchema>), ...extra } }
+}
 
 /**
  * Barrido `pnpm ai:fal --capability <id> --estimate` sobre TODO el catálogo con la cuenta de Efeonce: las 44
@@ -116,11 +134,11 @@ export const HIGGSFIELD_CAPABILITIES: readonly HiggsfieldCapability[] = [
   capability('hf-marketing-studio', 'marketing-studio/image', 'Marketing Studio (piezas de campaña, producto)', 'image', 'image-edit', {
     note: 'Hasta 16 referencias; modo enhanced con preset_id + imagen de producto; 1k/2k/4k'
   }),
-  capability('hf-recraft41', 'recraft/v4.1/text-to-image', 'Recraft V4.1 (raster)', 'image', 'text-to-image', {
-    note: 'SÓLO raster jpg/png/webp: NO entrega SVG. Paleta por colors/background_color'
+  capability('hf-recraft41', 'recraft/v4.1/text-to-image', 'Recraft V4.1', 'image', 'text-to-image', {
+    note: 'output_format jpg/png/webp; SVG SIN CONFIRMAR: probar --input \'{"model_type":"vector"}\' con una generación real. Paleta por colors/background_color'
   }),
-  capability('hf-recraft41-pro', 'recraft/v4.1/pro/text-to-image', 'Recraft V4.1 Pro (raster 2k)', 'image', 'text-to-image', {
-    note: 'SÓLO raster jpg/png/webp: NO entrega SVG'
+  capability('hf-recraft41-pro', 'recraft/v4.1/pro/text-to-image', 'Recraft V4.1 Pro (2k)', 'image', 'text-to-image', {
+    note: 'output_format jpg/png/webp; SVG SIN CONFIRMAR (model_type vector por --input)'
   }),
   capability('hf-ideogram4', 'ideogram/v4.0', 'Ideogram 4.0 (tipografía en imagen)', 'image', 'text-to-image', {
     note: 'rendering_speed TURBO/DEFAULT/QUALITY; image_url opcional con image_weight'

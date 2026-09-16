@@ -27,7 +27,7 @@ Para generar desde la terminal, a traves de fal.ai:
   o un documento**. Las 6 opciones estan verificadas (2026-09-16).
 
 Desde el 2026-09-16 el mismo comando habla también con **Higgsfield** (ver "Usar Higgsfield desde el mismo comando"):
-SOUL 2, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Recraft 4.1 (sólo raster), PixVerse 6, LTX 2.5,
+SOUL 2, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Recraft 4.1 (SVG sin confirmar), PixVerse 6, LTX 2.5,
 Happy Horse, Kling 3.0/Omni/O3, Grok Imagine y otra vía para Seedance, Wan y MiniMax.
 
 Es un comando **hermano** de `pnpm ai:image`, no su reemplazo: para GPT Image se sigue usando `ai:image`. Todo lo
@@ -595,7 +595,7 @@ falta esa línea o tu usuario no tiene acceso al secreto.
 
 **Qué no hacer con Higgsfield.**
 
-- No pidas SVG a `hf-recraft41`: la API de Higgsfield sólo entrega jpg, png o webp.
+- No des por hecho que `hf-recraft41` entrega SVG: `--format svg` se rechaza, y `--input '{"model_type":"vector"}'` (modo vector de la app) está sin probar por la API.
 - No dejes un `--detach` sin descargar: el proveedor guarda la salida sólo unos 7 días.
 - No busques Veo 3.1, Sora 2 ni Nano Banana Pro por esta vía: la cuenta no los tiene habilitados.
 - No uses `--lora`, `--keyframe`, `--task`, `--size` ni `--fal-account`: son de fal y el comando los rechaza.

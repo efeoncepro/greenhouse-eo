@@ -3,7 +3,7 @@
 > **Tipo de documento:** Referencia técnica agent-facing
 > **Version:** 1.2
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-16 por Claude — v1.2: carril **Higgsfield API** dentro de `pnpm ai:fal` (§5.8): 44 capacidades con esquema real y precio exacto por API; Recraft de Higgsfield API es **raster**, no SVG. v1.1: brechas de los CLIs corregidas (commit `17196ead1`): estimación de costo previa con confirmación en `ai:fal`, resolución barata por defecto, formato real, `--seed` y tope de referencias validados, flags de LoRA/entrenador; `ai:image` valida `--size`/`--background`, agrega `--format` y estima costo
+> **Ultima actualizacion:** 2026-09-16 por Claude — v1.2: carril **Higgsfield API** dentro de `pnpm ai:fal` (§5.8): 44 capacidades con esquema real y precio exacto por API; Recraft de Higgsfield API: SVG **sin confirmar**. v1.1: brechas de los CLIs corregidas (commit `17196ead1`): estimación de costo previa con confirmación en `ai:fal`, resolución barata por defecto, formato real, `--seed` y tope de referencias validados, flags de LoRA/entrenador; `ai:image` valida `--size`/`--background`, agrega `--format` y estima costo
 > **Alcance:** todos los modelos de imagen y video disponibles en `pnpm ai:image` (OpenAI) y `pnpm ai:fal` (55 capacidades de fal + 44 de Higgsfield API), más los carriles fuera de esos CLIs y los candidatos evaluados que NO están conectados.
 > **Documentación relacionada (no se duplica acá):**
 > [Catálogo de modelos fal](GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) ·
@@ -63,7 +63,7 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 | Un raster final para marca, UI, pieza editorial o edición con máscara | `pnpm ai:image` (OpenAI) | Máscara real, transparencia plena en 2.5, #1–#2 en Arena/AA [tercero] |
 | Materialidad, atmósfera, look development, lotes baratos, capas editables | `pnpm ai:fal` (Seedream 5) | Rango de aspecto 1/16–16, Lite a USD 0,035, único con layerize [oficial] |
 | Modelos propios de Higgsfield (SOUL 2, Marketing Studio) o familias que fal no expone (Ideogram 4.0, Qwen Image 3, Z-Image, PixVerse 6, LTX 2.5, Happy Horse, Kling 3.0/Omni/O3, Grok Imagine) | `pnpm ai:fal --capability hf-*` (Higgsfield API) | Precio exacto por API antes de encolar [contrato]; **ninguna generación real verificada: la cuenta de API no tiene créditos** (§5.8) |
-| Vectores reales (SVG) | Recraft V4.1 vía Higgsfield CLI | GPT Image y Seedream son raster [contrato]; **hoy sin sesión** (§8). El Recraft de la **API** de Higgsfield (`hf-recraft41`) es raster [contrato] |
+| Vectores reales (SVG) | Recraft V4.1 vía Higgsfield CLI | GPT Image y Seedream son raster [contrato]; **hoy sin sesión** (§8). El Recraft de la **API** de Higgsfield (`hf-recraft41`): SVG **sin confirmar** (§5.8) |
 | Nano Banana 2 / Pro | Google directo (Vertex) | [decisión] nunca por fal; no hay CLI (§10) |
 
 ### 2.2 Árbol
@@ -84,7 +84,7 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 | **Formatos extremos (más de 3:1)** | Seedream Pro (aspecto 1/16–16) | [oficial] | GPT Image 2 resolvió 3:1 en un pase [verificado 2026-07-18] | GPT Image más allá de 3:1: tope 1:3–3:1 [oficial] |
 | **Texto multilingüe dentro de la imagen (concepto)** | Seedream 5 Pro | Texto denso multilingüe declarado, 16 idiomas de prompt incluido español [oficial] | GPT Image 2 escribió bien una frase corta en español [verificado 2026-07-18] | Entregar ese texto como final; OpenAI no declara nada multilingüe para 2.5 [oficial, ausencia] |
 | **Infografía o layout denso (concepto)** | GPT Image 2.5 o Seedream Pro | 2.5 "improves infographic accuracy and layout" [oficial]; Pro "dense text into professional layouts" [oficial] | — | Confiar en datos o cifras dentro de la imagen |
-| **Vectores (SVG)** | Recraft V4.1 vía Higgsfield **CLI** | Único vector real [contrato] | Recraft por fal: no conectado (§10) | Vectorizar un raster de GPT/Seedream y llamarlo vector; usar `hf-recraft41` (API) esperando SVG: sólo entrega jpg/png/webp [contrato] |
+| **Vectores (SVG)** | Recraft V4.1 vía Higgsfield **CLI** | Único vector real [contrato] | Recraft por fal: no conectado (§10) | Vectorizar un raster de GPT/Seedream y llamarlo vector; dar por hecho que `hf-recraft41` (API) entrega SVG: sin confirmar (§5.8) |
 | **Campaña híbrida** | Seedream ↔ GPT Image 2/2.5 → video | Flujo canónico [decisión], ver §6.16 | — | Mezclar anclas de distintas campañas |
 
 ---
@@ -625,7 +625,7 @@ pnpm ai:fal --capability wan3prime-t2v --prompt "<escena>" --duration 5 --resolu
 
 **Qué es.** Segundo proveedor de `pnpm ai:fal`, con el mismo diseño que fal (cola asíncrona, clave `id:secret` en `Authorization: Key`). Cliente canónico `src/lib/ai/higgsfield.ts`; secreto `greenhouse-higgsfield-api-key` en Secret Manager (`efeonce-group`), leído vía `HIGGSFIELD_API_KEY_SECRET_REF`. `--capability hf-*` elige el proveedor sola; `--provider higgsfield --model <endpoint>` abre cualquier otro endpoint [contrato].
 
-**Catálogo.** 44 capacidades (`pnpm ai:fal --list --provider higgsfield`): SOUL 2 / SOUL / SOUL Cinema, Marketing Studio, Recraft 4.1 (+Pro), Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Grok Imagine Image 2.0; Seedance 2.5 (t2v, i2v, r2v, editar, extender) y 2.0; Wan 3.0 (t2v, i2v, r2v), Wan 3.0 Prime, 2.7 y 2.6; Kling 3.0 std/pro/4K/Turbo, Kling O3 y Omni primer-último cuadro, Kling 2.6 Pro, 2.5 Turbo; MiniMax H3 (sólo 2K), Hailuo 2.3, LTX 2.5 Fast/Pro, PixVerse 6, Happy Horse 1.0/1.1, Grok Imagine Video 1.5 [contrato].
+**Catálogo.** 44 capacidades (`pnpm ai:fal --list --provider higgsfield`): SOUL 2 / SOUL / SOUL Cinema, Marketing Studio, Recraft 4.1 (+Pro; SVG sin confirmar), Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Grok Imagine Image 2.0; Seedance 2.5 (t2v, i2v, r2v, editar, extender) y 2.0; Wan 3.0 (t2v, i2v, r2v), Wan 3.0 Prime, 2.7 y 2.6; Kling 3.0 std/pro/4K/Turbo, Kling O3 y Omni primer-último cuadro, Kling 2.6 Pro, 2.5 Turbo; MiniMax H3 (sólo 2K), Hailuo 2.3, LTX 2.5 Fast/Pro, PixVerse 6, Happy Horse 1.0/1.1, Grok Imagine Video 1.5 [contrato].
 
 **Contrato de entrada.** No se transcribe a mano: `pnpm ai:higgsfield:sync-schemas` congela en `src/lib/ai/higgsfield-schemas.json` el JSON Schema que el playground de la consola publica por endpoint (43 al 2026-09-16; SOUL Cinema transcrito de su documentación). La CLI mapea los flags genéricos al campo real de cada endpoint (`--image` → `image_url`/`first_frame_url`/`image_urls`; `--end-image` → `end_image_url`/`last_image_url`/`last_frame_url`; `--no-audio` → `generate_audio:false` o `sound:"off"`; `--count` → `batch_size`) y valida todo el cuerpo en local antes de pedir precio. Lo propio de cada endpoint (`style_id`, `multi_prompt`, `camera_movement`, `rendering_speed`, `colors`, `preset_id`) va por `--input` [contrato].
 
@@ -648,7 +648,9 @@ pnpm ai:fal --capability wan3prime-t2v --prompt "<escena>" --duration 5 --resolu
 
 **Cuándo SÍ.** Modelos que fal no expone (SOUL, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image, LTX 2.5, PixVerse 6, Happy Horse, Kling Omni/O3); comparar precio exacto antes de gastar [contrato].
 
-**Cuándo NO.** SVG (el Recraft de la API es raster); Veo 3.1, Sora 2 y Nano Banana Pro (la API responde `model_not_found`/`model_disabled` a la cuenta) [verificado 2026-09-16]; Nano Banana y Gemini Omni siempre directo por Google [decisión].
+**Cuándo NO.** Contar con SVG todavía (ver Vectores abajo); Veo 3.1, Sora 2 y Nano Banana Pro (la API responde `model_not_found`/`model_disabled` a la cuenta) [verificado 2026-09-16]; Nano Banana y Gemini Omni siempre directo por Google [decisión].
+
+**Vectores (Recraft).** La API rechaza `output_format: svg` (400: sólo `jpg`/`png`/`webp`) [verificado 2026-09-16]. La app de Higgsfield ofrece Recraft V4.1 con `model_type` `vector` y `utility_vector` (logos, íconos, ilustración tipo SVG) [verificado con el conector de la app 2026-09-16]. La API no documenta `model_type` y su estimación acepta cualquier campo (`foo`, `model_type: "banana"` → 200), así que no prueba nada: **si `--input '{"model_type":"vector"}'` entrega SVG por la API está sin confirmar** hasta una generación real (USD 0,035). La CLI deja pasar ese campo para poder probarlo.
 
 **Estado.** Las 44 capacidades pasaron el barrido `--estimate` (acceso + esquema + precio) [verificado 2026-09-16]. **Ninguna generación real verificada:** el primer intento respondió `403 not_enough_credits`. Hasta recargar créditos en console.higgsfield.ai/billing y correr una generación por familia, trátalas como SIN VERIFICAR en salida.
 
@@ -758,7 +760,7 @@ pnpm ai:fal --capability seedance25-i2v --image ai-generations/2026-09-16_explor
 
 ### 6.14 Vectores
 
-Recraft V4.1 vía Higgsfield CLI: **sin sesión** (`Not authenticated`) hasta que una persona haga `higgsfield auth login` en navegador [contrato]. Sin vía operativa hoy. No sustituir con vectorización de raster. **No confundir con la API de Higgsfield:** su endpoint `recraft/v4.1/text-to-image` sólo ofrece `jpg`/`png`/`webp` en el esquema [contrato 2026-09-16].
+Recraft V4.1 vía Higgsfield CLI: **sin sesión** (`Not authenticated`) hasta que una persona haga `higgsfield auth login` en navegador [contrato]. Sin vía operativa hoy. No sustituir con vectorización de raster. **API de Higgsfield:** `model_type: vector|utility_vector` existe en la app de Higgsfield; la API no lo documenta y su estimación ignora campos desconocidos, así que **si la API entrega SVG está sin confirmar** hasta una generación real (§5.8).
 
 ### 6.15 Texto en imagen
 

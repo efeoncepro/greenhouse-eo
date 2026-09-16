@@ -215,7 +215,7 @@ Higgsfield empiezan con `hf-`.
 | Revisión previa | El pedido se compara con las reglas reales de cada modelo antes de gastar, y el comando lista todo lo que falta o sobra. |
 | Solo cotizar | `--estimate` muestra el precio sin generar nada. |
 | Archivos | Higgsfield los guarda unos 7 días; el comando los descarga siempre. |
-| Vectores | El Recraft de Higgsfield entrega imágenes normales (jpg, png, webp), no SVG. |
+| Vectores | Pedir formato SVG no funciona. La app de Higgsfield tiene un modo vector para Recraft; si la API lo respeta y entrega SVG está sin probar hasta la primera generación real. |
 
 **Estado:** los 44 modelos respondieron con precio con la cuenta de Efeonce. **Todavía no se generó nada real**,
 porque la cuenta de la API de Higgsfield no tiene créditos (son aparte de la suscripción de la app). Veo 3.1, Sora 2 y

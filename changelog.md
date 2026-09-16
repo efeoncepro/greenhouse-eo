@@ -14,8 +14,8 @@ Marketing Studio, Ideogram 4.0, Qwen Image 3, Kling Omni y O3, PixVerse 6, LTX 2
 revisa el pedido contra las reglas reales de cada modelo y pide el precio exacto al proveedor, que no cobra por
 cotizar. En Seedance y Wan 3.0, que solo publican una fórmula, calcula un techo. `--estimate` cotiza sin generar y
 `--cancel` anula un trabajo que sigue en cola. La llave quedó en Secret Manager. Las 44 opciones cotizaron con la
-cuenta de Efeonce, pero todavía no se generó nada: la cuenta de la API de Higgsfield no tiene créditos. El Recraft de
-esta API entrega imágenes normales, no SVG, y Veo 3.1, Sora 2 y Nano Banana Pro no están disponibles por esta vía.
+cuenta de Efeonce, pero todavía no se generó nada: la cuenta de la API de Higgsfield no tiene créditos. Si el Recraft de
+esta API entrega SVG está sin probar, y Veo 3.1, Sora 2 y Nano Banana Pro no están disponibles por esta vía.
 
 ## 2026-09-16 — Los comandos de IA avisan cuánto van a costar antes de gastar
 
