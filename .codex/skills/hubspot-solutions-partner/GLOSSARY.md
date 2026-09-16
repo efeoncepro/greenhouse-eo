@@ -23,7 +23,7 @@
 | **Growth Specialist (GS)** | El rep de HubSpot que gestiona una cuenta existente. Con él se coordina el *shared deal* de un cross-sell |
 | **Membership** | **USD 400/mes** desde el 2026-07-15. **Se exonera si tu suscripción neta post-discount supera USD 400/mes** |
 
-## Producto HubSpot (as-of 2026-08-30)
+## Producto HubSpot (as-of 2026-09-16)
 
 | Término | Qué es |
 |---|---|
@@ -33,10 +33,15 @@
 | **Revenue Hub** | ⚠️ **Ex-Commerce Hub.** Ahora es **quote-to-cash completo**: CPQ, contratos, subscription billing, e-signature, pagos |
 | **Content Hub** | CMS, blog, landing pages, memberships, multisite |
 | **HubSpot AEO** | 🆕 *Answer Engine Optimization*. Mide visibilidad de marca en ChatGPT/Gemini/Perplexity. **USD 50/mo standalone; incluido en Marketing Pro/Enterprise** |
+| **ChatGPT Ads en HubSpot** | **Beta**. Conecta la cuenta de ChatGPT Ads para crear/publicar campañas, reportar/atribuir resultados y sincronizar conversion events. Requiere `Ads publishing` y opt-in de Super Admin |
+| **AI Growth Bundle** | Oferta promocional condicionada de HubSpot/OpenAI (Starter + Credits, ChatGPT Business y match de gasto Ads según términos). **No es promesa de precio, disponibilidad ni elegibilidad** |
 | **Breeze** | La capa de IA transversal |
 | **Breeze Assistant** | ⚠️ Ex-*Breeze Copilot*. La interfaz conversacional. **GA**, incluido en todos los planes |
-| **Agent Hub** | Workspace beta que centraliza agentes preconstruidos, custom y agentic workflows; no es un Hub de producto |
-| **Agent Builder** | Superficie para configurar agentes custom, inputs, instructions, tools, knowledge y automation |
+| **Agent Hub** | Workspace de **public beta** para Professional/Enterprise que centraliza agentes preconstruidos, custom y agentic workflows; no es un Hub de producto |
+| **Agent Builder** | Superficie beta para configurar agentes custom y automations con contexto compartido, inputs, instrucciones, tools, knowledge y triggers |
+| **Agentic team** | Framing de Fall Spotlight: agentes coordinados por motion GTM sobre el mismo Growth Context; no es un roster ni una promesa de cantidad |
+| **Lead scoring / AI insights** | Scoring de contactos, compañías y deals disponible según Marketing/Sales Pro/Enterprise; AI insights sugiere criterios basados en eventos y requiere permiso de edición. Validar superficie por portal |
+| **MCP remoto** | Servidor MCP de HubSpot **GA** con reads y writes acotados; OAuth/PKCE, permisos del usuario/portal y Audit Log gobiernan cada acción |
 | **Breeze Agents** | Agentes de HubSpot cuyo roster, estado y elegibilidad deben verificarse por capacidad y portal |
 | **Projects** | Objeto CRM para organizar trabajo; distinto de developer projects y no equivalente a un PSA completo |
 | **Services** | Objeto CRM para representar ofertas entregadas; distinto de Service Hub y de un servicio Efeonce |

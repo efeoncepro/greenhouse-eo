@@ -4,7 +4,8 @@ description: >-
   Opera la práctica HubSpot de Efeonce como Solutions Partner: vender, implementar, retener y expandir.
   Cubre licencias, implementación, Managed CRM Ops, CRM Intelligence, sourced/managed MRR, economía del
   programa, tiers, deal registration, pricing, battlecards, AEO, discovery, scoping y descalificación.
-  Incluye la narrativa Agentic Customer Platform 2026: Growth Context, Breeze, workspaces, MCP/API,
+  Incluye la narrativa Agentic Customer Platform 2026: Growth Context, Fall Spotlight/UNBOUND, ChatGPT Ads,
+  AI Growth Bundle condicionado, Breeze, agentic team, workspaces, MCP/API con writes y gobierno,
   Agent CLI, Customer Agent, Prospecting Agent, Data Agent, agentes, gobierno e incentivos. Usar ante HubSpot,
   Solutions Partner, vender o implementar
   HubSpot, tier points, comisión/revenue share, Best Partner Wins, Marketing Studio, Sales Workspace,
@@ -12,9 +13,6 @@ description: >-
   Agent CLI, Angela O'Dowd, Duncan Lennox, Yamini Rangan,
   Dharmesh Shah, PDM, Simón Suárez o portal 48713323. Aporta dominio; el método de venta es de
   commercial-expert, el motion de gtm-architect y la operación del portal de hubspot-ops.
-type: skill
-user-invocable: true
-argument-hint: "[decisión, deal, cuenta o pieza concreta de la práctica HubSpot]"
 ---
 
 # HubSpot Solutions Partner — operador de la práctica

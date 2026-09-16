@@ -4,7 +4,8 @@ description: >-
   Opera la práctica HubSpot de Efeonce como Solutions Partner: vender, implementar, retener y expandir.
   Cubre licencias, implementación, Managed CRM Ops, CRM Intelligence, sourced/managed MRR, economía del
   programa, tiers, deal registration, pricing, battlecards, AEO, discovery, scoping y descalificación.
-  Incluye la narrativa Agentic Customer Platform 2026: Growth Context, Breeze, workspaces, MCP/API,
+  Incluye la narrativa Agentic Customer Platform 2026: Growth Context, Fall Spotlight/UNBOUND, ChatGPT Ads,
+  AI Growth Bundle condicionado, Breeze, agentic team, workspaces, MCP/API con writes y gobierno,
   Agent CLI, Customer Agent, Prospecting Agent, Data Agent, agentes, gobierno e incentivos. Usar ante HubSpot,
   Solutions Partner, vender o implementar
   HubSpot, tier points, comisión/revenue share, Best Partner Wins, Marketing Studio, Sales Workspace,

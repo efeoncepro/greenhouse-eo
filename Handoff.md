@@ -1,5 +1,13 @@
 # Handoff activo
 
+**HubSpot Fall Spotlight / UNBOUND 2026 (2026-09-16, documental):** las skills espejo de HubSpot as a Service,
+Solutions Partner y HubSpot-Greenhouse bridge, junto con el catálogo de oferta, incorporan ChatGPT Ads beta,
+MCP/Claude con writes gobernados, Agent Hub/Builder/Breeze, Developer Platform 2026.09 y la deprecación de APIs/apps
+legacy para septiembre de 2027. El detalle y la matriz de disponibilidad están en
+[`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md).
+No se activó ningún beta, permiso, campaña, conexión ni write de portal; falta verificar elegibilidad por cliente antes
+de vender o implementar.
+
 **Contacto:** TASK-1801 cerrada; [alcance y evidencia](.codex/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
 
 **Creative/social 14/09:** AXIS `v0.2.5` publicó `supportingTagline` y selección colaborativa; Greenhouse fija

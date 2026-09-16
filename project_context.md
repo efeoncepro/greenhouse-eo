@@ -1,5 +1,12 @@
 # Contexto vigente del repositorio
 
+## Actualización documental reciente
+
+El 2026-09-16 se actualizaron las skills espejo de HubSpot as a Service, Solutions Partner y
+HubSpot-Greenhouse bridge con Fall Spotlight/UNBOUND 2026. La referencia operativa es
+`docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`; mantiene separadas beta,
+GA, first look, entitlement del portal y runtime.
+
 ## Estado vigente para agentes
 
 Greenhouse: plataforma operativa Efeonce Group, Next.js 16/MUI 7/Vuexy starter-kit/TypeScript.

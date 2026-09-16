@@ -4,7 +4,7 @@
 > materialmente solo en 2026**, y el producto se renombró en tres lugares. Todo dato numérico se cita
 > con marca y `as-of`. Si vas a decir un número frente a un cliente, sale de acá o no sale.
 
-**As-of de producto de este ledger: 2026-08-30.** Pricing y programa conservan verificaciones fechadas por
+**As-of de producto de este ledger: 2026-09-16.** Pricing y programa conservan verificaciones fechadas por
 sección. Refresh obligatorio: **antes de UNBOUND (16-18 sep 2026)** y
 **antes del 15 de enero de 2027** (suben los umbrales de tier).
 
@@ -72,6 +72,19 @@ Fuentes verificadas 2026-08-27: [Gartner B2B Marketing Automation 2025](https://
 ---
 
 ## Producto HubSpot — as-of 2026-07-13
+
+### Fall Spotlight / UNBOUND 2026 — as-of 2026-09-16
+
+| Claim | Fuente primaria / evidencia | Marca y uso |
+|---|---|---|
+| Fall Spotlight presenta **Growth Context visible/provable** y un **agentic team** para cada motion GTM | [Fall Spotlight 2026 Partner Enablement Kit](https://offers.hubspot.com/fall-2026-spotlight-partner-enablement-kit) | ✅ Narrativa de posicionamiento; no convertir en garantía de outcome |
+| **ChatGPT Ads en HubSpot**: conexión, creación/publicación, reporting/atribución y conversion events | [Connect/manage ChatGPT Ads](https://knowledge.hubspot.com/connect-and-manage-chatgpt-ads-account-in-hubspot) · [Create campaigns](https://knowledge.hubspot.com/create-chatgpt-ads-campaigns-in-hubspot) · [Conversion events](https://knowledge.hubspot.com/create-and-sync-ad-conversion-events-with-chatgpt) | ✅ Capacidad documentada, **beta**; requiere `Ads publishing` y opt-in de Super Admin |
+| **AI Growth Bundle** combina HubSpot Starter/Credits, ChatGPT Business y match de gasto Ads bajo términos promocionales | [HubSpot/OpenAI announcement](https://www.businesswire.com/news/home/20260916265759/en/) · [offer link](https://offers.hubspot.com/ai-growth-bundle) | ⚠️ El anuncio es fuente secundaria y la oferta puede variar; **no prometer precio, ahorro, ventana ni elegibilidad**. Confirmar por escrito |
+| **Agent Hub y Agent Builder**: public beta para Professional/Enterprise, con agentes y automations sobre contexto compartido | [Meet Agent Hub and Agent Builder](https://www.hubspot.com/company-news/meet-agent-hub-and-agent-builder) | ✅ Estado y alcance publicados; no SLA ni roster fijo |
+| **MCP remoto GA**: reads/writes acotados, permisos existentes, OAuth 2.1/PKCE y reautorización al cambiar scopes | [MCP GA changelog](https://developers.hubspot.com/changelog/remote-hubspot-mcp-server-is-now-generally-available) · [MCP docs](https://developers.hubspot.com/docs/apps/developer-platform/build-apps/integrate-with-the-remote-hubspot-mcp-server) | ✅ Capacidad; writes dependen de herramienta, usuario, scopes/permisos y sensibilidad del dato |
+| Cada write de app se atribuye en Audit Log y governance permite least privilege por app/tool | [App governance and accountability](https://developers.hubspot.com/blog/build-with-confidence-app-governance) · [Fall Developer changelog](https://developers.hubspot.com/changelog/fall-2026-spotlight) | ✅ Control operativo; verificar superficie live antes de prometer cobertura completa |
+| Lead scoring base y AI insights para criterios basados en eventos | [Understand lead scoring](https://knowledge.hubspot.com/scoring/understand-the-lead-scoring-tool) · [AI insights](https://knowledge.hubspot.com/scoring/score-leads-based-on-high-impact-events) | ✅ Scoring documentado en Marketing/Sales Pro/Enterprise; AI insights exige `Edit` de Lead Scoring; validar objetos y disponibilidad por portal |
+| Enablement e incentivos de Fall Spotlight: curso para Solutions Partners, Builder Incentive y promoción de Credits | [Fall Spotlight Partner Enablement Kit](https://offers.hubspot.com/fall-2026-spotlight-partner-enablement-kit) | ✅ Oferta de canal publicada; **no afirma elegibilidad Efeonce**. Confirmar PDM/portal, tier, cuenta, SKU, mercado y cutoff |
 
 ### Narrativa agéntica, workspaces y motion de partners — as-of 2026-07-16 ✅
 

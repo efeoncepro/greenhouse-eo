@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — HubSpot actualizado con Fall Spotlight y UNBOUND 2026
+
+Las skills espejo y el catálogo HubSpot incorporan ChatGPT Ads en beta pública, la expansión del MCP/Claude,
+Agent Hub, Agent Builder, Breeze y Scheduled Prompts, además de Developer Platform 2026.09, sus APIs GA y betas.
+Se documentan requisitos de portal, plan, créditos, permisos, consentimiento, Audit Log y la separación entre
+capacidad anunciada, elegibilidad y runtime. También queda registrada la deprecación de APIs y apps legacy, con
+enforcement previsto para septiembre de 2027. [Detalle](docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md)
+
 ## 2026-09-16 — Flux 3 entra a `pnpm ai:fal`, y Seedance ya sabe hacer video a video sin sorpresas
 
 Flux 3 llegó al CLI completo y con sus 12 endpoints probados en real. En fal no es un modelo de imagen sino

@@ -1,5 +1,8 @@
 # 07 · Las entradas — el mapa dolor → Hub, y la cuña AEO
 
+> **Refresh Fall Spotlight/UNBOUND 2026 — 2026-09-16.** AEO sigue siendo medición y wedge; paid AI discovery
+> y lead scoring son superficies complementarias, no sustitutos del método AEO.
+
 > **Reescrito 2026-07-13.** La versión anterior hacía de la cuña AEO **el eje**, y eso estrechaba el negocio a
 > Marketing Hub. **Error.** Vendes **la plataforma completa**: siete dolores, siete puertas, un HubSpot.
 > La cuña AEO es **una** de ellas — poderosa, pero una.
@@ -85,6 +88,20 @@ literalmente esto. Habla ese idioma → `modules/01_PRODUCTO_2026.md` § 4.
 Dueño del método: **`seo-aeo`**. Esta skill lo **consume**.
 🔴 **NUNCA muestres un run con `unknown`** en las dimensiones clave (hay drift de extracción en prosa).
 Un dato malo en una reunión enterprise cuesta más que no tener dato. **Vuelve a correrlo.**
+
+### AEO, ChatGPT Ads y lead scoring: tres capas, tres límites
+
+1. **AEO** mide presencia y citación en answer engines; no garantiza ranking, tráfico ni pipeline.
+2. **ChatGPT Ads** permite conectar y operar campañas desde HubSpot en **beta**, con reporting/atribución y
+   conversion events documentados. Requiere `Ads publishing` y opt-in de Super Admin; no se promete acceso,
+   performance ni continuidad.
+3. **Lead scoring** convierte señales de comportamiento/fit en propiedades utilizables por workflows, segmentos
+   y reportes. El scoring con AI insights está documentado para Marketing/Sales Professional y Enterprise y exige
+   permiso de edición; validar en cada portal qué reglas, objetos e insights están disponibles.
+
+**Lectura comercial:** AEO descubre el gap, ChatGPT Ads prueba un canal pagado y lead scoring prioriza la respuesta.
+Ninguna de las tres superficies reemplaza contenido citable, contexto, consentimiento, operación ni medición de
+outcome.
 
 ---
 

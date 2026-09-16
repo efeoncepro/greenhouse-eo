@@ -5,6 +5,16 @@
 
 ---
 
+## 0.5 Fall Spotlight: incentivos de partner no equivalen a elegibilidad Efeonce
+
+El kit de enablement de Fall Spotlight anuncia, para la ventana **2026-07-01 a 2026-12-31**, incentivos sobre
+activación de agentes, Credits y payments. Incluye un Builder Incentive sujeto a activación y consumo, y una
+promoción de **40% de comisión sobre ventas de Credits** según los SKUs y términos aplicables.
+
+⚠️ Esto es una señal de priorización interna, **no una afirmación de que Efeonce sea elegible**. No calcular
+forecast, comisión, bonus points ni consumo esperado con esos incentivos. Validar cuenta, mercado, tier, SKU,
+cutoff, documentación y aprobación con el PDM/portal antes de cualquier propuesta.
+
 ## 1. La comisión ✅
 
 | Tipo de deal | Revenue share | Duración |
@@ -221,7 +231,8 @@ licencia → implementación → managed ops → intelligence → **expansión d
 
 Cosas que ❌ **no están publicadas** y que cambian decisiones de plata. **Pídelas por escrito.**
 
-1. 2. **El proceso operativo del shared deal para cross-sell** a cuentas existentes (Growth Specialist, link de
+   reduce a la mitad el esfuerzo de cada tier. **Necesitas esto por escrito.**
+2. **El proceso operativo del shared deal para cross-sell** a cuentas existentes (Growth Specialist, link de
    confirmación, plazos). Habilita toda la motion de base instalada.
 3. **El onboarding fee del bundle Customer Platform** (Pro y Enterprise). ❌ No publicado. Es la diferencia
    entre USD 7K y USD 14K+ en la primera factura del cliente.

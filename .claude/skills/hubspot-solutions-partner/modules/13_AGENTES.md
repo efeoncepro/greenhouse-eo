@@ -1,5 +1,8 @@
 # 13 · Agent Hub y Agentic Operations — diseñar, implementar, gobernar y operar
 
+> **Refresh Fall Spotlight/UNBOUND 2026 — 2026-09-16.** Fall cambia el framing de agentes aislados a **agentic
+> team**; no cambia la obligación de validar release state, permisos, consumo y readback por caso.
+
 > **Este módulo nació el 2026-07-13** porque los agentes dejaron de ser una nota al pie del producto y pasaron
 > a ser **una capa de servicio con caso propio**. Es la oferta más diferenciada que Efeonce tiene hoy en LATAM.
 
@@ -47,7 +50,8 @@
 ## 2. Inventario y elegibilidad por caso de uso
 
 No memorices ni publiques un número fijo de agentes. Agent Hub reúne agentes preconstruidos, custom y agentic
-workflows, pero continúa beta al corte 2026-08-30. Para cada caso crea una ficha:
+ workflows, y Agent Hub/Agent Builder están documentados como **public beta para Professional y Enterprise** al
+ corte actual. Para cada caso crea una ficha:
 
 | Campo | Pregunta obligatoria |
 | --- | --- |
@@ -61,6 +65,19 @@ workflows, pero continúa beta al corte 2026-08-30. Para cada caso crea una fich
 | Operación | ¿Quién monitorea, corrige, versiona y retira? |
 
 🔴 **NUNCA firmes un SLA sobre un agente en beta ni sobre Agent Hub como categoría genérica.**
+
+### MCP remoto: writes GA, permisos y auditabilidad
+
+El MCP remoto de HubSpot está **GA** desde 2026-04-13. Permite leer más superficies y escribir determinados CRM
+records y activities; la disponibilidad exacta depende de las herramientas y permisos otorgados. Cada acción
+respeta los permisos del usuario y del portal, y las conexiones usan OAuth 2.1 con PKCE. En la superficie de
+governance, los writes deben quedar atribuibles en Audit Log y los administradores pueden controlar acceso por
+app/tool; reautenticar cuando cambian scopes. Con Sensitive Data activo, ciertas activities quedan bloqueadas por
+MCP aunque las APIs CRM estándar puedan seguir siendo otra superficie.
+
+**Regla de servicio:** MCP con writes no equivale a permiso amplio. Diseñar least privilege, `propose →
+confirmación humana → execute`, pruebas en sandbox/dry-run cuando existan, auditoría y readback. Nunca afirmar
+paridad completa de API ni habilitar writes productivos por defecto.
 
 ### Prospecting Agent — contrato reusable
 

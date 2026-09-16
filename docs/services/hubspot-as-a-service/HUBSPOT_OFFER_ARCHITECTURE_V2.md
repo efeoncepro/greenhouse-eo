@@ -1,12 +1,17 @@
 # HubSpot as a Service — arquitectura de oferta V2
 
 > **Estado:** vigente
-> **Fecha de verificación:** 2026-08-30
+> **Fecha de verificación:** 2026-09-16
 > **Owner:** RevOps & CRM / práctica HubSpot
 > **Evidencia de mercado:**
 > [`HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md`](../../audits/commercial/HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md)
 > **Regla de producto:** toda disponibilidad, tier, seat, crédito, beta y limitación se vuelve a verificar contra
 > fuente primaria al cotizar y antes de publicar.
+
+> **Delta Fall 2026 / UNBOUND 2026:** ChatGPT Ads en HubSpot se incorpora como beta pública; Agent Hub, MCP/Claude,
+> Breeze y Scheduled Prompts quedan sujetos a la matriz de estado, gates y fuentes oficiales de
+> [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md). No se
+> incorporan pricing ni disponibilidad territorial por inferencia.
 
 ## 1. Decisión
 
@@ -25,12 +30,12 @@ cruzan esos productos. Por eso no se publican como una séptima lista equivalent
 
 | Familia pública | Resultado que compra el cliente | Superficies HubSpot que puede componer |
 | --- | --- | --- |
-| **Marketing, Content & AEO** | Crear demanda, mejorar visibilidad y convertirla con una operación medible. | Marketing Hub, Content Hub, Marketing Studio, campañas, segmentos, automatización, atribución, AEO y agentes de contenido/campaña/nurture cuando sean elegibles. |
+| **Marketing, Content & AEO** | Crear demanda, mejorar visibilidad y convertirla con una operación medible. | Marketing Hub, Content Hub, Marketing Studio, campañas —incluido ChatGPT Ads en beta pública—, segmentos, automatización, atribución, AEO y agentes de contenido/campaña/nurture cuando sean elegibles. |
 | **Sales & AI Pipeline** | Volver visible y operable el pipeline, priorizar cuentas y mejorar ejecución comercial. | Sales Hub, Sales Workspace, leads, targets, secuencias, conversation intelligence, forecasting, coaching, Prospecting Agent y progresión inteligente de deals. |
 | **Revenue Lifecycle** | Gobernar desde producto, cotización y contrato hasta facturación, renovación y expansión. | Revenue Hub, catálogo, CPQ/quotes, Contracts, change/renewal quotes, billing, invoices, payments, orders y reporting de revenue, sujetos a elegibilidad territorial y financiera. |
 | **Service, Customer Success & Delivery** | Resolver atención y operar adopción, salud, entrega, renovación y expansión. | Service Hub, Help Desk, tickets, SLA, knowledge base, feedback, Customer Agent, Customer Success Workspace, health scores y los objetos Projects/Services cuando correspondan. |
 | **Data, Integration & CRM Intelligence** | Unificar datos confiables y convertirlos en contexto, automatización y decisión. | Smart CRM, Data Hub, Data Studio, sync, datasets, calidad, scoring, reporting, Data Agent, APIs, webhooks, custom workflow actions, UI extensions, MCP e integraciones. |
-| **Agent Hub & Agentic Operations** | Diseñar, desplegar y gobernar agentes y workflows agentic con resultados, costo y escalamiento observables. | Agent Hub, agentes preconstruidos, agentes custom, Agent Builder, agentic workflows, knowledge/context, herramientas, permisos, créditos, evaluación, observabilidad y human handoff. |
+| **Agent Hub & Agentic Operations** | Diseñar, desplegar y gobernar agentes y workflows agentic con resultados, costo y escalamiento observables. | Agent Hub, agentes preconstruidos, agentes custom, Agent Builder, agentic workflows, Breeze Assistant, Scheduled Prompts beta, MCP, knowledge/context, herramientas, permisos, créditos, evaluación, observabilidad y human handoff. |
 
 ### Reglas de clasificación
 
@@ -128,7 +133,7 @@ señales de fit, anti-fit, prueba y siguiente paso; la nomenclatura del producto
 | --- | --- |
 | **Vendible con evidencia actual** | evaluación provider-fit; arquitectura RevOps/CRM; datos, automatización, reporting; implementación; Marketing/Content/AEO dentro de alcance; Customer Agent gestionado cuando se delimita al caso probado. |
 | **Vendible con discovery y alcance reforzado** | Sales & AI Pipeline; Customer Success Workspace; Projects/Services; integraciones; Managed HubSpot Operations cuando se prueban backlog, owner, cadencia y economics. |
-| **Pilot-first / no prometer end-to-end** | Agent Hub y agentes custom mientras la superficie sea beta; Revenue Hub/Contracts/billing/payments en Chile sin validación de SII, ERP, Finance y Legal; PSA completo; verticales sin caso propio. |
+| **Pilot-first / no prometer end-to-end** | ChatGPT Ads beta; Agent Hub, agentes custom y Scheduled Prompts mientras la superficie/portal sea beta o no esté verificada; writes MCP/Claude; Revenue Hub/Contracts/billing/payments en Chile sin validación de SII, ERP, Finance y Legal; PSA completo; verticales sin caso propio. |
 
 El perfil público de Efeonce en el Solutions Directory confirma Gold y amplitud de servicios, pero tiene cero
 reviews al corte. Claims propios como cantidad de implementaciones, certificaciones o industrias no sustituyen
@@ -142,7 +147,10 @@ casos estructurados, reviews ni acreditaciones visibles. El plan de prueba debe 
 - [Contracts](https://knowledge.hubspot.com/contracts/create-contracts)
 - [Customer Success Workspace](https://knowledge.hubspot.com/customer-success/set-up-and-manage-the-customer-success-workspace)
 - [Marketing Studio](https://www.hubspot.com/products/marketing/studio)
+- [ChatGPT Ads en HubSpot — conexión](https://knowledge.hubspot.com/connect-and-manage-chatgpt-ads-account-in-hubspot)
+- [ChatGPT Ads en HubSpot — conversion events](https://knowledge.hubspot.com/create-and-sync-ad-conversion-events-with-chatgpt)
+- [HubSpot connector for Claude](https://knowledge.hubspot.com/integrations/set-up-and-use-the-hubspot-connector-for-claude)
+- [Breeze Assistant — prompts y Scheduled Prompts](https://knowledge.hubspot.com/ai/create-and-manage-prompts-in-breeze-assistant?2079224=undefined)
 - [Projects API](https://developers.hubspot.com/docs/api-reference/latest/crm/objects/projects/guide)
 - [Services API](https://developers.hubspot.com/docs/api-reference/latest/crm/objects/services/guide)
 - [Industry Solutions](https://www.hubspot.com/industry-solutions)
-
