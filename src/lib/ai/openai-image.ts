@@ -227,6 +227,111 @@ export const OPENAI_IMAGE_QUALITIES: OpenAIImageQuality[] = ['auto', 'low', 'med
 export const isOpenAIImageQuality = (value: string): value is OpenAIImageQuality =>
   (OPENAI_IMAGE_QUALITIES as string[]).includes(value)
 
+export const OPENAI_IMAGE_BACKGROUNDS: OpenAIImageBackground[] = ['auto', 'opaque', 'transparent']
+
+export const isOpenAIImageBackground = (value: string): value is OpenAIImageBackground =>
+  (OPENAI_IMAGE_BACKGROUNDS as string[]).includes(value)
+
+export const OPENAI_IMAGE_FORMATS: OpenAIImageFormat[] = ['png', 'jpeg', 'webp']
+
+export const isOpenAIImageFormat = (value: string): value is OpenAIImageFormat =>
+  (OPENAI_IMAGE_FORMATS as string[]).includes(value)
+
+/**
+ * Contrato de tamaños custom de la grilla extendida (GPT Image 2 y 2.5), según la guía de OpenAI (2026-09-16): ambos
+ * lados múltiplos de 16, borde máximo 3840, relación entre 1:3 y 3:1, área entre 655.360 y 8.294.400 píxeles (sobre
+ * 2560×1440 OpenAI lo marca experimental). Los modelos anteriores sólo aceptan la grilla legacy.
+ *
+ * Por qué: el CLI casteaba `--size` sin validar y un tamaño inválido viajaba al API; si OpenAI lo rechaza antes o
+ * después de cobrar es [sin dato], así que se corta en local.
+ */
+export const assertOpenAIImageSizeSupported = ({ model, size }: { model: OpenAIImageModel; size: string }): void => {
+  if (size === 'auto') return
+
+  const match = /^(\d+)x(\d+)$/.exec(size)
+
+  if (!match) throw new Error(`--size "${size}" no es válido: usa auto o ANCHOxALTO (p. ej. 1536x1024).`)
+
+  const width = Number(match[1])
+  const height = Number(match[2])
+  const { extendedSizeGrid } = OPENAI_IMAGE_MODEL_CAPABILITIES[model]
+
+  if (!extendedSizeGrid) {
+    if (!LEGACY_OPENAI_IMAGE_SIZES.has(size as OpenAIImageSize)) {
+      throw new Error(`"${model}" sólo acepta ${[...LEGACY_OPENAI_IMAGE_SIZES].join(', ')}; "${size}" requiere GPT Image 2 o 2.5.`)
+    }
+
+    return
+  }
+
+  const problems: string[] = []
+
+  if (width % 16 !== 0 || height % 16 !== 0) problems.push('ambos lados deben ser múltiplos de 16')
+  if (Math.max(width, height) > 3840) problems.push('el borde mayor no puede superar 3840')
+  if (Math.max(width, height) / Math.min(width, height) > 3) problems.push('la relación no puede superar 3:1')
+
+  const area = width * height
+
+  if (area < 655_360 || area > 8_294_400) problems.push('el área debe estar entre 655.360 y 8.294.400 píxeles')
+
+  if (problems.length) throw new Error(`--size "${size}" no es válido para "${model}": ${problems.join('; ')}.`)
+}
+
+/** Lado largo de la grilla de tokens por calidad (código de la calculadora oficial de OpenAI, 2026-09-16). */
+const OPENAI_IMAGE_TOKEN_GRID: Readonly<Record<'gpt-image-2' | 'gpt-image-2.5', Partial<Record<OpenAIImageQuality, number>>>> = {
+  'gpt-image-2': { low: 16, medium: 48, high: 96 },
+  'gpt-image-2.5': { low: 16, medium: 24, high: 48, xhigh: 64, max: 96 }
+}
+
+/** USD por millón de tokens de imagen de salida (Standard) — iguales para GPT Image 2 y la familia 2.5 (2026-09-16). */
+export const OPENAI_IMAGE_OUTPUT_USD_PER_MILLION = 30
+
+/** Redondeo del lado corto como la calculadora de OpenAI: .5 va al par. */
+const roundHalfToEven = (value: number): number => {
+  const floor = Math.floor(value)
+  const diff = value - floor
+
+  if (Math.abs(diff - 0.5) < 1e-9) return floor % 2 === 0 ? floor : floor + 1
+
+  return Math.round(value)
+}
+
+/**
+ * Tokens de imagen de SALIDA con la fórmula oficial. Reproduce lo medido en el repo: 2.5 a 1024×1024 = 196 (`low`),
+ * 1.756 (`high`) y 7.024 (`max`). `null` con `auto` (no estimable) o modelos sin grilla publicada.
+ */
+export const estimateOpenAIImageOutputTokens = ({
+  model,
+  quality,
+  size
+}: {
+  model: OpenAIImageModel
+  quality: OpenAIImageQuality
+  size: string
+}): number | null => {
+  const family = model.startsWith('gpt-image-2.5') ? 'gpt-image-2.5' : model === 'gpt-image-2' ? 'gpt-image-2' : null
+  const match = /^(\d+)x(\d+)$/.exec(size)
+
+  if (!family || !match) return null
+
+  const longSide = OPENAI_IMAGE_TOKEN_GRID[family][quality]
+
+  if (!longSide) return null
+
+  const width = Number(match[1])
+  const height = Number(match[2])
+  const shortSide = roundHalfToEven(longSide / (Math.max(width, height) / Math.min(width, height)))
+
+  return Math.ceil((longSide * shortSide * (2_000_000 + width * height)) / 4_000_000)
+}
+
+/** Costo estimado de salida en USD por imagen; no incluye tokens de entrada (texto, imágenes de referencia, máscara). */
+export const estimateOpenAIImageOutputUsd = (params: { model: OpenAIImageModel; quality: OpenAIImageQuality; size: string }): number | null => {
+  const tokens = estimateOpenAIImageOutputTokens(params)
+
+  return tokens === null ? null : Math.round(((tokens * OPENAI_IMAGE_OUTPUT_USD_PER_MILLION) / 1_000_000) * 10_000) / 10_000
+}
+
 export const getOpenAIImageModelCapabilities = (model: OpenAIImageModel): OpenAIImageModelCapabilities =>
   OPENAI_IMAGE_MODEL_CAPABILITIES[model]
 

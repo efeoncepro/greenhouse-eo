@@ -1,8 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  assertOpenAIImageSizeSupported,
   editOpenAIImage,
+  estimateOpenAIImageOutputTokens,
+  estimateOpenAIImageOutputUsd,
   generateOpenAIImage,
+  isOpenAIImageBackground,
+  isOpenAIImageFormat,
   getOpenAIImageModel,
   isOpenAIImageModel,
   isOpenAIImageQuality,
@@ -360,5 +365,47 @@ describe('GPT Image 2.5 family contract (TASK-1851)', () => {
       quality: 'high',
       output_format: 'png'
     })
+  })
+})
+
+describe('ai:image — validación local y estimación de costo', () => {
+  // Fórmula oficial de la calculadora de OpenAI; reproduce lo medido en el repo el 2026-09-16.
+  it('reproduce los tokens de salida medidos de GPT Image 2.5 a 1024×1024', () => {
+    const model: OpenAIImageModel = 'gpt-image-2.5-flare'
+
+    expect(estimateOpenAIImageOutputTokens({ model, quality: 'low', size: '1024x1024' })).toBe(196)
+    expect(estimateOpenAIImageOutputTokens({ model, quality: 'high', size: '1024x1024' })).toBe(1756)
+    expect(estimateOpenAIImageOutputTokens({ model, quality: 'max', size: '1024x1024' })).toBe(7024)
+  })
+
+  it('iguala la tabla oficial de GPT Image 2 (high 1536×1024 ≈ USD 0,165) y equivalencias con 2.5', () => {
+    expect(estimateOpenAIImageOutputUsd({ model: 'gpt-image-2', quality: 'high', size: '1536x1024' })).toBeCloseTo(0.165, 3)
+    expect(estimateOpenAIImageOutputTokens({ model: 'gpt-image-2', quality: 'medium', size: '1024x1024' })).toBe(
+      estimateOpenAIImageOutputTokens({ model: 'gpt-image-2.5-sunburst', quality: 'high', size: '1024x1024' })
+    )
+  })
+
+  it('no estima auto ni modelos sin grilla publicada', () => {
+    expect(estimateOpenAIImageOutputTokens({ model: 'gpt-image-2.5-flare', quality: 'auto', size: '1024x1024' })).toBeNull()
+    expect(estimateOpenAIImageOutputTokens({ model: 'gpt-image-2.5-flare', quality: 'high', size: 'auto' })).toBeNull()
+    expect(estimateOpenAIImageOutputTokens({ model: 'gpt-image-1', quality: 'high', size: '1024x1024' })).toBeNull()
+  })
+
+  it('valida --size contra la grilla del modelo antes de la red', () => {
+    expect(() => assertOpenAIImageSizeSupported({ model: 'gpt-image-2.5-flare', size: '3840x2160' })).not.toThrow()
+    expect(() => assertOpenAIImageSizeSupported({ model: 'gpt-image-2', size: 'auto' })).not.toThrow()
+    expect(() => assertOpenAIImageSizeSupported({ model: 'gpt-image-2', size: '1000x1000' })).toThrow('múltiplos de 16')
+    expect(() => assertOpenAIImageSizeSupported({ model: 'gpt-image-2', size: '4096x2304' })).toThrow('3840')
+    expect(() => assertOpenAIImageSizeSupported({ model: 'gpt-image-2', size: '3840x1024' })).toThrow('3:1')
+    expect(() => assertOpenAIImageSizeSupported({ model: 'gpt-image-2', size: '512x512' })).toThrow('área')
+    expect(() => assertOpenAIImageSizeSupported({ model: 'gpt-image-1', size: '2048x1152' })).toThrow('sólo acepta')
+    expect(() => assertOpenAIImageSizeSupported({ model: 'gpt-image-2', size: 'grande' })).toThrow('ANCHOxALTO')
+  })
+
+  it('reconoce fondos y formatos válidos', () => {
+    expect(isOpenAIImageBackground('transparent')).toBe(true)
+    expect(isOpenAIImageBackground('clear')).toBe(false)
+    expect(isOpenAIImageFormat('webp')).toBe(true)
+    expect(isOpenAIImageFormat('gif')).toBe(false)
   })
 })

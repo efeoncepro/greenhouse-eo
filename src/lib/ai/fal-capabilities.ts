@@ -132,6 +132,15 @@ export interface FalTrainingContract {
   learningRate: { min: number; max: number }
   /** Probabilidades de condicionamiento propias de cada entrenador (informativo; se pasan por `--input`). */
   conditioningFields: readonly string[]
+  /**
+   * `number_of_frames`: rango 22–124 y regla `frames % 17 == 5` (22, 39, 56, 73, 90, 107, 124). fal no la valida en el
+   * schema; fuera de la regla el entrenamiento falla después de cobrar. Medido contra la documentación de fal 2026-09-16.
+   */
+  frames: { min: number; max: number; modulo: number; remainder: number; defaultValue: number }
+  /** `split_input_duration_threshold` en segundos (divide videos largos en escenas). */
+  splitThreshold: { min: number; max: number; defaultValue: number }
+  /** fal cobra un mínimo de steps aunque se pidan menos. */
+  minBillableSteps: number
 }
 
 const SEEDANCE_ASPECT_RATIOS: readonly string[] = ['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16']
@@ -245,7 +254,10 @@ const H3_TRAINING = (conditioningFields: readonly string[]): FalTrainingContract
   steps: { min: 1, max: 15_000, defaultValue: 2000 },
   ranks: [8, 16, 32, 64, 128],
   learningRate: { min: 0.000001, max: 1 },
-  conditioningFields
+  conditioningFields,
+  frames: { min: 22, max: 124, modulo: 17, remainder: 5, defaultValue: 73 },
+  splitThreshold: { min: 1, max: 60, defaultValue: 30 },
+  minBillableSteps: 100
 })
 
 const FLUX3_ASPECT_RATIOS: readonly string[] = ['auto', '21:9', '2:1', '16:9', '4:3', '1:1', '3:4', '9:16']
@@ -341,9 +353,40 @@ export interface FalCapability {
    */
   unsupportedReason?: string
   notes?: string
+  /** El endpoint declara `seed` de entrada. Sin esto, `--seed` se rechaza en local (ver FAL_SEED_CAPABILITY_IDS). */
+  acceptsSeed?: boolean
+  /** Tope de `--image` que el endpoint realmente usa (Seedream edit: fal toma sólo las últimas 10 sin avisar). */
+  maxInputImages?: number
+  /** Sólo imagen: formatos que acepta `output_format` (vacío = no expone el campo) y el que entrega por defecto. */
+  imageOutput?: { formats: readonly ('jpeg' | 'png')[]; defaultFormat: 'jpeg' | 'png' }
+  /** Regla para estimar el costo antes de encolar (ver FAL_PRICING_RULES y src/lib/ai/fal-pricing.ts). */
+  pricing?: FalPricingRule
 }
 
-export const FAL_CAPABILITIES: readonly FalCapability[] = [
+/**
+ * Cómo se cobra un endpoint. `unitSource: 'api'` toma el precio unitario de `GET /v1/models/pricing`; las tablas
+ * `publishedUsdByResolution` / `publishedUsdPerUnit` vienen de las páginas de modelo de fal y los fabricantes
+ * (2026-09-16) y PREVALECEN, porque la API devuelve sólo el escalón más bajo: Wan 3.0 a 1080p cuesta 4× lo que
+ * dice la API y Flux 3 el doble. Toda estimación es orientativa; `pnpm ai:fal --balance` antes y después es la medida.
+ */
+export interface FalPricingRule {
+  unit: 'second' | 'token_1k' | 'image' | 'layer' | 'step'
+  /** USD por unidad según la resolución pedida (claves = valores canónicos del contrato). */
+  publishedUsdByResolution?: Readonly<Record<string, number>>
+  /** USD por unidad fijo publicado (cuando no depende de resolución). */
+  publishedUsdPerUnit?: number
+  /** Imagen: precio por área (Seedream Pro ≤ 1536² vs mayor). */
+  publishedUsdByArea?: { upTo1536sq: number; above1536sq: number }
+  /** Seedream Pro edit: USD por cada referencia adicional (la primera no se cobra). */
+  extraReferenceUsd?: number
+  /** Duración que fal usa si no se pasa --duration (segundos). */
+  defaultSeconds?: number
+  /** Resolución por defecto del endpoint (para advertir cuando no se pasa --resolution). */
+  defaultResolution?: string
+  minBillableUnits?: number
+}
+
+const BASE_FAL_CAPABILITIES: readonly FalCapability[] = [
   // ── Seedream 5.0 — imagen ───────────────────────────────────────────────────────────────────────
   {
     id: 'seedream5-pro',
@@ -1123,6 +1166,101 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     notes: 'hasta 10 imágenes, 5 videos y 5 audios (≤ 15 s) · --web-url / --file con --thinking · prompt opcional'
   },
 ] as const
+
+
+/**
+ * Endpoints que declaran `seed` en su OpenAPI (leído para las 55 capacidades el 2026-09-16): toda la familia H3 de
+ * generación, Wan 3.0 y Prime, y sólo el reference-to-video de Seedance 2.5. Seedream, el resto de Seedance, Flux 3 y
+ * los entrenadores NO lo declaran: mandar `--seed` ahí tenía efecto desconocido.
+ */
+export const FAL_SEED_CAPABILITY_IDS: readonly string[] = [
+  'seedance25-r2v',
+  'h3-t2v', 'h3-i2v', 'h3-r2v', 'h3-t2v-lora', 'h3-i2v-lora', 'h3-r2v-lora',
+  'h3max-t2v', 'h3max-i2v', 'h3max-r2v', 'h3max-camera', 'h3turbo-t2v', 'h3turbo-i2v',
+  'wan3-t2v', 'wan3-i2v', 'wan3-r2v', 'wan3prime-t2v', 'wan3prime-i2v', 'wan3prime-r2v'
+]
+
+const SEEDREAM_PRO_OUTPUT = { formats: ['jpeg', 'png'], defaultFormat: 'jpeg' } as const
+const SEEDREAM_LITE_OUTPUT = { formats: [], defaultFormat: 'png' } as const
+
+/** Imagen: formato de salida real y tope de referencias (Seedream edit usa sólo las últimas 10). */
+const FAL_IMAGE_RULES: Readonly<Record<string, Pick<FalCapability, 'imageOutput' | 'maxInputImages'>>> = {
+  'seedream5-pro': { imageOutput: SEEDREAM_PRO_OUTPUT },
+  'seedream5-pro-edit': { imageOutput: SEEDREAM_PRO_OUTPUT, maxInputImages: 10 },
+  'seedream5-pro-layerize': { imageOutput: { formats: [], defaultFormat: 'png' } },
+  'seedream5-lite': { imageOutput: SEEDREAM_LITE_OUTPUT },
+  'seedream5-lite-edit': { imageOutput: SEEDREAM_LITE_OUTPUT, maxInputImages: 10 }
+}
+
+const SEEDANCE_TOKENS: FalPricingRule = { unit: 'token_1k', defaultResolution: '720p' }
+const WAN3_PRICE: FalPricingRule = { unit: 'second', publishedUsdByResolution: { '480p': 0.05, '720p': 0.1, '1080p': 0.2 }, defaultSeconds: 5, defaultResolution: '1080p' }
+const WAN3_PRIME_PRICE: FalPricingRule = { unit: 'second', publishedUsdByResolution: { '480p': 0.068, '720p': 0.14, '1080p': 0.28 }, defaultSeconds: 5, defaultResolution: '1080p' }
+const H3_BASE_PRICE: FalPricingRule = { unit: 'second', publishedUsdByResolution: { '480P': 0.05, '768P': 0.06, '2K': 0.13, '4K': 0.16 }, defaultSeconds: 5, defaultResolution: '2K' }
+const H3_MAX_PRICE: FalPricingRule = { unit: 'second', publishedUsdByResolution: { '480P': 0.025, '768P': 0.04, '1080P': 0.08 }, defaultSeconds: 5, defaultResolution: '768P' }
+const H3_TURBO_PRICE: FalPricingRule = { unit: 'second', publishedUsdByResolution: { '768P': 0.02, '1080P': 0.04 }, defaultSeconds: 5, defaultResolution: '768P' }
+const FLUX3_FINAL_PRICE: FalPricingRule = { unit: 'second', publishedUsdByResolution: { '720p': 0.17, '1080p': 0.29 }, defaultSeconds: 5, defaultResolution: '720p' }
+const FLUX3_DRAFT_PRICE: FalPricingRule = { unit: 'second', publishedUsdPerUnit: 0.06, defaultSeconds: 5 }
+const H3_TRAINER_PRICE: FalPricingRule = { unit: 'step', minBillableUnits: 100 }
+
+/**
+ * Cómo estimar el costo de cada capacidad. Fuentes 2026-09-16: API de pricing de fal (precio unitario), páginas de
+ * modelo de fal y fabricantes (escalones por resolución) y gasto real de la cuenta B (fórmula de Seedance validada
+ * dentro de ~5 %). Sin escalón publicado (camera-controls, LoRA, enhance, extend draft, Turbo 480P) se usa la API.
+ */
+export const FAL_PRICING_RULES: Readonly<Record<string, FalPricingRule>> = {
+  'seedream5-pro': { unit: 'image', publishedUsdByArea: { upTo1536sq: 0.0675, above1536sq: 0.135 } },
+  'seedream5-pro-edit': { unit: 'image', publishedUsdByArea: { upTo1536sq: 0.0675, above1536sq: 0.135 }, extraReferenceUsd: 0.0045 },
+  'seedream5-pro-layerize': { unit: 'layer', publishedUsdByArea: { upTo1536sq: 0.03375, above1536sq: 0.0675 } },
+  'seedream5-lite': { unit: 'image', publishedUsdPerUnit: 0.035 },
+  'seedream5-lite-edit': { unit: 'image', publishedUsdPerUnit: 0.035 },
+  ...Object.fromEntries(
+    ['seedance25-t2v', 'seedance25-i2v', 'seedance25-r2v', 'seedance20-t2v', 'seedance20-i2v', 'seedance20-r2v']
+      .concat(['fast', 'mini', 'us'].flatMap(v => ['t2v', 'i2v', 'r2v'].map(m => `seedance20-${v}-${m}`)))
+      .map(id => [id, SEEDANCE_TOKENS])
+  ),
+  'h3-t2v': H3_BASE_PRICE,
+  'h3-i2v': H3_BASE_PRICE,
+  'h3-r2v': H3_BASE_PRICE,
+  'h3-t2v-lora': { unit: 'second', defaultSeconds: 5, defaultResolution: '2K' },
+  'h3-i2v-lora': { unit: 'second', defaultSeconds: 5, defaultResolution: '2K' },
+  'h3-r2v-lora': { unit: 'second', defaultSeconds: 5, defaultResolution: '2K' },
+  'h3max-t2v': H3_MAX_PRICE,
+  'h3max-i2v': H3_MAX_PRICE,
+  'h3max-r2v': H3_MAX_PRICE,
+  'h3max-camera': { unit: 'second', defaultSeconds: 5, defaultResolution: '480P' },
+  'h3turbo-t2v': H3_TURBO_PRICE,
+  'h3turbo-i2v': H3_TURBO_PRICE,
+  'h3-train-t2v': H3_TRAINER_PRICE,
+  'h3-train-i2v': H3_TRAINER_PRICE,
+  'h3-train-flf2v': H3_TRAINER_PRICE,
+  'h3-train-ref2va': H3_TRAINER_PRICE,
+  'flux3-t2v': FLUX3_FINAL_PRICE,
+  'flux3-i2v': FLUX3_FINAL_PRICE,
+  'flux3-flf': FLUX3_FINAL_PRICE,
+  'flux3-keyframes': FLUX3_FINAL_PRICE,
+  'flux3-t2v-draft': FLUX3_DRAFT_PRICE,
+  'flux3-i2v-draft': FLUX3_DRAFT_PRICE,
+  'flux3-flf-draft': FLUX3_DRAFT_PRICE,
+  'flux3-keyframes-draft': FLUX3_DRAFT_PRICE,
+  'flux3-edit': { unit: 'second', publishedUsdPerUnit: 0.03 },
+  'flux3-extend': { unit: 'second', publishedUsdByResolution: { '720p': 0.41, '1080p': 0.53 }, defaultSeconds: 5, defaultResolution: '720p' },
+  'flux3-extend-draft': { unit: 'second', defaultSeconds: 5 },
+  'flux3-enhance': { unit: 'second' },
+  'wan3-t2v': WAN3_PRICE,
+  'wan3-i2v': WAN3_PRICE,
+  'wan3-r2v': WAN3_PRICE,
+  'wan3prime-t2v': WAN3_PRIME_PRICE,
+  'wan3prime-i2v': WAN3_PRIME_PRICE,
+  'wan3prime-r2v': WAN3_PRIME_PRICE
+}
+
+/** Registro final: cada capacidad con su regla de seed, imagen y precio aplicada desde las tablas de arriba. */
+export const FAL_CAPABILITIES: readonly FalCapability[] = BASE_FAL_CAPABILITIES.map(capability => ({
+  ...capability,
+  ...(FAL_SEED_CAPABILITY_IDS.includes(capability.id) ? { acceptsSeed: true } : {}),
+  ...FAL_IMAGE_RULES[capability.id],
+  ...(FAL_PRICING_RULES[capability.id] ? { pricing: FAL_PRICING_RULES[capability.id] } : {})
+}))
 
 export const findFalCapability = (id: string): FalCapability | undefined =>
   FAL_CAPABILITIES.find(capability => capability.id === id)

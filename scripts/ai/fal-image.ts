@@ -11,6 +11,7 @@ import {
   awaitFalRequest,
   FAL_ACCOUNT_ENV_VARS,
   getFalAccountBalances,
+  getFalEndpointPricing,
   getFalRequestStatus,
   isFalBalanceLock,
   resolveFalQueueHandle,
@@ -19,6 +20,17 @@ import {
   type FalAccountName
 } from '@/lib/ai/fal'
 import { FAL_CAPABILITIES, findFalCapability, type FalCapability, type FalReferenceSlot } from '@/lib/ai/fal-capabilities'
+import {
+  assertMaxInputImages,
+  assertSeedAllowed,
+  assertSplitThreshold,
+  assertTrainingFrames,
+  detectMediaFormat,
+  parseLoraFlag,
+  reconcileOutputExtension,
+  resolveImageOutputFormat
+} from '@/lib/ai/fal-input-rules'
+import { estimateFalCost, resolveFalCostCap } from '@/lib/ai/fal-pricing'
 
 /**
  * CLI de fal.ai para Greenhouse — `pnpm ai:fal`.
@@ -51,18 +63,24 @@ import { FAL_CAPABILITIES, findFalCapability, type FalCapability, type FalRefere
  *   --detach             Encola, imprime request_id y cuenta, y termina sin esperar (recupéralo con --request-id)
  *   --status             Con --request-id: consulta una vez si terminó, sin esperar ni descargar (no cobra)
  *   --json               Imprime el output crudo del modelo
+ *   --yes                Confirma corridas cuya estimación supera el tope (default USD 1; env FAL_COST_CONFIRM_USD)
+ *   --max-usd <n>        Tope de confirmación para esta corrida
  *   --fal-account <FAL_API_KEY|FAL_API_KEY_B>  Fuerza una cuenta. Omitido = la de más saldo, y si fal la bloquea por
  *                        saldo pasa sola a la otra (el bloqueo ocurre antes de encolar: no cobra)
  *
  * Imagen:  --size <enum|WxH> · --count <n> · --format jpeg|png
  * Video:   --duration · --resolution · --aspect · --bitrate · --task · --no-audio · --end-image
  *          --video <path|url> y --audio <path|url> (referencias, repetibles) · --prompt-expansion <modo>
- *          --lora <path[@scale]> (repetible) · --camera-trajectory <json>
+ *          --lora <path[@scale][#weight_name]> (repetible) · --camera-trajectory <json>
  *          Flux 3: --keyframe <imagen>@<frame_index> (repetible) · --safety-tolerance 0-4 · --draft-cache <url>
  *          (en edit/extend el video de origen va por --video)
  *          Wan 3.0: --thinking · --web-url <url> · --file <path|url> (ambos exigen --thinking) · --no-prompt-expansion
  *          --seed <n> (cualquier endpoint que lo acepte)
  * LoRA:    --training-data <zip|url> · --steps <n> · --rank <n> · --learning-rate <n> · --trigger <frase>
+ *          --frames <n> (22–124, frames % 17 == 5) · --split-threshold <s> (1–60)
+ *
+ * Sin --resolution en video, el CLI envía la resolución MÁS BARATA del endpoint y lo avisa (Wan 3.0 y H3 base
+ * tienen defaults caros: 1080p y 2K). Antes de encolar imprime el costo estimado y pide --yes sobre el tope.
  */
 
 loadEnv({ path: join(process.cwd(), '.env.local') })
@@ -108,6 +126,10 @@ interface CliArgs {
   file?: string
   noPromptExpansion: boolean
   seed?: string
+  frames?: string
+  splitThreshold?: string
+  yes: boolean
+  maxUsd?: string
   requestId?: string
   size?: string
   count?: number
@@ -126,7 +148,7 @@ interface CliArgs {
 }
 
 const parseArgs = (argv: string[]): CliArgs => {
-  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], keyframes: [], noAudio: false, thinking: false, noPromptExpansion: false, json: false, list: false, balance: false, detach: false, status: false, help: false }
+  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], keyframes: [], noAudio: false, thinking: false, noPromptExpansion: false, json: false, list: false, balance: false, detach: false, status: false, yes: false, help: false }
 
   let i = 0
 
@@ -170,6 +192,10 @@ const parseArgs = (argv: string[]): CliArgs => {
       case '--file': args.file = next(); break
       case '--no-prompt-expansion': args.noPromptExpansion = true; break
       case '--seed': args.seed = next(); break
+      case '--frames': args.frames = next(); break
+      case '--split-threshold': args.splitThreshold = next(); break
+      case '--yes': args.yes = true; break
+      case '--max-usd': args.maxUsd = next(); break
       case '--request-id': args.requestId = next(); break
       case '--size': args.size = next(); break
       case '--count': args.count = Math.max(1, Number(next()) || 1); break
@@ -277,24 +303,6 @@ const parseSize = (raw: string): string | { width: number; height: number } => {
   const match = /^(\d+)x(\d+)$/i.exec(raw.trim())
 
   return match ? { width: Number(match[1]), height: Number(match[2]) } : raw.trim()
-}
-
-/** `--lora <path>` o `--lora <path>@<scale>`. El path puede ser URL o repo de Hugging Face. */
-const parseLora = (raw: string, scaleMin: number, scaleMax: number): { path: string; scale?: number } => {
-  const at = raw.lastIndexOf('@')
-  const hasScale = at > 0 && /^\d+(\.\d+)?$/.test(raw.slice(at + 1))
-  const path = (hasScale ? raw.slice(0, at) : raw).trim()
-
-  if (!path) throw new Error(`--lora "${raw}" no trae path.`)
-  if (!hasScale) return { path }
-
-  const scale = Number(raw.slice(at + 1))
-
-  if (scale < scaleMin || scale > scaleMax) {
-    throw new Error(`--lora "${raw}": la escala debe estar entre ${scaleMin} y ${scaleMax}.`)
-  }
-
-  return { path, scale }
 }
 
 const parseCameraTrajectory = (raw: string, maxKeyframes: number): Record<string, number>[] => {
@@ -439,17 +447,26 @@ const extractAssets = (output: unknown, capability: FalCapability | null): Downl
   return assets
 }
 
-const downloadAsset = async (url: string, target: string) => {
+/**
+ * Descarga y guarda con la extensión del formato REAL (por sus bytes). Si difiere de la pedida, corrige la ruta y lo
+ * avisa: nunca más un JPEG guardado como .png.
+ */
+const downloadAsset = async (url: string, target: string): Promise<{ bytes: number; path: string }> => {
   const response = await fetch(url)
 
   if (!response.ok) throw new Error(`No se pudo descargar ${url} (HTTP ${response.status})`)
 
   const buffer = Buffer.from(await response.arrayBuffer())
+  const finalPath = reconcileOutputExtension(target, detectMediaFormat(new Uint8Array(buffer.subarray(0, 32))))
 
-  await mkdir(dirname(target), { recursive: true })
-  await writeFile(target, buffer)
+  if (finalPath !== target) {
+    process.stderr.write(`  ⚠ el archivo real no coincide con la extensión pedida: se guarda como ${basename(finalPath)}\n`)
+  }
 
-  return buffer.length
+  await mkdir(dirname(finalPath), { recursive: true })
+  await writeFile(finalPath, buffer)
+
+  return { bytes: buffer.length, path: finalPath }
 }
 
 const printCapabilities = () => {
@@ -541,7 +558,8 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
 
     const trainingOnly: [string, unknown][] = [
       ['--training-data', args.trainingData], ['--steps', args.steps], ['--rank', args.rank],
-      ['--learning-rate', args.learningRate], ['--trigger', args.trigger]
+      ['--learning-rate', args.learningRate], ['--trigger', args.trigger], ['--frames', args.frames],
+      ['--split-threshold', args.splitThreshold]
     ]
 
     if (!training) {
@@ -659,10 +677,10 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
     if (!args.loras.length) throw new Error(`"${capability?.id}" exige al menos un --lora <path[@scale]>.`)
     if (args.loras.length > video.loras.max) throw new Error(`"${capability?.id}" admite hasta ${video.loras.max} --lora.`)
 
-    input.loras = args.loras.map(raw => parseLora(raw, video.loras!.scaleMin, video.loras!.scaleMax))
+    input.loras = args.loras.map(raw => parseLoraFlag(raw, video.loras!.scaleMin, video.loras!.scaleMax))
   } else if (args.loras.length) {
     if (capability) throw new Error(`"${capability.id}" no acepta --lora; usa su variante /lora.`)
-    input.loras = args.loras.map(raw => parseLora(raw, 0, 4))
+    input.loras = args.loras.map(raw => parseLoraFlag(raw, 0, 4))
   }
 
   if (args.cameraTrajectory) {
@@ -702,6 +720,8 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
   }
 
   if (args.seed !== undefined) {
+    assertSeedAllowed(capability, args.seed)
+
     const seed = Number(args.seed)
 
     if (!Number.isInteger(seed) || seed < 0) throw new Error('--seed debe ser un entero >= 0.')
@@ -753,6 +773,8 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
   // ── Medios ───────────────────────────────────────────────────────────────────────────────────
   if (args.images.length) {
     const slot = video?.references?.images
+
+    assertMaxInputImages(capability, args.images.length)
 
     if (slot?.max !== null && slot?.max !== undefined && args.images.length > slot.max) {
       throw new Error(`--image admite hasta ${slot.max} en "${capability?.id}"; pasaste ${args.images.length}.`)
@@ -840,6 +862,8 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
     }
 
     if (args.trigger) input.trigger_phrase = args.trigger
+    if (args.frames !== undefined) input.number_of_frames = assertTrainingFrames(training, args.frames)
+    if (args.splitThreshold !== undefined) input.split_input_duration_threshold = assertSplitThreshold(training, args.splitThreshold)
 
     if (args.trainingData) {
       const [dataUrl] = await resolveMediaUrls([args.trainingData])
@@ -851,15 +875,88 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
   // ── Imagen ───────────────────────────────────────────────────────────────────────────────────
   if (args.size) input.image_size = parseSize(args.size)
   if (args.count) input.num_images = args.count
-  if (args.format) input.output_format = args.format
+  // Seedream Pro entrega JPEG por defecto: sin esto, `--out x.png` guardaba un JPEG con extensión .png.
+  const outputFormat = resolveImageOutputFormat({ capability, format: args.format, outPath: args.out })
+
+  if (outputFormat) input.output_format = outputFormat
 
   if (args.extraInput) Object.assign(input, JSON.parse(args.extraInput) as Record<string, unknown>)
+
+  // `--input` también pasa por las reglas del entrenador: una regla que se salta por el escape hatch no protege.
+  if (training) {
+    if (input.number_of_frames !== undefined) assertTrainingFrames(training, input.number_of_frames)
+    if (input.split_input_duration_threshold !== undefined) assertSplitThreshold(training, input.split_input_duration_threshold)
+
+    const steps = Number(input.number_of_steps ?? training.steps.defaultValue)
+
+    if (steps < training.minBillableSteps) {
+      process.stderr.write(`  ⚠ ${steps} steps: fal cobra un mínimo de ${training.minBillableSteps} steps.\n`)
+    }
+  }
+
+  // Sin --resolution, la más barata del endpoint (explícita): Wan 3.0 (1080p) y H3 base (2K) tienen defaults caros.
+  if (video && !args.resolution && video.resolutions.length && input.resolution === undefined) {
+    input.resolution = video.resolutions[0]
+    process.stdout.write(`  · sin --resolution: uso ${video.resolutions[0]}, la más barata de "${capability?.id}" (opciones: ${video.resolutions.join(', ')})\n`)
+  }
 
   if (training && typeof input[training.dataField] !== 'string') {
     throw new Error(`"${capability?.id}" requiere --training-data <zip|url> (o ${training.dataField} en --input).`)
   }
 
   return input
+}
+
+/** Duración de un video local con ffprobe (para estimar edit/enhance); `null` si no se puede medir. */
+const probeDurationSeconds = async (source: string | undefined): Promise<number | null> => {
+  if (!source || isRemote(source)) return null
+
+  try {
+    const { stdout } = await promisify(execFile)('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', resolvePath(source)])
+    const seconds = Number(stdout.trim())
+
+    return Number.isFinite(seconds) ? seconds : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Imprime el costo estimado y exige --yes sobre el tope. No bloquea cuando no hay estimación (slug fuera del registro
+ * o datos faltantes): lo avisa, para no frenar un `--model` directo.
+ */
+const confirmEstimatedCost = async (params: {
+  args: CliArgs
+  capability: FalCapability | null
+  slug: string
+  input: Record<string, unknown>
+}) => {
+  const { args, capability, slug, input } = params
+  const cap = resolveFalCostCap(args.maxUsd)
+
+  if (!capability) {
+    process.stdout.write(`  $ costo: sin estimación (slug fuera del registro) · revisa fal.ai/models/${slug}\n`)
+
+    return
+  }
+
+  const needsApi = capability.pricing && (capability.pricing.unit === 'token_1k' || capability.pricing.unit === 'step' || !(capability.pricing.publishedUsdByResolution || capability.pricing.publishedUsdPerUnit || capability.pricing.publishedUsdByArea))
+  const apiPrice = needsApi ? await getFalEndpointPricing(slug) : null
+  // Sólo editar cobra la duración del video de origen; extender cobra los segundos NUEVOS de --duration.
+  const sourceSeconds = capability.operation === 'video-edit' ? await probeDurationSeconds(args.videos[0]) : null
+  const estimate = estimateFalCost({ capability, input, apiPrice, sourceSeconds })
+
+  if (estimate.usd === null) {
+    process.stdout.write(`  $ costo: sin estimación (${estimate.basis})\n`)
+
+    return
+  }
+
+  process.stdout.write(`  $ costo estimado ≈ USD ${estimate.usd.toFixed(2)} · ${estimate.basis}\n`)
+
+  if (estimate.usd > cap && !args.yes) {
+    throw new Error(`la estimación (USD ${estimate.usd.toFixed(2)}) supera el tope de USD ${cap.toFixed(2)}. Repite con --yes para confirmar o ajusta --max-usd.`)
+  }
 }
 
 const main = async () => {
@@ -949,6 +1046,8 @@ const main = async () => {
     }
 
     const input = await buildInput(args, capability)
+
+    await confirmEstimatedCost({ args, capability, slug, input })
 
     process.stdout.write(`→ ${slug} · hasta ${Math.round(timeoutMs / 1000)}s de espera\n`)
 
@@ -1048,10 +1147,10 @@ const main = async () => {
         ? resolvePath(args.out)
         : join(outDir, `${asset.suggestedName}${remoteExt}`)
 
-    const bytes = await downloadAsset(asset.url, target)
+    const saved = await downloadAsset(asset.url, target)
 
-    process.stdout.write(`  ✓ ${Math.round(bytes / 1024)}KB · ${target.replace(process.cwd(), '.')}\n`)
-    manifest.push({ index, file: target.replace(`${process.cwd()}/`, ''), ...asset.meta })
+    process.stdout.write(`  ✓ ${Math.round(saved.bytes / 1024)}KB · ${saved.path.replace(process.cwd(), '.')}\n`)
+    manifest.push({ index, file: saved.path.replace(`${process.cwd()}/`, ''), ...asset.meta })
   }
 
   // Las capas traen metadata que se pierde si sólo se guardan los PNG.
