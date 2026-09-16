@@ -89,9 +89,9 @@ A `1024x1024`, PNG, leyendo `usage` de respuestas reales:
 
 | Quality | Output tokens | USD derivado por imagen | Latencia flare | Latencia sunburst |
 |---|---|---|---|---|
-| `low` | 196 | 0,0063 | 13,3 s | 11,6 s |
-| `high` | 1 756 | 0,0531 | 18,7 s | 29,1 s |
-| `max` | 7 024 | 0,2111 | 46,0 s | 80,6 s |
+| `low` | 196 | 0,0061 | 13,3 s | 11,6 s |
+| `high` | 1 756 | 0,0529 | 18,7 s | 29,1 s |
+| `max` | 7 024 | 0,2110 | 46,0 s | 80,6 s |
 
 Para qué sirve: **decidir `quality` y modelo en `pnpm ai:image` y en el helper canónico**. Lo que cambia:
 
@@ -103,8 +103,31 @@ Para qué sirve: **decidir `quality` y modelo en `pnpm ai:image` y en el helper 
 - La escalera es ~9× de `low` a `high` y ~4× de `high` a `max`. Una pieza en `max` cuesta lo mismo que 36
   exploraciones en `low`.
 
+### Editar cuesta MÁS que generar, no menos
+
+Misma medición, `gpt-image-2.5-flare` · `low` · `1024x1024`, leyendo `usage` real:
+
+| Caso | Input (img / txt) | Output | Total | USD derivado |
+|---|---:|---:|---:|---:|
+| Generar | 37 (0 / 37) | 196 | 233 | 0,0061 |
+| Editar **con** máscara | 1.056 (1.024 / 32) | 196 | 1.252 | 0,0142 |
+| Editar **sin** máscara | 1.056 (1.024 / 32) | 196 | 1.252 | 0,0142 |
+
+- **La máscara controla el resultado, no el gasto.** El modelo devuelve la imagen **completa** aunque la máscara
+  acote qué cambia: el `output` se cobra idéntico al de una generación (196 en los tres casos).
+- **La imagen base se paga como entrada**: 1.024 tokens de imagen por una de `1024x1024`. En `low`, editar costó
+  **2,3× generar**.
+- **La máscara es gratis**: el `usage` fue idéntico con y sin ella.
+- **El sobrecosto relativo se diluye al subir la calidad**, porque el output domina: ~2,3× en `low`, ~1,15× en
+  `high`, ~1,04× en `max` (derivado de los outputs de la tabla anterior: 196 / 1.756 / 7.024).
+- 🔴 **Para recortar el fondo de una imagen que ya existe, usa `pnpm ai:image:rmbg`** (matting local, cero costo
+  de proveedor). Pedirle el recorte al modelo cuesta como una imagen nueva.
+
+Tarifas aplicadas: image in USD 8,00/1M · text in USD 5,00/1M · image out USD 30,00/1M. El `input` de la fila
+"Generar" difiere de la tabla anterior porque el prompt es otro; el `output` es el mismo 196.
+
 🔴 **Esto es evidencia fechada, no una tarifa.** USD derivado con las tarifas vigentes al 2026-09-16 (input
-texto USD 8,00 / 1M; output imagen USD 30,00 / 1M). **Sigue vigente la regla:** ninguna cifra de costo de 2.5
+texto de entrada USD 5,00 / 1M; output imagen USD 30,00 / 1M). **Sigue vigente la regla:** ninguna cifra de costo de 2.5
 entra a una propuesta ni a un pricing sin volver a medir — precios, escalones y
 snapshots de modelo rotan sin aviso.
 
@@ -400,6 +423,24 @@ Output should be [format/background/size].
 
 If using a mask, describe the masked region semantically. Do not assume pixel-perfect compliance; inspect the result.
 
+**Inpainting por máscara desde el CLI (desde 2026-09-16).** `pnpm ai:image` expone `--mask`, así que el
+inpainting ya no exige escribir un script contra `editOpenAIImage()`:
+
+```bash
+pnpm ai:image --image base.png --mask mask.png --prompt "<qué va en la zona marcada>" --out out.png
+```
+
+- La máscara es un **PNG con las zonas a reemplazar en TRANSPARENTE**, con el **mismo formato y las mismas
+  dimensiones** que la primera `--image`. El cliente canónico lo valida y falla **antes de gastar**.
+- `--mask` sin `--image` **aborta antes de cualquier I/O**. Sin esa guarda el request saldría como una
+  generación desde cero, ignorando la máscara en silencio.
+- El prompt describe **qué va en la zona marcada**, no la imagen completa.
+- El CLI imprime `usage` en cada corrida (`usage: in N (img N · txt N) · out N · total N`): para la familia 2.5
+  ese `usage` real es la única fuente documentada de costo.
+- 🔴 **Editar no abarata.** El output se cobra igual que una generación y la imagen base se suma como input —
+  en `low`, 2,3× generar. **Si sólo necesitas recortar el fondo de una imagen que ya existe, usa
+  `pnpm ai:image:rmbg`**, que es matting local y no gasta proveedor. Ver §Costo de la familia 2.5.
+
 ## Repo Execution Patterns
 
 ### Generate via Greenhouse helper
@@ -425,7 +466,8 @@ console.log(result)
 "
 ```
 
-For reference/mask workflows, import from `./src/lib/ai/openai-image`.
+Para flujos de referencia/máscara hay dos caminos: `pnpm ai:image --image <base> --mask <mask> --prompt "…"`
+desde la terminal, o importar `./src/lib/ai/openai-image` cuando el flujo vive en código.
 
 ### Use native image tool
 

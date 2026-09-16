@@ -4,9 +4,11 @@
   "measuredAt": "2026-09-16",
   "disclaimer": "EVIDENCIA FECHADA, NO CONTRATO. OpenAI declara que la calculadora de GPT Image 2 no estima el consumo de 2.5 y que tarifas por token iguales no implican costo por imagen igual. Estas cifras se releen antes de presupuestar; no se convierten en tarifa estable ni entran a una propuesta comercial sin revalidar.",
   "rates": {
-    "inputTextPerMillionUsd": 8.0,
+    "imageInPerMillionUsd": 8.0,
+    "textInPerMillionUsd": 5.0,
     "outputImagePerMillionUsd": 30.0,
-    "ratesObservedAt": "2026-09-16"
+    "ratesObservedAt": "2026-09-16",
+    "note": "Corregido 2026-09-16: la primera versión derivó los USD aplicando 8,00/1M a los tokens de TEXTO de entrada. 8,00 es la tarifa de IMAGEN de entrada; la de texto es 5,00. El consumo medido (tokens) nunca cambió: sólo la derivación a dinero."
   },
   "authorizedScope": "7 piezas, tope fijado por el operador en piezas (no en USD, porque el costo por imagen no es estimable de antemano). Corrida en serie, escalón por escalón.",
   "findings": [
@@ -44,7 +46,7 @@
         },
         "total_tokens": 245
       },
-      "derivedCostUsd": 0.006272,
+      "derivedCostUsd": 0.006125,
       "latencyMs": 13275,
       "image": {
         "bytes": 905375,
@@ -82,7 +84,7 @@
         },
         "total_tokens": 1805
       },
-      "derivedCostUsd": 0.053072,
+      "derivedCostUsd": 0.052925,
       "latencyMs": 18748,
       "image": {
         "bytes": 895298,
@@ -120,7 +122,7 @@
         },
         "total_tokens": 7073
       },
-      "derivedCostUsd": 0.211112,
+      "derivedCostUsd": 0.210965,
       "latencyMs": 46038,
       "image": {
         "bytes": 894026,
@@ -158,7 +160,7 @@
         },
         "total_tokens": 245
       },
-      "derivedCostUsd": 0.006272,
+      "derivedCostUsd": 0.006125,
       "latencyMs": 11608,
       "image": {
         "bytes": 947154,
@@ -196,7 +198,7 @@
         },
         "total_tokens": 1805
       },
-      "derivedCostUsd": 0.053072,
+      "derivedCostUsd": 0.052925,
       "latencyMs": 29071,
       "image": {
         "bytes": 907501,
@@ -234,7 +236,7 @@
         },
         "total_tokens": 7073
       },
-      "derivedCostUsd": 0.211112,
+      "derivedCostUsd": 0.210965,
       "latencyMs": 80569,
       "image": {
         "bytes": 951823,
@@ -272,7 +274,7 @@
         },
         "total_tokens": 1808
       },
-      "derivedCostUsd": 0.053096,
+      "derivedCostUsd": 0.05294,
       "latencyMs": 21022,
       "image": {
         "bytes": 976966,
@@ -289,7 +291,7 @@
   ],
   "totals": {
     "pieces": 7,
-    "derivedCostUsd": 0.594
+    "derivedCostUsd": 0.593
   },
   "editBaseline": {
     "measuredAt": "2026-09-16",

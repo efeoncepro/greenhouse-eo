@@ -25,16 +25,26 @@ Todas a `1024x1024`, PNG, en serie, un solo prompt neutro.
 
 | Caso | Modelo | Quality | Output tokens | Total tokens | Latencia | USD derivado |
 |---|---|---|---|---|---|---|
-| flare-low | flare | low | 196 | 245 | 13,3 s | 0,0063 |
-| flare-high | flare | high | 1 756 | 1 805 | 18,7 s | 0,0531 |
-| flare-max | flare | max | 7 024 | 7 073 | 46,0 s | 0,2111 |
-| sunburst-low | sunburst | low | 196 | 245 | 11,6 s | 0,0063 |
-| sunburst-high | sunburst | high | 1 756 | 1 805 | 29,1 s | 0,0531 |
-| sunburst-max | sunburst | max | 7 024 | 7 073 | 80,6 s | 0,2111 |
-| flare-transparent | flare | high + `background: transparent` | 1 756 | 1 808 | 21,0 s | 0,0531 |
+| flare-low | flare | low | 196 | 245 | 13,3 s | 0,0061 |
+| flare-high | flare | high | 1 756 | 1 805 | 18,7 s | 0,0529 |
+| flare-max | flare | max | 7 024 | 7 073 | 46,0 s | 0,2110 |
+| sunburst-low | sunburst | low | 196 | 245 | 11,6 s | 0,0061 |
+| sunburst-high | sunburst | high | 1 756 | 1 805 | 29,1 s | 0,0529 |
+| sunburst-max | sunburst | max | 7 024 | 7 073 | 80,6 s | 0,2110 |
+| flare-transparent | flare | high + `background: transparent` | 1 756 | 1 808 | 21,0 s | 0,0529 |
 
-**Total: USD 0,594 en 7 piezas.** USD derivado con las tarifas vigentes al 2026-09-16
-(input texto USD 8,00 / 1M; output imagen USD 30,00 / 1M).
+**Total: USD 0,593 en 7 piezas.** USD derivado con las tarifas vigentes al 2026-09-16
+(output imagen USD 30,00 / 1M; texto de entrada USD 5,00 / 1M).
+
+## Corrección de la derivación a USD (mismo día)
+
+La primera versión de esta tabla derivó los USD aplicando **8,00 / 1M a los tokens de texto de entrada**.
+Es incorrecto: 8,00 es la tarifa de **imagen** de entrada; la de **texto** es 5,00. Los USD publicados
+bajaron levemente (`low` 0,0063 → 0,0061; total 0,594 → 0,593).
+
+**El consumo medido no cambió** — los tokens son los que devolvió el API y siguen siendo los mismos. Lo que
+estaba mal era la conversión a dinero, no la medición. Se deja anotado en vez de reescribir la cifra en
+silencio, porque esta tabla se publicó como evidencia para presupuestar.
 
 ## Qué se aprendió
 

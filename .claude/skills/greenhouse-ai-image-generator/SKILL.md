@@ -104,8 +104,8 @@ decodificando bytes, nunca por metadata ni por ver un checkerboard.
 el consumo de 2.5, así que la única fuente es `usage` de respuestas reales — y esa medición ya existe:
 `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/` (manifest por corrida, salida cruda, instrumento
 reproducible). A `1024x1024`, output tokens **196** (`low`) / **1 756** (`high`) / **7 024** (`max`),
-**idénticos entre Flare y Sunburst** → USD **0,0063** / **0,0531** / **0,2111** por imagen con las tarifas
-vigentes al medir (input texto USD 8,00 / 1M; output imagen USD 30,00 / 1M).
+**idénticos entre Flare y Sunburst** → USD **0,0061** / **0,0529** / **0,2110** por imagen con las tarifas
+vigentes al medir (output imagen USD 30,00 / 1M; texto de entrada USD 5,00 / 1M).
 
 El **edit** tiene su propia línea base en el mismo directorio (ver el bloque de `--mask` abajo): editar no abarata, suma la imagen base como input.
 

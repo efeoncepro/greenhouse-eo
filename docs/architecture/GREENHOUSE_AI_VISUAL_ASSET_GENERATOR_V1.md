@@ -128,6 +128,13 @@ await runOpenAIImageTool({
 })
 ```
 
+**El modo 2 también es alcanzable desde la terminal desde 2026-09-16:** `pnpm ai:image --image <base.png>
+--mask <mask.png> --prompt "…" --out <out.png>`. La máscara es un PNG con las zonas a reemplazar en
+**transparente**, del mismo formato y dimensiones que la primera imagen — el helper lo valida y falla antes de
+gastar. `--mask` sin `--image` aborta antes de cualquier I/O: sin esa guarda el request saldría como generación
+desde cero, ignorando la máscara en silencio. La superficie del proveedor no cambió (`POST /v1/images/edits`
+siempre aceptó máscara); lo que cambió es que Greenhouse ahora la transporta desde el CLI.
+
 OpenAI documenta PNG/WebP transparente nativo en `gpt-image-2` como preview. El helper preserva el modelo exacto,
 rechaza `transparent + jpeg` antes de red y no usa `gpt-image-1.5` como fallback. La aceptación del asset verifica
 el canal alfa desde bytes decodificados. Matriz completa:
@@ -162,6 +169,13 @@ real. Hay línea base fechada del 2026-09-16 (7 piezas, `1024x1024`) en
 `creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md` → §Línea base de consumo medido. Su hallazgo
 central: **el costo por imagen lo fija `quality × size`, no el modelo** — Flare y Sunburst consumen idéntico
 para el mismo `quality`, y lo que los separa es la latencia.
+
+**Editar no abarata.** Medido el 2026-09-16 (`flare` · `low` · `1024x1024`): el modelo devuelve la imagen
+completa aunque la máscara acote qué cambia, así que el `output` se cobra igual que una generación (196 tokens) y
+la imagen base se suma como input (1.024 tokens) — **2,3× generar** en `low`, y la máscara en sí no cuesta nada.
+El sobrecosto relativo se diluye al subir la calidad porque el output domina (~1,15× en `high`, ~1,04× en `max`).
+🔴 **Para recortar el fondo de una imagen que ya existe, usar `pnpm ai:image:rmbg`** (matting local, cero costo de
+proveedor). Tabla completa en la matriz → §Qué cuesta editar frente a generar.
 
 ### `generateAnimation(prompt, options)`
 
@@ -278,7 +292,6 @@ Zero dependencias nuevas.
 
 ## Future
 
-- Image editing / inpainting: modificar imagenes existentes con mascaras
 - Video generation via Veo: micro-videos para onboarding
 - Batch generation: sets completos de assets por tema (todos los empty states)
 - GCS upload: para assets grandes que no deben vivir en el repo
@@ -296,7 +309,7 @@ Zero dependencias nuevas.
 - La skill no solo opera el provider: debe actuar como direccion de arte, con brief visual, composicion, materiales/acabados, iluminacion, paleta, iteracion single-change y rubric de QA profesional. Guia compartida: `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md`.
 - Entry point canonico para assets visuales generados por agentes: `src/lib/ai/image-generator.ts`.
 - `generateImage()` soporta providers `openai-image` (default) y `google-gemini-image`; no llamar APIs de imagen desde scripts paralelos si el helper cubre el caso. El carril Google migró de Imagen a Gemini Image por TASK-1851: `imagen-4.0-generate-001` está retirado y responde 404.
-- **CLI canonica de generacion `pnpm ai:image` (gpt-image-2, desde 2026-06-10):** wrapper operativo del fn canonico `generateOpenAIImage` (`src/lib/ai/openai-image.ts`) para generar imagenes desde la terminal — conceptos del `product-design-loop`, fixtures de mockup, batches de iconos/assets. **NO crear scripts de generacion ad-hoc** (`scripts/_gen-*.ts`): usar esta CLI. Self-contained (carga `.env.local` solo; resuelve `OPENAI_API_KEY_SECRET_REF` server-side, nunca imprime el secreto). Default `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` supera los 125s del helper runtime `generateImage`, que NO pasa-through `timeoutMs` — por eso la CLI usa el fn de bajo nivel). Uso: `pnpm ai:image --prompt "<texto>" [--out <path>] [--size 1024x1024|1536x1024|1024x1536|2048x...] [--quality low|medium|high|xhigh|max|auto] [--background opaque|transparent] [--model gpt-image-2|gpt-image-2.5-flare|gpt-image-2.5-sunburst] [--count N] [--timeout ms] [--open]`; `--prompt-file <path>` (prompts largos); `--batch <json>` (`[{ filename, prompt }, …]`, varios). La CLI **valida `--model` y `--quality` contra el allowlist antes de cualquier I/O**, y valida la combinación `model × quality` una sola vez al arrancar (no por pieza): `xhigh` y `max` sólo existen en la familia 2.5. Preserva el modelo exacto para transparencia, rechaza JPEG y no degrada a 1.5. **Sigue siendo raster** (PNG/WebP) — para vectores reales, Higgsfield + Recraft V4.1 (abajo). Para assets repo-bound que el runtime sirve, preferir el helper `generateImage()`; la CLI es para generacion operada por agente/operador. **Direccion de arte = invocar la skill `greenhouse-ai-image-generator`** (la CLI opera el modelo; la skill aporta brief/composicion/QA).
+- **CLI canonica de generacion `pnpm ai:image` (gpt-image-2, desde 2026-06-10):** wrapper operativo del fn canonico `generateOpenAIImage` (`src/lib/ai/openai-image.ts`) para generar imagenes desde la terminal — conceptos del `product-design-loop`, fixtures de mockup, batches de iconos/assets. **NO crear scripts de generacion ad-hoc** (`scripts/_gen-*.ts`): usar esta CLI. Self-contained (carga `.env.local` solo; resuelve `OPENAI_API_KEY_SECRET_REF` server-side, nunca imprime el secreto). Default `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` supera los 125s del helper runtime `generateImage`, que NO pasa-through `timeoutMs` — por eso la CLI usa el fn de bajo nivel). Uso: `pnpm ai:image --prompt "<texto>" [--out <path>] [--size 1024x1024|1536x1024|1024x1536|2048x...] [--quality low|medium|high|xhigh|max|auto] [--background opaque|transparent] [--model gpt-image-2|gpt-image-2.5-flare|gpt-image-2.5-sunburst] [--count N] [--timeout ms] [--open]`; `--prompt-file <path>` (prompts largos); `--batch <json>` (`[{ filename, prompt }, …]`, varios). **Modo edit/inpainting:** `--image <path>` (repetible) edita una referencia en vez de generar desde cero, y `--mask <path>` (desde 2026-09-16) marca **qué zona** se reemplaza — PNG con las zonas a editar en **transparente**, mismo formato y mismas dimensiones que la primera `--image`; el cliente canónico lo valida y falla antes de gastar. **`--mask` sin `--image` aborta antes de cualquier I/O**: sin esa guarda el request saldría como generación desde cero ignorando la máscara en silencio. **La CLI imprime `usage` en cada corrida** (`usage: in N (img N · txt N) · out N · total N`) porque para la familia 2.5 ese `usage` real es la única fuente documentada de costo. 🔴 **Editar no abarata** — el modelo devuelve la imagen completa aunque la máscara acote el cambio, así que el output se cobra igual que una generación y la imagen base se suma como input (2,3× generar en `low`); **para recortar el fondo de una imagen que ya existe, usar `pnpm ai:image:rmbg`** (matting local, cero costo de proveedor). La CLI **valida `--model` y `--quality` contra el allowlist antes de cualquier I/O**, y valida la combinación `model × quality` una sola vez al arrancar (no por pieza): `xhigh` y `max` sólo existen en la familia 2.5. Preserva el modelo exacto para transparencia, rechaza JPEG y no degrada a 1.5. **Sigue siendo raster** (PNG/WebP) — para vectores reales, Higgsfield + Recraft V4.1 (abajo). Para assets repo-bound que el runtime sirve, preferir el helper `generateImage()`; la CLI es para generacion operada por agente/operador. **Direccion de arte = invocar la skill `greenhouse-ai-image-generator`** (la CLI opera el modelo; la skill aporta brief/composicion/QA).
 - `GREENHOUSE_IMAGE_PROVIDER` controla el default runtime, pero cada llamada puede pasar `provider`.
 - OpenAI usa `src/lib/ai/openai-image.ts` y resuelve la key solo server-side con `OPENAI_API_KEY` / `OPENAI_API_KEY_SECRET_REF`; el secreto canonico es `greenhouse-openai-api-key` en GCP Secret Manager. Nunca hardcodear `sk-*` en repo, Vercel env directo, logs, tests ni docs.
 - Para transparencia del proveedor, pedir `format: 'png' | 'webp'` y `background: 'transparent'`; el helper
