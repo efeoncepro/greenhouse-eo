@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Diseño`
+- Status real: `Slice 1 en curso — discovery cerrado, decisiones de operador tomadas 2026-09-16`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`

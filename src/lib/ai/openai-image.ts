@@ -7,8 +7,16 @@ import sharp from 'sharp'
 
 import { resolveSecret, type SecretResolutionSource } from '@/lib/secrets/secret-manager'
 
-export type OpenAIImageModel = 'gpt-image-2' | 'gpt-image-1.5' | 'gpt-image-1' | 'gpt-image-1-mini'
-export type OpenAIImageQuality = 'auto' | 'low' | 'medium' | 'high'
+export type OpenAIImageModel =
+  | 'gpt-image-2.5-sunburst'
+  | 'gpt-image-2.5-sunburst-2026-09-08'
+  | 'gpt-image-2.5-flare'
+  | 'gpt-image-2.5-flare-2026-09-08'
+  | 'gpt-image-2'
+  | 'gpt-image-1.5'
+  | 'gpt-image-1'
+  | 'gpt-image-1-mini'
+export type OpenAIImageQuality = 'auto' | 'low' | 'medium' | 'high' | 'xhigh' | 'max'
 export type OpenAIImageFormat = 'png' | 'webp' | 'jpeg'
 export type OpenAIImageBackground = 'auto' | 'opaque' | 'transparent'
 export type OpenAIImageInputFidelity = 'low' | 'high'
@@ -174,12 +182,68 @@ const DEFAULT_OPENAI_IMAGE_QUALITY: OpenAIImageQuality = 'medium'
 const DEFAULT_OPENAI_IMAGE_FORMAT: OpenAIImageFormat = 'png'
 const DEFAULT_OPENAI_IMAGE_TIMEOUT_MS = 125_000
 
-const OPENAI_IMAGE_MODELS = new Set<OpenAIImageModel>([
-  'gpt-image-2',
-  'gpt-image-1.5',
-  'gpt-image-1',
-  'gpt-image-1-mini'
-])
+/**
+ * Capacidades declaradas por modelo.
+ *
+ * Es un `Record` y no un `Set` a propósito: TypeScript obliga a declarar las capacidades de cada modelo
+ * nuevo, así que agregar uno no puede volver a degradar en silencio por olvidar un literal en una rama
+ * (que es exactamente como `gpt-image-2.5-*` terminaba resuelto con la grilla de tamaños legacy).
+ */
+interface OpenAIImageModelCapabilities {
+  /** Grilla de tamaños ampliada (2048x1152, 2048x2048, …) en vez de la legacy de tres tamaños. */
+  extendedSizeGrid: boolean
+  /** Escalones de calidad `xhigh` y `max`, exclusivos de la familia 2.5. */
+  premiumQualityTiers: boolean
+  /**
+   * `input_fidelity` en `/v1/images/edits`. La guía de OpenAI lo ubica bajo "Earlier GPT Image models"
+   * con la frase explícita "not Sunburst or Flare": NUNCA debe viajar con un modelo 2.5, aunque siga
+   * presente en el enum del schema. En 2.5 la preservación de identidad se pide por prompt.
+   */
+  inputFidelity: boolean
+}
+
+const OPENAI_IMAGE_MODEL_CAPABILITIES: Record<OpenAIImageModel, OpenAIImageModelCapabilities> = {
+  'gpt-image-2.5-sunburst': { extendedSizeGrid: true, premiumQualityTiers: true, inputFidelity: false },
+  'gpt-image-2.5-sunburst-2026-09-08': { extendedSizeGrid: true, premiumQualityTiers: true, inputFidelity: false },
+  'gpt-image-2.5-flare': { extendedSizeGrid: true, premiumQualityTiers: true, inputFidelity: false },
+  'gpt-image-2.5-flare-2026-09-08': { extendedSizeGrid: true, premiumQualityTiers: true, inputFidelity: false },
+  'gpt-image-2': { extendedSizeGrid: true, premiumQualityTiers: false, inputFidelity: false },
+  'gpt-image-1.5': { extendedSizeGrid: false, premiumQualityTiers: false, inputFidelity: true },
+  'gpt-image-1': { extendedSizeGrid: false, premiumQualityTiers: false, inputFidelity: true },
+  'gpt-image-1-mini': { extendedSizeGrid: false, premiumQualityTiers: false, inputFidelity: true }
+}
+
+const OPENAI_IMAGE_MODELS = new Set<OpenAIImageModel>(
+  Object.keys(OPENAI_IMAGE_MODEL_CAPABILITIES) as OpenAIImageModel[]
+)
+
+const PREMIUM_OPENAI_IMAGE_QUALITIES = new Set<OpenAIImageQuality>(['xhigh', 'max'])
+
+export const getOpenAIImageModelCapabilities = (model: OpenAIImageModel): OpenAIImageModelCapabilities =>
+  OPENAI_IMAGE_MODEL_CAPABILITIES[model]
+
+/**
+ * `xhigh` y `max` existen sólo en la familia 2.5. Pedirlos a un modelo anterior falla acá, antes de la red,
+ * en vez de gastar un request que el proveedor rechaza.
+ */
+export const assertOpenAIImageQualitySupported = ({
+  model,
+  quality
+}: {
+  model: OpenAIImageModel
+  quality: OpenAIImageQuality
+}) => {
+  if (!PREMIUM_OPENAI_IMAGE_QUALITIES.has(quality)) return
+  if (OPENAI_IMAGE_MODEL_CAPABILITIES[model].premiumQualityTiers) return
+
+  const supported = (Object.keys(OPENAI_IMAGE_MODEL_CAPABILITIES) as OpenAIImageModel[]).filter(
+    candidate => OPENAI_IMAGE_MODEL_CAPABILITIES[candidate].premiumQualityTiers
+  )
+
+  throw new Error(
+    `OpenAI image quality "${quality}" only exists on the GPT Image 2.5 family; "${model}" supports up to "high". Models with "${quality}": ${supported.join(', ')}.`
+  )
+}
 
 const LEGACY_OPENAI_IMAGE_SIZES = new Set<OpenAIImageSize>(['auto', '1024x1024', '1024x1536', '1536x1024'])
 const MAX_OPENAI_IMAGE_INPUTS = 16
@@ -208,15 +272,17 @@ export const resolveOpenAIImageSize = ({
   size?: OpenAIImageSize
   aspectRatio?: OpenAIImageAspectRatio
 }): OpenAIImageSize => {
+  const { extendedSizeGrid } = OPENAI_IMAGE_MODEL_CAPABILITIES[model]
+
   if (size) {
-    if (model === 'gpt-image-2' || LEGACY_OPENAI_IMAGE_SIZES.has(size)) {
+    if (extendedSizeGrid || LEGACY_OPENAI_IMAGE_SIZES.has(size)) {
       return size
     }
 
     return size.includes('1536x') ? '1024x1536' : size.includes('x1536') ? '1536x1024' : 'auto'
   }
 
-  if (model !== 'gpt-image-2') {
+  if (!extendedSizeGrid) {
     switch (aspectRatio) {
       case '1:1':
         return '1024x1024'
@@ -516,6 +582,9 @@ export const generateOpenAIImage = async ({
   assertBackgroundFormatCompatibility(background, format)
 
   const resolvedRequest = resolveOpenAIImageRequestModel({ model, background })
+
+  assertOpenAIImageQualitySupported({ model: resolvedRequest.model, quality })
+
   const resolvedSize = resolveOpenAIImageSize({ model: resolvedRequest.model, size, aspectRatio })
 
   const resolvedBackground = resolveOpenAIImageBackground({
@@ -593,6 +662,9 @@ export const editOpenAIImage = async ({
   }
 
   const resolvedRequest = resolveOpenAIImageRequestModel({ model, background })
+
+  assertOpenAIImageQualitySupported({ model: resolvedRequest.model, quality })
+
   const resolvedSize = resolveOpenAIImageSize({ model: resolvedRequest.model, size, aspectRatio })
 
   const resolvedBackground = resolveOpenAIImageBackground({
@@ -614,7 +686,7 @@ export const editOpenAIImage = async ({
     formData.append('background', resolvedBackground)
   }
 
-  if (inputFidelity && resolvedRequest.model !== 'gpt-image-2') {
+  if (inputFidelity && OPENAI_IMAGE_MODEL_CAPABILITIES[resolvedRequest.model].inputFidelity) {
     formData.append('input_fidelity', inputFidelity)
   }
 
