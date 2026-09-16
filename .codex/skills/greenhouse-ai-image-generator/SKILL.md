@@ -468,6 +468,16 @@ deterministic and are composed after any generative finish.
   size. The built-in chat generator may be used for exploration, but its model must remain `unknown` when the
   runtime does not expose `model_id`; never infer it from visual quality.
 - Never generate official logos or brand marks from memory.
+- 🔴 **El logotipo de Efeonce es `efe[isotipo]nce`: el símbolo ES la letra «o», no la acompaña.** Una sola
+  pieza. **NUNCA** pongas un isotipo grande al lado de la palabra — duplica el símbolo y produce un lockup
+  que no existe. El isotipo suelto (`public/branding/SVG/isotipo-full-efeonce.svg`) es una variante válida
+  **por separado**, para cuando la marca aparece sin el nombre; no se combina con el wordmark
+  (`public/branding/logo-full.svg`). Al materializar la marca, pasa el activo correcto como referencia y
+  declara en el prompt que el símbolo aparece **exactamente una vez**.
+- **Mira el activo oficial renderizado antes de describirlo.** No infieras su estructura del nombre del
+  archivo, de un render anterior ni de la lectura natural del término "logo completo". Caso fuente
+  2026-09-16: leer el logotipo de Efeonce como "isotipo + palabra" costó dos corridas facturables y produjo
+  una pieza peor que la anterior, mientras el diagnóstico decía que la estaba corrigiendo.
 - Do not include visible text unless the user explicitly asks and accepts risk; image models can still struggle with precise text.
 - Treat model-rendered campaign text as concept-only. Final copy, editorial logo, CTA, price, legal and
   localization require deterministic composition unless an explicit exception accepts raster risk. Physical
