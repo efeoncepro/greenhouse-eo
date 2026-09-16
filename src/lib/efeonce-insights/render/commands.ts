@@ -160,7 +160,9 @@ export const requestInsightRender = async (input: RequestInsightRenderInput): Pr
       editionId: edition.editionId,
       audience: edition.audience,
       requestedOutputs: outputs,
-      requestedByKind: grant.actor.kind === 'member' ? 'member' : 'system',
+      // TASK-1846 — el actor se audita tal cual: un usuario del portal cliente es `client_user`, no
+      // `system` (así lo registran también reportes, ediciones y transiciones de Insights).
+      requestedByKind: grant.actor.kind,
       requestedByUserId: grant.actor.userId,
       requestedByMemberId: grant.actor.memberId,
       outputs: outputs.map(output => ({ output, catalogName: INSIGHT_RENDER_CATALOG_NAME, manifest, manifestHash }))
@@ -194,7 +196,7 @@ export const retryInsightRender = async (input: RenderScope & { renderRunId: str
   if (!isInsightsRenderEnabled(input.env)) throw new InsightsRenderDisabledError()
 
   const { grant, run } = await loadRun(input, input.renderRunId, 'create')
-  const requeued = await retryFailedInsightOutputs({ organizationId: grant.organizationId, renderRunId: run.renderRunId })
+  const requeued = await retryFailedInsightOutputs({ organizationId: grant.organizationId, renderRunId: run.renderRunId, actorKind: grant.actor.kind })
   const fresh = (await getInsightRenderRun({ organizationId: grant.organizationId, renderRunId: run.renderRunId })) ?? run
 
   return { run: fresh, outputs: await listInsightOutputsForRun({ organizationId: grant.organizationId, renderRunId: run.renderRunId }), idempotent: requeued.length === 0 }
@@ -204,7 +206,7 @@ export const cancelInsightRender = async (
   input: RenderScope & { renderRunId: string }
 ): Promise<InsightRenderRunResult & { cancelled: number; stillRunning: number }> => {
   const { grant, run } = await loadRun(input, input.renderRunId, 'create')
-  const result = await cancelInsightRenderRun({ organizationId: grant.organizationId, renderRunId: run.renderRunId })
+  const result = await cancelInsightRenderRun({ organizationId: grant.organizationId, renderRunId: run.renderRunId, actorKind: grant.actor.kind })
   const fresh = (await getInsightRenderRun({ organizationId: grant.organizationId, renderRunId: run.renderRunId })) ?? run
 
   return { run: fresh, outputs: await listInsightOutputsForRun({ organizationId: grant.organizationId, renderRunId: run.renderRunId }), idempotent: result.cancelled === 0, ...result }

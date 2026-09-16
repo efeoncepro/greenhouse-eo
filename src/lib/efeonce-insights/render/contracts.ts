@@ -88,7 +88,7 @@ export interface InsightRenderRunRecord {
   audience: InsightAudience
   requestedOutputs: InsightOutput[]
   state: InsightRenderRunState
-  requestedByKind: 'member' | 'system' | 'cli'
+  requestedByKind: 'member' | 'client_user' | 'system' | 'cli'
   requestedByUserId: string | null
   requestedByMemberId: string | null
   startedAt: Date | null

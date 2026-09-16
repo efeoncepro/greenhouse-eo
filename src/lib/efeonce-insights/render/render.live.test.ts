@@ -176,7 +176,7 @@ describe.skipIf(!hasLiveDb)('TASK-1846 — lease y fencing del render (PostgreSQ
         const runningId = await mk('web', 'running', 'lease_expires_at', [new Date(Date.now() + 600_000)])
 
         // ── Retry: sólo el fallido vuelve a la cola ───────────────────────────────────────────
-        const requeued = await retryFailedInsightOutputs({ organizationId, renderRunId, client })
+        const requeued = await retryFailedInsightOutputs({ organizationId, renderRunId, actorKind: 'client_user', client })
 
         expect(requeued).toHaveLength(1)
         expect(requeued[0]!.insightOutputId).toBe(failedId)
@@ -200,7 +200,7 @@ describe.skipIf(!hasLiveDb)('TASK-1846 — lease y fencing del render (PostgreSQ
         expect(okAfter.rows[0]!.state).toBe('completed')
 
         // ── Cancelación: cancela lo pendiente, NO miente sobre lo que corre ───────────────────
-        const cancel = await cancelInsightRenderRun({ organizationId, renderRunId, client })
+        const cancel = await cancelInsightRenderRun({ organizationId, renderRunId, actorKind: 'member', client })
 
         expect(cancel.cancelled).toBe(1) // el que acabábamos de re-encolar
         expect(cancel.stillRunning).toBe(1) // el 'web' sigue corriendo: no podemos matar al worker
@@ -219,6 +219,18 @@ describe.skipIf(!hasLiveDb)('TASK-1846 — lease y fencing del render (PostgreSQ
         )
 
         expect(runAfter.rows[0]!.state).not.toBe('cancelled')
+
+        // El historial conserva QUIÉN reintentó y QUIÉN canceló (antes quedaba todo como system).
+        const actors = await client.query<{ to_state: string; actor_kind: string }>(
+          `SELECT to_state, actor_kind FROM greenhouse_insights.insight_render_events
+            WHERE render_run_id = $1 AND from_state IS NOT NULL ORDER BY render_event_id`,
+          [renderRunId]
+        )
+
+        expect(actors.rows).toEqual([
+          { to_state: 'queued', actor_kind: 'client_user' },
+          { to_state: 'cancelled', actor_kind: 'member' }
+        ])
 
         throw new RollbackSentinel('rollback')
       })
@@ -266,13 +278,22 @@ describe.skipIf(!hasLiveDb)('TASK-1846 — lease y fencing del render (PostgreSQ
           editionId,
           audience,
           requestedOutputs: ['deck_pdf'],
-          requestedByKind: 'system',
-          requestedByUserId: null,
+          // TASK-1846 — un usuario del portal cliente se audita como client_user, nunca como system.
+          requestedByKind: 'client_user',
+          requestedByUserId: 'user-agent-client-001',
           requestedByMemberId: null,
           outputs: [{ output: 'deck_pdf', catalogName: 'deck-axis', manifest: { input: { artifactId: editionId, slides: [] } }, manifestHash: 'd'.repeat(64) }]
         })
 
         expect(inserted.run.state).toBe('pending')
+        expect(inserted.run.requestedByKind).toBe('client_user')
+
+        const queuedEvent = await client.query<{ actor_kind: string }>(
+          `SELECT actor_kind FROM greenhouse_insights.insight_render_events WHERE render_run_id = $1 AND to_state = 'queued'`,
+          [inserted.run.renderRunId]
+        )
+
+        expect(queuedEvent.rows.map(r => r.actor_kind)).toEqual(['client_user'])
         expect(inserted.outputs).toHaveLength(1)
         expect(inserted.outputs[0]!.state).toBe('queued')
         expect(inserted.outputs[0]!.fenceToken).toBe(0)

@@ -446,6 +446,8 @@ export const markInsightOutputFailed = async (input: {
 export const retryFailedInsightOutputs = async (input: {
   organizationId: string
   renderRunId: string
+  /** Quién pidió el retry; queda en el historial. Default `system` para callers sin actor humano. */
+  actorKind?: InsightRenderActorKind
   client?: InsightsDbClient
 }): Promise<InsightOutputRecord[]> =>
   withClient(input.client, async client => {
@@ -478,8 +480,8 @@ export const retryFailedInsightOutputs = async (input: {
       await client.query(
         `INSERT INTO greenhouse_insights.insight_render_events
            (insight_output_id, render_run_id, organization_id, from_state, to_state, detail, actor_kind)
-         VALUES ($1, $2, $3, 'failed', 'queued', $4, 'system')`,
-        [outputId, input.renderRunId, input.organizationId, JSON.stringify({ retry: 'requeued' })]
+         VALUES ($1, $2, $3, 'failed', 'queued', $4, $5)`,
+        [outputId, input.renderRunId, input.organizationId, JSON.stringify({ retry: 'requeued' }), input.actorKind ?? 'system']
       )
 
       requeued.push(mapOutputRow(updated.rows[0]!))
@@ -508,6 +510,8 @@ export const retryFailedInsightOutputs = async (input: {
 export const cancelInsightRenderRun = async (input: {
   organizationId: string
   renderRunId: string
+  /** Quién pidió la cancelación; queda en el historial. Default `system`. */
+  actorKind?: InsightRenderActorKind
   client?: InsightsDbClient
 }): Promise<{ cancelled: number; stillRunning: number }> =>
   withClient(input.client, async client => {
@@ -539,13 +543,14 @@ export const cancelInsightRenderRun = async (input: {
       await client.query(
         `INSERT INTO greenhouse_insights.insight_render_events
            (insight_output_id, render_run_id, organization_id, from_state, to_state, detail, actor_kind)
-         VALUES ($1, $2, $3, $4, 'cancelled', $5, 'system')`,
+         VALUES ($1, $2, $3, $4, 'cancelled', $5, $6)`,
         [
           row.insight_output_id,
           input.renderRunId,
           input.organizationId,
           row.state,
-          JSON.stringify({ cancel: 'run_scope' })
+          JSON.stringify({ cancel: 'run_scope' }),
+          input.actorKind ?? 'system'
         ]
       )
 
@@ -568,12 +573,15 @@ export const cancelInsightRenderRun = async (input: {
 // Altas y lecturas por edición (las usa el command de encolado y el puerto de outputs)
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** Quién actuó sobre un render. `client_user` = usuario del portal cliente (no es un member). */
+export type InsightRenderActorKind = 'member' | 'client_user' | 'system' | 'cli'
+
 export interface InsertInsightRenderRunInput {
   organizationId: string
   editionId: string
   audience: InsightAudience
   requestedOutputs: InsightOutput[]
-  requestedByKind: 'member' | 'system' | 'cli'
+  requestedByKind: InsightRenderActorKind
   requestedByUserId: string | null
   requestedByMemberId: string | null
   outputs: Array<{
@@ -645,7 +653,7 @@ export const insertInsightRenderRun = async (
         runRecord.renderRunId,
         input.organizationId,
         JSON.stringify({ manifestHash: output.manifestHash, catalogName: output.catalogName }),
-        input.requestedByKind === 'member' ? 'member' : 'system'
+        input.requestedByKind
       ]
     )
 
