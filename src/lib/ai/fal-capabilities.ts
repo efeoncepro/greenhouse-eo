@@ -63,12 +63,19 @@ export interface FalVideoContract {
     min: number
     max: number
     acceptsAuto: boolean
+    /**
+     * Cómo viaja `auto`: como texto (Seedance, Flux 3) o como `null` (Wan 3.0: "smart duration", el modelo
+     * elige el largo según el prompt y las referencias). Omitido = texto.
+     */
+    autoValue?: 'auto' | null
   } | null
   /** Valores canónicos del endpoint; vacío = no acepta `resolution` (drafts de Flux 3, edición). */
   resolutions: readonly string[]
   /** Vacío = el endpoint no acepta `aspect_ratio` (el encuadre sale de la imagen de entrada). */
   aspectRatios: readonly string[]
   supportsAudioToggle: boolean
+  /** Nombre del booleano de audio: `generate_audio` (default) o `audio` (Wan 3.0). */
+  audioField?: 'generate_audio' | 'audio'
   supportsBitrateMode: boolean
   /** `task` (reference | editing | extension) sólo existe en Seedance 2.5 reference-to-video. */
   acceptsTask: boolean
@@ -108,6 +115,13 @@ export interface FalVideoContract {
   requiresSourceAudio?: boolean
   /** reference-to-video: exige al menos una imagen o video de referencia; el audio solo no alcanza. */
   requiresVisualReference?: boolean
+  /** Wan 3.0: la reescritura del prompt es un booleano (`enable_prompt_expansion`, prendido por defecto). */
+  promptExpansionToggle?: boolean
+  /**
+   * Wan 3.0: razonamiento previo (`enable_thinking`). Con `groundingSources`, el video puede basarse en una página
+   * web pública (`web_url`) o un documento (`file_url`), y ambos EXIGEN el razonamiento prendido.
+   */
+  thinking?: { groundingSources: boolean }
 }
 
 /** Entrenadores de LoRA: el dataset viaja como URL a un zip y los hiperparámetros tienen rangos reales. */
@@ -269,6 +283,36 @@ const FLUX3_PASSTHROUGH: FalVideoContract = {
   aspectRatios: [],
   supportsAudioToggle: false
 }
+
+const WAN3_REFERENCES: NonNullable<FalVideoContract['references']> = {
+  images: { field: 'reference_image_urls', max: 10 },
+  videos: { field: 'reference_video_urls', max: 5 },
+  audios: { field: 'reference_audio_urls', max: 5 }
+}
+
+/**
+ * Wan 3.0 y Wan 3.0 Prime (Alibaba) — segundo del ranking de video de OpenArt Arena y primero en edición de video
+ * (2026-09-16). Mismo contrato y mismo precio (USD 0,05/s) en ambas líneas, medido contra el OpenAPI 2026-09-16:
+ * duración entera 2–30 s (`auto` = `null`), 480p/720p/1080p con 1080p por defecto, audio por `audio`, expansión de
+ * prompt booleana y razonamiento opcional.
+ */
+const WAN3: FalVideoContract = {
+  duration: { encoding: 'integer', min: 2, max: 30, acceptsAuto: true, autoValue: null },
+  resolutions: ['480p', '720p', '1080p'],
+  aspectRatios: ['adaptive', '16:9', '4:3', '1:1', '3:4', '9:16'],
+  supportsAudioToggle: true,
+  audioField: 'audio',
+  supportsBitrateMode: false,
+  acceptsTask: false,
+  acceptsEndImage: false,
+  promptExpansionToggle: true,
+  thinking: { groundingSources: false }
+}
+
+const WAN3_I2V: FalVideoContract = { ...WAN3, acceptsEndImage: true }
+
+/** Referencias a video: hasta 10 imágenes, 5 videos y 5 audios, y puede basarse en una web o un documento. */
+const WAN3_R2V: FalVideoContract = { ...WAN3, references: WAN3_REFERENCES, thinking: { groundingSources: true } }
 
 export interface FalCapability {
   /** Identificador corto que el operador escribe en el CLI. */
@@ -991,6 +1035,92 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     verifiedAt: '2026-09-16',
     video: { ...FLUX3_PASSTHROUGH, draftCache: 'consumes' },
     notes: '--draft-cache <url> de un draft · entrega la versión final (verificado: 1920×1088) · USD 0,085/s'
+  },
+
+  // ── Wan 3.0 / Wan 3.0 Prime (Alibaba) — video · slugs SIN fal-ai/ ────────────────────────────────────
+  {
+    id: 'wan3-t2v',
+    slug: 'alibaba/wan-3.0/text-to-video',
+    kind: 'video',
+    operation: 'text-to-video',
+    label: 'Wan 3.0 — texto a video',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: WAN3,
+    notes: '2–30 s o auto · hasta 1080p (default) · --thinking · USD 0,05/s'
+  },
+  {
+    id: 'wan3-i2v',
+    slug: 'alibaba/wan-3.0/image-to-video',
+    kind: 'video',
+    operation: 'image-to-video',
+    label: 'Wan 3.0 — imagen a video',
+    inputMediaField: 'start_image_url',
+    inputMedia: 'one',
+    requiresPrompt: false,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: WAN3_I2V,
+    notes: '--image = primer cuadro · --end-image opcional · prompt opcional'
+  },
+  {
+    id: 'wan3-r2v',
+    slug: 'alibaba/wan-3.0/reference-to-video',
+    kind: 'video',
+    operation: 'reference-to-video',
+    label: 'Wan 3.0 — referencias a video',
+    inputMediaField: 'reference_image_urls',
+    inputMedia: 'many',
+    requiresPrompt: false,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: WAN3_R2V,
+    notes: 'hasta 10 imágenes, 5 videos y 5 audios (≤ 15 s) · --web-url / --file con --thinking · prompt opcional'
+  },
+  {
+    id: 'wan3prime-t2v',
+    slug: 'alibaba/wan-3.0-prime/text-to-video',
+    kind: 'video',
+    operation: 'text-to-video',
+    label: 'Wan 3.0 Prime — texto a video',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: WAN3,
+    notes: '2–30 s o auto · hasta 1080p (default) · --thinking · USD 0,05/s'
+  },
+  {
+    id: 'wan3prime-i2v',
+    slug: 'alibaba/wan-3.0-prime/image-to-video',
+    kind: 'video',
+    operation: 'image-to-video',
+    label: 'Wan 3.0 Prime — imagen a video',
+    inputMediaField: 'start_image_url',
+    inputMedia: 'one',
+    requiresPrompt: false,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: WAN3_I2V,
+    notes: '--image = primer cuadro · --end-image opcional · prompt opcional'
+  },
+  {
+    id: 'wan3prime-r2v',
+    slug: 'alibaba/wan-3.0-prime/reference-to-video',
+    kind: 'video',
+    operation: 'reference-to-video',
+    label: 'Wan 3.0 Prime — referencias a video',
+    inputMediaField: 'reference_image_urls',
+    inputMedia: 'many',
+    requiresPrompt: false,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: WAN3_R2V,
+    notes: 'hasta 10 imágenes, 5 videos y 5 audios (≤ 15 s) · --web-url / --file con --thinking · prompt opcional'
   },
 ] as const
 

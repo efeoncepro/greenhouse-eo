@@ -45,6 +45,8 @@ import { FAL_CAPABILITIES, findFalCapability, type FalCapability, type FalRefere
  *          --lora <path[@scale]> (repetible) · --camera-trajectory <json>
  *          Flux 3: --keyframe <imagen>@<frame_index> (repetible) · --safety-tolerance 0-4 · --draft-cache <url>
  *          (en edit/extend el video de origen va por --video)
+ *          Wan 3.0: --thinking · --web-url <url> · --file <path|url> (ambos exigen --thinking) · --no-prompt-expansion
+ *          --seed <n> (cualquier endpoint que lo acepte)
  * LoRA:    --training-data <zip|url> · --steps <n> · --rank <n> · --learning-rate <n> · --trigger <frase>
  */
 
@@ -83,6 +85,11 @@ interface CliArgs {
   keyframes: string[]
   safetyTolerance?: string
   draftCache?: string
+  thinking: boolean
+  webUrl?: string
+  file?: string
+  noPromptExpansion: boolean
+  seed?: string
   requestId?: string
   size?: string
   count?: number
@@ -97,7 +104,7 @@ interface CliArgs {
 }
 
 const parseArgs = (argv: string[]): CliArgs => {
-  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], keyframes: [], noAudio: false, json: false, list: false, help: false }
+  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], keyframes: [], noAudio: false, thinking: false, noPromptExpansion: false, json: false, list: false, help: false }
 
   let i = 0
 
@@ -136,6 +143,11 @@ const parseArgs = (argv: string[]): CliArgs => {
       case '--keyframe': args.keyframes.push(next()); break
       case '--safety-tolerance': args.safetyTolerance = next(); break
       case '--draft-cache': args.draftCache = next(); break
+      case '--thinking': args.thinking = true; break
+      case '--web-url': args.webUrl = next(); break
+      case '--file': args.file = next(); break
+      case '--no-prompt-expansion': args.noPromptExpansion = true; break
+      case '--seed': args.seed = next(); break
       case '--request-id': args.requestId = next(); break
       case '--size': args.size = next(); break
       case '--count': args.count = Math.max(1, Number(next()) || 1); break
@@ -169,7 +181,11 @@ const MIME_BY_EXT: Record<string, string> = {
   '.mp3': 'audio/mpeg',
   '.wav': 'audio/wav',
   '.m4a': 'audio/mp4',
-  '.zip': 'application/zip'
+  '.zip': 'application/zip',
+  '.pdf': 'application/pdf',
+  '.txt': 'text/plain',
+  '.md': 'text/markdown',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 }
 
 /**
@@ -449,7 +465,8 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
       throw new Error(`"${capability.id}" necesita al menos una imagen o un video de referencia; el audio solo no alcanza.`)
     }
 
-    if (isReference && referenceCount === 0) {
+    // Wan 3.0 puede basar el video en una web o un documento en vez de medios.
+    if (isReference && referenceCount === 0 && !args.webUrl && !args.file) {
       throw new Error(`"${capability.id}" necesita al menos una referencia: --image, --video o --audio.`)
     }
 
@@ -475,7 +492,8 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
       ['--prompt-expansion', args.promptExpansion], ['--camera-trajectory', args.cameraTrajectory],
       ['--no-audio', args.noAudio || undefined], ['--lora', args.loras.length || undefined],
       ['--keyframe', args.keyframes.length || undefined], ['--safety-tolerance', args.safetyTolerance],
-      ['--draft-cache', args.draftCache]
+      ['--draft-cache', args.draftCache], ['--thinking', args.thinking || undefined], ['--web-url', args.webUrl],
+      ['--file', args.file], ['--no-prompt-expansion', args.noPromptExpansion || undefined]
     ]
 
     if (!video) {
@@ -520,8 +538,9 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
       throw new Error(`--duration ${seconds}s excede el máximo de "${capability?.id}" (${contract.max}s).`)
     }
 
-    // `auto` siempre viaja como texto; los segundos, como número sólo si el endpoint los pide enteros.
-    input.duration = isAuto || contract?.encoding !== 'integer' ? args.duration : seconds
+    // `auto` viaja como texto salvo que el endpoint lo pida como `null` (Wan 3.0); los segundos, como número sólo
+    // si el endpoint los pide enteros.
+    input.duration = isAuto ? (contract?.autoValue === null ? null : 'auto') : contract?.encoding === 'integer' ? seconds : args.duration
   }
 
   if (args.resolution) {
@@ -583,7 +602,7 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
 
   if (args.noAudio) {
     if (video && !video.supportsAudioToggle) throw new Error(`"${capability?.id}" no acepta --no-audio.`)
-    input.generate_audio = false
+    input[video?.audioField ?? 'generate_audio'] = false
   }
 
   if (args.promptExpansion) {
@@ -612,6 +631,44 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
   if (args.cameraTrajectory) {
     if (video && !video.cameraTrajectory) throw new Error(`"${capability?.id}" no acepta --camera-trajectory.`)
     input.camera_trajectory = parseCameraTrajectory(args.cameraTrajectory, video?.cameraTrajectory?.maxKeyframes ?? 12)
+  }
+
+  if (args.noPromptExpansion) {
+    if (video && !video.promptExpansionToggle) {
+      throw new Error(`"${capability?.id}" no acepta --no-prompt-expansion${video.promptExpansion ? '; usa --prompt-expansion disabled' : ''}.`)
+    }
+
+    input.enable_prompt_expansion = false
+  }
+
+  if (args.thinking) {
+    if (video && !video.thinking) throw new Error(`"${capability?.id}" no acepta --thinking.`)
+    input.enable_thinking = true
+  }
+
+  if (args.webUrl || args.file) {
+    const flag = args.webUrl ? '--web-url' : '--file'
+
+    if (video && !video.thinking?.groundingSources) {
+      throw new Error(`"${capability?.id}" no acepta ${flag}; sólo Wan 3.0 referencias a video se basa en una web o un documento.`)
+    }
+
+    // El proveedor exige el razonamiento para leer la fuente: se pide explícito para que el operador sepa que lo activa.
+    if (video && !args.thinking) throw new Error(`${flag} exige --thinking (el modelo razona sobre la fuente antes de generar).`)
+
+    if (args.webUrl) {
+      if (!isRemote(args.webUrl)) throw new Error('--web-url debe ser una URL pública http(s).')
+      input.web_url = args.webUrl
+    }
+
+    if (args.file) input.file_url = (await resolveMediaUrls([args.file]))[0]
+  }
+
+  if (args.seed !== undefined) {
+    const seed = Number(args.seed)
+
+    if (!Number.isInteger(seed) || seed < 0) throw new Error('--seed debe ser un entero >= 0.')
+    input.seed = seed
   }
 
   if (args.safetyTolerance !== undefined) {
@@ -862,7 +919,8 @@ const main = async () => {
 
   const body = (result.output ?? {}) as Record<string, unknown>
 
-  // H3 reescribe el prompt (con soundscape y música): se muestra un extracto; --json trae el texto completo.
+  // H3 (expanded_prompt), Wan 3.0 (actual_prompt) y Grok (revised_prompt) reescriben el prompt: se muestra un
+  // extracto; --json trae el texto completo.
   // Flux 3 draft: el cache es lo que permite subir a calidad final sin re-generar la toma.
   const draftCache = fileUrl(body.draft_cache) ?? (typeof body.draft_cache === 'string' ? body.draft_cache : null)
 
@@ -870,8 +928,12 @@ const main = async () => {
     process.stdout.write(`  draft_cache: ${draftCache}\n  mejóralo con: pnpm ai:fal --capability flux3-enhance --draft-cache "${draftCache}" --out <ruta>\n`)
   }
 
-  if (typeof body.expanded_prompt === 'string' && body.expanded_prompt.trim()) {
-    const expanded = body.expanded_prompt.trim().replace(/\s+/g, ' ')
+  const rewritten = [body.expanded_prompt, body.actual_prompt, body.revised_prompt].find(
+    (value): value is string => typeof value === 'string' && value.trim().length > 0
+  )
+
+  if (rewritten) {
+    const expanded = rewritten.trim().replace(/\s+/g, ' ')
 
     process.stdout.write(`  prompt expandido: ${expanded.length > 220 ? `${expanded.slice(0, 220)}… (--json para verlo entero)` : expanded}\n`)
   }

@@ -206,6 +206,37 @@ describe('registro de capacidades fal', () => {
     expect(extend.every(c => c.video?.requiresSourceAudio === true)).toBe(true)
   })
 
+  // Wan 3.0 (medido contra el OpenAPI 2026-09-16): `auto` viaja como null ("smart duration"), el audio por `audio`,
+  // la expansión de prompt es booleana y sólo referencias a video se basa en una web o un documento.
+  it('conserva el contrato propio de Wan 3.0 y Wan 3.0 Prime', () => {
+    const wan = FAL_CAPABILITIES.filter(c => c.slug.startsWith('alibaba/wan-3.0'))
+
+    expect(wan.map(c => c.id).sort()).toEqual([
+      'wan3-i2v',
+      'wan3-r2v',
+      'wan3-t2v',
+      'wan3prime-i2v',
+      'wan3prime-r2v',
+      'wan3prime-t2v'
+    ])
+
+    for (const capability of wan) {
+      const contract = capability.video!
+
+      expect(contract.duration).toEqual({ encoding: 'integer', min: 2, max: 30, acceptsAuto: true, autoValue: null })
+      expect(contract.audioField).toBe('audio')
+      expect(contract.promptExpansionToggle).toBe(true)
+      expect(contract.thinking?.groundingSources).toBe(capability.operation === 'reference-to-video')
+    }
+
+    expect(findFalCapability('wan3-i2v')?.inputMediaField).toBe('start_image_url')
+    expect(findFalCapability('wan3-r2v')?.video?.references).toEqual({
+      images: { field: 'reference_image_urls', max: 10 },
+      videos: { field: 'reference_video_urls', max: 5 },
+      audios: { field: 'reference_audio_urls', max: 5 }
+    })
+  })
+
   it('declara el director de H3 como no operable por cola, sin verificar', () => {
     const director = findFalCapability('h3max-director')
 
