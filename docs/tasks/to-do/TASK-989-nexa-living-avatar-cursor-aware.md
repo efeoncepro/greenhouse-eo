@@ -1,5 +1,14 @@
 # TASK-989 — Nexa Living Avatar (cursor-aware / mascota viva)
 
+## Delta 2026-09-16
+
+- El supuesto de providers de esta task cambió: `google-imagen` **dejó de existir** (TASK-1851). Se renombró a
+  `google-gemini-image` sobre `gemini-3.1-flash-image`, porque `imagen-4.0-generate-001` fue retirado por Google.
+- El default de `generateImage` pasó a `openai-image`, y el helper ya transporta GPT Image 2.5
+  (`gpt-image-2.5-flare` / `gpt-image-2.5-sunburst`).
+- Un provider/modelo desconocido ahora falla ruidoso en vez de degradar al default: si esta task genera assets,
+  debe declarar provider y modelo explícitos.
+
 ## Status
 
 - Lifecycle: `to-do`

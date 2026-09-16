@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Slices 1-5 ejecutados 2026-09-16. Code complete + evidencia de costo entregada. Dos entregables NO hechos por instrucción del operador (no tocar Globe, hibernado): ledger de flota y Delta en TASK-1553. Cierre documental bloqueado por un flag ajeno en el gate de flags.`
+- Status real: `Slices 1-5 ejecutados 2026-09-16. Gates de cierre verdes: test 14164/14164, build de producción exit 0, lint, tsc, skills:mirrors, docs:closure-check y context-check:strict. Barrido documental extendido al resto del repo (capa funcional, skill de email que mandaba a generar con el carril muerto, catálogo Fal, índice de documentación, CLAUDE.md). Queda in-progress porque dos entregables de Globe NO se hicieron por instrucción del operador (hibernado): ledger de flota y Delta en TASK-1553.`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -538,7 +538,7 @@ para un entorno mal configurado, un cambio de comportamiento. Por eso su mitigac
 - [x] `DEFAULT_IMAGE_PROVIDER` no apunta a ningún provider cuyo modelo esté declarado bloqueado en `GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
 - [x] El carril `google-imagen` quedó migrado al provider Gemini Image `generateContent` **o** retirado del tipo y del código, con la razón escrita. No quedó en limbo.
 - [x] Si se migró: la migración es de provider, no una sustitución del string `IMAGEN_MODEL`.
-- [ ] `POST /api/internal/generate-image` con `provider: 'openai-image'` explícito devuelve el mismo `provider` y `model` que antes de esta task. — **SIN VERIFICAR el camino feliz.** En vivo se ejercitó la ruta con `provider` inválido (400 canónico, sin gasto) y el handler tiene test propio, pero el POST con `provider: 'openai-image'` que **genera** una imagen no se corrió: habría gastado una pieza fuera del tope autorizado por el operador. El helper sí quedó ejercitado 7 veces en el canary del Slice 4.
+- [ ] `POST /api/internal/generate-image` con `provider: 'openai-image'` explícito devuelve el mismo `provider` y `model` que antes de esta task. — **SIN VERIFICAR el camino feliz, por infraestructura local, no por gasto** (el operador autorizó la pieza el 2026-09-16). El `pnpm dev` de este equipo sólo levantó 1 de 4 intentos: en la corrida que sí levantó se ejercitó la ruta con `provider` inválido (400 canónico) y `/api/internal/generate-animation` (201, SVG válido), pero el POST que **genera** por `openai-image` nunca alcanzó a correr. Lo cubierto por otras vías: el handler tiene 4 tests con `Request` real que fijan que las opciones llegan intactas a `generateImage`, y el helper quedó ejercitado 7 veces en el canary del Slice 4 con `model`/`quality`/`size` resueltos por el API. Falta sólo el tramo HTTP→helper del camino feliz.
 - [x] `POST /api/internal/generate-animation` sigue respondiendo correctamente.
 - [x] Existe `ai-generations/<fecha>_gpt-image-2-5-usage-baseline/manifest.json` con al menos una fila por combinación de la matriz declarada en el Slice 4, cada una con `usage` completo y el `quality`/`size` resueltos por el API.
 - [x] La tabla de consumo publicada en la matriz de capacidades lleva fecha, snapshot de modelo y la advertencia de que es evidencia, no contrato.

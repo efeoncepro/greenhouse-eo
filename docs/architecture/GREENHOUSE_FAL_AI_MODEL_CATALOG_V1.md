@@ -113,7 +113,7 @@ Fal.ai cobra **por uso**, con la unidad según la modalidad (siempre confirmar e
 | Ideogram | Ideogram V3 | `fal-ai/ideogram/v3` ✅ | |
 | Z-Image | Z-Image Turbo | `fal-ai/z-image/turbo` ✅ | |
 | Recraft | Recraft V3 / V4.1 | `fal-ai/recraft/*` 🔎 | **vectores reales** (SVG) + control de paleta |
-| Google | Imagen 4 | `fal-ai/imagen4/*` 🔎 | (también lo corremos directo vía Vertex) |
+| Google | Imagen 4 | `fal-ai/imagen4/*` 🔎 | **Ya no lo corremos directo vía Vertex:** `imagen-4.0-generate-001` fue retirado por Google y responde 404 (TASK-1851). El carril Google del helper es `google-gemini-image` sobre `gemini-3.1-flash-image` |
 | Otros | Qwen Image, HiDream, Stable Diffusion 3.5, Luma Photon | 🔎 | verificar slug en catálogo |
 
 ## 2. Image editing / Image-to-Image

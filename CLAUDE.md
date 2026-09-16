@@ -390,7 +390,7 @@ Los invariantes de admin center entitlement governance, deprecated capabilities 
 
 ### AI image generation + LLM providers — invariantes
 
-Los invariantes de generación de assets visuales con IA (CLI `pnpm ai:image`, `generateImage()`, OpenAI/Imagen/Higgsfield-Recraft vectores, secret `greenhouse-openai-api-key`) y de los providers de texto/LLM (Gemini/Vertex, Anthropic, OpenAI — `src/lib/ai/`) viven en **`docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` → §`Invariantes operativos para agentes — AI image + LLM providers`**. **Skill `greenhouse-ai-image-generator` para dirección de arte.** **NUNCA** crear un cliente/SDK LLM paralelo dentro de un módulo de dominio (extender el cliente canónico de `src/lib/ai/`); **NUNCA** hardcodear `sk-*`/`sk-ant-*` (resolver server-side via `*_SECRET_REF`); **NUNCA** crear scripts de generación ad-hoc (usar `pnpm ai:image`).
+Los invariantes de generación de assets visuales con IA (CLI `pnpm ai:image`, `generateImage()`, OpenAI GPT Image (familia 2.5 incluida) / Gemini Image / Higgsfield-Recraft vectores, secret `greenhouse-openai-api-key`) y de los providers de texto/LLM (Gemini/Vertex, Anthropic, OpenAI — `src/lib/ai/`) viven en **`docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` → §`Invariantes operativos para agentes — AI image + LLM providers`**. **Skill `greenhouse-ai-image-generator` para dirección de arte.** **NUNCA** crear un cliente/SDK LLM paralelo dentro de un módulo de dominio (extender el cliente canónico de `src/lib/ai/`); **NUNCA** hardcodear `sk-*`/`sk-ant-*` (resolver server-side via `*_SECRET_REF`); **NUNCA** crear scripts de generación ad-hoc (usar `pnpm ai:image`).
 
 ### Workforce Contracting Studio — invariantes (TASK-1019)
 

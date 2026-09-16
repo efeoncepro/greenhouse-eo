@@ -1,8 +1,9 @@
 # AI Tooling, Content y Assets end-to-end
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-15 por Codex
+> **Ultima actualizacion:** 2026-09-16 por Claude (agente) — motor de imagenes por defecto tras TASK-1851
 > **Modulo:** AI Tooling / Content / Asset Generation
 > **Rutas principales:** `/admin/ai-tools`, `/api/admin/ai-tools/*`, `/api/ai-tools/*`, `/api/internal/generate-image`, `/api/internal/generate-animation`
 > **Arquitectura relacionada:** `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`, `docs/documentation/ai-tooling/generador-visual-assets.md`, `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
@@ -19,6 +20,12 @@ Snapshot DB agregado del ambiente consultado:
 - `greenhouse_ai.credit_ledger`: 0 movimientos en este ambiente.
 
 Interpretacion: el catalogo AI Tools esta operativo; wallets/licencias/ledger no muestran uso cargado en este ambiente al momento de la consulta.
+
+Delta 2026-09-16: se actualizo solo la parte de generacion de imagenes. El motor por defecto dejo de ser
+Google Imagen 4 (retirado por Google) y paso a ser OpenAI GPT Image. El detalle en lenguaje simple esta en
+[generador-visual-assets.md](generador-visual-assets.md); el contrato tecnico, en
+[GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md).
+El resto del snapshot DB es del 2026-06-15 y no se volvio a medir.
 
 ## Que es
 
@@ -52,8 +59,9 @@ AI Tooling tiene dos carriles que no deben mezclarse:
 - Lista licencias, wallets y ledger con joins a provider/tool/client/member.
 - Consume creditos registrando ledger y actualizando wallet de forma gobernada.
 - Recarga o ajusta creditos con metadata.
-- En asset generator, llama Google Imagen 4 por defecto u OpenAI Image si se opta explicitamente.
-- Genera animaciones con Gemini/SVG cuando se usa el helper correspondiente.
+- En asset generator, llama **OpenAI GPT Image por defecto** —incluida la familia nueva GPT Image 2.5, en sus variantes Flare (rapida) y Sunburst (edicion de precision)— o el carril Google **Gemini Image** si se opta explicitamente. El motor anterior, Google Imagen 4, fue retirado por Google y ya no responde; el cambio se hizo en TASK-1851.
+- Si se pide un modelo o una calidad que no existe, avisa con un error claro en vez de sustituirlo en silencio por otro.
+- Genera animaciones con Gemini/SVG cuando se usa el helper correspondiente (sin cambios).
 - Guarda assets como archivos estaticos versionables, no como hot output invisible.
 - Deshabilita endpoints internos de generacion en production salvo `ENABLE_ASSET_GENERATOR=true`.
 

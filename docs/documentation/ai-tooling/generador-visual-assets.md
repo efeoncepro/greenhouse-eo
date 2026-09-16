@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-07-18 por Codex (produccion hibrida Seedream + GPT Image)
+> **Ultima actualizacion:** 2026-09-16 por Claude (agente) — cambio de motor por defecto tras TASK-1851
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 # Generador Visual de Assets con IA
@@ -12,7 +12,7 @@ Un modulo interno que permite al agente AI (Claude) generar imagenes y animacion
 
 ## Que puede generar
 
-### Imagenes (via Imagen 4 de Google)
+### Imagenes (via GPT Image de OpenAI)
 
 Imagenes rasterizadas de alta calidad:
 - **Banners** para headers de seccion (perfil, detalle de persona, organizacion)
@@ -57,15 +57,73 @@ El sistema selecciona automaticamente el banner correcto basandose en los roles 
 
 ## Aspectos tecnicos
 
-- Motor de imagenes: **Imagen 4** de Google (modelo `imagen-4.0-generate-001`)
-- Motor de animaciones: **Gemini** de Google (ultimo modelo disponible)
+- Motor de imagenes por defecto: **GPT Image** de OpenAI (ver la seccion siguiente)
+- Motor de imagenes alternativo: **Gemini Image** de Google, cuando se pide explicitamente
+- Motor de animaciones: **Gemini** de Google (ultimo modelo disponible) — sin cambios
+- El comando para generar sigue siendo el mismo: `pnpm ai:image`
 - Los assets son archivos estaticos — no se generan en tiempo real para usuarios
 - Se generan durante el desarrollo y se guardan en el repositorio
 - Servidos por la CDN de Vercel — latencia minima
+- Las rutas internas de generacion siguen protegidas: en produccion responden 403 salvo que se active
+  el flag `ENABLE_ASSET_GENERATOR`, que hoy esta apagado
+
+## Los dos motores de imagen (estado al 2026-09-16)
+
+Hasta hace poco el motor por defecto era **Imagen 4** de Google. Google retiró ese modelo: dejó de
+ofrecerse en Vertex el 2026-06-30 y el servicio se apagó el 2026-08-17. Una prueba hecha el
+2026-09-16 contra nuestro proyecto confirmó que ya no responde. Como era el motor por defecto,
+cualquier generación que no pidiera otro motor a mano quedaba fallando.
+
+Hoy hay dos motores disponibles:
+
+| Motor | Cuándo se usa | Para qué es bueno |
+|---|---|---|
+| **GPT Image de OpenAI** | Es el **nuevo motor por defecto** | Uso cotidiano de imágenes del portal y piezas internas |
+| **Gemini Image de Google** | Solo si se pide explícitamente | Alternativa cuando se quiere el carril Google |
+
+Dentro de GPT Image hay una familia nueva, **GPT Image 2.5**, con dos variantes:
+
+- **Flare** — la rápida, pensada para el uso de todos los días.
+- **Sunburst** — pensada para edición de precisión, cuando hay que corregir o ajustar con detalle.
+
+También sigue disponible la versión anterior, **GPT Image 2**.
+
+Dos novedades de la familia 2.5 que se notan en el resultado:
+
+- **Dos niveles de calidad nuevos** por encima de "alta": se llaman `xhigh` y `max`. Sirven cuando la
+  pieza es grande o va a verse muy de cerca.
+- **Fondo transparente con soporte pleno**, útil para íconos y assets recortados que se apoyan sobre
+  cualquier color de fondo.
+
+## Cuánto cuesta generar una imagen
+
+Cifras **medidas el 2026-09-16**, en dólares y por imagen:
+
+- Calidad baja: aproximadamente **USD 0,006**
+- Calidad alta: aproximadamente **USD 0,05**
+- Calidad máxima: aproximadamente **USD 0,21**
+
+Un dato que suele sorprender: **elegir Flare o Sunburst cuesta lo mismo**. El precio lo determinan la
+calidad y el tamaño de la imagen, no cuál de las dos variantes se use. Lo que sí cambia entre ellas es
+la velocidad: en calidad máxima, Flare tardó 46 segundos y Sunburst 81 segundos en la misma prueba.
+
+Los precios de los proveedores cambian. Antes de comprometer un costo con un cliente hay que volver a
+medirlo, no citar estas cifras como si fueran permanentes.
+
+## Ahora avisa en vez de sustituir en silencio
+
+Antes, si alguien pedía un modelo o una calidad que no existía, el sistema usaba otro por su cuenta y
+entregaba una imagen que parecía correcta pero no era la que se había pedido. Eso hacía muy difícil
+darse cuenta del error.
+
+Ahora no sustituye nada por su cuenta: si el modelo o la calidad no existen, **avisa con un error
+claro** y no genera. Es preferible una falla visible a una imagen silenciosamente distinta.
+
+> Detalle tecnico: ver [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) para la tabla de motores, el contrato de la familia GPT Image 2.5 y las opciones del comando `pnpm ai:image`.
 
 ## Acceso a Fal.ai (imagen, video y audio por IA) — desde 2026-07-06
 
-Ademas de Imagen/OpenAI (imagen) y Higgsfield (vectores), Greenhouse tiene acceso a **Fal.ai**, un agregador que permite generar **imagen, video y audio** con muchos modelos a traves de una sola API (por ejemplo Seedance, Kling y Veo para video; flux para imagen).
+Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recraft (vectores), Greenhouse tiene acceso a **Fal.ai**, un agregador que permite generar **imagen, video y audio** con muchos modelos a traves de una sola API (por ejemplo Seedance, Kling y Veo para video; flux para imagen).
 
 - **Para que sirve:** producir contenido media de mayor variedad (sobre todo **video**) que los motores de imagen actuales no cubren, para piezas de marketing, campanas y exploracion visual.
 - **Como se usa:** de forma programatica, con un cliente interno unico. El contenido se genera fuera del portal y se **sube** por el flujo normal de assets — no se genera en tiempo real para los usuarios del producto.

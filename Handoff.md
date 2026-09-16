@@ -167,8 +167,8 @@ familia 2.5 y decide por **capacidad declarada**, no por literales. Cinco puerta
 🔴 **El carril `google-imagen` estaba MUERTO, no "bloqueado"** (probe `404`) y era el default: migrado de
 **provider** a `gemini-3.1-flash-image`/`generateContent`, default → `openai-image`. Primera medición propia del
 costo de 2.5 (ver changelog).
-**Pendientes:** `build` de cierre; y los dos entregables de Globe, **sin hacer por instrucción del operador**
-(Globe hibernado). Todo en [`TASK-1851`](docs/tasks/in-progress/TASK-1851-openai-image-provider-contract-consolidation.md).
+**Gates:** test y build verdes. **Pendiente:** los dos entregables de Globe, **sin hacer
+por instrucción del operador** (hibernado). Todo en [`TASK-1851`](docs/tasks/in-progress/TASK-1851-openai-image-provider-contract-consolidation.md).
 
 **TASK-1844 COMPLETE (2026-09-08):** producción ON para una identidad; SQL aplicada y fixtures retiradas.
 Codex y Claude Code/hospedado/Desktop certificados, rollback probado (Claude Code exige login tras OFF).

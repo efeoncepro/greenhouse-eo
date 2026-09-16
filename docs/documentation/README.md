@@ -225,7 +225,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 ### Herramientas IA
 
 - [AI Tooling, Content y Assets end-to-end](ai-tooling/ai-tooling-content-assets-end-to-end.md) — catalogo de herramientas IA, licencias, wallets, credit ledger y generacion interna de assets/contenido, con frontera clara frente a Public Site Content Factory y publicaciones.
-- [Generador Visual de Assets con IA](ai-tooling/generador-visual-assets.md) — generacion de imagenes (Imagen 4) y animaciones SVG (Gemini) para enriquecer interfaces, banners de perfil por categoria
+- [Generador Visual de Assets con IA](ai-tooling/generador-visual-assets.md) — generacion de imagenes (helper canonico: `openai-image` por defecto, `google-gemini-image` como carril Google) y animaciones SVG (Gemini) para enriquecer interfaces, banners de perfil por categoria
 - [Estudio de Flujos Creativos](ai-tooling/estudio-de-flujos-creativos.md) — lienzo node-based (tipo Higgsfield/ComfyUI) para orquestar producciones de media encadenando pasos (imagen → video → audio → reframe); coordina el motor de generacion, no genera por si mismo; control de gasto a nivel del flujo completo. Propuesta (no construido); ver ADR Creative Flow Studio.
 - [Layout Design & Finishing](ai-tooling/layout-design-and-finishing.md) — método operativo para separar grilla,
   clean plates, acabado Seedream/GPT, composición exacta, mastering y QA en sets estáticos premium.
@@ -284,4 +284,4 @@ Para detalle tecnico, schemas, contratos y decisiones de diseno, ver `docs/archi
 | [12-testing-development.md](../architecture/12-testing-development.md)                                     | Plataforma interna | Flujo actual de testing, observabilidad del suite, artifacts y CI |
 | [GREENHOUSE_STAGING_ACCESS_V1.md](../architecture/GREENHOUSE_STAGING_ACCESS_V1.md)                         | Plataforma         | Acceso programatico a Staging: SSO bypass, agent auth, script     |
 | [GREENHOUSE_PERSON_COMPLETE_360_V1.md](../architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md)               | Personas           | Person Complete 360: resolver federado, facetas, auth, cache      |
-| [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)   | IA / Tooling       | Generador visual: Imagen 4, Gemini SVG, banners por categoria     |
+| [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)   | IA / Tooling       | Generador visual: GPT Image / Gemini Image, Gemini SVG, banners   |

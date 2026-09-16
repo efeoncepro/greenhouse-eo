@@ -7,10 +7,15 @@ email.
 ## Verdad de modelo
 
 - La skill heredada fijaba **Imagen 4**, no GPT Image 1.5.
+- **Imagen 4 ya no es una opción (TASK-1851, 2026-09-16):** `imagen-4.0-generate-001` fue retirado por Google y
+  responde 404, y el provider `google-imagen` dejó de existir — se renombró a `google-gemini-image` sobre
+  `gemini-3.1-flash-image`. El default del helper es `openai-image`. Un provider o modelo desconocido falla
+  ruidoso; no cae al default en silencio.
 - Para trabajo OpenAI nuevo usa `gpt-image-2` o su snapshot exacto. GPT Image 1.5 está deprecated y se retira el
   2026-12-01; no es fallback de transparencia.
-- Conserva Imagen 4 cuando el objetivo sea igualar deliberadamente una familia existente generada con Imagen.
-  No regeneres heroes aprobados solo para cambiar la etiqueta del modelo.
+- Los heroes ya generados con Imagen 4 conservan su provenance y **no** se regeneran solo por cambiar la etiqueta
+  del modelo. Para igualar una familia existente de ese carril, usa `google-gemini-image` y valida el match a
+  ojo: no hay forma de reproducir Imagen 4.
 - La identidad del modelo debe venir del helper/CLI. No la infieras por apariencia.
 
 ## Elección y generación
