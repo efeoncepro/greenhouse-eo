@@ -1,7 +1,9 @@
 import 'server-only'
 
+import { execFile } from 'node:child_process'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { basename, dirname, extname, isAbsolute, join } from 'node:path'
+import { promisify } from 'node:util'
 
 import { config as loadEnv } from 'dotenv'
 
@@ -41,6 +43,8 @@ import { FAL_CAPABILITIES, findFalCapability, type FalCapability, type FalRefere
  * Video:   --duration · --resolution · --aspect · --bitrate · --task · --no-audio · --end-image
  *          --video <path|url> y --audio <path|url> (referencias, repetibles) · --prompt-expansion <modo>
  *          --lora <path[@scale]> (repetible) · --camera-trajectory <json>
+ *          Flux 3: --keyframe <imagen>@<frame_index> (repetible) · --safety-tolerance 0-4 · --draft-cache <url>
+ *          (en edit/extend el video de origen va por --video)
  * LoRA:    --training-data <zip|url> · --steps <n> · --rank <n> · --learning-rate <n> · --trigger <frase>
  */
 
@@ -76,6 +80,9 @@ interface CliArgs {
   rank?: string
   learningRate?: string
   trigger?: string
+  keyframes: string[]
+  safetyTolerance?: string
+  draftCache?: string
   requestId?: string
   size?: string
   count?: number
@@ -90,7 +97,7 @@ interface CliArgs {
 }
 
 const parseArgs = (argv: string[]): CliArgs => {
-  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], noAudio: false, json: false, list: false, help: false }
+  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], keyframes: [], noAudio: false, json: false, list: false, help: false }
 
   let i = 0
 
@@ -126,6 +133,9 @@ const parseArgs = (argv: string[]): CliArgs => {
       case '--rank': args.rank = next(); break
       case '--learning-rate': args.learningRate = next(); break
       case '--trigger': args.trigger = next(); break
+      case '--keyframe': args.keyframes.push(next()); break
+      case '--safety-tolerance': args.safetyTolerance = next(); break
+      case '--draft-cache': args.draftCache = next(); break
       case '--request-id': args.requestId = next(); break
       case '--size': args.size = next(); break
       case '--count': args.count = Math.max(1, Number(next()) || 1); break
@@ -160,6 +170,24 @@ const MIME_BY_EXT: Record<string, string> = {
   '.wav': 'audio/wav',
   '.m4a': 'audio/mp4',
   '.zip': 'application/zip'
+}
+
+/**
+ * ¿El video local trae pista de audio? `null` si no se puede saber (URL remota o ffprobe no instalado): en ese
+ * caso el CLI avisa en vez de bloquear.
+ */
+const hasAudioTrack = async (source: string): Promise<boolean | null> => {
+  if (isRemote(source)) return null
+
+  try {
+    const { stdout } = await promisify(execFile)('ffprobe', [
+      '-v', 'error', '-select_streams', 'a', '-show_entries', 'stream=codec_type', '-of', 'csv=p=0', resolvePath(source)
+    ])
+
+    return stdout.trim().length > 0
+  } catch {
+    return null
+  }
 }
 
 const mimeFor = (path: string): string => MIME_BY_EXT[extname(path).toLowerCase()] ?? 'application/octet-stream'
@@ -408,28 +436,46 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
 
   if (capability) {
     const referenceCount = args.images.length + args.videos.length + args.audios.length
+    // En editar/extender, el medio principal es un VIDEO: llega por --video, no por --image.
+    const primaryIsVideo = capability.inputMediaField === 'video_url'
+    const primary = primaryIsVideo ? args.videos : args.images
+    const primaryFlag = primaryIsVideo ? '--video' : '--image'
+
+    if (primaryIsVideo && args.images.length) {
+      throw new Error(`"${capability.id}" parte de un video: pásalo con --video, no con --image.`)
+    }
+
+    if (isReference && capability.video?.requiresVisualReference && args.images.length + args.videos.length === 0) {
+      throw new Error(`"${capability.id}" necesita al menos una imagen o un video de referencia; el audio solo no alcanza.`)
+    }
 
     if (isReference && referenceCount === 0) {
       throw new Error(`"${capability.id}" necesita al menos una referencia: --image, --video o --audio.`)
     }
 
-    if (!isReference && capability.inputMedia !== 'none' && !args.images.length) {
-      throw new Error(`La capacidad "${capability.id}" requiere --image.`)
+    if (!isReference && capability.inputMedia !== 'none' && !primary.length) {
+      throw new Error(`La capacidad "${capability.id}" requiere ${primaryFlag}.`)
     }
 
     if (capability.inputMedia === 'none' && args.images.length) {
-      throw new Error(`La capacidad "${capability.id}" no recibe imágenes de entrada; quita --image.`)
+      throw new Error(
+        capability.video?.keyframes
+          ? `"${capability.id}" recibe las imágenes como --keyframe <imagen>@<frame_index>, no como --image.`
+          : `La capacidad "${capability.id}" no recibe imágenes de entrada; quita --image.`
+      )
     }
 
-    if (capability.inputMedia === 'one' && args.images.length > 1) {
-      throw new Error(`La capacidad "${capability.id}" recibe una sola --image.`)
+    if (capability.inputMedia === 'one' && primary.length > 1) {
+      throw new Error(`La capacidad "${capability.id}" recibe un solo ${primaryFlag}.`)
     }
 
     const videoOnly: [string, unknown][] = [
       ['--duration', args.duration], ['--resolution', args.resolution], ['--aspect', args.aspect],
       ['--bitrate', args.bitrate], ['--task', args.task], ['--end-image', args.endImage],
       ['--prompt-expansion', args.promptExpansion], ['--camera-trajectory', args.cameraTrajectory],
-      ['--no-audio', args.noAudio || undefined], ['--lora', args.loras.length || undefined]
+      ['--no-audio', args.noAudio || undefined], ['--lora', args.loras.length || undefined],
+      ['--keyframe', args.keyframes.length || undefined], ['--safety-tolerance', args.safetyTolerance],
+      ['--draft-cache', args.draftCache]
     ]
 
     if (!video) {
@@ -456,24 +502,34 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
   if (args.duration) {
     const isAuto = args.duration === 'auto'
     const seconds = Number(args.duration)
+    const contract = video?.duration
 
-    if (isAuto && video && !video.duration.acceptsAuto) {
-      throw new Error(`"${capability?.id}" no acepta --duration auto; usa ${video.duration.min}–${video.duration.max}.`)
+    if (video && !contract) {
+      throw new Error(`"${capability?.id}" no acepta --duration: hereda la del video de origen.`)
     }
 
-    if (!isAuto && (!Number.isInteger(seconds) || seconds < (video?.duration.min ?? 1))) {
-      throw new Error(`--duration "${args.duration}" no es válido${video ? `: mínimo ${video.duration.min} s` : ''}.`)
+    if (isAuto && contract && !contract.acceptsAuto) {
+      throw new Error(`"${capability?.id}" no acepta --duration auto; usa ${contract.min}–${contract.max}.`)
     }
 
-    if (!isAuto && video && seconds > video.duration.max) {
-      throw new Error(`--duration ${seconds}s excede el máximo de "${capability?.id}" (${video.duration.max}s).`)
+    if (!isAuto && (!Number.isInteger(seconds) || seconds < (contract?.min ?? 1))) {
+      throw new Error(`--duration "${args.duration}" no es válido${contract ? `: mínimo ${contract.min} s` : ''}.`)
     }
 
-    input.duration = video?.duration.encoding === 'integer' ? seconds : args.duration
+    if (!isAuto && contract && seconds > contract.max) {
+      throw new Error(`--duration ${seconds}s excede el máximo de "${capability?.id}" (${contract.max}s).`)
+    }
+
+    // `auto` siempre viaja como texto; los segundos, como número sólo si el endpoint los pide enteros.
+    input.duration = isAuto || contract?.encoding !== 'integer' ? args.duration : seconds
   }
 
   if (args.resolution) {
     const canonical = video?.resolutions.find(value => value.toLowerCase() === args.resolution!.toLowerCase())
+
+    if (video && video.resolutions.length === 0) {
+      throw new Error(`"${capability?.id}" no acepta --resolution${video.draftCache === 'produces' ? ': los drafts salen a resolución fija; la final se obtiene con flux3-enhance' : ''}.`)
+    }
 
     if (video && !canonical) {
       throw new Error(`--resolution "${args.resolution}" no está en "${capability?.id}". Soportadas: ${video.resolutions.join(', ')}.`)
@@ -484,7 +540,7 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
 
   if (args.aspect) {
     if (video && video.aspectRatios.length === 0) {
-      throw new Error(`"${capability?.id}" no acepta --aspect: el encuadre sale de la imagen de entrada.`)
+      throw new Error(`"${capability?.id}" no acepta --aspect: el encuadre sale del medio de entrada.`)
     }
 
     if (video && !video.aspectRatios.includes(args.aspect)) {
@@ -502,6 +558,24 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
   if (args.task) {
     if (video && !video.acceptsTask) {
       throw new Error(`"${capability?.id}" no acepta --task; sólo Seedance 2.5 reference-to-video lo expone.`)
+    }
+
+    if (!['reference', 'editing', 'extension'].includes(args.task)) {
+      throw new Error(`--task "${args.task}" no es válido: reference, editing o extension.`)
+    }
+
+    // editing/extension trabajan SOBRE un video: sin él, fal no tiene qué editar ni continuar.
+    if (args.task !== 'reference' && !args.videos.length) {
+      throw new Error(`--task ${args.task} necesita el video de origen por --video.`)
+    }
+
+    // El proveedor fuerza estos campos a auto: pasarlos sólo engañaría al operador sobre lo que va a recibir.
+    if (args.task === 'editing' && (args.duration || args.aspect)) {
+      throw new Error('--task editing ignora --duration y --aspect (el proveedor los fuerza a auto): quítalos.')
+    }
+
+    if (args.task === 'extension' && args.aspect) {
+      throw new Error('--task extension ignora --aspect (el proveedor lo fuerza a auto): quítalo.')
     }
 
     input.task = args.task
@@ -540,6 +614,48 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
     input.camera_trajectory = parseCameraTrajectory(args.cameraTrajectory, video?.cameraTrajectory?.maxKeyframes ?? 12)
   }
 
+  if (args.safetyTolerance !== undefined) {
+    const tolerance = Number(args.safetyTolerance)
+    const range = video?.safetyTolerance
+
+    if (video && !range) throw new Error(`"${capability?.id}" no acepta --safety-tolerance.`)
+
+    if (!Number.isInteger(tolerance) || (range && (tolerance < range.min || tolerance > range.max))) {
+      throw new Error(`--safety-tolerance debe ser entero${range ? ` entre ${range.min} y ${range.max}` : ''}.`)
+    }
+
+    input.safety_tolerance = tolerance
+  }
+
+  if (video?.keyframes) {
+    if (!args.keyframes.length) throw new Error(`"${capability?.id}" exige al menos un --keyframe <imagen>@<frame_index>.`)
+    if (args.keyframes.length > video.keyframes.max) throw new Error(`"${capability?.id}" admite hasta ${video.keyframes.max} --keyframe.`)
+
+    const parsed = args.keyframes.map(raw => {
+      const at = raw.lastIndexOf('@')
+      const index = Number(raw.slice(at + 1))
+
+      if (at <= 0 || !Number.isInteger(index) || index < 0) {
+        throw new Error(`--keyframe "${raw}" debe tener la forma <imagen>@<frame_index> con un índice entero >= 0.`)
+      }
+
+      return { source: raw.slice(0, at), frameIndex: index }
+    })
+
+    const urls = await resolveMediaUrls(parsed.map(item => item.source))
+
+    input.keyframes = parsed.map((item, i) => ({ frame_index: item.frameIndex, image_url: urls[i] }))
+  } else if (args.keyframes.length && capability) {
+    throw new Error(`"${capability.id}" no acepta --keyframe; usa flux3-keyframes.`)
+  }
+
+  if (video?.draftCache === 'consumes') {
+    if (!args.draftCache) throw new Error(`"${capability?.id}" exige --draft-cache <url> (lo imprime un draft de Flux 3).`)
+    input.draft_cache_url = args.draftCache
+  } else if (args.draftCache && capability) {
+    throw new Error(`"${capability.id}" no acepta --draft-cache; sólo flux3-enhance lo consume.`)
+  }
+
   // ── Medios ───────────────────────────────────────────────────────────────────────────────────
   if (args.images.length) {
     const slot = video?.references?.images
@@ -551,7 +667,12 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
     const urls = await resolveMediaUrls(args.images)
     const field = capability?.inputMediaField ?? (urls.length > 1 ? 'image_urls' : 'image_url')
 
-    input[field] = field === 'image_url' ? urls[0] : urls
+    // Campo singular (`image_url`, `start_image_url`) recibe una URL; los plurales, la lista.
+    input[field] = capability?.inputMedia === 'one' || (!capability && field === 'image_url') ? urls[0] : urls
+  }
+
+  if (video?.endImageRequired && !args.endImage) {
+    throw new Error(`"${capability?.id}" exige --end-image: el último cuadro es obligatorio.`)
   }
 
   if (args.endImage) {
@@ -562,8 +683,32 @@ const buildInput = async (args: CliArgs, capability: FalCapability | null): Prom
     input.end_image_url = endUrl
   }
 
+  let referenceVideos = args.videos
+
+  if (video?.requiresSourceAudio && args.videos.length) {
+    const audio = await hasAudioTrack(args.videos[0])
+
+    if (audio === false) {
+      throw new Error(
+        `"${capability?.id}" exige que el video de origen traiga pista de audio; sin ella fal lo rechaza tras encolarlo ` +
+          '(422 genérico). Agrega una pista (aunque sea silencio) o genera el origen sin --no-audio.'
+      )
+    }
+
+    if (audio === null) {
+      process.stderr.write('  ⚠ no se pudo verificar la pista de audio del origen: sin ella, fal rechaza la extensión.\n')
+    }
+  }
+
+  if (capability?.inputMediaField === 'video_url') {
+    const [sourceUrl] = await resolveMediaUrls(args.videos)
+
+    input.video_url = sourceUrl
+    referenceVideos = []
+  }
+
   for (const [flag, values, slot] of [
-    ['--video', args.videos, video?.references?.videos],
+    ['--video', referenceVideos, video?.references?.videos],
     ['--audio', args.audios, video?.references?.audios]
   ] as const) {
     const resolved = await resolveReferences(flag, values, slot, capability)
@@ -718,6 +863,13 @@ const main = async () => {
   const body = (result.output ?? {}) as Record<string, unknown>
 
   // H3 reescribe el prompt (con soundscape y música): se muestra un extracto; --json trae el texto completo.
+  // Flux 3 draft: el cache es lo que permite subir a calidad final sin re-generar la toma.
+  const draftCache = fileUrl(body.draft_cache) ?? (typeof body.draft_cache === 'string' ? body.draft_cache : null)
+
+  if (draftCache) {
+    process.stdout.write(`  draft_cache: ${draftCache}\n  mejóralo con: pnpm ai:fal --capability flux3-enhance --draft-cache "${draftCache}" --out <ruta>\n`)
+  }
+
   if (typeof body.expanded_prompt === 'string' && body.expanded_prompt.trim()) {
     const expanded = body.expanded_prompt.trim().replace(/\s+/g, ' ')
 

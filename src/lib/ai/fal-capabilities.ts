@@ -27,6 +27,11 @@ export type FalOperation =
   | 'image-to-video'
   | 'reference-to-video'
   | 'camera-control'
+  | 'first-last-frame-to-video'
+  | 'keyframes-to-video'
+  | 'video-edit'
+  | 'video-extend'
+  | 'draft-enhance'
   | 'realtime-stream'
   | 'lora-training'
 
@@ -48,14 +53,18 @@ export interface FalReferenceSlot {
  * después de encolar falla en local.
  */
 export interface FalVideoContract {
+  /** `null` = el endpoint no acepta duración (editar un video o mejorar un draft heredan la del origen). */
   duration: {
-    /** `string` = Seedance (`"5"`, `"auto"`); `integer` = Minimax H3 (`5`). */
+    /**
+     * `string` = Seedance (`"5"`, `"auto"`); `integer` = Minimax H3 y Flux 3 (`5`). Con `integer` y
+     * `acceptsAuto`, `auto` viaja como texto y los segundos como número (Flux 3).
+     */
     encoding: 'string' | 'integer'
     min: number
     max: number
     acceptsAuto: boolean
-  }
-  /** Valores canónicos del endpoint. El CLI compara sin distinguir mayúsculas y envía el canónico. */
+  } | null
+  /** Valores canónicos del endpoint; vacío = no acepta `resolution` (drafts de Flux 3, edición). */
   resolutions: readonly string[]
   /** Vacío = el endpoint no acepta `aspect_ratio` (el encuadre sale de la imagen de entrada). */
   aspectRatios: readonly string[]
@@ -64,6 +73,8 @@ export interface FalVideoContract {
   /** `task` (reference | editing | extension) sólo existe en Seedance 2.5 reference-to-video. */
   acceptsTask: boolean
   acceptsEndImage: boolean
+  /** Flux 3 first-last-frame: el último cuadro es OBLIGATORIO, no opcional. */
+  endImageRequired?: boolean
   /** Sólo reference-to-video: por qué campo viaja cada tipo de referencia y con qué tope. */
   references?: {
     images?: FalReferenceSlot
@@ -80,6 +91,23 @@ export interface FalVideoContract {
   loras?: { max: number; scaleMin: number; scaleMax: number }
   /** Camera controls: trayectoria por keyframes `{ distance, elevation, azimuth, time }`. */
   cameraTrajectory?: { maxKeyframes: number }
+  /** Flux 3 keyframes-to-video: `keyframes` obligatorio, `{ frame_index, image_url }`, con tope. */
+  keyframes?: { max: number }
+  /** Flux 3: tolerancia del filtro de seguridad (`safety_tolerance`). */
+  safetyTolerance?: { min: number; max: number }
+  /**
+   * Flujo draft → enhance de Flux 3. `produces`: el endpoint devuelve `draft_cache` además del video barato;
+   * `consumes`: `draft-enhance` recibe ese `draft_cache_url` y entrega la versión final sin re-generar la toma.
+   */
+  draftCache?: 'produces' | 'consumes'
+  /**
+   * Flux 3 extend: el video de origen DEBE traer pista de audio. Sin ella fal acepta el trabajo en cola y lo
+   * rechaza al procesarlo con un 422 genérico ("Invalid request parameters"), cualquiera sea la duración.
+   * Aislado con corridas reales 2026-09-16. El CLI lo revisa con ffprobe antes de subir.
+   */
+  requiresSourceAudio?: boolean
+  /** reference-to-video: exige al menos una imagen o video de referencia; el audio solo no alcanza. */
+  requiresVisualReference?: boolean
 }
 
 /** Entrenadores de LoRA: el dataset viaja como URL a un zip y los hiperparámetros tienen rangos reales. */
@@ -93,11 +121,28 @@ export interface FalTrainingContract {
 }
 
 const SEEDANCE_ASPECT_RATIOS: readonly string[] = ['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16']
-const SEEDANCE_REFERENCES = { audios: { field: 'audio_urls', max: null }, videos: { field: 'video_urls', max: null } }
+
+/**
+ * Topes de referencias medidos contra el OpenAPI 2026-09-16. Seedance 2.0 (todas sus variantes): 9 imágenes,
+ * 3 videos (2–15 s combinados, 480p–720p) y 3 audios (≤ 15 s combinados). Seedance 2.5: 30 imágenes,
+ * 10 videos y 10 audios (cada uno 1,8–30,2 s; ≤ 30,2 s combinados).
+ */
+const SEEDANCE_20_REFERENCES: NonNullable<FalVideoContract['references']> = {
+  images: { field: 'image_urls', max: 9 },
+  videos: { field: 'video_urls', max: 3 },
+  audios: { field: 'audio_urls', max: 3 }
+}
+
+const SEEDANCE_25_REFERENCES: NonNullable<FalVideoContract['references']> = {
+  images: { field: 'image_urls', max: 30 },
+  videos: { field: 'video_urls', max: 10 },
+  audios: { field: 'audio_urls', max: 10 }
+}
 
 const seedanceDuration = (max: number): FalVideoContract['duration'] => ({
   encoding: 'string',
-  min: 1,
+  // 4 s es el mínimo real del enum (`auto`, `4`…); medido contra el OpenAPI 2026-09-16.
+  min: 4,
   max,
   acceptsAuto: true
 })
@@ -129,11 +174,16 @@ const SEEDANCE_20_MINI: FalVideoContract = { ...SEEDANCE_20_LIGHT, supportsBitra
 /** Variante image-to-video de un contrato Seedance: admite último cuadro. */
 const seedanceI2V = (contract: FalVideoContract): FalVideoContract => ({ ...contract, acceptsEndImage: true })
 
-/** Variante reference-to-video de un contrato Seedance: audio y video de referencia. */
+/**
+ * Variante reference-to-video de un contrato Seedance. El video a video de Seedance vive ACÁ, no en un
+ * endpoint aparte: en 2.5, `--task editing` modifica un video de referencia y `--task extension` lo continúa;
+ * en 2.0 el video sólo guía la generación (`@Video1` en el prompt), sin edición ni extensión.
+ */
 const seedanceR2V = (contract: FalVideoContract, acceptsTask = false): FalVideoContract => ({
   ...contract,
   acceptsTask,
-  references: { images: { field: 'image_urls', max: null }, ...SEEDANCE_REFERENCES }
+  references: acceptsTask ? SEEDANCE_25_REFERENCES : SEEDANCE_20_REFERENCES,
+  requiresVisualReference: true
 })
 
 const H3_ASPECT_RATIOS: readonly string[] = ['21:9', '16:9', '4:3', '1:1', '3:4', '9:16']
@@ -184,6 +234,42 @@ const H3_TRAINING = (conditioningFields: readonly string[]): FalTrainingContract
   conditioningFields
 })
 
+const FLUX3_ASPECT_RATIOS: readonly string[] = ['auto', '21:9', '2:1', '16:9', '4:3', '1:1', '3:4', '9:16']
+const FLUX3_SAFETY = { min: 0, max: 4 }
+
+/**
+ * Flux 3 (Black Forest Labs) — en fal es un modelo de VIDEO, no de imagen. Duración `auto` o entera 5–20 s,
+ * 720p/1080p, audio generado apagable, `safety_tolerance` 0–4. Verificado contra el OpenAPI 2026-09-16.
+ */
+const FLUX3: FalVideoContract = {
+  duration: { encoding: 'integer', min: 5, max: 20, acceptsAuto: true },
+  resolutions: ['720p', '1080p'],
+  aspectRatios: FLUX3_ASPECT_RATIOS,
+  supportsAudioToggle: true,
+  supportsBitrateMode: false,
+  acceptsTask: false,
+  acceptsEndImage: false,
+  safetyTolerance: FLUX3_SAFETY
+}
+
+/** Variante `/draft`: sin resolución, más barata, y devuelve `draft_cache` para mejorarla después. */
+const flux3Draft = (contract: FalVideoContract): FalVideoContract => ({ ...contract, resolutions: [], draftCache: 'produces' })
+
+/** first-last-frame y keyframes: duración entera 5–20 SIN `auto`. */
+const FLUX3_FIXED_DURATION: FalVideoContract['duration'] = { encoding: 'integer', min: 5, max: 20, acceptsAuto: false }
+
+const FLUX3_FLF: FalVideoContract = { ...FLUX3, duration: FLUX3_FIXED_DURATION, acceptsEndImage: true, endImageRequired: true }
+const FLUX3_KEYFRAMES: FalVideoContract = { ...FLUX3, duration: FLUX3_FIXED_DURATION, keyframes: { max: 10 } }
+
+/** edit-video y draft-enhance: sin duración, resolución, aspecto ni audio (heredan del origen). */
+const FLUX3_PASSTHROUGH: FalVideoContract = {
+  ...FLUX3,
+  duration: null,
+  resolutions: [],
+  aspectRatios: [],
+  supportsAudioToggle: false
+}
+
 export interface FalCapability {
   /** Identificador corto que el operador escribe en el CLI. */
   id: string
@@ -193,7 +279,7 @@ export interface FalCapability {
   operation: FalOperation
   label: string
   /** Campo por el que viajan las entradas visuales principales; null si el endpoint no recibe ninguna. */
-  inputMediaField: 'image_url' | 'image_urls' | 'reference_image_urls' | null
+  inputMediaField: 'image_url' | 'image_urls' | 'reference_image_urls' | 'start_image_url' | 'video_url' | null
   /** Cuántas entradas visuales acepta: una sola, varias, o ninguna. */
   inputMedia: 'none' | 'one' | 'many'
   requiresPrompt: boolean
@@ -735,6 +821,176 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     verifiedAt: null,
     training: H3_TRAINING(['reference_conditioning_p', 'resume_from_lora_url']),
     notes: 'condicionamiento por referencia 0.9 · puede retomar desde una LoRA'
+  },
+
+  // ── Flux 3 (Black Forest Labs) — video · slugs SIN fal-ai/ ────────────────────────────────────────
+  {
+    id: 'flux3-t2v',
+    slug: 'blackforestlabs/flux-3/text-to-video',
+    kind: 'video',
+    operation: 'text-to-video',
+    label: 'Flux 3 — texto a video',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: FLUX3,
+    notes: 'auto o 5–20 s · 720p/1080p · USD 0,085/s'
+  },
+  {
+    id: 'flux3-t2v-draft',
+    slug: 'blackforestlabs/flux-3/text-to-video/draft',
+    kind: 'video',
+    operation: 'text-to-video',
+    label: 'Flux 3 — texto a video (draft)',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: flux3Draft(FLUX3),
+    notes: 'borrador barato (USD 0,03/s) · devuelve draft_cache para flux3-enhance'
+  },
+  {
+    id: 'flux3-i2v',
+    slug: 'blackforestlabs/flux-3/image-to-video',
+    kind: 'video',
+    operation: 'image-to-video',
+    label: 'Flux 3 — imagen a video',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: FLUX3,
+    notes: 'auto o 5–20 s · 720p/1080p'
+  },
+  {
+    id: 'flux3-i2v-draft',
+    slug: 'blackforestlabs/flux-3/image-to-video/draft',
+    kind: 'video',
+    operation: 'image-to-video',
+    label: 'Flux 3 — imagen a video (draft)',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: flux3Draft(FLUX3),
+    notes: 'borrador · devuelve draft_cache'
+  },
+  {
+    id: 'flux3-flf',
+    slug: 'blackforestlabs/flux-3/first-last-frame-to-video',
+    kind: 'video',
+    operation: 'first-last-frame-to-video',
+    label: 'Flux 3 — primer y último cuadro a video',
+    inputMediaField: 'start_image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: FLUX3_FLF,
+    notes: '--image (primero) y --end-image (último) obligatorios · 5–20 s sin auto'
+  },
+  {
+    id: 'flux3-flf-draft',
+    slug: 'blackforestlabs/flux-3/first-last-frame-to-video/draft',
+    kind: 'video',
+    operation: 'first-last-frame-to-video',
+    label: 'Flux 3 — primer y último cuadro (draft)',
+    inputMediaField: 'start_image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: flux3Draft(FLUX3_FLF),
+    notes: 'borrador · devuelve draft_cache'
+  },
+  {
+    id: 'flux3-keyframes',
+    slug: 'blackforestlabs/flux-3/keyframes-to-video',
+    kind: 'video',
+    operation: 'keyframes-to-video',
+    label: 'Flux 3 — keyframes a video',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: FLUX3_KEYFRAMES,
+    notes: '--keyframe <imagen>@<frame_index>, de 1 a 10 · 5–20 s sin auto'
+  },
+  {
+    id: 'flux3-keyframes-draft',
+    slug: 'blackforestlabs/flux-3/keyframes-to-video/draft',
+    kind: 'video',
+    operation: 'keyframes-to-video',
+    label: 'Flux 3 — keyframes a video (draft)',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: flux3Draft(FLUX3_KEYFRAMES),
+    notes: 'borrador · devuelve draft_cache'
+  },
+  {
+    id: 'flux3-edit',
+    slug: 'blackforestlabs/flux-3/edit-video',
+    kind: 'video',
+    operation: 'video-edit',
+    label: 'Flux 3 Fast — editar video',
+    inputMediaField: 'video_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: FLUX3_PASSTHROUGH,
+    notes: '--video obligatorio · edición por prompt · USD 0,03/s'
+  },
+  {
+    id: 'flux3-extend',
+    slug: 'blackforestlabs/flux-3/extend-video',
+    kind: 'video',
+    operation: 'video-extend',
+    label: 'Flux 3 — extender video',
+    inputMediaField: 'video_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: { ...FLUX3, requiresSourceAudio: true },
+    notes: '--video con pista de audio · entrega SÓLO la continuación (--duration = segundos nuevos); unir en post · USD 0,205/s'
+  },
+  {
+    id: 'flux3-extend-draft',
+    slug: 'blackforestlabs/flux-3/extend-video/draft',
+    kind: 'video',
+    operation: 'video-extend',
+    label: 'Flux 3 — extender video (draft)',
+    inputMediaField: 'video_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: { ...flux3Draft(FLUX3), requiresSourceAudio: true },
+    notes: 'borrador de la extensión (USD 0,06/s) · origen con audio · entrega sólo la continuación · devuelve draft_cache'
+  },
+  {
+    id: 'flux3-enhance',
+    slug: 'blackforestlabs/flux-3/draft-enhance',
+    kind: 'video',
+    operation: 'draft-enhance',
+    label: 'Flux 3 — mejorar un draft',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: false,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: { ...FLUX3_PASSTHROUGH, draftCache: 'consumes' },
+    notes: '--draft-cache <url> de un draft · entrega la versión final (verificado: 1920×1088) · USD 0,085/s'
   },
 ] as const
 
