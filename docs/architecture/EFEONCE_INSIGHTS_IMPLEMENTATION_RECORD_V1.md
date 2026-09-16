@@ -266,6 +266,8 @@ hay 4 capabilities vigentes, si falta el módulo `insights_v1`, o si el generado
 
 ### 4.8 Down (líneas 654–692) y por qué no se ha ensayado
 
+> **Delta 2026-09-15 (ensayo de rollback con Codex):** el Down original falló con `module_assignments_module_key_fkey` porque la organización sintética tiene `insights_v1` asignado; node-pg-migrate revirtió la transacción entera y la base quedó intacta. Se corrigió únicamente la sección Down de la migración (nunca ejecutada; el Up no cambia) para retirar antes `module_assignment_events` y `module_assignments` de `insights_v1`. El ensayo debe repetirse con el Down corregido y, tras el `up`, reasignar el módulo a la org sintética.
+
 El Down hace únicamente undo: 13 `DROP TRIGGER IF EXISTS`, 7 `DROP TABLE IF EXISTS` (en orden de
 dependencias), 10 `DROP FUNCTION IF EXISTS`, `DROP SEQUENCE`, `DROP SCHEMA` (sin CASCADE), marca las 4
 capabilities con `deprecated_at = NOW()` (no las borra) y hace `DELETE` del módulo `insights_v1`. El propio
