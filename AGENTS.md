@@ -265,3 +265,7 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
 
 No adivinar contratos ni obedecer memoria histórica a ciegas. Resolver la fuente vigente, cargar el contexto
 del dominio, preservar evidencia y dejar el siguiente paso ejecutable.
+
+## Efeonce Insights — skill viva y contrato de mantenimiento (EPIC-045)
+
+Al tocar `src/lib/efeonce-insights/**`, las lanes `/api/platform/*/insights/**`, las tools MCP `*_insight*`, el schema `greenhouse_insights` o cualquier task de EPIC-045, invocar la skill `efeonce-insights` (`.codex/skills/efeonce-insights/` para Codex, `.claude/skills/efeonce-insights/` para Claude; mismo contenido) y leer primero `references/program-ledger.md`. **Toda task de EPIC-045 (TASK-1846, 1847, 1848, 1849, 1875 y futuras) actualiza la skill al cerrar** (ledger, mapa, contratos, operación, lecciones) y espeja `.claude/` ↔ `.codex/` con `pnpm skills:mirrors` verde; sin eso no se declara `complete`. Registro canónico de la foundation: `docs/architecture/EFEONCE_INSIGHTS_IMPLEMENTATION_RECORD_V1.md`.

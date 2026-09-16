@@ -78,6 +78,10 @@ gates de findings/rollout; no otro motor ni sender. La matriz dueña está en
 Las dependencias de Hub/transporte/preferencias están asignadas en
 [EPIC-046](EPIC-046-client-services-visibility-and-self-service.md#matriz-de-comunicación-y-retorno-al-portal).
 
+## Contrato de la skill `efeonce-insights` (obligatorio para cada hija)
+
+La skill `.claude/skills/efeonce-insights/` (espejo `.codex/`) es la memoria operativa del programa. Cada task hija actualiza al cerrar, en el mismo commit del cambio de lifecycle: `references/program-ledger.md` (qué construyó, dónde corre, qué deja a la siguiente), `architecture-map.md`, `contracts.md`, `operations.md` y `lessons.md`; espeja a `.codex/` y deja `pnpm skills:mirrors` verde. Sin esa actualización la task no pasa a `complete`. TASK-1845 dejó la versión inicial el 2026-09-16.
+
 ## Child Tasks
 
 **Cinco tasks nuevas de implementación.** Son unidades de ownership con varios slices, no cinco cambios

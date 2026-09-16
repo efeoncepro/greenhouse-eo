@@ -1,0 +1,7 @@
+interface:
+  display_name: "Efeonce Insights (living skill)"
+  short_description: "Operate and extend Efeonce Insights (EPIC-045): editions over SEO/AEO/ICO evidence, lanes app/ecosystem, MCP + gateway federation, flags, canaries, rollback. Program ledger, contracts, operations and lessons accumulated task by task."
+  default_prompt: "Use $efeonce-insights before touching src/lib/efeonce-insights/**, the /api/platform/*/insights/** lanes, the *_insight* MCP tools, the greenhouse_insights schema or any EPIC-045 task (1846–1849, 1875). Read references/program-ledger.md first. At task closure you MUST update this skill per its Skill Maintenance Contract and mirror .claude/ ↔ .codex/."
+
+policy:
+  allow_implicit_invocation: true

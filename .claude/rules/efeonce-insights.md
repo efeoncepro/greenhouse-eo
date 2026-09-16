@@ -41,3 +41,5 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
   ni secretos (test de fuga); al editarla, `pnpm mcp:skills:generate` + `pnpm mcp:skills:check`.
 
 Registro de construcción y despliegue (archivo por archivo, schema, contratos, matriz de runtimes): `docs/architecture/EFEONCE_INSIGHTS_IMPLEMENTATION_RECORD_V1.md`.
+
+**Contrato de mantenimiento de la skill:** toda task de EPIC-045 (1846–1849, 1875 y futuras) actualiza `.claude/skills/efeonce-insights/` al cerrar — `references/program-ledger.md` (qué construyó y dónde corre), `architecture-map.md`, `contracts.md`, `operations.md`, `lessons.md` — y espeja a `.codex/` (`rsync -a --delete .claude/skills/efeonce-insights/ .codex/skills/efeonce-insights/`). Sin eso la task no se declara complete. Las sesiones que hacen trabajo parcial anotan en `lessons.md` de inmediato.

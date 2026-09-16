@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — Skill viva `efeonce-insights` para Claude y Codex, con contrato de mantenimiento
+
+La skill pasa de un resumen a una memoria operativa del programa: `references/program-ledger.md` (qué construyó
+cada task y dónde corre), `architecture-map.md`, `contracts.md`, `operations.md` y `lessons.md`, espejada en
+`.codex/` con su `agents/openai.yaml`. Contrato obligatorio: cada task de EPIC-045 la actualiza al cerrar
+(registrado en CLAUDE.md, AGENTS.md, la regla auto-load, EPIC-045 y los closing protocols de 1847–1849/1875;
+TASK-1846 lo asume por coordinación entre sesiones).
+
 ## 2026-09-16 — TASK-1845 complete: rollback ensayado en la instancia compartida
 
 El ensayo de `migrate:down` reveló dos defectos del Down original (borraba el módulo con asignaciones vigentes y luego
@@ -1027,13 +1035,3 @@ mismo; una persona ligada se revoca como miembro). En `efeonce-mcp` quedó abier
 `identity.invitations.list` / `identity.invitation.create` (sólo issuer nativo, población externa). Tasks
 derivadas: TASK-1838 (consola del administrador del cliente) y TASK-1839 (convergencia con la invitación del
 portal). Producción sigue esperando el release.
-
-## 2026-09-06 — Efeonce ID: invitación externa verificada end-to-end en staging (TASK-1837)
-
-Con los flags ON en Vercel staging y un binding de prueba sobre el emisor real, el recorrido completo corrió sin que
-nadie tocara el token: correo real en Outlook, aceptación en `auth.efeonce.org`, persona externa nueva con admin
-designado, magic link y sesión viva; rebote forzado con `bounced@resend.dev` marcado `bounced` y la señal
-`identity.external_invitation.undelivered` observada encendiéndose; reenvío que rota, revelación de 1 h, y la lane
-delegada ejercitada con el token del gateway (200/403/422/201, correo real). Al cierre el binding se revocó y la
-sesión murió (401). Producción espera el release y el flip de flags; la federación de la lane en `efeonce-mcp` sigue
-pendiente. [Evidencia](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md).
