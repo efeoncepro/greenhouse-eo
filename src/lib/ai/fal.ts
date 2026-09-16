@@ -264,6 +264,24 @@ const pollFalRequest = async <TOutput>(params: {
   }
 }
 
+const FAL_BALANCE_URL = 'https://rest.alpha.fal.ai/billing/user_balance'
+
+/**
+ * Saldo en USD de la cuenta dueña de la clave. Funciona con una clave normal (no ADMIN); devuelve `null` si fal no
+ * responde un número.
+ *
+ * Existe por el incidente del 2026-09-16: tras una recarga de USD 50 el CLI seguía recibiendo 403 "User is locked.
+ * Exhausted balance", y esta consulta mostró −3,86: la recarga no estaba en la cuenta de la clave. Un 403 de
+ * bloqueo se diagnostica primero acá, no reintentando corridas.
+ */
+export const getFalBalance = async (): Promise<number | null> => {
+  const apiKey = await resolveFalApiKey()
+  const response = await fetch(FAL_BALANCE_URL, { headers: authHeaders(apiKey.value) })
+  const balance = Number((await response.text()).trim())
+
+  return response.ok && Number.isFinite(balance) ? balance : null
+}
+
 const FAL_UPLOAD_INITIATE_URL = 'https://rest.alpha.fal.ai/storage/upload/initiate'
 
 export interface FalUploadResult {

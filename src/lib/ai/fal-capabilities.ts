@@ -1076,7 +1076,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'many',
     requiresPrompt: false,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: WAN3_R2V,
     notes: 'hasta 10 imágenes, 5 videos y 5 audios (≤ 15 s) · --web-url / --file con --thinking · prompt opcional'
   },
@@ -1090,7 +1090,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'none',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: WAN3,
     notes: '2–30 s o auto · hasta 1080p (default) · --thinking · USD 0,05/s'
   },
@@ -1118,7 +1118,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'many',
     requiresPrompt: false,
     outputKey: 'video',
-    verifiedAt: null,
+    verifiedAt: '2026-09-16',
     video: WAN3_R2V,
     notes: 'hasta 10 imágenes, 5 videos y 5 audios (≤ 15 s) · --web-url / --file con --thinking · prompt opcional'
   },

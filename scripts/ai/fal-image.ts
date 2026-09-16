@@ -7,7 +7,7 @@ import { promisify } from 'node:util'
 
 import { config as loadEnv } from 'dotenv'
 
-import { awaitFalRequest, resolveFalQueueHandle, runFalModel, uploadFalFile } from '@/lib/ai/fal'
+import { awaitFalRequest, getFalBalance, resolveFalQueueHandle, runFalModel, uploadFalFile } from '@/lib/ai/fal'
 import { FAL_CAPABILITIES, findFalCapability, type FalCapability, type FalReferenceSlot } from '@/lib/ai/fal-capabilities'
 
 /**
@@ -22,6 +22,7 @@ import { FAL_CAPABILITIES, findFalCapability, type FalCapability, type FalRefere
  *
  * Uso:
  *   pnpm ai:fal --list
+ *   pnpm ai:fal --balance                     (saldo USD de la cuenta dueña de la clave; gratis)
  *   pnpm ai:fal --capability seedream5-pro --prompt "<texto>" --out out.png
  *   pnpm ai:fal --capability seedream5-pro-layerize --image poster.png --out-dir ./capas
  *   pnpm ai:fal --capability h3turbo-t2v --prompt "<texto>" --duration 5 --resolution 768P --out clip.mp4
@@ -100,11 +101,12 @@ interface CliArgs {
   timeoutMs?: number
   json: boolean
   list: boolean
+  balance: boolean
   help: boolean
 }
 
 const parseArgs = (argv: string[]): CliArgs => {
-  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], keyframes: [], noAudio: false, thinking: false, noPromptExpansion: false, json: false, list: false, help: false }
+  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], keyframes: [], noAudio: false, thinking: false, noPromptExpansion: false, json: false, list: false, balance: false, help: false }
 
   let i = 0
 
@@ -158,6 +160,7 @@ const parseArgs = (argv: string[]): CliArgs => {
       case '--timeout': args.timeoutMs = Math.max(10_000, Number(next()) || DEFAULT_TIMEOUT_MS); break
       case '--json': args.json = true; break
       case '--list': args.list = true; break
+      case '--balance': args.balance = true; break
       case '--help':
       case '-h': args.help = true; break
       default: throw new Error(`Argumento desconocido: ${argv[i]}`)
@@ -834,6 +837,13 @@ const main = async () => {
     process.exit(0)
   }
 
+  if (args.balance) {
+    const balance = await getFalBalance()
+
+    process.stdout.write(balance === null ? 'fal no devolvió el saldo.\n' : `Saldo de la cuenta de la clave: USD ${balance.toFixed(2)}\n`)
+    process.exit(0)
+  }
+
   if (args.list) {
     printCapabilities()
     process.exit(0)
@@ -904,6 +914,16 @@ const main = async () => {
 
   if (!result.ok) {
     process.stderr.write(`FATAL: ${slug} falló (HTTP ${result.httpStatus})${result.errorDetail ? `: ${result.errorDetail}` : ''}\n`)
+
+    // Un bloqueo por saldo se diagnostica mirando la cuenta DUEÑA de la clave: una recarga en otra cuenta no lo levanta.
+    if (result.httpStatus === 403 && /locked|balance|top.?up/i.test(result.errorDetail ?? '')) {
+      const balance = await getFalBalance().catch(() => null)
+
+      process.stderr.write(
+        `  saldo de la cuenta de esta clave: ${balance === null ? 'no disponible' : `USD ${balance.toFixed(2)}`}. ` +
+          'Si recargaste y sigue bajo cero, la recarga quedó en otra cuenta o equipo de fal.\n'
+      )
+    }
 
     if (result.requestId) {
       process.stderr.write(`  request_id ${result.requestId}\n`)
