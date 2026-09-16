@@ -54,6 +54,13 @@ describe('artifact-worker · deploy.sh (SoT de env vars del Job)', () => {
     expect(deploySh).toMatch(/ENV_VARS="\$\{ENV_VARS\},ARTIFACT_RENDER_JOBS_ENABLED=/)
   })
 
+  it('el flag INSIGHTS_RENDER_ENABLED está DECLARADO y su default es OFF (TASK-1846)', () => {
+    // Misma bug class que GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED (revisión 00473): un flag aplicado
+    // sólo con --update-env-vars desaparece en el próximo deploy destructivo, sin ruido.
+    expect(deploySh).toMatch(/ENV_VARS="\$\{ENV_VARS\},INSIGHTS_RENDER_ENABLED=/)
+    expect(deploySh).toMatch(/INSIGHTS_RENDER_ENABLED:-false/)
+  })
+
   it('el SELFTEST de imagen corre en Cloud Build ANTES del deploy (la imagen se prueba a sí misma)', () => {
     expect(deploySh).toContain("args: ['run', '--rm', '${IMAGE}', '--selftest']")
   })

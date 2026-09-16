@@ -998,7 +998,7 @@ export const storeSystemGeneratedPrivateAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate' | 'proposal_deliverable'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'final_settlement_document' | 'quote_pdf' | 'workforce_contracting_document' | 'signature_signed_document' | 'organization_logo_candidate' | 'proposal_deliverable' | 'insight_output'
   >
   ownerAggregateId: string
   ownerClientId?: string | null

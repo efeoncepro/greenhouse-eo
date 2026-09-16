@@ -30,35 +30,18 @@ import { initSentryForService } from '../_shared/sentry-init'
 initSentryForService('artifact-worker')
 
 import { composeArtifact } from '@/lib/artifact-composer'
-import { deckAxisCatalog } from '@/lib/artifact-composer/catalogs/deck-axis'
 import { SlideQualityError } from '@/lib/artifact-composer/quality-gates'
 import { SlideGeometryError, SlotFillError } from '@/lib/artifact-composer/render'
-import { attachProposalAsset } from '@/lib/commercial/tenders/proposals/assets'
-import {
-  claimNextRenderJobForExecution,
-  getProposalRenderJob,
-  getRenderJobManifest,
-  hashResolvedManifest,
-  isArtifactRenderJobsEnabled,
-  markRenderJobCompleted,
-  markRenderJobFailed,
-  markRenderJobRunning,
-  type ProposalRenderJobRecord,
-  type RenderJobFailureCode
-} from '@/lib/commercial/tenders/proposals/render-jobs'
-import { storeSystemGeneratedPrivateAsset } from '@/lib/storage/greenhouse-assets'
+import { hashResolvedManifest } from '@/lib/commercial/tenders/proposals/render-jobs'
 import { captureWithDomain } from '@/lib/observability/capture'
 
-const CATALOGS = new Map([[deckAxisCatalog.name, deckAxisCatalog]])
-
-// uploaded_by_user_id es FK nullable a users: un Job no tiene usuario — null (precedente:
-// quote-pdf-asset). El vínculo semántico con el job vive en metadata.renderJobId.
-const WORKER_ACTOR_USER = null
+import type { RenderConsumer, RenderJobView } from './consumer-contract'
+import { buildRenderConsumers, findConsumer } from './consumers'
 
 const log = (msg: string, extra: Record<string, unknown> = {}) =>
   console.log(JSON.stringify({ svc: 'artifact-worker', msg, ...extra }))
 
-const classifyFailure = (error: unknown): { code: RenderJobFailureCode; detail: string } => {
+const classifyFailure = (error: unknown): { code: string; detail: string } => {
   if (error instanceof SlideQualityError) {
     return { code: error.code, detail: error.message }
   }
@@ -75,13 +58,16 @@ const classifyFailure = (error: unknown): { code: RenderJobFailureCode; detail: 
   return { code: 'render_error', detail: error instanceof Error ? error.message : String(error) }
 }
 
-const renderJob = async (job: ProposalRenderJobRecord): Promise<void> => {
+/**
+ * Render de UN job, agnóstico del dominio. Todo lo que era específico de Proposal vive ahora en su
+ * consumer: catálogo, assets, vínculo semántico, transiciones y dominio de observabilidad.
+ */
+const renderJob = async (consumer: RenderConsumer, job: RenderJobView): Promise<void> => {
   const startedAt = Date.now()
-  const catalog = CATALOGS.get(job.catalogName)
+  const catalog = consumer.getCatalog(job.catalogName)
 
   if (!catalog) {
-    await markRenderJobFailed({
-      renderJobId: job.renderJobId,
+    await consumer.markFailed(job, {
       failureCode: 'manifest_drift',
       failureDetail: `El catálogo "${job.catalogName}" no está empaquetado en este worker.`
     })
@@ -89,11 +75,10 @@ const renderJob = async (job: ProposalRenderJobRecord): Promise<void> => {
     return
   }
 
-  const manifest = await getRenderJobManifest(job.renderJobId)
+  const manifest = await consumer.getManifest(job.jobId)
 
   if (!manifest) {
-    await markRenderJobFailed({
-      renderJobId: job.renderJobId,
+    await consumer.markFailed(job, {
       failureCode: 'render_error',
       failureDetail: 'El job no tiene manifest persistido.'
     })
@@ -123,8 +108,7 @@ const renderJob = async (job: ProposalRenderJobRecord): Promise<void> => {
     const emittedHash = hashResolvedManifest(emittedManifest)
 
     if (emittedHash !== job.manifestHash) {
-      await markRenderJobFailed({
-        renderJobId: job.renderJobId,
+      await consumer.markFailed(job, {
         failureCode: 'manifest_drift',
         failureDetail: `El manifest re-resuelto (${emittedHash.slice(0, 12)}…) difiere del encolado (${job.manifestHash.slice(0, 12)}…): el catálogo cambió desde el enqueue.`
       })
@@ -137,8 +121,7 @@ const renderJob = async (job: ProposalRenderJobRecord): Promise<void> => {
     const maxPdfMb = (job.constraints?.maxPdfMb as number | undefined) ?? 20
 
     if (job.outputTarget === 'pdf-merged' && pdfBytes > maxPdfMb * 1024 * 1024) {
-      await markRenderJobFailed({
-        renderJobId: job.renderJobId,
+      await consumer.markFailed(job, {
         failureCode: 'size_rejected',
         failureDetail: `PDF de ${(pdfBytes / 1024 / 1024).toFixed(2)} MB supera el límite de ${maxPdfMb} MB del requisito-set.`
       })
@@ -149,8 +132,7 @@ const renderJob = async (job: ProposalRenderJobRecord): Promise<void> => {
     const maxPages = job.constraints?.maxPages as number | null | undefined
 
     if (typeof maxPages === 'number' && input.slides.length > maxPages) {
-      await markRenderJobFailed({
-        renderJobId: job.renderJobId,
+      await consumer.markFailed(job, {
         failureCode: 'size_rejected',
         failureDetail: `${input.slides.length} láminas superan el máximo de ${maxPages} páginas del requisito-set.`
       })
@@ -158,59 +140,18 @@ const renderJob = async (job: ProposalRenderJobRecord): Promise<void> => {
       return
     }
 
-    // Upload: PDF final + previews PNG como assets privados system-generated.
-    let outputPdfAssetId: string | null = null
+    const { primaryAssetId, previewAssetIds } = await consumer.storeOutputs(job, {
+      pdfPath: result.pdfPath ?? null,
+      slidePaths: result.slidePaths,
+      pdfBytes,
+      warnings: result.warnings,
+      slideCount: result.slidePaths.length
+    })
 
-    if (result.pdfPath) {
-      const stored = await storeSystemGeneratedPrivateAsset({
-        ownerAggregateType: 'proposal_deliverable',
-        ownerAggregateId: job.proposalId,
-        fileName: path.basename(result.pdfPath),
-        mimeType: 'application/pdf',
-        bytes: await fs.readFile(result.pdfPath),
-        actorUserId: WORKER_ACTOR_USER,
-        metadata: {
-          renderJobId: job.renderJobId,
-          manifestHash: job.manifestHash,
-          artifactPurpose: job.artifactPurpose,
-          audience: job.audience
-        }
-      })
-
-      outputPdfAssetId = stored.assetId
-
-      await attachProposalAsset({
-        ownerOrgId: job.ownerOrgId,
-        proposalId: job.proposalId,
-        assetId: stored.assetId,
-        kind: 'deck',
-        audience: job.audience,
-        actorUserId: 'system:artifact-worker',
-        actor: { kind: 'system' }
-      })
-    }
-
-    const previewAssetIds: string[] = []
-
-    for (const slidePath of result.slidePaths) {
-      const stored = await storeSystemGeneratedPrivateAsset({
-        ownerAggregateType: 'proposal_deliverable',
-        ownerAggregateId: job.proposalId,
-        fileName: path.basename(slidePath),
-        mimeType: 'image/png',
-        bytes: await fs.readFile(slidePath),
-        actorUserId: WORKER_ACTOR_USER,
-        metadata: { renderJobId: job.renderJobId, kind: 'preview' }
-      })
-
-      previewAssetIds.push(stored.assetId)
-    }
-
-    await markRenderJobCompleted({
-      renderJobId: job.renderJobId,
-      outputPdfAssetId,
-      outputPreviewAssetIds: previewAssetIds,
-      outputReport: {
+    await consumer.markCompleted(job, {
+      primaryAssetId,
+      previewAssetIds,
+      report: {
         durationMs: Date.now() - startedAt,
         pdfBytes,
         slides: result.slidePaths.length,
@@ -220,7 +161,8 @@ const renderJob = async (job: ProposalRenderJobRecord): Promise<void> => {
     })
 
     log('render completed', {
-      renderJobId: job.renderJobId,
+      consumer: consumer.key,
+      jobId: job.jobId,
       durationMs: Date.now() - startedAt,
       pdfBytes,
       previews: previewAssetIds.length
@@ -241,55 +183,75 @@ const main = async (): Promise<void> => {
     return
   }
 
-  if (!isArtifactRenderJobsEnabled()) {
-    log('flag OFF — skip')
+  const consumers = buildRenderConsumers().filter(consumer => consumer.isEnabled())
+
+  if (consumers.length === 0) {
+    log('todos los consumers OFF — skip')
 
     return
   }
 
   // Dos modos:
-  //   · RENDER_JOB_ID en env → ejecución dirigida (smoke/replay manual del operador).
-  //   · sin RENDER_JOB_ID → CLAIM ATÓMICO del próximo job por prioridad (FOR UPDATE SKIP LOCKED).
-  //     Es el modo normal: el dispatcher sólo lanza la ejecución (jobs.run, sin overrides — no
-  //     necesita `runWithOverrides`), y el worker elige. Dos ejecuciones concurrentes nunca toman
-  //     el mismo job.
+  //   · RENDER_JOB_ID en env → ejecución dirigida (smoke/replay manual del operador). RENDER_CONSUMER
+  //     elige el dominio; por compatibilidad con TASK-1391, el default es 'proposal'.
+  //   · sin RENDER_JOB_ID → CLAIM ATÓMICO en orden declarado (FOR UPDATE SKIP LOCKED por dominio).
+  //     El dispatcher sólo lanza la ejecución (jobs.run, sin overrides — no necesita
+  //     `runWithOverrides`) y el worker elige. Dos ejecuciones concurrentes nunca toman el mismo job.
   const directJobId = process.env.RENDER_JOB_ID?.trim()
 
-  let job: ProposalRenderJobRecord | null
+  let consumer: RenderConsumer | null = null
+  let job: RenderJobView | null = null
 
   if (directJobId) {
-    const running = await markRenderJobRunning(directJobId)
+    const key = process.env.RENDER_CONSUMER?.trim() || 'proposal'
 
-    job = await getProposalRenderJob({ ownerOrgId: running.ownerOrgId, renderJobId: directJobId })
+    consumer = findConsumer(consumers, key)
+
+    if (!consumer) {
+      log('consumer dirigido no disponible o deshabilitado', { key })
+
+      return
+    }
+
+    job = await consumer.claimById(directJobId)
+
+    if (!job) throw new Error(`Job ${directJobId} desapareció tras el claim (imposible: tabla append-only).`)
   } else {
-    job = await claimNextRenderJobForExecution()
+    for (const candidate of consumers) {
+      const claimed = await candidate.claimNext()
 
-    if (!job) {
+      if (claimed) {
+        consumer = candidate
+        job = claimed
+        break
+      }
+    }
+
+    if (!consumer || !job) {
       log('sin jobs en cola — nada que hacer')
 
       return
     }
   }
 
-  if (!job) throw new Error(`Job ${directJobId} desapareció tras el claim (imposible: tabla append-only).`)
-
-  const renderJobId = job.renderJobId
+  const activeConsumer = consumer
+  const activeJob = job
 
   try {
-    await renderJob(job)
+    await renderJob(activeConsumer, activeJob)
   } catch (error) {
     const { code, detail } = classifyFailure(error)
 
-    captureWithDomain(error, 'commercial', {
-      tags: { source: 'artifact_worker', failureCode: code },
-      extra: { renderJobId }
+    captureWithDomain(error, activeConsumer.observabilityDomain as never, {
+      tags: { source: 'artifact_worker', failureCode: code, consumer: activeConsumer.key },
+      extra: { jobId: activeJob.jobId }
     })
 
-    await markRenderJobFailed({ renderJobId, failureCode: code, failureDetail: detail })
+    await activeConsumer.markFailed(activeJob, { failureCode: code, failureDetail: detail })
 
     // El fallo queda gobernado en el job; la ejecución sale 0 (el retry es del dominio, no de
     // Cloud Run — max-retries=0 en el Job para no re-ejecutar fuera del contrato).
-    log('render failed (gobernado)', { renderJobId, code })
+    log('render failed (gobernado)', { consumer: activeConsumer.key, jobId: activeJob.jobId, code })
   }
 }
 

@@ -65,10 +65,14 @@ export interface RenderConsumer {
    * Persiste los bytes producidos como assets privados del dominio y los vincula
    * semánticamente. Devuelve el id del asset principal (null si el target no produce PDF).
    */
-  storeOutputs(job: RenderJobView, rendered: RenderedArtifact): Promise<{ primaryAssetId: string | null }>
+  storeOutputs(
+    job: RenderJobView,
+    rendered: RenderedArtifact
+  ): Promise<{ primaryAssetId: string | null; previewAssetIds: string[] }>
 
   markCompleted(job: RenderJobView, input: {
     primaryAssetId: string | null
+    previewAssetIds: string[]
     report: Record<string, unknown>
   }): Promise<void>
 

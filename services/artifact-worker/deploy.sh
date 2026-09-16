@@ -121,6 +121,13 @@ ENV_VARS="${ENV_VARS},GOOGLE_CLOUD_PROJECT=${PROJECT_ID}"
 # único trabajo posible viene de staging/CLI. Ledger: FEATURE_FLAG_STATE_LEDGER.md
 ENV_VARS="${ENV_VARS},ARTIFACT_RENDER_JOBS_ENABLED=${ARTIFACT_RENDER_JOBS_ENABLED:-true}"
 
+# 🚩 TASK-1846 — flag del render de Efeonce Insights. SEPARADO a propósito: encender Insights jamás
+# puede encender Proposal ni al revés. Default OFF: desplegar el código no habilita el producto.
+# Declararlo ACÁ es obligatorio, no opcional — `--set-env-vars` de abajo es DESTRUCTIVO y borra
+# toda variable agregada out-of-band; aplicarlo sólo con `--update-env-vars` en vivo lo hace
+# desaparecer en el próximo deploy, en silencio. Ledger: FEATURE_FLAG_STATE_LEDGER.md
+ENV_VARS="${ENV_VARS},INSIGHTS_RENDER_ENABLED=${INSIGHTS_RENDER_ENABLED:-false}"
+
 SECRETS="GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
 
 SENTRY_DSN_SECRET_NAME="${SENTRY_DSN_SECRET_NAME:-greenhouse-sentry-dsn}"
