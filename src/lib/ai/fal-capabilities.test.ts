@@ -43,11 +43,40 @@ describe('registro de capacidades fal', () => {
     }
   })
 
-  it('el video queda declarado pero sin verificar mientras no se ejercite', () => {
+  it('toda capacidad de video declara su contrato y su salida', () => {
     const video = FAL_CAPABILITIES.filter(c => c.kind === 'video')
 
     expect(video.length).toBeGreaterThan(0)
     expect(video.every(c => c.outputKey === 'video')).toBe(true)
+    // Sin contrato el CLI no podría validar límites y dejaría pasar un pedido que el proveedor cobra y rechaza.
+    expect(video.every(c => Boolean(c.video))).toBe(true)
+  })
+
+  it.each(FAL_CAPABILITIES.filter(c => c.video))('$id declara límites de video plausibles', capability => {
+    const contract = capability.video!
+
+    expect(contract.maxDurationSeconds).toBeGreaterThan(0)
+    expect(contract.resolutions.length).toBeGreaterThan(0)
+    expect(contract.aspectRatios).toContain('16:9')
+  })
+
+  // Asimetría real y contraintuitiva, verificada contra el OpenAPI de cada endpoint el 2026-09-16:
+  // la versión NUEVA dura más pero rinde menos resolución. Si alguien "empareja" estos números por
+  // simetría, el CLI empezaría a aceptar pedidos que el proveedor rechaza después de cobrar la cola.
+  it('conserva la asimetría medida entre Seedance 2.5 y 2.0', () => {
+    const v25 = FAL_CAPABILITIES.find(c => c.id === 'seedance25-t2v')?.video
+    const v20 = FAL_CAPABILITIES.find(c => c.id === 'seedance20-t2v')?.video
+    const mini = FAL_CAPABILITIES.find(c => c.id === 'seedance20-mini-t2v')?.video
+
+    expect(v25?.maxDurationSeconds).toBe(30)
+    expect(v20?.maxDurationSeconds).toBe(15)
+    expect(v25?.resolutions).not.toContain('4k')
+    expect(v20?.resolutions).toContain('4k')
+    expect(mini?.supportsBitrateMode).toBe(false)
+  })
+
+  it('no quedan capacidades de Gemini Omni: ese carril va directo por Google, no por fal', () => {
+    expect(FAL_CAPABILITIES.some(c => c.slug.includes('gemini-omni'))).toBe(false)
   })
 
   it('resuelve por id y devuelve undefined ante uno inexistente', () => {

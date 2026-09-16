@@ -44,9 +44,20 @@ loadEnv({ path: join(process.cwd(), '.env.local') })
 
 const DEFAULT_OUT_DIR = join(process.cwd(), 'public', 'images', 'generated')
 const DEFAULT_TIMEOUT_MS = 180_000
+/** El video tarda bastante más que una imagen; el default sube solo para capacidades de video. */
+const VIDEO_TIMEOUT_MS = 900_000
 
 interface CliArgs {
   capability?: string
+  duration?: string
+  resolution?: string
+  aspect?: string
+  bitrate?: string
+  task?: string
+  noAudio: boolean
+  endImage?: string
+  audios: string[]
+  videos: string[]
   model?: string
   prompt?: string
   promptFile?: string
@@ -64,7 +75,17 @@ interface CliArgs {
 }
 
 const parseArgs = (argv: string[]): CliArgs => {
-  const args: CliArgs = { images: [], timeoutMs: DEFAULT_TIMEOUT_MS, json: false, list: false, help: false }
+  const args: CliArgs = {
+    images: [],
+    audios: [],
+    videos: [],
+    noAudio: false,
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+    json: false,
+    list: false,
+    help: false
+  }
+
   let i = 0
 
   const next = (): string => {
@@ -82,6 +103,15 @@ const parseArgs = (argv: string[]): CliArgs => {
       case '--prompt': args.prompt = next(); break
       case '--prompt-file': args.promptFile = next(); break
       case '--image': args.images.push(next()); break
+      case '--duration': args.duration = next(); break
+      case '--resolution': args.resolution = next(); break
+      case '--aspect': args.aspect = next(); break
+      case '--bitrate': args.bitrate = next(); break
+      case '--task': args.task = next(); break
+      case '--no-audio': args.noAudio = true; break
+      case '--end-image': args.endImage = next(); break
+      case '--audio': args.audios.push(next()); break
+      case '--video': args.videos.push(next()); break
       case '--size': args.size = next(); break
       case '--count': args.count = Math.max(1, Number(next()) || 1); break
       case '--format': args.format = next(); break
@@ -304,9 +334,54 @@ const main = async () => {
     )
   }
 
+  const videoContract = capability?.video ?? null
+
+  // El contrato de video difiere POR ENDPOINT. Validar acá evita quemar una corrida pidiéndole 4K a un
+  // modelo que topa en 1080p, o 30 s a uno que llega a 15: el proveedor lo rechazaría después de cobrar
+  // la cola, y el operador se enteraría por un error críptico.
+  if (args.duration && args.duration !== 'auto') {
+    const seconds = Number(args.duration)
+
+    if (!Number.isFinite(seconds) || seconds < 1) {
+      throw new Error(`--duration "${args.duration}" no es válido: usa "auto" o un número de segundos.`)
+    }
+
+    if (videoContract && seconds > videoContract.maxDurationSeconds) {
+      throw new Error(
+        `--duration ${seconds}s excede el máximo de "${capability?.id}" (${videoContract.maxDurationSeconds}s).`
+      )
+    }
+  }
+
+  if (args.resolution && videoContract && !videoContract.resolutions.includes(args.resolution)) {
+    throw new Error(
+      `--resolution "${args.resolution}" no está en "${capability?.id}". Soportadas: ${videoContract.resolutions.join(', ')}.`
+    )
+  }
+
+  if (args.aspect && videoContract && !videoContract.aspectRatios.includes(args.aspect)) {
+    throw new Error(
+      `--aspect "${args.aspect}" no está en "${capability?.id}". Soportados: ${videoContract.aspectRatios.join(', ')}.`
+    )
+  }
+
+  if (args.bitrate && videoContract && !videoContract.supportsBitrateMode) {
+    throw new Error(`"${capability?.id}" no acepta --bitrate; ese endpoint no expone bitrate_mode.`)
+  }
+
+  if (args.task && capability && capability.operation !== 'reference-to-video') {
+    throw new Error(`--task sólo aplica a reference-to-video; "${capability.id}" es ${capability.operation}.`)
+  }
+
   const input: Record<string, unknown> = {}
 
   if (prompt) input.prompt = prompt
+  if (args.duration) input.duration = args.duration
+  if (args.resolution) input.resolution = args.resolution
+  if (args.aspect) input.aspect_ratio = args.aspect
+  if (args.bitrate) input.bitrate_mode = args.bitrate
+  if (args.task) input.task = args.task
+  if (args.noAudio) input.generate_audio = false
   if (args.size) input.image_size = parseSize(args.size)
   if (args.count) input.num_images = args.count
   if (args.format) input.output_format = args.format
@@ -318,11 +393,23 @@ const main = async () => {
     input[field] = field === 'image_urls' ? urls : urls[0]
   }
 
+  if (args.endImage) {
+    const [endUrl] = await resolveMediaUrls([args.endImage])
+
+    input.end_image_url = endUrl
+  }
+
+  if (args.audios.length) input.audio_urls = await resolveMediaUrls(args.audios)
+  if (args.videos.length) input.video_urls = await resolveMediaUrls(args.videos)
+
   if (args.extraInput) Object.assign(input, JSON.parse(args.extraInput) as Record<string, unknown>)
 
-  process.stdout.write(`→ ${slug}\n`)
+  const timeoutMs =
+    args.timeoutMs === DEFAULT_TIMEOUT_MS && capability?.kind === 'video' ? VIDEO_TIMEOUT_MS : args.timeoutMs
 
-  const result = await runFalModel({ model: slug, input, pollTimeoutMs: args.timeoutMs })
+  process.stdout.write(`→ ${slug}${capability?.kind === 'video' ? ` · hasta ${Math.round(timeoutMs / 1000)}s de espera` : ''}\n`)
+
+  const result = await runFalModel({ model: slug, input, pollTimeoutMs: timeoutMs })
 
   if (!result.ok) {
     process.stderr.write(`FATAL: ${slug} falló (HTTP ${result.httpStatus})${result.errorDetail ? `: ${result.errorDetail}` : ''}\n`)

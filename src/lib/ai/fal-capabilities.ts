@@ -27,6 +27,53 @@ export type FalOperation =
   | 'image-to-video'
   | 'reference-to-video'
 
+/**
+ * Contrato de video declarado POR ENDPOINT, no por familia: las variantes difieren de verdad.
+ * Seedance 2.5 llega a 30 s pero topa en 1080p; Seedance 2.0 base sólo hace 15 s pero sí ofrece 4K;
+ * `fast`, `mini` y `us` topan en 720p, y `mini` ni siquiera acepta `bitrate_mode`. Verificado contra
+ * el OpenAPI de cada endpoint el 2026-09-16. El CLI valida contra esto ANTES de gastar: pedir 4K a
+ * 2.5 o 30 s a 2.0 falla en local en vez de quemar una corrida.
+ */
+export interface FalVideoContract {
+  maxDurationSeconds: number
+  resolutions: readonly string[]
+  aspectRatios: readonly string[]
+  supportsAudioToggle: boolean
+  supportsBitrateMode: boolean
+}
+
+const SEEDANCE_ASPECT_RATIOS: readonly string[] = ['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16']
+
+/** Seedance 2.5: duración larga (hasta 30 s), sin 4K. */
+const SEEDANCE_25: FalVideoContract = {
+  maxDurationSeconds: 30,
+  resolutions: ['480p', '720p', '1080p'],
+  aspectRatios: SEEDANCE_ASPECT_RATIOS,
+  supportsAudioToggle: true,
+  supportsBitrateMode: true
+}
+
+/** Seedance 2.0 base: hasta 15 s, y la única familia con 4K. */
+const SEEDANCE_20_BASE: FalVideoContract = {
+  maxDurationSeconds: 15,
+  resolutions: ['480p', '720p', '1080p', '4k'],
+  aspectRatios: SEEDANCE_ASPECT_RATIOS,
+  supportsAudioToggle: true,
+  supportsBitrateMode: true
+}
+
+/** Variantes fast / us de 2.0: mismas duraciones, techo 720p. */
+const SEEDANCE_20_LIGHT: FalVideoContract = {
+  maxDurationSeconds: 15,
+  resolutions: ['480p', '720p'],
+  aspectRatios: SEEDANCE_ASPECT_RATIOS,
+  supportsAudioToggle: true,
+  supportsBitrateMode: true
+}
+
+/** Mini: como las anteriores pero sin `bitrate_mode`. */
+const SEEDANCE_20_MINI: FalVideoContract = { ...SEEDANCE_20_LIGHT, supportsBitrateMode: false }
+
 export interface FalCapability {
   /** Identificador corto que el operador escribe en el CLI. */
   id: string
@@ -44,6 +91,8 @@ export interface FalCapability {
   outputKey: 'images' | 'layers' | 'video'
   /** Fecha en que se ejercitó contra el API real. `null` = declarada, sin verificar. */
   verifiedAt: string | null
+  /** Sólo para `kind: 'video'`: límites reales del endpoint, que el CLI valida antes de gastar. */
+  video?: FalVideoContract
   notes?: string
 }
 
@@ -116,10 +165,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     verifiedAt: '2026-09-16'
   },
 
-  // ── Video — DECLARADO, SIN VERIFICAR ────────────────────────────────────────────────────────────
-  // El CLI ya sabe operarlos (el transporte es el mismo), pero ninguno se ejercitó contra el API real.
-  // Antes de marcar `verifiedAt` hay que correr uno y confirmar la forma del output: el contrato de
-  // video NO está verificado y `outputKey: 'video'` es una hipótesis leída del catálogo, no evidencia.
+  // ── Seedance — video · DECLARADO, SIN VERIFICAR hasta ejercitar cada endpoint ──────────────────
   {
     id: 'seedance25-t2v',
     slug: 'bytedance/seedance-2.5/text-to-video',
@@ -130,7 +176,9 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'none',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null
+    verifiedAt: '2026-09-16',
+    video: SEEDANCE_25,
+    notes: 'hasta 30 s · techo 1080p'
   },
   {
     id: 'seedance25-i2v',
@@ -142,7 +190,9 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'one',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null
+    verifiedAt: '2026-09-16',
+    video: SEEDANCE_25,
+    notes: 'hasta 30 s · techo 1080p · admite end_image_url (último cuadro)'
   },
   {
     id: 'seedance25-r2v',
@@ -154,44 +204,178 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     inputMedia: 'many',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null
+    verifiedAt: null,
+    video: SEEDANCE_25,
+    notes: 'hasta 30 s · techo 1080p · admite audio_urls y video_urls · task reference|editing|extension'
   },
   {
-    id: 'omni11-t2v',
-    slug: 'google/gemini-omni-flash/v1.1/text-to-video',
+    id: 'seedance20-t2v',
+    slug: 'bytedance/seedance-2.0/text-to-video',
     kind: 'video',
     operation: 'text-to-video',
-    label: 'Gemini Omni Flash 1.1 — texto a video',
+    label: 'Seedance 2.0 — texto a video',
     inputMediaField: null,
     inputMedia: 'none',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null
+    verifiedAt: null,
+    video: SEEDANCE_20_BASE,
+    notes: 'hasta 15 s · única familia con 4K'
   },
   {
-    id: 'omni11-i2v',
-    slug: 'google/gemini-omni-flash/v1.1/image-to-video',
+    id: 'seedance20-i2v',
+    slug: 'bytedance/seedance-2.0/image-to-video',
     kind: 'video',
     operation: 'image-to-video',
-    label: 'Gemini Omni Flash 1.1 — imagen a video',
+    label: 'Seedance 2.0 — imagen a video',
     inputMediaField: 'image_url',
     inputMedia: 'one',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null
+    verifiedAt: null,
+    video: SEEDANCE_20_BASE,
+    notes: 'hasta 15 s · única familia con 4K · admite end_image_url (último cuadro)'
   },
   {
-    id: 'omni11-r2v',
-    slug: 'google/gemini-omni-flash/v1.1/reference-to-video',
+    id: 'seedance20-r2v',
+    slug: 'bytedance/seedance-2.0/reference-to-video',
     kind: 'video',
     operation: 'reference-to-video',
-    label: 'Gemini Omni Flash 1.1 — referencias a video',
+    label: 'Seedance 2.0 — referencias a video',
     inputMediaField: 'image_urls',
     inputMedia: 'many',
     requiresPrompt: true,
     outputKey: 'video',
-    verifiedAt: null
-  }
+    verifiedAt: null,
+    video: SEEDANCE_20_BASE,
+    notes: 'hasta 15 s · única familia con 4K · admite audio_urls y video_urls'
+  },
+  {
+    id: 'seedance20-fast-t2v',
+    slug: 'bytedance/seedance-2.0/fast/text-to-video',
+    kind: 'video',
+    operation: 'text-to-video',
+    label: 'Seedance 2.0 Fast — texto a video',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: SEEDANCE_20_LIGHT,
+    notes: 'variante rápida · techo 720p'
+  },
+  {
+    id: 'seedance20-fast-i2v',
+    slug: 'bytedance/seedance-2.0/fast/image-to-video',
+    kind: 'video',
+    operation: 'image-to-video',
+    label: 'Seedance 2.0 Fast — imagen a video',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: SEEDANCE_20_LIGHT,
+    notes: 'variante rápida · techo 720p · admite end_image_url (último cuadro)'
+  },
+  {
+    id: 'seedance20-fast-r2v',
+    slug: 'bytedance/seedance-2.0/fast/reference-to-video',
+    kind: 'video',
+    operation: 'reference-to-video',
+    label: 'Seedance 2.0 Fast — referencias a video',
+    inputMediaField: 'image_urls',
+    inputMedia: 'many',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: SEEDANCE_20_LIGHT,
+    notes: 'variante rápida · techo 720p · admite audio_urls y video_urls'
+  },
+  {
+    id: 'seedance20-mini-t2v',
+    slug: 'bytedance/seedance-2.0/mini/text-to-video',
+    kind: 'video',
+    operation: 'text-to-video',
+    label: 'Seedance 2.0 Mini — texto a video',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: SEEDANCE_20_MINI,
+    notes: 'la más barata · sin bitrate_mode'
+  },
+  {
+    id: 'seedance20-mini-i2v',
+    slug: 'bytedance/seedance-2.0/mini/image-to-video',
+    kind: 'video',
+    operation: 'image-to-video',
+    label: 'Seedance 2.0 Mini — imagen a video',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: SEEDANCE_20_MINI,
+    notes: 'la más barata · sin bitrate_mode · admite end_image_url (último cuadro)'
+  },
+  {
+    id: 'seedance20-mini-r2v',
+    slug: 'bytedance/seedance-2.0/mini/reference-to-video',
+    kind: 'video',
+    operation: 'reference-to-video',
+    label: 'Seedance 2.0 Mini — referencias a video',
+    inputMediaField: 'image_urls',
+    inputMedia: 'many',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: SEEDANCE_20_MINI,
+    notes: 'la más barata · sin bitrate_mode · admite audio_urls y video_urls'
+  },
+  {
+    id: 'seedance20-us-t2v',
+    slug: 'bytedance/seedance-2.0/us/text-to-video',
+    kind: 'video',
+    operation: 'text-to-video',
+    label: 'Seedance 2.0 US — texto a video',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: SEEDANCE_20_LIGHT,
+    notes: 'región US · techo 720p'
+  },
+  {
+    id: 'seedance20-us-i2v',
+    slug: 'bytedance/seedance-2.0/us/image-to-video',
+    kind: 'video',
+    operation: 'image-to-video',
+    label: 'Seedance 2.0 US — imagen a video',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: SEEDANCE_20_LIGHT,
+    notes: 'región US · techo 720p · admite end_image_url (último cuadro)'
+  },
+  {
+    id: 'seedance20-us-r2v',
+    slug: 'bytedance/seedance-2.0/us/reference-to-video',
+    kind: 'video',
+    operation: 'reference-to-video',
+    label: 'Seedance 2.0 US — referencias a video',
+    inputMediaField: 'image_urls',
+    inputMedia: 'many',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: SEEDANCE_20_LIGHT,
+    notes: 'región US · techo 720p · admite audio_urls y video_urls'
+  },
 ] as const
 
 export const findFalCapability = (id: string): FalCapability | undefined =>
