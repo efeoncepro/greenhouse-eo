@@ -59,5 +59,9 @@ N43–N47 permanecen. Mapa autorizado:
 | N57 | N58 | Papel tapiz |
 | N58 | N59 | Pintura sobrante |
 
+**Adicional de septiembre (2026-09-16):** `N61 — Colores de Temporada Berel 2027`, en
+`Produccion Creativa - Septiembre 26`, publicación 2026-09-29. Se tomó el siguiente número libre después de N60
+(Raíces de la piel, también en septiembre); no reabre el mapa de noviembre/diciembre.
+
 Octubre y meses anteriores excluidos. La renumeración no reabre la distribución aprobada.
 Evidencia y estado: [auditoría](../../../../docs/audits/seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md).

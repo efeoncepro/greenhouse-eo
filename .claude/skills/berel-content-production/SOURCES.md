@@ -6,6 +6,16 @@
 > fechada del cliente o una spec específica contradice una regla más vieja, manda la fuente más
 > reciente/específica y se registra el drift.
 
+## Colores de Temporada 2027 — 2026-09-16
+
+Decisiones expresas del operador en esta sesión: arquitectura objetivo pillar + páginas por año, ejecutada por
+fases porque el layout de pillar no existe (página propia del ciclo 2027 sin tocar la genérica); las cuatro
+paletas se presentan completas al lanzar con aprobación de Berel; slot N61 en septiembre con publicación el
+2026-09-29; research y plan sin pendientes y notas internas en desplegable aparte. Fuentes leídas: Wiki de Berel
+(`🌈 Color del año 2027` y su Canva de 11 láminas; especificación técnica de la Pillar Page v1.4), fichas 2027 del
+Content Hub, Semrush `mx`, Search Console de berel.com y HTML en vivo. No se leyó Teams por instrucción del
+operador. Evidencia: `docs/audits/seo/BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md`. Módulos 03, 07, 09, 14 y 16.
+
 ## Colaboración y cadencia mensual — 2026-09-08
 
 Decisión expresa del operador: proponer desde septiembre una dinámica con Notion como fuente central,

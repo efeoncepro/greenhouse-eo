@@ -12,6 +12,9 @@ precedencia de pedidos del cliente ni autoriza publicación.
    Hub: el inventario de Notion no agota el sitio público. V1 e híbrido son una pieza. Fecha editorial,
    entrega real, estado Notion y URL pública son hechos distintos.
 4. Minar por problema y decisión del lector en México/español, con dataforseo-operator y seo-aeo.
+   Search Console de berel.com es **MEDIDO** y manda sobre cualquier estimación: leerlo con el reader canónico
+   `readSearchConsoleAnalytics` (16 meses; la serie propia `seo_gsc_daily` existe sólo desde 2026-07-31) y
+   cruzarlo con Semrush base `mx` (ESTIMADO) para demanda y SERP. Receta y límites: [auditoría 2026-09-16](../../../../docs/audits/seo/BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md) §5.
    Gasto presupuestado por conjunto, transportes/gates canónicos y sin seguimiento recurrente automático.
 5. Etiquetar cada cluster cubierto/parcial/nuevo candidato/fuera de foco/bloqueado técnico con página
    y sección propia. Rodillo, resane, limpieza de paredes y tablaroca no son vacíos por defecto.

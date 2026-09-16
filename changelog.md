@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — Berel: Colores de Temporada 2027 sin canibalizar el ciclo 2026
+
+El nuevo ciclo nace en su propia página (`/articulos/colores-de-temporada-2027`) y la página genérica existente
+queda como el ciclo 2026 sin cambios, porque el layout de pillar todavía no existe. La separación se sostiene con
+Search Console de 16 meses: la página actual vive de marca y catálogo y no gana clics por «colores de temporada».
+En el Content Hub quedaron research (material oficial de las cuatro paletas, Semrush y Search Console), plan
+editorial y SEO, el artículo N61 en revisión con fichas N1–N4 y un desplegable aparte de notas internas; el gate de
+copy visible pasó sobre la página releída. La skill `berel-content-production` (espejo `.claude`/`.codex`) suma
+Color del Año 2027, las paletas, la regla de página de ciclo anual y la de notas internas.
+[Detalle](docs/audits/seo/BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md)
+
 ## 2026-09-16 — HubSpot y Salesforce: provider-fit por segmento
 
 La posición comercial deja de tratarlos como sustitutos universales: HubSpot-first parte como hipótesis para
@@ -941,97 +952,3 @@ Studio apuntan al ADR y preservan las prohibiciones de iframe, quinto provider, 
 por el browser. El ADR nativo anterior mantiene su historia y sólo agrega un delta fechado. Este cambio es
 documental: no implementa OIDC first-party, no cambia login, flags, datos ni runtime, y no hizo commit, push ni
 deploy.
-
-## 2026-09-07 — TASK-1832: Claude Code y Claude.ai completan OAuth y lectura real
-
-La falla de Claude Code quedó atribuida a `2.1.186`: esa versión pedía el catálogo completo descubierto.
-Anthropic corrigió el comportamiento desde `2.1.196`; el CLI local quedó en `2.1.263` con
-`oauth.scopes="efeonce.mcp.read"`. Un login nuevo completó PKCE S256, consentimiento de la organización canary,
-catálogo de dos tools read-only y `get_seo_entitlement=no_entitlement`; el write no estuvo disponible. Una
-repetición posterior al TTL rotó la familia sin widening: dos access/refresh, uno rotado y uno activo. El warning
-SEP-2352 del cliente sobre una credencial aún sin sello `issuer` se conserva como observación no bloqueante.
-
-Claude.ai agregó el custom connector remoto con un segundo DCR público exclusivo, `software_id=run_id`, callback
-hospedado exacto, secret vacío, OAuth siempre requerido y Streamable HTTP. Se eligió el cliente propio en vez del
-CIMD compartido detectado por Anthropic para preservar el contrato de borrado. El consentimiento fue base-only,
-las mismas dos tools quedaron visibles y una llamada aprobada devolvió `no_entitlement` con todos los contadores
-en cero. La repetición post-TTL rotó una vez y conservó el scope. Claude Desktop `1.46388.4` abrió el chat desde
-la app nativa, pidió aprobación propia y ejecutó la misma lectura sobre el conector remoto.
-
-El dry-run incorporó ambos DCR: 22 clientes, 21 codes/consents, 29 access/refresh, 18 sesiones, 14 magic links,
-2 passkeys, 5 challenges y 4 contexts; `unexpectedRefs=0`. La documentación y las skills MCP ahora distinguen
-versión/local/hospedado, DCR run-owned frente a CIMD compartido, serialización observable de
-schemas/annotations/security, probe vacío 401/400 y refresh real post-TTL. TASK-1832 continúa en observación y no
-se cierra antes del cleanup/readback cero. La matriz técnica cliente quedó completa; sólo siguen abiertos la
-ventana de observación y el retiro controlado.
-
-Un barrido documental posterior eliminó estados vivos que todavía presentaban Claude, el emisor o la
-federación como pendientes y dejó los detalles mutables en el manifest. Las skills espejadas ahora exigen
-monitoreo read-only, distinguen superficies Claude compartidas de clientes OAuth persistidos y prohíben
-adelantar el cleanup antes de `delete_after`. La muestra de observación de 12:09:54Z mantuvo `unexpectedRefs=0`,
-cero contaminación 360/comercial y sólo los blockers esperados de la ventana; no cambió runtime ni flags.
-
-## 2026-09-07 — TASK-1832: ChatGPT completa el OAuth hospedado y el gateway endurece el probe vacío
-
-ChatGPT ya funciona de punta a punta con el authorization server y el gateway productivos. La app hospedada
-`Efeonce` se registró por DCR, mostró la organización canary exacta y autorizó sólo `efeonce.mcp.read`. Tras
-actualizar su definición importó exactamente dos tools read-only —estado del gateway y entitlement SEO— y
-ejecutó ambas: `ready` y `no_entitlement` con presupuesto cero, sin ninguna escritura. La familia OAuth rotó dos
-veces después del TTL inicial y mantuvo siempre el scope base; el cliente terminó con dos refresh usados y uno
-activo. Esto sustituye la hipótesis de que la ausencia de `offline_access` impediría continuidad: el
-comportamiento hospedado real no lo solicitó ni lo necesitó.
-
-La primera actualización de ChatGPT reveló un borde de protocolo: su `POST /mcp` con JSON vacío fallaba en el
-parser de Fastify antes de autenticar y el handler global lo convertía en 500. El gateway `v1.1.2`, commit
-`171965c99034`, ahora autentica primero ese probe y devuelve 401 con el challenge canónico sin bearer, o 400
-`invalid_request` con bearer válido. `pnpm check` pasó 153/153, CI `34111553554` y deploy `34111643880`
-terminaron verdes; `efeonce-mcp-gateway-00046-6n2` sirve 100 % y la repetición hospedada respondió 200 sin nuevos 500. El gateway usa los paquetes MCP v2 estables `2.0.0`; no se hizo downgrade al paquete monolítico v1.
-
-El dry-run posterior agregó el DCR de ChatGPT al contrato de retiro: 20 clientes, 19 codes/consents, 25
-access/refresh tokens, 18 sesiones, 14 magic links, 2 passkeys, 5 challenges y 4 contexts;
-`unexpectedRefs=0`, sin contaminación comercial/360. Claude Code continúa fail-closed por scopes adicionales y
-de escritura en `TASK-1813`; Claude Desktop/web no está certificado. TASK-1832 sigue en observación hasta los
-siete días, cleanup/readback cero desde `2026-09-13T19:43:30Z` y apagado de ambos gates.
-
-## 2026-09-06 — TASK-1832 entra en observación productiva con retiro verificable
-
-La organización canary dedicada ya recorre el mismo emisor y gateway productivos que usaría un cliente, pero
-sigue fuera de Account/Person 360 y de toda superficie comercial. Vercel/auth-server sirven `fb5fc082aa92`; el
-gateway sirve `8438c5fa87ed`; ambos gates canary están ON. M365, Gmail personal autorizado, magic link, passkey
-Chrome/Safari, consentimiento, PKCE, refresh, revocación de familia, base-only, internal-only y revocación de
-authority en `19.272 s` tienen evidencia live. Codex 0.153.4 completó una lectura MCP real sin gasto.
-El E2E Playwright productivo pasó `1/1` en Chrome con listener loopback real: DCR+PKCE, consentimiento, JWT,
-MCP initialize/list/call, refresh, revocación y logout `401`, sin persistir storage state ni tokens.
-
-Claude Code 2.1.186 pidió scopes desconocidos y de escritura antes del consentimiento; el emisor lo rechazó y
-el defecto volvió a TASK-1813. No se amplió la allowlist. La expiración natural recibió `401 invalid_token`
-después de `899 s`, antes de rotar o revocar la familia; otra ceremonia exigió el `organization_id` exacto y
-confirmó el fixture servido. Los clientes hospedados siguen abiertos, igual que siete días de observación y el
-cleanup final. El dry-run post-Playwright enumera 19 DCR y todo el grafo auth/identity, con
-`unexpectedRefs=0`; se niega correctamente mientras authority/auth están activas. Los cuatro DCR usados por
-error con una sesión interna siguen siendo run-owned y el cleanup conserva esa identidad compartida. El wordmark
-ausente del correo se restauró como asset público compartido y quedó visible en Gmail; no se eliminará con el
-fixture. El readback dejó las sesiones humanas canary activas en cero y conserva sólo la passkey necesaria para
-la observación. Quedó activa una automatización diaria silenciosa para vigilar la ventana y ejecutar el retiro
-sólo desde `delete_after` con todas las precondiciones verdes.
-Los cinco consentimientos Playwright y las dos familias emitidas durante los intentos se revocaron por el store
-canónico; los cinco DCR quedaron en el manifest para el cleanup final.
-
-El preflight del cliente hospedado agregó un riesgo específico a TASK-1813: el emisor anuncia y entrega refresh
-tokens rotativos, pero discovery no publica `offline_access`, recomendado por OpenAI para conservar la conexión.
-No se alteró runtime ni se amplió el catálogo; la fila ChatGPT exige ceremonia hospedada y renovación post-TTL.
-
-El push de endurecimiento `b69f5297d` mostró una colisión real del entorno compartido: el workflow staging
-`34071542507` desplegó `auth-server-00042-hp5` con el gate canary OFF sobre el Cloud Run único. El intervalo
-fail-closed duró desde 01:07:25Z hasta 01:15:47Z y no concedió acceso. El dispatch production `34072064873`,
-fijado al SHA released `fb5fc082aa92`, restauró `auth-server-00043-ndg`, 100 % de tráfico, `Ready=True`, gate ON;
-`readyz` y preflight OAuth/MCP pasaron. Para evitar repetición durante la observación, se eliminaron los overrides
-staging/production y quedó una sola variable GitHub de repositorio en `true`; Vercel staging continúa OFF. El
-cleanup final debe apagar esa variable y Vercel Production antes del readback de gates.
-
-Una lectura posterior del control plane mostró que esa última afirmación documental era falsa: la variable
-Vercel del environment custom staging estaba en `true`. Se corrigió su valor exacto a `false`; el primer
-redeploy de recuperación fue `dpl_6UUXxsT7eS4EL44kkLWuDrHFqKDT` y la build final de `develop@c75a07f`,
-`dpl_D9mkjQLE1a26H4TXQ2HX7wXWMpLf`, quedó READY desde `2026-09-07T02:03:16.160Z`, tomó los aliases de staging
-y respondió 200 en `/api/auth/session`. Production permaneció `true` y no se redeployó. La evidencia cubre
-config/build; el deny flow-level de staging no se infiere.

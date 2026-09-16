@@ -252,6 +252,30 @@ piezas evergreen **no usar anclas dependientes del momento**: `paleta vigente`, 
 ni equivalentes. Nombrar el color por nombre + código, sin etiqueta estacional. Una página hija puede
 nombrar su paleta/año cuando esa temporalidad sea su intención explícita.
 
+**Ciclo anual mientras la pillar no existe (decisión del operador, 2026-09-16).** El layout de pillar de
+Colores de Temporada está especificado en la Wiki pero no construido. Un ciclo nuevo nace como **página propia
+del año** (`/articulos/colores-de-temporada-2027`) y la página genérica existente, que queda como el ciclo
+anterior, **no se reescribe**. Evidencia de Search Console que sostiene la separación: la página genérica vive de
+marca y catálogo (`berel` en posición 2), no de «colores de temporada» (posición 8,5, cero clics en 90 días), y la
+demanda del ciclo nace con el lanzamiento del Color del Año (octubre–noviembre).
+
+| URL | Atiende | No persigue |
+|---|---|---|
+| Página del año | «colores de temporada AAAA», paletas del año, mes o trimestre del año, tendencia para casa | la genérica sin año · catálogo · color del año como consulta principal |
+| Página genérica (ciclo anterior) | «colores de temporada» y el año anterior | nada del año nuevo |
+| Artículo del Color del Año | «color del año AAAA» y su nombre | detalle de las paletas |
+| Artículo de cada paleta | nombre de la paleta, combinaciones y espacios | comparar las cuatro |
+| `/colores` | catálogo y «paleta de colores Berel» | — |
+
+Reglas de la página del año: año al inicio de title, H1, slug, ALT principal y schema; ningún párrafo, tabla o
+FAQ reutilizado del ciclo anterior (una línea con enlace basta); anclas sin año apuntan a la página genérica y
+anclas con año a la nueva; el Color del Año se resume en un párrafo y vive en **una sola URL** (en 2026 `color
+pitaya` se repartió entre dos artículos); cada paleta en resumen de 500–700 palabras sin combinaciones cerradas;
+el valor propio es el **calendario y la guía para elegir entre paletas**; sin enlaces a páginas aún no publicadas
+(se registran en `🗒️ Notas internas de producción`). Infografías que funcionaron: calendario como
+`Técnica Gráfica · Técnica con íconos · estructura B. Cards en columnas` y comparación de paletas aplicadas como
+`Tipos de Color · variante 4 bloques 2 × 2` 🔁. Caso completo: [auditoría 2026-09-16](../../../../docs/audits/seo/BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md).
+
 ## Revisión por comentarios del cliente
 
 La revisión no es una reescritura libre. Inventariar hilos, separar diagnóstico de remedio, editar con
