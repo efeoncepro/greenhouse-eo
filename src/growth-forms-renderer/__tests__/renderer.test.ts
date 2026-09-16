@@ -628,7 +628,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
             type: 'select',
             label: 'País',
             placeholder: 'Selecciona tu país',
-            presentation: { control: 'country_select' },
+            presentation: { control: 'country_select', icon: 'globe' },
             options: [
               { value: 'Chile', label: 'Chile', countryCode: 'CL' },
               { value: 'Colombia', label: 'Colombia', countryCode: 'CO' }
@@ -643,6 +643,10 @@ describe('growth-forms-renderer · FormRenderer', () => {
 
     expect(trigger.getAttribute('role')).toBe('combobox')
     expect(root.querySelector('.ghf-choice-group')).toBeNull()
+    const countryLabelIcon = root.querySelector<HTMLElement>('[data-ghf-field-key="country"] .ghf-label .ghf-field-icon')
+
+    expect(countryLabelIcon).not.toBeNull()
+    expect(countryLabelIcon?.hasAttribute('data-icon')).toBe(false)
     trigger.click()
     expect(root.querySelectorAll('.ghf-select-option .ghf-country-flag')).toHaveLength(2)
     expect(root.querySelector<HTMLImageElement>('[data-value="Chile"] .ghf-country-flag')?.src).toBe(
