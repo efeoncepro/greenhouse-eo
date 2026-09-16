@@ -64,6 +64,12 @@ jobs:
 
     env:
       ENV: staging
+      # TASK-1846 — flag del render de Insights, ON en STAGING. Va acá y no sólo con
+      # `--update-env-vars` porque `deploy.sh` usa `--set-env-vars` (destructivo): una var aplicada
+      # en vivo desaparece en el próximo deploy, en silencio. El default del SoT sigue siendo
+      # `false`, así que el día que este workflow gane un camino a production, production NO lo
+      # hereda: tendrá que declararlo explícitamente en su propio gate (regla del control plane).
+      INSIGHTS_RENDER_ENABLED: 'true'
       GCP_PROJECT_ID: efeonce-group
       GCP_REGION: us-east4
       DEPLOYER_SERVICE_ACCOUNT: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
