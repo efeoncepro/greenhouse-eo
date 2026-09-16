@@ -24,6 +24,15 @@ Lee `SOURCES.md` y `references/release-ledger.md` siempre que cites edición, di
 5. En venta, separa licencia, add-ons/créditos, implementación, migración y managed operations. Cotiza sólo con evidencia vigente.
 6. Declara los supuestos, gaps de evidencia, riesgos y decisión `fit | fit condicionado | no fit`.
 
+## Actualización Dreamforce 2026
+
+La página oficial de novedades de Marketing Cloud incorpora Campaign Agent, Headless Marketing con MCP, Palmata,
+Data Guardian, Budget Optimization, Adaptive Web: Quick Setup, Personalized Paths, Account Discovery y
+Account-Based Recommendations. Sus fechas mezclan GA ahora, octubre y noviembre de 2026. AIforce es una capa de
+interfaz de Salesforce y no una edición de Next ni un reemplazo automático de Engagement. Lee
+[references/release-ledger.md](references/release-ledger.md) antes de convertir estas superficies en alcance,
+roadmap, pricing o claim comercial.
+
 ## Reglas duras
 
 - **Nunca** presentes Marketing Cloud Next como cambio de nombre o reemplazo automático de Marketing Cloud Engagement o Account Engagement.

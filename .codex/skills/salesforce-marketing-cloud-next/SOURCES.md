@@ -17,6 +17,9 @@ Fecha de revisión: **2026-09-16**. Abre la fuente primaria antes de convertir u
 | Agentforce job-ready agents | https://www.salesforce.com/ap/news/press-releases/2026/09/14/ph-salesforce-expands-agentforce-with-a-new-portfolio-of-ai-agents-built-for-high-value-work/ | Agentes de marketing/ventas y long-horizon runtime; separar GA, piloto y roadmap |
 | AWS y Salesforce | https://www.salesforce.com/news/stories/aws-salesforce-enterprise-ai-expansion/ | Bedrock, Amazon Quick, zero-copy, voz y estados de disponibilidad |
 | Google Cloud y Salesforce | https://www.salesforce.com/news/stories/salesforce-google-cloud-unify-infrastructure-and-agents/ | Gemini Enterprise, Hyperforce, MCP, Tableau y estados de disponibilidad |
+| Novedades de Marketing Cloud desde Dreamforce | https://www.salesforce.com/marketing/whats-new/ | Campaign Agent, Palmata, Headless Marketing, Data Guardian, Budget Optimization y fechas GA |
+| AIforce regional | https://www.salesforce.com/ap/news/press-releases/2026/09/16/sg-salesforce-unveils-aiforce-bringing-the-full-power-of-its-platform-to-any-interface/ | Capa de interfaz, contexto gobernado y acciones desde Claude, Slack y otras superficies |
+| Missionforce y OpenAI | https://www.salesforce.com/news/stories/missionsforce-expansion-agents-nvidia-openai-partnerships/ | Capacidades gubernamentales, modelos y condiciones de entornos regulados |
 
 ## Jerarquía
 

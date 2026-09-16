@@ -6,6 +6,13 @@ HubSpot-first parte para crecimiento B2B, mid-market y time-to-value; Salesforce
 gobierno, service a escala, extensibilidad e integración enterprise. La práctica usa `HubSpot-first`,
 `Salesforce-first`, `híbrida` o `no-fit`; no es una decisión automática ni una afirmación de segmentación exclusiva.
 
+**Dreamforce 2026 — delta 16/09 (documental):** el ledger y las skills Salesforce quedaron actualizados con AIforce
+como capa de interfaz/headless gobernada; Missionforce con OpenAI/NVIDIA para government y entornos regulados; y
+las novedades de Marketing Cloud Next (Campaign Agent, Headless Marketing/MCP, Palmata, Data Guardian, Budget
+Optimization, Adaptive Web, Personalized Paths y otras) con disponibilidad separada por capacidad. Koa pertenece
+al anuncio del 15/09 y sigue en pilotos seleccionados. No se cambió ninguna org, entitlement ni contrato. Detalle:
+[`Dreamforce 2026`](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md).
+
 **HubSpot Fall Spotlight / UNBOUND 2026 (2026-09-16, documental):** las skills espejo de HubSpot as a Service,
 Solutions Partner y HubSpot-Greenhouse bridge, junto con el catálogo de oferta, incorporan ChatGPT Ads beta,
 MCP/Claude con writes gobernados, Agent Hub/Builder/Breeze, Developer Platform 2026.09 y la deprecación de APIs/apps

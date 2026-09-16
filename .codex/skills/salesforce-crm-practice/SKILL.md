@@ -48,9 +48,10 @@ Lee [references/sell.md](references/sell.md) y usa [templates/discovery-guide.md
 ## Actualización Dreamforce 2026
 
 Para lanzamientos de septiembre de 2026, estados de disponibilidad, integraciones y límites de claim, lee
-[references/dreamforce-2026.md](references/dreamforce-2026.md). AIforce, Claudeforce, Slackforce, Koa y las
-alianzas AWS/Google/NVIDIA son superficies con estados distintos; no las trates como una sola licencia ni como
-GA universal.
+[references/dreamforce-2026.md](references/dreamforce-2026.md). AIforce, Claudeforce, Slackforce, Koa,
+Missionforce y las alianzas AWS/Google/NVIDIA/OpenAI son superficies con estados y fechas distintos; no las trates
+como una sola licencia ni como GA universal. Koa corresponde al 15/09; AIforce y Missionforce tienen publicaciones
+del 16/09, con una diferencia de fecha visible entre páginas regionales y la newsroom USA.
 
 ## Fuentes
 

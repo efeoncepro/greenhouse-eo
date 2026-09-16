@@ -4,6 +4,10 @@
 
 ## Actualización documental reciente
 
+El 2026-09-16 se actualizaron las skills espejo y el mapa Salesforce con el delta de Dreamforce: AIforce como capa
+headless/interfaz, Missionforce/OpenAI/NVIDIA y las novedades agentic de Marketing Cloud Next. El ledger separa
+anuncios del 15/09 y 16/09, con estados GA, piloto y roadmap por capacidad.
+
 El 2026-09-16 se actualizaron las skills espejo de HubSpot as a Service, Solutions Partner y
 HubSpot-Greenhouse bridge con Fall Spotlight/UNBOUND 2026. La referencia operativa es
 `docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`; mantiene separadas beta,
