@@ -70,33 +70,48 @@ const extractErrorDetail = (body: unknown): string | null => {
 
 const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
 
+export interface FalQueueHandle {
+  requestId: string
+  statusUrl: string
+  resultUrl: string
+}
+
+/**
+ * Reconstruye las URLs de cola de un request ya encolado, para retomarlo sin volver a pagar.
+ *
+ * fal direcciona la cola por la APP (`owner/app`, los dos primeros segmentos del slug), no por el slug
+ * completo: `minimax/h3/text-to-video` encola bajo `minimax/h3/requests/<id>`. Construir desde el slug
+ * entero da 405. Cuando existe, `status_url`/`response_url` del submit mandan; esto es sólo para retomar.
+ */
+export const resolveFalQueueHandle = (model: string, requestId: string): FalQueueHandle => {
+  const app = model.trim().split('/').slice(0, 2).join('/')
+
+  return {
+    requestId,
+    statusUrl: `${FAL_QUEUE_BASE_URL}/${app}/requests/${requestId}/status`,
+    resultUrl: `${FAL_QUEUE_BASE_URL}/${app}/requests/${requestId}`
+  }
+}
+
 /**
  * Submit a fal.ai model to the queue and poll to completion. Model-agnostic: `model` is the
  * fal slug (e.g. 'fal-ai/flux/schnell'), `input` is that model's input schema. Does NOT throw
  * on HTTP-not-ok — returns `ok:false` with sanitized `errorDetail` (mirrors runPerplexitySearch).
+ *
+ * `onEnqueued` avisa apenas fal acepta el trabajo: un video o un entrenamiento siguen corriendo (y
+ * cobrando) aunque el polling local se rinda, así que el llamador necesita el `requestId` ANTES de
+ * esperar para poder retomarlo con `awaitFalRequest`.
  */
 export const runFalModel = async <TOutput = unknown>(params: {
   model: string
   input: Record<string, unknown>
   pollTimeoutMs?: number
   pollIntervalMs?: number
+  onEnqueued?: (handle: FalQueueHandle) => void
 }): Promise<FalModelResult<TOutput>> => {
   const apiKey = await resolveFalApiKey()
   const model = params.model.trim()
-  const pollTimeoutMs = params.pollTimeoutMs ?? FAL_DEFAULT_POLL_TIMEOUT_MS
-  const pollIntervalMs = params.pollIntervalMs ?? FAL_DEFAULT_POLL_INTERVAL_MS
   const started = Date.now()
-
-  const fail = (httpStatus: number, requestId: string | null, errorDetail: string | null): FalModelResult<TOutput> => ({
-    ok: false,
-    httpStatus,
-    model,
-    requestId,
-    output: null,
-    errorDetail,
-    latencyMs: Date.now() - started,
-    secretSource: apiKey.source
-  })
 
   // 1. Enqueue the job.
   const submitResponse = await fetch(`${FAL_QUEUE_BASE_URL}/${model}`, {
@@ -108,66 +123,140 @@ export const runFalModel = async <TOutput = unknown>(params: {
   const submitBody = (await submitResponse.json().catch(() => null)) as Record<string, unknown> | null
 
   if (!submitResponse.ok) {
-    return fail(submitResponse.status, null, extractErrorDetail(submitBody))
+    return failure<TOutput>(model, submitResponse.status, null, extractErrorDetail(submitBody), started, apiKey.source)
   }
 
   const requestId = typeof submitBody?.request_id === 'string' ? submitBody.request_id : null
 
   if (!requestId) {
-    return fail(submitResponse.status, null, 'fal.ai no devolvió request_id al encolar el trabajo.')
+    return failure<TOutput>(
+      model,
+      submitResponse.status,
+      null,
+      'fal.ai no devolvió request_id al encolar el trabajo.',
+      started,
+      apiKey.source
+    )
   }
 
   // fal returns the canonical polling URLs in the submit response. For models with a sub-path
   // (e.g. `fal-ai/flux/schnell`) these resolve to the PARENT app (`fal-ai/flux/requests/...`),
-  // so reconstructing from `model` yields a 405. Always prefer fal's URLs; reconstruct only as
-  // a last-resort fallback for the flat-slug case.
-  const statusUrl =
-    typeof submitBody?.status_url === 'string'
-      ? submitBody.status_url
-      : `${FAL_QUEUE_BASE_URL}/${model}/requests/${requestId}/status`
+  // so reconstructing from the full slug yields a 405. Always prefer fal's URLs.
+  const fallback = resolveFalQueueHandle(model, requestId)
 
-  const resultUrl =
-    typeof submitBody?.response_url === 'string'
-      ? submitBody.response_url
-      : `${FAL_QUEUE_BASE_URL}/${model}/requests/${requestId}`
+  const handle: FalQueueHandle = {
+    requestId,
+    statusUrl: typeof submitBody?.status_url === 'string' ? submitBody.status_url : fallback.statusUrl,
+    resultUrl: typeof submitBody?.response_url === 'string' ? submitBody.response_url : fallback.resultUrl
+  }
+
+  params.onEnqueued?.(handle)
+
+  return pollFalRequest<TOutput>({
+    model,
+    handle,
+    apiKey,
+    started,
+    pollTimeoutMs: params.pollTimeoutMs ?? FAL_DEFAULT_POLL_TIMEOUT_MS,
+    pollIntervalMs: params.pollIntervalMs ?? FAL_DEFAULT_POLL_INTERVAL_MS
+  })
+}
+
+/**
+ * Retoma un request ya encolado (por ejemplo, tras un timeout local) sin volver a enviarlo ni pagarlo.
+ */
+export const awaitFalRequest = async <TOutput = unknown>(params: {
+  model: string
+  requestId: string
+  pollTimeoutMs?: number
+  pollIntervalMs?: number
+}): Promise<FalModelResult<TOutput>> => {
+  const apiKey = await resolveFalApiKey()
+  const model = params.model.trim()
+
+  return pollFalRequest<TOutput>({
+    model,
+    handle: resolveFalQueueHandle(model, params.requestId.trim()),
+    apiKey,
+    started: Date.now(),
+    pollTimeoutMs: params.pollTimeoutMs ?? FAL_DEFAULT_POLL_TIMEOUT_MS,
+    pollIntervalMs: params.pollIntervalMs ?? FAL_DEFAULT_POLL_INTERVAL_MS
+  })
+}
+
+const failure = <TOutput>(
+  model: string,
+  httpStatus: number,
+  requestId: string | null,
+  errorDetail: string | null,
+  started: number,
+  secretSource: SecretResolutionSource
+): FalModelResult<TOutput> => ({
+  ok: false,
+  httpStatus,
+  model,
+  requestId,
+  output: null,
+  errorDetail,
+  latencyMs: Date.now() - started,
+  secretSource
+})
+
+const pollFalRequest = async <TOutput>(params: {
+  model: string
+  handle: FalQueueHandle
+  apiKey: { value: string; source: SecretResolutionSource }
+  started: number
+  pollTimeoutMs: number
+  pollIntervalMs: number
+}): Promise<FalModelResult<TOutput>> => {
+  const { model, handle, apiKey, started } = params
+
+  const fail = (httpStatus: number, errorDetail: string | null) =>
+    failure<TOutput>(model, httpStatus, handle.requestId, errorDetail, started, apiKey.source)
 
   // 2. Poll status until COMPLETED / failure / timeout.
-  while (Date.now() - started < pollTimeoutMs) {
-    await sleep(pollIntervalMs)
+  let completed = false
 
-    const statusResponse = await fetch(statusUrl, { headers: authHeaders(apiKey.value) })
+  while (Date.now() - started < params.pollTimeoutMs) {
+    const statusResponse = await fetch(handle.statusUrl, { headers: authHeaders(apiKey.value) })
     const statusBody = (await statusResponse.json().catch(() => null)) as Record<string, unknown> | null
 
     if (!statusResponse.ok) {
-      return fail(statusResponse.status, requestId, extractErrorDetail(statusBody))
+      return fail(statusResponse.status, extractErrorDetail(statusBody))
     }
 
     const status = typeof statusBody?.status === 'string' ? statusBody.status : ''
 
-    if (status === 'COMPLETED') break
+    if (status === 'COMPLETED') {
+      completed = true
+      break
+    }
 
     if (status !== 'IN_QUEUE' && status !== 'IN_PROGRESS') {
-      return fail(statusResponse.status, requestId, `Estado inesperado de fal.ai: ${status || 'desconocido'}.`)
+      return fail(statusResponse.status, `Estado inesperado de fal.ai: ${status || 'desconocido'}.`)
     }
+
+    await sleep(params.pollIntervalMs)
   }
 
-  if (Date.now() - started >= pollTimeoutMs) {
-    return fail(408, requestId, `fal.ai no completó el trabajo dentro de ${pollTimeoutMs} ms.`)
+  if (!completed) {
+    return fail(408, `fal.ai no completó el trabajo dentro de ${params.pollTimeoutMs} ms.`)
   }
 
   // 3. Fetch the final result.
-  const resultResponse = await fetch(resultUrl, { headers: authHeaders(apiKey.value) })
+  const resultResponse = await fetch(handle.resultUrl, { headers: authHeaders(apiKey.value) })
   const resultBody = (await resultResponse.json().catch(() => null)) as TOutput | null
 
   if (!resultResponse.ok) {
-    return fail(resultResponse.status, requestId, extractErrorDetail(resultBody))
+    return fail(resultResponse.status, extractErrorDetail(resultBody))
   }
 
   return {
     ok: true,
     httpStatus: resultResponse.status,
     model,
-    requestId,
+    requestId: handle.requestId,
     output: resultBody,
     errorDetail: null,
     latencyMs: Date.now() - started,

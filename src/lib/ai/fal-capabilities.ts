@@ -17,7 +17,7 @@
  *    (el camino de imagen del producto sigue siendo `src/lib/ai/image-generator.ts`).
  */
 
-export type FalMediaKind = 'image' | 'video'
+export type FalMediaKind = 'image' | 'video' | 'training'
 
 export type FalOperation =
   | 'text-to-image'
@@ -26,53 +26,163 @@ export type FalOperation =
   | 'text-to-video'
   | 'image-to-video'
   | 'reference-to-video'
+  | 'camera-control'
+  | 'realtime-stream'
+  | 'lora-training'
+
+/** Un campo de referencias multimedia y cuántas entradas acepta (`null` = el OpenAPI no declara tope). */
+export interface FalReferenceSlot {
+  field: string
+  max: number | null
+}
 
 /**
  * Contrato de video declarado POR ENDPOINT, no por familia: las variantes difieren de verdad.
+ *
  * Seedance 2.5 llega a 30 s pero topa en 1080p; Seedance 2.0 base sólo hace 15 s pero sí ofrece 4K;
- * `fast`, `mini` y `us` topan en 720p, y `mini` ni siquiera acepta `bitrate_mode`. Verificado contra
- * el OpenAPI de cada endpoint el 2026-09-16. El CLI valida contra esto ANTES de gastar: pedir 4K a
- * 2.5 o 30 s a 2.0 falla en local en vez de quemar una corrida.
+ * `fast`, `mini` y `us` topan en 720p, y `mini` ni siquiera acepta `bitrate_mode`. Minimax H3 cambia
+ * hasta la FORMA de los campos: la duración es un entero de 5 a 15 (Seedance la recibe como texto y
+ * admite `auto`), la resolución va en mayúsculas (`768P`, `2K`), image-to-video no acepta aspect ratio y
+ * las referencias viajan por `reference_*_urls` con topes propios. Verificado contra el OpenAPI de cada
+ * endpoint el 2026-09-16. El CLI valida contra esto ANTES de gastar: un pedido que el proveedor rechaza
+ * después de encolar falla en local.
  */
 export interface FalVideoContract {
-  maxDurationSeconds: number
+  duration: {
+    /** `string` = Seedance (`"5"`, `"auto"`); `integer` = Minimax H3 (`5`). */
+    encoding: 'string' | 'integer'
+    min: number
+    max: number
+    acceptsAuto: boolean
+  }
+  /** Valores canónicos del endpoint. El CLI compara sin distinguir mayúsculas y envía el canónico. */
   resolutions: readonly string[]
+  /** Vacío = el endpoint no acepta `aspect_ratio` (el encuadre sale de la imagen de entrada). */
   aspectRatios: readonly string[]
   supportsAudioToggle: boolean
   supportsBitrateMode: boolean
+  /** `task` (reference | editing | extension) sólo existe en Seedance 2.5 reference-to-video. */
+  acceptsTask: boolean
+  acceptsEndImage: boolean
+  /** Sólo reference-to-video: por qué campo viaja cada tipo de referencia y con qué tope. */
+  references?: {
+    images?: FalReferenceSlot
+    videos?: FalReferenceSlot
+    audios?: FalReferenceSlot
+  }
+  /** Minimax H3: reescritura del prompt por el proveedor. `required` = el endpoint exige el campo. */
+  promptExpansion?: {
+    modes: readonly string[]
+    required: boolean
+    defaultMode: string
+  }
+  /** Endpoints `/lora`: exigen `loras` (`{ path, scale }`), con tope de entradas. */
+  loras?: { max: number; scaleMin: number; scaleMax: number }
+  /** Camera controls: trayectoria por keyframes `{ distance, elevation, azimuth, time }`. */
+  cameraTrajectory?: { maxKeyframes: number }
+}
+
+/** Entrenadores de LoRA: el dataset viaja como URL a un zip y los hiperparámetros tienen rangos reales. */
+export interface FalTrainingContract {
+  dataField: 'training_data_url'
+  steps: { min: number; max: number; defaultValue: number }
+  ranks: readonly number[]
+  learningRate: { min: number; max: number }
+  /** Probabilidades de condicionamiento propias de cada entrenador (informativo; se pasan por `--input`). */
+  conditioningFields: readonly string[]
 }
 
 const SEEDANCE_ASPECT_RATIOS: readonly string[] = ['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16']
+const SEEDANCE_REFERENCES = { audios: { field: 'audio_urls', max: null }, videos: { field: 'video_urls', max: null } }
+
+const seedanceDuration = (max: number): FalVideoContract['duration'] => ({
+  encoding: 'string',
+  min: 1,
+  max,
+  acceptsAuto: true
+})
 
 /** Seedance 2.5: duración larga (hasta 30 s), sin 4K. */
 const SEEDANCE_25: FalVideoContract = {
-  maxDurationSeconds: 30,
+  duration: seedanceDuration(30),
   resolutions: ['480p', '720p', '1080p'],
   aspectRatios: SEEDANCE_ASPECT_RATIOS,
   supportsAudioToggle: true,
-  supportsBitrateMode: true
+  supportsBitrateMode: true,
+  acceptsTask: false,
+  acceptsEndImage: false
 }
 
 /** Seedance 2.0 base: hasta 15 s, y la única familia con 4K. */
 const SEEDANCE_20_BASE: FalVideoContract = {
-  maxDurationSeconds: 15,
-  resolutions: ['480p', '720p', '1080p', '4k'],
-  aspectRatios: SEEDANCE_ASPECT_RATIOS,
-  supportsAudioToggle: true,
-  supportsBitrateMode: true
+  ...SEEDANCE_25,
+  duration: seedanceDuration(15),
+  resolutions: ['480p', '720p', '1080p', '4k']
 }
 
 /** Variantes fast / us de 2.0: mismas duraciones, techo 720p. */
-const SEEDANCE_20_LIGHT: FalVideoContract = {
-  maxDurationSeconds: 15,
-  resolutions: ['480p', '720p'],
-  aspectRatios: SEEDANCE_ASPECT_RATIOS,
-  supportsAudioToggle: true,
-  supportsBitrateMode: true
-}
+const SEEDANCE_20_LIGHT: FalVideoContract = { ...SEEDANCE_20_BASE, resolutions: ['480p', '720p'] }
 
 /** Mini: como las anteriores pero sin `bitrate_mode`. */
 const SEEDANCE_20_MINI: FalVideoContract = { ...SEEDANCE_20_LIGHT, supportsBitrateMode: false }
+
+/** Variante image-to-video de un contrato Seedance: admite último cuadro. */
+const seedanceI2V = (contract: FalVideoContract): FalVideoContract => ({ ...contract, acceptsEndImage: true })
+
+/** Variante reference-to-video de un contrato Seedance: audio y video de referencia. */
+const seedanceR2V = (contract: FalVideoContract, acceptsTask = false): FalVideoContract => ({
+  ...contract,
+  acceptsTask,
+  references: { images: { field: 'image_urls', max: null }, ...SEEDANCE_REFERENCES }
+})
+
+const H3_ASPECT_RATIOS: readonly string[] = ['21:9', '16:9', '4:3', '1:1', '3:4', '9:16']
+const H3_R2V_ASPECT_RATIOS: readonly string[] = ['adaptive', ...H3_ASPECT_RATIOS]
+const H3_DURATION: FalVideoContract['duration'] = { encoding: 'integer', min: 5, max: 15, acceptsAuto: false }
+
+const H3_REFERENCES: NonNullable<FalVideoContract['references']> = {
+  images: { field: 'reference_image_urls', max: 9 },
+  videos: { field: 'reference_video_urls', max: 3 },
+  audios: { field: 'reference_audio_urls', max: 3 }
+}
+
+/** Minimax H3 base: la única variante H3 con 2K y 4K; expansión de prompt opcional con modo `fast`. */
+const H3_BASE: FalVideoContract = {
+  duration: H3_DURATION,
+  resolutions: ['480P', '768P', '2K', '4K'],
+  aspectRatios: H3_ASPECT_RATIOS,
+  supportsAudioToggle: false,
+  supportsBitrateMode: false,
+  acceptsTask: false,
+  acceptsEndImage: false,
+  promptExpansion: { modes: ['disabled', 'fast', 'balanced', 'quality'], required: false, defaultMode: 'balanced' }
+}
+
+/** Minimax H3 Max y Max Turbo: techo 1080p y `prompt_expansion_mode` OBLIGATORIO (sin `fast`). */
+const H3_MAX: FalVideoContract = {
+  ...H3_BASE,
+  resolutions: ['480P', '768P', '1080P'],
+  promptExpansion: { modes: ['disabled', 'balanced', 'quality'], required: true, defaultMode: 'balanced' }
+}
+
+const H3_LORAS: NonNullable<FalVideoContract['loras']> = { max: 3, scaleMin: 0, scaleMax: 4 }
+
+/** image-to-video de H3: sin aspect ratio (manda la imagen) y con último cuadro opcional. */
+const h3I2V = (contract: FalVideoContract): FalVideoContract => ({ ...contract, aspectRatios: [], acceptsEndImage: true })
+
+const h3R2V = (contract: FalVideoContract): FalVideoContract => ({
+  ...contract,
+  aspectRatios: H3_R2V_ASPECT_RATIOS,
+  references: H3_REFERENCES
+})
+
+const H3_TRAINING = (conditioningFields: readonly string[]): FalTrainingContract => ({
+  dataField: 'training_data_url',
+  steps: { min: 1, max: 15_000, defaultValue: 2000 },
+  ranks: [8, 16, 32, 64, 128],
+  learningRate: { min: 0.000001, max: 1 },
+  conditioningFields
+})
 
 export interface FalCapability {
   /** Identificador corto que el operador escribe en el CLI. */
@@ -82,17 +192,24 @@ export interface FalCapability {
   kind: FalMediaKind
   operation: FalOperation
   label: string
-  /** Campo por el que viajan las entradas visuales; null si el endpoint no recibe ninguna. */
-  inputMediaField: 'image_url' | 'image_urls' | null
+  /** Campo por el que viajan las entradas visuales principales; null si el endpoint no recibe ninguna. */
+  inputMediaField: 'image_url' | 'image_urls' | 'reference_image_urls' | null
   /** Cuántas entradas visuales acepta: una sola, varias, o ninguna. */
   inputMedia: 'none' | 'one' | 'many'
   requiresPrompt: boolean
   /** Clave del output que trae los assets generados. */
-  outputKey: 'images' | 'layers' | 'video'
+  outputKey: 'images' | 'layers' | 'video' | 'lora_file'
   /** Fecha en que se ejercitó contra el API real. `null` = declarada, sin verificar. */
   verifiedAt: string | null
   /** Sólo para `kind: 'video'`: límites reales del endpoint, que el CLI valida antes de gastar. */
   video?: FalVideoContract
+  /** Sólo para `kind: 'training'`. */
+  training?: FalTrainingContract
+  /**
+   * Presente cuando el endpoint existe en el catálogo de fal pero NO se puede operar por la cola. El CLI
+   * lo lista para que nadie lo "descubra" de nuevo, y se niega a ejecutarlo explicando por qué.
+   */
+  unsupportedReason?: string
   notes?: string
 }
 
@@ -165,7 +282,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     verifiedAt: '2026-09-16'
   },
 
-  // ── Seedance — video · DECLARADO, SIN VERIFICAR hasta ejercitar cada endpoint ──────────────────
+  // ── Seedance — video ──────────────────────────────────────────────────────────────────────────
   {
     id: 'seedance25-t2v',
     slug: 'bytedance/seedance-2.5/text-to-video',
@@ -191,7 +308,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'video',
     verifiedAt: '2026-09-16',
-    video: SEEDANCE_25,
+    video: seedanceI2V(SEEDANCE_25),
     notes: 'hasta 30 s · techo 1080p · admite end_image_url (último cuadro)'
   },
   {
@@ -205,7 +322,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'video',
     verifiedAt: null,
-    video: SEEDANCE_25,
+    video: seedanceR2V(SEEDANCE_25, true),
     notes: 'hasta 30 s · techo 1080p · admite audio_urls y video_urls · task reference|editing|extension'
   },
   {
@@ -233,7 +350,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'video',
     verifiedAt: null,
-    video: SEEDANCE_20_BASE,
+    video: seedanceI2V(SEEDANCE_20_BASE),
     notes: 'hasta 15 s · única familia con 4K · admite end_image_url (último cuadro)'
   },
   {
@@ -247,7 +364,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'video',
     verifiedAt: null,
-    video: SEEDANCE_20_BASE,
+    video: seedanceR2V(SEEDANCE_20_BASE),
     notes: 'hasta 15 s · única familia con 4K · admite audio_urls y video_urls'
   },
   {
@@ -275,7 +392,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'video',
     verifiedAt: null,
-    video: SEEDANCE_20_LIGHT,
+    video: seedanceI2V(SEEDANCE_20_LIGHT),
     notes: 'variante rápida · techo 720p · admite end_image_url (último cuadro)'
   },
   {
@@ -289,7 +406,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'video',
     verifiedAt: null,
-    video: SEEDANCE_20_LIGHT,
+    video: seedanceR2V(SEEDANCE_20_LIGHT),
     notes: 'variante rápida · techo 720p · admite audio_urls y video_urls'
   },
   {
@@ -317,7 +434,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'video',
     verifiedAt: null,
-    video: SEEDANCE_20_MINI,
+    video: seedanceI2V(SEEDANCE_20_MINI),
     notes: 'la más barata · sin bitrate_mode · admite end_image_url (último cuadro)'
   },
   {
@@ -331,7 +448,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'video',
     verifiedAt: null,
-    video: SEEDANCE_20_MINI,
+    video: seedanceR2V(SEEDANCE_20_MINI),
     notes: 'la más barata · sin bitrate_mode · admite audio_urls y video_urls'
   },
   {
@@ -359,7 +476,7 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'video',
     verifiedAt: null,
-    video: SEEDANCE_20_LIGHT,
+    video: seedanceI2V(SEEDANCE_20_LIGHT),
     notes: 'región US · techo 720p · admite end_image_url (último cuadro)'
   },
   {
@@ -373,8 +490,251 @@ export const FAL_CAPABILITIES: readonly FalCapability[] = [
     requiresPrompt: true,
     outputKey: 'video',
     verifiedAt: null,
-    video: SEEDANCE_20_LIGHT,
+    video: seedanceR2V(SEEDANCE_20_LIGHT),
     notes: 'región US · techo 720p · admite audio_urls y video_urls'
+  },
+
+  // ── Minimax H3 — video (base: hasta 4K · Max y Max Turbo: techo 1080p) ──────────────────────────
+  {
+    id: 'h3-t2v',
+    slug: 'minimax/h3/text-to-video',
+    kind: 'video',
+    operation: 'text-to-video',
+    label: 'Minimax H3 — texto a video',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: H3_BASE,
+    notes: '5–15 s · 480P/768P/2K/4K · expansión de prompt opcional (incluye fast)'
+  },
+  {
+    id: 'h3-i2v',
+    slug: 'minimax/h3/image-to-video',
+    kind: 'video',
+    operation: 'image-to-video',
+    label: 'Minimax H3 — imagen a video',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: h3I2V(H3_BASE),
+    notes: '5–15 s · hasta 4K · sin aspect ratio · admite end_image_url'
+  },
+  {
+    id: 'h3-r2v',
+    slug: 'minimax/h3/reference-to-video',
+    kind: 'video',
+    operation: 'reference-to-video',
+    label: 'Minimax H3 — referencias a video',
+    inputMediaField: 'reference_image_urls',
+    inputMedia: 'many',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: h3R2V(H3_BASE),
+    notes: '5–15 s · hasta 4K · hasta 9 imágenes, 3 videos y 3 audios de referencia'
+  },
+  {
+    id: 'h3-t2v-lora',
+    slug: 'minimax/h3/text-to-video/lora',
+    kind: 'video',
+    operation: 'text-to-video',
+    label: 'Minimax H3 — texto a video con LoRA',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: { ...H3_BASE, loras: H3_LORAS },
+    notes: 'exige --lora (hasta 3) · 5–15 s · hasta 4K'
+  },
+  {
+    id: 'h3-i2v-lora',
+    slug: 'minimax/h3/image-to-video/lora',
+    kind: 'video',
+    operation: 'image-to-video',
+    label: 'Minimax H3 — imagen a video con LoRA',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: { ...h3I2V(H3_BASE), loras: H3_LORAS },
+    notes: 'exige --lora (hasta 3) · sin aspect ratio · admite end_image_url'
+  },
+  {
+    id: 'h3-r2v-lora',
+    slug: 'minimax/h3/reference-to-video/lora',
+    kind: 'video',
+    operation: 'reference-to-video',
+    label: 'Minimax H3 — referencias a video con LoRA',
+    inputMediaField: 'reference_image_urls',
+    inputMedia: 'many',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    video: { ...h3R2V(H3_BASE), loras: H3_LORAS },
+    notes: 'exige --lora (hasta 3) · hasta 9 imágenes, 3 videos y 3 audios'
+  },
+  {
+    id: 'h3max-t2v',
+    slug: 'minimax/h3-max/text-to-video',
+    kind: 'video',
+    operation: 'text-to-video',
+    label: 'Minimax H3 Max — texto a video',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: H3_MAX,
+    notes: '5–15 s · techo 1080P · prompt_expansion_mode obligatorio (el CLI envía balanced)'
+  },
+  {
+    id: 'h3max-i2v',
+    slug: 'minimax/h3-max/image-to-video',
+    kind: 'video',
+    operation: 'image-to-video',
+    label: 'Minimax H3 Max — imagen a video',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: h3I2V(H3_MAX),
+    notes: '5–15 s · techo 1080P · sin aspect ratio · admite end_image_url'
+  },
+  {
+    id: 'h3max-r2v',
+    slug: 'minimax/h3-max/reference-to-video',
+    kind: 'video',
+    operation: 'reference-to-video',
+    label: 'Minimax H3 Max — referencias a video',
+    inputMediaField: 'reference_image_urls',
+    inputMedia: 'many',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: h3R2V(H3_MAX),
+    notes: '5–15 s · techo 1080P · hasta 9 imágenes, 3 videos y 3 audios'
+  },
+  {
+    id: 'h3max-camera',
+    slug: 'minimax/h3-max/camera-controls',
+    kind: 'video',
+    operation: 'camera-control',
+    label: 'Minimax H3 Max — control de cámara',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: false,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: { ...h3I2V(H3_MAX), acceptsEndImage: false, cameraTrajectory: { maxKeyframes: 12 } },
+    notes: 'escena congelada, sólo se mueve la cámara · --camera-trajectory hasta 12 keyframes · prompt opcional'
+  },
+  {
+    id: 'h3turbo-t2v',
+    slug: 'minimax/h3-max-turbo/text-to-video',
+    kind: 'video',
+    operation: 'text-to-video',
+    label: 'Minimax H3 Max Turbo — texto a video',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: H3_MAX,
+    notes: 'la más barata de H3 · 5–15 s · techo 1080P'
+  },
+  {
+    id: 'h3turbo-i2v',
+    slug: 'minimax/h3-max-turbo/image-to-video',
+    kind: 'video',
+    operation: 'image-to-video',
+    label: 'Minimax H3 Max Turbo — imagen a video',
+    inputMediaField: 'image_url',
+    inputMedia: 'one',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: '2026-09-16',
+    video: h3I2V(H3_MAX),
+    notes: 'la más barata de H3 · techo 1080P · admite end_image_url'
+  },
+  {
+    id: 'h3max-director',
+    slug: 'minimax/h3-max/director',
+    kind: 'video',
+    operation: 'realtime-stream',
+    label: 'Minimax H3 Max Director — video en tiempo real',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: true,
+    outputKey: 'video',
+    verifiedAt: null,
+    unsupportedReason:
+      'Stream continuo con prompts en vivo, no un trabajo de cola: fal lo lista activo, pero su OpenAPI de cola ' +
+      'da 404 y POST a la app responde "Application h3-max not found" (medido 2026-09-16). Necesita un cliente realtime.'
+  },
+
+  // ── Minimax H3 — entrenamiento de LoRA (se cobra por step) ──────────────────────────────────────
+  {
+    id: 'h3-train-t2v',
+    slug: 'minimax/h3/t2v/trainer',
+    kind: 'training',
+    operation: 'lora-training',
+    label: 'Minimax H3 — entrenar LoRA texto a video',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: false,
+    outputKey: 'lora_file',
+    verifiedAt: null,
+    training: H3_TRAINING([]),
+    notes: 'dataset zip por --training-data · 1–15000 steps · rank 8–128'
+  },
+  {
+    id: 'h3-train-i2v',
+    slug: 'minimax/h3/i2v/trainer',
+    kind: 'training',
+    operation: 'lora-training',
+    label: 'Minimax H3 — entrenar LoRA imagen a video',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: false,
+    outputKey: 'lora_file',
+    verifiedAt: null,
+    training: H3_TRAINING(['first_frame_conditioning_p']),
+    notes: 'condicionamiento por primer cuadro (default 0.5)'
+  },
+  {
+    id: 'h3-train-flf2v',
+    slug: 'minimax/h3/flf2v/trainer',
+    kind: 'training',
+    operation: 'lora-training',
+    label: 'Minimax H3 — entrenar LoRA primer y último cuadro',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: false,
+    outputKey: 'lora_file',
+    verifiedAt: null,
+    training: H3_TRAINING(['first_frame_conditioning_p', 'last_frame_conditioning_p', 'first_last_frame_conditioning_p']),
+    notes: 'condicionamiento primer 0.2 · último 0.2 · ambos 0.4'
+  },
+  {
+    id: 'h3-train-ref2va',
+    slug: 'minimax/h3/ref2va/trainer',
+    kind: 'training',
+    operation: 'lora-training',
+    label: 'Minimax H3 — entrenar LoRA referencias a video y audio',
+    inputMediaField: null,
+    inputMedia: 'none',
+    requiresPrompt: false,
+    outputKey: 'lora_file',
+    verifiedAt: null,
+    training: H3_TRAINING(['reference_conditioning_p', 'resume_from_lora_url']),
+    notes: 'condicionamiento por referencia 0.9 · puede retomar desde una LoRA'
   },
 ] as const
 

@@ -5,8 +5,8 @@ import { basename, dirname, extname, isAbsolute, join } from 'node:path'
 
 import { config as loadEnv } from 'dotenv'
 
-import { runFalModel, uploadFalFile } from '@/lib/ai/fal'
-import { FAL_CAPABILITIES, findFalCapability, type FalCapability } from '@/lib/ai/fal-capabilities'
+import { awaitFalRequest, resolveFalQueueHandle, runFalModel, uploadFalFile } from '@/lib/ai/fal'
+import { FAL_CAPABILITIES, findFalCapability, type FalCapability, type FalReferenceSlot } from '@/lib/ai/fal-capabilities'
 
 /**
  * CLI de fal.ai para Greenhouse — `pnpm ai:fal`.
@@ -16,28 +16,32 @@ import { FAL_CAPABILITIES, findFalCapability, type FalCapability } from '@/lib/a
  * ensuciaría el que ya funciona.
  *
  * Es model-agnostic por diseño: `--capability` resuelve un slug conocido del registro, y `--model`
- * acepta CUALQUIER slug de fal — incluidos los que el registro todavía no lista. Por eso agregar video
- * no exige tocar este archivo: basta declarar la capacidad, o pasar su slug a mano.
+ * acepta CUALQUIER slug de fal — incluidos los que el registro todavía no lista.
  *
  * Uso:
  *   pnpm ai:fal --list
  *   pnpm ai:fal --capability seedream5-pro --prompt "<texto>" --out out.png
- *   pnpm ai:fal --capability seedream5-pro-edit --image base.png --prompt "<delta>" --out out.png
  *   pnpm ai:fal --capability seedream5-pro-layerize --image poster.png --out-dir ./capas
- *   pnpm ai:fal --model <cualquier/slug/fal> --prompt "<texto>" --input '{"campo":"valor"}'
+ *   pnpm ai:fal --capability h3turbo-t2v --prompt "<texto>" --duration 5 --resolution 768P --out clip.mp4
+ *   pnpm ai:fal --capability h3max-camera --image escena.png --camera-trajectory '[{"distance":1,"elevation":10,"azimuth":0,"time":0},{"distance":1,"elevation":10,"azimuth":60,"time":1}]'
+ *   pnpm ai:fal --capability h3-train-t2v --training-data dataset.zip --steps 1500 --trigger "estilo efeonce"
+ *   pnpm ai:fal --capability h3-t2v --request-id <id> --out clip.mp4     (retoma sin volver a pagar)
  *
- * Flags:
- *   --capability <id>   Capacidad del registro (ver --list)
- *   --model <slug>      Slug de fal directo (model-agnostic; ignora el registro)
+ * Flags generales:
+ *   --capability <id> | --model <slug>
  *   --prompt <texto> | --prompt-file <path>
- *   --image <path|url>  Entrada visual; repetible. Los archivos locales se suben al storage de fal
- *   --size <valor>      image_size: enum (auto_2K, landscape_16_9, …) o WxH
- *   --count <n>         num_images
- *   --format jpeg|png
- *   --input <json>      JSON extra que se fusiona con el input (escape hatch para campos no cubiertos)
- *   --out <path>        Salida única · --out-dir <dir> para varias
- *   --timeout <ms>      Presupuesto de polling (default 180000; el video necesita más)
- *   --json              Imprime el output crudo del modelo
+ *   --image <path|url>   Entrada visual (o imagen de referencia en reference-to-video); repetible
+ *   --input <json>       JSON extra que se fusiona con el input (escape hatch para campos no cubiertos)
+ *   --out <path> | --out-dir <dir>
+ *   --timeout <ms>       Presupuesto de polling (imagen 3 min · video 15 min · entrenamiento 3 h)
+ *   --request-id <id>    Retoma un trabajo ya encolado en vez de enviar uno nuevo
+ *   --json               Imprime el output crudo del modelo
+ *
+ * Imagen:  --size <enum|WxH> · --count <n> · --format jpeg|png
+ * Video:   --duration · --resolution · --aspect · --bitrate · --task · --no-audio · --end-image
+ *          --video <path|url> y --audio <path|url> (referencias, repetibles) · --prompt-expansion <modo>
+ *          --lora <path[@scale]> (repetible) · --camera-trajectory <json>
+ * LoRA:    --training-data <zip|url> · --steps <n> · --rank <n> · --learning-rate <n> · --trigger <frase>
  */
 
 loadEnv({ path: join(process.cwd(), '.env.local') })
@@ -46,9 +50,15 @@ const DEFAULT_OUT_DIR = join(process.cwd(), 'public', 'images', 'generated')
 const DEFAULT_TIMEOUT_MS = 180_000
 /** El video tarda bastante más que una imagen; el default sube solo para capacidades de video. */
 const VIDEO_TIMEOUT_MS = 900_000
+/** Un entrenamiento de miles de steps corre por horas. */
+const TRAINING_TIMEOUT_MS = 10_800_000
 
 interface CliArgs {
   capability?: string
+  model?: string
+  prompt?: string
+  promptFile?: string
+  images: string[]
   duration?: string
   resolution?: string
   aspect?: string
@@ -58,33 +68,29 @@ interface CliArgs {
   endImage?: string
   audios: string[]
   videos: string[]
-  model?: string
-  prompt?: string
-  promptFile?: string
-  images: string[]
+  promptExpansion?: string
+  loras: string[]
+  cameraTrajectory?: string
+  trainingData?: string
+  steps?: string
+  rank?: string
+  learningRate?: string
+  trigger?: string
+  requestId?: string
   size?: string
   count?: number
   format?: string
   extraInput?: string
   out?: string
   outDir?: string
-  timeoutMs: number
+  timeoutMs?: number
   json: boolean
   list: boolean
   help: boolean
 }
 
 const parseArgs = (argv: string[]): CliArgs => {
-  const args: CliArgs = {
-    images: [],
-    audios: [],
-    videos: [],
-    noAudio: false,
-    timeoutMs: DEFAULT_TIMEOUT_MS,
-    json: false,
-    list: false,
-    help: false
-  }
+  const args: CliArgs = { images: [], audios: [], videos: [], loras: [], noAudio: false, json: false, list: false, help: false }
 
   let i = 0
 
@@ -112,6 +118,15 @@ const parseArgs = (argv: string[]): CliArgs => {
       case '--end-image': args.endImage = next(); break
       case '--audio': args.audios.push(next()); break
       case '--video': args.videos.push(next()); break
+      case '--prompt-expansion': args.promptExpansion = next(); break
+      case '--lora': args.loras.push(next()); break
+      case '--camera-trajectory': args.cameraTrajectory = next(); break
+      case '--training-data': args.trainingData = next(); break
+      case '--steps': args.steps = next(); break
+      case '--rank': args.rank = next(); break
+      case '--learning-rate': args.learningRate = next(); break
+      case '--trigger': args.trigger = next(); break
+      case '--request-id': args.requestId = next(); break
       case '--size': args.size = next(); break
       case '--count': args.count = Math.max(1, Number(next()) || 1); break
       case '--format': args.format = next(); break
@@ -133,15 +148,21 @@ const parseArgs = (argv: string[]): CliArgs => {
 const resolvePath = (p: string): string => (isAbsolute(p) ? p : join(process.cwd(), p))
 const isRemote = (value: string) => /^https?:\/\//i.test(value)
 
-const mimeFor = (path: string): string => {
-  const ext = extname(path).toLowerCase()
-
-  if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg'
-  if (ext === '.webp') return 'image/webp'
-  if (ext === '.mp4') return 'video/mp4'
-
-  return 'image/png'
+const MIME_BY_EXT: Record<string, string> = {
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.png': 'image/png',
+  '.mp4': 'video/mp4',
+  '.mov': 'video/quicktime',
+  '.webm': 'video/webm',
+  '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav',
+  '.m4a': 'audio/mp4',
+  '.zip': 'application/zip'
 }
+
+const mimeFor = (path: string): string => MIME_BY_EXT[extname(path).toLowerCase()] ?? 'application/octet-stream'
 
 /** Sube los archivos locales y deja pasar las URLs remotas tal cual. */
 const resolveMediaUrls = async (inputs: string[]): Promise<string[]> => {
@@ -177,10 +198,89 @@ const parseSize = (raw: string): string | { width: number; height: number } => {
   return match ? { width: Number(match[1]), height: Number(match[2]) } : raw.trim()
 }
 
+/** `--lora <path>` o `--lora <path>@<scale>`. El path puede ser URL o repo de Hugging Face. */
+const parseLora = (raw: string, scaleMin: number, scaleMax: number): { path: string; scale?: number } => {
+  const at = raw.lastIndexOf('@')
+  const hasScale = at > 0 && /^\d+(\.\d+)?$/.test(raw.slice(at + 1))
+  const path = (hasScale ? raw.slice(0, at) : raw).trim()
+
+  if (!path) throw new Error(`--lora "${raw}" no trae path.`)
+  if (!hasScale) return { path }
+
+  const scale = Number(raw.slice(at + 1))
+
+  if (scale < scaleMin || scale > scaleMax) {
+    throw new Error(`--lora "${raw}": la escala debe estar entre ${scaleMin} y ${scaleMax}.`)
+  }
+
+  return { path, scale }
+}
+
+const parseCameraTrajectory = (raw: string, maxKeyframes: number): Record<string, number>[] => {
+  let parsed: unknown
+
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    throw new Error('--camera-trajectory no es JSON válido. Espera un arreglo de {distance, elevation, azimuth, time}.')
+  }
+
+  if (!Array.isArray(parsed) || parsed.length === 0) {
+    throw new Error('--camera-trajectory debe ser un arreglo con al menos un keyframe.')
+  }
+
+  if (parsed.length > maxKeyframes) {
+    throw new Error(`--camera-trajectory trae ${parsed.length} keyframes; el máximo es ${maxKeyframes}.`)
+  }
+
+  return parsed.map((frame, index) => {
+    const entry = (frame ?? {}) as Record<string, unknown>
+
+    for (const key of ['distance', 'elevation', 'azimuth', 'time']) {
+      if (typeof entry[key] !== 'number' || !Number.isFinite(entry[key])) {
+        throw new Error(`--camera-trajectory keyframe ${index}: "${key}" debe ser numérico.`)
+      }
+    }
+
+    const { distance, elevation, azimuth, time } = entry as Record<string, number>
+
+    if (elevation < -90 || elevation > 90) throw new Error(`keyframe ${index}: elevation fuera de [-90, 90].`)
+    if (time < 0 || time > 1) throw new Error(`keyframe ${index}: time fuera de [0, 1].`)
+
+    return { distance, elevation, azimuth, time }
+  })
+}
+
+/** Valida cantidad contra el slot declarado y resuelve las URLs. */
+const resolveReferences = async (
+  flag: string,
+  values: string[],
+  slot: FalReferenceSlot | undefined,
+  capability: FalCapability | null
+): Promise<{ field: string; urls: string[] } | null> => {
+  if (!values.length) return null
+
+  if (capability && !slot) {
+    throw new Error(`"${capability.id}" no acepta ${flag}.`)
+  }
+
+  if (slot?.max !== null && slot?.max !== undefined && values.length > slot.max) {
+    throw new Error(`${flag} admite hasta ${slot.max} en "${capability?.id}"; pasaste ${values.length}.`)
+  }
+
+  return { field: slot?.field ?? (flag === '--video' ? 'video_urls' : 'audio_urls'), urls: await resolveMediaUrls(values) }
+}
+
 interface DownloadableAsset {
   url: string
   suggestedName: string
   meta?: Record<string, unknown>
+}
+
+const fileUrl = (value: unknown): string | null => {
+  const entry = (value ?? {}) as Record<string, unknown>
+
+  return typeof entry.url === 'string' ? entry.url : null
 }
 
 /** Normaliza la salida del modelo a una lista de assets descargables, sea cual sea su forma. */
@@ -194,8 +294,7 @@ const extractAssets = (output: unknown, capability: FalCapability | null): Downl
   if (Array.isArray(layers)) {
     layers.forEach((layer, index) => {
       const entry = layer as Record<string, unknown>
-      const image = (entry.image ?? {}) as Record<string, unknown>
-      const url = typeof image.url === 'string' ? image.url : null
+      const url = fileUrl(entry.image)
 
       if (!url) return
 
@@ -228,6 +327,15 @@ const extractAssets = (output: unknown, capability: FalCapability | null): Downl
     if (assets.length) return assets
   }
 
+  // Entrenamiento: la LoRA es el entregable; config y dataset de depuración la acompañan.
+  for (const [key, name] of [['lora_file', 'lora'], ['config_file', 'config'], ['debug_dataset', 'debug-dataset']] as const) {
+    const url = fileUrl(body[key])
+
+    if (url) assets.push({ url, suggestedName: name })
+  }
+
+  if (assets.length) return assets
+
   // Video: single object o array, según el endpoint.
   const video = body.video ?? body.videos
 
@@ -235,9 +343,9 @@ const extractAssets = (output: unknown, capability: FalCapability | null): Downl
     const list = Array.isArray(video) ? video : [video]
 
     list.forEach((item, index) => {
-      const entry = item as Record<string, unknown>
+      const url = fileUrl(item)
 
-      if (typeof entry.url === 'string') assets.push({ url: entry.url, suggestedName: `video-${index}` })
+      if (url) assets.push({ url, suggestedName: `video-${index}` })
     })
   }
 
@@ -266,11 +374,15 @@ const downloadAsset = async (url: string, target: string) => {
 const printCapabilities = () => {
   process.stdout.write('\nCapacidades registradas (pnpm ai:fal --capability <id>):\n\n')
 
-  for (const kind of ['image', 'video'] as const) {
+  for (const kind of ['image', 'video', 'training'] as const) {
     process.stdout.write(`  ${kind.toUpperCase()}\n`)
 
     for (const capability of FAL_CAPABILITIES.filter(item => item.kind === kind)) {
-      const state = capability.verifiedAt ? `verificada ${capability.verifiedAt}` : 'SIN VERIFICAR'
+      const state = capability.unsupportedReason
+        ? 'NO OPERABLE POR COLA'
+        : capability.verifiedAt
+          ? `verificada ${capability.verifiedAt}`
+          : 'SIN VERIFICAR'
 
       process.stdout.write(`    ${capability.id.padEnd(24)} ${capability.label}\n`)
       process.stdout.write(`    ${''.padEnd(24)} ${capability.slug}  [${state}]\n`)
@@ -280,6 +392,235 @@ const printCapabilities = () => {
   }
 
   process.stdout.write('  Cualquier otro slug de fal: pnpm ai:fal --model <slug> --input \'{"campo":"valor"}\'\n\n')
+}
+
+/** Construye el input validando CADA flag contra el contrato del endpoint, antes de gastar. */
+const buildInput = async (args: CliArgs, capability: FalCapability | null): Promise<Record<string, unknown>> => {
+  const prompt = args.promptFile ? (await readFile(resolvePath(args.promptFile), 'utf8')).trim() : args.prompt?.trim()
+  const video = capability?.video ?? null
+  const training = capability?.training ?? null
+  const input: Record<string, unknown> = {}
+  const isReference = capability?.operation === 'reference-to-video'
+
+  if (capability?.requiresPrompt && !prompt) {
+    throw new Error(`La capacidad "${capability.id}" requiere --prompt o --prompt-file.`)
+  }
+
+  if (capability) {
+    const referenceCount = args.images.length + args.videos.length + args.audios.length
+
+    if (isReference && referenceCount === 0) {
+      throw new Error(`"${capability.id}" necesita al menos una referencia: --image, --video o --audio.`)
+    }
+
+    if (!isReference && capability.inputMedia !== 'none' && !args.images.length) {
+      throw new Error(`La capacidad "${capability.id}" requiere --image.`)
+    }
+
+    if (capability.inputMedia === 'none' && args.images.length) {
+      throw new Error(`La capacidad "${capability.id}" no recibe imágenes de entrada; quita --image.`)
+    }
+
+    if (capability.inputMedia === 'one' && args.images.length > 1) {
+      throw new Error(`La capacidad "${capability.id}" recibe una sola --image.`)
+    }
+
+    const videoOnly: [string, unknown][] = [
+      ['--duration', args.duration], ['--resolution', args.resolution], ['--aspect', args.aspect],
+      ['--bitrate', args.bitrate], ['--task', args.task], ['--end-image', args.endImage],
+      ['--prompt-expansion', args.promptExpansion], ['--camera-trajectory', args.cameraTrajectory],
+      ['--no-audio', args.noAudio || undefined], ['--lora', args.loras.length || undefined]
+    ]
+
+    if (!video) {
+      const misplaced = videoOnly.find(([, value]) => value !== undefined)
+
+      if (misplaced) throw new Error(`${misplaced[0]} no aplica a "${capability.id}" (${capability.kind}).`)
+    }
+
+    const trainingOnly: [string, unknown][] = [
+      ['--training-data', args.trainingData], ['--steps', args.steps], ['--rank', args.rank],
+      ['--learning-rate', args.learningRate], ['--trigger', args.trigger]
+    ]
+
+    if (!training) {
+      const misplaced = trainingOnly.find(([, value]) => value !== undefined)
+
+      if (misplaced) throw new Error(`${misplaced[0]} sólo aplica a entrenamiento de LoRA.`)
+    }
+  }
+
+  if (prompt) input.prompt = prompt
+
+  // ── Video ────────────────────────────────────────────────────────────────────────────────────
+  if (args.duration) {
+    const isAuto = args.duration === 'auto'
+    const seconds = Number(args.duration)
+
+    if (isAuto && video && !video.duration.acceptsAuto) {
+      throw new Error(`"${capability?.id}" no acepta --duration auto; usa ${video.duration.min}–${video.duration.max}.`)
+    }
+
+    if (!isAuto && (!Number.isInteger(seconds) || seconds < (video?.duration.min ?? 1))) {
+      throw new Error(`--duration "${args.duration}" no es válido${video ? `: mínimo ${video.duration.min} s` : ''}.`)
+    }
+
+    if (!isAuto && video && seconds > video.duration.max) {
+      throw new Error(`--duration ${seconds}s excede el máximo de "${capability?.id}" (${video.duration.max}s).`)
+    }
+
+    input.duration = video?.duration.encoding === 'integer' ? seconds : args.duration
+  }
+
+  if (args.resolution) {
+    const canonical = video?.resolutions.find(value => value.toLowerCase() === args.resolution!.toLowerCase())
+
+    if (video && !canonical) {
+      throw new Error(`--resolution "${args.resolution}" no está en "${capability?.id}". Soportadas: ${video.resolutions.join(', ')}.`)
+    }
+
+    input.resolution = canonical ?? args.resolution
+  }
+
+  if (args.aspect) {
+    if (video && video.aspectRatios.length === 0) {
+      throw new Error(`"${capability?.id}" no acepta --aspect: el encuadre sale de la imagen de entrada.`)
+    }
+
+    if (video && !video.aspectRatios.includes(args.aspect)) {
+      throw new Error(`--aspect "${args.aspect}" no está en "${capability?.id}". Soportados: ${video.aspectRatios.join(', ')}.`)
+    }
+
+    input.aspect_ratio = args.aspect
+  }
+
+  if (args.bitrate) {
+    if (video && !video.supportsBitrateMode) throw new Error(`"${capability?.id}" no acepta --bitrate.`)
+    input.bitrate_mode = args.bitrate
+  }
+
+  if (args.task) {
+    if (video && !video.acceptsTask) {
+      throw new Error(`"${capability?.id}" no acepta --task; sólo Seedance 2.5 reference-to-video lo expone.`)
+    }
+
+    input.task = args.task
+  }
+
+  if (args.noAudio) {
+    if (video && !video.supportsAudioToggle) throw new Error(`"${capability?.id}" no acepta --no-audio.`)
+    input.generate_audio = false
+  }
+
+  if (args.promptExpansion) {
+    if (video && !video.promptExpansion) throw new Error(`"${capability?.id}" no acepta --prompt-expansion.`)
+
+    if (video?.promptExpansion && !video.promptExpansion.modes.includes(args.promptExpansion)) {
+      throw new Error(`--prompt-expansion "${args.promptExpansion}" no está en "${capability?.id}". Modos: ${video.promptExpansion.modes.join(', ')}.`)
+    }
+
+    input.prompt_expansion_mode = args.promptExpansion
+  } else if (video?.promptExpansion?.required) {
+    // El endpoint rechaza el pedido sin el campo: se envía el default declarado, explícito.
+    input.prompt_expansion_mode = video.promptExpansion.defaultMode
+  }
+
+  if (video?.loras) {
+    if (!args.loras.length) throw new Error(`"${capability?.id}" exige al menos un --lora <path[@scale]>.`)
+    if (args.loras.length > video.loras.max) throw new Error(`"${capability?.id}" admite hasta ${video.loras.max} --lora.`)
+
+    input.loras = args.loras.map(raw => parseLora(raw, video.loras!.scaleMin, video.loras!.scaleMax))
+  } else if (args.loras.length) {
+    if (capability) throw new Error(`"${capability.id}" no acepta --lora; usa su variante /lora.`)
+    input.loras = args.loras.map(raw => parseLora(raw, 0, 4))
+  }
+
+  if (args.cameraTrajectory) {
+    if (video && !video.cameraTrajectory) throw new Error(`"${capability?.id}" no acepta --camera-trajectory.`)
+    input.camera_trajectory = parseCameraTrajectory(args.cameraTrajectory, video?.cameraTrajectory?.maxKeyframes ?? 12)
+  }
+
+  // ── Medios ───────────────────────────────────────────────────────────────────────────────────
+  if (args.images.length) {
+    const slot = video?.references?.images
+
+    if (slot?.max !== null && slot?.max !== undefined && args.images.length > slot.max) {
+      throw new Error(`--image admite hasta ${slot.max} en "${capability?.id}"; pasaste ${args.images.length}.`)
+    }
+
+    const urls = await resolveMediaUrls(args.images)
+    const field = capability?.inputMediaField ?? (urls.length > 1 ? 'image_urls' : 'image_url')
+
+    input[field] = field === 'image_url' ? urls[0] : urls
+  }
+
+  if (args.endImage) {
+    if (video && !video.acceptsEndImage) throw new Error(`"${capability?.id}" no acepta --end-image.`)
+
+    const [endUrl] = await resolveMediaUrls([args.endImage])
+
+    input.end_image_url = endUrl
+  }
+
+  for (const [flag, values, slot] of [
+    ['--video', args.videos, video?.references?.videos],
+    ['--audio', args.audios, video?.references?.audios]
+  ] as const) {
+    const resolved = await resolveReferences(flag, values, slot, capability)
+
+    if (resolved) input[resolved.field] = resolved.urls
+  }
+
+  // ── Entrenamiento ────────────────────────────────────────────────────────────────────────────
+  if (training) {
+    if (args.steps !== undefined) {
+      const steps = Number(args.steps)
+
+      if (!Number.isInteger(steps) || steps < training.steps.min || steps > training.steps.max) {
+        throw new Error(`--steps debe ser entero entre ${training.steps.min} y ${training.steps.max}.`)
+      }
+
+      input.number_of_steps = steps
+    }
+
+    if (args.rank !== undefined) {
+      const rank = Number(args.rank)
+
+      if (!training.ranks.includes(rank)) throw new Error(`--rank debe ser uno de ${training.ranks.join(', ')}.`)
+      input.rank = rank
+    }
+
+    if (args.learningRate !== undefined) {
+      const rate = Number(args.learningRate)
+
+      if (!Number.isFinite(rate) || rate < training.learningRate.min || rate > training.learningRate.max) {
+        throw new Error(`--learning-rate debe estar entre ${training.learningRate.min} y ${training.learningRate.max}.`)
+      }
+
+      input.learning_rate = rate
+    }
+
+    if (args.trigger) input.trigger_phrase = args.trigger
+
+    if (args.trainingData) {
+      const [dataUrl] = await resolveMediaUrls([args.trainingData])
+
+      input[training.dataField] = dataUrl
+    }
+  }
+
+  // ── Imagen ───────────────────────────────────────────────────────────────────────────────────
+  if (args.size) input.image_size = parseSize(args.size)
+  if (args.count) input.num_images = args.count
+  if (args.format) input.output_format = args.format
+
+  if (args.extraInput) Object.assign(input, JSON.parse(args.extraInput) as Record<string, unknown>)
+
+  if (training && typeof input[training.dataField] !== 'string') {
+    throw new Error(`"${capability?.id}" requiere --training-data <zip|url> (o ${training.dataField} en --input).`)
+  }
+
+  return input
 }
 
 const main = async () => {
@@ -308,115 +649,80 @@ const main = async () => {
     )
   }
 
+  if (capability?.unsupportedReason) {
+    throw new Error(`"${capability.id}" no se puede operar desde este CLI: ${capability.unsupportedReason}`)
+  }
+
   const slug = args.model ?? capability?.slug
 
   if (!slug) throw new Error('No se pudo resolver el slug del modelo.')
 
-  const prompt = args.promptFile ? (await readFile(resolvePath(args.promptFile), 'utf8')).trim() : args.prompt?.trim()
+  const kindTimeout =
+    capability?.kind === 'training' ? TRAINING_TIMEOUT_MS : capability?.kind === 'video' ? VIDEO_TIMEOUT_MS : DEFAULT_TIMEOUT_MS
 
-  if (capability?.requiresPrompt && !prompt) {
-    throw new Error(`La capacidad "${capability.id}" requiere --prompt o --prompt-file.`)
-  }
+  const timeoutMs = args.timeoutMs ?? kindTimeout
 
-  if (capability && capability.inputMedia !== 'none' && !args.images.length) {
-    throw new Error(`La capacidad "${capability.id}" requiere al menos un --image.`)
-  }
+  const resumeHint = (requestId: string) =>
+    `pnpm ai:fal ${capability ? `--capability ${capability.id}` : `--model ${slug}`} --request-id ${requestId}`
 
-  if (capability && capability.inputMedia === 'none' && args.images.length) {
-    throw new Error(`La capacidad "${capability.id}" no recibe imágenes de entrada; quita --image.`)
-  }
+  let result
 
-  // Una capacidad declarada y nunca ejercitada puede fallar o devolver otra forma: se avisa ANTES de gastar.
-  if (capability && !capability.verifiedAt) {
-    process.stderr.write(
-      `⚠ "${capability.id}" está declarada pero NO verificada contra el API real. ` +
-        'Si funciona, anota la fecha en src/lib/ai/fal-capabilities.ts.\n'
-    )
-  }
-
-  const videoContract = capability?.video ?? null
-
-  // El contrato de video difiere POR ENDPOINT. Validar acá evita quemar una corrida pidiéndole 4K a un
-  // modelo que topa en 1080p, o 30 s a uno que llega a 15: el proveedor lo rechazaría después de cobrar
-  // la cola, y el operador se enteraría por un error críptico.
-  if (args.duration && args.duration !== 'auto') {
-    const seconds = Number(args.duration)
-
-    if (!Number.isFinite(seconds) || seconds < 1) {
-      throw new Error(`--duration "${args.duration}" no es válido: usa "auto" o un número de segundos.`)
-    }
-
-    if (videoContract && seconds > videoContract.maxDurationSeconds) {
-      throw new Error(
-        `--duration ${seconds}s excede el máximo de "${capability?.id}" (${videoContract.maxDurationSeconds}s).`
+  if (args.requestId) {
+    process.stdout.write(`↻ retomando ${slug} · request ${args.requestId}\n`)
+    result = await awaitFalRequest({ model: slug, requestId: args.requestId, pollTimeoutMs: timeoutMs })
+  } else {
+    // Una capacidad declarada y nunca ejercitada puede fallar o devolver otra forma: se avisa ANTES de gastar.
+    if (capability && !capability.verifiedAt) {
+      process.stderr.write(
+        `⚠ "${capability.id}" está declarada pero NO verificada contra el API real. ` +
+          'Si funciona, anota la fecha en src/lib/ai/fal-capabilities.ts.\n'
       )
     }
+
+    const input = await buildInput(args, capability)
+
+    process.stdout.write(`→ ${slug} · hasta ${Math.round(timeoutMs / 1000)}s de espera\n`)
+
+    result = await runFalModel({
+      model: slug,
+      input,
+      pollTimeoutMs: timeoutMs,
+      onEnqueued: handle => {
+        process.stdout.write(`  ⋯ encolado · request_id ${handle.requestId}\n`)
+
+        // La reconstrucción del retome debe coincidir con lo que fal devolvió; si no, el retome fallaría.
+        const rebuilt = resolveFalQueueHandle(slug, handle.requestId)
+
+        if (rebuilt.statusUrl !== handle.statusUrl) {
+          process.stderr.write(`  ⚠ --request-id no podrá retomar este trabajo: fal usa ${handle.statusUrl}\n`)
+        }
+      }
+    })
   }
-
-  if (args.resolution && videoContract && !videoContract.resolutions.includes(args.resolution)) {
-    throw new Error(
-      `--resolution "${args.resolution}" no está en "${capability?.id}". Soportadas: ${videoContract.resolutions.join(', ')}.`
-    )
-  }
-
-  if (args.aspect && videoContract && !videoContract.aspectRatios.includes(args.aspect)) {
-    throw new Error(
-      `--aspect "${args.aspect}" no está en "${capability?.id}". Soportados: ${videoContract.aspectRatios.join(', ')}.`
-    )
-  }
-
-  if (args.bitrate && videoContract && !videoContract.supportsBitrateMode) {
-    throw new Error(`"${capability?.id}" no acepta --bitrate; ese endpoint no expone bitrate_mode.`)
-  }
-
-  if (args.task && capability && capability.operation !== 'reference-to-video') {
-    throw new Error(`--task sólo aplica a reference-to-video; "${capability.id}" es ${capability.operation}.`)
-  }
-
-  const input: Record<string, unknown> = {}
-
-  if (prompt) input.prompt = prompt
-  if (args.duration) input.duration = args.duration
-  if (args.resolution) input.resolution = args.resolution
-  if (args.aspect) input.aspect_ratio = args.aspect
-  if (args.bitrate) input.bitrate_mode = args.bitrate
-  if (args.task) input.task = args.task
-  if (args.noAudio) input.generate_audio = false
-  if (args.size) input.image_size = parseSize(args.size)
-  if (args.count) input.num_images = args.count
-  if (args.format) input.output_format = args.format
-
-  if (args.images.length) {
-    const urls = await resolveMediaUrls(args.images)
-    const field = capability?.inputMediaField ?? (urls.length > 1 ? 'image_urls' : 'image_url')
-
-    input[field] = field === 'image_urls' ? urls : urls[0]
-  }
-
-  if (args.endImage) {
-    const [endUrl] = await resolveMediaUrls([args.endImage])
-
-    input.end_image_url = endUrl
-  }
-
-  if (args.audios.length) input.audio_urls = await resolveMediaUrls(args.audios)
-  if (args.videos.length) input.video_urls = await resolveMediaUrls(args.videos)
-
-  if (args.extraInput) Object.assign(input, JSON.parse(args.extraInput) as Record<string, unknown>)
-
-  const timeoutMs =
-    args.timeoutMs === DEFAULT_TIMEOUT_MS && capability?.kind === 'video' ? VIDEO_TIMEOUT_MS : args.timeoutMs
-
-  process.stdout.write(`→ ${slug}${capability?.kind === 'video' ? ` · hasta ${Math.round(timeoutMs / 1000)}s de espera` : ''}\n`)
-
-  const result = await runFalModel({ model: slug, input, pollTimeoutMs: timeoutMs })
 
   if (!result.ok) {
     process.stderr.write(`FATAL: ${slug} falló (HTTP ${result.httpStatus})${result.errorDetail ? `: ${result.errorDetail}` : ''}\n`)
+
+    if (result.requestId) {
+      process.stderr.write(`  request_id ${result.requestId}\n`)
+
+      // Un timeout local NO detiene el trabajo en fal: sigue corriendo y se cobra. Se puede retomar.
+      if (result.httpStatus === 408) process.stderr.write(`  el trabajo sigue en fal; retómalo con:\n  ${resumeHint(result.requestId)}\n`)
+    }
+
     process.exit(1)
   }
 
   if (args.json) process.stdout.write(`${JSON.stringify(result.output, null, 2)}\n`)
+
+  const body = (result.output ?? {}) as Record<string, unknown>
+
+  // H3 reescribe el prompt (con soundscape y música): se muestra un extracto; --json trae el texto completo.
+  if (typeof body.expanded_prompt === 'string' && body.expanded_prompt.trim()) {
+    const expanded = body.expanded_prompt.trim().replace(/\s+/g, ' ')
+
+    process.stdout.write(`  prompt expandido: ${expanded.length > 220 ? `${expanded.slice(0, 220)}… (--json para verlo entero)` : expanded}\n`)
+  }
 
   const assets = extractAssets(result.output, capability)
 
@@ -429,7 +735,7 @@ const main = async () => {
   const manifest: Record<string, unknown>[] = []
 
   for (const [index, asset] of assets.entries()) {
-    const remoteExt = extname(new URL(asset.url).pathname) || '.png'
+    const remoteExt = extname(new URL(asset.url).pathname) || '.bin'
 
     const target =
       args.out && assets.length === 1
@@ -450,7 +756,7 @@ const main = async () => {
     process.stdout.write(`  ✓ metadata de capas → ${manifestPath.replace(process.cwd(), '.')}\n`)
   }
 
-  process.stdout.write(`done · ${result.latencyMs} ms · ${assets.length} asset(s)\n`)
+  process.stdout.write(`done · ${result.latencyMs} ms · ${assets.length} asset(s) · request_id ${result.requestId}\n`)
 }
 
 void main().catch((error: unknown) => {
