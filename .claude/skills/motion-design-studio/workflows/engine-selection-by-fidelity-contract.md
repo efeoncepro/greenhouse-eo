@@ -11,7 +11,7 @@
 | Contrato de la toma | Primera mano | Por qué |
 | --- | --- | --- |
 | Un paquete de stills ficticios define tono/campaña, pero cada microescena puede interpretarse; no hay texto ni objeto diegético que deba ser exacto | **Gemini Omni image-to-video** | Convierte cada key visual en un beat vivo y breve; funciona especialmente bien para UGC, Reel, Historia y Creador si se describe la acción humana concreta. |
-| Un key visual existente es la verdad del set y hace falta una **toma nueva**: composición, producto/practical, color y profundidad deben seguir reconocibles | **Seedance 2.0 image/reference-to-video** | Fallback de producción para ángulo, acción o continuidad nuevos preservando mundo/objeto. Sigue siendo candidato técnico y debe pasar actuación, texto y sonido. |
+| Un key visual existente es la verdad del set y hace falta una **toma nueva**: composición, producto/practical, color y profundidad deben seguir reconocibles | **Seedance 2.x image/reference-to-video** (`pnpm ai:fal`) | Fallback de producción para ángulo, acción o continuidad nuevos preservando mundo/objeto. Sigue siendo candidato técnico y debe pasar actuación, texto y sonido. |
 | La toma necesita cámara, blocking o timing espacial preplaneados; el look puede reinterpretarse | **Seedance reference-to-video** con playblast/viewport **exportado** + keyframe de look | El modelo puede tomar video e imagen como referencias; requiere un endpoint que exponga ambos y una prueba aislada. Capacidad investigada, no receta validada. |
 | Falta una acción/objeto que no existe y se necesita explorar o editar hablando sobre una escena que tolera reinterpretación | **Gemini Omni edit/generation** | Su valor diferencial es el loop conversacional, no una promesa de fidelidad frame-perfect. |
 | Sólo cambia orden, pausa, trim, freeze, grade o copy no diegético exacto | **Post determinista / mograph** | No gastar generación ni fingir física que no existe en los frames. |
@@ -19,15 +19,47 @@
 
 La plataforma o canal es un dato de formato; la **fidelidad permitida**, la presencia de un practical y la semántica física de la acción son la decisión de motor.
 
-**Regla de fallback:** Seedance 2.0 entra porque falta verdad temporal nueva —otra toma, ángulo, acción o
+**Regla de fallback:** Seedance 2.x entra porque falta verdad temporal nueva —otra toma, ángulo, acción o
 continuidad—, no porque una edición existente necesite arreglo. Si la acción ya existe, termina en NLE/composite/
 audio. Si no existe y es el significado del plano, reabre producción de toma integral y vuelve al animatic.
+
+## Operar Seedance: `pnpm ai:fal` y elección de endpoint
+
+Seedance se opera con el CLI `pnpm ai:fal` (`scripts/ai/fal-image.ts`, registro en `src/lib/ai/fal-capabilities.ts`),
+out-of-band y nunca runtime del producto. No armar scripts ad-hoc sobre `runFalModel`. `pnpm ai:fal --list` es
+gratis; cualquier corrida con `--capability` gasta, y fal no devuelve `usage`: el CLI no reporta costo por corrida.
+
+```bash
+pnpm ai:fal --capability seedance25-i2v --image frame.png --prompt "…" --duration 5 --resolution 720p --no-audio --out shot.mp4
+```
+
+Hay 15 endpoints: 2.5 y 2.0 × `t2v` / `i2v` / `r2v`, y 2.0 además en variantes `fast`, `mini` y `us`
+(ids `seedance25-*`, `seedance20-*`, `seedance20-{fast,mini,us}-*`). Los slugs van **sin** `fal-ai/` (Seedance
+v1/v1.5 sí lo llevan: el prefijo depende del endpoint). Los límites difieren **por endpoint** y el CLI los valida
+**antes** de gastar:
+
+| Endpoint | Duración máx. | Resoluciones | Notas |
+| --- | --- | --- | --- |
+| 2.5 (`seedance25-*`) | 30 s | 480p · 720p · 1080p | Sin 4K. Sólo su `r2v` acepta `--task reference\|editing\|extension` |
+| 2.0 base (`seedance20-*`) | 15 s | 480p · 720p · 1080p · 4k | Único con 4K (verificado: 3840×2160 real) |
+| 2.0 `fast` / `us` | 15 s | 480p · 720p | — |
+| 2.0 `mini` | 15 s | 480p · 720p | Sin `--bitrate` (no expone `bitrate_mode`) |
+
+- Aspectos en todos: `auto`, `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16` (`--aspect`).
+- `i2v` acepta `--end-image` (último cuadro); `r2v` acepta `--audio` y `--video` (repetibles). `--no-audio` apaga el
+  audio generado. Timeout de video por defecto: 900 s.
+- Verificados 2026-09-16: `seedance25-t2v`, `seedance25-i2v` (con upload de imagen local) y `seedance20-t2v` (4K).
+  Los otros 12 están declarados sin verificar: el CLI lo advierte antes de gastar; la primera corrida es prueba.
+
+**Criterio de elección:** toma larga (más de 15 s) → **2.5**; entrega en **4K** → **2.0 base**; exploración barata
+de movimiento o actuación → **2.0 `mini`/`fast` a 480p**, y subir de tier sólo con el take aprobado. Catálogo
+completo: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`.
 
 ## Previs 3D → Seedance: capacidad investigada, no evidencia interna
 
 Seedance recibe referencias de texto, imagen, audio y video; una previs se aporta como media exportada, no como `.blend` ni escena editable. El video puede orientar cámara, composición, blocking y ritmo, mientras una imagen alineada define el look final. Esto sigue siendo condicionamiento interpretativo: no garantiza cámara 3D, geometría, contactos, texto ni continuidad frame-perfect.
 
-Antes de probar, confirmar que el endpoint expone **video de referencia + imagen de referencia** y registrar modelo/tier, prompt, costo, metadata y rúbrica temporal. La fuente funcional, las referencias oficiales y el límite específico de Glitch viven en `docs/documentation/ai-tooling/previs-3d-y-referencias-seedance.md`. El blocking 3D Glitch fue rechazado por el operador: no reutilizarlo ni elevar esta capacidad a workflow validado sin un fixture nuevo autorizado.
+Antes de probar, confirmar que el endpoint expone **video de referencia + imagen de referencia** (los `r2v` de `pnpm ai:fal` aceptan `--image` y `--video`; ninguno está verificado aún) y registrar modelo/tier, prompt, costo, metadata y rúbrica temporal. La fuente funcional, las referencias oficiales y el límite específico de Glitch viven en `docs/documentation/ai-tooling/previs-3d-y-referencias-seedance.md`. El blocking 3D Glitch fue rechazado por el operador: no reutilizarlo ni elevar esta capacidad a workflow validado sin un fixture nuevo autorizado.
 
 ## Caso validado: Redes Sociales
 
@@ -69,3 +101,4 @@ El reintento T está documentado pero bloqueado por saldo Fal. No promocionar Se
 - `living-social-wall-clips.md` — receta y publicación de RRSS con Omni.
 - `omni-in-place-edit-and-deterministic-finish.md` — límite de la edición Omni y del post determinista.
 - `https://fal.ai/models/bytedance/seedance-2.0/reference-to-video` — capacidades/precio variables de Seedance; reverificar antes de gastar.
+- `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` + `src/lib/ai/fal-capabilities.ts` — slugs y límites vigentes por endpoint.

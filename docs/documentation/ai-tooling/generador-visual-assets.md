@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-09-16 por Claude (agente) — cambio de motor por defecto tras TASK-1851
+> **Ultima actualizacion:** 2026-09-16 por agente — nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 # Generador Visual de Assets con IA
@@ -141,14 +141,71 @@ claro** y no genera. Es preferible una falla visible a una imagen silenciosament
 
 ## Acceso a Fal.ai (imagen, video y audio por IA) — desde 2026-07-06
 
-Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recraft (vectores), Greenhouse tiene acceso a **Fal.ai**, un agregador que permite generar **imagen, video y audio** con muchos modelos a traves de una sola API (por ejemplo Seedance, Kling y Veo para video; flux para imagen).
+Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recraft (vectores), Greenhouse tiene acceso a **Fal.ai**, un agregador que permite generar **imagen, video y audio** con muchos modelos a traves de una sola API (por ejemplo Seedance y Kling para video; Seedream y flux para imagen). Los modelos de Google (Gemini, Veo, Omni) no se usan a través de Fal: se conectan directo con Google.
 
 - **Para que sirve:** producir contenido media de mayor variedad (sobre todo **video**) que los motores de imagen actuales no cubren, para piezas de marketing, campanas y exploracion visual.
-- **Como se usa:** de forma programatica, con un cliente interno unico. El contenido se genera fuera del portal y se **sube** por el flujo normal de assets — no se genera en tiempo real para los usuarios del producto.
+- **Como se usa:** con el comando de terminal `pnpm ai:fal` (ver la sección siguiente) o de forma programatica, con un cliente interno unico. El contenido se genera fuera del portal y se **sube** por el flujo normal de assets — no se genera en tiempo real para los usuarios del producto.
 - **Estado actual (2026-07-06):** **operativo.** La llave quedo guardada de forma segura (en el gestor de secretos) y se **verifico una generacion real de punta a punta** (se genero una imagen de prueba correctamente). La llave es temporal (se rotara mas adelante). Todavia no esta conectada a ninguna pantalla del producto — es acceso para generacion operada por el equipo/agente.
 - **Costo:** se paga por segundo de video segun el modelo (ejemplo: un clip corto economico ronda los US$0.36; uno de mayor calidad, varios dolares). Siempre revisar el precio del modelo en `fal.ai/models` antes de generar.
 
 > Detalle tecnico: ver [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) para la API del generador, system prompts, contrato SVG, endpoints internos y la seccion "Fal.ai — agregador de generacion media".
+
+## El comando `pnpm ai:fal`: imágenes, capas y video (desde 2026-09-16)
+
+Es un comando de terminal que el equipo o el agente usa para trabajar con dos familias de modelos a través de
+Fal. Convive con `pnpm ai:image`: no lo reemplaza. `ai:image` sigue siendo el camino para GPT Image; `ai:fal`
+es el camino para los modelos que viven en Fal.
+
+### Qué permite hacer
+
+| Necesidad | Modelo | Qué entrega |
+|---|---|---|
+| Crear una imagen desde un texto | **Seedream 5** (Pro para mejor acabado, Lite para explorar rápido y barato) | Una o varias imágenes |
+| Cambiar algo de una imagen usando referencias | **Seedream 5 edit** (Pro acepta hasta 10 referencias) | La imagen ajustada, conservando el resto |
+| **Separar una pieza terminada en capas** | **Seedream 5 Pro layerize** | Una capa por elemento, con fondo transparente, más un archivo que dice dónde va cada una |
+| Crear un video desde un texto, una imagen o referencias | **Seedance 2.5** o **Seedance 2.0** | Un video corto |
+
+### La separación por capas, en simple
+
+Es la novedad más útil. Se entrega **una sola imagen plana** (por ejemplo, un key visual ya aprobado) y el
+sistema la devuelve **desarmada**: la imagen completa primero y después hasta 16 piezas sueltas (el logo, el
+sujeto, un elemento decorativo…). Cada pieza viene recortada, con **fondo transparente de verdad** (también en
+los huecos internos, como el centro de una letra) y con su posición y orden guardados en un archivo aparte.
+
+No hace falta escribir instrucciones: basta con la imagen. En una prueba real sobre un key visual devolvió 8
+capas.
+
+Sirve para reaprovechar una pieza plana que no tiene archivo de diseño editable: mover un elemento, reutilizar
+el logo o el sujeto en otro formato, o armar variantes sin volver a generar todo.
+
+### Qué diferencia a Seedance 2.5 y 2.0
+
+| Versión | Duración máxima | Calidad máxima |
+|---|---|---|
+| Seedance 2.5 | 30 segundos | 1080p (no hace 4K) |
+| Seedance 2.0 | 15 segundos | 4K (es la única que llega a 4K) |
+| Seedance 2.0 fast, mini y us | 15 segundos | 720p |
+
+Si se pide algo que el modelo elegido no hace (por ejemplo 4K a la 2.5, o 30 segundos a la 2.0), el comando
+**avisa y se detiene antes de cobrar**, indicando qué valores sí acepta.
+
+### Qué está probado y qué no
+
+- Las cinco opciones de **Seedream 5** están probadas con generaciones reales (2026-09-16).
+- En video están probadas **Seedance 2.5** desde texto y desde imagen, y **Seedance 2.0** desde texto (entregó 4K
+  real). Las otras doce variantes de video están conectadas pero **sin probar**; el comando lo advierte antes de
+  gastar.
+- `pnpm ai:fal --list` muestra este estado en cualquier momento, y no cuesta nada.
+
+### Lo que conviene saber
+
+- **Cada uso cuesta dinero**, salvo `--list`. A diferencia de `ai:image`, este comando **no informa cuánto costó**
+  cada corrida, porque Fal no entrega ese dato. Antes de un lote o de un video largo hay que revisar el precio
+  vigente en la página del modelo.
+- Es producción **fuera del portal**: nada de esto se genera en tiempo real para los usuarios.
+- Gemini Omni (video de Google) **no** se usa por aquí; se conectará directo con Google.
+
+> Detalle tecnico: [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo (registro de capacidades, contratos de video, subida de archivos) y el manual [Operar el CLI de fal (Seedream y Seedance)](../../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md). Código: `scripts/ai/fal-image.ts`, `src/lib/ai/fal-capabilities.ts`, `src/lib/ai/fal.ts`.
 
 ## Produccion de campañas con varias manos de IA
 

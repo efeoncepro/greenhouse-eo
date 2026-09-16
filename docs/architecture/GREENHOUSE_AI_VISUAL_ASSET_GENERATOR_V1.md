@@ -1,9 +1,9 @@
 # Greenhouse AI Visual Asset Generator V1
 
 > **Tipo de documento:** Spec de arquitectura
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1851 — familia GPT Image 2.5 transportada, carril Google migrado a Gemini Image)
+> **Ultima actualizacion:** 2026-09-16 por agente (carril out-of-band `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — familia GPT Image 2.5 transportada, carril Google migrado a Gemini Image)
 > **Task:** TASK-278 — AI Visual Asset Generator
 
 ---
@@ -57,6 +57,7 @@ git add + commit → asset servido por Vercel CDN
 | Imagenes rasterizadas — carril Google | Gemini Image | `gemini-3.1-flash-image` (configurable via `GOOGLE_GEMINI_IMAGE_MODEL`) | PNG/WebP | Migrado de Imagen 4 por TASK-1851; usa `generateContent` y respeta el aspect ratio via `imageConfig` |
 | Animaciones SVG | Gemini | Resuelto via `resolveNexaModel()` | SVG con CSS keyframes | Loading spinners, iconos animados, empty states, micro-interacciones |
 | Produccion still hibrida out-of-band | Fal Seedream 5 Lite/Pro + OpenAI GPT Image 2 | Slugs verificados en el catalogo Fal y adapter OpenAI server-only | PNG/JPEG de trabajo; export gobernado posterior | Campanas multi-formato: exploracion/materialidad en Seedream, estructura/reparacion/adaptacion en GPT |
+| Imagen, capas y video via fal (out-of-band, CLI `pnpm ai:fal`) | fal.ai (`runFalModel` + `uploadFalFile`) | Registro `src/lib/ai/fal-capabilities.ts`: Seedream 5 Pro/Lite (texto a imagen, edit, **layerize**) y Seedance 2.5/2.0 (texto, imagen y referencias a video) | Imagenes; capas PNG con alfa + `layers.json`; video MP4 | Terminal, nunca runtime del producto. Hermano de `pnpm ai:image`, no su reemplazo. Detalle en `GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` §Carril operativo |
 
 ## Files
 
@@ -64,6 +65,9 @@ git add + commit → asset servido por Vercel CDN
 |------|---------|
 | `src/lib/ai/image-generator.ts` | Helper con `generateImage()` + `generateAnimation()` |
 | `src/lib/ai/openai-image.ts` | Adapter server-only para OpenAI Image API |
+| `src/lib/ai/fal.ts` | Cliente canonico fal.ai (`runFalModel`, `uploadFalFile`) |
+| `src/lib/ai/fal-capabilities.ts` | Registro de capacidades fal que opera el CLI (slug literal, contrato de video, `verifiedAt`) |
+| `scripts/ai/fal-image.ts` | CLI `pnpm ai:fal` (out-of-band) |
 | `src/app/api/internal/generate-image/route.ts` | Endpoint POST admin-only (imagen rasterizada) |
 | `src/app/api/internal/generate-animation/route.ts` | Endpoint POST admin-only (SVG animado) |
 | `scripts/generate-banners.mts` | Script batch para generar sets de banners |
@@ -341,15 +345,16 @@ separado de este helper Greenhouse.
 - **Producción out-of-band, NO runtime** (misma regla que Higgsfield): generar acá + **subir el asset por el uploader canónico**; **NUNCA** cablear fal a un flujo runtime del producto — el entrypoint runtime de imagen sigue siendo `src/lib/ai/image-generator.ts` (OpenAI GPT Image / Gemini Image).
 - **Dirección de arte por dominio:** video → skill `motion-design-studio`; audio → `audio-studio`; elección de modelo/estética → `design-studio`; still images de UI/marca → `greenhouse-ai-image-generator`. El cliente opera el modelo; las skills aportan brief/composición/QA.
 - **Pricing público por-segundo en la página del modelo** (verificar en `fal.ai/models` antes de correr — es volátil): ej. Seedance 2.0 Standard ~US$0.3024/s (10s ≈US$3.02, hasta 1080p), Fast ~US$0.2419/s (hasta 720p), Mini 480p ~US$0.0721/s (~US$0.36 los 5s). Audio incluido sin costo extra. El costo es lineal (`$/s × duración`); resolución y duración lo suben proporcionalmente.
+- **CLI `pnpm ai:fal` (desde 2026-09-16):** carril de terminal sobre `runFalModel`, hermano de `pnpm ai:image` (fal tiene esquema de input por endpoint, no el contrato OpenAI). Resuelve capacidades del registro `src/lib/ai/fal-capabilities.ts` (`--capability`, ver `--list`) o cualquier slug con `--model` + `--input '<json>'`; sube archivos locales con `uploadFalFile`; valida duración/resolución/aspecto/bitrate/task de video **antes** de encolar; advierte ante capacidades con `verifiedAt: null`; no reporta costo porque fal no devuelve `usage`. Contrato, capacidades y estado de verificación: catálogo §Carril operativo. Gemini Omni no pasa por fal.
 - **Catálogo completo de modelos y capacidades:** `GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` — las 13 categorías (imagen, edición, upscale, bg-removal, video t2v/i2v/v2v, TTS, música/SFX, STT/voice, 3D, LLM, training) con slugs verificados 2026-07-06.
 
 #### Produccion still hibrida Seedream 5 + GPT Image 2 — desde 2026-07-18
 
 - Es un **workflow operativo out-of-band**, no un provider nuevo del runtime de Greenhouse. No cambia `generateImage()` ni habilita generacion para usuarios.
 - La topologia canonica es estrella: un anchor aprobado alimenta derivados por mensaje/formato. Nunca usar una pieza derivada como origen de la siguiente por conveniencia.
-- Seedream 5 Lite (`fal-ai/bytedance/seedream/v5/lite/{text-to-image|edit}`) se usa para divergencia; Seedream 5 Pro (`fal-ai/bytedance/seedream/v5/pro/{text-to-image|edit}`) para materialidad, atmosfera y desarrollo; GPT Image 2 para estructura, reparacion localizada y adaptacion. Texto/logo/legal quedan en composicion determinista.
+- Seedream 5 Lite (`bytedance/seedream/v5/lite/{text-to-image|edit}`, sin prefijo `fal-ai/`) se usa para divergencia; Seedream 5 Pro (`bytedance/seedream/v5/pro/{text-to-image|edit}`) para materialidad, atmosfera y desarrollo; GPT Image 2 para estructura, reparacion localizada y adaptacion. Texto/logo/legal quedan en composicion determinista.
 - El relevo entre motores usa el contrato `.codex/skills/design-studio/templates/model-handoff-contract.yaml`, con referencia, regiones editables, invariantes, safe zones, criterio de aceptacion y executor destino.
-- Un archivo local que deba entrar a Fal se transfiere mediante upload temporal `fal-cdn-v3` con expiracion corta. No hacer un objeto GCS publico, no ensanchar IAM y no guardar la URL efimera en provenance.
+- Un archivo local que deba entrar a Fal se transfiere con `uploadFalFile` (storage de fal: initiate → `PUT` → `file_url`; `pnpm ai:fal` lo hace solo). No hacer un objeto GCS publico, no ensanchar IAM y no guardar la URL efimera en provenance.
 - El metodo, endpoints, schemas, pricing verificado, formatos, benchmark y anti-patrones viven en `.codex/skills/greenhouse-ai-image-generator/references/seedream-5-gpt-image-2-hybrid-production.md` y `.codex/skills/design-studio/modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md`.
 
 ### AI providers — texto/LLM (Gemini, Anthropic, OpenAI) — desde 2026-06-05

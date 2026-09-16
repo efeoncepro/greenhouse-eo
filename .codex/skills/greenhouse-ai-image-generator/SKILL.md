@@ -344,8 +344,8 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
   ya no genera. Usa `google-gemini-image` cuando la superficie ya use ese lenguaje visual.
   `generateAnimation()` y el carril SVG siguen intactos.
 - Use Seedream 5 Lite out-of-band for inexpensive creative divergence and Seedream 5 Pro for
-  material/color/atmosphere development or semantic regional edits; use `src/lib/ai/fal.ts`,
-  never a parallel fal client or product runtime wiring.
+  material/color/atmosphere development or semantic regional edits; operate them with `pnpm ai:fal`
+  (built on `src/lib/ai/fal.ts`), never a parallel fal client, ad-hoc script or product runtime wiring.
 - For campaign systems, do not choose one provider globally. Load
   `references/seedream-5-gpt-image-2-hybrid-production.md` and route each operation through an
   explicit anchor/handoff contract. If the system adds Gemini Omni motion or offline outputs, also load
@@ -379,7 +379,7 @@ the master plus featured, OG and card crops independently; the crop can change a
 
 ## Fal.ai API (video + media aggregator, out-of-band)
 
-Fal.ai is a programmatic media-generation aggregator — one API fronts many models: **video** (Seedance 2.0, Kling v3, PixVerse, Veo, Grok Imagine, Gemini Omni, Runway, Luma Ray, Hailuo, Wan…), **image** (flux, krea), **audio**, **3D**. Canonical client: `src/lib/ai/fal.ts` — `runFalModel({ model, input })` submits to the fal queue and polls to completion; model-agnostic (pass the fal slug, e.g. `bytedance/seedance-2.0/mini/image-to-video`). Secret resolves server-side via `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF` — never hardcode the `<id>:<secret>` key.
+Fal.ai is a programmatic media-generation aggregator — one API fronts many models: **video** (Seedance 2.5/2.0, Kling v3, PixVerse, Veo, Grok Imagine, Runway, Luma Ray, Hailuo, Wan…; Gemini Omni does NOT run through fal — it goes direct via Google), **image** (flux, krea), **audio**, **3D**. Canonical client: `src/lib/ai/fal.ts` — `runFalModel({ model, input })` submits to the fal queue and polls to completion; model-agnostic (pass the fal slug, e.g. `bytedance/seedance-2.0/mini/image-to-video`). Secret resolves server-side via `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF` — never hardcode the `<id>:<secret>` key.
 
 - **Out-of-band, NOT runtime** (same rule as Higgsfield): generate here + upload via the canonical uploader; never wire fal into a product runtime flow (runtime image path stays `src/lib/ai/image-generator.ts`).
 - **Video is the headline** — for video art direction / model choice use `motion-design-studio`; audio → `audio-studio`; model/aesthetic pick → `design-studio`. THIS skill covers still-image asset craft.
@@ -388,6 +388,35 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
   Credits or copy a point-in-time vendor price into a commercial offer.
 - **Full model & capability catalog** (13 categories, verified slugs): `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`.
 
+### CLI de fal: `pnpm ai:fal` (Seedream 5 + layerize, Seedance 2.5/2.0)
+
+Hermano de `pnpm ai:image` (`scripts/ai/fal-image.ts`), **out-of-band, NUNCA runtime del producto**. Es la mano
+de producción de fal: no escribas scripts ad-hoc sobre `runFalModel`. El registro model-agnostic vive en
+`src/lib/ai/fal-capabilities.ts` (slug entero, campo de entrada, salida, límites de video y `verifiedAt`).
+
+```bash
+pnpm ai:fal --list                                    # gratis: capacidades, slugs y estado de verificación
+pnpm ai:fal --capability seedream5-pro --prompt "…" --out kv.png
+pnpm ai:fal --capability seedream5-pro-edit --image base.png --image material.png --prompt "…" --out v2.png
+pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ./capas
+pnpm ai:fal --model <cualquier/slug/fal> --prompt "…" --input '{"campo":"valor"}'   # fuera del registro
+```
+
+- Flags: `--prompt|--prompt-file`, `--image` (repetible; los archivos locales se suben solos al storage de fal),
+  `--size`, `--count`, `--format jpeg|png`, `--out|--out-dir`, `--timeout`, `--json`. Video (`--duration`,
+  `--resolution`, `--aspect`, `--bitrate`, `--task`, `--no-audio`, `--end-image`, `--audio`, `--video`) y la
+  elección de Seedance viven en `motion-design-studio` (`workflows/engine-selection-by-fidelity-contract.md`).
+- 🔴 Todo `--capability`/`--model` sin `--list` **gasta dinero**. fal no devuelve `usage`: el CLI no reporta
+  costo por corrida; no inventes precios. Si la capacidad figura SIN VERIFICAR, el CLI lo advierte antes de gastar.
+- Seedream 5 (las 5 verificadas 2026-09-16): `seedream5-lite` / `seedream5-lite-edit` (divergencia barata),
+  `seedream5-pro` / `seedream5-pro-edit` (desarrollo; edit hasta 10 referencias) y `seedream5-pro-layerize`.
+  No existe Seedream 5.1 al 2026-09-16.
+- **Layerize** recibe UNA imagen, sin prompt obligatorio, y devuelve la base + hasta 16 capas por `z_index`
+  (nombre, descripción, bounding box y recorte con **alfa real**, reconstruyendo lo ocluido). El CLI guarda
+  `NN-<nombre>.png` + `layers.json`. Uso: rescatar un key visual aprobado como capas editables (texto, sujeto,
+  fondo) para recomponer, retocar o animar por separado **sin volver a generar**. No reemplaza la composición
+  determinística: el logo oficial y el copy final siguen saliendo del vector y del compositor.
+
 ### Seedream 5 still-image routing (verified 2026-07-18)
 
 - Lite endpoints: `bytedance/seedream/v5/lite/text-to-image` and
@@ -395,16 +424,18 @@ Fal.ai is a programmatic media-generation aggregator — one API fronts many mod
 - Pro endpoints: `bytedance/seedream/v5/pro/text-to-image` and
   `bytedance/seedream/v5/pro/edit`; use for expressive development, multireference material
   fusion and semantic regional art direction.
-- **ByteDance slugs carry NO `fal-ai/` prefix — hard rule (re-verified live 2026-07-19, end-to-end
-  with a real image hash):** the Seedream slugs above are correct as-is. With `fal-ai/bytedance/...`
-  the submit is accepted (200) but the **result 404s** (`Path /... not found`) with `inference_time`
-  ≈ 0.02s — nothing was generated. FLUX, Recraft, GPT Image, Topaz etc. **do** keep `fal-ai/`.
+- **The `fal-ai/` prefix depends on the ENDPOINT, not the provider — hard rule (re-verified 2026-09-16):**
+  Seedream 5 and Seedance 2.x go **without** it (the slugs above are correct as-is); Seedream 4/4.5 and
+  Seedance v1/v1.5 go **with** it (e.g. `fal-ai/bytedance/seedream/v4.5/text-to-image`). FLUX, Recraft,
+  GPT Image, Topaz etc. keep `fal-ai/`. With the wrong prefix the submit is accepted (200) but the **result
+  404s** (`Path /... not found`, `inference_time` ≈ 0.02s) — a silent failure. Never compose a slug from
+  provider + version: take it whole from `src/lib/ai/fal-capabilities.ts` or the catalog.
 - **Cheap slug check before generating (no spend):** `POST {}` (empty body) to `https://fal.run/<slug>`
   → **404** = the app does not exist · **422** = the app exists (input validation failed). Confirm any
   slug this way before a run.
 - Both edit endpoints accept ordered `image_urls`; assign every reference a role and conflict
-  precedence. Pro's marketed region/layer comprehension still returns a flat raster and exposes
-  no public mask/layer output contract.
+  precedence. Pro Edit's region/layer comprehension still returns a flat raster with no mask
+  contract; real layers come only from the separate `seedream5-pro-layerize` endpoint (see CLI above).
 - Large data URIs proved unreliable in the real bridge. For local files, prefer a temporary
   `fal-cdn-v3` upload with short lifecycle and do not persist its input URL. A private GCS object
   with short-lived signed URL is only an alternative when `signBlob` is already authorized;
@@ -482,10 +513,11 @@ deterministic and are composed after any generative finish.
 - Treat model-rendered campaign text as concept-only. Final copy, editorial logo, CTA, price, legal and
   localization require deterministic composition unless an explicit exception accepts raster risk. Physical
   brand materialization uses official references and the separate identity/material review above.
-- Seedream Pro «region/layer editing» is semantic art direction over one flattened raster, not editable
-  layers or pixel-perfect locality. Use GPT + alpha mask when protected-region drift has operational cost.
+- Seedream Pro Edit «region/layer editing» is semantic art direction over one flattened raster, not editable
+  layers or pixel-perfect locality. Use GPT + alpha mask when protected-region drift has operational cost; when
+  you need separable layers of an approved piece, run `seedream5-pro-layerize` instead of regenerating.
 - If a still becomes motion, hand the approved clean plate to `motion-design-studio`. Build the 15/10/6
-  family in deterministic post; use Seedance 2.0 only for a genuinely new shot/action/continuity need,
+  family in deterministic post; use Seedance (2.5/2.0 via `pnpm ai:fal`) only for a genuinely new shot/action/continuity need,
   never to repair timing, crop, copy/logo, grade, foley or other editing defects.
 - Do not ship assets with watermarks, fake logos, accidental letters, cropped subjects, dirty alpha edges, or background residue.
 - Do not accept a full-bleed scene or dashboard collage when the brief requires an

@@ -60,7 +60,7 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 | **Gemini 3.1 Flash Lite Image** (Vertex) | volumen y baja latencia | lifecycle corto | scale directo GCP con refresh gate |
 | **GPT Image 2** (OpenAI) | realismo, fidelidad al prompt, edición, texto, uso diario (top general) | estilo cinematográfico < MJ | default realista y de publishing diario; el repo ya lo usa (personaje Nexa) |
 | **Seedream 5 Lite** (ByteDance vía fal.ai) | divergencia material rápida y barata, refs/edición de volumen | continuidad/anatomía de campaña antes del anchor | abrir 8–16 territorios y descartar barato |
-| **Seedream 5 Pro** (ByteDance vía fal.ai) | riqueza material, color, atmósfera, fusión multirreferencia y edición regional semántica | layout extremo menos obediente en el benchmark; sin máscara/layers públicos | desarrollar el mundo visual y hacer art direction regional |
+| **Seedream 5 Pro** (ByteDance vía fal.ai) | riqueza material, color, atmósfera, fusión multirreferencia y edición regional semántica | layout extremo menos obediente en el benchmark; Edit sin máscara (devuelve raster plano) | desarrollar el mundo visual y hacer art direction regional |
 | **Midjourney v7** | **estética/dirección de arte**, cinematográfico, surreal/pictórico, concept | texto-en-imagen, control literal | mood boards, editorial, hero de alto concepto |
 | **FLUX.2 Pro / 1.1 Pro** | calidad técnica, realismo, velocidad (~4.5s), **params de cámara** (focal/DoF/ángulo) | estética "de autor" | pre-viz de film/VFX, storyboard, realismo comercial; open-weight/self-host |
 | **Ideogram 4** | **texto-en-imagen** (posters, thumbnails, headlines) | fotorrealismo fino | explorar lettering; el release tipográfico sigue siendo determinístico |
@@ -72,8 +72,8 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 
 | Modelo | Fuerte en | Débil en | Cuándo usarlo |
 |---|---|---|---|
-| **Seedance 2.0** (ByteDance/Fal) | hasta 9 imágenes + 3 videos + 3 audios, native audio, 4–15 s y reference-to-video | requiere QA de acción, anatomía y continuidad | toma nueva o continuidad controlada por referencias |
-| **Seedance 2.5** (ByteDance vía Fal) | T2V, I2V y R2V; I2V con frame inicial y final opcional; R2V con imágenes, videos y audio, hasta 50 archivos; audio nativo; 4–30 s; 480p/720p | Fal no declara 4K, máscara, storyboard ni edición regional estructurada; es provider-supported, no ruta Globe disponible | referencia multimodal de alta continuidad; cargar route card y gates antes de usarlo en producción |
+| **Seedance 2.0** (ByteDance/Fal) | hasta 9 imágenes + 3 videos + 3 audios, native audio, 4–15 s y reference-to-video; 4K sólo en el endpoint base (`fast`/`mini`/`us` topan en 720p) | requiere QA de acción, anatomía y continuidad | toma nueva o continuidad controlada por referencias |
+| **Seedance 2.5** (ByteDance vía Fal) | T2V, I2V y R2V; I2V con frame inicial y final opcional; R2V con imágenes, videos y audio, hasta 50 archivos; audio nativo; 4–30 s; 480p/720p/1080p | Fal no declara 4K, máscara, storyboard ni edición regional estructurada; es provider-supported, no ruta Globe disponible | referencia multimodal de alta continuidad; cargar route card y gates antes de usarlo en producción |
 | **Veo 3.1 / Fast** (Google Vertex) | ruta premium/broadcast y ruta de escala GCP | costo/cupo y duración por endpoint | premium y scale; nunca vía Fal |
 | **Kling 3 Pro/4K** (Fal) | first/last frame, elements, multi-shot y 4K | audio/idioma y concurrencia por endpoint | especialista 4K/control |
 | **PixVerse V6** (Fal) | 1080p, audio, camera controls y buen costo/volumen | límites 1080p/duración | variantes social a escala |
@@ -97,6 +97,7 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 - **Realista diario / edición fiel** → GPT Image 2.
 - **Divergencia de campaña barata** → Seedream 5 Lite.
 - **Material/color/atmósfera o región semántica** → Seedream 5 Pro.
+  Ambos Seedream se producen con `pnpm ai:fal` (ver `greenhouse-ai-image-generator`).
 - **Campaña multi-modelo** → cargar `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md`; usar
   Seedream para abrir/desarrollar y GPT para organizar/extender/reparar cuando ese routing
   corresponda al contrato, no como regla rígida de marca.
@@ -105,7 +106,8 @@ Cierra siempre en `templates/image-prompt-sheet.md` — no dejes el prompt suelt
 - **UI de Greenhouse** → nada de esto: `greenhouse-ai-image-generator`.
 
 **Regla de encaje (video):**
-- **Control por referencias / social punchy / económico** → Seedance.
+- **Control por referencias / social punchy / económico** → Seedance (vía `pnpm ai:fal`; endpoint por
+  duración/4K/costo en `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`).
 - **Broadcast / cine** → Veo 3.1.
 - **Simple y barato** → Kling 3.0.
 - **Edición conversacional preservando contexto** → Gemini Omni.
@@ -145,6 +147,7 @@ Cuando la generación está casi, **edita el pixel** en vez de rifar de nuevo:
 | **Upscale** | Subir resolución + detalle plausible (Magnific) | Frame elegido → entrega en alta |
 | **Remove-bg** | Cutout / fondo transparente | Componer sobre otra capa; PNG héroe |
 | **Reference / style-lock** | Fijar composición, paleta o personaje entre tomas | Serie coherente, campaña multi-pieza |
+| **Layerize** | Descomponer un KV en hasta 16 capas con alfa real (texto, sujeto, fondo reconstruido) — `pnpm ai:fal --capability seedream5-pro-layerize` | KV aprobado que hay que recomponer, retocar o animar por partes sin regenerar; el logo exacto sigue siendo el vector |
 
 **Regla:** un fallo local no invalida una imagen buena. Inpaint > regenerar. Cada regeneración
 completa es dinero y azar; la edición es cirugía barata.

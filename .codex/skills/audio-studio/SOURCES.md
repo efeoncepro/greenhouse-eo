@@ -21,6 +21,12 @@
 | Pricing de modelos IA | **volátil (mensual)** | $/min, tiers | 10 |
 | Capacidades MCP (Higgsfield/Adobe audio) | **trimestral** | qué tool hace qué | 10, STUDIO_TOOLING |
 
+## Acceso programático — Fal.ai API (desde 2026-07-06)
+
+Además de ElevenLabs MCP, Greenhouse tiene un **path API a Fal.ai** — agregador que también hostea modelos de audio (TTS, música, SFX) junto a imagen/video. Cliente canónico `src/lib/ai/fal.ts` (`runFalModel({ model, input })`, pasas el slug fal). **Ojo con LICENCIAMIENTO** (regla dura de esta skill): el modelo hosteado en fal conserva su propia licencia comercial — verificarla igual que si lo corrieras directo, fal no la cambia. Secreto server-side `FAL_API_KEY` / `FAL_API_KEY_SECRET_REF`, nunca hardcodear; producción out-of-band. Catálogo completo de modelos + slugs (TTS, música/SFX, STT, voice-changer, isolation): `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` §8-10. Contrato: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+
+**Slugs de audio verificados en vivo (2026-07-19).** **Seed Audio** (ByteDance) NO vive en `bytedance/seed-audio` (da 404); vive en **`fal-ai/seed-audio`** — **CON** el prefijo `fal-ai/` (el prefijo depende del ENDPOINT, no del proveedor: Seedream 5 y Seedance 2.x van sin él; Seedream 4/4.5 y Seedance v1/v1.5, con él) y usa el campo **`prompt`**. **ElevenLabs** verificado en vivo: TTS **`fal-ai/elevenlabs/tts/multilingual-v2`**, **`fal-ai/elevenlabs/sound-effects`** y **`fal-ai/elevenlabs/music`** (todos con prefijo `fal-ai/`). **Método barato para chequear un slug sin gastar:** `POST {}` (body vacío) a `https://fal.run/<slug>` → **404** = la app no existe · **422** = la app existe (falló la validación de input por falta de campos).
+
 ## Fuentes base (as-of 2026-07)
 
 **Música IA + licencia**

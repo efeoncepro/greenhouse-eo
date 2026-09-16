@@ -133,14 +133,16 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
 - **Dirigir**: brief + storyboard + animatic + shotlist (`modules/04` + `templates/`).
 - **Producir (IA)**: elige el modelo por toma (`modules/09`): **Higgsfield** (Cinema Studio para
   cámara/lente/focal, Soul ID para consistencia de personaje, LipSync — vía MCP), **Runway Gen-4.5**
-  (cine dirigido, beats/coreografía de cámara), **Seedance** (refs + camera moves), **Kling** (Voice
+  (cine dirigido, beats/coreografía de cámara), **Seedance 2.5/2.0** (refs + camera moves; se opera con
+  `pnpm ai:fal` y el endpoint se elige por duración/4K/costo en
+  `workflows/engine-selection-by-fidelity-contract.md`), **Kling** (Voice
   Binding), **Veo** (broadcast), **Gemini Omni** (edición conversacional).
 - **Producir (humano)**: After Effects (mograph/compositing), Blender/C4D (3D), Nuke/Fusion
   (compositing/VFX), Mocha (tracking), Houdini (FX/simulaciones) — handoff con spec (`modules/11`).
 - **Editar + finalizar**: montaje, sonido, color grade, render, entrega (`modules/06`, `07`, `08`, `10`).
 - **Profusionar una campaña motion**: desde un clean shot aprobado, construir 15/10/6 como tres argumentos
   editoriales con copy/logo exactos y audio medido (`workflows/single-shot-to-deterministic-campaign-hero.md`).
-  Omni sirve para microescena reinterpretada; Seedance 2.0 sólo para una toma/acción/continuidad nueva que
+  Omni sirve para microescena reinterpretada; Seedance 2.x sólo para una toma/acción/continuidad nueva que
   preserve el mundo. Timing, crop, safe zone, copy/logo, grade, foley y mezcla pertenecen a post.
 
 > **Regla dura (director, no dictador).** El estudio **decide y dirige**. Las **operaciones

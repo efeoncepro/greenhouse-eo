@@ -1,12 +1,16 @@
 # Greenhouse — Fal.ai Model & Capability Catalog V1
 
-> **Tipo:** Referencia técnica agent-facing · **Version:** 1.0 · **Creado:** 2026-07-06 por Claude
+> **Tipo:** Referencia técnica agent-facing · **Version:** 1.1 · **Creado:** 2026-07-06 por Claude
+> **Última actualización:** 2026-09-16 por agente — CLI `pnpm ai:fal`, Seedream 5 layerize, Seedance 2.5 y
+> corrección de la regla del prefijo `fal-ai/`.
 > **Estado:** inventario histórico de discovery Greenhouse; no es allowlist productivo de Creative Studio.
 > **Última verificación parcial:** 2026-07-19.
 > **Fuente vigente de incorporación:** [Efeonce Creative Studio Enterprise Model Portfolio V1](EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md)
 > y su [Capability Registry](EFEONCE_CREATIVE_STUDIO_CAPABILITY_REGISTRY_V1.json).
 > **Contrato/acceso:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) → §Fal.ai
-> **Cliente canónico:** [`src/lib/ai/fal.ts`](../../src/lib/ai/fal.ts) (`runFalModel`)
+> **Cliente canónico:** [`src/lib/ai/fal.ts`](../../src/lib/ai/fal.ts) (`runFalModel`, `uploadFalFile`)
+> **Carril operativo Greenhouse:** `pnpm ai:fal` ([`scripts/ai/fal-image.ts`](../../scripts/ai/fal-image.ts)) sobre el
+> registro [`src/lib/ai/fal-capabilities.ts`](../../src/lib/ai/fal-capabilities.ts) — ver §Carril operativo.
 
 ## Propósito
 
@@ -44,9 +48,75 @@ const res = await runFalModel<{ images?: Array<{ url: string }> }>({
 - **Out-of-band, NO runtime del producto:** el cliente Greenhouse es un puente de laboratorio. El runtime
   productivo futuro pertenece al repositorio separado de Creative Studio.
 - **Gotcha queue URLs:** para slugs con sub-path (`fal-ai/flux/schnell`), Fal.ai devuelve `status_url`/`response_url` en el **app padre** (`fal-ai/flux/requests/...`). `runFalModel` ya usa esas URLs; nunca reconstruirlas a mano (da HTTP 405).
-- **⚠️ Gotcha prefijo ByteDance (verificado en vivo 2026-07-19):** los modelos **ByteDance** de imagen y video (Seedream, Seedance) usan slug **SIN** el prefijo `fal-ai/` — `bytedance/seedream/v5/pro/text-to-image`, `bytedance/seedance-2.0/text-to-video`. Con el prefijo `fal-ai/bytedance/...` el submit se acepta (200) pero el **result da 404** (`Path /seedream/... not found`) y `inference_time` ≈ 0.02s (no generó nada). El resto de los proveedores (FLUX, Recraft, ElevenLabs, Topaz, Trellis, Hyper3D…) **sí** llevan `fal-ai/`. **Excepción Seed Audio:** pese a ser ByteDance, **Seed Audio NO sigue esta regla** — vive en `fal-ai/seed-audio` (CON prefijo; `bytedance/seed-audio` da 404) y usa el campo `prompt` (ver §9). Fuente de verdad de slugs: las **skills** (tested), no este catálogo si difieren.
+- **⚠️ Gotcha del prefijo `fal-ai/` (corregido 2026-09-16 contra el API de modelos):** el prefijo **depende del endpoint y su versión, no del proveedor**. Dentro de ByteDance conviven ambos: **Seedream 5** va **SIN** prefijo (`bytedance/seedream/v5/pro/text-to-image`), pero **Seedream 4 y 4.5** van **CON** prefijo (`fal-ai/bytedance/seedream/v4.5/text-to-image`, `fal-ai/bytedance/seedream/v4/...`). Lo mismo en Seedance: **2.0 y 2.5 SIN** prefijo (`bytedance/seedance-2.5/text-to-video`), **v1 y v1.5 CON** prefijo (`fal-ai/bytedance/seedance/v1.5/pro/...`); y **Seed Audio** vive en `fal-ai/seed-audio` (`bytedance/seed-audio` da 404). La regla anterior («todo ByteDance va sin prefijo») era falsa. Lo que sí se mantiene: **el prefijo equivocado falla en silencio** — el submit responde 200, el result da 404 (`Path ... not found`) e `inference_time` ≈ 0.02s (no generó nada). Por eso el slug se declara **entero** y nunca se compone concatenando proveedor + versión. Fuente de verdad de slugs: el registro `src/lib/ai/fal-capabilities.ts` (con `verifiedAt`) para las capacidades registradas; para el resto, el método barato de abajo, no este catálogo.
 - **🔬 Método barato para verificar un slug (verificado en vivo 2026-07-19, sin generar ni gastar):** `POST {}` (body vacío) a `https://fal.run/<slug>` → **404** = la app no existe · **422** = la app existe (falló la validación de input por falta de campos). Confirma cualquier slug así antes de incorporarlo, sin correr una generación real.
 - **Dirección de arte:** video → skill `motion-design-studio`; audio → `audio-studio`; elección de modelo/estética → `design-studio`; still images de UI/marca → `greenhouse-ai-image-generator`.
+
+### Carril operativo: `pnpm ai:fal` (desde 2026-09-16)
+
+CLI de terminal para operar fal sin escribir código. Es **hermano** de `pnpm ai:image`, no su reemplazo:
+`ai:image` habla el contrato OpenAI (model/quality/size) y fal tiene un esquema de input **por endpoint**. Es
+out-of-band: el runtime de imagen del producto sigue siendo `src/lib/ai/image-generator.ts`.
+
+- **Registro model-agnostic** (`src/lib/ai/fal-capabilities.ts`): cada capacidad declara `id`, `slug` literal,
+  `kind` (`image|video`), `operation`, `inputMediaField` (`image_url|image_urls|null`), `inputMedia`
+  (`none|one|many`), `requiresPrompt`, `outputKey` (`images|layers|video`), `verifiedAt` (fecha o `null`) y, en
+  video, un contrato `video` (`maxDurationSeconds`, `resolutions`, `aspectRatios`, `supportsAudioToggle`,
+  `supportsBitrateMode`). `--model <slug>` acepta cualquier slug de fal aunque no esté registrado, con
+  `--input '<json>'` como escape hatch para campos no cubiertos.
+- **Estado real:** `pnpm ai:fal --list` (gratis) imprime cada capacidad con su slug y `verificada <fecha>` o
+  `SIN VERIFICAR`. Ante una capacidad sin verificar el CLI **advierte antes de gastar**.
+- **Entradas locales:** los endpoints de edit/layerize/i2v/r2v piden URLs, no bytes. `uploadFalFile` hace
+  `POST https://rest.alpha.fal.ai/storage/upload/initiate` con `{content_type, file_name}` → `{file_url, upload_url}`,
+  `PUT` de los bytes a `upload_url`, y el modelo consume `file_url`. El CLI lo hace solo con cada `--image`,
+  `--end-image`, `--audio` y `--video` local; las URLs `https://` pasan tal cual. No usar data URI grandes (ya
+  fallaron en el puente).
+- **Validación de video antes de encolar:** duración, resolución, aspecto y `--bitrate` se validan en local
+  contra el contrato del endpoint y fallan nombrando lo aceptado; `--task` se rechaza fuera de reference-to-video.
+  Llegar al proveedor con un valor inválido costaría la cola. Brecha conocida: el CLI no bloquea `--task` en los
+  r2v de 2.0, aunque según su OpenAPI sólo el r2v de 2.5 lo acepta.
+- **Costo:** fal **no devuelve `usage`** en estas respuestas, así que el CLI no reporta costo por corrida (a
+  diferencia de `ai:image`). Consultar el pricing vigente del proveedor, con fecha, antes de correr.
+- **Qué NO va por aquí:** Gemini Omni se conecta directo por las plataformas de Google, no por fal (fue retirado
+  del registro). Flux 3 y Minimax H3 no están conectados.
+
+Capacidades registradas al 2026-09-16:
+
+| id | Slug | Operación | Verificada |
+|---|---|---|---|
+| `seedream5-pro` | `bytedance/seedream/v5/pro/text-to-image` | texto a imagen | ✅ 2026-09-16 (56,8 s) |
+| `seedream5-pro-edit` | `bytedance/seedream/v5/pro/edit` | edición por referencia (hasta 10) | ✅ 2026-09-16 (116,2 s) |
+| `seedream5-pro-layerize` | `bytedance/seedream/v5/pro/layerize` | separación por capas | ✅ 2026-09-16 (83,2 s) |
+| `seedream5-lite` | `bytedance/seedream/v5/lite/text-to-image` | texto a imagen | ✅ 2026-09-16 (43,8 s) |
+| `seedream5-lite-edit` | `bytedance/seedream/v5/lite/edit` | edición por referencia | ✅ 2026-09-16 (53,5 s) |
+| `seedance25-t2v` · `-i2v` · `-r2v` | `bytedance/seedance-2.5/{text,image,reference}-to-video` | video | t2v ✅ · i2v ✅ · r2v sin verificar |
+| `seedance20-t2v` · `-i2v` · `-r2v` | `bytedance/seedance-2.0/{text,image,reference}-to-video` | video | t2v ✅ (4K real) · i2v, r2v sin verificar |
+| `seedance20-fast-*` · `-mini-*` · `-us-*` | `bytedance/seedance-2.0/{fast,mini,us}/{text,image,reference}-to-video` | video | sin verificar (9) |
+
+No existe Seedream 5.1 en fal al 2026-09-16.
+
+**Layerize** (`seedream5-pro-layerize`) recibe **una** imagen en `image_url` y **no requiere prompt** (acepta uno
+opcional y `enhance_prompt_mode` `standard|fast`). Devuelve `layers`: primero la imagen base y luego hasta 16
+capas ordenadas por `z_index`, cada una con `name`, `description`, `z_index`, `bounding_box` (normalizado y
+absoluto) e `image`. Verificado sobre un key visual: 8 capas, la base 2048x1152 sin alfa y cada elemento recortado
+a su bounding box **con canal alfa real** (por ejemplo 54% transparente en el isotipo), incluso en huecos internos.
+El CLI descarga cada capa como `NN-<nombre>.png` y escribe `layers.json` con la metadata, que se perdería si sólo
+se guardaran los PNG.
+
+**Contratos Seedance por endpoint** (verificados en el OpenAPI de cada uno, 2026-09-16):
+
+| Familia | Duración máx. | Resoluciones | `bitrate_mode` |
+|---|---|---|---|
+| Seedance 2.5 (`seedance25-*`) | 30 s | 480p · 720p · 1080p (sin 4K) | sí |
+| Seedance 2.0 base (`seedance20-t2v/i2v/r2v`) | 15 s | 480p · 720p · 1080p · 4k (la única con 4K) | sí |
+| Seedance 2.0 fast / us | 15 s | 480p · 720p | sí |
+| Seedance 2.0 mini | 15 s | 480p · 720p | **no** |
+
+Aspectos en todos: `auto`, `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16`. Image-to-video acepta `end_image_url`
+(último cuadro). Reference-to-video acepta `audio_urls` y `video_urls`; **sólo el r2v de 2.5** acepta `task`
+`reference|editing|extension`. Output: `video` + `seed`. Corridas reales: `seedance25-t2v` (147 s → h264 854x480,
+4,04 s, 97 cuadros), `seedance25-i2v` (194 s → h264 854x480, 4,04 s, con upload de imagen) y `seedance20-t2v`
+(4K real: 3840x2160, 4,04 s).
 
 ### Modelo de pricing (resumen)
 
@@ -103,10 +173,10 @@ Fal.ai cobra **por uso**, con la unidad según la modalidad (siempre confirmar e
 | OpenAI | GPT Image 2 | `openai/gpt-image-2` ✅ | (misma familia que nuestro runtime OpenAI) |
 | xAI | Grok Imagine Image | `xai/grok-imagine-image` ✅ | |
 | xAI | Grok Imagine Pro | `xai/grok-imagine-image/quality/text-to-image` ✅ | |
-| Seedream (ByteDance) | Seedream 4.5 | `bytedance/seedream/v4.5/text-to-image` ✅ | |
-| Seedream | Seedream 4.0 | `bytedance/seedream/v4/text-to-image` ✅ | |
+| Seedream (ByteDance) | Seedream 4.5 | `fal-ai/bytedance/seedream/v4.5/text-to-image` ✅ | **CON** prefijo (sin él da 404; corregido 2026-09-16) |
+| Seedream | Seedream 4.0 | `fal-ai/bytedance/seedream/v4/text-to-image` ✅ | **CON** prefijo |
 | Seedream | Seedream 5.0 Lite | `bytedance/seedream/v5/lite/text-to-image` ✅ | divergencia y lotes rápidos |
-| Seedream | Seedream 5.0 Pro | `bytedance/seedream/v5/pro/text-to-image` ✅ | materialidad, atmósfera y desarrollo de look |
+| Seedream | Seedream 5.0 Pro | `bytedance/seedream/v5/pro/text-to-image` ✅ | materialidad, atmósfera y desarrollo de look; `pnpm ai:fal --capability seedream5-pro` |
 | Krea | Krea 2 Turbo | `fal-ai/krea-2/turbo` ✅ | |
 | Krea | Krea 2 Turbo LoRA | `fal-ai/krea-2/turbo/lora` ✅ | |
 | Ideogram | Ideogram V4 Instant / Fast | `ideogram/v4/instant` · `ideogram/v4/fast` ✅ | fuerte en **texto en imagen** |
@@ -129,9 +199,10 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 | GPT Image 2 Edit | `openai/gpt-image-2/edit` ✅ | edición image-to-image |
 | FLUX.2 [pro] Edit | `fal-ai/flux-2-pro/edit` ✅ | |
 | FLUX.1 Kontext [pro] | `fal-ai/flux-pro/kontext` ✅ | edición contextual / reference |
-| Seedream 4.5 Edit | `bytedance/seedream/v4.5/edit` ✅ | |
+| Seedream 4.5 Edit | `fal-ai/bytedance/seedream/v4.5/edit` ✅ | **CON** prefijo (corregido 2026-09-16) |
 | Seedream 5.0 Lite Edit | `bytedance/seedream/v5/lite/edit` ✅ | |
-| Seedream 5.0 Pro Edit | `bytedance/seedream/v5/pro/edit` ✅ | edición de alta fidelidad para desarrollo de look |
+| Seedream 5.0 Pro Edit | `bytedance/seedream/v5/pro/edit` ✅ | edición de alta fidelidad para desarrollo de look; hasta 10 referencias |
+| Seedream 5.0 Pro Layerize | `bytedance/seedream/v5/pro/layerize` ✅ | descompone una imagen en base + hasta 16 capas con alfa y bounding box; sin prompt (ver §Carril operativo) |
 | Grok Imagine Image Edit | `xai/grok-imagine-image/edit` · `xai/grok-imagine-image/quality/edit` ✅ | |
 | ControlNet / IP-Adapter (FLUX/SD) | `fal-ai/flux-controlnet-*` 🔎 | control estructural (pose, depth, canny) |
 
@@ -162,8 +233,9 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 
 | Familia | Slug | Nota |
 |---|---|---|
-| Seedance 2.0 (ByteDance) | `bytedance/seedance-2.0/text-to-video` · `/fast/...` · `/mini/...` ✅ | audio nativo, camera control, ~$0.30/s (std) |
-| Seedance 1.0 Pro | `fal-ai/bytedance/seedance/v1/pro/...` 🔎 | generación previa |
+| Seedance 2.5 (ByteDance) | `bytedance/seedance-2.5/text-to-video` ✅ | hasta 30 s, techo 1080p; `pnpm ai:fal --capability seedance25-t2v` |
+| Seedance 2.0 (ByteDance) | `bytedance/seedance-2.0/text-to-video` · `/fast/...` · `/mini/...` · `/us/...` ✅ | audio nativo, camera control; base hasta 15 s y única con 4K, fast/mini/us techo 720p |
+| Seedance 1.0 / 1.5 Pro | `fal-ai/bytedance/seedance/v1/pro/...` · `fal-ai/bytedance/seedance/v1.5/pro/...` 🔎 | generación previa; **CON** prefijo |
 | Google Veo 3 | `fal-ai/veo3` · `fal-ai/veo3/fast` 🔎 | ~$0.20–0.40/s (std), ~$0.10–0.15/s (fast); 1080p |
 | Google Veo 2 | `fal-ai/veo2` 🔎 | |
 | Kling 3.0 / 2.5 | `fal-ai/kling-video/v3/*` · `v2.5-turbo/*` 🔎 | storyboarding multi-shot, Voice Binding |
@@ -172,7 +244,7 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 | LTX Video 2.3 | `fal-ai/ltx-2.3-*` 🔎 | rápido/económico |
 | PixVerse V6 | `fal-ai/pixverse/v6/*` ✅ | |
 | Grok Imagine | `xai/grok-imagine-video/text-to-video` ✅ | |
-| Google Gemini Omni Flash | `google/gemini-omni-flash` ✅ | |
+| Google Gemini Omni Flash | `google/gemini-omni-flash` ✅ | listado por fal, **no se opera por fal**: se conecta directo por Google |
 | Luma Dream Machine / Ray 2 | `fal-ai/luma-dream-machine/*` 🔎 | |
 | Minimax Hailuo (Video 01) | `fal-ai/minimax/video-01*` 🔎 | |
 | Mochi 1 | `fal-ai/mochi-v1` 🔎 | abierto |
@@ -182,13 +254,14 @@ Edición dirigida por prompt, inpainting, reference/kontext, controlnet.
 
 | Familia | Slug | Nota |
 |---|---|---|
-| Seedance 2.0 | `bytedance/seedance-2.0/image-to-video` · `/mini/...` · `/fast/...` · `/reference-to-video` ✅ | reference-to-video fija personaje/producto |
+| Seedance 2.5 | `bytedance/seedance-2.5/image-to-video` · `/reference-to-video` ✅ | i2v admite `end_image_url`; r2v admite audio/video de referencia y `task` |
+| Seedance 2.0 | `bytedance/seedance-2.0/image-to-video` · `/mini/...` · `/fast/...` · `/us/...` · `/reference-to-video` ✅ | reference-to-video fija personaje/producto |
 | Kling v3 Pro / Standard | `fal-ai/kling-video/v3/pro/image-to-video` · `/standard/...` ✅ | audio nativo |
 | Kling 2.5 Turbo Pro | `fal-ai/kling-video/v2.5-turbo/pro/image-to-video` ✅ | |
 | PixVerse V6 | `fal-ai/pixverse/v6/image-to-video` ✅ | |
 | Happy Horse 1.1 (Alibaba) | `alibaba/happy-horse/v1.1/image-to-video` ✅ | |
 | Grok Imagine | `xai/grok-imagine-video/image-to-video` · `/reference-to-video` · `/v1.5/image-to-video` ✅ | |
-| Gemini Omni Flash | `google/gemini-omni-flash/image-to-video` · `/reference-to-video` ✅ | |
+| Gemini Omni Flash | `google/gemini-omni-flash/image-to-video` · `/reference-to-video` ✅ | listado por fal, **no se opera por fal**: se conecta directo por Google |
 | Wan 2.x | `fal-ai/wan/v2.2-a14b/image-to-video/lora` 🔎 | i2v con LoRAs |
 | Veo 2 (i2v) | `fal-ai/veo2/image-to-video` 🔎 | |
 | Luma Ray (i2v) | `fal-ai/luma-dream-machine/image-to-video` 🔎 | |
@@ -273,6 +346,9 @@ Edición, restyle, restauración, lipsync, upscale, reframe sobre video existent
 - **NUNCA** instanciar un fetch/SDK paralelo a Fal en un módulo de dominio — extender `runFalModel`.
 - **NUNCA** cablear Fal a un flujo runtime del producto (out-of-band: generar + subir por uploader; runtime de imagen = `src/lib/ai/image-generator.ts`).
 - **NUNCA** reconstruir las polling URLs desde el slug (usar `status_url`/`response_url` del submit — da 405 si no).
+- **NUNCA** componer un slug concatenando proveedor + versión ni asumir el prefijo `fal-ai/` por proveedor: depende del endpoint, y el error es silencioso (submit 200, result 404).
+- **NUNCA** marcar `verifiedAt` en `fal-capabilities.ts` sin haber corrido la capacidad contra el API real.
+- **SIEMPRE** subir archivos locales con `uploadFalFile` (lo hace `pnpm ai:fal`), no como data URI.
 - **SIEMPRE** verificar slug + input schema + pricing en `https://fal.ai/models/<slug>` antes de un modelo nuevo (catálogo volátil).
 - **SIEMPRE** aplicar la dirección de arte de la skill del dominio (video/audio/design/image) + el contrato visual Greenhouse (tokens AXIS) al asset producido.
 - **SIEMPRE** confirmar la **licencia comercial** del modelo de audio/voz/música (Fal no la modifica).

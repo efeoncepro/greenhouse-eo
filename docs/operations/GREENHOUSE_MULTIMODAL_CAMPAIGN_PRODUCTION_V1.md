@@ -152,7 +152,8 @@ campaña; no reemplaza lineage, gates ni aprobación humana.
 
 Gemini Omni Flash es **video**, no un tercer generador de stills. Al 2026-07-18 está en preview como
 `gemini-omni-flash-preview`: genera 720p, 3–10 s, 16:9 o 9:16, admite texto/imagen y edición conversacional.
-En Fal existen `google/gemini-omni-flash`, `/image-to-video`, `/reference-to-video` y `/edit`.
+Fal lista `google/gemini-omni-flash`, `/image-to-video`, `/reference-to-video` y `/edit`, pero Greenhouse **no**
+opera Omni por Fal: se conecta directo por las plataformas de Google (el registro de `pnpm ai:fal` no lo incluye).
 
 ### Patrón motion validado: single-shot → familia profesional
 
@@ -324,7 +325,7 @@ parent_asset: path/to/clean-plate.png
 parent_sha256: '...'
 source_stage: gpt-organized-plate
 target_model: gemini-omni-flash-preview
-target_endpoint: google/gemini-omni-flash/image-to-video
+target_provider: google-direct  # Omni no se opera por Fal; declarar el endpoint Google al cablearlo
 brand_mode: editorial-neutral
 channel_mode: digital-motion
 role: FIRST_FRAME

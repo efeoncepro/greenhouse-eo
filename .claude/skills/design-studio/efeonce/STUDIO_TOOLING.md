@@ -27,13 +27,20 @@
   (matriz en `SOURCES.md`): volumen GCP → Gemini 3.1 Flash Lite Image; contexto/multirreferencia →
   Gemini 3.1 Flash Image; acabado premium → Gemini 3 Pro Image; texto conceptual → Ideogram;
   vector escalable → Recraft; realismo/cámara → FLUX.2; composición/máscara → GPT Image 2;
-  divergencia barata → Seedream 5 Lite; material/color/atmósfera o región semántica → Seedream 5 Pro.
+  divergencia barata → Seedream 5 Lite; material/color/atmósfera o región semántica → Seedream 5 Pro
+  (ambos con `pnpm ai:fal`, CLI out-of-band; `pnpm ai:fal --list` es gratis, toda corrida gasta).
   Midjourney, Firefly, Higgsfield y Magnific son workbenches `watch/out-of-band`, no rutas enterprise
   allowlisted hasta completar términos, schemas y evals. Si una campaña requiere varias
   fortalezas, cargar `../modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` y diseñar una secuencia
   de manos con anchor/handoff, no un torneo de modelos.
+- **¿Hay que recomponer, retocar o animar por partes un KV ya aprobado?** → no regeneres:
+  `pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ./capas` devuelve hasta 16 capas
+  con alfa real + `layers.json`. Es dirección de arte sobre capas; el logo oficial y el copy final siguen
+  saliendo del vector y de la composición determinística.
 - **¿Es video/motion?** → Seedance 2.5 (Fal: T2V/I2V/R2V, audio y referencias multimodales) o Seedance 2.0 (control por referencias, Fal) / Veo 3.1 (premium, Vertex) /
   PixVerse V6 (escala, Fal) / Kling 3 (4K/specialist, Fal) / Gemini Omni (canary, Vertex);
+  Seedance se opera con `pnpm ai:fal` y el endpoint (2.5 larga · 2.0 base 4K · mini/fast exploración) se elige en
+  `motion-design-studio/workflows/engine-selection-by-fidelity-contract.md`;
   producción y formato social →
   `social-media-studio`. Un clip de duración mínima sólo valida el endpoint: el release profesional exige
   master + cutdown por ratio, end card, poster, audio/captions y QA temporal.

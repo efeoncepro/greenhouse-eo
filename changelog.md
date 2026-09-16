@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — `pnpm ai:fal`: Seedream 5 con capas editables y Seedance 2.5/2.0 desde la terminal
+
+El cliente fal.ai existía desde julio sin un solo consumidor. Ahora lo usa un CLI hermano de `ai:image`, sobre un
+registro de capacidades model-agnostic (`src/lib/ai/fal-capabilities.ts`) donde cada endpoint declara su slug
+literal, sus campos y sus límites. Seedream 5 quedó completo y verificado —incluido **layerize**, que descompone
+una pieza en hasta 16 capas con alfa real, nombre y bounding box— y los 15 endpoints de Seedance 2.5/2.0 quedan
+operables, con límites validados **antes** de encolar: 2.5 llega a 30 s pero topa en 1080p, y sólo 2.0 base
+entrega 4K (verificado: 3840×2160). Gemini Omni salió del carril: irá directo por Google.
+
+Dos correcciones que venían mal documentadas: el prefijo `fal-ai/` depende del endpoint y no del proveedor
+(Seedream 5 sin él, Seedream 4/4.5 con él), y la subida de archivos es `uploadFalFile`, no un CDN temporal.
+Tres capas documentales y las skills de imagen, video y dirección de arte actualizadas.
+
 ## 2026-09-16 — Efeonce Insights: render durable (TASK-1846, code complete, rollout pendiente)
 
 - Artifact Worker despacha por `RenderConsumer` (Proposal intacto: `composer:visual-gate` 61 frames a cero píxeles);
@@ -1029,22 +1042,3 @@ local inválida y `CRON_SECRET` ausente; TASK-1832 no cambió secretos.
 sintético: commit/push, promoción, deploys, gates, fixture dedicado, buzones controlados, sesiones canary,
 revocación y cleanup. La autorización no incorpora clientes ni habilita writes; la task sigue pendiente hasta
 matriz runtime, retiro demostrable y siete días de señales estables.
-
-## 2026-09-06 — TASK-1832: carril oscuro desplegado y fixture removible iniciado
-
-Greenhouse `develop` y el gateway MCP ya sirven consumers compatibles con los dos gates canary apagados. El
-auth-server quedó en `auth-server-00034-85c` y el gateway en `efeonce-mcp-gateway-00041-7dq`; metadata/readyz y
-los SHAs servidos fueron releídos. Antes del primer write se versionó el manifiesto con IDs exactos. Después, los
-commands crearon una organización dedicada `inactive/other/disqualified`, su registro temporal y un binding
-`canary`; el readback da `1/1`, purpose drift cero y ninguna persona `smoke_test` visible en Person 360. El dry-run
-de retiro encontró sólo las referencias esperadas y se negó mientras root/authority siguen activos.
-
-Para M365, el operador eligió un alias preexistente compartido. No colisiona con perfiles; la invitación definitiva
-fue entregada, quedó visible y se aceptó mediante el POST scanner-safe. El profile resultante es exclusivamente
-`smoke_test`, permanece fuera de Person 360 y recibió el único grant read-only permitido, personal y expirante con
-el binding. El magic link también fue entregado, pero no se consumió todavía porque el Mac quedó bloqueado. Una
-invitación preparatoria a plus-address se revocó sin aceptación y permanece inventariada para el cleanup. El gate
-sigue OFF y producción no se promueve antes de completar correo Google, sesión/passkey y negativas en staging. La
-primera CI del commit falló en el gate de navegación porque el smoke OAuth usaba `page.goto` directo; el fix local
-ya usa el helper transitorio compartido y pasa el gate focal. Durante una consulta, el CLI de Vercel imprimió un
-cursor sensible: no se reutilizó ni se conserva en evidencia; su posible rotación queda como acción de higiene.

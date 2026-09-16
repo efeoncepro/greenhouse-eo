@@ -3,7 +3,7 @@
 > **Tipo:** operating guide para agentes
 > **Estado:** Accepted
 > **Creado:** 2026-06-01
-> **Ultima actualizacion:** 2026-09-16 (TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
+> **Ultima actualizacion:** 2026-09-16 (CLI `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — el helper transporta 2.5; `google-imagen` renombrado a `google-gemini-image`; línea base de consumo medida)
 > **Fuentes externas verificadas:** OpenAI developer docs 2026-08-21 y fichas oficiales Fal.ai 2026-07-18
 
 ## Purpose
@@ -22,10 +22,12 @@ Fuentes oficiales consultadas:
 - OpenAI API overview/auth: `https://developers.openai.com/api/reference/overview`
 - OpenAI Cookbook GPT Image prompting guide: `https://developers.openai.com/cookbook/examples/multimodal/image-gen-1.5-prompting_guide`
 - Matriz canónica de la familia: `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`
-- Fal Seedream 5.0 Lite: `https://fal.ai/models/fal-ai/bytedance/seedream/v5/lite/text-to-image`
-- Fal Seedream 5.0 Lite Edit: `https://fal.ai/models/fal-ai/bytedance/seedream/v5/lite/edit`
-- Fal Seedream 5.0 Pro: `https://fal.ai/models/fal-ai/bytedance/seedream/v5/pro/text-to-image`
-- Fal Seedream 5.0 Pro Edit: `https://fal.ai/models/fal-ai/bytedance/seedream/v5/pro/edit`
+- Fal Seedream 5.0 Lite: `https://fal.ai/models/bytedance/seedream/v5/lite/text-to-image`
+- Fal Seedream 5.0 Lite Edit: `https://fal.ai/models/bytedance/seedream/v5/lite/edit`
+- Fal Seedream 5.0 Pro: `https://fal.ai/models/bytedance/seedream/v5/pro/text-to-image`
+- Fal Seedream 5.0 Pro Edit: `https://fal.ai/models/bytedance/seedream/v5/pro/edit`
+- Fal Seedream 5.0 Pro Layerize: `https://fal.ai/models/bytedance/seedream/v5/pro/layerize`
+- Slugs, contratos y estado de verificación de fal (2026-09-16): `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` §Carril operativo. Seedream 5 va **sin** prefijo `fal-ai/`; el prefijo depende del endpoint, no del proveedor.
 
 Facts operativos vigentes al 2026-06-01:
 
@@ -146,6 +148,9 @@ snapshots de modelo rotan sin aviso.
 | Concept art no versionable en chat | Tool nativo de imagen del entorno, si existe | Usarlo solo como exploracion; pasar el asset final por repo si se va a servir |
 | Logo real de marca externa | No generar desde IA | Usar `greenhouse-digital-brand-asset-designer` y fuente oficial |
 | SVG animado simple | `generateAnimation()` | Gemini via helper, no JavaScript, reduced-motion |
+| Separar una pieza plana en capas editables | `pnpm ai:fal --capability seedream5-pro-layerize` | Una imagen, sin prompt; devuelve base + hasta 16 capas PNG con alfa real + `layers.json` (nombre, z_index, bounding box) |
+| Divergencia o materialidad Seedream 5 | `pnpm ai:fal --capability seedream5-lite` / `seedream5-pro` (+ `-edit`) | Out-of-band; no hay `usage` por corrida, consultar pricing vigente del proveedor |
+| Video desde texto, imagen o referencias | `pnpm ai:fal --capability seedance25-*` / `seedance20-*` | 2.5 hasta 30 s y 1080p; 2.0 base hasta 15 s y única con 4K; el CLI valida límites antes de encolar |
 
 ## Prompt Anatomy
 
@@ -469,6 +474,46 @@ console.log(result)
 Para flujos de referencia/máscara hay dos caminos: `pnpm ai:image --image <base> --mask <mask> --prompt "…"`
 desde la terminal, o importar `./src/lib/ai/openai-image` cuando el flujo vive en código.
 
+### Generate via fal CLI (`pnpm ai:fal`)
+
+CLI hermano de `pnpm ai:image` para Seedream 5 (imagen, edición y capas) y Seedance 2.5/2.0 (video). No lo
+reemplaza: `ai:image` habla el contrato OpenAI y fal tiene un esquema de input por endpoint. Es out-of-band; el
+runtime de imagen del producto sigue en `src/lib/ai/image-generator.ts`. Manual paso a paso:
+`docs/manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md`.
+
+```bash
+pnpm ai:fal --list                                                     # gratis: capacidades + estado de verificación
+pnpm ai:fal --capability seedream5-pro --prompt "<texto>" --out out.png
+pnpm ai:fal --capability seedream5-pro-edit --image base.png --prompt "<delta>" --out out.png
+pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ai-generations/<fecha>_<slug>/capas
+pnpm ai:fal --capability seedance25-i2v --image plate.png --prompt "<movimiento>" \
+  --duration 5 --resolution 720p --aspect 9:16 --out clip.mp4
+pnpm ai:fal --model <slug/fal> --prompt "<texto>" --input '{"campo":"valor"}'   # slug fuera del registro
+```
+
+Flags: `--list` · `--capability <id>` · `--model <slug>` · `--prompt` / `--prompt-file` · `--image <path|url>`
+(repetible; los locales se suben al storage de fal con `uploadFalFile`) · `--size` (enum o `WxH`) · `--count` ·
+`--format jpeg|png` · `--input <json>` · `--out` / `--out-dir` · `--timeout <ms>` · `--json`. Video:
+`--duration <n|auto>` · `--resolution` · `--aspect` · `--bitrate standard|high` · `--task reference|editing|extension`
+· `--no-audio` · `--end-image <path|url>` · `--audio <path|url>` (repetible) · `--video <path|url>` (repetible).
+Timeout por defecto 180 s; sube solo a 900 s en capacidades de video.
+
+Reglas operativas:
+
+- 🔴 **Toda corrida sin `--list` gasta dinero real.** fal no devuelve `usage`, así que el CLI no imprime costo:
+  revisar el pricing vigente del proveedor (con fecha) antes de lotes o video largo.
+- Sin `--out`/`--out-dir` la salida cae en `public/images/generated/`. Para exploración usar `--out-dir` bajo
+  `ai-generations/`, fuera de `public/` y de `.captures/`.
+- Las validaciones fallan **en local, antes de encolar**: prompt faltante, `--image` faltante o sobrante, duración
+  sobre el máximo, resolución/aspecto no soportados, `--bitrate` en mini y `--task` fuera de reference-to-video.
+  Ojo: según su OpenAPI sólo el r2v de **2.5** acepta `task`; el CLI no bloquea `--task` en los r2v de 2.0, así
+  que no pasarlo ahí.
+- Una capacidad con `verifiedAt: null` imprime una advertencia antes de gastar. Si la corrida funciona, anotar la
+  fecha en `src/lib/ai/fal-capabilities.ts`; nunca marcarla sin haber corrido.
+- Layerize: el CLI escribe `NN-<nombre>.png` por capa (orden `z_index`) y `layers.json` con nombre, descripción,
+  `z_index` y `bounding_box`. Conservar `layers.json` junto a los PNG: sin él se pierde la posición de cada capa.
+- Si el output no trae la clave esperada, correr con `--json` para ver la forma real antes de tocar el registro.
+
 ### Use native image tool
 
 Use the native chat image generation tool only when:
@@ -506,7 +551,7 @@ digital/offline a escala, usar por defecto:
 - **Seedream 5 Lite:** divergencia rápida, búsqueda de familias visuales y variaciones de un lenguaje.
 - **Seedream 5 Pro:** desarrollo de materialidad, color, atmósfera, energía y continuidad visual de una dirección seleccionada.
 - **GPT Image 2:** organización espacial, instrucciones complejas, reparación localizada, adaptación de formatos y creación de campos de copy.
-- **Gemini Omni Flash:** motion 9:16/16:9 desde un clean plate, audio nativo y edición conversacional.
+- **Gemini Omni Flash:** motion 9:16/16:9 desde un clean plate, audio nativo y edición conversacional. Se conecta directo por las plataformas de Google, no por fal ni por `pnpm ai:fal`.
 - **Composición determinista:** texto, logos, claims, legal, grillas y exports finales. Un modelo generativo no es la fuente de verdad tipográfica.
 
 El paso `anchor` es obligatorio antes de escalar. Debe aprobar identidad, silueta, paleta, sistema de luz, fondo, zona de copy y invariantes protegidos. Desde ese anchor se derivan todas las piezas en una topología estrella; no se encadenan treinta derivados entre sí.
@@ -518,7 +563,7 @@ Dos relevos reales quedaron verificados el 2026-07-18:
 1. **GPT Image 2 -> Seedream 5 Pro:** GPT fijó anatomía y composición; Seedream elevó atmósfera y color conservando estructura. Correlación de bordes `0.9212`, MAE normalizado `0.0926` y cromaticidad media `+12.1%` relativa.
 2. **Seedream 5 Pro -> GPT Image 2:** Seedream creó el sistema de material/energía; GPT lo convirtió en banner `3:1` con un solo cuerpo y campo de copy. El seleccionado obtuvo `4.67/5`, con `48%` del lienzo reservado como campo limpio. Tres intentos previos enseñaron que anatomía temporal y escala deben expresarse con límites duros, no con “aproximadamente”.
 
-Para pasar una imagen local de GPT a Fal sin hacerla pública, iniciar un upload temporal `fal-cdn-v3`, subir por el `upload_url` devuelto y entregar el `file_url` efímero a Seedream. No persistir esa URL en manifests. No ampliar IAM ni hacer público un bucket para resolver el puente.
+Para pasar una imagen local de GPT a Fal sin hacerla pública, usar `uploadFalFile` (`POST /storage/upload/initiate` → `PUT` a `upload_url` → `file_url`); `pnpm ai:fal --image <local>` lo hace solo y entrega el `file_url` a Seedream. No persistir esa URL en manifests. No ampliar IAM ni hacer público un bucket para resolver el puente.
 
 Canon detallado:
 
