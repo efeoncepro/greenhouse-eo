@@ -112,7 +112,15 @@ caída.
   referencias de rostro y cuerpo de la persona. El texto de la prenda —logo completo + «Empower your Growth»— se
   **compone determinísticamente** y entra como referencia; nunca se le pide al modelo. El emblema del pecho conserva el
   tamaño del asset oficial y no se reduce.
-- **Próximas prendas:** polera y chaqueta, que se diseñan desde cero (no existe asset oficial); los pasos están en la
-  sección «Aplicar a otra prenda» de la bitácora.
+- **Polo piqué Efeonce:** `5. Contenidos/13- Branding/Polo Efeonce/v01/` — 21 vistas (navy con bordado blanco, kit
+  completo de 15; blanco con bordado navy, set esencial de 6), 13 con transparente, más `efeonce-polo-manifiesto.json`.
+  Emblema **bordado** de ~7 cm en el pecho izquierdo y **espalda limpia**.
+  [`LEEME`](../../../ai-generations/2026-09-17_polo-efeonce/LEEME.md).
+- **Cápsula por contexto:** cada prenda tiene su contexto de uso —polo frente a cliente, camisa o blusa con chaqueta
+  para comité y licitación, polera para evento, hoodie y gorra para producción—; en prendas formales el emblema va
+  bordado y sin eslogan, y la estampa de espalda con eslogan es lenguaje de merch. Tabla completa en la
+  sección «Cápsula de vestuario Efeonce» de la bitácora.
+- **Próximas prendas:** chaqueta softshell navy y gorra, que se diseñan desde cero (no existe asset oficial); los pasos
+  están en la sección «Aplicar a otra prenda» de la bitácora.
 - **Registro:** [bitácora del método](2026-09-17-hoodie-efeonce-garment-reference-kit.md) ·
   [`LEEME`](../../../ai-generations/2026-09-17_hoodie-efeonce/LEEME.md).

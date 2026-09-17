@@ -273,3 +273,7 @@ el business model V1.1; sin claims de runtime hardcodeados.*
 ## Identidad en informes
 
 Todos los informes de Efeonce aplican el [estándar de marca y entrega](../operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md): pie institucional, URL bubble oficial, contacto, logos de Efeonce y del cliente cuando corresponda, tipografías de marca y gráficos con evidencia. Los valores se resuelven desde sus fuentes canónicas, sin duplicarlos en este contexto.
+
+## Identidad en el vestuario del equipo
+
+El equipo frente al cliente también es un touchpoint de marca, y desde 2026-09-17 el vestuario se decide **por contexto de uso**, no por gusto: polo piqué navy con emblema bordado frente a cliente; camisa o blusa blanca con chaqueta softshell o blazer navy en reunión formal, comité y licitación; polera navy en evento, feria y stand; hoodie, polera royal y gorra en producción, terreno, grabación y streaming. La regla de marca es que en prendas formales el emblema va **bordado y sin eslogan**: la estampa grande de espalda con «Empower your Growth» es lenguaje de merch, no de ropa corporativa frente a un decisor B2B. La cápsula completa, los kits de prenda ya producidos y el método de producción viven en la [bitácora de kits de prenda](../operations/social/2026-09-17-hoodie-efeonce-garment-reference-kit.md); acá no se duplican.

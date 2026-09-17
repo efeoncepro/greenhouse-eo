@@ -518,8 +518,10 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
   pesos del contrato de marca y entra como imagen 2; al modelo nunca se le pide la ortografía. Proporciones
   declaradas (emblema del pecho nunca se reduce; estampa de espalda al 38 % del ancho) + **contrato de realismo
   verbatim** en todos los prompts, o la prenda sale con aspecto de render. Si cambia el contrato se rehace la serie
-  completa. El hoodie ya existe (21 vistas, OneDrive `13- Branding/Hoodie Efeonce/v01/`); para una prenda nueva que
-  se diseña desde cero, primero la prenda base aprobada y recién después las vistas:
+  completa. Si el emblema va **bordado**, se espeja: pasar el isotipo oficial rasterizado como imagen 2 y revisar el
+  pecho vista por vista al 100 %. Hoodie y polo ya existen (21 vistas cada uno, OneDrive `13- Branding/`), y **la
+  prenda la elige el contexto de la escena**, no la costumbre; para una prenda nueva que se diseña desde cero,
+  primero la prenda base aprobada y recién después las vistas:
   [`references/garment-reference-kit.md`](references/garment-reference-kit.md).
 - Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md) ·
   [nave Efeonce 3D](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).

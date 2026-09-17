@@ -77,17 +77,21 @@ Registro: `ai-generations/2026-09-17_nexa-logo-estudio/LEEME.md`. Cinco reglas m
 - **Encuadre:** pedir márgenes explícitos («nada toca los bordes») y tercio superior limpio si después va titular AXIS.
 
 
-## 1.d Vestuario de marca: el kit del hoodie
+## 1.d Vestuario de marca: los kits de prenda
 
-Mismo contrato para la ropa. Registro: `ai-generations/2026-09-17_hoodie-efeonce/LEEME.md`; entrega en OneDrive
-`13- Branding/Hoodie Efeonce/v01/` con manifiesto por vista.
+Mismo contrato para la ropa. Registro: `ai-generations/2026-09-17_{hoodie,polo}-efeonce/LEEME.md`; entrega en OneDrive
+`13- Branding/Hoodie Efeonce/v01/` y `Polo Efeonce/v01/`, con manifiesto por vista.
 
+- **La prenda la elige el contexto de la escena** (cliente → polo, formal → camisa + softshell, evento → polera,
+  producción → hoodie): la cápsula la gobierna `efeonce-brand-studio`, no la costumbre.
 - **Elegir la vista por el ángulo de la toma** (de espaldas → vista de espalda) y pasarla junto con las referencias de
   rostro y cuerpo de la persona. Sin la vista correcta, el modelo inventa la espalda, la capucha o el puño.
 - **El texto de la prenda se compone, no se genera:** la estampa de espalda (logo + «Empower your Growth» con los tres
   pesos del contrato de marca) se arma con `estampa-espalda.mjs` y entra como referencia.
 - **Proporciones fijas:** emblema del pecho igual al asset oficial, nunca reducido; estampa de espalda al 38 % del
   ancho de la espalda (al 55 % no se ve realista).
+- **El emblema bordado se espeja:** pasar el isotipo oficial rasterizado como imagen 2, describir su geometría y
+  revisar el pecho **vista por vista con recorte al 100 %** (en la hoja de contacto no se ve).
 - **Contrato de realismo** en el prompt (lente 100 mm, arrugas asimétricas, pelo de la tela, tinta serigráfica sobre
   las fibras): sin él la prenda sale con aspecto de render. Si se cambia el contrato, rehacer la serie completa.
 

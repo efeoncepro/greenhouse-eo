@@ -51,7 +51,10 @@ rostro se validó a ojo contra las referencias. El hoodie es vestuario de esa ca
 
 Desde el 2026-09-17 existe un [kit de referencia de prenda](2026-09-17-hoodie-efeonce-garment-reference-kit.md) del
 hoodie (21 vistas en `13- Branding/Hoodie Efeonce/v01/`): es la referencia de vestuario a usar, eligiendo la vista por
-el **ángulo de la toma**, en lugar de un asset suelto del sitio público.
+el **ángulo de la toma**, en lugar de un asset suelto del sitio público. Existe también el kit del **polo piqué**
+(`13- Branding/Polo Efeonce/v01/`): si la escena es corporativa —cliente, comité, licitación—, la prenda que
+corresponde es el polo, no el hoodie, según la cápsula de vestuario de la misma bitácora. La elección sigue siendo
+vestuario **de esa pieza**, no un atributo universal de Nexa.
 
 ## Biblioteca de poses 3D (pendiente)
 

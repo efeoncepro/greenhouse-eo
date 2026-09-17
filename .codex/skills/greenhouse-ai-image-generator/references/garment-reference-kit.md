@@ -4,9 +4,18 @@ Mismo contrato que el [kit 3D del logo](logo-3d-reference-kit.md): **la referenc
 persona y la escena**. Sin la vista correcta el modelo inventa la espalda, la capucha, el puño y la caída, y cada
 pieza queda con un hoodie distinto.
 
-Caso ejecutado: [`ai-generations/2026-09-17_hoodie-efeonce/LEEME.md`](../../../../ai-generations/2026-09-17_hoodie-efeonce/LEEME.md)
-(hoodie Efeonce, 21 vistas, aprobado 2026-09-17). Entrega en OneDrive `5. Contenidos/13- Branding/Hoodie Efeonce/v01/`.
-Pendientes por el mismo método: **polera** y **chaqueta**, que se diseñan desde cero (§8).
+Casos ejecutados, ambos aprobados 2026-09-17:
+
+- [hoodie Efeonce](../../../../ai-generations/2026-09-17_hoodie-efeonce/LEEME.md) — 21 vistas a partir de un asset
+  oficial ya existente. OneDrive `5. Contenidos/13- Branding/Hoodie Efeonce/v01/`.
+- [polo piqué Efeonce](../../../../ai-generations/2026-09-17_polo-efeonce/LEEME.md) — 21 vistas **diseñadas desde
+  cero** (§8): navy con bordado blanco (principal, 15 vistas) y blanco con bordado navy (segunda, 6 vistas).
+  OneDrive `.../Polo Efeonce/v01/`. Es la prenda corporativa frente a cliente; la cápsula de vestuario por contexto
+  la gobierna [`efeonce-brand-studio`](../../efeonce-brand-studio/SKILL.md).
+
+Pendientes por el mismo método, ambos desde cero (§8): **chaqueta softshell navy** —cierre completo con tapeta
+interior, cuello alto, bolsillos con cierre oculto, puños ajustables, sin capucha para que funcione sobre el polo,
+emblema bordado en el pecho y opcional en la manga— y la **polera** de evento.
 
 ## Cuándo usarlo
 
@@ -74,6 +83,22 @@ mismas proporciones, misma tinta», más la ubicación y el porcentaje. Nunca se
 ⚠️ **Trampa de librsvg:** el eslogan partido en `<tspan>` **pierde los espacios**. Usar espacios duros (` `) y
 `xml:space="preserve"`, y mirar el PNG antes de usarlo.
 
+### El emblema bordado también lleva su propia referencia
+
+La prenda base fija la prenda, pero **no fija la orientación del emblema**: se espeja con facilidad. En el polo, 6 de
+21 vistas volvieron con la nave apuntando a la izquierda (las cuatro blancas y dos navy: percha y segundo cuerpo).
+
+- Pasar el **isotipo oficial rasterizado** (`public/branding/SVG/isotipo-full-efeonce.svg` → PNG, como
+  `ref/isotipo-oficial.png`) como **imagen 2** de toda vista donde el emblema se lea.
+- **Describir su geometría en palabras**, porque la imagen sola no basta: nave a la derecha con la nariz redondeada a
+  la derecha y las dos aletas abajo a la izquierda, órbita como elipse ancha con cortes, planeta arriba, tres
+  ventanas en el cuerpo.
+- **Cómo se pide un bordado:** puntada satinada con dirección de puntada visible y leve relieve sobre el tejido, no
+  tinta plana (`satin-stitch embroidery, visible stitch direction, slightly raised over the piqué knit`). Es distinto
+  del estampado plastisol del contrato de realismo (§5), que se apoya sobre la fibra.
+- **Tono sobre tono sólo si la marca se lee por relieve.** En el polo no se leía y el operador lo descartó: «el logo
+  se pierde». Para uso corporativo, hilo de contraste: blanco sobre navy, navy sobre blanco.
+
 ## 4. Proporciones declaradas (el modelo las mueve si no se fijan)
 
 - **Emblema del pecho:** mismo tamaño y posición que el asset oficial. **Nunca se reduce** — corrección expresa del
@@ -125,7 +150,9 @@ No basta mirar la grilla. Por cada vista:
 
 1. **Color de tela medido**, no estimado. En el hoodie: entre (10,54,155) y (25,76,186) en las navy, con Δ máximo 38
    en los primeros planos porque la luz cercana lo oscurece. Registrar el rango aceptado en el manifiesto.
-2. **Proporción y posición del emblema** contra el asset oficial. Si encogió, se regenera.
+2. **Emblema: proporción, posición y orientación** contra el asset oficial. Si encogió, se regenera. La orientación
+   se revisa **vista por vista, con recorte al 100 % sobre el pecho**: en la hoja de contacto el espejo no se ve.
+   Aplica a cualquier prenda con emblema, no sólo al polo.
 3. **Ortografía y lockup de la estampa**, con zoom. La espalda gris **perdió el eslogan** en un intento y la grilla
    no lo delataba.
 4. **Una sola fotografía**, no un collage (§7).
@@ -139,6 +166,10 @@ No basta mirar la grilla. Por cada vista:
   sobreviven al recorte; se entregan como escena.
 - ⚠️ Un pedido de «detalle de puño y cordón» devolvió un **collage de dos paneles**. Exigir en el prompt «ONE single
   close-up photograph (not a collage, not a split image)».
+- ⚠️ En el polo varias vistas volvieron como **par frente+espalda** o con un **círculo de zoom insertado**. Pedir
+  explícitamente «una sola fotografía de una sola prenda: ni par, ni díptico, ni collage, ni inset».
+- ⚠️ Los detalles salen como prenda completa si no se declara el **encuadre macro**: «el bordado llena el cuadro y el
+  resto de la prenda queda fuera».
 - ⚠️ Las variantes de color se piden como «SAME construction but in \<tela\>», declarando qué cambia en la tinta y
   cerrando con «everything else identical». Si no, cambia también el corte.
 
@@ -151,7 +182,8 @@ Cuando **no existe** asset oficial de la prenda, el kit tiene un paso 0 que el h
 2. **Generar 2–3 direcciones de la prenda base sola**, frente, con el contrato de realismo ya puesto, y **llevarlas
    al operador**. Ésta es la única aprobación que bloquea: todo lo demás se copia de aquí.
 3. **Congelar la aprobada como imagen 1** de toda la serie y escribir su bloque base verbatim.
-4. **Componer la estampa** con el script determinístico (§3) si la prenda lleva texto.
+4. **Preparar las referencias del emblema:** el isotipo oficial rasterizado si va bordado, y la estampa compuesta con
+   el script determinístico si la prenda lleva texto (§3). El polo no lleva estampa: espalda limpia.
 5. **Recién entonces generar las vistas** (§2), todas con el mismo bloque base + el delta de cada una.
 6. **QA (§6), recorte selectivo (§7), manifiesto y entrega (§9).**
 
@@ -192,4 +224,5 @@ pnpm ai:image --model gpt-image-2.5-sunburst \
 ```
 
 Modelo `gpt-image-2.5-sunburst`, calidad `xhigh`. Costo medido: **≈ USD 0,14 por vista**; el hoodie tomó **26
-generaciones para 21 vistas** contando descartes (≈ USD 3,6). Presupuestar el 25 % de descarte.
+generaciones para 21 vistas** y el polo **29 para 21**, contando descartes (≈ USD 3,6–4,1). Presupuestar el 25 % de
+descarte, y más si la prenda lleva emblema bordado: ahí los descartes son por espejo (§3).
