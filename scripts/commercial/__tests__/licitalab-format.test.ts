@@ -53,3 +53,30 @@ describe('formato de pnpm licitalab', () => {
     expect(formatLicitalabResult('support', { answer: 'Respuesta' })).toBe('Respuesta')
   })
 })
+
+describe('formato de sesión de usuario (opportunity/provider)', () => {
+  it('opportunity con multiple_matches lista candidatos sin elegir uno', async () => {
+    const { formatOpportunity } = await import('../licitalab-format')
+
+    const text = formatOpportunity({ multiple_matches: true, candidates: [{ type: 'tender_pe', buyer: 'aguachica' }, { type: 'tender_co', buyer: 'otra' }] })
+
+    expect(text).toContain('--type')
+    expect(text).toContain('1. type=tender_pe · buyer=aguachica')
+    expect(text).toContain('2. type=tender_co')
+  })
+
+  it('provider resume métricas en CLP y avisa si hay más páginas', async () => {
+    const { formatProviderReport } = await import('../licitalab-format')
+
+    const text = formatProviderReport({
+      provider: { name: 'EFEONCE GROUP SPA', tax_number: '77.357.182-1', country: 'CL' },
+      period: { from: '2025-09-17', to: '2026-09-17', date_basis: 'awarding_date' },
+      summary: { participations: 4, awarded: 0, win_rate_pct: 0, offered_amount: 47386865, awarded_amount: 0, currency: 'CLP' },
+      applications: { items: [], has_more: true, next_cursor: 'abc' }
+    })
+
+    expect(text).toContain('Participaciones 4 · adjudicadas 0 · win rate 0%')
+    expect(text).toContain('CLP 47.386.865')
+    expect(text).toContain('--cursor abc')
+  })
+})
