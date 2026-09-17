@@ -95,3 +95,24 @@ dilatar, porque dilatar arrastraba un halo gris del muro viejo; suavizado 0,7 px
 cubren con el navy promedio de cada fila. Se regeneró el 4:5 (sólo merge del ancho) y se recompusieron ambos formatos;
 QA sin cambios. Regla transferible: cuando se repinta el fondo alrededor de una mascota con partes finas o sueltas,
 proteger la mascota con máscara propia verificada a zoom, no con el matte genérico del sujeto.
+
+## v05 — acabado profesional: plate nativo, Clawd más grande, cursor Claude legible (2026-09-17)
+
+El operador vio el recorte «mordido» (pelo de Nexa, bordes de Clawd) en v04 y aprobó aplicar todas las mejoras. v04 y su
+muro repintado quedan descartados. Entregables: `kv-tu-ia-no-conoce-clawd-4x5-v05.png` y
+`kv-tu-ia-no-conoce-clawd-9x16-v05.png`, con `*-overlay.svg`, `*-qa.json` y vista 390.
+
+| Paso | Detalle |
+|---|---|
+| Intento 1 (descartado) | Plate 9:16 nativo con muro navy (`brief/plate-kv-v05-9x16.prompt.txt`, 2 variantes): integración real, pero cámara demasiado cerca (cabeza al 18 %, manos cortadas). Alejar 25 % con outpaint (`v05/zoomout.mjs`) duplicó marcos de ventana y dejó una línea en el escritorio |
+| Boceto de composición | `v05/layout-sketch.mjs` → `v05/layout-sketch.png`: formas planas con cabeza, Clawd sobre el hombro, manos, escritorio y laptop en su lugar |
+| Plate nativo guiado | `gpt-image-2.5-sunburst` xhigh 1152×2048 edit con 5 imágenes (boceto + Avatar 3/4 + Cuerpo Completo + hoodie + Clawd shrug) · `brief/plate-kv-v05b-9x16.prompt.txt` · 2 variantes; elegida `plate-kv-9x16-v05b-1` (manos completas, Clawd apoyado con «?» completo, mirada hacia Clawd, pelo integrado al muro) |
+| Aire para titular | `v05/zoomout.mjs` con `S=0.9 Y=200 TAG=-b`: alejamiento de 10 % con más espacio arriba; uniones sólo en muro, ventanas y escritorio · salto máximo por fila en la unión superior 0,95 |
+| 4:5 | `feed/outpaint-wide.mjs` con `PLATE=../v05/plate-9x16-v05-b.png TAG=-v05` · saltos por columna 1,43 / 1,40. Clawd ≈ 11 % del ancho (antes 7 %) |
+| Composición | `compose-kv-v05.mjs`: mismo sistema que v04 con `presentation` del adapter AXIS: `collaboratorScale 1.9` (etiqueta «Claude» legible a 390 px), `localCursorScale 1.25`, `participantColors.claude = #d77757` (naranja de Clawd, tinta navy por contraste). Bloque 4:5 bajado (top 128). Logo centrado sobre la laptop desenfocada del primer plano |
+
+Contraste peor caso: entrada 10,54 (4:5) / 10,76 (9:16) · remate 12,92 / 13,52 · etiqueta de capa 4,59 · logo 10,09 /
+11,01. Sin recortes del sujeto: pelo y Clawd son nativos del plate.
+
+Adapter AXIS extendido (`scripts/creative/layout-compiler/axis-advertising.mjs`): opción `presentation` con pruebas en
+`axis-advertising-presentation.test.mjs` (sin opciones el render es idéntico al contrato por defecto).

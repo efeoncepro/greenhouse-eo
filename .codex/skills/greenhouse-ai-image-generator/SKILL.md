@@ -471,6 +471,11 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
 - **Objetos 3D con forma de marca:** boceto con los glifos o siluetas reales en su posición exacta → `--image` con
   Sunburst para materializar → texto y logo compuestos después. El resultado no es vector exacto de la fuente:
   declararlo en la entrega.
+- **Cambiar el fondo detrás de una persona o mascota: regenerar, no recortar.** Repintar un muro alrededor de un
+  sujeto con matte + máscara deja bordes «mordidos» en pelo y deforma partes finas o sueltas (el «?» de Clawd).
+  Acabado profesional = plate nativo con el set nuevo, guiado por un **boceto de composición** de formas planas
+  (posición y escala de cada elemento) como imagen 1; si falta aire, alejar la cámara ≤ 10 % con outpaint cuyas
+  uniones caigan sólo en muro, ventanas o escritorio. Alejar 25 % duplicó marcos de ventana («marco dentro de marco»).
 - **Extender a otro formato (4:5 → 9:16) sin costuras:** colocar el plate aprobado en el lienzo nuevo, outpaint con
   máscara y re-pegar el núcleo. La máscara debe abrir también una franja de transición DENTRO del núcleo (zona sin
   objetos clave): si sólo abre el exterior, el modelo conserva el borde del lienzo y deja una línea. Fundir el núcleo

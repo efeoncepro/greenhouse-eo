@@ -126,6 +126,12 @@ del sistema ni de síntesis tipográfica.
 
 ## Selección colaborativa invocable por agentes
 
+**Escala y color de campaña (adapter, 2026-09-17).** `renderCollaborationSelection` acepta `presentation` opcional:
+`collaboratorScale` (etiqueta y cursor colaborador; ~1,9 para que el nombre se lea a 390 px en 1080 de ancho),
+`localCursorScale` y `participantColors` por id de cursor (p. ej. color de marca de un partner). La tinta de la
+etiqueta se elige por contraste WCAG y el render falla bajo 4,5:1. Sin `presentation` el resultado es idéntico al
+contrato por defecto. No recolorear ni reescalar el SVG a mano. Caso: KV «Tu IA no conoce tu negocio».
+
 La API agent-facing vive en AXIS, no en la página del Lab. Dentro de Greenhouse, un agente normaliza la
 intención con:
 

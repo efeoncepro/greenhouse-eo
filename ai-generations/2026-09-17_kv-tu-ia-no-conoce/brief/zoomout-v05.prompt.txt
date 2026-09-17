@@ -1,0 +1,5 @@
+Outpaint this photograph outward on all four sides: the camera pulls back. Keep the existing central scene exactly as it is (the woman in the royal blue hoodie with both hands raised in a shrug, the orange cube figurine with its question mark on her shoulder, the navy wall, the desk and the laptop). Fill only the transparent frame so the same photograph continues seamlessly:
+- Top: more of the same smooth, matte, deep navy painted wall, softly lit, clean and empty, gently darker toward the top edge.
+- Left and right: the same tall dark window frames with soft blurred daylight and a few blurred plants at the far edges; complete her fingertips naturally if they reach the edge.
+- Bottom: the same dark navy desk in the immediate foreground continuing across the full width and down to the bottom edge, strongly out of focus, smooth and uncluttered, with the closed laptop completed naturally.
+Match lighting, color grade, depth of field, grain and perspective exactly. No new objects, no people, no text, no letters, no logos.

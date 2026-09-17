@@ -256,7 +256,37 @@ const cursorPath = ({ hotspot, direction, size, fill, stroke, strokeWidth, id, k
   return `<g data-axis-cursor-id="${escapeXml(id)}" data-axis-cursor-kind="${kind}" data-axis-cursor-state="${state}" data-axis-cursor-action="${action}" data-axis-cursor-direction="${direction}" data-axis-cursor-hotspot-x="${round(hotspot.x)}" data-axis-cursor-hotspot-y="${round(hotspot.y)}" transform="translate(${round(hotspot.x)} ${round(hotspot.y)}) rotate(${angle}) scale(${round(scale)})"><path d="M 0 0 L 32 13 L 19 18 L 14 33 Z" fill="${fill}" stroke="${stroke}" stroke-width="${round(strokeWidth / scale)}" stroke-linejoin="round"/></g>`
 }
 
-export const renderCollaborationSelection = ({ manifest, targetBounds, canvas, measureLabel }) => {
+const hexLuminance = hex => {
+  const n = Number.parseInt(hex.slice(1), 16)
+
+  const channel = v => {
+    const c = v / 255
+
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+  }
+
+  return 0.2126 * channel((n >> 16) & 255) + 0.7152 * channel((n >> 8) & 255) + 0.0722 * channel(n & 255)
+}
+
+const contrastRatio = (a, b) => {
+  const [hi, lo] = [hexLuminance(a), hexLuminance(b)].sort((x, y) => y - x)
+
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+// Tinta de etiqueta por contraste WCAG: el blanco o el navy AXIS que más contraste logre sobre el color del colaborador.
+// Con la paleta por defecto reproduce exactamente la elección histórica (blanco sobre violeta/azul, navy sobre verde/naranja).
+const labelInkFor = color => (contrastRatio('#ffffff', color) >= contrastRatio('#00284d', color) ? '#ffffff' : '#00284d')
+
+/**
+ * `presentation` (opcional) adapta la escala de lectura a la superficie, sin tocar la semántica del manifest:
+ * - `collaboratorScale`: multiplica cursor colaborador, etiqueta y separación (campañas leídas a 390 px necesitan >1).
+ * - `localCursorScale`: multiplica el cursor local.
+ * - `participantColors`: color por id de cursor colaborador (p. ej. color de marca de un partner). Debe ser #rrggbb y
+ *   la tinta resultante debe alcanzar 4,5:1 o el render falla.
+ * Sin `presentation` el resultado es idéntico al contrato por defecto.
+ */
+export const renderCollaborationSelection = ({ manifest, targetBounds, canvas, measureLabel, presentation = {} }) => {
   assertAxisAdvertisingPackages()
   if (manifest.schema !== 'axis.collaboration-selection-composition.v1')
     throw new Error(`Unsupported collaboration manifest schema ${manifest.schema ?? 'missing'}`)
@@ -268,11 +298,17 @@ export const renderCollaborationSelection = ({ manifest, targetBounds, canvas, m
 
   const bounds = expandedBounds(targetBounds, manifest.selection.paddingRatio, canvas.width)
   const handleSize = Math.max(7, canvas.width * 0.008)
-  const localSize = Math.max(32, canvas.width * 0.047)
-  const collaboratorSize = Math.max(18, canvas.width * 0.026)
-  const labelFontSize = Math.max(11, canvas.width * 0.012)
+  const { collaboratorScale = 1, localCursorScale = 1, participantColors = {} } = presentation
+
+  for (const [id, value] of Object.entries(participantColors))
+    if (!/^#[0-9a-f]{6}$/i.test(value)) throw new Error(`participantColors.${id} must be #rrggbb`)
+  if (!(collaboratorScale > 0) || !(localCursorScale > 0)) throw new Error('Presentation scales must be positive numbers')
+
+  const localSize = Math.max(32, canvas.width * 0.047) * localCursorScale
+  const collaboratorSize = Math.max(18, canvas.width * 0.026) * collaboratorScale
+  const labelFontSize = Math.max(11, canvas.width * 0.012) * collaboratorScale
   const labelHeight = labelFontSize * 2.15
-  const gap = Math.max(3, canvas.width * 0.004)
+  const gap = Math.max(3, canvas.width * 0.004) * collaboratorScale
   const palette = ['#5d50ff', axisAdvertising.color.growthOnDark, '#0375db', axisAdvertising.color.accentSurface]
 
   const overlay =
@@ -329,12 +365,11 @@ export const renderCollaborationSelection = ({ manifest, targetBounds, canvas, m
 
     if (!hotspot) throw new Error(`No free semantic canvas position for moving cursor ${cursor.id}`)
 
-    const color = palette[collaboratorIndex % palette.length]
+    const color = participantColors[cursor.id] ?? palette[collaboratorIndex % palette.length]
+    const labelInk = labelInkFor(color)
 
-    const labelInk =
-      color === axisAdvertising.color.growthOnDark || color === axisAdvertising.color.accentSurface
-        ? '#00284d'
-        : '#ffffff'
+    if (contrastRatio(labelInk, color) < 4.5)
+      throw new Error(`Collaborator label for ${cursor.id} cannot reach 4.5:1 on ${color}`)
 
     const labelWidth = measureLabel(cursor.label, labelFontSize) + labelFontSize * 1.6
 
