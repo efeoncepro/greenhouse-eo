@@ -55,6 +55,22 @@ y 4 cm de fondo, montado con pines ocultos sobre travertino». Una pasada, USD 0
 («espectacular»). Antes, la variante de pegar + halo sobre el mismo muro fue rechazada: «se ve muy falso», y el navy
 sobre travertino no tenía jerarquía. Registro: bitácora §5.
 
+
+## 1.c Aplicar el kit con una persona en la escena (caso Nexa en set de TV)
+
+Registro: `ai-generations/2026-09-17_nexa-logo-estudio/LEEME.md`. Cinco reglas medidas en esa producción:
+
+- **El emblema es lo frágil:** acompañar SIEMPRE el render con el logo oficial plano como referencia extra y declarar
+  su geometría (nave a la derecha, órbita como elipse ancha con cortes, planeta encima) y su proporción (del alto de
+  una letra). Sin eso, la órbita se vuelve círculo y el emblema crece.
+- **Referencia frontal** en escenas complejas; la de tres cuartos exige más del modelo.
+- **Color del logo por contraste con el sujeto:** con un hoodie navy sobre set oscuro, letras blancas; el navy pide
+  fondos claros.
+- **Anatomía:** un objeto a la altura del codo obliga a poses que se leen mal. Apoyarse con las manos en una mesa a la
+  cadera funciona. Declarar qué parte del cuerpo se ve y a qué altura llega cada elemento; si el cuerpo se corta en la
+  oscuridad, iluminar el piso y declarar el calzado.
+- **Encuadre:** pedir márgenes explícitos («nada toca los bordes») y tercio superior limpio si después va titular AXIS.
+
 ## 2. Elegir la variante (manda §1.b: el tamaño es sólo uno de los criterios)
 
 El camino canónico es **generativo en las dos variantes**: el logo entra como píxeles exactos y el modelo aporta
