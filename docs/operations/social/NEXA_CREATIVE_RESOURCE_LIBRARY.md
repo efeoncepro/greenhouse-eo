@@ -54,7 +54,7 @@ rostro se validó a ojo contra las referencias. El hoodie es vestuario de esa ca
 El método usado el 2026-09-17 para las [bibliotecas de poses 3D de mascotas de partners](PARTNER_MASCOT_POSE_LIBRARIES.md)
 (Clawd y Codex) se aplicará a Nexa: fuente oficial → base validada → ángulos de cámara → accesorios → recorte con
 relleno de huecos → QA → OneDrive. Destino: una carpeta propia dentro de `10. Nexa (Influencer IA)`, nunca en
-`Recursos/Mascotas de partners` (Nexa es marca propia, no mascota de partner). Nexa tiene dos familias y cada una lleva
+`14. Mascotas de partners` (Nexa es marca propia, no mascota de partner). Nexa tiene dos familias y cada una lleva
 su propia serie, sin mezclarlas:
 
 - **Personaje 3D estilo Pixar:** `public/images/illustrations/characters/greenhouse-*.png` (pipeline edit + `rmbg`).

@@ -6,7 +6,7 @@ no assets entregados por los partners.
 
 ## Ubicación
 
-`/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/Recursos/Mascotas de partners`
+`/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/14. Mascotas de partners`
 
 En otra máquina localizar esa biblioteca OneDrive, no crear esta ruta personal. `Alineación` puede venir descompuesto
 en Unicode: resolver con listado real, no renombrar originales.

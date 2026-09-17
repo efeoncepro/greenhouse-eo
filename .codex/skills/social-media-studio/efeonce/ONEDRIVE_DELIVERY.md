@@ -14,7 +14,8 @@ localizar la misma biblioteca/carpeta; no crear esta ruta absoluta si el OneDriv
 
 Conservar las carpetas del equipo: `01. Contenido Evergreen`, `02. Grilla`, `03. Plantillas Contenido`,
 `04. Ads`, `05. Highlights`, `06. Blog Content`, `07. Ebook`, `08. Estrategia`, `09. Glitch`,
-`10. Nexa (Influencer IA)`, `11. Spot`, `12. LP Opengraphs`, `2025`, `Recursos` y `Seasonalities`.
+`10. Nexa (Influencer IA)`, `11. Spot`, `12. LP Opengraphs`, `13- Branding`, `14. Mascotas de partners`, `2025`,
+`Recursos` y `Seasonalities`.
 `Seasonalities` es una categoría entre varias, no el destino por defecto. Inspeccionar la estructura vigente
 antes de clasificar; el inventario anterior describe lo observado, no congela nuevas categorías.
 No reorganizar contenido existente ajeno al alcance solicitado.
@@ -46,7 +47,7 @@ para fondo oscuro; light es navy para fondo claro. No inferirlo al revés.
 [inventario y contrato de selección](../../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md)
 antes de reutilizarla; incluye rutas y particularidades Unicode verificadas.
 
-**Mascotas de partners:** `Recursos/Mascotas de partners/<Mascota (Partner)>/` con subcarpetas por familia y versión
+**Mascotas de partners:** `14. Mascotas de partners/<Mascota (Partner)>/` con subcarpetas por familia y versión
 (p. ej. `Clawd (Claude)/` y `Codex (OpenAI)/`, cada una con `Fuente oficial/`, `Poses 3D/v01/` y
 `Poses 3D con accesorios/v01/`, cada pose en fondo de estudio y transparente). Método reutilizable:
 [`mascot-3d-pose-library.md`](../../greenhouse-ai-image-generator/references/mascot-3d-pose-library.md); evidencia en
@@ -61,7 +62,8 @@ existentes cuando la tarea lo requiera, verificando el destino y evitando romper
 la familiaridad con la biblioteca no autoriza limpieza masiva, borrado ni reorganización general.
 
 Clasificar por finalidad: contenido permanente → Evergreen; publicidad → Ads; plantillas → Plantillas;
-blog → Blog Content; ebooks → Ebook; recursos reutilizables → Recursos; festividades → Seasonalities.
+blog → Blog Content; ebooks → Ebook; recursos reutilizables → Recursos; mascotas de partners → `14. Mascotas de partners`
+(indicación del operador 2026-09-17: carpeta propia en la raíz, no dentro de Recursos); festividades → Seasonalities.
 Para otras categorías, leer los nombres y el contenido pertinente antes de elegir. No crear carpetas vacías
 preventivamente ni enviar todo a Seasonalities. Si el usuario especifica un destino, prevalece su instrucción.
 El estándar PNG aplica a la entrega de imágenes estáticas; conservar formatos nativos de editables, video,

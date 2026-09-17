@@ -3,7 +3,7 @@
 Pedido del operador: al menos 7 poses de Clawd (mascota de Claude, partner) desde distintos ángulos de cámara en 3D de
 alta calidad, más 8 poses con accesorios relacionados con lo que hace Efeonce, guardadas en la biblioteca de contenido.
 
-**Destino OneDrive:** `5. Contenidos/Recursos/Mascotas de partners/Clawd (Claude)/`
+**Destino OneDrive:** `5. Contenidos/14. Mascotas de partners/Clawd (Claude)/`
 - `Poses 3D/v01/` — 8 poses × 2 variantes (`-fondo-estudio.png` y `-transparente.png`), 16 PNG 1600×1600.
 - `Poses 3D con accesorios/v01/` — 8 poses × 2 variantes, 16 PNG 1600×1600.
 

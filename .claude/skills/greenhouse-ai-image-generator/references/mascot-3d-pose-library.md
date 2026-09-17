@@ -119,7 +119,7 @@ conserva: si el color del hueco ≈ mediana del borde del original, sigue transp
 ## 9. Entrega en OneDrive
 
 ```text
-5. Contenidos/Recursos/Mascotas de partners/<Mascota (Partner)>/
+5. Contenidos/14. Mascotas de partners/<Mascota (Partner)>/
   Fuente oficial/                      sprite reconstruido o atlas oficial + cuadros clave
   Poses 3D/v01/                        8 poses × 2 variantes
   Poses 3D con accesorios/v01/         8 accesorios × 2 variantes

@@ -4,7 +4,7 @@ Pedido del operador: replicar con Codex (mascota de Codex/ChatGPT, partner OpenA
 alta calidad desde distintos ángulos y con accesorios ligados a Efeonce — dejarlo en la carpeta de contenidos y
 documentar el método para repetirlo con Nexa.
 
-**Destino OneDrive:** `5. Contenidos/Recursos/Mascotas de partners/Codex (OpenAI)/`
+**Destino OneDrive:** `5. Contenidos/14. Mascotas de partners/Codex (OpenAI)/`
 - `Fuente oficial/` — atlas oficial `codex-spritesheet-v6-oficial-app-chatgpt-26.911.webp` + 11 cuadros clave ×4.
 - `Poses 3D/v01/` — 8 ángulos × (`-fondo-estudio.png`, `-transparente.png`), PNG 1600×1600.
 - `Poses 3D con accesorios/v01/` — 8 accesorios × 2 variantes.
