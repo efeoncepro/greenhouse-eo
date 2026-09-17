@@ -110,6 +110,36 @@ ordena por score y recorta; con `--json` recorta tú.
 
 ## Recetas canónicas
 
+### 0. Flujo agéntico de punta a punta con la CLI (receta por defecto)
+
+Reparto: **el agente busca, filtra y lee; el humano elige candidatas y decide**. Todo con `pnpm licitalab`
+(ver §API key + CLI). Manual: `docs/manual-de-uso/comercial/revisar-licitaciones-licitalab-con-cli.md`.
+
+1. **Buscar.** `pnpm licitalab search --view all --max 200 --match "<término>" --enrich --no-login`
+   (o `--view recommended --max 50`). `--match` filtra sólo lo recolectado: para un barrido amplio sube `--max`,
+   y si el término es corto o ambiguo corre varias búsquedas en vez de una.
+2. **Filtrar.** Descarta sin leer bases lo que no es servicio de Efeonce (licencias, hardware, bienes físicos),
+   lo que no llega a tiempo (cierre < preparación realista) y lo que `--enrich` muestra como cerrado. Entrega 3–5
+   candidatas con una línea de por qué y cierre/monto. El score de LicitaLAB ordena; nunca justifica.
+3. **Confirmación humana** de qué candidatas analizar a fondo. No se analiza en masa sin ese paso.
+4. **Análisis por candidata:**
+   - `opportunity <código>` → estado, ítems, fechas, monto. `multiple_matches` = mostrar candidatos y pedir elegir.
+   - `documents <código>` → inventario; los `✗` no se leen con RAG: decláralos como no revisados.
+   - `ask-docs <código> "<pregunta acotada>"` → una pregunta por tema: requisitos excluyentes, experiencia y
+     equipo exigido, garantías, plazos y entregables, criterios y ponderación, formato y anexos de la oferta,
+     forma de pago. Respeta los estados RAG (§Estados del RAG documental).
+   - `provider <RUT>` (opcional) → historial del comprador o de competidores con `--include lost_items_pricing`.
+5. **Matriz.** Por requisito: `cumple | no cumple | falta evidencia`, con archivo y página. Lo que el RAG no
+   devolvió es **falta evidencia**, nunca «no existe». Suma riesgos, fechas clave y recomendación
+   `GO | HOLD | NO-GO`; GO exige admisibilidad y margen sobre loaded cost (`bid-lifecycle-go-no-go.md`).
+6. **Decisión y CRM.** Sólo con confirmación humana explícita: promoción a `public_opportunity`/`Proposal`
+   (`origin='public_tender'`) y write a HubSpot con readback (`licitalab-radar-playwright.md`).
+
+**Sesiones.** El agente corre siempre con `--no-login`. Si la sesión web (search) o el token OAuth
+(opportunity/provider/--enrich, 7 días) vencieron, se detiene y le pide al operador ejecutar en su terminal
+`pnpm licitalab search --headed` o `pnpm licitalab login`: el agente nunca ingresa ni pide la contraseña.
+En runtime (Vercel/Cloud Run) sólo existe la API key: documents, ask-docs y support.
+
 ### 1. Analizar una oportunidad por código
 
 1. Ejecuta `findOpportunityTool` con el código y el país cuando sea necesario.
@@ -152,8 +182,8 @@ Nunca afirmes haber leído bases cuando el estado no sea `ok` ni `partial`.
 
 - Es una superficie **read-only de contratación pública**: no guarda, etiqueta, cotiza, postula, acepta órdenes,
   envía ofertas ni modifica LicitaLAB o el portal público de origen.
-- El inventario observado no incluye discovery general por keyword, región, categoría o fecha; la búsqueda de
-  oportunidad requiere `code`.
+- El MCP no incluye discovery general por keyword, región, categoría o fecha; consultar una oportunidad requiere
+  `code`. El discovery sale del radar web: `pnpm licitalab search` (receta 0).
 - No hay tool callable para listar “Mis negocios” o todas las oportunidades monitoreadas.
 - No hay tool de descarga binaria: se listan archivos y se consulta texto vía RAG.
 - Cobertura desigual por país/tipo debe representarse como `unsupported`, no como ausencia legítima de datos.
@@ -174,6 +204,8 @@ Después de conectar o renovar OAuth:
 
 ## Prompts de arranque
 
+- “Busca oportunidades de marketing y comunicación en LicitaLAB y dame las 5 mejores candidatas.” (receta 0)
+- “Analiza a fondo `<código>`: requisitos excluyentes, garantías, criterios y riesgos, con archivo y página.”
 - “Busca la oportunidad `<código>` en Chile y dame comprador, estado, fechas, ítems y adjudicatarios.”
 - “Lista las bases y anexos de `<código>`; todavía no los analices.”
 - “En las bases de `<código>`, identifica requisitos excluyentes y cita archivo y página.”

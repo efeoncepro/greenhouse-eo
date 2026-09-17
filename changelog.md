@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-17 — LicitaLAB: CLI `pnpm licitalab` y flujo agéntico de licitaciones públicas
+
+Nuevo cliente canónico `src/lib/commercial/tenders/licitalab/client.ts` sobre el MCP de LicitaLAB y CLI con tres
+credenciales: API key en Secret Manager (`documents`, `ask-docs`, `support`), sesión OAuth de usuario de 7 días
+automatizada con Playwright (`opportunity`, `provider`; la key responde `unsupported`) y el radar web existente,
+ahora con `--headless/--no-login`, detrás de `search [--match] [--enrich]`. Verificado en vivo (20 recomendadas
+enriquecidas; 175 del listado completo). Receta 0 en la skill de licitaciones y manual
+`revisar-licitaciones-licitalab-con-cli.md`. El agente nunca ingresa la contraseña: renovar sesiones es del operador.
+
 ## 2026-09-17 — Nave de Efeonce en 3D, navy y blanco
 
 Quedó en `13- Branding/Nave Efeonce 3D` la biblioteca del isotipo en 3D: 16 ángulos de cámara por color (con versiones
@@ -834,18 +843,3 @@ la fecha del banco), más el adapter `bancochile_cuenta_vista_text`. Datos: Humb
 retención; Deel REC-2026-11/12/13; Valentina EO-CPAY-0002 pagado el 07/09; comisión HubSpot Q2 2026 como
 ingreso; Banco de Chile FAN Emprende anclado e importado. Seis períodos `reconciled`. Pendiente de despliegue:
 el ops-worker recomputa saldos con el código previo a ISSUE-169.
-
-## 2026-09-10 — Finance: recuperación de conciliación agosto–septiembre 2026
-
-Cuatro meses sin cartola se resolvieron re-anclando cada instrumento con una OTB bank-authoritative al inicio de
-agosto (Global66 al 31/07 y la TC al cierre de ciclo 06/08) en vez de reconstruir mayo–julio. Nacen los adapters
-de cartola (`santander_cartola_xlsx`, `santander_tc_movimientos_xlsx`, `santander_tc_estado_cuenta_text`,
-`global66_xls`) detrás de `parseBankStatementFile`; la ruta de import acepta archivo/texto y el drawer suma la
-pestaña «Archivo del banco» (la lista CSV ahora calza con el parser). CLIs canónicas nuevas:
-`finance:instrument:create`, `finance:import-statement`, `finance:reconcile-rows` (plan JSON) y
-`finance:declare-otbs --file`. Se corrigió `ISSUE-169` (cuentas USD/MXN sumaban CLP; el día genesis de la OTB no
-materializaba movimientos), el opening canónico del período honra la OTB, las filas idénticas del mismo día ya no
-colapsan al importar y las factorías de settlement aceptan fechas partidas y MXN. Créditos V1
-(`src/lib/finance/loans.ts`): Crédito FOGAPE Santander registrado con su desembolso como settlement `funding`.
-Datos: `banco-chile-clp` registrada, 9 períodos ago/sep importados, 77 filas conciliadas por plan, tres períodos
-`reconciled`; las discrepancias de nómina y dos cobros quedan escaladas al operador (follow-up propuesto `TASK-1858`, sin registrar aún).
