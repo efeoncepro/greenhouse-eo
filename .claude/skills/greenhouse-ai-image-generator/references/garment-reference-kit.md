@@ -230,3 +230,7 @@ descarte, y más si la prenda lleva emblema bordado: ahí los descartes son por 
 ## Delta 2026-09-17 — dónde va la estampa de espalda
 
 La estampa canónica (logo completo + eslogan al 38 % del ancho de la espalda) va en el **hoodie** y en las **chaquetas (softshell y bomber) sí la llevan**, por decisión del operador. La única prenda con **espalda limpia** es el **polo**, la más formal frente a cliente. Si una serie ya se produjo con la regla anterior, se rehacen sólo las vistas de espalda (prenda sola, plano cenital y puesta) con la estampa como imagen 2.
+
+## Delta 2026-09-17 — elegir la vista por cómo se usa la prenda
+
+No basta el ángulo de la toma: si en la pieza la chaqueta va **abierta**, la referencia es la vista de cierre abierto, no la de frente; si va sobre otra prenda, se pasan ambas (interior y exterior) como referencias separadas. Caso: `ai-generations/2026-09-17_nexa-vestuario/LEEME.md` (Nexa con polo y softshell, una pasada).
