@@ -11,18 +11,19 @@ const PW = 1152
 const LEFT = (CW - PW) / 2 // 240
 const BAND = 40
 const FADE = 28
-const PLATE = path.join(DIR, '../story/plate-9x16.png')
+const PLATE = path.join(DIR, process.env.PLATE ?? '../story/plate-9x16.png')
+const TAG = process.env.TAG ?? ''
 const mode = process.argv[2]
 
 if (mode === 'prep') {
   const plate = await sharp(PLATE).ensureAlpha().png().toBuffer()
   await sharp({ create: { width: CW, height: CH, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
-    .composite([{ input: plate, left: LEFT, top: 0 }]).png().toFile(path.join(DIR, 'canvas.png'))
+    .composite([{ input: plate, left: LEFT, top: 0 }]).png().toFile(path.join(DIR, `canvas${TAG}.png`))
   const keep = `<svg xmlns="http://www.w3.org/2000/svg" width="${CW}" height="${CH}"><rect x="${LEFT + BAND}" y="0" width="${PW - BAND * 2}" height="${CH}" fill="#fff"/></svg>`
-  await sharp(Buffer.from(keep)).png().toFile(path.join(DIR, 'mask.png'))
+  await sharp(Buffer.from(keep)).png().toFile(path.join(DIR, `mask${TAG}.png`))
   console.log('canvas + mask', { LEFT, keepFrom: LEFT + BAND, keepTo: LEFT + PW - BAND })
 } else if (mode === 'merge') {
-  const ext = await sharp(path.join(DIR, 'extended-raw.png')).resize(CW, CH).removeAlpha().png().toBuffer()
+  const ext = await sharp(path.join(DIR, `extended-raw${TAG}.png`)).resize(CW, CH).removeAlpha().png().toBuffer()
   const plate = await sharp(PLATE).removeAlpha().raw().toBuffer()
   const rgba = Buffer.alloc(PW * CH * 4)
 
@@ -35,9 +36,9 @@ if (mode === 'prep') {
   }
 
   const core = await sharp(rgba, { raw: { width: PW, height: CH, channels: 4 } }).png().toBuffer()
-  await sharp(ext).composite([{ input: core, left: LEFT, top: 0 }]).png().toFile(path.join(DIR, 'plate-4x5-wide.png'))
+  await sharp(ext).composite([{ input: core, left: LEFT, top: 0 }]).png().toFile(path.join(DIR, `plate-4x5-wide${TAG}.png`))
 
-  const { data } = await sharp(path.join(DIR, 'plate-4x5-wide.png')).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+  const { data } = await sharp(path.join(DIR, `plate-4x5-wide${TAG}.png`)).removeAlpha().raw().toBuffer({ resolveWithObject: true })
   const colL = x => { let s = 0; for (let y = 0; y < CH; y++) { const i = (y * CW + x) * 3; s += 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2] } return s / CH }
   const jumps = {}
 

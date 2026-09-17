@@ -65,3 +65,23 @@ directo sobre la pared fallaba (2,5–3,5:1) por las juntas oscuras del ladrillo
 
 Observaciones: Clawd mide cerca de 7 % del ancho en 4:5 y se reconoce a 390 px por silueta, color y «?», pero es
 pequeño; si el feed lo pierde, subirlo en el plate. Insignia de partner Claude sigue pendiente.
+
+## v04 — muro navy, jerarquía y selección colaborativa AXIS (2026-09-17)
+
+Pedido del operador: sin degradado azul detrás del texto, titular con jerarquía y uso de los elementos gráficos de la
+marca (bounding box, cursor local y multiplayer). Entregables: `kv-tu-ia-no-conoce-clawd-4x5-v04.png` y
+`kv-tu-ia-no-conoce-clawd-9x16-v04.png`, con `*-overlay.svg`, `*-qa.json` y vista 390.
+
+| Paso | Detalle |
+|---|---|
+| Decisión de muro | Se descartó el muro claro propuesto: los controles de selección AXIS (trazo `#a6cdf5`, tiradores blancos) están diseñados para fondo oscuro y desaparecen sobre claro. El muro se repintó navy liso como escenografía, sin scrim |
+| Matte | `pnpm ai:image:rmbg` sobre el 9:16 → `wall/subject-alpha.png` (Nexa + Clawd) |
+| Repintado del muro | `wall/wall.mjs prep|merge` + `brief/wall-navy.prompt.txt` · `gpt-image-2.5-sunburst` edit con máscara (rectángulo del muro menos núcleo del sujeto erosionado 3 px) · usage out 2511. Merge: sujeto original sobre muro nuevo con matte suavizado (σ 2, umbral 0,7→1) y fundido de 6 px en los bordes del muro; con 36 px quedaba una franja clara junto a las ventanas y con matte duro un filo en el pelo |
+| 4:5 | `feed/outpaint-wide.mjs` con `PLATE=../wall/plate-9x16-navy.png TAG=-navy` · salto máximo por columna 5,22 / 2,36 (sin costura visible) |
+| Composición | `compose-kv-v04.mjs`: «Tu IA no conoce» Poppins 500 `softOnDark` (0,4× del remate) → «tu negocio.» Bricolage `ideaImpact` 780 blanco (47 % del ancho). `resolveCollaborationSelectionIntent` + `renderCollaborationSelection`: `eight-handles`, overlay `subtle`, colaborador «Claude» (`role`, top-end, select) y cursor local (bottom-start). Etiqueta de capa «Contexto: 0 %» Poppins 600 en `#0375db` centrada bajo la selección. Logo centrado sobre el escritorio. Guardias: zona segura, bloque sobre la cabeza, selección dentro del muro, `<text>` convertidos a trazados, `withinCanvas` |
+
+Contraste peor caso: entrada 12,77 (4:5) / 12,16 (9:16) · remate 15,22 · texto de etiqueta 4,59 · logo 17,64 / 17,04.
+
+Límites observados: la etiqueta del cursor «Claude» usa el tamaño del contrato AXIS (1,2 % del ancho) y a 390 px no se
+lee; el color del cursor colaborador sale de la paleta AXIS (violeta), no del naranja de Clawd. Ambos requieren
+extender el contrato AXIS (escala de etiqueta para campaña, color de participante), no parchear el render.
