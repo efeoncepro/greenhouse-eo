@@ -64,3 +64,12 @@ su propia serie, sin mezclarlas:
 Sin guía de partner que validar, pero rostro, cabello y rasgos de identidad se mantienen; el hoodie Efeonce es
 vestuario de campaña, no atributo universal. Método:
 [`mascot-3d-pose-library.md`](../../../.claude/skills/greenhouse-ai-image-generator/references/mascot-3d-pose-library.md).
+
+Lecciones de la [nave de Efeonce en 3D](2026-09-17-efeonce-ship-3d-production-method.md) (2026-09-17) que aplican a Nexa:
+
+- **Ángulos extremos:** un contrapicado, picado o gran angular se indica con una guía geométrica de perspectiva como
+  imagen de referencia; con la cámara sólo en texto el modelo devolvió casi frontal.
+- **Variantes de vestuario o color:** editar el render ya aprobado cambiando sólo ese atributo, en vez de regenerar;
+  así se conservan identidad, pose y cámara.
+- **QA del recorte:** componer la variante transparente sobre un fondo de contraste fuerte y revisar al 100 % los
+  huecos y bordes finos (cabello, dedos, accesorios).

@@ -489,7 +489,21 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
   máscara y re-pegar el núcleo. La máscara debe abrir también una franja de transición DENTRO del núcleo (zona sin
   objetos clave): si sólo abre el exterior, el modelo conserva el borde del lienzo y deja una línea. Fundir el núcleo
   dentro de esa franja repintada y verificar con perfil de luminancia por fila en las uniones.
-- Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md).
+- **Segundo color o variante de un asset 3D aprobado → editar el render aprobado, no regenerar.** Cambiar SÓLO
+  material y fondo (en escenas, sólo material). La nave blanca generada desde cero salió plana y con cortes difusos
+  y fue rechazada; la recoloreada desde cada render navy conservó geometría, cortes y cámara.
+- **Ángulos extremos (gusano, picado, gran angular, sobrevuelo) necesitan guía de perspectiva como imagen 1.** Con
+  la cámara sólo en texto el modelo devuelve casi frontal. Guía = silueta oficial extruida y proyectada con cámara
+  real (`ai-generations/2026-09-17_efeonce-ship-3d/guias/proyectar.mjs`), «copiar cámara, no su aspecto plano»;
+  base 3D aprobada como imagen 2 y logo como 3. La isométrica siguió frontal; una vista inferior pura de un logo
+  plano sólo muestra su canto.
+- **Recorte de objeto claro sobre fondo oscuro:** `pnpm ai:image:rmbg` deja OPACOS los huecos que muestran el fondo
+  (cortes, ventanas). Revisar siempre sobre fondo de contraste fuerte con zoom 100 %. Mientras rmbg no tenga una
+  opción canónica, la corrección es de corrida: `limpiar-huecos.mjs <fondo> <transparente> <umbral> <minPx>` de la
+  misma carpeta. Escenas claras sobre fondo claro y macros desenfocados no se recortan: se entregan como escena.
+  Método completo: [isotipo propio en 3D con dos colores](references/mascot-3d-pose-library.md#isotipo-propio-en-3d-con-dos-colores-caso-nave-de-efeonce).
+- Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md) ·
+  [nave Efeonce 3D](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).
 
 ## Provider Choice
 

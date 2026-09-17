@@ -112,6 +112,12 @@ Cuando el operador pide materialización generativa o el modelo puede resolver m
 6. **Después** componer el titular editorial de forma determinística. El master tipografiado no entra a un
    enhancer general. Cualquier uso posterior de IA con marca ya integrada exige revalidar su identidad.
 
+**Isotipo de Efeonce como objeto:** existe una biblioteca 3D aprobada de la nave en navy y blanco (ángulos con
+transparente y escenas; OneDrive `5. Contenidos/13- Branding/Nave Efeonce 3D/`). Usarla como el objeto, compuesta
+(ruta B) o como referencia para regenerar el plate (ruta C), antes de generar otra nave. Navy sobre fondos claros,
+blanco sobre oscuros o navy. Para integrarla con personas o mascotas, regenerar el plate en vez de recortar
+alrededor de los sujetos. Método: [isotipo propio en 3D](../../greenhouse-ai-image-generator/references/mascot-3d-pose-library.md#isotipo-propio-en-3d-con-dos-colores-caso-nave-de-efeonce).
+
 No imponer «todos los logos van después del modelo» a esta ruta: confunde firma gráfica con objeto material.
 Tampoco imponer «todo product placement exige IA»: las rutas A/B permiten control físico y de identidad.
 La elección responde al encargo, al asset y al acabado.

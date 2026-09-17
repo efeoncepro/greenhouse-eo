@@ -1,9 +1,9 @@
 # Greenhouse AI Visual Asset Generator V1
 
 > **Tipo de documento:** Spec de arquitectura
-> **Version:** 1.11
+> **Version:** 1.12
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-09-17 por Claude (1.11: `pnpm ai:image:rmbg` rellena por defecto los huecos internos del matting; `--no-fill-holes`. Antes, 1.10: carril Higgsfield API dentro de `pnpm ai:fal` — cliente canónico `src/lib/ai/higgsfield.ts`, 44 capacidades con JSON Schema real, precio exacto por API, secreto `greenhouse-higgsfield-api-key`; Recraft de la API: SVG sin confirmar. Antes, 1.9: brechas de `pnpm ai:image` y `pnpm ai:fal` corregidas en el commit `17196ead1` — estimación de costo previa, confirmación con tope en `ai:fal`, resolución barata por defecto, validaciones locales y `--format`. Antes: guía canónica de selección de modelos enlazada; GPT Image 2.5: costo estimable antes de gastar con la fórmula oficial, rate limits publicados, OpenAI recomienda 2.5 para integraciones nuevas, equivalencias de tokens con GPT Image 2; rankings externos contradictorios con fecha; correcciones de precio por resolución en fal. Antes: cliente fal con dos cuentas: selección por saldo, failover ante bloqueo por saldo, secreto `greenhouse-fal-api-key-b`, `--balance`, `--detach`/`--status`; verificación completa del registro: 47 de 55; costo real medido y filtro de contenido de Seedance; rotación de la clave B pendiente; antes, Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal`: 6 endpoints; estado real de Nano Banana Pro en el carril Google; Kling 3 y Grok Imagine revisados sin conectar; antes, Flux 3 conectado a `pnpm ai:fal`: 12 endpoints de video verificados, draft → enhance, edit y extend; contrato real de Seedance video a video; antes, Minimax H3 conectado a `pnpm ai:fal`: kind `training`, retome por `request_id`, director no operable; antes, carril out-of-band `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — familia GPT Image 2.5 transportada, carril Google migrado a Gemini Image)
+> **Ultima actualizacion:** 2026-09-17 por Claude (1.12: gap abierto del recorte de objeto claro sobre fondo oscuro —huecos opacos— con arreglo temporal de corrida; patrones recolorear desde el aprobado y guía de perspectiva. Antes, 1.11: `pnpm ai:image:rmbg` rellena por defecto los huecos internos del matting; `--no-fill-holes`. Antes, 1.10: carril Higgsfield API dentro de `pnpm ai:fal` — cliente canónico `src/lib/ai/higgsfield.ts`, 44 capacidades con JSON Schema real, precio exacto por API, secreto `greenhouse-higgsfield-api-key`; Recraft de la API: SVG sin confirmar. Antes, 1.9: brechas de `pnpm ai:image` y `pnpm ai:fal` corregidas en el commit `17196ead1` — estimación de costo previa, confirmación con tope en `ai:fal`, resolución barata por defecto, validaciones locales y `--format`. Antes: guía canónica de selección de modelos enlazada; GPT Image 2.5: costo estimable antes de gastar con la fórmula oficial, rate limits publicados, OpenAI recomienda 2.5 para integraciones nuevas, equivalencias de tokens con GPT Image 2; rankings externos contradictorios con fecha; correcciones de precio por resolución en fal. Antes: cliente fal con dos cuentas: selección por saldo, failover ante bloqueo por saldo, secreto `greenhouse-fal-api-key-b`, `--balance`, `--detach`/`--status`; verificación completa del registro: 47 de 55; costo real medido y filtro de contenido de Seedance; rotación de la clave B pendiente; antes, Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal`: 6 endpoints; estado real de Nano Banana Pro en el carril Google; Kling 3 y Grok Imagine revisados sin conectar; antes, Flux 3 conectado a `pnpm ai:fal`: 12 endpoints de video verificados, draft → enhance, edit y extend; contrato real de Seedance video a video; antes, Minimax H3 conectado a `pnpm ai:fal`: kind `training`, retome por `request_id`, director no operable; antes, carril out-of-band `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — familia GPT Image 2.5 transportada, carril Google migrado a Gemini Image)
 > **Task:** TASK-278 — AI Visual Asset Generator
 
 ---
@@ -236,6 +236,24 @@ ver el piso sombreado y se rellenaba. Un neutro más claro (glifos, brillos) o m
 espurias. `--no-fill-holes` lo desactiva; la salida imprime `huecos internos rellenados=<px>/<componentes>`. Prueba:
 `scripts/ai/fill-alpha-holes.test.ts`. Caso fuente: el `_` del emblema `>_` de Codex («saludo», biblioteca de poses 3D
 del 2026-09-17) salió transparente y sobre navy se veía un rectángulo oscuro.
+
+**Delta 2026-09-17 — caso inverso sin cubrir (gap abierto).** Con un objeto claro sobre fondo oscuro, el matting deja
+**opacos** los huecos pasantes que muestran el fondo (cortes de la órbita y ventanas de la nave de Efeonce blanca sobre
+navy; ventanas del macro navy). El relleno de huecos no lo corrige, porque atiende el problema opuesto (huecos
+transparentes). Workaround **temporal y local de la corrida**:
+`ai-generations/2026-09-17_efeonce-ship-3d/limpiar-huecos.mjs <fondo> <transparente> <umbral> <minPx>` — toma como
+fondo la mediana del borde y pasa a alfa 0 los componentes conexos cercanos a ese color (umbral) y de tamaño ≥ `minPx`,
+con borde suave de 2 px y descontaminación (blanco 42/30; macro navy 30/800). No es herramienta canónica: se retira
+cuando `pnpm ai:image:rmbg` tenga una opción canónica de llave de fondo (candidata `--key-background`). Mientras tanto,
+QA de transparentes sobre un fondo de contraste fuerte con zoom al 100 %. Registro:
+[bitácora](../operations/social/2026-09-17-efeonce-ship-3d-production-method.md).
+
+**Patrones de generación verificados en el mismo caso** (modo edit de `pnpm ai:image`):
+
+- **Recolorear desde el aprobado:** una variante de color se obtiene editando el render ya aprobado y cambiando sólo
+  material y fondo; regenerarla desde cero salió plana y fue rechazada.
+- **Guía de perspectiva:** para ángulos de cámara extremos, una proyección geométrica de la silueta oficial con cámara
+  real entra como imagen 1 (copiar cámara, no aspecto); la cámara descrita sólo en texto volvió a frontal.
 
 ### `generateAnimation(prompt, options)`
 

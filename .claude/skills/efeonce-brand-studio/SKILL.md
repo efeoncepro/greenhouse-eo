@@ -133,3 +133,13 @@ de fotografía, bokeh natural para la firma, tipografía y producción pertenece
 [comida cultural premium](../design-studio/references/premium-cultural-food-art-direction.md).
 El [caso canónico](../../../docs/operations/social/2026-09-13-fiestas-patrias-production-method.md) distingue
 decisiones del operador, ejecución y evidencia; no tratar una aprobación estética como brand equity medido.
+
+### Isotipo 3D de Efeonce (biblioteca aprobada 2026-09-17)
+
+La nave (isotipo) existe en 3D en navy y blanco, aprobada por el operador, en OneDrive
+`5. Contenidos/13- Branding/Nave Efeonce 3D/`: `Fuente oficial/` (SVG), 16 ángulos por color con fondo y 14 con
+transparente, y 8 escenas por color. Navy para fondos claros; blanco para fondos oscuros o navy. Antes de generar
+otra nave, reutilizar esta biblioteca. Recomendación (no decisión del operador): tratar el render como elemento
+ilustrativo de marca (escenas, portadas, decks, headers); no reemplaza el SVG oficial en firmas. Método y entrega:
+[isotipo propio en 3D](../greenhouse-ai-image-generator/references/mascot-3d-pose-library.md#isotipo-propio-en-3d-con-dos-colores-caso-nave-de-efeonce)
+· [bitácora](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).
