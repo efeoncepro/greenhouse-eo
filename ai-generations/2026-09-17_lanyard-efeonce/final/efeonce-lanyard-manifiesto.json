@@ -3,7 +3,8 @@
   "artes_canonicas": {
     "cinta": "efeonce-lanyard-arte-cinta-canonica.png — logo blanco repetido + eslogan; «Empower your» en gris CLARO #C8CEDA y «Growth» en blanco. El gris de marca #848484 no se usa aquí: sobre navy da 2,98:1 de contraste y no resuelve en serigrafía ni sublimado; el gris claro da 7,06:1",
     "yoyo": "efeonce-lanyard-arte-yoyo-canonica.png — disco blanco con el isotipo navy #023c70 bajo la resina",
-    "carnet": "efeonce-carnet-plantilla-plano.png (sirve además como vista plana del carnet) — CR80 vertical: cabecera navy con el logo blanco, retrato circular, nombre en navy, cargo en gris y el eslogan al pie (Growth en navy como acento sobre blanco). Se compone con arte-carnet.mjs: `node arte-carnet.mjs <foto.png> \"<Nombre>\" \"<Cargo>\" <salida.png>`"
+    "carnet": "efeonce-carnet-plantilla-plano.png (sirve además como vista plana del carnet) — CR80 vertical: cabecera navy con el logo blanco, retrato circular, nombre en navy, cargo en gris y el eslogan al pie (Growth en navy como acento sobre blanco). Se compone con arte-carnet.mjs: `node arte-carnet.mjs <foto.png> \"<Nombre>\" \"<Cargo>\" <salida.png>`",
+    "carnet_julio": "efeonce-carnet-julio-reyes.png — carnet real del operador: «Julio Reyes» / «Managing & GTM Director» (cargo declarado por él; en la empresa es CEO, pero usa ese título en la credencial). Generado con arte-carnet.mjs."
   },
   "invariantes": {
     "cinta": "poliéster plano 20 mm, navy #023c70, hebilla de seguridad, gancho giratorio metálico",

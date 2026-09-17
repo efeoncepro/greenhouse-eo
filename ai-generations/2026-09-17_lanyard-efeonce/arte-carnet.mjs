@@ -2,7 +2,10 @@
 // Se compone de forma determinística: logo oficial, nombre, cargo y foto. El texto exacto nunca se genera.
 // Uso: node arte-carnet.mjs <foto.png> "<Nombre Apellido>" "<Cargo>" <salida.png>
 import sharp from 'sharp'
-const [, , FOTO, NOMBRE, CARGO, OUT] = process.argv
+const [, , FOTO, NOMBRE_RAW, CARGO_RAW, OUT] = process.argv
+// El texto entra a un SVG: escapar entidades o un «&» en el cargo rompe el parseo.
+const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+const NOMBRE = esc(NOMBRE_RAW), CARGO = esc(CARGO_RAW)
 const W = 1050, H = 1670, R = 60
 const NAVY = '#023c70', GRIS = '#5A6472', GRIS_CLARO = '#C8CEDA'
 const headerH = Math.round(H * 0.17)

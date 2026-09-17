@@ -58,8 +58,17 @@ Cinta de poliéster plano de 20 mm en navy `#023c70`, hebilla de seguridad, ganc
 | El reverso liso y el carnet plano volvían como conjunto: las referencias del arte empujan a mostrar el logo | El reverso se generó **sin referencias**, describiendo que no hay impresión; el carnet plano no se genera: es el arte compuesto |
 | Los macros volvían como conjunto o como collage de dos paneles | Describir el encuadre por lo que **no** debe verse: «la silueta del lanyard NO aparece — sin lazo, sin gancho, sin fondo» |
 
-El retrato de la plantilla del carnet es de una persona ficticia generada para ese fin; para un carnet real se pasa la
-foto de la persona y su cargo confirmado.
+El retrato de la plantilla del carnet es de una persona ficticia generada para ese fin.
+
+**Carnet real emitido:** `final/efeonce-carnet-julio-reyes.png` — «Julio Reyes / Managing & GTM Director», con su foto
+de `Equipo/Julio Reyes/v01/`. El título de la credencial lo define la persona: en la empresa es CEO y usa ese cargo en
+la tarjeta. Para emitir otro basta:
+
+```bash
+node arte-carnet.mjs <foto.png> "<Nombre Apellido>" "<Cargo>" <salida.png>
+```
+
+El texto se escapa antes de entrar al SVG: un «&» en el cargo rompía el render.
 
 Modelo `gpt-image-2.5-sunburst`, xhigh; ~USD 0,14 por vista, 11 generaciones con descartes.
 
