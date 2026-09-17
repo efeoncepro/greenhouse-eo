@@ -14,6 +14,7 @@ QA en `ai-generations/2026-09-16_viva-mexico/` y `ai-generations/2026-09-17_prev
 | Viva México, documento | LinkedIn organización | 2026-09-16 21:40 | 377235636 | `PUBLISHED` · `urn:li:ugcPost:7506150065338621952` |
 | Previa 18, estática | LinkedIn organización | 2026-09-17 11:00 | 377254451 | `PENDING` (readback 2026-09-16 22:52) |
 | Previa 18, estática | Instagram `efeoncepro` | 2026-09-17 12:00 | 377254381 | `PENDING` (readback 2026-09-16 22:52) |
+| Previa 18, historia 9:16 | Instagram `efeoncepro` | 2026-09-17 12:30 | 377259369 | `PENDING` (readback 2026-09-16 23:15) |
 
 Publicación y programación fueron autorizadas explícitamente por el operador. El consentimiento de las tres personas
 del equipo que aparecen en el carrusel lo confirmó el operador antes de programar. No hay medición de audiencia.
@@ -94,6 +95,9 @@ bandera ni rojo en la acción. El rojo quedó en ≈4 % de la imagen, lejos del 
   98 del fondo bajo la tinta, y el render falla bajo 4,5:1.
 - **Guardias en el render:** fallar si el copy invade el aire de la firma, si un cursor/etiqueta AXIS sale del lienzo,
   si un comentario desborda su tarjeta o si quedan `<text>` sin convertir a trazados.
+- **Adaptación 9:16 sin costuras:** plate aprobado al centro de un lienzo vertical → outpaint con máscara → núcleo
+  re-pegado. Si la máscara abre sólo el exterior, el modelo conserva el borde del lienzo y queda una línea; abrir una
+  franja de transición dentro del núcleo en zonas sin objetos clave y fundir el núcleo sólo dentro de esa franja.
 - **Recolor determinístico en vez de inpainting:** la edición con máscara de GPT Image 2.5 cambió la geometría de los
   banderines (menos, más grandes, borde desenfocado teñido) y se descartó. Se recoloreó sobre el plate original:
   detección de cada banderín por perfil de columnas (B−R 84–120 celestes, < 25 blancos), relleno por semilla,

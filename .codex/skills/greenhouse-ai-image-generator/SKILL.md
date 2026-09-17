@@ -471,6 +471,10 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
 - **Objetos 3D con forma de marca:** boceto con los glifos o siluetas reales en su posición exacta → `--image` con
   Sunburst para materializar → texto y logo compuestos después. El resultado no es vector exacto de la fuente:
   declararlo en la entrega.
+- **Extender a otro formato (4:5 → 9:16) sin costuras:** colocar el plate aprobado en el lienzo nuevo, outpaint con
+  máscara y re-pegar el núcleo. La máscara debe abrir también una franja de transición DENTRO del núcleo (zona sin
+  objetos clave): si sólo abre el exterior, el modelo conserva el borde del lienzo y deja una línea. Fundir el núcleo
+  dentro de esa franja repintada y verificar con perfil de luminancia por fila en las uniones.
 - Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md).
 
 ## Provider Choice

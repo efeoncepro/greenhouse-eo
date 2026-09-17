@@ -77,3 +77,16 @@ se conservan; primer plano desenfocado, números, cursor y piso sin cambios. Sin
   original (trama, pliegues y luz intactos) y 8 % del ambiente azul.
 - Contraste peor caso: lead 6,02:1 · remate 11,03:1 · logo 15,21:1 (sin cambio: el rojo queda fuera de la zona de texto).
 - Detalle conocido: la secuencia empieza rojo-rojo (heredada del orden original de colores).
+
+## Historia 9:16 (2026-09-16)
+
+`story/post-17-story-9x16.png` (1080×1920 PNG). Recomposición nativa, sin estirar ni bandas: plate v3b escalado a
+1152×1440 al centro de un lienzo 1152×2048 → outpaint arriba (techo con foco) y abajo (piso) con
+`gpt-image-2.5-sunburst` xhigh y máscara → núcleo aprobado re-pegado con fundido.
+
+- Primer intento con costura visible (salto de luminancia 89,6 → 100,4 en y=304): el modelo conservó el borde del
+  lienzo aunque la máscara abría la franja de solape. Corrección: abrir una franja de transición DENTRO del núcleo en
+  zonas seguras (techo hasta 20 px antes de los banderines rojos; piso lejos del «7») y fundir el núcleo sólo dentro
+  de esa franja repintada (344→372 y 1560→1600). Resultado continuo.
+- Composición `story/compose-story.mjs`: zona segura AXIS story (13 % vertical, 10 % lateral) con guardias; scrim del
+  piso adelantado tras fallar el primer render por contraste (lead 4,24:1). Final: lead 9,41:1 · remate 13,7:1 · logo 14,89:1.
