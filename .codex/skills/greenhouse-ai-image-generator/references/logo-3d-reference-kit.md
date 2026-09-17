@@ -71,6 +71,21 @@ Registro: `ai-generations/2026-09-17_nexa-logo-estudio/LEEME.md`. Cinco reglas m
   oscuridad, iluminar el piso y declarar el calzado.
 - **Encuadre:** pedir márgenes explícitos («nada toca los bordes») y tercio superior limpio si después va titular AXIS.
 
+
+## 1.d Vestuario de marca: el kit del hoodie
+
+Mismo contrato para la ropa. Registro: `ai-generations/2026-09-17_hoodie-efeonce/LEEME.md`; entrega en OneDrive
+`13- Branding/Hoodie Efeonce/v01/` con manifiesto por vista.
+
+- **Elegir la vista por el ángulo de la toma** (de espaldas → vista de espalda) y pasarla junto con las referencias de
+  rostro y cuerpo de la persona. Sin la vista correcta, el modelo inventa la espalda, la capucha o el puño.
+- **El texto de la prenda se compone, no se genera:** la estampa de espalda (logo + «Empower your Growth» con los tres
+  pesos del contrato de marca) se arma con `estampa-espalda.mjs` y entra como referencia.
+- **Proporciones fijas:** emblema del pecho igual al asset oficial, nunca reducido; estampa de espalda al 38 % del
+  ancho de la espalda (al 55 % no se ve realista).
+- **Contrato de realismo** en el prompt (lente 100 mm, arrugas asimétricas, pelo de la tela, tinta serigráfica sobre
+  las fibras): sin él la prenda sale con aspecto de render. Si se cambia el contrato, rehacer la serie completa.
+
 ## 2. Elegir la variante (manda §1.b: el tamaño es sólo uno de los criterios)
 
 El camino canónico es **generativo en las dos variantes**: el logo entra como píxeles exactos y el modelo aporta
