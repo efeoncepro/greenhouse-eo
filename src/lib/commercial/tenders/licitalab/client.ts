@@ -87,9 +87,15 @@ export class LicitalabConfigurationError extends Error {
   }
 }
 
-interface LicitalabRequestOptions {
+export interface LicitalabRequestOptions {
   timeoutMs?: number
   fetchImpl?: typeof fetch
+  /**
+   * Access token OAuth de un usuario de LicitaLAB. Si viene, reemplaza a la API key: es la única credencial con la que
+   * operan findOpportunityTool y providerReportTool. El dominio no persiste ni refresca tokens (el servidor no emite
+   * refresh token); quien lo obtiene lo gestiona — hoy `scripts/commercial/licitalab-oauth.ts`, sólo local.
+   */
+  userAccessToken?: string
 }
 
 interface JsonRpcResponse {
@@ -169,7 +175,10 @@ const callJsonRpc = async (
   params: Record<string, unknown>,
   options: LicitalabRequestOptions = {}
 ): Promise<{ httpStatus: number; response: JsonRpcResponse | null; errorDetail: string | null; latencyMs: number; secretSource: SecretResolutionSource }> => {
-  const resolution = await resolveLicitalabApiKey()
+  const resolution = options.userAccessToken
+    ? { source: 'env' as SecretResolutionSource, value: options.userAccessToken }
+    : await resolveLicitalabApiKey()
+
   const apiKey = resolution.value as string
   const fetchImpl = options.fetchImpl ?? fetch
   const startedAt = Date.now()
@@ -194,6 +203,16 @@ const callJsonRpc = async (
 
     if (!res.ok) {
       const detail = response?.error?.message ?? body
+
+      if (res.status === 401 && options.userAccessToken) {
+        return {
+          httpStatus: res.status,
+          response,
+          errorDetail: 'La sesión OAuth de LicitaLAB venció o fue revocada. Vuelve a autorizar (pnpm licitalab login).',
+          latencyMs,
+          secretSource: resolution.source
+        }
+      }
 
       return {
         httpStatus: res.status,

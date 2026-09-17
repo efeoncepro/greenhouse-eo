@@ -64,11 +64,18 @@ no la acepta. Cliente canónico: `src/lib/commercial/tenders/licitalab/client.ts
 | `pnpm licitalab documents <código>`               | `listOpportunityDocumentsTool` | Opera                          |
 | `pnpm licitalab ask-docs <código> "<pregunta>"`   | `getOpportunityDocumentTool`   | Opera (cita archivo y página)  |
 | `pnpm licitalab support "<pregunta>"`             | `searchSupportTool`            | Opera                          |
-| `pnpm licitalab opportunity <código>`             | `findOpportunityTool`          | `unsupported`: exige OAuth     |
-| `pnpm licitalab provider <RUT>`                   | `providerReportTool`           | `unsupported`: exige OAuth     |
+| `pnpm licitalab opportunity <código>`             | `findOpportunityTool`          | `unsupported`: usa sesión OAuth |
+| `pnpm licitalab provider <RUT>`                   | `providerReportTool`           | `unsupported`: usa sesión OAuth |
 
-`tools/list` sigue listando las 5: el inventario NO prueba que una tool opere con la key. Para ficha de oportunidad
-o reporte de proveedor usa el conector OAuth. `--json` entrega el payload crudo; exit `1` fallo de tool/red o
+`tools/list` sigue listando las 5: el inventario NO prueba que una tool opere con la key.
+
+**Sesión OAuth de usuario (local).** `opportunity` y `provider` usan un token de usuario guardado en
+`.auth/licitalab-mcp-oauth.json` (`0600`, ignorado). El authorization server `aiagents.licitalab.cl` acepta registro
+dinámico + PKCE, sólo `authorization_code` y **no emite refresh token**; su formulario de correo + contraseña es
+distinto de la sesión web `app.licitalab.cl`. `pnpm licitalab login` lo completa con Playwright (Chrome) y la
+credencial de `pnpm licitalab:radar:setup`; si no hay token vigente, `opportunity`/`provider` hacen ese login solos
+(`--no-login` lo impide, `--headed` lo muestra). `pnpm licitalab session` informa el estado sin imprimir el token;
+`logout [--forget-client]` lo borra. Este carril no existe en runtime (Vercel/Cloud Run): allí sólo opera la key. `--json` entrega el payload crudo; exit `1` fallo de tool/red o
 `unsupported`, `2` uso inválido, `3` sin configurar. El servidor no siempre respeta `topK`: la salida de texto
 ordena por score y recorta; con `--json` recorta tú.
 
