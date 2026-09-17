@@ -16,6 +16,7 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 | [`AGENTIC_REVENUE_OPERATING_MODEL_V1.md`](AGENTIC_REVENUE_OPERATING_MODEL_V1.md)             | Stack HubSpot/Apollo/agentes, dos carriles, human-in-control, capacidad y triggers de staffing    |
 | [`REVENUE_OPERATING_CADENCE_2027_V1.md`](REVENUE_OPERATING_CADENCE_2027_V1.md)               | Calendario, scorecard, cierre mensual, pipeline council y gates del piloto outbound               |
 | [`SERVICE_PORTFOLIO_REVENUE_ARCHITECTURE_V1.md`](SERVICE_PORTFOLIO_REVENUE_ARCHITECTURE_V1.md) | Familias de servicio, motores de ingreso, rol en cuota, capacidad y backlog de construcción      |
+| [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md) | Narrativa go-to-market Q4 2026 – Q3 2027 «Tu IA no conoce tu negocio»: capítulos, mapa a servicios, arco y reglas de uso |
 | [`tenders/LICITATION_CRM_REGISTER.md`](tenders/LICITATION_CRM_REGISTER.md)                     | Admisibilidad, bid/no-bid, postulación y resultado de licitaciones/RFP                           |
 | Finance                                                                                        | Facturación, cobro, revenue reconocido, costos, margen, cash y tratamiento fiscal                |
 | SharePoint / Teams / propuesta                                                                 | Evidencia de alcance, comité, interacción bilateral, versiones y proceso de compra               |

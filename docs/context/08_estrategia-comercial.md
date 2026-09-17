@@ -28,6 +28,18 @@ medir 24 meses de pipeline, win/loss, segmento, margen, demanda y expansión por
 
 ---
 
+## Narrativa go-to-market Q4 2026 – Q3 2027
+
+**«Tu IA no conoce tu negocio»** es la plataforma narrativa integrada (orgánica y pagada) del período: Efeonce
+construye el contexto que hace que la IA trabaje para el negocio. Cinco capítulos —lo que tu IA no sabe, lo que cree
+que es cierto (datos), lo que la IA dice de ti, un equipo no una herramienta, campañas en días con tu marca— más una
+capa de resultados, mapeados a RevOps & CRM (HubSpot y Salesforce), Wave (SEO/AEO, datos, medición, agentes),
+Creative Services (escala creativa, branding, contenido, social) y Media & Distribution. Contenido, social, pauta y
+pitch del período se anclan a un capítulo. Canon y reglas de uso:
+[`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md).
+
+---
+
 ## El ecosistema de producto como activo comercial
 
 Las tres plataformas posicionan a Efeonce **fuera del comparison set de agencias tradicionales**. Cada una se usa distinto en el proceso comercial:

@@ -45,6 +45,13 @@ mejor combinación de diferenciación, capacidad documentada y potencial de expa
 Estos beachheads no deben salir al mercado como un segundo catálogo. Son rutas condicionadas por trigger y señal de
 cuenta.
 
+### Narrativa del período (Q4 2026 – Q3 2027)
+
+Los beachheads se comunican bajo la plataforma narrativa **«Tu IA no conoce tu negocio»**
+([`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md)):
+RevOps & CRM entra por los capítulos 1, 2 y 4; AI Visibility & Search por el 3; Creative Velocity & Production por
+el 5; Performance & Commerce por la capa de resultados. La narrativa no crea beachheads nuevos ni un segundo catálogo.
+
 ## 3. Oferta de entrada: contrato mínimo
 
 Una oferta de entrada no es una auditoría gratuita ni una versión reducida sin borde. Debe declarar:

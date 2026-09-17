@@ -183,6 +183,19 @@ y demostrar outcomes:
 obtener comisión o puntos. **Nada de esto afirma elegibilidad de Efeonce**: confirmar PDM/portal, cuenta, tier,
 mercado, SKU, cutoff y términos antes de forecast, propuesta o comunicación al cliente.
 
+### Cómo usa Efeonce esta narrativa en su propio pitch (Q4 2026 – Q3 2027)
+
+La narrativa agéntica de HubSpot alimenta la plataforma de Efeonce **«Tu IA no conoce tu negocio»**
+([`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../../../docs/strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md)), donde HubSpot es la prueba más visible, no la única
+puerta:
+- Growth Context, Context Home y Smart CRM → capítulos 1 (lo que tu IA no sabe) y 2 (datos).
+- Visibilidad en IA de Marketing Studio y ChatGPT Ads → capítulo 3 (lo que la IA dice de ti).
+- Agentic team, Agent Hub y Breeze Assistant → capítulo 4 (un equipo, no una herramienta), en contraste respetuoso
+  con el *digital labor* de Salesforce.
+- Marketing Studio y Campaign Agent → capítulo 5 (campañas en días, con tu marca).
+- Las cifras de outcomes de HubSpot se usan en piezas y pitch **atribuidas a HubSpot**; siguen sin ser garantía de
+  resultado de Efeonce en una propuesta concreta (§9).
+
 ## 9. Prueba y límites
 
 - **Alta confianza:** dirección estratégica, arquitectura, estados de producto y reglas publicadas en fuentes HubSpot.
