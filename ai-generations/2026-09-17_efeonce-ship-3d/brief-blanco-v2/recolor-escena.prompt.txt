@@ -1,0 +1,4 @@
+Image 1 is an approved 3D render of the Efeonce logo sculpture. Keep EVERYTHING identical: exact same object geometry, every gap and over-and-under crossing of the orbit ring, the three round window through-holes, the planet, the camera angle, framing, object size and position, and the lighting direction. Change ONLY two things:
+1. Material: the whole sculpture becomes glossy pure white lacquer (like high-end white car paint or polished porcelain) with the same crisp specular highlights, clear soft shading on every rounded edge so each volume, bevel and gap reads clearly, subtle cool-gray core shadows and ambient occlusion inside the gaps and window holes. Not flat, not chalky, not matte, no gray tint on the lit faces.
+2. Everything that is not the logo sculpture (hands, desk, pedestal, props, background, lights) stays exactly as in image 1.
+No other changes, no text, no extra objects.

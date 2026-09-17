@@ -37,7 +37,7 @@ no sobrescribir silenciosamente. Agrupar tres archivos en una misma versión cua
 
 ## Trabajo con assets existentes
 
-**Marketing con Manzanitas:** los nueve SVG de logos y símbolos están en `13- Branding/SVG`.
+**Marketing con Manzanitas:** los nueve SVG de logos y símbolos están en `13- Branding/SVG`. La nave (isotipo) en 3D, navy y blanco, con ángulos, transparentes y escenas, está en `13- Branding/Nave Efeonce 3D/`.
 Cargar el [inventario de identidad](../../../../docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md)
 para elegir la variante exacta, colores y relación con efeonce. En estos archivos dark es blanco
 para fondo oscuro; light es navy para fondo claro. No inferirlo al revés.

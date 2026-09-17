@@ -1,0 +1,11 @@
+High quality 3D render of this exact logo as a physical premium collectible object. Image 1 is a flat-shaded PERSPECTIVE GUIDE: copy its exact camera angle, perspective, orientation and on-frame position of every part (light blue = the front face of the logo, dark = its thickness seen from the side); it is only a guide, never copy its flat look or colors. Image 2 is the approved 3D object: copy its rounded glossy volumes, tube-like ring and sphere planet. Image 3 is the official flat logo; together they are the ONLY source of shape. Reproduce the logo shape EXACTLY, with identical proportions, positions and relative sizes:
+- a rocket ship pointing to the right, with a rounded nose, two swept-back tail fins at the lower left, and three small round window holes in a row along its body;
+- a wide thin elliptical orbit ring around the ship, broken where it crosses the ship, keeping exactly the same over-and-under crossings as the logo (the gaps show which part passes in front);
+- a small round planet sphere sitting on top of the ring, above the ship.
+Do not add, remove, bend, re-proportion or restyle any part. No flames, no extra stars, no text, no extra details, no engravings, no other colors.
+
+Construction and material: Glossy deep navy lacquer in exactly #023c70 on every face, subtle realistic reflections, uniform color. The ship is a solid rounded volume, the ring a thin smooth band with a round cross-section, the planet a sphere, all joined exactly as in the logo so it reads as one sculpture. The three windows are clean round through-holes in the ship body.
+
+SCENE AND CAMERA: Worm's-eye hero shot exactly as the guide: camera near the floor looking UP at the standing sculpture, we see its underside and thickness, 20mm lens, monumental, soft reflection on the glossy floor.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim light, soft ambient occlusion, realistic soft contact shadow, crisp focus on the whole object, physically based materials. Plain seamless light warm-gray studio background, nothing else in the frame unless described above. The whole object fully visible with generous margin, centered.

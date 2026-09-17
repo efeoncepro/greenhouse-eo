@@ -157,3 +157,16 @@ aprobación (HubSpot: formulario con boceto, 7–10 días hábiles); mientras ta
 Recorte: el fondo visto a través de agujeros del logo en sombra debe quedar transparente (regla corregida en
 `scripts/ai/fill-alpha-holes.ts`). Registro: `ai-generations/2026-09-17_sprocket-3d/LEEME.md`.
 
+
+## Isotipo propio en 3D con dos colores (caso nave de Efeonce)
+
+Registro: `ai-generations/2026-09-17_efeonce-ship-3d/LEEME.md`. Tres reglas aprendidas:
+
+- **Segundo color = recolorear el render aprobado**, nunca regenerarlo desde cero: editar cada imagen aprobada cambiando
+  solo material y fondo conserva geometría, cortes y cámara. El blanco generado aparte salió plano y fue rechazado.
+- **Ángulos extremos (desde abajo, picado fuerte, gran angular, sobrevuelo) requieren guía de perspectiva:** extruir la
+  silueta oficial y proyectarla con cámara real (`guias/proyectar.mjs`), y pasarla como imagen 1 con la orden de copiar
+  la cámara y no su aspecto. Con solo texto y la base frontal como referencia, el modelo devuelve casi frontal.
+- **Objeto claro sobre fondo oscuro:** el matting deja opacos los huecos que muestran fondo (cortes, ventanas); vaciarlos
+  por color de fondo con borde suave (`limpiar-huecos.mjs`). Objeto claro sobre fondo claro no se recorta: se entrega
+  solo como escena.

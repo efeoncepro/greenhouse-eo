@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-17 — Nave de Efeonce en 3D, navy y blanco
+
+Quedó en `13- Branding/Nave Efeonce 3D` la biblioteca del isotipo en 3D: 16 ángulos de cámara por color (con versiones
+transparentes) y 8 escenas. El blanco se obtuvo recoloreando los renders navy aprobados, porque generarlo aparte salió
+plano; los ángulos extremos usaron una guía de perspectiva proyectada desde la silueta oficial.
+
 ## 2026-09-17 — Sprocket de HubSpot en 3D (uso interno) y mascotas en carpeta propia
 
 Las bibliotecas de mascotas pasaron a `14. Mascotas de partners` en la raíz de la carpeta de contenidos, por
@@ -843,19 +849,3 @@ colapsan al importar y las factorías de settlement aceptan fechas partidas y MX
 (`src/lib/finance/loans.ts`): Crédito FOGAPE Santander registrado con su desembolso como settlement `funding`.
 Datos: `banco-chile-clp` registrada, 9 períodos ago/sep importados, 77 filas conciliadas por plan, tres períodos
 `reconciled`; las discrepancias de nómina y dos cobros quedan escaladas al operador (follow-up propuesto `TASK-1858`, sin registrar aún).
-
-## 2026-09-10 — TASK-1604: pack SEO/Arte y vacantes reconciliadas
-
-Ampliación 2026-09-13: nueve preguntas SEO afinadas activas para piloto manual, ocho originales retiradas con
-linaje idempotente. Snapshot D4 desplegado en producción, dos migraciones aplicadas; 594 tests focales y dos
-live passed. [Evidencia](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md). Pendientes calibración independiente,
-recorrido sintético y automatización por etapa. Piloto autorizado: nueve activas y template/policy manual habilitada con 75 min y cap 5/h. Sin asignaciones ni correos.
-
-Se agregó el pack versionado de evaluación para SEO Specialist Senior y Director(a) de Arte Senior: seis
-competencias aditivas, nueve preguntas SEO con rúbricas BARS en `sme_review`, scorecard de portfolio/caso para
-Arte, migración y operador local/readback. El guard de materialización ahora cuenta sólo las preguntas exactas
-del pack; la reutilización de templates exige un único match de role hint, módulos, niveles y pesos y falla
-cerrado ante colisiones. Las vacantes `EO-OPN-0674/0675` fueron publicadas por una operación separada y se
-releyeron `active|published|public_listed`, rutas 200, pero continúan con cero policies, templates del pack y
-assessments. Task, registry, epic, documentación funcional y handoff reflejan esa frontera; TASK-1604 sigue
-`in-progress` hasta SME, template/binding y Quality Gate.
