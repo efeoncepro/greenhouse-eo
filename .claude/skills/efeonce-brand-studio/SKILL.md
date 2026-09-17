@@ -155,7 +155,7 @@ siendo la firma. Método: [kit de logo 3D](../greenhouse-ai-image-generator/refe
 ### Vestuario de marca (kit de prenda, hoodie entregado 2026-09-17)
 
 Los assets de marca viven todos en OneDrive `5. Contenidos/13- Branding/`: `SVG/` (nueve logos y símbolos),
-`Nave Efeonce 3D/`, `Logo Efeonce 3D/` y ahora `Hoodie Efeonce/v01/` — 21 vistas de la prenda (sola, detalles,
+`Nave Efeonce 3D/`, `Logo Efeonce 3D/` y ahora `Hoodie Efeonce/v01/` y `Polo Efeonce/v01/` — 21 vistas de la prenda (sola, detalles,
 planos cenitales, puesta en cuerpo neutro sin rostro, variantes blanco y gris) con manifiesto por vista. Antes de
 generar ropa de marca, reutilizar este kit. **Polera y chaqueta** vienen por el mismo método y **se diseñan desde
 cero**: no existe asset oficial, así que la prenda base es una decisión de marca —silueta, color, qué emblema, dónde

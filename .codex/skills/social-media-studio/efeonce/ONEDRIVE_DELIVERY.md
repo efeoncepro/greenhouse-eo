@@ -37,7 +37,7 @@ no sobrescribir silenciosamente. Agrupar tres archivos en una misma versión cua
 
 ## Trabajo con assets existentes
 
-**Marketing con Manzanitas:** los nueve SVG de logos y símbolos están en `13- Branding/SVG`. La nave (isotipo) en 3D, navy y blanco, con ángulos, transparentes y escenas, está en `13- Branding/Nave Efeonce 3D/`. El hoodie de Efeonce, con 21 vistas de prenda y su manifiesto, está en `13- Branding/Hoodie Efeonce/v01/`. El logo completo en 3D está en `13- Branding/Logo Efeonce 3D/` (navy/blanco × monumental/grande/mediana/pequeña, transparente + fondo estudio + manifiesto).
+**Marketing con Manzanitas:** los nueve SVG de logos y símbolos están en `13- Branding/SVG`. La nave (isotipo) en 3D, navy y blanco, con ángulos, transparentes y escenas, está en `13- Branding/Nave Efeonce 3D/`. El hoodie de Efeonce está en `13- Branding/Hoodie Efeonce/v01/` y el polo piqué corporativo en `13- Branding/Polo Efeonce/v01/`, cada uno con sus vistas y manifiesto. El logo completo en 3D está en `13- Branding/Logo Efeonce 3D/` (navy/blanco × monumental/grande/mediana/pequeña, transparente + fondo estudio + manifiesto).
 Cargar el [inventario de identidad](../../../../docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md)
 para elegir la variante exacta, colores y relación con efeonce. En estos archivos dark es blanco
 para fondo oscuro; light es navy para fondo claro. No inferirlo al revés.

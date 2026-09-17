@@ -1,0 +1,265 @@
+{
+  "prenda": "Polo piqué Efeonce (ropa corporativa del equipo)",
+  "decision": "Prenda principal del equipo frente a cliente. Navy #023c70 con emblema bordado en hilo blanco (elegida por el operador) y blanco con bordado navy como segunda. El bordado tono sobre tono se descartó: el logo se perdía.",
+  "invariantes": {
+    "construccion": "piqué de algodón peso medio, corte regular entallado, tapeta de tres botones tono sobre tono, cuello y puños de punto plano, aberturas laterales, sin bolsillo ni etiqueta visible",
+    "emblema": "isotipo BORDADO en el pecho izquierdo, ~7 cm de ancho, a un palmo bajo la costura del hombro; hilo blanco sobre navy y navy #023c70 sobre blanco",
+    "espalda": "limpia. La estampa de logo + eslogan es de merch, no de ropa corporativa",
+    "realismo": "contrato de realismo en el prompt (lente 100 mm, arrugas asimétricas, textura del piqué, puntada satinada con relieve)"
+  },
+  "como_usarla": "Elegir la vista por el ángulo de la toma y pasarla junto con las referencias de rostro y cuerpo de la persona. En prendas corporativas el emblema va bordado y sin eslogan.",
+  "vistas": [
+    {
+      "color": "blanco",
+      "id": "01-frente",
+      "descripcion": "Frente (maniquí invisible)",
+      "cuando_usarla": "tomas frontales; referencia por defecto",
+      "archivo_fondo_estudio": "efeonce-polo-blanco-01-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-blanco-01-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "blanco",
+      "id": "02-espalda",
+      "descripcion": "Espalda limpia, sin estampa",
+      "cuando_usarla": "tomas de espaldas",
+      "archivo_fondo_estudio": "efeonce-polo-blanco-02-espalda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-blanco-02-espalda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "blanco",
+      "id": "03-tres-cuartos-izquierda",
+      "descripcion": "Tres cuartos izquierda",
+      "cuando_usarla": "sujeto girado hacia su derecha",
+      "archivo_fondo_estudio": "efeonce-polo-blanco-03-tres-cuartos-izquierda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-blanco-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "blanco",
+      "id": "08-plano-frente",
+      "descripcion": "Plano cenital, frente",
+      "cuando_usarla": "mockups",
+      "archivo_fondo_estudio": "efeonce-polo-blanco-08-plano-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-blanco-08-plano-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "blanco",
+      "id": "10-detalle-bordado",
+      "descripcion": "Macro del bordado del pecho",
+      "cuando_usarla": "primeros planos y verificación del bordado",
+      "archivo_fondo_estudio": "efeonce-polo-blanco-10-detalle-bordado-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "blanco",
+      "id": "13-puesto-frente",
+      "descripcion": "Puesto, frente, cuerpo neutro sin rostro",
+      "cuando_usarla": "caída en el cuerpo",
+      "archivo_fondo_estudio": "efeonce-polo-blanco-13-puesto-frente-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "01-frente",
+      "descripcion": "Frente (maniquí invisible)",
+      "cuando_usarla": "tomas frontales; referencia por defecto",
+      "archivo_fondo_estudio": "efeonce-polo-navy-01-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-navy-01-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "02-espalda",
+      "descripcion": "Espalda limpia, sin estampa",
+      "cuando_usarla": "tomas de espaldas",
+      "archivo_fondo_estudio": "efeonce-polo-navy-02-espalda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-navy-02-espalda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "03-tres-cuartos-izquierda",
+      "descripcion": "Tres cuartos izquierda",
+      "cuando_usarla": "sujeto girado hacia su derecha",
+      "archivo_fondo_estudio": "efeonce-polo-navy-03-tres-cuartos-izquierda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-navy-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "04-tres-cuartos-derecha",
+      "descripcion": "Tres cuartos derecha",
+      "cuando_usarla": "sujeto girado hacia su izquierda",
+      "archivo_fondo_estudio": "efeonce-polo-navy-04-tres-cuartos-derecha-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-navy-04-tres-cuartos-derecha-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "05-lateral",
+      "descripcion": "Lateral",
+      "cuando_usarla": "perfiles",
+      "archivo_fondo_estudio": "efeonce-polo-navy-05-lateral-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-navy-05-lateral-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "06-doblado",
+      "descripcion": "Doblado",
+      "cuando_usarla": "bodegón, entrega de bienvenida",
+      "archivo_fondo_estudio": "efeonce-polo-navy-06-doblado-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-navy-06-doblado-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "07-percha",
+      "descripcion": "En percha",
+      "cuando_usarla": "vestuario, tienda interna",
+      "archivo_fondo_estudio": "efeonce-polo-navy-07-percha-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-navy-07-percha-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "08-plano-frente",
+      "descripcion": "Plano cenital, frente",
+      "cuando_usarla": "mockups",
+      "archivo_fondo_estudio": "efeonce-polo-navy-08-plano-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-navy-08-plano-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "09-plano-espalda",
+      "descripcion": "Plano cenital, espalda",
+      "cuando_usarla": "mockups de espalda",
+      "archivo_fondo_estudio": "efeonce-polo-navy-09-plano-espalda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-polo-navy-09-plano-espalda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "10-detalle-bordado",
+      "descripcion": "Macro del bordado del pecho",
+      "cuando_usarla": "primeros planos y verificación del bordado",
+      "archivo_fondo_estudio": "efeonce-polo-navy-10-detalle-bordado-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "11-detalle-cuello-tapeta",
+      "descripcion": "Detalle de cuello y tapeta",
+      "cuando_usarla": "primeros planos de acabado",
+      "archivo_fondo_estudio": "efeonce-polo-navy-11-detalle-cuello-tapeta-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "12-detalle-puno-abertura",
+      "descripcion": "Macro de puño y abertura lateral",
+      "cuando_usarla": "primeros planos de acabado",
+      "archivo_fondo_estudio": "efeonce-polo-navy-12-detalle-puno-abertura-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "13-puesto-frente",
+      "descripcion": "Puesto, frente, cuerpo neutro sin rostro",
+      "cuando_usarla": "caída en el cuerpo",
+      "archivo_fondo_estudio": "efeonce-polo-navy-13-puesto-frente-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "14-puesto-espalda",
+      "descripcion": "Puesto, espalda, cuerpo neutro sin rostro",
+      "cuando_usarla": "tomas de espaldas con persona",
+      "archivo_fondo_estudio": "efeonce-polo-navy-14-puesto-espalda-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "color": "navy",
+      "id": "15-puesto-frente-cuerpo-b",
+      "descripcion": "Puesto, frente, otro cuerpo y tono de piel",
+      "cuando_usarla": "evitar un único tipo de modelo",
+      "archivo_fondo_estudio": "efeonce-polo-navy-15-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    }
+  ]
+}
