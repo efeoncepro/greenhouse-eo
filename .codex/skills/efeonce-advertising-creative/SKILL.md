@@ -132,6 +132,9 @@ del sistema ni de síntesis tipográfica.
 etiqueta se elige por contraste WCAG y el render falla bajo 4,5:1. Sin `presentation` el resultado es idéntico al
 contrato por defecto. No recolorear ni reescalar el SVG a mano. Caso: KV «Tu IA no conoce tu negocio».
 
+**Fondo bajo una selección.** Los controles (trazo `#a6cdf5`, tiradores blancos) están diseñados para fondo oscuro y
+desaparecen sobre claro: el fondo bajo la selección debe ser oscuro por escenografía de la imagen, no por degradado.
+
 La API agent-facing vive en AXIS, no en la página del Lab. Dentro de Greenhouse, un agente normaliza la
 intención con:
 

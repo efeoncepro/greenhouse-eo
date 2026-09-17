@@ -91,6 +91,23 @@ llama a modelos, no compone el anuncio completo, no publica y no aprueba. El ada
 agente reporta `unsupported/pending adapter`; no copia `CollaborationSelection.astro`, no inventa campos y no
 simula la capacidad con `top`/`left`.
 
+### Escala y color de campaña: `presentation`
+
+`renderCollaborationSelection` (`scripts/creative/layout-compiler/axis-advertising.mjs`) acepta la opción
+`presentation`, que adapta la lectura a la superficie sin tocar la semántica del manifest:
+
+- `collaboratorScale`: multiplica cursor colaborador, etiqueta y separación. Una campaña leída a 390 px necesita > 1
+  (el KV «Tu IA no conoce tu negocio» usó 1,9 en 1080 px).
+- `localCursorScale`: multiplica el cursor local.
+- `participantColors`: color por id de cursor colaborador, en `#rrggbb` (por ejemplo, el color de marca de un partner).
+  La tinta de la etiqueta se elige por contraste WCAG y el render falla si no alcanza 4,5:1.
+
+Sin `presentation` el resultado es idéntico al contrato por defecto. Pruebas:
+`scripts/creative/layout-compiler/axis-advertising-presentation.test.mjs`. Los controles de selección (trazo
+`#a6cdf5`, tiradores blancos) están diseñados para **fondo oscuro**: sobre fondos claros desaparecen, así que la escena
+debe darles un fondo oscuro. Caso:
+[bitácora del KV](social/2026-09-17-kv-tu-ia-no-conoce-production-method.md).
+
 ## Invariantes
 
 - No hay ExtraBold por defecto. Cada tramo debe justificar la masa por longitud, fondo, formato y distancia.

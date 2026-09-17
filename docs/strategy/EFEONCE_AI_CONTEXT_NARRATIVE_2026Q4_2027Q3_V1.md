@@ -35,7 +35,7 @@ esas puertas de entrada se comunican durante el período.
 | Ley 21.719 de protección de datos (Chile), plena vigencia el **2026-12-01** | El contexto necesita permiso: consentimiento, gobierno y trazabilidad |
 
 Evidencia HubSpot: [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](../services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md)
-y `hubspot-solutions-partner/SOURCES.md`. Fuentes externas y estado de verificación en §9.
+y `hubspot-solutions-partner/SOURCES.md`. Fuentes externas y estado de verificación en §10.
 
 ## 3. Arquitectura
 
@@ -182,7 +182,23 @@ Las fechas de eventos 2027 se confirman antes de amarrar hitos.
   la medición se reporta por capítulo y línea de negocio. Crear la propiedad es una escritura con autorización.
 - **Prueba propia:** Greenhouse, Nexa y la operación de Efeonce sirven como caso vivo en los capítulos 4 y 5.
 
-## 8. Pendientes
+## 8. Key visual paraguas
+
+- **Pieza:** KV «Tu IA no conoce tu negocio», versión Clawd v05, aprobada por el operador y programada en Metricool
+  para el lunes 2026-09-21 (LinkedIn 11:00, Instagram 12:00; estado `PENDING` hasta el readback). La historia 9:16 está
+  producida y no programada.
+- **Sistema de mascota intercambiable:** Nexa es central (versión humana con hoodie Efeonce). El hombro lleva **una sola
+  mascota de partner por imagen** (Clawd de Claude hoy; Codex Pet de OpenAI después), nunca dos mascotas de terceros
+  juntas. El nombre y color del cursor colaborador y la insignia de partner cambian junto con la mascota.
+- **Riesgo de lectura:** el cursor «Claude» sobre «tu negocio» con la mascota confundida puede leerse como «la IA del
+  partner no sirve». Mitigación: el copy ubica el problema en el contexto, no en la capacidad («Claude razona
+  increíble. Nadie le ha contado cómo funciona tu empresa.»), y se valida contra la guía de marca del partner antes de
+  pautar.
+
+Detalle: [bitácora de producción](../operations/social/2026-09-17-kv-tu-ia-no-conoce-production-method.md) y
+[`LEEME.md`](../../ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md) de la carpeta de producción.
+
+## 9. Pendientes
 
 1. Brief operativo del lanzamiento Q4 en `docs/commercial/campaigns/2026-q4-tu-ia-no-conoce-tu-negocio/`.
 2. Registro de evidencia `docs/audits/commercial/AGENTIC_NARRATIVES_HUBSPOT_VS_SALESFORCE_2026-09-17.md`.
@@ -191,8 +207,12 @@ Las fechas de eventos 2027 se confirman antes de amarrar hitos.
 5. Evaluar un PDR de territorios editoriales para sitio y blog si los capítulos pasan a ser taxonomía pública.
 6. Punteros en skills de prioridad 2: `salesforce-crm-practice`, `seo-aeo-practice`, `digital-marketing`,
    `creative-practice`, `efeonce-agency`.
+7. Insignia oficial de partner Claude para el KV (asset pendiente).
+8. Archivar la guía de marca de Anthropic y validar Clawd 3D, el «?» y el cursor «Claude» antes de pautar.
+9. Versión Codex Pet del KV (sistema modular listo; pieza no producida) tras recibir la guía de marca de OpenAI.
+10. Readback de publicación del KV el 2026-09-21 (confirmar `PUBLISHED` y URL pública).
 
-## 9. Evidencia y estado de verificación (corte 2026-09-17)
+## 10. Evidencia y estado de verificación (corte 2026-09-17)
 
 | Afirmación | Estado |
 |---|---|

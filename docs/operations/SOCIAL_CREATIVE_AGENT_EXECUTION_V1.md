@@ -160,3 +160,12 @@ programación de carrusel, documento de LinkedIn y estáticas en Metricool. Regl
 [línea estacional](../../.codex/skills/social-media-studio/efeonce/SEASONAL_CONTENT.md) y
 [entrega Metricool](../../.codex/skills/social-media-studio/references/video-delivery-metricool.md). Imágenes sociales en
 PNG (regla dura desde 2026-09-16).
+
+## Key visual paraguas con mascota de partner
+
+La [bitácora del KV «Tu IA no conoce tu negocio»](social/2026-09-17-kv-tu-ia-no-conoce-production-method.md) conserva
+el sistema modular de mascotas (Nexa central, una sola mascota de partner por imagen, cursor e insignia ligados a la
+mascota), el riesgo de lectura sobre el partner, el recorrido v01→v05 con las correcciones del operador, Clawd 3D desde
+el sprite oficial, el plate nativo guiado por boceto que reemplazó un repintado con recorte mordido, la opción
+`presentation` del adapter AXIS y la programación en Metricool. Detalle en su
+[`LEEME.md`](../../ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md).

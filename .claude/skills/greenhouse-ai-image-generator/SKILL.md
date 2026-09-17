@@ -471,6 +471,11 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
 - **Objetos 3D con forma de marca:** boceto con los glifos o siluetas reales en su posición exacta → `--image` con
   Sunburst para materializar → texto y logo compuestos después. El resultado no es vector exacto de la fuente:
   declararlo en la entrega.
+- **Mascota pixel-art de partner a 3D con fidelidad:** reconstruir el sprite desde la fuente oficial (caso Clawd: arte
+  de bloques del binario de Claude Code y color `rgb(215,119,87)` del mismo binario), no de memoria. La celda de
+  terminal es 1:2: cada píxel mide 1 de ancho × 2 de alto; renderizarlo cuadrado aplana la figura. Sprite como
+  imagen 1 del edit con «cada píxel = pila de 1×2 cubos» y material declarado; verificar silueta, ojos y extremidades
+  contra el sprite antes de usarlo.
 - **Cambiar el fondo detrás de una persona o mascota: regenerar, no recortar.** Repintar un muro alrededor de un
   sujeto con matte + máscara deja bordes «mordidos» en pelo y deforma partes finas o sueltas (el «?» de Clawd).
   Acabado profesional = plate nativo con el set nuevo, guiado por un **boceto de composición** de formas planas

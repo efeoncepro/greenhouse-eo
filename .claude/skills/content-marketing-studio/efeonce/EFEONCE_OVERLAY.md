@@ -136,7 +136,7 @@ Los capítulos de **«Tu IA no conoce tu negocio»** son los pilares editoriales
   que tu IA no sabe · 2 lo que tu IA cree que es cierto · 3 lo que la IA dice de ti · 4 un equipo, no una
   herramienta · 5 campañas en días, con tu marca · resultados.
 - El capítulo 3 es el hogar natural de SEO/AEO y content marketing; el 2 atraviesa a todos como dimensión de datos.
-- Cifras de HubSpot atribuidas; las de Forrester/Gartner sólo tras confirmar la fuente primaria (§9 del canon).
+- Cifras de HubSpot atribuidas; las de Forrester/Gartner sólo tras confirmar la fuente primaria (§10 del canon).
 - Seasonalities y efemérides no se fuerzan a un capítulo: conservan su propia línea (PDR-020).
 
 ## Reglas duras del overlay

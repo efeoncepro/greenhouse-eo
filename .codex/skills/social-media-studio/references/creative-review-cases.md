@@ -88,6 +88,19 @@ Bitácora: `docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production
 | Edición con máscara para recolorear un elemento | Comparar geometría antes/después; si cambia forma, cantidad o posición, descartar y recolorear determinísticamente | Aceptar un inpainting que «se ve bien» pero cambió el objeto |
 | Contraste sobre fuegos, reflejos o luz variable | Scrim gradual local y medición sobre el fondo ya oscurecido, con umbral que haga fallar el render | Medir sobre el plate original o usar un velo rectangular |
 
+## Regresiones observadas: KV «Tu IA no conoce tu negocio» (2026-09-17)
+
+Bitácora: `ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md`.
+
+| Caso / entrada | Conducta esperada | Señal de fallo |
+|---|---|---|
+| Operador rechaza el degradado azul detrás del texto | Resolver el fondo con escenografía (muro navy pintado en la escena) y medir contraste sobre ella | Otro scrim, velo o luz artificial que se lee como foco |
+| Titular de un solo peso se ve débil | Jerarquía: entrada liviana → remate pesado, con proporción declarada | Agrandar el mismo peso o añadir adornos |
+| Recorte «mordido» en pelo o mascota tras cambiar el fondo | Regenerar el plate con el set nuevo, guiado por boceto de composición | Suavizar el matte y entregar el borde |
+| Mascota con partes finas o sueltas («?», brazos) pasada por matte + máscara | Verificar silueta completa contra la fuente; si falta una parte, regenerar | Aceptar la figura porque se reconoce en miniatura |
+| Logo centrado sobre objeto de primer plano desenfocado (escritorio/laptop) | Firma apoyada en un soporte plausible de la escena, con contraste medido | Logo flotando en una caja o esquina forzada |
+| Pieza pedida en 4:5 y 9:16 | Misma escena: 9:16 nativo y 4:5 abriendo el encuadre a los lados; revisar ambos | 4:5 nativo con la cabeza arriba y sin aire, o dos escenas distintas |
+
 ## Protocolo de evaluación documental
 
 1. Elegir escenarios que ejerciten decisiones diferentes: estacional, reactivo con evidencia incompleta,

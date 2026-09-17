@@ -1,7 +1,8 @@
 # KV paraguas «Tu IA no conoce tu negocio» — versión Clawd (2026-09-17)
 
-Estado: **prueba producida y revisada por el agente**. Pendiente: aprobación del operador, insignia oficial de partner
-Claude y guía de marca de Anthropic archivada. Nada publicado ni programado.
+Estado: **v05 aprobada por el operador y programada para el 2026-09-21** (LinkedIn 11:00 · Instagram 12:00; ver
+[`PROGRAMACION.md`](PROGRAMACION.md)). Pendiente: readback de publicación, insignia oficial de partner Claude y guía de
+marca de Anthropic archivada. Las secciones v01–v04 quedan como historial.
 
 Narrativa canónica: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../docs/strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md).
 

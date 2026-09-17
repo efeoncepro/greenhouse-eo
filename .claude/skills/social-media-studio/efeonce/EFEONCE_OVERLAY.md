@@ -166,6 +166,12 @@ negocio»**. Canon: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../.
 - Salesforce sólo se nombra en orgánico de liderazgo de opinión, con respeto; nunca en pauta.
 - La cuenta regresiva a la Ley 21.719 (1 dic 2026) es orientación, no asesoría legal.
 - Seasonalities conservan su línea propia; no se les fuerza un capítulo.
+- KV paraguas: Nexa (humana, hoodie Efeonce) es central; el hombro lleva **una sola** mascota de partner por imagen
+  (Clawd/Claude hoy, Codex Pet/Codex después), que cambia junto con nombre y color del cursor colaborador e insignia.
+  Nunca dos mascotas de terceros juntas.
+- Riesgo de partner: la mascota confundida puede leerse «Claude no sirve». Mitigar en caption (el problema es el
+  contexto, no la capacidad) y validar con la guía de marca del partner antes de pautar. Caso:
+  [`LEEME.md`](../../../../ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md).
 
 ## Coherencia con las skills hermanas del repo
 

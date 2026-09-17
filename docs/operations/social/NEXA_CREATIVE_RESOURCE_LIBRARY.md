@@ -39,3 +39,12 @@ Para acompañar a Nexa con Marketing con Manzanitas, usar su
 
 Para aplicación y errores observados, ver
 [Día del Pódcast](2026-09-13-podcast-fotohistoria-production-method.md).
+
+## Versión humana con hoodie Efeonce
+
+En el [KV «Tu IA no conoce tu negocio»](2026-09-17-kv-tu-ia-no-conoce-production-method.md) (2026-09-17) Nexa aparece
+en versión humana con el hoodie azul de Efeonce. Referencias usadas: `Avatar 3,4 v2` y `Avatar Cuerpo Completo v2`
+(identidad) más el asset del sitio público `contacto-careers-hoodie.png` (vestuario), con copias locales en la carpeta
+de producción. Aprendizaje: la identidad se mantuvo bien con esas dos referencias de avatar más el hoodie, incluso en
+un plate nativo guiado por boceto; el isotipo del hoodie salió prácticamente igual al oficial, sin re-estampado. El
+rostro se validó a ojo contra las referencias. El hoodie es vestuario de esa campaña, no un atributo universal.
