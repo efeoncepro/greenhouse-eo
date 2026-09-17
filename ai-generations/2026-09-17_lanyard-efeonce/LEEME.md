@@ -16,8 +16,9 @@ azul**.
 - **Yoyo** (`ref/arte-yoyo.png`): disco blanco con el isotipo navy `#023c70` centrado, para ir bajo la cúpula de resina.
 - **Carnet** (`ref/arte-carnet-plantilla.png`, CR80 vertical): cabecera navy con el logo blanco, retrato circular,
   nombre en navy, cargo en gris y el eslogan al pie con «Growth» en navy como acento sobre blanco. Se compone con
-  `arte-carnet.mjs <foto.png> "<Nombre>" "<Cargo>" <salida.png>`; va dentro de un **portacarnet plástico rígido
-  transparente** con ranura superior.
+  `arte-carnet.mjs <foto.png> "<Nombre>" "<Cargo>" <salida.png>`; va dentro de un **portacarnet de marco rígido** transparente: sujeta la tarjeta por los bordes, se abre por un costado
+  para deslizarla y deja la cara del carnet **expuesta**, con ranura superior. No es una funda de vinilo ni un estuche
+  cerrado sobre el arte: eso es un **portacredencial**, que es otra pieza.
 
 Ambas entran como referencia al modelo; el texto exacto nunca se le pide a la generación.
 
@@ -39,7 +40,8 @@ Cinta de poliéster plano de 20 mm en navy `#023c70`, hebilla de seguridad, ganc
 | El primer patrón se solapaba (logo sobre eslogan) | Calcular el paso desde el ancho real de cada pieza más un espacio, en vez de fijarlo a mano |
 | La cara del yoyo salía cuadrada | Fondo transparente y círculo dibujado, no lienzo blanco |
 | El gris de marca en el eslogan no resolvía sobre navy impreso (corrección del operador) | Gris claro `#C8CEDA` para el prefijo, manteniendo «Growth» en blanco; contraste medido 7,06:1 contra 2,98:1 |
-| Faltaban el portacarnet y el carnet (corrección del operador) | Portacarnet plástico rígido transparente y carnet compuesto con logo, foto, nombre y cargo |
+| Faltaban el portacarnet y el carnet (corrección del operador) | Carnet compuesto con logo, foto, nombre y cargo |
+| La primera versión mostraba un **portacredencial** (funda cerrada sobre el arte), no un portacarnet | Portacarnet de **marco rígido** abierto por un costado, con la cara del carnet expuesta; la distinción quedó escrita en el manifiesto |
 | Los macros volvían como conjunto o como collage de dos paneles | Describir el encuadre por lo que **no** debe verse: «la silueta del lanyard NO aparece — sin lazo, sin gancho, sin fondo» |
 
 El retrato de la plantilla del carnet es de una persona ficticia generada para ese fin; para un carnet real se pasa la

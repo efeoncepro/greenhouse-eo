@@ -1,5 +1,5 @@
 {
-  "producto": "Lanyard Efeonce con yoyo, portacarnet transparente y carnet",
+  "producto": "Lanyard Efeonce con yoyo, portacarnet de marco rígido y carnet",
   "artes_canonicas": {
     "cinta": "efeonce-lanyard-arte-cinta-canonica.png — logo blanco repetido + eslogan; «Empower your» en gris CLARO #C8CEDA y «Growth» en blanco. El gris de marca #848484 no se usa aquí: sobre navy da 2,98:1 de contraste y no resuelve en serigrafía ni sublimado; el gris claro da 7,06:1",
     "yoyo": "efeonce-lanyard-arte-yoyo-canonica.png — disco blanco con el isotipo navy #023c70 bajo la resina",
@@ -8,13 +8,13 @@
   "invariantes": {
     "cinta": "poliéster plano 20 mm, navy #023c70, hebilla de seguridad, gancho giratorio metálico",
     "yoyo": "carcasa redonda 32 mm navy brillante, cúpula de resina, clip de acero, cordón de nylon",
-    "portacarnet": "plástico rígido transparente con ranura superior; el arte del carnet se ve a través del plástico",
+    "portacarnet": "portacarnet de MARCO RÍGIDO transparente: sujeta la tarjeta por los bordes, abierto por un costado para deslizarla, con la cara frontal del carnet expuesta (sin lámina sobre el arte) y ranura superior. NO es funda de vinilo ni estuche cerrado (eso es un portacredencial)",
     "arte": "las tres artes se componen determinísticamente; el texto exacto nunca se le pide al modelo"
   },
   "vistas": [
     {
       "id": "01-conjunto",
-      "descripcion": "Lanyard completo con yoyo y carnet en portacarnet transparente",
+      "descripcion": "Lanyard completo con yoyo y carnet en portacarnet de marco rígido",
       "cuando_usarla": "vista general, catálogo, kit de bienvenida",
       "archivo_fondo_estudio": "efeonce-lanyard-01-conjunto-1200x1600-v01-fondo-estudio.png",
       "archivo_transparente": "efeonce-lanyard-01-conjunto-1200x1600-v01-transparente.png",
@@ -58,7 +58,7 @@
     },
     {
       "id": "05-carnet-portacarnet",
-      "descripcion": "Macro del carnet dentro del portacarnet transparente",
+      "descripcion": "Macro del carnet en el portacarnet de marco rígido",
       "cuando_usarla": "detalle del carnet y del portacarnet",
       "archivo_fondo_estudio": "efeonce-lanyard-05-carnet-portacarnet-1200x1600-v01-fondo-estudio.png",
       "archivo_transparente": null,
