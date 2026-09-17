@@ -226,3 +226,7 @@ pnpm ai:image --model gpt-image-2.5-sunburst \
 Modelo `gpt-image-2.5-sunburst`, calidad `xhigh`. Costo medido: **≈ USD 0,14 por vista**; el hoodie tomó **26
 generaciones para 21 vistas** y el polo **29 para 21**, contando descartes (≈ USD 3,6–4,1). Presupuestar el 25 % de
 descarte, y más si la prenda lleva emblema bordado: ahí los descartes son por espejo (§3).
+
+## Delta 2026-09-17 — dónde va la estampa de espalda
+
+La estampa canónica (logo completo + eslogan al 38 % del ancho de la espalda) va en el **hoodie** y en las **chaquetas (softshell y bomber) sí la llevan**, por decisión del operador. La única prenda con **espalda limpia** es el **polo**, la más formal frente a cliente. Si una serie ya se produjo con la regla anterior, se rehacen sólo las vistas de espalda (prenda sola, plano cenital y puesta) con la estampa como imagen 2.

@@ -5,7 +5,7 @@
     "softshell": "softshell de tres capas, cierre completo con tapeta interior y protector de mentón, cuello alto, dos bolsillos con cierre oculto, puños ajustables, cordón en el ruedo, sin capucha",
     "bomber": "sarga técnica mate, cierre completo, cuello, puños y ruedo de punto acanalado navy, dos bolsillos ribeteados con cierre oculto, mangas raglán",
     "emblema": "isotipo BORDADO en hilo blanco en el pecho izquierdo, ~7 cm, geometría del isotipo oficial (nave a la derecha, aletas abajo a la izquierda, órbita elipse ancha, planeta arriba)",
-    "espalda": "limpia, sin estampa: es ropa corporativa, no merch",
+    "espalda": "lleva la estampa canónica (logo completo + «Empower your Growth» centrado y más chico) al 38 % del ancho de la espalda, igual que el hoodie — decisión del operador 2026-09-17; el polo mantiene la espalda limpia",
     "color": "navy de marca #023c70"
   },
   "como_usarla": "Elegir la vista por el ángulo de la toma y pasarla junto con las referencias de rostro y cuerpo. La chaqueta va sobre el polo navy en piezas frente a cliente.",
@@ -25,7 +25,7 @@
     {
       "tipo": "bomber",
       "id": "02-espalda",
-      "descripcion": "Espalda limpia",
+      "descripcion": "Espalda con estampa canónica",
       "cuando_usarla": "tomas de espaldas",
       "archivo_fondo_estudio": "efeonce-chaqueta-bomber-02-espalda-1600x1600-v01-fondo-estudio.png",
       "archivo_transparente": "efeonce-chaqueta-bomber-02-espalda-1600x1600-v01-transparente.png",
@@ -97,7 +97,7 @@
     {
       "tipo": "softshell",
       "id": "02-espalda",
-      "descripcion": "Espalda limpia",
+      "descripcion": "Espalda con estampa canónica",
       "cuando_usarla": "tomas de espaldas",
       "archivo_fondo_estudio": "efeonce-chaqueta-softshell-02-espalda-1600x1600-v01-fondo-estudio.png",
       "archivo_transparente": "efeonce-chaqueta-softshell-02-espalda-1600x1600-v01-transparente.png",
@@ -193,7 +193,7 @@
     {
       "tipo": "softshell",
       "id": "10-plano-espalda",
-      "descripcion": "Plano cenital, espalda",
+      "descripcion": "Plano cenital, espalda con estampa canónica",
       "cuando_usarla": "mockups de espalda",
       "archivo_fondo_estudio": "efeonce-chaqueta-softshell-10-plano-espalda-1600x1600-v01-fondo-estudio.png",
       "archivo_transparente": "efeonce-chaqueta-softshell-10-plano-espalda-1600x1600-v01-transparente.png",
@@ -253,7 +253,7 @@
     {
       "tipo": "softshell",
       "id": "15-puesto-espalda",
-      "descripcion": "Puesta, espalda",
+      "descripcion": "Puesta, espalda con estampa canónica",
       "cuando_usarla": "tomas de espaldas con persona",
       "archivo_fondo_estudio": "efeonce-chaqueta-softshell-15-puesto-espalda-1200x1600-v01-fondo-estudio.png",
       "archivo_transparente": null,

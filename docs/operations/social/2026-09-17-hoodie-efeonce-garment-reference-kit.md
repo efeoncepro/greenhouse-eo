@@ -112,6 +112,8 @@ El operador ya decidió el mismo kit para **polera** y **chaqueta**, y el **polo
 
 ## 8. Cápsula de vestuario Efeonce
 
+
+> **Delta 2026-09-17 (operador):** la estampa canónica de espalda —logo completo + «Empower your Growth» al 38 %— va también en las **chaquetas** (softshell y bomber), igual que en el hoodie. La prenda que mantiene la **espalda limpia** es el **polo**, por ser la de uso más formal frente a cliente.
 Decisión del operador (2026-09-17), tomada al preguntarse si la polera servía como ropa corporativa. El cliente de
 Efeonce es corporativo —retainer Sky, RevOps/CRM con HubSpot y Salesforce, comités, licitaciones—, así que una polera
 de algodón con estampa **no** es la ropa corporativa del equipo. La cápsula reparte las prendas por contexto de uso:

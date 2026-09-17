@@ -15,7 +15,7 @@ la micropolar («es más de invierno»).
 - **Bomber ligera navy (pieza de imagen, set esencial de 6 vistas):** sarga técnica mate, cuello, puños y ruedo de
   punto acanalado, bolsillos ribeteados con cierre oculto, mangas raglán.
 
-Ambas con **emblema bordado en hilo blanco** en el pecho izquierdo y **espalda limpia**: es ropa corporativa, no merch.
+Ambas con **emblema bordado en hilo blanco** en el pecho izquierdo y, por decisión del operador, la **estampa canónica en la espalda** —logo completo + «Empower your Growth» centrado y más chico, al 38 % del ancho— igual que el hoodie. El polo es la excepción: mantiene la espalda limpia.
 
 ## Contenido (`final/`, 22 vistas)
 
@@ -29,6 +29,7 @@ vistas de prenda sola y planos. Manifiesto `efeonce-chaqueta-manifiesto.json` co
 | Observación | Corrección |
 |---|---|
 | Los macros volvían como prenda completa aunque el prompt pedía primer plano | Describir el encuadre por lo que **no** debe verse: «la silueta de la chaqueta NO aparece — sin línea de cuello, sin ruedo, sin manga, sin fondo; sólo el tejido de cerca» |
+| La primera tanda salió con la espalda limpia por la regla del polo; el operador corrigió: en las chaquetas la espalda lleva logo y eslogan | Rehacer las cuatro vistas de espalda con la estampa canónica como imagen 2, al 38 % |
 | Riesgo de emblema espejado (visto en el polo) | Isotipo oficial como imagen 1 y QA del emblema **vista por vista al 100 %**: las 22 quedaron correctas |
 
 Modelo `gpt-image-2.5-sunburst`, xhigh; ~USD 0,14 por vista, 25 generaciones con descartes.
