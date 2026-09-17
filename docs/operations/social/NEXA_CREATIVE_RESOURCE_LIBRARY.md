@@ -53,8 +53,10 @@ Desde el 2026-09-17 existe un [kit de referencia de prenda](2026-09-17-hoodie-ef
 hoodie (21 vistas en `13- Branding/Hoodie Efeonce/v01/`): es la referencia de vestuario a usar, eligiendo la vista por
 el **ángulo de la toma**, en lugar de un asset suelto del sitio público. Existe también el kit del **polo piqué**
 (`13- Branding/Polo Efeonce/v01/`): si la escena es corporativa —cliente, comité, licitación—, la prenda que
-corresponde es el polo, no el hoodie, según la cápsula de vestuario de la misma bitácora. La elección sigue siendo
-vestuario **de esa pieza**, no un atributo universal de Nexa.
+corresponde es el polo, no el hoodie, según la cápsula de vestuario de la misma bitácora. Completan la cápsula la
+**chaqueta** (`13- Branding/Chaqueta Efeonce/v01/`, softshell navy sobre el polo para reunión formal y comité) y la
+**gorra** (`13- Branding/Gorra Efeonce/v01/`, navy con logotipo blanco como principal, para producción y terreno);
+ambas ya se probaron sobre Nexa. La elección sigue siendo vestuario **de esa pieza**, no un atributo universal de Nexa.
 
 ## Biblioteca de poses 3D (pendiente)
 

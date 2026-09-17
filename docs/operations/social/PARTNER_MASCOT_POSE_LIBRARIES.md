@@ -116,6 +116,17 @@ caída. El mismo contrato cubre el **merch con arte impreso**, donde la referenc
   completo de 15; blanco con bordado navy, set esencial de 6), 13 con transparente, más `efeonce-polo-manifiesto.json`.
   Emblema **bordado** de ~7 cm en el pecho izquierdo y **espalda limpia**.
   [`LEEME`](../../../ai-generations/2026-09-17_polo-efeonce/LEEME.md).
+- **Chaqueta Efeonce:** `5. Contenidos/13- Branding/Chaqueta Efeonce/v01/` — 22 vistas (softshell navy oficial del
+  equipo, kit completo de 16; bomber ligera navy, set esencial de 6), 14 con transparente, más
+  `efeonce-chaqueta-manifiesto.json`. Emblema bordado en el pecho **y** estampa canónica de espalda al 38 %, igual que
+  el hoodie. [`LEEME`](../../../ai-generations/2026-09-17_chaqueta-efeonce/LEEME.md).
+- **Gorra Efeonce:** `5. Contenidos/13- Branding/Gorra Efeonce/v01/` — 12 vistas, 11 con transparente, más
+  `efeonce-gorra-manifiesto.json` y la referencia descargada del sitio. Cinco variantes; la **principal** es navy con
+  logotipo blanco. Es el único caso donde la prenda **ya existía** —es el héroe de la landing `/contacto`—, así que esa
+  foto es la única fuente de construcción y las variantes son cambio de color o de aplicación. Reglas propias: declarar
+  que la **trasera va sin bordado**, y **declarar el calce** (ceñido, perfil bajo, ≈ un tercio de la altura de la
+  cabeza, visera corta y curva), porque una referencia de producto se escala de más.
+  [`LEEME`](../../../ai-generations/2026-09-17_gorra-efeonce/LEEME.md).
 - **Lanyard Efeonce (merch con arte impreso):** `5. Contenidos/13- Branding/Lanyard Efeonce/v01/` — 12 vistas + 3 artes
   canónicas (cinta, yoyo y carnet) más `efeonce-lanyard-manifiesto.json`. Incluye el **carnet compuesto**: plantilla
   CR80 vertical que se arma con la foto, el nombre y el cargo de la persona y va dentro de un **portacarnet** de marco
@@ -125,7 +136,11 @@ caída. El mismo contrato cubre el **merch con arte impreso**, donde la referenc
   para comité y licitación, polera para evento, hoodie y gorra para producción—; en prendas formales el emblema va
   bordado y sin eslogan, y la estampa de espalda con eslogan es lenguaje de merch. Tabla completa en la
   sección «Cápsula de vestuario Efeonce» de la bitácora.
-- **Próximas prendas:** chaqueta softshell navy y gorra, que se diseñan desde cero (no existe asset oficial); los pasos
-  están en la sección «Aplicar a otra prenda» de la bitácora.
+- **Referencias de persona:** `5. Contenidos/13- Branding/Equipo/<Nombre>/v01/` con su manifiesto. Hoy sólo
+  **Julio Reyes** (8 fotos entregadas por él: 4 retratos y 4 de cuerpo entero). Al vestir a una persona real hay que
+  pasar **al menos una de cuerpo entero** junto a las de rostro: con sólo retratos el modelo agranda la cabeza.
+  [`LEEME`](../../../ai-generations/2026-09-17_equipo-vestuario/LEEME.md).
+- **Próxima prenda:** polera navy, la única de la cápsula que sigue sin kit; los pasos están en la sección «Aplicar a
+  otra prenda» de la bitácora.
 - **Registro:** [bitácora del método](2026-09-17-hoodie-efeonce-garment-reference-kit.md) ·
   [`LEEME`](../../../ai-generations/2026-09-17_hoodie-efeonce/LEEME.md).

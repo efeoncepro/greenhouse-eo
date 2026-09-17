@@ -95,11 +95,13 @@ Vista por vista, antes de entregar:
 
 ## 7. Aplicar a otra prenda (polera, chaqueta, gorra)
 
-El operador ya decidió el mismo kit para **polera** y **chaqueta**, y el **polo piqué** ya se produjo con estos pasos
-(ver §8). A diferencia del hoodie, **no existe asset oficial de esas prendas**: se diseñan desde cero. Pasos:
+El **polo piqué**, la **chaqueta** y la **gorra** ya se produjeron con estos pasos (ver §8); la **polera** queda
+pendiente. A diferencia del hoodie, **no existe asset oficial** de la mayoría de esas prendas: se diseñan desde cero
+—salvo la gorra, que ya existía—. Pasos:
 
 1. **Diseñar la prenda base según marca** y aprobarla antes de generar vistas. Sin base aprobada, cada vista es un
-   diseño distinto.
+   diseño distinto. **Excepción:** si la pieza **ya existe** —como la gorra del sitio público—, no se diseña nada: esa
+   foto es la base y la única fuente de construcción (ver el kit de la gorra en §8).
 2. **Componer determinísticamente todo el texto y todo emblema** que la prenda lleve (la estampa de espalda del hoodie
    es el patrón). El modelo nunca escribe el texto de la prenda.
 3. **Declarar las proporciones** de cada aplicación —emblema, estampa, bordado— como porcentaje de la parte de la
@@ -116,6 +118,8 @@ El operador ya decidió el mismo kit para **polera** y **chaqueta**, y el **polo
 
 ## 8. Cápsula de vestuario Efeonce
 
+
+> **Elegir la vista por cómo se usa la prenda, no sólo por el ángulo.** Si en la pieza la chaqueta va abierta, la referencia es su vista de `cierre-abierto`, no la de frente; si van dos prendas (polo bajo chaqueta), se pasan las dos como referencias separadas. Caso: [`2026-09-17_nexa-vestuario`](../../../ai-generations/2026-09-17_nexa-vestuario/LEEME.md).
 
 > **Delta 2026-09-17 (operador):** la estampa canónica de espalda —logo completo + «Empower your Growth» al 38 %— va también en las **chaquetas** (softshell y bomber), igual que en el hoodie. La prenda que mantiene la **espalda limpia** es el **polo**, por ser la de uso más formal frente a cliente.
 Decisión del operador (2026-09-17), tomada al preguntarse si la polera servía como ropa corporativa. El cliente de
@@ -143,9 +147,49 @@ Prenda base: piqué de algodón de peso medio, corte regular entallado, tapeta d
 puños de punto plano, aberturas laterales, sin bolsillo ni etiqueta visible; emblema bordado de ~7 cm en el pecho
 izquierdo. Registro: [`LEEME`](../../../ai-generations/2026-09-17_polo-efeonce/LEEME.md).
 
-**Próxima prenda:** chaqueta softshell navy — cierre completo con tapeta interior, cuello alto, bolsillos con cierre
-oculto, puños ajustables, **sin capucha** para que funcione sobre el polo; emblema bordado en el pecho y opcional en la
-manga.
+### Kit de la chaqueta (entregado)
+
+`5. Contenidos/13- Branding/Chaqueta Efeonce/v01/` — 22 vistas + 14 transparentes + `efeonce-chaqueta-manifiesto.json`.
+Dos acabados: **softshell navy** como chaqueta oficial del equipo (kit completo de 16 vistas; tres capas, cierre
+completo con tapeta interior y protector de mentón, cuello alto, bolsillos con cierre oculto, puños ajustables, cordón
+en el ruedo, **sin capucha** para ir sobre el polo) y **bomber ligera navy** como pieza de imagen (set esencial de 6;
+sarga técnica mate, cuello, puños y ruedo de punto acanalado, mangas raglán). Ambas con emblema bordado en hilo blanco
+en el pecho izquierdo y, por decisión del operador, la **estampa canónica de espalda al 38 %** —el polo es la única
+excepción de espalda limpia—. Registro: [`LEEME`](../../../ai-generations/2026-09-17_chaqueta-efeonce/LEEME.md).
+
+### Kit de la gorra (entregado)
+
+Único caso de la cápsula donde **la prenda ya existía**: es el héroe visual de la landing `/contacto` del sitio
+público, royal con el logotipo completo bordado en blanco. Esa foto es la única fuente de construcción —seis paneles,
+visera curva, botón forrado, dos ojetillos por lado y cierre de cinta— y las variantes se piden como cambio de color o
+de aplicación.
+
+| Variante | Rol |
+|---|---|
+| Royal con logotipo | La existente; continuidad con el sitio, producción y regalo |
+| **Navy con logotipo blanco** | **Principal** del equipo; combina con polo y softshell |
+| Navy sólo con isotipo | Alternativa discreta frente a cliente |
+| Blanco con logotipo navy | Verano y eventos |
+| Trucker navy con malla blanca | Terreno, grabación y exteriores |
+
+`5. Contenidos/13- Branding/Gorra Efeonce/v01/` — **12 vistas** (de la principal: héroe en tres cuartos, frente recto,
+lateral, trasera con el cierre, macro del bordado y cenital; de las alternativas: héroe y trasera), 11 con transparente
+—todas menos el macro—, más `efeonce-gorra-manifiesto.json` y la referencia descargada del sitio. Probada en dos
+personas: Nexa y el operador, con la gorra navy sobre el polo navy.
+
+**Tres reglas nuevas, una línea cada una:**
+
+1. **Si la pieza ya existe, su foto manda:** la construcción sale de la foto real, nunca de una descripción, y las
+   variantes son cambio de color o de aplicación sobre esa misma foto.
+2. **Declarar lo que NO lleva:** la trasera se pide explícitamente **sin bordado**, porque si no el modelo repite el
+   logotipo detrás.
+3. **El calce se declara, no se asume:** una referencia de producto se escala de más, así que se describe el ajuste
+   —talla adulta, calce ceñido, perfil bajo, de la ceja a lo alto de la copa ≈ un tercio de la altura de la cabeza,
+   visera corta y curva del ancho de la frente— y no el objeto.
+
+Registro: [`LEEME`](../../../ai-generations/2026-09-17_gorra-efeonce/LEEME.md).
+
+**Próxima prenda:** polera navy, la única de la cápsula que sigue sin kit.
 
 ## 9. Merch con arte impreso (lanyard, yoyo, portacarnet y carnet)
 

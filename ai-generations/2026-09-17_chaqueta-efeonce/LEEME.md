@@ -19,6 +19,8 @@ Ambas con **emblema bordado en hilo blanco** en el pecho izquierdo y, por decisi
 
 ## Contenido (`final/`, 22 vistas)
 
+Entrega: OneDrive `5. Contenidos/13- Branding/Chaqueta Efeonce/v01/`.
+
 Frente · espalda · tres cuartos izquierda y derecha · lateral · cierre abierto con el forro a la vista · doblada ·
 percha · planos cenitales frente y espalda · macro del bordado · macro del cierre y la tapeta · macro de puño y
 bolsillo · puesta de frente sobre polo navy, de espaldas y con un segundo cuerpo y tono de piel. Transparentes en las
