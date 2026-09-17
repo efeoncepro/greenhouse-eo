@@ -166,3 +166,22 @@ nocturnos o navy.
   ni superficie.
 - **No reemplaza la firma ni el logo plano** en piezas con texto: en una pieza, la firma sigue siendo el SVG oficial
   compuesto con AXIS. El logo 3D es la idea visual dentro de la escena.
+
+### Delta 2026-09-17 — el criterio no es sólo el tamaño: también el material
+
+Al producir la recepción premium (9:16, larga exposición, escala mediana) la variante de pegar + halo fue rechazada por
+el operador: «se ve muy falso», porque el objeto conserva el material y la luz del kit; además el navy sobre travertino
+no tenía jerarquía. La pasada directa —render blanco como referencia de forma y el prompt pidiendo letras volumétricas
+de acero cepillado montadas sobre la piedra— resolvió material, montaje, sombra y atmósfera en un intento (USD 0,14) y
+quedó aprobada.
+
+Regla corregida:
+
+| Situación | Variante |
+|---|---|
+| Logo grande en cuadro | Pasada directa |
+| **Cambio de material** (acero, aluminio, vidrio, neón, madera) | **Pasada directa** |
+| Escena con atmósfera fuerte (larga exposición, neón, contraluz) | Pasada directa |
+| Material exacto del kit + logo chico o detalle fino | Halo enmascarado |
+
+Elegir la referencia por luminancia: render blanco para materiales claros, navy para oscuros o para el color de marca.

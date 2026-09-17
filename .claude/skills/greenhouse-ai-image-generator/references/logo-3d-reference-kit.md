@@ -35,6 +35,26 @@ Ubicación: OneDrive `5. Contenidos/13- Branding/Logo Efeonce 3D/` → `Fuente o
 5. Usar el `-transparente.png` como imagen 1; el `-fondo-estudio.png` sirve para revisión o si el modelo pierde
    bordes con alfa.
 
+## 1.b Regla de elección (corregida 2026-09-17 con el caso recepción)
+
+La pasada directa con el render como referencia **no es sólo para logo grande en cuadro**: es también la vía cuando la
+pieza **cambia el material** del logo (acero, aluminio, vidrio, neón, madera, cobre) o cuando se quiere que el modelo
+resuelva montaje, luz y atmósfera. Entregar la forma exacta como referencia y la intención en el prompt rinde mucho
+mejor que pegar el render: pegado, el objeto queda con el material y la luz del kit y se ve falso en la escena.
+
+- **Pasada directa (por defecto):** logo grande en cuadro **o** cambio de material **o** escena con una atmósfera fuerte
+  (larga exposición, neón, contraluz). El render fija la forma; el prompt fija material y escena.
+- **Halo enmascarado:** sólo cuando hay que conservar el material exacto del kit **y** el logo es chico o de detalle
+  fino, donde la pasada directa deforma la órbita.
+- **Referencia por luminancia:** para materiales claros (acero, aluminio, blanco, vidrio) usar el render **blanco**;
+  para materiales oscuros o el navy de marca, el render **navy**. La luminosidad parecida guía mejor al modelo.
+
+Caso probado: recepción premium 9:16 con larga exposición, escala mediana, referencia blanca frontal luz derecha y la
+instrucción «mismas letras, nave, órbita y proporciones; cambia sólo el material: acero inoxidable cepillado de 1,2 m
+y 4 cm de fondo, montado con pines ocultos sobre travertino». Una pasada, USD 0,14, aprobado por el operador
+(«espectacular»). Antes, la variante de pegar + halo sobre el mismo muro fue rechazada: «se ve muy falso», y el navy
+sobre travertino no tenía jerarquía. Registro: bitácora §5.
+
 ## 2. Elegir la variante: la decide el tamaño del logo en cuadro
 
 El camino canónico es **generativo en las dos variantes**: el logo entra como píxeles exactos y el modelo aporta
