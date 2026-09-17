@@ -1,0 +1,58 @@
+{
+  "producto": "Lanyard Efeonce con yoyo (portacredencial retráctil)",
+  "artes_canonicas": {
+    "cinta": "efeonce-lanyard-arte-cinta-canonica.png — patrón repetido logo blanco · eslogan; «Empower your» en gris #848484 y «Growth» en blanco (traducción a escala de grises del lockup oficial, donde el prefijo va gris y la última palabra lleva el acento de color: Growth #173b6c)",
+    "yoyo": "efeonce-lanyard-arte-yoyo-canonica.png — disco blanco con el isotipo navy #023c70 bajo la resina"
+  },
+  "invariantes": {
+    "cinta": "poliéster plano 20 mm, navy #023c70, hebilla de seguridad, gancho giratorio metálico",
+    "yoyo": "carcasa redonda 32 mm navy brillante, cúpula de resina, clip de acero, cordón de nylon",
+    "arte": "se compone determinísticamente con arte-lanyard.mjs; el texto exacto nunca se le pide al modelo"
+  },
+  "vistas": [
+    {
+      "id": "01-conjunto",
+      "descripcion": "Lanyard completo con yoyo y credencial",
+      "cuando_usarla": "vista general, catálogo, kit de bienvenida",
+      "archivo_fondo_estudio": "efeonce-lanyard-01-conjunto-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-lanyard-01-conjunto-1200x1600-v01-transparente.png",
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "02-detalle-cinta",
+      "descripcion": "Macro de la cinta con un módulo del patrón",
+      "cuando_usarla": "verificación de arte y primeros planos",
+      "archivo_fondo_estudio": "efeonce-lanyard-02-detalle-cinta-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "03-detalle-yoyo",
+      "descripcion": "Macro del yoyo con la resina",
+      "cuando_usarla": "detalle de producto",
+      "archivo_fondo_estudio": "efeonce-lanyard-03-detalle-yoyo-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "04-puesto",
+      "descripcion": "Puesto sobre el polo navy, sin rostro",
+      "cuando_usarla": "piezas con persona, credencial en el pecho",
+      "archivo_fondo_estudio": "efeonce-lanyard-04-puesto-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    }
+  ]
+}

@@ -241,3 +241,13 @@ No basta el ángulo de la toma: si en la pieza la chaqueta va **abierta**, la re
 - **Encuadre y óptica:** plano tres cuartos desde debajo de las rodillas, cámara a la altura del pecho y lente larga (≈135 mm) a varios metros; el plano cerrado con lente corta agranda lo cercano.
 - **Declarar la anatomía:** cabeza ≈ 1/7,5 de la altura, hombros más anchos que la cabeza, torso de largo natural, «nunca agrandar la cabeza ni encoger el cuerpo».
 - **Consentimiento:** una persona real sólo se genera con su consentimiento; los sets de referencia del equipo viven en OneDrive `13- Branding/Equipo/<Nombre>/` con su manifiesto.
+
+## Delta 2026-09-17 — merch con arte impreso (lanyard con yoyo)
+
+El método vale para merch, no sólo ropa: `ai-generations/2026-09-17_lanyard-efeonce/LEEME.md`.
+- **El arte se compone, el producto se genera.** Patrón de la cinta y cara del yoyo se arman con un script desde
+  los archivos oficiales y entran como referencia; el texto exacto nunca se genera.
+- **Paso del patrón calculado desde el ancho real** de cada pieza más un espacio; fijarlo a mano solapa el logo
+  con el eslogan.
+- **Eslogan en dos tonos:** el lockup oficial lleva «Empower your» en gris `#848484` y la última palabra con el
+  acento de color (Growth `#173b6c`); sobre navy se traduce a escala de grises con «Growth» en blanco.
