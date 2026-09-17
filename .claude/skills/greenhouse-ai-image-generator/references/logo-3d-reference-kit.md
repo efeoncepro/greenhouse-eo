@@ -35,7 +35,19 @@ Ubicación: OneDrive `5. Contenidos/13- Branding/Logo Efeonce 3D/` → `Fuente o
 5. Usar el `-transparente.png` como imagen 1; el `-fondo-estudio.png` sirve para revisión o si el modelo pierde
    bordes con alfa.
 
-## 2. Contrato de prompt (imagen 1)
+## 2. Elegir la variante: la decide el tamaño del logo en cuadro
+
+El camino canónico es **generativo en las dos variantes**: el logo entra como píxeles exactos y el modelo aporta
+sombra, reflejo y profundidad. Lo que cambia es cuánto se le deja tocar.
+
+| Situación | Variante | Por qué |
+|---|---|---|
+| El logo ocupa **≳ un tercio del ancho** del cuadro, letras grandes y legibles | **A. Pasada directa** | A ese tamaño el modelo respeta la forma; una sola llamada e integración completa |
+| Logo **chico en cuadro**, detalle fino (órbita, cortes, ventanas), ángulos cerrados | **B. Pegar y repintar el halo con máscara** | A escala chica el modelo re-dibuja el detalle aunque el prompt lo prohíba |
+
+Regla corta: **si dudas, variante B.** Cuesta una llamada más (el plato) y garantiza la forma.
+
+## 3. Variante A — pasada directa (logo grande en cuadro)
 
 ```bash
 pnpm ai:image --model gpt-image-2.5-sunburst --image <render-del-kit.png> --prompt "…"
@@ -50,21 +62,76 @@ Texto obligatorio al inicio del prompt, sin variar:
 El resto del prompt describe **sólo la escena** (lugar, hora, luz, personas, cámara coherente con el render). No
 describir el logo ni sus letras: la descripción compite con la imagen.
 
-## 3. Fallback: componer en vez de integrar
+**Evidencia medida (2026-09-17):** avenida de Nueva York al anochecer con la **monumental blanca** (cámara 03, luz
+der) salió fiel al primer intento, **USD 0,14**. Diferencias menores que el QA aceptó: órbita algo más gruesa y
+nariz de la nave algo más corta que en el render.
 
-Si la escena es exigente con las letras (logo pequeño en cuadro, muchas letras a la vista, ángulos cerrados):
-generar la escena **con el espacio reservado** y **componer el render encima** en posición exacta; integrar sombra de
-contacto y luz después. Regla general: lo exacto no se deja inventar al modelo.
+## 4. Variante B — pegar y repintar el halo con máscara (logo chico o detalle fino)
 
-## 4. QA letra por letra (antes de usar)
+**Por qué existe (medido):** con la escala **pequeña** sobre un escritorio, la pasada directa deformó la órbita —la
+encogió a un lazo— y aclaró el navy, **dos veces seguidas**, aun exigiendo en el prompt la elipse ancha y `#023c70`.
+A ese tamaño el prompt no gana: hay que quitarle al modelo el permiso de dibujar el objeto.
+
+1. **Plato sin el objeto.** Generar la escena vacía y declarar en el prompt el espacio libre donde irá el logo
+   («leave the centre-left area completely EMPTY: clean bare wood, no object, no prop, no shadow of any object
+   there, a clear space about 30 cm wide»), con la profundidad de campo enfocada en esa zona.
+2. **Base = plato + render pegado, sin sombra.** La sombra la pone el modelo después.
+3. **Máscara**: protegido el **interior del logo** (erosión ≈ 8 px, para que el borde pueda fundirse) **y también
+   todo el resto de la escena**; editable **sólo un halo de ≈ 140 px** alrededor del objeto.
+4. **Una pasada de edición** que pida **sólo integración**: sombra de contacto según la dirección de la luz de la
+   escena, reflejo en la superficie, rebotes cálido/frío y fundido de bordes con la profundidad de campo; y que
+   declare explícitamente que el objeto ya colocado es real, está protegido y no se re-dibuja.
+
+```bash
+# 2 y 3 — base + máscara (HALO en píxeles; 140 por defecto)
+HALO=140 node prueba/preparar-mascara.mjs <plato.png> <render-del-kit.png> <ancho-px> <x> <y> base.png mascara.png
+
+# verificación PREVIA AL GASTO: cuántos píxeles quedaron protegidos
+node -e "const s=require('sharp');s('mascara.png').extractChannel('alpha').raw().toBuffer().then(b=>{let p=0;for(const v of b)if(v>200)p++;console.log('protegidos',p,'de',b.length,(100*p/b.length).toFixed(1)+'%')})"
+
+# 4 — una sola pasada de integración
+pnpm ai:image --model gpt-image-2.5-sunburst --image base.png --mask mascara.png --prompt "…"
+```
+
+**Resultado medido:** zona protegida con diferencia media **4,4/255** (logo y escena intactos) y halo editable
+**39,6** (la sombra y el reflejo nuevos). **Artefacto conocido:** un brillo sucio donde el halo toca el borde del
+remate; se corrige bajando `HALO` o la erosión.
+
+**No omitir la máscara de la escena.** Protegiendo sólo el logo, el modelo conserva el objeto pero **re-dibuja toda
+la escena**: cambia props y encuadre (medido: IoU de silueta **0,72** por desplazamiento y escala).
+
+**Trampa técnica de `sharp` (cuesta plata si se ignora):** `blur()` / `linear()` sobre un buffer **raw de 1 canal**
+devuelven **3 canales**; sin `.toColourspace('b-w')` el índice se corre y la máscara sale **100 % transparente**, es
+decir *todo editable*, sin ningún error visible. Por eso el conteo de píxeles protegidos de arriba es obligatorio
+**antes** de llamar al modelo: una máscara rota se ve igual de bien en el visor y se paga igual.
+
+Herramientas de la corrida (en `ai-generations/2026-09-17_efeonce-logo-3d/prueba/`): `preparar-mascara.mjs` (base +
+máscara de halo, `HALO` por variable de entorno) · `componer-escritorio.mjs` (composición determinística, sólo
+respaldo) · `reanclar.mjs` (re-anclar el render sobre la salida: **descartado**, reintroduce el aspecto pegado y
+los fringes).
+
+## 5. QA letra por letra (obligatorio en las dos variantes)
 
 1. Superponer la silueta del render sobre el resultado.
-2. Comparar letra por letra: forma de «e», «f», nave, anillo con sus cortes, tres ventanas.
+2. Comparar **letra por letra**: forma de «e», «f», nave, órbita **con sus cortes**, **tres ventanas**.
 3. Color sin deriva frente al render; perspectiva coherente con la escena.
-4. **Una letra distinta = regenerar o componer.** Nunca entregar «casi igual».
-5. Revisión adversarial con `efeonce-advertising-creative` antes de proponer.
+4. En la **variante B**, además: medir la diferencia media por píxel entre base y salida separando la **zona
+   protegida** (alfa opaco de la máscara) del **halo**. La protegida debe quedar cerca de cero; si sube, la máscara
+   no hizo efecto.
+5. **Una letra distinta = regenerar o cambiar de variante.** Nunca entregar «casi igual».
+6. Revisión adversarial con `efeonce-advertising-creative` antes de proponer.
+7. La **firma** de la pieza sigue siendo el SVG oficial compuesto con AXIS: el 3D es el objeto de la escena, nunca
+   la firma.
 
-## 5. Agregar cámaras o rendir otro logo (`blender/render_logo.py`)
+## 6. Último recurso: composición determinística
+
+Pegar el render sobre la escena y pintar la sombra a mano **no es el camino por defecto**. El operador lo rechazó
+explícitamente: «al componerlo de forma determinante pierde sombras integradas, profundidad; hay que lograr que
+sirva con IA generativa». El resultado se lee pegado —sin sombra de contacto real, sin reflejo, sin fundido con la
+profundidad de campo— por más precisa que sea la posición. Reservarlo para cuando la variante B no converja después
+de ajustar `HALO`/erosión, y decirlo al entregar.
+
+## 7. Agregar cámaras o rendir otro logo (`blender/render_logo.py`)
 
 Configuración por escala y color en `blender/<escala>-<color>.json` (`svg`, `color`, `color_hex`, `prefijo`,
 `resolucion`, `samples`, `escala{ancho_m, grosor_m, bisel_m}`, `camaras[]{id, pos, mira, lente_mm, descripcion,
@@ -95,7 +162,7 @@ reflejarse: en Cycles apagar con `visible_glossy = False` del objeto luz (`specu
 relativas al centro real del objeto, incluida su elevación. Blanco calibrado por medición: subir la caja y bajar el
 entorno hasta que la cara lea blanco sin perder los costados.
 
-## 6. Reproducir
+## 8. Reproducir
 
 ```bash
 cd ai-generations/2026-09-17_efeonce-logo-3d

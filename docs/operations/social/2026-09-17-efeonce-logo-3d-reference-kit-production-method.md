@@ -71,13 +71,79 @@ integrar el render en una escena.
 3. Pasarlo al modelo como **imagen 1** (`pnpm ai:image --model gpt-image-2.5-sunburst --image <render> …`) con el
    contrato de prompt del [`LEEME`](../../../ai-generations/2026-09-17_efeonce-logo-3d/LEEME.md) (mantener forma,
    letras, proporciones, color y perspectiva; no redibujar). El resto del prompt describe sólo la escena.
-4. Si la escena exige mucho a las letras (logo pequeño en cuadro, muchas letras a la vista, ángulos cerrados): generar
-   la escena con el espacio reservado y componer el render encima en posición exacta, integrando sombra y luz después.
+4. Si la escena exige mucho a las letras (logo pequeño en cuadro, muchas letras a la vista, ángulos cerrados): usar la
+   variante B de la sección 5 (pegar el render y repintar sólo el halo con máscara).
 5. QA antes de usar: superponer la silueta del render sobre el resultado y comparar letra por letra (forma de «e»,
    «f», nave, anillo con sus cortes, tres ventanas); color sin deriva; perspectiva coherente. Una letra distinta =
    regenerar o componer. Revisión adversarial con la skill de publicidad antes de proponer.
 
-## 5. Reproducir
+## 5. Aplicación con IA generativa (probado)
+
+El camino por defecto es **generativo**, no determinístico. El operador rechazó explícitamente componer el render sobre
+la escena como camino por defecto: «al componerlo de forma determinante pierde sombras integradas, profundidad; hay que
+lograr que sirva con IA generativa». La composición determinística queda sólo como respaldo.
+
+Hay **dos variantes**, y la que se usa la decide el **tamaño del logo en cuadro**:
+
+| Variante | Cuándo | Qué hace el modelo |
+|---|---|---|
+| **A. Pasada directa** | El logo ocupa ≳ un tercio del ancho del cuadro | Recibe el render como imagen 1 y genera la escena a su alrededor |
+| **B. Pegar y repintar el halo** | Logo chico en cuadro o con detalle fino (órbita, ventanas, letras pequeñas) | Sólo pinta sombra y reflejo en un halo alrededor del objeto ya pegado |
+
+### 5.1 Variante A — pasada directa
+
+El render del kit entra como **imagen 1** con el contrato: «este objeto es real; conserva forma, letras, órbita con sus
+cortes, ventanas, proporciones, color y perspectiva». El prompt describe **sólo la escena**.
+
+Caso medido: **avenida de Nueva York al anochecer con la escala monumental blanca** (cámara 03, luz der). Fiel al
+primer intento, **USD 0,14**. Diferencias menores aceptadas: órbita algo más gruesa y nariz de la nave más corta.
+
+### 5.2 Variante B — pegar y repintar el halo con máscara
+
+Por qué existe: medido con la **escala pequeña sobre un escritorio**, la pasada directa **falló dos veces seguidas** —
+encogió la órbita a un lazo y aclaró el navy— **incluso exigiendo en el prompt** la elipse ancha y `#023c70`. El detalle
+fino no se le deja al modelo.
+
+Pasos:
+
+1. **Plato de escena sin el objeto**: generar la escena declarando en el prompt el espacio libre donde irá el logo.
+2. **Base**: plato + render exacto pegado en posición, **sin sombra** (`prueba/preparar-mascara.mjs`).
+3. **Máscara**: protege **dos** zonas — el interior del logo (erosión ≈ 8 px) **y** el resto de la escena. Queda
+   editable **sólo un halo de ≈ 140 px** alrededor del objeto (`HALO` por variable de entorno).
+4. **Una pasada** de `pnpm ai:image --image <base> --mask <mascara>` pidiendo **sólo integración**: sombra de contacto
+   según la dirección de la luz, reflejo en la superficie, rebotes y fundido de bordes con la profundidad de campo.
+
+Resultado medido: zona protegida con **diferencia media 4,4/255** (logo y escena intactos) frente a **39,6** en el halo
+editable (la sombra y el reflejo nuevos).
+
+**Artefacto conocido:** un brillo sucio donde el halo toca el borde del remate. Se corrige bajando el halo o la erosión.
+
+**No omitir la máscara de escena.** Si sólo se protege el logo, el modelo re-dibuja toda la escena alrededor: conserva
+el objeto pero cambia props y encuadre. Medido: **IoU de silueta 0,72** por desplazamiento y escala.
+
+### 5.3 Trampa técnica de la máscara (sharp, 1 canal)
+
+En sharp, `blur()` o `linear()` sobre un buffer raw de **1 canal devuelve 3 canales**. Sin `.toColourspace('b-w')` el
+índice se corre y la máscara sale **100 % transparente** — es decir, todo editable, y el modelo repinta la escena
+completa. **Contar siempre los píxeles protegidos antes de gastar en el modelo.**
+
+### 5.4 Herramientas de la corrida
+
+| Script | Qué hace | Estado |
+|---|---|---|
+| `prueba/preparar-mascara.mjs` | Arma base (plato + render pegado) y máscara de halo; `HALO` por variable de entorno | Camino canónico de la variante B |
+| `prueba/componer-escritorio.mjs` | Composición determinística | **Sólo respaldo**, no es el camino por defecto |
+| `prueba/reanclar.mjs` | Re-ancla el render sobre la salida del modelo | **Descartado**: reintroduce el aspecto pegado y los fringes |
+
+### 5.5 QA obligatorio (cualquiera de las dos variantes)
+
+- Comparar el resultado contra el render **letra por letra**: «e», «f», nave, órbita con sus cortes, tres ventanas.
+- Color sin deriva y perspectiva coherente con la escena.
+- En la variante B, además: **medir la diferencia en la zona protegida** (debe quedar en el orden de 4/255, no de 40).
+- La firma de la pieza sigue siendo el **SVG oficial compuesto con AXIS**. El 3D es el objeto de la escena, nunca la
+  firma.
+
+## 6. Reproducir
 
 ```bash
 cd ai-generations/2026-09-17_efeonce-logo-3d
@@ -89,9 +155,14 @@ node blender/postproceso.mjs render/grande-navy kit/grande-navy <hoja.png>
 Configuración por escala y color en `blender/<escala>-<color>.json`. Agregar una cámara = agregar una entrada y correr
 con `--only` (el manifiesto conserva las demás).
 
-## 6. Uso y límites
+## 7. Uso y límites
+
+**Cuándo usar el kit:** cualquier pieza donde el logo aparezca como **objeto físico dentro de una escena** — OOH y vía
+pública, fachadas, muros de oficina, escenarios y eventos, stands, vitrinas, trofeos, objetos de escritorio, packaging,
+mockups de merch, portadas de campaña y decks. Navy sobre fondos claros o de día; blanco sobre fondos oscuros,
+nocturnos o navy.
 
 - Es la **fuente de verdad de la forma** del logo en 3D, no una pieza ni una escena: el objeto va aislado, sin piso
   ni superficie.
-- **No reemplaza la firma:** en una pieza, la firma sigue siendo el SVG oficial compuesto con AXIS. El logo 3D es la
-  idea visual dentro de la escena.
+- **No reemplaza la firma ni el logo plano** en piezas con texto: en una pieza, la firma sigue siendo el SVG oficial
+  compuesto con AXIS. El logo 3D es la idea visual dentro de la escena.

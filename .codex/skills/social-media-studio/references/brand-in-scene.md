@@ -117,7 +117,12 @@ transparente y escenas; OneDrive `5. Contenidos/13- Branding/Nave Efeonce 3D/`).
 (ruta B) o como referencia para regenerar el plate (ruta C), antes de generar otra nave. Navy sobre fondos claros,
 blanco sobre oscuros o navy. Para integrarla con personas o mascotas, regenerar el plate en vez de recortar
 alrededor de los sujetos. Método: [isotipo propio en 3D](../../greenhouse-ai-image-generator/references/mascot-3d-pose-library.md#isotipo-propio-en-3d-con-dos-colores-caso-nave-de-efeonce).
-**Logo completo de Efeonce en la escena:** usar el [kit de referencia 3D](../../greenhouse-ai-image-generator/references/logo-3d-reference-kit.md) (escala, cámara y luz por manifiesto) como imagen 1 y QA letra por letra.
+**Logo completo de Efeonce en la escena:** usar el [kit de referencia 3D](../../greenhouse-ai-image-generator/references/logo-3d-reference-kit.md) (escala, cámara y luz por manifiesto). El **tamaño del logo en cuadro** elige la variante:
+
+- **A. Pasada directa** — logo grande (≳ un tercio del ancho): el render va como imagen 1 con el contrato «este objeto es real, conserva forma, letras, color y perspectiva» y el prompt describe sólo la escena. Una llamada, integración completa.
+- **B. Pegar y repintar el halo** — logo chico o detalle fino: plato generado sin el objeto y con el espacio declarado libre, render exacto pegado encima y una edición con máscara que protege el logo **y** el resto de la escena, dejando editable sólo un halo alrededor para sombra de contacto, reflejo y fundido. A escala chica la pasada directa deformó la órbita y aclaró el navy aunque el prompt lo prohibiera.
+
+En ambas, QA letra por letra («e», «f», nave, órbita con sus cortes, tres ventanas). Componer de forma determinística es el último recurso: se lee pegado, sin sombra ni profundidad integradas.
 
 No imponer «todos los logos van después del modelo» a esta ruta: confunde firma gráfica con objeto material.
 Tampoco imponer «todo product placement exige IA»: las rutas A/B permiten control físico y de identidad.

@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-17 — Aplicar el logo 3D en escenas con IA generativa
+
+El kit 3D del logo ya no se compone a mano sobre la escena: se pega el render exacto y el modelo repinta sólo un halo
+alrededor con máscara, así aporta sombra de contacto, reflejo y rebote sin poder re-dibujar el logo. Con el logo grande
+en cuadro basta la pasada directa con el render como referencia. Medido en dos casos reales (avenida de Nueva York y
+escritorio): zona protegida 4,4/255 de diferencia y halo 39,6. La composición determinística queda como respaldo.
+
 ## 2026-09-17 — Logo de Efeonce en 3D como kit de referencia para agentes
 
 Quedó en `13- Branding/Logo Efeonce 3D` el logo completo en 3D renderizado en Blender desde el SVG oficial, en navy y
@@ -831,10 +838,3 @@ diez archivos de skills reconciliados con espejo Claude/Codex, incluido el hueco
 mecánica de plataforma. Quedan siete decisiones pendientes y un conflicto declarado sin resolver con el plan
 estacional 2026–2027, que sigue vigente. No se abrió ninguna cuenta, no se produjo contenido, no se programó nada
 y no se autorizó publicación.
-
-## 2026-09-10 — Finance: nómina agosto al valor real de Global66 y TASK-1858
-
-Con autorización del operador, los dos pagos de nómina de agosto que Payroll había registrado en USD con tasa
-estimada quedaron superseded y reemplazados por lo que salió de Global66 el 03/09 (800.730 y 1.114.423 más las
-comisiones de cambio), pagados en la moneda del expense al tipo de cambio realizado; Global66 septiembre queda
-`reconciled`. Se crea `TASK-1858` como cierre formal de la recuperación.

@@ -1,9 +1,9 @@
 # Editar solo una zona de una imagen (inpainting con mascara)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-17 por Claude — (1.4) `--key-background` para huecos opacos de objeto claro sobre fondo oscuro. Antes (1.3) `pnpm ai:image:rmbg` rellena huecos internos por defecto; cuándo usar `--no-fill-holes`. Antes (1.2) brechas del comando corregidas (commit `17196ead1`): `--size` y `--background` se validan antes de gastar, nuevo `--format png|jpeg|webp`, aviso de `--count N` y línea `$ costo estimado` antes de pedir. Antes (1.1): elección GPT Image 2 vs 2.5 Sunburst vs Flare con enlace a la guía canónica de selección; el costo de 2.5 sí se estima antes con la fórmula oficial; brechas conocidas del comando (`--size`/`--background` sin validar, PNG siempre, `--count` = N pedidos pagados)
+> **Ultima actualizacion:** 2026-09-17 por Claude — (1.5) segundo uso de la mascara: integrar un objeto real (render de marca) en una escena protegiendo objeto y escena y abriendo solo un halo de ~140 px; verificacion de pixeles protegidos antes de gastar y trampa de `sharp` de 1 canal (`toColourspace('b-w')`). Antes (1.4) `--key-background` para huecos opacos de objeto claro sobre fondo oscuro. Antes (1.3) `pnpm ai:image:rmbg` rellena huecos internos por defecto; cuándo usar `--no-fill-holes`. Antes (1.2) brechas del comando corregidas (commit `17196ead1`): `--size` y `--background` se validan antes de gastar, nuevo `--format png|jpeg|webp`, aviso de `--count N` y línea `$ costo estimado` antes de pedir. Antes (1.1): elección GPT Image 2 vs 2.5 Sunburst vs Flare con enlace a la guía canónica de selección; el costo de 2.5 sí se estima antes con la fórmula oficial; brechas conocidas del comando (`--size`/`--background` sin validar, PNG siempre, `--count` = N pedidos pagados)
 > **Modulo:** AI Tooling / Asset Generation
 > **Comandos:** `pnpm ai:image --image ... --mask ...`, `pnpm ai:image:rmbg`
 > **Documentacion relacionada:** `docs/documentation/ai-tooling/generador-visual-assets.md`, `.claude/skills/greenhouse-ai-image-generator/SKILL.md`, `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`
@@ -100,6 +100,72 @@ entrada (1.024 tokens a 1024²).
 
 Abre la imagen y comparala con la original. **No confies en una diferencia promedio de pixeles**: un objeto
 chico mueve muy poco el promedio y parece que no paso nada. Hay que mirar.
+
+## Otro uso de la mascara: integrar un objeto real en una escena
+
+El caso de arriba abre un hueco para que el modelo **invente** algo. Este es el contrario: ya tienes un objeto exacto
+—por ejemplo el render 3D del logo de Efeonce— y lo que quieres del modelo es **solo la integracion**: la sombra de
+contacto, el reflejo en la superficie y el fundido de bordes. Ni el objeto ni la escena deben cambiar.
+
+La forma de conseguirlo es una mascara que **protege dos zonas** y deja editable **solo un halo** alrededor del objeto.
+Se usa cuando el objeto es chico en cuadro o tiene detalle fino: pasarlo suelto al modelo deforma ese detalle aunque el
+prompt lo prohiba (medido: una orbita se encogio a un lazo dos veces seguidas).
+
+### Pasos
+
+1. **Genera la escena sin el objeto**, declarando en el prompt el espacio libre donde va a ir.
+2. **Arma la base**: pega el objeto exacto sobre esa escena en su posicion final, **sin sombra**.
+3. **Arma la mascara**, opaca (protegida) en el interior del objeto —con una erosion de unos 8 px hacia adentro— y
+   opaca tambien en **todo el resto de la escena**. Transparente (editable) solo en un halo de ~140 px alrededor del
+   objeto.
+4. **Corre una pasada** pidiendo unicamente integracion:
+
+```bash
+pnpm ai:image --image BASE.png --mask MASCARA-HALO.png \
+  --model gpt-image-2.5-sunburst \
+  --prompt "Add only contact shadow, surface reflection and bounce light around the object, matching the scene light direction, and blend the edges with the depth of field. Keep the object and the rest of the scene exactly the same." \
+  --out RESULTADO.png
+```
+
+### Verifica los pixeles protegidos antes de gastar
+
+**Cuenta los pixeles opacos de la mascara antes de pedir nada.** Hay una trampa silenciosa: en `sharp`, aplicar
+`blur()` o `linear()` sobre un buffer raw de **1 canal devuelve 3 canales**. Si no cierras con
+`.toColourspace('b-w')`, el indice se corre y la mascara sale **100 % transparente** — todo editable — sin ningun
+error. El modelo te repinta la escena entera y lo pagas.
+
+```bash
+node -e "
+const sharp=require('sharp');
+(async()=>{
+  const {data,info}=await sharp('MASCARA-HALO.png').ensureAlpha().raw().toBuffer({resolveWithObject:true});
+  let op=0,tr=0;
+  for(let i=3;i<data.length;i+=4){ data[i]>127?op++:tr++; }
+  console.log('protegidos',op,'editables',tr,'=>',(100*tr/(op+tr)).toFixed(1)+'% editable');
+})()
+"
+```
+
+Si sale `100% editable`, la mascara esta mal: no la uses.
+
+### Como saber si funciono
+
+Compara el resultado con la base **midiendo por zona**, no en promedio global:
+
+- **Zona protegida** (objeto + escena): diferencia media del orden de **4/255**. Es decir, intacta.
+- **Halo editable**: del orden de **40/255**. Ahi aparecieron la sombra y el reflejo.
+
+Si la zona protegida se parece al halo, la mascara no protegio nada.
+
+### Que no hacer aqui
+
+- **No omitas la parte de la mascara que protege la escena.** Si solo proteges el objeto, el modelo conserva el objeto
+  pero **redibuja la escena completa**: cambia props y encuadre (medido: IoU de silueta 0,72 por desplazamiento y
+  escala).
+- **No vuelvas a pegar el objeto encima del resultado** para "corregirlo": reintroduce el aspecto de recorte pegado y
+  los bordes sucios que la pasada acababa de resolver.
+- Artefacto conocido: un **brillo sucio donde el halo toca el borde del objeto**. Se corrige bajando el ancho del halo
+  o la erosion.
 
 ## Que significan las senales
 

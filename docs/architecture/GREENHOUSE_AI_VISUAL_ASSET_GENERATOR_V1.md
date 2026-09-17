@@ -1,9 +1,9 @@
 # Greenhouse AI Visual Asset Generator V1
 
 > **Tipo de documento:** Spec de arquitectura
-> **Version:** 1.14
+> **Version:** 1.15
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-09-17 por Claude (1.14: patrón forma exacta de marca = render 3D determinístico en Blender como imagen 1 del modelo, que sólo integra la escena; kit del logo completo de Efeonce por escala y cámara, QA letra por letra. Antes, 1.13: `pnpm ai:image:rmbg --key-background [umbral] [minPx]` cierra el gap de huecos opacos de objeto claro sobre fondo oscuro. Antes, 1.12: gap abierto del recorte de objeto claro sobre fondo oscuro —huecos opacos— con arreglo temporal de corrida; patrones recolorear desde el aprobado y guía de perspectiva. Antes, 1.11: `pnpm ai:image:rmbg` rellena por defecto los huecos internos del matting; `--no-fill-holes`. Antes, 1.10: carril Higgsfield API dentro de `pnpm ai:fal` — cliente canónico `src/lib/ai/higgsfield.ts`, 44 capacidades con JSON Schema real, precio exacto por API, secreto `greenhouse-higgsfield-api-key`; Recraft de la API: SVG sin confirmar. Antes, 1.9: brechas de `pnpm ai:image` y `pnpm ai:fal` corregidas en el commit `17196ead1` — estimación de costo previa, confirmación con tope en `ai:fal`, resolución barata por defecto, validaciones locales y `--format`. Antes: guía canónica de selección de modelos enlazada; GPT Image 2.5: costo estimable antes de gastar con la fórmula oficial, rate limits publicados, OpenAI recomienda 2.5 para integraciones nuevas, equivalencias de tokens con GPT Image 2; rankings externos contradictorios con fecha; correcciones de precio por resolución en fal. Antes: cliente fal con dos cuentas: selección por saldo, failover ante bloqueo por saldo, secreto `greenhouse-fal-api-key-b`, `--balance`, `--detach`/`--status`; verificación completa del registro: 47 de 55; costo real medido y filtro de contenido de Seedance; rotación de la clave B pendiente; antes, Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal`: 6 endpoints; estado real de Nano Banana Pro en el carril Google; Kling 3 y Grok Imagine revisados sin conectar; antes, Flux 3 conectado a `pnpm ai:fal`: 12 endpoints de video verificados, draft → enhance, edit y extend; contrato real de Seedance video a video; antes, Minimax H3 conectado a `pnpm ai:fal`: kind `training`, retome por `request_id`, director no operable; antes, carril out-of-band `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — familia GPT Image 2.5 transportada, carril Google migrado a Gemini Image)
+> **Ultima actualizacion:** 2026-09-17 por Claude (1.15: la aplicación del render 3D es **generativa en dos variantes** —A pasada directa para logo grande en cuadro; B pegar y repintar sólo un halo de ≈ 140 px con `--mask` protegiendo logo y escena, para detalle fino—, con umbrales medidos (4,4/255 protegido vs 39,6 halo; IoU 0,72 sin máscara de escena), composición determinística rechazada por el operador como default, y trampa de sharp `toColourspace('b-w')` al construir máscaras de 1 canal. Antes, 1.14: patrón forma exacta de marca = render 3D determinístico en Blender como imagen 1 del modelo, que sólo integra la escena; kit del logo completo de Efeonce por escala y cámara, QA letra por letra. Antes, 1.13: `pnpm ai:image:rmbg --key-background [umbral] [minPx]` cierra el gap de huecos opacos de objeto claro sobre fondo oscuro. Antes, 1.12: gap abierto del recorte de objeto claro sobre fondo oscuro —huecos opacos— con arreglo temporal de corrida; patrones recolorear desde el aprobado y guía de perspectiva. Antes, 1.11: `pnpm ai:image:rmbg` rellena por defecto los huecos internos del matting; `--no-fill-holes`. Antes, 1.10: carril Higgsfield API dentro de `pnpm ai:fal` — cliente canónico `src/lib/ai/higgsfield.ts`, 44 capacidades con JSON Schema real, precio exacto por API, secreto `greenhouse-higgsfield-api-key`; Recraft de la API: SVG sin confirmar. Antes, 1.9: brechas de `pnpm ai:image` y `pnpm ai:fal` corregidas en el commit `17196ead1` — estimación de costo previa, confirmación con tope en `ai:fal`, resolución barata por defecto, validaciones locales y `--format`. Antes: guía canónica de selección de modelos enlazada; GPT Image 2.5: costo estimable antes de gastar con la fórmula oficial, rate limits publicados, OpenAI recomienda 2.5 para integraciones nuevas, equivalencias de tokens con GPT Image 2; rankings externos contradictorios con fecha; correcciones de precio por resolución en fal. Antes: cliente fal con dos cuentas: selección por saldo, failover ante bloqueo por saldo, secreto `greenhouse-fal-api-key-b`, `--balance`, `--detach`/`--status`; verificación completa del registro: 47 de 55; costo real medido y filtro de contenido de Seedance; rotación de la clave B pendiente; antes, Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal`: 6 endpoints; estado real de Nano Banana Pro en el carril Google; Kling 3 y Grok Imagine revisados sin conectar; antes, Flux 3 conectado a `pnpm ai:fal`: 12 endpoints de video verificados, draft → enhance, edit y extend; contrato real de Seedance video a video; antes, Minimax H3 conectado a `pnpm ai:fal`: kind `training`, retome por `request_id`, director no operable; antes, carril out-of-band `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — familia GPT Image 2.5 transportada, carril Google migrado a Gemini Image)
 > **Task:** TASK-278 — AI Visual Asset Generator
 
 ---
@@ -259,14 +259,38 @@ transparentes sobre un fondo de contraste fuerte con zoom al 100 %. Registro:
 - **Guía de perspectiva:** para ángulos de cámara extremos, una proyección geométrica de la silueta oficial con cámara
   real entra como imagen 1 (copiar cámara, no aspecto); la cámara descrita sólo en texto volvió a frontal.
 
-**Forma exacta de marca = render 3D determinístico (desde 2026-09-17).** Cuando la forma no admite variación (el logo
-completo de Efeonce: una palabra cuyas letras deben quedar exactas), no la genera el modelo: se renderiza en Blender
-desde el SVG oficial con cámaras reales y ese render entra como **imagen 1** de `pnpm ai:image`. El modelo sólo integra
-la escena (sombras de contacto, reflejos, escala). Kit: OneDrive `5. Contenidos/13- Branding/Logo Efeonce 3D/`, por
-escala (monumental, grande, mediana, pequeña), cámara y luz, con manifiesto por escala. Si la escena exige mucho a las
-letras, generar la escena con el espacio reservado y componer el render encima. **QA:** superponer la silueta del render
-sobre el resultado y comparar letra por letra; una letra distinta = regenerar o componer. En una pieza, la firma sigue
-siendo el SVG oficial compuesto. Registro:
+**Forma exacta de marca = render 3D determinístico como imagen 1, aplicado con IA generativa en dos variantes (desde
+2026-09-17).** Cuando la forma no admite variación (el logo completo de Efeonce: una palabra cuyas letras deben quedar
+exactas), no la genera el modelo: se renderiza en Blender desde el SVG oficial con cámaras reales y ese render entra
+como **imagen 1** de `pnpm ai:image`. El modelo sólo integra la escena (sombras de contacto, reflejos, escala). Kit:
+OneDrive `5. Contenidos/13- Branding/Logo Efeonce 3D/`, por escala (monumental, grande, mediana, pequeña), cámara y luz,
+con manifiesto por escala.
+
+La **aplicación es generativa, no determinística**: componer el render sobre la escena pierde sombras integradas y
+profundidad, y fue **rechazado por el operador como camino por defecto** (queda como respaldo). La variante la decide el
+**tamaño del logo en cuadro**:
+
+- **A — pasada directa** (logo ≳ un tercio del ancho del cuadro). Render como imagen 1 con el contrato «objeto real:
+  conserva forma, letras, órbita con sus cortes, ventanas, proporciones, color y perspectiva»; el prompt describe sólo
+  la escena. Medido: avenida de Nueva York con la monumental blanca, fiel al primer intento, USD 0,14.
+- **B — pegar y repintar el halo con máscara** (logo chico en cuadro o con detalle fino). La pasada directa falló dos
+  veces seguidas en detalle fino —encogió la órbita a un lazo y aclaró el navy— aun exigiéndolo en el prompt. Flujo:
+  plato de escena sin el objeto → base con el render pegado sin sombra → máscara que protege **el interior del logo
+  (erosión ≈ 8 px) y el resto de la escena**, dejando editable **sólo un halo de ≈ 140 px** → una pasada de
+  `pnpm ai:image --image <base> --mask <mascara>` pidiendo sólo integración (sombra de contacto, reflejo, rebotes,
+  fundido con la profundidad de campo). Medido: diferencia media **4,4/255** en la zona protegida vs **39,6** en el halo
+  editable. **Omitir la máscara de escena** hace que el modelo re-dibuje la escena completa conservando el objeto:
+  **IoU de silueta 0,72**. Artefacto conocido: brillo sucio donde el halo toca el borde del remate (bajar halo o
+  erosión).
+
+**Trampa al construir la máscara:** en sharp, `blur()`/`linear()` sobre un buffer raw de **1 canal devuelve 3 canales**;
+sin `.toColourspace('b-w')` el índice se corre y la máscara sale **100 % transparente** (todo editable) sin error.
+Contar los píxeles protegidos **antes** de gastar en el modelo.
+
+**QA (ambas variantes):** superponer la silueta del render sobre el resultado y comparar letra por letra («e», «f»,
+nave, órbita con sus cortes, tres ventanas), color sin deriva y perspectiva coherente; una letra distinta = regenerar o
+componer. En la variante B, además medir la diferencia en la zona protegida. En una pieza, la firma sigue siendo el SVG
+oficial compuesto. Registro:
 [bitácora](../operations/social/2026-09-17-efeonce-logo-3d-reference-kit-production-method.md) ·
 [`LEEME`](../../ai-generations/2026-09-17_efeonce-logo-3d/LEEME.md).
 
