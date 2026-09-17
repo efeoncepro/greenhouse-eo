@@ -376,6 +376,9 @@ pnpm ai:image --image <ref.png> --prompt "keep this exact <subject>, change ONLY
 pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (AI matting, soft edges)
 ```
 
+`ai:image:rmbg` rellena **por defecto** los huecos internos que el matting deja transparentes y no son fondo
+(glifos, emblemas); el fondo real encerrado se conserva. `--no-fill-holes` lo desactiva.
+
 🔴 **Editar NO abarata — medido 2026-09-16, `flare · low · 1024x1024`:** el modelo devuelve la imagen
 **completa** aunque la máscara acote qué cambia, así que el output se cobra **idéntico** a una generación
 (196 tokens), y encima la imagen base entra como **1 024 tokens de input**. Editar costó **2,3× generar** en
@@ -475,7 +478,8 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
   de bloques del binario de Claude Code y color `rgb(215,119,87)` del mismo binario), no de memoria. La celda de
   terminal es 1:2: cada píxel mide 1 de ancho × 2 de alto; renderizarlo cuadrado aplana la figura. Sprite como
   imagen 1 del edit con «cada píxel = pila de 1×2 cubos» y material declarado; verificar silueta, ojos y extremidades
-  contra el sprite antes de usarlo.
+  contra el sprite antes de usarlo. Biblioteca completa (8 ángulos + 8 accesorios, recorte, QA, entrega y cómo
+  aplicarlo a Nexa): [`references/mascot-3d-pose-library.md`](references/mascot-3d-pose-library.md).
 - **Cambiar el fondo detrás de una persona o mascota: regenerar, no recortar.** Repintar un muro alrededor de un
   sujeto con matte + máscara deja bordes «mordidos» en pelo y deforma partes finas o sueltas (el «?» de Clawd).
   Acabado profesional = plate nativo con el set nuevo, guiado por un **boceto de composición** de formas planas

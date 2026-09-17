@@ -169,3 +169,5 @@ mascota), el riesgo de lectura sobre el partner, el recorrido v01→v05 con las 
 el sprite oficial, el plate nativo guiado por boceto que reemplazó un repintado con recorte mordido, la opción
 `presentation` del adapter AXIS y la programación en Metricool. Detalle en su
 [`LEEME.md`](../../ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md).
+Las poses 3D reutilizables de Clawd y Codex (fuente oficial, ángulos, accesorios y reglas de uso) están inventariadas en
+[bibliotecas de mascotas de partners](social/PARTNER_MASCOT_POSE_LIBRARIES.md).

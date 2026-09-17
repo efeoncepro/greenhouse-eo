@@ -1,9 +1,9 @@
 # Editar solo una zona de una imagen (inpainting con mascara)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-16 por Claude — (1.2) brechas del comando corregidas (commit `17196ead1`): `--size` y `--background` se validan antes de gastar, nuevo `--format png|jpeg|webp`, aviso de `--count N` y línea `$ costo estimado` antes de pedir. Antes (1.1): elección GPT Image 2 vs 2.5 Sunburst vs Flare con enlace a la guía canónica de selección; el costo de 2.5 sí se estima antes con la fórmula oficial; brechas conocidas del comando (`--size`/`--background` sin validar, PNG siempre, `--count` = N pedidos pagados)
+> **Ultima actualizacion:** 2026-09-17 por Claude — (1.3) `pnpm ai:image:rmbg` rellena huecos internos por defecto; cuándo usar `--no-fill-holes`. Antes (1.2) brechas del comando corregidas (commit `17196ead1`): `--size` y `--background` se validan antes de gastar, nuevo `--format png|jpeg|webp`, aviso de `--count N` y línea `$ costo estimado` antes de pedir. Antes (1.1): elección GPT Image 2 vs 2.5 Sunburst vs Flare con enlace a la guía canónica de selección; el costo de 2.5 sí se estima antes con la fórmula oficial; brechas conocidas del comando (`--size`/`--background` sin validar, PNG siempre, `--count` = N pedidos pagados)
 > **Modulo:** AI Tooling / Asset Generation
 > **Comandos:** `pnpm ai:image --image ... --mask ...`, `pnpm ai:image:rmbg`
 > **Documentacion relacionada:** `docs/documentation/ai-tooling/generador-visual-assets.md`, `.claude/skills/greenhouse-ai-image-generator/SKILL.md`, `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`
@@ -122,6 +122,12 @@ chico mueve muy poco el promedio y parece que no paso nada. Hay que mirar.
   El sobrecosto se diluye al subir calidad (~1,15x en `high`, ~1,04x en `max`).
 - **No uses una edicion para quitar un fondo.** Para eso esta `pnpm ai:image:rmbg`, que corre local y no le
   cobra nada al proveedor. Pedirselo al modelo cuesta como una imagen nueva.
+  Desde 2026-09-17 el recorte **rellena por defecto los huecos internos** que el matting deja transparentes
+  por error (ojos, visores, glifos): la salida muestra `huecos internos rellenados=<px>/<componentes>`. Un hueco
+  cuyo color se parece al fondo de estudio se respeta y sigue transparente. Usa `--no-fill-holes` solo si el sujeto
+  tiene huecos reales que deben quedar transparentes y **no** se parecen al fondo (por ejemplo, un fondo de otro
+  color visible a traves de un aro). Verifica siempre el recorte sobre un fondo oscuro (navy): ahi se ven los huecos
+  y los halos que sobre blanco pasan desapercibidos.
 - **No pagues por la mascara**: no cuesta nada. El `usage` es identico con y sin ella. Lo que se cobra es
   la imagen base.
 - No uses `--input-fidelity` con modelos 2.5: no lo transportan. La preservacion se pide por prompt.

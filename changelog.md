@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-17 — Bibliotecas de poses 3D de Clawd y Codex, y recorte sin huecos
+
+Quedaron en la carpeta de contenidos de Marketing dos bibliotecas de mascotas de partners: Clawd (Claude) y Codex
+(OpenAI), cada una con 8 ángulos de cámara y 8 poses con accesorios ligados a servicios de Efeonce, en fondo de estudio y
+transparente, más su fuente oficial (sprite del binario de Claude Code y atlas del app de ChatGPT). `pnpm ai:image:rmbg`
+ahora rellena por defecto los huecos internos que el recorte automático deja en el sujeto (ojos, visores, glifos) y
+conserva los huecos reales de fondo. El método quedó documentado para repetirlo con Nexa; inventario en
+`docs/operations/social/PARTNER_MASCOT_POSE_LIBRARIES.md`.
+
 ## 2026-09-17 — Narrativa «Tu IA no conoce tu negocio» y su key visual
 
 Quedó definida la narrativa go-to-market de Efeonce para Q4 2026 – Q3 2027: cinco capítulos de contexto (lo que la IA
@@ -855,18 +864,3 @@ aplicar el helper client-scoped. El retiro exige primero planner/delete/readback
 preservación del cliente/hijos ajenos, además del diagnóstico de refresh; no hubo revoke, cleanup apply, gate
 OFF, push ni deploy. El gateway 1.4.0 usa los tres paquetes MCP v2 oficiales 2.0.0, todavía latest en npm al
 momento del chequeo.
-
-## 2026-09-10 — TASK-1852: canal MCP delegado vivo; TASK-1857 Creative Hub
-
-Canal delegado completo fuera del primitive: scope Entra `efeonce.mcp.client_services.write` (Admin) en la app recurso MCP,
-`efeonce-mcp-client-services` en la allowlist de consumers de Vercel Production (redeploy `greenhouse-naxc5guq3`) y
-federación en `efeonce-mcp` 1.4.0 (PR #9 provider `greenhouse-client-services` con preview/apply/rollback; PR #10 corrige
-`efeonce.gateway.status`, que omitía el provider; revisión `00052-slt`, 174 tests). Verificado en producción por
-`efeonce.gateway.status`). Canary humano punta a punta y apply de Sky ejecutados ~07:40Z por el canal (`EO-APC-ECD63852`, `delegated_oauth`, 0 altas, replay idempotente). `scopes.ts` del auth-server suma
-`efeonce.mcp.client_services.write` a las clases de escritura MCP (paridad con `efeonce-mcp/src/config.ts`).
-Decisión del operador: Creative Hub ES el módulo de Sky → `TASK-1857` (ui-ux; wireframe v2 de cinco bloques cliente + dirección visual C «hoja de trabajo creativa» con component mapping por bloque sobre el surface system; sin JSX) y Delta en `TASK-1687`.
-[Auditoría](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md) §Canal MCP delegado.
-Barrido documental por dos subagentes (32 archivos): skills `efeonce-mcp-platform` (+referencias, espejo `.codex`),
-`greenhouse-teams-message-operator`, `teams-bot-platform`, `efeonce-customer-experience`; arquitectura MCP §25, invariantes MCP §11,
-sister platforms §16 (registro de clientes de exchange), gap ledger de parity, Teams/Notification Hub, client lifecycle §9,
-Pilot Engagement (`bundled_modules`), docs funcionales y manuales de portal/comunicaciones, DECISIONS_INDEX.

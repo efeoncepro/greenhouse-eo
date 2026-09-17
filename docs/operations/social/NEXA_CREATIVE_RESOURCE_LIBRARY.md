@@ -48,3 +48,19 @@ en versión humana con el hoodie azul de Efeonce. Referencias usadas: `Avatar 3,
 de producción. Aprendizaje: la identidad se mantuvo bien con esas dos referencias de avatar más el hoodie, incluso en
 un plate nativo guiado por boceto; el isotipo del hoodie salió prácticamente igual al oficial, sin re-estampado. El
 rostro se validó a ojo contra las referencias. El hoodie es vestuario de esa campaña, no un atributo universal.
+
+## Biblioteca de poses 3D (pendiente)
+
+El método usado el 2026-09-17 para las [bibliotecas de poses 3D de mascotas de partners](PARTNER_MASCOT_POSE_LIBRARIES.md)
+(Clawd y Codex) se aplicará a Nexa: fuente oficial → base validada → ángulos de cámara → accesorios → recorte con
+relleno de huecos → QA → OneDrive. Destino: una carpeta propia dentro de `10. Nexa (Influencer IA)`, nunca en
+`Recursos/Mascotas de partners` (Nexa es marca propia, no mascota de partner). Nexa tiene dos familias y cada una lleva
+su propia serie, sin mezclarlas:
+
+- **Personaje 3D estilo Pixar:** `public/images/illustrations/characters/greenhouse-*.png` (pipeline edit + `rmbg`).
+- **Versión humana fotorrealista:** esta biblioteca OneDrive (`Avatar 3,4 v2`, `Avatar Cuerpo Completo v2`, poses y
+  vestuario).
+
+Sin guía de partner que validar, pero rostro, cabello y rasgos de identidad se mantienen; el hoodie Efeonce es
+vestuario de campaña, no atributo universal. Método:
+[`mascot-3d-pose-library.md`](../../../.claude/skills/greenhouse-ai-image-generator/references/mascot-3d-pose-library.md).

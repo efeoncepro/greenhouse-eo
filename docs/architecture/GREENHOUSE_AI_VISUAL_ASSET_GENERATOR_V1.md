@@ -1,9 +1,9 @@
 # Greenhouse AI Visual Asset Generator V1
 
 > **Tipo de documento:** Spec de arquitectura
-> **Version:** 1.10
+> **Version:** 1.11
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-09-16 por Claude (1.10: carril Higgsfield API dentro de `pnpm ai:fal` — cliente canónico `src/lib/ai/higgsfield.ts`, 44 capacidades con JSON Schema real, precio exacto por API, secreto `greenhouse-higgsfield-api-key`; Recraft de la API: SVG sin confirmar. Antes, 1.9: brechas de `pnpm ai:image` y `pnpm ai:fal` corregidas en el commit `17196ead1` — estimación de costo previa, confirmación con tope en `ai:fal`, resolución barata por defecto, validaciones locales y `--format`. Antes: guía canónica de selección de modelos enlazada; GPT Image 2.5: costo estimable antes de gastar con la fórmula oficial, rate limits publicados, OpenAI recomienda 2.5 para integraciones nuevas, equivalencias de tokens con GPT Image 2; rankings externos contradictorios con fecha; correcciones de precio por resolución en fal. Antes: cliente fal con dos cuentas: selección por saldo, failover ante bloqueo por saldo, secreto `greenhouse-fal-api-key-b`, `--balance`, `--detach`/`--status`; verificación completa del registro: 47 de 55; costo real medido y filtro de contenido de Seedance; rotación de la clave B pendiente; antes, Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal`: 6 endpoints; estado real de Nano Banana Pro en el carril Google; Kling 3 y Grok Imagine revisados sin conectar; antes, Flux 3 conectado a `pnpm ai:fal`: 12 endpoints de video verificados, draft → enhance, edit y extend; contrato real de Seedance video a video; antes, Minimax H3 conectado a `pnpm ai:fal`: kind `training`, retome por `request_id`, director no operable; antes, carril out-of-band `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — familia GPT Image 2.5 transportada, carril Google migrado a Gemini Image)
+> **Ultima actualizacion:** 2026-09-17 por Claude (1.11: `pnpm ai:image:rmbg` rellena por defecto los huecos internos del matting; `--no-fill-holes`. Antes, 1.10: carril Higgsfield API dentro de `pnpm ai:fal` — cliente canónico `src/lib/ai/higgsfield.ts`, 44 capacidades con JSON Schema real, precio exacto por API, secreto `greenhouse-higgsfield-api-key`; Recraft de la API: SVG sin confirmar. Antes, 1.9: brechas de `pnpm ai:image` y `pnpm ai:fal` corregidas en el commit `17196ead1` — estimación de costo previa, confirmación con tope en `ai:fal`, resolución barata por defecto, validaciones locales y `--format`. Antes: guía canónica de selección de modelos enlazada; GPT Image 2.5: costo estimable antes de gastar con la fórmula oficial, rate limits publicados, OpenAI recomienda 2.5 para integraciones nuevas, equivalencias de tokens con GPT Image 2; rankings externos contradictorios con fecha; correcciones de precio por resolución en fal. Antes: cliente fal con dos cuentas: selección por saldo, failover ante bloqueo por saldo, secreto `greenhouse-fal-api-key-b`, `--balance`, `--detach`/`--status`; verificación completa del registro: 47 de 55; costo real medido y filtro de contenido de Seedance; rotación de la clave B pendiente; antes, Wan 3.0 y Wan 3.0 Prime conectados a `pnpm ai:fal`: 6 endpoints; estado real de Nano Banana Pro en el carril Google; Kling 3 y Grok Imagine revisados sin conectar; antes, Flux 3 conectado a `pnpm ai:fal`: 12 endpoints de video verificados, draft → enhance, edit y extend; contrato real de Seedance video a video; antes, Minimax H3 conectado a `pnpm ai:fal`: kind `training`, retome por `request_id`, director no operable; antes, carril out-of-band `pnpm ai:fal`: Seedream 5 + layerize y Seedance 2.5/2.0; antes, TASK-1851 — familia GPT Image 2.5 transportada, carril Google migrado a Gemini Image)
 > **Task:** TASK-278 — AI Visual Asset Generator
 
 ---
@@ -223,6 +223,17 @@ la imagen base se suma como input (1.024 tokens) — **2,3× generar** en `low`,
 El sobrecosto relativo se diluye al subir la calidad porque el output domina (~1,15× en `high`, ~1,04× en `max`).
 🔴 **Para recortar el fondo de una imagen que ya existe, usar `pnpm ai:image:rmbg`** (matting local, cero costo de
 proveedor). Tabla completa en la matriz → §Qué cuesta editar frente a generar.
+
+**Relleno de huecos internos en `pnpm ai:image:rmbg` (desde 2026-09-17, activo por defecto).** El matting IMG.LY puede
+dejar transparentes zonas internas del sujeto que parecen fondo (cuencas de ojos, visores, glifos). Tras el recorte,
+cada componente semitransparente (alpha < 250) **no conectado al borde del lienzo** se rellena con el píxel original,
+salvo que su color promedio ≈ la mediana del borde del original (tolerancia 18 por canal): ese es fondo real (el
+espacio dentro del arco de unos audífonos) y queda transparente. Corre en un **proceso aparte**
+(`scripts/ai/fill-alpha-holes-cli.ts`, lógica pura en `scripts/ai/fill-alpha-holes.ts`) porque
+`@imgly/background-removal-node` trae su propio sharp/libvips anidado y dos libvips en un proceso advierten fallas
+espurias. `--no-fill-holes` lo desactiva; la salida imprime `huecos internos rellenados=<px>/<componentes>`. Prueba:
+`scripts/ai/fill-alpha-holes.test.ts`. Caso fuente: el `_` del emblema `>_` de Codex («saludo», biblioteca de poses 3D
+del 2026-09-17) salió transparente y sobre navy se veía un rectángulo oscuro.
 
 ### `generateAnimation(prompt, options)`
 
