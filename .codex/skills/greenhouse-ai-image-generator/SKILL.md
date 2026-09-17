@@ -529,6 +529,11 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
 - Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md) ·
   [nave Efeonce 3D](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).
 
+- **Usar un kit de marca ya producido (logo 3D, nave, vestuario, credencial, gorra) en una imagen o un video:**
+  [guía de uso de los kits](../../../docs/operations/social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md) — elección de la vista,
+  contrato de referencias, QA al 100 % y las tres reglas propias del video (primer cuadro aprobado, la marca no se mueve
+  dentro del plano generado, planos cortos).
+
 ## Provider Choice
 
 - Use `openai-image` for higher prompt fidelity, complex composition, reference-guided edits, UI assets, icon sets, and transparent PNG batches.

@@ -66,6 +66,11 @@ description: >-
 
 ---
 
+> **Marca física en video** (logo 3D, prendas, credencial, gorra): usar la
+> [guía de uso de los kits](../../../docs/operations/social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md). Reglas duras: el primer
+> cuadro es una imagen ya aprobada con los kits; la marca no se anima dentro del plano generado (se compone); planos
+> cortos y movimiento contenido; QA de primer, último y dos cuadros intermedios.
+
 ## 1. Cómo se usa esta skill (router)
 
 1. **Clasifica la intención** (§2). ¿Es producción cinematográfica/broadcast? Si es motion de UI

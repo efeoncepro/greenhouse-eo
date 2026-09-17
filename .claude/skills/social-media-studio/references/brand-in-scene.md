@@ -209,3 +209,5 @@ receta universal de seasonality.
 - Skill instalada Higgsfield `product-photoshoot`, referencias `lifestyle-scene` y `refinement-pass`:
   estudiadas como método de producto/contexto/luz y corrección del defecto observado. Su receta de modelo/MCP
   no se declara ejecutada por usar el motor nativo ni reemplaza el schema vigente del conector elegido.
+
+- **Usar los kits en imagen o video:** [guía de uso de los kits de marca](../../../../docs/operations/social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md).

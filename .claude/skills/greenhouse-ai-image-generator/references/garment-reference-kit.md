@@ -1,3 +1,7 @@
+> **Para USAR los kits ya producidos en una imagen o un video**, la guía operativa es
+> [`docs/operations/social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md`](../../../../docs/operations/social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md).
+> Este documento es el método para PRODUCIR un kit nuevo.
+
 # Kit de referencia de prenda: vestir a alguien con ropa de marca sin que el modelo la invente
 
 Mismo contrato que el [kit 3D del logo](logo-3d-reference-kit.md): **la referencia fija la prenda, el prompt fija la

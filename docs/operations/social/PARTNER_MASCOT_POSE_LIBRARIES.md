@@ -4,6 +4,8 @@ Inventario local verificado el 2026-09-17. Recurso de Marketing Efeonce para pie
 mascotas de partners (Anthropic, OpenAI). Son **interpretaciones 3D hechas por Efeonce** a partir de la fuente oficial,
 no assets entregados por los partners.
 
+> **Cómo usar estos kits en una imagen o un video:** [guía de uso de los kits de marca](EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md).
+
 ## Ubicación
 
 `/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/14. Mascotas de partners`
