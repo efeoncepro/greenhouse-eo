@@ -54,3 +54,15 @@ geométrica explícita → accesorios → `pnpm ai:image:rmbg` con relleno de hu
 vive en [`mascot-3d-pose-library.md`](../../../.claude/skills/greenhouse-ai-image-generator/references/mascot-3d-pose-library.md).
 El mismo método se aplicará a Nexa con destino propio (ver
 [biblioteca creativa de Nexa](NEXA_CREATIVE_RESOURCE_LIBRARY.md)), no dentro de `Mascotas de partners`.
+
+## Sprocket de HubSpot (logo, no mascota)
+
+- **Carpeta:** `14. Mascotas de partners/Sprocket (HubSpot)/` con `Fuente oficial/` (SVG `public/images/logos/axis/hubspot-isotype.svg`),
+  `Poses 3D/v01/` (8 ángulos) y `Poses 3D en contexto/v01/` (8 escenas), más un LEEME de uso interno.
+- **Regla dura:** es marca registrada de HubSpot. Sus guías prohíben modificar el logo y exigen aprobación previa por
+  formulario con boceto (7–10 días hábiles) para usar el sprocket; para piezas sin aprobación usar la insignia de
+  Solutions Partner (`public/branding/partners/hubspot/solution-partner/`). Nunca personificarlo, recolorearlo ni
+  agregarle elementos.
+- **Método:** igual que las mascotas, con la silueta oficial como única fuente de forma y verificación contra ella.
+  Registro: [`LEEME`](../../../ai-generations/2026-09-17_sprocket-3d/LEEME.md).
+

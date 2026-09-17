@@ -147,3 +147,13 @@ con estas diferencias:
 - **Invariantes del prompt:** rasgos faciales, pelo y hoodie con isotipo en lugar de anatomía de juguete; la expresión
   es facial.
 - **Destino:** `10. Nexa (Influencer IA)`, nunca `Mascotas de partners`.
+
+## Logos de partners en 3D (caso sprocket de HubSpot)
+
+Un logo no es una mascota: no se personifica, no se recolorea ni se le agregan partes. Fuente de forma = SVG oficial
+renderizado como silueta, con la geometría enumerada en el prompt («no agregar, quitar ni re-proporcionar»); material
+de color único exacto. Las escenas agregan objetos alrededor, nunca sobre el logo. Antes de publicar, la marca exige
+aprobación (HubSpot: formulario con boceto, 7–10 días hábiles); mientras tanto, la biblioteca es de uso interno.
+Recorte: el fondo visto a través de agujeros del logo en sombra debe quedar transparente (regla corregida en
+`scripts/ai/fill-alpha-holes.ts`). Registro: `ai-generations/2026-09-17_sprocket-3d/LEEME.md`.
+

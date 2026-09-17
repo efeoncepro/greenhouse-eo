@@ -8,7 +8,8 @@
  *
  * Regla: un componente semitransparente (alpha < 250) que NO toca el borde del lienzo se rellena con el
  * píxel original, salvo que su color original promedio sea el del fondo de estudio (estimado como la
- * mediana del borde del original). Así se conservan los huecos reales de fondo (el espacio dentro del
+ * mediana del borde del original) o ese mismo gris neutro en sombra (caso: el piso visto por el aro del sprocket
+ * apoyado en cenital). Así se conservan los huecos reales de fondo (el espacio dentro del
  * arco de unos audífonos) y se reparan los huecos falsos del sujeto.
  */
 
@@ -116,7 +117,15 @@ export const fillEnclosedAlphaHoles = (
     }
 
     const mean = sum.map(v => v / members.length)
-    const isBackground = mean.every((v, c) => Math.abs(v - bg[c]) <= backgroundTolerance)
+    const lum = (c: number[]) => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+    const neutral = Math.max(...mean) - Math.min(...mean) <= 16
+
+    // Fondo visto a través de un hueco real: igual al borde, o el mismo gris neutro pero en sombra (el piso bajo un
+    // objeto apoyado se ve más oscuro). Un blanco neutro MÁS claro que el fondo (glifos, brillos) sigue siendo sujeto,
+    // y un neutro mucho más oscuro (cuencas, visores, negros del objeto) también.
+    const shadowedBackground = neutral && lum(mean) <= lum(bg) + 8 && lum(mean) >= lum(bg) - 70
+
+    const isBackground = mean.every((v, c) => Math.abs(v - bg[c]) <= backgroundTolerance) || shadowedBackground
 
     if (isBackground) continue
 

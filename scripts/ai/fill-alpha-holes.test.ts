@@ -57,4 +57,20 @@ describe('fillEnclosedAlphaHoles', () => {
     fillEnclosedAlphaHoles(rgba, rgb, W, H)
     expect(rgba[emblem * 4 + 3]).toBe(0)
   })
+
+  it('conserva transparente el fondo en sombra visto a través de un hueco y rellena negros del sujeto', () => {
+    const { rgb, rgba } = build()
+    const shadow = 5 * W + 3 // piso gris en sombra visto por el aro
+    const black = 5 * W + 5 // negro de una cuenca del sujeto
+
+    rgb.set([196, 196, 196], shadow * 3)
+    rgba[shadow * 4 + 3] = 0
+    rgb.set([30, 30, 32], black * 3)
+    rgba[black * 4 + 3] = 0
+
+    const result = fillEnclosedAlphaHoles(rgba, rgb, W, H)
+
+    expect(result.rgba[shadow * 4 + 3]).toBe(0)
+    expect(result.rgba[black * 4 + 3]).toBe(255)
+  })
 })

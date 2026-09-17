@@ -228,7 +228,9 @@ proveedor). Tabla completa en la matriz → §Qué cuesta editar frente a genera
 dejar transparentes zonas internas del sujeto que parecen fondo (cuencas de ojos, visores, glifos). Tras el recorte,
 cada componente semitransparente (alpha < 250) **no conectado al borde del lienzo** se rellena con el píxel original,
 salvo que su color promedio ≈ la mediana del borde del original (tolerancia 18 por canal): ese es fondo real (el
-espacio dentro del arco de unos audífonos) y queda transparente. Corre en un **proceso aparte**
+espacio dentro del arco de unos audífonos) y queda transparente. También se considera fondo el mismo gris neutro en
+sombra (luminancia entre −70 y +8 respecto del borde): caso sprocket de HubSpot apoyado en cenital, cuyo aro dejaba
+ver el piso sombreado y se rellenaba. Un neutro más claro (glifos, brillos) o mucho más oscuro (cuencas) sigue siendo sujeto. Corre en un **proceso aparte**
 (`scripts/ai/fill-alpha-holes-cli.ts`, lógica pura en `scripts/ai/fill-alpha-holes.ts`) porque
 `@imgly/background-removal-node` trae su propio sharp/libvips anidado y dos libvips en un proceso advierten fallas
 espurias. `--no-fill-holes` lo desactiva; la salida imprime `huecos internos rellenados=<px>/<componentes>`. Prueba:

@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-17 — Sprocket de HubSpot en 3D (uso interno) y mascotas en carpeta propia
+
+Las bibliotecas de mascotas pasaron a `14. Mascotas de partners` en la raíz de la carpeta de contenidos, por
+indicación del operador, y se sumó el sprocket de HubSpot en 3D: 8 ángulos y 8 escenas desde el SVG oficial. Como es
+marca registrada y HubSpot exige aprobación previa para usarlo, la biblioteca queda como uso interno hasta obtenerla.
+El relleno de huecos de `pnpm ai:image:rmbg` ahora reconoce el fondo en sombra visto a través de un agujero del objeto.
+
 ## 2026-09-17 — Bibliotecas de poses 3D de Clawd y Codex, y recorte sin huecos
 
 Quedaron en la carpeta de contenidos de Marketing dos bibliotecas de mascotas de partners: Clawd (Claude) y Codex
@@ -852,15 +859,3 @@ cerrado ante colisiones. Las vacantes `EO-OPN-0674/0675` fueron publicadas por u
 releyeron `active|published|public_listed`, rutas 200, pero continúan con cero policies, templates del pack y
 assessments. Task, registry, epic, documentación funcional y handoff reflejan esa frontera; TASK-1604 sigue
 `in-progress` hasta SME, template/binding y Quality Gate.
-
-## 2026-09-10 — TASK-1832: retiro bloqueado y contrato shared-CIMD documentado
-
-Readback live conserva la organización sintética aislada: registro/binding `1/1`, purpose drift `0/0`, dos
-profiles run-owned fuera de Person 360 y un único grant read-only activo. La muestra dejó de ser steady:
-`auth.oauth.refresh_reuse_detected` reportó 93 eventos/24h sobre el CIMD compartido de Codex. El cleanup dry-run
-no mutó y añadió `oauth_client_not_run_owned`; el mismo cliente tiene 8 artefactos canary y 35 de otros sujetos.
-Task, manifiesto, runbook, manual, doc funcional y skills Claude/Codex ahora prohíben remover ese blocker o
-aplicar el helper client-scoped. El retiro exige primero planner/delete/readback sujeto-específicos y prueba de
-preservación del cliente/hijos ajenos, además del diagnóstico de refresh; no hubo revoke, cleanup apply, gate
-OFF, push ni deploy. El gateway 1.4.0 usa los tres paquetes MCP v2 oficiales 2.0.0, todavía latest en npm al
-momento del chequeo.

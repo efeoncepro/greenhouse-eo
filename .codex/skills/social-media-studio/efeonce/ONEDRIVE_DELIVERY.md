@@ -47,7 +47,7 @@ para fondo oscuro; light es navy para fondo claro. No inferirlo al revés.
 [inventario y contrato de selección](../../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md)
 antes de reutilizarla; incluye rutas y particularidades Unicode verificadas.
 
-**Mascotas de partners:** `14. Mascotas de partners/<Mascota (Partner)>/` con subcarpetas por familia y versión
+**Mascotas de partners:** `14. Mascotas de partners/<Mascota (Partner)>/` (incluye `Sprocket (HubSpot)`, logo de uso interno hasta aprobación) con subcarpetas por familia y versión
 (p. ej. `Clawd (Claude)/` y `Codex (OpenAI)/`, cada una con `Fuente oficial/`, `Poses 3D/v01/` y
 `Poses 3D con accesorios/v01/`, cada pose en fondo de estudio y transparente). Método reutilizable:
 [`mascot-3d-pose-library.md`](../../greenhouse-ai-image-generator/references/mascot-3d-pose-library.md); evidencia en
