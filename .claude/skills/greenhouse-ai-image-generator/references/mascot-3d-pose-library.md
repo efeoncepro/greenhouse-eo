@@ -158,6 +158,12 @@ Recorte: el fondo visto a través de agujeros del logo en sombra debe quedar tra
 `scripts/ai/fill-alpha-holes.ts`). Registro: `ai-generations/2026-09-17_sprocket-3d/LEEME.md`.
 
 
+**Llevar cualquiera de estas piezas 3D a una escena generada** (nave, logo de partner, mascota, merch) usa el mismo
+contrato que el logo completo: el render aprobado entra como **referencia de forma** y el prompt lleva la
+**intención** —material, montaje, escena, atmósfera—. Nunca pegarlo como camino por defecto; el halo enmascarado es
+la excepción para material exacto a escala chica. Criterio y medidas:
+[`logo-3d-reference-kit.md`](logo-3d-reference-kit.md#1b-regla-de-elección-corregida-2026-09-17-con-el-caso-recepción).
+
 ## Isotipo propio en 3D con dos colores (caso nave de Efeonce)
 
 Registro: `ai-generations/2026-09-17_efeonce-ship-3d/LEEME.md`. Tres reglas aprendidas:

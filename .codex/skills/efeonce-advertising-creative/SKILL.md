@@ -57,10 +57,12 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
 3. **Construye el medio limpio.** Genera o selecciona imagen/video sin texto ni logotipos inventados. Compón
    tipografía, marcas y legales de forma determinista con los archivos oficiales. El isotipo 3D de Efeonce es
    elemento ilustrativo, no firma. Para el logo completo como objeto físico en una escena, usa el
-   [kit de referencia 3D](../greenhouse-ai-image-generator/references/logo-3d-reference-kit.md): con el logo grande
-   en cuadro basta la pasada directa con el render como imagen 1; **cuando el objeto de marca es chico o tiene
-   detalle fino, se pega el render sobre un plato sin objeto y se repinta sólo un halo con máscara** (logo y escena
-   protegidos), porque a esa escala el modelo redibuja el detalle aunque el prompt lo prohíba. **El QA es letra por
+   [kit de referencia 3D](../greenhouse-ai-image-generator/references/logo-3d-reference-kit.md): **por defecto, pasada
+   directa** —el render entra como referencia de **forma** y el prompt lleva la **intención** (material, montaje,
+   escena, atmósfera)—, también cuando la pieza cambia el material (acero, vidrio, neón) o la escena tiene atmósfera
+   fuerte como la larga exposición. Elegir la referencia por **luminancia** (blanca para materiales claros, navy para
+   oscuros o el color de marca). **Nunca pegar el render como camino por defecto**: se ve falso. El halo enmascarado
+   es la **excepción**, sólo con el material exacto del kit y el objeto chico o de detalle fino. **El QA es letra por
    letra** —«e», «f», nave, órbita con sus cortes, tres ventanas— y una letra distinta obliga a regenerar; la firma
    sigue siendo el SVG oficial.
    Cuando la pieza requiera firma web, usa el SVG canónico

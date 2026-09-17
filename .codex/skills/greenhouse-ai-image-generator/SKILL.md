@@ -503,11 +503,14 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
   siempre sobre fondo de contraste fuerte con zoom 100 %. Escenas claras sobre fondo claro y macros desenfocados no se recortan: se entregan como escena.
   Método completo: [isotipo propio en 3D con dos colores](references/mascot-3d-pose-library.md#isotipo-propio-en-3d-con-dos-colores-caso-nave-de-efeonce).
 - **Logo completo de marca como objeto en una escena → kit Blender como píxeles exactos; el modelo nunca dibuja las
-  letras.** Escala, cámara y luz salen del manifiesto y **el tamaño en cuadro elige la variante**: **A** pasada
-  directa con el render como imagen 1 (logo grande, ≳ un tercio del ancho); **B** plato sin el objeto + render
-  pegado + `--mask` que protege el logo **y** la escena y abre sólo un halo (~140 px) para sombra, reflejo y
-  fundido (logo chico o detalle fino: a esa escala la pasada directa deformó la órbita y aclaró el navy dos veces).
-  Si dudas, B. QA letra por letra y composición determinística sólo como último recurso:
+  letras.** Escala, cámara y luz salen del manifiesto. **Por defecto, pasada directa:** el render entra como imagen 1
+  y aporta la **forma**; el prompt aporta la **intención** (material, montaje, escena, cámara, atmósfera). Aplica al
+  logo grande en cuadro, al **cambio de material** (acero, aluminio, vidrio, neón, madera, latón) y a escenas de
+  atmósfera fuerte (larga exposición, neón, contraluz). **Referencia elegida por luminancia:** render blanco para
+  materiales claros, navy para oscuros o para el color de marca. **Nunca pegar el render como camino por defecto:**
+  conserva el material y la luz del kit y se lee falso. El **halo enmascarado** (`--mask` que protege logo **y**
+  escena, ~140 px editables) es la **excepción**: material exacto del kit + logo chico o detalle fino. QA letra por
+  letra y composición determinística sólo como último recurso:
   [`references/logo-3d-reference-kit.md`](references/logo-3d-reference-kit.md).
 - Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md) ·
   [nave Efeonce 3D](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).

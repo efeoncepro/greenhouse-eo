@@ -333,12 +333,15 @@ Reglas:
 - Verificar canal alfa, dimensiones y formato antes del request.
 - Describir semánticamente la región además de suministrar la máscara.
 - Medir/revisar deriva fuera de región.
-- **Integrar un objeto exacto en una escena (logo, producto, pieza 3D aprobada):** la máscara se usa al revés de lo
-  habitual —protege **el objeto pegado y también el resto de la escena**, y abre sólo un **halo** a su alrededor—
-  para que el modelo aporte sombra de contacto, reflejo y fundido sin re-dibujar ni el objeto ni los props. Si se
-  protege sólo el objeto, el modelo rehace la escena alrededor. Contar los píxeles protegidos **antes** de gastar:
-  una máscara mal construida sale 100 % transparente sin error visible. Método y medidas:
-  [`logo-3d-reference-kit.md`](logo-3d-reference-kit.md).
+- **Integrar un objeto exacto en una escena (logo, producto, pieza 3D aprobada) — EXCEPCIÓN, no camino por defecto.**
+  Lo normal es la **pasada directa**: el render exacto como referencia de forma y la intención (material, montaje,
+  escena, atmósfera) en el prompt; pegado, el objeto conserva el material y la luz de su render y se lee falso. El
+  halo enmascarado queda para material exacto del kit con objeto chico o de detalle fino. Cuando aplica, la máscara
+  se usa al revés de lo habitual —protege **el objeto pegado y también el resto de la escena**, y abre sólo un
+  **halo** a su alrededor— para que el modelo aporte sombra de contacto, reflejo y fundido sin re-dibujar ni el
+  objeto ni los props. Si se protege sólo el objeto, el modelo rehace la escena alrededor. Contar los píxeles
+  protegidos **antes** de gastar: una máscara mal construida sale 100 % transparente sin error visible. Ambas vías,
+  criterio y medidas: [`logo-3d-reference-kit.md`](logo-3d-reference-kit.md).
 
 Benchmark 2026-07-18 sobre la misma fuente/región:
 

@@ -147,4 +147,7 @@ ilustrativo de marca (escenas, portadas, decks, headers); no reemplaza el SVG of
 **Logo completo en 3D (kit de referencia aprobado 2026-09-17):** OneDrive `5. Contenidos/13- Branding/Logo Efeonce 3D/`,
 navy y blanco en cuatro escalas: Monumental (20 m), Grande (6 m), Mediana (1,2 m) y Pequeña (24 cm), con cámaras por
 escala, luz izquierda/derecha, transparente + fondo estudio y manifiesto. Es referencia de forma para pasar al modelo,
-no firma. Método: [kit de logo 3D](../greenhouse-ai-image-generator/references/logo-3d-reference-kit.md).
+no firma. El kit sirve además para **exploraciones de material** (acero, aluminio, vidrio, latón, retroiluminado): la
+pasada directa entrega el render como forma y describe el material y el montaje en el prompt —elegir el render por
+luminancia, blanco para materiales claros y navy para oscuros—, sin pegarlo ni recolorearlo; el SVG oficial sigue
+siendo la firma. Método: [kit de logo 3D](../greenhouse-ai-image-generator/references/logo-3d-reference-kit.md).

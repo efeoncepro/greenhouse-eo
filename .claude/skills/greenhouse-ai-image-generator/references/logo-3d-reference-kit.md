@@ -55,7 +55,7 @@ y 4 cm de fondo, montado con pines ocultos sobre travertino». Una pasada, USD 0
 («espectacular»). Antes, la variante de pegar + halo sobre el mismo muro fue rechazada: «se ve muy falso», y el navy
 sobre travertino no tenía jerarquía. Registro: bitácora §5.
 
-## 2. Elegir la variante: la decide el tamaño del logo en cuadro
+## 2. Elegir la variante (manda §1.b: el tamaño es sólo uno de los criterios)
 
 El camino canónico es **generativo en las dos variantes**: el logo entra como píxeles exactos y el modelo aporta
 sombra, reflejo y profundidad. Lo que cambia es cuánto se le deja tocar.
@@ -63,11 +63,12 @@ sombra, reflejo y profundidad. Lo que cambia es cuánto se le deja tocar.
 | Situación | Variante | Por qué |
 |---|---|---|
 | El logo ocupa **≳ un tercio del ancho** del cuadro, letras grandes y legibles | **A. Pasada directa** | A ese tamaño el modelo respeta la forma; una sola llamada e integración completa |
-| Logo **chico en cuadro**, detalle fino (órbita, cortes, ventanas), ángulos cerrados | **B. Pegar y repintar el halo con máscara** | A escala chica el modelo re-dibuja el detalle aunque el prompt lo prohíba |
+| **Cambio de material** (acero, aluminio, vidrio, neón, madera, latón) o escena de atmósfera fuerte | **A. Pasada directa** | El render fija la forma y el prompt la intención; pegado se ve falso (§1.b) |
+| Material exacto del kit **y** logo chico en cuadro, detalle fino (órbita, cortes, ventanas), ángulos cerrados | **B. Pegar y repintar el halo con máscara** | A esa escala el modelo re-dibuja el detalle aunque el prompt lo prohíba |
 
-Regla corta: **si dudas, variante B.** Cuesta una llamada más (el plato) y garantiza la forma.
+Regla corta: **por defecto A; B sólo cuando hay que conservar el material exacto del kit a escala chica.** Cuesta una llamada más (el plato) y garantiza la forma.
 
-## 3. Variante A — pasada directa (logo grande en cuadro)
+## 3. Variante A — pasada directa (por defecto)
 
 ```bash
 pnpm ai:image --model gpt-image-2.5-sunburst --image <render-del-kit.png> --prompt "…"
@@ -82,11 +83,16 @@ Texto obligatorio al inicio del prompt, sin variar:
 El resto del prompt describe **sólo la escena** (lugar, hora, luz, personas, cámara coherente con el render). No
 describir el logo ni sus letras: la descripción compite con la imagen.
 
+**Si la pieza cambia el material**, el contrato cambia una palabra: la referencia conserva forma, letras, órbita con
+sus cortes, tres ventanas, proporciones y perspectiva, y **cambia sólo el material**, que el prompt describe con
+dimensiones y montaje («acero inoxidable cepillado de 1,2 m y 4 cm de fondo, cantos vivos, veta horizontal, pines
+ocultos sobre travertino»). Elegir el render por **luminancia** (blanco para materiales claros, navy para oscuros).
+
 **Evidencia medida (2026-09-17):** avenida de Nueva York al anochecer con la **monumental blanca** (cámara 03, luz
 der) salió fiel al primer intento, **USD 0,14**. Diferencias menores que el QA aceptó: órbita algo más gruesa y
 nariz de la nave algo más corta que en el render.
 
-## 4. Variante B — pegar y repintar el halo con máscara (logo chico o detalle fino)
+## 4. Variante B — pegar y repintar el halo con máscara (excepción: material del kit a escala chica)
 
 **Por qué existe (medido):** con la escala **pequeña** sobre un escritorio, la pasada directa deformó la órbita —la
 encogió a un lazo— y aclaró el navy, **dos veces seguidas**, aun exigiendo en el prompt la elipse ancha y `#023c70`.

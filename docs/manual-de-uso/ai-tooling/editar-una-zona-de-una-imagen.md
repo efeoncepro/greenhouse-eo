@@ -1,9 +1,9 @@
 # Editar solo una zona de una imagen (inpainting con mascara)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-17 por Claude — (1.5) segundo uso de la mascara: integrar un objeto real (render de marca) en una escena protegiendo objeto y escena y abriendo solo un halo de ~140 px; verificacion de pixeles protegidos antes de gastar y trampa de `sharp` de 1 canal (`toColourspace('b-w')`). Antes (1.4) `--key-background` para huecos opacos de objeto claro sobre fondo oscuro. Antes (1.3) `pnpm ai:image:rmbg` rellena huecos internos por defecto; cuándo usar `--no-fill-holes`. Antes (1.2) brechas del comando corregidas (commit `17196ead1`): `--size` y `--background` se validan antes de gastar, nuevo `--format png|jpeg|webp`, aviso de `--count N` y línea `$ costo estimado` antes de pedir. Antes (1.1): elección GPT Image 2 vs 2.5 Sunburst vs Flare con enlace a la guía canónica de selección; el costo de 2.5 sí se estima antes con la fórmula oficial; brechas conocidas del comando (`--size`/`--background` sin validar, PNG siempre, `--count` = N pedidos pagados)
+> **Ultima actualizacion:** 2026-09-17 por Claude — (1.6) la mascara de halo para integrar un objeto real es la **excepcion, no el default**: para una forma exacta de marca en una escena generada el camino por defecto es la pasada directa (render como referencia de forma + intencion en el prompt), y el halo solo aplica con material exacto del kit y logo chico o de detalle fino. Antes (1.5) segundo uso de la mascara: integrar un objeto real (render de marca) en una escena protegiendo objeto y escena y abriendo solo un halo de ~140 px; verificacion de pixeles protegidos antes de gastar y trampa de `sharp` de 1 canal (`toColourspace('b-w')`). Antes (1.4) `--key-background` para huecos opacos de objeto claro sobre fondo oscuro. Antes (1.3) `pnpm ai:image:rmbg` rellena huecos internos por defecto; cuándo usar `--no-fill-holes`. Antes (1.2) brechas del comando corregidas (commit `17196ead1`): `--size` y `--background` se validan antes de gastar, nuevo `--format png|jpeg|webp`, aviso de `--count N` y línea `$ costo estimado` antes de pedir. Antes (1.1): elección GPT Image 2 vs 2.5 Sunburst vs Flare con enlace a la guía canónica de selección; el costo de 2.5 sí se estima antes con la fórmula oficial; brechas conocidas del comando (`--size`/`--background` sin validar, PNG siempre, `--count` = N pedidos pagados)
 > **Modulo:** AI Tooling / Asset Generation
 > **Comandos:** `pnpm ai:image --image ... --mask ...`, `pnpm ai:image:rmbg`
 > **Documentacion relacionada:** `docs/documentation/ai-tooling/generador-visual-assets.md`, `.claude/skills/greenhouse-ai-image-generator/SKILL.md`, `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`
@@ -101,14 +101,28 @@ entrada (1.024 tokens a 1024²).
 Abre la imagen y comparala con la original. **No confies en una diferencia promedio de pixeles**: un objeto
 chico mueve muy poco el promedio y parece que no paso nada. Hay que mirar.
 
-## Otro uso de la mascara: integrar un objeto real en una escena
+## Otro uso de la mascara: integrar un objeto real en una escena (**es la excepcion, no el default**)
+
+> **Antes de leer esto, descarta el camino normal.** Para poner una forma exacta de marca —el render 3D del logo de
+> Efeonce, la nave, una mascota 3D— dentro de una escena generada, el camino por defecto **no es esta mascara**: es una
+> **pasada directa**, entregando el render como **referencia de forma** (imagen 1) y poniendo la **intencion** en el
+> prompt (material, montaje, escena, camara, atmosfera). El modelo resuelve material, luz, sombra montada y atmosfera
+> mucho mejor que pegar el objeto y repintarle un halo; pegado conserva el material y la luz del kit y **se ve falso**
+> en la escena. Metodo y evidencia:
+> [§Forma exacta de marca](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) y la
+> [bitacora del kit 3D](../../operations/social/2026-09-17-efeonce-logo-3d-reference-kit-production-method.md).
+>
+> **Esta mascara se usa solo si se cumplen las dos condiciones a la vez:** el objeto debe conservar **exactamente el
+> material y la luz del kit** (no hay cambio de material) **y** es chico en cuadro o tiene detalle fino. Si cambia el
+> material (acero, aluminio, vidrio, neon, madera) o la escena tiene atmosfera fuerte (larga exposicion, neon,
+> contraluz, lluvia), usa la pasada directa.
 
 El caso de arriba abre un hueco para que el modelo **invente** algo. Este es el contrario: ya tienes un objeto exacto
-—por ejemplo el render 3D del logo de Efeonce— y lo que quieres del modelo es **solo la integracion**: la sombra de
-contacto, el reflejo en la superficie y el fundido de bordes. Ni el objeto ni la escena deben cambiar.
+y lo que quieres del modelo es **solo la integracion**: la sombra de contacto, el reflejo en la superficie y el fundido
+de bordes. Ni el objeto ni la escena deben cambiar.
 
 La forma de conseguirlo es una mascara que **protege dos zonas** y deja editable **solo un halo** alrededor del objeto.
-Se usa cuando el objeto es chico en cuadro o tiene detalle fino: pasarlo suelto al modelo deforma ese detalle aunque el
+Dentro de ese caso acotado se justifica porque pasar el objeto suelto al modelo deforma el detalle fino aunque el
 prompt lo prohiba (medido: una orbita se encogio a un lazo dos veces seguidas).
 
 ### Pasos

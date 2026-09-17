@@ -89,8 +89,12 @@ Tampoco es mascota de partner: es la marca propia completa, renderizada en Blend
 - **Escalas:** monumental 20 m, grande 6 m, mediana 1,2 m y pequeña 24 cm de ancho, cada una con sus cámaras.
 - **Regla dura:** es referencia de forma para agentes y modelos (entra como imagen 1 y el modelo sólo integra la escena),
   no una firma. En una pieza, la firma sigue siendo el SVG oficial compuesto con AXIS.
-- **Cómo aplicarlo con IA generativa:** dos variantes según el tamaño del logo en cuadro (pasada directa, o pegar y
-  repintar sólo el halo con máscara) en
+- **Cómo aplicarlo con IA generativa:** por defecto, **pasada directa** —el render entra como referencia de forma y la
+  intención (material, montaje, escena, atmósfera) va en el prompt—; pegar y repintar sólo el halo con máscara es la
+  excepción (material exacto del kit + objeto chico o de detalle fino). Ver
   [§5 de la bitácora](2026-09-17-efeonce-logo-3d-reference-kit-production-method.md#5-aplicación-con-ia-generativa-probado).
+- **El mismo contrato aplica a cualquier forma de marca exacta que deba aparecer como objeto en una escena:** las
+  mascotas 3D de partners de este inventario (Clawd, Codex, sprocket), el isotipo propio, un logo de cliente
+  renderizado con el mismo `blender/render_logo.py` y las piezas de merch o señalética.
 - **Registro:** [bitácora](2026-09-17-efeonce-logo-3d-reference-kit-production-method.md) ·
   [`LEEME`](../../../ai-generations/2026-09-17_efeonce-logo-3d/LEEME.md).

@@ -1,6 +1,6 @@
 # Ejecución de creatividad social para Codex y Claude
 
-Estado: vigente para trabajo local autorizado. Owner: Social Media Studio. Actualizado: 2026-09-13.
+Estado: vigente para trabajo local autorizado. Owner: Social Media Studio. Actualizado: 2026-09-17.
 Alcance: solicitudes de seasonality, trendjacking, memes de marca, creatividad social y correcciones de
 identidad/product placement. Es un protocolo de entrada y cierre; las skills enlazadas contienen el oficio.
 No habilita publicación, presupuestos externos nuevos ni cambios de runtime.
@@ -28,6 +28,16 @@ No cargar todos los studios: componer únicamente las capacidades que exige el e
 El [contrato multimodal](GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md) conserva las fronteras del
 runtime. Si una capacidad artesanal no está soportada por el compiler, describir la prueba local como tal;
 no inventar campos de schema ni aprobar una campaña para ejecutar un experimento.
+
+**Forma exacta de marca dentro de una escena generada (regla corregida 2026-09-17).** Cuando la forma debe salir
+exacta —logo de Efeonce, isotipo, mascota 3D, logo de cliente—, el render determinístico entra como **referencia de
+forma** y la **intención** (material, montaje, escena, cámara, atmósfera) va en el prompt; el modelo genera la escena
+alrededor. **Nunca pegar el render sobre la escena como camino por defecto:** conserva el material y la luz del kit, no
+pertenece a la escena y el operador lo rechazó («se ve muy falso»). La composición determinística y el halo enmascarado
+quedan como excepción, sólo con material exacto del kit y objeto chico o de detalle fino. **QA obligatorio:** comparar
+**letra por letra** contra el render (letras, órbita con sus cortes, ventanas), color sin deriva y perspectiva
+coherente; la firma de la pieza sigue siendo el SVG oficial compuesto con AXIS. Método y evidencia:
+[bitácora del kit 3D](social/2026-09-17-efeonce-logo-3d-reference-kit-production-method.md).
 
 ## Referente de seasonalities y destino editorial
 
