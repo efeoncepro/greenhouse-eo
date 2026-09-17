@@ -295,3 +295,7 @@ inventa para llenar la línea.
 ## Delta 2026-09-17 — cuando la pieza ya existe
 
 Si la prenda o el merch ya tiene una foto real (por ejemplo la gorra del héroe de `/contacto` en el sitio público), esa foto es la **única fuente de construcción** y las variantes se piden como cambio de color o de aplicación sobre ella, igual que el segundo color de un render 3D. Antes de diseñar desde cero, buscar si la pieza ya existe en el sitio, en OneDrive o en el repo. Declarar además lo que NO lleva (por ejemplo, la trasera sin bordado): el modelo tiende a repetir el logotipo donde no va. Caso: `ai-generations/2026-09-17_gorra-efeonce/LEEME.md`.
+
+## Delta 2026-09-17 — el calce se declara, no se asume
+
+Al vestir a alguien con una pieza cuya referencia es una **foto de producto** (gorra, mochila, accesorio), el modelo tiende a escalarla de más: la gorra sale oversized y domina la cara. Describir el **ajuste**, no el objeto: talla adulta normal, calce ceñido y perfil bajo; de la ceja a lo alto de la copa ≈ un tercio de la altura de la cabeza; banda sobre las cejas y laterales sin hueco; visera corta y curva del ancho de la frente. Vale para cualquier accesorio que se lleve puesto. Caso: `ai-generations/2026-09-17_gorra-efeonce/LEEME.md`.

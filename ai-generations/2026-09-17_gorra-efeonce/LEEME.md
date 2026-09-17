@@ -28,6 +28,16 @@ Entrega: OneDrive `5. Contenidos/13- Branding/Gorra Efeonce/v01/`.
 y, en la persona real, al menos una foto de cuerpo entero. El logotipo se mantiene legible y el emblema conserva su
 orientación.
 
+**Corrección del operador: «muy grandes las gorras».** En el primer intento la gorra se leía de talla grande y dominaba
+la cara. La referencia es una foto de producto, así que el modelo la escala de más si no se declara el calce. Se
+resolvió describiendo el ajuste, no el objeto:
+
+- talla adulta normal, calce **ceñido** y perfil **bajo**, nunca oversized;
+- de la ceja a lo alto de la copa, alrededor de **un tercio** de la altura de la cabeza;
+- la banda apoya justo sobre las cejas y los laterales abrazan sin hueco en las sienes;
+- visera corta y curva, del ancho de la frente; nunca visera larga y plana;
+- el logotipo se lee pequeño en los paneles, sin estirarse.
+
 ## Notas de método
 
 - La construcción sale de una **foto real existente**, no de una descripción: cuando la pieza ya existe, esa foto es
