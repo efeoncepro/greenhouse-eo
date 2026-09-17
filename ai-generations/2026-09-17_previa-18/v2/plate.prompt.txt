@@ -1,0 +1,14 @@
+Transform this flat layout sketch into a stunning, high-end 3D studio render for a premium brand social media post. Keep the exact composition, positions, rotations, scale and the exact letterform shapes of the numerals from the sketch (a bold grotesque "1" and "8" standing, and a "7" being pushed out of the frame on the right, tilted and falling). Do not add, remove or change any digit.
+
+Materials and look:
+- The "1" and the "8" are big solid sculptural 3D objects in glossy soft-touch white resin with subtly rounded bevels, thick depth (extruded), crisp specular highlights and soft ambient occlusion.
+- The falling "7" is the same material in pale ice blue, caught mid-fall with a slight motion blur on its trailing edge and a tiny rotation, clearly being shoved out by the "8".
+- A giant glossy 3D mouse cursor arrow (deep navy-black body with a thin white rim) grips the top right shoulder of the "8", as if dragging it into place.
+- Along the top, a festive string of 3D fabric bunting flags (triangles) in white, deep navy and pale blue hangs in a gentle curve, with soft folds and realistic fabric texture and cast shadows.
+
+Scene and light:
+- Seamless infinite studio backdrop in saturated brand blue (#0375db) graduating to deep navy (#023c70) at the bottom.
+- Dramatic cinematic key light from the upper left, a soft blue rim light, long soft contact shadows cast by the numerals onto the backdrop, subtle floor reflection, rich contrast and depth, sharp focus, ultra detailed, polished advertising campaign quality.
+- Minimalist: only these objects. The lower 28% of the image must stay as clean empty backdrop (no objects, no shadows crossing it) for typography added later.
+
+Strictly avoid: any text, letters or extra numbers; logos; flags of any country; red color; cartoonish style; clutter.
