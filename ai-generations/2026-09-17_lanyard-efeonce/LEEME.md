@@ -22,11 +22,24 @@ azul**.
 
 Ambas entran como referencia al modelo; el texto exacto nunca se le pide a la generación.
 
-## Vistas (`final/`, 4 + artes)
+## Vistas (`final`, 12 + 3 artes)
 
-Conjunto completo con el carnet en su portacarnet · macro de la cinta con un módulo del patrón · macro del yoyo con la
-resina · macro del carnet dentro del portacarnet · puesto sobre el polo navy sin rostro. Manifiesto `efeonce-lanyard-manifiesto.json` con **cuándo usar** cada una.
-Entrega: OneDrive `5. Contenidos/13- Branding/Lanyard Efeonce/v01/`.
+Doce vistas pensadas para que ningún agente ni modelo reinterprete la pieza:
+
+| Vista | Para qué |
+|---|---|
+| 01 conjunto · 12 colgado | Vista general y caída natural |
+| 02 macro de la cara impresa · 06 cinta estirada de extremo a extremo | Arte y ritmo del patrón; base de mockups |
+| 07 macro del reverso | Declara que la cara trasera va lisa, sin impresión |
+| 08 macro de herrajes | Gancho giratorio, hebilla de seguridad y regulador |
+| 03 macro del yoyo · 09 reverso del yoyo | Resina por delante, clip de acero por detrás |
+| 10 portacarnet vacío | La pieza sola, sin tarjeta, para que no se confunda con un portacredencial |
+| 05 carnet en el portacarnet · arte del carnet plano | Diseño del carnet y cómo se ve montado |
+| 13 en la mano | Escala real de tarjeta, marco y yoyo |
+| 04 puesto | Referencia con persona |
+
+Regla al usarlas: pasar siempre las **artes canónicas** junto con la vista que corresponda a lo que la pieza debe
+mostrar.
 
 ## Producto
 
@@ -42,9 +55,14 @@ Cinta de poliéster plano de 20 mm en navy `#023c70`, hebilla de seguridad, ganc
 | El gris de marca en el eslogan no resolvía sobre navy impreso (corrección del operador) | Gris claro `#C8CEDA` para el prefijo, manteniendo «Growth» en blanco; contraste medido 7,06:1 contra 2,98:1 |
 | Faltaban el portacarnet y el carnet (corrección del operador) | Carnet compuesto con logo, foto, nombre y cargo |
 | La primera versión mostraba un **portacredencial** (funda cerrada sobre el arte), no un portacarnet | Portacarnet de **marco rígido** abierto por un costado, con la cara del carnet expuesta; la distinción quedó escrita en el manifiesto |
+| El reverso liso y el carnet plano volvían como conjunto: las referencias del arte empujan a mostrar el logo | El reverso se generó **sin referencias**, describiendo que no hay impresión; el carnet plano no se genera: es el arte compuesto |
 | Los macros volvían como conjunto o como collage de dos paneles | Describir el encuadre por lo que **no** debe verse: «la silueta del lanyard NO aparece — sin lazo, sin gancho, sin fondo» |
 
 El retrato de la plantilla del carnet es de una persona ficticia generada para ese fin; para un carnet real se pasa la
 foto de la persona y su cargo confirmado.
 
 Modelo `gpt-image-2.5-sunburst`, xhigh; ~USD 0,14 por vista, 11 generaciones con descartes.
+
+## Pruebas en persona
+
+El kit se probó en dos personas (`out/prueba-nexa.png`, `out/prueba-julio.png`): cinta, yoyo y carnet se mantienen consistentes, con el carnet mostrando el retrato y el nombre de cada uno. Se pasan las tres artes más las referencias de la persona y, en el caso de una persona real, al menos una foto de cuerpo entero para que la proporción no se deforme.
