@@ -170,7 +170,7 @@ para uso corporativo: el logo se pierde. Al vestir a alguien en una pieza, la pr
 no de la costumbre.
 
 Los assets de marca viven todos en OneDrive `5. Contenidos/13- Branding/`: `SVG/` (nueve logos y símbolos),
-`Nave Efeonce 3D/`, `Logo Efeonce 3D/`, `Hoodie Efeonce/v01/` y `Polo Efeonce/v01/` — 21 vistas por prenda (sola,
+`Nave Efeonce 3D/`, `Logo Efeonce 3D/`, `Hoodie Efeonce/v01/` y `Polo Efeonce/v01/` y `Chaqueta Efeonce/v01/` — 21 vistas por prenda (sola,
 detalles, planos cenitales, puesta en cuerpo neutro sin rostro, variantes de color) con manifiesto por vista. Antes de
 generar ropa de marca, reutilizar estos kits. **Chaqueta softshell y polera** vienen por el mismo método y **se
 diseñan desde cero**: no existe asset oficial, así que la prenda base es una decisión de marca —silueta, color, qué

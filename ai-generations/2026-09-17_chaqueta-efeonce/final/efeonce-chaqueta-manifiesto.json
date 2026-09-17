@@ -1,0 +1,278 @@
+{
+  "prenda": "Chaqueta Efeonce",
+  "decision": "Dos tipos aprobados por el operador: SOFTSHELL navy como chaqueta oficial del equipo (kit completo) y BOMBER ligera navy como pieza de imagen (set esencial). La micropolar se descartó por ser demasiado invernal.",
+  "invariantes": {
+    "softshell": "softshell de tres capas, cierre completo con tapeta interior y protector de mentón, cuello alto, dos bolsillos con cierre oculto, puños ajustables, cordón en el ruedo, sin capucha",
+    "bomber": "sarga técnica mate, cierre completo, cuello, puños y ruedo de punto acanalado navy, dos bolsillos ribeteados con cierre oculto, mangas raglán",
+    "emblema": "isotipo BORDADO en hilo blanco en el pecho izquierdo, ~7 cm, geometría del isotipo oficial (nave a la derecha, aletas abajo a la izquierda, órbita elipse ancha, planeta arriba)",
+    "espalda": "limpia, sin estampa: es ropa corporativa, no merch",
+    "color": "navy de marca #023c70"
+  },
+  "como_usarla": "Elegir la vista por el ángulo de la toma y pasarla junto con las referencias de rostro y cuerpo. La chaqueta va sobre el polo navy en piezas frente a cliente.",
+  "vistas": [
+    {
+      "tipo": "bomber",
+      "id": "01-frente",
+      "descripcion": "Frente, cierre cerrado",
+      "cuando_usarla": "tomas frontales",
+      "archivo_fondo_estudio": "efeonce-chaqueta-bomber-01-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-bomber-01-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "bomber",
+      "id": "02-espalda",
+      "descripcion": "Espalda limpia",
+      "cuando_usarla": "tomas de espaldas",
+      "archivo_fondo_estudio": "efeonce-chaqueta-bomber-02-espalda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-bomber-02-espalda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "bomber",
+      "id": "03-tres-cuartos-izquierda",
+      "descripcion": "Tres cuartos izquierda",
+      "cuando_usarla": "sujeto girado hacia su derecha",
+      "archivo_fondo_estudio": "efeonce-chaqueta-bomber-03-tres-cuartos-izquierda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-bomber-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "bomber",
+      "id": "08-percha",
+      "descripcion": "En percha",
+      "cuando_usarla": "vestuario, backstage",
+      "archivo_fondo_estudio": "efeonce-chaqueta-bomber-08-percha-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-bomber-08-percha-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "bomber",
+      "id": "11-macro-bordado",
+      "descripcion": "Macro del bordado",
+      "cuando_usarla": "primeros planos y verificación del emblema",
+      "archivo_fondo_estudio": "efeonce-chaqueta-bomber-11-macro-bordado-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "bomber",
+      "id": "14-puesto-frente",
+      "descripcion": "Puesta, frente, sobre polo navy",
+      "cuando_usarla": "persona de pie, plano medio",
+      "archivo_fondo_estudio": "efeonce-chaqueta-bomber-14-puesto-frente-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "01-frente",
+      "descripcion": "Frente, cierre cerrado",
+      "cuando_usarla": "tomas frontales",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-01-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-softshell-01-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "02-espalda",
+      "descripcion": "Espalda limpia",
+      "cuando_usarla": "tomas de espaldas",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-02-espalda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-softshell-02-espalda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "03-tres-cuartos-izquierda",
+      "descripcion": "Tres cuartos izquierda",
+      "cuando_usarla": "sujeto girado hacia su derecha",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-03-tres-cuartos-izquierda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-softshell-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "04-tres-cuartos-derecha",
+      "descripcion": "Tres cuartos derecha",
+      "cuando_usarla": "sujeto girado hacia su izquierda",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-04-tres-cuartos-derecha-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-softshell-04-tres-cuartos-derecha-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "05-lateral",
+      "descripcion": "Lateral",
+      "cuando_usarla": "perfiles",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-05-lateral-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-softshell-05-lateral-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "06-cierre-abierto",
+      "descripcion": "Cierre abierto, forro a la vista",
+      "cuando_usarla": "piezas donde la chaqueta va abierta sobre el polo",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-06-cierre-abierto-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-softshell-06-cierre-abierto-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "07-doblada",
+      "descripcion": "Doblada",
+      "cuando_usarla": "bodegón, kit de bienvenida",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-07-doblada-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-softshell-07-doblada-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "08-percha",
+      "descripcion": "En percha",
+      "cuando_usarla": "vestuario, backstage",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-08-percha-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-softshell-08-percha-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "09-plano-frente",
+      "descripcion": "Plano cenital, frente",
+      "cuando_usarla": "mockups",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-09-plano-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-softshell-09-plano-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "10-plano-espalda",
+      "descripcion": "Plano cenital, espalda",
+      "cuando_usarla": "mockups de espalda",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-10-plano-espalda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-chaqueta-softshell-10-plano-espalda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "11-macro-bordado",
+      "descripcion": "Macro del bordado",
+      "cuando_usarla": "primeros planos y verificación del emblema",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-11-macro-bordado-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "12-detalle-cierre-cuello",
+      "descripcion": "Macro del cierre y la tapeta",
+      "cuando_usarla": "detalle de acabado",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-12-detalle-cierre-cuello-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "13-detalle-puno-bolsillo",
+      "descripcion": "Macro de puño ajustable y bolsillo",
+      "cuando_usarla": "detalle de acabado",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-13-detalle-puno-bolsillo-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "14-puesto-frente",
+      "descripcion": "Puesta, frente, sobre polo navy",
+      "cuando_usarla": "persona de pie, plano medio",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-14-puesto-frente-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "15-puesto-espalda",
+      "descripcion": "Puesta, espalda",
+      "cuando_usarla": "tomas de espaldas con persona",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-15-puesto-espalda-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "tipo": "softshell",
+      "id": "16-puesto-frente-cuerpo-b",
+      "descripcion": "Puesta, frente, otro cuerpo y tono de piel",
+      "cuando_usarla": "evitar un único tipo de modelo",
+      "archivo_fondo_estudio": "efeonce-chaqueta-softshell-16-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    }
+  ]
+}
