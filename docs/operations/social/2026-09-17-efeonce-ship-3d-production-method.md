@@ -38,7 +38,7 @@ Modelo: `gpt-image-2.5-sunburst` edit, `xhigh`, 1600×1600, ~USD 0,14 por imagen
 | Blanco v1 generado desde cero («matte-satin white ceramic» sobre navy): plano, como jabón, cortes de la órbita poco definidos. Rechazado | Blanco v2: editar cada render navy aprobado cambiando SOLO material (laca blanca brillante, sombras frías en los cortes) y fondo (navy `#0f2744`); en escenas, sólo el material | El segundo color se recolorea desde el render aprobado, no se regenera: geometría, cortes y cámara quedan idénticos |
 | Con la base frontal como referencia y la cámara sólo en texto (gusano, picado 45°, isométrica, gran angular, vista inferior), el modelo devolvió casi frontal | Guía de perspectiva proyectada desde la silueta oficial como imagen 1 | Un ángulo extremo se indica con una guía geométrica, no con una descripción; misma familia que el boceto de composición del [KV «Tu IA no conoce tu negocio»](2026-09-17-kv-tu-ia-no-conoce-production-method.md) |
 | Vista inferior pura (cámara debajo mirando arriba) | Descartada | Para un logo plano sólo muestra el canto: no sirve |
-| `pnpm ai:image:rmbg` dejó opacos los huecos que muestran el fondo (cortes de la órbita y ventanas de la nave blanca sobre navy; ventanas del macro navy) | `limpiar-huecos.mjs` de la corrida | Objeto claro sobre fondo oscuro es el caso inverso del relleno de huecos: revisar siempre los huecos pasantes |
+| `pnpm ai:image:rmbg` dejó opacos los huecos que muestran el fondo (cortes de la órbita y ventanas de la nave blanca sobre navy; ventanas del macro navy) | `limpiar-huecos.mjs` de la corrida, reemplazado luego por la opción canónica `pnpm ai:image:rmbg --key-background` (mismo alfa) | Objeto claro sobre fondo oscuro es el caso inverso del relleno de huecos: revisar siempre los huecos pasantes |
 | Escenas con nave blanca sobre fondo claro y macros no recortaban limpio | Se entregan sólo como escena o con fondo | No todo se recorta: si el cuerpo queda semitransparente o arrastra elementos, no hay variante transparente |
 
 ## 3. Procedimientos técnicos
@@ -53,12 +53,10 @@ Modelo: `gpt-image-2.5-sunburst` edit, `xhigh`, 1600×1600, ~USD 0,14 por imagen
   imagen 1 («copiar cámara y posición, nunca su aspecto plano»), la base 3D aprobada como imagen 2 y la silueta
   oficial como imagen 3. Funcionó en 09, 10, 16 y 17 (`brief-angulos-v2/`). La isométrica siguió frontal. Holandés,
   contrapicado tres cuartos y macros salieron sólo con prompt.
-- **Recorte y limpieza de huecos.** `pnpm ai:image:rmbg` y luego
-  `node limpiar-huecos.mjs <fondo> <transparente> <umbral> <minPx>`: el color de fondo es la mediana del borde; los
-  componentes conexos con distancia al fondo menor al umbral y tamaño ≥ `minPx` pasan a alfa 0, con borde suave de
-  2 px y descontaminación del color. Parámetros: blanco 42/30; macro navy 30/800. Es un script de la corrida, no una
-  herramienta canónica (gap abierto registrado en
-  [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)).
+- **Recorte y limpieza de huecos.** Hoy: `pnpm ai:image:rmbg <fondo> <transparente> --key-background <umbral> <minPx>`
+  (blanco 42/30; macro navy 30/800). Durante la corrida se usó `node limpiar-huecos.mjs <fondo> <transparente> <umbral>
+  <minPx>` (mediana del borde como fondo, componentes conexos cercanos a ese color y ≥ `minPx` a alfa 0, borde suave de
+  2 px con descontaminación); la opción canónica reproduce el mismo alfa y lo reemplaza.
 - **Qué no se recorta.** Escenas con nave blanca sobre fondo claro (el cuerpo quedaba semitransparente y arrastraba
   manos, pin y vidrio) y macros (órbita desenfocada a medio borrar).
 - **QA de transparentes.** Componer sobre un fondo de contraste fuerte (terracota) y revisar con zoom al 100 % cortes

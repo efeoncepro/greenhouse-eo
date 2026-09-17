@@ -46,7 +46,8 @@ pedestal · 06 pin · 07 en mano · 08 vitrina.
    guía entra como imagen 1 («copiar cámara, no su aspecto plano»), la base 3D como 2 y el logo como 3. Funcionó en 09,
    10, 16 y 17 (`brief-angulos-v2/`). La isométrica siguió frontal. Holandés, contrapicado 3/4 y macros salieron con
    prompt solo.
-4. **Recorte:** `pnpm ai:image:rmbg` y luego `node limpiar-huecos.mjs <fondo> <transparente> <umbral> <minPx>`, que
+4. **Recorte:** hoy `pnpm ai:image:rmbg <fondo> <transparente> --key-background <umbral> <minPx>` (opción canónica que
+   reemplaza a `limpiar-huecos.mjs`, **superseded**; mismo alfa sobre los finales). En la corrida: `pnpm ai:image:rmbg` y luego `node limpiar-huecos.mjs <fondo> <transparente> <umbral> <minPx>`, que
    vacía los componentes del color de fondo que el matting dejó opacos (cortes de la órbita y ventanas del blanco sobre
    navy; ventanas del macro navy), con borde suave y descontaminación. Umbral 42/min 30 para blanco, 30/800 para navy.
    Sin transparente: escenas (la nave blanca sobre fondo claro quedaba semitransparente y arrastraba manos, pines y

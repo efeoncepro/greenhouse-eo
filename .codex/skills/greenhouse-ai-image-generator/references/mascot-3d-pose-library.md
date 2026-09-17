@@ -168,5 +168,5 @@ Registro: `ai-generations/2026-09-17_efeonce-ship-3d/LEEME.md`. Tres reglas apre
   silueta oficial y proyectarla con cámara real (`guias/proyectar.mjs`), y pasarla como imagen 1 con la orden de copiar
   la cámara y no su aspecto. Con solo texto y la base frontal como referencia, el modelo devuelve casi frontal.
 - **Objeto claro sobre fondo oscuro:** el matting deja opacos los huecos que muestran fondo (cortes, ventanas); vaciarlos
-  por color de fondo con borde suave (`limpiar-huecos.mjs`). Objeto claro sobre fondo claro no se recorta: se entrega
+  con `pnpm ai:image:rmbg … --key-background [umbral] [minPx]`. Objeto claro sobre fondo claro no se recorta: se entrega
   solo como escena.

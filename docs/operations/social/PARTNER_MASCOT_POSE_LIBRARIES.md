@@ -76,6 +76,6 @@ No es mascota de partner: es marca propia y vive fuera de esta biblioteca.
 - **Lecciones:**
   1. El segundo color se recolorea editando el render aprobado; regenerarlo desde cero salió plano y se rechazó.
   2. Los ángulos extremos necesitan una guía de perspectiva proyectada desde la silueta oficial; el texto solo vuelve a frontal.
-  3. Objeto claro sobre fondo oscuro: `rmbg` deja opacos los huecos pasantes; limpiarlos y revisar sobre fondo de contraste fuerte.
+  3. Objeto claro sobre fondo oscuro: `rmbg` deja opacos los huecos pasantes; usar `--key-background` y revisar sobre fondo de contraste fuerte.
 - **Registro:** [bitácora](2026-09-17-efeonce-ship-3d-production-method.md) ·
   [`LEEME`](../../../ai-generations/2026-09-17_efeonce-ship-3d/LEEME.md).

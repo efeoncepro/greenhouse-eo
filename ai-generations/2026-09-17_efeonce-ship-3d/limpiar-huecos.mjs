@@ -1,4 +1,5 @@
 // Vacía los huecos (ventanas, cortes de la órbita) que el matting dejó opacos con el color del fondo de estudio.
+// SUPERSEDED (2026-09-17): usar `pnpm ai:image:rmbg <in> <out> --key-background <umbral> <minPx>`; se conserva como registro.
 // Uso: node limpiar-huecos.mjs <fondo.png> <transparente.png> <umbral> <minPx>
 import sharp from 'sharp'
 const [,, fondoPath, transPath, T = '42', MIN = '30'] = process.argv

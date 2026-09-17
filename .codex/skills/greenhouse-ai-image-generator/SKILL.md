@@ -498,9 +498,9 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
   base 3D aprobada como imagen 2 y logo como 3. La isométrica siguió frontal; una vista inferior pura de un logo
   plano sólo muestra su canto.
 - **Recorte de objeto claro sobre fondo oscuro:** `pnpm ai:image:rmbg` deja OPACOS los huecos que muestran el fondo
-  (cortes, ventanas). Revisar siempre sobre fondo de contraste fuerte con zoom 100 %. Mientras rmbg no tenga una
-  opción canónica, la corrección es de corrida: `limpiar-huecos.mjs <fondo> <transparente> <umbral> <minPx>` de la
-  misma carpeta. Escenas claras sobre fondo claro y macros desenfocados no se recortan: se entregan como escena.
+  (cortes, ventanas): usar `pnpm ai:image:rmbg <in> <out> --key-background [umbral] [minPx]` (opt-in; 42/30 por
+  defecto, 30/800 en fondo claro desenfocado o macro; no usar si el sujeto tiene zonas del color del fondo). Revisar
+  siempre sobre fondo de contraste fuerte con zoom 100 %. Escenas claras sobre fondo claro y macros desenfocados no se recortan: se entregan como escena.
   Método completo: [isotipo propio en 3D con dos colores](references/mascot-3d-pose-library.md#isotipo-propio-en-3d-con-dos-colores-caso-nave-de-efeonce).
 - Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md) ·
   [nave Efeonce 3D](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).

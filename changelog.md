@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-17 — `pnpm ai:image:rmbg --key-background` para huecos opacos
+
+El recorte de fondo suma una opción opt-in para el caso de objeto claro sobre fondo oscuro: vacía los huecos pasantes
+(ventanas, cortes) que el matting dejaba opacos mostrando el fondo de estudio, con borde suave y sin halo. Reemplaza el
+script de corrida de la nave de Efeonce 3D y reproduce el mismo alfa en sus finales aprobados.
+
 ## 2026-09-17 — LicitaLAB: CLI `pnpm licitalab` y flujo agéntico de licitaciones públicas
 
 Nuevo cliente canónico `src/lib/commercial/tenders/licitalab/client.ts` sobre el MCP de LicitaLAB y CLI con tres
@@ -833,13 +839,3 @@ supersede de settlements) sobre el command compartido `linkStatementRow`; los ex
 USD/MXN con tipo de cambio explícito y `createMemberPaymentExpense` registra pagos a un colaborador sin entry
 de Payroll. Datos: sueldo accionista 2×1.000.000 reemplaza los traspasos al CCA; Berel folios 51/52/53 cobrados
 en MXN; comisión HubSpot cerrada con la fee de recepción estimada; Deel REC-2026-8/9/10 al CCA.
-
-## 2026-09-10 — Finance: segunda pasada de conciliación (honorarios brutos, Deel al CCA, payable backdated, Banco de Chile)
-
-El plan de conciliación suma `honorarios_gross_paid`, `income_receipt`, `link_existing_payment` y
-`link_existing_leg`; nacen `finance:record-deel-receipts` (recibos Deel con tarjeta personal → cuenta corriente
-accionista) y `finance:contractor-settle` (boleta on-behalf → readiness → obligación reactiva → orden pagada con
-la fecha del banco), más el adapter `bancochile_cuenta_vista_text`. Datos: Humberly julio/agosto como brutos sin
-retención; Deel REC-2026-11/12/13; Valentina EO-CPAY-0002 pagado el 07/09; comisión HubSpot Q2 2026 como
-ingreso; Banco de Chile FAN Emprende anclado e importado. Seis períodos `reconciled`. Pendiente de despliegue:
-el ops-worker recomputa saldos con el código previo a ISSUE-169.
