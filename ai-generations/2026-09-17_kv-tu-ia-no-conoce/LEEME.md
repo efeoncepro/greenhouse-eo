@@ -42,3 +42,26 @@ Narrativa canónica: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../
 
 Límites: Nexa y Clawd son generados; el rostro de Nexa se validó a ojo contra sus referencias. El «hombro vacío» del
 concepto original no se lee en esta composición y se descartó.
+
+## v03 — hoodie Efeonce, cámara lejana, titular plano, 4:5 y 9:16 (2026-09-17)
+
+Pedido del operador: Nexa con el hoodie de Efeonce, cámara más alejada, titular sin jerarquía, logo centrado sobre un
+objeto de primer plano desenfocado, producción en 4:5 y 9:16.
+
+Entregables: `kv-tu-ia-no-conoce-clawd-4x5-v03b.png` (1080×1350) y `kv-tu-ia-no-conoce-clawd-9x16-v03b.png`
+(1080×1920), con `*-overlay.svg`, `*-qa.json` y vista 390. La variante `v03a` (titular navy con luz sobre la pared) se
+descartó: la luz se lee como un foco artificial.
+
+| Paso | Detalle |
+|---|---|
+| Referencia hoodie | `refs/efeonce-hoodie.png` (hoodie azul rey con isotipo blanco, asset del sitio público) |
+| Plate 4:5 nativo | `gpt-image-2.5-sunburst` xhigh 1600×2000 edit (Avatar 3/4, Cuerpo Completo, hoodie, Clawd shrug) · `brief/plate-kv-v03-4x5.prompt.txt` · usage in 6223 · out 4244. Isotipo del hoodie prácticamente igual al oficial: sin re-estampado |
+| 9:16 | `story/outpaint.mjs`: plate a 1152×1440 en lienzo 1152×2048, outpaint arriba (pared) y abajo (escritorio) con franja de 56 px dentro del núcleo y fundido de 40 px · `brief/extend-9x16.prompt.txt` · salto máximo de luminancia por fila en uniones: 1,12 / 0,79 |
+| 4:5 final | El 4:5 nativo dejaba la cabeza al 17 % y no daba aire para titular ni logo. Se abrió el encuadre del 9:16 a los lados: `feed/outpaint-wide.mjs` (lienzo 1632×2048, franja 40 px, fundido 28 px) · `brief/extend-4x5-wide.prompt.txt`. Los dos formatos comparten escena |
+| Composición | `compose-kv-v03.mjs` (`FORMAT=4x5|9x16`): titular Bricolage `ideaShort` 740 blanco, un solo peso, centrado sobre la pared; pared oscurecida hacia navy arriba con fundido largo hasta la cabeza; logo negativo centrado sobre el frente del escritorio. Guardias: titular dentro de la pared libre y sobre la cabeza, zona segura de historia 13 %, logo sobre el escritorio |
+
+Contraste peor caso: 4:5 titular 15,54 / 14,42 · logo 17,64 — 9:16 titular 14,92 / 14,04 · logo 17,04. El titular navy
+directo sobre la pared fallaba (2,5–3,5:1) por las juntas oscuras del ladrillo; de ahí el cambio a titular blanco.
+
+Observaciones: Clawd mide cerca de 7 % del ancho en 4:5 y se reconoce a 390 px por silueta, color y «?», pero es
+pequeño; si el feed lo pierde, subirlo en el plate. Insignia de partner Claude sigue pendiente.

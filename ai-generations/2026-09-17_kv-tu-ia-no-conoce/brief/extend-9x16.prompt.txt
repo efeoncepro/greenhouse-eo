@@ -1,0 +1,4 @@
+Outpaint this photograph to a vertical 9:16 frame. Keep the existing central scene exactly as it is (the woman in the royal blue hoodie, the orange cube figurine on her shoulder, the desk and laptop). Fill only the transparent areas at the top and bottom so the photograph continues seamlessly:
+- Top: continue the same softly out-of-focus white painted brick wall upward, calm and empty, gently darker toward the top, with the dark window frame and the shelves continuing only at the far left and right edges. No new objects, no ceiling lights, no plants in the center.
+- Bottom: continue the dark navy desk in the immediate foreground downward: its smooth, strongly out-of-focus front edge and surface, fading to deep navy near the bottom. Dark, smooth and uncluttered, no new objects.
+Match lighting, color grade, depth of field, grain and perspective exactly. No text, letters, logos or new elements.
