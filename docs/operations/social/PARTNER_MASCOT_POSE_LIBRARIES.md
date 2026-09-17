@@ -98,3 +98,21 @@ Tampoco es mascota de partner: es la marca propia completa, renderizada en Blend
   renderizado con el mismo `blender/render_logo.py` y las piezas de merch o señalética.
 - **Registro:** [bitácora](2026-09-17-efeonce-logo-3d-reference-kit-production-method.md) ·
   [`LEEME`](../../../ai-generations/2026-09-17_efeonce-logo-3d/LEEME.md).
+
+## Vestuario de marca (kits de prenda)
+
+Mismo contrato aplicado a la ropa: la referencia fija la prenda, el prompt fija la persona y la escena. Se usa al
+vestir a Nexa o a cualquier persona en una imagen generada, para que el modelo no invente espalda, capucha, puño ni
+caída.
+
+- **Hoodie Efeonce:** `5. Contenidos/13- Branding/Hoodie Efeonce/v01/` — 21 vistas (prenda sola, detalles, puesta en
+  cuerpo neutro sin rostro y variantes de color), 14 con transparente, más `efeonce-hoodie-manifiesto.json` y la
+  estampa canónica.
+- **Regla dura:** elegir la vista por el **ángulo de la toma** (de espaldas → vista de espalda) y pasarla junto con las
+  referencias de rostro y cuerpo de la persona. El texto de la prenda —logo completo + «Empower your Growth»— se
+  **compone determinísticamente** y entra como referencia; nunca se le pide al modelo. El emblema del pecho conserva el
+  tamaño del asset oficial y no se reduce.
+- **Próximas prendas:** polera y chaqueta, que se diseñan desde cero (no existe asset oficial); los pasos están en la
+  sección «Aplicar a otra prenda» de la bitácora.
+- **Registro:** [bitácora del método](2026-09-17-hoodie-efeonce-garment-reference-kit.md) ·
+  [`LEEME`](../../../ai-generations/2026-09-17_hoodie-efeonce/LEEME.md).

@@ -38,6 +38,10 @@ quedan como excepción, sólo con material exacto del kit y objeto chico o de de
 **letra por letra** contra el render (letras, órbita con sus cortes, ventanas), color sin deriva y perspectiva
 coherente; la firma de la pieza sigue siendo el SVG oficial compuesto con AXIS. Método y evidencia:
 [bitácora del kit 3D](social/2026-09-17-efeonce-logo-3d-reference-kit-production-method.md).
+**Vestir a una persona con ropa de marca** usa el mismo contrato: pasar la vista del
+[kit de prenda](social/2026-09-17-hoodie-efeonce-garment-reference-kit.md) que corresponde al **ángulo de la toma**
+(de espaldas → vista de espalda), junto con las referencias de rostro y cuerpo; el texto y los emblemas de la prenda se
+componen determinísticamente y nunca se le piden al modelo.
 
 ## Referente de seasonalities y destino editorial
 

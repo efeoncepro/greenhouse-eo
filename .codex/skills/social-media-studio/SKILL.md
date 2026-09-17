@@ -284,7 +284,7 @@ Las pruebas de un carril no certifican otros formatos ni rendimiento de audienci
 - `efeonce/` — overlay: `EFEONCE_OVERLAY.md`, `STUDIO_TOOLING.md`, `SOCIAL_BOUNDARY.md`,
   `CLIENT_DELIVERY.md`.
 
-Para logos sobre objetos, relieves y product placement físico: [brand-in-scene.md](references/brand-in-scene.md).
+Para logos sobre objetos, relieves, product placement físico y **vestuario de marca o merch**: [brand-in-scene.md](references/brand-in-scene.md).
 
 ## Referente de fechas y calendario editorial
 

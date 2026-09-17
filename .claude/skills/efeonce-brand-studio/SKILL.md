@@ -151,3 +151,18 @@ no firma. El kit sirve además para **exploraciones de material** (acero, alumin
 pasada directa entrega el render como forma y describe el material y el montaje en el prompt —elegir el render por
 luminancia, blanco para materiales claros y navy para oscuros—, sin pegarlo ni recolorearlo; el SVG oficial sigue
 siendo la firma. Método: [kit de logo 3D](../greenhouse-ai-image-generator/references/logo-3d-reference-kit.md).
+
+### Vestuario de marca (kit de prenda, hoodie entregado 2026-09-17)
+
+Los assets de marca viven todos en OneDrive `5. Contenidos/13- Branding/`: `SVG/` (nueve logos y símbolos),
+`Nave Efeonce 3D/`, `Logo Efeonce 3D/` y ahora `Hoodie Efeonce/v01/` — 21 vistas de la prenda (sola, detalles,
+planos cenitales, puesta en cuerpo neutro sin rostro, variantes blanco y gris) con manifiesto por vista. Antes de
+generar ropa de marca, reutilizar este kit. **Polera y chaqueta** vienen por el mismo método y **se diseñan desde
+cero**: no existe asset oficial, así que la prenda base es una decisión de marca —silueta, color, qué emblema, dónde
+y en qué tinta, qué variantes existen— que se cierra acá antes de producir la serie.
+
+**Regla dura:** la estampa con el eslogan **se compone, nunca se genera**. «Empower your Growth» se arma
+determinísticamente con los tres pesos del contrato de marca de `src/config/efeonce-brand.ts` (*Empower* Poppins
+ExtraBold itálica, *your* ExtraBold, *Growth* Black itálica) sobre el logo, y entra como referencia; pedirle el
+texto a un modelo de imagen es cómo se pierde la ortografía y los pesos. Método y producción:
+[kit de referencia de prenda](../greenhouse-ai-image-generator/references/garment-reference-kit.md).

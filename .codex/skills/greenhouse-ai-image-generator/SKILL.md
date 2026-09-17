@@ -512,6 +512,15 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
   escena, ~140 px editables) es la **excepción**: material exacto del kit + logo chico o detalle fino. QA letra por
   letra y composición determinística sólo como último recurso:
   [`references/logo-3d-reference-kit.md`](references/logo-3d-reference-kit.md).
+- **Vestir a alguien con ropa de marca o producir merch → kit de referencia de prenda, nunca describir la prenda en
+  el prompt.** La vista se elige por el **ángulo de la toma** (de espaldas → vista de espalda) y se pasa junto con
+  las referencias de rostro y cuerpo de la persona. El **texto de la prenda se compone determinísticamente** con los
+  pesos del contrato de marca y entra como imagen 2; al modelo nunca se le pide la ortografía. Proporciones
+  declaradas (emblema del pecho nunca se reduce; estampa de espalda al 38 % del ancho) + **contrato de realismo
+  verbatim** en todos los prompts, o la prenda sale con aspecto de render. Si cambia el contrato se rehace la serie
+  completa. El hoodie ya existe (21 vistas, OneDrive `13- Branding/Hoodie Efeonce/v01/`); para una prenda nueva que
+  se diseña desde cero, primero la prenda base aprobada y recién después las vistas:
+  [`references/garment-reference-kit.md`](references/garment-reference-kit.md).
 - Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md) ·
   [nave Efeonce 3D](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).
 

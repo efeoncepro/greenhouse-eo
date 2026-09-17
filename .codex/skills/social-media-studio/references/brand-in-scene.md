@@ -128,6 +128,8 @@ Caso aprobado: recepción de oficina premium 9:16 con **larga exposición** —a
 
 QA letra por letra en ambas vías («e», «f», nave, órbita con sus cortes, tres ventanas), color sin deriva y perspectiva coherente. Componer de forma determinística es el último recurso: se lee pegado, sin sombra ni profundidad integradas. La firma de la pieza sigue siendo el SVG oficial compuesto con AXIS.
 
+**Vestir a una persona con ropa de marca:** mismo contrato, con el [kit de referencia de prenda](../../greenhouse-ai-image-generator/references/garment-reference-kit.md) (hoodie Efeonce, OneDrive `13- Branding/Hoodie Efeonce/v01/`). Elegir la vista que corresponde al **ángulo de la toma** —de espaldas, la vista de espalda— y pasarla junto con las referencias de rostro y cuerpo; nunca describir la prenda en el prompt ni pedirle al modelo el texto de la estampa, que se compone aparte.
+
 No imponer «todos los logos van después del modelo» a esta ruta: confunde firma gráfica con objeto material.
 Tampoco imponer «todo product placement exige IA»: las rutas A/B permiten control físico y de identidad.
 La elección responde al encargo, al asset y al acabado.

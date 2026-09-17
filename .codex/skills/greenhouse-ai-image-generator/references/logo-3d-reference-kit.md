@@ -1,5 +1,10 @@
 # Logo 3D como referencia exacta: kit por escala y cámara (Blender)
 
+> **Alcance:** este documento cubre los **kits de referencia de forma de marca** —el logo 3D (§1–§8) y el
+> **vestuario** (§1.d)—. Todos comparten el mismo contrato: la referencia fija la forma, el prompt fija la escena.
+> El método completo de prenda, para producir un kit nuevo, vive en
+> [`garment-reference-kit.md`](garment-reference-kit.md); §1.d es su resumen operativo.
+
 Fuente de verdad: [`ai-generations/2026-09-17_efeonce-logo-3d/LEEME.md`](../../../../ai-generations/2026-09-17_efeonce-logo-3d/LEEME.md)
 (aprobado por el operador 2026-09-17). Bitácora:
 [`docs/operations/social/2026-09-17-efeonce-logo-3d-reference-kit-production-method.md`](../../../../docs/operations/social/2026-09-17-efeonce-logo-3d-reference-kit-production-method.md).

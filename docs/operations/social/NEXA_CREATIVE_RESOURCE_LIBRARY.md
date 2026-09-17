@@ -49,6 +49,10 @@ de producción. Aprendizaje: la identidad se mantuvo bien con esas dos referenci
 un plate nativo guiado por boceto; el isotipo del hoodie salió prácticamente igual al oficial, sin re-estampado. El
 rostro se validó a ojo contra las referencias. El hoodie es vestuario de esa campaña, no un atributo universal.
 
+Desde el 2026-09-17 existe un [kit de referencia de prenda](2026-09-17-hoodie-efeonce-garment-reference-kit.md) del
+hoodie (21 vistas en `13- Branding/Hoodie Efeonce/v01/`): es la referencia de vestuario a usar, eligiendo la vista por
+el **ángulo de la toma**, en lugar de un asset suelto del sitio público.
+
 ## Biblioteca de poses 3D (pendiente)
 
 El método usado el 2026-09-17 para las [bibliotecas de poses 3D de mascotas de partners](PARTNER_MASCOT_POSE_LIBRARIES.md)
