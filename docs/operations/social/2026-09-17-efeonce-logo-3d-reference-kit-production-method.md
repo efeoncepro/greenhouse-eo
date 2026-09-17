@@ -20,7 +20,7 @@ Aprobado el 2026-09-17 («todas me encantan»).
 | `Fuente oficial/` | `logo-efeonce-oficial.svg` (`public/branding/logo-full.svg`, `#023c70`) |
 | `Navy/Monumental/` | 9 cámaras × 2 luces × 2 variantes = 36 PNG + manifiesto |
 | `Navy/Grande/`, `Navy/Mediana/`, `Navy/Pequena/` | 8 cámaras × 2 luces × 2 variantes = 32 PNG + manifiesto cada una |
-| `Blanco/<escala>/` | Misma estructura. Al registrar, el blanco seguía en render y su carpeta aún no existía en OneDrive |
+| `Blanco/<escala>/` | Misma estructura; entregado el 2026-09-17 (136 PNG + 4 manifiestos). Cara frontal medida p50 ≈ 225 en todas las escalas |
 
 Cada render tiene variante `-transparente` y `-fondo-estudio`, con luz `luz-izq` y `luz-der`. El PNG va recortado al
 logo con 6 % de margen, así que su tamaño cambia por cámara (ejemplo: 2260×718 en la pequeña frontal). Nombre:
@@ -60,7 +60,7 @@ integrar el render en una escena.
 | En contrapicados media palabra salía 60 % más clara. Diagnóstico: medir por mitades apagando luz por luz hasta aislar la caja de luz principal reflejada en las caras | `visible_glossy = False` en el objeto luz (en Cycles, `specular_factor` de la luz se ignora) | La luz principal ilumina pero no debe reflejarse; un brillo desigual se diagnostica apagando las luces una por una y midiendo |
 | Regla de iluminación, necesaria al elevar el objeto | Luces relativas al centro real del objeto, incluida su elevación | La luz sigue al objeto, no a la escena |
 | Regla de proporción entre escalas (24 cm a 20 m) | Grosor de letra = 15 % del alto de la letra en todas las escalas; bisel ≈ 0,4 % del ancho | Proporciones relativas, no medidas absolutas, para que todas las escalas sean el mismo objeto |
-| Con la luz del navy el blanco quedaba gris (cara ≈ 203) | Subir la caja y bajar el entorno hasta que las caras leen blanco sin perder los costados | El blanco se calibra midiendo píxeles, no a ojo |
+| Con la luz del navy el blanco quedaba gris (cara ≈ 203) | Caja 60 000, sol 5, entorno 0,35: cara ≈ 225 con costados legibles | El blanco se calibra midiendo píxeles, no a ojo |
 
 ## 4. Cómo lo usa un agente
 
