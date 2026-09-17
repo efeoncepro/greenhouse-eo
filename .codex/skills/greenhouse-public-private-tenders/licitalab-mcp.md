@@ -22,7 +22,7 @@ Readback realizado el **2026-08-28**:
 
 - servidor: `LicitaLab AI Tools` `1.0.0`;
 - endpoint Streamable HTTP: `https://aiagents.licitalab.cl/api/mcp/licitalab-mcp-server/mcp`;
-- autenticación: OAuth del proveedor;
+- autenticación: OAuth del proveedor (API key sin OAuth desde 2026-09-17; ver §API key + CLI);
 - inventario: 5 tools, 0 resources y 0 resource templates;
 - todas las tools declaran `readOnlyHint: true` y `destructiveHint: false`;
 - canary ejecutado: `searchSupportTool` respondió `isError: false` con `structuredContent`.
@@ -51,6 +51,26 @@ abre una sesión nueva después de completar OAuth.
 Agrega un custom connector con el mismo endpoint, completa el OAuth de LicitaLAB y abre un chat nuevo. No escribas
 usuario o clave en archivos del repo ni en comandos versionables. La sesión del sitio `app.licitalab.cl` y el OAuth
 del MCP son autoridades distintas: que Chrome esté autenticado no prueba que el MCP lo esté, ni al revés.
+
+### API key + CLI `pnpm licitalab` (verificado 2026-09-17)
+
+Carril sin OAuth para agentes, scripts y runtime. La key vive en Secret Manager `greenhouse-licitalab-api-key`
+(`efeonce-group`; accessor: `greenhouse-portal` + operador) y se resuelve con `LICITALAB_API_KEY_SECRET_REF`.
+Viaja como `Authorization: Bearer` al mismo endpoint MCP (`x-api-key` responde 401); la REST `api2.licitalab.cl`
+no la acepta. Cliente canónico: `src/lib/commercial/tenders/licitalab/client.ts` — no crear otro fetch.
+
+| Comando                                           | Tool                           | Con API key                    |
+| ------------------------------------------------- | ------------------------------ | ------------------------------ |
+| `pnpm licitalab documents <código>`               | `listOpportunityDocumentsTool` | Opera                          |
+| `pnpm licitalab ask-docs <código> "<pregunta>"`   | `getOpportunityDocumentTool`   | Opera (cita archivo y página)  |
+| `pnpm licitalab support "<pregunta>"`             | `searchSupportTool`            | Opera                          |
+| `pnpm licitalab opportunity <código>`             | `findOpportunityTool`          | `unsupported`: exige OAuth     |
+| `pnpm licitalab provider <RUT>`                   | `providerReportTool`           | `unsupported`: exige OAuth     |
+
+`tools/list` sigue listando las 5: el inventario NO prueba que una tool opere con la key. Para ficha de oportunidad
+o reporte de proveedor usa el conector OAuth. `--json` entrega el payload crudo; exit `1` fallo de tool/red o
+`unsupported`, `2` uso inválido, `3` sin configurar. El servidor no siempre respeta `topK`: la salida de texto
+ordena por score y recorta; con `--json` recorta tú.
 
 ## Inventario live observado
 
