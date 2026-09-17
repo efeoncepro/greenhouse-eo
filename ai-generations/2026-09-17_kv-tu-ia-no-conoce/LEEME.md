@@ -85,3 +85,13 @@ Contraste peor caso: entrada 12,77 (4:5) / 12,16 (9:16) · remate 15,22 · texto
 Límites observados: la etiqueta del cursor «Claude» usa el tamaño del contrato AXIS (1,2 % del ancho) y a 390 px no se
 lee; el color del cursor colaborador sale de la paleta AXIS (violeta), no del naranja de Clawd. Ambos requieren
 extender el contrato AXIS (escala de etiqueta para campaña, color de participante), no parchear el render.
+
+### Corrección v04 — el «?» de Clawd (2026-09-17)
+
+El operador detectó que Clawd perdió el signo de interrogación. Causa: en el repintado del muro los cubos sueltos del
+«?» y el brazo derecho quedaron bajo el umbral del matte, fueron repintados y salieron deformados. Corrección en
+`wall/wall.mjs merge`: dentro del rectángulo de Clawd la figura se toma del plate aprobado por color naranja (sin
+dilatar, porque dilatar arrastraba un halo gris del muro viejo; suavizado 0,7 px) y los restos naranjas del repintado se
+cubren con el navy promedio de cada fila. Se regeneró el 4:5 (sólo merge del ancho) y se recompusieron ambos formatos;
+QA sin cambios. Regla transferible: cuando se repinta el fondo alrededor de una mascota con partes finas o sueltas,
+proteger la mascota con máscara propia verificada a zoom, no con el matte genérico del sujeto.
