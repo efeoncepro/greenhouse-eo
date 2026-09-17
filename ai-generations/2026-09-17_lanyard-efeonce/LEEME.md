@@ -57,6 +57,9 @@ Cinta de poliéster plano de 20 mm en navy `#023c70`, hebilla de seguridad, ganc
 | La primera versión mostraba un **portacredencial** (funda cerrada sobre el arte), no un portacarnet | Portacarnet de **marco rígido** abierto por un costado, con la cara del carnet expuesta; la distinción quedó escrita en el manifiesto |
 | El reverso liso y el carnet plano volvían como conjunto: las referencias del arte empujan a mostrar el logo | El reverso se generó **sin referencias**, describiendo que no hay impresión; el carnet plano no se genera: es el arte compuesto |
 | Los macros volvían como conjunto o como collage de dos paneles | Describir el encuadre por lo que **no** debe verse: «la silueta del lanyard NO aparece — sin lazo, sin gancho, sin fondo» |
+| El retrato del carnet quedó pegado al borde del círculo (corrección del operador) | El recorte se hace con `retrato-carnet.mjs`, que **gana aire** estirando y difuminando la franja superior de la propia foto en vez de acercarse más |
+| La chaqueta salió **lisa, sin el emblema bordado** (corrección del operador) | La corrida pasaba sólo el polo: la chaqueta se describía en palabras. Se pasa la vista `softshell 06-cierre-abierto` como referencia y se declara el emblema |
+| Con la chaqueta como referencia, el emblema salió del doble de su tamaño | El tamaño se declara como **proporción anclada a un objeto del mismo cuadro** («no más ancho que un tercio del panel del pecho, apenas más ancho que el carnet que cuelga»), nunca en centímetros |
 
 El retrato de la plantilla del carnet es de una persona ficticia generada para ese fin.
 
@@ -70,8 +73,23 @@ node arte-carnet.mjs <foto.png> "<Nombre Apellido>" "<Cargo>" <salida.png>
 
 El texto se escapa antes de entrar al SVG: un «&» en el cargo rompía el render.
 
+El retrato circular **no se recorta a mano**:
+
+```bash
+node retrato-carnet.mjs <foto.png> <retrato.png> [aire=0.09] [desplazamientoX=0]
+```
+
+Un retrato corporativo ya viene encuadrado corto; recortarlo cuadrado sin más deja la cara tocando el borde del
+círculo. El script estira y difumina la franja superior de la misma foto para ganar aire sobre la cabeza. Con
+`extendWith: 'mirror'` no funciona: si el borde ya toca el pelo, lo duplica y queda un mechón flotando.
+
 Modelo `gpt-image-2.5-sunburst`, xhigh; ~USD 0,14 por vista, 11 generaciones con descartes.
 
 ## Pruebas en persona
 
-El kit se probó en dos personas (`out/prueba-nexa.png`, `out/prueba-julio.png`): cinta, yoyo y carnet se mantienen consistentes, con el carnet mostrando el retrato y el nombre de cada uno. Se pasan las tres artes más las referencias de la persona y, en el caso de una persona real, al menos una foto de cuerpo entero para que la proporción no se deforme.
+El kit se probó en dos personas (`out/prueba-nexa.png`, `out/prueba-julio.png`, `out/prueba-julio-carnet.png`): cinta, yoyo y carnet se mantienen consistentes, con el carnet mostrando el retrato y el nombre de cada uno. Se pasan las tres artes más las referencias de la persona y, en el caso de una persona real, al menos una foto de cuerpo entero para que la proporción no se deforme.
+
+**Toda prenda que aparezca en la toma va como referencia, no como descripción.** La primera versión de
+`prueba-julio-carnet.png` pasaba sólo el polo y describía la chaqueta con palabras: el modelo la devolvió lisa, sin
+el emblema bordado. El orden de referencias que funciona es artes del kit → prendas (una vista por prenda, elegida
+por cómo se usa: chaqueta abierta → `06-cierre-abierto`) → persona (rostro + cuerpo entero).

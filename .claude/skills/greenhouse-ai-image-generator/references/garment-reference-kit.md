@@ -239,12 +239,30 @@ La estampa canónica (logo completo + eslogan al 38 % del ancho de la espalda) v
 
 No basta el ángulo de la toma: si en la pieza la chaqueta va **abierta**, la referencia es la vista de cierre abierto, no la de frente; si va sobre otra prenda, se pasan ambas (interior y exterior) como referencias separadas. Caso: `ai-generations/2026-09-17_nexa-vestuario/LEEME.md` (Nexa con polo y softshell, una pasada).
 
+## Delta 2026-09-17 — una prenda descrita es una prenda inventada
+
+Toda prenda que aparezca en la toma entra **como referencia**, no como descripción. Caso medido
+(`ai-generations/2026-09-17_lanyard-efeonce/LEEME.md`): una pasada pasó sólo el polo y describió la chaqueta con
+palabras —«navy softshell jacket»— y el modelo la devolvió **lisa, sin el emblema bordado**, aunque el emblema
+estaba nombrado en el prompt. Con la vista `softshell 06-cierre-abierto` como referencia el emblema volvió, bien
+orientado, en una sola pasada.
+
+Orden que funciona: **artes del kit → prendas (una vista por prenda, elegida por cómo se usa) → persona (rostro +
+cuerpo entero)**. Y declarar explícitamente que la prenda exterior **también** lleva emblema: al modelo le basta
+verlo en una sola prenda para dejar la otra limpia.
+
+**El tamaño del emblema se ancla a un objeto del mismo cuadro, no a centímetros.** Con la referencia puesta pero
+el tamaño en centímetros, el emblema salió del doble de lo que corresponde —la misma clase de error que las gorras
+sobredimensionadas—. Lo que lo corrige: «no más ancho que un tercio del panel del pecho, apenas más ancho que el
+carnet que cuelga en la misma toma».
+
 ## Delta 2026-09-17 — vestir a una persona real: referencias y proporción
 
 - **Nunca sólo retratos.** Con referencias de rostro el modelo construye el cuerpo desde la cara y saca la cabeza más grande que el cuerpo (caso medido: `ai-generations/2026-09-17_equipo-vestuario/LEEME.md`). Pasar siempre al menos una foto de **cuerpo entero** junto a una de rostro.
 - **Encuadre y óptica:** plano tres cuartos desde debajo de las rodillas, cámara a la altura del pecho y lente larga (≈135 mm) a varios metros; el plano cerrado con lente corta agranda lo cercano.
 - **Declarar la anatomía:** cabeza ≈ 1/7,5 de la altura, hombros más anchos que la cabeza, torso de largo natural, «nunca agrandar la cabeza ni encoger el cuerpo».
 - **Consentimiento:** una persona real sólo se genera con su consentimiento; los sets de referencia del equipo viven en OneDrive `13- Branding/Equipo/<Nombre>/` con su manifiesto.
+- **Retrato para una credencial:** un retrato corporativo ya viene encuadrado corto; recortarlo cuadrado sin más deja la cara tocando el borde del círculo. Se gana aire estirando y difuminando la franja superior de la propia foto (`ai-generations/2026-09-17_lanyard-efeonce/retrato-carnet.mjs`). `extendWith: 'mirror'` de sharp **no sirve** acá: si el borde superior ya toca el pelo, lo duplica y queda un mechón flotando sobre la cabeza.
 
 ## Merch con arte impreso y piezas mecánicas
 

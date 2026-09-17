@@ -1,6 +1,6 @@
 # Guía de uso de los kits de marca de Efeonce en imagen y video
 
-> **Tipo de documento:** Guía operativa para agentes · **Versión:** 1.0 · **Creado:** 2026-09-17 por Claude
+> **Tipo de documento:** Guía operativa para agentes · **Versión:** 1.1 · **Creado:** 2026-09-17 por Claude · **Actualizado:** 2026-09-17
 > **Método de producción de los kits:** [kits de prenda y merch](2026-09-17-hoodie-efeonce-garment-reference-kit.md) ·
 > [kit 3D del logo](2026-09-17-efeonce-logo-3d-reference-kit-production-method.md) ·
 > [bibliotecas 3D y vestuario](PARTNER_MASCOT_POSE_LIBRARIES.md)
@@ -47,15 +47,22 @@ pnpm ai:image --model gpt-image-2.5-sunburst --quality xhigh --size 1152x1440 --
 ```
 
 - **Orden de referencias:** primero la pieza cuya forma no se negocia, después las demás piezas, después la persona.
+- **Toda prenda que se vea entra como referencia.** Describirla en palabras no basta: una chaqueta sólo nombrada en
+  el prompt volvió lisa, sin su emblema bordado, aunque el emblema estaba escrito. Si hay dos prendas superpuestas,
+  van las dos, cada una con la vista que corresponde a cómo se usa.
 - **Si la pieza lleva un emblema**, sumar el **isotipo oficial** como referencia: el bordado se espeja con facilidad.
 - **Texto exacto nunca se genera.** Estampas, credenciales y cualquier lockup se componen con script y entran como
   referencia. La firma de la pieza sigue siendo el SVG oficial compuesto con AXIS.
 - **Vista que debe salir sin arte** (por ejemplo el reverso liso de una cinta): generar **sin referencias**, describiendo
   que no hay impresión.
+- **Retrato para una credencial:** un retrato corporativo ya viene corto; recortarlo cuadrado sin más deja la cara
+  tocando el borde del círculo. Se gana aire extendiendo el borde superior de la propia foto, nunca acercándose más.
 - **Personas reales:** nunca sólo retratos —el cuerpo se deforma y la cabeza sale grande—; sumar una foto de cuerpo
   entero, encuadrar desde bajo las rodillas con lente larga y declarar la anatomía. Y sólo con su consentimiento.
 - **Accesorios puestos:** declarar el **calce** (gorra de perfil bajo, ceñida, visera corta), o el modelo los escala de
   más.
+- **Tamaño de un emblema o aplicación:** anclarlo a algo del mismo cuadro («un tercio del panel del pecho», «apenas
+  más ancho que el carnet que cuelga»). En centímetros el modelo lo dibuja del doble.
 
 **QA obligatorio antes de usar la pieza:** letra por letra contra la referencia («e», «f», nave, órbita con sus cortes,
 tres ventanas), color sin deriva, emblema sin espejar —revisado **con recorte al 100 %**, porque en una hoja de
