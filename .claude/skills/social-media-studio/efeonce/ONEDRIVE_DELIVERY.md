@@ -46,6 +46,10 @@ para fondo oscuro; light es navy para fondo claro. No inferirlo al revés.
 [inventario y contrato de selección](../../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md)
 antes de reutilizarla; incluye rutas y particularidades Unicode verificadas.
 
+**Mascotas de partners:** `Recursos/Mascotas de partners/<Mascota (Partner)>/` con subcarpetas por familia y versión
+(p. ej. `Clawd (Claude)/Poses 3D/v01/` y `Poses 3D con accesorios/v01/`, cada pose en fondo de estudio y transparente).
+Método y límites: `ai-generations/2026-09-17_clawd-poses-3d/LEEME.md`.
+
 Ante una solicitud de buscar, adaptar, editar, reutilizar u organizar assets, comenzar en esta raíz y explorar
 sólo las categorías pertinentes. Identificar archivo fuente, marca, versión y uso antes de editar. Reutilizar
 recursos y plantillas adecuados; conservar originales y guardar derivados con nombre semántico y versión.
