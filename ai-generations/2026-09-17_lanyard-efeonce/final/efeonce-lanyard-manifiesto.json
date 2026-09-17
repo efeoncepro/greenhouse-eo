@@ -1,18 +1,20 @@
 {
-  "producto": "Lanyard Efeonce con yoyo (portacredencial retráctil)",
+  "producto": "Lanyard Efeonce con yoyo, portacarnet transparente y carnet",
   "artes_canonicas": {
-    "cinta": "efeonce-lanyard-arte-cinta-canonica.png — patrón repetido logo blanco · eslogan; «Empower your» en gris #848484 y «Growth» en blanco (traducción a escala de grises del lockup oficial, donde el prefijo va gris y la última palabra lleva el acento de color: Growth #173b6c)",
-    "yoyo": "efeonce-lanyard-arte-yoyo-canonica.png — disco blanco con el isotipo navy #023c70 bajo la resina"
+    "cinta": "efeonce-lanyard-arte-cinta-canonica.png — logo blanco repetido + eslogan; «Empower your» en gris CLARO #C8CEDA y «Growth» en blanco. El gris de marca #848484 no se usa aquí: sobre navy da 2,98:1 de contraste y no resuelve en serigrafía ni sublimado; el gris claro da 7,06:1",
+    "yoyo": "efeonce-lanyard-arte-yoyo-canonica.png — disco blanco con el isotipo navy #023c70 bajo la resina",
+    "carnet": "efeonce-carnet-plantilla.png — CR80 vertical: cabecera navy con el logo blanco, retrato circular, nombre en navy, cargo en gris y el eslogan al pie (Growth en navy como acento sobre blanco). Se compone con arte-carnet.mjs: `node arte-carnet.mjs <foto.png> \"<Nombre>\" \"<Cargo>\" <salida.png>`"
   },
   "invariantes": {
     "cinta": "poliéster plano 20 mm, navy #023c70, hebilla de seguridad, gancho giratorio metálico",
     "yoyo": "carcasa redonda 32 mm navy brillante, cúpula de resina, clip de acero, cordón de nylon",
-    "arte": "se compone determinísticamente con arte-lanyard.mjs; el texto exacto nunca se le pide al modelo"
+    "portacarnet": "plástico rígido transparente con ranura superior; el arte del carnet se ve a través del plástico",
+    "arte": "las tres artes se componen determinísticamente; el texto exacto nunca se le pide al modelo"
   },
   "vistas": [
     {
       "id": "01-conjunto",
-      "descripcion": "Lanyard completo con yoyo y credencial",
+      "descripcion": "Lanyard completo con yoyo y carnet en portacarnet transparente",
       "cuando_usarla": "vista general, catálogo, kit de bienvenida",
       "archivo_fondo_estudio": "efeonce-lanyard-01-conjunto-1200x1600-v01-fondo-estudio.png",
       "archivo_transparente": "efeonce-lanyard-01-conjunto-1200x1600-v01-transparente.png",
@@ -46,8 +48,19 @@
     {
       "id": "04-puesto",
       "descripcion": "Puesto sobre el polo navy, sin rostro",
-      "cuando_usarla": "piezas con persona, credencial en el pecho",
+      "cuando_usarla": "piezas con persona",
       "archivo_fondo_estudio": "efeonce-lanyard-04-puesto-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "05-carnet-portacarnet",
+      "descripcion": "Macro del carnet dentro del portacarnet transparente",
+      "cuando_usarla": "detalle del carnet y del portacarnet",
+      "archivo_fondo_estudio": "efeonce-lanyard-05-carnet-portacarnet-1200x1600-v01-fondo-estudio.png",
       "archivo_transparente": null,
       "resolucion": [
         1200,
