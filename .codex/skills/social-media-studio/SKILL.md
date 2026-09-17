@@ -76,6 +76,12 @@ Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes d
    `efeonce/CLIENT_DELIVERY.md`: la pieza social no es la unidad de crédito; identifica las operaciones
    generativas y separa layout/copy/export/QA, capacidad y derechos.
 
+### Formato de imagen: PNG siempre (regla dura)
+
+Las imágenes para social media se **generan y se publican en PNG** (posts, carruseles, documentos de LinkedIn desde
+imágenes, portadas). No derivar JPG para transporte ni por supuesta exigencia de la red: sólo ante un rechazo real
+observado, registrado y declarado. Detalle en [video-delivery-metricool.md](references/video-delivery-metricool.md) §3.
+
 ### Videos aprobados, portadas y programación
 
 Para entregar un video por red y programarlo con portada, cargar

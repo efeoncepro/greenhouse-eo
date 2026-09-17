@@ -14,7 +14,7 @@ necesariamente el cierre del video. No anticipar en ella un remate reservado al 
 recortes de perfil/feed y legibilidad reducida, además del lienzo completo.
 
 Guardar MP4 final con audio aprobado integrado y portada PNG master en la campaña de OneDrive.
-Mantener masters/versiones anteriores; un JPG de transporte no sustituye el PNG. Reabrir destino,
+Mantener masters/versiones anteriores; se publica el PNG (un JPG sólo existe ante un rechazo observado y nunca sustituye al PNG). Reabrir destino,
 comprobar dimensiones y SHA-256. Registrar duración, resolución, FPS, códecs y versión de audio.
 La aprobación de una cueca o pista se conserva: no regenerarla al adaptar el encuadre. Si se copia
 sin recodificar, un hash del stream de audio demuestra igualdad; no confundirlo con hash del MP4.
@@ -48,6 +48,19 @@ reintentar para no duplicar.
 
 ## 3. Transportar media y crear un post por red
 
+**Regla dura de formato (instrucción del operador, 2026-09-16): en social media las imágenes se generan y se
+publican en PNG.** Aplica a posts estáticos, carruseles de Instagram, documentos de LinkedIn armados desde imágenes
+y portadas de video. El JPG no garantiza la calidad: suma una compresión con pérdida antes de la que la plataforma
+aplique por su cuenta.
+
+- Generar con `--format png` (`pnpm ai:image` / `pnpm ai:fal`) y componer/exportar el master en PNG sRGB.
+- Subir al bucket de campañas y pasar a Metricool **las URLs de los PNG**. Nunca derivar un JPG «de transporte» por
+  costumbre ni por suponer que la red lo exige.
+- Única excepción: un rechazo real y observado del conector o la red para ese PNG (error con evidencia). Registrar el
+  error, derivar el JPG con la máxima calidad (q ≥ 95, 4:4:4) y declararlo en la entrega. Una suposición no es evidencia.
+- Caso que motivó la regla: «Hay frases que no se tocan» (Instagram 377234791 y LinkedIn 377235636, 2026-09-16) se
+  programó con JPEG q95 derivados de PNG sin que nada lo exigiera; el operador lo corrigió.
+
 Descubrir el schema MCP actual. El conector usado exponía `createScheduledPost` con `blogId`,
 `date`, `info` (JSON serializado) y `mediaFiles`; no asumir que acepta directamente todos los campos
 del objeto interno. Mantener las fechas del envoltorio y `publicationDate` coherentes.
@@ -58,9 +71,8 @@ del objeto interno. Mantener las fechas del envoltorio y `publicationDate` coher
 - Subir nombres versionados y `content-type` explícito. Verificar HTTP 200 y tipo correcto de video
   e imagen. Si cambia el archivo, usar URL nueva para evitar contenido anterior en caché.
 - `media` contiene el MP4; la portada va en **`videoThumbnailUrl`**, no como segundo elemento de
-  `media`. En el caso se admitieron JPEG (Fiestas Patrias) y PNG (Día de Muertos). No convertir
-  preventivamente todo a JPEG por una supuesta limitación: conservar PNG master y derivar sólo
-  cuando el transporte lo requiera.
+  `media`. En el caso se admitieron JPEG (Fiestas Patrias) y PNG (Día de Muertos): **PNG es el default**
+  (regla dura de formato, arriba); JPEG sólo ante un rechazo observado.
 - Metricool re-alojó ambos recursos en `static.metricool.com/planner/...`; verificar media nativa y
   thumbnail persistidos. Una URL en el cuerpo del copy no equivale a adjuntar el video.
 - Crear una publicación por red cuando copy u hora difieran. La portada puede compartirse si su

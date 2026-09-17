@@ -99,8 +99,8 @@ La aprobación del estático no aprueba automáticamente el video. Ver
 Cuando se solicite guardar y programar, conservar las versiones de trabajo ya entregadas y consolidar
 los archivos vigentes en `Entrega para publicación/` dentro del concepto, si evita ambigüedad. Incluir
 un MP4 y portada por formato solicitado, PNG master, copy por red y `PROGRAMACION.md` con IDs,
-fecha/hora/zona y estado verificado. Un JPG necesario para transporte es un derivado adicional;
-no sustituye el PNG ni supone permiso para reemplazarlo. Si la versión ya constituye un paquete
+fecha/hora/zona y estado verificado. Se publica el PNG (regla dura de formato en `SKILL.md`); un JPG sólo
+existe ante un rechazo observado del conector o la red, no sustituye el PNG ni supone permiso para reemplazarlo. Si la versión ya constituye un paquete
 inequívoco, registrar programación allí sin duplicar por obligación.
 
 Validar también el archivo de portada: ratio y recorte, legibilidad, firma y correspondencia con el
