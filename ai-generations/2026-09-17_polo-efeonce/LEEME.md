@@ -30,5 +30,6 @@ sobre tono porque el logo se perdía.
 | El bordado tono sobre tono hacía desaparecer el logo | Hilo blanco sobre navy; el tonal se descarta para uso corporativo |
 | Varias vistas volvieron como par frente+espalda o con un círculo de zoom | Exigir «una sola fotografía de una sola prenda: ni par, ni díptico, ni collage, ni inset» |
 | Los detalles salían como prenda completa | Pedir **encuadre macro explícito**: «el bordado llena el cuadro y el resto de la prenda queda fuera» |
+| **El emblema salía espejado** (nave apuntando a la izquierda) en las cuatro vistas blancas y en dos navy (percha y segundo cuerpo) | Pasar el **isotipo oficial** (`ref/isotipo-oficial.png`) como imagen 2 y describir su geometría: nave a la derecha, aletas abajo a la izquierda, órbita como elipse ancha con cortes, planeta arriba. Verificar el emblema **vista por vista** con recortes al 100 %: el defecto no se ve en la hoja de contacto |
 
 Modelo `gpt-image-2.5-sunburst`, xhigh; ~USD 0,14 por vista, 29 generaciones con descartes.
