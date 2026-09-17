@@ -130,6 +130,8 @@ QA letra por letra en ambas vías («e», «f», nave, órbita con sus cortes, t
 
 **Vestir a una persona con ropa de marca:** mismo contrato, con el [kit de referencia de prenda](../../greenhouse-ai-image-generator/references/garment-reference-kit.md) (OneDrive `13- Branding/Hoodie Efeonce/v01/` y `Polo Efeonce/v01/`). Elegir la vista que corresponde al **ángulo de la toma** —de espaldas, la vista de espalda— y pasarla junto con las referencias de rostro y cuerpo; nunca describir la prenda en el prompt ni pedirle al modelo el texto de la estampa, que se compone aparte.
 
+**Si en la escena aparece credencial o merch** (lanyard, yoyo, portacarnet, carnet, tazón, libreta de marca), usar las vistas del mismo kit y las **artes canónicas** compuestas —nunca pedirle el arte impreso al modelo—: [merch con arte impreso](../../greenhouse-ai-image-generator/references/garment-reference-kit.md#merch-con-arte-impreso-y-piezas-mecánicas).
+
 **La prenda la elige el contexto de la escena, no la costumbre:** frente a cliente el polo piqué navy, formal camisa + softshell o blazer navy, evento la polera, producción y terreno el hoodie o la gorra. No vestir siempre con hoodie. La cápsula completa y sus reglas duras están en [`efeonce-brand-studio`](../../efeonce-brand-studio/SKILL.md) → «Vestuario de marca».
 
 No imponer «todos los logos van después del modelo» a esta ruta: confunde firma gráfica con objeto material.

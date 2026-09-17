@@ -99,11 +99,11 @@ Tampoco es mascota de partner: es la marca propia completa, renderizada en Blend
 - **Registro:** [bitácora](2026-09-17-efeonce-logo-3d-reference-kit-production-method.md) ·
   [`LEEME`](../../../ai-generations/2026-09-17_efeonce-logo-3d/LEEME.md).
 
-## Vestuario de marca (kits de prenda)
+## Vestuario de marca (kits de prenda y merch)
 
 Mismo contrato aplicado a la ropa: la referencia fija la prenda, el prompt fija la persona y la escena. Se usa al
 vestir a Nexa o a cualquier persona en una imagen generada, para que el modelo no invente espalda, capucha, puño ni
-caída.
+caída. El mismo contrato cubre el **merch con arte impreso**, donde la referencia fija el arte y el objeto.
 
 - **Hoodie Efeonce:** `5. Contenidos/13- Branding/Hoodie Efeonce/v01/` — 21 vistas (prenda sola, detalles, puesta en
   cuerpo neutro sin rostro y variantes de color), 14 con transparente, más `efeonce-hoodie-manifiesto.json` y la
@@ -116,6 +116,11 @@ caída.
   completo de 15; blanco con bordado navy, set esencial de 6), 13 con transparente, más `efeonce-polo-manifiesto.json`.
   Emblema **bordado** de ~7 cm en el pecho izquierdo y **espalda limpia**.
   [`LEEME`](../../../ai-generations/2026-09-17_polo-efeonce/LEEME.md).
+- **Lanyard Efeonce (merch con arte impreso):** `5. Contenidos/13- Branding/Lanyard Efeonce/v01/` — 12 vistas + 3 artes
+  canónicas (cinta, yoyo y carnet) más `efeonce-lanyard-manifiesto.json`. Incluye el **carnet compuesto**: plantilla
+  CR80 vertical que se arma con la foto, el nombre y el cargo de la persona y va dentro de un **portacarnet** de marco
+  rígido, con la cara expuesta —no una funda cerrada, que es un portacredencial—. El carnet en plano **no se genera**:
+  es el arte compuesto. [`LEEME`](../../../ai-generations/2026-09-17_lanyard-efeonce/LEEME.md).
 - **Cápsula por contexto:** cada prenda tiene su contexto de uso —polo frente a cliente, camisa o blusa con chaqueta
   para comité y licitación, polera para evento, hoodie y gorra para producción—; en prendas formales el emblema va
   bordado y sin eslogan, y la estampa de espalda con eslogan es lenguaje de merch. Tabla completa en la

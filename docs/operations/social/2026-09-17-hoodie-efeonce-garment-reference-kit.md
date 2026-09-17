@@ -1,4 +1,4 @@
-# Hoodie Efeonce (2026): kit de referencia de prenda
+# Hoodie Efeonce (2026): kit de referencia de prenda y de merch de marca
 
 Fecha de registro: 2026-09-17. Owner: Social Media Studio / Efeonce.
 Caso: vistas fotográficas del hoodie de Efeonce para pasarlas como referencia cuando hay que vestir a Nexa o a
@@ -6,6 +6,10 @@ cualquier persona en una imagen generada, de modo que **el modelo no invente la 
 caída). Bitácora técnica y creativa; el inventario de vistas y el uso operativo viven en
 [`LEEME.md`](../../../ai-generations/2026-09-17_hoodie-efeonce/LEEME.md) (binarios fuera de git). Caso hermano:
 [kit de referencia del logo 3D](2026-09-17-efeonce-logo-3d-reference-kit-production-method.md).
+
+Aunque nació con el hoodie, el archivo es el **método de kits de prenda y de merch de marca**: el mismo contrato cubre
+cualquier objeto que lleve arte de marca impreso encima. La extensión a merch —lanyard, yoyo, portacarnet y carnet— está
+en [§9](#9-merch-con-arte-impreso-lanyard-yoyo-portacarnet-y-carnet).
 
 ## 1. Qué es y para qué
 
@@ -142,3 +146,61 @@ izquierdo. Registro: [`LEEME`](../../../ai-generations/2026-09-17_polo-efeonce/L
 **Próxima prenda:** chaqueta softshell navy — cierre completo con tapeta interior, cuello alto, bolsillos con cierre
 oculto, puños ajustables, **sin capucha** para que funcione sobre el polo; emblema bordado en el pecho y opcional en la
 manga.
+
+## 9. Merch con arte impreso (lanyard, yoyo, portacarnet y carnet)
+
+Extensión del mismo contrato a un objeto que no se viste: **la referencia fija el arte, el prompt fija el objeto y la
+escena**. Todo lo de §3 (el texto se compone, no se genera), §4 (contrato de realismo, encuadre macro declarado por lo
+que queda fuera, rehacer la serie si cambia el contrato) y §5 (QA vista por vista) aplica igual y no se repite acá.
+Lo que cambia es que el merch suma **piezas mecánicas** —herrajes, resortes, clips— y **piezas planas** —una tarjeta—,
+y cada una tiene su propia forma de salir mal.
+
+**Caso entregado:** lanyard Efeonce con yoyo, portacarnet y carnet. **12 vistas + 3 artes canónicas** en
+`5. Contenidos/13- Branding/Lanyard Efeonce/v01/` con `efeonce-lanyard-manifiesto.json`. Producto: cinta de poliéster
+plano de 20 mm en navy `#023c70` con hebilla de seguridad y gancho giratorio metálico; yoyo redondo de 32 mm navy
+brillante con cúpula de resina, clip de acero y cordón de nylon. Modelo `gpt-image-2.5-sunburst`, `xhigh`; ~USD 0,14 por
+vista, 11 generaciones con descartes. Registro:
+[`LEEME`](../../../ai-generations/2026-09-17_lanyard-efeonce/LEEME.md).
+
+Artes canónicas compuestas (nunca generadas): la **cinta**, con el patrón que alterna logo negativo y eslogan y el paso
+calculado desde el ancho real de cada pieza; el **yoyo**, disco blanco con el isotipo navy `#023c70` para ir bajo la
+resina; y el **carnet** CR80 vertical, con cabecera navy, retrato circular, nombre, cargo y eslogan al pie.
+
+### Vistas que cierran reinterpretación
+
+La lista del lanyard, leída como criterio transferible a cualquier merch:
+
+| Vista | Qué vía de reinterpretación cierra |
+|---|---|
+| Conjunto y conjunto colgado | Forma general y caída natural |
+| Macro de la cara impresa y producto estirado de extremo a extremo | Ritmo del patrón y base de mockups |
+| Macro de la cara trasera | Declara que el reverso va **liso**, sin impresión |
+| Macro de herrajes | Gancho, hebilla y regulador: la parte que el modelo inventa con más libertad |
+| Macro de la pieza mecánica por delante y por detrás | Construcción real (resina por delante, clip por detrás), no una cara pegada |
+| La pieza vacía, sin contenido | Evita que se confunda con otra pieza parecida |
+| Contenido montado + su arte en plano | Diseño y cómo se ve puesto |
+| En la mano | Escala real |
+| Puesto en una persona | Referencia de uso |
+
+### Reglas nuevas
+
+1. **Gris imprimible sobre navy.** El gris de marca `#848484` da **2,98:1** de contraste sobre navy `#023c70` y no
+   resuelve en serigrafía ni sublimado. En el eslogan impreso se usa **gris claro `#C8CEDA`** (7,06:1) para «Empower
+   your» y blanco para «Growth» (11,15:1). Es una **excepción declarada para sustratos oscuros impresos**, no un cambio
+   del color de marca: en pantalla y PDF el eslogan sigue en `#848484`.
+2. **Portacarnet ≠ portacredencial** (corrección del operador). El **portacarnet** es un marco rígido transparente que
+   sujeta la tarjeta por los bordes, abierto por un costado, con la cara del carnet **expuesta**. El
+   **portacredencial** es la funda cerrada que cubre el arte con una lámina. Si no se declara cuál es en el prompt, el
+   modelo devuelve la funda.
+3. **La vista que debe salir SIN el arte se genera sin referencias.** Pasar el arte empuja al modelo a imprimir el logo
+   igual aunque el prompt diga lo contrario; el reverso liso se resolvió describiendo que no hay impresión y **sin
+   imágenes de referencia**.
+4. **Lo plano no se genera.** Una tarjeta, una etiqueta o cualquier cara plana es el arte compuesto, no una generación:
+   pedírsela al modelo solo reintroduce el riesgo de que reescriba el texto.
+5. **La prueba en persona cierra el kit.** Se pasan las artes canónicas más las referencias de la persona, igual que en
+   §6, y si es una persona real se suma al menos una foto de **cuerpo entero**: con solo retratos el modelo agranda la
+   cabeza (regla de proporción al vestir personas, en la referencia `garment-reference-kit.md` de la skill
+   `greenhouse-ai-image-generator`). El kit se probó en Nexa —carnet como agente de IA— y en el operador.
+
+**Pendiente conocido:** el cargo del operador no está declarado en el repo, así que su carnet real queda sin esa línea
+hasta que lo confirme.

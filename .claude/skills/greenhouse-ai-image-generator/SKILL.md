@@ -512,8 +512,8 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
   escena, ~140 px editables) es la **excepción**: material exacto del kit + logo chico o detalle fino. QA letra por
   letra y composición determinística sólo como último recurso:
   [`references/logo-3d-reference-kit.md`](references/logo-3d-reference-kit.md).
-- **Vestir a alguien con ropa de marca o producir merch → kit de referencia de prenda, nunca describir la prenda en
-  el prompt.** La vista se elige por el **ángulo de la toma** (de espaldas → vista de espalda) y se pasa junto con
+- **Vestir a alguien con ropa de marca, o producir merch y credencial (lanyard, yoyo, portacarnet, carnet) → kit de
+  referencia de prenda y merch, nunca describir la pieza en el prompt.** La vista se elige por el **ángulo de la toma** (de espaldas → vista de espalda) y se pasa junto con
   las referencias de rostro y cuerpo de la persona. El **texto de la prenda se compone determinísticamente** con los
   pesos del contrato de marca y entra como imagen 2; al modelo nunca se le pide la ortografía. Proporciones
   declaradas (emblema del pecho nunca se reduce; estampa de espalda al 38 % del ancho) + **contrato de realismo
@@ -521,8 +521,11 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
   completa. Si el emblema va **bordado**, se espeja: pasar el isotipo oficial rasterizado como imagen 2 y revisar el
   pecho vista por vista al 100 %. Hoodie y polo ya existen (21 vistas cada uno, OneDrive `13- Branding/`), y **la
   prenda la elige el contexto de la escena**, no la costumbre; para una prenda nueva que se diseña desde cero,
-  primero la prenda base aprobada y recién después las vistas:
-  [`references/garment-reference-kit.md`](references/garment-reference-kit.md).
+  primero la prenda base aprobada y recién después las vistas. En **merch con arte impreso y piezas mecánicas**
+  (lanyard con yoyo, portacarnet y carnet, 12 vistas en `13- Branding/Lanyard Efeonce/v01/`) valen las mismas
+  reglas más tres propias: lo **plano se compone, no se genera**; la vista que debe salir **sin arte se genera sin
+  referencias**; y la pieza se **nombra con precisión** (portacarnet de marco rígido ≠ portacredencial) o vuelve la
+  genérica: [`references/garment-reference-kit.md`](references/garment-reference-kit.md).
 - Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md) ·
   [nave Efeonce 3D](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).
 

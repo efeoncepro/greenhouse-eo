@@ -181,3 +181,17 @@ determinísticamente con los tres pesos del contrato de marca de `src/config/efe
 ExtraBold itálica, *your* ExtraBold, *Growth* Black itálica) sobre el logo, y entra como referencia; pedirle el
 texto a un modelo de imagen es cómo se pierde la ortografía y los pesos. Método y producción:
 [kit de referencia de prenda](../greenhouse-ai-image-generator/references/garment-reference-kit.md).
+
+### Sistema de credencial (lanyard, yoyo, portacarnet y carnet — aprobado 2026-09-17)
+
+La credencial es un asset de marca más, en OneDrive `5. Contenidos/13- Branding/Lanyard Efeonce/v01/`: cinta navy
+`#023c70` con el logo blanco repetido y el eslogan, yoyo con el isotipo navy bajo resina, **portacarnet de marco
+rígido** —no una funda cerrada sobre el arte: eso es un portacredencial, otra pieza— y carnet CR80 con logo,
+retrato, nombre y cargo. 12 vistas + las 3 artes canónicas, con manifiesto. Antes de generar credenciales,
+reutilizar este kit; las artes se componen, como la estampa.
+
+**Excepción de color declarada:** sobre navy **impreso**, el prefijo del eslogan va en **gris claro `#C8CEDA`** en
+vez del gris de marca `#848484`, que da 2,98:1 de contraste y no resuelve en serigrafía ni sublimado (el gris claro
+da 7,06:1; «Growth» en blanco, 11,15:1). Es una excepción de legibilidad para sustratos oscuros impresos, **no
+drift**: en pantalla y sobre fondos claros el gris de marca sigue vigente. Método:
+[merch con arte impreso](../greenhouse-ai-image-generator/references/garment-reference-kit.md#merch-con-arte-impreso-y-piezas-mecánicas).

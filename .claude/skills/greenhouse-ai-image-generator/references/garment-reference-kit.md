@@ -242,12 +242,52 @@ No basta el ángulo de la toma: si en la pieza la chaqueta va **abierta**, la re
 - **Declarar la anatomía:** cabeza ≈ 1/7,5 de la altura, hombros más anchos que la cabeza, torso de largo natural, «nunca agrandar la cabeza ni encoger el cuerpo».
 - **Consentimiento:** una persona real sólo se genera con su consentimiento; los sets de referencia del equipo viven en OneDrive `13- Branding/Equipo/<Nombre>/` con su manifiesto.
 
-## Delta 2026-09-17 — merch con arte impreso (lanyard con yoyo)
+## Merch con arte impreso y piezas mecánicas
 
-El método vale para merch, no sólo ropa: `ai-generations/2026-09-17_lanyard-efeonce/LEEME.md`.
-- **El arte se compone, el producto se genera.** Patrón de la cinta y cara del yoyo se arman con un script desde
-  los archivos oficiales y entran como referencia; el texto exacto nunca se genera.
-- **Paso del patrón calculado desde el ancho real** de cada pieza más un espacio; fijarlo a mano solapa el logo
-  con el eslogan.
-- **Eslogan en dos tonos:** el lockup oficial lleva «Empower your» en gris `#848484` y la última palabra con el
-  acento de color (Growth `#173b6c`); sobre navy se traduce a escala de grises con «Growth» en blanco.
+El método vale para merch, no sólo ropa. Caso aprobado 2026-09-17:
+[lanyard con yoyo, portacarnet y carnet](../../../../ai-generations/2026-09-17_lanyard-efeonce/LEEME.md) — 12 vistas
++ 3 artes canónicas.
+
+**El arte se compone, el producto se genera.** Patrón de la cinta, cara del yoyo y carnet se arman con un script
+desde los archivos oficiales y entran como referencia; el texto exacto nunca se genera. El **paso del patrón se
+calcula desde el ancho real de cada pieza** más un espacio: fijarlo a mano solapa el logo con el eslogan.
+**Lo plano no se genera:** el carnet, la tarjeta o la etiqueta en plano **son** el arte compuesto, no una
+generación.
+
+### Vistas que cierran reinterpretación
+
+Además de las familias de §2, cualquier merch con arte impreso y partes mecánicas necesita:
+
+| Vista | Qué cierra |
+|---|---|
+| Producto estirado / plano de extremo a extremo | ritmo del patrón; base de mockups |
+| Cara trasera en macro | que va lisa, sin impresión |
+| Herrajes en macro | gancho giratorio, hebilla, regulador |
+| Reverso de la pieza mecánica | cómo está construida por detrás (clip, resorte, resina) |
+| Pieza vacía, sin contenido | qué es la pieza sola, sin lo que la explica |
+| Conjunto colgado | caída natural |
+| En la mano | escala real |
+
+⚠️ **La vista que debe salir SIN el arte se genera sin referencias.** Pasar el arte empuja al modelo a imprimir el
+logo igual; el reverso liso se resolvió describiendo que no hay impresión y sin ninguna imagen de referencia.
+
+### Contraste del texto sobre sustrato oscuro impreso
+
+El lockup oficial lleva el prefijo en gris `#848484` y la última palabra con el acento de color (Growth `#173b6c`).
+Ese gris **sobre navy `#023c70` impreso da 2,98:1** y no resuelve en serigrafía ni sublimado. En impresión sobre
+navy, «Empower your» va en **gris claro `#C8CEDA`** (7,06:1) y «Growth» en blanco (11,15:1). Es una **excepción
+declarada para sustratos oscuros**, no un cambio del color de marca: se escribe en el manifiesto.
+
+### Nombrar la pieza con precisión
+
+Si el prompt no la distingue, el modelo devuelve la pieza genérica de la categoría. **Portacarnet ≠
+portacredencial:** el portacarnet es un **marco rígido** transparente que sujeta la tarjeta por los bordes, abierto
+por un costado, con la cara del carnet **expuesta**; el portacredencial es la funda cerrada que cubre el arte con
+una lámina. La primera pasada volvió con la funda. La distinción se escribe en el prompt **y** en el manifiesto.
+
+### Prueba en persona: el cierre del kit
+
+El kit no está listo hasta verlo puesto en alguien: se pasan las artes canónicas más las referencias de la persona
+y, si es una persona real, al menos una foto de **cuerpo entero** (delta de proporción, arriba). El lanyard se probó
+en Nexa y en el operador. El dato que no está confirmado —el cargo del operador— queda **fuera** del arte; no se
+inventa para llenar la línea.
