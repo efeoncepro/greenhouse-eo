@@ -204,6 +204,59 @@ export const formatProviderReport = (payload: unknown) => {
   return lines.join('\n')
 }
 
+export interface SearchFormatInput {
+  view: string
+  collected: number
+  match: string | null
+  reportPath: string
+  enriched: boolean
+  opportunities: AnyRecord[]
+}
+
+export const formatSearchResult = (result: SearchFormatInput) => {
+  const scope = result.view === 'recommended' ? 'Recomendadas' : 'Todas'
+
+  const lines = [
+    `${scope} · ${result.collected} recolectadas${result.match ? ` · filtro "${result.match}": ${result.opportunities.length}` : ''}`,
+    `Reporte: ${result.reportPath}`
+  ]
+
+  if (!result.opportunities.length) {
+    lines.push('', result.match ? 'Ningún resultado calza con el filtro en lo recolectado (prueba --view all o más --max).' : 'Sin oportunidades.')
+
+    return lines.join('\n')
+  }
+
+  result.opportunities.forEach((opportunity, index) => {
+    const score = typeof opportunity.scorePct === 'number' ? `${opportunity.scorePct}%` : '—'
+
+    lines.push(
+      '',
+      `${index + 1}. [${score}] ${opportunity.code} · ${opportunity.title ?? 'sin título'}`,
+      `   ${opportunity.buyer ?? '—'}${opportunity.buyerRegion ? ` · ${opportunity.buyerRegion}` : ''}`,
+      `   Monto ${opportunity.amountText ?? '—'} · cierre ${opportunity.closeText ?? '—'}`
+    )
+
+    if (!result.enriched) return
+
+    const detail = isRecord(opportunity.detail) ? opportunity.detail : null
+    const documents = isRecord(opportunity.documents) ? opportunity.documents : null
+
+    lines.push(
+      detail
+        ? `   Ficha: ${detail.status ?? '—'} · ${detail.type ?? '—'} · estimado ${clp(detail.estimatedAmount, detail.currency ?? 'CLP')} · cierre ${day(detail.closesAt)}`
+        : `   Ficha: no disponible (${opportunity.detailError ?? 'sin detalle'})`,
+      documents
+        ? `   Documentos: ${documents.total} (${documents.searchable} consultables con ask-docs)`
+        : `   Documentos: no disponibles (${opportunity.documentsError ?? 'sin detalle'})`
+    )
+  })
+
+  lines.push('', 'El score es priorización de LicitaLAB, no un GO: revisa bases con ask-docs antes de decidir.')
+
+  return lines.join('\n')
+}
+
 const formatSupport = (payload: unknown) => (isRecord(payload) && typeof payload.answer === 'string' ? payload.answer : asJson(payload))
 
 export const formatLicitalabResult = (command: string, payload: unknown, options: { topK?: number } = {}): string => {

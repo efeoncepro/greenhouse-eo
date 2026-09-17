@@ -75,7 +75,16 @@ dinámico + PKCE, sólo `authorization_code` y **no emite refresh token**; su fo
 distinto de la sesión web `app.licitalab.cl`. `pnpm licitalab login` lo completa con Playwright (Chrome) y la
 credencial de `pnpm licitalab:radar:setup`; si no hay token vigente, `opportunity`/`provider` hacen ese login solos
 (`--no-login` lo impide, `--headed` lo muestra). `pnpm licitalab session` informa el estado sin imprimir el token;
-`logout [--forget-client]` lo borra. Este carril no existe en runtime (Vercel/Cloud Run): allí sólo opera la key. `--json` entrega el payload crudo; exit `1` fallo de tool/red o
+`logout [--forget-client]` lo borra. Este carril no existe en runtime (Vercel/Cloud Run): allí sólo opera la key.
+
+**Búsqueda (`pnpm licitalab search`).** El MCP no busca: sólo consulta por código. `search` ejecuta el radar
+Playwright (`licitalab-radar-playwright.md`) sin ventana, lee su reporte en `.auth/licitalab-radar-reports/` y
+opcionalmente hidrata cada código (`--enrich`: ficha con la sesión OAuth + inventario de documentos con la key).
+`--view recommended|all`, `--max 1-500`, `--match "texto"` filtra LOCALMENTE lo recolectado (no busca en LicitaLAB:
+un término fuera de las primeras `--max` filas no aparece). La sesión web del radar es otra autoridad: si venció,
+el radar inicia sesión con la credencial guardada (`--no-login` lo impide, `--headed` lo muestra). El score del
+listado nunca es un GO.
+ `--json` entrega el payload crudo; exit `1` fallo de tool/red o
 `unsupported`, `2` uso inválido, `3` sin configurar. El servidor no siempre respeta `topK`: la salida de texto
 ordena por score y recorta; con `--json` recorta tú.
 

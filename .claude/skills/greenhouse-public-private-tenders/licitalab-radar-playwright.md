@@ -61,7 +61,11 @@ pnpm licitalab:radar -- --check-only
 pnpm licitalab:radar -- --view recommended --max-opportunities 50
 pnpm licitalab:radar -- --view all --max-opportunities 200
 pnpm licitalab:radar -- --force-login
+pnpm licitalab:radar -- --headless --no-login
 ```
+
+Para uso diario prefiere `pnpm licitalab search [--enrich]`, que corre este radar sin ventana y muestra el resultado
+(y, con `--enrich`, ficha y documentos por MCP). Ver `licitalab-mcp.md` §API key + CLI.
 
 El reporte público queda bajo `.auth/licitalab-radar-reports/`, con permisos `0600`, y contiene código, título,
 score, organismo comprador, región, monto y cierre visibles. El runner:

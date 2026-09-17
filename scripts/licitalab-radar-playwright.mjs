@@ -60,7 +60,7 @@ return
 
   context = await chromium.launchPersistentContext(profilePath, {
     channel: 'chrome',
-    headless: false,
+    headless: options.headless,
     viewport: { width: 1440, height: 980 },
     acceptDownloads: false
   })
@@ -100,6 +100,7 @@ function printUsage() {
   pnpm licitalab:radar
   pnpm licitalab:radar -- --check-only
   pnpm licitalab:radar -- --force-login
+  pnpm licitalab:radar -- --headless --no-login   (sin ventana; falla si la sesión venció)
   pnpm licitalab:radar -- --view recommended
   pnpm licitalab:radar -- --view all --max-opportunities 200
   pnpm licitalab:radar -- --output .auth/licitalab-radar-reports/mi-revision.json
@@ -169,6 +170,10 @@ async function readCredentialsOptional() {
 
 async function ensureAuthenticated(page, credentials) {
   if (!options.forceLogin && (await isAuthenticated(page))) return
+
+  if (options.noLogin) {
+    throw new Error('la sesión web de LicitaLAB no está vigente y se pidió --no-login')
+  }
 
   if (!credentials) {
     throw new Error('LicitaLAB requiere login; ejecuta pnpm licitalab:radar:setup en una terminal interactiva')

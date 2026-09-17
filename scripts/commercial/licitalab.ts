@@ -26,7 +26,7 @@ import {
   type LicitalabToolResult
 } from '@/lib/commercial/tenders/licitalab/client'
 
-import { formatLicitalabResult } from './licitalab-format'
+import { formatLicitalabResult, formatSearchResult } from './licitalab-format'
 import {
   getLicitalabSessionStatus,
   invalidateLicitalabUserAccessToken,
@@ -35,6 +35,7 @@ import {
   logoutLicitalabOAuth,
   readLicitalabUserAccessToken
 } from './licitalab-oauth'
+import { LicitalabSearchError, searchLicitalabOpportunities } from './licitalab-search'
 
 /**
  * CLI de LicitaLAB — `pnpm licitalab`. Lectura sobre compras públicas (Mercado Público CL, PE, CO) vía el
@@ -50,6 +51,7 @@ import {
  *
  * Uso:
  *   pnpm licitalab login [--headed] · pnpm licitalab session · pnpm licitalab logout [--forget-client]
+ *   pnpm licitalab search [--view recommended|all] [--max 50] [--match "marketing digital"] [--enrich] [--headed] [--no-login]
  *   pnpm licitalab tools
  *   pnpm licitalab documents <código> [--country CL]
  *   pnpm licitalab ask-docs <código> "<pregunta>" [--top-k 10] [--country CL]
@@ -71,6 +73,9 @@ loadEnv({ path: join(process.cwd(), '.env.local') })
 const USAGE = `Uso: pnpm licitalab <comando> [argumentos] [flags]
 
 Comandos:
+  search                               Oportunidades de tu radar LicitaLAB (web con Playwright)
+                                       --view recommended|all (default recommended) · --max 1-500 (default 50)
+                                       --match "texto" filtra lo recolectado · --enrich agrega ficha + documentos
   tools                                Lista las tools disponibles
   documents <código>                   Documentos de la oportunidad
   ask-docs <código> "<pregunta>"       Busca en bases y anexos (--top-k 1-20)
@@ -169,6 +174,10 @@ const main = async (): Promise<number> => {
       limit: { type: 'string' },
       'order-by': { type: 'string' },
       cursor: { type: 'string' },
+      view: { type: 'string' },
+      max: { type: 'string' },
+      match: { type: 'string' },
+      enrich: { type: 'boolean', default: false },
       json: { type: 'boolean', default: false },
       'no-login': { type: 'boolean', default: false },
       headed: { type: 'boolean', default: false },
@@ -218,6 +227,23 @@ const main = async (): Promise<number> => {
       }
 
       return status.token?.valid ? 0 : 3
+    }
+
+    case 'search': {
+      const enrich = Boolean(values.enrich)
+
+      const result = await searchLicitalabOpportunities({
+        view: assertEnum('--view', values.view ?? 'recommended', ['recommended', 'all'] as const) as 'recommended' | 'all',
+        max: parseIntFlag('--max', values.max, 1, 500) ?? 50,
+        match: values.match?.trim() || null,
+        headed,
+        allowLogin,
+        enrichWith: enrich ? { ...options, userAccessToken: await resolveUserAccessToken(allowLogin, headed) } : null
+      })
+
+      console.log(values.json ? JSON.stringify(result, null, 2) : formatSearchResult(result as never))
+
+      return 0
     }
 
     case 'logout':
@@ -340,7 +366,7 @@ main()
       process.exit(2)
     }
 
-    if (error instanceof LicitalabConfigurationError || error instanceof MissingSessionError || error instanceof LicitalabOAuthError) {
+    if (error instanceof LicitalabConfigurationError || error instanceof MissingSessionError || error instanceof LicitalabOAuthError || error instanceof LicitalabSearchError) {
       console.error(error.message)
       process.exit(3)
     }
