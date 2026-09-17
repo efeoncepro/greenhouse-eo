@@ -460,6 +460,19 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
 - **Human-review every variant against the anchor** for identity drift before keeping it.
 - **Log durable generations in `ai-generations/`** (repo, not `.captures/`): one subfolder per run named `YYYY-MM-DD_<semantic>/` with `README.md` (verbatim prompts) + `manifest.json`, plus a row in `ai-generations/INDEX.md`. Worked example: `ai-generations/2026-07-05_nexa-fallback-characters/` — the 3D Nexa character (`public/images/illustrations/characters/greenhouse-*.png`) posed per fallback `kind`.
 
+### Recolor, inpainting y materialización con forma exacta (caso 2026-09-16)
+
+- **Inpainting con máscara puede cambiar la geometría** aunque el prompt pida conservarla: al recolorear banderines,
+  GPT Image 2.5 Sunburst devolvió menos banderines, más grandes y tiñó un objeto fuera de la zona. Comparar
+  antes/después por forma, cantidad y posición; si cambian, descartar.
+- **Cambio de color de un elemento ya aprobado → recolor determinístico** sobre el plate original: detectar el
+  elemento (perfil de color/columnas), rellenar por semilla, apertura morfológica para excluir líneas finas y aplicar
+  el color nuevo con la luminosidad del píxel original. Conserva textura, pliegues y luz.
+- **Objetos 3D con forma de marca:** boceto con los glifos o siluetas reales en su posición exacta → `--image` con
+  Sunburst para materializar → texto y logo compuestos después. El resultado no es vector exacto de la fuente:
+  declararlo en la entrega.
+- Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md).
+
 ## Provider Choice
 
 - Use `openai-image` for higher prompt fidelity, complex composition, reference-guided edits, UI assets, icon sets, and transparent PNG batches.

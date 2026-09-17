@@ -79,3 +79,16 @@ pesos, cuándo una familia se omite y cuándo dos pesos nominalmente distintos p
 También mantiene separados producido, aprobado, normativamente sólido, programado, publicado y medido. La
 referencia operativa para agentes vive en
 [casos reales de tipografía](../../../.codex/skills/greenhouse-typography-accessibility/references/real-campaign-typography-cases.md).
+
+## Casos de septiembre 2026: México y previa del 18
+
+Dos piezas amplían el método. En México, un carrusel muestra al equipo intentando «mejorar» la frase «¡Viva México!» y
+descartando cada sugerencia; su conexión con Efeonce nace de mostrar el oficio, después de que una idea anterior se
+rechazó por no conectar. No usa bandera, escudo ni himno por la ley mexicana de símbolos patrios. En Chile, una
+estática de alto impacto muestra el 17 convertido en 18, con colores corporativos y banderines de fonda.
+
+Aprendizajes para el equipo: las imágenes sociales se publican en PNG; las personas del equipo aparecen sólo con su
+consentimiento; un documento de LinkedIn puede armarse con las mismas imágenes del carrusel; y cuando se pide alto
+impacto, la respuesta es luz, cámara, material y acción, no más elementos.
+
+> Detalle técnico: [bitácora del caso](../../operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md).

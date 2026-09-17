@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-16 — Serie social de Fiestas Patrias: México y previa del 18
+
+Se publicaron el carrusel «Hay frases que no se tocan» en Instagram y su documento en LinkedIn para México, y quedó
+programada para el 17/09 la estática «Hay días que sí rediseñaríamos». El caso dejó reglas nuevas en las skills
+sociales: la conexión con la marca se demuestra con el oficio y no con una moraleja; sin símbolos patrios mexicanos en
+piezas de marca; personas del equipo sólo con consentimiento; alto impacto se logra con luz, cámara, material y
+acción; un recoloreo con máscara de IA que cambia la forma se descarta por uno determinístico; y las imágenes sociales
+se publican en PNG. Bitácora en `docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md`.
+
 ## 2026-09-16 — `pnpm ai:fal` también trabaja con Higgsfield
 
 El mismo comando ahora opera la API de Higgsfield: 44 modelos que se eligen con `--capability hf-*`, entre ellos SOUL,
@@ -875,12 +884,3 @@ tres personas Berel provisionadas sin correo. El lane App acepta autoridad human
 humana y flag. Chats grupales de Berel y Sky registrados como destino `chat_group` del Teams bot (`ready`, pertenencia
 verificada por Graph read-only; ruta `lifecycle/teams/chat`; migración que relaja el CHECK legado). Invitaciones Berel
 bloqueadas por decisión del operador hasta tener interfaces. Política de preferencias `client_service_default_v1` aplicada a las seis personas (ruta `portal-users/notification-preferences`). **Release 2026-09-10:** PR #232 → main `f69b9d32`, orquestador `34431792218`, manifest `released` 03:16Z, flag `CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true` horneada, canary de contrato 5/5 en producción. [Readback](docs/audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
-
-## 2026-09-09 — Planificación estacional Efeonce y continuidad editorial
-
-Documentadas 13 piezas 2026–2027 con conceptos, tareas, calendario y readback fechado en
-[registro social](docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
-Social Media incorpora guía de efemérides, metáforas visuales y briefs; Notion explicita la aplicación
-del flujo existente a pares tarea/calendario, con fechas separadas y detección de divergencias.
-Skills espejadas Claude/Codex. Cuatro tareas tienen asignaciones nuevas aún no copiadas al calendario;
-se documenta el pendiente sin mutaciones Notion. Producción, aprobación y publicación siguen abiertas.

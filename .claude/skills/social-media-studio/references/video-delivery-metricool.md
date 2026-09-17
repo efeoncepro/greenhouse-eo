@@ -100,6 +100,21 @@ todo video. Preservar copy literal aprobado por red; no reutilizar automáticame
 de LinkedIn en Instagram. `mediaAltText` para imágenes cuando se soporte; el readback de estos
 videos devolvió `[null]`, por lo que no afirmar que se publicó alt text en el video.
 
+### Posts de imagen y documentos (verificado 2026-09-16)
+
+- **Carrusel de Instagram:** `media` con las URLs PNG en el orden de lectura, `mediaAltText` con un texto por imagen
+  (persistió en el readback), `instagramData.type:"POST"` e `isAiGenerated` según la procedencia.
+- **Documento de LinkedIn desde imágenes:** mismas URLs + `linkedinData:{"publishImagesAsPDF":true,"documentTitle":"…"}`.
+  Metricool arma el documento; el readback devuelve `mediaAltText` nulo por página: no afirmar alt text en LinkedIn.
+  Un PDF local es respaldo, no el transporte.
+- **Estática para LinkedIn:** `publishImagesAsPDF:false` y texto propio con el argumento profesional, no el caption de
+  Instagram.
+- **Corregir antes de publicar:** `updateScheduledPost` exige el contenido completo, **cambia el ID** y conserva el UUID;
+  registrar ambos y releer.
+- **Publicación efectiva:** el readback cambia `providers[].status` a `PUBLISHED` con `publicUrl`. Si el operador no ve
+  el post, leer ese estado antes de suponer fallo: puede ser demora del feed.
+- Caso: [Viva México y previa 18](../../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md).
+
 ## 4. Readback, evidencia y cierre
 
 La respuesta de creación no cierra la tarea. Leer nuevamente `getScheduledPosts` y comprobar por ID:

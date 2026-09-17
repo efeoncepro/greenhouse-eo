@@ -100,6 +100,11 @@ Comparar archivos en destino. No afirmar sincronización remota ni permisos a pa
 9. Ante respuesta incierta, consultar cola antes de reintentar. No crear duplicados por un timeout.
 10. Guardar PROGRAMACION.md y evidencia saneada con IDs/enlaces. Reportar programado, no publicado.
 
+**Posts de imagen (desde 2026-09-16):** subir y publicar **PNG**. Carrusel de Instagram: URLs en orden y un texto
+alternativo por imagen. Documento de LinkedIn: las mismas imágenes con `publishImagesAsPDF` y título del documento.
+Para corregir un post programado se envía el contenido completo: el ID cambia y el UUID se mantiene.
+[Caso Viva México y previa 18](../../operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md).
+
 [Payloads, errores de interpretación y checklist completo](../../../.codex/skills/social-media-studio/references/video-delivery-metricool.md).
 
 ## 8. Cierre y seguimiento

@@ -141,3 +141,13 @@ del compositor liga `target.id` al texto/objeto/grupo real y verifica la geometr
 consume el intent declarado en el contrato y soporta `headline|support|hook|lockup`; `targetKind` debe coincidir
 con `text|text|object|group`. Esta ruta no llama a un modelo, no publica ni aprueba. Usa
 `templates/collaboration-selection-intent.json` como estructura, no como copy fijo.
+
+Contrato observado al componer piezas reales (2026-09-16, [bitácora](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md)):
+
+- los colaboradores sólo se anclan en esquinas (`collaborator-anchor-not-corner`); un cursor `moving` no lleva
+  `targetId` (`moving-cursor-must-not-target-selection`);
+- las etiquetas de esquina se ubican fuera del objeto: deja aire lateral (en 1080 px, un titular a ≤ ~64 % del ancho)
+  y exige `evidence.withinCanvas` antes de exportar;
+- `renderCollaborationSelection` emite etiquetas como `<text>`; si el rasterizador no garantiza Poppins, conviértelas a
+  trazados con la fuente real en la misma posición y falla si queda algún `<text>`;
+- las etiquetas quedan pequeñas por contrato: no cargues en ellas información que la pieza necesite leer.

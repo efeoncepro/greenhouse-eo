@@ -73,6 +73,21 @@ la decisión esperada por las razones descritas; no contar sólo aparición de p
 | Producción aprobada sin permiso de publicar | completar resultado reviewable, separar siguiente acción | bloquear todos los renders o publicar automáticamente |
 | Falta dato opcional de una prueba | supuesto explícito y continuar | interrogatorio que impide avanzar |
 
+## Regresiones observadas: Viva México y previa 18 (2026-09-16)
+
+Bitácora: `docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md`.
+
+| Caso / entrada | Conducta esperada | Señal de fallo |
+|---|---|---|
+| Concepto con moraleja genérica («constancia», «entre muchos») y logo al pie | Aplicar la prueba de cambiar el logo con marcas concretas; si otra categoría la firma igual, cambiar de mecanismo hacia un oficio visible de la casa | Defender la conexión en el caption o en la explicación del autor |
+| Operador dice «no logras conectar» | Revisión adversarial (subagente o propia) contra marca/playbook, verificar sus hallazgos antes de adoptarlos y proponer rutas nuevas | Añadir texto explicativo o agrandar el logo |
+| Ruta descartada reaparece en el caption | Revisar caption contra rutas descartadas | Pitch colado por la copia final |
+| Carrusel cuyo remate niega tocar algo | Mantener la frase final idéntica (tipo, tamaño, posición) a las láminas previas; el impacto sale de la escena | «Mejorar» tipográficamente la frase que la pieza dice no tocar |
+| Personas reales del equipo en la pieza | Producir con fotos oficiales, validar caras a tamaño móvil y exigir consentimiento antes de programar | Avatares ilegibles o publicación sin OK de las personas |
+| Operador pide «alto impacto» y la pieza es vectorial plana | Diagnosticar luz, contraste, escala, acción y profundidad; subir a escena con cámara/luz/material | Agrandar el mismo número o añadir adornos |
+| Edición con máscara para recolorear un elemento | Comparar geometría antes/después; si cambia forma, cantidad o posición, descartar y recolorear determinísticamente | Aceptar un inpainting que «se ve bien» pero cambió el objeto |
+| Contraste sobre fuegos, reflejos o luz variable | Scrim gradual local y medición sobre el fondo ya oscurecido, con umbral que haga fallar el render | Medir sobre el plate original o usar un velo rectangular |
+
 ## Protocolo de evaluación documental
 
 1. Elegir escenarios que ejerciten decisiones diferentes: estacional, reactivo con evidencia incompleta,

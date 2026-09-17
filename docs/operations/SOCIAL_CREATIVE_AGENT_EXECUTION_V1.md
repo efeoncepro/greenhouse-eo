@@ -148,3 +148,15 @@ Para ejecución cargar [Motion](../../.codex/skills/motion-design-studio/workflo
 y [entrega/Metricool](../../.codex/skills/social-media-studio/references/video-delivery-metricool.md).
 Los valores del caso no son presets universales; la autorización ya otorgada persiste y PENDING sigue
 separado de publicado. Estos aprendizajes no amplían el contrato multimodal ni el presupuesto.
+
+## De la revisión adversarial a una serie programada
+
+La [bitácora Viva México y previa 18](social/2026-09-16-viva-mexico-y-previa-18-production-method.md) conserva la
+revisión adversarial que rechazó un concepto sin conexión de marca, el límite legal de símbolos patrios de México,
+la secuencia de carrusel con plate idéntico, caras del equipo con consentimiento, la escalada de una estática plana a
+escena 3D de alto impacto, el recolor determinístico que reemplazó un inpainting con deriva geométrica y la
+programación de carrusel, documento de LinkedIn y estáticas en Metricool. Reglas en
+[casos de revisión](../../.codex/skills/social-media-studio/references/creative-review-cases.md),
+[línea estacional](../../.codex/skills/social-media-studio/efeonce/SEASONAL_CONTENT.md) y
+[entrega Metricool](../../.codex/skills/social-media-studio/references/video-delivery-metricool.md). Imágenes sociales en
+PNG (regla dura desde 2026-09-16).
