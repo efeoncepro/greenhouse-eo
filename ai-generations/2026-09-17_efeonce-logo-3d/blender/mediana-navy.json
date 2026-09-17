@@ -1,0 +1,191 @@
+{
+  "svg": "../ref/logo-efeonce-oficial.svg",
+  "color": "navy",
+  "color_hex": "#023c70",
+  "prefijo": "efeonce-logo-3d-navy-mediana",
+  "resolucion": [
+    2400,
+    1600
+  ],
+  "samples": 160,
+  "escala": {
+    "nombre": "mediana",
+    "ancho_m": 1.2,
+    "grosor_m": 0.042,
+    "bisel_m": 0.005,
+    "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+  },
+  "camaras": [
+    {
+      "id": "01-frente-altura-ojos",
+      "pos": [
+        0,
+        -3.0,
+        1.6
+      ],
+      "mira": [
+        0,
+        0,
+        1.1400000000000001
+      ],
+      "lente_mm": 50,
+      "descripcion": "De frente a la altura de los ojos de una persona de pie",
+      "usos": [
+        "pedestal",
+        "stand",
+        "vitrina"
+      ],
+      "elevacion_objeto_m": 1.0
+    },
+    {
+      "id": "02-tres-cuartos-izquierda",
+      "pos": [
+        -3.2,
+        -3.4,
+        1.5
+      ],
+      "mira": [
+        0,
+        0,
+        1.1400000000000001
+      ],
+      "lente_mm": 50,
+      "descripcion": "Tres cuartos desde la izquierda",
+      "usos": [
+        "stand",
+        "mesón de recepción",
+        "exhibición"
+      ],
+      "elevacion_objeto_m": 1.0
+    },
+    {
+      "id": "03-tres-cuartos-derecha",
+      "pos": [
+        3.2,
+        -3.4,
+        1.5
+      ],
+      "mira": [
+        0,
+        0,
+        1.1400000000000001
+      ],
+      "lente_mm": 50,
+      "descripcion": "Tres cuartos desde la derecha",
+      "usos": [
+        "stand",
+        "mesón de recepción",
+        "exhibición"
+      ],
+      "elevacion_objeto_m": 1.0
+    },
+    {
+      "id": "04-picado-frente",
+      "pos": [
+        0,
+        -2.4,
+        2.6
+      ],
+      "mira": [
+        0,
+        0,
+        1.1400000000000001
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde arriba y de frente, unos 30°",
+      "usos": [
+        "mesón",
+        "vitrina baja",
+        "premio"
+      ],
+      "elevacion_objeto_m": 1.0
+    },
+    {
+      "id": "05-picado-tres-cuartos-izquierda",
+      "pos": [
+        -1.9,
+        -2.0,
+        2.4
+      ],
+      "mira": [
+        0,
+        0,
+        1.1400000000000001
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde arriba y desde la izquierda",
+      "usos": [
+        "producto",
+        "premio",
+        "exhibición"
+      ],
+      "elevacion_objeto_m": 1.0
+    },
+    {
+      "id": "06-picado-tres-cuartos-derecha",
+      "pos": [
+        1.9,
+        -2.0,
+        2.4
+      ],
+      "mira": [
+        0,
+        0,
+        1.1400000000000001
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde arriba y desde la derecha",
+      "usos": [
+        "producto",
+        "premio",
+        "exhibición"
+      ],
+      "elevacion_objeto_m": 1.0
+    },
+    {
+      "id": "07-contrapicado-leve",
+      "pos": [
+        0,
+        -3.0,
+        0.85
+      ],
+      "mira": [
+        0,
+        0,
+        1.1400000000000001
+      ],
+      "lente_mm": 50,
+      "descripcion": "Levemente desde abajo, pieza heroica sobre un pedestal",
+      "usos": [
+        "trofeo",
+        "pedestal",
+        "hero de producto"
+      ],
+      "elevacion_objeto_m": 1.0
+    },
+    {
+      "id": "08-teleobjetivo",
+      "pos": [
+        0,
+        -9,
+        1.3
+      ],
+      "mira": [
+        0,
+        0,
+        1.1400000000000001
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde lejos con teleobjetivo, perspectiva casi plana",
+      "usos": [
+        "catálogo",
+        "ficha de producto",
+        "fondo desenfocado"
+      ],
+      "elevacion_objeto_m": 1.0
+    }
+  ],
+  "regla_camara": "Vistas oblicuas a >= 3,5x el ancho del logo y lente >= 35 mm efectivo: evita que la palabra se vea curvada o con un extremo gigante. Contrapicados elevando el objeto, no acercando la cámara.",
+  "rugosidad": 0.42,
+  "coat": 0.12
+}

@@ -79,3 +79,15 @@ No es mascota de partner: es marca propia y vive fuera de esta biblioteca.
   3. Objeto claro sobre fondo oscuro: `rmbg` deja opacos los huecos pasantes; usar `--key-background` y revisar sobre fondo de contraste fuerte.
 - **Registro:** [bitácora](2026-09-17-efeonce-ship-3d-production-method.md) ·
   [`LEEME`](../../../ai-generations/2026-09-17_efeonce-ship-3d/LEEME.md).
+
+## Logo completo de Efeonce en 3D (kit de referencia)
+
+Tampoco es mascota de partner: es la marca propia completa, renderizada en Blender desde el SVG oficial.
+
+- **Carpeta:** `5. Contenidos/13- Branding/Logo Efeonce 3D/` con `Fuente oficial/` y `Navy|Blanco/<Monumental|Grande|Mediana|Pequena>/`
+  (por cámara y luz, `-transparente` y `-fondo-estudio`, más el manifiesto de la escala).
+- **Escalas:** monumental 20 m, grande 6 m, mediana 1,2 m y pequeña 24 cm de ancho, cada una con sus cámaras.
+- **Regla dura:** es referencia de forma para agentes y modelos (entra como imagen 1 y el modelo sólo integra la escena),
+  no una firma. En una pieza, la firma sigue siendo el SVG oficial compuesto con AXIS.
+- **Registro:** [bitácora](2026-09-17-efeonce-logo-3d-reference-kit-production-method.md) ·
+  [`LEEME`](../../../ai-generations/2026-09-17_efeonce-logo-3d/LEEME.md).

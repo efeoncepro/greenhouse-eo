@@ -56,7 +56,9 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    definitivos desde AXIS después de conocer longitud, fondo, tamaño final y distancia de lectura.
 3. **Construye el medio limpio.** Genera o selecciona imagen/video sin texto ni logotipos inventados. Compón
    tipografía, marcas y legales de forma determinista con los archivos oficiales. El isotipo 3D de Efeonce es
-   elemento ilustrativo, no firma.
+   elemento ilustrativo, no firma. Para el logo completo como objeto físico en una escena, usa el
+   [kit de referencia 3D](../greenhouse-ai-image-generator/references/logo-3d-reference-kit.md) como imagen 1 y
+   verifica letra por letra; la firma sigue siendo el SVG oficial.
    Cuando la pieza requiera firma web, usa el SVG canónico
    `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg`: no lo reconstruyas con texto o CSS. Conserva
    `efeoncepro.com`, `opacity: 0.72`, fusión `luminosity`, escala proporcional y comprueba píxeles visibles en el

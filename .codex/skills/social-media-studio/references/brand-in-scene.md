@@ -117,6 +117,7 @@ transparente y escenas; OneDrive `5. Contenidos/13- Branding/Nave Efeonce 3D/`).
 (ruta B) o como referencia para regenerar el plate (ruta C), antes de generar otra nave. Navy sobre fondos claros,
 blanco sobre oscuros o navy. Para integrarla con personas o mascotas, regenerar el plate en vez de recortar
 alrededor de los sujetos. Método: [isotipo propio en 3D](../../greenhouse-ai-image-generator/references/mascot-3d-pose-library.md#isotipo-propio-en-3d-con-dos-colores-caso-nave-de-efeonce).
+**Logo completo de Efeonce en la escena:** usar el [kit de referencia 3D](../../greenhouse-ai-image-generator/references/logo-3d-reference-kit.md) (escala, cámara y luz por manifiesto) como imagen 1 y QA letra por letra.
 
 No imponer «todos los logos van después del modelo» a esta ruta: confunde firma gráfica con objeto material.
 Tampoco imponer «todo product placement exige IA»: las rutas A/B permiten control físico y de identidad.

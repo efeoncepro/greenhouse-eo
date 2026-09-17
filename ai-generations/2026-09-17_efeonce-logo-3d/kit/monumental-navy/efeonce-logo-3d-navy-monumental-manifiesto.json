@@ -1,0 +1,621 @@
+{
+  "logo": "../ref/logo-efeonce-oficial.svg",
+  "color_hex": "#023c70",
+  "regla_camara": "Vistas oblicuas a >= 3,5x el ancho del logo y lente >= 35 mm efectivo: evita que la palabra se vea curvada o con un extremo gigante. Contrapicados elevando el objeto, no acercando la cámara.",
+  "renders": [
+    {
+      "id": "01-frente-nivel-calle",
+      "descripcion": "De frente, a la altura de un peatón, a distancia media",
+      "usos": [
+        "avenida",
+        "plaza",
+        "frente de edificio"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-monumental-01-frente-nivel-calle-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -38,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          2.4
+        ],
+        "lente_mm_efectiva": 56.9,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "01-frente-nivel-calle",
+      "descripcion": "De frente, a la altura de un peatón, a distancia media",
+      "usos": [
+        "avenida",
+        "plaza",
+        "frente de edificio"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-monumental-01-frente-nivel-calle-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -38,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          2.4
+        ],
+        "lente_mm_efectiva": 56.9,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "02-contrapicado-frente",
+      "descripcion": "Desde abajo y de frente: letras elevadas (azotea, fachada alta) vistas desde la calle; se ve su cara inferior",
+      "usos": [
+        "fachada",
+        "azotea",
+        "marquesina",
+        "estructura elevada"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-monumental-02-contrapicado-frente-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -40,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          14.5
+        ],
+        "lente_mm_efectiva": 62.9,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 12
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "02-contrapicado-frente",
+      "descripcion": "Desde abajo y de frente: letras elevadas (azotea, fachada alta) vistas desde la calle; se ve su cara inferior",
+      "usos": [
+        "fachada",
+        "azotea",
+        "marquesina",
+        "estructura elevada"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-monumental-02-contrapicado-frente-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -40,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          14.5
+        ],
+        "lente_mm_efectiva": 62.9,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 12
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "03-tres-cuartos-izquierda-calle",
+      "descripcion": "Tres cuartos desde la izquierda, altura peatón",
+      "usos": [
+        "esquina de avenida",
+        "vereda",
+        "acceso a edificio"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-monumental-03-tres-cuartos-izquierda-calle-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          -50,
+          -56,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          2.4
+        ],
+        "lente_mm_efectiva": 146.5,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "03-tres-cuartos-izquierda-calle",
+      "descripcion": "Tres cuartos desde la izquierda, altura peatón",
+      "usos": [
+        "esquina de avenida",
+        "vereda",
+        "acceso a edificio"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-monumental-03-tres-cuartos-izquierda-calle-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          -50,
+          -56,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          2.4
+        ],
+        "lente_mm_efectiva": 146.5,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "04-tres-cuartos-derecha-calle",
+      "descripcion": "Tres cuartos desde la derecha, altura peatón",
+      "usos": [
+        "esquina de avenida",
+        "vereda",
+        "acceso a edificio"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-monumental-04-tres-cuartos-derecha-calle-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          50,
+          -56,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          2.4
+        ],
+        "lente_mm_efectiva": 146.5,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "04-tres-cuartos-derecha-calle",
+      "descripcion": "Tres cuartos desde la derecha, altura peatón",
+      "usos": [
+        "esquina de avenida",
+        "vereda",
+        "acceso a edificio"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-monumental-04-tres-cuartos-derecha-calle-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          50,
+          -56,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          2.4
+        ],
+        "lente_mm_efectiva": 146.5,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "05-contrapicado-tres-cuartos-izquierda",
+      "descripcion": "Desde abajo y desde la izquierda: letras elevadas vistas desde la vereda",
+      "usos": [
+        "hero vertical",
+        "stories",
+        "OOH dramático"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-monumental-05-contrapicado-tres-cuartos-izquierda-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          -28,
+          -34,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          14.5
+        ],
+        "lente_mm_efectiva": 85.8,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 12
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "05-contrapicado-tres-cuartos-izquierda",
+      "descripcion": "Desde abajo y desde la izquierda: letras elevadas vistas desde la vereda",
+      "usos": [
+        "hero vertical",
+        "stories",
+        "OOH dramático"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-monumental-05-contrapicado-tres-cuartos-izquierda-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          -28,
+          -34,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          14.5
+        ],
+        "lente_mm_efectiva": 85.8,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 12
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "06-contrapicado-tres-cuartos-derecha",
+      "descripcion": "Desde abajo y desde la derecha: letras elevadas vistas desde la vereda",
+      "usos": [
+        "hero vertical",
+        "stories",
+        "OOH dramático"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-monumental-06-contrapicado-tres-cuartos-derecha-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          28,
+          -34,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          14.5
+        ],
+        "lente_mm_efectiva": 85.9,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 12
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "06-contrapicado-tres-cuartos-derecha",
+      "descripcion": "Desde abajo y desde la derecha: letras elevadas vistas desde la vereda",
+      "usos": [
+        "hero vertical",
+        "stories",
+        "OOH dramático"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-monumental-06-contrapicado-tres-cuartos-derecha-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          28,
+          -34,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          14.5
+        ],
+        "lente_mm_efectiva": 85.9,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 12
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "07-teleobjetivo-lejos",
+      "descripcion": "Desde muy lejos con teleobjetivo; perspectiva casi plana",
+      "usos": [
+        "skyline",
+        "al fondo de una avenida",
+        "compresión urbana"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-monumental-07-teleobjetivo-lejos-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -150,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          2.4
+        ],
+        "lente_mm_efectiva": 226.3,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "07-teleobjetivo-lejos",
+      "descripcion": "Desde muy lejos con teleobjetivo; perspectiva casi plana",
+      "usos": [
+        "skyline",
+        "al fondo de una avenida",
+        "compresión urbana"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-monumental-07-teleobjetivo-lejos-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -150,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          2.4
+        ],
+        "lente_mm_efectiva": 226.3,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "08-picado-desde-edificio",
+      "descripcion": "Desde un piso alto de un edificio vecino",
+      "usos": [
+        "plaza vista desde arriba",
+        "azotea",
+        "evento masivo"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-monumental-08-picado-desde-edificio-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          12,
+          -44,
+          18
+        ],
+        "mira_m": [
+          0,
+          0,
+          2
+        ],
+        "lente_mm_efectiva": 74.6,
+        "altura_camara_m": 18,
+        "elevacion_objeto_m": 0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "08-picado-desde-edificio",
+      "descripcion": "Desde un piso alto de un edificio vecino",
+      "usos": [
+        "plaza vista desde arriba",
+        "azotea",
+        "evento masivo"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-monumental-08-picado-desde-edificio-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          12,
+          -44,
+          18
+        ],
+        "mira_m": [
+          0,
+          0,
+          2
+        ],
+        "lente_mm_efectiva": 74.6,
+        "altura_camara_m": 18,
+        "elevacion_objeto_m": 0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "09-dron-picado",
+      "descripcion": "Vista de dron, desde arriba y al frente, a media altura",
+      "usos": [
+        "aérea urbana",
+        "festival",
+        "instalación en parque"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-monumental-09-dron-picado-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -34,
+          20
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.5
+        ],
+        "lente_mm_efectiva": 57.4,
+        "altura_camara_m": 20,
+        "elevacion_objeto_m": 0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    },
+    {
+      "id": "09-dron-picado",
+      "descripcion": "Vista de dron, desde arriba y al frente, a media altura",
+      "usos": [
+        "aérea urbana",
+        "festival",
+        "instalación en parque"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-monumental-09-dron-picado-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -34,
+          20
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.5
+        ],
+        "lente_mm_efectiva": 57.4,
+        "altura_camara_m": 20,
+        "elevacion_objeto_m": 0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "monumental",
+        "ancho_m": 20,
+        "grosor_m": 0.7,
+        "bisel_m": 0.08,
+        "nota": "letras corpóreas de ~4,7 m de alto"
+      }
+    }
+  ]
+}

@@ -1,0 +1,191 @@
+{
+  "svg": "../ref/logo-efeonce-oficial.svg",
+  "color": "navy",
+  "color_hex": "#023c70",
+  "prefijo": "efeonce-logo-3d-navy-grande",
+  "resolucion": [
+    2400,
+    1600
+  ],
+  "samples": 160,
+  "escala": {
+    "nombre": "grande",
+    "ancho_m": 6,
+    "grosor_m": 0.22,
+    "bisel_m": 0.025,
+    "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+  },
+  "camaras": [
+    {
+      "id": "01-frente-altura-ojos",
+      "pos": [
+        0,
+        -14,
+        1.7
+      ],
+      "mira": [
+        0,
+        0,
+        1.9
+      ],
+      "lente_mm": 50,
+      "descripcion": "De frente a la altura de los ojos, letras montadas en un muro",
+      "usos": [
+        "muro de oficina",
+        "recepción",
+        "showroom"
+      ],
+      "elevacion_objeto_m": 1.2
+    },
+    {
+      "id": "02-tres-cuartos-izquierda",
+      "pos": [
+        -15,
+        -17,
+        1.7
+      ],
+      "mira": [
+        0,
+        0,
+        1.9
+      ],
+      "lente_mm": 50,
+      "descripcion": "Tres cuartos desde la izquierda, altura de ojos",
+      "usos": [
+        "pasillo",
+        "lobby",
+        "muro lateral"
+      ],
+      "elevacion_objeto_m": 1.2
+    },
+    {
+      "id": "03-tres-cuartos-derecha",
+      "pos": [
+        15,
+        -17,
+        1.7
+      ],
+      "mira": [
+        0,
+        0,
+        1.9
+      ],
+      "lente_mm": 50,
+      "descripcion": "Tres cuartos desde la derecha, altura de ojos",
+      "usos": [
+        "pasillo",
+        "lobby",
+        "muro lateral"
+      ],
+      "elevacion_objeto_m": 1.2
+    },
+    {
+      "id": "04-contrapicado-frente",
+      "pos": [
+        0,
+        -13,
+        1.2
+      ],
+      "mira": [
+        0,
+        0,
+        3.7
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde abajo y de frente: letras altas sobre un escenario o recepción",
+      "usos": [
+        "escenario",
+        "evento",
+        "recepción alta"
+      ],
+      "elevacion_objeto_m": 3.0
+    },
+    {
+      "id": "05-contrapicado-tres-cuartos-izquierda",
+      "pos": [
+        -9,
+        -11,
+        1.2
+      ],
+      "mira": [
+        0,
+        0,
+        3.7
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde abajo y desde la izquierda, letras altas",
+      "usos": [
+        "escenario",
+        "stand de feria",
+        "hall"
+      ],
+      "elevacion_objeto_m": 3.0
+    },
+    {
+      "id": "06-contrapicado-tres-cuartos-derecha",
+      "pos": [
+        9,
+        -11,
+        1.2
+      ],
+      "mira": [
+        0,
+        0,
+        3.7
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde abajo y desde la derecha, letras altas",
+      "usos": [
+        "escenario",
+        "stand de feria",
+        "hall"
+      ],
+      "elevacion_objeto_m": 3.0
+    },
+    {
+      "id": "07-picado-leve",
+      "pos": [
+        3,
+        -14,
+        4.8
+      ],
+      "mira": [
+        0,
+        0,
+        1.9
+      ],
+      "lente_mm": 50,
+      "descripcion": "Levemente desde arriba, como desde un mezzanine o una cámara de evento",
+      "usos": [
+        "evento",
+        "oficina abierta",
+        "mezzanine"
+      ],
+      "elevacion_objeto_m": 1.2
+    },
+    {
+      "id": "08-desde-el-publico",
+      "pos": [
+        0,
+        -32,
+        1.2
+      ],
+      "mira": [
+        0,
+        0,
+        3.7
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde lejos entre el público, teleobjetivo: letras de escenario comprimidas",
+      "usos": [
+        "conferencia",
+        "auditorio",
+        "keynote"
+      ],
+      "elevacion_objeto_m": 3.0
+    }
+  ],
+  "regla_camara": "Vistas oblicuas a >= 3,5x el ancho del logo y lente >= 35 mm efectivo: evita que la palabra se vea curvada o con un extremo gigante. Contrapicados elevando el objeto, no acercando la cámara.",
+  "rugosidad": 0.42,
+  "coat": 0.12
+}

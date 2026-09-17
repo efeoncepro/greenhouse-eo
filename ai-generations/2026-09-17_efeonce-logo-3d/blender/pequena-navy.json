@@ -1,0 +1,183 @@
+{
+  "svg": "../ref/logo-efeonce-oficial.svg",
+  "color": "navy",
+  "color_hex": "#023c70",
+  "prefijo": "efeonce-logo-3d-navy-pequena",
+  "resolucion": [
+    2400,
+    1600
+  ],
+  "samples": 160,
+  "escala": {
+    "nombre": "pequena",
+    "ancho_m": 0.24,
+    "grosor_m": 0.0085,
+    "bisel_m": 0.001,
+    "nota": "objeto de ~6 cm de alto: escritorio, repisa, mano, packaging"
+  },
+  "camaras": [
+    {
+      "id": "01-frente-a-ras",
+      "pos": [
+        0,
+        -0.6,
+        0.03
+      ],
+      "mira": [
+        0,
+        0,
+        0.028
+      ],
+      "lente_mm": 50,
+      "descripcion": "De frente, cámara a la altura del objeto (a ras de mesa)",
+      "usos": [
+        "escritorio",
+        "repisa",
+        "detalle de producto"
+      ]
+    },
+    {
+      "id": "02-picado-persona-sentada",
+      "pos": [
+        0,
+        -0.55,
+        0.32
+      ],
+      "mira": [
+        0,
+        0,
+        0.028
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde arriba y de frente, como lo ve una persona sentada",
+      "usos": [
+        "escritorio",
+        "mesa de reunión",
+        "workspace"
+      ]
+    },
+    {
+      "id": "03-picado-tres-cuartos-izquierda",
+      "pos": [
+        -0.42,
+        -0.45,
+        0.28
+      ],
+      "mira": [
+        0,
+        0,
+        0.028
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde arriba y desde la izquierda",
+      "usos": [
+        "escritorio",
+        "flat lay en ángulo",
+        "packaging"
+      ]
+    },
+    {
+      "id": "04-picado-tres-cuartos-derecha",
+      "pos": [
+        0.42,
+        -0.45,
+        0.28
+      ],
+      "mira": [
+        0,
+        0,
+        0.028
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde arriba y desde la derecha",
+      "usos": [
+        "escritorio",
+        "flat lay en ángulo",
+        "packaging"
+      ]
+    },
+    {
+      "id": "05-picado-alto",
+      "pos": [
+        0,
+        -0.28,
+        0.52
+      ],
+      "mira": [
+        0,
+        0,
+        0.028
+      ],
+      "lente_mm": 50,
+      "descripcion": "Muy desde arriba (~60°), casi cenital",
+      "usos": [
+        "vista superior de escritorio",
+        "flat lay",
+        "mood board"
+      ]
+    },
+    {
+      "id": "06-macro-tres-cuartos-izquierda",
+      "pos": [
+        -0.62,
+        -0.66,
+        0.06
+      ],
+      "mira": [
+        0,
+        0,
+        0.028
+      ],
+      "lente_mm": 85,
+      "descripcion": "Bajo y desde la izquierda, look macro de producto",
+      "usos": [
+        "detalle premium",
+        "hero de objeto",
+        "regalo corporativo"
+      ]
+    },
+    {
+      "id": "07-macro-tres-cuartos-derecha",
+      "pos": [
+        0.62,
+        -0.66,
+        0.06
+      ],
+      "mira": [
+        0,
+        0,
+        0.028
+      ],
+      "lente_mm": 85,
+      "descripcion": "Bajo y desde la derecha, look macro de producto",
+      "usos": [
+        "detalle premium",
+        "hero de objeto",
+        "regalo corporativo"
+      ]
+    },
+    {
+      "id": "08-picado-lejano",
+      "pos": [
+        0.25,
+        -1.3,
+        0.95
+      ],
+      "mira": [
+        0,
+        0,
+        0.028
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde lejos y arriba: objeto pequeño dentro de un escritorio amplio",
+      "usos": [
+        "escritorio completo",
+        "oficina",
+        "contexto amplio"
+      ]
+    }
+  ],
+  "regla_camara": "Vistas oblicuas a >= 3,5x el ancho del logo y lente >= 35 mm efectivo: evita que la palabra se vea curvada o con un extremo gigante. Contrapicados elevando el objeto, no acercando la cámara.",
+  "rugosidad": 0.42,
+  "coat": 0.12
+}

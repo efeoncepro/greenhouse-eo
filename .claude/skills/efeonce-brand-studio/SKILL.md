@@ -143,3 +143,8 @@ otra nave, reutilizar esta biblioteca. Recomendación (no decisión del operador
 ilustrativo de marca (escenas, portadas, decks, headers); no reemplaza el SVG oficial en firmas. Método y entrega:
 [isotipo propio en 3D](../greenhouse-ai-image-generator/references/mascot-3d-pose-library.md#isotipo-propio-en-3d-con-dos-colores-caso-nave-de-efeonce)
 · [bitácora](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).
+
+**Logo completo en 3D (kit de referencia aprobado 2026-09-17):** OneDrive `5. Contenidos/13- Branding/Logo Efeonce 3D/`,
+navy y blanco en cuatro escalas: Monumental (20 m), Grande (6 m), Mediana (1,2 m) y Pequeña (24 cm), con cámaras por
+escala, luz izquierda/derecha, transparente + fondo estudio y manifiesto. Es referencia de forma para pasar al modelo,
+no firma. Método: [kit de logo 3D](../greenhouse-ai-image-generator/references/logo-3d-reference-kit.md).

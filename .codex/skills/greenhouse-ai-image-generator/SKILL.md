@@ -502,6 +502,9 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
   defecto, 30/800 en fondo claro desenfocado o macro; no usar si el sujeto tiene zonas del color del fondo). Revisar
   siempre sobre fondo de contraste fuerte con zoom 100 %. Escenas claras sobre fondo claro y macros desenfocados no se recortan: se entregan como escena.
   Método completo: [isotipo propio en 3D con dos colores](references/mascot-3d-pose-library.md#isotipo-propio-en-3d-con-dos-colores-caso-nave-de-efeonce).
+- **Logo completo de marca como objeto en una escena → kit Blender como imagen 1; el modelo nunca dibuja las
+  letras.** Elegir escala, cámara y luz en el manifiesto, contrato de prompt fijo, componer si las letras son
+  exigentes y QA letra por letra: [`references/logo-3d-reference-kit.md`](references/logo-3d-reference-kit.md).
 - Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md) ·
   [nave Efeonce 3D](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).
 

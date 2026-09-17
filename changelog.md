@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-17 — Logo de Efeonce en 3D como kit de referencia para agentes
+
+Quedó en `13- Branding/Logo Efeonce 3D` el logo completo en 3D renderizado en Blender desde el SVG oficial, en navy y
+blanco, en cuatro escalas (monumental, grande, mediana, pequeña) con 33 cámaras y luz izquierda/derecha, sin
+superficies. Cada escala trae un manifiesto de cámara y usos para que un agente elija el render que coincide con la
+escena y se lo pase al modelo como imagen 1, sin dejar que el modelo dibuje las letras.
+
 ## 2026-09-17 — `pnpm ai:image:rmbg --key-background` para huecos opacos
 
 El recorte de fondo suma una opción opt-in para el caso de objeto claro sobre fondo oscuro: vacía los huecos pasantes
@@ -831,11 +838,3 @@ Con autorización del operador, los dos pagos de nómina de agosto que Payroll h
 estimada quedaron superseded y reemplazados por lo que salió de Global66 el 03/09 (800.730 y 1.114.423 más las
 comisiones de cambio), pagados en la moneda del expense al tipo de cambio realizado; Global66 septiembre queda
 `reconciled`. Se crea `TASK-1858` como cierre formal de la recuperación.
-
-## 2026-09-10 — Finance: tercera pasada (sueldo accionista, Berel MXN, fee HubSpot, Deel mayo–julio)
-
-Nace `finance:ledger-adjust` (cobros en moneda nativa con vínculo a fila, comisiones, pagos directos a un member y
-supersede de settlements) sobre el command compartido `linkStatementRow`; los expenses anclados aceptan
-USD/MXN con tipo de cambio explícito y `createMemberPaymentExpense` registra pagos a un colaborador sin entry
-de Payroll. Datos: sueldo accionista 2×1.000.000 reemplaza los traspasos al CCA; Berel folios 51/52/53 cobrados
-en MXN; comisión HubSpot cerrada con la fee de recepción estimada; Deel REC-2026-8/9/10 al CCA.
