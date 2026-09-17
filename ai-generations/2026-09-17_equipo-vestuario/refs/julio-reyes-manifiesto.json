@@ -1,0 +1,47 @@
+{
+  "persona": "Julio Reyes",
+  "consentimiento": "Fotos entregadas por él mismo el 2026-09-17 para usarlas como referencia. No usar la imagen de otra persona real sin su consentimiento.",
+  "como_usarlas": "Para vestirlo con una prenda del kit: pasar SIEMPRE al menos una referencia de CUERPO ENTERO junto con una de rostro. Sólo con retratos el modelo deforma el cuerpo (cabeza grande). Declarar además la proporción (cabeza ≈ 1/7,5 de la altura), encuadrar desde debajo de las rodillas y usar lente larga (≈135 mm) con la cámara a la altura del pecho.",
+  "referencias": [
+    {
+      "archivo": "julio-reyes-01.png",
+      "descripcion": "Retrato en sala de directorio, traje azul y camisa blanca",
+      "tipo": "rostro"
+    },
+    {
+      "archivo": "julio-reyes-02.png",
+      "descripcion": "Retrato en lobby cálido, traje azul y camisa blanca",
+      "tipo": "rostro"
+    },
+    {
+      "archivo": "julio-reyes-03.png",
+      "descripcion": "Retrato en oficina con ventanal, blazer sobre polo oscuro",
+      "tipo": "rostro"
+    },
+    {
+      "archivo": "julio-reyes-04.png",
+      "descripcion": "Retrato en oficina luminosa, blazer sobre polo oscuro",
+      "tipo": "rostro"
+    },
+    {
+      "archivo": "julio-reyes-05.png",
+      "descripcion": "Cuerpo entero apoyado en mesa de reuniones, blazer y zapatillas blancas",
+      "tipo": "cuerpo entero"
+    },
+    {
+      "archivo": "julio-reyes-06.png",
+      "descripcion": "Cuerpo entero en lobby oscuro, total black",
+      "tipo": "cuerpo entero"
+    },
+    {
+      "archivo": "julio-reyes-07.png",
+      "descripcion": "Cuerpo entero en sala de directorio al atardecer, traje azul y camisa blanca",
+      "tipo": "cuerpo entero"
+    },
+    {
+      "archivo": "julio-reyes-08.png",
+      "descripcion": "Cuerpo entero en terraza de noche, traje azul y camisa blanca",
+      "tipo": "cuerpo entero"
+    }
+  ]
+}
