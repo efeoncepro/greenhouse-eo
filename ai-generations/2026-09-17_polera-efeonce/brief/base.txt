@@ -1,0 +1,9 @@
+Design a premium brand T-shirt for Efeonce and photograph it as a real garment. Construction: heavyweight combed cotton jersey (about 240 g), relaxed unisex fit, ribbed crew neck with a clean taped shoulder seam, set-in short sleeves with a plain double-needle hem, straight body, no pocket, no zipper, no visible brand label.
+
+{delta}
+
+Image 1 is the Efeonce hoodie, used ONLY as the reference for the chest emblem: reproduce that same white rocket-and-orbit emblem on the LEFT CHEST at the same relative size and position as on the hoodie (about 9 cm wide, centred on the left chest, a hand's width below the shoulder seam). Do not copy the hoodie's hood, pocket or cuffs — this is a T-shirt. No extra text, no tags, no other prints.
+
+Realism contract — this must look like a REAL photograph of a real garment, not a 3D render or a flat mockup: shot on a 100 mm lens at f/8, natural soft wrinkles where the jersey falls, slightly asymmetric folds, visible cotton weave and a hint of slub, the seams and double-needle topstitching slightly irregular as in real sewing, the neck ribbing showing its knit rows, micro shadows inside every fold. Any print is screen-printed plastisol ink sitting ON the fibres: matte, very slightly raised, with a minimally broken edge where the ink meets the weave, deforming with the folds instead of floating flat. No perfect symmetry, no plastic smoothness, no CGI sheen.
+
+Product photography for a brand asset library: plain seamless light warm-gray studio background, soft large key light from the upper left with gentle fill, crisp focus over the whole garment, soft contact shadow, no props, no people unless described above, nothing cropped, generous margin. No text overlay, no watermark.

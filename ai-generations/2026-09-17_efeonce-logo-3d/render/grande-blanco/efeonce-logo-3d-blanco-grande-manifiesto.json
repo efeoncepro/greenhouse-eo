@@ -1,0 +1,551 @@
+{
+  "logo": "../ref/logo-efeonce-oficial.svg",
+  "color_hex": "#f2f3f5",
+  "regla_camara": "Vistas oblicuas a >= 3,5x el ancho del logo y lente >= 35 mm efectivo: evita que la palabra se vea curvada o con un extremo gigante. Contrapicados elevando el objeto, no acercando la cámara.",
+  "renders": [
+    {
+      "id": "01-frente-altura-ojos",
+      "descripcion": "De frente a la altura de los ojos, letras montadas en un muro",
+      "usos": [
+        "muro de oficina",
+        "recepción",
+        "showroom"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-blanco-grande-01-frente-altura-ojos-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -14,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.9
+        ],
+        "lente_mm_efectiva": 70.0,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 1.2
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "01-frente-altura-ojos",
+      "descripcion": "De frente a la altura de los ojos, letras montadas en un muro",
+      "usos": [
+        "muro de oficina",
+        "recepción",
+        "showroom"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-blanco-grande-01-frente-altura-ojos-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -14,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.9
+        ],
+        "lente_mm_efectiva": 70.0,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 1.2
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "02-tres-cuartos-izquierda",
+      "descripcion": "Tres cuartos desde la izquierda, altura de ojos",
+      "usos": [
+        "pasillo",
+        "lobby",
+        "muro lateral"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-blanco-grande-02-tres-cuartos-izquierda-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          -15,
+          -17,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.9
+        ],
+        "lente_mm_efectiva": 146.6,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 1.2
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "02-tres-cuartos-izquierda",
+      "descripcion": "Tres cuartos desde la izquierda, altura de ojos",
+      "usos": [
+        "pasillo",
+        "lobby",
+        "muro lateral"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-blanco-grande-02-tres-cuartos-izquierda-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          -15,
+          -17,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.9
+        ],
+        "lente_mm_efectiva": 146.6,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 1.2
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "03-tres-cuartos-derecha",
+      "descripcion": "Tres cuartos desde la derecha, altura de ojos",
+      "usos": [
+        "pasillo",
+        "lobby",
+        "muro lateral"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-blanco-grande-03-tres-cuartos-derecha-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          15,
+          -17,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.9
+        ],
+        "lente_mm_efectiva": 146.6,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 1.2
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "03-tres-cuartos-derecha",
+      "descripcion": "Tres cuartos desde la derecha, altura de ojos",
+      "usos": [
+        "pasillo",
+        "lobby",
+        "muro lateral"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-blanco-grande-03-tres-cuartos-derecha-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          15,
+          -17,
+          1.7
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.9
+        ],
+        "lente_mm_efectiva": 146.6,
+        "altura_camara_m": 1.7,
+        "elevacion_objeto_m": 1.2
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "04-contrapicado-frente",
+      "descripcion": "Desde abajo y de frente: letras altas sobre un escenario o recepción",
+      "usos": [
+        "escenario",
+        "evento",
+        "recepción alta"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-blanco-grande-04-contrapicado-frente-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -13,
+          1.2
+        ],
+        "mira_m": [
+          0,
+          0,
+          3.7
+        ],
+        "lente_mm_efectiva": 66.2,
+        "altura_camara_m": 1.2,
+        "elevacion_objeto_m": 3.0
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "04-contrapicado-frente",
+      "descripcion": "Desde abajo y de frente: letras altas sobre un escenario o recepción",
+      "usos": [
+        "escenario",
+        "evento",
+        "recepción alta"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-blanco-grande-04-contrapicado-frente-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -13,
+          1.2
+        ],
+        "mira_m": [
+          0,
+          0,
+          3.7
+        ],
+        "lente_mm_efectiva": 66.2,
+        "altura_camara_m": 1.2,
+        "elevacion_objeto_m": 3.0
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "05-contrapicado-tres-cuartos-izquierda",
+      "descripcion": "Desde abajo y desde la izquierda, letras altas",
+      "usos": [
+        "escenario",
+        "stand de feria",
+        "hall"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-blanco-grande-05-contrapicado-tres-cuartos-izquierda-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          -9,
+          -11,
+          1.2
+        ],
+        "mira_m": [
+          0,
+          0,
+          3.7
+        ],
+        "lente_mm_efectiva": 89.8,
+        "altura_camara_m": 1.2,
+        "elevacion_objeto_m": 3.0
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "05-contrapicado-tres-cuartos-izquierda",
+      "descripcion": "Desde abajo y desde la izquierda, letras altas",
+      "usos": [
+        "escenario",
+        "stand de feria",
+        "hall"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-blanco-grande-05-contrapicado-tres-cuartos-izquierda-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          -9,
+          -11,
+          1.2
+        ],
+        "mira_m": [
+          0,
+          0,
+          3.7
+        ],
+        "lente_mm_efectiva": 89.8,
+        "altura_camara_m": 1.2,
+        "elevacion_objeto_m": 3.0
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "06-contrapicado-tres-cuartos-derecha",
+      "descripcion": "Desde abajo y desde la derecha, letras altas",
+      "usos": [
+        "escenario",
+        "stand de feria",
+        "hall"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-blanco-grande-06-contrapicado-tres-cuartos-derecha-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          9,
+          -11,
+          1.2
+        ],
+        "mira_m": [
+          0,
+          0,
+          3.7
+        ],
+        "lente_mm_efectiva": 89.9,
+        "altura_camara_m": 1.2,
+        "elevacion_objeto_m": 3.0
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "06-contrapicado-tres-cuartos-derecha",
+      "descripcion": "Desde abajo y desde la derecha, letras altas",
+      "usos": [
+        "escenario",
+        "stand de feria",
+        "hall"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-blanco-grande-06-contrapicado-tres-cuartos-derecha-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          9,
+          -11,
+          1.2
+        ],
+        "mira_m": [
+          0,
+          0,
+          3.7
+        ],
+        "lente_mm_efectiva": 89.9,
+        "altura_camara_m": 1.2,
+        "elevacion_objeto_m": 3.0
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "07-picado-leve",
+      "descripcion": "Levemente desde arriba, como desde un mezzanine o una cámara de evento",
+      "usos": [
+        "evento",
+        "oficina abierta",
+        "mezzanine"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-blanco-grande-07-picado-leve-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          3,
+          -14,
+          4.8
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.9
+        ],
+        "lente_mm_efectiva": 74.6,
+        "altura_camara_m": 4.8,
+        "elevacion_objeto_m": 1.2
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "07-picado-leve",
+      "descripcion": "Levemente desde arriba, como desde un mezzanine o una cámara de evento",
+      "usos": [
+        "evento",
+        "oficina abierta",
+        "mezzanine"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-blanco-grande-07-picado-leve-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          3,
+          -14,
+          4.8
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.9
+        ],
+        "lente_mm_efectiva": 74.6,
+        "altura_camara_m": 4.8,
+        "elevacion_objeto_m": 1.2
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "08-desde-el-publico",
+      "descripcion": "Desde lejos entre el público, teleobjetivo: letras de escenario comprimidas",
+      "usos": [
+        "conferencia",
+        "auditorio",
+        "keynote"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-blanco-grande-08-desde-el-publico-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -32,
+          1.2
+        ],
+        "mira_m": [
+          0,
+          0,
+          3.7
+        ],
+        "lente_mm_efectiva": 161.2,
+        "altura_camara_m": 1.2,
+        "elevacion_objeto_m": 3.0
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    },
+    {
+      "id": "08-desde-el-publico",
+      "descripcion": "Desde lejos entre el público, teleobjetivo: letras de escenario comprimidas",
+      "usos": [
+        "conferencia",
+        "auditorio",
+        "keynote"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-blanco-grande-08-desde-el-publico-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -32,
+          1.2
+        ],
+        "mira_m": [
+          0,
+          0,
+          3.7
+        ],
+        "lente_mm_efectiva": 161.2,
+        "altura_camara_m": 1.2,
+        "elevacion_objeto_m": 3.0
+      },
+      "color": "blanco",
+      "escala": {
+        "nombre": "grande",
+        "ancho_m": 6,
+        "grosor_m": 0.22,
+        "bisel_m": 0.025,
+        "nota": "letras corpóreas de ~1,4 m de alto: muro de oficina, escenario, recepción"
+      }
+    }
+  ]
+}

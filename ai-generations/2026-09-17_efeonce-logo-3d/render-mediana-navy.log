@@ -1,0 +1,61 @@
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:67: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat = bpy.data.materials.new('laca'); mat.use_nodes = True
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:80: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('estudio'); scene.world = world; world.use_nodes = True
+00:19.950  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-01-frente-altura-ojos-luz-izq-transparente.png'
+00:40.118  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-01-frente-altura-ojos-luz-der-transparente.png'
+01:01.728  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-02-tres-cuartos-izquierda-luz-izq-transparente.png'
+01:20.792  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-02-tres-cuartos-izquierda-luz-der-transparente.png'
+01:40.800  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-03-tres-cuartos-derecha-luz-izq-transparente.png'
+02:04.857  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-03-tres-cuartos-derecha-luz-der-transparente.png'
+02:23.599  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-04-picado-frente-luz-izq-transparente.png'
+02:39.668  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-04-picado-frente-luz-der-transparente.png'
+03:00.653  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-05-picado-tres-cuartos-izquierda-luz-izq-transparente.png'
+03:19.955  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-05-picado-tres-cuartos-izquierda-luz-der-transparente.png'
+03:37.434  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-06-picado-tres-cuartos-derecha-luz-izq-transparente.png'
+03:53.658  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-06-picado-tres-cuartos-derecha-luz-der-transparente.png'
+04:09.602  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-07-contrapicado-leve-luz-izq-transparente.png'
+04:24.934  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-07-contrapicado-leve-luz-der-transparente.png'
+04:38.705  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-08-teleobjetivo-luz-izq-transparente.png'
+04:56.869  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-08-teleobjetivo-luz-der-transparente.png'
+OK efeonce-logo-3d-navy-mediana-01-frente-altura-ojos-luz-izq
+OK efeonce-logo-3d-navy-mediana-01-frente-altura-ojos-luz-der
+OK efeonce-logo-3d-navy-mediana-02-tres-cuartos-izquierda-luz-izq
+OK efeonce-logo-3d-navy-mediana-02-tres-cuartos-izquierda-luz-der
+OK efeonce-logo-3d-navy-mediana-03-tres-cuartos-derecha-luz-izq
+OK efeonce-logo-3d-navy-mediana-03-tres-cuartos-derecha-luz-der
+OK efeonce-logo-3d-navy-mediana-04-picado-frente-luz-izq
+OK efeonce-logo-3d-navy-mediana-04-picado-frente-luz-der
+OK efeonce-logo-3d-navy-mediana-05-picado-tres-cuartos-izquierda-luz-izq
+OK efeonce-logo-3d-navy-mediana-05-picado-tres-cuartos-izquierda-luz-der
+OK efeonce-logo-3d-navy-mediana-06-picado-tres-cuartos-derecha-luz-izq
+OK efeonce-logo-3d-navy-mediana-06-picado-tres-cuartos-derecha-luz-der
+OK efeonce-logo-3d-navy-mediana-07-contrapicado-leve-luz-izq
+OK efeonce-logo-3d-navy-mediana-07-contrapicado-leve-luz-der
+OK efeonce-logo-3d-navy-mediana-08-teleobjetivo-luz-izq
+OK efeonce-logo-3d-navy-mediana-08-teleobjetivo-luz-der
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:67: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat = bpy.data.materials.new('laca'); mat.use_nodes = True
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:80: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('estudio'); scene.world = world; world.use_nodes = True
+00:14.675  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-02-tres-cuartos-izquierda-luz-izq-transparente.png'
+00:30.312  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-02-tres-cuartos-izquierda-luz-der-transparente.png'
+OK efeonce-logo-3d-navy-mediana-02-tres-cuartos-izquierda-luz-izq
+OK efeonce-logo-3d-navy-mediana-02-tres-cuartos-izquierda-luz-der
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:67: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat = bpy.data.materials.new('laca'); mat.use_nodes = True
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:80: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('estudio'); scene.world = world; world.use_nodes = True
+00:14.267  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-03-tres-cuartos-derecha-luz-izq-transparente.png'
+00:30.805  render           | Saved: 'render/mediana-navy/efeonce-logo-3d-navy-mediana-03-tres-cuartos-derecha-luz-der-transparente.png'
+OK efeonce-logo-3d-navy-mediana-03-tres-cuartos-derecha-luz-izq
+OK efeonce-logo-3d-navy-mediana-03-tres-cuartos-derecha-luz-der
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit

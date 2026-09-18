@@ -1,0 +1,39 @@
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:67: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat = bpy.data.materials.new('laca'); mat.use_nodes = True
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:80: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('estudio'); scene.world = world; world.use_nodes = True
+00:18.662  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-01-frente-a-ras-luz-izq-transparente.png'
+00:34.454  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-01-frente-a-ras-luz-der-transparente.png'
+00:49.817  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-02-picado-persona-sentada-luz-izq-transparente.png'
+01:05.071  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-02-picado-persona-sentada-luz-der-transparente.png'
+01:24.149  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-03-picado-tres-cuartos-izquierda-luz-izq-transparente.png'
+01:42.291  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-03-picado-tres-cuartos-izquierda-luz-der-transparente.png'
+01:58.753  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-04-picado-tres-cuartos-derecha-luz-izq-transparente.png'
+02:16.394  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-04-picado-tres-cuartos-derecha-luz-der-transparente.png'
+02:33.461  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-05-picado-alto-luz-izq-transparente.png'
+02:48.820  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-05-picado-alto-luz-der-transparente.png'
+03:08.042  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-06-macro-tres-cuartos-izquierda-luz-izq-transparente.png'
+03:27.005  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-06-macro-tres-cuartos-izquierda-luz-der-transparente.png'
+03:45.614  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-07-macro-tres-cuartos-derecha-luz-izq-transparente.png'
+04:04.090  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-07-macro-tres-cuartos-derecha-luz-der-transparente.png'
+04:21.792  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-08-picado-lejano-luz-izq-transparente.png'
+04:37.489  render           | Saved: 'render/pequena-blanco/efeonce-logo-3d-blanco-pequena-08-picado-lejano-luz-der-transparente.png'
+OK efeonce-logo-3d-blanco-pequena-01-frente-a-ras-luz-izq
+OK efeonce-logo-3d-blanco-pequena-01-frente-a-ras-luz-der
+OK efeonce-logo-3d-blanco-pequena-02-picado-persona-sentada-luz-izq
+OK efeonce-logo-3d-blanco-pequena-02-picado-persona-sentada-luz-der
+OK efeonce-logo-3d-blanco-pequena-03-picado-tres-cuartos-izquierda-luz-izq
+OK efeonce-logo-3d-blanco-pequena-03-picado-tres-cuartos-izquierda-luz-der
+OK efeonce-logo-3d-blanco-pequena-04-picado-tres-cuartos-derecha-luz-izq
+OK efeonce-logo-3d-blanco-pequena-04-picado-tres-cuartos-derecha-luz-der
+OK efeonce-logo-3d-blanco-pequena-05-picado-alto-luz-izq
+OK efeonce-logo-3d-blanco-pequena-05-picado-alto-luz-der
+OK efeonce-logo-3d-blanco-pequena-06-macro-tres-cuartos-izquierda-luz-izq
+OK efeonce-logo-3d-blanco-pequena-06-macro-tres-cuartos-izquierda-luz-der
+OK efeonce-logo-3d-blanco-pequena-07-macro-tres-cuartos-derecha-luz-izq
+OK efeonce-logo-3d-blanco-pequena-07-macro-tres-cuartos-derecha-luz-der
+OK efeonce-logo-3d-blanco-pequena-08-picado-lejano-luz-izq
+OK efeonce-logo-3d-blanco-pequena-08-picado-lejano-luz-der
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit

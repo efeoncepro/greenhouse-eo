@@ -1,0 +1,39 @@
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:67: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat = bpy.data.materials.new('laca'); mat.use_nodes = True
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:80: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('estudio'); scene.world = world; world.use_nodes = True
+00:18.043  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-01-frente-altura-ojos-luz-izq-transparente.png'
+00:32.707  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-01-frente-altura-ojos-luz-der-transparente.png'
+00:50.108  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-02-tres-cuartos-izquierda-luz-izq-transparente.png'
+01:08.671  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-02-tres-cuartos-izquierda-luz-der-transparente.png'
+01:28.439  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-03-tres-cuartos-derecha-luz-izq-transparente.png'
+01:47.779  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-03-tres-cuartos-derecha-luz-der-transparente.png'
+02:03.730  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-04-contrapicado-frente-luz-izq-transparente.png'
+02:17.670  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-04-contrapicado-frente-luz-der-transparente.png'
+02:36.454  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-05-contrapicado-tres-cuartos-izquierda-luz-izq-transparente.png'
+02:55.724  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-05-contrapicado-tres-cuartos-izquierda-luz-der-transparente.png'
+03:15.214  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-06-contrapicado-tres-cuartos-derecha-luz-izq-transparente.png'
+03:34.582  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-06-contrapicado-tres-cuartos-derecha-luz-der-transparente.png'
+03:49.484  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-07-picado-leve-luz-izq-transparente.png'
+04:04.681  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-07-picado-leve-luz-der-transparente.png'
+04:19.051  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-08-desde-el-publico-luz-izq-transparente.png'
+04:34.415  render           | Saved: 'render/grande-blanco/efeonce-logo-3d-blanco-grande-08-desde-el-publico-luz-der-transparente.png'
+OK efeonce-logo-3d-blanco-grande-01-frente-altura-ojos-luz-izq
+OK efeonce-logo-3d-blanco-grande-01-frente-altura-ojos-luz-der
+OK efeonce-logo-3d-blanco-grande-02-tres-cuartos-izquierda-luz-izq
+OK efeonce-logo-3d-blanco-grande-02-tres-cuartos-izquierda-luz-der
+OK efeonce-logo-3d-blanco-grande-03-tres-cuartos-derecha-luz-izq
+OK efeonce-logo-3d-blanco-grande-03-tres-cuartos-derecha-luz-der
+OK efeonce-logo-3d-blanco-grande-04-contrapicado-frente-luz-izq
+OK efeonce-logo-3d-blanco-grande-04-contrapicado-frente-luz-der
+OK efeonce-logo-3d-blanco-grande-05-contrapicado-tres-cuartos-izquierda-luz-izq
+OK efeonce-logo-3d-blanco-grande-05-contrapicado-tres-cuartos-izquierda-luz-der
+OK efeonce-logo-3d-blanco-grande-06-contrapicado-tres-cuartos-derecha-luz-izq
+OK efeonce-logo-3d-blanco-grande-06-contrapicado-tres-cuartos-derecha-luz-der
+OK efeonce-logo-3d-blanco-grande-07-picado-leve-luz-izq
+OK efeonce-logo-3d-blanco-grande-07-picado-leve-luz-der
+OK efeonce-logo-3d-blanco-grande-08-desde-el-publico-luz-izq
+OK efeonce-logo-3d-blanco-grande-08-desde-el-publico-luz-der
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit
