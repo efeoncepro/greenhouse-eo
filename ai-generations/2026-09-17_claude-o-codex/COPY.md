@@ -2,7 +2,8 @@
 
 Pieza: `out/claude-o-codex-4x5-v04.png` (4:5, sirve igual para el feed de LinkedIn y el de Instagram).
 Marca Metricool: **Julio Reyes** (`5105024`) — LinkedIn personal e Instagram `cesargrowth`.
-Estado: **borrador para aprobar**. No está programado.
+Estado: **programado** el 2026-09-23 — ver `PROGRAMACION.md`. LinkedIn salió en la página de Efeonce, en voz de la
+empresa (sección «LinkedIn — página de Efeonce»).
 
 ## Cómo se tomó su voz
 
@@ -30,7 +31,7 @@ me dejó encantado». Esta pieza es la continuación natural.
 El resto es opinión suya y está escrita como tal. El copy **no afirma que la foto sea real** («la foto no miente» se
 descartó por eso).
 
-## LinkedIn
+## LinkedIn — versión en su voz (no programada)
 
 > En junio escribí aquí que soy Claude Lover 100%.
 >
@@ -56,7 +57,33 @@ descartó por eso).
 >
 > #InteligenciaArtificial #Claude #Codex
 
-## Instagram
+## LinkedIn — página de Efeonce (la que se programó)
+
+> En junio, Julio Reyes, nuestro Managing & GTM Director, escribió que es Claude Lover 100%.
+>
+> Lo sigue siendo. Pero hoy en Efeonce trabajamos con Claude y con Codex, los dos, en el mismo repositorio.
+>
+> Y cada vez que nos preguntan cuál es mejor, sentimos que la pregunta está mal planteada.
+>
+> Los dos agentes trabajan con las mismas instrucciones: cómo operamos, qué no se toca y cómo se verifica algo antes
+> de darlo por terminado. Tenemos incluso un chequeo que no deja subir cambios si las instrucciones de uno y de otro
+> dejan de ser idénticas.
+>
+> Haciendo eso nos quedó algo muy claro: la diferencia grande no está entre un modelo y otro. Está entre un agente
+> con contexto y uno sin él.
+>
+> Un agente sin contexto, por bueno que sea, trabaja como alguien que llegó ayer a la empresa. Uno que conoce tus
+> procesos, tus reglas y tus criterios trabaja como alguien del equipo.
+>
+> Por eso nuestra respuesta honesta a "¿Claude o Codex?" es otra pregunta: ¿cuál de los dos conoce mejor tu negocio?
+>
+> Ninguno lo trae de fábrica. Ese contexto lo construyes tú.
+>
+> ¿Tú ya elegiste? ¿O también los tienes a los dos hablándote al oído?
+>
+> #InteligenciaArtificial #Claude #Codex
+
+## Instagram y Threads (su voz)
 
 > Hace unos meses dije que era Claude Lover 100%.
 >
