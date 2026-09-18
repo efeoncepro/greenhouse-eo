@@ -211,3 +211,42 @@ receta universal de seasonality.
   no se declara ejecutada por usar el motor nativo ni reemplaza el schema vigente del conector elegido.
 
 - **Usar los kits en imagen o video:** [guía de uso de los kits de marca](../../../../docs/operations/social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md).
+
+## Marca en el primer plano desenfocado (regla, 2026-09-17)
+
+Presencia de marca dentro de la fotografía **sin** poner un logo nítido compitiendo con la idea: un objeto real
+delante del sujeto, completamente fuera de foco, sirve de soporte. Pedido del operador: «que en las fotografías
+haya algún bokeh o difuminado de un objeto que esté delante, como excusa, para que en ese difuminado vaya el logo».
+Caso fuente: `ai-generations/2026-09-17_claude-o-codex/`.
+
+**El objeto se genera; el logo se compone.** Nunca se le pide el logo al modelo, ni siquiera desenfocado: una forma
+equivocada y borrosa sigue siendo una forma equivocada. El plate trae el objeto con la **cara limpia** y el logo se
+apoya encima de forma determinística.
+
+**Cómo pedir el objeto en el plate.** Que sea un prop que pertenezca a la escena y tenga una cara plana que recoja
+luz —una barra o placa de acrílico, un vidrio, el canto de una pantalla, una tarjeta de pie—; que esté a
+centímetros del lente y por eso **completamente** fuera de foco; y que su cara sea «COMPLETELY BLANK and EVEN», sin
+grabado, sin textura, sin reflejos de objetos y **sin un brillo fuerte en el medio**, o el logo cae sobre un parche
+claro. Declarar además qué bordes quedan dentro del cuadro: si el logo va **centrado**, el objeto necesita sus dos
+bordes laterales visibles, y entonces sólo puede sangrar por abajo.
+
+**Dónde ponerlo.** Donde no tape lo que cuenta la foto. En un plano de busto detrás de una mesa, la franja que
+queda **bajo las manos** es el único sitio limpio a todo lo ancho; un panel lateral choca con la cara o con el
+gesto. Medir dónde termina el sujeto antes de elegir la zona.
+
+**Cómo componer el logo encima — nada de esto se elige a ojo:**
+
+| Parámetro | Cómo se fija |
+|---|---|
+| Desenfoque | El **sigma medido en el borde del propio objeto**: ancho de la transición de luminancia 10-90 % ÷ 2,56 |
+| Color | Por la luminancia media de la cara del objeto: sobre una cara **clara**, logo navy en `multiply` (lee como impreso); sobre una oscura, negativo en `screen` |
+| Opacidad | La justa para reconocer la forma, no para leerla |
+| Posición | Centrado en el **ancho del objeto**, no en el del lienzo |
+
+**QA, medible:** el gradiente máximo dentro del logo debe quedar **muy por debajo** del de la cara del sujeto y del
+texto. Medido en la pieza fuente: logo en el bokeh **112**, rostro **314**, titular **479**. Si el logo se acerca al
+rostro, está demasiado nítido y se convirtió en un segundo foco: más desenfoque o menos opacidad.
+
+**Límites.** Una sola aparición por pieza. Nunca sobre la cara ni cruzando la mirada. No reemplaza la firma legible
+cuando la pieza necesita una: o es la única marca y entonces su silueta tiene que ser reconocible, o hay firma y
+entonces el bokeh es apoyo.

@@ -3,7 +3,31 @@
 Pedido del operador: él **detrás de una mesa, tipo estudio de podcast pero sin micrófono**, con Clawd y Codex, y el
 titular **¿Claude o Codex?** más su línea entre comillas.
 
-## Piezas
+## Pieza vigente
+
+`out/claude-o-codex-4x5-v03.png` (1152 × 1440) sobre `plates/plate-final.png`. Tres capas, ninguna generada:
+
+1. **Marca en el primer plano desenfocado** — una barra de acrílico fuera de foco cruza el borde frontal de la mesa
+   con la cara limpia, y el logo navy se apoya centrado en su ancho, con el sigma medido del propio borde (7 px) y
+   `multiply` porque la barra es clara. Regla completa en la skill `social-media-studio`, referencia `brand-in-scene`.
+2. **Jerarquía en tres niveles** — titular 98 px dominante · cita 33 px al margen izquierdo, fuera del eje, como un
+   aparte humano · la marca sólo en el bokeh. Antes eran titular y subtítulo centrados en el mismo eje: dos tamaños,
+   un solo nivel.
+3. **Selección colaborativa AXIS sobre el titular** — caja de ocho tiradores, cursor de Clawd en su naranja
+   (`#d77757`) y de Codex en su azul (`#2f67db`, medido sobre el plate), más el cursor local. La decisión es el
+   objeto seleccionado y las dos mascotas se la disputan.
+
+### Cómo se llegó al plate
+
+`plate-v04` trae la cara buena. El primer plano se agregó con **pasada enmascarada** y se recortó a mano: el modelo
+regenera todo aunque le des `--mask` (delta medido en la zona protegida: 221/255, y los ojos 147/255), así que la
+esquina nueva se compone sobre `plate-v04` invirtiendo el alfa de la misma máscara. Verificado: rostro con **delta
+máximo 0**. Ver `docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md`.
+
+Descartes: `plate-v05` (panel bien, ojos oscuros), `plate-v06` y `plate-v07` (el panel lateral choca con la cara y
+con las manos), `out/claude-o-codex-4x5-v01.png` y `-v02` (mascotas en la mesa / jerarquía plana).
+
+## Piezas anteriores
 
 | Formato | Master | Medida social | Plate |
 |---|---|---|---|
@@ -58,15 +82,20 @@ sin ellas es una falta en una pieza de marca. Las comillas y los signos de inter
    anatomía en fracciones de la altura total no basta cuando el encuadre corta a la altura de la mesa: no hay altura
    total visible contra la cual medir.
 
-## QA medido
+## QA medido (pieza vigente)
 
-Contraste sobre los píxeles reales del plate, contra el píxel **más claro** de cada zona:
+Contraste sobre los píxeles reales, contra el píxel **más claro** de cada zona:
 
-| Zona | Blanco | `softOnDark` |
-|---|---|---|
-| Titular | 18,45:1 | 14,17:1 |
-| Cita | 18,39:1 | 14,13:1 |
-| Logo (sobre la mesa) | 10,67:1 | 8,19:1 |
+| Zona | Medido |
+|---|---|
+| Titular (blanco) | 8,80:1 |
+| Cita (`softOnDark`) | 10,63:1 |
+
+La cita empezó bajo el titular y ahí caía sobre el pelo: **1,17:1**, ilegible. Se movió al margen izquierdo, que es
+donde el fondo deja de ser claro. El contraste de una línea de texto se mide **donde queda**, no donde se diseñó.
+
+**Nitidez del logo en el bokeh** (gradiente máximo): logo **112** · rostro **314** · titular **479**. El logo tiene
+que quedar muy por debajo del rostro; si se acerca, dejó de ser atmósfera y se volvió un segundo foco.
 
 Revisado además a 390 px de ancho: titular y cita siguen legibles. Mascotas verificadas al 100 % (cubos naranja con
 ojos rectangulares; nube azul con `>_` cian en pantalla y blanco en el pecho) y el emblema del polo con la nave a la

@@ -1,33 +1,50 @@
-// «¿Claude o Codex?» — titular compuesto sobre el plate de estudio.
+// «¿Claude o Codex?» — composición sobre el plate de estudio.
+//
+// Tres capas, ninguna generada por el modelo:
+//   1. Logo en el PRIMER PLANO DESENFOCADO: se apoya sobre el panel de acrílico que el plate trae
+//      limpio, con el desenfoque medido del propio panel. Presencia de marca, no lectura.
+//   2. Jerarquía tipográfica: titular dominante centrado arriba · la cita del protagonista abajo a la
+//      izquierda, fuera de eje, como un aparte humano · firma más chica en el mismo eje.
+//   3. Selección colaborativa AXIS sobre el titular: Clawd y Codex disputándose la decisión.
+//
 // El texto NUNCA se genera: se moldea con fontkit a trazos SVG desde las fuentes oficiales y las
-// recetas de `axisAdvertising`, y se compone con sharp sobre la foto.
+// recetas de `axisAdvertising`.
 // Uso: node ai-generations/2026-09-17_claude-o-codex/componer.mjs [plate.png] [salida.png]
 import path from 'node:path'
 import { createRequire } from 'node:module'
 
 import sharp from 'sharp'
 import { axisAdvertising } from '@efeoncepro/axis-tokens'
+import { resolveCollaborationSelectionIntent } from '@efeoncepro/axis-ui-contracts'
+
+import { renderCollaborationSelection } from '../../scripts/creative/layout-compiler/axis-advertising.mjs'
 
 const require = createRequire(import.meta.url)
 const fontkit = require('fontkit')
 const DIR = path.dirname(new URL(import.meta.url).pathname)
 
-const PLATE = process.argv[2] ?? `${DIR}/plates/plate-v02.png`
-const OUT = process.argv[3] ?? `${DIR}/out/claude-o-codex-4x5-v01.png`
+const PLATE = process.argv[2] ?? `${DIR}/plates/plate-final.png`
+const OUT = process.argv[3] ?? `${DIR}/out/claude-o-codex-4x5-v03.png`
 
 const R = axisAdvertising.recipes
 const C = axisAdvertising.color
 
 const TITULO = '¿Claude o Codex?'
-// Acentuado según ortografía: el operador escribió «No se cual elegir» sin tildes al dictarlo.
+// Acentuado según ortografía: el operador lo dictó como «No se cual elegir».
 const CITA = '“No sé cuál elegir”'
+
+// Colores de marca de cada mascota, medidos sobre el propio plate (no inventados):
+// Clawd toma el naranja oficial de Claude Code; Codex, el azul de su vinilo.
+const COLOR_CLAWD = '#d77757'
+const COLOR_CODEX = '#2f67db'
 
 const FONTS = {
   bric: fontkit.openSync('src/assets/fonts/BricolageGrotesque-Variable.ttf'),
-  'Poppins-500': fontkit.openSync('src/assets/fonts/Poppins-Medium.ttf')
+  'Poppins-500': fontkit.openSync('src/assets/fonts/Poppins-Medium.ttf'),
+  'Poppins-700': fontkit.openSync('src/assets/fonts/Poppins-Bold.ttf')
 }
 
-// Moldea un texto a trazos y devuelve su caja de tinta real (no la métrica de la fuente).
+// Moldea un texto a trazos y devuelve su caja de TINTA real (no la métrica de la fuente).
 const shape = (text, font, size, trackingEm = 0) => {
   const run = font.layout(text)
   const scale = size / font.unitsPerEm
@@ -50,61 +67,114 @@ const shape = (text, font, size, trackingEm = 0) => {
     x += p.xAdvance * scale + (i === run.glyphs.length - 1 ? 0 : trackingEm * size)
   })
 
-  return { paths, ink }
+  return { paths, ink, advance: x }
 }
 
 const { width: W, height: H } = await sharp(PLATE).metadata()
-
-// El formato manda la disposición. En vertical el titular y la cita van apilados arriba; en
-// horizontal no caben sin chocar con la coronilla, así que la cita baja a la mesa y el logo se
-// va al otro extremo.
 const ANCHO = W / H > 1.2
-const L = ANCHO
-  ? { anchoTitulo: 0.42, top: 0.035, citaAbajo: true, logoDerecha: true, logoW: 0.11 }
-  : { anchoTitulo: 0.8, top: 0.072, citaAbajo: false, logoDerecha: false, logoW: 0.17 }
+const MARGEN = W * 0.075
 
-// ── Titular: Bricolage ideaImpact, ajustado al ancho objetivo por la tinta, no por la métrica ──
+// ── Nivel 1 · titular ────────────────────────────────────────────────────────────────────────────
+// Se deja aire a la derecha para el cursor y la etiqueta del colaborador, que viven fuera de la caja.
 const impactFont = FONTS.bric.getVariation({ wght: R.ideaImpact.weight, wdth: R.ideaImpact.width, opsz: R.ideaImpact.opticalSize })
 const TR = Number.parseFloat(R.ideaImpact.tracking)
 const sonda = shape(TITULO, impactFont, 100, TR)
-const tamTitulo = (100 * W * L.anchoTitulo) / (sonda.ink.right - sonda.ink.left)
+const tamTitulo = (100 * W * (ANCHO ? 0.36 : 0.58)) / (sonda.ink.right - sonda.ink.left)
 const titulo = shape(TITULO, impactFont, tamTitulo, TR)
+const xTitulo = W / 2 - (titulo.ink.left + titulo.ink.right) / 2
+const yTitulo = Math.round(H * (ANCHO ? 0.09 : 0.135)) - titulo.ink.top
+const cajaTitulo = {
+  left: xTitulo + titulo.ink.left,
+  right: xTitulo + titulo.ink.right,
+  top: yTitulo + titulo.ink.top,
+  bottom: yTitulo + titulo.ink.bottom
+}
 
-// ── Cita: Poppins structureTagline, proporcional al titular ──
-const tamCita = tamTitulo * (ANCHO ? 0.34 : 0.30)
+// ── Nivel 2 · la cita, fuera de eje y abajo a la izquierda ───────────────────────────────────────
+const tamCita = tamTitulo * 0.34
 const cita = shape(CITA, FONTS['Poppins-500'], tamCita, Number.parseFloat(R.structureTagline.tracking))
 
-// Centrado óptico por la tinta; la línea base se deriva de la altura de tinta medida.
-const situar = (l, baseline, x) => ({
-  x: x ?? W / 2 - (l.ink.left + l.ink.right) / 2,
-  y: baseline,
-  top: baseline + l.ink.top,
-  bottom: baseline + l.ink.bottom
+// ── Nivel 3 · la marca vive en el primer plano desenfocado ───────────────────────────────────────
+// El plate trae una barra de acrílico tumbada en el borde frontal de la mesa, completamente fuera
+// de foco y con la cara LIMPIA. El logo se apoya ahí, centrado en el ancho de la barra.
+//
+// Tres cosas no se eligen a ojo:
+//   · el desenfoque es el SIGMA MEDIDO en el borde de la propia barra (transición 10-90 % ÷ 2,56);
+//   · sobre una barra clara el logo va en NAVY y en `multiply`, para que lea como impreso en el
+//     acrílico y no como un parche pegado encima;
+//   · la opacidad se queda por debajo de la lectura nítida: es presencia de marca, no un segundo
+//     foco. Si el logo se lee crudo, está mal.
+const BANDA = { cy: 1362, sigma: 7, luminancia: 132 }
+const NIEBLA = ANCHO ? null : { cx: W / 2, cy: BANDA.cy, ancho: Math.round(W * 0.30), sigma: BANDA.sigma, opacidad: 0.62 }
+
+let nieblaCapa = null
+if (NIEBLA) {
+  const base = await sharp('public/branding/logo-full.svg', { density: 600 })
+    .resize({ width: NIEBLA.ancho })
+    .blur(NIEBLA.sigma)
+    .png()
+    .toBuffer()
+  const { width: nw, height: nh } = await sharp(base).metadata()
+  nieblaCapa = {
+    input: base,
+    left: Math.round(NIEBLA.cx - nw / 2),
+    top: Math.round(NIEBLA.cy - nh / 2),
+    blend: 'multiply',
+    opacity: NIEBLA.opacidad
+  }
+}
+
+// La cita va al margen izquierdo, fuera del eje del titular: rompe la simetría y la deja claramente
+// por debajo en la jerarquía. Se mantiene a la izquierda del pelo, que es donde el fondo deja de ser
+// oscuro — medido: sobre el pelo el contraste cae a 1,17:1.
+const yCita = cajaTitulo.bottom + tamTitulo * 1.05 - cita.ink.top
+const xCita = W * 0.055 - cita.ink.left
+
+// ── Selección colaborativa AXIS sobre el titular ─────────────────────────────────────────────────
+// La decisión es el objeto seleccionado y las dos mascotas se la disputan: cada cursor lleva su
+// color de marca, la tinta de la etiqueta la elige el adapter por contraste.
+const measureLabel = (label, size) => shape(label, FONTS['Poppins-700'], size).advance
+const manifest = resolveCollaborationSelectionIntent({
+  targetId: 'titulo-decision',
+  targetKind: 'text',
+  variant: 'eight-handles',
+  padding: 'standard',
+  overlay: 'subtle',
+  cursors: [
+    { id: 'clawd', kind: 'collaborator', targetId: 'titulo-decision', anchor: 'top-end', action: 'select', label: 'Clawd', participantKind: 'role' },
+    { id: 'codex', kind: 'collaborator', targetId: 'titulo-decision', anchor: 'top-start', action: 'select', label: 'Codex', participantKind: 'role' },
+    { id: 'local', kind: 'local', targetId: 'titulo-decision', anchor: 'bottom-end', action: 'select' }
+  ]
+})
+const rendered = renderCollaborationSelection({
+  manifest,
+  targetBounds: cajaTitulo,
+  canvas: { width: W, height: H },
+  measureLabel,
+  presentation: { collaboratorScale: 1.7, localCursorScale: 1.15, participantColors: { clawd: COLOR_CLAWD, codex: COLOR_CODEX } }
 })
 
-const baseTitulo = Math.round(H * L.top) - titulo.ink.top
-const pTitulo = situar(titulo, baseTitulo)
-
-const pCita = L.citaAbajo
-  ? situar(cita, H - H * 0.055 - cita.ink.bottom, W * 0.055 - cita.ink.left)
-  : situar(cita, pTitulo.bottom + tamTitulo * 0.46 - cita.ink.top)
-
-// ── Logo Efeonce en negativo ──
-const LOGO_W = Math.round(W * L.logoW)
-const logo = await sharp('public/branding/logo-negative.svg', { density: 600 }).resize({ width: LOGO_W }).png().toBuffer()
-const { height: logoH } = await sharp(logo).metadata()
-const logoLeft = L.logoDerecha ? Math.round(W - LOGO_W - W * 0.055) : Math.round((W - LOGO_W) / 2)
-const logoTop = Math.round(L.citaAbajo ? (pCita.top + pCita.bottom) / 2 - logoH / 2 : H - logoH - H * 0.038)
+// El adapter emite <text>; acá no hay fuentes instaladas en el render, así que se convierte a trazos.
+const seleccion = rendered.overlay.replace(
+  /<text x="(-?[\d.]+)" y="(-?[\d.]+)" fill="([^"]+)" font-family="[^"]*" font-size="([\d.]+)" font-weight="700">([^<]*)<\/text>/g,
+  (_, x, y, fill, size, label) => {
+    const s = shape(label.replaceAll('&amp;', '&'), FONTS['Poppins-700'], Number(size))
+    return `<g fill="${fill}" transform="translate(${x} ${y})">${s.paths}</g>`
+  }
+)
+if (/<text/.test(seleccion)) throw new Error('Quedó un <text> sin convertir a trazos')
+if (!rendered.evidence.withinCanvas) throw new Error(`Selección fuera del lienzo: ${JSON.stringify(rendered.evidence)}`)
 
 const overlay = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-  <g fill="${C.inkOnDark}" transform="translate(${pTitulo.x.toFixed(2)} ${pTitulo.y.toFixed(2)})">${titulo.paths}</g>
-  <g fill="${C.softOnDark}" transform="translate(${pCita.x.toFixed(2)} ${pCita.y.toFixed(2)})">${cita.paths}</g>
+  ${seleccion}
+  <g fill="${C.inkOnDark}" transform="translate(${xTitulo.toFixed(2)} ${yTitulo.toFixed(2)})">${titulo.paths}</g>
+  <g fill="${C.softOnDark}" transform="translate(${xCita.toFixed(2)} ${yCita.toFixed(2)})">${cita.paths}</g>
 </svg>`)
 
 await sharp(PLATE)
   .composite([
-    { input: overlay, left: 0, top: 0 },
-    { input: logo, left: logoLeft, top: logoTop }
+    ...(nieblaCapa ? [nieblaCapa] : []),
+    { input: overlay, left: 0, top: 0 }
   ])
   .png()
   .toFile(OUT)
@@ -112,6 +182,10 @@ await sharp(PLATE)
 console.log(JSON.stringify({
   salida: OUT,
   lienzo: [W, H],
-  titulo: { texto: TITULO, tam: Math.round(tamTitulo), tinta: [Math.round(pTitulo.top), Math.round(pTitulo.bottom)] },
-  cita: { texto: CITA, tam: Math.round(tamCita), tinta: [Math.round(pCita.top), Math.round(pCita.bottom)] }
+  jerarquia: {
+    titular: { tam: Math.round(tamTitulo), tinta: [Math.round(cajaTitulo.top), Math.round(cajaTitulo.bottom)] },
+    cita: { tam: Math.round(tamCita), tinta: [Math.round(yCita + cita.ink.top), Math.round(yCita + cita.ink.bottom)] }
+  },
+  seleccion: { cursores: manifest.cursors.map(c => c.id), dentroDelLienzo: rendered.evidence.withinCanvas },
+  nieblaDeMarca: NIEBLA
 }, null, 2))

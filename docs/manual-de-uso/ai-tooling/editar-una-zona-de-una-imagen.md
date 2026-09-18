@@ -249,3 +249,36 @@ Lo que sigue abierto:
 - Cliente canonico: `src/lib/ai/openai-image.ts` (`editOpenAIImage`)
 - CLI: `scripts/ai/generate-image.ts`
 - Medicion de costo con evidencia: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`
+
+## La mascara NO preserva pixeles: el recorte lo haces tu
+
+**Medido 2026-09-17** (`ai-generations/2026-09-17_claude-o-codex/`). GPT Image 2.5 **regenera la imagen completa**
+aunque le pases `--mask`. La zona protegida cambia: en una pasada que solo debia tocar una esquina, el delta maximo
+en la zona protegida fue **221/255** y la caja de los ojos del sujeto se movio **147/255**. El promedio de la zona
+protegida fue bajo (4,85) — por eso el promedio **no** sirve como criterio de aceptacion.
+
+**Regla dura:** si lo que esta fuera de la mascara no se puede tocar —una cara, un logo ya aprobado, un texto
+compuesto— no confies en el modelo. Compon tu el resultado: toma la salida, invierte el alfa de la misma mascara y
+apoyala sobre la base original. Asi la zona protegida queda **identica bit a bit** y el degradado de la mascara te
+da la union sin costura.
+
+```js
+const alfa = await sharp(MASCARA).extractChannel('alpha').raw().toBuffer()
+const nueva = await sharp(SALIDA_DEL_MODELO).ensureAlpha().raw().toBuffer()
+const parche = Buffer.alloc(W * H * 4)
+for (let i = 0; i < W * H; i++) {
+  parche[i * 4] = nueva[i * 4]
+  parche[i * 4 + 1] = nueva[i * 4 + 1]
+  parche[i * 4 + 2] = nueva[i * 4 + 2]
+  parche[i * 4 + 3] = 255 - alfa[i] // se trae SOLO lo que la mascara abrio
+}
+await sharp(BASE).composite([{ input: png(parche), left: 0, top: 0 }]).toFile(FINAL)
+```
+
+**Verificalo, no lo supongas:** compara base y final en una caja de la zona protegida y exige **delta maximo 0**.
+Cuidado al comparar: `.raw()` sobre un PNG sin alfa devuelve 3 canales y sobre uno con alfa devuelve 4; si mezclas
+los dos, los bytes se desalinean y el delta sale disparatado aunque la imagen este bien. Fuerza `.removeAlpha()` en
+ambos lados.
+
+**Para que sirve igual la mascara:** le dice al modelo donde trabajar y le da el contexto de alrededor, que es lo
+que hace que la zona nueva calce en luz, color y grano. El recorte fino es tuyo.
