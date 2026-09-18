@@ -228,8 +228,9 @@ concurrentes agotó casi las conexiones de la instancia compartida por 5 min ⇒
 `pnpm hiring:email-type` y apagados al terminar): `share_link` y `attachment` → ambos `accepted` al primer intento, fila
 `sent` con `resend_id`, asunto del enlace redactado, sin bearer persistido, grant `source=delivery` (7 días). Retiro de la
 edición: enlace B 200 → 410 y grants vivos (manual + delivery) revocados `edition_withdrawn`. `provider_status`
-(entregado) no se pudo leer: el ciclo de vida de Resend no opera (`ISSUE-160`); la entrega la confirma el operador en su
-bandeja. **Pendiente fuera de la frontera acordada:** federación en `efeonce-mcp`, producción (flags + release).
+(entregado) no se pudo leer: el ciclo de vida de Resend no opera (`ISSUE-160`); **el operador confirmó 2026-09-18 que los
+dos correos (enlace `idlv-5be5306b…` y adjunto `idlv-0ee709e7…`) llegaron a su bandeja** — evidencia humana, no de
+ledger. Federación en `efeonce-mcp` y release a producción: cerrados el mismo día (ver Delta 2026-09-18).
 
 **Slices:** 1 grants + reader público + web model + redacción + proxy · 2 intents/recipients + EmailTypes + projection
 + reconciliación + in-app · 3 schedules + tick `ops-worker` + período relativo · 4 conformance, docs, skill, staging.
