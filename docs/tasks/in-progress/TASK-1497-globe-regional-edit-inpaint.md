@@ -1,5 +1,30 @@
 # TASK-1497 — Regional Edit / Inpaint
 
+## Delta 2026-09-17 — el proveedor no preserva la zona fuera de la máscara
+
+Hallazgo medido el 2026-09-17 y documentado en
+[`docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md`](../../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md),
+paso 5 «La máscara NO preserva píxeles»: GPT Image 2.5 **regenera la imagen completa** aunque reciba `--mask`. En una
+pasada que sólo debía tocar una esquina, el delta máximo en la zona protegida fue **221/255** y la caja de los ojos
+del sujeto se movió **147/255**, mientras el promedio de la zona protegida fue apenas **4,85**. El promedio, por lo
+tanto, **no sirve como criterio de aceptación**: esconde exactamente los cambios que importan.
+
+Consecuencias para esta task, sin cambiar su alcance ni su lifecycle:
+
+- **El proveedor no garantiza preservación.** Ninguna ruta regional puede darla por supuesta porque el modelo
+  recibió una máscara.
+- **La preservación la compone el servidor.** La capacidad de edición regional de Globe toma la salida del modelo,
+  invierte el alfa de la misma máscara de composición y apoya el resultado sobre la imagen base original. Sólo así la
+  zona protegida queda idéntica bit a bit.
+- **Se acepta por delta máximo 0 en la zona protegida**, no por promedio ni por tolerancia visual. Al comparar, se
+  aplica `.removeAlpha()` en ambos lados: un buffer de 3 canales contra uno de 4 desalinea los bytes y da un delta
+  falso.
+- **Los criterios existentes siguen vigentes sólo leídos así.** Donde esta task dice que el resto del asset «queda
+  preservado» o «se preserva», eso significa preservación compuesta por el servidor y verificada con delta máximo 0,
+  nunca preservación entregada por el proveedor.
+- Esto concreta el modo `strict` del delta 2026-07-26: la «recomposición verificable» es esta composición con alfa
+  invertido, y su verificación es el delta máximo 0. El canary en vivo debe medirlo así.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
