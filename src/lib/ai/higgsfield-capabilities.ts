@@ -98,7 +98,9 @@ export const getHiggsfieldSchema = (endpoint: string): HiggsfieldJsonSchema | nu
 /**
  * Barrido `pnpm ai:fal --capability <id> --estimate` sobre TODO el catálogo con la cuenta de Efeonce: las 44
  * capacidades respondieron 200 (validación + precio). La primera generación real quedó bloqueada por
- * `403 not_enough_credits` (la cuenta de API aún no tiene créditos), así que ninguna tiene `verifiedAt`.
+ * `403 not_enough_credits` hasta que se cargaron créditos en la cuenta de API; el 2026-09-17 `hf-zimage-turbo`
+ * completó la primera generación real (request `52df8c09-c2b4-4aec-98c7-b5768fbda8fc`, USD 0,015). El resto sigue
+ * sin `verifiedAt`: una generación exitosa verifica su capacidad, no la familia.
  */
 const ESTIMATE_SWEEP = '2026-09-16'
 
@@ -144,7 +146,9 @@ export const HIGGSFIELD_CAPABILITIES: readonly HiggsfieldCapability[] = [
     note: 'rendering_speed TURBO/DEFAULT/QUALITY; image_url opcional con image_weight'
   }),
   capability('hf-qwen-image3', 'alibaba/qwen-image-3/text-to-image', 'Qwen Image 3', 'image', 'text-to-image'),
-  capability('hf-zimage-turbo', 'z-image/turbo', 'Z-Image Turbo (rápido y barato)', 'image', 'text-to-image'),
+  capability('hf-zimage-turbo', 'z-image/turbo', 'Z-Image Turbo (rápido y barato)', 'image', 'text-to-image', {
+    verifiedAt: '2026-09-17'
+  }),
   capability('hf-grok-image2', 'xai/grok-imagine-image-2.0', 'Grok Imagine Image 2.0 (genera y edita)', 'image', 'image-edit', {
     note: 'Hasta 10 imágenes de referencia; 1k/2k'
   }),

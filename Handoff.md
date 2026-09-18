@@ -1,6 +1,6 @@
 # Handoff activo
 
-**16–17/09:** Higgsfield sin créditos; sin activación. Previa 18: verificar · KV 21/09: readback.
+**16–17/09:** Higgsfield API con créditos. Previa 18: verificar · readback KV 21/09 y 23/09.
 
 **Posicionamiento CRM actualizado (2026-09-16, documental):** HubSpot y Salesforce se mantienen como proveedores
 con una zona de solapamiento —mid-market alto, agentes e integraciones— pero con centros de gravedad distintos.

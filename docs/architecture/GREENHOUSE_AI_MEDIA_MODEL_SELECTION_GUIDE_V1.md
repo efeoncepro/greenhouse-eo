@@ -652,7 +652,7 @@ pnpm ai:fal --capability wan3prime-t2v --prompt "<escena>" --duration 5 --resolu
 
 **Vectores (Recraft).** La API rechaza `output_format: svg` (400: sólo `jpg`/`png`/`webp`) [verificado 2026-09-16]. La app de Higgsfield ofrece Recraft V4.1 con `model_type` `vector` y `utility_vector` (logos, íconos, ilustración tipo SVG) [verificado con el conector de la app 2026-09-16]. La API no documenta `model_type` y su estimación acepta cualquier campo (`foo`, `model_type: "banana"` → 200), así que no prueba nada: **si `--input '{"model_type":"vector"}'` entrega SVG por la API está sin confirmar** hasta una generación real (USD 0,035). La CLI deja pasar ese campo para poder probarlo.
 
-**Estado.** Las 44 capacidades pasaron el barrido `--estimate` (acceso + esquema + precio) [verificado 2026-09-16]. **Ninguna generación real verificada:** el primer intento respondió `403 not_enough_credits`. Hasta recargar créditos en console.higgsfield.ai/billing y correr una generación por familia, trátalas como SIN VERIFICAR en salida.
+**Estado.** Las 44 capacidades pasaron el barrido `--estimate` (acceso + esquema + precio) [verificado 2026-09-16]. La cuenta de API ya tiene créditos: **`hf-zimage-turbo` completó la primera generación real** el 2026-09-17 (1k, USD 0,015, 7,7 s, request `52df8c09-c2b4-4aec-98c7-b5768fbda8fc`) [verificado 2026-09-17]. **Las otras 43 siguen SIN VERIFICAR en salida:** una generación exitosa prueba la cuenta y esa capacidad, no la familia. Antes de usar una en producción, correr una generación real de esa capacidad.
 
 ```bash
 # Precio y cuerpo sin encolar
