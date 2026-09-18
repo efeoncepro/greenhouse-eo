@@ -8,6 +8,7 @@ type Args = {
   actorId: string
   apply: boolean
   confirmRegistration: string | null
+  confirmedRunOwnedOAuthClientIds: string[]
 }
 
 const valueAfter = (argv: string[], flag: string) => {
@@ -20,16 +21,28 @@ const valueAfter = (argv: string[], flag: string) => {
   return index >= 0 ? argv[index + 1] : undefined
 }
 
+const valuesAfter = (argv: string[], flag: string) => {
+  const values: string[] = []
+
+  for (const [index, argument] of argv.entries()) {
+    if (argument.startsWith(`${flag}=`)) values.push(argument.slice(flag.length + 1))
+    else if (argument === flag && argv[index + 1]) values.push(argv[index + 1]!)
+  }
+
+  return [...new Set(values)]
+}
+
 const parseArgs = (argv: string[]): Args => {
   const canaryRegistrationId = valueAfter(argv, '--registration') ?? ''
   const reason = valueAfter(argv, '--reason') ?? 'TASK-1832 governed canary cleanup inspection'
   const actorId = valueAfter(argv, '--actor') ?? 'operator:task-1832-canary-cleanup'
   const apply = argv.includes('--apply')
   const confirmRegistration = valueAfter(argv, '--confirm-registration') ?? null
+  const confirmedRunOwnedOAuthClientIds = valuesAfter(argv, '--confirm-owned-client')
 
   if (!canaryRegistrationId) {
     throw new Error(
-      'Usage: pnpm identity:external-canary:cleanup -- --registration <xcr-id> [--reason <text>] [--apply --confirm-registration <same-xcr-id>]'
+      'Usage: pnpm identity:external-canary:cleanup -- --registration <xcr-id> [--confirm-owned-client <dcr-id> ...] [--reason <text>] [--apply --confirm-registration <same-xcr-id>]'
     )
   }
 
@@ -37,7 +50,14 @@ const parseArgs = (argv: string[]): Args => {
     throw new Error('--apply requires --confirm-registration with the exact canary registration id')
   }
 
-  return { canaryRegistrationId, reason, actorId, apply, confirmRegistration }
+  return {
+    canaryRegistrationId,
+    reason,
+    actorId,
+    apply,
+    confirmRegistration,
+    confirmedRunOwnedOAuthClientIds
+  }
 }
 
 const serializeError = (error: unknown) => {
@@ -55,7 +75,7 @@ const serializeError = (error: unknown) => {
 const main = async () => {
   if (process.argv.includes('--help')) {
     console.log(
-      'Usage: pnpm identity:external-canary:cleanup -- --registration <xcr-id> [--reason <text>] [--apply --confirm-registration <same-xcr-id>]'
+      'Usage: pnpm identity:external-canary:cleanup -- --registration <xcr-id> [--confirm-owned-client <dcr-id> ...] [--reason <text>] [--apply --confirm-registration <same-xcr-id>]'
     )
 
     return
@@ -76,7 +96,8 @@ const main = async () => {
       {
         canaryRegistrationId: args.canaryRegistrationId,
         apply: args.apply,
-        reason: args.reason
+        reason: args.reason,
+        confirmedRunOwnedOAuthClientIds: args.confirmedRunOwnedOAuthClientIds
       },
       { actorId: args.actorId }
     )

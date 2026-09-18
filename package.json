@@ -50,6 +50,7 @@
     "identity:internal-access:reconcile": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/identity/reconcile-internal-authority.ts",
     "identity:external-access:smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/identity/external-access-smoke.ts",
     "identity:external-canary:cleanup": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/identity/external-canary-cleanup.ts",
+    "identity:external-canary:revoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/identity/external-canary-revoke.ts",
     "identity:external-canary:readback": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/identity/external-canary-readback.ts",
     "email:resend:reconcile": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/email/reconcile-resend-deliveries.ts",
     "sister-platform:redirect": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/sister-platform-oauth-redirect-uris.ts",

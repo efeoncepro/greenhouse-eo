@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 type Handler = (params: unknown[], sql: string) => unknown[] | { rows: unknown[] }
@@ -125,9 +127,11 @@ const emptyAuthInventory = (overrides: Record<string, string> = {}) => ({
   authorization_contexts: '0',
   oauth_clients: '0',
   active_auth: '0',
-  unsafe_oauth_clients: '0',
   ...overrides
 })
+
+const preservationRows = (keys: string[] = []) => keys.map(preservationKey => ({ preservation_key: preservationKey }))
+const preservationDigest = (keys: string[] = []) => createHash('sha256').update(keys.join('\n')).digest('hex')
 
 describe('TASK-1832 — external canary lifecycle', () => {
   beforeEach(() => {
@@ -250,8 +254,9 @@ describe('TASK-1832 — external canary lifecycle', () => {
     route([
       [/FROM greenhouse_core\.external_canary_registrations r/, () => [cleanupRegistration()]],
       [/SELECT binding_id,status FROM greenhouse_core\.external_organization_bindings/, () => []],
-      [/SELECT DISTINCT owned\.client_id/, () => []],
-      [/AS active_auth,/, () => [emptyAuthInventory()]],
+      [/SELECT DISTINCT observed\.client_id/, () => []],
+      [/AS active_auth/, () => [emptyAuthInventory()]],
+      [/AS preservation_key/, () => preservationRows()],
       [/canary_registration_id IS DISTINCT FROM \$2/, () => [{ total: '0' }]],
       [/SELECT session_hash FROM greenhouse_auth\.sessions/, () => []],
       [
@@ -284,12 +289,105 @@ describe('TASK-1832 — external canary lifecycle', () => {
     )
   })
 
+  it('partitions run-owned DCRs from shared clients and preserves the shared baseline', async () => {
+    const sharedClientId = 'https://chatgpt.com/oauth/codex/client.json'
+
+    route([
+      [/FROM greenhouse_core\.external_canary_registrations r/, () => [cleanupRegistration()]],
+      [
+        /SELECT binding_id,status FROM greenhouse_core\.external_organization_bindings/,
+        () => [{ binding_id: 'xob-canary', status: 'revoked' }]
+      ],
+      [/SELECT DISTINCT owned\.profile_id/, () => [{ profile_id: 'profile-canary' }]],
+      [/SELECT DISTINCT link_id FROM greenhouse_core\.external_member_invitations/, () => [{ link_id: 'link-canary' }]],
+      [
+        /SELECT l\.link_id,l\.source_system/,
+        () => [
+          {
+            link_id: 'link-canary',
+            source_system: 'external_idp:efeonce-auth',
+            source_object_type: 'subject',
+            source_object_id: 'subject-canary',
+            data_origin: 'smoke_test'
+          }
+        ]
+      ],
+      [
+        /SELECT DISTINCT observed\.client_id/,
+        () => [
+          { client_id: 'dcr-owned', run_owned: true, dcr_eligible: true },
+          { client_id: 'dcr-legacy', run_owned: false, dcr_eligible: true },
+          { client_id: sharedClientId, run_owned: false, dcr_eligible: false }
+        ]
+      ],
+      [
+        /AS active_auth/,
+        () => [
+          emptyAuthInventory({
+            authorization_codes: '2',
+            refresh_tokens: '2',
+            access_tokens: '2',
+            client_consents: '2',
+            authorization_contexts: '2',
+            oauth_clients: '1'
+          })
+        ]
+      ],
+      [/AS preservation_key[\s\S]*FROM greenhouse_auth\.oauth_clients/, () => preservationRows([sharedClientId])],
+      [/AS preservation_key/, () => preservationRows(['one', 'two', 'three', 'four', 'five', 'six', 'seven'])],
+      [/SELECT \([\s\S]*external_organization_bindings WHERE binding_id=ANY/, () => [{ total: '0' }]],
+      [/canary_registration_id IS DISTINCT FROM \$2/, () => [{ total: '0' }]],
+      [/SELECT session_hash FROM greenhouse_auth\.sessions/, () => []],
+      [
+        /FROM pg_constraint fk/,
+        params =>
+          params[0] === 'greenhouse_auth.oauth_clients'
+            ? [
+                {
+                  source_schema: 'greenhouse_auth',
+                  source_table: 'access_tokens',
+                  source_column: 'client_id',
+                  columns: 1
+                }
+              ]
+            : []
+      ],
+      [
+        /FROM "greenhouse_auth"\."access_tokens"/,
+        params => {
+          expect(params[0]).toEqual(['dcr-owned', 'dcr-legacy'])
+
+          return [{ total: '0' }]
+        }
+      ]
+    ])
+
+    const plan = await inspectExternalCanaryCleanup(registrationId, {
+      confirmedRunOwnedOAuthClientIds: ['dcr-legacy']
+    })
+
+    expect(plan).toMatchObject({
+      oauthClientIds: ['dcr-owned', 'dcr-legacy', sharedClientId],
+      runOwnedOAuthClientIds: ['dcr-owned', 'dcr-legacy'],
+      confirmedRunOwnedOAuthClientIds: ['dcr-legacy'],
+      unconfirmedOAuthClientIds: [],
+      sharedOAuthClientIds: [sharedClientId],
+      logicalBlockers: [],
+      deletionReady: true,
+      preservedSharedAuthArtifacts: {
+        oauthClients: { count: 1, digest: preservationDigest([sharedClientId]) },
+        refreshTokens: { count: 7, digest: preservationDigest(['one', 'two', 'three', 'four', 'five', 'six', 'seven']) }
+      }
+    })
+  })
+
   it('requires the migrator database role before any destructive cleanup statement', async () => {
     route([
       [/FROM greenhouse_core\.external_canary_registrations r/, () => [cleanupRegistration()]],
       [/SELECT binding_id,status FROM greenhouse_core\.external_organization_bindings/, () => []],
-      [/SELECT DISTINCT owned\.client_id/, () => []],
-      [/AS active_auth,/, () => [emptyAuthInventory()]],
+      [/SELECT DISTINCT observed\.client_id/, () => []],
+      [/AS active_auth/, () => [emptyAuthInventory()]],
+      [/AS preservation_key/, () => preservationRows()],
       [/canary_registration_id IS DISTINCT FROM \$2/, () => [{ total: '0' }]],
       [/SELECT session_hash FROM greenhouse_auth\.sessions/, () => []],
       [/FROM pg_constraint fk/, () => []],
@@ -440,9 +538,9 @@ describe('TASK-1832 — external canary lifecycle', () => {
           }
         ]
       ],
-      [/SELECT DISTINCT owned\.client_id/, () => [{ client_id: 'dcr-canary' }]],
+      [/SELECT DISTINCT observed\.client_id/, () => [{ client_id: 'dcr-canary', run_owned: true }]],
       [
-        /AS active_auth,/,
+        /AS active_auth/,
         () => [
           emptyAuthInventory({
             sessions: '1',
@@ -457,6 +555,7 @@ describe('TASK-1832 — external canary lifecycle', () => {
           })
         ]
       ],
+      [/AS preservation_key/, () => preservationRows()],
       [/SELECT \([\s\S]*external_organization_bindings WHERE binding_id=ANY/, () => [{ total: '0' }]],
       [/canary_registration_id IS DISTINCT FROM \$2/, () => [{ total: '0' }]],
       [/SELECT session_hash FROM greenhouse_auth\.sessions/, () => [{ session_hash: 'session-canary' }]],
@@ -503,16 +602,24 @@ describe('TASK-1832 — external canary lifecycle', () => {
     expect(result).toMatchObject({
       applied: true,
       readback: {
-        organizations: 0,
-        registrations: 0,
-        bindings: 0,
-        grants: 0,
-        invitations: 0,
-        profiles: 0,
-        source_links: 0,
-        sessions: 0,
-        passkey_credentials: 0,
-        oauth_clients: 0
+        deletedGraph: {
+          organizations: 0,
+          registrations: 0,
+          bindings: 0,
+          grants: 0,
+          invitations: 0,
+          profiles: 0,
+          source_links: 0,
+          sessions: 0,
+          passkey_credentials: 0,
+          oauth_clients: 0
+        },
+        preservedShared: {
+          oauthClients: {
+            count: 0,
+            digest: preservationDigest()
+          }
+        }
       }
     })
 
