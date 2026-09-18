@@ -36,6 +36,10 @@ Necesitas:
 - sesión `efeonce_admin` con `identity.external_canary.register|bind|revoke`;
 - proxy PostgreSQL y perfil `ops` sólo para el cleanup apply;
 - una copia nueva del manifiesto por corrida.
+- la lista de clientes de la matriz clasificada como propios de la corrida (DCR) o compartidos (por ejemplo
+  ChatGPT/Codex hospedados), y un dry-run de cleanup por sujeto sobre un cliente compartido que salga verde
+  antes de invitar a nadie;
+- la consulta por sujeto que usarás en cada muestra diaria (nunca la cifra agregada del cliente).
 
 Confirma el baseline agregado antes de crear datos:
 

@@ -135,6 +135,20 @@ conserva PKCE, callbacks, anti-SSRF, auth method y allowlist de scopes. Canon: c
   adelanta el retiro. Una excepción expresa debe nombrar el asset/conexión y conservar el resto de la ventana;
   no se convierte en autorización para borrar el registro completo o los clientes compartidos.
 
+## Diseño de una corrida nueva
+
+Lecciones de TASK-1832 (la certificación pasó; el retiro quedó bloqueado una semana por diseño):
+
+- Clasifica cada cliente OAuth de la matriz como `run_owned` o `shared` antes del primer write. Los hospedados
+  por CIMD (ChatGPT/Codex) son shared; prueba el cleanup por sujeto en dry-run sobre uno de ellos antes de
+  invitar, no el día del retiro.
+- Toda señal se lee por sujeto (`subject_hash`/`grant_id`), nunca por `client_id`, y las muestras por sujeto
+  cubren sin huecos todo el período hasta la revocación. Una ventana steady con un tramo sin muestra no es
+  evidencia.
+- El dry-run corre con el mismo perfil DB que el apply (`ops`).
+- Los gates y sus carriles de apagado se inventarían en el manifiesto al abrir; se leen en el runtime servido
+  al abrir y al cerrar.
+
 ## Cierre
 
 Para el canary externo, después de `delete_after`: corta authority, mide deny con token vigente, revoca

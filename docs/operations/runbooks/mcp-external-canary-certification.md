@@ -287,6 +287,30 @@ Hasta completar esos siete puntos, TASK-1832 permanece `rollout productivo en ob
 como piloto ni adopción de cliente. Para la corrida activa, `delete_after=2026-09-13T19:43:30Z`: antes de esa
 fecha el dry-run debe negarse por authority/auth activas y `--apply` no se ejecuta.
 
+## Diseño de la corrida — lecciones de TASK-1832
+
+La corrida `task-1832-canary-20260906-a` certificó bien la matriz y encontró defectos reales (probe vacío `500`
+en el gateway, scopes de Claude Code `2.1.186`, sesión interna colada en la ceremonia, drift de la flag en
+staging). Lo que falló fue el diseño de su salida: el retiro quedó bloqueado una semana. Para la próxima:
+
+1. **Asume clientes OAuth compartidos desde el día 0.** Los clientes hospedados (ChatGPT/Codex por CIMD) no son
+   de la corrida. Antes del primer write, clasifica cada cliente de la matriz como `run_owned` (DCR con
+   `software_id=run_id`) o `shared`, y regístralo en el manifiesto. El cleanup por sujeto ya existe
+   (`74638aed0`); pruébalo en dry-run con un sujeto sintético sobre un cliente shared **antes** de invitar,
+   no al retirar.
+2. **Lee las señales por sujeto, nunca por `client_id`.** Una señal agregada de un cliente compartido mezcla
+   personas reales. Define desde el inicio la consulta por `subject_hash`/`grant_id` de los sujetos exactos y
+   úsala en cada muestra diaria.
+3. **Muestra por sujeto hasta el retiro, sin huecos.** La ventana steady sólo vale si hay muestras por sujeto
+   que cubran todo el período hasta la revocación. En TASK-1832 faltó el tramo 2026-09-14 → retiro.
+4. **Verifica el perfil DB del apply en el preflight.** El dry-run debe ejecutarse con el mismo perfil que el
+   apply (`ops`), para que un permiso faltante aparezca antes de la ventana y no el día del retiro.
+5. **Lee las flags en cada runtime al abrir y al cerrar.** Config de Vercel (`env pull`), revisión servida de
+   Cloud Run y variables GitHub (repo y environment). El ledger no es la verdad live.
+6. **Planifica el apagado como parte del retiro.** Cada gate tiene su carril (repo var + workflow del
+   auth-server, Vercel + redeploy, environment `production` + `deploy.yml` del gateway); inclúyelos en el
+   manifiesto desde el principio.
+
 ## Estado final de la corrida 2026-09-18
 
 - Revocación de authority a `2026-09-18T12:46:01Z`: `activeAuthorityCount=0`, `activeAuthCount=0`.

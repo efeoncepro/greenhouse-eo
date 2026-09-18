@@ -13,7 +13,9 @@ Se revocó la authority del canary sintético, el cleanup sujeto-específico bor
 y preservó el cliente compartido de ChatGPT/Codex y los artefactos de otros sujetos. El apply ahora usa el
 perfil PostgreSQL `ops`. Las dos puertas canary quedaron en `false` en todos sus runtimes, con lectura en la
 revisión servida: auth-server `00076-t2t`, Vercel Production y gateway `00056-kgs`. Runbook, manual, matriz,
-manifiesto, ledger y skill `efeonce-mcp-platform` (espejo) quedaron actualizados.
+manifiesto, ledger y skill `efeonce-mcp-platform` (espejo) quedaron actualizados. Además se documentó el diagnóstico —buen canary,
+retiro mal diseñado— y las reglas para la próxima corrida: clientes OAuth compartidos clasificados desde el día 0,
+señales y muestras por sujeto sin huecos, dry-run con el perfil del apply y gates inventariados al abrir.
 
 ## 2026-09-18 — Efeonce Insights: enlaces, correo y recurrencia en producción con flags OFF (TASK-1848)
 

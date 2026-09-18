@@ -30,6 +30,16 @@ es el valor en config + un deployment creado después del cambio y aliasado. Pen
 sujeto entre el 2026-09-14 y el retiro no se registró (la última correlación sólo cubre hasta el 14), y el gate
 de cierre `pnpm test` + `pnpm build` completo no se corrió en esta sesión.
 
+### Diagnóstico: buen canary, retiro mal diseñado
+
+La prueba cumplió: certificó la matriz y encontró cuatro defectos reales antes de un cliente. El retiro falló
+por supuestos del diseño: (1) asumió que todo cliente OAuth sería run-owned, cuando los hospedados por CIMD son
+compartidos, y el cleanup por `client_id` habría borrado datos de otros sujetos (lo impidió el fail-closed);
+(2) leyó una señal por cliente y no por sujeto (458 eventos de un perfil interno real); (3) el apply apuntaba a
+un perfil DB sin acceso transversal; (4) la ventana steady no tuvo muestras por sujeto hasta el retiro. Las
+lecciones quedaron en el runbook (§Diseño de la corrida), el manual, la plantilla del manifiesto y la skill
+`efeonce-mcp-platform`.
+
 ## Delta 2026-09-14 — atribución de `refresh_reuse` corregida por sujeto
 
 La revisión read-only del 2026-09-14 corrigió la interpretación conservadora del 2026-09-10 sin debilitar el
