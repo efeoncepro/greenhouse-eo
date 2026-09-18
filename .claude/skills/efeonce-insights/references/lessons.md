@@ -1,10 +1,21 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-18 · Release from an explicit SHA, not from the tip of `develop`.** TASK-1848's release was cut from an explicit
+  SHA to exclude a peer commit on `develop` that had not been validated. Rule: dispatch the release from the explicit, validated SHA so an
+  unvalidated peer commit stays out; verify the manifest's `target_sha` before approving.
+- **2026-09-18 · The gateway deploys only after the Greenhouse release that publishes its routes.** `efeonce-mcp`
+  `deploy.yml` is `workflow_dispatch` (merging to its `main` does NOT deploy). Federating tools whose ecosystem routes are
+  not yet in production makes the gateway point at 404s. Order: Greenhouse release → contract canary → dispatch the
+  gateway deploy → provider canary.
+- **2026-09-18 · "Delivered" cannot be read from the ledger.** Resend's lifecycle webhook does not operate (ISSUE-160), so
+  `provider_status` stays null after `accepted`. Rule: a real-email canary is confirmed by the operator looking at the
+  authorized inbox and saying so; record it as human evidence, never as ledger evidence.
 - **2026-09-18 · A concurrent burst against a public route nearly exhausted the shared PostgreSQL.** Measuring the share
   reader's rate limit with 64 concurrent requests left 86–88 idle `greenhouse_app` connections (max 100) for exactly 5 min:
   each Vercel invocation opens its own pool, the pool's idle timeout never runs while the function is frozen, and the
-  server only cuts at `idle_session_timeout` (5 min). DB-backed rate limiters spend a connection before rejecting. Rule:
-  never probe limits with concurrent bursts against the shared instance; sequence them. Fix owner: TASK-1876 (ISSUE-174).
+  server only cuts at `idle_session_timeout` (5 min). DB-backed rate limiters spend a connection before rejecting, so the
+  limiter itself does not protect the database. Rule: never probe limits with concurrent bursts against public DB-backed
+  routes on the single shared Cloud SQL (it serves production); sequence them. Fix owner: TASK-1876 (ISSUE-174).
 - **2026-09-18 · The email platform's token-sensitive intent index is unique per (type, source_event_id, source_entity).**
   Symptom: a retry that reuses the SAME correlation never creates a new `email_deliveries` row (it collides with the
   previous attempt). Rule: correlate per attempt — `idlr-<uuid>` for attempt 1, `idlr-<uuid>:aN` for retries N=2..5 —

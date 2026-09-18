@@ -1,18 +1,19 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-18 por Claude (TASK-1848 code complete: enlaces, correo y recurrencia; sin deploy)
+> **Ultima actualizacion:** 2026-09-18 por Claude (TASK-1848 en producción con flags OFF: enlaces, correo y recurrencia; gateway 1.7.0)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
 
 Crear y seguir ediciones de Efeonce Insights sin pantalla (la UI llega en TASK-1849): desde el
 portal autenticado (lane `app`), desde un consumer del ecosistema (lane `ecosystem`) o desde un
-agente por MCP. Hoy el flujo llega hasta `ready_for_review` y, en staging, hasta el deck PDF renderizado;
-emitir sigue apagado en todos los ambientes. Las recetas de enlaces compartidos, envío por correo y
-recurrencia (TASK-1848) están en su sección: el código existe, pero **no está desplegado** (2026-09-18).
+agente por MCP. Hoy el flujo llega hasta `ready_for_review` y, en staging y producción, hasta el deck PDF renderizado;
+emitir sigue apagado en producción (encendido en staging desde 2026-09-18 para el canary de TASK-1848). Las
+recetas de enlaces compartidos, envío por correo y recurrencia (TASK-1848) están en su sección: el código está
+**en producción con los flags OFF** (release `bda1cf2cd938`, 2026-09-18) y encendido en staging.
 
 ## Antes de empezar
 
@@ -98,12 +99,12 @@ del gateway (binding interno del provider SEO/Insights, scope `internal`), nunca
 Evidencia del 2026-09-15: `EO-INS-000012` (app, staging), `EO-INS-000013` (ecosystem, staging),
 `EO-INS-000014` (ecosystem, producción); las tres `ready_for_review` sobre la org sintética Greenhouse Demo.
 
-Vista web compartida: cuando exista (TASK-1848/1849), el enlace apuntará a `think.efeoncepro.com/insights/r/<token>`;
+Vista web compartida: el resolver por token ya existe (TASK-1848); cuando exista la página de Think (TASK-1875), el enlace apuntará a `think.efeoncepro.com/insights/r/<token>`;
 Think resuelve el token contra Greenhouse en cada visita, así que revocar el enlace corta el acceso de inmediato.
 
 MCP: `get_insights_catalog` → `create_insight_edition` → `get_insight_edition` (con `includeEvidence`),
 con el manual servido `efeonce-insights` (`get_greenhouse_skill`). Las cuatro tools **ya están federadas** en el
-gateway `efeonce-mcp` (versión 1.5.0, 47 tools, 8 clases de scope, desplegado el 2026-09-15): las tres de
+gateway `efeonce-mcp` (federadas en la versión 1.5.0 del 2026-09-15; hoy el gateway está en **1.7.0, 58 tools**, 2026-09-18): las tres de
 lectura con el scope base `efeonce.mcp.read`; `create_insight_edition` exige la clase
 `efeonce.mcp.insights.write`, que ya existe en Entra pero **ningún cliente porta todavía** → responde
 `insufficient_scope` hasta un consentimiento/grant gobernado. Canary de lectura del gateway:
@@ -207,11 +208,25 @@ Con la org sintética «Greenhouse Demo» y la persona cliente:
    persona cliente → `404`, sin outputs.
 5. Contra PostgreSQL real: `pnpm test:live src/lib/efeonce-insights/render` (4/4 el 2026-09-16).
 
-## Enlaces, correo y recurrencia (TASK-1848 — code complete 2026-09-18, sin deploy)
+## Enlaces, correo y recurrencia (TASK-1848 — en producción con flags OFF desde 2026-09-18)
 
-> **Estado:** commits locales en `develop`, sin push ni deploy; migraciones aplicadas en la base compartida;
-> flags de Vercel OFF; tipos de correo pausados. Hasta el rollout, estas recetas sólo corren en local o en live tests.
+> **Estado (2026-09-18):** código en producción (release `bda1cf2cd938`) con `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED`
+> y la emisión **OFF en producción** hasta que exista el lector de Think (TASK-1875). En **staging** los cuatro flags
+> están ON y el canary sintético corrió completo en la org sandbox (`EO-INS-000015`); los dos correos llegaron al buzón
+> autorizado del operador (evidencia humana: Resend no reporta `delivered`, ISSUE-160). Canary de contrato en
+> producción: crear enlace ⇒ `503 sharing_disabled`; lector público con token inexistente ⇒ `404`; sin token ⇒ `401`.
 > Todo requiere una edición `issued` con audiencia `client`.
+>
+> **Por MCP (`mcp.efeonce.org`, gateway 1.7.0):** cinco lecturas con el scope base (`list_insight_shares`,
+> `list_insight_deliveries`, `get_insight_delivery`, `list_insight_schedules`, `get_insight_schedule`) y dos
+> escrituras de enlace (`create_insight_share`, `revoke_insight_share`) que exigen `efeonce.mcp.insights.write`
+> — ningún cliente la porta, así que hoy responden `insufficient_scope`. **Enviar por correo y programar recurrencias
+> no existen por MCP**: sólo lane App (persona interna; UI en el portal cuando llegue TASK-1849). En el gateway,
+> `*_disabled` (503) llega como `policy_blocked` y `quota_exceeded` (429) como `rate_limited`.
+>
+> ⚠️ **Nunca pruebes límites (rate limit, cuota) con ráfagas concurrentes** contra la base compartida: una ráfaga de
+> 64 requests al lector público dejó 86–88 conexiones ociosas en Cloud SQL durante 5 min (ISSUE-174; TASK-1876).
+> Secuencia las requests.
 
 ### Flags y dónde se leen
 
@@ -236,7 +251,7 @@ Prender un flag del worker es multi-runtime: `deploy.sh` + revisión activa (led
 2. Listar: `GET …/editions/<editionId>/shares` (sin token ni digest).
 3. Revocar: `POST /api/platform/app/insights/shares/<shareGrantId>/revoke`. Idempotente; nunca reactiva.
 - Ecosystem: mismas rutas bajo `/api/platform/ecosystem/insights/**`; crear y revocar exigen binding `internal`.
-- MCP: `create_insight_share`, `list_insight_shares`, `revoke_insight_share` (el gateway aún no las federa).
+- MCP: `create_insight_share`, `list_insight_shares`, `revoke_insight_share` (federadas en el gateway 1.7.0; crear y revocar exigen `efeonce.mcp.insights.write`, que ningún cliente porta).
 - Límite: 20 activos por edición → `429 quota_exceeded`. Permiso: `insights.share.manage` (Admin/Account; cliente executive sobre su org).
 
 ### Leer el reader público

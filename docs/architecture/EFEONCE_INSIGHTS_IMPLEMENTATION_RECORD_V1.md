@@ -1,9 +1,9 @@
 # Efeonce Insights — Registro de implementación y despliegue (TASK-1845)
 
 > **Tipo de documento:** Registro de implementación y despliegue
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-15 por Claude
-> **Ultima actualizacion:** 2026-09-15 por Claude
+> **Ultima actualizacion:** 2026-09-18 por Claude (§8.y y filas de §10/§11: TASK-1848)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · ADR [EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md)
 > **Task:** [TASK-1845](../tasks/in-progress/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) (EPIC-045)
 
@@ -591,6 +591,21 @@ client_services.write, insights.write).
 | Dominio | `src/lib/efeonce-insights/render/{contracts,store,commands,readers,outputs-port,deck-mapper,plan-limits}.ts` | store compone con `InsightsDbClient` (testeable en rollback) |
 | Worker | `services/artifact-worker/{consumer-contract.ts,consumers/*}` + `main.ts` por registry | Proposal = adapter compatible; `INSIGHTS_RENDER_ENABLED` en `deploy.sh` (default `false` al escribirse; **delta 2026-09-16: default `true`** en el `deploy.sh` del Job y del `ops-worker`, ambos únicos para staging y producción) |
 
+### 8.y Superficies agregadas por TASK-1848 (2026-09-18)
+
+Fuente: [TASK-1848](../tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) y arquitectura §14.6.
+
+| Superficie | Ruta / tool | Notas |
+|---|---|---|
+| Enlaces compartidos | tabla `insight_share_grants` (`ishr-`), token `isg_` + 32 bytes base64url, en DB sólo `token_digest` sha256 | sólo ediciones emitidas; TTL 1–90 días (default 30); máx 20 enlaces activos por edición (429 `quota_exceeded`); revocación única (410); retirar la edición revoca sus enlaces; access log append-only `insight_share_access_events`; capability `insights.share.manage` |
+| Lector público (Think) | `GET /api/public/insights/shared/[token]` → `InsightWebModelV1` (`modelVersion '1.0'`) · `GET …/outputs/[output]` | 404 desconocido/expirado/flag OFF/org suspendida/módulo ausente; 410 revocado/retirado; 429 rate limit (IP 300/60 s, grant 60/20); `private, no-store`, noindex, no-referrer, CSP. El render en `efeonce-think` es TASK-1875 |
+| Envío por correo | intents/recipients/events (`idlv-`, `idlr-`); EmailTypes `insights_edition_delivery` y `insights_edition_delivery_attachment` (sembrados apagados); projection `insights_delivery_dispatch` en `ops-worker` | aceptado ≠ entregado; `ambiguous` = señal de reliability; `portal_link` ⇒ `not_ready` hasta TASK-1849; capability `insights.delivery.send` (interna) |
+| Recurrencia | schedules + ocurrencias; Cloud Scheduler `ops-insights-schedules-tick` (`20 * * * *`) → `ops-worker` `/insights/schedules/tick` | V1 = borrador + render y se detiene en revisión humana (`draft_for_review`); pausa automática por `authority_revoked`/`module_unavailable`; capability `insights.schedule.manage` (interna) |
+| Lanes | App `/api/platform/app/insights/**` (shares, deliveries con cancel/retry/reconcile, schedules con activate/pause/retire); Ecosystem (shares crear/listar/revocar; deliveries y schedules sólo lectura) | errores 503 `sharing_disabled\|delivery_disabled\|schedules_disabled`, 429 `quota_exceeded`, 409 `not_ready` |
+| MCP interno | `create_insight_share`, `list_insight_shares`, `revoke_insight_share`, `list_insight_deliveries`, `get_insight_delivery`, `list_insight_schedules`, `get_insight_schedule` | manifiesto 62 tools, hash `9fc46c8d90d3` |
+| Gateway `efeonce-mcp` | v1.7.0 (PR #16 `4c9d7c44`, deploy `35351850324`, revisión `00055-gk6` al 100 %) | provider `greenhouse-insights` contrato `task-1848-v1`; 51 → 58 tools; crear/revocar enlace exigen `efeonce.mcp.insights.write` (fail-closed); envío y recurrencia no existen por MCP |
+| Migraciones | 4 (share grants, delivery intents, skip reason edition, schedules) | aplicadas en la instancia única |
+
 ## 9. Verificación realizada
 
 | Capa | Evidencia | Fuente |
@@ -630,6 +645,9 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Cloud Run `efeonce-mcp-gateway` | v1.5.0, provider `greenhouse-insights`, 47 tools | Rev `00053-dsk` al 100 % | `efeonce-mcp/README.md`; facts file |
 | Entra (tenant Efeonce) | scope `efeonce.mcp.insights.write` en «Efeonce MCP Resource» | Creado; sin clientes que lo porten | facts file |
 | Greenhouse manifest/skills MCP | 51 tools + skill `efeonce-insights` | En `develop` y `main` | artefactos generados |
+| Vercel `staging` + `ops-worker` (TASK-1848, 2026-09-18) | `INSIGHTS_SHARING/DELIVERY/SCHEDULES/ISSUANCE_ENABLED=true` en staging; `ops-worker` con DELIVERY/SCHEDULES/GENERATION | Canary sintético completo (`EO-INS-000015`); el operador confirmó la llegada de los dos correos | TASK-1848 Delta 2026-09-18 |
+| Vercel `Production` (TASK-1848) | release `bda1cf2cd938` (PR #238, orquestador `35349506106`, `released` 13:41Z) | Código vivo, **flags OFF** (sharing/delivery/schedules/emisión) hasta TASK-1875; canary: crear enlace ⇒ 503 `sharing_disabled`, token inexistente ⇒ 404, sin token ⇒ 401 | TASK-1848 Delta 2026-09-18 |
+| Cloud Run `efeonce-mcp-gateway` (TASK-1848) | v1.7.0, 58 tools | Rev `00055-gk6` al 100 %; canary del provider contra producción verde | TASK-1848 Delta 2026-09-18 |
 | Ledgers | `FEATURE_FLAG_STATE_LEDGER.md` (3 filas + snapshot), `PRODUCTION_RELEASE_TIMING_LEDGER.md` (fila del release) | Al día | líneas 249–251, 383–385; línea 78 |
 
 ---
@@ -642,8 +660,8 @@ en 2026-07/08); se ejercitó el camino «sin datos declarados», no el de un cli
 | Emisión | `INSIGHTS_ISSUANCE_ENABLED` OFF; el puerto (real desde 2026-09-16) responde `not_ready` mientras falte un output `completed` de la misma audiencia; `insights.edition.issued` nunca se ha publicado | rollout de TASK-1846 + policy EPIC-046 P01 |
 | IA de autoría | `INSIGHTS_AUTHORING_AI_ENABLED` OFF; todos los planes existentes son `deterministic` | medir costo/tokens en staging antes |
 | UI del portal (biblioteca, encargo, revisión) | no existe; sólo API/MCP | TASK-1849 |
-| Vista web compartida | resolver `InsightWebModelV1` + proxy (TASK-1848) y render en Think (TASK-1849/1875) sin código | EPIC-045 |
-| Share/delivery/schedules | `insightSharePort = { implemented: false }` | TASK-1848 |
+| Vista web compartida | resolver `InsightWebModelV1` + proxy **existen desde TASK-1848 (en producción con flag OFF, 2026-09-18)**; el render en Think no tiene código | TASK-1875 |
+| Share/delivery/schedules | **Actualizado 2026-09-18:** construidos y en producción con flags OFF (release `bda1cf2cd938`, §8.y); faltan in-app/Teams, `portal_link`, recordatorios/preferencias/baja y ISSUE-174 → TASK-1876 | TASK-1849, TASK-1875, TASK-1876, TASK-690–693 |
 | Grant del scope `insights.write` a clientes MCP | `create_insight_edition` por el gateway ⇒ `insufficient_scope` | consentimiento/grant gobernado |
 | Ensayo de `migrate:down` | ejecutado 2026-09-16 00:24–00:25Z con el Down definitivo (down OK, readback, up OK, readback; canaries posteriores `EO-INS-000002` staging / `EO-INS-000003` producción) | cerrado (§4.8) |
 | Sesión MCP con token humano | `tools/list` desde un cliente real (evidencia de 47 tools + skill) no obtenida | pendiente para `complete` |

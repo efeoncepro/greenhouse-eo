@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-18 por Claude (TASK-1848 code complete: compartir por enlace, envío por correo y recurrencia; sin deploy)
+> **Ultima actualizacion:** 2026-09-18 por Claude (TASK-1848 en producción con los interruptores apagados: compartir por enlace, envío por correo y recurrencia)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -17,10 +17,11 @@ La vista web que se comparte por enlace no vivirá en el portal: se mostrará en
 hub que hoy muestra el informe de visibilidad en IA. Greenhouse sigue siendo dueño del dato y del enlace; Think
 sólo lo dibuja (decisión del 2026-09-15). La biblioteca para pedir y revisar informes sí queda en el portal.
 
-Hoy (TASK-1845) existe el **núcleo**: crear un encargo, recolectar evidencia, redactar el plan y dejar
-la edición lista para revisión. **Todavía no se renderiza ningún PDF ni vista web, no se comparte por
-enlace ni se envía por correo** (unidades posteriores del programa). Y como emitir exige salidas
-validadas, **hoy ninguna edición puede emitirse**: llega hasta `ready_for_review`.
+La primera unidad (TASK-1845) creó el **núcleo**: crear un encargo, recolectar evidencia, redactar el plan y
+dejar la edición lista para revisión. Después se sumaron el deck PDF (TASK-1846) y el enlace compartido, el envío
+por correo y la recurrencia (TASK-1848, en producción pero apagados). **Todavía no existen la vista web ni el
+informe A4.** Como la emisión sigue apagada en producción, **ahí ninguna edición puede emitirse**: llega hasta
+`ready_for_review`.
 
 ## Cómo se comporta
 
@@ -59,7 +60,7 @@ Como emitir todavía no es posible, hoy un cliente que pide una edición la ver�
 cifras visibles: eso es lo esperado hasta que su deck esté renderizado y un interno la emita (el render del deck
 ya corre en staging y producción, pero la emisión sigue apagada en todos los ambientes).
 
-## Estado de disponibilidad (2026-09-16)
+## Estado de disponibilidad (2026-09-18)
 
 **Disponible en producción** desde el 2026-09-15 para las organizaciones que tengan el módulo `insights_v1`
 asignado. Lo que está encendido y lo que no:
@@ -67,12 +68,12 @@ asignado. Lo que está encendido y lo que no:
 | Capacidad | Estado | Nota |
 | --- | --- | --- |
 | Pedir una edición y generarla hasta `ready_for_review` | **Encendida** en staging y producción | Flag `INSIGHTS_GENERATION_ENABLED=true` en Vercel (staging y producción); en Preview sigue apagada |
-| Emitir una edición | Apagada y bloqueada | Flag `INSIGHTS_ISSUANCE_ENABLED` OFF en todos los ambientes; además exige que todos los outputs pedidos estén renderizados y validados |
+| Emitir una edición | Apagada en producción | Flag `INSIGHTS_ISSUANCE_ENABLED` OFF en producción (encendido sólo en staging desde 2026-09-18 para las pruebas de TASK-1848); además exige que todos los outputs pedidos estén renderizados y validados |
 | Redacción asistida por IA | Apagada | Flag `INSIGHTS_AUTHORING_AI_ENABLED` OFF; el plan sale del redactor determinista |
 | Pedir el render del **deck PDF** de una edición | **Encendido en staging y producción** (desde 2026-09-16) | Staging: probado con cinco decks reales, un reintento y una cancelación. Producción: probado el 2026-09-16 en la organización de prueba — el deck salió solo, al primer intento, y pedir la vista web fue rechazado como corresponde. Ver «Pedir el deck de una edición» |
-| Enlace compartido, envío por correo y recurrencia | **Construidos, todavía no disponibles** (2026-09-18) | Código listo y tablas creadas, pero nada está desplegado y los tres interruptores siguen apagados. Ver las tres secciones siguientes |
+| Enlace compartido, envío por correo y recurrencia | **En producción, pero apagados** (2026-09-18) | El código salió a producción el 2026-09-18 con los tres interruptores apagados a propósito: se encenderán cuando exista la página pública del enlace en Think (TASK-1875). En staging están encendidos y se probaron completos con una organización de prueba; los dos correos de prueba llegaron al buzón autorizado. Ver las tres secciones siguientes |
 | Informe A4 y pantalla pública del enlace | No existen todavía | TASK-1847 (A4) y TASK-1875 (la página en `think.efeoncepro.com` que muestra el enlace) |
-| Pedir una edición desde un agente externo por el gateway MCP | Lectura sí; escritura todavía no | Las herramientas de ediciones y de render están publicadas (gateway v1.6.0, 2026-09-16); crear exige un permiso de escritura que ningún cliente tiene aún (`insufficient_scope`) |
+| Usar Insights desde un agente externo por el gateway MCP (`mcp.efeonce.org`) | Lectura sí; escritura todavía no | Gateway v1.7.0 (2026-09-18). Además de ediciones y render, un agente puede **ver** enlaces, envíos y recurrencias (cinco herramientas de lectura). Crear y revocar enlaces existen, pero exigen un permiso de escritura que ningún cliente tiene aún; lo mismo crear ediciones. **Enviar por correo y programar recurrencias sólo se hacen desde el portal**, no por MCP |
 
 **Pedir el deck de una edición (render).** Cuando una edición está `ready_for_review`, quien tenga permiso sobre
 esa organización puede pedir su deck PDF. El pedido no devuelve el archivo al instante: queda **en cola** y un
@@ -101,8 +102,9 @@ proceso en segundo plano lo produce.
 
 ## Compartir un informe por enlace
 
-> Estado: construido el 2026-09-18, **todavía no disponible** (sin deploy, interruptor apagado). La página pública que
-> muestra el enlace en `think.efeoncepro.com` es otra unidad (TASK-1875).
+> Estado: en producción desde el 2026-09-18, **todavía no disponible** (interruptor apagado en producción; encendido y
+> probado en staging). La página pública que muestra el enlace en `think.efeoncepro.com` es otra unidad (TASK-1875) y
+> no existe todavía; el interruptor se enciende cuando exista.
 
 **Qué hace.** Genera un enlace secreto para que alguien sin cuenta en el portal lea una edición **ya emitida** y, si
 se permite, descargue sus archivos. El enlace sólo abre esa edición: no da acceso a la biblioteca, no permite pedir
@@ -134,7 +136,8 @@ momento, no borra copias. Los registros de acceso guardan si hubo una visita (si
 
 ## Enviar un informe por correo
 
-> Estado: construido el 2026-09-18, **todavía no disponible** (sin deploy, interruptores apagados, tipos de correo pausados).
+> Estado: en producción desde el 2026-09-18, **todavía no disponible** (interruptor apagado en producción; encendido y
+> probado en staging, donde los dos correos de prueba llegaron).
 
 **Qué hace.** Envía una edición emitida por correo, desde Efeonce, a personas elegidas de la lista de usuarios
 activos de la organización (o a internos). Cada persona tiene su propio resultado.
@@ -163,7 +166,8 @@ correo llegará con TASK-1849.
 
 ## Programar informes recurrentes
 
-> Estado: construido el 2026-09-18, **todavía no disponible** (sin deploy, interruptor apagado).
+> Estado: en producción desde el 2026-09-18, **todavía no disponible** (interruptor apagado en producción; encendido y
+> probado en staging).
 
 **Qué hace.** Prepara automáticamente una edición por cada período que se cierra (semanal o mensual), con el mismo
 encargo cada vez, en la zona horaria de la cuenta. **No emite ni envía nada solo:** cada edición queda lista para

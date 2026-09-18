@@ -74,7 +74,8 @@ Internal bindings must pass `organizationId`; org-scoped bindings read their own
 
 ## Sharing, delivery, schedules (TASK-1848) — verified against code 2026-09-18
 
-Code complete, not deployed. Shapes below are the ones in `sharing/`, `delivery/`, `schedules/` and the lanes.
+In production since release `bda1cf2cd938` (2026-09-18) with the lane flags OFF there (ON in staging). Shapes below are
+the ones in `sharing/`, `delivery/`, `schedules/` and the lanes.
 
 ### Share links
 
@@ -133,6 +134,11 @@ Code complete, not deployed. Shapes below are the ones in `sharing/`, `delivery/
   failed without dispatch_unknown ⇒ failed (grant revoked, retryable); pending/dispatch_unknown ⇒ unresolved unless
   `operatorDecision` + `reason`.
 - Email correlation per attempt: `source_event_id` = `idlr-<uuid>` (attempt 1) / `idlr-<uuid>:aN` (N=2..5).
+- `share_link` sends through the token-sensitive EmailType: the ShareGrant (`source=delivery`) is issued in the SAME
+  transaction that claims the `email_deliveries` row (`claimTokenSensitiveEmailIntent`); the bearer lives only in memory
+  for that send. A definitive failure revokes that grant; a retry issues a new one. The attachment EmailType is a separate,
+  non-sensitive type and never carries a ShareGrant in the same email.
+- `accepted` (provider took it) ≠ `delivered` ≠ read; `ambiguous` = outcome unknown, stays unresolved until reconciled.
 
 ### Schedules (App lane only for writes)
 
@@ -159,3 +165,7 @@ Code complete, not deployed. Shapes below are the ones in `sharing/`, `delivery/
 `list_insight_deliveries {organizationId?, editionId}`, `get_insight_delivery {organizationId?, deliveryIntentId}`,
 `list_insight_schedules {organizationId?}`, `get_insight_schedule {organizationId?, scheduleId}`. No MCP tool sends,
 cancels, retries or reconciles email, nor creates/activates/pauses/retires schedules.
+
+Gateway mapping (`efeonce-mcp` 1.7.0, contract `task-1848-v1`): 503 `sharing_disabled|delivery_disabled|schedules_disabled`
+⇒ `policy_blocked`; 429 `quota_exceeded` ⇒ `rate_limited`; 404 anti-oracle preserved; `create_insight_share` /
+`revoke_insight_share` need `efeonce.mcp.insights.write` (no client carries it ⇒ 403 challenge), the 5 reads the base scope.

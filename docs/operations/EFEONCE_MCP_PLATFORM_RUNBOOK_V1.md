@@ -643,6 +643,11 @@ Nunca resuelvas un problema del provider ampliando el scope, quitando el entitle
 
 > Task dueña: `TASK-1845` (foundation del dominio + lane ecosystem + federación). Desplegado en producción el
 > 2026-09-15 (gateway `1.5.0`, revisión `efeonce-mcp-gateway-00053-dsk`).
+>
+> **Estado vigente 2026-09-18:** gateway `1.7.0` (PR #16 `4c9d7c44`, deploy `35351850324`, revisión
+> `efeonce-mcp-gateway-00055-gk6` al 100 %, front door 200/200/401), **58 tools**. Pasó por `1.6.0` (render de
+> TASK-1846, 51 tools) y suma las 7 tools de enlaces, envíos y recurrencias de TASK-1848 (§Delta 2026-09-18 abajo).
+> Lo descrito a continuación sobre `1.5.0` es la historia de la federación inicial.
 
 El provider `greenhouse-insights` (`src/providers/greenhouse-insights.ts`) es un adapter delgado sobre el lane
 ecosystem `/api/platform/ecosystem/insights/**`. **No tiene interruptor, config ni secreto propios**: cabalga
@@ -684,9 +689,35 @@ Corrida de certificación 2026-09-15 contra staging (antes del deploy `00053-dsk
 evidencia verdes sobre la organización sintética con `insights_v1` asignado; deny `404` sobre una organización sin
 módulo. Después del deploy: front door 200/200/401 y `efeonce.gateway.status` listando el provider.
 
+
+### Delta 2026-09-18 — enlaces, envíos y recurrencias (TASK-1848, `1.7.0`)
+
+El provider `greenhouse-insights` federa, con contrato `task-1848-v1`, siete tools más (superficie 51 → 58):
+
+| Tool | Clase | Scope |
+| --- | --- | --- |
+| `list_insight_shares` | lectura | base `efeonce.mcp.read` |
+| `list_insight_deliveries`, `get_insight_delivery` | lectura | base |
+| `list_insight_schedules`, `get_insight_schedule` | lectura | base |
+| `create_insight_share`, `revoke_insight_share` | escritura | `efeonce.mcp.insights.write` (ningún cliente la porta ⇒ fail-closed, 403 challenge; el cliente base-only no se amplió) |
+
+- **Enviar por correo y programar recurrencias NO existen por MCP**: son sólo lane App (persona interna) en
+  Greenhouse. Por MCP, envíos y recurrencias son de lectura.
+- **Mapeo de errores** (misma tabla que el lane): 503 `sharing_disabled|delivery_disabled|schedules_disabled` ⇒
+  `policy_blocked`; 429 `quota_exceeded` ⇒ `rate_limited` (el mensaje indica revocar un enlace con
+  `list_insight_shares` + `revoke_insight_share`); 404 anti-oráculo.
+- **Autoridad nativa:** `unsupported`, declarada con la capability real de cada superficie
+  (`insights.share.manage`, `insights.delivery.send`, `insights.schedule.manage`).
+- **Canary del provider** contra producción verde, ahora también sobre recurrencias, enlaces y envíos
+  (schedules 1, shares 3, deliveries 3). En producción los flags de Greenhouse `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED`
+  están OFF (release `bda1cf2cd938`): crear un enlace responde `sharing_disabled` ⇒ `policy_blocked`; las lecturas
+  devuelven las filas sintéticas del canary de staging porque la instancia Cloud SQL es única.
+- ⚠️ **No probar límites con ráfagas concurrentes** contra el lector público ni el lane: una ráfaga de 64 requests
+  dejó 86–88 conexiones ociosas en la instancia compartida durante 5 min (ISSUE-174; corrección TASK-1876).
+
 ### Rollback del provider
 
-No tiene interruptor propio: apagar `GREENHOUSE_SEO_PROVIDER_ENABLED` retira las cuatro tools junto con SEO,
+No tiene interruptor propio: apagar `GREENHOUSE_SEO_PROVIDER_ENABLED` retira todas las tools de Insights junto con SEO,
 manuales e identidad delegada. Para retirar sólo Insights, revertir el PR de federación (`cad57b31d`) y redeploy
 (baja de `1.5.0` con bump de versión y baseline regenerado). En Greenhouse, `INSIGHTS_GENERATION_ENABLED=false`
 convierte la creación en `503 generation_disabled` (`policy_blocked` en el gateway) sin tocar las lecturas.
@@ -956,7 +987,7 @@ los flags.
 | Hiring | 4 | `hiring.talent_pool.search`, `hiring.talent_pool.profile.get`, `hiring.applications.review.list`, `hiring.application.review_packet.get` |
 | Identidad delegada (TASK-1837) | 2 | `identity.invitations.list`, `identity.invitation.create` (write, scope `efeonce.mcp.identity.write`) |
 | Habilitación de servicios cliente (TASK-1852) | 3 | `preview_client_service_enablement`, `apply_client_service_enablement`, `rollback_client_service_enablement` (writes de autoridad humana delegada; scope `efeonce.mcp.client_services.write`; provider `greenhouse-client-services`; live desde 2026-09-10 rev `00052-slt`) |
-| Efeonce Insights (TASK-1845) | 4 | `get_insights_catalog`, `list_insight_editions`, `get_insight_edition` (lecturas, scope base) y `create_insight_edition` (write **sin gasto de proveedor**; scope `efeonce.mcp.insights.write`; provider `greenhouse-insights` sobre la config SEO; live desde 2026-09-15 rev `00053-dsk`; las cuatro `unsupported` para el emisor nativo) |
+| Efeonce Insights (TASK-1845; ampliado por TASK-1846 y TASK-1848) | 15 (4 + 4 de render en `1.6.0` + 7 de enlaces/envíos/recurrencias en `1.7.0`, as-of 2026-09-18) | `get_insights_catalog`, `list_insight_editions`, `get_insight_edition` (lecturas, scope base) y `create_insight_edition` (write **sin gasto de proveedor**; scope `efeonce.mcp.insights.write`; provider `greenhouse-insights` sobre la config SEO; live desde 2026-09-15 rev `00053-dsk`; las cuatro `unsupported` para el emisor nativo) |
 | SEO / Search Visibility 360 | 28 | reads + writes (detalle en §Provider Greenhouse-SEO) |
 
 Las **dos de identidad son propias del gateway**, no federadas desde el manifiesto de Greenhouse: no existen como
@@ -978,7 +1009,7 @@ administrador designado.
 
 ### Cobertura de federación vs el MCP interno de Greenhouse
 
-`src/mcp/greenhouse/tool-manifest.ts` declara **51 tools** (as-of 2026-09-15, `toolCount` del artefacto generado; la cifra se lee del manifiesto, nunca de acá); el gateway registra **47** (as-of 2026-09-15, `surface-baseline.json` en `1.5.0`). Comparar las dos cifras de frente no significa nada: 2 de las 47 —las de identidad delegada— **no salen del manifiesto**, exactamente como `get_seo_provider_spend`. El delta no es homogéneo:
+`src/mcp/greenhouse/tool-manifest.ts` declara **62 tools** (as-of 2026-09-18, hash `9fc46c8d90d3`; la cifra se lee del manifiesto, nunca de acá); el gateway registra **58** (as-of 2026-09-18, `1.7.0`; 47 en `1.5.0`, 51 en `1.6.0`). Comparar las dos cifras de frente no significa nada: 2 de las 58 —las de identidad delegada— **no salen del manifiesto**, exactamente como `get_seo_provider_spend`. El delta no es homogéneo:
 
 - **Dominio SEO: paridad completa.** Las 26 SEO internas están federadas, con el guard bidireccional de `TASK-1658`
   vigilándolo y `GREENHOUSE_SEO_TOOL_EXCLUSIONS` vacío (ninguna exclusión declarada).

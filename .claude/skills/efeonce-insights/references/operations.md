@@ -5,12 +5,12 @@
 | Flag | Gates | Read in | State 2026-09-16 |
 | --- | --- | --- | --- |
 | `INSIGHTS_GENERATION_ENABLED` | create / revise / evidence collection | Vercel only (`flags.ts`) | ON staging + Production; Preview OFF |
-| `INSIGHTS_ISSUANCE_ENABLED` | issue (plus human gate and validated outputs) | Vercel | OFF everywhere (render is live since 2026-09-16; turning issuance on is a product decision) |
+| `INSIGHTS_ISSUANCE_ENABLED` | issue (plus human gate and validated outputs) | Vercel | Production OFF (product decision); staging ON since 2026-09-18, operator-authorized for the TASK-1848 canary |
 | `INSIGHTS_AUTHORING_AI_ENABLED` | Gemini rewrite of the plan | Vercel | OFF everywhere |
-| `INSIGHTS_SHARING_ENABLED` (TASK-1848) | create share links + public reader (OFF ⇒ create 503 `sharing_disabled`, reader 404) | Vercel | OFF (default); not deployed as of 2026-09-18 |
-| `INSIGHTS_DELIVERY_ENABLED` (TASK-1848) | create delivery intent (Vercel, OFF ⇒ 503 `delivery_disabled`) + dispatch (ops-worker) | Vercel + `ops-worker` (default `true` in `deploy.sh`, guarded by `deploy-contract.test.ts`) | Vercel OFF; worker not deployed |
-| `INSIGHTS_SCHEDULES_ENABLED` (TASK-1848) | schedule writes (Vercel) + tick (ops-worker) | Vercel (OFF) + `ops-worker` (default `true`) | Vercel OFF; worker not deployed |
-| `INSIGHTS_GENERATION_ENABLED` in the worker (TASK-1848) | the schedules tick creates editions | now ALSO `ops-worker` (default `true` in `deploy.sh`) | worker not deployed; `INSIGHTS_AUTHORING_AI_ENABLED` is NOT declared in the worker |
+| `INSIGHTS_SHARING_ENABLED` (TASK-1848) | create share links + public reader (OFF ⇒ create 503 `sharing_disabled`, reader 404) | Vercel | 2026-09-18: staging ON · Production OFF until the Think reader (TASK-1875) |
+| `INSIGHTS_DELIVERY_ENABLED` (TASK-1848) | create delivery intent (Vercel, OFF ⇒ 503 `delivery_disabled`) + dispatch (ops-worker) | Vercel + `ops-worker` (default `true` in `deploy.sh`, guarded by `deploy-contract.test.ts`) | 2026-09-18: Vercel staging ON · Production OFF; ops-worker ON (`ops-worker-00695-hrw`, then release `bda1cf2cd938`) |
+| `INSIGHTS_SCHEDULES_ENABLED` (TASK-1848) | schedule writes (Vercel) + tick (ops-worker) | Vercel + `ops-worker` (default `true`) | 2026-09-18: Vercel staging ON · Production OFF; ops-worker ON |
+| `INSIGHTS_GENERATION_ENABLED` in the worker (TASK-1848) | the schedules tick creates editions | now ALSO `ops-worker` (default `true` in `deploy.sh`) | ops-worker ON; `INSIGHTS_AUTHORING_AI_ENABLED` is NOT declared in the worker |
 
 Flip = `vercel env add <FLAG> <env>` (`production` lowercase for the standard env; custom `staging` literal) **+
 `vercel redeploy <url>`**: a deployment built before the env var never sees it. If a worker starts reading a flag,
@@ -93,14 +93,17 @@ flag, 202 after.
 - Rollback: disable the flag in both runtimes; keep tables and assets; never `migrate:down` on the shared instance
   without explicit operator authorization (it serves production).
 
-## Sharing, delivery, schedules (TASK-1848) — code complete, rollout pending (2026-09-18)
+## Sharing, delivery, schedules (TASK-1848) — in production with flags OFF (release `bda1cf2cd938`, 2026-09-18)
+
+Production flags stay OFF until the Think reader (TASK-1875) exists. ISSUE-174 (connection exhaustion by a concurrent
+burst on a public DB-backed route) is open → TASK-1876; weigh it before exposing the public reader to real traffic.
 
 - **EmailType kill switch:** `email_type_config` rows for `insights_edition_delivery` and
   `insights_edition_delivery_attachment` are seeded `enabled=false`. The table FAILS OPEN when a row is missing, so the
   seed is what keeps them off. Turning email on = flag ON in Vercel + ops-worker AND flip the row(s) to `enabled=true`;
   turning off = flip the row back (recipients then skip with `email_type_paused`).
 - **Cloud Scheduler:** `ops-insights-schedules-tick`, `20 * * * *`, → ops-worker `POST /insights/schedules/tick`; ONE job
-  for every organization. Not created yet. The tick also purges access events >180 d and rate buckets >1 d, even with
+  for every organization. ENABLED since 2026-09-18 (single scheduler for staging and production). The tick also purges access events >180 d and rate buckets >1 d, even with
   `INSIGHTS_SCHEDULES_ENABLED` OFF.
 - **Delivery dispatch runtime:** projection `insights_delivery_dispatch` (domain `notifications`, lane
   ops-reactive-notifications) in the ops-worker — the send happens there, not in Vercel.
@@ -127,6 +130,22 @@ Resend lifecycle webhook works (ISSUE-160), so "delivered" is confirmed by the r
 5. Schedules: define + activate a monthly schedule for the synthetic org; trigger one tick; expect one occurrence
    `render_requested` and an edition in `ready_for_review` — never issued, never emailed. Then retire it.
 6. `pnpm test:live` for `sharing`, `delivery`, `schedules` live tests.
+
+### EmailType switch (shared config table — staging and production see the same rows)
+
+`pnpm hiring:email-type -- --type <insights_edition_delivery|insights_edition_delivery_attachment> --on --apply` only for
+the duration of a canary, then `--off --apply` right away; without `--apply` it is a dry-run. A recipient hit while the row
+is off is `skipped/email_type_paused` (no grant issued).
+
+### Production contract canary — EXECUTED 2026-09-18 (flags OFF; sequential, never a burst)
+
+1. Ecosystem lane with the gateway consumer token on the synthetic org: `POST …/editions/<id>/shares` ⇒ 503
+   `sharing_disabled` (only the new code produces that code, so it proves the deployed SHA).
+2. `GET` shares / deliveries / schedules ⇒ 200 (they show the staging canary's synthetic rows: single instance).
+3. `GET /api/public/insights/shared/<unknown token>` ⇒ 404; the route without a token ⇒ 401.
+4. Gateway: `scripts/greenhouse-insights-canary.mjs` in `efeonce-mcp` against production (verified: schedules 1,
+   shares 3, deliveries 3). Deploy the gateway only AFTER the Greenhouse release publishes the routes: its `deploy.yml`
+   is `workflow_dispatch`, a merge to its `main` does not deploy.
 
 ### Rollback per lane
 

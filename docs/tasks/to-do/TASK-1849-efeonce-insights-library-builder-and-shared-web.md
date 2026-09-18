@@ -1,5 +1,9 @@
 # TASK-1849 — Efeonce Insights: biblioteca, creación y experiencia web compartida
 
+## Delta 2026-09-18
+
+- **TASK-1848 en producción 2026-09-18** (release `bda1cf2cd938`, flags OFF en producción; ON en staging): ya existen en el lane App `/api/platform/app/insights/**` las rutas de **shares** (crear/listar/revocar), **deliveries** (crear, leer, cancel/retry/reconcile) y **schedules** (crear, leer, activate/pause/retire); ecosystem y MCP sólo leen envíos y recurrencias. Errores de lane: 503 `sharing_disabled|delivery_disabled|schedules_disabled`, 429 `quota_exceeded`, 409 `not_ready`. La modalidad de envío **`portal_link` responde `not_ready` hasta que esta task construya la ruta de la edición en el portal**. In-app/Teams siguen fuera de V1 (TASK-690–693 / esta task). Ya no bloquea: queda TASK-1847. — por TASK-1848
+
 ## Delta 2026-09-15
 
 - **Decisión del operador (ADR delta 2026-09-15):** la vista web compartida NO se construye en Greenhouse: se renderiza en `efeonce-think` desde `InsightWebModelV1` (endpoint público de TASK-1848). Esta task conserva biblioteca/builder/detalle del portal + presentación email en Greenhouse, y la experiencia compartida como slice ejecutado en el repo `efeonce-think` (mismo modelo de trabajo que TASK-1325). Los criterios de GVC/estados (expirado/revocado/unknown) aplican allá; el `StatusScreen` de Think ya cubre `not_found`/`gone`. **Ese slice tiene ID propio: TASK-1875** (nodo S6 del master flow `docs/ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md`); esta task conserva S1–S5 y S7 y el botón «Copiar enlace» apunta a la URL de 1875.
@@ -31,7 +35,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui|agency`
-- Blocked by: `TASK-1847, TASK-1848`
+- Blocked by: `TASK-1847`
 - Branch: `Greenhouse develop; sin branch dedicada ni worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

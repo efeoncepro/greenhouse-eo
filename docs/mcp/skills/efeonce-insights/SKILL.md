@@ -75,7 +75,12 @@ If a tool below is not listed by your client, it is not available in that enviro
   link is never reactivated; revoking twice answers `idempotent: true`. Files already downloaded cannot be revoked —
   say so when you report. Withdrawing an edition revokes all of its links automatically.
 - A visit to a link is never evidence that a person read the report. Do not claim it.
-- `service_unavailable` with code `sharing_disabled` means sharing is off in this runtime: report it and stop.
+- `service_unavailable` (or `policy_blocked` through the gateway) with code `sharing_disabled` means sharing is off in
+  this runtime: report it and stop. Any `*_disabled` code means the same for its lane. Lists can still answer while a
+  lane is off; that does not mean the lane is on.
+- Creating and revoking links need a write scope that most MCP clients do not carry: `insufficient_scope` there is
+  expected, reads are unaffected. Do not retry with another token; ask a human for a governed grant.
+- **Revoking is irreversible.** Confirm with the human which link (by label) before calling `revoke_insight_share`.
 
 ### Email deliveries (read only)
 
@@ -236,6 +241,11 @@ frozen and hashed; both are immutable. Every figure in the plan references a fac
 | An output stays `queued` for several minutes | Normal queue wait: one output per turn of about two minutes | Estimate about 2·N minutes by position; report it as queued, not as failed |
 | `retry_insight_render` on a cancelled run answers successfully but nothing changes | Cancelled is terminal | Request a new render with `request_insight_render` |
 | `not_found` when rendering an edition | The edition is not visible to your binding (for example an internal edition read by a client binding) | Do not retry; report it as not available |
+| `policy_blocked` / `service_unavailable` with `sharing_disabled`, `delivery_disabled` or `schedules_disabled` | That distribution lane is switched off in this runtime | Report it and stop; do not retry or look for another path |
+| `insufficient_scope` on `create_insight_share` or `revoke_insight_share` | Your client does not carry the write scope; list tools still work | Do not retry with another token; ask a human for a governed grant |
+| `rate_limited` / `quota_exceeded` when creating a link | The edition already has 20 active links | Review `list_insight_shares`; a human decides which link to revoke before creating another |
+| `not_ready` when creating a link | The edition is not issued or is not client-audience | Share only issued client editions; issuing is a human decision |
+| A delivery recipient in `ambiguous` | The send outcome is unknown and nothing is resent until a person reconciles it | Report it as unresolved, never as sent or failed |
 
 ## Recipes
 

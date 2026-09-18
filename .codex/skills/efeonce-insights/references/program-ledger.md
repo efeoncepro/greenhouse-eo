@@ -158,7 +158,17 @@ tender decks: separate issue for the catalog owner.
 ## TASK-1847 — charts and catalogs (to-do)
 _Fill at closure._
 
-## TASK-1848 — sharing, delivery, schedules (in-progress; staging verified 2026-09-18, gateway + production pending)
+## TASK-1848 — sharing, delivery, schedules (in-progress; in production with flags OFF since 2026-09-18)
+
+**Delta 2026-09-18 (production) — supersedes the staging delta's "production and gateway out of frontier" and the
+"Deployed where" table below.** Release `bda1cf2cd938` (PR #238, orchestrator `35349506106`, `released` 13:41Z, no retry;
+Vercel + 6 Cloud Run workers). Production flags OFF (sharing/delivery/schedules; issuance OFF) until the Think reader
+(TASK-1875) exists. Sequential contract canary: create share ⇒ 503 `sharing_disabled`; public reader unknown token ⇒ 404,
+no token ⇒ 401. Gateway `efeonce-mcp` 1.7.0 (PR #16 `4c9d7c44`, deploy run `35351850324`, revision
+`efeonce-mcp-gateway-00055-gk6` 100 %, 51 → 58 tools, provider contract `task-1848-v1`); provider canary against production
+green (schedules 1, shares 3, deliveries 3). The operator confirmed both canary emails reached the inbox (human evidence;
+Resend reports no `delivered`, ISSUE-160). Still open: in-app/Teams channels (TASK-690–693/1849), portal route
+(`portal_link` `not_ready`, TASK-1849), Think render (TASK-1875, now unblocked), ISSUE-174 → TASK-1876.
 
 **Delta 2026-09-18 (staging) — supersedes "NOT pushed / NOT deployed" below.** Pushed `52562a2f9` to `develop` (CI + all
 worker deploys green). Vercel staging: `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED=true` and `INSIGHTS_ISSUANCE_ENABLED=true`
@@ -196,7 +206,7 @@ draft + render only).
 `20260918094614053_task-1848-insights-share-grants`, `20260918100238745_task-1848-insights-delivery-intents`,
 `20260918100811735_…-skip-reason-edition`, `20260918101834425_task-1848-insights-schedules`.
 
-**Deployed where (2026-09-18):**
+**Deployed where (2026-09-18, pre-push snapshot — superseded by the deltas above):**
 
 | Runtime | Component | State | Evidence |
 | --- | --- | --- | --- |
@@ -238,6 +248,10 @@ _Fill at closure._
 _Fill at closure: Astro route, token handling, `no-store`, GVC evidence._
 
 ## Sessions (append as you go; newest first)
+
+- **2026-09-18 · TASK-1848 production + gateway.** Staging canary green (incl. real email to the operator inbox, confirmed
+  by the operator); ISSUE-174 caused by a concurrent burst (→ TASK-1876); release `bda1cf2cd938` with flags OFF in
+  production; gateway `efeonce-mcp` 1.7.0 deployed after the release (58 tools); contract + provider canaries green.
 
 - **2026-09-18 · greenhouse-eo-91 · TASK-1848 Slices 1-3 implemented (code complete, rollout pending).** Commits
   `75715589d`, `83d57380a`, `1c109fc8e` on local `develop` (not pushed). 4 migrations applied on the shared instance.

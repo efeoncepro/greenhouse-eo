@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-18 — Efeonce Insights: enlaces, correo y recurrencia en producción con flags OFF (TASK-1848)
+
+Release `bda1cf2cd938` (PR #238) lleva a producción compartir por enlace, envío por correo y recurrencia de Insights
+con `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED` y la emisión **apagados** hasta que exista el lector de Think
+(TASK-1875, ya desbloqueada). Canary de contrato: crear enlace ⇒ 503 `sharing_disabled`, token inexistente ⇒ 404.
+Staging queda encendido; el operador confirmó la llegada de los dos correos del canary. Gateway `efeonce-mcp` 1.7.0
+(revisión `00055-gk6`, 58 tools): 5 lecturas con el scope base y crear/revocar enlace con `efeonce.mcp.insights.write`
+(fail-closed); enviar y programar no existen por MCP. `ISSUE-174` → `TASK-1876` sigue abierto.
+
 ## 2026-09-18 — Efeonce Insights: compartir por enlace, envío por correo y recurrencia (TASK-1848, code complete)
 
 Una edición emitida ya puede compartirse por enlace personal que vence (se guarda sólo el hash del token; revocable
@@ -793,14 +802,3 @@ capacidad que exige el roadmap** contra la del equipo. Se agregan métricas de r
 contratadas, conversión fix→run, drift en ventanas sin gobierno) y la regla de honestidad: **si el drift no sube
 cuando nos vamos, el retainer no se merecía**. Prospección: se busca a quien va a construir más de lo que su equipo
 alcanza a diseñar —señal pública y anticipable—, no a quien ya está en problemas.
-
-## 2026-09-10 — Conciliación bancaria ago–sep en producción, `fx_drift` cubre USD/MXN y rutina mensual (TASK-1858)
-
-Release `2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` (`released` 20:06Z, run `34523159501`, un solo
-intento): producción y el `ops-worker` sirven el fix de `ISSUE-169` (cuentas USD/MXN en unidades de la cuenta,
-día genesis materializado, piso de genesis reactivo), los adapters de cartola y las CLIs `finance:*`. El
-detector `finance.account_balances.fx_drift` deja de filtrar `currency = 'CLP'` y compara en la moneda de cada
-cuenta (tolerancia nativa 0,05); el remediator nunca auto-remedia filas no-CLP. Manual de conciliación v1.2 con
-la rutina mensual por cuenta y la decisión sobre facturas Nubox (siguen por plan `pay_expense`). OTB del CCA del
-accionista al 01/08/2026 = 2.141.867 (`estimated`). Retención SII de Humberly (jul/ago) asumida por la empresa
-por decisión del operador, registrada en Finance; Payroll sin tipo de ajuste para modelarla.

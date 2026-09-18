@@ -65,16 +65,26 @@ it without repeating what already cost a day*. It grows with every task: see the
   before `vercel env add` does not see the variable: redeploy.
 - **Share links (TASK-1848): the bearer is never persisted** — not even encrypted; only its sha256 digest. It is
   returned once on create and lives only in memory during an email send. A lost link is revoked and replaced, never
-  recovered. Revoking works with the flag OFF and never reactivates; withdrawing an edition revokes its live grants.
+  recovered. Only ISSUED client editions; TTL 1–90 days (default 30); max 20 active links per edition (429
+  `quota_exceeded`). Revoking works with the flag OFF and never reactivates; withdrawing an edition revokes its live
+  grants (`edition_withdrawn`). The access log is not proof of reading.
 - **The public reader is anti-oracle and uncacheable**: `404` for unknown/malformed/expired/flag OFF/suspended org/
   retired module (indistinguishable), `410` revoked or withdrawn, `429` rate limit that FAILS CLOSED, and always
   `Cache-Control: private, no-store` + `noindex`. Never copy the Grader's link (token in clear, `public, max-age=300`).
+  Think consumes it server-side as `InsightWebModelV1` (`modelVersion '1.0'`, client-facing projection only). NEVER
+  probe its limits with concurrent bursts: the DB-backed limiter spends a connection before rejecting (ISSUE-174).
 - **Email delivery and schedule writes are App lane only, human internal actor** (capabilities without `own`: a
   client never sends). Ecosystem lane and MCP only read deliveries and schedules; MCP never sends email.
 - **Schedules never issue nor send**: `review_policy = 'draft_for_review'` (DB CHECK); each occurrence creates the
   edition and requests its render, then stops at `ready_for_review`. A revoked authority or missing module pauses it.
 - **An `ambiguous` delivery is reconciled against the email ledger, never resent blindly**; a definitive failure
   revokes its grant and a retry issues a new one with a per-attempt correlation (`…:aN`). Accepted ≠ delivered ≠ read.
+  The link email uses the token-sensitive EmailType: its grant is issued in the same transaction that claims the
+  `email_deliveries` row. EmailTypes are seeded OFF (the config table fails open without a row).
+- **TASK-1848 state (2026-09-18):** in production since release `bda1cf2cd938` with sharing/delivery/schedules flags
+  OFF there (ON in staging) until the Think reader (TASK-1875) exists. Gateway `efeonce-mcp` 1.7.0 federates the 7 tools
+  (58 total): share create/revoke require `efeonce.mcp.insights.write` (no client carries it ⇒ fail-closed), the 5
+  reads use the base scope; sending email and scheduling do not exist over MCP.
 - **Figures are never invented, never "0" when absent.** `no_data`, `unsupported_window`,
   `insufficient_data` are rejections recorded in the snapshot and shown as limits in the plan. The AI
   author only rewrites validated text; if a figure changes, the deterministic plan wins.

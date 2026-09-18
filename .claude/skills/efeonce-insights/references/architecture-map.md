@@ -1,6 +1,6 @@
 # Efeonce Insights — architecture map (where things live)
 
-Verified against develop on 2026-09-16. The exhaustive, line-referenced version is
+Verified against develop on 2026-09-16 (TASK-1848 section 2026-09-18). The exhaustive, line-referenced version is
 `docs/architecture/EFEONCE_INSIGHTS_IMPLEMENTATION_RECORD_V1.md`; keep this map short and current.
 
 ## Domain `src/lib/efeonce-insights/`
@@ -76,8 +76,8 @@ runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-0
 
 ## TASK-1848 — sharing, delivery, schedules (2026-09-18)
 
-Code complete on local `develop` (commits `75715589d`, `83d57380a`, `1c109fc8e`), not pushed or deployed; the four
-migrations are applied on the shared instance.
+Slices in commits `75715589d`, `83d57380a`, `1c109fc8e`; in production since release `bda1cf2cd938` (2026-09-18) with the
+sharing/delivery/schedules flags OFF there (ON in staging); the four migrations are applied on the shared instance.
 
 | Piece | Where | Responsibility |
 | --- | --- | --- |
@@ -114,9 +114,10 @@ migrations are applied on the shared instance.
 | Storage | `src/lib/storage/greenhouse-assets.ts` | `downloadPrivateAsset` accepts `actorUserId: string \| null` |
 | Projection | `src/lib/sync/projections/insights-delivery-dispatch.ts` (registered in `projections/index.ts`) | `insights_delivery_dispatch`, domain `notifications`, lane ops-reactive-notifications |
 | Worker | `services/ops-worker/server.ts` `POST /insights/schedules/tick` + `deploy.sh` | schedules tick; declares `INSIGHTS_DELIVERY_ENABLED`, `INSIGHTS_SCHEDULES_ENABLED`, `INSIGHTS_GENERATION_ENABLED` (default true) |
-| Scheduler | Cloud Scheduler `ops-insights-schedules-tick` `20 * * * *` | one job for all organizations (not created yet) |
+| Scheduler | Cloud Scheduler `ops-insights-schedules-tick` `20 * * * *` | one job for all organizations (ENABLED 2026-09-18) |
 | Reliability | `src/lib/reliability/queries/insights-delivery-ambiguous.ts` (`insights.delivery.ambiguous`) wired in `get-reliability-overview.ts` | steady 0; warning 1–3, error >3; ambiguous + claimed >30 min |
 | Observability | `src/lib/observability/redact.ts` (`insights_share_path`, `insights_share_token`) + `sentry-server-event-scrub.ts` in `sentry.server.config.ts`/`sentry.edge.config.ts` | scrub share paths/tokens from url, query, transaction, breadcrumbs, spans |
 | Events | `src/lib/sync/event-catalog.ts` | `insights.share.created`, `insights.share.revoked`, `insights.delivery.requested`, `insights.schedule.changed`, `insights.schedule.occurrence_generated` |
 | Entitlements | `src/config/entitlements-catalog.ts` + `src/lib/entitlements/runtime.ts` | share: ADMIN + ACCOUNT (tenant), CLIENT_EXECUTIVE (own); delivery + schedule: ADMIN + ACCOUNT |
-| MCP | `src/mcp/greenhouse/{tool-manifest,server,tools,http-client}.ts` | 7 tools (62 total, hash `9fc46c8d90d3`); not federated in the gateway yet |
+| MCP | `src/mcp/greenhouse/{tool-manifest,server,tools,http-client}.ts` | 7 tools (62 total, hash `9fc46c8d90d3`) |
+| Gateway | `efeonce-mcp` 1.7.0 (PR #16 `4c9d7c44`, revision `00055-gk6`, 58 tools), provider `greenhouse-insights` contract `task-1848-v1` | federates the 7 tools; share create/revoke on `efeonce.mcp.insights.write` (fail-closed: no client carries it), 5 reads on the base scope; native authority `unsupported` per tool with the surface's real capability |
