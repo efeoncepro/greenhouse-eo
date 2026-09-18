@@ -1,0 +1,245 @@
+{
+  "prenda": "Hoodie Efeonce",
+  "fuente": "ai-generations/2026-09-17_kv-tu-ia-no-conoce/refs/efeonce-hoodie.png (asset oficial del sitio público)",
+  "invariantes": {
+    "tela": "azul royal del asset oficial; medido en las vistas navy entre (10,54,155) y (25,76,186), Δ máximo 38 en primeros planos",
+    "emblema_pecho": "isotipo blanco en el pecho izquierdo, del mismo tamaño y posición que el asset oficial; NUNCA se reduce",
+    "estampa_espalda": "logo completo + eslogan «Empower your Growth» centrado y más chico, al 38 % del ancho de la espalda; se compone de forma determinística con estampa-espalda.mjs, nunca se le pide el texto al modelo",
+    "eslogan": "Poppins ExtraBold Italic / ExtraBold / Black Italic, contrato de src/config/efeonce-brand.ts; blanco sobre navy, navy #023c70 sobre blanco o gris",
+    "construccion": "cordones planos tono sobre tono, bolsillo canguro, puños y ruedo acanalados, capucha de doble capa, sin cierre ni etiquetas visibles"
+  },
+  "como_usarla": "Elegir la vista por el ÁNGULO DE LA TOMA, no por costumbre: si el sujeto se ve de espaldas, la referencia es la espalda. Se pasa junto con las referencias de rostro y cuerpo de la persona; la prenda la fija esta referencia y la escena la fija el prompt.",
+  "vistas": [
+    {
+      "id": "01-frente",
+      "descripcion": "Prenda sola, frente (maniquí invisible)",
+      "cuando_usarla": "tomas frontales; referencia por defecto del pecho",
+      "archivo_fondo_estudio": "efeonce-hoodie-01-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-01-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "02-espalda",
+      "descripcion": "Prenda sola, espalda con la estampa canónica",
+      "cuando_usarla": "cualquier toma de espaldas",
+      "archivo_fondo_estudio": "efeonce-hoodie-02-espalda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-02-espalda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "03-tres-cuartos-izquierda",
+      "descripcion": "Prenda sola, tres cuartos izquierda",
+      "cuando_usarla": "sujeto girado hacia su derecha",
+      "archivo_fondo_estudio": "efeonce-hoodie-03-tres-cuartos-izquierda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "04-tres-cuartos-derecha",
+      "descripcion": "Prenda sola, tres cuartos derecha",
+      "cuando_usarla": "sujeto girado hacia su izquierda",
+      "archivo_fondo_estudio": "efeonce-hoodie-04-tres-cuartos-derecha-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-04-tres-cuartos-derecha-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "05-lateral",
+      "descripcion": "Prenda sola, lateral",
+      "cuando_usarla": "perfiles y tomas de costado",
+      "archivo_fondo_estudio": "efeonce-hoodie-05-lateral-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-05-lateral-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "06-capucha-puesta",
+      "descripcion": "Capucha puesta, frente",
+      "cuando_usarla": "piezas con la capucha arriba",
+      "archivo_fondo_estudio": "efeonce-hoodie-06-capucha-puesta-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-06-capucha-puesta-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "07-doblado",
+      "descripcion": "Doblada sobre superficie",
+      "cuando_usarla": "bodegón, merch, escritorio",
+      "archivo_fondo_estudio": "efeonce-hoodie-07-doblado-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-07-doblado-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "08-percha",
+      "descripcion": "En percha",
+      "cuando_usarla": "vestuario, backstage, tienda",
+      "archivo_fondo_estudio": "efeonce-hoodie-08-percha-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-08-percha-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "09-detalle-pecho",
+      "descripcion": "Detalle del emblema del pecho",
+      "cuando_usarla": "primeros planos y verificación del emblema",
+      "archivo_fondo_estudio": "efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "10-detalle-puno-cordon",
+      "descripcion": "Detalle de puño y cordón",
+      "cuando_usarla": "primeros planos de textura",
+      "archivo_fondo_estudio": "efeonce-hoodie-10-detalle-puno-cordon-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "11-interior-capucha",
+      "descripcion": "Interior de la capucha",
+      "cuando_usarla": "capucha abierta o vista desde atrás",
+      "archivo_fondo_estudio": "efeonce-hoodie-11-interior-capucha-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "12-cuello-interior",
+      "descripcion": "Cuello por dentro",
+      "cuando_usarla": "detalle de cuello; sin etiqueta de marca",
+      "archivo_fondo_estudio": "efeonce-hoodie-12-cuello-interior-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "13-plano-frente",
+      "descripcion": "Plano cenital, frente",
+      "cuando_usarla": "mockups y flat lay",
+      "archivo_fondo_estudio": "efeonce-hoodie-13-plano-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-13-plano-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "14-plano-espalda",
+      "descripcion": "Plano cenital, espalda con estampa",
+      "cuando_usarla": "mockups y flat lay de espalda",
+      "archivo_fondo_estudio": "efeonce-hoodie-14-plano-espalda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-14-plano-espalda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "15-puesto-frente",
+      "descripcion": "Puesta, frente, cuerpo neutro sin rostro",
+      "cuando_usarla": "caída de la tela en un cuerpo",
+      "archivo_fondo_estudio": "efeonce-hoodie-15-puesto-frente-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "16-puesto-espalda",
+      "descripcion": "Puesta, espalda, cuerpo neutro sin rostro",
+      "cuando_usarla": "caída de la estampa sobre el cuerpo",
+      "archivo_fondo_estudio": "efeonce-hoodie-16-puesto-espalda-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "17-puesto-frente-cuerpo-b",
+      "descripcion": "Puesta, frente, otro cuerpo y tono de piel",
+      "cuando_usarla": "evitar que la referencia empuje a un solo tipo de modelo",
+      "archivo_fondo_estudio": "efeonce-hoodie-17-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "18-blanco-frente",
+      "descripcion": "Variante blanco hueso, frente, tinta navy",
+      "cuando_usarla": "fondos oscuros o piezas de verano",
+      "archivo_fondo_estudio": "efeonce-hoodie-18-blanco-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-18-blanco-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "19-blanco-espalda",
+      "descripcion": "Variante blanco hueso, espalda, tinta navy",
+      "cuando_usarla": "fondos oscuros, toma de espaldas",
+      "archivo_fondo_estudio": "efeonce-hoodie-19-blanco-espalda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-19-blanco-espalda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "20-gris-frente",
+      "descripcion": "Variante gris jaspeado, frente, tinta navy",
+      "cuando_usarla": "piezas neutras o de oficina",
+      "archivo_fondo_estudio": "efeonce-hoodie-20-gris-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-20-gris-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "21-gris-espalda",
+      "descripcion": "Variante gris jaspeado, espalda, tinta navy",
+      "cuando_usarla": "piezas neutras, toma de espaldas",
+      "archivo_fondo_estudio": "efeonce-hoodie-21-gris-espalda-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-hoodie-21-gris-espalda-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    }
+  ]
+}

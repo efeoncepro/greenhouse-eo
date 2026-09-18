@@ -7,6 +7,122 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-18 — Efeonce Insights: compartir por enlace, envío por correo y recurrencia (TASK-1848, code complete)
+
+Una edición emitida ya puede compartirse por enlace personal que vence (se guarda sólo el hash del token; revocable
+uno a uno; el lector público responde 404/410/429 y nunca cachea), enviarse por correo desde Efeonce a personas
+activas de la organización (enlace compartido o PDF adjunto opt-in, dedupe por persona y versión, un resultado
+ambiguo se reconcilia antes de reenviar) y programarse (semanal/mensual, zona y consolidación; cada ocurrencia deja
+un borrador en revisión, nunca emite ni envía). Migraciones aplicadas en la base compartida; los tres flags nuevos
+nacen apagados en producción y los EmailTypes apagados. Verificado en staging con canary sintético completo (incluye un
+correo real al buzón autorizado del operador); la prueba destapó `ISSUE-174` → `TASK-1876`. Producción y gateway pendientes.
+
+## 2026-09-17 — Higgsfield documentado como proveedor gobernado de Creative Studio
+
+La revisión de los nueve repositorios oficiales de Higgsfield quedó documentada en arquitectura, auditoría,
+documentación funcional, manual de uso, runbook, fleet ledger y skills espejo. API/SDK/CLI, skills agentic y MCP
+local para After Effects/Blender quedan como superficies preparadas; Higgsfield permanece
+`provider-supported / no Globe route` hasta contar con route card, adapter, secreto, coste, derechos, canary,
+Asset Governance y readback. No se instaló, generó, compró crédito ni publicó nada.
+
+## 2026-09-17 — Aplicar el logo 3D en escenas con IA generativa
+
+El kit 3D del logo ya no se compone a mano sobre la escena: se pega el render exacto y el modelo repinta sólo un halo
+alrededor con máscara, así aporta sombra de contacto, reflejo y rebote sin poder re-dibujar el logo. Con el logo grande
+en cuadro basta la pasada directa con el render como referencia. Medido en dos casos reales (avenida de Nueva York y
+escritorio): zona protegida 4,4/255 de diferencia y halo 39,6. La composición determinística queda como respaldo.
+
+## 2026-09-17 — Logo de Efeonce en 3D como kit de referencia para agentes
+
+Quedó en `13- Branding/Logo Efeonce 3D` el logo completo en 3D renderizado en Blender desde el SVG oficial, en navy y
+blanco, en cuatro escalas (monumental, grande, mediana, pequeña) con 33 cámaras y luz izquierda/derecha, sin
+superficies. Cada escala trae un manifiesto de cámara y usos para que un agente elija el render que coincide con la
+escena y se lo pase al modelo como imagen 1, sin dejar que el modelo dibuje las letras.
+
+## 2026-09-17 — `pnpm ai:image:rmbg --key-background` para huecos opacos
+
+El recorte de fondo suma una opción opt-in para el caso de objeto claro sobre fondo oscuro: vacía los huecos pasantes
+(ventanas, cortes) que el matting dejaba opacos mostrando el fondo de estudio, con borde suave y sin halo. Reemplaza el
+script de corrida de la nave de Efeonce 3D y reproduce el mismo alfa en sus finales aprobados.
+
+## 2026-09-17 — LicitaLAB: CLI `pnpm licitalab` y flujo agéntico de licitaciones públicas
+
+Nuevo cliente canónico `src/lib/commercial/tenders/licitalab/client.ts` sobre el MCP de LicitaLAB y CLI con tres
+credenciales: API key en Secret Manager (`documents`, `ask-docs`, `support`), sesión OAuth de usuario de 7 días
+automatizada con Playwright (`opportunity`, `provider`; la key responde `unsupported`) y el radar web existente,
+ahora con `--headless/--no-login`, detrás de `search [--match] [--enrich]`. Verificado en vivo (20 recomendadas
+enriquecidas; 175 del listado completo). Receta 0 en la skill de licitaciones y manual
+`revisar-licitaciones-licitalab-con-cli.md`. El agente nunca ingresa la contraseña: renovar sesiones es del operador.
+
+## 2026-09-17 — Nave de Efeonce en 3D, navy y blanco
+
+Quedó en `13- Branding/Nave Efeonce 3D` la biblioteca del isotipo en 3D: 16 ángulos de cámara por color (con versiones
+transparentes) y 8 escenas. El blanco se obtuvo recoloreando los renders navy aprobados, porque generarlo aparte salió
+plano; los ángulos extremos usaron una guía de perspectiva proyectada desde la silueta oficial.
+
+## 2026-09-17 — Sprocket de HubSpot en 3D (uso interno) y mascotas en carpeta propia
+
+Las bibliotecas de mascotas pasaron a `14. Mascotas de partners` en la raíz de la carpeta de contenidos, por
+indicación del operador, y se sumó el sprocket de HubSpot en 3D: 8 ángulos y 8 escenas desde el SVG oficial. Como es
+marca registrada y HubSpot exige aprobación previa para usarlo, la biblioteca queda como uso interno hasta obtenerla.
+El relleno de huecos de `pnpm ai:image:rmbg` ahora reconoce el fondo en sombra visto a través de un agujero del objeto.
+
+## 2026-09-17 — Bibliotecas de poses 3D de Clawd y Codex, y recorte sin huecos
+
+Quedaron en la carpeta de contenidos de Marketing dos bibliotecas de mascotas de partners: Clawd (Claude) y Codex
+(OpenAI), cada una con 8 ángulos de cámara y 8 poses con accesorios ligados a servicios de Efeonce, en fondo de estudio y
+transparente, más su fuente oficial (sprite del binario de Claude Code y atlas del app de ChatGPT). `pnpm ai:image:rmbg`
+ahora rellena por defecto los huecos internos que el recorte automático deja en el sujeto (ojos, visores, glifos) y
+conserva los huecos reales de fondo. El método quedó documentado para repetirlo con Nexa; inventario en
+`docs/operations/social/PARTNER_MASCOT_POSE_LIBRARIES.md`.
+
+## 2026-09-17 — Narrativa «Tu IA no conoce tu negocio» y su key visual
+
+Quedó definida la narrativa go-to-market de Efeonce para Q4 2026 – Q3 2027: cinco capítulos de contexto (lo que la IA
+no sabe, datos, lo que la IA dice de ti, equipo agéntico y marca) más una capa de resultados, conectados con todas las
+líneas de negocio (`docs/strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`). Su key visual —Nexa con hoodie
+Efeonce y Clawd en 3D en el hombro, con una selección AXIS sobre «tu negocio.»— quedó programado para el 21/09 en
+LinkedIn e Instagram. Anthropic y OpenAI figuran como partners aceptados. El adapter de selección colaborativa AXIS
+suma una opción de presentación (escala y color por participante, con contraste verificado) y las skills aprenden que
+cambiar el fondo detrás de una persona o mascota se resuelve regenerando la escena, no recortando. Bitácora en
+`docs/operations/social/2026-09-17-kv-tu-ia-no-conoce-production-method.md`.
+
+## 2026-09-16 — Serie social de Fiestas Patrias: México y previa del 18
+
+Se publicaron el carrusel «Hay frases que no se tocan» en Instagram y su documento en LinkedIn para México, y quedó
+programada para el 17/09 la estática «Hay días que sí rediseñaríamos». El caso dejó reglas nuevas en las skills
+sociales: la conexión con la marca se demuestra con el oficio y no con una moraleja; sin símbolos patrios mexicanos en
+piezas de marca; personas del equipo sólo con consentimiento; alto impacto se logra con luz, cámara, material y
+acción; un recoloreo con máscara de IA que cambia la forma se descarta por uno determinístico; y las imágenes sociales
+se publican en PNG. Bitácora en `docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md`.
+
+## 2026-09-16 — `pnpm ai:fal` también trabaja con Higgsfield
+
+El mismo comando ahora opera la API de Higgsfield: 44 modelos que se eligen con `--capability hf-*`, entre ellos SOUL,
+Marketing Studio, Ideogram 4.0, Qwen Image 3, Kling Omni y O3, PixVerse 6, LTX 2.5 y Happy Horse. Antes de gastar,
+revisa el pedido contra las reglas reales de cada modelo y pide el precio exacto al proveedor, que no cobra por
+cotizar. En Seedance y Wan 3.0, que solo publican una fórmula, calcula un techo. `--estimate` cotiza sin generar y
+`--cancel` anula un trabajo que sigue en cola. La llave quedó en Secret Manager. Las 44 opciones cotizaron con la
+cuenta de Efeonce, pero todavía no se generó nada: la cuenta de la API de Higgsfield no tiene créditos. Si el Recraft de
+esta API entrega SVG está sin probar, y Veo 3.1, Sora 2 y Nano Banana Pro no están disponibles por esta vía.
+
+## 2026-09-16 — Los comandos de IA avisan cuánto van a costar antes de gastar
+
+`pnpm ai:fal` ahora calcula el costo antes de mandar un trabajo y se detiene si pasa de USD 1 (o del tope que
+indiques) hasta que confirmes con `--yes`. Sin `--resolution`, usa la resolución más barata del modelo en vez del
+valor caro por defecto de algunos proveedores. También dejó de guardar archivos con la extensión equivocada, rechaza
+`--seed` en los modelos que no lo aceptan y avisa antes de mandar más imágenes de las que el modelo usa. `pnpm
+ai:image` valida tamaño, fondo y formato antes de llamar a OpenAI, permite elegir PNG, JPEG o WebP, y muestra el
+costo estimado con la fórmula oficial. Guía, catálogo, manuales y skills quedaron al día.
+
+## 2026-09-16 — Efeonce Insights ya entrega decks en producción
+
+El render de Insights quedó en producción: una edición pedida por API o MCP produce su deck descargable sin
+intervención, y el gateway de MCP de Efeonce ya expone las cuatro herramientas de render. El release llevó por primera
+vez al orquestador de producción un Cloud Run Job, el worker de render, que el watchdog y el rollback ya saben leer.
+La prueba final en producción siguió el camino real: el despacho automático lanzó el worker y el deck quedó listo al
+primer intento. Emitir la edición al cliente sigue apagado y es el siguiente paso de EPIC-045.
+
 ## 2026-09-16 — Efeonce Insights renderiza solo en staging y el worker de render entra al release
 
 El render de Insights ya funciona de punta a punta en staging sin intervención: se encarga por API o MCP, el despacho
@@ -263,8 +379,10 @@ banderas. La v3 de `efeonce-contacto` (`fver-c00955ca-863a-4e7d-99c7-c09706660a3
 localizadas, typeahead/listbox accesible y chevron con orientación cerrada/abierta verificada; la v2 fue
 deprecada conservando el destino existente.
 
-Queda pendiente para el próximo release del renderer el hotfix `e5d4a0fb2`: reemplaza el glifo `↗` que aún puede
-aparecer junto a “País” por el ícono geográfico SVG. No requiere una nueva versión del formulario.
+Se probó y revirtió el 2026-09-16 la mitigación page-scoped de WordPress (`ghf-country-icon-ohio-override-v1`, página
+20729, snapshot `_gh_contacto_before_country_icon_override`): el CSS no atraviesa el Shadow DOM y dejaba `globe`
+junto al SVG. No queda parche live. El hotfix definitivo del renderer `d15bb9256` (sobre `e5d4a0fb2`) queda
+preparado para el próximo release; no requiere una nueva versión del formulario.
 
 ## 2026-09-15 — TASK-1845: foundation de Efeonce Insights en develop (code complete, rollout pendiente)
 
@@ -705,218 +823,3 @@ etiquetar; el Calendario no puede expresar franquicia, canal-hogar frente a sat�
 métricas que la doctrina declara (sends, saves, watch time, dwell), y conserva `Portafolio` como tipo de
 pieza. La propuesta de cambios queda ordenada de menor a mayor invasividad y **ninguna fue aplicada**:
 no se creó, editó ni borró nada en Notion.
-
-## 2026-09-10 — Las seasonalities entran al catálogo como línea propia de marca
-
-`PDR-020` rev 1.4 cierra la reconciliación con el plan de seasonalities 2026–2027: se conserva como línea propia
-y permanente porque su trabajo es marca, no como compromiso previo con vencimiento. Son **seasonalities, no
-efemérides**, y la distinción es operativa: una efeméride es una fecha conmemorativa puntual, mientras una
-seasonality es una temporada con comportamiento propio de audiencia y mercado, con ventana y variación por país.
-La unidad de trabajo es la ventana, no el día — por eso Navidad se entrega en octubre — y una temporada puede
-sostener más de una pieza. Lo que la distingue del post
-genérico de efeméride es que cada fecha demuestra una disciplina de la casa — Halloween es un envase que pierde
-personalidad por imitación, el Día de la Usabilidad son fricciones digitales como obstáculos físicos, el Óscar es
-retirar una luz para cambiar una escena — y ese es el estándar declarado de la línea. Canal-hogar Instagram,
-métrica sends y saves, nunca seguidores. Único ajuste operativo: LinkedIn deja de recibir la misma pieza con otro
-caption y recibe el argumento profesional desarrollado, sólo cuando la disciplina es legible para un comprador.
-No se fusiona con trendjacking: misma familia cultural, economía de producción opuesta. Alcance, fechas,
-responsables y entregas del plan no cambian, y sigue pendiente la conciliación tarea/calendario de MET-2339–2342.
-No se produjo, programó ni publicó nada.
-
-## 2026-09-10 — Canales propios de Efeonce quedan bajo un sistema editorial declarado
-
-`PDR-020` fija el sistema editorial de los canales propios de marca: un motor compartido con un rol por canal
-(blog el activo, LinkedIn el comprador, YouTube la profundidad, Instagram craft y cultura, Threads conversación
-viva, Glitch la propiedad), catálogo propio de formatos por canal y franquicias con canal-hogar que viajan como
-corte y nunca como copia. Los territorios se heredan de la taxonomía de `PDR-019` sin taxonomía social paralela;
-el educativo nace en LinkedIn y el blog recibe la versión answer-first; el blog queda declarado multiformato con
-casos, tools, webinars, ebooks y data studies; los casos de éxito se modelan en tres profundidades con canonical
-en el blog y compuerta de aprobación del cliente. El vocero de talking head es Julio Reyes.
-[Decisión](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md), delta de impacto en
-`TASK-1802`, cross-links en `PDR-003/004/005/019`, drift de Thought Territories registrado en el context pack y
-diez archivos de skills reconciliados con espejo Claude/Codex, incluido el hueco de Threads que no existía en la
-mecánica de plataforma. Quedan siete decisiones pendientes y un conflicto declarado sin resolver con el plan
-estacional 2026–2027, que sigue vigente. No se abrió ninguna cuenta, no se produjo contenido, no se programó nada
-y no se autorizó publicación.
-
-## 2026-09-10 — Finance: nómina agosto al valor real de Global66 y TASK-1858
-
-Con autorización del operador, los dos pagos de nómina de agosto que Payroll había registrado en USD con tasa
-estimada quedaron superseded y reemplazados por lo que salió de Global66 el 03/09 (800.730 y 1.114.423 más las
-comisiones de cambio), pagados en la moneda del expense al tipo de cambio realizado; Global66 septiembre queda
-`reconciled`. Se crea `TASK-1858` como cierre formal de la recuperación.
-
-## 2026-09-10 — Finance: tercera pasada (sueldo accionista, Berel MXN, fee HubSpot, Deel mayo–julio)
-
-Nace `finance:ledger-adjust` (cobros en moneda nativa con vínculo a fila, comisiones, pagos directos a un member y
-supersede de settlements) sobre el command compartido `linkStatementRow`; los expenses anclados aceptan
-USD/MXN con tipo de cambio explícito y `createMemberPaymentExpense` registra pagos a un colaborador sin entry
-de Payroll. Datos: sueldo accionista 2×1.000.000 reemplaza los traspasos al CCA; Berel folios 51/52/53 cobrados
-en MXN; comisión HubSpot cerrada con la fee de recepción estimada; Deel REC-2026-8/9/10 al CCA.
-
-## 2026-09-10 — Finance: segunda pasada de conciliación (honorarios brutos, Deel al CCA, payable backdated, Banco de Chile)
-
-El plan de conciliación suma `honorarios_gross_paid`, `income_receipt`, `link_existing_payment` y
-`link_existing_leg`; nacen `finance:record-deel-receipts` (recibos Deel con tarjeta personal → cuenta corriente
-accionista) y `finance:contractor-settle` (boleta on-behalf → readiness → obligación reactiva → orden pagada con
-la fecha del banco), más el adapter `bancochile_cuenta_vista_text`. Datos: Humberly julio/agosto como brutos sin
-retención; Deel REC-2026-11/12/13; Valentina EO-CPAY-0002 pagado el 07/09; comisión HubSpot Q2 2026 como
-ingreso; Banco de Chile FAN Emprende anclado e importado. Seis períodos `reconciled`. Pendiente de despliegue:
-el ops-worker recomputa saldos con el código previo a ISSUE-169.
-
-## 2026-09-10 — Finance: recuperación de conciliación agosto–septiembre 2026
-
-Cuatro meses sin cartola se resolvieron re-anclando cada instrumento con una OTB bank-authoritative al inicio de
-agosto (Global66 al 31/07 y la TC al cierre de ciclo 06/08) en vez de reconstruir mayo–julio. Nacen los adapters
-de cartola (`santander_cartola_xlsx`, `santander_tc_movimientos_xlsx`, `santander_tc_estado_cuenta_text`,
-`global66_xls`) detrás de `parseBankStatementFile`; la ruta de import acepta archivo/texto y el drawer suma la
-pestaña «Archivo del banco» (la lista CSV ahora calza con el parser). CLIs canónicas nuevas:
-`finance:instrument:create`, `finance:import-statement`, `finance:reconcile-rows` (plan JSON) y
-`finance:declare-otbs --file`. Se corrigió `ISSUE-169` (cuentas USD/MXN sumaban CLP; el día genesis de la OTB no
-materializaba movimientos), el opening canónico del período honra la OTB, las filas idénticas del mismo día ya no
-colapsan al importar y las factorías de settlement aceptan fechas partidas y MXN. Créditos V1
-(`src/lib/finance/loans.ts`): Crédito FOGAPE Santander registrado con su desembolso como settlement `funding`.
-Datos: `banco-chile-clp` registrada, 9 períodos ago/sep importados, 77 filas conciliadas por plan, tres períodos
-`reconciled`; las discrepancias de nómina y dos cobros quedan escaladas al operador (follow-up propuesto `TASK-1858`, sin registrar aún).
-
-## 2026-09-10 — TASK-1604: pack SEO/Arte y vacantes reconciliadas
-
-Ampliación 2026-09-13: nueve preguntas SEO afinadas activas para piloto manual, ocho originales retiradas con
-linaje idempotente. Snapshot D4 desplegado en producción, dos migraciones aplicadas; 594 tests focales y dos
-live passed. [Evidencia](docs/audits/hiring/2026-09-13-seo-assignment-readiness.md). Pendientes calibración independiente,
-recorrido sintético y automatización por etapa. Piloto autorizado: nueve activas y template/policy manual habilitada con 75 min y cap 5/h. Sin asignaciones ni correos.
-
-Se agregó el pack versionado de evaluación para SEO Specialist Senior y Director(a) de Arte Senior: seis
-competencias aditivas, nueve preguntas SEO con rúbricas BARS en `sme_review`, scorecard de portfolio/caso para
-Arte, migración y operador local/readback. El guard de materialización ahora cuenta sólo las preguntas exactas
-del pack; la reutilización de templates exige un único match de role hint, módulos, niveles y pesos y falla
-cerrado ante colisiones. Las vacantes `EO-OPN-0674/0675` fueron publicadas por una operación separada y se
-releyeron `active|published|public_listed`, rutas 200, pero continúan con cero policies, templates del pack y
-assessments. Task, registry, epic, documentación funcional y handoff reflejan esa frontera; TASK-1604 sigue
-`in-progress` hasta SME, template/binding y Quality Gate.
-
-## 2026-09-10 — TASK-1832: retiro bloqueado y contrato shared-CIMD documentado
-
-Readback live conserva la organización sintética aislada: registro/binding `1/1`, purpose drift `0/0`, dos
-profiles run-owned fuera de Person 360 y un único grant read-only activo. La muestra dejó de ser steady:
-`auth.oauth.refresh_reuse_detected` reportó 93 eventos/24h sobre el CIMD compartido de Codex. El cleanup dry-run
-no mutó y añadió `oauth_client_not_run_owned`; el mismo cliente tiene 8 artefactos canary y 35 de otros sujetos.
-Task, manifiesto, runbook, manual, doc funcional y skills Claude/Codex ahora prohíben remover ese blocker o
-aplicar el helper client-scoped. El retiro exige primero planner/delete/readback sujeto-específicos y prueba de
-preservación del cliente/hijos ajenos, además del diagnóstico de refresh; no hubo revoke, cleanup apply, gate
-OFF, push ni deploy. El gateway 1.4.0 usa los tres paquetes MCP v2 oficiales 2.0.0, todavía latest en npm al
-momento del chequeo.
-
-## 2026-09-10 — TASK-1852: canal MCP delegado vivo; TASK-1857 Creative Hub
-
-Canal delegado completo fuera del primitive: scope Entra `efeonce.mcp.client_services.write` (Admin) en la app recurso MCP,
-`efeonce-mcp-client-services` en la allowlist de consumers de Vercel Production (redeploy `greenhouse-naxc5guq3`) y
-federación en `efeonce-mcp` 1.4.0 (PR #9 provider `greenhouse-client-services` con preview/apply/rollback; PR #10 corrige
-`efeonce.gateway.status`, que omitía el provider; revisión `00052-slt`, 174 tests). Verificado en producción por
-`efeonce.gateway.status`). Canary humano punta a punta y apply de Sky ejecutados ~07:40Z por el canal (`EO-APC-ECD63852`, `delegated_oauth`, 0 altas, replay idempotente). `scopes.ts` del auth-server suma
-`efeonce.mcp.client_services.write` a las clases de escritura MCP (paridad con `efeonce-mcp/src/config.ts`).
-Decisión del operador: Creative Hub ES el módulo de Sky → `TASK-1857` (ui-ux; wireframe v2 de cinco bloques cliente + dirección visual C «hoja de trabajo creativa» con component mapping por bloque sobre el surface system; sin JSX) y Delta en `TASK-1687`.
-[Auditoría](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md) §Canal MCP delegado.
-Barrido documental por dos subagentes (32 archivos): skills `efeonce-mcp-platform` (+referencias, espejo `.codex`),
-`greenhouse-teams-message-operator`, `teams-bot-platform`, `efeonce-customer-experience`; arquitectura MCP §25, invariantes MCP §11,
-sister platforms §16 (registro de clientes de exchange), gap ledger de parity, Teams/Notification Hub, client lifecycle §9,
-Pilot Engagement (`bundled_modules`), docs funcionales y manuales de portal/comunicaciones, DECISIONS_INDEX.
-
-## 2026-09-09 — TASK-1852: habilitación común de servicios
-
-Implementados inventario/preview, apply y compensación por organización/persona/servicio con commands
-canónicos, locks, snapshot e idempotencia atómica. App/CLI/MCP/Nexa reutilizan el dominio; escritura
-delegada denegada y writes nuevos apagados. JOIN comercial corregido, procedencia agent preservada
-durante refresh y audit App acepta cliente nulo de sesión interna. Suite inicial 290 tests, PostgreSQL local y smoke
-HTTP autenticado; [QA y matriz Berel/Sky](docs/audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
-Rollout autorizado y alcance Berel/Sky confirmado por el operador; permiso de compensación EFEONCE_ADMIN
-corregido, 392 tests passed. Servicio Berel sincronizado por command; resolver HubSpot vigente y
-normalizador conservan importes ausentes NULL. [Estado del despliegue](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
-PR #231/main `5726ce9d90` en Production; orquestador `34416904936` success y manifest `released`.
-CI/Deep/build, cinco workers Ready, health, watchdog sin drift y siete canaries HTTP verdes. Excepción
-de compensación autorizada y auditada. Altas OFF; mapping comercial y certificación cliente pendientes.
-Tres contactos Berel quedaron seleccionados en HubSpot pero aún sin usuario Greenhouse; tres usuarios Sky
-activos fueron confirmados, sin login observado. [Dossier de discovery](docs/audits/client-portal/TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md).
-2026-09-10 (local, sin push): `declareCommercialTerms` acepta `bundledModules` validados contra el catálogo activo y
-gana contrato App `/api/platform/app/commercial/services/{serviceId}/terms` + CLI; Berel y Sky declarados con importes
-NULL. `inviteClientPortalUser` gana `delivery: 'deferred'` + `deliverClientPortalInvitation` (ruta `portal-users/deliver`);
-tres personas Berel provisionadas sin correo. El lane App acepta autoridad humana `delegated_oauth`
-(`client_services.enablement.write`, exchange RFC 8693 con cliente dedicado sembrado por migración) y el recibo registra
-`authority`; el preview distingue `person_invitation_pending`. Preview Sky limpio en producción; apply pendiente de sesión
-humana y flag. Chats grupales de Berel y Sky registrados como destino `chat_group` del Teams bot (`ready`, pertenencia
-verificada por Graph read-only; ruta `lifecycle/teams/chat`; migración que relaja el CHECK legado). Invitaciones Berel
-bloqueadas por decisión del operador hasta tener interfaces. Política de preferencias `client_service_default_v1` aplicada a las seis personas (ruta `portal-users/notification-preferences`). **Release 2026-09-10:** PR #232 → main `f69b9d32`, orquestador `34431792218`, manifest `released` 03:16Z, flag `CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true` horneada, canary de contrato 5/5 en producción. [Readback](docs/audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
-
-## 2026-09-09 — Planificación estacional Efeonce y continuidad editorial
-
-Documentadas 13 piezas 2026–2027 con conceptos, tareas, calendario y readback fechado en
-[registro social](docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
-Social Media incorpora guía de efemérides, metáforas visuales y briefs; Notion explicita la aplicación
-del flujo existente a pares tarea/calendario, con fechas separadas y detección de divergencias.
-Skills espejadas Claude/Codex. Cuatro tareas tienen asignaciones nuevas aún no copiadas al calendario;
-se documenta el pendiente sin mutaciones Notion. Producción, aprobación y publicación siguen abiertas.
-
-## 2026-09-09 — Portal de servicios: EPIC-046 e integración con Efeonce Insights
-
-Registrados [EPIC-046](docs/epics/to-do/EPIC-046-client-services-visibility-and-self-service.md) y
-[ADR](docs/architecture/GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md): Berel SEO/marketing de
-contenidos y Sky diseño digital, primero visibilidad y después solicitudes/briefs. Cinco tasks nuevas
-registradas y tres existentes por reutilizar, sin cambiar asignaciones ni desplegar.
-Baseline fechado de catálogo, acceso y destinos 404; fuentes, permisos, contratación y estados separados.
-El operador aprueba la dirección y añade Insights como hito obligatorio: autogestión cliente y gestión
-interna comparten dominio/historial, con permisos distintos y token limitado a una edición. EPIC-045,
-arquitectura/ADR, TASK-1845/1846/1848/1849 y flow/wireframe sincronizados; sin otro builder o motor.
-Ampliación del operador: email de Insights con resumen/deep link, in-app y Teamsbot en esta fase;
-móvil posterior. Hito N/P09 reutiliza Hub y sus dueñas, distingue entrega/consulta/acción y exige
-preferencias, destino autorizado y dedupe. TASK-690/693/1848/1849 actualizadas; sin envíos reales.
-El operador autoriza el registro: TASK-1852–1856 creadas con templates, contratos UI/backend y
-criterios; TASK-1852 ↔ TASK-1834 enlazadas para identidad/contexto/deep links y rollout nativo
-condicional. Inicio por 1852 con login vigente probado; commit documental autorizado, sin implementación, push ni deploy.
-Diseño UI ampliado por pedido del operador: ocho documentos TASK-1854/1856 con pantallas H0/S1 y R0–R5,
-campos de contenidos/SEO/diseño, deep links, recovery, adjuntos, copy, responsive y motion causal.
-Primitives verificadas en código; tareas/backend/epic alineados. UI ready no hasta integración/primer fold/GVC;
-umbral premium vigente ≥4.5, sin declarar capturas, scorecard ni funcionalidad desplegada.
-Asignación Claude/Codex documentada en EPIC-022/045/046: modelo, esfuerzo y revisión por task/carril;
-Astra para fronteras críticas, Sol para integración, Opus para UI/editorial y Fable para TASK-1669.
-Reglas comunes en EPIC-046: un editor por archivos, continuidad de owner y sin ejecución/rollout implícitos.
-Commit completo autorizado: incluye el movimiento previo de TASK-1690 a in-progress; lifecycle, registro y README conciliados, sin avance de implementación.
-
-## 2026-09-08 — GPT Image 2.5 entra a la doc como capacidad de proveedor, no como camino disponible
-
-OpenAI publicó `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare`. La matriz de capacidades, la spec del
-generador visual, el doc operativo, el ledger de la flota Globe y cuatro skills espejadas quedaron al
-día contra la doc oficial, no contra la prensa.
-
-Lo que cambia el trabajo real: OpenAI declara que **la calculadora de GPT Image 2 no estima el consumo
-de 2.5** y que tarifas por token iguales no implican costo por imagen igual. Eso rompe la estimación
-previa al gasto — el compiler de Globe reserva créditos ANTES de generar, y con 2.5 esa reserva no
-tiene fuente documentada. Quedó registrado como bloqueador de integración, no como detalle de pricing.
-Tampoco hay Batch ni rate limits publicados, así que `gpt-image-2` no se retira.
-
-Se documentaron dos trampas silenciosas del helper local, verificadas leyendo el código: por env var,
-`OPENAI_IMAGE_MODEL=gpt-image-2.5-*` no pasa el allowlist y cae a `gpt-image-2` sin avisar; por flag
-CLI, `--model` se castea sin validar, así que el modelo sí viaja pero la resolución se degrada a la
-rama legacy y se inyecta `input_fidelity`, que la guía de OpenAI excluye de Sunburst y Flare.
-
-Inventariando el dominio apareció un tercer defecto de la misma forma: `DEFAULT_IMAGE_PROVIDER` apunta
-a `imagen-4.0-generate-001`, que la arquitectura declara bloqueado. `TASK-1850` se creó y se supersedió
-el mismo día por `TASK-1851`, que toma el contrato entero: partirlo habría dejado el mismo archivo con
-dos dueños y el mismo invariante declarado en dos lugares. El hallazgo del auditor de flags —ciego a
-`ENABLE_ASSET_GENERATOR` porque su patrón exige sufijo `_ENABLED` y éste lleva prefijo `ENABLE_`— NO
-generó task: `TASK-1782` ya posee ese bug class y recibió un Delta. `TASK-278` recibió otro: sus
-entregables existen en el repo con 0 de 11 criterios tildados.
-
-También quedó por escrito lo que 2.5 NO mejora: OpenAI no afirma mejora de tipografía ni de texto
-multilingüe, las cuatro limitaciones declaradas siguen vigentes, y el system card mide una mejora de
-seguridad sin significancia estadística con Abuse peor que 2.0.
-
-## 2026-09-08 — Efeonce Insights: arquitectura y programa multiformato
-
-Extensión: skill operativa y distribución MCP/harness exigibles al cierre, con fuente común, routing,
-versionado y evaluación de agente sin historial. Se integra en TASK-1845/1848/1849; no agrega tareas.
-
-[EPIC-045](docs/epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md) formaliza cinco tasks
-TASK-1845–1849: evidencia/adapters, render durable, catálogos deck/A4, acceso/correo/recurrencia y biblioteca/web.
-ADR y arquitectura fijan dominio Greenhouse + Artifact Worker, tres salidas de primera clase, snapshots,
-API/UI/MCP, co-branding y grants revocables. TASK-1672/1673 conservan integración de auditoría técnica SEO.
-Sólo planificación autorizada; sin implementación, emisión de reportes ni rollout.

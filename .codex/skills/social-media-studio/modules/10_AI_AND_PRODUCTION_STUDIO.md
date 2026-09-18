@@ -50,7 +50,7 @@ presencia de un conector no garantiza una capacidad. Confirmar schema, sesión e
 |---|---|---|
 | Falta concepto o relación de marca | módulo 11 + copywriting/dirección de arte | mecanismo, papel de marca y recorrido visual defendibles |
 | Falta escena o acción | motor nativo o modelo disponible vía Higgsfield | plate/toma que ejecuta el concepto |
-| Defecto localizado de escena | edición por referencias o máscara admitida | defecto corregido con identidad/composición preservadas |
+| Defecto localizado de escena | edición por referencias o máscara admitida, **y recomposición de la zona abierta sobre el plate** — la máscara orienta al modelo pero no preserva píxeles ([paso 5](../../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md)) | defecto corregido con identidad/composición preservadas, verificado por delta máximo 0 fuera de la zona |
 | Marca física falsa o deformada | referencia oficial + materialización, mockup o 3D | geometría, material e identidad verificables |
 | Titular, firma editorial, CTA o legal inexactos | compositor con archivos reales | texto y vectores exactos; no regenerar la escena |
 | Resolución insuficiente | upscale disponible, incluido Magnific | detalle útil sin alterar producto, marca o códigos culturales |
@@ -69,7 +69,9 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    generar el final sólo de la toma aprobada; hero → Seedance 2.5; con personas o marcas → Flux 3 o Wan 3.0 (el
    filtro de Seedance rechaza **después de cobrar**).
 3. **Presupuesta por resolución:** fal cobra por escalón y el precio registrado es el más bajo (Wan 1080p 0,20
-   USD/s; H3 base 2K 0,13; Flux 3 publicado = el doble del registrado). Confirma con `pnpm ai:fal --balance`.
+   USD/s; H3 base 2K 0,13; Flux 3 publicado = el doble del registrado). `pnpm ai:fal` imprime `$ costo estimado` antes de encolar, pide
+   `--yes` sobre el tope (USD 1, `--max-usd`) y, sin `--resolution`, usa el escalón más barato: para el final pasa la
+   resolución explícita. Confirma con `pnpm ai:fal --balance`.
 4. **Copy, logo, CTA y legal nunca salen del modelo**: se componen de forma determinística sobre el plate.
 5. **Rankings con fecha y fuente**: OpenArt, Arena y Artificial Analysis se contradicen; manda la prueba contra el brief.
 

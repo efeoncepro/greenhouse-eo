@@ -14,7 +14,8 @@ localizar la misma biblioteca/carpeta; no crear esta ruta absoluta si el OneDriv
 
 Conservar las carpetas del equipo: `01. Contenido Evergreen`, `02. Grilla`, `03. Plantillas Contenido`,
 `04. Ads`, `05. Highlights`, `06. Blog Content`, `07. Ebook`, `08. Estrategia`, `09. Glitch`,
-`10. Nexa (Influencer IA)`, `11. Spot`, `12. LP Opengraphs`, `2025`, `Recursos` y `Seasonalities`.
+`10. Nexa (Influencer IA)`, `11. Spot`, `12. LP Opengraphs`, `13- Branding`, `14. Mascotas de partners`, `2025`,
+`Recursos` y `Seasonalities`.
 `Seasonalities` es una categoría entre varias, no el destino por defecto. Inspeccionar la estructura vigente
 antes de clasificar; el inventario anterior describe lo observado, no congela nuevas categorías.
 No reorganizar contenido existente ajeno al alcance solicitado.
@@ -36,7 +37,7 @@ no sobrescribir silenciosamente. Agrupar tres archivos en una misma versión cua
 
 ## Trabajo con assets existentes
 
-**Marketing con Manzanitas:** los nueve SVG de logos y símbolos están en `13- Branding/SVG`.
+**Marketing con Manzanitas:** los nueve SVG de logos y símbolos están en `13- Branding/SVG`. La nave (isotipo) en 3D, navy y blanco, con ángulos, transparentes y escenas, está en `13- Branding/Nave Efeonce 3D/`. El hoodie de Efeonce está en `13- Branding/Hoodie Efeonce/v01/` y el polo piqué corporativo en `13- Branding/Polo Efeonce/v01/` la chaqueta (softshell y bomber) en `13- Branding/Chaqueta Efeonce/v01/` el lanyard con yoyo en `13- Branding/Lanyard Efeonce/v01/` la gorra en `13- Branding/Gorra Efeonce/v01/` y la hoja maestra del kit en `13- Branding/efeonce-kit-marca-fisica-v01-A4.png`, cada uno con sus vistas y manifiesto. El logo completo en 3D está en `13- Branding/Logo Efeonce 3D/` (navy/blanco × monumental/grande/mediana/pequeña, transparente + fondo estudio + manifiesto).
 Cargar el [inventario de identidad](../../../../docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md)
 para elegir la variante exacta, colores y relación con efeonce. En estos archivos dark es blanco
 para fondo oscuro; light es navy para fondo claro. No inferirlo al revés.
@@ -46,6 +47,13 @@ para fondo oscuro; light es navy para fondo claro. No inferirlo al revés.
 [inventario y contrato de selección](../../../../docs/operations/social/NEXA_CREATIVE_RESOURCE_LIBRARY.md)
 antes de reutilizarla; incluye rutas y particularidades Unicode verificadas.
 
+**Mascotas de partners:** `14. Mascotas de partners/<Mascota (Partner)>/` (incluye `Sprocket (HubSpot)`, logo de uso interno hasta aprobación) con subcarpetas por familia y versión
+(p. ej. `Clawd (Claude)/` y `Codex (OpenAI)/`, cada una con `Fuente oficial/`, `Poses 3D/v01/` y
+`Poses 3D con accesorios/v01/`, cada pose en fondo de estudio y transparente). Método reutilizable:
+[`mascot-3d-pose-library.md`](../../greenhouse-ai-image-generator/references/mascot-3d-pose-library.md); evidencia en
+`ai-generations/2026-09-17_clawd-poses-3d/LEEME.md` y `ai-generations/2026-09-17_codex-poses-3d/LEEME.md`. Para Nexa
+(marca propia) el destino es `10. Nexa (Influencer IA)`, no esta carpeta.
+
 Ante una solicitud de buscar, adaptar, editar, reutilizar u organizar assets, comenzar en esta raíz y explorar
 sólo las categorías pertinentes. Identificar archivo fuente, marca, versión y uso antes de editar. Reutilizar
 recursos y plantillas adecuados; conservar originales y guardar derivados con nombre semántico y versión.
@@ -54,7 +62,8 @@ existentes cuando la tarea lo requiera, verificando el destino y evitando romper
 la familiaridad con la biblioteca no autoriza limpieza masiva, borrado ni reorganización general.
 
 Clasificar por finalidad: contenido permanente → Evergreen; publicidad → Ads; plantillas → Plantillas;
-blog → Blog Content; ebooks → Ebook; recursos reutilizables → Recursos; festividades → Seasonalities.
+blog → Blog Content; ebooks → Ebook; recursos reutilizables → Recursos; mascotas de partners → `14. Mascotas de partners`
+(indicación del operador 2026-09-17: carpeta propia en la raíz, no dentro de Recursos); festividades → Seasonalities.
 Para otras categorías, leer los nombres y el contenido pertinente antes de elegir. No crear carpetas vacías
 preventivamente ni enviar todo a Seasonalities. Si el usuario especifica un destino, prevalece su instrucción.
 El estándar PNG aplica a la entrega de imágenes estáticas; conservar formatos nativos de editables, video,
@@ -99,8 +108,8 @@ La aprobación del estático no aprueba automáticamente el video. Ver
 Cuando se solicite guardar y programar, conservar las versiones de trabajo ya entregadas y consolidar
 los archivos vigentes en `Entrega para publicación/` dentro del concepto, si evita ambigüedad. Incluir
 un MP4 y portada por formato solicitado, PNG master, copy por red y `PROGRAMACION.md` con IDs,
-fecha/hora/zona y estado verificado. Un JPG necesario para transporte es un derivado adicional;
-no sustituye el PNG ni supone permiso para reemplazarlo. Si la versión ya constituye un paquete
+fecha/hora/zona y estado verificado. Se publica el PNG (regla dura de formato en `SKILL.md`); un JPG sólo
+existe ante un rechazo observado del conector o la red, no sustituye el PNG ni supone permiso para reemplazarlo. Si la versión ya constituye un paquete
 inequívoco, registrar programación allí sin duplicar por obligación.
 
 Validar también el archivo de portada: ratio y recorte, legibilidad, firma y correspondencia con el

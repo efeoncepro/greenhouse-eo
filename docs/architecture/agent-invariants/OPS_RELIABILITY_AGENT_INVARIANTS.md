@@ -70,7 +70,7 @@
   - **NUNCA** angostes la declaración de rutas a subdirectorios enumerados. **1385 de los 1449** archivos vienen de `src/lib`: enumerar es estructuralmente insostenible y ya se rompió **cinco veces**, cada una cerrada agregando una ruta más (TASK-1210 nubox, TASK-742 auth/secrets, TASK-1723 talent-pool, TASK-1746 hiring/notifications, TASK-1279 deps transitivos del grader). La declaración correcta es **gruesa** (`src/lib/**` y hermanos); conserva la selectividad que sí importa (`src/app/**`, `docs/**`, `tests/**` NO redespliegan).
   - **NUNCA** agregues una ruta a una sola de las dos listas. Un hueco en `on.push.paths` deja el workflow sin correr; un hueco sólo en `WORKER_RUNTIME_PATHS` es igual de grave: el workflow corre, el drift-check salta el deploy y el job cierra `success`. Declarar el **directorio**, nunca el archivo.
   - 🔴 **NUNCA leas un skip del change-gate como prueba de que el diff runtime es vacío.** Un skip prueba que las rutas **DECLARADAS** no cambiaron, nada más. Para distinguir un no-op legítimo de uno falso, **SIEMPRE** compara el **árbol completo**, sin `--`: `git diff --name-only <sha_desplegado> <sha_target>` — vacío ⇒ árboles idénticos ⇒ skip legítimo. Ambos casos están en el registro: en `e1718a359575` el diff completo salió vacío y el skip de 44 s fue correcto; en `64bdd105c737` los árboles sí diferían y el mismo síntoma dejó el worker stale.
-  - **SIEMPRE** corre `pnpm worker:deploy-path-gate` al tocar el workflow de un worker o al mover código de dominio hacia el bundle de uno. Deriva la cobertura del **árbol real** (`metafile.inputs` del mismo `esbuild --bundle` del Dockerfile, transitivos incluidos — justo lo que TASK-1279 mostró que se escapa a la revisión a ojo). Cubre los 4 deployables Node bundleados con esbuild (`ops-worker`, `commercial-cost-worker`, `ico-batch` y, desde 2026-09-04, `auth-server` — 11 archivos en su bundle); `artifact-worker` corre source+`tsx` y **no** está registrado en este gate, su lista sigue bajo revisión manual.
+  - **SIEMPRE** corre `pnpm worker:deploy-path-gate` al tocar el workflow de un worker o al mover código de dominio hacia el bundle de uno. Deriva la cobertura del **árbol real** (`metafile.inputs` del mismo `esbuild --bundle` del Dockerfile, transitivos incluidos — justo lo que TASK-1279 mostró que se escapa a la revisión a ojo). Cubre los 4 deployables Node bundleados con esbuild (`ops-worker`, `commercial-cost-worker`, `ico-batch` y, desde 2026-09-04, `auth-server` — 11 archivos en su bundle); desde 2026-09-16 (TASK-1846) también `artifact-worker`: corre source+`tsx`, pero el metafile de esbuild describe igual su grafo de imports `.ts` (los assets no-TS del catálogo los cubre el prefijo grueso `src/lib/**` del workflow, no el gate).
   - Un test textual sobre el YAML **no** reemplaza este gate. Cuando la declaración pasó a gruesa, `services/ops-worker/deploy-contract.test.ts` se puso rojo con la cobertura **mejorada**: hoy afirma la forma gruesa y referencia `worker:deploy-path-gate` como verificador real. Si vuelves a escribir una guarda textual sobre estas listas, que apunte al gate, no que lo suplante.
 - **Deploy canónico via GitHub Actions** (`.github/workflows/ops-worker-deploy.yml`): trigger automático en `push` a `develop` o `main` que toque el runtime surface del worker; trigger manual: `gh workflow run ops-worker-deploy.yml --ref <branch>` o desde la UI de Actions. El workflow autentica con WIF, corre `bash services/ops-worker/deploy.sh` (mismo script idempotente que upsertea Cloud Scheduler jobs), verifica `/health` y registra el commit. Desde 2026-06-18, `workflow_dispatch` sin `expected_sha` resuelve el último SHA que tocó paths runtime del worker, no necesariamente el HEAD documental; antes de construir Docker compara la revisión Cloud Run actual por `GIT_SHA` y por diff de paths runtime para saltar build/deploy cuando el worker servido es runtime-equivalente. Confirmar deploy con `gh run list --workflow=ops-worker-deploy.yml --limit 1` o `gh run watch <run-id>`. **Manual local (`bash services/ops-worker/deploy.sh`) solo para hotfix puntual** con `gcloud` autenticado contra `efeonce-group`; el path canónico para que el deploy quede trazable es el workflow.
 - Las rutas API Vercel (`/api/cron/outbox-react`, etc.) son fallback manual, no scheduladas.
@@ -285,7 +285,57 @@ ejecución = un artefacto** (`tasks=1`, `parallelism=1`, `max-retries=0`).
   (~200 ms). El flag (`ARTIFACT_RENDER_JOBS_ENABLED`) es **multi-runtime ×3** (Vercel enqueue ·
   ops-worker dispatch · el Job): prenderlo en uno solo deja el pipeline muerto **en silencio**.
 
+### Delta 2026-09-16 — Job multiconsumidor y dentro del release (TASK-1846, release `917491fd02e4`)
+
+- **Consumidores:** el Job ya no es sólo de Proposal. Despacha por registry tipado
+  (`services/artifact-worker/consumer-contract.ts` + `consumers/{proposal,insights}.ts`): Proposal
+  (`proposal_render_jobs`) y Efeonce Insights (`greenhouse_insights.insight_outputs`, claim atómico + lease
+  con `fence_token`). Proposal conserva commands y comportamiento; el reclaim por lease existe en el
+  mecanismo compartido pero está apagado para Proposal.
+- **Lanzador:** `jobs.run` vive en `src/lib/render-dispatch/job-runner.ts` (server-only), no en el composer
+  (primitive portable; su boundary lo rechaza). El hash del manifest es domain-free:
+  `src/lib/artifact-composer/manifest-hash.ts`.
+- **Dispatcher:** `POST /artifact-render/dispatch` (Scheduler `ops-artifact-render-dispatch`, `*/2`) drena
+  Proposal primero y, **sólo si Proposal no lanzó nada**, `dispatchNextInsightRender`. Throughput medido:
+  **1 ejecución/output por tick de 2 min** compartido entre ambos; con el Job en frío (~2 min) puede lanzar 2
+  ejecuciones para 1 output (el claim atómico + fencing lo absorben: una finaliza, la otra no encuentra
+  trabajo). `INSIGHTS_RENDER_ENABLED` se lee en Vercel (encolar), en el `ops-worker` (despachar) y en el Job
+  (reclamar); en los dos Cloud Run va declarado default `true` en su `deploy.sh`, porque ambos son únicos
+  para staging y producción — **omitirlo en el dispatcher deja la cola de Insights sin drenar en silencio**.
+- **Release:** el Job es único para staging y producción y está **integrado al release control plane**:
+  `artifact-worker-deploy.yml` con push:develop (staging) + `workflow_call` (producción) + dispatch
+  `staging|production` para break-glass; change-gate por la etiqueta `metadata.labels.git-sha` (un Job no
+  tiene revisiones con `GIT_SHA`); `deploy.sh` etiqueta `EXPECTED_SHA` y **aborta si `HEAD≠EXPECTED_SHA`**
+  (el Job se construye desde el árbol de trabajo). `RELEASE_DEPLOY_WORKFLOWS` lo declara con
+  `cloudRunResourceKind:'job'`; `pnpm release:workers`, watchdog y rollback (`PREV_ARTIFACT_WORKER_SHA` →
+  `gcloud run jobs update --image`) leen Jobs. `GREENHOUSE_STORAGE_ENV` va fijo en `staging` (bucket vivo;
+  cada asset guarda su `bucket_name`): **NUNCA** lo hagas depender del carril, porque el último deploy
+  (develop o main) lo cambiaría para ambos ambientes.
+- **Señal:** `insights.render.orphaned_output` (steady 0; reader `src/lib/reliability/queries/insights-render-orphaned.ts`)
+  cuenta outputs `running` que nadie va a retomar: sin lease (worker previo al lease) o con lease vencido hace
+  más de 60 min (Job caído, flag OFF en la revisión activa o Scheduler detenido).
+- **Qué NO prueba el release:** que el render de Proposal esté activo en producción. Su puerta es el enqueue
+  en Vercel Production (`ARTIFACT_RENDER_JOBS_ENABLED`: presencia verificada, valor no leído).
+
 Spec: `GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md` · Runbook: `docs/manual-de-uso/proposal-studio/operar-el-artifact-worker.md`
+
+### Efeonce Insights — tick de recurrencia y despacho de correo en el `ops-worker` (TASK-1848, code complete 2026-09-18, sin deploy)
+
+- **Tick:** Cloud Scheduler `ops-insights-schedules-tick` (`20 * * * *`) → `ops-worker` `POST /insights/schedules/tick`
+  (`runInsightSchedulesTick`). **UN** job para todas las organizaciones; **NUNCA** un cron por cliente. También purga
+  retención (access events de enlaces > 180 días, rate buckets > 1 día) aunque el flag esté OFF.
+- **Despacho de correo:** projection `insights_delivery_dispatch` (lane `ops-reactive-notifications`), no un cron.
+- **Flags multi-runtime:** `INSIGHTS_DELIVERY_ENABLED` e `INSIGHTS_SCHEDULES_ENABLED` se leen en Vercel (crear intent
+  / escribir schedule; default OFF) **y** en el `ops-worker` (despachar / tick; default `true` en `deploy.sh`,
+  guardado en `deploy-contract.test.ts`). `INSIGHTS_GENERATION_ENABLED` ahora también se lee en el `ops-worker`
+  (default `true`). Kill switch adicional por EmailType en `email_type_config` (sembrado `enabled=false`; la tabla
+  falla abierto si falta la fila).
+- **Autoridad desde el worker:** revalidar leyendo `greenhouse_serving.session_360` (role_codes con ciclo de vida);
+  **NUNCA** importar `tenant/access` en código worker-bundled (arrastra bcrypt/BigQuery/notificaciones).
+- **Señal:** `insights.delivery.ambiguous` (steady 0; reader `src/lib/reliability/queries/insights-delivery-ambiguous.ts`)
+  cuenta destinatarios `ambiguous` + `claimed` > 30 min. Se reconcilia contra el ledger; **NUNCA** se reenvía a ciegas.
+
+Spec: `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` §9 y §14.6 · Runbook: `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`
 
 ## Consumer reactivo: breaker, huérfanos y señal de circuito (ISSUE-172/173, 2026-09-12)
 

@@ -11,9 +11,19 @@ import type { AppPlatformRequestContext } from '@/lib/api-platform/core/app-auth
 import { ApiPlatformError } from '@/lib/api-platform/core/errors'
 import { buildApiPlatformPaginationMeta, parseApiPlatformPaginationParams } from '@/lib/api-platform/core/pagination'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
-import { cancelInsightRender, createInsightEdition, issueInsightEdition, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition, withdrawInsightEdition } from '@/lib/efeonce-insights/commands'
+import { cancelInsightRender, createInsightEdition, createInsightShare, revokeInsightShare, issueInsightEdition, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition, withdrawInsightEdition } from '@/lib/efeonce-insights/commands'
 import { isInsightEditionState, type InsightEditionState } from '@/lib/efeonce-insights/contracts/states'
-import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsightRenderRuns, readInsightReport, readInsightReports, readInsightsCatalog } from '@/lib/efeonce-insights/readers'
+import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsightShares, readInsightRenderRuns, readInsightReport, readInsightReports, readInsightsCatalog } from '@/lib/efeonce-insights/readers'
+
+import {
+  cancelInsightDelivery,
+  readInsightDeliveries,
+  readInsightDelivery,
+  reconcileInsightDeliveryRecipient,
+  requestInsightDelivery,
+  retryInsightDelivery
+} from '@/lib/efeonce-insights/delivery/commands'
+import { createInsightSchedule, readInsightSchedule, readInsightSchedules, transitionInsightScheduleCommand } from '@/lib/efeonce-insights/schedules/commands'
 
 import { withInsightsErrors } from './insights-errors'
 
@@ -139,3 +149,79 @@ export const cancelAppInsightRender = async ({ context, request, body, renderRun
     return { data: { run: result.run, outputs: result.outputs, cancelled: result.cancelled, stillRunning: result.stillRunning, idempotent: result.idempotent }, status: 200 }
   })
 
+
+// ── TASK-1848 — enlaces compartidos (ShareGrant). El token sale UNA vez, en la respuesta de crear. ──
+
+export const createAppInsightShare = async ({ context, request, body, editionId }: { context: AppPlatformRequestContext; request: Request; body: unknown; editionId: string }) =>
+  withInsightsErrors(async () => ({ data: await createInsightShare({ ...resolveScope(context, request, body), editionId, options: body }), status: 201 }))
+
+export const listAppInsightShares = async ({ context, request, editionId }: { context: AppPlatformRequestContext; request: Request; editionId: string }) =>
+  withInsightsErrors(async () => ({ data: (await readInsightShares({ ...resolveScope(context, request), editionId })).items }))
+
+export const revokeAppInsightShare = async ({ context, request, body, shareGrantId }: { context: AppPlatformRequestContext; request: Request; body: unknown; shareGrantId: string }) =>
+  withInsightsErrors(async () => {
+    const result = await revokeInsightShare({ ...resolveScope(context, request, body), shareGrantId })
+
+    return { data: { share: result.share, idempotent: result.idempotent }, status: 200 }
+  })
+
+// ── TASK-1848 — envío por correo (sólo App lane: enviar desde Efeonce exige una persona interna) ──
+
+export const requestAppInsightDelivery = async ({ context, request, body, editionId }: { context: AppPlatformRequestContext; request: Request; body: unknown; editionId: string }) =>
+  withInsightsErrors(async () => {
+    const result = await requestInsightDelivery({ ...resolveScope(context, request, body), editionId, body })
+
+    return { data: result, status: result.idempotent ? 200 : 202 }
+  })
+
+export const listAppInsightDeliveries = async ({ context, request, editionId }: { context: AppPlatformRequestContext; request: Request; editionId: string }) =>
+  withInsightsErrors(async () => ({ data: (await readInsightDeliveries({ ...resolveScope(context, request), editionId })).items }))
+
+export const getAppInsightDelivery = async ({ context, request, deliveryIntentId }: { context: AppPlatformRequestContext; request: Request; deliveryIntentId: string }) =>
+  withInsightsErrors(async () => ({ data: await readInsightDelivery({ ...resolveScope(context, request), deliveryIntentId }) }))
+
+export const cancelAppInsightDelivery = async ({ context, request, body, deliveryIntentId }: { context: AppPlatformRequestContext; request: Request; body: unknown; deliveryIntentId: string }) =>
+  withInsightsErrors(async () => ({ data: await cancelInsightDelivery({ ...resolveScope(context, request, body), deliveryIntentId }), status: 200 }))
+
+export const retryAppInsightDelivery = async ({ context, request, body, deliveryIntentId }: { context: AppPlatformRequestContext; request: Request; body: unknown; deliveryIntentId: string }) =>
+  withInsightsErrors(async () => {
+    const result = await retryInsightDelivery({ ...resolveScope(context, request, body), deliveryIntentId })
+
+    return { data: result, status: result.idempotent ? 200 : 202 }
+  })
+
+export const reconcileAppInsightDeliveryRecipient = async ({ context, request, body, deliveryRecipientId }: { context: AppPlatformRequestContext; request: Request; body: unknown; deliveryRecipientId: string }) =>
+  withInsightsErrors(async () => ({
+    data: await reconcileInsightDeliveryRecipient({
+      ...resolveScope(context, request, body),
+      deliveryRecipientId,
+      operatorDecision: isRecord(body) ? body.operatorDecision : undefined,
+      reason: isRecord(body) ? body.reason : undefined
+    }),
+    status: 200
+  }))
+
+// ── TASK-1848 — recurrencia (sólo App lane: la autoridad durable es una persona interna) ──
+
+export const createAppInsightSchedule = async ({ context, request, body }: { context: AppPlatformRequestContext; request: Request; body: unknown }) =>
+  withInsightsErrors(async () => ({ data: await createInsightSchedule({ ...resolveScope(context, request, body), body }), status: 201 }))
+
+export const listAppInsightSchedules = async ({ context, request }: { context: AppPlatformRequestContext; request: Request }) =>
+  withInsightsErrors(async () => ({ data: (await readInsightSchedules(resolveScope(context, request))).items }))
+
+export const getAppInsightSchedule = async ({ context, request, scheduleId }: { context: AppPlatformRequestContext; request: Request; scheduleId: string }) =>
+  withInsightsErrors(async () => ({ data: await readInsightSchedule({ ...resolveScope(context, request), scheduleId }) }))
+
+export const transitionAppInsightSchedule = async ({
+  context,
+  request,
+  body,
+  scheduleId,
+  action
+}: {
+  context: AppPlatformRequestContext
+  request: Request
+  body: unknown
+  scheduleId: string
+  action: 'activate' | 'pause' | 'retire'
+}) => withInsightsErrors(async () => ({ data: await transitionInsightScheduleCommand({ ...resolveScope(context, request, body), scheduleId, action }), status: 200 }))

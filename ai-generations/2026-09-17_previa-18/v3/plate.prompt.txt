@@ -1,0 +1,15 @@
+Transform this layout sketch into a spectacular, award-winning 3D advertising key visual. Keep the exact composition, scale, positions, rotations and the exact silhouettes of the numerals from the sketch: a monumental bold grotesque "1" and "8", and a "7" being violently shoved out of the frame on the right. Do not add, remove or reshape any digit; preserve the flat terminal of the "1" flag and the geometric bowls of the "8" exactly as drawn.
+
+Camera: low heroic angle, slightly looking up at the numerals, 35mm lens, close to the objects so they feel monumental and fill most of the frame; shallow depth of field.
+
+Materials: the "1" and "8" are massive sculptures in glossy white lacquered resin with soft rounded bevels and thick extrusion, crisp specular highlights, subtle subsurface glow. The "7" is the same material in pale ice blue, tumbling out with strong directional motion blur and a spinning feel, casting a moving shadow on the floor. The "8" is sliding into place, slightly tilted, with a short motion trail behind it on the right.
+
+The cursor: a large glossy 3D mouse pointer in deep navy-black lacquer with a thin luminous teal edge light (#12afa2), firmly pressing and dragging the top right shoulder of the "8", casting a soft shadow onto the "8".
+
+Bunting: a crisp string of fabric bunting flags (white, deep navy, pale blue) hangs across the top in the midground; a few very large flags hang in the extreme foreground at the top corners, heavily out of focus (bokeh), creating depth.
+
+Lighting and color: dark, deep navy studio environment (#011a33 to #023c70) with a dramatic overhead spotlight cone and soft volumetric haze falling on the "18", saturated Efeonce brand blue (#0375db) glow and rim light around the numerals and reflected on a glossy dark floor, the teal edge light only on the cursor and a subtle teal kiss on the right edge of the "8". High contrast, cinematic, premium, ultra detailed, sharp focus on the "8" and cursor.
+
+Keep the lower 22% of the image as dark glossy floor with soft reflections only, no objects, for typography added later.
+
+Strictly avoid: any text, letters or extra numbers; logos; flags of any country; red; cartoonish style; clutter.

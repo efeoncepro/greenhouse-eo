@@ -23,6 +23,9 @@ export type InsightsErrorCode =
   | 'quota_exceeded'
   | 'render_disabled'
   | 'render_rejected'
+  | 'sharing_disabled'
+  | 'delivery_disabled'
+  | 'schedules_disabled'
 
 export class InsightsError extends Error {
   readonly code: InsightsErrorCode
@@ -156,5 +159,37 @@ export class InsightsRenderDisabledError extends InsightsError {
 export class InsightsRenderRejectedError extends InsightsError {
   constructor(message: string, details: Record<string, unknown> = {}) {
     super('render_rejected', message, 422, details)
+  }
+}
+
+/** TASK-1848 — el sharing por enlace no está habilitado en este runtime (`INSIGHTS_SHARING_ENABLED`). */
+export class InsightsSharingDisabledError extends InsightsError {
+  constructor() {
+    super('sharing_disabled', 'El sharing de Insights no está habilitado en este runtime', 503)
+    this.name = 'InsightsSharingDisabledError'
+  }
+}
+
+/** TASK-1848 — cuota por edición/organización agotada (enlaces activos, envíos, schedules). */
+export class InsightsQuotaExceededError extends InsightsError {
+  constructor(message: string, details: Record<string, unknown> = {}) {
+    super('quota_exceeded', message, 429, details)
+    this.name = 'InsightsQuotaExceededError'
+  }
+}
+
+/** TASK-1848 — el envío por correo no está habilitado en este runtime (`INSIGHTS_DELIVERY_ENABLED`). */
+export class InsightsDeliveryDisabledError extends InsightsError {
+  constructor() {
+    super('delivery_disabled', 'El envío por correo de Insights no está habilitado en este runtime', 503)
+    this.name = 'InsightsDeliveryDisabledError'
+  }
+}
+
+/** TASK-1848 — la recurrencia no está habilitada en este runtime (`INSIGHTS_SCHEDULES_ENABLED`). */
+export class InsightsSchedulesDisabledError extends InsightsError {
+  constructor() {
+    super('schedules_disabled', 'La recurrencia de Insights no está habilitada en este runtime', 503)
+    this.name = 'InsightsSchedulesDisabledError'
   }
 }

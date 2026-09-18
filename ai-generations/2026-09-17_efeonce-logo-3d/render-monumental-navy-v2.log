@@ -1,0 +1,51 @@
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:67: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat = bpy.data.materials.new('laca'); mat.use_nodes = True
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:80: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('estudio'); scene.world = world; world.use_nodes = True
+00:14.067  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-01-frente-nivel-calle-luz-izq-transparente.png'
+00:26.699  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-01-frente-nivel-calle-luz-der-transparente.png'
+00:41.719  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-02-contrapicado-frente-luz-izq-transparente.png'
+00:57.068  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-02-contrapicado-frente-luz-der-transparente.png'
+01:11.932  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-03-tres-cuartos-izquierda-calle-luz-izq-transparente.png'
+01:26.182  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-03-tres-cuartos-izquierda-calle-luz-der-transparente.png'
+01:41.432  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-04-tres-cuartos-derecha-calle-luz-izq-transparente.png'
+02:01.871  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-04-tres-cuartos-derecha-calle-luz-der-transparente.png'
+02:17.491  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-05-contrapicado-tres-cuartos-izquierda-luz-izq-transparente.png'
+02:36.708  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-05-contrapicado-tres-cuartos-izquierda-luz-der-transparente.png'
+03:01.063  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-06-contrapicado-tres-cuartos-derecha-luz-izq-transparente.png'
+03:17.820  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-06-contrapicado-tres-cuartos-derecha-luz-der-transparente.png'
+03:37.159  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-07-rasante-izquierda-luz-izq-transparente.png'
+03:54.470  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-07-rasante-izquierda-luz-der-transparente.png'
+04:14.192  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-08-rasante-derecha-luz-izq-transparente.png'
+04:33.138  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-08-rasante-derecha-luz-der-transparente.png'
+04:46.323  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-09-teleobjetivo-lejos-luz-izq-transparente.png'
+05:00.944  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-09-teleobjetivo-lejos-luz-der-transparente.png'
+05:15.250  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-10-picado-desde-edificio-luz-izq-transparente.png'
+05:29.259  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-10-picado-desde-edificio-luz-der-transparente.png'
+05:43.279  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-11-dron-picado-luz-izq-transparente.png'
+05:57.151  render           | Saved: 'render/monumental-navy-v2/efeonce-logo-3d-navy-monumental-11-dron-picado-luz-der-transparente.png'
+OK efeonce-logo-3d-navy-monumental-01-frente-nivel-calle-luz-izq
+OK efeonce-logo-3d-navy-monumental-01-frente-nivel-calle-luz-der
+OK efeonce-logo-3d-navy-monumental-02-contrapicado-frente-luz-izq
+OK efeonce-logo-3d-navy-monumental-02-contrapicado-frente-luz-der
+OK efeonce-logo-3d-navy-monumental-03-tres-cuartos-izquierda-calle-luz-izq
+OK efeonce-logo-3d-navy-monumental-03-tres-cuartos-izquierda-calle-luz-der
+OK efeonce-logo-3d-navy-monumental-04-tres-cuartos-derecha-calle-luz-izq
+OK efeonce-logo-3d-navy-monumental-04-tres-cuartos-derecha-calle-luz-der
+OK efeonce-logo-3d-navy-monumental-05-contrapicado-tres-cuartos-izquierda-luz-izq
+OK efeonce-logo-3d-navy-monumental-05-contrapicado-tres-cuartos-izquierda-luz-der
+OK efeonce-logo-3d-navy-monumental-06-contrapicado-tres-cuartos-derecha-luz-izq
+OK efeonce-logo-3d-navy-monumental-06-contrapicado-tres-cuartos-derecha-luz-der
+OK efeonce-logo-3d-navy-monumental-07-rasante-izquierda-luz-izq
+OK efeonce-logo-3d-navy-monumental-07-rasante-izquierda-luz-der
+OK efeonce-logo-3d-navy-monumental-08-rasante-derecha-luz-izq
+OK efeonce-logo-3d-navy-monumental-08-rasante-derecha-luz-der
+OK efeonce-logo-3d-navy-monumental-09-teleobjetivo-lejos-luz-izq
+OK efeonce-logo-3d-navy-monumental-09-teleobjetivo-lejos-luz-der
+OK efeonce-logo-3d-navy-monumental-10-picado-desde-edificio-luz-izq
+OK efeonce-logo-3d-navy-monumental-10-picado-desde-edificio-luz-der
+OK efeonce-logo-3d-navy-monumental-11-dron-picado-luz-izq
+OK efeonce-logo-3d-navy-monumental-11-dron-picado-luz-der
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit

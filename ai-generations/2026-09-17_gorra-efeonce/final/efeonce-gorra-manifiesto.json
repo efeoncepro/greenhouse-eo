@@ -1,0 +1,145 @@
+{
+  "producto": "Gorra Efeonce",
+  "decision": "Cinco variantes sobre la gorra existente del sitio. Principal: navy con logotipo blanco (kit completo). Alternativas: navy sólo con isotipo (discreta) y trucker navy con malla (terreno). Royal queda por continuidad con la landing de contacto; blanca como pieza estacional.",
+  "fuente": "efeonce-gorra-referencia-oficial-sitio.png — gorra royal del héroe de /contacto en el sitio público, usada como única fuente de construcción",
+  "invariantes": {
+    "construccion": "seis paneles, visera curva, botón forrado, dos ojetillos por lado, cierre de cinta con corredera metálica (snapback plástico sólo en la trucker)",
+    "emblema": "bordado en puntada satinada con relieve; logotipo completo o isotipo según variante; nunca espejado",
+    "trasera": "sin bordado",
+    "color": "navy de marca #023c70; royal sólo en la variante existente"
+  },
+  "vistas": [
+    {
+      "id": "v1-royal-logotipo",
+      "descripcion": "Royal con logotipo completo (la existente del sitio)",
+      "cuando_usarla": "continuidad con la landing de contacto; producción y regalo",
+      "archivo_fondo_estudio": "efeonce-gorra-v1-royal-logotipo-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-gorra-v1-royal-logotipo-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "v2-01-frente",
+      "descripcion": "Navy, frente recto",
+      "cuando_usarla": "fichas y catálogo",
+      "archivo_fondo_estudio": "efeonce-gorra-v2-01-frente-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-gorra-v2-01-frente-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "v2-02-lateral",
+      "descripcion": "Navy, lateral",
+      "cuando_usarla": "perfil de la copa y curva de la visera",
+      "archivo_fondo_estudio": "efeonce-gorra-v2-02-lateral-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-gorra-v2-02-lateral-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "v2-03-trasera",
+      "descripcion": "Navy, trasera con el cierre",
+      "cuando_usarla": "construcción; declara que atrás no lleva bordado",
+      "archivo_fondo_estudio": "efeonce-gorra-v2-03-trasera-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-gorra-v2-03-trasera-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "v2-04-macro-bordado",
+      "descripcion": "Navy, macro del bordado",
+      "cuando_usarla": "verificación del emblema y de la puntada",
+      "archivo_fondo_estudio": "efeonce-gorra-v2-04-macro-bordado-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "v2-05-cenital",
+      "descripcion": "Navy, cenital",
+      "cuando_usarla": "paneles y costuras; base de mockups",
+      "archivo_fondo_estudio": "efeonce-gorra-v2-05-cenital-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-gorra-v2-05-cenital-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "v2-navy-logotipo",
+      "descripcion": "Navy con logotipo blanco — PRINCIPAL",
+      "cuando_usarla": "uso general del equipo; combina con polo y softshell",
+      "archivo_fondo_estudio": "efeonce-gorra-v2-navy-logotipo-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-gorra-v2-navy-logotipo-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "v3-02-trasera",
+      "descripcion": "Navy isotipo, trasera",
+      "cuando_usarla": "construcción",
+      "archivo_fondo_estudio": "efeonce-gorra-v3-02-trasera-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-gorra-v3-02-trasera-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "v3-navy-isotipo",
+      "descripcion": "Navy sólo con isotipo",
+      "cuando_usarla": "alternativa discreta frente a cliente",
+      "archivo_fondo_estudio": "efeonce-gorra-v3-navy-isotipo-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-gorra-v3-navy-isotipo-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "v4-blanco-logotipo",
+      "descripcion": "Blanco con logotipo navy",
+      "cuando_usarla": "verano y eventos",
+      "archivo_fondo_estudio": "efeonce-gorra-v4-blanco-logotipo-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-gorra-v4-blanco-logotipo-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "v5-02-trasera",
+      "descripcion": "Trucker, trasera con malla y snapback",
+      "cuando_usarla": "construcción",
+      "archivo_fondo_estudio": "efeonce-gorra-v5-02-trasera-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-gorra-v5-02-trasera-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "v5-trucker-navy",
+      "descripcion": "Trucker navy con malla blanca",
+      "cuando_usarla": "terreno, grabación y exteriores",
+      "archivo_fondo_estudio": "efeonce-gorra-v5-trucker-navy-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-gorra-v5-trucker-navy-1600x1600-v01-transparente.png",
+      "resolucion": [
+        1600,
+        1600
+      ]
+    }
+  ]
+}

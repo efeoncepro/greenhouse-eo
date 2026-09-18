@@ -59,6 +59,11 @@ Estos manuales **complementan**, no reemplazan, a los dos manuales comerciales p
 - **Producción:** el pipeline de render está **cerrado por diseño** — Vercel Production no tiene la
   variable `ARTIFACT_RENDER_JOBS_ENABLED`, así que el enqueue productivo rechaza con `flag_disabled`.
   Abrirlo exige sign-off del operador + integrar `artifact-worker-deploy.yml` al release control plane.
+  *Actualizado 2026-09-16 (TASK-1846):* la integración al release control plane ya ocurrió (el Job
+  `artifact-worker`, único para staging y producción, tuvo su primer deploy productivo en el release
+  `917491fd02e4` y ahora también renderiza Efeonce Insights). En Vercel Production la variable
+  `ARTIFACT_RENDER_JOBS_ENABLED` ahora existe (presencia verificada, valor no leído): antes de afirmar que el render de
+  Proposal está abierto o cerrado en producción, lee su valor. Abrirlo sigue exigiendo sign-off del operador.
 - **Entitlement:** el módulo `proposal_studio_v1` está activo **sólo para la organización Efeonce**
   (`org-2df565fb-98aa-42f7-b324-ea9a2209017f`). Cualquier otra organización recibe
   `proposal_not_entitled` (403).

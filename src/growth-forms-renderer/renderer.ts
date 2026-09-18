@@ -663,16 +663,24 @@ export class FormRenderer {
         // Country fields use the semantic globe SVG. The legacy text glyph for
         // `globe` was the external-link arrow (↗), which made “País” look like
         // a broken link in the public Contacto form.
-        labelEl.appendChild(
-          field.presentation.icon === 'globe'
-            ? this.renderIcon('globe', 'ghf-field-icon')
-            : el(
+        if (field.presentation.icon === 'globe') {
+          const globeIcon = this.renderIcon('globe', 'ghf-field-icon')
+
+          // Ohio's global CSS targets [data-icon] and injects the legacy
+          // textual “globe ↗” marker. Labels use the SVG directly, so avoid
+          // that selector while preserving data-icon on control icons.
+          globeIcon.removeAttribute('data-icon')
+          labelEl.appendChild(globeIcon)
+        } else {
+          labelEl.appendChild(
+            el(
                 this.doc,
                 'span',
                 { class: 'ghf-field-icon', 'aria-hidden': 'true', 'data-icon': field.presentation.icon },
                 this.fieldIconGlyph(field.presentation.icon)
               )
-        )
+          )
+        }
       }
 
       labelEl.appendChild(el(this.doc, 'span', {}, label))

@@ -8,13 +8,21 @@ import { config as loadEnv } from 'dotenv'
 
 import {
   assertOpenAIImageQualitySupported,
+  assertOpenAIImageSizeSupported,
   editOpenAIImage,
+  estimateOpenAIImageOutputTokens,
+  estimateOpenAIImageOutputUsd,
   generateOpenAIImage,
+  isOpenAIImageBackground,
+  isOpenAIImageFormat,
   isOpenAIImageModel,
   isOpenAIImageQuality,
+  OPENAI_IMAGE_BACKGROUNDS,
+  OPENAI_IMAGE_FORMATS,
   OPENAI_IMAGE_MODEL_IDS,
   OPENAI_IMAGE_QUALITIES,
   type OpenAIImageBackground,
+  type OpenAIImageFormat,
   type OpenAIImageInputFidelity,
   type OpenAIImageModel,
   type OpenAIImageQuality,
@@ -59,13 +67,17 @@ loadEnv({ path: join(process.cwd(), '.env.local') })
  *                           OpenAI lo excluye explícitamente: se ignora y la identidad se pide por prompt.
  *   --out <path>            Output file path (single prompt). Default: <out-dir>/<slug>-<ts>.png
  *   --out-dir <dir>         Output directory. Default: public/images/generated
- *   --size <WxH>            1024x1024 | 1536x1024 | 1024x1536 | 2048x... (default 1536x1024)
+ *   --size <WxH>            1024x1024 | 1536x1024 | 1024x1536 | 2048x... (default 1536x1024). Se valida en local:
+ *                           GPT Image 2/2.5 = múltiplos de 16, borde ≤ 3840, relación ≤ 3:1, área 655.360–8.294.400;
+ *                           modelos anteriores = sólo 1024x1024, 1536x1024, 1024x1536 o auto
+ *   --format <f>            png | jpeg | webp. Omitido: se deduce de la extensión de --out (.jpg → jpeg), o png
  *   --quality <q>           low | medium | high | auto (default high)
  *                           xhigh | max — sólo en la familia GPT Image 2.5
- *   --background <b>        opaque | transparent (default opaque; GPT Image 2 transparency is preview)
+ *   --background <b>        auto | opaque | transparent (default opaque; GPT Image 2 transparency is preview;
+ *                           transparent exige png o webp)
  *   --model <m>             gpt-image-2.5-flare | gpt-image-2.5-sunburst (+ snapshots -2026-09-08)
  *                           gpt-image-2 (default) | gpt-image-1.5 | gpt-image-1 | gpt-image-1-mini
- *   --count <n>             Images per prompt (default 1)
+ *   --count <n>             Imágenes por prompt (default 1). OJO: son N pedidos separados y se pagan N veces
  *   --timeout <ms>          Per-image timeout (default 280000; gpt-image-2 high can exceed 125s)
  *   --open                  Open the result(s) in the default viewer (macOS `open`)
  *   --help                  Show this help
@@ -89,6 +101,7 @@ interface CliArgs {
   size: OpenAIImageSize
   quality: OpenAIImageQuality
   background: OpenAIImageBackground
+  format?: OpenAIImageFormat
   model: OpenAIImageModel
   count: number
   timeoutMs: number
@@ -99,7 +112,7 @@ interface CliArgs {
 const HELP = `Greenhouse AI image CLI — OpenAI GPT Image (2.5 family + gpt-image-2)
 
   pnpm ai:image --prompt "<text>" [--out <path>] [--size 1536x1024] [--quality high]
-                [--background opaque|transparent] [--model gpt-image-2] [--count 1]
+                [--background auto|opaque|transparent] [--format png|jpeg|webp] [--model gpt-image-2] [--count 1]
                 # --model gpt-image-2.5-flare|gpt-image-2.5-sunburst · --quality xhigh|max (sólo 2.5)
                 [--timeout 280000] [--open]
   pnpm ai:image --prompt-file <path> ...
@@ -194,9 +207,27 @@ const parseArgs = (argv: string[]): CliArgs => {
         break
       }
 
-      case '--background':
-        args.background = next() as OpenAIImageBackground
+      case '--background': {
+        const value = next()
+
+        if (!isOpenAIImageBackground(value)) {
+          throw new Error(`--background "${value}" no es válido. Opciones: ${OPENAI_IMAGE_BACKGROUNDS.join(' | ')}.`)
+        }
+
+        args.background = value
         break
+      }
+
+      case '--format': {
+        const value = next()
+
+        if (!isOpenAIImageFormat(value)) {
+          throw new Error(`--format "${value}" no es válido. Opciones: ${OPENAI_IMAGE_FORMATS.join(' | ')}.`)
+        }
+
+        args.format = value
+        break
+      }
 
       case '--model': {
         const value = next()
@@ -299,11 +330,36 @@ interface GenItem {
   filePath: string
 }
 
+const EXTENSION_BY_FORMAT: Record<OpenAIImageFormat, string> = { png: '.png', jpeg: '.jpg', webp: '.webp' }
+
+/** Formato de salida: --format o, si no, la extensión de la ruta (.jpg/.jpeg → jpeg, .webp → webp); png por defecto. */
+const resolveOutputFormat = (args: CliArgs, filePath: string): OpenAIImageFormat => {
+  if (args.format) return args.format
+
+  const lower = filePath.toLowerCase()
+
+  if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'jpeg'
+  if (lower.endsWith('.webp')) return 'webp'
+
+  return 'png'
+}
+
+/** Ruta con la extensión del formato real, sin duplicar si ya coincide. */
+const withFormatExtension = (filePath: string, format: OpenAIImageFormat): string => {
+  const extension = EXTENSION_BY_FORMAT[format]
+  const matches = format === 'jpeg' ? /\.jpe?g$/i.test(filePath) : filePath.toLowerCase().endsWith(extension)
+
+  return matches ? filePath : filePath.replace(/\.(png|jpe?g|webp)$/i, '') + extension
+}
+
 const generateOne = async (item: GenItem, args: CliArgs): Promise<void> => {
   await mkdir(dirname(item.filePath), { recursive: true })
 
+  const format = resolveOutputFormat(args, item.filePath)
+  const basePath = withFormatExtension(item.filePath, format)
+
   for (let n = 0; n < args.count; n += 1) {
-    const target = args.count > 1 ? item.filePath.replace(/\.png$/i, `-${n + 1}.png`) : item.filePath
+    const target = args.count > 1 ? basePath.replace(/(\.[a-z]+)$/i, `-${n + 1}$1`) : basePath
 
     const editing = Boolean(args.image?.length)
 
@@ -317,7 +373,7 @@ const generateOne = async (item: GenItem, args: CliArgs): Promise<void> => {
           size: args.size,
           quality: args.quality,
           background: args.background,
-          format: 'png',
+          format,
           numberOfImages: 1,
           timeoutMs: args.timeoutMs,
           ...(args.mask ? { mask: { path: resolvePath(args.mask) } } : {}),
@@ -329,7 +385,7 @@ const generateOne = async (item: GenItem, args: CliArgs): Promise<void> => {
           size: args.size,
           quality: args.quality,
           background: args.background,
-          format: 'png',
+          format,
           numberOfImages: 1,
           timeoutMs: args.timeoutMs
         })
@@ -342,8 +398,7 @@ const generateOne = async (item: GenItem, args: CliArgs): Promise<void> => {
 
     process.stdout.write(`  ✓ ${Math.round(buffer.length / 1024)}KB · ${result.model} · ${result.size} · ${result.quality}${fallback}\n`)
 
-    // El costo por imagen de la familia 2.5 NO es estimable desde la documentación: la única vía documentada
-    // es leer `usage` de la respuesta real. Si el instrumento que gasta no lo muestra, nadie lo mide.
+    // `usage` es la medida real; la estimación previa (fórmula oficial) se imprime antes de gastar en main().
     if (result.usage) {
       const { input_tokens: inputTokens, output_tokens: outputTokens } = result.usage
       const imageIn = result.usage.input_tokens_details?.image_tokens ?? 0
@@ -369,6 +424,11 @@ const main = async () => {
   // La combinación model × quality se valida acá y no por pieza: dentro del loop, un --count 5 repetiría
   // el mismo error cinco veces y ya habría creado directorios de salida.
   assertOpenAIImageQualitySupported({ model: args.model, quality: args.quality })
+  assertOpenAIImageSizeSupported({ model: args.model, size: args.size })
+
+  if (args.background === 'transparent' && args.format === 'jpeg') {
+    throw new Error('--background transparent exige --format png o webp: JPEG no tiene canal alfa.')
+  }
 
   // Una máscara sin imagen base no tiene a qué aplicarse: /v1/images/edits exige la imagen, y sin este
   // guardarraíl el request saldría como una generación desde cero, ignorando la máscara en silencio.
@@ -403,6 +463,21 @@ const main = async () => {
 
     items.push({ prompt, filePath })
   }
+
+  // Estimación ANTES de gastar con la fórmula oficial de tokens (sólo salida; texto, referencias y máscara suman).
+  const totalRequests = items.length * args.count
+  const perImageUsd = estimateOpenAIImageOutputUsd({ model: args.model, quality: args.quality, size: args.size })
+  const perImageTokens = estimateOpenAIImageOutputTokens({ model: args.model, quality: args.quality, size: args.size })
+
+  if (args.count > 1) {
+    process.stdout.write(`  ⚠ --count ${args.count}: son ${args.count} pedidos separados por prompt y se paga cada uno\n`)
+  }
+
+  process.stdout.write(
+    perImageUsd === null
+      ? `  $ costo: sin estimación para ${args.model} · ${args.quality} · ${args.size} (auto o modelo sin grilla publicada)\n`
+      : `  $ costo estimado ≈ USD ${(perImageUsd * totalRequests).toFixed(3)} (${totalRequests} × ${perImageTokens} tokens de salida × USD 30/1M; la entrada suma aparte)\n`
+  )
 
   for (const item of items) {
     try {

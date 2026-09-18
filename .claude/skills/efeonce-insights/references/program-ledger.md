@@ -6,10 +6,10 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | Task | Scope | Lifecycle | Live where | Closed on |
 | --- | --- | --- | --- | --- |
 | TASK-1845 | Domain, evidence, adapters, lanes, MCP, gateway federation | **complete** | Cloud SQL (single instance), Vercel staging + Production (generation ON), gateway v1.5.0, Entra scope | 2026-09-16 |
-| TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | in-progress | Cloud SQL (migrations applied), Vercel staging (render ON), Cloud Run Job `artifact-worker` + `ops-worker` dispatcher (flag ON, shared by staging/prod); Production pending | — |
+| TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | **complete** | Cloud SQL (migrations applied), Vercel staging + Production (render ON), Cloud Run Job `artifact-worker` (first productive deploy in release `917491fd02e4`) + `ops-worker` dispatcher (flag ON, shared by staging/prod), gateway v1.6.0 deployed | 2026-09-16 |
 | TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | to-do | — | — |
-| TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | to-do (blocked by 1846) | — | — |
-| TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1846/1847/1848) | — | — |
+| TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — code complete, rollout pending** | Cloud SQL only (4 migrations applied); code on local `develop` (not pushed); Vercel / ops-worker / gateway NOT deployed | — |
+| TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
 
 ## TASK-1845 — foundation (complete 2026-09-16)
@@ -55,7 +55,28 @@ UI, client grants of the write scope, real-client integration (Berel/Sky — def
 `plan.limits` (repeats "ico: sin datos." per rejection); any worker reading `INSIGHTS_*` must declare it in its
 `deploy.sh`; `issuance` stays OFF until outputs are validated; keep Proposal untouched in the Artifact Worker.
 
-## TASK-1846 — durable rendering (in-progress; live in staging, production pending)
+## TASK-1846 — durable rendering (complete 2026-09-16; live in staging and production)
+
+**Delta 2026-09-16 (production) — supersedes every "production pending / not deployed / Production OFF" below.**
+
+- Release develop→main PR #237 squash `917491fd02e4e2dac5ec1668192de59bdd6b20dd`, orchestrator run `35154555317`,
+  manifest `917491fd02e4-9231b87b-20da-43c3-abce-4348dccdda99` `released` 22:02:41Z in one attempt (planned
+  break-glass: Insights migrations already applied; `cloud_release`). First productive deploy of the Cloud Run Job
+  `artifact-worker` via `deploy-artifact-worker`, change-gated (serves `f6551157e`; tree differs from the target only in
+  `Handoff.md`/`project_context.md`). Watchdog `ok` 6/6 synced.
+- `INSIGHTS_RENDER_ENABLED=true` in Vercel Production (read back with `vercel env pull`) + redeploy
+  `greenhouse-d6l33zils` aliased to `greenhouse.efeoncepro.com`. Job and ops-worker already ON ⇒ ON in the three reader
+  runtimes, staging and production. `pnpm flags:audit --strict`: 0 flags ON without code on main, 0 with a different reader.
+- Gateway `efeonce-mcp` v1.6.0 deployed: run `35156353046`, revision `efeonce-mcp-gateway-00054-n78` 100 %, `/health` ok, 51 tools.
+- Production canary (ecosystem lane, gateway consumer token, sandbox org `Greenhouse Demo`): create `202`
+  (`insed-83c23534…`) → `POST …/render` `202` (run `irun-e275767b-a6a8-4587-9579-d9bbba713181`, `requestedByKind: member`)
+  → ops-worker dispatcher launched the Job on its own (ticks 22:12 and 22:14) → `deck_pdf` `completed` first attempt,
+  render 22:14:46→22:14:52Z, asset `asset-acf726a0-3c02-4172-b0cd-1141468a8a97`; `web` → `422 render_rejected`.
+  Provider canary in `efeonce-mcp` (`scripts/greenhouse-insights-canary.mjs --render-run`): catalog (renderable=1), list,
+  render run `completed`, deny `404`.
+- Known behaviour: cold Job start (~2 min) ⇒ two executions for one output; one finalized, the other found no work.
+- Still OFF / elsewhere: `INSIGHTS_ISSUANCE_ENABLED` (product step); `report_pdf` → TASK-1847; `web` → TASK-1848.
+
 
 **Delta 2026-09-16 (late) — rollout in staging, Cloud Run benchmark, actor audit.** Supersedes the "not deployed /
 flag OFF / no Cloud Run measurement" statements below, which describe the earlier state.
@@ -65,17 +86,17 @@ flag OFF / no Cloud Run measurement" statements below, which describe the earlie
   `/artifact-render/dispatch` (Cloud Scheduler `ops-artifact-render-dispatch`, every 2 min; Proposal wins the tick);
   domain-free launcher `src/lib/render-dispatch/job-runner.ts`; consumer `services/artifact-worker/consumers/insights.ts`.
 - Gateway `efeonce-mcp` PR #14 merged (`da8295a`), v1.6.0, 51 tools, render writes on `efeonce.mcp.insights.write`.
-  **NOT deployed**: gateway deploy goes after the Greenhouse release (render routes are not in production).
+  ~~NOT deployed~~ → **deployed 2026-09-16** after release `917491fd02e4` (revision `efeonce-mcp-gateway-00054-n78`, provider canary green).
 - Migration `20260916201127095_task-1846-insights-render-client-user-actor` (expand, applied): runs/events accept
   `client_user`; the human actor travels to run, enqueue event, retry and cancel (before: always `system`).
 
 | Runtime | Component | State 2026-09-16 | Evidence |
 | --- | --- | --- | --- |
 | Vercel `staging` | enqueue + `INSIGHTS_RENDER_ENABLED` | ON | burst of 5 renders, retry, cancel, audience deny |
-| Vercel Production | enqueue | OFF (variable absent) | — |
-| Cloud Run Job `artifact-worker` | claim/render | ON (default `true` in `deploy.sh`); integrated in the production release control plane, first productive deploy on the next release; assets bucket fixed to `efeonce-group-greenhouse-private-assets-staging` (`bucket_name` stored per row) | 5/5 `completed` |
+| Vercel Production | enqueue | ON since 2026-09-16 (post-release) | production canary `deck_pdf` completed |
+| Cloud Run Job `artifact-worker` | claim/render | ON (default `true` in `deploy.sh`); integrated in the production release control plane, first productive deploy in release `917491fd02e4` (2026-09-16); assets bucket fixed to `efeonce-group-greenhouse-private-assets-staging` (`bucket_name` stored per row) | 5/5 `completed` |
 | Cloud Run `ops-worker` | dispatcher | ON since revision `ops-worker-00690-xhl` (default `true` in `deploy.sh`). Before that day it lacked the flag | logs 13:02Z `insightsQueued=0` with a queued output |
-| Gateway `mcp.efeonce.org` | 4 render tools | merged, not deployed | — |
+| Gateway `mcp.efeonce.org` | 4 render tools | deployed 2026-09-16 (revision `00054-n78`) | provider canary `--render-run` green |
 
 **Cloud Run staging benchmark (org sandbox `Greenhouse Demo`, persona `agent-client`):** 5 seo+ico `deck_pdf` queued
 20:09:33–20:09:41Z; starts 20:12:51 / 20:14:49 / 20:16:46 / 20:18:45 / 20:20:51; all `completed` first attempt; render
@@ -89,7 +110,7 @@ GET → 404, 0 outputs. Live tests `pnpm test:live src/lib/efeonce-insights/rend
 Earlier LOCAL benchmark: 15 slides 4.44–4.72 s RSS 300–328 MB PDF 5.4 MB; 25 slides 7.07–7.42 s RSS 355–365 MB PDF
 12.6 MB; burst 5×15 23.3 s. Not measured: A4 10/30 pages (TASK-1847), queue contention with Proposal active.
 
-**Pending (not verified):** Greenhouse release → `vercel env add INSIGHTS_RENDER_ENABLED production` + redeploy →
+**Pending at the time (done — see production delta above):** Greenhouse release → `vercel env add INSIGHTS_RENDER_ENABLED production` + redeploy →
 gateway v1.6.0 deploy → production canary. `INSIGHTS_ISSUANCE_ENABLED` stays OFF. Orphans `running` without lease
 need a human decision (signal `insights.render.orphaned_output`, steady 0).
 
@@ -123,7 +144,7 @@ ecosystem (`…/editions/{id}/render`, `…/render-runs/{id}[/retry|/cancel]`), 
 `request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render`), events
 `insights.render.*`, errors `render_disabled`/`render_rejected`, catalog `renderableOutputs: ['deck_pdf']`.
 Mapper V1 `render/deck-mapper.ts` (plan → deck-axis slides; no CoverFull; never truncates figures/claims).
-`INSIGHTS_RENDER_ENABLED` is now read in TWO runtimes (Vercel + artifact-worker).
+`INSIGHTS_RENDER_ENABLED` is now read in TWO runtimes (Vercel + artifact-worker) — superseded: THREE, the `ops-worker` dispatcher too (found in staging, fixed `d9da99df8`).
 
 **Deliberately NOT done (needs operator authorization):** worker deploy, flag flip (both runtimes), staging or
 production canary, gateway federation of the 4 tools in `efeonce-mcp`, and any `git push`. Status:
@@ -137,8 +158,78 @@ tender decks: separate issue for the catalog owner.
 ## TASK-1847 — charts and catalogs (to-do)
 _Fill at closure._
 
-## TASK-1848 — sharing, delivery, schedules (to-do)
-_Fill at closure: web-model resolver/proxy for Think, tokens, email path, schedules._
+## TASK-1848 — sharing, delivery, schedules (in-progress; staging verified 2026-09-18, gateway + production pending)
+
+**Delta 2026-09-18 (staging) — supersedes "NOT pushed / NOT deployed" below.** Pushed `52562a2f9` to `develop` (CI + all
+worker deploys green). Vercel staging: `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED=true` and `INSIGHTS_ISSUANCE_ENABLED=true`
+(staging only, operator-authorized) + redeploy `greenhouse-bki7l2rl9`. `ops-worker-00695-hrw` carries DELIVERY/SCHEDULES/
+GENERATION/RENDER=true; Cloud Scheduler `ops-insights-schedules-tick` ENABLED. Synthetic canary (sandbox org, edition
+`EO-INS-000015`): render by dispatcher → issue → share create/read/download (PDF 330 KB) with real headers → revoke A 410 while
+B 200 → per-grant rate limit 60×200 + 4×429 → negatives → schedule create/activate/tick `{schedules:1,paused:0}`/pause/retire →
+delivery with EmailType off ⇒ `skipped` → real email to the operator's authorized inbox (share_link + attachment `accepted`,
+subject redacted, no bearer stored) → withdraw ⇒ live grants revoked `edition_withdrawn`. EmailTypes turned back OFF.
+Finding: a 64-request concurrent burst nearly exhausted shared PG connections for 5 min ⇒ ISSUE-174 → TASK-1876.
+Production and gateway federation (`efeonce-mcp`) remain out of this session's frontier.
+
+
+**Built (local `develop`, NOT pushed, NOT deployed):** commits `75715589d` (Slice 1 — ShareGrant + public reader +
+`InsightWebModelV1`), `83d57380a` (Slice 2 — durable email delivery), `1c109fc8e` (Slice 3 — governed schedules,
+draft + render only).
+
+- Slice 1: `insight_share_grants` (only the sha256 digest of the bearer is stored), append-only access events, per-minute
+  rate buckets; commands create/revoke/read under `src/lib/efeonce-insights/sharing/`; public reader
+  `GET /api/public/insights/shared/[token]` (+ `/outputs/[output]` download proxy); `InsightWebModelV1` +
+  `InsightSharedEditionResponseV1`; Sentry scrub of share paths/tokens (server + edge); `withdrawInsightEdition` now
+  revokes live grants and cancels pending deliveries in the same transaction; capability `insights.share.manage`.
+- Slice 2: delivery intents/recipients/events; two EmailTypes (`insights_edition_delivery` token-sensitive,
+  `insights_edition_delivery_attachment` standard) seeded `enabled=false`; projection `insights_delivery_dispatch`
+  (ops-worker, lane ops-reactive-notifications); reconcile/retry/cancel; signal `insights.delivery.ambiguous`;
+  capability `insights.delivery.send` (internal only).
+- Slice 3: `insight_schedules` + `insight_schedule_occurrences`; `runInsightSchedulesTick` on ops-worker
+  `POST /insights/schedules/tick` (Cloud Scheduler `ops-insights-schedules-tick`, `20 * * * *`); capability
+  `insights.schedule.manage`; retention purge (access events >180 d, rate buckets >1 d).
+- MCP: 7 new tools (manifest 62 tools, was 55; hash `9fc46c8d90d3`): `create_insight_share`, `list_insight_shares`,
+  `revoke_insight_share`, `list_insight_deliveries`, `get_insight_delivery`, `list_insight_schedules`,
+  `get_insight_schedule`.
+
+**Migrations (all applied on the single Cloud SQL instance, verified by readback):**
+`20260918094614053_task-1848-insights-share-grants`, `20260918100238745_task-1848-insights-delivery-intents`,
+`20260918100811735_…-skip-reason-edition`, `20260918101834425_task-1848-insights-schedules`.
+
+**Deployed where (2026-09-18):**
+
+| Runtime | Component | State | Evidence |
+| --- | --- | --- | --- |
+| Cloud SQL `greenhouse-pg-dev` (single instance dev/staging/prod) | 4 migrations + seeds (capabilities, `email_type_config` rows `enabled=false`) | applied | readback; live tests `sharing/delivery/schedules.live.test.ts` 3/3 (rolled-back transaction) |
+| Vercel staging / Production | lanes, public reader, commands | NOT deployed (code not pushed) | — |
+| Cloud Run `ops-worker` | delivery dispatch projection + schedules tick | NOT deployed | — |
+| Cloud Scheduler | `ops-insights-schedules-tick` | NOT created | — |
+| Gateway `efeonce-mcp` | 7 new tools | NOT federated (out of session scope) | — |
+
+**Flags and runtimes:** `INSIGHTS_SHARING_ENABLED` (Vercel, default OFF); `INSIGHTS_DELIVERY_ENABLED` (Vercel for
+intent creation, OFF ⇒ 503 `delivery_disabled`; ops-worker for dispatch, default `true` in `deploy.sh`, guarded by
+`deploy-contract.test.ts`); `INSIGHTS_SCHEDULES_ENABLED` (Vercel OFF; ops-worker default `true`);
+`INSIGHTS_GENERATION_ENABLED` is now ALSO read by the ops-worker (default `true` in `deploy.sh`);
+`INSIGHTS_AUTHORING_AI_ENABLED` is NOT declared in the worker. Extra kill switch per EmailType in `email_type_config`.
+
+**Verified:** focal unit suites green (last sweep 1147 tests across efeonce-insights / mcp / entitlements / reliability /
+api-platform / ops-worker; plus email/emails/sync/observability for Slice 2); live 3/3; `pnpm worker:runtime-deps-gate`
+OK; `pnpm mcp:manifest:check` up to date.
+
+**Deliberately NOT done:** in-app (`NotificationService`, `report_ready`) and Teams notices (dispatch cannot restrict
+channels ⇒ double email; Teams resolver only resolves members — owners TASK-690–693 and TASK-1849); `portal_link`
+modality (rejected `not_ready` until the portal edition route exists, `INSIGHT_PORTAL_EDITION_ROUTE_AVAILABLE = false`);
+auto-issue / auto-send from schedules (CHECK `review_policy = 'draft_for_review'`); gateway federation of the 7 tools;
+full `pnpm test` + `pnpm build`; push; deploy; staging flags; staging canary.
+
+**Hand-off:**
+- **TASK-1875 (Think):** consume `GET /api/public/insights/shared/[token]` and `GET …/[token]/outputs/[output]`
+  server-side; response `InsightSharedEditionResponseV1 {modelVersion, header, model: InsightWebModelV1, downloads,
+  expiresAt}`; honour 404/410/429/503 and `no-store`; the token never reaches client JS, logs or analytics.
+  Default public base URL `https://think.efeoncepro.com/insights/r/<token>` (override `INSIGHTS_SHARE_PUBLIC_BASE_URL`).
+- **TASK-1849 (portal):** the portal edition route + deep link `insights_edition` (then flip
+  `INSIGHT_PORTAL_EDITION_ROUTE_AVAILABLE` and enable `portal_link`), final presentation of
+  `src/emails/InsightsEditionDeliveryEmail.tsx`, the in-app notice, and the UI for share/delivery/schedules.
 
 ## TASK-1849 — portal library/builder/shared web (to-do)
 _Fill at closure._
@@ -147,6 +238,16 @@ _Fill at closure._
 _Fill at closure: Astro route, token handling, `no-store`, GVC evidence._
 
 ## Sessions (append as you go; newest first)
+
+- **2026-09-18 · greenhouse-eo-91 · TASK-1848 Slices 1-3 implemented (code complete, rollout pending).** Commits
+  `75715589d`, `83d57380a`, `1c109fc8e` on local `develop` (not pushed). 4 migrations applied on the shared instance.
+  Operator decisions: bearer never persisted (digest only); schedules V1 = draft + render; PDF attachment opt-in with
+  irrevocability ack; session frontier = staging (production, release and gateway federation out). Not done: push,
+  deploy, staging flags/canary, full test/build, federation.
+
+- **2026-09-16 · TASK-1846 production + closure.** Release `917491fd02e4` (first productive deploy of the Job),
+  render flag ON in Vercel Production, gateway v1.6.0 deployed, production canary green (dispatcher-driven `deck_pdf`,
+  `web` 422, provider canary). Observed two Job executions for one output on a cold start (harmless). Task moved to complete.
 
 - **2026-09-16 · TASK-1846 staging rollout + Cloud Run benchmark.** Flag ON in Vercel staging, Job and ops-worker;
   found the ops-worker lacked the flag (hidden by a hand-launched canary); client_user actor migration; burst of 5,

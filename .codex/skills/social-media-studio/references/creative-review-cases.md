@@ -73,6 +73,34 @@ la decisión esperada por las razones descritas; no contar sólo aparición de p
 | Producción aprobada sin permiso de publicar | completar resultado reviewable, separar siguiente acción | bloquear todos los renders o publicar automáticamente |
 | Falta dato opcional de una prueba | supuesto explícito y continuar | interrogatorio que impide avanzar |
 
+## Regresiones observadas: Viva México y previa 18 (2026-09-16)
+
+Bitácora: `docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md`.
+
+| Caso / entrada | Conducta esperada | Señal de fallo |
+|---|---|---|
+| Concepto con moraleja genérica («constancia», «entre muchos») y logo al pie | Aplicar la prueba de cambiar el logo con marcas concretas; si otra categoría la firma igual, cambiar de mecanismo hacia un oficio visible de la casa | Defender la conexión en el caption o en la explicación del autor |
+| Operador dice «no logras conectar» | Revisión adversarial (subagente o propia) contra marca/playbook, verificar sus hallazgos antes de adoptarlos y proponer rutas nuevas | Añadir texto explicativo o agrandar el logo |
+| Ruta descartada reaparece en el caption | Revisar caption contra rutas descartadas | Pitch colado por la copia final |
+| Carrusel cuyo remate niega tocar algo | Mantener la frase final idéntica (tipo, tamaño, posición) a las láminas previas; el impacto sale de la escena | «Mejorar» tipográficamente la frase que la pieza dice no tocar |
+| Personas reales del equipo en la pieza | Producir con fotos oficiales, validar caras a tamaño móvil y exigir consentimiento antes de programar | Avatares ilegibles o publicación sin OK de las personas |
+| Operador pide «alto impacto» y la pieza es vectorial plana | Diagnosticar luz, contraste, escala, acción y profundidad; subir a escena con cámara/luz/material | Agrandar el mismo número o añadir adornos |
+| Edición con máscara para recolorear un elemento | Comparar geometría antes/después; si cambia forma, cantidad o posición, descartar y recolorear determinísticamente | Aceptar un inpainting que «se ve bien» pero cambió el objeto |
+| Contraste sobre fuegos, reflejos o luz variable | Scrim gradual local y medición sobre el fondo ya oscurecido, con umbral que haga fallar el render | Medir sobre el plate original o usar un velo rectangular |
+
+## Regresiones observadas: KV «Tu IA no conoce tu negocio» (2026-09-17)
+
+Bitácora: `ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md`.
+
+| Caso / entrada | Conducta esperada | Señal de fallo |
+|---|---|---|
+| Operador rechaza el degradado azul detrás del texto | Resolver el fondo con escenografía (muro navy pintado en la escena) y medir contraste sobre ella | Otro scrim, velo o luz artificial que se lee como foco |
+| Titular de un solo peso se ve débil | Jerarquía: entrada liviana → remate pesado, con proporción declarada | Agrandar el mismo peso o añadir adornos |
+| Recorte «mordido» en pelo o mascota tras cambiar el fondo | Regenerar el plate con el set nuevo, guiado por boceto de composición | Suavizar el matte y entregar el borde |
+| Mascota con partes finas o sueltas («?», brazos) pasada por matte + máscara | Verificar silueta completa contra la fuente; si falta una parte, regenerar | Aceptar la figura porque se reconoce en miniatura |
+| Logo dentro de un desenfoque de primer plano | Medir primero el gradiente del plate limpio: si la superficie cercana (mesa, escritorio) ya mide como el fondo, el logo va ahí con contraste medido; añadir objeto sólo si mide en foco ([brand-in-scene](brand-in-scene.md)) | Añadir un objeto para fabricar el desenfoque (panel, franja, tapa de portátil, follaje), o logo flotando en una caja o esquina forzada |
+| Pieza pedida en 4:5 y 9:16 | Misma escena: 9:16 nativo y 4:5 abriendo el encuadre a los lados; revisar ambos | 4:5 nativo con la cabeza arriba y sin aire, o dos escenas distintas |
+
 ## Protocolo de evaluación documental
 
 1. Elegir escenarios que ejerciten decisiones diferentes: estacional, reactivo con evidencia incompleta,

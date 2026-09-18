@@ -1,0 +1,2777 @@
+{
+  "capturedAt": "2026-09-16",
+  "source": "https://console.higgsfield.ai/models/<endpoint>/playground (Input JSON Schema)",
+  "missing": [
+    "higgsfield-ai/soul/cinema"
+  ],
+  "schemas": {
+    "alibaba/happy-horse/text-to-video": {
+      "type": "object",
+      "title": "Happy Horse",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "maximum": 2147483646,
+          "minimum": 1
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 3
+        },
+        "resolution": {
+          "enum": [
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "default": "720p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1",
+            "4:3",
+            "3:4"
+          ],
+          "type": "string",
+          "title": "Aspect Ratio",
+          "default": "16:9"
+        }
+      }
+    },
+    "alibaba/happy-horse/v1.1/text-to-video": {
+      "type": "object",
+      "title": "Happy Horse",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "maximum": 2147483646,
+          "minimum": 1
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 3
+        },
+        "resolution": {
+          "enum": [
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "default": "1080p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1",
+            "4:3",
+            "3:4"
+          ],
+          "type": "string",
+          "title": "Aspect Ratio",
+          "default": "16:9"
+        }
+      }
+    },
+    "alibaba/qwen-image-3/text-to-image": {
+      "type": "object",
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "enable_thinking"
+            ],
+            "properties": {
+              "enable_thinking": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "prompt_extend"
+            ],
+            "properties": {
+              "prompt_extend": {
+                "const": true
+              }
+            }
+          }
+        }
+      ],
+      "title": "Qwen Image 3 Text to Image",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 0,
+          "description": "Optional random seed for similar, reproducible results."
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Positive prompt or editing instruction in Chinese or English. Alibaba recommends at most 4,500 tokens."
+        },
+        "resolution": {
+          "enum": [
+            "1k",
+            "2k"
+          ],
+          "type": "string",
+          "default": "1k",
+          "description": "Output resolution tier. Both tiers produce PNG images."
+        },
+        "aspect_ratio": {
+          "enum": [
+            "1:1",
+            "2:3",
+            "3:2",
+            "3:4",
+            "4:3",
+            "7:9",
+            "9:7",
+            "9:16",
+            "16:9",
+            "21:9"
+          ],
+          "type": "string",
+          "default": "1:1",
+          "description": "Output aspect ratio. Exact provider-recommended dimensions are selected automatically."
+        },
+        "prompt_extend": {
+          "type": "boolean",
+          "default": true,
+          "description": "Improve the prompt before generation. Required when thinking mode is enabled."
+        },
+        "enable_thinking": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use model reasoning to improve image quality. Requires prompt enhancement."
+        },
+        "negative_prompt": {
+          "type": "string",
+          "description": "Content, styles, or artifacts to avoid in the output."
+        },
+        "prompt_extend_mode": {
+          "enum": [
+            "direct",
+            "agent"
+          ],
+          "type": "string",
+          "default": "direct",
+          "description": "Direct enhancement is available for every request; agent enhancement is text-to-image only."
+        }
+      },
+      "additionalProperties": false
+    },
+    "alibaba/wan-3.0-prime/text-to-video": {
+      "type": "object",
+      "title": "Wan 3.0 Prime Text to Video",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "title": "Seed",
+          "maximum": 2147483647,
+          "minimum": 0
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration (sec)",
+          "default": 5,
+          "maximum": 30,
+          "minimum": 2,
+          "description": "2-30 seconds."
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "1080p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "adaptive"
+          ],
+          "type": "string",
+          "title": "Aspect Ratio",
+          "default": "adaptive"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "title": "Sound",
+          "default": true
+        },
+        "enable_thinking": {
+          "type": "boolean",
+          "title": "Deep Thinking",
+          "default": false
+        }
+      }
+    },
+    "alibaba/wan-3.0/image-to-video": {
+      "type": "object",
+      "title": "Wan 3.0 Image to Video",
+      "required": [
+        "prompt",
+        "image_url"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "title": "Seed",
+          "maximum": 2147483647,
+          "minimum": 0
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration (sec)",
+          "default": 5,
+          "maximum": 30,
+          "minimum": 2,
+          "description": "2-30 seconds."
+        },
+        "image_url": {
+          "type": "string",
+          "title": "First Frame",
+          "format": "uri"
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "1080p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "adaptive"
+          ],
+          "type": "string",
+          "title": "Aspect Ratio",
+          "default": "adaptive"
+        },
+        "end_image_url": {
+          "type": "string",
+          "title": "Last Frame",
+          "format": "uri"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "title": "Sound",
+          "default": true
+        },
+        "enable_thinking": {
+          "type": "boolean",
+          "title": "Deep Thinking",
+          "default": false
+        }
+      }
+    },
+    "alibaba/wan-3.0/reference-to-video": {
+      "type": "object",
+      "title": "Wan 3.0 Reference to Video",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "title": "Seed",
+          "maximum": 2147483647,
+          "minimum": 0
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration (sec)",
+          "default": 5,
+          "maximum": 30,
+          "minimum": 2,
+          "description": "2-30 seconds."
+        },
+        "file_url": {
+          "type": "string",
+          "title": "Reference Document",
+          "format": "uri",
+          "description": "One document (docx/xlsx/pptx/pdf/md). Forces deep thinking."
+        },
+        "link_url": {
+          "type": "string",
+          "title": "Reference Web Page",
+          "format": "uri",
+          "description": "One public page. Forces deep thinking. Not combinable with file_url."
+        },
+        "audio_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "title": "Reference Audio",
+          "maxItems": 5,
+          "description": "Up to 5 files, 30s total. WAV or MP3."
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "title": "Reference Images",
+          "maxItems": 10
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "1080p"
+        },
+        "video_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "title": "Reference Videos",
+          "maxItems": 5,
+          "description": "Up to 5 clips, 30s total, each 1-30s."
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "adaptive"
+          ],
+          "type": "string",
+          "title": "Aspect Ratio",
+          "default": "adaptive"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "title": "Sound",
+          "default": true
+        },
+        "enable_thinking": {
+          "type": "boolean",
+          "title": "Deep Thinking",
+          "default": false
+        }
+      }
+    },
+    "alibaba/wan-3.0/text-to-video": {
+      "type": "object",
+      "title": "Wan 3.0 Text to Video",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "title": "Seed",
+          "maximum": 2147483647,
+          "minimum": 0
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration (sec)",
+          "default": 5,
+          "maximum": 30,
+          "minimum": 2,
+          "description": "2-30 seconds."
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "1080p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "adaptive"
+          ],
+          "type": "string",
+          "title": "Aspect Ratio",
+          "default": "adaptive"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "title": "Sound",
+          "default": true
+        },
+        "enable_thinking": {
+          "type": "boolean",
+          "title": "Deep Thinking",
+          "default": false
+        }
+      }
+    },
+    "bytedance/seedance-2.0/image-to-video": {
+      "type": "object",
+      "required": [
+        "image_url"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 4
+        },
+        "image_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p",
+            "1080p",
+            "4k"
+          ],
+          "type": "string",
+          "default": "720p"
+        },
+        "end_image_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "bytedance/seedance-2.0/reference-to-video": {
+      "if": {
+        "required": [
+          "image_urls"
+        ]
+      },
+      "else": {
+        "required": [
+          "video_urls"
+        ]
+      },
+      "type": "object",
+      "required": [],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 4
+        },
+        "audio_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 3,
+          "minItems": 1
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 9,
+          "minItems": 1
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p",
+            "1080p",
+            "4k"
+          ],
+          "type": "string",
+          "default": "720p"
+        },
+        "video_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 3,
+          "minItems": 1
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "21:9"
+          ],
+          "type": "string",
+          "default": "16:9"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "bytedance/seedance-2.0/text-to-video": {
+      "type": "object",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 4
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p",
+            "1080p",
+            "4k"
+          ],
+          "type": "string",
+          "default": "720p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "21:9"
+          ],
+          "type": "string",
+          "default": "16:9"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "bytedance/seedance-2.5/image-to-video": {
+      "type": "object",
+      "required": [
+        "image_url"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "maximum": 30,
+          "minimum": 4
+        },
+        "image_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p"
+          ],
+          "type": "string",
+          "default": "720p"
+        },
+        "end_image_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "bytedance/seedance-2.5/reference-to-video": {
+      "if": {
+        "required": [
+          "image_urls"
+        ]
+      },
+      "else": {
+        "if": {
+          "required": [
+            "video_urls"
+          ]
+        },
+        "else": {
+          "required": [
+            "audio_urls"
+          ]
+        }
+      },
+      "type": "object",
+      "required": [],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "maximum": 30,
+          "minimum": 4
+        },
+        "audio_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 10,
+          "minItems": 1
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 30,
+          "minItems": 1
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p"
+          ],
+          "type": "string",
+          "default": "720p"
+        },
+        "video_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 10,
+          "minItems": 1
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "21:9"
+          ],
+          "type": "string",
+          "default": "16:9"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "bytedance/seedance-2.5/text-to-video": {
+      "type": "object",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "maximum": 30,
+          "minimum": 4
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p"
+          ],
+          "type": "string",
+          "default": "720p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "21:9"
+          ],
+          "type": "string",
+          "default": "16:9"
+        },
+        "output_format": {
+          "enum": [
+            "mp4",
+            "mov"
+          ],
+          "type": "string",
+          "default": "mp4"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "bytedance/seedance-2.5/video-edit": {
+      "type": "object",
+      "required": [
+        "prompt",
+        "video_url"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "video_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "audio_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 10,
+          "minItems": 1
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 30,
+          "minItems": 1
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p"
+          ],
+          "type": "string",
+          "default": "720p"
+        },
+        "video_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 10,
+          "minItems": 1
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "bytedance/seedance-2.5/video-extend": {
+      "type": "object",
+      "required": [
+        "prompt",
+        "video_url"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "maximum": 30,
+          "minimum": 4
+        },
+        "video_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "audio_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 10,
+          "minItems": 1
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 30,
+          "minItems": 1
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p"
+          ],
+          "type": "string",
+          "default": "720p"
+        },
+        "video_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxItems": 10,
+          "minItems": 1
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "higgsfield-ai/soul/standard": {
+      "type": "object",
+      "title": "Soul Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "title": "Seed",
+          "default": null,
+          "maximum": 1000000,
+          "minimum": 1
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "style_id": {
+          "type": "string",
+          "title": "Soul Style",
+          "format": "uuid",
+          "default": null
+        },
+        "batch_size": {
+          "enum": [
+            1,
+            4
+          ],
+          "type": "integer",
+          "title": "Result images",
+          "default": 1
+        },
+        "resolution": {
+          "enum": [
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "720p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "9:16",
+            "16:9",
+            "4:3",
+            "3:4",
+            "1:1",
+            "2:3",
+            "3:2"
+          ],
+          "type": "string",
+          "title": "Aspect Ratio",
+          "default": "4:3"
+        },
+        "enhance_prompt": {
+          "type": "boolean",
+          "title": "Enhance Prompt",
+          "default": true
+        },
+        "style_strength": {
+          "type": "number",
+          "title": "Style strength",
+          "format": "float",
+          "default": 1,
+          "maximum": 1,
+          "minimum": 0
+        }
+      }
+    },
+    "higgsfield-ai/soul/v2/standard": {
+      "type": "object",
+      "title": "Soul V2 Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "title": "Seed",
+          "default": null,
+          "maximum": 1000000,
+          "minimum": 1
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "style_id": {
+          "type": "string",
+          "title": "Soul Style",
+          "format": "uuid"
+        },
+        "batch_size": {
+          "enum": [
+            1,
+            4
+          ],
+          "type": "integer",
+          "title": "Result images",
+          "default": 1
+        },
+        "resolution": {
+          "enum": [
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "720p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "9:16",
+            "16:9",
+            "4:3",
+            "3:4",
+            "1:1",
+            "2:3",
+            "3:2"
+          ],
+          "type": "string",
+          "title": "Aspect Ratio",
+          "default": "4:3"
+        },
+        "enhance_prompt": {
+          "type": "boolean",
+          "title": "Enhance Prompt",
+          "default": true
+        }
+      }
+    },
+    "ideogram/v4.0": {
+      "type": "object",
+      "title": "Ideogram 4.0 Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "title": "Prompt",
+          "maxLength": 2048,
+          "minLength": 2
+        },
+        "image_url": {
+          "type": "string",
+          "title": "Input image",
+          "format": "uri"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "1:1",
+            "1:2",
+            "2:1",
+            "2:3",
+            "3:2",
+            "4:5",
+            "5:4",
+            "9:16",
+            "16:9",
+            "5:8",
+            "8:5",
+            "3:4",
+            "4:3",
+            "9:22",
+            "22:9",
+            "9:23",
+            "23:9",
+            "3:8",
+            "8:3",
+            "5:12",
+            "12:5",
+            "1:3",
+            "3:1"
+          ],
+          "type": "string",
+          "title": "Aspect ratio",
+          "default": "1:1"
+        },
+        "image_weight": {
+          "type": "integer",
+          "title": "Image weight",
+          "maximum": 100,
+          "minimum": 1,
+          "description": "How strongly the output should preserve the input image."
+        },
+        "rendering_speed": {
+          "enum": [
+            "TURBO",
+            "DEFAULT",
+            "QUALITY"
+          ],
+          "type": "string",
+          "title": "Rendering speed",
+          "default": "DEFAULT"
+        }
+      },
+      "additionalProperties": false
+    },
+    "kling-video/o3/first-last-frame": {
+      "if": {
+        "properties": {
+          "multi_shots": {
+            "const": true
+          }
+        }
+      },
+      "else": {
+        "required": [
+          "prompt",
+          "first_frame_url"
+        ]
+      },
+      "then": {
+        "required": [
+          "multi_prompt",
+          "first_frame_url"
+        ]
+      },
+      "type": "object",
+      "title": "Kling O3 Playground",
+      "properties": {
+        "mode": {
+          "enum": [
+            "std",
+            "pro",
+            "4k"
+          ],
+          "type": "string",
+          "default": "pro"
+        },
+        "sound": {
+          "enum": [
+            "on",
+            "off"
+          ],
+          "type": "string",
+          "default": "off"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 3
+        },
+        "multi_shots": {
+          "type": "boolean",
+          "default": false
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1"
+          ],
+          "type": "string"
+        },
+        "multi_prompt": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "duration": {
+                "type": "integer",
+                "maximum": 15,
+                "minimum": 1
+              }
+            }
+          },
+          "maxItems": 6,
+          "minItems": 1
+        },
+        "last_frame_url": {
+          "type": "string",
+          "title": "Last frame URL",
+          "format": "uri"
+        },
+        "first_frame_url": {
+          "type": "string",
+          "title": "First frame URL",
+          "format": "uri"
+        }
+      }
+    },
+    "kling-video/omni/first-last-frame": {
+      "type": "object",
+      "title": "Kling Omni Playground",
+      "required": [
+        "prompt",
+        "first_frame_url"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "std",
+            "pro"
+          ],
+          "type": "string",
+          "default": "pro"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "enum": [
+            5,
+            10
+          ],
+          "type": "integer",
+          "title": "Duration",
+          "default": 5
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1"
+          ],
+          "type": "string",
+          "default": "16:9"
+        },
+        "last_frame_url": {
+          "type": "string",
+          "title": "Last frame URL",
+          "format": "uri"
+        },
+        "first_frame_url": {
+          "type": "string",
+          "title": "First frame URL",
+          "format": "uri"
+        }
+      }
+    },
+    "kling-video/v2.5-turbo/standard/image-to-video": {
+      "type": "object",
+      "title": "Kling 2.5 Playground",
+      "required": [
+        "prompt",
+        "image_url"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "enum": [
+            5,
+            10
+          ],
+          "type": "integer",
+          "title": "Duration",
+          "default": 5
+        },
+        "cfg_scale": {
+          "type": "number",
+          "title": "CFG Scale",
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "multipleOf": 0.01
+        },
+        "image_url": {
+          "type": "string",
+          "title": "Image URL",
+          "format": "uri"
+        },
+        "negative_prompt": {
+          "type": "string",
+          "title": "Negative Prompt",
+          "default": ""
+        }
+      }
+    },
+    "kling-video/v2.6/pro/text-to-video": {
+      "type": "object",
+      "title": "Kling 2.6 Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "sound": {
+          "enum": [
+            "on",
+            "off"
+          ],
+          "type": "string",
+          "title": "Generate sound",
+          "default": "on"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "enum": [
+            5,
+            10
+          ],
+          "type": "integer",
+          "title": "Duration",
+          "default": 5
+        },
+        "cfg_scale": {
+          "type": "number",
+          "title": "CFG Scale",
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "multipleOf": 0.01
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1"
+          ],
+          "type": "string",
+          "title": "Aspect ratio",
+          "default": "16:9"
+        }
+      }
+    },
+    "kling-video/v3.0-turbo/image-to-video": {
+      "type": "object",
+      "title": "Kling 3.0 Turbo",
+      "required": [
+        "prompt",
+        "image_url"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 3
+        },
+        "image_url": {
+          "type": "string",
+          "title": "Image URL",
+          "format": "uri"
+        },
+        "resolution": {
+          "enum": [
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "720p"
+        }
+      }
+    },
+    "kling-video/v3.0-turbo/text-to-video": {
+      "type": "object",
+      "title": "Kling 3.0 Turbo",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 3
+        },
+        "resolution": {
+          "enum": [
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "720p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1"
+          ],
+          "type": "string",
+          "title": "Aspect ratio",
+          "default": "16:9"
+        }
+      }
+    },
+    "kling-video/v3.0/4k/image-to-video": {
+      "type": "object",
+      "title": "Kling 3.0 Playground",
+      "required": [
+        "image_url"
+      ],
+      "properties": {
+        "sound": {
+          "enum": [
+            "on",
+            "off"
+          ],
+          "type": "string",
+          "title": "Generate sound",
+          "default": "on"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 3
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cfg_scale": {
+          "type": "number",
+          "title": "CFG Scale",
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "multipleOf": 0.01
+        },
+        "image_url": {
+          "type": "string",
+          "title": "Image URL",
+          "format": "uri"
+        },
+        "multi_shots": {
+          "type": "boolean",
+          "default": false
+        },
+        "multi_prompt": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "duration": {
+                "type": "integer",
+                "maximum": 15,
+                "minimum": 1
+              }
+            }
+          },
+          "maxItems": 6,
+          "minItems": 0
+        },
+        "last_image_url": {
+          "type": "string",
+          "title": "Image URL",
+          "format": "uri"
+        }
+      }
+    },
+    "kling-video/v3.0/4k/text-to-video": {
+      "type": "object",
+      "title": "Kling 3.0 Playground",
+      "properties": {
+        "sound": {
+          "enum": [
+            "on",
+            "off"
+          ],
+          "type": "string",
+          "title": "Generate sound",
+          "default": "on"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 3
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cfg_scale": {
+          "type": "number",
+          "title": "CFG Scale",
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "multipleOf": 0.01
+        },
+        "multi_shots": {
+          "type": "boolean",
+          "default": false
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1"
+          ],
+          "type": "string",
+          "title": "Aspect ratio",
+          "default": "16:9"
+        },
+        "multi_prompt": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "duration": {
+                "type": "integer",
+                "maximum": 15,
+                "minimum": 1
+              }
+            }
+          },
+          "maxItems": 6,
+          "minItems": 0
+        }
+      }
+    },
+    "kling-video/v3.0/pro/image-to-video": {
+      "type": "object",
+      "title": "Kling 3.0 Playground",
+      "required": [
+        "image_url"
+      ],
+      "properties": {
+        "sound": {
+          "enum": [
+            "on",
+            "off"
+          ],
+          "type": "string",
+          "title": "Generate sound",
+          "default": "on"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 3
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cfg_scale": {
+          "type": "number",
+          "title": "CFG Scale",
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "multipleOf": 0.01
+        },
+        "image_url": {
+          "type": "string",
+          "title": "Image URL",
+          "format": "uri"
+        },
+        "multi_shots": {
+          "type": "boolean",
+          "default": false
+        },
+        "multi_prompt": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "duration": {
+                "type": "integer",
+                "maximum": 15,
+                "minimum": 1
+              }
+            }
+          },
+          "maxItems": 6,
+          "minItems": 0
+        },
+        "last_image_url": {
+          "type": "string",
+          "title": "Image URL",
+          "format": "uri"
+        }
+      }
+    },
+    "kling-video/v3.0/pro/text-to-video": {
+      "type": "object",
+      "title": "Kling 3.0 Playground",
+      "properties": {
+        "sound": {
+          "enum": [
+            "on",
+            "off"
+          ],
+          "type": "string",
+          "title": "Generate sound",
+          "default": "on"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 3
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cfg_scale": {
+          "type": "number",
+          "title": "CFG Scale",
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "multipleOf": 0.01
+        },
+        "multi_shots": {
+          "type": "boolean",
+          "default": false
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1"
+          ],
+          "type": "string",
+          "title": "Aspect ratio",
+          "default": "16:9"
+        },
+        "multi_prompt": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "duration": {
+                "type": "integer",
+                "maximum": 15,
+                "minimum": 1
+              }
+            }
+          },
+          "maxItems": 6,
+          "minItems": 0
+        }
+      }
+    },
+    "kling-video/v3.0/std/image-to-video": {
+      "type": "object",
+      "title": "Kling 3.0 Playground",
+      "required": [
+        "image_url"
+      ],
+      "properties": {
+        "sound": {
+          "enum": [
+            "on",
+            "off"
+          ],
+          "type": "string",
+          "title": "Generate sound",
+          "default": "on"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 3
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cfg_scale": {
+          "type": "number",
+          "title": "CFG Scale",
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "multipleOf": 0.01
+        },
+        "image_url": {
+          "type": "string",
+          "title": "Image URL",
+          "format": "uri"
+        },
+        "multi_shots": {
+          "type": "boolean",
+          "default": false
+        },
+        "multi_prompt": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "duration": {
+                "type": "integer",
+                "maximum": 15,
+                "minimum": 1
+              }
+            }
+          },
+          "maxItems": 6,
+          "minItems": 1
+        },
+        "last_image_url": {
+          "type": "string",
+          "title": "Image URL",
+          "format": "uri"
+        }
+      }
+    },
+    "kling-video/v3.0/std/text-to-video": {
+      "type": "object",
+      "title": "Kling 3.0 Playground",
+      "properties": {
+        "sound": {
+          "enum": [
+            "on",
+            "off"
+          ],
+          "type": "string",
+          "title": "Generate sound",
+          "default": "on"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 3
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cfg_scale": {
+          "type": "number",
+          "title": "CFG Scale",
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "multipleOf": 0.01
+        },
+        "multi_shots": {
+          "type": "boolean",
+          "default": false
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1"
+          ],
+          "type": "string",
+          "title": "Aspect ratio",
+          "default": "16:9"
+        },
+        "multi_prompt": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "prompt": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "duration": {
+                "type": "integer",
+                "maximum": 15,
+                "minimum": 1
+              }
+            }
+          },
+          "maxItems": 6,
+          "minItems": 1
+        }
+      }
+    },
+    "lightricks/ltx-2.5/text-to-video/fast": {
+      "type": "object",
+      "title": "LTX-2.5 Fast Text to Video Playground",
+      "required": [
+        "prompt",
+        "duration"
+      ],
+      "properties": {
+        "fps": {
+          "enum": [
+            24,
+            25,
+            48,
+            50
+          ],
+          "type": "integer",
+          "title": "Frames per second",
+          "default": 25
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt",
+          "maxLength": 5000,
+          "minLength": 2
+        },
+        "duration": {
+          "enum": [
+            6,
+            8,
+            10
+          ],
+          "type": "integer",
+          "title": "Duration",
+          "default": 6
+        },
+        "resolution": {
+          "enum": [
+            "720p",
+            "1080p",
+            "2k",
+            "4k"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "720p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "9:16"
+          ],
+          "type": "string",
+          "title": "Aspect ratio",
+          "default": "16:9"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "title": "Generate audio",
+          "default": true
+        },
+        "camera_movement": {
+          "enum": [
+            "dolly_in",
+            "dolly_out",
+            "dolly_left",
+            "dolly_right",
+            "jib_up",
+            "jib_down",
+            "static",
+            "focus_shift"
+          ],
+          "type": "string",
+          "title": "Camera movement"
+        }
+      },
+      "additionalProperties": false
+    },
+    "lightricks/ltx-2.5/text-to-video/pro": {
+      "type": "object",
+      "title": "LTX-2.5 Pro Text to Video Playground",
+      "required": [
+        "prompt",
+        "duration"
+      ],
+      "properties": {
+        "fps": {
+          "enum": [
+            24,
+            25,
+            50
+          ],
+          "type": "integer",
+          "title": "Frames per second",
+          "default": 25
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt",
+          "maxLength": 5000,
+          "minLength": 2
+        },
+        "duration": {
+          "enum": [
+            6,
+            8,
+            10
+          ],
+          "type": "integer",
+          "title": "Duration",
+          "default": 6
+        },
+        "resolution": {
+          "enum": [
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "720p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "9:16"
+          ],
+          "type": "string",
+          "title": "Aspect ratio",
+          "default": "16:9"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "title": "Generate audio",
+          "default": true
+        },
+        "camera_movement": {
+          "enum": [
+            "dolly_in",
+            "dolly_out",
+            "dolly_left",
+            "dolly_right",
+            "jib_up",
+            "jib_down",
+            "static",
+            "focus_shift"
+          ],
+          "type": "string",
+          "title": "Camera movement"
+        }
+      },
+      "additionalProperties": false
+    },
+    "marketing-studio/image": {
+      "type": "object",
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "enhance_prompt"
+            ],
+            "properties": {
+              "enhance_prompt": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "preset_id",
+              "image_urls"
+            ],
+            "properties": {
+              "quality": {
+                "const": "high"
+              },
+              "image_urls": {
+                "maxItems": 2,
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ],
+      "title": "Marketing Studio Image",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "title": "Prompt",
+          "maxLength": 5000,
+          "minLength": 1
+        },
+        "quality": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "type": "string",
+          "default": "high"
+        },
+        "preset_id": {
+          "type": "string",
+          "title": "Preset ID",
+          "format": "uuid"
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "title": "Image URLs",
+          "maxItems": 16,
+          "minItems": 0
+        },
+        "moderation": {
+          "enum": [
+            "auto",
+            "low"
+          ],
+          "type": "string",
+          "default": "auto"
+        },
+        "resolution": {
+          "enum": [
+            "1k",
+            "2k",
+            "4k"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "2k"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "auto",
+            "1:1",
+            "3:2",
+            "2:3",
+            "4:3",
+            "3:4",
+            "16:9",
+            "9:16",
+            "21:9"
+          ],
+          "type": "string",
+          "title": "Aspect Ratio",
+          "default": "auto"
+        },
+        "enhance_prompt": {
+          "type": "boolean",
+          "title": "Enhance prompt",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "minimax/h3/text-to-video": {
+      "type": "object",
+      "title": "MiniMax H3 Text to Video Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "title": "Prompt",
+          "minLength": 1
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 5
+        },
+        "resolution": {
+          "enum": [
+            "2K"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "2K"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "auto",
+            "adaptive",
+            "21:9",
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16"
+          ],
+          "type": "string",
+          "title": "Aspect ratio",
+          "default": "auto"
+        },
+        "aigc_watermark": {
+          "type": "boolean",
+          "title": "AIGC watermark",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "minimax/hailuo-2.3/standard/text-to-video": {
+      "type": "object",
+      "title": "Minimax Hailuo 2.3 Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "enum": [
+            6,
+            10
+          ],
+          "type": "integer",
+          "title": "Duration",
+          "default": 6
+        },
+        "prompt_optimizer": {
+          "type": "boolean",
+          "title": "Prompt optimizer",
+          "default": true
+        }
+      }
+    },
+    "pixverse/v6/text-to-video": {
+      "type": "object",
+      "title": "PixVerse V6 Text to Video Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "title": "Seed",
+          "maximum": 2147483647,
+          "minimum": 0
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt",
+          "maxLength": 5000,
+          "minLength": 1
+        },
+        "duration": {
+          "type": "number",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 1
+        },
+        "resolution": {
+          "enum": [
+            "360p",
+            "540p",
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "720p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16"
+          ],
+          "type": "string",
+          "title": "Aspect ratio",
+          "default": "16:9"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "title": "Generate audio",
+          "default": true
+        },
+        "negative_prompt": {
+          "type": "string",
+          "title": "Negative prompt",
+          "maxLength": 2048,
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "recraft/v4.1/pro/text-to-image": {
+      "type": "object",
+      "title": "Recraft V4.1 Pro Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "colors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "rgb"
+            ],
+            "properties": {
+              "rgb": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "maximum": 255,
+                  "minimum": 0
+                },
+                "maxItems": 3,
+                "minItems": 3
+              }
+            }
+          },
+          "title": "Colors"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt",
+          "maxLength": 10000,
+          "minLength": 1
+        },
+        "resolution": {
+          "enum": [
+            "2k"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "2k"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "1:1",
+            "2:1",
+            "1:2",
+            "3:2",
+            "2:3",
+            "4:3",
+            "3:4",
+            "5:4",
+            "4:5",
+            "6:10",
+            "14:10",
+            "10:14",
+            "16:9",
+            "9:16"
+          ],
+          "type": "string",
+          "title": "Aspect ratio",
+          "default": "1:1"
+        },
+        "output_format": {
+          "enum": [
+            "jpg",
+            "png",
+            "webp"
+          ],
+          "type": "string",
+          "title": "Output format",
+          "default": "jpg"
+        },
+        "background_color": {
+          "type": "object",
+          "title": "Background color",
+          "required": [
+            "rgb"
+          ],
+          "properties": {
+            "rgb": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "maximum": 255,
+                "minimum": 0
+              },
+              "maxItems": 3,
+              "minItems": 3
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "recraft/v4.1/text-to-image": {
+      "type": "object",
+      "title": "Recraft V4.1 Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "colors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "rgb"
+            ],
+            "properties": {
+              "rgb": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "maximum": 255,
+                  "minimum": 0
+                },
+                "maxItems": 3,
+                "minItems": 3
+              }
+            }
+          },
+          "title": "Colors"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt",
+          "maxLength": 10000,
+          "minLength": 1
+        },
+        "resolution": {
+          "enum": [
+            "1k"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "1k"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "1:1",
+            "2:1",
+            "1:2",
+            "3:2",
+            "2:3",
+            "4:3",
+            "3:4",
+            "5:4",
+            "4:5",
+            "6:10",
+            "14:10",
+            "10:14",
+            "16:9",
+            "9:16"
+          ],
+          "type": "string",
+          "title": "Aspect ratio",
+          "default": "1:1"
+        },
+        "output_format": {
+          "enum": [
+            "jpg",
+            "png",
+            "webp"
+          ],
+          "type": "string",
+          "title": "Output format",
+          "default": "jpg"
+        },
+        "background_color": {
+          "type": "object",
+          "title": "Background color",
+          "required": [
+            "rgb"
+          ],
+          "properties": {
+            "rgb": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "maximum": 255,
+                "minimum": 0
+              },
+              "maxItems": 3,
+              "minItems": 3
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "wan/v2.6/text-to-video": {
+      "type": "object",
+      "title": "Wan 2.6 Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "maximum": 10000000,
+          "minimum": -1
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "enum": [
+            5,
+            10,
+            15
+          ],
+          "type": "integer",
+          "title": "Duration",
+          "default": 5
+        },
+        "audio_url": {
+          "type": "string",
+          "title": "Audio URL",
+          "format": "uri"
+        },
+        "resolution": {
+          "enum": [
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "default": "720p"
+        },
+        "multi_shots": {
+          "type": "boolean",
+          "default": false
+        },
+        "prompt_extend": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "wan/v2.7/text-to-video": {
+      "type": "object",
+      "title": "Wan 2.6 Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "maximum": 2147483646,
+          "minimum": 1
+        },
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 2
+        },
+        "audio_url": {
+          "type": "string",
+          "title": "Audio URL",
+          "format": "uri"
+        },
+        "resolution": {
+          "enum": [
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "default": "720p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1",
+            "4:3",
+            "3:4"
+          ],
+          "type": "string",
+          "title": "Aspect Ratio",
+          "default": "16:9"
+        },
+        "prompt_extend": {
+          "type": "boolean",
+          "default": false
+        },
+        "negative_prompt": {
+          "type": "string",
+          "title": "Negative prompt",
+          "default": ""
+        }
+      }
+    },
+    "xai/grok-imagine-image-2.0": {
+      "type": "object",
+      "title": "Grok Imagine 2.0 Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "quality": {
+          "enum": [
+            "low",
+            "medium"
+          ],
+          "type": "string",
+          "title": "Quality",
+          "default": "medium"
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "title": "Image",
+            "format": "uri"
+          },
+          "title": "Input Images",
+          "maxItems": 10,
+          "minItems": 0
+        },
+        "resolution": {
+          "enum": [
+            "1k",
+            "2k"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "1k"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "auto",
+            "1:1",
+            "1:2",
+            "2:1",
+            "3:2",
+            "2:3",
+            "4:3",
+            "3:4",
+            "16:9",
+            "9:16"
+          ],
+          "type": "string",
+          "default": "auto"
+        }
+      }
+    },
+    "xai/grok-imagine-video/v1.5/reference-to-video": {
+      "type": "object",
+      "title": "Grok Imagine Video 1.5 Reference Playground",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "title": "Prompt"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration",
+          "default": 5,
+          "maximum": 15,
+          "minimum": 1
+        },
+        "audio_url": {
+          "type": "string",
+          "title": "Reference audio",
+          "format": "uri"
+        },
+        "image_url": {
+          "type": "string",
+          "title": "First-frame image",
+          "format": "uri"
+        },
+        "image_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "title": "Image",
+            "format": "uri"
+          },
+          "title": "Reference images",
+          "maxItems": 7,
+          "minItems": 0
+        },
+        "resolution": {
+          "enum": [
+            "480p",
+            "720p",
+            "1080p"
+          ],
+          "type": "string",
+          "title": "Resolution",
+          "default": "480p"
+        },
+        "aspect_ratio": {
+          "enum": [
+            "auto",
+            "1:1",
+            "16:9",
+            "9:16",
+            "4:3",
+            "3:4",
+            "3:2",
+            "2:3"
+          ],
+          "type": "string",
+          "default": "auto"
+        }
+      }
+    },
+    "z-image/turbo": {
+      "type": "object",
+      "title": "Z-Image Turbo",
+      "required": [
+        "prompt"
+      ],
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": 0,
+          "description": "Optional random seed for similar, reproducible results."
+        },
+        "prompt": {
+          "type": "string",
+          "maxLength": 800,
+          "minLength": 1,
+          "description": "Positive prompt describing the desired content, style, and composition."
+        },
+        "resolution": {
+          "enum": [
+            "1k",
+            "2k"
+          ],
+          "type": "string",
+          "default": "1k",
+          "description": "Output resolution tier. Both tiers produce PNG images."
+        },
+        "aspect_ratio": {
+          "enum": [
+            "1:1",
+            "2:3",
+            "3:2",
+            "3:4",
+            "4:3",
+            "7:9",
+            "9:7",
+            "9:16",
+            "16:9",
+            "21:9"
+          ],
+          "type": "string",
+          "default": "1:1",
+          "description": "Output aspect ratio. Exact provider-recommended dimensions are selected automatically."
+        },
+        "prompt_extend": {
+          "type": "boolean",
+          "default": false,
+          "description": "Rewrite and reason over the prompt before generation; this uses the enhanced price tier."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -42,7 +42,8 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
   2560×1440); Seedream 5 Pro en fal **no pasa de 2048²**.
 - Formato más extremo que 3:1 → Seedream (1/16–16); GPT Image tope 3:1.
 - Motion con marca o personas → Flux 3 o Wan 3.0, no Seedance (su filtro rechaza tras cobrar); presupuesta por
-  resolución y confirma con `pnpm ai:fal --balance`.
+  resolución (el CLI estima antes de encolar y pide `--yes` sobre el tope; sin `--resolution` usa el escalón más
+  barato) y confirma con `pnpm ai:fal --balance`.
 
 ## Bucle de trabajo
 
@@ -54,7 +55,16 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    Bricolage instala la idea, Poppins estructura y Guttery sólo aparece como gesto opcional. Elige los valores
    definitivos desde AXIS después de conocer longitud, fondo, tamaño final y distancia de lectura.
 3. **Construye el medio limpio.** Genera o selecciona imagen/video sin texto ni logotipos inventados. Compón
-   tipografía, marcas y legales de forma determinista con los archivos oficiales.
+   tipografía, marcas y legales de forma determinista con los archivos oficiales. El isotipo 3D de Efeonce es
+   elemento ilustrativo, no firma. Para el logo completo como objeto físico en una escena, usa el
+   [kit de referencia 3D](../greenhouse-ai-image-generator/references/logo-3d-reference-kit.md): **por defecto, pasada
+   directa** —el render entra como referencia de **forma** y el prompt lleva la **intención** (material, montaje,
+   escena, atmósfera)—, también cuando la pieza cambia el material (acero, vidrio, neón) o la escena tiene atmósfera
+   fuerte como la larga exposición. Elegir la referencia por **luminancia** (blanca para materiales claros, navy para
+   oscuros o el color de marca). **Nunca pegar el render como camino por defecto**: se ve falso. El halo enmascarado
+   es la **excepción**, sólo con el material exacto del kit y el objeto chico o de detalle fino. **El QA es letra por
+   letra** —«e», «f», nave, órbita con sus cortes, tres ventanas— y una letra distinta obliga a regenerar; la firma
+   sigue siendo el SVG oficial.
    Cuando la pieza requiera firma web, usa el SVG canónico
    `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg`: no lo reconstruyas con texto o CSS. Conserva
    `efeoncepro.com`, `opacity: 0.72`, fusión `luminosity`, escala proporcional y comprueba píxeles visibles en el
@@ -125,6 +135,15 @@ del sistema ni de síntesis tipográfica.
 
 ## Selección colaborativa invocable por agentes
 
+**Escala y color de campaña (adapter, 2026-09-17).** `renderCollaborationSelection` acepta `presentation` opcional:
+`collaboratorScale` (etiqueta y cursor colaborador; ~1,9 para que el nombre se lea a 390 px en 1080 de ancho),
+`localCursorScale` y `participantColors` por id de cursor (p. ej. color de marca de un partner). La tinta de la
+etiqueta se elige por contraste WCAG y el render falla bajo 4,5:1. Sin `presentation` el resultado es idéntico al
+contrato por defecto. No recolorear ni reescalar el SVG a mano. Caso: KV «Tu IA no conoce tu negocio».
+
+**Fondo bajo una selección.** Los controles (trazo `#a6cdf5`, tiradores blancos) están diseñados para fondo oscuro y
+desaparecen sobre claro: el fondo bajo la selección debe ser oscuro por escenografía de la imagen, no por degradado.
+
 La API agent-facing vive en AXIS, no en la página del Lab. Dentro de Greenhouse, un agente normaliza la
 intención con:
 
@@ -140,3 +159,27 @@ del compositor liga `target.id` al texto/objeto/grupo real y verifica la geometr
 consume el intent declarado en el contrato y soporta `headline|support|hook|lockup`; `targetKind` debe coincidir
 con `text|text|object|group`. Esta ruta no llama a un modelo, no publica ni aprueba. Usa
 `templates/collaboration-selection-intent.json` como estructura, no como copy fijo.
+
+Contrato observado al componer piezas reales (2026-09-16, [bitácora](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md)):
+
+- los colaboradores sólo se anclan en esquinas (`collaborator-anchor-not-corner`); un cursor `moving` no lleva
+  `targetId` (`moving-cursor-must-not-target-selection`);
+- las etiquetas de esquina se ubican fuera del objeto: deja aire lateral (en 1080 px, un titular a ≤ ~64 % del ancho)
+  y exige `evidence.withinCanvas` antes de exportar (necesario, no suficiente: ver el caso sobre fotografía abajo);
+- `renderCollaborationSelection` emite etiquetas como `<text>`; si el rasterizador no garantiza Poppins, conviértelas a
+  trazados con la fuente real en la misma posición y falla si queda algún `<text>`;
+- las etiquetas quedan pequeñas por contrato: no cargues en ellas información que la pieza necesite leer.
+
+Sobre una **fotografía** (primer uso, 2026-09-17, «¿Claude o Codex?», `ai-generations/2026-09-17_claude-o-codex/`):
+
+- receta: `resolveCollaborationSelectionIntent` → `renderCollaborationSelection` con `targetBounds` = caja de
+  **tinta** del titular (no la métrica de la fuente); etiquetas a trazos con fontkit, porque el render no tiene
+  fuentes instaladas;
+- con **dos colaboradores** el aire lateral se paga dos veces, porque etiquetas y cursores viven **fuera** de la caja
+  del objetivo: el titular al 66 % del ancho sacaba las etiquetas del lienzo por ambos lados; funcionó al 58 % con
+  los colaboradores anclados arriba (`top-start` y `top-end`), que además los aleja de la coronilla del retratado;
+- **`evidence.withinCanvas: true` no prueba que la etiqueta respire**: puede dar `true` con la placa pegada al
+  borde. Mira el render en ese borde antes de exportar;
+- los colaboradores pueden ser **mascotas de partners** disputándose el objeto (Clawd `#d77757`, Codex `#2f67db`
+  medido sobre el plate, no inventado): la decisión del titular es el objeto seleccionado.
+  `presentation.participantColors` acepta sólo `#rrggbb`.

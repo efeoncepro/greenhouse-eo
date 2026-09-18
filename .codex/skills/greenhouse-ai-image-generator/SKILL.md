@@ -30,7 +30,14 @@ Separar dos rutas: **firma editorial**, con zona reservada y activo exacto compu
 **marca física**, con soporte pertinente, geometría y acabado definidos, usando arte oficial como referencia
 si se elige materialización generativa. La segunda no exige regenerar titulares ni acepta deformación del logo.
 Aplicar [brand-in-scene](../social-media-studio/references/brand-in-scene.md). Mantener la marca fuera de objetos
-rituales sin revisión cultural específica. No añadir nombre de ocasión/fecha/CTA si no tiene función o fue retirado.
+rituales sin revisión cultural específica.
+
+🔴 **Antes de generar un primer plano desenfocado o un objeto de escena para apoyar la marca, mide el foco del plate
+que ya tienes.** El desenfoque de primer plano suele venir dado por la óptica de la toma: en «¿Claude o Codex?»
+(2026-09-17, 135 mm a f/2,8) el borde inferior de la mesa medía gradiente máximo **5**, igual que el fondo, contra
+**314** en el rostro; los cinco soportes añadidos (acrílico, franja, tapa de portátil, hojas, follaje) eran
+redundantes y los cinco se leyeron puestos. El logo se compuso sobre esa mesa a 11,36:1 sin añadir nada. Añade un
+objeto sólo si la zona de la marca mide cerca del rostro. Protocolo y reglas de forma: [brand-in-scene](../social-media-studio/references/brand-in-scene.md). No añadir nombre de ocasión/fecha/CTA si no tiene función o fue retirado.
 
 ## First Reads
 
@@ -85,6 +92,7 @@ ranking fechado · **[decisión]** del operador · **sin dato** = no existe evid
 | Google directo (Vertex, `global`) | **sólo** runtime `generateImage` provider `google-gemini-image`; **no hay CLI** | Nano Banana 2 (`gemini-3.1-flash-image`, default); Nano Banana Pro (`gemini-3-pro-image`) disponible pero **sin superficie** |
 | Higgsfield CLI (out-of-band) | `higgsfield` | Recraft V4.1, **vectores SVG reales**. Estado 2026-09-16: `Not authenticated` → sin vía hasta que una persona corra `higgsfield auth login` |
 | fal.ai (out-of-band, NUNCA runtime) | `pnpm ai:fal` | Seedream 5 Pro/Lite/edit/layerize (imagen); Seedance, Minimax H3, Flux 3, Wan 3.0 (video) |
+| Higgsfield API (out-of-band, NUNCA runtime) | `pnpm ai:fal --capability hf-*` | SOUL 2/Cinema, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Grok Image 2.0, Recraft 4.1 (SVG **sin confirmar**: `model_type: vector` de la app, sin probar por API); video Kling/PixVerse/LTX/Happy Horse y otra vía para Seedance/Wan/H3. `--estimate` cotiza exacto sin cobrar. Estado 2026-09-16: 44/44 cotizan, **0 generaciones reales** (cuenta de API sin créditos). Guía §5.8 |
 
 Nano Banana Pro y Gemini Omni Flash van **siempre directo por Google, nunca por fal** [decisión]. Recraft por fal
 (23 endpoints) no está conectado.
@@ -98,6 +106,8 @@ Nano Banana Pro y Gemini Omni Flash van **siempre directo por Google, nunca por 
    `gpt-image-2.5-sunburst` en `xhigh`/`max`, con `--mask` si hay zona protegida. Sunburst es #1 en edición en
    Arena y Artificial Analysis [tercero, 2026-09-07/16]; la máscara alfa tuvo menos deriva protegida que la
    edición semántica de Seedream (MAE 0,0308 vs 0,0458, medido con GPT Image 2) [verificado 2026-07-18].
+   **Menos deriva no es cero:** la máscara orienta, no preserva (ver el bloque de `--mask` abajo); la zona protegida
+   se recompone desde la base.
 4. **¿Generación cotidiana, social, asset de UI, volumen, transparencia?** → `gpt-image-2.5-flare` en
    `medium`/`high`. Mismo costo que Sunburst para igual `quality × size`; los separa la latencia (en `max`, Flare
    46,0 s vs Sunburst 80,6 s) [verificado 2026-09-16]. Transparencia: soporte pleno en 2.5, preview en GPT Image 2.
@@ -172,23 +182,35 @@ Toda elección de video se hace con `motion-design-studio` → `workflows/engine
 | Video basado en una web o documento | `wan3-r2v --thinking --web-url <url>` / `--file <doc>` + prompt con guion |
 
 🔴 **fal cobra por escalón de resolución**: el precio del registro es el escalón **más bajo**. Wan 3.0 a 1080p
-(su default) USD 0,20/s, Wan 3.0 Prime 0,28/s (más cara que base), H3 base a 2K (su default) 0,13/s; Flux 3
+USD 0,20/s, Wan 3.0 Prime 0,28/s (más cara que base), H3 base a 2K 0,13/s (defaults del proveedor; sin
+`--resolution` el CLI envía el escalón más barato y lo avisa); Flux 3
 publicado ≠ registrado (0,17/s final, 0,06 draft, 0,41 extend, el doble) → confirma con `--balance`. Seedance sí
 se estima con la fórmula de fal: `tokens = alto × ancho × segundos × 24 / 1024`; `costo = tokens × precio_por_1000
 / 1000` (calzó con lo medido dentro de ~5 %; la equivalencia de OpenArt subestima ~2×). Filtro de Seedance:
 rechaza marcas y personas reales **después de cobrar**.
 
-### Brechas conocidas de los CLIs (documentadas; follow-up abierto por el orquestador)
+### Brechas conocidas de los CLIs (corregidas 2026-09-16, commit `17196ead1`; lo abierto al final)
 
-- `pnpm ai:image`: **no valida** `--size` ni `--background` (llegan tal cual al API; si OpenAI rechaza antes de
-  cobrar: sin dato); formato **siempre PNG** (no hay `--format`); `--count N` = **N pedidos pagados** de una
-  imagen; `--input-fidelity` con 2.5 o 2 se **ignora en silencio**; no hay `--moderation`; salida por defecto
-  `public/images/generated` (usa `--out` hacia `ai-generations/` o scratchpad).
-- `pnpm ai:fal`: `seedream5-pro` con `--out x.png` sin `--format png` guarda **JPEG con extensión `.png`**;
-  `--seed` se envía a endpoints que no lo declaran (Seedream, Seedance t2v/i2v): efecto no probado, no confíes en
-  él; con más de 10 `--image` fal usa **sólo las últimas 10** sin aviso; faltan flags para `weight_name` (LoRA),
-  `split_input_duration_threshold` y la regla de cuadros del entrenador (usa `--input`); **no hay estimación de
-  costo previa** en el CLI.
+- `pnpm ai:image` **ya valida en local** `--size` (2/2.5: `auto` o WxH múltiplos de 16, borde ≤ 3840, relación ≤ 3:1,
+  área 655.360–8.294.400; 1.5/1/mini: `1024x1024`, `1536x1024`, `1024x1536` o `auto`) y `--background`; tiene
+  `--format png|jpeg|webp` (sin flag lo deduce de la extensión de `--out`; `transparent` + `jpeg` se rechaza); avisa
+  que `--count N` son **N pedidos pagados**; e imprime `$ costo estimado ≈ USD X (N × tokens × USD 30/1M; la
+  entrada suma aparte)` antes de pedir. **No pide confirmación**: sólo informa; sin estimación con `auto` o modelos
+  sin grilla.
+- `pnpm ai:fal` **estima antes de encolar** (`$ costo estimado ≈ USD X · base`) y, sobre el tope (USD 1;
+  `FAL_COST_CONFIRM_USD`; `--max-usd <n>`), se detiene y pide `--yes`; sin estimación posible avisa y no bloquea.
+  En Seedance pasa `--duration`: con `auto` estima el máximo del contrato. En video, sin `--resolution` envía la
+  resolución **más barata** y lo avisa: para entrega pásala explícita. Seedream Pro deriva el formato de la
+  extensión de `--out` y corrige la extensión si los bytes no coinciden (ya no hace falta `--format png`);
+  `--format` en Lite se rechaza; `--seed` sólo se acepta donde el OpenAPI lo declara (H3 de generación, Wan
+  3.0/Prime, `seedance25-r2v`); más de 10 `--image` en Seedream edit se rechaza; LoRA con
+  `--lora <path>[@escala][#weight_name]`; entrenadores con `--frames` (22–124, `% 17 == 5`) y `--split-threshold`
+  (1–60), validados también por `--input`.
+- **Sigue abierto:** `ai:image` ignora `--input-fidelity` con 2.5 o 2 en silencio, no hay `--moderation` y la salida
+  por defecto es `public/images/generated` (usa `--out` hacia `ai-generations/` o scratchpad). `ai:fal`: `--size`/
+  `--count` de imagen sin validar; número de capas de layerize y si la base se cobra: sin dato; la API de pricing
+  devuelve la mitad del precio publicado de Flux 3 (sin dato por qué); tablas de escalones al 2026-09-16, pueden
+  cambiar. Toda estimación es orientativa: `pnpm ai:fal --balance` antes y después.
 
 ## GPT Image 2.5 — Sunburst y Flare (delta de proveedor 2026-09-08)
 
@@ -363,6 +385,9 @@ pnpm ai:image --image <ref.png> --prompt "keep this exact <subject>, change ONLY
 pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (AI matting, soft edges)
 ```
 
+`ai:image:rmbg` rellena **por defecto** los huecos internos que el matting deja transparentes y no son fondo
+(glifos, emblemas); el fondo real encerrado se conserva. `--no-fill-holes` lo desactiva.
+
 🔴 **Editar NO abarata — medido 2026-09-16, `flare · low · 1024x1024`:** el modelo devuelve la imagen
 **completa** aunque la máscara acote qué cambia, así que el output se cobra **idéntico** a una generación
 (196 tokens), y encima la imagen base entra como **1 024 tokens de input**. Editar costó **2,3× generar** en
@@ -370,6 +395,14 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
 **La máscara es gratis**: con y sin máscara el `usage` fue idéntico. Corolario operativo: para recortar un
 fondo de una imagen que ya existe, usa `pnpm ai:image:rmbg` (local, cero costo de proveedor), no un edit.
 El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de costo real de 2.5.
+
+🔴 **La máscara NO preserva píxeles — medido 2026-09-17** (`ai-generations/2026-09-17_claude-o-codex/`): GPT Image 2.5
+redibuja la imagen entera aunque se pase `--mask`. En una pasada que sólo debía tocar una esquina, la zona protegida
+tuvo delta máximo **221/255** (los ojos del sujeto, **147/255**) con una media de sólo **4,85**: la media no sirve de
+criterio. Si fuera de la máscara hay algo que no se puede tocar (cara, logo aprobado, texto compuesto), el recorte
+fino lo hace el agente: salida del modelo con el **alfa invertido de la misma máscara** sobre la base original, y
+verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales al comparar:
+[editar una zona de una imagen, paso 5](../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu).
 
 - El cliente acepta hasta **16** `--image` por request (`MAX_OPENAI_IMAGE_INPUTS = 16`, < 50 MB c/u) y conserva su orden. Cada referencia debe declarar en el
   prompt su rol: estructura, paleta, identidad, activo oficial o anti-referencia.
@@ -447,6 +480,78 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
 - **Human-review every variant against the anchor** for identity drift before keeping it.
 - **Log durable generations in `ai-generations/`** (repo, not `.captures/`): one subfolder per run named `YYYY-MM-DD_<semantic>/` with `README.md` (verbatim prompts) + `manifest.json`, plus a row in `ai-generations/INDEX.md`. Worked example: `ai-generations/2026-07-05_nexa-fallback-characters/` — the 3D Nexa character (`public/images/illustrations/characters/greenhouse-*.png`) posed per fallback `kind`.
 
+### Recolor, inpainting y materialización con forma exacta (caso 2026-09-16)
+
+- **Inpainting con máscara puede cambiar la geometría** aunque el prompt pida conservarla: al recolorear banderines,
+  GPT Image 2.5 Sunburst devolvió menos banderines, más grandes y tiñó un objeto fuera de la zona. Comparar
+  antes/después por forma, cantidad y posición; si cambian, descartar.
+- **Cambio de color de un elemento ya aprobado → recolor determinístico** sobre el plate original: detectar el
+  elemento (perfil de color/columnas), rellenar por semilla, apertura morfológica para excluir líneas finas y aplicar
+  el color nuevo con la luminosidad del píxel original. Conserva textura, pliegues y luz.
+- **Objetos 3D con forma de marca:** boceto con los glifos o siluetas reales en su posición exacta → `--image` con
+  Sunburst para materializar → texto y logo compuestos después. El resultado no es vector exacto de la fuente:
+  declararlo en la entrega.
+- **Mascota pixel-art de partner a 3D con fidelidad:** reconstruir el sprite desde la fuente oficial (caso Clawd: arte
+  de bloques del binario de Claude Code y color `rgb(215,119,87)` del mismo binario), no de memoria. La celda de
+  terminal es 1:2: cada píxel mide 1 de ancho × 2 de alto; renderizarlo cuadrado aplana la figura. Sprite como
+  imagen 1 del edit con «cada píxel = pila de 1×2 cubos» y material declarado; verificar silueta, ojos y extremidades
+  contra el sprite antes de usarlo. Biblioteca completa (8 ángulos + 8 accesorios, recorte, QA, entrega y cómo
+  aplicarlo a Nexa): [`references/mascot-3d-pose-library.md`](references/mascot-3d-pose-library.md).
+- **Cambiar el fondo detrás de una persona o mascota: regenerar, no recortar.** Repintar un muro alrededor de un
+  sujeto con matte + máscara deja bordes «mordidos» en pelo y deforma partes finas o sueltas (el «?» de Clawd).
+  Acabado profesional = plate nativo con el set nuevo, guiado por un **boceto de composición** de formas planas
+  (posición y escala de cada elemento) como imagen 1; si falta aire, alejar la cámara ≤ 10 % con outpaint cuyas
+  uniones caigan sólo en muro, ventanas o escritorio. Alejar 25 % duplicó marcos de ventana («marco dentro de marco»).
+- **Extender a otro formato (4:5 → 9:16) sin costuras:** colocar el plate aprobado en el lienzo nuevo, outpaint con
+  máscara y re-pegar el núcleo. La máscara debe abrir también una franja de transición DENTRO del núcleo (zona sin
+  objetos clave): si sólo abre el exterior, el modelo conserva el borde del lienzo y deja una línea. Fundir el núcleo
+  dentro de esa franja repintada y verificar con perfil de luminancia por fila en las uniones.
+- **Segundo color o variante de un asset 3D aprobado → editar el render aprobado, no regenerar.** Cambiar SÓLO
+  material y fondo (en escenas, sólo material). La nave blanca generada desde cero salió plana y con cortes difusos
+  y fue rechazada; la recoloreada desde cada render navy conservó geometría, cortes y cámara.
+- **Ángulos extremos (gusano, picado, gran angular, sobrevuelo) necesitan guía de perspectiva como imagen 1.** Con
+  la cámara sólo en texto el modelo devuelve casi frontal. Guía = silueta oficial extruida y proyectada con cámara
+  real (`ai-generations/2026-09-17_efeonce-ship-3d/guias/proyectar.mjs`), «copiar cámara, no su aspecto plano»;
+  base 3D aprobada como imagen 2 y logo como 3. La isométrica siguió frontal; una vista inferior pura de un logo
+  plano sólo muestra su canto.
+- **Recorte de objeto claro sobre fondo oscuro:** `pnpm ai:image:rmbg` deja OPACOS los huecos que muestran el fondo
+  (cortes, ventanas): usar `pnpm ai:image:rmbg <in> <out> --key-background [umbral] [minPx]` (opt-in; 42/30 por
+  defecto, 30/800 en fondo claro desenfocado o macro; no usar si el sujeto tiene zonas del color del fondo). Revisar
+  siempre sobre fondo de contraste fuerte con zoom 100 %. Escenas claras sobre fondo claro y macros desenfocados no se recortan: se entregan como escena.
+  Método completo: [isotipo propio en 3D con dos colores](references/mascot-3d-pose-library.md#isotipo-propio-en-3d-con-dos-colores-caso-nave-de-efeonce).
+- **Logo completo de marca como objeto en una escena → kit Blender como píxeles exactos; el modelo nunca dibuja las
+  letras.** Escala, cámara y luz salen del manifiesto. **Por defecto, pasada directa:** el render entra como imagen 1
+  y aporta la **forma**; el prompt aporta la **intención** (material, montaje, escena, cámara, atmósfera). Aplica al
+  logo grande en cuadro, al **cambio de material** (acero, aluminio, vidrio, neón, madera, latón) y a escenas de
+  atmósfera fuerte (larga exposición, neón, contraluz). **Referencia elegida por luminancia:** render blanco para
+  materiales claros, navy para oscuros o para el color de marca. **Nunca pegar el render como camino por defecto:**
+  conserva el material y la luz del kit y se lee falso. El **halo enmascarado** (`--mask` que protege logo **y**
+  escena, ~140 px editables, y después recomponer las zonas protegidas desde la base porque la máscara no preserva
+  píxeles) es la **excepción**: material exacto del kit + logo chico o detalle fino. QA letra por
+  letra y composición determinística sólo como último recurso:
+  [`references/logo-3d-reference-kit.md`](references/logo-3d-reference-kit.md).
+- **Vestir a alguien con ropa de marca, o producir merch y credencial (lanyard, yoyo, portacarnet, carnet) → kit de
+  referencia de prenda y merch, nunca describir la pieza en el prompt.** La vista se elige por el **ángulo de la toma** (de espaldas → vista de espalda) y se pasa junto con
+  las referencias de rostro y cuerpo de la persona. El **texto de la prenda se compone determinísticamente** con los
+  pesos del contrato de marca y entra como imagen 2; al modelo nunca se le pide la ortografía. Proporciones
+  declaradas (emblema del pecho nunca se reduce; estampa de espalda al 38 % del ancho) + **contrato de realismo
+  verbatim** en todos los prompts, o la prenda sale con aspecto de render. Si cambia el contrato se rehace la serie
+  completa. Si el emblema va **bordado**, se espeja: pasar el isotipo oficial rasterizado como imagen 2 y revisar el
+  pecho vista por vista al 100 %. Hoodie y polo ya existen (21 vistas cada uno, OneDrive `13- Branding/`), y **la
+  prenda la elige el contexto de la escena**, no la costumbre; para una prenda nueva que se diseña desde cero,
+  primero la prenda base aprobada y recién después las vistas. En **merch con arte impreso y piezas mecánicas**
+  (lanyard con yoyo, portacarnet y carnet, 12 vistas en `13- Branding/Lanyard Efeonce/v01/`) valen las mismas
+  reglas más tres propias: lo **plano se compone, no se genera**; la vista que debe salir **sin arte se genera sin
+  referencias**; y la pieza se **nombra con precisión** (portacarnet de marco rígido ≠ portacredencial) o vuelve la
+  genérica: [`references/garment-reference-kit.md`](references/garment-reference-kit.md).
+- Casos: [Viva México y previa 18](../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md) ·
+  [nave Efeonce 3D](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).
+
+- **Usar un kit de marca ya producido (logo 3D, nave, vestuario, credencial, gorra) en una imagen o un video:**
+  [guía de uso de los kits](../../../docs/operations/social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md) — elección de la vista,
+  contrato de referencias, QA al 100 % y las tres reglas propias del video (primer cuadro aprobado, la marca no se mueve
+  dentro del plano generado, planos cortos).
+
 ## Provider Choice
 
 - Use `openai-image` for higher prompt fidelity, complex composition, reference-guided edits, UI assets, icon sets, and transparent PNG batches.
@@ -491,6 +596,11 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
 - Campaign derivation uses a governed **star topology**: the approved `anchor_id`/`anchor_revision` is the
   center; ratios, motion plates, print proofs and OOH proofs are independent spokes. A local repair does not
   become the next anchor without explicit human promotion.
+- **Derivados de formato (9:16, 16:9) se generan NATIVOS, nunca recortando el 4:5:** el recorte se come el espacio
+  del titular (medido en «¿Claude o Codex?», 2026-09-17). Plate nativo del formato, o extensión por outpaint desde el
+  anchor (receta «Extender a otro formato» arriba), y el layout de texto se re-decide por formato: con `W/H > 1.2` el
+  titular y la cita no caben apilados sin chocar con la coronilla, la cita baja y el logo va al extremo opuesto
+  (`ai-generations/2026-09-17_claude-o-codex/componer.mjs`).
 - For layout-designed static sets, the model receives only a clean ratio plate. Build the layout contract first,
   use Seedream Pro for material/light/atmosphere or GPT Image 2 for geometry/protected repair, then compose
   final copy, editorial logo, CTA and legal deterministically. After approving the finish, use `pnpm creative:layout` for
@@ -541,12 +651,13 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
 ```
 
 - Flags: `--prompt|--prompt-file`, `--image` (repetible; los archivos locales se suben solos al storage de fal),
-  `--size`, `--count`, `--format jpeg|png`, `--out|--out-dir`, `--timeout`, `--json`. Video (`--duration`,
+  `--size`, `--count`, `--format jpeg|png` (sólo Seedream Pro), `--max-usd <n>`, `--yes`, `--out|--out-dir`,
+  `--timeout`, `--json`. Video (`--duration`,
   `--resolution`, `--aspect`, `--bitrate`, `--task`, `--no-audio`, `--end-image`, `--audio`, `--video`,
-  `--prompt-expansion`, `--no-prompt-expansion`, `--thinking`, `--web-url`, `--file`, `--lora`,
-  `--camera-trajectory`, `--keyframe`, `--safety-tolerance`, `--draft-cache`), `--seed <n>` (entero ≥ 0; ⚠️ el CLI
-  lo envía a cualquier endpoint sin revisar el esquema, incluidos Seedream y Seedance t2v/i2v que no lo declaran),
-  entrenamiento (`--training-data`, `--steps`, `--rank`, `--learning-rate`, `--trigger`) y la elección entre
+  `--prompt-expansion`, `--no-prompt-expansion`, `--thinking`, `--web-url`, `--file`, `--lora <path>[@escala][#weight_name]`,
+  `--camera-trajectory`, `--keyframe`, `--safety-tolerance`, `--draft-cache`), `--seed <n>` (entero ≥ 0; sólo en los
+  endpoints que lo declaran: H3 de generación, Wan 3.0/Prime y `seedance25-r2v`; en el resto el CLI lo rechaza),
+  entrenamiento (`--training-data`, `--steps`, `--rank`, `--learning-rate`, `--trigger`, `--frames`, `--split-threshold`) y la elección entre
   Seedance, H3, Flux 3 y Wan 3.0 (incluido video a video) viven en `motion-design-studio`
   (`workflows/engine-selection-by-fidelity-contract.md`). El CLI valida cada flag contra el contrato del endpoint
   **antes** de gastar: flags de video en una capacidad de imagen, o de entrenamiento fuera de un entrenador, fallan.
@@ -593,7 +704,7 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   2.7, no conectada). Flags propios: `--duration auto` (se envía `null`: duración inteligente; o entero 2–30),
   `--no-audio` (campo `audio`), `--no-prompt-expansion` (booleano; distinto del `--prompt-expansion <modo>` de H3),
   `--thinking`, y en r2v `--web-url <url pública>` / `--file <path|url>`, que **exigen `--thinking`**. Resolución
-  default **1080p**: explora a 480p. La salida trae `actual_prompt` y `seed`. Elección y ejemplos en
+  default del proveedor **1080p**; sin `--resolution` el CLI envía 480p y lo avisa (para entrega pasa `720p`/`1080p`). La salida trae `actual_prompt` y `seed`. Elección y ejemplos en
   `motion-design-studio`.
   ```bash
   pnpm ai:fal --capability wan3-t2v --prompt "…" --resolution 480p --duration auto --seed 7 --out explora.mp4
@@ -712,7 +823,9 @@ deterministic and are composed after any generative finish.
   localization require deterministic composition unless an explicit exception accepts raster risk. Physical
   brand materialization uses official references and the separate identity/material review above.
 - Seedream Pro Edit «region/layer editing» is semantic art direction over one flattened raster, not editable
-  layers or pixel-perfect locality. Use GPT + alpha mask when protected-region drift has operational cost; when
+  layers or pixel-perfect locality. Use GPT + alpha mask when protected-region drift has operational cost, then
+  recompose the protected region from the base (the mask reduces drift, it does not eliminate it: 221/255 max
+  measured 2026-09-17); when
   you need separable layers of an approved piece, run `seedream5-pro-layerize` instead of regenerating.
 - If a still becomes motion, hand the approved clean plate to `motion-design-studio`. Build the 15/10/6
   family in deterministic post; use Seedance (2.5/2.0 via `pnpm ai:fal`) only for a genuinely new shot/action/continuity need,

@@ -1,0 +1,11 @@
+Keep every protected pixel exactly as it is. Only the transparent area of the mask changes.
+
+In that area, place ONE upright slab of clear acrylic standing on the table in the VERY NEAR FOREGROUND, on the right-hand side, its broad FACE turned squarely to the camera.
+
+Its shape must be fully readable: BOTH of its vertical side edges are inside the picture with dark room visible to the left and right of it, and its top edge is inside the picture too. Only its bottom runs off the bottom edge of the frame. It is a tall rectangle, clearly taller than it is wide, and its face is a wide open area.
+
+Because it sits centimetres from the lens it is COMPLETELY OUT OF FOCUS: one large, soft, creamy blurred plane, a little brighter than the dark room behind it, with soft blurred highlights down both bevelled side edges where the light catches them, and its top edge dissolving gently. No sharp edges anywhere on it.
+
+Its face is COMPLETELY BLANK and EVEN — no engraving, no print, no logo, no letters, no numbers, no texture, no reflections of objects, no bright hotspot in the middle. A smooth, uniform, empty blurred surface across its whole face.
+
+It must blend seamlessly with the table and the room already in the picture: same colour temperature, same cool rim from behind right, same grain. Nothing sharp, no text, no watermark.

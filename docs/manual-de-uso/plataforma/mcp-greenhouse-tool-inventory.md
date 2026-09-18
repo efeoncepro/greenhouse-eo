@@ -1,9 +1,9 @@
 # MCP Greenhouse — Inventario de Tools
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 3.3
+> **Version:** 3.4
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-09-15 por Claude (TASK-1845: dominio `insights` con 4 tools —una escribe—, §10; **51 tools medidas en el manifiesto** (`toolCount` del artefacto generado, hash `4089283477991d…`); manuales servidos: ocho; delta previo 2026-09-02 TASK-1804: la superficie sirve sus propios manuales de uso — tool `get_greenhouse_skill` + recurso `skill://efeonce/{name}/SKILL.md`, §9; 44 tools medidas en el manifiesto; delta previo 2026-08-31 TASK-1780: el archivo dejó de llamarse read-only porque el servidor no lo es; las cifras de superficie se leen del manifiesto, no de este texto)
+> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846: render durable de Insights, 4 tools más en §10, gateway `1.6.0` con 51 tools; la cifra del manifiesto se lee del artefacto generado; delta previo 2026-09-15 TASK-1845: dominio `insights` con 4 tools —una escribe—, §10; **51 tools medidas en el manifiesto** (`toolCount` del artefacto generado, hash `4089283477991d…`); manuales servidos: ocho; delta previo 2026-09-02 TASK-1804: la superficie sirve sus propios manuales de uso — tool `get_greenhouse_skill` + recurso `skill://efeonce/{name}/SKILL.md`, §9; 44 tools medidas en el manifiesto; delta previo 2026-08-31 TASK-1780: el archivo dejó de llamarse read-only porque el servidor no lo es; las cifras de superficie se leen del manifiesto, no de este texto)
 > **Actualización de acceso:** 2026-09-08, TASK-1844: Efeonce ID, lectura interna v2 por objetivo y manual diario canónico.
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
@@ -413,6 +413,13 @@ Reglas:
 - **Federación:** las cuatro viajan al gateway `efeonce-mcp` (`1.5.0`, provider `greenhouse-insights` sobre la config
   SEO). Allá las lecturas van con `efeonce.mcp.read` y la creación exige `efeonce.mcp.insights.write`, que ningún
   cliente porta todavía (`insufficient_scope` hasta un consentimiento gobernado).
+- **Render durable (TASK-1846, 2026-09-16):** el dominio suma cuatro tools más — `request_insight_render`,
+  `get_insight_render_run` (lectura), `retry_insight_render` y `cancel_insight_render` (las tres de escritura exigen
+  binding interno). Hoy sólo `deck_pdf` es renderizable: otro output ⇒ `422 render_rejected`; con
+  `INSIGHTS_RENDER_ENABLED` apagado ⇒ `503 render_disabled`. En el gateway `efeonce-mcp` **`1.6.0`** (51 tools,
+  desplegado el 2026-09-16, revisión `efeonce-mcp-gateway-00054-n78`) la lectura va con `efeonce.mcp.read` y las tres
+  escrituras con `efeonce.mcp.insights.write`; allá los errores se ven como `policy_blocked` / `invalid_request` /
+  `not_found`. Paso a paso en [Operar Efeonce Insights por API y MCP](../insights/operar-efeonce-insights-api-mcp.md).
 - **Manual servido:** `efeonce-insights` vía `get_greenhouse_skill` (§9). Paso a paso por API y MCP en
   [Operar Efeonce Insights por API y MCP](../insights/operar-efeonce-insights-api-mcp.md); funcionamiento en
   [Dominio y ediciones](../../documentation/insights/efeonce-insights-dominio-ediciones.md).

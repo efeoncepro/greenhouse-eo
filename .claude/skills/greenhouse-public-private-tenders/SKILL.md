@@ -19,8 +19,9 @@ argument-hint: '[país/etapa del bid o pregunta concreta]'
 - Cotizar, dimensionar garantías y evaluar cashflow/factoring del pago estatal.
 - Presentar, responder foro de aclaraciones, seguir evaluación, y gestionar adjudicación/impugnación.
 - Mapear un portal LATAM nuevo o un RFP corporativo privado.
-- Revisar **licitaciones públicas** en LicitaLAB mediante Playwright + MCP → `licitalab-radar-playwright.md` y
-  `licitalab-mcp.md`. LicitaLAB no es una fuente de RFP/RFQ privados.
+- Buscar y analizar **licitaciones públicas** en LicitaLAB con la CLI `pnpm licitalab` (search → opportunity →
+  documents → ask-docs; receta 0 de `licitalab-mcp.md`) → `licitalab-mcp.md` y `licitalab-radar-playwright.md`.
+  LicitaLAB no es una fuente de RFP/RFQ privados.
 - Consultar el estado rápido de bid, CRM y postulación →
   `docs/commercial/tenders/LICITATION_CRM_REGISTER.md`; es un índice operativo, no una fuente de verdad.
 - Para una licitación ya promovida a Deal, consultar también `docs/commercial/CRM_DEAL_REGISTER.md`, la vista

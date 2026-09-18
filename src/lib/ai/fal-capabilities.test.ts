@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { FAL_CAPABILITIES, FAL_CAPABILITY_IDS, findFalCapability } from '@/lib/ai/fal-capabilities'
+import {
+  FAL_CAPABILITIES,
+  FAL_CAPABILITY_IDS,
+  FAL_PRICING_RULES,
+  FAL_SEED_CAPABILITY_IDS,
+  findFalCapability
+} from '@/lib/ai/fal-capabilities'
 
 describe('registro de capacidades fal', () => {
   it('no repite ids ni slugs', () => {
@@ -265,5 +271,31 @@ describe('registro de capacidades fal', () => {
   it('resuelve por id y devuelve undefined ante uno inexistente', () => {
     expect(findFalCapability('seedream5-pro-layerize')?.outputKey).toBe('layers')
     expect(findFalCapability('no-existe')).toBeUndefined()
+  })
+
+  // Una regla con id que no existe no protege nada: todas las claves de las tablas deben existir.
+  it('las tablas de seed y precio sólo nombran capacidades existentes', () => {
+    for (const id of [...FAL_SEED_CAPABILITY_IDS, ...Object.keys(FAL_PRICING_RULES)]) {
+      expect(FAL_CAPABILITY_IDS).toContain(id)
+    }
+  })
+
+  it('toda capacidad operable tiene regla de precio para estimar antes de gastar', () => {
+    expect(FAL_CAPABILITIES.filter(c => !c.unsupportedReason && !c.pricing).map(c => c.id)).toEqual([])
+  })
+
+  // Leído del OpenAPI de las 55 capacidades el 2026-09-16.
+  it('declara seed sólo donde el OpenAPI lo declara', () => {
+    expect(FAL_CAPABILITIES.filter(c => c.acceptsSeed).length).toBe(19)
+    expect(findFalCapability('seedream5-pro')?.acceptsSeed).toBeFalsy()
+    expect(findFalCapability('seedance20-r2v')?.acceptsSeed).toBeFalsy()
+    expect(findFalCapability('flux3-t2v')?.acceptsSeed).toBeFalsy()
+    expect(findFalCapability('h3-train-t2v')?.acceptsSeed).toBeFalsy()
+  })
+
+  it('declara el formato de salida real de Seedream', () => {
+    expect(findFalCapability('seedream5-pro')?.imageOutput).toEqual({ formats: ['jpeg', 'png'], defaultFormat: 'jpeg' })
+    expect(findFalCapability('seedream5-lite')?.imageOutput?.formats).toEqual([])
+    expect(findFalCapability('seedream5-pro-edit')?.maxInputImages).toBe(10)
   })
 })

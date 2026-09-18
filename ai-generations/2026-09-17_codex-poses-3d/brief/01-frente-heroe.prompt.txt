@@ -1,0 +1,11 @@
+High quality 3D render of this exact character: the official Codex pet mascot. Image 1 is the approved 3D collectible figure of this character and image 2 is its official pixel-art sprite. Keep the character's identity EXACTLY as in image 1 in every pose:
+
+- HEAD: a large soft cloud-shaped head (about 60 percent of the total height) made of rounded puffy lobes all around the top and sides, like a fluffy cumulus cloud, matte soft-touch vinyl in periwinkle blue: light areas #70a0ff, base #5080f0, shadows #4060e0.
+- FACE: there is no mouth, no nose and no separate eyes. The whole face is a wide dark navy (#203060) rounded-rectangle visor set into the front of the cloud head, made of glossy smoked glass with a subtle reflection. The visor shows glowing cyan terminal glyphs as its expression: the default ">_" glyph (a chevron ">" on the left and an underscore "_" on the right). The glyphs are clean, crisp, pixel-shaped, softly emissive light cyan.
+- BODY: a small rounded bean-shaped torso in the same blue vinyl, with a small light cyan-white ">_" terminal emblem printed on the chest.
+- LIMBS: two short rounded stubby arms and two short rounded legs, same blue vinyl.
+- Proportions and silhouette exactly as in the sprite. Never add a mouth, ears, antennae, fingers, clothing, text other than the glyphs, or logos. Never turn it into cubes or voxels: it is smooth and rounded.
+
+POSE AND CAMERA: Standing neutral and confident, arms relaxed at its sides. Camera exactly frontal at eye level, symmetrical composition, 85mm lens.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim light, soft ambient occlusion, realistic soft contact shadow, crisp focus on the whole figure, physically based materials. Plain seamless light warm-gray studio background, nothing else in the frame. The whole figure fully visible with generous margin, centered.

@@ -1,13 +1,13 @@
 ---
 name: efeonce-insights
-description: How to operate Efeonce Insights through MCP — build a valid request from the catalog, create an edition, follow its phases, read sealed evidence and the frozen plan honestly, request and follow the rendering of its deck, and know what a machine cannot do (issue, share, send). Load it before creating, rendering or describing an Insights edition.
+description: How to operate Efeonce Insights through MCP — build a valid request from the catalog, create an edition, follow its phases, read sealed evidence and the frozen plan honestly, request and follow the rendering of its deck, manage read-only share links of issued editions, read email deliveries and recurring schedules honestly, and know what a machine cannot do (issue, send email, manage schedules). Load it before creating, rendering, sharing or describing an Insights edition.
 ---
 
 # Operating Efeonce Insights
 
 Efeonce Insights turns a client's evidence (SEO, AEO, ICO delivery metrics) into a frozen, versioned
 edition for a period. Greenhouse owns the library, the request, the permissions and the lifecycle.
-This manual teaches you to operate it correctly through its MCP tools (four for editions, four for rendering). It grants no permission:
+This manual teaches you to operate it correctly through its MCP tools (four for editions, four for rendering, three for share links, two for email deliveries and two for schedules). It grants no permission:
 everything below is enforced server-side per binding and per organization.
 
 ## What exists today and what does not
@@ -19,7 +19,12 @@ everything below is enforced server-side per binding and per organization.
 | Create an edition and run its generation up to `ready_for_review` | `create_insight_edition` — internal bindings only |
 | Issue, withdraw, recover a failed edition | Not through MCP. Issuing is a human decision with its own capability |
 | Request the rendering of an edition's deck and follow it | `request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render` — writes are internal bindings only; today only `deck_pdf` renders |
-| A4 report, web view, share by link, send by email, schedule | Not yet: they arrive in later units of the program |
+| Create, list and revoke read-only share links of an issued edition | `create_insight_share`, `list_insight_shares`, `revoke_insight_share` — create and revoke are internal bindings only |
+| Read email deliveries of an edition and their per-recipient outcome | `list_insight_deliveries`, `get_insight_delivery` — read only |
+| Read recurring schedules and their latest occurrences | `list_insight_schedules`, `get_insight_schedule` — read only |
+| Send an edition by email; cancel, retry or reconcile a delivery | Not through MCP. A person does it in the Greenhouse portal |
+| Create, activate, pause or retire a schedule | Not through MCP. A person does it in the Greenhouse portal |
+| A4 report and the in-portal edition page | Not yet: they arrive in later units of the program |
 
 `renderableOutputs` in the catalog lists what the render engine can produce today (`deck_pdf`). An
 edition can be created, generated and reviewed, but **it cannot be issued** until every requested
@@ -47,6 +52,84 @@ is switched off in this runtime — report it and stop. Never tell a human that 
 - **Audience.** Asking to render or read the render of an edition you cannot see answers `not_found`, and
   nothing is created. Do not infer that the edition exists.
 - Every request, retry and cancel is recorded under the identity that made it.
+
+## Distribution: share links, email deliveries and schedules
+
+If a tool below is not listed by your client, it is not available in that environment yet — say so and stop.
+
+### Share links (read-only link to one issued edition)
+
+- A share link opens exactly one **issued, client-audience** edition in the public viewer, read only. It never opens
+  the library, never creates editions, never sends email and never acts as the client. Draft, in-review, withdrawn and
+  internal editions are rejected with `not_ready`.
+- `create_insight_share { organizationId, editionId, expiresInDays?, downloadOutputs?, label? }`: `expiresInDays`
+  1–90 (default 30; every link expires); `downloadOutputs` is a subset of the edition outputs among `deck_pdf` and
+  `report_pdf` (empty means view only); `label` 1–120 chars to recognise it later. At most 20 active links per edition
+  (`quota_exceeded` beyond that).
+- **The link is shown once.** The answer carries the link and the token a single time; they are never stored in
+  readable form and cannot be recovered. Hand the link only to the human who asked. Never paste it into logs, tickets,
+  summaries, shared channels or tool arguments of other systems. If it is lost, revoke it and create a new one.
+- `list_insight_shares { organizationId, editionId }` shows each link's `status` (`active`, `revoked`, `expired`),
+  expiry, allowed downloads, label and `source` (`manual` or created by an email delivery). It never returns a token.
+- `revoke_insight_share { organizationId, shareGrantId }`: the next view or download through that link fails; a revoked
+  link is never reactivated; revoking twice answers `idempotent: true`. Files already downloaded cannot be revoked —
+  say so when you report. Withdrawing an edition revokes all of its links automatically.
+- A visit to a link is never evidence that a person read the report. Do not claim it.
+- `service_unavailable` with code `sharing_disabled` means sharing is off in this runtime: report it and stop.
+
+### Email deliveries (read only)
+
+- Sending an edition by email, cancelling, retrying and reconciling a delivery are **human actions in the Greenhouse
+  portal**, not MCP. If a human asks you to send, explain that and offer to prepare the list of recipients and the
+  subject for them to confirm there.
+- `list_insight_deliveries { organizationId, editionId }` and `get_insight_delivery { organizationId, deliveryIntentId }`
+  show the modality (`share_link`: each person receives a personal link; `attachment`: the PDF travels in the email),
+  the delivery state (`pending`, `dispatching`, `completed`, `partially_failed`, `failed`, `cancelled`) and, per
+  recipient, a masked address, `state`, `skipReason` and `transportStatus`.
+- **Accepted ≠ delivered ≠ read.** `accepted` means the email provider took the message; `delivered` is a separate
+  provider signal; nothing in these tools means a person read it. Report exactly the status you see.
+- **`ambiguous` means unresolved**: the outcome of the send is unknown and nothing will be resent until a person
+  reconciles it against the email records. Report it as unresolved — never as sent, never as failed.
+- A `skipped` recipient carries its reason (`duplicate_delivery`, `recipient_inactive`, `recipient_undeliverable`,
+  `email_type_paused`, `asset_unavailable`, `edition_unavailable`); report it verbatim. `partially_failed` means some
+  recipients were accepted and others failed: report both groups.
+
+### Schedules (read only)
+
+- Creating, activating, pausing and retiring a recurring schedule are **human actions in the Greenhouse portal**, not MCP.
+- `list_insight_schedules { organizationId }` and `get_insight_schedule { organizationId, scheduleId }` show cadence
+  (`weekly`, `monthly`), IANA time zone, consolidation days, state (`draft`, `active`, `paused`, `retired`) with the
+  pause reason, the request template and the latest occurrences with the edition each one produced.
+- **Occurrences stop at review.** Each occurrence creates the edition for a closed period and requests its rendering,
+  then waits in review: the review policy is always `draft_for_review`. Nothing is issued or emailed automatically —
+  never tell a human that a scheduled report "went out".
+- Occurrence states: `pending`, `generating`, `generated`, `render_requested`, `failed`, `skipped`. A schedule paused
+  with `authority_revoked` or `module_unavailable` stopped itself; `repeated_failures` means three failures in a row.
+  Report it; reactivating is a human decision.
+
+### Distribution recipes
+
+Share an issued edition with a client contact for two weeks, deck downloadable:
+
+1. `get_insight_edition { organizationId, editionId }` → confirm it is issued and client-audience.
+2. Confirm with the human: expiry 14 days, `downloadOutputs: ["deck_pdf"]`, a label naming the recipient.
+3. `create_insight_share { organizationId, editionId, expiresInDays: 14, downloadOutputs: ["deck_pdf"], label }` →
+   hand the link to the human once, in the reply only; do not repeat it later.
+4. To cut access: `list_insight_shares` → find it by label → `revoke_insight_share`; say that already-downloaded files
+   stay with whoever downloaded them.
+
+Check whether an email delivery reached its recipients:
+
+1. `list_insight_deliveries { organizationId, editionId }` → pick the delivery.
+2. `get_insight_delivery { organizationId, deliveryIntentId }` → per recipient report `state` and `transportStatus`.
+3. Say "accepted by the email provider" or "delivered", never "read"; list `ambiguous` recipients as unresolved and
+   hand them to a person in the portal.
+
+Explain what a schedule will do next:
+
+1. `list_insight_schedules { organizationId }` → `get_insight_schedule { organizationId, scheduleId }`.
+2. Report cadence, time zone and the latest occurrences; state that each one lands in review and needs a person to
+   issue and send it.
 
 ## The request, field by field
 

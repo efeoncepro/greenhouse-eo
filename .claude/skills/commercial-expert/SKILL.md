@@ -173,6 +173,21 @@ When advising commercial decisions inside this repo, the patterns below are pre-
 
 ---
 
+## Narrativa comercial vigente (Q4 2026 – Q3 2027)
+
+El pitch del período es **«Tu IA no conoce tu negocio»**: Efeonce construye el contexto que hace que la IA trabaje
+para el negocio. Canon, mapa a servicios y reglas: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../../docs/strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md).
+
+- **Capítulo según comprador:** gerencia general/dirección comercial → 1 (lo que tu IA no sabe); RevOps/finanzas/TI
+  → 2 (datos) y 4 (equipo agéntico); marketing/digital/growth → 3 (lo que la IA dice de ti); marketing/marca → 5
+  (campañas en días, con tu marca). La capa de resultados cierra toda conversación.
+- **Cifras de HubSpot** (3,6× MQL, 3,2× deals, 81 % más campañas…): se usan atribuidas a HubSpot; en una propuesta
+  concreta no se presentan como resultado garantizado por Efeonce.
+- **Salesforce:** contraste agentic team vs. digital labor sólo en conversación u orgánico, con respeto; Efeonce es
+  partner de ambos y el ángulo es provider-fit.
+- **Entrada:** evaluación RevOps, chequeo de salud de datos, Radiografía AEO, taller de equipo agéntico o Creative
+  Diagnostic; la expansión sigue el §4 del canon.
+
 ## Hard rules (Greenhouse-specific commercial)
 
 - **NUNCA** proponer pricing change sin validar contra Loaded Cost Model + Bow-tie metrics impact

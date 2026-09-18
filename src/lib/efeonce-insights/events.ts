@@ -151,3 +151,93 @@ export const publishInsightRenderOutputFailed = (client: OutboxClient, payload: 
     client
   )
 
+
+// ── TASK-1848 — sharing por enlace ──────────────────────────────────────────────────────────
+
+export type InsightShareCreatedPayload = {
+  version: 1
+  shareGrantId: string
+  editionId: string
+  organizationId: string
+  expiresAt: string
+  downloadOutputs: string[]
+  source: 'manual' | 'delivery'
+  actorKind: InsightActorKind
+}
+
+export type InsightShareRevokedPayload = {
+  version: 1
+  shareGrantId: string
+  editionId: string
+  organizationId: string
+  reason: string
+  actorKind: InsightActorKind
+}
+
+export const publishInsightShareCreated = (client: OutboxClient, payload: InsightShareCreatedPayload) =>
+  publishOutboxEvent(
+    { aggregateType: AGGREGATE_TYPES.insightShareGrant, aggregateId: payload.shareGrantId, eventType: EVENT_TYPES.insightShareCreated, payload },
+    client
+  )
+
+export const publishInsightShareRevoked = (client: OutboxClient, payload: InsightShareRevokedPayload) =>
+  publishOutboxEvent(
+    { aggregateType: AGGREGATE_TYPES.insightShareGrant, aggregateId: payload.shareGrantId, eventType: EVENT_TYPES.insightShareRevoked, payload },
+    client
+  )
+
+// ── TASK-1848 — envío por correo ────────────────────────────────────────────────────────────
+
+export type InsightDeliveryRequestedPayload = {
+  version: 1
+  deliveryIntentId: string
+  editionId: string
+  organizationId: string
+  modality: string
+  recipientCount: number
+  /** `initial` al autorizar; `retry` cuando un humano re-encola los fallidos. */
+  reason: 'initial' | 'retry'
+  actorKind: InsightActorKind
+}
+
+export const publishInsightDeliveryRequested = (client: OutboxClient, payload: InsightDeliveryRequestedPayload) =>
+  publishOutboxEvent(
+    { aggregateType: AGGREGATE_TYPES.insightDeliveryIntent, aggregateId: payload.deliveryIntentId, eventType: EVENT_TYPES.insightDeliveryRequested, payload },
+    client
+  )
+
+// ── TASK-1848 — recurrencia ─────────────────────────────────────────────────────────────────
+
+export type InsightScheduleChangedPayload = {
+  version: 1
+  scheduleId: string
+  organizationId: string
+  state: string
+  scheduleVersion: number
+  /** Motivo cuando lo pausa el sistema (autoridad revocada, módulo retirado, fallos repetidos). */
+  reason?: string
+  actorKind: InsightActorKind
+}
+
+export type InsightScheduleOccurrenceGeneratedPayload = {
+  version: 1
+  occurrenceId: string
+  scheduleId: string
+  organizationId: string
+  periodStart: string
+  periodEndExclusive: string
+  editionId: string
+  renderRunId: string | null
+}
+
+export const publishInsightScheduleChanged = (client: OutboxClient, payload: InsightScheduleChangedPayload) =>
+  publishOutboxEvent(
+    { aggregateType: AGGREGATE_TYPES.insightSchedule, aggregateId: payload.scheduleId, eventType: EVENT_TYPES.insightScheduleChanged, payload },
+    client
+  )
+
+export const publishInsightScheduleOccurrenceGenerated = (client: OutboxClient, payload: InsightScheduleOccurrenceGeneratedPayload) =>
+  publishOutboxEvent(
+    { aggregateType: AGGREGATE_TYPES.insightSchedule, aggregateId: payload.scheduleId, eventType: EVENT_TYPES.insightScheduleOccurrenceGenerated, payload },
+    client
+  )

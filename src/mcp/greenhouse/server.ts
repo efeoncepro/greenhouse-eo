@@ -987,6 +987,116 @@ export const createGreenhouseMcpServer = (
     async args => handlers.cancelInsightRender(args as { organizationId?: string; renderRunId: string })
   )
 
+  // TASK-1848 — enlaces compartidos. Crear/revocar exige binding interno; ningún binding envía correo.
+  collector.registerTool(
+    'create_insight_share',
+    {
+      title: 'Create Insight Share Link',
+      description:
+        'Create a read-only share link (ShareGrant) for an ISSUED client-audience Efeonce Insights edition. THIS WRITES. Only internal bindings may call it; draft, in-review, withdrawn and internal-audience editions are rejected (not_ready). The link opens only that edition on the public viewer: it never opens the library, creates editions, sends email or acts as the client. Optional: expiresInDays (1-90, default 30), downloadOutputs (subset of the edition outputs among deck_pdf and report_pdf; empty means view only) and a label. The link is returned ONCE and cannot be recovered later: hand it to the human who asked and never paste it into logs, tickets or shared channels. Up to 20 active links per edition (quota_exceeded beyond that). A service_unavailable with code sharing_disabled means sharing is off in this runtime — report it and stop.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        editionId: z.string().trim().min(1),
+        expiresInDays: z.number().int().min(1).max(90).optional(),
+        downloadOutputs: z.array(z.enum(['deck_pdf', 'report_pdf'])).optional(),
+        label: z.string().trim().min(1).max(120).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.createInsightShare(args as { organizationId?: string; editionId: string; expiresInDays?: number; downloadOutputs?: string[]; label?: string })
+  )
+
+  collector.registerTool(
+    'list_insight_shares',
+    {
+      title: 'List Insight Share Links',
+      description:
+        'List the share links of one Efeonce Insights edition with their status (active, revoked, expired), expiry, allowed downloads and source (manual or delivery). Never returns a token: a lost link cannot be recovered, only revoked and replaced. Access logs are not reading evidence — a hit is never proof that a person read the report.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        editionId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.listInsightShares(args as { organizationId?: string; editionId: string })
+  )
+
+  collector.registerTool(
+    'revoke_insight_share',
+    {
+      title: 'Revoke Insight Share Link',
+      description:
+        'Revoke one share link. THIS WRITES. The next read and the next download through that link fail (410); a revoked link is never reactivated — create a new one if access must be restored. Files already downloaded cannot be revoked; say so when reporting. Idempotent: revoking twice answers idempotent=true. Only internal bindings may call it.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        shareGrantId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.revokeInsightShare(args as { organizationId?: string; shareGrantId: string })
+  )
+
+  // TASK-1848 — envíos por correo: lectura. Solicitar/cancelar/reintentar/reconciliar no existen por MCP.
+  collector.registerTool(
+    'list_insight_deliveries',
+    {
+      title: 'List Insight Deliveries',
+      description:
+        'List the email deliveries of one Efeonce Insights edition: modality (share_link, attachment), state (pending, dispatching, completed, partially_failed, failed, cancelled) and per-recipient state with the transport status read from the email ledger. accepted means the provider took the message; delivered is a separate provider signal; neither proves a person read the report. Sending, cancelling, retrying and reconciling are human actions in the Greenhouse portal and are not available through MCP.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        editionId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.listInsightDeliveries(args as { organizationId?: string; editionId: string })
+  )
+
+  collector.registerTool(
+    'get_insight_delivery',
+    {
+      title: 'Get Insight Delivery',
+      description:
+        'Read one email delivery of an Efeonce Insights edition with masked recipients, per-recipient state (pending, claimed, accepted, failed, ambiguous, skipped, cancelled), skip reason and transport status. ambiguous means the outcome is unknown and nothing will be resent until a person reconciles it against the email ledger — report it as unresolved, never as sent or failed.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        deliveryIntentId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getInsightDelivery(args as { organizationId?: string; deliveryIntentId: string })
+  )
+
+  // TASK-1848 — recurrencia: lectura. Crear/activar/pausar/retirar no existen por MCP.
+  collector.registerTool(
+    'list_insight_schedules',
+    {
+      title: 'List Insight Schedules',
+      description:
+        'List the recurring Efeonce Insights schedules of an organization: cadence (weekly, monthly), IANA time zone, consolidation days, state (draft, active, paused, retired) with the pause reason, and their latest occurrences. Each occurrence generates an edition and requests its rendering, then stops at human review: nothing is issued or emailed automatically. Creating, activating, pausing and retiring are human actions in the Greenhouse portal and are not available through MCP.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.listInsightSchedules(args as { organizationId?: string })
+  )
+
+  collector.registerTool(
+    'get_insight_schedule',
+    {
+      title: 'Get Insight Schedule',
+      description:
+        'Read one recurring Efeonce Insights schedule with its request template, review policy (always draft_for_review), catch-up limit and recent occurrences (pending, generating, generated, render_requested, failed, skipped) with the edition each one produced. A paused schedule with reason authority_revoked or module_unavailable stopped itself: report it, do not work around it.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        scheduleId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getInsightSchedule(args as { organizationId?: string; scheduleId: string })
+  )
+
   // ── El registro: una pasada por el manifiesto, en su orden ────────────────
   const coverage = computeGreenhouseMcpToolCoverage({
     manifest: GREENHOUSE_MCP_TOOL_MANIFEST,

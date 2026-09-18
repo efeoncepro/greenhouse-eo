@@ -57,14 +57,22 @@ en NLE para no introducir judder al mezclar motores.
 ## Costo por resolución: fal cobra por escalón
 
 🔴 **El precio del registro (`fal-capabilities.ts`, API de pricing) es el escalón MÁS BAJO**, no el de la resolución
-por defecto. Presupuesta por la resolución que realmente pides y confirma con `pnpm ai:fal --balance` antes y después
-de la corrida. USD por segundo de salida, publicado 2026-09-16 [oficial fal/BFL]:
+por defecto del proveedor. Presupuesta por la resolución que realmente pides y confirma con `pnpm ai:fal --balance`
+antes y después de la corrida.
 
-| Familia | 480p / 480P | 720p / 768P | 1080p / 1080P | 2K | 4K | Default del endpoint |
+**El CLI ya estima y confirma** (desde 2026-09-16, commit `17196ead1`): antes de encolar imprime
+`$ costo estimado ≈ USD X · base del cálculo` con las tablas de abajo (Seedance por la fórmula de tokens; H3, Wan y
+Flux 3 por escalón publicado; entrenadores por step con mínimo de 100). Si supera el tope (USD 1; env
+`FAL_COST_CONFIRM_USD`; flag `--max-usd <n>`) se detiene sin encolar y pide `--yes`. Con `--duration auto` en
+Seedance estima el máximo del contrato: pasa `--duration`. **Sin `--resolution`, el CLI envía la resolución más
+barata del endpoint y lo avisa**: la columna «Default del endpoint» es el default del proveedor, que ya no se
+hereda; para la toma final pasa `--resolution` explícito. La estimación es orientativa (tablas al 2026-09-16). USD por segundo de salida, publicado 2026-09-16 [oficial fal/BFL]:
+
+| Familia | 480p / 480P | 720p / 768P | 1080p / 1080P | 2K | 4K | Default del proveedor |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Wan 3.0 | 0,05 | 0,10 | **0,20** | — | — | **1080p** (4× lo registrado) |
+| Wan 3.0 | 0,05 | 0,10 | **0,20** | — | — | **1080p** (4× lo registrado; el CLI envía 480p sin flag) |
 | Wan 3.0 Prime | 0,068 | 0,14 | **0,28** | — | — | 1080p (**más cara** que base en fal) |
-| H3 base | 0,05 | 0,06 (768P) | — | **0,13** | 0,16 | **2K** (2,6× lo registrado) |
+| H3 base | 0,05 | 0,06 (768P) | — | **0,13** | 0,16 | **2K** (2,6× lo registrado; el CLI envía 480P sin flag) |
 | H3 Max (fal rotula "50% off") | 0,025 | 0,04 (768P) | 0,08 | — | — | 768P; si es promo o lista: ambiguo |
 | H3 Max Turbo | no listado | 0,02 (promo 0,01) | 0,04 (promo 0,02) | — | — | registro 0,0125 no calza → medir |
 | Flux 3 final (t2v/i2v/flf/keyframes) | — | 0,17 | 0,29 | — | — | 720p |
@@ -73,7 +81,8 @@ de la corrida. USD por segundo de salida, publicado 2026-09-16 [oficial fal/BFL]
 | Seedance 2.0 base · fast · mini · us | mini ≈0,0721 · us 0,1731 | base 0,3024 · fast 0,2419 · mini ≈0,1547 · us 0,37 | por fórmula | — | por fórmula | — |
 
 ⚠️ **Flux 3: precio publicado ≠ registrado.** BFL y fal publican 0,17/s final, 0,06 draft y 0,41 extend; el registro
-dice 0,085 / 0,03 / 0,205 (exactamente la mitad). Por qué: sin dato. Hasta medir, presupuesta con el publicado.
+dice 0,085 / 0,03 / 0,205 (exactamente la mitad). Por qué: sin dato. La estimación del CLI usa el publicado; confirma
+con `--balance`.
 
 **Seedance se estima con la fórmula de fal** (corrige "estimar por tokens falla ~2×"; lo que fallaba era la
 equivalencia de OpenArt, que subestima ~2×):
@@ -101,7 +110,8 @@ cuadros se descartan en silencio**.
 
 Seedance se opera con el CLI `pnpm ai:fal` (`scripts/ai/fal-image.ts`, registro en `src/lib/ai/fal-capabilities.ts`),
 out-of-band y nunca runtime del producto. No armar scripts ad-hoc sobre `runFalModel`. `pnpm ai:fal --list` es
-gratis; cualquier corrida con `--capability` gasta, y fal no devuelve `usage`: el CLI no reporta costo por corrida.
+gratis; cualquier corrida con `--capability` gasta, y fal no devuelve `usage`: el CLI no reporta costo real por
+corrida, pero sí imprime la estimación previa y pide `--yes` sobre el tope (ver §Costo por resolución).
 El CLI opera dos cuentas de fal con failover por saldo (`pnpm ai:fal --balance` las lista gratis); el detalle vive en
 `greenhouse-ai-image-generator` y en `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md`.
 
@@ -171,9 +181,9 @@ pnpm ai:fal --capability h3max-camera --image kv.png --camera-trajectory '[{"dis
 | --- | --- | --- | --- |
 | **Max Turbo** (`h3turbo-t2v`, `h3turbo-i2v`) | 480P · 768P · 1080P | registro 0,0125 / s; publicado 768P 0,02 · 1080P 0,04 (ver §Costo por resolución) | Divergencia barata y rápida: explorar movimiento/actuación antes de subir de tier |
 | **Max** (`h3max-t2v`, `h3max-i2v`, `h3max-r2v`, `h3max-camera`) — post-entrenado **por fal** (2026-08-27), no un modelo de MiniMax; su 1080P se refina desde 768P | 480P · 768P · 1080P | 0,025 / s en 480P; 768P 0,04 · 1080P 0,08 | `h3max-camera`: **control de cámara real sobre una imagen congelada** (la escena no se mueve, sólo la cámara; hasta 12 keyframes `{distance, elevation -90..90, azimuth, time 0..1}`) |
-| **Base** (`h3-t2v`, `h3-i2v`, `h3-r2v`) | 480P · 768P · **2K · 4K** (default 2K) | 0,05 / s en 480P; **2K 0,13** · 4K 0,16 | Única H3 con 2K/4K, pero **reescalados desde 768P** (no nativos) |
+| **Base** (`h3-t2v`, `h3-i2v`, `h3-r2v`) | 480P · 768P · **2K · 4K** (default del proveedor 2K; el CLI envía 480P sin `--resolution`) | 0,05 / s en 480P; **2K 0,13** · 4K 0,16 | Única H3 con 2K/4K, pero **reescalados desde 768P** (no nativos) |
 | **LoRA** (`h3-{t2v,i2v,r2v}-lora`) | como base | 0,0625 / s | Consistencia de marca/personaje con una LoRA propia (`--lora <path[@scale]>`, hasta 3, scale 0–4). **Sin verificar** |
-| **Entrenadores** (`h3-train-{t2v,i2v,flf2v,ref2va}`) | — | t2v 0,005 / step (2000 ≈ USD 10) · ref2va 0,015 / step (≈ USD 30); **mínimo 100 steps facturables** | Producir esa LoRA: `--training-data <zip\|url>`, `--steps`, `--rank`, `--learning-rate`, `--trigger`. **Sin verificar**; timeout default 3 h. Sin flag para `weight_name`, `split_input_duration_threshold` ni la regla `number_of_frames % 17 == 5`: usar `--input` |
+| **Entrenadores** (`h3-train-{t2v,i2v,flf2v,ref2va}`) | — | t2v 0,005 / step (2000 ≈ USD 10) · ref2va 0,015 / step (≈ USD 30); **mínimo 100 steps facturables** | Producir esa LoRA: `--training-data <zip\|url>`, `--steps`, `--rank`, `--learning-rate`, `--trigger`, `--frames <n>` (22–124, `% 17 == 5`), `--split-threshold <s>` (1–60), ambos validados también por `--input`. **Sin verificar**; timeout default 3 h. LoRA en inferencia: `--lora <path>[@escala][#weight_name]` |
 
 Límites que cambian la decisión (difieren de Seedance en la **forma** de los campos; el CLI valida antes de gastar):
 
@@ -276,13 +286,13 @@ Contrato (leído del OpenAPI 2026-09-16, igual en base y Prime; el CLI valida an
   Alibaba ofrece edición, extensión y multi-shot de Wan 3.0, pero **fal no los expone**.
 - **Duración:** entero 2–30 s (default 5) o `--duration auto` (se envía `null`: **duración inteligente**, el modelo
   elige el largo según prompt y referencias).
-- **Resolución:** `480p` | `720p` | `1080p`, **default 1080p** (el más caro de explorar: pasa `--resolution 480p` al
-  divergir). **Aspecto:** `adaptive` (default), `16:9`, `4:3`, `1:1`, `3:4`, `9:16`.
+- **Resolución:** `480p` | `720p` | `1080p`; default del proveedor 1080p, pero sin `--resolution` el CLI envía 480p y
+  lo avisa (para la toma final pasa `720p` o `1080p` explícito). **Aspecto:** `adaptive` (default), `16:9`, `4:3`, `1:1`, `3:4`, `9:16`.
 - **Audio:** genera audio por defecto (campo `audio`, no `generate_audio`); `--no-audio` lo apaga.
 - **Expansión de prompt:** activa por defecto; `--no-prompt-expansion` la apaga (ahorra ~20–60 s, puede bajar calidad).
   Es un booleano, distinto del `--prompt-expansion <modo>` de H3. La salida trae `actual_prompt` (prompt reescrito),
   `duration` y `seed`; el CLI muestra un extracto.
-- **Razonamiento:** `--thinking` (default apagado). **Semilla:** `--seed <n>` (entero ≥ 0).
+- **Razonamiento:** `--thinking` (default apagado). **Semilla:** `--seed <n>` (entero ≥ 0; Wan la declara en sus 6 endpoints, y el CLI la rechaza donde el OpenAPI no la declara).
 - **`i2v`:** `--image` = primer cuadro, `--end-image` opcional, prompt opcional.
 - **`r2v`:** hasta **10 `--image`, 5 `--video`** (≤ 15 s en total, ≥ 16 fps) y **5 `--audio`** (≤ 15 s); se citan
   **por posición** en el prompt (`Image 1`, `Video 1`), no con `@Image1` como Seedance. Prompt opcional. También puede

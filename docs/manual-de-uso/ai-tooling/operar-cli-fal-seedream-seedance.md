@@ -1,9 +1,9 @@
 # Operar el CLI de fal: Seedream 5, Seedance 2.5/2.0, Minimax H3, Flux 3 y Wan 3.0
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.7
+> **Version:** 1.9
 > **Creado:** 2026-09-16 por agente
-> **Ultima actualizacion:** 2026-09-16 por Claude — nuevo paso «Elige el modelo antes de correr» con enlace a la guía canónica de selección; costos por escalón de resolución (Wan 3.0 1080p y H3 base 2K por defecto; Wan 3.0 Prime más cara; Flux 3 publicado al doble; fórmula de tokens de Seedance); piso de 100 steps en LoRA; brechas conocidas del CLI (JPEG con `.png` en Seedream Pro sin `--format`, `--seed` en endpoints que no lo declaran, más de 10 `--image`). Antes: limpieza de estados superados: el bloqueo por saldo quedó resuelto con dos cuentas (`--balance`, `--detach`/`--status`), Wan 3.0 y Seedance 2.5 video a video verificados, espera de video 30 min; antes, Wan 3.0 y Wan 3.0 Prime (texto, imagen y referencias a video; `--duration auto`, `--thinking` con `--web-url`/`--file`, `--no-prompt-expansion`, `--seed`), advertencia de saldo agotado en fal y 403 `Exhausted balance`; antes, Flux 3 (draft → enhance, primer/ultimo cuadro, keyframes, edit y extend) y video a video con Seedance 2.5 (`--task editing|extension`, sin verificar); antes, Minimax H3 (video, camera-controls, LoRA y entrenamiento), retome por `--request-id` y cierre de la brecha de `--task`
+> **Ultima actualizacion:** 2026-09-16 por Claude — (1.9) el mismo comando opera **Higgsfield** (`--capability hf-*` o `--provider higgsfield`): 44 modelos, precio exacto antes de gastar, `--estimate`, `--cancel`; la cuenta de API todavía no tiene créditos. Antes (1.8) el comando estima el costo antes de encolar y pide `--yes` sobre el tope (`--max-usd`, `FAL_COST_CONFIRM_USD`); sin `--resolution` usa la resolución más barata; Seedream Pro guarda el formato real; `--seed` sólo donde el modelo lo declara; más de 10 `--image` se rechaza; flags nuevos `--lora …#weight_name`, `--frames`, `--split-threshold` (commit `17196ead1`). Antes (1.7): nuevo paso «Elige el modelo antes de correr» con enlace a la guía canónica de selección; costos por escalón de resolución (Wan 3.0 1080p y H3 base 2K por defecto; Wan 3.0 Prime más cara; Flux 3 publicado al doble; fórmula de tokens de Seedance); piso de 100 steps en LoRA; brechas conocidas del CLI (JPEG con `.png` en Seedream Pro sin `--format`, `--seed` en endpoints que no lo declaran, más de 10 `--image`). Antes: limpieza de estados superados: el bloqueo por saldo quedó resuelto con dos cuentas (`--balance`, `--detach`/`--status`), Wan 3.0 y Seedance 2.5 video a video verificados, espera de video 30 min; antes, Wan 3.0 y Wan 3.0 Prime (texto, imagen y referencias a video; `--duration auto`, `--thinking` con `--web-url`/`--file`, `--no-prompt-expansion`, `--seed`), advertencia de saldo agotado en fal y 403 `Exhausted balance`; antes, Flux 3 (draft → enhance, primer/ultimo cuadro, keyframes, edit y extend) y video a video con Seedance 2.5 (`--task editing|extension`, sin verificar); antes, Minimax H3 (video, camera-controls, LoRA y entrenamiento), retome por `--request-id` y cierre de la brecha de `--task`
 > **Modulo:** AI Tooling / Asset Generation
 > **Comando:** `pnpm ai:fal`
 > **Documentacion tecnica:** [GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md](../../architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) §Carril operativo
@@ -25,6 +25,10 @@ Para generar desde la terminal, a traves de fal.ai:
 - **video con Wan 3.0 y Wan 3.0 Prime**: desde texto, desde una imagen (con ultimo cuadro opcional) o desde
   referencias, de 2 a 30 s o con largo elegido por el modelo, y desde referencias puede **basarse en una pagina web
   o un documento**. Las 6 opciones estan verificadas (2026-09-16).
+
+Desde el 2026-09-16 el mismo comando habla también con **Higgsfield** (ver "Usar Higgsfield desde el mismo comando"):
+SOUL 2, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Recraft 4.1 (SVG sin confirmar), PixVerse 6, LTX 2.5,
+Happy Horse, Kling 3.0/Omni/O3, Grok Imagine y otra vía para Seedance, Wan y MiniMax.
 
 Es un comando **hermano** de `pnpm ai:image`, no su reemplazo: para GPT Image se sigue usando `ai:image`. Todo lo
 que produce es trabajo fuera del portal; nada se genera en tiempo real para usuarios.
@@ -59,17 +63,37 @@ Antes de correr, confirma también el **costo a la resolución que vas a pedir**
 
 - **fal cobra por escalón de resolución.** Los precios de las tablas de abajo (y del registro) son el escalón **más
   bajo**, no el de la resolución por defecto. Tabla completa: catálogo técnico §Precios por escalón de resolución.
-- ⚠️ **Wan 3.0 sale en 1080p si no pasas `--resolution`**: USD 0,20/s en base y 0,28/s en Prime (4× el
-  480p de cada línea). Un clip de 30 s a 1080p en base cuesta USD 6,00.
-- ⚠️ **H3 base sale en 2K si no pasas `--resolution`**: USD 0,13/s (2,6× lo de 480P). Además su 2K y 4K son
+- **Sin `--resolution`, el comando usa la resolución más barata** del modelo y lo avisa
+  (`· sin --resolution: uso 480p, la más barata de "wan3-t2v"…`). Sirve para explorar; para la toma final pasa
+  `--resolution` explícito. Referencia de escalones caros: Wan 3.0 1080p cuesta USD 0,20/s en base y 0,28/s en Prime
+  (4× el 480p; 30 s a 1080p en base = USD 6,00); H3 base 2K cuesta USD 0,13/s (2,6× lo de 480P) y su 2K y 4K son
   reescalados desde 768P, no nativos.
 - **Flux 3:** fal y Black Forest Labs publican el doble de lo registrado (final 0,17/s a 720p, borrador 0,06/s,
   extend 0,41/s a 720p). Presupuesta con el publicado.
 - **Seedance:** calcula con la fórmula de fal, que calzó con el gasto real:
   `tokens = alto × ancho × segundos × 24 / 1024` y `costo = tokens × precio_por_1000 / 1000` (por 1.000 tokens: 2.5
   USD 0,0214 · 2.0 base 0,014 · fast 0,0112 · mini 0,007 · us 0,0168). La equivalencia de OpenArt subestima ~2×.
-- Cuando el precio no esté confirmado, corre una prueba corta y mira `pnpm ai:fal --balance` antes y después. El
-  comando **no estima el costo** antes de gastar.
+- **El comando estima el costo antes de encolar.** Imprime `$ costo estimado ≈ USD X · <base del cálculo>` con las
+  mismas reglas de arriba (Seedance por tokens; H3, Wan y Flux 3 por escalón publicado; Seedream por imagen según
+  área; layerize por capa, sin total; entrenadores por step con mínimo de 100).
+- **Si la estimación supera el tope, se detiene antes de encolar** y pide confirmación. El tope por defecto es
+  USD 1; cámbialo para una corrida con `--max-usd <n>` o para tu sesión con la variable `FAL_COST_CONFIRM_USD`.
+  Confirma con `--yes`:
+
+  ```bash
+  pnpm ai:fal --capability wan3-t2v --prompt "<escena>" --duration 10 --resolution 1080p \
+    --out ai-generations/2026-09-16_mi-pieza/wan3.mp4
+  # $ costo estimado ≈ USD 2.00 · …  → se detiene: supera el tope de USD 1.00
+  pnpm ai:fal --capability wan3-t2v --prompt "<escena>" --duration 10 --resolution 1080p --yes \
+    --out ai-generations/2026-09-16_mi-pieza/wan3.mp4
+  ```
+
+- **Pasa `--duration` en Seedance.** Con `auto` o sin duración, la estimación usa el máximo del modelo (30 s en 2.5:
+  a 480p ≈ USD 6,45) y probablemente te pedirá `--yes` sin necesidad.
+- Si no puede estimar (un `--model` fuera del registro o faltan datos), lo avisa y **no** bloquea.
+- La estimación es orientativa (tablas de precio al 2026-09-16). Cuando el precio no esté confirmado, corre una
+  prueba corta y mira `pnpm ai:fal --balance` antes y después. Los archivos locales se suben antes de estimar; subir
+  no cobra.
 
 ### 2. Elige la capacidad
 
@@ -118,7 +142,7 @@ Minimax H3 tiene otros limites y otra forma de escribirlos:
 
 | Familia H3 | Duracion | Resoluciones (en mayusculas) | Precio fal 2026-09-16 (USD / s por resolucion) |
 |---|---|---|---|
-| H3 base (`h3-*`) | 5 a 15 s, entero, sin `auto` | `480P`, `768P`, `2K`, `4K` (**default `2K`**; 2K y 4K reescalados desde 768P) | 480P 0,05 · 768P 0,06 · **2K 0,13** · 4K 0,16 (con LoRA el registro dice 0,0625 como minimo) |
+| H3 base (`h3-*`) | 5 a 15 s, entero, sin `auto` | `480P`, `768P`, `2K`, `4K` (sin flag el comando envía `480P`; el proveedor usaría `2K`; 2K y 4K reescalados desde 768P) | 480P 0,05 · 768P 0,06 · **2K 0,13** · 4K 0,16 (con LoRA el registro dice 0,0625 como minimo) |
 | H3 Max (`h3max-*`) | 5 a 15 s | `480P`, `768P`, `1080P` (default `768P`; camera-controls `480P`; 1080P refinado desde 768P) | 480P 0,025 · 768P 0,04 · 1080P 0,08 (rotulados «50% off»: sin dato si es promocion) |
 | H3 Max Turbo (`h3turbo-*`) | 5 a 15 s | `480P`, `768P`, `1080P` (default `768P`) | registro 0,0125; publicado 768P 0,02 · 1080P 0,04 (promo 0,01 / 0,02): medir |
 
@@ -154,18 +178,18 @@ Wan 3.0 y Wan 3.0 Prime comparten contrato (OpenAPI de fal, 2026-09-16), **no pr
 
 | Wan 3.0 | Duracion | `--resolution` | `--aspect` | Precio fal 2026-09-16 (USD / s) |
 |---|---|---|---|---|
-| `wan3-*` | 2 a 30 s (entero) o `auto` (default 5) | `480p`, `720p`, `1080p` (**default `1080p`**) | `adaptive` (default), `16:9`, `4:3`, `1:1`, `3:4`, `9:16` | 480p 0,05 · 720p 0,10 · **1080p 0,20** |
+| `wan3-*` | 2 a 30 s (entero) o `auto` (default 5) | `480p`, `720p`, `1080p` (sin flag el comando envía `480p`; el proveedor usaría `1080p`) | `adaptive` (default), `16:9`, `4:3`, `1:1`, `3:4`, `9:16` | 480p 0,05 · 720p 0,10 · **1080p 0,20** |
 | `wan3prime-*` | igual | igual | igual | 480p 0,068 · 720p 0,14 · **1080p 0,28** |
 
-- ⚠️ **Si no pasas `--resolution`, sale en 1080p**, que es la opcion mas lenta y **4× mas cara** que 480p. Para
-  explorar, pide `480p` o `720p`.
+- Si no pasas `--resolution`, el comando envía `480p` y lo avisa. Para entrega pide `720p` o `1080p` explícito:
+  1080p es la opción más lenta y **4× más cara** que 480p.
 - Prime es la version **acelerada** segun Alibaba y cuesta mas que base; que tenga mejor calidad no esta medido.
   Salida a 30 fps.
 - `--duration auto` deja que el modelo elija el largo segun el prompt y las referencias (en la corrida verificada
   eligio 5,04 s).
 - Sale con sonido por defecto; `--no-audio` lo apaga. No acepta `--bitrate` ni `--prompt-expansion <modo>`.
 - `--no-prompt-expansion` hace que use tu prompt tal cual (segun el proveedor ahorra 20 a 60 s, pero puede bajar la
-  calidad). `--thinking` activa el razonamiento previo. `--seed <n>` (entero >= 0) fija la semilla.
+  calidad). `--thinking` activa el razonamiento previo. `--seed <n>` (entero >= 0) fija la semilla (Wan la declara en sus 6 capacidades).
 - Referencias (`r2v`): hasta 10 `--image`, 5 `--video` (sumados hasta 15 s, al menos 16 fps) y 5 `--audio` (hasta
   15 s). Se citan en el prompt por posicion: «the subject in Image 1 walks past Video 1».
 - Estado: las 6 capacidades verificadas el 2026-09-16 (`wan3-t2v` primero; las otras 5 con la segunda cuenta de fal).
@@ -175,22 +199,26 @@ Wan 3.0 y Wan 3.0 Prime comparten contrato (OpenAPI de fal, 2026-09-16), **no pr
 Imagen desde texto:
 
 ```bash
-pnpm ai:fal --capability seedream5-pro --prompt "<descripcion>" --format png --out ai-generations/2026-09-16_mi-pieza/kv.png
+pnpm ai:fal --capability seedream5-pro --prompt "<descripcion>" --out ai-generations/2026-09-16_mi-pieza/kv.png
 ```
 
 Edicion con referencias (los archivos locales se suben solos al storage de fal):
 
 ```bash
 pnpm ai:fal --capability seedream5-pro-edit --image base.png --image referencia.png \
-  --prompt "<que cambia; conserva el resto>" --format png --out ai-generations/2026-09-16_mi-pieza/kv-v2.png
+  --prompt "<que cambia; conserva el resto>" --out ai-generations/2026-09-16_mi-pieza/kv-v2.png
 ```
 
-- ⚠️ **Seedream 5 Pro entrega JPEG por defecto.** Sin `--format png`, `--out kv.png` guarda un JPEG con extension
-  `.png` (brecha conocida). Pasa `--format png` o nombra el archivo `.jpg`.
+- **El formato sale de la extensión de `--out`.** Seedream 5 Pro entrega JPEG por defecto, así que el comando pide
+  PNG si nombras `.png` y JPEG si nombras `.jpg`/`.jpeg`; otra extensión se rechaza antes de gastar. Al descargar
+  revisa el formato real del archivo y, si no coincide, lo guarda con la extensión correcta y avisa
+  (`⚠ el archivo real no coincide con la extensión pedida…`). `--format` también sirve en Pro; en Seedream Lite se
+  rechaza (Lite siempre entrega PNG).
 - **Seedream 5 Pro llega hasta 2048×2048, no a 4K.** Para mas area usa `seedream5-lite` (hasta 4096² segun el
   schema; la ficha dice 3072²).
-- ⚠️ **Con mas de 10 `--image`, fal usa solo las ultimas 10** sin avisar (y Pro cobra USD 0,0045 por cada
-  referencia adicional). Ordena las referencias pensando en eso.
+- **Hasta 10 `--image` en edición.** Con más, el comando se detiene antes de gastar (fal usaría sólo las últimas 10
+  sin avisar). Pro cobra USD 0,0045 por cada referencia adicional; la estimación ya lo suma.
+- `--seed` no existe en Seedream: el comando lo rechaza.
 - Layerize se cobra **por capa**: USD 0,03375 por capa hasta 1536² y 0,0675 por capa sobre eso.
 
 Separacion por capas:
@@ -245,25 +273,33 @@ pnpm ai:fal --capability h3max-camera --image escena.png \
 
 Sin `--prompt`, la escena queda congelada y sólo se mueve la camara.
 
-Con LoRA (hasta 3; `path` es una URL o un repo de Hugging Face, y la escala va de 0 a 4):
+Con LoRA (hasta 3; `path` es una URL o un repo de Hugging Face, la escala va de 0 a 4 y, si el repo trae varios
+archivos de pesos, eliges uno con `#<weight_name>`):
 
 ```bash
 pnpm ai:fal --capability h3-t2v-lora --prompt "<escena>" \
   --lora https://<url-de-la-lora>@1 --out ai-generations/2026-09-16_mi-pieza/h3-lora.mp4
+
+# Repo de Hugging Face con varios archivos de pesos
+pnpm ai:fal --capability h3-t2v-lora --prompt "<escena>" \
+  --lora <usuario>/<repo>@0.8#<archivo>.safetensors --out ai-generations/2026-09-16_mi-pieza/h3-lora-hf.mp4
 ```
 
 Entrenamiento de una LoRA (se cobra por paso, con **minimo de 100 pasos**: aunque pidas 10, pagas 100, desde USD
 0,50 en `h3-train-t2v`; con 2000 pasos ronda USD 10; `h3-train-ref2va`, USD 30). En t2v cada clip del zip necesita un
 `.txt` con su descripcion (o `--trigger` como respaldo), y **los clips de menos de 73 cuadros (~3 s) se descartan sin
-aviso**. `number_of_frames` (por `--input`) debe ser 22, 39, 56, 73, 90, 107 o 124; el CLI no lo valida:
+aviso**. Con `--frames <n>` fijas `number_of_frames`, que debe ser 22, 39, 56, 73, 90, 107 o 124, y con
+`--split-threshold <s>` (1 a 60 s) el largo sobre el que se parten los clips; el comando valida ambos, también si
+llegan por `--input`, y avisa si pides menos de 100 pasos:
 
 ```bash
 pnpm ai:fal --capability h3-train-t2v --training-data dataset.zip --steps 1500 --rank 32 \
-  --trigger "estilo efeonce" --out-dir ai-generations/2026-09-16_mi-lora
+  --trigger "estilo efeonce" --frames 73 --split-threshold 30 --out-dir ai-generations/2026-09-16_mi-lora
 ```
 
 - `--steps` de 1 a 15000 (default 2000), `--rank` `8|16|32|64|128` (default 32), `--learning-rate` de 1e-6 a 1
-  (default 2e-4). El resto de los ajustes (cuadros, frame rate, resolucion, condicionamiento) va por `--input`.
+  (default 2e-4). El resto de los ajustes (frame rate, resolucion, condicionamiento) va por `--input`. Con 1500 pasos la estimación
+  supera el tope por defecto: agrega `--yes` cuando confirmes el gasto.
 - Al terminar descarga `lora.*`, `config.*` y, si lo pediste, `debug-dataset.*`.
 - `h3max-director` **no se puede usar** con este comando: es video en vivo guiado en tiempo real, no un trabajo
   de cola. El comando lo explica y se detiene.
@@ -410,7 +446,7 @@ pnpm ai:fal --capability wan3-t2v --prompt "<texto exacto>" --no-prompt-expansio
   **documento** (`--file`) todavia no tiene corrida real.
 
 Opciones generales: `--prompt-file <path>` para prompts largos, `--size` (enum del proveedor o `WxH`), `--count`,
-`--format jpeg|png`, `--timeout <ms>`, `--json` para ver la respuesta cruda y `--request-id <id>` para retomar un
+`--format jpeg|png` (sólo Seedream Pro), `--max-usd <n>` y `--yes` (tope y confirmación de costo), `--timeout <ms>`, `--json` para ver la respuesta cruda y `--request-id <id>` para retomar un
 trabajo ya encolado.
 
 Un modelo de fal que no esta en el registro se puede correr por su slug, con los campos extra en JSON:
@@ -488,6 +524,16 @@ trabajo real.
 | `--web-url debe ser una URL pública http(s).` | La direccion no es `http(s)://`. |
 | `"<id>" no acepta --no-prompt-expansion; usa --prompt-expansion disabled.` | Usaste el flag de Wan en H3, que tiene modos. |
 | `--seed debe ser un entero >= 0.` | La semilla no es un entero positivo o cero. |
+| `"<id>" no declara seed en su contrato; quita --seed…` | Ese modelo no acepta semilla (Seedream, Seedance salvo `seedance25-r2v`, Flux 3, entrenadores). Se detuvo antes de cobrar. |
+| `"<id>" usa como máximo 10 --image…` | Pasaste más de 10 referencias a Seedream edit. Se detuvo antes de cobrar. |
+| `"<id>" no acepta --format: entrega PNG siempre.` / `--out "…": "<id>" sólo entrega jpeg o png…` | `--format` en Seedream Lite, o una extensión de `--out` que Seedream Pro no entrega. |
+| `number_of_frames "…" no es válido…` / `split_input_duration_threshold "…" debe estar entre 1 y 60…` | `--frames` o `--split-threshold` fuera de regla (también si llegaron por `--input`). |
+| `⚠ N steps: fal cobra un mínimo de 100 steps.` | Pediste menos de 100 pasos; se cobran 100. |
+| `· sin --resolution: uso <res>, la más barata…` | No pasaste `--resolution`; el comando eligió el escalón más barato. Para entrega, pásalo explícito. |
+| `$ costo estimado ≈ USD X · …` | Estimación orientativa antes de encolar. Todavía no se cobró nada. |
+| `la estimación (USD X) supera el tope de USD Y. Repite con --yes…` | Se detuvo antes de encolar. Revisa el costo; si está bien, repite con `--yes` o ajusta `--max-usd`. |
+| `$ costo: sin estimación (…)` | No pudo estimar (slug fuera del registro o faltan datos). Sigue sin bloquear: mide con `--balance`. |
+| `⚠ el archivo real no coincide con la extensión pedida: se guarda como …` | El proveedor entregó otro formato; el archivo quedó con la extensión real. |
 | `"<id>" no se puede operar desde este CLI: …` | Capacidad marcada `[NO OPERABLE POR COLA]` (hoy, `h3max-director`). |
 | `⋯ encolado · request_id <id>` | fal acepto el trabajo; desde aqui cuenta como gasto. Anota el id. |
 | `⚠ --request-id no podrá retomar este trabajo: …` | La direccion de cola de ese modelo no sigue la regla habitual; si vence el tiempo, no se podra retomar con el comando. |
@@ -497,6 +543,65 @@ trabajo real.
 | `HTTP 408` en el FATAL | Se acabo el tiempo de espera. El trabajo **sigue en fal y se cobra**; el comando imprime como retomarlo. |
 | `⚠ el output no trajo "<clave>"` | La respuesta tiene otra forma que la esperada. Repite con `--json` para verla. |
 | `✓ sin assets descargables` | El modelo respondio pero no habia archivos que bajar. |
+
+### Usar Higgsfield desde el mismo comando
+
+**Antes de empezar.** La llave vive en Secret Manager (`greenhouse-higgsfield-api-key`) y se lee con
+`HIGGSFIELD_API_KEY_SECRET_REF=greenhouse-higgsfield-api-key` en `.env.local`. Si ves `Higgsfield no está configurado`,
+falta esa línea o tu usuario no tiene acceso al secreto.
+
+1. **Mira el catálogo (gratis).** Cada capacidad empieza con `hf-`:
+
+   ```bash
+   pnpm ai:fal --list --provider higgsfield
+   ```
+
+2. **Pide el precio sin gastar.** `--estimate` valida el pedido contra el esquema real del modelo, consulta el precio
+   al proveedor e imprime el cuerpo que se enviaría. No encola nada:
+
+   ```bash
+   pnpm ai:fal --capability hf-kling3-std-t2v --prompt "Paper boats on a rainy street" --duration 5 --estimate
+   ```
+
+3. **Genera.** Usa los mismos flags de siempre: `--prompt`, `--image`, `--end-image`, `--video`, `--audio`,
+   `--duration`, `--resolution`, `--aspect`, `--seed`, `--count`, `--format`, `--no-audio`, `--thinking`,
+   `--web-url`, `--file`, `--no-prompt-expansion`. El comando los traduce al campo que usa cada modelo. Lo propio de un
+   modelo (estilo de SOUL, tomas de Kling, movimiento de cámara de LTX, paleta de Recraft) va por `--input '{...}'`:
+
+   ```bash
+   pnpm ai:fal --capability hf-soul2 --prompt "Editorial portrait in window light" --aspect 3:4 --out ai-generations/2026-09-16_retrato/soul2.jpg
+   ```
+
+4. **Trabajos largos.** `--detach` encola y termina. Con el `request_id` consultas (`--status`), cancelas mientras siga
+   en cola (`--cancel`, se reembolsa) o descargas (`--request-id <id>` con la misma capacidad):
+
+   ```bash
+   pnpm ai:fal --provider higgsfield --request-id <id> --status
+   pnpm ai:fal --provider higgsfield --request-id <id> --cancel
+   pnpm ai:fal --capability hf-seedance25-i2v --request-id <id> --out clip.mp4
+   ```
+
+**Qué significan sus señales.**
+
+| Señal | Qué significa |
+|---|---|
+| `$ costo exacto del proveedor = USD …` | Precio que dio Higgsfield para ese pedido, con el descuento vigente. |
+| `$ costo ≈ USD … (cota)` | Seedance o Wan 3.0: el proveedor sólo da la fórmula; el comando la calcula antes de descuento. |
+| `sin monto calculable` | Falta un dato para la fórmula (la duración de un video remoto). Revisa la fórmula y confirma con `--yes`. |
+| `el cuerpo no cumple el esquema` | Lista todo lo que está mal en el pedido. No se envió nada. |
+| `Higgsfield rechazó el cuerpo al estimar` | El proveedor encontró otro problema. No se cobró. |
+| `403 not_enough_credits` | La cuenta de API no tiene créditos (son aparte de la suscripción de la app). No se cobró. |
+| `Maximum number of concurrent requests` | Llegaste al tope de trabajos simultáneos de la cuenta. Espera a que termine uno. No se cobró. |
+
+**Qué no hacer con Higgsfield.**
+
+- No des por hecho que `hf-recraft41` entrega SVG: `--format svg` se rechaza, y `--input '{"model_type":"vector"}'` (modo vector de la app) está sin probar por la API.
+- No dejes un `--detach` sin descargar: el proveedor guarda la salida sólo unos 7 días.
+- No busques Veo 3.1, Sora 2 ni Nano Banana Pro por esta vía: la cuenta no los tiene habilitados.
+- No uses `--lora`, `--keyframe`, `--task`, `--size` ni `--fal-account`: son de fal y el comando los rechaza.
+
+**Estado (2026-09-16).** Las 44 capacidades pasaron la prueba de precio. **Ninguna generación real está verificada**
+porque la cuenta de API no tiene créditos: recárgalos en `console.higgsfield.ai/billing` antes de la primera corrida.
 
 ### Encolar sin esperar (`--detach`)
 
@@ -522,8 +627,9 @@ descargar el resultado cuando esté listo. Sirve para dejar varios videos encola
 - **No marques una capacidad como verificada** en el registro sin haberla corrido de verdad.
 - **No uses este comando para Gemini Omni ni para Nano Banana Pro.** Los dos se conectan directo con Google, no por
   fal, aunque fal los liste (decision del operador, 2026-09-16).
-- **No dejes Wan 3.0 ni H3 base en su resolucion por defecto para explorar.** Sin `--resolution` Wan sale en 1080p
-  (4× el costo de 480p) y H3 base en 2K (2,6×).
+- **No entregues una toma sin `--resolution` explícito.** Sin el flag el comando usa el escalón más barato (480p o
+  480P), bueno para explorar pero no para entrega.
+- **No pongas `--yes` por costumbre.** Confirma sólo después de leer la línea `$ costo estimado`.
 - **No presupuestes con el precio del registro sin mirar la resolucion.** Es el escalon mas bajo.
 - **No planees probar una LoRA con 10 steps.** fal cobra minimo 100.
 - **No lo conectes al portal.** Es produccion fuera de linea; el runtime de imagen del producto es otro.
@@ -603,21 +709,24 @@ Si ves `HTTP 408`, el trabajo sigue en fal. Consulta con el comando `--status` q
 
 ### Brechas conocidas del comando (2026-09-16)
 
-No son errores tuyos; estan registradas para corregirse. Mientras tanto:
+Corregidas el 2026-09-16 (commit `17196ead1`): el formato real de Seedream Pro, `--seed` en modelos que no lo
+declaran, más de 10 `--image`, los flags de LoRA y entrenador (`#weight_name`, `--frames`, `--split-threshold`), la
+estimación de costo con confirmación y los defaults caros de resolución. Lo que sigue abierto:
 
-- **Seedream 5 Pro con `--out x.png` y sin `--format png` guarda un JPEG con extension `.png`.** Pasa `--format png`.
-- **`--seed` se envia a endpoints que no lo declaran** (Seedream 5 y Seedance desde texto o imagen). Que pasa (error o
-  semilla ignorada) no esta probado: no cuentes con reproducir un resultado en esos modelos.
-- **Con mas de 10 `--image`, fal usa solo las ultimas 10** sin avisar.
-- **No hay flag** para `weight_name` de una LoRA, `split_input_duration_threshold` de los entrenadores ni la regla de
-  cuadros del entrenador; usa `--input '<json>'`.
 - **`--size` y `--count` de imagen no se validan** contra el contrato antes de gastar.
-- **No hay estimacion de costo previa.** Calcula con el paso 1 y confirma con `--balance`.
+- **Layerize:** cuántas capas saldrán y si la base se cobra no está medido; la estimación muestra el precio por capa sin
+  total.
+- **Flux 3:** la API de precios de fal devuelve la mitad del precio publicado y no se sabe por qué; la estimación usa
+  el publicado. Confirma con `--balance`.
+- **Las estimaciones son orientativas:** las tablas de precio son del 2026-09-16 y pueden cambiar.
+- Forzar `seed` por `--input` en un modelo que no lo declara: efecto sin probar. No lo hagas.
 
 ## Referencias tecnicas
 
 - Guia canonica de seleccion de modelos: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`
-- CLI: `scripts/ai/fal-image.ts` (`pnpm ai:fal`)
+- CLI: `scripts/ai/fal-image.ts` (`pnpm ai:fal`) · carril Higgsfield: `scripts/ai/higgsfield-lane.ts`
+- Higgsfield: cliente `src/lib/ai/higgsfield.ts`, catálogo `src/lib/ai/higgsfield-capabilities.ts`, esquemas
+  `src/lib/ai/higgsfield-schemas.json` (`pnpm ai:higgsfield:sync-schemas`), guía §5.8
 - Registro de capacidades: `src/lib/ai/fal-capabilities.ts`
 - Cliente canonico: `src/lib/ai/fal.ts` (`runFalModel`, `uploadFalFile`)
 - Catalogo y contratos: `docs/architecture/GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md` §Carril operativo, §Seedance video

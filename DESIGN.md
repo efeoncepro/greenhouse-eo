@@ -683,6 +683,8 @@ A **brand-zone** element (header / masthead / brand strip), **never** the legal 
 
 **Color canónico**: gris **`#848484`** (= token `text-disabled`). Es el default de ambos componentes; un override solo aplica sobre fondo oscuro. Single source of truth: `EFEONCE_SLOGAN_COLOR` en `src/config/efeonce-brand.ts`.
 
+> Fuera de pantalla y PDF hay **una** excepción declarada: en arte **impreso** sobre sustrato oscuro (merch, serigrafía, sublimado) este gris da 2,98:1 sobre navy y se reemplaza por un gris claro con «Growth» en blanco. Es legibilidad de impresión, no un color de marca nuevo, y no aplica a ninguna superficie de producto. Detalle en `docs/architecture/agent-invariants/DESIGN_TOKENS_BRAND_AGENT_INVARIANTS.md`.
+
 Typography contract (Poppins):
 
 | Word | Family | Weight | Style |

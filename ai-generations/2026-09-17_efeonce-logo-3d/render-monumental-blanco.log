@@ -1,0 +1,43 @@
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:67: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat = bpy.data.materials.new('laca'); mat.use_nodes = True
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:80: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('estudio'); scene.world = world; world.use_nodes = True
+00:13.946  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-01-frente-nivel-calle-luz-izq-transparente.png'
+00:26.785  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-01-frente-nivel-calle-luz-der-transparente.png'
+00:44.057  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-02-contrapicado-frente-luz-izq-transparente.png'
+01:04.059  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-02-contrapicado-frente-luz-der-transparente.png'
+01:22.133  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-03-tres-cuartos-izquierda-calle-luz-izq-transparente.png'
+01:40.470  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-03-tres-cuartos-izquierda-calle-luz-der-transparente.png'
+01:58.678  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-04-tres-cuartos-derecha-calle-luz-izq-transparente.png'
+02:18.995  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-04-tres-cuartos-derecha-calle-luz-der-transparente.png'
+02:41.459  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-05-contrapicado-tres-cuartos-izquierda-luz-izq-transparente.png'
+03:02.629  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-05-contrapicado-tres-cuartos-izquierda-luz-der-transparente.png'
+03:23.916  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-06-contrapicado-tres-cuartos-derecha-luz-izq-transparente.png'
+03:43.692  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-06-contrapicado-tres-cuartos-derecha-luz-der-transparente.png'
+03:59.562  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-07-teleobjetivo-lejos-luz-izq-transparente.png'
+04:14.291  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-07-teleobjetivo-lejos-luz-der-transparente.png'
+04:32.089  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-08-picado-desde-edificio-luz-izq-transparente.png'
+04:49.257  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-08-picado-desde-edificio-luz-der-transparente.png'
+05:06.886  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-09-dron-picado-luz-izq-transparente.png'
+05:21.578  render           | Saved: 'render/monumental-blanco/efeonce-logo-3d-blanco-monumental-09-dron-picado-luz-der-transparente.png'
+OK efeonce-logo-3d-blanco-monumental-01-frente-nivel-calle-luz-izq
+OK efeonce-logo-3d-blanco-monumental-01-frente-nivel-calle-luz-der
+OK efeonce-logo-3d-blanco-monumental-02-contrapicado-frente-luz-izq
+OK efeonce-logo-3d-blanco-monumental-02-contrapicado-frente-luz-der
+OK efeonce-logo-3d-blanco-monumental-03-tres-cuartos-izquierda-calle-luz-izq
+OK efeonce-logo-3d-blanco-monumental-03-tres-cuartos-izquierda-calle-luz-der
+OK efeonce-logo-3d-blanco-monumental-04-tres-cuartos-derecha-calle-luz-izq
+OK efeonce-logo-3d-blanco-monumental-04-tres-cuartos-derecha-calle-luz-der
+OK efeonce-logo-3d-blanco-monumental-05-contrapicado-tres-cuartos-izquierda-luz-izq
+OK efeonce-logo-3d-blanco-monumental-05-contrapicado-tres-cuartos-izquierda-luz-der
+OK efeonce-logo-3d-blanco-monumental-06-contrapicado-tres-cuartos-derecha-luz-izq
+OK efeonce-logo-3d-blanco-monumental-06-contrapicado-tres-cuartos-derecha-luz-der
+OK efeonce-logo-3d-blanco-monumental-07-teleobjetivo-lejos-luz-izq
+OK efeonce-logo-3d-blanco-monumental-07-teleobjetivo-lejos-luz-der
+OK efeonce-logo-3d-blanco-monumental-08-picado-desde-edificio-luz-izq
+OK efeonce-logo-3d-blanco-monumental-08-picado-desde-edificio-luz-der
+OK efeonce-logo-3d-blanco-monumental-09-dron-picado-luz-izq
+OK efeonce-logo-3d-blanco-monumental-09-dron-picado-luz-der
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit

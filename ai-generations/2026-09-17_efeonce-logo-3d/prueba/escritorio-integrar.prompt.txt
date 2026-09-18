@@ -1,0 +1,9 @@
+The navy Efeonce object already placed on the desk is REAL and must stay exactly as it is: same shape, letters, orbit ring with its gaps, three windows, proportions and navy colour. It is protected; do not redraw it.
+
+Your job is only to make it belong to this photograph. Around it, on the desk and in the room:
+- cast a realistic soft contact shadow on the oak surface, falling to the left and slightly toward the camera, since the warm morning light comes from the window on the right; darker and sharper right where each letter touches the wood, softer and longer away from it;
+- add the subtle reflection of the navy piece on the polished desktop, stretched and faint;
+- let a warm bounce of the wood and a cool bounce from the room appear on the surfaces near the object;
+- blend the edges of the object into the scene with matching depth of field and grain, so nothing looks pasted.
+
+Keep the rest of the desk, props, light and framing unchanged. No text, no watermark, no extra logos.

@@ -1,0 +1,12 @@
+Image 1 is the EXACT 3D Efeonce logo, rendered from the official brand file. Keep it exactly as it is: same shape, same letters and their spelling "efeonce", same rocket and orbit ring with its gaps and three round windows, same proportions, same deep navy colour, same camera perspective and three-quarter orientation. Do not redraw, respell, restyle, stretch or rotate it, and do not add any text. Two things that must NOT change:
+(a) the wide elliptical orbit ring: it stays a wide flat ellipse around the rocket, broken with the same small gaps, never a small loop and never re-shaped;
+(b) the colour: deep navy #023c70, not a brighter or lighter blue.
+
+Place that logo, unchanged, as a small premium desk object about 24 cm wide, resting on a designer's desk. Photographic still life, seen from above at the angle of image 1, as a person sitting at the desk would see it:
+
+- Light oak desktop, a closed laptop, a ceramic cup of black coffee, a notebook with a pencil and a pair of glasses placed around it, none of them overlapping the object.
+- Soft warm morning light from a window on the right, gentle shadow of the object falling to the left on the wood, a faint reflection of the navy piece on the polished desktop.
+- Shallow depth of field: the object is crisply in focus, the desk items and the blurred office background soften away.
+- The navy lacquer picks up the warm window light on its right side and a cool bounce from the room on its left.
+- Treat image 1 as a photograph of the real object: relight it for this desk, but copy its geometry pixel for pixel.
+- Editorial product photography, clean and elegant, realistic materials, no text overlay, no watermark, no extra logos.

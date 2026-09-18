@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react'
 
-export type EmailDomain = 'identity' | 'payroll' | 'finance' | 'hr' | 'delivery' | 'system' | 'growth'
+export type EmailDomain = 'identity' | 'payroll' | 'finance' | 'hr' | 'delivery' | 'system' | 'growth' | 'insights'
 
 export type EmailType =
   | 'password_reset'
@@ -41,6 +41,11 @@ export type EmailType =
   // poder pausarse SIN silenciar el correo de decisión individual.
   | 'hiring_decision_not_selected'
   | 'hiring_talent_pool_verification'
+  // TASK-1848 — entrega de una edición emitida de Efeonce Insights. DOS tipos porque el enlace y el
+  // adjunto tienen persistencias distintas: el enlace compartido lleva un bearer (token-sensitive,
+  // sin adjuntos, sin replay genérico) y el PDF adjunto no lleva credencial pero sí bytes.
+  | 'insights_edition_delivery'
+  | 'insights_edition_delivery_attachment'
 
 export type EmailDeliveryStatus =
   | 'pending'
@@ -66,7 +71,9 @@ export const TOKEN_SENSITIVE_EMAIL_TYPES = Object.freeze([
   'external_access_invitation',
   'hiring_assessment_assigned',
   'hiring_assessment_access_recovery',
-  'hiring_talent_pool_verification'
+  'hiring_talent_pool_verification',
+  // TASK-1848 — el enlace personal de un informe es un bearer: nunca se persiste ni se reenvía solo.
+  'insights_edition_delivery'
 ] as const satisfies readonly EmailType[])
 
 export const isTokenSensitiveEmailType = (emailType: EmailType): boolean =>
@@ -98,6 +105,8 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   weekly_executive_digest: 'broadcast',
   quote_share: 'transactional',
   contractor_remittance_paid: 'transactional',
+  insights_edition_delivery: 'transactional',
+  insights_edition_delivery_attachment: 'transactional',
   ai_visibility_grader_report: 'transactional',
   growth_ebook_delivery: 'transactional',
   // TASK-1689 — ciclo de vida de Hiring (consumers reactivos en ops-worker)
@@ -246,6 +255,9 @@ export const CANDIDATE_REPLY_TO_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<Em
 ])
 export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailType>([
   'ai_visibility_grader_report',
+  // TASK-1848 — Efeonce Insights es un producto de Efeonce: el informe lo firma la agencia.
+  'insights_edition_delivery',
+  'insights_edition_delivery_attachment',
   // TASK-1837 — la persona invitada a Efeonce ID es externa (cliente): conoce a Efeonce, no al portal.
   'external_access_invitation',
   'growth_ebook_delivery',

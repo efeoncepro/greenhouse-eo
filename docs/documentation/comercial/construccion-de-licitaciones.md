@@ -1,9 +1,9 @@
 # Construcción de Licitaciones — Método Efeonce
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-07-11 por Claude (con Julio Reyes)
-> **Última actualización:** 2026-07-11 por Claude
+> **Última actualización:** 2026-09-17 por Claude
 > **Documentación técnica / método canónico:** skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md`
 
 ## Para qué sirve este documento
@@ -26,6 +26,30 @@ Construir una licitación pasa por diez momentos encadenados. Cada uno produce a
 8. **Escribir la propuesta técnica.** Redactar de forma clara y persuasiva, con cada afirmación respaldada por su mecanismo o una prueba, sin humo.
 9. **Armar la oferta económica y el paquete.** La planilla de precios en el formato pedido, revisar que todo lo obligatorio esté, y exportar a PDF.
 10. **Presentar (lo hace una persona).** La oferta la sube un humano a la plataforma; el sistema solo la prepara. Nunca se envía ni se firma solo.
+
+## Desde el radar público de LicitaLAB hasta una candidata analizada
+
+Para licitaciones **públicas**, Efeonce usa LicitaLAB. El trabajo se reparte así: **un agente busca, filtra y lee;
+una persona elige y decide**.
+
+1. **Búsqueda.** El agente recorre el listado de LicitaLAB (recomendadas o todas) y filtra por tema. LicitaLAB no
+   ofrece búsqueda por su API: el listado se lee desde la web con una sesión automatizada.
+2. **Lista corta.** Descarta lo que no es servicio de Efeonce (licencias, equipos, bienes) y lo que cierra muy
+   pronto, y propone 3 a 5 candidatas. El puntaje de LicitaLAB solo ordena la lista.
+3. **Elección humana** de qué candidatas analizar.
+4. **Lectura de bases.** Por cada candidata, el agente consulta la ficha y hace preguntas acotadas a los documentos
+   (requisitos, experiencia, garantías, criterios, formato). Toda respuesta cita archivo y página; lo que no aparece
+   queda como «falta evidencia», nunca como «no se exige».
+5. **Matriz y recomendación** GO / HOLD / NO-GO, que decide una persona, con margen revisado.
+6. **Solo con confirmación** la oportunidad pasa a Greenhouse y a HubSpot.
+
+Hay un límite práctico: buscar, ver la ficha y analizar proveedores dependen del inicio de sesión de una persona en
+LicitaLAB, que el agente no realiza. La lectura de documentos funciona también desde la plataforma con una clave de
+API.
+
+> **Detalle técnico:** receta 0 de `licitalab-mcp.md` (skill `greenhouse-public-private-tenders`); cliente
+> `src/lib/commercial/tenders/licitalab/client.ts`; CLI `scripts/commercial/licitalab.ts`. Paso a paso en
+> `docs/manual-de-uso/comercial/revisar-licitaciones-licitalab-con-cli.md`.
 
 ## Desde un radar privado hasta una oportunidad operable
 
@@ -104,6 +128,7 @@ Este método es **vivo**: cada vez que armamos o mejoramos una licitación, se a
 | **Método canónico** (fuente de verdad) | skill `greenhouse-public-private-tenders` (`bid-construction-playbook.md`) | agentes y quien construye la propuesta |
 | **Documentación funcional** (este documento) | `docs/documentation/comercial/` | entender cómo funciona, en simple |
 | **Manual de uso** (paso a paso) | `docs/manual-de-uso/comercial/construir-una-licitacion.md` | operar el proceso de propuesta paso a paso |
+| **Radar LicitaLAB** (descubrimiento público) | `docs/manual-de-uso/comercial/revisar-licitaciones-licitalab-con-cli.md` | pedir la búsqueda al agente, elegir candidatas y revisar la matriz con evidencia de las bases |
 | **Radar Wherex** (descubrimiento) | `docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md` | ejecutar `pnpm wherex:radar`, revisar Nueva + Editando y fundar el fit en ficha y bases |
 
 ## Primer caso de referencia

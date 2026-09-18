@@ -1,0 +1,4 @@
+Outpaint this image to a vertical 9:16 frame. Keep the existing central scene exactly as it is. Fill only the transparent areas at the top and bottom so the scene continues seamlessly:
+- Top: continue the dark deep-navy studio ceiling with the overhead spotlight source, volumetric haze and light beams falling down toward the numerals; the large out-of-focus foreground bunting flags in the corners may continue upward naturally. Do not add new bunting strings, flags in new colors, or any new objects.
+- Bottom: continue the dark glossy reflective floor with soft blue reflections fading into near-black at the very bottom.
+Match lighting, color grade, grain, perspective and focus exactly. No text, letters, numbers, logos or new elements.

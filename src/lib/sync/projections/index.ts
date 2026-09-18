@@ -81,6 +81,7 @@ import { knowledgeNotionIngestProjection } from './knowledge-notion-ingest'
 import { sampleSprintHubSpotOutboundProjection } from './sample-sprint-hubspot-outbound'
 import { sampleSprintRuntimeCacheInvalidationProjection } from './sample-sprint-runtime-cache-invalidation'
 import { growthAeoDiagnosticGraderRunProjection } from './growth-aeo-diagnostic-grader-run-from-submission'
+import { insightsDeliveryDispatchProjection } from './insights-delivery-dispatch'
 import { growthEbookDeliveryFromSubmissionProjection } from './growth-ebook-delivery-from-submission'
 import {
   hiringApplicationCreatedEmailsProjection,
@@ -196,6 +197,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(knowledgeNotionIngestProjection) // TASK-1094 — re-fetch + gate + re-ingest idempotente | deprecación de páginas de knowledge Notion (webhook-triggered); gated upstream por NOTION_KNOWLEDGE_WEBHOOK_ENABLED
   registerProjection(growthGraderRunFromSubmissionProjection) // TASK-1251 — growth.forms.submission_accepted (grader-form) → enqueue grader run + materialize lead linked to submission (idempotent, PII-safe); drenado por ops-reactive-growth
   registerProjection(growthEbookDeliveryFromSubmissionProjection) // TASK-1375 — growth.forms.submission_accepted (ebook form) → email de respaldo con link gated de descarga (genérico por ebook, idempotente); drenado por ops-reactive-growth
+  registerProjection(insightsDeliveryDispatchProjection) // TASK-1848 — insights.delivery.requested → correo por destinatario (enlace compartido o PDF); claim atómico + dedupe; drenado por ops-reactive-notifications
   registerProjection(hiringApplicationCreatedEmailsProjection) // TASK-1689 — hiring.application.created → aviso interno People + acuse candidato; flag HIRING_LIFECYCLE_EMAILS_ENABLED (ops-worker); drenado por ops-reactive-notifications
   registerProjection(hiringAssessmentAssignedEmailProjection) // TASK-1689 — hiring.assessment.assigned (candidate_test) → email con link de evaluación (token re-emitido canónico)
   registerProjection(hiringAssessmentAccessRotatedEmailProjection) // TASK-1757 — hiring.assessment.access_recovery_recorded (secure_link) → aviso al candidato de que su acceso anterior murió; NUNCA lleva el enlace

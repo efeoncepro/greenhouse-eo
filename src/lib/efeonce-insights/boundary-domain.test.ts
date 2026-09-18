@@ -43,6 +43,18 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_insights.insight_render_runs',
   'greenhouse_insights.insight_outputs',
   'greenhouse_insights.insight_render_events',
+  // TASK-1848 — sharing por enlace: grant (sólo digest), access log mínimo y cubeta de rate limit.
+  'greenhouse_insights.insight_share_grants',
+  'greenhouse_insights.insight_share_access_events',
+  'greenhouse_insights.insight_share_rate_buckets',
+  // TASK-1848 — envío por correo: intent autorizado, destinatarios y su historial append-only. El
+  // transporte (`greenhouse_notifications.email_deliveries`) lo escribe la plataforma de correo, no el dominio.
+  'greenhouse_insights.insight_delivery_intents',
+  'greenhouse_insights.insight_delivery_recipients',
+  'greenhouse_insights.insight_delivery_events',
+  // TASK-1848 — recurrencia: definición versionada y ocurrencias únicas por período.
+  'greenhouse_insights.insight_schedules',
+  'greenhouse_insights.insight_schedule_occurrences',
   // Outbox canónico (vía publishOutboxEvent; el literal no aparece aquí, se lista por completitud).
   'greenhouse_sync.outbox_events'
 ])

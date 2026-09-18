@@ -10117,6 +10117,62 @@ export interface GreenhouseHrWorkRelationshipOnboardingCases {
   user_id: string | null;
 }
 
+export interface GreenhouseInsightsInsightDeliveryEvents {
+  actor_kind: string;
+  created_at: Generated<Timestamp>;
+  delivery_event_id: Generated<Int8>;
+  delivery_intent_id: string;
+  delivery_recipient_id: string | null;
+  detail: Generated<Json>;
+  from_state: string | null;
+  organization_id: string;
+  to_state: string;
+}
+
+export interface GreenhouseInsightsInsightDeliveryIntents {
+  attachment_irrevocable_ack: Generated<boolean>;
+  authorized_by_actor_kind: string;
+  authorized_by_user_id: string | null;
+  cancel_reason: string | null;
+  cancelled_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  delivery_intent_id: Generated<string>;
+  edition_id: string;
+  edition_issued_hash: string;
+  idempotency_key: string;
+  message: string | null;
+  modality: string;
+  organization_id: string;
+  outputs: Generated<string[]>;
+  request_hash: string;
+  share_ttl_days: number | null;
+  state: Generated<string>;
+  subject: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseInsightsInsightDeliveryRecipients {
+  attempts: Generated<number>;
+  claimed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  delivery_intent_id: string;
+  delivery_recipient_id: Generated<string>;
+  edition_id: string;
+  edition_issued_hash: string;
+  email_delivery_id: string | null;
+  finished_at: Timestamp | null;
+  last_error_code: string | null;
+  modality: string;
+  organization_id: string;
+  recipient_key: string;
+  recipient_kind: string;
+  recipient_user_id: string;
+  share_grant_id: string | null;
+  skip_reason: string | null;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseInsightsInsightEditions {
   audience: string;
   created_at: Generated<Timestamp>;
@@ -10277,6 +10333,84 @@ export interface GreenhouseInsightsInsightRetentionClasses {
   notes: string;
   retention_class: string;
   retention_days: number;
+}
+
+export interface GreenhouseInsightsInsightScheduleOccurrences {
+  attempts: Generated<number>;
+  created_at: Generated<Timestamp>;
+  edition_id: string | null;
+  failure_code: string | null;
+  occurrence_id: Generated<string>;
+  organization_id: string;
+  period_end_exclusive: Timestamp;
+  period_start: Timestamp;
+  render_run_id: string | null;
+  schedule_id: string;
+  schedule_version: number;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseInsightsInsightSchedules {
+  activated_at: Timestamp | null;
+  authorized_by_actor_kind: string;
+  authorized_by_user_id: string;
+  cadence: string;
+  catch_up_limit: Generated<number>;
+  consolidation_days: Generated<number>;
+  created_at: Generated<Timestamp>;
+  label: string;
+  organization_id: string;
+  pause_reason: string | null;
+  paused_at: Timestamp | null;
+  request_template: Json;
+  retired_at: Timestamp | null;
+  review_policy: Generated<string>;
+  schedule_id: Generated<string>;
+  schedule_version: Generated<number>;
+  state: Generated<string>;
+  time_zone: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseInsightsInsightShareAccessEvents {
+  access_event_id: Generated<Int8>;
+  access_kind: string;
+  client_hint: Generated<string>;
+  created_at: Generated<Timestamp>;
+  edition_id: string | null;
+  organization_id: string | null;
+  outcome: string;
+  output: string | null;
+  share_grant_id: string | null;
+  subject_hash: string | null;
+}
+
+export interface GreenhouseInsightsInsightShareGrants {
+  audience: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by_actor_kind: string;
+  created_by_user_id: string | null;
+  download_outputs: Generated<string[]>;
+  edition_id: string;
+  expires_at: Timestamp;
+  label: string | null;
+  organization_id: string;
+  revoke_reason: string | null;
+  revoked_at: Timestamp | null;
+  revoked_by_actor_kind: string | null;
+  revoked_by_user_id: string | null;
+  share_grant_id: Generated<string>;
+  source: Generated<string>;
+  token_digest: string;
+}
+
+export interface GreenhouseInsightsInsightShareRateBuckets {
+  action: string;
+  hit_count: number;
+  subject_hash: string;
+  updated_at: Generated<Timestamp>;
+  window_started_at: Timestamp;
 }
 
 export interface GreenhouseKnowledgeKnowledgeChunks {
@@ -13939,6 +14073,9 @@ export interface DB {
   "greenhouse_hr.workforce_contracting_case_events": GreenhouseHrWorkforceContractingCaseEvents;
   "greenhouse_hr.workforce_contracting_cases": GreenhouseHrWorkforceContractingCases;
   "greenhouse_hr.workforce_contracting_drafts": GreenhouseHrWorkforceContractingDrafts;
+  "greenhouse_insights.insight_delivery_events": GreenhouseInsightsInsightDeliveryEvents;
+  "greenhouse_insights.insight_delivery_intents": GreenhouseInsightsInsightDeliveryIntents;
+  "greenhouse_insights.insight_delivery_recipients": GreenhouseInsightsInsightDeliveryRecipients;
   "greenhouse_insights.insight_edition_state_matrix": GreenhouseInsightsInsightEditionStateMatrix;
   "greenhouse_insights.insight_edition_transitions": GreenhouseInsightsInsightEditionTransitions;
   "greenhouse_insights.insight_editions": GreenhouseInsightsInsightEditions;
@@ -13949,6 +14086,11 @@ export interface DB {
   "greenhouse_insights.insight_render_runs": GreenhouseInsightsInsightRenderRuns;
   "greenhouse_insights.insight_reports": GreenhouseInsightsInsightReports;
   "greenhouse_insights.insight_retention_classes": GreenhouseInsightsInsightRetentionClasses;
+  "greenhouse_insights.insight_schedule_occurrences": GreenhouseInsightsInsightScheduleOccurrences;
+  "greenhouse_insights.insight_schedules": GreenhouseInsightsInsightSchedules;
+  "greenhouse_insights.insight_share_access_events": GreenhouseInsightsInsightShareAccessEvents;
+  "greenhouse_insights.insight_share_grants": GreenhouseInsightsInsightShareGrants;
+  "greenhouse_insights.insight_share_rate_buckets": GreenhouseInsightsInsightShareRateBuckets;
   "greenhouse_knowledge.knowledge_chunks": GreenhouseKnowledgeKnowledgeChunks;
   "greenhouse_knowledge.knowledge_document_versions": GreenhouseKnowledgeKnowledgeDocumentVersions;
   "greenhouse_knowledge.knowledge_documents": GreenhouseKnowledgeKnowledgeDocuments;

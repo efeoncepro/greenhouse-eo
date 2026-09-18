@@ -93,3 +93,6 @@ export const readInsightEdition = async (scope: ReaderScope & { editionId: strin
 
 // TASK-1846 — readers del render durable (runs/outputs por edición y audiencia)
 export { readInsightRenderRun, readInsightRenderRuns, type InsightOutputDto, type InsightRenderRunDto } from '../render/readers'
+
+// TASK-1848 — enlaces de una edición (DTO sin token ni digest)
+export { readInsightShares } from '../sharing/commands'

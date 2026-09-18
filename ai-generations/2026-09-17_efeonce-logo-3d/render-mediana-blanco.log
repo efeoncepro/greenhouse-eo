@@ -1,0 +1,39 @@
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:67: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat = bpy.data.materials.new('laca'); mat.use_nodes = True
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-17_efeonce-logo-3d/blender/render_logo.py:80: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('estudio'); scene.world = world; world.use_nodes = True
+00:15.506  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-01-frente-altura-ojos-luz-izq-transparente.png'
+00:30.240  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-01-frente-altura-ojos-luz-der-transparente.png'
+00:48.882  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-02-tres-cuartos-izquierda-luz-izq-transparente.png'
+01:08.621  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-02-tres-cuartos-izquierda-luz-der-transparente.png'
+01:29.129  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-03-tres-cuartos-derecha-luz-izq-transparente.png'
+01:46.964  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-03-tres-cuartos-derecha-luz-der-transparente.png'
+02:02.851  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-04-picado-frente-luz-izq-transparente.png'
+02:18.754  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-04-picado-frente-luz-der-transparente.png'
+02:35.185  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-05-picado-tres-cuartos-izquierda-luz-izq-transparente.png'
+02:54.274  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-05-picado-tres-cuartos-izquierda-luz-der-transparente.png'
+03:18.244  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-06-picado-tres-cuartos-derecha-luz-izq-transparente.png'
+03:34.767  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-06-picado-tres-cuartos-derecha-luz-der-transparente.png'
+03:50.620  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-07-contrapicado-leve-luz-izq-transparente.png'
+04:04.409  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-07-contrapicado-leve-luz-der-transparente.png'
+04:18.718  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-08-teleobjetivo-luz-izq-transparente.png'
+04:32.968  render           | Saved: 'render/mediana-blanco/efeonce-logo-3d-blanco-mediana-08-teleobjetivo-luz-der-transparente.png'
+OK efeonce-logo-3d-blanco-mediana-01-frente-altura-ojos-luz-izq
+OK efeonce-logo-3d-blanco-mediana-01-frente-altura-ojos-luz-der
+OK efeonce-logo-3d-blanco-mediana-02-tres-cuartos-izquierda-luz-izq
+OK efeonce-logo-3d-blanco-mediana-02-tres-cuartos-izquierda-luz-der
+OK efeonce-logo-3d-blanco-mediana-03-tres-cuartos-derecha-luz-izq
+OK efeonce-logo-3d-blanco-mediana-03-tres-cuartos-derecha-luz-der
+OK efeonce-logo-3d-blanco-mediana-04-picado-frente-luz-izq
+OK efeonce-logo-3d-blanco-mediana-04-picado-frente-luz-der
+OK efeonce-logo-3d-blanco-mediana-05-picado-tres-cuartos-izquierda-luz-izq
+OK efeonce-logo-3d-blanco-mediana-05-picado-tres-cuartos-izquierda-luz-der
+OK efeonce-logo-3d-blanco-mediana-06-picado-tres-cuartos-derecha-luz-izq
+OK efeonce-logo-3d-blanco-mediana-06-picado-tres-cuartos-derecha-luz-der
+OK efeonce-logo-3d-blanco-mediana-07-contrapicado-leve-luz-izq
+OK efeonce-logo-3d-blanco-mediana-07-contrapicado-leve-luz-der
+OK efeonce-logo-3d-blanco-mediana-08-teleobjetivo-luz-izq
+OK efeonce-logo-3d-blanco-mediana-08-teleobjetivo-luz-der
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+
+Blender quit

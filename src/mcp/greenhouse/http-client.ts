@@ -747,6 +747,48 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1848 — enlaces compartidos
+  async createInsightShare(input: { organizationId?: string; editionId: string; expiresInDays?: number; downloadOutputs?: string[]; label?: string }) {
+    return this.request(`/api/platform/ecosystem/insights/editions/${encodeURIComponent(input.editionId)}/shares`, {}, {
+      method: 'POST',
+      body: {
+        organizationId: input.organizationId,
+        ...(input.expiresInDays !== undefined ? { expiresInDays: input.expiresInDays } : {}),
+        ...(input.downloadOutputs ? { downloadOutputs: input.downloadOutputs } : {}),
+        ...(input.label ? { label: input.label } : {})
+      }
+    })
+  }
+
+  async listInsightShares(input: { organizationId?: string; editionId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/editions/${encodeURIComponent(input.editionId)}/shares`, { organizationId: input.organizationId })
+  }
+
+  async revokeInsightShare(input: { organizationId?: string; shareGrantId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/shares/${encodeURIComponent(input.shareGrantId)}/revoke`, {}, {
+      method: 'POST',
+      body: { organizationId: input.organizationId }
+    })
+  }
+
+  // TASK-1848 — envíos por correo (lectura)
+  async listInsightDeliveries(input: { organizationId?: string; editionId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/editions/${encodeURIComponent(input.editionId)}/deliveries`, { organizationId: input.organizationId })
+  }
+
+  async getInsightDelivery(input: { organizationId?: string; deliveryIntentId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/deliveries/${encodeURIComponent(input.deliveryIntentId)}`, { organizationId: input.organizationId })
+  }
+
+  // TASK-1848 — recurrencia (lectura)
+  async listInsightSchedules(input: { organizationId?: string }) {
+    return this.request('/api/platform/ecosystem/insights/schedules', { organizationId: input.organizationId })
+  }
+
+  async getInsightSchedule(input: { organizationId?: string; scheduleId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/schedules/${encodeURIComponent(input.scheduleId)}`, { organizationId: input.organizationId })
+  }
+
   private async request<TData>(
     path: string,
     query: QueryParams = {},

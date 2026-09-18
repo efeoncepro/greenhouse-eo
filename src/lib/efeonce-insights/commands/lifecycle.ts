@@ -14,9 +14,11 @@ import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { assertInsightsAccess } from '../authz'
 import type { InsightFailedPhase } from '../contracts/states'
 import { InsightsInputError, InsightsIssuanceDisabledError, InsightsNotFoundError, InsightsNotReadyError } from '../errors'
-import { publishInsightEditionIssued, publishInsightEditionStateTransitioned } from '../events'
+import { publishInsightEditionIssued, publishInsightEditionStateTransitioned, publishInsightShareRevoked } from '../events'
 import { isInsightsIssuanceEnabled } from '../flags'
 import { getInsightOutputsPort } from '../ports'
+import { cancelPendingInsightDeliveryRecipients, insertInsightDeliveryEvent } from '../delivery/store'
+import { revokeActiveInsightShareGrantsForEdition } from '../sharing/store'
 import { hashCanonical } from '../request-hash'
 import { getInsightEditionById, transitionInsightEditionState } from '../stores/edition-store'
 import { getInsightEditorialPlanByEdition } from '../stores/plan-store'
@@ -90,6 +92,21 @@ export const withdrawInsightEdition = async (input: LifecycleInput): Promise<{ e
 
     if (!result.idempotent) {
       await publishInsightEditionStateTransitioned(client, { version: 1, editionId: edition.editionId, reportId: edition.reportId, organizationId: edition.organizationId, fromState: result.transition.fromState, toState: 'withdrawn', requiresHumanGate: true, actorKind: grant.actor.kind, transitionId: result.transition.transitionId })
+
+      // TASK-1848 — retirar corta TODOS los enlaces vivos en la misma transacción. El reader público
+      // ya falla cerrado ante una edición retirada; revocar deja además el estado del grant honesto.
+      const revoked = await revokeActiveInsightShareGrantsForEdition(client, { organizationId: grant.organizationId, editionId: edition.editionId, actor: grant.actor, reason: 'edition_withdrawn' })
+
+      for (const share of revoked) {
+        await publishInsightShareRevoked(client, { version: 1, shareGrantId: share.shareGrantId, editionId: share.editionId, organizationId: share.organizationId, reason: 'edition_withdrawn', actorKind: grant.actor.kind })
+      }
+
+      // Lo que aún no salió por correo tampoco sale: los envíos pendientes de la edición se cancelan.
+      const cancelledRecipients = await cancelPendingInsightDeliveryRecipients(client, { organizationId: grant.organizationId, editionId: edition.editionId })
+
+      for (const intentId of new Set(cancelledRecipients.map(row => row.deliveryIntentId))) {
+        await insertInsightDeliveryEvent(client, { deliveryIntentId: intentId, organizationId: grant.organizationId, toState: 'cancelled', detail: { cause: 'edition_withdrawn' }, actorKind: grant.actor.kind })
+      }
     }
 
     return { edition: result.edition, idempotent: result.idempotent }

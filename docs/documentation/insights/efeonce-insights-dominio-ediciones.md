@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.5
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846, render del deck vivo en staging; producción pendiente)
+> **Ultima actualizacion:** 2026-09-18 por Claude (TASK-1848 code complete: compartir por enlace, envío por correo y recurrencia; sin deploy)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -56,8 +56,8 @@ validadas, **hoy ninguna edición puede emitirse**: llega hasta `ready_for_revie
 | Agente por MCP | Catálogo, listar, leer y (con permiso de escritura) pedir; **nunca emite** | Lo que su vínculo con la organización permita |
 
 Como emitir todavía no es posible, hoy un cliente que pide una edición la verá quedar en `in_review` sin
-cifras visibles: eso es lo esperado hasta que su deck esté renderizado y un interno la emita (hoy el render sólo
-corre en staging y la emisión está apagada en todos los ambientes).
+cifras visibles: eso es lo esperado hasta que su deck esté renderizado y un interno la emita (el render del deck
+ya corre en staging y producción, pero la emisión sigue apagada en todos los ambientes).
 
 ## Estado de disponibilidad (2026-09-16)
 
@@ -69,9 +69,10 @@ asignado. Lo que está encendido y lo que no:
 | Pedir una edición y generarla hasta `ready_for_review` | **Encendida** en staging y producción | Flag `INSIGHTS_GENERATION_ENABLED=true` en Vercel (staging y producción); en Preview sigue apagada |
 | Emitir una edición | Apagada y bloqueada | Flag `INSIGHTS_ISSUANCE_ENABLED` OFF en todos los ambientes; además exige que todos los outputs pedidos estén renderizados y validados |
 | Redacción asistida por IA | Apagada | Flag `INSIGHTS_AUTHORING_AI_ENABLED` OFF; el plan sale del redactor determinista |
-| Pedir el render del **deck PDF** de una edición | **Encendido en staging**; **apagado en producción** | Staging: probado el 2026-09-16 con cinco decks reales, un reintento y una cancelación. Producción: falta el release de Greenhouse, prender el flag en Vercel Production y desplegar el gateway MCP. Ver «Pedir el deck de una edición» |
-| Informe A4, vista web, enlace compartido, correo, recurrencia | No existen todavía | TASK-1847, 1848, 1849 y 1875 |
-| Pedir una edición desde un agente externo por el gateway MCP | Lectura sí; escritura todavía no | Las cuatro herramientas están publicadas; crear exige un permiso de escritura que ningún cliente tiene aún (`insufficient_scope`) |
+| Pedir el render del **deck PDF** de una edición | **Encendido en staging y producción** (desde 2026-09-16) | Staging: probado con cinco decks reales, un reintento y una cancelación. Producción: probado el 2026-09-16 en la organización de prueba — el deck salió solo, al primer intento, y pedir la vista web fue rechazado como corresponde. Ver «Pedir el deck de una edición» |
+| Enlace compartido, envío por correo y recurrencia | **Construidos, todavía no disponibles** (2026-09-18) | Código listo y tablas creadas, pero nada está desplegado y los tres interruptores siguen apagados. Ver las tres secciones siguientes |
+| Informe A4 y pantalla pública del enlace | No existen todavía | TASK-1847 (A4) y TASK-1875 (la página en `think.efeoncepro.com` que muestra el enlace) |
+| Pedir una edición desde un agente externo por el gateway MCP | Lectura sí; escritura todavía no | Las herramientas de ediciones y de render están publicadas (gateway v1.6.0, 2026-09-16); crear exige un permiso de escritura que ningún cliente tiene aún (`insufficient_scope`) |
 
 **Pedir el deck de una edición (render).** Cuando una edición está `ready_for_review`, quien tenga permiso sobre
 esa organización puede pedir su deck PDF. El pedido no devuelve el archivo al instante: queda **en cola** y un
@@ -81,7 +82,8 @@ proceso en segundo plano lo produce.
   en unos 3 a 4 minutos en lo medido (algo más si el proceso arranca en frío); si se piden varios juntos, cuentan como una fila: cinco decks tardaron unos 11 minutos en
   quedar todos listos (medido en staging). Regla práctica: N decks ≈ 2·N minutos. Dibujar el deck en sí toma unos
   7 segundos; el resto es espera en la cola y arranque del proceso. Si hay propuestas comerciales en cola, pasan
-  primero.
+  primero. Cuando el proceso arranca en frío puede lanzarse dos veces para un mismo deck: sólo una lo produce y la
+  otra termina sin hacer nada; no aparece un deck duplicado.
 - **Estados.** El pedido (run) y cada archivo (output) pasan por `queued`/`running` y terminan en `completed`,
   `failed`, `dead_letter` (se agotaron los intentos o el fallo no se arregla reintentando) o `cancelled`.
   `partial_failed` significa que un archivo salió y otro no.
@@ -96,6 +98,91 @@ proceso en segundo plano lo produce.
   usuario cliente (antes todo quedaba como "sistema").
 - **Qué no hace todavía.** Sólo existe el deck. El informe A4 y la vista web se rechazan al pedirlos. Tener el deck
   no lo envía ni lo comparte: descargarlo, compartirlo y emitir siguen siendo pasos aparte.
+
+## Compartir un informe por enlace
+
+> Estado: construido el 2026-09-18, **todavía no disponible** (sin deploy, interruptor apagado). La página pública que
+> muestra el enlace en `think.efeoncepro.com` es otra unidad (TASK-1875).
+
+**Qué hace.** Genera un enlace secreto para que alguien sin cuenta en el portal lea una edición **ya emitida** y, si
+se permite, descargue sus archivos. El enlace sólo abre esa edición: no da acceso a la biblioteca, no permite pedir
+otras ediciones ni consultar otros datos.
+
+**Quién puede.** Admin y Account internos sobre cualquier cuenta que gestionen; el cliente con rol executive sobre
+su propia organización. El cliente con rol manager **no** puede compartir. Sólo se comparten ediciones pensadas
+para el cliente: una edición interna no se puede compartir.
+
+**Límites.**
+- El enlace **siempre vence**: entre 1 y 90 días (30 por defecto).
+- Hasta 20 enlaces activos por edición.
+- El enlace completo se muestra **una sola vez**, al crearlo. Greenhouse no lo guarda, así que no se puede
+  "volver a ver": si se pierde, se crea otro.
+- Se elige qué archivos PDF se pueden descargar desde el enlace (deck o informe), sólo entre los que tiene la edición.
+
+**Qué ve quien lo abre.** Una versión de lectura del informe: resumen, capítulos con sus cifras, gráficos y tablas,
+límites, metodología y fuentes, más los botones de descarga permitidos. Nunca ve borradores, instrucciones de IA ni
+quién preparó el informe. Si el enlace no existe, venció o la cuenta ya no está habilitada, ve "no encontrado" sin
+el nombre del cliente; si fue revocado o la edición se retiró, ve que ya no está disponible. Si alguien lo abre
+demasiadas veces seguidas, se frena un momento.
+
+**Revocar.** Cualquier enlace se puede revocar en cualquier momento (incluso con la función apagada), y un enlace
+revocado no se reactiva nunca. Retirar la edición revoca todos sus enlaces a la vez.
+
+**Qué no se puede deshacer.** Lo que alguien ya descargó sigue en su poder: revocar corta el acceso desde ese
+momento, no borra copias. Los registros de acceso guardan si hubo una visita (sin guardar el enlace ni la IP) y
+**no** prueban que una persona lo haya leído; se conservan 180 días.
+
+## Enviar un informe por correo
+
+> Estado: construido el 2026-09-18, **todavía no disponible** (sin deploy, interruptores apagados, tipos de correo pausados).
+
+**Qué hace.** Envía una edición emitida por correo, desde Efeonce, a personas elegidas de la lista de usuarios
+activos de la organización (o a internos). Cada persona tiene su propio resultado.
+
+**Quién puede.** Sólo Admin y Account internos, desde el portal (o su API interna). Un cliente **nunca** envía correos
+desde Efeonce, y los agentes por MCP o el ecosistema sólo pueden **consultar** envíos, no hacerlos.
+
+**Cómo se envía.** Dos formas:
+- **Con enlace:** cada persona recibe su propio enlace personal (con las reglas de la sección anterior).
+- **Con PDF adjunto:** hay que confirmarlo explícitamente, porque **un adjunto enviado no se puede recuperar**.
+- El enlace al portal autenticado todavía no está disponible: responde "aún no listo" hasta que exista la página de la
+  edición en el portal (TASK-1849).
+
+**Límites.** Entre 1 y 50 destinatarios, elegidos de la lista (no se pueden escribir correos a mano). Asunto de 3 a
+200 caracteres y mensaje de hasta 2000. Si una persona ya recibió la misma edición por la misma vía, no se le vuelve
+a enviar.
+
+**Qué significan los resultados.** "Aceptado" quiere decir que el proveedor de correo lo tomó; "entregado", que llegó
+al buzón. Nada indica que la persona lo haya leído. Si el sistema no puede saber si un correo salió (por ejemplo,
+se cortó la conexión), el destinatario queda **en duda**: no se reenvía solo, porque podría duplicar un correo con
+un enlace personal; un interno lo revisa contra el registro de correo antes de decidir. Un envío que falló se puede
+reintentar (hasta 5 intentos); en ese caso el enlace del intento fallido se anula y el nuevo intento lleva uno nuevo.
+
+**Qué no hace todavía.** No envía avisos dentro del portal ni por Teams: sólo correo. La presentación final del
+correo llegará con TASK-1849.
+
+## Programar informes recurrentes
+
+> Estado: construido el 2026-09-18, **todavía no disponible** (sin deploy, interruptor apagado).
+
+**Qué hace.** Prepara automáticamente una edición por cada período que se cierra (semanal o mensual), con el mismo
+encargo cada vez, en la zona horaria de la cuenta. **No emite ni envía nada solo:** cada edición queda lista para
+revisión y un interno decide emitirla, compartirla o enviarla.
+
+**Quién puede.** Sólo Admin y Account internos. Quien activa la recurrencia queda como responsable de ella.
+
+**Cómo funciona.**
+- Nace como borrador y se activa aparte. Máximo 10 recurrencias activas por organización.
+- Espera unos días después del cierre del período para que los datos se asienten (3 por defecto, configurable hasta 15).
+- No genera informes de períodos anteriores a su activación. Si el sistema estuvo caído, recupera como máximo el
+  último período pendiente (configurable hasta 3), nunca una avalancha de informes viejos.
+- Un mismo período nunca genera dos ediciones.
+
+**Cuándo se pausa sola.** Si la persona responsable deja de tener permiso, si el módulo deja de estar disponible
+para la cuenta, o si falla tres veces seguidas. El motivo queda visible. También se puede pausar a mano, y retirar
+de forma definitiva (una recurrencia retirada no se reactiva).
+
+## Habilitación de una organización y pruebas realizadas
 
 **Cómo se habilita una organización.** Un interno asigna el módulo `insights_v1` a la organización con el
 script `scripts/insights/assign-insights-module.ts --org=<id>` (primero sin `--apply` para ver qué haría;
@@ -116,7 +203,7 @@ reales de un cliente.
 compartida y una sesión MCP con un usuario humano que liste las herramientas publicadas). Hasta entonces la
 task sigue `in-progress`, aunque la capacidad ya esté en producción.
 
-> Detalle técnico: arquitectura §14 (estado, rollout, límites e invariantes); dominio `src/lib/efeonce-insights/**`; rutas
+> Detalle técnico: arquitectura §8 (enlace compartido), §9 (correo y recurrencia) y §14 (estado, rollout, límites e invariantes; §14.6 para TASK-1848); dominio `src/lib/efeonce-insights/**`; rutas
 > `src/app/api/platform/{app,ecosystem}/insights/**`; migración
 > `migrations/20260915100154428_task-1845-insights-foundation.sql`; script
 > `scripts/insights/assign-insights-module.ts`; flags en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.

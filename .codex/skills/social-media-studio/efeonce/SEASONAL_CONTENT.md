@@ -207,3 +207,22 @@ conserva decisiones del operador, mesa/apetito, tipografía, timeline, cueca, ad
 portadas, entrega y programación verificada. Consultar el [manual operativo](../../../../docs/manual-de-uso/social/producir-y-programar-seasonalities.md)
 para repetir el flujo. Los parámetros son del caso, no una plantilla universal; el registro de Metricool
 no implica actualización de Notion ni publicación efectiva.
+
+## Caso: Viva México y previa 18 (2026-09-16)
+
+[Bitácora](../../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md). Criterios que se
+transfieren, no la estética:
+
+- **Símbolos patrios de México:** el art. 32 Bis de la Ley sobre el Escudo, la Bandera y el Himno Nacionales impide usar
+  la Bandera para promover imagen, bienes o servicios; restringe el Escudo y el Himno con fines de lucro. En piezas de
+  marca: sin bandera, escudo, himno ni emoji 🇲🇽. Colores culturales sí, nunca como franjas de bandera. Orientador, no
+  dictamen legal.
+- **Oficio visible antes que moraleja:** la serie «Hay frases que no se tocan» / «Hay días que sí rediseñaríamos» /
+  «Hay cosas que no necesitan rediseño» conecta porque la marca actúa con su oficio (seleccionar, comentar, descartar,
+  rediseñar). Una lección sobre constancia firmada con logo no conecta.
+- **Una señal de fiesta basta** cuando la paleta es corporativa: banderines de fonda en la franja superior resolvieron
+  el reconocimiento de Fiestas Patrias chilenas para la audiencia global; el rojo quedó en ≈4 % de la imagen y lejos
+  del acento de la acción.
+- **Alto impacto no es más elementos:** cámara baja y cercana, foco de luz con contraste, material, acción física y
+  profundidad en dos planos. Una composición vectorial plana no alcanzó la barra aunque fuera legible.
+- **Equipo en escena:** fotos oficiales del squad, nombres legibles y consentimiento de cada persona antes de programar.

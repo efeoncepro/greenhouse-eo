@@ -28,6 +28,16 @@ El posicionamiento y la motion se calibran contra el **baseline competitivo** (`
 ## GTM para clientes (servicio)
 Efeonce vende GTM como servicio (`09`): auditoría/estrategia/launch/retainer. Es coherente con Growth OS (vender el sistema). Al servir clientes, usa **su** doctrina, no la de Efeonce; NDA + sin conflicto entre competidores.
 
+## Narrativa vigente del período (Q4 2026 – Q3 2027)
+**«Tu IA no conoce tu negocio»** — Efeonce construye el contexto que hace que la IA trabaje para el negocio. Es la
+plataforma narrativa integrada (orgánica + pagada) que conecta todas las líneas; **esta skill es su dueña de
+posicionamiento**. Canon: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../../../docs/strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md) — leerlo antes de posicionar,
+priorizar mensajes, planificar campañas o revisar el arco trimestral.
+- Capítulos: 1 lo que tu IA no sabe · 2 lo que tu IA cree que es cierto (datos, pilar de apoyo) · 3 lo que la IA dice
+  de ti · 4 un equipo, no una herramienta · 5 campañas en días, con tu marca · capa de resultados.
+- Se comunica **a través** de los beachheads existentes; no crea beachheads nuevos ni un segundo catálogo.
+- Cambios de tesis, capítulos o arco se hacen en el canon (versión nueva), nunca en este overlay.
+
 ## Reglas duras del overlay
 - **NUNCA** sobrescribir el ASaaS Manifesto / bow-tie (gana la doctrina).
 - **NUNCA** posicionar los 4 productos a la vez ni tratar los `client_kind` uniformemente.

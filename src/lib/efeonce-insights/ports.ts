@@ -21,9 +21,13 @@ export interface InsightOutputsPort {
   assertOutputsValidated(edition: InsightEditionRecord): Promise<ValidatedOutputsSummary>
 }
 
+/**
+ * TASK-1848 — costura de sharing. La implementación vive en `sharing/` (commands + reader público)
+ * y los consumers la importan directo; este marcador sólo declara que la costura está conectada.
+ */
 export interface InsightSharePort {
-  /** TASK-1848: crear/revocar grants. Declarado para fijar la costura; sin implementación aquí. */
-  readonly implemented: false
+  readonly implemented: true
+  readonly module: 'sharing'
 }
 
 const notConnectedOutputsPort: InsightOutputsPort = {
@@ -44,4 +48,4 @@ export const setInsightOutputsPort = (port: InsightOutputsPort | null): void => 
   outputsPort = port ?? notConnectedOutputsPort
 }
 
-export const insightSharePort: InsightSharePort = { implemented: false }
+export const insightSharePort: InsightSharePort = { implemented: true, module: 'sharing' }

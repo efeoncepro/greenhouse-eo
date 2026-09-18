@@ -133,3 +133,65 @@ de fotografía, bokeh natural para la firma, tipografía y producción pertenece
 [comida cultural premium](../design-studio/references/premium-cultural-food-art-direction.md).
 El [caso canónico](../../../docs/operations/social/2026-09-13-fiestas-patrias-production-method.md) distingue
 decisiones del operador, ejecución y evidencia; no tratar una aprobación estética como brand equity medido.
+
+### Isotipo 3D de Efeonce (biblioteca aprobada 2026-09-17)
+
+La nave (isotipo) existe en 3D en navy y blanco, aprobada por el operador, en OneDrive
+`5. Contenidos/13- Branding/Nave Efeonce 3D/`: `Fuente oficial/` (SVG), 16 ángulos por color con fondo y 14 con
+transparente, y 8 escenas por color. Navy para fondos claros; blanco para fondos oscuros o navy. Antes de generar
+otra nave, reutilizar esta biblioteca. Recomendación (no decisión del operador): tratar el render como elemento
+ilustrativo de marca (escenas, portadas, decks, headers); no reemplaza el SVG oficial en firmas. Método y entrega:
+[isotipo propio en 3D](../greenhouse-ai-image-generator/references/mascot-3d-pose-library.md#isotipo-propio-en-3d-con-dos-colores-caso-nave-de-efeonce)
+· [bitácora](../../../docs/operations/social/2026-09-17-efeonce-ship-3d-production-method.md).
+
+**Logo completo en 3D (kit de referencia aprobado 2026-09-17):** OneDrive `5. Contenidos/13- Branding/Logo Efeonce 3D/`,
+navy y blanco en cuatro escalas: Monumental (20 m), Grande (6 m), Mediana (1,2 m) y Pequeña (24 cm), con cámaras por
+escala, luz izquierda/derecha, transparente + fondo estudio y manifiesto. Es referencia de forma para pasar al modelo,
+no firma. El kit sirve además para **exploraciones de material** (acero, aluminio, vidrio, latón, retroiluminado): la
+pasada directa entrega el render como forma y describe el material y el montaje en el prompt —elegir el render por
+luminancia, blanco para materiales claros y navy para oscuros—, sin pegarlo ni recolorearlo; el SVG oficial sigue
+siendo la firma. Método: [kit de logo 3D](../greenhouse-ai-image-generator/references/logo-3d-reference-kit.md).
+
+### Vestuario de marca (cápsula por contexto, decidida 2026-09-17)
+
+El cliente de Efeonce es corporativo (retainers, RevOps/CRM, comités, licitaciones), así que **no hay una sola prenda
+del equipo: hay una cápsula por contexto**, decidida por el operador:
+
+| Contexto | Prenda |
+|---|---|
+| **Frente a cliente** (prenda principal) | polo piqué navy `#023c70` con **emblema bordado**, espalda limpia |
+| **Reunión formal, comité, licitación** | camisa o blusa blanca + chaqueta softshell o blazer navy, emblema bordado discreto |
+| **Evento, feria, stand** | polera navy |
+| **Producción, terreno, grabación, streaming** | hoodie, polera royal y gorra |
+
+**Reglas duras:** en prendas formales el emblema va **bordado** y **sin eslogan**; la estampa grande de espalda (logo
++ «Empower your Growth») es **lenguaje de merch**, no de ropa corporativa. El bordado tono sobre tono está descartado
+para uso corporativo: el logo se pierde. Al vestir a alguien en una pieza, la prenda sale del contexto de la escena,
+no de la costumbre.
+
+Los assets de marca viven todos en OneDrive `5. Contenidos/13- Branding/`: `SVG/` (nueve logos y símbolos),
+`Nave Efeonce 3D/`, `Logo Efeonce 3D/`, `Hoodie Efeonce/v01/` y `Polo Efeonce/v01/` y `Chaqueta Efeonce/v01/` — 21 vistas por prenda (sola,
+detalles, planos cenitales, puesta en cuerpo neutro sin rostro, variantes de color) con manifiesto por vista. Antes de
+generar ropa de marca, reutilizar estos kits. **Chaqueta softshell y polera** vienen por el mismo método y **se
+diseñan desde cero**: no existe asset oficial, así que la prenda base es una decisión de marca —silueta, color, qué
+emblema, dónde y en qué tinta, qué variantes existen— que se cierra acá antes de producir la serie.
+
+**Regla dura:** la estampa con el eslogan **se compone, nunca se genera**. «Empower your Growth» se arma
+determinísticamente con los tres pesos del contrato de marca de `src/config/efeonce-brand.ts` (*Empower* Poppins
+ExtraBold itálica, *your* ExtraBold, *Growth* Black itálica) sobre el logo, y entra como referencia; pedirle el
+texto a un modelo de imagen es cómo se pierde la ortografía y los pesos. Método y producción:
+[kit de referencia de prenda](../greenhouse-ai-image-generator/references/garment-reference-kit.md).
+
+### Sistema de credencial (lanyard, yoyo, portacarnet y carnet — aprobado 2026-09-17)
+
+La credencial es un asset de marca más, en OneDrive `5. Contenidos/13- Branding/Lanyard Efeonce/v01/`: cinta navy
+`#023c70` con el logo blanco repetido y el eslogan, yoyo con el isotipo navy bajo resina, **portacarnet de marco
+rígido** —no una funda cerrada sobre el arte: eso es un portacredencial, otra pieza— y carnet CR80 con logo,
+retrato, nombre y cargo. 12 vistas + las 3 artes canónicas, con manifiesto. Antes de generar credenciales,
+reutilizar este kit; las artes se componen, como la estampa.
+
+**Excepción de color declarada:** sobre navy **impreso**, el prefijo del eslogan va en **gris claro `#C8CEDA`** en
+vez del gris de marca `#848484`, que da 2,98:1 de contraste y no resuelve en serigrafía ni sublimado (el gris claro
+da 7,06:1; «Growth» en blanco, 11,15:1). Es una excepción de legibilidad para sustratos oscuros impresos, **no
+drift**: en pantalla y sobre fondos claros el gris de marca sigue vigente. Método:
+[merch con arte impreso](../greenhouse-ai-image-generator/references/garment-reference-kit.md#merch-con-arte-impreso-y-piezas-mecánicas).

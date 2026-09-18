@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.9
+> **Version:** 1.15
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-09-16 por Claude — nueva sección «Qué modelo usar para cada cosa» con enlace a la guía técnica de selección; correcciones de costos: en video el precio sube con la resolución (Wan 3.0 y H3 usan por defecto la más cara), Wan 3.0 Prime cuesta más que Wan 3.0, Flux 3 publica precios del doble de lo registrado, el costo de Seedance y de GPT Image 2.5 sí se puede calcular antes; H3 2K/4K son reescalados; entrenar una LoRA cobra mínimo 100 pasos. Antes: `pnpm ai:fal` trabaja con dos cuentas de Fal y cambia sola si una se queda sin saldo, muestra el saldo con `--balance` y puede encolar sin esperar (`--detach` / `--status`); prueba completa: 47 de 55 opciones probadas, costo real medido y filtro de contenido de Seedance 2.5 (rechaza marcas y personas reales y cobra el intento); antes, Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
+> **Ultima actualizacion:** 2026-09-17 por Claude — (1.15) la mascara no deja el resto igual por si sola: el modelo redibuja la imagen entera y lo que no se puede tocar se recompone despues desde la original. Antes (1.14) precision sobre el logo: la firma se compone fuera del modelo, pero el logo como objeto fisico dentro de una escena si lo genera el modelo, con la forma dada por un render exacto como referencia y el material/montaje en la instruccion. Antes (1.13) opcion `--key-background` para vaciar los agujeros que el recorte deja tapados con el fondo. Antes (1.12) el recorte de fondo repara huecos internos del personaje. Antes (1.11) `pnpm ai:fal` también trabaja con **Higgsfield**: 44 modelos más (SOUL, Marketing Studio, Ideogram, Kling, PixVerse y otros), con precio exacto antes de gastar; todavía sin créditos para generar. Antes (1.10) los comandos avisan cuánto costará antes de gastar; el de Fal pide confirmación si es caro y, en video, usa por defecto la resolución más barata; el formato del archivo sale del nombre que se le da. Antes: nueva sección «Qué modelo usar para cada cosa» con enlace a la guía técnica de selección; correcciones de costos: en video el precio sube con la resolución (Wan 3.0 y H3 usan por defecto la más cara), Wan 3.0 Prime cuesta más que Wan 3.0, Flux 3 publica precios del doble de lo registrado, el costo de Seedance y de GPT Image 2.5 sí se puede calcular antes; H3 2K/4K son reescalados; entrenar una LoRA cobra mínimo 100 pasos. Antes: `pnpm ai:fal` trabaja con dos cuentas de Fal y cambia sola si una se queda sin saldo, muestra el saldo con `--balance` y puede encolar sin esperar (`--detach` / `--status`); prueba completa: 47 de 55 opciones probadas, costo real medido y filtro de contenido de Seedance 2.5 (rechaza marcas y personas reales y cobra el intento); antes, Wan 3.0 sumado a `pnpm ai:fal` (video desde texto, imagen o referencias, que también puede basarse en una web o un documento; una opción probada y el resto a la espera de recargar saldo en Fal) y estado real de Nano Banana Pro; antes, Flux 3 sumado a `pnpm ai:fal` (borrador barato y mejora, primer/último cuadro, keyframes, editar y extender video) y cómo se hace video a video con Seedance; antes, Minimax H3 sumado a `pnpm ai:fal` (video rápido y barato, control de cámara, LoRAs y entrenamiento); antes, nuevo comando `pnpm ai:fal` (Seedream 5, separación por capas y video Seedance); antes, cambio de motor por defecto tras TASK-1851
 > **Documentacion tecnica:** [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)
 
 # Generador Visual de Assets con IA
@@ -104,9 +104,13 @@ Tres advertencias que aplican a todo:
 - **Los rankings externos no coinciden.** OpenArt pone a Seedream 5 Pro primero en imagen, pero Arena y
   Artificial Analysis (septiembre de 2026) ponen primero a GPT Image 2.5 y a Seedream 5 Pro entre el puesto 8 y
   el 15. En video pasa algo parecido. Ningún ranking reemplaza probar con el brief real.
-- **La resolución cambia mucho el precio.** Varios modelos de video cobran distinto según la calidad pedida, y
-  algunos usan por defecto la más cara (ver "Lo que conviene saber" más abajo).
-- **El texto, el logo y lo legal** se componen fuera del modelo, en diseño, nunca se confían a la generación.
+- **La resolución cambia mucho el precio.** Varios modelos de video cobran distinto según la calidad pedida. El
+  comando usa por defecto la más barata y avisa el costo estimado antes de gastar (ver "Cuánto va a costar, antes
+  de gastar" más abajo).
+- **El texto, la firma y lo legal** se componen fuera del modelo, en diseño, nunca se confían a la generación. Distinto
+  es el logo como **objeto físico dentro de una escena** (letras 3D en un muro, marca sobre un envase): ahí sí entra el
+  modelo, pero con la forma dada por un render exacto como referencia y la intención —material, montaje, escena— en la
+  instrucción; nunca dibujada de memoria. La firma de la pieza sigue siendo el archivo oficial compuesto en diseño.
 
 ## Los dos motores de imagen (estado al 2026-09-16)
 
@@ -142,7 +146,16 @@ Dos novedades de la familia 2.5 que se notan en el resultado:
 
 Se puede pedir que el sistema cambie **solo una zona** de una imagen que ya existe y deje el resto igual.
 Para eso se entrega la imagen original y una segunda imagen llamada **mascara**, que marca en transparente
-la zona que se quiere reemplazar. El resto queda protegido.
+la zona que se quiere reemplazar.
+
+**La mascara no deja el resto igual por si sola.** Le indica al modelo donde trabajar, pero el modelo devuelve la
+imagen entera redibujada: medido el 2026-09-17, una zona que debia quedar igual cambio hasta **221 de 255** en algunos
+pixeles (en los ojos de la persona, **147**), aunque en promedio casi no se notaba (4,85). Por eso, cuando fuera de la
+zona hay algo que no se puede tocar —una cara, un logo aprobado, un texto— el resultado del modelo se combina despues
+con la imagen original usando la misma mascara, y se comprueba que lo protegido quedo identico. Como hacerlo:
+[manual, paso 5](../../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu).
+
+> Detalle técnico: [delta 2026-09-17 en la spec](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md).
 
 Sirve, por ejemplo, para poner un objeto sobre una mesa vacia, cambiar un color puntual o corregir un
 detalle sin volver a generar la pieza completa.
@@ -155,6 +168,15 @@ La mascara en si no tiene costo.
 Por eso, para **quitar el fondo** de una imagen que ya existe conviene usar la herramienta local
 (`pnpm ai:image:rmbg`), que no le cobra nada al proveedor. Pedirle el recorte al modelo costaria como una
 imagen nueva.
+
+Desde el 2026-09-17 esa herramienta tambien **repara huecos internos**: si el recorte dejo transparente por error
+una parte del personaje (unos ojos, un visor, un simbolo en el pecho), la vuelve a rellenar con la imagen original,
+pero respeta los huecos que de verdad son fondo.
+
+Y tiene una opcion para el caso contrario, `--key-background`: cuando el objeto es claro y el fondo oscuro (una
+nave blanca sobre azul marino), el recorte puede dejar **tapados** los agujeros por los que se ve el fondo, como las
+ventanas o los cortes de una orbita. Con esa opcion la herramienta los vacia. No viene activada, porque si el
+personaje tiene partes del mismo color que el fondo tambien las borraria.
 
 ## Cuánto cuesta generar una imagen
 
@@ -169,7 +191,10 @@ calidad y el tamaño de la imagen, no cuál de las dos variantes se use. Lo que 
 la velocidad: en calidad máxima, Flare tardó 46 segundos y Sunburst 81 segundos en la misma prueba.
 
 **El costo se puede calcular antes de generar** (corrección 2026-09-16): OpenAI publica una fórmula que coincide
-exactamente con lo medido, así que ya no hace falta gastar para saber cuánto costará una pieza. Otra equivalencia
+exactamente con lo medido, así que ya no hace falta gastar para saber cuánto costará una pieza. Desde el mismo día
+**el comando hace ese cálculo solo** y muestra el costo estimado antes de pedir la imagen (sólo informa; no pide
+confirmación). También revisa antes de gastar que el tamaño y el fondo pedidos sean válidos, y permite elegir el
+formato del archivo (PNG, JPEG o WebP); si no se indica, lo toma de la extensión del nombre del archivo. Otra equivalencia
 útil: la calidad **alta de GPT Image 2** cuesta lo mismo que la **máxima de GPT Image 2.5**, y la **media de la 2**
 lo mismo que la **alta de la 2.5**.
 
@@ -197,6 +222,29 @@ Ademas de los motores de imagen (GPT Image y Gemini Image) y de Higgsfield/Recra
 - **Costo:** se paga por segundo de video segun el modelo (ejemplo: un clip corto economico ronda los US$0.36; uno de mayor calidad, varios dolares). Siempre revisar el precio del modelo en `fal.ai/models` antes de generar.
 
 > Detalle tecnico: ver [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) para la API del generador, system prompts, contrato SVG, endpoints internos y la seccion "Fal.ai — agregador de generacion media".
+
+## Higgsfield dentro de `pnpm ai:fal` (desde 2026-09-16)
+
+Higgsfield es otro agregador de modelos, parecido a Fal, con modelos propios (SOUL para retratos realistas, Marketing
+Studio para piezas de campaña) y otros que Fal no ofrece (Ideogram 4.0, Qwen Image 3, Z-Image Turbo, PixVerse 6,
+LTX 2.5, Happy Horse, Kling Omni y O3). En vez de crear otro comando, se sumó al mismo `pnpm ai:fal`: las opciones de
+Higgsfield empiezan con `hf-`.
+
+| Qué cambia | Cómo funciona |
+|---|---|
+| Precio | Higgsfield dice el precio exacto antes de generar. El comando lo muestra y pide confirmar si pasa el tope. En Seedance y Wan 3.0 calcula un techo con la fórmula del proveedor. |
+| Revisión previa | El pedido se compara con las reglas reales de cada modelo antes de gastar, y el comando lista todo lo que falta o sobra. |
+| Solo cotizar | `--estimate` muestra el precio sin generar nada. |
+| Archivos | Higgsfield los guarda unos 7 días; el comando los descarga siempre. |
+| Vectores | Pedir formato SVG no funciona. La app de Higgsfield tiene un modo vector para Recraft; si la API lo respeta y entrega SVG está sin probar hasta la primera generación real. |
+
+**Estado:** los 44 modelos respondieron con precio con la cuenta de Efeonce. **Todavía no se generó nada real**,
+porque la cuenta de la API de Higgsfield no tiene créditos (son aparte de la suscripción de la app). Veo 3.1, Sora 2 y
+Nano Banana Pro no están disponibles por esta vía.
+
+> Detalle técnico: [Guía de selección de modelos §5.8](../../architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md) ·
+> [Manual del comando](../../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md) · código en
+> `src/lib/ai/higgsfield.ts` y `scripts/ai/higgsfield-lane.ts`.
 
 ## El comando `pnpm ai:fal`: imágenes, capas y video (desde 2026-09-16)
 
@@ -238,9 +286,11 @@ pieza de 8 capas a 2K rondaría medio dólar.
 ### Seedream 5 Pro y Lite no son iguales
 
 - **Pro llega a 2048×2048**, no a 4K. Lite puede sacar imágenes más grandes.
-- **Pro entrega JPEG** si no se pide PNG; Lite entrega PNG.
+- **Pro puede entregar JPEG o PNG**: el comando lo decide por la extensión del nombre del archivo (`.png` o `.jpg`) y,
+  si lo que llega no coincide, guarda el archivo con la extensión correcta y lo avisa. Lite siempre entrega PNG.
 - **Lite puede sacar series** de imágenes relacionadas en un solo pedido; Pro no.
-- Ninguno permite fijar una semilla para repetir exactamente un resultado.
+- Ninguno permite fijar una semilla para repetir exactamente un resultado (el comando lo rechaza si se intenta).
+- Al editar con imágenes de referencia, el máximo es **10**; con más, el comando se detiene antes de cobrar.
 
 ### Qué diferencia a Seedance 2.5 y 2.0
 
@@ -260,8 +310,8 @@ Sólo conviene si un cliente exige que el procesamiento ocurra en Estados Unidos
 
 - **Video rápido y barato.** En las pruebas reales cada video tardó entre 3 y 8 segundos en generarse. **H3 Max
   Turbo** es la opción más barata de todo el comando (del orden de uno a dos centavos de dólar por segundo de video
-  a baja resolución). Ojo: el precio sube con la resolución, y **H3 base usa por defecto 2K**, que cuesta unos 13
-  centavos por segundo (casi tres veces lo que cuesta a 480P).
+  a baja resolución). Ojo: el precio sube con la resolución. **H3 base a 2K** cuesta unos 13 centavos por segundo (casi
+  tres veces lo que cuesta a 480P); si no se indica la calidad, el comando usa la más barata y lo avisa.
 - **Calidad según versión.** H3 base ofrece hasta **4K**, pero su 2K y su 4K son una **ampliación** de un video
   generado a 768P, no una generación nativa en esa resolución; Max y Max Turbo llegan a 1080p (también refinado
   desde 768P). H3 Max no es de MiniMax: es una versión entrenada por Fal sobre H3.
@@ -314,8 +364,9 @@ como la versión **acelerada**; que tenga mejor calidad no está medido.
 - **Desde texto, desde una imagen o desde referencias.** Desde imagen se entrega el primer cuadro y, si se quiere,
   también el último.
 - **De 2 a 30 segundos**, o dejar que **el modelo elija el largo** según lo que se pide.
-- **Hasta 1080p.** Ojo: si no se indica la calidad, usa **1080p**, que es la más cara (cuatro veces el precio de
-  480p) y la más lenta. Para explorar conviene pedir 480p o 720p.
+- **Hasta 1080p**, que es la más cara (cuatro veces el precio de 480p) y la más lenta. Si no se indica la calidad,
+  el comando usa **480p**, la más barata, y lo avisa: sirve para explorar, pero para la pieza final hay que pedir
+  720p o 1080p.
 - **Con sonido** por defecto (se puede apagar).
 - **Referencias variadas:** hasta 10 imágenes, 5 videos y 5 audios, que se nombran en la instrucción por su orden
   («la persona de la imagen 1…»).
@@ -391,6 +442,18 @@ Sobre Seedance, lo que conviene saber:
   referencia: 3 videos de Seedance 2.0 fast de 4 segundos a 480p costaron cerca de USD 1,37, y 3 de mini, USD 0,85.
 - Es producción **fuera del portal**: nada de esto se genera en tiempo real para los usuarios.
 - Gemini Omni (video de Google) y Nano Banana Pro (imagen de Google) **no** se usan por aquí: van directo con Google.
+
+### Cuánto va a costar, antes de gastar (desde 2026-09-16)
+
+- **El comando de Fal avisa cuánto costará** cada pedido antes de mandarlo a la fila. Es una estimación: usa los
+  precios publicados a esa fecha, que pueden cambiar.
+- **Si es caro, pide confirmación.** Cuando la estimación pasa de USD 1, el comando se detiene sin cobrar nada y pide
+  repetir con `--yes`. Ese límite se puede cambiar para un pedido (`--max-usd`) o de forma general
+  (`FAL_COST_CONFIRM_USD`).
+- **En video usa por defecto la calidad más barata.** Antes, algunos modelos usaban la más cara si no se indicaba
+  nada; ahora hay que pedir la calidad final a propósito.
+- **Si no puede estimar** (por ejemplo, un modelo que no está en la lista del comando), lo dice y deja seguir.
+- La medida real sigue siendo mirar el saldo antes y después (`pnpm ai:fal --balance`).
 
 ### Dos cuentas y saldo (desde 2026-09-16)
 

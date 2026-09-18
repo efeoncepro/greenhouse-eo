@@ -1,6 +1,6 @@
 # Ejecución de creatividad social para Codex y Claude
 
-Estado: vigente para trabajo local autorizado. Owner: Social Media Studio. Actualizado: 2026-09-13.
+Estado: vigente para trabajo local autorizado. Owner: Social Media Studio. Actualizado: 2026-09-17.
 Alcance: solicitudes de seasonality, trendjacking, memes de marca, creatividad social y correcciones de
 identidad/product placement. Es un protocolo de entrada y cierre; las skills enlazadas contienen el oficio.
 No habilita publicación, presupuestos externos nuevos ni cambios de runtime.
@@ -28,6 +28,20 @@ No cargar todos los studios: componer únicamente las capacidades que exige el e
 El [contrato multimodal](GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md) conserva las fronteras del
 runtime. Si una capacidad artesanal no está soportada por el compiler, describir la prueba local como tal;
 no inventar campos de schema ni aprobar una campaña para ejecutar un experimento.
+
+**Forma exacta de marca dentro de una escena generada (regla corregida 2026-09-17).** Cuando la forma debe salir
+exacta —logo de Efeonce, isotipo, mascota 3D, logo de cliente—, el render determinístico entra como **referencia de
+forma** y la **intención** (material, montaje, escena, cámara, atmósfera) va en el prompt; el modelo genera la escena
+alrededor. **Nunca pegar el render sobre la escena como camino por defecto:** conserva el material y la luz del kit, no
+pertenece a la escena y el operador lo rechazó («se ve muy falso»). La composición determinística y el halo enmascarado
+quedan como excepción, sólo con material exacto del kit y objeto chico o de detalle fino. **QA obligatorio:** comparar
+**letra por letra** contra el render (letras, órbita con sus cortes, ventanas), color sin deriva y perspectiva
+coherente; la firma de la pieza sigue siendo el SVG oficial compuesto con AXIS. Método y evidencia:
+[bitácora del kit 3D](social/2026-09-17-efeonce-logo-3d-reference-kit-production-method.md).
+**Vestir a una persona con ropa de marca** usa el mismo contrato: pasar la vista del
+[kit de prenda](social/2026-09-17-hoodie-efeonce-garment-reference-kit.md) que corresponde al **ángulo de la toma**
+(de espaldas → vista de espalda), junto con las referencias de rostro y cuerpo; el texto y los emblemas de la prenda se
+componen determinísticamente y nunca se le piden al modelo.
 
 ## Referente de seasonalities y destino editorial
 
@@ -148,3 +162,26 @@ Para ejecución cargar [Motion](../../.codex/skills/motion-design-studio/workflo
 y [entrega/Metricool](../../.codex/skills/social-media-studio/references/video-delivery-metricool.md).
 Los valores del caso no son presets universales; la autorización ya otorgada persiste y PENDING sigue
 separado de publicado. Estos aprendizajes no amplían el contrato multimodal ni el presupuesto.
+
+## De la revisión adversarial a una serie programada
+
+La [bitácora Viva México y previa 18](social/2026-09-16-viva-mexico-y-previa-18-production-method.md) conserva la
+revisión adversarial que rechazó un concepto sin conexión de marca, el límite legal de símbolos patrios de México,
+la secuencia de carrusel con plate idéntico, caras del equipo con consentimiento, la escalada de una estática plana a
+escena 3D de alto impacto, el recolor determinístico que reemplazó un inpainting con deriva geométrica y la
+programación de carrusel, documento de LinkedIn y estáticas en Metricool. Reglas en
+[casos de revisión](../../.codex/skills/social-media-studio/references/creative-review-cases.md),
+[línea estacional](../../.codex/skills/social-media-studio/efeonce/SEASONAL_CONTENT.md) y
+[entrega Metricool](../../.codex/skills/social-media-studio/references/video-delivery-metricool.md). Imágenes sociales en
+PNG (regla dura desde 2026-09-16).
+
+## Key visual paraguas con mascota de partner
+
+La [bitácora del KV «Tu IA no conoce tu negocio»](social/2026-09-17-kv-tu-ia-no-conoce-production-method.md) conserva
+el sistema modular de mascotas (Nexa central, una sola mascota de partner por imagen, cursor e insignia ligados a la
+mascota), el riesgo de lectura sobre el partner, el recorrido v01→v05 con las correcciones del operador, Clawd 3D desde
+el sprite oficial, el plate nativo guiado por boceto que reemplazó un repintado con recorte mordido, la opción
+`presentation` del adapter AXIS y la programación en Metricool. Detalle en su
+[`LEEME.md`](../../ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md).
+Las poses 3D reutilizables de Clawd y Codex (fuente oficial, ángulos, accesorios y reglas de uso) están inventariadas en
+[bibliotecas de mascotas de partners](social/PARTNER_MASCOT_POSE_LIBRARIES.md).

@@ -1,0 +1,14 @@
+Photorealistic cinematic editorial photograph for a brand key visual, vertical 9:16, symmetrical centered composition, shot in camera (not a composite).
+
+Reference images: images 1 and 2 are the same real woman (Nexa). Keep her identity EXACTLY: same face, eyes, eyebrows, skin tone, long dark wavy hair, small gold hoop earrings. Image 3 is her outfit: she wears EXACTLY this royal blue hoodie (same saturated royal blue, same drawstrings, same small white rocket-in-orbit emblem on the left chest). Image 4 is a small orange voxel toy figurine (a pixel-art character built from small matte terracotta cubes, with a floating question mark made of cubes above its head). Keep the figurine EXACTLY as in image 4: same cube construction and proportions, same two dark rectangular eye holes, same two blocky arms raised in a shrug, same four blocky legs, the complete cube question mark floating above its head, same color rgb(215,119,87). Do not redesign it, no mouth, no facial features.
+
+Set: a smooth, matte, deep navy blue painted wall (rich dark navy, around #0f2744) fills the background behind her, softly and evenly lit, no bricks, no texture pattern, no objects on it. Only at the far left and far right edges, tall dark window frames with soft blurred daylight and a few blurred plants.
+
+Framing, top to bottom:
+- Top 26 percent of the frame: only the clean navy wall, empty, for a headline.
+- Middle: Nexa standing behind a desk, centered, seen from the waist up, with generous space around her; the top of her head at about 27 percent from the top of the frame. The figurine, clearly visible and larger (about 20 percent of the image width, question mark included), stands firmly on top of her RIGHT shoulder (left side of the frame), close to her neck, its legs resting on the hoodie with a soft contact shadow, lit by the same light as her. The figurine is turned slightly toward her face. Nexa turns her head toward it and looks DIRECTLY into its eyes, face to face at close range, her eyes clearly focused on the figurine: puzzled and amused "no idea" expression, one eyebrow raised, lips pressed sideways in a half smile. Both of her hands are raised at chest height, palms up, in a clear shrug, fully inside the frame. The figurine mirrors her shrug.
+- Bottom 22 percent of the frame: the edge of a dark navy desk in the immediate foreground, very close to the camera and strongly out of focus, with a closed dark laptop lying flat on it, also blurred. Dark, smooth and uncluttered.
+
+Photography: 50mm, f/2, shallow depth of field, warm soft key light from the front-left, subtle cool rim light separating her dark hair from the navy wall, natural hair strands against the wall, cinematic grade with deep navy tones. The royal blue hoodie and the orange figurine are the strongest colors.
+
+No text, no letters, no logos other than the small hoodie emblem, no watermark, no extra characters, no extra hands.

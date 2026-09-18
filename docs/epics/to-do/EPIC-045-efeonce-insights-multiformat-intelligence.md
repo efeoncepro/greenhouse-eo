@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 in-progress (render durable: staging verificado 2026-09-16, producción espera el release); TASK-1847–1849 y TASK-1875 en diseño`
+- Status real: `En ejecución — TASK-1845 (foundation) COMPLETE 2026-09-16: en producción desde 2026-09-15 con generación ON (emisión/IA OFF), rollback ensayado; TASK-1846 (render durable) COMPLETE 2026-09-16: en producción (release 917491fd02e4, render ON en los 3 runtimes, gateway v1.6.0, canary productivo deck_pdf verde); TASK-1847–1849 y TASK-1875 en diseño`
 - Rank: `TBD`
 - Domain: `platform|growth|delivery|ui|cross-domain`
 - Owner: `Platform / Client Experience; Julio Reyes (producto)`
@@ -90,10 +90,10 @@ pequeños. No agregar una task por módulo, gráfico, formato, endpoint ni otra 
 | Unidad | Task | Resultado | Blocked by |
 |---|---|---|---|
 | U01 | [TASK-1845](../../tasks/complete/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO — **complete 2026-09-16: en producción desde 2026-09-15, rollback ensayado** | none |
-| U02 | [TASK-1846](../../tasks/to-do/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor | TASK-1845 |
+| U02 | [TASK-1846](../../tasks/complete/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor — **complete 2026-09-16: en producción** (`deck_pdf`; `report_pdf`/`web` en TASK-1847/1848) | none |
 | U03 | [TASK-1847](../../tasks/to-do/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md) | gráficos y catálogos premium para deck e informe vertical | TASK-1845 |
-| U04 | [TASK-1848](../../tasks/to-do/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados | TASK-1845, TASK-1846 |
-| U05 | [TASK-1849](../../tasks/to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca, creación y experiencia web compartida | TASK-1845, TASK-1846, TASK-1847, TASK-1848 |
+| U04 | [TASK-1848](../../tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados | none |
+| U05 | [TASK-1849](../../tasks/to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca, creación y experiencia web compartida | TASK-1847, TASK-1848 |
 | U06 | [TASK-1875](../../tasks/to-do/TASK-1875-efeonce-insights-shared-web-render-think.md) | vista web compartida por token renderizada en `efeonce-think` (nodo S6; decisión 2026-09-15) | TASK-1848 |
 
 TASK-1847 puede preparar catálogos tras TASK-1845; integración/export final requiere TASK-1846.
@@ -152,6 +152,19 @@ Resumen del estado real; el detalle verificado vive en
   (`not_ready` hasta TASK-1846); `plan.limits` repite «ico: sin datos.» por rechazo (dedupe → TASK-1846).
 - **Para cerrar TASK-1845:** ensayo de `migrate:down` en la instancia compartida y `tools/list` por una sesión
   MCP servida con token humano. Ninguna otra hija tiene código.
+
+## Rollout del render durable — 2026-09-16 (TASK-1846)
+
+- **Producción:** release develop→main PR #237 → `917491fd02e4`, manifest `released` 22:02:41Z en un intento
+  (break-glass planificado: migraciones ya aplicadas); primer deploy productivo del Cloud Run Job `artifact-worker`
+  por `deploy-artifact-worker` (change-gated); watchdog `ok` 6/6.
+- **Flag:** `INSIGHTS_RENDER_ENABLED` ON en Vercel, Job y `ops-worker` (dispatcher), en staging y producción.
+- **Federación:** gateway `efeonce-mcp` v1.6.0 desplegado (revisión `00054-n78`, 51 tools).
+- **Canary productivo** (org sandbox `Greenhouse Demo`, lane ecosystem): render `202` → dispatcher automático →
+  `deck_pdf` `completed` al 1er intento; `web` → `422 render_rejected`; canary del provider MCP verde.
+- **Límites honestos:** `report_pdf` (TASK-1847) y `web` (TASK-1848) se rechazan al encargar;
+  `INSIGHTS_ISSUANCE_ENABLED` sigue OFF (paso de producto). Con arranque en frío el dispatcher puede lanzar dos
+  ejecuciones para un output; una finaliza (claim + fencing) y la otra termina sin trabajo.
 
 ## Exit Criteria
 

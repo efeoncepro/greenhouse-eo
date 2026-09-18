@@ -78,6 +78,10 @@ se declara en el brief; no añade enums al schema `brandMode`. La modalidad fís
 - **Firma editorial:** logo, titular, CTA, URL, legal y captions permanecen exactos en el compositor.
 - **Marca física:** logo o packaging sobre objeto realista puede requerir referencia oficial al modelo,
   mockup fotográfico o 3D para describir tinta, foil, bajorrelieve, grabado o bordado. No generar de memoria.
+  Ruta por defecto cuando la forma debe salir exacta (2026-09-17): el render determinístico entra como **referencia de
+  forma** y la **intención** —material, montaje, escena, atmósfera— va en el prompt; pegar el render sobre la escena no
+  es el default. Método: [ejecución social](SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md) y
+  [bitácora del kit 3D](social/2026-09-17-efeonce-logo-3d-reference-kit-production-method.md).
 - Registrar un `materialized_plate` como artefacto de trabajo separado: escena con marca física revisada,
   sin titular/firma editorial. El nombre es descriptivo, no nuevo tipo o estado del compiler.
 - Verificar identidad, proporción sobre la superficie, luz/material y reconocimiento en consumo. Una

@@ -24,7 +24,7 @@ y una ejecución termina. El primero (y único hoy) del ecosistema (TASK-1391, 2
 
 | Job | Region | Identity | Invocación | Recursos | Nota |
 | --- | --- | --- | --- | --- | --- |
-| `artifact-worker` | `us-east4` | `greenhouse-portal@...` | IAM only — `jobs.run` **sin overrides** desde el dispatcher del `ops-worker` (`roles/run.invoker`) | `cpu=2`, `mem=2Gi`, `task-timeout=900s`, `tasks=1`, `parallelism=1`, `max-retries=0` | Render de artefactos del Artifact Composer (Chromium/Playwright **pinneado** a la versión de `@playwright/test`). Secrets vía Secret Manager. Flag `ARTIFACT_RENDER_JOBS_ENABLED` (SoT: `services/artifact-worker/deploy.sh`). **Staging-only** hasta sign-off + release control plane |
+| `artifact-worker` | `us-east4` | `greenhouse-portal@...` | IAM only — `jobs.run` **sin overrides** desde el dispatcher del `ops-worker` (`roles/run.invoker`) | `cpu=2`, `mem=2Gi`, `task-timeout=900s`, `tasks=1`, `parallelism=1`, `max-retries=0` | Render de artefactos del Artifact Composer (Chromium/Playwright **pinneado** a la versión de `@playwright/test`). Secrets vía Secret Manager. Flag `ARTIFACT_RENDER_JOBS_ENABLED` (SoT: `services/artifact-worker/deploy.sh`). Delta 2026-09-16 (TASK-1846): **multiconsumidor** (Proposal + Efeonce Insights; lee también `INSIGHTS_RENDER_ENABLED`, default `true`), Job único para staging y producción e **integrado al release control plane** (primer deploy productivo: release `917491fd02e4`); `GREENHOUSE_STORAGE_ENV` fijo en `staging` |
 
 - `max-retries=0` es deliberado: **el retry es del dominio** (`proposal_render_jobs.attempts`),
   no de Cloud Run — ninguna re-ejecución ocurre fuera del contrato del job record.

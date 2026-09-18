@@ -70,7 +70,7 @@ Hechos operativos:
   entre `2560×1440` y `4096×4096` (`auto_2K`, `auto_3K`, `auto_4K`; default `auto_2K`) y la ficha comercial dice
   máx. `3072×3072` [oficial fal, leído 2026-09-16]. Tratar el límite como volátil y ejecutar contract test. Si el
   tamaño pedido no cumple el área, fal **reescala solo**.
-- Entrega PNG (no expone `output_format`; qué hace fal si el CLI le manda `--format`: sin dato).
+- Entrega PNG (no expone `output_format`; desde el 2026-09-16 el CLI rechaza `--format` en Lite).
 - `max_images` 1–6 genera **series relacionadas** por pedido (sin flag propio: `--input '{"max_images":4}'`); se cobra
   por imagen efectiva.
 - El laboratorio verificó `1792×2240`.
@@ -95,9 +95,10 @@ Hechos operativos:
   🔴 **No es 4K en fal** (presets `auto_1K`/`auto_2K`): la nota "Hasta 4K según el proveedor" del registro estaba
   contradicha por el schema. Si necesitas resolución nativa > 2K, usa Lite (hasta 4096² de área según schema) o
   GPT Image (hasta 3840×2160; experimental sobre 2560×1440).
-- `output_format`: `jpeg | png`; default `jpeg`. 🔴 Trampa del CLI: `pnpm ai:fal --capability seedream5-pro --out
-  x.png` **sin** `--format png` guarda un JPEG con extensión `.png`. Pasa siempre `--format png` o nombra `.jpg`.
-- No devuelve `seed` ni acepta seed de entrada (el CLI envía `--seed` igual; efecto no probado: no lo uses).
+- `output_format`: `jpeg | png`; default `jpeg`. Desde el 2026-09-16 (commit `17196ead1`) el CLI deriva
+  `output_format` de la extensión de `--out` (`.png` → png, `.jpg`/`.jpeg` → jpeg; otra → error local) y, al
+  descargar, detecta el formato por los bytes y corrige la extensión con aviso. Ya no hace falta `--format png`.
+- No devuelve `seed` ni acepta seed de entrada (el CLI rechaza `--seed` en local en todo Seedream).
 - Sin `max_images`: una generación = una pieza (usa `--count` → `num_images` 1–6).
 - Edit acepta hasta 10 referencias.
 - Primera referencia sin recargo; referencias adicionales: USD 0,0045 cada una.
@@ -111,8 +112,9 @@ Hechos operativos:
   `NN-<nombre>.png` + `layers.json`. Precio publicado: USD 0,03375 **por capa** si el área es ≤ `1536×1536` y USD
   0,0675 por capa sobre ese umbral (una pieza de 8 capas a 2K ≈ USD 0,54 [inferencia]; si la base se cobra como
   capa: sin dato). `image_size` admite `auto|auto_1K|auto_1.5K|auto_2K`; entrada 512²–6000², ≤ 30 MB.
-- Edit: con más de 10 `--image`, fal usa **sólo las últimas 10 sin aviso** (y en Pro cobra USD 0,0045 por cada
-  adicional). Ordena las referencias pensando en eso.
+- Edit: más de 10 `--image` se rechaza en local (fal usaría sólo las últimas 10 sin aviso); en Pro cada referencia
+  adicional cobra USD 0,0045 y la estimación previa del CLI ya lo suma. Layerize: la estimación muestra el precio por
+  capa sin total (el número de capas lo decide el modelo).
 
 Fuentes:
 
@@ -242,7 +244,8 @@ Usar cuando la campaña nace de material, atmósfera o gesto visual:
 3. Aprobar un anchor.
 4. GPT recompone y sistematiza.
 5. GPT deriva ratios desde el mismo anchor.
-6. GPT + máscara repara áreas protegidas.
+6. GPT + máscara repara el área dañada y la zona protegida se recompone desde el anchor con el alfa invertido de la
+   misma máscara (la máscara orienta, no preserva: [paso 5](../../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu)).
 7. Composición determinística libera masters.
 
 Si el anchor aprobado debe recomponerse por ratio, retocarse por elemento o animarse por planos, pasar el
@@ -331,6 +334,17 @@ Reglas:
 - Verificar canal alfa, dimensiones y formato antes del request.
 - Describir semánticamente la región además de suministrar la máscara.
 - Medir/revisar deriva fuera de región.
+- **Integrar un objeto exacto en una escena (logo, producto, pieza 3D aprobada) — EXCEPCIÓN, no camino por defecto.**
+  Lo normal es la **pasada directa**: el render exacto como referencia de forma y la intención (material, montaje,
+  escena, atmósfera) en el prompt; pegado, el objeto conserva el material y la luz de su render y se lee falso. El
+  halo enmascarado queda para material exacto del kit con objeto chico o de detalle fino. Cuando aplica, la máscara
+  se usa al revés de lo habitual —protege **el objeto pegado y también el resto de la escena**, y abre sólo un
+  **halo** a su alrededor— para que el modelo aporte sombra de contacto, reflejo y fundido sin re-dibujar ni el
+  objeto ni los props. Si se protege sólo el objeto, el modelo rehace la escena alrededor. Contar los píxeles
+  protegidos **antes** de gastar: una máscara mal construida sale 100 % transparente sin error visible. Aun con la
+  máscara bien hecha, GPT Image 2.5 redibuja todo (delta máximo 221/255 en zona protegida, 2026-09-17): recomponer
+  lo protegido desde la base ([paso 5](../../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu)). Ambas vías,
+  criterio y medidas: [`logo-3d-reference-kit.md`](logo-3d-reference-kit.md).
 
 Benchmark 2026-07-18 sobre la misma fuente/región:
 

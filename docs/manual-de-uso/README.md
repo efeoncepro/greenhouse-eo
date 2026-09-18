@@ -12,6 +12,9 @@ La diferencia con otras capas de documentacion:
 
 ### Social y Creative Studio
 
+- [Usar Higgsfield con Creative Studio](creative-studio/higgsfield-provider.md) — preparación, derechos, coste,
+  ejecución, readback, governance y límites del MCP local After Effects/Blender.
+
 - [Usar reglas publicitarias con Codex y Claude](creative/usar-reglas-publicitarias-con-agentes.md) — prompts,
   entregables, ficha tipográfica y revisión para crear/corregir publicidad y social con texto sin confundir
   producción, aprobación y publicación.
@@ -26,6 +29,7 @@ La diferencia con otras capas de documentacion:
 - [Operar ANAM HubSpot Managed Service](hubspot-as-a-service/operar-anam-hubspot-managed-service.md) — rutina diaria/semanal/mensual para Customer Agent, calidad por owner, Growth, Services, automatización, pilotos y preparación read-only de billing.
 - [Usar el Diagnóstico SEO de Prospecto en venta](comercial/diagnostico-seo-prospecto-en-venta.md) — cómo convertir la sorpresa del Grader en tamaño de pérdida cuantificado sin pedirle nada al prospecto: el encadenamiento Grader → diagnóstico → Radiografía AEO → propuesta, qué significa cada estado (`cost_blocked` = cero gasto), y las tres prohibiciones (nunca presentar un estimado como medido, nunca declarar un sitio "sano", nunca cifras de industria ni lifts).
 - [Usar el Panel Competitivo AEO en venta](comercial/panel-competitivo-aeo-en-venta.md) — comparar al cliente con sus competidores en las respuestas de IA con el mismo set de preguntas, el mismo día y los mismos 5 motores: diseñar el set desde demanda real, pedir la preparación a Growth, revisar lo que cae en revisión humana, verificar links, armar el panorama cruzado y entregarlo en correo + reunión con los límites declarados. Caso fuente: SKY frente a LATAM, JetSMART, Avianca y Gol (Chile, 2026-09-11).
+- [Revisar licitaciones públicas de LicitaLAB con la CLI](comercial/revisar-licitaciones-licitalab-con-cli.md) — el agente busca (`pnpm licitalab search`), filtra y lee bases con evidencia (archivo y página); tú eliges candidatas y decides GO / HOLD / NO-GO. Qué cubre cada credencial (API key, sesión OAuth de 7 días, sesión web), qué significan score, `✓/✗` y estados del RAG, y cómo renovar sesiones sin darle la contraseña al agente.
 - [Componer el deck de una licitacion](comercial/componer-deck-de-licitacion.md) — `pnpm deck:compose <plan.json>`: escribir el plan, componer, revisar las laminas y entregar. Que significan `too_long` (el renderer NO trunca), `missing_evidence_ref` (una cifra sin fuente no se compone) y el aviso de peso del PDF (si el portal rechaza el archivo, la oferta queda fuera del proceso).
 - [Autorar una lámina con el chapter-author](comercial/autorar-lamina-con-chapter-author.md) — generar las láminas de diagnóstico desde un run real del Grader con el agente (propose → confirmación humana → render): prerrequisitos (proxy PG, flag, key), el script canónico, cómo entran los hechos externos del operador (siempre con fuente), qué significa cada rechazo (no son bugs: es el diseño anti-fabricación) y qué no hacer.
 
@@ -61,7 +65,7 @@ La diferencia con otras capas de documentacion:
 
 ### Efeonce Insights
 
-- [Operar Efeonce Insights por API y MCP](insights/operar-efeonce-insights-api-mcp.md) — crear y seguir ediciones sin pantalla: flags y módulo `insights_v1` como prerrequisitos, el encargo (módulos, período `[inicio, fin)` en zona IANA, comparación, idempotencia), lectura de evidencia sellada y plan congelado, estados por audiencia, códigos de rechazo, cómo se ve cada respuesta (`202`/replay idempotente/`409`/`404`/`503 generation_disabled`/`not_ready`), qué ve un cliente vs un interno, la receta del canary por lane ecosystem, la asignación del módulo con `scripts/insights/assign-insights-module.ts`, la trampa de Vercel (env var nuevo exige redeploy) y qué está bloqueado a propósito (emitir sin salidas validadas, emitir por MCP, `create_insight_edition` por el gateway hasta un grant del scope). TASK-1845.
+- [Operar Efeonce Insights por API y MCP](insights/operar-efeonce-insights-api-mcp.md) — crear y seguir ediciones sin pantalla: flags y módulo `insights_v1` como prerrequisitos, el encargo (módulos, período `[inicio, fin)` en zona IANA, comparación, idempotencia), lectura de evidencia sellada y plan congelado, estados por audiencia, códigos de rechazo, cómo se ve cada respuesta (`202`/replay idempotente/`409`/`404`/`503 generation_disabled`/`not_ready`), qué ve un cliente vs un interno, la receta del canary por lane ecosystem, la asignación del módulo con `scripts/insights/assign-insights-module.ts`, la trampa de Vercel (env var nuevo exige redeploy) qué está bloqueado a propósito (emitir sin salidas validadas, emitir por MCP, `create_insight_edition` por el gateway hasta un grant del scope), y las recetas de enlaces compartidos, envío por correo (reconciliar ambiguos, reintentar, cancelar), schedules, flags por runtime y rollback por lane (TASK-1848, sin deploy). TASK-1845/1846/1848.
 
 ### Growth
 

@@ -1,0 +1,551 @@
+{
+  "logo": "../ref/logo-efeonce-oficial.svg",
+  "color_hex": "#023c70",
+  "regla_camara": "Vistas oblicuas a >= 3,5x el ancho del logo y lente >= 35 mm efectivo: evita que la palabra se vea curvada o con un extremo gigante. Contrapicados elevando el objeto, no acercando la cámara.",
+  "renders": [
+    {
+      "id": "01-frente-altura-ojos",
+      "descripcion": "De frente a la altura de los ojos de una persona de pie",
+      "usos": [
+        "pedestal",
+        "stand",
+        "vitrina"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-mediana-01-frente-altura-ojos-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -3.0,
+          1.6
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 75.9,
+        "altura_camara_m": 1.6,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "01-frente-altura-ojos",
+      "descripcion": "De frente a la altura de los ojos de una persona de pie",
+      "usos": [
+        "pedestal",
+        "stand",
+        "vitrina"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-mediana-01-frente-altura-ojos-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -3.0,
+          1.6
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 75.9,
+        "altura_camara_m": 1.6,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "02-tres-cuartos-izquierda",
+      "descripcion": "Tres cuartos desde la izquierda",
+      "usos": [
+        "stand",
+        "mesón de recepción",
+        "exhibición"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-mediana-02-tres-cuartos-izquierda-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          -3.2,
+          -3.4,
+          1.5
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 155.8,
+        "altura_camara_m": 1.5,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "02-tres-cuartos-izquierda",
+      "descripcion": "Tres cuartos desde la izquierda",
+      "usos": [
+        "stand",
+        "mesón de recepción",
+        "exhibición"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-mediana-02-tres-cuartos-izquierda-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          -3.2,
+          -3.4,
+          1.5
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 155.8,
+        "altura_camara_m": 1.5,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "03-tres-cuartos-derecha",
+      "descripcion": "Tres cuartos desde la derecha",
+      "usos": [
+        "stand",
+        "mesón de recepción",
+        "exhibición"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-mediana-03-tres-cuartos-derecha-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          3.2,
+          -3.4,
+          1.5
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 155.8,
+        "altura_camara_m": 1.5,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "03-tres-cuartos-derecha",
+      "descripcion": "Tres cuartos desde la derecha",
+      "usos": [
+        "stand",
+        "mesón de recepción",
+        "exhibición"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-mediana-03-tres-cuartos-derecha-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          3.2,
+          -3.4,
+          1.5
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 155.8,
+        "altura_camara_m": 1.5,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "04-picado-frente",
+      "descripcion": "Desde arriba y de frente, unos 30°",
+      "usos": [
+        "mesón",
+        "vitrina baja",
+        "premio"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-mediana-04-picado-frente-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -2.4,
+          2.6
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 70.2,
+        "altura_camara_m": 2.6,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "04-picado-frente",
+      "descripcion": "Desde arriba y de frente, unos 30°",
+      "usos": [
+        "mesón",
+        "vitrina baja",
+        "premio"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-mediana-04-picado-frente-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -2.4,
+          2.6
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 70.2,
+        "altura_camara_m": 2.6,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "05-picado-tres-cuartos-izquierda",
+      "descripcion": "Desde arriba y desde la izquierda",
+      "usos": [
+        "producto",
+        "premio",
+        "exhibición"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-mediana-05-picado-tres-cuartos-izquierda-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          -1.9,
+          -2.0,
+          2.4
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 100.6,
+        "altura_camara_m": 2.4,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "05-picado-tres-cuartos-izquierda",
+      "descripcion": "Desde arriba y desde la izquierda",
+      "usos": [
+        "producto",
+        "premio",
+        "exhibición"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-mediana-05-picado-tres-cuartos-izquierda-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          -1.9,
+          -2.0,
+          2.4
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 100.6,
+        "altura_camara_m": 2.4,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "06-picado-tres-cuartos-derecha",
+      "descripcion": "Desde arriba y desde la derecha",
+      "usos": [
+        "producto",
+        "premio",
+        "exhibición"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-mediana-06-picado-tres-cuartos-derecha-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          1.9,
+          -2.0,
+          2.4
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 100.4,
+        "altura_camara_m": 2.4,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "06-picado-tres-cuartos-derecha",
+      "descripcion": "Desde arriba y desde la derecha",
+      "usos": [
+        "producto",
+        "premio",
+        "exhibición"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-mediana-06-picado-tres-cuartos-derecha-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          1.9,
+          -2.0,
+          2.4
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 100.4,
+        "altura_camara_m": 2.4,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "07-contrapicado-leve",
+      "descripcion": "Levemente desde abajo, pieza heroica sobre un pedestal",
+      "usos": [
+        "trofeo",
+        "pedestal",
+        "hero de producto"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-mediana-07-contrapicado-leve-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -3.0,
+          0.85
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 75.4,
+        "altura_camara_m": 0.85,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "07-contrapicado-leve",
+      "descripcion": "Levemente desde abajo, pieza heroica sobre un pedestal",
+      "usos": [
+        "trofeo",
+        "pedestal",
+        "hero de producto"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-mediana-07-contrapicado-leve-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -3.0,
+          0.85
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 75.4,
+        "altura_camara_m": 0.85,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "08-teleobjetivo",
+      "descripcion": "Desde lejos con teleobjetivo, perspectiva casi plana",
+      "usos": [
+        "catálogo",
+        "ficha de producto",
+        "fondo desenfocado"
+      ],
+      "luz": "der",
+      "archivo": "efeonce-logo-3d-navy-mediana-08-teleobjetivo-luz-der-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -9,
+          1.3
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 226.3,
+        "altura_camara_m": 1.3,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    },
+    {
+      "id": "08-teleobjetivo",
+      "descripcion": "Desde lejos con teleobjetivo, perspectiva casi plana",
+      "usos": [
+        "catálogo",
+        "ficha de producto",
+        "fondo desenfocado"
+      ],
+      "luz": "izq",
+      "archivo": "efeonce-logo-3d-navy-mediana-08-teleobjetivo-luz-izq-transparente.png",
+      "camara": {
+        "posicion_m": [
+          0,
+          -9,
+          1.3
+        ],
+        "mira_m": [
+          0,
+          0,
+          1.1400000000000001
+        ],
+        "lente_mm_efectiva": 226.3,
+        "altura_camara_m": 1.3,
+        "elevacion_objeto_m": 1.0
+      },
+      "color": "navy",
+      "escala": {
+        "nombre": "mediana",
+        "ancho_m": 1.2,
+        "grosor_m": 0.042,
+        "bisel_m": 0.005,
+        "nota": "pieza de ~28 cm de alto: pedestal, stand, vitrina, mesón"
+      }
+    }
+  ]
+}

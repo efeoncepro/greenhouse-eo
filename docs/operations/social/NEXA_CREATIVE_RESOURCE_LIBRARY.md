@@ -39,3 +39,46 @@ Para acompañar a Nexa con Marketing con Manzanitas, usar su
 
 Para aplicación y errores observados, ver
 [Día del Pódcast](2026-09-13-podcast-fotohistoria-production-method.md).
+
+## Versión humana con hoodie Efeonce
+
+En el [KV «Tu IA no conoce tu negocio»](2026-09-17-kv-tu-ia-no-conoce-production-method.md) (2026-09-17) Nexa aparece
+en versión humana con el hoodie azul de Efeonce. Referencias usadas: `Avatar 3,4 v2` y `Avatar Cuerpo Completo v2`
+(identidad) más el asset del sitio público `contacto-careers-hoodie.png` (vestuario), con copias locales en la carpeta
+de producción. Aprendizaje: la identidad se mantuvo bien con esas dos referencias de avatar más el hoodie, incluso en
+un plate nativo guiado por boceto; el isotipo del hoodie salió prácticamente igual al oficial, sin re-estampado. El
+rostro se validó a ojo contra las referencias. El hoodie es vestuario de esa campaña, no un atributo universal.
+
+Desde el 2026-09-17 existe un [kit de referencia de prenda](2026-09-17-hoodie-efeonce-garment-reference-kit.md) del
+hoodie (21 vistas en `13- Branding/Hoodie Efeonce/v01/`): es la referencia de vestuario a usar, eligiendo la vista por
+el **ángulo de la toma**, en lugar de un asset suelto del sitio público. Existe también el kit del **polo piqué**
+(`13- Branding/Polo Efeonce/v01/`): si la escena es corporativa —cliente, comité, licitación—, la prenda que
+corresponde es el polo, no el hoodie, según la cápsula de vestuario de la misma bitácora. Completan la cápsula la
+**chaqueta** (`13- Branding/Chaqueta Efeonce/v01/`, softshell navy sobre el polo para reunión formal y comité) y la
+**gorra** (`13- Branding/Gorra Efeonce/v01/`, navy con logotipo blanco como principal, para producción y terreno);
+ambas ya se probaron sobre Nexa. La elección sigue siendo vestuario **de esa pieza**, no un atributo universal de Nexa.
+
+## Biblioteca de poses 3D (pendiente)
+
+El método usado el 2026-09-17 para las [bibliotecas de poses 3D de mascotas de partners](PARTNER_MASCOT_POSE_LIBRARIES.md)
+(Clawd y Codex) se aplicará a Nexa: fuente oficial → base validada → ángulos de cámara → accesorios → recorte con
+relleno de huecos → QA → OneDrive. Destino: una carpeta propia dentro de `10. Nexa (Influencer IA)`, nunca en
+`14. Mascotas de partners` (Nexa es marca propia, no mascota de partner). Nexa tiene dos familias y cada una lleva
+su propia serie, sin mezclarlas:
+
+- **Personaje 3D estilo Pixar:** `public/images/illustrations/characters/greenhouse-*.png` (pipeline edit + `rmbg`).
+- **Versión humana fotorrealista:** esta biblioteca OneDrive (`Avatar 3,4 v2`, `Avatar Cuerpo Completo v2`, poses y
+  vestuario).
+
+Sin guía de partner que validar, pero rostro, cabello y rasgos de identidad se mantienen; el hoodie Efeonce es
+vestuario de campaña, no atributo universal. Método:
+[`mascot-3d-pose-library.md`](../../../.claude/skills/greenhouse-ai-image-generator/references/mascot-3d-pose-library.md).
+
+Lecciones de la [nave de Efeonce en 3D](2026-09-17-efeonce-ship-3d-production-method.md) (2026-09-17) que aplican a Nexa:
+
+- **Ángulos extremos:** un contrapicado, picado o gran angular se indica con una guía geométrica de perspectiva como
+  imagen de referencia; con la cámara sólo en texto el modelo devolvió casi frontal.
+- **Variantes de vestuario o color:** editar el render ya aprobado cambiando sólo ese atributo, en vez de regenerar;
+  así se conservan identidad, pose y cámara.
+- **QA del recorte:** componer la variante transparente sobre un fondo de contraste fuerte y revisar al 100 % los
+  huecos y bordes finos (cabello, dedos, accesorios).

@@ -406,6 +406,11 @@ operar. El resumen:
   `proposal_render_jobs` (idempotencia por hash canónico del manifest) → dispatcher con prioridad
   deadline+aging → Cloud Run Job `artifact-worker` (Chromium pinneado) → PDF + previews al asset
   store privado. Corrida real de referencia: el deck SKY de 15 láminas salió por este camino.
+- **Delta 2026-09-16 (TASK-1846):** el `artifact-worker` es multiconsumidor (Proposal + Efeonce Insights,
+  `services/artifact-worker/consumers/*`), el hash del manifest vive en `artifact-composer/manifest-hash.ts`
+  y el lanzador del Job en `src/lib/render-dispatch/job-runner.ts` (fuera del composer). El Job entra al
+  release control plane (primer deploy productivo: release `917491fd02e4`). Detalle en
+  `proposal-studio-runtime.md`.
 
 ### Las reglas que ese runtime ENFORCEA (ya no son intención)
 

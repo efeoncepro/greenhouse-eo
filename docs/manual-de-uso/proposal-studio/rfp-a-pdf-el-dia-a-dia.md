@@ -489,7 +489,7 @@ Esto está **construido y probado, pero apagado por defecto**. Nexa opera propue
 |---|---|
 | **Flag apagado** (lo que verás hoy si no se prendió) | Nexa te dice, sin rodeos, que las acciones gobernadas no están habilitadas. **No inventa, no simula, no "hace como que"**. |
 | **Flag prendido** | Nexa opera el ciclo completo, con la tarjeta de confirmación que verás más abajo. |
-| **Pedir el deck** (`request_proposal_render`) | Necesita **además** `ARTIFACT_RENDER_JOBS_ENABLED` en el mismo entorno. Hoy está prendido en staging y **apagado en producción, por diseño**. |
+| **Pedir el deck** (`request_proposal_render`) | Necesita **además** `ARTIFACT_RENDER_JOBS_ENABLED` en el mismo entorno. Hoy está prendido en staging y **apagado en producción, por diseño**. *(2026-09-16: en Vercel Production la variable existe — presencia verificada, valor no leído; verifica su valor antes de dar por cerrado o abierto el render productivo.)* |
 
 **Mientras tanto, el camino vivo del día a día es el que documenta el resto de este manual**: tú + Claude Code + los comandos. No hay pantalla del Proposal Studio en el portal, y esta sección no te promete una.
 

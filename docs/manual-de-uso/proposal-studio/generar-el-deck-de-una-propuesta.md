@@ -43,7 +43,8 @@ Hay **dos caminos** y elegir mal cuesta caro:
    - El módulo `proposal_studio_v1` activo en tu organización.
    - La capability `commercial.proposal.render` (roles `efeonce_admin` o `efeonce_account`).
    - El flag `ARTIFACT_RENDER_JOBS_ENABLED=true` en el runtime desde el que encolas. **Hoy: staging sí,
-     Production no** (ver [operar-el-artifact-worker.md](operar-el-artifact-worker.md)).
+     Production no** (ver [operar-el-artifact-worker.md](operar-el-artifact-worker.md)). *Actualizado
+     2026-09-16: en Vercel Production la variable existe (presencia verificada, valor no leído); léela antes de asumir el estado.*
    - Si el artefacto es `client_facing`: **ser una persona**. Un script o un agente no puede pedir un
      render hacia el comprador (lo rechazan el command y la base de datos).
 
@@ -327,7 +328,7 @@ proposal_render_conflict` con el motivo. Ver
 | Síntoma | Causa | Qué hacer |
 |---|---|---|
 | `422 proposal_render_rejected` al encolar y no se creó ningún job | Uno de los 4 gates de enqueue. El detalle está en el mensaje del error tipado (`flag_disabled`, `deadline_expired`, `accessibility_unsupported`, `semantic_rejected`, `audience_violation`). | Ver la tabla completa en [entender-los-errores-y-rechazos.md](entender-los-errores-y-rechazos.md). |
-| "El pipeline de render está apagado" | El flag `ARTIFACT_RENDER_JOBS_ENABLED` está en `false` en el runtime que recibe el enqueue (hoy: **Vercel Production**). | Es el diseño actual. El CLI (camino A) sigue disponible. Abrir producción exige sign-off. |
+| "El pipeline de render está apagado" | El flag `ARTIFACT_RENDER_JOBS_ENABLED` está en `false` en el runtime que recibe el enqueue (hoy: **Vercel Production**). | Es el diseño actual. El CLI (camino A) sigue disponible. Abrir producción exige sign-off. *(2026-09-16: el Job ya está en el release control plane; lo que decide es el valor de la variable en Vercel Production.)* |
 | El job queda `queued` para siempre | El dispatcher está caído, o el flag está apagado en el `ops-worker`. | Señal `artifact.render.queue.starvation`. Ver [operar-el-artifact-worker.md](operar-el-artifact-worker.md). |
 | `manifest_drift` | El catálogo (plantilla/brand pack/contrato) cambió entre el enqueue y la ejecución. | **No se reintenta.** Vuelve a resolver el plan (`resolvePlan`) y encola un render nuevo: el hash será otro. |
 | El PDF salió pero pesa más de lo que aceptan las bases | El requisito de peso no estaba declarado cuando encolaste (el job fijó el default de 20 MB). | Declara el requisito `format` con el literal de las bases y encola un render nuevo. El sistema toma el límite **más restrictivo**. |

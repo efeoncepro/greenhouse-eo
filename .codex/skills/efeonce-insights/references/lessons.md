@@ -1,5 +1,35 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-18 · A concurrent burst against a public route nearly exhausted the shared PostgreSQL.** Measuring the share
+  reader's rate limit with 64 concurrent requests left 86–88 idle `greenhouse_app` connections (max 100) for exactly 5 min:
+  each Vercel invocation opens its own pool, the pool's idle timeout never runs while the function is frozen, and the
+  server only cuts at `idle_session_timeout` (5 min). DB-backed rate limiters spend a connection before rejecting. Rule:
+  never probe limits with concurrent bursts against the shared instance; sequence them. Fix owner: TASK-1876 (ISSUE-174).
+- **2026-09-18 · The email platform's token-sensitive intent index is unique per (type, source_event_id, source_entity).**
+  Symptom: a retry that reuses the SAME correlation never creates a new `email_deliveries` row (it collides with the
+  previous attempt). Rule: correlate per attempt — `idlr-<uuid>` for attempt 1, `idlr-<uuid>:aN` for retries N=2..5 —
+  so a retry never collides with, nor is confused with, the previous attempt when reconciling.
+- **2026-09-18 · `email_type_config` fails OPEN.** Symptom: a new EmailType without a seeded row is enabled the moment
+  the code deploys. Rule: every new EmailType ships with its `email_type_config` row seeded `enabled=false` in the same
+  migration; turning email on is a row flip, not a side effect of the deploy.
+- **2026-09-18 · `NotificationService.dispatch` cannot restrict channels.** Symptom: using it for an "in-app" notice
+  also fires its own generic `notification` email — a double send with no dedupe. Rule: do not use it for in-app next to
+  a domain email until channel restriction exists (owners TASK-690–693 / TASK-1849); document the gap instead.
+- **2026-09-18 · `pnpm pg:connect:migrate` stops the Cloud SQL Proxy when it finishes.** Symptom: a proxy you started
+  earlier is dead afterwards (`ECONNREFUSED 127.0.0.1:15432`) for readbacks and live tests. Rule: restart the proxy after
+  migrating before any readback or `pnpm test:live`.
+- **2026-09-18 · `tenant/access` drags bcrypt/BigQuery/notifications into the worker bundle.** Symptom: revalidating an
+  authority from the ops-worker through the tenant access helpers pulls heavy, unrelated deps. Rule: read
+  `greenhouse_serving.session_360` (role_codes with lifecycle) and build the subject there.
+- **2026-09-18 · The Grader's share link is not a model for sharing.** Symptom: it stores the token in clear and serves
+  without anti-index headers (`public, max-age=300`). Rule: the model is the talent-pool token (digest only) plus the
+  headers of `hiring/assessment/public-session/http.ts`.
+- **2026-09-16 · A cold Job start makes the dispatcher launch twice for one output.** Production canary: the Job took
+  ~2 min to start, so the next 2-min tick (22:14) still saw the `deck_pdf` output `queued` and launched a second
+  execution after the 22:12 one. Only one finalized (atomic claim + fencing); the other found no work. Rule: count
+  executions per output as "≥1", never "exactly 1"; integrity lives in claim + fence, not in the dispatcher. Two Job
+  executions for one output after a cold start are expected, not a double render — do not retry or cancel. If the
+  cost ever matters, the fix is for the dispatcher to account for Job executions still running before launching.
 - **2026-09-16 · A hand-launched canary hid the dispatcher's missing flag.** The 13:00Z render canary executed the
   `artifact-worker` Job manually and passed; the `ops-worker` dispatcher did not have `INSIGHTS_RENDER_ENABLED`
   (logs 13:02Z `insightsQueued=0` with an output queued), so nothing would have drained on its own. Rule: a canary

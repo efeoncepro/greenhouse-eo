@@ -94,7 +94,9 @@ Usar cuando el hallazgo depende de riqueza visual:
 2. Desarrollar 2–3 con Pro.
 3. Aprobar un anchor humano.
 4. Entregarlo a GPT para organizar y recomponer formatos.
-5. Usar máscara GPT si rostro, producto o packaging deben protegerse.
+5. Usar máscara GPT si rostro, producto o packaging deben protegerse, y recomponer después esa región desde el
+   anchor: GPT Image 2.5 redibuja todo aunque reciba máscara (delta máximo 221/255 en zona protegida, 2026-09-17;
+   [receta](../../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu)).
 6. Componer copy y marca fuera del raster.
 
 ### GPT → Seedream Pro (→ GPT sólo si hace falta)
@@ -237,6 +239,7 @@ Laboratorio `hummingbird-high-frequency`, as-of 2026-07-18:
 - Pro 3:1: dos pases y 232,27 s hasta cumplir crop.
 - GPT medium: 33,97–57,60 s; 3:1 correcto en un pase (~34 s).
 - GPT + máscara produjo 32,6% menos deriva pixel-level protegida que el edit semántico Pro evaluado con la misma región.
+  Menos deriva no es cero: la región protegida se recompone desde el anchor.
 - Ambos acertaron una frase española en un intento; no extrapolar a legales o localización masiva.
 - Flujo GPT→Pro: anchor GPT high (~70 s) + finish Pro (128,86 s) conservó cuatro fases y safe
   zone con correlación de bordes 0,9212 y elevó croma medio 12,1%.

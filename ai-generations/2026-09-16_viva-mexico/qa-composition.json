@@ -1,0 +1,334 @@
+{
+  "headline": {
+    "size": 182.9,
+    "bounds": {
+      "left": 259.20000000000005,
+      "top": 350.25196149438375,
+      "right": 820.8,
+      "bottom": 648.7480385056163
+    },
+    "recipe": "ideaImpact"
+  },
+  "idea": {
+    "size": 88.64,
+    "bounds": {
+      "left": 248.4,
+      "top": 420.69707914407377,
+      "right": 831.6,
+      "bottom": 578.3029208559262
+    },
+    "recipe": "ideaShort"
+  },
+  "logo": {
+    "x": 440,
+    "y": 1222.0075143058525,
+    "width": 200,
+    "height": 46.99248569414744
+  },
+  "slides": [
+    {
+      "id": "01",
+      "plate": "a",
+      "contrastWorstCase": 12.66,
+      "logoContrastWorstCase": 18.27,
+      "cards": [
+        {
+          "left": 100,
+          "top": 744.7480385056163,
+          "right": 980,
+          "bottom": 916.7480385056163
+        }
+      ],
+      "selection": null
+    },
+    {
+      "id": "02",
+      "plate": "a",
+      "contrastWorstCase": 12.66,
+      "logoContrastWorstCase": null,
+      "cards": [
+        {
+          "left": 100,
+          "top": 744.7480385056163,
+          "right": 980,
+          "bottom": 916.7480385056163
+        }
+      ],
+      "selection": {
+        "withinCanvas": true,
+        "cursors": [
+          {
+            "id": "local",
+            "state": "acting",
+            "action": "select",
+            "direction": "north-west",
+            "anchor": "bottom-end",
+            "hotspot": {
+              "x": 833.76,
+              "y": 659.548
+            },
+            "touchesTarget": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "03",
+      "plate": "a",
+      "contrastWorstCase": 12.66,
+      "logoContrastWorstCase": null,
+      "cards": [
+        {
+          "left": 100,
+          "top": 744.7480385056163,
+          "right": 980,
+          "bottom": 916.7480385056163
+        }
+      ],
+      "selection": {
+        "withinCanvas": true,
+        "cursors": [
+          {
+            "id": "melkin",
+            "state": "acting",
+            "action": "resize",
+            "direction": "south-west",
+            "anchor": "top-end",
+            "hotspot": {
+              "x": 833.76,
+              "y": 339.452
+            },
+            "touchesTarget": true,
+            "label": "Melkin",
+            "participantKind": "person",
+            "attachment": "south-west",
+            "labelGap": 4.32,
+            "labelBounds": {
+              "left": 866.16,
+              "top": 279.188,
+              "right": 931.167,
+              "bottom": 307.052
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "04",
+      "plate": "a",
+      "contrastWorstCase": 12.66,
+      "logoContrastWorstCase": null,
+      "cards": [
+        {
+          "left": 100,
+          "top": 744.7480385056163,
+          "right": 980,
+          "bottom": 916.7480385056163
+        }
+      ],
+      "selection": {
+        "withinCanvas": true,
+        "cursors": [
+          {
+            "id": "local",
+            "state": "acting",
+            "action": "resize",
+            "direction": "north-west",
+            "anchor": "bottom-end",
+            "hotspot": {
+              "x": 833.76,
+              "y": 659.548
+            },
+            "touchesTarget": true
+          },
+          {
+            "id": "andres",
+            "state": "acting",
+            "action": "rotate",
+            "direction": "south-east",
+            "anchor": "top-start",
+            "hotspot": {
+              "x": 246.24,
+              "y": 339.452
+            },
+            "touchesTarget": true,
+            "label": "Andrés",
+            "participantKind": "person",
+            "attachment": "south-east",
+            "labelGap": 4.32,
+            "labelBounds": {
+              "left": 145.256,
+              "top": 279.188,
+              "right": 213.84,
+              "bottom": 307.052
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "05",
+      "plate": "a",
+      "contrastWorstCase": 12.66,
+      "logoContrastWorstCase": null,
+      "cards": [
+        {
+          "left": 100,
+          "top": 744.7480385056163,
+          "right": 980,
+          "bottom": 917.0840385056163
+        }
+      ],
+      "selection": {
+        "withinCanvas": true,
+        "cursors": [
+          {
+            "id": "daniela",
+            "state": "moving",
+            "action": "move",
+            "direction": "north-west",
+            "canvasRegion": "upper-end",
+            "hotspot": {
+              "x": 885.6,
+              "y": 243
+            },
+            "touchesTarget": false,
+            "clearOfTarget": true,
+            "label": "Daniela",
+            "participantKind": "person",
+            "attachment": "north-west",
+            "labelGap": 4.32,
+            "labelBounds": {
+              "left": 918,
+              "top": 275.4,
+              "right": 990.122,
+              "bottom": 303.264
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "06",
+      "plate": "a",
+      "contrastWorstCase": 14.1,
+      "logoContrastWorstCase": null,
+      "cards": [],
+      "selection": null
+    },
+    {
+      "id": "06b",
+      "plate": "a",
+      "contrastWorstCase": 12.24,
+      "logoContrastWorstCase": null,
+      "cards": [],
+      "selection": null
+    },
+    {
+      "id": "06-v1",
+      "plate": "a",
+      "contrastWorstCase": 13.47,
+      "logoContrastWorstCase": null,
+      "cards": [],
+      "selection": null
+    },
+    {
+      "id": "07",
+      "plate": "b",
+      "contrastWorstCase": 7.18,
+      "logoContrastWorstCase": 16.94,
+      "cards": [],
+      "selection": null
+    },
+    {
+      "id": "07-v02",
+      "plate": "b-v02",
+      "contrastWorstCase": 7.05,
+      "logoContrastWorstCase": 19.08,
+      "cards": [],
+      "selection": null
+    },
+    {
+      "id": "06-graded",
+      "plate": "a-graded",
+      "contrastWorstCase": 15.73,
+      "logoContrastWorstCase": null,
+      "cards": [],
+      "selection": null
+    }
+  ],
+  "ideaVariants": {
+    "A": {
+      "metrics": [
+        {
+          "text": "Hay frases que",
+          "family": "Poppins",
+          "weight": 500,
+          "size": 56.7,
+          "inkTop": 382.82,
+          "inkBottom": 441.44,
+          "inkWidth": 415.65
+        },
+        {
+          "text": "no se",
+          "family": "Bricolage",
+          "weight": 420,
+          "size": 109.49,
+          "inkTop": 460.99,
+          "inkBottom": 520.77,
+          "inkWidth": 230.41
+        },
+        {
+          "text": "tocan.",
+          "family": "Bricolage",
+          "weight": 800,
+          "size": 215.06,
+          "inkTop": 534.46,
+          "inkBottom": 676.18,
+          "inkWidth": 540
+        }
+      ],
+      "inkGaps": [
+        19.55,
+        13.69
+      ],
+      "bounds": {
+        "left": 269.99999999999994,
+        "top": 382.81615092073463,
+        "right": 810,
+        "bottom": 676.1838490792653
+      }
+    },
+    "B": {
+      "metrics": [
+        {
+          "text": "Hay frases que",
+          "family": "Poppins",
+          "weight": 500,
+          "size": 49.17,
+          "inkTop": 452.92,
+          "inkBottom": 503.76,
+          "inkWidth": 360.43
+        },
+        {
+          "text": "no se tocan.",
+          "family": "Bricolage",
+          "weight": 780,
+          "size": 127.15,
+          "inkTop": 522.41,
+          "inkBottom": 606.08,
+          "inkWidth": 604.8
+        }
+      ],
+      "inkGaps": [
+        18.65
+      ],
+      "bounds": {
+        "left": 237.60000000000002,
+        "top": 452.92376763593813,
+        "right": 842.4,
+        "bottom": 606.0762323640619
+      }
+    }
+  }
+}

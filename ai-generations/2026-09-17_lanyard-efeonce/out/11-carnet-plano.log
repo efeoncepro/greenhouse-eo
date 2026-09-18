@@ -1,0 +1,4 @@
+  $ costo estimado ≈ USD 0.090 (1 × 3011 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-09-17_lanyard-efeonce/out/lanyard-11-carnet-plano.png (edit) …
+  ✗ ./ai-generations/2026-09-17_lanyard-efeonce/out/lanyard-11-carnet-plano.png FAILED: OpenAI image generation failed with HTTP 520.
+done

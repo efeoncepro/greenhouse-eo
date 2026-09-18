@@ -16,11 +16,14 @@ import 'server-only'
 import type { ApiPlatformRequestContext, ApiPlatformSuccessResult } from '@/lib/api-platform/core/context'
 import { ApiPlatformError } from '@/lib/api-platform/core/errors'
 import { buildApiPlatformPaginationMeta, parseApiPlatformPaginationParams } from '@/lib/api-platform/core/pagination'
-import { cancelInsightRender, createInsightEdition, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition } from '@/lib/efeonce-insights/commands'
+import { cancelInsightRender, createInsightEdition, createInsightShare, revokeInsightShare, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition } from '@/lib/efeonce-insights/commands'
 import { isInsightEditionState, type InsightEditionState } from '@/lib/efeonce-insights/contracts/states'
-import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsightRenderRuns, readInsightReport, readInsightReports, readInsightsCatalog } from '@/lib/efeonce-insights/readers'
+import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsightShares, readInsightRenderRuns, readInsightReport, readInsightReports, readInsightsCatalog } from '@/lib/efeonce-insights/readers'
 import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { ROLE_CODES } from '@/config/role-codes'
+
+import { readInsightDeliveries, readInsightDelivery } from '@/lib/efeonce-insights/delivery/commands'
+import { readInsightSchedule, readInsightSchedules } from '@/lib/efeonce-insights/schedules/commands'
 
 import { withInsightsErrors } from './insights-errors'
 
@@ -189,3 +192,46 @@ export const cancelEcosystemInsightRenderPayload = async ({ context, request, bo
     return { data: { run: result.run, outputs: result.outputs, cancelled: result.cancelled, stillRunning: result.stillRunning, idempotent: result.idempotent }, status: 200 }
   })
 
+
+// ── TASK-1848 — enlaces compartidos por el lane ecosystem. Crear/revocar exige binding interno
+// (un binding org-scoped no comparte: su sujeto sintético no tiene `insights.share.manage`). ──
+
+export const createEcosystemInsightSharePayload = async ({ context, request, body, editionId }: { context: ApiPlatformRequestContext; request: Request; body: unknown; editionId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => {
+    const scope = resolveScope(context, request, body)
+
+    assertWrite(scope)
+
+    return { data: await createInsightShare({ ...scope, editionId, options: body }), status: 201 }
+  })
+
+export const listEcosystemInsightSharesPayload = async ({ context, request, editionId }: { context: ApiPlatformRequestContext; request: Request; editionId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => ({ data: (await readInsightShares({ ...resolveScope(context, request), editionId })).items }))
+
+export const revokeEcosystemInsightSharePayload = async ({ context, request, body, shareGrantId }: { context: ApiPlatformRequestContext; request: Request; body: unknown; shareGrantId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => {
+    const scope = resolveScope(context, request, body)
+
+    assertWrite(scope)
+
+    const result = await revokeInsightShare({ ...scope, shareGrantId })
+
+    return { data: { share: result.share, idempotent: result.idempotent }, status: 200 }
+  })
+
+// ── TASK-1848 — envíos por correo: el lane ecosystem SÓLO lee. Solicitar, cancelar, reintentar y
+// reconciliar exigen una persona interna en el App lane (mismo criterio que `issue`). ──
+
+export const listEcosystemInsightDeliveriesPayload = async ({ context, request, editionId }: { context: ApiPlatformRequestContext; request: Request; editionId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => ({ data: (await readInsightDeliveries({ ...resolveScope(context, request), editionId })).items }))
+
+export const getEcosystemInsightDeliveryPayload = async ({ context, request, deliveryIntentId }: { context: ApiPlatformRequestContext; request: Request; deliveryIntentId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => ({ data: await readInsightDelivery({ ...resolveScope(context, request), deliveryIntentId }) }))
+
+// ── TASK-1848 — recurrencia: el lane ecosystem SÓLO lee (crearla o activarla exige una persona). ──
+
+export const listEcosystemInsightSchedulesPayload = async ({ context, request }: { context: ApiPlatformRequestContext; request: Request }): Payload<unknown> =>
+  withInsightsErrors(async () => ({ data: (await readInsightSchedules(resolveScope(context, request))).items }))
+
+export const getEcosystemInsightSchedulePayload = async ({ context, request, scheduleId }: { context: ApiPlatformRequestContext; request: Request; scheduleId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => ({ data: await readInsightSchedule({ ...resolveScope(context, request), scheduleId }) }))

@@ -42,6 +42,10 @@ freehand por la puerta de atrás.
 >    client_facing), accesibilidad (PDF/UA exigido ⇒ rechazo), peso/páginas del RFP fijados,
 >    deadline. Manual completo de uso y evolución:
 >    `greenhouse-public-private-tenders/proposal-studio-runtime.md`.
+>    **Delta 2026-09-16 (TASK-1846):** el Job `artifact-worker` es multiconsumidor (Proposal + Efeonce
+>    Insights), está integrado al release control plane (primer deploy productivo: release
+>    `917491fd02e4`) y el lanzador del Job vive fuera del motor (`src/lib/render-dispatch/job-runner.ts`);
+>    el hash del manifest es del motor (`artifact-composer/manifest-hash.ts`).
 >
 > **La QA visual ya es MECÁNICA en ambos caminos** (`quality-gates.ts`, dentro del render):
 > `missing_asset` (todo `<img>` con naturalWidth>0) · `font_fallback_detected` (familia sin

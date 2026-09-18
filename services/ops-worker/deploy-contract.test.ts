@@ -15,6 +15,22 @@ describe('ops-worker deploy render dispatch contract', () => {
     // Sin el flag declarado, dispatchNextInsightRender lo ve OFF y ningún output encolado lanza el Job.
     expect(deployScript()).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_RENDER_ENABLED=${INSIGHTS_RENDER_ENABLED:-true}"')
   })
+
+  it('declares INSIGHTS_DELIVERY_ENABLED ON: the reactive dispatcher sends Insights deliveries (TASK-1848)', () => {
+    // Guarda textual que SEÑALA, no verifica: --set-env-vars es destructivo y un flag aplicado sólo con
+    // --update-env-vars desaparece en el próximo deploy. El verificador real es leer la revisión ACTIVA
+    // (`gcloud run services describe ops-worker`) y el canary de entrega en staging (runbook de Insights).
+    expect(deployScript()).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_DELIVERY_ENABLED=${INSIGHTS_DELIVERY_ENABLED:-true}"')
+  })
+
+  it('declares the Insights schedules tick flags and its single scheduler job (TASK-1848)', () => {
+    // Señala, no verifica: el verificador real es la revisión activa y un tick del canary de staging.
+    const script = deployScript()
+
+    expect(script).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_SCHEDULES_ENABLED=${INSIGHTS_SCHEDULES_ENABLED:-true}"')
+    expect(script).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_GENERATION_ENABLED=${INSIGHTS_GENERATION_ENABLED:-true}"')
+    expect(script).toContain('"/insights/schedules/tick"')
+  })
 })
 
 describe('ops-worker deploy Nubox contract', () => {

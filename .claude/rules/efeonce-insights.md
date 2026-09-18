@@ -36,10 +36,19 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
 - **Flags multi-gate**: `INSIGHTS_RENDER_ENABLED` se lee en TRES runtimes — Vercel (encolar; la puerta de producto por
   ambiente, default OFF), el Job `artifact-worker` (reclamar) y el `ops-worker` (despachar). Job y `ops-worker` son únicos
   para staging y producción, así que declaran el flag default ON en su `deploy.sh` (SoT); omitirlo en el dispatcher deja
-  toda cola sin drenar (hallazgo 2026-09-16). Los demás sólo en Vercel: `INSIGHTS_GENERATION_ENABLED` (crear/revisar; ON en
+  toda cola sin drenar (hallazgo 2026-09-16). Render ON en los tres runtimes en staging y producción desde 2026-09-16
+  (release `917491fd02e4`); con el Job en frío el dispatcher puede lanzar dos ejecuciones para un output (una finaliza). Los demás sólo en Vercel: `INSIGHTS_GENERATION_ENABLED` (crear/revisar; ON en
   Production y staging desde 2026-09-15), `INSIGHTS_ISSUANCE_ENABLED`, `INSIGHTS_AUTHORING_AI_ENABLED` (Gemini acotada
   con validación de cifras y fallback determinista). Sin generación ⇒ `503 generation_disabled`. Registrar todo flip en
   `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- **Sharing / correo / recurrencia (TASK-1848, `sharing/`, `delivery/`, `schedules/`)**: del token `isg_` sólo se
+  persiste su sha256 — **NUNCA** el bearer (ni cifrado); un reintento de correo revoca el grant y emite otro. El reader
+  público (`/api/public/insights/shared/**`) responde 404 desconocido/expirado, 410 revocado/retirado, 429 y SIEMPRE
+  `private, no-store` (distinto del Grader a propósito) y revalida el grant antes de servir cada byte. Enviar por correo
+  y gestionar recurrencias sólo por App lane con persona interna (ecosystem/MCP leen). Un destinatario `ambiguous`
+  **NUNCA** se reenvía: se reconcilia contra `email_deliveries`. Un schedule **NUNCA** emite ni envía (CHECK
+  `draft_for_review`). Flags `INSIGHTS_SHARING_ENABLED` (Vercel), `INSIGHTS_DELIVERY_ENABLED` y
+  `INSIGHTS_SCHEDULES_ENABLED` (Vercel + `ops-worker`); los EmailTypes nacen apagados en `email_type_config`.
 - **Eventos** `insights.*` sólo por `events.ts` en la misma transacción del write; **señales** de reliability
   `insights.editions.*` leen la tabla, no el evento. Observabilidad: `captureWithDomain(err, 'insights', …)`.
 - **Tool MCP nueva** ⇒ entrada en `src/mcp/greenhouse/tool-manifest.ts` (`writes` correcto) + `pnpm mcp:manifest:generate`

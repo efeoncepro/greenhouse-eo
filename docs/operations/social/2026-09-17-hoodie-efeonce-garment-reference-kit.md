@@ -1,0 +1,250 @@
+# Hoodie Efeonce (2026): kit de referencia de prenda y de merch de marca
+
+Fecha de registro: 2026-09-17. Owner: Social Media Studio / Efeonce.
+Caso: vistas fotográficas del hoodie de Efeonce para pasarlas como referencia cuando hay que vestir a Nexa o a
+cualquier persona en una imagen generada, de modo que **el modelo no invente la prenda** (espalda, capucha, puño,
+caída). Bitácora técnica y creativa; el inventario de vistas y el uso operativo viven en
+[`LEEME.md`](../../../ai-generations/2026-09-17_hoodie-efeonce/LEEME.md) (binarios fuera de git). Caso hermano:
+[kit de referencia del logo 3D](2026-09-17-efeonce-logo-3d-reference-kit-production-method.md).
+
+Aunque nació con el hoodie, el archivo es el **método de kits de prenda y de merch de marca**: el mismo contrato cubre
+cualquier objeto que lleve arte de marca impreso encima. La extensión a merch —lanyard, yoyo, portacarnet y carnet— está
+en [§9](#9-merch-con-arte-impreso-lanyard-yoyo-portacarnet-y-carnet).
+
+## 1. Qué es y para qué
+
+Es el mismo contrato del kit 3D del logo, aplicado a ropa: **la referencia fija la prenda, el prompt fija la persona y
+la escena**. Sin una vista de referencia, cada generación reinventa la espalda, la capucha, el puño y la caída, y dos
+piezas de la misma campaña no muestran la misma prenda.
+
+El kit no es una pieza ni una campaña: es la fuente de verdad de la forma de la prenda, igual que el kit del logo lo es
+de la forma del logo.
+
+Qué prenda corresponde a cada contexto de uso —y cuáles ya tienen kit— está en
+[§8 Cápsula de vestuario Efeonce](#8-cápsula-de-vestuario-efeonce).
+
+## 2. Estado y entrega
+
+Pedido del operador: distintas vistas del hoodie como referencia de vestuario. La espalda debe llevar el **logo
+completo** y, debajo, **«Empower your Growth»** centrado respecto al logo y más chico.
+
+**Destino OneDrive:** `5. Contenidos/13- Branding/Hoodie Efeonce/v01/` — 21 vistas + 14 transparentes +
+`efeonce-hoodie-manifiesto.json` (cada vista con su descripción y **cuándo usarla**) + la estampa canónica.
+
+Nombre: `efeonce-hoodie-<id>-<ancho>x<alto>-v01-<fondo-estudio|transparente>.png`.
+
+| Familia | Vistas |
+|---|---|
+| Prenda sola | frente · espalda con estampa · tres cuartos izquierda y derecha · lateral · capucha puesta · doblada · percha · dos planos cenitales (frente y espalda) |
+| Detalles | emblema del pecho · puño y cordón · interior de la capucha · cuello por dentro |
+| Puesta en cuerpo neutro sin rostro | frente · espalda · un segundo cuerpo con otro tono de piel |
+| Variantes de color | blanco hueso y gris jaspeado, frente y espalda, con la tinta en navy `#023c70` |
+
+**Qué se recorta:** las 14 vistas de prenda sola y planos tienen variante transparente. Los primeros planos y las
+vistas puestas **no** se recortan.
+
+Modelo `gpt-image-2.5-sunburst`, calidad `xhigh`; ~USD 0,14 por vista, 26 generaciones con descartes.
+
+## 3. El texto de la prenda se compone, no se genera
+
+La estampa de espalda (logo completo + eslogan «Empower your Growth» centrado y más chico) se arma
+**determinísticamente** con `estampa-espalda.mjs` desde `public/branding/logo-negative.svg` y el contrato de pesos de
+`src/config/efeonce-brand.ts`: *Empower* en Poppins ExtraBold itálica, *your* en ExtraBold, *Growth* en Black itálica;
+blanco sobre navy y `#023c70` sobre claro.
+
+Esa estampa entra al modelo como **imagen 2**: el modelo sólo la apoya sobre la tela y la deforma con los pliegues. **El
+texto exacto nunca se le pide al modelo.** Es el mismo principio que en el kit del logo, donde la forma de las letras
+sale de la geometría oficial y no del modelo.
+
+## 4. Decisiones que cambiaron el resultado
+
+| Observación | Corrección | Criterio transferible |
+|---|---|---|
+| La estampa de espalda al 55 % del ancho de la espalda no se veía realista | Bajarla al **38 %** del ancho de la espalda | La proporción de una estampa se declara y se mide; no se deja al criterio del modelo |
+| El emblema del pecho tendía a encogerse entre vistas | **Mismo tamaño y posición que el asset oficial; nunca se reduce** (corrección expresa del operador) | Lo que ya tiene asset oficial conserva su proporción; la vista cambia, el emblema no |
+| La primera tanda se veía como render: simetría perfecta, brillo plástico, tela sin fibra | **Contrato de realismo obligatorio** en todos los prompts: lente de 100 mm, arrugas asimétricas, pelo de la tela con fibras sueltas, costuras y pespuntes levemente irregulares, tinta serigráfica mate apoyada sobre las fibras y deformada por los pliegues; sin simetría perfecta ni brillo plástico | Sin contrato de realismo explícito, una prenda sale con aspecto de render aunque el resto del prompt sea correcto |
+| La tanda vieja y la nueva juntas parecían dos sesiones distintas | **Si cambia el contrato, se rehace la serie completa**, no sólo la vista nueva | Un kit vale por su coherencia interna: una vista fuera de contrato contamina todas |
+| Un pedido de «detalle de puño y cordón» devolvió un collage de dos paneles | Exigir en el prompt **«una sola fotografía, no un collage»** | Un pedido de «detalle» puede leerse como lámina comparativa; hay que cerrar esa lectura |
+| El eslogan compuesto con `<tspan>` perdía los espacios al rasterizar en librsvg | Espacios duros + `xml:space="preserve"` en el SVG de la estampa | La composición determinística también tiene sus trampas: verificar el rasterizado, no sólo el SVG |
+| La espalda gris perdió el eslogan en un intento | Verificar la estampa **vista por vista**, no por muestreo | Una vista puede salir sin el texto con todo lo demás correcto |
+| Las vistas puestas tendían siempre al mismo cuerpo | Cuerpos y tonos de piel distintos, siempre **sin rostro** | La referencia de prenda no debe arrastrar un modelo de persona a toda la campaña |
+| **El emblema bordado salió espejado** —la nave apuntando a la izquierda— en 6 de las 21 vistas del polo: las cuatro blancas y dos navy | Pasar el **isotipo oficial** rasterizado (`public/branding/SVG/isotipo-full-efeonce.svg`) como **imagen 2** y describir su geometría en el prompt: nave a la derecha con la nariz redondeada a la derecha, las dos aletas abajo a la izquierda, órbita como elipse ancha con cortes, planeta arriba, tres ventanas en el cuerpo | Un emblema chico se espeja con facilidad. No basta con nombrarlo: hay que darle la forma oficial como referencia **y** describir su orientación en palabras |
+| El espejo **no se ve en la hoja de contacto** | QA del emblema **vista por vista y al 100 %**, con recorte sobre el pecho | La revisión en miniatura da falsos verdes: un defecto de orientación sólo aparece con zoom. Aplica a cualquier prenda con emblema |
+| Varias vistas del polo volvieron como **par frente+espalda** o con un **círculo de zoom insertado** | Cerrar todas las lecturas de una vez: **«una sola fotografía de una sola prenda: ni par, ni díptico, ni collage, ni inset»** | Extiende la regla del collage de arriba: el modelo tiene más de una forma de meter dos cosas en un cuadro, así que se enumeran todas |
+| Los pedidos de detalle volvían como prenda completa | Pedir **encuadre macro explícito**: «el bordado llena el cuadro y el resto de la prenda queda fuera» | «Detalle» no es una instrucción de encuadre. El macro se declara diciendo qué queda **fuera**, no sólo qué se quiere ver |
+| El bordado **tono sobre tono** hacía desaparecer el emblema en el polo navy | Hilo blanco sobre navy y navy sobre blanco. El bordado se pide como **puntada satinada con dirección visible y leve relieve** sobre el piqué | Bordado y estampado son contratos de material distintos: el estampado se apoya sobre la tela, el bordado la levanta. El tono sobre tono es una decisión de legibilidad —sólo sirve si la marca se lee por relieve—, no de estilo |
+
+## 5. QA medido
+
+Vista por vista, antes de entregar:
+
+- **Color de tela:** azul royal del asset oficial. Medido entre (10, 54, 155) y (25, 76, 186) en las vistas navy, con
+  Δ máximo 38 en primeros planos, donde la luz cercana lo oscurece. Tinta navy `#023c70` en las variantes clara y gris.
+- **Proporción del emblema del pecho** contra el asset oficial.
+- **Ortografía de la estampa** y presencia del eslogan (ver el caso de la espalda gris arriba).
+- **Recorte:** revisar la variante transparente sobre fondo de contraste fuerte antes de usarla para componer.
+
+## 6. Cómo lo usa un agente
+
+1. **Elegir la vista por el ángulo de la toma**, no por costumbre: persona de espaldas → vista de espalda; tres cuartos
+   → la vista de tres cuartos del lado que corresponda.
+2. Pasar esa vista **junto con** las referencias de rostro y cuerpo de la persona. La prenda la fija esta referencia;
+   la persona y la escena las fija el prompt.
+3. Elegir la variante de color por el fondo y la jerarquía de la escena, igual que en el kit del logo.
+4. QA sobre el resultado: emblema del pecho en su proporción, estampa legible y bien escrita, color de tela sin deriva.
+
+## 7. Aplicar a otra prenda (polera, chaqueta, gorra)
+
+El **polo piqué**, la **chaqueta** y la **gorra** ya se produjeron con estos pasos (ver §8); la **polera** queda
+pendiente. A diferencia del hoodie, **no existe asset oficial** de la mayoría de esas prendas: se diseñan desde cero
+—salvo la gorra, que ya existía—. Pasos:
+
+1. **Diseñar la prenda base según marca** y aprobarla antes de generar vistas. Sin base aprobada, cada vista es un
+   diseño distinto. **Excepción:** si la pieza **ya existe** —como la gorra del sitio público—, no se diseña nada: esa
+   foto es la base y la única fuente de construcción (ver el kit de la gorra en §8).
+2. **Componer determinísticamente todo el texto y todo emblema** que la prenda lleve (la estampa de espalda del hoodie
+   es el patrón). El modelo nunca escribe el texto de la prenda.
+3. **Declarar las proporciones** de cada aplicación —emblema, estampa, bordado— como porcentaje de la parte de la
+   prenda que las sostiene, y fijarlas antes de la primera tanda.
+4. **Fijar el contrato de realismo** del material de esa prenda (una chaqueta con cierre, forro y cuello rígido no
+   arruga como un algodón perchado) y usarlo en **todos** los prompts de la serie.
+5. **Generar las mismas familias:** prenda sola por ángulos, detalles, puesta en cuerpo neutro sin rostro con cuerpos y
+   tonos de piel distintos, y variantes de color.
+6. **QA medido vista por vista** y recorte sólo donde corresponda (prenda sola y planos, no primeros planos ni vistas
+   puestas).
+7. **Entregar con manifiesto** que diga, por vista, qué es y **cuándo usarla**, a `13- Branding/<Prenda> Efeonce/v01/`.
+   Una versión nueva va a `v02/`, sin sobrescribir `v01/`.
+8. Si durante la serie cambia cualquier contrato (realismo, proporción, color), **rehacer la serie completa**.
+
+## 8. Cápsula de vestuario Efeonce
+
+
+> **Elegir la vista por cómo se usa la prenda, no sólo por el ángulo.** Si en la pieza la chaqueta va abierta, la referencia es su vista de `cierre-abierto`, no la de frente; si van dos prendas (polo bajo chaqueta), se pasan las dos como referencias separadas. Caso: [`2026-09-17_nexa-vestuario`](../../../ai-generations/2026-09-17_nexa-vestuario/LEEME.md).
+
+> **Delta 2026-09-17 (operador):** la estampa canónica de espalda —logo completo + «Empower your Growth» al 38 %— va también en las **chaquetas** (softshell y bomber), igual que en el hoodie. La prenda que mantiene la **espalda limpia** es el **polo**, por ser la de uso más formal frente a cliente.
+Decisión del operador (2026-09-17), tomada al preguntarse si la polera servía como ropa corporativa. El cliente de
+Efeonce es corporativo —retainer Sky, RevOps/CRM con HubSpot y Salesforce, comités, licitaciones—, así que una polera
+de algodón con estampa **no** es la ropa corporativa del equipo. La cápsula reparte las prendas por contexto de uso:
+
+| Contexto | Prenda |
+|---|---|
+| **Frente a cliente (prenda principal)** | Polo piqué navy `#023c70` con **emblema bordado**, espalda limpia |
+| **Reunión formal, comité, licitación** | Camisa o blusa blanca + chaqueta softshell o blazer navy, emblema bordado discreto, sin estampas |
+| **Evento, feria, stand** | Polera navy — la polera queda como pieza de evento, no como uniforme |
+| **Producción, terreno, grabación, streaming** | Hoodie, polera royal y gorra |
+
+**Reglas duras:** en prendas formales el emblema va **bordado** y **sin eslogan**; la estampa grande de espalda —logo
+completo + «Empower your Growth»— es **lenguaje de merch**, no de ropa corporativa.
+
+### Kit del polo piqué (entregado)
+
+`5. Contenidos/13- Branding/Polo Efeonce/v01/` — 21 vistas + 13 transparentes + `efeonce-polo-manifiesto.json` con la
+descripción y el **cuándo usar** de cada vista. Acabado principal: **navy con bordado blanco**, kit completo de 15
+vistas; segunda opción: **blanco con bordado navy**, set esencial de 6. El bordado tono sobre tono se descartó porque
+el logo se perdía.
+
+Prenda base: piqué de algodón de peso medio, corte regular entallado, tapeta de tres botones tono sobre tono, cuello y
+puños de punto plano, aberturas laterales, sin bolsillo ni etiqueta visible; emblema bordado de ~7 cm en el pecho
+izquierdo. Registro: [`LEEME`](../../../ai-generations/2026-09-17_polo-efeonce/LEEME.md).
+
+### Kit de la chaqueta (entregado)
+
+`5. Contenidos/13- Branding/Chaqueta Efeonce/v01/` — 22 vistas + 14 transparentes + `efeonce-chaqueta-manifiesto.json`.
+Dos acabados: **softshell navy** como chaqueta oficial del equipo (kit completo de 16 vistas; tres capas, cierre
+completo con tapeta interior y protector de mentón, cuello alto, bolsillos con cierre oculto, puños ajustables, cordón
+en el ruedo, **sin capucha** para ir sobre el polo) y **bomber ligera navy** como pieza de imagen (set esencial de 6;
+sarga técnica mate, cuello, puños y ruedo de punto acanalado, mangas raglán). Ambas con emblema bordado en hilo blanco
+en el pecho izquierdo y, por decisión del operador, la **estampa canónica de espalda al 38 %** —el polo es la única
+excepción de espalda limpia—. Registro: [`LEEME`](../../../ai-generations/2026-09-17_chaqueta-efeonce/LEEME.md).
+
+### Kit de la gorra (entregado)
+
+Único caso de la cápsula donde **la prenda ya existía**: es el héroe visual de la landing `/contacto` del sitio
+público, royal con el logotipo completo bordado en blanco. Esa foto es la única fuente de construcción —seis paneles,
+visera curva, botón forrado, dos ojetillos por lado y cierre de cinta— y las variantes se piden como cambio de color o
+de aplicación.
+
+| Variante | Rol |
+|---|---|
+| Royal con logotipo | La existente; continuidad con el sitio, producción y regalo |
+| **Navy con logotipo blanco** | **Principal** del equipo; combina con polo y softshell |
+| Navy sólo con isotipo | Alternativa discreta frente a cliente |
+| Blanco con logotipo navy | Verano y eventos |
+| Trucker navy con malla blanca | Terreno, grabación y exteriores |
+
+`5. Contenidos/13- Branding/Gorra Efeonce/v01/` — **12 vistas** (de la principal: héroe en tres cuartos, frente recto,
+lateral, trasera con el cierre, macro del bordado y cenital; de las alternativas: héroe y trasera), 11 con transparente
+—todas menos el macro—, más `efeonce-gorra-manifiesto.json` y la referencia descargada del sitio. Probada en dos
+personas: Nexa y el operador, con la gorra navy sobre el polo navy.
+
+**Tres reglas nuevas, una línea cada una:**
+
+1. **Si la pieza ya existe, su foto manda:** la construcción sale de la foto real, nunca de una descripción, y las
+   variantes son cambio de color o de aplicación sobre esa misma foto.
+2. **Declarar lo que NO lleva:** la trasera se pide explícitamente **sin bordado**, porque si no el modelo repite el
+   logotipo detrás.
+3. **El calce se declara, no se asume:** una referencia de producto se escala de más, así que se describe el ajuste
+   —talla adulta, calce ceñido, perfil bajo, de la ceja a lo alto de la copa ≈ un tercio de la altura de la cabeza,
+   visera corta y curva del ancho de la frente— y no el objeto.
+
+Registro: [`LEEME`](../../../ai-generations/2026-09-17_gorra-efeonce/LEEME.md).
+
+**Próxima prenda:** polera navy, la única de la cápsula que sigue sin kit.
+
+## 9. Merch con arte impreso (lanyard, yoyo, portacarnet y carnet)
+
+Extensión del mismo contrato a un objeto que no se viste: **la referencia fija el arte, el prompt fija el objeto y la
+escena**. Todo lo de §3 (el texto se compone, no se genera), §4 (contrato de realismo, encuadre macro declarado por lo
+que queda fuera, rehacer la serie si cambia el contrato) y §5 (QA vista por vista) aplica igual y no se repite acá.
+Lo que cambia es que el merch suma **piezas mecánicas** —herrajes, resortes, clips— y **piezas planas** —una tarjeta—,
+y cada una tiene su propia forma de salir mal.
+
+**Caso entregado:** lanyard Efeonce con yoyo, portacarnet y carnet. **12 vistas + 3 artes canónicas** en
+`5. Contenidos/13- Branding/Lanyard Efeonce/v01/` con `efeonce-lanyard-manifiesto.json`. Producto: cinta de poliéster
+plano de 20 mm en navy `#023c70` con hebilla de seguridad y gancho giratorio metálico; yoyo redondo de 32 mm navy
+brillante con cúpula de resina, clip de acero y cordón de nylon. Modelo `gpt-image-2.5-sunburst`, `xhigh`; ~USD 0,14 por
+vista, 11 generaciones con descartes. Registro:
+[`LEEME`](../../../ai-generations/2026-09-17_lanyard-efeonce/LEEME.md).
+
+Artes canónicas compuestas (nunca generadas): la **cinta**, con el patrón que alterna logo negativo y eslogan y el paso
+calculado desde el ancho real de cada pieza; el **yoyo**, disco blanco con el isotipo navy `#023c70` para ir bajo la
+resina; y el **carnet** CR80 vertical, con cabecera navy, retrato circular, nombre, cargo y eslogan al pie.
+
+### Vistas que cierran reinterpretación
+
+La lista del lanyard, leída como criterio transferible a cualquier merch:
+
+| Vista | Qué vía de reinterpretación cierra |
+|---|---|
+| Conjunto y conjunto colgado | Forma general y caída natural |
+| Macro de la cara impresa y producto estirado de extremo a extremo | Ritmo del patrón y base de mockups |
+| Macro de la cara trasera | Declara que el reverso va **liso**, sin impresión |
+| Macro de herrajes | Gancho, hebilla y regulador: la parte que el modelo inventa con más libertad |
+| Macro de la pieza mecánica por delante y por detrás | Construcción real (resina por delante, clip por detrás), no una cara pegada |
+| La pieza vacía, sin contenido | Evita que se confunda con otra pieza parecida |
+| Contenido montado + su arte en plano | Diseño y cómo se ve puesto |
+| En la mano | Escala real |
+| Puesto en una persona | Referencia de uso |
+
+### Reglas nuevas
+
+1. **Gris imprimible sobre navy.** El gris de marca `#848484` da **2,98:1** de contraste sobre navy `#023c70` y no
+   resuelve en serigrafía ni sublimado. En el eslogan impreso se usa **gris claro `#C8CEDA`** (7,06:1) para «Empower
+   your» y blanco para «Growth» (11,15:1). Es una **excepción declarada para sustratos oscuros impresos**, no un cambio
+   del color de marca: en pantalla y PDF el eslogan sigue en `#848484`.
+2. **Portacarnet ≠ portacredencial** (corrección del operador). El **portacarnet** es un marco rígido transparente que
+   sujeta la tarjeta por los bordes, abierto por un costado, con la cara del carnet **expuesta**. El
+   **portacredencial** es la funda cerrada que cubre el arte con una lámina. Si no se declara cuál es en el prompt, el
+   modelo devuelve la funda.
+3. **La vista que debe salir SIN el arte se genera sin referencias.** Pasar el arte empuja al modelo a imprimir el logo
+   igual aunque el prompt diga lo contrario; el reverso liso se resolvió describiendo que no hay impresión y **sin
+   imágenes de referencia**.
+4. **Lo plano no se genera.** Una tarjeta, una etiqueta o cualquier cara plana es el arte compuesto, no una generación:
+   pedírsela al modelo solo reintroduce el riesgo de que reescriba el texto.
+5. **La prueba en persona cierra el kit.** Se pasan las artes canónicas más las referencias de la persona, igual que en
+   §6, y si es una persona real se suma al menos una foto de **cuerpo entero**: con solo retratos el modelo agranda la
+   cabeza (regla de proporción al vestir personas, en la referencia `garment-reference-kit.md` de la skill
+   `greenhouse-ai-image-generator`). El kit se probó en Nexa —carnet como agente de IA— y en el operador.
+
+**Pendiente conocido:** el cargo del operador no está declarado en el repo, así que su carnet real queda sin esa línea
+hasta que lo confirme.

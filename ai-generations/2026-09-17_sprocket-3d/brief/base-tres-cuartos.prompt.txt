@@ -1,0 +1,12 @@
+High quality 3D render of this exact logo shape as a physical premium object. Image 1 is the official flat logo and is the ONLY source of shape: reproduce its silhouette EXACTLY, with identical proportions, positions, angles and relative sizes:
+- a thick ring (a circle with a round hole in the center) at the lower right;
+- a short straight bar going straight up from the ring to a round node on top;
+- a long straight bar going up-left from the ring to a larger round node at the upper left;
+- a short straight bar going down-left from the ring to a smaller round node at the lower left.
+Do not add, remove, bend, round off, thicken, thin or re-proportion any part. No gears, no teeth, no text, no extra elements, no bevel patterns or engravings.
+
+Construction and material: the flat shape extruded into a solid object with a uniform thickness of about one quarter of the ring width, crisp edges with a very small uniform bevel, all parts fused into one piece. Matte soft-touch enamel finish in exactly #FF5C35 (HubSpot orange) on every face, subtle realistic light falloff, no gradient color changes, no other colors.
+
+SCENE AND CAMERA: Standing upright, camera at three-quarter view from the front-left, slightly above eye level, clearly showing the thickness of the extrusion.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim light, soft ambient occlusion, realistic soft contact shadow, crisp focus on the whole object, physically based materials. Plain seamless light warm-gray studio background, nothing else in the frame unless described above. The whole object fully visible with generous margin, centered.

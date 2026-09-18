@@ -1,0 +1,7 @@
+Edit this exact film still. Keep the same camera, framing, cathedral bell tower, crowd, smoke, color grade and all existing fireworks identical.
+
+Add cinematic depth only in the foreground: large out-of-focus golden spark embers and glowing bokeh drifting very close to the lens in the lower-left and lower-right corners and along the left and right edges, as if sparks are raining down just in front of the camera, with soft anamorphic light streaks. Add a subtle warm light wrap on the silhouettes of the raised arms closest to camera, catching the fireworks glow.
+
+Keep completely unchanged and dark: the central sky area (horizontally 22% to 78%, vertically 24% to 52% of the image) and the bottom-center area (horizontally 35% to 65%, vertically 86% to 100%). No new elements there.
+
+Strictly avoid: any text, letters or numbers; flags, banners, emblems or stripes; logos; visible faces.

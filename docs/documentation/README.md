@@ -16,6 +16,9 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Social y Creative Studio
 
+- [Proveedor Higgsfield en Creative Studio](creative-studio/HIGGSFIELD_PROVIDER.md) — superficies de API, SDK,
+  CLI, skills y MCP local; estados de adopción y evidencia exigida antes de entregar una salida.
+
 - [Reglas publicitarias para agentes](creative/reglas-publicitarias-para-agentes.md) — activación común de
   Codex/Claude para posts, stories, reels, covers, banners, brochure y motion con contrato AXIS, tipografía real,
   contraste, gate DO/DON'T y estados separados de publicación.
@@ -129,7 +132,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Quote-to-Cash Comercial end-to-end](comercial/quote-to-cash-comercial-end-to-end.md) — mapa funcional completo del dominio Comercial: organizations/parties, deals, catalogo, pricing engine, cotizaciones, aprobaciones, contratos, HubSpot sync y frontera con Finance.
 - [Pipeline comercial](finance/pipeline-comercial.md) — forecast comercial de deals, contratos standalone y pre-sales; lane dedicada en `/finance/intelligence/pipeline` con compat temporal desde Finanzas > Economía.
 - [Sample Sprints comerciales](comercial/sample-sprints.md) — pilotos, trials, POCs y discovery sobre `services.engagement_kind`, con approval, progreso, outcome, reportes y audit/outbox.
-- [Construcción de Licitaciones — Método Efeonce](comercial/construccion-de-licitaciones.md) — cómo Efeonce arma una propuesta de licitación (pública/privada, RFP/RFQ) de punta a punta: radar Wherex, archivo de originales, verificación CRM, las 10 fases, principios y los tres planos de documentación viva. Método canónico en la skill `greenhouse-public-private-tenders`.
+- [Construcción de Licitaciones — Método Efeonce](comercial/construccion-de-licitaciones.md) — cómo Efeonce arma una propuesta de licitación (pública/privada, RFP/RFQ) de punta a punta: radar público LicitaLAB (agente busca y lee, persona decide), radar Wherex, archivo de originales, verificación CRM, las 10 fases, principios y los tres planos de documentación viva. Método canónico en la skill `greenhouse-public-private-tenders`.
 - [Proposal Studio — aggregate `Proposal` y su gobernanza](comercial/proposal-studio-aggregate.md) — el objeto único de cada propuesta (licitación pública, RFP privado o venta directa): estados con compuertas humanas e historial inmutable, documentos vía asset store con escaneo, evidencia con fuente/audiencia (interno vs. cliente falla cerrado), gate de margen sobre la cotización, agente de intake que propone pero nunca ejecuta, y habilitación por módulo por organización (activo para Efeonce desde 2026-07-12; apagado para el resto). TASK-1392.
 - [Motor de Chapter-Authors — autoría agéntica de láminas](comercial/motor-chapter-authors.md) — cómo un agente redacta el contenido de una lámina de propuesta con confirmación humana: separación dura dato/redacción (las cifras nunca pasan por el modelo — viajan del dato medido a la lámina con su fuente), rechazo total ante una cifra o link sin respaldo, el eval como candado del prompt, y qué existe hoy (diagnóstico SEO/AEO + credenciales) vs. qué falta (orquestador, verifier, authors por servicio, superficie Nexa). Flag OFF por defecto. TASK-1415.
 - [Servicios engagement](comercial/servicios-engagement.md) — sincronizacion HubSpot p_services, materializacion de servicios y degradacion honesta
@@ -145,7 +148,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Efeonce Insights
 
-- [Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)](insights/efeonce-insights-dominio-ediciones.md) — qué es una edición (informe congelado por período con versión e identidad `EO-INS-…`), cómo se genera por fases (recolectar evidencia de SEO/AEO/ICO con unidad, cobertura y corte → plan determinista con cifras que referencian hechos → validación), qué ve cada audiencia, por qué **ausente no es cero**, qué ve cada persona (cliente vs interno vs agente), cómo se habilita una organización (módulo `insights_v1`) y el estado honesto a 2026-09-15: **en producción** con generación encendida (staging y producción), emisión e IA apagadas, sin render ni emisión hasta TASK-1846. TASK-1845, EPIC-045.
+- [Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)](insights/efeonce-insights-dominio-ediciones.md) — qué es una edición (informe congelado por período con versión e identidad `EO-INS-…`), cómo se genera por fases (recolectar evidencia de SEO/AEO/ICO con unidad, cobertura y corte → plan determinista con cifras que referencian hechos → validación), qué ve cada audiencia, por qué **ausente no es cero**, qué ve cada persona (cliente vs interno vs agente), cómo se habilita una organización (módulo `insights_v1`) y el estado honesto: **en producción** con generación y render del deck encendidos, emisión e IA apagadas; compartir por enlace, envío por correo y recurrencia construidos (2026-09-18) pero sin desplegar. TASK-1845/1846/1848, EPIC-045.
 
 ### Growth
 

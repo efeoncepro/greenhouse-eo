@@ -1,0 +1,64 @@
+{
+  "file": "post-17.png",
+  "size": "1080x1350",
+  "numberSize": 968.6,
+  "punchSize": 99.9,
+  "contrast": {
+    "number": 4.19,
+    "lead": 5.69,
+    "punch": 8.01,
+    "logo": 9.72
+  },
+  "inkGapLeadPunch": 16,
+  "numberBounds": {
+    "left": 199.80000000000004,
+    "right": 880.1999999999999,
+    "top": 260.3698821251638,
+    "bottom": 900.6301178748363
+  },
+  "sevenBounds": {
+    "left": 439.4762371163373,
+    "right": 880.1999999999999,
+    "top": 260.3698821251638,
+    "bottom": 900.6301178748363
+  },
+  "oneBounds": {
+    "left": 199.80000000000004,
+    "right": 437.1127953988953,
+    "top": 261.3385057798532,
+    "bottom": 900.6301178748363
+  },
+  "copyBounds": {
+    "left": 162.00000000000006,
+    "right": 918,
+    "top": 1008.6301178748363,
+    "bottom": 1151.2894630070148
+  },
+  "logoBox": {
+    "x": 445,
+    "y": 1224.35713859056
+  },
+  "selection": {
+    "withinCanvas": true,
+    "bounds": {
+      "left": 426.516,
+      "top": 249.57,
+      "right": 893.16,
+      "bottom": 911.43
+    },
+    "cursors": [
+      {
+        "id": "local",
+        "state": "acting",
+        "action": "resize",
+        "direction": "north-west",
+        "anchor": "bottom-end",
+        "hotspot": {
+          "x": 893.16,
+          "y": 911.43
+        },
+        "touchesTarget": true
+      }
+    ]
+  }
+}

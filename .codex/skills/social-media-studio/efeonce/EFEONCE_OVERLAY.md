@@ -157,6 +157,22 @@ Dos ejes ortogonales — **superficies** front-of-house (por audiencia/etapa) qu
 - Ilustraciones/personajes propietarios (`characters/greenhouse-*.png`, Nexa) = obra del equipo
   creativo, NO stock. Úsalas con criterio de marca; producción visual nueva → generadores (§tooling).
 
+## Narrativa del período (Q4 2026 – Q3 2027)
+
+Las piezas sociales de marca de Efeonce que no son seasonality se anclan a un capítulo de **«Tu IA no conoce tu
+negocio»**. Canon: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../../../docs/strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md).
+- Instagram: tensión y demostración (mismo prompt con y sin marca, negocios cerrados por WhatsApp, organigrama
+  humano-agente). LinkedIn: el argumento profesional del capítulo (PDR-020 manda por canal).
+- Salesforce sólo se nombra en orgánico de liderazgo de opinión, con respeto; nunca en pauta.
+- La cuenta regresiva a la Ley 21.719 (1 dic 2026) es orientación, no asesoría legal.
+- Seasonalities conservan su línea propia; no se les fuerza un capítulo.
+- KV paraguas: Nexa (humana, hoodie Efeonce) es central; el hombro lleva **una sola** mascota de partner por imagen
+  (Clawd/Claude hoy, Codex Pet/Codex después), que cambia junto con nombre y color del cursor colaborador e insignia.
+  Nunca dos mascotas de terceros juntas.
+- Riesgo de partner: la mascota confundida puede leerse «Claude no sirve». Mitigar en caption (el problema es el
+  contexto, no la capacidad) y validar con la guía de marca del partner antes de pautar. Caso:
+  [`LEEME.md`](../../../../ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md).
+
 ## Coherencia con las skills hermanas del repo
 
 Esta skill es **social-first ejecución**. Encadena con: `digital-marketing` (cuando social es

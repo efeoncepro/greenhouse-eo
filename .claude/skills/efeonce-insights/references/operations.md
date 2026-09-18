@@ -5,8 +5,12 @@
 | Flag | Gates | Read in | State 2026-09-16 |
 | --- | --- | --- | --- |
 | `INSIGHTS_GENERATION_ENABLED` | create / revise / evidence collection | Vercel only (`flags.ts`) | ON staging + Production; Preview OFF |
-| `INSIGHTS_ISSUANCE_ENABLED` | issue (plus human gate and validated outputs) | Vercel | OFF everywhere (until TASK-1846) |
+| `INSIGHTS_ISSUANCE_ENABLED` | issue (plus human gate and validated outputs) | Vercel | OFF everywhere (render is live since 2026-09-16; turning issuance on is a product decision) |
 | `INSIGHTS_AUTHORING_AI_ENABLED` | Gemini rewrite of the plan | Vercel | OFF everywhere |
+| `INSIGHTS_SHARING_ENABLED` (TASK-1848) | create share links + public reader (OFF ⇒ create 503 `sharing_disabled`, reader 404) | Vercel | OFF (default); not deployed as of 2026-09-18 |
+| `INSIGHTS_DELIVERY_ENABLED` (TASK-1848) | create delivery intent (Vercel, OFF ⇒ 503 `delivery_disabled`) + dispatch (ops-worker) | Vercel + `ops-worker` (default `true` in `deploy.sh`, guarded by `deploy-contract.test.ts`) | Vercel OFF; worker not deployed |
+| `INSIGHTS_SCHEDULES_ENABLED` (TASK-1848) | schedule writes (Vercel) + tick (ops-worker) | Vercel (OFF) + `ops-worker` (default `true`) | Vercel OFF; worker not deployed |
+| `INSIGHTS_GENERATION_ENABLED` in the worker (TASK-1848) | the schedules tick creates editions | now ALSO `ops-worker` (default `true` in `deploy.sh`) | worker not deployed; `INSIGHTS_AUTHORING_AI_ENABLED` is NOT declared in the worker |
 
 Flip = `vercel env add <FLAG> <env>` (`production` lowercase for the standard env; custom `staging` literal) **+
 `vercel redeploy <url>`**: a deployment built before the env var never sees it. If a worker starts reading a flag,
@@ -58,11 +62,18 @@ flag, 202 after.
   --update-env-vars` AND keep it in `deploy.sh`. Vercel: `vercel env add` + redeploy.
 - Job and ops-worker are SINGLE for staging and production. The per-environment product gate is the Vercel enqueue.
   The Job's assets bucket is fixed to `efeonce-group-greenhouse-private-assets-staging` (assets store `bucket_name` per row).
-- State 2026-09-16: Vercel staging ON · Vercel Production OFF (absent) · Job ON · ops-worker ON (revision
-  `ops-worker-00690-xhl`). The Job is in the production release control plane; first productive deploy on next release.
-- Production rollout order (NOT executed): Greenhouse release → `vercel env add INSIGHTS_RENDER_ENABLED production` +
-  `vercel redeploy` → deploy gateway `efeonce-mcp` v1.6.0 (merged, PR #14) → production canary on the synthetic org →
-  only then consider `INSIGHTS_ISSUANCE_ENABLED` (OFF).
+- State 2026-09-16 (after release `917491fd02e4`): Vercel staging ON · Vercel Production ON (redeploy
+  `greenhouse-d6l33zils`) · Job ON (first productive deploy by the release control plane, change-gated) · ops-worker ON
+  (revision `ops-worker-00690-xhl`) · gateway `efeonce-mcp` v1.6.0 deployed (revision `00054-n78`, 51 tools).
+  `INSIGHTS_ISSUANCE_ENABLED` stays OFF.
+- Production canary (executed 2026-09-16): ecosystem lane with the gateway consumer token on the synthetic org →
+  create 202 → `POST …/editions/<id>/render` 202 → wait for the dispatcher (never launch the Job by hand) → poll
+  `GET …/render-runs/<id>` every 30–60 s until `completed` with `outputAssetId` → negative `outputs:["web"]` → 422
+  `render_rejected`. Gateway side: `scripts/greenhouse-insights-canary.mjs --render-run` in `efeonce-mcp`
+  (catalog, list, render run, deny 404).
+- Cold start double execution: with a cold Job (~2 min) the next dispatcher tick still sees the output `queued` and
+  launches a second execution; only one claims/finalizes (atomic claim + fencing), the other exits with no work.
+  Harmless; do not retry or cancel because of it.
 - Throughput (Cloud Run staging 2026-09-16): 1 output per 2-min tick (one execution per tick, `parallelism=1`; Proposal
   wins the tick). A burst of N ≈ 2·N min. Render 6.3–7.3 s, PDF ~330 KB; execution start 3.9 s warm / 42 s first after
   deploy / 154 s cold; task total 50–58 s. Local: 15 slides ~4.6 s, 25 slides ~7.2 s, RSS ≤ 365 MB.
@@ -81,3 +92,48 @@ flag, 202 after.
 - Live tests: `pnpm test:live src/lib/efeonce-insights/render` (rollback transaction; needs the proxy).
 - Rollback: disable the flag in both runtimes; keep tables and assets; never `migrate:down` on the shared instance
   without explicit operator authorization (it serves production).
+
+## Sharing, delivery, schedules (TASK-1848) — code complete, rollout pending (2026-09-18)
+
+- **EmailType kill switch:** `email_type_config` rows for `insights_edition_delivery` and
+  `insights_edition_delivery_attachment` are seeded `enabled=false`. The table FAILS OPEN when a row is missing, so the
+  seed is what keeps them off. Turning email on = flag ON in Vercel + ops-worker AND flip the row(s) to `enabled=true`;
+  turning off = flip the row back (recipients then skip with `email_type_paused`).
+- **Cloud Scheduler:** `ops-insights-schedules-tick`, `20 * * * *`, → ops-worker `POST /insights/schedules/tick`; ONE job
+  for every organization. Not created yet. The tick also purges access events >180 d and rate buckets >1 d, even with
+  `INSIGHTS_SCHEDULES_ENABLED` OFF.
+- **Delivery dispatch runtime:** projection `insights_delivery_dispatch` (domain `notifications`, lane
+  ops-reactive-notifications) in the ops-worker — the send happens there, not in Vercel.
+- **Sentry scrub:** share paths and `isg_` tokens are redacted server + edge; verify with a synthetic event after deploy.
+
+### Staging canary recipe — EXECUTED 2026-09-18 (green; see ledger § TASK-1848 for evidence)
+
+Lessons from the run: sequence the rate-limit probe (NEVER a concurrent burst against the shared instance —
+ISSUE-174); turn the EmailTypes on with `pnpm hiring:email-type -- --type <t> --on --apply` only for the canary and
+back `--off --apply` right after (the config table is shared with production); `provider_status` stays null until the
+Resend lifecycle webhook works (ISSUE-160), so "delivered" is confirmed by the recipient, not the ledger.
+
+1. Push `develop`, deploy ops-worker (declares the three flags), create the Cloud Scheduler job, then
+   `vercel env add INSIGHTS_SHARING_ENABLED staging` (+ `INSIGHTS_DELIVERY_ENABLED`, `INSIGHTS_SCHEDULES_ENABLED`) +
+   redeploy the staging deployment.
+2. Needs an ISSUED client edition of the synthetic org "Greenhouse Demo" (`INSIGHTS_ISSUANCE_ENABLED` is OFF: issuing
+   needs a human decision or a flag step in staging — decide before the canary).
+3. Share: create → success with `token` returned once; public `GET /api/public/insights/shared/<token>` → 200 + `no-store`
+   headers; download of an allowed output; revoke → next GET 410; unknown token → 404; burst beyond the rate limit → 429.
+   Deny: an org without the module → 404.
+4. Delivery: request `share_link` to the synthetic client persona with the EmailType row enabled only for the canary;
+   poll `GET …/deliveries/<id>` until `accepted`; replay with the same key → `idempotent: true`. Leave no ambiguous rows
+   (signal `insights.delivery.ambiguous` back to 0).
+5. Schedules: define + activate a monthly schedule for the synthetic org; trigger one tick; expect one occurrence
+   `render_requested` and an edition in `ready_for_review` — never issued, never emailed. Then retire it.
+6. `pnpm test:live` for `sharing`, `delivery`, `schedules` live tests.
+
+### Rollback per lane
+
+- **Sharing:** flag OFF in Vercel (+ redeploy) ⇒ create 503 and public reader 404 for every link. To cut specific access
+  now, revoke the grants (revoke works with the flag OFF). Already-downloaded files cannot be revoked.
+- **Delivery:** flip the EmailType rows to `enabled=false` (immediate, both runtimes) and/or flag OFF in Vercel (no new
+  intents) and ops-worker (no dispatch). Cancel pending intents. Ambiguous recipients are reconciled, never resent.
+- **Schedules:** flag OFF in Vercel (no writes) and ops-worker (tick does nothing but purge); pause or retire schedules
+  (both work with the flag OFF); deleting the Cloud Scheduler job stops the tick entirely.
+- **Schema:** never `migrate:down` on the shared instance without explicit operator authorization (it serves production).

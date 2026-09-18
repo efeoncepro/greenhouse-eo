@@ -81,6 +81,9 @@ describe('manifiesto de tools MCP (TASK-1780)', () => {
         'request_insight_render',
         'retry_insight_render',
         'cancel_insight_render',
+        // TASK-1848 — crear/revocar un enlace compartido escribe; listarlos es lectura.
+        'create_insight_share',
+        'revoke_insight_share',
         'declare_seo_competitors',
         'discover_seo_keywords',
         'prepare_seo_grounded_queries',

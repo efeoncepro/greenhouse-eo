@@ -166,6 +166,23 @@ Reglas obligatorias:
   improved) tras el `READY` del release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z, canary 13:15:26Z); primera fila explícita improved del worker
   (cron 16/17) que lleve la señal `seo.etv_methodology.drift` de `warning` a `ok`.
 
+**Delta 2026-09-17 (verificación en producción, sin gasto ni mutación).**
+- **Readback de producción: CERRADO.** Vercel producción y ops-worker (revisión `ops-worker-00694-zpv`) configuran
+  `improved_layout_clickstream_v2` en escritura y lectura. Las lanes leídas contra la base productiva sirven improved
+  con evidencia `explicit_request` y comparabilidad `single_methodology`: `domain-overview` de `berel.com` (2484) y
+  `url-visibility` de 3 sujetos Berel muestreados de 105, más `comex.com.mx` y `efeoncepro.com`.
+- **Señal `seo.etv_methodology.drift`: `ok`.** Reproducida con el reader canónico y los selectores de producción
+  (`explicitRows` del worker en improved, `contractEvidenceRowsLast7d` 0, `legacyAfterCutoffRows` 0). El cron
+  `ops-seo-etv-drift-watch` (diario 12:00 local) reporta `severity=ok alerted=false` el 16 y el 17.
+- **La primera fila explícita del worker desatendido NO ocurrió, y no correspondía que ocurriera.** Los crons
+  mensuales `ops-seo-domain-overview` (día 16) y `ops-seo-url-visibility` (día 17) sí corrieron —HTTP 200, logs
+  `targets=2 captured=0 skipped=2 failed=0 costUsd=0`—, pero saltaron por frescura: las últimas filas son del
+  2026-09-03 (corridas manuales del cutover) y la ventana es de 30 días (`URL_VISIBILITY_FRESHNESS_DAYS`,
+  `DOMAIN_OVERVIEW_FRESHNESS_DAYS`). La expectativa "cron 16/17 de septiembre" estaba equivocada por eso.
+  **Próxima ventana real: 2026-10-16 (domain-overview) y 2026-10-17 (url-visibility)**, siempre que nadie capture a
+  mano antes; si alguien lo hace, el reloj de 30 días vuelve a correr. No bloquea nada: el corte del proveedor es el
+  2026-11-01 y la señal ya está en `ok`.
+
 ## Modular Placement Contract
 
 - Topology impact: `cross-runtime`

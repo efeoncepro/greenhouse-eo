@@ -1314,10 +1314,17 @@ export const deletePendingAsset = async ({
 
 export const downloadPrivateAsset = async ({
   assetId,
-  actorUserId
+  actorUserId,
+  accessMetadata
 }: {
   assetId: string
-  actorUserId: string
+  /**
+   * `null` sólo para un acceso sin sesión ya autorizado por su dominio (TASK-1848: enlace
+   * compartido de Insights, que revalida el grant antes de llamar acá). El log y el evento
+   * quedan con actor nulo y la procedencia viaja en `accessMetadata`.
+   */
+  actorUserId: string | null
+  accessMetadata?: Record<string, unknown>
 }) => {
   const asset = await getAssetById(assetId)
 
@@ -1353,6 +1360,7 @@ export const downloadPrivateAsset = async ({
     action: 'download',
     actorUserId,
     metadata: {
+      ...accessMetadata,
       ownerAggregateType: asset.ownerAggregateType,
       ownerAggregateId: asset.ownerAggregateId
     }

@@ -23,3 +23,23 @@ export const isInsightsAuthoringAiEnabled = (env: NodeJS.ProcessEnv = process.en
  * DOS runtimes — Vercel (command de encolado) y el artifact-worker (claim) — y debe estar ON en ambos.
  */
 export const isInsightsRenderEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.INSIGHTS_RENDER_ENABLED)
+
+/**
+ * TASK-1848 — habilita crear/revocar enlaces compartidos y servir el reader público por token.
+ * Se lee SÓLO en Vercel (commands + `/api/public/insights/shared/**`). Con el flag OFF el reader
+ * público responde 404 (no revela que el token existió) y los commands `sharing_disabled` (503).
+ */
+export const isInsightsSharingEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.INSIGHTS_SHARING_ENABLED)
+
+/**
+ * TASK-1848 — habilita solicitar envíos por correo (Vercel: `requestInsightDelivery`) y DESPACHARLOS
+ * (`ops-worker`: projection reactiva). Se lee en DOS runtimes y debe estar ON en ambos; el EmailType
+ * tiene además su kill switch propio en `email_type_config` (nace apagado).
+ */
+export const isInsightsDeliveryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.INSIGHTS_DELIVERY_ENABLED)
+
+/**
+ * TASK-1848 — habilita crear/activar recurrencias (Vercel) y el tick que genera sus ocurrencias
+ * (`ops-worker`, `/insights/schedules/tick`). Dos runtimes. Pausar y retirar funcionan con el flag OFF.
+ */
+export const isInsightsSchedulesEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.INSIGHTS_SCHEDULES_ENABLED)

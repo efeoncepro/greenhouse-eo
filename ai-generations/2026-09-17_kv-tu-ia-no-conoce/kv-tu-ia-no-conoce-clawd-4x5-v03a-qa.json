@@ -1,0 +1,20 @@
+{
+  "format": "4x5",
+  "plate": "feed/plate-4x5-wide.png",
+  "titleSize": 84.8,
+  "title": {
+    "left": 270,
+    "right": 810,
+    "top": 118,
+    "bottom": 265.71720481134605
+  },
+  "logo": {
+    "x": 435,
+    "y": 1187.3289450105726
+  },
+  "contrast": {
+    "line0": 7.64,
+    "line1": 10.05,
+    "logo": 17.64
+  }
+}

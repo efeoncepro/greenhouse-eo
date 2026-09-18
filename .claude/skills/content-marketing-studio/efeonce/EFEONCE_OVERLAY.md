@@ -128,6 +128,17 @@ El baseline competitivo de la agencia vive en `docs/context/15_panorama-competit
 
 **Jugada canónica para este studio (quick win del baseline):** producir contenido de autoridad propio que gane ese SERP **con método creíble** (data study, no auto-bombo), apropiando el ángulo AEO/integración antes que la competencia lo consolide. Es literalmente vender lo que Efeonce vende. Cruza con `seo-aeo` (citabilidad/AI SoV) y `research-benchmark-operator` (el data study como munición). Meta: volver a Efeonce **fuente** que la prensa gremial (DF, Adlatina, Publimark, ANDA, IAB, AMDD) cite — no solo proveedor.
 
+## Narrativa del período: pilares editoriales (Q4 2026 – Q3 2027)
+
+Los capítulos de **«Tu IA no conoce tu negocio»** son los pilares editoriales de Efeonce del período. Canon:
+[`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../../../docs/strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md).
+- Todo contenido de marca Efeonce (blog, Think, Glitch, Manzanitas, ebooks, infografías) declara su capítulo: 1 lo
+  que tu IA no sabe · 2 lo que tu IA cree que es cierto · 3 lo que la IA dice de ti · 4 un equipo, no una
+  herramienta · 5 campañas en días, con tu marca · resultados.
+- El capítulo 3 es el hogar natural de SEO/AEO y content marketing; el 2 atraviesa a todos como dimensión de datos.
+- Cifras de HubSpot atribuidas; las de Forrester/Gartner sólo tras confirmar la fuente primaria (§10 del canon).
+- Seasonalities y efemérides no se fuerzan a un capítulo: conservan su propia línea (PDR-020).
+
 ## Reglas duras del overlay
 
 - **NUNCA** reimplementar el Content Factory ni el publishing (operar vía `efeonce-public-site-wordpress`).

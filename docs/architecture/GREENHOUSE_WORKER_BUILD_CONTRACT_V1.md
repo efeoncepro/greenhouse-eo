@@ -115,9 +115,10 @@ The second check only applies where the mechanism exists: a workflow with no `WO
 drift check to skip. Remediation always declares a **directory**, never a single file.
 
 Scope: the four esbuild-bundled Node build units registered in the script — `ops-worker`, `commercial-cost-worker`,
-`ico-batch` and, since 2026-09-04, `auth-server` (`.github/workflows/auth-server-deploy.yml`). `artifact-worker`
-runs from source through `tsx` rather than an esbuild bundle and is not registered in this gate; its path list
-remains under manual review.
+`ico-batch` and, since 2026-09-04, `auth-server` (`.github/workflows/auth-server-deploy.yml`). Delta 2026-09-16
+(TASK-1846): `artifact-worker` is now registered too. It still runs from source through `tsx`, but the esbuild
+metafile describes its `.ts` import graph all the same; non-TS catalog assets (templates, fonts) are covered by
+the coarse `src/lib/**` workflow prefix, not by this gate. The Job is also part of the release control plane since that task.
 
 Verified coverage on 2026-08-29: `ops-worker` 1449 files, `commercial-cost-worker` 107, `ico-batch` 55. The first
 run surfaced two gaps nobody was looking for: `commercial-cost-worker` and `ico-batch` did not cover

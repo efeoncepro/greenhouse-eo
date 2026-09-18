@@ -1,0 +1,10 @@
+  ⚠ --count 2: son 2 pedidos separados por prompt y se paga cada uno
+  $ costo estimado ≈ USD 0.151 (2 × 2511 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-09-17_kv-tu-ia-no-conoce/plates/plate-kv-9x16-v05-1.png (edit) …
+  ✓ 2904KB · gpt-image-2.5-sunburst · 1152x2048 · xhigh
+    usage: in 6261 (img 5553 · txt 708) · out 2511 · total 8772
+→ ./ai-generations/2026-09-17_kv-tu-ia-no-conoce/plates/plate-kv-9x16-v05-2.png (edit) …
+  ✓ 2830KB · gpt-image-2.5-sunburst · 1152x2048 · xhigh
+    usage: in 6261 (img 5553 · txt 708) · out 2511 · total 8772
+done
+done

@@ -31,6 +31,22 @@ publisher del outbox. Va en el Cloud Run **Job** dedicado **`artifact-worker`** 
 renderiza catálogos, no un dominio), frontera autorizada por **excepción documentada de EPIC-027**. Un
 deployable nuevo no se crea por conveniencia.
 
+> **Delta 2026-09-16 (TASK-1846, release `917491fd02e4`) — la fila «Renderer productivo» quedó atrás.**
+> «Producción explícitamente gateada» ya no describe el deployable: el Job `artifact-worker` es **único para
+> staging y producción**, está **integrado al release control plane** (`artifact-worker-deploy.yml` con
+> push:develop + `workflow_call`; change-gate por etiqueta `git-sha`; `RELEASE_DEPLOY_WORKFLOWS` con
+> `cloudRunResourceKind:'job'`; watchdog y rollback leen Jobs) y tuvo su primer deploy productivo en ese
+> release. Es **multiconsumidor**: Proposal (`proposal_render_jobs`) + Efeonce Insights
+> (`greenhouse_insights.insight_outputs`) vía registry tipado (`services/artifact-worker/consumers/*`);
+> Proposal conserva commands y comportamiento (reclaim por lease compartido, apagado para Proposal). El hash
+> del manifest es domain-free (`src/lib/artifact-composer/manifest-hash.ts`, Proposal re-exporta) y el
+> lanzador del Job salió del composer a `src/lib/render-dispatch/job-runner.ts` (server-only: **NUNCA** lo
+> devuelvas al composer, su boundary lo rechaza). El dispatcher drena Proposal primero e Insights sólo si
+> Proposal no lanzó nada (1 ejecución por tick de 2 min, compartida). La puerta de producción de Proposal
+> sigue siendo el enqueue en Vercel Production (`ARTIFACT_RENDER_JOBS_ENABLED`: presencia verificada, valor
+> no leído) + el entitlement per-ORG: **no afirmes que el render de Proposal está activo en producción**
+> sin leer ese valor.
+
 ⚠️ **Lo único renderizable productivo es el `ResolvedCompositionManifest` sellado.** El worker lo
 **re-resuelve** contra su copia del catálogo y compara hash: si una plantilla/contrato/brand pack cambió
 desde el enqueue → `manifest_drift` y **no se publica**. Gates fail-closed **al encolar** (audience por

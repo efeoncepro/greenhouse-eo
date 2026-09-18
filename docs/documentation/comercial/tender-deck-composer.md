@@ -26,6 +26,9 @@
 >    **`artifact-worker`** en Cloud Run, y el PDF queda **versionado en el almacén privado** vinculado a
 >    su propuesta. La sección *"Dónde se usa hoy"* de abajo describe el estado anterior. (Sigue siendo
 >    cierto que **no hay pantalla en el portal**.) Producción sigue **apagada a propósito**.
+>    *Actualizado 2026-09-16:* el `artifact-worker` ya forma parte del release a producción (release
+>    `917491fd02e4`) y también renderiza informes de Efeonce Insights; el render de propuestas en producción
+>    depende del valor de la variable en Vercel Production, que existe pero no se leyó.
 >
 > **La documentación vigente del sistema completo vive en
 > [`docs/documentation/proposal-studio/`](../proposal-studio/README.md)** — empieza por su README.

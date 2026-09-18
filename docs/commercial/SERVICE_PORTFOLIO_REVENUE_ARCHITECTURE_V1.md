@@ -229,6 +229,7 @@ producto/schema.
 - [`SALES_GOALS_OPERATING_MODEL_V1.md`](SALES_GOALS_OPERATING_MODEL_V1.md)
 - [`SALES_GOALS_2026_Q4_2027.md`](SALES_GOALS_2026_Q4_2027.md)
 - [`EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md`](../strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md)
+- [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md) — narrativa go-to-market Q4 2026 – Q3 2027; §4 mapea sus capítulos a las familias de servicio de este documento.
 - [`docs/services/README.md`](../services/README.md)
 - [`docs/business-models/README.md`](../business-models/README.md)
 - [`EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md`](../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md)

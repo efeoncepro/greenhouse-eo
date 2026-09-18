@@ -114,6 +114,13 @@ productivos, con la única novedad del modo Job + Chromium. La decisión de fron
 
 **Registro cruzado:** EPIC-027 (child + exit criterion parcial), `DECISIONS_INDEX.md`, TASK-1391 Slice 0.
 
+> **Delta 2026-09-16 (TASK-1846).** La excepción no se amplió a un deployable nuevo: el mismo Job
+> `artifact-worker` pasó a ser **multiconsumidor** (Proposal + Efeonce Insights, registry tipado en
+> `services/artifact-worker/consumers/*`) y sigue siendo render batch. Quedó integrado al release control
+> plane (Job único para staging y producción; primer deploy productivo en el release `917491fd02e4`). El
+> lanzador del Job vive en `src/lib/render-dispatch/job-runner.ts`, fuera del composer, para que el
+> primitive siga siendo extraíble.
+
 ## Delta 2026-09-03 — Excepción documentada: frontera `auth-server` (Cloud Run Service) AUTORIZADA
 
 **Solicitud (sesión EPIC-044 / TASK-1828):** autorizar la creación del deployable **`services/auth-server/`**

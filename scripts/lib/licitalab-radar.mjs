@@ -4,8 +4,10 @@ export function parseLicitaLabRadarArgs(args) {
   const parsed = {
     checkOnly: false,
     forceLogin: false,
+    headless: false,
     help: false,
     maxOpportunities: 100,
+    noLogin: false,
     output: null,
     view: null
   }
@@ -22,6 +24,16 @@ export function parseLicitaLabRadarArgs(args) {
 
     if (arg === '--force-login') {
       parsed.forceLogin = true
+      continue
+    }
+
+    if (arg === '--headless') {
+      parsed.headless = true
+      continue
+    }
+
+    if (arg === '--no-login') {
+      parsed.noLogin = true
       continue
     }
 
@@ -65,6 +77,8 @@ export function parseLicitaLabRadarArgs(args) {
 
     throw new Error(`opción no reconocida: ${arg}`)
   }
+
+  if (parsed.noLogin && parsed.forceLogin) throw new Error('--no-login y --force-login son incompatibles')
 
   return parsed
 }

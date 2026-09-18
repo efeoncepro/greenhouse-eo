@@ -1,0 +1,9 @@
+The navy Efeonce lettering on the travertine wall is a REAL object and must stay exactly as it is: same shape, letters, orbit ring with its gaps, three windows, proportions and navy colour. It is protected; do not redraw it.
+
+Your job is only to make it belong to this photograph, working around it:
+- make it read as solid letters mounted a few centimetres off the stone: a soft drop shadow cast down and slightly to the left on the travertine, tighter and darker right behind each letter, softer as it falls away, since the cove light grazes from above and daylight comes from the right;
+- add gentle ambient occlusion where each letter meets the wall and a faint warm bounce of the stone on the lower edges;
+- keep the stone texture continuous behind and around the letters, with the same grain and light falloff as the rest of the wall;
+- let the long-exposure motion trails of the people keep passing in front of the lower part of the scene, untouched.
+
+Do not change the wall, the desk, the plants, the people or the framing. No text, no watermark, no extra logos.

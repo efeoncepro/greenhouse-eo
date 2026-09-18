@@ -1,9 +1,9 @@
 # Greenhouse MCP Architecture V1
 
 > **Tipo de documento:** Spec de arquitectura
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-04-25
-> **Ultima actualizacion:** 2026-09-10 — §25 TASK-1852 (habilitación de servicios de cliente, autoridad humana delegada)
+> **Ultima actualizacion:** 2026-09-16 — §27 TASK-1846 (render durable de Insights federado, gateway `1.6.0`); previo 2026-09-10 §25 TASK-1852
 > **Scope:** MCP server oficial de Greenhouse para agentes y LLMs
 > **Docs relacionados:** `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_OPS_REGISTRY_ARCHITECTURE_V1.md`, `TASK-040`, `TASK-616`
 
@@ -904,3 +904,31 @@ del binding, releída por Greenhouse en cada llamada.
   `docs/api/GREENHOUSE_API_PLATFORM_V1.md` §Efeonce Insights, manual
   `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, invariantes en
   `agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §TASK-1845.
+
+## 27. Delta 2026-09-16 — TASK-1846: render durable de Insights en el MCP y gateway `1.6.0`
+
+§26 dejó el dominio `insights` hasta `ready_for_review`. TASK-1846 suma el render durable (hoy sólo `deck_pdf`) al
+mismo dominio y al mismo provider, sin clase de scope nueva.
+
+- **Manifiesto interno:** cuatro tools más en el dominio `insights`: `request_insight_render`,
+  `get_insight_render_run` (lectura), `retry_insight_render` y `cancel_insight_render`. El manifiesto de Greenhouse
+  queda en **55 tools** (la cifra vigente se lee del artefacto generado, nunca de este texto).
+- **Federación (`efeonce-mcp`):** provider `greenhouse-insights`, contrato `task-1845-v1 → task-1846-v1`; PR #14 →
+  `main` `da8295a`, versión `1.5.0` → **`1.6.0`**, superficie **47 → 51 tools** (`surface-baseline.json`
+  regenerado), `pnpm check` 194/194. Mismo interruptor `GREENHOUSE_SEO_PROVIDER_ENABLED`, sin variables nuevas.
+- **Scopes y autoridad:** `get_insight_render_run` viaja con el scope base (Greenhouse exige `insights.report.read`);
+  `request_`/`retry_`/`cancel_insight_render` exigen `efeonce.mcp.insights.write` (derivado de `writes: true`,
+  rechequeado en el handler) y Greenhouse exige `insights.edition.create`. Las cuatro son `unsupported` para el
+  emisor nativo (`insights_native_policy_missing`). Ningún cliente porta todavía la clase de escritura.
+- **Errores del lane:** `503 render_disabled` ⇒ `policy_blocked`; `422 render_rejected` ⇒ `invalid_request`; `404` ⇒
+  `not_found` anti-oráculo.
+- **Despliegue:** después del release de Greenhouse que publicó las rutas de render; run `35156353046` de
+  `deploy.yml` (exposure `public-oauth`, ingress `internal-and-cloud-load-balancing`), revisión
+  `efeonce-mcp-gateway-00054-n78` al 100 % del tráfico, digest
+  `sha256:6c7aa768eb9102dc8268075138b00ae0e164b8fadc8f4e83402ac29c204c283b`, `/health` ok.
+- **Evidencia:** canary del provider contra producción (`scripts/greenhouse-insights-canary.mjs … --deny … --render-run
+  …`): catálogo con 1 output renderizable, lista de 5 ediciones, render run `completed`, deny `404`. Canary directo al
+  lane ecosystem de producción: render `202` → `completed` en 1 intento con asset; output `web` ⇒ `422`.
+- **Estado honesto:** federado, desplegado y verificado por canary. Ninguna escritura de render pasó todavía por el
+  gateway (ningún cliente porta la clase) y sigue pendiente el `tools/list` con token humano (51 tools).
+- **Operación:** `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md` §Pedir el render de una edición.

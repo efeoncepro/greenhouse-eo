@@ -68,6 +68,12 @@ Los rangos se solapan en atribución: el source original y el assisted source de
 no carga cuota base durante el piloto. Inicialmente debe originar 15–25% del pipeline new-logo; puede sostener hasta
 cuatro cierres sólo después de validar el modelo.
 
+Los canales `Inbound, Search, contenido y señales` y `Referidos, aliados y HubSpot` se alimentan en Q4 2026 – Q3
+2027 de la narrativa **«Tu IA no conoce tu negocio»**
+([`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md)).
+Cada capítulo debe registrarse como campaña en HubSpot para separar source original y assisted source por capítulo.
+La narrativa no modifica los rangos de esta tabla hasta medir su aporte.
+
 ## 4. Actividad comercial no fría
 
 ### Mensual
@@ -290,6 +296,7 @@ La plantilla de scorecard, el cierre mensual y la agenda del pipeline council vi
 
 | Fecha      | Cambio                                                                              | Estado                                                 |
 | ---------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| 2026-09-17 | Se enlaza la narrativa «Tu IA no conoce tu negocio» como fuente de inbound y canal HubSpot | `Proposed for validation · outbound pilot not started` |
 | 2026-08-29 | Se adopta `primeras reuniones realizadas` y se enlaza la cadencia operativa mensual | `Proposed for validation · outbound pilot not started` |
 | 2026-08-29 | Se integra Agentic Revenue Pod, capacidad por función y staffing condicionado      | `Proposed for validation · outbound pilot not started` |
 | 2026-08-29 | Primera versión: funnel, canales, actividad, piloto Apollo, capacidad, RACI y gates | `Proposed for validation · outbound pilot not started` |

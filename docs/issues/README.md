@@ -64,12 +64,13 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-170`
+`ISSUE-175`
 
 ## Open
 
 | ID          | Título                                                                                                                       | Ambiente             | Detectado  | Estado |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ------ |
+| `ISSUE-174` | [Una ráfaga a una ruta pública sin sesión agota las conexiones de la instancia PostgreSQL compartida](open/ISSUE-174-public-route-burst-exhausts-shared-pg-connections.md) | staging → instancia compartida (incluye producción) | 2026-09-18 | open — 64 requests concurrentes al reader público de Insights dejaron 86–88 conexiones `idle` (máx 100) por 5 min: cada invocación Vercel abre su pool, el `idleTimeoutMillis` no corre con la función congelada y el servidor recién corta a los 5 min (`idle_session_timeout`). El rate limit consume conexión antes de rechazar. Aplica a toda ruta pública. Task: `TASK-1876`. |
 | `ISSUE-173` | [El consumer reactivo deja huérfanos los eventos que un breaker saltó cuando otro handler del mismo evento ya los reconoció](open/ISSUE-173-reactive-consumer-strands-breaker-skipped-handler-events.md) | producción (`ops-worker`) | 2026-09-12 | open — reproducido (drain del dominio `0 processed`; drain acotado por handler `6/6 ok`) y mitigado a mano; el fetch de Phase A excluye un evento si **cualquier** handler tiene fila, así que el handler saltado por el breaker (que no escribe fila a propósito) nunca vuelve a verlo. Fix estructural pendiente en task propia. |
 | `ISSUE-170` | [El link gap del diagnóstico de prospecto puede colapsar por intersección AND](open/ISSUE-170-prospect-link-gap-colapsa-por-interseccion-and.md) | producción (carril de prospección) | 2026-09-11 | open — hipótesis con experimento definido; `domain_intersection` recibe hasta 5 competidores juntos y el default `all` devolvería sólo los dominios que enlazan a todos. Falla en silencio. |
 | `ISSUE-168` | [El CTA hereda el esquema del sistema operativo, no de la página que lo hospeda](open/ISSUE-168-cta-hereda-el-esquema-del-so-no-del-anfitrion.md) | production | 2026-09-01 | open — code complete, rollout pendiente |

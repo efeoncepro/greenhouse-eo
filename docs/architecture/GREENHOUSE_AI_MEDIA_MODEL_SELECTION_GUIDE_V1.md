@@ -1,16 +1,16 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.0
+> **Version:** 1.3
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-16 por Claude
-> **Alcance:** todos los modelos de imagen y video disponibles en `pnpm ai:image` (OpenAI) y `pnpm ai:fal` (55 capacidades de fal), más los carriles fuera de esos CLIs y los candidatos evaluados que NO están conectados.
+> **Ultima actualizacion:** 2026-09-17 por Claude — v1.3: la máscara de 2.5 orienta pero no preserva: la «deriva fuera de zona 2,4/255» es una media; el 2026-09-17 la zona protegida llegó a delta máximo 221/255 (media 4,85) y se recompone desde la base. v1.2: carril **Higgsfield API** dentro de `pnpm ai:fal` (§5.8): 44 capacidades con esquema real y precio exacto por API; Recraft de Higgsfield API: SVG **sin confirmar**. v1.1: brechas de los CLIs corregidas (commit `17196ead1`): estimación de costo previa con confirmación en `ai:fal`, resolución barata por defecto, formato real, `--seed` y tope de referencias validados, flags de LoRA/entrenador; `ai:image` valida `--size`/`--background`, agrega `--format` y estima costo
+> **Alcance:** todos los modelos de imagen y video disponibles en `pnpm ai:image` (OpenAI) y `pnpm ai:fal` (55 capacidades de fal + 44 de Higgsfield API), más los carriles fuera de esos CLIs y los candidatos evaluados que NO están conectados.
 > **Documentación relacionada (no se duplica acá):**
 > [Catálogo de modelos fal](GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) ·
 > [Generador de assets visuales](GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md) ·
 > [Manual del CLI fal](../manual-de-uso/ai-tooling/operar-cli-fal-seedream-seedance.md) ·
 > [Selección de motor por contrato de fidelidad](../../.claude/skills/motion-design-studio/workflows/engine-selection-by-fidelity-contract.md)
-> **Código fuente de verdad:** `src/lib/ai/fal-capabilities.ts` (registro), `scripts/ai/fal-image.ts` (CLI `ai:fal`), `src/lib/ai/openai-image.ts` + `scripts/ai/generate-image.ts` (CLI `ai:image`), `src/lib/ai/fal.ts` (cuentas).
+> **Código fuente de verdad:** `src/lib/ai/fal-capabilities.ts` (registro), `src/lib/ai/higgsfield-capabilities.ts` + `higgsfield-schemas.json` (registro Higgsfield), `scripts/ai/higgsfield-lane.ts` (carril Higgsfield), `scripts/ai/fal-image.ts` (CLI `ai:fal`), `src/lib/ai/openai-image.ts` + `scripts/ai/generate-image.ts` (CLI `ai:image`), `src/lib/ai/fal.ts` (cuentas).
 
 ---
 
@@ -62,14 +62,15 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 |---|---|---|
 | Un raster final para marca, UI, pieza editorial o edición con máscara | `pnpm ai:image` (OpenAI) | Máscara real, transparencia plena en 2.5, #1–#2 en Arena/AA [tercero] |
 | Materialidad, atmósfera, look development, lotes baratos, capas editables | `pnpm ai:fal` (Seedream 5) | Rango de aspecto 1/16–16, Lite a USD 0,035, único con layerize [oficial] |
-| Vectores reales (SVG) | Recraft V4.1 vía Higgsfield CLI | GPT Image y Seedream son raster [contrato]; **hoy sin sesión** (§8) |
+| Modelos propios de Higgsfield (SOUL 2, Marketing Studio) o familias que fal no expone (Ideogram 4.0, Qwen Image 3, Z-Image, PixVerse 6, LTX 2.5, Happy Horse, Kling 3.0/Omni/O3, Grok Imagine) | `pnpm ai:fal --capability hf-*` (Higgsfield API) | Precio exacto por API antes de encolar [contrato]; **ninguna generación real verificada: la cuenta de API no tiene créditos** (§5.8) |
+| Vectores reales (SVG) | Recraft V4.1 vía Higgsfield CLI | GPT Image y Seedream son raster [contrato]; **hoy sin sesión** (§8). El Recraft de la **API** de Higgsfield (`hf-recraft41`): SVG **sin confirmar** (§5.8) |
 | Nano Banana 2 / Pro | Google directo (Vertex) | [decisión] nunca por fal; no hay CLI (§10) |
 
 ### 2.2 Árbol
 
 | Si necesitas | Usa | Por qué | Alternativa | Evita |
 |---|---|---|---|---|
-| **Pieza final con edición precisa o inpainting con máscara** | GPT Image 2.5 **Sunburst** `xhigh`/`max` + `--mask` | #1 edición en Arena (1520) y AA (1164) [tercero]; máscara PNG con alfa [oficial]; deriva fuera de zona 2,4/255 con máscara [verificado 2026-09-16] | 2.5 Flare (mismo costo, más rápido) | Seedream Pro Edit cuando la zona protegida debe quedar intacta: sin máscara en fal, MAE protegido 0,0458 vs 0,0308 de GPT Image 2 con máscara [verificado 2026-07-18] |
+| **Pieza final con edición precisa o inpainting con máscara** | GPT Image 2.5 **Sunburst** `xhigh`/`max` + `--mask` | #1 edición en Arena (1520) y AA (1164) [tercero]; máscara PNG con alfa [oficial]; deriva media fuera de zona 2,4/255 con máscara [verificado 2026-09-16]; la media esconde picos: delta máximo 221/255 en zona protegida [verificado 2026-09-17], así que lo protegido se recompone desde la base ([paso 5](../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu)) | 2.5 Flare (mismo costo, más rápido) | Seedream Pro Edit cuando la zona protegida debe quedar intacta: sin máscara en fal, MAE protegido 0,0458 vs 0,0308 de GPT Image 2 con máscara [verificado 2026-07-18] |
 | **Generación cotidiana de calidad, rápida** | GPT Image 2.5 **Flare** `medium`/`high` | Mismo costo que Sunburst; en `high` 18,7 s vs 29,1 s, en `max` 46,0 s vs 80,6 s a 1024² [verificado 2026-09-16] | Sunburst si la pieza es de edición | Dejar el default del CLI (`gpt-image-2` `high` 1536×1024 ≈ USD 0,165): cuesta lo mismo que 2.5 `max` [cálculo] |
 | **Máxima calidad OpenAI sin importar latencia** | 2.5 Sunburst `max` | `max` ≈ tokens de GPT Image 2 `high` [cálculo sobre fórmula oficial] | 2.5 Flare `max` (#1 AA texto a imagen, 1189) [tercero] | `xhigh`/`max` con `gpt-image-2`: el CLI lo rechaza antes de la red [contrato] |
 | **Mínimo costo por pieza en OpenAI** | 2.5 `low` (≈ 0,006 a 1024²) o `medium` (≈ 0,013) | [cálculo] fórmula oficial | Seedream Lite (0,035 por imagen) si buscas divergencia | Esperar calidad final en `low` |
@@ -83,7 +84,7 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 | **Formatos extremos (más de 3:1)** | Seedream Pro (aspecto 1/16–16) | [oficial] | GPT Image 2 resolvió 3:1 en un pase [verificado 2026-07-18] | GPT Image más allá de 3:1: tope 1:3–3:1 [oficial] |
 | **Texto multilingüe dentro de la imagen (concepto)** | Seedream 5 Pro | Texto denso multilingüe declarado, 16 idiomas de prompt incluido español [oficial] | GPT Image 2 escribió bien una frase corta en español [verificado 2026-07-18] | Entregar ese texto como final; OpenAI no declara nada multilingüe para 2.5 [oficial, ausencia] |
 | **Infografía o layout denso (concepto)** | GPT Image 2.5 o Seedream Pro | 2.5 "improves infographic accuracy and layout" [oficial]; Pro "dense text into professional layouts" [oficial] | — | Confiar en datos o cifras dentro de la imagen |
-| **Vectores (SVG)** | Recraft V4.1 vía Higgsfield | Único vector real [contrato] | Recraft por fal: no conectado (§10) | Vectorizar un raster de GPT/Seedream y llamarlo vector |
+| **Vectores (SVG)** | Recraft V4.1 vía Higgsfield **CLI** | Único vector real [contrato] | Recraft por fal: no conectado (§10) | Vectorizar un raster de GPT/Seedream y llamarlo vector; dar por hecho que `hf-recraft41` (API) entrega SVG: sin confirmar (§5.8) |
 | **Campaña híbrida** | Seedream ↔ GPT Image 2/2.5 → video | Flujo canónico [decisión], ver §6.16 | — | Mezclar anclas de distintas campañas |
 
 ---
@@ -124,7 +125,7 @@ Todo el video vive en `pnpm ai:fal`, salvo Gemini Omni Flash (Google directo, si
 
 | Modelo / id | Carril / CLI | Entradas | Salida máx. real | Transparencia | Controles especiales | Precio (escalón) | Latencia medida | Estado | Ranking (§9) |
 |---|---|---|---|---|---|---|---|---|---|
-| GPT Image 2.5 Sunburst `gpt-image-2.5-sunburst` (+ `-2026-09-08`) | OpenAI · `ai:image` | Prompt ≤ 32.000 car.; hasta 16 imágenes < 50 MB; máscara PNG alfa [oficial] | 3840×2160 (borde ≤ 3840, área ≤ 8.294.400; > 2560×1440 experimental) [oficial] | Plena [oficial] | Calidad `low…max`; `--mask`; `n` vía `--count` = N pedidos [contrato] | Por tokens de salida: 1024² `high` ≈ 0,053 · `max` ≈ 0,211 [cálculo] | 1024²: low 11,6 s · high 29,1 s · max 80,6 s [verificado 2026-09-16] | Conectado, en uso | Arena T2I #1, edit #1; AA T2I #2, edit #1 [tercero] |
+| GPT Image 2.5 Sunburst `gpt-image-2.5-sunburst` (+ `-2026-09-08`) | OpenAI · `ai:image` | Prompt ≤ 32.000 car.; hasta 16 imágenes < 50 MB; máscara PNG alfa [oficial] | 3840×2160 (borde ≤ 3840, área ≤ 8.294.400; > 2560×1440 experimental) [oficial] | Plena [oficial] | Calidad `low…max`; `--mask`; `n` vía `--count` = N pedidos (el CLI lo avisa) [contrato] | Por tokens de salida: 1024² `high` ≈ 0,053 · `max` ≈ 0,211 [cálculo] | 1024²: low 11,6 s · high 29,1 s · max 80,6 s [verificado 2026-09-16] | Conectado, en uso | Arena T2I #1, edit #1; AA T2I #2, edit #1 [tercero] |
 | GPT Image 2.5 Flare `gpt-image-2.5-flare` (+ snapshot) | OpenAI · `ai:image` | Igual que Sunburst [oficial] | Igual [oficial] | Plena [oficial] | Igual; única diferencia de API es `model` [oficial] | Idéntico a Sunburst [verificado 2026-09-16] | 1024²: low 13,3 s · high 18,7 s · max 46,0 s [verificado 2026-09-16] | Conectado | Arena T2I #2, edit #2; AA T2I #1, edit #2 [tercero] |
 | GPT Image 2 `gpt-image-2` (+ `-2026-04-21`) | OpenAI · `ai:image` (**default del CLI**) | Igual; `input_fidelity` se omite [oficial] | Igual [oficial] | Preview [oficial] | Calidad `low/medium/high/auto`; único con Batch API [oficial] | 1536×1024 `high` ≈ 0,165; `medium` ≈ 0,041 [oficial] | `medium` 34–58 s por job [verificado 2026-07-18]; `high` puede superar 125 s [contrato] | Conectado; "Earlier GPT Image models" [oficial] | Arena T2I #3; OpenArt #2 [tercero] |
 | Seedream 5.0 Pro `seedream5-pro` | fal · `ai:fal` | Prompt (recomendado ≤ 600 palabras inglés [oficial]) | Área 1024²–2048² (`auto_1K`, `auto_2K`, WxH); aspecto 1/16–16 [contrato] | No expuesta en fal [contrato] | `--format jpeg|png` (default **jpeg**); `--count` 1–6; sin seed [contrato] | 0,0675 (≤ 1536²) · 0,135 (1536²–2048²) [oficial, "tentative"] | 56,8 s [verificado 2026-09-16] | Verificada 2026-09-16 | OpenArt #1; Arena T2I #10; AA T2I #15 [tercero] |
@@ -148,7 +149,7 @@ Precio: **registro** = lo que guarda `fal-capabilities.ts` (escalón más bajo d
 | **H3 Max** · `h3max-t2v`, `-i2v`, `-r2v` | Igual | 480P/768P nativos; 1080P refinado desde 768P [contrato] | 5–15 s | 24 | Siempre | 9/3/3 [contrato] | Expansión **obligatoria** (`balanced` por defecto del CLI) [contrato]; post-entrenado por fal, no por MiniMax [oficial] | 0,025/s → 480P 0,025 · 768P 0,04 · 1080P 0,08 (rotulados "50% off": promo o lista [sin dato]) [oficial] | 5 s en < 3 s declarado [oficial] | Verificadas 2026-09-16 | AA I2V con audio **#1**, T2V con audio #3 [tercero] |
 | **H3 Max camera** · `h3max-camera` | 1 imagen; prompt opcional [contrato] | 1080P [contrato] | 5–15 s | 24 | Siempre | — | `--camera-trajectory` ≤ 12 keyframes `{distance, elevation −90..90, azimuth, time 0..1}`; unidades de distance/azimuth [sin dato] [contrato] | 0,025/s registro; escalones publicados [sin dato] | [sin dato] | Verificada 2026-09-16 | — |
 | **H3 Max Turbo** · `h3turbo-t2v`, `-i2v` | Texto · imagen [contrato] | 1080P [contrato] | 5–15 s | 24 | Siempre | — | Expansión obligatoria [contrato] | 0,0125/s registro → 768P 0,02 (promo 0,01) · 1080P 0,04 (promo 0,02); 480P no listado [oficial]; **registro no calza: medir** | 2,7–8 s [verificado 2026-09-16] | Verificadas 2026-09-16 | Sin presencia [tercero] |
-| **H3 LoRA** · `h3-t2v-lora`, `h3-i2v-lora`, `h3-r2v-lora` | Igual que base + `--lora path@escala` (≤ 3, escala 0–4) [contrato] | 2K/4K reescalados [contrato] | 5–15 s | 24 | Siempre | 9/3/3 (r2v) | `weight_name` sin flag [contrato] | 0,0625/s registro; escalones [sin dato] | [sin dato] | **SIN VERIFICAR** | — |
+| **H3 LoRA** · `h3-t2v-lora`, `h3-i2v-lora`, `h3-r2v-lora` | Igual que base + `--lora path@escala` (≤ 3, escala 0–4) [contrato] | 2K/4K reescalados [contrato] | 5–15 s | 24 | Siempre | 9/3/3 (r2v) | `--lora path@escala#weight_name` [contrato] | 0,0625/s registro; escalones [sin dato] | [sin dato] | **SIN VERIFICAR** | — |
 | **H3 entrenadores** · `h3-train-t2v`, `-i2v`, `-flf2v`, `-ref2va` | `.zip` de clips (`--training-data`) [contrato] | `lora_file` .safetensors + `config_file` [oficial] | — | — | Entrena video+audio (`t2va`) [oficial] | — | `--steps` (1–15000 contrato; página 1–6000 [contradicción]), `--rank 8…128`, `--learning-rate`, `--trigger` [contrato] | t2v 0,005/step · i2v/flf2v 0,01 · ref2va 0,015; **mínimo 100 steps** [oficial] | Espera CLI hasta 3 h [contrato] | **SIN VERIFICAR** | — |
 | **H3 Max Director** · `h3max-director` | Prompt, primer/último cuadro, audio objetivo [oficial] | [sin dato] | Sesión hasta 15 min [oficial] | — | — | — | Stream realtime | 0,08/s lista · 0,02/s promo · 1080p 2× · mínimo USD 1,20 [oficial] | Realtime | **NO OPERABLE** por cola | — |
 | **Flux 3** final · `flux3-t2v`, `-i2v`, `-flf`, `-keyframes` | Texto · imagen · primer+último (ambos obligatorios) · 1–10 keyframes [contrato] | 720p/1080p en fal (BFL directo hasta 3840×2176) [oficial] | `auto` o 5–20 s (flf y keyframes sin `auto`) [contrato] | 24 [verificado] | Sí, `--no-audio` [contrato] | — | `--safety-tolerance 0–4` (default 2) [contrato] | 0,085/s registro → **720p 0,17 · 1080p 0,29** [oficial BFL y fal] | 40 s–4 min [verificado] | Verificadas 2026-09-16 | OpenArt #6; ausente en AA [tercero] |
@@ -156,7 +157,7 @@ Precio: **registro** = lo que guarda `fal-capabilities.ts` (escalón más bajo d
 | **Flux 3 enhance** · `flux3-enhance` | `--draft-cache <url>` (sin prompt, duración, resolución ni aspect) [contrato] | 1920×1088 [verificado] | Hereda | 24 | Hereda | — | "sin reinterpretar", misma semilla y movimiento [oficial] | 0,085/s registro; publicado [sin dato] (riesgo 2×, ver §7) | [sin dato] | Verificada 2026-09-16 | — |
 | **Flux 3 edit** · `flux3-edit` | `--video` (MP4/MOV/WebM/M4V/GIF, < 15 s) [contrato] [oficial] | 720p [oficial] | Hereda | 24 | Conserva audio [sin dato] | — | Re-render por prompt conservando movimiento y encuadre [contrato] | 0,03/s registro = 0,03/s publicado (720p) [oficial] | ~5 min [oficial] | Verificada 2026-09-16 | — |
 | **Flux 3 extend** · `flux3-extend`, `flux3-extend-draft` | `--video` **con pista de audio**, < 50 MB [contrato] | 720p/1080p [contrato] | `--duration` = segundos **nuevos** (5–20 o `auto`; `auto` entregó 15 s) [contrato] [verificado] | 24 | Sí | — | Usa hasta 4 s de video+audio como contexto; entrega **sólo la continuación** [oficial] [verificado] | extend 0,205/s registro → **720p 0,41 · 1080p 0,53** [oficial]; extend-draft 0,06/s registro, publicado [sin dato] | [sin dato] | Verificadas 2026-09-16 | — |
-| **Wan 3.0** · `wan3-t2v`, `-i2v`, `-r2v` | Texto · imagen (prompt opcional, `--end-image`) · refs; web/documento en r2v [contrato] | 1080p (**default**) [contrato] | 2–30 s o `auto` (se envía `null`; verificado → 5,04 s) [contrato] [verificado] | **30** [oficial] | Sí, `--no-audio` [contrato] | 10 img · 5 video (≤ 15 s total, ≥ 16 fps) · 5 audio [contrato] | `--thinking`, `--web-url`, `--file` (r2v), `--no-prompt-expansion`, `--seed` [contrato] | 0,05/s registro → 480p 0,05 · 720p 0,10 · **1080p 0,20** [oficial] | Sin expansión ahorra 20–60 s [contrato]; típica 1–5 min [tercero] | Verificadas 2026-09-16 (`--file` sin corrida) | OpenArt #2; AA T2V con y sin audio **#1** [tercero] |
+| **Wan 3.0** · `wan3-t2v`, `-i2v`, `-r2v` | Texto · imagen (prompt opcional, `--end-image`) · refs; web/documento en r2v [contrato] | 1080p (default del proveedor; el CLI envía 480p si omites `--resolution`) [contrato] | 2–30 s o `auto` (se envía `null`; verificado → 5,04 s) [contrato] [verificado] | **30** [oficial] | Sí, `--no-audio` [contrato] | 10 img · 5 video (≤ 15 s total, ≥ 16 fps) · 5 audio [contrato] | `--thinking`, `--web-url`, `--file` (r2v), `--no-prompt-expansion`, `--seed` [contrato] | 0,05/s registro → 480p 0,05 · 720p 0,10 · **1080p 0,20** [oficial] | Sin expansión ahorra 20–60 s [contrato]; típica 1–5 min [tercero] | Verificadas 2026-09-16 (`--file` sin corrida) | OpenArt #2; AA T2V con y sin audio **#1** [tercero] |
 | **Wan 3.0 Prime** · `wan3prime-t2v`, `-i2v`, `-r2v` | Igual que base [contrato] | 1080p [contrato] | Igual | 30 | Igual | Igual | Igual; "versión acelerada" [oficial] | 0,05/s registro → 480p 0,068 · 720p 0,14 · **1080p 0,28** (más cara que base) [oficial] | Más rápida [oficial]; "hasta 7×" [tercero]; sin medir | Verificadas 2026-09-16 | No figura [tercero] |
 
 ---
@@ -190,7 +191,7 @@ Cada ficha: qué es · cuándo SÍ · cuándo NO · capacidades y límites · co
 | Tamaños | recomendados `1024x1024`, `1536x1024`, `1024x1536`, `auto`; custom múltiplos de 16, ratio 1:3–3:1, borde ≤ 3840, área 655.360–8.294.400, > 2560×1440 experimental [oficial] | igual + populares 2048×2048, 2048×1152, 3840×2160, 2160×3840 [oficial] |
 | Calidad | `low`, `medium`, `high`, `xhigh`, `max`, `auto` [oficial] | `low`, `medium`, `high`, `auto` [oficial] |
 | Transparencia | Plena, PNG/WebP [oficial] | Preview [oficial] |
-| Formato | PNG/JPEG/WebP en API [oficial]; **el CLI siempre PNG** [contrato] | igual |
+| Formato | PNG/JPEG/WebP en API [oficial]; el CLI acepta `--format png|jpeg|webp` o lo deduce de la extensión de `--out` (png si no hay pista); `transparent` + `jpeg` se rechaza [contrato] | igual |
 | Batch API | No [oficial] | Sí, mitad de precio [oficial] |
 | Provenance | C2PA + SynthID [oficial] | C2PA; SynthID [sin dato] |
 | Rate limits | T1 100.000 TPM/5 IPM · T2 250.000/20 · T3 800.000/50 · T4 3.000.000/150 · T5 8.000.000/250 [oficial] | igual [oficial] |
@@ -231,7 +232,8 @@ Costo de salida por imagen (USD) [cálculo sobre la fórmula; coincide con la ta
 - Transparente no cuesta extra [verificado 2026-09-16].
 - `partial_images` suma 100 tokens de salida cada una [oficial]; el helper no lo permite [contrato].
 - El CLI imprime `usage` (tokens de entrada imagen/texto, salida, total) por pieza [contrato]: úsalo para validar tu estimación después.
-- `--count N` = **N pedidos pagados** secuenciales [contrato].
+- `--count N` = **N pedidos pagados** secuenciales; el CLI lo avisa (`⚠ --count N: son N pedidos separados…`) [contrato].
+- **Estimación del CLI (desde 2026-09-16, commit `17196ead1`):** antes de pedir, `ai:image` imprime `$ costo estimado ≈ USD X (N × tokens × USD 30/1M; la entrada suma aparte)` con esta misma fórmula. No estima con `--size auto` ni con modelos sin grilla publicada, y **no pide confirmación**: sólo informa [contrato].
 
 **Comandos.**
 
@@ -255,9 +257,9 @@ pnpm ai:image --batch conceptos.json --model gpt-image-2.5-flare --quality mediu
 pnpm ai:image:rmbg
 ```
 
-Flags reales de `ai:image` [contrato]: `--prompt`, `--prompt-file`, `--batch`, `--image` (repetible), `--mask`, `--input-fidelity`, `--out`, `--out-dir`, `--concept`, `--task`, `--size`, `--quality`, `--background`, `--model`, `--count`, `--timeout` (default 280000 ms), `--open`, `--help`. Defaults: `gpt-image-2` · `1536x1024` · `high` · `opaque` · `public/images/generated`.
+Flags reales de `ai:image` [contrato]: `--prompt`, `--prompt-file`, `--batch`, `--image` (repetible), `--mask`, `--input-fidelity`, `--out`, `--out-dir`, `--concept`, `--task`, `--size`, `--quality`, `--background`, `--format`, `--model`, `--count`, `--timeout` (default 280000 ms), `--open`, `--help`. Defaults: `gpt-image-2` · `1536x1024` · `high` · `opaque` · `public/images/generated`.
 
-**Trampas.** Ver §8.1: formato siempre PNG; `--size` y `--background` sin validar; `--count` = N pedidos; `--input-fidelity` ignorado; sin `--moderation`; default de salida en `public/`. Deprecaciones de modelos anteriores que el CLI aún acepta: `gpt-image-1` retira 2026-10-23; `gpt-image-1.5` y `gpt-image-1-mini` 2026-12-01 [oficial].
+**Trampas.** Ver §8.1: `--count` = N pedidos pagados; `--input-fidelity` ignorado; sin `--moderation`; default de salida en `public/`. Ya no son trampas (commit `17196ead1`): `--size` se valida en local (2/2.5: `auto` o WxH múltiplos de 16, borde ≤ 3840, relación ≤ 3:1, área 655.360–8.294.400; 1.5/1/mini: sólo `1024x1024`, `1536x1024`, `1024x1536` o `auto`), `--background` se valida y existe `--format`. Deprecaciones de modelos anteriores que el CLI aún acepta: `gpt-image-1` retira 2026-10-23; `gpt-image-1.5` y `gpt-image-1-mini` 2026-12-01 [oficial].
 
 **Estado.** Conectados. Línea base de consumo 2.5 medida 2026-09-16 (7 piezas 1024²) [verificado]; canary transparente GPT Image 2 2026-08-21 [verificado].
 **Fuentes.** O1–O8 (§12).
@@ -284,7 +286,7 @@ Flags reales de `ai:image` [contrato]: `--prompt`, `--prompt-file`, `--batch`, `
 | Aspecto | Pro T2I | Pro Edit | Pro Layerize | Lite T2I | Lite Edit |
 |---|---|---|---|---|---|
 | Prompt | requerido | requerido | **opcional**; acepta `<bbox>l t r b</bbox>` 0–1000 | requerido | requerido |
-| Referencias | — | hasta 10 (más → usa las últimas 10) | 1 imagen png/jpeg 512²–6000², ≤ 30 MB, aspecto 1/16–16 | — | hasta 10 en fal |
+| Referencias | — | hasta 10 (más → el CLI lo rechaza en local) | 1 imagen png/jpeg 512²–6000², ≤ 30 MB, aspecto 1/16–16 | — | hasta 10 en fal |
 | Tamaño | enum `square_hd, square, portrait_4_3, portrait_16_9, landscape_4_3, landscape_16_9, auto_1K, auto_2K` o WxH; área 1024²–2048²; default `auto_2K` | igual | `auto`, `auto_1K`, `auto_1.5K`, `auto_2K` | enum + `auto_2K/3K/4K`; área 2560×1440–4096² (ficha: 3072²); reescala solo si no cumple | igual que Lite |
 | Formato | **jpeg (default)** \| png | igual | capas PNG con alfa | PNG | PNG |
 | Imágenes por pedido | `num_images` 1–6 (`--count`) | igual | base + ≤ 16 capas con `name`, `description`, `z_index`, `bounding_box` | `num_images` 1–6 × `max_images` 1–6 | igual |
@@ -310,8 +312,8 @@ fal no devuelve `usage` y el CLI no reporta costo [contrato]. Referencia directa
 **Comandos.**
 
 ```bash
-# Look development (Pro); fuerza PNG si nombras .png
-pnpm ai:fal --capability seedream5-pro --prompt "<materialidad, luz, atmósfera>" --size 2048x1152 --format png --out ai-generations/2026-09-16_mi-pieza/look.png
+# Look development (Pro); la extensión .png pide PNG (Pro entrega JPEG por defecto)
+pnpm ai:fal --capability seedream5-pro --prompt "<materialidad, luz, atmósfera>" --size 2048x1152 --out ai-generations/2026-09-16_mi-pieza/look.png
 
 # Exploración barata: 4 imágenes Lite
 pnpm ai:fal --capability seedream5-lite --prompt "<territorio>" --size auto_2K --count 4 --out-dir ai-generations/2026-09-16_mi-pieza/lite
@@ -320,7 +322,7 @@ pnpm ai:fal --capability seedream5-lite --prompt "<territorio>" --size auto_2K -
 pnpm ai:fal --capability seedream5-lite --prompt "<serie de 4 piezas coherentes>" --input '{"max_images":4}' --out-dir ai-generations/2026-09-16_mi-pieza/serie
 
 # Edición con referencias (la primera es el ancla)
-pnpm ai:fal --capability seedream5-pro-edit --image ancla.png --image material.png --prompt "<qué cambia; conserva todo lo demás>" --format png --out ai-generations/2026-09-16_mi-pieza/edit.png
+pnpm ai:fal --capability seedream5-pro-edit --image ancla.png --image material.png --prompt "<qué cambia; conserva todo lo demás>" --out ai-generations/2026-09-16_mi-pieza/edit.png
 
 # Capas editables
 pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ai-generations/2026-09-16_mi-pieza/capas
@@ -329,7 +331,7 @@ pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --out-dir ai-gene
 pnpm ai:fal --capability seedream5-pro-layerize --image kv.png --size auto_2K --input '{"enhance_prompt_mode":"fast"}' --out-dir ai-generations/2026-09-16_mi-pieza/capas
 ```
 
-**Trampas.** Pro + `--out x.png` sin `--format png` guarda **JPEG con extensión .png**; `--format` enviado a Lite (sin `output_format`) → efecto [sin dato]; `--seed` enviado aunque ningún Seedream lo acepta; > 10 `--image` → usa las últimas 10 y Pro cobra 0,0045 por cada adicional; `--size`/`--count` no validados contra el contrato de imagen; sin flags para `max_images`, `enhance_prompt_mode` ni `enable_safety_checker` (usar `--input`) [contrato]. Slug sin prefijo `fal-ai/`: con prefijo equivocado responde 200 y el resultado da 404 [verificado]. El registro dice "Hasta 4K según el proveedor" para Pro era **incorrecta**: el tope es 2048²; la nota del registro se corrigió el 2026-09-16 [contrato].
+**Trampas.** Pro cobra 0,0045 por cada `--image` adicional en edit; `--size`/`--count` no validados contra el contrato de imagen; sin flags para `max_images`, `enhance_prompt_mode` ni `enable_safety_checker` (usar `--input`) [contrato]. Slug sin prefijo `fal-ai/`: con prefijo equivocado responde 200 y el resultado da 404 [verificado]. Resuelto en el CLI el 2026-09-16 (commit `17196ead1`): Pro deriva `output_format` de la extensión de `--out` (`.png` → png, `.jpg`/`.jpeg` → jpeg, otra → error local) y, al descargar, detecta el formato por los bytes y corrige la extensión con aviso; `--format` en Lite se rechaza (Lite entrega PNG); `--seed` se rechaza en todo Seedream; más de 10 `--image` se rechaza en local [contrato]. El registro dice "Hasta 4K según el proveedor" para Pro era **incorrecta**: el tope es 2048²; la nota del registro se corrigió el 2026-09-16 [contrato].
 
 **Estado.** Las 5 verificadas 2026-09-16 (una corrida cada una); laboratorio híbrido 2026-07-18 [verificado].
 **Fuentes.** B1–B9 (§12).
@@ -382,7 +384,7 @@ pnpm ai:fal --capability seedance25-r2v --task editing --video clip.mp4 --prompt
 pnpm ai:fal --capability seedance25-r2v --task extension --video clip.mp4 --prompt "Continúa @Video1: <qué pasa después>" --duration 8 --out ai-generations/2026-09-16_mi-pieza/sd25-extension.mp4
 ```
 
-**Trampas.** Rechazo de contenido cobrado; r2v reference > 15 min de latencia (usa `--detach`) [verificado]; `--seed` en t2v/i2v se envía aunque el endpoint no lo declara, efecto [sin dato] [contrato].
+**Trampas.** Rechazo de contenido cobrado; r2v reference > 15 min de latencia (usa `--detach`) [verificado]; `--seed` sólo lo acepta `seedance25-r2v`; en t2v/i2v (y en 2.0) el CLI lo rechaza en local desde 2026-09-16 [contrato]. Con `--duration auto` o sin `--duration`, la estimación previa usa el máximo del contrato (30 s en 2.5): pasa `--duration` para que no te pida `--yes` de más [contrato].
 **Estado.** Las 3 verificadas 2026-09-16 (480p); `editing` y `extension` verificadas [verificado].
 **Fuentes.** V1, V2, V32–V38, R1 (§12).
 
@@ -439,8 +441,8 @@ pnpm ai:fal --capability seedance20-r2v --image personaje.png --video movimiento
 
 | Variante | ids | Resolución [contrato] | Expansión de prompt [contrato] | Registro [contrato] → publicado [oficial] |
 |---|---|---|---|---|
-| base | `h3-t2v`, `h3-i2v`, `h3-r2v` | 480P/768P nativos · 2K/4K **reescalados desde 768P** | Opcional: `disabled|fast|balanced|quality` | 0,05/s → 480P 0,05 · 768P 0,06 · **2K 0,13** (default) · 4K 0,16 |
-| Max | `h3max-t2v`, `h3max-i2v`, `h3max-r2v` | 480P/768P nativos · 1080P refinado desde 768P | **Obligatoria** `disabled|balanced|quality` (CLI envía `balanced`) | 0,025/s → 480P 0,025 · 768P 0,04 (default) · 1080P 0,08 ("50% off": promo o lista [sin dato]) |
+| base | `h3-t2v`, `h3-i2v`, `h3-r2v` | 480P/768P nativos · 2K/4K **reescalados desde 768P** | Opcional: `disabled|fast|balanced|quality` | 0,05/s → 480P 0,05 · 768P 0,06 · **2K 0,13** (default del proveedor; el CLI envía 480P si omites `--resolution`) · 4K 0,16 |
+| Max | `h3max-t2v`, `h3max-i2v`, `h3max-r2v` | 480P/768P nativos · 1080P refinado desde 768P | **Obligatoria** `disabled|balanced|quality` (CLI envía `balanced`) | 0,025/s → 480P 0,025 · 768P 0,04 (default del proveedor) · 1080P 0,08 ("50% off": promo o lista [sin dato]) |
 | camera | `h3max-camera` | 480P/768P/1080P | Obligatoria | 0,025/s; escalones [sin dato] |
 | Max Turbo | `h3turbo-t2v`, `h3turbo-i2v` | 480P/768P/1080P | Obligatoria | 0,0125/s → 768P 0,02 (promo 0,01) · 1080P 0,04 (promo 0,02); 480P no listado → **medir** |
 | LoRA | `h3-t2v-lora`, `h3-i2v-lora`, `h3-r2v-lora` | como base | Opcional | 0,0625/s; escalones [sin dato] |
@@ -455,14 +457,14 @@ pnpm ai:fal --capability seedance20-r2v --image personaje.png --video movimiento
 - r2v: 9 imágenes, 3 videos, 3 audios; aspecto `adaptive` + ratios.
 - camera: `--camera-trajectory` JSON con ≤ 12 keyframes `{distance, elevation, azimuth, time}`; `elevation` −90..90, `time` 0..1 (el CLI valida ambos); unidades de `distance` y rango de `azimuth` [sin dato]; prompt opcional; guía oficial: empezar y terminar en el encuadre original, luz y focal sin cambios [oficial].
 - Audio 48 kHz estéreo, 24 fps [oficial].
-- LoRA: `--lora <path|url|repo HF>@<escala 0–4>`, hasta 3; `loras[].weight_name` sin flag (usar `--input`) [contrato].
-- Entrenadores (`h3-train-t2v`, `h3-train-i2v`, `h3-train-flf2v`, `h3-train-ref2va`): `--training-data` zip, `--steps` (default 2000; contrato 1–15000, página 1–6000: **contradicción**, [sin dato] cuál rige), `--rank 8|16|32|64|128` (default 32), `--learning-rate` (default 2e-4), `--trigger`. Condicionamiento: i2v primer cuadro 0.5; flf2v primero 0.2 · último 0.2 · ambos 0.4; ref2va referencia 0.9 y puede retomar desde una LoRA [contrato]. Datos oficiales del entrenador t2v: mínimo 10 clips recomendados, 20–50 rinden mejor; **captions obligatorias** (`.txt` con el mismo nombre por clip, o `trigger_phrase` de respaldo); **clips de menos de 73 cuadros (~3 s) se descartan en silencio** salvo `auto_scale_input`; entrena video+audio (`t2va`) [oficial]. `number_of_frames` debe cumplir `% 17 == 5` (22, 39, 56, 73, 90, 107, 124) y `split_input_duration_threshold` (1–60 s, default 30) existe; ninguno tiene flag ni validación en el CLI [contrato]. Con `split_input_into_scenes`, ref2va descarta los sidecars de referencia de clips partidos [contrato]. Diferencias reales entre entrenadores más allá del condicionamiento [sin dato].
+- LoRA: `--lora <path|url|repo HF>[@<escala 0–4>][#<weight_name>]`, hasta 3; `weight_name` elige el archivo de pesos dentro de un repo de Hugging Face [contrato].
+- Entrenadores (`h3-train-t2v`, `h3-train-i2v`, `h3-train-flf2v`, `h3-train-ref2va`): `--training-data` zip, `--steps` (default 2000; contrato 1–15000, página 1–6000: **contradicción**, [sin dato] cuál rige), `--rank 8|16|32|64|128` (default 32), `--learning-rate` (default 2e-4), `--trigger`. Condicionamiento: i2v primer cuadro 0.5; flf2v primero 0.2 · último 0.2 · ambos 0.4; ref2va referencia 0.9 y puede retomar desde una LoRA [contrato]. Datos oficiales del entrenador t2v: mínimo 10 clips recomendados, 20–50 rinden mejor; **captions obligatorias** (`.txt` con el mismo nombre por clip, o `trigger_phrase` de respaldo); **clips de menos de 73 cuadros (~3 s) se descartan en silencio** salvo `auto_scale_input`; entrena video+audio (`t2va`) [oficial]. `--frames <n>` → `number_of_frames` (22–124 y `% 17 == 5`: 22, 39, 56, 73, 90, 107, 124) y `--split-threshold <s>` → `split_input_duration_threshold` (1–60 s, default 30); el CLI valida ambas reglas también si llegan por `--input`, y avisa si pides menos de 100 steps (mínimo facturable) [contrato]. Con `split_input_into_scenes`, ref2va descarta los sidecars de referencia de clips partidos [contrato]. Diferencias reales entre entrenadores más allá del condicionamiento [sin dato].
 - Director: stream realtime (AsyncAPI) con prompt, primer y último cuadro y audio objetivo; **no operable por cola**, el CLI se detiene [oficial] [contrato].
 
 **Contenido y licencia.** `enable_safety_checker` default true, sin flag [contrato]. fal rotula H3 "Commercial use" [oficial]. Pesos abiertos H3-Base bajo licencia comunitaria propia: reportan obligación de mostrar "MiniMax H3", autorización sobre USD 20 M de ingresos, **prohibición de usar H3 o sus salidas para entrenar otro modelo** y exclusión territorial (UE, Reino Unido, Corea, EE. UU.) para despliegue local [tercero]; si alcanza a salidas de la API de fal [sin dato]. H3 Max es de fal, relevante para derechos [oficial].
 
 **Precio y estimación.**
-- Video: `segundos × tarifa publicada del escalón pedido`. Usa la **publicada**, no la del registro: H3 base al default 2K cuesta 2,6× el registro [oficial]. Para Turbo, ninguna cifra calza con el registro: mide con `--balance` antes y después de una corrida aislada.
+- Video: `segundos × tarifa publicada del escalón pedido`. Usa la **publicada**, no la del registro: H3 base a 2K cuesta 2,6× el registro [oficial]. Para Turbo, ninguna cifra calza con el registro: mide con `--balance` antes y después de una corrida aislada.
 - Entrenamiento: `max(steps, 100) × tarifa` → t2v 0,005 · i2v/flf2v 0,01 · ref2va 0,015. Piso: t2v **0,50**, i2v/flf2v 1,00, ref2va 1,50; 2000 steps = 10 / 20 / 20 / 30 [oficial] [cálculo]. **El plan anterior "10 steps ≈ USD 0,40" es falso** (corrección 2026-09-16).
 - Director: mínimo 1,20 por sesión [oficial].
 
@@ -491,7 +493,7 @@ pnpm ai:fal --capability h3-t2v-lora --prompt "<frase disparadora> <escena>" --l
 pnpm ai:fal --capability h3-train-t2v --training-data dataset.zip --steps 100 --rank 32 --trigger "tronl0g0" --detach
 ```
 
-**Trampas.** Resolución en minúsculas → rechazo local [contrato]; audio siempre presente [contrato]; precios del registro subestiman [oficial]; frames del entrenador sin validar; clips cortos descartados en silencio [oficial].
+**Trampas.** Resolución en minúsculas → rechazo local [contrato]; audio siempre presente [contrato]; precios del registro subestiman [oficial]; clips cortos descartados en silencio [oficial]. Sin `--resolution`, el CLI ya no hereda el 2K del proveedor en H3 base: envía el escalón más barato y lo avisa; para entrega pasa `--resolution` explícito [contrato].
 **Estado.** 9 verificadas 2026-09-16 (base ×3, Max ×3, camera ×1, Turbo ×2); LoRA ×3 y entrenadores ×4 **sin verificar** por [decisión] del operador; Director no operable [contrato].
 **Fuentes.** V7–V14, V47–V53 (§12).
 
@@ -576,10 +578,10 @@ pnpm ai:fal --capability flux3-extend --video clip-con-audio.mp4 --prompt "<cóm
 El registro guarda 0,05/s para ambas y el manual dice "mismo precio": **incorrecto en fal**; Prime es ~36–40 % más cara. En Alibaba directo Prime 720P = 0,127199/s [oficial]; Picsart dice que Prime cuesta 1/3 de créditos [tercero, 2026-08-31]: el precio depende del canal.
 
 **Cuándo SÍ.** Toma larga hasta 30 s; video a partir de una **página web** o **documento** (único); consistencia por referencias (10/5/5) incluyendo replicar movimiento de cámara [oficial]; material con personas o marcas donde Seedance rechaza (sin filtro medido); texto a video con audio (#1 AA [tercero]); rostros humanos diversos con microexpresiones (declarado) [oficial]. Prime sólo si la latencia manda.
-**Cuándo NO.** Texto preciso en pantalla y textura de audio ("todavía no donde queremos") [oficial]; lip sync, manos o multitudes, prompts surrealistas o con varios sujetos [tercero]; un solo plano continuo de 30 s (puede cortar entre encuadres) [tercero]; edición, extensión o multi-shot controlado de Wan 3.0 (Alibaba los ofrece, **fal no los expone**) [oficial]; explorar sin `--resolution` (default 1080p = 4× el escalón más bajo).
+**Cuándo NO.** Texto preciso en pantalla y textura de audio ("todavía no donde queremos") [oficial]; lip sync, manos o multitudes, prompts surrealistas o con varios sujetos [tercero]; un solo plano continuo de 30 s (puede cortar entre encuadres) [tercero]; edición, extensión o multi-shot controlado de Wan 3.0 (Alibaba los ofrece, **fal no los expone**) [oficial]; asumir que omitir `--resolution` da calidad final (el CLI envía 480p, el escalón más barato).
 
 **Capacidades y límites** [contrato salvo indicación].
-- Duración entera 2–30 s o `auto` (se envía `null`; el modelo eligió 5,04 s [verificado]). Resolución 480p/720p/1080p, **default 1080p**. Aspecto `adaptive, 16:9, 4:3, 1:1, 3:4, 9:16`. **30 fps** [oficial].
+- Duración entera 2–30 s o `auto` (se envía `null`; el modelo eligió 5,04 s [verificado]). Resolución 480p/720p/1080p; default del proveedor 1080p, pero sin `--resolution` el CLI envía 480p y lo avisa. Aspecto `adaptive, 16:9, 4:3, 1:1, 3:4, 9:16`. **30 fps** [oficial].
 - t2v: prompt obligatorio. i2v: `--image` = primer cuadro, `--end-image` opcional, **prompt opcional**. r2v: 10 imágenes (≤ 20 MB c/u), 5 videos (total ≤ 15 s, ≥ 16 fps, ≤ 100 MB c/u), 5 audios (total ≤ 15 s, ≤ 15 MB c/u), máximo 20 materiales; prompt opcional; se citan por posición ("the subject in Image 1 … like Video 1") [contrato] [oficial].
 - Audio por campo `audio` (`--no-audio`) con diálogo, BGM y efectos [oficial].
 - `--no-prompt-expansion` ahorra 20–60 s y puede bajar calidad; `--seed`.
@@ -613,9 +615,66 @@ pnpm ai:fal --capability wan3-t2v --prompt "<texto exacto>" --no-prompt-expansio
 pnpm ai:fal --capability wan3prime-t2v --prompt "<escena>" --duration 5 --resolution 720p --aspect 16:9 --out ai-generations/2026-09-16_mi-pieza/wan3prime.mp4
 ```
 
-**Trampas.** Omitir `--resolution` = 1080p = 0,20/s; creer que Prime cuesta igual; `--web-url`/`--file` fuera de r2v o sin `--thinking` los rechaza el CLI [contrato]; `--web-url` sin guion anima la portada en vez de narrar [verificado].
+**Trampas.** Omitir `--resolution` = 480p (el CLI elige el escalón barato; para entrega pásalo explícito); creer que Prime cuesta igual; `--web-url`/`--file` fuera de r2v o sin `--thinking` los rechaza el CLI [contrato]; `--web-url` sin guion anima la portada en vez de narrar [verificado].
 **Estado.** Las 6 verificadas 2026-09-16 según el registro (`--web-url` con Prime r2v verificado); `--file` **sin corrida real**. El manual del CLI aún dice que i2v, r2v y Prime no tienen corrida: desactualizado frente al registro.
 **Fuentes.** V17–V20, V28, V29, V31, V58–V64, R1 (§12).
+
+---
+
+### 5.8 Higgsfield API (`pnpm ai:fal --capability hf-*`)
+
+**Qué es.** Segundo proveedor de `pnpm ai:fal`, con el mismo diseño que fal (cola asíncrona, clave `id:secret` en `Authorization: Key`). Cliente canónico `src/lib/ai/higgsfield.ts`; secreto `greenhouse-higgsfield-api-key` en Secret Manager (`efeonce-group`), leído vía `HIGGSFIELD_API_KEY_SECRET_REF`. `--capability hf-*` elige el proveedor sola; `--provider higgsfield --model <endpoint>` abre cualquier otro endpoint [contrato].
+
+**Catálogo.** 44 capacidades (`pnpm ai:fal --list --provider higgsfield`): SOUL 2 / SOUL / SOUL Cinema, Marketing Studio, Recraft 4.1 (+Pro; SVG sin confirmar), Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Grok Imagine Image 2.0; Seedance 2.5 (t2v, i2v, r2v, editar, extender) y 2.0; Wan 3.0 (t2v, i2v, r2v), Wan 3.0 Prime, 2.7 y 2.6; Kling 3.0 std/pro/4K/Turbo, Kling O3 y Omni primer-último cuadro, Kling 2.6 Pro, 2.5 Turbo; MiniMax H3 (sólo 2K), Hailuo 2.3, LTX 2.5 Fast/Pro, PixVerse 6, Happy Horse 1.0/1.1, Grok Imagine Video 1.5 [contrato].
+
+**Contrato de entrada.** No se transcribe a mano: `pnpm ai:higgsfield:sync-schemas` congela en `src/lib/ai/higgsfield-schemas.json` el JSON Schema que el playground de la consola publica por endpoint (43 al 2026-09-16; SOUL Cinema transcrito de su documentación). La CLI mapea los flags genéricos al campo real de cada endpoint (`--image` → `image_url`/`first_frame_url`/`image_urls`; `--end-image` → `end_image_url`/`last_image_url`/`last_frame_url`; `--no-audio` → `generate_audio:false` o `sound:"off"`; `--count` → `batch_size`) y valida todo el cuerpo en local antes de pedir precio. Lo propio de cada endpoint (`style_id`, `multi_prompt`, `camera_movement`, `rendering_speed`, `colors`, `preset_id`) va por `--input` [contrato].
+
+**Precio.** Lo da la API de estimación (`POST /estimate/<endpoint>`), que valida el cuerpo y **no cobra**. Monto exacto con descuento vigente en 33 capacidades; Seedance 2.0/2.5 y Wan 3.0 sólo devuelven fórmula y la CLI la aplica como **cota antes de descuento** (si falta la duración de un video remoto de entrada, exige `--yes`). Tope y `--yes` como en fal. `--estimate` imprime precio y cuerpo sin encolar [contrato].
+
+| Barrido `--estimate` 2026-09-16 (cuerpo mínimo, resolución más barata) | USD |
+|---|---|
+| SOUL 2 · SOUL Cinema (720p) | 0,004 |
+| Z-Image Turbo (1k) · Recraft 4.1 · Qwen Image 3 (1k) | 0,015 · 0,035 · 0,040 |
+| Ideogram 4.0 · Grok Image 2.0 (1k) · SOUL | 0,060 · 0,060 · 0,094 |
+| Marketing Studio (1k) · Recraft 4.1 Pro | 0,189 · 0,210 |
+| PixVerse 6 5 s 360p · Kling 2.5 Turbo i2v | 0,175 · 0,179 |
+| Hailuo 2.3 · Wan 3.0 Prime 5 s 480p · Grok Video 1.5 5 s 480p | 0,280 · 0,340 · 0,410 |
+| Kling 3.0 Turbo 720p · Kling Omni/O3 · Wan 2.7/2.6 720p | 0,476 · 0,476 · 0,500 |
+| Kling 3.0 std · LTX 2.5 Fast 6 s · H3 2K · Kling 2.6 Pro · Happy Horse | 0,536 · 0,540 · 0,553 · 0,595 · 0,595 |
+| Kling 3.0 Pro · LTX 2.5 Pro 6 s · Kling 3.0 4K | 0,714 · 0,720 · 1,785 |
+| Seedance 2.5 5 s 480p (cota por fórmula) · Wan 3.0 5 s 480p (fórmula) | ≈ 1,075 · 0,25 |
+
+**Diferencias con fal que importan.** Salida retenida ≥ 7 días en el proveedor (la CLI siempre descarga; un `--detach` hay que recuperarlo dentro de esa ventana). Tope de concurrencia por cuenta que responde `400`, no `429`. `--cancel` sólo mientras siga en cola. Sin API de saldo documentada: `--balance` remite a la consola. La cuenta de API tiene créditos propios, distintos de la suscripción de la app [contrato].
+
+**Cuándo SÍ.** Modelos que fal no expone (SOUL, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image, LTX 2.5, PixVerse 6, Happy Horse, Kling Omni/O3); comparar precio exacto antes de gastar [contrato].
+
+**Cuándo NO.** Contar con SVG todavía (ver Vectores abajo); Veo 3.1, Sora 2 y Nano Banana Pro (la API responde `model_not_found`/`model_disabled` a la cuenta) [verificado 2026-09-16]; Nano Banana y Gemini Omni siempre directo por Google [decisión].
+
+**Vectores (Recraft).** La API rechaza `output_format: svg` (400: sólo `jpg`/`png`/`webp`) [verificado 2026-09-16]. La app de Higgsfield ofrece Recraft V4.1 con `model_type` `vector` y `utility_vector` (logos, íconos, ilustración tipo SVG) [verificado con el conector de la app 2026-09-16]. La API no documenta `model_type` y su estimación acepta cualquier campo (`foo`, `model_type: "banana"` → 200), así que no prueba nada: **si `--input '{"model_type":"vector"}'` entrega SVG por la API está sin confirmar** hasta una generación real (USD 0,035). La CLI deja pasar ese campo para poder probarlo.
+
+**Estado.** Las 44 capacidades pasaron el barrido `--estimate` (acceso + esquema + precio) [verificado 2026-09-16]. La cuenta de API ya tiene créditos: **`hf-zimage-turbo` completó la primera generación real** el 2026-09-17 (1k, USD 0,015, 7,7 s, request `52df8c09-c2b4-4aec-98c7-b5768fbda8fc`) [verificado 2026-09-17]. **Las otras 43 siguen SIN VERIFICAR en salida:** una generación exitosa prueba la cuenta y esa capacidad, no la familia. Antes de usar una en producción, correr una generación real de esa capacidad.
+
+```bash
+# Precio y cuerpo sin encolar
+pnpm ai:fal --capability hf-kling3-std-t2v --prompt "<texto>" --duration 5 --estimate
+
+# Imagen SOUL 2 vertical
+pnpm ai:fal --capability hf-soul2 --prompt "<texto>" --aspect 3:4 --out retrato.jpg
+
+# Marketing Studio con referencias de producto (campos propios por --input)
+pnpm ai:fal --capability hf-marketing-studio --prompt "<brief>" --image producto.png --resolution 2k --out pieza.png
+
+# Video largo desacoplado, estado, cancelación y retome
+pnpm ai:fal --capability hf-seedance25-i2v --image hero.png --duration 10 --resolution 720p --detach --yes
+pnpm ai:fal --provider higgsfield --request-id <id> --status
+pnpm ai:fal --provider higgsfield --request-id <id> --cancel
+pnpm ai:fal --capability hf-seedance25-i2v --request-id <id> --out clip.mp4
+
+# Refrescar esquemas del proveedor
+pnpm ai:higgsfield:sync-schemas
+```
+
+**Fuentes.** docs.higgsfield.ai (requests, polling, errors, webhooks, billing, rate limits, file uploads, SDK), console.higgsfield.ai (catálogo y JSON Schema por playground), barrido `--estimate` con la cuenta de Efeonce (2026-09-16).
 
 ---
 
@@ -693,7 +752,7 @@ pnpm ai:fal --capability seedance25-i2v --image ai-generations/2026-09-16_explor
 
 1. Hoy: referencias r2v con la misma hoja de personaje/producto en cada toma (`seedance25-r2v` si no hay rostros reales; `wan3-r2v` o `h3max-r2v` si los hay).
 2. Futuro: LoRA de H3 (postergada [decisión]; verificación mínima: entrenamiento t2v 100 steps **0,50** + inferencia).
-3. Otro carril: Higgsfield Soul ID (skill motion-design-studio). Kling elements: no conectado.
+3. Otro carril: Higgsfield Soul ID (skill motion-design-studio). Kling elements: expuestos como campo `elements` en `hf-kling3-*` (Higgsfield API) vía `--input`, **sin corrida real**.
 
 ### 6.13 Capas editables
 
@@ -701,7 +760,7 @@ pnpm ai:fal --capability seedance25-i2v --image ai-generations/2026-09-16_explor
 
 ### 6.14 Vectores
 
-Recraft V4.1 vía Higgsfield CLI: **sin sesión** (`Not authenticated`) hasta que una persona haga `higgsfield auth login` en navegador [contrato]. Sin vía operativa hoy. No sustituir con vectorización de raster.
+Recraft V4.1 vía Higgsfield CLI: **sin sesión** (`Not authenticated`) hasta que una persona haga `higgsfield auth login` en navegador [contrato]. Sin vía operativa hoy. No sustituir con vectorización de raster. **API de Higgsfield:** `model_type: vector|utility_vector` existe en la app de Higgsfield; la API no lo documenta y su estimación ignora campos desconocidos, así que **si la API entrega SVG está sin confirmar** hasta una generación real (§5.8).
 
 ### 6.15 Texto en imagen
 
@@ -750,7 +809,7 @@ Canon del flujo híbrido: skill `greenhouse-ai-image-generator`, referencia `see
 1. Explora en el motor más barato que conserve lo que quieres juzgar (movimiento: Turbo 480P / Flux 3 draft / Seedance mini 480p; look: Seedream Lite; layout: GPT Image 2.5 `medium`).
 2. Genera en el motor final **sólo** la toma aprobada, a la resolución de entrega.
 3. Arregla defectos editoriales en post; no regeneres por crop, texto, grade o mezcla [decisión].
-4. Pasa **siempre** `--resolution` explícito: los defaults de Wan (1080p) y H3 base (2K) son los escalones caros [contrato] [oficial].
+4. Para la toma final pasa `--resolution` explícito. Sin ese flag, el CLI envía la resolución **más barata** del endpoint y lo avisa (`· sin --resolution: uso 480p…`); antes del 2026-09-16 se heredaban los defaults caros del proveedor (Wan 1080p ≈ 0,20/s, H3 base 2K ≈ 0,13/s) [contrato] [oficial].
 
 ### 7.3 Reglas de gasto
 
@@ -774,7 +833,19 @@ Canon del flujo híbrido: skill `greenhouse-ai-image-generator`, referencia `see
   ```
 
 - **Rechazos cobrados**: Seedance cobra aunque el filtro rechace después de encolar [verificado]. Revisa personas y marcas **antes**.
-- **Sin estimación previa en `ai:fal`**: hoy no existe; calcula a mano con esta guía (§8.3).
+- **Estimación y confirmación en `ai:fal`** (desde 2026-09-16, commit `17196ead1`) [contrato]: antes de encolar el CLI imprime `$ costo estimado ≈ USD X · <base del cálculo>`.
+  - Seedance: fórmula de tokens (área × segundos × 24 / 1024 × precio por 1.000 tokens de la API de pricing). Con `--duration auto` o sin `--duration` usa el máximo del contrato como cota superior (2.5 a 480p ≈ USD 6,45): pasa `--duration`.
+  - H3 base/Max/Turbo, Wan 3.0/Prime y Flux 3 (final, draft, extend, edit): precio publicado por escalón de resolución; donde no hay escalón publicado (camera-controls, LoRA, enhance, extend draft, Turbo 480P) usa el precio de la API. Extend cobra los segundos nuevos de `--duration`; edit mide con `ffprobe` la duración del video de origen local.
+  - Seedream: por imagen según área (+ 0,0045 por referencia extra en Pro edit). Layerize: precio por capa, sin total (el número de capas lo decide el modelo).
+  - Entrenadores H3: `steps × precio` con mínimo facturable de 100 steps.
+  - **Tope:** si la estimación supera USD 1 (o `FAL_COST_CONFIRM_USD`, o `--max-usd <n>` para esa corrida), el CLI se detiene **antes de encolar** y pide `--yes`. Sin estimación posible (slug fuera del registro con `--model`, datos faltantes) avisa y no bloquea.
+  - La estimación es orientativa: las tablas de escalones son de las páginas de fal y fabricantes al 2026-09-16. La medida real sigue siendo `--balance` antes y después. Las subidas de archivos locales ocurren antes de la estimación (subir no cobra).
+
+  ```bash
+  pnpm ai:fal --capability wan3-t2v --prompt "<escena>" --duration 10 --resolution 1080p --out ai-generations/2026-09-16_mi-pieza/wan3.mp4
+  # → $ costo estimado ≈ USD 2.00 · … supera el tope de USD 1.00 → repite con --yes
+  pnpm ai:fal --capability wan3-t2v --prompt "<escena>" --duration 10 --resolution 1080p --yes --out ai-generations/2026-09-16_mi-pieza/wan3.mp4
+  ```
 
 ---
 
@@ -784,37 +855,51 @@ Canon del flujo híbrido: skill `greenhouse-ai-image-generator`, referencia `see
 
 | Brecha | Efecto | Mitigación |
 |---|---|---|
-| Formato siempre PNG; sin `--format` ni `--output-compression` | No puedes pedir JPEG/WebP (JPEG es más rápido [oficial]) | Convierte en post |
-| `--size` y `--background` no se validan | Un tamaño inválido llega al API; si el API rechaza antes de cobrar [sin dato] | Usa tamaños de §5.1 |
-| `--count N` = N pedidos pagados secuenciales | Multiplica costo y tiempo | Cuenta `N × costo` |
+| Sin `--output-compression` | No controlas la compresión de JPEG/WebP | Recomprime en post |
+| `--count N` = N pedidos pagados secuenciales | Multiplica costo y tiempo (el CLI lo avisa y la estimación ya multiplica por N) | Cuenta `N × costo` |
+| Estimación sólo informativa | No hay tope ni `--yes` en `ai:image`; sin estimación con `--size auto` o modelos sin grilla | Revisa la línea `$ costo estimado` antes de dejarlo correr |
 | `--input-fidelity` con 2.5 o GPT Image 2 se ignora en silencio | Crees controlar algo que no viaja | No lo uses |
 | Sin `--moderation` | No puedes usar `moderation=low` | — |
 | `--batch` no usa la Batch API | Sin descuento 50 % | Batch sólo vía API directa con `gpt-image-2` |
 | Default de salida `public/images/generated` | Riesgo de commitear assets | Siempre `--out`/`--out-dir` |
 
+**Resuelto el 2026-09-16 (commit `17196ead1`):** `--format png|jpeg|webp` (o deducido de la extensión de `--out`); `--size` validado en local contra la grilla del modelo; `--background` validado; aviso de `--count N`; estimación previa con la fórmula oficial de tokens. Sigue [sin dato] si OpenAI rechaza un tamaño inválido antes de cobrar (ahora el CLI corta antes).
+
 ### 8.2 `pnpm ai:fal` [contrato]
 
 | Brecha | Efecto | Mitigación |
 |---|---|---|
-| `seedream5-pro --out x.png` sin `--format png` | Guarda JPEG con extensión `.png` | `--format png` o nombra `.jpg` |
-| `--seed` se envía a endpoints que no lo declaran (Seedream, Seedance t2v/i2v) | Efecto no probado (422 o ignorado) | No lo uses ahí |
-| Más de 10 `--image` en Seedream edit | fal usa las últimas 10 sin aviso (y Pro cobra por cada adicional) | Máximo 10, ancla al final si importa |
-| `--format` enviado a Lite (sin `output_format`) | [sin dato] | No lo pases a Lite |
 | `--size`/`--count` sin validar en imagen | Lite reescala solo | Usa el enum |
-| Sin flags para `weight_name` (LoRA), `split_input_duration_threshold`, regla de cuadros `% 17 == 5` del entrenador, `max_images`, `enhance_prompt_mode`, `enable_safety_checker` | Sólo vía `--input` sin validación | `--input '{"campo":valor}'` |
-| Sin estimación de costo previa | Gastas sin tope | Esta guía + `--balance` |
+| Sin flags para `max_images`, `enhance_prompt_mode`, `enable_safety_checker` | Sólo vía `--input` | `--input '{"campo":valor}'` |
+| `--seed` forzado por `--input` en un endpoint que no lo declara | Efecto [sin dato] | No lo fuerces |
+| Layerize: número de capas y si la base se cobra | [sin dato]; la estimación muestra precio por capa sin total | Presupuesta 16 capas como techo |
+| Flux 3: la API de pricing devuelve la mitad del precio publicado | Causa [sin dato]; la estimación usa el publicado | Mide con `--balance` |
+| Estimación orientativa | Tablas de escalones al 2026-09-16, pueden cambiar; las subidas locales ocurren antes de estimar (no cobran) | `--balance` antes y después |
 | Registro con precio del escalón más bajo | Subestima Wan, H3 base/Max/Turbo y Flux 3 | Usa el publicado (§4.2) |
 | Nota del registro "Hasta 4K" en `seedream5-pro` | Corregida el 2026-09-16 (tope 2048²; también notas de precio de Wan, Flux 3 y H3) | Resuelto |
 | Default de salida `public/images/generated` | Riesgo de commitear | Siempre `--out`/`--out-dir` |
 
-### 8.3 Pendientes
+**Resuelto el 2026-09-16 (commit `17196ead1`)** [contrato]: formato real de Seedream Pro derivado de `--out` + detección por bytes con corrección de extensión; `--format` rechazado en Lite; `--seed` aceptado sólo en los 19 endpoints que lo declaran (H3 de generación, Wan 3.0/Prime, `seedance25-r2v`); tope de 10 `--image` en Seedream edit validado; `--lora …#weight_name`, `--frames` y `--split-threshold` con validación (también por `--input`); estimación de costo con confirmación `--yes` sobre el tope; resolución más barata por defecto en video.
+
+### 8.3 Higgsfield API dentro de `pnpm ai:fal` [contrato]
+
+| Brecha | Efecto | Mitigación |
+|---|---|---|
+| Cuenta de API sin créditos (`403 not_enough_credits`) | Ninguna generación real verificada | Recargar en console.higgsfield.ai/billing y verificar una generación por familia (anotar `verifiedAt`) |
+| Sin API de saldo documentada | `--balance` no muestra monto | Consola del proveedor |
+| Seedance/Wan 3.0: la estimación devuelve fórmula | La CLI calcula una cota antes de descuento | Si falta la duración de un video remoto de entrada, pide `--yes` |
+| Validador local = subconjunto de JSON Schema | Lo no cubierto lo rechaza la estimación (sin cobrar) | Mensaje del proveedor en inglés en ese caso |
+| Snapshot de esquemas puede quedar viejo | Enum o rango desactualizado | `pnpm ai:higgsfield:sync-schemas` |
+| Salida retenida ≥ 7 días | Un `--detach` olvidado pierde el archivo | Recuperar con `--request-id` dentro de la ventana |
+
+### 8.4 Pendientes
 
 | Pendiente | Estado | Condición de cierre |
 |---|---|---|
 | **LoRA H3 y entrenadores** | Postergados [decisión]. Costos corregidos: piso 100 steps → t2v ≥ 0,50, i2v/flf2v ≥ 1,00, ref2va ≥ 1,50; captions por clip obligatorias; clips < 73 cuadros descartados | Verificar entrenamiento t2v de 100 steps + 1–3 inferencias `h3-t2v-lora` y anotar `verifiedAt` |
 | **Recraft V4.1 vía Higgsfield** | Sin sesión (`Not authenticated`) | Persona hace `higgsfield auth login` en navegador con mkt@efeoncepro.com |
 | **Rotación de la clave B de fal** | Pendiente [contrato] | Rotar `greenhouse-fal-api-key-b` con verificación del consumer |
-| **Estimación de costo en `ai:fal`** | Propuesta: estimación + confirmación con tope + defaults baratos | Follow-up que abre el orquestador |
+| ~~Estimación de costo en `ai:fal`~~ | **Cerrado 2026-09-16** (commit `17196ead1`): estimación + confirmación con tope + resolución barata por defecto | — |
 | **Nano Banana Pro sin superficie** | `gemini-3-pro-image` disponible en Vertex (models.get OK 2026-09-16) pero ninguna superficie lo usa; decisión pendiente del operador de exponerlo | Decisión del operador |
 | Medición real de precios | Flux 3 (todos), H3 Turbo/Max/camera, Wan Prime, Seedance 2.5 1080p | Corrida aislada con `--balance` (§7.3) |
 | Calidad y latencia Wan base vs Prime | Sin medir | Misma toma en ambos, comparar |
@@ -854,7 +939,7 @@ OpenArt completo (2026-09-16): 1 Seedream 5.0 Pro · 2 GPT Image 2 · 3 Nano Ban
 | Flux 3 Video | #6 · 1003 | no incluido | no incluido | no incluido | no incluido |
 | MiniMax H3 | #7 · 1000 (ancla) | #4 · 1225 | #3 | #3 · 1190 | #3 · 1351 |
 | H3 Max (post-entrenado por fal) | — | #3 · 1231 | — | **#1 · 1206** | — |
-| Kling 3.0 Omni (no conectado) | #8 · 979 | — | — | — | — |
+| Kling 3.0 Omni (vía Higgsfield API, sin corrida real) | #8 · 979 | — | — | — | — |
 
 OpenArt 9–11: HappyHorse 1.1 · Grok Imagine 1.5 · PixVerse V6. Subcategoría Video Editing de OpenArt: #1 Wan 3.0, pero **en fal Wan 3.0 no tiene endpoint de edición** (la edición Wan conectable es 2.7, no conectada). Sub-puntajes OpenArt de Seedance 2.5: adherencia 1053, estética 1096, física y movimiento 1104, consistencia 1195. fal afirma que H3 Max es #1 en su propia evaluación humana contra 12 modelos (autodeclarado) [oficial]; BFL declara Elo 1135 de Flux 3 en texto a video (autodeclarado) [oficial].
 
@@ -871,7 +956,7 @@ OpenArt 9–11: HappyHorse 1.1 · Grok Imagine 1.5 · PixVerse V6. Subcategoría
 | Google directo (Vertex, location `global`), runtime `generateImage` provider `google-gemini-image` | **Nano Banana 2** = `gemini-3.1-flash-image` (default del provider; sobrescribible con `GOOGLE_GEMINI_IMAGE_MODEL`) | En runtime del producto; **sin CLI** [contrato] | Cambiar la env cambia todo el carril del producto [contrato] |
 | Google directo (Vertex) | **Nano Banana Pro** = `gemini-3-pro-image` | Disponible (models.get OK 2026-09-16) pero **ninguna superficie lo usa**; `gemini-3.1-pro-image` responde 404 [verificado] | Siempre directo por Google, nunca por fal [decisión]; exponerlo es decisión pendiente |
 | Google directo | **Gemini Omni Flash** (video) | Sin CLI en el repo [contrato] | Siempre directo por Google (más barato, misma calidad), nunca por fal [decisión]. Rankings: OpenArt #5; AA #1 imagen a video sin audio [tercero] |
-| Higgsfield CLI `~/.local/bin/higgsfield` (cuenta mkt@efeoncepro.com), out-of-band | **Recraft V4.1** vectores reales (SVG) | `Not authenticated` al 2026-09-16 [verificado] | Requiere `higgsfield auth login` por una persona |
+| Higgsfield CLI `~/.local/bin/higgsfield` (cuenta mkt@efeoncepro.com), out-of-band | **Recraft V4.1** vectores reales (SVG) | `Not authenticated` al 2026-09-16 [verificado] | Requiere `higgsfield auth login` por una persona. Distinto del carril Higgsfield **API** de `ai:fal` (§5.8) |
 
 ### 10.2 Evaluados y NO conectados (no usar como si existieran)
 
@@ -884,7 +969,7 @@ Precios de la API de pricing de fal (2026-09-16), escalón más bajo, **no verif
 | **Recraft vía fal** (23 endpoints) | text-to-vector V4.1, pro, vectorize, upscale crisp, estilos propios `recraft/v4/style/*` | text-to-vector 0,08 · pro 0,30 · vectorize 0,01 · upscale crisp 0,004 · create-style 0,005 | Vía alternativa a Higgsfield para SVG |
 | **Qwen Image 3** | Imagen, edición, *layered* | [sin dato] | Capas; OpenArt imagen #6 [tercero] |
 | **Wan 2.7** | Edición de video | [sin dato] | Edición Wan (3.0 no la expone en fal) |
-| **HappyHorse 1.1**, **PixVerse V6** | Video | [sin dato] | OpenArt video #9 y #11 [tercero] |
+| **HappyHorse 1.1**, **PixVerse V6** | Video | Conectados vía Higgsfield API (`hf-happyhorse11-t2v`, `hf-pixverse6-t2v`), sin corrida real | OpenArt video #9 y #11 [tercero] |
 | **Flux.2 Pro** | Imagen | [sin dato] | OpenArt imagen #7 [tercero] |
 | **Flux 3 directo en BFL** | qhd/uhd hasta 3840×2176, keyframes por timestamp, i2v con 1–10 imágenes | qhd 0,40/s · uhd 0,80/s [oficial] | 4K de Flux 3 |
 | **Wan 3.0 directo en Alibaba** | Edición (incluye cambiar diálogo), extensión adelante/atrás, multi-shot 4–6 s por plano | Prime 720P 0,127199/s [oficial] | Funciones que fal no expone |

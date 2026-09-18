@@ -1,0 +1,105 @@
+{
+  "format": "9x16",
+  "plate": "wall/plate-9x16-navy.png",
+  "impactSize": 116.9,
+  "leadBox": {
+    "x": 354.9521391773568,
+    "y": 284.54410894063415,
+    "left": 356.77573148868544,
+    "right": 723.2242685113146,
+    "top": 252,
+    "bottom": 284.9649379355561
+  },
+  "impactBox": {
+    "x": 285.4986183417967,
+    "y": 396.95220936201997,
+    "left": 286.20000000000005,
+    "right": 793.8,
+    "top": 313.02020426368904,
+    "bottom": 415.538823304408
+  },
+  "selBounds": {
+    "left": 273.24000000000007,
+    "right": 806.76,
+    "top": 302.220204263689,
+    "bottom": 426.33882330440804
+  },
+  "chip": {
+    "x": 450.6624,
+    "y": 439.298823304408,
+    "w": 178.67520000000002,
+    "h": 37.800000000000004
+  },
+  "stackBottom": 477.09882330440803,
+  "logo": {
+    "x": 430,
+    "y": 1580.154132868219
+  },
+  "contrast": {
+    "lead": 12.16,
+    "impact": 15.22,
+    "chipText": 4.59,
+    "logo": 17.04
+  },
+  "selection": {
+    "schema": "axis.collaboration-selection-composition.v1",
+    "contract": {
+      "id": "efeonce.collaboration-selection",
+      "version": "0.2.0"
+    },
+    "target": {
+      "id": "kv-headline-negocio",
+      "kind": "text"
+    },
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "paddingRatio": {
+        "inline": 0.012,
+        "block": 0.01
+      },
+      "overlay": "subtle",
+      "overlayOpacity": 0.1,
+      "overlayBlendMode": "luminosity"
+    },
+    "cursorEvidence": [
+      {
+        "id": "claude",
+        "state": "acting",
+        "action": "select",
+        "direction": "south-west",
+        "anchor": "top-end",
+        "hotspot": {
+          "x": 806.76,
+          "y": 302.22
+        },
+        "touchesTarget": true,
+        "label": "Claude",
+        "participantKind": "role",
+        "attachment": "south-west",
+        "labelGap": 4.32,
+        "labelBounds": {
+          "left": 839.16,
+          "top": 241.956,
+          "right": 907.913,
+          "bottom": 269.82
+        }
+      },
+      {
+        "id": "local",
+        "state": "acting",
+        "action": "select",
+        "direction": "north-west",
+        "anchor": "bottom-start",
+        "hotspot": {
+          "x": 273.24,
+          "y": 426.339
+        },
+        "touchesTarget": true
+      }
+    ],
+    "noFreeCoordinates": true,
+    "targetGeometrySource": "rendered-content-bounds",
+    "withinCanvas": true
+  }
+}

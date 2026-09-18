@@ -457,6 +457,58 @@ export const GREENHOUSE_MCP_TOOL_MANIFEST: readonly GreenhouseMcpToolManifestEnt
     writes: true,
     spendsProviderBudget: false,
     purpose: 'Cancela el trabajo pendiente de un run; lo que ya está renderizando termina solo y se reporta honesto.'
+  },
+  // ── Efeonce Insights (TASK-1848) — enlaces compartidos de ediciones emitidas ──
+  {
+    name: 'create_insight_share',
+    domain: 'insights',
+    writes: true,
+    spendsProviderBudget: false,
+    purpose: 'Crea un enlace de lectura (ShareGrant) de una edición emitida; el enlace se devuelve una sola vez y vence.'
+  },
+  {
+    name: 'list_insight_shares',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Enlaces de una edición con su estado (active/revoked/expired); nunca trae el token.'
+  },
+  {
+    name: 'revoke_insight_share',
+    domain: 'insights',
+    writes: true,
+    spendsProviderBudget: false,
+    purpose: 'Revoca un enlace: la siguiente lectura o descarga falla; lo ya descargado no es revocable.'
+  },
+  // ── Efeonce Insights (TASK-1848) — envíos por correo: MCP sólo lee (enviar exige una persona interna) ──
+  {
+    name: 'list_insight_deliveries',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Envíos por correo de una edición con el estado por destinatario y del transporte (aceptado ≠ entregado).'
+  },
+  {
+    name: 'get_insight_delivery',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Un envío por correo: modalidad, destinatarios enmascarados, estado y resultado del transporte.'
+  },
+  // ── Efeonce Insights (TASK-1848) — recurrencia: MCP sólo lee (crear/activar exige una persona interna) ──
+  {
+    name: 'list_insight_schedules',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Recurrencias de Insights de una organización: cadencia, zona, estado y últimas ocurrencias.'
+  },
+  {
+    name: 'get_insight_schedule',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Una recurrencia con su plantilla, política de revisión y el resultado de sus últimas ocurrencias.'
   }
 ] as const
 

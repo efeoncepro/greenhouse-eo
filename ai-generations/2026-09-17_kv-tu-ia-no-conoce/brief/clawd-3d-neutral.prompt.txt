@@ -1,0 +1,7 @@
+Turn this exact pixel-art sprite into a physical 3D voxel collectible figurine. The reference image is the ONLY source of shape: the sprite is drawn on a grid of tall pixels (each pixel is twice as tall as it is wide). Rebuild it with equal small cubes where every sprite pixel becomes a stack of 1 cube wide by 2 cubes tall, so the body is 12 cubes wide and 8 cubes tall, each eye hole is 1 cube wide by 2 cubes tall, each side arm is 1 cube wide by 2 cubes tall, and each of the four legs is 1 cube wide by 2 cubes tall. Keep the same silhouette and proportions as the reference image. Do not add, remove, round or reinterpret any pixel.
+
+Construction: extrude the sprite front-to-back so the figurine is about 8 cubes deep, a solid chunky block body. The two eye holes become recessed square cavities going into the body, dark charcoal inside. The two side arms stick out at the height shown in the sprite. The four legs stand under the body, two on each side, exactly where the sprite has them. No mouth, no face details, no claws, no antennae, no text, no logo.
+
+Material and color: matte soft-touch vinyl, very slightly beveled cube edges so the pixel grid stays visible, uniform color exactly rgb(215,119,87) (warm terracotta orange), subtle ambient occlusion between cubes.
+
+Camera and light: three-quarter front view from slightly above, the figurine standing on its four legs, centered, fully visible with generous margin. Soft large studio key light from upper left, gentle fill, soft contact shadow. Plain seamless light warm-gray background, no props.

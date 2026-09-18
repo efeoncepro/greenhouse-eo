@@ -130,6 +130,29 @@ export const resetFalAccountsForTests = () => {
   rankedAccounts = null
 }
 
+/**
+ * Precio unitario de un endpoint según `GET https://api.fal.ai/v1/models/pricing` (clave normal, sin costo). Ojo: es
+ * el escalón más bajo; las reglas de `FAL_PRICING_RULES` corrigen por resolución. `null` si fal no responde.
+ */
+export const getFalEndpointPricing = async (slug: string): Promise<{ unitPrice: number; unit: string } | null> => {
+  try {
+    const [account] = await rankFalAccounts()
+
+    const response = await fetch(`https://api.fal.ai/v1/models/pricing?endpoint_id=${encodeURIComponent(slug)}`, {
+      headers: authHeaders(account.value)
+    })
+
+    if (!response.ok) return null
+
+    const body = (await response.json().catch(() => null)) as { prices?: { unit_price?: number; unit?: string }[] } | null
+    const price = body?.prices?.[0]
+
+    return typeof price?.unit_price === 'number' ? { unitPrice: price.unit_price, unit: price.unit ?? '' } : null
+  } catch {
+    return null
+  }
+}
+
 export interface FalAccountBalance {
   account: FalAccountName
   balance: number | null

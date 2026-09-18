@@ -40,7 +40,7 @@ Siguiente ID libre `TASK-1876`. Insights TASK-1845–1849 (+ TASK-1875, vista we
 [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md) registra **cinco tareas nuevas**,
 P1/Alto. Dominio Greenhouse + Artifact Worker; tres salidas iniciales: deck, informe A4 y web.
 TASK-1672/1673 conservan la auditoría técnica SEO y su distribución como consumers. La foundation (TASK-1845) está
-**complete** (2026-09-16): en producción desde 2026-09-15 (generación ON en staging y producción; emisión/IA OFF), rollback ensayado; TASK-1846 en ejecución y el resto en diseño.
+**complete** (2026-09-16): en producción desde 2026-09-15 (generación ON en staging y producción; emisión/IA OFF), rollback ensayado; TASK-1846 (render durable) **complete** (2026-09-16, en producción) y el resto en diseño.
 Desde 2026-09-09, [EPIC-046](../epics/to-do/EPIC-046-client-services-visibility-and-self-service.md)
 integra autogestión cliente y gestión de colaboradores internos. TASK-1845/1846/1848/1849 incorporan
 autoridad por población, render/entrega segura y las dos experiencias; mismos IDs y owners, sin duplicados.
@@ -49,10 +49,11 @@ TASK-690–693 para Hub/preferencias y TASK-303/387/694 para audiencia/digest/me
 
 | Task | Resultado | Estado |
 |---|---|---|
-| [TASK-1845](in-progress/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO — code complete y **en producción** (2026-09-15: schema `greenhouse_insights`, lanes app/ecosystem, 4 tools MCP federadas en `efeonce-mcp` 1.5.0, scope Entra, `INSIGHTS_GENERATION_ENABLED` ON en staging+producción, emisión/IA OFF; ediciones `EO-INS-000012/13` staging y `000014` prod); faltan ensayo `migrate:down` y sesión MCP humana | in-progress |
-| [TASK-1846](in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor — **staging verificado, producción pendiente del release** (2026-09-16): flag ON en los 3 runtimes de staging (dispatcher corregido), benchmark Cloud Run (1 output por tick de 2 min), retry/cancel/audiencia por API real, auditoría `client_user`, Job en el release control plane, gateway v1.6.0 mergeado sin deploy | in-progress |
+| [TASK-1845](complete/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md) | dominio, evidencia y adaptadores SEO/AEO/ICO — **en producción** desde 2026-09-15 (schema `greenhouse_insights`, lanes app/ecosystem, `INSIGHTS_GENERATION_ENABLED` ON en staging+producción, emisión/IA OFF), rollback ensayado | complete |
+| [TASK-1846](complete/TASK-1846-efeonce-insights-durable-artifact-rendering.md) | render durable y Artifact Worker multiconsumidor — **en producción 2026-09-16**: release `917491fd02e4` (primer deploy productivo del Job `artifact-worker`), `INSIGHTS_RENDER_ENABLED` ON en los 3 runtimes lectores en staging y producción, gateway `efeonce-mcp` v1.6.0 desplegado, canary productivo en org sandbox (`deck_pdf` completed por el dispatcher automático; `web` → `422`); `report_pdf`/`web` quedan en TASK-1847/1848 | complete |
 | [TASK-1847](to-do/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md) | gráficos y catálogos premium para deck e informe vertical | to-do |
-| [TASK-1848](to-do/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados | to-do |
+| [TASK-1848](in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md) | acceso compartido, correo y recurrencia gobernados | in-progress |
+| [TASK-1876](to-do/TASK-1876-public-route-connection-exhaustion-guard.md) | rutas públicas: defensa volumétrica antes de la base (ISSUE-174) | to-do |
 | [TASK-1849](to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md) | biblioteca, creación y experiencia web compartida | to-do |
 | [TASK-1875](to-do/TASK-1875-efeonce-insights-shared-web-render-think.md) | vista web compartida por token renderizada en Think (`efeonce-think`) | to-do |
 
@@ -1696,6 +1697,8 @@ Reglas de lectura:
 | `TASK-427` | [TASK-427-finance-metric-registry-sharding.md](to-do/TASK-427-finance-metric-registry-sharding.md) | P3 | Medio | Bajo | Diseño (trigger-based) | Sharding por sub-dominio cuando registry supere 30 entradas; barrel re-export preserva contrato público |
 
 ## Complete
+
+- `TASK-1846` ✅ — **Efeonce Insights: render durable y Artifact Worker multiconsumidor.** En producción 2026-09-16: release `917491fd02e4` (manifest `released` en un intento, Job `artifact-worker` desplegado por el control plane, change-gated), `INSIGHTS_RENDER_ENABLED` ON en Vercel, Job y `ops-worker` (staging y producción), gateway `efeonce-mcp` v1.6.0 desplegado (51 tools) y canary productivo en la org sandbox (`deck_pdf` completed al 1er intento; `web` → `422 render_rejected`; canary del provider MCP verde). `report_pdf` → TASK-1847, `web` → TASK-1848; `INSIGHTS_ISSUANCE_ENABLED` sigue OFF. `EPIC-045`.
 
 - `TASK-1352` ✅ — **Landing HubSpot (Pillar del hub)** (`/servicios-contratar-hubspot/`, page `244079`). Cerrada 2026-09-11 por decisión del operador: publicada e indexable. No se hizo la migración a `/servicios/hubspot/` (hoy `301` a un post antiguo) y los 27 criterios quedan sin certificar; la URL padre del hub es decisión pendiente en `EPIC-047`.
 

@@ -213,9 +213,14 @@ Qué hace, en orden:
 4. Concede `roles/run.invoker` al dispatcher sobre el Job.
 5. **Verifica que el SHA desplegado sea el SHA que construiste.** Si no coincide, aborta.
 
-> **Producción todavía no.** El script acepta `ENV=production`, pero el rollout productivo exige sign-off
-> del operador **+** integrar `artifact-worker-deploy.yml` al release control plane
-> (`RELEASE_DEPLOY_WORKFLOWS`). No lo ejecutes sin eso.
+> **Actualizado 2026-09-16 (TASK-1846).** El Job ya está integrado al release control plane: producción
+> lo despliega `production-release.yml` vía `workflow_call` con `EXPECTED_SHA` (primer deploy productivo:
+> release `917491fd02e4`) y cada push a `develop` que toca su superficie despliega staging. Como el Job es
+> **único** para ambos ambientes, `deploy.sh` fija el bucket (`GREENHOUSE_STORAGE_ENV=staging`) y los flags
+> (`ARTIFACT_RENDER_JOBS_ENABLED`, `INSIGHTS_RENDER_ENABLED`, default `true`), etiqueta la imagen con
+> `git-sha` y **aborta si el árbol no está en el SHA esperado**. No lo corras a mano salvo break-glass
+> auditado. El Job también renderiza outputs de Efeonce Insights: un output de Insights puede esperar un
+> tick si Proposal tenía trabajo (el dispatcher atiende Proposal primero).
 
 ---
 
@@ -243,7 +248,9 @@ solo NO configura el sistema.
 | **`ops-worker`** (dispatcher) | No despacha; registra el skip. Los jobs se quedan en `queued` **para siempre** | `services/ops-worker/deploy.sh` |
 | **`artifact-worker`** (Job) | Registra `flag OFF — skip` y sale con código 0. No renderiza | `services/artifact-worker/deploy.sh` |
 
-**Estado real hoy (2026-07-12):**
+**Estado real al 2026-07-12** *(Delta 2026-09-16: el Job y el `ops-worker` siguen únicos y con el flag
+declarado ON en su `deploy.sh`; en Vercel Production la variable ahora **existe** — presencia verificada,
+valor no leído —, así que no des por cerrado ni por abierto el enqueue productivo sin leer su valor)*:
 
 | Runtime | Staging | Production |
 |---|---|---|

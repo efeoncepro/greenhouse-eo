@@ -33,6 +33,19 @@ interface RedactionPattern {
 }
 
 const PATTERNS: RedactionPattern[] = [
+  // TASK-1848 — bearer de enlace compartido de Insights en el PATH de una URL (`/insights/shared/<token>`
+  // en Greenhouse, `/insights/r/<token>` en Think). Va primero: el segmento puede no llevar prefijo.
+  {
+    label: 'insights_share_path',
+    pattern: /(\/insights\/(?:shared|r)\/)[^/?#\s"']+/g,
+    replacement: '$1[redacted]'
+  },
+  // TASK-1848 — bearer `isg_…` suelto en cualquier string (mensajes, extras, breadcrumbs).
+  {
+    label: 'insights_share_token',
+    pattern: /\bisg_[A-Za-z0-9_-]{20,}/g,
+    replacement: '[redacted:share-token]'
+  },
   // GCP Secret Manager URIs (must come BEFORE generic projects/* matches)
   {
     label: 'gcp_secret_uri',

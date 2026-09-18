@@ -84,6 +84,7 @@ const ASSESSMENT_ID = new RegExp(`^asmt-${UUID}$`, 'i')
 const EXTERNAL_INVITATION_ID = /^xmi-[0-9a-f-]{36}$/
 const TALENT_CONSENT_ID = new RegExp(`^tlpc-${UUID}$`, 'i')
 const ASSESSMENT_RECOVERY_EVENT_ID = /^assessment-access-recovery:[a-f0-9]{64}$/
+const INSIGHT_DELIVERY_RECIPIENT_ID = new RegExp(`^idlr-${UUID}(?::a[2-5])?$`, 'i')
 
 const durableSensitiveSource = (
   emailType: EmailType,
@@ -130,6 +131,17 @@ const durableSensitiveSource = (
         ? { sourceEventId }
         : {})
     }
+  }
+
+  // TASK-1848 — un correo por destinatario de un DeliveryIntent de Insights (`idlr-…`): la
+  // correlación es la fila del destinatario, que es la unidad de dedupe y de reconciliación.
+  if (
+    emailType === 'insights_edition_delivery' &&
+    sourceEntity === 'insight_delivery_recipients' &&
+    sourceEventId &&
+    INSIGHT_DELIVERY_RECIPIENT_ID.test(sourceEventId)
+  ) {
+    return { sourceEventId, sourceEntity }
   }
 
   return {}
@@ -253,11 +265,15 @@ type RotationOwnerEmailType =
   | 'hiring_assessment_assigned'
   | 'hiring_assessment_access_recovery'
   | 'hiring_talent_pool_verification'
+  | 'insights_edition_delivery'
 
 const ROTATION_OWNER_EMAIL_TYPES: readonly RotationOwnerEmailType[] = Object.freeze([
   'hiring_assessment_assigned',
   'hiring_assessment_access_recovery',
-  'hiring_talent_pool_verification'
+  'hiring_talent_pool_verification',
+  // TASK-1848 — el grant del enlace se emite DENTRO del claim del correo (misma transacción), y el
+  // índice `uq_email_deliveries_token_intent_v3` impide un segundo correo por destinatario.
+  'insights_edition_delivery'
 ])
 
 const isRotationOwnerEmailType = (emailType: EmailType): emailType is RotationOwnerEmailType =>

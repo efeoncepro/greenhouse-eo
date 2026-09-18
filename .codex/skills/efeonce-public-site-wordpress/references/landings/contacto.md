@@ -78,8 +78,11 @@ El renderer y las banderas fueron publicados y la versión v3 de `efeonce-contac
 gobernado. Readback público: `country_select`, placeholder `Selecciona tu país` y 250 opciones. La activación no
 requiere mutar Elementor; no saltar las guardas con un write WP-CLI directo.
 
-Pendiente para el próximo release del renderer: promover `e5d4a0fb2` para sustituir el glifo `↗` que aún puede
-aparecer junto a “País” por el SVG geográfico. No crear otra versión del formulario; la v3 ya está activa.
+El override page-scoped `ghf-country-icon-ohio-override-v1` se probó y se revirtió el 2026-09-16: el CSS no
+atraviesa el Shadow DOM del renderer y dejaba `globe` junto al SVG. Se restauró el snapshot
+`_gh_contacto_before_country_icon_override`; no queda parche live. El hotfix correcto del renderer
+`d15bb9256` (sobre `e5d4a0fb2`) queda preparado para el próximo release. No crear otra versión del formulario;
+la v3 ya está activa.
 
 Canon de producto: `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`. Task cerrada:
 `docs/tasks/complete/TASK-1801-contacto-multistakeholder-form-agenda.md`.

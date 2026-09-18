@@ -1,0 +1,150 @@
+{
+  "producto": "Lanyard Efeonce con yoyo, portacarnet de marco rígido y carnet",
+  "artes_canonicas": {
+    "cinta": "efeonce-lanyard-arte-cinta-canonica.png — logo blanco repetido + eslogan; «Empower your» en gris CLARO #C8CEDA y «Growth» en blanco. El gris de marca #848484 no se usa aquí: sobre navy da 2,98:1 de contraste y no resuelve en serigrafía ni sublimado; el gris claro da 7,06:1",
+    "yoyo": "efeonce-lanyard-arte-yoyo-canonica.png — disco blanco con el isotipo navy #023c70 bajo la resina",
+    "carnet": "efeonce-carnet-plantilla-plano.png (sirve además como vista plana del carnet) — CR80 vertical: cabecera navy con el logo blanco, retrato circular, nombre en navy, cargo en gris y el eslogan al pie (Growth en navy como acento sobre blanco). Se compone con arte-carnet.mjs: `node arte-carnet.mjs <foto.png> \"<Nombre>\" \"<Cargo>\" <salida.png>`",
+    "carnet_julio": "efeonce-carnet-julio-reyes.png — carnet real del operador: «Julio Reyes» / «Managing & GTM Director» (cargo declarado por él; en la empresa es CEO, pero usa ese título en la credencial). Generado con arte-carnet.mjs."
+  },
+  "invariantes": {
+    "cinta": "poliéster plano 20 mm, navy #023c70, hebilla de seguridad, gancho giratorio metálico",
+    "yoyo": "carcasa redonda 32 mm navy brillante, cúpula de resina, clip de acero, cordón de nylon",
+    "portacarnet": "portacarnet de MARCO RÍGIDO transparente: sujeta la tarjeta por los bordes, abierto por un costado para deslizarla, con la cara frontal del carnet expuesta (sin lámina sobre el arte) y ranura superior. NO es funda de vinilo ni estuche cerrado (eso es un portacredencial)",
+    "arte": "las tres artes se componen determinísticamente; el texto exacto nunca se le pide al modelo"
+  },
+  "vistas": [
+    {
+      "id": "01-conjunto",
+      "descripcion": "Conjunto completo con carnet en el portacarnet",
+      "cuando_usarla": "vista general, catálogo, kit de bienvenida",
+      "archivo_fondo_estudio": "efeonce-lanyard-01-conjunto-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-lanyard-01-conjunto-1200x1600-v01-transparente.png",
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "02-detalle-cinta",
+      "descripcion": "Macro de la cara impresa de la cinta",
+      "cuando_usarla": "verificación del arte y primeros planos",
+      "archivo_fondo_estudio": "efeonce-lanyard-02-detalle-cinta-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "03-detalle-yoyo",
+      "descripcion": "Macro del yoyo y su resina",
+      "cuando_usarla": "detalle de producto",
+      "archivo_fondo_estudio": "efeonce-lanyard-03-detalle-yoyo-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "04-puesto",
+      "descripcion": "Puesto sobre el polo navy, sin rostro",
+      "cuando_usarla": "piezas con persona",
+      "archivo_fondo_estudio": "efeonce-lanyard-04-puesto-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "05-carnet-portacarnet",
+      "descripcion": "Macro del carnet en el portacarnet de marco rígido",
+      "cuando_usarla": "detalle del carnet",
+      "archivo_fondo_estudio": "efeonce-lanyard-05-carnet-portacarnet-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "06-cinta-plana",
+      "descripcion": "Cinta estirada de extremo a extremo",
+      "cuando_usarla": "ritmo del patrón y largo real; base para mockups",
+      "archivo_fondo_estudio": "efeonce-lanyard-06-cinta-plana-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "07-reverso-cinta",
+      "descripcion": "Macro del reverso de la cinta, sin impresión",
+      "cuando_usarla": "declara que la cara trasera va lisa",
+      "archivo_fondo_estudio": "efeonce-lanyard-07-reverso-cinta-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "08-herrajes",
+      "descripcion": "Macro de gancho, hebilla de seguridad y regulador",
+      "cuando_usarla": "detalle de herrajes",
+      "archivo_fondo_estudio": "efeonce-lanyard-08-herrajes-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "09-yoyo-reverso",
+      "descripcion": "Reverso del yoyo con el clip de acero",
+      "cuando_usarla": "detalle de construcción",
+      "archivo_fondo_estudio": "efeonce-lanyard-09-yoyo-reverso-1600x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1600,
+        1600
+      ]
+    },
+    {
+      "id": "10-portacarnet-vacio",
+      "descripcion": "Portacarnet de marco rígido vacío",
+      "cuando_usarla": "deja clara la pieza sin la tarjeta",
+      "archivo_fondo_estudio": "efeonce-lanyard-10-portacarnet-vacio-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-lanyard-10-portacarnet-vacio-1200x1600-v01-transparente.png",
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "12-conjunto-colgado",
+      "descripcion": "Conjunto colgado de un gancho",
+      "cuando_usarla": "posición natural de caída; vitrina o percha",
+      "archivo_fondo_estudio": "efeonce-lanyard-12-conjunto-colgado-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": "efeonce-lanyard-12-conjunto-colgado-1200x1600-v01-transparente.png",
+      "resolucion": [
+        1200,
+        1600
+      ]
+    },
+    {
+      "id": "13-en-mano",
+      "descripcion": "Carnet en la mano",
+      "cuando_usarla": "escala real de tarjeta, marco y yoyo",
+      "archivo_fondo_estudio": "efeonce-lanyard-13-en-mano-1200x1600-v01-fondo-estudio.png",
+      "archivo_transparente": null,
+      "resolucion": [
+        1200,
+        1600
+      ]
+    }
+  ],
+  "como_usarla": "Elegir la vista por lo que la pieza tiene que mostrar: conjunto para catálogo, macros para verificar arte, reverso y herrajes para construcción, portacarnet vacío para la pieza sola, cinta plana para mockups, en mano para escala y puesto para piezas con persona. Pasar siempre las artes canónicas junto con la vista."
+}

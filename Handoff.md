@@ -1,5 +1,7 @@
 # Handoff activo
 
+**16–17/09:** Higgsfield API con créditos. Previa 18: verificar · readback KV 21/09 y 23/09.
+
 **Posicionamiento CRM actualizado (2026-09-16, documental):** HubSpot y Salesforce se mantienen como proveedores
 con una zona de solapamiento —mid-market alto, agentes e integraciones— pero con centros de gravedad distintos.
 HubSpot-first parte para crecimiento B2B, mid-market y time-to-value; Salesforce-first para org instalada compleja,
@@ -31,8 +33,8 @@ blend raster `luminosity` `0.72` verificado. Templates: `efeonce-advertising-cre
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
 no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
 
-**Efeonce Insights — TASK-1845 COMPLETE (2026-09-16):** foundation en producción desde 2026-09-15 (generación ON,
-emisión/IA OFF, gateway v1.5.0, rollback ensayado). Detalle: la task, arquitectura §14 y la skill `efeonce-insights`.
+**Efeonce Insights:** 1845/1846 en producción (emisión/IA OFF); TASK-1848 verificada en staging, pendiente gateway y prod.
+Estado vivo: arquitectura §14 y la skill `efeonce-insights`.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
 TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con
@@ -48,7 +50,7 @@ invariantes SQL/Ops, playbook reactivo, skills talento/resend/email/release (+ e
 Follow-ups formales: `TASK-1872` (fix de `ISSUE-173`: Phase A del consumer deja huérfano al handler que el breaker
 saltó; mitigación `reactive:backfill --handler=`), `TASK-1873`+`TASK-1874` (enlace descartado: warnings de intake +
 aviso en Application 360). Sin task: valor live de `GROWTH_FORMS_SERVER_VALIDATION_ENABLED`, 6 CV en cuarentena de
-`EO-OPN-0675`, reader canónico submissions↔postulaciones (hoy ad hoc). Resend en Pro. Siguiente ID libre: `TASK-1876`.
+`EO-OPN-0675`, reader canónico submissions↔postulaciones (hoy ad hoc). Resend en Pro. Siguiente ID libre: `TASK-1877`.
 
 **Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
 **no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a
@@ -429,11 +431,11 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
-## 2026-09-16 — TASK-1846: render durable — staging verificado, producción espera el release
+## 2026-09-16 — TASK-1846 COMPLETE: render durable de Efeonce Insights en producción
 
-[TASK-1846](docs/tasks/in-progress/TASK-1846-efeonce-insights-durable-artifact-rendering.md) sigue `in-progress`
-sólo por producción. Staging verificado: flag ON en Vercel staging, Job y `ops-worker-00690-xhl` (el dispatcher no
-lo leía; corregido en `d9da99df8`), benchmark 1 output por tick de 2 min, auditoría `client_user` (`1875fdd32`).
-Job en el release control plane; gateway `efeonce-mcp#14` mergeado sin desplegar. **Pendiente (tras autorizar
-release):** release develop→main, `INSIGHTS_RENDER_ENABLED` en Vercel Production + redeploy, deploy del gateway
-v1.6.0 y canary productivo en la org sandbox. Evidencia: la task y la skill `efeonce-insights`.
+Release `917491fd02e4` (PR #237, run `35154555317`, manifest `917491fd02e4-9231b87b-20da-43c3-abce-4348dccdda99`
+`released` 22:02:41Z, un solo intento; watchdog `ok` 6/6, primer Job `artifact-worker` en el orquestador).
+`INSIGHTS_RENDER_ENABLED` ON en Vercel Production (redeploy `greenhouse-d6l33zils`) + Job + `ops-worker`. Gateway
+`efeonce-mcp` v1.6.0 desplegado (`00054-n78`). Canary productivo: render `202` → dispatcher automático → `completed`.
+Siguiente de EPIC-045: `INSIGHTS_ISSUANCE_ENABLED` sigue OFF; `report_pdf`/`web` en TASK-1847/1848. Detalle: la task
+(complete), ledgers de flags y tiempos, y la skill `efeonce-insights`.

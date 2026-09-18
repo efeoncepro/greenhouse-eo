@@ -1,0 +1,210 @@
+{
+  "svg": "../ref/logo-efeonce-oficial.svg",
+  "color": "navy",
+  "color_hex": "#023c70",
+  "prefijo": "efeonce-logo-3d-navy-monumental",
+  "resolucion": [
+    2400,
+    1600
+  ],
+  "samples": 160,
+  "escala": {
+    "nombre": "monumental",
+    "ancho_m": 20,
+    "grosor_m": 0.7,
+    "bisel_m": 0.08,
+    "nota": "letras corpóreas de ~4,7 m de alto"
+  },
+  "camaras": [
+    {
+      "id": "01-frente-nivel-calle",
+      "pos": [
+        0,
+        -38,
+        1.7
+      ],
+      "mira": [
+        0,
+        0,
+        2.4
+      ],
+      "lente_mm": 35,
+      "descripcion": "De frente, a la altura de un peatón, a distancia media",
+      "usos": [
+        "avenida",
+        "plaza",
+        "frente de edificio"
+      ]
+    },
+    {
+      "id": "02-contrapicado-frente",
+      "pos": [
+        0,
+        -40,
+        1.7
+      ],
+      "mira": [
+        0,
+        0,
+        14.5
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde abajo y de frente: letras elevadas (azotea, fachada alta) vistas desde la calle; se ve su cara inferior",
+      "usos": [
+        "fachada",
+        "azotea",
+        "marquesina",
+        "estructura elevada"
+      ],
+      "elevacion_objeto_m": 12
+    },
+    {
+      "id": "03-tres-cuartos-izquierda-calle",
+      "pos": [
+        -50,
+        -56,
+        1.7
+      ],
+      "mira": [
+        0,
+        0,
+        2.4
+      ],
+      "lente_mm": 35,
+      "descripcion": "Tres cuartos desde la izquierda, altura peatón",
+      "usos": [
+        "esquina de avenida",
+        "vereda",
+        "acceso a edificio"
+      ]
+    },
+    {
+      "id": "04-tres-cuartos-derecha-calle",
+      "pos": [
+        50,
+        -56,
+        1.7
+      ],
+      "mira": [
+        0,
+        0,
+        2.4
+      ],
+      "lente_mm": 35,
+      "descripcion": "Tres cuartos desde la derecha, altura peatón",
+      "usos": [
+        "esquina de avenida",
+        "vereda",
+        "acceso a edificio"
+      ]
+    },
+    {
+      "id": "05-contrapicado-tres-cuartos-izquierda",
+      "pos": [
+        -28,
+        -34,
+        1.7
+      ],
+      "mira": [
+        0,
+        0,
+        14.5
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde abajo y desde la izquierda: letras elevadas vistas desde la vereda",
+      "usos": [
+        "hero vertical",
+        "stories",
+        "OOH dramático"
+      ],
+      "elevacion_objeto_m": 12
+    },
+    {
+      "id": "06-contrapicado-tres-cuartos-derecha",
+      "pos": [
+        28,
+        -34,
+        1.7
+      ],
+      "mira": [
+        0,
+        0,
+        14.5
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde abajo y desde la derecha: letras elevadas vistas desde la vereda",
+      "usos": [
+        "hero vertical",
+        "stories",
+        "OOH dramático"
+      ],
+      "elevacion_objeto_m": 12
+    },
+    {
+      "id": "07-teleobjetivo-lejos",
+      "pos": [
+        0,
+        -150,
+        1.7
+      ],
+      "mira": [
+        0,
+        0,
+        2.4
+      ],
+      "lente_mm": 135,
+      "descripcion": "Desde muy lejos con teleobjetivo; perspectiva casi plana",
+      "usos": [
+        "skyline",
+        "al fondo de una avenida",
+        "compresión urbana"
+      ]
+    },
+    {
+      "id": "08-picado-desde-edificio",
+      "pos": [
+        12,
+        -44,
+        18
+      ],
+      "mira": [
+        0,
+        0,
+        2
+      ],
+      "lente_mm": 50,
+      "descripcion": "Desde un piso alto de un edificio vecino",
+      "usos": [
+        "plaza vista desde arriba",
+        "azotea",
+        "evento masivo"
+      ]
+    },
+    {
+      "id": "09-dron-picado",
+      "pos": [
+        0,
+        -34,
+        20
+      ],
+      "mira": [
+        0,
+        0,
+        1.5
+      ],
+      "lente_mm": 24,
+      "descripcion": "Vista de dron, desde arriba y al frente, a media altura",
+      "usos": [
+        "aérea urbana",
+        "festival",
+        "instalación en parque"
+      ]
+    }
+  ],
+  "regla_camara": "Vistas oblicuas a >= 3,5x el ancho del logo y lente >= 35 mm efectivo: evita que la palabra se vea curvada o con un extremo gigante. Contrapicados elevando el objeto, no acercando la cámara.",
+  "rugosidad": 0.42,
+  "coat": 0.12,
+  "descartadas": [
+    "rasante izquierda/derecha (~60°): las letras se comprimen y la palabra deja de leerse; para fuga usar 03/04"
+  ]
+}

@@ -31,7 +31,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui|agency`
-- Blocked by: `TASK-1846, TASK-1847, TASK-1848`
+- Blocked by: `TASK-1847, TASK-1848`
 - Branch: `Greenhouse develop; sin branch dedicada ni worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

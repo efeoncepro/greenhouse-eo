@@ -32,10 +32,20 @@ test('valida opciones del runner', () => {
   assert.deepEqual(parseLicitaLabRadarArgs(['--view', 'recommended', '--max-opportunities', '25']), {
     checkOnly: false,
     forceLogin: false,
+    headless: false,
     help: false,
     maxOpportunities: 25,
+    noLogin: false,
     output: null,
     view: 'recommended'
   })
   assert.throws(() => parseLicitaLabRadarArgs(['--view', 'mine']), /recommended o all/)
+})
+
+test('headless y no-login para uso desde pnpm licitalab search', () => {
+  const parsed = parseLicitaLabRadarArgs(['--headless', '--no-login'])
+
+  assert.equal(parsed.headless, true)
+  assert.equal(parsed.noLogin, true)
+  assert.throws(() => parseLicitaLabRadarArgs(['--no-login', '--force-login']), /incompatibles/)
 })
