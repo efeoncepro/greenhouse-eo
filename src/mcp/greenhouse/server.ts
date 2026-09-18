@@ -1036,6 +1036,37 @@ export const createGreenhouseMcpServer = (
     async args => handlers.revokeInsightShare(args as { organizationId?: string; shareGrantId: string })
   )
 
+  // TASK-1848 — envíos por correo: lectura. Solicitar/cancelar/reintentar/reconciliar no existen por MCP.
+  collector.registerTool(
+    'list_insight_deliveries',
+    {
+      title: 'List Insight Deliveries',
+      description:
+        'List the email deliveries of one Efeonce Insights edition: modality (share_link, attachment), state (pending, dispatching, completed, partially_failed, failed, cancelled) and per-recipient state with the transport status read from the email ledger. accepted means the provider took the message; delivered is a separate provider signal; neither proves a person read the report. Sending, cancelling, retrying and reconciling are human actions in the Greenhouse portal and are not available through MCP.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        editionId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.listInsightDeliveries(args as { organizationId?: string; editionId: string })
+  )
+
+  collector.registerTool(
+    'get_insight_delivery',
+    {
+      title: 'Get Insight Delivery',
+      description:
+        'Read one email delivery of an Efeonce Insights edition with masked recipients, per-recipient state (pending, claimed, accepted, failed, ambiguous, skipped, cancelled), skip reason and transport status. ambiguous means the outcome is unknown and nothing will be resent until a person reconciles it against the email ledger — report it as unresolved, never as sent or failed.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        deliveryIntentId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getInsightDelivery(args as { organizationId?: string; deliveryIntentId: string })
+  )
+
   // ── El registro: una pasada por el manifiesto, en su orden ────────────────
   const coverage = computeGreenhouseMcpToolCoverage({
     manifest: GREENHOUSE_MCP_TOOL_MANIFEST,

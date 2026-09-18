@@ -28,7 +28,8 @@ const MAP: Record<InsightsError['code'], { statusCode: number; errorCode: ApiPla
   quota_exceeded: { statusCode: 429, errorCode: 'rate_limited' },
   render_disabled: { statusCode: 503, errorCode: 'service_unavailable' },
   render_rejected: { statusCode: 422, errorCode: 'bad_request' },
-  sharing_disabled: { statusCode: 503, errorCode: 'service_unavailable' }
+  sharing_disabled: { statusCode: 503, errorCode: 'service_unavailable' },
+  delivery_disabled: { statusCode: 503, errorCode: 'service_unavailable' }
 }
 
 export const toInsightsApiPlatformError = (error: unknown): ApiPlatformError => {

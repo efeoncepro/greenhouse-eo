@@ -24,6 +24,7 @@ export type InsightsErrorCode =
   | 'render_disabled'
   | 'render_rejected'
   | 'sharing_disabled'
+  | 'delivery_disabled'
 
 export class InsightsError extends Error {
   readonly code: InsightsErrorCode
@@ -173,5 +174,13 @@ export class InsightsQuotaExceededError extends InsightsError {
   constructor(message: string, details: Record<string, unknown> = {}) {
     super('quota_exceeded', message, 429, details)
     this.name = 'InsightsQuotaExceededError'
+  }
+}
+
+/** TASK-1848 — el envío por correo no está habilitado en este runtime (`INSIGHTS_DELIVERY_ENABLED`). */
+export class InsightsDeliveryDisabledError extends InsightsError {
+  constructor() {
+    super('delivery_disabled', 'El envío por correo de Insights no está habilitado en este runtime', 503)
+    this.name = 'InsightsDeliveryDisabledError'
   }
 }

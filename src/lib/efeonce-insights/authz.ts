@@ -23,7 +23,17 @@ import { InsightsForbiddenError, InsightsNotFoundError } from './errors'
 
 export const INSIGHTS_MODULE_KEY = 'insights_v1'
 
-export type InsightsAccessNeed = 'read' | 'create' | 'review' | 'issue' | 'share_read' | 'share_create' | 'share_revoke'
+export type InsightsAccessNeed =
+  | 'read'
+  | 'create'
+  | 'review'
+  | 'issue'
+  | 'share_read'
+  | 'share_create'
+  | 'share_revoke'
+  | 'delivery_read'
+  | 'delivery_send'
+  | 'delivery_manage'
 
 type InsightsCapabilityKey =
   | 'insights.report.read'
@@ -31,6 +41,7 @@ type InsightsCapabilityKey =
   | 'insights.edition.review'
   | 'insights.edition.issue'
   | 'insights.share.manage'
+  | 'insights.delivery.send'
 
 const NEED_TO_CAPABILITY: Record<InsightsAccessNeed, { capability: InsightsCapabilityKey; action: 'read' | 'create' | 'update' | 'approve' }> = {
   read: { capability: 'insights.report.read', action: 'read' },
@@ -40,7 +51,11 @@ const NEED_TO_CAPABILITY: Record<InsightsAccessNeed, { capability: InsightsCapab
   // TASK-1848 — compartir es una autoridad propia: generar o leer un informe no concede enlaces.
   share_read: { capability: 'insights.share.manage', action: 'read' },
   share_create: { capability: 'insights.share.manage', action: 'create' },
-  share_revoke: { capability: 'insights.share.manage', action: 'update' }
+  share_revoke: { capability: 'insights.share.manage', action: 'update' },
+  // TASK-1848 — enviar desde Efeonce es autoridad interna: sin scope `own`, un cliente nunca la tiene.
+  delivery_read: { capability: 'insights.delivery.send', action: 'read' },
+  delivery_send: { capability: 'insights.delivery.send', action: 'create' },
+  delivery_manage: { capability: 'insights.delivery.send', action: 'update' }
 }
 
 export interface InsightsAccessInput {

@@ -135,6 +135,8 @@ export const AGGREGATE_TYPES = {
   insightRenderRun: 'insight_render_run',
   // TASK-1848 — enlace compartido (ShareGrant) de una edición emitida
   insightShareGrant: 'insight_share_grant',
+  // TASK-1848 — encargo de envío por correo de una edición emitida
+  insightDeliveryIntent: 'insight_delivery_intent',
   quotationLineItem: 'quotation_line_item',
   quotationLineCostOverride: 'quotation_line_cost_override',
   commercialCapacity: 'commercial_capacity',
@@ -619,6 +621,8 @@ export const EVENT_TYPES = {
   // TASK-1848 — sharing por enlace (payload: ids, expiración, motivo; NUNCA el token ni su digest)
   insightShareCreated: 'insights.share.created',
   insightShareRevoked: 'insights.share.revoked',
+  // TASK-1848 — envío por correo (payload: ids, modalidad, cantidad; NUNCA correos ni bearer)
+  insightDeliveryRequested: 'insights.delivery.requested',
   quotationDiscountHealthAlert: 'commercial.discount.health_alert',
 
   // Commercial Deals (TASK-453)

@@ -224,6 +224,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'createInsightShare'
   | 'listInsightShares'
   | 'revokeInsightShare'
+  | 'listInsightDeliveries'
+  | 'getInsightDelivery'
   | 'getMcpSkill'
 >) => ({
   /**
@@ -771,6 +773,28 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         return `Share link ${input.shareGrantId} ${data.idempotent ? 'was already revoked' : 'revoked'}; the next read or download fails (${result.requestId}).`
       },
       () => client.revokeInsightShare(input)
+    )
+  },
+  // ── TASK-1848 — envíos por correo (lectura) ──────────────────────────────
+  async listInsightDeliveries(input: { organizationId?: string; editionId: string }) {
+    return callTool(
+      result => {
+        const items = Array.isArray(result.data) ? (result.data as Array<{ state: string }>) : []
+
+        return `Deliveries for edition ${input.editionId}: ${String(items.length)} (${items.map(item => item.state).join(', ') || 'none'}) (${result.requestId}).`
+      },
+      () => client.listInsightDeliveries(input)
+    )
+  },
+  async getInsightDelivery(input: { organizationId?: string; deliveryIntentId: string }) {
+    return callTool(
+      result => {
+        const data = result.data as { state?: string; modality?: string; recipients?: Array<{ state: string; transportStatus: string }> }
+        const recipients = (data.recipients ?? []).map(r => `${r.state}/${r.transportStatus}`).join(', ')
+
+        return `Delivery ${input.deliveryIntentId} ${String(data.modality ?? '')} state=${String(data.state ?? 'unknown')}; recipients=[${recipients}]. Accepted by the provider is not delivered, and neither is proof of reading (${result.requestId}).`
+      },
+      () => client.getInsightDelivery(input)
     )
   },
   async getSeoEntitlement(input: { organizationId?: string }) {

@@ -30,3 +30,10 @@ export const isInsightsRenderEnabled = (env: NodeJS.ProcessEnv = process.env): b
  * público responde 404 (no revela que el token existió) y los commands `sharing_disabled` (503).
  */
 export const isInsightsSharingEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.INSIGHTS_SHARING_ENABLED)
+
+/**
+ * TASK-1848 — habilita solicitar envíos por correo (Vercel: `requestInsightDelivery`) y DESPACHARLOS
+ * (`ops-worker`: projection reactiva). Se lee en DOS runtimes y debe estar ON en ambos; el EmailType
+ * tiene además su kill switch propio en `email_type_config` (nace apagado).
+ */
+export const isInsightsDeliveryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.INSIGHTS_DELIVERY_ENABLED)

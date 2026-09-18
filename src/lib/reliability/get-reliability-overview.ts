@@ -184,6 +184,7 @@ import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unl
 import { getAuthServerSignals } from './queries/auth-server-signals'
 import { getInsightsEditionSignals } from './queries/insights-edition-signals'
 import { getInsightsRenderOrphanedSignal } from './queries/insights-render-orphaned'
+import { getInsightsDeliveryAmbiguousSignal } from './queries/insights-delivery-ambiguous'
 import { getGlobeCreditFundingStaleProposalsSignal } from './queries/globe-credit-funding-stale-proposals'
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
@@ -703,6 +704,8 @@ interface ReliabilityOverviewSources {
   insightsEditionSignals?: ReliabilitySignal[] | null
   /** TASK-1846 — insights.render.orphaned_output: outputs en running que nadie va a retomar (steady 0). */
   insightsRenderOrphanedSignal?: ReliabilitySignal | null
+  /** TASK-1848 — insights.delivery.ambiguous: destinatarios con resultado de correo desconocido (steady 0). */
+  insightsDeliveryAmbiguousSignal?: ReliabilitySignal | null
   globeCreditFundingStaleProposals?: ReliabilitySignal | null
   growthAiVisibility?: ReliabilitySignal[] | null
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
@@ -1290,6 +1293,7 @@ export const buildReliabilityOverview = (
     ...(sources.insightsEditionSignals ?? []),
     // TASK-1846 — Efeonce Insights: outputs de render huérfanos.
     ...(sources.insightsRenderOrphanedSignal ? [sources.insightsRenderOrphanedSignal] : []),
+    ...(sources.insightsDeliveryAmbiguousSignal ? [sources.insightsDeliveryAmbiguousSignal] : []),
     ...(sources.globeCreditFundingStaleProposals ? [sources.globeCreditFundingStaleProposals] : []),
     // TASK-1082 — Knowledge ingestion: quarantine count + failed sync source.
     ...(sources.knowledgeQuarantineCount ? [sources.knowledgeQuarantineCount] : []),
@@ -2008,6 +2012,12 @@ export const getReliabilityOverview = async (
     preloadedSources.insightsRenderOrphanedSignal !== undefined
       ? preloadedSources.insightsRenderOrphanedSignal
       : await getInsightsRenderOrphanedSignal().catch(() => null)
+
+  // TASK-1848 — un envío ambiguo no se reenvía solo: la señal es la que obliga a reconciliar.
+  const insightsDeliveryAmbiguousSignal =
+    preloadedSources.insightsDeliveryAmbiguousSignal !== undefined
+      ? preloadedSources.insightsDeliveryAmbiguousSignal
+      : await getInsightsDeliveryAmbiguousSignal().catch(() => null)
 
   // TASK-1566 — propuestas de fondeo de Globe sin confirmar. Steady=0: un valor > 0 es una decision
   // humana pendiente, no un fallo del sistema, y por eso escala por ANTIGUEDAD y no por cantidad.
@@ -3012,6 +3022,7 @@ export const getReliabilityOverview = async (
     authServerSignals,
     insightsEditionSignals,
     insightsRenderOrphanedSignal,
+    insightsDeliveryAmbiguousSignal,
     globeCreditFundingStaleProposals,
     knowledgeQuarantineCount,
     assetScanOpenQuarantine,

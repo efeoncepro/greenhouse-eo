@@ -22,6 +22,8 @@ import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsi
 import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { ROLE_CODES } from '@/config/role-codes'
 
+import { readInsightDeliveries, readInsightDelivery } from '@/lib/efeonce-insights/delivery/commands'
+
 import { withInsightsErrors } from './insights-errors'
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -215,3 +217,12 @@ export const revokeEcosystemInsightSharePayload = async ({ context, request, bod
 
     return { data: { share: result.share, idempotent: result.idempotent }, status: 200 }
   })
+
+// ── TASK-1848 — envíos por correo: el lane ecosystem SÓLO lee. Solicitar, cancelar, reintentar y
+// reconciliar exigen una persona interna en el App lane (mismo criterio que `issue`). ──
+
+export const listEcosystemInsightDeliveriesPayload = async ({ context, request, editionId }: { context: ApiPlatformRequestContext; request: Request; editionId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => ({ data: (await readInsightDeliveries({ ...resolveScope(context, request), editionId })).items }))
+
+export const getEcosystemInsightDeliveryPayload = async ({ context, request, deliveryIntentId }: { context: ApiPlatformRequestContext; request: Request; deliveryIntentId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => ({ data: await readInsightDelivery({ ...resolveScope(context, request), deliveryIntentId }) }))

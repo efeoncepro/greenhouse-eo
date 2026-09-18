@@ -771,6 +771,15 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1848 — envíos por correo (lectura)
+  async listInsightDeliveries(input: { organizationId?: string; editionId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/editions/${encodeURIComponent(input.editionId)}/deliveries`, { organizationId: input.organizationId })
+  }
+
+  async getInsightDelivery(input: { organizationId?: string; deliveryIntentId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/deliveries/${encodeURIComponent(input.deliveryIntentId)}`, { organizationId: input.organizationId })
+  }
+
   private async request<TData>(
     path: string,
     query: QueryParams = {},

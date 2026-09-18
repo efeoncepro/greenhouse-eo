@@ -3099,7 +3099,11 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       // TASK-1848 — enlaces compartidos de ediciones emitidas (crear/listar/revocar).
       { capability: 'insights.share.manage', action: 'create' },
       { capability: 'insights.share.manage', action: 'read' },
-      { capability: 'insights.share.manage', action: 'update' }
+      { capability: 'insights.share.manage', action: 'update' },
+      // TASK-1848 — envío por correo desde Efeonce (sólo internos que operan la cuenta).
+      { capability: 'insights.delivery.send', action: 'create' },
+      { capability: 'insights.delivery.send', action: 'read' },
+      { capability: 'insights.delivery.send', action: 'update' }
     ] as const) {
       addEntitlement(entries, {
         module: 'insights',

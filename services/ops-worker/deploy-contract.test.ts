@@ -15,6 +15,13 @@ describe('ops-worker deploy render dispatch contract', () => {
     // Sin el flag declarado, dispatchNextInsightRender lo ve OFF y ningún output encolado lanza el Job.
     expect(deployScript()).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_RENDER_ENABLED=${INSIGHTS_RENDER_ENABLED:-true}"')
   })
+
+  it('declares INSIGHTS_DELIVERY_ENABLED ON: the reactive dispatcher sends Insights deliveries (TASK-1848)', () => {
+    // Guarda textual que SEÑALA, no verifica: --set-env-vars es destructivo y un flag aplicado sólo con
+    // --update-env-vars desaparece en el próximo deploy. El verificador real es leer la revisión ACTIVA
+    // (`gcloud run services describe ops-worker`) y el canary de entrega en staging (runbook de Insights).
+    expect(deployScript()).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_DELIVERY_ENABLED=${INSIGHTS_DELIVERY_ENABLED:-true}"')
+  })
 })
 
 describe('ops-worker deploy Nubox contract', () => {

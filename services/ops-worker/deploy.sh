@@ -262,6 +262,12 @@ ENV_VARS="${ENV_VARS},ARTIFACT_RENDER_JOBS_ENABLED=${ARTIFACT_RENDER_JOBS_ENABLE
 # Default ON por la misma razón que el flag de Proposal: el ops-worker es un servicio ÚNICO, y la
 # puerta de producto por ambiente es el ENCOLADO en Vercel (`requestInsightRender`), no el dispatch.
 ENV_VARS="${ENV_VARS},INSIGHTS_RENDER_ENABLED=${INSIGHTS_RENDER_ENABLED:-true}"
+# 🚩 TASK-1848 — la projection `insights_delivery_dispatch` (lane ops-reactive-notifications) despacha
+# los correos de Efeonce Insights y lee este flag SOLO acá. Default ON por la misma razón que el
+# render: el ops-worker es ÚNICO para staging y producción; la puerta de producto por ambiente es
+# CREAR el intent en Vercel (`requestInsightDelivery`, flag propio) + el kill switch del EmailType en
+# `email_type_config` (nace apagado). Apagarlo acá corta el despacho de ambos ambientes a la vez.
+ENV_VARS="${ENV_VARS},INSIGHTS_DELIVERY_ENABLED=${INSIGHTS_DELIVERY_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF=${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"

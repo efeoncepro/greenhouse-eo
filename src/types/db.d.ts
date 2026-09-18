@@ -10117,6 +10117,62 @@ export interface GreenhouseHrWorkRelationshipOnboardingCases {
   user_id: string | null;
 }
 
+export interface GreenhouseInsightsInsightDeliveryEvents {
+  actor_kind: string;
+  created_at: Generated<Timestamp>;
+  delivery_event_id: Generated<Int8>;
+  delivery_intent_id: string;
+  delivery_recipient_id: string | null;
+  detail: Generated<Json>;
+  from_state: string | null;
+  organization_id: string;
+  to_state: string;
+}
+
+export interface GreenhouseInsightsInsightDeliveryIntents {
+  attachment_irrevocable_ack: Generated<boolean>;
+  authorized_by_actor_kind: string;
+  authorized_by_user_id: string | null;
+  cancel_reason: string | null;
+  cancelled_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  delivery_intent_id: Generated<string>;
+  edition_id: string;
+  edition_issued_hash: string;
+  idempotency_key: string;
+  message: string | null;
+  modality: string;
+  organization_id: string;
+  outputs: Generated<string[]>;
+  request_hash: string;
+  share_ttl_days: number | null;
+  state: Generated<string>;
+  subject: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseInsightsInsightDeliveryRecipients {
+  attempts: Generated<number>;
+  claimed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  delivery_intent_id: string;
+  delivery_recipient_id: Generated<string>;
+  edition_id: string;
+  edition_issued_hash: string;
+  email_delivery_id: string | null;
+  finished_at: Timestamp | null;
+  last_error_code: string | null;
+  modality: string;
+  organization_id: string;
+  recipient_key: string;
+  recipient_kind: string;
+  recipient_user_id: string;
+  share_grant_id: string | null;
+  skip_reason: string | null;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseInsightsInsightEditions {
   audience: string;
   created_at: Generated<Timestamp>;
@@ -13979,6 +14035,9 @@ export interface DB {
   "greenhouse_hr.workforce_contracting_case_events": GreenhouseHrWorkforceContractingCaseEvents;
   "greenhouse_hr.workforce_contracting_cases": GreenhouseHrWorkforceContractingCases;
   "greenhouse_hr.workforce_contracting_drafts": GreenhouseHrWorkforceContractingDrafts;
+  "greenhouse_insights.insight_delivery_events": GreenhouseInsightsInsightDeliveryEvents;
+  "greenhouse_insights.insight_delivery_intents": GreenhouseInsightsInsightDeliveryIntents;
+  "greenhouse_insights.insight_delivery_recipients": GreenhouseInsightsInsightDeliveryRecipients;
   "greenhouse_insights.insight_edition_state_matrix": GreenhouseInsightsInsightEditionStateMatrix;
   "greenhouse_insights.insight_edition_transitions": GreenhouseInsightsInsightEditionTransitions;
   "greenhouse_insights.insight_editions": GreenhouseInsightsInsightEditions;

@@ -35,6 +35,7 @@ import QuoteSharePromptEmail from '@/emails/QuoteSharePromptEmail'
 import WeeklyExecutiveDigestEmail from '@/emails/WeeklyExecutiveDigestEmail'
 import { getMicrocopy } from '@/lib/copy'
 import VerifyEmail from '@/emails/VerifyEmail'
+import InsightsEditionDeliveryEmail, { type InsightsEditionDeliveryModality } from '@/emails/InsightsEditionDeliveryEmail'
 import type { WeeklyDigestEmailContext } from '@/lib/nexa/digest'
 
 import type {
@@ -2602,4 +2603,117 @@ registerPreviewMeta('hiring_decision_rejected', {
     { key: 'openingTitle', label: 'Vacante', type: 'text' },
     { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
   ]
+})
+
+// ── TASK-1848 — entrega de ediciones de Efeonce Insights ─────────────────────────────────────
+// El asunto lo autoriza el DeliveryIntent (congelado con la versión y los destinatarios); el
+// template no lo reinventa. Los bytes del PDF (modalidad attachment) llegan por `attachments`
+// del sendEmail, no por el contexto.
+
+export interface InsightsEditionDeliveryEmailContext extends EmailTemplateContext {
+  subject: string
+  recipientName?: string
+  organizationName: string
+  reportTitle: string
+  periodLabel: string
+  modality: InsightsEditionDeliveryModality
+  actionUrl?: string
+  expiresOnLabel?: string
+  message?: string
+  locale?: 'es' | 'en'
+}
+
+const buildInsightsEditionDeliveryPlainText = (context: InsightsEditionDeliveryEmailContext): string => {
+  const isEn = context.locale === 'en'
+  const firstName = context.recipientName?.split(' ')[0]
+
+  return [
+    isEn ? (firstName ? `Hi ${firstName},` : 'Hi,') : firstName ? `Hola ${firstName},` : 'Hola,',
+    '',
+    isEn
+      ? `The report «${context.reportTitle}» for ${context.organizationName} covering ${context.periodLabel} is now available.`
+      : `Ya está disponible el informe «${context.reportTitle}» de ${context.organizationName} para el período ${context.periodLabel}.`,
+    context.message ? `\n${context.message}` : '',
+    context.modality !== 'attachment' && context.actionUrl ? `\n${isEn ? 'View the report:' : 'Ver el informe:'} ${context.actionUrl}` : '',
+    context.modality === 'share_link' && context.expiresOnLabel
+      ? isEn
+        ? `This link is personal and expires on ${context.expiresOnLabel}.`
+        : `Este enlace es personal y vence el ${context.expiresOnLabel}.`
+      : '',
+    context.modality === 'attachment'
+      ? isEn
+        ? 'The report is attached as a PDF. Once sent, the file cannot be withdrawn from your inbox.'
+        : 'Adjuntamos el informe en PDF. Una vez enviado, el archivo no se puede retirar de tu correo.'
+      : '',
+    '',
+    '— Efeonce'
+  ]
+    .filter(line => line !== '')
+    .join('\n')
+}
+
+const resolveInsightsEditionDelivery = (context: InsightsEditionDeliveryEmailContext) => ({
+  subject: context.subject,
+  react: InsightsEditionDeliveryEmail({
+    recipientName: context.recipientName,
+    organizationName: context.organizationName,
+    reportTitle: context.reportTitle,
+    periodLabel: context.periodLabel,
+    modality: context.modality,
+    actionUrl: context.actionUrl,
+    expiresOnLabel: context.expiresOnLabel,
+    message: context.message,
+    locale: context.locale ?? 'es'
+  }),
+  text: buildInsightsEditionDeliveryPlainText(context)
+})
+
+registerTemplate('insights_edition_delivery', resolveInsightsEditionDelivery)
+registerTemplate('insights_edition_delivery_attachment', resolveInsightsEditionDelivery)
+
+const INSIGHTS_DELIVERY_PREVIEW_SCHEMA = [
+  { key: 'recipientName', label: 'Nombre del destinatario', type: 'text' as const },
+  { key: 'organizationName', label: 'Organización', type: 'text' as const },
+  { key: 'reportTitle', label: 'Título del informe', type: 'text' as const },
+  { key: 'periodLabel', label: 'Período', type: 'text' as const },
+  { key: 'message', label: 'Nota del equipo', type: 'text' as const },
+  { key: 'locale', label: 'Idioma', type: 'select' as const, options: ['es', 'en'] }
+]
+
+registerPreviewMeta('insights_edition_delivery', {
+  label: 'Entrega de informe Insights (enlace)',
+  description:
+    'Entrega de una edición emitida de Efeonce Insights con enlace al portal o enlace compartido personal que vence. Token-sensitive: el enlace no se persiste ni se reenvía solo. Marca Efeonce.',
+  domain: 'insights',
+  supportsLocale: true,
+  defaultProps: {
+    subject: 'Tu informe mensual de desempeño está listo',
+    recipientName: 'María González',
+    organizationName: 'Organización de ejemplo',
+    reportTitle: 'Informe mensual de desempeño',
+    periodLabel: '1 al 31 de agosto de 2026',
+    modality: 'share_link',
+    actionUrl: 'https://think.efeoncepro.com/insights/r/isg_preview',
+    expiresOnLabel: '17 de octubre de 2026',
+    locale: 'es'
+  },
+  propsSchema: INSIGHTS_DELIVERY_PREVIEW_SCHEMA
+})
+
+registerPreviewMeta('insights_edition_delivery_attachment', {
+  label: 'Entrega de informe Insights (PDF adjunto)',
+  description:
+    'Entrega de una edición emitida de Efeonce Insights con el PDF adjunto. Opt-in explícito: un archivo enviado no se puede retirar. Sin enlace ni credencial. Marca Efeonce.',
+  domain: 'insights',
+  supportsLocale: true,
+  defaultProps: {
+    subject: 'Tu informe mensual de desempeño está listo',
+    recipientName: 'María González',
+    organizationName: 'Organización de ejemplo',
+    reportTitle: 'Informe mensual de desempeño',
+    periodLabel: '1 al 31 de agosto de 2026',
+    modality: 'attachment',
+    locale: 'es'
+  },
+  propsSchema: INSIGHTS_DELIVERY_PREVIEW_SCHEMA
 })

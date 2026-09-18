@@ -185,3 +185,23 @@ export const publishInsightShareRevoked = (client: OutboxClient, payload: Insigh
     { aggregateType: AGGREGATE_TYPES.insightShareGrant, aggregateId: payload.shareGrantId, eventType: EVENT_TYPES.insightShareRevoked, payload },
     client
   )
+
+// ── TASK-1848 — envío por correo ────────────────────────────────────────────────────────────
+
+export type InsightDeliveryRequestedPayload = {
+  version: 1
+  deliveryIntentId: string
+  editionId: string
+  organizationId: string
+  modality: string
+  recipientCount: number
+  /** `initial` al autorizar; `retry` cuando un humano re-encola los fallidos. */
+  reason: 'initial' | 'retry'
+  actorKind: InsightActorKind
+}
+
+export const publishInsightDeliveryRequested = (client: OutboxClient, payload: InsightDeliveryRequestedPayload) =>
+  publishOutboxEvent(
+    { aggregateType: AGGREGATE_TYPES.insightDeliveryIntent, aggregateId: payload.deliveryIntentId, eventType: EVENT_TYPES.insightDeliveryRequested, payload },
+    client
+  )

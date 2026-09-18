@@ -55,6 +55,14 @@ const sharing = vi.hoisted(() => ({ revokeActiveInsightShareGrantsForEdition: vi
 
 vi.mock('../sharing/store', () => sharing)
 
+// TASK-1848 — retirar también cancela los envíos por correo pendientes de la edición.
+const deliveryStore = vi.hoisted(() => ({
+  cancelPendingInsightDeliveryRecipients: vi.fn(async () => [{ deliveryIntentId: 'idlv-1' }]),
+  insertInsightDeliveryEvent: vi.fn(async () => undefined)
+}))
+
+vi.mock('../delivery/store', () => deliveryStore)
+
 const ENV_ON = { INSIGHTS_GENERATION_ENABLED: 'true', INSIGHTS_ISSUANCE_ENABLED: 'true' } as unknown as NodeJS.ProcessEnv
 
 const internalSubject = { userId: 'user-int', tenantType: 'efeonce_internal' as const, roleCodes: ['efeonce_account'], primaryRoleCode: 'efeonce_account', routeGroups: ['internal'], authorizedViews: [], memberId: 'mem-1' }
@@ -248,6 +256,7 @@ describe('TASK-1845 — issue / withdraw / recover', () => {
     expect((await withdrawInsightEdition({ subject: internalSubject, actorOrganizationId: null, organizationId: 'org-a', editionId: 'insed-1', reason: 'retirada por el account' })).edition.state).toBe('withdrawn')
     expect(sharing.revokeActiveInsightShareGrantsForEdition).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ editionId: 'insed-1', reason: 'edition_withdrawn' }))
     expect(JSON.stringify(infra.publish.mock.calls)).toContain('insights.share.revoked')
+    expect(deliveryStore.cancelPendingInsightDeliveryRecipients).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ editionId: 'insed-1' }))
 
     stores.getInsightEditionById.mockResolvedValue(edition({ state: 'ready_for_review' }))
     await expect(recoverInsightEdition({ subject: opsSubject, actorOrganizationId: null, organizationId: 'org-a', editionId: 'insed-1' })).rejects.toMatchObject({ code: 'invalid_request' })
