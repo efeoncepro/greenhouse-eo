@@ -57,9 +57,10 @@ sin borrar submissions.
 
 El override page-scoped `ghf-country-icon-ohio-override-v1` se probó y se revirtió el 2026-09-16: el CSS no
 atraviesa el Shadow DOM del renderer y dejaba `globe` junto al SVG. Se restauró el snapshot
-`_gh_contacto_before_country_icon_override`; no queda mitigación live. Los commits `e5d4a0fb2` y `d15bb9256`
-contienen el hotfix correcto del renderer, preparado para el próximo release. No requiere crear otra versión de
-Growth Forms ni repetir la activación de países. Hasta promover ese bundle, el runtime puede mostrar `↗ País`.
+`_gh_contacto_before_country_icon_override`; no queda mitigación live para ese problema. Tras el release del
+renderer se detectó una duplicación distinta (pin azul del host + globo SVG del renderer); se corrigió sin release
+mediante CSS page-scoped `ghf-country-icon-dedup-v1`, que oculta solo el globo dentro de `/contacto/`. Los commits
+`e5d4a0fb2` y `d15bb9256` siguen siendo el hotfix del renderer; no requiere crear otra versión de Growth Forms.
 
 ## Release aplicado: cobertura y banda de reuniones (2026-09-16)
 

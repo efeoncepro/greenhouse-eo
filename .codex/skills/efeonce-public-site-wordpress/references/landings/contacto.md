@@ -80,9 +80,10 @@ requiere mutar Elementor; no saltar las guardas con un write WP-CLI directo.
 
 El override page-scoped `ghf-country-icon-ohio-override-v1` se probó y se revirtió el 2026-09-16: el CSS no
 atraviesa el Shadow DOM del renderer y dejaba `globe` junto al SVG. Se restauró el snapshot
-`_gh_contacto_before_country_icon_override`; no queda parche live. El hotfix correcto del renderer
-`d15bb9256` (sobre `e5d4a0fb2`) queda preparado para el próximo release. No crear otra versión del formulario;
-la v3 ya está activa.
+`_gh_contacto_before_country_icon_override`; no queda parche live para ese problema. Tras el release se corrigió la
+duplicación del pin azul del host y el globo SVG del renderer sin otro release, mediante CSS page-scoped
+`ghf-country-icon-dedup-v1`, que oculta solo el globo en `/contacto/`. El hotfix del renderer `d15bb9256`
+(sobre `e5d4a0fb2`) y la v3 siguen activos.
 
 Canon de producto: `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`. Task cerrada:
 `docs/tasks/complete/TASK-1801-contacto-multistakeholder-form-agenda.md`.

@@ -391,8 +391,9 @@ deprecada conservando el destino existente.
 
 Se probó y revirtió el 2026-09-16 la mitigación page-scoped de WordPress (`ghf-country-icon-ohio-override-v1`, página
 20729, snapshot `_gh_contacto_before_country_icon_override`): el CSS no atraviesa el Shadow DOM y dejaba `globe`
-junto al SVG. No queda parche live. El hotfix definitivo del renderer `d15bb9256` (sobre `e5d4a0fb2`) queda
-preparado para el próximo release; no requiere una nueva versión del formulario.
+junto al SVG. Luego del release se corrigió esa duplicación sin otro release mediante CSS page-scoped
+`ghf-country-icon-dedup-v1`, que oculta solo el globo dentro de `/contacto/`. El hotfix definitivo del renderer
+`d15bb9256` (sobre `e5d4a0fb2`) y la v3 siguen activos; no requiere una nueva versión del formulario.
 
 ## 2026-09-15 — TASK-1845: foundation de Efeonce Insights en develop (code complete, rollout pendiente)
 
