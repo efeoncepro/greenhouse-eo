@@ -7,10 +7,16 @@ titular **¿Claude o Codex?** más su línea entre comillas.
 
 `out/claude-o-codex-4x5-v03.png` (1152 × 1440) sobre `plates/plate-final.png`. Tres capas, ninguna generada:
 
-1. **Marca sobre el primer plano desenfocado** — una barra de acrílico fuera de foco cruza el borde frontal de la
-   mesa con la cara limpia, y el logo navy se apoya **nítido** y centrado en su ancho, en `multiply` porque la barra
-   es clara. **El desenfoque es del objeto, no del logo**: el primer intento desenfocó también la marca y quedó
-   ilegible (corrección del operador). Regla completa en `social-media-studio`, referencia `brand-in-scene`.
+1. **Marca sobre un objeto real del estudio, fuera de foco** — el dorso de la tapa de un **portátil** apoyado en la
+   mesa entre él y la cámara, asomando sobre el borde, con sus dos esquinas dentro del cuadro y completamente
+   desenfocado. El logo va **en negativo, nítido y centrado en el ancho de la tapa**.
+
+   Dos correcciones del operador llegaron hasta acá: primero se desenfocó también la marca («un logo borroso no
+   firma nada»), y después la primera superficie —una franja de acrílico de borde a borde— «no parecía un objeto
+   del estudio desenfocado, sino una franja forzada para desenfocar». Lo que delata al artificio es no tener forma
+   propia: esquinas, borde superior e inclinación. Y el color del logo sale de la luminancia **medida** de la cara
+   (L ≈ 37/255 → negativo); el navy sobre claro del intento anterior no pertenecía a una escena nocturna.
+   Regla completa en `social-media-studio`, referencia `brand-in-scene`.
 2. **Jerarquía en tres niveles** — titular 98 px dominante · cita 33 px al margen izquierdo, fuera del eje, como un
    aparte humano · la marca sólo en el bokeh. Antes eran titular y subtítulo centrados en el mismo eje: dos tamaños,
    un solo nivel.
@@ -26,7 +32,7 @@ esquina nueva se compone sobre `plate-v04` invirtiendo el alfa de la misma másc
 máximo 0**. Ver `docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md`.
 
 Descartes: `plate-v05` (panel bien, ojos oscuros), `plate-v06` y `plate-v07` (el panel lateral choca con la cara y
-con las manos), `out/claude-o-codex-4x5-v01.png` y `-v02` (mascotas en la mesa / jerarquía plana).
+con las manos), `plate-v08` (franja de borde a borde: se lee como recurso gráfico, no como objeto), `out/claude-o-codex-4x5-v01.png` y `-v02` (mascotas en la mesa / jerarquía plana).
 
 ## Piezas anteriores
 
@@ -95,9 +101,9 @@ Contraste sobre los píxeles reales, contra el píxel **más claro** de cada zon
 La cita empezó bajo el titular y ahí caía sobre el pelo: **1,17:1**, ilegible. Se movió al margen izquierdo, que es
 donde el fondo deja de ser claro. El contraste de una línea de texto se mide **donde queda**, no donde se diseñó.
 
-**Logo sobre la barra desenfocada:** contraste de la tinta contra la cara de la barra **9,17:1**. El logo es lo
-único enfocado de esa zona, y ese contraste de nitidez contra el fondo borroso es lo que lo hace destacar sin
-competir con el rostro, que está en otro plano.
+**Logo sobre la tapa del portátil:** contraste **13,90:1**. Y la blandura del objeto, que es el otro número que
+importa: gradiente del borde de la tapa **54** contra **314** del rostro. Si el objeto no es mucho más blando que
+el sujeto, no está en primer plano: está pegado.
 
 Revisado además a 390 px de ancho: titular y cita siguen legibles. Mascotas verificadas al 100 % (cubos naranja con
 ojos rectangulares; nube azul con `>_` cian en pantalla y blanco en el pecho) y el emblema del polo con la nave a la

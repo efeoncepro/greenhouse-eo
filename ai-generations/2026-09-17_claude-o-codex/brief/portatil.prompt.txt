@@ -1,0 +1,11 @@
+Keep every protected pixel exactly as it is. Only the transparent area of the mask changes.
+
+In that area, an open laptop sits on the table between him and the camera, turned away from us so we see the BACK OF ITS LID. It is the nearest thing to the lens, so only the upper part of the lid rises above the near edge of the table — the rest of the laptop is below the bottom of the frame.
+
+It must read unmistakably as a real object, not as a band: BOTH of its top corners are visible and gently rounded, its two side edges are inside the picture with dark tabletop visible to the left and to the right of it, and the whole lid is tilted very slightly, a few degrees off horizontal, the way a laptop actually sits when someone has nudged it.
+
+Because it is centimetres from the lens it is COMPLETELY OUT OF FOCUS: soft creamy edges, its corners melting into the dark table, a faint blurred sheen along its top edge where the cool rim light grazes the aluminium. No sharp edge anywhere on it.
+
+Material: dark graphite aluminium, clearly DARKER than the tabletop behind it, matte, with no bright hotspot. Its back is COMPLETELY BLANK and EVEN — no logo, no badge, no letters, no stickers, no camera bump, no texture, nothing. A smooth empty dark surface.
+
+Same colour temperature and grain as the rest of the room. Nothing sharp, no text, no watermark.

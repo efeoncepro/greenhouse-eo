@@ -1,10 +1,10 @@
 // «¿Claude o Codex?» — composición sobre el plate de estudio.
 //
 // Tres capas, ninguna generada por el modelo:
-//   1. Logo en el PRIMER PLANO DESENFOCADO: se apoya sobre el panel de acrílico que el plate trae
-//      limpio, con el desenfoque medido del propio panel. Presencia de marca, no lectura.
-//   2. Jerarquía tipográfica: titular dominante centrado arriba · la cita del protagonista abajo a la
-//      izquierda, fuera de eje, como un aparte humano · firma más chica en el mismo eje.
+//   1. Logo sobre un OBJETO DEL ESTUDIO que está fuera de foco: el dorso de un portátil apoyado en
+//      la mesa, que el plate trae limpio. El desenfoque es del objeto; la marca se lee.
+//   2. Jerarquía tipográfica: titular dominante arriba · la cita del protagonista al margen izquierdo,
+//      fuera de eje, como un aparte humano · la marca, sólo sobre el objeto.
 //   3. Selección colaborativa AXIS sobre el titular: Clawd y Codex disputándose la decisión.
 //
 // El texto NUNCA se genera: se moldea con fontkit a trazos SVG desde las fuentes oficiales y las
@@ -94,33 +94,26 @@ const cajaTitulo = {
 const tamCita = tamTitulo * 0.34
 const cita = shape(CITA, FONTS['Poppins-500'], tamCita, Number.parseFloat(R.structureTagline.tracking))
 
-// ── Nivel 3 · la marca vive en el primer plano desenfocado ───────────────────────────────────────
-// El plate trae una barra de acrílico tumbada en el borde frontal de la mesa, completamente fuera
-// de foco y con la cara LIMPIA. El logo se apoya ahí, centrado en el ancho de la barra.
+// ── Nivel 3 · la marca, sobre el objeto del estudio que está fuera de foco ───────────────────────
+// El plate trae un PORTÁTIL real apoyado en la mesa entre él y la cámara: se ve el dorso de la tapa,
+// asomando sobre el borde de la mesa, con sus dos esquinas dentro del cuadro y completamente
+// desenfocado por estar a centímetros del lente. Su dorso llega LIMPIO desde el plate.
 //
-// Tres cosas no se eligen a ojo:
-//   · el DESENFOQUE es del objeto, no del logo. La barra da la superficie y la profundidad; la
-//     marca se lee. Un logo borroso no firma nada (corrección del operador 2026-09-17);
-//   · sobre una barra clara el logo va en NAVY y en `multiply`, para que lea como impreso en el
-//     acrílico y no como un parche pegado encima;
-//   · va centrado en el ANCHO DE LA BARRA, no en el del lienzo.
-const BANDA = { cy: 1362, luminancia: 132 }
-const NIEBLA = ANCHO ? null : { cx: W / 2, cy: BANDA.cy, ancho: Math.round(W * 0.30), opacidad: 1 }
+//   · El desenfoque es del OBJETO, no del logo: la marca va nítida y se lee.
+//   · El color sale de la luminancia medida del dorso (L ≈ 37/255, más oscuro que la mesa):
+//     tapa oscura → logo en NEGATIVO. El navy sobre claro era del intento anterior y no pertenecía
+//     a esta escena nocturna.
+//   · Va centrado en el ANCHO DE LA TAPA, no en el del lienzo.
+const TAPA = { izquierda: 240, derecha: 950, arriba: 1230, abajo: 1440, luminancia: 37 }
+const MARCA = ANCHO
+  ? null
+  : { cx: (TAPA.izquierda + TAPA.derecha) / 2, cy: (TAPA.arriba + TAPA.abajo) / 2, ancho: Math.round((TAPA.derecha - TAPA.izquierda) * 0.44) }
 
-let nieblaCapa = null
-if (NIEBLA) {
-  const base = await sharp('public/branding/logo-full.svg', { density: 600 })
-    .resize({ width: NIEBLA.ancho })
-    .png()
-    .toBuffer()
+let marcaCapa = null
+if (MARCA) {
+  const base = await sharp('public/branding/logo-negative.svg', { density: 600 }).resize({ width: MARCA.ancho }).png().toBuffer()
   const { width: nw, height: nh } = await sharp(base).metadata()
-  nieblaCapa = {
-    input: base,
-    left: Math.round(NIEBLA.cx - nw / 2),
-    top: Math.round(NIEBLA.cy - nh / 2),
-    blend: 'multiply',
-    opacity: NIEBLA.opacidad
-  }
+  marcaCapa = { input: base, left: Math.round(MARCA.cx - nw / 2), top: Math.round(MARCA.cy - nh / 2) }
 }
 
 // La cita va al margen izquierdo, fuera del eje del titular: rompe la simetría y la deja claramente
@@ -172,7 +165,7 @@ const overlay = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}
 
 await sharp(PLATE)
   .composite([
-    ...(nieblaCapa ? [nieblaCapa] : []),
+    ...(marcaCapa ? [marcaCapa] : []),
     { input: overlay, left: 0, top: 0 }
   ])
   .png()
@@ -186,5 +179,5 @@ console.log(JSON.stringify({
     cita: { tam: Math.round(tamCita), tinta: [Math.round(yCita + cita.ink.top), Math.round(yCita + cita.ink.bottom)] }
   },
   seleccion: { cursores: manifest.cursors.map(c => c.id), dentroDelLienzo: rendered.evidence.withinCanvas },
-  nieblaDeMarca: NIEBLA
+  marcaSobreElObjeto: MARCA
 }, null, 2))

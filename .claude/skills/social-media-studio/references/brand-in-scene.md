@@ -223,16 +223,25 @@ Caso fuente: `ai-generations/2026-09-17_claude-o-codex/`.
 equivocada y borrosa sigue siendo una forma equivocada. El plate trae el objeto con la **cara limpia** y el logo se
 apoya encima de forma determinística.
 
-**Cómo pedir el objeto en el plate.** Que sea un prop que pertenezca a la escena y tenga una cara plana que recoja
-luz —una barra o placa de acrílico, un vidrio, el canto de una pantalla, una tarjeta de pie—; que esté a
-centímetros del lente y por eso **completamente** fuera de foco; y que su cara sea «COMPLETELY BLANK and EVEN», sin
-grabado, sin textura, sin reflejos de objetos y **sin un brillo fuerte en el medio**, o el logo cae sobre un parche
-claro. Declarar además qué bordes quedan dentro del cuadro: si el logo va **centrado**, el objeto necesita sus dos
-bordes laterales visibles, y entonces sólo puede sangrar por abajo.
+**Tiene que ser un objeto que YA estaría ahí, no un soporte inventado.** Segunda corrección del operador: una
+franja de acrílico cruzando de borde a borde «no parece un objeto del estudio desenfocado, sino una franja forzada
+para desenfocar». Y tenía razón: lo que delata al artificio es que no tiene forma propia. Preguntarse primero qué
+hay de verdad en ese set —un portátil, una taza, el canto de un monitor, una cámara— y usar eso. En el caso fuente
+quedó el **dorso de la tapa de un portátil** apoyado en la mesa entre el sujeto y la cámara: es el objeto más común
+de un estudio, su dorso es plano y en la vida real lleva un logo.
 
-**Dónde ponerlo.** Donde no tape lo que cuenta la foto. En un plano de busto detrás de una mesa, la franja que
-queda **bajo las manos** es el único sitio limpio a todo lo ancho; un panel lateral choca con la cara o con el
-gesto. Medir dónde termina el sujeto antes de elegir la zona.
+**Lo que hace que se lea como objeto y no como recurso gráfico:** sus **dos esquinas superiores dentro del cuadro**
+con fondo visible a izquierda y derecha, un **borde superior propio** y una **inclinación de unos pocos grados**.
+Un rectángulo perfectamente horizontal que sangra por los dos lados nunca va a leerse como cosa.
+
+**Cómo pedirlo en el plate:** a centímetros del lente y por eso **completamente** fuera de foco, con la cara
+«COMPLETELY BLANK and EVEN» —sin logo, sin insignia, sin pegatinas, sin textura y **sin un brillo fuerte en el
+medio**—, y con el material declarado por su relación con el fondo («más oscuro que la mesa»), porque de ahí sale
+después el color del logo.
+
+**Dónde ponerlo.** Donde no tape lo que cuenta la foto. Medir dónde termina el sujeto antes de elegir la zona: en
+un plano de busto detrás de una mesa las manos ocupan las dos esquinas de abajo, así que el objeto entra **por
+delante del borde de la mesa**, asomando apenas; un panel lateral choca con la cara o con el gesto.
 
 **El desenfoque es del OBJETO, no del logo.** Corrección expresa del operador (2026-09-17): en el primer intento se
 desenfocó también la marca, para «respetar» la profundidad de campo, y quedó ilegible. Un logo borroso no firma
@@ -245,14 +254,20 @@ rostro, que está más arriba y en otro plano.
 | Parámetro | Cómo se fija |
 |---|---|
 | Nitidez | El logo va **sin desenfoque**. El objeto ya aporta el fuera de foco |
-| Color | Por la luminancia media de la cara del objeto: sobre una cara **clara**, logo navy en `multiply` (lee como impreso en el acrílico); sobre una oscura, el negativo |
+| Color | Por la **luminancia medida** de la cara del objeto, no por gusto: cara oscura (L ≈ 37/255 en el caso fuente) → logo en **negativo**; cara clara → navy en `multiply`. Un logo navy sobre una superficie clara dentro de una escena nocturna se siente ajeno aunque contraste |
 | Opacidad | Plena. Es una firma, no una marca de agua |
 | Tamaño | Cabe holgado dentro de la cara del objeto, con aire arriba y abajo |
 | Posición | Centrado en el **ancho del objeto**, no en el del lienzo |
 
-**QA, medible:** contraste de la tinta del logo contra la cara del objeto **≥ 4,5:1** — medido en la pieza fuente
-**9,17:1** (navy sobre la barra clara). Y verificar que la cara del objeto llegue **limpia** desde el plate: si el
-modelo le dejó un brillo fuerte justo en el centro, el logo cae encima y el contraste se desploma.
+**QA, medible, dos números:**
+
+1. **Contraste** del logo contra la cara del objeto **≥ 4,5:1** — medido en la pieza fuente **13,90:1** (negativo
+   sobre la tapa oscura).
+2. **Blandura del objeto:** el gradiente máximo de su borde tiene que quedar muy por debajo del del rostro — medido
+   **54** contra **314**. Si el objeto no es mucho más blando que el sujeto, no está en primer plano: está pegado.
+
+Y verificar que la cara llegue **limpia** desde el plate: si el modelo le dejó un brillo fuerte justo en el centro,
+el logo cae encima y el contraste se desploma.
 
 **Límites.** Una sola aparición por pieza. Nunca sobre la cara ni cruzando la mirada. Si esta es la única marca de
 la pieza, tiene que leerse completa: entonces no hace falta una segunda firma.
