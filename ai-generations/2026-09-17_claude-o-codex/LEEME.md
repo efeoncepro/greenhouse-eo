@@ -5,26 +5,51 @@ titular **¿Claude o Codex?** más su línea entre comillas.
 
 ## Pieza vigente
 
-`out/claude-o-codex-4x5-v03.png` (1152 × 1440) sobre `plates/plate-final.png`. Tres capas, ninguna generada:
+`out/claude-o-codex-4x5-v04.png` (1152 × 1440) sobre `plates/plate-v04.png`, **sin ningún objeto añadido**.
+Tres capas compuestas, ninguna generada:
 
-1. **Primer plano desenfocado como lecho de la marca** — el **follaje de la planta** que ya está en la sala cruza
-   todo el borde inferior, con la cámara puesta detrás de ella, y el **logo va dentro de ese desenfoque**, centrado.
-   La silueta está modulada a propósito: puntas sueltas en los costados, masa baja y calma al centro, que es donde
-   se apoya el logo.
-
-   Llegó acá tras cuatro rechazos del operador: panel al costado (choca con la cara), franja de borde a borde
-   («forzada para desenfocar»), tapa de portátil («un cuadrado allí») y hojas sólo en la esquina («si el objeto está
-   a la izquierda no cumple el objetivo»). Los tres primeros comparten el error de **buscar una superficie donde
-   imprimir el logo**; el cuarto, el de poner el objeto donde no va la marca. La regla que salió de ahí: **se diseña
-   la composición para que el desenfoque caiga donde va el logo**, no al revés.
-   Completa en `social-media-studio`, referencia `brand-in-scene`.
-
+1. **La marca dentro del primer plano desenfocado — que es la propia mesa.** A 135 mm y f/2,8 el borde cercano de
+   la mesa ya cae completamente fuera de foco. El logo se apoya ahí, centrado, en negativo.
 2. **Jerarquía en tres niveles** — titular 98 px dominante · cita 33 px al margen izquierdo, fuera del eje, como un
-   aparte humano · la marca sólo en el bokeh. Antes eran titular y subtítulo centrados en el mismo eje: dos tamaños,
-   un solo nivel.
+   aparte humano · la marca abajo. Antes eran titular y subtítulo centrados en el mismo eje: dos tamaños, un solo
+   nivel.
 3. **Selección colaborativa AXIS sobre el titular** — caja de ocho tiradores, cursor de Clawd en su naranja
    (`#d77757`) y de Codex en su azul (`#2f67db`, medido sobre el plate), más el cursor local. La decisión es el
    objeto seleccionado y las dos mascotas se la disputan.
+
+### El hallazgo: el desenfoque ya estaba
+
+El operador pidió que el logo viviera dentro de un desenfoque de primer plano. Se añadieron **cinco** soportes y
+los cinco se rechazaron:
+
+| Intento | Plate | Rechazo |
+|---|---|---|
+| Panel de acrílico al costado | `v05`–`v07` | Choca con la cara y con el gesto |
+| Franja de acrílico de borde a borde | `v08` | «Una franja forzada para desenfocar» |
+| Tapa de portátil sobre la mesa | `v09` | «Se ve como un cuadrado allí» |
+| Hojas en la esquina inferior izquierda | `v10` | «Si el objeto está a la izquierda no cumple el objetivo» |
+| Follaje cruzando el borde inferior | `v11` | «Parece una selva forzada» |
+
+El operador pidió entonces **analizar en vez de generar**. Midiendo el enfoque plano por plano en el plate limpio:
+
+| Plano | Gradiente máximo |
+|---|---|
+| Rostro (plano de foco) | 314 |
+| Mesa junto a las manos | 39 |
+| **Mesa en el borde inferior** | **5** |
+| Fondo desenfocado | 5 |
+
+El borde cercano de la mesa ya estaba **tan desenfocado como el fondo**. Los cinco objetos eran redundantes, y por
+eso todos se veían puestos. Contraste del logo ahí, sin tocar nada: **11,36:1**.
+
+La contradicción que no se nombró a tiempo: un primer plano de verdad incidental no cae donde firma un logo, y
+forzarlo a caer ahí es justo lo que lo delata. La salida no era un objeto mejor sino entender que el primer plano
+suele ser **la superficie que ya está en la foto**. Regla y protocolo de medición en `social-media-studio`,
+referencia `brand-in-scene`.
+
+**Pendiente, sin aprobar:** un panel de acrílico claro en el borde derecho viene del prompt original de `plate-v04`
+y aparece en todas las versiones. Es el único elemento sobrante; se quitaría con una pasada enmascarada sobre esa
+franja, sin tocar cara, manos ni mascotas.
 
 ### Cómo se llegó al plate
 
@@ -33,8 +58,8 @@ regenera todo aunque le des `--mask` (delta medido en la zona protegida: 221/255
 esquina nueva se compone sobre `plate-v04` invirtiendo el alfa de la misma máscara. Verificado: rostro con **delta
 máximo 0**. Ver `docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md`.
 
-Descartes: `plate-v05` (panel bien, ojos oscuros), `plate-v06` y `plate-v07` (el panel lateral choca con la cara y
-con las manos), `plate-v08` (franja de borde a borde), `plate-v09` (tapa de portátil: un cuadrado puesto ahí), `plate-v10` (hojas sólo en la esquina), `out/claude-o-codex-4x5-v01.png` y `-v02` (mascotas en la mesa / jerarquía plana).
+Descartes de plate: `v05` (ojos oscuros) y `v06`–`v11` (los cinco soportes añadidos de la tabla de arriba).
+Descartes de pieza: `out/claude-o-codex-4x5-v01.png` y `-v02` (mascotas en la mesa / jerarquía plana).
 
 ## Piezas anteriores
 
@@ -99,13 +124,14 @@ Contraste sobre los píxeles reales, contra el píxel **más claro** de cada zon
 |---|---|
 | Titular (blanco) | 8,80:1 |
 | Cita (`softOnDark`) | 10,63:1 |
+| Logo sobre la mesa desenfocada | 11,36:1 |
 
 La cita empezó bajo el titular y ahí caía sobre el pelo: **1,17:1**, ilegible. Se movió al margen izquierdo, que es
 donde el fondo deja de ser claro. El contraste de una línea de texto se mide **donde queda**, no donde se diseñó.
 
-**Logo dentro del desenfoque:** contraste **12,58:1** contra el píxel más claro de su lecho. **Blandura del primer
-plano:** gradiente **6** contra **314** del rostro. Trampa de medición: una caja que tocaba el borde de la mesa dio
-**278** y parecía que el follaje estaba tan nítido como la cara; hay que medir sólo dentro del objeto.
+**Blandura del lecho del logo:** gradiente **5** contra **314** del rostro — sin añadir nada. Trampa de medición
+anotada en el camino: con el follaje, una caja que tocaba el borde de la mesa dio **278** y parecía que el objeto
+estaba tan nítido como la cara; hay que medir sólo dentro de la zona que interesa.
 
 Revisado además a 390 px de ancho: titular y cita siguen legibles. Mascotas verificadas al 100 % (cubos naranja con
 ojos rectangulares; nube azul con `>_` cian en pantalla y blanco en el pecho) y el emblema del polo con la nave a la

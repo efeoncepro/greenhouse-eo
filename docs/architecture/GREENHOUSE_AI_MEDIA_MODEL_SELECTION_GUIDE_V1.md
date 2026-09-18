@@ -1,9 +1,9 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-16 por Claude — v1.2: carril **Higgsfield API** dentro de `pnpm ai:fal` (§5.8): 44 capacidades con esquema real y precio exacto por API; Recraft de Higgsfield API: SVG **sin confirmar**. v1.1: brechas de los CLIs corregidas (commit `17196ead1`): estimación de costo previa con confirmación en `ai:fal`, resolución barata por defecto, formato real, `--seed` y tope de referencias validados, flags de LoRA/entrenador; `ai:image` valida `--size`/`--background`, agrega `--format` y estima costo
+> **Ultima actualizacion:** 2026-09-17 por Claude — v1.3: la máscara de 2.5 orienta pero no preserva: la «deriva fuera de zona 2,4/255» es una media; el 2026-09-17 la zona protegida llegó a delta máximo 221/255 (media 4,85) y se recompone desde la base. v1.2: carril **Higgsfield API** dentro de `pnpm ai:fal` (§5.8): 44 capacidades con esquema real y precio exacto por API; Recraft de Higgsfield API: SVG **sin confirmar**. v1.1: brechas de los CLIs corregidas (commit `17196ead1`): estimación de costo previa con confirmación en `ai:fal`, resolución barata por defecto, formato real, `--seed` y tope de referencias validados, flags de LoRA/entrenador; `ai:image` valida `--size`/`--background`, agrega `--format` y estima costo
 > **Alcance:** todos los modelos de imagen y video disponibles en `pnpm ai:image` (OpenAI) y `pnpm ai:fal` (55 capacidades de fal + 44 de Higgsfield API), más los carriles fuera de esos CLIs y los candidatos evaluados que NO están conectados.
 > **Documentación relacionada (no se duplica acá):**
 > [Catálogo de modelos fal](GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) ·
@@ -70,7 +70,7 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 
 | Si necesitas | Usa | Por qué | Alternativa | Evita |
 |---|---|---|---|---|
-| **Pieza final con edición precisa o inpainting con máscara** | GPT Image 2.5 **Sunburst** `xhigh`/`max` + `--mask` | #1 edición en Arena (1520) y AA (1164) [tercero]; máscara PNG con alfa [oficial]; deriva fuera de zona 2,4/255 con máscara [verificado 2026-09-16] | 2.5 Flare (mismo costo, más rápido) | Seedream Pro Edit cuando la zona protegida debe quedar intacta: sin máscara en fal, MAE protegido 0,0458 vs 0,0308 de GPT Image 2 con máscara [verificado 2026-07-18] |
+| **Pieza final con edición precisa o inpainting con máscara** | GPT Image 2.5 **Sunburst** `xhigh`/`max` + `--mask` | #1 edición en Arena (1520) y AA (1164) [tercero]; máscara PNG con alfa [oficial]; deriva media fuera de zona 2,4/255 con máscara [verificado 2026-09-16]; la media esconde picos: delta máximo 221/255 en zona protegida [verificado 2026-09-17], así que lo protegido se recompone desde la base ([paso 5](../manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu)) | 2.5 Flare (mismo costo, más rápido) | Seedream Pro Edit cuando la zona protegida debe quedar intacta: sin máscara en fal, MAE protegido 0,0458 vs 0,0308 de GPT Image 2 con máscara [verificado 2026-07-18] |
 | **Generación cotidiana de calidad, rápida** | GPT Image 2.5 **Flare** `medium`/`high` | Mismo costo que Sunburst; en `high` 18,7 s vs 29,1 s, en `max` 46,0 s vs 80,6 s a 1024² [verificado 2026-09-16] | Sunburst si la pieza es de edición | Dejar el default del CLI (`gpt-image-2` `high` 1536×1024 ≈ USD 0,165): cuesta lo mismo que 2.5 `max` [cálculo] |
 | **Máxima calidad OpenAI sin importar latencia** | 2.5 Sunburst `max` | `max` ≈ tokens de GPT Image 2 `high` [cálculo sobre fórmula oficial] | 2.5 Flare `max` (#1 AA texto a imagen, 1189) [tercero] | `xhigh`/`max` con `gpt-image-2`: el CLI lo rechaza antes de la red [contrato] |
 | **Mínimo costo por pieza en OpenAI** | 2.5 `low` (≈ 0,006 a 1024²) o `medium` (≈ 0,013) | [cálculo] fórmula oficial | Seedream Lite (0,035 por imagen) si buscas divergencia | Esperar calidad final en `low` |

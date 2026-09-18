@@ -1,9 +1,9 @@
 # Editar solo una zona de una imagen (inpainting con mascara)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-17 por Claude — (1.6) la mascara de halo para integrar un objeto real es la **excepcion, no el default**: para una forma exacta de marca en una escena generada el camino por defecto es la pasada directa (render como referencia de forma + intencion en el prompt), y el halo solo aplica con material exacto del kit y logo chico o de detalle fino. Antes (1.5) segundo uso de la mascara: integrar un objeto real (render de marca) en una escena protegiendo objeto y escena y abriendo solo un halo de ~140 px; verificacion de pixeles protegidos antes de gastar y trampa de `sharp` de 1 canal (`toColourspace('b-w')`). Antes (1.4) `--key-background` para huecos opacos de objeto claro sobre fondo oscuro. Antes (1.3) `pnpm ai:image:rmbg` rellena huecos internos por defecto; cuándo usar `--no-fill-holes`. Antes (1.2) brechas del comando corregidas (commit `17196ead1`): `--size` y `--background` se validan antes de gastar, nuevo `--format png|jpeg|webp`, aviso de `--count N` y línea `$ costo estimado` antes de pedir. Antes (1.1): elección GPT Image 2 vs 2.5 Sunburst vs Flare con enlace a la guía canónica de selección; el costo de 2.5 sí se estima antes con la fórmula oficial; brechas conocidas del comando (`--size`/`--background` sin validar, PNG siempre, `--count` = N pedidos pagados)
+> **Ultima actualizacion:** 2026-09-17 por Claude — (1.7) el manual deja de prometer que la zona protegida queda igual: GPT Image 2.5 regenera la imagen entera aunque se pase `--mask` (delta maximo 221/255 en zona protegida con promedio de solo 4,85), asi que la seccion «La mascara NO preserva pixeles» pasa a ser el paso 5 del flujo, el criterio de aceptacion es el delta **maximo** 0 tras recomponer (no la diferencia media) y el halo tambien se recompone. Antes (1.6) la mascara de halo para integrar un objeto real es la **excepcion, no el default**: para una forma exacta de marca en una escena generada el camino por defecto es la pasada directa (render como referencia de forma + intencion en el prompt), y el halo solo aplica con material exacto del kit y logo chico o de detalle fino. Antes (1.5) segundo uso de la mascara: integrar un objeto real (render de marca) en una escena protegiendo objeto y escena y abriendo solo un halo de ~140 px; verificacion de pixeles protegidos antes de gastar y trampa de `sharp` de 1 canal (`toColourspace('b-w')`). Antes (1.4) `--key-background` para huecos opacos de objeto claro sobre fondo oscuro. Antes (1.3) `pnpm ai:image:rmbg` rellena huecos internos por defecto; cuándo usar `--no-fill-holes`. Antes (1.2) brechas del comando corregidas (commit `17196ead1`): `--size` y `--background` se validan antes de gastar, nuevo `--format png|jpeg|webp`, aviso de `--count N` y línea `$ costo estimado` antes de pedir. Antes (1.1): elección GPT Image 2 vs 2.5 Sunburst vs Flare con enlace a la guía canónica de selección; el costo de 2.5 sí se estima antes con la fórmula oficial; brechas conocidas del comando (`--size`/`--background` sin validar, PNG siempre, `--count` = N pedidos pagados)
 > **Modulo:** AI Tooling / Asset Generation
 > **Comandos:** `pnpm ai:image --image ... --mask ...`, `pnpm ai:image:rmbg`
 > **Documentacion relacionada:** `docs/documentation/ai-tooling/generador-visual-assets.md`, `.claude/skills/greenhouse-ai-image-generator/SKILL.md`, `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`
@@ -13,6 +13,10 @@
 Para cambiar **una zona concreta** de una imagen que ya existe y dejar el resto igual: poner un objeto sobre
 una mesa vacia, reemplazar un elemento, corregir un detalle. La zona se marca con una segunda imagen llamada
 **mascara**.
+
+Ojo con lo que la mascara hace y no hace: le dice al modelo **donde** trabajar, pero el modelo devuelve la imagen
+**entera redibujada**, tambien fuera de la zona. Que el resto quede igual lo garantizas tu en el paso 5, recomponiendo
+la zona protegida desde la original. Ver [La mascara NO preserva pixeles](#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu).
 
 ## Antes de empezar
 
@@ -24,7 +28,7 @@ Resumen para `pnpm ai:image` (fuentes oficiales de OpenAI y mediciones propias d
 
 | Modelo (`--model`) | Cuándo | Qué tener en cuenta |
 |---|---|---|
-| `gpt-image-2.5-sunburst` | Edición precisa con máscara o pieza final donde importa no tocar lo demás | El más capaz según OpenAI; #1 en edición en Arena y Artificial Analysis (rankings externos, septiembre 2026). Más lento: 80,6 s vs 46,0 s de Flare en `max` a 1024² |
+| `gpt-image-2.5-sunburst` | Edición precisa con máscara o pieza final donde importa no tocar lo demás (lo que no se toca igual se recompone en el paso 5) | El más capaz según OpenAI; #1 en edición en Arena y Artificial Analysis (rankings externos, septiembre 2026). Más lento: 80,6 s vs 46,0 s de Flare en `max` a 1024² |
 | `gpt-image-2.5-flare` | Uso diario de calidad, iteraciones y pruebas | El rápido; mismo contrato, mismo costo y mismo consumo que Sunburst para igual `quality × size` |
 | `gpt-image-2` | Cuando necesitas Batch (mitad de precio) o reproducir un flujo existente | Sigue siendo el **default del comando** si no pasas `--model`; OpenAI ya recomienda 2.5 para integraciones nuevas. Calidad hasta `high` (sin `xhigh`/`max`) |
 
@@ -101,6 +105,41 @@ entrada (1.024 tokens a 1024²).
 Abre la imagen y comparala con la original. **No confies en una diferencia promedio de pixeles**: un objeto
 chico mueve muy poco el promedio y parece que no paso nada. Hay que mirar.
 
+### 5. Recompon la zona protegida: la mascara NO preserva pixeles
+
+<a id="la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu"></a>
+
+**Medido 2026-09-17** (`ai-generations/2026-09-17_claude-o-codex/`). GPT Image 2.5 **regenera la imagen completa**
+aunque le pases `--mask`. La zona protegida cambia: en una pasada que solo debia tocar una esquina, el delta maximo
+en la zona protegida fue **221/255** y la caja de los ojos del sujeto se movio **147/255**. El promedio de la zona
+protegida fue bajo (4,85) — por eso el promedio **no** sirve como criterio de aceptacion.
+
+**Regla dura:** si lo que esta fuera de la mascara no se puede tocar —una cara, un logo ya aprobado, un texto
+compuesto— no confies en el modelo. Compon tu el resultado: toma la salida, invierte el alfa de la misma mascara y
+apoyala sobre la base original. Asi la zona protegida queda **identica bit a bit** y el degradado de la mascara te
+da la union sin costura.
+
+```js
+const alfa = await sharp(MASCARA).extractChannel('alpha').raw().toBuffer()
+const nueva = await sharp(SALIDA_DEL_MODELO).ensureAlpha().raw().toBuffer()
+const parche = Buffer.alloc(W * H * 4)
+for (let i = 0; i < W * H; i++) {
+  parche[i * 4] = nueva[i * 4]
+  parche[i * 4 + 1] = nueva[i * 4 + 1]
+  parche[i * 4 + 2] = nueva[i * 4 + 2]
+  parche[i * 4 + 3] = 255 - alfa[i] // se trae SOLO lo que la mascara abrio
+}
+await sharp(BASE).composite([{ input: png(parche), left: 0, top: 0 }]).toFile(FINAL)
+```
+
+**Verificalo, no lo supongas:** compara base y final en una caja de la zona protegida y exige **delta maximo 0**.
+Cuidado al comparar: `.raw()` sobre un PNG sin alfa devuelve 3 canales y sobre uno con alfa devuelve 4; si mezclas
+los dos, los bytes se desalinean y el delta sale disparatado aunque la imagen este bien. Fuerza `.removeAlpha()` en
+ambos lados.
+
+**Para que sirve igual la mascara:** le dice al modelo donde trabajar y le da el contexto de alrededor, que es lo
+que hace que la zona nueva calce en luz, color y grano. El recorte fino es tuyo.
+
 ## Otro uso de la mascara: integrar un objeto real en una escena (**es la excepcion, no el default**)
 
 > **Antes de leer esto, descarta el camino normal.** Para poner una forma exacta de marca —el render 3D del logo de
@@ -119,7 +158,8 @@ chico mueve muy poco el promedio y parece que no paso nada. Hay que mirar.
 
 El caso de arriba abre un hueco para que el modelo **invente** algo. Este es el contrario: ya tienes un objeto exacto
 y lo que quieres del modelo es **solo la integracion**: la sombra de contacto, el reflejo en la superficie y el fundido
-de bordes. Ni el objeto ni la escena deben cambiar.
+de bordes. Ni el objeto ni la escena deben cambiar, y como el modelo igual los redibuja, **al final recompones las dos
+zonas protegidas** desde la base con el paso 5.
 
 La forma de conseguirlo es una mascara que **protege dos zonas** y deja editable **solo un halo** alrededor del objeto.
 Dentro de ese caso acotado se justifica porque pasar el objeto suelto al modelo deforma el detalle fino aunque el
@@ -140,6 +180,9 @@ pnpm ai:image --image BASE.png --mask MASCARA-HALO.png \
   --prompt "Add only contact shadow, surface reflection and bounce light around the object, matching the scene light direction, and blend the edges with the depth of field. Keep the object and the rest of the scene exactly the same." \
   --out RESULTADO.png
 ```
+
+5. **Recompon** con el alfa invertido de la misma `MASCARA-HALO.png` sobre `BASE.png`, como en el
+   [paso 5](#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu), y exige delta maximo 0 en la zona protegida.
 
 ### Verifica los pixeles protegidos antes de gastar
 
@@ -166,18 +209,24 @@ Si sale `100% editable`, la mascara esta mal: no la uses.
 
 Compara el resultado con la base **midiendo por zona**, no en promedio global:
 
-- **Zona protegida** (objeto + escena): diferencia media del orden de **4/255**. Es decir, intacta.
-- **Halo editable**: del orden de **40/255**. Ahi aparecieron la sombra y el reflejo.
-
-Si la zona protegida se parece al halo, la mascara no protegio nada.
+- **Antes de recomponer**, la diferencia media sirve solo para saber si la mascara orienta al modelo: del orden de
+  **4/255** en la zona protegida (objeto + escena) contra **40/255** en el halo, donde aparecieron la sombra y el
+  reflejo. Si la zona protegida se parece al halo, la mascara no oriento nada: revisala. Una media de ~4/255 **no**
+  significa intacta: en la corrida del 2026-09-17 una media de 4,85 escondia un delta maximo de **221/255**.
+- **Despues de recomponer** (paso 5), la zona protegida debe dar **delta maximo 0** contra la base. Ese es el criterio
+  de aceptacion.
 
 ### Que no hacer aqui
 
 - **No omitas la parte de la mascara que protege la escena.** Si solo proteges el objeto, el modelo conserva el objeto
   pero **redibuja la escena completa**: cambia props y encuadre (medido: IoU de silueta 0,72 por desplazamiento y
   escala).
-- **No vuelvas a pegar el objeto encima del resultado** para "corregirlo": reintroduce el aspecto de recorte pegado y
-  los bordes sucios que la pasada acababa de resolver.
+- **No vuelvas a pegar el render suelto del objeto encima del resultado** para "corregirlo": con su borde duro
+  reintroduce el aspecto de recorte pegado y los bordes sucios que la pasada acababa de resolver. Esto **no** es lo
+  mismo que el paso 5: ahi se trae desde la base solo lo que la mascara protegio (el interior erosionado del objeto y
+  la escena) con el alfa de la misma mascara, y la franja de ~8 px del borde mas el halo se quedan con lo que hizo el
+  modelo. La union cae dentro del halo; mirala al 100 % (esta recomposicion en el caso del halo es inferida del
+  metodo, no medida todavia en una pieza de logo).
 - Artefacto conocido: un **brillo sucio donde el halo toca el borde del objeto**. Se corrige bajando el ancho del halo
   o la erosion.
 
@@ -235,8 +284,9 @@ Lo que sigue abierto:
 
 ## Problemas comunes
 
-- **El modelo cambio cosas fuera de la zona.** Repite en el prompt que conserve el resto
-  ("keep everything else exactly the same") y revisa que la mascara sea realmente opaca fuera de la zona.
+- **El modelo cambio cosas fuera de la zona.** Es lo esperado: 2.5 redibuja la imagen entera. Recompon la zona
+  protegida con el paso 5. Si el cambio fuera de la zona es enorme (encuadre o props distintos), revisa ademas que la
+  mascara sea realmente opaca fuera de la zona.
 - **No se ve ningun cambio.** Confirma que el `usage` muestre `img` distinto de cero; si es cero, el comando
   corrio como generacion y la mascara no viajo.
 - **La zona quedo bien pero el estilo no calza.** Sube la calidad un escalon; el costo del output sube pero
@@ -249,36 +299,3 @@ Lo que sigue abierto:
 - Cliente canonico: `src/lib/ai/openai-image.ts` (`editOpenAIImage`)
 - CLI: `scripts/ai/generate-image.ts`
 - Medicion de costo con evidencia: `ai-generations/2026-09-16_gpt-image-2-5-usage-baseline/`
-
-## La mascara NO preserva pixeles: el recorte lo haces tu
-
-**Medido 2026-09-17** (`ai-generations/2026-09-17_claude-o-codex/`). GPT Image 2.5 **regenera la imagen completa**
-aunque le pases `--mask`. La zona protegida cambia: en una pasada que solo debia tocar una esquina, el delta maximo
-en la zona protegida fue **221/255** y la caja de los ojos del sujeto se movio **147/255**. El promedio de la zona
-protegida fue bajo (4,85) — por eso el promedio **no** sirve como criterio de aceptacion.
-
-**Regla dura:** si lo que esta fuera de la mascara no se puede tocar —una cara, un logo ya aprobado, un texto
-compuesto— no confies en el modelo. Compon tu el resultado: toma la salida, invierte el alfa de la misma mascara y
-apoyala sobre la base original. Asi la zona protegida queda **identica bit a bit** y el degradado de la mascara te
-da la union sin costura.
-
-```js
-const alfa = await sharp(MASCARA).extractChannel('alpha').raw().toBuffer()
-const nueva = await sharp(SALIDA_DEL_MODELO).ensureAlpha().raw().toBuffer()
-const parche = Buffer.alloc(W * H * 4)
-for (let i = 0; i < W * H; i++) {
-  parche[i * 4] = nueva[i * 4]
-  parche[i * 4 + 1] = nueva[i * 4 + 1]
-  parche[i * 4 + 2] = nueva[i * 4 + 2]
-  parche[i * 4 + 3] = 255 - alfa[i] // se trae SOLO lo que la mascara abrio
-}
-await sharp(BASE).composite([{ input: png(parche), left: 0, top: 0 }]).toFile(FINAL)
-```
-
-**Verificalo, no lo supongas:** compara base y final en una caja de la zona protegida y exige **delta maximo 0**.
-Cuidado al comparar: `.raw()` sobre un PNG sin alfa devuelve 3 canales y sobre uno con alfa devuelve 4; si mezclas
-los dos, los bytes se desalinean y el delta sale disparatado aunque la imagen este bien. Fuerza `.removeAlpha()` en
-ambos lados.
-
-**Para que sirve igual la mascara:** le dice al modelo donde trabajar y le da el contexto de alrededor, que es lo
-que hace que la zona nueva calce en luz, color y grano. El recorte fino es tuyo.

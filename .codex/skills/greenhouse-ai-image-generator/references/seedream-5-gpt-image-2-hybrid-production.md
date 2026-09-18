@@ -244,7 +244,8 @@ Usar cuando la campaña nace de material, atmósfera o gesto visual:
 3. Aprobar un anchor.
 4. GPT recompone y sistematiza.
 5. GPT deriva ratios desde el mismo anchor.
-6. GPT + máscara repara áreas protegidas.
+6. GPT + máscara repara el área dañada y la zona protegida se recompone desde el anchor con el alfa invertido de la
+   misma máscara (la máscara orienta, no preserva: [paso 5](../../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu)).
 7. Composición determinística libera masters.
 
 Si el anchor aprobado debe recomponerse por ratio, retocarse por elemento o animarse por planos, pasar el
@@ -340,7 +341,9 @@ Reglas:
   se usa al revés de lo habitual —protege **el objeto pegado y también el resto de la escena**, y abre sólo un
   **halo** a su alrededor— para que el modelo aporte sombra de contacto, reflejo y fundido sin re-dibujar ni el
   objeto ni los props. Si se protege sólo el objeto, el modelo rehace la escena alrededor. Contar los píxeles
-  protegidos **antes** de gastar: una máscara mal construida sale 100 % transparente sin error visible. Ambas vías,
+  protegidos **antes** de gastar: una máscara mal construida sale 100 % transparente sin error visible. Aun con la
+  máscara bien hecha, GPT Image 2.5 redibuja todo (delta máximo 221/255 en zona protegida, 2026-09-17): recomponer
+  lo protegido desde la base ([paso 5](../../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu)). Ambas vías,
   criterio y medidas: [`logo-3d-reference-kit.md`](logo-3d-reference-kit.md).
 
 Benchmark 2026-07-18 sobre la misma fuente/región:

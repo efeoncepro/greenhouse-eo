@@ -1,9 +1,8 @@
 // «¿Claude o Codex?» — composición sobre el plate de estudio.
 //
 // Tres capas, ninguna generada por el modelo:
-//   1. Un OBJETO DE LA SALA se mete en el primer plano y sale fuera de foco —las hojas de la planta,
-//      cámara puesta detrás de ella—. Es la excusa que da profundidad y deja una zona tranquila; el
-//      logo vive en esa zona, nítido. No va impreso sobre el objeto.
+//   1. El logo vive DENTRO del primer plano desenfocado, que acá no es un objeto añadido sino la
+//      propia mesa: su borde cercano ya está fuera de foco por la óptica de la toma.
 //   2. Jerarquía tipográfica: titular dominante arriba · la cita del protagonista al margen izquierdo,
 //      fuera de eje, como un aparte humano · la marca, sólo sobre el objeto.
 //   3. Selección colaborativa AXIS sobre el titular: Clawd y Codex disputándose la decisión.
@@ -24,8 +23,8 @@ const require = createRequire(import.meta.url)
 const fontkit = require('fontkit')
 const DIR = path.dirname(new URL(import.meta.url).pathname)
 
-const PLATE = process.argv[2] ?? `${DIR}/plates/plate-final.png`
-const OUT = process.argv[3] ?? `${DIR}/out/claude-o-codex-4x5-v03.png`
+const PLATE = process.argv[2] ?? `${DIR}/plates/plate-v04.png`
+const OUT = process.argv[3] ?? `${DIR}/out/claude-o-codex-4x5-v04.png`
 
 const R = axisAdvertising.recipes
 const C = axisAdvertising.color
@@ -96,12 +95,10 @@ const tamCita = tamTitulo * 0.34
 const cita = shape(CITA, FONTS['Poppins-500'], tamCita, Number.parseFloat(R.structureTagline.tracking))
 
 // ── Nivel 3 · la marca, dentro del primer plano desenfocado ──────────────────────────────────────
-// El plate trae el follaje de la planta de la sala cruzando el borde inferior, completamente fuera
-// de foco: la cámara está puesta detrás de la planta y disparamos pasándola.
-// La composición está hecha para esto: el follaje cruza TODO el borde inferior —puntas sueltas en
-// los costados, masa baja y calma al centro— y el logo va DENTRO de ese desenfoque, centrado en el
-// eje de la pieza. El objeto no es un soporte con el logo impreso: es el primer plano de la foto, y
-// el logo respira encima. Color por la luminancia medida de la masa central → negativo.
+// NO hay ningún objeto añadido. El primer plano desenfocado es **la mesa misma**: a 135 mm y f/2,8
+// su borde cercano ya cae completamente fuera de foco. Medido en este plate: gradiente 5 en el borde
+// inferior contra 314 en el rostro — tan desenfocado como el fondo. El logo se apoya ahí, centrado
+// en el eje de la pieza, en negativo porque el lecho es oscuro.
 const ZONA = { cx: W / 2, cy: 1362 }
 const MARCA = ANCHO ? null : { cx: ZONA.cx, cy: ZONA.cy, ancho: Math.round(W * 0.26) }
 

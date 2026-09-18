@@ -68,6 +68,24 @@ pnpm ai:image --model gpt-image-2.5-sunburst --quality xhigh --size 1152x1440 --
 tres ventanas), color sin deriva, emblema sin espejar —revisado **con recorte al 100 %**, porque en una hoja de
 contacto no se ve—, y proporción humana coherente.
 
+**Componer firma y texto sobre la foto** (caso «¿Claude o Codex?», 2026-09-17):
+
+- **Logo en un desenfoque de primer plano: medir antes de añadir.** Casi siempre el lecho desenfocado ya está en la
+  foto (la mesa, el mostrador). En el caso fuente, a 135 mm y f/2,8, el borde inferior de la mesa medía gradiente
+  máximo **5**, igual que el fondo, contra **314** del rostro; el logo se apoyó ahí con **11,36:1** sin añadir nada,
+  tras cinco objetos añadidos rechazados por forzados. Protocolo y reglas de forma:
+  [marca dentro de la escena](../../../.claude/skills/social-media-studio/references/brand-in-scene.md), sección
+  «Primer plano desenfocado como lecho de la marca».
+- **Jerarquía: dos tamaños en el mismo eje son un solo nivel.** Titular y subtítulo centrados uno bajo otro se leen
+  planos aunque difieran en tamaño. Lo que lo resuelve es darle **una función distinta a cada pieza**: titular
+  dominante, cita al margen fuera de eje (aparte humano) y marca sólo abajo. Agrandar el titular no lo arregla.
+- **El contraste de una línea se mide donde queda, no donde se diseñó.** La misma cita, mismo color y tamaño, dio
+  **1,17:1** bajo el titular (caía sobre el pelo) y **10,63:1** al margen izquierdo. Medir contra el píxel más claro
+  de la zona final.
+- **Cada formato se genera nativo.** 9:16 y 16:9 no se recortan del 4:5: el recorte se come el espacio del titular, y
+  la disposición cambia por formato (en horizontal la cita baja y el logo va al extremo opuesto para no chocar con la
+  coronilla).
+
 ## 4. Video
 
 El video hereda todo lo anterior y agrega tres reglas propias. Motor y costos:

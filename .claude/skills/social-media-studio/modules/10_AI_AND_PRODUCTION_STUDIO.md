@@ -50,7 +50,7 @@ presencia de un conector no garantiza una capacidad. Confirmar schema, sesión e
 |---|---|---|
 | Falta concepto o relación de marca | módulo 11 + copywriting/dirección de arte | mecanismo, papel de marca y recorrido visual defendibles |
 | Falta escena o acción | motor nativo o modelo disponible vía Higgsfield | plate/toma que ejecuta el concepto |
-| Defecto localizado de escena | edición por referencias o máscara admitida | defecto corregido con identidad/composición preservadas |
+| Defecto localizado de escena | edición por referencias o máscara admitida, **y recomposición de la zona abierta sobre el plate** — la máscara orienta al modelo pero no preserva píxeles ([paso 5](../../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md)) | defecto corregido con identidad/composición preservadas, verificado por delta máximo 0 fuera de la zona |
 | Marca física falsa o deformada | referencia oficial + materialización, mockup o 3D | geometría, material e identidad verificables |
 | Titular, firma editorial, CTA o legal inexactos | compositor con archivos reales | texto y vectores exactos; no regenerar la escena |
 | Resolución insuficiente | upscale disponible, incluido Magnific | detalle útil sin alterar producto, marca o códigos culturales |

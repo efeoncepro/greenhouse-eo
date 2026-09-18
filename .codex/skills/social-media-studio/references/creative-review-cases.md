@@ -98,7 +98,7 @@ Bitácora: `ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md`.
 | Titular de un solo peso se ve débil | Jerarquía: entrada liviana → remate pesado, con proporción declarada | Agrandar el mismo peso o añadir adornos |
 | Recorte «mordido» en pelo o mascota tras cambiar el fondo | Regenerar el plate con el set nuevo, guiado por boceto de composición | Suavizar el matte y entregar el borde |
 | Mascota con partes finas o sueltas («?», brazos) pasada por matte + máscara | Verificar silueta completa contra la fuente; si falta una parte, regenerar | Aceptar la figura porque se reconoce en miniatura |
-| Logo centrado sobre objeto de primer plano desenfocado (escritorio/laptop) | Firma apoyada en un soporte plausible de la escena, con contraste medido | Logo flotando en una caja o esquina forzada |
+| Logo dentro de un desenfoque de primer plano | Medir primero el gradiente del plate limpio: si la superficie cercana (mesa, escritorio) ya mide como el fondo, el logo va ahí con contraste medido; añadir objeto sólo si mide en foco ([brand-in-scene](brand-in-scene.md)) | Añadir un objeto para fabricar el desenfoque (panel, franja, tapa de portátil, follaje), o logo flotando en una caja o esquina forzada |
 | Pieza pedida en 4:5 y 9:16 | Misma escena: 9:16 nativo y 4:5 abriendo el encuadre a los lados; revisar ambos | 4:5 nativo con la cabeza arriba y sin aire, o dos escenas distintas |
 
 ## Protocolo de evaluación documental

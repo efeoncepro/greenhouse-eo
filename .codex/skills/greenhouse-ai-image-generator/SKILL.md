@@ -30,7 +30,14 @@ Separar dos rutas: **firma editorial**, con zona reservada y activo exacto compu
 **marca física**, con soporte pertinente, geometría y acabado definidos, usando arte oficial como referencia
 si se elige materialización generativa. La segunda no exige regenerar titulares ni acepta deformación del logo.
 Aplicar [brand-in-scene](../social-media-studio/references/brand-in-scene.md). Mantener la marca fuera de objetos
-rituales sin revisión cultural específica. No añadir nombre de ocasión/fecha/CTA si no tiene función o fue retirado.
+rituales sin revisión cultural específica.
+
+🔴 **Antes de generar un primer plano desenfocado o un objeto de escena para apoyar la marca, mide el foco del plate
+que ya tienes.** El desenfoque de primer plano suele venir dado por la óptica de la toma: en «¿Claude o Codex?»
+(2026-09-17, 135 mm a f/2,8) el borde inferior de la mesa medía gradiente máximo **5**, igual que el fondo, contra
+**314** en el rostro; los cinco soportes añadidos (acrílico, franja, tapa de portátil, hojas, follaje) eran
+redundantes y los cinco se leyeron puestos. El logo se compuso sobre esa mesa a 11,36:1 sin añadir nada. Añade un
+objeto sólo si la zona de la marca mide cerca del rostro. Protocolo y reglas de forma: [brand-in-scene](../social-media-studio/references/brand-in-scene.md). No añadir nombre de ocasión/fecha/CTA si no tiene función o fue retirado.
 
 ## First Reads
 
@@ -99,6 +106,8 @@ Nano Banana Pro y Gemini Omni Flash van **siempre directo por Google, nunca por 
    `gpt-image-2.5-sunburst` en `xhigh`/`max`, con `--mask` si hay zona protegida. Sunburst es #1 en edición en
    Arena y Artificial Analysis [tercero, 2026-09-07/16]; la máscara alfa tuvo menos deriva protegida que la
    edición semántica de Seedream (MAE 0,0308 vs 0,0458, medido con GPT Image 2) [verificado 2026-07-18].
+   **Menos deriva no es cero:** la máscara orienta, no preserva (ver el bloque de `--mask` abajo); la zona protegida
+   se recompone desde la base.
 4. **¿Generación cotidiana, social, asset de UI, volumen, transparencia?** → `gpt-image-2.5-flare` en
    `medium`/`high`. Mismo costo que Sunburst para igual `quality × size`; los separa la latencia (en `max`, Flare
    46,0 s vs Sunburst 80,6 s) [verificado 2026-09-16]. Transparencia: soporte pleno en 2.5, preview en GPT Image 2.
@@ -387,6 +396,14 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
 fondo de una imagen que ya existe, usa `pnpm ai:image:rmbg` (local, cero costo de proveedor), no un edit.
 El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de costo real de 2.5.
 
+🔴 **La máscara NO preserva píxeles — medido 2026-09-17** (`ai-generations/2026-09-17_claude-o-codex/`): GPT Image 2.5
+redibuja la imagen entera aunque se pase `--mask`. En una pasada que sólo debía tocar una esquina, la zona protegida
+tuvo delta máximo **221/255** (los ojos del sujeto, **147/255**) con una media de sólo **4,85**: la media no sirve de
+criterio. Si fuera de la máscara hay algo que no se puede tocar (cara, logo aprobado, texto compuesto), el recorte
+fino lo hace el agente: salida del modelo con el **alfa invertido de la misma máscara** sobre la base original, y
+verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales al comparar:
+[editar una zona de una imagen, paso 5](../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu).
+
 - El cliente acepta hasta **16** `--image` por request (`MAX_OPENAI_IMAGE_INPUTS = 16`, < 50 MB c/u) y conserva su orden. Cada referencia debe declarar en el
   prompt su rol: estructura, paleta, identidad, activo oficial o anti-referencia.
 - Una **anti-referencia** no tiene peso negativo nativo: es una instrucción semántica. Nombrar el rasgo excluido
@@ -509,7 +526,8 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
   atmósfera fuerte (larga exposición, neón, contraluz). **Referencia elegida por luminancia:** render blanco para
   materiales claros, navy para oscuros o para el color de marca. **Nunca pegar el render como camino por defecto:**
   conserva el material y la luz del kit y se lee falso. El **halo enmascarado** (`--mask` que protege logo **y**
-  escena, ~140 px editables) es la **excepción**: material exacto del kit + logo chico o detalle fino. QA letra por
+  escena, ~140 px editables, y después recomponer las zonas protegidas desde la base porque la máscara no preserva
+  píxeles) es la **excepción**: material exacto del kit + logo chico o detalle fino. QA letra por
   letra y composición determinística sólo como último recurso:
   [`references/logo-3d-reference-kit.md`](references/logo-3d-reference-kit.md).
 - **Vestir a alguien con ropa de marca, o producir merch y credencial (lanyard, yoyo, portacarnet, carnet) → kit de
@@ -578,6 +596,11 @@ El CLI ahora imprime `usage` en cada corrida — úsalo, es la única fuente de 
 - Campaign derivation uses a governed **star topology**: the approved `anchor_id`/`anchor_revision` is the
   center; ratios, motion plates, print proofs and OOH proofs are independent spokes. A local repair does not
   become the next anchor without explicit human promotion.
+- **Derivados de formato (9:16, 16:9) se generan NATIVOS, nunca recortando el 4:5:** el recorte se come el espacio
+  del titular (medido en «¿Claude o Codex?», 2026-09-17). Plate nativo del formato, o extensión por outpaint desde el
+  anchor (receta «Extender a otro formato» arriba), y el layout de texto se re-decide por formato: con `W/H > 1.2` el
+  titular y la cita no caben apilados sin chocar con la coronilla, la cita baja y el logo va al extremo opuesto
+  (`ai-generations/2026-09-17_claude-o-codex/componer.mjs`).
 - For layout-designed static sets, the model receives only a clean ratio plate. Build the layout contract first,
   use Seedream Pro for material/light/atmosphere or GPT Image 2 for geometry/protected repair, then compose
   final copy, editorial logo, CTA and legal deterministically. After approving the finish, use `pnpm creative:layout` for
@@ -800,7 +823,9 @@ deterministic and are composed after any generative finish.
   localization require deterministic composition unless an explicit exception accepts raster risk. Physical
   brand materialization uses official references and the separate identity/material review above.
 - Seedream Pro Edit «region/layer editing» is semantic art direction over one flattened raster, not editable
-  layers or pixel-perfect locality. Use GPT + alpha mask when protected-region drift has operational cost; when
+  layers or pixel-perfect locality. Use GPT + alpha mask when protected-region drift has operational cost, then
+  recompose the protected region from the base (the mask reduces drift, it does not eliminate it: 221/255 max
+  measured 2026-09-17); when
   you need separable layers of an approved piece, run `seedream5-pro-layerize` instead of regenerating.
 - If a still becomes motion, hand the approved clean plate to `motion-design-studio`. Build the 15/10/6
   family in deterministic post; use Seedance (2.5/2.0 via `pnpm ai:fal`) only for a genuinely new shot/action/continuity need,

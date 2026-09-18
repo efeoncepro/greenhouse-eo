@@ -4,7 +4,7 @@
 >
 > **Estado:** Aplicable a producción creativa out-of-band
 >
-> **Última actualización:** 2026-09-16 por Claude (nota de cuentas de Fal en el ejemplo ejecutable)
+> **Última actualización:** 2026-09-17 por Claude (la máscara no preserva la región protegida: se recompone desde el clean plate). Antes: 2026-09-16, nota de cuentas de Fal en el ejemplo ejecutable
 >
 > **Documentación funcional:** [Layout Design & Finishing](../../documentation/ai-tooling/layout-design-and-finishing.md)
 
@@ -85,7 +85,7 @@ herramienta. El SVG contiene el plate enlazado y overlays vectoriales; mueve el 
 
 | Problema                                         | Acción                                                                                                                |
 | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| El finish mueve al sujeto o invade el copy field | volver al clean plate; usar GPT para recomponer o una máscara si la región debe protegerse                            |
+| El finish mueve al sujeto o invade el copy field | volver al clean plate; usar GPT para recomponer o una máscara si la región debe protegerse, y después recomponer esa región desde el clean plate: la máscara no preserva píxeles ([paso 5](./editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu)) |
 | El resultado parece “texto pegado sobre foto”    | mejorar underlay, contraste local, escala tipográfica y relación entre hook y plate; no pedir “más premium” al modelo |
 | Seedream cambia demasiado                        | reducir el delta, enumerar locks y editar sólo el raster limpio                                                       |
 | GPT deja el plate correcto pero frío             | conservar estructura y pasar a Seedream Pro sólo para material/luz/atmósfera                                          |

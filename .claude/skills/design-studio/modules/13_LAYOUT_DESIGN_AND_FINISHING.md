@@ -64,7 +64,7 @@ Elegir según el **delta restante**, no por preferencia de proveedor:
 | Delta restante                                                          | Mano preferida                           |
 | ----------------------------------------------------------------------- | ---------------------------------------- |
 | material, microtextura, color, luz, atmósfera, integración orgánica     | Seedream 5 Pro Edit                      |
-| geometría, escala, crop, espacio negativo, identidad o región protegida | GPT Image 2 Edit; máscara si corresponde |
+| geometría, escala, crop, espacio negativo, identidad o región protegida | GPT Image 2 Edit; máscara si corresponde, y la región protegida se recompone desde el plate (la máscara no preserva píxeles) |
 | copy, firma editorial, rail, grilla, CTA, legal, localización, resize y sharpening | composición determinística               |
 
 Pro recibe sólo el `clean_plate`, sin copy/firma editorial final. El prompt declara una transformación principal y locks

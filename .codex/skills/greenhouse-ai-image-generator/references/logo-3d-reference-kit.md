@@ -159,8 +159,14 @@ node -e "const s=require('sharp');s('mascara.png').extractChannel('alpha').raw()
 pnpm ai:image --model gpt-image-2.5-sunburst --image base.png --mask mascara.png --prompt "…"
 ```
 
-**Resultado medido:** zona protegida con diferencia media **4,4/255** (logo y escena intactos) y halo editable
-**39,6** (la sombra y el reflejo nuevos). **Artefacto conocido:** un brillo sucio donde el halo toca el borde del
+**Resultado medido:** zona protegida con diferencia media **4,4/255** y halo editable **39,6** (la sombra y el
+reflejo nuevos). Esa media prueba que la máscara orientó al modelo, **no** que el logo y la escena quedaron intactos:
+el 2026-09-17 una media de 4,85 en zona protegida escondía un delta máximo de **221/255**, porque GPT Image 2.5
+redibuja la imagen entera aunque reciba `--mask`. **Paso 5 obligatorio:** recomponer la salida con el alfa invertido
+de la misma máscara sobre la base y exigir delta máximo 0 en la zona protegida
+([receta](../../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md#la-mascara-no-preserva-pixeles-el-recorte-lo-haces-tu)).
+No es el `reanclar.mjs` descartado de abajo: ese pega el render con borde duro; éste trae de la base sólo lo
+protegido y deja la franja erosionada y el halo del modelo (inferido del método; aún sin medir en una pieza de logo). **Artefacto conocido:** un brillo sucio donde el halo toca el borde del
 remate; se corrige bajando `HALO` o la erosión.
 
 **No omitir la máscara de la escena.** Protegiendo sólo el logo, el modelo conserva el objeto pero **re-dibuja toda
@@ -183,7 +189,8 @@ los fringes).
 3. Color sin deriva frente al render; perspectiva coherente con la escena.
 4. En la **variante B**, además: medir la diferencia media por píxel entre base y salida separando la **zona
    protegida** (alfa opaco de la máscara) del **halo**. La protegida debe quedar cerca de cero; si sube, la máscara
-   no hizo efecto.
+   no hizo efecto. Después recomponer la zona protegida desde la base y exigir **delta máximo 0** ahí: la media baja
+   no garantiza nada (221/255 de máximo con media 4,85, medido 2026-09-17).
 5. **Una letra distinta = regenerar o cambiar de variante.** Nunca entregar «casi igual».
 6. Revisión adversarial con `efeonce-advertising-creative` antes de proponer.
 7. La **firma** de la pieza sigue siendo el SVG oficial compuesto con AXIS: el 3D es el objeto de la escena, nunca

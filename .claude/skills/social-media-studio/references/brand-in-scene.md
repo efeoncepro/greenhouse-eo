@@ -212,58 +212,89 @@ receta universal de seasonality.
 
 - **Usar los kits en imagen o video:** [guía de uso de los kits de marca](../../../../docs/operations/social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md).
 
-## Primer plano desenfocado como lecho de la marca (regla, 2026-09-17)
+## Primer plano desenfocado como lecho de la marca (regla, 2026-09-17; reescrita el mismo día)
 
-Presencia de marca dentro de la fotografía, sin un logo pegado sobre la imagen: se dispara **pasando por delante
-de** un objeto de la propia sala, que sale completamente fuera de foco, y **el logo va DENTRO de ese desenfoque**.
-Pedido del operador: «es como cuando tomas una foto profesional pero delante tienes un objeto que sale
-desenfocado… justo en el desenfoque se pone el logo». Caso fuente: `ai-generations/2026-09-17_claude-o-codex/`.
+Presencia de marca dentro de la fotografía sin un logo pegado encima: el logo se apoya en un plano de la escena
+que sale fuera de foco. Pedido del operador: «es como cuando tomas una foto profesional pero delante tienes un
+objeto que sale desenfocado… justo en el desenfoque se pone el logo». Caso fuente:
+`ai-generations/2026-09-17_claude-o-codex/` (pieza vigente `out/claude-o-codex-4x5-v04.png` sobre
+`plates/plate-v04.png`, **sin objeto añadido**).
 
-### La regla de composición
+> La primera versión de esta regla mandaba añadir un objeto delante de la cámara. Esa premisa quedó **falsada** en
+> el mismo caso: el desenfoque de primer plano ya estaba en la foto. Se medía después; ahora se mide **antes**.
 
-**Se diseña la composición para que el desenfoque caiga donde va el logo, no al revés.** Un objeto bonito en una
-esquina no sirve: si la marca va centrada al pie, el primer plano tiene que ocupar el pie del cuadro. Esa es la
-decisión, y se toma antes de generar nada.
+### Paso 1 — medir el plate limpio antes de añadir nada
 
-### Cuatro intentos rechazados, y el patrón
+Sobre el plate sin marca ni objetos añadidos, medir el **gradiente máximo** de luminancia en cada plano: el rostro
+(plano de foco), la zona donde iría la marca y el fondo. Medición del caso fuente (135 mm, f/2,8):
+
+| Plano | Gradiente máximo |
+|---|---|
+| Rostro (plano de foco) | 314 |
+| Mesa junto a las manos | 39 |
+| **Mesa en el borde inferior** | **5** |
+| Fondo desenfocado | 5 |
+
+El borde cercano de la mesa ya estaba **tan fuera de foco como el fondo**. El logo se compuso ahí, en negativo,
+con **11,36:1** de contraste, sin tocar el plate.
+
+**Decisión:**
+
+- La zona de la marca mide cerca del fondo y lejos del rostro → **no se añade objeto**. Se compone el logo sobre esa
+  superficie (la mesa, el mostrador, el borde del escritorio).
+- La zona mide cerca del rostro (está en foco) → recién entonces se evalúa añadir un objeto, con las reglas de forma
+  de abajo. Antes de eso, probar si otro encuadre o apertura desenfoca la superficie que ya existe.
+
+### La contradicción que hay que tener presente
+
+Un primer plano de verdad **incidental** no cae justo donde firma un logo. Forzarlo a caer ahí es precisamente lo
+que lo delata: el ojo lee que el objeto existe para sostener la marca. Por eso la salida no es buscar un objeto
+mejor, sino reconocer que el primer plano desenfocado casi siempre es **la superficie que ya está en la foto**.
+
+### Cinco intentos rechazados: el patrón del error
 
 | Intento | Por qué se cayó |
 |---|---|
-| Panel de acrílico grande al costado | Choca con la cara y con el gesto |
+| Panel de acrílico al costado | Choca con la cara y con el gesto |
 | Franja de acrílico de borde a borde | «Una franja forzada para desenfocar» |
 | Tapa de portátil asomando sobre la mesa | «Se ve como un cuadrado allí»: forma geométrica y borde recto |
-| Hojas sólo en la esquina inferior izquierda | Bonito, pero **el logo no cabe ahí**: no cumple el objetivo |
+| Hojas sólo en la esquina inferior izquierda | «Si el objeto está a la izquierda no cumple el objetivo» |
+| Follaje cruzando todo el borde inferior | «Parece una selva forzada» |
 
-Los tres primeros comparten el mismo error: **buscar una superficie donde imprimir el logo**. En cuanto el objeto
-existe para sostener la marca, se nota. El cuarto falla por lo contrario: el objeto es honesto pero no está donde
-se necesita.
+Los cinco eran **redundantes**: la mesa ya entregaba el desenfoque, y por eso todos se veían puestos. Tres
+buscaban una superficie donde imprimir el logo; uno era honesto pero no estaba donde iba la marca; el quinto
+cumplía todas las reglas de forma y aun así se leyó forzado. Cumplir la forma no rescata un objeto que sobra.
 
-### Lo que sí funciona
+### Sólo si la medición exige añadir un objeto
 
-- **Un objeto que ya está en la sala** —follaje, una taza, el respaldo de una silla— y la cámara puesta detrás.
+- **Un objeto que tenga razón de estar en la sala** (follaje, una taza, el respaldo de una silla) y la cámara
+  puesta detrás; nunca un soporte cuya única función sea la marca.
 - **Cruza el borde entero donde va la marca**, no una esquina.
-- **Silueta modulada, y ahí está el oficio:** puntas sueltas y separadas en los **costados**, con huecos desiguales
-  y ninguna paralela; y una masa **baja, ancha y calma** en el **centro**, sin puntas, que es el lecho del logo. Así
-  el objeto se lee orgánico y aun así entrega una superficie tranquila. Declararlo explícito en el prompt:
-  «never a straight edge, never a rectangle, never a band».
-- **Casi una silueta:** más oscuro que todo lo que tiene detrás, con a lo sumo un brillo tenue en un borde donde lo
-  alcanza una luz práctica de la escena.
-- **Que no suba a tapar** la cara ni el gesto que cuenta la foto.
+- **Silueta modulada:** puntas sueltas y separadas en los costados, con huecos desiguales y ninguna paralela; masa
+  baja, ancha y calma en el centro, que es el lecho del logo. Declararlo en el prompt: «never a straight edge,
+  never a rectangle, never a band».
+- **Casi una silueta:** más oscuro que lo que tiene detrás, con a lo sumo un brillo tenue donde lo alcanza una luz
+  práctica de la escena.
+- **Que no suba** a tapar la cara ni el gesto que cuenta la foto.
+- Un objeto añadido con pasada enmascarada exige recomponer sobre el plate original: la máscara no preserva
+  píxeles (ver [editar una zona de una imagen](../../../../docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md)).
 
 ### Cómo se eligen los valores — nada a ojo
 
 | Parámetro | Cómo se fija |
 |---|---|
-| Nitidez del logo | Ninguna. El desenfoque es del objeto; la marca se lee. Un logo borroso no firma nada |
-| Posición | En el eje de la pieza, dentro de la masa calma del centro |
-| Color | Por la **luminancia medida** del lecho: masa oscura → negativo; clara → navy |
-| Tamaño | Holgado dentro de la masa calma, sin tocar las puntas de los costados |
+| Nitidez del logo | Ninguna. El desenfoque es del lecho; la marca se lee. Un logo borroso no firma nada |
+| Posición | En el eje de la pieza, sobre el lecho medido como desenfocado |
+| Color | Por la **luminancia medida** del lecho: oscuro → negativo; claro → navy |
+| Tamaño | Holgado dentro del lecho, sin tocar zonas con gradiente alto |
 
 ### QA, dos números
 
-1. **Contraste** del logo contra el píxel más claro de su lecho **≥ 4,5:1** — medido **12,58:1**.
-2. **Blandura del primer plano:** gradiente máximo **dentro del objeto**, muy por debajo del del rostro — medido
-   **6** contra **314**. Cuidado al medir: si la caja toca el borde de una mesa o una mano, el número se dispara y
-   miente (una medición contaminada dio 278). Medir sólo objeto.
+1. **Contraste** del logo contra el píxel más claro de su lecho **≥ 4,5:1**. Vigente: **11,36:1** sobre la mesa
+   (el follaje descartado daba 12,58:1: el contraste no fue lo que lo tumbó).
+2. **Blandura del lecho:** gradiente máximo **dentro del lecho**, del orden del fondo y muy por debajo del rostro.
+   Vigente: **5** contra **314**. **Trampa de medición:** si la caja toca el borde de una mesa, una mano u otro
+   plano en foco, el número se dispara y miente — una caja que tocaba la mesa dio **278** y hacía parecer el
+   primer plano tan nítido como la cara. Medir sólo dentro del lecho.
 
 **Límites.** Una sola aparición por pieza. Nunca sobre la cara ni cruzando la mirada.

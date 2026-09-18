@@ -165,7 +165,21 @@ Contrato observado al componer piezas reales (2026-09-16, [bitácora](../../../d
 - los colaboradores sólo se anclan en esquinas (`collaborator-anchor-not-corner`); un cursor `moving` no lleva
   `targetId` (`moving-cursor-must-not-target-selection`);
 - las etiquetas de esquina se ubican fuera del objeto: deja aire lateral (en 1080 px, un titular a ≤ ~64 % del ancho)
-  y exige `evidence.withinCanvas` antes de exportar;
+  y exige `evidence.withinCanvas` antes de exportar (necesario, no suficiente: ver el caso sobre fotografía abajo);
 - `renderCollaborationSelection` emite etiquetas como `<text>`; si el rasterizador no garantiza Poppins, conviértelas a
   trazados con la fuente real en la misma posición y falla si queda algún `<text>`;
 - las etiquetas quedan pequeñas por contrato: no cargues en ellas información que la pieza necesite leer.
+
+Sobre una **fotografía** (primer uso, 2026-09-17, «¿Claude o Codex?», `ai-generations/2026-09-17_claude-o-codex/`):
+
+- receta: `resolveCollaborationSelectionIntent` → `renderCollaborationSelection` con `targetBounds` = caja de
+  **tinta** del titular (no la métrica de la fuente); etiquetas a trazos con fontkit, porque el render no tiene
+  fuentes instaladas;
+- con **dos colaboradores** el aire lateral se paga dos veces, porque etiquetas y cursores viven **fuera** de la caja
+  del objetivo: el titular al 66 % del ancho sacaba las etiquetas del lienzo por ambos lados; funcionó al 58 % con
+  los colaboradores anclados arriba (`top-start` y `top-end`), que además los aleja de la coronilla del retratado;
+- **`evidence.withinCanvas: true` no prueba que la etiqueta respire**: puede dar `true` con la placa pegada al
+  borde. Mira el render en ese borde antes de exportar;
+- los colaboradores pueden ser **mascotas de partners** disputándose el objeto (Clawd `#d77757`, Codex `#2f67db`
+  medido sobre el plate, no inventado): la decisión del titular es el objeto seleccionado.
+  `presentation.participantColors` acepta sólo `#rrggbb`.
