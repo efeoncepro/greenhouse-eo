@@ -15,7 +15,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -28,7 +28,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `Diseno`
+- Status real: `Discovery`
 - Rank: `TBD`
 - Domain: `platform|identity|ops|data`
 - Blocked by: `none`
@@ -184,6 +184,30 @@ El Grader tiene un enlace activo por reporte y estado especializado; no cubre lo
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Plan de ejecución (2026-09-18, discovery Claude greenhouse-eo-91)
+
+**Decisiones del operador (2026-09-18):**
+
+1. **Bearer nunca persistido.** Sólo digest. Fallo definitivo de envío ⇒ revocar ese grant y emitir uno nuevo al
+   reintentar; resultado ambiguo ⇒ no se reintenta hasta reconciliar. No se crea primitive de cifrado.
+2. **Schedules V1 = borrador + render.** Cada ocurrencia crea la edición y pide el render; queda en revisión humana.
+   Autoemisión/autoenvío no existen en V1 (follow-up), por lo que nunca ocurren sin autorización.
+3. **PDF adjunto opt-in en V1.** Segundo EmailType no sensible para el adjunto (el modo `token_sensitive` rechaza
+   adjuntos); el intent declara la irrevocabilidad y el adjunto nunca viaja con un ShareGrant en el mismo correo.
+4. **Frontera: hasta staging.** Push a `develop`, flags en staging (Vercel + `ops-worker`) y canary sintético de dos
+   organizaciones. Producción, release y federación en el repo `efeonce-mcp` quedan fuera de esta sesión.
+
+**Hallazgos de discovery que corrigen la spec:** el enlace del Grader guarda el token en claro y sin cabeceras
+anti-índice (no es modelo; se usan el token del talent pool y las cabeceras de `hiring/assessment/public-session`);
+`sendEmail()` no tiene idempotency key y un timeout previo al id queda `failed` sin `resend_id` ⇒ dedupe en tablas
+propias; `email_type_config` falla abierto ⇒ seed `enabled=FALSE`; `durableSensitiveSource` descarta correlación de
+tipos no listados; no hay redacción de token en path para Sentry; `downloadPrivateAsset` exige `actorUserId` string;
+no existe resolver de período relativo; el resolver Teams sólo resuelve members (cliente ⇒ `unavailable`); la ruta de
+portal destino del deep link la construye TASK-1849.
+
+**Slices:** 1 grants + reader público + web model + redacción + proxy · 2 intents/recipients + EmailTypes + projection
++ reconciliación + in-app · 3 schedules + tick `ops-worker` + período relativo · 4 conformance, docs, skill, staging.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC

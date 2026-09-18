@@ -987,6 +987,55 @@ export const createGreenhouseMcpServer = (
     async args => handlers.cancelInsightRender(args as { organizationId?: string; renderRunId: string })
   )
 
+  // TASK-1848 — enlaces compartidos. Crear/revocar exige binding interno; ningún binding envía correo.
+  collector.registerTool(
+    'create_insight_share',
+    {
+      title: 'Create Insight Share Link',
+      description:
+        'Create a read-only share link (ShareGrant) for an ISSUED client-audience Efeonce Insights edition. THIS WRITES. Only internal bindings may call it; draft, in-review, withdrawn and internal-audience editions are rejected (not_ready). The link opens only that edition on the public viewer: it never opens the library, creates editions, sends email or acts as the client. Optional: expiresInDays (1-90, default 30), downloadOutputs (subset of the edition outputs among deck_pdf and report_pdf; empty means view only) and a label. The link is returned ONCE and cannot be recovered later: hand it to the human who asked and never paste it into logs, tickets or shared channels. Up to 20 active links per edition (quota_exceeded beyond that). A service_unavailable with code sharing_disabled means sharing is off in this runtime — report it and stop.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        editionId: z.string().trim().min(1),
+        expiresInDays: z.number().int().min(1).max(90).optional(),
+        downloadOutputs: z.array(z.enum(['deck_pdf', 'report_pdf'])).optional(),
+        label: z.string().trim().min(1).max(120).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.createInsightShare(args as { organizationId?: string; editionId: string; expiresInDays?: number; downloadOutputs?: string[]; label?: string })
+  )
+
+  collector.registerTool(
+    'list_insight_shares',
+    {
+      title: 'List Insight Share Links',
+      description:
+        'List the share links of one Efeonce Insights edition with their status (active, revoked, expired), expiry, allowed downloads and source (manual or delivery). Never returns a token: a lost link cannot be recovered, only revoked and replaced. Access logs are not reading evidence — a hit is never proof that a person read the report.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        editionId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.listInsightShares(args as { organizationId?: string; editionId: string })
+  )
+
+  collector.registerTool(
+    'revoke_insight_share',
+    {
+      title: 'Revoke Insight Share Link',
+      description:
+        'Revoke one share link. THIS WRITES. The next read and the next download through that link fail (410); a revoked link is never reactivated — create a new one if access must be restored. Files already downloaded cannot be revoked; say so when reporting. Idempotent: revoking twice answers idempotent=true. Only internal bindings may call it.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        shareGrantId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.revokeInsightShare(args as { organizationId?: string; shareGrantId: string })
+  )
+
   // ── El registro: una pasada por el manifiesto, en su orden ────────────────
   const coverage = computeGreenhouseMcpToolCoverage({
     manifest: GREENHOUSE_MCP_TOOL_MANIFEST,

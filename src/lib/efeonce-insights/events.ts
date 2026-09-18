@@ -151,3 +151,37 @@ export const publishInsightRenderOutputFailed = (client: OutboxClient, payload: 
     client
   )
 
+
+// ── TASK-1848 — sharing por enlace ──────────────────────────────────────────────────────────
+
+export type InsightShareCreatedPayload = {
+  version: 1
+  shareGrantId: string
+  editionId: string
+  organizationId: string
+  expiresAt: string
+  downloadOutputs: string[]
+  source: 'manual' | 'delivery'
+  actorKind: InsightActorKind
+}
+
+export type InsightShareRevokedPayload = {
+  version: 1
+  shareGrantId: string
+  editionId: string
+  organizationId: string
+  reason: string
+  actorKind: InsightActorKind
+}
+
+export const publishInsightShareCreated = (client: OutboxClient, payload: InsightShareCreatedPayload) =>
+  publishOutboxEvent(
+    { aggregateType: AGGREGATE_TYPES.insightShareGrant, aggregateId: payload.shareGrantId, eventType: EVENT_TYPES.insightShareCreated, payload },
+    client
+  )
+
+export const publishInsightShareRevoked = (client: OutboxClient, payload: InsightShareRevokedPayload) =>
+  publishOutboxEvent(
+    { aggregateType: AGGREGATE_TYPES.insightShareGrant, aggregateId: payload.shareGrantId, eventType: EVENT_TYPES.insightShareRevoked, payload },
+    client
+  )

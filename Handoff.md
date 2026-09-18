@@ -35,6 +35,8 @@ no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creati
 
 **Efeonce Insights — TASK-1845 COMPLETE (2026-09-16):** foundation en producción desde 2026-09-15 (generación ON,
 emisión/IA OFF, gateway v1.5.0, rollback ensayado). Detalle: la task, arquitectura §14 y la skill `efeonce-insights`.
+**TASK-1848 in-progress (2026-09-18, Claude greenhouse-eo-91, `develop`):** sharing/correo/recurrencia de Insights;
+discovery y plan, sin código ni rollout todavía.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
 TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con

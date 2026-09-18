@@ -2,8 +2,8 @@
   "$comment": "GENERADO por pnpm mcp:manifest:generate (TASK-1780). NO editar a mano: el hash y el gate de Greenhouse lo detectan. Greenhouse declara que EXISTE; el gateway decide que CRUZA.",
   "source": "greenhouse-eo/src/mcp/greenhouse/tool-manifest.ts",
   "generator": "pnpm mcp:manifest:generate",
-  "manifestHash": "44680f1d3543bda8bf03eac68bf00f17fa09fee24f01a238a893c785fa0eba5f",
-  "toolCount": 55,
+  "manifestHash": "3b0bbc5a60f1ce2e5b86562ebc713de4cd705ea9d4382920633c56689fe2a920",
+  "toolCount": 58,
   "tools": [
     {
       "name": "preview_client_service_enablement",
@@ -791,6 +791,48 @@
       ],
       "description": "Cancel the pending work of a render run. THIS WRITES. Queued and failed outputs become cancelled; an output that is already rendering cannot be killed and keeps running until it finishes — the response reports cancelled and stillRunning separately, and the run is not marked cancelled while something still runs. Only internal bindings may call it.",
       "descriptionHash": "3d5bd5f8e4e2f7d50a1d7929ffd662f316a6e981630506d5b9fb3c3903cb0e70"
+    },
+    {
+      "name": "create_insight_share",
+      "domain": "insights",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Crea un enlace de lectura (ShareGrant) de una edición emitida; el enlace se devuelve una sola vez y vence.",
+      "inputKeys": [
+        "downloadOutputs",
+        "editionId",
+        "expiresInDays",
+        "label",
+        "organizationId"
+      ],
+      "description": "Create a read-only share link (ShareGrant) for an ISSUED client-audience Efeonce Insights edition. THIS WRITES. Only internal bindings may call it; draft, in-review, withdrawn and internal-audience editions are rejected (not_ready). The link opens only that edition on the public viewer: it never opens the library, creates editions, sends email or acts as the client. Optional: expiresInDays (1-90, default 30), downloadOutputs (subset of the edition outputs among deck_pdf and report_pdf; empty means view only) and a label. The link is returned ONCE and cannot be recovered later: hand it to the human who asked and never paste it into logs, tickets or shared channels. Up to 20 active links per edition (quota_exceeded beyond that). A service_unavailable with code sharing_disabled means sharing is off in this runtime — report it and stop.",
+      "descriptionHash": "3fbd292629b7b55a5c174e7274541db46ce2accbb934dba94319843bda006ac4"
+    },
+    {
+      "name": "list_insight_shares",
+      "domain": "insights",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Enlaces de una edición con su estado (active/revoked/expired); nunca trae el token.",
+      "inputKeys": [
+        "editionId",
+        "organizationId"
+      ],
+      "description": "List the share links of one Efeonce Insights edition with their status (active, revoked, expired), expiry, allowed downloads and source (manual or delivery). Never returns a token: a lost link cannot be recovered, only revoked and replaced. Access logs are not reading evidence — a hit is never proof that a person read the report.",
+      "descriptionHash": "03019bf212ec00210e74a932fab838533fa0912e4362cdf19b035bba99e3b975"
+    },
+    {
+      "name": "revoke_insight_share",
+      "domain": "insights",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Revoca un enlace: la siguiente lectura o descarga falla; lo ya descargado no es revocable.",
+      "inputKeys": [
+        "organizationId",
+        "shareGrantId"
+      ],
+      "description": "Revoke one share link. THIS WRITES. The next read and the next download through that link fail (410); a revoked link is never reactivated — create a new one if access must be restored. Files already downloaded cannot be revoked; say so when reporting. Idempotent: revoking twice answers idempotent=true. Only internal bindings may call it.",
+      "descriptionHash": "466fbfe267c4059d87c2752dbc573295c478044ad3daf54cd734132312e21e1b"
     }
   ]
 }

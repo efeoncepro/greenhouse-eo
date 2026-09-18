@@ -3095,7 +3095,11 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       { capability: 'insights.report.read', action: 'read' },
       { capability: 'insights.edition.create', action: 'create' },
       { capability: 'insights.edition.review', action: 'update' },
-      { capability: 'insights.edition.issue', action: 'approve' }
+      { capability: 'insights.edition.issue', action: 'approve' },
+      // TASK-1848 — enlaces compartidos de ediciones emitidas (crear/listar/revocar).
+      { capability: 'insights.share.manage', action: 'create' },
+      { capability: 'insights.share.manage', action: 'read' },
+      { capability: 'insights.share.manage', action: 'update' }
     ] as const) {
       addEntitlement(entries, {
         module: 'insights',
@@ -3140,6 +3144,14 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
         scope: 'own',
         source: 'role'
       })
+    }
+
+    // TASK-1848 — sólo el ejecutivo del cliente comparte enlaces de SU org (capability explícita,
+    // §7.1): un enlace saca el informe fuera del portal, así que no nace con leer ni con generar.
+    if (hasRole(subject, ROLE_CODES.CLIENT_EXECUTIVE)) {
+      for (const action of ['create', 'read', 'update'] as const) {
+        addEntitlement(entries, { module: 'insights', capability: 'insights.share.manage', action, scope: 'own', source: 'role' })
+      }
     }
   }
 

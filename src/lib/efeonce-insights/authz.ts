@@ -23,13 +23,24 @@ import { InsightsForbiddenError, InsightsNotFoundError } from './errors'
 
 export const INSIGHTS_MODULE_KEY = 'insights_v1'
 
-export type InsightsAccessNeed = 'read' | 'create' | 'review' | 'issue'
+export type InsightsAccessNeed = 'read' | 'create' | 'review' | 'issue' | 'share_read' | 'share_create' | 'share_revoke'
 
-const NEED_TO_CAPABILITY: Record<InsightsAccessNeed, { capability: 'insights.report.read' | 'insights.edition.create' | 'insights.edition.review' | 'insights.edition.issue'; action: 'read' | 'create' | 'update' | 'approve' }> = {
+type InsightsCapabilityKey =
+  | 'insights.report.read'
+  | 'insights.edition.create'
+  | 'insights.edition.review'
+  | 'insights.edition.issue'
+  | 'insights.share.manage'
+
+const NEED_TO_CAPABILITY: Record<InsightsAccessNeed, { capability: InsightsCapabilityKey; action: 'read' | 'create' | 'update' | 'approve' }> = {
   read: { capability: 'insights.report.read', action: 'read' },
   create: { capability: 'insights.edition.create', action: 'create' },
   review: { capability: 'insights.edition.review', action: 'update' },
-  issue: { capability: 'insights.edition.issue', action: 'approve' }
+  issue: { capability: 'insights.edition.issue', action: 'approve' },
+  // TASK-1848 — compartir es una autoridad propia: generar o leer un informe no concede enlaces.
+  share_read: { capability: 'insights.share.manage', action: 'read' },
+  share_create: { capability: 'insights.share.manage', action: 'create' },
+  share_revoke: { capability: 'insights.share.manage', action: 'update' }
 }
 
 export interface InsightsAccessInput {

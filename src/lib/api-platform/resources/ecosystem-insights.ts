@@ -16,9 +16,9 @@ import 'server-only'
 import type { ApiPlatformRequestContext, ApiPlatformSuccessResult } from '@/lib/api-platform/core/context'
 import { ApiPlatformError } from '@/lib/api-platform/core/errors'
 import { buildApiPlatformPaginationMeta, parseApiPlatformPaginationParams } from '@/lib/api-platform/core/pagination'
-import { cancelInsightRender, createInsightEdition, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition } from '@/lib/efeonce-insights/commands'
+import { cancelInsightRender, createInsightEdition, createInsightShare, revokeInsightShare, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition } from '@/lib/efeonce-insights/commands'
 import { isInsightEditionState, type InsightEditionState } from '@/lib/efeonce-insights/contracts/states'
-import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsightRenderRuns, readInsightReport, readInsightReports, readInsightsCatalog } from '@/lib/efeonce-insights/readers'
+import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsightShares, readInsightRenderRuns, readInsightReport, readInsightReports, readInsightsCatalog } from '@/lib/efeonce-insights/readers'
 import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { ROLE_CODES } from '@/config/role-codes'
 
@@ -189,3 +189,29 @@ export const cancelEcosystemInsightRenderPayload = async ({ context, request, bo
     return { data: { run: result.run, outputs: result.outputs, cancelled: result.cancelled, stillRunning: result.stillRunning, idempotent: result.idempotent }, status: 200 }
   })
 
+
+// ── TASK-1848 — enlaces compartidos por el lane ecosystem. Crear/revocar exige binding interno
+// (un binding org-scoped no comparte: su sujeto sintético no tiene `insights.share.manage`). ──
+
+export const createEcosystemInsightSharePayload = async ({ context, request, body, editionId }: { context: ApiPlatformRequestContext; request: Request; body: unknown; editionId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => {
+    const scope = resolveScope(context, request, body)
+
+    assertWrite(scope)
+
+    return { data: await createInsightShare({ ...scope, editionId, options: body }), status: 201 }
+  })
+
+export const listEcosystemInsightSharesPayload = async ({ context, request, editionId }: { context: ApiPlatformRequestContext; request: Request; editionId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => ({ data: (await readInsightShares({ ...resolveScope(context, request), editionId })).items }))
+
+export const revokeEcosystemInsightSharePayload = async ({ context, request, body, shareGrantId }: { context: ApiPlatformRequestContext; request: Request; body: unknown; shareGrantId: string }): Payload<unknown> =>
+  withInsightsErrors(async () => {
+    const scope = resolveScope(context, request, body)
+
+    assertWrite(scope)
+
+    const result = await revokeInsightShare({ ...scope, shareGrantId })
+
+    return { data: { share: result.share, idempotent: result.idempotent }, status: 200 }
+  })

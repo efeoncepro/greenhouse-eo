@@ -43,6 +43,10 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_insights.insight_render_runs',
   'greenhouse_insights.insight_outputs',
   'greenhouse_insights.insight_render_events',
+  // TASK-1848 — sharing por enlace: grant (sólo digest), access log mínimo y cubeta de rate limit.
+  'greenhouse_insights.insight_share_grants',
+  'greenhouse_insights.insight_share_access_events',
+  'greenhouse_insights.insight_share_rate_buckets',
   // Outbox canónico (vía publishOutboxEvent; el literal no aparece aquí, se lista por completitud).
   'greenhouse_sync.outbox_events'
 ])

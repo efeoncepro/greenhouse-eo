@@ -11,9 +11,9 @@ import type { AppPlatformRequestContext } from '@/lib/api-platform/core/app-auth
 import { ApiPlatformError } from '@/lib/api-platform/core/errors'
 import { buildApiPlatformPaginationMeta, parseApiPlatformPaginationParams } from '@/lib/api-platform/core/pagination'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
-import { cancelInsightRender, createInsightEdition, issueInsightEdition, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition, withdrawInsightEdition } from '@/lib/efeonce-insights/commands'
+import { cancelInsightRender, createInsightEdition, createInsightShare, revokeInsightShare, issueInsightEdition, recoverInsightEdition, requestInsightRender, retryInsightRender, reviseInsightEdition, withdrawInsightEdition } from '@/lib/efeonce-insights/commands'
 import { isInsightEditionState, type InsightEditionState } from '@/lib/efeonce-insights/contracts/states'
-import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsightRenderRuns, readInsightReport, readInsightReports, readInsightsCatalog } from '@/lib/efeonce-insights/readers'
+import { readInsightEdition, readInsightEditions, readInsightRenderRun, readInsightShares, readInsightRenderRuns, readInsightReport, readInsightReports, readInsightsCatalog } from '@/lib/efeonce-insights/readers'
 
 import { withInsightsErrors } from './insights-errors'
 
@@ -139,3 +139,18 @@ export const cancelAppInsightRender = async ({ context, request, body, renderRun
     return { data: { run: result.run, outputs: result.outputs, cancelled: result.cancelled, stillRunning: result.stillRunning, idempotent: result.idempotent }, status: 200 }
   })
 
+
+// ── TASK-1848 — enlaces compartidos (ShareGrant). El token sale UNA vez, en la respuesta de crear. ──
+
+export const createAppInsightShare = async ({ context, request, body, editionId }: { context: AppPlatformRequestContext; request: Request; body: unknown; editionId: string }) =>
+  withInsightsErrors(async () => ({ data: await createInsightShare({ ...resolveScope(context, request, body), editionId, options: body }), status: 201 }))
+
+export const listAppInsightShares = async ({ context, request, editionId }: { context: AppPlatformRequestContext; request: Request; editionId: string }) =>
+  withInsightsErrors(async () => ({ data: (await readInsightShares({ ...resolveScope(context, request), editionId })).items }))
+
+export const revokeAppInsightShare = async ({ context, request, body, shareGrantId }: { context: AppPlatformRequestContext; request: Request; body: unknown; shareGrantId: string }) =>
+  withInsightsErrors(async () => {
+    const result = await revokeInsightShare({ ...resolveScope(context, request, body), shareGrantId })
+
+    return { data: { share: result.share, idempotent: result.idempotent }, status: 200 }
+  })

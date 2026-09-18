@@ -457,6 +457,28 @@ export const GREENHOUSE_MCP_TOOL_MANIFEST: readonly GreenhouseMcpToolManifestEnt
     writes: true,
     spendsProviderBudget: false,
     purpose: 'Cancela el trabajo pendiente de un run; lo que ya está renderizando termina solo y se reporta honesto.'
+  },
+  // ── Efeonce Insights (TASK-1848) — enlaces compartidos de ediciones emitidas ──
+  {
+    name: 'create_insight_share',
+    domain: 'insights',
+    writes: true,
+    spendsProviderBudget: false,
+    purpose: 'Crea un enlace de lectura (ShareGrant) de una edición emitida; el enlace se devuelve una sola vez y vence.'
+  },
+  {
+    name: 'list_insight_shares',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Enlaces de una edición con su estado (active/revoked/expired); nunca trae el token.'
+  },
+  {
+    name: 'revoke_insight_share',
+    domain: 'insights',
+    writes: true,
+    spendsProviderBudget: false,
+    purpose: 'Revoca un enlace: la siguiente lectura o descarga falla; lo ya descargado no es revocable.'
   }
 ] as const
 

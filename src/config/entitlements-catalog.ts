@@ -2441,7 +2441,9 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   { key: 'insights.report.read', module: 'insights', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'insights.edition.create', module: 'insights', actions: ['create'] as const, defaultScope: 'tenant' },
   { key: 'insights.edition.review', module: 'insights', actions: ['update'] as const, defaultScope: 'tenant' },
-  { key: 'insights.edition.issue', module: 'insights', actions: ['approve'] as const, defaultScope: 'tenant' }
+  { key: 'insights.edition.issue', module: 'insights', actions: ['approve'] as const, defaultScope: 'tenant' },
+  // TASK-1848 — compartir por enlace es autoridad propia (§7.1): leer/generar/emitir no la concede.
+  { key: 'insights.share.manage', module: 'insights', actions: ['create', 'read', 'update'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

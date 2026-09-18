@@ -23,3 +23,10 @@ export const isInsightsAuthoringAiEnabled = (env: NodeJS.ProcessEnv = process.en
  * DOS runtimes — Vercel (command de encolado) y el artifact-worker (claim) — y debe estar ON en ambos.
  */
 export const isInsightsRenderEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.INSIGHTS_RENDER_ENABLED)
+
+/**
+ * TASK-1848 — habilita crear/revocar enlaces compartidos y servir el reader público por token.
+ * Se lee SÓLO en Vercel (commands + `/api/public/insights/shared/**`). Con el flag OFF el reader
+ * público responde 404 (no revela que el token existió) y los commands `sharing_disabled` (503).
+ */
+export const isInsightsSharingEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => isOn(env.INSIGHTS_SHARING_ENABLED)

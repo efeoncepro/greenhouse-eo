@@ -23,6 +23,7 @@ export type InsightsErrorCode =
   | 'quota_exceeded'
   | 'render_disabled'
   | 'render_rejected'
+  | 'sharing_disabled'
 
 export class InsightsError extends Error {
   readonly code: InsightsErrorCode
@@ -156,5 +157,21 @@ export class InsightsRenderDisabledError extends InsightsError {
 export class InsightsRenderRejectedError extends InsightsError {
   constructor(message: string, details: Record<string, unknown> = {}) {
     super('render_rejected', message, 422, details)
+  }
+}
+
+/** TASK-1848 — el sharing por enlace no está habilitado en este runtime (`INSIGHTS_SHARING_ENABLED`). */
+export class InsightsSharingDisabledError extends InsightsError {
+  constructor() {
+    super('sharing_disabled', 'El sharing de Insights no está habilitado en este runtime', 503)
+    this.name = 'InsightsSharingDisabledError'
+  }
+}
+
+/** TASK-1848 — cuota por edición/organización agotada (enlaces activos, envíos, schedules). */
+export class InsightsQuotaExceededError extends InsightsError {
+  constructor(message: string, details: Record<string, unknown> = {}) {
+    super('quota_exceeded', message, 429, details)
+    this.name = 'InsightsQuotaExceededError'
   }
 }

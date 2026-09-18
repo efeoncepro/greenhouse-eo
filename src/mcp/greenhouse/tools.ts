@@ -221,6 +221,9 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getInsightRenderRun'
   | 'retryInsightRender'
   | 'cancelInsightRender'
+  | 'createInsightShare'
+  | 'listInsightShares'
+  | 'revokeInsightShare'
   | 'getMcpSkill'
 >) => ({
   /**
@@ -736,6 +739,38 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         return `Render run ${input.renderRunId}: cancelled=${String(data.cancelled ?? 0)}, stillRunning=${String(data.stillRunning ?? 0)}; state=${String(data.run?.state ?? 'unknown')} (${result.requestId}).`
       },
       () => client.cancelInsightRender(input)
+    )
+  },
+  // ── TASK-1848 — enlaces compartidos ──────────────────────────────────────
+  async createInsightShare(input: { organizationId?: string; editionId: string; expiresInDays?: number; downloadOutputs?: string[]; label?: string }) {
+    return callTool(
+      result => {
+        const data = result.data as { share?: { shareGrantId?: string; expiresAt?: string; downloadOutputs?: string[] }; url?: string }
+
+        return `Share link ${String(data.share?.shareGrantId ?? 'unknown')} created; expires ${String(data.share?.expiresAt ?? 'unknown')}; downloads=[${(data.share?.downloadOutputs ?? []).join(', ')}]. The link is shown only once: hand it to the human who asked, never log it (${result.requestId}).`
+      },
+      () => client.createInsightShare(input)
+    )
+  },
+  async listInsightShares(input: { organizationId?: string; editionId: string }) {
+    return callTool(
+      result => {
+        const items = Array.isArray(result.data) ? (result.data as Array<{ status: string }>) : []
+        const active = items.filter(item => item.status === 'active').length
+
+        return `Share links for edition ${input.editionId}: ${String(items.length)} total, ${String(active)} active (${result.requestId}).`
+      },
+      () => client.listInsightShares(input)
+    )
+  },
+  async revokeInsightShare(input: { organizationId?: string; shareGrantId: string }) {
+    return callTool(
+      result => {
+        const data = result.data as { idempotent?: boolean }
+
+        return `Share link ${input.shareGrantId} ${data.idempotent ? 'was already revoked' : 'revoked'}; the next read or download fails (${result.requestId}).`
+      },
+      () => client.revokeInsightShare(input)
     )
   },
   async getSeoEntitlement(input: { organizationId?: string }) {

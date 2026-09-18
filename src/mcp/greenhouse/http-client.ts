@@ -747,6 +747,30 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1848 — enlaces compartidos
+  async createInsightShare(input: { organizationId?: string; editionId: string; expiresInDays?: number; downloadOutputs?: string[]; label?: string }) {
+    return this.request(`/api/platform/ecosystem/insights/editions/${encodeURIComponent(input.editionId)}/shares`, {}, {
+      method: 'POST',
+      body: {
+        organizationId: input.organizationId,
+        ...(input.expiresInDays !== undefined ? { expiresInDays: input.expiresInDays } : {}),
+        ...(input.downloadOutputs ? { downloadOutputs: input.downloadOutputs } : {}),
+        ...(input.label ? { label: input.label } : {})
+      }
+    })
+  }
+
+  async listInsightShares(input: { organizationId?: string; editionId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/editions/${encodeURIComponent(input.editionId)}/shares`, { organizationId: input.organizationId })
+  }
+
+  async revokeInsightShare(input: { organizationId?: string; shareGrantId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/shares/${encodeURIComponent(input.shareGrantId)}/revoke`, {}, {
+      method: 'POST',
+      body: { organizationId: input.organizationId }
+    })
+  }
+
   private async request<TData>(
     path: string,
     query: QueryParams = {},

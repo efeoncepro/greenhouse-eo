@@ -10279,6 +10279,46 @@ export interface GreenhouseInsightsInsightRetentionClasses {
   retention_days: number;
 }
 
+export interface GreenhouseInsightsInsightShareAccessEvents {
+  access_event_id: Generated<Int8>;
+  access_kind: string;
+  client_hint: Generated<string>;
+  created_at: Generated<Timestamp>;
+  edition_id: string | null;
+  organization_id: string | null;
+  outcome: string;
+  output: string | null;
+  share_grant_id: string | null;
+  subject_hash: string | null;
+}
+
+export interface GreenhouseInsightsInsightShareGrants {
+  audience: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by_actor_kind: string;
+  created_by_user_id: string | null;
+  download_outputs: Generated<string[]>;
+  edition_id: string;
+  expires_at: Timestamp;
+  label: string | null;
+  organization_id: string;
+  revoke_reason: string | null;
+  revoked_at: Timestamp | null;
+  revoked_by_actor_kind: string | null;
+  revoked_by_user_id: string | null;
+  share_grant_id: Generated<string>;
+  source: Generated<string>;
+  token_digest: string;
+}
+
+export interface GreenhouseInsightsInsightShareRateBuckets {
+  action: string;
+  hit_count: number;
+  subject_hash: string;
+  updated_at: Generated<Timestamp>;
+  window_started_at: Timestamp;
+}
+
 export interface GreenhouseKnowledgeKnowledgeChunks {
   agentic_policy: Generated<string>;
   allowed_scopes: Generated<string[]>;
@@ -13949,6 +13989,9 @@ export interface DB {
   "greenhouse_insights.insight_render_runs": GreenhouseInsightsInsightRenderRuns;
   "greenhouse_insights.insight_reports": GreenhouseInsightsInsightReports;
   "greenhouse_insights.insight_retention_classes": GreenhouseInsightsInsightRetentionClasses;
+  "greenhouse_insights.insight_share_access_events": GreenhouseInsightsInsightShareAccessEvents;
+  "greenhouse_insights.insight_share_grants": GreenhouseInsightsInsightShareGrants;
+  "greenhouse_insights.insight_share_rate_buckets": GreenhouseInsightsInsightShareRateBuckets;
   "greenhouse_knowledge.knowledge_chunks": GreenhouseKnowledgeKnowledgeChunks;
   "greenhouse_knowledge.knowledge_document_versions": GreenhouseKnowledgeKnowledgeDocumentVersions;
   "greenhouse_knowledge.knowledge_documents": GreenhouseKnowledgeKnowledgeDocuments;
