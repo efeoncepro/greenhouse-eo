@@ -137,6 +137,8 @@ export const AGGREGATE_TYPES = {
   insightShareGrant: 'insight_share_grant',
   // TASK-1848 — encargo de envío por correo de una edición emitida
   insightDeliveryIntent: 'insight_delivery_intent',
+  // TASK-1848 — recurrencia de ediciones
+  insightSchedule: 'insight_schedule',
   quotationLineItem: 'quotation_line_item',
   quotationLineCostOverride: 'quotation_line_cost_override',
   commercialCapacity: 'commercial_capacity',
@@ -623,6 +625,9 @@ export const EVENT_TYPES = {
   insightShareRevoked: 'insights.share.revoked',
   // TASK-1848 — envío por correo (payload: ids, modalidad, cantidad; NUNCA correos ni bearer)
   insightDeliveryRequested: 'insights.delivery.requested',
+  // TASK-1848 — recurrencia (payload: ids, estado, versión; nunca plantilla ni autoridad)
+  insightScheduleChanged: 'insights.schedule.changed',
+  insightScheduleOccurrenceGenerated: 'insights.schedule.occurrence_generated',
   quotationDiscountHealthAlert: 'commercial.discount.health_alert',
 
   // Commercial Deals (TASK-453)

@@ -53,3 +53,37 @@ describe('TASK-1845 — resolución de ventanas', () => {
     ).toThrow(InsightsInvalidWindowError)
   })
 })
+
+describe('resolveClosedInsightPeriods (TASK-1848)', () => {
+  it('mes anterior = mes calendario, respeta consolidación en la zona y ordena del más antiguo al más reciente', async () => {
+    const { resolveClosedInsightPeriods } = await import('./window')
+
+    // 3 de septiembre 12:00 UTC en Santiago: sin consolidación el último cerrado es agosto.
+    expect(resolveClosedInsightPeriods({ cadence: 'monthly', timeZone: 'America/Santiago', consolidationDays: 0, count: 1, now: new Date('2026-09-03T12:00:00Z') }))
+      .toEqual([{ start: '2026-08-01', endExclusive: '2026-09-01' }])
+
+    // Con 5 días de consolidación, el 3 de septiembre agosto todavía no cuenta: el último es julio.
+    expect(resolveClosedInsightPeriods({ cadence: 'monthly', timeZone: 'America/Santiago', consolidationDays: 5, count: 2, now: new Date('2026-09-03T12:00:00Z') }))
+      .toEqual([{ start: '2026-06-01', endExclusive: '2026-07-01' }, { start: '2026-07-01', endExclusive: '2026-08-01' }])
+
+    // Febrero bisiesto: el mes tiene 29 días, no 30.
+    expect(resolveClosedInsightPeriods({ cadence: 'monthly', timeZone: 'UTC', consolidationDays: 0, count: 1, now: new Date('2028-03-10T00:00:00Z') }))
+      .toEqual([{ start: '2028-02-01', endExclusive: '2028-03-01' }])
+  })
+
+  it('el día civil es el de la zona, no el UTC', async () => {
+    const { resolveClosedInsightPeriods } = await import('./window')
+
+    // 1 de octubre 02:00 UTC = 30 de septiembre 23:00 en Santiago (UTC-3): septiembre aún no cierra allá.
+    expect(resolveClosedInsightPeriods({ cadence: 'monthly', timeZone: 'America/Santiago', consolidationDays: 0, count: 1, now: new Date('2026-10-01T02:00:00Z') }))
+      .toEqual([{ start: '2026-08-01', endExclusive: '2026-09-01' }])
+  })
+
+  it('semana ISO lunes a lunes', async () => {
+    const { resolveClosedInsightPeriods } = await import('./window')
+
+    // Jueves 17 de septiembre 2026: la última semana cerrada es lun 7 → lun 14.
+    expect(resolveClosedInsightPeriods({ cadence: 'weekly', timeZone: 'UTC', consolidationDays: 0, count: 1, now: new Date('2026-09-17T10:00:00Z') }))
+      .toEqual([{ start: '2026-09-07', endExclusive: '2026-09-14' }])
+  })
+})

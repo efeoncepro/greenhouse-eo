@@ -236,3 +236,62 @@ export const resolveInsightWindows = (
 
   return { current, comparison: comparisonWindow, comparisonRule: comparison.kind }
 }
+
+// ── TASK-1848 — períodos relativos para la recurrencia ──────────────────────────────────────
+
+export type InsightScheduleCadence = 'weekly' | 'monthly'
+
+/** Día civil de `now` en `timeZone` (no el día UTC: a las 22:00 de Santiago ya es mañana en UTC). */
+export const civilToday = (timeZone: string, now: Date = new Date()): CivilDate => {
+  const parts = new Intl.DateTimeFormat('en-US', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now)
+  const read = (type: string) => Number(parts.find(part => part.type === type)?.value ?? '0')
+
+  return { year: read('year'), month: read('month'), day: read('day') }
+}
+
+const startOfMonth = (date: CivilDate): CivilDate => ({ year: date.year, month: date.month, day: 1 })
+
+const previousMonth = (date: CivilDate): CivilDate => (date.month === 1 ? { year: date.year - 1, month: 12, day: 1 } : { year: date.year, month: date.month - 1, day: 1 })
+
+/** Lunes (ISO) de la semana civil de `date`. */
+const startOfIsoWeek = (date: CivilDate): CivilDate => {
+  const weekday = new Date(Date.UTC(date.year, date.month - 1, date.day)).getUTCDay()
+  const offset = weekday === 0 ? 6 : weekday - 1
+
+  return addCivilDays(date, -offset)
+}
+
+export interface ClosedInsightPeriod {
+  start: string
+  endExclusive: string
+}
+
+/**
+ * Los últimos `count` períodos CERRADOS y ya consolidados, del más antiguo al más reciente.
+ * Un período cuenta sólo cuando su `endExclusive + consolidationDays <= hoy` (civil, en la zona):
+ * «mes anterior» es el mes calendario, jamás 30 días; la semana es ISO (lunes a lunes).
+ */
+export const resolveClosedInsightPeriods = (input: {
+  cadence: InsightScheduleCadence
+  timeZone: string
+  consolidationDays: number
+  count: number
+  now?: Date
+}): ClosedInsightPeriod[] => {
+  if (!isValidTimeZone(input.timeZone)) throw new InsightsInvalidWindowError('timeZone no es una zona IANA válida', { timeZone: input.timeZone })
+
+  // Retroceder la consolidación: lo que está "cerrado y consolidado hoy" es lo cerrado al día (hoy − N).
+  const reference = addCivilDays(civilToday(input.timeZone, input.now), -input.consolidationDays)
+  const periods: ClosedInsightPeriod[] = []
+
+  let endExclusive = input.cadence === 'monthly' ? startOfMonth(reference) : startOfIsoWeek(reference)
+
+  for (let i = 0; i < input.count; i++) {
+    const start = input.cadence === 'monthly' ? previousMonth(endExclusive) : addCivilDays(endExclusive, -7)
+
+    periods.unshift({ start: formatCivilDate(start), endExclusive: formatCivilDate(endExclusive) })
+    endExclusive = start
+  }
+
+  return periods
+}

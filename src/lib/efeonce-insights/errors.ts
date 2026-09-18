@@ -25,6 +25,7 @@ export type InsightsErrorCode =
   | 'render_rejected'
   | 'sharing_disabled'
   | 'delivery_disabled'
+  | 'schedules_disabled'
 
 export class InsightsError extends Error {
   readonly code: InsightsErrorCode
@@ -182,5 +183,13 @@ export class InsightsDeliveryDisabledError extends InsightsError {
   constructor() {
     super('delivery_disabled', 'El envío por correo de Insights no está habilitado en este runtime', 503)
     this.name = 'InsightsDeliveryDisabledError'
+  }
+}
+
+/** TASK-1848 — la recurrencia no está habilitada en este runtime (`INSIGHTS_SCHEDULES_ENABLED`). */
+export class InsightsSchedulesDisabledError extends InsightsError {
+  constructor() {
+    super('schedules_disabled', 'La recurrencia de Insights no está habilitada en este runtime', 503)
+    this.name = 'InsightsSchedulesDisabledError'
   }
 }

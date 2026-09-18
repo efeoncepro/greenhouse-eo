@@ -52,6 +52,9 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_insights.insight_delivery_intents',
   'greenhouse_insights.insight_delivery_recipients',
   'greenhouse_insights.insight_delivery_events',
+  // TASK-1848 — recurrencia: definición versionada y ocurrencias únicas por período.
+  'greenhouse_insights.insight_schedules',
+  'greenhouse_insights.insight_schedule_occurrences',
   // Outbox canónico (vía publishOutboxEvent; el literal no aparece aquí, se lista por completitud).
   'greenhouse_sync.outbox_events'
 ])

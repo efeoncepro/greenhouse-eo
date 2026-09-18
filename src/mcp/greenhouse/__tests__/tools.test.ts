@@ -77,6 +77,8 @@ describe('createGreenhouseMcpHandlers', () => {
       revokeInsightShare: vi.fn(),
       listInsightDeliveries: vi.fn(),
       getInsightDelivery: vi.fn(),
+      listInsightSchedules: vi.fn(),
+      getInsightSchedule: vi.fn(),
       previewClientServiceEnablement: vi.fn(),
       applyClientServiceEnablement: vi.fn(),
       rollbackClientServiceEnablement: vi.fn()
@@ -202,6 +204,8 @@ describe('createGreenhouseMcpHandlers', () => {
       revokeInsightShare: vi.fn(),
       listInsightDeliveries: vi.fn(),
       getInsightDelivery: vi.fn(),
+      listInsightSchedules: vi.fn(),
+      getInsightSchedule: vi.fn(),
       previewClientServiceEnablement: vi.fn(),
       applyClientServiceEnablement: vi.fn(),
       rollbackClientServiceEnablement: vi.fn()

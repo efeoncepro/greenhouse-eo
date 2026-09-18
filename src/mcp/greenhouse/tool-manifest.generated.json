@@ -2,8 +2,8 @@
   "$comment": "GENERADO por pnpm mcp:manifest:generate (TASK-1780). NO editar a mano: el hash y el gate de Greenhouse lo detectan. Greenhouse declara que EXISTE; el gateway decide que CRUZA.",
   "source": "greenhouse-eo/src/mcp/greenhouse/tool-manifest.ts",
   "generator": "pnpm mcp:manifest:generate",
-  "manifestHash": "3b88f9e92b19b8b95522a2c4dfe09640ea07b38ebee6004099f3963988c55253",
-  "toolCount": 60,
+  "manifestHash": "9fc46c8d90d32ff586b1365af169b41e2805c9d0e801873d57dbd84068016cac",
+  "toolCount": 62,
   "tools": [
     {
       "name": "preview_client_service_enablement",
@@ -859,6 +859,31 @@
       ],
       "description": "Read one email delivery of an Efeonce Insights edition with masked recipients, per-recipient state (pending, claimed, accepted, failed, ambiguous, skipped, cancelled), skip reason and transport status. ambiguous means the outcome is unknown and nothing will be resent until a person reconciles it against the email ledger — report it as unresolved, never as sent or failed.",
       "descriptionHash": "25fb7d6d74b7d3cdd53cbd17ab331694f51d3cf32bbffeeb1bb15ed28d966ef0"
+    },
+    {
+      "name": "list_insight_schedules",
+      "domain": "insights",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Recurrencias de Insights de una organización: cadencia, zona, estado y últimas ocurrencias.",
+      "inputKeys": [
+        "organizationId"
+      ],
+      "description": "List the recurring Efeonce Insights schedules of an organization: cadence (weekly, monthly), IANA time zone, consolidation days, state (draft, active, paused, retired) with the pause reason, and their latest occurrences. Each occurrence generates an edition and requests its rendering, then stops at human review: nothing is issued or emailed automatically. Creating, activating, pausing and retiring are human actions in the Greenhouse portal and are not available through MCP.",
+      "descriptionHash": "8dd42300b80201ebf716062fd72be16c22dd1a812320c5be86d6793c1a75d299"
+    },
+    {
+      "name": "get_insight_schedule",
+      "domain": "insights",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Una recurrencia con su plantilla, política de revisión y el resultado de sus últimas ocurrencias.",
+      "inputKeys": [
+        "organizationId",
+        "scheduleId"
+      ],
+      "description": "Read one recurring Efeonce Insights schedule with its request template, review policy (always draft_for_review), catch-up limit and recent occurrences (pending, generating, generated, render_requested, failed, skipped) with the edition each one produced. A paused schedule with reason authority_revoked or module_unavailable stopped itself: report it, do not work around it.",
+      "descriptionHash": "b5ec42afe22bbe8dde0c825dc553bdb43a4db6292f580b6ddd1f8a47bf33a5b6"
     }
   ]
 }

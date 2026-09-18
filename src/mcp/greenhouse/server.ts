@@ -1067,6 +1067,36 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getInsightDelivery(args as { organizationId?: string; deliveryIntentId: string })
   )
 
+  // TASK-1848 — recurrencia: lectura. Crear/activar/pausar/retirar no existen por MCP.
+  collector.registerTool(
+    'list_insight_schedules',
+    {
+      title: 'List Insight Schedules',
+      description:
+        'List the recurring Efeonce Insights schedules of an organization: cadence (weekly, monthly), IANA time zone, consolidation days, state (draft, active, paused, retired) with the pause reason, and their latest occurrences. Each occurrence generates an edition and requests its rendering, then stops at human review: nothing is issued or emailed automatically. Creating, activating, pausing and retiring are human actions in the Greenhouse portal and are not available through MCP.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.listInsightSchedules(args as { organizationId?: string })
+  )
+
+  collector.registerTool(
+    'get_insight_schedule',
+    {
+      title: 'Get Insight Schedule',
+      description:
+        'Read one recurring Efeonce Insights schedule with its request template, review policy (always draft_for_review), catch-up limit and recent occurrences (pending, generating, generated, render_requested, failed, skipped) with the edition each one produced. A paused schedule with reason authority_revoked or module_unavailable stopped itself: report it, do not work around it.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        scheduleId: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getInsightSchedule(args as { organizationId?: string; scheduleId: string })
+  )
+
   // ── El registro: una pasada por el manifiesto, en su orden ────────────────
   const coverage = computeGreenhouseMcpToolCoverage({
     manifest: GREENHOUSE_MCP_TOOL_MANIFEST,

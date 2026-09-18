@@ -23,6 +23,7 @@ import {
   requestInsightDelivery,
   retryInsightDelivery
 } from '@/lib/efeonce-insights/delivery/commands'
+import { createInsightSchedule, readInsightSchedule, readInsightSchedules, transitionInsightScheduleCommand } from '@/lib/efeonce-insights/schedules/commands'
 
 import { withInsightsErrors } from './insights-errors'
 
@@ -199,3 +200,28 @@ export const reconcileAppInsightDeliveryRecipient = async ({ context, request, b
     }),
     status: 200
   }))
+
+// ── TASK-1848 — recurrencia (sólo App lane: la autoridad durable es una persona interna) ──
+
+export const createAppInsightSchedule = async ({ context, request, body }: { context: AppPlatformRequestContext; request: Request; body: unknown }) =>
+  withInsightsErrors(async () => ({ data: await createInsightSchedule({ ...resolveScope(context, request, body), body }), status: 201 }))
+
+export const listAppInsightSchedules = async ({ context, request }: { context: AppPlatformRequestContext; request: Request }) =>
+  withInsightsErrors(async () => ({ data: (await readInsightSchedules(resolveScope(context, request))).items }))
+
+export const getAppInsightSchedule = async ({ context, request, scheduleId }: { context: AppPlatformRequestContext; request: Request; scheduleId: string }) =>
+  withInsightsErrors(async () => ({ data: await readInsightSchedule({ ...resolveScope(context, request), scheduleId }) }))
+
+export const transitionAppInsightSchedule = async ({
+  context,
+  request,
+  body,
+  scheduleId,
+  action
+}: {
+  context: AppPlatformRequestContext
+  request: Request
+  body: unknown
+  scheduleId: string
+  action: 'activate' | 'pause' | 'retire'
+}) => withInsightsErrors(async () => ({ data: await transitionInsightScheduleCommand({ ...resolveScope(context, request, body), scheduleId, action }), status: 200 }))

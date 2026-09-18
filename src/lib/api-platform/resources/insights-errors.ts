@@ -29,7 +29,8 @@ const MAP: Record<InsightsError['code'], { statusCode: number; errorCode: ApiPla
   render_disabled: { statusCode: 503, errorCode: 'service_unavailable' },
   render_rejected: { statusCode: 422, errorCode: 'bad_request' },
   sharing_disabled: { statusCode: 503, errorCode: 'service_unavailable' },
-  delivery_disabled: { statusCode: 503, errorCode: 'service_unavailable' }
+  delivery_disabled: { statusCode: 503, errorCode: 'service_unavailable' },
+  schedules_disabled: { statusCode: 503, errorCode: 'service_unavailable' }
 }
 
 export const toInsightsApiPlatformError = (error: unknown): ApiPlatformError => {

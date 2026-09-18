@@ -494,6 +494,21 @@ export const GREENHOUSE_MCP_TOOL_MANIFEST: readonly GreenhouseMcpToolManifestEnt
     writes: false,
     spendsProviderBudget: false,
     purpose: 'Un envío por correo: modalidad, destinatarios enmascarados, estado y resultado del transporte.'
+  },
+  // ── Efeonce Insights (TASK-1848) — recurrencia: MCP sólo lee (crear/activar exige una persona interna) ──
+  {
+    name: 'list_insight_schedules',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Recurrencias de Insights de una organización: cadencia, zona, estado y últimas ocurrencias.'
+  },
+  {
+    name: 'get_insight_schedule',
+    domain: 'insights',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Una recurrencia con su plantilla, política de revisión y el resultado de sus últimas ocurrencias.'
   }
 ] as const
 

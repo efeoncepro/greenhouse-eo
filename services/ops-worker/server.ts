@@ -162,6 +162,7 @@ import { purgeAssessmentPublicAccessRetention } from '@/lib/hiring/assessment/pu
 import '@/lib/growth/seo/register-provider-spend'
 import { dispatchNextRenderJob } from '@/lib/commercial/tenders/proposals/render-dispatch'
 import { countClaimableInsightOutputs, dispatchNextInsightRender } from '@/lib/efeonce-insights/render/dispatch'
+import { runInsightSchedulesTick } from '@/lib/efeonce-insights/schedules/tick'
 import { isFormsDispatchEnabled } from '@/lib/growth/forms/flags'
 
 import { computeRollingRematerializationWindow } from './finance-rematerialize-seed'
@@ -2570,6 +2571,22 @@ const handleEmailDeliverabilityMonitor = wrapCronHandler({
   }
 })
 
+// ─── /insights/schedules/tick ──────────────────────────────────────────────
+//
+// TASK-1848 — recurrencia de Efeonce Insights: UN job para todas las organizaciones (nunca uno por
+// cliente). Revalida la autoridad durable de cada schedule, crea la ocurrencia única del período y su
+// edición (idempotente), pide el render y la deja en revisión humana. Purga además la retención del
+// access log del reader público por token. Flag `INSIGHTS_SCHEDULES_ENABLED` (declarado en deploy.sh).
+const handleInsightSchedulesTick = wrapCronHandler({
+  name: 'insights-schedules-tick',
+  domain: 'insights',
+  run: async (): Promise<Record<string, unknown>> => {
+    const result = await runInsightSchedulesTick()
+
+    return { ...result }
+  }
+})
+
 // ─── /hiring/talent-pool/reconcile ─────────────────────────────────────────
 //
 // TASK-1723 — Safety-net incremental reconciliation for the person-first Talent
@@ -3244,6 +3261,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/artifact-render/dispatch') {
       await handleArtifactRenderDispatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/insights/schedules/tick') {
+      await handleInsightSchedulesTick(req, res)
 
       return
     }

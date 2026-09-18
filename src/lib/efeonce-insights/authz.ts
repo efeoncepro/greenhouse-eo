@@ -34,6 +34,8 @@ export type InsightsAccessNeed =
   | 'delivery_read'
   | 'delivery_send'
   | 'delivery_manage'
+  | 'schedule_read'
+  | 'schedule_manage'
 
 type InsightsCapabilityKey =
   | 'insights.report.read'
@@ -42,6 +44,7 @@ type InsightsCapabilityKey =
   | 'insights.edition.issue'
   | 'insights.share.manage'
   | 'insights.delivery.send'
+  | 'insights.schedule.manage'
 
 const NEED_TO_CAPABILITY: Record<InsightsAccessNeed, { capability: InsightsCapabilityKey; action: 'read' | 'create' | 'update' | 'approve' }> = {
   read: { capability: 'insights.report.read', action: 'read' },
@@ -55,7 +58,10 @@ const NEED_TO_CAPABILITY: Record<InsightsAccessNeed, { capability: InsightsCapab
   // TASK-1848 — enviar desde Efeonce es autoridad interna: sin scope `own`, un cliente nunca la tiene.
   delivery_read: { capability: 'insights.delivery.send', action: 'read' },
   delivery_send: { capability: 'insights.delivery.send', action: 'create' },
-  delivery_manage: { capability: 'insights.delivery.send', action: 'update' }
+  delivery_manage: { capability: 'insights.delivery.send', action: 'update' },
+  // TASK-1848 — la recurrencia también es interna: una autoridad durable que genera en nombre de alguien.
+  schedule_read: { capability: 'insights.schedule.manage', action: 'read' },
+  schedule_manage: { capability: 'insights.schedule.manage', action: 'update' }
 }
 
 export interface InsightsAccessInput {

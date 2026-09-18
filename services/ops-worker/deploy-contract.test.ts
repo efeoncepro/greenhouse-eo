@@ -22,6 +22,15 @@ describe('ops-worker deploy render dispatch contract', () => {
     // (`gcloud run services describe ops-worker`) y el canary de entrega en staging (runbook de Insights).
     expect(deployScript()).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_DELIVERY_ENABLED=${INSIGHTS_DELIVERY_ENABLED:-true}"')
   })
+
+  it('declares the Insights schedules tick flags and its single scheduler job (TASK-1848)', () => {
+    // Señala, no verifica: el verificador real es la revisión activa y un tick del canary de staging.
+    const script = deployScript()
+
+    expect(script).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_SCHEDULES_ENABLED=${INSIGHTS_SCHEDULES_ENABLED:-true}"')
+    expect(script).toContain('ENV_VARS="${ENV_VARS},INSIGHTS_GENERATION_ENABLED=${INSIGHTS_GENERATION_ENABLED:-true}"')
+    expect(script).toContain('"/insights/schedules/tick"')
+  })
 })
 
 describe('ops-worker deploy Nubox contract', () => {

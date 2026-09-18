@@ -268,6 +268,13 @@ ENV_VARS="${ENV_VARS},INSIGHTS_RENDER_ENABLED=${INSIGHTS_RENDER_ENABLED:-true}"
 # CREAR el intent en Vercel (`requestInsightDelivery`, flag propio) + el kill switch del EmailType en
 # `email_type_config` (nace apagado). Apagarlo acá corta el despacho de ambos ambientes a la vez.
 ENV_VARS="${ENV_VARS},INSIGHTS_DELIVERY_ENABLED=${INSIGHTS_DELIVERY_ENABLED:-true}"
+# 🚩 TASK-1848 — el tick `/insights/schedules/tick` genera las ocurrencias de la recurrencia: lee
+# INSIGHTS_SCHEDULES_ENABLED y, como crea ediciones con `createInsightEdition`, también
+# INSIGHTS_GENERATION_ENABLED (hasta hoy leído sólo en Vercel). Ambos default ON por la misma razón que
+# render/delivery: el ops-worker es único; la puerta por ambiente es crear/activar el schedule en Vercel.
+# La autoría IA (INSIGHTS_AUTHORING_AI_ENABLED) NO se declara: en el worker el plan es determinista.
+ENV_VARS="${ENV_VARS},INSIGHTS_SCHEDULES_ENABLED=${INSIGHTS_SCHEDULES_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},INSIGHTS_GENERATION_ENABLED=${INSIGHTS_GENERATION_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF=${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"
@@ -1330,6 +1337,15 @@ upsert_scheduler_job \
   "/artifact-render/dispatch" \
   '{}'
 echo "  -> ops-artifact-render-dispatch: */2 * * * * (TASK-1391 render queue)"
+
+# TASK-1848 — recurrencia de Efeonce Insights: UN job para todas las organizaciones (nunca uno por
+# cliente). Horario: la ocurrencia depende del cierre + consolidación en la zona de cada schedule.
+upsert_scheduler_job \
+  "ops-insights-schedules-tick" \
+  "20 * * * *" \
+  "/insights/schedules/tick" \
+  '{}'
+echo "  -> ops-insights-schedules-tick: 20 * * * * (TASK-1848 Insights schedules + share retention)"
 
 # TASK-1521 — Freshness is a renewable lease, independent from semantic
 # workspace/member revisions. Five-minute cadence leaves a seven-minute

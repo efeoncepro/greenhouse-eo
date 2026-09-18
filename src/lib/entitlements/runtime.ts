@@ -3103,7 +3103,11 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       // TASK-1848 — envío por correo desde Efeonce (sólo internos que operan la cuenta).
       { capability: 'insights.delivery.send', action: 'create' },
       { capability: 'insights.delivery.send', action: 'read' },
-      { capability: 'insights.delivery.send', action: 'update' }
+      { capability: 'insights.delivery.send', action: 'update' },
+      // TASK-1848 — recurrencia (borradores para revisión; nunca autoemite ni autoenvía).
+      { capability: 'insights.schedule.manage', action: 'create' },
+      { capability: 'insights.schedule.manage', action: 'read' },
+      { capability: 'insights.schedule.manage', action: 'update' }
     ] as const) {
       addEntitlement(entries, {
         module: 'insights',

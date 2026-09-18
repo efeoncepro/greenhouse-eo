@@ -10335,6 +10335,44 @@ export interface GreenhouseInsightsInsightRetentionClasses {
   retention_days: number;
 }
 
+export interface GreenhouseInsightsInsightScheduleOccurrences {
+  attempts: Generated<number>;
+  created_at: Generated<Timestamp>;
+  edition_id: string | null;
+  failure_code: string | null;
+  occurrence_id: Generated<string>;
+  organization_id: string;
+  period_end_exclusive: Timestamp;
+  period_start: Timestamp;
+  render_run_id: string | null;
+  schedule_id: string;
+  schedule_version: number;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseInsightsInsightSchedules {
+  activated_at: Timestamp | null;
+  authorized_by_actor_kind: string;
+  authorized_by_user_id: string;
+  cadence: string;
+  catch_up_limit: Generated<number>;
+  consolidation_days: Generated<number>;
+  created_at: Generated<Timestamp>;
+  label: string;
+  organization_id: string;
+  pause_reason: string | null;
+  paused_at: Timestamp | null;
+  request_template: Json;
+  retired_at: Timestamp | null;
+  review_policy: Generated<string>;
+  schedule_id: Generated<string>;
+  schedule_version: Generated<number>;
+  state: Generated<string>;
+  time_zone: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseInsightsInsightShareAccessEvents {
   access_event_id: Generated<Int8>;
   access_kind: string;
@@ -14048,6 +14086,8 @@ export interface DB {
   "greenhouse_insights.insight_render_runs": GreenhouseInsightsInsightRenderRuns;
   "greenhouse_insights.insight_reports": GreenhouseInsightsInsightReports;
   "greenhouse_insights.insight_retention_classes": GreenhouseInsightsInsightRetentionClasses;
+  "greenhouse_insights.insight_schedule_occurrences": GreenhouseInsightsInsightScheduleOccurrences;
+  "greenhouse_insights.insight_schedules": GreenhouseInsightsInsightSchedules;
   "greenhouse_insights.insight_share_access_events": GreenhouseInsightsInsightShareAccessEvents;
   "greenhouse_insights.insight_share_grants": GreenhouseInsightsInsightShareGrants;
   "greenhouse_insights.insight_share_rate_buckets": GreenhouseInsightsInsightShareRateBuckets;

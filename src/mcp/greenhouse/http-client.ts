@@ -780,6 +780,15 @@ export class GreenhouseApiPlatformClient {
     return this.request(`/api/platform/ecosystem/insights/deliveries/${encodeURIComponent(input.deliveryIntentId)}`, { organizationId: input.organizationId })
   }
 
+  // TASK-1848 — recurrencia (lectura)
+  async listInsightSchedules(input: { organizationId?: string }) {
+    return this.request('/api/platform/ecosystem/insights/schedules', { organizationId: input.organizationId })
+  }
+
+  async getInsightSchedule(input: { organizationId?: string; scheduleId: string }) {
+    return this.request(`/api/platform/ecosystem/insights/schedules/${encodeURIComponent(input.scheduleId)}`, { organizationId: input.organizationId })
+  }
+
   private async request<TData>(
     path: string,
     query: QueryParams = {},

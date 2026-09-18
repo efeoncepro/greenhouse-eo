@@ -226,6 +226,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'revokeInsightShare'
   | 'listInsightDeliveries'
   | 'getInsightDelivery'
+  | 'listInsightSchedules'
+  | 'getInsightSchedule'
   | 'getMcpSkill'
 >) => ({
   /**
@@ -795,6 +797,28 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         return `Delivery ${input.deliveryIntentId} ${String(data.modality ?? '')} state=${String(data.state ?? 'unknown')}; recipients=[${recipients}]. Accepted by the provider is not delivered, and neither is proof of reading (${result.requestId}).`
       },
       () => client.getInsightDelivery(input)
+    )
+  },
+  // ── TASK-1848 — recurrencia (lectura) ────────────────────────────────────
+  async listInsightSchedules(input: { organizationId?: string }) {
+    return callTool(
+      result => {
+        const items = Array.isArray(result.data) ? (result.data as Array<{ state: string; cadence: string }>) : []
+
+        return `Insight schedules: ${String(items.length)} (${items.map(item => `${item.cadence}:${item.state}`).join(', ') || 'none'}) (${result.requestId}).`
+      },
+      () => client.listInsightSchedules(input)
+    )
+  },
+  async getInsightSchedule(input: { organizationId?: string; scheduleId: string }) {
+    return callTool(
+      result => {
+        const data = result.data as { state?: string; cadence?: string; pauseReason?: string | null; recentOccurrences?: Array<{ periodStart: string; state: string }> }
+        const occurrences = (data.recentOccurrences ?? []).slice(0, 3).map(o => `${o.periodStart}:${o.state}`).join(', ')
+
+        return `Schedule ${input.scheduleId} ${String(data.cadence ?? '')} state=${String(data.state ?? 'unknown')}${data.pauseReason ? ` (paused: ${data.pauseReason})` : ''}; recent=[${occurrences}]. Occurrences end in review; nothing is issued or sent automatically (${result.requestId}).`
+      },
+      () => client.getInsightSchedule(input)
     )
   },
   async getSeoEntitlement(input: { organizationId?: string }) {
