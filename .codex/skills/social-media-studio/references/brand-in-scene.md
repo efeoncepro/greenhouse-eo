@@ -234,19 +234,25 @@ bordes laterales visibles, y entonces sólo puede sangrar por abajo.
 queda **bajo las manos** es el único sitio limpio a todo lo ancho; un panel lateral choca con la cara o con el
 gesto. Medir dónde termina el sujeto antes de elegir la zona.
 
+**El desenfoque es del OBJETO, no del logo.** Corrección expresa del operador (2026-09-17): en el primer intento se
+desenfocó también la marca, para «respetar» la profundidad de campo, y quedó ilegible. Un logo borroso no firma
+nada. La barra fuera de foco existe para dar **superficie y profundidad**; el logo se apoya encima **nítido** y es
+lo único enfocado de esa zona — ese contraste de nitidez es justamente lo que lo hace destacar sin pelearse con el
+rostro, que está más arriba y en otro plano.
+
 **Cómo componer el logo encima — nada de esto se elige a ojo:**
 
 | Parámetro | Cómo se fija |
 |---|---|
-| Desenfoque | El **sigma medido en el borde del propio objeto**: ancho de la transición de luminancia 10-90 % ÷ 2,56 |
-| Color | Por la luminancia media de la cara del objeto: sobre una cara **clara**, logo navy en `multiply` (lee como impreso); sobre una oscura, negativo en `screen` |
-| Opacidad | La justa para reconocer la forma, no para leerla |
+| Nitidez | El logo va **sin desenfoque**. El objeto ya aporta el fuera de foco |
+| Color | Por la luminancia media de la cara del objeto: sobre una cara **clara**, logo navy en `multiply` (lee como impreso en el acrílico); sobre una oscura, el negativo |
+| Opacidad | Plena. Es una firma, no una marca de agua |
+| Tamaño | Cabe holgado dentro de la cara del objeto, con aire arriba y abajo |
 | Posición | Centrado en el **ancho del objeto**, no en el del lienzo |
 
-**QA, medible:** el gradiente máximo dentro del logo debe quedar **muy por debajo** del de la cara del sujeto y del
-texto. Medido en la pieza fuente: logo en el bokeh **112**, rostro **314**, titular **479**. Si el logo se acerca al
-rostro, está demasiado nítido y se convirtió en un segundo foco: más desenfoque o menos opacidad.
+**QA, medible:** contraste de la tinta del logo contra la cara del objeto **≥ 4,5:1** — medido en la pieza fuente
+**9,17:1** (navy sobre la barra clara). Y verificar que la cara del objeto llegue **limpia** desde el plate: si el
+modelo le dejó un brillo fuerte justo en el centro, el logo cae encima y el contraste se desploma.
 
-**Límites.** Una sola aparición por pieza. Nunca sobre la cara ni cruzando la mirada. No reemplaza la firma legible
-cuando la pieza necesita una: o es la única marca y entonces su silueta tiene que ser reconocible, o hay firma y
-entonces el bokeh es apoyo.
+**Límites.** Una sola aparición por pieza. Nunca sobre la cara ni cruzando la mirada. Si esta es la única marca de
+la pieza, tiene que leerse completa: entonces no hace falta una segunda firma.

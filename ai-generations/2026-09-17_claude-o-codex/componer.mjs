@@ -99,19 +99,18 @@ const cita = shape(CITA, FONTS['Poppins-500'], tamCita, Number.parseFloat(R.stru
 // de foco y con la cara LIMPIA. El logo se apoya ahí, centrado en el ancho de la barra.
 //
 // Tres cosas no se eligen a ojo:
-//   · el desenfoque es el SIGMA MEDIDO en el borde de la propia barra (transición 10-90 % ÷ 2,56);
+//   · el DESENFOQUE es del objeto, no del logo. La barra da la superficie y la profundidad; la
+//     marca se lee. Un logo borroso no firma nada (corrección del operador 2026-09-17);
 //   · sobre una barra clara el logo va en NAVY y en `multiply`, para que lea como impreso en el
 //     acrílico y no como un parche pegado encima;
-//   · la opacidad se queda por debajo de la lectura nítida: es presencia de marca, no un segundo
-//     foco. Si el logo se lee crudo, está mal.
-const BANDA = { cy: 1362, sigma: 7, luminancia: 132 }
-const NIEBLA = ANCHO ? null : { cx: W / 2, cy: BANDA.cy, ancho: Math.round(W * 0.30), sigma: BANDA.sigma, opacidad: 0.62 }
+//   · va centrado en el ANCHO DE LA BARRA, no en el del lienzo.
+const BANDA = { cy: 1362, luminancia: 132 }
+const NIEBLA = ANCHO ? null : { cx: W / 2, cy: BANDA.cy, ancho: Math.round(W * 0.30), opacidad: 1 }
 
 let nieblaCapa = null
 if (NIEBLA) {
   const base = await sharp('public/branding/logo-full.svg', { density: 600 })
     .resize({ width: NIEBLA.ancho })
-    .blur(NIEBLA.sigma)
     .png()
     .toBuffer()
   const { width: nw, height: nh } = await sharp(base).metadata()

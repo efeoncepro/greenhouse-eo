@@ -7,9 +7,10 @@ titular **¿Claude o Codex?** más su línea entre comillas.
 
 `out/claude-o-codex-4x5-v03.png` (1152 × 1440) sobre `plates/plate-final.png`. Tres capas, ninguna generada:
 
-1. **Marca en el primer plano desenfocado** — una barra de acrílico fuera de foco cruza el borde frontal de la mesa
-   con la cara limpia, y el logo navy se apoya centrado en su ancho, con el sigma medido del propio borde (7 px) y
-   `multiply` porque la barra es clara. Regla completa en la skill `social-media-studio`, referencia `brand-in-scene`.
+1. **Marca sobre el primer plano desenfocado** — una barra de acrílico fuera de foco cruza el borde frontal de la
+   mesa con la cara limpia, y el logo navy se apoya **nítido** y centrado en su ancho, en `multiply` porque la barra
+   es clara. **El desenfoque es del objeto, no del logo**: el primer intento desenfocó también la marca y quedó
+   ilegible (corrección del operador). Regla completa en `social-media-studio`, referencia `brand-in-scene`.
 2. **Jerarquía en tres niveles** — titular 98 px dominante · cita 33 px al margen izquierdo, fuera del eje, como un
    aparte humano · la marca sólo en el bokeh. Antes eran titular y subtítulo centrados en el mismo eje: dos tamaños,
    un solo nivel.
@@ -94,8 +95,9 @@ Contraste sobre los píxeles reales, contra el píxel **más claro** de cada zon
 La cita empezó bajo el titular y ahí caía sobre el pelo: **1,17:1**, ilegible. Se movió al margen izquierdo, que es
 donde el fondo deja de ser claro. El contraste de una línea de texto se mide **donde queda**, no donde se diseñó.
 
-**Nitidez del logo en el bokeh** (gradiente máximo): logo **112** · rostro **314** · titular **479**. El logo tiene
-que quedar muy por debajo del rostro; si se acerca, dejó de ser atmósfera y se volvió un segundo foco.
+**Logo sobre la barra desenfocada:** contraste de la tinta contra la cara de la barra **9,17:1**. El logo es lo
+único enfocado de esa zona, y ese contraste de nitidez contra el fondo borroso es lo que lo hace destacar sin
+competir con el rostro, que está en otro plano.
 
 Revisado además a 390 px de ancho: titular y cita siguen legibles. Mascotas verificadas al 100 % (cubos naranja con
 ojos rectangulares; nube azul con `>_` cian en pantalla y blanco en el pecho) y el emblema del polo con la nave a la
