@@ -3,14 +3,23 @@
 Pedido del operador: él **detrás de una mesa, tipo estudio de podcast pero sin micrófono**, con Clawd y Codex, y el
 titular **¿Claude o Codex?** más su línea entre comillas.
 
-## Pieza
+## Piezas
 
-`out/claude-o-codex-4x5-v01.png` — 1152 × 1440 (4:5).
-Plate: `plates/plate-v02.png`. Titular compuesto con `componer.mjs`.
+| Formato | Master | Medida social | Plate |
+|---|---|---|---|
+| 4:5 | `out/claude-o-codex-4x5-v02.png` (1152 × 1440) | `out/claude-o-codex-4x5-1080x1350.png` | `plates/plate-v03.png` |
+| 9:16 | `out/claude-o-codex-9x16-v02.png` (1088 × 1936) | `out/claude-o-codex-9x16-1080x1920.png` | `plates/plate-9x16.png` |
+| 16:9 | `out/claude-o-codex-16x9-v02.png` (1936 × 1088) | `out/claude-o-codex-16x9-1920x1080.png` | `plates/plate-16x9.png` |
+
+`out/claude-o-codex-4x5-v01.png` queda como **descarte**: las mascotas estaban sobre la mesa y la cabeza salía
+desproporcionada respecto al cuerpo (ver regla 6).
 
 ```bash
 node ai-generations/2026-09-17_claude-o-codex/componer.mjs [plate.png] [salida.png]
 ```
+
+El compositor **elige la disposición según el formato**: en vertical el titular y la cita van apilados arriba; en
+horizontal no caben sin chocar con la coronilla, así que la cita baja a la mesa y el logo se va al extremo opuesto.
 
 ## Cómo se hizo
 
@@ -18,8 +27,8 @@ node ai-generations/2026-09-17_claude-o-codex/componer.mjs [plate.png] [salida.p
 texto se **compone** con fontkit a trazos SVG desde las fuentes oficiales y las recetas de `axisAdvertising`:
 
 - Titular `¿Claude o Codex?` — Bricolage Grotesque, receta `ideaImpact` (peso 780, ancho 96, óptico 88,
-  tracking −0,035 em), `color.inkOnDark`, ajustado al 80 % del ancho **midiendo la tinta real**, no la métrica.
-- Cita `“No sé cuál elegir”` — Poppins Medium, tracking de `structureTagline`, `color.softOnDark`, al 30 % del
+  tracking −0,035 em), `color.inkOnDark`, ajustado al ancho objetivo del formato **midiendo la tinta real**, no la métrica.
+- Cita `“No sé cuál elegir”` — Poppins Medium, tracking de `structureTagline`, `color.softOnDark`, proporcional al
   cuerpo del titular.
 - Logo Efeonce en negativo, centrado abajo sobre la mesa.
 
@@ -41,6 +50,13 @@ sin ellas es una falta en una pieza de marca. Las comillas y los signos de inter
 4. **Escala anclada a un objeto del cuadro:** cada figura mide lo que su cabeza de mentón a coronilla, y **apoya**
    sobre la mesa con sombra de contacto.
 5. **Persona real, con su consentimiento.** Fotos entregadas por él mismo; `refs` en `2026-09-17_equipo-vestuario`.
+6. **Nunca sólo retratos, ni siquiera en un plano de busto.** La primera versión pasó `julio-reyes-01` y `-02`, las
+   dos de rostro, y devolvió la cabeza desproporcionada respecto al cuerpo. La regla ya estaba escrita y se rompió.
+   Corrección: `-01` para la cara y `-07` de **cuerpo entero** para construir el cuerpo, lente 135 mm a varios metros,
+   cámara a la altura del pecho, y la proporción anclada a algo medible del cuadro — «el ancho de hombro a hombro es
+   unas dos veces y media el ancho de su cabeza» y «del mentón a la mesa hay al menos una cabeza». Declarar la
+   anatomía en fracciones de la altura total no basta cuando el encuadre corta a la altura de la mesa: no hay altura
+   total visible contra la cual medir.
 
 ## QA medido
 
@@ -58,4 +74,4 @@ derecha.
 
 ## Pendiente
 
-Derivados 9:16 y 16:9 si la pieza se usa como portada. No está en OneDrive ni programada.
+No está en OneDrive ni programada.

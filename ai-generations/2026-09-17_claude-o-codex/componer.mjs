@@ -55,36 +55,46 @@ const shape = (text, font, size, trackingEm = 0) => {
 
 const { width: W, height: H } = await sharp(PLATE).metadata()
 
+// El formato manda la disposición. En vertical el titular y la cita van apilados arriba; en
+// horizontal no caben sin chocar con la coronilla, así que la cita baja a la mesa y el logo se
+// va al otro extremo.
+const ANCHO = W / H > 1.2
+const L = ANCHO
+  ? { anchoTitulo: 0.42, top: 0.035, citaAbajo: true, logoDerecha: true, logoW: 0.11 }
+  : { anchoTitulo: 0.8, top: 0.072, citaAbajo: false, logoDerecha: false, logoW: 0.17 }
+
 // ── Titular: Bricolage ideaImpact, ajustado al ancho objetivo por la tinta, no por la métrica ──
 const impactFont = FONTS.bric.getVariation({ wght: R.ideaImpact.weight, wdth: R.ideaImpact.width, opsz: R.ideaImpact.opticalSize })
 const TR = Number.parseFloat(R.ideaImpact.tracking)
-const ANCHO_TITULO = 0.8
 const sonda = shape(TITULO, impactFont, 100, TR)
-const tamTitulo = (100 * W * ANCHO_TITULO) / (sonda.ink.right - sonda.ink.left)
+const tamTitulo = (100 * W * L.anchoTitulo) / (sonda.ink.right - sonda.ink.left)
 const titulo = shape(TITULO, impactFont, tamTitulo, TR)
 
 // ── Cita: Poppins structureTagline, proporcional al titular ──
-const tamCita = tamTitulo * 0.30
+const tamCita = tamTitulo * (ANCHO ? 0.34 : 0.30)
 const cita = shape(CITA, FONTS['Poppins-500'], tamCita, Number.parseFloat(R.structureTagline.tracking))
 
 // Centrado óptico por la tinta; la línea base se deriva de la altura de tinta medida.
-const centrar = (l, baseline) => ({
-  x: W / 2 - (l.ink.left + l.ink.right) / 2,
+const situar = (l, baseline, x) => ({
+  x: x ?? W / 2 - (l.ink.left + l.ink.right) / 2,
   y: baseline,
   top: baseline + l.ink.top,
   bottom: baseline + l.ink.bottom
 })
 
-const TOP = Math.round(H * 0.072) // margen superior de la tinta del titular
-const baseTitulo = TOP - titulo.ink.top
-const pTitulo = centrar(titulo, baseTitulo)
-const baseCita = pTitulo.bottom + tamTitulo * 0.46 - cita.ink.top
-const pCita = centrar(cita, baseCita)
+const baseTitulo = Math.round(H * L.top) - titulo.ink.top
+const pTitulo = situar(titulo, baseTitulo)
 
-// ── Logo Efeonce en negativo, centrado abajo ──
-const LOGO_W = Math.round(W * 0.17)
+const pCita = L.citaAbajo
+  ? situar(cita, H - H * 0.055 - cita.ink.bottom, W * 0.055 - cita.ink.left)
+  : situar(cita, pTitulo.bottom + tamTitulo * 0.46 - cita.ink.top)
+
+// ── Logo Efeonce en negativo ──
+const LOGO_W = Math.round(W * L.logoW)
 const logo = await sharp('public/branding/logo-negative.svg', { density: 600 }).resize({ width: LOGO_W }).png().toBuffer()
 const { height: logoH } = await sharp(logo).metadata()
+const logoLeft = L.logoDerecha ? Math.round(W - LOGO_W - W * 0.055) : Math.round((W - LOGO_W) / 2)
+const logoTop = Math.round(L.citaAbajo ? (pCita.top + pCita.bottom) / 2 - logoH / 2 : H - logoH - H * 0.038)
 
 const overlay = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <g fill="${C.inkOnDark}" transform="translate(${pTitulo.x.toFixed(2)} ${pTitulo.y.toFixed(2)})">${titulo.paths}</g>
@@ -94,7 +104,7 @@ const overlay = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}
 await sharp(PLATE)
   .composite([
     { input: overlay, left: 0, top: 0 },
-    { input: logo, left: Math.round((W - LOGO_W) / 2), top: Math.round(H - logoH - H * 0.038) }
+    { input: logo, left: logoLeft, top: logoTop }
   ])
   .png()
   .toFile(OUT)
