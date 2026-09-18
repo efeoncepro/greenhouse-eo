@@ -8,7 +8,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1845 | Domain, evidence, adapters, lanes, MCP, gateway federation | **complete** | Cloud SQL (single instance), Vercel staging + Production (generation ON), gateway v1.5.0, Entra scope | 2026-09-16 |
 | TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | **complete** | Cloud SQL (migrations applied), Vercel staging + Production (render ON), Cloud Run Job `artifact-worker` (first productive deploy in release `917491fd02e4`) + `ops-worker` dispatcher (flag ON, shared by staging/prod), gateway v1.6.0 deployed | 2026-09-16 |
 | TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | to-do | — | — |
-| TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — code complete, rollout pending** | Cloud SQL only (4 migrations applied); code on local `develop` (not pushed); Vercel / ops-worker / gateway NOT deployed | — |
+| TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — in production with flags OFF** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON (sharing/delivery/schedules/issuance), production OFF until TASK-1875; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); open: in-app/Teams channels, portal route (1849), ISSUE-174 → TASK-1876 | 2026-09-18 |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
 

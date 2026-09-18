@@ -154,6 +154,12 @@ The relying-party boundary is fixed by
   passed against production (catalog renderable=1, list 5, render run `completed`, deny 404) and a direct
   production lane render reached `completed` in one attempt (`web` ⇒ 422). No render write has gone through the
   gateway yet.
+  **Update 2026-09-18 (`TASK-1848`):** gateway `v1.7.0` (PR #16 `4c9d7c44`, deploy run `35351850324`) serving
+  `efeonce-mcp-gateway-00055-gk6` at 100 %; surface **58 tools**. Seven Insights tools added on the same provider
+  (`task-1848-v1`): `create_insight_share` / `revoke_insight_share` behind `efeonce.mcp.insights.write`; share,
+  delivery and schedule READS on the base scope. Sending email and scheduling are portal-only (never MCP). In
+  production the lane flags are OFF, so the share write answers `policy_blocked: sharing_disabled`; production
+  provider canary green (schedules/shares/deliveries read).
   The PRM intentionally announces only the base scope; read the others from the exact 403 challenge and policy,
   never from a cached catalog count.
   Scope granularity is **one scope per blast-radius class, never one per capability**: a per-capability list turns
