@@ -139,15 +139,15 @@ verificado por API/reader. [Evidencia](docs/audits/hiring/2026-09-13-seo-assignm
 D4 desplegado en producción con release `cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9`, canary sin efectos.
 Recorrido sintético y automatización pendientes; sin asignaciones/correos; Arte intacto.
 
-**TASK-1832 (revisión read-only 2026-09-14T14:12Z): operativamente bloqueada para retiro, no para uso MCP.**
-La correlación por sujeto atribuyó los `458 refresh_reuse/7d` del CIMD compartido de Codex a un perfil interno
-`real`, no a los dos perfiles canary. La conexión posterior a TASK-1832 funciona por el conector hospedado de
-Claude: grant vigente, familia refresh activa y access token emitido a `13:55:32Z`, con vigencia hasta
-`14:10:32Z`. Para los sujetos canary hubo `14` eventos desde el alta, todos contenidos en negativos/DCR
-run-owned; el último fue
-`2026-09-11T01:33:34.325Z`, sin actividad posterior. La primera fecha conservadora de siete días es
-`2026-09-18T01:33:34.325Z`. El apply sigue prohibido por `oauth_client_not_run_owned`: el helper borra por
-`client_id` y debe pasar a planner/delete/readback sujeto-específicos que preserven el CIMD y sus hijos ajenos.
+**TASK-1832 (2026-09-18): corrida canary retirada; gates OFF con readback servido. Sigue `in-progress`.**
+Authority revocada a `12:46:01Z`; cleanup sujeto-específico (`74638aed0`, perfil `ops`) con `deletionReady=true`,
+`unexpectedRefs=0`, grafo run-owned en cero y el CIMD compartido de ChatGPT/Codex preservado con recibos
+idénticos. Readback agregado `14:09Z`: registros/bindings canary `0`, drift `0/0`, Person 360 `0`. Apagados:
+GitHub repo var `EXTERNAL_IDENTITY_CANARY_ENABLED=false` (sin overrides) → auth-server `00076-t2t` sirve `false`
+(mismo SHA `bda1cf2cd938`); Vercel Production `false` + redeploy `dpl_CWnDKTVm…`; `efeonce-mcp` environment
+`production` `MCP_NATIVE_EXTERNAL_CANARY_ENABLED=false` → gateway `00056-kgs` sirve `false`. Flags generales
+intactos. Para cerrar faltan la muestra steady por sujeto 2026-09-14→retiro y `pnpm test` + `pnpm build`.
+No volver a correr revoke/cleanup.
 [Evidencia y alcance](docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md).
 
 **Sistema de contenidos Notion (2026-09-10, mapeado / sin mutaciones):**

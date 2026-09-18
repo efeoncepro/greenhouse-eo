@@ -84,7 +84,10 @@ const main = async () => {
   const args = parseArgs(process.argv.slice(2))
 
   loadGreenhouseToolEnv()
-  applyGreenhousePostgresProfile(args.apply ? 'migrator' : 'ops')
+  // El cleanup es DML operacional sobre tablas cuyo owner canónico es `greenhouse_ops`.
+  // `migrator` queda reservado para DDL/migrations y no tiene acceso transversal a todos los
+  // schemas que el censo fail-closed debe inspeccionar antes de borrar.
+  applyGreenhousePostgresProfile('ops')
 
   const [{ cleanupExternalCanaryFixture }, { closeGreenhousePostgres }] = await Promise.all([
     import('@/lib/identity/external-access'),

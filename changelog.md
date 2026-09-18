@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-18 — TASK-1832 retira la corrida canary y apaga sus gates
+
+Se revocó la authority del canary sintético, el cleanup sujeto-específico borró todo el grafo run-owned
+y preservó el cliente compartido de ChatGPT/Codex y los artefactos de otros sujetos. El apply ahora usa el
+perfil PostgreSQL `ops`. Las dos puertas canary quedaron en `false` en todos sus runtimes, con lectura en la
+revisión servida: auth-server `00076-t2t`, Vercel Production y gateway `00056-kgs`. Runbook, manual, matriz,
+manifiesto, ledger y skill `efeonce-mcp-platform` (espejo) quedaron actualizados.
+
 ## 2026-09-18 — Efeonce Insights: enlaces, correo y recurrencia en producción con flags OFF (TASK-1848)
 
 Release `bda1cf2cd938` (PR #238) lleva a producción compartir por enlace, envío por correo y recurrencia de Insights
@@ -757,48 +765,3 @@ el cumplimiento de su proveedor: el hueco de accountability es de **oferta**, no
 como hipótesis a validar en G1, con la evidencia indirecta que sí existe (reclamos por opacidad) y su límite (casi
 toda de diseño de marketing, no de producto). Límites declarados de toda la investigación: cero mid-market, cero
 LATAM, y ninguna encuesta del sector sin un proveedor financiándola.
-
-## 2026-09-10 — Product Design 360 modelado como sexta familia propuesta de Wave
-
-UI/UX y product design no estaban modelados en ninguna parte: cero fichas en `docs/services/`, cero modelos en
-`docs/business-models/`. El ADR de Wave le daba a **Web Experience 360** el _diseño técnico, delivery y operación_
-de la web —construir y operar—, pero nadie poseía **decidir cómo debe ser la experiencia**; la disciplina caía
-entre Wave (ingeniería) y Globe (producción creativa). Se agrega
-`docs/business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md` (`Proposed`, 14 secciones,
-Operator & Buying Group Contract, 5 gates de validación) y la ficha
-`docs/services/wave/product-design-360.md` con seis servicios: Diagnóstico de Experiencia, Experience Design
-Sprint, Digital Product Design, Design System (build + gobierno), Experience Research & Validation y Design
-Operations. Alcance: web **y** producto digital (app, portal, SaaS, herramienta interna, superficie
-conversacional). Unidad de cobro de la línea recurrente: capacidad gobernada, nunca horas ni pantallas. El ADR de
-boundaries recibe un **delta fechado que no reescribe la decisión aceptada**: la sexta familia queda `Proposed` y
-su gate G1 (demanda externa) decide si se acepta en un ADR V2 o si se repliega a capability dentro de Web
-Experience 360. Evidencia declarada como capability interna (AXIS, UI Platform, GVC, Premium UI Delivery
-Standard), explícitamente **no** como caso de cliente. Se crea además `docs/services/wave/README.md`, primer
-índice de fichas de Wave. Sin pricing, sin claims públicos, sin venta general.
-
-**Corrección de tesis en la misma sesión (V1.1).** V1 asumía un cliente sin capacidad de diseño y listaba al
-diseñador interno como _blocker_. Estaba invertido: las empresas mid y grandes ya tienen product design in-house, y
-ese líder es el **comprador, el operador y el único con poder de veto**. El motion primario pasa a ser **extensión
-de capacidad**: se venden **lanes** de capacidad gobernada —Feature Delivery, Research & Validation, Design System,
-Accessibility, Design Debt & Consistency, Design Ops—, nunca diseñadores. Se agrega el **contrato
-anti-desplazamiento** (el cliente elige qué lanes conserva; Efeonce no posee visión ni roadmap; no se presenta a
-ejecutivos sin el Head of Design; la telemetría mide nuestras lanes, no a su gente) y la distinción dura **Managed
-Squad ≠ Staff Augmentation** con la deriva como métrica de alarma. Doctrina aplicada desde la skill
-`creative-practice` (in-housing, el comparable real, piso 45%, gobierno que no se descuenta). Comparables de
-mercado **verificados para product design** con fuente y `as-of` 2026 —senior product designer US ~USD 185k mediana,
-loaded 1,4–2,4× base, contractor embebido USD 80–135/h, ratio diseñador:ingeniero 1:2–1:1 en equipos maduros,
-deuda de diseño 10–20% del sprint— con **sesgo de proveedor declarado** y la advertencia de rehacer el cálculo con
-loaded cost chileno antes de usarlos (decisión abierta D7). Diseño integral queda como motion secundario.
-
-**Segunda corrección de la misma sesión: recurrencia y razón de compra.** El modelo estaba construido sobre señales
-de **disfunción**, lo que sesgaba el ICP hacia clientes con problemas, y sus lanes eran mayormente de **arreglo**,
-que termina. Se incorporan **tres razones de compra**: expansión de capacidad productiva (el roadmap creció y el
-equipo no alcanza), gap estructural permanente (no tiene ni tendrá research, accesibilidad o design system) y
-deterioro. **Las dos primeras son retainer desde el mes uno y no requieren conversión**; sólo el deterioro entra
-como proyecto. Para ese caso se agregan los **dos tiempos de una lane** —arreglar y sostener— con disparador de
-conversión declarado por lane y la regla de que todo SOW de arreglo declara el sostener que le sigue. El
-diagnóstico se reformula hacia adelante: deja de preguntar _"¿qué tienes roto?"_ y pasa a **dimensionar la
-capacidad que exige el roadmap** contra la del equipo. Se agregan métricas de recurrencia (lanes en `run` ÷
-contratadas, conversión fix→run, drift en ventanas sin gobierno) y la regla de honestidad: **si el drift no sube
-cuando nos vamos, el retainer no se merecía**. Prospección: se busca a quien va a construir más de lo que su equipo
-alcanza a diseñar —señal pública y anticipable—, no a quien ya está en problemas.

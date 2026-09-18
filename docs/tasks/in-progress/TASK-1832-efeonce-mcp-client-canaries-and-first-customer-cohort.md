@@ -1,5 +1,35 @@
 # TASK-1832 — Efeonce MCP Synthetic External Canaries and Client Compatibility Certification
 
+## Delta 2026-09-18 — corrida retirada y gates canary OFF con readback servido
+
+El cleanup sujeto-específico (`74638aed0`) separó el DCR run-owned (borrado por `client_id`) del cliente shared
+(borrado sólo por environment + sujeto canary, más `binding_id` en contexts) y compara un recibo de preservación
+antes/después. Authority revocada a `2026-09-18T12:46:01Z` (`activeAuthorityCount=0`, `activeAuthCount=0`). El
+apply corrió con perfil `ops` —`migrator` no tiene DML transversal sobre todos los schemas del censo; el guard
+exige membresía `greenhouse_migrator`, que `greenhouse_ops` tiene— y devolvió `deletionReady=true`,
+`unexpectedRefs=0` y cero blockers. Toda la gráfica run-owned quedó en cero; el CIMD compartido de ChatGPT/Codex
+y los artefactos de otros sujetos conservaron recibos idénticos. Audit/outbox y deliveries retenidos; wordmark
+compartido HTTP 200. Readback agregado `2026-09-18T14:09:17Z`: `registrations=0`, `canary_bindings=0`, drift
+`0/0`, `smoke_in_person_360=0`.
+
+Gates apagados por su carril gobernado, con readback en la revisión que sirve el 100 %:
+
+- `EXTERNAL_IDENTITY_CANARY_ENABLED`: variable GitHub de repositorio `false`, sin overrides en
+  `Production|Preview|staging|copilot`; auth-server redeployado por `auth-server-deploy.yml` (dispatch de
+  producción con el mismo SHA `bda1cf2cd938`, run `35353431957`, drift sólo de config) → `auth-server-00076-t2t`
+  sirve `false`. Vercel Production `false` + redeploy del deployment vigente →
+  `dpl_CWnDKTVmLkrQY2xUtLHnxEL64ZG9` (`bda1cf2cd938`) en el alias productivo. Vercel staging sigue `false`.
+- `MCP_NATIVE_EXTERNAL_CANARY_ENABLED`: variable del environment `production` de `efeonce-mcp` `false` +
+  `deploy.yml` run `35353391431` → `efeonce-mcp-gateway-00056-kgs` (`4c9d7c44cf0e`, igual a `origin/main`,
+  sin código nuevo) sirve `false`.
+- Flags nativos generales intactos (`AUTH_SERVER_*`, `MCP_NATIVE_AUTH_ENABLED`, internos y multi-org `true`).
+  `auth.efeonce.org/readyz` 200, PRM del gateway 200, `POST /mcp` sin bearer `401`, sesión del portal 200.
+
+La prueba flow-level del lado Vercel no es posible sin un sujeto canary vivo (todos fueron borrados); la evidencia
+es el valor en config + un deployment creado después del cambio y aliasado. Pendiente para cerrar: la muestra por
+sujeto entre el 2026-09-14 y el retiro no se registró (la última correlación sólo cubre hasta el 14), y el gate
+de cierre `pnpm test` + `pnpm build` completo no se corrió en esta sesión.
+
 ## Delta 2026-09-14 — atribución de `refresh_reuse` corregida por sujeto
 
 La revisión read-only del 2026-09-14 corrigió la interpretación conservadora del 2026-09-10 sin debilitar el
@@ -278,10 +308,10 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Operativamente bloqueado para retiro. La matriz de compatibilidad sigue acreditada para Codex, ChatGPT, Claude Code 2.1.263 y Claude.ai/Desktop; Claude Code 2.1.186 conserva su FAIL histórico. La revisión del 2026-09-14 atribuyó los 458 refresh_reuse/7d del CIMD compartido de Codex a un perfil interno real, no a la canary, y confirmó una conexión MCP hospedada de Claude activa. Para los dos sujetos canary, el último evento específico fue un reintento ya contenido el 2026-09-11T01:33:34.325Z; la ventana conservadora termina el 2026-09-18T01:33:34.325Z. No hay implementación segura para apply: el cleanup aún borra hijos por client_id y debe pasar a una partición sujeto-específica que preserve el CIMD y los artefactos ajenos; después corresponde dry-run verde, revocación, readback cero y gates OFF.`
+- Status real: `Corrida retirada 2026-09-18: authority revocada, cleanup sujeto-específico aplicado con readback cero y CIMD compartido preservado; EXTERNAL_IDENTITY_CANARY_ENABLED (GitHub repo var, auth-server 00076-t2t, Vercel Production) y MCP_NATIVE_EXTERNAL_CANARY_ENABLED (gateway 00056-kgs) en false con readback servido. Matriz de clientes certificada como evidencia histórica. Queda registrar la muestra steady por sujeto 2026-09-14→retiro y correr el gate de cierre test+build completo.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
-- Blocked by: `cleanup OAuth sujeto-específico y ventana canary hasta 2026-09-18T01:33:34.325Z antes del retiro`
+- Blocked by: `none técnico; cierre pendiente de evidencia steady por sujeto y gate test+build completo`
 - Branch: `Greenhouse develop; efeonce-mcp main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -684,18 +714,19 @@ organización dedicada creada sólo después de una autorización específica.
 - [x] Auditoría MCP de TASK-1836 §14: clientes/revisiones reales, discovery desde URL canónica, login,
       consentimiento por cliente y revocación/rotación observados en Codex y ChatGPT; no se inyectó ningún token.
 
-- [ ] Cada cliente MCP real completa login con persona externa `smoke_test`, token nativo, llamada autorizada,
-      refresh y revocación; el mismo issuer nunca permite tools internas. Evidencia por cliente y revisión registradas.
+- [x] Cada cliente MCP real completa login con persona externa `smoke_test`, token nativo, llamada autorizada,
+      refresh y revocación (revocación final de toda la corrida 2026-09-18T12:46:01Z); el mismo issuer nunca permite tools internas. Evidencia por cliente y revisión registradas.
 
 - [x] Matriz de tokens publicada con Claude Code, Codex y ChatGPT hospedado, sin tokens crudos.
 - [x] El mismo `sub` para la misma persona `smoke_test` en loopback y ChatGPT hospedado; sólo se conserva el
       fingerprint redactado. Readback PostgreSQL: un subject por cliente y `same_subject=true`, sin imprimirlo.
 - [x] Organización canary no-cliente registrada y ligada por command dedicado; `bindExternalOrganization`
       continúa rechazándola y los readers/KPI comerciales no la presentan como cliente.
-- [ ] Manifiesto de assets creado antes del primer write y completo con IDs/ownership/TTL; cleanup dry-run
+- [x] Manifiesto de assets creado antes del primer write y completo con IDs/ownership/TTL; cleanup dry-run
       reporta `deletion_ready`, `unexpected_refs=0`, lifecycle history cero y ningún intento de borrar assets shared.
-- [ ] Todos los profiles del canary tienen `data_origin='smoke_test'`; no se fusionan con personas reales y el
-      cleanup/revocación queda probado sin borrar audit.
+      Evidencia 2026-09-18: dry-run y apply verdes con perfil `ops`, CIMD compartido preservado con recibos idénticos.
+- [x] Todos los profiles del canary tienen `data_origin='smoke_test'`; no se fusionan con personas reales y el
+      cleanup/revocación queda probado sin borrar audit (readback 2026-09-18: grafo run-owned `0`, Person 360 `0`, audit retenido).
 - [x] Correo/invitación/magic link se verifican en M365 corporativo y Gmail personal del operador autorizado,
       con delivery/bounce y scanner-safe POST; el expediente distingue ownership y no acredita control Efeonce
       sobre Gmail. Evidencia: invitaciones `xmi-b7cfc54e…` y `xmi-0b307567…`; deliveries exactos y perfiles
@@ -708,7 +739,9 @@ organización dedicada creada sólo después de una autorización específica.
   insufficient_scope` con challenge canónico; referenciar en su cierre documental.
 - [x] Runbook de certificación canary y expediente de readiness para TASK-1841 publicados; el expediente
       conserva veredicto no certificado mientras existan filas/pasos abiertos.
-- [ ] Siete días de señales steady registrados en Handoff.
+- [ ] Siete días de señales steady registrados en Handoff. Parcial: correlación por sujeto del 2026-09-14 sin
+      actividad canary desde 2026-09-11T01:33:34Z y retiro posterior al fin de la ventana; falta la muestra por
+      sujeto 2026-09-14→retiro.
 
 ## Verification
 
@@ -744,12 +777,14 @@ organización dedicada creada sólo después de una autorización específica.
       `2026-09-11T01:33:34.325Z`. No hubo evento canary posterior. El mismo readback confirmó que el MCP posterior
       a TASK-1832 funciona mediante un grant hospedado de Claude activo. El retiro sigue bloqueado por el cleanup
       sujeto-específico y por la ventana conservadora hasta `2026-09-18T01:33:34.325Z`.
-- [ ] Sesiones interactivas por cliente MCP registradas: Codex y ChatGPT hospedado verdes; ChatGPT importó sólo
+- [x] Sesiones interactivas por cliente MCP registradas: Codex y ChatGPT hospedado verdes; ChatGPT importó sólo
       `efeonce.gateway.status|get_seo_entitlement`, ejecutó ambas sin write y rotó refresh dos veces post-TTL.
       Claude Code `2.1.186` conserva su FAIL histórico; `2.1.263` completó consentimiento, catálogo exacto,
       lectura y refresh post-TTL con scope base único. Claude.ai completó el mismo recorrido y refresh; Desktop
       `1.46388.4` ejecutó la lectura desde la app nativa sobre el conector remoto. La compatibilidad de todos los
-      clientes declarados está verde; el criterio permanece abierto sólo por la revocación/cleanup final.
+      clientes declarados está verde; revocación y cleanup final hechos el 2026-09-18.
+- [x] Retiro 2026-09-18: `pnpm identity:external-canary:readback` → `registrations=0`, `canary_bindings=0`,
+      drift `0/0`, `smoke_in_person_360=0`; readback Cloud Run/Vercel de los tres gates en `false` (ver Delta).
 - `pnpm secrets:audit` en el shell final: 0/8, todos `unconfigured` porque el comando no cargó un entorno local.
   No es evidencia de runtime; los valores productivos se verificaron por Vercel/Cloud Run y TASK-1832 no
   modifica secretos.

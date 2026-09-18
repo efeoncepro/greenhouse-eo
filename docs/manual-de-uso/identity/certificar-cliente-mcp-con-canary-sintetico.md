@@ -1,8 +1,9 @@
 # Certificar un cliente MCP con un canary sintético
 
-> Manual operativo · TASK-1832 · estado al 2026-09-06: **rollout productivo en observación**.
-> Corrida activa: `task-1832-canary-20260906-a`; no crees una segunda. Su retiro no empieza antes de
-> `2026-09-13T19:43:30Z` y exige dry-run verde más readback cero.
+> Manual operativo · TASK-1832 · estado al 2026-09-18: **corrida `task-1832-canary-20260906-a` retirada**.
+> Authority revocada, cleanup aplicado con readback cero y las dos puertas canary (Efeonce ID y gateway) en
+> `false` en todos los runtimes. Una corrida nueva necesita un checkpoint aprobado, un manifiesto nuevo y volver
+> a encender ambas puertas por su carril de deploy.
 
 Este procedimiento comprueba que Claude, Codex o ChatGPT pueden usar Efeonce ID y el gateway MCP sin pedirle a
 un cliente real que haga QA. El resultado es readiness técnica para un piloto; no es validación de usabilidad,
@@ -33,7 +34,7 @@ Necesitas:
 - aprobación específica para crear el fixture y los buzones M365/Google controlados;
 - migraciones y consumers ya desplegados con los dos gates canary OFF;
 - sesión `efeonce_admin` con `identity.external_canary.register|bind|revoke`;
-- proxy PostgreSQL y perfil migrator sólo para el cleanup apply;
+- proxy PostgreSQL y perfil `ops` sólo para el cleanup apply;
 - una copia nueva del manifiesto por corrida.
 
 Confirma el baseline agregado antes de crear datos:
@@ -272,7 +273,7 @@ pnpm identity:external-canary:cleanup -- \
   --confirm-registration <mismo-xcr-id>
 ```
 
-El apply sólo funciona con el perfil DB migrator. El endpoint admin de cleanup sirve para inspección; no puede
+El apply sólo funciona con el perfil DB `ops` (su rol pertenece a `greenhouse_migrator`, que es lo que exige el guard; el perfil `migrator` a secas no alcanza todos los schemas del censo). El endpoint admin de cleanup sirve para inspección; no puede
 hacer hard delete con el rol runtime por diseño.
 
 Marca el manifiesto `deleted` únicamente después de comprobar cero en organización, registro, binding, grants,
@@ -291,7 +292,7 @@ conteo agregado no sustituye las consultas por los IDs exactos de la corrida.
 | `capability_not_allowed`  | permiso fuera de la única allowlist             | elimina la solicitud; no amplíes el canary           |
 | `canary_cleanup_blocked`  | authority, postura, FK o readback impide borrar | revisa el plan y resuelve el owner exacto            |
 | `oauth_client_not_run_owned` | un sujeto canary usó un cliente compartido  | no apliques; implementa cleanup sujeto-específico    |
-| `forbidden` al apply      | no se está usando el perfil migrator            | no cambies roles runtime; usa el wrapper autorizado  |
+| `forbidden` al apply      | no se está usando el perfil `ops`               | no cambies roles runtime; usa el wrapper autorizado  |
 | canary visible en 360/CRM | contaminación de proyección                     | apaga gates, revoca y abre incidente antes de seguir |
 
 ## Criterio de cierre
@@ -299,3 +300,17 @@ conteo agregado no sustituye las consultas por los IDs exactos de la corrida.
 El trabajo queda técnicamente certificado sólo con matriz completa, producción allow/deny/revocación
 acreditada, siete días de señales estables y cleanup/readback final cero. Durante la ventana el estado correcto
 es `rollout productivo en observación`.
+
+## Apagar las puertas canary al cerrar una corrida
+
+Después del cleanup con readback cero:
+
+1. Efeonce ID: variable de repositorio GitHub `EXTERNAL_IDENTITY_CANARY_ENABLED=false` (sin overrides por
+   environment) y redeploy del auth-server por su workflow; en producción se despacha con el SHA ya servido, así
+   sólo cambia la configuración.
+2. Portal: `EXTERNAL_IDENTITY_CANARY_ENABLED=false` en Vercel Production (staging ya está en `false`) y redeploy
+   del deployment productivo vigente.
+3. Gateway: variable del environment `production` de `efeonce-mcp` `MCP_NATIVE_EXTERNAL_CANARY_ENABLED=false` y
+   ejecución de su workflow de deploy.
+4. Lee el valor en la revisión que sirve el 100 % del tráfico de cada runtime y regístralo en el manifiesto y en
+   el ledger de flags. No toques los flags generales de autenticación.
