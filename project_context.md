@@ -4,9 +4,9 @@
 
 ## Actualización documental reciente
 
-El 2026-09-16 se actualizaron las skills CRM: Dreamforce 2026 (ledger Salesforce, estados por capacidad) y HubSpot
-Fall Spotlight/UNBOUND (`docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`). El
-provider-fit usa `HubSpot-first`, `Salesforce-first`, `híbrida` o `no-fit`; el detalle vive en esas referencias.
+El 2026-09-18 se actualizaron las skills y ledgers CRM de Dreamforce 2026 y HubSpot Fall Spotlight/UNBOUND; el
+detalle de lanzamientos y estados vive en sus referencias canónicas. El provider-fit usa `HubSpot-first`,
+`Salesforce-first`, `híbrida` o `no-fit`.
 
 Greenhouse: plataforma operativa Efeonce Group (Next.js 16/MUI 7/Vuexy/TS). Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.

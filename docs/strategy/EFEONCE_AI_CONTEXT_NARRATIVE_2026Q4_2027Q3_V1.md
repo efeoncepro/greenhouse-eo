@@ -3,7 +3,7 @@
 > **Estado:** `Approved for validation` — dirección aprobada por el operador en conversación (2026-09-17); brief de
 > lanzamiento, piezas, pauta y KPIs pendientes.
 > **Owner:** Efeonce Strategy + Commercial + prácticas dueñas (RevOps & CRM, Wave, Creative Services, Media & Distribution)
-> **Fecha:** 2026-09-17
+> **Fecha:** 2026-09-18
 > **Vigencia:** Q4 2026 a Q3 2027; revisión trimestral y renovación antes de UNBOUND/Dreamforce 2027.
 > **Propósito:** narrativa go-to-market integrada, orgánica y pagada, que conecta todas las líneas de negocio de
 > Efeonce bajo una tesis común para el período.
@@ -28,13 +28,13 @@ esas puertas de entrada se comunican durante el período.
 
 | Señal (septiembre 2026) | Lectura |
 |---|---|
-| HubSpot Fall Spotlight / UNBOUND (16–18 sep): Growth Context, Context Home, Smart CRM que se actualiza solo, agentic team, Marketing Studio rehecho, integración ChatGPT Ads y Microsoft Advertising | El proveedor líder de mid-market declara que la IA sin contexto produce output sin valor |
-| Salesforce (Dreamforce 2026, misma semana según fuente secundaria): digital labor, Agentforce Coworker, «AI replacing the UI» | El proveedor enterprise enmarca los agentes como fuerza laboral digital |
+| HubSpot Fall Spotlight / UNBOUND (16–18 sep): Growth Context, Context Home, Smart CRM que se actualiza solo, Marketing Studio, integración ChatGPT Ads y Microsoft Advertising; demos de Customer Agent Voice, HubSpot Work y Agent CLI | El proveedor líder de mid-market declara que la IA sin contexto produce output sin valor; las demos no prueban GA ni disponibilidad contractual |
+| Salesforce (Dreamforce 2026, 15–16 sep, fuente oficial): AIforce, Agentforce Coworker, Koa, interoperabilidad y agentes job-ready | El proveedor enterprise convierte el CRM gobernado en infraestructura para agentes, modelos e interfaces |
 | OpenAI (16 sep): Sponsored Agents en prueba en EE.UU.; anuncios que abren una conversación con un agente de marca | La pauta pasa del clic a la conversación |
 | Compradores B2B investigan y comparan proveedores en asistentes de IA | La marca debe ser legible para máquinas, no sólo para personas |
 | Ley 21.719 de protección de datos (Chile), plena vigencia el **2026-12-01** | El contexto necesita permiso: consentimiento, gobierno y trazabilidad |
 
-Evidencia HubSpot: [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](../services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md)
+Evidencia HubSpot: [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](../services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md). El corte ampliado del 18/09 incorpora Smart CRM self-updating, Growth Context, Context Home, Breeze Assistant reconstruido, Marketing Studio, Microsoft Advertising, Prospecting Agent, Customer Agent Voice, HubSpot Work y Agent CLI.
 y `hubspot-solutions-partner/SOURCES.md`. Fuentes externas y estado de verificación en §10.
 
 ## 3. Arquitectura
@@ -175,8 +175,10 @@ Las fechas de eventos 2027 se confirman antes de amarrar hitos.
 - **Conversiones pagadas:** sólo hacia servicios aprobados o vendibles (evaluación RevOps, Radiografía AEO, Creative
   Diagnostic, Managed Creative Squad, Content & Social Operations). Los servicios `Proposed` y Globe (acceso cliente
   cerrado) entran en la conversación posterior, no en la promesa del anuncio.
-- **Betas:** ChatGPT Ads, Agent Hub/Agent Builder, HubSpot Work y Sponsored Agents se comunican como piloto o
-  tendencia, sin SLA ni disponibilidad por país no verificada.
+- **Estados no equivalentes:** ChatGPT Ads se comunica como beta pública; HubSpot Work, Customer Agent Voice y Agent CLI
+  se comunican como first look/demo de UNBOUND hasta que exista documentación de disponibilidad, pricing y runtime.
+  Sponsored Agents y Agent Hub/Agent Builder se comunican como piloto o tendencia, sin SLA ni disponibilidad por país no
+  verificada.
 - **Legal:** la cuenta regresiva a la Ley 21.719 es orientación, no asesoría legal (`legal-privacy-ip-operator`).
 - **Enrutamiento:** cada capítulo lleva una propiedad de campaña en HubSpot para que el lead llegue a la práctica dueña;
   la medición se reporta por capítulo y línea de negocio. Crear la propiedad es una escritura con autorización.
@@ -212,7 +214,7 @@ Detalle: [bitácora de producción](../operations/social/2026-09-17-kv-tu-ia-no-
 9. Versión Codex Pet del KV (sistema modular listo; pieza no producida) tras recibir la guía de marca de OpenAI.
 10. Readback de publicación del KV el 2026-09-21 (confirmar `PUBLISHED` y URL pública).
 
-## 10. Evidencia y estado de verificación (corte 2026-09-17)
+## 10. Evidencia y estado de verificación (corte ampliado 2026-09-18)
 
 | Afirmación | Estado |
 |---|---|
@@ -220,7 +222,7 @@ Detalle: [bitácora de producción](../operations/social/2026-09-17-kv-tu-ia-no-
 | Frase «a team, not a tool» | Resumen automático del kit; confirmar en el kit antes de citar literal |
 | Disponibilidad de cada agente (GA vs. beta) | Fuentes no coinciden; verificar por agente |
 | Salesforce digital labor, cita de Benioff | Salesforce News |
-| Dreamforce 2026 (15–17 sep), Agentforce Coworker, «AI replacing the UI» | Sólo Salesforce Ben |
+| Dreamforce 2026 (lineup público de producto 15–16 sep), AIforce, Agentforce Coworker y Koa | Fuentes oficiales de Salesforce: media resources, catálogo de sesiones y Newsroom; la interpretación «AI replacing the UI» queda como marco editorial, no como nombre de producto |
 | Sponsored Agents en prueba sólo en EE.UU.; integración HubSpot–ChatGPT Ads | OpenAI y varias fuentes |
 | Ley 21.719 plena vigencia 2026-12-01 | Varias fuentes legales secundarias concordantes |
 | Forrester 94 % / Gartner 45 % y 69 % sobre compradores B2B y IA | Sólo agregadores; confirmar fuente primaria antes de usar |

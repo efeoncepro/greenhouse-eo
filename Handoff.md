@@ -2,23 +2,22 @@
 
 **16–17/09:** Higgsfield API con créditos. Previa 18: verificar · readback KV 21/09 y 23/09.
 
-**Posicionamiento CRM actualizado (2026-09-16, documental):** HubSpot y Salesforce se mantienen como proveedores
+**Posicionamiento CRM actualizado (2026-09-18, documental):** HubSpot y Salesforce se mantienen como proveedores
 con una zona de solapamiento —mid-market alto, agentes e integraciones— pero con centros de gravedad distintos.
 HubSpot-first parte para crecimiento B2B, mid-market y time-to-value; Salesforce-first para org instalada compleja,
 gobierno, service a escala, extensibilidad e integración enterprise. La práctica usa `HubSpot-first`,
 `Salesforce-first`, `híbrida` o `no-fit`; no es una decisión automática ni una afirmación de segmentación exclusiva.
 
-**Dreamforce 2026 — delta 16/09 (documental):** el ledger y las skills Salesforce quedaron actualizados con AIforce
-como capa de interfaz/headless gobernada; Missionforce con OpenAI/NVIDIA para government y entornos regulados; y
-las novedades de Marketing Cloud Next (Campaign Agent, Headless Marketing/MCP, Palmata, Data Guardian, Budget
-Optimization, Adaptive Web, Personalized Paths y otras) con disponibilidad separada por capacidad. Koa pertenece
-al anuncio del 15/09 y sigue en pilotos seleccionados. No se cambió ninguna org, entitlement ni contrato. Detalle:
+**Dreamforce 2026 — corte ampliado 18/09 (documental):** el ledger Salesforce separa AIforce, Missionforce, Koa,
+Agentforce, interoperabilidad y Marketing Cloud Next por capacidad y estado. El catálogo público concentra el lineup
+de producto en 15–16/09; no se identificaron nuevos lanzamientos en el media hub oficial el 17–18/09. No se cambió
+ninguna org, entitlement ni contrato. Detalle:
 [`Dreamforce 2026`](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md).
 
-**HubSpot Fall Spotlight / UNBOUND 2026 (2026-09-16, documental):** las skills espejo de HubSpot as a Service,
-Solutions Partner y HubSpot-Greenhouse bridge, junto con el catálogo de oferta, incorporan ChatGPT Ads beta,
-MCP/Claude con writes gobernados, Agent Hub/Builder/Breeze, Developer Platform 2026.09 y la deprecación de APIs/apps
-legacy para septiembre de 2027. El detalle y la matriz de disponibilidad están en
+**HubSpot Fall Spotlight / UNBOUND 2026 — corte ampliado 18/09 (documental):** las skills espejo de HubSpot as a Service,
+Solutions Partner y HubSpot-Greenhouse bridge incorporan el corte ampliado del ledger: Smart CRM, Growth Context,
+Context Home, Breeze, Marketing Studio, ChatGPT Ads, MCP/Claude y nuevas superficies de agentes. Customer Agent Voice,
+HubSpot Work y Agent CLI quedan como first look/demo hasta verificar GA, pricing y runtime. El detalle y la matriz están en
 [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md).
 No se activó ningún beta, permiso, campaña, conexión ni write de portal; falta verificar elegibilidad por cliente antes
 de vender o implementar.

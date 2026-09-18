@@ -17,6 +17,16 @@ un borrador en revisión, nunca emite ni envía). Migraciones aplicadas en la ba
 nacen apagados en producción y los EmailTypes apagados. Verificado en staging con canary sintético completo (incluye un
 correo real al buzón autorizado del operador); la prueba destapó `ISSUE-174` → `TASK-1876`. Producción y gateway pendientes.
 
+## 2026-09-18 — Corte ampliado de Dreamforce 2026 y UNBOUND 2026
+
+Se actualizaron los ledgers, docs de oferta, narrativa estratégica y skills espejo `.codex`/`.claude` con la
+investigación oficial ampliada al 18/09. Salesforce queda separado por AIforce, Koa, Missionforce, Agentforce,
+interoperabilidad y Marketing Cloud Next, con estados por capacidad y sin nuevos lanzamientos identificados el
+17–18/09 en el media hub. HubSpot incorpora Smart CRM self-updating, Growth Context, Context Home, Breeze, Marketing
+Studio, Microsoft Advertising, Prospecting Agent, ChatGPT Ads y las superficies mostradas en UNBOUND; Customer Agent
+Voice, HubSpot Work y Agent CLI quedan marcadas como first look/demo hasta verificar GA, pricing y runtime. No se
+activaron entitlements, betas, campañas ni conexiones.
+
 ## 2026-09-17 — Higgsfield documentado como proveedor gobernado de Creative Studio
 
 La revisión de los nueve repositorios oficiales de Higgsfield quedó documentada en arquitectura, auditoría,
@@ -793,33 +803,3 @@ cuenta (tolerancia nativa 0,05); el remediator nunca auto-remedia filas no-CLP. 
 la rutina mensual por cuenta y la decisión sobre facturas Nubox (siguen por plan `pay_expense`). OTB del CCA del
 accionista al 01/08/2026 = 2.141.867 (`estimated`). Retención SII de Humberly (jul/ago) asumida por la empresa
 por decisión del operador, registrada en Finance; Payroll sin tipo de ajuste para modelarla.
-
-## 2026-09-10 — El sistema de contenidos en Notion queda mapeado y PDR-020 se reconcilia con él
-
-Lectura MCP en vivo de las bases que operan el contenido de Efeonce. El sistema no es el calendario: son
-Pilares JTBD, Content Hub y Calendario encadenados, más la Wiki. El Content Hub es el taller donde se
-escribe el texto largo — artículos, ebooks, pillar pages, series, podcast, storytime, con ocho templates
-por tipo — y desde ahí el material se distribuye a Think o al sitio público WordPress. El mapa con IDs, schema vigente y brechas queda en
-[docs/operations](docs/operations/EFEONCE_CONTENT_SYSTEM_NOTION_MAP_V1.md).
-
-El mapeo corrigió dos supuestos de `PDR-020`, que se escribió sin conocer ese runtime. Existe una base de
-siete Pilares JTBD con job, buyers, tier, registro de voz y canales declarados: es el eje temático
-canónico y las franquicias del PDR son un eje ortogonal, no un reemplazo, de modo que una pieza bien
-formada declara cuatro ejes y no tres. Y `LinkedIn Julio` es un canal distinto de `LinkedIn Página` en
-las tres bases, con voz propia. También queda advertido que `Territorio Arc` no es el territorio de
-`PDR-019`: son dos taxonomías vivas y distintas.
-
-Tres fracturas medidas que el mapeo destapó. Existen dos bases de Calendario con schema idéntico: la
-anterior con 100 filas de histórico publicado y la vigente con 66 filas todas a futuro, y el histórico
-queda partido, de modo que cualquier promedio de velocidad operativa usa la mitad de la evidencia. El
-eje temático no se está usando donde importa: cero de las 66 filas del calendario vigente declaran
-Pilar JTBD, mientras el Content Hub y los Pilares siguen apuntando al calendario anterior. Y el destino
-de publicación que el operador declaró como flujo no tiene dónde vivir: el Content Hub sólo tiene
-Enlace, poblado en cinco de 41 piezas, sin propiedad que distinga Think de WordPress, que es
-justamente la decisión de host y canonical de PDR-018.
-
-Brechas previas que siguen abiertas: la Wiki tiene las ocho etiquetas definidas y las 89 páginas sin
-etiquetar; el Calendario no puede expresar franquicia, canal-hogar frente a satélite, territorio ni las
-métricas que la doctrina declara (sends, saves, watch time, dwell), y conserva `Portafolio` como tipo de
-pieza. La propuesta de cambios queda ordenada de menor a mayor invasividad y **ninguna fue aplicada**:
-no se creó, editó ni borró nada en Notion.

@@ -103,7 +103,7 @@ artefacto versionado usa `orange` por su contraste con la portada clara.
 ## Fuentes transversales
 
 - [Arquitectura de oferta V2](HUBSPOT_OFFER_ARCHITECTURE_V2.md)
-- [Lanzamientos Fall 2026 / UNBOUND 2026 — corte 2026-09-16](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md)
+- [Lanzamientos Fall 2026 / UNBOUND 2026 — corte ampliado 2026-09-18](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md)
 - [Benchmark de mercado 2026-08-30](../../audits/commercial/HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md)
 - [Canon técnico HubSpot as a Service](../../architecture/kortex/hubspot-as-a-service/README.md)
 - [Documentación funcional ANAM](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)

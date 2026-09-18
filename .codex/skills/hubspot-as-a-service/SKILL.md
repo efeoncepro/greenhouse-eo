@@ -45,7 +45,7 @@ explicit source of truth, lifecycle, consent, attribution, deduplication and syn
    - Offer/sector qualification: `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md`
 4. When the work derives from a sold implementation, read `../hubspot-solutions-partner/modules/12_IMPLEMENTACION.md`; for agents, also read `../hubspot-solutions-partner/modules/13_AGENTES.md`. Product claims and prices remain owned by that skill's `hubspot-solutions-partner` → `SOURCES.md`.
 
-For Fall 2026 / UNBOUND 2026 product changes, read [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](../../../docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md) before qualifying ChatGPT Ads, MCP/Claude, Agent Hub, Breeze or Scheduled Prompts. It is a dated evidence register, not proof of portal eligibility, regional availability, pricing or runtime.
+For Fall 2026 / UNBOUND 2026 product changes, read [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](../../../docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md) before qualifying ChatGPT Ads, MCP/Claude, Agent Hub, Breeze, Scheduled Prompts, Customer Agent Voice, HubSpot Work or Agent CLI. The register is cut at 2026-09-18; it is evidence of vendor documentation/demo, not proof of portal eligibility, regional availability, pricing or runtime.
 
 ## Boundary router
 

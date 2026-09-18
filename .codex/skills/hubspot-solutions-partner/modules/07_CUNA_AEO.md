@@ -1,6 +1,6 @@
 # 07 · Las entradas — el mapa dolor → Hub, y la cuña AEO
 
-> **Refresh Fall Spotlight/UNBOUND 2026 — 2026-09-16.** AEO sigue siendo medición y wedge; paid AI discovery
+> **Refresh Fall Spotlight/UNBOUND 2026 — 2026-09-18.** AEO sigue siendo medición y wedge; paid AI discovery
 > y lead scoring son superficies complementarias, no sustitutos del método AEO.
 
 > **Reescrito 2026-07-13.** La versión anterior hacía de la cuña AEO **el eje**, y eso estrechaba el negocio a

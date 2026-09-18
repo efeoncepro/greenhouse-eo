@@ -2,7 +2,7 @@
 
 > **Estado:** `Approved for validation`
 > **Owner:** Revenue Operations & CRM + Marketing Operations
-> **As-of:** 2026-09-16
+> **As-of:** 2026-09-18
 > **Uso:** routing de discovery, skills, scope y propuestas; no reemplaza contrato ni entitlement live.
 
 La arquitectura comercial de la práctica —incluidos customer model, lifecycle, ofertas, delivery y gates de
@@ -35,7 +35,7 @@ proveedor. Las salidas válidas son `Salesforce-first`, `HubSpot-first`, `híbri
 | Marketing Cloud Personalization    | producto/licencia separada                  | decisioning y personalización en tiempo real                                                   | fuera de V1 salvo integración acotada              |
 | Marketing Cloud Intelligence       | producto analítico separado                 | ingest, armonización y analytics de marketing                                                  | fuera de V1 salvo integración acotada              |
 
-## Delta Dreamforce 2026 — 2026-09-16
+## Delta Dreamforce 2026 — corte ampliado 2026-09-18
 
 Salesforce está moviendo el punto de acceso de la plataforma: AIforce lleva el contexto gobernado, los workflows y
 las acciones a interfaces como Claude, Slack y otras superficies, de modo que el usuario o un agente no siempre debe
@@ -52,7 +52,13 @@ posteriores. Cada capacidad debe evaluarse por separado y no entra automáticame
 Koa es un lanzamiento del 15/09, no del 16/09: modelo de razonamiento CRM de Salesforce/NVIDIA para Agentforce,
 en pilotos seleccionados y con GA prevista para invierno de 2026 en regiones de EE. UU. Missionforce/OpenAI y la
 expansión de Missionforce son anuncios del 16/09 orientados a gobierno y entornos regulados; no se extrapolan al CRM
-estándar.
+estándar. El catálogo público concentra las sesiones de producto en el 15 y 16/09; no se añadió un lanzamiento nuevo
+en el media hub oficial el 17 o 18/09 al corte de esta revisión.
+
+Los agentes job-ready Casey, Paige, Carter, Marshall, Piper y Fin fueron presentados como GA, mientras Hunter quedó
+en piloto con GA prevista para noviembre; Multi-Agent Orchestration se presentó como GA y AI Skills/Agent Optimizer
+quedaron para estados posteriores. Los casos Adecco, Siemens y Live Nation prueban adopción concreta, no entitlement
+universal.
 
 ## Reglas de coexistencia
 

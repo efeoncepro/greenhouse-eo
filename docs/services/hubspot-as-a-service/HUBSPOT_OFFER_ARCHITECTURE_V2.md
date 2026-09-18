@@ -1,15 +1,16 @@
 # HubSpot as a Service — arquitectura de oferta V2
 
 > **Estado:** vigente
-> **Fecha de verificación:** 2026-09-16
+> **Fecha de verificación:** 2026-09-18
 > **Owner:** RevOps & CRM / práctica HubSpot
 > **Evidencia de mercado:**
 > [`HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md`](../../audits/commercial/HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md)
 > **Regla de producto:** toda disponibilidad, tier, seat, crédito, beta y limitación se vuelve a verificar contra
 > fuente primaria al cotizar y antes de publicar.
 
-> **Delta Fall 2026 / UNBOUND 2026:** ChatGPT Ads en HubSpot se incorpora como beta pública; Agent Hub, MCP/Claude,
-> Breeze y Scheduled Prompts quedan sujetos a la matriz de estado, gates y fuentes oficiales de
+> **Delta Fall 2026 / UNBOUND 2026:** ChatGPT Ads en HubSpot se incorpora como beta pública; Smart CRM self-updating,
+> Growth Context, Context Home, Marketing Studio y las nuevas superficies de agentes quedan sujetos a la matriz de
+> estado, gates y fuentes oficiales de
 > [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md). No se
 > incorporan pricing ni disponibilidad territorial por inferencia.
 

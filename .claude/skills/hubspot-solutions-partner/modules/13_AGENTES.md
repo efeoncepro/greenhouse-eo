@@ -1,7 +1,12 @@
 # 13 · Agent Hub y Agentic Operations — diseñar, implementar, gobernar y operar
 
-> **Refresh Fall Spotlight/UNBOUND 2026 — 2026-09-16.** Fall cambia el framing de agentes aislados a **agentic
+> **Refresh Fall Spotlight/UNBOUND 2026 — 2026-09-18.** Fall cambia el framing de agentes aislados a **agentic
 > team**; no cambia la obligación de validar release state, permisos, consumo y readback por caso.
+
+El corte ampliado añade tres superficies que deben quedar en `first look/demo` hasta readback: **Customer Agent
+Voice**, **HubSpot Work** y **Agent CLI**. Agent CLI se mostró en un flujo read-only de pipeline con evidencia y
+revisión humana; no inferir desde esa demo permiso de escritura, ejecución programada, disponibilidad regional o
+paridad de API.
 
 > **Este módulo nació el 2026-07-13** porque los agentes dejaron de ser una nota al pie del producto y pasaron
 > a ser **una capa de servicio con caso propio**. Es la oferta más diferenciada que Efeonce tiene hoy en LATAM.

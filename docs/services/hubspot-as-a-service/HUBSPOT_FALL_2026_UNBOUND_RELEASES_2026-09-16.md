@@ -1,6 +1,6 @@
 # HubSpot as a Service — lanzamientos Fall 2026 / UNBOUND 2026
 
-> **Corte de investigación:** 2026-09-16 (America/Santiago)
+> **Corte de investigación:** 2026-09-18 (America/Santiago)
 > **Uso:** referencia operativa para discovery, diseño y propuesta; no sustituye la verificación del portal del cliente.
 > **Regla:** una fuente del proveedor prueba que la capacidad está documentada, no que el portal, el país, el plan, los créditos o el runtime del cliente sean elegibles.
 
@@ -9,11 +9,17 @@
 | Superficie | Estado al corte | Qué puede afirmarse | Qué sigue sin probar |
 | --- | --- | --- | --- |
 | ChatGPT Ads en HubSpot | **Beta pública** | Super Admin puede inscribir la cuenta; con cuenta ChatGPT Ads conectada, HubSpot documenta creación/publicación, seguimiento, atribución y eventos de conversión. | Acceso del portal concreto, país habilitado en OpenAI Ads Manager, revisión de anunciante, billing, pixel y entrega real. |
-| HubSpot connector for Claude / remote MCP | **Conector oficial documentado; expansión de scopes (GA no confirmado en estas fuentes)** | Claude puede consultar y, tras reautenticación, escribir en superficies soportadas de HubSpot; las actualizaciones del MCP incluyen leads, landing pages/analytics y campañas/atribución. | Elegibilidad del workspace de Claude, scopes efectivos, permisos HubSpot, límites API, aprobación de writes y comportamiento runtime del portal. |
+| HubSpot connector for Claude / remote MCP | **Conector oficial documentado; expansión de scopes publicada, GA del conector/portal no equivale a runtime del cliente** | Claude puede consultar y, tras reautenticación, escribir en CRM, contenido, reportes, objetos personalizados y operaciones soportadas; las actualizaciones incluyen campañas, AEO, conversaciones y configuración. | Elegibilidad del workspace de Claude, scopes efectivos, permisos HubSpot, límites API, aprobación de writes y comportamiento runtime del portal. |
 | Agent Hub / Agent Builder | **Documentado; first look de UNBOUND; pilot-first para servicio** | HubSpot lo presenta como lugar para gestionar agentes y construir agentes/workflows; puede conectar aplicaciones mediante MCP y usar contexto CRM. | Que el menú, agente, acción, créditos, seats y permisos estén disponibles o activos en un portal específico. |
 | Breeze Assistant — prompts compartidos | **Beta pública** | En cuentas enroladas se pueden compartir prompts con el equipo; Super Admin controla prompts compartidos de otros usuarios. | Enrolamiento y disponibilidad de la cuenta. |
 | Breeze Assistant — Scheduled Prompts | **Beta pública** | En cuentas enroladas, cada usuario puede configurar hasta cinco prompts automatizados personales y pausarlos, editarlos o eliminarlos. | Enrolamiento, horarios efectivos, consumo, resultados y cualquier límite adicional no declarado por la fuente. |
 | UNBOUND 2026 | **First look / contenido de evento** | Las sesiones presentan Agent Hub, Agent Builder, Breeze Assistant y el conector ChatGPT Ads como superficies de aprendizaje y demostración. | Una sesión no es GA, contrato de disponibilidad, pricing ni prueba de runtime. |
+| Self-updating Smart CRM / Growth Context / Context Home | **Lanzamiento Fall Spotlight; disponibilidad por cuenta/plan** | HubSpot presenta CRM que captura llamadas, emails y reuniones, y una superficie para revisar la calidad del contexto que alimenta a IA. | Freshness, portal, plan, permisos, cobertura de fuentes y resultado operativo. |
+| Breeze Assistant reconstruido | **Lanzamiento Fall Spotlight; disponibilidad por cuenta/plan** | Puede coordinar agentes para preguntas, planes, reportes, contenido y acciones desde la experiencia de HubSpot. | Roster, créditos, permisos, acciones, límites y publicación efectiva. |
+| Marketing Studio + Campaign Agent | **Lanzamiento/demo Fall Spotlight; Campaign Agent y agentes de contenido requieren validación** | Marketing Studio conecta insights, campañas, contenido y rendimiento; Campaign Agent ayuda a construir campañas con contexto CRM. | Estado GA/beta, edición, canales, consentimiento, créditos y outcome. |
+| Customer Agent Voice | **First look / demo de UNBOUND del 17/09** | Agente de voz de soporte que usa contexto CRM, toma acciones y deriva a humanos. | No es prueba de GA, región, idioma, canal o runtime. |
+| HubSpot Work | **First look / demo de UNBOUND del 18/09** | Producto de gestión de trabajo que combina procesos, contexto de cliente y agentes de IA. | No es prueba de GA, pricing, disponibilidad ni sustitución de PSA/ERP. |
+| Agent CLI | **Demo de UNBOUND; estado beta pública según el ledger de la skill** | Agentes pueden analizar deals, asociaciones y transcripciones para producir una vista de pipeline con evidencia y revisión humana. | Developer opt-in, scopes, ejecución, writes, límites y runtime del portal. |
 
 ## ChatGPT Ads dentro de HubSpot
 
@@ -124,6 +130,45 @@ portal lo exponga.
 
 ## Lectura comercial y gates de Efeonce
 
+## Lanzamientos ampliados del 16–18/09
+
+### Plataforma y contexto
+
+Fall Spotlight presenta un cambio de base: **Growth Context** reúne contexto del negocio, equipo, clientes y
+procesos; **Context Home** permite revisar vacíos y correcciones; y el **Smart CRM self-updating** busca mantener
+registros actualizados desde llamadas, emails y reuniones. Es una dirección de producto y una capacidad documentada,
+no evidencia de que cada portal tenga cobertura completa.
+
+### Marketing, ventas y revenue
+
+- **Marketing Studio + Campaign Agent:** insight → campaña → contenido → nurturing → medición, con agentes
+  especializados y contexto de marca/CRM.
+- **Microsoft Advertising:** campañas y atribución junto con otros canales dentro de HubSpot.
+- **Prospecting Agent:** más de 40 señales de compra, grupos de compra y outreach contextual; validar límites y
+  estado por portal.
+- **Mobile Notetaker + Deal Progression:** captura de reuniones, propuestas de actualización y seguimiento con
+  aprobación.
+- **Revenue Hub:** cotizaciones generadas desde el contexto del deal y continuidad quote-to-cash.
+
+### Demos del 17–18/09: no convertir en GA
+
+UNBOUND mostró **Customer Agent Voice**, **HubSpot Work** y **Agent CLI**. Se registran como first look/demo hasta
+que Knowledge Base, release notes y el portal del cliente prueben estado, elegibilidad y runtime. Lo mismo aplica a
+las sesiones de “What’s New for Service/Sellers/Marketers”: son evidencia de dirección y demostración, no una lista
+de entitlements universales.
+
+### Ecosistema e integraciones
+
+El Marketplace reportó 156+ apps nuevas y 21+ actualizadas, incluyendo conectores para Gemini, G2, Gong, Microsoft
+Advertising, SharePoint/OneDrive, TikTok Ads y ampliaciones de Copilot, Claude y Slack. Registrar estas integraciones
+como opciones de ecosistema, no como capacidades nativas de HubSpot ni como disponibilidad automática.
+
+### Cambios legales y comerciales de operación
+
+HubSpot actualizó términos para Revenue Hub, Pay-as-You-Go por excedentes de créditos y responsabilidades específicas
+de AI Agents: autorización de acceso, supervisión, disclosure de interacciones automatizadas y uso permitido. Este
+registro no sustituye el contrato ni el DPA del cliente.
+
 - **Puede entrar en discovery:** auditoría de elegibilidad, diseño de atribución consentida, prueba controlada de
   ChatGPT Ads y evaluación de conectores/agentes.
 - **Pilot-first:** ChatGPT Ads beta, Agent Hub/Agent Builder, MCP writes y Scheduled Prompts. El alcance debe quedar
@@ -135,7 +180,7 @@ portal lo exponga.
   conversion events, writes del conector, activación de agentes/workflows y scheduled prompts requieren aprobación
   explícita y readback posterior.
 
-## Fuentes oficiales consultadas (corte 2026-09-16)
+## Fuentes oficiales consultadas (corte 2026-09-18)
 
 ### 2026-09-15
 
@@ -154,9 +199,21 @@ portal lo exponga.
 - [OpenAI Help Center — Ads in ChatGPT](https://help.openai.com/en/articles/20001047) — audiencia, privacidad, temas sensibles, menores, personalización y reporting agregado.
 - [HubSpot — Set up and use the HubSpot connector for Claude](https://knowledge.hubspot.com/integrations/set-up-and-use-the-hubspot-connector-for-claude) — suscripción Claude, objetos, reautenticación, límites de bulk y aprobación de writes.
 
+### 2026-09-17 y 2026-09-18
+
+- [HubSpot Fall 2026 Spotlight](https://www.hubspot.com/company-news/fall-26-spotlight) — Smart CRM self-updating, Growth Context, Context Home, Breeze Assistant, Marketing Studio, Microsoft Advertising, Prospecting Agent, Notetaker, Deal Progression y Revenue Hub.
+- [HubSpot and OpenAI deepen partnership](https://ir.hubspot.com/news-releases/news-release-details/hubspot-and-openai-deepen-partnership-bring-ai-transformation) — capacidades ampliadas del conector ChatGPT, ChatGPT Ads y AI Growth Bundle.
+- [UNBOUND — Customer Agent Voice](https://unbound.hubspot.com/sessions/sess-1442) — demo del 17/09; first look, no prueba de GA.
+- [UNBOUND — Marketing Studio + Campaign Agent](https://unbound.hubspot.com/sessions/sess-1441) — demo del 17/09; contexto de Marketing Studio y Campaign Agent.
+- [UNBOUND — HubSpot Work](https://unbound.hubspot.com/sessions/sess-1448) — first look del 18/09; producto de AI work management.
+- [UNBOUND — Agent CLI](https://unbound.hubspot.com/sessions/sess-1447) — demo del 18/09; pipeline read-only con revisión humana.
+- [HubSpot Community — Marketplace apps](https://community.hubspot.com/t/156-new-and-21-featured-updated-apps-in-the-hubspot-marketplace/157999) — 156+ apps nuevas y 21+ actualizadas.
+- [HubSpot Legal Update 2026-09-16](https://community.hubspot.com/t/september-16-2026-legal-update/158698) — Revenue Hub, créditos, AI Agents, subprocesadores y términos.
+
 ### Fuentes oficiales de contexto vigente consultadas en el corte
 
 - [OpenAI — Testing ads in ChatGPT](https://openai.com/index/testing-ads-in-chatgpt/) — actualización pública de regiones 2026-08-11, consultada 2026-09-16; no se usa como prueba de disponibilidad actual del ad account.
 
 Las fuentes se vuelven a validar antes de cada propuesta, activación o publicación. Pricing y disponibilidad no se
-derivan de esta nota.
+derivan de esta nota. Las sesiones de UNBOUND son evidencia de dirección/demo; sólo documentación de producto y
+readback del portal prueban elegibilidad o runtime.

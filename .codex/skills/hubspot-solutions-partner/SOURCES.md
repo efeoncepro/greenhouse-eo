@@ -4,7 +4,7 @@
 > materialmente solo en 2026**, y el producto se renombró en tres lugares. Todo dato numérico se cita
 > con marca y `as-of`. Si vas a decir un número frente a un cliente, sale de acá o no sale.
 
-**As-of de producto de este ledger: 2026-09-16.** Pricing y programa conservan verificaciones fechadas por
+**As-of de producto de este ledger: 2026-09-18.** Pricing y programa conservan verificaciones fechadas por
 sección. Refresh obligatorio: **antes de UNBOUND (16-18 sep 2026)** y
 **antes del 15 de enero de 2027** (suben los umbrales de tier).
 
@@ -73,7 +73,7 @@ Fuentes verificadas 2026-08-27: [Gartner B2B Marketing Automation 2025](https://
 
 ## Producto HubSpot — as-of 2026-07-13
 
-### Fall Spotlight / UNBOUND 2026 — as-of 2026-09-16
+### Fall Spotlight / UNBOUND 2026 — as-of 2026-09-18
 
 | Claim | Fuente primaria / evidencia | Marca y uso |
 |---|---|---|
@@ -85,6 +85,15 @@ Fuentes verificadas 2026-08-27: [Gartner B2B Marketing Automation 2025](https://
 | Cada write de app se atribuye en Audit Log y governance permite least privilege por app/tool | [App governance and accountability](https://developers.hubspot.com/blog/build-with-confidence-app-governance) · [Fall Developer changelog](https://developers.hubspot.com/changelog/fall-2026-spotlight) | ✅ Control operativo; verificar superficie live antes de prometer cobertura completa |
 | Lead scoring base y AI insights para criterios basados en eventos | [Understand lead scoring](https://knowledge.hubspot.com/scoring/understand-the-lead-scoring-tool) · [AI insights](https://knowledge.hubspot.com/scoring/score-leads-based-on-high-impact-events) | ✅ Scoring documentado en Marketing/Sales Pro/Enterprise; AI insights exige `Edit` de Lead Scoring; validar objetos y disponibilidad por portal |
 | Enablement e incentivos de Fall Spotlight: curso para Solutions Partners, Builder Incentive y promoción de Credits | [Fall Spotlight Partner Enablement Kit](https://offers.hubspot.com/fall-2026-spotlight-partner-enablement-kit) | ✅ Oferta de canal publicada; **no afirma elegibilidad Efeonce**. Confirmar PDM/portal, tier, cuenta, SKU, mercado y cutoff |
+| Fall Spotlight: Smart CRM self-updating, Growth Context y Context Home | [Fall 2026 Spotlight](https://www.hubspot.com/company-news/fall-26-spotlight) | ✅ Lanzamiento/documentación del vendor; validar cobertura de fuentes, plan, permisos y runtime |
+| Fall Spotlight: Breeze Assistant reconstruido y Marketing Studio | [Fall 2026 Spotlight](https://www.hubspot.com/company-news/fall-26-spotlight) | ✅ Dirección y capacidades publicadas; agentes, acciones, créditos y disponibilidad se verifican por portal |
+| Fall Spotlight: Microsoft Advertising, Prospecting Agent, Mobile Notetaker, Deal Progression y Revenue Hub | [Fall 2026 Spotlight](https://www.hubspot.com/company-news/fall-26-spotlight) | ✅ Capacidades anunciadas; separar GA, beta, plan, canal y entitlement |
+| HubSpot + OpenAI: conector ChatGPT ampliado, ChatGPT Ads y AI Growth Bundle | [HubSpot IR](https://ir.hubspot.com/news-releases/news-release-details/hubspot-and-openai-deepen-partnership-bring-ai-transformation) | ✅ Anuncio del proveedor; ChatGPT Ads es beta y la oferta/promoción requiere términos vigentes |
+| Customer Agent Voice | [UNBOUND demo](https://unbound.hubspot.com/sessions/sess-1442) | ⚠️ First look/demo del 17/09; no usar como prueba de GA, región o runtime |
+| HubSpot Work | [UNBOUND demo](https://unbound.hubspot.com/sessions/sess-1448) | ⚠️ First look/demo del 18/09; no es prueba de GA, pricing ni sustitución de PSA/ERP |
+| Agent CLI: pipeline read-only con evidencia y revisión humana | [UNBOUND demo](https://unbound.hubspot.com/sessions/sess-1447) | ⚠️ Demo; validar beta, developer opt-in, scopes, límites y writes por portal |
+| Marketplace: 156+ apps nuevas y 21+ actualizadas | [HubSpot Community](https://community.hubspot.com/t/156-new-and-21-featured-updated-apps-in-the-hubspot-marketplace/157999) | ✅ Cifra del Marketplace; apps son integraciones del ecosistema, no capacidades nativas ni entitlements automáticos |
+| Cambios legales para Revenue Hub, créditos y AI Agents | [Legal Update 2026-09-16](https://community.hubspot.com/t/september-16-2026-legal-update/158698) | ✅ Cambio documental; revisar contrato/DPA antes de propuesta o activación |
 
 ### Narrativa agéntica, workspaces y motion de partners — as-of 2026-07-16 ✅
 

@@ -1,6 +1,6 @@
 # Dreamforce 2026 — lanzamientos y estado de evidencia
 
-Investigación verificada el **2026-09-16** sobre los anuncios publicados en la ventana de Dreamforce 2026.
+Investigación verificada el **2026-09-18** sobre los anuncios publicados en la ventana de Dreamforce 2026.
 Este documento es un ledger de producto, no una autorización comercial ni evidencia de disponibilidad para una org
 concreta. Separa los anuncios del **15/09** (keynote y partners) de las publicaciones del **16/09**.
 
@@ -29,7 +29,14 @@ concreta. Separa los anuncios del **15/09** (keynote y partners) de las publicac
 
 Las fechas de AIforce requieren una nota de evidencia: la página regional de Salesforce la publica como anuncio del
 16/09, mientras la newsroom USA y la página de Dreamforce pueden mostrar 15/09 por su asociación con la keynote.
-No uses esa diferencia para afirmar que hubo dos lanzamientos distintos.
+No uses esa diferencia para afirmar que hubo dos lanzamientos distintos. El catálogo público concentra las sesiones de producto en el 15 y 16/09; al corte del 18/09 no se identificó un nuevo lanzamiento de producto publicado el 17 o 18/09 en el media hub oficial.
+
+## Corte ampliado del 18/09
+
+- La agenda pública muestra 53 sesiones el martes 15 y 85 el miércoles 16; Dreamforce no debe confundirse con una ventana de cuatro días.
+- Los agentes job-ready Casey, Paige, Carter, Marshall, Piper y Fin fueron presentados como GA; Hunter quedó en piloto con GA prevista para noviembre. Multi-Agent Orchestration se presentó como GA; AI Skills y Agent Optimizer quedaron para estados posteriores.
+- Adecco, Siemens y Live Nation son casos de adopción, no evidencia de entitlement universal.
+- Koa, AIforce, Missionforce y las alianzas AWS/Google/NVIDIA/OpenAI conservan estados independientes; no los agrupes bajo una licencia única ni bajo “Agentforce GA”.
 
 ## Cambios de Agentforce mostrados o anunciados en la misma ventana
 

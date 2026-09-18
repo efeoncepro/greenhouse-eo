@@ -1,4 +1,4 @@
-# 01 · El producto que vendes hoy — as-of 2026-09-16
+# 01 · El producto que vendes hoy — as-of 2026-09-18
 
 > Todo con marca ✅/⚠️/❌ en `SOURCES.md`. **Fall Spotlight/UNBOUND 2026 está en curso: verifica portal, tier,
 > seat, permisos y estado antes de cotizar.**
@@ -21,6 +21,11 @@
 | **ChatGPT Ads en HubSpot** | **Beta**; conexión, creación/publicación, reporting/atribución y conversion events documentados. Requiere `Ads publishing` y opt-in de Super Admin | Vender como piloto de paid AI discovery; no prometer disponibilidad, performance ni acceso sin validar el portal |
 | **AI Growth Bundle** | **Oferta promocional condicionada**: Starter + Credits, ChatGPT Business y match de gasto de ChatGPT Ads; condiciones, fechas, mercado y elegibilidad se deben leer en la oferta vigente | No es SKU permanente ni promesa de precio/ahorro; confirmar por escrito con HubSpot antes de presentarlo |
 | **Agentic team** | Narrativa Fall: agentes para cada motion GTM sobre el mismo Growth Context | Vender outcomes y contexto compartido, no una flota fija |
+| **Self-updating Smart CRM** | Captura llamadas, emails y reuniones para mantener registros al día | Validar fuente, cobertura, plan y permisos; no prometer automatización total |
+| **Context Home** | Revisa el contexto que alimenta a agentes y Breeze y muestra vacíos | Vender readiness y gobierno; no confundir score con calidad certificada |
+| **Breeze Assistant reconstruido** | Pregunta, construye y crea desde distintas superficies de HubSpot | Validar agentes, acciones, créditos y estado por portal |
+| **Marketing Studio + Campaign Agent** | Insight, campaña, contenido, nurture y medición con contexto CRM | Separar demo, beta, GA, edición, canales y consentimiento |
+| **HubSpot Work / Customer Agent Voice / Agent CLI** | First looks y demos de UNBOUND del 17–18/09 | No convertir sesiones en GA, pricing ni disponibilidad universal |
 | **Lead scoring con AI insights** | Documentado para Marketing/Sales Professional y Enterprise; permisos de edición de Lead Scoring requeridos | Es una capacidad de calificación; no confundir la disponibilidad del scoring base con cualquier beta de insight o recomendación |
 
 ✅/⚠️ Detalle y URLs: `SOURCES.md` § Fall Spotlight / UNBOUND 2026.
