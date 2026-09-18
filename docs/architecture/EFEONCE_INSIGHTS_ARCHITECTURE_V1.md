@@ -1,8 +1,9 @@
 # Efeonce Insights — Architecture V1
 
 > Status: **Foundation implementada y en producción (TASK-1845, 2026-09-15; ver §14)** — generación habilitada en
-> staging y producción, emisión e IA apagadas; render, sharing/delivery, UI y vista web en Think siguen en diseño
-> (TASK-1846–1849, TASK-1875). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
+> staging y producción, emisión e IA apagadas; render en producción (TASK-1846, §14.5); enlaces compartidos, correo
+> y recurrencia code complete sin deploy (TASK-1848, §14.6); A4, UI y vista web en Think siguen pendientes
+> (TASK-1847, TASK-1849, TASK-1875). Los §§1–13 describen el contrato; §14 registra qué existe en código y runtime, el
 > rollout verificado, sus límites honestos y las invariantes que un agente debe respetar al tocar el dominio.
 > Owner: Platform + Client Experience.
 > [ADR](EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
@@ -83,9 +84,9 @@ Nombres lógicos propuestos; TASK-1845 materializa schema/DDL con helpers canón
 | EvidenceSnapshot | Hechos mínimos, fuentes y hashes de evidencia | Inmutable al sellar; sólo datos autorizados; sin PII operativa innecesaria |
 | EditorialPlan | Secciones, claims, ChartSpec, acciones, referencias | Congela datos y texto final; versiona modelo/prompt si hubo IA, sin chain-of-thought |
 | RenderRun / Output | edición + target + manifestHash + assetId | Estado y error por salida; retries sin duplicar archivos finales |
-| ShareGrant | edición + hash de token + expiración + downloadPolicy | Muchos por edición, revocación individual; no autoriza biblioteca ni queries libres |
-| DeliveryIntent | edición + destinatarios + outputs + autorización | Cada destinatario tiene estado; referencia `email_deliveries`, no segundo transporte |
-| InsightSchedule | encargo relativo + zona + frecuencia + autoridad | Resolución de período por ocurrencia; inactive por defecto; generación y envío separados |
+| ShareGrant | `insight_share_grants` (`ishr-…`): edición + `token_digest` sha256 + `expires_at` + `download_outputs` | Muchos por edición (cupo 20 activos), revocación individual; audiencia `client`; expiración obligatoria ≤ 90 días; inmutable salvo revocación única; no autoriza biblioteca ni queries libres |
+| DeliveryIntent | `insight_delivery_intents` (`idlv-…`) + `insight_delivery_recipients` (`idlr-…`): edición + `edition_issued_hash` + modalidad + outputs + autorización | Contenido autorizado inmutable; cada destinatario tiene estado; idempotencia (org, key) + hash; transporte en `email_deliveries`, no segundo transporte |
+| InsightSchedule | `insight_schedules` (`isch-…`) + `insight_schedule_occurrences` (`isco-…`): plantilla relativa + zona + cadencia + autoridad | Nace `draft`; ocurrencia única por (schedule, versión, período); V1 sólo genera borrador + render (`review_policy = 'draft_for_review'`) |
 
 Materializar relaciones dentro del dominio con integridad de organización en todas las referencias. Ownership
 de nuevos stores: TASK-1845 núcleo; TASK-1846 renders/outputs; TASK-1848 grants/delivery/schedules. Los catálogos
@@ -97,9 +98,17 @@ globales tienen ownership explícito de plataforma; logos del cliente quedan lig
   por fase y `withdrawn` para retirada de acceso. Emitir exige los outputs solicitados validados.
 - Render por target: `queued → running → succeeded | failed | cancelled`. Lease vencido permite recuperación
   con fencing; un worker antiguo no puede finalizar encima del nuevo.
-- Share: `active → revoked | expired`; no se reactiva un token revocado.
-- Delivery: `pending → accepted → delivered | bounced | failed`; aceptación HTTP no es entrega ni lectura.
-- Schedule: `draft → active → paused | retired`; cambio de audiencia/destinatarios invalida autorización anterior.
+- Share: `active → revoked | expired`; un trigger impide reactivar, borrar o mutar el grant salvo la revocación
+  única. Retirar la edición revoca todos sus grants vivos (`edition_withdrawn`) en la misma transacción.
+- Delivery intent: `pending → dispatching → completed | partially_failed | failed`, o `cancelled`. Destinatario:
+  `pending → claimed → accepted | failed | ambiguous`, además de `skipped` (con `skip_reason`) y `cancelled`.
+  `ambiguous` no se reintenta: se reconcilia contra el ledger. El estado de transporte (`transportStatus`:
+  `accepted`, `delivered`, `bounced`, `complained`, `suppressed`…) se lee de `email_deliveries`; aceptación
+  HTTP no es entrega y nunca se afirma "leído".
+- Schedule: `draft → active → paused | retired`; un retirado no se reactiva. Pausa con motivo `manual`,
+  `authority_revoked`, `module_unavailable` o `repeated_failures`. Ocurrencia: `pending → generating →
+  generated → render_requested`, o `failed | skipped`. V1 sólo admite la política `draft_for_review`: la
+  ocurrencia deja la edición `ready_for_review`; autoemisión y autoenvío no existen.
 
 UI muestra progreso por fase; no inventa porcentajes. Un PDF listo y otro fallido se muestran separados,
 sin emitir una entrega completa ficticia. El usuario puede solicitar una nueva edición con otro output set.
@@ -173,9 +182,9 @@ Superficie **propuesta**, naming final de rutas/capabilities se registra durante
 |---|---|---|
 | list/get/catalog/validateRequest/createEdition/revise/issue | Thin adapters App/Ecosystem; listado paginado y estados compactos | TASK-1845 |
 | requestOutputs/getRun/retryOutput/cancelRun | Requests asíncronos, sin esperar Chromium. **Registrado 2026-09-16:** `POST/GET …/insights/editions/{editionId}/render`, `GET …/insights/render-runs/{renderRunId}`, `POST …/render-runs/{renderRunId}/retry`, `POST …/render-runs/{renderRunId}/cancel` en los lanes app y ecosystem; tools MCP `request_insight_render`, `get_insight_render_run`, `retry_insight_render`, `cancel_insight_render`. Errores nuevos `render_disabled` (503) y `render_rejected` (422). | TASK-1846 |
-| createShare/revokeShare/getShare/withdrawEdition | Writes gobernados; token sólo al emitir enlace autorizado | TASK-1848 |
-| requestDelivery/getDelivery/createSchedule/pauseSchedule | Autorización exacta por destinatario, modalidad y recurrencia | TASK-1848 |
-| resolveSharedEdition/downloadSharedOutput | Token de lectura limitado, sin OAuth ni discovery de módulos | TASK-1848 |
+| createShare/revokeShare/getShare/withdrawEdition | Writes gobernados; token sólo al emitir enlace autorizado. **Registrado 2026-09-18 (code complete, sin deploy):** `POST/GET …/insights/editions/{editionId}/shares`, `POST …/insights/shares/{shareId}/revoke` en los lanes app y ecosystem (en ecosystem crear/revocar exige binding interno); tools MCP `create_insight_share`, `list_insight_shares`, `revoke_insight_share` (clase write: create/revoke). Capability `insights.share.manage`. Error `sharing_disabled` (503) | TASK-1848 |
+| requestDelivery/getDelivery/createSchedule/pauseSchedule | Autorización exacta por destinatario, modalidad y recurrencia. **Registrado 2026-09-18 (code complete, sin deploy).** Envío — app: `POST/GET …/editions/{editionId}/deliveries`, `GET …/deliveries/{deliveryId}`, `POST …/deliveries/{deliveryId}/cancel\|retry`, `POST …/delivery-recipients/{recipientId}/reconcile`; ecosystem: sólo los dos `GET`; MCP `list_insight_deliveries`, `get_insight_delivery`. Recurrencia — app: `POST/GET …/insights/schedules`, `GET …/schedules/{scheduleId}`, `POST …/schedules/{scheduleId}/activate\|pause\|retire`; ecosystem: sólo `GET`; MCP `list_insight_schedules`, `get_insight_schedule`. **Envío, cancelación, reintento, reconciliación y escrituras de recurrencia son sólo lane App (persona interna); ecosystem y MCP son de lectura.** La modalidad `portal_link` responde `not_ready` hasta que TASK-1849 construya la ruta de la edición en el portal. Capabilities `insights.delivery.send` e `insights.schedule.manage`. Errores `delivery_disabled` y `schedules_disabled` (503); `quota_exceeded` (429) | TASK-1848 |
+| resolveSharedEdition/downloadSharedOutput | Token de lectura limitado, sin OAuth ni discovery de módulos. **Registrado 2026-09-18:** `GET /api/public/insights/shared/[token]` y `GET /api/public/insights/shared/[token]/outputs/[output]` (§8) | TASK-1848 |
 
 API responde `202` con `reportId/editionId/runId` para trabajo asíncrono. Repetir la misma idempotency key y
 payload devuelve el mismo recurso; diferente payload con misma key devuelve conflicto. Todas las escrituras
@@ -232,9 +241,42 @@ pueden tener distinto corte; mostrar fecha/período explica la diferencia, no fo
 ## 8. Acceso web compartido
 
 Tokens opacos aleatorios de al menos 128 bits de entropía; persistir digest, nunca bearer recuperable.
-Mostrar URL secreta sólo al crear; después regenerar significa un grant nuevo. La entrega autorizada que
-necesite retry conserva el secreto únicamente cifrado y efímero dentro del carril sensible canónico, con
-retención mínima; no lo copia en outbox genérico, logs, analytics ni errores. Resolver asset y auth en servidor.
+Mostrar URL secreta sólo al crear; después regenerar significa un grant nuevo. **El bearer nunca se persiste,
+ni cifrado** (decisión del operador 2026-09-18): en el envío por correo vive sólo en memoria; un fallo definitivo
+revoca el grant y el reintento emite uno nuevo. No se copia en outbox, logs, analytics ni errores. Resolver asset
+y auth en servidor.
+
+**Contrato materializado (TASK-1848, code complete 2026-09-18, sin deploy).**
+
+- **Token:** `isg_` + 32 bytes aleatorios base64url (256 bits), `src/lib/efeonce-insights/sharing/token.ts`; se
+  guarda sólo el digest sha256 (`token_digest` UNIQUE). URL: `${INSIGHTS_SHARE_PUBLIC_BASE_URL ??
+  'https://think.efeoncepro.com'}/insights/r/<token>`, devuelta una única vez al crear.
+- **Respuesta:** `InsightSharedEditionResponseV1 {modelVersion, header, model, downloads, expiresAt}`, con
+  `InsightWebModelV1` (`modelVersion 1.0`, `contracts/web-model.ts`): resumen, capítulos (claims, `ChartSpecV1` +
+  tabla resuelta, tablas, límites), acciones sin `ownerRef`, metodología, referencias sin `evidenceRef` y hechos
+  formateados por locale. Nunca `authoringMode`, `modelId`, prompts, historial ni ids de actor.
+- **Semántica:** `404` = token desconocido, mal formado, expirado, flag OFF, org suspendida o módulo retirado
+  (indistinguibles entre sí); `410` = revocado o edición retirada; `429` = rate limit; `503` sanitizado.
+- **Rate limit** (`insight_share_rate_buckets`, ventana por minuto sobre sujeto hasheado, UPSERT atómico): por IP
+  300 vistas / 60 descargas por minuto; por grant 60 / 20. Si la base no responde, **falla cerrado**.
+- **Cabeceras:** `Cache-Control: private, no-store, max-age=0`, `Pragma: no-cache`, `Referrer-Policy: no-referrer`,
+  `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-Robots-Tag: noindex, nofollow, noarchive`, CSP
+  `default-src 'none'; frame-ancestors 'none'`.
+- **Descarga:** proxy vía `downloadPrivateAsset({actorUserId: null, accessMetadata: {accessChannel:
+  'insights_share_grant', shareGrantId}})` (firma ampliada a `string | null`), revalidando el grant justo antes
+  de leer bytes.
+- **Access log:** `insight_share_access_events`, append-only, sin token ni IP cruda (`subject_hash`, `client_hint`
+  `unknown|robot|prefetch`, outcome `served|not_found|revoked|expired|withdrawn|unavailable|rate_limited`).
+  Retención 180 días; los rate buckets se purgan pasado 1 día (lo hace el tick de schedules, aun con flag OFF).
+- **Observabilidad:** `redact.ts` (patrones `insights_share_path` e `insights_share_token`) y
+  `src/lib/observability/sentry-server-event-scrub.ts`, cableado en `sentry.server.config.ts` y
+  `sentry.edge.config.ts` (`beforeSend` + `beforeSendTransaction`: URL, query string, transaction, breadcrumbs, spans).
+- **Quién comparte:** capability `insights.share.manage`; EFEONCE_ADMIN y EFEONCE_ACCOUNT (tenant),
+  CLIENT_EXECUTIVE (own). CLIENT_MANAGER no comparte. TTL 1–90 días (default 30).
+
+**Deliberadamente distinto del Grader:** el enlace del Grader guarda el token en claro y se sirve con
+`public, max-age=300` sin cabeceras anti-índice; no es modelo. El modelo es el token del talent pool (sólo digest)
+más las cabeceras de `hiring/assessment/public-session/http.ts`.
 
 **Dónde se renderiza (delta ADR 2026-09-15):** la vista compartida vive en el hub público `efeonce-think`
 (`think.efeoncepro.com`; ruta propuesta `/insights/r/<token>`, hermana de `/brand-visibility/r/<token>` del
@@ -282,12 +324,51 @@ scheduleVersion + período; dos ticks no duplican. Caída se recupera por polít
 (una ocurrencia pendiente por defecto), no tormenta histórica. Revocar autoridad pausa el schedule. Default:
 genera borrador para revisión; autoemisión/envío exige autorización previa explícita, acotada y revocable.
 
+**Materializado por TASK-1848 (code complete 2026-09-18, sin deploy).**
+
+- **Modalidades vivas V1:** `share_link` y `attachment`. `portal_link` se rechaza `not_ready` hasta que TASK-1849
+  construya la ruta de la edición en el portal (`INSIGHT_PORTAL_EDITION_ROUTE_AVAILABLE = false` en
+  `delivery/contracts.ts`; al activarla se registra el deep link `insights_edition`).
+- **Destinatarios:** sólo user ids de personas activas de la org (cliente) o internas activas; 1–50; nunca correos
+  libres. Asunto 3–200, mensaje ≤ 2000. Capability `insights.delivery.send` (sin scope `own`: un cliente nunca
+  envía); EFEONCE_ADMIN y EFEONCE_ACCOUNT.
+- **Correo:** EmailTypes `insights_edition_delivery` (token-sensitive, sin adjuntos, sin replay genérico) e
+  `insights_edition_delivery_attachment` (estándar, con PDF; exige `acknowledgeIrrevocableAttachment=true`).
+  Dominio de correo `insights`, marca Efeonce. Ambos sembrados `enabled=false` en `email_type_config`, que falla
+  abierto si falta la fila. Template funcional `src/emails/InsightsEditionDeliveryEmail.tsx` (presentación: 1849).
+- **Despacho:** projection `insights_delivery_dispatch` (lane `ops-reactive-notifications`) →
+  `dispatchInsightDeliveryIntent`: claim atómico, revalida edición/persona/buzón; `share_link` usa
+  `claimTokenSensitiveEmailIntent`, que crea la fila de `email_deliveries` y el grant (`source='delivery'`) en la
+  misma transacción (índice `uq_email_deliveries_token_intent_v3`).
+- **Dedupe:** índice único parcial por (org, edición, issued_hash, modalidad, persona) mientras el destinatario
+  está `pending|claimed|accepted|ambiguous`; el duplicado queda `skipped` (`duplicate_delivery`).
+- **Correlación por intento:** `idlr-<uuid>` en el primero y `idlr-<uuid>:aN` en los reintentos (N = 2..5), porque
+  el índice de la plataforma de correo es único por (tipo, source_event_id).
+- **Ambiguo → reconciliar:** un resultado incierto deja al destinatario `ambiguous` y no se reintenta.
+  `reconcileInsightDeliveryRecipient` lee el ledger del intento exacto: enviado/entregado/`resend_id` ⇒ `accepted`;
+  sin fila o `failed` sin `dispatch_unknown` ⇒ `failed` y revoca el grant; `pending`/`dispatch_unknown` ⇒
+  `unresolved` salvo `operatorDecision` + `reason` (≥ 10 caracteres). Reintento sólo de `failed`, máximo 5 intentos.
+  Señal `insights.delivery.ambiguous` (steady 0; warning 1–3, error > 3; cuenta ambiguos + `claimed` > 30 min).
+- **Recurrencia:** un solo Cloud Scheduler `ops-insights-schedules-tick` (`20 * * * *`) para todas las orgs →
+  `ops-worker` `POST /insights/schedules/tick` (`runInsightSchedulesTick`). Revalida la autoridad con
+  `session_360` y `assertInsightsAccess`; si falla, pausa. Períodos cerrados y consolidados (`window.ts`: mes
+  calendario, semana ISO lunes-lunes, día civil de la zona) con fin posterior a la activación: sin ediciones
+  retroactivas. Claim con reintento (máx 3); idempotencyKey `sched-<scheduleId>-v<version>-<periodStart>`; pide
+  render de los outputs renderizables (hoy `deck_pdf`). Tres fallos seguidos ⇒ pausa `repeated_failures`.
+  Máximo 10 schedules activos por org; `consolidation_days` 0–15 (default 3), `catch_up_limit` 1–3 (default 1).
+
 ### 9.1 Activación y retorno al portal — EPIC-046
 
 Decisión de producto del operador, 2026-09-09: Insights debe llegar por correo con valor útil y deep links;
 notificaciones por email, in-app y Teamsbot acompañan el servicio desde esta fase. La app móvil y su
 adapter push quedan para una fase posterior. Este contrato describe el resultado exigido, no un envío
 habilitado ni la disponibilidad actual del Hub.
+
+**Gap vigente (2026-09-18): in-app y Teams no están implementados.** TASK-1848 entrega sólo correo.
+`NotificationService.dispatch` (categoría `report_ready`) no permite restringir canales y dispararía su propio
+correo genérico `notification`: doble envío sin dedupe. El resolver de Teams sólo resuelve members, así que para
+clientes no está disponible. Dueños: TASK-690–693 (Hub y preferencias) y TASK-1849 (experiencia). Hasta que se
+cierre, la "primera entrega cliente con email + in-app verificables" de este contrato sigue pendiente.
 
 **Recorrido:** hecho relevante → destinatario autorizado → aviso útil → destino exacto del portal →
 acción/consulta → seguimiento. No enviar recordatorios genéricos para inflar visitas. El correo muestra
@@ -378,7 +459,8 @@ reduced motion, contraste y `scrollWidth === clientWidth`. No afirmar PDF/UA sin
 
 Retención: snapshots/outputs según policy de cliente y clase de datos; access logs separados. Expirar enlaces
 no borra evidencia; eliminación autorizada genera tombstone/audit sin retener PII por el argumento de inmutabilidad.
-Definir duración efectiva y cleanup verificable en TASK-1845/1848 antes de primera emisión externa.
+Definir duración efectiva y cleanup verificable en TASK-1845/1848 antes de primera emisión externa. TASK-1848
+fija la de su dominio: access events de enlaces 180 días y rate buckets 1 día, purgados por el tick de schedules.
 
 ## 11. Plan compacto y rollout
 
@@ -715,3 +797,44 @@ canary productivo. Los huérfanos en `running` sin lease requieren decisión hum
   vacía). No es un bug de doble finalización; si el costo importara, la corrección es que el dispatcher cuente las
   ejecuciones del Job aún en curso antes de lanzar otra.
 - **Sigue fuera:** `INSIGHTS_ISSUANCE_ENABLED` OFF (paso de producto); `report_pdf` → TASK-1847; `web` → TASK-1848.
+
+### 14.6 Estado de TASK-1848 — sharing, correo y recurrencia (code complete 2026-09-18, rollout pendiente)
+
+**Construido (commits locales en `develop`, sin push ni deploy):**
+- Slice 1 — ShareGrant + reader público: token `isg_` con sólo digest, commands `createInsightShare` /
+  `revokeInsightShare` / `readInsightShares`, retirada de edición que revoca grants y cancela envíos pendientes,
+  `InsightWebModelV1`, `GET /api/public/insights/shared/[token]` (+ `/outputs/[output]`), cabeceras y rate limit
+  de §8, scrub de Sentry. Eventos `insights.share.created|revoked`.
+- Slice 2 — envío por correo: intents + destinatarios + eventos, dos EmailTypes, projection de despacho,
+  reconciliación de ambiguos, reintento y cancelación (§9). Evento `insights.delivery.requested`; señal
+  `insights.delivery.ambiguous` cableada en `get-reliability-overview`.
+- Slice 3 — recurrencia: schedules + ocurrencias, `window.ts`, tick en `ops-worker` con Cloud Scheduler
+  `ops-insights-schedules-tick` (`20 * * * *`). Eventos `insights.schedule.changed|occurrence_generated`.
+- Lanes App/Ecosystem y MCP de §7: manifest 62 tools (antes 55), hash `9fc46c8d90d3`.
+
+**Migraciones aplicadas** en la instancia Cloud SQL única (dev/staging/prod comparten base), con readback:
+`20260918094614053_task-1848-insights-share-grants`, `20260918100238745_task-1848-insights-delivery-intents`,
+`20260918100811735_…-skip-reason-edition`, `20260918101834425_task-1848-insights-schedules`.
+
+**Flags y runtimes lectores:**
+
+| Flag | Vercel | ops-worker |
+|---|---|---|
+| `INSIGHTS_SHARING_ENABLED` | crear enlace y reader público; default OFF | — |
+| `INSIGHTS_DELIVERY_ENABLED` | crear intent; default OFF | despacho; default `true` en `deploy.sh` |
+| `INSIGHTS_SCHEDULES_ENABLED` | escrituras de schedule; default OFF | tick; default `true` en `deploy.sh` |
+| `INSIGHTS_GENERATION_ENABLED` | ya existente | ahora también se lee aquí; default `true` en `deploy.sh` |
+
+Revocar, cancelar, pausar y retirar funcionan con el flag OFF. Kill switch adicional por EmailType en
+`email_type_config` (ambos sembrados `enabled=false`). `INSIGHTS_AUTHORING_AI_ENABLED` no se declara en el worker.
+
+**Verificado:** suites focales (último barrido 1147 tests), live tests `sharing`, `delivery` y `schedules` 3/3
+contra PostgreSQL real (transacción revertida), `pnpm worker:runtime-deps-gate` y `pnpm mcp:manifest:check`.
+
+**Pendiente (bloquea declarar operativo):**
+- `pnpm test` completo y `pnpm build` de producción sobre el último commit.
+- Push a `develop`, flags en Vercel staging, deploy del `ops-worker` y del Cloud Scheduler, canary sintético.
+- Federación de las tools en el gateway `efeonce-mcp` (fuera de esta sesión).
+- TASK-1875 (Think): consumidor de `/insights/r/<token>`; sin él el enlace compartido no tiene pantalla pública.
+- Producción y release quedan fuera de la frontera de esta sesión.
+- Gaps de producto: `portal_link` (TASK-1849), in-app/Teams (TASK-690–693 / TASK-1849), presentación final del correo.

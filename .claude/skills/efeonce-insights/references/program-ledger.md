@@ -8,7 +8,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1845 | Domain, evidence, adapters, lanes, MCP, gateway federation | **complete** | Cloud SQL (single instance), Vercel staging + Production (generation ON), gateway v1.5.0, Entra scope | 2026-09-16 |
 | TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | **complete** | Cloud SQL (migrations applied), Vercel staging + Production (render ON), Cloud Run Job `artifact-worker` (first productive deploy in release `917491fd02e4`) + `ops-worker` dispatcher (flag ON, shared by staging/prod), gateway v1.6.0 deployed | 2026-09-16 |
 | TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | to-do | — | — |
-| TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | to-do (unblocked 2026-09-16) | — | — |
+| TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — code complete, rollout pending** | Cloud SQL only (4 migrations applied); code on local `develop` (not pushed); Vercel / ops-worker / gateway NOT deployed | — |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
 
@@ -158,8 +158,66 @@ tender decks: separate issue for the catalog owner.
 ## TASK-1847 — charts and catalogs (to-do)
 _Fill at closure._
 
-## TASK-1848 — sharing, delivery, schedules (to-do)
-_Fill at closure: web-model resolver/proxy for Think, tokens, email path, schedules._
+## TASK-1848 — sharing, delivery, schedules (in-progress; code complete, rollout pending — 2026-09-18)
+
+**Built (local `develop`, NOT pushed, NOT deployed):** commits `75715589d` (Slice 1 — ShareGrant + public reader +
+`InsightWebModelV1`), `83d57380a` (Slice 2 — durable email delivery), `1c109fc8e` (Slice 3 — governed schedules,
+draft + render only).
+
+- Slice 1: `insight_share_grants` (only the sha256 digest of the bearer is stored), append-only access events, per-minute
+  rate buckets; commands create/revoke/read under `src/lib/efeonce-insights/sharing/`; public reader
+  `GET /api/public/insights/shared/[token]` (+ `/outputs/[output]` download proxy); `InsightWebModelV1` +
+  `InsightSharedEditionResponseV1`; Sentry scrub of share paths/tokens (server + edge); `withdrawInsightEdition` now
+  revokes live grants and cancels pending deliveries in the same transaction; capability `insights.share.manage`.
+- Slice 2: delivery intents/recipients/events; two EmailTypes (`insights_edition_delivery` token-sensitive,
+  `insights_edition_delivery_attachment` standard) seeded `enabled=false`; projection `insights_delivery_dispatch`
+  (ops-worker, lane ops-reactive-notifications); reconcile/retry/cancel; signal `insights.delivery.ambiguous`;
+  capability `insights.delivery.send` (internal only).
+- Slice 3: `insight_schedules` + `insight_schedule_occurrences`; `runInsightSchedulesTick` on ops-worker
+  `POST /insights/schedules/tick` (Cloud Scheduler `ops-insights-schedules-tick`, `20 * * * *`); capability
+  `insights.schedule.manage`; retention purge (access events >180 d, rate buckets >1 d).
+- MCP: 7 new tools (manifest 62 tools, was 55; hash `9fc46c8d90d3`): `create_insight_share`, `list_insight_shares`,
+  `revoke_insight_share`, `list_insight_deliveries`, `get_insight_delivery`, `list_insight_schedules`,
+  `get_insight_schedule`.
+
+**Migrations (all applied on the single Cloud SQL instance, verified by readback):**
+`20260918094614053_task-1848-insights-share-grants`, `20260918100238745_task-1848-insights-delivery-intents`,
+`20260918100811735_…-skip-reason-edition`, `20260918101834425_task-1848-insights-schedules`.
+
+**Deployed where (2026-09-18):**
+
+| Runtime | Component | State | Evidence |
+| --- | --- | --- | --- |
+| Cloud SQL `greenhouse-pg-dev` (single instance dev/staging/prod) | 4 migrations + seeds (capabilities, `email_type_config` rows `enabled=false`) | applied | readback; live tests `sharing/delivery/schedules.live.test.ts` 3/3 (rolled-back transaction) |
+| Vercel staging / Production | lanes, public reader, commands | NOT deployed (code not pushed) | — |
+| Cloud Run `ops-worker` | delivery dispatch projection + schedules tick | NOT deployed | — |
+| Cloud Scheduler | `ops-insights-schedules-tick` | NOT created | — |
+| Gateway `efeonce-mcp` | 7 new tools | NOT federated (out of session scope) | — |
+
+**Flags and runtimes:** `INSIGHTS_SHARING_ENABLED` (Vercel, default OFF); `INSIGHTS_DELIVERY_ENABLED` (Vercel for
+intent creation, OFF ⇒ 503 `delivery_disabled`; ops-worker for dispatch, default `true` in `deploy.sh`, guarded by
+`deploy-contract.test.ts`); `INSIGHTS_SCHEDULES_ENABLED` (Vercel OFF; ops-worker default `true`);
+`INSIGHTS_GENERATION_ENABLED` is now ALSO read by the ops-worker (default `true` in `deploy.sh`);
+`INSIGHTS_AUTHORING_AI_ENABLED` is NOT declared in the worker. Extra kill switch per EmailType in `email_type_config`.
+
+**Verified:** focal unit suites green (last sweep 1147 tests across efeonce-insights / mcp / entitlements / reliability /
+api-platform / ops-worker; plus email/emails/sync/observability for Slice 2); live 3/3; `pnpm worker:runtime-deps-gate`
+OK; `pnpm mcp:manifest:check` up to date.
+
+**Deliberately NOT done:** in-app (`NotificationService`, `report_ready`) and Teams notices (dispatch cannot restrict
+channels ⇒ double email; Teams resolver only resolves members — owners TASK-690–693 and TASK-1849); `portal_link`
+modality (rejected `not_ready` until the portal edition route exists, `INSIGHT_PORTAL_EDITION_ROUTE_AVAILABLE = false`);
+auto-issue / auto-send from schedules (CHECK `review_policy = 'draft_for_review'`); gateway federation of the 7 tools;
+full `pnpm test` + `pnpm build`; push; deploy; staging flags; staging canary.
+
+**Hand-off:**
+- **TASK-1875 (Think):** consume `GET /api/public/insights/shared/[token]` and `GET …/[token]/outputs/[output]`
+  server-side; response `InsightSharedEditionResponseV1 {modelVersion, header, model: InsightWebModelV1, downloads,
+  expiresAt}`; honour 404/410/429/503 and `no-store`; the token never reaches client JS, logs or analytics.
+  Default public base URL `https://think.efeoncepro.com/insights/r/<token>` (override `INSIGHTS_SHARE_PUBLIC_BASE_URL`).
+- **TASK-1849 (portal):** the portal edition route + deep link `insights_edition` (then flip
+  `INSIGHT_PORTAL_EDITION_ROUTE_AVAILABLE` and enable `portal_link`), final presentation of
+  `src/emails/InsightsEditionDeliveryEmail.tsx`, the in-app notice, and the UI for share/delivery/schedules.
 
 ## TASK-1849 — portal library/builder/shared web (to-do)
 _Fill at closure._
@@ -168,6 +226,12 @@ _Fill at closure._
 _Fill at closure: Astro route, token handling, `no-store`, GVC evidence._
 
 ## Sessions (append as you go; newest first)
+
+- **2026-09-18 · greenhouse-eo-91 · TASK-1848 Slices 1-3 implemented (code complete, rollout pending).** Commits
+  `75715589d`, `83d57380a`, `1c109fc8e` on local `develop` (not pushed). 4 migrations applied on the shared instance.
+  Operator decisions: bearer never persisted (digest only); schedules V1 = draft + render; PDF attachment opt-in with
+  irrevocability ack; session frontier = staging (production, release and gateway federation out). Not done: push,
+  deploy, staging flags/canary, full test/build, federation.
 
 - **2026-09-16 · TASK-1846 production + closure.** Release `917491fd02e4` (first productive deploy of the Job),
   render flag ON in Vercel Production, gateway v1.6.0 deployed, production canary green (dispatcher-driven `deck_pdf`,

@@ -41,6 +41,14 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
   Production y staging desde 2026-09-15), `INSIGHTS_ISSUANCE_ENABLED`, `INSIGHTS_AUTHORING_AI_ENABLED` (Gemini acotada
   con validación de cifras y fallback determinista). Sin generación ⇒ `503 generation_disabled`. Registrar todo flip en
   `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- **Sharing / correo / recurrencia (TASK-1848, `sharing/`, `delivery/`, `schedules/`)**: del token `isg_` sólo se
+  persiste su sha256 — **NUNCA** el bearer (ni cifrado); un reintento de correo revoca el grant y emite otro. El reader
+  público (`/api/public/insights/shared/**`) responde 404 desconocido/expirado, 410 revocado/retirado, 429 y SIEMPRE
+  `private, no-store` (distinto del Grader a propósito) y revalida el grant antes de servir cada byte. Enviar por correo
+  y gestionar recurrencias sólo por App lane con persona interna (ecosystem/MCP leen). Un destinatario `ambiguous`
+  **NUNCA** se reenvía: se reconcilia contra `email_deliveries`. Un schedule **NUNCA** emite ni envía (CHECK
+  `draft_for_review`). Flags `INSIGHTS_SHARING_ENABLED` (Vercel), `INSIGHTS_DELIVERY_ENABLED` y
+  `INSIGHTS_SCHEDULES_ENABLED` (Vercel + `ops-worker`); los EmailTypes nacen apagados en `email_type_config`.
 - **Eventos** `insights.*` sólo por `events.ts` en la misma transacción del write; **señales** de reliability
   `insights.editions.*` leen la tabla, no el evento. Observabilidad: `captureWithDomain(err, 'insights', …)`.
 - **Tool MCP nueva** ⇒ entrada en `src/mcp/greenhouse/tool-manifest.ts` (`writes` correcto) + `pnpm mcp:manifest:generate`

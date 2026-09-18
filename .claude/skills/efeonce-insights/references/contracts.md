@@ -71,3 +71,91 @@ Internal bindings must pass `organizationId`; org-scoped bindings read their own
 - Errors: `render_disabled` → 503 `service_unavailable`; `render_rejected` → 422 `bad_request` (details carry the cause; nothing is truncated).
 - Events: `insights.render.requested`, `insights.render.output_completed`, `insights.render.output_failed` (aggregate `insight_render_run`).
 - Port: `assertOutputsValidated(edition)` requires every `edition.outputs` `completed` with asset, same audience → `{ outputs: [{ output, assetId, manifestHash }] }`.
+
+## Sharing, delivery, schedules (TASK-1848) — verified against code 2026-09-18
+
+Code complete, not deployed. Shapes below are the ones in `sharing/`, `delivery/`, `schedules/` and the lanes.
+
+### Share links
+
+- `POST …/insights/editions/{editionId}/shares` body `{ expiresInDays?: 1–90 (default 30), downloadOutputs?: subset of
+  the edition outputs among deck_pdf|report_pdf (empty = view only), label?: 1–120 }` →
+  `{ share: InsightShareGrantDto, token, url }`. The token is returned ONCE; `url` =
+  `${INSIGHTS_SHARE_PUBLIC_BASE_URL ?? 'https://think.efeoncepro.com'}/insights/r/<token>`.
+- Preconditions: flag ON, need `share_create`, edition `issued` + audience `client` (internal edition ⇒ `not_ready` for an
+  internal actor, `not_found` for a client), max 20 active grants per edition ⇒ `quota_exceeded` 429.
+- `GET …/editions/{editionId}/shares` → `InsightShareGrantDto[]` `{ shareGrantId, editionId, status: active|revoked|expired,
+  downloadOutputs, label, source: manual|delivery, expiresAt, createdAt, createdByActorKind, revokedAt, revokeReason }`.
+  Never token nor digest.
+- `POST …/insights/shares/{shareGrantId}/revoke` → `{ share, idempotent }`; works with the flag OFF; never reactivates.
+  Revoke reasons: `manual|edition_withdrawn|delivery_superseded|delivery_failed|authority_revoked`.
+- Token format `isg_` + 32 bytes base64url (256 bits). Only `sha256` digest stored.
+
+### Public reader (Think consumes it)
+
+- `GET /api/public/insights/shared/{token}` → `InsightSharedEditionResponseV1 { modelVersion: '1.0', header {organizationName,
+  reportCode, reportTitle, editionVersion, periodLabel, periodStart, periodEndExclusive, timeZone, issuedAt, asOfMax},
+  model: InsightWebModelV1, downloads [{ output, status: available|unavailable, href? }], expiresAt }`.
+- `InsightWebModelV1`: executiveSummary, chapters (claims, charts = `ChartSpecV1` + table resolved to formatted figures,
+  tables, limits), actions (no ownerRef), limits, methodology, references (no evidenceRef), facts (`display` formatted
+  per locale, value, unit, observation, source, asOf, `absentReason: 'no_data'` when value is null). Never
+  authoringMode, modelId, prompts, history or actor ids.
+- `GET /api/public/insights/shared/{token}/outputs/{output}` → bytes via private-asset proxy; grant revalidated just
+  before reading. Already-downloaded files cannot be revoked.
+- Status codes: `404` unknown, malformed, expired, flag OFF, org suspended or module retired (indistinguishable);
+  `410` revoked or edition withdrawn; `429` rate limit (per IP 300 view / 60 download per minute; per grant 60 / 20;
+  FAILS CLOSED if the DB does not answer); `503` sanitized.
+- Headers on every answer: `Cache-Control: private, no-store, max-age=0`, `Pragma: no-cache`, `Referrer-Policy: no-referrer`,
+  `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-Robots-Tag: noindex, nofollow, noarchive`,
+  CSP `default-src 'none'; frame-ancestors 'none'`. Deliberately NOT the Grader's `public, max-age=300`.
+- Access events outcomes: `served|not_found|revoked|expired|withdrawn|unavailable|rate_limited`; `client_hint`
+  `unknown|robot|prefetch`. A hit is never reading evidence.
+
+### Email delivery (App lane only, human internal actor)
+
+- `POST …/editions/{editionId}/deliveries` body `{ modality: share_link|attachment (portal_link ⇒ not_ready in V1),
+  recipientUserIds: 1–50 active user ids of the org or active internal users (never free emails), outputs,
+  subject: 3–200, message?: ≤2000, idempotencyKey: 8–200, shareTtlDays? (share_link only; default 30),
+  acknowledgeIrrevocableAttachment: true (required for attachment, with outputs) }` → `{ delivery: InsightDeliveryIntentDto,
+  idempotent }`. Idempotency `(org, key)` + hash of the authorized payload. Needs `delivery_send`; edition `issued` + client.
+- `GET …/editions/{editionId}/deliveries`, `GET …/deliveries/{deliveryIntentId}` (both lanes) → DTO
+  `{ deliveryIntentId, editionId, modality, outputs, subject, state, shareTtlDays, authorizedByActorKind, cancelledAt,
+  cancelReason, createdAt, recipients[{ deliveryRecipientId, recipientUserId, recipientKind, recipientEmailMasked,
+  state, skipReason, transportStatus, attempts, shareGrantId, lastErrorCode, finishedAt }] }`.
+- `POST …/deliveries/{id}/cancel`, `POST …/deliveries/{id}/retry` (only `failed` → `pending`, max 5 attempts),
+  `POST …/delivery-recipients/{id}/reconcile` body `{ operatorDecision?: accepted|failed, reason?: ≥10 chars }`.
+- Intent states `pending|dispatching|completed|partially_failed|failed|cancelled` (honest rollup: any
+  pending/claimed/ambiguous ⇒ `dispatching`). Recipient states `pending|claimed|accepted|failed|ambiguous|skipped|cancelled`.
+  Skip reasons `duplicate_delivery|recipient_inactive|recipient_undeliverable|email_type_paused|asset_unavailable|edition_unavailable`.
+- Transport status (from `email_deliveries`): `not_sent|pending|accepted|delivered|delivery_delayed|bounced|complained|failed|suppressed|skipped`.
+  Never "read".
+- Reconcile outcomes `accepted|failed|unresolved|not_ambiguous`: ledger row sent/delivered/resend_id ⇒ accepted; no row or
+  failed without dispatch_unknown ⇒ failed (grant revoked, retryable); pending/dispatch_unknown ⇒ unresolved unless
+  `operatorDecision` + `reason`.
+- Email correlation per attempt: `source_event_id` = `idlr-<uuid>` (attempt 1) / `idlr-<uuid>:aN` (N=2..5).
+
+### Schedules (App lane only for writes)
+
+- `POST …/app/insights/schedules` body `{ label: 3–120, cadence: weekly|monthly, timeZone? (default America/Santiago),
+  consolidationDays?: 0–15 (default 3), catchUpLimit?: 1–3 (default 1), reviewPolicy?: 'draft_for_review' only,
+  requestTemplate: InsightRequestV1 without period / idempotencyKey / organizationId }`; template validated with
+  `validateInsightRequest` against the last closed period. `POST …/schedules/{id}/activate|pause|retire`
+  (activator = durable authority; max 10 active per org; pause/retire work with the flag OFF; retired never reactivates).
+- `GET …/schedules`, `GET …/schedules/{id}` (both lanes) → `InsightScheduleDto` (record without `authorizedByUserId`) +
+  `recentOccurrences[{ occurrenceId, periodStart, periodEndExclusive, state, editionId, failureCode }]`.
+- States `draft|active|paused|retired`; pause reasons `manual|authority_revoked|module_unavailable|repeated_failures`;
+  occurrence states `pending|generating|generated|render_requested|failed|skipped`. Occurrence idempotency key
+  `sched-<scheduleId>-v<version>-<periodStart>`; stops at `ready_for_review` (never issues, never sends).
+
+### New error codes (shared lane table)
+
+`sharing_disabled`, `delivery_disabled`, `schedules_disabled` → 503 `service_unavailable`; `quota_exceeded` → 429
+(existing row, now backed by `InsightsQuotaExceededError`).
+
+### MCP tool inputs (TASK-1848)
+
+`create_insight_share {organizationId?, editionId, expiresInDays? 1–90, downloadOutputs? (deck_pdf|report_pdf)[], label? 1–120}` (write),
+`list_insight_shares {organizationId?, editionId}`, `revoke_insight_share {organizationId?, shareGrantId}` (write),
+`list_insight_deliveries {organizationId?, editionId}`, `get_insight_delivery {organizationId?, deliveryIntentId}`,
+`list_insight_schedules {organizationId?}`, `get_insight_schedule {organizationId?, scheduleId}`. No MCP tool sends,
+cancels, retries or reconciles email, nor creates/activates/pauses/retires schedules.

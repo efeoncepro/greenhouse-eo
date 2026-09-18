@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-18 — Efeonce Insights: compartir por enlace, envío por correo y recurrencia (TASK-1848, code complete)
+
+Una edición emitida ya puede compartirse por enlace personal que vence (se guarda sólo el hash del token; revocable
+uno a uno; el lector público responde 404/410/429 y nunca cachea), enviarse por correo desde Efeonce a personas
+activas de la organización (enlace compartido o PDF adjunto opt-in, dedupe por persona y versión, un resultado
+ambiguo se reconcilia antes de reenviar) y programarse (semanal/mensual, zona y consolidación; cada ocurrencia deja
+un borrador en revisión, nunca emite ni envía). Migraciones aplicadas en la base compartida; los tres flags nuevos
+nacen apagados en Vercel y los EmailTypes apagados. Sin push ni deploy todavía: rollout a staging en curso.
+
 ## 2026-09-17 — Higgsfield documentado como proveedor gobernado de Creative Studio
 
 La revisión de los nueve repositorios oficiales de Higgsfield quedó documentada en arquitectura, auditoría,
@@ -813,20 +822,3 @@ etiquetar; el Calendario no puede expresar franquicia, canal-hogar frente a sat�
 métricas que la doctrina declara (sends, saves, watch time, dwell), y conserva `Portafolio` como tipo de
 pieza. La propuesta de cambios queda ordenada de menor a mayor invasividad y **ninguna fue aplicada**:
 no se creó, editó ni borró nada en Notion.
-
-## 2026-09-10 — Las seasonalities entran al catálogo como línea propia de marca
-
-`PDR-020` rev 1.4 cierra la reconciliación con el plan de seasonalities 2026–2027: se conserva como línea propia
-y permanente porque su trabajo es marca, no como compromiso previo con vencimiento. Son **seasonalities, no
-efemérides**, y la distinción es operativa: una efeméride es una fecha conmemorativa puntual, mientras una
-seasonality es una temporada con comportamiento propio de audiencia y mercado, con ventana y variación por país.
-La unidad de trabajo es la ventana, no el día — por eso Navidad se entrega en octubre — y una temporada puede
-sostener más de una pieza. Lo que la distingue del post
-genérico de efeméride es que cada fecha demuestra una disciplina de la casa — Halloween es un envase que pierde
-personalidad por imitación, el Día de la Usabilidad son fricciones digitales como obstáculos físicos, el Óscar es
-retirar una luz para cambiar una escena — y ese es el estándar declarado de la línea. Canal-hogar Instagram,
-métrica sends y saves, nunca seguidores. Único ajuste operativo: LinkedIn deja de recibir la misma pieza con otro
-caption y recibe el argumento profesional desarrollado, sólo cuando la disciplina es legible para un comprador.
-No se fusiona con trendjacking: misma familia cultural, economía de producción opuesta. Alcance, fechas,
-responsables y entregas del plan no cambian, y sigue pendiente la conciliación tarea/calendario de MET-2339–2342.
-No se produjo, programó ni publicó nada.

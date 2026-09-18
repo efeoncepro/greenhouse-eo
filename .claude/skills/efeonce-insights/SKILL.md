@@ -59,9 +59,22 @@ it without repeating what already cost a day*. It grows with every task: see the
   + capability `insights.*` + audience. An organization without the module is `not_found` (404
   anti-oracle), never `403`. Clients see evidence/plan only of issued editions.
 - **Flags are multi-gate and default OFF**: `INSIGHTS_GENERATION_ENABLED` (create/revise),
-  `INSIGHTS_ISSUANCE_ENABLED` (issue), `INSIGHTS_AUTHORING_AI_ENABLED` (Gemini). Read only in Vercel
-  today; a worker that reads one must declare it in its `deploy.sh`. A Vercel deployment created
+  `INSIGHTS_ISSUANCE_ENABLED` (issue), `INSIGHTS_AUTHORING_AI_ENABLED` (Gemini). Since TASK-1848 the
+  `ops-worker` also reads `INSIGHTS_GENERATION_ENABLED`, `INSIGHTS_DELIVERY_ENABLED` and `INSIGHTS_SCHEDULES_ENABLED`
+  (declared in its `deploy.sh`); a worker that reads one must declare it in its `deploy.sh`. A Vercel deployment created
   before `vercel env add` does not see the variable: redeploy.
+- **Share links (TASK-1848): the bearer is never persisted** — not even encrypted; only its sha256 digest. It is
+  returned once on create and lives only in memory during an email send. A lost link is revoked and replaced, never
+  recovered. Revoking works with the flag OFF and never reactivates; withdrawing an edition revokes its live grants.
+- **The public reader is anti-oracle and uncacheable**: `404` for unknown/malformed/expired/flag OFF/suspended org/
+  retired module (indistinguishable), `410` revoked or withdrawn, `429` rate limit that FAILS CLOSED, and always
+  `Cache-Control: private, no-store` + `noindex`. Never copy the Grader's link (token in clear, `public, max-age=300`).
+- **Email delivery and schedule writes are App lane only, human internal actor** (capabilities without `own`: a
+  client never sends). Ecosystem lane and MCP only read deliveries and schedules; MCP never sends email.
+- **Schedules never issue nor send**: `review_policy = 'draft_for_review'` (DB CHECK); each occurrence creates the
+  edition and requests its render, then stops at `ready_for_review`. A revoked authority or missing module pauses it.
+- **An `ambiguous` delivery is reconciled against the email ledger, never resent blindly**; a definitive failure
+  revokes its grant and a retry issues a new one with a per-attempt correlation (`…:aN`). Accepted ≠ delivered ≠ read.
 - **Figures are never invented, never "0" when absent.** `no_data`, `unsupported_window`,
   `insufficient_data` are rejections recorded in the snapshot and shown as limits in the plan. The AI
   author only rewrites validated text; if a figure changes, the deterministic plan wins.

@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-16 por Claude (TASK-1846 complete: render en producción y canary productivo)
+> **Ultima actualizacion:** 2026-09-18 por Claude (TASK-1848 code complete: enlaces, correo y recurrencia; sin deploy)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 ## Para qué sirve
@@ -11,7 +11,8 @@
 Crear y seguir ediciones de Efeonce Insights sin pantalla (la UI llega en TASK-1849): desde el
 portal autenticado (lane `app`), desde un consumer del ecosistema (lane `ecosystem`) o desde un
 agente por MCP. Hoy el flujo llega hasta `ready_for_review` y, en staging, hasta el deck PDF renderizado;
-emitir sigue apagado en todos los ambientes.
+emitir sigue apagado en todos los ambientes. Las recetas de enlaces compartidos, envío por correo y
+recurrencia (TASK-1848) están en su sección: el código existe, pero **no está desplegado** (2026-09-18).
 
 ## Antes de empezar
 
@@ -205,6 +206,126 @@ Con la org sintética «Greenhouse Demo» y la persona cliente:
    `retry` sobre él → `200` sin re-encolar; render de una edición `internal` (creada por un interno) pedido por la
    persona cliente → `404`, sin outputs.
 5. Contra PostgreSQL real: `pnpm test:live src/lib/efeonce-insights/render` (4/4 el 2026-09-16).
+
+## Enlaces, correo y recurrencia (TASK-1848 — code complete 2026-09-18, sin deploy)
+
+> **Estado:** commits locales en `develop`, sin push ni deploy; migraciones aplicadas en la base compartida;
+> flags de Vercel OFF; tipos de correo pausados. Hasta el rollout, estas recetas sólo corren en local o en live tests.
+> Todo requiere una edición `issued` con audiencia `client`.
+
+### Flags y dónde se leen
+
+| Flag | Vercel | `ops-worker` | Con OFF |
+|---|---|---|---|
+| `INSIGHTS_SHARING_ENABLED` | crear enlace + reader público | — | crear → `503 sharing_disabled`; reader → `404`; revocar sigue funcionando |
+| `INSIGHTS_DELIVERY_ENABLED` | crear el envío | despacho (default `true` en `deploy.sh`) | crear y reintentar → `503 delivery_disabled`; cancelar y reconciliar siguen funcionando |
+| `INSIGHTS_SCHEDULES_ENABLED` | escrituras de schedule | tick (default `true` en `deploy.sh`) | crear → `503 schedules_disabled`; pausar y retirar siguen funcionando |
+| `INSIGHTS_GENERATION_ENABLED` | ya existente | **ahora también** en el tick (default `true`) | el tick no genera ediciones |
+
+Kill switch del correo, aparte del flag: `greenhouse_notifications.email_type_config`, filas
+`insights_edition_delivery` (con enlace) e `insights_edition_delivery_attachment` (con PDF), sembradas
+`enabled = false`. **La tabla falla abierto si falta la fila**: nunca la borres para "encender".
+Prender un flag del worker es multi-runtime: `deploy.sh` + revisión activa (ledger `FEATURE_FLAG_STATE_LEDGER.md`).
+
+### Crear y revocar un enlace
+
+1. `POST /api/platform/app/insights/editions/<editionId>/shares` con `{ "organizationId": "<org>", "expiresInDays": 30,
+   "downloadOutputs": ["deck_pdf"] }` (`expiresInDays` 1–90, default 30; `downloadOutputs` sólo `deck_pdf`/`report_pdf`
+   que existan en la edición). Responde `201` con el grant, **el token y la URL, una sola vez**. Guárdalo en el canal
+   seguro que corresponda; Greenhouse no puede mostrarlo de nuevo.
+2. Listar: `GET …/editions/<editionId>/shares` (sin token ni digest).
+3. Revocar: `POST /api/platform/app/insights/shares/<shareGrantId>/revoke`. Idempotente; nunca reactiva.
+- Ecosystem: mismas rutas bajo `/api/platform/ecosystem/insights/**`; crear y revocar exigen binding `internal`.
+- MCP: `create_insight_share`, `list_insight_shares`, `revoke_insight_share` (el gateway aún no las federa).
+- Límite: 20 activos por edición → `429 quota_exceeded`. Permiso: `insights.share.manage` (Admin/Account; cliente executive sobre su org).
+
+### Leer el reader público
+
+`GET /api/public/insights/shared/<token>` → `InsightSharedEditionResponseV1` (`header`, `model`, `downloads`,
+`expiresAt`). Descarga: `GET /api/public/insights/shared/<token>/outputs/<output>` (proxy; revalida el grant antes de
+leer bytes). Sin sesión.
+
+| Respuesta | Significa |
+|---|---|
+| `200` | Grant activo; edición emitida y accesible |
+| `404` | Token desconocido, mal formado o expirado, flag OFF, org suspendida o módulo retirado. **Indistinguibles a propósito** |
+| `410` | Revocado o edición retirada |
+| `429` | Rate limit: por IP 300 vistas/60 descargas por minuto, por grant 60/20. También si la base no responde (falla cerrado) |
+| `503` | Error interno sanitizado |
+
+Verifica las cabeceras en cualquier canary: `Cache-Control: private, no-store, max-age=0`, `X-Robots-Tag: noindex,
+nofollow, noarchive`, `Referrer-Policy: no-referrer`. El access log (`insight_share_access_events`) registra resultado y
+tipo de cliente, nunca token ni IP; un hit **no** prueba lectura humana.
+
+### Solicitar un envío por correo (sólo lane App, persona interna)
+
+`POST /api/platform/app/insights/editions/<editionId>/deliveries` con:
+
+```json
+{ "organizationId": "<org>", "modality": "share_link", "recipientUserIds": ["<userId>"],
+  "outputs": ["deck_pdf"], "subject": "Informe de agosto", "message": "Opcional, ≤ 2000",
+  "shareTtlDays": 30, "idempotencyKey": "insights-delivery-<org>-2026-08" }
+```
+
+- `modality`: `share_link` (enlace personal por destinatario) o `attachment` (exige
+  `"acknowledgeIrrevocableAttachment": true` y outputs). `portal_link` → `not_ready` hasta TASK-1849.
+- `recipientUserIds`: 1–50 user ids de personas activas de la org o internas activas; nunca correos libres.
+- `subject` 3–200; `idempotencyKey` 8–200. Misma key + mismo payload → `200` idempotente; nuevo → `202`.
+- Seguimiento: `GET …/deliveries/<deliveryIntentId>` → estado del intent y por destinatario, correo enmascarado y
+  `transportStatus` leído de `email_deliveries` (`accepted`, `delivered`, `bounced`, `suppressed`…). Nunca "leído".
+- Ecosystem y MCP (`list_insight_deliveries`, `get_insight_delivery`) sólo leen.
+
+### Reconciliar un destinatario ambiguo
+
+Un destinatario `ambiguous` (o `claimed` hace más de 30 min; señal `insights.delivery.ambiguous`) **no se reenvía**.
+
+1. `POST /api/platform/app/insights/delivery-recipients/<deliveryRecipientId>/reconcile` con `{ "organizationId": "<org>" }`.
+   Lee el ledger del intento exacto: enviado/entregado/`resend_id` → `accepted`; sin fila o `failed` sin
+   `dispatch_unknown` → `failed` (revoca el enlace); `pending`/`dispatch_unknown` → `unresolved`.
+2. Si queda `unresolved`, confirma en el proveedor de correo y decide:
+   `{ "organizationId": "<org>", "operatorDecision": "accepted" | "failed", "reason": "≥ 10 caracteres con la evidencia" }`.
+3. Sólo después, si quedó `failed`, reintenta.
+
+### Reintentar fallidos y cancelar
+
+- Reintentar: `POST …/deliveries/<deliveryIntentId>/retry`. Re-encola **sólo** destinatarios `failed`, máximo 5
+  intentos; cada intento lleva su propia correlación (`idlr-<uuid>:aN`) y un enlace nuevo.
+- Cancelar: `POST …/deliveries/<deliveryIntentId>/cancel`. Cancela lo que aún no salió; lo aceptado no se retira.
+- Retirar la edición revoca sus enlaces y cancela envíos pendientes en la misma transacción.
+
+### Crear y operar un schedule (sólo lane App)
+
+1. Crear: `POST /api/platform/app/insights/schedules` con `{ "organizationId": "<org>", "label": "Mensual SEO",
+   "cadence": "monthly", "timeZone": "America/Santiago", "consolidationDays": 3, "catchUpLimit": 1,
+   "requestTemplate": { … } }`. `cadence` `weekly|monthly`; `consolidationDays` 0–15; `catchUpLimit` 1–3;
+   `requestTemplate` es el encargo **sin** `period`, `idempotencyKey` ni `organizationId` (se validan contra el
+   último período cerrado). `reviewPolicy` sólo admite `draft_for_review`. Nace `draft`.
+2. Activar: `POST …/schedules/<scheduleId>/activate`. Quien activa queda como autoridad durable. Máximo 10 activos por org.
+3. Pausar: `POST …/schedules/<scheduleId>/pause`. Retirar: `POST …/schedules/<scheduleId>/retire` (definitivo).
+4. Leer por qué se pausó: `GET …/schedules/<scheduleId>` → `state`, `pauseReason` (`manual`, `authority_revoked`,
+   `module_unavailable`, `repeated_failures`), `pausedAt` y `recentOccurrences` con su `failureCode`.
+   Tras corregir la causa, `activate` de nuevo (un `retired` no se reactiva).
+- El tick corre en el `ops-worker` (`POST /insights/schedules/tick`, Cloud Scheduler `ops-insights-schedules-tick`,
+  `20 * * * *`). Cada ocurrencia crea la edición (`idempotencyKey` `sched-<scheduleId>-v<version>-<periodStart>`) y pide
+  el render de `deck_pdf`; queda `ready_for_review`. **Nunca emite ni envía.**
+- Ecosystem y MCP (`list_insight_schedules`, `get_insight_schedule`) sólo leen.
+
+### Rollback por lane
+
+| Lane | Cómo apagar | Qué queda |
+|---|---|---|
+| Enlaces | `INSIGHTS_SHARING_ENABLED` OFF en Vercel + redeploy | Todo enlace responde `404`; los grants siguen en la base y revocar funciona |
+| Correo | `email_type_config.enabled = false` en los dos EmailTypes (efecto inmediato) y/o `INSIGHTS_DELIVERY_ENABLED` OFF en Vercel y en el `ops-worker` (`deploy.sh` + revisión activa) | Intents pendientes no salen; reconciliar y cancelar siguen disponibles |
+| Recurrencia | Pausar los schedules y/o `INSIGHTS_SCHEDULES_ENABLED` OFF en Vercel y `ops-worker` | Sin ocurrencias nuevas; la purga de retención sigue corriendo |
+
+### Qué no hacer (enlaces, correo y recurrencia)
+
+- No reenviar a un destinatario `ambiguous` ni devolverlo a `pending` a mano: reconcilia primero.
+- No pegar tokens `isg_…` ni URLs `/insights/r/…` en tickets, logs, chats o commits.
+- No borrar filas de `email_type_config` para "encender" un correo: falla abierto; cambia `enabled`.
+- No prender un flag de worker sólo con `gcloud run services update`: el próximo deploy lo borra; declarar en `deploy.sh`.
+- No prometer que revocar recupera lo descargado o un PDF adjunto ya enviado: no es revocable.
+- No crear un cron por cliente para recurrencias: hay un solo tick para todas las organizaciones.
 
 ## Qué significan los estados
 

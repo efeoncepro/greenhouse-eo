@@ -73,3 +73,50 @@ runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-0
 | Migration | `20260916201127095_task-1846-insights-render-client-user-actor` | runs/events accept `client_user`; human actor on run, enqueue event, retry, cancel |
 | Gateway | `efeonce-mcp` v1.6.0 (PR #14 `da8295a`, 51 tools) | 4 render tools federated; writes need `efeonce.mcp.insights.write`; deployed 2026-09-16 (revision `00054-n78`) |
 | Release plane | artifact-worker Job in the production release control plane | first productive deploy in release `917491fd02e4` (2026-09-16, change-gated) |
+
+## TASK-1848 — sharing, delivery, schedules (2026-09-18)
+
+Code complete on local `develop` (commits `75715589d`, `83d57380a`, `1c109fc8e`), not pushed or deployed; the four
+migrations are applied on the shared instance.
+
+| Piece | Where | Responsibility |
+| --- | --- | --- |
+| Migration | `20260918094614053_task-1848-insights-share-grants` | `insight_share_grants`, `insight_share_access_events`, `insight_share_rate_buckets`, capability `insights.share.manage` |
+| Migration | `20260918100238745_task-1848-insights-delivery-intents` + `20260918100811735_…-skip-reason-edition` | delivery intents/recipients/events, `email_type_config` rows `enabled=false`, capability `insights.delivery.send`, skip reason `edition_unavailable` |
+| Migration | `20260918101834425_task-1848-insights-schedules` | `insight_schedules`, `insight_schedule_occurrences`, capability `insights.schedule.manage` |
+| Table | `greenhouse_insights.insight_share_grants` (`ishr-…`) | one grant per link: `token_digest` sha256 UNIQUE, audience `client`, `download_outputs`, mandatory expiry ≤ 90 d; immutable except one revocation; no delete |
+| Table | `insight_share_access_events` | append-only access log (hashed subject, `client_hint`, outcome); no token, no raw IP |
+| Table | `insight_share_rate_buckets` | per-minute window per hashed subject, atomic UPSERT |
+| Table | `insight_delivery_intents` (`idlv-…`) | authorized email delivery of one issued edition; immutable authorized content; idempotency `(org, key)` + hash |
+| Table | `insight_delivery_recipients` (`idlr-…`) | per-person state + skip reason; partial unique dedupe across intents |
+| Table | `insight_delivery_events` | append-only delivery history |
+| Table | `insight_schedules` (`isch-…`) · `insight_schedule_occurrences` (`isco-…`) | versioned recurrence, `review_policy = 'draft_for_review'` CHECK; one occurrence per (schedule, version, period_start) |
+| Domain | `src/lib/efeonce-insights/sharing/token.ts` | `isg_` + 32 random bytes base64url, sha256 digest (pure primitives of `auth-server/oauth/primitives.ts`) |
+| Domain | `sharing/commands.ts` · `sharing/store.ts` · `sharing/contracts.ts` | `createInsightShare` (token returned once), `revokeInsightShare` (works with flag OFF), `readInsightShares`; DTO without token/digest |
+| Domain | `sharing/public.ts` · `sharing/http.ts` | public resolve of a token (grant, edition, org, module, rate limit) + anti-cache/anti-index headers |
+| Domain | `sharing/web-model.ts` + `contracts/web-model.ts` | `InsightWebModelV1` resolver and `InsightSharedEditionResponseV1` DTO for Think |
+| Domain | `delivery/contracts.ts` | modalities, states, skip reasons, transport statuses, honest rollup, per-attempt correlation, `INSIGHT_PORTAL_EDITION_ROUTE_AVAILABLE = false` |
+| Domain | `delivery/commands.ts` · `delivery/store.ts` | request / cancel / retry / reconcile / read deliveries |
+| Domain | `delivery/dispatch.ts` | `dispatchInsightDeliveryIntent`: atomic claim, revalidation, share_link or attachment send, accepted/failed/ambiguous |
+| Domain | `schedules/contracts.ts` · `schedules/commands.ts` · `schedules/store.ts` | create/activate/pause/retire/read schedules; DTO hides the authority user id |
+| Domain | `schedules/tick.ts` | `runInsightSchedulesTick`: authority revalidation via `session_360`, closed periods, occurrence claim, create edition + render, retention purge |
+| Domain | `window.ts` (extended) | `civilToday`, `resolveClosedInsightPeriods` (calendar month, ISO week, civil day in the zone) |
+| Domain | `commands/lifecycle.ts` (withdraw) | withdrawing an edition revokes live grants (`edition_withdrawn`) and cancels pending deliveries in the same transaction |
+| Domain | `flags.ts` · `errors.ts` · `events.ts` · `authz.ts` · `ports.ts` | new flags, errors (`InsightsQuotaExceededError`, `*DisabledError`), events, needs `share_*`/`delivery_*`/`schedule_*` |
+| Public route | `src/app/api/public/insights/shared/[token]/route.ts` | JSON `InsightSharedEditionResponseV1` (404/410/429/503, `no-store`) |
+| Public route | `src/app/api/public/insights/shared/[token]/outputs/[output]/route.ts` | download proxy through `downloadPrivateAsset` with actor `null` + `insights_share_grant` channel, grant revalidated before bytes |
+| App lane | `…/app/insights/editions/[editionId]/shares`, `…/insights/shares/[shareGrantId]/revoke` | create/list/revoke links |
+| App lane | `…/app/insights/editions/[editionId]/deliveries`, `…/deliveries/[deliveryIntentId]{,/cancel,/retry}`, `…/delivery-recipients/[deliveryRecipientId]/reconcile` | request/list/read/cancel/retry/reconcile deliveries (human only) |
+| App lane | `…/app/insights/schedules{,/[scheduleId]{,/activate,/pause,/retire}}` | define/activate/pause/retire/read schedules (human only) |
+| Ecosystem lane | same share routes (create/revoke need internal binding); `GET` deliveries (by edition, by id); `GET` schedules (list, by id) | read-mostly surface, via `ecosystem-insights.ts` |
+| Errors | `src/lib/api-platform/resources/insights-errors.ts` | `sharing_disabled`, `delivery_disabled`, `schedules_disabled` 503; `quota_exceeded` 429 |
+| Email | `src/lib/email/types.ts` · `templates.ts` · `delivery.ts` + `src/emails/InsightsEditionDeliveryEmail.tsx` | EmailTypes `insights_edition_delivery` (token-sensitive) and `insights_edition_delivery_attachment`; domain `insights`; index `uq_email_deliveries_token_intent_v3` |
+| Storage | `src/lib/storage/greenhouse-assets.ts` | `downloadPrivateAsset` accepts `actorUserId: string \| null` |
+| Projection | `src/lib/sync/projections/insights-delivery-dispatch.ts` (registered in `projections/index.ts`) | `insights_delivery_dispatch`, domain `notifications`, lane ops-reactive-notifications |
+| Worker | `services/ops-worker/server.ts` `POST /insights/schedules/tick` + `deploy.sh` | schedules tick; declares `INSIGHTS_DELIVERY_ENABLED`, `INSIGHTS_SCHEDULES_ENABLED`, `INSIGHTS_GENERATION_ENABLED` (default true) |
+| Scheduler | Cloud Scheduler `ops-insights-schedules-tick` `20 * * * *` | one job for all organizations (not created yet) |
+| Reliability | `src/lib/reliability/queries/insights-delivery-ambiguous.ts` (`insights.delivery.ambiguous`) wired in `get-reliability-overview.ts` | steady 0; warning 1–3, error >3; ambiguous + claimed >30 min |
+| Observability | `src/lib/observability/redact.ts` (`insights_share_path`, `insights_share_token`) + `sentry-server-event-scrub.ts` in `sentry.server.config.ts`/`sentry.edge.config.ts` | scrub share paths/tokens from url, query, transaction, breadcrumbs, spans |
+| Events | `src/lib/sync/event-catalog.ts` | `insights.share.created`, `insights.share.revoked`, `insights.delivery.requested`, `insights.schedule.changed`, `insights.schedule.occurrence_generated` |
+| Entitlements | `src/config/entitlements-catalog.ts` + `src/lib/entitlements/runtime.ts` | share: ADMIN + ACCOUNT (tenant), CLIENT_EXECUTIVE (own); delivery + schedule: ADMIN + ACCOUNT |
+| MCP | `src/mcp/greenhouse/{tool-manifest,server,tools,http-client}.ts` | 7 tools (62 total, hash `9fc46c8d90d3`); not federated in the gateway yet |

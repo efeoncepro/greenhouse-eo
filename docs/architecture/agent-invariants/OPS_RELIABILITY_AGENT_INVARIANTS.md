@@ -319,6 +319,24 @@ ejecución = un artefacto** (`tasks=1`, `parallelism=1`, `max-retries=0`).
 
 Spec: `GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md` · Runbook: `docs/manual-de-uso/proposal-studio/operar-el-artifact-worker.md`
 
+### Efeonce Insights — tick de recurrencia y despacho de correo en el `ops-worker` (TASK-1848, code complete 2026-09-18, sin deploy)
+
+- **Tick:** Cloud Scheduler `ops-insights-schedules-tick` (`20 * * * *`) → `ops-worker` `POST /insights/schedules/tick`
+  (`runInsightSchedulesTick`). **UN** job para todas las organizaciones; **NUNCA** un cron por cliente. También purga
+  retención (access events de enlaces > 180 días, rate buckets > 1 día) aunque el flag esté OFF.
+- **Despacho de correo:** projection `insights_delivery_dispatch` (lane `ops-reactive-notifications`), no un cron.
+- **Flags multi-runtime:** `INSIGHTS_DELIVERY_ENABLED` e `INSIGHTS_SCHEDULES_ENABLED` se leen en Vercel (crear intent
+  / escribir schedule; default OFF) **y** en el `ops-worker` (despachar / tick; default `true` en `deploy.sh`,
+  guardado en `deploy-contract.test.ts`). `INSIGHTS_GENERATION_ENABLED` ahora también se lee en el `ops-worker`
+  (default `true`). Kill switch adicional por EmailType en `email_type_config` (sembrado `enabled=false`; la tabla
+  falla abierto si falta la fila).
+- **Autoridad desde el worker:** revalidar leyendo `greenhouse_serving.session_360` (role_codes con ciclo de vida);
+  **NUNCA** importar `tenant/access` en código worker-bundled (arrastra bcrypt/BigQuery/notificaciones).
+- **Señal:** `insights.delivery.ambiguous` (steady 0; reader `src/lib/reliability/queries/insights-delivery-ambiguous.ts`)
+  cuenta destinatarios `ambiguous` + `claimed` > 30 min. Se reconcilia contra el ledger; **NUNCA** se reenvía a ciegas.
+
+Spec: `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` §9 y §14.6 · Runbook: `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`
+
 ## Consumer reactivo: breaker, huérfanos y señal de circuito (ISSUE-172/173, 2026-09-12)
 
 > Fuente: `docs/issues/resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md` +
