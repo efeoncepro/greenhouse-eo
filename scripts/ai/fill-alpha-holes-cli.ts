@@ -38,7 +38,7 @@ const main = async (): Promise<void> => {
     .toBuffer()
 
   const { width, height } = cut.info
-  let rgba = new Uint8Array(cut.data)
+  let rgba: Uint8Array = new Uint8Array(cut.data)
   let filledPixels = 0
   let components = 0
   let changed = false
