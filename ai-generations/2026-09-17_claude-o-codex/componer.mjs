@@ -95,14 +95,14 @@ const cajaTitulo = {
 const tamCita = tamTitulo * 0.34
 const cita = shape(CITA, FONTS['Poppins-500'], tamCita, Number.parseFloat(R.structureTagline.tracking))
 
-// ── Nivel 3 · la marca, en el aire que deja el primer plano ──────────────────────────────────────
-// El plate trae las hojas de la planta de la sala metiéndose por la esquina inferior izquierda,
-// completamente fuera de foco: la cámara está puesta detrás de la planta y disparamos pasándola.
-// El objeto NO es un soporte del logo: es la excusa que crea profundidad y deja una zona tranquila.
-// El logo se apoya en esa zona, nítido y legible, con la posición y el color elegidos por medición:
-// se barre la franja de mesa a la derecha de las hojas y se toma el centro cuyo píxel más claro es
-// el más bajo (L = 59/255 → negativo).
-const ZONA = { cx: 560, cy: 1362, luminancia: 59 }
+// ── Nivel 3 · la marca, dentro del primer plano desenfocado ──────────────────────────────────────
+// El plate trae el follaje de la planta de la sala cruzando el borde inferior, completamente fuera
+// de foco: la cámara está puesta detrás de la planta y disparamos pasándola.
+// La composición está hecha para esto: el follaje cruza TODO el borde inferior —puntas sueltas en
+// los costados, masa baja y calma al centro— y el logo va DENTRO de ese desenfoque, centrado en el
+// eje de la pieza. El objeto no es un soporte con el logo impreso: es el primer plano de la foto, y
+// el logo respira encima. Color por la luminancia medida de la masa central → negativo.
+const ZONA = { cx: W / 2, cy: 1362 }
 const MARCA = ANCHO ? null : { cx: ZONA.cx, cy: ZONA.cy, ancho: Math.round(W * 0.26) }
 
 let marcaCapa = null

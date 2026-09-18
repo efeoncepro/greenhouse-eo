@@ -212,49 +212,58 @@ receta universal de seasonality.
 
 - **Usar los kits en imagen o video:** [guía de uso de los kits de marca](../../../../docs/operations/social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md).
 
-## Primer plano desenfocado como excusa para la marca (regla, 2026-09-17)
+## Primer plano desenfocado como lecho de la marca (regla, 2026-09-17)
 
-Presencia de marca dentro de la fotografía **sin** un logo pegado encima de la imagen: se dispara **pasando por
-delante de** un objeto de la propia sala, que sale completamente fuera de foco. Ese objeto da profundidad y deja
-una zona tranquila; el logo vive en esa zona. Pedido del operador: «como cuando tomas una foto profesional pero
-delante tienes un objeto que sale desenfocado». Caso fuente: `ai-generations/2026-09-17_claude-o-codex/`.
+Presencia de marca dentro de la fotografía, sin un logo pegado sobre la imagen: se dispara **pasando por delante
+de** un objeto de la propia sala, que sale completamente fuera de foco, y **el logo va DENTRO de ese desenfoque**.
+Pedido del operador: «es como cuando tomas una foto profesional pero delante tienes un objeto que sale
+desenfocado… justo en el desenfoque se pone el logo». Caso fuente: `ai-generations/2026-09-17_claude-o-codex/`.
 
-### Lo que NO es (tres intentos rechazados, en este orden)
+### La regla de composición
+
+**Se diseña la composición para que el desenfoque caiga donde va el logo, no al revés.** Un objeto bonito en una
+esquina no sirve: si la marca va centrada al pie, el primer plano tiene que ocupar el pie del cuadro. Esa es la
+decisión, y se toma antes de generar nada.
+
+### Cuatro intentos rechazados, y el patrón
 
 | Intento | Por qué se cayó |
 |---|---|
-| Panel de acrílico grande al costado | Choca con la cara y con el gesto; hay que medir dónde termina el sujeto antes de elegir la zona |
-| Franja de acrílico de borde a borde bajo las manos | «No parece un objeto del estudio desenfocado, sino una franja forzada para desenfocar» |
-| Tapa de un portátil asomando sobre la mesa | Sigue leyéndose como **un cuadrado puesto ahí**: forma geométrica, borde recto, centrado |
+| Panel de acrílico grande al costado | Choca con la cara y con el gesto |
+| Franja de acrílico de borde a borde | «Una franja forzada para desenfocar» |
+| Tapa de portátil asomando sobre la mesa | «Se ve como un cuadrado allí»: forma geométrica y borde recto |
+| Hojas sólo en la esquina inferior izquierda | Bonito, pero **el logo no cabe ahí**: no cumple el objetivo |
 
-**El patrón del error:** buscar una *superficie* donde imprimir el logo. En cuanto el objeto existe para sostener
-la marca, se nota. El objeto tiene que existir **por la escena**, y el logo aprovechar el silencio que deja.
+Los tres primeros comparten el mismo error: **buscar una superficie donde imprimir el logo**. En cuanto el objeto
+existe para sostener la marca, se nota. El cuarto falla por lo contrario: el objeto es honesto pero no está donde
+se necesita.
 
-### Lo que sí es
+### Lo que sí funciona
 
-- **Un objeto que ya está en la sala** —las hojas de una planta, una taza, el respaldo de una silla, una lámpara—
-  y la cámara puesta detrás de él. En el caso fuente: las hojas de la planta que ya se veía al fondo.
-- **Entra por una esquina o un borde** y se detiene bastante antes del centro. Nunca cruza de lado a lado.
-- **Silueta orgánica e irregular:** formas de distinto tamaño, no paralelas, con huecos desiguales entre ellas.
-  Declararlo así de explícito: «never a straight edge, never a rectangle, never a band».
-- **Casi una silueta:** más oscuro que el fondo, con a lo sumo un brillo tenue en un borde donde lo alcanza una luz
-  práctica de la escena.
-- **El logo NO va impreso encima.** Va en la zona tranquila que el objeto deja al otro lado, nítido y legible.
+- **Un objeto que ya está en la sala** —follaje, una taza, el respaldo de una silla— y la cámara puesta detrás.
+- **Cruza el borde entero donde va la marca**, no una esquina.
+- **Silueta modulada, y ahí está el oficio:** puntas sueltas y separadas en los **costados**, con huecos desiguales
+  y ninguna paralela; y una masa **baja, ancha y calma** en el **centro**, sin puntas, que es el lecho del logo. Así
+  el objeto se lee orgánico y aun así entrega una superficie tranquila. Declararlo explícito en el prompt:
+  «never a straight edge, never a rectangle, never a band».
+- **Casi una silueta:** más oscuro que todo lo que tiene detrás, con a lo sumo un brillo tenue en un borde donde lo
+  alcanza una luz práctica de la escena.
+- **Que no suba a tapar** la cara ni el gesto que cuenta la foto.
 
 ### Cómo se eligen los valores — nada a ojo
 
 | Parámetro | Cómo se fija |
 |---|---|
 | Nitidez del logo | Ninguna. El desenfoque es del objeto; la marca se lee. Un logo borroso no firma nada |
-| Posición del logo | Se barre la franja libre y se toma el centro cuyo **píxel más claro sea el más bajo** — la zona más tranquila, medida |
-| Color del logo | Por la **luminancia medida** de esa zona: oscura (L = 59/255 en el caso fuente) → negativo; clara → navy |
-| Tamaño | Holgado dentro de la zona, sin tocar el objeto ni el sujeto |
+| Posición | En el eje de la pieza, dentro de la masa calma del centro |
+| Color | Por la **luminancia medida** del lecho: masa oscura → negativo; clara → navy |
+| Tamaño | Holgado dentro de la masa calma, sin tocar las puntas de los costados |
 
 ### QA, dos números
 
-1. **Contraste** del logo contra el píxel más claro de su zona **≥ 4,5:1** — medido **11,61:1**.
-2. **Blandura del primer plano:** su gradiente máximo debe quedar claramente por debajo del del rostro — medido
-   **168** contra **314**. Si se acerca, el objeto no está delante: está en el mismo plano y estorba.
+1. **Contraste** del logo contra el píxel más claro de su lecho **≥ 4,5:1** — medido **12,58:1**.
+2. **Blandura del primer plano:** gradiente máximo **dentro del objeto**, muy por debajo del del rostro — medido
+   **6** contra **314**. Cuidado al medir: si la caja toca el borde de una mesa o una mano, el número se dispara y
+   miente (una medición contaminada dio 278). Medir sólo objeto.
 
-**Límites.** Una sola aparición por pieza. Nunca sobre la cara ni cruzando la mirada. Si el objeto tapa el gesto que
-cuenta la foto, va en otra esquina.
+**Límites.** Una sola aparición por pieza. Nunca sobre la cara ni cruzando la mirada.

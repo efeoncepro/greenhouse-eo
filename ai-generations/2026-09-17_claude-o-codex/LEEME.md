@@ -7,14 +7,17 @@ titular **¿Claude o Codex?** más su línea entre comillas.
 
 `out/claude-o-codex-4x5-v03.png` (1152 × 1440) sobre `plates/plate-final.png`. Tres capas, ninguna generada:
 
-1. **Primer plano desenfocado como excusa** — las **hojas de la planta** que ya está en la sala entran por la
-   esquina inferior izquierda, con la cámara puesta detrás de ellas. Dan profundidad y dejan una zona tranquila;
-   el **logo vive en esa zona**, en negativo y nítido. No va impreso sobre el objeto.
+1. **Primer plano desenfocado como lecho de la marca** — el **follaje de la planta** que ya está en la sala cruza
+   todo el borde inferior, con la cámara puesta detrás de ella, y el **logo va dentro de ese desenfoque**, centrado.
+   La silueta está modulada a propósito: puntas sueltas en los costados, masa baja y calma al centro, que es donde
+   se apoya el logo.
 
-   Llegó acá después de tres rechazos del operador: panel de acrílico al costado (choca con la cara y el gesto),
-   franja de borde a borde («una franja forzada para desenfocar») y tapa de portátil («se ve como un cuadrado
-   allí»). El patrón del error era buscar una *superficie* donde imprimir el logo: en cuanto el objeto existe para
-   sostener la marca, se nota. Regla completa en `social-media-studio`, referencia `brand-in-scene`.
+   Llegó acá tras cuatro rechazos del operador: panel al costado (choca con la cara), franja de borde a borde
+   («forzada para desenfocar»), tapa de portátil («un cuadrado allí») y hojas sólo en la esquina («si el objeto está
+   a la izquierda no cumple el objetivo»). Los tres primeros comparten el error de **buscar una superficie donde
+   imprimir el logo**; el cuarto, el de poner el objeto donde no va la marca. La regla que salió de ahí: **se diseña
+   la composición para que el desenfoque caiga donde va el logo**, no al revés.
+   Completa en `social-media-studio`, referencia `brand-in-scene`.
 
 2. **Jerarquía en tres niveles** — titular 98 px dominante · cita 33 px al margen izquierdo, fuera del eje, como un
    aparte humano · la marca sólo en el bokeh. Antes eran titular y subtítulo centrados en el mismo eje: dos tamaños,
@@ -31,7 +34,7 @@ esquina nueva se compone sobre `plate-v04` invirtiendo el alfa de la misma másc
 máximo 0**. Ver `docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md`.
 
 Descartes: `plate-v05` (panel bien, ojos oscuros), `plate-v06` y `plate-v07` (el panel lateral choca con la cara y
-con las manos), `plate-v08` (franja de borde a borde), `plate-v09` (tapa de portátil: un cuadrado puesto ahí), `out/claude-o-codex-4x5-v01.png` y `-v02` (mascotas en la mesa / jerarquía plana).
+con las manos), `plate-v08` (franja de borde a borde), `plate-v09` (tapa de portátil: un cuadrado puesto ahí), `plate-v10` (hojas sólo en la esquina), `out/claude-o-codex-4x5-v01.png` y `-v02` (mascotas en la mesa / jerarquía plana).
 
 ## Piezas anteriores
 
@@ -100,9 +103,9 @@ Contraste sobre los píxeles reales, contra el píxel **más claro** de cada zon
 La cita empezó bajo el titular y ahí caía sobre el pelo: **1,17:1**, ilegible. Se movió al margen izquierdo, que es
 donde el fondo deja de ser claro. El contraste de una línea de texto se mide **donde queda**, no donde se diseñó.
 
-**Logo en la zona tranquila:** contraste **11,61:1**. La posición no se eligió a ojo: se barrió la franja libre y
-se tomó el centro cuyo píxel más claro era el más bajo. **Blandura del primer plano:** gradiente de las hojas
-**168** contra **314** del rostro; si se acerca, el objeto no está delante sino en el mismo plano.
+**Logo dentro del desenfoque:** contraste **12,58:1** contra el píxel más claro de su lecho. **Blandura del primer
+plano:** gradiente **6** contra **314** del rostro. Trampa de medición: una caja que tocaba el borde de la mesa dio
+**278** y parecía que el follaje estaba tan nítido como la cara; hay que medir sólo dentro del objeto.
 
 Revisado además a 390 px de ancho: titular y cita siguen legibles. Mascotas verificadas al 100 % (cubos naranja con
 ojos rectangulares; nube azul con `>_` cian en pantalla y blanco en el pecho) y el emblema del polo con la nave a la
