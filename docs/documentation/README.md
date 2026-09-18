@@ -16,6 +16,9 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Social y Creative Studio
 
+- [Proveedor Higgsfield en Creative Studio](creative-studio/HIGGSFIELD_PROVIDER.md) — superficies de API, SDK,
+  CLI, skills y MCP local; estados de adopción y evidencia exigida antes de entregar una salida.
+
 - [Reglas publicitarias para agentes](creative/reglas-publicitarias-para-agentes.md) — activación común de
   Codex/Claude para posts, stories, reels, covers, banners, brochure y motion con contrato AXIS, tipografía real,
   contraste, gate DO/DON'T y estados separados de publicación.

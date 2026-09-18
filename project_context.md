@@ -55,14 +55,14 @@ Globe invisibles al leer el archivo: `CREATE OR REPLACE VIEW` **no puede** reord
 checkpoint de saga nunca va delante de una lectura pura**: no protege nada y consume el único estado desde el que
 se puede reintentar.
 
-Flota de modelos de Globe: se resuelve y promueve por identidad exacta de ruta. Estado live en
+Flota de modelos de Globe: se resuelve y promueve por identidad exacta de ruta. Higgsfield: `provider-supported`,
+sin ruta Globe; cargar `higgsfield-provider` y su ADR antes de integrar. Estado live en
 `globe.producer.fleet.list`, mapa humano en `GLOBE_MODEL_FLEET_STATUS.md`; una promoción se cierra con
 evaluación/derechos/readbacks y una generación real desde la UI autenticada. Un MIME de transporte genérico nunca
 amplía la allowlist global: sólo se acepta para una salida exacta esperada tras verificar sus bytes. Método transversal
 para añadir o auditar proveedores: `greenhouse-globe-model-fleet` (espejado Codex/Claude); sus route cards machine-readable viven en `docs/architecture/creative-studio/model-fleet/routes/` y nunca
-sustituyen la autoridad live del reader. ADR-023 y el card inicial de FLUX 3 separan evidencia del
-proveedor, cables de integración y disponibilidad de Globe; el baseline auditado cubre además Gemini Omni, Veo 3.1,
-Seedance 2.0/R2V, GPT Image 2, Seedream 5 Pro, Nano Banana 2/Pro y Kling 3.0. “Imagen 2 de ChatGPT” se normaliza a
+sustituyen la autoridad live del reader. ADR-023 separa evidencia del proveedor, cables de integración y disponibilidad
+de Globe. “Imagen 2 de ChatGPT” se normaliza a
 `gpt-image-2`; Google `imagen-2` no tiene ruta en Globe. La transparencia GPT Image 2 sigue en preview y gated hasta
 canary y readback. Desde 2026-09-08 existe `gpt-image-2.5` (Sunburst/Flare): provider-supported,
 sin ruta Globe, sin Batch y **sin calculadora de costo por imagen**; `gpt-image-2` no quedó deprecado y el

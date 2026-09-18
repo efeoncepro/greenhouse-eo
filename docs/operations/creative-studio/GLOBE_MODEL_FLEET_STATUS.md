@@ -33,6 +33,15 @@ solo el Lab. La foundation de selección multi-modelo es ADR-013 (resolución po
 
 ## Fleet — estado por ruta/modelo
 
+### Higgsfield — proveedor preparado, sin ruta Globe todavía
+
+La revisión del 2026-09-17 cubrió los nueve repositorios oficiales de Higgsfield y dejó la adopción documentada en
+[`EFEONCE_HIGGSFIELD_PROVIDER_ADOPTION_DECISION_V1.md`](../../architecture/creative-studio/EFEONCE_HIGGSFIELD_PROVIDER_ADOPTION_DECISION_V1.md).
+Higgsfield queda en `provider-supported / no Globe route`: API, SDKs, CLI, skills y MCP local son superficies
+disponibles para evaluación, pero no prueban adapter, binding, readiness, coste, derechos, canary ni disponibilidad
+del Producer. No crear una fila `available` hasta cerrar la tupla exacta de ruta y su evidencia. El detalle de los
+repositorios y riesgos está en la [auditoría](../../audits/creative-studio/2026-09-17-higgsfield-github-review.md).
+
 Backbone = `PRODUCER_ROUTE_CATALOG` (`packages/domain/src/producer-catalog.ts`, runtime observado `v1.7.0`; este
 ledger conserva referencias históricas `v1.3.0`). El nombre público
 del modelo es señal de calidad (ADR-003); el slug de wire vive solo en el adapter/binding.

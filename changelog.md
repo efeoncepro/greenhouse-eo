@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-17 — Higgsfield documentado como proveedor gobernado de Creative Studio
+
+La revisión de los nueve repositorios oficiales de Higgsfield quedó documentada en arquitectura, auditoría,
+documentación funcional, manual de uso, runbook, fleet ledger y skills espejo. API/SDK/CLI, skills agentic y MCP
+local para After Effects/Blender quedan como superficies preparadas; Higgsfield permanece
+`provider-supported / no Globe route` hasta contar con route card, adapter, secreto, coste, derechos, canary,
+Asset Governance y readback. No se instaló, generó, compró crédito ni publicó nada.
+
 ## 2026-09-17 — Aplicar el logo 3D en escenas con IA generativa
 
 El kit 3D del logo ya no se compone a mano sobre la escena: se pega el render exacto y el modelo repinta sólo un halo
@@ -822,19 +830,3 @@ caption y recibe el argumento profesional desarrollado, sólo cuando la discipli
 No se fusiona con trendjacking: misma familia cultural, economía de producción opuesta. Alcance, fechas,
 responsables y entregas del plan no cambian, y sigue pendiente la conciliación tarea/calendario de MET-2339–2342.
 No se produjo, programó ni publicó nada.
-
-## 2026-09-10 — Canales propios de Efeonce quedan bajo un sistema editorial declarado
-
-`PDR-020` fija el sistema editorial de los canales propios de marca: un motor compartido con un rol por canal
-(blog el activo, LinkedIn el comprador, YouTube la profundidad, Instagram craft y cultura, Threads conversación
-viva, Glitch la propiedad), catálogo propio de formatos por canal y franquicias con canal-hogar que viajan como
-corte y nunca como copia. Los territorios se heredan de la taxonomía de `PDR-019` sin taxonomía social paralela;
-el educativo nace en LinkedIn y el blog recibe la versión answer-first; el blog queda declarado multiformato con
-casos, tools, webinars, ebooks y data studies; los casos de éxito se modelan en tres profundidades con canonical
-en el blog y compuerta de aprobación del cliente. El vocero de talking head es Julio Reyes.
-[Decisión](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md), delta de impacto en
-`TASK-1802`, cross-links en `PDR-003/004/005/019`, drift de Thought Territories registrado en el context pack y
-diez archivos de skills reconciliados con espejo Claude/Codex, incluido el hueco de Threads que no existía en la
-mecánica de plataforma. Quedan siete decisiones pendientes y un conflicto declarado sin resolver con el plan
-estacional 2026–2027, que sigue vigente. No se abrió ninguna cuenta, no se produjo contenido, no se programó nada
-y no se autorizó publicación.
