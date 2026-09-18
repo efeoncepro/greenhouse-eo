@@ -1,8 +1,9 @@
 // «¿Claude o Codex?» — composición sobre el plate de estudio.
 //
 // Tres capas, ninguna generada por el modelo:
-//   1. Logo sobre un OBJETO DEL ESTUDIO que está fuera de foco: el dorso de un portátil apoyado en
-//      la mesa, que el plate trae limpio. El desenfoque es del objeto; la marca se lee.
+//   1. Un OBJETO DE LA SALA se mete en el primer plano y sale fuera de foco —las hojas de la planta,
+//      cámara puesta detrás de ella—. Es la excusa que da profundidad y deja una zona tranquila; el
+//      logo vive en esa zona, nítido. No va impreso sobre el objeto.
 //   2. Jerarquía tipográfica: titular dominante arriba · la cita del protagonista al margen izquierdo,
 //      fuera de eje, como un aparte humano · la marca, sólo sobre el objeto.
 //   3. Selección colaborativa AXIS sobre el titular: Clawd y Codex disputándose la decisión.
@@ -94,20 +95,15 @@ const cajaTitulo = {
 const tamCita = tamTitulo * 0.34
 const cita = shape(CITA, FONTS['Poppins-500'], tamCita, Number.parseFloat(R.structureTagline.tracking))
 
-// ── Nivel 3 · la marca, sobre el objeto del estudio que está fuera de foco ───────────────────────
-// El plate trae un PORTÁTIL real apoyado en la mesa entre él y la cámara: se ve el dorso de la tapa,
-// asomando sobre el borde de la mesa, con sus dos esquinas dentro del cuadro y completamente
-// desenfocado por estar a centímetros del lente. Su dorso llega LIMPIO desde el plate.
-//
-//   · El desenfoque es del OBJETO, no del logo: la marca va nítida y se lee.
-//   · El color sale de la luminancia medida del dorso (L ≈ 37/255, más oscuro que la mesa):
-//     tapa oscura → logo en NEGATIVO. El navy sobre claro era del intento anterior y no pertenecía
-//     a esta escena nocturna.
-//   · Va centrado en el ANCHO DE LA TAPA, no en el del lienzo.
-const TAPA = { izquierda: 240, derecha: 950, arriba: 1230, abajo: 1440, luminancia: 37 }
-const MARCA = ANCHO
-  ? null
-  : { cx: (TAPA.izquierda + TAPA.derecha) / 2, cy: (TAPA.arriba + TAPA.abajo) / 2, ancho: Math.round((TAPA.derecha - TAPA.izquierda) * 0.44) }
+// ── Nivel 3 · la marca, en el aire que deja el primer plano ──────────────────────────────────────
+// El plate trae las hojas de la planta de la sala metiéndose por la esquina inferior izquierda,
+// completamente fuera de foco: la cámara está puesta detrás de la planta y disparamos pasándola.
+// El objeto NO es un soporte del logo: es la excusa que crea profundidad y deja una zona tranquila.
+// El logo se apoya en esa zona, nítido y legible, con la posición y el color elegidos por medición:
+// se barre la franja de mesa a la derecha de las hojas y se toma el centro cuyo píxel más claro es
+// el más bajo (L = 59/255 → negativo).
+const ZONA = { cx: 560, cy: 1362, luminancia: 59 }
+const MARCA = ANCHO ? null : { cx: ZONA.cx, cy: ZONA.cy, ancho: Math.round(W * 0.26) }
 
 let marcaCapa = null
 if (MARCA) {

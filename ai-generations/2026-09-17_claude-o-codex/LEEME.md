@@ -7,16 +7,15 @@ titular **¿Claude o Codex?** más su línea entre comillas.
 
 `out/claude-o-codex-4x5-v03.png` (1152 × 1440) sobre `plates/plate-final.png`. Tres capas, ninguna generada:
 
-1. **Marca sobre un objeto real del estudio, fuera de foco** — el dorso de la tapa de un **portátil** apoyado en la
-   mesa entre él y la cámara, asomando sobre el borde, con sus dos esquinas dentro del cuadro y completamente
-   desenfocado. El logo va **en negativo, nítido y centrado en el ancho de la tapa**.
+1. **Primer plano desenfocado como excusa** — las **hojas de la planta** que ya está en la sala entran por la
+   esquina inferior izquierda, con la cámara puesta detrás de ellas. Dan profundidad y dejan una zona tranquila;
+   el **logo vive en esa zona**, en negativo y nítido. No va impreso sobre el objeto.
 
-   Dos correcciones del operador llegaron hasta acá: primero se desenfocó también la marca («un logo borroso no
-   firma nada»), y después la primera superficie —una franja de acrílico de borde a borde— «no parecía un objeto
-   del estudio desenfocado, sino una franja forzada para desenfocar». Lo que delata al artificio es no tener forma
-   propia: esquinas, borde superior e inclinación. Y el color del logo sale de la luminancia **medida** de la cara
-   (L ≈ 37/255 → negativo); el navy sobre claro del intento anterior no pertenecía a una escena nocturna.
-   Regla completa en `social-media-studio`, referencia `brand-in-scene`.
+   Llegó acá después de tres rechazos del operador: panel de acrílico al costado (choca con la cara y el gesto),
+   franja de borde a borde («una franja forzada para desenfocar») y tapa de portátil («se ve como un cuadrado
+   allí»). El patrón del error era buscar una *superficie* donde imprimir el logo: en cuanto el objeto existe para
+   sostener la marca, se nota. Regla completa en `social-media-studio`, referencia `brand-in-scene`.
+
 2. **Jerarquía en tres niveles** — titular 98 px dominante · cita 33 px al margen izquierdo, fuera del eje, como un
    aparte humano · la marca sólo en el bokeh. Antes eran titular y subtítulo centrados en el mismo eje: dos tamaños,
    un solo nivel.
@@ -32,7 +31,7 @@ esquina nueva se compone sobre `plate-v04` invirtiendo el alfa de la misma másc
 máximo 0**. Ver `docs/manual-de-uso/ai-tooling/editar-una-zona-de-una-imagen.md`.
 
 Descartes: `plate-v05` (panel bien, ojos oscuros), `plate-v06` y `plate-v07` (el panel lateral choca con la cara y
-con las manos), `plate-v08` (franja de borde a borde: se lee como recurso gráfico, no como objeto), `out/claude-o-codex-4x5-v01.png` y `-v02` (mascotas en la mesa / jerarquía plana).
+con las manos), `plate-v08` (franja de borde a borde), `plate-v09` (tapa de portátil: un cuadrado puesto ahí), `out/claude-o-codex-4x5-v01.png` y `-v02` (mascotas en la mesa / jerarquía plana).
 
 ## Piezas anteriores
 
@@ -101,9 +100,9 @@ Contraste sobre los píxeles reales, contra el píxel **más claro** de cada zon
 La cita empezó bajo el titular y ahí caía sobre el pelo: **1,17:1**, ilegible. Se movió al margen izquierdo, que es
 donde el fondo deja de ser claro. El contraste de una línea de texto se mide **donde queda**, no donde se diseñó.
 
-**Logo sobre la tapa del portátil:** contraste **13,90:1**. Y la blandura del objeto, que es el otro número que
-importa: gradiente del borde de la tapa **54** contra **314** del rostro. Si el objeto no es mucho más blando que
-el sujeto, no está en primer plano: está pegado.
+**Logo en la zona tranquila:** contraste **11,61:1**. La posición no se eligió a ojo: se barrió la franja libre y
+se tomó el centro cuyo píxel más claro era el más bajo. **Blandura del primer plano:** gradiente de las hojas
+**168** contra **314** del rostro; si se acerca, el objeto no está delante sino en el mismo plano.
 
 Revisado además a 390 px de ancho: titular y cita siguen legibles. Mascotas verificadas al 100 % (cubos naranja con
 ojos rectangulares; nube azul con `>_` cian en pantalla y blanco en el pecho) y el emblema del polo con la nave a la

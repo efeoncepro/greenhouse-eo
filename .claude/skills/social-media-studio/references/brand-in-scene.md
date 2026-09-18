@@ -212,62 +212,49 @@ receta universal de seasonality.
 
 - **Usar los kits en imagen o video:** [guía de uso de los kits de marca](../../../../docs/operations/social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md).
 
-## Marca en el primer plano desenfocado (regla, 2026-09-17)
+## Primer plano desenfocado como excusa para la marca (regla, 2026-09-17)
 
-Presencia de marca dentro de la fotografía **sin** poner un logo nítido compitiendo con la idea: un objeto real
-delante del sujeto, completamente fuera de foco, sirve de soporte. Pedido del operador: «que en las fotografías
-haya algún bokeh o difuminado de un objeto que esté delante, como excusa, para que en ese difuminado vaya el logo».
-Caso fuente: `ai-generations/2026-09-17_claude-o-codex/`.
+Presencia de marca dentro de la fotografía **sin** un logo pegado encima de la imagen: se dispara **pasando por
+delante de** un objeto de la propia sala, que sale completamente fuera de foco. Ese objeto da profundidad y deja
+una zona tranquila; el logo vive en esa zona. Pedido del operador: «como cuando tomas una foto profesional pero
+delante tienes un objeto que sale desenfocado». Caso fuente: `ai-generations/2026-09-17_claude-o-codex/`.
 
-**El objeto se genera; el logo se compone.** Nunca se le pide el logo al modelo, ni siquiera desenfocado: una forma
-equivocada y borrosa sigue siendo una forma equivocada. El plate trae el objeto con la **cara limpia** y el logo se
-apoya encima de forma determinística.
+### Lo que NO es (tres intentos rechazados, en este orden)
 
-**Tiene que ser un objeto que YA estaría ahí, no un soporte inventado.** Segunda corrección del operador: una
-franja de acrílico cruzando de borde a borde «no parece un objeto del estudio desenfocado, sino una franja forzada
-para desenfocar». Y tenía razón: lo que delata al artificio es que no tiene forma propia. Preguntarse primero qué
-hay de verdad en ese set —un portátil, una taza, el canto de un monitor, una cámara— y usar eso. En el caso fuente
-quedó el **dorso de la tapa de un portátil** apoyado en la mesa entre el sujeto y la cámara: es el objeto más común
-de un estudio, su dorso es plano y en la vida real lleva un logo.
+| Intento | Por qué se cayó |
+|---|---|
+| Panel de acrílico grande al costado | Choca con la cara y con el gesto; hay que medir dónde termina el sujeto antes de elegir la zona |
+| Franja de acrílico de borde a borde bajo las manos | «No parece un objeto del estudio desenfocado, sino una franja forzada para desenfocar» |
+| Tapa de un portátil asomando sobre la mesa | Sigue leyéndose como **un cuadrado puesto ahí**: forma geométrica, borde recto, centrado |
 
-**Lo que hace que se lea como objeto y no como recurso gráfico:** sus **dos esquinas superiores dentro del cuadro**
-con fondo visible a izquierda y derecha, un **borde superior propio** y una **inclinación de unos pocos grados**.
-Un rectángulo perfectamente horizontal que sangra por los dos lados nunca va a leerse como cosa.
+**El patrón del error:** buscar una *superficie* donde imprimir el logo. En cuanto el objeto existe para sostener
+la marca, se nota. El objeto tiene que existir **por la escena**, y el logo aprovechar el silencio que deja.
 
-**Cómo pedirlo en el plate:** a centímetros del lente y por eso **completamente** fuera de foco, con la cara
-«COMPLETELY BLANK and EVEN» —sin logo, sin insignia, sin pegatinas, sin textura y **sin un brillo fuerte en el
-medio**—, y con el material declarado por su relación con el fondo («más oscuro que la mesa»), porque de ahí sale
-después el color del logo.
+### Lo que sí es
 
-**Dónde ponerlo.** Donde no tape lo que cuenta la foto. Medir dónde termina el sujeto antes de elegir la zona: en
-un plano de busto detrás de una mesa las manos ocupan las dos esquinas de abajo, así que el objeto entra **por
-delante del borde de la mesa**, asomando apenas; un panel lateral choca con la cara o con el gesto.
+- **Un objeto que ya está en la sala** —las hojas de una planta, una taza, el respaldo de una silla, una lámpara—
+  y la cámara puesta detrás de él. En el caso fuente: las hojas de la planta que ya se veía al fondo.
+- **Entra por una esquina o un borde** y se detiene bastante antes del centro. Nunca cruza de lado a lado.
+- **Silueta orgánica e irregular:** formas de distinto tamaño, no paralelas, con huecos desiguales entre ellas.
+  Declararlo así de explícito: «never a straight edge, never a rectangle, never a band».
+- **Casi una silueta:** más oscuro que el fondo, con a lo sumo un brillo tenue en un borde donde lo alcanza una luz
+  práctica de la escena.
+- **El logo NO va impreso encima.** Va en la zona tranquila que el objeto deja al otro lado, nítido y legible.
 
-**El desenfoque es del OBJETO, no del logo.** Corrección expresa del operador (2026-09-17): en el primer intento se
-desenfocó también la marca, para «respetar» la profundidad de campo, y quedó ilegible. Un logo borroso no firma
-nada. La barra fuera de foco existe para dar **superficie y profundidad**; el logo se apoya encima **nítido** y es
-lo único enfocado de esa zona — ese contraste de nitidez es justamente lo que lo hace destacar sin pelearse con el
-rostro, que está más arriba y en otro plano.
-
-**Cómo componer el logo encima — nada de esto se elige a ojo:**
+### Cómo se eligen los valores — nada a ojo
 
 | Parámetro | Cómo se fija |
 |---|---|
-| Nitidez | El logo va **sin desenfoque**. El objeto ya aporta el fuera de foco |
-| Color | Por la **luminancia medida** de la cara del objeto, no por gusto: cara oscura (L ≈ 37/255 en el caso fuente) → logo en **negativo**; cara clara → navy en `multiply`. Un logo navy sobre una superficie clara dentro de una escena nocturna se siente ajeno aunque contraste |
-| Opacidad | Plena. Es una firma, no una marca de agua |
-| Tamaño | Cabe holgado dentro de la cara del objeto, con aire arriba y abajo |
-| Posición | Centrado en el **ancho del objeto**, no en el del lienzo |
+| Nitidez del logo | Ninguna. El desenfoque es del objeto; la marca se lee. Un logo borroso no firma nada |
+| Posición del logo | Se barre la franja libre y se toma el centro cuyo **píxel más claro sea el más bajo** — la zona más tranquila, medida |
+| Color del logo | Por la **luminancia medida** de esa zona: oscura (L = 59/255 en el caso fuente) → negativo; clara → navy |
+| Tamaño | Holgado dentro de la zona, sin tocar el objeto ni el sujeto |
 
-**QA, medible, dos números:**
+### QA, dos números
 
-1. **Contraste** del logo contra la cara del objeto **≥ 4,5:1** — medido en la pieza fuente **13,90:1** (negativo
-   sobre la tapa oscura).
-2. **Blandura del objeto:** el gradiente máximo de su borde tiene que quedar muy por debajo del del rostro — medido
-   **54** contra **314**. Si el objeto no es mucho más blando que el sujeto, no está en primer plano: está pegado.
+1. **Contraste** del logo contra el píxel más claro de su zona **≥ 4,5:1** — medido **11,61:1**.
+2. **Blandura del primer plano:** su gradiente máximo debe quedar claramente por debajo del del rostro — medido
+   **168** contra **314**. Si se acerca, el objeto no está delante: está en el mismo plano y estorba.
 
-Y verificar que la cara llegue **limpia** desde el plate: si el modelo le dejó un brillo fuerte justo en el centro,
-el logo cae encima y el contraste se desploma.
-
-**Límites.** Una sola aparición por pieza. Nunca sobre la cara ni cruzando la mirada. Si esta es la única marca de
-la pieza, tiene que leerse completa: entonces no hace falta una segunda firma.
+**Límites.** Una sola aparición por pieza. Nunca sobre la cara ni cruzando la mirada. Si el objeto tapa el gesto que
+cuenta la foto, va en otra esquina.
