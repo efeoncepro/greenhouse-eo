@@ -14,7 +14,8 @@ uno a uno; el lector público responde 404/410/429 y nunca cachea), enviarse por
 activas de la organización (enlace compartido o PDF adjunto opt-in, dedupe por persona y versión, un resultado
 ambiguo se reconcilia antes de reenviar) y programarse (semanal/mensual, zona y consolidación; cada ocurrencia deja
 un borrador en revisión, nunca emite ni envía). Migraciones aplicadas en la base compartida; los tres flags nuevos
-nacen apagados en Vercel y los EmailTypes apagados. Sin push ni deploy todavía: rollout a staging en curso.
+nacen apagados en producción y los EmailTypes apagados. Verificado en staging con canary sintético completo (incluye un
+correo real al buzón autorizado del operador); la prueba destapó `ISSUE-174` → `TASK-1876`. Producción y gateway pendientes.
 
 ## 2026-09-17 — Higgsfield documentado como proveedor gobernado de Creative Studio
 

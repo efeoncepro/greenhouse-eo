@@ -106,7 +106,12 @@ flag, 202 after.
   ops-reactive-notifications) in the ops-worker — the send happens there, not in Vercel.
 - **Sentry scrub:** share paths and `isg_` tokens are redacted server + edge; verify with a synthetic event after deploy.
 
-### Staging canary recipe — DRAFT, NOT YET EXECUTED
+### Staging canary recipe — EXECUTED 2026-09-18 (green; see ledger § TASK-1848 for evidence)
+
+Lessons from the run: sequence the rate-limit probe (NEVER a concurrent burst against the shared instance —
+ISSUE-174); turn the EmailTypes on with `pnpm hiring:email-type -- --type <t> --on --apply` only for the canary and
+back `--off --apply` right after (the config table is shared with production); `provider_status` stays null until the
+Resend lifecycle webhook works (ISSUE-160), so "delivered" is confirmed by the recipient, not the ledger.
 
 1. Push `develop`, deploy ops-worker (declares the three flags), create the Cloud Scheduler job, then
    `vercel env add INSIGHTS_SHARING_ENABLED staging` (+ `INSIGHTS_DELIVERY_ENABLED`, `INSIGHTS_SCHEDULES_ENABLED`) +

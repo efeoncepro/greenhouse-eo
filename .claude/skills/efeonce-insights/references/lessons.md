@@ -1,5 +1,10 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-18 · A concurrent burst against a public route nearly exhausted the shared PostgreSQL.** Measuring the share
+  reader's rate limit with 64 concurrent requests left 86–88 idle `greenhouse_app` connections (max 100) for exactly 5 min:
+  each Vercel invocation opens its own pool, the pool's idle timeout never runs while the function is frozen, and the
+  server only cuts at `idle_session_timeout` (5 min). DB-backed rate limiters spend a connection before rejecting. Rule:
+  never probe limits with concurrent bursts against the shared instance; sequence them. Fix owner: TASK-1876 (ISSUE-174).
 - **2026-09-18 · The email platform's token-sensitive intent index is unique per (type, source_event_id, source_entity).**
   Symptom: a retry that reuses the SAME correlation never creates a new `email_deliveries` row (it collides with the
   previous attempt). Rule: correlate per attempt — `idlr-<uuid>` for attempt 1, `idlr-<uuid>:aN` for retries N=2..5 —

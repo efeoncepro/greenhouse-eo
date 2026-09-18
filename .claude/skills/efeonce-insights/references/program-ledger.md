@@ -158,7 +158,19 @@ tender decks: separate issue for the catalog owner.
 ## TASK-1847 — charts and catalogs (to-do)
 _Fill at closure._
 
-## TASK-1848 — sharing, delivery, schedules (in-progress; code complete, rollout pending — 2026-09-18)
+## TASK-1848 — sharing, delivery, schedules (in-progress; staging verified 2026-09-18, gateway + production pending)
+
+**Delta 2026-09-18 (staging) — supersedes "NOT pushed / NOT deployed" below.** Pushed `52562a2f9` to `develop` (CI + all
+worker deploys green). Vercel staging: `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED=true` and `INSIGHTS_ISSUANCE_ENABLED=true`
+(staging only, operator-authorized) + redeploy `greenhouse-bki7l2rl9`. `ops-worker-00695-hrw` carries DELIVERY/SCHEDULES/
+GENERATION/RENDER=true; Cloud Scheduler `ops-insights-schedules-tick` ENABLED. Synthetic canary (sandbox org, edition
+`EO-INS-000015`): render by dispatcher → issue → share create/read/download (PDF 330 KB) with real headers → revoke A 410 while
+B 200 → per-grant rate limit 60×200 + 4×429 → negatives → schedule create/activate/tick `{schedules:1,paused:0}`/pause/retire →
+delivery with EmailType off ⇒ `skipped` → real email to the operator's authorized inbox (share_link + attachment `accepted`,
+subject redacted, no bearer stored) → withdraw ⇒ live grants revoked `edition_withdrawn`. EmailTypes turned back OFF.
+Finding: a 64-request concurrent burst nearly exhausted shared PG connections for 5 min ⇒ ISSUE-174 → TASK-1876.
+Production and gateway federation (`efeonce-mcp`) remain out of this session's frontier.
+
 
 **Built (local `develop`, NOT pushed, NOT deployed):** commits `75715589d` (Slice 1 — ShareGrant + public reader +
 `InsightWebModelV1`), `83d57380a` (Slice 2 — durable email delivery), `1c109fc8e` (Slice 3 — governed schedules,

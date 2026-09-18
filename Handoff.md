@@ -33,7 +33,7 @@ blend raster `luminosity` `0.72` verificado. Templates: `efeonce-advertising-cre
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
 no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
 
-**Efeonce Insights:** 1845/1846 en producción (emisión/IA OFF); TASK-1848 code complete, rollout staging pendiente.
+**Efeonce Insights:** 1845/1846 en producción (emisión/IA OFF); TASK-1848 verificada en staging, pendiente gateway y prod.
 Estado vivo: arquitectura §14 y la skill `efeonce-insights`.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
@@ -50,7 +50,7 @@ invariantes SQL/Ops, playbook reactivo, skills talento/resend/email/release (+ e
 Follow-ups formales: `TASK-1872` (fix de `ISSUE-173`: Phase A del consumer deja huérfano al handler que el breaker
 saltó; mitigación `reactive:backfill --handler=`), `TASK-1873`+`TASK-1874` (enlace descartado: warnings de intake +
 aviso en Application 360). Sin task: valor live de `GROWTH_FORMS_SERVER_VALIDATION_ENABLED`, 6 CV en cuarentena de
-`EO-OPN-0675`, reader canónico submissions↔postulaciones (hoy ad hoc). Resend en Pro. Siguiente ID libre: `TASK-1876`.
+`EO-OPN-0675`, reader canónico submissions↔postulaciones (hoy ad hoc). Resend en Pro. Siguiente ID libre: `TASK-1877`.
 
 **Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
 **no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a

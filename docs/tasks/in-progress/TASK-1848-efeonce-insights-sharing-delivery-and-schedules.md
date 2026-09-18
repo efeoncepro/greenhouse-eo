@@ -28,7 +28,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `Code complete (Slices 1–3 + docs); rollout a staging en curso`
+- Status real: `Staging verificado (canary sintético completo); pendiente gateway efeonce-mcp y producción`
 - Rank: `TBD`
 - Domain: `platform|identity|ops|data`
 - Blocked by: `none`
@@ -177,7 +177,7 @@ El Grader tiene un enlace activo por reporte y estado especializado; no cubre lo
 ### Acceptance criteria additions
 
 - [x] Capability/registry/grant en mismo PR, fine-grained auth, API/MCP, auditoría y errores equivalentes verificados. — Verificado: 3 capabilities con seed + catálogo + grants en el mismo commit de cada slice; suite completa 14.569 tests verde (incluye `capability-grant-coverage`).
-- [ ] Source of truth, tenant boundary, concurrencia, migración/rollback y evidencia live de esta unidad pasan antes del cierre. — **Parcial:** live tests 3/3 contra PG real; evidencia de runtime en staging pendiente.
+- [x] Source of truth, tenant boundary, concurrencia, migración/rollback y evidencia live de esta unidad pasan antes del cierre. — Live tests 3/3 contra PG real + canary de staging (org sin módulo 404, claim/dedupe, cascada de retiro).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -205,6 +205,25 @@ propias; `email_type_config` falla abierto ⇒ seed `enabled=FALSE`; `durableSen
 tipos no listados; no hay redacción de token en path para Sentry; `downloadPrivateAsset` exige `actorUserId` string;
 no existe resolver de período relativo; el resolver Teams sólo resuelve members (cliente ⇒ `unavailable`); la ruta de
 portal destino del deep link la construye TASK-1849.
+
+**Rollout staging (2026-09-18, en curso):** push `52562a2f9` a `develop` (CI + 5 deploys de workers verdes);
+Vercel staging con `INSIGHTS_SHARING/DELIVERY/SCHEDULES_ENABLED=true` + `INSIGHTS_ISSUANCE_ENABLED=true` (sólo staging,
+autorizado para el canary) y redeploy `greenhouse-bki7l2rl9` (target staging); `ops-worker-00695-hrw` con los 4 flags;
+Cloud Scheduler `ops-insights-schedules-tick` ENABLED. Canary sintético (org sandbox «Greenhouse Demo», edición
+`EO-INS-000015` `insed-3b96d035…`): render `deck_pdf` completed por el dispatcher → issue 200 → share A 201 (token una
+vez, URL Think) → reader 200 (`modelVersion 1.0`, sin fugas) + cabeceras reales verificadas con curl + PDF 200 (330 KB) →
+share B → revocar A: A 410 lectura y descarga, B 200, revocar otra vez `idempotent:true` → rate limit por grant 60×200 +
+4×429 `Retry-After: 60` → negativos (share/delivery sin emitir 409 `not_ready`, org sin módulo 404, `portal_link` 409,
+`auto_issue` 400, cliente programa 403, token desconocido/mal formado 404) → schedule create 201 / activate / tick real
+`{schedules:1, paused:0, generated:0}` / pause / retire / reactivar 409 → delivery con EmailType apagado: 202 → projection
+→ `skipped/email_type_paused`, sin grant, fila de correo correlacionada y redactada. **Hallazgo:** la ráfaga de 64 requests
+concurrentes agotó casi las conexiones de la instancia compartida por 5 min ⇒ `ISSUE-174` → `TASK-1876`. Correo real
+(buzón autorizado por el operador `jreyes@efeoncepro.com`, EmailTypes encendidos sólo durante el canary con
+`pnpm hiring:email-type` y apagados al terminar): `share_link` y `attachment` → ambos `accepted` al primer intento, fila
+`sent` con `resend_id`, asunto del enlace redactado, sin bearer persistido, grant `source=delivery` (7 días). Retiro de la
+edición: enlace B 200 → 410 y grants vivos (manual + delivery) revocados `edition_withdrawn`. `provider_status`
+(entregado) no se pudo leer: el ciclo de vida de Resend no opera (`ISSUE-160`); la entrega la confirma el operador en su
+bandeja. **Pendiente fuera de la frontera acordada:** federación en `efeonce-mcp`, producción (flags + release).
 
 **Slices:** 1 grants + reader público + web model + redacción + proxy · 2 intents/recipients + EmailTypes + projection
 + reconciliación + in-app · 3 schedules + tick `ops-worker` + período relativo · 4 conformance, docs, skill, staging.
@@ -315,7 +334,7 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [x] Dedupe, timeout ambiguo, reintento y webhook duplicado no provocan otro correo sin reconciliación; retiro pausa intents pendientes. — Verificado: dedupe por índice parcial (live), ambiguo sin reenvío + reconciliación por intento exacto, retiro cancela pendientes (`delivery.test.ts`, `commands.test.ts`).
 - [x] Schedule resuelve período cerrado/zona/consolidación, doble tick produce una ocurrencia, catch-up acotado y revoke de autoridad lo pausa. — Verificado: `resolveClosedInsightPeriods` (DST/bisiesto/semana ISO), ocurrencia única ante doble tick y claim único (`schedules.live.test.ts`), catch-up acotado y pausa por autoridad revocada (`schedules.test.ts`).
 - [ ] API/MCP ejercitan mismos permisos y errores; write scopes por consentimiento preciso, sin ampliar cliente base-only. — **Abierto:** lanes con la misma tabla de errores; las tools no están federadas en el gateway (fuera de la sesión).
-- [ ] Retención/cleanup y rate limits verificados; rollout por sharing/delivery/schedules con gates OFF, inbox sintético autorizado y rollback ejercitado; integración SEO especializada sigue en TASK-1673. — **Parcial:** purga y cubetas verificadas en código/live; rollout por lane en staging, inbox sintético y rollback ejercitado pendientes.
+- [x] Retención/cleanup y rate limits verificados; rollout por sharing/delivery/schedules con gates OFF, inbox sintético autorizado y rollback ejercitado; integración SEO especializada sigue en TASK-1673. — Verificado en staging 2026-09-18: tick real con `retention` ejecutada, rate limit 60/min por grant con 429 + `Retry-After`, flags por lane (Vercel staging) con default OFF en producción, buzón autorizado por el operador, rollback ejercitado en el kill switch del EmailType (on→off) y en schedules (pause/retire); el rollback por flag de Vercel está documentado pero no se ejercitó.
 
 ## Verification
 
