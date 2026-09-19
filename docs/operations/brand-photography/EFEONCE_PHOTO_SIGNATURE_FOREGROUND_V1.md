@@ -205,3 +205,22 @@ Se mantienen **prohibidos** los cinco soportes rechazados el 2026-09-17, porque 
 | Follaje cruzando todo el borde inferior | «Parece una selva forzada» |
 
 Actualizar `brand-in-scene.md` para apuntar a esta firma corresponde al agente que mantiene las skills.
+
+## Delta 2026-09-19 — la caja de selección tiene propósito, no decoración
+
+**Decisión del operador:** «hay reglas para usar el bounding box: no se pone en cualquier parte, se usa con un
+propósito, para seleccionar un objeto o texto para hacer énfasis, no solo por colocar y ya».
+
+| Regla | Detalle |
+|---|---|
+| **Hay objeto o no hay caja** | La caja enmarca **algo con sentido**: la obra que se está co-creando, la pieza en revisión, el resultado que alguien aprueba, o **una palabra del titular** a la que se hace énfasis. Si la foto no tiene ese objeto aislado, **no va selección** |
+| **Nunca sobre el vacío** | Enmarcar una zona vacía de la mesa o un recorte arbitrario es decoración: se retira |
+| **Nunca sobre una persona** | Ni sobre su cara ni recortándola; las personas no son objetos que se seleccionan |
+| **El objeto se elige en la ficha de toma** | El plate se pide con ese objeto aislado y con aire alrededor para la caja y las etiquetas; no se busca «dónde poner la caja» al componer |
+| **Quién selecciona dice algo** | Cliente + Efeonce sobre la misma pieza = co-creación; un solo cursor = revisión o presencia; el cursor local = el espectador |
+| **Verificación** | `componer-foto.mjs` falla si la caja o una etiqueta se salen del lienzo; el objeto y el sentido los valida una persona |
+
+Casos de esta ronda **[medido/visto]**: en 4:5 la caja enmarca la palabra «donde» del titular (énfasis, igual que en
+el carrusel de GTA VI, donde enmarcaba la decisión); en la pieza de co-creación enmarca **las láminas impresas** que
+ambos están mirando, con «Cliente» y «Efeonce» sobre la misma obra; en 16:9 se **retiró** porque no había objeto
+aislado y caía sobre la cara de una persona.
