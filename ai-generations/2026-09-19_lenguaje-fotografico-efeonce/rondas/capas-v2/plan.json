@@ -6,14 +6,13 @@
   "top": 0.045,
   "label": "CREATIVE · RUN & GUN",
   "lead": "Grabamos el oficio",
-  "leadSize": 58,
+  "leadSize": 50,
   "textWidth": 0.66,
   "dominant": "donde",
-  "dominantSize": 180,
+  "dominantSize": 190,
   "dominantMax": 0.46,
   "after": "pasa: en la|**panadería.**",
-  "afterSize": 52,
-  "afterGap": 20,
+  "afterSize": 46,
   "afterFill": "#ffffff",
   "gesture": {
    "text": "¡ahí está!",
@@ -22,22 +21,6 @@
    "y": 0.45,
    "rotate": -6,
    "color": "#ffffff"
-  },
-  "selection": {
-   "cursors": [
-    {
-     "id": "arte",
-     "label": "Arte",
-     "anchor": "bottom-end",
-     "color": "#f55d01"
-    },
-    {
-     "id": "yo",
-     "kind": "local",
-     "anchor": "end-center"
-    }
-   ],
-   "scale": 1.5
   },
   "logo": {
    "width": 0.17,
@@ -56,14 +39,13 @@
   "top": 0.055,
   "label": "CO-CREACIÓN",
   "lead": "No te entregamos crecimiento:",
-  "leadSize": 52,
+  "leadSize": 44,
   "textWidth": 0.7,
   "dominant": "lo construimos",
-  "dominantSize": 140,
+  "dominantSize": 150,
   "dominantMax": 0.84,
   "after": "**contigo.**",
-  "afterSize": 56,
-  "afterGap": 22,
+  "afterSize": 44,
   "afterFill": "#ffffff",
   "selection": {
    "box": [
@@ -112,7 +94,7 @@
   "top": 0.16,
   "label": "REVOPS · PIPELINE",
   "lead": "Tu operación,",
-  "leadSize": 56,
+  "leadSize": 48,
   "textWidth": 0.42,
   "dominant": "en vivo.",
   "dominantSize": 190,

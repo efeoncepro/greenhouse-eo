@@ -224,3 +224,8 @@ enmarcar; el objeto se elige en la ficha de toma, no al componer.
 **La caja de selección tiene propósito:** enmarca un objeto con sentido (la obra en revisión, el resultado aprobado)
 o una palabra del titular para énfasis. Nunca sobre vacío, nunca sobre una persona, y si la foto no tiene ese objeto,
 no va selección. El objeto se decide en la ficha de toma.
+
+**Craft tipográfico (no negociable):** Bricolage es la **única** voz expresiva (sólo el dominante); etiqueta,
+entrada, cierre y notas van en **Poppins** (`structureLabel` en mayúsculas +0,08 em; `structureCopy` leading 1,5).
+El aire entre tramos se mide como **gap de tinta** ≈ **0,09 del tamaño del dominante** (0,10 tras la etiqueta), no
+como leading; `componer-foto.mjs` lo reporta en `qa.json`.

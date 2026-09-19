@@ -376,6 +376,7 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   let under = ''
   let body = ''
   const checks = []
+  const tramos = []
   const layers = []
 
   // Oscurecimiento sólo donde el plate lo pide (gradual, desde arriba), declarado por lámina.
@@ -414,18 +415,19 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
 
     // La estrella fue un marcador de misión propio del post de GTA VI: aquí es opt-in y por defecto NO va.
     body += (s.labelStar ? `<path d="${starPath(lx0 + starR, scy, starR)}" fill="${ACCENT}"/>` : '') + lab.svg
-    checks.push({ id: 'etiqueta', box: lab.box, inkL: INK_L })
-    y = lab.box.bottom + 26
+    checks.push({ id: 'etiqueta', box: lab.box, inkL: INK_L }); tramos.push(['etiqueta', lab.box, s.labelSize ?? lsize])
+    y = lab.box.bottom + Math.round((s.labelGap ?? 0.10) * (s.dominantSize ?? 160))
   }
 
   // 2 · entrada
   if (s.lead) {
     const lr = R.ideaLead
-    const le = richBlock({ text: s.lead, fonts: BRIC(lr, lr.width, 760), size: s.leadSize ?? 70, tracking: em(lr.tracking), leading: lr.lineHeight, x, topY: y, maxWidth: W * (s.textWidth ?? 0.8), fill: SOFT, accentFill: INK, align: s.align })
+    const leadPoppins = (s.leadFamily ?? 'poppins') === 'poppins'
+    const le = richBlock({ text: s.lead, fonts: leadPoppins ? POP : BRIC(lr, lr.width, 760), size: s.leadSize ?? 70, tracking: leadPoppins ? em(R.structureCopy.tracking) : em(lr.tracking), leading: leadPoppins ? 1.5 : lr.lineHeight, x, topY: y, maxWidth: W * (s.textWidth ?? 0.8), fill: SOFT, accentFill: INK, align: s.align })
 
     body += le.svg
-    checks.push({ id: 'entrada', box: le.box, inkL: INK_L })
-    y = le.box.bottom + (s.leadGap ?? 30)
+    checks.push({ id: 'entrada', box: le.box, inkL: INK_L }); tramos.push(['entrada', le.box, s.leadSize ?? 70])
+    y = le.box.bottom + Math.round((s.leadGap ?? 0.09) * (s.dominantSize ?? 160))
   }
 
   // 3 · dominante (+ selección colaborativa)
@@ -437,7 +439,7 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   if (s.dominantMax && widest > s.dominantMax * W) domSize = domSize * (s.dominantMax * W) / widest
   const dom = richBlock({ text: s.dominant, fonts: { base: domFont, bold: domFont }, size: domSize, tracking: em(ir.tracking), leading: ir.lineHeight, x, topY: y, maxWidth: W * 0.9, fill: INK, align: s.align })
 
-  checks.push({ id: 'dominante', box: dom.box, inkL: INK_L })
+  checks.push({ id: 'dominante', box: dom.box, inkL: INK_L }); tramos.push(['dominante', dom.box, domSize])
   dom.accentBoxes.forEach((b, i) => checks.push({ id: `dominante-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
 
   let selection = ''
@@ -484,11 +486,12 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   // display posterior (cierre de la frase) si existe
   if (s.after) {
     const ar = R.ideaMedium
-    const af = richBlock({ text: s.after, fonts: BRIC(ar, ar.width, 800), size: s.afterSize ?? 74, tracking: em(ar.tracking), leading: ar.lineHeight, x, topY: y + (s.afterGap ?? 34), maxWidth: W * (s.textWidth ?? 0.8), fill: s.afterFill ?? INK, align: s.align })
+    const afterPoppins = (s.afterFamily ?? 'poppins') === 'poppins'
+    const af = richBlock({ text: s.after, fonts: afterPoppins ? POP : BRIC(ar, ar.width, 800), size: s.afterSize ?? 74, tracking: afterPoppins ? em(R.structureCopy.tracking) : em(ar.tracking), leading: afterPoppins ? 1.5 : ar.lineHeight, x, topY: y + Math.round((s.afterGap ?? 0.09) * domSize), maxWidth: W * (s.textWidth ?? 0.8), fill: s.afterFill ?? INK, align: s.align })
     af.accentBoxes.forEach((b, i) => checks.push({ id: `cierre-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
 
     body += af.svg
-    checks.push({ id: 'cierre-frase', box: af.box, inkL: s.afterFill ? undefined : INK_L })
+    checks.push({ id: 'cierre-frase', box: af.box, inkL: s.afterFill ? undefined : INK_L }); tramos.push(['cierre', af.box, s.afterSize ?? 74])
     y = af.box.bottom
   }
 
@@ -603,8 +606,11 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   }
   if (cardEl) contraste.tarjeta = await contrastUnder(bare, cardEl.textBoxes[0])
 
-  qa.push({ id: s.id, dominante: dom.lines, contraste, seleccion: selEvidence })
+  // Gap de tinta real entre tramos (no leading): top(siguiente) − bottom(anterior)
+  const gaps = []
+  for (let i = 1; i < tramos.length; i++) gaps.push({ entre: `${tramos[i - 1][0]}→${tramos[i][0]}`, px: +(tramos[i][1].top - tramos[i - 1][1].bottom).toFixed(1), ratioDominante: +((tramos[i][1].top - tramos[i - 1][1].bottom) / domSize).toFixed(3) })
+  qa.push({ id: s.id, dominante: dom.lines, contraste, gapsTinta: gaps, seleccion: selEvidence })
 }
 
 fs.writeFileSync(`${PLAN_DIR}/out/qa${only.length ? '-parcial' : ''}.json`, JSON.stringify(qa, null, 2))
-for (const q of qa) console.log(q.id, JSON.stringify(q.contraste))
+for (const q of qa) console.log(q.id, 'contraste', JSON.stringify(q.contraste), 'gaps', JSON.stringify(q.gapsTinta))

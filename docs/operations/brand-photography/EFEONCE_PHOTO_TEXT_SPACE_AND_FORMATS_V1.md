@@ -222,3 +222,21 @@ lenguaje son las voces tipográficas AXIS, la selección colaborativa, la firma 
 Cuarta corrección de la misma familia: **la caja de selección sólo va si la foto tiene un objeto aislado que valga
 la pena enmarcar.** En la pieza 16:9 caía sobre la cara de una persona y se retiró: el objeto se elige en la ficha
 de toma, no al componer.
+
+## 13. Craft tipográfico: una voz expresiva y gap de tinta medido (2026-09-19)
+
+Dos errores míos que el operador corrigió («interespaciado mal… mala aplicación de Poppins tienen las 3»):
+
+| Error | Regla |
+|---|---|
+| Entrada, dominante y cierre los puse **los tres en Bricolage** | **Bricolage es la ÚNICA voz expresiva de la pieza** (skill de tipografía, §Creative asset boundary). La etiqueta, la entrada, el cierre y la nota van en **Poppins**: `structureLabel` en mayúsculas para la etiqueta (+0,08 em) y `structureCopy` (leading 1,5, tracking 0 a −0,01 em) para entrada/cierre/nota. Así el contraste también es de familia, no sólo de peso |
+| Separé los tramos con píxeles fijos (26/30/20 px) → **ratio 0,11–0,17** del dominante, se leía suelto | El aire se mide como **gap de tinta** (`top` de la línea siguiente − `bottom` de la anterior), no como leading. Objetivo **≈ 0,09 del tamaño del dominante** (0,10 tras la etiqueta), coherente con el caso medido de Fiestas Patrias (gaps ~11 px con tipos de 104–126 px) |
+
+`componer-foto.mjs` ahora **reporta los gaps de tinta reales** por pieza (`gapsTinta` en `out/qa.json`) y los
+calcula desde ratios (`labelGap`, `leadGap`, `afterGap` como fracción del dominante, 0,10 / 0,09 / 0,09 por
+defecto). Tracking por tramo según los rangos medidos: Bricolage ≥80 px −0,020 a −0,040 em; 48–79 px −0,010 a
+−0,030 em; Poppins de apoyo 0 a −0,010 em con leading 1,45–1,65; Poppins overline +0,060 a +0,100 em.
+
+Resultado de la pasada corregida **[medido]**: gaps 0,089–0,100 del dominante en las tres piezas; contraste por
+nivel 4,7–12,9:1; la caja de selección se **retiró** de la pieza 4:5 (no había objeto con sentido que enmarcar) y
+se mantiene en la de co-creación sobre las láminas impresas.
