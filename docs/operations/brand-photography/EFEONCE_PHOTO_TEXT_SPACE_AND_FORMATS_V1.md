@@ -153,3 +153,31 @@ con aviso).
 | Etiqueta de cursor fuera del lienzo | ancla hacia el borde con el objeto pegado a él | anclar hacia el espacio libre; el render falla si se sale |
 | «→» salió como caja | Poppins no tiene ese glifo | el compositor ahora **falla** con glifos inexistentes; usar caracteres soportados o componer el símbolo aparte |
 | Gesto Guttery en 1,76:1 | caligrafía sobre madera de tono medio | el compositor **falla** bajo 4,5:1; mover el gesto a una zona pareja |
+
+## 9. Corrección 2026-09-19: se reutiliza el compositor de «Nivel de búsqueda», no uno nuevo
+
+**Error cometido:** para las pruebas de §4 y §8 escribí dos compositores nuevos (`titular.mjs`, `composicion.mjs`)
+en vez de reutilizar el que ya existía y funcionaba: `ai-generations/2026-09-19_nivel-de-busqueda/componer-v2.mjs`
+(carrusel GTA VI). El operador lo detectó y rechazó las piezas («todas mal»: tipografía y jerarquía, ubicación y
+layout, cursores y caja, y también los plates). **Ese compositor original no fue modificado** (verificado con
+`git status`).
+
+**Corrección:** el camino canónico para componer una pieza fotográfica con capa es
+`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/componer-foto.mjs`, que es **una adaptación
+declarada de `componer-v2.mjs`**, conservando su gramática:
+
+| Del original se conserva | Qué se adaptó |
+|---|---|
+| Jerarquía por voces: etiqueta con marcador-estrella, entrada `ideaLead`, dominante `ideaImpact` a ancho 78 con `dominantMax`, cierre `ideaMedium` | Lienzo tomado del plate: 4:5, 9:16 y 16:9 (antes fijo 1152×1440) |
+| `richBlock` con `**negrita**` y `[[acento]]` y medición del acento por separado | HUD de misiones GTA pasa a opcional |
+| Scrims declarados por lámina, tarjeta de vidrio esmerilado del propio plate | Scrim con color por pieza (oscuro o blanco) |
+| Selección AXIS con cursores, etiquetas a trazos, verificación `withinCanvas` | La selección puede anclarse al **dominante** (texto) o a un **objeto de la foto** (`selection.box` en fracciones) |
+| QA de contraste real bajo cada caja + preview 390 px | Tinta por pieza (`"ink": "dark"`) y **variante de logo automática** por contraste |
+
+`titular.mjs` y `composicion.mjs` quedan **superados**: sirven sólo como registro de la exploración. Cualquier
+pieza nueva se compone con `componer-foto.mjs` y un plan declarativo (`rondas/capas-v2/plan.json` como ejemplo).
+
+**Estado de la primera pasada con el compositor correcto** (`rondas/capas-v2/out/`): contrastes de todas las capas
+entre 4,3 y 20:1, pero la **ubicación de la caja de selección y de las etiquetas de cursores sigue sin resolver**
+(la caja cae sobre zonas vacías de la mesa o recorta a una persona). Pendiente: elegir el objeto a enmarcar en la
+ficha de toma, no al componer.

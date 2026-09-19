@@ -1,0 +1,180 @@
+[
+ {
+  "id": "a-oficio-45",
+  "plate": "p1.png",
+  "align": "left",
+  "top": 0.065,
+  "scrimTop": {
+   "to": 0.72,
+   "opacity": 0.95
+  },
+  "label": "CREATIVE · RUN & GUN",
+  "lead": "Grabamos el oficio",
+  "leadSize": 58,
+  "textWidth": 0.66,
+  "dominant": "donde",
+  "dominantSize": 210,
+  "dominantMax": 0.46,
+  "after": "pasa: en la|**panadería.**",
+  "afterSize": 58,
+  "afterGap": 26,
+  "afterFill": "#ffffff",
+  "gesture": {
+   "text": "¡así!",
+   "size": 62,
+   "x": 0.62,
+   "y": 0.33,
+   "rotate": -8,
+   "color": "#ffffff"
+  },
+  "selection": {
+   "cursors": [
+    {
+     "id": "arte",
+     "label": "Arte",
+     "anchor": "top-end",
+     "color": "#f55d01"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "bottom-end"
+    }
+   ],
+   "scale": 1.5
+  },
+  "logo": {
+   "width": 0.17,
+   "variant": "auto"
+  },
+  "final": [
+   1080,
+   1350
+  ],
+  "labelSize": 30
+ },
+ {
+  "id": "b-cocreacion-45",
+  "plate": "p2.png",
+  "align": "left",
+  "top": 0.07,
+  "scrimTop": {
+   "to": 0.62,
+   "opacity": 0.95
+  },
+  "label": "CO-CREACIÓN",
+  "lead": "No te entregamos crecimiento:",
+  "leadSize": 52,
+  "textWidth": 0.7,
+  "dominant": "lo construimos",
+  "dominantSize": 150,
+  "dominantMax": 0.84,
+  "after": "**contigo.**",
+  "afterSize": 56,
+  "afterGap": 22,
+  "afterFill": "#ffffff",
+  "selection": {
+   "box": [
+    0.28,
+    0.62,
+    0.8,
+    0.84
+   ],
+   "targetKind": "object",
+   "variant": "eight-handles",
+   "scale": 1.5,
+   "cursors": [
+    {
+     "id": "cliente",
+     "label": "Cliente",
+     "anchor": "top-start",
+     "color": "#6ec207"
+    },
+    {
+     "id": "efeonce",
+     "label": "Efeonce",
+     "anchor": "top-end",
+     "color": "#0375db"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "bottom-end"
+    }
+   ]
+  },
+  "logo": {
+   "width": 0.17,
+   "variant": "auto"
+  },
+  "final": [
+   1080,
+   1350
+  ],
+  "labelSize": 30
+ },
+ {
+  "id": "c-pipeline-169",
+  "plate": "p3.png",
+  "align": "left",
+  "top": 0.14,
+  "label": "REVOPS · PIPELINE",
+  "lead": "Tu operación,",
+  "leadSize": 56,
+  "textWidth": 0.42,
+  "dominant": "en vivo.",
+  "dominantSize": 190,
+  "dominantMax": 0.36,
+  "card": {
+   "header": "Este mes",
+   "body": "Ganados **+18** · RpA 2,1 a **1,4**",
+   "width": 0.32,
+   "bottom": 0.76
+  },
+  "selection": {
+   "box": [
+    0.7,
+    0.46,
+    0.92,
+    0.72
+   ],
+   "targetKind": "object",
+   "scale": 1.3,
+   "cursors": [
+    {
+     "id": "revops",
+     "label": "RevOps",
+     "anchor": "top-start",
+     "color": "#0375db"
+    },
+    {
+     "id": "cliente",
+     "label": "Cliente",
+     "anchor": "bottom-start",
+     "color": "#6ec207"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "end-center"
+    }
+   ]
+  },
+  "logo": {
+   "width": 0.12,
+   "variant": "auto",
+   "x": 0.22
+  },
+  "final": [
+   1920,
+   1080
+  ],
+  "ink": "dark",
+  "scrimTop": {
+   "to": 0.9,
+   "opacity": 0.55,
+   "color": "#ffffff"
+  },
+  "labelSize": 34
+ }
+]

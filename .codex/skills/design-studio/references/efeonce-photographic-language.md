@@ -204,3 +204,8 @@ local) o **cursores multiplayer**, y la firma. Reservar en la toma: zona de text
 enmarcar, zona pareja para HUD y para el gesto. Compositor: `scripts/composicion.mjs` (contraste por capa, autoajuste,
 falla con glifos inexistentes como «→» y con gesto bajo 4,5:1). Detalle:
 [zonas de composición y formatos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).
+
+**Compositor canónico:** `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/componer-foto.mjs`, adaptación
+declarada del compositor del carrusel GTA VI (`2026-09-19_nivel-de-busqueda/componer-v2.mjs`): misma gramática de voces,
+`richBlock`, scrims, tarjeta de vidrio, selección AXIS y QA de contraste; adaptado a foto, multiformato, tinta por pieza,
+selección sobre objeto y logo automático. **NUNCA** escribir un compositor nuevo para una pieza: se extiende éste.

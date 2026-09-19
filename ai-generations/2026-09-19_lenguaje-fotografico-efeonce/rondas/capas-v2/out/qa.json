@@ -1,0 +1,141 @@
+[
+  {
+    "id": "a-oficio-45",
+    "dominante": [
+      "donde"
+    ],
+    "contraste": {
+      "etiqueta": 19.7,
+      "entrada": 19.15,
+      "dominante": 7.6,
+      "cierre-frase": 4.26,
+      "gesto": 18.94,
+      "logo": 20.03
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "arte",
+          "labelBounds": {
+            "left": 562.882,
+            "top": 104.474,
+            "right": 641.409,
+            "bottom": 149.056
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "b-cocreacion-45",
+    "dominante": [
+      "lo construimos"
+    ],
+    "contraste": {
+      "etiqueta": 12.74,
+      "entrada": 9.55,
+      "dominante": 5.65,
+      "cierre-frase": 4.95,
+      "logo": 6.58
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "cliente",
+          "labelBounds": {
+            "left": 147.742,
+            "top": 784.858,
+            "right": 256.896,
+            "bottom": 829.44
+          }
+        },
+        {
+          "id": "efeonce",
+          "labelBounds": {
+            "left": 987.264,
+            "top": 784.858,
+            "right": 1104.402,
+            "bottom": 829.44
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c-pipeline-169",
+    "dominante": [
+      "en vivo."
+    ],
+    "contraste": {
+      "etiqueta": 11.61,
+      "entrada": 11.08,
+      "dominante": 10.46,
+      "logo": 7.3,
+      "tarjeta": 7.24
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "revops",
+          "labelBounds": {
+            "left": 1152.89,
+            "top": 360.878,
+            "right": 1329.152,
+            "bottom": 429.568
+          }
+        },
+        {
+          "id": "cliente",
+          "labelBounds": {
+            "left": 1160.974,
+            "top": 929.792,
+            "right": 1329.152,
+            "bottom": 998.482
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  }
+]
