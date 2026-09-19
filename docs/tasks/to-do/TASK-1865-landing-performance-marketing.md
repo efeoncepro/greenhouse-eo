@@ -440,8 +440,8 @@ La especificación completa por región —layout desktop y mobile, contenido, I
 | R5 | Firma: cambia la señal | `greenhouse_performance_signal` |
 | R6 | Dos formas de trabajar | `greenhouse_performance_motions` |
 | R7 | Cinco frentes | `greenhouse_performance_modules` |
-| R8 | Ocho canales con estado | `greenhouse_performance_channels` |
-| R9 | Servicios: cómo empezamos + servicios que se suman | `greenhouse_performance_services` |
+| R8 | Servicios por plataforma (diez, con estado) | `greenhouse_performance_channels` |
+| R9 | Cómo trabajamos contigo: escalera + otras formas de trabajar | `greenhouse_performance_engagement` |
 | R10 | Posición por tipo de proveedor | `greenhouse_comparison_table` (reuse) |
 | R11 | Reglas del juego + lo que no se promete | `greenhouse_performance_operating` |
 | R12 | Qué recibes + marcas | `greenhouse_performance_proof` + `greenhouse_social_trust` |
@@ -698,16 +698,19 @@ el motor ya soporta.
 
 ## Delta 2026-09-19
 
-- **Pedido del owner:** la landing presenta **servicios, no precios**. R9 pasa de "Cómo empezamos" a "Servicios" y
-  muestra el catálogo completo de la [ficha](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md):
-  los cuatro pasos de entrada (con qué se lleva el cliente en cada uno) y cuatro servicios que se suman —Programmatic y
-  pantallas digitales, Anuncios en ChatGPT, Especialista dedicado y Asesoría—. Widget renombrado a
-  `greenhouse_performance_services`, anchor `#servicios`, capture `performance-services`. Wireframe, flow, copy ledger,
-  mapeo de nombres y decision log actualizados.
-- Programmatic ahora nombra explícitamente las pantallas digitales (vía pública, aeropuertos, centros comerciales) en
-  R8, R9 y FAQ 9. Sigue sin nombrar al partner ni mostrar CPM: Real Audiences y Basis están en evaluación y no hay
-  acuerdo firmado.
-- La prohibición de precios, bandas y porcentajes no cambia.
+- **Pedido del owner:** la landing presenta **servicios, no precios**, y los servicios se reconocen por plataforma.
+  - **R8 "Servicios por plataforma"** (anchor `#servicios`): diez tarjetas con qué hacemos en cada una y su estado. Son
+    Google Ads, Meta Ads, TikTok Ads, LinkedIn Ads, Microsoft Advertising, Anuncios en ChatGPT, Programmatic y
+    pantallas digitales, Retail media y Mercado Ads, Amazon Ads (México) y X Ads. Microsoft y Amazon son nuevas en la
+    página. Todo sale de la cobertura de canales de la
+    [ficha](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md).
+  - **R9 "Cómo trabajamos contigo"** (`greenhouse_performance_engagement`, anchor `#como-empezamos`): la escalera de
+    cuatro pasos con qué se lleva el cliente, más especialista dedicado y asesoría.
+  - El formulario suma Microsoft Advertising, pantallas digitales y Amazon a "Dónde inviertes hoy".
+- Se mantiene la doctrina de la ficha: ninguna plataforma se vende suelta ni con precio por plataforma; todas se activan
+  dentro del diagnóstico, el sprint o la operación mensual, y la página lo dice (`channels.contract`).
+- Programmatic nombra las pantallas digitales en R8 y FAQ 9, sin nombrar al partner ni mostrar CPM: Real Audiences y
+  Basis siguen en evaluación, sin acuerdo firmado.
 
 ## Open Questions
 
