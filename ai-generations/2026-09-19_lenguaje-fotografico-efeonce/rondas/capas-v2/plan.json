@@ -3,24 +3,24 @@
   "id": "a-oficio-45",
   "plate": "p1.png",
   "align": "left",
-  "top": 0.055,
+  "top": 0.045,
   "label": "CREATIVE · RUN & GUN",
   "lead": "Grabamos el oficio",
   "leadSize": 58,
   "textWidth": 0.66,
   "dominant": "donde",
-  "dominantSize": 200,
+  "dominantSize": 180,
   "dominantMax": 0.46,
   "after": "pasa: en la|**panadería.**",
-  "afterSize": 58,
-  "afterGap": 26,
+  "afterSize": 52,
+  "afterGap": 20,
   "afterFill": "#ffffff",
   "gesture": {
-   "text": "¡así!",
-   "size": 62,
-   "x": 0.62,
-   "y": 0.33,
-   "rotate": -8,
+   "text": "¡ahí está!",
+   "size": 58,
+   "x": 0.58,
+   "y": 0.45,
+   "rotate": -6,
    "color": "#ffffff"
   },
   "selection": {
@@ -28,13 +28,13 @@
     {
      "id": "arte",
      "label": "Arte",
-     "anchor": "top-end",
+     "anchor": "bottom-end",
      "color": "#f55d01"
     },
     {
      "id": "yo",
      "kind": "local",
-     "anchor": "bottom-end"
+     "anchor": "end-center"
     }
    ],
    "scale": 1.5

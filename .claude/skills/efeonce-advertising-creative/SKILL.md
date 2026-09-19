@@ -84,7 +84,8 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    es un default; una cursiva o Guttery larga tampoco. El contraste útil puede venir de peso, escala, espacio,
    color, posición o tiempo, pero cada capa debe conservar una función.
 5. **Protege lectura y marca.** Mide contraste sobre los píxeles reales de cada zona. Si falla, cambia
-   encuadre, posición, color, plate o scrim antes de añadir contornos/sombras decorativas. Un logo negativo
+   encuadre, posición, color o plate antes de añadir contornos/sombras decorativas. **En fotografía de marca
+   Efeonce NUNCA un scrim** (2026-09-19): la zona se pide con su tono en la toma y, si no pasa, se regenera. Un logo negativo
    sobre una zona clara o variable es un DON’T aunque el archivo sea oficial.
 6. **Revisa en el tamaño de uso.** Comprueba composición completa y vista reducida, safe areas, ritmo,
    desbordes, solapamientos, contraste, logo, subtítulos y `prefers-reduced-motion` cuando corresponda.
@@ -104,11 +105,11 @@ que usó el caso y se revalidan con cada fondo, largo y soporte.
 
 | Voz | Función | Tipografía (caso) | Tinta (caso) |
 |---|---|---|---|
-| Etiqueta | Nombra la misión/tema | Poppins 700 mayúsculas, tracking `structureLabel`, + marcador estrella | blanco; el marcador lleva el naranja `#ff6500` |
+| Etiqueta | Nombra la misión/tema | Poppins 700 mayúsculas, tracking `structureLabel` (el **marcador estrella fue puntual de GTA VI**: no va en otras piezas) | blanco |
 | Entrada | Prepara la tesis | Bricolage `ideaLead`; nombres propios con `**…**` a 760 | `softOnDark` `#cfe4fa`; énfasis blanco |
 | Dominante | La tesis en 1–3 palabras | Bricolage `ideaImpact` a ancho 78 | blanco; palabra clave `[[…]]` en naranja Efeonce |
 | Cierre de frase | Completa la tesis | Bricolage `ideaMedium`, remate `**…**` a 800 | blanco, o celeste con remate blanco |
-| Tarjeta HUD | Da el giro/argumento sobre la escena | Poppins 400 + remate Poppins 700 | celeste + blanco |
+| Tarjeta HUD | Giro/argumento sobre la escena — **sólo ilustración/HUD de género; en foto de marca va como texto limpio** | Poppins 400 + remate Poppins 700 | celeste + blanco |
 | Gesto (opcional) | Voz humana breve | Guttery, 1 por pieza, ≤ 3 palabras | blanco |
 
 - **Regla: dos niveles vecinos nunca comparten peso y color a la vez.** La v1 falló por eso (entrada 740 vs dominante

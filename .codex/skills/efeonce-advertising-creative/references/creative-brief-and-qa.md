@@ -48,11 +48,16 @@ necesitan gritar a la vez, el problema es de jerarquía, no de tamaño.
    luminancia del fondo bajo la tinta (conservadora: pesca luces puntuales). Si un nivel queda bajo el umbral y aun
    así lo apruebas porque se lee, registra la **revisión visual a 390 px** junto al número; sin esa nota es REWORK.
    Guarda el resultado por lámina (p. ej. `out-v2/qa.json` en «Nivel de búsqueda», 2026-09-19).
-9. **Tarjetas de notificación / paneles UI.** Si la pieza usa una tarjeta tipo HUD, debe ser vidrio esmerilado
-   **real**: región del propio plate desenfocada (en el caso, `blur 22` + máscara redondeada), borde sutil y tinta
+9. **Tarjetas de notificación / paneles UI.** 🔴 **En fotografía de marca propia Efeonce NO se usan** (decisión del
+   operador 2026-09-19: la tarjeta con línea naranja fue puntual del post de GTA VI). El dato va como texto limpio
+   (Poppins) sobre una zona clara de la propia foto. En ilustración/HUD de género, si la pieza usa una tarjeta tipo
+   HUD, debe ser vidrio esmerilado **real**: región del propio plate desenfocada (en el caso, `blur 22` + máscara redondeada), borde sutil y tinta
    oscura translúcida encima. Es un elemento de UI del género que la escena justifica, no un rectángulo decorativo
    detrás de palabras; si no cumple una función narrativa, se retira.
-10. **Oscurecimientos graduales declarados.** Un scrim es la última opción, tras intentar encuadre, posición y plate.
+10. **Oscurecimientos graduales declarados.** 🔴 **En fotografía de marca propia Efeonce: NUNCA.** Decisión del
+    operador 2026-09-19: «es muy 2010, le resta limpieza». El contraste se planifica en la toma pidiendo la zona con
+    su tono (sombra profunda y pareja, o muro claro y parejo); si no pasa 4,5:1 se regenera el plate o se mueve el
+    texto. En ilustración, un scrim es la última opción, tras intentar encuadre, posición y plate.
     Si queda, se declara **por lámina** (`scrimTop { to, opacity }`, `scrimBottom { from, opacity }`) como degradado
     que se funde con la escena; nunca un velo rectangular ni un valor global oculto en el compositor.
 11. **Hoja de revisión.** Arma una hoja con todas las piezas en el orden de publicación. Si se genera ordenando
@@ -79,7 +84,10 @@ necesitan gritar a la vez, el problema es de jerarquía, no de tamaño.
 | Niveles de texto | Vecinos distintos en ≥ 2 ejes (peso, tinta, escala, familia) | Entrada y dominante con el mismo peso y color |
 | Acento de color | Naranja sobre cielo oscurecido, medido aparte y revisado a 390 px | Naranja sobre horizonte encendido (1–2:1) sin degradar a peso |
 | Tarjeta HUD | Vidrio esmerilado real del plate, función narrativa | Rectángulo plano de color detrás del texto |
-| Scrim | Degradado declarado por lámina tras intentar composición | Velo rectangular o global sin registro |
+| Scrim | Sólo ilustración y declarado por lámina | **Cualquier scrim en fotografía de marca** (2026-09-19) |
+| Tarjeta HUD en foto | Dato como texto limpio sobre zona clara de la foto | Tarjeta de vidrio con línea naranja (era de GTA VI) |
+| Marcador-estrella | Sólo el post de GTA VI (marcaba la misión) | Estrella junto a la etiqueta en cualquier otra pieza |
+| Propósito del bounding box | Enmarca un objeto con sentido (obra en revisión, resultado aprobado) o una palabra del titular | Caja sobre vacío, sobre una persona, o «porque sí» |
 | Firma web | url-lum con evidencia `non-separable-luminosity`; si el logo 3D es héroe, sólo url-lum | Segundo logo plano compitiendo con el héroe |
 
 ## Salida de la revisión

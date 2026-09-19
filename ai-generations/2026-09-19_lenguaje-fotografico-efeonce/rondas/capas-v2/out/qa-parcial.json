@@ -1,19 +1,20 @@
 [
   {
-    "id": "b-cocreacion-45",
+    "id": "a-oficio-45",
     "dominante": [
-      "lo construimos"
+      "donde"
     ],
     "contraste": {
-      "etiqueta": 10.54,
-      "entrada": 10.37,
-      "dominante": 10.02,
-      "cierre-frase": 9.11,
-      "logo": 13.01
+      "etiqueta": 6.54,
+      "entrada": 6.56,
+      "dominante": 6.2,
+      "cierre-frase": 4.65,
+      "gesto": 10.16,
+      "logo": 20.38
     },
     "seleccion": {
       "selection": {
-        "variant": "open-brackets",
+        "variant": "eight-handles",
         "padding": "standard",
         "paddingRatio": {
           "inline": 0.012,
@@ -25,21 +26,12 @@
       },
       "cursores": [
         {
-          "id": "cliente",
+          "id": "arte",
           "labelBounds": {
-            "left": 191.461,
-            "top": 1197.792,
-            "right": 278.784,
-            "bottom": 1233.458
-          }
-        },
-        {
-          "id": "efeonce",
-          "labelBounds": {
-            "left": 1057.536,
-            "top": 1197.792,
-            "right": 1151.246,
-            "bottom": 1233.458
+            "left": 503.422,
+            "top": 372.256,
+            "right": 581.949,
+            "bottom": 416.838
           }
         },
         {
