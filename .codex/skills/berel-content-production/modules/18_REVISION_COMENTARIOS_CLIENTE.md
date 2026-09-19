@@ -119,6 +119,56 @@ cerrada.
     en `Aprendizajes del feedback de Berel` y en el Playbook. Todo hallazgo fuera del comentario se reporta
     aparte; si la pieza ya está publicada, registrar también un pendiente Drupal con owner y evidencia esperada.
 
+## Revisión amplia tras comentarios: V2 debajo de la V1 (validado 2026-09-19)
+
+Cuando una ronda de comentarios cambia el criterio de toda la pieza —entrada, estructura, registro, gráficos—
+los reemplazos pequeños ya no alcanzan y reescribir sobre la V1 destruiría las anclas de los hilos. Caso fuente:
+las tres piezas de la campaña 2027 (Color del Año, Colores de Temporada 2027 y Raíces de la piel), con 29 hilos.
+
+1. **Baseline antes de tocar nada:** ids de discusión, autores y `resolved` de todos los hilos, incluidos los
+   resueltos y los anclados a bloques.
+2. **La V1 se convierte en historia sin moverse:** renombrar solo su encabezado a `🗄️ Histórico · Artículo V1`
+   (cambio de una línea). Sus bloques y sus hilos quedan intactos. Dentro de ella solo se permite retirar callouts
+   de notas internas; su contenido útil pasa a `🗒️ Notas internas de producción`.
+3. **La V2 nace debajo de la V1** (y antes de `🗒️ Notas internas de producción`) como toggle de primer nivel con
+   el título exacto `✍️ Versión vigente para revisión · V2`, con todo su contenido tabulado dentro.
+4. 🔴 **Nunca reescribir sobre bloques con comentarios** ni usar un reemplazo de página completa: solo inserciones
+   y reemplazos pequeños, con readback después de cada escritura.
+5. Al cerrar, comparar el conjunto de hilos contra el baseline: ninguno debe desaparecer.
+
+🔴 **Una inserción de varias líneas necesita un tabulador por línea.** En `update_content`, cada línea que sigue a
+un `\n` debe empezar con su propio `\t` (o los que correspondan a su nivel). Una línea sin tabulador sale del toggle
+y queda suelta al final de la página aunque la API responda `success`. Pasó en vivo el 2026-09-19: es la regla 57
+confirmada, no una hipótesis.
+
+### Cierre de ronda: un comentario de página con el estado final
+
+- Al terminar la ronda, dejar **un comentario de página** dirigido a las personas de Berel que revisan, con dónde
+  está la versión vigente, que la V1 quedó como histórico con sus hilos intactos y un resumen breve de cambios.
+- Si la ronda tuvo varias pasadas (por ejemplo, gráficos primero y adaptación después), el último comentario
+  describe el **estado final** y reemplaza a los resúmenes anteriores: se agrega como respuesta en el mismo hilo de
+  página y lo dice («Este resumen reemplaza al anterior»). Nunca dejar dos resúmenes que se contradicen.
+- **Corregir en el hilo lo que la versión nueva desmiente.** Si una respuesta nuestra afirmó algo que la V2 ya no
+  sostiene —un cambio que no estaba aplicado, un criterio que ahora cedemos—, se responde en ese mismo hilo con
+  «Una precisión…» y se explica cómo quedó. No se edita ni se borra la respuesta anterior.
+
+### Revisión adversarial en cuatro lentes
+
+Antes de declarar lista una V2 amplia, leer las páginas completas con cuatro lentes separadas; cada lente
+entrega citas literales, el problema y la reescritura propuesta, y los hallazgos se aplican por página. Lo que una
+lente propone no se aplica por defecto: se contrasta con decisiones del cliente (ejemplo: la lente mexicana marcó
+«premium», pero Berel lo usa para Insignia y se conservó).
+
+| Lente | Qué busca | Defectos de ese tipo hallados el 2026-09-19 |
+|---|---|---|
+| **Lectura como Berel** | ¿La pieza cumple lo que Berel pidió en los hilos y en Teams? | respuestas nuestras que decían «ya está aplicado» sin estarlo; criterios del cliente cumplidos en una pieza y no en las otras; tablas que repiten el texto |
+| **SEO/AEO y canibalización** | ¿Cada intención vive en una sola URL y la jerarquía de enlaces es correcta? | el hub desarrollaba una paleta más que su propia URL; anclas con intención 2027 que apuntaban a la página 2026; la misma FAQ en dos piezas; un color enlazado a tres destinos distintos; enlaces a `/search` |
+| **Verificación contra fuentes** | ¿Cada dato, color, código, ruta y cifra coincide con la ficha, el catálogo y el sitio vivo? ¿Y coincide con las reglas de producto y marca de Berel (módulo 09), en los dos sentidos: no falta lo que Berel pidió destacar y no se quitó lo que pidió decir? | colores de la paleta del año anterior dentro de una tabla del año nuevo; datos técnicos sin hoja técnica; rutas soft-404; certificado vencido; «uso preferente en exteriores» de Insignia omitido por ceñirse a la hoja; «purifica el aire en interiores» de Berelex Green ausente (módulo 12 §7) |
+| **Lector mexicano** | ¿Suena natural para quien vive en México, sin coloquialismos? | jerga traducida, fórmulas repetidas entre páginas, el «nosotros» convertido en «los mexicanos», explicaciones obvias y exceso de posesivos. Patrones y ejemplos: [módulo 04](04_VOZ_Y_TONO_BEREL.md#adaptación-a-méxico-español-mexicano-estándar) |
+
+Una lente que solo dice «suena raro» no sirve: debe citar la frase exacta y proponer la reescritura. Las cuatro se
+corren sobre las tres páginas a la vez cuando salen juntas, porque la repetición entre piezas solo se ve así.
+
 ## Controles editoriales introducidos el 2026-09-07
 
 ### Barrido preventivo aunque no existan comentarios
@@ -220,6 +270,9 @@ se contabiliza ni se modifica Notion. `Segundasegunda capa` fue un error del rep
 - [ ] Cada hilo atendido tiene respuesta con observación, acción y razón.
 - [ ] Ningún hilo fue marcado como resuelto por Efeonce.
 - [ ] Una sola zona vigente está rotulada con claridad; las anteriores se distinguen como historial.
+- [ ] Si la revisión fue amplia: V2 debajo de la V1, V1 renombrada `🗄️ Histórico · Artículo V1` y hilos iguales al baseline.
+- [ ] El comentario de página final describe el estado final y las respuestas desmentidas quedaron precisadas en su hilo.
+- [ ] Si fue una V2 amplia, pasó por las cuatro lentes adversariales y sus hallazgos se resolvieron o descartaron con motivo.
 - [ ] Los toggles de análisis/evidencia requeridos permanecen completos y separados de la zona editorial.
 - [ ] No hay notas internas, QA, pendientes editoriales, CMS/Dev ni mensajes entre agentes en la zona vigente.
 - [ ] Las cuatro fichas N1–N4 permanecen en contexto y coinciden literalmente con sus tareas visuales.

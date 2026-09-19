@@ -71,6 +71,46 @@ Cupo confirmado no equivale a cumplimiento. Si las imágenes de blog, Stories y 
 superan 50, registrar el exceso por archivo y pedir priorización antes de retirar trabajo iniciado
 o alterar el paquete de banners. No inflar ni reducir el conteo para que coincida con las filas.
 
+## Conteo del cupo mensual — método verificado 2026-09-19
+
+Aplica al cierre de cada mes y a cualquier pregunta sobre cuánto se lleva del contrato. Es solo lectura.
+
+1. **Unidad = archivo.** Es la unidad que usó el operador en el reparto aprobado de noviembre («32 banners,
+   4 fotos N50 y 14 gráficas sociales: 50»). Una secuencia de 4 fotos es 1 tarea y 4 archivos; una Story cuenta
+   los archivos realmente entregados (en septiembre, 1 PNG por artículo). Reportar también por tarea —es la unidad
+   del rollup—, sin mezclar las dos.
+2. **Universo:** todas las tareas cuyo `Proyecto` es el del mes, paginadas hasta el final, contrastadas con los
+   archivos reales en SharePoint (`04_Entregables`) y en Frame.io. Un artículo de otro proyecto que se publica
+   este mes no suma. En Frame.io, abrir la subcarpeta «Social Media» de cada pieza: los derivados viven ahí, y un
+   contador de «5 Items» con 4 assets visibles suele ser una pila de versiones.
+3. **Cuatro criterios, siempre los cuatro,** porque cada uno responde una pregunta distinta:
+
+| Criterio | Qué incluye | Septiembre 2026 · gráficas (contrato 50) | Videos (contrato 3) |
+|---|---|---|---|
+| Mínimo con archivo encontrado | solo lo visto como archivo y en uso | 61 (+11) | 6 (+3) |
+| En uso hoy | entregado y vigente | 79 (+29) | 7 (+4) |
+| **Entregables al cliente al cierre** | en uso + comprometidos sin empezar; la tarea v2 reemplaza a su original | **90 (+40)** | **10 (+7)** |
+| Producidos por el equipo al cierre | todo lo trabajado, incluidas piezas entregadas que no se usarán | 101 (+51) | 13 (+10) |
+
+   Artículos del mismo mes: **12 contra 8 (+4)**; 11 si se excluye una reescritura cerrada el mes anterior dentro
+   del mismo proyecto. Una cifra de un resumen anterior se reproduce o se descarta: el «9» que circuló el 19-sep no
+   se pudo reproducir con ninguna regla y era incorrecto.
+4. **No cuenta:** el material de marca de Berel (banner principal del Color del Año, masters de paletas), porque no
+   tiene tarea ni archivo de Efeonce; tareas `Archivadas` sin producción; piezas de otro proyecto.
+5. **El rollup de Notion no es fiable.** Errores de etiquetado que lo desvían, todos vistos en septiembre: tareas
+   visuales sin `Tipo de pieza`/`Canal de pieza` (subcuenta); tareas archivadas que conservan etiquetas
+   (sobrecuenta); derivados sociales con `Canal de pieza = Blog`; un Reel con `Tipo de entregable = Diseño gráfico`;
+   archivos de otro artículo o mes en la carpeta equivocada de SharePoint. En un conteo de solo lectura se reportan,
+   no se corrigen.
+6. **Verificado ≠ inferido.** Una tarea `Listo` sin archivo encontrado es inferida y se reporta así.
+7. **Excedente:** decisión del operador del 2026-09-19: el excedente de un mes **se descuenta de los meses
+   siguientes**. Septiembre cerró con artículos +4, gráficas +40 como entregables y videos +7. Lo gestiona el
+   operador; no se escribe en las páginas de artículo.
+
+Cuando un derivado se rehace en una tarea v2 ([módulo 06](06_DERIVADOS_SOCIALES.md#arte-entregado-que-no-usa-la-base-vigente-tarea-v2)),
+la original conserva estado y etiquetas porque fue producida y entregada: suma en «producidos» y no en
+«entregables», donde la reemplaza la v2.
+
 ## Aplicación a tareas existentes, reversible
 
 **Lote autorizado el 2026-09-03: solo noviembre y diciembre de 2026. Octubre está expresamente
@@ -116,3 +156,4 @@ No confundir este reparto aprobado con producción, entrega o publicación acred
 - Exclusiones reversibles, reservas visibles, gates técnicos y temporales conservados.
 - Comparación de cada par, contenido anterior preservado, fechas y relaciones intactas.
 - Cupo contractual confirmado o pendiente explícito; ninguna entrega o resultado inventado.
+- Conteo del mes por archivo con los cuatro criterios; material de marca de Berel fuera; rollup no citado como cifra.

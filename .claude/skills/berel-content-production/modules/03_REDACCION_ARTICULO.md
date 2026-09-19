@@ -2,7 +2,8 @@
 
 > Vale para las dos modalidades. En ambas, la única zona activa se llama
 > `✍️ Versión vigente para revisión`; los toggles hermanos de análisis/plan conservan la evidencia de
-> modalidad y decisiones, sin cambiar el título de la zona editorial.
+> modalidad y decisiones, sin cambiar el título de la zona editorial. Tras una revisión amplia se llama
+> `✍️ Versión vigente para revisión · V2` y la anterior queda como `🗄️ Histórico · Artículo V1` (módulo 18).
 
 ## Cómo se monta
 
@@ -111,6 +112,22 @@ con mirar `title`, `H1` y `meta description`: la frase puede estar enterrada en 
 **frase literal en todo el HTML** de cada página candidata, **con y sin tilde**. Así se cerró esa
 verificación para los tres artículos de sala en septiembre 2026.
 
+### Formato del enlace en Notion y piezas que salen juntas (2026-09-19)
+
+- 🔴 **Todo enlace interno se escribe como ruta relativa** (`/articulos/...`, `/colores/...`, `/ubica-tienda`):
+  nunca `https://berel.com/...`, nunca un enlace de Notion (`/p/…` o id de 32 caracteres), nunca `/search` ni `?q=`.
+  Berel lo pidió así porque en el sitio la ruta relativa abre en pestaña nueva. Notion la muestra como
+  `https://app.notion.com/articulos/...`: es la ruta pública de berel.com renderizada, no una página de Notion, y el
+  gate la acepta.
+- **Cada color, a su página de familia en su primera mención** de la página (familia primaria según el Catálogo RGB
+  interno). Las familias rotas —`verdes`, `amarillos`, `azules`, `morados`, revalidado el 2026-09-19— no cargan
+  colores ni `title`: esos colores enlazan a `/colores`. El Color del Año, en las demás piezas de la campaña, enlaza a
+  su artículo; en su propio artículo, a su familia.
+- **Piezas que se publican el mismo día se enlazan entre sí como vivas** en la V2, porque el lector las encuentra
+  juntas. Es la excepción al «sin enlaces a páginas aún no publicadas»: el día de la publicación se comprueba en vivo
+  `title`, H1, cuerpo, canonical y schema de cada una antes de dar por activos esos enlaces y sus derivados
+  (regla 35). Una pieza que sale otro día sigue sin enlazarse.
+
 ## Estructura obligatoria de la versión vigente
 
 La página compartida con Berel contiene toggles hermanos de evidencia y una sola **zona editorial vigente**.
@@ -142,7 +159,8 @@ vigente.
 - **Colores enlazados:** **Berel no tiene página por tono, pero sí por familia.** Orden:
   **paleta o artículo propio que rankee** → **`berel.com/colores/<familia>`**. Las nueve verificadas
   en `sitemap-colores.xml` el 2026-08-25: `amarillos` `azules` `cafes` `grises` `morados` `naranjas`
-  `pasteles` `rojos` `verdes`. **No hay ninguna otra.**
+  `pasteles` `rojos` `verdes`. **No hay ninguna otra.** Cuatro están rotas (`amarillos`, `azules`, `morados`,
+  `verdes`): sus colores van a `/colores` → [§ Formato del enlace](#formato-del-enlace-en-notion-y-piezas-que-salen-juntas-2026-09-19).
   🔴 **Nunca la búsqueda del sitio:** `robots.txt` trae `Disallow: /search` y `Disallow: /*?q=`.
 - **Productos enlazados a su página pública** (`berel.com/productos/...`) o a la categoría; **nunca al
   Home, nunca a `/search?q=` y nunca a URLs del backend/CMS**. 🔴 Y a la **variante** correcta, no al
@@ -238,10 +256,26 @@ Del estándar editorial de la marca (→ [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TON
   directa en la primera línea · tablas comparativas y listas reales (los LLM las extraen con
   facilidad) · datos verificables y citables.
 - **Datos estructurados (tarea privada para Dev):** `Article` completo
-  (`description`, `author`, `datePublished`/`dateModified`, `image`) · `FAQPage` para las preguntas ·
+  (`description`, `author`, `publisher`, `datePublished`/`dateModified`, `image`) · `FAQPage` para las preguntas ·
   `HowTo` para guías paso a paso · `BreadcrumbList` para la migaja. **El texto del schema debe
   coincidir exactamente con el visible.** Unificar dominio a `berel.com` **sin www** entre canónica
-  y `@id`.
+  y `@id`. `author` y `publisher` = `Organization` «Pinturas Berel» → [§ Autoría](#autoría-y-datos-estructurados-decisión-2026-09-19).
+
+### Autoría y datos estructurados (decisión 2026-09-19)
+
+🔴 **Berel no quiere que ninguna persona firme.** Las piezas se publican a nombre de **Pinturas Berel, como
+organización**:
+
+- `author` y `publisher` = `Organization` con `name` «Pinturas Berel» y `url` hacia `/somos-berel`.
+- Nunca `Person`: ni una persona inventada ni el `Person` «Equipo Editorial Berel» que hoy usa el sitio, que se
+  corrige a `Organization` al publicar.
+- En la página del Content Hub, la decisión va en `🗒️ Notas internas de producción`, nunca dentro del artículo.
+
+**Por qué alcanza.** La recomendación general de SEO/AEO es atribuir el contenido a una persona identificable
+porque buscadores y asistentes de IA valoran saber quién respalda lo que dicen. Esa decisión la tomó Berel y
+manda (regla 21). La señal de quién respalda la pieza se cubre de otra forma: la marca como autora, **expertos
+invitados nombrados por su disciplina** (sin nombres propios) y **datos de las fichas técnicas** citados con su
+condición. Queda superado el pendiente de «un especialista identificable de Berel».
 
 **Contenido evergreen → arquitectura hub & spoke.** Para temas que se repiten cada temporada
 (colores del año, tendencias): una **pillar page atemporal** que acumula ("Colores de Temporada") y
@@ -272,7 +306,9 @@ FAQ reutilizado del ciclo anterior (una línea con enlace basta); anclas sin añ
 anclas con año a la nueva; el Color del Año se resume en un párrafo y vive en **una sola URL** (en 2026 `color
 pitaya` se repartió entre dos artículos); cada paleta en resumen de 500–700 palabras sin combinaciones cerradas;
 el valor propio es el **calendario y la guía para elegir entre paletas**; sin enlaces a páginas aún no publicadas
-(se registran en `🗒️ Notas internas de producción`). Infografías que funcionaron: calendario como
+(se registran en `🗒️ Notas internas de producción`), salvo las piezas que se publican el mismo día, que se enlazan
+como vivas. ⚠️ Para la campaña 2027, Berel retiró después el calendario visible: sin tiempos ni orden de las
+paletas (módulo 09, «Campaña 2027»). Infografías que funcionaron: calendario como
 `Técnica Gráfica · Técnica con íconos · estructura B. Cards en columnas` y comparación de paletas aplicadas como
 `Tipos de Color · variante 4 bloques 2 × 2` 🔁. Caso completo: [auditoría 2026-09-16](../../../../docs/audits/seo/BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md).
 
@@ -285,7 +321,8 @@ reemplazos pequeños, responder con la razón editorial y dejar el cierre al cli
 ## Anatomía esperada del texto
 
 - **Arco de cinco tiempos:** apertura emocional (micro-escena) → desarrollo → resolución → cierre →
-  CTA. El cierre **retoma la escena de apertura**: el arco cierra el círculo.
+  CTA. El cierre **retoma la escena de apertura**: el arco cierra el círculo. Excepción: piezas de campaña
+  ancladas al menú, con entrada informativa y sin escena (módulo 09, ⚠️ Choque 3).
 - **Respuesta directa extractable** de **40 a 55 palabras** justo después del gancho. Es lo que cita
   un motor de respuesta.
 - **Longitud:** 3.000–5.000 palabras según contrato vigente; excepción explícita si corresponde.

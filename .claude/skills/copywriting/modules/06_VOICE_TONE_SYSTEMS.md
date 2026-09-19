@@ -56,6 +56,8 @@ Efeonce sirve clientes Globe internacionales: el copy vive en **es-CL** y **en-U
 - **es-CL:** tuteo neutro (puedes/quieres/dime), **sin voseo** (nunca podés/querés), sin modismos
   argentinos. Evita chilenismos salvo contexto de producto/país.
 - **en-US:** natural, directo, sin "spanglish" ni calcos.
+- **Cliente de otro mercado hispano** (p. ej. México): variedad estándar de ese país, sin coloquialismos; se
+  localiza, no se neutraliza.
 - Cada idioma se **craftea**, no se pasa por traductor. Detalle en `efeonce/BILINGUAL_CRAFT.md`.
 
 ## 6. La voz Efeonce (overlay)

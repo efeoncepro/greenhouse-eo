@@ -62,7 +62,9 @@ resuelvas en silencio a favor del documento más viejo.
   sin plomo. Destacar una prestación respaldada del producto concreto, no una garantía genérica.
 - **Berelex Green:** sus diferenciadores son que **purifica el aire en interiores** (remueve
   formaldehído; **siempre especificar "en interiores"**) y su **garantía de por vida**. Ambos
-  verificados en ficha técnica. Destacarlos por encima de atributos genéricos.
+  verificados en ficha técnica. Destacarlos por encima de atributos genéricos. 🔴 En la V2 del Color del Año
+  2027 la purificación del aire faltaba y hubo que agregarla (2026-09-19): comprobar que lo que Berel pide
+  destacar está en la pieza, no solo que lo publicado tiene ficha (módulo 12 §7).
 - 🔴 **RGB/HEX nunca hacia el usuario final.** Son de uso interno (diseño/producción gráfica). En
   público: **descripción verbal del tono** (*azul profundo*, *turquesa vibrante*) junto al nombre y
   el código.
@@ -144,7 +146,14 @@ ancladas al menú principal. Fuente: hilos de Fernanda Vega y Anel Garza en las 
   versión para publicación.
 - **Publicación conjunta:** Color del Año, Colores de Temporada 2027 y Raíces de la piel, martes 29 de septiembre
   de 2026. Superan la cuota de artículos de septiembre; el excedente se descuenta de los meses siguientes
-  (operador, 2026-09-19).
+  (operador, 2026-09-19). Conteo del mes y criterios: módulo 15.
+- **Extensión:** las V2 de campaña rondan 1.100–1.500 palabras, por debajo del piso contractual de 3.000. El
+  operador plantea a Berel mantener esa extensión para piezas de campaña; no se declara aceptada hasta registrar la
+  respuesta de Berel.
+
+Lo aprendido al ejecutar estas decisiones vive en su módulo dueño: V2 debajo de la V1, comentario de estado final y
+lentes adversariales (18); adaptación a México (04); autoría como organización (03); ficha de material de marca
+(05); tareas v2 de derivados (06); hojas técnicas de Berelex Green e Insignia (12).
 
 ### ⚠️ Choque 3 — la micro-escena de apertura
 
@@ -183,7 +192,9 @@ la campaña, la micro-escena sigue siendo el patrón del blog mientras Berel no 
 - **Tono comercial:** acompañante experto, sin venta extrema ni FAQ autorreferencial. `Premium` puede
   calificar la línea cuando esté respaldado; nunca la formulación. `Sin plomo` no es diferenciador.
 - **Insignia:** describirla como recomendada para interiores y exteriores, con uso preferente en
-  exteriores. Nunca reducirla a uso exclusivo exterior.
+  exteriores. Nunca reducirla a uso exclusivo exterior. 🔴 Esta corrección gana sobre la hoja técnica
+  R1-07/19, que no declara preferencia: en la V2 del Color del Año 2027 se omitió por ceñirse a la hoja y hubo
+  que restaurarla (2026-09-19; módulo 12 §7).
 - **Tablas:** encabezados semánticos como `Especificación` / `Dato`; en comparativas, cada columna nombra
   el producto. Un criterio exclusivo de una alternativa —por ejemplo, garantía— se explica fuera.
 - **CTA:** toda recomendación de consultar a un especialista lleva un anchor descriptivo a `/contacto`.
@@ -309,13 +320,23 @@ los textos no afectados. La preferencia de producto no valida prestaciones ni ot
   con **nombre + código alfanumérico**, pero las piezas de septiembre solo pudieron usar familias
   enlazadas. Mientras no llegue el catálogo, las fichas de infografía salen con celdas marcadas
   `PENDIENTE DE CONFIRMACIÓN — NO INCLUIR EN ARTE`, y **eso frena producción de diseño**.
-- 🔴 **Falta definir la autoría.** El estándar de citabilidad exige atribuir cada pieza a **un
-  especialista identificable de Berel**, no a "Equipo Berel". **Nadie ha nombrado a esa persona.**
+- ✅ **Autoría — resuelto el 2026-09-19: Pinturas Berel como organización.** Berel no quiere que ninguna persona
+  firme. Las piezas se publican a nombre de **Pinturas Berel**; en datos estructurados, `author` y `publisher` son
+  `Organization` «Pinturas Berel» con `url` hacia `/somos-berel`. Esto también corrige el `Person` «Equipo
+  Editorial Berel» que hoy usa el sitio. Razonamiento y señales de experiencia: módulo 03, «Autoría y datos
+  estructurados».
+  *Antecedente (septiembre de 2026, hasta el 2026-09-19):* figuraba como hallazgo abierto «🔴 Falta definir la
+  autoría»: el estándar de citabilidad pedía atribuir cada pieza a un especialista identificable de Berel, no a
+  «Equipo Berel», y nadie había nombrado a esa persona. La decisión de Berel lo cierra sin persona.
+- **`/articulos/colores-de-temporada` es la página de 2026** y no se toca, pero su `title` y su H1 no dicen el año.
+  Se sugiere a Berel agregar «2026» para que no compita con `/articulos/colores-de-temporada-2027`. El día de la
+  publicación de la campaña (29 de septiembre de 2026), el menú debe apuntar «Color del Año» a
+  `/articulos/color-berel-2027` y «Colores de temporada» a `/articulos/colores-de-temporada-2027`.
 - 🔴 **Enlaces rotos del menú y del catálogo (observado el 2026-09-19).** El menú principal enlaza
   `/colores-de-temporada` y `/articulos/colores-de-temporada-2025`, que cargan la página vacía (sin `title`).
   Las familias `/colores/verdes`, `/colores/amarillos`, `/colores/azules` y `/colores/morados` están en el
   sitemap pero no cargan colores ni `title`. Mientras sigan así, los colores de esas familias se enlazan a
-  `/colores`.
+  `/colores`. Las familias enlazan además `/articulos/colores-de-temporada-2025`, que es un soft-404.
 - **Drift de Instagram corregido el 2026-09-03:** la Fase 8 del Playbook Producción en Notion
   ya nombra **Instagram Story**. La distribución se selecciona por artículo, sin cambiar el formato.
   Detalle y tabla de precedencia →

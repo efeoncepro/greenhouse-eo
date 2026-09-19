@@ -12,13 +12,15 @@
 | **Tienda de Pintura Berel** | Nombre oficial del punto de venta. CTA a `/ubica-tienda` |
 | **App Color Berel** | Nombre exacto de la app |
 | **Color del Año** | 2027 = Bien y de Buenas 1-3404D; 2026 = Pitaya 2-3605D; 2025 = Maíz 2-1403T |
-| **Colores de Temporada 2027** | Cuatro paletas trimestrales alrededor de Bien y de Buenas 1-3404D: Raíces de la piel (oct–dic 2026) · Umbral Vivo (ene–mar 2027) · Algarabía Folclórica (abr–jun 2027) · Esencia del mañana (jul–sep 2027). Colores, expertos y fuente: módulo 09 |
+| **Colores de Temporada 2027** | Cuatro paletas trimestrales alrededor de Bien y de Buenas 1-3404D: Raíces de la piel (oct–dic 2026) · Umbral Vivo (ene–mar 2027) · Algarabía Folclórica (abr–jun 2027) · Esencia del mañana (jul–sep 2027). Las temporadas y los nombres de expertos son internos: no se publican. Colores, expertos y fuente: módulo 09 |
 | **Página de ciclo anual** | `/articulos/colores-de-temporada-AAAA`: presenta y compara las paletas de un año mientras no exista la pillar; no reemplaza al hub genérico ni al artículo del Color del Año |
 | **Catálogo RGB** | Base interna para diseño. RGB/HEX no salen al cuerpo publicable |
 | **Código alfanumérico** | Identificador público del color; se usa junto al nombre |
 | **Ficha técnica** | Documento técnico oficial que respalda prestaciones, condiciones y cifras; no es la URL editorial del producto |
 | **Página pública del producto** | URL navegable de berel.com para el producto; se verifica en sitemap y contra soft-404 |
 | **Producto de awareness** | Producto nuevo o de baja notoriedad que exige explicar primero su diferenciador e incluir el render oficial del empaque |
+| **Material de marca Berel** | Imagen que entrega Berel y no diseña Efeonce (banner principal del Color del Año, masters de paletas). Lleva su ficha propia en la versión vigente —Origen, Pieza, Formato, ALT, Archivo, Posición—, un archivo único compartido entre páginas, sin tarea de diseño y fuera del cupo |
+| **Autoría Berel** | `Organization` «Pinturas Berel» con `url` `/somos-berel` como `author` y `publisher`; nunca una persona (decisión del 2026-09-19) |
 
 ## Ciclo de producción
 
@@ -39,6 +41,9 @@
 | **Registro privado sensible** | Credenciales, secretos, prompts, conversación cruda, datos restringidos u operación que no debe exponerse en el Content Hub |
 | **Pendiente trazable** | Dato, URL, asset o capacidad CMS no confirmada; se documenta con fuente, impacto, owner y siguiente paso en evidencia, o en privado si es sensible; nunca se publica como hecho en la narrativa |
 | **Verificación en la URL publicada** | Sección fechada que documenta lo comprobado contra HTML real |
+| **Unidad de conteo** | El archivo: una secuencia de 4 fotos es 1 tarea y 4 archivos. Es la unidad con que el operador reparte y cuenta el cupo |
+| **Entregables al cliente** | Criterio de conteo del cupo: piezas en uso más las comprometidas sin empezar; una tarea v2 reemplaza a su original. Los otros tres criterios son mínimo con archivo, en uso hoy y producidos por el equipo |
+| **Tarea v2 (derivado)** | Tarea nueva que rehace un derivado social cuando el arte entregado no parte de la base 🔁 vigente; la original se conserva con un callout |
 
 ## Formato Tutorial híbrido
 
@@ -74,6 +79,11 @@
 | **Hilo de comentario** | Comentario inicial más todas sus respuestas; se evalúa completo, nunca desde una réplica aislada |
 | **Atendido** | Estado operativo Efeonce: existe decisión, cambio cuando aplica, respuesta y readback fresco |
 | **Resuelto** | Estado nativo que cierra el hilo en Notion; pertenece al cliente y no equivale a `atendido` |
+| **V2 · `✍️ Versión vigente para revisión · V2`** | Zona editorial nueva que nace debajo de la V1 cuando una ronda de comentarios cambia el criterio de toda la pieza |
+| **`🗄️ Histórico · Artículo V1`** | Encabezado que recibe la V1 al crearse la V2; sus bloques y sus hilos anclados no se tocan |
+| **Comentario de estado final** | Comentario de página que cierra una ronda: dónde está la versión vigente y qué cambió; reemplaza a los resúmenes anteriores |
+| **Lentes adversariales** | Cuatro lecturas separadas antes de cerrar una V2 amplia: como Berel, SEO/AEO y canibalización, verificación contra fuentes y lector mexicano |
+| **Español mexicano estándar** | Registro de una marca mexicana grande: natural, sin coloquialismos ni jerga traducida (módulo 04) |
 
 ## Voz y estructura editorial
 
@@ -96,8 +106,8 @@
 
 | Término | Qué es |
 |---|---|
-| **Ruta relativa CMS** | En handoff, enlace interno desde el primer `/` posterior a `.com`, con anchor descriptivo |
+| **Ruta relativa CMS** | Enlace interno desde el primer `/` posterior a `.com`, con anchor descriptivo. Desde septiembre de 2026 se escribe así también en Notion (abre en pestaña nueva en el sitio); Notion la muestra bajo `app.notion.com` |
 | **`/search?q=`** | Ruta bloqueada por robots; nunca se usa como destino editorial |
-| **Familia de color** | Destino `/colores/<familia>` cuando no hay paleta/artículo más específico |
+| **Familia de color** | Destino `/colores/<familia>` cuando no hay paleta/artículo más específico. Familias rotas (`verdes`, `amarillos`, `azules`, `morados`, revalidado 2026-09-19) → `/colores` |
 | **Instagram Story** | Formato vigente de Instagram para derivados Berel; no post estático |
 | **Paridad social** | Tarea y subítem deben terminar con el mismo contenido/enlaces finales |

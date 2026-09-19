@@ -27,7 +27,9 @@ distribución de canales no autoriza borrar historia ni migrar comentarios antig
 Los comentarios editoriales se procesan en Notion mediante el módulo
 [`18_REVISION_COMENTARIOS_CLIENTE.md`](../../.codex/skills/berel-content-production/modules/18_REVISION_COMENTARIOS_CLIENTE.md):
 inventario completo, decisión fundada, cambio cuando corresponde, respuesta y readback. Efeonce no marca como
-resueltos los hilos del cliente ni duplica su discusión en Teams o correo.
+resueltos los hilos del cliente ni duplica su discusión en Teams o correo. Si la ronda exige una revisión amplia,
+la versión nueva va debajo de la anterior, que queda como histórico con todos sus hilos, y la ronda se cierra con
+un comentario de página que describe el estado final.
 
 ## Cadencia mensual
 

@@ -4,6 +4,11 @@
 `Approved for validation`, enlazada desde HubSpot/Salesforce y skills. Sin activación, precio ni ROI aprobado;
 faltan entrevistas, Finance/Legal y prueba pagada.
 
+**Berel campaña 2027 (19/09):** Color del Año, hub Colores de Temporada 2027 y Raíces de la piel con V2 en revisión
+(publican juntos el 29/09; gate PASS). Pendientes: enviar mensaje a Berel (material de marca, menú, «2026»), rehacer arte
+social (tareas 744–755) y gráficos 739/740 antes del 25/09. Septiembre: 12 artículos vs 8, 90 gráficas vs 50
+([conteo](docs/audits/seo/BEREL_CONTEO_PIEZAS_SEPTIEMBRE_2026-09-19.md)); skill `berel-content-production`.
+
 **16–17/09:** Higgsfield API con créditos. Previa 18: verificar · readback KV 21/09 y 23/09.
 
 **GTA VI:** posts 22 y 25/09 ([bitácora](docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md)).

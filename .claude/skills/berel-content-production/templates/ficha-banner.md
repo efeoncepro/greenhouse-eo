@@ -38,3 +38,28 @@
 - [ ] Si es infografía: **formato y variante declarados** (`../modules/10_FORMATOS_DE_INFOGRAFIA.md`) y acento en Rojo Editorial `#B3153A` o la paleta complementaria — nunca el rojo corporativo
 - [ ] Si aparece la Paleta Frida Kahlo, la pieza lleva el **logo de la licencia oficial**
 - [ ] Si es producto nuevo/de awareness, usa el render oficial del empaque o declara el bloqueo
+
+## Variante · Ficha de material de marca Berel
+
+> Para una imagen que **entrega Berel** y no diseña Efeonce (desde 2026-09-19: banner principal del Color del Año,
+> masters de paletas). Va como callout 🖼️ **dentro de la versión vigente**, junto a su sección. No lleva tarea de
+> diseño ni cuenta para el cupo. Norma: `../modules/05_BANNERS_IMAGENES.md` § Material de marca Berel.
+
+```markdown
+<callout icon="🖼️" color="gray_bg">
+	**Banner N# · Material de marca Berel — [pieza]**
+	- **Origen:** material oficial de Berel (no lo diseña Efeonce).
+	- **Pieza:** [qué es], versión para publicación.
+	- **Formato:** el que entregue Berel; para web, 1408 × 768 px en `.webp`, menos de 200 KB, [con / sin] `loading="lazy"`.
+	- **ALT (exacto):** “[...]”.
+	- **Archivo:** `[nombre-unico-compartido].webp`.
+	- **Posición:** [sección exacta, después de … y antes de …].
+	- **🔁 Base de adaptación social:** [solo si aplica].
+</callout>
+```
+
+- [ ] Sin composición, copy de arte ni dirección visual: la pieza ya existe
+- [ ] El archivo es el mismo en todas las páginas que usan esa pieza; el ALT se adapta a cada página
+- [ ] Varios masters en una posición: un archivo y un ALT por master
+- [ ] Si la versión disponible trae fechas, nombres o fotos que no se publican, la ficha solo dice «versión para publicación» y el detalle va a Notas internas
+- [ ] Declara Archivo, ALT, px y Posición: el gate la cuenta como N1–N4

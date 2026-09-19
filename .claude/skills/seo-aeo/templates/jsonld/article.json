@@ -1,5 +1,5 @@
 {
-  "//": "Plantilla Article/BlogPosting — para contenido editorial. author como Person con credenciales eleva E-E-A-T. dateModified honesto = factor de frescura IA. Marca SOLO contenido visible.",
+  "//": "Plantilla Article/BlogPosting — para contenido editorial. author como Person con credenciales eleva E-E-A-T; si el cliente no quiere firma de persona, author = { \"@id\": \"https://EXAMPLE.com/#organization\" } (mismo nodo que publisher; nunca un colectivo tipado como Person — ver modules/03_EEAT_ENTITY.md). dateModified honesto = factor de frescura IA. Marca SOLO contenido visible.",
   "@context": "https://schema.org",
   "@type": "BlogPosting",
   "@id": "https://EXAMPLE.com/slug-del-articulo/#article",

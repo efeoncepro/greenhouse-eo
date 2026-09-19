@@ -4,6 +4,7 @@
 > más un reporte de costos de mano de obra en México. Baseline extraído el **2026-08-25**.
 > **Corrección acotada 2026-09-03:** §3 y §3.1, con Wiki y ficha técnica de Berelex Semibrillante.
 > **Feedback del cliente 2026-09-04:** §1 queda bajo revalidación y §3.2 registra catálogo/pedidos abiertos.
+> **Ampliación 2026-09-19:** §7, hojas técnicas de Berelex Green e Insignia usadas en el Color del Año 2027.
 > El resto del baseline no se declara revalidado por esta actualización.
 
 ## Por qué existe este módulo
@@ -206,6 +207,51 @@ cuadro de la §1.
 Calcular con el piso es una estimación conservadora, **no garantiza sobrante para retoques**:
 porosidad, textura, color y aplicación pueden reducir el rendimiento. Al explicarlo, distinguir una
 regla orientativa del dato de la variante y no multiplicar otra vez por manos ya incluidas.
+
+## 7 · Berelex Green e Insignia — hojas técnicas (2026-09-19)
+
+Usadas en la V2 del Color del Año 2027 para recomendar pintura en interiores (Berelex Green) y en fachada
+(Insignia). Ubicación: OneDrive `Berel - Efeonce - Squad Berel › Workspace Oficial › 02_Recursos ›
+03_Producto PNG › 01. Arquitectura › Vinil-Acrilicas › Berelex Green` e `› Insignia`. Se leen como PDF, página 1.
+
+| Dato | Berelex Green — `FT_BERELEX GREEN.pdf`, R1-02/24 | Insignia — `HT-INSIGNIA.pdf`, R1-07/19 |
+|---|---|---|
+| Descripción | 100 % acrílica, formulada especialmente para interiores | uso en interiores y exteriores; resistencia al lavado, manchado, giseo y decoloración a la intemperie |
+| Acabado | mate | semimate |
+| Rendimiento a dos manos | 8–10 m²/L, puede ser menor según color, superficie y método | 10–12 m²/L, con la misma nota |
+| Secado al tacto | 1 hora máximo | 1 hora máximo |
+| Entre manos | mínimo 2 horas | mínimo 2 horas |
+| Resistencia al tallado | NMX-C-423-ONNCCE-2019, Tipo I, Categoría AA | la misma norma y categoría |
+| COV | menos de 5 g/L; varía con la tinta | menos de 50 g/L; varía con la tinta |
+| Garantía | de por vida | de por vida, con sellador acrílico sobre cemento, yeso o mortero |
+| Solo en texto (hoja o regla del cliente) | lavable después de 7 días; **purifica el aire en interiores** (remueve formaldehído), diferenciador que Berel pidió destacar (módulo 09) | no pintar en días de lluvia ni por debajo de 10 °C; recomendada para interiores y exteriores, **con uso preferente en exteriores** (corrección de Berel del 2026-09-04) |
+
+**No se publicaron:** series y número del sellador (regla 12); densidad, sólidos y viscosidad; el brillo a 60° de
+Berelex Green, porque solo lo declara una hoja; sus propiedades antivirales, antibacteriales y de origen renovable,
+fuera del alcance de esa pieza; la cifra de ciclos de lavado de Insignia, que aparece en su página pública (§1) pero
+no en la hoja R1-07/19; el acabado satinado, porque no hubo hoja técnica en la pieza.
+
+🔴 **Certificado vencido fuera.** `MAS CERTIFIED GREEN.pdf` (Berelex Green) tuvo vigencia de junio de 2024 a junio
+de 2025. No se cita mientras no exista una renovación.
+
+🔴 **Tabla comparativa: solo filas que declaran las dos hojas.** Cada columna nombra su producto, el encabezado es
+`Especificación`, la nota de variación viaja con la cifra y la condición de la garantía va en la misma celda. Lo
+exclusivo de un producto se explica en el texto, nunca como fila con una celda vacía (regla 47).
+
+🔴 **Verificar contra la hoja técnica no basta: también contra las reglas de producto y marca del cliente, en los
+dos sentidos.** La hoja respalda el dato técnico; Berel decide cómo se presenta su producto (módulo 09, Wiki ›
+«Recomendaciones Cliente» y «Reglas del cliente — Correcciones de Berel (septiembre 2026)»). En la V2 del Color del
+Año fallaron los dos sentidos y hubo que restaurar ambos:
+
+- **Se quitó algo que Berel pidió decir.** La hoja de Insignia declara «interiores y exteriores» sin preferencia y
+  se omitió el uso preferente; pero Berel corrigió el 4 de septiembre de 2026 que se describe **recomendada para
+  interiores y exteriores, con uso preferente en exteriores**. Por precedencia, esa corrección gana.
+- **Faltó algo que Berel pidió destacar.** Berelex Green «purifica el aire en interiores» (remueve formaldehído)
+  está registrado como diferenciador en el módulo 09 y la ficha lo respalda textualmente, pero la V2 no lo decía.
+
+Antes de cerrar una pieza con producto: listar lo que el módulo 09 pide decir o destacar de ese producto y
+comprobar que está; listar lo que la pieza dice del producto y comprobar que tiene ficha **y** no contradice una
+corrección del cliente.
 
 ## Cross-links
 

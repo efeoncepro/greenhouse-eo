@@ -118,7 +118,7 @@ Carga selectiva: no traigas los 7 módulos de una.
 4. **No dupliques craft ni canal.** El studio **dirige y opera**; delega palabras (`copywriting`), descubribilidad (`seo-aeo`), conversión (`growth-marketing-cro`), social (`social-media-studio`), assets (studios de asset), publicación (runtime).
 5. **IA con gobernanza.** Contenido asistido por IA con fidelidad de voz + barra de edición humana; nunca output crudo. Nunca reimplementar el Content Factory ni el publishing — operarlos vía su skill dueña.
 6. **Todo mapea a etapa de funnel + ICP.** Contenido sin JTBD, etapa ni ICP es ruido. El *encaje al negocio/bow-tie* se valida con `efeonce-agency`/`commercial-expert`, no se inventa aquí.
-7. **es-CL neutro, tuteo**, sin voseo. Copy visible se valida con `copywriting` / `greenhouse-ux-writing`. Para clientes internacionales, transcreación, no traducción literal.
+7. **es-CL neutro, tuteo**, sin voseo. Copy visible se valida con `copywriting` / `greenhouse-ux-writing`. Para clientes internacionales, transcreación, no traducción literal; para un cliente de otro mercado hispano (p. ej. México), variedad estándar de ese país sin coloquialismos (`copywriting/efeonce/BILINGUAL_CRAFT.md`).
 8. **Contenido no es producto.** Una Pillar puede crear lenguaje, demanda e hipótesis; un ebook debe agregar
    método y una tool requiere PDR, modelo, privacidad, analytics, QA y ejecución formal. Nunca conviertas una
    buena respuesta editorial en feature o claim de disponibilidad por inferencia.

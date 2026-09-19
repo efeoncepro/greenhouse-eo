@@ -228,6 +228,8 @@ Definir `P` principales editoriales (artículos + tutoriales), `B` tareas de ban
 - Subítems sociales activos/reservados: **`S`**, con pares verificados `S/S`.
 - Cancelados/archivados históricos se conservan y reportan aparte; las filas físicas pueden ser más.
 - Son tareas/paquetes, no archivos entregados ni una modificación de fórmulas Notion.
+- El cupo contractual se cuenta **por archivo**, con cuatro criterios, sin material de marca de Berel y sin fiarse
+  del rollup; el excedente se descuenta de los meses siguientes → [módulo 15](15_DISTRIBUCION_SELECTIVA.md#conteo-del-cupo-mensual--método-verificado-2026-09-19).
 
 ## 11 · Fase 9 — Íconos
 

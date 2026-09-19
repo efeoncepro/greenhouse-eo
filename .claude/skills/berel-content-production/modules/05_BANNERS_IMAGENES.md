@@ -149,6 +149,37 @@ paleta, ALT, archivo, formato, carga y posición no cambian por una revisión de
 notas internas. Si un comentario obliga a cambiar el hecho representado, detener la edición, inventariar el
 asset y su tarea, explicar el impacto y coordinar una nueva versión. Nunca “mejorar” la ficha a espaldas del arte.
 
+Caso de la campaña 2027 (2026-09-19): en el hub de Colores de Temporada y en Raíces de la piel, los N1 y N4
+fotográficos ya estaban producidos y sus fichas quedaron **congeladas** en la V2, aunque el resto del artículo
+cambió. En el Color del Año, la portada y el cierre producidos dejaron de usarse porque Berel entrega el banner
+principal: sus tareas **se conservan como producidas** (no se cancelan ni se borran) y el cambio se explica en
+`🗒️ Notas internas de producción`.
+
+## Material de marca Berel (desde 2026-09-19)
+
+Algunas imágenes no las diseña Efeonce: las entrega Berel. En la campaña 2027, el banner principal del Color del
+Año y los masters de las paletas son **material de marca de Berel**, y Efeonce no hace infografías para esas piezas
+(solo los dos gráficos del Color del Año que Berel pidió: el color en diversas luces y en diversos acabados). Ver
+módulo 09, «Campaña 2027».
+
+La posición N# sigue existiendo en el artículo, pero su ficha cambia:
+
+- Callout 🖼️ rotulado `Banner N# · Material de marca Berel — <pieza>`, junto a la sección que acompaña.
+- Campos: **Origen** (material oficial de Berel, no lo diseña Efeonce) · **Pieza** (qué es, en su versión para
+  publicación) · **Formato** (el que entregue Berel; para web, 1408 × 768 px en `.webp`, menos de 200 KB y carga
+  según su posición) · **ALT (exacto)** · **Archivo** · **Posición**. Si es la base de adaptación social, lleva 🔁.
+- 🔴 **Sin composición, copy de arte ni dirección visual inventados.** La pieza ya existe; describirla sería
+  ficción. Si la versión disponible no sirve para publicar (por ejemplo, láminas con fechas, nombres de expertos o
+  foto de equipo), la ficha solo dice «versión para publicación» y el detalle va a Notas internas.
+- **No tiene tarea de diseño,** así que no hay paridad que verificar; tampoco suma al cupo (módulo 15).
+- **Un archivo único por pieza, compartido entre páginas.** Si el mismo material aparece en varias piezas, todas
+  usan el mismo nombre de archivo (`color-del-ano-berel-2027-bien-y-de-buenas.webp`,
+  `master-raices-de-la-piel-2027.webp`, …); el ALT sí se adapta a cada página. Varios masters en una misma posición
+  llevan un archivo y un ALT por master.
+- El gate cuenta estas fichas como N1–N4: deben declarar Archivo, ALT, dimensiones en px y Posición.
+
+→ Plantilla: [`../templates/ficha-banner.md`](../templates/ficha-banner.md#variante--ficha-de-material-de-marca-berel)
+
 ## Checklist antes de pasar a diseño
 
 - [ ] Cada imagen está anclada a una sección/tabla/paso/concepto real del artículo
@@ -165,6 +196,7 @@ asset y su tarea, explicar el impacto y coordinar una nueva versión. Nunca “m
 - [ ] Si el producto es nuevo/de awareness: render oficial del empaque incluido o bloqueo documentado
 - [ ] Ninguna nota de agente, auditoría, QA, pendiente editorial o instrucción CMS/Dev se confundió con las fichas N1–N4
 - [ ] Si ya existe arte, el saneamiento o corrección no modificó ningún campo de su ficha
+- [ ] Material de marca de Berel con su ficha propia (Origen, Pieza, Formato, ALT, Archivo, Posición), sin composición inventada y con el mismo archivo en todas las páginas que lo usan
 - [ ] 🔴 Si la pieza es infografía: formato y variante declarados, y el acento usa Rojo Editorial `#B3153A` o la paleta complementaria, nunca el rojo corporativo
 
 ## Cross-links

@@ -172,7 +172,8 @@
 - **Repetir el nombre completo del producto.** Una vez y después genérico; **contarlo antes de
   cerrar, incluido el CTA**. Tres menciones ya suenan a anuncio. (→ `04`)
 - **Intercambiar beneficios entre líneas de producto.** Green purifica el aire en interiores; la
-  humedad de costa es la Serie 3500; la garantía de por vida es Insignia. (→ `04`)
+  humedad de costa es la Serie 3500. La garantía de por vida la declaran las hojas de Green y de Insignia, pero la
+  de Insignia exige sellador acrílico sobre cemento, yeso o mortero: citar cada una con su condición. (→ `04`, `12`)
 - 🔴 **Publicar valores RGB o HEX.** Nombre + código alfanumérico, con descripción verbal del tono.
   El Catálogo RGB es interno. (→ `09`)
 - **Mencionar series de producto en el cuerpo** (*Serie 800*, *Serie 2300*) — también en tablas,
@@ -309,13 +310,78 @@
 - **Crear una página del año que compita con el Color del Año o con las paletas.** Sin un valor propio
   (calendario y elección entre paletas) repite dos artículos y los canibaliza. (→ `03`)
 - **Enlazar el artículo del Color del Año o de una paleta antes de que exista en vivo.** Hoy esas rutas devuelven
-  el shell soft-404; el enlace se registra en notas internas y se activa al publicar. (→ `03`, `07`)
+  el shell soft-404; el enlace se registra en notas internas y se activa al publicar. Excepción desde el
+  2026-09-19: piezas que se publican el mismo día se enlazan como vivas y se verifican en vivo ese día. (→ `03`, `07`)
 - **Asignar roles, temperatura o emoción a un color por su nombre o por el chip del Canva.** Solo entra lo que el
   material oficial declara de la paleta. (→ `09`)
 - **Dejar pendientes o bloqueos dentro del research o el plan de una página que ve Berel.** Van en el desplegable
   `🗒️ Notas internas de producción`. (→ `07`)
 - **Confiar en Semrush para la consulta genérica de la marca.** No ubicaba a berel.com en el top 10 de «colores
   de temporada» mientras Search Console medía la posición real. (→ `14`)
+
+## Campaña 2027: revisión amplia, gráficos, derivados y conteo — 2026-09-19
+
+- 🔴 **Reescribir la V1 encima de sus comentarios.** Cuando una ronda cambia el criterio de toda la pieza, la V2
+  nace debajo y la V1 solo cambia su encabezado a `🗄️ Histórico · Artículo V1`; sus hilos quedan anclados. (→ `18`)
+- **Dejar varios resúmenes de página que se contradicen.** El último comentario de página describe el estado final
+  y dice que reemplaza a los anteriores. (→ `18`)
+- **Dejar sin corregir una respuesta propia que la V2 desmiente.** Se precisa en el mismo hilo («Una
+  precisión…»); en la ronda de campaña había respuestas que decían «ya está aplicado» sin estarlo. (→ `18`)
+- 🔴 **Insertar varias líneas con `\n` sin tabulador en cada una.** La línea sale del toggle y la API responde
+  `success`. Pasó en vivo el 2026-09-19. (→ `07`, `18`)
+- 🔴 **Verificar un producto solo contra su hoja técnica.** La hoja respalda el dato; las reglas de producto y
+  marca del cliente deciden cómo se presenta. Hay que contrastar en los dos sentidos, y en la V2 del Color del Año
+  fallaron ambos: **se quitó algo que Berel pidió decir** —la hoja de Insignia no declara preferencia y se omitió
+  «uso preferente en exteriores», que Berel corrigió el 4 de septiembre— y **faltó algo que Berel pidió destacar**
+  —Berelex Green «purifica el aire en interiores» (remueve formaldehído), diferenciador registrado en el módulo 09
+  y respaldado textualmente por la ficha—. Ambos se restauraron. Revisar siempre el módulo 09, `Reglas del cliente`
+  y `Recomendaciones Cliente`. (→ `09`, `12`, `18`)
+- **Poner en una tabla comparativa una fila que solo declara un producto,** o citar un certificado vencido
+  (MAS Certified Green, vigente hasta junio de 2025). Lo exclusivo va en texto; lo vencido, fuera. (→ `12`)
+- **Inventar composición o copy de arte para una imagen que entrega Berel.** El material de marca lleva su ficha
+  propia: Origen, Pieza, Formato, ALT, Archivo y Posición. (→ `05`)
+- **Dar nombres de archivo distintos al mismo material de marca en cada página.** Un archivo único, compartido
+  por todas las piezas que lo usan. (→ `05`)
+- **Reciclar la tarea social entregada para pedir arte nuevo.** Si el arte entregado no parte de la base 🔁
+  vigente, se crea una tarea v2; la original se conserva con un callout. (→ `06`)
+- 🔴 **Cancelar una tarea porque un agente no vio su archivo en Frame.io.** Frame.io anida «Social Media»; el
+  Reel del hub (tarea 734) se canceló por error y hubo que revertirlo. Abrir la subcarpeta y preguntar antes. (→ `06`)
+- 🔴 **Citar el rollup de Notion como conteo del cupo.** Tareas sin etiquetas, archivadas etiquetadas y canales mal
+  puestos lo desvían. Se cuenta por archivo con cuatro criterios. (→ `15`)
+- **Contar el material de marca de Berel como gráfica de Efeonce.** No tiene tarea ni archivo de Efeonce. (→ `15`)
+- **Repetir una cifra de un resumen anterior sin reproducirla.** El «9 artículos» de septiembre no salía con
+  ninguna regla; el conteo real fue 12. (→ `15`)
+- **Enlazar un color a su familia rota.** `verdes`, `amarillos`, `azules` y `morados` no cargan colores ni
+  `title`: esos colores van a `/colores`. (→ `03`, `04`)
+- **Escribir enlaces internos como `https://berel.com/...` en Notion.** Van como ruta relativa, que en el sitio abre
+  en pestaña nueva. (→ `03`)
+- 🔴 **Pedir la firma de una persona o usar `Person` en el schema.** Berel publica como organización: `author` y
+  `publisher` = `Organization` «Pinturas Berel». También se corrige el `Person` «Equipo Editorial Berel». (→ `03`, `09`)
+
+## Adaptación a México — campaña 2027 (2026-09-19)
+
+Berel dijo que la redacción «no suena natural» y «no está adaptada a México». Casos reales corregidos con la lente
+de lector mexicano; la regla vive en el módulo `04`.
+
+| Antes | Problema | Después |
+|---|---|---|
+| «algo que hacemos muy bien en casa: recibir» | el «nosotros» de marca se vuelve «los mexicanos» | «Elegimos un tono tierra porque habla del gusto de recibir en casa.» |
+| «lo que contestamos cuando alguien nos pregunta cómo estamos… quiere decir que estamos bien y, además, de buen humor» | le explica al lector una expresión que ya usa | «“Bien y de Buenas” es lo que contestas cuando te preguntan cómo estás y todo va bien.» |
+| «La manera en que recibimos, acompañamos y compartimos… espacios honestos, cálidos y humanos» | tríadas encadenadas: suena a manifiesto | «En una casa así, las visitas se sienten bienvenidas y en confianza.» |
+| «los de profundidad… los de contraste fresco» | jerga traducida (*deep*, *accent*) | «los oscuros, para un muro que quieras destacar… los frescos, para equilibrar la calidez» |
+| «Suma la mirada de expertos invitados en…» (seis veces) | fórmula clonada; «sumar una mirada» no se dice | «Para crearla participaron expertos invitados en…» |
+| «En Berel presentamos…» al abrir las tres piezas | la misma fórmula en páginas que salen juntas | solo el Color del Año; el hub: «Estos son nuestros Colores de Temporada 2027» |
+| «convive con cafés claros y profundos» · «tonos etéreos» · «contrastantes» | calco y registro de ensayo | «se combina con…» · «tonos claros» · «de mucho contraste» |
+| «un muro de acento» · «un punto focal» | jerga de decoración traducida | «el muro que quieres destacar» · «el muro de color se vuelve el centro de atención» |
+| «el conjunto conserva calma visual» · «si tu casa pide otra atmósfera» | abstractos encadenados | «la recámara se siente tranquila» · «si buscas otro estilo para tu casa» |
+| «se prepara en base Deep» | anglicismo técnico | «te lo preparan en la base para tonos intensos» |
+| «con espacio para estudiar» | frase de catálogo traducido | «donde también se hace la tarea» |
+| «juntos, llenan de energía cualquier espacio» | promesa sin dato | se retira |
+| 27 «nuestr-» en unas 1.400 palabras | exceso de posesivos | un «nuestro» por bloque; después «el catálogo», «la paleta» |
+| madera, barro y plantas en las tres piezas (madera, 11 veces) | objetos repetidos | alternar loseta, talavera, herrería, petate, patio, sobremesa |
+
+⚠️ La lente también marcó «premium» como anglicismo, pero Berel usa «premium» para Insignia: se conserva para la
+línea, nunca para la formulación. Una lente propone; la decisión del cliente manda.
 
 ## Selección de tema y medición
 

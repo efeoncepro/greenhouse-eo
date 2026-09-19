@@ -22,6 +22,11 @@ Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que 
 
 ## Auditorías
 
+- [Berel — conteo real de piezas de septiembre 2026 contra contrato — 2026-09-19](BEREL_CONTEO_PIEZAS_SEPTIEMBRE_2026-09-19.md) —
+  proyecto único de septiembre con 118 tareas; contado por archivo, que es la unidad del operador: artículos 12 contra 8
+  (+4), gráficas entregables 90 contra 50 (+40), videos 10 contra 3 (+7), con piso verificado de 61 gráficas. El rollup
+  de Notion (102) no sirve para contar por etiquetas faltantes o erróneas. El excedente se descuenta de los meses
+  siguientes (decisión del operador; aceptación de Berel no leída).
 - [Berel — Colores de Temporada 2027: arquitectura, research y artículo N61 — 2026-09-16](BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md) —
   página de ciclo 2027 complementaria a la página actual (ciclo 2026) mientras no exista el layout de pillar;
   Semrush (ESTIMADO) y Search Console de 16 meses (MEDIDO): la genérica no gana clics y la página actual vive de

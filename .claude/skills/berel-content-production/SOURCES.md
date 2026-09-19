@@ -1,10 +1,29 @@
 # Fuentes — de dónde salió cada regla
 
-> **Última actualización:** **2026-09-08** por aclaración expresa del operador; última sincronización
+> **Última actualización:** **2026-09-19**, cierre de la campaña 2027 (sección siguiente); última sincronización
 > integral contra la Wiki viva de Berel en Notion: **2026-09-07**.
 > Notion sigue siendo la fuente de verdad viva; el repo es una copia operativa. Cuando una petición
 > fechada del cliente o una spec específica contradice una regla más vieja, manda la fuente más
 > reciente/específica y se registra el drift.
+
+## Campaña 2027: V2, adaptación a México, autoría, material de marca y conteo — 2026-09-19
+
+Trabajo con readback en Notion, Frame.io, berel.com y el repo. No es una resincronización integral de la Wiki.
+
+| Fuente | Qué respalda | Dónde quedó |
+|---|---|---|
+| Hilos de Fernanda Vega y Anel Garza en las tres páginas del Content Hub (17–18 sep): Color del Año `3a639c2fefe7807d847cc099a0b99966`, Colores de Temporada 2027 `3dd39c2fefe781bf8ff1f1f943011491`, Raíces de la piel `3d539c2fefe78131abe4fe1f0a1b6500` | criterios de campaña; queja «no suena natural / no adaptado a México» | módulos 09, 04, 18 |
+| Teams Berel–Efeonce, María Fernanda, 2026-09-17 | el banner principal lo entrega Berel; Efeonce hace solo los gráficos de luces y acabados | módulos 05, 09 |
+| Decisiones del operador, 2026-09-19 | método V2; autoría como organización; publicación conjunta el 29 de septiembre; excedente descontado de meses siguientes | módulos 03, 07, 09, 15, 18 |
+| Correcciones posteriores sobre la V2 del Color del Año (2026-09-19), contrastadas con Wiki › «Reglas del cliente — Correcciones de Berel (septiembre 2026)» y el módulo 09 | Insignia con uso preferente en exteriores; Berelex Green purifica el aire en interiores: la regla del cliente gana y se contrasta en los dos sentidos | módulos 09, 12, 18, ANTIPATTERNS |
+| Hojas técnicas en OneDrive (`02_Recursos › 03_Producto PNG › 01. Arquitectura › Vinil-Acrilicas`): `FT_BERELEX GREEN.pdf` R1-02/24, `HT-INSIGNIA.pdf` R1-07/19, `MAS CERTIFIED GREEN.pdf` | datos técnicos publicados, exclusiones y certificado vencido | módulo 12 §7 |
+| Frame.io (16–17 sep, «Aprobación interna»): N28 `https://f.io/r6p_WB-8`, N60 `https://f.io/4pzeKPE6`, N61 `https://f.io/efRQ0F39` | arte producido, congelamiento, tareas v2 744–755 y 741–743, caso del Reel 734 | módulos 05, 06 |
+| HTML vivo de berel.com y Catálogo RGB (`collection://3cb94025-0447-476b-8780-e60d3026b8ff`) | familias rotas → `/colores`; soft-404 de menú y pie; rutas relativas | módulos 03, 04, 09 |
+| Conteo de septiembre (solo lectura): 118 tareas del proyecto `Produccion Creativa - Septiembre 26`, SharePoint `04_Entregables`, Frame.io y Teams | unidad por archivo, cuatro criterios, errores de rollup; 12 artículos (el «9» anterior era incorrecto) | módulos 01, 07, 15 |
+| Revisión adversarial en cuatro lentes sobre las tres V2 | tipos de defecto y ejemplos reales de adaptación a México | módulos 04, 18, ANTIPATTERNS |
+
+Límites: las V2 quedaron `En revisión`, con gate PASS e hilos íntegros; nada de esto prueba aprobación de Berel,
+carga en Drupal ni publicación. La excepción de extensión para piezas de campaña está planteada, no aceptada.
 
 ## Colores de Temporada 2027 — 2026-09-16
 
@@ -337,8 +356,10 @@ Cada vez que cambie el Playbook Producción, revisar como mínimo:
 - `07_SISTEMA_NOTION.md`
 - `08_PUBLICACION_CMS_DRUPAL.md`
 - `09_RECOMENDACIONES_DEL_CLIENTE.md`
+- `12_DATOS_VERIFICADOS_DEL_CATALOGO.md`
 - `13_FORMATO_TUTORIAL_HIBRIDO.md`
 - `14_PLANEACION_TEMATICA_Y_COBERTURA.md`
+- `15_DISTRIBUCION_SELECTIVA.md`
 - `18_REVISION_COMENTARIOS_CLIENTE.md`
 - `ANTIPATTERNS.md`
 - `GLOSSARY.md`

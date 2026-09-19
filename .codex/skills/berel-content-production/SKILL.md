@@ -64,14 +64,19 @@ Informe periódico al cliente, continuidad y responsabilidad ........ modules/17
 Canales, cortes de revisión, reunión e informe mensual .............. modules/19_COLABORACION_CLIENTE_Y_CADENCIA.md
 Auditoría de URL viva y análisis SEO/AEO ........................... modules/02_ANALISIS_AUDITORIA.md
 Redacción de reescritura o artículo nuevo .......................... modules/03_REDACCION_ARTICULO.md
+Autoría, schema y formato de enlaces ............................... modules/03_REDACCION_ARTICULO.md
 Voz y tono Berel es-MX ............................................. modules/04_VOZ_Y_TONO_BEREL.md
+Adaptación a México: español mexicano estándar ..................... modules/04_VOZ_Y_TONO_BEREL.md
 Banners, imágenes y ficha visual ................................... modules/05_BANNERS_IMAGENES.md
+Material de marca Berel (ficha sin diseño) ......................... modules/05_BANNERS_IMAGENES.md
 Derivados sociales ................................................. modules/06_DERIVADOS_SOCIALES.md
 Selección de canales, capacidad y exclusiones reversibles .......... modules/15_DISTRIBUCION_SELECTIVA.md
+Conteo del cupo mensual por archivo y excedente .................... modules/15_DISTRIBUCION_SELECTIVA.md
 Sistema Notion, propiedades y relaciones ........................... modules/07_SISTEMA_NOTION.md
 CMS Drupal ........................................................ modules/08_PUBLICACION_CMS_DRUPAL.md
 Correcciones y pedidos fechados del cliente ........................ modules/09_RECOMENDACIONES_DEL_CLIENTE.md
 Revisión y respuesta de comentarios del cliente .................... modules/18_REVISION_COMENTARIOS_CLIENTE.md
+Revisión amplia V2 y lentes adversariales .......................... modules/18_REVISION_COMENTARIOS_CLIENTE.md
 Formatos de infografía ............................................. modules/10_FORMATOS_DE_INFOGRAFIA.md
 Ficha de producción de infografía ................................. modules/11_FICHA_DE_PRODUCCION_INFOGRAFIA.md
 Datos verificados de catálogo ...................................... modules/12_DATOS_VERIFICADOS_DEL_CATALOGO.md
@@ -270,12 +275,21 @@ Plantillas ......................................................... templates/
 65. 🔴 **Ciclo anual sin pillar construida = página propia del año, no reescritura del hub.** Mientras no exista el
     layout de pillar, un ciclo nuevo de Colores de Temporada nace en `/articulos/colores-de-temporada-AAAA` y la
     página genérica existente no se toca. Año al inicio de title/H1/slug; nada reutilizado del ciclo anterior;
-    el Color del Año vive en una sola URL; catálogo a `/colores`; sin enlaces a páginas aún no publicadas.
+    el Color del Año vive en una sola URL; catálogo a `/colores`; sin enlaces a páginas aún no publicadas, salvo
+    las que salen el mismo día (módulo 03).
     Caso y evidencia: módulo 03 y [auditoría 2026-09-16](../../../docs/audits/seo/BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md).
 66. 🔴 **Piezas de campaña ancladas al menú = registro de lanzamiento.** Entrada informativa sin escena, sin tiempo
     ni orden de paletas, sin «ciclo» ni «colección 2027», nombre del color enlazado una vez por página, colores a
     su página de familia y cada intención en una sola URL (Color del Año · hub del año · paleta). Decisiones de
     Berel del 17–18 de septiembre de 2026: módulo 09, «Campaña 2027» y ⚠️ Choque 3.
+67. 🔴 **Revisión amplia = V2 debajo de la V1, nunca encima de los comentarios.** Si una ronda cambia el criterio
+    de toda la pieza, la V1 solo cambia su encabezado a `🗄️ Histórico · Artículo V1` y conserva sus hilos; la V2
+    nace debajo como `✍️ Versión vigente para revisión · V2`, con un tabulador en cada línea insertada. La ronda
+    cierra con un comentario de página de estado final, las respuestas propias desmentidas se precisan en su hilo y
+    la V2 pasa por las cuatro lentes adversariales (Berel · SEO/AEO · fuentes · lector mexicano). Módulo 18.
+68. 🔴 **Autoría = Pinturas Berel como organización.** Ninguna persona firma: `author` y `publisher` =
+    `Organization` «Pinturas Berel» con `url` `/somos-berel`, también en lugar del `Person` «Equipo Editorial
+    Berel» del sitio. La experiencia se respalda con expertos por disciplina y datos de fichas técnicas. Módulo 03.
 
 ## Lo que no se toca
 

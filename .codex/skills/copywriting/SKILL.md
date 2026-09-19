@@ -227,6 +227,8 @@ capacidad y derechos no se esconden dentro de ella. Fuentes:
 - **Idioma:** por defecto **es-CL neutro, tuteo** (puedes/quieres/dime), **sin voseo**
   (nunca podés/querés). Todo ejemplo de craft nace en es-CL salvo pedido en inglés. Para
   clientes Globe internacionales, transcreación es-CL/en-US (no traducción literal) → `06`.
+  Para un cliente de otro mercado hispano (p. ej. México), variedad estándar de ese país, sin
+  coloquialismos → `efeonce/BILINGUAL_CRAFT.md`.
 - **Entrega:** el copy + una nota de *por qué* (qué framework, qué nivel de consciencia,
   qué se editó). No entregues palabras sin el pensamiento detrás.
 - **Router de voz:** copy institucional, producto, UI, propuestas y piezas sin byline personal

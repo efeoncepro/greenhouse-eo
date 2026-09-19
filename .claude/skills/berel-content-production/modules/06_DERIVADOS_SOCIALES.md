@@ -199,6 +199,30 @@ el callout de **la tarea y el subítem**, y prevalece sobre el CTA normal del ca
 El gate no se "resuelve" suavizando el copy: se conserva visible hasta que el dueño indicado lo
 retire con evidencia.
 
+## Arte entregado que no usa la base vigente: tarea v2
+
+Caso fuente (2026-09-19, campaña 2027): el arte social entregado en Frame.io eran renders de ambientes y no partía
+de la base 🔁 vigente de la V2 (el gráfico de luces en el Color del Año; el master oficial en el hub y en Raíces).
+
+- **Se crea una tarea v2 nueva por derivado**; no se recicla ni se reabre la tarea entregada. Se crearon doce
+  (744–755), con la misma plantilla del canal, `Tipo de pieza`/`Canal de pieza` desde la creación y la base 🔁
+  vigente como fuente.
+- **La tarea original se conserva** con su estado, etiquetas y archivo, y recibe un callout de cabecera que dice que
+  su arte no se usará y qué tarea v2 la reemplaza. No se cancela ni se le retiran etiquetas: fue producida (módulo 15).
+- **Paridad:** la tarea v2 termina con la misma cadena de copy y enlaces que su subítem del Content Hub (regla 27).
+- **Piezas entregadas sin tarea:** si en Frame.io aparece un derivado que no tiene tarea (en septiembre, la Story y
+  el Pin del Color del Año y la Story de Raíces), se crea su tarea para que exista registro y conteo (741–743).
+- **La matriz de distribución se corrige a lo real:** canales producidos, reemplazados y pendientes, sin fingir que
+  el plan original se cumplió tal cual.
+- Formatos sin cambio: Instagram = Story de 3–4 pantallas (regla 26); Reel de 20–30 s y 5 escenas.
+
+### Frame.io: no ver un archivo no prueba que no exista
+
+Frame.io anida una carpeta «Social Media» dentro de cada pieza: **abrir la subcarpeta** antes de concluir que falta
+un derivado. El 2026-09-19 un subagente no vio el Reel del hub (tarea 734), se canceló la tarea por error y hubo que
+revertirlo. Antes de cancelar o declarar faltante, abrir la carpeta y la subcarpeta por enlace directo y, si sigue sin
+aparecer, preguntar a quien diseña. Un contador de «5 Items» con 4 assets visibles suele ser una pila de versiones.
+
 ## Checklist de cierre por artículo
 
 - [ ] Cuatro opciones evaluadas por artículo; selección, exclusiones y pendientes justificados
@@ -213,6 +237,8 @@ retire con evidencia.
 - [ ] La comparación cubrió todos los pares seleccionados y los históricos modificados
 - [ ] Estados: tarea en `Sin empezar` para diseño, subítem en `En curso`
 - [ ] Piezas históricas, sensibles, consolidadas o con soft-404 conservan su gate visible
+- [ ] Si el arte entregado no parte de la base 🔁 vigente: tarea v2 nueva, original conservada con callout
+- [ ] Ningún derivado se declaró faltante sin abrir la subcarpeta «Social Media» de Frame.io
 - [ ] Gancho en la primera línea / primer segundo
 - [ ] Emojis, hashtags y longitud según las reglas del canal
 - [ ] Sin superlativos vacíos, urgencia, competencia ni clichés de mexicanidad
