@@ -50,7 +50,8 @@ encabezado; una costura ausente hace que el bloque siga sintiéndose insertado a
 No es plantilla rígida: es la columna vertebral que hace que una pieza "se sienta Berel".
 
 1. **Gancho con micro-escena.** Abre con una situación reconocible y sensorial, **no con una
-   definición**. *La duda frente al muestrario; la mancha que asoma en la esquina; papá moviendo las
+   definición**. Excepción: en las piezas de campaña ancladas al menú, entrada informativa sin escena
+   (⚠️ Choque 3 en el módulo 09). *La duda frente al muestrario; la mancha que asoma en la esquina; papá moviendo las
    brasas.* El hook nombra el miedo o el deseo concreto del lector **una sola vez**: ahí se permite
    la tensión o el dato negativo, **el resto del artículo se mantiene en positivo**.
 2. **Respuesta directa (TL;DR).** Justo después del gancho, **40-55 palabras** extractables que

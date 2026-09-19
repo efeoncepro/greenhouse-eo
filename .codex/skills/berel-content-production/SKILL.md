@@ -272,6 +272,10 @@ Plantillas ......................................................... templates/
     página genérica existente no se toca. Año al inicio de title/H1/slug; nada reutilizado del ciclo anterior;
     el Color del Año vive en una sola URL; catálogo a `/colores`; sin enlaces a páginas aún no publicadas.
     Caso y evidencia: módulo 03 y [auditoría 2026-09-16](../../../docs/audits/seo/BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md).
+66. 🔴 **Piezas de campaña ancladas al menú = registro de lanzamiento.** Entrada informativa sin escena, sin tiempo
+    ni orden de paletas, sin «ciclo» ni «colección 2027», nombre del color enlazado una vez por página, colores a
+    su página de familia y cada intención en una sola URL (Color del Año · hub del año · paleta). Decisiones de
+    Berel del 17–18 de septiembre de 2026: módulo 09, «Campaña 2027» y ⚠️ Choque 3.
 
 ## Lo que no se toca
 

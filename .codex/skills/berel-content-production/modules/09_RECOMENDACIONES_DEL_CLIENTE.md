@@ -109,6 +109,40 @@ El Canva trae erratas en los textos de inspiración: se usan para el concepto, n
 cromáticos, combinaciones, productos, acabados ni bios; no se infieren. «Experto» es el crédito que declara el
 material: no convertirlo en «en colaboración con» sin confirmación.
 
+🔴 La columna **Temporada** y los nombres de los expertos son información interna de planeación: **no se
+publican** (ver la sección siguiente).
+
+### Campaña 2027 — decisiones de Berel en los comentarios del 17 y 18 de septiembre de 2026
+
+Aplican a las piezas de la campaña (Color del Año 2027, Colores de Temporada 2027 y cada paleta), que están
+ancladas al menú principal. Fuente: hilos de Fernanda Vega y Anel Garza en las tres páginas del Content Hub.
+
+- **Entrada informativa, sin escena de apertura ni de cierre** (Fernanda, 18-sep: «es un criterio que tomaremos
+  para todos los artículos pertenecientes a esta campaña»). La primera oración anuncia nombre + código + año en
+  primera persona. Registro de **lanzamiento**, no de ensayo ni de venta. Ver ⚠️ Choque 3.
+- **Sin tiempo ni orden:** «los tiempos y temporadas son meramente internos, como tal no se comunican de esa forma
+  al cliente». Nada de meses, trimestres, «primera/segunda temporada», «en este orden», «a lo largo del año».
+  «Colores de Temporada» sí es el nombre del programa.
+- **Vocabulario vetado:** «ciclo», «colección 2027», «código» entre el nombre y el número («Bien y de Buenas
+  1-3404D»), «luz norte/sur» (usar cálida, neutra, fría).
+- **Sin repetición:** el nombre del Color del Año se enlaza una vez por página (Anel: «+27 veces, me parece
+  demasiado»); fuera las tablas que repiten lo que el texto ya dice.
+- **Expertos por disciplina, sin nombres propios.** Los **masters gráficos oficiales** de cada paleta se incrustan
+  en el hub, donde antes iba la tabla de calendario.
+- **Colores enlazados**: todos existen en el catálogo del sitio, pero no hay página por color: cada color enlaza a
+  su **página de familia** `/colores/<familia>` (Playbook, línea de «Colores sugeridos»).
+- **Color del Año:** la sección ladrillo/adobe/terracota se retira (18-sep: «no vemos relevante esta sección»);
+  queda una FAQ corta sobre terracota que enlaza a Calidez Vibrante. La tabla de combinaciones se queda, con
+  colores de las paletas 2027.
+- **Enlaces internos como ruta relativa** en el artículo de Notion: así abren en pestaña nueva en el sitio
+  (Playbook, septiembre 2026). Las tres piezas salen el mismo día: los enlaces entre ellas se arman como vivos.
+
+### ⚠️ Choque 3 — la micro-escena de apertura
+
+**6. Voz y Tono** y el módulo 04 piden abrir con una micro-escena y cerrar volviendo a ella. Para las piezas de
+campaña ancladas al menú, **rige la decisión de Berel del 2026-09-18**: entrada informativa, sin escena. Fuera de
+la campaña, la micro-escena sigue siendo el patrón del blog mientras Berel no amplíe el criterio.
+
 ## Redacción y estructura de borradores
 
 - 🔴 **Encabezados en formato pregunta** cuando la sección responde una duda (*¿Qué es…?*, *¿Cómo
@@ -268,6 +302,11 @@ los textos no afectados. La preferencia de producto no valida prestaciones ni ot
   `PENDIENTE DE CONFIRMACIÓN — NO INCLUIR EN ARTE`, y **eso frena producción de diseño**.
 - 🔴 **Falta definir la autoría.** El estándar de citabilidad exige atribuir cada pieza a **un
   especialista identificable de Berel**, no a "Equipo Berel". **Nadie ha nombrado a esa persona.**
+- 🔴 **Enlaces rotos del menú y del catálogo (observado el 2026-09-19).** El menú principal enlaza
+  `/colores-de-temporada` y `/articulos/colores-de-temporada-2025`, que cargan la página vacía (sin `title`).
+  Las familias `/colores/verdes`, `/colores/amarillos`, `/colores/azules` y `/colores/morados` están en el
+  sitemap pero no cargan colores ni `title`. Mientras sigan así, los colores de esas familias se enlazan a
+  `/colores`.
 - **Drift de Instagram corregido el 2026-09-03:** la Fase 8 del Playbook Producción en Notion
   ya nombra **Instagram Story**. La distribución se selecciona por artículo, sin cambiar el formato.
   Detalle y tabla de precedencia →
