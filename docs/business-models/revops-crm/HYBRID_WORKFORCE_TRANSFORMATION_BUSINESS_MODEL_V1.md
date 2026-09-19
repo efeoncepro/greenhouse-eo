@@ -1,6 +1,6 @@
 # Modelo de negocio — transformación de equipos humano-agente
 
-> Estado: `Approved for validation` · 2026-09-19 · Owner: RevOps & CRM + Commercial + Finance.
+> Estado comercial de la oferta: aprobado y probado por confirmación del operador (2026-09-19). Economics y tarifario: no documentados como aprobados aquí · Owner: RevOps & CRM + Commercial + Finance.
 > Modelo de la [oferta de servicio](../../services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md), no tarifario ni autorización de publicación.
 
 ## Cliente y decisión de compra
@@ -27,6 +27,6 @@ Modelo por escenario: `costo total = fee Efeonce + licencias + consumo + integra
 
 ## Validación y expansión
 
-Primera prueba: entrevistas buyer/operator → blueprint pagado → un equipo en producción → revisión de calidad, adopción, costo y responsabilidad → renovación/expansión. La expansión natural va por workflow, equipo, país o sistema **sólo** si la primera ola sostiene calidad y capacidad de supervisión. Evidencia mínima para declarar Product Service: método y entregables repetibles, delivery owner, margen observado, RACI/contratos, soporte viable, casos autorizados y playbook de salida/portabilidad. Hasta entonces, vender caso a caso bajo `Approved for validation` y no publicar tiers o ROI.
+El servicio ya fue aprobado y probado según el operador; la secuencia entrevistas buyer/operator → blueprint pagado → primer equipo → revisión de calidad/adopción/costo → expansión queda como **método de venta y delivery**, no como una validación inicial pendiente. La expansión natural va por workflow, equipo, país o sistema **sólo** si la ola anterior sostiene calidad y capacidad de supervisión. Antes de fijar tiers públicos, ROI o una afirmación de economía replicable, Finance y la práctica deben enlazar pricing, margen observado, RACI/contratos, soporte y pruebas autorizadas. Que esos registros falten en este archivo no revoca la aprobación comercial; sí limita los claims cuantitativos y la generalización pública.
 
 La [investigación fechada](../../audits/commercial/HUMAN_AGENT_TEAMS_MARKET_RESEARCH_2026-09-19.md) respalda dirección de mercado, no willingness-to-pay ni economics propios.

@@ -161,11 +161,24 @@ Dos ejes ortogonales — **superficies** front-of-house (por audiencia/etapa) qu
 
 Las piezas sociales de marca de Efeonce que no son seasonality se anclan a un capítulo de **«Tu IA no conoce tu
 negocio»**. Canon: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../../../docs/strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md).
-- Instagram: tensión y demostración (mismo prompt con y sin marca, negocios cerrados por WhatsApp, organigrama
-  humano-agente). LinkedIn: el argumento profesional del capítulo (PDR-020 manda por canal).
+- El capítulo 4 prioriza la serie **«Así trabaja un equipo humano-agente»**: job, ficha de rol, handoff,
+  excepción, supervisor y resultado válido. Es una serie temática, no territorio social ni octava franquicia.
+  [Brief Q4](../../../../docs/commercial/campaigns/2026-q4-tu-ia-no-conoce-tu-negocio/README.md).
+- La variante para CMO de esa misma serie conecta AEO (qué se dice de la marca), contexto aprobado de campaña y handoff humano-agente. Mostrar brief, revisión de claims/segmento y decisión de publicación o gasto, no un bot genérico ni volumen de campañas como resultado. Respetar canal-hogar y permisos distintos entre contexto público y datos privados.
+- Instagram: proceso real con tropiezo/decisión bajo `Behind the Build`, nunca organigrama ficticio o caso de éxito
+  no autorizado. LinkedIn Página: método educativo y documento útil; LinkedIn Julio: POV personal con su voz.
+  El blog conserva casos completos autorizados. PDR-020 manda el catálogo y cada satélite aporta trabajo propio.
+- El CRM que se actualiza solo desplaza la pregunta de «¿quién escribe el dato?» a «¿quién autoriza la acción,
+  revisa la interpretación y corrige el error?». Evitar el absoluto «el CRM nunca se enteró» sin prueba.
+- En piezas del servicio usar artefactos auténticos anonimizados (work chart, ficha, registro de excepción),
+  escenas/entrevistas reales y baseline. Un mockup se rotula ilustrativo; métricas, nombres y logos de cliente
+  exigen permiso específico. No usar robots/cerebros genéricos como sustituto de prueba.
 - Salesforce sólo se nombra en orgánico de liderazgo de opinión, con respeto; nunca en pauta.
 - La cuenta regresiva a la Ley 21.719 (1 dic 2026) es orientación, no asesoría legal.
 - Seasonalities conservan su línea propia; no se les fuerza un capítulo.
+- La oferta humano-agente está comercialmente aprobada y probada por confirmación del operador; esto no autoriza
+  publicar ROI, precio, caso ni claim de disponibilidad de un tenant sin su propia evidencia. Antes de convertir
+  en paid, verificar landing neutral, CTA, formulario/agenda y atribución. No programar por este overlay.
 - KV paraguas: Nexa (humana, hoodie Efeonce) es central; el hombro lleva **una sola** mascota de partner por imagen
   (Clawd/Claude hoy, Codex Pet/Codex después), que cambia junto con nombre y color del cursor colaborador e insignia.
   Nunca dos mascotas de terceros juntas.

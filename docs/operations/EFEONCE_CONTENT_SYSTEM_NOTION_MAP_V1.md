@@ -190,7 +190,20 @@ Es coherente con la corrección de `PDR-020` rev 1.4: la unidad es la ventana, n
 **NUNCA** ejecutar ninguno de estos pasos sin autorización explícita del operador. Retirar una opción
 de un select con histórico es destructivo: se marca deprecada, no se borra.
 
-## 7. Referencias
+## 7. Propuesta editorial posterior al corte (2026-09-19; no aplicada en Notion)
+
+La oferta de transformación humano-agente fue confirmada como servicio aprobado y probado por el operador. Los
+siete pilares del snapshot del 2026-09-10 no representan claramente el job del COO/CRO/VP Service que debe diseñar
+autoridad, handoffs, supervisión y resultado de equipos mixtos. Antes de abrir un octavo Pilar JTBD o ampliar uno
+existente, leer las páginas y relaciones **vigentes** de Notion, mapear las piezas del capítulo 4 a buyer/job y
+verificar que el contenido tiene profundidad y owner sostenibles. El territorio de archivo sigue siendo
+`Inteligencia Artificial` (`Agentes` como subterritorio); el capítulo de campaña y la serie temática no son
+propiedades equivalentes al Pilar JTBD. Brief: [campaña Q4](../commercial/campaigns/2026-q4-tu-ia-no-conoce-tu-negocio/README.md).
+
+Ningún schema, fila, relación, fecha ni estado de publicación de Notion cambió por esta propuesta. Requiere
+autorización explícita y readback vivo antes de una mutación.
+
+## 8. Referencias
 
 - Decisión de canales: [`PDR-020`](../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md)
 - Taxonomía del blog: [`PDR-019`](../public-site/decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md)

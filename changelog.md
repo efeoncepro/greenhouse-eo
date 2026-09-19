@@ -14,6 +14,15 @@ equipos humano-agente con roles, autonomía, handoffs, adopción, calidad y econ
 la ruta RevOps & CRM y las skills espejo remiten al método. Estado `Approved for validation`: sin activación runtime,
 precio, margen ni ROI aprobado.
 
+## 2026-09-19 — Ajuste editorial y GTM para la oferta humano-agente
+
+El operador confirmó que la oferta de transformación humano-agente está aprobada comercialmente y probada como
+servicio. Se actualizó «Tu IA no conoce tu negocio» con una serie transversal en las franquicias existentes:
+operaciones y ruta CMO (AEO público → contexto de campaña → equipo humano-agente), sin CRM obligatorio ni nueva SKU.
+Quedaron buyer, piezas, roles por canal, Blueprint/operación y gates de prueba, paid y claims. Los Pilares JTBD de
+Notion siguen separados de capítulos y taxonomía pública; posible nuevo pilar requiere readback y aprobación. Sin
+cambios en Notion, sitio público ni publicación.
+
 ## 2026-09-19 — Trendjacking «Nivel de búsqueda» (GTA VI): jerarquía de 5 voces y compositor reutilizable
 
 Carrusel de 9 láminas + pieza suelta para Efeonce, programado en Instagram (22-sep) y LinkedIn (25-sep, documento).
@@ -685,41 +694,3 @@ video; en video las pantallas las renderiza el modelo (el reemplazo con green sc
 pantallas de texto grande + cada pantalla como referencia; `start_image` de Seedance no fija el encuadre, así que el
 overlay se diagrama midiendo el sujeto por frame; y el copy de trendjacking cita lo que las marcas publicaron, sin
 inventar su estado, con frases naturales y golpe.
-
-## 2026-09-10 — Performance & Commerce: paid media con dos motions, pricing por nivel y landing propia
-
-La solución de paid media de Media & Distribution vivía como sección del catálogo de la línea, sin precio, con un solo
-comprador B2C y sin decisión sobre programmatic ni partnerships de plataforma. Se propone su arquitectura V1
-(`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md`, `Proposed`): una capability con dos motions por
-comprador —Demand & Commerce, que optimiza hacia venta y margen, y B2B Pipeline, que optimiza hacia la etapa del CRM
-con LinkedIn, Search y ABM vía partner—; los canales son cobertura y nunca SKU ni página; programmatic y CTV se compran
-vía partner con cláusula de transparencia. Performance especifica la señal; Wave Measurement & Analytics la implementa;
-RevOps & CRM opera el lado CRM.
-
-Pricing Integrity Pack `hypothesis_only`: fee mensual por tres niveles de complejidad costeados con el catálogo
-Greenhouse (USD 2.400 / 5.900 / 11.800 al piso de 45%), Diagnostic y Sprint de precio fijo, híbrido porcentual sólo
-como alternativa con piso y programmatic sin markup. El SKU legacy `EFG-003` (asignado a Wave, con creatividad
-incluida y bajo el piso) queda en conflicto y se pide su retiro a Finance. Market update fechado con evidencia de
-demanda, plataformas, programas de partners, programmatic, precios Chile/LATAM y costo de talento; el registry suma
-diez relaciones de plataformas y medios, todas `No iniciado` salvo Google Ads (estado sin verificar).
-
-PDR-022 propone una spoke `/servicios/performance-marketing`: "agencia (de) performance marketing" tiene 480–590
-búsquedas al mes en Chile con KD 11–13, dato que PDR-008 no había medido. Sin páginas por plataforma. Nada autoriza
-precios públicos, badges, venta general ni implementación de la landing. Las skills `efeonce-pricing-operator` y
-`efeonce-business-model-operator` (Codex y Claude) y el router de contexto de agentes enrutan ahora a estos documentos.
-
-Canales emergentes (misma fecha): ChatGPT Ads entra como canal `selectivo` donde OpenAI lo habilita —self-service en
-52 países; en LATAM sólo Brasil y México, Chile no—, medido del lado del sitio porque la plataforma sólo entrega vistas y
-clics agregados; en Chile se ofrece preparación en composición con AEO. Nunca se vende como visibilidad orgánica. X Ads
-queda `selectivo` bajo pedido con brand safety de terceros; Perplexity queda `no disponible` (abandonó la publicidad).
-Partner programático: el CEO seleccionó a **Real Audiences** (DSP con operación en CL, CO, MX, PE y EE.UU.), usado
-primero en modo managed por briefing y después autogestionado con trader certificado; suma pDOOH y push como canales
-selectivos. Sin acuerdo firmado: fees, cláusula de transparencia, brand safety, CTV y ABM por confirmar. MiQ y TenX
-quedan como alternativas.
-
-Landing (2026-09-11): `TASK-1865` en `/servicios/performance-marketing/` con dirección "La señal" —firma interactiva
-`Clics / Ventas` que reordena las campañas sin cifras ni logos—, trece módulos semánticos, form `efeonce-performance-brief`
-con rango de inversión alineado a los niveles del pricing pack, y 301 desde la página legacy `242862`, que no se parcha:
-la página se construye desde cero. La investigación Semrush en cinco países mostró que no hay un término único —Chile
-busca "performance marketing"; Perú, México y Colombia, "publicidad digital"; Estados Unidos, en inglés—: el title combina
-ambas cabezas, el copy suma una línea de léxico y el FAQ pasa a catorce preguntas.

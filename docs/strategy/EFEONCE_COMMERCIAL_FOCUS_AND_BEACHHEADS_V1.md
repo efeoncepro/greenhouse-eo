@@ -50,7 +50,8 @@ cuenta.
 Los beachheads se comunican bajo la plataforma narrativa **«Tu IA no conoce tu negocio»**
 ([`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md)):
 RevOps & CRM entra por los capítulos 1, 2 y 4; AI Visibility & Search por el 3; Creative Velocity & Production por
-el 5; Performance & Commerce por la capa de resultados. La narrativa no crea beachheads nuevos ni un segundo catálogo.
+el 5; Performance & Commerce por la capa de resultados. Para la CMO, **3 → 5 → 4** conecta visibilidad pública,
+contexto de campaña y equipo de marketing humano-agente. La narrativa no crea beachheads nuevos ni un segundo catálogo.
 
 ## 3. Oferta de entrada: contrato mínimo
 
@@ -81,6 +82,11 @@ La expansión ocurre cuando el diagnóstico identifica gaps de entity clarity, c
 pipeline. Wave lidera la línea digital; Creative Services, RevOps & CRM y Media & Distribution se componen sin absorber
 su ownership.
 
+Una entrada AEO también puede continuar hacia estrategia de marca/contenido, sistema de campañas, Media o un primer
+workflow humano-agente de marketing **sin** pasar por RevOps. El buyer y la decisión de cada fase determinan la
+composición; no empaquetar una nueva SKU ni tratar AEO sólo como captación para CRM. Distinguir el contexto público
+que hace legible a la marca del contexto privado/autorizado que usa el equipo para planificar y ejecutar.
+
 ### Revenue Operations & CRM
 
 `RevOps & CRM Diagnostic → provider-fit architecture → HubSpot-first | Salesforce-first | híbrido gobernado → implementation → Managed CRM Operations → Customer/Revenue Agents + CRM Intelligence`
@@ -91,7 +97,13 @@ Operations`. Es una expansión del beachhead RevOps & CRM, no un quinto motor co
 un proceso operado por personas y agentes con dueño, autoridad, handoffs, medición y costos explícitos;
 no una cantidad de bots. La [ficha transversal](../services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md)
 conserva el método, y el [modelo de negocio](../business-models/revops-crm/HYBRID_WORKFORCE_TRANSFORMATION_BUSINESS_MODEL_V1.md)
-mantiene sus economics como hipótesis hasta validación.
+mantiene sus economics como hipótesis sin modelo validado para publicación; esto no revierte la aprobación
+comercial del servicio confirmada por el operador.
+
+Cuando el primer equipo es de marketing, el mismo método se compone con AI Visibility, Creative y Media; RevOps &
+CRM participa en arquitectura de plataforma, datos y agentes cuando el alcance lo requiere. No imponer el
+RevOps & CRM Diagnostic como paso previo. El dueño del proceso de marketing aprueba claims, audiencias, publicación,
+envíos y gasto dentro de un RACI de cliente; Efeonce no hereda esa autoridad por configurar la plataforma.
 
 El diagnóstico es provider-neutral y provider-transparent. HubSpot-first prioriza demand generation B2B, adopción y
 time-to-value; Salesforce-first prioriza continuidad de base instalada, complejidad enterprise y marketing B2C

@@ -1,7 +1,7 @@
 # Transformación de equipos humano-agente — RevOps & CRM
 
-> Estado: `Approved for validation` · 2026-09-19 · Owner propuesto: Efeonce RevOps & CRM con Operations/Change.
-> Alcance: ventas, marketing, servicio y revenue lifecycle. Método provider-neutral; no autoriza activaciones, claims de partnership ni precios publicados.
+> Estado: servicio comercial aprobado y probado, confirmado por el operador el 2026-09-19 · Owner: Efeonce RevOps & CRM con Operations/Change.
+> Alcance: ventas, marketing, servicio y revenue lifecycle. Método provider-neutral. La confirmación comercial no autoriza activar capacidades de un tenant, publicar precios/ROI ni identificar casos de clientes sin evidencia y permisos específicos.
 
 ## Promesa y límite
 
@@ -51,6 +51,23 @@ El patrón se adapta a prospecting o marketing, pero cambian autoridad y riesgos
 de enviar un mensaje externo, modificar una oportunidad, alterar una audiencia o gastar presupuesto. Cada acción
 externa requiere su propia regla de permiso, consentimiento, aprobación y readback.
 
+### Instancia de marketing: descubrimiento, campaña y equipo
+
+El primer equipo híbrido puede ser de marketing sin proyecto previo de CRM. La CMO o dueña de Marketing define el
+job y los criterios de marca; AEO/Content mide cómo se entiende públicamente la marca; Creative diseña el brief y
+la calidad de la campaña; Media gobierna inversión; la práctica de plataforma configura fuentes, agentes e
+integraciones sólo cuando el workflow lo requiere. Operations/Change acompaña la adopción. Es una **composición de
+delivery por alcance**, no una nueva unidad organizativa aprobada ni una SKU nueva. El RACI y la aceptación de
+claims, audiencias, envíos, publicación y presupuesto se pactan con el cliente.
+
+En un primer workflow posible, el agente recopila insumos autorizados y **propone** variantes de campaña; el equipo
+contrasta con el brief, revisa precisión y derechos, y autoriza por separado cualquier acción externa. La
+información pública que observan buscadores y asistentes no se importa sin más al contexto privado del agente, ni
+un dataset privado se publica para mejorar AEO. Un diagnóstico AEO puede ser entrada independiente; sólo si el
+problema del cliente es también la forma de trabajar se ofrece Blueprint o First Hybrid Team. Medir visibilidad y
+exactitud por motor/pregunta, calidad y progresión de campañas, revisión humana, riesgo y costo con baseline; no
+usar campañas creadas o prompts generados como prueba de resultado.
+
 ## Secuencia de servicios comprables
 
 | Fase | Entregable autónomo / aceptación | Lo que no implica |
@@ -90,6 +107,8 @@ Buyer probable: COO, CRO, CMO, VP Service o dirección de transformación; usuar
 
 HubSpot-first favorece un customer context y GTM integrados cuando el fit lo prueba; Salesforce-first, entornos instalados complejos con gobierno, múltiples equipos y superficies; híbrido sólo con source of truth, identidad, consentimiento, handoff y observabilidad entre sistemas. La misma metodología se aplica con herramientas diferentes; no se promete paridad. Verificar estado `GA | beta | pilot | demo`, región, tier, créditos, permisos y runtime antes de proponer la activación concreta.
 
-## Estado de validación
+## Estado comercial y prueba publicable
 
-No hay precio aprobado, margen probado ni Product Service declarado para esta oferta. Para promocionarla comercialmente faltan: buyer/ICP entrevistados, capacidad y owner de delivery, alcance repetible, cost-to-serve con Finance, contratos y riesgos con Legal, primera prueba pagada, evidencia de producción/adopción y condiciones de soporte. Investigación y fuentes: [revisión 2026-09-19](../../audits/commercial/HUMAN_AGENT_TEAMS_MARKET_RESEARCH_2026-09-19.md). Arquitecturas de provider: [HubSpot](../hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md) y [Salesforce](../salesforce/EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md).
+El operador confirmó que la oferta está aprobada y ya se ha prestado como servicio probado. El registro documental anterior (`Approved for validation`, sin primera prueba pagada) queda superado como estado comercial; no debe usarse para bloquear la comunicación de la oferta. La evidencia concreta todavía no está inventariada aquí: antes de publicar una métrica, nombre, logo, captura, testimonio o caso, registrar cliente/permiso, proceso, período, baseline, denominador, resultado, alcance de Efeonce y fuente verificable. La aprobación comercial tampoco convierte por sí sola una fórmula de precio, margen, ROI, disponibilidad de producto o tenant en dato aprobado.
+
+La landing y la campaña pueden describir el método, entregables, roles y servicio vigente. Finance/Commercial conservan precios y economics transaccionales; Legal/cliente conservan derechos y permisos; la práctica verifica la elegibilidad y el runtime de cada capacidad de HubSpot o Salesforce. Investigación y fuentes de mercado: [revisión 2026-09-19](../../audits/commercial/HUMAN_AGENT_TEAMS_MARKET_RESEARCH_2026-09-19.md). Arquitecturas de provider: [HubSpot](../hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md) y [Salesforce](../salesforce/EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md).

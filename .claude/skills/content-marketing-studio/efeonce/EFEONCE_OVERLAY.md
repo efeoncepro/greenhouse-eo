@@ -130,12 +130,24 @@ El baseline competitivo de la agencia vive en `docs/context/15_panorama-competit
 
 ## Narrativa del período: pilares editoriales (Q4 2026 – Q3 2027)
 
-Los capítulos de **«Tu IA no conoce tu negocio»** son los pilares editoriales de Efeonce del período. Canon:
+Los capítulos de **«Tu IA no conoce tu negocio»** son el **arco narrativo** del período, no los siete Pilares JTBD
+de Notion ni los territorios de archivo de PDR-019. Canon:
 [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../../../docs/strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md).
 - Todo contenido de marca Efeonce (blog, Think, Glitch, Manzanitas, ebooks, infografías) declara su capítulo: 1 lo
   que tu IA no sabe · 2 lo que tu IA cree que es cierto · 3 lo que la IA dice de ti · 4 un equipo, no una
   herramienta · 5 campañas en días, con tu marca · resultados.
 - El capítulo 3 es el hogar natural de SEO/AEO y content marketing; el 2 atraviesa a todos como dimensión de datos.
+- La ruta CMO enlaza 3 → 5 → 4: qué dicen los motores sobre la marca, qué brief/claims aprobados necesita la campaña y qué trabajo propone el agente bajo revisión humana. AEO es un servicio/entrada propia, no sólo lead magnet para CRM. Un artículo responde una pregunta de búsqueda; no recorta sin más la pieza social. Distinguir fuentes públicas de datos privados autorizados.
+- El capítulo 4 demuestra el servicio humano-agente ya aprobado y probado: una serie temática reutiliza
+  `Educativo`, `Behind the Build` y `Casos de Éxito` según canal y permiso, sin crear franquicia o categoría
+  nueva. Cada nodo resuelve una pregunta sobre job, autoridad, handoff, excepción o medición; un artículo
+  answer-first se escribe para una pregunta de búsqueda distinta del post de LinkedIn. Brief:
+  [`2026-q4-tu-ia-no-conoce-tu-negocio/README.md`](../../../../docs/commercial/campaigns/2026-q4-tu-ia-no-conoce-tu-negocio/README.md).
+- Los siete Pilares JTBD documentados no representan claramente la transformación de operaciones humano-agente.
+  Candidato a octavo pilar o a revisión de uno existente **tras readback de Notion y decisión del operador**;
+  mientras tanto se asigna buyer/job por pieza sin inventar schema. La taxonomía pública sigue en PDR-019.
+- La prueba del método precede a la cifra de proveedor. No publicar caso, resultado o visualización de cliente
+  sin baseline, período, denominador y autorización; la aprobación comercial de la oferta no abre ese gate.
 - Cifras de HubSpot atribuidas; las de Forrester/Gartner sólo tras confirmar la fuente primaria (§10 del canon).
 - Seasonalities y efemérides no se fuerzan a un capítulo: conservan su propia línea (PDR-020).
 

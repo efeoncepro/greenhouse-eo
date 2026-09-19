@@ -1,8 +1,8 @@
 # Handoff activo
 
-**Transformación humano-agente (19/09, documental):** [oferta transversal](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md)
-`Approved for validation`, enlazada desde HubSpot/Salesforce y skills. Sin activación, precio ni ROI aprobado;
-faltan entrevistas, Finance/Legal y prueba pagada.
+**Transformación humano-agente (19/09):** [oferta aprobada y probada](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md).
+Serie Q4: operaciones y ruta CMO (AEO → campaña → equipo), sin CRM obligatorio. Pendientes prueba publicable,
+landing y calendario Notion. Sin publicación ni activación.
 
 **Berel campaña 2027 (19/09):** Color del Año, hub Colores de Temporada 2027 y Raíces de la piel con V2 en revisión
 (publican juntos el 29/09; gate PASS). Pendientes: enviar mensaje a Berel (material de marca, menú, «2026»), rehacer arte

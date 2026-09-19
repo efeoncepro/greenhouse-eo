@@ -6,7 +6,8 @@
 
 Los ledgers CRM de Dreamforce/UNBOUND están actualizados al 2026-09-19; el provider-fit admite
 `HubSpot-first | Salesforce-first | híbrida | no-fit`. La [transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md)
-está `Approved for validation`, sin activación runtime ni pricing aprobado.
+está aprobado y probado comercialmente por confirmación del operador; pruebas publicables, pricing y elegibilidad
+de cada capacidad siguen sujetos a verificación.
 
 Greenhouse: plataforma operativa Efeonce Group (Next.js 16/MUI 7/Vuexy/TS). Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
