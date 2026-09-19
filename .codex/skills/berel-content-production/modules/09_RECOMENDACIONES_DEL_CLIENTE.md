@@ -136,6 +136,15 @@ ancladas al menú principal. Fuente: hilos de Fernanda Vega y Anel Garza en las 
   colores de las paletas 2027.
 - **Enlaces internos como ruta relativa** en el artículo de Notion: así abren en pestaña nueva en el sitio
   (Playbook, septiembre 2026). Las tres piezas salen el mismo día: los enlaces entre ellas se arman como vivos.
+- **Gráficos de campaña = material de marca de Berel.** Efeonce no diseña infografías para estas piezas: en su
+  lugar va una ficha «Material de marca Berel» (banner principal del Color del Año, masters de las paletas). Para
+  el Color del Año, Berel pidió a Efeonce solo dos gráficos: el color en diversos acabados y el color en diversas
+  luces (María Fernanda, Teams 2026-09-17: «el banner principal sale de aquí de Berel»). Los masters de la
+  presentación Canva *Paletas de Color Berel 2027* traen temporalidad, nombres y una foto de equipo: se pide la
+  versión para publicación.
+- **Publicación conjunta:** Color del Año, Colores de Temporada 2027 y Raíces de la piel, martes 29 de septiembre
+  de 2026. Superan la cuota de artículos de septiembre; el excedente se descuenta de los meses siguientes
+  (operador, 2026-09-19).
 
 ### ⚠️ Choque 3 — la micro-escena de apertura
 
