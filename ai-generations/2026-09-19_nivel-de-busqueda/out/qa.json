@@ -1,0 +1,112 @@
+[
+  {
+    "id": "carrusel-01-portada",
+    "lineasTitular": [
+      "¿Cuál es tu",
+      "nivel de",
+      "búsqueda?"
+    ],
+    "contraste": {
+      "hud-label": 8.77,
+      "titular": 3.74
+    }
+  },
+  {
+    "id": "carrusel-02-el-juego",
+    "lineasTitular": [
+      "En el juego, cinco estrellas",
+      "significan que toda la ciudad",
+      "te busca."
+    ],
+    "contraste": {
+      "hud-label": 17.23,
+      "titular": 16.68,
+      "apoyo": 16.41
+    }
+  },
+  {
+    "id": "carrusel-03-estrella-1",
+    "lineasTitular": [
+      "La IA sabe",
+      "quién eres."
+    ],
+    "contraste": {
+      "hud-label": 17.23,
+      "titular": 16.94,
+      "apoyo": 15.6
+    }
+  },
+  {
+    "id": "carrusel-04-estrella-2",
+    "lineasTitular": [
+      "Respondes antes",
+      "de explicar."
+    ],
+    "contraste": {
+      "hud-label": 17.23,
+      "titular": 16.94,
+      "apoyo": 16.29
+    }
+  },
+  {
+    "id": "carrusel-05-estrella-3",
+    "lineasTitular": [
+      "Tienes datos que",
+      "nadie más tiene."
+    ],
+    "contraste": {
+      "hud-label": 17.23,
+      "titular": 16.95,
+      "apoyo": 16.4
+    }
+  },
+  {
+    "id": "carrusel-06-estrella-4",
+    "lineasTitular": [
+      "Otros hablan",
+      "de ti."
+    ],
+    "contraste": {
+      "hud-label": 17.23,
+      "titular": 16.96,
+      "apoyo": 16.39
+    }
+  },
+  {
+    "id": "carrusel-07-estrella-5",
+    "lineasTitular": [
+      "Los bots",
+      "pueden entrar."
+    ],
+    "contraste": {
+      "hud-label": 17.23,
+      "titular": 16.96,
+      "apoyo": 16.35
+    }
+  },
+  {
+    "id": "carrusel-08-cierre",
+    "lineasTitular": [
+      "Cinco estrellas.",
+      "Todos te buscan.",
+      "Y te encuentran."
+    ],
+    "contraste": {
+      "hud-label": 18.75,
+      "titular": 18.06,
+      "apoyo": 6.41
+    }
+  },
+  {
+    "id": "post-nadie-te-busca",
+    "lineasTitular": [
+      "Nadie te está",
+      "buscando."
+    ],
+    "contraste": {
+      "hud-label": 10.76,
+      "titular": 6.92,
+      "apoyo": 4.2
+    }
+  }
+]

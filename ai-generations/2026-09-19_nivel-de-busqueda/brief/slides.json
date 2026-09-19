@@ -1,0 +1,209 @@
+[
+ {
+  "id": "carrusel-01-portada",
+  "plate": "plate-cover",
+  "align": "left",
+  "hud": {
+   "mode": "corner",
+   "lit": 0
+  },
+  "headline": {
+   "recipe": "ideaShort",
+   "size": 124,
+   "y": 0.215,
+   "text": "¿Cuál es tu|nivel de|búsqueda?",
+   "maxWidth": 0.8
+  },
+  "logo": {
+   "width": 230,
+   "variant": "negative"
+  }
+ },
+ {
+  "id": "carrusel-02-el-juego",
+  "plate": "plate-night",
+  "align": "left",
+  "hud": {
+   "mode": "big",
+   "lit": 5,
+   "y": 0.17
+  },
+  "headline": {
+   "recipe": "ideaMedium",
+   "size": 80,
+   "y": 0.355,
+   "text": "En el juego, cinco estrellas significan que toda la ciudad te busca."
+  },
+  "support": {
+   "size": 44,
+   "text": "En la búsqueda con IA, lo mismo.|Solo que ahí sí las quieres.",
+   "maxWidth": 0.78,
+   "gap": 1.7
+  }
+ },
+ {
+  "id": "carrusel-03-estrella-1",
+  "plate": "plate-night",
+  "align": "left",
+  "hud": {
+   "mode": "big",
+   "lit": 1,
+   "y": 0.17
+  },
+  "headline": {
+   "recipe": "ideaShort",
+   "size": 96,
+   "y": 0.355,
+   "text": "La IA sabe|quién eres."
+  },
+  "support": {
+   "size": 44,
+   "text": "Tu nombre, lo que haces y dónde lo haces dicen lo mismo en todas partes. Si cada sitio te describe distinto, la IA no sabe a quién recomendar.",
+   "maxWidth": 0.78,
+   "gap": 1.7
+  }
+ },
+ {
+  "id": "carrusel-04-estrella-2",
+  "plate": "plate-night",
+  "align": "left",
+  "hud": {
+   "mode": "big",
+   "lit": 2,
+   "y": 0.17
+  },
+  "headline": {
+   "recipe": "ideaShort",
+   "size": 96,
+   "y": 0.355,
+   "text": "Respondes antes|de explicar."
+  },
+  "support": {
+   "size": 44,
+   "text": "La primera frase de cada página contesta la pregunta. Un motor de IA cita respuestas, no introducciones.",
+   "maxWidth": 0.78,
+   "gap": 1.7
+  }
+ },
+ {
+  "id": "carrusel-05-estrella-3",
+  "plate": "plate-night",
+  "align": "left",
+  "hud": {
+   "mode": "big",
+   "lit": 3,
+   "y": 0.17
+  },
+  "headline": {
+   "recipe": "ideaShort",
+   "size": 96,
+   "y": 0.355,
+   "text": "Tienes datos que|nadie más tiene."
+  },
+  "support": {
+   "size": 44,
+   "text": "Cifras propias, casos y estudios con fuente. Lo que solo tú puedes decir es lo que obliga a la IA a citarte.",
+   "maxWidth": 0.78,
+   "gap": 1.7
+  }
+ },
+ {
+  "id": "carrusel-06-estrella-4",
+  "plate": "plate-night",
+  "align": "left",
+  "hud": {
+   "mode": "big",
+   "lit": 4,
+   "y": 0.17
+  },
+  "headline": {
+   "recipe": "ideaShort",
+   "size": 96,
+   "y": 0.355,
+   "text": "Otros hablan|de ti."
+  },
+  "support": {
+   "size": 44,
+   "text": "Menciones en medios, reseñas y comunidades. La IA confía más en lo que dicen de ti que en lo que dices tú.",
+   "maxWidth": 0.78,
+   "gap": 1.7
+  }
+ },
+ {
+  "id": "carrusel-07-estrella-5",
+  "plate": "plate-night",
+  "align": "left",
+  "hud": {
+   "mode": "big",
+   "lit": 5,
+   "y": 0.17
+  },
+  "headline": {
+   "recipe": "ideaShort",
+   "size": 96,
+   "y": 0.355,
+   "text": "Los bots|pueden entrar."
+  },
+  "support": {
+   "size": 44,
+   "text": "Si tu sitio bloquea a los rastreadores de IA o no se deja leer, da igual lo bueno que sea: no existe para ellos.",
+   "maxWidth": 0.78,
+   "gap": 1.7
+  }
+ },
+ {
+  "id": "carrusel-08-cierre",
+  "plate": "plate-phone",
+  "align": "center",
+  "hud": {
+   "mode": "big",
+   "lit": 5,
+   "y": 0.12
+  },
+  "headline": {
+   "recipe": "ideaShort",
+   "size": 96,
+   "y": 0.27,
+   "text": "Cinco estrellas.|Todos te buscan.|Y te encuentran."
+  },
+  "support": {
+   "size": 46,
+   "text": "¿Cuántas tienes hoy?"
+  },
+  "logo": {
+   "width": 230,
+   "variant": "negative"
+  },
+  "scrim": {
+   "from": 0.34,
+   "to": 0.74,
+   "opacity": 0.82,
+   "dir": "down"
+  }
+ },
+ {
+  "id": "post-nadie-te-busca",
+  "plate": "plate-hero",
+  "align": "left",
+  "hud": {
+   "mode": "corner",
+   "lit": 0
+  },
+  "headline": {
+   "recipe": "ideaShort",
+   "size": 118,
+   "y": 0.245,
+   "text": "Nadie te está|buscando."
+  },
+  "support": {
+   "size": 44,
+   "text": "En el juego, es la mejor noticia.|En la búsqueda con IA, la peor.",
+   "gap": 1.6,
+   "maxWidth": 0.62
+  },
+  "logo": {
+   "width": 230,
+   "variant": "color"
+  }
+ }
+]
