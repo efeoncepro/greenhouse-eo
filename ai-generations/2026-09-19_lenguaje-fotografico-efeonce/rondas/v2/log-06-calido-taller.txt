@@ -1,0 +1,2 @@
+  ✓ 1946KB · gpt-image-2.5-flare · 1152x1440 · high
+    usage: in 3645 (img 3042 · txt 603) · out 1669 · total 5314

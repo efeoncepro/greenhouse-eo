@@ -134,6 +134,26 @@ de fotografía, bokeh natural para la firma, tipografía y producción pertenece
 El [caso canónico](../../../docs/operations/social/2026-09-13-fiestas-patrias-production-method.md) distingue
 decisiones del operador, ejecución y evidencia; no tratar una aprobación estética como brand equity medido.
 
+### Lenguaje fotográfico de marca (aprobado 2026-09-19)
+
+Sistema para la fotografía e imagen fotorrealista de **la marca propia Efeonce**: idea «El oficio a la vista» (la obra
+y el oficio de cada servicio, el sistema o dato y personas decidiendo; nunca reuniones genéricas), firma con primer
+plano desenfocado **planeado** y logo SVG oficial al 15%, y roles de color (azul activo = la casa, naranja = la idea,
+lima = el resultado). Aprobado por el operador el 2026-09-19.
+
+- **Qué decide esta skill:** papel de la marca, test de sustitución, que la paleta viva en luz y material (no en
+  vestir de navy), cuándo una pieza va **sin firma** (emblema legible o 3D de marca protagonista) y la evidencia de
+  reconocimiento. **Qué decide `design-studio`:** tomas, luz, color medido, lecho, composición y QA de imagen, según
+  [su referencia operativa](../design-studio/references/efeonce-photographic-language.md).
+- **Estado:** **sistema consistente**, **NO activo distintivo medido**. La prueba de reconocimiento (n≥100,
+  distractores coherentes, antes/después) está pendiente; NUNCA presentarlo como brand equity.
+- **Regla dura:** NUNCA anclar la serie en la categoría de un cliente real ni insinuar trabajo con un cliente (la
+  pintura se leyó como Berel: «nosotros NO somos Berel»). Variar industrias; nunca etiquetar con nombre de cliente.
+- Fuente: [lenguaje fotográfico V1](../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) ·
+  [índice](../../../docs/operations/brand-photography/README.md) ·
+  [manual de uso](../../../docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md). Referencias en OneDrive
+  `5. Contenidos/13- Branding/Lenguaje Fotografico Efeonce/v01/`.
+
 ### Isotipo 3D de Efeonce (biblioteca aprobada 2026-09-17)
 
 La nave (isotipo) existe en 3D en navy y blanco, aprobada por el operador, en OneDrive

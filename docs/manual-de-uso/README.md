@@ -18,6 +18,9 @@ La diferencia con otras capas de documentacion:
 - [Usar reglas publicitarias con Codex y Claude](creative/usar-reglas-publicitarias-con-agentes.md) — prompts,
   entregables, ficha tipográfica y revisión para crear/corregir publicidad y social con texto sin confundir
   producción, aprobación y publicación.
+- [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
+  prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
+  lenguaje fotográfico aprobado el 2026-09-19.
 - [Manual: producir un post visual de reporte](social/visual-report-social-production.md) — brief, dirección,
   crop, logo, QA y gates contra capturas ilegibles o composiciones genéricas.
 - [Manual: operar Creator Influence & Content](media-distribution/operar-creator-influence-content.md) — intake,

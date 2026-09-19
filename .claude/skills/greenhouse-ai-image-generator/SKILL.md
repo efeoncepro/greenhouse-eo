@@ -600,6 +600,33 @@ verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales a
   contrato de referencias, QA al 100 % y las tres reglas propias del video (primer cuadro aprobado, la marca no se mueve
   dentro del plano generado, planos cortos).
 
+## Fotografía de marca propia Efeonce
+
+Lenguaje aprobado el 2026-09-19. **Dirección** (idea, barra, firma, color, tomas, QA) en
+[`design-studio` → lenguaje fotográfico](../design-studio/references/efeonce-photographic-language.md); contrato completo en
+[el maestro](../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) y receta paso a paso en
+[bloques y pipeline](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md). Aquí sólo
+lo que toca a la mano:
+
+- **Modelo:** `gpt-image-2.5-flare` `high` 1152×1440 para explorar; `gpt-image-2.5-sunburst` cuando hay **identidad**
+  (Julio, Nexa) o **edición**; `xhigh` **sólo masters** (≈1,8× costo, mejora modesta de detalle fino). Observado:
+  ≈ USD 0,05 por imagen high, ≈ 0,09 xhigh; los edits suman entrada.
+- **Prompt = bloques** en este orden: realismo (`prompts/bloque-realismo-v2.txt`) + impacto (`bloque-impacto-v1.txt`) +
+  color/WB + escena + **`FOREGROUND` con el tono del lecho declarado** («DARK near black» / «VERY LIGHT almost white»).
+  Bloques verbatim en `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/`.
+- **Medir y regenerar, no parchar:** nitidez p99 Sobel dentro del lecho (`scripts/medir.mjs` de la corrida) ≤ ~20; si
+  pasa, o si el lecho sale de tono medio, **se regenera**. Sin grade: la corrección técnica es la excepción.
+- **Firma:** SVG oficial compuesto con `scripts/componer.mjs` (`LOGO=0.15`), nunca generado.
+- **Pantallas por curación generativa:** plate con pantalla en chroma `#00FF00` → UI de referencia → edit con
+  `--image plate --image ui --mask <máscara>` → restaurar fuera de la pantalla desde el plate. La máscara se arma
+  detectando chroma (g>120, g>1,4r, g>1,4b), dilatando (blur 2 + threshold 20) y con **`.extractChannel(0)`**: sin eso
+  sharp devuelve 3 canales y la máscara se desalinea (2 intentos fallidos). Alfa 0 = editable, 255 = protegido. Una
+  máscara rectangular que incluye a una persona delante de la pantalla deja un **fantasma**.
+- **Gotchas de zsh:** una variable con varios `--image` se expande con **`${=R}`** (sin eso fallaron 8 llamadas, sin
+  costo); `setopt nullglob` antes de copiar con globs (un glob sin match aborta el comando entero).
+- **Lotes:** JSON con `json.dump` (§Serie con estética de trend) y `--batch <json> --out <dir>` ya respeta el
+  directorio (corregido 2026-09-19, §Brechas conocidas).
+
 ## Provider Choice
 
 - Use `openai-image` for higher prompt fidelity, complex composition, reference-guided edits, UI assets, icon sets, and transparent PNG batches.

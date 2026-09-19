@@ -1,0 +1,221 @@
+# Lenguaje Fotográfico Efeonce V1 — «El oficio a la vista»
+
+> **Tipo de documento:** Especificación canónica de marca (documento maestro)
+> **Versión:** 1.0
+> **Creado:** 2026-09-19 por Claude
+> **Última actualización:** 2026-09-19 por Claude
+> **Estado:** Aprobado por el operador (Julio Reyes, dueño de Efeonce) el 2026-09-19. Sistema consistente; **no** es todavía un activo distintivo medido.
+> **Documentación relacionada:** [Índice](./README.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md) · [Marca de agencia](../../context/09_marca-agencia.md) · [Quiénes somos](../../context/01_quienes-somos.md) · [Marca en escena](../../../.claude/skills/social-media-studio/references/brand-in-scene.md)
+
+Convenciones: **[medido]** = número obtenido en la corrida del 2026-09-19 · **[decisión del operador]** = lo decidió
+Julio Reyes · **[criterio]** = recomendación propia, revisable · **[pendiente]** = no resuelto.
+
+## 1. Estado y alcance
+
+| Tema | Definición |
+|---|---|
+| Qué es | La forma en que Efeonce fotografía su propia marca: qué se muestra, con qué luz y color, con qué cámara y cómo firma |
+| Estado | Aprobado el 2026-09-19. El operador pidió documentarlo tras ver todas las rondas: «todas me gustaron» **[decisión del operador]** |
+| Aplica a | Fotografía e imagen fotorrealista de la marca propia: social, sitio, presentaciones, piezas de equipo, eventos, espacios, objetos |
+| Formatos | Probado sólo en 4:5 (1152×1440). 9:16 y 16:9 nativos **[pendiente]** |
+| No aplica a | Piezas de clientes (cada cliente tiene su lenguaje); trendjacking que toma prestada una estética ajena; ilustración; infografía |
+| Qué no es todavía | Un activo distintivo. Para llamarlo así falta la prueba de reconocimiento (§9) |
+
+## 2. De dónde viene: del posicionamiento a la fotografía
+
+### 2.1 El objetivo del operador
+
+> «que incluso al ver una foto y su colorimetría se pueda sentir que es un elemento o foto de la agencia»
+> — Julio Reyes, 2026-09-19
+
+> «necesitamos vernos como una agencia premium basado en cómo nos vendemos»
+
+La referencia de ambición fue «agencia A1 de clase mundial»: premium, sofisticada, moderna **[decisión del operador]**.
+
+### 2.2 Lo que Efeonce dice que es
+
+| Fuente | Lo que dice | Consecuencia fotográfica |
+|---|---|---|
+| [`09_marca-agencia.md`](../../context/09_marca-agencia.md) — Why | «No te entregamos crecimiento. Lo construimos contigo»: co-creación, educar como experto, transparencia como piso, crecimiento integral | Se fotografía el trabajo **hecho con** el cliente y a la vista, no el resultado aislado |
+| `09_marca-agencia.md` — How | El Why sin mecanismo «es humo de agencia»: método, medición, software propio | Cada foto muestra un **mecanismo**: una obra, un sistema, un dato |
+| [`01_quienes-somos.md`](../../context/01_quienes-somos.md) y `docs/services/README.md` | Growth Operating System **y** agencia creativa: Creative Services (branding, campañas, KV, audiovisual, Run & Gun, Social), Growth Strategy & Measurement, RevOps & CRM (HubSpot, Salesforce, Kortex), Media & Distribution (Reach), Digital Services/Wave (SEO/AEO, web, agentes), Channel & Commerce (trade/BTL, Proposed) | La serie recorre **todos** los servicios; no se queda en la sala de reuniones |
+| `01_quienes-somos.md` | Mercados: Chile, Estados Unidos, Colombia, México, Perú | Las tomas se sitúan en esos lugares (Santiago, Miami, Bogotá, CDMX, Lima) |
+
+### 2.3 La barra de juicio
+
+Criterios con los que se aceptó o rechazó cada pieza (propuestos por el subagente estratega y usados en todas las
+rondas desde «El oficio a la vista»):
+
+| # | Criterio | Pregunta de control |
+|---|---|---|
+| 1 | Test de sustitución | Si pongo el logo de otra agencia, ¿la foto deja de funcionar? Si sigue funcionando, es genérica |
+| 2 | Hay obra | ¿Se ve algo hecho por nosotros o en proceso (un rodaje, un KV, una corrección de color, una góndola)? |
+| 3 | Hay mecanismo | ¿Se ve un sistema, una traza o un dato (pipeline, pantalla, journey)? |
+| 4 | Hay idea | ¿Hay una situación con tensión, no una pose? |
+| 5 | Funciona en 3 modos y a 390 px | ¿Funciona con equipo de uniforme, con personas sin marca y sin personas? ¿Se lee en un celular? |
+| 6 | Verdad operativa | ¿Todo lo que se ve es algo que hacemos? ¿Nada parece stock? |
+| 7 | Paleta = luz y material | ¿El color de marca vive en la luz y en los objetos, no en la ropa? |
+
+### 2.4 Arquetipos a evitar
+
+| Arquetipo | Cómo se ve | Por qué no es Efeonce |
+|---|---|---|
+| Consultora | Talleres, post-its, mesas con papeles, reuniones | Es lo que produjo la grilla V2 y el operador la rechazó por genérica |
+| Performance | Dashboards sin idea, pantallas con gráficos | Mecanismo sin oficio creativo |
+| Creativa pura | Oficio sin sistema: taller, arte, pintura | Oficio sin mecanismo; olvida la mitad de Growth Operating System |
+
+## 3. La idea: «El oficio a la vista»
+
+Se fotografía **la obra y el oficio de cada servicio, el sistema o el dato, y a las personas decidiendo**. Nunca
+reuniones genéricas **[decisión del operador]**, tras el rechazo de la V2 («muy muy genérico, efeonce es una agencia
+creativa también»).
+
+| Servicio | Cómo se ve el oficio (piezas de la corrida) |
+|---|---|
+| Creative Services / audiovisual / Run & Gun | Rodaje en una panadería (`oficio/01-rodaje`), rodaje macro (`oficio2/A`), director en el piso con 24 mm (`camaras/4-contrapicado`), rodaje de calle en tilt-shift (`camaras/3-tilt-shift`), mercado con gimbal (set curado) |
+| Branding / KV | Revisión de pruebas impresas de KV con selección colaborativa (`oficio/03-kv`), KV de café (`curado/K1`) |
+| Postproducción | Consola de corrección de color (`oficio/02-color`) |
+| Growth / RevOps | Pipeline en pantalla con tarjeta «Ganado» en lima (`oficio2/B`, Bogotá) |
+| Wave / SEO-AEO | Ficha de producto en laptop y celular con cursores SEO y Nexa (`oficio/04-aeo`, `oficio3/1-aeo-miami`) |
+| Estrategia / journey | Journey dibujado sobre vidrio con reflejo de ciudad (`camaras/5-reflejo`, `personas/N2-reflejo`) |
+| Channel & Commerce | Góndola y retail (`oficio3/2-gondola-cdmx`, `curado/K2b-retail-bebidas`) |
+| Eventos / activación | Instalación de cuadrados azules vista desde dron (`camaras/2-drone-cenital`), Julio en escenario (`personas/J3`) |
+| Datos / escala | Persona pequeña frente a pantalla gigante (`impacto/I4-escala`) |
+
+Vista de conjunto: `rondas/curado/set-curado-12.jpg` (12 piezas, sin pintura) y `rondas/oficio/oficio-a-la-vista.jpg`
+(6 piezas de la primera ronda de la idea).
+
+## 4. Principios
+
+### 4.1 Realismo: «no se siente IA», sin suciedad
+
+> «una buena imagen de IA es la que no se siente que es IA» — regla del operador
+> «tanto desorden y suciedad tampoco se ve bien»
+
+| Sí | No |
+|---|---|
+| Realismo desde **personas, luz y materiales**: poros, arrugas finas, pelo suelto, pliegues de tela, textura de papel, polvo sólo dentro de un haz de luz, leve movimiento en manos, viñeteo natural, encuadre levemente imperfecto | Suciedad como atajo de realismo: manchas, aros de café, restos de cinta, cables enredados, desorden |
+| Espacios limpios y cuidados como un estudio creativo premium, con 1–2 detalles de uso (una taza, una libreta) | Piel plástica, simetría perfecta, superficies CGI, sobreenfoque, HDR, retoque de belleza, sonrisas de stock |
+| Color natural, altas luces con detalle, sombras abiertas | Grade de color, texto, letras, números, logos o marcas de agua generados |
+| Casting latinoamericano, caras con carácter, no modelos, edades variadas | Casting de modelo (se lee como stock premium) |
+
+Bloque vigente: `prompts/bloque-realismo-v2.txt`. La versión 1 pedía «clutter, coffee rings, tape» y fue rechazada.
+Detalle en [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) y [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
+
+### 4.2 Impacto: un nivel más
+
+> «falta un nivel más para garantizar impacto visual» — operador, origen de la ronda `impacto/`
+
+| Palanca | Qué es | Ejemplo en la corrida |
+|---|---|---|
+| Luz con carácter | Haz de sol duro, sombras gráficas, contraluz, hora dorada, mediodía duro | Retrato con persianas (`impacto/I5`), haz sobre la harina (`impacto/I1`) |
+| Momento decisivo | El pico de la acción: harina en el aire, risa, celebración | `impacto/I1-harina`, risa en el pipeline (`oficio2/B`) |
+| Composición gráfica | Geometría, marco dentro del marco, escala, espacio negativo | `impacto/I3b-marco`, `impacto/I4-escala`, `camaras/2-drone-cenital` |
+| Tres planos de profundidad | Primer plano desenfocado, sujeto nítido, fondo suave | Todas: el primer plano es también la firma |
+| Bloque de color | Un campo o un objeto azul que da el golpe gráfico | Set azul (`impacto/I2`), pantalla gigante (`impacto/I4`), cuadrados del dron |
+
+Principio: **el impacto viene de la luz y la composición, no del modelo** **[medido]**: `impacto/high-vs-xhigh.jpg`
+compara la misma toma en `high` y `xhigh`; `xhigh` cuesta 1,8× y mejora poco el detalle fino. Bloque vigente:
+`prompts/bloque-impacto-v1.txt`.
+
+### 4.3 Variedad de industrias y de cámaras
+
+- Se varían industrias que **no** sean de clientes reales: café, bebidas, panadería, retail, finanzas, gastronomía,
+  eventos **[decisión del operador]** tras «nosotros NO somos Berel».
+- Se varían cámaras y ángulos: ojo de pez, dron, tilt-shift, contrapicado, reflejo, tele 200 mm, macro, retrato,
+  barrido, noche (catálogo en [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md)).
+- Se varía el objeto de acento: la misma taza azul apareció en 3–4 piezas (persianas, noche, KV café, mesa JN1) y se
+  leyó como sesgo **[medido en revisión]**.
+
+### 4.4 Verdad operativa
+
+- Nada que Efeonce no haga. Nada de stock.
+- Nunca insinuar trabajo con un cliente real ni etiquetar con su nombre (se corrigió la etiqueta «Berel» → «Cliente»).
+- Sin marcas de terceros en objetos (la cámara salió con una inscripción tipo «Blackmagic»; se pide «completely
+  unbranded, no brand names» y se revisa al zoom).
+- Para piezas publicables con personas: equipo real (Run & Gun) como base; IA para explorar, espacios, objetos y 3D
+  **[criterio]** (revisión adversarial).
+- Pantallas y UI: nunca pegadas determinísticamente; se integran por curación generativa (§5, Prompts y pipeline).
+
+## 5. Los sistemas, en resumen
+
+| Sistema | Regla central | Documento |
+|---|---|---|
+| Firma | Un primer plano desenfocado **planeado desde la toma** (herramienta o superficie del oficio) sirve de lecho al logo centrado, ancho 15%, centro vertical ≈ 93,5% del alto, contraste ≥ 4,5:1. Lecho p99 ≤ ~20, tono declarado en el prompt | [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) |
+| Colorimetría | Sin grade; color natural; blancos ~5200 K neutro-cálido; sombras nunca azules. Azul activo `#0375DB` = la casa (en todas, como luz u objeto); naranja `#F55D01` = la idea; lima `#6EC207` = el resultado; un solo acento además del azul | [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) |
+| Cámaras | Lente, ángulo y lecho se eligen juntos; el modelo respeta la sensación del lente, no la física exacta | [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) |
+| Prompts y pipeline | Prompt = bloque realismo + bloque impacto + color + escena + FOREGROUND. Generar → medir lecho → curar pantallas → componer firma → métricas → QA al zoom | [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) |
+| Personas | Casting real, nadie mira a cámara salvo decisión, identidad de Julio y Nexa con referencias y bloque IDENTITY, uniforme sin firma cuando el emblema se lee | [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) |
+
+## 6. Qué NO es Efeonce
+
+| No | Por qué | Evidencia |
+|---|---|---|
+| Grade navy («Navy Shadow»: negros llevados al navy de marca) | El operador prefirió el color natural: «los de la izquierda me gustan más» | `rondas/ejemplos/ej1-…-antes-despues.jpg`, `ej2-…-antes-despues.jpg`; script histórico `scripts/efeonce-look.mjs` (descartado) |
+| Vestir de navy como firma de color | «la colorimetría no es vestir de navy» | Grilla V2 (`rondas/v2/grilla-v2.jpg`): polos navy y paredes tinta |
+| Navy en pared, ropa y logo a la vez | Se funde: ΔE navy vs tinta = 12,4 **[medido]**, insuficiente | Piezas de la V2 con pared tinta y polo navy |
+| Salas tonales genéricas con gente en mesas | «muy muy genérico, efeonce es una agencia creativa también» | Grilla V2 completa (9 piezas) |
+| Pintura como tema recurrente | «nosotros NO somos Berel»: es la categoría de un cliente real | Set azul con rodillo (`impacto/I2`), góndola de tarros (`oficio/05-gondola`), `palancas/T1-macro-pintura`; el set curado de 12 salió sin pintura |
+| Desorden y suciedad como realismo | «tanto desorden y suciedad tampoco se ve bien» | Primera versión del bloque de realismo |
+| Look de podcast-stock con lámparas prácticas encendidas | Lámparas encendidas subieron b\* de altas luces a +20 **[medido]** y el cuadro se leyó como stock | `rondas/paleta/P2-podcast-*` |
+| La misma taza azul como acento | Utilería repetida en 3–4 piezas = sesgo | Persianas, noche, KV café, JN1 |
+| Acento de utilería (jarrón o libro naranja) | Se lee puesto; el acento nace de la situación | Revisión de rondas `v2`/`oficio` |
+| Azul intermedio en ropa grande | Ni acento ni campo: camisa azul Miami 16% del cuadro, hoodie del contrapicado 17% **[medido]** | `oficio3/1-aeo-miami`, `camaras/4-contrapicado` |
+| Paneles azules grandes de fondo en cada escenario/podcast | Se repiten entre piezas | `personas/J3`, `personas/JN2` |
+| Composiciones determinísticas como pieza final | «no me gustan tanto a menos que sean referencias para pasarla al modelo y curar con IA generativa» | UI de referencia `scripts/ui-ref.cjs`, `scripts/ui-ia.cjs` usadas sólo como insumo |
+| Logo como sello o marca de agua | Al 20% de ancho se leía como sello; bajó a 15% | Rondas `asiento`/`territorios` vs `oficio` en adelante |
+
+## 7. Historia de decisiones
+
+Todas del 2026-09-19. Citas del operador verbatim o casi.
+
+| # | Momento | Decisión o cita | Efecto en el sistema |
+|---|---|---|---|
+| 1 | Encargo | «que incluso al ver una foto y su colorimetría se pueda sentir que es un elemento o foto de la agencia» | Objetivo del sistema |
+| 2 | Ronda 1 (`ejemplos/`) | «los de la izquierda me gustan más» (natural sobre grade navy) | Sin grade; se descarta la propuesta V0/V1 del grade |
+| 3 | Encargo | «necesitamos vernos como una agencia premium basado en cómo nos vendemos» | Barra premium |
+| 4 | Firma | «un leve desenfoque que consista en un elemento superpuesto entre la cámara y adonde va a enfocar como excusa para que allí siempre vaya el logo que va en el centro; el objeto NO debe ser forzado sino planeado y natural desde el inicio» | Nace la firma de primer plano planeado (ronda `asiento/`) |
+| 5 | Color | «la colorimetría no es vestir de navy» | El navy sale de la ropa como firma; roles de color por luz y objeto |
+| 6 | Referentes | Premium, sofisticada, moderna, «agencia A1 de clase mundial»; le gustó el set tonal verde (T3) y la limpieza y color de sets y oficinas de podcasts de marketing de EE. UU. | Rondas `territorios/` y `paleta/`; T3 queda como referencia de serenidad |
+| 7 | Modos | Debe funcionar con equipo de uniforme, con personas sin marca y sin personas (objetos, espacios, 3D) | Criterio 5 de la barra; V2 prueba los tres modos |
+| 8 | Grilla V2 | «muy muy genérico, efeonce es una agencia creativa también» | Rechazo de la V2; nace «El oficio a la vista» |
+| 9 | Color | Preguntó por el lima y el naranja | Roles: naranja = idea, lima = resultado |
+| 10 | Realismo | «una buena imagen de IA es la que no se siente que es IA» | Regla de realismo |
+| 11 | Realismo | «tanto desorden y suciedad tampoco se ve bien» | Bloque de realismo v2: limpio con 1–2 detalles de uso |
+| 12 | Pantallas | «Las composiciones deterministas no me gustan tanto a menos que sean referencias para pasarla al modelo y curar con IA generativa» | Método de pantallas por curación generativa (`oficio2/`, `oficio3/`) |
+| 13 | Impacto | «falta un nivel más para garantizar impacto visual» | Rondas `impacto/`, `cruce/`, `palancas/` |
+| 14 | Texto | «las imágenes deben dejar espacio a veces para donde se vaya a agregar los textos» | **[pendiente]**: no trabajado aún |
+| 15 | Categoría | «nosotros NO somos Berel» | Set curado sin pintura; variar industrias (memoria `feedback_brand_photo_no_client_category_anchor.md`) |
+| 16 | Cierre | Aprobó todo; destacó el ojo de pez con Nexa (N1b) y la versión anterior desde el borde de la mesa a ras (N1): «son dos ángulos que podemos usar» | Ambos ángulos entran al catálogo |
+
+Recorrido completo ronda por ronda en la [bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md).
+
+## 8. Operación y costos
+
+- Motor: `gpt-image-2.5-flare` (sin identidad) o `gpt-image-2.5-sunburst` (identidad o edición), `--quality high`,
+  1152×1440, vía `pnpm ai:image`.
+- Costo **[medido]**: ≈ USD 0,05 por imagen `high` 1152×1440 (1669 tokens de salida); `xhigh` ≈ USD 0,09; ediciones
+  ≈ USD 0,07–0,10. La sesión completa costó ≈ USD 6–7 en ~95 imágenes.
+- Scripts (hoy dentro de la corrida, no promovidos a `pnpm`): `medir.mjs`, `metricas.cjs`, `componer.mjs`,
+  `firmar.mjs` (v1), `ui-ref.cjs`, `ui-ia.cjs`, `efeonce-look.mjs` (histórico, descartado).
+
+## 9. Pendientes
+
+| Pendiente | Por qué importa | Condición de cierre |
+|---|---|---|
+| Espacio para texto | Pedido explícito del operador | Reglas de reserva por formato probadas en piezas reales |
+| Formatos 9:16 y 16:9 nativos | Todo se probó en 4:5 | Rondas nativas con lecho y logo medidos (propuesta del subagente de composición: lecho 4:5 22–28%; 9:16 18–22% con logo a 85–88%; 16:9 25–30%; 1:1 20–25%) |
+| Firma en dron y tomas todo-enfocadas | Sin desenfoque, la franja se ve algo puesta | Decisión del operador sobre la firma alternativa (url-lum) |
+| Promover scripts a comando `pnpm` | Hoy viven en la carpeta de la corrida | Comando canónico con tests |
+| Prueba de reconocimiento | Sin ella no hay «activo distintivo» | n ≥ 100 del público objetivo, distractores coherentes, medición antes y después |
+| Masters `xhigh` y limpieza | Inscripción diminuta en la cámara; emblemas por revisar letra por letra | Master limpio con QA al zoom |
+| Equipo real para piezas publicables | Verdad operativa | Sesión Run & Gun con el equipo |
+| Pruebas con Clawd, Codex, logo y nave 3D con Julio y Nexa | Extender el sistema a las mascotas y al 3D | En curso tras esta documentación |
+
+## 10. Referencias
+
+- Contexto de marca: [`docs/context/09_marca-agencia.md`](../../context/09_marca-agencia.md) (Golden Circle, SSOT del Why), [`docs/context/01_quienes-somos.md`](../../context/01_quienes-somos.md).
+- Regla previa de marca en escena: [`brand-in-scene.md`](../../../.claude/skills/social-media-studio/references/brand-in-scene.md) §«Primer plano desenfocado como lecho de la marca» (evolucionada por la [firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md)).
+- Paleta de marca: `.claude/skills/content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md` §2.
+- Evidencia: [`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/`](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md).
+- Propuesta intermedia descartada (grade navy): `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/PROPUESTA_LENGUAJE_FOTOGRAFICO_V1.md` (su §5 de prueba de reconocimiento sigue vigente como método).

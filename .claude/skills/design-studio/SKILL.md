@@ -276,3 +276,12 @@ Para comida, mesa y detalles de una celebración, cargar
 referencias, anatomía, apetito, luz, profundidad, decisión foto/generación/3D y composición por ratio.
 El [caso Fiestas Patrias](../../../docs/operations/social/2026-09-13-fiestas-patrias-production-method.md)
 conserva la metodología completa con evidencia y programación.
+
+## Fotografía de marca propia Efeonce
+
+Para fotografía o imagen fotorrealista de **la marca Efeonce** (no de clientes), cargar
+[lenguaje fotográfico de Efeonce](references/efeonce-photographic-language.md), aprobado el 2026-09-19:
+«El oficio a la vista», barra de juicio, firma con primer plano **planeado** y logo SVG al 15%, roles de color,
+WB sin grade, catálogo de tomas y checklist QA. **NUNCA** anclar la serie en la categoría de un cliente real.
+El [documento maestro](../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) conserva el
+contrato completo; la producción del pixel sigue en `greenhouse-ai-image-generator`.

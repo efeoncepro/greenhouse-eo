@@ -150,6 +150,9 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
 - No copies cifras desde esta skill ni inventes presets universales. Lee la versión vigente de
   `axisAdvertising`; un valor de campaña sólo se reutiliza si el nuevo formato reproduce sus condiciones.
 - No incrustes copy crítico o logos dentro de una generación cuando el texto debe ser exacto.
+- La fotografía de marca propia Efeonce sigue el
+  [lenguaje fotográfico](../design-studio/references/efeonce-photographic-language.md): la firma sobre el lecho
+  desenfocado usa el SVG oficial **compuesto** (15% del ancho, contraste ≥ 4,5:1 medido), **nunca generado**.
 - No uses rectángulos decorativos detrás de palabras como solución automática. Un plate existe para asegurar
   contraste y debe responder a la composición, no parecer una etiqueta accidental.
 - No conviertas un ejemplo aprobado en regla universal ni un mockup didáctico en campaña publicada.

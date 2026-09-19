@@ -1,0 +1,473 @@
+# Bloques de prompt y pipeline de producción — fotografía de marca Efeonce V1
+
+> **Tipo de documento:** Especificación técnica de producción (prompts, comandos, scripts, QA)
+> **Versión:** 1.0
+> **Creado:** 2026-09-19 por Claude
+> **Última actualización:** 2026-09-19 por Claude
+> **Documentación relacionada:** [Índice](./README.md) · [Lenguaje fotográfico (maestro)](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma: primer plano y logo](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Manual de uso](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
+
+Este documento es el **cómo se produce**: los bloques de texto que se pegan en cada prompt (verbatim), la ficha de
+toma, el pipeline paso a paso con los comandos exactos, la medición, la curación de pantallas, la composición de la
+firma, el QA, los costos y las trampas conocidas.
+
+Evidencia: `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/` («la corrida»). Los prompts de cada ronda están
+verbatim en `rondas/<ronda>/batch*.json` y `*.txt` (versionados); las imágenes son locales (gitignoreadas).
+
+Marcas: **[medido]**, **[decisión del operador]**, **[criterio]**, **[pendiente]** (ver [índice](./README.md)).
+
+---
+
+## 1. Anatomía de un prompt
+
+Orden canónico **[criterio, usado en todas las rondas aprobadas]**:
+
+```text
+[REALISMO v2]                 ← §3.1 (o su variante para personas con referencia, §3.1.1)
+[IMPACTO v1]                  ← §3.2 (piezas de impacto) — o COLOR SYSTEM §3.3 (piezas serenas)
+[WB / EXPOSICIÓN fuerte]      ← §3.4, cuando hay mesa de luz, blancos grandes o sala clara
+[IDENTITY Julio / Nexa]       ← §3.6, sólo con personas reales de referencia
+[REFERENCES ...]              ← §3.7, rol de cada imagen de referencia
+SCENE: servicio · ciudad · luz y hora · momento · acento y su origen · lente y foco   ← ficha §2
+[regla de NOCHE]              ← §3.5, dentro de SCENE, sólo de noche
+FOREGROUND (planned): ...     ← §3.8, siempre al final, con tono declarado
+```
+
+Todo prompt pide **4:5 vertical** hoy (el bloque de realismo lo dice). Otros formatos: [pendiente], ver
+[catálogo §5](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md#5-formatos).
+
+---
+
+## 2. Ficha de toma (plantilla)
+
+Se llena **antes** de escribir el prompt. Una ficha = una foto.
+
+| Campo | Qué poner | Ejemplo (K1, KV café) |
+|---|---|---|
+| Servicio / oficio | Qué servicio de Efeonce se ve trabajando | Dirección de arte / Creative Services |
+| Obra visible | La cosa concreta que se está haciendo | Pruebas impresas de un KV |
+| Mecanismo | Sistema, traza o dato que se ve | Lupa + corrección con lápiz graso |
+| Industria (no-cliente) | Café, bebidas, panadería, retail, finanzas, gastronomía, eventos. **Nunca la categoría de un cliente real** | Café de especialidad |
+| Mercado / ciudad | Santiago, CDMX, Bogotá, Lima, Miami | Santiago |
+| Cámara / lente / ángulo | Del [catálogo](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) | Picado 60°, 50 mm f/4 |
+| Luz y hora | Haz de sol, persianas, contraluz, dorada, mediodía, noche | Haz bajo de sol de mañana |
+| Momento | La tensión o el pico de la acción | La mano marca el vapor |
+| Azul (la casa) | Portador del `#0375DB` y su modo (acento o campo) | Taza azul (acento) — *variar el portador en la serie* |
+| Acento de historia | Naranja (idea) **o** lima (resultado) y de dónde nace | Lápiz graso naranja |
+| Lecho + tono | Primer plano planeado + DARK / VERY LIGHT | Borde de la mesa de luz, VERY LIGHT |
+| Formato | 4:5 (probado) | 4:5 1152×1440 |
+| Firma | Logo / selección AXIS / sin firma | Logo |
+| Personas | Casting, o Julio/Nexa con referencias | Sólo manos |
+
+---
+
+## 3. Bloques verbatim
+
+### 3.1 Realismo v2
+
+Archivo: `prompts/bloque-realismo-v2.txt`. Nace de la regla del operador «una buena imagen de IA es la que no se
+siente que es IA» y de su rechazo a la suciedad **[decisión del operador]**.
+
+```text
+IT MUST NOT LOOK AI-GENERATED: a real candid documentary photograph taken by a working photographer on a full-frame mirrorless camera with a real lens. Realism comes from PEOPLE, LIGHT AND MATERIALS, not from dirt: visible skin pores, fine wrinkles, uneven skin tone, stray hairs, natural fabric creases, real paper texture, soft dust visible only in a beam of light, slight motion blur on moving hands, subtle natural lens vignetting, a slightly imperfect un-staged composition. The SPACE is clean, cared-for and organized like a premium creative studio: only one or two lived-in details (a mug, a notebook); NO dirt, NO stains, NO coffee rings, NO loose tape scraps, NO tangled cables, NO mess. No plastic skin, no perfect symmetry, no glossy CGI surfaces, no over-sharpening, no HDR, no beauty retouching, no stock-photo smiles. Natural true-to-life color with no color grading; highlights keep detail, shadows open. Latin American people with real, characterful faces. No text, no letters, no numbers, no logos, no watermarks anywhere. Vertical 4:5.
+```
+
+#### 3.1.1 Variante para personas con referencia (Julio / Nexa)
+
+Idéntico pero **sin** la oración «Latin American people with real, characterful faces.» (la identidad la dan las
+referencias y el bloque IDENTITY; la oración de casting compite con ellas) **[criterio, usado en `rondas/personas/`]**.
+
+#### 3.1.2 Versión retirada (v1) — no usar
+
+La v1 pedía «fingerprints and smudges, … lived-in clutter (cables, tape, mugs, scraps)». Resultado: suciedad. El
+operador: «tanto desorden y suciedad tampoco se ve bien» **[decisión del operador]**. Queda sólo en
+`rondas/oficio2/batch.json` como historia.
+
+### 3.2 Impacto v1
+
+Archivo: `prompts/bloque-impacto-v1.txt`. Se usa en las piezas de nivel +1 (`impacto/`, `cruce/`, `palancas/`,
+`curado/`, `personas/`).
+
+```text
+VISUAL IMPACT (this is an award-level editorial photograph, the kind that stops the scroll): ONE bold visual idea per frame; LIGHT WITH CHARACTER — a hard, directional beam of real sunlight or a single strong source sculpting the subject, with crisp graphic shadows and rich but detailed darks (never flat, never evenly lit); a DECISIVE MOMENT at the peak of the action; a GRAPHIC COMPOSITION with strong geometry, clear figure-ground separation and generous calm negative space; THREE distinct depth planes (blurred foreground, sharp subject, soft background). COLOR: natural true-to-life color, no grading; a restrained palette where one bold field or object in bright azure blue (#0375DB) creates the graphic punch, everything else calm and neutral-warm; highlights keep detail; white balance warm-neutral, shadows never blue.
+```
+
+### 3.3 Color system (piezas serenas y cámaras)
+
+Verbatim de `rondas/camaras/batch.json`. Reemplaza al bloque de impacto cuando la pieza no busca impacto máximo.
+
+```text
+COLOR SYSTEM: a calm tonal background field; skin and real materials; ONE vivid accent of bright azure blue (#0375DB) from light or a single object (never walls), covering only a small part of the frame; plus at most ONE small story accent described in the scene. Moderate contrast. WHITE BALANCE AND EXPOSURE: warm-neutral daylight (about 5200K), whites very slightly warm, never bluish; shadows neutral, never blue; exposed for the highlights, bright surfaces keep texture and detail.
+```
+
+Variante corta usada en `oficio3/` (sin WB): «COLOR SYSTEM: a calm tonal background field; skin and real materials;
+ONE vivid accent of bright azure blue (#0375DB) from light or a single object (never walls); plus at most ONE small
+story accent described in the scene. Moderate contrast, soft natural daylight as key, practical lamps off.»
+
+### 3.4 Balance de blancos y exposición (versión fuerte)
+
+Verbatim de `rondas/oficio3/bfix.json`. Obligatorio con mesas de luz, blancos grandes o salas claras. Efecto medido:
+Lima b* altas −7,2 → 0,0; KV quemado 31,5 % → 0,05 % ([colorimetría §5.2](./EFEONCE_PHOTO_COLORIMETRY_V1.md#52-efecto-medido-del-bloque-de-balance-y-exposición)).
+
+```text
+WHITE BALANCE AND EXPOSURE: warm-neutral daylight white balance (about 5200K): whites read clean and very slightly warm, never bluish; shadows neutral, never blue or cyan. Exposed for the highlights: bright surfaces keep texture and detail, nothing pure white or blown out except tiny specular glints.
+```
+
+### 3.5 Regla de noche
+
+Va **dentro** de SCENE. Verbatim de `rondas/curado/batch.json` (K3). Aplastado 18,5 % → 7,1 % **[medido]**.
+
+```text
+NIGHT COLOR RULE: natural mixed light, skin natural and warm, city lights small warm and white points, NO teal-and-orange, NO neon; shadows deep but ALWAYS with visible texture and detail in clothes, desk and room (no pure black areas).
+```
+
+### 3.6 IDENTITY (personas reales)
+
+Verbatim de `rondas/personas/*.txt`. Detalle y QA en [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
+
+```text
+IDENTITY (critical): the man is the SAME real person shown in the Julio reference images: a Venezuelan man in his mid-forties with short salt-and-pepper curly hair, thin rectangular silver-rim glasses, a full dark beard with grey, warm brown skin. Preserve his face, glasses, beard and build EXACTLY as in the references; only pose, clothing, light and setting change. Do not beautify or change his age.
+```
+
+```text
+IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images: a woman in her early thirties with long dark wavy hair, fair olive skin, dark eyes and defined brows. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.
+```
+
+### 3.7 REFERENCES (rol de cada imagen)
+
+Cada `--image` necesita una frase que diga **qué tomar y qué ignorar** **[criterio, medido en QA de identidad]**.
+
+| Caso | Texto verbatim |
+|---|---|
+| Julio solo | «REFERENCES: Images 1-3 are Julio (identity only; ignore their clothing and backgrounds).» |
+| Julio + polo | «REFERENCES: Images 1-3 are Julio (identity only). Images 4-5 are the Efeonce team polo (deep navy pique with a small embroidered emblem on the left chest): use it as his exact garment.» |
+| Julio + Nexa | «REFERENCES: Images 1-2 are Julio (identity only). Images 3-4 are Nexa (identity only). Ignore the clothing and backgrounds of all references.» |
+| Nexa sola | «REFERENCES: Images 1-3 are Nexa (identity only; ignore their clothing and backgrounds).» |
+| Polo (equipo) | «REFERENCES: Image 1 and Image 2 show the Efeonce team polo (deep navy pique polo with a small embroidered emblem on the left chest). Use them ONLY as the exact garment: same color, collar, fabric and embroidered emblem in the same position and size. Do not copy the studio background or presentation.» |
+| Nave 3D (emblema) | «REFERENCES: Image 1 is the official white 3D model of the Efeonce ship emblem. Reproduce EXACTLY this object — same silhouette, the ring/orbit with its cuts, the three small windows, same proportions — as a real, physical, finely made matte white ceramic sculpture about 20 cm long. Do not redraw or simplify it.» (`rondas/v2/edit-nave.txt`) |
+
+Rutas de referencia:
+
+| Referencia | Ruta |
+|---|---|
+| Julio (rostro) | `ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-01.png`, `-04.png` |
+| Julio (cuerpo) | `ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-07.png` |
+| Nexa | `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`, `nexa-the-point.png`, `nexa-the-listen.png` |
+| Polo | `ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-01-frente…png`, `…-10-detalle-bordado…png` |
+
+### 3.8 FOREGROUND (plantilla del lecho)
+
+Plantilla consolidada de las rondas `cruce/`, `curado/`, `palancas/`, `personas/` **[medido: todas las del set
+curado]**. Siempre al final del prompt.
+
+```text
+FOREGROUND (planned): <herramienta o superficie propia de la escena, sin logos ni texto>, so close to the lens that it dissolves into a soft abstract blur with no visible edges or details, spanning the ENTIRE width of the bottom 18% of the frame (never a hard band), <TONO>; its center calm and even.
+```
+
+| `<TONO>` | Texto verbatim que funcionó |
+|---|---|
+| Oscuro | «DARK near black» · «DARK in shadow» · «DARK walnut in shadow» · «DARK charcoal» · «DARK but with subtle texture» (noche) |
+| Claro | «VERY LIGHT, pale oak in sun, almost white» · «VERY LIGHT, warm white» · «VERY LIGHT, bleached pale oak lit directly by daylight, almost white, the brightest surface in the lower frame» |
+
+Refuerzos cuando el lecho sale nítido (retail): «the lens is almost touching a row of … shot wide open at f/1.4, so
+they dissolve completely into a smooth, abstract, creamy dark blur with no shapes, highlights, edges or details at
+all» (`curado/b2.json`, K2b). Sin esto la fila de botellas/latas salió nítida dos veces (p99 90 y 47) **[medido en
+sesión]**. Catálogo de lechos por toma: [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) y
+[catálogo](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md).
+
+Excepción dron (todo enfocado): «BOTTOM AREA (planned): the bottom 18% of the frame is a calm, even band of very
+pale, almost white limestone paving in full sun, seamless with no joints or lines, with nothing on it (no people, no
+shadows, no objects).»
+
+### 3.9 Bloques históricos (V2, rechazados como genéricos)
+
+`rondas/v2/` usó bloques «World-class creative agency photography … SET: one single tonal color family …» y
+«ROOM PALETTE (ink family / warm-neutral family)». El operador rechazó la V2: «muy muy genérico, efeonce es una
+agencia creativa también» **[decisión del operador]**. Se conservan dos aprendizajes: pedir paredes tinta **por
+material** y la paleta cálida sin azul en sala («NO blue elements in the room at all»). No usar los bloques completos.
+
+---
+
+## 4. Pipeline paso a paso
+
+| Paso | Qué | Herramienta | Salida |
+|---|---|---|---|
+| 1 | Ficha de toma (§2) | Documento / prompt | Ficha |
+| 2 | Armar prompt (§1) y batch JSON | Python `json.dump` | `batch.json` |
+| 3 | Generar plates | `pnpm ai:image --batch` | `*-plate.png` |
+| 4 | Hoja de contacto y revisión | Visor / Read | Lista de candidatas |
+| 5 | Medir lecho | `medir.mjs` | max/p99/lum |
+| 6 | Regenerar si falla (§5.3) | `pnpm ai:image` | Nuevo plate |
+| 7 | Pantallas por curación generativa (si hay pantalla) | `--image` + `--mask` | Plate con UI integrada |
+| 8 | Firma / selección AXIS | `componer.mjs` | `*-final.png` |
+| 9 | Métricas Lab | `metricas.cjs` | Tabla |
+| 10 | QA al zoom (§8) | Ojo humano | Aprobada / regenerar |
+| 11 | Grilla para revisión del operador | sharp (hoja de contacto) | `*.jpg` |
+
+### 4.1 Preparar la carpeta de la corrida
+
+```bash
+cd /Users/jreye/Documents/greenhouse-eo
+RUN=ai-generations/$(date +%F)_<slug>
+mkdir -p $RUN/rondas/<ronda> $RUN/prompts $RUN/scripts
+cp ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/bloque-*.txt $RUN/prompts/
+cp ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/{medir.mjs,metricas.cjs,componer.mjs} $RUN/scripts/
+```
+
+`ai-generations/` es la carpeta durable de corridas (no `.captures/`, que se purga) **[criterio, memoria del
+operador]**.
+
+### 4.2 Construir el batch con Python
+
+Los prompts tienen comillas, apóstrofes y `#`: **no** escribir el JSON a mano ni con `echo` **[medido: comillas rotas
+en sesión]**.
+
+```bash
+python3 - <<'EOF'
+import json
+R = open('prompts/bloque-realismo-v2.txt').read().strip()
+I = open('prompts/bloque-impacto-v1.txt').read().strip()
+shots = [
+  ("K1-kv-cafe-plate.png", """SCENE (creative art direction, Santiago studio): ... 50mm lens at f/4, focus on the main proof.""",
+   """FOREGROUND (planned): the near edge of the light table, so close to the lens that it dissolves into a soft abstract blur with no visible edges or details, spanning the ENTIRE width of the bottom 18% of the frame (never a hard band), VERY LIGHT, warm white; its center calm and even."""),
+]
+batch = [{"filename": f, "prompt": f"{R}\n\n{I}\n\n{scene}\n\n{fg}"} for f, scene, fg in shots]
+json.dump(batch, open('rondas/<ronda>/batch.json', 'w'), ensure_ascii=False, indent=1)
+EOF
+```
+
+### 4.3 Generar
+
+```bash
+pnpm ai:image --batch $RUN/rondas/<ronda>/batch.json --out $RUN/rondas/<ronda> \
+  --model gpt-image-2.5-flare --quality high --size 1152x1440
+```
+
+| Parámetro | Valor | Por qué |
+|---|---|---|
+| `--model` | `gpt-image-2.5-flare` para escenas sin identidad; `gpt-image-2.5-sunburst` con referencias de identidad o ediciones | Sunburst sostuvo mejor la identidad al mismo costo por quality×size **[medido]** |
+| `--quality` | `high` para explorar; `xhigh` sólo masters | xhigh ≈ 1,8× costo, mejora modesta ([catálogo §6](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md#6-high-vs-xhigh)) |
+| `--size` | `1152x1440` (4:5) | Único formato probado |
+| `--out` | **Directorio** (sin extensión) en modo `--batch` | Desde el commit `5946f14a0`; antes se ignoraba y las imágenes caían en `public/images/generated` (§9) |
+
+Con referencias (una sola imagen, no batch):
+
+```bash
+R="--image ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-01.png --image ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-04.png --image ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-07.png"
+pnpm ai:image ${=R} --prompt-file $RUN/rondas/personas/J1-retrato.txt \
+  --out $RUN/rondas/personas/J1-retrato-plate.png \
+  --model gpt-image-2.5-sunburst --quality high --size 1152x1440
+```
+
+`${=R}` es obligatorio en zsh (§9).
+
+### 4.4 Revisar la hoja de contacto
+
+Mirar todas las candidatas juntas antes de medir: la serie se juzga como serie (sesgos repetidos, taza azul, paneles
+azules, pintura) **[criterio]**.
+
+---
+
+## 5. Medición y umbrales para regenerar
+
+### 5.1 Lecho (`medir.mjs`)
+
+```bash
+cd $RUN
+node scripts/medir.mjs rondas/<ronda>/<pieza>-plate.png '{"lecho":[0.30,0.87,0.70,0.995],"rostro":[0.40,0.25,0.60,0.45]}'
+```
+
+Salida: `lecho  max  13  p99   7  lum media 19`. Coordenadas relativas `[x0, y0, x1, y1]`. Ajustar la caja del rostro
+a cada pieza. Definición: [colorimetría §7.2](./EFEONCE_PHOTO_COLORIMETRY_V1.md#72-medirmjs--nitidez-del-lecho-firma).
+
+### 5.2 Métricas Lab (`metricas.cjs`)
+
+```bash
+node scripts/metricas.cjs K1=rondas/curado/K1-kv-cafe-plate.png K3=rondas/curado/K3-noche-plate.png
+```
+
+Imprime una tabla (`console.table`) con Lmedia, p1, p99, quemado, aplastado, contraste, Cmedia, Cp95, dispTono, bAltas,
+bSombras, azul, naranja, lima y piel. Medir siempre el **plate** (sin logo). Rangos por contexto:
+[colorimetría §7.4](./EFEONCE_PHOTO_COLORIMETRY_V1.md#74-rangos-objetivo-por-contexto).
+
+### 5.3 Cuándo regenerar
+
+| Señal | Umbral | Acción |
+|---|---|---|
+| Lecho nítido | p99 > ~20 o max > ~25 | Regenerar con «so close … no visible edges or details» (+ «almost touching … f/1.4» en retail) |
+| Lecho tono medio | `lum media` ~100–175 | Regenerar declarando DARK o VERY LIGHT («the brightest surface in the lower frame») |
+| Logo < 4,5:1 | `componer.mjs` lo reporta | Regenerar el lecho; nunca oscurecer/aclarar la foto a mano |
+| Quemado / aplastado fuera de rango | Según contexto | Bloque WB/exposición, regla de noche, «highlights keep detail» |
+| Azul intermedio en ropa | `azul` 10–18 % por una prenda | Reducir prenda o mover el azul a objeto/luz |
+| Marca de terceros o texto | Cualquiera visible al zoom | «completely unbranded, no brand names, no text, no logos anywhere on the body» |
+| Identidad | Rasgo cambiado (lentes, barba, edad) | Regenerar con Sunburst + IDENTITY + roles de referencia |
+
+---
+
+## 6. Curación generativa de pantallas
+
+Regla del operador: «las composiciones deterministas no me gustan tanto a menos que sean referencias para pasarla al
+modelo y curar con IA generativa» **[decisión del operador]**. Por eso **nunca se pega una UI** sobre la foto.
+
+### 6.1 Pasos
+
+| # | Paso | Detalle |
+|---|---|---|
+| 1 | Plate con pantalla en chroma | Pedir en SCENE: «the wall screen, seen almost straight-on and entirely inside the frame, is FULLY filled with flat uniform pure chroma-green (#00FF00), no reflections» |
+| 2 | UI de referencia determinística | `node ui-ref.cjs` (pipeline 1600×900, 4 columnas «Calificado · Propuesta · Negociación · Ganado», tarjeta «Ganado» en lima `#6EC207`, puntos en azul `#0375DB`, Poppins trazada con fontkit) o `node ui-ia.cjs` (respuesta de IA en teléfono 900×1900 con card «Recomendado» con borde lima). Se ejecutan desde la carpeta de la ronda; escriben `ui-pipeline-ref.png` / `ui-ia-ref.png` |
+| 3 | Máscara del chroma | §6.2 |
+| 4 | Edición con máscara | §6.3 |
+| 5 | Restaurar fuera de la pantalla | Componer: dentro de la máscara la edición, fuera el plate original, con alfa suavizado (`alpha-chroma.png`, `alpha-phone.png` en la corrida) |
+| 6 | QA al zoom | Caras (delta medio medido 16,5: cambian poco pero cambian), bordes del dispositivo, reflejos |
+
+### 6.2 Máscara (receta)
+
+Scripts guardados en la corrida (2026-09-19): `scripts/mascara-chroma.cjs <plate> <mask.png> <alpha.png>` y
+`scripts/restaurar-fuera-de-pantalla.cjs <plate> <edit> <alpha.png> <out.png>`. La receta equivalente es:
+
+```js
+// mask.mjs <plate> <mask.png> <alpha.png>
+import sharp from '/Users/jreye/Documents/greenhouse-eo/node_modules/sharp/lib/index.js'
+const [plate, maskOut, alphaOut] = process.argv.slice(2)
+const { data, info } = await sharp(plate).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+const { width: W, height: H } = info
+const chroma = Buffer.alloc(W * H)
+for (let i = 0; i < W * H; i++) {
+  const r = data[i * 3], g = data[i * 3 + 1], b = data[i * 3 + 2]
+  chroma[i] = g > 120 && g > 1.4 * r && g > 1.4 * b ? 255 : 0          // 255 = pantalla verde
+}
+// Dilatar: blur 2 + threshold 20. extractChannel(0) es OBLIGATORIO: sin él sharp devuelve 3 canales
+const dil = await sharp(chroma, { raw: { width: W, height: H, channels: 1 } })
+  .blur(2).threshold(20).extractChannel(0).raw().toBuffer()
+// Máscara para la API: alfa 0 = zona a editar, alfa 255 = protegida
+const rgba = Buffer.alloc(W * H * 4)
+for (let i = 0; i < W * H; i++) { rgba[i * 4 + 3] = 255 - dil[i] }
+await sharp(rgba, { raw: { width: W, height: H, channels: 4 } }).png().toFile(maskOut)
+// Alfa suavizado para restaurar el plate fuera de la pantalla
+await sharp(dil, { raw: { width: W, height: H, channels: 1 } }).blur(1.5).png().toFile(alphaOut)
+```
+
+Errores reales de la sesión:
+
+- Sin `extractChannel(0)` la máscara salió de 3 canales y **se desalineó**: 2 intentos fallidos **[medido]**.
+- Una **máscara rectangular** incluyó a una persona parada delante de la pantalla → la edición la convirtió en
+  fantasma. La máscara debe salir del chroma, no de un rectángulo **[medido]**.
+- La máscara **no preserva píxeles**: el modelo regenera toda la imagen y las caras pueden variar; por eso el paso 5
+  restaura desde el plate **[medido]**.
+
+### 6.3 Edición
+
+```bash
+pnpm ai:image --image rondas/cruce/X1-pipeline-atardecer-plate.png --image rondas/oficio2/ui-pipeline-ref.png \
+  --mask rondas/cruce/mask.png --prompt-file rondas/cruce/prompt.txt \
+  --out rondas/cruce/X1-edit.png --model gpt-image-2.5-sunburst --quality high --size 1152x1440
+```
+
+Prompt verbatim que funcionó (`rondas/cruce/prompt.txt`):
+
+```text
+Replace ALL of the flat chroma-green on the wall screen with the interface shown in Image 2, so that no green remains anywhere on the screen. The screen is a real lit LED display photographed in the room, lit in a warm golden-hour room; add a gentle warm glare of the low sun on the glass. Follow the screen's exact edges and perspective, keep the bezel, add the natural slight glare, a faint reflection of the window, the photo's white balance and a slight focus falloff so it looks photographed, not pasted. Keep the layout, colors and the lime-green "Ganado" card faithful to Image 2. Do not change the people, their faces, hands, expressions, the table, the window or the city. It must look like one real photograph.
+```
+
+Variantes verbatim: pantalla parcialmente tapada por una persona (`oficio2/prompt-pantalla2.txt`: «the interface
+continues naturally BEHIND him») y teléfono (`oficio3/prompt-phone.txt`: «keep the phone bezel, her fingers and thumb
+in front of the screen where they overlap»). Defecto conocido del teléfono: el borde inferior se fundió con la UI
+**[medido, visual]**.
+
+---
+
+## 7. Composición de la firma y selección AXIS (`componer.mjs`)
+
+```bash
+cd $RUN
+LOGO=0.15 node scripts/componer.mjs rondas/<ronda>/<pieza>-plate.png rondas/<ronda>/<pieza>-final.png
+# con selección colaborativa AXIS:
+LOGO=0.15 CSCALE=1.8 node scripts/componer.mjs rondas/cruce/X1-final-plate.png rondas/cruce/X1-final.png \
+  '{"box":{"left":620,"top":180,"right":1040,"bottom":480},"cursors":[{"id":"c1","kind":"collaborator","label":"Cliente","anchor":"top-start"},{"id":"c2","kind":"collaborator","label":"RevOps","anchor":"top-end"}],"colors":{"c1":"#6EC207","c2":"#0375DB"},"padding":"compact","local":"bottom-end"}'
+# (valores de caja ilustrativos: medir el objeto real en píxeles del plate)
+```
+
+| Parámetro | Qué hace | Valor canónico |
+|---|---|---|
+| `LOGO` (env) | Ancho del logo como fracción del ancho del lienzo. **Default del script: 0.15** (desde 2026-09-19) | **0.15** (bajó de 0,20 porque se leía como sello) **[decisión del operador]** |
+| `CSCALE` (env) | Escala de las etiquetas de los cursores colaboradores | 1.8 (default) |
+| Posición | Centrado horizontal; centro vertical a 93,5 % del alto | Fija en el script |
+| Color del logo | Compara blanco (`public/branding/logo-negative.svg`) vs navy (`logo-full.svg`) contra el píxel más claro / más oscuro del área del logo; elige el de mayor contraste | Mínimo 4,5:1 |
+| JSON de selección (3.er argumento) | `box` = límites del objeto en píxeles `{left, top, right, bottom}`; `cursors` = `{id, kind: "collaborator", label, anchor}` con `anchor` en una esquina (`top-start`, `top-end`, `bottom-end`, `bottom-start`); `colors` = `#rrggbb` por id; `padding` (`standard`/`compact`); `local` = ancla del cursor local (default `bottom-end`) | Etiquetas cortas: Arte, Cliente, SEO, RevOps, Nexa. Anclas **hacia el espacio libre**: hacia el borde, las etiquetas salen del lienzo y el script aborta |
+
+Implementación: usa `resolveCollaborationSelectionIntent` (`@efeoncepro/axis-ui-contracts`) y
+`renderCollaborationSelection` (`scripts/creative/layout-compiler/axis-advertising.mjs`); convierte cada `<text>` en
+trazos con fontkit (Poppins Bold) y **aborta** si queda un `<text>` o si una etiqueta sale del lienzo
+(`evidence.withinCanvas`). Colores por rol: Cliente lima `#6EC207`, Arte naranja `#F55D01`, RevOps/Efeonce azul
+`#0375DB`, Nexa `#D6246E`, SEO `#12AFA2`. **Nunca** etiquetar con el nombre de un cliente real («Berel» → «Cliente»)
+**[decisión del operador]**. Reglas completas: [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md).
+
+Salida: `…-final.png logo blanco 18.82:1 selección OK`.
+
+`firmar.mjs` (firma v1: `node firmar.mjs <plate> <out> <cy_frac> [ancho_frac]`) queda como histórico; usar
+`componer.mjs`.
+
+---
+
+## 8. QA final (checklist)
+
+| # | Chequeo | Cómo | Bloquea |
+|---|---|---|---|
+| 1 | Test de sustitución: con el logo de otra agencia, ¿deja de funcionar? | Mirar | Sí |
+| 2 | Hay obra, mecanismo e idea (no reunión genérica) | Mirar vs ficha | Sí |
+| 3 | No parece IA: piel, manos, dedos, texto fantasma, simetría | Zoom 200 % | Sí |
+| 4 | Limpio sin suciedad | Mirar | Sí |
+| 5 | Azul presente; un solo acento (naranja **o** lima) que nace de la escena | Mirar + `metricas.cjs` | Sí |
+| 6 | Sin grade; b* sombras −3 a +3; quemado/aplastado en rango | `metricas.cjs` | Revisar |
+| 7 | Lecho desenfocado, tono declarado, transición gradual (≥ 5 % del alto) | `medir.mjs` + zoom | Sí |
+| 8 | Logo ≥ 4,5:1, 15 % de ancho, no parece sello | `componer.mjs` | Sí |
+| 9 | Sin marcas de terceros ni inscripciones (cámaras, botellas, autos) | Zoom | Sí |
+| 10 | Sin categoría de un cliente real ni insinuación de trabajo con él | Leer la escena | Sí |
+| 11 | Identidad de Julio/Nexa y emblema del polo letra por letra | Zoom junto a la referencia | Sí |
+| 12 | Nadie mira a cámara (salvo decisión explícita) | Mirar | Revisar |
+| 13 | La serie no repite objeto de acento ni paneles azules | Hoja de contacto | Revisar |
+| 14 | Funciona a 390 px de ancho | Reducir y mirar | Revisar |
+| 15 | Para publicar: ¿necesita equipo real? (casting de IA = stock premium) | Criterio | Revisar **[criterio]** |
+
+---
+
+## 9. Costos por operación
+
+| Operación | Costo aprox. | Fuente |
+|---|---|---|
+| Flare o Sunburst, `high`, 1152×1440 | ≈ USD 0,05 por imagen (1669 tokens de salida) | [medido] |
+| `xhigh`, 1152×1440 | ≈ USD 0,09 | [medido] |
+| Edición con `--image` / `--mask` | ≈ USD 0,07–0,10 (suma tokens de entrada) | [medido] |
+| Sesión completa del 2026-09-19 | ≈ USD 6–7 en ~95 imágenes | [medido] |
+| `medir.mjs`, `metricas.cjs`, `componer.mjs` | USD 0 (local) | — |
+
+---
+
+## 10. Trampas conocidas (gotchas)
+
+| Trampa | Síntoma | Solución |
+|---|---|---|
+| zsh no divide variables | `R="--image a --image b"; pnpm ai:image $R …` pasa un solo argumento; 8 llamadas fallaron (sin costo) | `pnpm ai:image ${=R} …` |
+| Glob sin coincidencias en zsh | `cp rondas/*/*-final.png dest/` aborta el comando entero si un patrón no calza | `setopt nullglob` antes de copiar con globs |
+| `--batch` ignoraba `--out` | Imágenes caían en `public/images/generated` (dentro del repo) | Corregido en `5946f14a0`: `--out` sin extensión = directorio del lote; con extensión de imagen aborta antes de gastar |
+| Máscara de 3 canales | Edición desalineada | `extractChannel(0)` (§6.2) |
+| Máscara rectangular | Persona delante de la pantalla sale fantasma | Máscara desde el chroma |
+| Marcas de terceros | Cámara con «Blackmagic»; quedó una inscripción diminuta en I6b | «completely unbranded, generic … (no brand names, no text, no logos anywhere on the body)» + zoom |
+| Lecho de tono medio | Logo sin contraste (6+ fallos, lum 139–171) | Declarar tono siempre |
+| JSON a mano | Comillas rotas | `json.dump` (§4.2) |
+| `componer.mjs` sin `LOGO` | Antes: logo al 20 % | Default corregido a 0,15 el 2026-09-19; `LOGO` sólo para variar |
+| Medir la pieza firmada | El logo contamina las métricas | Medir el plate |
+
+---
+
+## 11. Estado de los scripts
+
+| Script | Ubicación | Estado |
+|---|---|---|
+| `medir.mjs` | `scripts/` de la corrida | Vigente; rutas absolutas a `node_modules/sharp` del repo |
+| `metricas.cjs` | Ídem | Vigente |
+| `componer.mjs` | Ídem (copia de trabajo en `rondas/oficio2/`) | Vigente |
+| `ui-ref.cjs`, `ui-ia.cjs` | Ídem (copias en `rondas/oficio2/`, `rondas/oficio3/`) | Vigentes como plantilla de UI de referencia |
+| `firmar.mjs` | Ídem | Histórico (firma v1) |
+| `efeonce-look.mjs` | Ídem | **Descartado** (grade V0) |
+| Script de máscara | No persistido | Receta en §6.2 **[pendiente: persistir]** |
+| Comando `pnpm` (p. ej. `pnpm brand-photo:measure`) | — | **[pendiente]**: promover a `scripts/` del repo con tests y umbrales por contexto |

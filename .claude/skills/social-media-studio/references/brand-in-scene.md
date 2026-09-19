@@ -223,6 +223,26 @@ objeto que sale desenfocado… justo en el desenfoque se pone el logo». Caso fu
 > La primera versión de esta regla mandaba añadir un objeto delante de la cámara. Esa premisa quedó **falsada** en
 > el mismo caso: el desenfoque de primer plano ya estaba en la foto. Se medía después; ahora se mide **antes**.
 
+### Delta 2026-09-19 — en fotografía de marca propia Efeonce, el lecho se planifica desde la toma
+
+Con el [lenguaje fotográfico de Efeonce](../../design-studio/references/efeonce-photographic-language.md) aprobado,
+la firma dejó de ser un hallazgo posterior: el primer plano es una **herramienta o superficie del oficio** entre la
+cámara y el sujeto, **escrita en el prompt como `FOREGROUND`** antes de generar. No contradice la lección de abajo: lo
+que sigue prohibido es **añadir** un soporte después; lo que ahora se exige es **planearlo** como parte de la escena.
+
+- **Lechos probados:** borde de mesa a ras del lente · respaldo de silla del espectador · escritorio del visitante ·
+  matte box o rig · consola de corrección de color · borde de mesa de luz · fila de latas o botellas («casi tocando el
+  lente, f/1.4, sin bordes», o sale nítida) · marco de vidrio · maleta de equipo · techo de auto · cabezas del
+  público · cámara de estudio · mostrador · desenfoque óptico del tilt-shift · borde curvo de mesa en ojo de pez.
+- **Tono del lecho declarado SIEMPRE** («DARK near black» / «VERY LIGHT almost white»): la madera de tono medio hizo
+  fallar el contraste 6+ veces. Lecho p99 ≤ ~20 y transición gradual; si falla, **se regenera**.
+- **Logo al 15% del ancho**, centrado, SVG oficial compuesto (20% se leía como sello). Contraste ≥ 4,5:1 medido.
+- Contrato completo: [firma y primer plano](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md).
+
+Los **cinco soportes rechazados** de esta sección siguen prohibidos como añadidos: un objeto que existe sólo para
+sostener la marca se lee puesto, lo planees o no. La medición del Paso 1 sigue vigente para piezas que no nacen
+de este lenguaje (trendjacking, seasonality, plates ajenos).
+
 ### Paso 1 — medir el plate limpio antes de añadir nada
 
 Sobre el plate sin marca ni objetos añadidos, medir el **gradiente máximo** de luminancia en cada plano: el rostro
