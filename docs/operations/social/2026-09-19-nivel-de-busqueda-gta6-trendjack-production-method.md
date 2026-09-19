@@ -21,7 +21,7 @@ Aprobación del operador: «Me encanta todos… programemos». Horas = máximo s
 (IG mar 16 h, índice 311; LinkedIn vie 11 h, índice 2914), sin choque con el KV del lunes 21 ni «¿Claude o Codex?» del
 miércoles 23. Readback: texto idéntico a `COPY.md`; orden verificado por firma de imagen (primera = portada, última =
 contraportada, diferencia 0). Media en `gs://efeonce-group-greenhouse-public-media-prod/campaigns/nivel-de-busqueda-2026-09/`.
-Publicación y medición: pendientes.
+Publicación y medición: pendientes. Entrega al equipo en OneDrive: `5. Contenidos/Trendjacking/2026/2026-09-16-Lanzamiento GTA VI/Nivel de búsqueda/v04/` (manifiesto SHA-256 verificado).
 
 ## 2. Concepto
 

@@ -94,6 +94,15 @@ audio y documentos, sin convertir toda la biblioteca a PNG.
 portada de video YouTube 1920×1080. PNG v8; revisión del operador pendiente. No incluir el copy de publicaciones
 como aprobado: la conversación todavía no cerró su selección. La portada no es banner de canal.
 
+## Caso inicial de Trendjacking
+
+`Trendjacking/` existe desde el 2026-09-19 en la raíz, con un `LEEME.md` que explica la convención y un índice de casos.
+Primer caso: `Trendjacking/2026/2026-09-16-Lanzamiento GTA VI/Nivel de búsqueda/v04/`, que contiene
+`Carrusel Instagram y LinkedIn/` (láminas 01–09 en orden de publicación + PDF de LinkedIn) y `Pieza suelta/` (aparte,
+no programada), junto con `LEEME.md` (idea y guía visual), `COPY.md`, `PROGRAMACION.md` y `manifiesto.json` (SHA-256
+igual al origen y a lo programado). El PNG es RGBA con alfa 255 en todos los píxeles: se entregó idéntico byte a byte
+a lo subido a Metricool, no re-aplanado. Al sumar un trendjacking nuevo, agregar su fila al índice del `LEEME.md` raíz.
+
 ## Videos dentro de una campaña
 
 Conservar `Seasonalities/<Ocasión>/<AAAA>/<Concepto>/Video/<Versión>/` cuando la finalidad sea estacional.
