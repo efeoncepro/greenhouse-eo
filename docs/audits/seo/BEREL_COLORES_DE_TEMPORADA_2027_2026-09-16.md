@@ -169,3 +169,32 @@ registrado como corrección para Drupal fuera de este alcance.
   fuente original.
 - Pendiente fuera de Notion (no visible al cliente): tareas visuales N1–N4 con ficha completa (N2 y N3 con ficha
   de infografía), matriz de distribución del módulo 15, activación de enlaces al publicar y QA en vivo.
+
+## Delta 2026-09-19 — V2 de las tres piezas de campaña tras los comentarios de Berel
+
+- **Alcance autorizado por el operador:** V2 de Color del Año 2027 (`3a639c2fefe7807d847cc099a0b99966`),
+  Colores de Temporada 2027 (`3dd39c2fefe781bf8ff1f1f943011491`) y Raíces de la piel
+  (`3d539c2fefe78131abe4fe1f0a1b6500`); respuesta a todos los hilos de Berel; enlaces entre piezas armados porque
+  las tres se publican el mismo día.
+- **Forma:** la V1 de cada página quedó como `🗄️ Histórico · Artículo V1` con todos sus hilos anclados; la V2 va
+  debajo como `✍️ Versión vigente para revisión · V2`; las notas internas salieron del artículo a
+  `🗒️ Notas internas de producción`. Ningún hilo desapareció ni fue marcado como resuelto.
+- **Criterio de Berel aplicado (17–18 sep):** entrada informativa sin escena; sin tiempo ni orden de paletas; sin
+  «ciclo» ni «colección 2027»; nombre del Color del Año enlazado una vez por página; fuera las tablas redundantes;
+  masters oficiales en el hub; sección ladrillo/adobe/terracota retirada del Color del Año (queda FAQ corta que
+  enlaza a Calidez Vibrante). Registro: módulo 09 de la skill («Campaña 2027», ⚠️ Choque 3).
+- **Enlaces:** rutas relativas (pestaña nueva en el sitio). Colores a su página de familia; `verdes`, `amarillos`,
+  `azules` y `morados` no cargan colores ni title, así que esos colores enlazan a `/colores`. Los 35 enlaces a
+  `/search?q=` del hub V1 salieron.
+- **Reparto de intenciones:** la diferencia Color del Año/paleta vive solo en el hub; los roles por color solo en
+  la página de cada paleta (como sugerencia, sin dato oficial); Bien y de Buenas se desarrolla solo en su artículo.
+- **Readback 2026-09-19 (OBSERVADO):** gate `client-visible-copy-gate` PASS en las tres páginas; cuerpos de
+  1.285 (Color del Año), 1.713 (hub) y 1.169 palabras (Raíces); hub y Raíces pasaron a `En revisión`, Color del
+  Año ya lo estaba.
+- **Pendiente de decisión:** tareas de diseño N2/N3 inexistentes en hub y Color del Año; Banner N1/N4 del Color
+  del Año congelados (en producción) con HEX y posición a conciliar; arte social del Color del Año (Facebook con
+  la tabla 60-30-10 de colores 2026, Reel con «luz de norte/sur») a conciliar con diseño; tareas de Reel marcadas
+  «No aplica» que contienen copy de Pin; excepción de extensión contractual y material oficial por pedir a Berel;
+  actualización del menú principal el día de publicación.
+- **Hallazgos del sitio (OBSERVADO):** el menú enlaza `/colores-de-temporada` y `/articulos/colores-de-temporada-2025`,
+  que cargan la página vacía.
