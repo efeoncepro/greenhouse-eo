@@ -5,12 +5,12 @@
       "donde"
     ],
     "contraste": {
-      "etiqueta": 19.7,
-      "entrada": 19.15,
-      "dominante": 7.6,
-      "cierre-frase": 4.26,
-      "gesto": 18.94,
-      "logo": 20.03
+      "etiqueta": 6.49,
+      "entrada": 6.58,
+      "dominante": 6.11,
+      "cierre-frase": 3.55,
+      "gesto": 8.52,
+      "logo": 20.38
     },
     "seleccion": {
       "selection": {
@@ -28,10 +28,10 @@
         {
           "id": "arte",
           "labelBounds": {
-            "left": 562.882,
-            "top": 104.474,
-            "right": 641.409,
-            "bottom": 149.056
+            "left": 543.062,
+            "top": 90.074,
+            "right": 621.589,
+            "bottom": 134.656
           }
         },
         {
@@ -46,11 +46,11 @@
       "lo construimos"
     ],
     "contraste": {
-      "etiqueta": 12.74,
-      "entrada": 9.55,
-      "dominante": 5.65,
-      "cierre-frase": 4.95,
-      "logo": 6.58
+      "etiqueta": 10.54,
+      "entrada": 10.37,
+      "dominante": 10.02,
+      "cierre-frase": 9.11,
+      "logo": 13.01
     },
     "seleccion": {
       "selection": {
@@ -68,19 +68,19 @@
         {
           "id": "cliente",
           "labelBounds": {
-            "left": 147.742,
-            "top": 784.858,
-            "right": 256.896,
-            "bottom": 829.44
+            "left": 243.694,
+            "top": 858.528,
+            "right": 334.656,
+            "bottom": 895.68
           }
         },
         {
           "id": "efeonce",
           "labelBounds": {
-            "left": 987.264,
-            "top": 784.858,
-            "right": 1104.402,
-            "bottom": 829.44
+            "left": 1001.664,
+            "top": 858.528,
+            "right": 1099.279,
+            "bottom": 895.68
           }
         },
         {
@@ -95,11 +95,11 @@
       "en vivo."
     ],
     "contraste": {
-      "etiqueta": 11.61,
-      "entrada": 11.08,
-      "dominante": 10.46,
-      "logo": 7.3,
-      "tarjeta": 7.24
+      "etiqueta": 12.77,
+      "entrada": 12.87,
+      "dominante": 12.86,
+      "logo": 7.66,
+      "tarjeta": 6.47
     },
     "seleccion": {
       "selection": {

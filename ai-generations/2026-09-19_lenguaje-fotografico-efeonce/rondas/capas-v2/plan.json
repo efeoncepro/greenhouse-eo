@@ -3,17 +3,13 @@
   "id": "a-oficio-45",
   "plate": "p1.png",
   "align": "left",
-  "top": 0.065,
-  "scrimTop": {
-   "to": 0.72,
-   "opacity": 0.95
-  },
+  "top": 0.055,
   "label": "CREATIVE · RUN & GUN",
   "lead": "Grabamos el oficio",
   "leadSize": 58,
   "textWidth": 0.66,
   "dominant": "donde",
-  "dominantSize": 210,
+  "dominantSize": 200,
   "dominantMax": 0.46,
   "after": "pasa: en la|**panadería.**",
   "afterSize": 58,
@@ -57,17 +53,13 @@
   "id": "b-cocreacion-45",
   "plate": "p2.png",
   "align": "left",
-  "top": 0.07,
-  "scrimTop": {
-   "to": 0.62,
-   "opacity": 0.95
-  },
+  "top": 0.055,
   "label": "CO-CREACIÓN",
   "lead": "No te entregamos crecimiento:",
   "leadSize": 52,
   "textWidth": 0.7,
   "dominant": "lo construimos",
-  "dominantSize": 150,
+  "dominantSize": 140,
   "dominantMax": 0.84,
   "after": "**contigo.**",
   "afterSize": 56,
@@ -75,14 +67,14 @@
   "afterFill": "#ffffff",
   "selection": {
    "box": [
-    0.28,
-    0.62,
-    0.8,
-    0.84
+    0.34,
+    0.66,
+    0.82,
+    0.86
    ],
    "targetKind": "object",
    "variant": "eight-handles",
-   "scale": 1.5,
+   "scale": 1.25,
    "cursors": [
     {
      "id": "cliente",
@@ -117,7 +109,7 @@
   "id": "c-pipeline-169",
   "plate": "p3.png",
   "align": "left",
-  "top": 0.14,
+  "top": 0.16,
   "label": "REVOPS · PIPELINE",
   "lead": "Tu operación,",
   "leadSize": 56,
@@ -170,11 +162,6 @@
    1080
   ],
   "ink": "dark",
-  "scrimTop": {
-   "to": 0.9,
-   "opacity": 0.55,
-   "color": "#ffffff"
-  },
   "labelSize": 34
  }
 ]

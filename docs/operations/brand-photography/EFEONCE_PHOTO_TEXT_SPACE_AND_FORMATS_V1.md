@@ -181,3 +181,20 @@ pieza nueva se compone con `componer-foto.mjs` y un plan declarativo (`rondas/ca
 entre 4,3 y 20:1, pero la **ubicación de la caja de selección y de las etiquetas de cursores sigue sin resolver**
 (la caja cae sobre zonas vacías de la mesa o recorta a una persona). Pendiente: elegir el objeto a enmarcar en la
 ficha de toma, no al componer.
+
+## 10. Regla dura: sin scrims ni overlays (2026-09-19)
+
+**Decisión del operador:** «estás poniendo overlay para poner los textos con contraste, eso no es lo que busco…
+eso es muy 2010, le resta limpieza a los diseños».
+
+- **NUNCA** oscurecer la foto con un degradado, un velo o una caja translúcida para que el texto se lea.
+- El contraste se consigue **en la toma**: la zona del titular se pide con su tono declarado (sombra profunda y
+  pareja, o muro claro y parejo) y sin objetos. Si la zona no pasa 4,5:1, **se regenera el plate** o se mueve el
+  texto; nunca se tapa la foto.
+- En el compositor, `scrimTop`/`scrimBottom` quedan **desactivados por defecto** para fotografía de marca. Existen
+  en el código porque vienen del carrusel ilustrado, donde el cielo pintado sí admitía un degradado; en foto no se
+  usan.
+- Medición sin scrim en la primera pasada limpia (`rondas/capas-v2/out/`, plan sin scrim): etiqueta 6,5–12,8:1 ·
+  entrada 6,6–12,9:1 · dominante 6,1–12,9:1 · gesto 8,5:1 · tarjeta 6,5:1 · firma 7,7–20,4:1 **[medido]**.
+- Pendiente de decisión: la **tarjeta HUD** (vidrio esmerilado del propio plate) también es una superficie sobre la
+  foto; se mantiene sólo si el operador la aprueba para piezas con dato.
