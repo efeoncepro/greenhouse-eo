@@ -18,6 +18,14 @@ reutilizar la firma url-lum. Skills `social-media-studio`, `efeonce-advertising-
 `greenhouse-ai-image-generator` (espejos) y docs de ejecución social/publicitaria actualizados.
 [Bitácora](docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md).
 
+## 2026-09-19 — Revisión de cierre del último día de UNBOUND
+
+La revisión de la agenda completa del 18/09 añadió al ledger Smart CRM Universal Record Page como private beta,
+el laboratorio de Customer Agent como enablement de clientes, la denominación ChatGPT Lead Gen Ads y el cierre
+técnico de Developer Platform 2026.09: Projects y Conversations API GA, 44 APIs actualizadas y nuevas betas públicas.
+Se mantuvieron los gates: demo/private beta no equivale a GA, pricing, entitlement ni runtime; no se activó ningún
+portal, write, conexión o campaña.
+
 ## 2026-09-18 — TASK-1832 retira la corrida canary y apaga sus gates
 
 Se revocó la authority del canary sintético, el cleanup sujeto-específico borró todo el grafo run-owned

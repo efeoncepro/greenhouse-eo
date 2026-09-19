@@ -17,10 +17,11 @@ de producto en 15–16/09; no se identificaron nuevos lanzamientos en el media h
 ninguna org, entitlement ni contrato. Detalle:
 [`Dreamforce 2026`](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md).
 
-**HubSpot Fall Spotlight / UNBOUND 2026 — corte ampliado 18/09 (documental):** las skills espejo de HubSpot as a Service,
-Solutions Partner y HubSpot-Greenhouse bridge incorporan el corte ampliado del ledger: Smart CRM, Growth Context,
-Context Home, Breeze, Marketing Studio, ChatGPT Ads, MCP/Claude y nuevas superficies de agentes. Customer Agent Voice,
-HubSpot Work y Agent CLI quedan como first look/demo hasta verificar GA, pricing y runtime. El detalle y la matriz están en
+**HubSpot Fall Spotlight / UNBOUND 2026 — cierre final revisado 19/09 (documental):** las skills espejo de HubSpot as a Service,
+Solutions Partner y HubSpot-Greenhouse bridge incorporan Smart CRM, Growth Context, Context Home, Breeze, Marketing
+Studio, ChatGPT Lead Gen Ads, MCP/Claude y Smart CRM Universal Record Page private beta. Customer Agent Voice, HubSpot
+Work y Agent CLI quedan como first look/demo; Projects 2026.09 y Conversations API quedan documentados como GA con
+gates propios. El detalle y la matriz están en
 [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md).
 No se activó ningún beta, permiso, campaña, conexión ni write de portal; falta verificar elegibilidad por cliente antes
 de vender o implementar.
