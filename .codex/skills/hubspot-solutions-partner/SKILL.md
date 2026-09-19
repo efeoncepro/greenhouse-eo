@@ -30,6 +30,11 @@ propia vive en `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MO
 La práctica se presenta como **Efeonce → RevOps & CRM → Kortex (cuando aplica) → HubSpot (plataforma/provider)**.
 La venta se organiza por las seis familias de resultado, modos de entrega y overlays sectoriales de
 [`HUBSPOT_OFFER_ARCHITECTURE_V2.md`](../../../docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md).
+Cuando el comprador busca rediseñar el trabajo humano-agente, cargar además
+[`Hybrid Human-Agent Transformation V1`](../../../docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md):
+vender un workflow con roles, autoridad y outcomes, no un roster de bots. Secuencia `Blueprint pagado → First
+Hybrid Team → transformación por áreas → Managed Agentic Operations`; no prometer precio, margen ni ROI antes de
+validar el [modelo de negocio](../../../docs/business-models/revops-crm/HYBRID_WORKFORCE_TRANSFORMATION_BUSINESS_MODEL_V1.md).
 La evaluación inicial de fit/cotización es normalmente gratuita; un blueprint se cobra solo cuando deja un
 artefacto autónomo. Customer Agent es un caso de uso, no una familia raíz. El brochure es input histórico,
 no canon: usa [`docs/services/hubspot-as-a-service/README.md`](../../../docs/services/hubspot-as-a-service/README.md) y
@@ -178,6 +183,7 @@ rehacerla, no memorizarla. Por eso la calculadora vive en `templates/tier-calcul
 | Armar la oferta, el arbitraje del onboarding fee, negociar **con** HubSpot, objeciones | `modules/11_PROPUESTA_PRICING.md` |
 | La implementación como argumento de venta y como negocio | `modules/12_IMPLEMENTACION.md` |
 | 🎯 **Agent Hub y Agentic Operations** — readiness, agentes prebuilt/custom, tools, gobierno, evaluación, operación y caso ANAM | `modules/13_AGENTES.md` |
+| **Transformación de equipos humano-agente** — work chart, owner, supervisor, autonomía, adopción y economics | `docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md` + `modules/13_AGENTES.md` |
 | Soluciones por industria: workflows, datos, integraciones, compliance, anti-fit y prueba | `modules/15_SOLUCIONES_POR_INDUSTRIA.md` |
 | **Prospecting Agent / agente de prospección** — entrenamiento/grounding, disponibilidad, plays/perfiles, señales, sourcing, outreach, créditos, guardrails, piloto, KPIs y gobierno | `references/prospecting-agent.md` + `SOURCES.md` |
 | **Cómo se vende HubSpot ahora** — narrativa ejecutiva · Growth Context · workspaces · motion por outcome · Champion-led prospecting · multithreading · incentivos H2 2026 | `modules/14_NARRATIVA_AGENTICA_Y_MOTION_2026.md` |

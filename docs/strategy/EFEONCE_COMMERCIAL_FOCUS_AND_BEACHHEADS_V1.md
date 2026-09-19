@@ -85,6 +85,14 @@ su ownership.
 
 `RevOps & CRM Diagnostic → provider-fit architecture → HubSpot-first | Salesforce-first | híbrido gobernado → implementation → Managed CRM Operations → Customer/Revenue Agents + CRM Intelligence`
 
+Si el trigger es transformar la forma de trabajar —y no sólo mejorar el CRM—, la ruta se amplía a
+`Hybrid Workforce Blueprint → First Hybrid Team → transformación por equipos/workflows → Managed Agentic
+Operations`. Es una expansión del beachhead RevOps & CRM, no un quinto motor comercial. El cliente compra
+un proceso operado por personas y agentes con dueño, autoridad, handoffs, medición y costos explícitos;
+no una cantidad de bots. La [ficha transversal](../services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md)
+conserva el método, y el [modelo de negocio](../business-models/revops-crm/HYBRID_WORKFORCE_TRANSFORMATION_BUSINESS_MODEL_V1.md)
+mantiene sus economics como hipótesis hasta validación.
+
 El diagnóstico es provider-neutral y provider-transparent. HubSpot-first prioriza demand generation B2B, adopción y
 time-to-value; Salesforce-first prioriza continuidad de base instalada, complejidad enterprise y marketing B2C
 multicanal; un híbrido HubSpot Marketing Hub + Salesforce CRM sólo se recomienda con fuente de verdad, lifecycle,

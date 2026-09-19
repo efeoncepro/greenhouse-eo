@@ -14,6 +14,10 @@
 > [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md). No se
 > incorporan pricing ni disponibilidad territorial por inferencia.
 
+> **Transformación humano-agente:** el método provider-neutral para pasar de readiness a equipos operativos vive en
+> [`Hybrid Human-Agent Transformation V1`](../revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md).
+> Agent Hub & Agentic Operations es su carril HubSpot, no un sinónimo de activar agentes aislados.
+
 ## 1. Decisión
 
 Efeonce organiza su práctica HubSpot por **resultados operativos del cliente**, no por una lista de Hubs ni por un
@@ -38,6 +42,10 @@ cruzan esos productos. Por eso no se publican como una séptima lista equivalent
 | **Data, Integration & CRM Intelligence** | Unificar datos confiables y convertirlos en contexto, automatización y decisión. | Smart CRM, Data Hub, Data Studio, sync, datasets, calidad, scoring, reporting, Data Agent, APIs, webhooks, custom workflow actions, UI extensions, MCP e integraciones. |
 | **Agent Hub & Agentic Operations** | Diseñar, desplegar y gobernar agentes y workflows agentic con resultados, costo y escalamiento observables. | Agent Hub, agentes preconstruidos, agentes custom, Agent Builder, agentic workflows, Breeze Assistant, Scheduled Prompts beta, MCP, knowledge/context, herramientas, permisos, créditos, evaluación, observabilidad y human handoff. |
 
+En esta última familia, el entregable puede ser un **equipo híbrido en producción**: mapa de trabajo, roles humanos
+y de agentes, autonomía por acción, capacidad de supervisión, adopción, evaluación y operación continua. Su diseño
+organizacional y economics no los resuelve una configuración de portal; se gobiernan desde el servicio transversal.
+
 ### Reglas de clasificación
 
 - **Customer Agent no es una familia comercial.** Es un componente de Service/Customer Success y, en algunos
@@ -61,6 +69,11 @@ cruzan esos productos. Por eso no se publican como una séptima lista equivalent
 | **Sprint de optimización** | Para resolver un cuello de botella o deuda acotada. | Baseline, change set, prueba, medición y backlog residual. |
 | **Managed HubSpot Operations** | Cuando existe backlog recurrente, owner, cadencia y costo de servir sostenible. | Operación continua, releases, calidad, adopción, reporting, QBR y expansión gobernada. |
 | **Managed Agentic Operations** | Cuando agentes o workflows agentic requieren evaluación y mejora continua. | Catálogo de agentes, autonomía/handoff, knowledge/context, tests, consumo, observabilidad, incidentes y optimización. |
+
+Para cuentas con transformación del trabajo como prioridad, la secuencia comprable es `Hybrid Workforce Blueprint
+→ First Hybrid Team → expansión por workflows/equipos → Managed Agentic Operations`. El blueprint es pagado sólo
+cuando deja un artefacto independiente; el primer despliegue debe probar a la vez runtime, colaboración humana,
+capacidad de revisión y costo por outcome válido. La elegibilidad de Agent Hub/Builder beta se comprueba por portal.
 
 La evaluación sin costo es el default de adquisición y cotización. No debe disfrazar consultoría extensa gratuita.
 La auditoría pagada existe solo cuando su salida es un producto intelectual autónomo.

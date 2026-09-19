@@ -30,6 +30,10 @@ Salesforce es la plataforma habilitadora. Efeonce conserva la responsabilidad so
 implementación, enablement y operación únicamente dentro del alcance contratado. Licencias, add-ons, consumo,
 servicios Efeonce, terceros e impuestos permanecen separados.
 
+La [transformación de equipos humano-agente](../revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md)
+es una oferta transversal de RevOps & CRM. Este documento define su carril Salesforce: Agentforce, AIforce y
+orquestación pueden habilitarlo, pero no reemplazan diseño del trabajo, adopción ni responsabilidad humana.
+
 ## Promesa de la práctica
 
 > **Conectamos CRM, servicio, marketing, datos, automatización y agentes para que Salesforce funcione como una
@@ -119,6 +123,9 @@ Ofertas estructuradas:
   jurisdicción y activación.
 - **Agentforce Use Case & Readiness Diagnostic:** job, grounding, acciones, permisos, human review, evaluación,
   consumo y medición.
+- **Hybrid Workforce Blueprint (carril Salesforce):** proceso `as-is/to-be`, work chart, roles humanos/agentes,
+  matriz de autonomía, handoffs, contexto y permisos, caso económico y plan por olas; diagnóstico pagado cuando
+  entrega un artefacto autónomo, sin activar agentes por inferencia.
 
 Outputs mínimos: current-state map, evidence ledger, fit verdict, arquitectura objetivo, riesgos, dependencias,
 roadmap por olas, responsibilities y decisión `fit | fit condicionado | no fit`.
@@ -158,6 +165,8 @@ Ofertas estructuradas:
 - **Journey Activation Wave:** journey, audiencia, contenido, datos, testing, medición y handoff.
 - **Deliverability Foundation:** autenticación, reputación, warming, hygiene, preferencias y monitoreo.
 - **Agentforce Accelerator:** caso acotado GA con grounding, acciones, evaluación, human review, consumo y KPI.
+- **First Hybrid Team:** primer workflow humano-agente con supervisor nombrado, fichas de rol, pruebas,
+  producción acotada, adopción y hypercare; después puede extenderse a transformación multi-equipo.
 - **Workflow Automation Wave:** automatizaciones priorizadas, fault paths, pruebas, versionado y desactivación.
 - **Adoption & Enablement:** roles, playbooks, entrenamiento por workflow, office hours, medición de adopción y
   backlog.
@@ -178,6 +187,8 @@ Ofertas recurrentes:
 - **Managed Marketing Cloud Operations:** journeys/campaigns, imports, APIs, canales, deliverability, releases,
   consumo, optimización e incidentes dentro del RACI contratado.
 - **Agentforce & Automation Assurance:** evaluaciones, permisos, fallos, consumo, human review y mejora controlada.
+- **Managed Hybrid Operations:** catálogo de workflows, capacidad de revisión humana, excepciones, costo por
+  resultado válido, incidentes y cambios organizacionales dentro del RACI contratado.
 - **Data & Consent Assurance:** calidad, identity resolution, preferencias, suppression, activación y
   reconciliación.
 - **Quarterly Architecture & Value Review:** arquitectura, adopción, deuda, licencias observadas, riesgos,
@@ -276,6 +287,10 @@ Para cada caso se declara:
 - quién aprueba y responde;
 - cómo se prueba, observa, limita y detiene;
 - qué consumo y datos genera.
+
+Cuando la venta es transformación de equipos, añadir mapa de trabajo `as-is/to-be`, dueño del proceso,
+operator-champion, supervisor, capacidad de revisión, fichas de agentes, formación, rituales y criterios de
+expansión/retiro. Una configuración de Agentforce o AIforce no acredita por sí sola un equipo híbrido operativo.
 
 ## Claims, marca y derechos
 

@@ -16,6 +16,12 @@ El orden comercial es **dolor → contexto → trabajo → outcome → plataform
 Hubs, agentes o features. La IA es el mecanismo; el comprador paga por más demanda, pipeline, cierres,
 resolución, retención o capacidad operativa.
 
+Cuando el buyer busca cambiar la operación completa, avanzar de este pitch a la
+[transformación de equipos humano-agente](../../../../docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md):
+`Hybrid Workforce Blueprint → First Hybrid Team → transformación por áreas → Managed Agentic Operations`.
+El organigrama híbrido debe asignar dueño humano, operador, supervisor, agente, autoridad, handoffs y capacidad
+de revisión. La herramienta coordina tareas; Efeonce y el cliente diseñan el trabajo y el accountability.
+
 ## 1. Quién está diciendo qué
 
 | Voz oficial | Rol público | Tesis | Traducción para Efeonce |

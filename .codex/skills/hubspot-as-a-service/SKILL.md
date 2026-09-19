@@ -15,6 +15,10 @@ platform/provider**. Use the service catalog in `docs/services/hubspot-as-a-serv
 default commercial entry is a limited evaluation without cost; use a paid blueprint only when it produces an
 independent technical artifact. Customer Agent is a component of Service/Customer Success and Agentic Operations,
 not the root of the AI offer.
+For human-agent team transformation, load
+`docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md`: portal configuration is only one
+part of workflow redesign, named human accountability, autonomy, handoffs, adoption, quality and cost. A first
+production team requires operator training and supervision capacity, not only an active agent toggle.
 Treat brochures as historical commercial input only; the review and quarantine rules live in
 `docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`. Do not import brochure claims, pricing, bundles or
 feature availability without current primary-source verification and an `as-of` date.

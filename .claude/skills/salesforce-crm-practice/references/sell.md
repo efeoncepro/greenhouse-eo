@@ -4,6 +4,11 @@
 
 Vende una mejora de revenue, servicio o productividad sustentada por arquitectura y adopción; no vendas “Salesforce” como fin. Una conclusión válida puede ser Salesforce-first, HubSpot-first, híbrida, optimización de la base instalada o no-fit.
 
+Cuando el comprador busca transformar la forma de trabajar, usa la [oferta transversal de equipos humano-agente](../../../../docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md).
+No detengas la escalera en `Agentforce Readiness`: vende un blueprint autónomo, el primer workflow humano-agente
+en producción, la transformación entre equipos y la operación continua. Comprueba capacidad real de supervisión,
+adopción y economics antes de prometer escala.
+
 ## ICP
 
 Señales favorables, a validar en conjunto:

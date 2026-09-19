@@ -3,6 +3,12 @@
 > **Refresh Fall Spotlight/UNBOUND 2026 — 2026-09-18.** Fall cambia el framing de agentes aislados a **agentic
 > team**; no cambia la obligación de validar release state, permisos, consumo y readback por caso.
 
+Para oportunidades de transformación, esta capa no termina en configurar Agent Hub. Cargar la
+[oferta transversal de equipos humano-agente](../../../../docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md):
+mapear el trabajo, dueño del proceso, operadores, supervisor, agente, autoridad, handoff, capacidad de revisión,
+adopción y costo por outcome válido. La ruta comercial es `Hybrid Workforce Blueprint → First Hybrid Team →
+transformación por workflows → Managed Agentic Operations`. Una beta visible no habilita SLA productivo.
+
 El corte ampliado añade tres superficies que deben quedar en `first look/demo` hasta readback: **Customer Agent
 Voice**, **HubSpot Work** y **Agent CLI**. Agent CLI se mostró en un flujo read-only de pipeline con evidencia y
 revisión humana; no inferir desde esa demo permiso de escritura, ejecución programada, disponibilidad regional o

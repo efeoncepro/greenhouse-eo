@@ -1,5 +1,9 @@
 # Handoff activo
 
+**Transformación humano-agente (19/09, documental):** [oferta transversal](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md)
+`Approved for validation`, enlazada desde HubSpot/Salesforce y skills. Sin activación, precio ni ROI aprobado;
+faltan entrevistas, Finance/Legal y prueba pagada.
+
 **16–17/09:** Higgsfield API con créditos. Previa 18: verificar · readback KV 21/09 y 23/09.
 
 **GTA VI:** posts 22 y 25/09 ([bitácora](docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md)).
@@ -10,20 +14,13 @@ HubSpot-first parte para crecimiento B2B, mid-market y time-to-value; Salesforce
 gobierno, service a escala, extensibilidad e integración enterprise. La práctica usa `HubSpot-first`,
 `Salesforce-first`, `híbrida` o `no-fit`; no es una decisión automática ni una afirmación de segmentación exclusiva.
 
-**Dreamforce 2026 — corte ampliado 18/09 (documental):** el ledger Salesforce separa AIforce, Missionforce, Koa,
-Agentforce, interoperabilidad y Marketing Cloud Next por capacidad y estado. El catálogo público concentra el lineup
-de producto en 15–16/09; no se identificaron nuevos lanzamientos en el media hub oficial el 17–18/09. No se cambió
-ninguna org, entitlement ni contrato. Detalle:
-[`Dreamforce 2026`](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md).
+**Dreamforce 2026 (corte 18/09, documental):** estados por producto en el
+[`ledger`](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md); sin cambios de org, entitlement
+ni contrato.
 
-**HubSpot Fall Spotlight / UNBOUND 2026 — cierre final revisado 19/09 (documental):** las skills espejo de HubSpot as a Service,
-Solutions Partner y HubSpot-Greenhouse bridge incorporan Smart CRM, Growth Context, Context Home, Breeze, Marketing
-Studio, ChatGPT Lead Gen Ads, MCP/Claude y Smart CRM Universal Record Page private beta. Customer Agent Voice, HubSpot
-Work y Agent CLI quedan como first look/demo; Projects 2026.09 y Conversations API quedan documentados como GA con
-gates propios. El detalle y la matriz están en
-[`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md).
-No se activó ningún beta, permiso, campaña, conexión ni write de portal; falta verificar elegibilidad por cliente antes
-de vender o implementar.
+**UNBOUND 2026 (corte 19/09, documental):** estados por capacidad en la
+[`matriz`](docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md); sin activar
+beta, permiso, campaña, conexión ni write. Verificar elegibilidad por cliente antes de vender o implementar.
 
 **Contacto:** TASK-1801 cerrada; [alcance y evidencia](.codex/skills/efeonce-public-site-wordpress/references/landings/contacto.md).
 

@@ -3,7 +3,7 @@
 > **Propietario:** Efeonce Group SpA — RUT 77.357.182-1
 > **Sitio:** <https://efeoncepro.com>
 > **Estado:** categoría documental activa
-> **Última actualización:** 2026-08-30
+> **Última actualización:** 2026-09-19
 
 ## Propósito
 
@@ -52,6 +52,9 @@ Cada servicio debe declarar como mínimo:
 - [HubSpot as a Service](hubspot-as-a-service/README.md)
 - [Salesforce Practice](salesforce/README.md) — arquitectura de oferta por outcomes y lifecycle para CRM core,
   Marketing Cloud Engagement y Marketing Cloud Next, con operación, venta y coexistencia separadas.
+- [Transformación de equipos humano-agente](revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md) —
+  oferta RevOps & CRM transversal a HubSpot/Salesforce para rediseñar, activar y operar workflows compartidos
+  por personas y agentes; `Approved for validation`, no precio o Product Service aprobado.
 - [Creative Services](creative-services/README.md) — incluye Social Media, su operación recurrente y la capability
   **Efeonce Run & Gun Studio**, que se comercializa mediante **Efeonce Run & Gun Production** con alcance propio.
 - [Media & Distribution](media-distribution/README.md) — incluye la ficha propia de
@@ -107,6 +110,10 @@ Nunca dos ofertas de Efeonce compitiendo por la capacidad de diseño de una mism
 La composición de un proyecto puede incorporar capacidades de RevOps & CRM/Kortex, Creative Services/Globe o
 Media & Distribution (con Reach cuando aplique) según el resultado contratado y el RACI definido. Wave conserva el ownership de sus
 familias de servicio.
+
+`Agent Systems & Platforms` de Wave diseña o implementa sistemas agentic como capacidad técnica transversal;
+`Transformación de equipos humano-agente` de RevOps & CRM vende el rediseño del trabajo en ventas, marketing,
+servicio y revenue lifecycle. Pueden componerse con un RACI, pero no son dos ofertas para cobrar el mismo trabajo.
 
 La composición propuesta [`Search + Social Visibility`](../business-models/search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md) conecta Search Visibility 360 con Social Media sin fusionar ownership, pricing o accountability.
 

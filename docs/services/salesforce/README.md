@@ -57,6 +57,9 @@ operations, consumo de datos/IA/mensajes e IP propia. Un precio público no es u
 La arquitectura comercial completa —promesa, customer model, fases comprables, carriles de solución, delivery,
 gates, métricas y madurez— vive en
 [`Efeonce Salesforce Service Offer Architecture V1`](EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md).
+Para rediseño de equipos y procesos humano-agente, cargar la
+[oferta transversal de transformación](../revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md):
+el carril Salesforce implementa parte del modelo, pero no reemplaza cambio operativo, supervisión ni accountability.
 La tabla siguiente es el router resumido y no debe evolucionar como un catálogo paralelo.
 
 | Superficie                 | Oferta de entrada                            | Core                                                                               | Expansión recurrente                                                      |
