@@ -1,5 +1,7 @@
 # Handoff activo
 
+**DataForSEO:** ISSUE-175 recuperado; TASK-1341 conserva rollout y smoke AIO pendientes.
+
 **Transformación humano-agente (19/09):** [oferta aprobada](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md);
 serie Q4 con ruta CMO sin CRM obligatorio. TASK-1877 landing transversal y TASK-1878 entradas Home/HubSpot/AEO:
 sólo planificadas. Pendientes prueba, CTA, QA y calendario Notion. Sin publicación ni activación.
@@ -13,11 +15,10 @@ social (tareas 744–755) y gráficos 739/740 antes del 25/09. Septiembre: 12 ar
 
 **GTA VI:** posts 22 y 25/09 ([bitácora](docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md)).
 
-**Posicionamiento CRM actualizado (2026-09-18, documental):** HubSpot y Salesforce se mantienen como proveedores
-con una zona de solapamiento —mid-market alto, agentes e integraciones— pero con centros de gravedad distintos.
-HubSpot-first parte para crecimiento B2B, mid-market y time-to-value; Salesforce-first para org instalada compleja,
-gobierno, service a escala, extensibilidad e integración enterprise. La práctica usa `HubSpot-first`,
-`Salesforce-first`, `híbrida` o `no-fit`; no es una decisión automática ni una afirmación de segmentación exclusiva.
+**Posicionamiento CRM (18/09, documental):** solapamiento HubSpot/Salesforce en mid-market alto, agentes e
+integraciones. `HubSpot-first`: crecimiento B2B, mid-market y time-to-value. `Salesforce-first`: org compleja,
+gobierno, service a escala, extensibilidad e integración enterprise. También `híbrida` o `no-fit`; selección
+no automática ni exclusiva.
 
 **Dreamforce 2026 (corte 18/09, documental):** estados por producto en el
 [`ledger`](.codex/skills/salesforce-crm-practice/references/dreamforce-2026.md); sin cambios de org, entitlement

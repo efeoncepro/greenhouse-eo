@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,11 +19,11 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `code complete, rollout pendiente — incidente ISSUE-175 recuperado; guard/error implementados; rollout y smoke AIO pendientes`
 - Rank: `TBD`
 - Domain: `growth|ai|integrations|ops|reliability`
 - Blocked by: `none`
-- Branch: `task/TASK-1341-dataforseo-aio-runtime-config-guard`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -297,10 +297,10 @@ order by created_at desc;
 ## Acceptance Criteria
 
 - [ ] `ops-worker` no puede desplegar con `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=true` y DataForSEO login/password ref ausentes sin fallar loud.
-- [ ] La revision viva de Cloud Run `ops-worker` muestra los env names DataForSEO esperados cuando AIO esta ON.
+- [x] La revision viva de Cloud Run `ops-worker` muestra los env names DataForSEO esperados cuando AIO esta ON.
 - [ ] Smoke real low-volume de `google_ai_overview` drenado por worker crea observations sin `error_code='missing_secret'`.
-- [ ] `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` y `docs/manual-de-uso/growth/ai-visibility-grader-smoke.md` quedan sincronizados con la verdad worker-vs-Vercel.
-- [ ] No se cambia UI/reporte/scoring ni se oculta el estado `partial`.
+- [x] `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` y `docs/manual-de-uso/growth/ai-visibility-grader-smoke.md` quedan sincronizados con la verdad worker-vs-Vercel.
+- [x] No se cambia UI/reporte/scoring ni se oculta el estado `partial`.
 
 ## Verification
 
@@ -328,4 +328,47 @@ order by created_at desc;
 
 ## Open Questions
 
-- ¿La rotacion del password DataForSEO se hara como prerequisito de esta task o como mini-task/ops separada?
+- Resuelta 2026-09-19: la recuperación usa la credencial vigente; rotación separada, sin cambiar secretos ni IAM.
+
+
+## Audit / Plan — 2026-09-19, ISSUE-175
+
+- Operador: «Corrígelo», precedido de «Avanza todo sin preguntarme». Ejecución sin checkpoint adicional de goal; checkout compartido `develop`, sin worktrees ni subagentes. WIP de HubSpot y TASK-1877 excluido.
+- Runtime verificado: login ausente en `ops-worker-00697-59f`; login local funcional y secret GitHub presente. El alcance incluye ahora SEO/discovery además de AIO, pues comparten cliente y configuración.
+- Reuso: cliente DataForSEO, runner discovery, gate/spend canónicos y deploy existente. Sin schema, flags nuevos, grants, rotación ni cambio de UI.
+- Canon: cloud governance, cloud security posture, OPS_RELIABILITY_AGENT_INVARIANTS y arquitectura SEO. Corrección del contrato de despliegue existente; sin nueva decisión de topología/SSOT.
+- Plan: (1) guard local probado y error tipado; (2) restauración env sobre imagen desplegada y comparación del resto de config; (3) preview + canary discovery propio en worker, presupuesto máximo USD 0.07 (preview conservador USD 0.0612); (4) evidencia, docs y gates. Smoke AIO separado sólo si puede realizarse sin ampliar alcance/costo.
+- No-regresión: credenciales configuradas conservan transporte y spend; flags deshabilitados permiten despliegue sin DataForSEO. Falla de configuración no abre breaker ni finge requests pagadas.
+
+## Modular Placement Contract
+
+- Topology impact: `none`
+- Current home: `services/ops-worker`, `src/lib/ai/dataforseo.ts`, `src/lib/growth/seo/keyword-discovery`.
+- Future candidate home: `remain-shared`.
+- Boundary: cliente proveedor canónico; deploy/check del worker; runner de discovery.
+- Server/browser split: configuración y secretos sólo server/tooling; sin imports al browser.
+- Build impact: sin dependencias nuevas; helper de despliegue en `services/ops-worker`.
+- Extraction blocker: credenciales/runtime y gate/spend del dominio SEO.
+
+
+## Evidencia / estado al 2026-09-19
+
+[ISSUE-175 resuelto](../../issues/resolved/ISSUE-175-dataforseo-worker-login-missing.md): revisión `ops-worker-00698-9m9`, mismo digest y GIT_SHA que 00697, únicamente login restaurado. Canary discovery `seokdr-43c277a6-b109-4110-9693-c280f2344846` por scheduler: `succeeded`, 10 candidatos, USD 0.0132; ledger reconciliado (8 → 9 llamadas; USD 0.1080 → 0.1212). No se vuelven a encolar las tres corridas originales.
+
+Implementación en develop: `services/ops-worker/dataforseo-config.mjs` valida antes de build y lee todas las revisiones que reciben tráfico; workflow ejecuta el check incluso si salta el deploy. Ambos consumers (SEO y AIO) exigen login/ref. `DataForSeoConfigurationError` distingue configuración ausente; discovery interrumpe el batch, conserva cualquier resultado/costo previo y no cuenta una llamada que nunca salió.
+
+59 tests focales verdes, incluidos 5 de deploy/config en el runner normal de Vitest. La prueba de regresión ejecuta el deploy real sin login y comprueba que falla antes de Cloud Build; no afirma strings del script como sustituto del comportamiento. Gates de build inputs, runtime deps y cobertura de rutas verdes.
+
+AC guard: implementado/probado en develop, casilla abierta hasta integrar código y verificar el pipeline. AC smoke AIO: pendiente; la verificación Labs confirma credenciales/transporte/ledger desde worker, no el adapter AIO ni sus observaciones. Sin push ni promoción de código en esta recuperación. No declarar complete.
+
+
+### Cierre QA del slice
+
+- `pnpm exec tsc --noEmit --incremental --pretty false` y ESLint sobre los siete archivos JS/TS propios: PASS. 59 tests de seis suites: PASS.
+
+- `task:lint --task TASK-1341`: 0 errores/advertencias. `ops:lint --changed`: 0 errores; 14 advertencias preexistentes de paridad epic/children fuera del alcance.
+- `worker:build-contract-gate`, `worker:runtime-deps-gate`, `worker:deploy-path-gate`: PASS; este último bundlea realmente los cinco workers (ops-worker: 1547 archivos).
+- `skills:mirrors`, `git diff --check`, `bash -n services/ops-worker/deploy.sh`: PASS.
+- Arquitectura/ADR: se conserva la decisión SEO §1.2 de cliente/ledger compartidos y el contrato de configuración propia de cada runtime (cloud governance + OPS_RELIABILITY_AGENT_INVARIANTS); no cambia source of truth, IAM, workflow_call, EXPECTED_SHA, GIT_SHA ni manifest de release.
+- Documentación: issue, task, manuales, arquitectura, ledger, context/handoff/changelog y skills espejo sincronizados. La advertencia `architecture_doc_monolith` ya existía en la arquitectura SEO; se editó un contrato en §1.2, sin añadir una sección Delta ni hacer un refactor ajeno.
+- No se corrió build Next.js ni suite completa: no cambió UI ni runtime desplegado de código; tsc, lint focal, tests del transporte/consumers y los bundles del gate de workers cubren el cambio local. No se ejecutó un release ni se infiere publicación del guard local.

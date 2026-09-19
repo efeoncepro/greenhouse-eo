@@ -81,6 +81,8 @@ pnpm growth:ai-visibility:smoke
 
 Para una prueba estrictamente local con Secret Manager, define además `GCP_PROJECT=efeonce-group` si tu ADC no trae project por defecto. No incluyas el password DataForSEO en `.env.local`; debe resolverse por `DATAFORSEO_API_PASSWORD_SECRET_REF`.
 
+**Preflight compartido (TASK-1341):** `node services/ops-worker/dataforseo-config.mjs --service ops-worker --project efeonce-group --region us-east4` comprueba login/ref en todas las revisiones que reciben tráfico sin llamar al proveedor. El guard de deploy también cubre SEO. Al 2026-09-19 está implementado en develop, pendiente de rollout; ISSUE-175 restauró la configuración del worker y verificó Labs/discovery. Ese canary no sustituye el smoke AIO de este manual.
+
 **Diagnóstico de `google_ai_overview` / DataForSEO en async:** cuando el run se ejecuta por `ops-worker`,
 verifica las env vars del servicio Cloud Run, no sólo Vercel:
 

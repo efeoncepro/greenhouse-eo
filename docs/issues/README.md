@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-175`
+`ISSUE-176`
 
 ## Open
 
@@ -121,6 +121,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 | ID          | Título                                                                                                                                                            | Ambiente                       | Detectado  | Resuelto   | Causa                                                                                                                    |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `ISSUE-175` | [DataForSEO falla en ops-worker por login ausente](resolved/ISSUE-175-dataforseo-worker-login-missing.md) | staging + producción (worker compartido) | 2026-09-19 | 2026-09-19 | Faltaba `DATAFORSEO_API_LOGIN` en la revisión viva; restaurado en 00698 y canary succeeded (10 candidatos, USD 0.0132). Guard en TASK-1341 pendiente de rollout. |
 | `ISSUE-172` | [`lpad` trunca el `public_id` del Banco de Talento: colisión de IDs que rompe el cron y el carril vivo de postulaciones](resolved/ISSUE-172-talent-pool-public-id-lpad-truncation-collision.md) | production (Cloud SQL única) | 2026-09-12 | 2026-09-12 | `lpad(nextval::text,5,'0')` recorta pasado 99 999 → diez valores colapsan contra `UNIQUE(public_id)`; el cron fallaba en cada corrida y el consumer de postulaciones abrió su circuito (hasta 38 personas sin proyectar, nada borrado). Fix: default a función sin recorte + `setval`, anti-join en la projection, parser tolerante, señal `sync.reactive.circuit_open`, revive gobernado de `dead_letter`. Recuperación por replay gobernado (0 sin postulación, 164 acuses); release `586a8627568a`; canary: la secuencia ya no avanza por corrida. Follow-ups en la ficha. |
 | `ISSUE-171` | [El pipeline de Hiring se ve vacío al cambiar de vacante: el tablero no re-lee el snapshot del servidor](resolved/ISSUE-171-hiring-pipeline-empty-stale-client-snapshot.md) | producción | 2026-09-12 | 2026-09-12 | `PipelineDeskView.tsx:125` sembraba `applications` con `useState` y nunca re-sincronizaba (el hermano `openingId` sí); en la navegación soft del selector el tablero filtraba el arreglo del montaje y daba 0. Preexistente desde `559f5654b` (2026-07-09). Fix: lista derivada del snapshot + overrides de etapa del arrastre; test de regresión; release `586a8627568a`. |
 | `ISSUE-169` | [account_balances: cuentas en moneda extranjera sumaban CLP y el día genesis de la OTB no contaba movimientos](resolved/ISSUE-169-account-balances-foreign-currency-and-genesis-day.md) | production (Cloud SQL única) | 2026-09-10 | 2026-09-10 | `getDailyMovementSummary` resolvía todo a CLP también en cuentas USD/MXN (TASK-774 sin distinguir moneda de la cuenta); el rematerialize sembraba el día genesis sin movimientos. Fix: `toAccountUnits` por moneda de cuenta + materializar el día genesis. Pendiente: extender `fx_drift` a cuentas no-CLP. |

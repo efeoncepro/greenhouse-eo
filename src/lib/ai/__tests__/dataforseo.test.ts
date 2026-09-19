@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { dataForSeoBreaker } from '../dataforseo-breaker'
+import { DataForSeoConfigurationError } from '../dataforseo-errors'
+
 const mockResolveSecret = vi.fn()
 
 vi.mock('@/lib/secrets/secret-manager', () => ({
@@ -17,6 +20,7 @@ const {
 const ORIGINAL_ENV = { ...process.env }
 
 beforeEach(() => {
+  dataForSeoBreaker.reset()
   mockResolveSecret.mockReset()
   global.fetch = vi.fn()
   delete process.env.DATAFORSEO_API_LOGIN
@@ -30,6 +34,26 @@ afterEach(() => {
 })
 
 describe('dataforseo client', () => {
+  it('missing login stops before secrets/fetch and never opens the provider breaker', async () => {
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      await expect(
+        postDataForSeoSerpLiveAdvanced({ endpoint: DATAFORSEO_DEFAULT_AI_MODE_ENDPOINT, tasks: [] })
+      ).rejects.toBeInstanceOf(DataForSeoConfigurationError)
+    }
+
+    expect(mockResolveSecret).not.toHaveBeenCalled()
+    expect(global.fetch).not.toHaveBeenCalled()
+    expect(dataForSeoBreaker.state('serp')).toBe('closed')
+  })
+
+  it('missing password is a configuration failure with no provider request', async () => {
+    process.env.DATAFORSEO_API_LOGIN = 'api@example.com'
+    mockResolveSecret.mockResolvedValue({ source: 'unconfigured', value: null })
+
+    await expect(checkDataForSeoConnection()).rejects.toMatchObject({ code: 'provider_configuration_missing' })
+    expect(global.fetch).not.toHaveBeenCalled()
+  })
+
   it('reports unconfigured when login or password is missing', async () => {
     mockResolveSecret.mockResolvedValue({
       source: 'unconfigured',

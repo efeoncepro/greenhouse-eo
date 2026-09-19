@@ -139,6 +139,25 @@ curl -s -X POST https://<host>/api/admin/growth/seo/keyword-discovery \
 - **NUNCA** presentar un `clusterConflict: 'unknown'` como "no hay conflicto". Significa que no se
   pudo saber: un hueco de datos no es una vía libre.
 
+## Verificación de configuración DataForSEO
+
+Antes de atribuir `provider_error` al proveedor, confirma login y password ref en las revisiones
+que sirven tráfico del worker compartido. La conexión local no verifica Cloud Run. Check sin gasto:
+
+```bash
+node services/ops-worker/dataforseo-config.mjs --service ops-worker --project efeonce-group --region us-east4
+```
+
+El preflight de `deploy.sh` exige ambos cuando SEO o Google AIO está ON, antes de Cloud Build;
+CI obtiene login de `secrets.DATAFORSEO_API_LOGIN`, el deploy local debe recibirlo explícitamente
+sin mostrarlo. La verificación post-deploy lee las revisiones con tráfico, no sólo el template.
+Este hardening y el error `provider_configuration_missing` están implementados en develop bajo
+TASK-1341 (rollout pendiente al 2026-09-19). Ese error corta las subllamadas sin contar requests
+que no salieron; las corridas antiguas mantienen el código histórico `provider_error`.
+[ISSUE-175](../../issues/resolved/ISSUE-175-dataforseo-worker-login-missing.md) recuperó la config
+con la misma imagen y probó un canary nuevo por scheduler (10 candidatos, USD 0.0132).
+No reescribir ni reintentar automáticamente los runs históricos.
+
 ## Problemas comunes
 
 - **`disabled`**: falta uno de los dos flags en ese runtime.

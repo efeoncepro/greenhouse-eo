@@ -294,6 +294,10 @@ jobs:
           # ISSUE-113 con Perplexity). El client secret viaja por secret ref, no por acá.
           GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID }}
 
+      - name: Verify serving DataForSEO configuration
+        # Runs even when the image drift check skipped deployment.
+        run: node services/ops-worker/dataforseo-config.mjs --service ops-worker --project efeonce-group --region us-east4
+
       - name: Verify deployment health
         run: |
           # Confirm the latest revision is serving. Cloud Run only routes

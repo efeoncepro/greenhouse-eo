@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-19 — ISSUE-175: recuperado keyword discovery de DataForSEO
+
+Restaurado el login ausente del worker compartido sin cambiar imagen ni otras env vars. Canary real
+por scheduler: 10 candidatos, USD 0.0132, gasto reconciliado. TASK-1341 añade localmente guard de
+configuración antes de build y readback de revisiones con tráfico, incluso si CI salta el deploy;
+discovery distingue configuración ausente y no cuenta requests que no salieron. Hardening en develop, sin
+push/despliegue de código; smoke AIO del alcance original pendiente.
+
 ## 2026-09-19 — Oferta transversal de transformación humano-agente
 
 Se añadió investigación primaria, ficha de servicio y modelo de negocio para pasar de readiness de agentes a
@@ -679,18 +687,3 @@ Se documenta el método en tres capas (manual comercial, doc funcional, runbook 
 multi-marca", Delta de arquitectura) y en las skills `seo-aeo-practice` (módulo de la cuña, plantilla de correo,
 estado actual) y `seo-aeo` (overlay operativo del grader). Quedan registrados tres defectos medidos del grader, sin
 task todavía, y la capacidad gobernada del panel en `TASK-1861` Delta (d).
-
-## 2026-09-11 — Trendjacking «Nuestro Duo»: pieza híbrida, Short con Seedance 2.5 y 4 canales vía Metricool
-
-Primera operación de trendjacking end-to-end sobre el lanzamiento del iPhone Duo: investigación de las reacciones
-reales de marcas, pieza 4:5 con mockup de plegable (plate `gpt-image-2` con pantallas chroma + homografía + texto y
-logo determinísticos), Short 9:16 con Seedance 2.5 vía Higgsfield y programación en Threads, Instagram, LinkedIn y
-YouTube (marca Efeonce Group, etiqueta IA declarada). Registro con ids y aprendizajes en
-`docs/operations/social/2026-09-11-iphone-duo-trendjack.md`.
-
-Las skills `social-media-studio`, `copywriting`, `greenhouse-ai-image-generator` y `motion-design-studio` (Codex y
-Claude) y `GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md` incorporan lo aprendido: YouTube en Metricool solo acepta
-video; en video las pantallas las renderiza el modelo (el reemplazo con green screen se ve pegado) y se protegen con
-pantallas de texto grande + cada pantalla como referencia; `start_image` de Seedance no fija el encuadre, así que el
-overlay se diagrama midiendo el sujeto por frame; y el copy de trendjacking cita lo que las marcas publicaron, sin
-inventar su estado, con frases naturales y golpe.

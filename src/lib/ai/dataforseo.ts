@@ -4,6 +4,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { resolveSecret, type SecretResolutionSource } from '@/lib/secrets/secret-manager'
 
 import { dataForSeoBreaker, isProviderHealthFailure } from './dataforseo-breaker'
+import { DataForSeoConfigurationError } from './dataforseo-errors'
 import {
   DATAFORSEO_FAMILIES,
   normalizeEndpoint,
@@ -82,13 +83,12 @@ export const isDataForSeoConfigured = async (): Promise<boolean> => {
 
 const resolveDataForSeoCredentials = async () => {
   const login = process.env.DATAFORSEO_API_LOGIN?.trim()
+
+  if (!login) throw new DataForSeoConfigurationError('DATAFORSEO_API_LOGIN')
+
   const password = await resolveSecret({ envVarName: 'DATAFORSEO_API_PASSWORD' })
 
-  if (!login || !password.value) {
-    throw new Error(
-      'DataForSEO no esta configurado. Define DATAFORSEO_API_LOGIN y DATAFORSEO_API_PASSWORD o DATAFORSEO_API_PASSWORD_SECRET_REF.'
-    )
-  }
+  if (!password.value) throw new DataForSeoConfigurationError('DATAFORSEO_API_PASSWORD')
 
   return {
     login,
@@ -333,7 +333,9 @@ export const postDataForSeoSerpLiveAdvanced = async (input: {
     ...(input.timeoutMs === undefined ? {} : { timeoutMs: input.timeoutMs })
   })
 
-export const checkDataForSeoConnection = async (input: { timeoutMs?: number } = {}): Promise<DataForSeoConnectionCheck> => {
+export const checkDataForSeoConnection = async (
+  input: { timeoutMs?: number } = {}
+): Promise<DataForSeoConnectionCheck> => {
   const credentials = await resolveDataForSeoCredentials()
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), input.timeoutMs ?? 15_000)

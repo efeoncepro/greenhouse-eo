@@ -110,7 +110,7 @@ append-only, `greenhouse_growth.seo_work_queue_*` (TASK-1700): ningún consumer 
 medida `priority_score` queda NULL. La curva CTR declara usabilidad y distingue cero de ausencia de muestra
 (TASK-1792); discovery identifica keywords normalizadas, no filas del proveedor. El módulo vive en producción
 y federado en `mcp.efeonce.org`, fail-closed por organización. `GROWTH_SEO_ENABLED` gobierna Vercel y
-`ops-worker`; el worker Cloud Run compartido materializa `seo_gsc_daily`, sin flip aislado de staging. Canon:
+`ops-worker`: Cloud Run compartido, `seo_gsc_daily`, sin flip aislado. Verificar credenciales en runtime. Canon:
 `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` e
 `docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`.
 
