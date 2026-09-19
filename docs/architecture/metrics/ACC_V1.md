@@ -54,6 +54,8 @@ Tests de comportamiento mínimos: ejemplos de §6, null/zero, duplicados, corte 
 
 Por cuenta: Assignment Coverage y demanda asignada de esa cuenta. Por cartera: sumar tareas únicas A/Q al MISMO t. Capacidad: unión de miembros del equipo, una sola vez, y todos sus compromisos; no suma de capacidad por cuenta. ACC no es un flujo mensual sumable: mensual muestra corte de cierre y, si observaciones diarias completas, ΣA_d/ΣQ_d (task-days), rotulado daily weighted coverage. Días sin observación son gaps, no cero; no imputarlos. Horas de períodos contiguos pueden sumarse sin solapamiento, tasas no.
 
+Contrato de acceso a capacidad: D completo incluye compromisos fuera del portfolio. No calcular D sólo con cuentas visibles y presentarlo como disponibilidad total. TASK-1879/1880 deben distinguir permiso de lectura detallada de compromisos y permiso explícito de resumen operacional cross-account. Sólo con este último se puede servir capacidad/carga derivada de todos los compromisos, sin nombres ni desglose privado; aprobar el riesgo de inferencia (incluso una única cuenta oculta) con People/Identity. Si ese resumen no está autorizado, Capacity Load/headroom/overload y disponibilidad derivada quedan suppressed/unavailable al consumidor; Assignment Coverage puede seguir disponible. Nunca inferir cero demanda de datos ocultos. Tests cubren una persona, una cuenta visible y otra oculta, incluido ataque por diferencia entre filtros.
+
 No existe agregado productivo de liderazgo en registry hoy. Implementación futura TASK-1880 sobre snapshot de TASK-1879; tablas/nombres nuevos permanecen propuestos. Página/filtro de UI no redefine universo materializado. Conservar conteos y precisión completa, redondear sólo presentación.
 
 ## 6. Semántica de casos edge

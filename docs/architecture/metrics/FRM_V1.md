@@ -22,10 +22,10 @@ Contrato de diseño, NO descripción de un helper de liderazgo ya operativo:
 ```text
 V1 descriptiva: counts y edades de Stuck, OCF, riesgo de vencimiento y reprogramaciones con motivo según señales canónicas; no sumarlos como total porque una tarea puede tener varios flags. uniqueAtRiskTasks = DISTINCT task identity.
 Componente de respuesta condicionado a instrumentación:
-E = episodios de riesgo elegibles detectados en período/intervalo de responsabilidad, no duplicados, no anulados por falso positivo aprobado.
+E = episodios de riesgo elegibles detectados en [cohortStart,cohortEnd) y atribuidos por responsabilidad al detectar, no duplicados ni anulados por falso positivo aprobado. Congelar IDs de E por revisión.
 deadline(e)=addBusinessMinutes(detected_at, SLA[severity,type], calendarVersion).
-M={e∈E | deadline(e) <= asOf}; incluir sin acción y resueltos automáticamente.
-R={e∈M | existe acción válida a con detected_at <= a.occurred_at <= deadline(e)}.
+M={e∈E | deadline(e) <= observationAsOf}; incluir sin acción y resueltos automáticamente.
+R={e∈M | existe acción válida a con detected_at <= a.occurred_at <= min(deadline(e),observationAsOf)}.
 Timely Intervention Rate=100×|R|/|M|; |M|=0 → null, aunque haya riesgos aún con plazo abierto.
 pendingMaturity=|E-M|. riskEventCoverage=episodios con detección/acción confiable sobre conocidos; población desconocida no permite tasa global plena.
 Response Time=businessMinutes(detected_at, earliestValidAction_at), p50/p90 sobre respondidos, acompañado de unanswered count/age.
@@ -33,6 +33,12 @@ Resolution Time es diagnóstico distinto; cierre de señal sin acción no cuenta
 ```
 
 Versionar método, policy, dependencias y manifest por separado. Cambiar semántica exige nueva versión y no reescribe revisiones locked.
+
+### Corte de cohorte vs maduración
+
+cohortEnd es fin exclusivo del mes de detección; observationAsOf es el corte de observación de respuesta, que puede avanzar al mes siguiente sin incorporar nuevos riesgos a E. Guardar ambos, runAsOf, watermark y revisión. Una acción posterior a cohortEnd pero anterior al SLA cuenta al madurar el episodio. El calendario/SLA y responsable de atribución del episodio quedan fijados por policy al detectarlo; una transferencia no reinicia el plazo.
+
+Ejemplo de fixture: riesgo 30 septiembre, deadline 2 octubre, acción válida 1 octubre. Corte 30 septiembre: pendingMaturity; observationAsOf 3 octubre: maduro y respondido a tiempo en cohorte septiembre. Un riesgo detectado 1 octubre no entra en E de septiembre. Evento tardío conocido después de lock propone revisión; nunca mutación silenciosa. Si no se certifica watermark/captura para el intervalo de respuesta, conservar confidence degradada aunque todo E haya madurado.
 
 ## 3. Inputs canonical
 

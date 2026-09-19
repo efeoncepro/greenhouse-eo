@@ -18,11 +18,11 @@ Una lista de cuatro cuentas sólo resuelve el piloto; asignaciones, fuentes y pe
 
 Se propone adoptar un scorecard **de responsabilidad operacional**, separado del individual y sin score compuesto ni efecto salarial:
 
-1. Universo dinámico por líder/cuenta/vigencia desde operational_responsibilities; manifest derivado versionado, no roster manual ni lista hardcodeada. V1 por cuenta/space explícito, sin herencia organizacional por cargo.
+1. Universo dinámico por líder/cuenta/vigencia desde operational_responsibilities; manifest compuesto operativo y atribución histórica por métrica, derivado/versionado, no roster manual ni lista hardcodeada. V1 por cuenta/space explícito, sin herencia organizacional por cargo.
 2. Seis indicadores definidos sólo en sus specs: [POTD](metrics/POTD_V1.md), [FTR contexto liderazgo](metrics/FTR_V1.md#14-contexto-de-liderazgo-operativo--proposed-2026-09-19), [RpA contexto liderazgo](metrics/LEADERSHIP_RPA_V1.md), [ACC](metrics/ACC_V1.md), [FRM](metrics/FRM_V1.md), [STI](metrics/STI_V1.md). ACC/FRM son familias y STI vector, no seis porcentajes intercambiables.
 3. Reusar hechos/clasificación canónicos. Ratios por cociente de sumas, evidencia explícita, unknown distinto de cero. Fuente parcial conserva cuenta y confianza baja; nunca eliminar para subir resultado.
-4. Temporalidad por métrica en [contrato compartido §3](GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md#3-universo-identidad-y-tiempo), propuesta sujeta a aprobación de Ops: compromiso para POTD, primera revisión cliente para FTR/RpA, corte para ACC, detección para FRM.
-5. Working diario, revisión semanal, conciliación/lock mensual y comparación trimestral con baseline equivalente. Revisión inmutable con lineage; correcciones auditadas crean versión nueva.
+4. Temporalidad por métrica en [contrato compartido §3](GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md#3-universo-identidad-y-tiempo), propuesta sujeta a aprobación de Ops: compromiso para POTD, primera revisión cliente para FTR/RpA, aunque el binding ya no esté vigente al cerrar, corte para ACC, detección para FRM.
+5. Working diario, revisión semanal, conciliación/lock mensual con corte de observación por componente y comparación trimestral con baseline equivalente. Revisión inmutable con lineage; correcciones auditadas crean versión nueva.
 6. Responsabilidad, disponibilidad de datos y permisos independientes. API primitive server-side común, filtros/aggregates no filtran información prohibida; UI Person 360 sólo presenta.
 7. Shadow antes de uso formal. Sin ranking individual, bonus nuevo, writeback Notion de liderazgo ni evaluación adversa automatizada.
 
@@ -49,6 +49,12 @@ La calidad de cohorte se conserva al transferir o suplir; exposición y acciones
 La persona evaluada conoce policy y puede controvertir evidencia. Correcciones no se autoaprueban ni sobrescriben cierres; suspender interpretación del componente controvertido. Baseline/metas/calendario se aprueban prospectivamente. Elegimos esta separación frente a evaluación inmediata, autoaprobación del líder o un gate personal de Daniela para todas las entregas.
 
 **RpA es rondas, no tiempo:** no prometer rapidez ni ahorro de horas a partir de su descenso. **Compatibilidad documental:** RPA_V1 queda intacto, liderazgo vive en LEADERSHIP_RPA_V1, indexado en ICO; cualquier corrección del canon base requiere trabajo independiente.
+
+### Precisiones de revisión adversarial — 2026-09-19
+
+El [contrato compartido](GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md) y specs incorporan seis correcciones: manifest histórico además del operativo; autorización específica para capacidad total cross-account; una observación de calidad por asset con período ancla/revisiones ante reapertura; cohorte FRM distinta de su observación/maduración; STI con pesos normalizados en C_k y baseline mensual explícito; technicalShadowReady separado de evaluationReady.
+
+No son cambios al RpA individual ni activación automática de permisos. Estas decisiones son propuestas verificables: los fixtures se exigen en TASK-1879/1880/1881, no se consideran pruebas runtime por estar escritos. [Informe adversarial](../audits/EPIC-048_LEADERSHIP_METRICS_ADVERSARIAL_REVIEW_2026-09-19.md).
 
 ### Consecuencias sobre código, datos y consumidores (planificación)
 

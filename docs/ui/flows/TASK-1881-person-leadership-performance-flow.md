@@ -23,12 +23,12 @@ close/Escape → contexto/filtro/scroll conservados y foco al trigger.
 
 ## Membership and Pagination
 
-ManifestVersion identifica la cartera de la revisión. Cuenta nueva aparece en siguiente lectura de ciclo, incluso pending_source; no añadir código ni un quinto slot. Alta durante fetch no mezcla manifest nuevo con resumen viejo. Baja/reasignación/revocación invalida caches y cierra sidecar, con foco seguro.
+ManifestVersion identifica los manifests operativo y de atribución histórica de la revisión. Cuenta nueva aparece en siguiente lectura de ciclo, incluso pending_source; no añadir código ni un quinto slot. Alta durante fetch no mezcla manifest nuevo con resumen viejo. Baja/reasignación/revocación invalida caches y cierra sidecar, con foco seguro.
 Cursor/order estables, resultados/metadata sólo del scope autorizado. Históricos conservan membresía del período. Deep link a cuenta fuera del período o permisos responde seguro; no fallback silencioso. Probar 51/201 cuentas y dos líderes; página visible nunca define denominador del score.
 
 ## Exceptions and Recovery
 
-Binding ausente: explicación, sin score; contacto operativo por canales existentes.
+Ambos manifests vacíos: explicación, sin score; binding histórico irresoluble: gap explícito; contacto operativo por canales existentes.
 Stale: fecha visible y último snapshot identificado, retry limitado.
 401/403 o permiso revocado: ocultar detalle y datos cacheados, sin fallback a API individual menos restrictiva.
 Revisión sustituida: ofrecer versión actual sin mezclar filas; historial sólo si autorizado.

@@ -30,15 +30,17 @@ Salida = vector {baseline,current,delta,unit,direction,sample,coverage,comparabl
 
 Comparabilidad por cuenta: misma métrica/método/policy, exposición de responsabilidad y mezcla observada; cambios materiales de equipo/source/work type se explicitan.
 Cohorte C=cuentas comparables presentes en B y T; mostrar a la vez cartera completa de cada ventana y entradas/salidas, sin llamar cohorte al total.
-Sensibilidad al mix: rates por cuenta y Δ estandarizado usando pesos baseline fijos w_c=denominator_c(B)/Σdenominator(B), Δstd=Σw_c×(rate_c(T)-rate_c(B)); sólo cuentas C con ambos denominadores >0. Rotular standardized comparable cohort, nunca sustituir rollup observado.
-Sustained flag por componente (no global): comparable + delta trimestral favorable + cada uno de los 3 meses T no peor que su baseline por tolerancia policy. Sin tolerancia aprobada, mostrar la serie/deltas sin flag.
+Sensibilidad al mix: rates por cuenta y Δ estandarizado usando pesos baseline fijos w_c=denominator_c(B)/Σ_{j∈C_k}denominator_j(B), Δstd=Σw_c×(rate_c(T)-rate_c(B)); C=C_k se define por componente k, sólo cuentas comparables con ambos denominadores >0; Σw_c=1 en C_k, C_k vacío → no_comparable. Rotular standardized comparable cohort, nunca sustituir rollup observado.
+Sustained flag por componente (no global): comparable + delta trimestral favorable + cada uno de los 3 meses T, con evidencia suficiente, no peor que el valor agregado fijo de B por tolerancia policy en la unidad/dirección del componente (RpA: mensual <= baseline+tolerancia; tasas favorables al alza: mensual >= baseline-tolerancia). No usar meses baseline elegidos después de observar T. Sin tolerancia aprobada o con un mes sin sample/cobertura/comparabilidad suficientes, sustained=null con reason; no false ni éxito. Mostrar serie/deltas diagnósticos cuando proceda.
 ```
+
+Una revisión fuente invalidada por reapertura propaga invalidated/non_comparable a este componente y sustained=null, aunque sus valores persistidos parezcan favorables. Sólo reconciliación/revisión aprobada restaura comparabilidad; nunca seleccionar otra baseline retrospectiva para evitar el caso.
 
 Versionar método, policy, dependencias y manifest por separado. Cambiar semántica exige nueva versión y no reescribe revisiones locked.
 
 ## 3. Inputs canonical
 
-Snapshots/revisiones locked de TASK-1880, manifestVersion y metadata de mix, exposure, coverage, método y calendario; baseline approvedBy/approvedAt congelado antes del período evaluado. Intervenciones semanales enlazadas como contexto, no numerador de mejora.
+Snapshots/revisiones locked de TASK-1880 sin invalidación evaluativa pendiente, manifestVersion y metadata de mix, exposure, coverage, método y calendario; baseline approvedBy/approvedAt congelado antes del período evaluado. Intervenciones semanales enlazadas como contexto, no numerador de mejora.
 
 El [contrato compartido](../GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md) gobierna universo, tiempo, source quality y autorización. Fuente primaria registra hechos; ICO deriva el indicador. Campos faltantes no se imputan.
 
@@ -65,6 +67,7 @@ No existe agregado productivo de liderazgo en registry hoy. Implementación futu
 | Cambió captura de correcciones | FTR/RpA no comparable hasta equivalencia demostrada; no castigo por mejor registro |
 | 2 meses actuales o baseline ausente | Serie parcial, STI trimestral unavailable |
 | Denominador baseline 0 | Delta de tasa unavailable; no dividir por cero |
+| Sale cuenta con 90% del denominador baseline; única retenida mejora +20 pp | Cohorte retenida normaliza peso a 1: +20 pp, nunca +2 pp |
 | Método cambiado | No comparación salvo reconciliación versionada aprobada |
 | OCF 10→6, backlog también cae | -4 casos, mostrar exposición; no atribuir causalidad a líder automáticamente |
 

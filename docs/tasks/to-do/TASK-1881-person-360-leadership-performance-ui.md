@@ -24,7 +24,7 @@
 - Status real: `Diseño — planificación creada; sin implementación ni verificación runtime`
 - Rank: `EPIC-048-03`
 - Domain: `ui|hr|delivery`
-- Blocked by: `TASK-1880`
+- Blocked by: `TASK-1880` (hito technicalShadowReady; no requiere lifecycle complete ni STI maduro)
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -89,7 +89,7 @@ El protocolo del contrato compartido §11 es normativo: diseño resuelto, activa
 
 - Specs de métricas y ADR de liderazgo en Normative Docs: fuente única de fórmulas/temporalidad; no redefinirlas dentro de la task.
 
-- TASK-1880: DTO versionado, reader autorizado, fixtures/trust/revisiones y drilldown; TASK-1879 transitiva.
+- TASK-1880: hito technicalShadowReady con DTO/commands versionados, autorización, canary y QA; TASK-1879 transitiva. Shadow visual no espera madurez evaluativa ni cierre de la task backend.
 - TASK-1075/1076 (EPIC-018): storytelling/primitives compartidos. Reusar estado actual; no absorber el rediseño de toda Actividad.
 - TASK-1216 y person-activity-access existentes: la nueva UI no concede permisos.
 
@@ -318,6 +318,13 @@ Ops revisa claridad de lectura para Daniela, no aprueba cambios salariales. Owne
 Consumir RpA como contexto ICO junto a FTR: unidad rondas/asset, muestra/cobertura, distribución y casos abiertos claramente separados de completados. Explicar cero demostrado frente a dato ausente; presentar transferencias/motivos sin culpabilidad automática. Artefactos UI sincronizados en diseño; validar mapping, formularios y runtime antes de UI ready, sin nueva fórmula ni semáforo salarial.
 
 ## Acceptance Criteria
+
+- [ ] UI distingue cartera operativa de atribución histórica, no muestra empty si sólo hay resultados heredados; scopes/summary capacity autorizados, observationAsOf por componente y reopened_pending visibles con copy gobernada.
+- [ ] Modo shadow permite acciones/disputas autorizadas antes de madurez; STI unavailable no bloquea diagnóstico ni obliga a aprobar evaluación.
+
+
+- [ ] Revisión adversarial EPIC-048: cumplir doble manifest operativo/histórico, reapertura sin duplicación, unidad coverageRatio y dependencias por hito según contrato/specs; evidencia de los casos de su dominio registrada, no sólo texto.
+
 
 - [ ] Mostrar policy vigente, unidad rondas/asset, límites de atribución/inherited/mixedExposure, captura pendiente, tradeoffs y disputed sin mezclar confianza técnica ni mostrar información fuera de permisos.
 - [ ] Consumir commands comunes para acciones, verificación y solicitud/revisión de corrección; no autoaprobación ni fórmulas UI. GVC incluye falta de autoridad, acción sin efecto y disputa antes/después de cierre.

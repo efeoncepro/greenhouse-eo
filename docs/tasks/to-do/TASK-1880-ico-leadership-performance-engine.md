@@ -239,9 +239,9 @@ UI/JSX, redefinir OTD/RpA/FTR individual, promedio de KPIs como score sintético
 
 ### Dynamic portfolio materialization and API
 
-Consumir exclusivamente el manifest de TASK-1879 para cualquier leader_member_id. Descubrir también nuevos líderes con responsabilidad elegible mediante query completa; no mantener roster de Daniela ni lista fija de subjects/cuentas. Un líder sin cuentas en el período emite empty, no resultado perfecto.
+Consumir exclusivamente el manifest compuesto de TASK-1879 (operativo + metricAttribution histórico) para cualquier leader_member_id. Descubrir también nuevos líderes con responsabilidad elegible mediante query completa; no mantener roster de Daniela ni lista fija de subjects/cuentas. Un líder sin cuentas operativas ni hechos históricamente atribuibles del período emite empty, no resultado perfecto.
 Cada run congela manifestVersion/asOf antes de procesar lotes; el alta/revocación durante el run invalida publicación o queda visible como scope pending hasta siguiente revisión, nunca produce una cartera mezclada. Reconciliación incluye nuevas cuentas sin source/snapshot. El snapshot previo se puede mostrar como stale/previousScope, nunca como cartera actual completa.
-Distinguir: assignedAccountCount (cuentas del manifest), measurableAccountCount POR MÉTRICA, pendingAccountCount POR RAZÓN, y cuentas legítimamente sin tareas. El porcentaje de cuentas con datos no es cobertura de tareas: si falta una fuente no conocemos su volumen, taskCoverage debe ser null/unknown, no 100%.
+Distinguir: assignedAccountCount (cuentas del manifest operativo), attributedAccountCount (cuentas por cohorte/métrica, también históricas), measurableAccountCount POR MÉTRICA, pendingAccountCount POR RAZÓN, y cuentas legítimamente sin tareas. El porcentaje de cuentas con datos no es cobertura de tareas: si falta una fuente no conocemos su volumen, taskCoverage debe ser null/unknown, no 100%.
 El rollup sobre datos conocidos se rotula observedSubset y partial cuando falta evidencia; conservar numerador/denominador observados sin imputación ni renormalización como nota completa. No convertir una cuenta no medible en eligible=0. Minimums se aplican por métrica/cuenta y portfolio, no como gate “tienen datos las cuatro”.
 Paginación/orden/filtros son del detalle: el agregado server-side abarca TODO el scope autorizado seleccionado, nunca sólo la página. DTO distingue fullPortfolio, authorizedSubset y filteredSubset; totales, nombres, agregados y metadata no revelan cuentas fuera de permisos. No enviar un agregado completo si permite inferir datos de cuentas prohibidas.
 Nuevas cuentas de fuentes soportadas se incorporan en el siguiente ciclo tras asignación, sin código/deploy; estados pending_source, disabled_source, insufficient_history y unsupported_source siguen visibles en el manifest autorizado.
@@ -260,8 +260,8 @@ Definiciones, cálculos y casos numéricos son los specs de Normative Docs. Impl
 
 ### Time and universe
 
-Períodos de negocio America/Santiago con límites [start,end), conversiones UTC y DST probadas; period_end+1 day es inicio de conciliación, NO lock automático.
-Usar snapshot/asOf común para cuentas; tasas no incluyen vencimientos futuros como éxito. Mostrar futureDue separado. Tareas multi-asignadas/cross-project se deduplican por identidad de fuente. Cambios de cuenta/due-date/leader siguen policy congelada de TASK-1879.
+Períodos de negocio America/Santiago con límites [start,end), conversiones UTC y DST probadas; siguiente día hábil a period_end es inicio de conciliación, NO lock automático.
+Usar runAsOf común y cortes de observación explícitos por componente según contrato §6; tasas no incluyen vencimientos futuros como éxito. Mostrar futureDue separado. Tareas multi-asignadas/cross-project se deduplican por identidad de fuente. Cambios de cuenta/due-date/leader siguen policy congelada de TASK-1879.
 FTR entre entregas completadas; reabiertas/canceladas y múltiples ciclos deben seguir fórmula canónica con ciclo/evento identificable, no recuento arbitrario.
 
 ### Trust and review
@@ -275,15 +275,17 @@ Revisión semanal registra decisiones reales; no crea mensajes Teams automático
 
 Daily: encadenar al ciclo ICO tras freshness de fuentes; actualizar working, mostrar updatedAt.
 Weekly: owner operativo revisa todas las cuentas de la cartera resuelta para la semana, altas/bajas, backlog, ownership/capacidad y acciones.
-Monthly: día siguiente al cierre → conciliación → aprobación/lock. Si upstream tarda, estado pending_reconciliation.
+Monthly: siguiente día hábil al cierre → conciliación → aprobación/lock. Si upstream tarda, estado pending_reconciliation.
 Quarterly: STI sólo tres meses locked comparables contra baseline aprobado.
 Shadow: mínimo dos cierres para calibración. STI completo exige tres meses actuales más baseline comparable de tres meses; seis meses si no hay historia certificada. Calendario real es evidencia, no simulación que cierre aceptación.
+
+Pruebas adversariales adicionales: mismo asset agosto→reapertura septiembre→recierre conserva un solo período ancla/revisión; FRM permite respuesta octubre a riesgo septiembre sin incorporar riesgos octubre; STI pesos normalizados sobre C_k y sustained null si mes sin evidencia; capacidad C40/D20+30 requiere capability cross-account o supresión. Ratios de cobertura usan [0,1] y displayPct no entra a minCoverage. Autorizar capacity summary no autoriza detalles ocultos.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-TASK-1879 → 1 → 2 → 3 → 4 → consumo productivo TASK-1881. UI puede planificarse con DTO fixtures, no afirmar rendimiento real antes de canary.
+TASK-1879 → slices 1–3 + canary técnico/autorización/QA → technicalShadowReady → consumer TASK-1881 interno allowlisted. Slice 4 y maduración evaluativa continúan en paralelo; no exigir dos cierres ni STI para diagnosticar/capturar. UI puede planificarse con fixtures antes, sin afirmar rendimiento real.
 
 ### Risk matrix
 
@@ -310,7 +312,7 @@ Propuestos NUEVOS: leadership materialization y leadership read, default OFF, m�
 
 ### Production verification sequence
 
-Migración/grants staging → unit/contract/concurrency → BQ/PG parity → fail/retry/rollback → canary allowlisted interno → daily/weekly readback → dos cierres reales para calibración y trimestre actual más baseline comparable para STI → revisar activación. Ninguna secuencia ejecutada en esta planificación.
+Migración/grants staging → unit/contract/concurrency → BQ/PG parity → fail/retry/rollback → canary allowlisted interno → daily/weekly readback → technicalShadowReady y UI shadow interna → dos cierres reales para calibración/evaluationReady por componente; STI sólo al contar con trimestre actual más baseline comparable. Ninguna secuencia ejecutada en esta planificación.
 
 ### Out-of-band coordination required
 
@@ -339,9 +341,15 @@ Implementar el contexto ICO RpA conforme LEADERSHIP_RPA_V1: cohorte compartida F
 
 ## Acceptance Criteria
 
+- [ ] Caso99 ceros+1 asset diez rondas: reapertura del último no habilita mejora evaluable aunque coverage99% pase el mínimo; invalidation overlay se aplica en readers/caches, revisiones y STI dependiente hasta conciliación aprobada.
+
+
+- [ ] Revisión adversarial EPIC-048: cumplir doble manifest operativo/histórico, reapertura sin duplicación, unidad coverageRatio y dependencias por hito según contrato/specs; evidencia de los casos de su dominio registrada, no sólo texto.
+
+
 - [ ] Protocolo §11.3–11.6: commands de acciones distinguen ejecución de efectividad, reviewer independiente, evidencia por caso y estados inconclusive/ineffective; no nuevo motor de tareas ni KPI de actividad.
 - [ ] Corrección/disputa con separación autor-revisor, revocación de permisos, idempotencia y audit; antes/después de lock genera el estado/revisión correcto sin autoaprobación ni sobrescritura.
-- [ ] Policy/calendario/metas versionados prospectivamente y gate de readiness: sin baseline/calibración/formación/titulares aprobados no se activa evaluación; fixtures de captura, suplencia, tradeoff y controversia de §11.6 pasan.
+- [ ] Policy/calendario/metas versionados prospectivamente y gate de readiness: sin baseline/calibración/formación/titulares aprobados no se activa evaluación; fixtures de captura, suplencia, tradeoff y controversia de §11.7 pasan.
 
 
 - [ ] Implementar el contexto ICO RpA conforme LEADERSHIP_RPA_V1: cohorte compartida FTR, sumas/counts exactos, distribución, percentiles definidos y señales abiertas separadas. Persistir lineage/versiones/coverage, resolver límites inclusivos del helper frente al período semiabierto y probar reaperturas/duplicados/transferencias. No cambiar helper individual ni recalcular en DTO/UI.

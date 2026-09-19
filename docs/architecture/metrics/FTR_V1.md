@@ -424,18 +424,18 @@ Evaluar la calidad del primer entregable de la cartera del líder, no cuántas p
 
 ### 14.2 Cálculo y población
 
-Sea E el conjunto deduplicado de tareas completadas elegibles en el período/corte según canon, atribuibles al líder por el manifest temporal; aplicar exclusiones canónicas con conteos visibles.
-K ⊆ E requiere a la vez: helper FTR válido, atribución fiable e historial completo relevante de revisión/correcciones hasta asOf. Un source_quality canonical o tener UNA transición no prueba completitud.
+Sea E el conjunto deduplicado de identidades cuya primera finalización elegible pertenece al período ancla, atribuibles por manifest temporal; incluye identidades posteriormente reabiertas como gaps. Aplicar exclusiones canónicas con conteos visibles.
+K ⊆ E requiere a la vez: completada al corte, sin invalidación pendiente, helper FTR válido, atribución fiable e historial completo relevante de revisión/correcciones hasta asOf. Un source_quality canonical o tener UNA transición no prueba completitud.
 P={t∈K | calculateFtr(t).value=pass}. FTR observado=100×|P|/|K|, si |K|>0; si no null.
-eligibleKnown=|E|; known=|K|; missingKnown=|E-K|; knownTaskCoverage=100×|K|/|E| cuando E>0. populationKnown=false por fuente faltante implica globalTaskCoverage=null.
+eligibleKnown=|E|; known=|K|; missingKnown=|E-K|; knownTaskCoveragePct=100×|K|/|E| cuando E>0. populationKnown=false por fuente faltante implica globalTaskCoverageRatio=null.
 Cartera suma P/K de cuentas e intervalos, no promedia sus tasas. Método de agregado propuesto leadership_ftr_v1.0, dependencias FTR_FORMULA_VERSION + versión RpA y coverage/attribution policy; no renombrar el helper a ftr_v2 sin cambiar su semántica.
-No pasar inicio de mes como windowStart si corta correcciones anteriores: usar historia de la tarea completa pertinente al ciclo, hasta el corte. Mes de finalización selecciona E, no la ventana del historial.
+No pasar inicio de mes como windowStart si corta correcciones anteriores: usar historia de la tarea completa pertinente al ciclo, hasta el corte. Mes de primera finalización elegible selecciona E (con revisiones de reapertura en el período ancla), no la ventana del historial. Atribución histórica sigue doble manifest del contrato compartido §3.
 
 ### 14.3 Casos y mecanismos
 
 - 10 completadas elegibles, 6 con historia fiable, 5 pass: 83.3% observado, coverage conocida 60%, 4 desconocidas; jamás presentar 9/10, 5/10 como nota plena ni 100% por correcciones ausentes.
 - Internas de Efeonce entran con revisión de cliente interno identificada; internal workflow review no se convierte en corrección de cliente.
-- Reabierta al corte: no finalizada, no FTR final. Una corrección posterior a cierre locked propone revisión auditada, no overwrite. Un ciclo nuevo real exige identidad/evento canónico; no usar reabrir/cerrar para sumar entregas repetidas.
+- Reabierta al corte: no finalizada, no FTR final. En liderazgo aplica la regla V1 de LEADERSHIP_RPA_V1 §3: una identidad, período ancla de primera finalización, reopened_pending y revisión auditada de ese período al recierre; no una nueva entrega del mes actual. FTR y RpA cambian juntos con la misma revisión/asOf y sin cambiar el cálculo individual. Mientras hay reopened_pending, bloquear evaluación del componente/rollups afectados aunque minCoverage pase; sólo diagnóstico sobre K. STI dependiente invalidated/non_comparable hasta revisión aprobada; no mejora aparente por sacar el caso difícil.
 - Bajo coverage/sample: valor diagnóstico low_confidence; K=0 unavailable; abierta/excluida no aplicable. Confidence de leadership puede ser más estricta que la del helper, nunca más laxa.
 - Cambio de fuente o lead sin evento de primera revisión fiable: atribución desconocida; no tomar líder actual ni finalización como proxy silencioso.
 - Cambio de alcance del cliente sigue contando según RpA vigente; segmentar motivos para interpretar, no redefinir pass/fail sólo aquí.

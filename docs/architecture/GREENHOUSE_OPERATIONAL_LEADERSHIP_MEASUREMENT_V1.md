@@ -31,10 +31,18 @@ ACC/FRM son familias con componentes explícitos; STI es un vector de cambios. N
 ## 3. Universo, identidad y tiempo
 
 Unidad base: leader_member_id × account_scope_id × período × revisión. Cuenta es unidad operativa canónica, no nombre comercial ni workspace Notion. TASK-1879 resuelve mapping de organización/space/source y conflictos antes de publicar.
-Cartera = unión de cuentas con responsabilidad elegible y vigencia intersectando el período; estado actual activo no sirve para reconstruir historia. En período abierto limitar hechos a asOf. Vigencias [from,to), UTC persistido, calendario America/Santiago y DST probado; fechas sin hora usan reglas de fecha de negocio del bucket canónico, no medianoche UTC arbitraria.
+Cartera operativa = unión de cuentas con responsabilidad elegible y vigencia intersectando el período; es el universo de gestión actual, no un filtro previo universal para cohortes históricas. Estado actual activo no sirve para reconstruir historia. En período abierto limitar hechos a asOf. Vigencias [from,to), UTC persistido, calendario America/Santiago y DST probado; fechas sin hora usan reglas de fecha de negocio del bucket canónico, no medianoche UTC arbitraria.
 
 V1: responsabilidad explícita por cuenta/space, con tipos delivery_lead/operations_lead sujetos a política de precedencia y primary; sin expansión implícita desde cargo, department, permisos o tareas de subordinados. Un registro por scope no garantiza responsabilidad si la vigencia o mapping es inválido. Conflicto entre tipos/co-leads debe resolverse por policy aprobada, no por orden SQL.
 Manifest derivado completo guarda cuentas, intervalos, responsabilidad/versiones, source refs, estados y digest. No segunda lista editable por líder. Quinta cuenta de fuente soportada se incorpora al siguiente ciclo exitoso sin código, seed por cliente ni redeploy. Fuentes no soportadas requieren adapter; mientras tanto se conserva la cuenta no medible.
+
+### Doble manifest: gestión operativa y atribución histórica
+
+El snapshot incluye operationalPortfolio (vigencias que intersectan el período) y metricAttribution por métrica (cuentas/subjects/bindings históricos a los que pertenecen hechos de la cohorte del período). La unión derivada conserva membershipReason=operational|historical_attribution|both; ambos conteos separados. No eliminar sujetos sin asignación actual si tienen hechos atribuibles del período. Tampoco introducirles trabajo operativo nuevo de la cuenta por tener un resultado histórico.
+
+Ejemplo obligatorio: primera revisión en agosto con A, transferencia a B el 1 de septiembre, cierre en septiembre. FTR/RpA cerrado corresponde a A en septiembre con historical_attribution/mixedExposure; B ve gestión abierta/intervenciones durante su vigencia, no ese crédito. Enumerar hechos elegibles y resolver su binding histórico antes del filtro de sujetos/carteras, sin roster actual como límite. Un leader con ambos manifests vacíos sí es empty. Identidad/binding desconocidos permanecen en la cobertura de fuente/cuenta, sin adjudicar a B ni afirmar portfolio global completo.
+
+Autorización al momento de lectura sigue siendo independiente: binding histórico no restaura permisos revocados. No exponer cuentas, counts o resultados históricos sin permiso actual; authorizedSubset no permite inferir el resto.
 
 ### Atribución temporal propuesta para el ADR
 
@@ -54,7 +62,7 @@ No inferir tarea inexistente de una fuente desconectada; el volumen faltante pue
 ## 5. Contrato de evidencia y confianza
 
 DTO propuesto por métrica/cuenta:
-metricKey, methodVersion, dependencyVersions, policyVersion, manifestVersion, periodStart/end, asOf, revision, sourceWatermark, numerator, denominator, value nullable, unit, eligibleKnown, measuredCount, missingKnown, excludedCountByReason, populationKnown, coverage, sampleSize, confidence, reasonCodes y evidenceCursor.
+metricKey, methodVersion, dependencyVersions, policyVersion, manifestVersion, periodStart/end, runAsOf, metricObservationAsOf, cohortStart/end, revision, sourceWatermark, numerator, denominator, value nullable, unit, eligibleKnown, measuredCount, missingKnown, excludedCountByReason, populationKnown, coverage, sampleSize, confidence, reasonCodes y evidenceCursor.
 
 - confidence: valid | low_confidence | unavailable.
 - lifecycle: working | locked | superseded, separado de confidence.
@@ -62,7 +70,7 @@ metricKey, methodVersion, dependencyVersions, policyVersion, manifestVersion, pe
 - Publication/access: suppressed no viaja como dato sensible; una política de acceso puede omitirlo o denegar la respuesta sin revelar su existencia.
 - value=null si denominador cero o faltan inputs para calcular; reason diferencia no_eligible_work, no_portfolio, missing_source, missing_history, invalid_binding, insufficient_sample, policy_unconfigured, non_comparable y ambiguous_source.
 
-Cobertura de cuentas y cobertura de tareas son medidas distintas. known coverage=measuredCount/eligibleKnown sólo describe el universo observado; si populationKnown=false, globalTaskCoverage=null. Cada KPI tiene readiness distinto.
+Cobertura de cuentas y cobertura de tareas son medidas distintas. coverageRatio (unidad fraction, rango [0,1])=measuredCount/eligibleKnown sólo describe el universo observado; si populationKnown=false, globalTaskCoverageRatio=null. Cada KPI tiene readiness distinto. minCoverage usa también [0,1]; los porcentajes de presentación se nombran *Pct y multiplican por 100 una sola vez. Nunca comparar 60 contra un mínimo 0.8.
 Con datos parciales puede publicarse observedSubset con low_confidence y fracción visible, nunca como resultado pleno. Menor población conocida no es mejor rendimiento.
 No emitir salud/evaluación formal sin minSample, minCoverage, freshnessBudget y policy vigentes aprobados. Shadow permite diagnóstico sin metas; policy faltante queda explícita. Valores de muestra/SLA/meta no se inventan ni se heredan de Payroll. Tests usan configuraciones sintéticas rotuladas.
 Cálculo con precisión completa; presentar tasas a un decimal, pp a un decimal; nunca sumar valores redondeados. Guardar enteros del numerador/denominador y unidad. No promedio simple de tasas.
@@ -70,7 +78,9 @@ Cálculo con precisión completa; presentar tasas a un decimal, pp a un decimal;
 ## 6. Persistencia, API y permisos
 
 Sources/bindings/historia: PostgreSQL operativo. Snapshots analíticos: BigQuery ICO; serving PG de liderazgo separado del individual. Propuestas de tablas/grants/migración están en TASK-1880; ninguna existe por escribir este documento.
-Run fija manifest/asOf y produce revisión coherente BQ/PG mediante staging/publication marker; publicación parcial no mezcla versiones. Lock/CAS por líder-período, retries idempotentes, audit y source digest. Cierre locked conserva inputs/lineage necesarios; corrección crea revisión con supersedes, motivo y aprobador, no force overwrite.
+Run fija manifests/runAsOf y los metricObservationAsOf explícitos (nunca posteriores a runAsOf), y produce revisión coherente BQ/PG mediante staging/publication marker; publicación parcial no mezcla versiones. Lock/CAS por líder-período, retries idempotentes, audit y source digest. Cierre locked conserva inputs/lineage necesarios; corrección crea revisión con supersedes, motivo y aprobador, no force overwrite.
+FRM congela cohorte de detección y puede observar respuesta después de cohortEnd; no obliga a mover el corte de POTD/ACC ni a incluir tareas del mes siguiente. Cada componente conserva su watermark y corte. Reaperturas de calidad revisan sólo el período ancla con revisedAfterPeriod según LEADERSHIP_RPA_V1; mantener coherencia de FTR/RpA y revalidar STI dependiente. Una revisión puede referenciar componentes sin cambios con sus IDs/cortes originales; no fingir que todos observan hasta el mismo instante.
+
 Una fuente degradada no destruye snapshot sano: último resultado se rotula stale/previousScope y la cartera actual pendiente sigue visible, no reemplazar desconocido por resultado viejo.
 
 Reader server-side compartido session/app/ecosystem/MCP, sin fórmulas frontend. Paginación de detalle no cambia agregado. Intersección de permisos se aplica también a counts, nombres y sumas; fullPortfolio, authorizedSubset y filteredSubset explícitos. Responsabilidad no concede acceso. Cliente externo no accede a evaluación personal.
@@ -82,7 +92,7 @@ Commands para intervención/cierre/corrección: capability fina + grant real, id
 |---|---|---|
 | Diaria | Captura + materialización encadenada a ICO con freshness | Working, cartera actual y excepciones; no nota definitiva |
 | Semanal | Revisión Ops de toda cartera y decisiones con owner/fecha/evidencia | Ajustes de asignación, desbloqueo, escalamiento y seguimiento |
-| Mensual | Día posterior al fin de mes inicia conciliación, no lock automático | Reviewer autorizado distinto del sujeto aprueba evidencia/lock o deja pending_reconciliation |
+| Mensual | Siguiente día hábil al fin de mes inicia conciliación, no lock automático | Reviewer autorizado distinto del sujeto aprueba evidencia/lock o deja pending_reconciliation |
 | Trimestral | Comparar tres meses locked vs baseline anterior comparable | STI y plan de mejora con hipótesis verificables |
 
 Shadow mínimo dos cierres para calibración; STI trimestral completo necesita baseline comparable y trimestre actual. Con baseline de tres meses no existente, seis meses observados totales; no afirmar que tres cierres nuevos bastan para comparar dos trimestres.
@@ -106,7 +116,7 @@ TASK-1879 aprueba ADR/política temporal, mapping/fuentes, garantías de captura
 Pendientes deliberados: bindings reales, calendario/SLA de riesgo, minSample/minCoverage, metas por mix, baseline y retención. Cada uno es gate de su consumer, no permiso para usar un default arbitrario.
 Los documentos hoy están en diseño; no hay implementación, GVC ni datos evaluativos de Daniela producidos por este trabajo.
 
-### Precisión del contexto de calidad
+## 10. Precisión del contexto de calidad
 
 FTR y RpA usan la misma cohorte conocida y certificada. Distribución, rondas condicionales y señales abiertas siguen exclusivamente [LEADERSHIP_RPA_V1](metrics/LEADERSHIP_RPA_V1.md); no sumar abiertos al denominador cerrado. El DTO conserva unidad rounds/asset, estadísticas y cobertura independientes de los semáforos. Estos indicadores permanecen en el [catálogo ICO](metrics/METRICS_INDEX.md), no en un catálogo paralelo de People.
 
@@ -166,7 +176,13 @@ Conciliación mensual abre el siguiente día hábil al fin de mes; ventana propu
 
 Shadow mínimo dos cierres para probar captura y proceso; no fija por sí solo una meta justa. ICO prepara baseline segmentado por fuente/tipo/cuenta con tamaño/cobertura y limitaciones; Ops/People aprueba metas y mínimos **antes** de la vigencia del período evaluado. No escoger retrospectivamente la meta que convenga. Si falta baseline suficiente, continuar diagnóstico; nuevas cuentas/cambios materiales de mix no reciben baseline inventado. STI mantiene su requisito de dos ventanas comparables.
 
-### 11.6 Evidencia de aceptación, sin ampliar ejecución
+### 11.6 Despliegue shadow y madurez evaluativa
+
+Dos hitos distintos: technicalShadowReady (TASK-1879 fuentes + TASK-1880 contrato/API/commands/canary/QA de slices 1–3 verificables) desbloquea implementación y uso interno allowlisted de TASK-1881 para diagnóstico, captura y revisión. No exige completar dos cierres ni STI. evaluationReady se habilita por componente sólo después de calibración, policy y evidencia de madurez; STI sigue unavailable hasta sus dos ventanas comparables. API/CLI son alternativas autorizadas durante desarrollo, no requisito permanente para la líder.
+
+Las tasks conservan to-do hasta ejecución y no pasan a complete por entregar una API si su shadow pendiente pertenece a sus acceptance criteria. El hito parcial y su evidencia desbloquean dependencias; no exigir el lifecycle complete como condición técnica del consumer. No hay despliegue ni activación por documentar estos hitos.
+
+### 11.7 Evidencia de aceptación, sin ampliar ejecución
 
 Fixtures exigibles: feedback fuera de canal sin transición; registro posterior a reentrega; dos devoluciones vs múltiples comentarios; solicitud de corrección propia denegada; reviewer independiente; ausencia con/sin suplente; transferencia mixta; acción ejecutada sin efecto; resultado inconcluso; menor RpA con atraso; controversia antes/después de lock; metas publicadas después del inicio rechazadas; cero con captura incompleta. Tests de valores/transiciones/autorización y readback en futura ejecución, no asserts de texto.
 

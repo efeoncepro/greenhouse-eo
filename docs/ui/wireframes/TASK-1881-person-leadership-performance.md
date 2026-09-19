@@ -98,3 +98,9 @@ No cambia la dirección/recipe ni autoriza JSX. Reutilizar el detalle contextual
 Campos y transiciones siguen contrato compartido §11. Estados añadidos: capture_pending, inherited/mixedExposure, tradeoff_requires_review, disputed, edición local, submitting, validation_error, conflict_revision, submitted y denied. Mostrar policy/calendario vigente y expectativa de revisión. No presentar menor RpA como menor tiempo.
 
 Pruebas futuras desktop/390px: formulario con error y foco, guardar/descartar, sin privilegio, doble envío, permiso revocado, autor intentando revisar, disputa antes/después de lock y acción ejecutada pero inconclusive. Extender mapping de copy y escenarios existentes; ningún screenshot o readiness queda acreditado por este texto.
+
+## Estados de contrato corregidos tras revisión adversarial
+
+Mostrar cuentas operativas y cuentas con atribución histórica por separado, con membershipReason; sin cuentas actuales pero con resultados históricos no es empty. ACC puede tener assignment disponible y capacidad no autorizada/no disponible, sin inferir demanda oculta. Resultado FTR/RpA reopened_pending indica revisión del período ancla, no un nuevo asset del mes actual. Fechas de observación FRM por componente evitan aparentar que todo el scorecard está cortado al mismo instante.
+
+Modo diagnóstico/shadow accesible al alcanzar technicalShadowReady y gates UI/autorización; no habilita evaluación formal. Añadir fixtures GVC de estas variantes, sin fabricar capturas ahora.

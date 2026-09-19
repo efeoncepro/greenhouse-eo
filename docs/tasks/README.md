@@ -45,7 +45,7 @@ Orden obligatorio: foundation → ICO → Person 360. Cartera dinámica por resp
 | Task | Entrega | Dependencia |
 |---|---|---|
 | [TASK-1879](to-do/TASK-1879-leadership-accountability-source-foundation.md) | Cartera dinámica, atribución temporal, cobertura y capacidad interna | none |
-| [TASK-1880](to-do/TASK-1880-ico-leadership-performance-engine.md) | Métricas ICO con RpA/FTR, cerrados y riesgo abierto; snapshots, confianza, API y shadow | TASK-1879 |
+| [TASK-1880](to-do/TASK-1880-ico-leadership-performance-engine.md) | Métricas ICO con RpA/FTR, cohortes históricas/reaperturas; API y technicalShadowReady separado de evaluación | TASK-1879 |
 | [TASK-1881](to-do/TASK-1881-person-360-leadership-performance-ui.md) | Perfil/Actividad: liderazgo, evidencia y separación individual; dirección, wireframe, flow y motion | TASK-1880 |
 
 ## Programa Efeonce Insights: EPIC-045

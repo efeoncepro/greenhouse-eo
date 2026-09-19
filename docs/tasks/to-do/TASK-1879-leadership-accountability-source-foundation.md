@@ -223,6 +223,10 @@ Extender sources productivas desde registry validado, sin listas estáticas por 
 
 Dry-run/backfill conservador, pruebas multi-cuenta y canary. Entregar contrato y fixtures a TASK-1880; datos no disponibles siguen explícitos.
 
+El resolver de sujetos también descubre líderes históricos con hechos atribuibles del período. Fixture: A revisa en agosto, sale el 1 de septiembre y la entrega cierra en septiembre; A conserva atribución histórica, B gestión actual. No contar esa cuenta como asignación operativa actual de A. Ausencia de permisos actuales suprime lectura histórica, no reescribe atribución.
+
+Capacidad cross-account requiere el resumen explícitamente autorizado de ACC_V1; sin grant no emitir capacidad libre basada sólo en compromisos visibles. Probar C40/Dvisible20/Doculta30: autorizado125%, no autorizado sin valor, nunca50% disponible.
+
 ## Out of Scope
 
 Fórmulas/materializador/UI de liderazgo, política de bono, cambiar capacidad comercial global, rehacer responsabilidad genérica, activar operating mode de TASK-1663, configurar cuentas no autorizadas.
@@ -237,10 +241,10 @@ Resolver tres planos independientes: (1) responsabilidad del líder, (2) partici
 V1 usa responsabilidades explícitas de delivery/operaciones por cuenta/space con vigencia. La política versionada define tipos elegibles y precedencia si hay delivery_lead y operations_lead en el mismo scope; no fusionar ambos como dos créditos primarios. Otros tipos (account_lead, approval_delegate) no se suman por conveniencia.
 La regla funciona para cualquier memberId autorizado, no sólo Daniela. Ser jefa de operaciones no implica automáticamente toda la agencia.
 
-Para cada responsabilidad con intervalo que intersecta [periodStart,periodEnd), resolver `account_scope_id` estable, intervalos efectivos, source responsibility IDs/version y motivo de inclusión. En período abierto cortar elegibilidad en asOf; una asignación con inicio futuro se informa como scheduled, no aporta resultados actuales. Materialización histórica usa historia, incluso de asignaciones hoy inactivas. Altas, bajas y reingresos se conservan como intervalos disjuntos; active actual nunca borra historia.
+Para operationalPortfolio, por cada responsabilidad con intervalo que intersecta [periodStart,periodEnd), resolver `account_scope_id` estable, intervalos efectivos, source responsibility IDs/version y motivo de inclusión. En período abierto cortar elegibilidad en asOf; una asignación con inicio futuro se informa como scheduled, no aporta resultados actuales. Materialización histórica usa historia, incluso de asignaciones hoy inactivas. Altas, bajas y reingresos se conservan como intervalos disjuntos; active actual nunca borra historia.
 Distinguir organización comercial, cuenta/unidad operativa y space: definir en ADR cómo se normalizan aliases y múltiples spaces a cuenta, evitar duplicar tareas/sources. Una cuenta puede tener cero o varias fuentes. Scope project no se amplía a cuenta completa; scope sin mapping queda unresolved con alerta, no desaparece.
 
-Resolver un manifest de cartera por período/asOf: lista completa de cuentas/intervalos, versión/digest, conflictos, bindingStatus y references de fuente. No persistir una segunda lista manual de cuentas por persona. Un snapshot derivado y versionado sí preserva el resultado histórico.
+Resolver el manifest compuesto operativo + metricAttribution por período/asOf según contrato compartido §3: lista completa de cuentas/intervalos y cuentas con atribución histórica (membershipReason separado), versión/digest, conflictos, bindingStatus y references de fuente. No persistir una segunda lista manual de cuentas por persona. Un snapshot derivado y versionado sí preserva el resultado histórico.
 Enumeración completa con orden estable/cursor (no truncar a 50/200); snapshot consistente durante paginación. Procesamiento por lotes, queries set-based e índices por member/scope/vigencia. Publicar límites/mediciones de performance en ejecución, nunca llamar “sin límite” al runtime.
 
 ### Onboarding, changes and source readiness
@@ -336,6 +340,9 @@ Conciliación diaria registra gaps por fuente y casos, sin crear eventos correct
 Para RpA/FTR, certificar identidad source/workspace/task y ciclo, primera revisión cliente, cobertura histórica y deduplicación por evento conforme LEADERSHIP_RPA_V1. Una transición existente no certifica captura completa; fuentes ambiguas/incompletas conservan cuenta y estado no evaluable.
 
 ## Acceptance Criteria
+
+- [ ] Revisión adversarial EPIC-048: cumplir doble manifest operativo/histórico, reapertura sin duplicación, unidad coverageRatio y dependencias por hito según contrato/specs; evidencia de los casos de su dominio registrada, no sólo texto.
+
 
 - [ ] Protocolo §11.1–11.2: captura con responsable/contacto y suplente, ocurrido vs registrado, referencia autorizada y conciliación diaria; feedback sin transición no produce cero confiable.
 - [ ] Suplencia/ausencia/transferencia mixta conservan cohorte histórica y exponen responsabilidad efectiva; conflicto bloquea evaluación, sin ocultar trabajo ni ampliar acceso.

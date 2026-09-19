@@ -33,7 +33,7 @@ correctedCount = count(i en K donde r_i > 0)
 correctedRoundsMean = roundsTotal / correctedCount
                                              si correctedCount > 0; si no null/no_corrected_assets
 distribution = count(r_i=0), count(r_i=1), count(r_i=2), count(r_i>=3)
-knownCoverage = n / |E|                       sólo si E es conocido y |E| > 0
+coverageRatio = n / |E|                       sólo si E es conocido y |E| > 0
 ```
 
 El agregado usa **sumas de rondas / sumas de assets conocidos**, nunca promedio de promedios de cuentas, personas o meses. Conservar enteros y precisión del cociente; redondear a dos decimales sólo al presentar. Los buckets 0/1/2/3+ son distribución, no semáforos ni thresholds de remuneración.
@@ -67,13 +67,15 @@ La complementariedad diagnóstica no justifica sumarlos como dos incentivos inde
 Unidad V1: una tarea/asset elegible con identidad canónica y ciclo de entrega gobernado. Una tarea que agrupa diez piezas sigue siendo una unidad bajo el modelo actual; no dividir por diez ni presentarlo como diez observaciones. Cualquier normalización por complejidad/unidades necesita metodología futura y evidencia.
 
 Para un líder L y período P:
-- E: tareas completadas elegibles del período según clasificación canónica y responsabilidad temporal.
-- K: subconjunto de E con identidad, atribución e historia de revisión/correcciones certificadas hasta el corte. Incluye tareas con cero rondas demostrado.
+- E: identidades con primera finalización elegible en el período ancla según clasificación canónica y responsabilidad temporal; incluye las posteriormente reabiertas como gaps, aunque ya no estén completadas al corte actual.
+- K: subconjunto de E actualmente completado y sin invalidación pendiente, con identidad, atribución e historia de revisión/correcciones certificadas hasta el corte. Incluye tareas con cero rondas demostrado.
 - U: E menos K, excluidas del valor por falta de evidencia; conservar conteos/reasons. Si el universo E tampoco se conoce completamente, declarar population unknown; no publicar cobertura total inventada.
-- La selección del mes usa finalización en [start,end), con calendario/zone explícitos. El conteo de cada tarea abarca su historia relevante completa hasta el corte, incluidas rondas de meses previos.
+- La selección inicial del mes usa primera finalización elegible en [start,end), con calendario/zone explícitos; las revisiones por reapertura conservan ese período ancla. En working se cuenta hasta el corte del cierre conocido, nunca eventos futuros; el conteo abarca la historia relevante completa, incluidas rondas de meses previos. Un corte actual no sobreescribe el cierre observado de otra revisión.
 - Atribuir al líder vigente en la primera revisión cliente del ciclo elegible, igual que FTR §14. Si falta ese evento, atribución desconocida. No usar al líder actual como sustituto ni cargarle automáticamente rondas anteriores a su responsabilidad.
 - Una transferencia se muestra con vigencias y contexto de intervención. Este resultado describe una cohorte bajo accountability; no prueba quién causó cada cambio. Evitar doble conteo dentro del rollup; responsabilidades solapadas requieren precedencia aprobada.
-- Reabrir no crea otro asset ni borra rondas. Antes de publicación, TASK-1880 debe resolver reaperturas contra la identidad de ciclo y cierre canónicos; si la fuente no puede distinguirlos, no generar otra observación. Correcciones a períodos locked producen revisión auditada, no sobrescritura.
+- Reabrir no crea otro asset ni borra rondas. V1 cuenta una identidad de task una sola vez entre períodos, sin inventar un ciclo para el mismo task. monthOfFirstEligibleCompletion es el período ancla; sin historia fiable, no se asigna una cohorte evaluable. Una reapertura posterior crea evento de invalidación: conserva el snapshot publicado como historia pero invalida su interpretación para ese asset (reopened_pending). La nueva revisión del período ancla retira provisionalmente el asset de K, manteniéndolo en elegibles/gaps; queda visible en abiertos actuales. Al cerrar de nuevo, una revisión auditada del mismo período ancla lo reintegra con historia acumulada hasta el nuevo cierre; no suma otra entrega al mes de recierre. Cambia asOf y revisedAfterPeriod explícitamente; una serie comparativa afectada debe revalidar comparabilidad. Un trabajo nuevo genuino requiere identidad de tarea nueva conforme fuente, no reset del mismo ID. No se altera por ello el ICO individual.
+- Mientras exista reopened_pending, FTR/RpA del componente/cuenta y sus rollups afectados tienen evaluationReady=false y confidence degradada, aunque se cumpla minCoverage. El cociente sobre K es sólo diagnóstico y no puede presentarse como mejora. Ejemplo: 99 assets con cero rondas y uno con diez; reabrir el último no transforma 99% FTR/0.10 RpA en éxito evaluable 100%/0. El snapshot anterior es inmutable; un registro de invalidación enlazado se aplica por el reader y no se omite sirviendo un cache previo. Al recierre, revisión aprobada reconcilia inputs y levanta invalidación; otros componentes no afectados mantienen sus estados. STI que depende de esas revisiones se marca invalidated/non_comparable con sustained=null hasta reconciliación aprobada, incluida la revisión de baseline si procede, nunca mediante recomputación silenciosa.
+- Historial de atributos/bindings y doble manifest siguen contrato compartido §3: una cuenta sin vigencia actual puede tener resultados de cohorte atribuibles al líder anterior. Nunca recortar la historia al mes consultado.
 
 ## 4. Helper canonical y evidencia
 
@@ -104,7 +106,7 @@ Las señales abiertas tienen su propio scope/asOf/conteos/evidencia; no esconder
 
 TASK-1880 debe probar numéricamente todos los ejemplos de §2; n=0; todos cero; un extremo; cuentas con tamaños diferentes; eventos previos al mes; evento en end; webhook duplicado; dos eventos con timestamp igual; captura incompleta con cero; identidad multifuente ambigua; transferencia; reapertura; cuenta quinta y 51/201 cuentas; dos líderes y permisos parciales. Probar semántica y valores, no presencia de strings SQL.
 
-Pendiente antes de evaluación: aprobar policy temporal/ciclo/reapertura, pruebas de cobertura y backfill posible por fuente, mínimos, calendario y metas. No afirmar que un API fuente ofrece historia si no se ha demostrado. Sin estas decisiones se mantiene diagnóstico/shadow, no evaluación formal.
+Pendiente antes de evaluación: aprobar política temporal y regla V1 de reapertura aquí definida, pruebas de cobertura y backfill posible por fuente, mínimos, calendario y metas. No afirmar que un API fuente ofrece historia si no se ha demostrado. Sin estas decisiones se mantiene diagnóstico/shadow, no evaluación formal.
 
 ## 7. Estados / dataStatus
 

@@ -164,3 +164,9 @@ LEADERSHIP_RPA_V1 concentra definición/cálculo, intensidad frente a FTR, cober
 ### Cierre de diseño operativo — 2026-09-19
 
 [Protocolo compartido §11](../../architecture/GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md#11-protocolo-operativo-de-medición-y-mejora--contrato-propuesto) define captura independiente del director, control/causas, suplencias/transferencias, acciones verificadas, autonomía y revisión prospectiva. RpA base permanece intacto y liderazgo se define en LEADERSHIP_RPA_V1. Las tres tasks incorporan criterios de implementación/QA; siguen to-do y sin rollout. Nombramientos, formación, calibración y aprobación del ADR son gates de ejecución, no logros documentales.
+
+### Revisión adversarial y dependencias por hitos
+
+[Informe y fixtures exigibles](../../audits/EPIC-048_LEADERSHIP_METRICS_ADVERSARIAL_REVIEW_2026-09-19.md). La dependencia TASK-1879→1880→1881 es por entrega técnica: technicalShadowReady de 1880 desbloquea UI shadow interna, no requiere esperar todo Slice 4 ni seis meses. Evaluación y STI conservan sus gates. Ninguna hija se marca complete sin sus criterios verificables.
+
+El manifest operativo y el de atribución histórica son distintos; un líder sin cuentas actuales puede tener resultados del período. No confundir attributedAccountCount con assignedAccountCount. Capacidad global requiere permiso explícito; cobertura usa fraction [0,1]. Reapertura corrige período ancla, FRM conserva cohorte y observa hasta maduración, STI normaliza sólo cohorte comparable.
