@@ -17,6 +17,36 @@ Marcas: **[medido]**, **[decisión del operador]**, **[criterio]**, **[pendiente
 
 ---
 
+## 0. Portabilidad de motor — el estilo NO depende del generador
+
+El lenguaje fotográfico es **texto de prompt + reglas de post-proceso + umbrales de medición**. Eso es portable a
+cualquier generador (GPT Image, Gemini/Imagen, Seedream, Firefly, Midjourney, el que sea) y a cualquier agente
+(Claude, Codex/ChatGPT, otro). **El motor es intercambiable; el estilo no.**
+
+| Parte de este documento | Portabilidad |
+|---|---|
+| §1 anatomía del prompt · §2 ficha de toma · **§3 bloques verbatim** | **Portable**: se pegan tal cual en cualquier motor |
+| §5 umbrales de medición · §7 QA y reglas duras | **Portable**: se verifican sobre el archivo resultante, no sobre el motor |
+| §4 pipeline (`pnpm ai:image`, batches, hoja de contacto) · §6 curación con máscara | **Específico de nuestro CLI**: con otro motor se replica la intención, no los comandos |
+
+**Obligatorio con cualquier motor, sin excepción:**
+
+1. Pegar los bloques verbatim de §3 (realismo, color system, balance de blancos, lecho/FOREGROUND, y IDENTITY +
+   REFERENCES cuando hay personas reales). Un prompt de marca Efeonce sin estos bloques **no es del lenguaje**.
+2. El plate se genera **sin logo, sin texto y sin marcas inventadas**. La firma es el SVG oficial **compuesto
+   después** (15% del lado corto, centrado sobre el lecho desenfocado, contraste ≥ 4,5:1 medido). Un logo generado
+   por el modelo es un descarte, no una corrección.
+3. Formato **nativo** (4:5, 9:16, 16:9); nunca recortar un formato desde otro.
+4. Medir antes de aprobar: nitidez del lecho (debe ser claramente menor que el sujeto) y contraste real de la zona
+   de la firma y de cualquier zona reservada. Si no pasa, **se regenera el plate**; no se parcha con un scrim.
+5. Si el motor no acepta imágenes de referencia, **no se improvisa la identidad de una persona real**: se usa una
+   toma sin personas o se cambia de motor.
+
+Si un motor nuevo rinde distinto con estos bloques, la corrección va al bloque (y queda registrada con su
+evidencia), no a una versión paralela del estilo por herramienta.
+
+---
+
 ## 1. Anatomía de un prompt
 
 Orden canónico **[criterio, usado en todas las rondas aprobadas]**:

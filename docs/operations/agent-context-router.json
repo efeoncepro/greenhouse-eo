@@ -4,6 +4,47 @@
   "fallbackSnapshot": "docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md",
   "domains": [
     {
+      "id": "efeonce-brand-photography",
+      "triggers": [
+        "fotografía de marca",
+        "foto de marca Efeonce",
+        "lenguaje fotográfico",
+        "colorimetría de la foto",
+        "imagen de Efeonce",
+        "foto del equipo",
+        "foto de la oficina",
+        "Julio en una foto",
+        "Nexa en una foto",
+        "mascotas en escena",
+        "logo 3D en escena",
+        "primer plano desenfocado",
+        "lecho de la firma",
+        "logo centrado sobre la foto",
+        "ángulo de cámara",
+        "lente",
+        "ojo de pez",
+        "tilt-shift",
+        "reserva de espacio para texto",
+        "zona de titular en la foto"
+      ],
+      "skills": [
+        "design-studio",
+        "efeonce-brand-studio",
+        "efeonce-advertising-creative"
+      ],
+      "sources": [
+        "docs/operations/brand-photography/README.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md",
+        "docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md",
+        ".codex/skills/design-studio/references/efeonce-photographic-language.md"
+      ]
+    },
+    {
       "id": "advertising-creative-production",
       "triggers": [
         "pieza publicitaria",
