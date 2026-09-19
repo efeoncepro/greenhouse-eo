@@ -9,10 +9,20 @@
 Pedido del operador: «las imágenes deben dejar espacio a veces para donde se vaya a agregar los textos». Esta ronda
 probó la reserva de espacio para titular y los formatos **nativos** 4:5, 9:16 y 16:9 (nunca recortados de otro).
 
-## 1. Resultado
 
-Tres escenas × tres formatos = 9 piezas con titular de prueba y firma. Todas pasan tras la corrección
-**[medido]**:
+> 🔴 **ESTADO (2026-09-19, decisión del operador): la CAPA DE COMPOSICIÓN de este documento NO está aprobada.**
+> Lo aprobado de esta sesión es **la fotografía**: dirección, colorimetría, cámaras/ángulos, firma sobre el lecho,
+> realismo, personas y escenarios (ver los otros documentos de esta carpeta). Las piezas compuestas que aparecen
+> aquí (§4, §8, §9, §13) fueron **rechazadas**: mala jerarquía, interespaciado y aplicación tipográfica. Un
+> contraste medido que pasa **no prueba** que la composición esté bien; yo las presenté como válidas y no lo eran.
+> Lo que SÍ vale de estas secciones son **las reglas y las prohibiciones** (§2, §3, §10, §11, §12, §13), porque
+> vienen del operador y del canon publicitario. El trabajo de capa gráfica se rehace en una sesión nueva, con
+> brief, ficha tipográfica y el compositor de «Nivel de búsqueda» como referencia de oficio.
+
+## 1. Resultado (pruebas NO aprobadas; sólo evidencia de medición)
+
+Tres escenas × tres formatos. Los números son de contraste medido, **no** un veredicto de diseño: el operador
+rechazó las piezas.
 
 | Escena | 4:5 (1152×1440) | 9:16 (1152×2048) | 16:9 (2048×1152) |
 |---|---|---|---|

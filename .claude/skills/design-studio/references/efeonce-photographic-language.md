@@ -229,3 +229,9 @@ no va selección. El objeto se decide en la ficha de toma.
 entrada, cierre y notas van en **Poppins** (`structureLabel` en mayúsculas +0,08 em; `structureCopy` leading 1,5).
 El aire entre tramos se mide como **gap de tinta** ≈ **0,09 del tamaño del dominante** (0,10 tras la etiqueta), no
 como leading; `componer-foto.mjs` lo reporta en `qa.json`.
+
+> **Estado:** la **fotografía** de este lenguaje está aprobada (2026-09-19). La **capa de composición gráfica**
+> (titulares, jerarquía, cursores sobre la foto) **NO**: las piezas de prueba fueron rechazadas por el operador.
+> Valen las prohibiciones y las reglas de craft de arriba; para componer una pieza real, partir del brief y la
+> ficha tipográfica de `efeonce-advertising-creative` y del compositor de «Nivel de búsqueda», y someterla a
+> revisión humana: un contraste que pasa NO prueba que la composición esté bien.
