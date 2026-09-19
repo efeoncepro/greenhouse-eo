@@ -12,9 +12,15 @@
 - No acredita: que Berel haya aceptado ese descuento, que las piezas cumplan la extensión contractual, que existan los
   archivos que no se encontraron ni que se hayan corregido las etiquetas de Notion. **No se editó nada** en Notion,
   SharePoint ni Frame.io.
-- Documentos hermanos: [Colores de Temporada 2027](BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md) (deltas del
+- Documentos hermanos: [Conteo del cupo septiembre–diciembre 2026 y descuento en 2027](BEREL_CONTEO_CUPO_SEP_DIC_2026_DESCUENTO_2027_2026-09-19.md) ·
+  [Colores de Temporada 2027](BEREL_COLORES_DE_TEMPORADA_2027_2026-09-16.md) (deltas del
   19-sep) · [Clasificación de tareas y conteo de piezas](BEREL_PIECE_COUNT_CLASSIFICATION_2026-09-03.md) ·
   [Numeración editorial](BEREL_EDITORIAL_NUMBERING_2026-09-03.md).
+- **Delta 2026-09-19 (tarde):** octubre, noviembre y diciembre se contaron con este mismo método en la
+  [auditoría del cupo septiembre–diciembre](BEREL_CONTEO_CUPO_SEP_DIC_2026_DESCUENTO_2027_2026-09-19.md). Neto de los
+  cuatro meses: artículos +4, gráficas +45 y videos +12. El operador precisó cómo se aplica el descuento: los videos se
+  absorben como cortesía y artículos y gráficas se descuentan en partes iguales de enero a marzo de 2027 (6/7/7
+  artículos y 35 gráficas por mes). Es un estimado que se confirma al cierre de diciembre y Berel aún no lo acepta.
 - Canon del contrato y de la unidad de conteo: módulo 15 de la skill
   [`berel-content-production`](../../../.claude/skills/berel-content-production/modules/15_DISTRIBUCION_SELECTIVA.md)
   (§Capacidad y conteo). Este documento lo aplica a un mes; no lo modifica.
@@ -159,7 +165,9 @@ excedente de 3.
 | Videos | 3 | 10 entregables | **+7** | producidos 13 (+10) · verificados en uso 6 (+3) |
 
 **Decisión del operador:** el excedente se descuenta de los meses siguientes. Registrarlo frente a Berel y reflejarlo en
-el cupo de los meses que absorben el saldo es trabajo pendiente; este documento no lo acredita.
+el cupo de los meses que absorben el saldo es trabajo pendiente; este documento no lo acredita. Cómo se aplica desde el
+19-sep (videos absorbidos; artículos y gráficas en enero–marzo de 2027): ver la
+[auditoría del cupo septiembre–diciembre](BEREL_CONTEO_CUPO_SEP_DIC_2026_DESCUENTO_2027_2026-09-19.md).
 
 ## 8. Hallazgos de datos (no corregidos)
 

@@ -181,6 +181,9 @@ Plantillas ......................................................... templates/
     y cuatro superficies activas; tres videos mensuales con cortesía mayo–octubre extendida por
     el operador a noviembre/diciembre 2026. Las cincuenta incluyen blog y RRSS; superficies:
     Blog, Facebook, Instagram y Pinterest. No inferir cumplimiento desde filas de tareas. Detalle y restricciones en módulo 15.
+    Balance septiembre–diciembre 2026 (estimado al 19-sep): artículos +4, gráficas +45 y videos +12; los videos se
+    absorben como cortesía y su cupo es 0 desde enero de 2027, y artículos y gráficas se descuentan en enero–marzo de
+    2027 (6/7/7 artículos, 35 gráficas por mes), pendiente de aceptación de Berel y del cierre de diciembre (módulo 15).
 42. 🔴 **Cuatro opciones, no cuatro derivados obligatorios.** Aplicar el módulo 15 antes de crear
     tareas: Producir / No aplica / Pendiente por artículo/canal, con fuente y motivo. Las reservas
     descartadas sin producción se cancelan de forma reversible y dejan de llevar tipo/canal;

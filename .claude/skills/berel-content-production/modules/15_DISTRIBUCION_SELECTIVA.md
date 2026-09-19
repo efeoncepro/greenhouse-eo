@@ -71,6 +71,46 @@ Cupo confirmado no equivale a cumplimiento. Si las imágenes de blog, Stories y 
 superan 50, registrar el exceso por archivo y pedir priorización antes de retirar trabajo iniciado
 o alterar el paquete de banners. No inflar ni reducir el conteo para que coincida con las filas.
 
+### Balance septiembre–diciembre 2026 y descuento en 2027
+
+> Decisión del operador, 2026-09-19 (tarde). Evidencia: [auditoría del cupo septiembre–diciembre](../../../../docs/audits/seo/BEREL_CONTEO_CUPO_SEP_DIC_2026_DESCUENTO_2027_2026-09-19.md).
+> Estimado al 19-sep con el método de abajo; se confirma al cierre de diciembre.
+
+Neto por mes, criterio *entregables al cliente al cierre* (saldo positivo = excedente; negativo = cupo disponible):
+
+| Mes | Artículos vs 8 | Gráficas vs 50 | Videos vs 3 |
+|---|---|---|---|
+| Septiembre 2026 | 12 → +4 | 90 → +40 | 10 → +7 |
+| Octubre 2026 | 8 → 0 | 66 → +16 | 8 → +5 |
+| Noviembre 2026 | 8 → 0 | 43 → −7 | 3 → 0 |
+| Diciembre 2026 | 8 → 0 | 46 → −4 | 3 → 0 |
+| **Neto** | **+4** | **+45** | **+12** |
+
+- **Videos:** el excedente ya producido (+12) se **absorbe como cortesía**; no se descuenta. La cortesía cubre de mayo a
+  diciembre de 2026; **desde enero de 2027 el cupo de videos es 0** salvo un acuerdo nuevo. Un video desde enero es
+  excedente desde el primero.
+- **Artículos y gráficas:** propuesta de descuento parejo en enero, febrero y marzo de 2027, **pendiente de aceptación
+  de Berel**:
+
+  | Mes | Artículos | Gráficas | Videos |
+  |---|---|---|---|
+  | Enero 2027 | 6 (−2) | 35 (−15) | 0 |
+  | Febrero 2027 | 7 (−1) | 35 (−15) | 0 |
+  | Marzo 2027 | 7 (−1) | 35 (−15) | 0 |
+
+- **Confirmar al cierre de diciembre:** recontar octubre, noviembre y diciembre con el mismo método una vez resueltos
+  N40 (detenido), N49 (fuera del paquete), N52 y N59 (bloqueados) y la idea «Umbral Vivo»; recalcular el neto y
+  repartirlo de nuevo en partes iguales. Sensibilidades del estimado: sin N40, +3 artículos y +38 gráficas; sin N52 ni
+  N59, +35 gráficas; con N49 o «Umbral Vivo», +5 artículos. Si el neto no divide exacto, confirmar el reparto con el
+  operador (en el actual, el resto de artículos se cargó a enero).
+- Mientras Berel no diga otra cosa, la planeación de enero a marzo usa este cupo reducido y sin videos (módulos 01 y 14).
+  Con 4 banners por artículo quedan 11 archivos para fotos de paso y derivados en enero y 7 en febrero y marzo; el
+  Reel entra en la matriz como «No aplica» con motivo `Apto, fuera por cupo/prioridad`. No reducir el paquete de
+  banners para abrir espacio sin autorización.
+- Por confirmar: en Teams (17-sep) el operador escribió que la cortesía de videos de diciembre ya se había agotado; el
+  balance aplica la extensión registrada. Si se confirma, los 3 videos de diciembre son excedente aparte.
+- El descuento lo gestiona el operador frente a Berel; no se escribe en las páginas de artículo.
+
 ## Conteo del cupo mensual — método verificado 2026-09-19
 
 Aplica al cierre de cada mes y a cualquier pregunta sobre cuánto se lleva del contrato. Es solo lectura.
@@ -105,7 +145,9 @@ Aplica al cierre de cada mes y a cualquier pregunta sobre cuánto se lleva del c
 6. **Verificado ≠ inferido.** Una tarea `Listo` sin archivo encontrado es inferida y se reporta así.
 7. **Excedente:** decisión del operador del 2026-09-19: el excedente de un mes **se descuenta de los meses
    siguientes**. Septiembre cerró con artículos +4, gráficas +40 como entregables y videos +7. Lo gestiona el
-   operador; no se escribe en las páginas de artículo.
+   operador; no se escribe en las páginas de artículo. Aplicación vigente desde el 19-sep (tarde): videos absorbidos
+   como cortesía; artículos y gráficas descontados en enero–marzo de 2027 → «Balance septiembre–diciembre 2026 y
+   descuento en 2027», arriba.
 
 Cuando un derivado se rehace en una tarea v2 ([módulo 06](06_DERIVADOS_SOCIALES.md#arte-entregado-que-no-usa-la-base-vigente-tarea-v2)),
 la original conserva estado y etiquetas porque fue producida y entregada: suma en «producidos» y no en

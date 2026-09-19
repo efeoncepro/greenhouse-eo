@@ -1,10 +1,22 @@
 # Fuentes — de dónde salió cada regla
 
-> **Última actualización:** **2026-09-19**, cierre de la campaña 2027 (sección siguiente); última sincronización
-> integral contra la Wiki viva de Berel en Notion: **2026-09-07**.
+> **Última actualización:** **2026-09-19**, balance del cupo septiembre–diciembre y cierre de la campaña 2027 (dos
+> secciones siguientes); última sincronización integral contra la Wiki viva de Berel en Notion: **2026-09-07**.
 > Notion sigue siendo la fuente de verdad viva; el repo es una copia operativa. Cuando una petición
 > fechada del cliente o una spec específica contradice una regla más vieja, manda la fuente más
 > reciente/específica y se registra el drift.
+
+## Cupo septiembre–diciembre 2026 y descuento en 2027 — 2026-09-19 (tarde)
+
+Conteo de solo lectura de octubre, noviembre y diciembre con el método de septiembre; no se editó nada.
+
+| Fuente | Qué respalda | Dónde quedó |
+|---|---|---|
+| [Auditoría del cupo septiembre–diciembre 2026 y descuento en 2027](../../../docs/audits/seo/BEREL_CONTEO_CUPO_SEP_DIC_2026_DESCUENTO_2027_2026-09-19.md) (2026-09-19): proyectos `Produccion Creativa - Octubre 26` (74 tareas), `- Noviembre 26` (79) y `- Diciembre 26` (73), shares de Frame.io «Mes Octubre», «Mes Noviembre» y «Mes Diciembre», correos de envío del 10 y 14 de septiembre, Teams | octubre 8/66/8, noviembre 8/43/3, diciembre 8/46/3; neto con septiembre +4 artículos, +45 gráficas y +12 videos; sensibilidades; Stories de 1 pantalla, reels de 11–14 s y audio a cambiar | módulos 01, 14, 15; SKILL regla 41 |
+| Decisiones del operador, 2026-09-19 (tarde) | videos absorbidos como cortesía y cupo 0 desde enero de 2027; descuento parejo enero–marzo de 2027 (6/7/7 artículos, 35 gráficas por mes); estimado a confirmar al cierre de diciembre | módulos 01, 14, 15; SKILL regla 41 |
+
+Límites: Berel no ha aceptado el descuento; ninguna pieza de octubre a diciembre tiene aprobación formal observada.
+Queda por confirmar con el operador si la cortesía de videos alcanzaba a diciembre (Teams, 17-sep).
 
 ## Campaña 2027: V2, adaptación a México, autoría, material de marca y conteo — 2026-09-19
 
