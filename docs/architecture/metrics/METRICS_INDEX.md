@@ -8,6 +8,19 @@
 
 ## Métricas ICO (Delivery)
 
+### Liderazgo operativo — EPIC-048 (In design, no runtime)
+
+[Contrato compartido](../GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md) · [ADR Proposed](../GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_DECISION_V1.md).
+Una cartera dinámica por responsabilidad/vigencia; ningún KPI nuevo de liderazgo alimenta Payroll. No confundir estas propuestas con métricas individuales Accepted.
+
+| Indicador | Spec | Helper/agregado | Writeback | Estado |
+|---|---|---|---|---|
+| Portfolio On-Time Delivery (POTD) | [POTD_V1](POTD_V1.md) | Nuevo agregado propuesto TASK-1880 sobre buckets canónicos | N.A. | In design |
+| First-Time Right (FTR), contexto liderazgo | [FTR_V1 §14](FTR_V1.md#14-contexto-de-liderazgo-operativo--proposed-2026-09-19) | calculateFtr existente + wrapper cobertura/atribución propuesto | Sin writeback nuevo | Extensión Proposed; base intacta |
+| Assignment & Capacity Coverage (ACC) | [ACC_V1](ACC_V1.md) | Familia asignación/capacidad; TASK-1879/1880 | N.A. | In design |
+| Flow Risk Management (FRM) | [FRM_V1](FRM_V1.md) | Exposición + respuesta condicionada a eventos/SLA; TASK-1880 | N.A. | In design |
+| Sustained Team Improvement (STI) | [STI_V1](STI_V1.md) | Vector comparable de dos ventanas trimestrales; TASK-1880 | N.A. | In design |
+
 ### Cluster A — Quality core (per-task, bonificaciones)
 
 | Métrica | Spec canonical | Helper canonical | Agregado registry | Writeback Notion | Status spec |
@@ -49,7 +62,7 @@
 | **BCS** (Brief Clarity Score — habilita TTM observed) | [BCS_V1.md](BCS_V1.md) | `src/lib/ico-engine/brief-clarity.ts` (IMPLEMENTED 412 líneas, infrastructure-ready) | NO en registry (project-level) | `not_implemented` → TASK-910 futura activa AI backend + writeback | Accepted 2026-05-17 |
 | **TTM** (Time-to-Market — Revenue Enabled palanca 1 Early Launch Advantage) | [TTM_V1.md](TTM_V1.md) | `src/lib/ico-engine/time-to-market.ts` (IMPLEMENTED, TASK-218) + `src/lib/campaigns/campaign-metrics.ts` | NO en registry (per-campaign) | `not_implemented` → TASK derivada futura post BCS backend activo | Accepted 2026-05-17 |
 
-**Total**: 14 métricas críticas canonical, **TODAS con spec V1 Accepted 2026-05-17**.
+**Inventario histórico de clusters A–E**: 14 métricas declaradas Accepted en el índice original. El bloque de liderazgo anterior es una extensión separada **In design**, no una afirmación de implementación ni de aprobación de sus métodos.
 
 ---
 

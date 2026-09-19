@@ -35,7 +35,18 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1877](to-do/TASK-1877-equipos-humano-agente-landing.md) | landing transversal de transformación de equipos humano-agente, con marketing/AEO, revenue, servicio y operaciones (EPIC-047, rank 03) | none |
 | [TASK-1878](to-do/TASK-1878-public-landing-entrypaths-human-agent.md) | entradas contextuales desde Home, HubSpot y AEO hacia TASK-1877, sólo tras publicación verificada (EPIC-047, H2) | TASK-1877 |
 
-Siguiente ID libre `TASK-1879`. Insights TASK-1845–1849 (+ TASK-1875, vista web compartida en Think) y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1882`. Insights TASK-1845–1849 (+ TASK-1875, vista web compartida en Think) y notificaciones conservan sus dueñas.
+
+## Liderazgo operativo: EPIC-048
+
+[EPIC-048](../epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md) tiene tres hijas `to-do`, P1/Alto: planificación de código, DB y UI, sin implementación ni cambio de bono.
+Orden obligatorio: foundation → ICO → Person 360. Cartera dinámica por responsabilidad/vigencia: el piloto no limita el universo; quinta cuenta sin código/deploy y 51/201 cuentas son casos exigibles. Umbrales y bindings runtime siguen sujetos a los gates.
+
+| Task | Entrega | Dependencia |
+|---|---|---|
+| [TASK-1879](to-do/TASK-1879-leadership-accountability-source-foundation.md) | Cartera dinámica, atribución temporal, cobertura y capacidad interna | none |
+| [TASK-1880](to-do/TASK-1880-ico-leadership-performance-engine.md) | Métricas ICO, snapshots, confianza, API, cadencia y shadow | TASK-1879 |
+| [TASK-1881](to-do/TASK-1881-person-360-leadership-performance-ui.md) | Perfil/Actividad: liderazgo, evidencia y separación individual; dirección, wireframe, flow y motion | TASK-1880 |
 
 ## Programa Efeonce Insights: EPIC-045
 

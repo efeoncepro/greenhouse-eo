@@ -1,5 +1,7 @@
 # Handoff activo
 
+[EPIC-048](docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md): specs KPI + ADR Proposed; TASK-1879→1880→1881 to-do, sin ejecución/bono.
+
 **DataForSEO:** ISSUE-175 y TASK-1341 cerrados (guard en `ops-worker-deploy`, revisión 00699, smoke AIO PASS).
 
 **Humano-agente (19/09):** [oferta aprobada](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md),

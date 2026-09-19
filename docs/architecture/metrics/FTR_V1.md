@@ -413,3 +413,37 @@ Display per-member-month de `ftr_pct` con threshold zone (verde ≥85% / ámbar 
 ### 13.3 CVR / QBR cliente narrative
 
 `ftr_pct` aparece en reportes ejecutivos al cliente como métrica de **calidad first-pass** — claim "X% de las piezas Globe se aprueban a la primera". Diferenciador comercial.
+
+## 14. Contexto de liderazgo operativo — Proposed 2026-09-19
+
+Esta extensión es **In design**, dependiente del [ADR de liderazgo](../GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_DECISION_V1.md). No modifica el mapping Accepted per-task, el agregado individual ni Payroll. La forma canónica visible del nombre sigue **First-Time Right (FTR)**; no es First Time Resolution.
+
+### 14.1 Propósito funcional
+
+Evaluar la calidad del primer entregable de la cartera del líder, no cuántas piezas ejecuta personalmente. Debe impulsar briefs claros, revisión interna efectiva y aprendizaje de correcciones recurrentes. FTR no mide satisfacción total ni distingue por sí solo error interno de cambio de preferencia/alcance del cliente; motivos se muestran como contexto, nunca se descuentan a mano.
+
+### 14.2 Cálculo y población
+
+Sea E el conjunto deduplicado de tareas completadas elegibles en el período/corte según canon, atribuibles al líder por el manifest temporal; aplicar exclusiones canónicas con conteos visibles.
+K ⊆ E requiere a la vez: helper FTR válido, atribución fiable e historial completo relevante de revisión/correcciones hasta asOf. Un source_quality canonical o tener UNA transición no prueba completitud.
+P={t∈K | calculateFtr(t).value=pass}. FTR observado=100×|P|/|K|, si |K|>0; si no null.
+eligibleKnown=|E|; known=|K|; missingKnown=|E-K|; knownTaskCoverage=100×|K|/|E| cuando E>0. populationKnown=false por fuente faltante implica globalTaskCoverage=null.
+Cartera suma P/K de cuentas e intervalos, no promedia sus tasas. Método de agregado propuesto leadership_ftr_v1.0, dependencias FTR_FORMULA_VERSION + versión RpA y coverage/attribution policy; no renombrar el helper a ftr_v2 sin cambiar su semántica.
+No pasar inicio de mes como windowStart si corta correcciones anteriores: usar historia de la tarea completa pertinente al ciclo, hasta el corte. Mes de finalización selecciona E, no la ventana del historial.
+
+### 14.3 Casos y mecanismos
+
+- 10 completadas elegibles, 6 con historia fiable, 5 pass: 83.3% observado, coverage conocida 60%, 4 desconocidas; jamás presentar 9/10, 5/10 como nota plena ni 100% por correcciones ausentes.
+- Internas de Efeonce entran con revisión de cliente interno identificada; internal workflow review no se convierte en corrección de cliente.
+- Reabierta al corte: no finalizada, no FTR final. Una corrección posterior a cierre locked propone revisión auditada, no overwrite. Un ciclo nuevo real exige identidad/evento canónico; no usar reabrir/cerrar para sumar entregas repetidas.
+- Bajo coverage/sample: valor diagnóstico low_confidence; K=0 unavailable; abierta/excluida no aplicable. Confidence de leadership puede ser más estricta que la del helper, nunca más laxa.
+- Cambio de fuente o lead sin evento de primera revisión fiable: atribución desconocida; no tomar líder actual ni finalización como proxy silencioso.
+- Cambio de alcance del cliente sigue contando según RpA vigente; segmentar motivos para interpretar, no redefinir pass/fail sólo aquí.
+
+### 14.4 Implementación, thresholds y consumo
+
+Base existente: src/lib/notion-metrics/calculate-ftr.ts → calculateRpaV2. Wrapper de elegibilidad/coverage y agregado propuestos en src/lib/ico-engine/leadership/calculate.ts (TASK-1880); source assurance en TASK-1879. No reutilizar metrics_by_member como resultado de equipo.
+El benchmark 85% histórico del spec base no queda automáticamente aprobado como meta contractual del líder ni se afirma como benchmark externo validado en este trabajo. Calibrar mínimo de muestra, cobertura, vigencia y metas por mix antes de evaluación; no semáforo salarial.
+Guardar snapshot de RpA/FTR, método y evidencia; no activar writeback Notion ni editar propiedades por esta extensión.
+Tests: transición antes del mes, historial parcial con helper pass, missing source, tarea sin owner, cuenta interna, duplicados, reapertura/cambio de lead y tres cuentas con tamaños distintos.
+Contrato cross-métrica/estados/cadencia/acceso: [Operational Leadership Measurement](../GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md). Consumers: TASK-1880/1881 en EPIC-048, sin nuevo input a bono.
