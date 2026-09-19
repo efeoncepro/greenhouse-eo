@@ -198,3 +198,23 @@ registrado como corrección para Drupal fuera de este alcance.
   actualización del menú principal el día de publicación.
 - **Hallazgos del sitio (OBSERVADO):** el menú enlaza `/colores-de-temporada` y `/articulos/colores-de-temporada-2025`,
   que cargan la página vacía.
+
+### Delta 2026-09-19 (ronda 2 y revisión adversarial)
+
+- **Decisiones del operador:** publicación conjunta el 29-sep-2026; sin infografías de Efeonce (Berel entrega el
+  material de marca: banner principal del Color del Año y masters de las paletas); para el Color del Año, Efeonce
+  desarrolla solo los gráficos de luces y de acabados (María Fernanda, Teams 2026-09-17); el excedente de artículos
+  de septiembre (9 en el proyecto contra 8 del contrato) se descuenta de los meses siguientes.
+- **Fichas técnicas incorporadas (OBSERVADO):** `FT_BERELEX GREEN.pdf` R1-02/24 e `HT-INSIGNIA.pdf` R1-07/19, p. 1;
+  tabla comparativa con filas comunes; exclusivos en texto; certificado MAS Certified Green (vencido jun-2025) fuera.
+- **Revisión adversarial (3 lentes: Berel, SEO/AEO, verificación de datos):** sin datos de producto mal publicados;
+  corregidos familia de Bien y de Buenas (rojos con fondo café, unificado), garantía de Insignia con su condición,
+  «uso preferente» sin fuente, recomendaciones de mate/satinado sin ficha, «verdes» en Raíces, «muestras físicas»,
+  «la más expresiva», repetición del nombre del Color del Año (27 → 12), H1/meta del hub parecidos a 2026, sección de
+  Raíces duplicada en el hub, tabla de luz de Raíces sin fuente, tres respuestas nuestras que la V2 desmentía.
+- **Derivados sociales (OBSERVADO en Frame.io):** 18 archivos entregados el 16–17 sep (2 banners + post, story, reel
+  y pin por pieza); cada uno con su tarea (nuevas 741, 742, 743); ninguna cancelación. El arte social entregado son
+  renders de ambientes y no usa la base vigente (luces N2 en el Color del Año; masters en hub y Raíces): requiere
+  rehacerse o validarse. Se revirtió una cancelación errónea del Reel N61 (tarea 734).
+- **Readback final:** gate PASS en las tres páginas; cuerpos de ~1.310 (Color del Año), ~1.430 (hub) y ~1.120
+  palabras (Raíces); hilos íntegros y abiertos; comentario de página con el estado final en cada una.
