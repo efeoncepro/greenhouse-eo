@@ -4,11 +4,11 @@
 // HUD mínimo (estrellas arriba a la derecha, tarjetas de notificación sobre la acción). Nada del juego se copia:
 // estrellas, íconos, tarjetas y tipografía son nuestros; los plates no contienen personajes ni marcas del juego.
 //
-// Jerarquía en cuatro niveles por lámina (nunca plana):
-//   1. etiqueta de misión (Poppins 700, tracking de label, acento)
-//   2. entrada (Bricolage ideaShort)
-//   3. palabra dominante (Bricolage ideaImpact condensado, 2,5–3× la entrada) + selección colaborativa AXIS
-//   4. tarjeta de notificación (Poppins) sobre la escena
+// Jerarquía en cinco voces por lámina (nunca plana; dos vecinas no comparten peso y color):
+//   1. etiqueta (Poppins 700 mayúsculas, blanca + estrella naranja)
+//   2. entrada (Bricolage ideaLead 420, celeste; nombres propios a 760 con **…**)
+//   3. palabra dominante (Bricolage ideaImpact 780, ancho 78; palabra clave [[…]] en naranja) + selección AXIS
+//   4. cierre de frase (Bricolage ideaMedium 620/800) o tarjeta de notificación (Poppins 400 + remate 700)
 //   + gesto Guttery (máx. 1 por pieza, ≤3 palabras) donde aporta voz.
 //
 // Uso: node ai-generations/2026-09-19_nivel-de-busqueda/componer-v2.mjs [id…]

@@ -38,8 +38,10 @@ Nombre de cada pose: `efeonce-<mascota>-3d-<nn>-<pose>-1x1-1600x1600-v01-{fondo-
 
 ## Reglas de uso
 
-1. **Una sola mascota de partner por imagen.** Nexa puede acompañar; dos mascotas de terceros juntas, nunca
-   (sistema modular del [KV «Tu IA no conoce tu negocio»](2026-09-17-kv-tu-ia-no-conoce-production-method.md)).
+1. **Una sola mascota de partner por imagen por defecto.** Nexa puede acompañar (sistema modular del
+   [KV «Tu IA no conoce tu negocio»](2026-09-17-kv-tu-ia-no-conoce-production-method.md)). Dos mascotas de terceros
+   juntas sólo con **pedido explícito del operador**, registrado en el LEEME de la corrida (casos: «¿Claude o Codex?»
+   2026-09-17 y «Nivel de búsqueda» 2026-09-19, abajo).
 2. **Validar la guía de marca del partner antes de pautar** (Anthropic para Clawd, OpenAI para Codex). Las poses, el
    material 3D y los accesorios son interpretación: sirven para exploración y orgánico aprobado, no certifican uso
    pagado. Registrar la validación y la insignia oficial de partner cuando existan.
@@ -48,6 +50,18 @@ Nombre de cada pose: `efeonce-<mascota>-3d-<nn>-<pose>-1x1-1600x1600-v01-{fondo-
 4. Usar la variante `transparente` para componer y la de `fondo-estudio` como pieza autónoma o referencia. Revisar el
    recorte sobre fondo oscuro antes de publicar.
 5. Conservar originales; derivados de campaña en la carpeta de esa campaña. No mover ni subir la biblioteca completa.
+
+## Usos en campaña
+
+| Fecha | Pieza | Mascotas y pose | Estado | Registro |
+| --- | --- | --- | --- | --- |
+| 2026-09-19 | «Nivel de búsqueda» (trendjacking GTA VI), contraportada `c09-refuerzos` del carrusel de 9 láminas | Clawd `01-detective-lupa` + Codex `08-laptop` (transparentes `v01`), juntos frente al logo 3D monumental blanco, en una sola pasada `gpt-image-2.5-sunburst` con 4 referencias | Programado en Metricool (marca Efeonce Group): Instagram mar 22-sep-2026 16:00 y LinkedIn (página Efeonce, documento PDF) vie 25-sep-2026 11:00. Orgánico; sin pauta | [`LEEME`](../../../ai-generations/2026-09-19_nivel-de-busqueda/LEEME.md) · [bitácora](2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md) |
+
+- **Por qué dos mascotas:** las pidió el operador explícitamente para la contraportada «Pide refuerzos» (precedente:
+  «¿Claude o Codex?»). La excepción no se extiende a otras piezas de la campaña ni cambia la regla 1.
+- **Pauta:** esta pieza no se pauta sin validar antes las guías de marca de Anthropic (Clawd) y OpenAI (Codex) y, por
+  el trendjacking, sin revisión legal de la referencia a GTA VI (`legal-privacy-ip-operator`).
+- **Método en escena** (referencias, fidelidad, QA): [`mascot-3d-pose-library.md` → caso en escena](../../../.claude/skills/greenhouse-ai-image-generator/references/mascot-3d-pose-library.md#caso-en-escena-clawd--codex-frente-al-logo-2026-09-19).
 
 ## Método y extensión
 

@@ -108,8 +108,48 @@ Sin `presentation` el resultado es idéntico al contrato por defecto. Pruebas:
 debe darles un fondo oscuro. Caso:
 [bitácora del KV](social/2026-09-17-kv-tu-ia-no-conoce-production-method.md).
 
+## Delta 2026-09-19 — jerarquía de 5 voces, texto enriquecido, cursores en movimiento y url-lum exportado
+
+Origen: carrusel «Nivel de búsqueda» (trendjacking GTA VI, 9 láminas 1080×1350 + pieza suelta), aprobado por el
+operador tras una pasada explícita contra jerarquías planas. Método y evidencia:
+[bitácora del caso](social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md). Corrida:
+`ai-generations/2026-09-19_nivel-de-busqueda/` (`componer-v2.mjs`, `brief/slides-v2.json`, `out-v2/qa.json`).
+
+Contrato que se suma al de ejecución:
+
+1. **Jerarquía por voces.** Una lámina con varios tramos declara hasta cinco voces más un gesto opcional: etiqueta
+   (Poppins 700 mayúsculas + marcador), entrada (Bricolage `ideaLead`), dominante (Bricolage `ideaImpact`), cierre de
+   frase (Bricolage `ideaMedium`) y tarjeta (Poppins 400/700); gesto Guttery, uno por pieza y ≤ 3 palabras. Invariante:
+   **dos voces vecinas nunca comparten peso y color a la vez**. Los pesos, tintas y el ancho 78 de Bricolage del caso
+   son decisiones declaradas del caso, no presets; la tabla completa vive en la skill `efeonce-advertising-creative`.
+2. **Texto enriquecido por palabra.** `**…**` sube al peso superior de la misma familia sin cambiar tinta; `[[…]]`
+   cambia a la tinta de acento del nivel (naranja Efeonce en el dominante, blanco en voces de apoyo). Cada acento se
+   mide aparte. El naranja sólo va sobre cielo oscurecido; sobre horizonte encendido el énfasis se degrada a peso con
+   tinta clara.
+3. **Cursores en movimiento.** Un colaborador que sólo transita se declara `state: 'moving'` con `canvasRegion` y sin
+   `targetId`. No existe cursor sin selección: el renderer siempre dibuja la caja del target. Con texto alineado a la
+   izquierda, colaboradores en `top-end`/`bottom-end`; cursor local en `end-center` si hay frase bajo el dominante.
+   Si `evidence.withinCanvas` es `false`, el compositor falla e imprime `cursorEvidence[].labelBounds`.
+4. **Firma url-lum por compositor canónico exportado.** `compositeLuminosity` de
+   `scripts/creative/layout-compiler/compiler.mjs` quedó exportada (antes privada; el cambio fue sólo la palabra
+   `export`, sin tocar su lógica). Un compositor de corrida la importa en vez de duplicar la fusión de luminosidad no
+   separable, y exige `evidence.method === 'non-separable-luminosity'`. Si el logo 3D es héroe de la escena, la firma
+   es url-lum y no se agrega un segundo logo plano.
+5. **QA por nivel.** Contraste p98 por voz y por acento, revisión visual a 390 px registrada cuando se aprueba bajo el
+   umbral, tarjeta HUD con vidrio esmerilado real y oscurecimientos graduales declarados por lámina. Gate en
+   [brief y QA](../../.claude/skills/efeonce-advertising-creative/references/creative-brief-and-qa.md).
+
+**Compositor de referencia, no módulo compartido.** `componer-v2.mjs` (funciones `shape`, `richBlock`/`parseRich`,
+`BRIC`/`POP`, `hud`, `card`, `contrastUnder`, integración con `resolveCollaborationSelectionIntent` +
+`renderCollaborationSelection` + `compositeLuminosity`) vive en la carpeta de la corrida y es el patrón a promover.
+Follow-up posible, sin task creada: extraer texto enriquecido, medición de contraste por nivel y tarjeta de vidrio a
+`scripts/creative/layout-compiler/` o a un adapter del Campaign Layout Compiler cuando aparezca un segundo consumidor
+real. Hasta entonces, una corrida nueva copia y adapta ese archivo declarándolo en su evidencia; no lo importa desde
+`ai-generations/`.
+
 ## Invariantes
 
+- Dos voces tipográficas vecinas no comparten peso y color a la vez; cada acento de color se mide aparte.
 - No hay ExtraBold por defecto. Cada tramo debe justificar la masa por longitud, fondo, formato y distancia.
 - La cursiva y Guttery son énfasis breves; no sostienen párrafos ni compiten con la tesis.
 - Se usan archivos tipográficos reales con `font-synthesis: none`; no se falsifican variantes.

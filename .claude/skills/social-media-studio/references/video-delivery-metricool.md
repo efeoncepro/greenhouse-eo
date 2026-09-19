@@ -115,6 +115,32 @@ videos devolvió `[null]`, por lo que no afirmar que se publicó alt text en el 
   el post, leer ese estado antes de suponer fallo: puede ser demora del feed.
 - Caso: [Viva México y previa 18](../../../../docs/operations/social/2026-09-16-viva-mexico-y-previa-18-production-method.md).
 
+### Receta verificada: carrusel IG + documento LinkedIn con readback por firma (2026-09-19)
+
+Caso «Nivel de búsqueda» (9 láminas PNG 1080×1350): Instagram `378566667` mar 22-sep 16:00 y LinkedIn página
+`378566757` vie 25-sep 11:00, marca `3961547`, zona `America/Santiago`. Registro:
+`ai-generations/2026-09-19_nivel-de-busqueda/PROGRAMACION.md`; bitácora
+`docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md`.
+
+1. **Media.** Subir los PNG finales a `gs://efeonce-group-greenhouse-public-media-prod/campaigns/<campaña>/` con
+   nombre de orden (`c01…c09`) y verificar **HTTP 200** de cada URL (y `content-type` correcto, §3) antes de crear el post. Si `gcloud`
+   responde `Reauthentication failed`, correr `pnpm gcloud:auth:playwright -- --force` sin preguntar y seguir.
+2. **Horario.** `getBestTimeToPostByNetwork` por red sobre la semana (en el caso: IG mar 16 h, índice 311 = máximo
+   semanal; LinkedIn vie 11 h, índice 2914 = máximo) **cruzado con `getScheduledPosts`** de la misma marca para no
+   chocar con piezas ya programadas (lun 21 y mié 23). El índice es intensidad relativa, no pronóstico.
+3. **Instagram.** `media` = URLs en orden de lectura, `mediaAltText` = un texto por lámina en el mismo orden,
+   `instagramData:{type:"POST", isAiGenerated:true}` cuando el arte es generado.
+4. **LinkedIn.** Las mismas URLs + `linkedinData:{"publishImagesAsPDF":true,"documentTitle":"…"}`; Metricool arma
+   el documento. El alt text queda **vacío** (no lo expone para documentos): no afirmarlo. El PDF local
+   (`out-v2/linkedin-nivel-de-busqueda.pdf`, pdf-lib, 25 MB bajo el límite de 100 MB) es respaldo, no transporte.
+5. **Readback de texto.** Releer por ID y comparar el texto completo contra `COPY.md` (idéntico, no «parecido»).
+6. **Readback de orden por firma de imagen.** Metricool re-aloja la media en `static.metricool.com`, así que la URL
+   no prueba el orden. Descargar las URLs re-alojadas y comparar su firma de imagen (p. ej. miniatura reducida
+   y diferencia de píxeles; no el hash, porque el re-alojamiento puede recodificar) contra los PNG locales: primera = portada y última = contraportada con diferencia 0 en
+   ambas redes. Un error de orden en un carrusel narrativo rompe la pieza aunque todos los archivos estén.
+7. Registrar en `PROGRAMACION.md` IDs, horarios con su justificación, URLs de media, resultado del readback y lo
+   **no** programado (la pieza suelta de Threads quedó fuera, declarada).
+
 ## 4. Readback, evidencia y cierre
 
 La respuesta de creación no cierra la tarea. Leer nuevamente `getScheduledPosts` y comprobar por ID:

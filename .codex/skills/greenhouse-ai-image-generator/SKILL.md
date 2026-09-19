@@ -25,6 +25,12 @@ la oportunidad, justificar participación, definir mecanismo creativo y papel de
 Para Efeonce, aplicar [SEASONAL_CONTENT](../social-media-studio/efeonce/SEASONAL_CONTENT.md): el oficio debe
 ser demostrable y la atribución reconocible. No forzar un objeto corporativo para cumplir branding. Color,
 marco o tipografía oficiales no equivalen a activos distintivos reconocidos sin evidencia.
+🔴 **Estudiar la estética del trend con fuentes antes de promptear, nunca de memoria.** En «Nivel de búsqueda»
+(GTA VI, 2026-09-19) la v1 salió en synthwave ochentero (el Vice City de 2002) y el operador la rechazó («no está
+mal, pero no está bien»): GTA VI es Florida hiperreal de 2026 en key art de realismo ilustrado pintado. Un estudio
+con URL y etiquetas verificado/observado/no verificado (`ai-generations/2026-09-19_nivel-de-busqueda/brief/gta6-visual-study.md`)
+fijó paleta, luz, trazo, HUD y la lista de IP que no se toca, y de ahí salió el bloque STYLE de la serie
+(§[Serie con estética de trend](#serie-con-estética-de-trend-bloque-style-batch-layout-y-moderación)).
 
 Separar dos rutas: **firma editorial**, con zona reservada y activo exacto compuesto después del modelo;
 **marca física**, con soporte pertinente, geometría y acabado definidos, usando arte oficial como referencia
@@ -370,6 +376,44 @@ pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": 
   alpha at original size and on the destination slide. This reduces matting halos and
   keeps the asset reusable across layouts.
 - Keep exploratory concepts out of commits (gitignored dir, e.g. `.captures/concepts/`).
+
+### Serie con estética de trend: bloque STYLE, batch, layout y moderación
+
+Medido en «Nivel de búsqueda» (2026-09-19, `ai-generations/2026-09-19_nivel-de-busqueda/`, bitácora
+[`2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md`](../../../docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md)):
+10 plates `gpt-image-2.5-flare` (escenas sin marca) y `gpt-image-2.5-sunburst` + `--image` (escenas con activos de
+marca), 1152×1440, `high`, ≈ USD 2–2,5 en total.
+
+- **Un bloque STYLE reutilizable por serie, escrito una vez y antepuesto a cada escena** (`brief/style.txt`):
+  técnica y acabado («digital painted key-art illustration in illustrated realism», contornos, sombras magenta,
+  reflejos turquesa, cielo cobalto→magenta→naranja, grano offset), época y lugar, las **anti-direcciones** que
+  corrigen el error de la v1 («NOT 1980s synthwave, NOT photoreal render, NOT flat vector») y los límites de IP
+  («no text, no letters…, no real brand logos, no characters from any existing video game»). Cada ítem del batch
+  = `STYLE: … SCENE: …`; el SCENE sólo describe la escena y su layout. Así la serie no deriva de lámina en lámina.
+- 🔴 **Construir el JSON de `--batch` con `json.dump` (Python) o `JSON.stringify` (Node), nunca con heredoc +
+  interpolación.** Las comillas dobles del estilo («"illustrated realism"») rompieron el JSON y el batch murió
+  con exit 1 **sin output visible** porque el `grep` del comando filtraba el error. Correcto:
+  `json.dump([{"filename": f, "prompt": style + " SCENE: " + scene} …], open("brief/plates.json","w"), ensure_ascii=False)`.
+  Ejemplos vigentes: `brief/plates-v2.json`, `brief/plates-v2b.json`. No filtrar la salida del CLI con `grep` en
+  la primera corrida de un batch.
+- **Pedir el espacio para texto con porcentajes en el prompt**, no con «leave space for text»: «the upper 45% of
+  the vertical frame is a deep dark twilight sky, darkest indigo-cobalt at the very top (dark enough for white
+  text), with the sunset glow only low near the horizon; keep that upper area free of buildings, palms and bright
+  objects». Con la versión vaga («upper 40% is open burning sunset sky») el cielo salió naranja brillante bajo el
+  titular y midió **1,4:1** (s5/s6/s8 v1). Con un objeto de marca, fijar su borde: «STRICT LAYOUT: the top edge of
+  the logo letters is at 55% of the frame height; above it ONLY … sky» (caso completo en
+  [`logo-3d-reference-kit.md`](references/logo-3d-reference-kit.md#evidencia-2026-09-19--monumental-como-cartel-de-azotea-en-estilo-ilustrado-pintado)).
+  Reservar también la banda de firma («the bottom 12% is dark matte, reserved for small text»).
+- **Falso positivo de moderación:** «a dense crowd … ALL holding their smartphones up high and pointing them
+  straight at the camera» devolvió `safety_violations=[sexual]` (`moderation_blocked`, `brief/plates-v2.log`) sin
+  nada sexual en el pedido. Pasó reescrito como escena de contexto explícito y vestuario declarado: «street
+  festival … fully clothed tourists and locals in t-shirts, caps and sundresses». Ante un bloqueo, reescribir
+  contexto y ropa; no insistir con la misma redacción ni forzar otro proveedor para saltarse el filtro.
+- **Nexa en estilo pintado: pedir el navy explícito.** Con la referencia de cuerpo completo
+  (`ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`) + la vista frontal transparente
+  del kit hoodie (`ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-…-transparente.png`), la
+  v1 salió con hoodie **azul rey**. Corrigió «deep navy (#023c70), not royal blue». La identidad de Nexa se conservó
+  en el estilo pintado; aun así el hoodie quedó algo más brillante que `#023c70`: revisar el color al 100 %.
 
 ## Reference edit + character consistency (`--image`)
 

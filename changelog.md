@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-19 — Trendjacking «Nivel de búsqueda» (GTA VI): jerarquía de 5 voces y compositor reutilizable
+
+Carrusel de 9 láminas + pieza suelta para Efeonce, programado en Instagram (22-sep) y LinkedIn (25-sep, documento).
+Método: estudio visual del trend con fuentes antes de dirigir, escenas de realismo ilustrado con GPT Image 2.5
+(Flare/Sunburst) y activos de marca en escena (Nexa, logo 3D, nave, Clawd y Codex), jerarquía tipográfica de 5 voces
+con texto enriquecido por palabra, selección AXIS con cursores fijos y en movimiento, y readback de Metricool por
+firma de imagen. `compositeLuminosity` quedó exportada en `scripts/creative/layout-compiler/compiler.mjs` para
+reutilizar la firma url-lum. Skills `social-media-studio`, `efeonce-advertising-creative`, `copywriting` y
+`greenhouse-ai-image-generator` (espejos) y docs de ejecución social/publicitaria actualizados.
+[Bitácora](docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md).
+
 ## 2026-09-18 — TASK-1832 retira la corrida canary y apaga sus gates
 
 Se revocó la authority del canary sintético, el cleanup sujeto-específico borró todo el grafo run-owned

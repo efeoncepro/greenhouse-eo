@@ -42,6 +42,22 @@ necesitan gritar a la vez, el problema es de jerarquía, no de tamaño.
 7. **Selección colaborativa:** conserva el intent y manifest AXIS. Verifica target real, aire óptico consistente,
    overlay bajo el contenido, hotspot local sobre el anclaje, multiplayer `acting` fuera con la punta en la
    esquina, `moving` sin contacto y placa siempre próxima al puntero. Repite en el formato más estrecho y ancho.
+8. **Contraste por nivel (carrusel/pieza con varias voces).** Mide cada voz por separado —etiqueta, entrada,
+   dominante, cierre, tarjeta, pie, logo— sobre el fondo real bajo su caja de tinta, **y cada acento `[[…]]` aparte**
+   (sus `accentBoxes`, con la luminancia de su tinta, p. ej. `#ff6500`). La métrica de referencia es la p98 de
+   luminancia del fondo bajo la tinta (conservadora: pesca luces puntuales). Si un nivel queda bajo el umbral y aun
+   así lo apruebas porque se lee, registra la **revisión visual a 390 px** junto al número; sin esa nota es REWORK.
+   Guarda el resultado por lámina (p. ej. `out-v2/qa.json` en «Nivel de búsqueda», 2026-09-19).
+9. **Tarjetas de notificación / paneles UI.** Si la pieza usa una tarjeta tipo HUD, debe ser vidrio esmerilado
+   **real**: región del propio plate desenfocada (en el caso, `blur 22` + máscara redondeada), borde sutil y tinta
+   oscura translúcida encima. Es un elemento de UI del género que la escena justifica, no un rectángulo decorativo
+   detrás de palabras; si no cumple una función narrativa, se retira.
+10. **Oscurecimientos graduales declarados.** Un scrim es la última opción, tras intentar encuadre, posición y plate.
+    Si queda, se declara **por lámina** (`scrimTop { to, opacity }`, `scrimBottom { from, opacity }`) como degradado
+    que se funde con la escena; nunca un velo rectangular ni un valor global oculto en el compositor.
+11. **Hoja de revisión.** Arma una hoja con todas las piezas en el orden de publicación. Si se genera ordenando
+    nombres de archivo, una pieza suelta fuera de la secuencia se intercala mal (el operador creyó que la
+    contraportada estaba penúltima): nómbrala fuera de la serie o preséntala aparte.
 
 ## Gate DO / DON’T
 
@@ -60,6 +76,11 @@ necesitan gritar a la vez, el problema es de jerarquía, no de tamaño.
 | Multiplayer | Punta y placa separadas pero próximas; label libre | Puntero decorativo, placa huérfana o identidad hardcodeada |
 | Estado moving | Presencia conjunta en región semántica, sin tocar selección | Target/anclaje fingido para justificar su posición |
 | Portabilidad | Manifest normalizado + adapter conformante | Copiar CSS del Lab o usar coordenadas libres |
+| Niveles de texto | Vecinos distintos en ≥ 2 ejes (peso, tinta, escala, familia) | Entrada y dominante con el mismo peso y color |
+| Acento de color | Naranja sobre cielo oscurecido, medido aparte y revisado a 390 px | Naranja sobre horizonte encendido (1–2:1) sin degradar a peso |
+| Tarjeta HUD | Vidrio esmerilado real del plate, función narrativa | Rectángulo plano de color detrás del texto |
+| Scrim | Degradado declarado por lámina tras intentar composición | Velo rectangular o global sin registro |
+| Firma web | url-lum con evidencia `non-separable-luminosity`; si el logo 3D es héroe, sólo url-lum | Segundo logo plano compitiendo con el héroe |
 
 ## Salida de la revisión
 

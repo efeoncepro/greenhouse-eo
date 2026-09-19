@@ -57,6 +57,9 @@ Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes d
    Para trendjacking, seasonalities o una pieza social que necesita idea y dirección visual, cargar
    `modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md`. Mantener ownership del resultado hasta mostrar
    la pieza revisada; componer skills y herramientas no equivale a terminar entregando sólo un prompt.
+   Trend de franquicia/lanzamiento: estudio visual con fuentes, IP de terceros y patrón de carrusel con el código
+   del juego en módulo 11 §1–§2 (caso GTA VI 2026-09-19); programación con readback por firma en
+   `references/video-delivery-metricool.md` §3.
 3. **Chequea frescura**: si vas a afirmar algo de la tabla `volátil`/`trimestral` de
    `SOURCES.md`, reverifica primero.
 4. **Si hay que ejecutar** (producir/programar/medir), abre `efeonce/STUDIO_TOOLING.md`

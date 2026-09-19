@@ -1,6 +1,6 @@
 # Ejecución de creatividad social para Codex y Claude
 
-Estado: vigente para trabajo local autorizado. Owner: Social Media Studio. Actualizado: 2026-09-17.
+Estado: vigente para trabajo local autorizado. Owner: Social Media Studio. Actualizado: 2026-09-19.
 Alcance: solicitudes de seasonality, trendjacking, memes de marca, creatividad social y correcciones de
 identidad/product placement. Es un protocolo de entrada y cierre; las skills enlazadas contienen el oficio.
 No habilita publicación, presupuestos externos nuevos ni cambios de runtime.
@@ -185,3 +185,26 @@ el sprite oficial, el plate nativo guiado por boceto que reemplazó un repintado
 [`LEEME.md`](../../ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md).
 Las poses 3D reutilizables de Clawd y Codex (fuente oficial, ángulos, accesorios y reglas de uso) están inventariadas en
 [bibliotecas de mascotas de partners](social/PARTNER_MASCOT_POSE_LIBRARIES.md).
+
+## Delta 2026-09-19 — trendjacking de franquicia en carrusel («Nivel de búsqueda», GTA VI)
+
+La [bitácora del caso](social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md) y la carpeta
+`ai-generations/2026-09-19_nivel-de-busqueda/` conservan el recorrido v1→v2, el estudio visual y la programación.
+Reglas nuevas, con el oficio en el [módulo 11](../../.codex/skills/social-media-studio/modules/11_TRENDJACKING_CREATIVE_PRODUCTION.md)
+(espejo Claude):
+
+- **Estudiar la estética del trend con fuentes antes de dirigir.** Nunca de memoria: la v1 (synthwave de Vice City
+  2002) fue rechazada porque GTA VI es Florida hiperreal de 2026. Estudio con URL y etiquetas `[V]/[O]/[NV]`,
+  activos de IP que no se usan y regla orgánico OK / pauta con `legal-privacy-ip-operator`.
+- **Carrusel de trendjacking con el código del juego:** portada-gancho con el meme vigente → reencuadre → N misiones
+  = mecanismo real del servicio → cierre → contraportada con CTA, refuerzos y marca como héroe. El layout del texto se
+  declara en el prompt del plate (porcentajes de alto, cielo oscuro reservado), no con velos.
+- **Readback por firma de imagen:** tras programar, además del texto idéntico a `COPY.md`, comprobar el orden de la
+  secuencia comparando la firma de la media re-alojada por Metricool contra los PNG locales (primera = portada,
+  última = contraportada). Receta en [entrega Metricool](../../.codex/skills/social-media-studio/references/video-delivery-metricool.md) §3.
+- **Pieza suelta separada de la secuencia:** nombre, hoja de revisión y programación propios; la hoja del carrusel
+  va en orden de publicación, no alfabético.
+
+El meme «We got X before GTA 6» caduca el 19-nov-2026; no reutilizar el gancho después. Regresiones en
+[casos de revisión](../../.codex/skills/social-media-studio/references/creative-review-cases.md); fuentes fechadas en
+[trend-production-sources](../../.codex/skills/social-media-studio/references/trend-production-sources.md).

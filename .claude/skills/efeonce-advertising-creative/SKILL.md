@@ -69,7 +69,14 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    `src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg`: no lo reconstruyas con texto o CSS. Conserva
    `efeoncepro.com`, `opacity: 0.72`, fusión `luminosity`, escala proporcional y comprueba píxeles visibles en el
    master, no sólo presencia de markup. En Sharp usa el compositor canónico, que calcula el blend no separable
-   contra el canvas; no confíes en que librsvg ejecute `mix-blend-mode`.
+   contra el canvas; no confíes en que librsvg ejecute `mix-blend-mode`. Desde un compositor de corrida (fuera de
+   `pnpm creative:layout`) **importa** esa función, no la reimplementes:
+   `import { compositeLuminosity } from '<repo>/scripts/creative/layout-compiler/compiler.mjs'` y llama
+   `compositeLuminosity({ backdropBytes, sourceBytes, left, top, width, opacity: 0.72 })` con el SVG rasterizado
+   como `sourceBytes`; usa `output` como nuevo master y falla si `evidence.method !== 'non-separable-luminosity'`.
+   La firma web no entra en la medición de contraste p98: su prueba es la evidencia de fusión más la revisión visual.
+   **Si el logo 3D ya es héroe de la escena, la firma es url-lum, no un segundo logo plano** (caso contraportada de
+   «Nivel de búsqueda», 2026-09-19).
    Si la pieza usa selección activa o presencia multiplayer, no dibujes cursores con coordenadas decorativas:
    declara un `AxisCollaborationSelectionIntent`, resuélvelo con `efeonce.collaboration-selection` y entrega el
    manifest `axis.collaboration-selection-composition.v1` al adapter de la superficie.
@@ -85,6 +92,54 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
 7. **Entrega evidencia honesta.** Muestra la pieza y conserva formato, fuente editable/export, decisiones
    tipográficas, provenance y resultado del gate. Distingue prueba producida, revisada, aprobada, programada,
    publicada y medida.
+
+## Jerarquía por voces: receta probada en carrusel (2026-09-19)
+
+Caso: carrusel «Nivel de búsqueda» (GTA VI, 9 láminas 1080×1350 + pieza suelta), aprobado tras una pasada pedida
+por el operador para que «no haya jerarquías planas». Compositor de referencia:
+`ai-generations/2026-09-19_nivel-de-busqueda/componer-v2.mjs` + `brief/slides-v2.json`; método completo en la
+[bitácora](../../../docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md).
+Es una receta de caso, no un preset: nombres de receta desde `axisAdvertising.recipes`; los pesos citados son los
+que usó el caso y se revalidan con cada fondo, largo y soporte.
+
+| Voz | Función | Tipografía (caso) | Tinta (caso) |
+|---|---|---|---|
+| Etiqueta | Nombra la misión/tema | Poppins 700 mayúsculas, tracking `structureLabel`, + marcador estrella | blanco; el marcador lleva el naranja `#ff6500` |
+| Entrada | Prepara la tesis | Bricolage `ideaLead`; nombres propios con `**…**` a 760 | `softOnDark` `#cfe4fa`; énfasis blanco |
+| Dominante | La tesis en 1–3 palabras | Bricolage `ideaImpact` a ancho 78 | blanco; palabra clave `[[…]]` en naranja Efeonce |
+| Cierre de frase | Completa la tesis | Bricolage `ideaMedium`, remate `**…**` a 800 | blanco, o celeste con remate blanco |
+| Tarjeta HUD | Da el giro/argumento sobre la escena | Poppins 400 + remate Poppins 700 | celeste + blanco |
+| Gesto (opcional) | Voz humana breve | Guttery, 1 por pieza, ≤ 3 palabras | blanco |
+
+- **Regla: dos niveles vecinos nunca comparten peso y color a la vez.** La v1 falló por eso (entrada 740 vs dominante
+  780, ambos blancos): se leía como un solo bloque. Separa por al menos dos ejes (peso, tinta, escala, familia).
+- Una etiqueta naranja sobre cielo violeta no pasó contraste: la etiqueta va en blanco y el naranja se reduce al
+  marcador. El naranja es acento, no tinta de texto por defecto.
+- **Ancho 78 de Bricolage (eje autorizado 75–100)** para el dominante es una decisión declarada del caso: registro
+  condensado de cartel de acción sin deformar el glifo. Declárala en la ficha tipográfica; no es el ancho por defecto.
+- El dominante se ajusta a un ancho máximo declarado (`dominantMax`) para dejar aire a las etiquetas de los
+  colaboradores, que viven fuera de su caja.
+
+### Texto enriquecido por palabra
+
+La jerarquía también vive dentro de la línea. El compositor de referencia expone `richBlock` + `parseRich`:
+
+- `**negrita**` sube al peso superior **de la misma familia** (par base/negrita declarado con
+  `BRIC(recipe, width, boldWeight)` o `POP = { base: 400, bold: 700 }`); no cambia la tinta.
+- `[[acento]]` cambia la tinta al `accentFill` del nivel: naranja en el dominante, blanco en entrada, tarjeta y pie.
+- `|` fuerza salto; el wrap es por palabra con estilo por segmento, anclado por la parte superior de la tinta.
+- Devuelve `accentBoxes`: **el contraste del acento se mide por separado** del resto del bloque.
+- **El acento naranja sólo va sobre cielo oscurecido.** Sobre horizonte o skyline encendido cae a 1,0–2,0:1 (p98). Si
+  no se lee a 390 px, degrada el énfasis a peso con tinta clara (`**…**`) en vez de naranja (casos «ChatGPT.» en la
+  portada y «Nadie» en la pieza suelta). La p98 es conservadora (pesca luces puntuales): acentos naranjas ≥ 150 px con
+  1,8–2,5:1 se leyeron bien a 390 px; si los apruebas así, registra la revisión visual junto al número.
+
+### Guttery
+
+- Archivo: `~/Library/Fonts/Guttery.otf` (no versionado en el repo; declara `fontFilesBundled: false` en la
+  evidencia). Si no existe en la máquina, esa capa se omite; no se sustituye por otra familia.
+- Cobertura verificada 2026-09-19: `¿ ¡`, tildes y `ñ` (`¿apostamos?`, `¡a la orden!`, `¿hola?`).
+- Una por pieza, ≤ 3 palabras, rotación leve; **blanco sobre fondos cálidos** (el naranja se pierde en el atardecer).
 
 ## Reglas duras
 
@@ -183,3 +238,21 @@ Sobre una **fotografía** (primer uso, 2026-09-17, «¿Claude o Codex?», `ai-ge
 - los colaboradores pueden ser **mascotas de partners** disputándose el objeto (Clawd `#d77757`, Codex `#2f67db`
   medido sobre el plate, no inventado): la decisión del titular es el objeto seleccionado.
   `presentation.participantColors` acepta sólo `#rrggbb`.
+
+En **carrusel sobre ilustración** (2026-09-19, «Nivel de búsqueda», `componer-v2.mjs`):
+
+- **Cursores en movimiento = los «cursores solos».** Un colaborador que sólo transita se declara
+  `{ kind: 'collaborator', state: 'moving', canvasRegion: '<región>', action: 'move', label }`, sin `targetId`.
+  **No existe cursor sin caja**: `renderCollaborationSelection` siempre dibuja la selección del target; si quieres
+  presencia sin selección, la pieza igual necesita un objeto seleccionado y el `moving` pasea fuera de él.
+- **Anclas con texto alineado a la izquierda**: colaboradores en `top-end` / `bottom-end`; `top-start` saca la etiqueta
+  del lienzo por el margen izquierdo. El cursor local acepta cualquier ancla; usa **`end-center`** cuando hay una frase
+  de cierre debajo del dominante (`bottom-*` la tapaba).
+- **Etiquetas cortas**: «Equipo Efeonce» se salió del lienzo con dos colaboradores → «Efeonce». Roles de una palabra
+  (SEO, Contenido, Data, PR, Dev, Nexa) leen mejor a 390 px.
+- Si el dominante está alto, las etiquetas de esquina chocan con el HUD o la etiqueta: baja el bloque, no el cursor.
+- **Diagnóstico**: con `evidence.withinCanvas === false`, falla e imprime `evidence.cursorEvidence[].labelBounds`
+  (junto a `evidence.target` y `bounds`) para ver qué placa se sale y por qué lado.
+- `presentation` del caso: `collaboratorScale: 1.8`, `localCursorScale: 1.2`, `participantColors` por id en `#rrggbb`
+  (Clawd `#d77757`, Codex `#2f67db`, Nexa `#d6246e`, SEO `#12afa2`, Contenido `#ff6500`, Data `#5d50ff`, Dev
+  `#0375db`). Los colores de rol son del caso, no una paleta canónica.

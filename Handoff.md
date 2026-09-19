@@ -2,6 +2,9 @@
 
 **16–17/09:** Higgsfield API con créditos. Previa 18: verificar · readback KV 21/09 y 23/09.
 
+**GTA VI «Nivel de búsqueda»:** IG 22/09 16:00 · LinkedIn 25/09 11:00; revalidar tono antes de salir.
+[Bitácora](docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md).
+
 **Posicionamiento CRM actualizado (2026-09-18, documental):** HubSpot y Salesforce se mantienen como proveedores
 con una zona de solapamiento —mid-market alto, agentes e integraciones— pero con centros de gravedad distintos.
 HubSpot-first parte para crecimiento B2B, mid-market y time-to-value; Salesforce-first para org instalada compleja,

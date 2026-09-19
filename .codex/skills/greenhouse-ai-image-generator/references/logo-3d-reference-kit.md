@@ -132,6 +132,36 @@ ocultos sobre travertino»). Elegir el render por **luminancia** (blanco para ma
 der) salió fiel al primer intento, **USD 0,14**. Diferencias menores que el QA aceptó: órbita algo más gruesa y
 nariz de la nave algo más corta que en el render.
 
+### Evidencia 2026-09-19 — monumental como cartel de azotea en estilo ilustrado pintado
+
+Caso «Nivel de búsqueda» (trendjacking GTA VI): `ai-generations/2026-09-19_nivel-de-busqueda/LEEME.md`, logs
+`brief/s3*.log` y `brief/s9*.log`, bitácora
+[`2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md`](../../../../docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md).
+La pasada directa funciona también cuando la escena **no es fotográfica** sino key art pintado: el render fija la
+forma y el bloque STYLE de la serie (`brief/style.txt`) fija el acabado.
+
+- **Montaje:** letras blancas monumentales como cartel sobre la azotea de un hotel art déco frente al mar (c03) y
+  sobre una estructura de cartel en una azotea con helipuerto (c09, contraportada).
+- **Referencias:** `Blanco/Monumental/efeonce-logo-3d-blanco-monumental-01-frente-nivel-calle-luz-<izq|der>-transparente.png`
+  o `…-02-contrapicado-frente-luz-<izq|der>-transparente.png` como imagen 1 + `ai-generations/2026-09-17_efeonce-logo-3d/ref/logo-silueta.png`
+  como imagen 2 (el emblema es lo frágil, §1.c). Contrato del §3 al inicio del prompt, sin variar.
+  `gpt-image-2.5-sunburst`, 1152×1440, `high`.
+- **El layout va en el prompt, con porcentajes.** Sin él: **s3 v1** cortó el logo contra el borde del cuadro y
+  **s3 v2** lo subió tanto que no quedó cielo para el titular. **s3 v3** (aprobada) llevó la regla estricta:
+
+  > STRICT LAYOUT: the top edge of the logo letters is at 55% of the frame height; above it ONLY deep dark
+  > indigo-cobalt night sky … no buildings, no skyline above 55%.
+
+  Y para la firma: «The bottom 12% is dark matte … reserved for small text». Pedir el cielo **oscuro en lo más
+  alto** («darkest at the very top, dark enough for white text»): un cielo naranja brillante bajo el titular midió
+  1,4:1 en otras láminas de la misma serie.
+- **QA letra por letra (§5) pasó en las 3 escenas con logo** que llegaron a revisión (s3 v3, s9 v1 y s9 v2): «e», «f»,
+  nave, órbita con cortes y tres ventanas correctas; revisado con recorte al 100 % (`brief/zoom-*logo*.png`).
+- **Cuatro referencias en una pasada:** la contraportada llevó **logo + silueta + Clawd + Codex** (4 `--image`) en
+  una sola llamada Sunburst y las cuatro formas salieron fieles (input medido 5 946 tokens de imagen). Declarar el
+  rol de cada imagen (forma exacta del logo, geometría del emblema, identidad de cada mascota) y dónde va cada una
+  en la escena (lado del logo, superficie de apoyo, delante o detrás del cartel). Mascotas: [`mascot-3d-pose-library.md`](mascot-3d-pose-library.md#caso-en-escena-clawd--codex-frente-al-logo-2026-09-19).
+
 ## 4. Variante B — pegar y repintar el halo con máscara (excepción: material del kit a escala chica)
 
 **Por qué existe (medido):** con la escala **pequeña** sobre un escritorio, la pasada directa deformó la órbita —la

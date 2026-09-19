@@ -69,6 +69,41 @@ sobre otra marca, jerga interna) están en `ANTIPATTERNS.md`. Caso fuente:
 [`2026-09-11-iphone-duo-trendjack.md`](../../../../docs/operations/social/2026-09-11-iphone-duo-trendjack.md).
 El go/no-go del trend es de `social-media-studio` (`modules/05` §6).
 
+**Segundo caso — humor desde el código del juego** («Nivel de búsqueda», trendjacking GTA VI, 2026-09-19;
+programado en Instagram y LinkedIn). El humor sale de las reglas del juego —estrellas, misiones, botín, refuerzos,
+la espera— y siempre empuja el argumento; nunca a costa del lector. Textos completos:
+`ai-generations/2026-09-19_nivel-de-busqueda/COPY.md`.
+
+- **Gancho con el meme dominante del trend** (la espera): *«GTA VI se hizo esperar 13 años. Tu marca en ChatGPT no
+  tiene por qué.»* El dato se verificó (GTA V: 17-sep-2013; GTA VI: 19-nov-2026) y el meme tiene fecha de
+  caducidad: publicar antes del lanzamiento.
+- **Reencuadre por doble sentido del término del trend**: *«En el juego, cinco estrellas significan que toda la
+  ciudad te busca… En la búsqueda con IA es al revés: si nadie te busca, nadie te encuentra.»*
+- **El mecanismo en el idioma del juego**: cada estrella es una misión = una señal real del servicio (*«Datos
+  propios (el único botín que nadie te puede robar)»*). La lista se lee como guía de juego y enseña el método.
+- **CTA en el código del juego**: *«¿Te trabaste en la misión 1? Pide refuerzos»*. Pedir ayuda es parte del juego,
+  no una derrota.
+- **Remate de comunidad**, en primera persona plural: *«(Nosotros ya bloqueamos el 19 de noviembre en el
+  calendario. Para jugar, no para trabajar.)»*
+- **Límite de IP en el copy:** «GTA VI» sólo como referencia nominativa; nada de literales del juego («Wasted»,
+  «Mission Passed»). El humor usa el código, no la propiedad intelectual.
+
+**Misma verdad, dos registros:**
+- **Instagram — humor abierto:** gancho corto con ⭐, misiones como lista con emoji, CTA de conversación nativa
+  (*«Escríbenos por DM»*, sin prometer un link no verificado) + pregunta de comunidad (*«¿en cuántas estrellas
+  vas?»*) + el remate.
+- **LinkedIn — humor medido + argumento profesional:** abre con el guiño (*«medio internet ya anda en modo «cinco
+  estrellas». Nosotros también, pero por otra razón.»*), traduce la métrica a una preocupación de negocio (cuántas
+  veces te nombran ChatGPT, Perplexity o Gemini), numera las misiones con su explicación, sostiene la creencia de
+  marca (*«Nada de esto es suerte ni un truco de temporada. Es sistema»*) y cierra con **pregunta al equipo**
+  (*«¿Cuál de las cinco misiones es la que más le cuesta a tu equipo?»*).
+- **Claim sin estudio → cuantificador honesto:** *«Muchas marcas andan con cero estrellas»*, no «la mayoría»: sin
+  un estudio propio que lo respalde, no se afirma una proporción.
+
+Bitácora del caso:
+[`2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md`](../../../../docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md).
+Jerarquía del texto dentro de las láminas: `references/seasonal-storytelling-and-caption.md`.
+
 ## 7. Tagline & slogan
 
 - **Tagline:** frase duradera de identidad de marca (ej. Efeonce **"Empower your Growth"**).
@@ -101,6 +136,7 @@ El go/no-go del trend es de `social-media-studio` (`modules/05` §6).
 - [ ] Microcopy: crafteado aquí, tokenizado vía UX-writing; nada hardcodeado.
 - [ ] CTA con verbo + valor; ansiedad reducida al lado.
 - [ ] Social/trend-jack: el gancho mapea el trend al insight del cliente, un recurso por bloque, variante por canal.
+- [ ] Trend-jack con humor: el chiste sale del código del trend y empuja el argumento; sin literales de IP; claims sin estudio con cuantificador honesto («muchas», no «la mayoría»).
 
 ## Cross-links
 

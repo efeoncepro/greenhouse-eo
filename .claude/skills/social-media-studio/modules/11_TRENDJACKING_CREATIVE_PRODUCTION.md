@@ -7,7 +7,10 @@ producción no significa devolver únicamente un brief ni abandonar el seguimien
 Este módulo aplica el contrato de manos/capas de
 [`GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md`](../../../../docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md).
 No crea un runtime, un compositor ni permiso de publicación. Referencias y evidencia fechada:
-[`trend-production-sources.md`](../references/trend-production-sources.md).
+[`trend-production-sources.md`](../references/trend-production-sources.md). Caso de referencia de trendjacking
+en carrusel (GTA VI, 2026-09-19):
+[bitácora](../../../../docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md) y
+carpeta `ai-generations/2026-09-19_nivel-de-busqueda/` (`LEEME.md`, `COPY.md`, `PROGRAMACION.md`).
 
 ## 0. Contrato de decisión obligatorio
 
@@ -31,6 +34,41 @@ fuente primaria del detonante, ejemplos del público, marcas participantes y lo 
 Las cuotas de investigación son objetivos de cobertura: si hay menos material, documentar la limitación y
 ajustar la confianza; nunca fabricar observaciones ni llamar «viral» a lo no medido. Separar hecho, interpretación
 y propuesta. Definir `expires_at` por evolución de la conversación, no por una vida universal de 24–72 horas.
+Si el trend tiene fecha de cierre conocida (lanzamiento, estreno, final), `expires_at` es esa fecha: el meme
+«We got X before GTA 6» deja de funcionar el día que sale el juego.
+
+### Estudiar el código visual vigente antes de dirigir
+
+Cuando el trend es una franquicia, lanzamiento o estética, investigar **con fuentes** su código visual vigente
+antes del primer prompt; nunca dirigir de memoria. Caso fuente (2026-09-19, «Nivel de búsqueda»): la v1 se dirigió
+como synthwave ochentero de Vice City 2002 y el operador la rechazó («no está mal, pero no está bien»); GTA VI es
+Florida hiperreal de 2026 vista por un teléfono, con key art de realismo ilustrado pintado. El estudio posterior
+(subagente web) quedó en `ai-generations/2026-09-19_nivel-de-busqueda/brief/gta6-visual-study.md`.
+
+El estudio mínimo registra, cada afirmación con URL y etiqueta `[V]` verificado · `[O]` opinión/fuente secundaria ·
+`[NV]` no verificado:
+
+- época, registro y referentes actuales frente a los de entregas o eras anteriores (la confusión más probable);
+- técnica del key art (trazo, contornos, luz, paleta, grano) separada del render in-game;
+- UI o código del género que la audiencia reconoce (HUD, notificaciones, estrellas, minimapa) y sus estados;
+- vocabulario en el idioma del mercado (p. ej. «nivel de búsqueda» es término de la comunidad hispana; el string
+  exacto de la UI localizada quedó `[NV]`), memes vigentes con origen y caducidad;
+- marcas que ya participan, con fecha y fuente, y lo que no se pudo documentar;
+- activos protegidos que no se pueden usar (ver abajo).
+
+Convertir el estudio en un bloque de estilo reutilizable para los prompts que diga también qué **no** es
+(`NOT 1980s synthwave, NOT photoreal render, NOT flat vector`); ejemplo en `brief/style.txt` de la corrida.
+
+### IP de terceros en trendjacking
+
+Tomar el **código** (luz, paleta, género de UI, vocabulario de la comunidad, estructura de un meme) y dejar la
+**propiedad**. No usar: logos, wordmarks y su tratamiento distintivo (p. ej. un degradado propio dentro de un
+numeral), fuentes que se leen como la marca aunque tengan licencia (Pricedown), sellos corporativos, personajes o
+parecidos, nombres de lugares ficticios registrados, capturas o fotogramas, recreaciones panel por panel ni frases
+literales de la UI del juego. Los nombres de producto sólo como referencia nominativa en el texto. Dibujar la UI
+propia (estrellas, tarjetas, íconos genéricos) en vez de imitar la del juego. **Orgánico** con estas reglas: OK.
+**Pauta**, boost o uso comercial ampliado: revisión previa con `legal-privacy-ip-operator`; incluye validar con las
+guías de marca de partners cualquier mascota de terceros (Clawd, Codex) que aparezca.
 
 Escribir una frase por pregunta:
 
@@ -72,6 +110,27 @@ como instrucciones autosuficientes. Traducirlos a cámara, gesto, material, luz,
 Seleccionar por **aporte propio, legibilidad cultural, relación de marca y viabilidad**, con razones de descarte.
 No sumar notas arbitrarias para presentar gusto personal como evidencia de performance.
 
+### Patrón: carrusel de trendjacking con el código del juego/franquicia
+
+Cuando el trend trae un sistema de reglas reconocible (niveles, misiones, estrellas, logros), usarlo como
+**estructura del argumento**, no como decorado. Secuencia verificada en «Nivel de búsqueda» (9 láminas 4:5):
+
+| Lámina | Función | En el caso |
+|---|---|---|
+| Portada-gancho | el meme vigente aplicado al problema de la audiencia | «GTA VI va a llegar antes que tu marca a ChatGPT» (13 años de espera) |
+| Reencuadre | el doble sentido que convierte el código en tesis | estrellas de persecución ↔ búsqueda con IA / AEO |
+| N misiones | una por lámina; cada una = una pieza del mecanismo real del servicio | 5 estrellas = entidad, respuesta primero, datos propios, menciones, acceso de rastreadores |
+| Cierre | la consecuencia de completar el sistema | nivel completo |
+| Contraportada | CTA en el idioma del juego + marca como héroe + refuerzos | logo 3D Efeonce héroe, Clawd y Codex, «Pide refuerzos», firma web |
+
+- El humor sale del código del juego y trabaja **a favor** del argumento; el caption aclara, no traduce el chiste.
+- Un elemento de UI propio da continuidad entre láminas (HUD de 5 estrellas con la misión actual resaltada;
+  tarjeta de notificación con vidrio esmerilado real extraído del plate). Es interfaz del género, no una caja
+  decorativa detrás de palabras.
+- Cursores colaborativos AXIS narran al squad trabajando cada misión (la marca demuestra oficio, no sólo firma).
+- Una pieza suelta derivada (Threads/feed) vive **fuera** de la secuencia: nombre y carpeta propios, no numerada
+  entre las láminas (ver §5).
+
 ## 3. Codiseñar imagen, palabras y marca
 
 Cargar `design-studio` módulos 03 y 13. Antes de generar completar
@@ -108,6 +167,19 @@ La foto debe permitir leer el texto. Primero cambiar posición/composición; des
 hace falta. Evitar velos rectangulares con cortes visibles, oscurecer toda la escena o tapar el gesto central.
 Medir contraste bajo los glifos y revisar a tamaño móvil. Un promedio alto puede ocultar una vela detrás de una letra.
 
+**Declarar el layout en el prompt del plate.** El «espacio para texto» se produce en la generación, no con velos
+después. Escribir el layout con porcentajes de alto y qué contiene cada banda: `STRICT LAYOUT: the top edge of the
+logo letters is at 55% of the frame height; above it ONLY deep dark indigo-cobalt night sky… no skyline above 55%`;
+`upper 45% deep dark twilight sky, darkest at the very top (dark enough for white text), sunset glow only near the
+horizon`; `the bottom 12% is dark matte… reserved for small text`. Sin eso, en la corrida del 2026-09-19 salieron un
+logo cortado en el borde, un plate sin cielo para el titular y cielos naranjas bajo el titular (1,4:1). Un acento
+naranja sólo va sobre cielo oscurecido: sobre horizonte o skyline encendido cae a 1,0–2,0:1 y el énfasis pasa a peso
+blanco. El scrim gradual declarado por lámina queda como último recurso tras intentar plate y composición.
+
+Jerarquía: una lámina con texto no se entrega en dos niveles planos (titular + apoyo del mismo peso y color).
+La escala de voces, pesos y colores la fija [`efeonce-advertising-creative`](../../efeonce-advertising-creative/SKILL.md);
+aquí sólo se exige que cada lámina tenga una voz dominante indiscutible medida en miniatura.
+
 ### Branding y product placement: nombrar el modo correctamente
 
 | Modo | Ejecución | Validación |
@@ -125,6 +197,21 @@ o edición generativa guiada por referencias. En esta última, pasar escena + lo
 el pase de materialización y revisar identidad, perspectiva, textura, luz y lectura móvil por separado.
 El titular y la firma editorial se componen después con activos exactos. No confundir fidelidad visual del
 logo generado con identidad vectorial garantizada. Si falla, corregir soporte/escala/ruta, no duplicar marcas.
+
+**Marca en escena desde activos canónicos.** Si la marca aparece dentro del mundo del trend, entrar con los
+activos canónicos como referencia de forma (edición con `--image`, intención en el prompt), nunca de memoria:
+
+| Activo | Referencia usada el 2026-09-19 | Lo que se exige |
+|---|---|---|
+| Nexa | `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png` + hoodie de `ai-generations/2026-09-17_hoodie-efeonce/final/` | color nombrado (`deep navy #023c70, not royal blue`); la v1 salió azul rey |
+| Logo 3D monumental | kit `ai-generations/2026-09-17_efeonce-logo-3d/kit/monumental-blanco/` (frente o contrapicado) + `ai-generations/2026-09-17_efeonce-logo-3d/ref/logo-silueta.png` | contrato de prompt del kit |
+| Nave | OneDrive `13- Branding/Nave Efeonce 3D/Blanco/Angulos 3D/v01/` vistas 01 y 17 | ventanas, esfera, aleta y cortes de la órbita |
+| Mascotas de partners | OneDrive `14. Mascotas de partners/<Clawd (Claude)\|Codex (OpenAI)>/Poses 3D con accesorios/v01/` | fidelidad de silueta y accesorio |
+
+Hasta cuatro referencias en una sola pasada funcionaron (Clawd + Codex + logo + silueta). QA obligatorio por
+activo, recortado al 100 %: **letra por letra** para el logo (letras, órbita con sus cortes), color sin deriva,
+perspectiva coherente. Donde el logo 3D ya es héroe, la firma es la URL (`url-lum.svg`), no un segundo logo plano.
+Dos mascotas de partners juntas sólo con pedido explícito del operador (la regla del KV paraguas dice una).
 
 Una marca no tiene que apropiarse de un objeto ritual para estar presente. En contexto cultural, investigar y
 respetar la función de los elementos; no estampar retratos, alimentos u objetos sagrados para resolver branding.
@@ -170,6 +257,11 @@ Para video revisar clip completo, frames críticos, audio y continuidad; una por
 Las zonas seguras internas son una envolvente prudencial, no una garantía vigente de todas las plataformas.
 Si el encargo requiere varios formatos, recomponer cada uno. No reducir un 16:9 a una Story ni certificar el
 feed porque pasó la versión 9:16. Validar la superficie real cuando esté disponible.
+
+La hoja de revisión (contact sheet) debe mostrar la secuencia en su orden de publicación. Si se arma por orden
+alfabético de archivo, una pieza suelta cae al final y parece la última lámina: el 2026-09-19 el operador creyó que
+la contraportada estaba penúltima. Numerar con prefijo de orden (`c01…c09`) y dejar la pieza suelta en una hoja
+aparte o rotulada fuera de la secuencia.
 
 Usar [`creative-review-cases.md`](../references/creative-review-cases.md) como conjunto de regresiones del oficio.
 Una lista marcada por el mismo agente no prueba desempeño de audiencia. Conservar aprobación humana como

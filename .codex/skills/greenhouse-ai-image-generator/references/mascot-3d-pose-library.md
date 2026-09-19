@@ -130,7 +130,31 @@ Nombre: `efeonce-<mascota>-3d-<nn>-<pose>-1x1-1600x1600-v01-{fondo-estudio|trans
 `Clawd (Claude)/` y `Codex (OpenAI)/`. Detalle de la raíz: `social-media-studio/efeonce/ONEDRIVE_DELIVERY.md`.
 
 **Límite:** son interpretaciones 3D de la mascota de un partner; validar contra la guía de marca de Anthropic/OpenAI
-antes de pautar. Nunca dos mascotas de terceros en la misma imagen.
+antes de pautar. Por defecto, una sola mascota de terceros por imagen (regla del KV paraguas); juntas sólo con pedido
+explícito del operador (ver el caso de abajo).
+
+## Caso en escena: Clawd + Codex frente al logo (2026-09-19)
+
+Contraportada `c09-refuerzos` del carrusel «Nivel de búsqueda» (trendjacking GTA VI):
+`ai-generations/2026-09-19_nivel-de-busqueda/` (`plates-v2/s9-contraportada-v2.png`, `brief/s9*.log`), bitácora
+[`2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md`](../../../../docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md).
+El accesorio elige la pose por servicio (§6): la pieza habla de AEO, así que Clawd va de **detective con lupa** y
+Codex con su **laptop** canónica.
+
+- **Referencias (transparentes, OneDrive `5. Contenidos/14. Mascotas de partners/`):**
+  `Clawd (Claude)/Poses 3D con accesorios/v01/efeonce-clawd-3d-01-detective-lupa-1x1-1600x1600-v01-transparente.png` y
+  `Codex (OpenAI)/Poses 3D con accesorios/v01/efeonce-codex-3d-08-laptop-1x1-1600x1600-v01-transparente.png`, junto
+  al logo monumental blanco del kit + `ai-generations/2026-09-17_efeonce-logo-3d/ref/logo-silueta.png`: **4 `--image`
+  en una sola pasada** `gpt-image-2.5-sunburst` (1152×1440, `high`), con el bloque STYLE de la serie (key art
+  pintado). Cada imagen con su rol declarado y su lugar en la escena.
+- **Fidelidad conseguida (revisión visual, sin medición de color):** Clawd conservó el cuerpo de cubos, los ojos,
+  las cuatro patas y su naranja; Codex, la nube, el visor oscuro y el glifo `>_`; sombrero, lupa y laptop quedaron en
+  el estilo de cada mascota. Las mascotas mantienen su acabado 3D de vinilo dentro de la escena nocturna de la serie,
+  y la identidad no se rompió. QA: recorte al 100 % de mascotas y logo (`brief/c09-check.png`, `brief/zoom-s9*-logo.png`).
+- **Gobernanza:** el KV paraguas «Tu IA no conoce tu negocio» fija **una sola mascota de partner por imagen**. Juntas
+  sólo con **pedido explícito del operador**, como aquí (precedente: «¿Claude o Codex?», 2026-09-17), y registrándolo
+  en el LEEME de la corrida. Orgánico aprobado ≠ pauta: antes de pautar, validar contra las guías de marca de
+  Anthropic y OpenAI. Registro de uso: [`PARTNER_MASCOT_POSE_LIBRARIES.md`](../../../../docs/operations/social/PARTNER_MASCOT_POSE_LIBRARIES.md).
 
 ## 10. Aplicarlo a Nexa
 

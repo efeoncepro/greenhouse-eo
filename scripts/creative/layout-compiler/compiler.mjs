@@ -661,6 +661,13 @@ const setPixelLuminosity = (color, targetLuminosity) => {
   return clipBlendColor(color.map(channel => channel + delta))
 }
 
+/**
+ * Fusión de luminosidad no separable (firma url-lum) de `sourceBytes` sobre `backdropBytes`. Exportada para que los
+ * compositores de corrida (p. ej. `ai-generations/<corrida>/componer-*.mjs`) reutilicen este compositor canónico en
+ * vez de duplicarlo; librsvg no ejecuta `mix-blend-mode`.
+ * Parámetros: `left`/`top` en px del backdrop, `width` al que se reescala la fuente y `opacity` (url-lum usa 0.72).
+ * Devuelve `{ output, evidence }`: `output` es el nuevo master y `evidence.method` vale 'non-separable-luminosity'.
+ */
 export const compositeLuminosity = async ({ backdropBytes, sourceBytes, left, top, width, opacity }) => {
   const { data: backdrop, info } = await sharp(backdropBytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
 

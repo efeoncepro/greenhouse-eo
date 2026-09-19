@@ -65,6 +65,42 @@ copy; no depende de las palabras “escalar” o “automatizar”.
 La guía pública ayuda a entender y discutir las decisiones, pero no aprueba una pieza ni convierte una receta
 en preset universal. El estado `trial` del contrato exige conservar ficha, evidencia y gate por cada composición.
 
+## Pedir un carrusel con jerarquía de 5 voces y selección colaborativa
+
+Caso de referencia: carrusel «Nivel de búsqueda» (2026-09-19). Método completo en la
+[bitácora del caso](../../operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md).
+
+**Cómo pedirlo.** Entrega el copy por lámina separado en voces y marca los énfasis:
+
+```text
+Usa $efeonce-advertising-creative y $social-media-studio. Carrusel 1080×1350, 9 láminas.
+Por lámina: etiqueta, entrada, dominante (1–3 palabras), cierre de frase, tarjeta y gesto opcional.
+Marca **negrita** para subir peso y [[acento]] para la palabra clave en naranja.
+Selección colaborativa sobre el dominante: SEO y Contenido editando, Paid moviéndose por el canvas.
+Firma con url-lum. Toma como referencia ai-generations/2026-09-19_nivel-de-busqueda/componer-v2.mjs.
+```
+
+**Qué revisar en la entrega.**
+
+- La **hoja de revisión** con todas las láminas en el orden de publicación (una pieza suelta debe venir aparte).
+- La **vista a 390 px**: la etiqueta, el dominante y la tarjeta se leen sin ampliar; ninguna voz se funde con la
+  vecina (si entrada y dominante tienen el mismo peso y color, pide corrección).
+- El **acento naranja legible**: sobre horizonte encendido debe haberse cambiado a peso blanco. Pide el contraste
+  por nivel (incluidos los acentos) y, si alguno quedó bajo el umbral, la nota de revisión visual a 390 px.
+- Las placas de los cursores dentro del lienzo, con nombres cortos, y sin tapar la frase ni el HUD.
+- La firma `efeoncepro.com` visible en el PNG final; si el logo 3D ya protagoniza la escena, no debe haber otro
+  logo plano.
+
+**Qué no hacer.**
+
+- No pidas «un cursor solo sin caja»: el cursor que pasea sin seleccionar es un colaborador en movimiento, y la
+  pieza siempre conserva un objeto seleccionado.
+- No aceptes rectángulos de color detrás del texto como tarjeta: la tarjeta es vidrio esmerilado de la propia escena.
+- No pidas Guttery en más de un gesto por pieza ni en frases largas; si la máquina no tiene la fuente, esa capa se
+  omite.
+- No trates los pesos o colores del caso como plantilla fija: se revalidan con cada fondo y copy.
+- Producir la pieza no autoriza programarla ni publicarla.
+
 ## Probar el harness en una sesión nueva
 
 Pide la producción normalmente y nombra `$social-media-studio`, `$efeonce-advertising-creative`,
