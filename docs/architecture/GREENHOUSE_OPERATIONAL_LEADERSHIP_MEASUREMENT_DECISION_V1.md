@@ -19,12 +19,43 @@ Una lista de cuatro cuentas sólo resuelve el piloto; asignaciones, fuentes y pe
 Se propone adoptar un scorecard **de responsabilidad operacional**, separado del individual y sin score compuesto ni efecto salarial:
 
 1. Universo dinámico por líder/cuenta/vigencia desde operational_responsibilities; manifest derivado versionado, no roster manual ni lista hardcodeada. V1 por cuenta/space explícito, sin herencia organizacional por cargo.
-2. Cinco indicadores definidos sólo en sus specs: [POTD](metrics/POTD_V1.md), [FTR contexto liderazgo](metrics/FTR_V1.md#14-contexto-de-liderazgo-operativo--proposed-2026-09-19), [ACC](metrics/ACC_V1.md), [FRM](metrics/FRM_V1.md), [STI](metrics/STI_V1.md). ACC/FRM son familias y STI vector, no cinco porcentajes intercambiables.
+2. Seis indicadores definidos sólo en sus specs: [POTD](metrics/POTD_V1.md), [FTR contexto liderazgo](metrics/FTR_V1.md#14-contexto-de-liderazgo-operativo--proposed-2026-09-19), [RpA contexto liderazgo](metrics/LEADERSHIP_RPA_V1.md), [ACC](metrics/ACC_V1.md), [FRM](metrics/FRM_V1.md), [STI](metrics/STI_V1.md). ACC/FRM son familias y STI vector, no seis porcentajes intercambiables.
 3. Reusar hechos/clasificación canónicos. Ratios por cociente de sumas, evidencia explícita, unknown distinto de cero. Fuente parcial conserva cuenta y confianza baja; nunca eliminar para subir resultado.
-4. Temporalidad por métrica en [contrato compartido §3](GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md#3-universo-identidad-y-tiempo), propuesta sujeta a aprobación de Ops: compromiso para POTD, primera revisión cliente para FTR, corte para ACC, detección para FRM.
+4. Temporalidad por métrica en [contrato compartido §3](GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md#3-universo-identidad-y-tiempo), propuesta sujeta a aprobación de Ops: compromiso para POTD, primera revisión cliente para FTR/RpA, corte para ACC, detección para FRM.
 5. Working diario, revisión semanal, conciliación/lock mensual y comparación trimestral con baseline equivalente. Revisión inmutable con lineage; correcciones auditadas crean versión nueva.
 6. Responsabilidad, disponibilidad de datos y permisos independientes. API primitive server-side común, filtros/aggregates no filtran información prohibida; UI Person 360 sólo presenta.
 7. Shadow antes de uso formal. Sin ranking individual, bonus nuevo, writeback Notion de liderazgo ni evaluación adversa automatizada.
+
+### Decisión específica: RpA como intensidad de retrabajo
+
+Se incorpora **Rounds per Asset (RpA)** al contexto de liderazgo del mismo catálogo ICO. [LEADERSHIP_RPA_V1](metrics/LEADERSHIP_RPA_V1.md) es la autoridad única de definición, cálculo, distribución, cohortes, ejemplos y evidencia; este ADR registra el porqué y los límites, no otra fórmula.
+
+FTR no distingue una ronda de cuatro una vez que falla la primera entrega. RpA sí describe esa intensidad; ambos comparten origen y deben leerse juntos. No se consideran dos factores independientes para puntuar o pagar. Elegimos conservar el contador canónico de correcciones del cliente y agregarlo sobre la cohorte completada atribuible al líder, manteniendo la contribución individual separada.
+
+**Resultado cerrado y riesgo abierto son perspectivas distintas.** El primero permite comparar cierres; la segunda expone rondas acumuladas, antigüedad y casos aún sin finalizar para evitar que ocultar o retrasar cierres mejore artificialmente la cifra. Las señales abiertas no se suman al resultado de completados ni se presentan como aprobaciones sin cambios.
+
+**La cobertura es parte del contrato, no una nota opcional.** La inspección de calculateRpaV2 y countCorrectionTransitions confirma que sourceMode canonical prueba existencia de alguna transición, no historia íntegra. El wrapper de liderazgo debe certificar identidad, primera revisión, continuidad de captura, deduplicación, temporalidad y evidencia compartida con FTR. Esto puede degradar un valor que el helper individual considera valid sin cambiar ese helper por esta decisión.
+
+**Interpretación responsable:** las rondas describen fricción de entrega, no culpa ni horas perdidas. Cambios de alcance y preferencias del cliente se segmentan con motivos auditados; no se eliminan del contador por conveniencia. Cohortes de transferencia, complejidad y mejor captura pueden explicar cambios. STI compara unidades de rondas por asset y dirección descendente, no puntos porcentuales.
+
+**Efecto esperado en Daniela:** anticipar ambigüedad del brief, mejorar el filtro de calidad, consolidar feedback y atender recurrencias con su equipo. La revisión semanal enlaza casos y acciones; POTD, carga y backlog actúan como guardrails frente a una reducción de RpA conseguida a costa de demora, sobrecarga o silenciamiento del cliente.
+
+### Decisión sobre operación y equidad
+
+Adoptar el [protocolo compartido §11](GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md#11-protocolo-operativo-de-medición-y-mejora--contrato-propuesto): captura a cargo del responsable operativo/contacto receptor, aseguramiento diario por líder/suplente, integridad por ICO y revisión independiente. No depender del director para registrar cambios; no confundir sincronización técnica con cobertura del feedback real.
+
+La calidad de cohorte se conserva al transferir o suplir; exposición y acciones posteriores se muestran aparte. Causas contextualizan, no restan rondas. La revisión semanal produce acciones con dueño, fecha y verificación de efectividad, sin convertir ejecución de checklist en mejora. Menos rondas junto a más espera/sobrecarga requiere revisión, no celebración automática.
+
+La persona evaluada conoce policy y puede controvertir evidencia. Correcciones no se autoaprueban ni sobrescriben cierres; suspender interpretación del componente controvertido. Baseline/metas/calendario se aprueban prospectivamente. Elegimos esta separación frente a evaluación inmediata, autoaprobación del líder o un gate personal de Daniela para todas las entregas.
+
+**RpA es rondas, no tiempo:** no prometer rapidez ni ahorro de horas a partir de su descenso. **Compatibilidad documental:** RPA_V1 queda intacto, liderazgo vive en LEADERSHIP_RPA_V1, indexado en ICO; cualquier corrección del canon base requiere trabajo independiente.
+
+### Consecuencias sobre código, datos y consumidores (planificación)
+
+- TASK-1879: contrato de identidad global/ciclo, primera revisión y cobertura; no fabricar historia desde estado actual.
+- TASK-1880: wrapper ICO sobre helpers existentes, población compartida FTR/RpA, estadísticas reproducibles, snapshots/revisiones y DTO de cerrados/abiertos separados. Validar límites semiabiertos de negocio contra el helper inclusivo, sin lógica duplicada en lectores.
+- TASK-1881: presentar valor, unidad, conteos, cobertura y motivos; detalle de distribución y cola abierta desde el DTO autorizado, sin cómputo en UI.
+- No se crean propiedades Notion, migraciones, flags, writebacks ni cambios salariales por editar el ADR.
 
 ## Alternatives Considered
 
@@ -36,6 +67,11 @@ Se propone adoptar un scorecard **de responsabilidad operacional**, separado del
 | Todas las cuentas donde trabaja su equipo | Descubrimiento fácil | Colaboradores compartidos amplían responsabilidad indebidamente |
 | Heredar toda la agencia del cargo | Onboarding automático | No hay alcance/precedencia temporal aprobados; confunde jerarquía con responsabilidad |
 | Score ponderado único con bono | Lectura simple | Pesos no calibrados, mezcla unidades/confianza y oculta riesgos |
+| Sólo FTR para calidad | Fácil de leer | Oculta intensidad después de la primera corrección |
+| Sustituir FTR por RpA | Un número menos | Un promedio idéntico puede esconder distribuciones muy distintas |
+| Promediar RpA por cuenta sin pesos de muestra | Cada cuenta pesa igual | Cambia la unidad; no representa rondas por asset de la cartera |
+| Mezclar abiertos y completados | Detecta trabajo actual | Confunde resultados parciales con finales; elegimos señales separadas |
+| Restar cambios por motivo editable | Aparente justicia | Facilita manipulación y cambia fórmula sin evidencia; motivos sólo contexto |
 | Cartera dinámica + componentes auditables | Escalable y explicable | Elegida; mayor costo de captura, historial y gobernanza |
 
 ## Consequences
@@ -57,6 +93,8 @@ Cambios de fuente/metric method, grants, source rollout y publication markers se
 - Aprobar ADR y política temporal/precedencia por owner operativo antes de schema.
 - TASK-1879 certifica fuentes/bindings y quinta cuenta sin código, más 51/201 cuentas/dos líderes y aislamiento.
 - TASK-1880 certifica fórmulas, snapshots, concurrency/replay, source coverage, commands y parity; pruebas numéricas, rollback y readback real.
+- Pruebas RpA/FTR de cohorte idéntica, eventos previos al mes, límites, reaperturas, cola abierta, duplicados, cobertura parcial y ejemplos numéricos de LEADERSHIP_RPA_V1; gates sin promedios de promedios ni cero por ausencia.
+- Certificar protocolo §11: captura fuera de canal, suplencias, revisión independiente, acciones sin efecto, tradeoffs, controversias/revisiones y metas prospectivas; owner y evidencia por task.
 - Configuración aprobada de mínimos/SLA/calendario/baseline antes de activar evaluación; sin defaults ocultos.
 - TASK-1881 verifica GVC/teclado/390px y confianza/cartera variable sin fórmulas nuevas.
 - Shadow dos cierres mínimo; STI requiere trimestre actual y baseline de tres meses comparable (seis si se empieza sin historia).
@@ -70,3 +108,7 @@ Si baseline/mix impide comparación, publicar no_comparable y revisar instrument
 ## Decision log
 
 2026-09-19: formalización solicitada por el operador; specs sustantivas y ADR Proposed creados. Implementación, acceptance del ADR y rollout no realizados por este commit.
+
+2026-09-19 (ampliación): incorporación explícita de RpA a liderazgo ICO; contexto separado en LEADERSHIP_RPA_V1, sin editar la spec base. Propuesta documental; sin implementación, publicación de métricas ni activación salarial.
+
+2026-09-19 (cierre de diseño): resueltos captura, control/atribución, suplencias, seguimiento de acciones, autonomía y revisión prospectiva. Spec RpA original restaurada; contexto liderazgo separado. Aprobación/implantación de policy y personas, datos de calibración y rollout siguen pendientes; no cambia el estado Proposed.

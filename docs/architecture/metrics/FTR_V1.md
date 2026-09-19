@@ -447,3 +447,7 @@ El benchmark 85% histórico del spec base no queda automáticamente aprobado com
 Guardar snapshot de RpA/FTR, método y evidencia; no activar writeback Notion ni editar propiedades por esta extensión.
 Tests: transición antes del mes, historial parcial con helper pass, missing source, tarea sin owner, cuenta interna, duplicados, reapertura/cambio de lead y tres cuentas con tamaños distintos.
 Contrato cross-métrica/estados/cadencia/acceso: [Operational Leadership Measurement](../GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md). Consumers: TASK-1880/1881 en EPIC-048, sin nuevo input a bono.
+
+### 14.5 Lectura conjunta con RpA
+
+[LEADERSHIP_RPA_V1](LEADERSHIP_RPA_V1.md) define intensidad y distribución de correcciones, identidad matemática con FTR, casos numéricos y cola abierta. Compartir K, manifest, método dependiente, corte y revisión. Si difieren las poblaciones, no presentar la relación como válida. FTR responde si hubo cambios; RpA cuántos. No sumarlos como dos incentivos independientes; las señales abiertas no generan pass final.

@@ -31,7 +31,7 @@
 
 ## Summary
 
-Calcular y publicar resultados de liderazgo en ICO por líder, cuenta y período usando evidencia certificada por TASK-1879. Materializar POTD, FTR, ACC, FRM y STI con numeradores, cobertura, confianza e historia auditable; exponer un reader común para Person 360 y consumidores programáticos.
+Calcular y publicar resultados de liderazgo en ICO por líder, cuenta y período usando evidencia certificada por TASK-1879. Materializar POTD, FTR, RpA, ACC, FRM y STI con numeradores, cobertura, confianza e historia auditable; exponer un reader común para Person 360 y consumidores programáticos.
 
 ## Why This Task Exists
 
@@ -68,7 +68,7 @@ ADR de TASK-1879 debe aceptar fronteras de cálculo/snapshot/acceso antes de sch
 
 - `docs/architecture/GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md` — contrato funcional/técnico compartido, In design.
 - `docs/architecture/GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_DECISION_V1.md` — ADR Proposed, aceptación pendiente antes de implementación.
-- `docs/architecture/metrics/POTD_V1.md`, `FTR_V1.md` (§14), `ACC_V1.md`, `FRM_V1.md`, `STI_V1.md` — definiciones únicas (todos bajo docs/architecture/metrics).
+- `docs/architecture/metrics/POTD_V1.md`, `FTR_V1.md` (§14), `LEADERSHIP_RPA_V1.md`, `ACC_V1.md`, `FRM_V1.md`, `STI_V1.md` — definiciones únicas (todos bajo docs/architecture/metrics).
 
 - `docs/tasks/TASK_PROCESS.md`
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
@@ -77,6 +77,8 @@ ADR de TASK-1879 debe aceptar fronteras de cálculo/snapshot/acceso antes de sch
 - `docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md`
 
 Prioridad/esfuerzo inferidos: P1/Alto por impacto en medición y evidencia sensible. Sólo se registra planificación el 2026-09-19; ninguna autorización de deploy, cambio salarial o implementación se desprende de este archivo.
+
+El protocolo del contrato compartido §11 es normativo: diseño resuelto, activación y evidencia runtime pendientes. Mantener estado to-do; ninguna casilla de implementación se satisface con documentación.
 
 ## Dependencies & Impact
 
@@ -96,7 +98,7 @@ Prioridad/esfuerzo inferidos: P1/Alto por impacto en medición y evidencia sensi
 
 ### Files owned
 
-- Documentación: contrato/ADR de liderazgo referenciados en Normative Docs; TASK-1880 posee cambios de métodos en los cinco specs de métricas, TASK-1879 sólo identidad/evidencia y TASK-1881 sólo consumo. Coordinar cualquier cambio de fórmula con TASK-1880.
+- Documentación: contrato/ADR de liderazgo referenciados en Normative Docs; TASK-1880 posee cambios de métodos en los seis specs de métricas, TASK-1879 sólo identidad/evidencia y TASK-1881 sólo consumo. Coordinar cualquier cambio de fórmula con TASK-1880.
 
 Existentes:
 - `src/lib/ico-engine/materialize-orchestrator.ts`, `materialize-tracking.ts`, `schema.ts`
@@ -215,7 +217,7 @@ Readback productivo verifica resultados por cuenta y suma contra fixtures/eviden
 
 ### Slice 1 — Contratos y métodos
 
-Revisar y aceptar los specs de POTD/ACC/FRM/STI y extensión FTR §14 ya publicados en diseño, sin recrearlos ni duplicar fórmulas. Definir DTO, policy, sample minimums/config versionada y fixtures de aceptación con owner. No fijar metas/ponderaciones arbitrarias.
+Revisar y aceptar los specs de POTD/ACC/FRM/STI y extensión FTR §14 y contexto LEADERSHIP_RPA_V1 ya publicados en diseño, sin recrearlos ni duplicar fórmulas. Definir DTO, policy, sample minimums/config versionada y fixtures de aceptación con owner. No fijar metas/ponderaciones arbitrarias.
 
 ### Slice 2 — Proyección y cálculos
 
@@ -254,7 +256,7 @@ Pruebas de contrato: quinto cliente sin datos → habilitación gobernada → co
 
 ### Metric definitions and fixtures
 
-Definiciones, cálculos y casos numéricos son los specs de Normative Docs. Implementar sus fixtures como tests de comportamiento; ningún valor de test fija una meta laboral. POTD/FTR conservan dependencias canónicas; ACC/FRM son familias y STI vector, no scores sintéticos.
+Definiciones, cálculos y casos numéricos son los specs de Normative Docs. Implementar sus fixtures como tests de comportamiento; ningún valor de test fija una meta laboral. POTD/FTR/RpA conservan dependencias canónicas; ACC/FRM son familias y STI vector, no scores sintéticos.
 
 ### Time and universe
 
@@ -321,7 +323,29 @@ Ops valida métodos/calendario y revisa cierre; owner de ICO coordina TASK-733/7
      al cerrar la task completa.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta — contratos de acciones, disputas y policy (diseño)
+
+Extender el modelo propuesto de leadership_risk_actions para actionId, owner, dueAt, hypothesis, verificationWindow, reviewer y outcome; preferir eventos append-only de transición vinculados al sistema de trabajo existente, no un task manager nuevo. El catálogo físico final se aprueba antes de migración.
+
+Persistencia adicional propuesta en el mismo dominio: solicitudes/decisiones de corrección vinculadas a snapshotRevision y evidencia; policy versionada con vigencia, mínimos/metas/calendario, approvedBy/At y constancia de comunicación. Nombres de tablas/DDL pendientes de verificación de reuso, no existentes por este texto. Source evidence permanece en delivery; no duplicar conversaciones privadas.
+
+Primitives server-side propuestos: record/update intervention, submit verification, request correction, review correction y publish measurement policy; reader común sirve historial/estado. Todos con entitlements/scope, separación autor-reviewer, idempotencia, CAS de revisión, audit y errores canónicos. Exponer por API parity, no endpoints exclusivos de click. Publicar policy no activa bono ni amplía permisos de cuentas. Evaluación requiere todos los gates de §11; policy con vigencia ya iniciada no altera metas retroactivamente.
+
+Migración additive y permisos mínimos; down sólo para estructuras vacías si es seguro. Una vez hay evidencia append-only, rollback deshabilita commands/evaluación y conserva lectura/historial; no borra solicitudes/acciones. Conservar compatibilidad del ICO individual y demostrar que sus snapshots/consumidores no cambian.
+
+## Delta — RpA y protocolo de liderazgo ICO (2026-09-19)
+
+Implementar el contexto ICO RpA conforme LEADERSHIP_RPA_V1: cohorte compartida FTR, sumas/counts exactos, distribución, percentiles definidos y señales abiertas separadas. Persistir lineage/versiones/coverage, resolver límites inclusivos del helper frente al período semiabierto y probar reaperturas/duplicados/transferencias. No cambiar helper individual ni recalcular en DTO/UI.
+
 ## Acceptance Criteria
+
+- [ ] Protocolo §11.3–11.6: commands de acciones distinguen ejecución de efectividad, reviewer independiente, evidencia por caso y estados inconclusive/ineffective; no nuevo motor de tareas ni KPI de actividad.
+- [ ] Corrección/disputa con separación autor-revisor, revocación de permisos, idempotencia y audit; antes/después de lock genera el estado/revisión correcto sin autoaprobación ni sobrescritura.
+- [ ] Policy/calendario/metas versionados prospectivamente y gate de readiness: sin baseline/calibración/formación/titulares aprobados no se activa evaluación; fixtures de captura, suplencia, tradeoff y controversia de §11.6 pasan.
+
+
+- [ ] Implementar el contexto ICO RpA conforme LEADERSHIP_RPA_V1: cohorte compartida FTR, sumas/counts exactos, distribución, percentiles definidos y señales abiertas separadas. Persistir lineage/versiones/coverage, resolver límites inclusivos del helper frente al período semiabierto y probar reaperturas/duplicados/transferencias. No cambiar helper individual ni recalcular en DTO/UI.
+
 
 - [ ] Métodos, estados y casos edge se ajustan a specs canónicos/ADR de Normative Docs; aprobación del ADR y calibración pendientes se registran sin confundir documentación con implementación.
 

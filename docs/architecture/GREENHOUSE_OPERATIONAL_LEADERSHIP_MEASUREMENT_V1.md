@@ -5,7 +5,7 @@
 - Owners: Delivery/Ops (significado y revisión), ICO/Data (cálculo y evidencia), People/Product (acceso y presentación).
 - Programa: [EPIC-048](../epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md).
 - Decisión: [ADR](GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_DECISION_V1.md), **Proposed**.
-- Código existente contrastado: materialize.ts, calculate-ftr.ts, operational-responsibility/readers.ts. Fuentes y bindings productivos no certificados en esta sesión.
+- Código existente contrastado: materialize.ts, calculate-ftr.ts, calculate-rpa-v2.ts, count-correction-transitions.ts, operational-responsibility/readers.ts. Fuentes y bindings productivos no certificados en esta sesión.
 
 ## 1. Propósito funcional
 
@@ -21,11 +21,12 @@ Una definición por métrica; este documento gobierna únicamente contratos comp
 |---|---|---|
 | Portfolio On-Time Delivery (POTD) | ¿Cumple el equipo los compromisos de entrega de la cartera? | [POTD_V1](metrics/POTD_V1.md) |
 | First-Time Right (FTR) | ¿Llegan las entregas al cliente sin necesitar correcciones? | [FTR_V1, extensión de liderazgo](metrics/FTR_V1.md#14-contexto-de-liderazgo-operativo--proposed-2026-09-19) |
+| Rounds per Asset (RpA) | ¿Cuántas rondas necesita el equipo y dónde se acumula retrabajo? | [LEADERSHIP_RPA_V1](metrics/LEADERSHIP_RPA_V1.md) |
 | Assignment & Capacity Coverage (ACC) | ¿Está el trabajo asignado y la carga cabe en la capacidad? | [ACC_V1](metrics/ACC_V1.md) |
 | Flow Risk Management (FRM) | ¿Se detectan y atienden riesgos a tiempo con evidencia? | [FRM_V1](metrics/FRM_V1.md) |
 | Sustained Team Improvement (STI) | ¿Mejora el sistema de trabajo de forma sostenida y comparable? | [STI_V1](metrics/STI_V1.md) |
 
-ACC/FRM son familias con componentes explícitos; STI es un vector de cambios. No convertirlos en porcentajes únicos para completar cinco tarjetas.
+ACC/FRM son familias con componentes explícitos; STI es un vector de cambios. No convertirlos en porcentajes únicos para completar seis tarjetas.
 
 ## 3. Universo, identidad y tiempo
 
@@ -38,7 +39,7 @@ Manifest derivado completo guarda cuentas, intervalos, responsabilidad/versiones
 ### Atribución temporal propuesta para el ADR
 
 - POTD: líder vigente en el compromiso de vencimiento congelado por la política canónica, no el dueño actual del task.
-- FTR: líder vigente en la primera entrega a revisión de cliente del ciclo elegible; finalización selecciona el mes. Si ese evento no es fiable, estado de atribución desconocida, sin fallback silencioso al líder actual.
+- FTR/RpA: líder vigente en la primera entrega a revisión de cliente del ciclo elegible; finalización selecciona el mes. Si ese evento no es fiable, estado de atribución desconocida, sin fallback silencioso al líder actual.
 - ACC: líder vigente en instante de cada observación; capacidad operacional no duplica personas por multi-asignación.
 - FRM: líder responsable cuando se detecta el episodio; transferencias conservan episodio y plazo, con intervalos de responsabilidad y acciones delegadas. No reiniciar reloj.
 - STI: consume snapshots comparables, no reatribuye tareas.
@@ -93,7 +94,7 @@ No atribuir a Daniela una métrica peor sólo porque mejoró el registro de prob
 - Cuenta nueva sin fuente permanece pendiente; no 0/100 inventado.
 - 0/1/4/5/51/201 cuentas, dos líderes, multi-source y quinto cliente sin deploy.
 - Timestamps límite, DST, altas/bajas/reingreso, responsabilidades retroactivas, cambio de cuenta y períodos históricos.
-- Corrección registrada en mes anterior afecta FTR del cierre, no se pierde por windowStart mensual.
+- Corrección registrada en mes anterior afecta FTR/RpA del cierre, no se pierde por windowStart mensual.
 - Reasignar/reabrir riesgo no borra fallos ni reinicia SLA; intervención sin evidencia no satisface respuesta.
 - Eventos duplicados/fuera de orden, pérdida de outbox y corrida concurrente convergen o reportan gap.
 - Misma página, distinta página y filtro conservan semántica declarada y ningún agregado filtra scopes prohibidos.
@@ -104,3 +105,69 @@ No atribuir a Daniela una métrica peor sólo porque mejoró el registro de prob
 TASK-1879 aprueba ADR/política temporal, mapping/fuentes, garantías de captura y capacidad; TASK-1880 implementa métodos/versiones, compara evidencia, habilita shadow y certifica runtime; TASK-1881 presenta sin reinterpretar fórmulas.
 Pendientes deliberados: bindings reales, calendario/SLA de riesgo, minSample/minCoverage, metas por mix, baseline y retención. Cada uno es gate de su consumer, no permiso para usar un default arbitrario.
 Los documentos hoy están en diseño; no hay implementación, GVC ni datos evaluativos de Daniela producidos por este trabajo.
+
+### Precisión del contexto de calidad
+
+FTR y RpA usan la misma cohorte conocida y certificada. Distribución, rondas condicionales y señales abiertas siguen exclusivamente [LEADERSHIP_RPA_V1](metrics/LEADERSHIP_RPA_V1.md); no sumar abiertos al denominador cerrado. El DTO conserva unidad rounds/asset, estadísticas y cobertura independientes de los semáforos. Estos indicadores permanecen en el [catálogo ICO](metrics/METRICS_INDEX.md), no en un catálogo paralelo de People.
+
+## 11. Protocolo operativo de medición y mejora — contrato propuesto
+
+Este protocolo resuelve las reglas de diseño; no certifica adopción real ni asigna permisos. No añade KPIs al scorecard. TASK-1879 implementa fuente/responsabilidad, TASK-1880 commands/evidencia y TASK-1881 consumo. La activación exige titulares, fuentes y policy aprobados; hasta entonces shadow sin evaluación.
+
+### 11.1 Captura sin dependencia del director
+
+| Responsabilidad | Dueño funcional | Obligación y evidencia |
+|---|---|---|
+| Registrar devolución | Responsable operativo de la entrega; si el feedback llega sólo al contacto de cuenta, ese contacto inicia el registro | Vincular devolución original al asset/ciclo y actualizar la fuente antes de la siguiente reentrega |
+| Asegurar registro | Líder de cuenta vigente o suplente explícito | Revisar diariamente pendientes/inconsistencias y asignar recuperación; no autovalidar excepciones que mejoren su nota |
+| Integridad técnica | ICO/Data | Ingesta idempotente, watermark, conciliación y estado de cobertura; automatización no presume feedback fuera del canal |
+| Validar controversia/cierre | Supervisor operativo distinto del evaluado y autor de la corrección; ICO valida lo técnico | Decisión motivada, revisión inmutable y trazabilidad |
+| Autorizar evaluación | Ops con People | Policy prospectiva, formación y baseline; Finance/HR separados para cualquier decisión salarial futura |
+
+No crear tareas nuevas para registrar cada cambio ni depender de que Julio lo cargue. Capturar el hecho en la fuente operacional del asset; conectores reutilizan ese registro. Feedback fuera de la fuente se vincula mediante referencia autorizada y mínima, sin copiar mensajes privados innecesarios. No crear una segunda lista editable de rondas ni convertir comentarios individuales en rondas.
+
+Mantener occurredAt, recordedAt, sourceEventId/ref, actor, asset/cycle y source quality. Si sólo hay hora de registro, no retrofechar el evento: incertidumbre visible. La captura operativa debe ocurrir antes de la siguiente reentrega y revisarse cada día laborable; retraso detectado degrada confianza del tramo afectado hasta conciliación. Esta regla de proceso no redefine cuándo comienza/termina una ronda canónica.
+
+Conciliación: comparar envíos/revisiones/devoluciones/aprobaciones referenciadas con transiciones. Revisar señales huérfanas, feedback sin cambio de estado y aprobaciones sin respaldo; una ausencia de transición jamás demuestra ausencia de feedback. Revisión humana de casos anómalos y muestra distribuida por fuente/cuenta, incluyendo ceros. ICO propone tamaño de muestra en shadow; Ops lo aprueba antes de evaluación. Muestreo no certifica por sí solo historia completa. Fuente sin evidencia suficiente queda parcial/unavailable; no inventar historia ni prometer APIs de historial inexistentes.
+
+### 11.2 Control, causas y atribución justa
+
+Conservar RpA bruto. Clasificación diagnóstica por ronda: ejecución/calidad, brief, alcance nuevo, preferencia/decisión cliente, dependencia externa o desconocida. Registrar evidencia, clasificador y revisión; permitir causas concurrentes sin duplicar el evento. No deducir culpabilidad de una categoría ni descontar rondas del resultado. Reasignación/cambio de motivo no reescribe una revisión locked.
+
+Separar: resultado de cohorte, exposición efectiva del líder y acciones realizadas. La cohorte de calidad conserva el responsable en primera revisión; si otro líder hereda la cuenta, ve riesgo abierto y sus intervenciones, no hereda retrospectivamente todo el resultado cerrado. Mostrar inherited/mixedExposure cuando corresponda; una cohorte con exposición mixta no puede presentarse como prueba de desempeño exclusivamente personal.
+
+Ausencias y suplencias: registro explícito de scope/tipo/desde/hasta y evidencia de delegación aprobada; acceso, cargo o vacaciones no crean suplencia automática. Los compromisos/resultados históricos no se borran. En cada evento/corte operativo hay un responsable primario según vigencia; conflicto no resuelto bloquea evaluación del componente, no la visibilidad del trabajo. La suplencia puede gestionar casos existentes sin recibir el crédito/carga histórica de calidad. Al retornar, no reiniciar episodios ni plazos. Backdating necesita corrección auditada, sin alterar silenciosamente cierres.
+
+### 11.3 De indicador a acción verificada
+
+Revisión semanal por líder y supervisor: priorizar recurrencias, cola abierta envejecida y desviaciones por cuenta/tipo, no sólo el promedio. Crear una acción gobernada con:
+`actionId, linkedCases, causeHypothesis, owner, dueAt, intervention, expectedOutcome, verificationWindow, evidenceRefs, reviewer, status`.
+Reusar el command de intervenciones de TASK-1880 y gestión de trabajo existente; no crear otro motor de tareas.
+
+Estados de diseño: planned → in_progress → awaiting_verification → verified_effective | ineffective | inconclusive; cancelación exige motivo. Ejecución de una acción no equivale a mejora. El reviewer valida el resultado con casos comparables posteriores, volumen y cobertura; sin exposición suficiente queda inconclusive y se acuerda nueva revisión. Una acción puede ser oportuna para FRM aunque resulte ineficaz: no reescribir esa tasa ni declarar resuelto el problema. Incumplimiento de fecha queda visible y se escala al supervisor, sin borrar la acción.
+
+Ejemplo: errores repetidos de medidas → checklist con responsable antes de revisión cliente → comprobar reincidencia en siguientes entregas del mismo tipo dentro de una ventana acordada. No contabilizar número de reuniones/checklists como éxito ni afirmar causalidad estadística.
+
+### 11.4 Autonomía y controles contra cuellos de botella
+
+Daniela define criterios y delega revisión según riesgo/experiencia; no se introduce aprobación personal obligatoria de todos los assets. El ejecutor y el revisor operativo quedan identificados cuando la fuente lo permite; no inferirlos de actor de webhook.
+
+Antes de declarar mejora de RpA, revisar POTD, carga ACC, antigüedad/espera abierta, trabajo fuera de capacidad y exposición por tipo/cuenta. Si menos rondas coincide con mayor demora/sobrecarga, marcar tradeoff_requires_review, sin premio global ni score compensatorio. No estimar horas a partir de rondas. Cuando no hay datos de espera interna o esfuerzo, declarar limitación y revisar casos; no fingir que ACC prueba ausencia de sobrecarga.
+
+Prohibido convertir la solución en Daniela corrigiendo todo: las acciones deben tener dueño de ejecución y transferencia de criterio al equipo. Revisar concentración de intervenciones como diagnóstico cualitativo, no nuevo KPI ni vigilancia personal.
+
+### 11.5 Reglas conocidas, controversias y activación
+
+Antes del primer período evaluable, Ops/People comunica a la líder: alcance, unidades, ejemplos, exclusiones, fuentes, mínimos, metas, calendario, uso permitido y mecanismo de revisión. Registrar versión entregada/fecha y constancia de recepción; no equivale a consentimiento salarial ni autoriza usos nuevos.
+
+Daniela puede solicitar corrección desde el resultado/caso: motivo, evidencia y campo cuestionado. El command registra requestId, author, snapshotRevision, requestedAt, reviewer y decisión. Propuesta y revisión separadas; nadie aprueba su propia corrección. Estados submitted/under_review/accepted/rejected/withdrawn, sin borrar expediente. Mientras se revisa, mostrar disputed en el componente pertinente y suspender su interpretación evaluativa; no alterar el dato bruto ni ocultar otros componentes válidos.
+
+Conciliación mensual abre el siguiente día hábil al fin de mes; ventana propuesta de cinco días hábiles para revisión antes del lock, con calendario versionado. Sin aprobación del calendario no se activa evaluación. Resolver controversias antes del lock o conservar el componente no evaluable; no cerrar silencio como aceptación. Solicitudes posteriores siguen disponibles y, si prosperan, generan nueva revisión con supersedes, motivo y aprobador. No hay retroactividad salarial automática.
+
+Shadow mínimo dos cierres para probar captura y proceso; no fija por sí solo una meta justa. ICO prepara baseline segmentado por fuente/tipo/cuenta con tamaño/cobertura y limitaciones; Ops/People aprueba metas y mínimos **antes** de la vigencia del período evaluado. No escoger retrospectivamente la meta que convenga. Si falta baseline suficiente, continuar diagnóstico; nuevas cuentas/cambios materiales de mix no reciben baseline inventado. STI mantiene su requisito de dos ventanas comparables.
+
+### 11.6 Evidencia de aceptación, sin ampliar ejecución
+
+Fixtures exigibles: feedback fuera de canal sin transición; registro posterior a reentrega; dos devoluciones vs múltiples comentarios; solicitud de corrección propia denegada; reviewer independiente; ausencia con/sin suplente; transferencia mixta; acción ejecutada sin efecto; resultado inconcluso; menor RpA con atraso; controversia antes/después de lock; metas publicadas después del inicio rechazadas; cero con captura incompleta. Tests de valores/transiciones/autorización y readback en futura ejecución, no asserts de texto.
+
+El protocolo resuelve el diseño de todos estos casos. Permanecen deliberadamente pendientes la elección de personas, umbrales con datos, formación, instrumentación y validación real; no convertir documentación en evidencia de adopción.

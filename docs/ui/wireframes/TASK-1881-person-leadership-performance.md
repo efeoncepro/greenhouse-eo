@@ -27,8 +27,8 @@ Liderazgo operativo                [Mes anterior | Septiembre | siguiente]
 Período provisional • actualizado ... • alcance/manifest ...
 N cuentas autorizadas • medibles/pendientes por métrica
 [Buscar cuenta] [Estado de datos] [Filtro de cuenta]
-POTD 9/12 · 75%          FTR 5/6 · cobertura 60% · confianza baja
-Cuenta      POTD/buckets   FTR/cobertura    Asignación   Riesgos
+POTD 9/12 · 75%          FTR 5/6 · cobertura 60% · confianza baja · RpA 2/6 = 0.33 rondas/asset
+Cuenta      POTD/buckets   FTR + RpA/cobertura   Asignación   Riesgos
 Cuenta A    ...           ...             ...          Ver evidencia
 Cuenta B    pendiente de fuente                         Ver estado
 ... filas dinámicas del manifest autorizado ...
@@ -42,14 +42,14 @@ Ejemplos numéricos ilustrativos de tests, NO resultados de Daniela. Fracciones/
 
 ## Mobile Target
 
-390×844. Encabezado, selector de período, estado de datos, POTD/FTR, lista de cuentas, excepciones, tendencia.
+390×844. Encabezado, selector de período, estado de datos, POTD/FTR/RpA, lista de cuentas, excepciones, tendencia.
 Tabla desktop se transforma en lista con labels, manteniendo mismo orden/semántica; no scroll horizontal de página. Búsqueda, filtros y paginación accesibles también en móvil; no cargar 201 opciones en un select. Touch targets y truncado reversible para títulos largos. Panel detalle adaptativo canónico con back/close/foco.
 
 ## Action Hierarchy
 
 Primary: abrir evidencia de una cuenta/excepción.
 Secondary: cambiar período/cuenta, comparar tendencia y revisar método.
-Tertiary: abrir tarea de origen autorizada. No CTA de modificar bono, exportar PII, conceder permisos o cerrar período desde esta task. Las intervenciones se leen; su captura programática la gobierna TASK-1880.
+Tertiary: abrir tarea de origen autorizada. No CTA de modificar bono, exportar PII, conceder permisos o cerrar período desde esta task. Las intervenciones se leen y se registran mediante commands gobernados por TASK-1880; solicitar corrección no edita la métrica. Permisos de escritura separados de lectura.
 
 ## Visual Fidelity Mapping
 
@@ -90,3 +90,11 @@ Comprobar document.documentElement.scrollWidth === clientWidth, keyboard, reduce
 - Reuse primitives; no tarjetas independientes por cada sigla.
 - Liderazgo y contribución individual separados, sin score combinado.
 - UI ready no hasta DTO final, copy, estados, tokens y revisión de dirección; este wireframe no es aprobación visual runtime.
+
+## Addendum de alcance operativo — 2026-09-19
+
+No cambia la dirección/recipe ni autoriza JSX. Reutilizar el detalle contextual para ver distribución RpA y casos abiertos separados; fórmula en LEADERSHIP_RPA_V1. Acciones contextuales autorizadas: registrar acción, aportar verificación, solicitar corrección y revisar solicitud (reviewer independiente). La acción primaria sigue siendo evidencia; formularios sólo al abrir el caso, no en cada fila ni como cards nuevas.
+
+Campos y transiciones siguen contrato compartido §11. Estados añadidos: capture_pending, inherited/mixedExposure, tradeoff_requires_review, disputed, edición local, submitting, validation_error, conflict_revision, submitted y denied. Mostrar policy/calendario vigente y expectativa de revisión. No presentar menor RpA como menor tiempo.
+
+Pruebas futuras desktop/390px: formulario con error y foco, guardar/descartar, sin privilegio, doble envío, permiso revocado, autor intentando revisar, disputa antes/después de lock y acción ejecutada pero inconclusive. Extender mapping de copy y escenarios existentes; ningún screenshot o readiness queda acreditado por este texto.

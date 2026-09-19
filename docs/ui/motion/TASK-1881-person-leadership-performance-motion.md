@@ -21,8 +21,12 @@ prefers-reduced-motion: apertura/cierre inmediato o fallback oficial del primiti
 
 ## Focus and Interruption
 
-Abrir lleva foco al heading/primer control del detalle según primitive; cerrar devuelve al trigger. Escape interrumpe y limpia petición; cambio de cuenta/mes no deja foco oculto. Live region anuncia estado estable, no cada frame.
+Abrir lleva foco al heading/primer control del detalle según primitive; cerrar devuelve al trigger. En lectura Escape interrumpe el fetch; en formulario respeta dirty state/envío del contrato de flow; cambio de cuenta/mes no deja foco oculto. Live region anuncia estado estable, no cada frame.
 
 ## Verification
 
 GVC normal/reduced en desktop y 390px; teclado, escape, clicks repetidos, red lenta, paginación con 51/201 cuentas y cambio de manifest durante sidecar. Confirmar layout estable/scrollWidth; dossier muestra equivalencia de contenido y foco. No aprobar motion sólo por screenshot estático.
+
+## Feedback de comandos
+
+Pending, error y confirmación usan feedback canónico accesible y localizado al formulario; reduced motion conserva mensaje y foco. No animar mejora de score al enviar solicitud ni al ejecutar una acción. Confirmar éxito sólo tras readback; transición de verificación inconclusive no usa celebración. Probar red lenta, retry, respuesta tardía y cierre con borrador.

@@ -66,7 +66,7 @@ Reusar Vuexy/theme/primitives; no publicidad ni estilos de campaña. No JSX ante
 
 - `docs/architecture/GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md` — contrato funcional/técnico compartido, In design.
 - `docs/architecture/GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_DECISION_V1.md` — ADR Proposed, aceptación pendiente antes de implementación.
-- `docs/architecture/metrics/POTD_V1.md`, `FTR_V1.md` (§14), `ACC_V1.md`, `FRM_V1.md`, `STI_V1.md` — definiciones únicas (todos bajo docs/architecture/metrics).
+- `docs/architecture/metrics/POTD_V1.md`, `FTR_V1.md` (§14), `LEADERSHIP_RPA_V1.md`, `ACC_V1.md`, `FRM_V1.md`, `STI_V1.md` — definiciones únicas (todos bajo docs/architecture/metrics).
 
 - `docs/tasks/TASK_PROCESS.md`
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
@@ -80,6 +80,8 @@ Prioridad/esfuerzo inferidos: P1/Alto por impacto en medición y evidencia sensi
 - `docs/ui/wireframes/TASK-1881-person-leadership-performance.md`
 - `docs/ui/flows/TASK-1881-person-leadership-performance-flow.md`
 - `docs/ui/motion/TASK-1881-person-leadership-performance-motion.md`
+
+El protocolo del contrato compartido §11 es normativo: diseño resuelto, activación y evidencia runtime pendientes. Mantener estado to-do; ninguna casilla de implementación se satisface con documentación.
 
 ## Dependencies & Impact
 
@@ -99,7 +101,7 @@ Prioridad/esfuerzo inferidos: P1/Alto por impacto en medición y evidencia sensi
 
 ### Files owned
 
-- Documentación: contrato/ADR de liderazgo referenciados en Normative Docs; TASK-1880 posee cambios de métodos en los cinco specs de métricas, TASK-1879 sólo identidad/evidencia y TASK-1881 sólo consumo. Coordinar cualquier cambio de fórmula con TASK-1880.
+- Documentación: contrato/ADR de liderazgo referenciados en Normative Docs; TASK-1880 posee cambios de métodos en los seis specs de métricas, TASK-1879 sólo identidad/evidencia y TASK-1881 sólo consumo. Coordinar cualquier cambio de fórmula con TASK-1880.
 
 Existentes:
 - `src/views/greenhouse/people/tabs/PersonActivityTab.tsx`
@@ -178,7 +180,7 @@ Reusar contrato de motion referenciado: estados de carga estables, no animated c
 ### Implementation mapping
 
 PersonActivityTab → PersonLeadershipSection (NEW) → header/period/status + hoja analítica + AccountEvidence (NEW).
-POTD/FTR exhiben fracción/cobertura; ACC presenta asignación/capacidad separadas; FRM cola y acciones registradas; STI vector de deltas comparable. No calcular tasas, baseline ni confianza en JSX.
+POTD/FTR/RpA exhiben fracción/cobertura; ACC presenta asignación/capacidad separadas; FRM cola y acciones registradas; STI vector de deltas comparable. No calcular tasas, baseline ni confianza en JSX.
 Direction/wireframe enumeran primitives. Tokens de theme, no valores decorativos literales. Reutilizar diccionarios/formatters existentes antes de crear nuevos.
 
 ### GVC scenario plan
@@ -222,7 +224,7 @@ Integrar lectura gateada, selector único y separación de contribución individ
 
 ### Slice 3 — Evidencia y tendencia
 
-Drill-down paginado con method/reason/exclusions/revision y tareas autorizadas. STI sólo si comparable; estados de confianza visibles. Lectura de intervenciones, sin nuevo formulario de escritura.
+Drill-down paginado con method/reason/exclusions/revision y tareas autorizadas. STI sólo si comparable; estados de confianza visibles. Lectura y formularios contextuales de intervención/corrección/revisión según contrato compartido §11; commands de TASK-1880, autorización independiente y ninguna edición directa de métricas.
 
 ### Slice 4 — QA y canary interno
 
@@ -247,7 +249,7 @@ Diseño/GVC incluye 0/1/4/5/51/201 cuentas, dos líderes, alta quinta sin datos,
 
 1. Identidad/rol y tabs existentes.
 2. Liderazgo operativo: período, lifecycle, frescura y alcance.
-3. POTD y FTR con numeradores/denominadores/confianza, sin mezclar sample con score.
+3. POTD, FTR y RpA con numeradores/denominadores/unidades/confianza, sin mezclar sample con score.
 4. Tabla de cuentas (mobile lista), volumen y huecos de fuente.
 5. Excepciones ACC/FRM por severidad/antigüedad de datos del backend, no ranking de personas.
 6. STI y baseline/metodología.
@@ -311,7 +313,19 @@ Ops revisa claridad de lectura para Daniela, no aprueba cambios salariales. Owne
      al cerrar la task completa.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta — RpA y protocolo de liderazgo ICO (2026-09-19)
+
+Consumir RpA como contexto ICO junto a FTR: unidad rondas/asset, muestra/cobertura, distribución y casos abiertos claramente separados de completados. Explicar cero demostrado frente a dato ausente; presentar transferencias/motivos sin culpabilidad automática. Artefactos UI sincronizados en diseño; validar mapping, formularios y runtime antes de UI ready, sin nueva fórmula ni semáforo salarial.
+
 ## Acceptance Criteria
+
+- [ ] Mostrar policy vigente, unidad rondas/asset, límites de atribución/inherited/mixedExposure, captura pendiente, tradeoffs y disputed sin mezclar confianza técnica ni mostrar información fuera de permisos.
+- [ ] Consumir commands comunes para acciones, verificación y solicitud/revisión de corrección; no autoaprobación ni fórmulas UI. GVC incluye falta de autoridad, acción sin efecto y disputa antes/después de cierre.
+- [ ] El flujo semanal delega acciones y muestra resultado de verificación; no agrega aprobación universal de Daniela ni interpreta menos rondas como menor tiempo.
+
+
+- [ ] Consumir RpA como contexto ICO junto a FTR: unidad rondas/asset, muestra/cobertura, distribución y casos abiertos claramente separados de completados. Explicar cero demostrado frente a dato ausente; presentar transferencias/motivos sin culpabilidad automática. Ajustar los artefactos UI existentes antes de UI ready, sin nueva fórmula ni semáforo salarial.
+
 
 - [ ] Métodos, estados y casos edge se ajustan a specs canónicos/ADR de Normative Docs; aprobación del ADR y calibración pendientes se registran sin confundir documentación con implementación.
 

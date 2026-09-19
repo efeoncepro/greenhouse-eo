@@ -107,3 +107,7 @@ Aprobar catálogo de acciones válidas (acknowledge nunca suficiente solo), pol�
 ## 13. Downstream consumers
 
 Person 360 y API común (TASK-1881/1880). Sin bono, ranking de personas ni exportación cliente por este programa; una política futura requiere decisión separada y prospectiva.
+
+### Seguimiento de efectividad
+
+El [contrato compartido §11](../GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md#11-protocolo-operativo-de-medición-y-mejora--contrato-propuesto) gobierna acciones/reviewers/disputas. Responder a tiempo y verificar mejora son hechos distintos: una acción oportuna puede resultar ineffective/inconclusive. No alterar retrospectivamente Timely Intervention Rate ni sumar un KPI nuevo por marcar checklists; conservar resultado y recurrencia como contexto.

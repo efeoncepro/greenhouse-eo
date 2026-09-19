@@ -65,7 +65,7 @@ ADR de liderazgo ya redactado (Proposed, Normative Docs): atribución temporal, 
 
 - `docs/architecture/GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md` — contrato funcional/técnico compartido, In design.
 - `docs/architecture/GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_DECISION_V1.md` — ADR Proposed, aceptación pendiente antes de implementación.
-- `docs/architecture/metrics/POTD_V1.md`, `FTR_V1.md` (§14), `ACC_V1.md`, `FRM_V1.md`, `STI_V1.md` — definiciones únicas (todos bajo docs/architecture/metrics).
+- `docs/architecture/metrics/POTD_V1.md`, `FTR_V1.md` (§14), `LEADERSHIP_RPA_V1.md`, `ACC_V1.md`, `FRM_V1.md`, `STI_V1.md` — definiciones únicas (todos bajo docs/architecture/metrics).
 
 - `docs/tasks/TASK_PROCESS.md`
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
@@ -74,6 +74,8 @@ ADR de liderazgo ya redactado (Proposed, Normative Docs): atribución temporal, 
 - `docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md`
 
 Prioridad/esfuerzo inferidos: P1/Alto por impacto en medición y evidencia sensible. Sólo se registra planificación el 2026-09-19; ninguna autorización de deploy, cambio salarial o implementación se desprende de este archivo.
+
+El protocolo del contrato compartido §11 es normativo: diseño resuelto, activación y evidencia runtime pendientes. Mantener estado to-do; ninguna casilla de implementación se satisface con documentación.
 
 ## Dependencies & Impact
 
@@ -93,7 +95,7 @@ Prioridad/esfuerzo inferidos: P1/Alto por impacto en medición y evidencia sensi
 
 ### Files owned
 
-- Documentación: contrato/ADR de liderazgo referenciados en Normative Docs; TASK-1880 posee cambios de métodos en los cinco specs de métricas, TASK-1879 sólo identidad/evidencia y TASK-1881 sólo consumo. Coordinar cualquier cambio de fórmula con TASK-1880.
+- Documentación: contrato/ADR de liderazgo referenciados en Normative Docs; TASK-1880 posee cambios de métodos en los seis specs de métricas, TASK-1879 sólo identidad/evidencia y TASK-1881 sólo consumo. Coordinar cualquier cambio de fórmula con TASK-1880.
 
 Existentes, cambios acotados al contrato:
 - `src/lib/operational-responsibility/readers.ts`, `src/lib/operational-responsibility/store.ts`
@@ -266,7 +268,7 @@ Herencia “todas las cuentas de la agencia” NO activada en V1. Si se aprueba 
 ### Attribution policy propuesta para aprobación
 
 Universo por cuenta = tareas de delivery elegibles, incluidas sin owner. Un task_source_id/workspace no se cuenta dos veces por múltiples relaciones de proyecto.
-Responsabilidad efectiva en [from,to); resolver día/hora/zone de límites explícitamente. Recomendación: POTD por lead vigente al compromiso de vencimiento congelado; FTR por lead de la primera entrega elegible; ACC/FRM por lead al corte/detección. Conservar binding usado; cambios posteriores no transfieren retroactivamente resultados.
+Responsabilidad efectiva en [from,to); resolver día/hora/zone de límites explícitamente. Recomendación: POTD por lead vigente al compromiso de vencimiento congelado; FTR/RpA por lead de la primera entrega elegible; ACC/FRM por lead al corte/detección. Conservar binding usado; cambios posteriores no transfieren retroactivamente resultados.
 Cambio de fecha/cuenta/lead exige historial; sin él, no reconstruir precisión ficticia. Acuerdo del owner del negocio es gate de Slice 1; no hardcodear nombres. Co-leads secundarios consultan contexto sin duplicar rollup, salvo decisión explícita versionada.
 Contribución individual de Daniela sigue en ICO individual; sus entregas pueden formar parte del universo de resultados del equipo UNA vez, nunca generar crédito personal extra.
 
@@ -323,7 +325,24 @@ Owner operativo confirma cuentas/vigencias y catálogo asignable; responsable No
      al cerrar la task completa.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta — captura y responsabilidad efectiva (diseño)
+
+Resolver roles de captura y suplencia desde asignaciones/bindings gobernados, no listas de nombres. Exponer en el contrato de evidencia sourceEventId/ref, occurredAt/recordedAt, actor, asset/cycle, cobertura/watermark y gap reasons. Historia de delegación conserva scope y [from,to), aprobador y motivo; no derivarla de permisos o vacaciones. Proponer campos aditivos sólo donde el schema actual no los represente y certificar unicidad antes de la migración.
+
+Conciliación diaria registra gaps por fuente y casos, sin crear eventos correctivos artificiales. Sólo evidencia validada recupera confianza. Audit/readers respetan acceso al origen; referencias privadas no se exponen por estar en un indicador agregado. Propietarios nombrados y suplentes son gate operativo de activación, no seed de Daniela.
+
+## Delta — RpA y protocolo de liderazgo ICO (2026-09-19)
+
+Para RpA/FTR, certificar identidad source/workspace/task y ciclo, primera revisión cliente, cobertura histórica y deduplicación por evento conforme LEADERSHIP_RPA_V1. Una transición existente no certifica captura completa; fuentes ambiguas/incompletas conservan cuenta y estado no evaluable.
+
 ## Acceptance Criteria
+
+- [ ] Protocolo §11.1–11.2: captura con responsable/contacto y suplente, ocurrido vs registrado, referencia autorizada y conciliación diaria; feedback sin transición no produce cero confiable.
+- [ ] Suplencia/ausencia/transferencia mixta conservan cohorte histórica y exponen responsabilidad efectiva; conflicto bloquea evaluación, sin ocultar trabajo ni ampliar acceso.
+
+
+- [ ] Para RpA/FTR, certificar identidad source/workspace/task y ciclo, primera revisión cliente, cobertura histórica y deduplicación por evento conforme LEADERSHIP_RPA_V1. Una transición existente no certifica captura completa; fuentes ambiguas/incompletas conservan cuenta y estado no evaluable.
+
 
 - [ ] Métodos, estados y casos edge se ajustan a specs canónicos/ADR de Normative Docs; aprobación del ADR y calibración pendientes se registran sin confundir documentación con implementación.
 

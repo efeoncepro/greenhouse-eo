@@ -36,8 +36,16 @@ Sin historial/denominador: no chart fabricado. Error parcial conserva sólo secc
 
 ## Navigation and Focus
 
-Nav placement none; no entrada en sidebar/avatar. Deep links internos conservan member/período/cuenta/revision validada; URL nunca autoriza. Escape y close canónicos, foco al trigger; browser back conserva período y subvista. Sin dirty state porque esta UI es read-only.
+Nav placement none; no entrada en sidebar/avatar. Deep links internos conservan member/período/cuenta/revision validada; URL nunca autoriza. Escape y close canónicos, foco al trigger; browser back conserva período y subvista. Los detalles son de lectura; los formularios autorizados tienen dirty state. Antes de cerrar/cambiar período con borrador, ofrecer continuar o descartar mediante confirmación canónica.
 
 ## Verification
 
 GVC desktop/mobile + keyboard: entrada, cambio rápido de mes, drill-down, retorno, denied y stale. Afirmar contenido por período/IDs con fixtures, no sólo capturas.
+
+## Acciones y revisión gobernadas — 2026-09-19
+
+Caso → formulario de acción/corrección → validación → submitting → submitted | validation_error | conflict_revision | denied. Mostrar resultado sólo tras readback del command común de TASK-1880; no actualizar optimistamente la métrica. Idempotency key estable durante retry; respuesta incierta se consulta antes de reenviar.
+
+Solicitud → reviewer distinto del autor → decisión motivada → revisión auditada del snapshot si aplica. No habilitar autoaprobación. Una acción ejecutada pasa a awaiting_verification, no directamente a éxito. Permisos se verifican en cada command, también con deep link; revocación elimina datos protegidos/borradores sensibles sin guardarlos en storage persistente.
+
+Escape/back durante edición solicita confirmación antes de descartar; durante envío no implica cancelación server-side. Mantener estado de envío, resolver por readback y luego restaurar foco. Cambio de revisión exige recargar contexto; conservar sólo borrador permitido, nunca sobrescribir resultado nuevo. Cierre mensual/bono no son acciones de esta UI.

@@ -1,6 +1,6 @@
 # Handoff activo
 
-[EPIC-048](docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md): specs KPI + ADR Proposed; TASK-1879→1880→1881 to-do, sin ejecución/bono.
+[EPIC-048](docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md): ICO liderazgo separado; ADR Proposed, TASK-1879–1881 to-do; sin runtime/bono.
 
 **DataForSEO:** ISSUE-175 y TASK-1341 cerrados (guard en `ops-worker-deploy`, revisión 00699, smoke AIO PASS).
 

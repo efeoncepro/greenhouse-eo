@@ -23,6 +23,7 @@ Contrato de diseño, NO descripción de un helper de liderazgo ya operativo:
 B=trimestre baseline aprobado (3 meses locked anteriores), T=trimestre actual (3 meses locked); guardar IDs/revisiones, policy y composición.
 Para cada tasa k comparable: Rate_k(W)=100×Σnumerator_k / Σdenominator_k sobre cuentas/períodos de W; para ACC usar task-days observados completos, no sumar tasas de cierre.
 Delta_k_pp=Rate_k(T)-Rate_k(B); POTD/FTR/assignment/response positivo suele ser mejora.
+Para RpA: agregar roundsTotal/knownCompletedCount en cada ventana; delta absoluto current-baseline en rounds/asset, negativo favorable. Seguir LEADERSHIP_RPA_V1; nunca promedio de promedios ni delta en pp. Exigir cohorte/evidencia comparable y excluir señales abiertas del resultado final.
 Para counts de stock OCF/Stuck: mostrar promedio de cortes mensuales y delta absoluto; normalizar sólo con backlog elegible conocido y misma definición. No sumar stocks como casos únicos.
 Capacity Overload: comparar overload hours por exposición de horas efectivas, si bases iguales; no interpretar incremento de Load como mejora.
 Salida = vector {baseline,current,delta,unit,direction,sample,coverage,comparable,reason} por componente; no promedio entre KPIs.
@@ -60,7 +61,8 @@ No existe agregado productivo de liderazgo en registry hoy. Implementación futu
 | POTD baseline 70%, actual 80% | +10 pp, no +10%; relativo +14.3% sólo si se solicita y se rotula |
 | Actual 85%, 68%, 87%; promedio mejora sobre 70% | Deltas visibles, no mejora sostenida con tolerancia 0 del fixture |
 | Quinta cuenta nueva muy fácil | Resultado actual cambia; STI cohorte separa composición, sin baseline inventado |
-| Cambió captura de correcciones | FTR no comparable hasta equivalencia demostrada; no castigo por mejor registro |
+| RpA baseline 2.0, actual 1.2 | -0.8 rondas/asset; favorable si cohorte/captura comparables, no -0.8 pp |
+| Cambió captura de correcciones | FTR/RpA no comparable hasta equivalencia demostrada; no castigo por mejor registro |
 | 2 meses actuales o baseline ausente | Serie parcial, STI trimestral unavailable |
 | Denominador baseline 0 | Delta de tasa unavailable; no dividir por cero |
 | Método cambiado | No comparación salvo reconciliación versionada aprobada |
@@ -97,7 +99,7 @@ Formalización solicitada por el operador. Diseño sobre cartera dinámica, evid
 - [Metric Spec Pattern](../GREENHOUSE_METRIC_SPEC_PATTERN_V1.md).
 - [EPIC-048](../../epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md).
 - [TASK-1879](../../tasks/to-do/TASK-1879-leadership-accountability-source-foundation.md), [TASK-1880](../../tasks/to-do/TASK-1880-ico-leadership-performance-engine.md), [TASK-1881](../../tasks/to-do/TASK-1881-person-360-leadership-performance-ui.md).
-- Dependencias: [OTD](OTD_V1.md), [FTR](FTR_V1.md), [OCF](OCF_V1.md), [Stuck Assets](STUCK_ASSETS_V1.md). No redefinir sus fórmulas base.
+- Dependencias: [OTD](OTD_V1.md), [FTR](FTR_V1.md), [RpA liderazgo](LEADERSHIP_RPA_V1.md), [OCF](OCF_V1.md), [Stuck Assets](STUCK_ASSETS_V1.md). No redefinir sus fórmulas base.
 
 ## 12. Open questions deliberadamente NO resueltas en V1
 

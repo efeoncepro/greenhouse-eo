@@ -68,6 +68,7 @@ El [contrato funcional/técnico](../../architecture/GREENHOUSE_OPERATIONAL_LEADE
 |---|---|---|
 | Portfolio On-Time Delivery (POTD) | ¿Cumple la cartera sus compromisos? | [POTD](../../architecture/metrics/POTD_V1.md) |
 | First-Time Right (FTR) | ¿Las entregas se aprueban sin correcciones? | [FTR §14](../../architecture/metrics/FTR_V1.md#14-contexto-de-liderazgo-operativo--proposed-2026-09-19) |
+| Rounds per Asset (RpA) | ¿Cuántas rondas requieren las entregas y qué casos siguen acumulándolas? | [RpA liderazgo](../../architecture/metrics/LEADERSHIP_RPA_V1.md) |
 | Assignment & Capacity Coverage (ACC) | ¿Tiene dueño el trabajo y cabe en la capacidad? | [ACC](../../architecture/metrics/ACC_V1.md) |
 | Flow Risk Management (FRM) | ¿Se atienden riesgos con evidencia y a tiempo? | [FRM](../../architecture/metrics/FRM_V1.md) |
 | Sustained Team Improvement (STI) | ¿La mejora se sostiene en una cartera comparable? | [STI](../../architecture/metrics/STI_V1.md) |
@@ -86,7 +87,7 @@ Specs nuevos y extensión de liderazgo están **In design**, ADR **Proposed**; n
 
 **Ubicación:** `/people/[memberId]`, pestaña existente `Actividad` (`PersonActivityTab`), con un bloque o subvista `Team Delivery` que aparece por responsabilidad operativa vigente/histórica y entitlement, **no por `memberId` hardcodeado**. `Mi Desempeño` conserva su audiencia personal; si después se expone este bloque allí, debe usar el mismo reader y política de redacción, no una segunda fórmula. Sin destino nuevo en navegación.
 
-**Lectura en primer fold:** identidad y rol → selector de período (mes en curso claramente `provisional` / mes cerrado `locked`) → cobertura de toda la cartera autorizada del período y estado de datos → resumen POTD y FTR con conteos → cola accionable de ACC/FRM. Debajo: comparación por cuenta, explicaciones/drill-down de tareas, tendencia de tres meses y registro de acciones. Las tareas propias/bono actual van en una sección separada y rotulada `Individual Contribution`; jamás se mezclan en una tarjeta única de “performance”.
+**Lectura en primer fold:** identidad y rol → selector de período (mes en curso claramente `provisional` / mes cerrado `locked`) → cobertura de toda la cartera autorizada del período y estado de datos → resumen POTD, FTR y RpA con unidades, conteos y cobertura → cola accionable de ACC/FRM. Debajo: comparación por cuenta, explicaciones/drill-down de tareas, tendencia de tres meses y registro de acciones. Las tareas propias/bono actual van en una sección separada y rotulada `Individual Contribution`; jamás se mezclan en una tarjeta única de “performance”.
 
 **Estados y acceso:** `loading`, sin rol, cuenta sin binding, cero tareas legítimas, muestra insuficiente, correcciones no capturadas, sync stale, error parcial, acceso denegado, período provisional y locked. Acceso server-side por `views` + `entitlements` y scope de People/organización; Daniela podrá ver su resumen/equipo sólo con grants y scopes explícitamente verificados (self no concede acceso hoy); dirección/HR consulta únicamente detalle autorizado; terceros/clientes no ven evaluación personal ni tareas de otra cuenta. La UI no muestra importes ni inputs privados de Payroll. Los enlaces al drill-down conservan filtros de cuenta y autorización anti-IDOR.
 
@@ -105,7 +106,7 @@ Specs nuevos y extensión de liderazgo están **In design**, ADR **Proposed**; n
 Tres unidades registradas en orden de dependencia; todas `to-do`, sólo planificación:
 
 - [TASK-1879](../../tasks/to-do/TASK-1879-leadership-accountability-source-foundation.md) — **[backend-data, foundation]** ADR, resolver de cartera dinámica, cobertura por cuenta y atribución temporal, capacidad interna y captura gobernada faltante. Entrega fuentes/fixtures al cálculo sin inventar historia.
-- [TASK-1880](../../tasks/to-do/TASK-1880-ico-leadership-performance-engine.md) — **[backend-data]** Proyección ICO POTD/FTR/ACC/FRM/STI, snapshots/revisiones, confianza, reader/API parity, cierre e intervenciones auditadas, migración/rollback y shadow. Depende de TASK-1879.
+- [TASK-1880](../../tasks/to-do/TASK-1880-ico-leadership-performance-engine.md) — **[backend-data]** Proyección ICO POTD/FTR/RpA/ACC/FRM/STI, snapshots/revisiones, confianza, reader/API parity, cierre e intervenciones auditadas, migración/rollback y shadow. Depende de TASK-1879.
 - [TASK-1881](../../tasks/to-do/TASK-1881-person-360-leadership-performance-ui.md) — **[ui-ux]** Person 360/Actividad con dirección, wireframe, flow/motion, cobertura/estados, drill-down y GVC. Depende de TASK-1880; sin cálculos cliente.
 
 Política de compensación fuera del alcance: sólo una solicitud nueva y explícita de HR/Finance podría originar otra unidad. No es cuarta hija ni prerrequisito de estas tres.
@@ -155,3 +156,11 @@ Por solicitud del operador, las tres tasks y sus contratos UI sustituyen el univ
 ### Definiciones técnicas y ADR — 2026-09-19
 
 Contrato compartido, cuatro specs nuevas y extensión FTR §14 formalizados; ADR Proposed indexado. Las tasks consumen estas definiciones, no mantienen fórmulas paralelas. Sin implementación ni evaluación real de Daniela.
+
+### Ampliación ICO — RpA (2026-09-19)
+
+LEADERSHIP_RPA_V1 concentra definición/cálculo, intensidad frente a FTR, cobertura y señales abiertas; el ADR registra la decisión. TASK-1879 certifica captura, TASK-1880 calcula/materializa y TASK-1881 consume. No se duplica spec ni se activan bonos. El diseño UI deberá ajustar sus artefactos de detalle antes de UI ready; esta ampliación no acredita validación visual.
+
+### Cierre de diseño operativo — 2026-09-19
+
+[Protocolo compartido §11](../../architecture/GREENHOUSE_OPERATIONAL_LEADERSHIP_MEASUREMENT_V1.md#11-protocolo-operativo-de-medición-y-mejora--contrato-propuesto) define captura independiente del director, control/causas, suplencias/transferencias, acciones verificadas, autonomía y revisión prospectiva. RpA base permanece intacto y liderazgo se define en LEADERSHIP_RPA_V1. Las tres tasks incorporan criterios de implementación/QA; siguen to-do y sin rollout. Nombramientos, formación, calibración y aprobación del ADR son gates de ejecución, no logros documentales.

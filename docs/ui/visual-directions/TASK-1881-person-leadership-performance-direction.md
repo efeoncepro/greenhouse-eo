@@ -6,13 +6,13 @@ Diseño propuesto 2026-09-19, no captura ni evidencia de UI implementada. Source
 
 ## Experience thesis
 
-Leer resultados del equipo y calidad de evidencia sobre la cartera dinámica del líder/período antes de interpretar un desempeño individual. El piloto no fija número de cuentas ni sujetos. El perfil conserva su identidad y contexto; una hoja analítica editorial evita cinco tarjetas que aparenten cinco scores comparables.
+Leer resultados del equipo y calidad de evidencia sobre la cartera dinámica del líder/período antes de interpretar un desempeño individual. El piloto no fija número de cuentas ni sujetos. El perfil conserva su identidad y contexto; una hoja analítica editorial evita tarjetas equivalentes que aparenten cinco scores comparables.
 
 ## Alternatives
 
-1. Cinco KPI cards: descartada; ACC/FRM/STI son familias/evidencias, no porcentajes equivalentes, y la confianza quedaría secundaria.
+1. Grid de KPI cards: descartada; ACC/FRM/STI son familias/evidencias, no porcentajes equivalentes, y la confianza quedaría secundaria.
 2. Página nueva de liderazgo: descartada; duplica navegación/identidad y aleja evidencia del perfil.
-3. Hoja analítica dentro de Actividad: elegida. Encabezado de período/alcance, dos anclas numéricas POTD/FTR, tabla de cuentas, cola de excepciones y tendencia con drill-down contextual.
+3. Hoja analítica dentro de Actividad: elegida. Encabezado de período/alcance, anclas numéricas POTD y calidad FTR/RpA, tabla de cuentas, cola de excepciones y tendencia con drill-down contextual.
 
 ## Targets and signature
 
@@ -35,3 +35,7 @@ GVC `qualityProfile: premium`, dossier desktop/mobile/estados; media ≥4.5, pis
 ## Dynamic portfolio direction
 
 La jerarquía no cambia por cardinalidad: alcance/cobertura → resumen → lista de cuentas → evidencia. Cuentas pendientes ocupan filas honestas, no desaparecen. Counts por métrica, labels/plurales dinámicos y estado scopeChanged; sin números de cuentas ni marcas fijos en copy. Probar 0/1/5/51/201, dos líderes y alta/revocación. El gate de diseño sigue pendiente; no hay capturas runtime.
+
+## Alcance funcional actualizado
+
+Misma hoja analítica; RpA contextual acompaña FTR con unidad/cobertura, sin score nuevo. El detalle admite acciones/correcciones autorizadas según contrato compartido §11, con reviewer independiente y estados honestos. No convierte el perfil en editor de métricas ni gate de aprobación universal. Formularios pendientes de mapping/validación de diseño antes de UI ready; no se declara aceptación visual.
