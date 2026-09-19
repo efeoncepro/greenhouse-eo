@@ -28,7 +28,7 @@
 - Backend impact: `none`
 - Epic: `EPIC-047`
 - Status real: `Estrategia, dirección, wireframe, flow y motion contratados; VoC, casos, CTA, slug y runtime binding pendientes`
-- Rank: `EPIC-047-08`
+- Rank: `EPIC-047-09`
 - Domain: `public-site|agency|content|growth|ui|seo`
 - Blocked by: `decisión comercial del Brand Diagnostic/CTA; inventario de casos y derechos; research SEO/canonical; discovery de work page WordPress`
 - Branch: `Greenhouse develop; sin worktrees`

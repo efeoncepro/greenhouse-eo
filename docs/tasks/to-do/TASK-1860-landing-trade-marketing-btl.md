@@ -24,7 +24,7 @@
 - Backend impact: `none`
 - Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `EPIC-047-07`
+- Rank: `EPIC-047-08`
 - Domain: `content|ui`
 - Blocked by: `none`
 - Promotion blocked by: `dirección visual aprobada; copy ledger aprobado; revisión legal de claims y tabla comparativa; Growth Form y Growth CTA publicados; slug validado con segunda fuente`

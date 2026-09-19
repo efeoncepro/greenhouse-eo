@@ -27,7 +27,7 @@ hub (decisión registrada en EPIC-047) — cerrado por trabajo en EPIC-047.
 - Backend impact: `none`
 - Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `EPIC-047-03`
+- Rank: `EPIC-047-04`
 - Domain: `public-site`
 - Blocked by: `none`
 - Branch: `task/TASK-1401-landing-hubspot-precios`

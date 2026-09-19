@@ -32,8 +32,10 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1872](to-do/TASK-1872-reactive-consumer-pending-per-handler.md) | Consumer reactivo: pendiente por handler en Phase A (cierra ISSUE-173) — un breaker abierto sobre un evento multi-handler ya no deja huérfano al handler saltado; señal `sync.reactive.handler_orphan_residue`; inventario y pre-reconocimiento gobernado de huérfanos históricos antes del deploy; sin migración ni flag | none |
 | [TASK-1873](to-do/TASK-1873-hiring-intake-discarded-link-warnings.md) | Intake de postulaciones: el enlace descartado por el parser queda visible como `intakeWarnings` application-scoped (sin el raw) en `hiring_application` y en el reader canónico; migración expand-only (EPIC-011) | none |
 | [TASK-1874](to-do/TASK-1874-application-360-discarded-link-notice.md) | Application 360: aviso «Envió un enlace de LinkedIn/portafolio que no pudimos leer; pídelo en el primer contacto» en «Perfil del candidato» y empty state coherente en «Portafolio y enlaces»; copy en diccionarios es-CL/en-US, `Alert info` reutilizado (EPIC-011) | TASK-1873 |
+| [TASK-1877](to-do/TASK-1877-equipos-humano-agente-landing.md) | landing transversal de transformación de equipos humano-agente, con marketing/AEO, revenue, servicio y operaciones (EPIC-047, rank 03) | none |
+| [TASK-1878](to-do/TASK-1878-public-landing-entrypaths-human-agent.md) | entradas contextuales desde Home, HubSpot y AEO hacia TASK-1877, sólo tras publicación verificada (EPIC-047, H2) | TASK-1877 |
 
-Siguiente ID libre `TASK-1876`. Insights TASK-1845–1849 (+ TASK-1875, vista web compartida en Think) y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1879`. Insights TASK-1845–1849 (+ TASK-1875, vista web compartida en Think) y notificaciones conservan sus dueñas.
 
 ## Programa Efeonce Insights: EPIC-045
 

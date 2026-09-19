@@ -22,7 +22,7 @@
 - Backend impact: `none`
 - Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `EPIC-047-10`
+- Rank: `EPIC-047-11`
 - Domain: `content`
 - Blocked by: `none`
 - Branch: `Greenhouse develop para contratos; runtime WordPress efeoncepro.com vía eo-elementor-widgets; sin worktrees`

@@ -42,7 +42,7 @@ padre del hub (decisión registrada en EPIC-047).
 - Backend impact: `none`
 - Epic: `EPIC-047`
 - Status real: `Diseno; reenfocada 2026-09-13 a landing del servicio de agentes; contratos UI superados y por rehacer`
-- Rank: `EPIC-047-04`
+- Rank: `EPIC-047-05`
 - Domain: `public-site`
 - Blocked by: `URL padre del hub HubSpot (decisión del operador); la región del caso además espera verificar la métrica ANAM y el alcance de su autorización`
 - Branch: `develop (Greenhouse, checkout compartido, sin worktrees)`
@@ -516,15 +516,26 @@ Playwright live 1440 + 390 con las assertions del plan · Rich Results Test · H
 - Segundo caso de agente para salir de n=1.
 - Validar economics de Managed Agentic Operations con pricing.
 - Variante `en-US`.
-- Landing de agentes en otras plataformas (Agentforce y demás), sin task todavía: se crea cuando el operador la
-  priorice y debe enlazar con esta sin duplicar el ciclo de servicio.
+- La transformación transversal de equipos humano-agente vive en TASK-1877; esta página conserva agentes
+  específicos de HubSpot. Una futura página Agentforce requeriría task propia y prueba de demanda.
 
 ## Open Questions
 
 - ¿Cuál es la URL padre del hub? (bloquea el Slice 1)
 - ~~¿El alcance es sólo agentes sobre HubSpot o también agentes en otras plataformas?~~ **Resuelta 2026-09-13
-  (operador):** esta página es sólo de agentes de HubSpot. Agentforce y otras plataformas tendrán su propia landing
-  más adelante.
+  (operador):** esta página es sólo de agentes de HubSpot. TASK-1877 cubre el servicio transversal, no un
+  catálogo Agentforce; otras páginas de producto quedan sujetas a priorización.
 - ¿Desde cuándo está en producción el Customer Agent de ANAM y sobre qué ventana se mide la reducción de carga?
 - ¿ANAM autoriza nombrarlo con el estado «en producción» y la métrica en esta landing?
 - ¿Se publica Managed Agentic Operations con precio de referencia o sólo como modo de entrega bajo evaluación?
+
+## Delta 2026-09-19 — límite con la oferta transversal
+
+- TASK-1877 posee el diseño organizacional y la transformación de equipos humano-agente, independiente de CRM.
+  TASK-1403 posee la implementación y operación de agentes **en HubSpot**; no duplica el Blueprint transversal.
+- Agregar puente contextual a la oferta transversal sólo cuando su URL responda `200`, tenga canonical/CTA
+  verificados y la navegación preserve la intención HubSpot. No enlazar una working route `404`.
+- Para marketing, diferenciar contexto público AEO de datos privados autorizados del portal. No prometer que
+  Customer/Prospecting/Data Agent cubran campañas o marca si el tenant y la capacidad no lo prueban.
+- [ ] Se valida en vivo el puente a TASK-1877 antes de activarlo y el copy no confunde agentes HubSpot con la
+      oferta transversal ni declara GA/beta sin readback.

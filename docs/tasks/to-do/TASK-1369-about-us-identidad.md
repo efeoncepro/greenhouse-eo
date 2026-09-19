@@ -20,7 +20,7 @@
 - Backend impact: `none`
 - Epic: `EPIC-047`
 - Status real: `Diseno`
-- Rank: `EPIC-047-09`
+- Rank: `EPIC-047-10`
 - Domain: `content`
 - Blocked by: `bios reales del equipo + dirección de arte del hero (ver Open Questions)`
 - Branch: `task/TASK-1369-about-us-identidad`
