@@ -1,15 +1,14 @@
 [
   {
-    "id": "c08-mision-cumplida",
+    "id": "c09-refuerzos",
     "dominante": [
-      "Misión",
-      "cumplida."
+      "Pide refuerzos."
     ],
     "contraste": {
-      "etiqueta": 17.53,
-      "dominante": 6.64,
-      "cierre-frase": 3.43,
-      "logo": 5.1
+      "etiqueta": 17.5,
+      "entrada": 16.39,
+      "dominante": 12.83,
+      "cierre-inferior": 10.69
     },
     "seleccion": {
       "selection": {
@@ -25,21 +24,21 @@
       },
       "cursores": [
         {
-          "id": "nexa",
+          "id": "clawd",
           "labelBounds": {
-            "left": 141.148,
-            "top": 222.469,
-            "right": 246.528,
-            "bottom": 275.968
+            "left": 871.272,
+            "top": 264.707,
+            "right": 992.727,
+            "bottom": 318.206
           }
         },
         {
-          "id": "equipo",
+          "id": "codex",
           "labelBounds": {
-            "left": 905.472,
-            "top": 222.469,
-            "right": 1046.037,
-            "bottom": 275.968
+            "left": 871.272,
+            "top": 575.573,
+            "right": 992.752,
+            "bottom": 629.072
           }
         },
         {

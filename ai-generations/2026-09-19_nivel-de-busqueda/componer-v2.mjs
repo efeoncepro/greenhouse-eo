@@ -22,6 +22,7 @@ import { axisAdvertising } from '@efeoncepro/axis-tokens'
 import { resolveCollaborationSelectionIntent } from '@efeoncepro/axis-ui-contracts'
 
 import { renderCollaborationSelection } from '../../scripts/creative/layout-compiler/axis-advertising.mjs'
+import { compositeLuminosity } from '../../scripts/creative/layout-compiler/compiler.mjs'
 
 const require = createRequire(import.meta.url)
 const fontkit = require('fontkit')
@@ -371,6 +372,15 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
     checks.push({ id: 'gesto', box: { left: gx + g.ink.left, right: gx + g.ink.right, top: gy + g.ink.top, bottom: gy + g.ink.bottom }, inkL: lum(255, 101, 0) })
   }
 
+  // cierre inferior (sobre el piso oscuro de la escena)
+  if (s.footer) {
+    const fr = R.ideaShort
+    const ft = block({ text: s.footer.text, font: fontFor(fr), size: s.footer.size, tracking: em(fr.tracking), leading: fr.lineHeight, x: W / 2, topY: s.footer.y * H, maxWidth: W * 0.84, fill: '#ffffff', align: 'center' })
+
+    body += ft.svg
+    checks.push({ id: 'cierre-inferior', box: ft.box })
+  }
+
   // 4 · tarjeta
   let cardEl = null
 
@@ -414,7 +424,22 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
     checks.push({ id: 'logo', box: { left: lx, right: lx + lw, top: ly, bottom: ly + lh }, inkL: s.logo.variant === 'color' ? lum(2, 60, 112) : 1 })
   }
 
-  const master = await sharp(bare).composite(topLayers).png().toBuffer()
+  let master = await sharp(bare).composite(topLayers).png().toBuffer()
+
+  // Firma web: SVG canónico url-lum con fusión de luminosidad no separable (compositor canónico, opacidad 0.72).
+  if (s.url) {
+    const src = await sharp('src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg', { density: 600 }).png().toBuffer()
+    const uw = Math.round(s.url.width * W)
+    const { height: uh0, width: uw0 } = await sharp(src).metadata()
+    const uh = Math.round((uh0 * uw) / uw0)
+    const left = Math.round(W / 2 - uw / 2)
+    const topU = Math.round(s.url.y * H)
+    const res = await compositeLuminosity({ backdropBytes: master, sourceBytes: src, left, top: topU, width: uw, opacity: 0.72 })
+
+    master = res.output
+    if (!res.evidence || res.evidence.method !== 'non-separable-luminosity') throw new Error('url-lum sin evidencia de fusión')
+    checks.push({ id: 'url', box: { left, right: left + uw, top: topU, bottom: topU + uh }, skipContrast: true })
+  }
 
   await sharp(master).resize(FINAL).png().toFile(`${DIR}/out-v2/${s.id}.png`)
   await sharp(master).resize({ width: 390 }).png().toFile(`${DIR}/out-v2/preview-390/${s.id}.png`)
@@ -423,7 +448,7 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
 
   for (const c of checks) {
     if (c.box.left < 0 || c.box.right > W || c.box.top < 0 || c.box.bottom > H) throw new Error(`${s.id}: ${c.id} fuera del lienzo`)
-    contraste[c.id] = await contrastUnder(bare, c.box, c.inkL ?? 1)
+    if (!c.skipContrast) contraste[c.id] = await contrastUnder(bare, c.box, c.inkL ?? 1)
   }
   if (cardEl) contraste.tarjeta = await contrastUnder(bare, cardEl.textBoxes[0])
 

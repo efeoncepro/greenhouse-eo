@@ -661,7 +661,7 @@ const setPixelLuminosity = (color, targetLuminosity) => {
   return clipBlendColor(color.map(channel => channel + delta))
 }
 
-const compositeLuminosity = async ({ backdropBytes, sourceBytes, left, top, width, opacity }) => {
+export const compositeLuminosity = async ({ backdropBytes, sourceBytes, left, top, width, opacity }) => {
   const { data: backdrop, info } = await sharp(backdropBytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
 
   const { data: source, info: sourceInfo } = await sharp(sourceBytes)

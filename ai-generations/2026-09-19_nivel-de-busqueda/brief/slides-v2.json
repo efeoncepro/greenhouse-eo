@@ -348,6 +348,52 @@
   }
  },
  {
+  "id": "c09-refuerzos",
+  "plate": "s9-contraportada-v2.png",
+  "align": "left",
+  "top": 0.15,
+  "hud": {
+   "lit": 0
+  },
+  "label": "¿SIN ESTRELLAS?",
+  "lead": "¿Tu marca no sale en ChatGPT, Perplexity ni Gemini?",
+  "leadSize": 54,
+  "textWidth": 0.7,
+  "dominant": "Pide refuerzos.",
+  "dominantSize": 200,
+  "dominantMax": 0.62,
+  "selection": {
+   "cursors": [
+    {
+     "id": "clawd",
+     "label": "Clawd",
+     "anchor": "top-end",
+     "color": "#d77757"
+    },
+    {
+     "id": "codex",
+     "label": "Codex",
+     "anchor": "bottom-end",
+     "color": "#2f67db"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "bottom-start"
+    }
+   ]
+  },
+  "footer": {
+   "text": "Te ayudamos a subir tu nivel de búsqueda.",
+   "size": 46,
+   "y": 0.855
+  },
+  "url": {
+   "width": 0.3,
+   "y": 0.925
+  }
+ },
+ {
   "id": "post-nadie-te-busca",
   "plate": "hero-nadie.png",
   "align": "left",
