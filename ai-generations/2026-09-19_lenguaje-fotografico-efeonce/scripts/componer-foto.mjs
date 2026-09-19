@@ -407,12 +407,13 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
     const probe = shape(s.label, pop[700], lsize, em(R.structureLabel.tracking))
     const starR = lsize * 0.46
     const gapS = lsize * 0.55
-    const totalW = starR * 2 + gapS + (probe.ink.right - probe.ink.left)
+    const totalW = (s.labelStar ? starR * 2 + gapS : 0) + (probe.ink.right - probe.ink.left)
     const lx0 = s.align === 'center' ? x - totalW / 2 : x
     const lab = block({ text: s.label, font: pop[700], size: lsize, tracking: em(R.structureLabel.tracking), leading: 1.2, x: lx0 + starR * 2 + gapS, topY: y, fill: INK, align: 'left' })
     const scy = (lab.box.top + lab.box.bottom) / 2
 
-    body += `<path d="${starPath(lx0 + starR, scy, starR)}" fill="${ACCENT}"/>` + lab.svg
+    // La estrella fue un marcador de misión propio del post de GTA VI: aquí es opt-in y por defecto NO va.
+    body += (s.labelStar ? `<path d="${starPath(lx0 + starR, scy, starR)}" fill="${ACCENT}"/>` : '') + lab.svg
     checks.push({ id: 'etiqueta', box: lab.box, inkL: INK_L })
     y = lab.box.bottom + 26
   }

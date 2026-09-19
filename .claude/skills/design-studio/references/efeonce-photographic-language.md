@@ -213,3 +213,6 @@ selección sobre objeto y logo automático. **NUNCA** escribir un compositor nue
 **NUNCA scrims ni overlays sobre la foto** para ganar contraste (decisión del operador 2026-09-19: «es muy 2010, le
 resta limpieza»). El contraste se planifica en la toma con el tono declarado de la zona; si no pasa 4,5:1 se
 regenera el plate o se mueve el texto.
+
+**NUNCA** el marcador-estrella naranja junto a la etiqueta: fue puntual del post de GTA VI (marcaba la misión), no del
+lenguaje de marca (`labelStar` opt-in, apagado por defecto).

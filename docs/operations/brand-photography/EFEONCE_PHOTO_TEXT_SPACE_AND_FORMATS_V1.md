@@ -198,3 +198,9 @@ eso es muy 2010, le resta limpieza a los diseños».
   entrada 6,6–12,9:1 · dominante 6,1–12,9:1 · gesto 8,5:1 · tarjeta 6,5:1 · firma 7,7–20,4:1 **[medido]**.
 - Pendiente de decisión: la **tarjeta HUD** (vidrio esmerilado del propio plate) también es una superficie sobre la
   foto; se mantiene sólo si el operador la aprueba para piezas con dato.
+
+## 11. La estrella del marcador no es del lenguaje (2026-09-19)
+
+El marcador-estrella naranja junto a la etiqueta fue un recurso **puntual del post de GTA VI** (marcaba la misión
+del juego). **NUNCA** se usa en fotografía de marca. En `componer-foto.mjs` quedó como `"labelStar": true`, opt-in y
+apagado por defecto; sin ella la etiqueta arranca en el margen.
