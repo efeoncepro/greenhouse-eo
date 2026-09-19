@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `code complete, rollout pendiente — incidente ISSUE-175 recuperado; guard/error implementados; rollout y smoke AIO pendientes`
+- Status real: `code complete, rollout pendiente — ISSUE-175 recuperado; smoke AIO drenado por worker PASS (2026-09-19); falta sólo empujar el guard a develop y verlo correr en el pipeline`
 - Rank: `TBD`
 - Domain: `growth|ai|integrations|ops|reliability`
 - Blocked by: `none`
@@ -170,11 +170,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -296,9 +296,9 @@ order by created_at desc;
 
 ## Acceptance Criteria
 
-- [ ] `ops-worker` no puede desplegar con `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=true` y DataForSEO login/password ref ausentes sin fallar loud.
+- [ ] `ops-worker` no puede desplegar con `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=true` y DataForSEO login/password ref ausentes sin fallar loud. — Sin tildar: el guard está probado localmente (el deploy real sin login falla antes de Cloud Build), pero el commit `54610ae96` no está en `origin/develop`; falta push autorizado y ver el workflow `ops-worker-deploy` ejecutarlo.
 - [x] La revision viva de Cloud Run `ops-worker` muestra los env names DataForSEO esperados cuando AIO esta ON.
-- [ ] Smoke real low-volume de `google_ai_overview` drenado por worker crea observations sin `error_code='missing_secret'`.
+- [x] Smoke real low-volume de `google_ai_overview` drenado por worker crea observations sin `error_code='missing_secret'`. — Run `grun-61619c42-9d77-4f71-a9f7-b546e815544c` (EO-GRUN-00055), 6/6 `succeeded`, `status_code=20000`, USD 0,024; PG confirma 0 `missing_secret` desde 2026-07-05.
 - [x] `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` y `docs/manual-de-uso/growth/ai-visibility-grader-smoke.md` quedan sincronizados con la verdad worker-vs-Vercel.
 - [x] No se cambia UI/reporte/scoring ni se oculta el estado `partial`.
 
@@ -372,3 +372,11 @@ AC guard: implementado/probado en develop, casilla abierta hasta integrar códig
 - Arquitectura/ADR: se conserva la decisión SEO §1.2 de cliente/ledger compartidos y el contrato de configuración propia de cada runtime (cloud governance + OPS_RELIABILITY_AGENT_INVARIANTS); no cambia source of truth, IAM, workflow_call, EXPECTED_SHA, GIT_SHA ni manifest de release.
 - Documentación: issue, task, manuales, arquitectura, ledger, context/handoff/changelog y skills espejo sincronizados. La advertencia `architecture_doc_monolith` ya existía en la arquitectura SEO; se editó un contrato en §1.2, sin añadir una sección Delta ni hacer un refactor ajeno.
 - No se corrió build Next.js ni suite completa: no cambió UI ni runtime desplegado de código; tsc, lint focal, tests del transporte/consumers y los bundles del gate de workers cubren el cambio local. No se ejecutó un release ni se infiere publicación del guard local.
+
+### Smoke AIO (Slice 3) — 2026-09-19
+
+- Runtime: `ops-worker-00698-9m9` (100 % del tráfico) con `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=true`, `DATAFORSEO_API_LOGIN` presente y `DATAFORSEO_API_PASSWORD_SECRET_REF=greenhouse-dataforseo-api-password` (sólo se leyó presencia, nunca valores).
+- Run: `pnpm staging:request POST /api/admin/growth/ai-visibility/runs` con `mode=light`, `runKind=smoke`, `onlyProviders:["google_ai_overview"]`, `idempotencyKey=task-1341-aio-smoke-2026-09-19` → HTTP 202, encolado; el worker lo tomó a las 16:25:05Z y terminó `succeeded` a las 16:26:03Z.
+- Resultado: 6/6 observaciones `google_ai_overview` `succeeded`, `usage.dataforseo_status_code=20000`, endpoint `/v3/serp/google/ai_mode/live/advanced`, USD 0,004 cada una (USD 0,024 total, techo 0,50), citas 5/4/2/4/6/4.
+- PG read-only: en las últimas 2 h sólo hay esas 6 filas (`succeeded`, `error_code` nulo). Histórico de `missing_secret` para el provider: 12 filas, la última el 2026-07-05; ninguna después.
+- Queda abierto sólo el AC del guard: requiere push a `develop` y una corrida del workflow que lo ejecute. No se hizo push en esta sesión.

@@ -1,6 +1,6 @@
 # Handoff activo
 
-**DataForSEO:** ISSUE-175 recuperado; TASK-1341 conserva rollout y smoke AIO pendientes.
+**DataForSEO:** ISSUE-175 recuperado; TASK-1341: smoke AIO PASS en worker (EO-GRUN-00055); falta push del guard `54610ae96` y verlo en `ops-worker-deploy`.
 
 **Transformación humano-agente (19/09):** [oferta aprobada](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md);
 serie Q4 con ruta CMO sin CRM obligatorio. TASK-1877 landing transversal y TASK-1878 entradas Home/HubSpot/AEO:
