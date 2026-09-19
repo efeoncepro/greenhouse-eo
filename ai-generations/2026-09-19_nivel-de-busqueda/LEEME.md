@@ -1,6 +1,6 @@
 # «Nivel de búsqueda» — trendjacking GTA VI (2026-09-19)
 
-Estado: **v2 producida y revisada por el agente**. Sin aprobación humana, sin programar, sin publicar.
+Estado: **v4 (9 láminas + contraportada incluida + pieza suelta) producida y revisada por el agente**. Sin aprobación humana, sin programar, sin publicar.
 Vigente: `out-v2/` (PNG 1080 × 1350). `out/` = v1 descartada por el operador («no está mal, pero no está bien»).
 
 ## Por qué cambió de v1 a v2
@@ -39,7 +39,7 @@ Vigente: `out-v2/` (PNG 1080 × 1350). `out/` = v1 descartada por el operador (�
 | Marca en escena | c01 Nexa con hoodie Efeonce (ref. rostro + kit hoodie) · c03 logo 3D monumental en azotea art déco (kit monumental 01 + silueta; QA letra por letra OK) · c08 nave en pasada de victoria (kit nave 01 + 17; ventanas, esfera, aleta y cortes OK). |
 | Firma | SVG oficial negativo, abajo al centro en portada, cierre y pieza suelta. |
 
-Guttery: se probó un gesto en la portada y se retiró (naranja sobre naranja, 2,5:1). No se forzó en otra lámina.
+Guttery: ver «Pasada de jerarquía» abajo (gestos en blanco, 1 por pieza).
 
 ## Piezas (`out-v2/`)
 
@@ -55,27 +55,10 @@ Guttery: se probó un gesto en la portada y se retiró (naranja sobre naranja, 2
 | `c08-mision-cumplida` | NIVEL DE BÚSQUEDA: MÁXIMO · **Misión cumplida.** Todos te buscan. Y te encuentran. (nave) |
 | `post-nadie-te-busca` | Pieza suelta (Threads/feed): SIN RASTRO · **Nadie** te está buscando. |
 
-## Copy de publicación (propuesta)
+## Copy de publicación
 
-**Carrusel (Instagram):**
-> 13 años esperando GTA VI y llega el 19 de noviembre. ¿Tu marca llega antes a las respuestas de ChatGPT? 👀
->
-> En el juego, cinco estrellas significan que toda la ciudad te busca. En la búsqueda con IA significan lo mismo,
-> pero ahí no quieres escapar: quieres que te encuentren.
->
-> Las 5 misiones para subir tu nivel de búsqueda:
-> ★ Que la IA sepa quién eres
-> ★ Primero, la respuesta
-> ★ Datos propios
-> ★ Que la calle hable de ti
-> ★ Abre la puerta a los bots
->
-> Aparecer en la IA no es suerte: es sistema. ¿En cuántas estrellas estás hoy? Te leemos 👇
-> #GTA6 #AEO #BúsquedaConIA #MarketingDigital
-
-**Pieza suelta (Threads):**
-> Nadie te está buscando. En el juego es la mejor noticia; en la búsqueda con IA, la peor.
-> Pregúntale hoy a ChatGPT por tu categoría: ¿apareces?
+Vigente en `COPY.md` (Instagram + LinkedIn). La contraportada `c09-refuerzos` («Pide refuerzos», Clawd y Codex,
+firma url-lum) completa el carrusel; PDF de LinkedIn en `out-v2/linkedin-nivel-de-busqueda.pdf`.
 
 ## Producción y QA
 
