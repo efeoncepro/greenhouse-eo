@@ -513,10 +513,18 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
     checks.push({ id: 'cierre-inferior', box: ft.box })
   }
 
+  // 4 · nota de dato: Poppins sobre la foto limpia (la tarjeta de vidrio era del post de GTA VI, no del lenguaje)
+  if (s.note) {
+    const nt = richBlock({ text: s.note.text, fonts: POP, size: s.note.size ?? Math.round(W * 0.026), tracking: 0, leading: 1.5, x: s.note.x != null ? s.note.x * W : M, topY: s.note.y * H, maxWidth: W * (s.note.width ?? 0.34), fill: SOFT, accentFill: INK, align: 'left' })
+    body += nt.svg
+    checks.push({ id: 'nota', box: nt.box, inkL: INK_L })
+  }
+
   // 4 · tarjeta
   let cardEl = null
 
   if (s.card) {
+    if (!s.card.allowGtaCard) throw new Error(`${s.id}: la tarjeta de vidrio con línea naranja fue puntual del post de GTA VI; usa "note" (texto limpio) o declara card.allowGtaCard`)
     const cw = W * (s.card.width ?? 0.74)
     const cx = s.card.align === 'right' ? W - M - cw : s.align === 'center' ? (W - cw) / 2 : M
 

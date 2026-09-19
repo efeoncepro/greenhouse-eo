@@ -117,41 +117,6 @@
   "dominant": "en vivo.",
   "dominantSize": 190,
   "dominantMax": 0.36,
-  "card": {
-   "header": "Este mes",
-   "body": "Ganados **+18** · RpA 2,1 a **1,4**",
-   "width": 0.32,
-   "bottom": 0.76
-  },
-  "selection": {
-   "box": [
-    0.7,
-    0.46,
-    0.92,
-    0.72
-   ],
-   "targetKind": "object",
-   "scale": 1.3,
-   "cursors": [
-    {
-     "id": "revops",
-     "label": "RevOps",
-     "anchor": "top-start",
-     "color": "#0375db"
-    },
-    {
-     "id": "cliente",
-     "label": "Cliente",
-     "anchor": "bottom-start",
-     "color": "#6ec207"
-    },
-    {
-     "id": "yo",
-     "kind": "local",
-     "anchor": "end-center"
-    }
-   ]
-  },
   "logo": {
    "width": 0.12,
    "variant": "auto",
@@ -162,6 +127,12 @@
    1080
   ],
   "ink": "dark",
-  "labelSize": 34
+  "labelSize": 34,
+  "note": {
+   "text": "Ganados este mes **+18**|RpA 2,1 a **1,4**",
+   "y": 0.62,
+   "width": 0.34,
+   "size": 46
+  }
  }
 ]

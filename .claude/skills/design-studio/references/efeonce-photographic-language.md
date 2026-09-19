@@ -216,3 +216,7 @@ regenera el plate o se mueve el texto.
 
 **NUNCA** el marcador-estrella naranja junto a la etiqueta: fue puntual del post de GTA VI (marcaba la misión), no del
 lenguaje de marca (`labelStar` opt-in, apagado por defecto).
+
+**NUNCA** la tarjeta HUD de vidrio con línea naranja (era del post de GTA VI): el dato va como nota de texto limpio
+(Poppins) sobre una zona clara de la foto. **NUNCA** caja de selección si la foto no tiene un objeto aislado que
+enmarcar; el objeto se elige en la ficha de toma, no al componer.

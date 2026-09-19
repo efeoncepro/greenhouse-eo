@@ -204,3 +204,21 @@ eso es muy 2010, le resta limpieza a los diseños».
 El marcador-estrella naranja junto a la etiqueta fue un recurso **puntual del post de GTA VI** (marcaba la misión
 del juego). **NUNCA** se usa en fotografía de marca. En `componer-foto.mjs` quedó como `"labelStar": true`, opt-in y
 apagado por defecto; sin ella la etiqueta arranca en el margen.
+
+## 12. Qué era de GTA VI y NO es del lenguaje (2026-09-19)
+
+Tres recursos del carrusel «Nivel de búsqueda» se colaron en las pruebas y el operador los rechazó uno por uno.
+Todos eran **puntuales de esa pieza**, ligados a la estética del juego:
+
+| Recurso | Por qué existía allí | Regla en fotografía de marca |
+|---|---|---|
+| **Scrim / degradado oscuro** sobre la imagen | el cielo pintado del key art lo admitía | **NUNCA.** «Es muy 2010, le resta limpieza». El contraste se planifica en la toma (§10) |
+| **Marcador-estrella naranja** junto a la etiqueta | marcaba la misión del juego | **NUNCA.** `labelStar` opt-in, apagado (§11) |
+| **Tarjeta HUD de vidrio con línea naranja** | lenguaje de HUD del videojuego | **NUNCA.** El dato va como **nota de texto limpio** (Poppins, `note`) sobre una zona clara de la propia foto. `componer-foto.mjs` **falla** si se pide `card` sin `card.allowGtaCard` |
+
+Regla general: **un recurso de una pieza puntual no entra al lenguaje sin decisión explícita.** Lo que sí es del
+lenguaje son las voces tipográficas AXIS, la selección colaborativa, la firma y las reglas de toma.
+
+Cuarta corrección de la misma familia: **la caja de selección sólo va si la foto tiene un objeto aislado que valga
+la pena enmarcar.** En la pieza 16:9 caía sobre la cara de una persona y se retiró: el objeto se elige en la ficha
+de toma, no al componer.
