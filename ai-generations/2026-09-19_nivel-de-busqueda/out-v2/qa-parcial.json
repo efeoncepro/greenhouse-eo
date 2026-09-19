@@ -1,14 +1,16 @@
 [
   {
-    "id": "c09-refuerzos",
+    "id": "c01-portada",
     "dominante": [
-      "Pide refuerzos."
+      "antes"
     ],
     "contraste": {
-      "etiqueta": 17.5,
-      "entrada": 16.39,
-      "dominante": 12.83,
-      "cierre-inferior": 10.69
+      "etiqueta": 14.34,
+      "entrada": 13.1,
+      "dominante": 6.93,
+      "cierre-frase": 4.99,
+      "gesto": 6.77,
+      "logo": 9.21
     },
     "seleccion": {
       "selection": {
@@ -24,25 +26,57 @@
       },
       "cursores": [
         {
-          "id": "clawd",
+          "id": "nexa",
           "labelBounds": {
-            "left": 871.272,
-            "top": 264.707,
-            "right": 992.727,
-            "bottom": 318.206
-          }
-        },
-        {
-          "id": "codex",
-          "labelBounds": {
-            "left": 871.272,
-            "top": 575.573,
-            "right": 992.752,
-            "bottom": 629.072
+            "left": 601.435,
+            "top": 245.831,
+            "right": 706.815,
+            "bottom": 299.33
           }
         },
         {
           "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "post-nadie-te-busca",
+    "dominante": [
+      "Nadie"
+    ],
+    "contraste": {
+      "etiqueta": 7.25,
+      "dominante": 5.26,
+      "cierre-frase": 4.29,
+      "gesto": 5.32,
+      "logo": 3.7,
+      "tarjeta": 10.43
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "yo"
+        },
+        {
+          "id": "ia",
+          "labelBounds": {
+            "left": 1006.848,
+            "top": 782.208,
+            "right": 1072.341,
+            "bottom": 835.707
+          }
         }
       ]
     }

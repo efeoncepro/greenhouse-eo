@@ -8,13 +8,13 @@
    "lit": 0
   },
   "label": "13 AÑOS DE ESPERA",
-  "lead": "GTA VI va a llegar",
+  "lead": "**GTA VI** va a llegar",
   "leadSize": 66,
   "textWidth": 0.62,
   "dominant": "antes",
   "dominantSize": 250,
   "dominantMax": 0.5,
-  "after": "que tu marca|a ChatGPT.",
+  "after": "que tu marca|a **ChatGPT.**",
   "afterSize": 66,
   "afterGap": 30,
   "selection": {
@@ -38,9 +38,18 @@
    "variant": "negative"
   },
   "scrimTop": {
-   "to": 0.52,
-   "opacity": 0.55
-  }
+   "to": 0.62,
+   "opacity": 0.8
+  },
+  "gesture": {
+   "text": "¿apostamos?",
+   "size": 68,
+   "x": 0.53,
+   "y": 0.37,
+   "rotate": -8,
+   "color": "#ffffff"
+  },
+  "afterFill": "#cfe4fa"
  },
  {
   "id": "c02-todos-te-buscan",
@@ -52,7 +61,7 @@
   },
   "label": "EN EL JUEGO",
   "lead": "Cinco estrellas:",
-  "dominant": "todos te|buscan.",
+  "dominant": "[[todos]] te|buscan.",
   "dominantSize": 200,
   "dominantMax": 0.56,
   "selection": {
@@ -85,7 +94,7 @@
   },
   "card": {
    "header": "En la búsqueda con IA",
-   "body": "Significa exactamente lo mismo. Solo que aquí no quieres escapar.",
+   "body": "Significa exactamente lo mismo. **Solo que aquí no quieres escapar.**",
    "bottom": 0.935,
    "width": 0.66
   },
@@ -105,7 +114,7 @@
   },
   "label": "MISIÓN 1 / 5",
   "lead": "Que la IA sepa",
-  "dominant": "quién eres.",
+  "dominant": "[[quién]] eres.",
   "dominantSize": 200,
   "dominantMax": 0.6,
   "selection": {
@@ -125,7 +134,7 @@
   },
   "card": {
    "header": "Tu entidad en la IA",
-   "body": "Tu nombre, lo que haces y dónde lo haces dicen lo mismo en tu web, tus perfiles y los directorios. Si no, la IA no sabe a quién recomendar.",
+   "body": "Tu nombre, lo que haces y dónde lo haces dicen lo mismo en tu web, tus perfiles y los directorios. **Si no, la IA no sabe a quién recomendar.**",
    "bottom": 0.955,
    "width": 0.8
   }
@@ -141,7 +150,7 @@
   },
   "label": "MISIÓN 2 / 5",
   "lead": "Primero,",
-  "dominant": "la respuesta.",
+  "dominant": "la [[respuesta.]]",
   "dominantSize": 200,
   "dominantMax": 0.6,
   "selection": {
@@ -169,9 +178,13 @@
   },
   "card": {
    "header": "Respuesta de IA · ahora",
-   "body": "La primera frase de cada página contesta la pregunta. La IA cita respuestas, no introducciones.",
+   "body": "La primera frase de cada página contesta la pregunta. **La IA cita respuestas, no introducciones.**",
    "bottom": 0.935,
    "width": 0.62
+  },
+  "scrimTop": {
+   "to": 0.52,
+   "opacity": 0.82
   }
  },
  {
@@ -185,7 +198,7 @@
   },
   "label": "MISIÓN 3 / 5",
   "lead": "El botín:",
-  "dominant": "datos|propios.",
+  "dominant": "datos|[[propios.]]",
   "dominantSize": 200,
   "dominantMax": 0.52,
   "selection": {
@@ -205,9 +218,21 @@
   },
   "card": {
    "header": "Por qué te citan",
-   "body": "Cifras, casos y estudios con fuente. Lo que solo tú puedes decir es lo que la IA tiene que citarte para decirlo.",
+   "body": "Cifras, casos y estudios con fuente. **Lo que solo tú puedes decir es lo que la IA tiene que citarte.**",
    "bottom": 0.935,
    "width": 0.7
+  },
+  "gesture": {
+   "text": "no se comparte",
+   "size": 56,
+   "x": 0.3,
+   "y": 0.232,
+   "rotate": -6,
+   "color": "#ffffff"
+  },
+  "scrimTop": {
+   "to": 0.5,
+   "opacity": 0.82
   }
  },
  {
@@ -221,7 +246,7 @@
   },
   "label": "MISIÓN 4 / 5",
   "lead": "Que la calle",
-  "dominant": "hable de ti.",
+  "dominant": "hable [[de ti.]]",
   "dominantSize": 200,
   "dominantMax": 0.6,
   "selection": {
@@ -247,7 +272,7 @@
   },
   "card": {
    "header": "Menciones · esta semana",
-   "body": "Medios, reseñas y comunidades. La IA confía más en lo que dicen de ti que en lo que dices tú.",
+   "body": "Medios, reseñas y comunidades. **La IA confía más en lo que dicen de ti que en lo que dices tú.**",
    "bottom": 0.935,
    "width": 0.66
   }
@@ -263,7 +288,7 @@
   },
   "label": "MISIÓN 5 / 5",
   "lead": "Abre la puerta",
-  "dominant": "a los bots.",
+  "dominant": "a los [[bots.]]",
   "dominantSize": 200,
   "dominantMax": 0.6,
   "selection": {
@@ -291,7 +316,7 @@
   },
   "card": {
    "header": "Rastreador de IA · acceso",
-   "body": "Si tu sitio bloquea a los rastreadores de IA o no se deja leer, no existes para ellos.",
+   "body": "Si tu sitio bloquea a los rastreadores de IA o no se deja leer, **no existes para ellos.**",
    "bottom": 0.935,
    "width": 0.62
   }
@@ -305,10 +330,10 @@
    "lit": 5
   },
   "label": "NIVEL DE BÚSQUEDA: MÁXIMO",
-  "dominant": "Misión|cumplida.",
+  "dominant": "Misión|[[cumplida.]]",
   "dominantSize": 190,
   "dominantMax": 0.44,
-  "after": "Todos te buscan. Y te encuentran.",
+  "after": "Todos te buscan. **Y te encuentran.**",
   "afterSize": 50,
   "afterGap": 34,
   "selection": {
@@ -338,13 +363,21 @@
    "variant": "negative"
   },
   "scrimTop": {
-   "to": 0.66,
-   "opacity": 0.85
+   "to": 0.72,
+   "opacity": 0.95
   },
   "textWidth": 0.84,
   "scrimBottom": {
    "from": 0.8,
    "opacity": 0.7
+  },
+  "gesture": {
+   "text": "¡por fin!",
+   "size": 66,
+   "x": 0.1,
+   "y": 0.305,
+   "rotate": -10,
+   "color": "#ffffff"
   }
  },
  {
@@ -356,10 +389,10 @@
    "lit": 0
   },
   "label": "¿SIN ESTRELLAS?",
-  "lead": "¿Tu marca no sale en ChatGPT, Perplexity ni Gemini?",
+  "lead": "¿Tu marca no sale en **ChatGPT, Perplexity** ni **Gemini**?",
   "leadSize": 54,
   "textWidth": 0.7,
-  "dominant": "Pide refuerzos.",
+  "dominant": "Pide [[refuerzos.]]",
   "dominantSize": 200,
   "dominantMax": 0.62,
   "selection": {
@@ -384,13 +417,21 @@
    ]
   },
   "footer": {
-   "text": "Te ayudamos a subir tu nivel de búsqueda.",
+   "text": "Te ayudamos a subir tu **nivel de búsqueda.**",
    "size": 46,
    "y": 0.855
   },
   "url": {
    "width": 0.3,
    "y": 0.925
+  },
+  "gesture": {
+   "text": "¡a la orden!",
+   "size": 56,
+   "x": 0.05,
+   "y": 0.8,
+   "rotate": -6,
+   "color": "#ffffff"
   }
  },
  {
@@ -405,7 +446,7 @@
   "dominant": "Nadie",
   "dominantSize": 260,
   "dominantMax": 0.5,
-  "after": "te está buscando.",
+  "after": "te está **buscando.**",
   "afterSize": 82,
   "afterGap": 24,
   "selection": {
@@ -426,13 +467,22 @@
   },
   "card": {
    "header": "Búsqueda con IA",
-   "body": "En el juego, es la mejor noticia. En la búsqueda con IA, la peor.",
+   "body": "En el juego, es la mejor noticia. **En la búsqueda con IA, la peor.**",
    "bottom": 0.8,
    "width": 0.62
   },
   "logo": {
    "width": 220,
    "variant": "negative"
-  }
+  },
+  "gesture": {
+   "text": "¿hola?",
+   "size": 72,
+   "x": 0.56,
+   "y": 0.25,
+   "rotate": -8,
+   "color": "#ffffff"
+  },
+  "afterFill": "#cfe4fa"
  }
 ]

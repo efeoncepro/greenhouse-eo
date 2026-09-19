@@ -120,6 +120,120 @@ const block = ({ text, font, size, tracking = 0, leading, x, topY, maxWidth = W,
   return { svg, box, lines }
 }
 
+
+// ── Texto enriquecido: **negrita** (peso superior de la misma familia) y [[acento]] (naranja Efeonce) ──
+// La jerarquía también vive DENTRO de la línea: un bloque nunca es un solo peso plano si tiene una palabra clave.
+const parseRich = text =>
+  text.split('|').map(chunk => {
+    const words = []
+    let bold = false
+    let accent = false
+    let cur = ''
+    const flush = () => {
+      if (cur) words.push({ text: cur, bold, accent })
+      cur = ''
+    }
+
+    for (let i = 0; i < chunk.length; i++) {
+      if (chunk.startsWith('**', i)) { flush(); bold = !bold; i++; continue }
+      if (chunk.startsWith('[[', i)) { flush(); accent = true; i++; continue }
+      if (chunk.startsWith(']]', i)) { flush(); accent = false; i++; continue }
+      if (chunk[i] === ' ') { flush(); words.push({ space: true }); continue }
+      cur += chunk[i]
+    }
+    flush()
+
+    // fusiona fragmentos contiguos (sin espacio) en una palabra con estilos por segmento
+    const out = []
+    let w = []
+
+    for (const t of words) {
+      if (t.space) { if (w.length) out.push(w); w = []; continue }
+      w.push(t)
+    }
+    if (w.length) out.push(w)
+
+    return out
+  })
+
+const richBlock = ({ text, fonts, size, tracking = 0, leading, x, topY, maxWidth = W, fill, accentFill = ACCENT, align = 'left' }) => {
+  const segW = seg => shape(seg.text, seg.bold ? fonts.bold : fonts.base, size, tracking)
+  const wordWidth = word => word.reduce((a, seg) => a + segW(seg).advance, 0)
+  const space = shape('a a', fonts.base, size).advance - shape('aa', fonts.base, size).advance
+  const lines = []
+
+  for (const chunk of parseRich(text)) {
+    let line = []
+    let width = 0
+
+    for (const word of chunk) {
+      const ww = wordWidth(word)
+
+      if (line.length && width + space + ww > maxWidth) { lines.push(line); line = []; width = 0 }
+      width += (line.length ? space : 0) + ww
+      line.push(word)
+    }
+    if (line.length) lines.push(line)
+  }
+
+  let svg = ''
+  const box = { left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity }
+  const accentBoxes = []
+  let firstTop = null
+
+  // medir tinta de la primera línea para anclar por arriba
+  const lineInk = line => {
+    let cx = 0
+    const ink = { left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity }
+    const parts = []
+
+    line.forEach((word, wi) => {
+      if (wi) cx += space
+      for (const seg of word) {
+        const sh = segW(seg)
+
+        parts.push({ seg, sh, dx: cx })
+        if (sh.ink.left !== Infinity) {
+          ink.left = Math.min(ink.left, cx + sh.ink.left)
+          ink.right = Math.max(ink.right, cx + sh.ink.right)
+          ink.top = Math.min(ink.top, sh.ink.top)
+          ink.bottom = Math.max(ink.bottom, sh.ink.bottom)
+        }
+        cx += sh.advance
+      }
+    })
+
+    return { ink, parts }
+  }
+
+  lines.forEach((line, i) => {
+    const { ink, parts } = lineInk(line)
+
+    if (firstTop === null) firstTop = ink.top
+    const baseline = topY - firstTop + i * size * leading
+    const lx = align === 'center' ? x - (ink.left + ink.right) / 2 : align === 'right' ? x - ink.right : x - ink.left
+
+    for (const { seg, sh, dx } of parts) {
+      const color = seg.accent ? accentFill : fill
+
+      svg += `<g fill="${color}" transform="translate(${(lx + dx).toFixed(2)} ${baseline.toFixed(2)})">${sh.paths}</g>`
+      if (seg.accent && sh.ink.left !== Infinity) accentBoxes.push({ left: lx + dx + sh.ink.left, right: lx + dx + sh.ink.right, top: baseline + sh.ink.top, bottom: baseline + sh.ink.bottom })
+    }
+    box.left = Math.min(box.left, lx + ink.left)
+    box.right = Math.max(box.right, lx + ink.right)
+    box.top = Math.min(box.top, baseline + ink.top)
+    box.bottom = Math.max(box.bottom, baseline + ink.bottom)
+  })
+
+  return { svg, box, accentBoxes, lines: lines.map(l => l.map(w => w.map(s => s.text).join('')).join(' ')) }
+}
+
+const BRIC = (recipe, width = recipe.width, boldWeight = 800) => ({
+  base: bric.getVariation({ wght: recipe.weight, wdth: width, opsz: recipe.opticalSize }),
+  bold: bric.getVariation({ wght: boldWeight, wdth: width, opsz: recipe.opticalSize })
+})
+const POP = { base: pop[400], bold: pop[700] }
+
 // ── HUD propio ───────────────────────────────────────────────────────────────────────────────────
 const starPath = (cx, cy, r) => {
   const pts = []
@@ -190,7 +304,7 @@ const card = ({ header, body, x, bottom, width }) => {
   const headSize = 23
   const bodySize = 36
   const head = shape(header.toUpperCase(), pop[700], headSize, em(R.structureLabel.tracking))
-  const bodyB = block({ text: body, font: pop[400], size: bodySize, tracking: em(R.structureLead.tracking), leading: 1.32, x: x + pad, topY: 0, maxWidth: width - pad * 2, fill: '#ffffff' })
+  const bodyB = richBlock({ text: body, fonts: POP, size: bodySize, tracking: em(R.structureLead.tracking), leading: 1.32, x: x + pad, topY: 0, maxWidth: width - pad * 2, fill: C.softOnDark })
   const headH = head.ink.bottom - head.ink.top
   const bodyH = bodyB.box.bottom - bodyB.box.top
   const h = pad + headH + 22 + bodyH + pad
@@ -198,7 +312,7 @@ const card = ({ header, body, x, bottom, width }) => {
   const dot = 11
   const headY = top + pad - head.ink.top
   const bodyTop = top + pad + headH + 22
-  const bodyFinal = block({ text: body, font: pop[400], size: bodySize, tracking: em(R.structureLead.tracking), leading: 1.32, x: x + pad, topY: bodyTop, maxWidth: width - pad * 2, fill: '#ffffff' })
+  const bodyFinal = richBlock({ text: body, fonts: POP, size: bodySize, tracking: em(R.structureLead.tracking), leading: 1.32, x: x + pad, topY: bodyTop, maxWidth: width - pad * 2, fill: C.softOnDark, accentFill: '#ffffff' })
 
   return {
     rect: { left: x, top, width, height: h, radius: 26 },
@@ -296,8 +410,8 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
 
   // 2 · entrada
   if (s.lead) {
-    const lr = R.ideaShort
-    const le = block({ text: s.lead, font: fontFor(lr), size: s.leadSize ?? 74, tracking: em(lr.tracking), leading: lr.lineHeight, x, topY: y, maxWidth: W * (s.textWidth ?? 0.8), fill: '#ffffff', align: s.align })
+    const lr = R.ideaLead
+    const le = richBlock({ text: s.lead, fonts: BRIC(lr, lr.width, 760), size: s.leadSize ?? 70, tracking: em(lr.tracking), leading: lr.lineHeight, x, topY: y, maxWidth: W * (s.textWidth ?? 0.8), fill: C.softOnDark, accentFill: '#ffffff', align: s.align })
 
     body += le.svg
     checks.push({ id: 'entrada', box: le.box })
@@ -309,11 +423,12 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   const domFont = fontFor(ir, DOMINANT_WIDTH)
   // Ajuste al ancho máximo declarado (deja aire para etiquetas de colaboradores fuera de la caja).
   let domSize = s.dominantSize
-  const widest = Math.max(...s.dominant.split('|').map(t => { const k = shape(t.trim(), domFont, domSize, em(ir.tracking)); return k.ink.right - k.ink.left }))
+  const widest = Math.max(...s.dominant.replace(/\*\*|\[\[|\]\]/g, '').split('|').map(t => { const k = shape(t.trim(), domFont, domSize, em(ir.tracking)); return k.ink.right - k.ink.left }))
   if (s.dominantMax && widest > s.dominantMax * W) domSize = domSize * (s.dominantMax * W) / widest
-  const dom = block({ text: s.dominant, font: domFont, size: domSize, tracking: em(ir.tracking), leading: ir.lineHeight, x, topY: y, maxWidth: W * 0.9, fill: '#ffffff', align: s.align })
+  const dom = richBlock({ text: s.dominant, fonts: { base: domFont, bold: domFont }, size: domSize, tracking: em(ir.tracking), leading: ir.lineHeight, x, topY: y, maxWidth: W * 0.9, fill: '#ffffff', align: s.align })
 
   checks.push({ id: 'dominante', box: dom.box })
+  dom.accentBoxes.forEach((b, i) => checks.push({ id: `dominante-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
 
   let selection = ''
   let selEvidence = null
@@ -354,8 +469,9 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
 
   // display posterior (cierre de la frase) si existe
   if (s.after) {
-    const ar = R.ideaShort
-    const af = block({ text: s.after, font: fontFor(ar), size: s.afterSize ?? 74, tracking: em(ar.tracking), leading: ar.lineHeight, x, topY: y + (s.afterGap ?? 34), maxWidth: W * (s.textWidth ?? 0.8), fill: '#ffffff', align: s.align })
+    const ar = R.ideaMedium
+    const af = richBlock({ text: s.after, fonts: BRIC(ar, ar.width, 800), size: s.afterSize ?? 74, tracking: em(ar.tracking), leading: ar.lineHeight, x, topY: y + (s.afterGap ?? 34), maxWidth: W * (s.textWidth ?? 0.8), fill: s.afterFill ?? '#ffffff', align: s.align })
+    af.accentBoxes.forEach((b, i) => checks.push({ id: `cierre-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
 
     body += af.svg
     checks.push({ id: 'cierre-frase', box: af.box })
@@ -369,13 +485,15 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
     const gy = s.gesture.y * H
 
     body += `<g fill="${s.gesture.color ?? ACCENT}" transform="translate(${gx} ${gy}) rotate(${s.gesture.rotate ?? -6})">${g.paths}</g>`
-    checks.push({ id: 'gesto', box: { left: gx + g.ink.left, right: gx + g.ink.right, top: gy + g.ink.top, bottom: gy + g.ink.bottom }, inkL: lum(255, 101, 0) })
+    const gc = (s.gesture.color ?? ACCENT).replace('#', '')
+    checks.push({ id: 'gesto', box: { left: gx + g.ink.left, right: gx + g.ink.right, top: gy + g.ink.top, bottom: gy + g.ink.bottom }, inkL: lum(parseInt(gc.slice(0, 2), 16), parseInt(gc.slice(2, 4), 16), parseInt(gc.slice(4, 6), 16)) })
   }
 
   // cierre inferior (sobre el piso oscuro de la escena)
   if (s.footer) {
-    const fr = R.ideaShort
-    const ft = block({ text: s.footer.text, font: fontFor(fr), size: s.footer.size, tracking: em(fr.tracking), leading: fr.lineHeight, x: W / 2, topY: s.footer.y * H, maxWidth: W * 0.84, fill: '#ffffff', align: 'center' })
+    const fr = R.ideaLead
+    const ft = richBlock({ text: s.footer.text, fonts: BRIC(fr, fr.width, 780), size: s.footer.size, tracking: em(fr.tracking), leading: fr.lineHeight, x: W / 2, topY: s.footer.y * H, maxWidth: W * 0.84, fill: C.softOnDark, accentFill: '#ffffff', align: 'center' })
+    ft.accentBoxes.forEach((b, i) => checks.push({ id: `cierre-inferior-acento-${i}`, box: b }))
 
     body += ft.svg
     checks.push({ id: 'cierre-inferior', box: ft.box })

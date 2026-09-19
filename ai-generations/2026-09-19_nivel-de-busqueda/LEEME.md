@@ -98,3 +98,22 @@ Guttery: se probó un gesto en la portada y se retiró (naranja sobre naranja, 2
 - El teléfono de Nexa recuerda el diseño de cámaras de un fabricante conocido; sin logo visible.
 - El hoodie de Nexa quedó algo más brillante que el navy `#023c70`; el emblema se lee correcto.
 - Claims AEO: criterios de práctica, sin cifras.
+
+## Pasada de jerarquía (v4, 2026-09-19)
+
+Cinco voces por lámina, con contraste de peso, color y familia (nunca dos niveles con el mismo peso y color):
+
+| Nivel | Tipografía | Color |
+|---|---|---|
+| Etiqueta | Poppins 700 mayúsculas + estrella | blanco + naranja |
+| Entrada | Bricolage ideaLead (420); nombres propios a 760 | celeste suave `#cfe4fa`, énfasis blanco |
+| Dominante | Bricolage ideaImpact 780, ancho 78 | blanco; **palabra clave en naranja Efeonce** |
+| Cierre de frase | Bricolage ideaMedium 620; remate a 800 | blanco o celeste con remate blanco |
+| Tarjeta | Poppins 400 + remate Poppins 700 | celeste suave + blanco |
+| Gesto | Guttery, 1 por pieza, ≤3 palabras | blanco |
+
+Gestos: ¿apostamos? (c01) · no se comparte (c05) · ¡por fin! (c08) · ¡a la orden! (c09) · ¿hola? (suelta).
+Acento naranja sólo donde cae sobre cielo oscurecido; donde el horizonte encendido lo apagaba (ChatGPT en c01,
+Nadie en la suelta) el énfasis pasa a peso blanco. La métrica p98 marca 1,8–2,5:1 en algunos acentos naranjas por
+luces puntuales del skyline; revisados a 390 px se leen (titulares ≥ 150 px). Compositor: `richBlock` en
+`componer-v2.mjs` (`**negrita**`, `[[acento]]`).

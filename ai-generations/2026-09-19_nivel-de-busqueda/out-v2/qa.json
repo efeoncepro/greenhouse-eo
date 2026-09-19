@@ -5,10 +5,12 @@
       "antes"
     ],
     "contraste": {
-      "etiqueta": 11.35,
-      "entrada": 10.35,
-      "dominante": 5.27,
-      "cierre-frase": 3.82,
+      "etiqueta": 14.34,
+      "entrada": 13.1,
+      "dominante": 6.93,
+      "cierre-acento-0": 1.69,
+      "cierre-frase": 4.99,
+      "gesto": 7.86,
       "logo": 9.21
     },
     "seleccion": {
@@ -28,9 +30,9 @@
           "id": "nexa",
           "labelBounds": {
             "left": 601.435,
-            "top": 246.755,
+            "top": 245.831,
             "right": 706.815,
-            "bottom": 300.254
+            "bottom": 299.33
           }
         },
         {
@@ -47,9 +49,10 @@
     ],
     "contraste": {
       "etiqueta": 15.15,
-      "entrada": 12.13,
-      "dominante": 3.22,
-      "tarjeta": 13.36
+      "entrada": 12.18,
+      "dominante": 3.26,
+      "dominante-acento-0": 2.21,
+      "tarjeta": 13.35
     },
     "seleccion": {
       "selection": {
@@ -67,19 +70,19 @@
         {
           "id": "seo",
           "labelBounds": {
-            "left": 665.332,
-            "top": 239.309,
-            "right": 753.468,
-            "bottom": 292.808
+            "left": 679.337,
+            "top": 234.277,
+            "right": 767.473,
+            "bottom": 287.776
           }
         },
         {
           "id": "contenido",
           "labelBounds": {
-            "left": 665.332,
-            "top": 759.664,
-            "right": 839.017,
-            "bottom": 813.163
+            "left": 679.337,
+            "top": 754.632,
+            "right": 853.021,
+            "bottom": 808.131
           }
         },
         {
@@ -104,9 +107,10 @@
     ],
     "contraste": {
       "etiqueta": 14.87,
-      "entrada": 14.24,
-      "dominante": 9.47,
-      "tarjeta": 10.88
+      "entrada": 14.33,
+      "dominante": 9.61,
+      "dominante-acento-0": 3.13,
+      "tarjeta": 10.9
     },
     "seleccion": {
       "selection": {
@@ -124,10 +128,10 @@
         {
           "id": "seo",
           "labelBounds": {
-            "left": 840.483,
-            "top": 260.779,
-            "right": 928.619,
-            "bottom": 314.278
+            "left": 854.487,
+            "top": 254.921,
+            "right": 942.624,
+            "bottom": 308.42
           }
         },
         {
@@ -142,10 +146,11 @@
       "la respuesta."
     ],
     "contraste": {
-      "etiqueta": 14.12,
-      "entrada": 13.35,
-      "dominante": 6.11,
-      "tarjeta": 9.72
+      "etiqueta": 17.83,
+      "entrada": 16.81,
+      "dominante": 9,
+      "dominante-acento-0": 2.47,
+      "tarjeta": 9.73
     },
     "seleccion": {
       "selection": {
@@ -163,19 +168,19 @@
         {
           "id": "contenido",
           "labelBounds": {
-            "left": 848.232,
-            "top": 259.289,
-            "right": 1021.917,
-            "bottom": 312.788
+            "left": 860.295,
+            "top": 254.081,
+            "right": 1033.98,
+            "bottom": 307.58
           }
         },
         {
           "id": "nexa",
           "labelBounds": {
-            "left": 848.232,
-            "top": 601.164,
-            "right": 953.612,
-            "bottom": 654.663
+            "left": 860.295,
+            "top": 595.956,
+            "right": 965.675,
+            "bottom": 649.455
           }
         },
         {
@@ -191,9 +196,11 @@
       "propios."
     ],
     "contraste": {
-      "etiqueta": 17.09,
-      "entrada": 16.77,
-      "dominante": 7.1,
+      "etiqueta": 18.96,
+      "entrada": 18.59,
+      "dominante": 7.77,
+      "dominante-acento-0": 1.8,
+      "gesto": 18.3,
       "tarjeta": 8.32
     },
     "seleccion": {
@@ -213,9 +220,9 @@
           "id": "data",
           "labelBounds": {
             "left": 665.233,
-            "top": 250.261,
+            "top": 247.291,
             "right": 767.03,
-            "bottom": 303.76
+            "bottom": 300.79
           }
         },
         {
@@ -231,9 +238,11 @@
     ],
     "contraste": {
       "etiqueta": 14.35,
-      "entrada": 13.68,
-      "dominante": 10.18,
-      "tarjeta": 15.79
+      "entrada": 13.74,
+      "dominante": 10.38,
+      "dominante-acento-0": 3.8,
+      "dominante-acento-1": 3.6,
+      "tarjeta": 15.78
     },
     "seleccion": {
       "selection": {
@@ -251,19 +260,19 @@
         {
           "id": "pr",
           "labelBounds": {
-            "left": 820.152,
-            "top": 260.779,
-            "right": 891.716,
-            "bottom": 314.278
+            "left": 848.161,
+            "top": 254.616,
+            "right": 919.725,
+            "bottom": 308.115
           }
         },
         {
           "id": "social",
           "labelBounds": {
-            "left": 820.152,
-            "top": 605.534,
-            "right": 937.75,
-            "bottom": 659.033
+            "left": 848.161,
+            "top": 599.371,
+            "right": 965.759,
+            "bottom": 652.869
           }
         },
         {
@@ -279,9 +288,10 @@
     ],
     "contraste": {
       "etiqueta": 16.27,
-      "entrada": 15.6,
-      "dominante": 10.83,
-      "tarjeta": 12.92
+      "entrada": 15.64,
+      "dominante": 10.94,
+      "dominante-acento-0": 3.61,
+      "tarjeta": 12.73
     },
     "seleccion": {
       "selection": {
@@ -299,10 +309,10 @@
         {
           "id": "dev",
           "labelBounds": {
-            "left": 780.053,
-            "top": 259.363,
-            "right": 868.861,
-            "bottom": 312.862
+            "left": 808.062,
+            "top": 254.921,
+            "right": 896.87,
+            "bottom": 308.42
           }
         },
         {
@@ -327,9 +337,11 @@
       "cumplida."
     ],
     "contraste": {
-      "etiqueta": 16.94,
-      "dominante": 5.65,
-      "cierre-frase": 2.78,
+      "etiqueta": 18.19,
+      "dominante": 7.69,
+      "dominante-acento-0": 2.33,
+      "cierre-frase": 3.99,
+      "gesto": 16.88,
       "logo": 5.1
     },
     "seleccion": {
@@ -370,6 +382,56 @@
     }
   },
   {
+    "id": "c09-refuerzos",
+    "dominante": [
+      "Pide refuerzos."
+    ],
+    "contraste": {
+      "etiqueta": 17.5,
+      "entrada": 16.36,
+      "dominante": 12.71,
+      "dominante-acento-0": 4.27,
+      "gesto": 3.06,
+      "cierre-inferior": 10.75
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "clawd",
+          "labelBounds": {
+            "left": 881.976,
+            "top": 267.137,
+            "right": 1003.431,
+            "bottom": 320.636
+          }
+        },
+        {
+          "id": "codex",
+          "labelBounds": {
+            "left": 881.976,
+            "top": 578.003,
+            "right": 1003.456,
+            "bottom": 631.502
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
     "id": "post-nadie-te-busca",
     "dominante": [
       "Nadie"
@@ -377,9 +439,11 @@
     "contraste": {
       "etiqueta": 7.25,
       "dominante": 5.26,
-      "cierre-frase": 4.32,
+      "dominante-acento-0": 1.78,
+      "cierre-frase": 4.29,
+      "gesto": 5.32,
       "logo": 3.7,
-      "tarjeta": 10.42
+      "tarjeta": 10.43
     },
     "seleccion": {
       "selection": {
