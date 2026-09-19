@@ -441,7 +441,7 @@ La especificación completa por región —layout desktop y mobile, contenido, I
 | R6 | Dos formas de trabajar | `greenhouse_performance_motions` |
 | R7 | Cinco frentes | `greenhouse_performance_modules` |
 | R8 | Ocho canales con estado | `greenhouse_performance_channels` |
-| R9 | Cómo empezamos | `greenhouse_performance_ladder` |
+| R9 | Servicios: cómo empezamos + servicios que se suman | `greenhouse_performance_services` |
 | R10 | Posición por tipo de proveedor | `greenhouse_comparison_table` (reuse) |
 | R11 | Reglas del juego + lo que no se promete | `greenhouse_performance_operating` |
 | R12 | Qué recibes + marcas | `greenhouse_performance_proof` + `greenhouse_social_trust` |
@@ -695,6 +695,19 @@ el motor ya soporta.
   cabezas, línea de léxico en R2, "Meta Ads: Facebook e Instagram", "Retail media y Mercado Ads", SEM en Google,
   "Marketing B2B", media buyers y traffickers, y dos preguntas nuevas (Google Ads y pauta digital); el FAQ pasa a
   catorce. La segunda fuente del Slice 1 sigue pendiente.
+
+## Delta 2026-09-19
+
+- **Pedido del owner:** la landing presenta **servicios, no precios**. R9 pasa de "Cómo empezamos" a "Servicios" y
+  muestra el catálogo completo de la [ficha](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md):
+  los cuatro pasos de entrada (con qué se lleva el cliente en cada uno) y cuatro servicios que se suman —Programmatic y
+  pantallas digitales, Anuncios en ChatGPT, Especialista dedicado y Asesoría—. Widget renombrado a
+  `greenhouse_performance_services`, anchor `#servicios`, capture `performance-services`. Wireframe, flow, copy ledger,
+  mapeo de nombres y decision log actualizados.
+- Programmatic ahora nombra explícitamente las pantallas digitales (vía pública, aeropuertos, centros comerciales) en
+  R8, R9 y FAQ 9. Sigue sin nombrar al partner ni mostrar CPM: Real Audiences y Basis están en evaluación y no hay
+  acuerdo firmado.
+- La prohibición de precios, bandas y porcentajes no cambia.
 
 ## Open Questions
 

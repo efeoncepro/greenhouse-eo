@@ -53,7 +53,7 @@ Orden de lectura y trabajo de cada región. Ninguna región existe si no cumple 
 | R6 | Dos formas de trabajar | Motion A y motion B | ¿Sirve para mi tipo de negocio? |
 | R7 | Cinco frentes | Módulos del servicio | ¿Qué hacen exactamente? |
 | R8 | Canales | Cobertura por canal con su estado | ¿Trabajan el canal que uso? |
-| R9 | Cómo empezamos | Escalera de cuatro pasos | ¿Por dónde entro? |
+| R9 | Servicios | Los nueve servicios: cuatro pasos para empezar y cuatro que se suman | ¿Qué les puedo contratar y por dónde entro? |
 | R10 | Posición | Comparación por tipo de proveedor | ¿En qué se diferencian? |
 | R11 | Reglas del juego | Compromisos + lo que no se promete | ¿Puedo confiar? |
 | R12 | Qué recibes + marcas | Entregables y confianza de empresa | ¿Esto es real? |
@@ -75,7 +75,7 @@ Orden de lectura y trabajo de cada región. Ninguna región existe si no cumple 
 | R6 Dos formas | `greenhouse_performance_motions` | `performance-motions` | `#como-trabajamos` | — |
 | R7 Cinco frentes | `greenhouse_performance_modules` | `performance-modules` | `#que-hacemos` | — |
 | R8 Canales | `greenhouse_performance_channels` | `performance-channels` | `#canales` | — |
-| R9 Cómo empezamos | `greenhouse_performance_ladder` | `performance-ladder` | `#como-empezamos` | Diagnóstico (enlace secundario) |
+| R9 Servicios | `greenhouse_performance_services` | `performance-services` | `#servicios` | Diagnóstico (enlace secundario) |
 | R10 Posición | `greenhouse_comparison_table` (reuse) | `performance-position` | `#posicion` | — |
 | R11 Reglas del juego | `greenhouse_performance_operating` | `performance-operating` | `#reglas` | — |
 | R12 Prueba | `greenhouse_performance_proof` + `greenhouse_social_trust` (reuse) | `performance-proof` | `#que-recibes` | — |
@@ -185,14 +185,27 @@ Orden de lectura y trabajo de cada región. Ninguna región existe si no cumple 
 - **Regla:** sin logos de plataformas; sin nombrar al partner programático; ChatGPT Ads lleva la fecha de vigencia
   visible y se revisa mensualmente contra el centro de ayuda de OpenAI.
 
-### R9 — Cómo empezamos
+### R9 — Servicios
 
-- **Desktop:** H2 + intro + cuatro pasos en una fila numerada unida por una línea, cada uno con nombre, una oración y la
-  duración en un chip. Enlace secundario al diagnóstico bajo el primer paso.
-- **Mobile:** pasos en lista vertical numerada.
-- **Contenido:** `ladder.title`, `ladder.intro`, `ladder.steps.{1..4}.{name,body,duration}`, `ladder.cta`.
-- **Regla:** es un `<ol>`; sin precios ni bandas. Los nombres públicos se mapean 1:1 con el catálogo (ver
-  `Mapeo de nombres públicos`).
+Delta 2026-09-19: la región deja de ser sólo la escalera y pasa a mostrar **todos los servicios que se pueden contratar**,
+sin precios. Pedido del owner: la landing vende servicios, no tarifas.
+
+- **Desktop:** H2 + intro, luego dos bloques dentro de la misma región:
+  1. **Cómo empezamos** — H3 + los cuatro pasos en una fila numerada unida por una línea, cada uno con nombre, una
+     oración, qué te llevas y la duración en un chip. Enlace secundario al diagnóstico bajo el primer paso.
+  2. **Servicios que se suman** — H3 + retícula de cuatro tarjetas de igual peso (2 × 2), cada una con icono de función,
+     H3 (nivel 4 en el HTML), una o dos oraciones y un chip de condición con icono y texto.
+- **Mobile:** pasos en lista vertical numerada; las cuatro tarjetas apiladas en una columna debajo.
+- **Contenido:** `services.title`, `services.intro`, `ladder.title`, `ladder.intro`,
+  `ladder.steps.{1..4}.{name,body,outcome,duration}`, `ladder.cta`, `services.extra.title`, `services.extra.intro`,
+  `services.extra.{programmatic,aiAds,dedicated,advisory}.{name,body,chip}`, `services.note`.
+- **Reglas:**
+  - Los pasos son un `<ol>`; las tarjetas, una `<ul>`. Nada de precios, bandas, CPM, porcentajes ni rebates.
+  - No se nombra al partner programático ni a ningún DSP; tampoco se muestran CPM de su tarifario.
+  - Los nombres públicos se mapean 1:1 con el catálogo (ver `Mapeo de nombres públicos`).
+  - Las tarjetas no llevan CTA propio: el único siguiente paso de la región es el diagnóstico.
+  - Anuncios en ChatGPT repite la vigencia de R8; si cambia la disponibilidad en Chile, se actualizan las dos regiones
+    a la vez.
 
 ### R10 — Posición
 
@@ -331,6 +344,10 @@ columna "Nombre público" para que nadie renombre servicios por su cuenta.
 | Sprint de Activación | Growth Activation Sprint |
 | Performance Gestionado | Managed Performance |
 | Incrementalidad | Incrementality & Media Investment Architecture |
+| Programmatic y pantallas digitales | Programmatic vía partner DSP |
+| Anuncios en ChatGPT | ChatGPT Ads + Preparación para anuncios en IA |
+| Especialista dedicado | Staff Augmentation |
+| Asesoría | Advisory |
 | Consumo y e-commerce | Motion A · Demand & Commerce |
 | Marketing B2B | Motion B · B2B Pipeline |
 
@@ -455,7 +472,7 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.channels.items.linkedin.name` | LinkedIn Ads |
 | `performance.landing.channels.items.linkedin.body` | Para B2B: llegar a cargos y empresas concretas, medido contra las oportunidades de tu CRM. |
 | `performance.landing.channels.items.programmatic.name` | Programmatic |
-| `performance.landing.channels.items.programmatic.body` | Display, video, audio y pantallas digitales en la vía pública, con reporte por sitio y costos declarados. |
+| `performance.landing.channels.items.programmatic.body` | Display, video y audio en sitios y apps, y pantallas digitales en la calle, aeropuertos y centros comerciales. Con reporte por sitio y por pantalla, y costos declarados. |
 | `performance.landing.channels.items.retail.name` | Retail media y Mercado Ads |
 | `performance.landing.channels.items.retail.body` | Mercado Ads y las redes de medios de las cadenas, leídas junto a tus ventas. |
 | `performance.landing.channels.items.chatgpt.name` | Anuncios en ChatGPT |
@@ -464,21 +481,42 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.channels.items.x.body` | Cuando tu audiencia conversa ahí, con verificación de brand safety. |
 | `performance.landing.channels.asOf` | Disponibilidad de canales revisada en septiembre de 2026. |
 | `performance.landing.channels.note` | Tus cuentas publicitarias, tus datos y tus audiencias quedan siempre a tu nombre. |
+| `performance.landing.services.title` | Servicios de performance marketing |
+| `performance.landing.services.intro` | Empiezas por un diagnóstico y avanzas con evidencia. Lo demás se suma cuando tu negocio lo necesita, no antes. |
 | `performance.landing.ladder.title` | Cómo empezamos |
 | `performance.landing.ladder.intro` | Cuatro pasos. Puedes entrar por el primero y decidir el siguiente con evidencia. |
 | `performance.landing.ladder.steps.1.name` | Diagnóstico de Performance |
-| `performance.landing.ladder.steps.1.body` | Revisamos tu inversión, tus cuentas, tu medición y tu creatividad. Te entregamos qué corregir primero y un plan de 90 días. |
+| `performance.landing.ladder.steps.1.body` | Revisamos tu inversión, tus cuentas, tu medición y tu creatividad. |
+| `performance.landing.ladder.steps.1.outcome` | Te llevas qué corregir primero y un plan de 90 días. |
 | `performance.landing.ladder.steps.1.duration` | 2 a 4 semanas |
 | `performance.landing.ladder.steps.2.name` | Sprint de Activación |
 | `performance.landing.ladder.steps.2.body` | Ordenamos la medición y las cuentas, y lanzamos las primeras pruebas contra una línea base. |
+| `performance.landing.ladder.steps.2.outcome` | Te llevas la señal corregida, cuentas ordenadas y la primera lectura de pruebas. |
 | `performance.landing.ladder.steps.2.duration` | 8 a 12 semanas |
 | `performance.landing.ladder.steps.3.name` | Performance Gestionado |
 | `performance.landing.ladder.steps.3.body` | Operamos tus canales cada mes y cada trimestre te recomendamos dónde poner el siguiente peso. |
+| `performance.landing.ladder.steps.3.outcome` | Te llevas un reporte mensual y una recomendación trimestral de inversión. |
 | `performance.landing.ladder.steps.3.duration` | Mensual, desde 3 meses |
 | `performance.landing.ladder.steps.4.name` | Incrementalidad |
 | `performance.landing.ladder.steps.4.body` | Pruebas controladas para saber qué resultado causó la inversión. |
+| `performance.landing.ladder.steps.4.outcome` | Te llevas una respuesta a una pregunta concreta de asignación. |
 | `performance.landing.ladder.steps.4.duration` | Cuando hay volumen |
 | `performance.landing.ladder.cta` | Pide un diagnóstico |
+| `performance.landing.services.extra.title` | Servicios que se suman |
+| `performance.landing.services.extra.intro` | Se contratan junto a la operación o por separado, según cómo trabaja tu equipo. |
+| `performance.landing.services.extra.programmatic.name` | Programmatic y pantallas digitales |
+| `performance.landing.services.extra.programmatic.body` | Display, video y audio en sitios y apps, y pantallas digitales en la calle, aeropuertos y centros comerciales, planificados junto al resto de tu pauta. Con reporte por sitio y por pantalla, y todos los costos declarados. |
+| `performance.landing.services.extra.programmatic.chip` | Con partner tecnológico |
+| `performance.landing.services.extra.aiAds.name` | Anuncios en ChatGPT |
+| `performance.landing.services.extra.aiAds.body` | Campañas en los países donde OpenAI ya los habilita. En Chile, dejamos tus landings y tu medición listas para cuando lleguen. |
+| `performance.landing.services.extra.aiAds.chip` | Donde está disponible |
+| `performance.landing.services.extra.dedicated.name` | Especialista dedicado |
+| `performance.landing.services.extra.dedicated.body` | Un especialista de performance que trabaja dentro de tu equipo y bajo tu dirección. |
+| `performance.landing.services.extra.dedicated.chip` | Tu equipo dirige |
+| `performance.landing.services.extra.advisory.name` | Asesoría |
+| `performance.landing.services.extra.advisory.body` | Tu equipo o tu agencia actual opera; nosotros revisamos, recomendamos y decidimos contigo. |
+| `performance.landing.services.extra.advisory.chip` | Tu equipo opera |
+| `performance.landing.services.note` | Cada servicio se arma según tus canales, tus mercados y cómo está tu medición. Lo definimos contigo después del diagnóstico. |
 | `performance.landing.position.title` | Qué cambia frente a otras formas de hacerlo |
 | `performance.landing.position.intro` | No se trata de cuánto sabe cada uno de Google o Meta. Se trata de qué aprende tu pauta y de quién son los datos. |
 | `performance.landing.position.caption` | Qué ofrece cada tipo de proveedor de performance marketing |
@@ -537,7 +575,7 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.faq.8.q` | ¿Trabajan LinkedIn Ads para B2B? |
 | `performance.landing.faq.8.a` | Sí. Lo conectamos con tu CRM para que la campaña aprenda de las oportunidades que ventas acepta y no de los formularios. Lo recomendamos cuando la inversión alcanza para que la plataforma aprenda. |
 | `performance.landing.faq.9.q` | ¿Compran medios programáticos? |
-| `performance.landing.faq.9.a` | Sí, a través de un partner tecnológico, con reporte por sitio, listas de exclusión de sitios de baja calidad y todos los costos declarados en tu factura. |
+| `performance.landing.faq.9.a` | Sí, a través de un partner tecnológico: display, video y audio en sitios y apps, y pantallas digitales en la vía pública. Con reporte por sitio y por pantalla, listas de exclusión de sitios de baja calidad y todos los costos declarados en tu factura. |
 | `performance.landing.faq.10.q` | ¿Hacen anuncios en ChatGPT? |
 | `performance.landing.faq.10.a` | Sí, en los países donde OpenAI ya los habilita, como México, Brasil, Estados Unidos y España. En Chile todavía no están disponibles (septiembre de 2026); mientras tanto preparamos tus landings y tu medición para cuando lleguen. |
 | `performance.landing.faq.11.q` | ¿Qué cambia con la Ley 21.719 para la publicidad digital? |
@@ -713,7 +751,7 @@ garantizados".
 - Viewports: 1536×911, 1440×1000 (desktop), 890×911 (tablet) y 390×844 (mobile).
 - Quality profile: `premium`, con `keyboard.enabled`, probes de teclado y `reducedMotionCheck`.
 - Markers: `performance-hero`, `performance-definition`, `performance-problem`, `performance-whynow`,
-  `performance-signal`, `performance-motions`, `performance-modules`, `performance-channels`, `performance-ladder`,
+  `performance-signal`, `performance-motions`, `performance-modules`, `performance-channels`, `performance-services`,
   `performance-position`, `performance-operating`, `performance-proof`, `performance-faq`, `performance-conversion`,
   `performance-disclosure`, `performance-dock`.
 - Capturas: first fold por viewport; firma en `Clics` y en `Ventas`; tabla de posición en desktop y en modo card;
@@ -738,6 +776,7 @@ garantizados".
 | Dirección A, la señal | B tablero de resultados · C muro de plataformas | Única que muestra el diferenciador sin cifras inventadas ni logos de terceros |
 | Página nueva en `/servicios/performance-marketing/` + 301 desde la legacy | Reconstruir sobre `/servicio-gestion-campanas-publicitarias/` | Alinea con la arquitectura `/servicios/*` de PDR-002; la legacy no rankea ninguna keyword del cluster, así que el riesgo de equidad es bajo. El Slice 1 puede revertir la decisión si los backlinks lo justifican |
 | Reapuntar el ítem de menú existente | Crear un ítem nuevo | Evita duplicados y conserva la posición en el menú |
+| R9 muestra los nueve servicios sin precios (2026-09-19) | Sólo la escalera de cuatro pasos · una tabla de paquetes con precios | Pedido del owner: la página vende servicios, no tarifas. La escalera queda como camino de entrada y los cuatro servicios complementarios dejan de estar escondidos en canales y FAQ. Sin precios, CPM ni nombre del partner |
 | Firma interactiva `Clics / Ventas` | Diagrama estático · animación automática | La interacción hace que el visitante vea el mecanismo; sin autoplay para no mover contenido sin intención |
 | Barras sin cifras | Porcentajes ilustrativos | Cualquier número se lee como resultado; la posición y el largo bastan |
 | Iconos de función, sin logos | Logos de plataformas | Evita leerse como badges de partner y depender de guías de marca de terceros |

@@ -132,7 +132,7 @@ R10 → R11 → R12 → R13 → R14
 | `#senal` | Firma | Envío en conversaciones comerciales |
 | `#como-trabajamos` | Dos formas de trabajar | Enlace desde la landing de HubSpot para B2B |
 | `#canales` | Canales | Enlaces desde Trade Marketing, Influencer Marketing, SEO y AEO |
-| `#como-empezamos` | Escalera | Seguimiento comercial |
+| `#servicios` | Servicios: escalera + servicios que se suman | Seguimiento comercial |
 | `#posicion` | Posición | Seguimiento comercial |
 | `#preguntas` | FAQ | Schema `FAQPage` y soporte comercial |
 | `#conversion` | Conversión | CTAs secundarios y dock |
