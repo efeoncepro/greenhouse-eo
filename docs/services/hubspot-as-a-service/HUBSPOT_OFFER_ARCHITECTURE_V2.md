@@ -18,6 +18,10 @@
 > [`Hybrid Human-Agent Transformation V1`](../revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md).
 > Agent Hub & Agentic Operations es su carril HubSpot, no un sinónimo de activar agentes aislados.
 
+> **Outcomes Era (UNBOUND 2026):** HubSpot enmarca el paso de funciones/herramientas a resultados mediante
+> contexto y acción de personas y agentes. Es narrativa del proveedor, no nombre de una oferta Efeonce ni promesa
+> de ROI. Ver [marco y fuentes](HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md#marco-de-posicionamiento-outcomes-era).
+
 ## 1. Decisión
 
 Efeonce organiza su práctica HubSpot por **resultados operativos del cliente**, no por una lista de Hubs ni por un

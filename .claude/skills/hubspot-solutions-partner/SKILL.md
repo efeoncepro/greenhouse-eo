@@ -35,6 +35,12 @@ Cuando el comprador busca rediseñar el trabajo humano-agente, cargar además
 vender un workflow con roles, autoridad y outcomes, no un roster de bots. Secuencia `Blueprint pagado → First
 Hybrid Team → transformación por áreas → Managed Agentic Operations`; no prometer precio, margen ni ROI antes de
 validar el [modelo de negocio](../../../docs/business-models/revops-crm/HYBRID_WORKFORCE_TRANSFORMATION_BUSINESS_MODEL_V1.md).
+
+En UNBOUND 2026 HubSpot llamó a este giro **«Outcomes Era»**: contexto + acción de personas y agentes para
+resultados observables. Atribuir el término a HubSpot; no es producto, oferta propia ni promesa de ROI. La
+[matriz Fall 2026](../../../docs/services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md#marco-de-posicionamiento-outcomes-era)
+conserva las fuentes y separa narrativa de disponibilidad por portal.
+
 La evaluación inicial de fit/cotización es normalmente gratuita; un blueprint se cobra solo cuando deja un
 artefacto autónomo. Customer Agent es un caso de uso, no una familia raíz. El brochure es input histórico,
 no canon: usa [`docs/services/hubspot-as-a-service/README.md`](../../../docs/services/hubspot-as-a-service/README.md) y

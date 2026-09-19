@@ -48,6 +48,8 @@ capacidades por tenant siguen sujetos a verificación.
 
 - Hacer comprensible el trabajo compartido, la autoridad humana y la unidad de compra en el primer fold.
 - Mostrar una instancia verificable o ilustrativa rotulada, con ficha de rol, handoff, excepción y resultado.
+- Traducir el marco «Outcomes Era» de HubSpot a una pregunta propia y neutral: qué resultado cambia, quién lo
+  supervisa y cómo se comprueba. No usar la expresión del proveedor como nombre de la landing ni como claim de ROI.
 - Ofrecer rutas de entrada por proceso y buyer, incluida CMO/AEO/campañas, sin RevOps obligatorio.
 - Convertir a conversación de fit con receipt real y atribución orgánica, paid, outbound y referidos.
 
@@ -81,6 +83,7 @@ y permiso específico. El copy y la conversión deben funcionar sin animación n
 - docs/context/05_voz-tono-estilo.md
 - docs/context/08_estrategia-comercial.md
 - docs/public-site/README.md
+- docs/audits/public-site/2026-09-19-efeonce-human-agent-landing-demand.md — estimado CL/es, GSC propio y límites paid.
 - docs/epics/to-do/EPIC-047-public-site-landing-portfolio-prioritization.md
 - .codex/skills/efeonce-public-site-wordpress/references/landing-workflow.md
 - .codex/skills/efeonce-public-site-wordpress/references/landing-registry.md
@@ -249,6 +252,8 @@ y permiso específico. El copy y la conversión deben funcionar sin animación n
 ### Slice 1 — Discovery y dirección
 
 - Reconfirmar rutas, estado WordPress, intent SEO/AEO y paid/outbound, prueba disponible, claims y derechos.
+- Partir del audit de demanda: probar intención/SERP exacta de automatización con IA y consultas de servicio;
+  no convertir «equipos humano-agente» en objetivo de volumen ni usar el CPC de Agentforce como forecast paid.
 - Comparar 2–3 direcciones visuales, elegir una y completar wireframe/flow/primer fold; UI ready sigue no
   hasta mapping y GVC plan completos.
 - Definir URL/canonical, copy ledger, CTA/host/recovery y medición sin PII; pedir aprobación de primer fold.

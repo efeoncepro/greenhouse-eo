@@ -2,9 +2,9 @@
 
 **DataForSEO:** ISSUE-175 recuperado; TASK-1341: smoke AIO PASS en worker (EO-GRUN-00055); falta push del guard `54610ae96` y verlo en `ops-worker-deploy`.
 
-**Transformación humano-agente (19/09):** [oferta aprobada](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md);
-serie Q4 con ruta CMO sin CRM obligatorio. TASK-1877 landing transversal y TASK-1878 entradas Home/HubSpot/AEO:
-sólo planificadas. Pendientes prueba, CTA, QA y calendario Notion. Sin publicación ni activación.
+**Humano-agente (19/09):** [oferta aprobada](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md),
+con ruta CMO sin CRM obligatorio; TASK-1877/1878 sólo planificadas. [Demanda CL/es + GSC](docs/audits/public-site/2026-09-19-efeonce-human-agent-landing-demand.md):
+rango 03 comercial, no volumen orgánico probado. Faltan prueba, CTA y QA; sin publicación ni paid.
 
 **Berel campaña 2027 (19/09):** Color del Año, hub Colores de Temporada 2027 y Raíces de la piel con V2 en revisión
 (publican juntos el 29/09; gate PASS). Pendientes: enviar mensaje a Berel (material de marca, menú, «2026»), rehacer arte

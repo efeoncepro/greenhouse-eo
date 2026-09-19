@@ -4,6 +4,20 @@
 > **Uso:** referencia operativa para discovery, diseño y propuesta; no sustituye la verificación del portal del cliente.
 > **Regla:** una fuente del proveedor prueba que la capacidad está documentada, no que el portal, el país, el plan, los créditos o el runtime del cliente sean elegibles.
 
+## Marco de posicionamiento: Outcomes Era
+
+HubSpot llamó **«Outcomes Era»** al cambio de una plataforma que ofrece herramientas a una que organiza el
+trabajo de personas y agentes para producir resultados observables. Es un **marco de la narrativa de UNBOUND
+2026**, no un nombre de producto, un estado de release ni una garantía de ROI. Sus materiales públicos de Fall
+Spotlight lo expresan como «proven by outcomes, powered by context»: Smart CRM que se actualiza, Growth Context
+y una capa de acción en marketing, ventas y servicio. Para Efeonce, la lectura comercial es evaluar el resultado
+por workflow, la calidad del contexto, el dueño humano, los límites de autonomía y la medición antes de escoger
+agentes o licencias. Esta interpretación no convierte un benchmark agregado de HubSpot en promesa para un cliente.
+
+Fuentes primarias del marco de resultados: [anuncio Fall Spotlight](https://ir.hubspot.com/news-releases/news-release-details/fall-26-spotlight-hubspot-just-made-its-most-foundational),
+[kit de partners](https://offers.hubspot.com/fall-2026-spotlight-partner-enablement-kit). La expresión exacta
+«Outcomes Era» se atribuye al discurso de UNBOUND/Analyst Day; no se usa como claim propio de Efeonce.
+
 ## Estado ejecutivo
 
 | Superficie | Estado al corte | Qué puede afirmarse | Qué sigue sin probar |

@@ -40,6 +40,12 @@ Tres criterios, en este peso:
 2. **Demanda real de búsqueda:** volumen y dificultad medidos (Semrush) en la task o su PDR.
 3. **Costo de terminar:** lo publicado o casi terminado va primero; ya costó y todavía no rinde.
 
+La [investigación DataForSEO + GSC del 2026-09-19](../../audits/public-site/2026-09-19-efeonce-human-agent-landing-demand.md)
+complementa, pero no reemplaza, este orden: Labs CL/es estima demanda de mercado; GSC registra exposición propia
+sin el mismo filtro geográfico. La categoría «equipos humano-agente» todavía no tiene volumen utilizable en esa
+muestra, de modo que su rango `03` se sostiene por el servicio probado y la utilidad comercial de la página,
+**no por SEO previsto**. CPC histórico de Labs tampoco es forecast ni aprobación de paid.
+
 Una landing publicada que **daña** (URL duplicada indexable, promesa sin prueba) sube por encima de su criterio.
 
 ## Outcome

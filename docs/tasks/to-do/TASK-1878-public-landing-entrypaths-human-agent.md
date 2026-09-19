@@ -76,6 +76,7 @@ activa tras 200/canonical/CTA live; una publicación CMS o una respuesta 2xx sin
 - docs/tasks/complete/TASK-1358-landing-agencia.md
 - docs/tasks/complete/TASK-1352-landing-hubspot-agentic-platform.md
 - docs/public-site/README.md
+- docs/audits/public-site/2026-09-19-efeonce-human-agent-landing-demand.md — exposición de inbound/AEO y medición por entrada.
 - .codex/skills/efeonce-public-site-wordpress/references/landing-workflow.md
 - .codex/skills/efeonce-public-site-wordpress/references/landing-registry.md
 - .codex/skills/efeonce-public-site-wordpress/references/landings/home-claude-design-preview.md
@@ -114,6 +115,8 @@ activa tras 200/canonical/CTA live; una publicación CMS o una respuesta 2xx sin
 
 - No hay enlace verificable a la oferta neutral; Home confunde práctica CRM con HubSpot.
 - No hay copy de transición desde AEO hacia marketing humano-agente sin desviar su CTA principal.
+- Hay exposición propia para inbound y AEO, pero casi ningún clic en la ventana auditada; el enlace nuevo se
+  evaluará por avance cualificado y no por impresiones o clics aislados. La URL inbound queda fuera de esta task.
 
 ## Modular Placement Contract
 
