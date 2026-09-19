@@ -1,0 +1,51 @@
+[
+  {
+    "id": "c08-mision-cumplida",
+    "dominante": [
+      "Misión",
+      "cumplida."
+    ],
+    "contraste": {
+      "etiqueta": 17.53,
+      "dominante": 6.64,
+      "cierre-frase": 3.43,
+      "logo": 5.1
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "nexa",
+          "labelBounds": {
+            "left": 141.148,
+            "top": 222.469,
+            "right": 246.528,
+            "bottom": 275.968
+          }
+        },
+        {
+          "id": "equipo",
+          "labelBounds": {
+            "left": 905.472,
+            "top": 222.469,
+            "right": 1046.037,
+            "bottom": 275.968
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  }
+]

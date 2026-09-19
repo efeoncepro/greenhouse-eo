@@ -1,68 +1,100 @@
-# «Nivel de búsqueda» — trendjacking GTA VI / estética Vice City (2026-09-19)
+# «Nivel de búsqueda» — trendjacking GTA VI (2026-09-19)
 
-Estado: **prueba producida y revisada por el agente**. Sin aprobación humana, sin programar, sin publicar.
+Estado: **v2 producida y revisada por el agente**. Sin aprobación humana, sin programar, sin publicar.
+Vigente: `out-v2/` (PNG 1080 × 1350). `out/` = v1 descartada por el operador («no está mal, pero no está bien»).
 
-## Oportunidad (clasificación: trendjacking; capa de seasonality por lanzamiento)
+## Por qué cambió de v1 a v2
 
-- Detonante primario: GTA VI sale el **19 de noviembre de 2026** (Rockstar Newswire). El 2026-09-19 Spotify lanzó
-  «GTAVI: The Album» con vallas de estética GTA en Nueva York, Los Ángeles y Miami (Marketing Directo, mismo día).
-- Marcas publicando con estética Vice City: **observación del operador**. El agente no pudo muestrear posts nativos
-  (IG/X/TikTok sin acceso); la única marca verificada con fuente es Spotify. Estado puntual, evolución no verificada.
-- `review_before`: revalidar el tono de la conversación justo antes de programar. Ventana estimada: desde hoy hasta
-  el lanzamiento, con un segundo pico probable el 19-nov; condición de retiro: saturación visible de marcas usando
-  el mismo código o un cambio de sentido (polémica del juego).
+- v1 usaba el Vice City **ochentero** de 2002. GTA VI es otra cosa: **Florida hiperreal de 2026 vista por un
+  teléfono**, key art de **realismo ilustrado pintado**, HUD mínimo (`brief/gta6-visual-study.md`, con fuentes).
+- v1 tenía jerarquía plana (titular + apoyo). v2 tiene cuatro niveles por lámina.
+- v1 no usaba marca en escena. v2 pone a **Nexa**, el **logo 3D monumental** y la **nave** como protagonistas.
+
+## Oportunidad (trendjacking con ventana de lanzamiento)
+
+- GTA VI sale el **19-nov-2026** (Rockstar). GTA V salió el 17-sep-2013: **13 años de espera** (dato de portada).
+- Spotify: vallas con arte de GTA VI desde el **16-sep** (NY, LA, Miami); el álbum oficial sale el **19-nov**.
+  (Corrección a v1, que decía «álbum 19-sep».)
+- Otras marcas con posts de estética GTA VI: **no documentadas** por el estudio (sólo Spotify, Netflix, ciudad de
+  Miami, Monster «Vice Guava»). El volumen de marcas es observación del operador.
+- El meme «GTA VI antes que…» **caduca el 19-nov**: la portada debe salir antes. Revalidar tono antes de programar.
 
 ## Idea
 
-- Tensión: en el juego, que toda la ciudad te busque es lo peor; en la búsqueda con IA, que nadie te encuentre es lo peor.
-- Mecanismo: **reencuadre por doble sentido**. En el GTA en español, las estrellas de persecución se llaman
-  «nivel de búsqueda». Para Efeonce «búsqueda» es su territorio AEO (foco actual PDR-019: AEO + IA).
-- Papel de marca: punto de vista + demostración de oficio (las cinco estrellas son cinco señales AEO reales).
-- Rutas descartadas: «Misión cumplida / Respeto +» (demasiado pegada a la UI de Rockstar); portada tipo collage de
-  personajes (exige imitar el arte de carátula, riesgo de IP alto).
+- Reencuadre por doble sentido: en la comunidad hispana las estrellas son el **«nivel de búsqueda»**. En el juego,
+  cinco estrellas = todos te persiguen; en la búsqueda con IA (AEO) = todos te encuentran, y ahí sí las quieres.
+- Hook: el meme de la espera («GTA VI va a llegar **antes** que tu marca a ChatGPT»).
+- Mecanismo del carrusel: cada estrella es una **misión** (lenguaje de juego) = una señal AEO real.
+- Creencia Efeonce #1 (el marketing sin sistema es caro por accidente): aparecer en la IA es arquitectura, no suerte.
+- Los cursores colaborativos cuentan al **squad** trabajando cada misión (SEO, Contenido, Data, PR, Social, Dev, Nexa).
 
-## Piezas (PNG 1080 × 1350, `out/`)
+## Sistema visual
 
-| Archivo | Rol |
+| Capa | Decisión |
 |---|---|
-| `carrusel-01-portada` | hook: «¿Cuál es tu nivel de búsqueda?», HUD con 0 estrellas |
-| `carrusel-02-el-juego` | reencuadre: 5 estrellas en el juego vs en la IA |
-| `carrusel-03…07` | una estrella por señal: entidad · respuesta primero · datos propios · menciones · rastreabilidad |
-| `carrusel-08-cierre` | «Cinco estrellas. Todos te buscan. Y te encuentran.» + pregunta |
-| `post-nadie-te-busca` | pieza suelta (Threads / IG feed): ausencia — motel vacío, 0 estrellas |
+| Plates | Realismo ilustrado pintado, luz dorada, sombras magenta, reflejos turquesa, cielo cobalto→magenta→naranja; escenas propias (bóveda, mural, club, marina). Sin personajes, logos ni UI del juego. |
+| HUD | Propio: 5 estrellas dibujadas por nosotros, blancas encendidas; **la misión actual en naranja Efeonce** con anillo; íconos genéricos de «quién te busca» (burbuja, chispa, lupa) en lugar de patrullas. |
+| Jerarquía | 1 etiqueta (Poppins 700 blanco + estrella naranja) · 2 entrada (Bricolage ideaShort) · 3 **dominante** (Bricolage ideaImpact, ancho 78 dentro del eje autorizado 75–100 = registro condensado de cartel) · 4 tarjeta de notificación (vidrio esmerilado real del propio plate, Poppins). |
+| Selección AXIS | `resolveCollaborationSelectionIntent` + `renderCollaborationSelection` sobre la tinta del dominante: colaboradores en esquinas, cursor local, y **colaboradores en movimiento** (cursores sueltos) en c02, c07 y la pieza suelta. Etiquetas a trazos. |
+| Marca en escena | c01 Nexa con hoodie Efeonce (ref. rostro + kit hoodie) · c03 logo 3D monumental en azotea art déco (kit monumental 01 + silueta; QA letra por letra OK) · c08 nave en pasada de victoria (kit nave 01 + 17; ventanas, esfera, aleta y cortes OK). |
+| Firma | SVG oficial negativo, abajo al centro en portada, cierre y pieza suelta. |
 
-Canal-hogar (PDR-020): Instagram + Threads. No despiezar a canales lentos. LinkedIn sólo si se reescribe como
-argumento profesional (documento PDF con el mismo cuerpo de 5 señales).
+Guttery: se probó un gesto en la portada y se retiró (naranja sobre naranja, 2,5:1). No se forzó en otra lámina.
+
+## Piezas (`out-v2/`)
+
+| Archivo | Lámina |
+|---|---|
+| `c01-portada` | 13 AÑOS DE ESPERA · GTA VI va a llegar **antes** que tu marca a ChatGPT. (Nexa filmando) |
+| `c02-todos-te-buscan` | EN EL JUEGO · Cinco estrellas: **todos te buscan.** + tarjeta: en la IA, lo mismo; aquí no quieres escapar |
+| `c03-quien-eres` | MISIÓN 1/5 · Que la IA sepa **quién eres.** (logo monumental) |
+| `c04-primero-la-respuesta` | MISIÓN 2/5 · Primero, **la respuesta.** |
+| `c05-datos-propios` | MISIÓN 3/5 · El botín: **datos propios.** (bóveda) |
+| `c06-hablan-de-ti` | MISIÓN 4/5 · Que la calle **hable de ti.** (mural) |
+| `c07-dejalos-entrar` | MISIÓN 5/5 · Abre la puerta **a los bots.** (robot en el club) |
+| `c08-mision-cumplida` | NIVEL DE BÚSQUEDA: MÁXIMO · **Misión cumplida.** Todos te buscan. Y te encuentran. (nave) |
+| `post-nadie-te-busca` | Pieza suelta (Threads/feed): SIN RASTRO · **Nadie** te está buscando. |
 
 ## Copy de publicación (propuesta)
 
 **Carrusel (Instagram):**
-> A dos meses del 19 de noviembre, media internet anda con la cabeza en Vice City. 🌴
-> En el juego, cinco estrellas significan que toda la ciudad te está buscando. En la búsqueda con IA significan lo
-> mismo, y ahí sí las quieres. Estas son las cinco que hacen que ChatGPT, Gemini o Perplexity te encuentren y te citen.
-> ¿Cuántas tienes hoy? Te leemos en los comentarios 👇
-> #GTA6 #AEO #MarketingDigital #InteligenciaArtificial
+> 13 años esperando GTA VI y llega el 19 de noviembre. ¿Tu marca llega antes a las respuestas de ChatGPT? 👀
+>
+> En el juego, cinco estrellas significan que toda la ciudad te busca. En la búsqueda con IA significan lo mismo,
+> pero ahí no quieres escapar: quieres que te encuentren.
+>
+> Las 5 misiones para subir tu nivel de búsqueda:
+> ★ Que la IA sepa quién eres
+> ★ Primero, la respuesta
+> ★ Datos propios
+> ★ Que la calle hable de ti
+> ★ Abre la puerta a los bots
+>
+> Aparecer en la IA no es suerte: es sistema. ¿En cuántas estrellas estás hoy? Te leemos 👇
+> #GTA6 #AEO #BúsquedaConIA #MarketingDigital
 
 **Pieza suelta (Threads):**
 > Nadie te está buscando. En el juego es la mejor noticia; en la búsqueda con IA, la peor.
-> ¿Cuándo fue la última vez que le preguntaste a ChatGPT por tu categoría y apareciste tú?
-
-Si se quiere empujar el AI Visibility Grader, va en caption/bio, nunca como botón en la imagen.
+> Pregúntale hoy a ChatGPT por tu categoría: ¿apareces?
 
 ## Producción y QA
 
-- Plates: `gpt-image-2.5-flare`, 1152 × 1440, sin texto/logos/personas (`brief/plates.json`, ≈ USD 0,20).
-- Composición determinística: `componer.mjs` + `brief/slides.json`. Bricolage (ideaShort / ideaMedium) + Poppins
-  (structureLead / structureLabel) desde `axisAdvertising`, glifos convertidos a trazos. Estrellas en
-  `accentSurface` (#ff6500). HUD dibujado por nosotros: no usa la UI, tipografía (Pricedown) ni marcas de Rockstar.
-- Contraste medido bajo la tinta (p98 del fondo, `out/qa.json`): láminas 2–7 ≥ 15:1; cierre 18:1 / 6,4:1;
-  portada titular 3,7:1 y pieza suelta apoyo 4,2:1 (texto grande ≥ 3:1). Logo: negativo salvo la pieza suelta,
-  que usa color porque cae sobre la piscina clara (5:1).
-- Revisado a 390 px (`out/preview-390/`, `nivel-de-busqueda-hoja-de-revision.png`).
+- Motor: **GPT Image 2.5** vía `pnpm ai:image` (OpenAI directo). Flare para escenas sin marca; **Sunburst** con
+  referencias para Nexa, logo y nave. Prompts: `brief/style.txt`, `brief/plates-v2*.json`, logs `brief/*.log`.
+  Rechazos: `s2` bloqueado por moderación con la primera redacción; cover v1 (composición), s3 v1/v2 (logo cortado /
+  sin cielo), s5/s6/s8 v1 (cielo claro bajo el titular). Costo aproximado ≈ USD 2.
+- Composición: `componer-v2.mjs` + `brief/slides-v2.json`; todo texto a trazos desde las fuentes oficiales.
+- Contraste medido bajo la tinta (p98 del fondo, `out-v2/qa.json`): etiquetas ≥ 7:1; tarjetas ≥ 8:1; dominantes
+  ≥ 3,2:1 (texto grande); frase final del cierre 3,4:1; logos ≥ 3,7:1. Oscurecimientos graduales sólo en c01, c02 y
+  c08 (arriba) y c08 (abajo), declarados por lámina.
+- Revisado a 390 px (`out-v2/preview-390/`, `nivel-de-busqueda-v2-hoja-de-revision.png`).
 
 ## Riesgos abiertos
 
-- **IP:** «GTA», «Vice City» y «Rockstar» no aparecen en las piezas; sólo en el caption como referencia editorial.
-  No pautar este contenido sin revisión legal (Take-Two es activo en defensa de marca).
-- El convertible del plate recuerda a un clásico europeo reconocible; sin logos ni placas legibles.
-- Claims AEO: son criterios de práctica, no cifras. Nada de % inventados.
+- **IP:** «GTA VI» aparece en el texto de la portada como referencia nominativa del meme; no se usa el logo, la
+  fuente Pricedown, el degradado del «VI», personajes, «Vice City» ni «Leonida». **No pautar** sin revisión legal
+  (`legal-privacy-ip-operator`); Take-Two defiende activamente sus marcas.
+- «ChatGPT» se nombra como referencia nominativa; sin logos de motores de IA (íconos genéricos).
+- El teléfono de Nexa recuerda el diseño de cámaras de un fabricante conocido; sin logo visible.
+- El hoodie de Nexa quedó algo más brillante que el navy `#023c70`; el emblema se lee correcto.
+- Claims AEO: criterios de práctica, sin cifras.

@@ -1,0 +1,392 @@
+[
+ {
+  "id": "c01-portada",
+  "plate": "cover-nexa-v2.png",
+  "align": "left",
+  "top": 0.165,
+  "hud": {
+   "lit": 0
+  },
+  "label": "13 AÑOS DE ESPERA",
+  "lead": "GTA VI va a llegar",
+  "leadSize": 66,
+  "textWidth": 0.62,
+  "dominant": "antes",
+  "dominantSize": 250,
+  "dominantMax": 0.5,
+  "after": "que tu marca|a ChatGPT.",
+  "afterSize": 66,
+  "afterGap": 30,
+  "selection": {
+   "cursors": [
+    {
+     "id": "nexa",
+     "label": "Nexa",
+     "who": "person",
+     "anchor": "top-end",
+     "color": "#d6246e"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "end-center"
+    }
+   ]
+  },
+  "logo": {
+   "width": 210,
+   "variant": "negative"
+  },
+  "scrimTop": {
+   "to": 0.52,
+   "opacity": 0.55
+  }
+ },
+ {
+  "id": "c02-todos-te-buscan",
+  "plate": "s2-todos-te-buscan.png",
+  "align": "left",
+  "top": 0.165,
+  "hud": {
+   "lit": 5
+  },
+  "label": "EN EL JUEGO",
+  "lead": "Cinco estrellas:",
+  "dominant": "todos te|buscan.",
+  "dominantSize": 200,
+  "dominantMax": 0.56,
+  "selection": {
+   "cursors": [
+    {
+     "id": "seo",
+     "label": "SEO",
+     "anchor": "top-end",
+     "color": "#12afa2"
+    },
+    {
+     "id": "contenido",
+     "label": "Contenido",
+     "anchor": "bottom-end",
+     "color": "#ff6500"
+    },
+    {
+     "id": "paid",
+     "label": "Paid",
+     "state": "moving",
+     "region": "center-end",
+     "color": "#5d50ff"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "bottom-start"
+    }
+   ]
+  },
+  "card": {
+   "header": "En la búsqueda con IA",
+   "body": "Significa exactamente lo mismo. Solo que aquí no quieres escapar.",
+   "bottom": 0.935,
+   "width": 0.66
+  },
+  "scrimTop": {
+   "to": 0.62,
+   "opacity": 0.9
+  }
+ },
+ {
+  "id": "c03-quien-eres",
+  "plate": "s3-quien-eres-v3.png",
+  "align": "left",
+  "top": 0.165,
+  "hud": {
+   "lit": 1,
+   "current": 1
+  },
+  "label": "MISIÓN 1 / 5",
+  "lead": "Que la IA sepa",
+  "dominant": "quién eres.",
+  "dominantSize": 200,
+  "dominantMax": 0.6,
+  "selection": {
+   "cursors": [
+    {
+     "id": "seo",
+     "label": "SEO",
+     "anchor": "top-end",
+     "color": "#12afa2"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "bottom-end"
+    }
+   ]
+  },
+  "card": {
+   "header": "Tu entidad en la IA",
+   "body": "Tu nombre, lo que haces y dónde lo haces dicen lo mismo en tu web, tus perfiles y los directorios. Si no, la IA no sabe a quién recomendar.",
+   "bottom": 0.955,
+   "width": 0.8
+  }
+ },
+ {
+  "id": "c04-primero-la-respuesta",
+  "plate": "s4-respuesta.png",
+  "align": "left",
+  "top": 0.165,
+  "hud": {
+   "lit": 2,
+   "current": 2
+  },
+  "label": "MISIÓN 2 / 5",
+  "lead": "Primero,",
+  "dominant": "la respuesta.",
+  "dominantSize": 200,
+  "dominantMax": 0.6,
+  "selection": {
+   "cursors": [
+    {
+     "id": "contenido",
+     "label": "Contenido",
+     "anchor": "top-end",
+     "color": "#ff6500"
+    },
+    {
+     "id": "nexa",
+     "label": "Nexa",
+     "who": "person",
+     "anchor": "bottom-end",
+     "color": "#d6246e",
+     "action": "resize"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "bottom-start"
+    }
+   ]
+  },
+  "card": {
+   "header": "Respuesta de IA · ahora",
+   "body": "La primera frase de cada página contesta la pregunta. La IA cita respuestas, no introducciones.",
+   "bottom": 0.935,
+   "width": 0.62
+  }
+ },
+ {
+  "id": "c05-datos-propios",
+  "plate": "s5-datos-propios-v2.png",
+  "align": "left",
+  "top": 0.165,
+  "hud": {
+   "lit": 3,
+   "current": 3
+  },
+  "label": "MISIÓN 3 / 5",
+  "lead": "El botín:",
+  "dominant": "datos|propios.",
+  "dominantSize": 200,
+  "dominantMax": 0.52,
+  "selection": {
+   "cursors": [
+    {
+     "id": "data",
+     "label": "Data",
+     "anchor": "top-end",
+     "color": "#5d50ff"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "bottom-end"
+    }
+   ]
+  },
+  "card": {
+   "header": "Por qué te citan",
+   "body": "Cifras, casos y estudios con fuente. Lo que solo tú puedes decir es lo que la IA tiene que citarte para decirlo.",
+   "bottom": 0.935,
+   "width": 0.7
+  }
+ },
+ {
+  "id": "c06-hablan-de-ti",
+  "plate": "s6-hablan-de-ti-v2.png",
+  "align": "left",
+  "top": 0.165,
+  "hud": {
+   "lit": 4,
+   "current": 4
+  },
+  "label": "MISIÓN 4 / 5",
+  "lead": "Que la calle",
+  "dominant": "hable de ti.",
+  "dominantSize": 200,
+  "dominantMax": 0.6,
+  "selection": {
+   "cursors": [
+    {
+     "id": "pr",
+     "label": "PR",
+     "anchor": "top-end",
+     "color": "#12afa2"
+    },
+    {
+     "id": "social",
+     "label": "Social",
+     "anchor": "bottom-end",
+     "color": "#d6246e"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "bottom-start"
+    }
+   ]
+  },
+  "card": {
+   "header": "Menciones · esta semana",
+   "body": "Medios, reseñas y comunidades. La IA confía más en lo que dicen de ti que en lo que dices tú.",
+   "bottom": 0.935,
+   "width": 0.66
+  }
+ },
+ {
+  "id": "c07-dejalos-entrar",
+  "plate": "s7-dejalos-entrar.png",
+  "align": "left",
+  "top": 0.165,
+  "hud": {
+   "lit": 5,
+   "current": 5
+  },
+  "label": "MISIÓN 5 / 5",
+  "lead": "Abre la puerta",
+  "dominant": "a los bots.",
+  "dominantSize": 200,
+  "dominantMax": 0.6,
+  "selection": {
+   "cursors": [
+    {
+     "id": "dev",
+     "label": "Dev",
+     "anchor": "top-end",
+     "color": "#0375db"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "bottom-end"
+    },
+    {
+     "id": "nexa",
+     "label": "Nexa",
+     "who": "person",
+     "state": "moving",
+     "region": "center-end",
+     "color": "#d6246e"
+    }
+   ]
+  },
+  "card": {
+   "header": "Rastreador de IA · acceso",
+   "body": "Si tu sitio bloquea a los rastreadores de IA o no se deja leer, no existes para ellos.",
+   "bottom": 0.935,
+   "width": 0.62
+  }
+ },
+ {
+  "id": "c08-mision-cumplida",
+  "plate": "s8-mision-cumplida-v2.png",
+  "align": "center",
+  "top": 0.205,
+  "hud": {
+   "lit": 5
+  },
+  "label": "NIVEL DE BÚSQUEDA: MÁXIMO",
+  "dominant": "Misión|cumplida.",
+  "dominantSize": 190,
+  "dominantMax": 0.44,
+  "after": "Todos te buscan. Y te encuentran.",
+  "afterSize": 50,
+  "afterGap": 34,
+  "selection": {
+   "cursors": [
+    {
+     "id": "nexa",
+     "label": "Nexa",
+     "who": "person",
+     "anchor": "top-start",
+     "color": "#d6246e"
+    },
+    {
+     "id": "equipo",
+     "label": "Efeonce",
+     "anchor": "top-end",
+     "color": "#ff6500"
+    },
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "end-center"
+    }
+   ]
+  },
+  "logo": {
+   "width": 230,
+   "variant": "negative"
+  },
+  "scrimTop": {
+   "to": 0.66,
+   "opacity": 0.85
+  },
+  "textWidth": 0.84,
+  "scrimBottom": {
+   "from": 0.8,
+   "opacity": 0.7
+  }
+ },
+ {
+  "id": "post-nadie-te-busca",
+  "plate": "hero-nadie.png",
+  "align": "left",
+  "top": 0.15,
+  "hud": {
+   "lit": 0
+  },
+  "label": "SIN RASTRO",
+  "dominant": "Nadie",
+  "dominantSize": 260,
+  "dominantMax": 0.5,
+  "after": "te está buscando.",
+  "afterSize": 82,
+  "afterGap": 24,
+  "selection": {
+   "cursors": [
+    {
+     "id": "yo",
+     "kind": "local",
+     "anchor": "end-center"
+    },
+    {
+     "id": "ia",
+     "label": "IA",
+     "state": "moving",
+     "region": "center-end",
+     "color": "#5d50ff"
+    }
+   ]
+  },
+  "card": {
+   "header": "Búsqueda con IA",
+   "body": "En el juego, es la mejor noticia. En la búsqueda con IA, la peor.",
+   "bottom": 0.8,
+   "width": 0.62
+  },
+  "logo": {
+   "width": 220,
+   "variant": "negative"
+  }
+ }
+]

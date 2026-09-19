@@ -1,0 +1,412 @@
+[
+  {
+    "id": "c01-portada",
+    "dominante": [
+      "antes"
+    ],
+    "contraste": {
+      "etiqueta": 11.35,
+      "entrada": 10.35,
+      "dominante": 5.27,
+      "cierre-frase": 3.82,
+      "logo": 9.21
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "nexa",
+          "labelBounds": {
+            "left": 601.435,
+            "top": 246.755,
+            "right": 706.815,
+            "bottom": 300.254
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c02-todos-te-buscan",
+    "dominante": [
+      "todos te",
+      "buscan."
+    ],
+    "contraste": {
+      "etiqueta": 15.15,
+      "entrada": 12.13,
+      "dominante": 3.22,
+      "tarjeta": 13.36
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "seo",
+          "labelBounds": {
+            "left": 665.332,
+            "top": 239.309,
+            "right": 753.468,
+            "bottom": 292.808
+          }
+        },
+        {
+          "id": "contenido",
+          "labelBounds": {
+            "left": 665.332,
+            "top": 759.664,
+            "right": 839.017,
+            "bottom": 813.163
+          }
+        },
+        {
+          "id": "paid",
+          "labelBounds": {
+            "left": 1006.848,
+            "top": 782.208,
+            "right": 1103.32,
+            "bottom": 835.707
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c03-quien-eres",
+    "dominante": [
+      "quién eres."
+    ],
+    "contraste": {
+      "etiqueta": 14.87,
+      "entrada": 14.24,
+      "dominante": 9.47,
+      "tarjeta": 10.88
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "seo",
+          "labelBounds": {
+            "left": 840.483,
+            "top": 260.779,
+            "right": 928.619,
+            "bottom": 314.278
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c04-primero-la-respuesta",
+    "dominante": [
+      "la respuesta."
+    ],
+    "contraste": {
+      "etiqueta": 14.12,
+      "entrada": 13.35,
+      "dominante": 6.11,
+      "tarjeta": 9.72
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "contenido",
+          "labelBounds": {
+            "left": 848.232,
+            "top": 259.289,
+            "right": 1021.917,
+            "bottom": 312.788
+          }
+        },
+        {
+          "id": "nexa",
+          "labelBounds": {
+            "left": 848.232,
+            "top": 601.164,
+            "right": 953.612,
+            "bottom": 654.663
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c05-datos-propios",
+    "dominante": [
+      "datos",
+      "propios."
+    ],
+    "contraste": {
+      "etiqueta": 17.09,
+      "entrada": 16.77,
+      "dominante": 7.1,
+      "tarjeta": 8.32
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "data",
+          "labelBounds": {
+            "left": 665.233,
+            "top": 250.261,
+            "right": 767.03,
+            "bottom": 303.76
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c06-hablan-de-ti",
+    "dominante": [
+      "hable de ti."
+    ],
+    "contraste": {
+      "etiqueta": 14.35,
+      "entrada": 13.68,
+      "dominante": 10.18,
+      "tarjeta": 15.79
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "pr",
+          "labelBounds": {
+            "left": 820.152,
+            "top": 260.779,
+            "right": 891.716,
+            "bottom": 314.278
+          }
+        },
+        {
+          "id": "social",
+          "labelBounds": {
+            "left": 820.152,
+            "top": 605.534,
+            "right": 937.75,
+            "bottom": 659.033
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c07-dejalos-entrar",
+    "dominante": [
+      "a los bots."
+    ],
+    "contraste": {
+      "etiqueta": 16.27,
+      "entrada": 15.6,
+      "dominante": 10.83,
+      "tarjeta": 12.92
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "dev",
+          "labelBounds": {
+            "left": 780.053,
+            "top": 259.363,
+            "right": 868.861,
+            "bottom": 312.862
+          }
+        },
+        {
+          "id": "yo"
+        },
+        {
+          "id": "nexa",
+          "labelBounds": {
+            "left": 1006.848,
+            "top": 782.208,
+            "right": 1112.228,
+            "bottom": 835.707
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "c08-mision-cumplida",
+    "dominante": [
+      "Misión",
+      "cumplida."
+    ],
+    "contraste": {
+      "etiqueta": 16.94,
+      "dominante": 5.65,
+      "cierre-frase": 2.78,
+      "logo": 5.1
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "nexa",
+          "labelBounds": {
+            "left": 141.148,
+            "top": 222.469,
+            "right": 246.528,
+            "bottom": 275.968
+          }
+        },
+        {
+          "id": "equipo",
+          "labelBounds": {
+            "left": 905.472,
+            "top": 222.469,
+            "right": 1046.037,
+            "bottom": 275.968
+          }
+        },
+        {
+          "id": "yo"
+        }
+      ]
+    }
+  },
+  {
+    "id": "post-nadie-te-busca",
+    "dominante": [
+      "Nadie"
+    ],
+    "contraste": {
+      "etiqueta": 7.25,
+      "dominante": 5.26,
+      "cierre-frase": 4.32,
+      "logo": 3.7,
+      "tarjeta": 10.42
+    },
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "yo"
+        },
+        {
+          "id": "ia",
+          "labelBounds": {
+            "left": 1006.848,
+            "top": 782.208,
+            "right": 1072.341,
+            "bottom": 835.707
+          }
+        }
+      ]
+    }
+  }
+]
