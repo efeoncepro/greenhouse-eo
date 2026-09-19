@@ -52,7 +52,8 @@ prueba de reconocimiento descrita en los pendientes del documento maestro.
 
 ## Delta 2026-09-19 (tarde)
 
-- [Espacio para texto y formatos nativos](EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md): zona de titular planificada con tono declarado y límite de cabezas; 4:5, 9:16 y 16:9 nativos; compositor `titular.mjs` con autoajuste.
+- [**Reserva de espacio en la toma**](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — **aprobado (capa fotográfica)**: las cuatro reservas (texto, objeto para enmarcar, lecho de firma, aire para cursores), tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.
+- [Espacio para texto y formatos nativos](EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md) — bitácora de la ronda: zona de titular con tono declarado y límite de cabezas; 4:5, 9:16 y 16:9 nativos. **Su capa de composición no está aprobada** (ver estado abajo).
 
 > **Estado 2026-09-19:** aprobado el **lenguaje fotográfico** (maestro, firma, colorimetría, cámaras, personas,
 > prompts/pipeline). **NO aprobada** la capa de composición gráfica sobre la foto: las pruebas de

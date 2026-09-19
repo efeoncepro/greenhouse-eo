@@ -18,6 +18,10 @@ probó la reserva de espacio para titular y los formatos **nativos** 4:5, 9:16 y
 > Lo que SÍ vale de estas secciones son **las reglas y las prohibiciones** (§2, §3, §10, §11, §12, §13), porque
 > vienen del operador y del canon publicitario. El trabajo de capa gráfica se rehace en una sesión nueva, con
 > brief, ficha tipográfica y el compositor de «Nivel de búsqueda» como referencia de oficio.
+>
+> **Las reglas que sí sobreviven se extrajeron a un documento propio del lado fotográfico:**
+> [reserva de espacio en la toma](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md). Úsalo para planear el plate;
+> este documento queda como bitácora de la ronda y de lo que se rechazó.
 
 ## 1. Resultado (pruebas NO aprobadas; sólo evidencia de medición)
 

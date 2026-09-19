@@ -193,7 +193,8 @@ todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `
 - La zona del titular se pide en la toma con **tono declarado** («DEEP warm shadow… for white text» / «VERY LIGHT warm-white wall… for dark text») y **límite de cabezas** (verticales: bajo 36% del alto; 16:9: gente dentro del 55% derecho).
 - Zonas: 4:5 tercio superior; 9:16 franja 11–31% (firma a 0,875); 16:9 costado izquierdo 42%. Firma al 15% del lado corto.
 - Compositor `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/titular.mjs` (Bricolage `ideaImpact` a trazos, color por contraste, autoajuste de zona ≥4,5:1).
-- Detalle: [espacio para texto y formatos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).
+- **Canon operativo (aprobado, capa fotográfica):** [reserva de espacio en la toma](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — las cuatro reservas, tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.
+- Bitácora de la ronda (composición **no aprobada**): [zonas de composición y formatos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).
 
 ## La capa de composición no es sólo texto
 
@@ -202,8 +203,9 @@ Una pieza puede llevar etiqueta (Poppins `structureLabel`), entrada/dominante/ci
 **caja de selección AXIS** (`eight-handles` · `four-corners` · `open-brackets`), **cursor solo** (un cursor, sin cursor
 local) o **cursores multiplayer**, y la firma. Reservar en la toma: zona de texto con tono, objeto aislado para
 enmarcar, zona pareja para HUD y para el gesto. Compositor: `scripts/composicion.mjs` (contraste por capa, autoajuste,
-falla con glifos inexistentes como «→» y con gesto bajo 4,5:1). Detalle:
-[zonas de composición y formatos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).
+falla con glifos inexistentes como «→» y con gesto bajo 4,5:1). **Lo que la foto debe reservar** para todo esto está
+en [reserva de espacio en la toma](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md);
+**cómo se compone encima NO está aprobado** y su canon es `efeonce-advertising-creative` (brief + ficha tipográfica + gate).
 
 **Compositor canónico:** `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/componer-foto.mjs`, adaptación
 declarada del compositor del carrusel GTA VI (`2026-09-19_nivel-de-busqueda/componer-v2.mjs`): misma gramática de voces,
