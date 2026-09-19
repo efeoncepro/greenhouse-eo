@@ -1,6 +1,6 @@
 # Handoff activo
 
-**DataForSEO:** ISSUE-175 recuperado; TASK-1341: smoke AIO PASS en worker (EO-GRUN-00055); falta push del guard `54610ae96` y verlo en `ops-worker-deploy`.
+**DataForSEO:** ISSUE-175 y TASK-1341 cerrados (guard en `ops-worker-deploy`, revisión 00699, smoke AIO PASS).
 
 **Humano-agente (19/09):** [oferta aprobada](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md),
 con ruta CMO sin CRM obligatorio; TASK-1877/1878 sólo planificadas. [Demanda CL/es + GSC](docs/audits/public-site/2026-09-19-efeonce-human-agent-landing-demand.md):

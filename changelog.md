@@ -12,8 +12,9 @@
 Restaurado el login ausente del worker compartido sin cambiar imagen ni otras env vars. Canary real
 por scheduler: 10 candidatos, USD 0.0132, gasto reconciliado. TASK-1341 añade localmente guard de
 configuración antes de build y readback de revisiones con tráfico, incluso si CI salta el deploy;
-discovery distingue configuración ausente y no cuenta requests que no salieron. Hardening en develop, sin
-push/despliegue de código; smoke AIO del alcance original pendiente.
+discovery distingue configuración ausente y no cuenta requests que no salieron. Cierre: guard y check
+post-deploy corrieron en `ops-worker-deploy` (revisión `ops-worker-00699-6rf`) y el smoke AIO drenado por el
+worker dio 6/6 `succeeded` (EO-GRUN-00055, USD 0,024). TASK-1341 complete.
 
 ## 2026-09-19 — Oferta transversal de transformación humano-agente
 

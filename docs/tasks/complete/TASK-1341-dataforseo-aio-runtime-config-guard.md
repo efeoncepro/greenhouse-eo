@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `code complete, rollout pendiente — ISSUE-175 recuperado; smoke AIO drenado por worker PASS (2026-09-19); falta sólo empujar el guard a develop y verlo correr en el pipeline`
+- Status real: `complete 2026-09-19 — guard y verificación post-deploy corriendo en ops-worker-deploy; smoke AIO PASS en worker`
 - Rank: `TBD`
 - Domain: `growth|ai|integrations|ops|reliability`
 - Blocked by: `none`
@@ -296,7 +296,7 @@ order by created_at desc;
 
 ## Acceptance Criteria
 
-- [ ] `ops-worker` no puede desplegar con `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=true` y DataForSEO login/password ref ausentes sin fallar loud. — Sin tildar: el guard está probado localmente (el deploy real sin login falla antes de Cloud Build), pero el commit `54610ae96` no está en `origin/develop`; falta push autorizado y ver el workflow `ops-worker-deploy` ejecutarlo.
+- [x] `ops-worker` no puede desplegar con `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=true` y DataForSEO login/password ref ausentes sin fallar loud. — Guard probado localmente (deploy sin login falla antes de Cloud Build) y en pipeline: run `35455283900` (commit `7e63a99`) registró «DataForSEO deploy configuration verified» antes del build y «serving configuration verified: ops-worker-00699-6rf» después; CI del commit en `success`.
 - [x] La revision viva de Cloud Run `ops-worker` muestra los env names DataForSEO esperados cuando AIO esta ON.
 - [x] Smoke real low-volume de `google_ai_overview` drenado por worker crea observations sin `error_code='missing_secret'`. — Run `grun-61619c42-9d77-4f71-a9f7-b546e815544c` (EO-GRUN-00055), 6/6 `succeeded`, `status_code=20000`, USD 0,024; PG confirma 0 `missing_secret` desde 2026-07-05.
 - [x] `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` y `docs/manual-de-uso/growth/ai-visibility-grader-smoke.md` quedan sincronizados con la verdad worker-vs-Vercel.
@@ -313,13 +313,13 @@ order by created_at desc;
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre TASK-1265, TASK-1327 y el ledger de flags
-- [ ] evidencia runtime del worker + PG quedo pegada en `Handoff.md` o en el Delta de la task
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre TASK-1265, TASK-1327 y el ledger de flags
+- [x] evidencia runtime del worker + PG quedo pegada en `Handoff.md` o en el Delta de la task
 
 ## Follow-ups
 
@@ -379,4 +379,5 @@ AC guard: implementado/probado en develop, casilla abierta hasta integrar códig
 - Run: `pnpm staging:request POST /api/admin/growth/ai-visibility/runs` con `mode=light`, `runKind=smoke`, `onlyProviders:["google_ai_overview"]`, `idempotencyKey=task-1341-aio-smoke-2026-09-19` → HTTP 202, encolado; el worker lo tomó a las 16:25:05Z y terminó `succeeded` a las 16:26:03Z.
 - Resultado: 6/6 observaciones `google_ai_overview` `succeeded`, `usage.dataforseo_status_code=20000`, endpoint `/v3/serp/google/ai_mode/live/advanced`, USD 0,004 cada una (USD 0,024 total, techo 0,50), citas 5/4/2/4/6/4.
 - PG read-only: en las últimas 2 h sólo hay esas 6 filas (`succeeded`, `error_code` nulo). Histórico de `missing_secret` para el provider: 12 filas, la última el 2026-07-05; ninguna después.
-- Queda abierto sólo el AC del guard: requiere push a `develop` y una corrida del workflow que lo ejecute. No se hizo push en esta sesión.
+- Guard en pipeline (push autorizado por el operador): workflow `Ops Worker Deploy` run `35455283900` en `success`; el guard previo al build y el check post-deploy verificaron `ops-worker-00699-6rf` (100 % del tráfico) sin llamar al proveedor. El resto de workflows del commit, incluido CI, en `success`.
+- Impacto cruzado: TASK-1265 y TASK-1652 (complete) sin cambios de estado; TASK-1327 se beneficia (nuevos runs ya no quedan `partial` por config); ledger de flags ya sincronizado en `54610ae96`.

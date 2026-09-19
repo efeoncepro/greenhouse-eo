@@ -44,6 +44,6 @@ resolved â€” incidente recuperado; hardening versionado en TASK-1341; integraciÃ
 
 ## Relacionado
 
-- [TASK-1341](../../tasks/in-progress/TASK-1341-dataforseo-aio-runtime-config-guard.md)
+- [TASK-1341](../../tasks/complete/TASK-1341-dataforseo-aio-runtime-config-guard.md)
 - `src/lib/ai/dataforseo.ts`, `src/lib/growth/seo/keyword-discovery/runner.ts`
 - `services/ops-worker/deploy.sh`, `.github/workflows/ops-worker-deploy.yml`
