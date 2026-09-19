@@ -195,9 +195,11 @@ operación mensual (R9), nunca suelta y nunca con precio por plataforma.
   - Sin logos de plataformas; sin precios, CPM, mínimos ni porcentajes.
   - Owner 2026-09-19: la página no dice cómo operamos cada plataforma (directo, con partner, bajo pedido) ni menciona
     partners en ninguna región. Esa información es interna y vive en la ficha. Las condiciones que el cliente sí
-    necesita saber van dentro del texto de la tarjeta: país disponible (ChatGPT, Amazon) o requisito (video nativo en
+    necesita saber van dentro del texto de la tarjeta: país disponible (Amazon) o requisito (video nativo en
     TikTok).
-  - ChatGPT Ads y Amazon Ads llevan la disponibilidad por país en el texto; la fecha de vigencia se revisa mensualmente.
+  - Amazon Ads lleva su país (México) en el texto; la fecha de vigencia se revisa mensualmente.
+  - Owner 2026-09-19: Anuncios en ChatGPT se presenta como servicio sin aclarar que aún no está disponible en Chile. La
+    disponibilidad por país es información de preventa y se aclara en el diagnóstico, no en la página.
   - Una plataforma nueva entra a esta región sólo si tiene estado `core`, `selectivo`, `vía partner` o `bajo pedido` en
     la ficha de servicio. Pinterest, Snap, Reddit y CTV no entran hasta que la ficha los habilite.
 
@@ -500,9 +502,10 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.channels.items.microsoft.tasks.1` | Campañas de búsqueda importadas desde Google y ajustadas a Bing |
 | `performance.landing.channels.items.microsoft.tasks.2` | Presupuesto y palabras clave propios cuando la búsqueda en Bing rinde distinto |
 | `performance.landing.channels.items.chatgpt.name` | Anuncios en ChatGPT |
-| `performance.landing.channels.items.chatgpt.body` | Anuncios bajo las respuestas de ChatGPT, en los países donde OpenAI ya los habilita, como México, Brasil, Estados Unidos y España. |
-| `performance.landing.channels.items.chatgpt.tasks.1` | Campañas donde el formato está disponible |
-| `performance.landing.channels.items.chatgpt.tasks.2` | En Chile, landings y medición listas para cuando lleguen |
+| `performance.landing.channels.items.chatgpt.body` | Anuncios bajo las respuestas de ChatGPT, para estar presente cuando tu cliente le pregunta a la IA qué comprar. |
+| `performance.landing.channels.items.chatgpt.tasks.1` | Campañas en ChatGPT Ads |
+| `performance.landing.channels.items.chatgpt.tasks.2` | Landings y medición preparadas para el tráfico que llega desde la IA |
+| `performance.landing.channels.items.chatgpt.tasks.3` | Lectura junto al resto de tu pauta |
 | `performance.landing.channels.items.programmatic.name` | Programmatic y pantallas digitales |
 | `performance.landing.channels.items.programmatic.body` | Display, video y audio en sitios y apps, y pantallas digitales en la calle, aeropuertos y centros comerciales, en un solo plan con tu pauta. |
 | `performance.landing.channels.items.programmatic.tasks.1` | Planificación de audiencias, sitios y pantallas por ciudad |
@@ -612,7 +615,7 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.faq.9.q` | ¿Compran medios programáticos? |
 | `performance.landing.faq.9.a` | Sí: display, video y audio en sitios y apps, y pantallas digitales en la calle, aeropuertos y centros comerciales. Con reporte por sitio y por pantalla, listas de exclusión de sitios de baja calidad y todos los costos declarados en tu factura. |
 | `performance.landing.faq.10.q` | ¿Hacen anuncios en ChatGPT? |
-| `performance.landing.faq.10.a` | Sí, en los países donde OpenAI ya los habilita, como México, Brasil, Estados Unidos y España. En Chile todavía no están disponibles (septiembre de 2026); mientras tanto preparamos tus landings y tu medición para cuando lleguen. |
+| `performance.landing.faq.10.a` | Sí. Operamos campañas en ChatGPT Ads y preparamos tus landings y tu medición para el tráfico que llega desde la IA, leídas junto al resto de tu pauta. |
 | `performance.landing.faq.11.q` | ¿Qué cambia con la Ley 21.719 para la publicidad digital? |
 | `performance.landing.faq.11.a` | Desde el 1 de diciembre de 2026, enviar datos de clientes a una plataforma publicitaria, por ejemplo para crear audiencias o registrar conversiones, requiere una base legal documentada. En el diagnóstico identificamos esos flujos para que tu equipo legal los revise. No es asesoría legal. |
 | `performance.landing.faq.12.q` | ¿Garantizan resultados? |

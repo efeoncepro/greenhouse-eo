@@ -542,7 +542,7 @@ CRM ni contexto. El control de la firma no emite eventos en V1.
 | La legacy sigue mostrando contadores en cero y claims no verificados hasta la promoción | Contenido / legal | high | Riesgo aceptado por el owner (2026-09-11); desaparece con el 301 del Slice 6 | Sin signal automática; fecha de promoción |
 | Un claim de resultado o de partner se cuela en el copy | Contenido / legal | medium | Revisión legal en Slice 2 y aserciones del gate de fidelidad | Revisión del owner; gate de fidelidad |
 | Un hecho de 2026 queda desactualizado | Contenido | medium | Fecha visible y revisión trimestral; retiro del bloque | Revisión trimestral registrada en el manual |
-| La disponibilidad de ChatGPT Ads cambia | Contenido | high | Fecha visible en canales y FAQ; revisión mensual contra el centro de ayuda de OpenAI | Revisión mensual registrada en el manual |
+| La disponibilidad de ChatGPT Ads cambia o un cliente en Chile espera campañas inmediatas | Contenido / comercial | medium | El copy no afirma países ni fechas; preventa y diagnóstico aclaran disponibilidad por mercado; revisión mensual contra el centro de ayuda de OpenAI | Revisión mensual registrada en el manual |
 | Pérdida de interactividad al compilar el diseño | UI | high | Módulos semánticos; gate que ejercita firma, FAQ, form y scheduler | Gate de fidelidad en rojo |
 | El renderer del form no monta | Growth Forms | medium | Estado `partial` con reunión y contacto; el gate exige campos montados | Gate en rojo; `gh_form_viewed` en cero |
 | Un guardado en Elementor borra metadata SEO | SEO | medium | Gate SEO después de cada guardado | Gate SEO en rojo |
@@ -617,8 +617,8 @@ el motor ya soporta.
 - [ ] La firma cambia de primer ítem al cambiar la señal, funciona con teclado, anuncia el cambio y muestra el rótulo
       ilustrativo sin interacción.
 - [ ] Ninguna región muestra un número sin fuente y fecha, un contador, un logo de plataforma o un badge de partner.
-- [ ] Las diez plataformas aparecen con qué hacemos en cada una, sin chip de estado ni mención de partner; ChatGPT Ads
-  y Amazon Ads dicen en qué países están disponibles y la región muestra su fecha de vigencia.
+- [ ] Las diez plataformas aparecen con qué hacemos en cada una, sin chip de estado ni mención de partner; Amazon Ads
+  dice que es para México y la región muestra su fecha de vigencia.
 - [ ] La tabla de posición no nombra ninguna empresa y muestra la nota por tipo de proveedor.
 - [ ] Ninguna sección promete ROAS, retorno, leads, pipeline, ventas ni precios.
 - [ ] La página no nombra partners ni dice que alguna plataforma se opera con partner.
@@ -713,6 +713,8 @@ el motor ya soporta.
 - **Segundo ajuste del owner (mismo día):** R8 no lleva chip de estado ("Lo operamos", "Con partner tecnológico",
   "Donde está disponible", "Bajo pedido") y la página no menciona partners en ninguna región, incluida FAQ 9. Las
   condiciones útiles para el cliente (país, requisito) quedan dentro del texto de cada tarjeta.
+- **Tercer ajuste del owner:** Anuncios en ChatGPT se presenta como servicio sin aclarar que aún no está disponible en
+  Chile (tarjeta de R8 y FAQ 10). La disponibilidad por país se aclara en preventa y en el diagnóstico.
 - Programmatic nombra las pantallas digitales en R8 y FAQ 9, sin nombrar al partner ni mostrar CPM: Real Audiences y
   Basis siguen en evaluación, sin acuerdo firmado.
 
