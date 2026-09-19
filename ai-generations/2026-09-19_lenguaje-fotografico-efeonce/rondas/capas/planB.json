@@ -1,0 +1,48 @@
+{
+ "label": {
+  "text": "Search Visibility 360",
+  "uppercase": true,
+  "zone": [
+   0.08,
+   0.115,
+   0.72,
+   0.15
+  ],
+  "align": "left"
+ },
+ "dominant": {
+  "text": "Lo que la IA|ve de ti.",
+  "zone": [
+   0.08,
+   0.165,
+   0.92,
+   0.3
+  ],
+  "align": "left"
+ },
+ "selection": {
+  "box": [
+   834,
+   713,
+   914,
+   932
+  ],
+  "variant": "four-corners",
+  "overlay": "subtle",
+  "padding": "compact",
+  "cursors": [
+   {
+    "id": "nexa",
+    "label": "Nexa",
+    "anchor": "bottom-end",
+    "color": "#d6246e"
+   }
+  ],
+  "local": false,
+  "scale": 1.4
+ },
+ "logo": {
+  "cy": 0.875,
+  "w": 0.15
+ }
+}

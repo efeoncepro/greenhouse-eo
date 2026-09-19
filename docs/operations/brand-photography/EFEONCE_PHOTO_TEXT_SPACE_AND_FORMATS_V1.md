@@ -1,4 +1,4 @@
-# Espacio para texto y formatos nativos — Lenguaje Fotográfico Efeonce
+# Zonas de composición (texto, selección y cursores) y formatos nativos — Lenguaje Fotográfico Efeonce
 
 > **Tipo de documento:** Especificación técnica y operativa
 > **Versión:** 1.0
@@ -95,3 +95,61 @@ Flare `high` para escenas sin identidad y Sunburst `high` para Julio y Nexa (4 r
 - Aplicar la reserva a más escenas y cámaras (ojo de pez, tele, macro) antes de fijar reglas por cámara.
 - La taza azul volvió a aparecer en la escena de Julio y Nexa: variar el objeto de acento.
 - 1:1 no se probó.
+
+## 8. La capa no es sólo texto: composición completa
+
+Corrección del operador (2026-09-19): «a veces no es solo texto… puede tener también bounding box, cursor standalone
+y cursor multiplayer, distintas voces o tipografías como Guttery y Poppins». Lo que se reserva en la toma son
+**zonas de composición**, no una zona de titular.
+
+### 8.1 Capas disponibles (todas opcionales, contrato AXIS de `efeonce-advertising-creative`)
+
+| Capa | Voz / receta | Rol | Notas |
+|---|---|---|---|
+| Etiqueta | Poppins SemiBold/Bold, `structureLabel` (tracking 0,08 em), mayúsculas | nombra la misión, el servicio o el capítulo | corta; nunca lleva el acento naranja |
+| Entrada | Bricolage `ideaLead` (peso 420) | prepara la tesis | |
+| Dominante | Bricolage `ideaImpact` (780 / ancho 96 / opsz 88) | la tesis, 1–3 palabras clave | acepta `[[acento]]` naranja y `**negrita**` |
+| Cierre | Bricolage `ideaMedium` (620) | completa la frase | |
+| Tarjeta HUD | Poppins Regular + remate Bold, `structureCopy` | dato o giro sobre la escena | |
+| Gesto | Guttery (`~/Library/Fonts/Guttery.otf`, no versionada) | voz humana breve, 1 por pieza, ≤ 3 palabras | si falta la fuente, la capa se omite |
+| Selección | AXIS `renderCollaborationSelection` | enmarca el objeto real | variantes válidas: `eight-handles`, `four-corners`, `open-brackets` |
+| Cursor solo | selección con **un** cursor y `local: false` | presencia de un rol o de Nexa | |
+| Cursores multiplayer | 2–3 cursores + cursor local | co-creación cliente ↔ Efeonce | colores por rol: Cliente lima `#6ec207` o azul, Arte naranja `#f55d01`, RevOps/Efeonce `#0375db`, Nexa `#d6246e` |
+| Firma | SVG oficial | cierre | 15% del lado corto |
+
+### 8.2 Qué reservar en la toma
+
+Además del tono de la zona de texto y del límite de cabezas (§2), el plate debe traer:
+- **un objeto aislado y completo** para enmarcar (una prueba impresa, una tarjeta en el muro, un portátil), con
+  espacio libre alrededor para la caja y las etiquetas de los cursores;
+- **una zona pareja para la tarjeta HUD** cuando la pieza lleva dato;
+- **una zona pareja para el gesto** (la caligrafía necesita ≥ 4,5:1 igual que el resto).
+
+### 8.3 Compositor `scripts/composicion.mjs`
+
+```bash
+node ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/composicion.mjs <plate> <out> plan.json
+```
+
+El plan declara `label`, `lead`, `dominant`, `closing`, `hud`, `gesture`, `selection` y `logo`. El script:
+mide el contraste de **cada capa** contra los píxeles reales y elige tinta blanca o `#00284d`; autoajusta la zona
+cuando no llega a 4,5:1; convierte todo a trazos (nunca `<text>`); valida que la selección quede dentro del lienzo;
+**falla si una fuente no tiene el glifo pedido** y **falla si el gesto queda bajo 4,5:1** (`"force": true` lo permite
+con aviso).
+
+### 8.4 Pruebas (rondas `rondas/capas/`, OneDrive `referencias/09-capa-composicion/`) **[medido]**
+
+| Pieza | Capas | Resultado |
+|---|---|---|
+| 4:5 arte final | etiqueta + dominante con acento + gesto Guttery + selección `open-brackets` con 2 cursores y cursor local | etiqueta 13,4:1 · dominante 4,7:1 · gesto 7,1:1 · firma 16,6:1 |
+| 9:16 Search Visibility | etiqueta + dominante + **cursor solo** (`four-corners`, un cursor Nexa, sin cursor local) | etiqueta 13,4:1 · dominante 11,7:1 · firma 12,9:1 |
+| 16:9 RevOps | dominante con acento + tarjeta HUD + **multiplayer** (`eight-handles`, RevOps + Cliente + local) | dominante 14,5:1 · HUD 16,7:1 · firma 15,6:1 |
+
+### 8.5 Fallos de esta ronda y su regla **[medido]**
+
+| Fallo | Causa | Regla |
+|---|---|---|
+| `variant: "outline"` rechazado | no existe en el contrato | sólo `eight-handles`, `four-corners`, `open-brackets` |
+| Etiqueta de cursor fuera del lienzo | ancla hacia el borde con el objeto pegado a él | anclar hacia el espacio libre; el render falla si se sale |
+| «→» salió como caja | Poppins no tiene ese glifo | el compositor ahora **falla** con glifos inexistentes; usar caracteres soportados o componer el símbolo aparte |
+| Gesto Guttery en 1,76:1 | caligrafía sobre madera de tono medio | el compositor **falla** bajo 4,5:1; mover el gesto a una zona pareja |

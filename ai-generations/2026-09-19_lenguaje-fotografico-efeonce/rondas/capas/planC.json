@@ -1,0 +1,50 @@
+{
+ "dominant": {
+  "text": "Tu pipeline,|en [[vivo]].",
+  "zone": [
+   0.06,
+   0.16,
+   0.44,
+   0.44
+  ],
+  "align": "left"
+ },
+ "hud": {
+  "text": "Ganados este mes **+18**|RpA 2,1 a **1,4**",
+  "zone": [
+   0.06,
+   0.5,
+   0.36,
+   0.62
+  ],
+  "align": "left"
+ },
+ "selection": {
+  "box": [
+   1541,
+   555,
+   1914,
+   885
+  ],
+  "cursors": [
+   {
+    "id": "revops",
+    "label": "RevOps",
+    "anchor": "top-start",
+    "color": "#0375db"
+   },
+   {
+    "id": "cliente",
+    "label": "Cliente",
+    "anchor": "bottom-start",
+    "color": "#6ec207"
+   }
+  ],
+  "local": "top-end",
+  "scale": 1.4
+ },
+ "logo": {
+  "cy": 0.92,
+  "w": 0.15
+ }
+}

@@ -1,0 +1,59 @@
+{
+ "label": {
+  "text": "Creative · Arte final",
+  "uppercase": true,
+  "zone": [
+   0.08,
+   0.055,
+   0.62,
+   0.095
+  ],
+  "align": "left"
+ },
+ "dominant": {
+  "text": "El oficio,|a la [[vista]].",
+  "zone": [
+   0.08,
+   0.11,
+   0.92,
+   0.3
+  ],
+  "align": "left"
+ },
+ "gesture": {
+  "text": "¡ahí está!",
+  "x": 0.52,
+  "y": 0.3,
+  "rotate": -5,
+  "size": 0.05
+ },
+ "selection": {
+  "box": [
+   76,
+   938,
+   841,
+   1131
+  ],
+  "cursors": [
+   {
+    "id": "arte",
+    "label": "Arte",
+    "anchor": "top-end",
+    "color": "#f55d01"
+   },
+   {
+    "id": "cliente",
+    "label": "Cliente",
+    "anchor": "bottom-end",
+    "color": "#0375db"
+   }
+  ],
+  "local": "top-start",
+  "scale": 1.4,
+  "variant": "open-brackets"
+ },
+ "logo": {
+  "cy": 0.935,
+  "w": 0.15
+ }
+}
