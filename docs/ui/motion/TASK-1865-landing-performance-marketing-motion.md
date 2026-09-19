@@ -49,7 +49,7 @@ Duraciones y curvas se toman de los tokens de motion del runtime público. **[ve
 | Módulos | Entrada en viewport | Stagger | 6 × 50 ms | Visibles | — |
 | Canales | Entrada en viewport | Stagger por columna, no por canal | 2 × 60 ms | Visibles | Con ocho canales, animar cada uno es ruido |
 | Escalera: línea de conexión | Entrada en viewport | Trazo de izquierda a derecha | 480 ms | Línea completa | Se omite bajo 760 px |
-| Chips de canal | Hover y focus del canal | Cambio de fondo tonal | 150 ms | Sólo color y foco | — |
+| Tarjetas de plataforma | Hover y focus de la tarjeta | Cambio de fondo tonal | 150 ms | Sólo color y foco | — |
 | CTAs | Hover y focus | `transform: translateY(-1px)` + sombra contenida | 150 ms | Sólo cambio de color y foco | — |
 | Dock | Salir del hero / entrar a R14 | `opacity` + `translateY(12px)` | 220 ms | Aparece y desaparece sin transición | `inert` mientras está oculto |
 | FAQ | Abrir `<details>` | Disclosure nativo | Del navegador | Nativo | Sin JS |
@@ -99,7 +99,7 @@ estado final en el mismo frame.
 - Hero en dos frames: al cargar y con el arco de retorno ya destacado.
 - Firma en tres frames: `Clics`, a mitad del reordenamiento y `Ventas`.
 - La firma cambiada dos veces seguidas con teclado, para verificar que la animación se interrumpe sin saltos.
-- Hover y focus de ambos CTAs, del CTA del dock y de un chip de canal.
+- Hover y focus de ambos CTAs, del CTA del dock y de una tarjeta de plataforma.
 - Dock en tres estados: oculto en el hero, visible entre R2 y R14, oculto en R14.
 - La misma ruta con reduced motion: circuito con el arco destacado y firma sin transición.
 - Medición de LCP y CLS en 390 y 1440; confirmar que el recorrido de la señal no entra en la ruta del LCP y que el FLIP no

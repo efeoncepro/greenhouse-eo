@@ -518,8 +518,8 @@ CRM ni contexto. El control de la firma no emite eventos en V1.
 
 - `public-website:verify-performance-landing-fidelity`: por viewport (1536, 1440, 890, 390 y reduced motion) valida
   separación bajo el masthead, un H1, orden del first fold, tres instancias del rol verde, firma que cambia de primer ítem,
-  `<ol>` en firma y escalera, rótulo ilustrativo, ausencia de números sin fuente y de logos de plataformas, ocho canales con
-  chip, catorce preguntas operables, form montado con diez campos, CTA que abre el scheduler nativo, dock `inert` cuando está
+  `<ol>` en firma y escalera, rótulo ilustrativo, ausencia de números sin fuente y de logos de plataformas, diez servicios por plataforma sin
+  chip de estado ni mención de partner, catorce preguntas operables, form montado con diez campos, CTA que abre el scheduler nativo, dock `inert` cuando está
   oculto, consola sin errores propios y `scrollWidth === clientWidth`.
 - `public-website:verify-performance-seo-package`: title, meta, canonical, robots, OG/Twitter, imagen social, `Service` y
   `FAQPage` sin entidades duplicadas, sitemap, menú y HTML inicial.
@@ -617,10 +617,11 @@ el motor ya soporta.
 - [ ] La firma cambia de primer ítem al cambiar la señal, funciona con teclado, anuncia el cambio y muestra el rótulo
       ilustrativo sin interacción.
 - [ ] Ninguna región muestra un número sin fuente y fecha, un contador, un logo de plataforma o un badge de partner.
-- [ ] Los ocho canales aparecen con su chip de estado; ChatGPT Ads muestra su fecha de vigencia.
+- [ ] Las diez plataformas aparecen con qué hacemos en cada una, sin chip de estado ni mención de partner; ChatGPT Ads
+  y Amazon Ads dicen en qué países están disponibles y la región muestra su fecha de vigencia.
 - [ ] La tabla de posición no nombra ninguna empresa y muestra la nota por tipo de proveedor.
 - [ ] Ninguna sección promete ROAS, retorno, leads, pipeline, ventas ni precios.
-- [ ] El partner programático no se nombra en la página.
+- [ ] La página no nombra partners ni dice que alguna plataforma se opera con partner.
 - [ ] El rol verde aparece exactamente en los tres CTAs de reunión.
 - [ ] El form `efeonce-performance-brief` está publicado con consentimiento, Turnstile, gate corporativo y retención `730d`.
 - [ ] Los estados ready, loading, empty, partial, error, denied y success del form fueron verificados.
@@ -709,6 +710,9 @@ el motor ya soporta.
   - El formulario suma Microsoft Advertising, pantallas digitales y Amazon a "Dónde inviertes hoy".
 - Se mantiene la doctrina de la ficha: ninguna plataforma se vende suelta ni con precio por plataforma; todas se activan
   dentro del diagnóstico, el sprint o la operación mensual, y la página lo dice (`channels.contract`).
+- **Segundo ajuste del owner (mismo día):** R8 no lleva chip de estado ("Lo operamos", "Con partner tecnológico",
+  "Donde está disponible", "Bajo pedido") y la página no menciona partners en ninguna región, incluida FAQ 9. Las
+  condiciones útiles para el cliente (país, requisito) quedan dentro del texto de cada tarjeta.
 - Programmatic nombra las pantallas digitales en R8 y FAQ 9, sin nombrar al partner ni mostrar CPM: Real Audiences y
   Basis siguen en evaluación, sin acuerdo firmado.
 

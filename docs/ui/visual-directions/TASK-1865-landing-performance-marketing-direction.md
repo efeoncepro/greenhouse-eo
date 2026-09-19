@@ -92,7 +92,7 @@ agencias de gestión de pauta.
   `Clics`; Midnight para planos de firma y conversión; verde reservado **únicamente** al CTA de reunión; neutros para
   superficies. El color nunca es la única señal: cada estado tiene nombre visible.
 - **Signature details:** circuito de cuatro nodos con el arco de retorno rotulado "La plataforma aprende"; control
-  `Clics / Ventas` con reordenamiento de la lista; chips de estado por canal con icono y texto; rótulo visible de ejemplo
+  `Clics / Ventas` con reordenamiento de la lista; tarjetas por plataforma con lo que hacemos en cada una (sin chips de estado desde 2026-09-19); rótulo visible de ejemplo
   ilustrativo en la firma.
 
 ## Desktop target

@@ -181,20 +181,22 @@ cada plataforma**. El catálogo comercial no cambia: cada plataforma se contrata
 operación mensual (R9), nunca suelta y nunca con precio por plataforma.
 
 - **Desktop:** H2 + intro + retícula de diez tarjetas en dos columnas. Cada tarjeta: icono de función, H3 con el nombre
-  de la plataforma, una oración de para qué sirve, una lista de tres o cuatro cosas que hacemos ahí y un chip de estado
-  con icono y texto. Nota final sobre la propiedad de las cuentas, nota de cómo se contratan y fecha de vigencia.
-- **Mobile:** una columna; chip debajo del nombre; la lista de tareas se mantiene visible, sin acordeón.
+  de la plataforma, una oración de para qué sirve y una lista de dos a cuatro cosas que hacemos ahí. Sin chip de estado.
+  Nota final sobre la propiedad de las cuentas, nota de cómo se contratan y fecha de vigencia.
+- **Mobile:** una columna; la lista de tareas se mantiene visible, sin acordeón.
 - **Orden:** Google Ads, Meta Ads, TikTok Ads, LinkedIn Ads, Microsoft Advertising, Anuncios en ChatGPT, Programmatic y
   pantallas digitales, Retail media y Mercado Ads, Amazon Ads, X Ads.
-- **Chips:** `Lo operamos` (Google, Meta, TikTok, LinkedIn, Microsoft, retail media) · `Con partner tecnológico`
-  (programmatic y pantallas digitales) · `Donde está disponible` (ChatGPT, Amazon) · `Bajo pedido` (X Ads).
 - **Contenido:** `channels.title`, `channels.intro`,
   `channels.items.{google,meta,tiktok,linkedin,microsoft,chatgpt,programmatic,retail,amazon,x}.{name,body,tasks.{1..4}}`,
-  `channels.chips.*`, `channels.note`, `channels.contract`, `channels.asOf`.
+  `channels.note`, `channels.contract`, `channels.asOf`.
 - **Reglas:**
   - Cada tarjeta es un `<li>` de una `<ul>`; las tareas, una `<ul>` anidada. H3 por plataforma para que cada una sea
     citable por separado.
-  - Sin logos de plataformas; sin nombrar al partner programático; sin precios, CPM, mínimos ni porcentajes.
+  - Sin logos de plataformas; sin precios, CPM, mínimos ni porcentajes.
+  - Owner 2026-09-19: la página no dice cómo operamos cada plataforma (directo, con partner, bajo pedido) ni menciona
+    partners en ninguna región. Esa información es interna y vive en la ficha. Las condiciones que el cliente sí
+    necesita saber van dentro del texto de la tarjeta: país disponible (ChatGPT, Amazon) o requisito (video nativo en
+    TikTok).
   - ChatGPT Ads y Amazon Ads llevan la disponibilidad por país en el texto; la fecha de vigencia se revisa mensualmente.
   - Una plataforma nueva entra a esta región sólo si tiene estado `core`, `selectivo`, `vía partner` o `bajo pedido` en
     la ficha de servicio. Pinterest, Snap, Reddit y CTV no entran hasta que la ficha los habilite.
@@ -339,7 +341,7 @@ Nunca dos acciones con relleno en el mismo bloque.
 | El mecanismo se entiende sin leer | Control que reordena la lista | Captura de `performance-signal` en `Clics` y en `Ventas`; aserción de que el primer ítem cambia |
 | Verde exclusivo del CTA de reunión | Sólo tres instancias del CTA primario | Conteo de elementos con el rol verde = 3 |
 | Sin cifras inventadas | Barras sin escala; ningún contador | Aserción: ningún número en `performance-signal`, `performance-hero` ni `performance-proof` salvo fechas y numeración |
-| Canales como cobertura | Lista con chips de estado, sin logos | Aserción: ningún `<img>` de marca de plataforma en `performance-channels` |
+| Servicios por plataforma | Tarjetas con tareas, sin chips de estado ni logos | Aserción: ningún `<img>` de marca de plataforma en `performance-channels` |
 | Posición por tipo de proveedor | `ComparisonTable` con columna Efeonce enfatizada por superficie | Captura en desktop y en modo card; aserción de ausencia de nombres de empresa |
 | Planos Midnight sólo en firma, conversión y dock | Clase `clb__dark_section` sólo en R5 y R14 | Revisión de capturas por región y del header dinámico de Ohio |
 | Tipografía del sistema | Poppins 700 display, Geist 400/600 | Computed style de H1, H2, body, chip y CTA |
@@ -471,10 +473,6 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.modules.advanced.body` | Cuando hay volumen, medimos qué ventas causó la inversión con pruebas controladas. No se activa por defecto. |
 | `performance.landing.channels.title` | Servicios por plataforma |
 | `performance.landing.channels.intro` | Operamos cada plataforma como parte de una sola pauta. Elegimos el mix según tu negocio, no según la plataforma que más nos conviene vender. |
-| `performance.landing.channels.chips.direct` | Lo operamos |
-| `performance.landing.channels.chips.partner` | Con partner tecnológico |
-| `performance.landing.channels.chips.available` | Donde está disponible |
-| `performance.landing.channels.chips.onRequest` | Bajo pedido |
 | `performance.landing.channels.items.google.name` | Google Ads |
 | `performance.landing.channels.items.google.body` | Para aparecer cuando te buscan y para llegar a quien todavía no te conoce. |
 | `performance.landing.channels.items.google.tasks.1` | Campañas de búsqueda (SEM) con palabras clave y anuncios por intención |
@@ -612,7 +610,7 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.faq.8.q` | ¿Trabajan LinkedIn Ads para B2B? |
 | `performance.landing.faq.8.a` | Sí. Lo conectamos con tu CRM para que la campaña aprenda de las oportunidades que ventas acepta y no de los formularios. Lo recomendamos cuando la inversión alcanza para que la plataforma aprenda. |
 | `performance.landing.faq.9.q` | ¿Compran medios programáticos? |
-| `performance.landing.faq.9.a` | Sí, a través de un partner tecnológico: display, video y audio en sitios y apps, y pantallas digitales en la vía pública. Con reporte por sitio y por pantalla, listas de exclusión de sitios de baja calidad y todos los costos declarados en tu factura. |
+| `performance.landing.faq.9.a` | Sí: display, video y audio en sitios y apps, y pantallas digitales en la calle, aeropuertos y centros comerciales. Con reporte por sitio y por pantalla, listas de exclusión de sitios de baja calidad y todos los costos declarados en tu factura. |
 | `performance.landing.faq.10.q` | ¿Hacen anuncios en ChatGPT? |
 | `performance.landing.faq.10.a` | Sí, en los países donde OpenAI ya los habilita, como México, Brasil, Estados Unidos y España. En Chile todavía no están disponibles (septiembre de 2026); mientras tanto preparamos tus landings y tu medición para cuando lleguen. |
 | `performance.landing.faq.11.q` | ¿Qué cambia con la Ley 21.719 para la publicidad digital? |
@@ -675,7 +673,6 @@ los hechos de 2026, y autorización de casos. Tuteo neutro, sin voseo, sin em-da
 | `performance.landing.aria.dock` | Empezar con Efeonce |
 | `performance.landing.aria.signalToggle` | Elegir qué aprende la plataforma |
 | `performance.landing.aria.signalList` | Campañas ordenadas por el presupuesto que reciben |
-| `performance.landing.aria.chip` | Estado del canal: {estado} |
 | `performance.landing.seo.title` | Agencia de performance marketing y publicidad digital \| Efeonce |
 | `performance.landing.seo.description` | Agencia de performance marketing y publicidad digital: Google Ads, Meta, TikTok y LinkedIn optimizados hacia ventas reales, con tus cuentas a tu nombre. |
 | `performance.landing.og.title` | Performance marketing que aprende de tus ventas |
@@ -733,7 +730,6 @@ garantizados".
   `aria-label` `aria.signalList`. Al cambiar de estado, una región `aria-live="polite"` anuncia
   `signal.live.clicks` o `signal.live.sales`. El foco se queda en el control.
 - **Barras de la firma:** decorativas (`aria-hidden="true"`); el orden y la nota de cada campaña llevan el significado.
-- **Chips de canal:** icono decorativo + texto visible; el chip completo tiene nombre accesible `aria.chip`.
 - Tabla de posición con `<table>`, `<caption>`, `<th scope="col">` y `<th scope="row">`; cada celda con texto, no sólo un
   icono.
 - FAQ con `<details>`/`<summary>`; nada depende de hover.
@@ -792,7 +788,7 @@ garantizados".
   `performance-position`, `performance-operating`, `performance-proof`, `performance-faq`, `performance-conversion`,
   `performance-disclosure`, `performance-dock`.
 - Capturas: first fold por viewport; firma en `Clics` y en `Ventas`; tabla de posición en desktop y en modo card;
-  canales con sus cuatro chips; FAQ abierto; formulario listo; submit vacío con resumen de errores; select abierto; dock
+  servicios por plataforma con sus tareas; FAQ abierto; formulario listo; submit vacío con resumen de errores; select abierto; dock
   visible; diálogo del scheduler abierto sin reservar; full page; la URL legacy tras el 301.
 - Assertions: un H1; `scrollWidth === clientWidth` en cada viewport (scroll-width check); formulario montado con diez
   campos y submit; el CTA de reunión abre el scheduler nativo; exactamente tres instancias del rol verde; `<ol>` presente
@@ -818,6 +814,7 @@ garantizados".
 | Barras sin cifras | Porcentajes ilustrativos | Cualquier número se lee como resultado; la posición y el largo bastan |
 | Iconos de función, sin logos | Logos de plataformas | Evita leerse como badges de partner y depender de guías de marca de terceros |
 | Sin nombrar al partner programático | Mencionarlo | La relación no está firmada; la decisión de oferta prohíbe comunicarla antes |
+| Sin chips de estado ni mención de partners (2026-09-19) | Chips "Lo operamos", "Con partner tecnológico", "Donde está disponible", "Bajo pedido" | Owner: al cliente no le sirve saber cómo operamos cada plataforma y "con partner" resta confianza. Las condiciones útiles (país, requisito) viven en el texto de la tarjeta |
 | Región "Qué cambió en 2026" con fecha y fuente | Omitirla · dejarla en el FAQ | Es la razón concreta para actuar ahora; con fecha visible no envejece en silencio |
 | Rango de inversión obligatorio con "Prefiero no decirlo" | Omitirlo · pedir un monto | Define el nivel de servicio sin forzar un dato sensible |
 | Tabla por tipo de proveedor | Nombrar competidores · omitir la comparación | La comparación es el argumento; nombrar empresas es riesgo legal |
