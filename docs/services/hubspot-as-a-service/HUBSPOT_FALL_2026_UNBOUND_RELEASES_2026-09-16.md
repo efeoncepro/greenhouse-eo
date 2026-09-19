@@ -1,6 +1,6 @@
 # HubSpot as a Service — lanzamientos Fall 2026 / UNBOUND 2026
 
-> **Corte de investigación:** 2026-09-18 (America/Santiago)
+> **Corte de investigación:** 2026-09-19 (America/Santiago); evidencia del evento hasta el cierre del 18/09.
 > **Uso:** referencia operativa para discovery, diseño y propuesta; no sustituye la verificación del portal del cliente.
 > **Regla:** una fuente del proveedor prueba que la capacidad está documentada, no que el portal, el país, el plan, los créditos o el runtime del cliente sean elegibles.
 
@@ -8,7 +8,7 @@
 
 | Superficie | Estado al corte | Qué puede afirmarse | Qué sigue sin probar |
 | --- | --- | --- | --- |
-| ChatGPT Ads en HubSpot | **Beta pública** | Super Admin puede inscribir la cuenta; con cuenta ChatGPT Ads conectada, HubSpot documenta creación/publicación, seguimiento, atribución y eventos de conversión. | Acceso del portal concreto, país habilitado en OpenAI Ads Manager, revisión de anunciante, billing, pixel y entrega real. |
+| ChatGPT Lead Gen Ads en HubSpot | **Beta pública** | Super Admin puede inscribir la cuenta; con cuenta ChatGPT Ads conectada, HubSpot documenta creación/publicación, seguimiento, atribución y eventos de conversión. UNBOUND lo presenta como la alianza detrás de ChatGPT Lead Gen Ads. | Acceso del portal concreto, país habilitado en OpenAI Ads Manager, revisión de anunciante, billing, pixel y entrega real. |
 | HubSpot connector for Claude / remote MCP | **Conector oficial documentado; expansión de scopes publicada, GA del conector/portal no equivale a runtime del cliente** | Claude puede consultar y, tras reautenticación, escribir en CRM, contenido, reportes, objetos personalizados y operaciones soportadas; las actualizaciones incluyen campañas, AEO, conversaciones y configuración. | Elegibilidad del workspace de Claude, scopes efectivos, permisos HubSpot, límites API, aprobación de writes y comportamiento runtime del portal. |
 | Agent Hub / Agent Builder | **Documentado; first look de UNBOUND; pilot-first para servicio** | HubSpot lo presenta como lugar para gestionar agentes y construir agentes/workflows; puede conectar aplicaciones mediante MCP y usar contexto CRM. | Que el menú, agente, acción, créditos, seats y permisos estén disponibles o activos en un portal específico. |
 | Breeze Assistant — prompts compartidos | **Beta pública** | En cuentas enroladas se pueden compartir prompts con el equipo; Super Admin controla prompts compartidos de otros usuarios. | Enrolamiento y disponibilidad de la cuenta. |
@@ -20,6 +20,7 @@
 | Customer Agent Voice | **First look / demo de UNBOUND del 17/09** | Agente de voz de soporte que usa contexto CRM, toma acciones y deriva a humanos. | No es prueba de GA, región, idioma, canal o runtime. |
 | HubSpot Work | **First look / demo de UNBOUND del 18/09** | Producto de gestión de trabajo que combina procesos, contexto de cliente y agentes de IA. | No es prueba de GA, pricing, disponibilidad ni sustitución de PSA/ERP. |
 | Agent CLI | **Demo de UNBOUND; estado beta pública según el ledger de la skill** | Agentes pueden analizar deals, asociaciones y transcripciones para producir una vista de pipeline con evidencia y revisión humana. | Developer opt-in, scopes, ejecución, writes, límites y runtime del portal. |
+| Smart CRM Universal Record Page | **Private beta; first look/demo del 18/09** | Nueva experiencia de registro universal con layout de dos columnas, timeline rediseñada, next best actions y personalización en página; HubSpot afirma que carga 2× más rápido que la experiencia clásica. | Opt-in de private beta, cobertura por cuenta/objeto, layout efectivo, permisos y rendimiento real. |
 
 ## ChatGPT Ads dentro de HubSpot
 
@@ -157,11 +158,25 @@ que Knowledge Base, release notes y el portal del cliente prueben estado, elegib
 las sesiones de “What’s New for Service/Sellers/Marketers”: son evidencia de dirección y demostración, no una lista
 de entitlements universales.
 
+El 18/09 también hubo un laboratorio exclusivo para clientes de **Build, Test, and Deploy Customer Agent**, con
+configuración de fuentes de conocimiento, handoffs, guidelines y pruebas antes del lanzamiento. Es evidencia de un
+flujo de enablement para clientes con acceso requerido, no prueba de disponibilidad universal ni de publicación en un
+portal concreto.
+
+El **Smart CRM Universal Record Page** se mostró como private beta. La referencia pública habla de un record universal,
+no de una migración obligatoria del layout clásico; la elegibilidad y el rendimiento deben comprobarse en el portal.
+
 ### Ecosistema e integraciones
 
 El Marketplace reportó 156+ apps nuevas y 21+ actualizadas, incluyendo conectores para Gemini, G2, Gong, Microsoft
 Advertising, SharePoint/OneDrive, TikTok Ads y ampliaciones de Copilot, Claude y Slack. Registrar estas integraciones
 como opciones de ecosistema, no como capacidades nativas de HubSpot ni como disponibilidad automática.
+
+El cierre técnico de Fall Spotlight también dejó **Developer Platform Projects 2026.09 en GA**, la **Conversations API
+en GA** para Inbox/Help Desk (hilos, mensajes, asignaciones, estados y webhooks), 44 APIs actualizadas y nuevas betas
+públicas —entre ellas Lead Scoring, Contracts, AEO, Marketing Forms, Automation Workflows, Scheduler, Subscriptions
+Lifecycle y Activity Auto Associations—. Una API GA sigue necesitando scopes, tier, permisos, versión y readback; una
+beta no entra al contrato de bridge ni autoriza writes productivos.
 
 ### Cambios legales y comerciales de operación
 
@@ -207,6 +222,12 @@ registro no sustituye el contrato ni el DPA del cliente.
 - [UNBOUND — Marketing Studio + Campaign Agent](https://unbound.hubspot.com/sessions/sess-1441) — demo del 17/09; contexto de Marketing Studio y Campaign Agent.
 - [UNBOUND — HubSpot Work](https://unbound.hubspot.com/sessions/sess-1448) — first look del 18/09; producto de AI work management.
 - [UNBOUND — Agent CLI](https://unbound.hubspot.com/sessions/sess-1447) — demo del 18/09; pipeline read-only con revisión humana.
+- [UNBOUND — Smart CRM Universal Record Page](https://unbound.hubspot.com/sessions/sess-1446) — demo del 18/09; private beta, layout/timeline/actions de la nueva página de registro.
+- [UNBOUND — Build, Test, and Deploy Customer Agent](https://unbound.hubspot.com/sessions/sess-1360) — laboratorio de clientes del 18/09; enablement y despliegue guiado, no entitlement universal.
+- [UNBOUND — Beyond the Click](https://unbound.hubspot.com/sessions/sess-1566) — conversación del 18/09 sobre la alianza HubSpot–OpenAI detrás de ChatGPT Lead Gen Ads.
+- [HubSpot — Fall 2026 Spotlight Developer / Builder Updates](https://developers.hubspot.com/changelog/fall-2026-spotlight) — Projects 2026.09 GA, Conversations API GA, APIs actualizadas y betas públicas.
+- [HubSpot — Universal record page](https://knowledge.hubspot.com/records/understand-the-default-record-layout?region=united-states) — private beta, layout actualizado y opt-in.
+- [HubSpot — Set up HubSpot Work](https://knowledge.hubspot.com/ai/set-up-hubspot-work) — HubSpot Work documentado como beta, con planes, permisos, seats y créditos condicionados.
 - [HubSpot Community — Marketplace apps](https://community.hubspot.com/t/156-new-and-21-featured-updated-apps-in-the-hubspot-marketplace/157999) — 156+ apps nuevas y 21+ actualizadas.
 - [HubSpot Legal Update 2026-09-16](https://community.hubspot.com/t/september-16-2026-legal-update/158698) — Revenue Hub, créditos, AI Agents, subprocesadores y términos.
 

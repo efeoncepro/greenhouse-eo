@@ -28,13 +28,13 @@ esas puertas de entrada se comunican durante el período.
 
 | Señal (septiembre 2026) | Lectura |
 |---|---|
-| HubSpot Fall Spotlight / UNBOUND (16–18 sep): Growth Context, Context Home, Smart CRM que se actualiza solo, Marketing Studio, integración ChatGPT Ads y Microsoft Advertising; demos de Customer Agent Voice, HubSpot Work y Agent CLI | El proveedor líder de mid-market declara que la IA sin contexto produce output sin valor; las demos no prueban GA ni disponibilidad contractual |
+| HubSpot Fall Spotlight / UNBOUND (16–18 sep): Growth Context, Context Home, Smart CRM que se actualiza solo, Marketing Studio, ChatGPT Lead Gen Ads, Microsoft Advertising, Universal Record Page private beta y APIs Developer Platform 2026.09; demos de Customer Agent Voice, HubSpot Work y Agent CLI | El proveedor líder de mid-market declara que la IA sin contexto produce output sin valor; las demos y betas no prueban GA ni disponibilidad contractual |
 | Salesforce (Dreamforce 2026, 15–16 sep, fuente oficial): AIforce, Agentforce Coworker, Koa, interoperabilidad y agentes job-ready | El proveedor enterprise convierte el CRM gobernado en infraestructura para agentes, modelos e interfaces |
 | OpenAI (16 sep): Sponsored Agents en prueba en EE.UU.; anuncios que abren una conversación con un agente de marca | La pauta pasa del clic a la conversación |
 | Compradores B2B investigan y comparan proveedores en asistentes de IA | La marca debe ser legible para máquinas, no sólo para personas |
 | Ley 21.719 de protección de datos (Chile), plena vigencia el **2026-12-01** | El contexto necesita permiso: consentimiento, gobierno y trazabilidad |
 
-Evidencia HubSpot: [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](../services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md). El corte ampliado del 18/09 incorpora Smart CRM self-updating, Growth Context, Context Home, Breeze Assistant reconstruido, Marketing Studio, Microsoft Advertising, Prospecting Agent, Customer Agent Voice, HubSpot Work y Agent CLI.
+Evidencia HubSpot: [`HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`](../services/hubspot-as-a-service/HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md). El corte final del 19/09 incorpora Smart CRM self-updating, Growth Context, Context Home, Breeze Assistant reconstruido, Marketing Studio, ChatGPT Lead Gen Ads, Microsoft Advertising, Prospecting Agent, Smart CRM Universal Record Page, Customer Agent Voice, HubSpot Work, Agent CLI y el cierre técnico de Developer Platform 2026.09.
 y `hubspot-solutions-partner/SOURCES.md`. Fuentes externas y estado de verificación en §10.
 
 ## 3. Arquitectura

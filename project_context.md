@@ -4,8 +4,9 @@
 
 ## Actualización documental reciente
 
-El 2026-09-18 se actualizaron las skills y ledgers CRM de Dreamforce 2026 y HubSpot Fall Spotlight/UNBOUND; el
-detalle de lanzamientos y estados vive en sus referencias canónicas. El provider-fit usa `HubSpot-first`,
+El 2026-09-19 se actualizaron las skills y ledgers CRM de Dreamforce 2026 y HubSpot Fall Spotlight/UNBOUND; el
+cierre del 18/09 añadió Universal Record Page private beta, ChatGPT Lead Gen Ads y Developer Platform 2026.09.
+El detalle de lanzamientos y estados vive en sus referencias canónicas. El provider-fit usa `HubSpot-first`,
 `Salesforce-first`, `híbrida` o `no-fit`.
 
 Greenhouse: plataforma operativa Efeonce Group (Next.js 16/MUI 7/Vuexy/TS). Estado: `Handoff.md`. Historia:

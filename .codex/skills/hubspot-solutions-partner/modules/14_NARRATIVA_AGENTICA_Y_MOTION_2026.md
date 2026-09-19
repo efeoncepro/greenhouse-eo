@@ -1,6 +1,6 @@
 # 14 · Narrativa agéntica y motion comercial 2026
 
-> **Verificado al 2026-09-18.** Cargar este módulo cuando la pregunta sea cómo posicionar, prospectar,
+> **Verificado al 2026-09-19, después del cierre de UNBOUND.** Cargar este módulo cuando la pregunta sea cómo posicionar, prospectar,
 > demostrar o empaquetar HubSpot en la etapa Agentic Customer Platform. Para implementación y gobierno
 > técnico de agentes, cargar además `13_AGENTES.md`. Para cualquier cifra o vigencia, abrir `../SOURCES.md`.
 
@@ -37,10 +37,10 @@ Angela son señales ejecutivas directas, pero LinkedIn no reemplaza políticas, 
 | **Coordinación** | Agent management, permisos, handoffs, sistemas conectados, auditoría | ¿Qué puede ejecutar un agente y qué exige aprobación humana? | Gobierno, `propose → confirmación humana → execute`, observabilidad y mejora continua |
 | **Acceso abierto** | APIs, remote MCP, conectores y Agent CLI | ¿El trabajo es conversacional o masivo/programado? | MCP para humano-en-el-loop; CLI/API para background, bulk y scheduled con dry-run y control |
 
-El corte del 17–18/09 añade tres señales de producto que deben tratarse con disponibilidad escalonada: Customer Agent
-Voice, HubSpot Work y Agent CLI. El primero es un agente de voz para soporte, el segundo un producto de gestión de
-trabajo con contexto CRM y agentes, y el tercero una superficie de trabajo read-only mostrada para análisis de
-pipeline. Las sesiones son first look/demo; no son prueba de GA, pricing o runtime.
+El corte final del 17–18/09 añade cuatro señales de producto que deben tratarse con disponibilidad escalonada:
+Customer Agent Voice, HubSpot Work, Agent CLI y Smart CRM Universal Record Page. Los tres primeros son superficies
+agénticas o de trabajo mostradas en demos; la cuarta es una private beta de la experiencia de registro. Las sesiones
+son first look/demo; no son prueba de GA, pricing, SLA o runtime.
 
 **No reducir “contexto” a campos del CRM.** HubSpot lo define como datos de cliente + conocimiento del
 negocio + forma real de trabajar + procesos + patrones aprendidos. Limpiar properties ayuda, pero no captura

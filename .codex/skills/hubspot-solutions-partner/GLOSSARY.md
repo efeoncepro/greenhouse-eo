@@ -58,6 +58,8 @@
 | **Customer Agent Voice** | First look de UNBOUND 2026 para soporte de voz; no tratar una demo como GA o runtime |
 | **HubSpot Work** | First look de UNBOUND 2026 para gestión de trabajo con contexto CRM y agentes; no equivale automáticamente a PSA/ERP |
 | **Agent CLI** | Superficie developer/CLI para convertir instrucciones y datos CRM en trabajo repetible; el demo del 18/09 mostró flujo read-only con revisión humana |
+| **Smart CRM Universal Record Page** | Private beta mostrada en UNBOUND el 18/09: record universal, layout de dos columnas, timeline rediseñada, next best actions y personalización en página; validar opt-in y rendimiento |
+| **Conversations API 2026.09** | API GA para Inbox/Help Desk: hilos, mensajes, asignaciones, estados y webhooks; requiere scopes, tier, permisos y readback |
 | **UNBOUND** | ⚠️ **Ex-INBOUND.** El evento anual. **16-18 sep 2026, Boston** |
 | **Core Seat** | Seat pagado con acceso completo (USD 45-USD 75). También hay **Sales**, **Service** y **Revenue** seats. **View-only y Partner seats: USD 0** |
 | **Marketing contact** | El contacto al que efectivamente le comercializas. Es lo que HubSpot cobra — **a diferencia de Marketo, que cobra por el tamaño total de la base** |

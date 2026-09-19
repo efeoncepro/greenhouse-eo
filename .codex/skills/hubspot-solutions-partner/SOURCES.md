@@ -4,7 +4,7 @@
 > materialmente solo en 2026**, y el producto se renombró en tres lugares. Todo dato numérico se cita
 > con marca y `as-of`. Si vas a decir un número frente a un cliente, sale de acá o no sale.
 
-**As-of de producto de este ledger: 2026-09-18.** Pricing y programa conservan verificaciones fechadas por
+**As-of de producto de este ledger: 2026-09-19.** Pricing y programa conservan verificaciones fechadas por
 sección. Refresh obligatorio: **antes de UNBOUND (16-18 sep 2026)** y
 **antes del 15 de enero de 2027** (suben los umbrales de tier).
 
@@ -71,14 +71,14 @@ Fuentes verificadas 2026-08-27: [Gartner B2B Marketing Automation 2025](https://
 
 ---
 
-## Producto HubSpot — as-of 2026-07-13
+## Producto HubSpot — as-of 2026-09-19
 
 ### Fall Spotlight / UNBOUND 2026 — as-of 2026-09-18
 
 | Claim | Fuente primaria / evidencia | Marca y uso |
 |---|---|---|
 | Fall Spotlight presenta **Growth Context visible/provable** y un **agentic team** para cada motion GTM | [Fall Spotlight 2026 Partner Enablement Kit](https://offers.hubspot.com/fall-2026-spotlight-partner-enablement-kit) | ✅ Narrativa de posicionamiento; no convertir en garantía de outcome |
-| **ChatGPT Ads en HubSpot**: conexión, creación/publicación, reporting/atribución y conversion events | [Connect/manage ChatGPT Ads](https://knowledge.hubspot.com/connect-and-manage-chatgpt-ads-account-in-hubspot) · [Create campaigns](https://knowledge.hubspot.com/create-chatgpt-ads-campaigns-in-hubspot) · [Conversion events](https://knowledge.hubspot.com/create-and-sync-ad-conversion-events-with-chatgpt) | ✅ Capacidad documentada, **beta**; requiere `Ads publishing` y opt-in de Super Admin |
+| **ChatGPT Lead Gen Ads en HubSpot**: conexión, creación/publicación, reporting/atribución y conversion events | [Connect/manage ChatGPT Ads](https://knowledge.hubspot.com/connect-and-manage-chatgpt-ads-account-in-hubspot) · [Create campaigns](https://knowledge.hubspot.com/create-chatgpt-ads-campaigns-in-hubspot) · [Beyond the Click](https://unbound.hubspot.com/sessions/sess-1566) | ✅ Capacidad documentada, **beta**; UNBOUND la presenta como alianza HubSpot–OpenAI y requiere `Ads publishing` + opt-in de Super Admin |
 | **AI Growth Bundle** combina HubSpot Starter/Credits, ChatGPT Business y match de gasto Ads bajo términos promocionales | [HubSpot/OpenAI announcement](https://www.businesswire.com/news/home/20260916265759/en/) · [offer link](https://offers.hubspot.com/ai-growth-bundle) | ⚠️ El anuncio es fuente secundaria y la oferta puede variar; **no prometer precio, ahorro, ventana ni elegibilidad**. Confirmar por escrito |
 | **Agent Hub y Agent Builder**: public beta para Professional/Enterprise, con agentes y automations sobre contexto compartido | [Meet Agent Hub and Agent Builder](https://www.hubspot.com/company-news/meet-agent-hub-and-agent-builder) | ✅ Estado y alcance publicados; no SLA ni roster fijo |
 | **MCP remoto GA**: reads/writes acotados, permisos existentes, OAuth 2.1/PKCE y reautorización al cambiar scopes | [MCP GA changelog](https://developers.hubspot.com/changelog/remote-hubspot-mcp-server-is-now-generally-available) · [MCP docs](https://developers.hubspot.com/docs/apps/developer-platform/build-apps/integrate-with-the-remote-hubspot-mcp-server) | ✅ Capacidad; writes dependen de herramienta, usuario, scopes/permisos y sensibilidad del dato |
@@ -92,10 +92,13 @@ Fuentes verificadas 2026-08-27: [Gartner B2B Marketing Automation 2025](https://
 | Customer Agent Voice | [UNBOUND demo](https://unbound.hubspot.com/sessions/sess-1442) | ⚠️ First look/demo del 17/09; no usar como prueba de GA, región o runtime |
 | HubSpot Work | [UNBOUND demo](https://unbound.hubspot.com/sessions/sess-1448) | ⚠️ First look/demo del 18/09; no es prueba de GA, pricing ni sustitución de PSA/ERP |
 | Agent CLI: pipeline read-only con evidencia y revisión humana | [UNBOUND demo](https://unbound.hubspot.com/sessions/sess-1447) | ⚠️ Demo; validar beta, developer opt-in, scopes, límites y writes por portal |
+| Smart CRM Universal Record Page | [UNBOUND first look](https://unbound.hubspot.com/sessions/sess-1446) · [KB](https://knowledge.hubspot.com/records/understand-the-default-record-layout?region=united-states) | ⚠️ Private beta; el demo afirma 2× de velocidad, pero la elegibilidad y el rendimiento deben verificarse en portal |
+| Customer Agent: laboratorio Build, Test, and Deploy | [UNBOUND lab](https://unbound.hubspot.com/sessions/sess-1360) | ✅ Enablement práctico para clientes con acceso requerido; no prueba GA ni publicación universal |
+| Developer Platform Projects 2026.09 / Conversations API | [Fall Spotlight Developer / Builder Updates](https://developers.hubspot.com/changelog/fall-2026-spotlight) | ✅ Projects y Conversations API GA; 44 APIs actualizadas y nuevas betas públicas siguen sujetas a scopes, tier y portal |
 | Marketplace: 156+ apps nuevas y 21+ actualizadas | [HubSpot Community](https://community.hubspot.com/t/156-new-and-21-featured-updated-apps-in-the-hubspot-marketplace/157999) | ✅ Cifra del Marketplace; apps son integraciones del ecosistema, no capacidades nativas ni entitlements automáticos |
 | Cambios legales para Revenue Hub, créditos y AI Agents | [Legal Update 2026-09-16](https://community.hubspot.com/t/september-16-2026-legal-update/158698) | ✅ Cambio documental; revisar contrato/DPA antes de propuesta o activación |
 
-### Narrativa agéntica, workspaces y motion de partners — as-of 2026-07-16 ✅
+### Narrativa agéntica, workspaces y motion de partners — as-of 2026-09-19 ✅
 
 | Claim verificado | Fuente primaria | Uso |
 |---|---|---|

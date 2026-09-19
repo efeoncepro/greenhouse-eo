@@ -1,7 +1,7 @@
 # HubSpot as a Service — arquitectura de oferta V2
 
 > **Estado:** vigente
-> **Fecha de verificación:** 2026-09-18
+> **Fecha de verificación:** 2026-09-19
 > **Owner:** RevOps & CRM / práctica HubSpot
 > **Evidencia de mercado:**
 > [`HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md`](../../audits/commercial/HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md)

@@ -1,6 +1,6 @@
-# 01 · El producto que vendes hoy — as-of 2026-09-18
+# 01 · El producto que vendes hoy — as-of 2026-09-19
 
-> Todo con marca ✅/⚠️/❌ en `SOURCES.md`. **Fall Spotlight/UNBOUND 2026 está en curso: verifica portal, tier,
+> Todo con marca ✅/⚠️/❌ en `SOURCES.md`. **Fall Spotlight/UNBOUND 2026 ya cerró el 18/09: verifica portal, tier,
 > seat, permisos y estado antes de cotizar.**
 
 ---
@@ -26,6 +26,8 @@
 | **Breeze Assistant reconstruido** | Pregunta, construye y crea desde distintas superficies de HubSpot | Validar agentes, acciones, créditos y estado por portal |
 | **Marketing Studio + Campaign Agent** | Insight, campaña, contenido, nurture y medición con contexto CRM | Separar demo, beta, GA, edición, canales y consentimiento |
 | **HubSpot Work / Customer Agent Voice / Agent CLI** | First looks y demos de UNBOUND del 17–18/09 | No convertir sesiones en GA, pricing ni disponibilidad universal |
+| **Smart CRM Universal Record Page** | First look del 18/09; private beta con layout/timeline/actions renovados | Verificar opt-in, objeto, permisos y rendimiento; el demo de 2× no es SLA |
+| **Developer Platform 2026.09 / Conversations API** | Projects y Conversations API GA; 44 APIs actualizadas y nuevas betas públicas | GA de plataforma/API no equivale a scopes, tier o contrato de bridge |
 | **Lead scoring con AI insights** | Documentado para Marketing/Sales Professional y Enterprise; permisos de edición de Lead Scoring requeridos | Es una capacidad de calificación; no confundir la disponibilidad del scoring base con cualquier beta de insight o recomendación |
 
 ✅/⚠️ Detalle y URLs: `SOURCES.md` § Fall Spotlight / UNBOUND 2026.
