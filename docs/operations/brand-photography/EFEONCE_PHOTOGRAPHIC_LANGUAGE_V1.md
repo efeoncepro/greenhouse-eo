@@ -219,3 +219,7 @@ Recorrido completo ronda por ronda en la [bitácora](../social/2026-09-19-efeonc
 - Paleta de marca: `.claude/skills/content-marketing-studio/efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md` §2.
 - Evidencia: [`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/`](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md).
 - Propuesta intermedia descartada (grade navy): `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/PROPUESTA_LENGUAJE_FOTOGRAFICO_V1.md` (su §5 de prueba de reconocimiento sigue vigente como método).
+
+## Delta 2026-09-19 (tarde) — espacio para texto y formatos
+
+Resuelto el pendiente «espacio para texto» y probados 9:16 y 16:9 nativos: ver [espacio para texto y formatos](EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md). Regla central: la zona del titular se planifica en la toma **con tono declarado y límite de cabezas**, igual que el lecho.

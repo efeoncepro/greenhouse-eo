@@ -172,6 +172,10 @@ llevados al navy de marca `#023c70`, L\* 25 a\* +5 b\* −34,7 h 278°), un bloq
 - Costo ≈ USD 0,90 (13 imágenes Sunburst high). Todo en OneDrive `referencias/06-…` y `07-…`; el archivo completo de
   las 16 rondas (243 imágenes) en `archivo-todas-las-pruebas/`.
 
+### Espacio para texto y formatos nativos
+
+- 3 escenas × 4:5/9:16/16:9 con titular de prueba. v1: la zona «calma» sin tono dio 1,3–4,3:1 y cabezas dentro de la zona. v2: tono declarado + límite de cabezas + autoajuste del compositor → 9/9 pasan (titular 5,7–15,2:1, firma 5,4–20,3:1). 16:9 es el formato que mejor reserva espacio. Detalle en [espacio para texto y formatos](../brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).
+
 ## 4. Fallos y correcciones con números
 
 | Fallo | Número | Corrección |

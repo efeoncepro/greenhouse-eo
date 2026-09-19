@@ -187,3 +187,10 @@ Costo observado ≈ USD 0,05 por imagen high 1152×1440 (xhigh ≈ 0,09). Bloque
 
 **Pendientes:** espacio para texto (pedido del operador, no trabajado), formatos 9:16 y 16:9, firma en tomas
 todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `xhigh` con equipo real.
+
+## Espacio para texto y formatos (2026-09-19)
+
+- La zona del titular se pide en la toma con **tono declarado** («DEEP warm shadow… for white text» / «VERY LIGHT warm-white wall… for dark text») y **límite de cabezas** (verticales: bajo 36% del alto; 16:9: gente dentro del 55% derecho).
+- Zonas: 4:5 tercio superior; 9:16 franja 11–31% (firma a 0,875); 16:9 costado izquierdo 42%. Firma al 15% del lado corto.
+- Compositor `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/titular.mjs` (Bricolage `ideaImpact` a trazos, color por contraste, autoajuste de zona ≥4,5:1).
+- Detalle: [espacio para texto y formatos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).
