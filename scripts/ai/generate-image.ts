@@ -29,6 +29,8 @@ import {
   type OpenAIImageSize
 } from '@/lib/ai/openai-image'
 
+import { resolveOutputDir } from './resolve-output-dir'
+
 // Self-contained: load .env.local so OPENAI_API_KEY_SECRET_REF resolves without manual sourcing.
 loadEnv({ path: join(process.cwd(), '.env.local') })
 
@@ -66,6 +68,7 @@ loadEnv({ path: join(process.cwd(), '.env.local') })
  *                           Sólo lo transportan gpt-image-1.5 / 1 / 1-mini. En la familia 2.5 la guía de
  *                           OpenAI lo excluye explícitamente: se ignora y la identidad se pide por prompt.
  *   --out <path>            Output file path (single prompt). Default: <out-dir>/<slug>-<ts>.png
+ *                           Con --batch es el DIRECTORIO del lote (sin extensión); con extensión de imagen aborta.
  *   --out-dir <dir>         Output directory. Default: public/images/generated
  *   --size <WxH>            1024x1024 | 1536x1024 | 1024x1536 | 2048x... (default 1536x1024). Se valida en local:
  *                           GPT Image 2/2.5 = múltiplos de 16, borde ≤ 3840, relación ≤ 3:1, área 655.360–8.294.400;
@@ -116,7 +119,7 @@ const HELP = `Greenhouse AI image CLI — OpenAI GPT Image (2.5 family + gpt-ima
                 # --model gpt-image-2.5-flare|gpt-image-2.5-sunburst · --quality xhigh|max (sólo 2.5)
                 [--timeout 280000] [--open]
   pnpm ai:image --prompt-file <path> ...
-  pnpm ai:image --batch <json>          # [{ "filename": "a.png", "prompt": "…" }, …]
+  pnpm ai:image --batch <json> [--out <dir>]   # [{ "filename": "a.png", "prompt": "…" }, …]; --out = directorio
   pnpm ai:image --concept <loop> --batch <json> [--task TASK-###]   # conceptos del design-loop
   pnpm ai:image --image <ref.png> --prompt "<delta>" --out <out.png>   # EDIT image-to-image (consistencia)
   pnpm ai:image --image <base.png> --mask <mask.png> --prompt "<qué va en la zona>" --out <out.png>
@@ -439,7 +442,16 @@ const main = async () => {
   // --concept <loop> rutea a la taxonomía de conceptos de GVC (gitignored, trazable,
   // protegida del garbage collector). Tiene prioridad sobre --out-dir.
   const conceptLoop = args.concept ? slugify(args.concept) : null
-  const outDir = conceptLoop ? join(CONCEPTS_DIR, conceptLoop) : args.outDir ? resolvePath(args.outDir) : DEFAULT_OUT_DIR
+
+  const outDir = resolveOutputDir({
+    batch: Boolean(args.batch),
+    out: args.out,
+    outDir: args.outDir,
+    conceptDir: conceptLoop ? join(CONCEPTS_DIR, conceptLoop) : null,
+    defaultDir: DEFAULT_OUT_DIR,
+    resolvePath
+  })
+
   const items: GenItem[] = []
 
   if (args.batch) {

@@ -212,6 +212,10 @@ rechaza marcas y personas reales **después de cobrar**.
   3.0/Prime, `seedance25-r2v`); más de 10 `--image` en Seedream edit se rechaza; LoRA con
   `--lora <path>[@escala][#weight_name]`; entrenadores con `--frames` (22–124, `% 17 == 5`) y `--split-threshold`
   (1–60), validados también por `--input`.
+- **`--batch` + `--out` (corregido 2026-09-19):** antes `--out` se ignoraba en silencio en modo lote y todo caía en
+  `public/images/generated` (dentro del repo). Ahora `--out <dir>` sin extensión es el directorio del lote; con
+  extensión de imagen, o junto a `--concept` o a un `--out-dir` distinto, aborta antes de gastar
+  (`scripts/ai/resolve-output-dir.ts`).
 - **Sigue abierto:** `ai:image` ignora `--input-fidelity` con 2.5 o 2 en silencio, no hay `--moderation` y la salida
   por defecto es `public/images/generated` (usa `--out` hacia `ai-generations/` o scratchpad). `ai:fal`: `--size`/
   `--count` de imagen sin validar; número de capas de layerize y si la base se cobra: sin dato; la API de pricing
