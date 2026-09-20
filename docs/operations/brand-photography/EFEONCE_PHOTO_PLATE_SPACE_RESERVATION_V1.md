@@ -58,7 +58,37 @@ encima pertenece a `efeonce-advertising-creative` y a su ficha tipográfica.
 Son puntos de partida medidos en esta corrida, **no una retícula aprobada**: la retícula definitiva debe salir de
 una pieza compuesta y aprobada, no de estas pruebas.
 
-## 3.1 Conflicto abierto: perímetro oscuro vs lecho claro **[pendiente — decisión del operador]**
+## 3.1 El tono no es el problema: la materia lo es **[decisión del operador, 2026-09-20]**
+
+> **«No, no todo tiene que ser claro; de hecho faltaba probar los oscuros. El tema era que el modelo estaba poniendo
+> un objeto sin sentido para lograrlo.»** — el operador, corrigiendo a las dos sesiones a la vez.
+
+Las dos sesiones llegamos al error por caminos opuestos y el mismo vicio: **decidir el tono por regla global en vez
+de por la escena.** Primero un armador impuso «oscuro» siempre; después se propuso «entonces claro por defecto». Las
+dos son la misma equivocación.
+
+**Una reserva oscura está perfecta cuando la superficie oscura existe de verdad y tiene nombre.** Lo que se prohíbe
+es la reserva **sin materia**, en cualquier tono: un prompt que pide un tono sin decir de qué está hecha la cosa
+obliga al modelo a inventar el objeto, y lo que inventa es un panel liso flotando — la «losa» que el operador
+rechazó por «extremadamente forzado».
+
+Probado el 2026-09-20 aislando la variable (misma toma, mismo tono oscuro, misma geometría; sólo cambió que la
+materia tuviera nombre y una razón para estar en sombra):
+
+| Toma | Materia nombrada | Resultado |
+|---|---|---|
+| T15 Noche | «the unlit interior studio wall beside the night window, in deep shadow but keeping visible texture (never pure black)» | reserva oscura natural, sin losa |
+| T13 Escala (clara por diseño; su versión oscura anterior fue rechazada) | «the shadowed side of a deep concrete structural pier that the gallery daylight does not reach» | se lee como arquitectura, no como panel flotante |
+
+**Ninguna métrica de píxel detecta la losa.** Planitud, dureza de canto y calma en L\* fallan las tres: la versión
+buena de T13 tiene el canto **el doble de duro** que la rechazada. La diferencia es **semántica** —si la cosa oscura
+es identificable como algo—, y eso se ataja en la **entrada**: `pnpm foto:prompt` aborta si la materia falta o es
+genérica («a wall», «the surface»).
+
+### Lo que sigue abierto, ya más chico **[pendiente — decisión del operador]**
+
+Sólo la **reserva 2**: la caja de selección exige perímetro oscuro por canon (el trazo `#a6cdf5` desaparece sobre
+claro) y eso sí choca cuando el lecho de la firma es claro en la misma zona. Sigue siendo decisión del operador:
 
 La reserva del **objeto para enmarcar** pide campo oscuro en los cuatro lados. La reserva del **lecho de la firma** pide
 tono declarado en el 16–22% inferior, y en cinco tomas aprobadas del catálogo ese lecho es **claro**: 11 (retrato
@@ -72,7 +102,8 @@ piden tonos opuestos en zonas contiguas**. Salidas posibles, ninguna decidida:
 - lecho oscuro y firma en blanco, cediendo el registro claro de esas cinco tomas.
 
 **No generar plates que pidan las dos cosas a la vez hasta que el operador elija.** El prompt saldría con el conflicto
-horneado y el plate no serviría para ninguna de las dos.
+horneado y el plate no serviría para ninguna de las dos. Esto ya NO alcanza a la reserva de texto ni a la del margen:
+ésas se resuelven con materia nombrada, en el tono que pida la escena.
 
 ## 4. Qué NO define este documento
 

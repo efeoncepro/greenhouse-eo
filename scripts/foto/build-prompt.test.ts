@@ -27,7 +27,7 @@ describe('foto:prompt · la tabla de formatos es la única fuente', () => {
     ['4:5', '1152x1440', 'bottom 18%', 'VERTICAL 4:5 composition.'],
     ['9:16', '1152x2048', 'bottom 22%', 'VERTICAL 9:16 composition for Stories/Reels.'],
     ['16:9', '2048x1152', 'bottom 16%', 'HORIZONTAL 16:9 composition.'],
-    ['1:1', '1152x1152', 'bottom 20%', 'SQUARE 1:1 composition.']
+    ['1:1', '1152x1152', 'bottom 18%', 'SQUARE 1:1 composition.']
   ])('%s emite %s, lecho %s y declara su formato una sola vez', (formato, size, lecho, declara) => {
     const { prompt, size: emitido } = construirPrompt({ ...fichaBase, formato })
 
@@ -104,10 +104,11 @@ describe('foto:prompt · las guardas', () => {
 })
 
 describe('foto:prompt · el lecho siempre pide algo cerca del lente', () => {
-  // Regla medida entre las dos sesiones el 2026-09-20 con tres plates: el lecho falla cuando el
-  // verbatim NO pone nada cerca del lente, en cualquier formato y cualquier ángulo. Picado 60° con el
-  // verbatim explícito da nitidez 0,0002 en 4:5 y 0,0035 en 16:9; sin él, 0,0043. El ángulo nunca fue
-  // la causa. Por eso la frase no es opcional: la emite el comando, no la escribe quien pide la foto.
+  // PRECAUCIÓN, no regla medida. Llegué a escribir que el lecho falla sin esta frase, citando tres
+  // plates; el prompt de la corrida que supuestamente NO la tenía nunca se versionó, y las dos franjas
+  // salen estadísticamente iguales, así que la diferencia era de FORMATO y no de verbatim. Ver §3.8.3.
+  // La frase se emite igual porque no cuesta nada y describe lo que un lecho ES, no porque esté
+  // demostrada como causa. NUNCA la cites como evidencia.
   it.each(['4:5', '9:16', '16:9', '1:1'])('en %s', formato => {
     expect(construirPrompt({ ...fichaBase, formato }).prompt).toContain('so close to the lens that it dissolves')
   })

@@ -54,7 +54,11 @@ const FORMATOS = {
   '1:1': {
     size: '1152x1152',
     declara: 'SQUARE 1:1 composition.',
-    lecho: '20%',
+    // 18% y no 20%: ninguno de los dos está medido, pero 18% es el que ya se usó en las fichas 1:1
+    // reales (`2026-09-20_formatos-catalogo/brief/batch-11.json`). Entre dos números sin medición,
+    // gana el que ya existe en un archivo; dos verdades para el mismo formato es peor que un número
+    // imperfecto. Queda `sinValidar` hasta que haya una ronda 1:1 con lecho medido.
+    lecho: '18%',
     limite: 'All heads and hands stay BELOW 40% of the frame height.',
     sinValidar: true,
     zonaTexto: ({ muro, tinta }) =>

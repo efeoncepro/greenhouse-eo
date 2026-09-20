@@ -261,20 +261,44 @@ altura y la banda se corta.
 **No compatible** con las tomas 4 (ojo de pez de grupo), 5 (dron cenital), 10 (macro) y 14 (barrido): ninguna tiene
 margen vertical libre. En esas, la voz secundaria va en otra parte o no va.
 
-### 3.8.3 Regla del lecho: el verbatim debe poner algo CERCA DEL LENTE **[medido 2026-09-20]**
+### 3.8.3 Regla del lecho: el verbatim pide algo CERCA DEL LENTE **[NO CONCLUYENTE — corregido 2026-09-20]**
 
-Tres mediciones entre las dos sesiones, sobre la misma toma (picado 60°, la 19 del catálogo):
+> 🔴 **Esta sección decía «[medido]» y no se sostiene. La corrijo acá en vez de borrarla, porque el error importa
+> más que la regla.**
 
-| Corrida | Formato | Verbatim del lecho | Nitidez |
-|---|---|---|---|
-| Piloto P1 | 4:5 | explícito («so close to the lens that it dissolves…») | 0,0002 ✓ |
-| Cobertura ola 1 | 16:9 | sin la frase | 0,0043 ✗ |
-| Cobertura ola 3 | 16:9 | explícito | 0,0035 ✓ |
+Lo que afirmé: que el lecho falla cuando el verbatim no pone nada cerca del lente, con tres mediciones de la toma 19
+(4:5 con la frase 0,0002 ✓ · 16:9 sin la frase 0,0043 ✗ · 16:9 con la frase 0,0035 ✓).
 
-**El ángulo nunca fue la causa, ni el formato.** El lecho falla cuando el verbatim no pone nada cerca del lente.
-Por eso esa frase **no es opcional y no la escribe quien pide la foto**: la emite `pnpm foto:prompt` siempre, en
-los cuatro formatos, y hay un test que lo verifica. La conclusión intermedia «el picado 60° no admite lecho» era
-falsa y estuvo a punto de sacar del catálogo una toma que funciona.
+**Lo que realmente se puede verificar hoy:**
+
+| Afirmación | Estado |
+|---|---|
+| 4:5 con la frase da 0,0002 | **[medido]**, prompt versionado (`piloto-reservas/rondas/p1/batch-45.json`) |
+| 16:9 con la frase da 0,0035 | **[medido]** el archivo; el prompt **no está versionado** |
+| 16:9 **sin** la frase da 0,0043 | **[no verificable]**: ese prompt no se guardó |
+| «la diferencia es el verbatim» | **[refutado o al menos sin respaldo]** |
+
+Tres razones para no sostenerla:
+
+1. **Todos los prompts de la toma 19 que SÍ están versionados llevan la frase** (`brief/batch-11.json`,
+   `brief/batch-916.json`): es parte de la plantilla de la ficha, no algo que se ponga a mano. Que la corrida de
+   16:9 careciera de ella sería la excepción, no la regla.
+2. La sesión de capa gráfica midió las dos franjas con energía fina/gruesa y salen **estadísticamente iguales en
+   todas las escalas** (0,162/0,470 contra 0,150/0,454). Parecen tener el mismo lecho.
+3. Si son iguales, lo único que separa 0,0002 de 0,0035 es el **formato** (4:5 contra 16:9), no el verbatim. Sería
+   un confundido de libro: comparé dos corridas que diferían en más de una variable y le atribuí la diferencia a la
+   que me convenía.
+
+**Qué queda en pie, y por qué el comando no cambia:** `pnpm foto:prompt` sigue emitiendo la frase siempre, en los
+cuatro formatos, y hay un test que lo verifica. Pero eso ahora es **precaución barata, no una regla medida**: la
+frase no cuesta nada, describe lo que un lecho ES, y todas las corridas aprobadas la llevan. **NUNCA la cites como
+evidencia de causa.**
+
+**La lección de proceso, que vale más:** los prompts de esas dos corridas **no se versionaron**, y por eso la
+pregunta no se puede cerrar ni en un sentido ni en el otro. El canon de la carpeta ya lo pedía —«una regla nueva
+entra con su evidencia (ruta de la pieza y medición), no de memoria»— y yo escribí una regla citando una corrida
+cuya evidencia no existe. `pnpm foto:prompt --batch` deja el prompt versionado por construcción; usarlo cierra
+este agujero.
 
 ### 3.9 Bloques históricos (V2, rechazados como genéricos)
 
@@ -463,7 +487,14 @@ azules, pintura) **[criterio]**.
 | 3 · lecho de la firma | mejor tinta ≥ 4,5:1 **y** nitidez < 0,004 — **señal débil, ver §5.1** | **[frágil]** |
 | 4 · aire para cursores | calma L* < 1,0 en ambos costados | **[criterio]** |
 | 5 · campo profundo al margen | banda continua ≥ 0,40 del alto, con calma L\* < 0,5 | **[medido]** piloto: alcanzable, da 0,60 |
-| 6 · lecho por formato | 4:5 18% · 9:16 22% · 16:9 16% · 1:1 20% **[sin validar]** | **[medido]** `bv2-{45,916,169}` |
+
+> **`CALMA_MAX` mide calma, NO detecta la «losa».** Una losa ES calma: ése es justamente su problema. El plate que
+> el operador rechazó por «extremadamente forzado» pasa este umbral, igual que pasaba el anterior. El detector de la
+> losa está en la **entrada**, no en la salida: la guarda de `foto:prompt` que aborta si la materia de la superficie
+> falta o es genérica. Tres métricas distintas —planitud, canto y calma en L\*— no distinguen la versión rechazada de
+> la buena, porque la diferencia es **semántica**: si la cosa oscura es identificable como algo. Eso no lo mide un
+> píxel, y fingir que sí sería el mismo error que esta corrida viene cazando.
+| 6 · lecho por formato | 4:5 18% · 9:16 22% · 16:9 16% · 1:1 18% **[sin validar]** | **[medido]** `bv2-{45,916,169}` |
 
 
 
