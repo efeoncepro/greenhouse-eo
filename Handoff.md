@@ -2,6 +2,8 @@
 
 **Fotografía de marca Efeonce (19–20/09):** lenguaje **aprobado**, capa gráfica sobre la foto **NO**. Comandos
 `pnpm foto:{doctor,prompt,validar}` (27 tests); nunca armar el prompt a mano. Abierto: sólo la **reserva 2**.
+Antes de generar, abrir finales aprobados comparables y declarar/medir el portador del azul y el acento de historia;
+firma vigente **20 %** explícito. [Prueba que motivó la guarda](ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa/README.md).
 Todo el detalle y el estado en [`brand-photography/README.md`](docs/operations/brand-photography/README.md).
 
 [EPIC-048](docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md): revisión adversarial aplicada; ADR Proposed, tasks to-do; sin runtime/bono.
@@ -55,17 +57,11 @@ Estado vivo: arquitectura §14 y la skill `efeonce-insights`.
 TASK-1403 reenfocada a landing del servicio de agentes (detalle en su Delta y en EPIC-047). **Pendiente con
 autorización:** el artículo publicado del caso (post `251432`) aún dice «no operativo».
 
-**Hiring: incidente P1 resuelto y en producción (2026-09-12; `ISSUE-171`/`172` resolved, `ISSUE-173` open; release
-`586a8627568a`):** el tablero no re-leía el snapshot al cambiar de vacante (`ISSUE-171`) y `lpad` recortaba el
-`public_id` del Banco de Talento pasado 99 999 (`ISSUE-172`, P1): colisión que rompía el cron y abrió el circuito
-del consumer de postulaciones. Recuperado por vías gobernadas sin borrar nada (migración, replay, revive de correos):
-**281 submissions / 0 sin postulación, 164 acuses enviados**, circuito `closed`, handler `healthy`. Release PR #234 →
-`released` 14:44:56Z, watchdog 5/5. Docs y skills barridas ese día: ATS §Delta 2026-09-12, `.claude/rules/hiring.md`,
-invariantes SQL/Ops, playbook reactivo, skills talento/resend/email/release (+ espejos `.codex/`), desk/careers/emails.
-Follow-ups formales: `TASK-1872` (fix de `ISSUE-173`: Phase A del consumer deja huérfano al handler que el breaker
-saltó; mitigación `reactive:backfill --handler=`), `TASK-1873`+`TASK-1874` (enlace descartado: warnings de intake +
-aviso en Application 360). Sin task: valor live de `GROWTH_FORMS_SERVER_VALIDATION_ENABLED`, 6 CV en cuarentena de
-`EO-OPN-0675`, reader canónico submissions↔postulaciones (hoy ad hoc). Resend en Pro. Siguiente ID libre: `TASK-1877`.
+**Hiring (12/09):** `ISSUE-171`/`172` resueltos en producción (release `586a8627568a`); recuperación:
+281 submissions / 0 sin postulación, 164 acuses, circuito `closed`, handler `healthy`. Evidencia y causa en los
+issues y el [contrato ATS](docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md). Abiertos:
+`ISSUE-173`/`TASK-1872` (consumer Phase A), `TASK-1873`/`1874` (intake y Application 360), seis CV en cuarentena
+de `EO-OPN-0675`, readback del flag `GROWTH_FORMS_SERVER_VALIDATION_ENABLED` y reader submissions↔postulaciones.
 
 **Revisión competitiva «AI Skills» de DataForSEO (2026-09-11, documental):** seis skills del proveedor analizadas;
 **no se instala ninguna**. El delta entró a `dataforseo-operator/references/**` y a

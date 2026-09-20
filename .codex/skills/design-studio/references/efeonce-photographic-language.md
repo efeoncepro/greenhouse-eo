@@ -8,6 +8,18 @@ el contrato completo, las mediciones y los prompts verbatim viven en la document
 > **Estado honesto.** Es un **sistema consistente aprobado**, **no un activo distintivo medido**. Falta la prueba
 > de reconocimiento (n≥100, distractores coherentes, antes/después). NUNCA afirmar que «se reconoce como Efeonce».
 
+## Preflight visual obligatorio antes de generar
+
+**Leer esta guía no sustituye mirar las imágenes que aprobó el operador.** Abre la hoja
+`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg` cuando salgan
+Julio o Nexa, la hoja `rondas/curado/set-curado-12.jpg` para la serie de color y al menos dos finales individuales
+comparables a tamaño completo. Antes del prompt, registra los archivos que viste y la comparación concreta:
+oficio/momento, portador visible del azul activo, origen del naranja **o** lima, lecho desenfocado, firma y rasgos de
+identidad. Declara esos portadores en la ficha de toma; **un HEX en un bloque genérico no basta**. Después de generar,
+mide el plate y compáralo otra vez con las aprobadas. Si el azul o el acento no aparecen en los píxeles, o el lecho
+falla, vuelve a dirigir y regenera; no lo declares aprobado. Canon operativo:
+[pipeline §0](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+
 ## 1. La idea: «El oficio a la vista»
 
 Se fotografía **la obra y el oficio de cada servicio** (Creative, Growth, RevOps/CRM, Media, Digital/Wave,
@@ -35,8 +47,8 @@ Arquetipos a evitar: **consultora** (talleres, post-its, mesas genéricas), **pe
 - **Medir** nitidez dentro del lecho (p99 Sobel): **p99 ≤ ~20 (máx ≤ ~25)**, muy por debajo del rostro (200–780).
   Transición gradual (≥5% del alto); cortes de 1–3% se leen como «banda». Si falla, **se regenera**.
 - **Logo:** SVG oficial (`public/branding/logo-negative.svg` blanco / `logo-full.svg` navy `#023c70`), compuesto
-  determinísticamente, **centrado horizontal**, centro vertical ≈ **93,5%** del alto en 4:5, **ancho 15%** del lienzo
-  (20% se leía como sello o marca de agua). Color por contraste medido: blanco contra el píxel más claro del área,
+  determinísticamente, **centrado horizontal**, centro vertical ≈ **93,5%** del alto en 4:5, **ancho 20%** del lienzo
+  (decisión del operador 2026-09-20). Color por contraste medido: blanco contra el píxel más claro del área,
   navy contra el más oscuro; **mínimo 4,5:1**.
 - **Sin firma** cuando el emblema bordado se lee a tamaño de consumo (polo) o un 3D de marca es protagonista.
   **Una sola marca protagonista por foto.**
@@ -155,7 +167,7 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
 Ficha de toma (servicio/oficio, industria no-cliente, mercado, cámara/lente/ángulo, luz y hora, momento, acento y su
 origen, lecho + tono, formato) → prompt = bloque realismo + bloque impacto + color/WB + escena + `FOREGROUND` →
 `gpt-image-2.5-flare` `high` para explorar (Sunburst si hay identidad o edición; `xhigh` sólo masters) → hoja de
-contacto → medir lecho → regenerar si falla → curar pantallas → componer firma (`LOGO=0.15`) → métricas → QA al zoom.
+contacto → medir lecho → regenerar si falla → curar pantallas → componer firma (`LOGO=0.20`) → métricas → QA al zoom.
 Costo observado ≈ USD 0,05 por imagen high 1152×1440 (xhigh ≈ 0,09). Bloques de prompt y scripts:
 [bloques y pipeline](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 
@@ -166,7 +178,7 @@ Costo observado ≈ USD 0,05 por imagen high 1152×1440 (xhigh ≈ 0,09). Bloque
 - [ ] Azul presente como luz u objeto; un solo acento (naranja o lima) de 1–5%, nacido de la situación.
 - [ ] Sin grade; WB neutro-cálido; sombras no azules; quemado y aplastado dentro de rango.
 - [ ] Lecho planeado, tono declarado, p99 ≤ ~20 y transición gradual; o excepción sin firma justificada.
-- [ ] Logo SVG oficial al 15%, centrado, contraste ≥ 4,5:1 medido; una sola marca protagonista.
+- [ ] Logo SVG oficial al 20%, centrado, contraste ≥ 4,5:1 medido; una sola marca protagonista.
 - [ ] Sin texto ni marcas de terceros al zoom; pantallas curadas, sin fantasmas de máscara.
 - [ ] Identidad (Julio/Nexa) y emblema verificados al zoom; nadie mira a cámara sin decisión.
 - [ ] No se siente IA. Si hay duda, se regenera; no se parcha con grade.
@@ -266,9 +278,9 @@ sesión las tenía delante al armar.
 ## Espacio para texto y formatos (2026-09-19)
 
 - La zona del titular se pide en la toma con **tono declarado** («DEEP warm shadow… for white text» / «VERY LIGHT warm-white wall… for dark text») y **límite de cabezas** (verticales: bajo 36% del alto; 16:9: gente dentro del 55% derecho).
-- Zonas: 4:5 tercio superior; 9:16 franja 11–31% (firma a 0,875); 16:9 costado izquierdo 42%. Firma al 15% del lado corto.
+- Zonas: 4:5 tercio superior; 9:16 franja 11–31% (firma a 0,875); 16:9 costado izquierdo 42%. Firma al 20% del lado corto (decisión posterior del operador).
 - Compositor `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/titular.mjs` (Bricolage `ideaImpact` a trazos, color por contraste, autoajuste de zona ≥4,5:1).
-- **Canon operativo (aprobado, capa fotográfica):** [reserva de espacio en la toma](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — las cuatro reservas, tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.
+- **Canon operativo (aprobado, capa fotográfica):** [reserva de espacio en la toma](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — las seis reservas, tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.
 - Bitácora de la ronda (composición **no aprobada**): [zonas de composición y formatos](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md).
 
 ## La capa de composición no es sólo texto

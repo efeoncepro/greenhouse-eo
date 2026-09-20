@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-20 — Fotografía Efeonce: comparación visual obligatoria antes del prompt
+
+El pipeline y las skills espejo de Design Studio y publicidad ahora exigen abrir los finales aprobados comparables,
+registrar los portadores visibles del azul activo y del acento de historia, y medirlos de nuevo en el plate. Se corrigió
+la firma vigente al **20 %** según la decisión del operador; el default histórico del compositor sigue en 15 % y se
+debe pasar `LOGO=0.20` explícitamente. La [prueba con Julio y Nexa](ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa/README.md)
+documenta el fallo que motivó la guarda.
+
 ## 2026-09-20 — Fotografía de marca: tres comandos, seis reservas y el umbral de calma en L*
 
 El prompt de una toma ya no se concatena a mano: `pnpm foto:prompt` lo arma desde una ficha y resuelve formato, % del
@@ -683,14 +691,3 @@ El bloque "Outbox publisher canónico" (TASK-773) se movió verbatim a
 dos reglas más peligrosas. Con ese espacio entra la fila de Channel & Commerce en el router de dominios, que el ADR
 `EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1` dejaba pendiente por el techo de 35.000 tokens; se retira del ADR la
 sección de pendiente. `pnpm claude-md check`: presupuesto al 98% y 0 huérfanos en ambos niveles del audit.
-
-## 2026-09-11 — Channel & Commerce: documento membretado del modelo de negocio para el equipo
-
-Se entrega el modelo de negocio de Channel & Commerce como PDF A4 de 19 páginas con membrete Efeonce, etiqueta
-"Confidencial · Uso interno" y sin rastros de trabajo interno de agentes
-(`docs/business-models/channel-commerce/deliverables/`). La fuente es HTML editable y la genera
-`scripts/documents/render-channel-commerce-business-model.mjs`: inyecta logos, URL bubble, contacto del catálogo y
-fuentes; pone el pie institucional en todas las páginas, incluida la portada; calcula el índice desde la página real
-y falla si alguna hoja desborda. `report-studio` y el estándar de marca de informes incorporan el patrón de hojas
-fijas, el QA de respaldo con poppler cuando falta PyMuPDF y las reglas para documentos internos. Sin cambios de
-runtime.

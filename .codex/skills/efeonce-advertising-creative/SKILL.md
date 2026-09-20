@@ -152,8 +152,10 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
   `axisAdvertising`; un valor de campaña sólo se reutiliza si el nuevo formato reproduce sus condiciones.
 - No incrustes copy crítico o logos dentro de una generación cuando el texto debe ser exacto.
 - La fotografía de marca propia Efeonce sigue el
-  [lenguaje fotográfico](../design-studio/references/efeonce-photographic-language.md): la firma sobre el lecho
-  desenfocado usa el SVG oficial **compuesto** (15% del ancho, contraste ≥ 4,5:1 medido), **nunca generado**.
+  [lenguaje fotográfico](../design-studio/references/efeonce-photographic-language.md): antes de generar, abre
+  imágenes aprobadas comparables y registra los portadores reales del azul activo y del acento naranja **o** lima
+  en la ficha; después comprueba su presencia en el plate. La firma sobre el lecho desenfocado usa el SVG oficial
+  **compuesto** (20% del ancho por decisión del operador 2026-09-20, contraste ≥ 4,5:1 medido), **nunca generado**.
 - **La frontera con la toma (2026-09-20).** Lo que la **foto** debe reservar son **seis reservas** —zona de texto,
   objeto para enmarcar, lecho de la firma, aire para cursores, campo profundo al margen y **lecho por formato**
   (**[medido]**: 4:5 **18%** · 9:16 **22%** · 16:9 **16%** · 1:1 **18%**, este último *sin validar*)— y **no se piden

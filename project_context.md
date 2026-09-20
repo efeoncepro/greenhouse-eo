@@ -14,13 +14,11 @@ Greenhouse: plataforma operativa Efeonce Group (Next.js 16/MUI 7/Vuexy/TS). Esta
 
 Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 
-TeamBot usa `pnpm teams:announce` para grupos: menciones explícitas, no `@todos` ni DMs. Un 1:1 manual aprobado exige dispatcher/audit canónicos, Entra revalidada e idempotencia; lo recurrente converge a Notification Hub. En Performance Reports, volumen no prueba sobrecarga y el mensaje publicado verifica la mención. Contrato: `docs/operations/manual-teams-announcements.md`.
+TeamBot: `pnpm teams:announce` sólo para grupos con menciones explícitas; 1:1 manual requiere dispatcher/audit, Entra e idempotencia. Performance Reports verifica mención publicada, no infiere sobrecarga por volumen. [Manual](docs/operations/manual-teams-announcements.md).
 
-AXIS: consumo privado cerrado para interno/producción — secreto activo en `efeonce-group`, secreto legacy de
-`efeonce-globe` eliminado, PAT legacy revocado. El PAT temporal aprobado sigue activo hasta reemplazarlo por una
-identidad de máquina antes del rollout externo. Release productivo `30502476429` y rollback ejercitado:
-`docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`. Selección colaborativa: contrato `0.2.0`
-`candidate` y manifest agent-facing sólo en source; Lab es el primer adapter y otros runtimes quedan `pending`.
+AXIS: consumo privado interno/productivo; PAT temporal hasta identidad de máquina para rollout externo. Release
+`30502476429` y rollback: [runbook](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md). Selección
+colaborativa `0.2.0` sigue `candidate`; Lab es el primer adapter, otros runtimes `pending`.
 
 Globe (`../efeonce-globe`): Tailwind v4 activo, vanilla fallback hasta TASK-1560.
 Hibernación reversible: `draining` obligatorio al apagar/encender; discovery estático permitido, nunca despertar
@@ -121,6 +119,7 @@ ETV DataForSEO: producción sirve `improved_layout_clickstream_v2` desde 2026-09
 Efeonce Insights (EPIC-045): [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14 = estado real.
 
 Informes: skill `report-studio` (evidencia, diseño, QA PDF).
+Fotografía propia Efeonce: [`design-studio` y su preflight visual](.codex/skills/design-studio/references/efeonce-photographic-language.md); abrir finales aprobados antes de generar, verificar azul/acento en píxeles y componer firma oficial al 20 %.
 Seasonalities: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.
 [Referente Metricool](.codex/skills/social-media-studio/references/seasonality-reference-calendar.md): inspiración para Efeonce/clientes; separado del calendario editorial y del scheduler.
 Producción seasonality/trendjacking: [protocolo de agentes](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md); canon en skills espejo `social-media-studio` (idea, marca, dirección, producción y QA).

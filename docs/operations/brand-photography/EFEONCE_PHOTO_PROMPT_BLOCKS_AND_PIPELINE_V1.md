@@ -31,14 +31,25 @@ cualquier generador (GPT Image, Gemini/Imagen, Seedream, Firefly, Midjourney, el
 
 **Obligatorio con cualquier motor, sin excepción:**
 
+0. **Mirar las imágenes aprobadas antes de generar.** Abrir la hoja de contacto y al menos dos finales a tamaño
+   completo comparables por sujetos u oficio; para Julio/Nexa, partir de
+   `rondas/personas/julio-nexa-firmadas.jpg` y de sus finales individuales; para el color de la serie, abrir
+   `rondas/curado/set-curado-12.jpg` (rutas bajo `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/`).
+   Registrar en la ficha los archivos mirados y qué objeto o luz porta el azul, de dónde nace el naranja **o** el
+   lima, cómo funciona el lecho y qué distingue la escena de una foto de stock. Leer la skill o copiar un prompt
+   anterior no acredita esta comparación visual. Si los binarios aprobados no están disponibles, recuperar esa
+   referencia antes de generar una persona o una foto de marca.
 1. Pegar los bloques verbatim de §3 (realismo, color system, balance de blancos, lecho/FOREGROUND, y IDENTITY +
    REFERENCES cuando hay personas reales). Un prompt de marca Efeonce sin estos bloques **no es del lenguaje**.
 2. El plate se genera **sin logo, sin texto y sin marcas inventadas**. La firma es el SVG oficial **compuesto
-   después** (15% del lado corto, centrado sobre el lecho desenfocado, contraste ≥ 4,5:1 medido). Un logo generado
+   después** (20% del lado corto, centrado sobre el lecho desenfocado, contraste ≥ 4,5:1 medido; decisión del
+   operador 2026-09-20). Un logo generado
    por el modelo es un descarte, no una corrección.
 3. Formato **nativo** (4:5, 9:16, 16:9); nunca recortar un formato desde otro.
 4. Medir antes de aprobar: nitidez del lecho (debe ser claramente menor que el sujeto) y contraste real de la zona
-   de la firma y de cualquier zona reservada. Si no pasa, **se regenera el plate**; no se parcha con un scrim.
+   de la firma y de cualquier zona reservada; medir y mirar también el azul activo y el acento de historia en los
+   píxeles finales. La presencia en el texto del prompt no prueba presencia en la foto. Si no pasa, **se regenera el
+   plate**; no se parcha con un scrim.
 5. Si el motor no acepta imágenes de referencia, **no se improvisa la identidad de una persona real**: se usa una
    toma sin personas o se cambia de motor.
 
@@ -667,16 +678,16 @@ in front of the screen where they overlap»). Defecto conocido del teléfono: el
 
 ```bash
 cd $RUN
-LOGO=0.15 node scripts/componer.mjs rondas/<ronda>/<pieza>-plate.png rondas/<ronda>/<pieza>-final.png
+LOGO=0.20 node scripts/componer.mjs rondas/<ronda>/<pieza>-plate.png rondas/<ronda>/<pieza>-final.png
 # con selección colaborativa AXIS:
-LOGO=0.15 CSCALE=1.8 node scripts/componer.mjs rondas/cruce/X1-final-plate.png rondas/cruce/X1-final.png \
+LOGO=0.20 CSCALE=1.8 node scripts/componer.mjs rondas/cruce/X1-final-plate.png rondas/cruce/X1-final.png \
   '{"box":{"left":620,"top":180,"right":1040,"bottom":480},"cursors":[{"id":"c1","kind":"collaborator","label":"Cliente","anchor":"top-start"},{"id":"c2","kind":"collaborator","label":"RevOps","anchor":"top-end"}],"colors":{"c1":"#6EC207","c2":"#0375DB"},"padding":"compact","local":"bottom-end"}'
 # (valores de caja ilustrativos: medir el objeto real en píxeles del plate)
 ```
 
 | Parámetro | Qué hace | Valor canónico |
 |---|---|---|
-| `LOGO` (env) | Ancho del logo como fracción del ancho del lienzo. **Default del script: 0.15** (desde 2026-09-19) | **0.15** (bajó de 0,20 porque se leía como sello) **[decisión del operador]** |
+| `LOGO` (env) | Ancho del logo como fracción del ancho del lienzo. El default del script histórico sigue en `0.15`: declarar el valor al invocarlo | **0.20** **[decisión del operador, 2026-09-20]**; contraste ≥ 4,5:1 medido |
 | `CSCALE` (env) | Escala de las etiquetas de los cursores colaboradores | 1.8 (default) |
 | Posición | Centrado horizontal; centro vertical a 93,5 % del alto | Fija en el script |
 | Color del logo | Compara blanco (`public/branding/logo-negative.svg`) vs navy (`logo-full.svg`) contra el píxel más claro / más oscuro del área del logo; elige el de mayor contraste | Mínimo 4,5:1 |
