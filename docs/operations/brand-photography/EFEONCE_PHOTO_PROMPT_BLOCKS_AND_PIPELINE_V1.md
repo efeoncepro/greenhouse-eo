@@ -222,6 +222,26 @@ Excepción dron (todo enfocado): «BOTTOM AREA (planned): the bottom <PCT> of th
 pale, almost white limestone paving in full sun, seamless with no joints or lines, with nothing on it (no people, no
 shadows, no objects).»
 
+### 3.8.0 Dónde va la luz y dónde va la reserva **[medido 2026-09-20]**
+
+> **La luz con carácter va sobre el SUJETO; la reserva vive en la sombra pareja que esa luz deja, nunca en su
+> camino.**
+
+Es la regla que hacía falta y que nadie había escrito, aunque el canon ya la practicaba. **Verificado en el prompt
+versionado de la pieza aprobada** `rondas/texto/bv2-169.json`: la luz es «a single hard beam of low sunlight cuts
+through the window… the flour glows inside the sunbeam», y la reserva es «the LEFT 42% is a DEEP, warm, evenly
+toned shadow on a plain wall». La luz sobre el panadero; el texto en la sombra del muro.
+
+Se descubrió rompiéndola: al pedir la sombra gráfica de la ventana **sobre el muro que ERA la reserva**, el
+contraste de la pieza cayó de **82 a 77** y la zona de texto de **0,24 a 0,22** **[medido por la sesión de capa
+gráfica]**. Pedir «campo parejo» y «luz dura» sobre la misma superficie es una contradicción, y el modelo la
+resuelve **aplanando la escena entera**. Eso explica buena parte de una tanda de 34 planchas planas, más que el
+bloque de impacto ausente.
+
+Corolario operativo: escribir la luz **dentro de la escena** sube el contraste de verdad (una toma pasó de 45 a
+**70**; otra con identidad dio **82**, por encima de la pieza aprobada que da 73). Pero la superficie que recibe la
+luz y la que aloja la reserva **tienen que ser distintas**.
+
 ### 3.8.1 SELECTION TARGET (objeto para enmarcar con caja AXIS) **[sin validar — bloque nuevo 2026-09-20]**
 
 Se pide cuando la pieza llevará **caja de selección**. La caja AXIS usa trazo `#a6cdf5` con tiradores blancos:
@@ -507,6 +527,7 @@ azules, pintura) **[criterio]**.
 > falta o es genérica. Tres métricas distintas —planitud, canto y calma en L\*— no distinguen la versión rechazada de
 > la buena, porque la diferencia es **semántica**: si la cosa oscura es identificable como algo. Eso no lo mide un
 > píxel, y fingir que sí sería el mismo error que esta corrida viene cazando.
+| color · sombras no azules | b\* del cuartil oscuro ≥ −8 | **[medido]**, con confundido declarado |
 | 6 · lecho por formato | 4:5 18% · 9:16 22% · 16:9 16% · 1:1 18% **[sin validar]** | **[medido]** `bv2-{45,916,169}` |
 
 

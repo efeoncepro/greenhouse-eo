@@ -35,6 +35,21 @@ const hexLum = h => lum(parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16)
 // la sesión de capa gráfica y lo reproduje: la losa oscura que el operador rechazó pasaba el umbral en
 // Y con 12× de margen, mientras un muro pálido genuinamente liso reprobaba. [medido 2026-09-20]
 const aLstar = Y => (Y <= 0.008856 ? 903.3 * Y : 116 * Math.cbrt(Y) - 16)
+
+// b* de CIELAB del cuartil más oscuro. El canon prohíbe las sombras azules («white balance warm-neutral,
+// shadows never blue») y nada lo medía: cuatro planchas de la tanda del 2026-09-20 salieron con b* de
+// −10 a −36 y pasaron todas las validaciones. Es barato de medir y grave de dejar pasar.
+const f = v => (v > 0.008856 ? Math.cbrt(v) : 7.787 * v + 16 / 116)
+
+const bEstrella = (r, g, b) => {
+  const l = c => ((c /= 255) <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
+  const [R, G, B] = [l(r), l(g), l(b)]
+  const Y = (0.2126729 * R + 0.7151522 * G + 0.072175 * B) / 1.0
+  const Z = (0.0193339 * R + 0.119192 * G + 0.9503041 * B) / 1.08883
+
+  return 200 * (f(Y) - f(Z))
+}
+
 const ratio = (a, b) => Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100
 
 const TINTA = { blanca: '#ffffff', oscura: '#00284d' }
@@ -90,7 +105,15 @@ const zona = async (x0, y0, x1, y1) => {
     }
 
   // `ocupacion` (Y) se conserva sólo para el lecho; `calma` (L*) es la que decide en zonas.
+  // b* del cuartil oscuro de la zona: negativo = sombra azulada.
+  const conB = []
+
+  for (let i = 0; i < data.length; i += 3) conB.push({ y: ls[i / 3], b: bEstrella(data[i], data[i + 1], data[i + 2]) })
+  conB.sort((a, b) => a.y - b.y)
+  const cuartil = conB.slice(0, Math.max(1, Math.floor(conB.length * 0.25)))
+
   return {
+    bSombras: cuartil.reduce((a, c) => a + c.b, 0) / cuartil.length,
     p2: ord[Math.floor(ord.length * 0.02)],
     p50: ord[Math.floor(ord.length * 0.5)],
     p98: ord[Math.floor(ord.length * 0.98)],
@@ -210,6 +233,21 @@ const mejorLogo = Math.max(logoBlanco, logoNavy)
 // la prueba real del lecho sigue siendo mirar el plate. Medir desenfoque bien pide otra métrica
 // (varianza de laplaciano o energía de alta frecuencia normalizada), y eso está PENDIENTE.
 filas.push([`3 · lecho de la firma (${Math.round(pct * 100)}% · señal débil)`, `blanco ${logoBlanco} · navy ${logoNavy} · nitidez ${lecho.ocupacion.toFixed(4)} (frágil)`, mejorLogo >= 4.5 && lecho.ocupacion < 0.004])
+
+// ── Colorimetría · sombras nunca azules ──────────────────────────────────────────────────────
+// No es una reserva: es el canon de color. Se mide sobre el lecho, que siempre existe.
+const bLecho = lecho.bSombras
+
+// ⚠ Confundido conocido: el cuartil oscuro NO siempre son sombras. Si la escena tiene un objeto azul
+// saturado y grande, ese objeto cae en el cuartil y arrastra el b* aunque las sombras estén neutras.
+// Medido: las planchas del dron con paneles azules en el piso dan −38 y −28, y el azul es el objeto,
+// no la sombra. El aviso igual sirve —esas dos plantean el otro problema, el azul como tema— pero el
+// número dice «hay mucho azul oscuro», no necesariamente «las sombras viraron». [2026-09-20]
+filas.push([
+  'color · sombras no azules',
+  `b* del cuartil oscuro ${bLecho.toFixed(1)} (negativo = azul; ojo si hay un objeto azul grande)`,
+  bLecho >= -8
+])
 
 // ── Reserva 4 · aire para cursores ───────────────────────────────────────────────────────────
 // Con dos colaboradores el aire lateral se paga dos veces: se exige margen libre a ambos costados.

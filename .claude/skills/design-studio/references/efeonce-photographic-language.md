@@ -204,6 +204,19 @@ todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `
 **NUNCA armes un prompt de foto de marca concatenando bloques a mano.** Esa es la vía por la que «Vertical 4:5.»
 vivió dentro del bloque de realismo sin que nadie lo viera, y habría contaminado todo plate no-4:5.
 
+## La regla de la luz y la reserva **[medido 2026-09-20]**
+
+> **La luz con carácter va sobre el SUJETO; la reserva vive en la sombra pareja que esa luz deja, nunca en su
+> camino.**
+
+El canon ya la practicaba sin tenerla escrita. En la pieza aprobada, la luz dura entra por la ventana y cae sobre
+el panadero; el titular vive en la sombra pareja del muro. Al pedir la sombra gráfica **sobre el muro que era la
+reserva**, el contraste cayó de 82 a 77 y la zona de texto de 0,24 a 0,22: «campo parejo» y «luz dura» sobre la
+**misma** superficie es una contradicción, y el modelo la resuelve **aplanando la escena entera**.
+
+**NUNCA** pongas el dibujo de luz sobre la superficie que aloja la reserva. Escribe la luz en la escena —sube el
+contraste de verdad— pero sobre el sujeto.
+
 ## Tres guardas nuevas del 2026-09-20 (por qué se perdió calidad)
 
 Una tanda de 34 planchas salió **sin dirección fotográfica**: el armador de esa sesión nunca incluyó el bloque de
