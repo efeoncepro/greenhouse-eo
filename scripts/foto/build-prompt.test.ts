@@ -605,11 +605,14 @@ describe('foto:prompt · el catálogo coincide con el lock de assets', () => {
 describe('foto:prompt · el catálogo de palancas', () => {
   const claves = Object.keys(PALANCAS as Record<string, unknown>)
 
-  it('tiene las diecinueve aprobadas y ninguna descartada', () => {
-    expect(claves).toHaveLength(19)
+  it('tiene las veintitrés aprobadas y ninguna descartada ni pendiente', () => {
+    expect(claves).toHaveLength(23)
 
-    for (const descartada of ['bano-de-color', 'split-diopter', 'clave-baja', 'flash-duro', 'trama']) {
-      expect(claves).not.toContain(descartada)
+    // `doble-exposicion` no está descartada: quedó pendiente de un intento (el modelo produjo la
+    // superposición, pero con un borde duro que su propio contrato prohíbe). Hasta que pase su
+    // comprobación no entra al catálogo: aprobar una que falla su marcador vacía el criterio de todas.
+    for (const fuera of ['bano-de-color', 'split-diopter', 'clave-baja', 'flash-duro', 'trama', 'doble-exposicion']) {
+      expect(claves).not.toContain(fuera)
     }
   })
 
@@ -713,5 +716,47 @@ describe('palancas de la ronda podcast', () => {
 
     expect(p).toMatch(/OUT OF FOCUS/)
     expect(p).toMatch(/operator FIRST and on the talent LAST/)
+  })
+})
+
+
+describe('palancas del oficio digital', () => {
+  const base = {
+    id: 'h',
+    formato: '4:5',
+    escena: 'SCENE: a hard directional beam rakes across a real walnut worktop',
+    lecho: { objeto: 'the near edge of a real walnut worktop', tono: 'DARK walnut in shadow, matte' }
+  }
+
+  // Sin «diferencias mínimas» el modelo devuelve nueve piezas distintas, que es un muro de trabajo,
+  // no una decisión: la repetición casi idéntica ES el tema.
+  it('variantes exige repetición casi idéntica y una apartada', () => {
+    const { prompt: p } = construirPrompt({ ...base, palanca: 'variantes' })
+
+    expect(p).toMatch(/MINIMAL differences/)
+    expect(p).toMatch(/SET APART/)
+  })
+
+  it('descarte deja fuera lo elegido y a todo el mundo', () => {
+    const { prompt: p } = construirPrompt({ ...base, palanca: 'descarte' })
+
+    expect(p).toMatch(/NOT in the picture/)
+    expect(p).toMatch(/NOBODY is present/)
+  })
+
+  // La trampa de `marcado` es volverse un plano de manos: la regla de la mano es lo que la separa
+  // de `manos` y de `instrumento`.
+  it('marcado hace de la marca el sujeto y saca la mano del cuadro', () => {
+    const { prompt: p } = construirPrompt({ ...base, palanca: 'marcado' })
+
+    expect(p).toMatch(/NEVER the subject/)
+    expect(p).toMatch(/eye lands on them FIRST/)
+  })
+
+  it('proyeccion pide materia atravesando la obra y prohíbe la pantalla', () => {
+    const { prompt: p } = construirPrompt({ ...base, palanca: 'proyeccion' })
+
+    expect(p).toMatch(/SHOW THROUGH the projected image/)
+    expect(p).toMatch(/NO screen and NO monitor/)
   })
 })

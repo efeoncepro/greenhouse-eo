@@ -1,0 +1,11 @@
+{
+  "id": "H4-proyeccion",
+  "formato": "4:5",
+  "impacto": true,
+  "atmosfera": "polvo",
+  "escena": "SCENE (reviewing work at scale, studio in Mexico City, night, NO recognisable faces): THE WORK ITSELF IS PROJECTED ONTO PHYSICAL MATTER — verify it by these landmarks: a beam from a projector behind the camera throws the artwork onto a rough plaster wall, and the wall's grain, cracks and unevenness SHOW THROUGH the projected image, bending and breaking it; the projection is AZURE BLUE and it is the ONLY light in the room. A person stands inside the beam with their back to the camera, and the artwork FALLS ACROSS THEIR SHOULDERS AND THE BACK OF THEIR HEAD, wrapping their body — part of the image is on the wall and part is on them. Their own shadow punches a hard black hole through the projection on the wall. No screen and no monitor anywhere: the image lives on plaster and on cloth. Caught at the instant they raise a hand into the beam and it catches the light. An ORANGE cable runs along the floor out of the projector, the only warm colour, under four percent of the frame. 35mm at f/2. Everything is completely unbranded, no readable text anywhere.",
+  "lecho": {
+    "objeto": "the out-of-focus corner of the projector body at the bottom edge, just under the lens",
+    "tono": "DARK near black, matte"
+  }
+}

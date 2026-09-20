@@ -1,8 +1,8 @@
 # Catálogo de palancas fotográficas Efeonce V1
 
 > **Tipo de documento:** Catálogo canónico de oficio (maestro de palancas)
-> **Versión:** 2.1 · **Creado:** 2026-09-20 por Claude
-> **Estado:** veintinueve palancas en cuatro familias, aprobadas por el operador tras tres rondas de prueba medidas el 2026-09-20.
+> **Versión:** 2.2 · **Creado:** 2026-09-20 por Claude
+> **Estado:** treinta y tres palancas en cuatro familias, aprobadas por el operador tras tres rondas de prueba medidas el 2026-09-20.
 > **Relacionado:** [maestro](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [reservas](./EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md)
 
 Una **palanca** es una decisión de oficio que cambia lo que la foto *hace*, no lo que muestra.
@@ -14,9 +14,9 @@ Una **palanca** es una decisión de oficio que cambia lo que la foto *hace*, no 
 | [A. Siempre activas](#a-las-cinco-siempre-activas-el-bloque-de-impacto) | 5 | van solas en cada prompt (`impacto: false` las apaga) | las cinco |
 | [B. Atmósfera](#b-atmósfera--el-aire-que-hace-visible-la-luz) | 4 | `atmosfera` | una, opcional |
 | [C. Acción suspendida](#c-acción-suspendida--lo-que-está-en-vuelo) | 1 | `suspendido` | opcional, **1 de cada 4 piezas** |
-| [D. Encuadre y punto de vista](#d-las-diecinueve-de-encuadre-y-punto-de-vista) | 19 | `palanca` | **una sola** |
+| [D. Encuadre y punto de vista](#d-las-veintitrés-de-encuadre-y-punto-de-vista) | 23 | `palanca` | **una sola** |
 
-Son **29 palancas**, y se combinan con las **[20 tomas de cámara](#las-veinte-tomas-del-catálogo-de-cámara)**
+Son **33 palancas**, y se combinan con las **[20 tomas de cámara](#las-veinte-tomas-del-catálogo-de-cámara)**
 —ojo de pez, dron cenital, tilt-shift, contrapicado, macro, tele, barrido…— que dicen **con qué** se fotografía.
 Además hay [otros ejes](#otros-ejes-que-deciden-la-pieza-y-no-son-palancas) —formato, reserva,
 lecho, cámara, objetos de marca, identidad— que deciden la pieza pero tienen documento propio. El maestro define el
@@ -112,7 +112,7 @@ de menos de ocho caracteres, porque dejarlo abierto hace que el modelo elija, **
 > **Dosis: 1 de cada 4 piezas** **[decisión del operador]**. El comando cuenta la tanda y avisa con el número.
 > Es también la razón por la que no vive en el bloque siempre activo: ahí volaría algo en cada foto.
 
-## D. Las diecinueve de encuadre y punto de vista
+## D. Las veintitrés de encuadre y punto de vista
 
 ### De luz y tiempo
 
@@ -286,6 +286,53 @@ suaves y fuera de foco**, de espalda, sin un rasgo legible. **El ojo tiene que l
 último a quien luce**: esa inversión es el punto.
 **Evidencia.** `G4` (Bogotá) · a la primera; los faders dieron el azul sin poner nada.
 
+### Del oficio de decidir **[2026-09-20, ronda oficio digital]**
+
+> **La tesis que las une.** El oficio con IA **no está en la máquina, está en la decisión**. Generar es barato y
+> no se ve; lo que cuesta es **elegir, descartar, corregir y dirigir**. Un robot, un circuito o una interfaz
+> flotante fotografían la parte que no vale nada, y encima es lo que hace todo el mundo. Estas cuatro fotografían
+> **el juicio**, que es lo que Efeonce vende y lo que la IA no hace.
+
+#### `variantes` — la misma cosa repetida, y una elegida
+**Qué es.** El sujeto es **la elección**, no el objeto.
+**Cómo se logra.** El cuadro lo llena la **misma pieza repetida** con diferencias **mínimas** —el mismo layout, la
+misma imagen, cambiando un peso, un encuadre de milímetros, un campo un tono más frío— y **una sola** queda
+**apartada**: adelantada, levantada, girada o marcada. La repetición casi idéntica **es** el tema. Mano y antebrazo
+pueden entrar por el borde; cara nunca.
+**Evidencia.** `H1` (Santiago) · a la primera.
+
+#### `descarte` — lo que no se eligió
+**Qué es.** Enseña el **volumen real** del trabajo, que es justo lo que se esconde cuando se presume de IA.
+**Cómo se logra.** Una **pila honda y desordenada** de trabajo rechazado llena el centro y la mitad inferior:
+decenas de piezas solapadas en todos los ángulos, algunas arrugadas, algunas boca abajo, algunas tachadas; es lo
+**más grande y más detallado** del cuadro. Lo elegido **NO está**: sólo el lugar que dejó —un pin vacío, un hueco—.
+**Nadie presente.** Luz baja y dura rasante, para que **cada canto** tire su propia sombra y la profundidad del
+montón se lea.
+**Evidencia.** `H2` (Lima) · a la primera.
+
+#### `marcado` — la corrección es el sujeto, no la mano
+**Qué es.** Dirección de arte pura: la **anotación** encima de la obra. El acento de marca deja de ser decoración
+y **pasa a ser el sujeto**.
+**Cómo se logra.** La obra llena el cuadro en ángulo pronunciado, con su material nítido; **encima** van las marcas
+de la revisión —círculo, flecha que arrastra, tachadura firme, corchete al margen—, que son lo **más nítido,
+deliberado y contrastado** de la imagen y donde el ojo cae **primero**. La herramienta queda donde se dejó.
+**Cualquier mano es, como mucho, un fragmento desenfocado saliendo por el borde lejano, nunca el sujeto.** Luz
+rasante para que **el relieve físico de cada trazo** tire su sombra: así las marcas se leen como materia y no como
+gráficos puestos después.
+**Ojo.** Es vecina de `manos` e `instrumento`; se salva exactamente por esa regla. Si sale un plano de manos, no es
+esta palanca.
+**Evidencia.** `H3` (Bogotá) · a la primera, y la trampa temida no apareció.
+
+#### `proyeccion` — la obra proyectada sobre materia física
+**Qué es.** Lo digital **tocando el mundo**, sin una sola pantalla.
+**Cómo se logra.** Un haz desde detrás de la cámara echa **la obra misma** sobre una superficie **áspera** —yeso,
+ladrillo, tela, madera— y el grano, las grietas y los desniveles de esa superficie **se ven A TRAVÉS** de la
+imagen, doblándola y rompiéndola. La proyección es la **única** luz del lugar. Una persona está **dentro del haz**
+de espaldas y la obra **le cae encima**, así que parte está en el muro y parte en ella; su sombra **abre un hueco
+negro** en la imagen. **Ni pantalla ni monitor**: la imagen vive sobre material, no sobre vidrio.
+**Ojo.** No es `luz-motivada`: ahí la fuente es luz; acá **lo que se proyecta es la obra**.
+**Evidencia.** `H4` (Ciudad de México) · a la primera.
+
 ## Las cinco descartadas y por qué **[medido]**
 
 Valen tanto como las aprobadas: evitan repetir el gasto.
@@ -302,6 +349,18 @@ Valen tanto como las aprobadas: evitan repetir el gasto.
 de diseñar una serie alrededor de uno.
 
 ---
+
+## La que quedó a un intento de distancia **[pendiente]**
+
+**`doble-exposicion`** — dos momentos del proceso superpuestos en un cuadro, visibles **uno a través del otro**.
+Probada el 2026-09-20 (`H5`): el modelo **sí produjo superposición real** —el boceto a lápiz atraviesa la pieza
+terminada y la misma persona aparece en dos momentos—, pero la pieza trae **un borde duro en diagonal**, y el
+contrato de la palanca prohíbe cualquier borde justamente porque **es lo que la separa de un collage**.
+
+No se descarta y **tampoco se aprueba**: el catálogo vale porque cada palanca declara cómo comprobarla, y aprobar
+una que no pasa su propia comprobación vacía el criterio de todas las demás. Para retomarla: insistir en que las
+zonas claras de una exposición rellenan las oscuras de la otra **en todo el cuadro**, sin que ninguna tenga canto,
+y no describir ninguna de las dos como una hoja o un papel —de ahí salió el borde.
 
 ## Otros ejes que deciden la pieza (y no son palancas)
 

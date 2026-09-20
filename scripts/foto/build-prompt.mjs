@@ -694,6 +694,36 @@ export const PALANCAS = {
     bloque:
       'THE ONE WHO MAKES IT POSSIBLE (this is the frame, not a detail): the person IN FOCUS is the one OPERATING — at the desk, the console, the panel, the rig — seen in three-quarter view with a hand on a control, watching a readout. The people who are actually performing are BEHIND them, SMALL, SOFT and OUT OF FOCUS, seen from behind, and no feature of them is legible. The eye must land on the operator FIRST and on the talent LAST: that inversion is the point of the picture.',
     requiere: null
+  },
+
+  // ── Ronda oficio digital, 2026-09-20 ─────────────────────────────────────────────────────────
+  // Tesis: el oficio con IA no está en la máquina, está en la decisión. Generar es barato y no se ve;
+  // elegir, descartar, corregir y dirigir es el trabajo. Fotografiar la máquina —robots, circuitos,
+  // interfaces flotantes— es fotografiar la parte que no vale nada, y además es lo que hace todo el mundo.
+  // Probadas en `ai-generations/2026-09-20_palancas-oficio-digital/`.
+  variantes: {
+    etiqueta: 'la misma cosa repetida, y una elegida',
+    bloque:
+      'THE SUBJECT IS THE CHOICE (this is the frame, not a detail): the picture is filled with the SAME piece repeated many times with only MINIMAL differences between the versions — the same layout, the same image, differing in tiny things: a slightly different weight, a crop a few millimetres tighter, one field of colour a shade cooler. ONE of them is physically SET APART from the rest: pulled forward, lifted, turned, or carrying a mark. The near-identical repetition is what the photograph is about: not the piece, but the decision between versions of it. A hand and forearm may enter from the frame edge, never a face.',
+    requiere: null
+  },
+  descarte: {
+    etiqueta: 'lo que no se eligió',
+    bloque:
+      'THE SUBJECT IS WHAT WAS NOT CHOSEN (this is the frame, not a detail): a deep, untidy PILE of rejected work fills the centre and lower half of the picture — dozens of sheets, prints or parts overlapping at every angle, some creased, some face-down, some crossed out. That pile is the LARGEST and most detailed thing in the frame. What WAS chosen is NOT in the picture: only the place it left behind — an empty pin, a cleared space, a gap. NOBODY is present. A low hard light rakes across the pile so every single edge casts its own shadow and the real depth of the stack is legible.',
+    requiere: null
+  },
+  marcado: {
+    etiqueta: 'la corrección es el sujeto, no la mano',
+    bloque:
+      'THE SUBJECT IS THE CORRECTION, NOT THE HAND THAT MADE IT (this is the frame, not a detail): the work fills the whole picture, seen at a steep angle so its material and texture are razor sharp; drawn ON TOP of it are the marks of a review — a circle around one element, an arrow dragging it across, a firm crossing-out, a bracket in the margin. Those marks are the SHARPEST, most deliberate and most contrasted thing in the picture and the eye lands on them FIRST. The tool that made them lies where it was put down. ANY hand is at most a blurred fragment leaving the frame at the far edge, NEVER the subject. Raking light makes the physical ridge of each stroke throw its own small shadow, so the marks read as material, not as graphics added afterwards.',
+    requiere: null
+  },
+  proyeccion: {
+    etiqueta: 'la obra proyectada sobre materia física',
+    bloque:
+      'THE WORK IS PROJECTED ONTO PHYSICAL MATTER (this is the frame, not a detail): a beam from behind the camera throws the work itself onto a rough physical surface — plaster, brick, cloth, timber — and that surface\'s grain, cracks and unevenness SHOW THROUGH the projected image, bending and breaking it. The projection is the ONLY light in the room. A person stands INSIDE the beam with their back to the camera and the work FALLS ACROSS their shoulders and body, so part of the image is on the surface and part is on them; their own shadow punches a hard black hole through it. NO screen and NO monitor anywhere: the image lives on material, not on glass.',
+    requiere: null
   }
 }
 

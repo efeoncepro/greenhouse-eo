@@ -349,11 +349,11 @@ el error que la guarda ahora nombra.
 
 ### 3.10 Palancas de encuadre y punto de vista — `palanca` **[aprobadas 2026-09-20]**
 
-**Diecinueve** palancas, probadas en cinco rondas del 2026-09-20 (`palancas-nuevas/`, `palancas-disruptivas/`,
-`palancas-ronda3/`, `palancas-con-color/`, `palancas-podcast/`). Se declaran con el campo `palanca` y **UNA sola por pieza**.
+**Veintitrés** palancas, probadas en seis rondas del 2026-09-20 (`palancas-nuevas/`, `palancas-disruptivas/`,
+`palancas-ronda3/`, `palancas-con-color/`, `palancas-podcast/`, `palancas-oficio-digital/`). Se declaran con el campo `palanca` y **UNA sola por pieza**.
 
 > **El dueño del catálogo es [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md)**: ahí
-> están las 19 con su ficha completa —qué es, cómo se logran, marcadores verbatim, evidencia, qué no hacer—, las
+> están las 23 con su ficha completa —qué es, cómo se logran, marcadores verbatim, evidencia, qué no hacer—, las
 > otras tres familias de palancas (5 siempre activas · 4 atmósferas · acción suspendida), las 20 tomas de cámara
 > y las cuatro descartadas. Esta tabla conserva **las cinco primeras**, que son las que nacieron en esta spec.
 
@@ -364,7 +364,7 @@ el error que la guarda ahora nombra.
 | `luz-motivada` | La luz viene de una **fuente visible en cuadro** | Monitor, pantalla, práctica o ventana **en el encuadre** · caída visible: un lado iluminado, el otro a negro · color de la fuente, **nunca filtro ni grade** | — |
 | `larga-exposicion` | **Duración acumulada** en vez de instante | Trípode · personas y luces en estelas continuas · **un elemento perfectamente nítido** que ancla · nadie reconocible en movimiento | — |
 | `oclusion` | La cámara **miró desde detrás de algo** y no movió nada | El objeto cubre **una parte real** del sujeto, ~un tercio del cuadro, solapándolo · más cerca del lente y desenfocado | `ocluye` |
-| **+14 más** | `silueta` · `reflejo` · `ausencia` · `fragmento` · `instrumento` · `cenital` · `suelo-oblicuo` · `little-planet` · `sombra` · `dentro-del-objeto` · `escucha` · `atraviesa` · `entre-dos` · `quien-sostiene` | en el [catálogo de palancas](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) | `corta` · `instrumento` · `objetoContenedor` según cuál |
+| **+18 más** | `silueta` · `reflejo` · `ausencia` · `fragmento` · `instrumento` · `cenital` · `suelo-oblicuo` · `little-planet` · `sombra` · `dentro-del-objeto` · `escucha` · `atraviesa` · `entre-dos` · `quien-sostiene` · `variantes` · `descarte` · `marcado` · `proyeccion` | en el [catálogo de palancas](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) | `corta` · `instrumento` · `objetoContenedor` según cuál |
 
 #### Las tres reglas que salieron de la prueba **[medido]**
 
