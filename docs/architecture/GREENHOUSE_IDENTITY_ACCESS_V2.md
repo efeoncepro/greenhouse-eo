@@ -1281,3 +1281,68 @@ auth-server nunca comparte `NEXTAUTH_SECRET` ni acepta cookies del portal, y la 
 un gate posterior (`TASK-1834`). Invariantes para agentes:
 [`agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` §Auth server propio](agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md#auth-server-propio-task-1828).
 Runbook: [`docs/operations/runbooks/auth-server.md`](../operations/runbooks/auth-server.md).
+
+## Delta 2026-09-20 — Agent Auth operativo, movido desde CLAUDE.md (TASK-1160)
+
+> **Procedencia:** este contenido vivía inline en `CLAUDE.md`. Se mueve acá, a su spec canónica, porque el router
+> tiene presupuesto de tokens y no es un spec-store. **Nada se perdió**: el gate `pnpm claude-md check` verifica
+> alcanzabilidad de cada línea. El router conserva el pointer.
+
+Permite que agentes AI y tests E2E obtengan una sesión NextAuth válida sin login interactivo.
+
+**Personas agente operativas:**
+
+Usar siempre la persona agente de menor privilegio que represente el caso. `agent@greenhouse.efeonce.org` queda reservado para diagnóstico transversal, admin, permisos y smoke amplio; no debe ser el default para validar experiencias collaborator/client si existe una persona dedicada más limitada.
+
+| Persona       | Email                                             | `user_id`                       | `tenant_type`      | Roles                                                 | Uso canónico                                                                 |
+| ------------- | ------------------------------------------------- | ------------------------------- | ------------------ | ----------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Superadmin    | `agent@greenhouse.efeonce.org`                    | `user-agent-e2e-001`            | `efeonce_internal` | `efeonce_admin` + `collaborator`                      | Admin, permisos, diagnóstico transversal, smoke amplio                       |
+| Collaborator  | `agent-collaborator@greenhouse.efeonce.org`       | `user-agent-collaborator-001`   | `efeonce_internal` | `collaborator`                                       | `/my`, self-service, experiencia personal y validación sin privilegios admin |
+| Client        | `agent-client@greenhouse.efeonce.org`             | `user-agent-client-001`         | `client`           | `client_executive` + `client_manager` + `client_specialist` | Portal cliente general, rutas `client`, dashboards y reporting client-facing |
+
+Todas usan password `Gh-Agent-2026!` en modo credentials y están provisionadas por migraciones PostgreSQL:
+
+- `20260405151705425_provision-agent-e2e-user.sql` — superadmin.
+- `20260531020000000_task-954-agent-role-personas.sql` — collaborator y client.
+
+La persona `agent-client@...` es compuesta para cobertura cliente general. No sirve para probar límites finos entre `client_executive`, `client_manager` y `client_specialist`; si una task requiere esos límites, crear personas separadas por rol antes de cerrar la validación.
+
+**Flujo rápido:**
+
+```bash
+# 1. Con dev server corriendo en localhost:3000
+curl -s -X POST http://localhost:3000/api/auth/agent-session \
+  -H 'Content-Type: application/json' \
+  -d '{"secret": "<AGENT_AUTH_SECRET>", "email": "agent@greenhouse.efeonce.org"}'
+# → { ok, cookieName, cookieValue, userId, portalHomePath }
+
+# 2. Playwright (genera .auth/storageState.json)
+AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
+
+# 3. Usar una persona limitada cuando el rol importe
+AGENT_AUTH_EMAIL=agent-collaborator@greenhouse.efeonce.org AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
+AGENT_AUTH_EMAIL=agent-client@greenhouse.efeonce.org AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
+```
+
+**Variables de entorno:**
+
+| Variable                      | Propósito                                                   | Requerida        |
+| ----------------------------- | ----------------------------------------------------------- | ---------------- |
+| `AGENT_AUTH_SECRET`           | Shared secret (`openssl rand -hex 32`)                      | Sí               |
+| `AGENT_AUTH_EMAIL`            | Email del usuario (default: `agent@greenhouse.efeonce.org`) | Sí               |
+| `AGENT_AUTH_PASSWORD`         | Password (`Gh-Agent-2026!`) — solo modo credentials         | Solo credentials |
+| `AGENT_AUTH_ALLOW_PRODUCTION` | `true` para habilitar en prod (no recomendado)              | No               |
+
+**Seguridad:**
+
+- Sin `AGENT_AUTH_SECRET` → endpoint devuelve 404 (invisible)
+- En production → 403 por defecto
+- Comparación timing-safe con `crypto.timingSafeEqual`
+- No crea usuarios — solo autentica emails que ya existen en PG
+
+**Archivos clave:**
+
+- Endpoint: `src/app/api/auth/agent-session/route.ts`
+- Lookup PG-first: `getTenantAccessRecordForAgent()` en `src/lib/tenant/access.ts`
+- Setup Playwright: `scripts/playwright-auth-setup.mjs`
+- Spec técnica: `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` (sección Agent Auth)
