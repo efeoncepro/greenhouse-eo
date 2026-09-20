@@ -346,6 +346,48 @@ Seis tomas, seis lentes, en `ai-generations/2026-09-20_angulos-atmosfera/`:
 con materia. Y la tanda se pasó de dosis (2 de 6 con suspendido, cuando el tope es 1 de 4), que es exactamente
 el error que la guarda ahora nombra.
 
+### 3.10 Palancas de encuadre y punto de vista — `palanca` **[aprobadas 2026-09-20]**
+
+Cinco palancas probadas en `ai-generations/2026-09-20_palancas-nuevas/`. Se declaran con el campo `palanca`
+y **UNA sola por pieza**.
+
+| `palanca` | Qué hace | Marcadores que emite | Exige |
+|---|---|---|---|
+| `pov` | La cámara ocupa **el lugar de la persona con la que se trabaja** | Altura de ojos sentado · los sujetos al otro lado · miran la obra o apenas pasando el lente · el borde del asiento propio abajo | — |
+| `manos` | **Las manos son el sujeto**; no hay rostros | Sólo manos y antebrazos · **ni una cara, ni siquiera desenfocada al fondo** · piel real con poros y pliegues · acción concreta a mitad | — |
+| `luz-motivada` | La luz viene de una **fuente visible en cuadro** | Monitor, pantalla, práctica o ventana **en el encuadre** · caída visible: un lado iluminado, el otro a negro · color de la fuente, **nunca filtro ni grade** | — |
+| `larga-exposicion` | **Duración acumulada** en vez de instante | Trípode · personas y luces en estelas continuas · **un elemento perfectamente nítido** que ancla · nadie reconocible en movimiento | — |
+| `oclusion` | La cámara **miró desde detrás de algo** y no movió nada | El objeto cubre **una parte real** del sujeto, ~un tercio del cuadro, solapándolo · más cerca del lente y desenfocado | `ocluye` |
+
+#### Las tres reglas que salieron de la prueba **[medido]**
+
+1. **Una palanca dominante por pieza.** En `B6` se combinaron `pov` y `luz-motivada`: el POV pide su encuadre y
+   la luz motivada pide dominar la escena, y el resultado tiene **un poco de cada una y lo mejor de ninguna**.
+   El comando **rechaza una lista** y lo explica.
+2. **La oclusión pedida a medias se anula.** En `B5` el objeto quedó al costado sin cubrir al sujeto y la pieza
+   se lee como «hay algo delante», no como punto de vista. Por eso `oclusion` **exige el campo `ocluye`** con el
+   objeto concreto y el bloque pide que tape de verdad.
+3. **La larga exposición no tiene momento decisivo.** Su tensión es duración, lo contrario a congelar. Pedirle
+   ambas cosas es contradictorio: la palanca **apaga ese aviso concreto** (y sólo ese).
+
+#### Por qué `pov` es la de mayor retorno **[criterio]**
+
+Es el Why de Efeonce hecho encuadre —*«no te entregamos crecimiento, lo construimos contigo»*— y la que mejor
+pasa el **test de sustitución**: otra agencia no puede copiarla sin tener esa idea. El canon ya la practicaba sin
+nombrarla (el «respaldo de la silla del espectador», «el asiento del cliente» como lechos); nombrarla la vuelve
+decisión en vez de accidente.
+
+#### Evidencia
+
+| Pieza | Palanca | Lecho **[medido]** | Resultado |
+|---|---|---|---|
+| B1 | `pov` (los dos, 50 mm, asiento a la cabecera) | 18,84:1 | Ella desliza el layout hacia el espectador; él ya se inclina |
+| B2 | `manos` (100 mm, sin rostros, + polvo) | 17,22:1 | Dos pares de manos sobre muestras de papel |
+| B3 | `luz-motivada` (85 mm, monitor en cuadro) | 17,26:1 | El monitor es lo único que ilumina, con caída clara |
+| B4 | `larga-exposicion` (24 mm, trípode, + bruma) | 19,91:1 | Estelas del equipo, el flight case quieto |
+| B5 | `oclusion` (85 mm) | 5,40:1 | **Floja:** el objeto no cubrió al sujeto |
+| B6 | `pov` + `luz-motivada` | 17,84:1 | **Se diluyen**: origen de la regla 1 |
+
 ### 3.8.0 Dónde va la luz y dónde va la reserva **[medido 2026-09-20]**
 
 > **La luz con carácter va sobre el SUJETO; la reserva vive en la sombra pareja que esa luz deja, nunca en su

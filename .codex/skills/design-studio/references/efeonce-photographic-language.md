@@ -122,6 +122,21 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
   nunca un esparcido decorativo ni confeti. Se declara QUÉ vuela, en concreto. **Dosis: 1 de cada 4 piezas**
   **[decisión del operador]**; el comando cuenta la tanda y avisa con el número si se pasa.
 
+- **Punto de vista subjetivo** (`palanca: pov`) — la cámara **ocupa el lugar de la persona con la que se
+  trabaja**: el asiento del cliente, la silla del visitante, a altura de ojos sentado. Es el Why de Efeonce hecho
+  encuadre y **la que mejor pasa el test de sustitución**: otra agencia no la copia sin tener esa idea.
+- **Manos como sujeto** (`palanca: manos`) — sólo manos y antebrazos, **ni una cara ni siquiera desenfocada**.
+  Da piezas sin depender de identidad y mata el casting de modelo.
+- **Luz motivada** (`palanca: luz-motivada`) — la luz sale de una **fuente visible en cuadro** (monitor, práctica,
+  ventana) con caída visible. Es lo que separa luz real de un grade, que el operador rechazó.
+- **Larga exposición** (`palanca: larga-exposicion`) — **duración acumulada** en vez de instante: estelas, con un
+  elemento nítido que ancla. **No tiene momento decisivo** y es correcto que no lo tenga.
+- **Oclusión** (`palanca: oclusion` + `ocluye`) — la cámara **miró desde detrás de algo**. Debe cubrir **una parte
+  real** del sujeto: pedida a medias se lee «hay algo delante» y la palanca se anula **[medido]**.
+
+> **UNA palanca dominante por pieza.** Combinar dos las diluye: cada una pide el control de la escena y el
+> resultado tiene un poco de cada una y lo mejor de ninguna **[medido 2026-09-20]**. El comando rechaza una lista.
+
 > **«Épica» no es la palabra** (arrastra escala grandilocuente y horizonte, el stock premium que este lenguaje
 > rechaza). Lo que se busca es **realismo cinematográfico**, y son cuatro cosas distintas: **registro documental**
 > (la cámara llega a algo que ya pasaba), **momento decisivo** (el pico), **acción suspendida** (lo que vuela) y
@@ -230,7 +245,8 @@ todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `
 - **`pnpm foto:prompt <ficha.json> [--batch <out.json>]`** — arma el prompt desde una ficha de toma. El formato,
   el porcentaje del lecho y el límite de sujetos salen de **una tabla**, no de un bloque copiado. La ficha declara
   además `identidad` (personas, con vista por ángulo), `objetos` (kits de marca: logo, mascota, prenda, merch),
-  `atmosfera` (`polvo`/`bruma`/`vapor`/`humo`) y `suspendido` (qué está en el aire). Aborta si un
+  `palanca` (una de `pov`/`manos`/`luz-motivada`/`larga-exposicion`/`oclusion`), `atmosfera`
+  (`polvo`/`bruma`/`vapor`/`humo`) y `suspendido` (qué está en el aire). Aborta si un
   bloque compartido trae un valor de formato adentro, si se pide una reserva en una toma que no la admite, o si un
   batch mezcla formatos. `--ficha-ejemplo` imprime la plantilla.
 - **`pnpm foto:validar <plate.png> [--zona-texto] [--objeto x0,y0,x1,y1]`** — valida las seis reservas sobre el

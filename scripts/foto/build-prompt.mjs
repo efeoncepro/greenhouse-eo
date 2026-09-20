@@ -525,6 +525,90 @@ function bloqueSuspendido(ficha) {
   return `SUSPENDED ACTION: ${que} is FROZEN IN MID-AIR at the peak of its arc — every piece sharp and clearly in flight, caught at a frozen shutter speed, with its real weight and trajectory. It is a single decisive instant, not a decorative scatter and never confetti.`
 }
 
+// ── Palancas de encuadre y punto de vista ───────────────────────────────────────────────────────
+// Probadas el 2026-09-20 en `ai-generations/2026-09-20_palancas-nuevas/`. Se piden UNA por pieza:
+// medido en B6, combinar dos las diluye — cada palanca pide el control de la escena y el resultado
+// tiene un poco de cada una y lo mejor de ninguna.
+//
+// Todas se escriben con MARCADORES VERIFICABLES, no con nombres de estilo: al modelo «tres cuartos»
+// o «punto de vista subjetivo» no le dicen nada, «la oreja lejana no se ve» sí.
+export const PALANCAS = {
+  pov: {
+    etiqueta: 'punto de vista subjetivo',
+    // El Why de Efeonce hecho encuadre: la cámara ocupa el lugar de la persona con la que se trabaja.
+    bloque:
+      'POINT OF VIEW (this is the frame, not a detail): the photograph is taken FROM THE PLACE OF THE PERSON BEING TALKED TO — the empty seat at the table, the visitor\'s chair, the side of the desk where the client sits. The camera is at SEATED EYE LEVEL, the subjects are on the far side facing it, and they address that place: they look at the work between them or slightly past the lens at the person sitting there, never into the lens itself. The nearest part of the viewer\'s own seat is visible at the bottom of the frame.',
+    requiere: null
+  },
+  manos: {
+    etiqueta: 'manos como sujeto',
+    // Resuelve piezas sin depender de identidad y mata el casting de modelo.
+    bloque:
+      'HANDS AS SUBJECT (no faces at all): the frame is filled by HANDS working on the craft — only hands and forearms enter the frame. NO faces, NO heads, NO bodies, not even out of focus in the background. The hands are real and unretouched: visible skin texture and pores, short clean nails, fine creases across the knuckles, a worn ring if any. They are doing something specific and mid-action, not posing.',
+    requiere: null
+  },
+  'luz-motivada': {
+    etiqueta: 'luz motivada por una fuente en cuadro',
+    // La diferencia entre luz real y un grade —que el operador rechazó— es que la fuente se ve.
+    bloque:
+      'MOTIVATED LIGHT: the light on the subject comes from a SOURCE THAT IS VISIBLE IN THE FRAME — a monitor, a screen, a practical lamp, a window — and that source is what lights them. The fall-off is visible: the side of the face nearest the source is lit and the far side drops into darkness, with the direction reading unmistakably from the source. Colour comes from the real source, never from a colour filter or a grade over the whole image.',
+    requiere: null
+  },
+  'larga-exposicion': {
+    etiqueta: 'larga exposición',
+    bloque:
+      'LONG EXPOSURE on a tripod: moving people and moving lights dissolve into soft translucent streaks and continuous light trails across the frame, while ONE chosen element stays perfectly sharp and still, anchoring the picture. The motion reads as accumulated time, not as camera shake, and nobody in motion is recognisable.',
+    // Una larga exposición NO tiene momento decisivo: su tensión es duración acumulada. Pedirle
+    // ambas cosas es contradictorio, así que esta palanca desactiva ese aviso [medido en B4].
+    sinMomento: true,
+    requiere: null
+  },
+  oclusion: {
+    etiqueta: 'oclusión',
+    // Medido en B5: pedida «a medias» se lee como «hay algo delante» y no como punto de vista.
+    // Por eso exige declarar QUÉ tapa y obliga a que tape de verdad.
+    bloque:
+      'OCCLUSION (the camera watched from where it stood and moved nothing): <QUE> sits in the near ground and PARTIALLY COVERS the subject — it must cover a real part of them, roughly a third of the frame and clearly overlapping their body or face edge, not merely sit beside them. It is closer to the lens than the subject and falls out of focus. The effect is of having watched past something, not of an object placed in the corner.',
+    requiere: 'ocluye'
+  }
+}
+
+function bloquePalanca(ficha) {
+  const pedida = ficha.palanca
+
+  if (!pedida) return null
+
+  if (Array.isArray(pedida)) {
+    throw new Error(
+      'Declara UNA palanca dominante por pieza, no una lista. Medido el 2026-09-20: combinar dos las diluye — ' +
+        'cada una pide el control de la escena y el resultado tiene un poco de cada una y lo mejor de ninguna.'
+    )
+  }
+
+  const palanca = PALANCAS[pedida]
+
+  if (!palanca) {
+    throw new Error(`Palanca "${pedida}" desconocida. Disponibles: ${Object.keys(PALANCAS).join(', ')}.`)
+  }
+
+  let texto = palanca.bloque
+
+  if (palanca.requiere) {
+    const valor = ficha[palanca.requiere]
+
+    if (typeof valor !== 'string' || valor.trim().length < 8) {
+      throw new Error(
+        `La palanca "${pedida}" exige el campo \`${palanca.requiere}\` diciendo QUÉ, en concreto ` +
+          '(por ejemplo "the dark back of a monitor"). Sin eso el modelo la aplica a medias y la palanca se anula.'
+      )
+    }
+
+    texto = texto.replace('<QUE>', valor.trim())
+  }
+
+  return { texto, sinMomento: Boolean(palanca.sinMomento) }
+}
+
 const FICHA_EJEMPLO = {
   id: 'ejemplo-picado-mesa-oscura',
   formato: '4:5',
@@ -627,6 +711,9 @@ export const construirPrompt = ficha => {
   const atmosfera = bloqueAtmosfera(ficha)
   const suspendido = bloqueSuspendido(ficha)
 
+  const palanca = bloquePalanca(ficha)
+
+  if (palanca) partes.push(palanca.texto)
   if (atmosfera) partes.push(atmosfera)
   if (suspendido) partes.push(suspendido)
 
@@ -672,7 +759,8 @@ export const construirPrompt = ficha => {
     sinValidar: Boolean(fmt.sinValidar),
     imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],
     avisosObjeto: objetos?.avisos ?? [],
-    llevaSuspendido: Boolean(suspendido)
+    llevaSuspendido: Boolean(suspendido),
+    sinMomento: Boolean(palanca?.sinMomento)
   }
 }
 
@@ -743,8 +831,10 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     )
   }
 
-  for (const { ficha, avisosObjeto } of resueltas) {
-    const avisos = auditarEscena(ficha.escena)
+  for (const { ficha, avisosObjeto, sinMomento } of resueltas) {
+    // Una larga exposición no tiene momento decisivo y pedirle ambos es contradictorio: la palanca
+    // apaga ese aviso concreto, no todos.
+    const avisos = auditarEscena(ficha.escena).filter(a => !(sinMomento && a.includes('MOMENTO')))
     const vestuario = auditarVestuario(ficha.escena, ficha.identidad)
 
     if (vestuario) avisos.push(vestuario)

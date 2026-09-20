@@ -115,12 +115,18 @@ Detalle en [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md
 | Bloque de color | Una relación de áreas azules integrada en la escena puede dar el golpe gráfico | Set azul (`impacto/I2`), pantalla gigante (`impacto/I4`), cuadrados del dron |
 | **Atmósfera** **[2026-09-20]** | **Aire con materia que hace VISIBLE la luz**: polvo dentro del haz, bruma que para los rayos como columnas, vapor, humo de escena a contraluz | `A1` (polvo en la tostaduría), `A3` (bruma en la calle), `A5` (columnas en la nave), `A6` (humo en el set) |
 | **Acción suspendida** **[2026-09-20]** | **Congelar lo que está en vuelo** en el pico de su arco, con peso y trayectoria reales | `A1` (granos de café), `A6` (rollo de cinta), `impacto/I1` (harina) |
+| **Punto de vista subjetivo** **[2026-09-20]** | La cámara **ocupa el lugar de la persona con la que se trabaja**: el asiento del cliente, la silla del visitante | `B1`; y el canon ya lo practicaba en los lechos «respaldo del espectador» y «asiento del cliente» |
+| **Manos como sujeto** **[2026-09-20]** | **Las manos son el sujeto** y no hay rostros: da piezas sin depender de identidad y mata el casting de modelo | `B2` |
+| **Luz motivada** **[2026-09-20]** | La luz viene de una **fuente visible en cuadro**; es lo que separa luz real de un grade | `B3` |
+| **Larga exposición** **[2026-09-20]** | **Duración acumulada** en vez de instante: estelas, con un elemento nítido que ancla | `B4` |
+| **Oclusión** **[2026-09-20]** | La cámara **miró desde detrás de algo** y no movió nada | `B5` (pedida a medias, se anula) |
 
-Las dos últimas se piden **por ficha** (`atmosfera`, `suspendido` en `pnpm foto:prompt`), nunca desde el bloque
+Las siete últimas se piden **por ficha** (`palanca`, `atmosfera`, `suspendido`) (`atmosfera`, `suspendido` en `pnpm foto:prompt`), nunca desde el bloque
 fijo de impacto: ese bloque se emite en todos los prompts, y si llevara «algo volando», volaría algo en cada
 pieza. La atmósfera **exige un haz declarado** —sin luz con dirección no tiene qué revelar y se lee pegada— y la
-acción suspendida tiene **dosis: 1 de cada 4 piezas** **[decisión del operador]**. Fragmentos verbatim, guardas y
-evidencia medida: [prompts y pipeline §3.9](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+acción suspendida tiene **dosis: 1 de cada 4 piezas** **[decisión del operador]**. Y va **UNA palanca de encuadre
+por pieza**: combinar dos las diluye, porque cada una pide el control de la escena **[medido]**. Fragmentos
+verbatim, guardas y evidencia medida: [prompts y pipeline §3.9](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 
 > **«Épica» no es la palabra.** En publicidad arrastra escala grandilocuente y gente mirando al horizonte: el
 > stock premium que este lenguaje rechaza. Lo que se busca es **realismo cinematográfico** —parece un fotograma,

@@ -8,7 +8,7 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 // @ts-expect-error -- .mjs sin tipos, a propósito: es una herramienta de corrida, no código de producto.
-import { auditarEscena, auditarVestuario, construirPrompt, detectarValorDeFormato, OBJETOS } from './build-prompt.mjs'
+import { auditarEscena, auditarVestuario, construirPrompt, detectarValorDeFormato, OBJETOS, PALANCAS } from './build-prompt.mjs'
 
 const raiz = path.resolve(__dirname, '../..')
 const BLOQUES = path.join(raiz, 'scripts/foto/bloques')
@@ -486,5 +486,62 @@ describe('foto:prompt · luz motivada por una fuente en cuadro', () => {
     'SCENE: the wide display glowing cool blue lights him as he leans in at the instant it swings into view.'
   ])('la reconoce como fuente declarada', escena => {
     expect(auditarEscena(escena)).not.toContainEqual(expect.stringContaining('FUENTE DE LUZ'))
+  })
+})
+
+// ── Palancas de encuadre ─────────────────────────────────────────────────────────────────────────
+// Probadas el 2026-09-20. Se piden UNA por pieza: combinar dos las diluye, porque cada una pide el
+// control de la escena.
+describe('foto:prompt · palancas de encuadre', () => {
+  it('sin palanca no emite ninguna', () => {
+    const p = construirPrompt(fichaBase).prompt
+
+    for (const clave of Object.keys(PALANCAS as Record<string, unknown>)) expect(p).not.toContain(clave.toUpperCase())
+  })
+
+  it.each(['pov', 'manos', 'luz-motivada', 'larga-exposicion'])('emite el bloque de %s', palanca => {
+    expect(construirPrompt({ ...fichaBase, palanca }).prompt.length).toBeGreaterThan(construirPrompt(fichaBase).prompt.length)
+  })
+
+  it('el POV pone la cámara en el lugar de la persona con la que se trabaja', () => {
+    expect(construirPrompt({ ...fichaBase, palanca: 'pov' }).prompt).toContain('FROM THE PLACE OF THE PERSON BEING TALKED TO')
+  })
+
+  it('las manos prohíben rostros incluso fuera de foco', () => {
+    expect(construirPrompt({ ...fichaBase, palanca: 'manos' }).prompt).toContain('not even out of focus in the background')
+  })
+
+  it('la luz motivada exige que la fuente se vea, no un filtro', () => {
+    const p = construirPrompt({ ...fichaBase, palanca: 'luz-motivada' }).prompt
+
+    expect(p).toContain('SOURCE THAT IS VISIBLE IN THE FRAME')
+    expect(p).toContain('never from a colour filter or a grade')
+  })
+
+  // El hallazgo de B6: no se suman, compiten.
+  it('rechaza una lista de palancas y explica por qué', () => {
+    expect(() => construirPrompt({ ...fichaBase, palanca: ['pov', 'luz-motivada'] })).toThrow(/UNA palanca dominante/)
+  })
+
+  it('aborta con una palanca desconocida y lista las válidas', () => {
+    expect(() => construirPrompt({ ...fichaBase, palanca: 'dron-cenital' })).toThrow(/Disponibles:/)
+  })
+
+  // El hallazgo de B5: pedida a medias, la oclusión se anula.
+  it('la oclusión exige declarar QUÉ tapa', () => {
+    expect(() => construirPrompt({ ...fichaBase, palanca: 'oclusion' })).toThrow(/exige el campo/)
+  })
+
+  it('la oclusión inserta el objeto declarado y pide que tape de verdad', () => {
+    const p = construirPrompt({ ...fichaBase, palanca: 'oclusion', ocluye: 'the dark back of a monitor' }).prompt
+
+    expect(p).toContain('the dark back of a monitor sits in the near ground')
+    expect(p).toContain('not merely sit beside them')
+  })
+
+  // Una larga exposición no tiene instante: su tensión es duración acumulada.
+  it('la larga exposición marca que el aviso de momento no aplica', () => {
+    expect(construirPrompt({ ...fichaBase, palanca: 'larga-exposicion' }).sinMomento).toBe(true)
+    expect(construirPrompt({ ...fichaBase, palanca: 'pov' }).sinMomento).toBe(false)
   })
 })
