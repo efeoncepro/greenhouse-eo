@@ -203,8 +203,8 @@ Recorrido completo ronda por ronda en la [bitácora](../social/2026-09-19-efeonc
 
 | Pendiente | Por qué importa | Condición de cierre |
 |---|---|---|
-| Espacio para texto | Pedido explícito del operador | Reglas de reserva por formato probadas en piezas reales |
-| Formatos 9:16 y 16:9 nativos | Todo se probó en 4:5 | Rondas nativas con lecho y logo medidos (propuesta del subagente de composición: lecho 4:5 22–28%; 9:16 18–22% con logo a 85–88%; 16:9 25–30%; 1:1 20–25%) |
+| ~~Espacio para texto~~ **cerrado en el plate (2026-09-19)** | Pedido explícito del operador | Reglas de reserva en [`EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md`](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md). **Ojo:** cerrado del lado de la TOMA; la capa gráfica encima NO está aprobada, y su retícula definitiva puede corregir los porcentajes por formato |
+| ~~Formatos 9:16 y 16:9 nativos~~ **cerrado (2026-09-19)** | Ya NO es cierto que «todo se probó en 4:5»: hay **7 plates nativos 1152×2048 y 8 nativos 2048×1152** (`rondas/texto/S1|S1v2|S2|S2v2|S3|S3v2-*-{916,169}-plate.png`, `rondas/capas/CB-916-plate.png`, `rondas/capas/CC-169-plate.png`) **[medido con sharp]** | Falta sólo **1:1**. Propuesta original del subagente de composición, aún sin validar (propuesta del subagente de composición: lecho 4:5 22–28%; 9:16 18–22% con logo a 85–88%; 16:9 25–30%; 1:1 20–25%) |
 | Firma en dron y tomas todo-enfocadas | Sin desenfoque, la franja se ve algo puesta | Decisión del operador sobre la firma alternativa (url-lum) |
 | Promover scripts a comando `pnpm` | Hoy viven en la carpeta de la corrida | Comando canónico con tests |
 | Prueba de reconocimiento | Sin ella no hay «activo distintivo» | n ≥ 100 del público objetivo, distractores coherentes, medición antes y después |
