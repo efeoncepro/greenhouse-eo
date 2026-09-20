@@ -191,7 +191,7 @@ Valen tanto como las aprobadas: evitan repetir el gasto.
 | Descartada | Qué pasó |
 |---|---|
 | **Baño de color** (toda la escena teñida del azul de marca) | **El modelo se niega.** Con marcadores explícitos —«su piel es azul», «el suéter blanco se lee azul»— oscureció el cuarto pero **mantuvo la piel natural**. Su sesgo es más fuerte que la instrucción. Lo que sí produce ya existe: es `luz-motivada`. |
-| **Split diopter** (dos planos nítidos a distinta distancia) | Devuelve **profundidad de campo normal**, sin la costura característica. El efecto no se consigue por prompt. |
+| **Split diopter** (dos planos nítidos a distinta distancia) | **Descartada dos veces.** Devuelve **profundidad de campo normal** sin la costura característica: pliego nítido + persona nítida + fondo suave es lo que da cualquier lente a f/5.6, así que la palanca no existe en el resultado. Reintentada con el sistema de color el 2026-09-20 y **rechazada por el operador: «se ve muy IA»** — el intento de forzar dos campos de foco produce una nitidez pareja que delata la generación. No volver a probarla por prompt. |
 | **Clave baja** (la escena en sombra, sólo emerge lo esencial) | Funciona, pero **no se distingue** de luz con carácter + lecho oscuro, que ya está en el canon. Duplicar una palanca es lo que diluye el sistema. |
 | **Flash duro editorial** | Funciona y **confirma que es otro idioma**: puesto junto a las demás, no pertenece. Si se adopta, va declarado como **territorio aparte** (trendjacking, cultura), nunca mezclado con el lenguaje principal. |
 
