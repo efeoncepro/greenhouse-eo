@@ -216,6 +216,28 @@ Rutas de referencia:
 | Nexa | `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`, `nexa-the-point.png`, `nexa-the-listen.png` |
 | Polo | `ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-01-frente…png`, `…-10-detalle-bordado…png` |
 
+### 3.7.1 Objetos de marca con kit 3D — `objetos` en la ficha **[2026-09-20]**
+
+Un logo, una mascota o una prenda **descritos con palabras** el modelo los dibuja de memoria, y de memoria
+salen deformados. El kit aprobado entra como **referencia de forma**; el prompt aporta la intención.
+
+`pnpm foto:prompt` lo resuelve desde un catálogo: la ficha declara `objetos: ["sprocket-hubspot"]`, o
+`[{ "objeto": "sprocket-hubspot", "vista": "cenital" }]` para elegir el ángulo del kit. El comando
+
+- numera el objeto **después** de las referencias de identidad (si el número no calza con el orden real de
+  los `--image`, el modelo aplica la instrucción a la imagen equivocada);
+- emite la geometría y las prohibiciones verbatim del kit;
+- aborta si el kit, la vista o el archivo no existen, listando las vistas disponibles;
+- **propaga el aviso de derechos**, para que viaje con el kit y no con la memoria de quien lo use.
+
+Kits en el catálogo: `sprocket-hubspot`, `nave-efeonce`, `clawd`, `codex`, `polo-efeonce`, `hoodie-efeonce`.
+Agregar uno nuevo es una entrada de datos —base, patrón de archivo y tabla de vistas—, no un cambio de lógica.
+
+> ⚠️ **`sprocket-hubspot` es marca registrada de un tercero.** Las guías de partner de HubSpot prohíben
+> modificar el logo y piden enviar un boceto por formulario (revisión de 7 a 10 días hábiles); prefieren las
+> insignias de partner. El kit sirve para bocetos y para pedir esa aprobación: **no publicar ni pautar sin
+> autorización escrita**. El comando emite este aviso solo en cada corrida que lo use.
+
 ### 3.8 FOREGROUND (plantilla del lecho)
 
 Plantilla consolidada de las rondas `cruce/`, `curado/`, `palancas/`, `personas/` **[medido: todas las del set

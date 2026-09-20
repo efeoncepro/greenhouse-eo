@@ -282,6 +282,128 @@ function resolverIdentidad(ficha) {
   return { identity: tramos.map(t => t.persona.identity).join('\n\n'), references, imagenes }
 }
 
+// ── Objetos de marca con kit 3D propio ──────────────────────────────────────────────────────────
+// Mismo problema que la identidad: describir un logo o una prenda con palabras hace que el modelo lo
+// dibuje de memoria, y un logo dibujado de memoria sale deformado. El kit aprobado entra como
+// REFERENCIA DE FORMA y el prompt aporta la intención. Agregar un kit nuevo es una entrada acá, no
+// un cambio de lógica: base + patrón + vistas.
+const OBJETOS = {
+  'sprocket-hubspot': {
+    etiqueta: 'the official 3D sculpture of the HubSpot sprocket symbol',
+    // El LEEME del kit es explícito y el aviso viaja con el objeto, no en la memoria de quien lo use.
+    aviso:
+      'marca registrada de un tercero: uso INTERNO hasta aprobación escrita de HubSpot (formulario con boceto, 7–10 días hábiles). No publicar ni pautar con esta pieza.',
+    instruccion:
+      'Reproduce EXACTLY this object — same silhouette and same proportions: a ring at the lower right, a short bar going up from it, a long bar at the upper left ending in the larger node, and a short bar at the lower left ending in the smaller node. Solid extrusion of uniform thickness (about a quarter of the ring width), minimal bevel, matte enamel finish in its exact orange with no colour variation. Do NOT add teeth, gears, text or extra parts, do NOT re-proportion it, and do NOT rotate it into an unreadable angle.',
+    base: 'ai-generations/2026-09-17_sprocket-3d/final/',
+    patron: 'efeonce-sprocket-hubspot-3d-<V>-1x1-1600x1600-v01-transparente.png',
+    vistas: {
+      frente: '01-frente-heroe',
+      'tres-cuartos-izq': '02-tres-cuartos-izquierda',
+      lateral: '03-lateral-pronunciado',
+      contrapicado: '04-contrapicado-monumental',
+      cenital: '05-cenital-plano',
+      flotando: '06-flotando',
+      rodando: '07-rodando-sobre-canto',
+      'tres-cuartos-trasero': '08-tres-cuartos-trasero'
+    },
+    vistaDefecto: 'tres-cuartos-izq'
+  },
+  'nave-efeonce': {
+    etiqueta: 'the official white 3D model of the Efeonce ship emblem',
+    instruccion:
+      'Reproduce EXACTLY this object — same silhouette, the ring/orbit with its cuts, the three small windows, same proportions. Do not redraw, simplify or add parts.',
+    base: 'ai-generations/2026-09-17_efeonce-ship-3d/final/',
+    patron: 'efeonce-nave-3d-blanco-<V>-1x1-1600x1600-v01-transparente.png',
+    vistas: { frente: '01-frente-heroe', 'tres-cuartos-izq': '02-tres-cuartos-izquierda', perfil: '03-perfil' },
+    vistaDefecto: 'tres-cuartos-izq'
+  },
+  clawd: {
+    etiqueta: 'the official 3D figure of Clawd, the Claude mascot',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small collectible figure about 25 cm tall, at correct scale with contact shadows. Do not redraw it, do not restyle it and do not change its proportions.',
+    base: 'ai-generations/2026-09-17_clawd-poses-3d/final/',
+    patron: 'efeonce-clawd-3d-<V>-1x1-1600x1600-v01-transparente.png',
+    vistas: { frente: '01-frente-heroe', saludo: '02-saludo-tres-cuartos-izquierda', perfil: '03-perfil-caminando' },
+    vistaDefecto: 'frente'
+  },
+  codex: {
+    etiqueta: 'the official 3D figure of Codex, the OpenAI mascot',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small collectible figure about 25 cm tall, at correct scale with contact shadows. Do not redraw it, do not restyle it and do not change its proportions.',
+    base: 'ai-generations/2026-09-17_codex-poses-3d/final/',
+    patron: 'efeonce-codex-3d-<V>-1x1-1600x1600-v01-transparente.png',
+    vistas: { frente: '01-frente-heroe', saludo: '02-saludo-tres-cuartos-izquierda', perfil: '03-perfil-caminando' },
+    vistaDefecto: 'frente'
+  },
+  'polo-efeonce': {
+    etiqueta: 'the Efeonce team polo',
+    instruccion:
+      'Use it as the exact garment the person wears: same colour, collar, fabric and embroidered emblem in the same position and size. Do not copy its studio background or presentation, and never let the model spell the emblem by itself — inspect it at 100% before publishing.',
+    base: 'ai-generations/2026-09-17_polo-efeonce/final/',
+    patron: 'efeonce-polo-blanco-<V>-1600x1600-v01-transparente.png',
+    vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
+    vistaDefecto: 'frente'
+  },
+  'hoodie-efeonce': {
+    etiqueta: 'the Efeonce team hoodie',
+    instruccion:
+      'Use it as the exact garment the person wears: same colour, cut, fabric and embroidered emblem in the same position and size. Do not copy its studio background or presentation.',
+    base: 'ai-generations/2026-09-17_hoodie-efeonce/final/',
+    patron: 'efeonce-hoodie-<V>-1600x1600-v01-transparente.png',
+    vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
+    vistaDefecto: 'frente'
+  }
+}
+
+// La vista se elige por el ÁNGULO DE LA TOMA, no por costumbre: de espaldas → vista de espalda.
+function resolverObjetos(ficha, desde) {
+  const pedidos = ficha.objetos ?? []
+
+  if (!Array.isArray(pedidos)) throw new Error('`objetos` debe ser una lista, por ejemplo ["sprocket-hubspot"].')
+  if (!pedidos.length) return null
+
+  const imagenes = []
+  const bloques = []
+  const avisos = []
+
+  for (const pedido of pedidos) {
+    const clave = typeof pedido === 'string' ? pedido : pedido?.objeto
+    const objeto = OBJETOS[clave]
+
+    if (!objeto) {
+      throw new Error(`Objeto "${clave}" desconocido. Kits disponibles: ${Object.keys(OBJETOS).join(', ')}.`)
+    }
+
+    const vista = (typeof pedido === 'string' ? null : pedido?.vista) ?? objeto.vistaDefecto
+    const sufijo = objeto.vistas[vista]
+
+    if (!sufijo) {
+      throw new Error(
+        `La vista "${vista}" no existe para "${clave}". Vistas del kit: ${Object.keys(objeto.vistas).join(', ')}.`
+      )
+    }
+
+    const ref = objeto.base + objeto.patron.replace('<V>', sufijo)
+
+    if (!existsSync(path.join(raiz, ref))) {
+      throw new Error(
+        `El kit de "${clave}" no tiene la vista "${vista}" en disco: ${ref}. ` +
+          'Sin el render, el modelo dibuja la marca de memoria y sale deformada.'
+      )
+    }
+
+    const n = desde + imagenes.length + 1
+
+    imagenes.push(ref)
+    bloques.push(`IMAGE ${n} (object reference): Image ${n} is ${objeto.etiqueta}. ${objeto.instruccion} Ignore its studio background.`)
+
+    if (objeto.aviso) avisos.push(`"${clave}" es ${objeto.aviso}`)
+  }
+
+  return { imagenes, bloque: bloques.join('\n\n'), avisos }
+}
+
 const FICHA_EJEMPLO = {
   id: 'ejemplo-picado-mesa-oscura',
   formato: '4:5',
@@ -313,7 +435,7 @@ const ANCLAS_PROHIBIDAS = [
 // de vitrina a mediodía [medido 2026-09-20]. Un aviso que grita donde no debe se vuelve ruido y deja
 // de leerse justo cuando acierta.
 const LUZ =
-  /\b(sun|sunlight|sunbeam|daylight|midday|noon|beam|backlit|rim-?lit|lit only|lamp|window light|golden hour|hard light|directional|shaft|raking|silhouett)/i
+  /\b(sun|sunlight|sunbeam|daylight|midday|noon|beam|backlit|rim-?lit|lit only|lamp|window light|golden hour|hard light|directional|shaft|raking|rakes|silhouett|spot|spotlight|stage light|practical|key light|candlelit|firelight|neon)/i
 
 const MOMENTO = /\b(mid-|at the peak|throws|laughing|mid-sentence|reaching|turning|just as|the moment|catches)/i
 
@@ -396,6 +518,12 @@ export const construirPrompt = ficha => {
     partes.push(identidad.references)
   }
 
+  // Los objetos se numeran DESPUÉS de las referencias de identidad: si el número no calza con el
+  // orden real de los --image, el modelo aplica la instrucción a la imagen equivocada.
+  const objetos = resolverObjetos(ficha, identidad?.imagenes.length ?? 0)
+
+  if (objetos) partes.push(objetos.bloque)
+
   partes.push(ficha.escena)
 
   // El lecho, con el porcentaje del formato. Nunca escrito a mano.
@@ -407,7 +535,8 @@ export const construirPrompt = ficha => {
     prompt: partes.join('\n\n'),
     size: fmt.size,
     sinValidar: Boolean(fmt.sinValidar),
-    imagenes: identidad?.imagenes ?? []
+    imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],
+    avisosObjeto: objetos?.avisos ?? []
   }
 }
 
@@ -466,17 +595,21 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
   }
 
   // Aviso de escena (no bloquea): luz, momento y azul como tema.
-  for (const { ficha } of resueltas) {
+  for (const { ficha, avisosObjeto } of resueltas) {
     const avisos = auditarEscena(ficha.escena)
     const vestuario = auditarVestuario(ficha.escena, ficha.identidad)
 
     if (vestuario) avisos.push(vestuario)
 
     for (const a of avisos) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: la escena ${a}`)
+
+    // El aviso de derechos viaja con el kit, no con la memoria de quien lo usa.
+    for (const a of avisosObjeto ?? []) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: ${a}`)
   }
 
-  // `pnpm ai:image --batch` NO transporta `--image`: un batch con identidad genera caras inventadas,
-  // se ve plausible en la hoja de contacto y se paga igual. Abortar es la única salida honesta.
+  // `pnpm ai:image --batch` NO transporta `--image`: un batch con identidad genera caras inventadas
+  // —y con un kit de marca, logos dibujados de memoria—, se ve plausible en la hoja de contacto y se
+  // paga igual. Abortar es la única salida honesta.
   const conIdentidad = resueltas.filter(r => r.imagenes.length)
 
   if (i >= 0 && conIdentidad.length) {

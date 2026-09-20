@@ -1,0 +1,13 @@
+{
+  "id": "U1-nexa-escenario-boston",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "escena": "SCENE (a large partner technology conference in Boston, breakout session hall, evening): the only strong light is the hard beam of the stage spot falling ONTO THE WOMAN from high front-left, carving her silhouette out of the dark room and catching the dust in the air; she stands mid-sentence at the edge of the stage, one hand open turned upward as she lands the point, the other holding a slim presenter remote. She is wearing a fine light heather-grey knit sweater with the sleeves pushed up and soft stone trousers; no jacket, no blazer, no navy or blue clothing. She looks out at the audience, never at the camera. Far behind her a large screen glows cool azure blue with a simple abstract diagram of connected nodes, deliberately out of focus and completely unbranded, with no readable text, no letters and no logos anywhere. A small lime-green indicator light glows on the lectern beside her. 200mm lens at f/2.8 shot from the back of the room, focus on her face and hands.",
+  "lecho": {
+    "objeto": "the backs of the heads and shoulders of the seated audience, filling the very bottom of the frame right against the lens",
+    "tono": "DARK near black, with subtle texture"
+  }
+}

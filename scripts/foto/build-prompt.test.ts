@@ -311,3 +311,79 @@ describe('foto:prompt · vistas de identidad', () => {
     expect(p).toContain('GREY IS CONCENTRATED THERE')
   })
 })
+
+// Segundo falso negativo del detector de luz, misma clase que `daylight`: una escena de escenario
+// declara la luz con «stage spot» y «rakes», y el aviso saltaba igual [2026-09-20].
+describe('foto:prompt · el detector de luz cubre el vocabulario real', () => {
+  it.each([
+    'SCENE: a single hard stage spot rakes onto the man at the moment he names it.',
+    'SCENE: hard midday daylight pours through the glass as she seats the divider.',
+    'SCENE: only the neon sign lights the room as he turns mid-sentence.'
+  ])('reconoce la fuente en %s', escena => {
+    // Comprueba SOLO el aviso de luz: estas frases no siempre declaran momento, y mezclar ambos
+    // chequeos hacía fallar el test por una razón distinta de la que decía verificar.
+    expect(auditarEscena(escena)).not.toContainEqual(expect.stringContaining('FUENTE DE LUZ'))
+  })
+})
+
+// ── Objetos de marca ─────────────────────────────────────────────────────────────────────────────
+// Un logo descrito con palabras se dibuja de memoria y sale deformado. El kit aprobado entra como
+// referencia de forma, y su numeración tiene que calzar con el orden real de los --image.
+describe('foto:prompt · objetos de marca', () => {
+  it('sin objetos no emite bloque ni pide referencias extra', () => {
+    const r = construirPrompt(fichaBase)
+
+    expect(r.prompt).not.toContain('object reference')
+    expect(r.imagenes).toEqual([])
+  })
+
+  it('numera el objeto DESPUÉS de las referencias de identidad', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: ['julio'], objetos: ['sprocket-hubspot'] })
+
+    expect(r.imagenes).toHaveLength(4)
+    expect(r.prompt).toContain('IMAGE 4 (object reference)')
+  })
+
+  it('sin identidad el objeto es la imagen 1', () => {
+    const r = construirPrompt({ ...fichaBase, objetos: ['nave-efeonce'] })
+
+    expect(r.imagenes).toHaveLength(1)
+    expect(r.prompt).toContain('IMAGE 1 (object reference)')
+  })
+
+  it('acepta varios objetos y los numera en orden', () => {
+    const r = construirPrompt({ ...fichaBase, objetos: ['clawd', 'codex'] })
+
+    expect(r.prompt).toContain('IMAGE 1 (object reference)')
+    expect(r.prompt).toContain('IMAGE 2 (object reference)')
+    expect(r.imagenes[0]).toContain('clawd')
+    expect(r.imagenes[1]).toContain('codex')
+  })
+
+  it('elige la vista pedida del kit', () => {
+    const r = construirPrompt({ ...fichaBase, objetos: [{ objeto: 'sprocket-hubspot', vista: 'cenital' }] })
+
+    expect(r.imagenes[0]).toContain('05-cenital-plano')
+  })
+
+  it('aborta con una vista que el kit no tiene y lista las que hay', () => {
+    expect(() => construirPrompt({ ...fichaBase, objetos: [{ objeto: 'sprocket-hubspot', vista: 'submarina' }] })).toThrow(
+      /Vistas del kit/
+    )
+  })
+
+  it('aborta con un kit desconocido', () => {
+    expect(() => construirPrompt({ ...fichaBase, objetos: ['logo-de-otra-marca'] })).toThrow(/Kits disponibles/)
+  })
+
+  // El derecho de uso viaja con el kit: quien lo tome recibe el aviso sin tener que recordarlo.
+  it('propaga el aviso de derechos de una marca de tercero', () => {
+    const r = construirPrompt({ ...fichaBase, objetos: ['sprocket-hubspot'] })
+
+    expect(r.avisosObjeto[0]).toMatch(/uso INTERNO hasta aprobación escrita/)
+  })
+
+  it('un kit propio no arrastra aviso de derechos', () => {
+    expect(construirPrompt({ ...fichaBase, objetos: ['nave-efeonce'] }).avisosObjeto).toEqual([])
+  })
+})
