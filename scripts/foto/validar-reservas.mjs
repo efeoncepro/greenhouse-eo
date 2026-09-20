@@ -29,10 +29,22 @@ const lum = (r, g, b) => {
 }
 
 const hexLum = h => lum(parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16))
+
+// L* de CIE: un paso vale lo mismo arriba y abajo de la escala. La luminancia LINEAL no: la misma
+// textura física salta ~15× más arriba que abajo, así que un umbral en Y premia la oscuridad. Lo midió
+// la sesión de capa gráfica y lo reproduje: la losa oscura que el operador rechazó pasaba el umbral en
+// Y con 12× de margen, mientras un muro pálido genuinamente liso reprobaba. [medido 2026-09-20]
+const aLstar = Y => (Y <= 0.008856 ? 903.3 * Y : 116 * Math.cbrt(Y) - 16)
 const ratio = (a, b) => Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100
 
 const TINTA = { blanca: '#ffffff', oscura: '#00284d' }
 const TRAZO = '#a6cdf5'
+
+// Piso de calma en L*. NO es un número a ojo: sale de medir los dos extremos [medido 2026-09-20].
+//   Deben pasar (reservas reales):  P3 0,24 · P2 0,29 · T13 claro 0,29 · T19 claro 0,18
+//   Deben reprobar (escena viva):   P3 derecha 0,89 · P1 objeto 1,29 · P2 sala 2,44
+// El hueco va de 0,29 a 0,89; 0,5 queda a ~1,7× del peor que pasa y ~1,8× del mejor que falla.
+const CALMA_MAX = 0.5
 // El lecho no mide igual en los tres formatos [medido en rondas/texto/bv2-{45,916,169}.json].
 const LECHO = { '4:5': 0.18, '9:16': 0.22, '16:9': 0.16, '1:1': 0.18 }
 
@@ -66,9 +78,25 @@ const zona = async (x0, y0, x1, y1) => {
   let g = 0
   let n = 0
 
-  for (let y = 0; y < height; y++) for (let x = 1; x < width; x++) { g += Math.abs(ls[y * width + x] - ls[y * width + x - 1]); n++ }
+  let gL = 0
 
-  return { p2: ord[Math.floor(ord.length * 0.02)], p50: ord[Math.floor(ord.length * 0.5)], p98: ord[Math.floor(ord.length * 0.98)], ocupacion: n ? g / n : 0 }
+  for (let y = 0; y < height; y++)
+    for (let x = 1; x < width; x++) {
+      const i = y * width + x
+
+      g += Math.abs(ls[i] - ls[i - 1])
+      gL += Math.abs(aLstar(ls[i]) - aLstar(ls[i - 1]))
+      n++
+    }
+
+  // `ocupacion` (Y) se conserva sólo para el lecho; `calma` (L*) es la que decide en zonas.
+  return {
+    p2: ord[Math.floor(ord.length * 0.02)],
+    p50: ord[Math.floor(ord.length * 0.5)],
+    p98: ord[Math.floor(ord.length * 0.98)],
+    ocupacion: n ? g / n : 0,
+    calma: n ? gL / n : 0
+  }
 }
 
 const contra = (z, tinta) => ratio(hexLum(tinta), hexLum(tinta) > 0.5 ? z.p98 : z.p2)
@@ -104,14 +132,14 @@ for (const [nombre, tinta] of Object.entries(TINTA)) {
     for (let y = geo.desde; y < geo.hasta; y += 0.02) {
       const z = await zona(geo.x0, y, geo.x1, y + 0.02)
 
-      if (contra(z, tinta) >= 4.5 && z.ocupacion < 0.005) alcance = y + 0.02
+      if (contra(z, tinta) >= 4.5 && z.calma < CALMA_MAX) alcance = y + 0.02
       else break
     }
   } else {
     for (let x = geo.x0; x < geo.x1; x += 0.02) {
       const z = await zona(x, geo.desde, x + 0.02, geo.hasta)
 
-      if (contra(z, tinta) >= 4.5 && z.ocupacion < 0.005) alcance = x + 0.02
+      if (contra(z, tinta) >= 4.5 && z.calma < CALMA_MAX) alcance = x + 0.02
       else break
     }
   }
@@ -174,14 +202,21 @@ const logoBlanco = contra(lecho, '#ffffff')
 const logoNavy = ratio(hexLum('#023c70'), lecho.p2)
 const mejorLogo = Math.max(logoBlanco, logoNavy)
 
-filas.push([`3 · lecho de la firma (${Math.round(pct * 100)}% por formato)`, `blanco ${logoBlanco} · navy ${logoNavy} · nitidez ${lecho.ocupacion.toFixed(4)}`, mejorLogo >= 4.5 && lecho.ocupacion < 0.004])
+// 🔴 El lecho se queda en Y a propósito, y su umbral es FRÁGIL. Medido 2026-09-20 sobre seis lechos:
+// en L* el lecho NO disuelto (T19 ola1, 0,18) es indistinguible de los disueltos (0,17–0,20), así que
+// pasar el lecho a L* le quitaría toda capacidad de detectar. Pero en Y separa por un pelo — 0,0035 el
+// disuelto contra 0,0043 el que no, apenas 20% de margen, que es ruido. Conclusión honesta: este
+// chequeo NO mide desenfoque de forma confiable en ningún espacio de los dos. Sirve como señal débil;
+// la prueba real del lecho sigue siendo mirar el plate. Medir desenfoque bien pide otra métrica
+// (varianza de laplaciano o energía de alta frecuencia normalizada), y eso está PENDIENTE.
+filas.push([`3 · lecho de la firma (${Math.round(pct * 100)}% · señal débil)`, `blanco ${logoBlanco} · navy ${logoNavy} · nitidez ${lecho.ocupacion.toFixed(4)} (frágil)`, mejorLogo >= 4.5 && lecho.ocupacion < 0.004])
 
 // ── Reserva 4 · aire para cursores ───────────────────────────────────────────────────────────
 // Con dos colaboradores el aire lateral se paga dos veces: se exige margen libre a ambos costados.
 const izq = await zona(0, 0.10, 0.10, 0.45)
 const der = await zona(0.90, 0.10, 1, 0.45)
 
-filas.push(['4 · aire para cursores', `costados ocupación ${izq.ocupacion.toFixed(4)} / ${der.ocupacion.toFixed(4)}`, izq.ocupacion < 0.012 && der.ocupacion < 0.012])
+filas.push(['4 · aire para cursores', `costados calma ${izq.calma.toFixed(2)} / ${der.calma.toFixed(2)}`, izq.calma < CALMA_MAX * 2 && der.calma < CALMA_MAX * 2])
 
 // ── Reserva 5 · campo profundo al margen ─────────────────────────────────────────────────────
 // Banda vertical de ~30% del ancho que siga siendo la MISMA superficie hasta pasado el 40% del alto.
@@ -194,7 +229,7 @@ for (const [nombre, tinta] of Object.entries(TINTA)) {
   for (let y = 0.05; y < 0.6; y += 0.025) {
     const z = await zona(0.05, y, 0.35, y + 0.025)
 
-    if (contra(z, tinta) >= 4.5 && z.ocupacion < 0.005) hasta = y + 0.025
+    if (contra(z, tinta) >= 4.5 && z.calma < CALMA_MAX) hasta = y + 0.025
     else break
   }
 

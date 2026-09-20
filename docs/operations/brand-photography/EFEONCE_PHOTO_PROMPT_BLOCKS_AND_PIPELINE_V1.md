@@ -458,11 +458,11 @@ azules, pintura) **[criterio]**.
 
 | Reserva | Umbral | Origen |
 |---|---|---|
-| 1 · zona de texto | contraste ≥ 4,5:1 con alguna tinta; banda ≥ 0,28 del alto (vertical) o ≥ 0,45 del ancho (16:9) | **[medido]** ronda `texto` |
+| 1 · zona de texto | contraste ≥ 4,5:1 con alguna tinta **y calma L\* < 0,5**; banda ≥ 0,28 del alto (vertical) o ≥ 0,45 del ancho (16:9) | **[medido]** ronda `texto` |
 | 2 · objeto para enmarcar | trazo `#a6cdf5` ≥ 3:1 en los **cuatro** lados del perímetro de la caja | **[medido]** capa gráfica |
-| 3 · lecho de la firma | mejor tinta ≥ 4,5:1 **y** nitidez < 0,004 | **[medido]** set curado |
-| 4 · aire para cursores | ocupación < 0,012 en ambos costados | **[criterio]** |
-| 5 · campo profundo al margen | banda continua ≥ 0,40 del alto | **[medido]** piloto: alcanzable, da 0,60 |
+| 3 · lecho de la firma | mejor tinta ≥ 4,5:1 **y** nitidez < 0,004 — **señal débil, ver §5.1** | **[frágil]** |
+| 4 · aire para cursores | calma L* < 1,0 en ambos costados | **[criterio]** |
+| 5 · campo profundo al margen | banda continua ≥ 0,40 del alto, con calma L\* < 0,5 | **[medido]** piloto: alcanzable, da 0,60 |
 | 6 · lecho por formato | 4:5 18% · 9:16 22% · 16:9 16% · 1:1 20% **[sin validar]** | **[medido]** `bv2-{45,916,169}` |
 
 
@@ -500,6 +500,31 @@ bSombras, azul, naranja, lima y piel. Medir siempre el **plate** (sin logo). Ran
 | Identidad | Rasgo cambiado (lentes, barba, edad) | Regenerar con Sunburst + IDENTITY + roles de referencia |
 
 ---
+
+### 5.1 Por qué la calma se mide en L\*, y por qué el lecho no es confiable **[medido 2026-09-20]**
+
+El umbral de calma estaba en **luminancia lineal (Y)**, y Y no es perceptual: la misma textura física salta unas
+15× más arriba de la escala que abajo. Un umbral en Y **premia la oscuridad**. Consecuencia medida: la losa oscura
+que el operador rechazó por «extremadamente forzado» pasaba con **12× de margen**, mientras un muro pálido
+genuinamente liso reprobaba. El detector empujaba justo hacia el defecto.
+
+En **L\*** un paso vale lo mismo en cualquier nivel. El piso de 0,5 no es a ojo; sale de medir los dos extremos:
+
+| Deben pasar (reservas reales) | L\* | Deben reprobar (escena viva) | L\* |
+|---|---|---|---|
+| T19 claro, banda | 0,18 | P3 lado derecho (monitor) | 0,89 |
+| P3 banda izquierda | 0,24 | P1 zona del objeto | 1,29 |
+| P2 banda izquierda · T13 claro | 0,29 | P2 lado derecho (la sala) | 2,44 |
+
+El hueco va de 0,29 a 0,89; **0,5** queda a ~1,7× del peor que pasa y ~1,8× del mejor que falla.
+
+**El lecho se queda en Y a propósito, y su umbral es frágil.** Sobre seis lechos: en L\* el lecho **no disuelto**
+(0,18) es **indistinguible** de los disueltos (0,17–0,20), así que pasarlo a L\* le quitaría toda capacidad de
+detectar; pero en Y separa por un pelo —0,0035 el disuelto contra 0,0043 el que no, 20% de margen, que es ruido—.
+Honestamente: **este chequeo no mide desenfoque de forma confiable en ninguno de los dos espacios.** Sirve como
+señal débil; la prueba real del lecho sigue siendo mirar el plate. Medirlo bien pide otra métrica (varianza de
+laplaciano o energía de alta frecuencia normalizada) y está **[pendiente]**.
+
 
 ## 6. Curación generativa de pantallas
 
