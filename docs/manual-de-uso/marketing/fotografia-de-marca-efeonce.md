@@ -6,6 +6,25 @@
 > **Última actualización:** 2026-09-19 por Claude
 > **Documentación relacionada:** [Índice de fotografía de marca](../../operations/brand-photography/README.md) · [Lenguaje fotográfico (maestro)](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](../../operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](../../operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](../../operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Bloques de prompt y pipeline](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](../../operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md)
 
+## Lo más corto que funciona
+
+```bash
+pnpm foto:prompt --ficha-ejemplo > ficha.json     # 1. plantilla; editá escena, lecho y reservas
+pnpm foto:prompt ficha.json --batch batch.json    # 2. arma el prompt (imprime el ai:image exacto)
+pnpm ai:image --batch batch.json --out <dir> --model gpt-image-2.5-flare --quality high --size <el que imprimió>
+pnpm foto:validar <dir>/<archivo>-plate.png       # 3. ¿sirve? con números, no a ojo
+```
+
+Tres reglas que ahorran plata:
+
+1. **No escribas el prompt a mano.** El comando resuelve el formato, el porcentaje del lecho y el límite de
+   sujetos desde una tabla. Armarlo a mano fue la vía por la que un valor de 4:5 terminó dentro de un bloque que
+   corría en todos los formatos, sin que nadie lo viera.
+2. **Validá antes de componer.** Si el plate no pasa, se **regenera**; no se parcha con un scrim ni al componer.
+3. **Piloto antes de la tanda.** Tres plates cuestan USD 0,15 y te dicen si el prompt sirve. Cincuenta cuestan
+   USD 2,50 y te dejan cincuenta imágenes que alguien tiene que mirar.
+
+
 ## Para qué sirve
 
 Para producir fotos de la **marca propia de Efeonce** (redes, web, presentaciones, propuestas) que se reconozcan como

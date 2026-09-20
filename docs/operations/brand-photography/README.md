@@ -13,6 +13,19 @@ piezas de clientes ni a trendjacking que toma prestada una estética ajena.
 Estado: **sistema aprobado y consistente, no activo distintivo medido**. Llamarlo activo distintivo exige antes la
 prueba de reconocimiento descrita en los pendientes del documento maestro.
 
+## Los dos comandos (empieza por acá)
+
+```bash
+pnpm foto:prompt --ficha-ejemplo          # plantilla de ficha de toma
+pnpm foto:prompt <ficha.json> --batch <out.json>   # arma el prompt; el formato sale de UNA tabla
+pnpm foto:validar <plate.png>             # valida las seis reservas sobre el plate limpio
+```
+
+`foto:prompt` existe porque dos veces se coló un valor de un formato dentro de un bloque compartido
+(«Vertical 4:5.», «bottom 18%») y ninguna se vio hasta medir. `foto:validar` es el arnés de reservas, promovido
+desde una carpeta de corrida el 2026-09-20 porque una herramienta dentro de una carpeta fechada no la encuentra
+nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) §4.2 y §5.
+
 ## Documentos
 
 | # | Documento | Qué resuelve | Autor |

@@ -275,10 +275,10 @@ material** y la paleta cálida sin azul en sala («NO blue elements in the room 
 | Paso | Qué | Herramienta | Salida |
 |---|---|---|---|
 | 1 | Ficha de toma (§2) | Documento / prompt | Ficha |
-| 2 | Armar prompt (§1) y batch JSON | Python `json.dump` | `batch.json` |
+| 2 | Armar prompt (§1) y batch JSON | **`pnpm foto:prompt <ficha.json> --batch <out.json>`** | `batch.json` |
 | 3 | Generar plates | `pnpm ai:image --batch` | `*-plate.png` |
 | 4 | Hoja de contacto y revisión | Visor / Read | Lista de candidatas |
-| 5 | Medir lecho | `medir.mjs` | max/p99/lum |
+| 5 | Medir lecho y reservas | **`pnpm foto:validar <plate.png>`** | Tabla de las seis reservas |
 | 6 | Regenerar si falla (§5.3) | `pnpm ai:image` | Nuevo plate |
 | 7 | Pantallas por curación generativa (si hay pantalla) | `--image` + `--mask` | Plate con UI integrada |
 | 8 | Firma / selección AXIS | `componer.mjs` | `*-final.png` |
@@ -299,7 +299,45 @@ cp ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/{medir.mjs,met
 `ai-generations/` es la carpeta durable de corridas (no `.captures/`, que se purga) **[criterio, memoria del
 operador]**.
 
-### 4.2 Construir el batch con Python
+### 4.2 Construir el batch — `pnpm foto:prompt`
+
+**No armes el prompt a mano.** Dos veces se coló un valor de un formato dentro de un bloque compartido y ninguna se
+vio hasta medir: «Vertical 4:5.» al final del bloque de realismo, y «bottom 18%» en la plantilla del lecho. Mientras
+armar un prompt sea copiar y pegar, ese bug vuelve.
+
+```bash
+pnpm foto:prompt --ficha-ejemplo > rondas/<ronda>/ficha.json   # plantilla para editar
+pnpm foto:prompt rondas/<ronda>/ficha.json                     # ver el prompt resuelto
+pnpm foto:prompt rondas/<ronda>/ficha.json --batch rondas/<ronda>/batch.json
+```
+
+La ficha declara **intención**; el comando resuelve los valores:
+
+| Campo de la ficha | Qué es |
+|---|---|
+| `formato` | `4:5` · `9:16` · `16:9` · `1:1`. Determina `--size`, la frase que declara el formato, el **porcentaje del lecho** y el **límite de sujetos**. Es la única fuente de esos cuatro valores |
+| `escena` | El párrafo `SCENE (...)` de la toma. Obligatorio: el modelo no inventa la escena |
+| `lecho.objeto` / `lecho.tono` | Qué se pone cerca del lente y con qué tono declarado. Obligatorio: la firma siempre necesita su lecho |
+| `reservas.texto` | `{ muro, tinta }` — zona de titular, con la geometría del formato |
+| `reservas.seleccion` | `{ objeto, campo }` — bloque §3.8.1 |
+| `reservas.margen` | `{ superficie, tinta }` — bloque §3.8.2 |
+| `toma` | Número del catálogo de cámaras. Habilita el chequeo de incompatibilidad toma ↔ reserva |
+| `impacto` | `false` para omitir el bloque de impacto (por defecto va) |
+
+Cinco cosas que el comando **impide**, todas verificadas:
+
+1. Un bloque compartido con un valor de formato adentro → **aborta** nombrando la frase culpable.
+2. Pedir una reserva en una toma que no la admite (margen en 4, 5, 10, 14) → **aborta** con el porqué.
+3. Mezclar formatos en un batch → **aborta**: `pnpm ai:image --batch` toma un solo `--size`.
+4. Olvidar el lecho o la escena → **aborta**.
+5. Escribir el JSON con `echo` y romper comillas → no aplica: lo escribe el comando.
+
+El comando imprime al final el `pnpm ai:image` exacto con el `--size` que corresponde. **`1:1` no tiene ronda
+validada** y el comando lo advierte: sus números son criterio, no medición.
+
+<details><summary>Cómo se hacía antes (histórico, ya no usar)</summary>
+
+### 4.2-bis Construir el batch con Python
 
 Los prompts tienen comillas, apóstrofes y `#`: **no** escribir el JSON a mano ni con `echo` **[medido: comillas rotas
 en sesión]**.
@@ -317,6 +355,8 @@ batch = [{"filename": f, "prompt": f"{R}\n\n{I}\n\n{scene}\n\n{fg}"} for f, scen
 json.dump(batch, open('rondas/<ronda>/batch.json', 'w'), ensure_ascii=False, indent=1)
 EOF
 ```
+
+</details>
 
 ### 4.3 Generar
 
@@ -351,6 +391,38 @@ azules, pintura) **[criterio]**.
 ---
 
 ## 5. Medición y umbrales para regenerar
+
+> **El comando canónico es `pnpm foto:validar <plate.png>`.** Valida las **seis reservas** del
+> [contrato de reserva](./EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) sobre un plate limpio, detecta el formato
+> solo y aplica el porcentaje de lecho que corresponde. Sale con código 1 si alguna reserva **evaluada** falla, así
+> que se encadena en un gate.
+>
+> ```bash
+> pnpm foto:validar <plate.png>                                  # lecho, aire, campo al margen
+> pnpm foto:validar <plate.png> --zona-texto                     # exige además la zona de titular
+> pnpm foto:validar <plate.png> --objeto 0.20,0.32,0.77,0.61     # exige además el perímetro de la caja
+> ```
+>
+> `--zona-texto` y `--objeto` son **opt-in**: un plate que no pide esa reserva no reprueba por no tenerla. Las
+> coordenadas van en **fracciones** del lienzo (0–1), nunca en píxeles. `--padding-x` / `--padding-y` barren el
+> padding de la caja: el perímetro que importa es el de la **caja**, no el del objeto (ver el piloto del
+> 2026-09-20).
+>
+> Los scripts sueltos `medir.mjs` y `metricas.cjs` de la carpeta de la corrida siguen sirviendo para medir una caja
+> arbitraria o las métricas Lab, pero **para las reservas el comando es el dueño**.
+
+### 5.0 Umbrales que aplica el comando
+
+| Reserva | Umbral | Origen |
+|---|---|---|
+| 1 · zona de texto | contraste ≥ 4,5:1 con alguna tinta; banda ≥ 0,28 del alto (vertical) o ≥ 0,45 del ancho (16:9) | **[medido]** ronda `texto` |
+| 2 · objeto para enmarcar | trazo `#a6cdf5` ≥ 3:1 en los **cuatro** lados del perímetro de la caja | **[medido]** capa gráfica |
+| 3 · lecho de la firma | mejor tinta ≥ 4,5:1 **y** nitidez < 0,004 | **[medido]** set curado |
+| 4 · aire para cursores | ocupación < 0,012 en ambos costados | **[criterio]** |
+| 5 · campo profundo al margen | banda continua ≥ 0,40 del alto | **[medido]** piloto: alcanzable, da 0,60 |
+| 6 · lecho por formato | 4:5 18% · 9:16 22% · 16:9 16% · 1:1 20% **[sin validar]** | **[medido]** `bv2-{45,916,169}` |
+
+
 
 ### 5.1 Lecho (`medir.mjs`)
 

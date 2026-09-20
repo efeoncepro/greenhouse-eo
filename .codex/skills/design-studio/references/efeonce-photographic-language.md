@@ -188,6 +188,18 @@ Costo observado ≈ USD 0,05 por imagen high 1152×1440 (xhigh ≈ 0,09). Bloque
 **Pendientes:** espacio para texto (pedido del operador, no trabajado), formatos 9:16 y 16:9, firma en tomas
 todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `xhigh` con equipo real.
 
+## Los dos comandos canónicos (2026-09-20)
+
+- **`pnpm foto:prompt <ficha.json> [--batch <out.json>]`** — arma el prompt desde una ficha de toma. El formato,
+  el porcentaje del lecho y el límite de sujetos salen de **una tabla**, no de un bloque copiado. Aborta si un
+  bloque compartido trae un valor de formato adentro, si se pide una reserva en una toma que no la admite, o si un
+  batch mezcla formatos. `--ficha-ejemplo` imprime la plantilla.
+- **`pnpm foto:validar <plate.png> [--zona-texto] [--objeto x0,y0,x1,y1]`** — valida las seis reservas sobre el
+  plate limpio y sale con código 1 si alguna **evaluada** falla. Las coordenadas van en fracciones, no en píxeles.
+
+**NUNCA armes un prompt de foto de marca concatenando bloques a mano.** Esa es la vía por la que «Vertical 4:5.»
+vivió dentro del bloque de realismo sin que nadie lo viera, y habría contaminado todo plate no-4:5.
+
 ## Espacio para texto y formatos (2026-09-19)
 
 - La zona del titular se pide en la toma con **tono declarado** («DEEP warm shadow… for white text» / «VERY LIGHT warm-white wall… for dark text») y **límite de cabezas** (verticales: bajo 36% del alto; 16:9: gente dentro del 55% derecho).

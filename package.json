@@ -294,6 +294,8 @@
     "ai:fal": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/fal-image.ts",
     "ai:higgsfield:sync-schemas": "tsx scripts/ai/higgsfield-sync-schemas.ts",
     "ai:image:rmbg": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/remove-bg.ts",
+    "foto:prompt": "node scripts/foto/build-prompt.mjs",
+    "foto:validar": "node scripts/foto/validar-reservas.mjs",
     "tender:new": "node scripts/commercial/new-tender.mjs",
     "tender:canonical-gate": "node scripts/commercial/canonical-tender-gate.mjs",
     "tender:canonical-gate:test": "node --test scripts/commercial/__tests__/tender-closure-gate.test.mjs",
