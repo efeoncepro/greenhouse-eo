@@ -116,8 +116,8 @@ material** entre piezas consecutivas (hallazgo del revisor adversarial) **[crite
 | Archivo | SVG oficial: `public/branding/logo-negative.svg` (blanco) o `public/branding/logo-full.svg` (navy `#023c70`) | Nunca generado por el modelo |
 | Composición | Determinística con `scripts/componer.mjs` (sharp), rasterizado a densidad 600 | — |
 | Posición horizontal | Centrado | `left = (W − ancho) / 2` |
-| Posición vertical | Centro del logo ≈ **93,5%** del alto (4:5) | `top = 0,935·H − alto/2` |
-| Ancho | **15%** del lienzo (`LOGO=0.15`) | Bajó de 20% (valor por defecto del script) porque al 20% se leía como sello o marca de agua **[decisión en revisión]** |
+| Posición vertical | Centro del logo ≈ **94%** del alto (4:5) | `top = 0,94·H − alto/2`. Las piezas al 20% usaron 94% (territorios) y 91,5% (asiento); las de personas, 93,5% |
+| Ancho | **20%** del lienzo | Cerrada la revisión: el operador eligió 20% el 2026-09-20 sobre piezas con identidad **[decisión del operador]**. Ver el delta de abajo: la frase «al 20% se leía como sello» no describía lo aprobado |
 | Proporción | Alto = ancho × 196,68 / 837,07 (proporción del SVG) | `componer.mjs` |
 | Color | Por contraste medido: blanco contra el píxel **más claro** del área del logo; navy contra el píxel **más oscuro**; gana el mayor | `componer.mjs` calcula ambos con luminancia relativa WCAG |
 | Contraste mínimo | **≥ 4,5:1** | Si ninguno pasa, se regenera el plate (no se oscurece el lecho en post) |
@@ -224,3 +224,28 @@ Casos de esta ronda **[medido/visto]**: en 4:5 la caja enmarca la palabra «dond
 el carrusel de GTA VI, donde enmarcaba la decisión); en la pieza de co-creación enmarca **las láminas impresas** que
 ambos están mirando, con «Cliente» y «Efeonce» sobre la misma obra; en 16:9 se **retiró** porque no había objeto
 aislado y caía sobre la cara de una persona.
+
+
+## Delta 2026-09-20 — el tamaño de la firma tenía dos poblaciones **[medido]**
+
+Al producir tres piezas con identidad el operador dijo que la firma se veía chica. Medido por diferencia
+plate↔firmada sobre **sus propias piezas aprobadas** del 2026-09-19:
+
+| Ronda aprobada | Ancho del logo | Centro vertical |
+|---|---|---|
+| Personas (J1, J3, JN1, N2) | 15,0% | 93,5% |
+| Territorios (T1, T1b, T2) | **20,0%** | 94,0% |
+| Asiento (A-mesa, B-silla) | **20,0%** | 91,5% |
+| Asiento (C2-escritorio) | **20,0%** | 93,4% |
+
+Este documento afirmaba que se bajó a 15% «porque al 20% se leía como sello o marca de agua». **Eso no describía
+lo aprobado:** más de la mitad de las piezas firmadas que el operador aprobó están al 20%. La causa no fue una
+decisión sino un accidente de herramienta: `scripts/firmar.mjs` tiene `0.2` por defecto y `scripts/componer.mjs`
+tiene `0.15`, así que el tamaño dependía de qué script corrió cada ronda.
+
+**Decisión del operador, 2026-09-20: 20%.** Evidencia de la comparación (las mismas tres piezas firmadas a 15% y
+a 20%): `ai-generations/2026-09-20_identidad-julio-nexa/final/` y `final-20/`.
+
+**[pendiente]** Unificar el default de los dos scripts al promoverlos a comando `pnpm` (pendiente ya abierto en el
+maestro §9). Mientras vivan en una carpeta de corrida, el valor sigue dependiendo de cuál se invoque: pasarlo
+siempre explícito.

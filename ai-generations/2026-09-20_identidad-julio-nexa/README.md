@@ -8,11 +8,11 @@ Las imágenes son locales y están gitignoreadas; lo versionado son las fichas, 
 
 ## Entregables (v2, firmados)
 
-| Pieza | Quién | Oficio / mercado | Lente | Lecho | Firma |
+| Pieza (`final-20/`) | Quién | Oficio / mercado | Lente | Lecho | Firma al 20% |
 |---|---|---|---|---|---|
-| `final/P1-julio-kv-santiago-v2.png` | Julio | revisión de pruebas impresas de un KV de café · Santiago | 85 mm f/1,8 | tapa mate negra de flight case · **12,11:1** | blanca **17,81:1** |
-| `final/P2-nexa-retail-cdmx-v2.png` | Nexa | auditoría de góndola, cuidado personal · CDMX | 35 mm f/4 | carro de reposición acero oscuro · **6,55:1** | blanca **11,64:1** |
-| `final/P3-juntos-taller-miami-v2.png` | Julio y Nexa | mapa de journey en taller de producción · Miami | 16 mm a ras de mesa | roble claro a ras del lente · **6,01:1** | navy **6,64:1** |
+| `P1-julio-kv-santiago-v2-logo20.png` | Julio | revisión de pruebas impresas de un KV de café · Santiago | 85 mm f/1,8 | tapa mate negra de flight case · **12,11:1** | blanca **17,85:1** |
+| `P2-nexa-retail-cdmx-v2-logo20.png` | Nexa | auditoría de góndola, cuidado personal · CDMX | 35 mm f/4 | carro de reposición acero oscuro · **6,55:1** | blanca **9,44:1** |
+| `P3-juntos-taller-miami-v2-logo20.png` | Julio y Nexa | mapa de journey en taller de producción · Miami | 16 mm a ras de mesa | roble claro a ras del lente · **6,01:1** | navy **6,52:1** |
 
 Sombras no azules en las tres (b\* del cuartil oscuro −1,4 / −1,0 / 7,5).
 
@@ -69,9 +69,9 @@ afirma que «20% se leía como sello o marca de agua» — pero **hay piezas apr
 describe todo lo aprobado. El default de `scripts/firmar.mjs` es `0.2`; el de `componer.mjs` es `0.15`: el valor
 que salía dependía de qué script corrió cada ronda, no de una decisión.
 
-**Resuelto para esta corrida:** se mantiene **15%**, el valor del canon y el de la ronda de personas, que es la
-comparable (identidad, mismo encuadre) — decisión del operador, 2026-09-20. Las versiones al 20% quedan en
-`final-20/` como evidencia de la comparación.
+**Resuelto: 20%** **[decisión del operador, 2026-09-20]**, tras comparar las mismas tres piezas a 15% y a 20%.
+Los entregables son los de **`final-20/`**; `final/` queda como evidencia de la comparación. El canon de la firma
+quedó corregido en su Delta 2026-09-20 (la revisión que tenía abierta se cerró con este valor).
 
 **[pendiente]** Unificar el default de los dos scripts y corregir la frase del canon sobre el 20%, o declarar el
 tamaño por tipo de pieza. Hoy el resultado depende del script que se invoque.
