@@ -388,3 +388,26 @@ detalle **[medido]**. No sirve para «arreglar» una pieza.
 | 3 | Re-medir lechos con cajas ajustadas por pieza (este catálogo usa una caja estándar) **[pendiente]** |
 | 4 | Contrapicado sin quemado de tragaluz **[pendiente]** |
 | 5 | Espacio para texto por toma **[pendiente]** |
+
+## Delta 2026-09-20 — seis tomas con atmósfera y acción suspendida **[medido]**
+
+Ronda `ai-generations/2026-09-20_angulos-atmosfera/` (fichas en `fichas/`, prompts verbatim en `prompts/`).
+Cubre seis lentes y ángulos que el catálogo tenía pendientes o sin combinar con las palancas nuevas.
+
+| Pieza | Cámara / lente / ángulo | Escena | Palanca | Lecho | Resultado |
+|---|---|---|---|---|---|
+| A1 | Macro 100 mm f/4, obturador congelado | Tostaduría, granos volcados del cucharón | suspendido + polvo en el haz | borde oscuro de mesa · 16,24:1 | Sirve; la palanca se lee de inmediato |
+| A2 | 35 mm, obturador lento, **paneando** | Mercado en Lima, operador Run & Gun | registro documental | cajón de fruta · 13,85:1 | Sujeto nítido sobre el mercado en estelas |
+| A3 | **Tilt-shift** 45° desde balcón | Rodaje callejero en Roma Norte, CDMX | bruma | baranda · 11,78:1 | Efecto miniatura + haces entre edificios |
+| A4 | 50 mm f/2 **a través de vidrio** | Journey dibujado, Bogotá, hora dorada | reflejo de ciudad como capa | marco de aluminio · 7,11:1 | Identidad sostenida. **Ojo:** dibujó flechas y círculos en el vidrio, al límite de «sin texto generado» |
+| A5 | 35 mm f/4, **escala** | Nave industrial, pantalla mural | bruma → columnas de luz | banco de concreto · **3,16:1 ✗** | La toma funciona; **el lecho falla y se regenera** |
+| A6 | 24 mm f/2.8, **cámara en el piso** | Set nocturno en Miami, contraluz duro | suspendido + humo | maleta de equipo · 18,96:1 | La más cinematográfica de la ronda |
+
+**Tres aprendizajes:**
+
+1. **La atmósfera es la palanca de mayor retorno.** A5 y A6 no existen sin ella: lo que se fotografía ahí es el
+   aire. En una escena de luz plana no tiene dónde vivir y se lee pegada.
+2. **El concreto claro no sirve de lecho** (A5, 3,16:1), igual que el concreto pulido de `N4`: se cambia de
+   lecho, no se insiste.
+3. **La ronda se pasó de dosis**: 2 de 6 con acción suspendida cuando el tope es 1 de 4. El comando ahora lo
+   cuenta y lo nombra con el número exacto.

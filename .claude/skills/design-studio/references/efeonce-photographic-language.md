@@ -114,6 +114,19 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 - **Momento decisivo:** harina en el aire, risa real, celebración, gesto a mitad.
 - **Composición gráfica:** geometría, marco dentro del marco, escala (persona pequeña en espacio grande), espacio negativo.
 - **Tres planos de profundidad** (lecho · sujeto · fondo) y **bloque de color** cuando el azul es campo.
+- **Atmósfera** — aire con materia cuya función es **hacer visible la luz**: `polvo` dentro del haz, `bruma` que
+  para los rayos como columnas sólidas, `vapor`, `humo` de escena a contraluz. **Exige un haz declarado**: sin
+  luz con dirección no tiene qué revelar y se lee pegada (`pnpm foto:prompt` aborta). El polvo vive **sólo dentro
+  de la luz**, nunca como suciedad. Es la palanca de mayor retorno **[medido 2026-09-20]**.
+- **Acción suspendida** — congelar **lo que está en vuelo** en el pico de su arco, con peso y trayectoria reales;
+  nunca un esparcido decorativo ni confeti. Se declara QUÉ vuela, en concreto. **Dosis: 1 de cada 4 piezas**
+  **[decisión del operador]**; el comando cuenta la tanda y avisa con el número si se pasa.
+
+> **«Épica» no es la palabra** (arrastra escala grandilocuente y horizonte, el stock premium que este lenguaje
+> rechaza). Lo que se busca es **realismo cinematográfico**, y son cuatro cosas distintas: **registro documental**
+> (la cámara llega a algo que ya pasaba), **momento decisivo** (el pico), **acción suspendida** (lo que vuela) y
+> **atmósfera** (el aire que revela la luz). Ambas palancas se piden **por ficha**, nunca desde el bloque fijo.
+> Detalle y evidencia: [pipeline §3.9](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 
 ## 7. Catálogo corto de tomas (lente declarado en el prompt)
 
@@ -215,7 +228,9 @@ todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `
 
 
 - **`pnpm foto:prompt <ficha.json> [--batch <out.json>]`** — arma el prompt desde una ficha de toma. El formato,
-  el porcentaje del lecho y el límite de sujetos salen de **una tabla**, no de un bloque copiado. Aborta si un
+  el porcentaje del lecho y el límite de sujetos salen de **una tabla**, no de un bloque copiado. La ficha declara
+  además `identidad` (personas, con vista por ángulo), `objetos` (kits de marca: logo, mascota, prenda, merch),
+  `atmosfera` (`polvo`/`bruma`/`vapor`/`humo`) y `suspendido` (qué está en el aire). Aborta si un
   bloque compartido trae un valor de formato adentro, si se pide una reserva en una toma que no la admite, o si un
   batch mezcla formatos. `--ficha-ejemplo` imprime la plantilla.
 - **`pnpm foto:validar <plate.png> [--zona-texto] [--objeto x0,y0,x1,y1]`** — valida las seis reservas sobre el

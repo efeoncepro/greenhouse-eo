@@ -113,6 +113,20 @@ Detalle en [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md
 | Composición gráfica | Geometría, marco dentro del marco, escala, espacio negativo | `impacto/I3b-marco`, `impacto/I4-escala`, `camaras/2-drone-cenital` |
 | Tres planos de profundidad | Primer plano desenfocado, sujeto nítido, fondo suave | Todas: el primer plano es también la firma |
 | Bloque de color | Una relación de áreas azules integrada en la escena puede dar el golpe gráfico | Set azul (`impacto/I2`), pantalla gigante (`impacto/I4`), cuadrados del dron |
+| **Atmósfera** **[2026-09-20]** | **Aire con materia que hace VISIBLE la luz**: polvo dentro del haz, bruma que para los rayos como columnas, vapor, humo de escena a contraluz | `A1` (polvo en la tostaduría), `A3` (bruma en la calle), `A5` (columnas en la nave), `A6` (humo en el set) |
+| **Acción suspendida** **[2026-09-20]** | **Congelar lo que está en vuelo** en el pico de su arco, con peso y trayectoria reales | `A1` (granos de café), `A6` (rollo de cinta), `impacto/I1` (harina) |
+
+Las dos últimas se piden **por ficha** (`atmosfera`, `suspendido` en `pnpm foto:prompt`), nunca desde el bloque
+fijo de impacto: ese bloque se emite en todos los prompts, y si llevara «algo volando», volaría algo en cada
+pieza. La atmósfera **exige un haz declarado** —sin luz con dirección no tiene qué revelar y se lee pegada— y la
+acción suspendida tiene **dosis: 1 de cada 4 piezas** **[decisión del operador]**. Fragmentos verbatim, guardas y
+evidencia medida: [prompts y pipeline §3.9](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+
+> **«Épica» no es la palabra.** En publicidad arrastra escala grandilocuente y gente mirando al horizonte: el
+> stock premium que este lenguaje rechaza. Lo que se busca es **realismo cinematográfico** —parece un fotograma,
+> no un catálogo— y se consigue con cuatro cosas que conviene no confundir: **registro documental** (la cámara
+> llega a algo que ya estaba pasando), **momento decisivo** (el pico de la acción), **acción suspendida** (lo que
+> está en vuelo) y **atmósfera** (el aire que revela la luz).
 
 Principio: **el impacto viene de la luz y la composición, no del modelo** **[medido]**: `impacto/high-vs-xhigh.jpg`
 compara la misma toma en `high` y `xhigh`; `xhigh` cuesta 1,8× y mejora poco el detalle fino. Bloque vigente:

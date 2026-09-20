@@ -284,6 +284,68 @@ Excepción dron (todo enfocado): «BOTTOM AREA (planned): the bottom <PCT> of th
 pale, almost white limestone paving in full sun, seamless with no joints or lines, with nothing on it (no people, no
 shadows, no objects).»
 
+### 3.9 Atmósfera y acción suspendida — las dos palancas del toque cinematográfico **[aprobadas 2026-09-20]**
+
+El bloque de impacto tenía luz, momento, composición gráfica, tres planos y bloque de color. Le faltaban las
+dos palancas que, medidas en la ronda `ai-generations/2026-09-20_angulos-atmosfera/`, son las que separan una
+foto correcta de una que se lee como un fotograma.
+
+**Van por ficha, NUNCA en el bloque fijo.** El bloque de impacto se emite en todos los prompts: si llevara
+«algo volando», volaría algo en cada pieza y el momento se volvería un recurso reconocible.
+
+#### Atmósfera — aire con materia
+
+Su función no es decorar: es **hacer visible la luz**. Un haz sin nada en el aire es un haz que no se ve.
+
+| `atmosfera` | Qué pide | Cuándo |
+|---|---|---|
+| `polvo` | Motas flotando **dentro** del haz, que lo vuelven visible; nunca suciedad sobre superficies | Interior con un rayo duro (ventana alta, persiana, claraboya) |
+| `bruma` | Velo bajo y parejo: los haces se paran como columnas sólidas y la distancia se lee por capas | Naves, halls, calles a contraluz; escala |
+| `vapor` | Hilo de vapor cálido que cruza la luz, corto y vivo | Cocina, tostaduría, taza, máquina |
+| `humo` | Velo de humo de escena a contraluz: el haz se ve y las figuras quedan recortadas | Set de rodaje, escenario, noche |
+
+**Regla dura:** la atmósfera **exige una fuente de luz con dirección declarada en la escena**. `pnpm foto:prompt`
+**aborta** si la ficha pide atmósfera y la escena no declara el haz — sin haz que revelar, el modelo la pinta
+encima y se lee pegada.
+
+**Límite del canon que se conserva:** el polvo existe **sólo dentro de la luz**. Nunca como manchas, restos ni
+desorden: eso sigue siendo el «realismo por suciedad» que el operador rechazó.
+
+#### Acción suspendida — congelar lo que está en vuelo
+
+| Campo | Qué se declara |
+|---|---|
+| `suspendido` | **QUÉ** está en el aire, en concreto: `"the roasted coffee beans tipped from the scoop"` |
+
+Emite: el objeto **congelado en el pico de su arco**, cada pieza nítida y claramente en vuelo, con su peso y
+trayectoria reales, **un solo instante decisivo — nunca un esparcido decorativo y nunca confeti**.
+
+**Regla dura:** el campo aborta con un valor vacío o genérico (`"algo"`). Si no se declara qué vuela, el modelo
+elige — y elige adorno.
+
+#### La dosis vive en la TANDA, no en la pieza **[decisión del operador]**
+
+**Una de cada cuatro piezas**, como máximo. Una pieza con algo volando es un momento; una serie donde vuela algo
+en todas es un truco. `pnpm foto:prompt` cuenta las fichas del lote y **avisa con el número exacto** cuando se
+pasa del tope; avisa en vez de bloquear porque una tanda temática puede justificarlo, pero lo dice.
+
+#### Evidencia
+
+Seis tomas, seis lentes, en `ai-generations/2026-09-20_angulos-atmosfera/`:
+
+| Pieza | Lente y ángulo | Palanca | Lecho **[medido]** |
+|---|---|---|---|
+| A1 | Macro 100 mm f/4 | suspendido + polvo | 16,24:1 |
+| A2 | 35 mm en barrido | registro documental | 13,85:1 |
+| A3 | Tilt-shift, 45° desde balcón | bruma | 11,78:1 |
+| A4 | 50 mm f/2 a través de vidrio | reflejo como capa | 7,11:1 |
+| A5 | 35 mm f/4, escala | bruma (haz volumétrico) | **3,16:1 ✗ — se regenera** |
+| A6 | 24 mm contrapicado desde el piso | suspendido + humo | 18,96:1 |
+
+**Lección de esa ronda:** la atmósfera es la palanca de mayor retorno — A5 y A6 no existirían sin ella, son aire
+con materia. Y la tanda se pasó de dosis (2 de 6 con suspendido, cuando el tope es 1 de 4), que es exactamente
+el error que la guarda ahora nombra.
+
 ### 3.8.0 Dónde va la luz y dónde va la reserva **[medido 2026-09-20]**
 
 > **La luz con carácter va sobre el SUJETO; la reserva vive en la sombra pareja que esa luz deja, nunca en su
@@ -303,6 +365,22 @@ bloque de impacto ausente.
 Corolario operativo: escribir la luz **dentro de la escena** sube el contraste de verdad (una toma pasó de 45 a
 **70**; otra con identidad dio **82**, por encima de la pieza aprobada que da 73). Pero la superficie que recibe la
 luz y la que aloja la reserva **tienen que ser distintas**.
+
+
+#### Corolario: el LECHO también es una reserva **[medido 2026-09-20]**
+
+La regla no vale sólo para la zona de texto: **el lecho de la firma tampoco puede estar en el camino del haz.**
+Medido en `A5` de la ronda de atmósfera, misma toma y mismo objeto, cambiando sólo dónde cae la luz:
+
+| Versión | Lecho declarado | Contraste |
+|---|---|---|
+| v1 | banco de concreto claro | **3,16:1 ✗** |
+| v2 | baúl de acero oscuro mate | **3,93:1 ✗** |
+| v3 | el mismo baúl **en sombra profunda, fuera del camino de los haces** | **11,55:1 ✓** |
+
+Con bruma el efecto se agrava: los haces visibles iluminan también el primer plano. Cuando la escena lleva
+atmósfera, **declarar el lecho en sombra explícita** («in DEEP SHADOW… well outside the path of the light
+shafts», «no highlights at all»), no sólo oscuro de material.
 
 ### 3.8.1 SELECTION TARGET (objeto para enmarcar con caja AXIS) **[sin validar — bloque nuevo 2026-09-20]**
 

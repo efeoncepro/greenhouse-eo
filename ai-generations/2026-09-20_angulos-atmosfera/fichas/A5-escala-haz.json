@@ -1,0 +1,14 @@
+{
+  "id": "A5-escala-haz-nexa-v3",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "escena": "SCENE (data review in a converted industrial hall, Santiago, early morning): enormous shafts of low sun come through the high clerestory windows and stand in the hazy air as solid visible columns of light, striping the concrete floor; she stands very small at the bottom of the frame in front of a wall-sized screen, one arm raised mid-gesture as she reads across it, dwarfed by the space. She wears a fine light heather-grey knit sweater; no jacket, no navy or blue clothing. She looks up at the screen, never at the camera. The screen glows cool azure blue with a simple abstract plot, softly out of focus and unbranded. 35mm lens at f/4, focus on her. Everything is completely unbranded, no brand names, no readable text anywhere.",
+  "lecho": {
+    "objeto": "the near edge of a matte dark steel equipment trunk standing in DEEP SHADOW between the camera and the hall, well outside the path of the light shafts",
+    "tono": "DARK near black in shadow, matte, with subtle texture but no highlights at all"
+  },
+  "atmosfera": "bruma"
+}

@@ -406,3 +406,74 @@ describe('foto:prompt · el catálogo de kits apunta a archivos reales', () => {
     expect(Object.keys(o.vistas)).toContain(o.vistaDefecto)
   })
 })
+
+// El detector de momento tenía el mismo problema de vocabulario que el de luz: reconocía unas pocas
+// formas y llamaba «pose de stock» a escenas que sí declaran el instante.
+describe('foto:prompt · el detector de momento cubre el vocabulario real', () => {
+  it.each([
+    'SCENE: hard sun. She draws, caught at the instant the marker lifts off the glass.',
+    'SCENE: hard sun. The beans are frozen in mid-air at the top of their arc.',
+    'SCENE: hard sun. A grip tosses a coil of tape upward to a colleague.'
+  ])('reconoce el momento en %s', escena => {
+    expect(auditarEscena(escena)).not.toContainEqual(expect.stringContaining('MOMENTO'))
+  })
+
+  it('sigue avisando cuando de verdad no hay momento', () => {
+    expect(auditarEscena('SCENE: hard sun on a table with papers and two people sitting.')).toContainEqual(
+      expect.stringContaining('MOMENTO')
+    )
+  })
+})
+
+// ── Atmósfera y acción suspendida ────────────────────────────────────────────────────────────────
+// Las dos palancas que el bloque de impacto no tenía. Van por ficha, no en el bloque fijo: si el
+// bloque las emitiera siempre, en cada pieza volaría algo y el momento se volvería un truco.
+describe('foto:prompt · atmósfera', () => {
+  const conLuz = { ...fichaBase, escena: 'SCENE (test): a hard shaft of sun cuts the room as she turns mid-step.' }
+
+  it('no emite nada si la ficha no la pide', () => {
+    expect(construirPrompt(conLuz).prompt).not.toContain('ATMOSPHERE:')
+  })
+
+  it.each(['polvo', 'bruma', 'vapor', 'humo'])('emite el bloque de %s', tipo => {
+    expect(construirPrompt({ ...conLuz, atmosfera: tipo }).prompt).toContain('ATMOSPHERE:')
+  })
+
+  it('el polvo vive sólo dentro de la luz, nunca como suciedad', () => {
+    expect(construirPrompt({ ...conLuz, atmosfera: 'polvo' }).prompt).toContain('never as dirt on surfaces')
+  })
+
+  // Sin haz que revelar, el modelo pinta la atmósfera encima y se ve puesta.
+  it('aborta si la escena no declara fuente de luz', () => {
+    expect(() =>
+      construirPrompt({ ...fichaBase, escena: 'SCENE (test): two people at a table as she turns.', atmosfera: 'bruma' })
+    ).toThrow(/no declara una FUENTE DE LUZ/)
+  })
+
+  it('aborta con un tipo desconocido y lista los válidos', () => {
+    expect(() => construirPrompt({ ...conLuz, atmosfera: 'niebla-espesa' })).toThrow(/Tipos:/)
+  })
+})
+
+describe('foto:prompt · acción suspendida', () => {
+  it('no emite nada si la ficha no la pide', () => {
+    expect(construirPrompt(fichaBase).prompt).not.toContain('SUSPENDED ACTION')
+    expect(construirPrompt(fichaBase).llevaSuspendido).toBe(false)
+  })
+
+  it('emite qué está en el aire y prohíbe el confeti decorativo', () => {
+    const p = construirPrompt({ ...fichaBase, suspendido: 'the coffee beans tipped from the scoop' }).prompt
+
+    expect(p).toContain('the coffee beans tipped from the scoop is FROZEN IN MID-AIR')
+    expect(p).toContain('never confetti')
+  })
+
+  // Un valor vago deja que el modelo elija qué vuela, y elige adorno.
+  it.each(['algo', '   ', 'x'])('aborta con el valor genérico "%s"', v => {
+    expect(() => construirPrompt({ ...fichaBase, suspendido: v })).toThrow(/debe decir QUÉ está en el aire/)
+  })
+
+  it('marca la pieza para que la tanda pueda medir la dosis', () => {
+    expect(construirPrompt({ ...fichaBase, suspendido: 'the loose sheets of paper' }).llevaSuspendido).toBe(true)
+  })
+})

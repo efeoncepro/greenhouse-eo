@@ -466,6 +466,65 @@ function resolverObjetos(ficha, desde) {
   return { imagenes, bloque: bloques.join('\n\n'), avisos }
 }
 
+// ── Atmósfera y acción suspendida ───────────────────────────────────────────────────────────────
+// Las dos palancas que el bloque de impacto NO tenía y que el operador aprobó el 2026-09-20: son lo
+// que separa una foto correcta de una que parece un fotograma. Van por ficha y NO en el bloque fijo,
+// porque el bloque se emite en todos los prompts y la dosis se perdería: si en cada pieza vuela algo,
+// deja de ser un momento y pasa a ser un truco reconocible.
+//
+// ATMÓSFERA = aire con materia. Su función es hacer VISIBLE la luz: sin un haz con dirección no tiene
+// dónde vivir y se lee pegada. Por eso exige que la escena declare la fuente.
+const ATMOSFERAS = {
+  polvo:
+    'ATMOSPHERE: the air inside the beam is alive with fine floating dust motes drifting slowly, so the shaft of light itself becomes visible; the dust exists ONLY inside the light, never as dirt on surfaces.',
+  bruma:
+    'ATMOSPHERE: a low even haze hangs in the air of the space, so the shafts of light stand as solid visible columns and distance reads in layers; the haze is clean and thin, never fog, never smog.',
+  vapor:
+    'ATMOSPHERE: a faint wisp of warm steam rises through the light and catches it, soft and short-lived, never a cloud that hides the subject.',
+  humo:
+    'ATMOSPHERE: a low veil of atmospheric haze catches the backlight so the beam is visible and the figures are rimmed with light; it is clean stage haze, never smoke from burning, never dirty air.'
+}
+
+// ACCIÓN SUSPENDIDA = congelar lo que está en vuelo. La dosis la fijó el operador: 1 de cada 4 piezas.
+const DOSIS_SUSPENDIDO = 4
+
+function bloqueAtmosfera(ficha) {
+  const pedida = ficha.atmosfera
+
+  if (!pedida) return null
+
+  const texto = ATMOSFERAS[pedida]
+
+  if (!texto) {
+    throw new Error(`Atmósfera "${pedida}" desconocida. Tipos: ${Object.keys(ATMOSFERAS).join(', ')}.`)
+  }
+
+  // Sin haz declarado, la atmósfera no tiene qué revelar: el modelo la pinta encima y se ve puesta.
+  if (!LUZ.test(ficha.escena ?? '')) {
+    throw new Error(
+      `La ficha pide atmósfera "${pedida}" pero su escena no declara una FUENTE DE LUZ con dirección. ` +
+        'La atmósfera existe para hacer visible un haz: sin haz se lee pegada. Declara la luz o saca la atmósfera.'
+    )
+  }
+
+  return texto
+}
+
+function bloqueSuspendido(ficha) {
+  const que = ficha.suspendido
+
+  if (!que) return null
+
+  if (typeof que !== 'string' || que.trim().length < 8) {
+    throw new Error(
+      '`suspendido` debe decir QUÉ está en el aire, por ejemplo "the coffee beans tipped from the scoop". ' +
+        'Un valor vacío o genérico deja que el modelo elija, y elige confeti.'
+    )
+  }
+
+  return `SUSPENDED ACTION: ${que} is FROZEN IN MID-AIR at the peak of its arc — every piece sharp and clearly in flight, caught at a frozen shutter speed, with its real weight and trajectory. It is a single decisive instant, not a decorative scatter and never confetti.`
+}
+
 const FICHA_EJEMPLO = {
   id: 'ejemplo-picado-mesa-oscura',
   formato: '4:5',
@@ -499,7 +558,11 @@ const ANCLAS_PROHIBIDAS = [
 const LUZ =
   /\b(sun|sunlight|sunbeam|daylight|midday|noon|beam|backlit|rim-?lit|lit only|lamp|window light|golden hour|hard light|directional|shaft|raking|rakes|silhouett|spot|spotlight|stage light|practical|key light|candlelit|firelight|neon)/i
 
-const MOMENTO = /\b(mid-|at the peak|throws|laughing|mid-sentence|reaching|turning|just as|the moment|catches)/i
+// Tercer falso negativo de vocabulario en un día (tras `daylight` y `stage spot`): una escena decía
+// «at the instant the marker lifts off the glass» y el aviso saltaba igual. Un aviso que grita donde
+// no debe deja de leerse justo cuando acierta.
+const MOMENTO =
+  /\b(mid-|at the peak|at the instant|the exact moment|the moment|split second|frozen|caught at|caught in|throws|tosses|laughing|reaching|turning|lifting|lifts|just as|catches)/i
 
 export const auditarEscena = escena => {
   const avisos = []
@@ -557,6 +620,14 @@ export const construirPrompt = ficha => {
 
   if (ficha.impacto !== false) partes.push(leerBloque('bloque-impacto-v1.txt'))
 
+  // Atmósfera y suspendido van juntas al bloque de impacto: son palancas de la misma familia, pero
+  // se piden por pieza para conservar la dosis.
+  const atmosfera = bloqueAtmosfera(ficha)
+  const suspendido = bloqueSuspendido(ficha)
+
+  if (atmosfera) partes.push(atmosfera)
+  if (suspendido) partes.push(suspendido)
+
   // Composición: el formato se declara UNA vez, acá, con el texto de la tabla.
   const comp = [fmt.declara, fmt.limite]
   const r = ficha.reservas ?? {}
@@ -598,7 +669,8 @@ export const construirPrompt = ficha => {
     size: fmt.size,
     sinValidar: Boolean(fmt.sinValidar),
     imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],
-    avisosObjeto: objetos?.avisos ?? []
+    avisosObjeto: objetos?.avisos ?? [],
+    llevaSuspendido: Boolean(suspendido)
   }
 }
 
@@ -657,6 +729,18 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
   }
 
   // Aviso de escena (no bloquea): luz, momento y azul como tema.
+  // Dosis de la acción suspendida: la regla vive en la TANDA, no en la pieza. Una pieza con algo
+  // volando está bien; una serie donde vuela algo en todas convierte el momento en un truco. Avisa
+  // en vez de bloquear porque una tanda temática puede justificarlo — pero lo dice con el número.
+  const conSuspendido = resueltas.filter(r => r.llevaSuspendido).length
+
+  if (conSuspendido * DOSIS_SUSPENDIDO > resueltas.length && resueltas.length > 1) {
+    console.error(
+      `  ⚠ acción suspendida en ${conSuspendido} de ${resueltas.length} fichas (dosis: 1 de cada ${DOSIS_SUSPENDIDO}). ` +
+        'Si vuela algo en casi todas, deja de leerse como un momento y se lee como un recurso repetido.'
+    )
+  }
+
   for (const { ficha, avisosObjeto } of resueltas) {
     const avisos = auditarEscena(ficha.escena)
     const vestuario = auditarVestuario(ficha.escena, ficha.identidad)
