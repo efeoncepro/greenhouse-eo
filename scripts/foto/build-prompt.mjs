@@ -164,13 +164,29 @@ const INCOMPATIBLES = {
 const PERSONAS = {
   julio: {
     etiqueta: 'Julio',
+    // Geometría, no adjetivos. Cuatro iteraciones el 2026-09-20 probaron que «cara delgada» no
+    // significa nada para el modelo y «óvalo 1,5 veces más alto que ancho, frente con entradas,
+    // mejillas planas, barba por debajo del mentón» sí. Lo mismo vale para el pelo: los laterales
+    // cortos con el gris concentrado son lo que lo hace reconocible, no «pelo entrecano».
     identity:
-      'IDENTITY (critical): the man is the SAME real person shown in the Julio reference images: a Venezuelan man in his mid-forties with short salt-and-pepper curly hair, thin rectangular silver-rim glasses, a full dark beard with grey, warm brown skin. Preserve his face, glasses, beard and build EXACTLY as in the references; only pose, clothing, light and setting change. Do not beautify or change his age.',
+      'IDENTITY (critical): the man is the SAME real person shown in the reference images. His face is LONG AND LEAN: measured from hairline to the bottom of the beard it is roughly 1.5 times TALLER than it is WIDE at the cheekbones — a long vertical oval, NOT round, NOT square, NOT chubby. If in doubt make it longer and narrower, never wider. FOREHEAD tall and open, with a RECEDING HAIRLINE pulling back at both temples into bare corners. CHEEKS flat and slightly hollow under the cheekbones. BEARD full and LONG, extending well BELOW the jawline past the chin, with heavy grey in the moustache, chin and lower beard, darker at the sideburns and a clean cheek line — never a short beard hugging the jaw. JAW narrowing to the chin, separated from a visible slim neck; no double chin, no jowls. GLASSES rectangular metal-rim with a THICK brushed-silver bar across the TOP of both lenses and wide flat temple arms — never rimless, thin-wire, round or plastic. HAIR cut SHORT and close at the sides and around the ears, almost faded, and the GREY IS CONCENTRATED THERE so the sides read clearly lighter than the top; on top, defined curls of MODERATE volume, dominant tone dark with scattered grey — never a tall voluminous hairstyle and never uniformly grey. BROWS thick and fairly straight. EXPRESSION a slight closed-mouth smile, eyes engaged. Warm brown skin with visible pores, mid-forties: do not rejuvenate, beautify or soften. Broad-shouldered and solid in the body, while the FACE stays long and lean.',
+    // Set aprobado por el operador el 2026-09-20 (hoja de contacto). Reemplaza al set de
+    // `2026-09-17_equipo-vestuario/refs/`, que idealizaba el rostro y arrastraba deriva.
     refs: [
-      'ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-01.png',
-      'ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-04.png',
-      'ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-07.png'
-    ]
+      'ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png',
+      'ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-08.png',
+      'ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-11.png'
+    ],
+    // Vistas que las referencias frontales NO cubren. Derivadas por EDICIÓN desde julio-ap-08,
+    // no generadas de cero: generar reconstruye el rostro y lo redondea.
+    vistas: {
+      '45-izq': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-45-izq.png',
+      '45-der': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-45-der.png',
+      'perfil-izq': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-perfil-izq.png',
+      'perfil-der': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-perfil-der.png',
+      trasero: 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-135-trasero.png',
+      espalda: 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-espalda.png'
+    }
   },
   nexa: {
     etiqueta: 'Nexa',
@@ -191,7 +207,12 @@ const REFS_POR_PERSONA = { 1: 3, 2: 2 }
 function resolverIdentidad(ficha) {
   const pedidas = ficha.identidad ?? []
 
-  if (!Array.isArray(pedidas)) throw new Error('`identidad` debe ser una lista, por ejemplo ["julio"] o ["julio", "nexa"].')
+  if (!Array.isArray(pedidas)) {
+    throw new Error(
+      '`identidad` debe ser una lista, por ejemplo ["julio"], ["julio", "nexa"] o [{ "persona": "julio", "vista": "perfil-izq" }].'
+    )
+  }
+
   if (!pedidas.length) return null
 
   if (pedidas.length > 2) {
@@ -205,14 +226,31 @@ function resolverIdentidad(ficha) {
   const imagenes = []
   const tramos = []
 
-  for (const clave of pedidas) {
+  for (const pedido of pedidas) {
+    // Una entrada puede ser "julio" (vista frontal) o { persona: 'julio', vista: 'perfil-izq' }.
+    const clave = typeof pedido === 'string' ? pedido : pedido?.persona
+    const vista = typeof pedido === 'string' ? null : pedido?.vista
     const persona = PERSONAS[clave]
 
     if (!persona) {
       throw new Error(`Persona "${clave}" desconocida. Personas con identidad canónica: ${Object.keys(PERSONAS).join(', ')}.`)
     }
 
-    const refs = persona.refs.slice(0, cupo)
+    // La vista manda: si la toma es de perfil, mandar sólo retratos frontales obliga al modelo a
+    // inventar el giro, y lo que inventa ensancha la cara. La vista va PRIMERA por ser la decisiva.
+    let refs = persona.refs.slice(0, cupo)
+
+    if (vista) {
+      const disponibles = persona.vistas ?? {}
+
+      if (!disponibles[vista]) {
+        throw new Error(
+          `La vista "${vista}" no existe para ${persona.etiqueta}. Vistas disponibles: ${Object.keys(disponibles).join(', ') || 'ninguna'}.`
+        )
+      }
+
+      refs = [disponibles[vista], ...persona.refs.slice(0, Math.max(0, cupo - 1))]
+    }
 
     for (const ref of refs) {
       if (!existsSync(path.join(raiz, ref))) {

@@ -177,12 +177,22 @@ NIGHT COLOR RULE: natural mixed light, skin natural and warm, city lights small 
 Verbatim de `rondas/personas/*.txt`. Detalle y QA en [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
 
 ```text
-IDENTITY (critical): the man is the SAME real person shown in the Julio reference images: a Venezuelan man in his mid-forties with short salt-and-pepper curly hair, thin rectangular silver-rim glasses, a full dark beard with grey, warm brown skin. Preserve his face, glasses, beard and build EXACTLY as in the references; only pose, clothing, light and setting change. Do not beautify or change his age.
+IDENTITY (critical): the man is the SAME real person shown in the reference images. His face is LONG AND LEAN: measured from hairline to the bottom of the beard it is roughly 1.5 times TALLER than it is WIDE at the cheekbones — a long vertical oval, NOT round, NOT square, NOT chubby. If in doubt make it longer and narrower, never wider. FOREHEAD tall and open, with a RECEDING HAIRLINE pulling back at both temples into bare corners. CHEEKS flat and slightly hollow under the cheekbones. BEARD full and LONG, extending well BELOW the jawline past the chin, with heavy grey in the moustache, chin and lower beard, darker at the sideburns and a clean cheek line — never a short beard hugging the jaw. JAW narrowing to the chin, separated from a visible slim neck; no double chin, no jowls. GLASSES rectangular metal-rim with a THICK brushed-silver bar across the TOP of both lenses and wide flat temple arms — never rimless, thin-wire, round or plastic. HAIR cut SHORT and close at the sides and around the ears, almost faded, and the GREY IS CONCENTRATED THERE so the sides read clearly lighter than the top; on top, defined curls of MODERATE volume, dominant tone dark with scattered grey — never a tall voluminous hairstyle and never uniformly grey. BROWS thick and fairly straight. EXPRESSION a slight closed-mouth smile, eyes engaged. Warm brown skin with visible pores, mid-forties: do not rejuvenate, beautify or soften. Broad-shouldered and solid in the body, while the FACE stays long and lean.
 ```
 
 ```text
 IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images: a woman in her early thirties with long dark wavy hair, fair olive skin, dark eyes and defined brows. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.
 ```
+
+> **Delta 2026-09-20 — el bloque de Julio pasó de adjetivos a geometría.** El anterior («short
+> salt-and-pepper curly hair, thin rectangular silver-rim glasses, a full dark beard with grey»)
+> describía rasgos sin proporciones, y el modelo rellenaba: cara más redonda, montura al aire, barba
+> corta, pelo de volumen parejo. Cuatro iteraciones ese día (v1→v4) mostraron que **«cara delgada» no
+> significa nada para el modelo y una proporción declarada sí**. El bloque vigente fija el óvalo
+> (1,5× más alto que ancho), la frente con entradas, las mejillas planas, la barba por debajo del
+> mentón, la barra superior de la montura y —lo que más lo hace reconocible— los **laterales cortos
+> con el gris concentrado ahí**. El texto de arriba es el que emite `pnpm foto:prompt`; un test lo
+> verifica contra este documento en los dos sentidos.
 
 ### 3.7 REFERENCES (rol de cada imagen)
 

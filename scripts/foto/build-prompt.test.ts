@@ -285,3 +285,29 @@ describe('foto:prompt · avisos que faltaban', () => {
     expect(auditarVestuario('SCENE: an empty studio at dawn.', [])).toBeNull()
   })
 })
+
+// Las referencias frontales no cubren perfil ni espalda. Pedir una toma de perfil con sólo retratos
+// frontales obliga al modelo a inventar el giro, y lo que inventa ensancha la cara [medido 2026-09-20].
+describe('foto:prompt · vistas de identidad', () => {
+  it('antepone la vista pedida a las referencias frontales', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'julio', vista: 'perfil-izq' }] })
+
+    expect(r.imagenes).toHaveLength(3)
+    expect(r.imagenes[0]).toContain('julio-perfil-izq.png')
+  })
+
+  it('sin vista usa las referencias frontales tal cual', () => {
+    expect(construirPrompt({ ...fichaBase, identidad: ['julio'] }).imagenes[0]).toContain('julio-ap-04.png')
+  })
+
+  it('aborta con una vista inexistente y dice cuáles hay', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: [{ persona: 'julio', vista: 'cenital' }] })).toThrow(/Vistas disponibles/)
+  })
+
+  it('el bloque IDENTITY declara la proporción del rostro, no adjetivos', () => {
+    const p = construirPrompt({ ...fichaBase, identidad: ['julio'] }).prompt
+
+    expect(p).toContain('1.5 times TALLER than it is WIDE')
+    expect(p).toContain('GREY IS CONCENTRATED THERE')
+  })
+})

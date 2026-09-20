@@ -203,3 +203,71 @@ Reglas nuevas:
 - **Hasta 6 referencias por pieza** (Julio ×2, Nexa ×2, Clawd, Codex) mantuvieron identidad de las dos personas y de
   ambas mascotas.
 - **Gotcha:** una superficie pulida con reflejos no es lecho aunque se pida «casi blanca»: cambiar de lecho, no insistir.
+
+## Delta 2026-09-20 — tomas de Julio aprobadas y sesgo del set de referencia
+
+### Aprobadas por el operador **[decisión del operador, 2026-09-20]**
+
+Revisadas en hoja de contacto (`ai-generations/2026-09-20_identidad-julio-nexa/hoja-salidas-julio.jpg`), sobre las
+15 salidas existentes con su identidad. Aprobó cuatro con «me reflejan perfectamente»:
+
+| Pieza | Toma | Lente | Dónde |
+|---|---|---|---|
+| **J1** retrato | retrato | 135 mm f/2 | `rondas/personas/J1-retrato-final.png` |
+| **J3** conferencia | tele desde el público | 200 mm f/2,8 | `rondas/personas/J3-escenario-final.png` |
+| **J5** respaldo | tras la silla vacía | 85 mm f/1,8 | `rondas/personas2/J5-respaldo-final.png` |
+| **JN5** noche (con Nexa) | noche | 50 mm f/1,8 | `rondas/personas2/JN5-noche-final.png` |
+
+Son **salidas aprobadas**, no referencias: siguen sin poder usarse como `--image` de identidad sin aceptar deriva
+acumulada (el ancla es siempre el mismo original, nunca una generación anterior).
+
+### El set de referencia tiene un sesgo de vestuario **[medido 2026-09-20]**
+
+Las **ocho** referencias de Julio lo muestran en ropa formal, y **seis de ocho en azul o navy**: traje azul con
+camisa blanca (01, 02, 07, 08), blazer sobre polo oscuro (03, 04), blazer con zapatillas (05), total black (06).
+
+Eso empuja al modelo a vestirlo formal y de navy aunque el prompt diga «ignore their clothing» — el mismo modo de
+falla medido ese día con las referencias de Nexa. Mientras el set sea así, **toda toma con identidad debe declarar
+el vestuario en la escena** (ya hay aviso en `pnpm foto:prompt`).
+
+**[pendiente]** Ampliar el set de referencia con vestuario neutro y no formal, y con ángulos que hoy no existen
+(perfil, tres cuartos izquierda y derecha, expresión hablando). Las ocho actuales son frontales o de tres cuartos
+suave.
+
+## Delta 2026-09-20 (tarde) — set de identidad de Julio reconstruido **[decisión del operador]**
+
+### El set anterior idealizaba el rostro
+
+Las ocho referencias de `2026-09-17_equipo-vestuario/refs/` producían un Julio **más estrecho y afilado
+que el real**, y además lo vestían siempre formal (8/8 formal, 6/8 azul o navy). Dejan de ser el ancla.
+
+### Set vigente: 11 referencias aprobadas + 6 ángulos derivados
+
+- **Referencias** (frontal, tres cuartos suave, cuerpo entero): `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`,
+  con `MANIFIESTO.json` que declara orden de preferencia, roles y exclusiones. `julio-ap-04` es la primera
+  opción de rostro, `julio-ap-11` la de cuerpo, y `julio-ap-01` **no se usa sola** (es la de cara más ancha).
+  `julio-ap-02` queda excluida: es una pieza compuesta con titular, cursores y logo, no un retrato.
+- **Ángulos derivados** (los que ninguna referencia cubre): `set-identidad/angulos/` — ambos perfiles, ambos
+  tres cuartos, tres cuartos trasero y espalda.
+
+`pnpm foto:prompt` los resuelve solo: `identidad: ["julio"]` usa las frontales;
+`identidad: [{ "persona": "julio", "vista": "perfil-izq" }]` antepone la vista y aborta si no existe.
+
+### Las tres reglas que salieron de esta corrida **[medido]**
+
+1. **Editar conserva; generar reconstruye.** Cuatro iteraciones de prompt (v1→v4) no lograron la proporción
+   facial del operador generando desde cero: cada reconstrucción redondeaba el rostro. **Una edición desde
+   `julio-ap-08` lo consiguió a la primera.** Para un ángulo nuevo de una persona, editar su foto aprobada
+   antes que generar con ella como referencia.
+2. **Marcadores verificables, no magnitudes.** «Gira 45 grados» produjo una cabeza apenas inclinada —ni
+   frontal ni tres cuartos— que se leía ancha. «El puente de la nariz corta el contorno de la mejilla lejana,
+   la oreja lejana no se ve, el ojo lejano queda escorzado» produjo el tres cuartos real. Igual para el perfil
+   y para la proporción del rostro. **Describe lo que se ve y lo que NO se ve.**
+3. **El cuadro de pies a cabeza degrada la cara.** A 1024×1536 el rostro ocupaba ~120 px y el modelo lo
+   rellenaba. Encuadre **bajo las rodillas, 135 mm a la altura del pecho y 1536×2304** lo lleva a ~400 px y
+   sostiene la identidad. El manifiesto del set anterior ya lo intuía sin explicar el porqué.
+
+### Límite de distribución **[pendiente]**
+
+Las imágenes están gitignoreadas: viven en esta máquina y en OneDrive. Lo versionado es el manifiesto y los
+prompts. Otra sesión en otro equipo **no tiene el set** hasta que se copie desde OneDrive.
