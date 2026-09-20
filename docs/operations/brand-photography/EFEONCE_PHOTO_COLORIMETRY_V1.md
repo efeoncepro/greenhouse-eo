@@ -25,9 +25,9 @@ imágenes son relativas a esa carpeta.
 | # | Principio | Tipo |
 |---|---|---|
 | 1 | **Sin grade.** Color natural, fiel a la escena. El grade V0 «Navy Shadow» se descartó. | [decisión del operador] |
-| 2 | **El azul activo `#0375DB` es la casa** y aparece en todas las piezas, como luz u objeto. | [decisión del operador] |
+| 2 | **El azul activo `#0375DB` es la casa** y aparece en todas las piezas integrado en la composición; no necesita un objeto propio. | [decisión del operador; aclaración 2026-09-20] |
 | 3 | **Naranja `#F55D01` = la idea; lima `#6EC207` = el resultado.** Uno solo de los dos por pieza, además del azul. | [decisión del operador] |
-| 4 | El acento **nace de la situación** (manga, luz REC, lápiz graso, tarjeta «Ganado»), nunca es utilería puesta. | [criterio, validado por el operador al rechazar jarrones/libros] |
+| 4 | El acento **nace de la situación y de la composición**, no de una obligación de colocar utilería de color. Puede vivir en luz, reflejo, material, superficie o relación entre planos. | [decisión del operador; aclaración 2026-09-20] |
 | 5 | «La colorimetría no es vestir de navy»: el navy en ropa no es la firma de color. | [decisión del operador] |
 | 6 | Balance neutro-cálido (~5200 K), sombras neutras (nunca azules), exponer para altas luces. | [criterio, medido] |
 | 7 | Si el color falla, **se regenera**; la corrección técnica es mínima y excepcional. | [decisión del operador] |
@@ -72,7 +72,10 @@ Lecturas técnicas:
 
 ### 3.1 Azul activo `#0375DB` — la casa
 
-Aparece **en todas las piezas**, como luz u objeto. Dos modos legítimos **[decisión del operador, medido]**:
+Aparece **en todas las piezas** como una relación cromática propia de la escena: luz, reflejo, material, superficie,
+profundidad o elemento existente. No se añade un objeto sólo para alcanzar un porcentaje. Los dos modos siguientes
+describen patrones de las fotos aprobadas, **no cuotas ni formas obligatorias** **[decisión del operador; aclaración
+2026-09-20]**:
 
 | Modo | Área del cuadro (métrica `azul`) | Ejemplos de la corrida | Área medida |
 |---|---|---|---:|
@@ -80,8 +83,8 @@ Aparece **en todas las piezas**, como luz u objeto. Dos modos legítimos **[deci
 | **Campo protagonista** | ≥ 18 % | Set de papel azul (`impacto/I2-set-azul`), pantalla gigante (`impacto/I4-escala`), instalación en dron (`camaras/2-drone-cenital`), pantalla del escenario (`personas/J3-escenario`), pintura macro (`palancas/T1-macro-pintura`) | 52,1 % · 18,4 % · 35,8 % · 23,5 % · 43,3 % |
 | **Prohibido: intermedio en ropa grande** | 10–18 % en una prenda | Camisa azul en Miami (`oficio3/1-aeo-miami-final-plate`), hoodie del contrapicado (`camaras/4-contrapicado`) | 15,9 % · 17,0 % |
 
-Regla: **o es un punto o es un campo**. Una prenda azul que ocupa un sexto del cuadro no es ninguna de las dos
-cosas y se lee como vestuario de catálogo **[criterio, validado por el operador]**.
+Una prenda azul que ocupa un sexto del cuadro se leyó como vestuario de catálogo en esa ronda **[criterio,
+validado por el operador]**. La lectura final depende de cómo se relaciona el azul con luz, espacio y oficio.
 
 Nota de medición: la métrica `azul` (h 250–300°, C > 30) **también cuenta el navy** (C 35) si está bien iluminado; un
 uniforme navy iluminado sube la cifra sin ser azul activo. Interpretar con la foto a la vista.
@@ -115,8 +118,8 @@ el vidrio (`camaras/5-reflejo` 0,43 %, `personas/N2-reflejo` 0,57 %), la card «
 | Regla | Valor | Tipo |
 |---|---|---|
 | Acentos por pieza | Azul + **uno** (naranja **o** lima) | [decisión del operador] |
-| Área del acento de historia | 1–5 % del cuadro (a ojo); métrica típica 0,1–1 % | [criterio, medido] |
-| Origen | La situación (herramienta, prenda de un rol, luz, tarjeta), nunca decoración | [criterio] |
+| Área del acento de historia | 1–5 % del cuadro a ojo como orientación compositiva; métrica típica 0,1–1 %, nunca umbral único de aprobación | [criterio, medido] |
+| Origen | La situación y la relación entre luz, superficies, reflejos y planos; un objeto concreto es opcional, nunca decoración añadida | [decisión del operador; aclaración 2026-09-20] |
 | Utilería rechazada | Jarrón o libro naranja «puesto» | [decisión del operador] |
 | Repetición | La **taza azul** apareció en 4 piezas (I5, K3, K1, JN1): sesgo a evitar; variar el portador del azul | [criterio, revisor adversarial] |
 | Paneles azules de fondo | Se repitieron en escenario y podcast: variar | [criterio] |

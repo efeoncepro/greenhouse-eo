@@ -268,13 +268,6 @@ const ANCLAS_PROHIBIDAS = [
   }
 ]
 
-// El color de marca es ACENTO, no tema. El bloque de impacto pide «one bold field or object in bright
-// azure blue creates the graphic punch, everything else calm». Cuando la escena convierte el azul en
-// EL objeto —pintura azul, paneles azules, una pantalla azul gigante— sale una masa de color sin
-// materia ni razón: la misma falla de la «losa» con otro disfraz. [2026-09-20]
-const AZUL_COMO_TEMA =
-  /\b(azure-?blue|#0375DB|blue)\s+(paint|panels?|floor|screen|wall|surface|backdrop|installation|grid)\b/i
-
 // Vocabulario con el que una escena declara LUZ y MOMENTO. La ronda que el operador aprobó el 19/09
 // los tiene en el 100% de sus escenas; la tanda de 34 que perdió calidad, en 64% y 26%. No es una
 // medición fuerte —mis propios pilotos aprobados sacan 66/33— así que AVISA, no bloquea. [medido]
@@ -291,9 +284,8 @@ export const auditarEscena = escena => {
 
   if (!LUZ.test(escena)) avisos.push('no declara la FUENTE DE LUZ ni su calidad (sol duro, contraluz, una sola lámpara…)')
   if (!MOMENTO.test(escena)) avisos.push('no declara un MOMENTO (algo ocurriendo), y sin momento salen poses de foto de stock')
-  if (AZUL_COMO_TEMA.test(escena)) avisos.push('convierte el AZUL DE MARCA en el objeto principal; el azul es acento, no tema')
-
-  return avisos
+  
+return avisos
 }
 
 // `ignore their clothing` NO alcanza [medido 2026-09-20]: las referencias de Nexa la muestran con

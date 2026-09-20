@@ -54,7 +54,7 @@ rondas desde «El oficio a la vista»):
 | 4 | Hay idea | ¿Hay una situación con tensión, no una pose? |
 | 5 | Funciona en 3 modos y a 390 px | ¿Funciona con equipo de uniforme, con personas sin marca y sin personas? ¿Se lee en un celular? |
 | 6 | Verdad operativa | ¿Todo lo que se ve es algo que hacemos? ¿Nada parece stock? |
-| 7 | Paleta = luz y material | ¿El color de marca vive en la luz y en los objetos, no en la ropa? |
+| 7 | Paleta en la composición | ¿El color de marca surge de la relación natural entre luz, reflejos, materiales y planos, sin utilería añadida para cumplir una cuota? |
 
 ### 2.4 Arquetipos a evitar
 
@@ -112,7 +112,7 @@ Detalle en [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md
 | Momento decisivo | El pico de la acción: harina en el aire, risa, celebración | `impacto/I1-harina`, risa en el pipeline (`oficio2/B`) |
 | Composición gráfica | Geometría, marco dentro del marco, escala, espacio negativo | `impacto/I3b-marco`, `impacto/I4-escala`, `camaras/2-drone-cenital` |
 | Tres planos de profundidad | Primer plano desenfocado, sujeto nítido, fondo suave | Todas: el primer plano es también la firma |
-| Bloque de color | Un campo o un objeto azul que da el golpe gráfico | Set azul (`impacto/I2`), pantalla gigante (`impacto/I4`), cuadrados del dron |
+| Bloque de color | Una relación de áreas azules integrada en la escena puede dar el golpe gráfico | Set azul (`impacto/I2`), pantalla gigante (`impacto/I4`), cuadrados del dron |
 
 Principio: **el impacto viene de la luz y la composición, no del modelo** **[medido]**: `impacto/high-vs-xhigh.jpg`
 compara la misma toma en `high` y `xhigh`; `xhigh` cuesta 1,8× y mejora poco el detalle fino. Bloque vigente:
@@ -124,8 +124,9 @@ compara la misma toma en `high` y `xhigh`; `xhigh` cuesta 1,8× y mejora poco el
   eventos **[decisión del operador]** tras «nosotros NO somos Berel».
 - Se varían cámaras y ángulos: ojo de pez, dron, tilt-shift, contrapicado, reflejo, tele 200 mm, macro, retrato,
   barrido, noche (catálogo en [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md)).
-- Se varía el objeto de acento: la misma taza azul apareció en 3–4 piezas (persianas, noche, KV café, mesa JN1) y se
-  leyó como sesgo **[medido en revisión]**.
+- Se varía la forma de integrar el color: la misma taza azul apareció en 3–4 piezas (persianas, noche, KV café,
+  mesa JN1) y se leyó como sesgo **[medido en revisión]**. Ningún color obliga a introducir un objeto puntual
+  **[aclaración del operador, 2026-09-20]**.
 
 ### 4.4 Verdad operativa
 
@@ -142,7 +143,7 @@ compara la misma toma en `high` y `xhigh`; `xhigh` cuesta 1,8× y mejora poco el
 | Sistema | Regla central | Documento |
 |---|---|---|
 | Firma | Un primer plano desenfocado **planeado desde la toma** (herramienta o superficie del oficio) sirve de lecho al logo centrado, ancho 15%, centro vertical ≈ 93,5% del alto, contraste ≥ 4,5:1. Lecho p99 ≤ ~20, tono declarado en el prompt | [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) |
-| Colorimetría | Sin grade; color natural; blancos ~5200 K neutro-cálido; sombras nunca azules. Azul activo `#0375DB` = la casa (en todas, como luz u objeto); naranja `#F55D01` = la idea; lima `#6EC207` = el resultado; un solo acento además del azul | [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) |
+| Colorimetría | Sin grade; color natural; blancos ~5200 K neutro-cálido; sombras nunca azules. Azul activo `#0375DB` = la casa, integrado naturalmente en la composición; naranja `#F55D01` = la idea; lima `#6EC207` = el resultado; un solo acento además del azul, sin objeto obligatorio | [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) |
 | Cámaras | Lente, ángulo y lecho se eligen juntos; el modelo respeta la sensación del lente, no la física exacta | [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) |
 | Prompts y pipeline | Prompt = bloque realismo + bloque impacto + color + escena + FOREGROUND. Generar → medir lecho → curar pantallas → componer firma → métricas → QA al zoom | [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) |
 | Personas | Casting real, nadie mira a cámara salvo decisión, identidad de Julio y Nexa con referencias y bloque IDENTITY, uniforme sin firma cuando el emblema se lee | [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) |

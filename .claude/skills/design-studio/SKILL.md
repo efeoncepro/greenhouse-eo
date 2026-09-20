@@ -79,8 +79,9 @@ Separar referencias de identidad de placas de escena; no extender textura de par
 
 Para fotografía propia Efeonce, cargar
 [`references/efeonce-photographic-language.md`](references/efeonce-photographic-language.md) y completar su
-**preflight visual**: abrir imágenes aprobadas comparables antes de generar, declarar portadores de color en la
-ficha y comparar los píxeles finales con esas referencias. Haber leído la guía o reutilizado un prompt no lo cumple.
+**preflight visual**: abrir imágenes aprobadas comparables antes de generar, declarar cómo se integra el color en
+la composición sin forzar utilería y comparar los píxeles finales con esas referencias. Haber leído la guía o
+reutilizado un prompt no lo cumple.
 
 1. **Clasifica la intención** (§2). ¿Es dirección de arte / diseño gráfico / auditoría de
    KV / imagen de marketing? Si pertenece a otra skill, **delega explícito** (§5) y para.

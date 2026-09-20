@@ -72,8 +72,8 @@ Lo mínimo:
 2. **Toma:** elige una del [catálogo](../../operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md)
    (asiento en la mesa, tilt-shift, tele 200, ojo de pez, reflejo…).
 3. **Luz y momento:** haz de sol, persianas, hora dorada, contraluz o noche; y el pico de la acción.
-4. **Azul:** quién lo lleva (una taza, una gorra, una pantalla, un papel). Si es ropa, que sea **pequeña**.
-5. **Acento:** naranja **o** lima, y de dónde nace (lápiz, manga, tarjeta «Ganado»). Nunca un adorno puesto.
+4. **Azul:** cómo aparece naturalmente en la composición (luz, reflejo, material, superficie o relación entre planos). No hace falta añadir un objeto azul.
+5. **Acento:** naranja **o** lima, y cómo se integra a la situación. Puede ser una relación cromática de la escena; nunca un adorno puesto para completar la paleta.
 6. **Primer plano (lecho) y su tono:** la herramienta o superficie más cercana a la cámara, **oscura** o **muy clara**.
 
 ### 3. Arma el prompt

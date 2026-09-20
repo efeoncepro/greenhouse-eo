@@ -35,8 +35,10 @@ cualquier generador (GPT Image, Gemini/Imagen, Seedream, Firefly, Midjourney, el
    completo comparables por sujetos u oficio; para Julio/Nexa, partir de
    `rondas/personas/julio-nexa-firmadas.jpg` y de sus finales individuales; para el color de la serie, abrir
    `rondas/curado/set-curado-12.jpg` (rutas bajo `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/`).
-   Registrar en la ficha los archivos mirados y qué objeto o luz porta el azul, de dónde nace el naranja **o** el
-   lima, cómo funciona el lecho y qué distingue la escena de una foto de stock. Leer la skill o copiar un prompt
+   Registrar en la ficha los archivos mirados y cómo viven el azul y el naranja **o** lima en la composición
+   (luz, reflejo, material, superficie, relación entre planos o elemento propio de la escena), cómo funciona el
+   lecho y qué distingue la escena de una foto de stock. No hay que inventar un objeto de color para completar la
+   ficha. Leer la skill o copiar un prompt
    anterior no acredita esta comparación visual. Si los binarios aprobados no están disponibles, recuperar esa
    referencia antes de generar una persona o una foto de marca.
 1. Pegar los bloques verbatim de §3 (realismo, color system, balance de blancos, lecho/FOREGROUND, y IDENTITY +
@@ -92,8 +94,8 @@ Se llena **antes** de escribir el prompt. Una ficha = una foto.
 | Cámara / lente / ángulo | Del [catálogo](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) | Picado 60°, 50 mm f/4 |
 | Luz y hora | Haz de sol, persianas, contraluz, dorada, mediodía, noche | Haz bajo de sol de mañana |
 | Momento | La tensión o el pico de la acción | La mano marca el vapor |
-| Azul (la casa) | Portador del `#0375DB` y su modo (acento o campo) | Taza azul (acento) — *variar el portador en la serie* |
-| Acento de historia | Naranja (idea) **o** lima (resultado) y de dónde nace | Lápiz graso naranja |
+| Azul (la casa) | Dónde vive `#0375DB` en la relación entre luz, material, espacio y planos; no exige un objeto | Reflejo azul de una escena en uso sobre el vidrio de la cabina |
+| Acento de historia | Cómo se integra el naranja (idea) **o** lima (resultado) a la situación sin utilería impuesta | Un borde cálido de luz de la acción, coherente con el lugar |
 | Lecho + tono | Primer plano planeado + DARK / VERY LIGHT | Borde de la mesa de luz, VERY LIGHT |
 | Formato | 4:5 (probado) | 4:5 1152×1440 |
 | Firma | Logo / selección AXIS / sin firma | Logo |
@@ -138,7 +140,7 @@ Archivo: `prompts/bloque-impacto-v1.txt`. Se usa en las piezas de nivel +1 (`imp
 `curado/`, `personas/`).
 
 ```text
-VISUAL IMPACT (this is an award-level editorial photograph, the kind that stops the scroll): ONE bold visual idea per frame; LIGHT WITH CHARACTER — a hard, directional beam of real sunlight or a single strong source sculpting the subject, with crisp graphic shadows and rich but detailed darks (never flat, never evenly lit); a DECISIVE MOMENT at the peak of the action; a GRAPHIC COMPOSITION with strong geometry, clear figure-ground separation and generous calm negative space; THREE distinct depth planes (blurred foreground, sharp subject, soft background). COLOR: natural true-to-life color, no grading; a restrained palette where one bold field or object in bright azure blue (#0375DB) creates the graphic punch, everything else calm and neutral-warm; highlights keep detail; white balance warm-neutral, shadows never blue.
+VISUAL IMPACT (this is an award-level editorial photograph, the kind that stops the scroll): ONE bold visual idea per frame; LIGHT WITH CHARACTER — a hard, directional beam of real sunlight or a single strong source sculpting the subject, with crisp graphic shadows and rich but detailed darks (never flat, never evenly lit); a DECISIVE MOMENT at the peak of the action; a GRAPHIC COMPOSITION with strong geometry, clear figure-ground separation and generous calm negative space; THREE distinct depth planes (blurred foreground, sharp subject, soft background). COLOR: natural true-to-life color, no grading; a restrained palette where bright azure blue (#0375DB) emerges naturally in the spatial composition through scene light, reflections, real materials or the relationship between depth planes, creating graphic rhythm without requiring a separate blue prop; everything else calm and neutral-warm; highlights keep detail; white balance warm-neutral, shadows never blue.
 ```
 
 ### 3.3 Color system (piezas serenas y cámaras)
@@ -146,12 +148,11 @@ VISUAL IMPACT (this is an award-level editorial photograph, the kind that stops 
 Verbatim de `rondas/camaras/batch.json`. Reemplaza al bloque de impacto cuando la pieza no busca impacto máximo.
 
 ```text
-COLOR SYSTEM: a calm tonal background field; skin and real materials; ONE vivid accent of bright azure blue (#0375DB) from light or a single object (never walls), covering only a small part of the frame; plus at most ONE small story accent described in the scene. Moderate contrast. WHITE BALANCE AND EXPOSURE: warm-neutral daylight (about 5200K), whites very slightly warm, never bluish; shadows neutral, never blue; exposed for the highlights, bright surfaces keep texture and detail.
+COLOR SYSTEM: a calm tonal background field; skin and real materials; bright azure blue (#0375DB) integrated naturally through scene light, reflections, materials or the relationship between spatial planes, with no separate color prop required; plus at most ONE small story accent arising from the scene and its composition. Moderate contrast. WHITE BALANCE AND EXPOSURE: warm-neutral daylight (about 5200K), whites very slightly warm, never bluish; shadows neutral, never blue; exposed for the highlights, bright surfaces keep texture and detail.
 ```
 
-Variante corta usada en `oficio3/` (sin WB): «COLOR SYSTEM: a calm tonal background field; skin and real materials;
-ONE vivid accent of bright azure blue (#0375DB) from light or a single object (never walls); plus at most ONE small
-story accent described in the scene. Moderate contrast, soft natural daylight as key, practical lamps off.»
+La variante corta usada en `oficio3/` (sin WB) queda como evidencia histórica de esa ronda; para nuevas fichas se
+aplica la formulación anterior, que admite color integrado en la composición sin utilería obligatoria.
 
 ### 3.4 Balance de blancos y exposición (versión fuerte)
 
@@ -438,8 +439,9 @@ Cinco cosas que el comando **impide**, todas verificadas:
    Berel». La regla estaba escrita desde el 19/09 y una sesión generó igual un macro de un rodillo de pintura: un
    doc no impide nada. La tabla es extensible y se amplía **sólo** con lo que el operador declare.
 
-Y dos **avisos** que no bloquean, porque la medición es débil: si la escena no declara **fuente de luz** o
-**momento**, y si convierte el **azul de marca en el tema** en vez de acento. La ronda que el operador aprobó
+Quedan dos **avisos** que no bloquean, porque la medición es débil: si la escena no declara **fuente de luz** o
+**momento**. El aviso sobre pantallas, paneles o superficies azules se retiró: esos campos pueden estar integrados
+naturalmente en la composición, como muestran varias tomas aprobadas. La ronda que el operador aprobó
 declara luz y momento en el **100%** de sus escenas; la tanda que perdió calidad, en 64% y 26%, con **0% de planos
 de profundidad** **[medido]**.
 
@@ -571,7 +573,7 @@ bSombras, azul, naranja, lima y piel. Medir siempre el **plate** (sin logo). Ran
 | Lecho tono medio | `lum media` ~100–175 | Regenerar declarando DARK o VERY LIGHT («the brightest surface in the lower frame») |
 | Logo < 4,5:1 | `componer.mjs` lo reporta | Regenerar el lecho; nunca oscurecer/aclarar la foto a mano |
 | Quemado / aplastado fuera de rango | Según contexto | Bloque WB/exposición, regla de noche, «highlights keep detail» |
-| Azul intermedio en ropa | `azul` 10–18 % por una prenda | Reducir prenda o mover el azul a objeto/luz |
+| Azul intermedio en ropa | `azul` 10–18 % por una prenda | Revisar si parece vestuario de catálogo; integrar el azul mediante luz, material o relaciones espaciales de la escena |
 | Marca de terceros o texto | Cualquiera visible al zoom | «completely unbranded, no brand names, no text, no logos anywhere on the body» |
 | Identidad | Rasgo cambiado (lentes, barba, edad) | Regenerar con Sunburst + IDENTITY + roles de referencia |
 
@@ -715,7 +717,7 @@ Salida: `…-final.png logo blanco 18.82:1 selección OK`.
 | 2 | Hay obra, mecanismo e idea (no reunión genérica) | Mirar vs ficha | Sí |
 | 3 | No parece IA: piel, manos, dedos, texto fantasma, simetría | Zoom 200 % | Sí |
 | 4 | Limpio sin suciedad | Mirar | Sí |
-| 5 | Azul presente; un solo acento (naranja **o** lima) que nace de la escena | Mirar + `metricas.cjs` | Sí |
+| 5 | Azul y un solo acento (naranja **o** lima) integrados naturalmente en la composición; ningún objeto de color obligatorio ni cuota rígida de píxeles | Mirar + `metricas.cjs` como apoyo | Sí |
 | 6 | Sin grade; b* sombras −3 a +3; quemado/aplastado en rango | `metricas.cjs` | Revisar |
 | 7 | Lecho desenfocado, tono declarado, transición gradual (≥ 5 % del alto) | `medir.mjs` + zoom | Sí |
 | 8 | Logo ≥ 4,5:1, 15 % de ancho, no parece sello | `componer.mjs` | Sí |
@@ -723,7 +725,7 @@ Salida: `…-final.png logo blanco 18.82:1 selección OK`.
 | 10 | Sin categoría de un cliente real ni insinuación de trabajo con él | Leer la escena | Sí |
 | 11 | Identidad de Julio/Nexa y emblema del polo letra por letra | Zoom junto a la referencia | Sí |
 | 12 | Nadie mira a cámara (salvo decisión explícita) | Mirar | Revisar |
-| 13 | La serie no repite objeto de acento ni paneles azules | Hoja de contacto | Revisar |
+| 13 | La serie varía cómo integra los colores; no repite utilería ni paneles por inercia | Hoja de contacto | Revisar |
 | 14 | Funciona a 390 px de ancho | Reducir y mirar | Revisar |
 | 15 | Para publicar: ¿necesita equipo real? (casting de IA = stock premium) | Criterio | Revisar **[criterio]** |
 

@@ -185,10 +185,10 @@ describe('foto:prompt · anclas prohibidas y auditoría de escena', () => {
     ])
   })
 
-  it('avisa cuando el azul de marca es el tema y no el acento', () => {
+  it('admite un campo azul integrado en una escena con luz y momento', () => {
     expect(
       auditarEscena('SCENE: a grid of large azure-blue floor panels forming a geometric installation at midday sun, people mid-stride.')
-    ).toEqual([expect.stringContaining('AZUL DE MARCA')])
+    ).toEqual([])
   })
 
   it('no avisa sobre una escena que sí declara luz y momento', () => {

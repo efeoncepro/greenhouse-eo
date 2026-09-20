@@ -14,10 +14,12 @@ el contrato completo, las mediciones y los prompts verbatim viven en la document
 `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg` cuando salgan
 Julio o Nexa, la hoja `rondas/curado/set-curado-12.jpg` para la serie de color y al menos dos finales individuales
 comparables a tamaño completo. Antes del prompt, registra los archivos que viste y la comparación concreta:
-oficio/momento, portador visible del azul activo, origen del naranja **o** lima, lecho desenfocado, firma y rasgos de
-identidad. Declara esos portadores en la ficha de toma; **un HEX en un bloque genérico no basta**. Después de generar,
-mide el plate y compáralo otra vez con las aprobadas. Si el azul o el acento no aparecen en los píxeles, o el lecho
-falla, vuelve a dirigir y regenera; no lo declares aprobado. Canon operativo:
+oficio/momento, cómo viven el azul activo y el naranja **o** lima en la composición, lecho desenfocado, firma y rasgos
+de identidad. Declara en la ficha su relación natural con luz, reflejos, materiales, superficies y planos de la
+escena; ningún color exige un objeto propio ni utilería añadida para cumplir la paleta. **Un HEX en un bloque
+genérico no basta**. Después de generar, mira el plate junto a las aprobadas y usa las métricas como apoyo, no como
+cuota de píxeles: un acento visible en sombra puede medir poco. Si la relación cromática se siente forzada, el color
+desaparece visualmente o el lecho falla, vuelve a dirigir y regenera; no lo declares aprobado. Canon operativo:
 [pipeline §0](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 
 ## 1. La idea: «El oficio a la vista»
@@ -75,12 +77,14 @@ Anclas hacia el espacio libre; mejor sobre objetos grandes que sobre UI chica. *
 
 | Color | Rol | Cómo aparece |
 |---|---|---|
-| Azul activo `#0375DB` | **La casa**, en todas | luz u objeto; acento 3–10% o **campo protagonista** (set azul, pantalla gigante) |
-| Naranja `#F55D01` | **La idea**, momento creativo | dentro de la obra: manga, luz REC, lápiz graso, bolsa de arena |
-| Lima `#6EC207` | **El resultado** | tarjeta «Ganado», cursor Cliente que aprueba, check |
+| Azul activo `#0375DB` | **La casa**, en todas | relación cromática integrada en luz, reflejos, materiales o planos de la escena; puede leerse como acento o campo |
+| Naranja `#F55D01` | **La idea**, momento creativo | señal cromática nacida de la acción o de la composición; no requiere utilería naranja |
+| Lima `#6EC207` | **El resultado** | señal cromática nacida del resultado o de la composición; no requiere tarjeta ni check |
 
-- **Un solo acento** (naranja o lima) por pieza además del azul, **1–5% del cuadro**, nacido de la situación.
-  Utilería puesta (jarrón o libro naranja) se lee falsa; la taza azul repetida en 3–4 piezas fue sesgo.
+- **Un solo acento** (naranja o lima) por pieza además del azul, nacido de la situación. El 1–5% **a ojo**
+  orienta la lectura, no obliga a fabricar un objeto ni es un umbral de aprobación de `metricas.cjs`. Una relación
+  entre áreas, un reflejo o una luz pueden llevarlo con naturalidad. Utilería puesta (jarrón o libro naranja) se lee
+  falsa; la taza azul repetida en 3–4 piezas fue sesgo.
 - Azul **nunca intermedio en ropa grande** (camisa 16%, hoodie 17% = demasiado).
 - Navy **nunca** en pared + ropa + logo a la vez; uniforme navy sobre set **no** azul (se funde con tinta).
 - HEX en prompt se interpreta laxo (ΔE 15–19): **pedir por material** («dusty matte deep ink blue, low sheen»).
@@ -175,7 +179,8 @@ Costo observado ≈ USD 0,05 por imagen high 1152×1440 (xhigh ≈ 0,09). Bloque
 
 - [ ] Pasa la barra (§2): sustitución, obra, mecanismo, idea, 3 modos, 390 px, verdad operativa.
 - [ ] Industria no-cliente y sin objeto de acento repetido en la serie.
-- [ ] Azul presente como luz u objeto; un solo acento (naranja o lima) de 1–5%, nacido de la situación.
+- [ ] Azul y un solo acento (naranja o lima) integrados en la composición, nacidos de la situación; juzgar visualmente
+      su función y naturalidad antes de interpretar los porcentajes medidos.
 - [ ] Sin grade; WB neutro-cálido; sombras no azules; quemado y aplastado dentro de rango.
 - [ ] Lecho planeado, tono declarado, p99 ≤ ~20 y transición gradual; o excepción sin firma justificada.
 - [ ] Logo SVG oficial al 20%, centrado, contraste ≥ 4,5:1 medido; una sola marca protagonista.
@@ -243,10 +248,9 @@ impacto. Medido sobre sus escenas contra la ronda que el operador aprobó: luz 6
 - **Anclas de categoría de cliente:** hoy **pintura**. **[decisión del operador]** «nosotros NO somos Berel». La
   regla estaba escrita desde el 19/09 y una sesión generó igual un macro de un rodillo aplicando pintura azul.
   **Un doc no impide nada; un comando que aborta, sí.** Se amplía sólo con lo que el operador declare.
-- **Avisos que no bloquean:** escena sin **fuente de luz**, sin **momento**, o con el **azul de marca como tema**
-  en vez de acento. El bloque de impacto pide «one bold field or object in bright azure blue… everything else
-  calm»: cuando la escena hace del azul EL objeto —pintura azul, paneles azules, pantalla azul— sale una masa de
-  color sin materia ni razón, la misma falla de la losa con otro disfraz.
+- **Avisos que no bloquean:** escena sin **fuente de luz** o sin **momento**. El aviso automático que cuestionaba
+  paneles, pantallas y otras áreas azules se retiró: también hay campos azules naturales en las fotos aprobadas.
+  La revisión visual decide si el color tiene razón de estar en la composición o si parece una pieza añadida.
 
 El comando además imprime, antes de cada batch, la ruta de **las piezas aprobadas**: son el estándar y ninguna
 sesión las tenía delante al armar.
