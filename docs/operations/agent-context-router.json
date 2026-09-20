@@ -25,7 +25,12 @@
         "ojo de pez",
         "tilt-shift",
         "reserva de espacio para texto",
-        "zona de titular en la foto"
+        "zona de titular en la foto",
+        "foto:prompt",
+        "foto:validar",
+        "ficha de toma",
+        "generar un plate",
+        "validar un plate"
       ],
       "skills": [
         "design-studio",
@@ -41,7 +46,10 @@
         "docs/operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md",
         "docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md",
         "docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md",
-        ".codex/skills/design-studio/references/efeonce-photographic-language.md"
+        ".codex/skills/design-studio/references/efeonce-photographic-language.md",
+        "scripts/foto/build-prompt.mjs",
+        "scripts/foto/validar-reservas.mjs",
+        "docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md"
       ]
     },
     {

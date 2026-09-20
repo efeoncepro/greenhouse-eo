@@ -18,7 +18,10 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const BLOQUES = path.join(raiz, 'ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts')
+// Los bloques viven AL LADO del comando, no en una carpeta de corrida fechada. La copia de
+// `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/` queda como evidencia histórica de
+// esa corrida; si se archiva, este comando sigue funcionando.
+const BLOQUES = path.join(raiz, 'scripts/foto/bloques')
 
 // ── La tabla. Única fuente del formato. ──────────────────────────────────────────────────────────
 // `size` es lo que se le pasa a `pnpm ai:image --size`. `lecho` y `limite` están medidos en

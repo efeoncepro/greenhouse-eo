@@ -89,7 +89,7 @@ console.log(`${path.basename(file)}  ${W}×${H}  · formato ${formato}\n`)
 // todos. Lo detectó la sesión de fotografía sobre su piloto, y es justo el error que yo venía
 // señalando en los docs de ella.
 const GEOMETRIA_ZONA = {
-  '16:9': { eje: 'columna', x0: 0.06, x1: 0.48, desde: 0.05, hasta: 0.95, minimo: 0.45 },
+  '16:9': { eje: 'columna', x0: 0.06, x1: 0.48, desde: 0.05, hasta: 0.95, minimo: 0.42 },
   __default: { eje: 'banda', x0: 0.07, x1: 0.69, desde: 0, hasta: 0.6, minimo: 0.28 }
 }
 

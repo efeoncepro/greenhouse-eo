@@ -261,6 +261,21 @@ altura y la banda se corta.
 **No compatible** con las tomas 4 (ojo de pez de grupo), 5 (dron cenital), 10 (macro) y 14 (barrido): ninguna tiene
 margen vertical libre. En esas, la voz secundaria va en otra parte o no va.
 
+### 3.8.3 Regla del lecho: el verbatim debe poner algo CERCA DEL LENTE **[medido 2026-09-20]**
+
+Tres mediciones entre las dos sesiones, sobre la misma toma (picado 60°, la 19 del catálogo):
+
+| Corrida | Formato | Verbatim del lecho | Nitidez |
+|---|---|---|---|
+| Piloto P1 | 4:5 | explícito («so close to the lens that it dissolves…») | 0,0002 ✓ |
+| Cobertura ola 1 | 16:9 | sin la frase | 0,0043 ✗ |
+| Cobertura ola 3 | 16:9 | explícito | 0,0035 ✓ |
+
+**El ángulo nunca fue la causa, ni el formato.** El lecho falla cuando el verbatim no pone nada cerca del lente.
+Por eso esa frase **no es opcional y no la escribe quien pide la foto**: la emite `pnpm foto:prompt` siempre, en
+los cuatro formatos, y hay un test que lo verifica. La conclusión intermedia «el picado 60° no admite lecho» era
+falsa y estuvo a punto de sacar del catálogo una toma que funciona.
+
 ### 3.9 Bloques históricos (V2, rechazados como genéricos)
 
 `rondas/v2/` usó bloques «World-class creative agency photography … SET: one single tonal color family …» y
@@ -285,6 +300,21 @@ material** y la paleta cálida sin azul en sala («NO blue elements in the room 
 | 9 | Métricas Lab | `metricas.cjs` | Tabla |
 | 10 | QA al zoom (§8) | Ojo humano | Aprobada / regenerar |
 | 11 | Grilla para revisión del operador | sharp (hoja de contacto) | `*.jpg` |
+
+### 4.0 Requisitos de la máquina (lo único que no viaja con el repo)
+
+Los comandos y los bloques están versionados; **la credencial no**. Para generar hacen falta dos cosas:
+
+| Requisito | Cómo se verifica | Si falta |
+|---|---|---|
+| `OPENAI_API_KEY_SECRET_REF` en `.env.local` | `grep OPENAI_API_KEY .env.local` | `.env.local` está gitignored por diseño. Pedirlo al operador; el valor canónico es el nombre del secreto `greenhouse-openai-api-key`, **nunca la clave cruda** |
+| Credenciales de aplicación de gcloud (ADC) vigentes | `gcloud auth application-default print-access-token` | `pnpm gcloud:auth:playwright -- --force`. Las ADC **expiran**: un fallo de resolución de secreto suele ser esto y no la clave |
+
+`pnpm foto:prompt` y `pnpm foto:validar` **no** necesitan credencial: arman el prompt y miden archivos locales. La
+credencial la necesita sólo `pnpm ai:image`. Eso permite preparar y revisar una tanda entera sin acceso, y pedir la
+generación después.
+
+Todo lo demás —bloques, tabla de formatos, umbrales, arnés— vive en `scripts/foto/` y viaja con el repo.
 
 ### 4.1 Preparar la carpeta de la corrida
 
