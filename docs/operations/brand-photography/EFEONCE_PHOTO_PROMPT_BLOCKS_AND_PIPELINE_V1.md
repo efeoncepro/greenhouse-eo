@@ -38,7 +38,8 @@ cualquier generador (GPT Image, Gemini/Imagen, Seedream, Firefly, Midjourney, el
    Registrar en la ficha los archivos mirados y cómo viven el azul y el naranja **o** lima en la composición
    (luz, reflejo, material, superficie, relación entre planos o elemento propio de la escena), cómo funciona el
    lecho y qué distingue la escena de una foto de stock. No hay que inventar un objeto de color para completar la
-   ficha. Leer la skill o copiar un prompt
+   ficha. Un objeto funcional sí puede llevar un acento de marca si suma sutileza y elegancia a la escena; esta
+   regla evita la obligación, no prohíbe los objetos **[aclaración del operador, 2026-09-20]**. Leer la skill o copiar un prompt
    anterior no acredita esta comparación visual. Si los binarios aprobados no están disponibles, recuperar esa
    referencia antes de generar una persona o una foto de marca.
 1. Pegar los bloques verbatim de §3 (realismo, color system, balance de blancos, lecho/FOREGROUND, y IDENTITY +

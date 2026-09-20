@@ -85,6 +85,9 @@ Anclas hacia el espacio libre; mejor sobre objetos grandes que sobre UI chica. *
   orienta la lectura, no obliga a fabricar un objeto ni es un umbral de aprobación de `metricas.cjs`. Una relación
   entre áreas, un reflejo o una luz pueden llevarlo con naturalidad. Utilería puesta (jarrón o libro naranja) se lee
   falsa; la taza azul repetida en 3–4 piezas fue sesgo.
+- **Los objetos sí son válidos** cuando pertenecen al oficio o al lugar y aportan un acento sutil y elegante.
+  Evaluar su función y cómo se integran con luz, personas y espacio; «no obligatorio» nunca significa «prohibido»
+  **[aclaración del operador, 2026-09-20]**.
 - Azul **nunca intermedio en ropa grande** (camisa 16%, hoodie 17% = demasiado).
 - Navy **nunca** en pared + ropa + logo a la vez; uniforme navy sobre set **no** azul (se funde con tinta).
 - HEX en prompt se interpreta laxo (ΔE 15–19): **pedir por material** («dusty matte deep ink blue, low sheen»).

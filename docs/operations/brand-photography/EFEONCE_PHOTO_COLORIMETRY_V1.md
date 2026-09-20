@@ -120,6 +120,7 @@ el vidrio (`camaras/5-reflejo` 0,43 %, `personas/N2-reflejo` 0,57 %), la card «
 | Acentos por pieza | Azul + **uno** (naranja **o** lima) | [decisión del operador] |
 | Área del acento de historia | 1–5 % del cuadro a ojo como orientación compositiva; métrica típica 0,1–1 %, nunca umbral único de aprobación | [criterio, medido] |
 | Origen | La situación y la relación entre luz, superficies, reflejos y planos; un objeto concreto es opcional, nunca decoración añadida | [decisión del operador; aclaración 2026-09-20] |
+| Objetos de marca | Válidos si pertenecen al oficio o al lugar y aportan acentos sutiles y elegantes; evaluar su función visual, no usarlos por cuota | [decisión del operador; aclaración 2026-09-20] |
 | Utilería rechazada | Jarrón o libro naranja «puesto» | [decisión del operador] |
 | Repetición | La **taza azul** apareció en 4 piezas (I5, K3, K1, JN1): sesgo a evitar; variar el portador del azul | [criterio, revisor adversarial] |
 | Paneles azules de fondo | Se repitieron en escenario y podcast: variar | [criterio] |
