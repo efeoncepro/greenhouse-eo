@@ -406,6 +406,14 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ga4.connect',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
     // TASK-1301 — Growth SEO (EPIC-022): target.configure (autor de targets/keywords/
     // competitors) + audit.run (disparar site audit). Mismo set operador que run.operator:
     // quien opera el motor de venta/servicio configura y dispara. El GASTO real lo gatea

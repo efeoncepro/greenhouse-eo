@@ -2314,6 +2314,7 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // nunca conecta directo). Grant set operador (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT
   // ∪ EFEONCE_OPERATIONS ∪ AI_TOOLING_ADMIN) en runtime.ts mismo PR.
   { key: 'growth.search_console.connect', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.ga4.connect', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
   // TASK-1301 — Growth SEO (dominio growth.seo, EPIC-022 "Search Visibility 360"). 5 capabilities
   // gobernadas (Full API Parity + MCP-first: mismas caps para UI/Nexa/lane app/lane ecosystem —
   // NUNCA un gate paralelo por consumer). El ACCESO efectivo es per-org vía module_assignments
