@@ -11,6 +11,8 @@ import { describe, expect, it } from 'vitest'
 // hace falta `@ts-expect-error` — al exportar OBJETOS y PALANCAS, TS resuelve el módulo y la
 // directiva quedaría sin uso (TS2578 rompe el pre-push).
 import {
+  auditarAcentoDeTanda,
+  auditarColor,
   auditarEscena,
   auditarReservas,
   auditarVestuario,
@@ -784,11 +786,17 @@ describe('reserva de texto — el mecanismo que estaba apagado', () => {
     const avisos = auditarReservas(base)
 
     expect(avisos.join(' ')).toMatch(/sin `reservas`/)
-    expect(avisos.join(' ')).toMatch(/o está en la toma, o el texto no cabe/)
+    expect(avisos.join(" ")).toMatch(/o está en la toma, o no cabe/)
   })
 
-  it('no avisa cuando la ficha sí la declara', () => {
-    expect(auditarReservas({ ...base, reservas: ['zona-texto'] })).toHaveLength(0)
+  // `reservas` es un OBJETO con claves, no un array. El test anterior le pasaba un array y por eso
+  // aprobaba una guarda que nunca habría reconocido una ficha real. La forma correcta es la que el
+  // resolvedor consume (`r.texto` → `fmt.zonaTexto`), y esa es la que se ejercita acá.
+  it('no avisa cuando la ficha sí la declara, con la forma que el comando consume', () => {
+    const reservas = { texto: { muro: 'a wall of board-formed concrete', tinta: 'blanca' } }
+
+    expect(auditarReservas({ ...base, reservas })).toHaveLength(0)
+    expect(construirPrompt({ ...base, reservas }).prompt).toMatch(/TEXT SPACE \(planned, essential\)/)
   })
 
   // El aviso no vale por existir en la función: vale si llega a quien corre el comando. Quien lo
@@ -798,5 +806,30 @@ describe('reserva de texto — el mecanismo que estaba apagado', () => {
     const fuente = readFileSync(path.join(raiz, 'scripts/foto/build-prompt.mjs'), 'utf8')
 
     expect(fuente).toMatch(/avisos\.push\(\.\.\.auditarReservas\(ficha\)\)/)
+  })
+})
+
+describe('acento cálido — la dosis vive en la tanda, no en la pieza', () => {
+  const conAcento = 'SCENE: an ORANGE strip of marking tape runs along the floor'
+  const sinAcento = 'SCENE: a blue screen lights the room'
+
+  // Pedir acento pieza por pieza contradecía la dosis: el mismo aviso empujaba al tic que la dosis
+  // existe para evitar. Por eso `auditarColor` ya no lo reclama y la decisión se toma sobre la tanda.
+  it('auditarColor no reclama el acento por pieza', () => {
+    expect(auditarColor(sinAcento).join(' ')).not.toMatch(/ACENTO/)
+  })
+
+  it('falla en las dos direcciones: ninguna lo lleva, o casi todas', () => {
+    expect(auditarAcentoDeTanda([sinAcento, sinAcento, sinAcento]).join(' ')).toMatch(/ninguna de las 3/)
+    expect(auditarAcentoDeTanda([conAcento, conAcento, conAcento]).join(' ')).toMatch(/dosis: 1 de cada 2/)
+  })
+
+  it('una tanda con la dosis correcta pasa sin avisos', () => {
+    expect(auditarAcentoDeTanda([conAcento, sinAcento, sinAcento, conAcento])).toHaveLength(0)
+  })
+
+  // Una pieza suelta no es una tanda: no hay dosis que medir sobre una sola.
+  it('no opina sobre una pieza suelta', () => {
+    expect(auditarAcentoDeTanda([sinAcento])).toHaveLength(0)
   })
 })

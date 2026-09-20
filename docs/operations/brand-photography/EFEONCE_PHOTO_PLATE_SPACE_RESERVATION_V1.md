@@ -117,3 +117,38 @@ horneado y el plate no serviría para ninguna de las dos. Esto ya NO alcanza a l
 Plates y mediciones en `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/texto/` (v1 sin tono
 declarado = falla; v2 con tono y límite de cabezas = pasa) y `rondas/capas-v2/`. OneDrive:
 `referencias/08-espacio-texto-y-formatos/`, con la hoja del primer intento fallido como material de aprendizaje.
+
+## Delta 2026-09-20 — la zona de texto se mide a la escala de la letra, no del grano
+
+**Dos reglas del canon se contradecían y ninguna pieza legítima podía pasar.** La zona de texto se validaba con
+`calma` —gradiente de luminancia píxel a píxel, es decir **microtextura**— mientras la guarda de materia del
+generador **exige** una superficie con nombre («a wall of board-formed concrete», nunca «a wall»), y toda materia
+real tiene grano.
+
+**Medido sobre `V2-marcado-45`** (`ai-generations/2026-09-20_plates-con-voz/`): la banda superior de hormigón
+encofrado daba **contraste 20:1 en todo su alto** —cuatro veces el mínimo de 4,5— y reprobaba **sólo por calma**,
+0,55–0,78 contra un máximo de 0,50. A ojo, el titular cabía perfecto.
+
+**El umbral viejo no nació mal.** Se calibró con plates que pasaban a 0,24–0,29, pero eran los de superficie lisa
+que el canon prohibió después como «losa». **La guarda de materia lo dejó obsoleto y nadie lo recalibró**, y por
+eso «espacio para texto» llevaba un día como pendiente sin que se supiera que el instrumento era el problema.
+
+**Corrección: cambia el instrumento, no el umbral.** Subir `CALMA_MAX` habría borrado la pregunta. Lo que estorba
+a un titular no es el grano de la materia, es una variación de luminancia **a la escala de la letra**. La banda se
+reduce a bloques de ~1/18 del lado corto y se mide la **desviación de L\* entre bloques**: el grano se promedia y
+sobrevive lo que de verdad rompe la lectura —una ventana, un objeto claro, un degradado fuerte—.
+
+| | Reservan de verdad (`V1`…`V5`) | No reservaron (auditoría ciega) |
+|---|---|---|
+| `calma` vieja (grano) | 0,00 · 0,00 · 0,44 · 0,40 · 0,08 | 0,00 · 0,00 · 0,10 · 0,00 |
+| **`calmaTexto` (escala de letra)** | **0,46 · 0,54 · 0,52 · 0,40 · 0,42** | **0,00 · 0,00 · 0,20 · 0,00** |
+
+La vieja daba cero a los dos grupos: **no discriminaba**. La nueva separa 4 de 5 contra 0 de 4 (`V4` queda en
+0,40 contra el 0,42 que pide la columna del 16:9, a dos centésimas).
+
+`CALMA_TEXTO_MAX = 12` (desviación en L\*). `CALMA_MAX = 0,5` **sigue vigente** para las demás reservas —aire de
+cursores, campo profundo—, donde el gradiente fino sí es la medida correcta.
+
+> **Regla que queda:** cuando una guarda reprueba algo que a ojo está bien y el contraste sobra por cuatro veces,
+> sospecha del instrumento antes que de la pieza. Y si dos reglas del sistema no se pueden satisfacer a la vez,
+> una de las dos llegó después y dejó a la otra obsoleta.

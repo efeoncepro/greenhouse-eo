@@ -60,6 +60,50 @@ const TRAZO = '#a6cdf5'
 //   Deben reprobar (escena viva):   P3 derecha 0,89 · P1 objeto 1,29 · P2 sala 2,44
 // El hueco va de 0,29 a 0,89; 0,5 queda a ~1,7× del peor que pasa y ~1,8× del mejor que falla.
 const CALMA_MAX = 0.5
+
+// CALMA A ESCALA DE TEXTO — para la zona de texto, `calma` (gradiente píxel a píxel) mide MICROTEXTURA,
+// y eso entró en contradicción con el canon: la guarda de materia del generador EXIGE una superficie con
+// nombre («a wall of board-formed concrete», no «a wall»), y toda materia real tiene grano. Medido el
+// 2026-09-20 sobre `V2-marcado-45`: contraste 20:1 en toda la banda —cuatro veces el mínimo— y reprueba
+// con calma 0,55–0,78. Ninguna pieza legítima podía pasar.
+//
+// El umbral viejo no nació mal: se calibró con plates que pasaban a 0,24–0,29, pero eran los de
+// superficie lisa que el canon prohibió después como «losa». La guarda de materia lo dejó obsoleto.
+//
+// Lo que estorba a un titular no es el grano, es una variación de luminancia A LA ESCALA DE LA LETRA.
+// Por eso la banda se reduce a bloques de ~1/18 del lado corto y se mide la desviación en L* ENTRE
+// bloques: el grano se promedia y sobrevive lo que de verdad rompe la lectura —una ventana, un objeto
+// claro, un degradado fuerte—. Calibrado [medido 2026-09-20], y discrimina donde el viejo no:
+//   reservan de verdad (V1…V5):     0,60 · 0,54 · 0,52 · 0,40 · 0,44   (el viejo daba 0,00 a tres)
+//   no reservaron (auditoría ciega): 0,00 · 0,00 · 0,20 · 0,00
+const CALMA_TEXTO_MAX = 12
+
+const calmaTexto = async (x0, y0, x1, y1) => {
+  const left = Math.max(0, Math.round(x0 * W))
+  const top = Math.max(0, Math.round(y0 * H))
+  const width = Math.max(2, Math.min(W - left, Math.round((x1 - x0) * W)))
+  const height = Math.max(2, Math.min(H - top, Math.round((y1 - y0) * H)))
+  const bloque = Math.max(6, Math.round(Math.min(W, H) / 18))
+  const cols = Math.max(2, Math.round(width / bloque))
+  const rows = Math.max(1, Math.round(height / bloque))
+
+  const { data } = await sharp(file)
+    .extract({ left, top, width, height })
+    .resize(cols, rows, { fit: 'fill', kernel: 'lanczos3' })
+    .removeAlpha()
+    .toColourspace('srgb')
+    .raw()
+    .toBuffer({ resolveWithObject: true })
+
+  const L = []
+
+  for (let i = 0; i < data.length; i += 3) L.push(aLstar(lum(data[i], data[i + 1], data[i + 2])))
+
+  const media = L.reduce((a, b) => a + b, 0) / L.length
+
+  return Math.sqrt(L.reduce((a, b) => a + (b - media) ** 2, 0) / L.length)
+}
+
 // El lecho no mide igual en los tres formatos [medido en rondas/texto/bv2-{45,916,169}.json].
 const LECHO = { '4:5': 0.18, '9:16': 0.22, '16:9': 0.16, '1:1': 0.18 }
 
@@ -155,14 +199,14 @@ for (const [nombre, tinta] of Object.entries(TINTA)) {
     for (let y = geo.desde; y < geo.hasta; y += 0.02) {
       const z = await zona(geo.x0, y, geo.x1, y + 0.02)
 
-      if (contra(z, tinta) >= 4.5 && z.calma < CALMA_MAX) alcance = y + 0.02
+      if (contra(z, tinta) >= 4.5 && (await calmaTexto(geo.x0, y, geo.x1, y + 0.02)) < CALMA_TEXTO_MAX) alcance = y + 0.02
       else break
     }
   } else {
     for (let x = geo.x0; x < geo.x1; x += 0.02) {
       const z = await zona(x, geo.desde, x + 0.02, geo.hasta)
 
-      if (contra(z, tinta) >= 4.5 && z.calma < CALMA_MAX) alcance = x + 0.02
+      if (contra(z, tinta) >= 4.5 && (await calmaTexto(x, geo.desde, x + 0.02, geo.hasta)) < CALMA_TEXTO_MAX) alcance = x + 0.02
       else break
     }
   }

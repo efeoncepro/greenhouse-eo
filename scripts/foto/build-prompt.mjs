@@ -833,12 +833,16 @@ const ACENTO =
 // mejor llegó a 0,10 del alto contra un mínimo de 0,28). Una pieza sin texto es legítima; una que va a
 // llevar titular y no reservó espacio ya nació sin él, y eso no se arregla en composición.
 export const auditarReservas = ficha => {
-  if (Array.isArray(ficha?.reservas) && ficha.reservas.length > 0) return []
+  // `reservas` es un OBJETO con claves (`texto`, `margen`, `seleccion`), no un array: comprobar
+  // `Array.isArray` daba el aviso incluso a una ficha que SÍ reservaba. Error propio del 2026-09-20,
+  // y el test lo confirmó porque le pasaba un array — una guarda que afirma la forma equivocada.
+  if (ficha?.reservas && Object.keys(ficha.reservas).length > 0) return []
 
   return [
-    'sin `reservas`: esta pieza no aparta espacio para la capa gráfica. Si va a llevar titular, copy o ' +
-      'cursores, decláralo ahora (`reservas: ["zona-texto"]`) y valídalo con `pnpm foto:validar <plate> ' +
-      '--zona-texto`. Reservar después de generar no existe: o está en la toma, o el texto no cabe.'
+    'sin `reservas`: esta pieza es MUDA (sólo foto y firma), lo cual es una categoría legítima y sirve de ' +
+      'descanso visual. Si va a llevar titular, copy o cursores, decláralo ahora — ' +
+      '`"reservas": { "texto": { "muro": "<materia con nombre>", "tinta": "blanca|oscura" } }` — y valida con ' +
+      '`pnpm foto:validar <plate> --zona-texto`. Reservar después de generar no existe: o está en la toma, o no cabe.'
   ]
 }
 
@@ -851,13 +855,35 @@ export const auditarColor = escena => {
     )
   }
 
-  if (!ACENTO.test(escena ?? '')) {
-    avisos.push(
-      'no declara el ACENTO (naranja o lima, 1–5% del cuadro, nacido de la situación: una marca en el piso, un post-it, una luz REC, una tarjeta)'
-    )
+  // El ACENTO no se audita por pieza: tiene DOSIS (1 de cada 2, auditoría ciega 2026-09-20) y pedirlo
+  // en cada una contradecía la dosis — el mismo aviso empujaba al tic que la dosis existe para evitar.
+  // Su decisión vive en la TANDA y se resuelve en `auditarAcentoDeTanda`.
+  return avisos
+}
+
+// El acento falla en las DOS direcciones y las dos importan: si no lo lleva ninguna se pierde la
+// puntuación de marca; si lo llevan casi todas se lee como un tic de producción y delata la receta.
+export const auditarAcentoDeTanda = escenas => {
+  if (escenas.length < 2) return []
+
+  const con = escenas.filter(e => ACENTO.test(e ?? '')).length
+
+  if (con === 0) {
+    return [
+      `ninguna de las ${escenas.length} fichas declara el ACENTO cálido (naranja o lima, 1–5%, nacido de la situación). ` +
+        'El azul portador es estructura y va en todas; el acento es la puntuación de marca y la tanda se queda sin ella.'
+    ]
   }
 
-  return avisos
+  if (con * DOSIS_ACENTO > escenas.length) {
+    return [
+      `acento cálido en ${con} de ${escenas.length} fichas (dosis: 1 de cada ${DOSIS_ACENTO}). ` +
+        'Medido desde fuera: repetido en casi todas deja de leerse como identidad y delata que la serie se armó ' +
+        'con una receta en vez de a lo largo de proyectos reales.'
+    ]
+  }
+
+  return []
 }
 
 const FICHA_EJEMPLO = {
@@ -1107,14 +1133,8 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
   // primera vez es identidad, a la octava se siente forzado» y «la taza y el post-it están puestos ahí
   // sólo para cumplir la cuota de naranja». El azul portador es estructura y va en todas; el ACENTO es
   // puntuación y necesita dosis, igual que la acción suspendida.
-  const conAcento = resueltas.filter(r => ACENTO.test(r.ficha.escena ?? '')).length
-
-  if (conAcento * DOSIS_ACENTO > resueltas.length && resueltas.length > 1) {
-    console.error(
-      `  ⚠ acento cálido en ${conAcento} de ${resueltas.length} fichas (dosis: 1 de cada ${DOSIS_ACENTO}). ` +
-        'Medido desde fuera: repetido en casi todas deja de leerse como identidad y delata que la serie ' +
-        'se armó con una receta en vez de a lo largo de proyectos reales. El azul portador sí va en todas.'
-    )
+  for (const aviso of auditarAcentoDeTanda(resueltas.map(r => r.ficha.escena))) {
+    console.error(`  ⚠ ${aviso}`)
   }
 
   if (conSuspendido * DOSIS_SUSPENDIDO > resueltas.length && resueltas.length > 1) {
