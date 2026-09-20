@@ -605,21 +605,21 @@ describe('foto:prompt · el catálogo coincide con el lock de assets', () => {
 describe('foto:prompt · el catálogo de palancas', () => {
   const claves = Object.keys(PALANCAS as Record<string, unknown>)
 
-  it('tiene las quince aprobadas y ninguna descartada', () => {
-    expect(claves).toHaveLength(15)
+  it('tiene las diecinueve aprobadas y ninguna descartada', () => {
+    expect(claves).toHaveLength(19)
 
-    for (const descartada of ['bano-de-color', 'split-diopter', 'clave-baja', 'flash-duro']) {
+    for (const descartada of ['bano-de-color', 'split-diopter', 'clave-baja', 'flash-duro', 'trama']) {
       expect(claves).not.toContain(descartada)
     }
   })
 
+  // Se mide el BLOQUE DE LA PALANCA, no el prompt entero: medir el prompt dejaba pasar una palanca sin
+  // marcadores propios, porque el bloque de realismo compartido ya trae un «not a…» y aprobaba por él.
   it.each(claves)('%s emite un bloque con marcadores verificables', clave => {
     const p = PALANCAS as Record<string, { bloque: string; requiere: string | null }>
-    const extra = p[clave].requiere ? { [p[clave].requiere as string]: 'un objeto concreto de prueba' } : {}
-    const prompt = construirPrompt({ ...fichaBase, palanca: clave, ...extra }).prompt
 
     // «verify it», «NOT a…», «no faces»: la marca de que el bloque describe qué se ve, no una intención.
-    expect(prompt).toMatch(/verify it|NOT a|NO facial|not a digital effect|nobody|no faces/i)
+    expect(p[clave].bloque).toMatch(/verify it|NOT a|NO facial|not a digital effect|nobody|no faces|does NOT|NEITHER/i)
   })
 
   it.each(claves.filter(c => (PALANCAS as Record<string, { requiere: string | null }>)[c].requiere))(
@@ -673,5 +673,45 @@ describe('palanca vs toma de cámara', () => {
   it('una palanca inventada lista las de encuadre y nombra las otras familias', () => {
     expect(() => construirPrompt({ ...base, palanca: 'inventada' })).toThrow(/Palanca de encuadre "inventada" desconocida/)
     expect(() => construirPrompt({ ...base, palanca: 'inventada' })).toThrow(/`atmosfera`/)
+  })
+})
+
+describe('palancas de la ronda podcast', () => {
+  const base = {
+    id: 'g',
+    formato: '4:5',
+    escena: 'SCENE: a hard directional beam rakes across a real walnut worktop',
+    lecho: { objeto: 'the near edge of a real walnut worktop', tono: 'DARK walnut in shadow, matte' }
+  }
+
+  // `escucha` se define por lo que NO pasa: si el bloque no dice «boca cerrada» ni «nunca al lente»,
+  // el modelo devuelve un retrato hablando, que es justo lo que el operador no quiere.
+  it('escucha pide boca cerrada y mirada fuera del cuadro', () => {
+    const { prompt: p } = construirPrompt({ ...base, palanca: 'escucha' })
+
+    expect(p).toMatch(/MOUTH IS CLOSED/)
+    expect(p).toMatch(/never into the lens/)
+    expect(p).toMatch(/UNUSED/)
+  })
+
+  it('atraviesa cruza en diagonal SIN cubrir al sujeto (si cubre, es oclusion)', () => {
+    const { prompt: p } = construirPrompt({ ...base, palanca: 'atraviesa' })
+
+    expect(p).toMatch(/does NOT cover their face or body/)
+  })
+
+  it('entre-dos deja el centro vacío y prohíbe la mirada al lente', () => {
+    const { prompt: p } = construirPrompt({ ...base, palanca: 'entre-dos' })
+
+    expect(p).toMatch(/CENTRE of the picture is the empty air/)
+    expect(p).toMatch(/NEITHER of them looks at the camera/)
+  })
+
+  // La inversión de foco ES la palanca: sin ella queda un retrato de operador cualquiera.
+  it('quien-sostiene invierte el foco y lo declara como el punto', () => {
+    const { prompt: p } = construirPrompt({ ...base, palanca: 'quien-sostiene' })
+
+    expect(p).toMatch(/OUT OF FOCUS/)
+    expect(p).toMatch(/operator FIRST and on the talent LAST/)
   })
 })

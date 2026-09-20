@@ -664,6 +664,36 @@ export const PALANCAS = {
     bloque:
       'OCCLUSION — verify it by what it covers (the camera watched from where it stood and moved nothing): <QUE> sits in the near ground and PARTIALLY COVERS the subject — it must cover a real part of them, roughly a third of the frame and clearly overlapping their body or face edge, not merely sit beside them. It is closer to the lens than the subject and falls out of focus. The effect is of having watched past something, not of an object placed in the corner.',
     requiere: 'ocluye'
+  },
+
+  // ── Ronda podcast, 2026-09-20 ────────────────────────────────────────────────────────────────
+  // El estudio de podcast fue el laboratorio, no el tema: es el único set donde el momento real NO
+  // es hablar. Las cuatro son domain-free y se probaron en `ai-generations/2026-09-20_palancas-podcast/`.
+  escucha: {
+    etiqueta: 'el momento de recibir',
+    // Igual que `pov`, es el Why de Efeonce hecho encuadre: la agencia que escucha antes de proponer.
+    bloque:
+      'LISTENING, NOT SPEAKING (this is the frame, not a detail): the subject is RECEIVING — verify it by these landmarks, not by mood: their MOUTH IS CLOSED and relaxed, with no teeth showing and no mid-word shape; their gaze is lowered or slightly unfocused and goes OUT of the frame towards whoever is speaking, never into the lens; their body is still and leaned very slightly forward, one hand resting near the ear or the jaw. The tool they would use to speak — microphone, pen, keyboard — is in the frame and UNUSED. The tension of the picture is attention, not action.',
+    requiere: null
+  },
+  atraviesa: {
+    etiqueta: 'un objeto del oficio cruza el cuadro',
+    bloque:
+      'AN OBJECT OF THE CRAFT CUTS THE FRAME (this is the composition, not a detail): a long rigid object of the trade — a boom arm, a rail, a ruler, a cable run, a beam — runs as a hard DIAGONAL from one corner of the picture towards the opposite one, IN FOCUS and sharp along its whole length so its joints and material are legible. It passes BETWEEN the lens and the person but it does NOT cover their face or body: it crosses the empty air in front of them and splits the picture into two zones. The composition is governed by that diagonal, not by the face.',
+    requiere: null
+  },
+  'entre-dos': {
+    etiqueta: 'la cámara entre dos que trabajan juntos',
+    bloque:
+      'BETWEEN THE TWO (this is the frame, not a detail): the camera sits IN THE SPACE BETWEEN two people who are talking TO EACH OTHER — verify it by these landmarks: one person at the LEFT edge of the frame and another at the RIGHT edge, both cut by the frame edges, both at the same distance from the lens, and the whole CENTRE of the picture is the empty air between them; NEITHER of them looks at the camera — they look ACROSS it at one another, so their eyelines cross in front of the lens; one has just stopped and the other is beginning. The subject of the photograph is the exchange, not either face.',
+    requiere: null
+  },
+  'quien-sostiene': {
+    etiqueta: 'quien hace posible el momento, no quien lo protagoniza',
+    // La inversión ES la palanca: el ojo llega primero a quien opera y último a quien luce.
+    bloque:
+      'THE ONE WHO MAKES IT POSSIBLE (this is the frame, not a detail): the person IN FOCUS is the one OPERATING — at the desk, the console, the panel, the rig — seen in three-quarter view with a hand on a control, watching a readout. The people who are actually performing are BEHIND them, SMALL, SOFT and OUT OF FOCUS, seen from behind, and no feature of them is legible. The eye must land on the operator FIRST and on the talent LAST: that inversion is the point of the picture.',
+    requiere: null
   }
 }
 

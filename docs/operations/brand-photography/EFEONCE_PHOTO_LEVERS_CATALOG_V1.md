@@ -1,8 +1,8 @@
 # Catálogo de palancas fotográficas Efeonce V1
 
 > **Tipo de documento:** Catálogo canónico de oficio (maestro de palancas)
-> **Versión:** 2.0 · **Creado:** 2026-09-20 por Claude
-> **Estado:** veinticinco palancas en cuatro familias, aprobadas por el operador tras tres rondas de prueba medidas el 2026-09-20.
+> **Versión:** 2.1 · **Creado:** 2026-09-20 por Claude
+> **Estado:** veintinueve palancas en cuatro familias, aprobadas por el operador tras tres rondas de prueba medidas el 2026-09-20.
 > **Relacionado:** [maestro](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [reservas](./EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md)
 
 Una **palanca** es una decisión de oficio que cambia lo que la foto *hace*, no lo que muestra.
@@ -14,9 +14,9 @@ Una **palanca** es una decisión de oficio que cambia lo que la foto *hace*, no 
 | [A. Siempre activas](#a-las-cinco-siempre-activas-el-bloque-de-impacto) | 5 | van solas en cada prompt (`impacto: false` las apaga) | las cinco |
 | [B. Atmósfera](#b-atmósfera--el-aire-que-hace-visible-la-luz) | 4 | `atmosfera` | una, opcional |
 | [C. Acción suspendida](#c-acción-suspendida--lo-que-está-en-vuelo) | 1 | `suspendido` | opcional, **1 de cada 4 piezas** |
-| [D. Encuadre y punto de vista](#d-las-quince-de-encuadre-y-punto-de-vista) | 15 | `palanca` | **una sola** |
+| [D. Encuadre y punto de vista](#d-las-diecinueve-de-encuadre-y-punto-de-vista) | 19 | `palanca` | **una sola** |
 
-Son **25 palancas**, y se combinan con las **[20 tomas de cámara](#las-veinte-tomas-del-catálogo-de-cámara)**
+Son **29 palancas**, y se combinan con las **[20 tomas de cámara](#las-veinte-tomas-del-catálogo-de-cámara)**
 —ojo de pez, dron cenital, tilt-shift, contrapicado, macro, tele, barrido…— que dicen **con qué** se fotografía.
 Además hay [otros ejes](#otros-ejes-que-deciden-la-pieza-y-no-son-palancas) —formato, reserva,
 lecho, cámara, objetos de marca, identidad— que deciden la pieza pero tienen documento propio. El maestro define el
@@ -112,7 +112,7 @@ de menos de ocho caracteres, porque dejarlo abierto hace que el modelo elija, **
 > **Dosis: 1 de cada 4 piezas** **[decisión del operador]**. El comando cuenta la tanda y avisa con el número.
 > Es también la razón por la que no vive en el bloque siempre activo: ahí volaría algo en cada foto.
 
-## D. Las quince de encuadre y punto de vista
+## D. Las diecinueve de encuadre y punto de vista
 
 ### De luz y tiempo
 
@@ -243,7 +243,50 @@ ordenada y vacía.
 
 ---
 
-## Las cuatro descartadas y por qué **[medido]**
+### De atención y de papel en la escena **[2026-09-20, ronda podcast]**
+
+Nacieron en un estudio de podcast, que se usó como **laboratorio y no como tema**: es el único set donde el
+momento real **no es hablar**. Las cuatro son domain-free — `entre-dos` se probó y salió una sala, no un estudio,
+y funciona igual.
+
+#### `escucha` — el momento de recibir
+**Qué es.** Fotografiar a quien **recibe**, no a quien emite. Junto con `pov`, es el Why de Efeonce hecho
+encuadre: la agencia que escucha antes de proponer.
+**Cómo se logra.** Boca **cerrada** y relajada, sin dientes ni forma de media palabra; mirada baja o levemente
+desenfocada que sale **fuera del cuadro** hacia quien habla, nunca al lente; cuerpo quieto e inclinado apenas
+adelante, una mano cerca de la oreja o la mandíbula. La herramienta con la que hablaría —micrófono, lápiz,
+teclado— **está en el cuadro y sin usar**. La tensión es la atención, no la acción.
+**Por qué importa.** Es lo contrario exacto de una selfie: la persona no está actuando.
+**Evidencia.** `G1` (sesión de grabación, Santiago) · a la primera.
+
+#### `atraviesa` — un objeto del oficio cruza el cuadro
+**Qué es.** Un objeto largo y rígido del oficio —brazo articulado, riel, regla, tendido de cable, viga— **manda
+la composición** en vez de la cara.
+**Cómo se logra.** Corre en **diagonal dura** de una esquina hacia la opuesta, **a foco y nítido en todo su
+largo**, con sus juntas y su material legibles. Pasa **entre el lente y la persona pero NO la cubre**: cruza el
+aire vacío delante de ella y parte el cuadro en dos zonas.
+**Ojo.** No es `oclusion` —esa **cubre** al sujeto— ni es el lecho, que va desenfocado contra el lente.
+**Evidencia.** `G2` (Lima) · a la primera.
+
+#### `entre-dos` — la cámara entre dos que trabajan juntos
+**Qué es.** El sujeto es **el intercambio**, no ninguna de las dos caras.
+**Cómo se logra.** Una persona en el borde **izquierdo** y otra en el **derecho**, ambas cortadas por el borde y
+a la misma distancia del lente; **todo el centro del cuadro es el aire vacío** entre ellas. **Ninguna mira al
+lente**: se miran **a través** de él, así que sus líneas de visión se cruzan delante de la cámara. Una acaba de
+terminar y la otra empieza.
+**Ojo.** No es `pov`: ahí la cámara ocupa el lugar del cliente y los sujetos se dirigen a ese lugar. Acá la
+cámara es un estorbo entre dos que se hablan entre sí.
+**Evidencia.** `G3` (Ciudad de México) · a la primera.
+
+#### `quien-sostiene` — quien hace posible el momento, no quien lo protagoniza
+**Qué es.** **Invierte a quién le toca el foco.** Es, con `pov`, la más Efeonce del catálogo.
+**Cómo se logra.** Nítida en el primer término va la persona que **opera** —mesa, consola, panel, rig— en tres
+cuartos, con una mano en un control y la vista en un medidor. Quienes **actúan** están detrás, **pequeños,
+suaves y fuera de foco**, de espalda, sin un rasgo legible. **El ojo tiene que llegar primero a quien opera y
+último a quien luce**: esa inversión es el punto.
+**Evidencia.** `G4` (Bogotá) · a la primera; los faders dieron el azul sin poner nada.
+
+## Las cinco descartadas y por qué **[medido]**
 
 Valen tanto como las aprobadas: evitan repetir el gasto.
 
@@ -252,6 +295,7 @@ Valen tanto como las aprobadas: evitan repetir el gasto.
 | **Baño de color** (toda la escena teñida del azul de marca) | **El modelo se niega.** Con marcadores explícitos —«su piel es azul», «el suéter blanco se lee azul»— oscureció el cuarto pero **mantuvo la piel natural**. Su sesgo es más fuerte que la instrucción. Lo que sí produce ya existe: es `luz-motivada`. |
 | **Split diopter** (dos planos nítidos a distinta distancia) | **Descartada dos veces.** Devuelve **profundidad de campo normal** sin la costura característica: pliego nítido + persona nítida + fondo suave es lo que da cualquier lente a f/5.6, así que la palanca no existe en el resultado. Reintentada con el sistema de color el 2026-09-20 y **rechazada por el operador: «se ve muy IA»** — el intento de forzar dos campos de foco produce una nitidez pareja que delata la generación. No volver a probarla por prompt. |
 | **Clave baja** (la escena en sombra, sólo emerge lo esencial) | Funciona, pero **no se distingue** de luz con carácter + lecho oscuro, que ya está en el canon. Duplicar una palanca es lo que diluye el sistema. |
+| **Trama** (a través de una malla perforada que fragmenta al sujeto) | **No se logró** (2026-09-20). El grill del micrófono salió espectacular como textura, pero detrás **no se lee que haya una persona**: sólo una mancha. La palanca exige una cara **rota por la rejilla**, no borrada, y lo que queda es un bodegón del objeto. Vecina de `instrumento` por diseño; si se reintenta, con la cara mucho más cerca de la malla y perforación más abierta. |
 | **Flash duro editorial** | Funciona y **confirma que es otro idioma**: puesto junto a las demás, no pertenece. Si se adopta, va declarado como **territorio aparte** (trendjacking, cultura), nunca mezclado con el lenguaje principal. |
 
 **Lección transversal:** hay extremos que el motor **no hace**. Conviene averiguarlo con una prueba barata antes
