@@ -2,13 +2,13 @@
 // «Vertical 4:5.» y la plantilla del lecho traía «bottom 18%». Los dos vivieron dentro de bloques que
 // se reusan en TODOS los formatos, el doc decía otra cosa que el archivo, y nadie lo vio hasta medir
 // 80 prompts. Cada `it` de acá es una de esas puertas cerrada con llave.
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
 // @ts-expect-error -- .mjs sin tipos, a propósito: es una herramienta de corrida, no código de producto.
-import { auditarEscena, auditarVestuario, construirPrompt, detectarValorDeFormato } from './build-prompt.mjs'
+import { auditarEscena, auditarVestuario, construirPrompt, detectarValorDeFormato, OBJETOS } from './build-prompt.mjs'
 
 const raiz = path.resolve(__dirname, '../..')
 const BLOQUES = path.join(raiz, 'scripts/foto/bloques')
@@ -385,5 +385,24 @@ describe('foto:prompt · objetos de marca', () => {
 
   it('un kit propio no arrastra aviso de derechos', () => {
     expect(construirPrompt({ ...fichaBase, objetos: ['nave-efeonce'] }).avisosObjeto).toEqual([])
+  })
+})
+
+// Guarda de integridad del catálogo: si alguien agrega un kit con una ruta mal escrita, o alguien
+// mueve/renombra una corrida, el fallo aparece acá y no a mitad de una tanda ya pagada.
+describe('foto:prompt · el catálogo de kits apunta a archivos reales', () => {
+  const pares = Object.entries(OBJETOS as Record<string, { base: string; patron: string; vistas: Record<string, string>; vistaDefecto: string }>)
+
+  it.each(pares.flatMap(([clave, o]) => Object.keys(o.vistas).map(v => [clave, v] as const)))(
+    '%s · vista %s existe en disco',
+    (clave, vista) => {
+      const o = (OBJETOS as Record<string, { base: string; patron: string; vistas: Record<string, string> }>)[clave]
+
+      expect(existsSync(path.join(raiz, o.base + o.patron.replace('<V>', o.vistas[vista])))).toBe(true)
+    }
+  )
+
+  it.each(pares)('%s declara una vista por defecto que existe', (_clave, o) => {
+    expect(Object.keys(o.vistas)).toContain(o.vistaDefecto)
   })
 })

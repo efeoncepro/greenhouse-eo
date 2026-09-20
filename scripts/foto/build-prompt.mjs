@@ -287,7 +287,7 @@ function resolverIdentidad(ficha) {
 // dibuje de memoria, y un logo dibujado de memoria sale deformado. El kit aprobado entra como
 // REFERENCIA DE FORMA y el prompt aporta la intención. Agregar un kit nuevo es una entrada acá, no
 // un cambio de lógica: base + patrón + vistas.
-const OBJETOS = {
+export const OBJETOS = {
   'sprocket-hubspot': {
     etiqueta: 'the official 3D sculpture of the HubSpot sprocket symbol',
     // El LEEME del kit es explícito y el aviso viaja con el objeto, no en la memoria de quien lo use.
@@ -336,8 +336,68 @@ const OBJETOS = {
     vistas: { frente: '01-frente-heroe', saludo: '02-saludo-tres-cuartos-izquierda', perfil: '03-perfil-caminando' },
     vistaDefecto: 'frente'
   },
+  'chaqueta-softshell-efeonce': {
+    etiqueta: 'the Efeonce team softshell jacket',
+    tipo: 'prenda',
+    instruccion:
+      'Use it as the exact garment the person wears: same navy colour, cut, collar, zip, pockets and the embroidered emblem in the same position and size. Do not copy its studio background or presentation.',
+    base: 'ai-generations/2026-09-17_chaqueta-efeonce/final/',
+    patron: 'efeonce-chaqueta-softshell-<V>-1600x1600-v01-transparente.png',
+    vistas: {
+      frente: '01-frente',
+      espalda: '02-espalda',
+      'tres-cuartos-izq': '03-tres-cuartos-izquierda',
+      'tres-cuartos-der': '04-tres-cuartos-derecha',
+      lateral: '05-lateral',
+      abierta: '06-cierre-abierto'
+    },
+    vistaDefecto: 'frente'
+  },
+  'chaqueta-bomber-efeonce': {
+    etiqueta: 'the Efeonce team bomber jacket',
+    tipo: 'prenda',
+    instruccion:
+      'Use it as the exact garment the person wears: same colour, cut, ribbed collar and cuffs, and the embroidered emblem in the same position and size. Do not copy its studio background or presentation.',
+    base: 'ai-generations/2026-09-17_chaqueta-efeonce/final/',
+    patron: 'efeonce-chaqueta-bomber-<V>-1600x1600-v01-transparente.png',
+    vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
+    vistaDefecto: 'frente'
+  },
+  'gorra-efeonce': {
+    etiqueta: 'the Efeonce cap',
+    tipo: 'prenda',
+    instruccion:
+      'Use it as the exact cap the person wears: same colour, crown shape, brim and the embroidered mark in the same position and size. Do not copy its studio background.',
+    base: 'ai-generations/2026-09-17_gorra-efeonce/final/',
+    patron: 'efeonce-gorra-<V>-1600x1600-v01-transparente.png',
+    // La gorra tiene variantes de diseño además de ángulos: v2 es la canónica.
+    vistas: {
+      frente: 'v2-01-frente',
+      lateral: 'v2-02-lateral',
+      trasera: 'v2-03-trasera',
+      cenital: 'v2-05-cenital',
+      'navy-logotipo': 'v2-navy-logotipo',
+      'navy-isotipo': 'v3-navy-isotipo',
+      'trucker-navy': 'v5-trucker-navy'
+    },
+    vistaDefecto: 'frente'
+  },
+  'lanyard-efeonce': {
+    etiqueta: 'the Efeonce lanyard with its retractable reel and rigid-frame badge holder',
+    tipo: 'merch',
+    instruccion:
+      'Reproduce EXACTLY this piece: same ribbon artwork and colour, same reel, and the RIGID-FRAME badge holder that grips the card by its edges and leaves the card face exposed — it is not a vinyl sleeve or a soft pouch. Do not restyle it and do not change its proportions.',
+    // El carnet NO se le pide al modelo: se compone con el generador del kit.
+    nota:
+      'el carnet se genera determinísticamente con `node ai-generations/2026-09-17_lanyard-efeonce/arte-carnet.mjs <foto.png> "<Nombre>" "<Cargo>" <salida.png>` y se compone después; al modelo nunca se le pide escribir el nombre ni el cargo',
+    base: 'ai-generations/2026-09-17_lanyard-efeonce/final/',
+    patron: 'efeonce-lanyard-<V>-1200x1600-v01-transparente.png',
+    vistas: { conjunto: '01-conjunto', colgado: '12-conjunto-colgado', 'portacarnet-vacio': '10-portacarnet-vacio' },
+    vistaDefecto: 'colgado'
+  },
   'polo-efeonce': {
     etiqueta: 'the Efeonce team polo',
+    tipo: 'prenda',
     instruccion:
       'Use it as the exact garment the person wears: same colour, collar, fabric and embroidered emblem in the same position and size. Do not copy its studio background or presentation, and never let the model spell the emblem by itself — inspect it at 100% before publishing.',
     base: 'ai-generations/2026-09-17_polo-efeonce/final/',
@@ -347,6 +407,7 @@ const OBJETOS = {
   },
   'hoodie-efeonce': {
     etiqueta: 'the Efeonce team hoodie',
+    tipo: 'prenda',
     instruccion:
       'Use it as the exact garment the person wears: same colour, cut, fabric and embroidered emblem in the same position and size. Do not copy its studio background or presentation.',
     base: 'ai-generations/2026-09-17_hoodie-efeonce/final/',
@@ -399,6 +460,7 @@ function resolverObjetos(ficha, desde) {
     bloques.push(`IMAGE ${n} (object reference): Image ${n} is ${objeto.etiqueta}. ${objeto.instruccion} Ignore its studio background.`)
 
     if (objeto.aviso) avisos.push(`"${clave}" es ${objeto.aviso}`)
+    if (objeto.nota) avisos.push(`"${clave}": ${objeto.nota}`)
   }
 
   return { imagenes, bloque: bloques.join('\n\n'), avisos }

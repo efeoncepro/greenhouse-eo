@@ -230,8 +230,25 @@ salen deformados. El kit aprobado entra como **referencia de forma**; el prompt 
 - aborta si el kit, la vista o el archivo no existen, listando las vistas disponibles;
 - **propaga el aviso de derechos**, para que viaje con el kit y no con la memoria de quien lo use.
 
-Kits en el catálogo: `sprocket-hubspot`, `nave-efeonce`, `clawd`, `codex`, `polo-efeonce`, `hoodie-efeonce`.
-Agregar uno nuevo es una entrada de datos —base, patrón de archivo y tabla de vistas—, no un cambio de lógica.
+Kits en el catálogo, por tipo:
+
+| Tipo | Kits |
+|---|---|
+| Prenda (viste a la persona) | `polo-efeonce` · `hoodie-efeonce` · `chaqueta-softshell-efeonce` · `chaqueta-bomber-efeonce` · `gorra-efeonce` |
+| Merch | `lanyard-efeonce` (cinta, yoyo y portacarnet de marco rígido) |
+| Marca propia | `nave-efeonce` |
+| Mascota de partner | `clawd` · `codex` |
+| Marca de tercero | `sprocket-hubspot` |
+
+**La vista de una prenda se elige por el ángulo de la toma**, no por costumbre: de espaldas → vista de espalda.
+Agregar un kit nuevo es una entrada de datos —base, patrón de archivo y tabla de vistas—, no un cambio de lógica.
+Un test recorre **todas** las vistas de **todos** los kits y falla si alguna ruta no existe en disco, así que un
+kit mal escrito o una corrida renombrada se detectan antes de gastar en una tanda.
+
+> **El carnet no se genera.** `lanyard-efeonce` emite su propia nota: el carnet se compone con
+> `node ai-generations/2026-09-17_lanyard-efeonce/arte-carnet.mjs <foto.png> "<Nombre>" "<Cargo>" <salida.png>`
+> y se monta después. Al modelo nunca se le pide escribir el nombre ni el cargo — lo plano se compone, no se
+> genera. En el plate, el portacarnet sale **vacío** y eso es lo correcto.
 
 > ⚠️ **`sprocket-hubspot` es marca registrada de un tercero.** Las guías de partner de HubSpot prohíben
 > modificar el logo y piden enviar un boceto por formulario (revisión de 7 a 10 días hábiles); prefieren las
