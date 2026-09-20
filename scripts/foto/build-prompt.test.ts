@@ -16,6 +16,18 @@ const raiz = path.resolve(__dirname, '../..')
 const BLOQUES = path.join(raiz, 'scripts/foto/bloques')
 const DOC = path.join(raiz, 'docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md')
 
+// Los renders de referencia y los kits viven FUERA de git (`.gitignore`: `/ai-generations/**/*.png`):
+// son pesados y algunos son material de marca. En CI no existen, y las guardas de `existsSync` del
+// comando —que en producción son correctas— abortan. Los tests que necesitan esos archivos se saltan
+// donde no están, declarándolo; la lógica que no depende del disco se sigue verificando siempre.
+// `FOTO_TEST_SIN_ASSETS=1` reproduce el entorno de CI en local. Existe porque verificar «pasa en mi
+// máquina» fue exactamente el error que dejó CI en rojo: los assets están acá y allá no.
+const HAY_ASSETS =
+  !process.env.FOTO_TEST_SIN_ASSETS &&
+  existsSync(path.join(raiz, 'ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png'))
+
+const conAssets = HAY_ASSETS ? describe : describe.skip
+
 const fichaBase = {
   id: 'test',
   formato: '4:5',
@@ -204,7 +216,7 @@ describe('foto:prompt · anclas prohibidas y auditoría de escena', () => {
 // Antes de esto, una toma con Julio o Nexa se armaba a mano: exactamente lo que este comando existe
 // para impedir. El modo de falla es silencioso y facturable — un prompt sin IDENTITY ni REFERENCES
 // devuelve una cara inventada que en la hoja de contacto pasa por buena.
-describe('foto:prompt · identidad', () => {
+conAssets('foto:prompt · identidad', () => {
   it('sin identidad no emite IDENTITY ni REFERENCES, y no pide referencias', () => {
     const r = construirPrompt(fichaBase)
 
@@ -290,7 +302,7 @@ describe('foto:prompt · avisos que faltaban', () => {
 
 // Las referencias frontales no cubren perfil ni espalda. Pedir una toma de perfil con sólo retratos
 // frontales obliga al modelo a inventar el giro, y lo que inventa ensancha la cara [medido 2026-09-20].
-describe('foto:prompt · vistas de identidad', () => {
+conAssets('foto:prompt · vistas de identidad', () => {
   it('antepone la vista pedida a las referencias frontales', () => {
     const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'julio', vista: 'perfil-izq' }] })
 
@@ -331,7 +343,7 @@ describe('foto:prompt · el detector de luz cubre el vocabulario real', () => {
 // ── Objetos de marca ─────────────────────────────────────────────────────────────────────────────
 // Un logo descrito con palabras se dibuja de memoria y sale deformado. El kit aprobado entra como
 // referencia de forma, y su numeración tiene que calzar con el orden real de los --image.
-describe('foto:prompt · objetos de marca', () => {
+conAssets('foto:prompt · objetos de marca', () => {
   it('sin objetos no emite bloque ni pide referencias extra', () => {
     const r = construirPrompt(fichaBase)
 
@@ -392,7 +404,7 @@ describe('foto:prompt · objetos de marca', () => {
 
 // Guarda de integridad del catálogo: si alguien agrega un kit con una ruta mal escrita, o alguien
 // mueve/renombra una corrida, el fallo aparece acá y no a mitad de una tanda ya pagada.
-describe('foto:prompt · el catálogo de kits apunta a archivos reales', () => {
+conAssets('foto:prompt · el catálogo de kits apunta a archivos reales', () => {
   const pares = Object.entries(OBJETOS as Record<string, { base: string; patron: string; vistas: Record<string, string>; vistaDefecto: string }>)
 
   it.each(pares.flatMap(([clave, o]) => Object.keys(o.vistas).map(v => [clave, v] as const)))(
