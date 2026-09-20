@@ -349,8 +349,13 @@ el error que la guarda ahora nombra.
 
 ### 3.10 Palancas de encuadre y punto de vista — `palanca` **[aprobadas 2026-09-20]**
 
-Cinco palancas probadas en `ai-generations/2026-09-20_palancas-nuevas/`. Se declaran con el campo `palanca`
-y **UNA sola por pieza**.
+**Quince** palancas, probadas en cuatro rondas del 2026-09-20 (`palancas-nuevas/`, `palancas-disruptivas/`,
+`palancas-ronda3/`, `palancas-con-color/`). Se declaran con el campo `palanca` y **UNA sola por pieza**.
+
+> **El dueño del catálogo es [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md)**: ahí
+> están las 15 con su ficha completa —qué es, cómo se logran, marcadores verbatim, evidencia, qué no hacer—, las
+> otras tres familias de palancas (5 siempre activas · 4 atmósferas · acción suspendida), las 20 tomas de cámara
+> y las cuatro descartadas. Esta tabla conserva **las cinco primeras**, que son las que nacieron en esta spec.
 
 | `palanca` | Qué hace | Marcadores que emite | Exige |
 |---|---|---|---|
@@ -359,10 +364,11 @@ y **UNA sola por pieza**.
 | `luz-motivada` | La luz viene de una **fuente visible en cuadro** | Monitor, pantalla, práctica o ventana **en el encuadre** · caída visible: un lado iluminado, el otro a negro · color de la fuente, **nunca filtro ni grade** | — |
 | `larga-exposicion` | **Duración acumulada** en vez de instante | Trípode · personas y luces en estelas continuas · **un elemento perfectamente nítido** que ancla · nadie reconocible en movimiento | — |
 | `oclusion` | La cámara **miró desde detrás de algo** y no movió nada | El objeto cubre **una parte real** del sujeto, ~un tercio del cuadro, solapándolo · más cerca del lente y desenfocado | `ocluye` |
+| **+10 más** | `silueta` · `reflejo` · `ausencia` · `fragmento` · `instrumento` · `cenital` · `suelo-oblicuo` · `little-planet` · `sombra` · `dentro-del-objeto` | en el [catálogo de palancas](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) | `corta` · `instrumento` · `objetoContenedor` según cuál |
 
 #### Las tres reglas que salieron de la prueba **[medido]**
 
-1. **Una palanca dominante por pieza.** En `B6` se combinaron `pov` y `luz-motivada`: el POV pide su encuadre y
+1. **Una palanca de encuadre dominante por pieza** (las otras tres familias sí se combinan con ella). En `B6` se combinaron `pov` y `luz-motivada`: el POV pide su encuadre y
    la luz motivada pide dominar la escena, y el resultado tiene **un poco de cada una y lo mejor de ninguna**.
    El comando **rechaza una lista** y lo explica.
 2. **La oclusión pedida a medias se anula.** En `B5` el objeto quedó al costado sin cubrir al sujeto y la pieza

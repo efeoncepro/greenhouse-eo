@@ -120,9 +120,13 @@ Detalle en [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md
 | **Luz motivada** **[2026-09-20]** | La luz viene de una **fuente visible en cuadro**; es lo que separa luz real de un grade | `B3` |
 | **Larga exposición** **[2026-09-20]** | **Duración acumulada** en vez de instante: estelas, con un elemento nítido que ancla | `B4` |
 | **Oclusión** **[2026-09-20]** | La cámara **miró desde detrás de algo** y no movió nada | `B5` (pedida a medias, se anula) |
-| **Diez más** **[2026-09-20, tarde]** | Tras tres rondas de prueba el catálogo cerró en **quince**: se suman `silueta`, `reflejo`, `ausencia`, `fragmento`, `instrumento`, `cenital`, `suelo-oblicuo`, `little-planet`, `sombra` y `dentro-del-objeto`. Cada una con su definición, sus marcadores verbatim y su evidencia en el [catálogo de palancas](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md), que también registra las **cuatro descartadas** y por qué | `C1`–`C4`, `D1`–`D4`, `E1`–`E6`, `F1`–`F7` |
+| **Diez más** **[2026-09-20, tarde]** | Tras tres rondas de prueba la familia de encuadre cerró en **quince**: se suman `silueta`, `reflejo`, `ausencia`, `fragmento`, `instrumento`, `cenital`, `suelo-oblicuo`, `little-planet`, `sombra` y `dentro-del-objeto`. Cada una con su definición, sus marcadores verbatim y su evidencia en el [catálogo de palancas](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md), que indexa **las 25 de las cuatro familias** y registra las **cuatro descartadas** y por qué | `C1`–`C4`, `D1`–`D4`, `E1`–`E6`, `F1`–`F7` |
 
-**El catálogo completo, con cómo se logra cada una, vive en [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md)**; esta tabla es el resumen.
+**El catálogo completo vive en [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md)**, que
+las ordena en **cuatro familias**: las **5 siempre activas** de esta tabla (van en todos los prompts), las **4
+atmósferas**, la **acción suspendida** y las **15 de encuadre** (**una sola** por pieza; las otras tres familias
+sí se combinan). Ahí también están nombradas las **20 tomas de cámara**, que dicen *con qué* se fotografía y no
+son palancas. Esta tabla es el resumen.
 
 Las palancas se piden **por ficha** (`palanca`, `atmosfera`, `suspendido` en `pnpm foto:prompt`), nunca desde el bloque
 fijo de impacto: ese bloque se emite en todos los prompts, y si llevara «algo volando», volaría algo en cada

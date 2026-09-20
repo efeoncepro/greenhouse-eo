@@ -537,8 +537,11 @@ describe('foto:prompt · palancas de encuadre', () => {
     expect(() => construirPrompt({ ...fichaBase, palanca: ['pov', 'luz-motivada'] })).toThrow(/UNA palanca dominante/)
   })
 
+  // Ojo con el ejemplo: `dron-cenital` servía acá hasta que el comando aprendió a reconocer las TOMAS
+  // de cámara y a explicar la diferencia (ver el describe `palanca vs toma de cámara`). Un nombre que no
+  // sea ni palanca ni toma es lo que prueba esta rama.
   it('aborta con una palanca desconocida y lista las válidas', () => {
-    expect(() => construirPrompt({ ...fichaBase, palanca: 'dron-cenital' })).toThrow(/Disponibles:/)
+    expect(() => construirPrompt({ ...fichaBase, palanca: 'no-existe-en-ningun-catalogo' })).toThrow(/Disponibles:/)
   })
 
   // El hallazgo de B5: pedida a medias, la oclusión se anula.
@@ -647,5 +650,28 @@ describe('foto:prompt · el catálogo de palancas', () => {
     }).prompt
 
     expect(p).toContain('the right edge cuts through her face just past the bridge of her nose')
+  })
+})
+
+
+describe('palanca vs toma de cámara', () => {
+  const base = {
+    id: 'x',
+    formato: '4:5',
+    escena: 'SCENE: a hard sunlight beam rakes across a real walnut worktop',
+    lecho: { objeto: 'the near edge of a real walnut worktop', tono: 'DARK walnut in shadow, matte' }
+  }
+
+  // El operador pidió «ojo de pez» como palanca el 2026-09-20: listarle quince nombres no le aclaraba
+  // que estaba pidiendo otra cosa. El error tiene que enseñar la distinción, no sólo rechazar.
+  it('una TOMA pedida como palanca explica la diferencia y apunta a su catálogo', () => {
+    expect(() => construirPrompt({ ...base, palanca: 'ojo-de-pez' })).toThrow(/es una TOMA del catálogo de cámara/)
+    expect(() => construirPrompt({ ...base, palanca: 'tilt-shift' })).toThrow(/se escribe en la escena/)
+    expect(() => construirPrompt({ ...base, palanca: 'dron-cenital' })).toThrow(/CAMERA_LENS_ANGLE_CATALOG/)
+  })
+
+  it('una palanca inventada lista las de encuadre y nombra las otras familias', () => {
+    expect(() => construirPrompt({ ...base, palanca: 'inventada' })).toThrow(/Palanca de encuadre "inventada" desconocida/)
+    expect(() => construirPrompt({ ...base, palanca: 'inventada' })).toThrow(/`atmosfera`/)
   })
 })

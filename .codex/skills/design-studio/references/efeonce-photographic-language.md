@@ -147,7 +147,8 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 - **Sombra** (`palanca: sombra`) — **la sombra es el sujeto**, la forma más detallada del cuadro.
 - **Dentro del objeto** (`palanca: dentro-del-objeto` + `objetoContenedor`) — el lente vive dentro y mira afuera.
 
-> **Las quince, con cómo se logra cada una, sus marcadores verbatim, su evidencia y las cuatro descartadas con su
+> **Las 25 palancas en cuatro familias —5 siempre activas · 4 atmósferas · 1 acción suspendida · estas 15 de
+> encuadre—, las 20 tomas de cámara y las cuatro descartadas con su
 > razón medida:** [catálogo de palancas](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
 
 > **El sistema de color va en TODAS.** Al probar una palanca nueva es fácil concentrarse en la geometría y
@@ -267,7 +268,7 @@ todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `
 - **`pnpm foto:prompt <ficha.json> [--batch <out.json>]`** — arma el prompt desde una ficha de toma. El formato,
   el porcentaje del lecho y el límite de sujetos salen de **una tabla**, no de un bloque copiado. La ficha declara
   además `identidad` (personas, con vista por ángulo), `objetos` (kits de marca: logo, mascota, prenda, merch),
-  `palanca` (**una** de las 15 del catálogo, con su campo obligatorio si lo pide), `atmosfera`
+  `palanca` (**una sola** de las 15 de encuadre, con su campo obligatorio si lo pide), `atmosfera`
   (`polvo`/`bruma`/`vapor`/`humo`) y `suspendido` (qué está en el aire). Aborta si un
   bloque compartido trae un valor de formato adentro, si se pide una reserva en una toma que no la admite, o si un
   batch mezcla formatos. `--ficha-ejemplo` imprime la plantilla.

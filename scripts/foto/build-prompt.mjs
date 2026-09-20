@@ -533,6 +533,33 @@ function bloqueSuspendido(ficha) {
 //
 // Todas se escriben con MARCADORES VERIFICABLES, no con nombres de estilo: al modelo «tres cuartos»
 // o «punto de vista subjetivo» no le dicen nada, «la oreja lejana no se ve» sí.
+// Las 20 TOMAS del catálogo de cámara NO son palancas: una toma dice CON QUÉ se fotografía (lente, altura,
+// distancia) y una palanca QUÉ HACE la foto. Se combinan —`fragmento` sobre un retrato de 85 mm— y se escriben
+// en la escena, no en un campo. Están acá sólo para que pedir una en `palanca` dé un error que lo explique:
+// el operador pidió «ojo de pez» como palanca el 2026-09-20 y la lista de quince nombres no se lo aclaraba.
+const TOMAS_DE_CAMARA = new Set([
+  'ojo-de-pez',
+  'ojo-de-pez-fuerte',
+  'ojo-de-pez-grupo',
+  'dron-cenital',
+  'tilt-shift',
+  'contrapicado',
+  'reflejo-en-vidrio',
+  'tele-200',
+  'macro',
+  'retrato',
+  'marco-en-marco',
+  'escala',
+  'barrido',
+  'noche',
+  'asiento-en-la-mesa',
+  'por-encima-del-respaldo',
+  'mesa-larga',
+  'por-encima-del-hombro',
+  'picado-60',
+  'respaldo-del-espectador'
+])
+
 export const PALANCAS = {
   pov: {
     etiqueta: 'punto de vista subjetivo',
@@ -655,7 +682,21 @@ function bloquePalanca(ficha) {
   const palanca = PALANCAS[pedida]
 
   if (!palanca) {
-    throw new Error(`Palanca "${pedida}" desconocida. Disponibles: ${Object.keys(PALANCAS).join(', ')}.`)
+    if (TOMAS_DE_CAMARA.has(pedida)) {
+      throw new Error(
+        `"${pedida}" es una TOMA del catálogo de cámara, no una palanca de encuadre. ` +
+          'Una toma dice CON QUÉ se fotografía (lente, altura, distancia) y se escribe en la escena; ' +
+          'una palanca dice QUÉ HACE la foto y va en `palanca`. Se combinan: `palanca: "fragmento"` ' +
+          'con un retrato de 85 mm en la escena. Las 20 tomas con su ficha: ' +
+          'docs/operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md'
+      )
+    }
+
+    throw new Error(
+      `Palanca de encuadre "${pedida}" desconocida. Disponibles: ${Object.keys(PALANCAS).join(', ')}. ` +
+        'La atmósfera va en `atmosfera` y la acción suspendida en `suspendido`: son otras familias. ' +
+        'Catálogo: docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md'
+    )
   }
 
   let texto = palanca.bloque
