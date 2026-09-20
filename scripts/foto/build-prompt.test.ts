@@ -10,7 +10,16 @@ import { describe, expect, it } from 'vitest'
 // El .mjs no lleva tipos a propósito: es una herramienta de corrida, no código de producto. Ya no
 // hace falta `@ts-expect-error` — al exportar OBJETOS y PALANCAS, TS resuelve el módulo y la
 // directiva quedaría sin uso (TS2578 rompe el pre-push).
-import { auditarEscena, auditarVestuario, construirPrompt, detectarValorDeFormato, OBJETOS, PALANCAS, PERSONAS } from './build-prompt.mjs'
+import {
+  auditarEscena,
+  auditarReservas,
+  auditarVestuario,
+  construirPrompt,
+  detectarValorDeFormato,
+  OBJETOS,
+  PALANCAS,
+  PERSONAS
+} from './build-prompt.mjs'
 
 const raiz = path.resolve(__dirname, '../..')
 const BLOQUES = path.join(raiz, 'scripts/foto/bloques')
@@ -81,7 +90,7 @@ describe('foto:prompt · las guardas', () => {
   })
 
   it('no dispara con los bloques legítimos que se usan hoy', () => {
-    for (const f of ['bloque-realismo-v2.txt', 'bloque-impacto-v1.txt']) {
+    for (const f of ['bloque-realismo-v3.txt', 'bloque-impacto-v1.txt']) {
       expect(detectarValorDeFormato(readFileSync(path.join(BLOQUES, f), 'utf8'))).toBeNull()
     }
   })
@@ -140,7 +149,7 @@ describe('doc ↔ archivo · la deriva que nadie vio', () => {
   }
 
   it.each([
-    ['bloque-realismo-v2.txt', '### 3.1 Realismo v2', '#### 3.1.1'],
+    ['bloque-realismo-v3.txt', '### 3.1 Realismo v3', '#### 3.1.1'],
     ['bloque-impacto-v1.txt', '### 3.2 Impacto v1', '### 3.3']
   ])('%s: el archivo que se usa y el texto del doc son idénticos', (archivo, desde, hasta) => {
     const enDisco = readFileSync(path.join(BLOQUES, archivo), 'utf8').replace(/\s+/g, ' ').trim()
@@ -758,5 +767,36 @@ describe('palancas del oficio digital', () => {
 
     expect(p).toMatch(/SHOW THROUGH the projected image/)
     expect(p).toMatch(/NO screen and NO monitor/)
+  })
+})
+
+describe('reserva de texto — el mecanismo que estaba apagado', () => {
+  const base = {
+    id: 'r',
+    formato: '4:5',
+    escena: 'SCENE: a hard beam rakes across a real walnut worktop at the instant she lifts it',
+    lecho: { objeto: 'the near edge of a real walnut worktop', tono: 'DARK walnut in shadow, matte' }
+  }
+
+  // Medido el 2026-09-20: las doce piezas de la auditoría ciega reprobaron la banda de texto (la mejor
+  // 0,10 del alto contra un mínimo de 0,28) porque NINGUNA declaró `reservas` y el campo es opt-in.
+  it('avisa cuando la ficha no reserva espacio para la capa gráfica', () => {
+    const avisos = auditarReservas(base)
+
+    expect(avisos.join(' ')).toMatch(/sin `reservas`/)
+    expect(avisos.join(' ')).toMatch(/o está en la toma, o el texto no cabe/)
+  })
+
+  it('no avisa cuando la ficha sí la declara', () => {
+    expect(auditarReservas({ ...base, reservas: ['zona-texto'] })).toHaveLength(0)
+  })
+
+  // El aviso no vale por existir en la función: vale si llega a quien corre el comando. Quien lo
+  // enciende de verdad es `pnpm foto:prompt`, y ahí se ejercita — el verificador real de que el
+  // mecanismo está cableado es la corrida del CLI, no esta aserción.
+  it('el CLI lo emite: `auditarReservas` está cableado en el bucle de avisos', () => {
+    const fuente = readFileSync(path.join(raiz, 'scripts/foto/build-prompt.mjs'), 'utf8')
+
+    expect(fuente).toMatch(/avisos\.push\(\.\.\.auditarReservas\(ficha\)\)/)
   })
 })

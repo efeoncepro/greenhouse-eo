@@ -51,7 +51,7 @@ const main = async () => {
 
   // ── 1. Los bloques de prompt están y no traen un valor de formato adentro ────────────────────────
   const BLOQUES = path.join(raiz, 'scripts/foto/bloques')
-  const archivos = ['bloque-realismo-v2.txt', 'bloque-impacto-v1.txt']
+  const archivos = ['bloque-realismo-v3.txt', 'bloque-impacto-v1.txt']
   const faltantes = archivos.filter(f => !existsSync(path.join(BLOQUES, f)))
 
   if (faltantes.length) {

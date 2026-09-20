@@ -10,7 +10,9 @@ Esta carpeta guarda el **Lenguaje Fotográfico de la marca propia de Efeonce**, 
 Reyes) el 2026-09-19 («todas me gustaron»). Aplica a fotografía e imagen fotorrealista de Efeonce. No aplica a
 piezas de clientes ni a trendjacking que toma prestada una estética ajena.
 
-Estado: **sistema aprobado y consistente, no activo distintivo medido**. Llamarlo activo distintivo exige antes la
+Estado: **sistema aprobado y consistente, no activo distintivo medido**. La [auditoría ciega del 2026-09-20](./EFEONCE_PHOTO_BLIND_AUDIT_2026-09-20.md) confirmó la consistencia desde fuera —dos evaluadores lo
+reconocieron como un mismo autor— y encontró que **todavía no logra credibilidad**: ninguna pieza muestra
+trabajo entregado. Su plan es la hoja de ruta vigente. Llamarlo activo distintivo exige antes la
 prueba de reconocimiento descrita en los pendientes del documento maestro.
 
 ## Comandos de producción (empieza por acá)
@@ -38,6 +40,7 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | 5 | [`EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md`](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) | Bloques de prompt (realismo, impacto, FOREGROUND), ficha de toma y pipeline de producción con scripts | Otro agente |
 | 6 | [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) | Personas: casting, gesto, mirada, piel; Julio y Nexa (referencias, identidad, QA); uniforme | Claude |
 | 7 | [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) | **Catálogo de palancas**: el índice de las **33 en cuatro familias** (5 siempre activas · 4 atmósferas · 1 acción suspendida · 23 de encuadre), qué campo pide cada una y cuántas admite una pieza; ficha completa de las 23 de encuadre; las 20 tomas de cámara nombradas; las cinco descartadas con su razón medida | Claude |
+| 8 | [`EFEONCE_PHOTO_BLIND_AUDIT_2026-09-20.md`](./EFEONCE_PHOTO_BLIND_AUDIT_2026-09-20.md) | **Auditoría ciega**: dos evaluadores independientes sin acceso al canon; qué coincidió, los tells de generación, el plan derivado y la ronda «obra real» | Claude |
 
 ## Registros y evidencia
 

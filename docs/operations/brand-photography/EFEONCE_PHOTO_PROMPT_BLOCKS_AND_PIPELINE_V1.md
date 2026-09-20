@@ -107,7 +107,7 @@ Se llena **antes** de escribir el prompt. Una ficha = una foto.
 
 ## 3. Bloques verbatim
 
-### 3.1 Realismo v2
+### 3.1 Realismo v3
 
 > ⚠️ **El formato NO va dentro de este bloque, pero SÍ va en el prompt.** Hasta 2026-09-20 este bloque terminaba
 > con «Vertical 4:5.» hardcodeado; copiarlo así mete una instrucción contradictoria en todo 9:16, 16:9 y 1:1. La cola
@@ -118,11 +118,20 @@ Se llena **antes** de escribir el prompt. Una ficha = una foto.
 > también cambia: **4:5 → 18%**, **9:16 → 22%**, **16:9 → 16%**. Regla: el formato vive donde vive la composición,
 > nunca dentro de un bloque que se reusa en los cuatro formatos.
 
-Archivo: `prompts/bloque-realismo-v2.txt`. Nace de la regla del operador «una buena imagen de IA es la que no se
-siente que es IA» y de su rechazo a la suciedad **[decisión del operador]**.
+Archivo: `scripts/foto/bloques/bloque-realismo-v3.txt`. Nace de la regla del operador «una buena imagen de IA es
+la que no se siente que es IA» y de su rechazo a la suciedad **[decisión del operador]**.
+
+> **Delta v2 → v3 (2026-09-20) — la regla que protegía estaba delatando.** La v2 cerraba con «No text, no letters,
+> no numbers, no logos, no watermarks anywhere», pensada para que no aparezcan marcas de terceros ni el texto
+> deforme que inventa el modelo. El efecto acumulado fue **un mundo sin letras**, y lo cazó una auditoría ciega:
+> «doce imágenes, cero texto legible; con lomos de libros, etiquetas de consola y prensa impresa en cuadro, eso
+> es estadísticamente imposible — sólo pasa si el sistema no sabe escribir». La v3 conserva la protección entera
+> —nada legible, ninguna marca— pero exige que **el texto EXISTA y quede ilegible por causa física** (pequeño,
+> fuera de foco, cortado, en ángulo, de espaldas, en sombra), **nunca por estar en blanco**. Evidencia:
+> [auditoría ciega](./EFEONCE_PHOTO_BLIND_AUDIT_2026-09-20.md).
 
 ```text
-IT MUST NOT LOOK AI-GENERATED: a real candid documentary photograph taken by a working photographer on a full-frame mirrorless camera with a real lens. Realism comes from PEOPLE, LIGHT AND MATERIALS, not from dirt: visible skin pores, fine wrinkles, uneven skin tone, stray hairs, natural fabric creases, real paper texture, soft dust visible only in a beam of light, slight motion blur on moving hands, subtle natural lens vignetting, a slightly imperfect un-staged composition. The SPACE is clean, cared-for and organized like a premium creative studio: only one or two lived-in details (a mug, a notebook); NO dirt, NO stains, NO coffee rings, NO loose tape scraps, NO tangled cables, NO mess. No plastic skin, no perfect symmetry, no glossy CGI surfaces, no over-sharpening, no HDR, no beauty retouching, no stock-photo smiles. Natural true-to-life color with no color grading; highlights keep detail, shadows open. Latin American people with real, characterful faces. No text, no letters, no numbers, no logos, no watermarks anywhere.
+IT MUST NOT LOOK AI-GENERATED: a real candid documentary photograph taken by a working photographer on a full-frame mirrorless camera with a real lens. Realism comes from PEOPLE, LIGHT AND MATERIALS, not from dirt: visible skin pores, fine wrinkles, uneven skin tone, stray hairs, natural fabric creases, real paper texture, soft dust visible only in a beam of light, slight motion blur on moving hands, subtle natural lens vignetting, a slightly imperfect un-staged composition. The SPACE is clean, cared-for and organized like a premium creative studio: only one or two lived-in details (a mug, a notebook); NO dirt, NO stains, NO coffee rings, NO loose tape scraps, NO tangled cables, NO mess. No plastic skin, no perfect symmetry, no glossy CGI surfaces, no over-sharpening, no HDR, no beauty retouching, no stock-photo smiles. Natural true-to-life color with no color grading; highlights keep detail, shadows open. Latin American people with real, characterful faces. PRINTED MATTER EXISTS but is never readable: book spines, labels, packaging, papers and screens are present exactly as they would be in any real working room, and they are kept ILLEGIBLE BY PHYSICAL MEANS ONLY — too small, out of focus, cut by the frame edge, at a steep angle, turned away or lost in shadow — NEVER by being blank. NO blank book spines, NO empty labels, NO unmarked packaging, NO featureless screens: a room where nothing at all carries writing reads as fabricated. No logos, no brand marks, no watermarks, and no text sharp enough to actually read.
 ```
 
 #### 3.1.1 Variante para personas con referencia (Julio / Nexa)

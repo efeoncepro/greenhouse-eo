@@ -489,6 +489,10 @@ const ATMOSFERAS = {
 // ACCIÓN SUSPENDIDA = congelar lo que está en vuelo. La dosis la fijó el operador: 1 de cada 4 piezas.
 const DOSIS_SUSPENDIDO = 4
 
+// ACENTO cálido (naranja/lima): puntuación, no estructura. Dosis nacida de la auditoría ciega del
+// 2026-09-20, donde el acento aparecía en 9 de cada 12 piezas y se leyó como un tic de producción.
+const DOSIS_ACENTO = 2
+
 function bloqueAtmosfera(ficha) {
   const pedida = ficha.atmosfera
 
@@ -824,6 +828,20 @@ const PORTADOR_AZUL =
 const ACENTO =
   /\b(orange|lime|lime-green|amber)\b/i
 
+// Reserva de texto: el campo `reservas` es OPT-IN y por eso se apagó solo. Medido el 2026-09-20 sobre
+// las doce piezas de la auditoría ciega: NINGUNA la declaró y las doce reprobaron la banda de texto (la
+// mejor llegó a 0,10 del alto contra un mínimo de 0,28). Una pieza sin texto es legítima; una que va a
+// llevar titular y no reservó espacio ya nació sin él, y eso no se arregla en composición.
+export const auditarReservas = ficha => {
+  if (Array.isArray(ficha?.reservas) && ficha.reservas.length > 0) return []
+
+  return [
+    'sin `reservas`: esta pieza no aparta espacio para la capa gráfica. Si va a llevar titular, copy o ' +
+      'cursores, decláralo ahora (`reservas: ["zona-texto"]`) y valídalo con `pnpm foto:validar <plate> ' +
+      '--zona-texto`. Reservar después de generar no existe: o está en la toma, o el texto no cabe.'
+  ]
+}
+
 export const auditarColor = escena => {
   const avisos = []
 
@@ -949,7 +967,7 @@ export const construirPrompt = ficha => {
     }
   }
 
-  const partes = [leerBloque('bloque-realismo-v2.txt')]
+  const partes = [leerBloque('bloque-realismo-v3.txt')]
 
   if (ficha.impacto !== false) partes.push(leerBloque('bloque-impacto-v1.txt'))
 
@@ -1084,6 +1102,21 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
   // en vez de bloquear porque una tanda temática puede justificarlo — pero lo dice con el número.
   const conSuspendido = resueltas.filter(r => r.llevaSuspendido).length
 
+  // Dosis del ACENTO. Hallazgo de la auditoría ciega del 2026-09-20: dos evaluadores que no sabían nada
+  // del canon contaron el naranja en 9 de 12 y en 12 de 12 piezas, y los dos lo leyeron igual — «la
+  // primera vez es identidad, a la octava se siente forzado» y «la taza y el post-it están puestos ahí
+  // sólo para cumplir la cuota de naranja». El azul portador es estructura y va en todas; el ACENTO es
+  // puntuación y necesita dosis, igual que la acción suspendida.
+  const conAcento = resueltas.filter(r => ACENTO.test(r.ficha.escena ?? '')).length
+
+  if (conAcento * DOSIS_ACENTO > resueltas.length && resueltas.length > 1) {
+    console.error(
+      `  ⚠ acento cálido en ${conAcento} de ${resueltas.length} fichas (dosis: 1 de cada ${DOSIS_ACENTO}). ` +
+        'Medido desde fuera: repetido en casi todas deja de leerse como identidad y delata que la serie ' +
+        'se armó con una receta en vez de a lo largo de proyectos reales. El azul portador sí va en todas.'
+    )
+  }
+
   if (conSuspendido * DOSIS_SUSPENDIDO > resueltas.length && resueltas.length > 1) {
     console.error(
       `  ⚠ acción suspendida en ${conSuspendido} de ${resueltas.length} fichas (dosis: 1 de cada ${DOSIS_SUSPENDIDO}). ` +
@@ -1098,6 +1131,8 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     const vestuario = auditarVestuario(ficha.escena, ficha.identidad)
 
     avisos.push(...auditarColor(ficha.escena))
+
+    avisos.push(...auditarReservas(ficha))
 
     if (vestuario) avisos.push(vestuario)
 

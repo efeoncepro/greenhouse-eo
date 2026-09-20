@@ -50,6 +50,14 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   y **no** son palancas. Índice: [catálogo de palancas](../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
 - **La atmósfera exige un haz declarado** (el comando aborta sin él) y **la acción suspendida tiene dosis: 1 de
   cada 4 piezas** (el comando cuenta la tanda y avisa con el número).
+- **El acento cálido también tiene dosis: 1 de cada 2** **[auditoría ciega 2026-09-20]**. El azul portador es
+  estructura y va en TODAS; el acento es puntuación. Dos evaluadores ciegos lo contaron en 9 y en 12 de 12 y lo
+  leyeron como un tic que delata que la serie se armó con una receta.
+- **Si la pieza va a llevar titular, copy o cursores, declara `reservas` EN LA TOMA** y valida con
+  `pnpm foto:validar <plate> --zona-texto`. Medido: las 12 piezas auditadas reprobaron la banda de texto (mejor
+  caso 0,10 del alto contra 0,28 exigido) porque ninguna la declaró. **Reservar después de generar no existe.**
+- **El texto de la escena EXISTE y es ilegible por causa física** (pequeño, fuera de foco, cortado, en ángulo),
+  **nunca por estar en blanco**: doce piezas sin una sola letra delataron la generación (`bloque-realismo-v3`).
 - **La luz con carácter va sobre el SUJETO; la reserva vive en la sombra que esa luz deja, nunca en su camino.**
   Vale también para el **lecho**: medido, 3,16 → 3,93 → **11,55:1** sólo por sacarlo del haz.
 - **Nunca un scrim.** Si el contraste no da, se **regenera** el plate; no se oscurece en post.

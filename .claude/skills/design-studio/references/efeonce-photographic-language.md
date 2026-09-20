@@ -171,6 +171,22 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 > encuadre—, las 20 tomas de cámara y las cinco descartadas con su
 > razón medida:** [catálogo de palancas](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
 
+> **Dosis del acento: 1 de cada 2** **[auditoría ciega 2026-09-20]**. El azul portador es estructura y va en
+> todas; el acento cálido es puntuación. Dos evaluadores que no sabían nada del canon lo contaron en 9 y 12 de
+> 12 piezas: «la primera vez es identidad, a la octava se siente forzado» y «puesto ahí sólo para cumplir la
+> cuota de naranja». `pnpm foto:prompt` cuenta la tanda. Evidencia:
+> [auditoría ciega](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_BLIND_AUDIT_2026-09-20.md).
+
+> **El texto de la escena EXISTE y queda ilegible por causa física** —pequeño, fuera de foco, cortado, en
+> ángulo, en sombra—, **nunca por estar en blanco**. La regla vieja («no text anywhere») protegía de marcas de
+> terceros y producía un mundo sin letras que delata la generación: «con lomos de libros y etiquetas en cuadro,
+> cero texto legible es estadísticamente imposible». Corregido en `bloque-realismo-v3`.
+
+> **Si la pieza va a llevar titular, copy o cursores, `reservas` se declara EN LA TOMA** y se valida con
+> `pnpm foto:validar <plate> --zona-texto`. Medido: **12 de 12** piezas auditadas reprobaron la banda de texto
+> (mejor caso 0,10 del alto contra 0,28) porque ninguna la declaró — el campo es opt-in y nadie lo encendía.
+> **Reservar después de generar no existe: o está en la toma, o el texto no cabe.**
+
 > **El sistema de color va en TODAS.** Al probar una palanca nueva es fácil concentrarse en la geometría y
 > dejar la paleta fuera: pasó en **21 de 21** fichas y las piezas salieron como fotografía genérica en vez de
 > Efeonce **[medido 2026-09-20]**. El azul va **en un portador visible** (pantalla, panel, lona, carpeta, tinta
