@@ -18,7 +18,21 @@ sesión que reconstruyó el oficio a pedazos en vez de cargar la skill perdió u
 pnpm foto:doctor                    # ¿puede esta máquina generar? seis chequeos, sin costo
 pnpm foto:prompt <ficha.json>       # arma el prompt desde la ficha
 pnpm foto:validar <plate.png>       # mide las seis reservas sobre el plate limpio
+pnpm foto:componer <piezas.json>    # la CAPA GRÁFICA encima: voces, selección AXIS, firma y QA
 ```
+
+**Dos categorías de pieza, y la diferencia se decide ANTES de generar:**
+
+| | Pieza **muda** | Pieza **con voz** |
+|---|---|---|
+| Qué lleva | Sólo foto + firma | Titular, copy, cursores, selección |
+| Para qué | **Descanso visual**: relaja el feed | Dice algo concreto |
+| Reserva | No necesita | **Obligatoria, declarada en la toma** |
+| Cómo | `foto:prompt` → `foto:validar` | `foto:prompt` con `reservas` → `foto:validar --zona-texto` → `foto:componer` |
+| Estado | **aprobada** | **capa SIN aprobar** (2026-09-19) |
+
+**NUNCA escribas un compositor nuevo.** `foto:componer` es el de «Nivel de búsqueda» con su gramática de voces
+intacta; escribir otro ya se intentó y el operador rechazó las piezas enteras.
 
 **NUNCA armes un prompt de foto de marca concatenando bloques a mano.** Es la vía por la que «Vertical 4:5.»
 vivió dentro del bloque de realismo compartido sin que nadie lo viera. El comando resuelve desde tablas:

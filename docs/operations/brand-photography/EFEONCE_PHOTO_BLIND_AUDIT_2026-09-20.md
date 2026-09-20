@@ -120,7 +120,7 @@ porque **el lecho ES la firma**: es donde va el logo. Es una tensión real del s
 Mar y palmeras en `ausencia` contra la cordillera en `marcado`: «el registro ejecutivo con vista pelea con el
 registro taller nocturno de las otras diez».
 
-## 12. El espacio para la capa gráfica: 12 de 12 reprueban **[medido el mismo día]**
+## 12. Faltaba la capa, no el espacio: las dos categorías de pieza **[medido y corregido el mismo día]**
 
 Señalado por el operador al leer el hallazgo 8 —«lo del texto nos falta trabajar, así como espacios suficientes
 en las composiciones para colocar esos textos»— y confirmado con el validador que ya existía:
@@ -136,10 +136,27 @@ pnpm foto:validar <plate> --zona-texto     # banda ≥ 0,28 del alto en vertical
 | Las otras diez | **0,00** |
 | Mínimo exigido en 4:5 | **0,28** |
 
-**Ninguna de las doce tiene dónde poner un titular.** Y la causa no es que la regla falte: la reserva está
-definida por formato, el validador la mide y el umbral está fijado desde el 2026-09-19. **El campo `reservas` es
-opt-in y nadie lo declaró**, así que el mecanismo existía apagado — la misma clase de falla que «construir el
-detector no basta, hay que cablearlo donde alguien ya corre».
+**Corrección del operador al leer esto, y cambia el marco entero:** que las doce reprueben **no es un defecto**.
+Una pieza **sin capa gráfica es una categoría legítima del lenguaje** —sirve de **descanso visual**, para relajar
+el feed de cualquier red entre piezas con voz— y estas doce están bien como están. El umbral sólo aplica a la
+pieza que **va a llevar texto**.
+
+Lo que el número sí prueba es otra cosa: **el sistema no distinguía las dos categorías**, así que no había forma
+de saber cuál es cuál hasta después de generar. Y para la segunda **faltaba la capa entera**.
+
+**Las dos categorías, ahora declaradas:**
+
+| | Pieza **muda** | Pieza **con voz** |
+|---|---|---|
+| Qué es | Sólo fotografía; la firma y nada más | Lleva titular, copy, cursores o selección |
+| Para qué | **Descanso visual**: relaja el feed entre piezas que hablan | Dice algo concreto |
+| Reserva | No necesita | **Obligatoria y declarada en la toma** |
+| Se produce con | `foto:prompt` → `foto:validar` | `foto:prompt` con `reservas` → `foto:validar --zona-texto` → **`foto:componer`** |
+| Estado | **Aprobada** desde el 2026-09-19 | **Capa sin aprobar**: es el trabajo abierto |
+
+**El campo `reservas` sigue siendo opt-in a propósito** —forzarlo obligaría a reservar en piezas mudas, que no lo
+necesitan— pero ahora **avisa**, para que la categoría sea una decisión declarada y no un olvido que se descubre
+cuando el titular no cabe.
 
 **Corregido el mismo día:** `pnpm foto:prompt` **avisa** cuando una ficha no declara `reservas`, con el texto que
 importa: *reservar después de generar no existe; o está en la toma, o el texto no cabe*. Avisa en vez de
@@ -178,8 +195,9 @@ reconocieron como un mismo autor —eso cierra la mitad del pendiente del maestr
 |---|---|---|
 | 1 | **Dosis del acento cálido: 1 de cada 2.** `pnpm foto:prompt` cuenta la tanda y avisa con el número, igual que con la acción suspendida. El azul portador sigue en todas | ✅ `DOSIS_ACENTO` |
 | 2 | **Bloque de realismo v3**: el texto existe y es ilegible por causa física, nunca por estar en blanco | ✅ `bloque-realismo-v3.txt` |
-| 3 | **Aviso de reserva de texto**: `foto:prompt` avisa si la ficha no declara `reservas`. El mecanismo existía y estaba apagado por ser opt-in silencioso | ✅ hallazgo 12 |
-| 4 | Esta auditoría, citable y con método reproducible | ✅ este documento |
+| 3 | **Aviso de reserva de texto**: `foto:prompt` avisa si la ficha no declara `reservas`, para que la categoría sea una decisión y no un olvido | ✅ hallazgo 12 |
+| 4 | **`pnpm foto:componer` promovido a comando canónico** desde `ai-generations/…/scripts/componer-foto.mjs`. No es un compositor nuevo —el canon lo prohíbe— es el de «Nivel de búsqueda» con su gramática de voces intacta, movido a donde se encuentra. Mismo motivo por el que se promovió `foto:validar` | ✅ |
+| 5 | Esta auditoría, citable y con método reproducible | ✅ este documento |
 
 ### Lo que falta, en orden de impacto
 
@@ -190,7 +208,7 @@ reconocieron como un mismo autor —eso cierra la mitad del pendiente del maestr
 | 7 | **Corregir el contrato de `variantes`**: diferencias **mínimas pero comparables** en UN eje declarado (el mismo encuadre, cambiando sólo el color / sólo el peso) | Hoy cae en el doble filo del hallazgo 5 | Se puede señalar en qué se diferencian sin que parezcan archivos distintos |
 | 8 | **Decidir sobre `little-planet`** | Dos lecturas independientes la llamaron truco | Decisión del operador, registrada |
 | 9 | **Variar el lecho o declararlo explícito** | Hallazgo 10, tensión con la firma | Una serie donde el lecho no sea el mismo recurso siete veces |
-| 10 | **Serie con capa gráfica**: fichas que declaren `reservas` desde la toma, validadas con `--zona-texto`, y la capa compuesta encima con el canon de `efeonce-advertising-creative` | Hallazgo 12: hoy **ninguna** pieza tiene dónde poner un titular, y la capa sigue **sin aprobar** desde el 2026-09-19 | Un plate que pasa `--zona-texto` **y** una composición aprobada por el operador sobre él |
+| 10 | **Aprobar la capa de la pieza con voz**: plates que reserven desde la toma + `foto:componer` encima, iterando hasta que el operador la apruebe | Es el trabajo que el operador puso como siguiente: *«me gustan como están; sólo tenemos que construir la capa para piezas que con el mismo lenguaje tendrán texto»*. La capa sigue **sin aprobar** desde el 2026-09-19 | Una serie con voz aprobada por el operador, con contraste medido bajo cada caja |
 | 11 | **Repetir esta auditoría después de 5 y 6** | Sin segunda medición no se sabe si mejoró | Comparar contra este documento |
 | 12 | **Prueba de reconocimiento** (pendiente desde el maestro) | Consistente ≠ distintivo | Alguien reconoce las piezas como Efeonce sin logo |
 
@@ -218,7 +236,7 @@ Eso pide una capacidad nueva, hermana de las seis reservas existentes:
 del oficio** (se revisa, se marca, se elige, se cuelga), **nunca como tema**. La foto sigue siendo sobre la
 decisión. Si la serie empieza a tratarse de pintura, volvió a fallar.
 
-**Gate previo, no negociable:** mostrar trabajo de un cliente en marketing propio exige **derechos de uso**
-verificados en el contrato de cada cuenta, y autorización cuando no estén cubiertos. Es una decisión comercial y
-legal, no fotográfica: se consultan `creative-practice` (derechos de uso en el SOW) y `legal-privacy-ip-operator`
-**antes** de producir, y desde luego antes de publicar. Sin ese gate, la ronda se queda en uso interno.
+**Gate de derechos: resuelto.** El operador confirmó el 2026-09-20 que **los contratos cubren el derecho de uso
+de todos los clientes**, así que la ronda puede producirse para publicar y no sólo para uso interno. Si en alguna
+cuenta futura el contrato no lo cubriera, vuelve a aplicar el gate: se consultan `creative-practice` (derechos de
+uso en el SOW) y `legal-privacy-ip-operator` **antes** de producir.

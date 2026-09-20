@@ -22,7 +22,12 @@ pnpm foto:doctor                         # comprueba la cadena local sin generar
 pnpm foto:prompt --ficha-ejemplo          # plantilla de ficha de toma
 pnpm foto:prompt <ficha.json> --batch <out.json>   # arma el prompt; el formato sale de UNA tabla
 pnpm foto:validar <plate.png>             # valida las seis reservas sobre el plate limpio
+pnpm foto:componer <piezas.json>          # la CAPA GRÁFICA encima: voces, selección AXIS, firma y QA
 ```
+
+**Dos categorías de pieza** **[operador, 2026-09-20]**: la **muda** —sólo foto y firma— es legítima y sirve de
+**descanso visual** para relajar el feed; la **con voz** lleva la capa y **reserva su espacio en la toma**. La
+capa de la segunda **sigue sin aprobar**: es el trabajo abierto.
 
 `foto:prompt` existe porque dos veces se coló un valor de un formato dentro de un bloque compartido
 («Vertical 4:5.», «bottom 18%») y ninguna se vio hasta medir. `foto:validar` es el arnés de reservas, promovido

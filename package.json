@@ -297,6 +297,7 @@
     "foto:doctor": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/foto/doctor.ts",
     "foto:prompt": "node scripts/foto/build-prompt.mjs",
     "foto:validar": "node scripts/foto/validar-reservas.mjs",
+    "foto:componer": "node scripts/foto/componer.mjs",
     "tender:new": "node scripts/commercial/new-tender.mjs",
     "tender:canonical-gate": "node scripts/commercial/canonical-tender-gate.mjs",
     "tender:canonical-gate:test": "node --test scripts/commercial/__tests__/tender-closure-gate.test.mjs",

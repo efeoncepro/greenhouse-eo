@@ -15,7 +15,7 @@ const shape = (text, size) => { const run = bold.layout(text); const sc = size /
 const layers = []
 // Logo centrado sobre el lecho, color por contraste
 const rel = (r, g, b) => { const f = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4 }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b) }
-const lw = Math.round(W * Number(process.env.LOGO ?? 0.15)), lh = Math.round(lw * 196.68 / 837.07), left = Math.round((W - lw) / 2), top = Math.round(0.935 * H - lh / 2)
+const lw = Math.round(Math.min(W, H) * Number(process.env.LOGO ?? 0.20)), lh = Math.round(lw * 196.68 / 837.07), left = Math.round((W - lw) / 2), top = Math.round(0.935 * H - lh / 2)
 const { data } = await sharp(PLATE).extract({ left, top, width: lw, height: lh }).removeAlpha().raw().toBuffer({ resolveWithObject: true })
 const Ls = []; for (let i = 0; i < data.length; i += 3) Ls.push(rel(data[i], data[i + 1], data[i + 2])); Ls.sort((a, b) => a - b)
 const white = 1.05 / (Ls.at(-1) + 0.05), navy = (Ls[0] + 0.05) / (rel(2, 60, 112) + 0.05), useWhite = white >= navy

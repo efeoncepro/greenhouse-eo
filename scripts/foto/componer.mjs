@@ -21,17 +21,23 @@ import sharp from 'sharp'
 import { axisAdvertising } from '@efeoncepro/axis-tokens'
 import { resolveCollaborationSelectionIntent } from '@efeoncepro/axis-ui-contracts'
 
-import { renderCollaborationSelection } from '../../../scripts/creative/layout-compiler/axis-advertising.mjs'
-import { compositeLuminosity } from '../../../scripts/creative/layout-compiler/compiler.mjs'
+import { renderCollaborationSelection } from '../creative/layout-compiler/axis-advertising.mjs'
+import { compositeLuminosity } from '../creative/layout-compiler/compiler.mjs'
 
 // ADAPTACIÓN del compositor de «Nivel de búsqueda» (GTA VI) a FOTOGRAFÍA de marca y multiformato.
 // Original: ai-generations/2026-09-19_nivel-de-busqueda/componer-v2.mjs (jerarquía por voces, richBlock,
 // selección AXIS, tarjeta de vidrio, QA de contraste). Cambios: lienzo tomado del plate (4:5, 9:16, 16:9),
 // HUD opcional, selección anclada al dominante o a un OBJETO de la foto, escalas relativas al lienzo.
-// Uso: node componer-foto.mjs <piezas.json> [id...]   ·  las rutas de plate son relativas al json.
+// PROMOVIDO a comando canónico el 2026-09-20 (antes vivía en
+// ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/componer-foto.mjs). Mismo motivo que
+// `foto:validar`: una herramienta dentro de una carpeta fechada no la encuentra nadie, y la capa gráfica
+// se reconstruía a mano cada vez. NO es un compositor nuevo — el canon lo prohíbe expresamente: es el de
+// «Nivel de búsqueda» con su gramática de voces intacta.
+//
+// Uso: pnpm foto:componer <piezas.json> [id...]   ·  las rutas de plate son relativas al json.
 const require = createRequire(import.meta.url)
 const fontkit = require('fontkit')
-const DIR = path.dirname(new URL(import.meta.url).pathname)
+
 const R = axisAdvertising.recipes
 const C = axisAdvertising.color
 
@@ -41,12 +47,14 @@ let M = Math.round(W * 0.07)
 const ACCENT = C.accentSurface // #ff6500, naranja Efeonce = el atardecer de la ciudad
 
 const bric = fontkit.openSync('src/assets/fonts/BricolageGrotesque-Variable.ttf')
+
 const pop = {
   400: fontkit.openSync('src/assets/fonts/Poppins-Regular.ttf'),
   500: fontkit.openSync('src/assets/fonts/Poppins-Medium.ttf'),
   600: fontkit.openSync('src/assets/fonts/Poppins-SemiBold.ttf'),
   700: fontkit.openSync('src/assets/fonts/Poppins-Bold.ttf')
 }
+
 const GUTTERY = path.join(os.homedir(), 'Library/Fonts/Guttery.otf')
 const gutt = fs.existsSync(GUTTERY) ? fontkit.openSync(GUTTERY) : null
 
@@ -70,12 +78,14 @@ const shape = (text, font, size, trackingEm = 0) => {
     const d = g.path.toSVG()
 
     if (d) paths += `<path d="${d}" transform="translate(${gx.toFixed(2)} ${gy.toFixed(2)}) scale(${scale} ${-scale})"/>`
+
     if (g.bbox && g.bbox.maxX > g.bbox.minX) {
       ink.left = Math.min(ink.left, gx + g.bbox.minX * scale)
       ink.right = Math.max(ink.right, gx + g.bbox.maxX * scale)
       ink.top = Math.min(ink.top, gy - g.bbox.maxY * scale)
       ink.bottom = Math.max(ink.bottom, gy - g.bbox.minY * scale)
     }
+
     x += p.xAdvance * scale + (i === run.glyphs.length - 1 ? 0 : trackingEm * size)
   })
 
@@ -96,6 +106,7 @@ const wrap = (text, font, size, maxWidth, trackingEm) => {
         line = word
       } else line = probe
     }
+
     if (line) lines.push(line)
   }
 
@@ -133,6 +144,7 @@ const parseRich = text =>
     let bold = false
     let accent = false
     let cur = ''
+
     const flush = () => {
       if (cur) words.push({ text: cur, bold, accent })
       cur = ''
@@ -145,6 +157,7 @@ const parseRich = text =>
       if (chunk[i] === ' ') { flush(); words.push({ space: true }); continue }
       cur += chunk[i]
     }
+
     flush()
 
     // fusiona fragmentos contiguos (sin espacio) en una palabra con estilos por segmento
@@ -155,6 +168,7 @@ const parseRich = text =>
       if (t.space) { if (w.length) out.push(w); w = []; continue }
       w.push(t)
     }
+
     if (w.length) out.push(w)
 
     return out
@@ -177,6 +191,7 @@ const richBlock = ({ text, fonts, size, tracking = 0, leading, x, topY, maxWidth
       width += (line.length ? space : 0) + ww
       line.push(word)
     }
+
     if (line.length) lines.push(line)
   }
 
@@ -193,16 +208,19 @@ const richBlock = ({ text, fonts, size, tracking = 0, leading, x, topY, maxWidth
 
     line.forEach((word, wi) => {
       if (wi) cx += space
+
       for (const seg of word) {
         const sh = segW(seg)
 
         parts.push({ seg, sh, dx: cx })
+
         if (sh.ink.left !== Infinity) {
           ink.left = Math.min(ink.left, cx + sh.ink.left)
           ink.right = Math.max(ink.right, cx + sh.ink.right)
           ink.top = Math.min(ink.top, sh.ink.top)
           ink.bottom = Math.max(ink.bottom, sh.ink.bottom)
         }
+
         cx += sh.advance
       }
     })
@@ -223,6 +241,7 @@ const richBlock = ({ text, fonts, size, tracking = 0, leading, x, topY, maxWidth
       svg += `<g fill="${color}" transform="translate(${(lx + dx).toFixed(2)} ${baseline.toFixed(2)})">${sh.paths}</g>`
       if (seg.accent && sh.ink.left !== Infinity) accentBoxes.push({ left: lx + dx + sh.ink.left, right: lx + dx + sh.ink.right, top: baseline + sh.ink.top, bottom: baseline + sh.ink.bottom })
     }
+
     box.left = Math.min(box.left, lx + ink.left)
     box.right = Math.max(box.right, lx + ink.right)
     box.top = Math.min(box.top, baseline + ink.top)
@@ -236,6 +255,7 @@ const BRIC = (recipe, width = recipe.width, boldWeight = 800) => ({
   base: bric.getVariation({ wght: recipe.weight, wdth: width, opsz: recipe.opticalSize }),
   bold: bric.getVariation({ wght: boldWeight, wdth: width, opsz: recipe.opticalSize })
 })
+
 const POP = { base: pop[400], bold: pop[700] }
 
 // ── HUD propio ───────────────────────────────────────────────────────────────────────────────────
@@ -264,6 +284,7 @@ const unitIcons = (x, cy, s) => {
 }
 
 let glowId = 0
+
 const hud = ({ lit, current = null, r = 34, gap = 12, right = W - M, top = M }) => {
   const step = r * 2 + gap
   const total = step * 5 - gap
@@ -353,6 +374,7 @@ const contrastUnder = async (buf, box, inkL = 1) => {
 }
 
 const measureLabel = (label, size) => shape(label, pop[700], size).advance
+
 const labelToPaths = svg =>
   svg.replace(
     /<text x="(-?[\d.]+)" y="(-?[\d.]+)" fill="([^"]+)" font-family="[^"]*" font-size="([\d.]+)" font-weight="700">([^<]*)<\/text>/g,
@@ -361,6 +383,31 @@ const labelToPaths = svg =>
 
 // ── Piezas ───────────────────────────────────────────────────────────────────────────────────────
 const PLAN = process.argv[2]
+
+// Sin plan, un comando canónico explica cómo se usa en vez de tirar un stack de node:fs.
+if (!PLAN || PLAN === '--help' || PLAN === '-h') {
+  console.error(`
+pnpm foto:componer <piezas.json> [id...]
+
+Compone la CAPA GRÁFICA sobre un plate limpio: jerarquía por voces (etiqueta · entrada · dominante ·
+cierre), gesto Guttery opcional, selección AXIS, firma y QA de contraste real bajo cada caja.
+
+  <piezas.json>  plan declarativo; las rutas de \`plate\` son relativas al json
+  [id...]        compone sólo esas piezas del plan
+
+La pieza MUDA —sin capa— es una categoría legítima del lenguaje: sirve de descanso visual en el feed.
+Este comando es para la pieza CON VOZ, y ésa reserva su espacio EN LA TOMA:
+
+  pnpm foto:prompt <ficha.json>            # con \`reservas: ["zona-texto"]\`
+  pnpm foto:validar <plate.png> --zona-texto
+  pnpm foto:componer <piezas.json>
+
+NUNCA escribas un compositor nuevo: éste es el de «Nivel de búsqueda» con su gramática de voces intacta.
+Canon: docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md
+`)
+  process.exit(1)
+}
+
 const SLIDES = JSON.parse(fs.readFileSync(PLAN, 'utf8'))
 const PLAN_DIR = path.dirname(path.resolve(PLAN))
 const only = process.argv.slice(3)
@@ -371,6 +418,7 @@ fs.mkdirSync(`${PLAN_DIR}/out/preview-390`, { recursive: true })
 for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   const plate = path.resolve(PLAN_DIR, s.plate)
   const meta = await sharp(plate).metadata()
+
   W = meta.width; H = meta.height; M = Math.round(W * 0.07)
   let defs = ''
   let under = ''
@@ -384,6 +432,7 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   const INK = DARK ? C.inkOnLight : '#ffffff'
   const SOFT = DARK ? C.mutedOnLight : C.softOnDark
   const INK_L = DARK ? lum(0, 40, 77) : 1
+
   if (s.scrimTop) {
     defs += `<linearGradient id="st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.scrimTop.color ?? (DARK ? '#ffffff' : '#050818')}" stop-opacity="${s.scrimTop.opacity}"/><stop offset="1" stop-color="#050818" stop-opacity="0"/></linearGradient>`
     under += `<rect x="0" y="0" width="${W}" height="${s.scrimTop.to * H}" fill="url(#st)"/>`
@@ -396,7 +445,9 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
     under += `<rect x="0" y="${y0}" width="${W}" height="${H - y0}" fill="url(#sb)"/>`
   }
 
-  if (s.hud) { const hudEl = hud({ lit: s.hud.lit, current: s.hud.current ?? null }); defs += hudEl.defs; body += hudEl.svg }
+  if (s.hud) { const hudEl = hud({ lit: s.hud.lit, current: s.hud.current ?? null });
+
+ defs += hudEl.defs; body += hudEl.svg }
 
   const x = s.align === 'center' ? W / 2 : M
   let y = s.top * H
@@ -435,7 +486,13 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   const domFont = fontFor(ir, DOMINANT_WIDTH)
   // Ajuste al ancho máximo declarado (deja aire para etiquetas de colaboradores fuera de la caja).
   let domSize = s.dominantSize
-  const widest = Math.max(...s.dominant.replace(/\*\*|\[\[|\]\]/g, '').split('|').map(t => { const k = shape(t.trim(), domFont, domSize, em(ir.tracking)); return k.ink.right - k.ink.left }))
+
+  const widest = Math.max(...s.dominant.replace(/\*\*|\[\[|\]\]/g, '').split('|').map(t => { const k = shape(t.trim(), domFont, domSize, em(ir.tracking));
+
+ 
+
+return k.ink.right - k.ink.left }))
+
   if (s.dominantMax && widest > s.dominantMax * W) domSize = domSize * (s.dominantMax * W) / widest
   const dom = richBlock({ text: s.dominant, fonts: { base: domFont, bold: domFont }, size: domSize, tracking: em(ir.tracking), leading: ir.lineHeight, x, topY: y, maxWidth: W * 0.9, fill: INK, align: s.align })
 
@@ -447,9 +504,11 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
 
   if (s.selection) {
     const onObject = Array.isArray(s.selection.box)
+
     const targetBox = onObject
       ? { left: s.selection.box[0] * W, top: s.selection.box[1] * H, right: s.selection.box[2] * W, bottom: s.selection.box[3] * H }
       : dom.box
+
     const manifest = resolveCollaborationSelectionIntent({
       targetId: 'dominante',
       targetKind: onObject ? (s.selection.targetKind ?? 'object') : 'text',
@@ -464,7 +523,9 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
             : { id: c.id, kind: 'collaborator', targetId: 'dominante', anchor: c.anchor, action: c.action ?? 'select', label: c.label, participantKind: c.who ?? 'role' }
       )
     })
+
     const colors = Object.fromEntries(s.selection.cursors.filter(c => c.color).map(c => [c.id, c.color]))
+
     const rendered = renderCollaborationSelection({
       manifest,
       targetBounds: targetBox,
@@ -488,6 +549,7 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
     const ar = R.ideaMedium
     const afterPoppins = (s.afterFamily ?? 'poppins') === 'poppins'
     const af = richBlock({ text: s.after, fonts: afterPoppins ? POP : BRIC(ar, ar.width, 800), size: s.afterSize ?? 74, tracking: afterPoppins ? em(R.structureCopy.tracking) : em(ar.tracking), leading: afterPoppins ? 1.5 : ar.lineHeight, x, topY: y + Math.round((s.afterGap ?? 0.09) * domSize), maxWidth: W * (s.textWidth ?? 0.8), fill: s.afterFill ?? INK, align: s.align })
+
     af.accentBoxes.forEach((b, i) => checks.push({ id: `cierre-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
 
     body += af.svg
@@ -503,6 +565,7 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
 
     body += `<g fill="${s.gesture.color ?? ACCENT}" transform="translate(${gx} ${gy}) rotate(${s.gesture.rotate ?? -6})">${g.paths}</g>`
     const gc = (s.gesture.color ?? ACCENT).replace('#', '')
+
     checks.push({ id: 'gesto', box: { left: gx + g.ink.left, right: gx + g.ink.right, top: gy + g.ink.top, bottom: gy + g.ink.bottom }, inkL: lum(parseInt(gc.slice(0, 2), 16), parseInt(gc.slice(2, 4), 16), parseInt(gc.slice(4, 6), 16)) })
   }
 
@@ -510,6 +573,7 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   if (s.footer) {
     const fr = R.ideaLead
     const ft = richBlock({ text: s.footer.text, fonts: BRIC(fr, fr.width, 780), size: s.footer.size, tracking: em(fr.tracking), leading: fr.lineHeight, x: W / 2, topY: s.footer.y * H, maxWidth: W * 0.84, fill: SOFT, accentFill: INK, align: 'center' })
+
     ft.accentBoxes.forEach((b, i) => checks.push({ id: `cierre-inferior-acento-${i}`, box: b }))
 
     body += ft.svg
@@ -519,6 +583,7 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   // 4 · nota de dato: Poppins sobre la foto limpia (la tarjeta de vidrio era del post de GTA VI, no del lenguaje)
   if (s.note) {
     const nt = richBlock({ text: s.note.text, fonts: POP, size: s.note.size ?? Math.round(W * 0.026), tracking: 0, leading: 1.5, x: s.note.x != null ? s.note.x * W : M, topY: s.note.y * H, maxWidth: W * (s.note.width ?? 0.34), fill: SOFT, accentFill: INK, align: 'left' })
+
     body += nt.svg
     checks.push({ id: 'nota', box: nt.box, inkL: INK_L })
   }
@@ -566,8 +631,10 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
       const lyTmp = Math.round(H - M * 0.85 - lhTmp)
       const cNeg = await contrastUnder(bare, { left: lxTmp, right: lxTmp + lwTmp, top: lyTmp, bottom: lyTmp + lhTmp }, 1)
       const cCol = await contrastUnder(bare, { left: lxTmp, right: lxTmp + lwTmp, top: lyTmp, bottom: lyTmp + lhTmp }, lum(2, 60, 112))
+
       s.logo.variant = cNeg >= cCol ? 'negative' : 'color'
     }
+
     const lb = await sharp(`public/branding/${s.logo.variant === 'color' ? 'logo-full.svg' : 'logo-negative.svg'}`, { density: 600 }).resize({ width: Math.round(s.logo.width <= 1 ? s.logo.width * Math.min(W, H) : s.logo.width) }).png().toBuffer()
     const { width: lw, height: lh } = await sharp(lb).metadata()
     const lx = s.logo.x != null ? Math.round(s.logo.x * W - lw / 2) : Math.round(W / 2 - lw / 2)
@@ -595,6 +662,7 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   }
 
   const out = s.final ? sharp(master).resize({ width: s.final[0], height: s.final[1] }) : sharp(master)
+
   await out.png().toFile(`${PLAN_DIR}/out/${s.id}.png`)
   await sharp(master).resize({ width: 390 }).png().toFile(`${PLAN_DIR}/out/preview-390/${s.id}.png`)
 
@@ -604,10 +672,12 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
     if (c.box.left < 0 || c.box.right > W || c.box.top < 0 || c.box.bottom > H) throw new Error(`${s.id}: ${c.id} fuera del lienzo`)
     if (!c.skipContrast) contraste[c.id] = await contrastUnder(bare, c.box, c.inkL ?? 1)
   }
+
   if (cardEl) contraste.tarjeta = await contrastUnder(bare, cardEl.textBoxes[0])
 
   // Gap de tinta real entre tramos (no leading): top(siguiente) − bottom(anterior)
   const gaps = []
+
   for (let i = 1; i < tramos.length; i++) gaps.push({ entre: `${tramos[i - 1][0]}→${tramos[i][0]}`, px: +(tramos[i][1].top - tramos[i - 1][1].bottom).toFixed(1), ratioDominante: +((tramos[i][1].top - tramos[i - 1][1].bottom) / domSize).toFixed(3) })
   qa.push({ id: s.id, dominante: dom.lines, contraste, gapsTinta: gaps, seleccion: selEvidence })
 }

@@ -6,38 +6,29 @@
     ],
     "contraste": {
       "etiqueta": 6.54,
-      "entrada": 6.56,
-      "dominante": 6.2,
-      "cierre-frase": 4.65,
+      "entrada": 6.54,
+      "dominante": 6.48,
+      "cierre-frase": 4.71,
       "gesto": 10.16,
       "logo": 20.38
     },
-    "seleccion": {
-      "selection": {
-        "variant": "eight-handles",
-        "padding": "standard",
-        "paddingRatio": {
-          "inline": 0.012,
-          "block": 0.01
-        },
-        "overlay": "subtle",
-        "overlayOpacity": 0.1,
-        "overlayBlendMode": "luminosity"
+    "gapsTinta": [
+      {
+        "entre": "etiqueta→entrada",
+        "px": 19,
+        "ratioDominante": 0.1
       },
-      "cursores": [
-        {
-          "id": "arte",
-          "labelBounds": {
-            "left": 503.422,
-            "top": 372.256,
-            "right": 581.949,
-            "bottom": 416.838
-          }
-        },
-        {
-          "id": "yo"
-        }
-      ]
-    }
+      {
+        "entre": "entrada→dominante",
+        "px": 17,
+        "ratioDominante": 0.089
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 17,
+        "ratioDominante": 0.089
+      }
+    ],
+    "seleccion": null
   }
 ]

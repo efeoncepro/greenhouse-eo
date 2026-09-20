@@ -181,7 +181,7 @@ layout, cursores y caja, y también los plates). **Ese compositor original no fu
 `git status`).
 
 **Corrección:** el camino canónico para componer una pieza fotográfica con capa es
-`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/componer-foto.mjs`, que es **una adaptación
+`pnpm foto:componer` (`scripts/foto/componer.mjs`), que es **una adaptación
 declarada de `componer-v2.mjs`**, conservando su gramática:
 
 | Del original se conserva | Qué se adaptó |
@@ -193,7 +193,7 @@ declarada de `componer-v2.mjs`**, conservando su gramática:
 | QA de contraste real bajo cada caja + preview 390 px | Tinta por pieza (`"ink": "dark"`) y **variante de logo automática** por contraste |
 
 `titular.mjs` y `composicion.mjs` quedan **superados**: sirven sólo como registro de la exploración. Cualquier
-pieza nueva se compone con `componer-foto.mjs` y un plan declarativo (`rondas/capas-v2/plan.json` como ejemplo).
+pieza nueva se compone con `foto:componer` y un plan declarativo (`rondas/capas-v2/plan.json` como ejemplo).
 
 **Estado de la primera pasada con el compositor correcto** (`rondas/capas-v2/out/`): contrastes de todas las capas
 entre 4,3 y 20:1, pero la **ubicación de la caja de selección y de las etiquetas de cursores sigue sin resolver**
@@ -220,7 +220,7 @@ eso es muy 2010, le resta limpieza a los diseños».
 ## 11. La estrella del marcador no es del lenguaje (2026-09-19)
 
 El marcador-estrella naranja junto a la etiqueta fue un recurso **puntual del post de GTA VI** (marcaba la misión
-del juego). **NUNCA** se usa en fotografía de marca. En `componer-foto.mjs` quedó como `"labelStar": true`, opt-in y
+del juego). **NUNCA** se usa en fotografía de marca. En `foto:componer` quedó como `"labelStar": true`, opt-in y
 apagado por defecto; sin ella la etiqueta arranca en el margen.
 
 ## 12. Qué era de GTA VI y NO es del lenguaje (2026-09-19)
@@ -232,7 +232,7 @@ Todos eran **puntuales de esa pieza**, ligados a la estética del juego:
 |---|---|---|
 | **Scrim / degradado oscuro** sobre la imagen | el cielo pintado del key art lo admitía | **NUNCA.** «Es muy 2010, le resta limpieza». El contraste se planifica en la toma (§10) |
 | **Marcador-estrella naranja** junto a la etiqueta | marcaba la misión del juego | **NUNCA.** `labelStar` opt-in, apagado (§11) |
-| **Tarjeta HUD de vidrio con línea naranja** | lenguaje de HUD del videojuego | **NUNCA.** El dato va como **nota de texto limpio** (Poppins, `note`) sobre una zona clara de la propia foto. `componer-foto.mjs` **falla** si se pide `card` sin `card.allowGtaCard` |
+| **Tarjeta HUD de vidrio con línea naranja** | lenguaje de HUD del videojuego | **NUNCA.** El dato va como **nota de texto limpio** (Poppins, `note`) sobre una zona clara de la propia foto. `foto:componer` **falla** si se pide `card` sin `card.allowGtaCard` |
 
 Regla general: **un recurso de una pieza puntual no entra al lenguaje sin decisión explícita.** Lo que sí es del
 lenguaje son las voces tipográficas AXIS, la selección colaborativa, la firma y las reglas de toma.
@@ -250,7 +250,7 @@ Dos errores míos que el operador corrigió («interespaciado mal… mala aplica
 | Entrada, dominante y cierre los puse **los tres en Bricolage** | **Bricolage es la ÚNICA voz expresiva de la pieza** (skill de tipografía, §Creative asset boundary). La etiqueta, la entrada, el cierre y la nota van en **Poppins**: `structureLabel` en mayúsculas para la etiqueta (+0,08 em) y `structureCopy` (leading 1,5, tracking 0 a −0,01 em) para entrada/cierre/nota. Así el contraste también es de familia, no sólo de peso |
 | Separé los tramos con píxeles fijos (26/30/20 px) → **ratio 0,11–0,17** del dominante, se leía suelto | El aire se mide como **gap de tinta** (`top` de la línea siguiente − `bottom` de la anterior), no como leading. Objetivo **≈ 0,09 del tamaño del dominante** (0,10 tras la etiqueta), coherente con el caso medido de Fiestas Patrias (gaps ~11 px con tipos de 104–126 px) |
 
-`componer-foto.mjs` ahora **reporta los gaps de tinta reales** por pieza (`gapsTinta` en `out/qa.json`) y los
+`foto:componer` ahora **reporta los gaps de tinta reales** por pieza (`gapsTinta` en `out/qa.json`) y los
 calcula desde ratios (`labelGap`, `leadGap`, `afterGap` como fracción del dominante, 0,10 / 0,09 / 0,09 por
 defecto). Tracking por tramo según los rangos medidos: Bricolage ≥80 px −0,020 a −0,040 em; 48–79 px −0,010 a
 −0,030 em; Poppins de apoyo 0 a −0,010 em con leading 1,45–1,65; Poppins overline +0,060 a +0,100 em.

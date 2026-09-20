@@ -218,7 +218,7 @@ propósito, para seleccionar un objeto o texto para hacer énfasis, no solo por 
 | **Nunca sobre una persona** | Ni sobre su cara ni recortándola; las personas no son objetos que se seleccionan |
 | **El objeto se elige en la ficha de toma** | El plate se pide con ese objeto aislado y con aire alrededor para la caja y las etiquetas; no se busca «dónde poner la caja» al componer |
 | **Quién selecciona dice algo** | Cliente + Efeonce sobre la misma pieza = co-creación; un solo cursor = revisión o presencia; el cursor local = el espectador |
-| **Verificación** | `componer-foto.mjs` falla si la caja o una etiqueta se salen del lienzo; el objeto y el sentido los valida una persona |
+| **Verificación** | `foto:componer` falla si la caja o una etiqueta se salen del lienzo; el objeto y el sentido los valida una persona |
 
 Casos de esta ronda **[medido/visto]**: en 4:5 la caja enmarca la palabra «donde» del titular (énfasis, igual que en
 el carrusel de GTA VI, donde enmarcaba la decisión); en la pieza de co-creación enmarca **las láminas impresas** que

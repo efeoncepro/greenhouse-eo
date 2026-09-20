@@ -182,6 +182,11 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 > terceros y producía un mundo sin letras que delata la generación: «con lomos de libros y etiquetas en cuadro,
 > cero texto legible es estadísticamente imposible». Corregido en `bloque-realismo-v3`.
 
+> **Dos categorías de pieza** **[operador, 2026-09-20]**: la **muda** —sólo foto y firma— es legítima y sirve de
+> **descanso visual** para relajar el feed; la **con voz** lleva la capa gráfica. La diferencia se decide **antes**
+> de generar, no después. Muda: `foto:prompt` → `foto:validar`. Con voz: `foto:prompt` con `reservas` →
+> `foto:validar --zona-texto` → **`pnpm foto:componer`**. La capa de la segunda **sigue sin aprobar**.
+
 > **Si la pieza va a llevar titular, copy o cursores, `reservas` se declara EN LA TOMA** y se valida con
 > `pnpm foto:validar <plate> --zona-texto`. Medido: **12 de 12** piezas auditadas reprobaron la banda de texto
 > (mejor caso 0,10 del alto contra 0,28) porque ninguna la declaró — el campo es opt-in y nadie lo encendía.
@@ -391,7 +396,7 @@ falla con glifos inexistentes como «→» y con gesto bajo 4,5:1). **Lo que la 
 en [reserva de espacio en la toma](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md);
 **cómo se compone encima NO está aprobado** y su canon es `efeonce-advertising-creative` (brief + ficha tipográfica + gate).
 
-**Compositor canónico:** `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/componer-foto.mjs`, adaptación
+**Compositor canónico:** `pnpm foto:componer` (`scripts/foto/componer.mjs`), adaptación
 declarada del compositor del carrusel GTA VI (`2026-09-19_nivel-de-busqueda/componer-v2.mjs`): misma gramática de voces,
 `richBlock`, scrims, tarjeta de vidrio, selección AXIS y QA de contraste; adaptado a foto, multiformato, tinta por pieza,
 selección sobre objeto y logo automático. **NUNCA** escribir un compositor nuevo para una pieza: se extiende éste.
@@ -414,7 +419,7 @@ no va selección. El objeto se decide en la ficha de toma.
 **Craft tipográfico (no negociable):** Bricolage es la **única** voz expresiva (sólo el dominante); etiqueta,
 entrada, cierre y notas van en **Poppins** (`structureLabel` en mayúsculas +0,08 em; `structureCopy` leading 1,5).
 El aire entre tramos se mide como **gap de tinta** ≈ **0,09 del tamaño del dominante** (0,10 tras la etiqueta), no
-como leading; `componer-foto.mjs` lo reporta en `qa.json`.
+como leading; `foto:componer` lo reporta en `qa.json`.
 
 > **Estado:** la **fotografía** de este lenguaje está aprobada (2026-09-19). La **capa de composición gráfica**
 > (titulares, jerarquía, cursores sobre la foto) **NO**: las piezas de prueba fueron rechazadas por el operador.
