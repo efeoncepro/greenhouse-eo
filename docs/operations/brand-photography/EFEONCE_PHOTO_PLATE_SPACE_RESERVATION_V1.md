@@ -11,14 +11,16 @@ Una foto de marca puede tener que alojar después texto, una caja de selección,
 decide en la toma, no al componer.** Este documento cubre sólo lo que el plate debe traer; cómo se compone
 encima pertenece a `efeonce-advertising-creative` y a su ficha tipográfica.
 
-## 1. Las cuatro reservas posibles
+## 1. Las seis reservas posibles
 
 | Reserva | Cuándo se pide | Qué debe traer el plate |
 |---|---|---|
 | **Zona de texto** | la pieza llevará etiqueta, titular o dato | área **pareja, sin objetos** y con **tono declarado** (sombra profunda o muro claro) |
-| **Objeto para enmarcar** | la pieza llevará caja de selección | un objeto **aislado y completo** (la obra en revisión, el resultado), con aire alrededor para la caja y las etiquetas de cursores |
+| **Objeto para enmarcar** | la pieza llevará caja de selección | un objeto **aislado y completo** (la obra en revisión, el resultado), con aire alrededor para la caja y las etiquetas de cursores, **recortado contra un campo OSCURO Y PAREJO por escenografía en los CUATRO lados de su perímetro** (ver §2 regla 7) |
 | **Lecho de la firma** | siempre | el primer plano desenfocado planeado, con su tono declarado (ver doc de firma) |
 | **Aire para cursores** | la pieza llevará cursores | espacio libre al costado del objeto: las etiquetas viven **fuera** de la caja y con dos colaboradores el aire se paga dos veces |
+| **Campo profundo al margen** | la pieza llevará una voz secundaria tipo cita | una **banda vertical** de tono declarado y parejo al margen izquierdo, que arranque en la zona de texto y siga libre **hasta al menos el 40% del alto**, sin que la escena la interrumpa (ver §2 regla 8) |
+| **Lecho por formato** | siempre | el lecho de la firma **no mide igual en los tres formatos**: 4:5 → 18%, 9:16 → 22%, 16:9 → 16% **[medido en `rondas/texto/bv2-{45,916,169}.json`]** |
 
 ## 2. Reglas duras (todas verificadas en esta corrida)
 
@@ -34,6 +36,16 @@ encima pertenece a `efeonce-advertising-creative` y a su ficha tipográfica.
    está prohibido (decisión del operador: «es muy 2010, le resta limpieza»).
 6. **Se mide antes de componer.** Sobre el plate limpio: nitidez de la zona (debe ser pareja) y contraste contra
    la tinta prevista (≥ 4,5:1). Si no pasa, el plate se rehace; no se parcha al componer.
+7. **Un objeto que se va a enmarcar necesita perímetro oscuro en los cuatro lados.** La caja de selección AXIS usa trazo
+   `#a6cdf5` con tiradores blancos: está diseñada para fondo oscuro y **desaparece sobre claro**. El campo oscuro se
+   consigue por **escenografía de la escena**, nunca por degradado ni scrim. Piso: **≥ 3:1 del trazo contra la foto en el
+   perímetro completo**, medido en los cuatro lados por separado. Arriba y abajo no bastan: el caso que parecía pasar
+   (objeto del set contra pared oscura) **cayó a 1,81:1 al medir los costados** **[medido por la sesión de capa gráfica,
+   2026-09-19]**. Sin este pedido explícito en el prompt, ninguna toma lo cumple: los plates existentes dan 1,0–2,5:1.
+8. **Una voz secundaria tipo cita necesita campo profundo al margen.** No basta una zona calma: la banda debe ser
+   **vertical**, de tono declarado y parejo, arrancar en la zona de texto y **seguir libre hacia abajo hasta al menos el
+   40% del alto**. Todos los plates actuales **cambian de tono antes del 33%** y dan ≤ 1,7:1; el caso aprobado
+   «¿Claude o Codex?» da 10,09:1 ahí **[medido por la sesión de capa gráfica, 2026-09-19]**.
 
 ## 3. Geometría por formato (punto de partida verificado)
 
@@ -45,6 +57,22 @@ encima pertenece a `efeonce-advertising-creative` y a su ficha tipográfica.
 
 Son puntos de partida medidos en esta corrida, **no una retícula aprobada**: la retícula definitiva debe salir de
 una pieza compuesta y aprobada, no de estas pruebas.
+
+## 3.1 Conflicto abierto: perímetro oscuro vs lecho claro **[pendiente — decisión del operador]**
+
+La reserva del **objeto para enmarcar** pide campo oscuro en los cuatro lados. La reserva del **lecho de la firma** pide
+tono declarado en el 16–22% inferior, y en cinco tomas aprobadas del catálogo ese lecho es **claro**: 11 (retrato
+105–135, borde de escritorio claro), 13 (escala, piso de concreto claro), 17 (mesa larga, mesa clara), 18 (por encima del
+hombro, borde de mesa claro) y 19 (picado 60°, mesa de luz clara).
+
+Si el objeto a enmarcar está sobre la mesa y el lecho de la firma es el borde claro de esa misma mesa, **las dos reservas
+piden tonos opuestos en zonas contiguas**. Salidas posibles, ninguna decidida:
+
+- objeto enmarcado en la mitad superior contra campo oscuro, lecho claro abajo con firma en tinta;
+- lecho oscuro y firma en blanco, cediendo el registro claro de esas cinco tomas.
+
+**No generar plates que pidan las dos cosas a la vez hasta que el operador elija.** El prompt saldría con el conflicto
+horneado y el plate no serviría para ninguna de las dos.
 
 ## 4. Qué NO define este documento
 

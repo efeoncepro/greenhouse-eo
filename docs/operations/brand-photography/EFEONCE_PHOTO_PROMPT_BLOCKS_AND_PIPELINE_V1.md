@@ -94,11 +94,17 @@ Se llena **antes** de escribir el prompt. Una ficha = una foto.
 
 ### 3.1 Realismo v2
 
+> ⚠️ **El formato NO va dentro del bloque.** Hasta 2026-09-20 este bloque terminaba con «Vertical 4:5.»
+> hardcodeado, y los prompts **aprobados** de la ronda `texto` NO lo contienen: el formato se declara **sólo**
+> por `--size`, y el porcentaje del lecho cambia por formato (**4:5 → 18%**, **9:16 → 22%**, **16:9 → 16%**,
+> medido en `rondas/texto/bv2-{45,916,169}.json`). Copiar el bloque con la cola vieja mete una instrucción
+> contradictoria en todo 9:16, 16:9 y 1:1. La cola ya fue removida.
+
 Archivo: `prompts/bloque-realismo-v2.txt`. Nace de la regla del operador «una buena imagen de IA es la que no se
 siente que es IA» y de su rechazo a la suciedad **[decisión del operador]**.
 
 ```text
-IT MUST NOT LOOK AI-GENERATED: a real candid documentary photograph taken by a working photographer on a full-frame mirrorless camera with a real lens. Realism comes from PEOPLE, LIGHT AND MATERIALS, not from dirt: visible skin pores, fine wrinkles, uneven skin tone, stray hairs, natural fabric creases, real paper texture, soft dust visible only in a beam of light, slight motion blur on moving hands, subtle natural lens vignetting, a slightly imperfect un-staged composition. The SPACE is clean, cared-for and organized like a premium creative studio: only one or two lived-in details (a mug, a notebook); NO dirt, NO stains, NO coffee rings, NO loose tape scraps, NO tangled cables, NO mess. No plastic skin, no perfect symmetry, no glossy CGI surfaces, no over-sharpening, no HDR, no beauty retouching, no stock-photo smiles. Natural true-to-life color with no color grading; highlights keep detail, shadows open. Latin American people with real, characterful faces. No text, no letters, no numbers, no logos, no watermarks anywhere. Vertical 4:5.
+IT MUST NOT LOOK AI-GENERATED: a real candid documentary photograph taken by a working photographer on a full-frame mirrorless camera with a real lens. Realism comes from PEOPLE, LIGHT AND MATERIALS, not from dirt: visible skin pores, fine wrinkles, uneven skin tone, stray hairs, natural fabric creases, real paper texture, soft dust visible only in a beam of light, slight motion blur on moving hands, subtle natural lens vignetting, a slightly imperfect un-staged composition. The SPACE is clean, cared-for and organized like a premium creative studio: only one or two lived-in details (a mug, a notebook); NO dirt, NO stains, NO coffee rings, NO loose tape scraps, NO tangled cables, NO mess. No plastic skin, no perfect symmetry, no glossy CGI surfaces, no over-sharpening, no HDR, no beauty retouching, no stock-photo smiles. Natural true-to-life color with no color grading; highlights keep detail, shadows open. Latin American people with real, characterful faces. No text, no letters, no numbers, no logos, no watermarks anywhere.
 ```
 
 #### 3.1.1 Variante para personas con referencia (Julio / Nexa)
@@ -189,8 +195,13 @@ Rutas de referencia:
 Plantilla consolidada de las rondas `cruce/`, `curado/`, `palancas/`, `personas/` **[medido: todas las del set
 curado]**. Siempre al final del prompt.
 
+> ⚠️ **`<PCT>` cambia por formato, no es 18% siempre.** Hasta 2026-09-20 esta plantilla tenía «18%» hardcodeado, que
+> es el valor de 4:5. Medido en `rondas/texto/bv2-{45,916,169}.json`: **4:5 → `18%`**, **9:16 → `22%`**,
+> **16:9 → `16%`**. Un lecho de 18% en 16:9 se come la escena; en 9:16 queda corto. Es el mismo bug de clase que
+> «Vertical 4:5.»: un valor de un formato metido dentro de un bloque que se reusa en todos.
+
 ```text
-FOREGROUND (planned): <herramienta o superficie propia de la escena, sin logos ni texto>, so close to the lens that it dissolves into a soft abstract blur with no visible edges or details, spanning the ENTIRE width of the bottom 18% of the frame (never a hard band), <TONO>; its center calm and even.
+FOREGROUND (planned): <herramienta o superficie propia de la escena, sin logos ni texto>, so close to the lens that it dissolves into a soft abstract blur with no visible edges or details, spanning the ENTIRE width of the bottom <PCT> of the frame (never a hard band), <TONO>; its center calm and even.
 ```
 
 | `<TONO>` | Texto verbatim que funcionó |
@@ -204,9 +215,48 @@ all» (`curado/b2.json`, K2b). Sin esto la fila de botellas/latas salió nítida
 sesión]**. Catálogo de lechos por toma: [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) y
 [catálogo](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md).
 
-Excepción dron (todo enfocado): «BOTTOM AREA (planned): the bottom 18% of the frame is a calm, even band of very
+Excepción dron (todo enfocado): «BOTTOM AREA (planned): the bottom <PCT> of the frame is a calm, even band of very
 pale, almost white limestone paving in full sun, seamless with no joints or lines, with nothing on it (no people, no
 shadows, no objects).»
+
+### 3.8.1 SELECTION TARGET (objeto para enmarcar con caja AXIS) **[sin validar — bloque nuevo 2026-09-20]**
+
+Se pide cuando la pieza llevará **caja de selección**. La caja AXIS usa trazo `#a6cdf5` con tiradores blancos:
+**desaparece sobre fondo claro**, y el campo oscuro se consigue por **escenografía**, nunca por degradado ni scrim.
+Piso: **≥ 3:1 del trazo contra la foto en los cuatro lados del perímetro**, medidos por separado. Sin este bloque
+ninguna toma lo cumple: los plates existentes dan 1,0–2,5:1, y el que parecía pasar cayó a 1,81:1 en los costados
+**[medido por la sesión de capa gráfica, 2026-09-19]**.
+
+```text
+SELECTION TARGET (planned): <un solo objeto propio de la escena, sin logos ni texto: la obra en revisión, la pieza terminada, la muestra>, complete and unobstructed, sitting clearly SEPARATED from everything else, with generous empty room on ALL FOUR sides of it. On every side of that object — above, below, left and right — the scene itself is a DEEP, evenly toned dark field (<materia oscura de la escena>), dark enough for a light blue outline to read against it; no bright surface, no window, no lamp, no pale tabletop and no light-coloured object touches or crosses that perimeter.
+```
+
+`<materia oscura de la escena>` es escenografía real, no un fondo abstracto: «a matt ink-blue studio wall in shadow»,
+«dark walnut worktop in shadow», «a black acoustic panel», «the unlit depth of the room behind». Si la toma no admite
+ninguno, **la toma no sirve para enmarcar**: cambiar de toma en vez de forzar el bloque.
+
+**Conflicto con el lecho claro:** en las tomas 11, 13, 17, 18 y 19 el lecho de la firma es claro y contiguo al objeto.
+Ver el conflicto abierto en
+[reserva de espacio §3.1](./EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — **pendiente de decisión del operador**; no
+generar plates que pidan las dos cosas a la vez.
+
+### 3.8.2 MARGIN FIELD (campo profundo para una voz secundaria) **[sin validar — bloque nuevo 2026-09-20]**
+
+Se pide cuando la pieza llevará una **voz secundaria tipo cita** al margen. No basta una zona calma: la banda debe ser
+**vertical**, de tono declarado y parejo, y seguir libre **hasta al menos el 40% del alto**. Todos los plates actuales
+cambian de tono antes del 33% y dan ≤ 1,7:1; el caso aprobado «¿Claude o Codex?» da 10,09:1 ahí **[medido por la
+sesión de capa gráfica, 2026-09-19]**.
+
+```text
+MARGIN FIELD (planned): down the LEFT side of the frame, a continuous vertical band about 30% of the frame width runs unbroken from the top of the frame to BELOW the 40% mark of the frame height. That whole band is one single <TONO> surface of the scene itself (<materia de la escena>), evenly lit and even in tone from top to bottom, with NOTHING crossing it: no person, no furniture edge, no window, no cable, no light beam, no bright highlight and no change of material anywhere inside it.
+```
+
+`<TONO>` usa el mismo vocabulario del §3.8 («DEEP, evenly toned shadow… dark enough for white text» / «VERY LIGHT,
+warm white… light enough for dark text»). El error típico es pedir «calma»: el modelo cambia de material a media
+altura y la banda se corta.
+
+**No compatible** con las tomas 4 (ojo de pez de grupo), 5 (dron cenital), 10 (macro) y 14 (barrido): ninguna tiene
+margen vertical libre. En esas, la voz secundaria va en otra parte o no va.
 
 ### 3.9 Bloques históricos (V2, rechazados como genéricos)
 
