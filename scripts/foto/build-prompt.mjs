@@ -13,7 +13,7 @@
 //
 // Canon: docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md (bloques)
 //        docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md (reservas)
-import { readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -170,11 +170,54 @@ const FICHA_EJEMPLO = {
 }
 
 // ── Armado ───────────────────────────────────────────────────────────────────────────────────────
+// ── Anclas prohibidas: la categoría de un cliente no es el oficio de Efeonce ─────────────────────
+// **[decisión del operador, 2026-09-19]** «nosotros NO somos Berel». Una sesión igual generó, el
+// 2026-09-20, un macro de un rodillo aplicando pintura azul: la regla estaba escrita en los docs y no
+// la ejecutaba nada. Tabla extensible; se agrega sólo lo que el operador declare, nunca por inferencia.
+const ANCLAS_PROHIBIDAS = [
+  {
+    patron: /\b(paint roller|rodillo|fresh paint|wet paint|painting the wall|paint(s|ing)? (a|the) wall)\b/i,
+    porque: 'la pintura es la categoría de Berel, un cliente. La fotografía de Efeonce NUNCA se ancla en el rubro de un cliente'
+  }
+]
+
+// El color de marca es ACENTO, no tema. El bloque de impacto pide «one bold field or object in bright
+// azure blue creates the graphic punch, everything else calm». Cuando la escena convierte el azul en
+// EL objeto —pintura azul, paneles azules, una pantalla azul gigante— sale una masa de color sin
+// materia ni razón: la misma falla de la «losa» con otro disfraz. [2026-09-20]
+const AZUL_COMO_TEMA =
+  /\b(azure-?blue|#0375DB|blue)\s+(paint|panels?|floor|screen|wall|surface|backdrop|installation|grid)\b/i
+
+// Vocabulario con el que una escena declara LUZ y MOMENTO. La ronda que el operador aprobó el 19/09
+// los tiene en el 100% de sus escenas; la tanda de 34 que perdió calidad, en 64% y 26%. No es una
+// medición fuerte —mis propios pilotos aprobados sacan 66/33— así que AVISA, no bloquea. [medido]
+const LUZ = /\b(sun|sunlight|sunbeam|beam|backlit|rim-?lit|lit only|lamp|window light|golden hour|hard light|directional|shaft|raking|silhouett)/i
+const MOMENTO = /\b(mid-|at the peak|throws|laughing|mid-sentence|reaching|turning|just as|the moment|catches)/i
+
+export const auditarEscena = escena => {
+  const avisos = []
+
+  if (!LUZ.test(escena)) avisos.push('no declara la FUENTE DE LUZ ni su calidad (sol duro, contraluz, una sola lámpara…)')
+  if (!MOMENTO.test(escena)) avisos.push('no declara un MOMENTO (algo ocurriendo), y sin momento salen poses de foto de stock')
+  if (AZUL_COMO_TEMA.test(escena)) avisos.push('convierte el AZUL DE MARCA en el objeto principal; el azul es acento, no tema')
+
+  return avisos
+}
+
 export const construirPrompt = ficha => {
   const fmt = FORMATOS[ficha.formato]
 
   if (!fmt) throw new Error(`Formato "${ficha.formato}" desconocido. Usa uno de: ${Object.keys(FORMATOS).join(', ')}.`)
   if (!ficha.escena) throw new Error('La ficha necesita `escena`: el modelo no inventa la escena por vos.')
+
+  const ancla = ANCLAS_PROHIBIDAS.find(a => a.patron.test(ficha.escena))
+
+  if (ancla) {
+    throw new Error(
+      `La escena de "${ficha.id ?? 'esta ficha'}" usa un ancla prohibida: ${ancla.porque}. ` +
+        `Cambia la materia de la escena; esto no se corrige regenerando.`
+    )
+  }
 
   if (!ficha.lecho?.objeto || !ficha.lecho?.tono) {
     throw new Error('La ficha necesita `lecho.objeto` y `lecho.tono`. La firma SIEMPRE necesita su lecho: no es opcional.')
@@ -250,6 +293,36 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
   const size = [...sizes][0]
   const i = args.indexOf('--batch')
 
+  // ── Tope de tanda sin piloto ───────────────────────────────────────────────────────────────────
+  // La calidad no vino nunca de un prompt mejor: vino de generar poco y MIRAR cada plate. Con 34 de
+  // una sola vez nadie mira ninguna —se mira una hoja de contacto, que es donde una cara de stock o
+  // un fondo plano pasan desapercibidos—. El canon ya decía «piloto antes de la tanda» y se saltó,
+  // costando 34 planchas sin dirección fotográfica. Acá deja de ser un consejo. [2026-09-20]
+  const TOPE_SIN_PILOTO = 6
+
+  if (fichas.length > TOPE_SIN_PILOTO) {
+    const sinPiloto = resueltas
+      .map(r => r.ficha)
+      .filter(f => !f.piloto || !existsSync(path.resolve(path.dirname(fichaPath), f.piloto)))
+
+    if (sinPiloto.length) {
+      throw new Error(
+        `Tanda de ${fichas.length} fichas (tope sin piloto: ${TOPE_SIN_PILOTO}) y ${sinPiloto.length} no declaran un piloto ya generado: ` +
+          `${sinPiloto.map(f => f.id ?? '<sin id>').join(', ')}.\n` +
+          `Cada ficha necesita \`piloto: "<ruta a un plate de esa misma ficha>"\` que exista en disco.\n` +
+          `Por qué: la calidad sale de mirar cada plate, y con más de ${TOPE_SIN_PILOTO} nadie mira ninguna. ` +
+          `Genera primero unas pocas, míralas, y recién entonces la tanda.`
+      )
+    }
+  }
+
+  // Aviso de escena (no bloquea): luz, momento y azul como tema.
+  for (const { ficha } of resueltas) {
+    const avisos = auditarEscena(ficha.escena)
+
+    for (const a of avisos) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: la escena ${a}`)
+  }
+
   if (i >= 0) {
     const out = args[i + 1]
     const batch = resueltas.map(r => ({ filename: `${r.ficha.id}-plate.png`, prompt: r.prompt }))
@@ -260,6 +333,14 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
   } else {
     for (const r of resueltas) console.log(`${r.prompt}\n\n─── size: ${r.size} ───\n`)
   }
+
+  // Las piezas que el operador aprobó son el estándar, y hoy ninguna sesión las tiene delante al
+  // armar. Recordarlas cuesta dos líneas y evita reconstruir de memoria lo que ya existe medido.
+  console.log(
+    '\n  Antes de gastar, mirá el estándar aprobado:\n' +
+      '    ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/texto/  (la ronda que el operador aprobó)\n' +
+      '    ai-generations/2026-09-20_piloto-reservas/rondas/p1/                  (piloto de las reservas nuevas)'
+  )
 
   if (resueltas.some(r => r.sinValidar)) {
     console.log('⚠ El formato 1:1 no tiene ronda validada: sus números son criterio, no medición.')

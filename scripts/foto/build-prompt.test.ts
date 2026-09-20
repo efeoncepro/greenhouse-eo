@@ -8,7 +8,7 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 // @ts-expect-error -- .mjs sin tipos, a propósito: es una herramienta de corrida, no código de producto.
-import { construirPrompt, detectarValorDeFormato } from './build-prompt.mjs'
+import { auditarEscena, construirPrompt, detectarValorDeFormato } from './build-prompt.mjs'
 
 const raiz = path.resolve(__dirname, '../..')
 const BLOQUES = path.join(raiz, 'scripts/foto/bloques')
@@ -156,5 +156,44 @@ describe('foto:prompt · la materia de la superficie no es opcional', () => {
     const { prompt } = construirPrompt(conMargen('the bare pale polished concrete wall of the gallery'))
 
     expect(prompt).toContain('the bare pale polished concrete wall of the gallery')
+  })
+})
+
+describe('foto:prompt · anclas prohibidas y auditoría de escena', () => {
+  // La regla «nosotros NO somos Berel» estaba escrita en los docs desde el 19/09 y una sesión igual
+  // generó un macro de un rodillo de pintura el 20/09. Un doc no impide nada; esto sí.
+  it('aborta con el ancla real que se coló (rodillo de pintura)', () => {
+    expect(() =>
+      construirPrompt({
+        ...fichaBase,
+        escena:
+          'SCENE (craft macro): extreme macro of a paint roller at the exact moment it lays fresh, glossy azure-blue paint over a clean white wall.'
+      })
+    ).toThrow(/ancla prohibida.*categoría de Berel/s)
+  })
+
+  it('no dispara con una escena legítima del oficio', () => {
+    expect(() => construirPrompt(fichaBase)).not.toThrow()
+  })
+
+  // Avisos, no bloqueos: la medición es débil (la ronda aprobada da 100/100, mis pilotos aprobados
+  // 66/33), así que bloquear por esto tiraría trabajo bueno.
+  it('avisa cuando la escena no declara luz ni momento', () => {
+    expect(auditarEscena('SCENE: a table with papers and two people sitting.')).toEqual([
+      expect.stringContaining('FUENTE DE LUZ'),
+      expect.stringContaining('MOMENTO')
+    ])
+  })
+
+  it('avisa cuando el azul de marca es el tema y no el acento', () => {
+    expect(
+      auditarEscena('SCENE: a grid of large azure-blue floor panels forming a geometric installation at midday sun, people mid-stride.')
+    ).toEqual([expect.stringContaining('AZUL DE MARCA')])
+  })
+
+  it('no avisa sobre una escena que sí declara luz y momento', () => {
+    expect(
+      auditarEscena('SCENE: a single hard shaft of low sun crosses the room as she throws the proof onto the table mid-sentence.')
+    ).toEqual([])
   })
 })

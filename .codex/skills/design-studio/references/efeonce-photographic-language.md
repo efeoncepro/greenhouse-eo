@@ -204,6 +204,28 @@ todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `
 **NUNCA armes un prompt de foto de marca concatenando bloques a mano.** Esa es la vía por la que «Vertical 4:5.»
 vivió dentro del bloque de realismo sin que nadie lo viera, y habría contaminado todo plate no-4:5.
 
+## Tres guardas nuevas del 2026-09-20 (por qué se perdió calidad)
+
+Una tanda de 34 planchas salió **sin dirección fotográfica**: el armador de esa sesión nunca incluyó el bloque de
+impacto. Medido sobre sus escenas contra la ronda que el operador aprobó: luz 64% vs **100%**, momento 26% vs
+**100%**, y **planos de profundidad 0% vs 40%**. La planitud viene de ahí — el bloque de impacto es el que pide
+«THREE distinct depth planes» y «rich but detailed darks, never flat, never evenly lit».
+
+- **Tope de tanda:** más de **6 fichas** exige que cada una declare `piloto: "<ruta a un plate ya generado>"` que
+  exista en disco. **La calidad nunca vino de un prompt mejor: vino de generar poco y MIRAR cada plate.** Con 34 de
+  una sola vez nadie mira ninguna; se mira una hoja de contacto, que es donde una cara de stock o un fondo plano
+  pasan desapercibidos.
+- **Anclas de categoría de cliente:** hoy **pintura**. **[decisión del operador]** «nosotros NO somos Berel». La
+  regla estaba escrita desde el 19/09 y una sesión generó igual un macro de un rodillo aplicando pintura azul.
+  **Un doc no impide nada; un comando que aborta, sí.** Se amplía sólo con lo que el operador declare.
+- **Avisos que no bloquean:** escena sin **fuente de luz**, sin **momento**, o con el **azul de marca como tema**
+  en vez de acento. El bloque de impacto pide «one bold field or object in bright azure blue… everything else
+  calm»: cuando la escena hace del azul EL objeto —pintura azul, paneles azules, pantalla azul— sale una masa de
+  color sin materia ni razón, la misma falla de la losa con otro disfraz.
+
+El comando además imprime, antes de cada batch, la ruta de **las piezas aprobadas**: son el estándar y ninguna
+sesión las tenía delante al armar.
+
 ## Lo que se corrigió el 2026-09-20 (leer antes de citar un número)
 
 - **El tono nunca fue el problema; la materia lo es** **[decisión del operador]**. Una reserva **oscura está

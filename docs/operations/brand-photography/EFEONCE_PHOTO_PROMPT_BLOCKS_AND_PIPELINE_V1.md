@@ -398,6 +398,19 @@ Cinco cosas que el comando **impide**, todas verificadas:
 3. Mezclar formatos en un batch → **aborta**: `pnpm ai:image --batch` toma un solo `--size`.
 4. Olvidar el lecho o la escena → **aborta**.
 5. Escribir el JSON con `echo` y romper comillas → no aplica: lo escribe el comando.
+6. **Una tanda de más de 6 fichas sin piloto** → **aborta**. Cada ficha necesita `piloto: "<ruta a un plate ya
+   generado de esa misma ficha>"` que exista en disco. La calidad nunca vino de un prompt mejor: vino de generar
+   poco y **mirar cada plate**. Con 34 de una sola vez nadie mira ninguna —se mira una hoja de contacto, que es
+   donde una cara de stock o un fondo plano pasan desapercibidos— y eso costó 34 planchas sin dirección
+   fotográfica el 2026-09-20.
+7. **Un ancla de categoría de cliente** (hoy: pintura) → **aborta**. **[decisión del operador]** «nosotros NO somos
+   Berel». La regla estaba escrita desde el 19/09 y una sesión generó igual un macro de un rodillo de pintura: un
+   doc no impide nada. La tabla es extensible y se amplía **sólo** con lo que el operador declare.
+
+Y dos **avisos** que no bloquean, porque la medición es débil: si la escena no declara **fuente de luz** o
+**momento**, y si convierte el **azul de marca en el tema** en vez de acento. La ronda que el operador aprobó
+declara luz y momento en el **100%** de sus escenas; la tanda que perdió calidad, en 64% y 26%, con **0% de planos
+de profundidad** **[medido]**.
 
 El comando imprime al final el `pnpm ai:image` exacto con el `--size` que corresponde. **`1:1` no tiene ronda
 validada** y el comando lo advierte: sus números son criterio, no medición.
