@@ -8,7 +8,7 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 // @ts-expect-error -- .mjs sin tipos, a propósito: es una herramienta de corrida, no código de producto.
-import { construirPrompt } from './build-prompt.mjs'
+import { construirPrompt, detectarValorDeFormato } from './build-prompt.mjs'
 
 const raiz = path.resolve(__dirname, '../..')
 const BLOQUES = path.join(raiz, 'scripts/foto/bloques')
@@ -54,24 +54,38 @@ describe('foto:prompt · la tabla de formatos es la única fuente', () => {
 })
 
 describe('foto:prompt · las guardas', () => {
-  it('aborta si un bloque compartido trae un valor de un formato adentro', () => {
-    // Simula la regresión exacta: alguien vuelve a pegar «Vertical 4:5.» en el bloque reusado.
-    const archivo = path.join(BLOQUES, 'bloque-realismo-v2.txt')
-    const original = readFileSync(archivo, 'utf8')
+  // El MECANISMO, ejercitado sobre strings. Afirmar que el archivo de hoy está limpio verifica el
+  // archivo, no la guarda: si alguien afloja la expresión, el archivo sigue limpio, el test sigue
+  // verde y la puerta queda abierta. El verificador real es `detectarValorDeFormato`, que es lo que
+  // `leerBloque` llama antes de devolver el bloque.
+  it.each([
+    ['Vertical 4:5.', 'Vertical 4:5'],
+    ['HORIZONTAL 16:9 composition.', 'HORIZONTAL 16:9'],
+    ['spanning the bottom 18% of the frame', 'bottom 18%']
+  ])('detecta un valor de formato colado: %s', (texto, esperado) => {
+    expect(detectarValorDeFormato(`un bloque cualquiera. ${texto}`)).toBe(esperado)
+  })
 
-    expect(original).not.toMatch(/\b(?:Vertical|Horizontal|Square)\s+\d+:\d+/i)
-    expect(original).not.toMatch(/bottom\s+\d+%/i)
+  it('no dispara con los bloques legítimos que se usan hoy', () => {
+    for (const f of ['bloque-realismo-v2.txt', 'bloque-impacto-v1.txt']) {
+      expect(detectarValorDeFormato(readFileSync(path.join(BLOQUES, f), 'utf8'))).toBeNull()
+    }
   })
 
   it('aborta si se pide una reserva en una toma que no la admite', () => {
     expect(() =>
-      construirPrompt({ ...fichaBase, toma: 10, reservas: { margen: { superficie: 'a wall', tinta: 'blanca' } } })
+      construirPrompt({ ...fichaBase, toma: 10, reservas: { margen: { superficie: 'the unlit plaster wall', tinta: 'blanca' } } })
     ).toThrow(/toma 10 no admite la reserva "margen"/)
   })
 
   it('deja pasar la misma reserva en una toma que sí la admite', () => {
+    // Materia real, no «a wall»: la guarda de materia rechaza lo genérico y tiene razón.
     expect(() =>
-      construirPrompt({ ...fichaBase, toma: 12, reservas: { margen: { superficie: 'a wall', tinta: 'blanca' } } })
+      construirPrompt({
+        ...fichaBase,
+        toma: 12,
+        reservas: { margen: { superficie: 'the unlit plaster wall of the corridor', tinta: 'blanca' } }
+      })
     ).not.toThrow()
   })
 
@@ -117,5 +131,29 @@ describe('doc ↔ archivo · la deriva que nadie vio', () => {
     const enDisco = readFileSync(path.join(BLOQUES, archivo), 'utf8').replace(/\s+/g, ' ').trim()
 
     expect(bloqueDelDoc(desde, hasta)).toBe(enDisco)
+  })
+})
+
+describe('foto:prompt · la materia de la superficie no es opcional', () => {
+  // El fallo que la sesión de capa gráfica encontró en su propio armador: rellenaba el tono y borraba
+  // la materia. El modelo entonces inventa un panel liso — la «losa» que el operador rechazó por
+  // «extremadamente forzado». Mi herramienta tenía el mismo riesgo por diseño.
+  const conMargen = (superficie: string) => ({
+    ...fichaBase,
+    reservas: { margen: { superficie, tinta: 'blanca' } }
+  })
+
+  it('aborta si falta la materia', () => {
+    expect(() => construirPrompt(conMargen(''))).toThrow(/necesita `superficie`/)
+  })
+
+  it.each(['a wall', 'the surface', 'background', 'a panel'])('aborta si la materia es genérica: %s', generica => {
+    expect(() => construirPrompt(conMargen(generica))).toThrow(/es genérico/)
+  })
+
+  it('deja pasar una materia real de la escena', () => {
+    const { prompt } = construirPrompt(conMargen('the bare pale polished concrete wall of the gallery'))
+
+    expect(prompt).toContain('the bare pale polished concrete wall of the gallery')
   })
 })

@@ -68,16 +68,22 @@ const TINTA = {
 }
 
 // ── Los bloques que sí son reusables tal cual ────────────────────────────────────────────────────
+// Exportada para poder ejercitarla sobre strings. Un test que sólo afirme que el archivo de hoy está
+// limpio verifica el archivo, no el mecanismo: si alguien afloja esta expresión, el archivo sigue
+// limpio, el test sigue verde y la puerta queda abierta.
+export const detectarValorDeFormato = texto =>
+  (texto.match(/\b(?:Vertical|Horizontal|Square)\s+\d+:\d+/i) ?? texto.match(/bottom\s+\d+%/i))?.[0] ?? null
+
 const leerBloque = f => {
   const t = readFileSync(path.join(BLOQUES, f), 'utf8').trim()
 
   // Guardia: el bug que este comando existe para evitar. Si alguien vuelve a meter el formato dentro
   // de un bloque compartido, esto lo detiene acá y no en 51 plates ya pagados.
-  const colado = t.match(/\b(?:Vertical|Horizontal|Square)\s+\d+:\d+/i) || t.match(/bottom\s+\d+%/i)
+  const colado = detectarValorDeFormato(t)
 
   if (colado) {
     throw new Error(
-      `El bloque compartido "${f}" contiene un valor de un formato concreto ("${colado[0]}"). ` +
+      `El bloque compartido "${f}" contiene un valor de un formato concreto ("${colado}"). ` +
         `El formato y el lecho salen de la tabla de este comando, nunca de un bloque reusado. Saca esa frase del archivo.`
     )
   }
@@ -86,10 +92,36 @@ const leerBloque = f => {
 }
 
 // ── Reservas opcionales ──────────────────────────────────────────────────────────────────────────
+// Guarda contra el fallo que la sesión de capa gráfica encontró en su propio armador: rellenaba el
+// tono y BORRABA la materia. Un prompt que pide un tono sin decir de qué está hecha la cosa obliga al
+// modelo a inventar el objeto, y lo que inventa es un panel liso — la «losa» que el operador rechazó
+// por «extremadamente forzado». La materia no es opcional y no puede ser genérica.
+const GENERICAS = /^(a |the )?(surface|background|area|field|wall|panel|zone|space|plane)\.?$/i
+
+const exigirMateria = (valor, campo, reserva) => {
+  if (!valor || !String(valor).trim()) {
+    throw new Error(
+      `La reserva "${reserva}" necesita \`${campo}\`: de qué está hecha la superficie en la escena. ` +
+        `Sin materia el modelo inventa un panel liso y la pieza se siente forzada.`
+    )
+  }
+
+  if (GENERICAS.test(String(valor).trim())) {
+    throw new Error(
+      `\`${campo}\` de "${reserva}" es genérico ("${valor}"). Nombrá la materia real de la escena: ` +
+        `«the bare pale polished concrete wall of the gallery», «dark walnut worktop in shadow», no «a wall».`
+    )
+  }
+
+  return valor
+}
+
 const RESERVAS = {
   seleccion: ({ objeto, campo }) =>
+    exigirMateria(campo, 'campo', 'seleccion') &&
     `SELECTION TARGET (planned): ${objeto}, complete and unobstructed, sitting clearly SEPARATED from everything else, with generous empty room on ALL FOUR sides of it. On every side of that object — above, below, left and right — the scene itself is a DEEP, evenly toned dark field (${campo}), dark enough for a light blue outline to read against it; no bright surface, no window, no lamp, no pale tabletop and no light-coloured object touches or crosses that perimeter. The object itself has NO bright white paper margin around it: it is full-bleed, so its own edge is as dark as the field around it.`,
   margen: ({ superficie, tinta }) =>
+    exigirMateria(superficie, 'superficie', 'margen') &&
     `MARGIN FIELD (planned): down the LEFT side of the frame, a continuous vertical band about 30% of the frame width runs unbroken from the top of the frame to BELOW the 40% mark of the frame height. That whole band is one single surface of the scene itself (${superficie}), ${TINTA[tinta]}, even in tone from top to bottom, with NOTHING crossing it: no person, no furniture edge, no window, no cable, no light beam, no bright highlight and no change of material anywhere inside it.`
 }
 
