@@ -388,6 +388,26 @@ decisión en vez de accidente.
 | B5 | `oclusion` (85 mm) | 5,40:1 | **Floja:** el objeto no cubrió al sujeto |
 | B6 | `pov` + `luz-motivada` | 17,84:1 | **Se diluyen**: origen de la regla 1 |
 
+### 3.11 Contenido generado dentro de la obra — la regla de las dos ramas **[2026-09-20]**
+
+El canon prohíbe **texto y logos generados**. Falta una zona gris que apareció al medir `A4` (journey dibujado
+sobre un vidrio): el modelo no escribió **ni una letra ni un número** —se verificó al zoom— pero dibujó **un
+diagrama de tres nodos con flechas**, nítido y perfectamente legible como una secuencia.
+
+No dice nada falso porque no dice nada. Pero **tampoco dice lo que Efeonce diría**, y al estar enfocado invita a
+leerlo. La regla depende de **qué papel cumple ese contenido en la pieza**:
+
+| Rama | Cuándo | Qué se pide |
+|---|---|---|
+| **Textura** | La escena necesita que alguien esté dibujando/escribiendo, pero **qué** da igual | Marcas **abstractas y explícitamente fuera del plano de foco**: trazos sueltos, nunca flechas con dirección, nunca nodos en secuencia, nunca nada que sugiera un orden legible |
+| **Obra** | El contenido **es el mensaje** de la pieza (el journey, el dato, la pantalla) | La superficie se pide **vacía o en chroma** y el arte real se **compone después**. Es el método de pantallas por curación aplicado a vidrio, papel o pizarra |
+
+**Gate, en las dos ramas:** zoom al 100% antes de aprobar, buscando letras, números **y flechas con semántica**.
+Un diagrama sin texto sigue siendo contenido informativo inventado.
+
+**Criterio de decisión rápido:** si un espectador podría citar lo que ve, es obra y se compone. Si sólo percibe
+que «ahí hay trabajo», es textura y va abstracta y desenfocada.
+
 ### 3.8.0 Dónde va la luz y dónde va la reserva **[medido 2026-09-20]**
 
 > **La luz con carácter va sobre el SUJETO; la reserva vive en la sombra pareja que esa luz deja, nunca en su
