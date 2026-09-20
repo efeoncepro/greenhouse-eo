@@ -154,6 +154,18 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
 - La fotografía de marca propia Efeonce sigue el
   [lenguaje fotográfico](../design-studio/references/efeonce-photographic-language.md): la firma sobre el lecho
   desenfocado usa el SVG oficial **compuesto** (15% del ancho, contraste ≥ 4,5:1 medido), **nunca generado**.
+- **La frontera con la toma (2026-09-20).** Lo que la **foto** debe reservar son **seis reservas** —zona de texto,
+  objeto para enmarcar, lecho de la firma, aire para cursores, campo profundo al margen y **lecho por formato**
+  (**[medido]**: 4:5 **18%** · 9:16 **22%** · 16:9 **16%** · 1:1 **18%**, este último *sin validar*)— y **no se piden
+  a mano**: se emiten con `pnpm foto:prompt <ficha.json>` y se miden con `pnpm foto:validar <plate.png>`. Canon:
+  [reserva de espacio en el plate](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md).
+  La **capa de composición gráfica** encima de la foto —tipografía, jerarquía, cursores— sigue siendo canon **de esta
+  skill** y **NO está aprobada**; los ejemplos de la carpeta de fotografía no la aprueban.
+- **Una reserva sin materia es el DON’T, en cualquier tono** (**[decisión del operador, 2026-09-20]**). Una zona
+  oscura está perfecta cuando la superficie oscura existe de verdad y **tiene nombre**; el error es decidir el tono por
+  regla global, clara u oscura. El detector de la «losa» está en la **entrada** —la guarda de materia de `foto:prompt`,
+  que rechaza «a wall» o «the surface»—, **no en una métrica**: planitud, canto y calma no distinguen la versión
+  rechazada de la buena, porque la diferencia es **semántica**.
 - No uses rectángulos decorativos detrás de palabras como solución automática. Un plate existe para asegurar
   contraste y debe responder a la composición, no parecer una etiqueta accidental.
 - No conviertas un ejemplo aprobado en regla universal ni un mockup didáctico en campaña publicada.

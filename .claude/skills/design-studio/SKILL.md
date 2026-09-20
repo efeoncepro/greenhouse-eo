@@ -285,3 +285,11 @@ Para fotografía o imagen fotorrealista de **la marca Efeonce** (no de clientes)
 WB sin grade, catálogo de tomas y checklist QA. **NUNCA** anclar la serie en la categoría de un cliente real.
 El [documento maestro](../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) conserva el
 contrato completo; la producción del pixel sigue en `greenhouse-ai-image-generator`.
+
+La toma se prepara y se valida con tres comandos, **nunca concatenando bloques a mano**: `pnpm foto:doctor` (¿esta
+máquina puede generar? seis chequeos que ejercitan la cadena, sin costo), `pnpm foto:prompt <ficha.json>` (arma el
+prompt desde una ficha de toma; formato, % del lecho y límite de sujetos salen de UNA tabla) y
+`pnpm foto:validar <plate.png>` (mide las **seis** reservas sobre el plate limpio). Canon de las reservas:
+[reserva de espacio en el plate](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md).
+La **capa de composición gráfica** sobre la foto (tipografía, jerarquía, cursores) **no está aprobada** y su canon es
+`efeonce-advertising-creative`, no los ejemplos de la carpeta de fotografía.

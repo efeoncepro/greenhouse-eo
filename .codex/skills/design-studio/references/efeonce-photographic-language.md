@@ -188,7 +188,11 @@ Costo observado ≈ USD 0,05 por imagen high 1152×1440 (xhigh ≈ 0,09). Bloque
 **Pendientes:** espacio para texto (pedido del operador, no trabajado), formatos 9:16 y 16:9, firma en tomas
 todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `xhigh` con equipo real.
 
-## Los dos comandos canónicos (2026-09-20)
+## Los TRES comandos canónicos (2026-09-20)
+
+- **`pnpm foto:doctor`** — ¿esta máquina puede generar? Ejercita la cadena entera (bloques, sharp, ADC, secreto,
+  clave aceptada por OpenAI vía `/v1/models`, **sin costo**). La clave nunca se imprime. Sale 1 si algo bloquea.
+
 
 - **`pnpm foto:prompt <ficha.json> [--batch <out.json>]`** — arma el prompt desde una ficha de toma. El formato,
   el porcentaje del lecho y el límite de sujetos salen de **una tabla**, no de un bloque copiado. Aborta si un
@@ -199,6 +203,30 @@ todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `
 
 **NUNCA armes un prompt de foto de marca concatenando bloques a mano.** Esa es la vía por la que «Vertical 4:5.»
 vivió dentro del bloque de realismo sin que nadie lo viera, y habría contaminado todo plate no-4:5.
+
+## Lo que se corrigió el 2026-09-20 (leer antes de citar un número)
+
+- **El tono nunca fue el problema; la materia lo es** **[decisión del operador]**. Una reserva **oscura está
+  perfecta** cuando la superficie oscura **existe y tiene nombre**. Lo prohibido es la reserva **sin materia**, en
+  cualquier tono: un prompt que pide un tono sin decir de qué está hecha la cosa obliga al modelo a inventar el
+  objeto, y lo que inventa es un panel liso flotando — la «losa» que el operador rechazó por «extremadamente
+  forzado». **NUNCA** decidas el tono por regla global («todo oscuro», «todo claro»): lo decide la escena.
+- **Ninguna métrica de píxel detecta la losa.** Planitud, dureza de canto y calma en L\* fallan las tres; la versión
+  buena tenía el canto **el doble de duro** que la rechazada. La diferencia es **semántica**. El detector está en la
+  **entrada**: `pnpm foto:prompt` aborta si la materia falta o es genérica.
+- **La calma se mide en L\*, no en luminancia lineal** **[medido]**. En Y la misma textura salta ~15× más arriba de
+  la escala, así que el umbral **premiaba la oscuridad**: la losa pasaba con 12× de margen y un muro pálido liso
+  reprobaba. `CALMA_MAX = 0.5`, de medir los dos extremos (pasa 0,18–0,29; reprueba 0,89–2,44).
+- **El chequeo del lecho es señal débil** **[frágil]**. Ni Y ni L\* miden desenfoque de forma confiable; la prueba
+  real del lecho sigue siendo **mirar el plate**. Medirlo bien está **[pendiente]**.
+- **Retirada la regla del lecho de §3.8.3** **[refutado]**: decía, como medida, que el lecho falla sin la frase «so
+  close to the lens». El prompt de esa corrida nunca se versionó, todos los prompts que sobreviven la llevan, y las
+  franjas miden igual: lo que separaba los números era el **formato**. El comando la emite igual como **precaución
+  declarada**; **NUNCA** la cites como evidencia de causa.
+- **Lecho por formato** **[medido]**: 4:5 18% · 9:16 22% · 16:9 16% · 1:1 18% *(sin validar)*.
+- **Reservas: seis, no cuatro.** Se sumaron «campo profundo al margen» (banda vertical continua ≥ 0,40 del alto;
+  el piloto da **0,60**) y «lecho por formato». La caja de selección necesita **padding**: pegada al objeto da
+  1,02:1, con 0,02 pasa a 3,29:1 y con 0,04 vuelve a caer. **Hay punto dulce, no monotonía** **[medido]**.
 
 ## Espacio para texto y formatos (2026-09-19)
 

@@ -7,6 +7,33 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-20 — Fotografía de marca: tres comandos, seis reservas y el umbral de calma en L*
+
+El prompt de una toma ya no se concatena a mano: `pnpm foto:prompt` lo arma desde una ficha y resuelve formato, % del
+lecho y límite de sujetos desde **una sola tabla** — armarlo a mano fue la vía por la que «Vertical 4:5.» vivió dentro
+del bloque de realismo compartido sin que nadie lo viera. `pnpm foto:validar` evalúa las seis reservas sobre el plate
+limpio (zona de texto y objeto opt-in, en fracciones) y `pnpm foto:doctor` dice si la máquina puede generar, con seis
+chequeos que ejercitan la cadena hasta la clave, sin costo y sin imprimirla; 27 tests cubren las guardas, incluida la de
+materia de la superficie. Las reservas pasaron de cuatro a seis, con lecho por formato **[medido]** (4:5 18% · 9:16 22%
+· 16:9 16% · 1:1 18% sin validar) y campo profundo al margen.
+
+El piloto de 3 plates (USD 0,142) midió las dos nuevas: la banda del margen llega a **0,60** del alto cuando se pide, y
+el recuadro de selección tiene punto dulce de padding (0,02 → 3,29:1; 0,00 y 0,04 fallan), no monotonía. El umbral de
+calma se corrigió a **L\***: en luminancia lineal premiaba la oscuridad y la «losa» rechazada pasaba con 12× de margen;
+`CALMA_MAX` mide calma y **no** detecta la losa —una losa es calma—, que se ataca en la entrada con la guarda de materia.
+Se retiró §3.8.3 **[refutado]**: el prompt que supuestamente no la llevaba nunca se versionó y las dos franjas miden
+igual; lo que separaba los números era el formato. **[decisión del operador]** el tono nunca fue el problema —una reserva
+oscura está perfecta si la superficie existe de verdad y tiene nombre; lo prohibido es la reserva sin materia, en
+cualquier tono—. La capa de composición gráfica sobre la foto sigue **sin aprobar**.
+[Bitácora](docs/operations/social/2026-09-19-efeonce-photographic-language-production-method.md).
+
+## 2026-09-19 — Berel: QA visual de comentarios en Frame.io
+
+Los comentarios del share de octubre se clasificaron entre errores comprobables, ajustes visuales,
+preferencias con motivo, observaciones incompletas y aprobaciones. La skill Berel en ambos espejos y el
+Playbook/Aprendizajes de Notion incorporan gates de color, producto, legibilidad, función editorial y canal.
+Sin masters editables, no se modificaron artes, versiones, estados ni publicación.
+
 ## 2026-09-19 — ISSUE-175: recuperado keyword discovery de DataForSEO
 
 Restaurado el login ausente del worker compartido sin cambiar imagen ni otras env vars. Canary real
@@ -667,24 +694,3 @@ fuentes; pone el pie institucional en todas las páginas, incluida la portada; c
 y falla si alguna hoja desborda. `report-studio` y el estándar de marca de informes incorporan el patrón de hojas
 fijas, el QA de respaldo con poppler cuando falta PyMuPDF y las reglas para documentos internos. Sin cambios de
 runtime.
-
-## 2026-09-11 — EPIC-047: portafolio de landings del sitio público con orden de prioridad
-
-Las landings pendientes dejan de colgar de EPIC-019 (control plane técnico) y pasan a `EPIC-047`, que fija su orden
-de ejecución en el campo `Rank` de cada task. Se cierran por decisión del operador TASK-1799 (Content Marketing),
-TASK-1358 (Home), TASK-1351 (Redes Sociales) y TASK-1352 (Pillar HubSpot), publicadas e indexables; sus criterios de QA sin verificar quedan
-registrados. TASK-1402 y TASK-1404 salen del ranking de landings porque son artículos del hub HubSpot. ASO sube al segundo lugar por el pitch activo con Berel. Sin cambios de
-código ni de runtime público.
-
-## 2026-09-11 — Panel competitivo AEO multi-marca: primer caso real (SKY) y método documentado
-
-El AI Visibility Grader se corrió sobre SKY y cuatro competidores (LATAM, JetSMART, Avianca, Gol) en Chile con un
-set curado de 12 preguntas idéntico para todos, el mismo día y los mismos 5 motores (`EO-GRUN-00050`…`00054`).
-Resultado: LATAM 81,1 · JetSMART 72,7 · SKY 70,6 · Avianca 41,5 · Gol 37,3; informes web y PDF entregados y usados como
-paso de venta fuera de la licitación SEO. Sin cambios de código ni flags: perfiles y set creados con funciones de
-dominio y aprobaciones de revisión firmadas por el operador.
-
-Se documenta el método en tres capas (manual comercial, doc funcional, runbook del grader con § "Panel competitivo
-multi-marca", Delta de arquitectura) y en las skills `seo-aeo-practice` (módulo de la cuña, plantilla de correo,
-estado actual) y `seo-aeo` (overlay operativo del grader). Quedan registrados tres defectos medidos del grader, sin
-task todavía, y la capacidad gobernada del panel en `TASK-1861` Delta (d).

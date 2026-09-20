@@ -215,7 +215,7 @@ rechaza marcas y personas reales **después de cobrar**.
 - **`--batch` + `--out` (corregido 2026-09-19):** antes `--out` se ignoraba en silencio en modo lote y todo caía en
   `public/images/generated` (dentro del repo). Ahora `--out <dir>` sin extensión es el directorio del lote; con
   extensión de imagen, o junto a `--concept` o a un `--out-dir` distinto, aborta antes de gastar
-  (`scripts/ai/resolve-output-dir.ts`).
+  (`scripts/ai/resolve-output-dir.ts`, con 7 tests).
 - **Sigue abierto:** `ai:image` ignora `--input-fidelity` con 2.5 o 2 en silencio, no hay `--moderation` y la salida
   por defecto es `public/images/generated` (usa `--out` hacia `ai-generations/` o scratchpad). `ai:fal`: `--size`/
   `--count` de imagen sin validar; número de capas de layerize y si la base se cobra: sin dato; la API de pricing
@@ -608,14 +608,39 @@ Lenguaje aprobado el 2026-09-19. **Dirección** (idea, barra, firma, color, toma
 [bloques y pipeline](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md). Aquí sólo
 lo que toca a la mano:
 
+**El prompt NO se arma a mano.** Tres comandos, con 27 tests en `scripts/foto/build-prompt.test.ts`:
+
+- `pnpm foto:doctor` — ¿esta máquina puede generar? Seis chequeos que **ejercitan la cadena**: bloques presentes y sin
+  contaminar · sharp · ADC de gcloud (pide un token real) · referencia al secreto · el secreto resolviendo · la clave
+  aceptada por OpenAI vía `/v1/models`, **sin costo**. La clave nunca se imprime y sale 1 si algo bloquea. Verificado en
+  los dos sentidos: con ADC vencida señaló el comando exacto, tras renovarla pasaron los seis, y quitando un bloque sale 1.
+- `pnpm foto:prompt <ficha.json> [--batch <out>]` — arma el prompt desde una ficha de toma: **el formato, el % del lecho
+  y el límite de sujetos salen de UNA tabla**. `--ficha-ejemplo` imprime la plantilla; la salida trae el `ai:image` exacto
+  con su `--size`. Los bloques viven en **`scripts/foto/bloques/`**, no en una carpeta de corrida fechada. Guardas
+  probadas: bloque compartido con un valor de formato adentro · reserva pedida en una toma que no la admite · batch que
+  mezcla formatos · falta el lecho o la escena · **materia de la superficie ausente o genérica** («a wall», «the surface»).
+- `pnpm foto:validar <plate.png> [--zona-texto] [--objeto x0,y0,x1,y1] [--padding-x/-y]` — valida las **seis** reservas
+  sobre el plate limpio y sale 1 si una reserva **evaluada** falla. `--zona-texto` y `--objeto` son **opt-in**; las
+  coordenadas van en **fracciones** (0–1), nunca píxeles.
+
+**NUNCA armar un prompt de foto de marca concatenando bloques a mano.** Es la vía por la que «Vertical 4:5.» vivió
+dentro del bloque de realismo compartido y «bottom 18%» dentro de la plantilla del lecho, sin que nadie los viera.
+
+`foto:prompt` y `foto:validar` **no necesitan credencial**: se puede preparar y validar una tanda entera sin acceso. Lo
+único que no viaja con el repo es `.env.local` con `OPENAI_API_KEY_SECRET_REF="greenhouse-openai-api-key"` (el **nombre**
+del secreto, nunca la clave cruda) + ADC de gcloud vigentes (`pnpm gcloud:auth:playwright -- --force`); `foto:doctor` lo
+diagnostica sin costo.
+
 - **Modelo:** `gpt-image-2.5-flare` `high` 1152×1440 para explorar; `gpt-image-2.5-sunburst` cuando hay **identidad**
   (Julio, Nexa) o **edición**; `xhigh` **sólo masters** (≈1,8× costo, mejora modesta de detalle fino). Observado:
   ≈ USD 0,05 por imagen high, ≈ 0,09 xhigh; los edits suman entrada.
 - **Prompt = bloques** en este orden: realismo (`prompts/bloque-realismo-v2.txt`) + impacto (`bloque-impacto-v1.txt`) +
   color/WB + escena + **`FOREGROUND` con el tono del lecho declarado** («DARK near black» / «VERY LIGHT almost white»).
-  Bloques verbatim en `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/`.
+  Ese orden lo emite `pnpm foto:prompt`; los bloques vigentes viven en `scripts/foto/bloques/`.
 - **Medir y regenerar, no parchar:** nitidez p99 Sobel dentro del lecho (`scripts/medir.mjs` de la corrida) ≤ ~20; si
-  pasa, o si el lecho sale de tono medio, **se regenera**. Sin grade: la corrección técnica es la excepción.
+  pasa, o si el lecho sale de tono medio, **se regenera**. Sin grade: la corrección técnica es la excepción. Las **seis**
+  reservas del plate se miden con `pnpm foto:validar`; el lecho sigue medido en luminancia y es **señal débil [frágil]**
+  (medir desenfoque bien queda **[pendiente]**).
 - **Firma:** SVG oficial compuesto con `scripts/componer.mjs` (`LOGO=0.15`), nunca generado.
 - **Pantallas por curación generativa:** plate con pantalla en chroma `#00FF00` → UI de referencia → edit con
   `--image plate --image ui --mask <máscara>` → restaurar fuera de la pantalla desde el plate. La máscara se arma

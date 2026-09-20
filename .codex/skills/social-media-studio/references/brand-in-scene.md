@@ -237,6 +237,11 @@ que sigue prohibido es **añadir** un soporte después; lo que ahora se exige es
 - **Tono del lecho declarado SIEMPRE** («DARK near black» / «VERY LIGHT almost white»): la madera de tono medio hizo
   fallar el contraste 6+ veces. Lecho p99 ≤ ~20 y transición gradual; si falla, **se regenera**.
 - **Logo al 15% del ancho**, centrado, SVG oficial compuesto (20% se leía como sello). Contraste ≥ 4,5:1 medido.
+- **Delta 2026-09-20 — el lecho ya tiene % por formato [medido]:** 4:5 **18%** · 9:16 **22%** · 16:9 **16%** ·
+  1:1 **18%** (*sin validar*). No se escribe a mano: `pnpm foto:prompt <ficha.json>` lo emite junto al `--size` del
+  `ai:image` desde una sola tabla —y rechaza un lecho cuya **materia** esté ausente o sea genérica («a wall», «the
+  surface»)—, y `pnpm foto:validar <plate.png>` lo mide sobre el plate limpio junto a las otras cinco reservas
+  ([canon](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md)).
 - Contrato completo: [firma y primer plano](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md).
 
 Los **cinco soportes rechazados** de esta sección siguen prohibidos como añadidos: un objeto que existe sólo para

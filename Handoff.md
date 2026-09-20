@@ -1,5 +1,9 @@
 # Handoff activo
 
+**Fotografía de marca Efeonce (19–20/09):** lenguaje **aprobado**, capa gráfica sobre la foto **NO**. Comandos
+`pnpm foto:{doctor,prompt,validar}` (27 tests); nunca armar el prompt a mano. Abierto: sólo la **reserva 2**.
+Todo el detalle y el estado en [`brand-photography/README.md`](docs/operations/brand-photography/README.md).
+
 [EPIC-048](docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md): revisión adversarial aplicada; ADR Proposed, tasks to-do; sin runtime/bono.
 
 **DataForSEO:** ISSUE-175 y TASK-1341 cerrados (guard en `ops-worker-deploy`, revisión 00699, smoke AIO PASS).
@@ -12,6 +16,10 @@ rango 03 comercial, no volumen orgánico probado. Faltan prueba, CTA y QA; sin p
 (publican juntos el 29/09; gate PASS). Pendientes: enviar mensaje a Berel (material de marca, menú, «2026»), rehacer arte
 social (tareas 744–755) y gráficos 739/740 antes del 25/09. Septiembre: 12 artículos vs 8, 90 gráficas vs 50
 ([conteo](docs/audits/seo/BEREL_CONTEO_PIEZAS_SEPTIEMBRE_2026-09-19.md)); skill `berel-content-production`.
+
+**Berel Frame.io (19/09):** [feedback visual de octubre](.codex/skills/berel-content-production/modules/20_REVISION_VISUAL_FRAMEIO.md)
+clasificado en la skill y Notion. Sin masters: artes intactos, sin publicación. «Berel Squad» no visible en la cuenta de Julio;
+cobertura limitada al share.
 
 **16–17/09:** Higgsfield API con créditos. Previa 18: verificar · readback KV 21/09 y 23/09.
 
@@ -337,12 +345,8 @@ sólo estos commits: la revisión anterior `00035-bhd` estaba construida desde `
 impacto visible: ningún cliente Claude renderiza `icons` todavía. Razones:
 [ADR](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md) §Delta 2026-09-05.
 
-**Berel, 2026-09-04:** Playbook Producción y feedback nuevo de septiembre leídos completos y promovidos a
-`berel-content-production` en los espejos Claude/Codex. La skill ahora distingue ficha técnica de página
-pública, elimina lenguaje interno del cuerpo, agrega la rama de awareness con render oficial, normaliza
-Kelvin/tablas/CTA y registra catálogo y pendientes técnicos. Se preservaron las reglas posteriores que
-superan líneas antiguas del Playbook. Alcance local documental: no se tocaron artículos, assets, Drupal ni
-el estado de publicación. Ver `SOURCES.md` de la skill para IDs, timestamps y drift.
+**Berel, 2026-09-04:** Playbook y feedback de septiembre incorporados a la skill espejo, sin tocar
+artículos, assets ni Drupal. Fuentes, decisiones y drift: `berel-content-production/SOURCES.md`.
 
 **SEO/AEO y Berel, 2026-09-04:** método de informes documentado en
 [modelo operativo](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) y skills espejo.

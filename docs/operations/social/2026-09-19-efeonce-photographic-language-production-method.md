@@ -1,9 +1,9 @@
 # Lenguaje Fotográfico Efeonce (2026-09-19): del grade navy a «El oficio a la vista»
 
 > **Tipo de documento:** Bitácora técnica y creativa del caso
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-19 por Claude
+> **Última actualización:** 2026-09-20 por Claude
 > **Documentación relacionada:** [Lenguaje fotográfico V1](../brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](../brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](../brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras](../brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](../brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](../brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Corrida](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md)
 
 Owner: Social Media Studio / Efeonce. Operador: Julio Reyes. Una sola sesión, 2026-09-19.
@@ -223,3 +223,93 @@ con Python `json.dump` para no romper comillas. Detalle en
 - Espacio para texto (pedido explícito, no trabajado).
 - 9:16 y 16:9 nativos; firma de dron; scripts a `pnpm`; masters `xhigh` con limpieza; sesión con equipo real;
   prueba de reconocimiento (n ≥ 100, distractores coherentes, antes/después).
+
+## Delta 2026-09-20 — El prompt deja de armarse a mano, las reservas llegan a seis y la calma se mide en L\*
+
+El 19 quedaron las reglas; el 20 quedó el **taller**. Esta ronda no buscó imágenes bonitas: buscó que la regla dejara
+de depender de que alguien la recordara al pegar bloques. Marcas de esta sección: **[medido]** ·
+**[decisión del operador]** · **[pendiente]** · **[refutado]**.
+
+### 1. Tres comandos, y el defecto que los justifica
+
+El prompt se armaba concatenando bloques a mano. Por esa vía **«Vertical 4:5.» vivió dentro del bloque de realismo
+compartido** y «bottom 18%» dentro de la plantilla del lecho: un valor de UN formato metido en un bloque que usan
+TODOS, sin que nadie lo viera. La regla nueva es corta: **nunca armar un prompt de foto de marca concatenando bloques a
+mano**.
+
+| Comando | Qué hace | Notas duras |
+|---|---|---|
+| `pnpm foto:doctor` | ¿Esta máquina puede generar? Seis chequeos que **ejercitan la cadena**: bloques presentes y sin contaminar · sharp · ADC de gcloud (pide un token real) · referencia al secreto · el secreto resolviendo · la clave aceptada por OpenAI vía `/v1/models` (**sin costo**) | La clave nunca se imprime. Sale 1 si algo bloquea. Verificado en los dos sentidos: con ADC vencida señaló el comando exacto, tras renovarla pasaron los seis, y quitando un bloque sale 1 |
+| `pnpm foto:prompt <ficha.json> [--batch <out>]` | Arma el prompt desde una ficha de toma. El formato, el % del lecho y el límite de sujetos salen de **UNA tabla** | `--ficha-ejemplo` imprime la plantilla; el comando imprime el `ai:image` exacto con su `--size` |
+| `pnpm foto:validar <plate.png> [--zona-texto] [--objeto x0,y0,x1,y1] [--padding-x/-y]` | Valida las **seis** reservas sobre el plate limpio. Sale 1 si una reserva **evaluada** falla | `--zona-texto` y `--objeto` son **opt-in**. Coordenadas en **fracciones** (0–1), nunca en píxeles |
+
+27 tests en `scripts/foto/build-prompt.test.ts` cubren las guardas: bloque compartido con un valor de formato adentro ·
+reserva pedida en una toma que no la admite · batch que mezcla formatos · falta el lecho o la escena · **materia de la
+superficie ausente o genérica** («a wall», «the surface»). Los bloques pasaron a vivir en `scripts/foto/bloques/`, no
+en una carpeta de corrida fechada.
+
+`foto:prompt` y `foto:validar` **no necesitan credencial**: se puede preparar y validar una tanda entera sin acceso. Lo
+único que no viaja con el repo es `.env.local` con `OPENAI_API_KEY_SECRET_REF="greenhouse-openai-api-key"` (el
+**nombre** del secreto, nunca la clave cruda) y las ADC de gcloud vigentes
+(`pnpm gcloud:auth:playwright -- --force`).
+
+### 2. Las reservas pasan de cuatro a seis
+
+Canon: [`EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md`](../brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md).
+Zona de texto · objeto para enmarcar · lecho de la firma · aire para cursores · **campo profundo al margen** ·
+**lecho por formato**.
+
+- **Lecho por formato [medido]:** 4:5 **18%** · 9:16 **22%** · 16:9 **16%** · 1:1 **18%** *(sin validar)*. Deja de ser
+  un 18% heredado de un solo formato.
+- **Objeto para enmarcar:** campo oscuro y parejo en los **cuatro** lados; trazo `#a6cdf5` ≥ **3:1** por lado.
+- **Campo profundo al margen:** banda vertical, tono declarado, continua **hasta ≥ 0,40 del alto**.
+- Bloques de prompt nuevos: **§3.8.1 SELECTION TARGET** y **§3.8.2 MARGIN FIELD**, ambos `[sin validar]` al nacer.
+
+### 3. Piloto de reservas (3 plates, USD 0,142)
+
+Carpeta: `ai-generations/2026-09-20_piloto-reservas/` · OneDrive
+`13- Branding/Lenguaje Fotografico Efeonce/v01/referencias/11-piloto-reservas-2026-09-20/`.
+
+- **MARGIN FIELD pasa** en 4:5 y en 16:9 nativo, con **banda continua hasta 0,60** del alto. El caso aprobado
+  «¿Claude o Codex?» daba 0,35 simplemente porque nadie se lo había pedido **[medido]**.
+- **SELECTION TARGET sirve con padding, y hay punto dulce, no monotonía [medido]:** 0,00 → 1,02:1 ✗ ·
+  **0,02 → 3,29:1 ✓** · 0,04 → 2,83:1 ✗. Con 0 falla porque el objeto trae su propio borde claro; con 0,04 la caja
+  toca a las personas. Subir el padding no mejora el contraste de forma monótona: hay que buscar el punto.
+
+### 4. El umbral de calma se mide en L\*, no en luminancia lineal **[medido]**
+
+La luminancia lineal no es perceptual: la misma textura salta ~15× más arriba de la escala que abajo, así que un umbral
+en Y **premia la oscuridad**. Medido en los dos extremos: la **«losa» que el operador rechazó pasaba con 12× de
+margen** mientras un muro pálido liso reprobaba. `CALMA_MAX = 0.5` sale de ahí — pasa 0,18–0,29, reprueba 0,89–2,44.
+
+El alcance hay que decirlo honesto: **`CALMA_MAX` mide calma, NO detecta la losa** — una losa *es* calma. Las tres
+métricas (planitud, canto, calma) no distinguen la versión rechazada de la buena, porque la diferencia es **semántica**.
+El detector real está en la **entrada**: la guarda de materia de `foto:prompt`.
+
+El lecho, en cambio, **se queda en Y y es señal débil `[frágil]`**: en L\* el lecho no disuelto es indistinguible de los
+disueltos, y en Y separa por 20%, que es ruido. Medir desenfoque bien queda **[pendiente]**.
+
+### 5. Una regla que se retiró **[refutado]**
+
+§3.8.3 afirmaba, con etiqueta **[medido]**, que el lecho falla cuando el verbatim no pone nada cerca del lente. No se
+sostiene: el prompt de la corrida que supuestamente no la llevaba **nunca se versionó**, todos los prompts de esa toma
+que sí sobreviven la llevan, y las dos franjas miden estadísticamente igual. Lo que separaba los números era el
+**formato**. El comando sigue emitiendo la frase, pero como **precaución declarada**, nunca como evidencia de causa.
+
+### 6. El tono nunca fue el problema: la materia lo es **[decisión del operador, 2026-09-20]**
+
+> «No, no todo tiene que ser claro; de hecho faltaba probar los oscuros. El tema era que el modelo estaba poniendo un
+> objeto sin sentido para lograrlo.»
+
+Una reserva **oscura está perfecta** cuando la superficie oscura existe de verdad y **tiene nombre**. Lo prohibido es la
+reserva **sin materia**, en cualquier tono. Decidir el tono por regla global —clara u oscura— es el error, y es el que
+casi se codifica al leer los rechazos como un problema de luminancia.
+
+### 7. Qué queda abierto
+
+- **Aprobado:** el lenguaje fotográfico y las reglas de reserva **de la toma**.
+- **NO aprobado:** la **capa de composición gráfica** sobre la foto (tipografía, jerarquía, cursores). Su canon es
+  `efeonce-advertising-creative`, no los ejemplos de la carpeta de fotografía.
+- **Abierto [pendiente — operador]:** sólo la **reserva 2** (perímetro oscuro de la caja contra lecho claro de la firma).
+- Otros pendientes: 1:1 con lecho medido · firma en tomas sin desenfoque (dron, `url-lum`) · masters `xhigh` · prueba
+  de reconocimiento (n ≥ 100) · sesión Run & Gun con el equipo real.

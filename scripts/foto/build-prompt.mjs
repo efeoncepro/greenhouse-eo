@@ -66,9 +66,15 @@ const FORMATOS = {
   }
 }
 
+// La cláusula de textura NO es decorativa: es la regla anti-losa. Un tono oscuro pedido sin ella sale
+// como un panel plano flotante — lo que el operador rechazó por «extremadamente forzado». Ya vivía
+// escrita en la ficha de la toma 15 y en el bloque de impacto («rich but detailed darks, never flat,
+// never evenly lit»); acá deja de depender de que alguien se acuerde de copiarla. [2026-09-20]
 const TINTA = {
-  blanca: 'a DEEP, warm, evenly toned shadow dark enough for white text',
-  oscura: 'plain, evenly lit and VERY LIGHT, almost white, light enough for dark ink text'
+  blanca:
+    'a DEEP, warm, evenly toned shadow, deep but ALWAYS keeping visible texture and detail of the material — never a flat pure-black panel, never an evenly filled shape — dark enough for white text',
+  oscura:
+    'plain, evenly lit and VERY LIGHT, almost white, keeping the visible grain and detail of the material — never a flat blank panel — light enough for dark ink text'
 }
 
 // ── Los bloques que sí son reusables tal cual ────────────────────────────────────────────────────
