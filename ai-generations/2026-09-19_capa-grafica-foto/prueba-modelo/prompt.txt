@@ -1,0 +1,13 @@
+Compose a 4:5 Spanish-language social advertising piece over the photographic scene, adding a GRAPHIC OVERLAY LAYER on top of it. Reference image 1 shows exactly the overlay system to reproduce; reference image 2 is a type specimen of the script typeface named "Guttery".
+
+TYPOGRAPHY — use these exact typefaces by name:
+1. HEADLINE: "Bricolage Grotesque" variable, weight 780, width axis 96, optical size 88, tracking -0.035em, line-height 0.9, pure white #ffffff. Text: "La obra, a la vista." Set on one line, left-aligned, ink left edge at 7.5% of the canvas width, ink top edge at 12.5% of the canvas height, total ink width about 56% of the canvas width.
+2. CURSOR NAME PLATE: "Poppins" Bold (700), uppercase-free, white text inside a solid rounded pill. Text: "Cliente". Pill fill lime green #6EC207.
+3. SCRIPT GESTURE: "Guttery" — the handwritten script shown in reference image 2. Text: "¿lo ves?" rotated about -8 degrees, in light blue #a6cdf5, placed wherever you judge it works best in the composition.
+
+GRAPHIC CONTROLS — reproduce the editing-software selection language from reference image 1:
+- A SELECTION BOUNDING BOX around the single word "vista": a thin dashed rectangle, stroke #a6cdf5, with eight small white square handles (four corners, four edge midpoints) sitting on the rectangle.
+- A COLLABORATOR CURSOR: a small solid lime-green arrow pointer at the TOP-RIGHT corner of that bounding box, with the "Cliente" pill attached right next to its tip, both outside the box.
+- A LOCAL CURSOR: a classic black arrow pointer with a white outline, near the bottom-right of the bounding box, tip touching the box edge.
+
+RULES: keep the photograph untouched and in focus as it is. Do not invent any logo. Do not add any other text. Spanish text must be spelled exactly as written, including the inverted question mark "¿" and the accent in "revisión" if used. Nothing may cover the faces of the two people.

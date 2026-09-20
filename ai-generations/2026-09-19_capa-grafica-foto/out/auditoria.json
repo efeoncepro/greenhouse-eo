@@ -1,0 +1,3934 @@
+[
+  {
+    "id": "V01-45-una-voz",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 108,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.54,
+        "izquierdaDeTintaPx": 234,
+        "anchoTinta": 0.593,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1053,
+      "distanciaEnAltos": 0.73,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V02-45-etiqueta",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "etiqueta",
+        "familia": "poppins",
+        "tam": 26,
+        "lineas": 1,
+        "tracking": 0.08,
+        "leading": 1.3,
+        "tinta": "#cfe4fa",
+        "rotacion": null,
+        "contraste": 5.51,
+        "izquierdaDeTintaPx": 434,
+        "anchoTinta": 0.246,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 108,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.57,
+        "izquierdaDeTintaPx": 234,
+        "anchoTinta": 0.593,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "etiqueta",
+          "titular"
+        ],
+        "gapDeTintaPx": 82,
+        "gapRelativoAlTamaño": 0.76,
+        "ejeCompartido": "eje",
+        "desalineacionOpticaPx": 0
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "etiqueta",
+          "titular"
+        ],
+        "tintaA": "#cfe4fa",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1.3,
+        "escala": 4.17,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 1024,
+      "distanciaEnAltos": 0.71,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V03-45-gesto",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 108,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.54,
+        "izquierdaDeTintaPx": 234,
+        "anchoTinta": 0.593,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 55,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 8.22,
+        "izquierdaDeTintaPx": 757,
+        "anchoTinta": 0.139,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 44,
+        "gapRelativoAlTamaño": 0.8,
+        "ejeCompartido": "eje vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1,
+        "escala": 1.97,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 953,
+      "distanciaEnAltos": 0.66,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V04-45-caja-local",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 86,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 10.59,
+        "izquierdaDeTintaPx": 219,
+        "anchoTinta": 0.62,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1056,
+      "distanciaEnAltos": 0.73,
+      "anchoRelativo": 0.15,
+      "contraste": 13.02,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V05-45-caja-1colab",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 86,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 10.59,
+        "izquierdaDeTintaPx": 219,
+        "anchoTinta": 0.62,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1056,
+      "distanciaEnAltos": 0.73,
+      "anchoRelativo": 0.15,
+      "contraste": 13.02,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V06-45-caja-2colab",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 105,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 18.36,
+        "izquierdaDeTintaPx": 258,
+        "anchoTinta": 0.553,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1041,
+      "distanciaEnAltos": 0.72,
+      "anchoRelativo": 0.15,
+      "contraste": 13.8,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V07-45-moving",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 105,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 18.36,
+        "izquierdaDeTintaPx": 258,
+        "anchoTinta": 0.553,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1041,
+      "distanciaEnAltos": 0.72,
+      "anchoRelativo": 0.15,
+      "contraste": 13.8,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V08-45-claro",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "etiqueta",
+        "familia": "poppins",
+        "tam": 26,
+        "lineas": 1,
+        "tracking": 0.08,
+        "leading": 1.3,
+        "tinta": "#00284d",
+        "rotacion": null,
+        "contraste": 10.35,
+        "izquierdaDeTintaPx": 86,
+        "anchoTinta": 0.112,
+        "anclaX": "margen",
+        "desviaciones": null
+      },
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 93,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#00284d",
+        "rotacion": null,
+        "contraste": 9.66,
+        "izquierdaDeTintaPx": 86,
+        "anchoTinta": 0.511,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "etiqueta",
+          "titular"
+        ],
+        "gapDeTintaPx": 61,
+        "gapRelativoAlTamaño": 0.66,
+        "ejeCompartido": "margen",
+        "desalineacionOpticaPx": 0
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "etiqueta",
+          "titular"
+        ],
+        "tintaA": "#00284d",
+        "tintaB": "#00284d",
+        "saltoDeTinta": 1,
+        "escala": 3.57,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 1037,
+      "distanciaEnAltos": 0.72,
+      "anchoRelativo": 0.15,
+      "contraste": 15.01,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V09-916-una-voz",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 123,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.89,
+        "izquierdaDeTintaPx": 187,
+        "anchoTinta": 0.675,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1354,
+      "distanciaEnAltos": 0.66,
+      "anchoRelativo": 0.15,
+      "contraste": 19.06,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V10-916-tres-voces",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": false,
+    "voces": [
+      {
+        "id": "etiqueta",
+        "familia": "poppins",
+        "tam": 37,
+        "lineas": 1,
+        "tracking": 0.08,
+        "leading": 1.3,
+        "tinta": "#cfe4fa",
+        "rotacion": null,
+        "contraste": 12.76,
+        "izquierdaDeTintaPx": 374,
+        "anchoTinta": 0.35,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 123,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.7,
+        "izquierdaDeTintaPx": 187,
+        "anchoTinta": 0.675,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "cita",
+        "familia": "poppins",
+        "tam": 42,
+        "lineas": 1,
+        "tracking": -0.025,
+        "leading": 1.45,
+        "tinta": "#cfe4fa",
+        "rotacion": null,
+        "contraste": 5.28,
+        "izquierdaDeTintaPx": 63,
+        "anchoTinta": 0.289,
+        "anclaX": "margen",
+        "desviaciones": [
+          "peso 500 vs receta 400"
+        ]
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "etiqueta",
+          "titular"
+        ],
+        "gapDeTintaPx": 96,
+        "gapRelativoAlTamaño": 0.78,
+        "ejeCompartido": "eje",
+        "desalineacionOpticaPx": 0
+      },
+      {
+        "entre": [
+          "titular",
+          "cita"
+        ],
+        "gapDeTintaPx": 129,
+        "gapRelativoAlTamaño": 3.07,
+        "ejeCompartido": "eje vs margen",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "etiqueta",
+          "titular"
+        ],
+        "tintaA": "#cfe4fa",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1.3,
+        "escala": 3.33,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      },
+      {
+        "entre": [
+          "titular",
+          "cita"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#cfe4fa",
+        "saltoDeTinta": 1.3,
+        "escala": 2.94,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 1152,
+      "distanciaEnAltos": 0.56,
+      "anchoRelativo": 0.15,
+      "contraste": 19.06,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V11-916-caja-local",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 123,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 11.03,
+        "izquierdaDeTintaPx": 68,
+        "anchoTinta": 0.881,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1429,
+      "distanciaEnAltos": 0.7,
+      "anchoRelativo": 0.15,
+      "contraste": 9.39,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V12-916-caja-2colab",
+    "formato": "9:16",
+    "lienzo": "1088×1936",
+    "pasa": false,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 116,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 17.55,
+        "izquierdaDeTintaPx": 190,
+        "anchoTinta": 0.65,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1236,
+      "distanciaEnAltos": 0.64,
+      "anchoRelativo": 0.15,
+      "contraste": 11.96,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V13-916-gesto-caja",
+    "formato": "9:16",
+    "lienzo": "1088×1936",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 116,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 17.58,
+        "izquierdaDeTintaPx": 190,
+        "anchoTinta": 0.65,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 74,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 17.37,
+        "izquierdaDeTintaPx": 647,
+        "anchoTinta": 0.23,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 46,
+        "gapRelativoAlTamaño": 0.62,
+        "ejeCompartido": "eje vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1,
+        "escala": 1.58,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 1152,
+      "distanciaEnAltos": 0.6,
+      "anchoRelativo": 0.15,
+      "contraste": 11.96,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V14-916-claro",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": false,
+    "voces": [
+      {
+        "id": "etiqueta",
+        "familia": "poppins",
+        "tam": 37,
+        "lineas": 1,
+        "tracking": 0.08,
+        "leading": 1.3,
+        "tinta": "#00284d",
+        "rotacion": null,
+        "contraste": 7,
+        "izquierdaDeTintaPx": 86,
+        "anchoTinta": 0.16,
+        "anclaX": "margen",
+        "desviaciones": null
+      },
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 123,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#00284d",
+        "rotacion": null,
+        "contraste": 2.64,
+        "izquierdaDeTintaPx": 86,
+        "anchoTinta": 0.679,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "etiqueta",
+          "titular"
+        ],
+        "gapDeTintaPx": 77,
+        "gapRelativoAlTamaño": 0.63,
+        "ejeCompartido": "margen",
+        "desalineacionOpticaPx": 0
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "etiqueta",
+          "titular"
+        ],
+        "tintaA": "#00284d",
+        "tintaB": "#00284d",
+        "saltoDeTinta": 1,
+        "escala": 3.33,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 1328,
+      "distanciaEnAltos": 0.65,
+      "anchoRelativo": 0.15,
+      "contraste": 15.8,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V15-916-acento",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 123,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.89,
+        "izquierdaDeTintaPx": 185,
+        "anchoTinta": 0.679,
+        "anclaX": "eje",
+        "desviaciones": [
+          "4 palabras vs maxWords 3 de la receta"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1354,
+      "distanciaEnAltos": 0.66,
+      "anchoRelativo": 0.15,
+      "contraste": 19.06,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V16-169-una-voz",
+    "formato": "16:9",
+    "lienzo": "2048×1152",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 106,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.35,
+        "izquierdaDeTintaPx": 123,
+        "anchoTinta": 0.327,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 624,
+      "distanciaEnAltos": 0.54,
+      "anchoRelativo": 0.15,
+      "contraste": 18.97,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V17-169-dos-voces",
+    "formato": "16:9",
+    "lienzo": "2048×1152",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "etiqueta",
+        "familia": "poppins",
+        "tam": 21,
+        "lineas": 1,
+        "tracking": 0.08,
+        "leading": 1.3,
+        "tinta": "#cfe4fa",
+        "rotacion": null,
+        "contraste": 12.17,
+        "izquierdaDeTintaPx": 123,
+        "anchoTinta": 0.111,
+        "anclaX": "margen",
+        "desviaciones": null
+      },
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 106,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.35,
+        "izquierdaDeTintaPx": 123,
+        "anchoTinta": 0.327,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "etiqueta",
+          "titular"
+        ],
+        "gapDeTintaPx": 55,
+        "gapRelativoAlTamaño": 0.52,
+        "ejeCompartido": "margen",
+        "desalineacionOpticaPx": 0
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "etiqueta",
+          "titular"
+        ],
+        "tintaA": "#cfe4fa",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1.3,
+        "escala": 5.11,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 624,
+      "distanciaEnAltos": 0.54,
+      "anchoRelativo": 0.15,
+      "contraste": 18.97,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V18-169-caja-local",
+    "formato": "16:9",
+    "lienzo": "1936×1088",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 117,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 16.03,
+        "izquierdaDeTintaPx": 611,
+        "anchoTinta": 0.368,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 768,
+      "distanciaEnAltos": 0.71,
+      "anchoRelativo": 0.15,
+      "contraste": 14.24,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V19-169-caja-2colab",
+    "formato": "16:9",
+    "lienzo": "1936×1088",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 91,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 10.18,
+        "izquierdaDeTintaPx": 691,
+        "anchoTinta": 0.287,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 736,
+      "distanciaEnAltos": 0.68,
+      "anchoRelativo": 0.15,
+      "contraste": 14.24,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V20-169-claro",
+    "formato": "16:9",
+    "lienzo": "2048×1152",
+    "pasa": false,
+    "voces": [
+      {
+        "id": "etiqueta",
+        "familia": "poppins",
+        "tam": 21,
+        "lineas": 1,
+        "tracking": 0.08,
+        "leading": 1.3,
+        "tinta": "#00284d",
+        "rotacion": null,
+        "contraste": 2.31,
+        "izquierdaDeTintaPx": 123,
+        "anchoTinta": 0.05,
+        "anclaX": "margen",
+        "desviaciones": null
+      },
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 105,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#00284d",
+        "rotacion": null,
+        "contraste": 2.45,
+        "izquierdaDeTintaPx": 123,
+        "anchoTinta": 0.327,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "etiqueta",
+          "titular"
+        ],
+        "gapDeTintaPx": 54,
+        "gapRelativoAlTamaño": 0.51,
+        "ejeCompartido": "margen",
+        "desalineacionOpticaPx": 0
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "etiqueta",
+          "titular"
+        ],
+        "tintaA": "#00284d",
+        "tintaB": "#00284d",
+        "saltoDeTinta": 1,
+        "escala": 5.08,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 749,
+      "distanciaEnAltos": 0.65,
+      "anchoRelativo": 0.15,
+      "contraste": 15.67,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V21-169-gesto",
+    "formato": "16:9",
+    "lienzo": "2048×1152",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 106,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.18,
+        "izquierdaDeTintaPx": 123,
+        "anchoTinta": 0.327,
+        "anclaX": "margen",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 69,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 16.47,
+        "izquierdaDeTintaPx": 123,
+        "anchoTinta": 0.099,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 42,
+        "gapRelativoAlTamaño": 0.61,
+        "ejeCompartido": "margen vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1,
+        "escala": 1.53,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 534,
+      "distanciaEnAltos": 0.46,
+      "anchoRelativo": 0.15,
+      "contraste": 18.97,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V22-169-acento-moving",
+    "formato": "16:9",
+    "lienzo": "1936×1088",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 117,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 16.03,
+        "izquierdaDeTintaPx": 611,
+        "anchoTinta": 0.368,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 768,
+      "distanciaEnAltos": 0.71,
+      "anchoRelativo": 0.15,
+      "contraste": 14.24,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V23-45-peso-short",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 106,
+        "lineas": 1,
+        "tracking": -0.03,
+        "leading": 0.92,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.54,
+        "izquierdaDeTintaPx": 236,
+        "anchoTinta": 0.591,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1054,
+      "distanciaEnAltos": 0.73,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V24-45-peso-condensado",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 139,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.56,
+        "izquierdaDeTintaPx": 232,
+        "anchoTinta": 0.597,
+        "anclaX": "eje",
+        "desviaciones": [
+          "ancho 78 vs receta 96"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1032,
+      "distanciaEnAltos": 0.72,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V25-45-guttery-rot9",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 97,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.57,
+        "izquierdaDeTintaPx": 270,
+        "anchoTinta": 0.532,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 60,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": -9,
+        "contraste": 7.82,
+        "izquierdaDeTintaPx": 711,
+        "anchoTinta": 0.14,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 13,
+        "gapRelativoAlTamaño": 0.22,
+        "ejeCompartido": "eje vs margen",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1,
+        "escala": 1.6,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 968,
+      "distanciaEnAltos": 0.67,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V26-45-guttery-naranja",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": false,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 97,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.57,
+        "izquierdaDeTintaPx": 270,
+        "anchoTinta": 0.532,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 72,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#7ed600",
+        "rotacion": 7,
+        "contraste": 3.27,
+        "izquierdaDeTintaPx": 111,
+        "anchoTinta": 0.19,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 31,
+        "gapRelativoAlTamaño": 0.43,
+        "ejeCompartido": "eje vs margen",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#7ed600",
+        "saltoDeTinta": 1.83,
+        "escala": 1.34,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 931,
+      "distanciaEnAltos": 0.65,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V27-916-guttery-rot12",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 123,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 16.13,
+        "izquierdaDeTintaPx": 187,
+        "anchoTinta": 0.675,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 72,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": -12,
+        "contraste": 14.29,
+        "izquierdaDeTintaPx": 113,
+        "anchoTinta": 0.266,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 43,
+        "gapRelativoAlTamaño": 0.6,
+        "ejeCompartido": "eje vs margen",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1,
+        "escala": 1.71,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 1225,
+      "distanciaEnAltos": 0.6,
+      "anchoRelativo": 0.15,
+      "contraste": 19.06,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V28-169-guttery-rot6",
+    "formato": "16:9",
+    "lienzo": "2048×1152",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 106,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.16,
+        "izquierdaDeTintaPx": 123,
+        "anchoTinta": 0.327,
+        "anclaX": "margen",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 81,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": -6,
+        "contraste": 16.36,
+        "izquierdaDeTintaPx": 119,
+        "anchoTinta": 0.103,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 27,
+        "gapRelativoAlTamaño": 0.33,
+        "ejeCompartido": "margen vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1,
+        "escala": 1.31,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 546,
+      "distanciaEnAltos": 0.47,
+      "anchoRelativo": 0.15,
+      "contraste": 18.97,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V29-45-caja-objeto-obra",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 94,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 10.69,
+        "izquierdaDeTintaPx": 240,
+        "anchoTinta": 0.583,
+        "anclaX": "eje",
+        "desviaciones": [
+          "5 palabras vs maxWords 3 de la receta"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1052,
+      "distanciaEnAltos": 0.73,
+      "anchoRelativo": 0.15,
+      "contraste": 13.02,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V30-45-caja-objeto-aprueba",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 95,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 10.7,
+        "izquierdaDeTintaPx": 285,
+        "anchoTinta": 0.506,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 58,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": -8,
+        "contraste": 12.38,
+        "izquierdaDeTintaPx": 711,
+        "anchoTinta": 0.084,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 22,
+        "gapRelativoAlTamaño": 0.38,
+        "ejeCompartido": "eje vs margen",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1,
+        "escala": 1.65,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 957,
+      "distanciaEnAltos": 0.66,
+      "anchoRelativo": 0.15,
+      "contraste": 13.02,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V31-45-caja-objeto-clawd",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 86,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 18.17,
+        "izquierdaDeTintaPx": 149,
+        "anchoTinta": 0.741,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1056,
+      "distanciaEnAltos": 0.73,
+      "anchoRelativo": 0.15,
+      "contraste": 13.8,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V32-45-caja-objeto-masas",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 97,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.57,
+        "izquierdaDeTintaPx": 270,
+        "anchoTinta": 0.532,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1061,
+      "distanciaEnAltos": 0.74,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V33-916-caja-objeto",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 123,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 11.25,
+        "izquierdaDeTintaPx": 139,
+        "anchoTinta": 0.759,
+        "anclaX": "eje",
+        "desviaciones": [
+          "5 palabras vs maxWords 3 de la receta"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1433,
+      "distanciaEnAltos": 0.7,
+      "anchoRelativo": 0.15,
+      "contraste": 9.39,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V34-169-caja-objeto",
+    "formato": "16:9",
+    "lienzo": "1936×1088",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 98,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 11.01,
+        "izquierdaDeTintaPx": 671,
+        "anchoTinta": 0.307,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 741,
+      "distanciaEnAltos": 0.68,
+      "anchoRelativo": 0.15,
+      "contraste": 14.24,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V35-45-acento-azul",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": false,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 104,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.54,
+        "izquierdaDeTintaPx": 246,
+        "anchoTinta": 0.573,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1055,
+      "distanciaEnAltos": 0.73,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V36-916-acento-lima",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 123,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.89,
+        "izquierdaDeTintaPx": 185,
+        "anchoTinta": 0.679,
+        "anclaX": "eje",
+        "desviaciones": [
+          "4 palabras vs maxWords 3 de la receta"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1354,
+      "distanciaEnAltos": 0.66,
+      "anchoRelativo": 0.15,
+      "contraste": 19.06,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V37-45-acento-teal",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 105,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 18.36,
+        "izquierdaDeTintaPx": 258,
+        "anchoTinta": 0.553,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1041,
+      "distanciaEnAltos": 0.72,
+      "anchoRelativo": 0.15,
+      "contraste": 13.8,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V38-169-acento-y-gesto",
+    "formato": "16:9",
+    "lienzo": "1936×1088",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 111,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 14.26,
+        "izquierdaDeTintaPx": 631,
+        "anchoTinta": 0.348,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 82,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": -7,
+        "contraste": 5.75,
+        "izquierdaDeTintaPx": 1002,
+        "anchoTinta": 0.159,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 20,
+        "gapRelativoAlTamaño": 0.24,
+        "ejeCompartido": "eje vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1,
+        "escala": 1.36,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 622,
+      "distanciaEnAltos": 0.57,
+      "anchoRelativo": 0.15,
+      "contraste": 14.24,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V39-45-escala-extrema",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 225,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.57,
+        "izquierdaDeTintaPx": 211,
+        "anchoTinta": 0.634,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1006,
+      "distanciaEnAltos": 0.7,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V40-916-dos-lineas",
+    "formato": "9:16",
+    "lienzo": "1088×1936",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 142,
+        "lineas": 2,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 17.54,
+        "izquierdaDeTintaPx": 196,
+        "anchoTinta": 0.529,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1194,
+      "distanciaEnAltos": 0.62,
+      "anchoRelativo": 0.15,
+      "contraste": 11.96,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V41-169-dos-lineas",
+    "formato": "16:9",
+    "lienzo": "2048×1152",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 176,
+        "lineas": 2,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.15,
+        "izquierdaDeTintaPx": 123,
+        "anchoTinta": 0.296,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 506,
+      "distanciaEnAltos": 0.44,
+      "anchoRelativo": 0.15,
+      "contraste": 18.97,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V42-45-todo-junto",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 98,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 10.64,
+        "izquierdaDeTintaPx": 227,
+        "anchoTinta": 0.607,
+        "anclaX": "eje",
+        "desviaciones": [
+          "6 palabras vs maxWords 3 de la receta"
+        ]
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 46,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": -6,
+        "contraste": 9.42,
+        "izquierdaDeTintaPx": 114,
+        "anchoTinta": 0.117,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 42,
+        "gapRelativoAlTamaño": 0.91,
+        "ejeCompartido": "eje vs margen",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1,
+        "escala": 2.12,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 966,
+      "distanciaEnAltos": 0.67,
+      "anchoRelativo": 0.15,
+      "contraste": 13.02,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V43-916-titular-rot4",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 123,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": -4,
+        "contraste": 15.89,
+        "izquierdaDeTintaPx": 185,
+        "anchoTinta": 0.679,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1348,
+      "distanciaEnAltos": 0.66,
+      "anchoRelativo": 0.15,
+      "contraste": 19.06,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V44-45-titular-vertical",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 86,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": -90,
+        "contraste": 11.08,
+        "izquierdaDeTintaPx": 157,
+        "anchoTinta": 0.065,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 594,
+      "distanciaEnAltos": 0.41,
+      "anchoRelativo": 0.15,
+      "contraste": 13.8,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V45-45-enfasis-local",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 108,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.54,
+        "izquierdaDeTintaPx": 234,
+        "anchoTinta": 0.593,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1053,
+      "distanciaEnAltos": 0.73,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V46-45-enfasis-1colab",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 93,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.61,
+        "izquierdaDeTintaPx": 281,
+        "anchoTinta": 0.511,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1063,
+      "distanciaEnAltos": 0.74,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V47-45-enfasis-escala",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 218,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.57,
+        "izquierdaDeTintaPx": 219,
+        "anchoTinta": 0.62,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1011,
+      "distanciaEnAltos": 0.7,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V48-45-enfasis-2colab",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 86,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 10.7,
+        "izquierdaDeTintaPx": 267,
+        "anchoTinta": 0.536,
+        "anclaX": "eje",
+        "desviaciones": [
+          "6 palabras vs maxWords 3 de la receta"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1059,
+      "distanciaEnAltos": 0.74,
+      "anchoRelativo": 0.15,
+      "contraste": 13.02,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V49-45-enfasis-guttery",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 97,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.57,
+        "izquierdaDeTintaPx": 270,
+        "anchoTinta": 0.532,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 65,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": -8,
+        "contraste": 7.94,
+        "izquierdaDeTintaPx": 710,
+        "anchoTinta": 0.147,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 38,
+        "gapRelativoAlTamaño": 0.58,
+        "ejeCompartido": "eje vs margen",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1,
+        "escala": 1.49,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 934,
+      "distanciaEnAltos": 0.65,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V50-916-enfasis-local",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 123,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.89,
+        "izquierdaDeTintaPx": 187,
+        "anchoTinta": 0.675,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1354,
+      "distanciaEnAltos": 0.66,
+      "anchoRelativo": 0.15,
+      "contraste": 19.06,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V51-916-enfasis-moving",
+    "formato": "9:16",
+    "lienzo": "1088×1936",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 116,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 17.6,
+        "izquierdaDeTintaPx": 188,
+        "anchoTinta": 0.654,
+        "anclaX": "eje",
+        "desviaciones": [
+          "4 palabras vs maxWords 3 de la receta"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1284,
+      "distanciaEnAltos": 0.66,
+      "anchoRelativo": 0.15,
+      "contraste": 11.96,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V52-916-enfasis-dos-lineas",
+    "formato": "9:16",
+    "lienzo": "1088×1936",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 142,
+        "lineas": 2,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 17.53,
+        "izquierdaDeTintaPx": 196,
+        "anchoTinta": 0.534,
+        "anclaX": "eje",
+        "desviaciones": [
+          "4 palabras vs maxWords 3 de la receta"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1194,
+      "distanciaEnAltos": 0.62,
+      "anchoRelativo": 0.15,
+      "contraste": 11.96,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V53-916-enfasis-guttery",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 123,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 16.13,
+        "izquierdaDeTintaPx": 187,
+        "anchoTinta": 0.675,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 92,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": -8,
+        "contraste": 14.02,
+        "izquierdaDeTintaPx": 110,
+        "anchoTinta": 0.244,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 49,
+        "gapRelativoAlTamaño": 0.53,
+        "ejeCompartido": "eje vs margen",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1,
+        "escala": 1.33,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 1204,
+      "distanciaEnAltos": 0.59,
+      "anchoRelativo": 0.15,
+      "contraste": 19.06,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V54-169-enfasis-local",
+    "formato": "16:9",
+    "lienzo": "1936×1088",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 117,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 11.65,
+        "izquierdaDeTintaPx": 609,
+        "anchoTinta": 0.371,
+        "anclaX": "eje",
+        "desviaciones": [
+          "4 palabras vs maxWords 3 de la receta"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 735,
+      "distanciaEnAltos": 0.68,
+      "anchoRelativo": 0.15,
+      "contraste": 14.24,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V55-169-enfasis-2colab",
+    "formato": "16:9",
+    "lienzo": "1936×1088",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 104,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 10.87,
+        "izquierdaDeTintaPx": 649,
+        "anchoTinta": 0.329,
+        "anclaX": "eje",
+        "desviaciones": [
+          "4 palabras vs maxWords 3 de la receta"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 735,
+      "distanciaEnAltos": 0.68,
+      "anchoRelativo": 0.15,
+      "contraste": 14.24,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V56-169-enfasis-costado",
+    "formato": "16:9",
+    "lienzo": "2048×1152",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 99,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.35,
+        "izquierdaDeTintaPx": 123,
+        "anchoTinta": 0.307,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 629,
+      "distanciaEnAltos": 0.55,
+      "anchoRelativo": 0.15,
+      "contraste": 18.97,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V57-169-enfasis-completo",
+    "formato": "16:9",
+    "lienzo": "1936×1088",
+    "pasa": false,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 111,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 9.93,
+        "izquierdaDeTintaPx": 629,
+        "anchoTinta": 0.35,
+        "anclaX": "eje",
+        "desviaciones": [
+          "4 palabras vs maxWords 3 de la receta"
+        ]
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 49,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": -7,
+        "contraste": 4.05,
+        "izquierdaDeTintaPx": 627,
+        "anchoTinta": 0.095,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 45,
+        "gapRelativoAlTamaño": 0.92,
+        "ejeCompartido": "eje vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#ffffff",
+        "saltoDeTinta": 1,
+        "escala": 2.26,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 603,
+      "distanciaEnAltos": 0.55,
+      "anchoRelativo": 0.15,
+      "contraste": 14.24,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V58-169-enfasis-doble",
+    "formato": "16:9",
+    "lienzo": "1936×1088",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 117,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 11.65,
+        "izquierdaDeTintaPx": 609,
+        "anchoTinta": 0.371,
+        "anclaX": "eje",
+        "desviaciones": [
+          "4 palabras vs maxWords 3 de la receta"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 735,
+      "distanciaEnAltos": 0.68,
+      "anchoRelativo": 0.15,
+      "contraste": 14.24,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V59-45-guttery-claro-navy",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 93,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#00284d",
+        "rotacion": null,
+        "contraste": 9.63,
+        "izquierdaDeTintaPx": 86,
+        "anchoTinta": 0.511,
+        "anclaX": "margen",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 65,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#023c70",
+        "rotacion": -8,
+        "contraste": 7.92,
+        "izquierdaDeTintaPx": 83,
+        "anchoTinta": 0.158,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 34,
+        "gapRelativoAlTamaño": 0.52,
+        "ejeCompartido": "margen",
+        "desalineacionOpticaPx": 3
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#00284d",
+        "tintaB": "#023c70",
+        "saltoDeTinta": 1.33,
+        "escala": 1.43,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 955,
+      "distanciaEnAltos": 0.66,
+      "anchoRelativo": 0.15,
+      "contraste": 15.01,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V60-45-guttery-claro-naranja",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": false,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 93,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#00284d",
+        "rotacion": null,
+        "contraste": 9.63,
+        "izquierdaDeTintaPx": 86,
+        "anchoTinta": 0.511,
+        "anclaX": "margen",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 86,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#b24600",
+        "rotacion": -9,
+        "contraste": 3.92,
+        "izquierdaDeTintaPx": 81,
+        "anchoTinta": 0.22,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 23,
+        "gapRelativoAlTamaño": 0.27,
+        "ejeCompartido": "margen",
+        "desalineacionOpticaPx": 5
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#00284d",
+        "tintaB": "#b24600",
+        "saltoDeTinta": 2.67,
+        "escala": 1.07,
+        "ejes": [
+          "familia",
+          "peso",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 932,
+      "distanciaEnAltos": 0.65,
+      "anchoRelativo": 0.15,
+      "contraste": 15.01,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V61-45-brackets",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 108,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.54,
+        "izquierdaDeTintaPx": 234,
+        "anchoTinta": 0.593,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1053,
+      "distanciaEnAltos": 0.73,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V62-45-four-corners",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 108,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.54,
+        "izquierdaDeTintaPx": 234,
+        "anchoTinta": 0.593,
+        "anclaX": "eje",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1053,
+      "distanciaEnAltos": 0.73,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V63-916-brackets-colab",
+    "formato": "9:16",
+    "lienzo": "1088×1936",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 116,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 17.6,
+        "izquierdaDeTintaPx": 188,
+        "anchoTinta": 0.654,
+        "anclaX": "eje",
+        "desviaciones": [
+          "4 palabras vs maxWords 3 de la receta"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 1284,
+      "distanciaEnAltos": 0.66,
+      "anchoRelativo": 0.15,
+      "contraste": 11.96,
+      "aislada": true
+    }
+  },
+  {
+    "id": "V64-169-brackets-moving",
+    "formato": "16:9",
+    "lienzo": "1936×1088",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 117,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 11.65,
+        "izquierdaDeTintaPx": 609,
+        "anchoTinta": 0.371,
+        "anclaX": "eje",
+        "desviaciones": [
+          "4 palabras vs maxWords 3 de la receta"
+        ]
+      }
+    ],
+    "gapsDeTinta": [],
+    "separacionEntreVoces": [],
+    "firma": {
+      "distanciaAlTextoPx": 735,
+      "distanciaEnAltos": 0.68,
+      "anchoRelativo": 0.15,
+      "contraste": 14.24,
+      "aislada": true
+    }
+  },
+  {
+    "id": "G1-costado-chico",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 104,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.54,
+        "izquierdaDeTintaPx": 246,
+        "anchoTinta": 0.573,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 31,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#a6cdf5",
+        "rotacion": -8,
+        "contraste": 4.86,
+        "izquierdaDeTintaPx": 781,
+        "anchoTinta": 0.071,
+        "anclaX": "margen",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 12,
+        "gapRelativoAlTamaño": 0.39,
+        "ejeCompartido": "eje vs margen",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#a6cdf5",
+        "saltoDeTinta": 1.66,
+        "escala": 3.33,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 1029,
+      "distanciaEnAltos": 0.71,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "G2-mellado-medio",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": false,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 104,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.54,
+        "izquierdaDeTintaPx": 246,
+        "anchoTinta": 0.573,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 52,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#a6cdf5",
+        "rotacion": -8,
+        "contraste": 4.67,
+        "izquierdaDeTintaPx": 704,
+        "anchoTinta": 0.118,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": -15,
+        "gapRelativoAlTamaño": -0.29,
+        "ejeCompartido": "eje vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#a6cdf5",
+        "saltoDeTinta": 1.66,
+        "escala": 2,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 1027,
+      "distanciaEnAltos": 0.71,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "G3-mellado-grande",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": false,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 104,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.54,
+        "izquierdaDeTintaPx": 246,
+        "anchoTinta": 0.573,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 71,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#a6cdf5",
+        "rotacion": -8,
+        "contraste": 4.5,
+        "izquierdaDeTintaPx": 610,
+        "anchoTinta": 0.16,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": -6,
+        "gapRelativoAlTamaño": -0.08,
+        "ejeCompartido": "eje vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#a6cdf5",
+        "saltoDeTinta": 1.66,
+        "escala": 1.47,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 993,
+      "distanciaEnAltos": 0.69,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "G4-bajo-centrado",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": false,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 104,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.54,
+        "izquierdaDeTintaPx": 246,
+        "anchoTinta": 0.573,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 57,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#a6cdf5",
+        "rotacion": -8,
+        "contraste": 4.4,
+        "izquierdaDeTintaPx": 501,
+        "anchoTinta": 0.13,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": 16,
+        "gapRelativoAlTamaño": 0.28,
+        "ejeCompartido": "eje vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#a6cdf5",
+        "saltoDeTinta": 1.66,
+        "escala": 1.82,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 989,
+      "distanciaEnAltos": 0.69,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "G5-cruzando",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": false,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 104,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.54,
+        "izquierdaDeTintaPx": 246,
+        "anchoTinta": 0.573,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 65,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#a6cdf5",
+        "rotacion": -14,
+        "contraste": 4.42,
+        "izquierdaDeTintaPx": 536,
+        "anchoTinta": 0.149,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": -1,
+        "gapRelativoAlTamaño": -0.02,
+        "ejeCompartido": "eje vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#a6cdf5",
+        "saltoDeTinta": 1.66,
+        "escala": 1.61,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 981,
+      "distanciaEnAltos": 0.68,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "G6-dos-lineas-hueco",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 144,
+        "lineas": 2,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.18,
+        "izquierdaDeTintaPx": 115,
+        "anchoTinta": 0.593,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 79,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#a6cdf5",
+        "rotacion": -10,
+        "contraste": 4.6,
+        "izquierdaDeTintaPx": 567,
+        "anchoTinta": 0.181,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": -22,
+        "gapRelativoAlTamaño": -0.28,
+        "ejeCompartido": "eje vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#a6cdf5",
+        "saltoDeTinta": 1.66,
+        "escala": 1.82,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 847,
+      "distanciaEnAltos": 0.59,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  },
+  {
+    "id": "G7-916-mellado",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 123,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 16.13,
+        "izquierdaDeTintaPx": 187,
+        "anchoTinta": 0.675,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 74,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#a6cdf5",
+        "rotacion": -8,
+        "contraste": 9.68,
+        "izquierdaDeTintaPx": 685,
+        "anchoTinta": 0.167,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": -5,
+        "gapRelativoAlTamaño": -0.07,
+        "ejeCompartido": "eje vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#a6cdf5",
+        "saltoDeTinta": 1.66,
+        "escala": 1.67,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 1298,
+      "distanciaEnAltos": 0.63,
+      "anchoRelativo": 0.15,
+      "contraste": 19.06,
+      "aislada": true
+    }
+  },
+  {
+    "id": "G8-169-mellado",
+    "formato": "16:9",
+    "lienzo": "2048×1152",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 99,
+        "lineas": 1,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.16,
+        "izquierdaDeTintaPx": 123,
+        "anchoTinta": 0.307,
+        "anclaX": "margen",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 60,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#a6cdf5",
+        "rotacion": -8,
+        "contraste": 9.35,
+        "izquierdaDeTintaPx": 497,
+        "anchoTinta": 0.076,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": -1,
+        "gapRelativoAlTamaño": -0.02,
+        "ejeCompartido": "margen vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#a6cdf5",
+        "saltoDeTinta": 1.66,
+        "escala": 1.67,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 594,
+      "distanciaEnAltos": 0.52,
+      "anchoRelativo": 0.15,
+      "contraste": 18.97,
+      "aislada": true
+    }
+  },
+  {
+    "id": "G9-916-hueco",
+    "formato": "9:16",
+    "lienzo": "1152×2048",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 191,
+        "lineas": 2,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 14.33,
+        "izquierdaDeTintaPx": 115,
+        "anchoTinta": 0.656,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 99,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#a6cdf5",
+        "rotacion": -10,
+        "contraste": 9.51,
+        "izquierdaDeTintaPx": 699,
+        "anchoTinta": 0.226,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": -29,
+        "gapRelativoAlTamaño": -0.29,
+        "ejeCompartido": "eje vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#a6cdf5",
+        "saltoDeTinta": 1.66,
+        "escala": 1.92,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 1090,
+      "distanciaEnAltos": 0.53,
+      "anchoRelativo": 0.15,
+      "contraste": 19.06,
+      "aislada": true
+    }
+  },
+  {
+    "id": "G10-169-hueco",
+    "formato": "16:9",
+    "lienzo": "2048×1152",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 163,
+        "lineas": 2,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 15.22,
+        "izquierdaDeTintaPx": 123,
+        "anchoTinta": 0.262,
+        "anclaX": "margen",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 85,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#a6cdf5",
+        "rotacion": -10,
+        "contraste": 9.54,
+        "izquierdaDeTintaPx": 683,
+        "anchoTinta": 0.109,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": -25,
+        "gapRelativoAlTamaño": -0.29,
+        "ejeCompartido": "margen vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#a6cdf5",
+        "saltoDeTinta": 1.66,
+        "escala": 1.92,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 430,
+      "distanciaEnAltos": 0.37,
+      "anchoRelativo": 0.15,
+      "contraste": 18.97,
+      "aislada": true
+    }
+  },
+  {
+    "id": "G11-45-hueco-caja",
+    "formato": "4:5",
+    "lienzo": "1152×1440",
+    "pasa": true,
+    "voces": [
+      {
+        "id": "titular",
+        "familia": "bricolage",
+        "tam": 144,
+        "lineas": 2,
+        "tracking": -0.035,
+        "leading": 0.9,
+        "tinta": "#ffffff",
+        "rotacion": null,
+        "contraste": 6.18,
+        "izquierdaDeTintaPx": 115,
+        "anchoTinta": 0.593,
+        "anclaX": "eje",
+        "desviaciones": null
+      },
+      {
+        "id": "gesto",
+        "familia": "guttery",
+        "tam": 79,
+        "lineas": 1,
+        "tracking": 0,
+        "leading": 0.9,
+        "tinta": "#a6cdf5",
+        "rotacion": -10,
+        "contraste": 4.6,
+        "izquierdaDeTintaPx": 567,
+        "anchoTinta": 0.181,
+        "anclaX": "ref:titular",
+        "desviaciones": null
+      }
+    ],
+    "gapsDeTinta": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "gapDeTintaPx": -22,
+        "gapRelativoAlTamaño": -0.28,
+        "ejeCompartido": "eje vs ref:titular",
+        "desalineacionOpticaPx": null
+      }
+    ],
+    "separacionEntreVoces": [
+      {
+        "entre": [
+          "titular",
+          "gesto"
+        ],
+        "tintaA": "#ffffff",
+        "tintaB": "#a6cdf5",
+        "saltoDeTinta": 1.66,
+        "escala": 1.82,
+        "ejes": [
+          "familia",
+          "peso",
+          "escala",
+          "tinta"
+        ],
+        "mismaLineaOptica": false,
+        "suficiente": true,
+        "exigeTinta": false
+      }
+    ],
+    "firma": {
+      "distanciaAlTextoPx": 847,
+      "distanciaEnAltos": 0.59,
+      "anchoRelativo": 0.15,
+      "contraste": 20.38,
+      "aislada": true
+    }
+  }
+]
