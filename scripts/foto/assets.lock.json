@@ -1,0 +1,222 @@
+{
+  "_comentario": "Huellas de los assets que el catálogo de foto:prompt declara. Los binarios viven fuera de git (640 MB); esto los verifica sin descargarlos. Regenerar con `pnpm foto:assets:lock` y commitear.",
+  "sellado": "2026-09-20",
+  "assets": {
+    "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png": {
+      "rol": "persona:julio",
+      "sha256": "fc241e2489f15a224de23c5e5c63755450b7fb504b7ccd5f3b25e75bb7e65722"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-08.png": {
+      "rol": "persona:julio",
+      "sha256": "ef836ea26aa5f347a16413675d8aed835dc643e4e68369a4d5f907bfaedfb80a"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-11.png": {
+      "rol": "persona:julio",
+      "sha256": "687e7e650443e6425d6b273b1c0cc2f9f3a8198ce89f6afabe5b8ffbfe5dd65a"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-45-izq.png": {
+      "rol": "persona:julio/45-izq",
+      "sha256": "f8b827f3e586eb8758ed088138403f80ccdbcccdc706fe4dc26e6a741a5373d0"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-45-der.png": {
+      "rol": "persona:julio/45-der",
+      "sha256": "2811ad49f1a03bc90c6e146ec30a1ceeb155a228e7601fa4938934d4d77dc58f"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-perfil-izq.png": {
+      "rol": "persona:julio/perfil-izq",
+      "sha256": "e932197bedf7494ea6f1b6ea212e3460b6acb9d1acc787808d9ba00ea7ab8022"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-perfil-der.png": {
+      "rol": "persona:julio/perfil-der",
+      "sha256": "c1ae6fb69c2dbb59f48e7da7a71496dcf1574fcb7ee158533137b5bc962e629c"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-135-trasero.png": {
+      "rol": "persona:julio/trasero",
+      "sha256": "0a1ed3329548d21b4643920e137a6c864500a4659b8682325668aaa864787290"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-espalda.png": {
+      "rol": "persona:julio/espalda",
+      "sha256": "640f278f70d13bb816b9889c0d8060623880f70ace639d4fa70b40894abd8c07"
+    },
+    "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png": {
+      "rol": "persona:nexa",
+      "sha256": "7f34d10b67f1c2da1cf316fbcfd99c6dcf2505bc070470beeccd2953c46b1818"
+    },
+    "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-point.png": {
+      "rol": "persona:nexa",
+      "sha256": "8caff285df54e18545abcbd9bca04069ad94f7e326c5bbae879db639ab9a70ff"
+    },
+    "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-listen.png": {
+      "rol": "persona:nexa",
+      "sha256": "e76ce55dc9b0fd49b2fd66bbe0aec697fda4f22b6df6c681f28d984bada97bd8"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/frente",
+      "sha256": "4bb97bc7fb7382b898fbdd76c4b97073dbe27e5e401c8c9a612ccf6a3026caf3"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-02-tres-cuartos-izquierda-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/tres-cuartos-izq",
+      "sha256": "171a68997a247cfa2a353835911663c2c49e97ddeb0c7dda20538aa9ecff2195"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-03-lateral-pronunciado-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/lateral",
+      "sha256": "5cb19ae1f9957406d24af205d5a95ef349f85caa25a4ad5dd4157b163d4355f8"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-04-contrapicado-monumental-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/contrapicado",
+      "sha256": "c2d68584fa6dd23b0ab2592fa9fb451200f6cfe17af8c17ba9c111e1d14de0b7"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-05-cenital-plano-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/cenital",
+      "sha256": "ef53a022da1acceab72005c2bf0d33468db85bf3c9a663c380027598b9d57fc9"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-06-flotando-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/flotando",
+      "sha256": "0d928ef313e3a2abd4508c6025e7ee0e610092484083948624fb6b24d96e0803"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-07-rodando-sobre-canto-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/rodando",
+      "sha256": "888da0020d183d76c4f2603ef2dd24578567316a1eb24819ba866b54b8927e53"
+    },
+    "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-08-tres-cuartos-trasero-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:sprocket-hubspot/tres-cuartos-trasero",
+      "sha256": "d0ea5ce54a6742f7bcf30efcf74a3a01fd903e75f3df374adc0ba3a6bcc01ad8"
+    },
+    "ai-generations/2026-09-17_efeonce-ship-3d/final/efeonce-nave-3d-blanco-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:nave-efeonce/frente",
+      "sha256": "c12e6678db2dcb59fe11a38bc9e7806a957ba6f36ad9c58631d10fe6650384c2"
+    },
+    "ai-generations/2026-09-17_efeonce-ship-3d/final/efeonce-nave-3d-blanco-02-tres-cuartos-izquierda-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:nave-efeonce/tres-cuartos-izq",
+      "sha256": "5ad2bf58febf7b3accfc62305997b2262b7078f1334a2580162dcc73f5a433df"
+    },
+    "ai-generations/2026-09-17_efeonce-ship-3d/final/efeonce-nave-3d-blanco-03-perfil-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:nave-efeonce/perfil",
+      "sha256": "49a210d22337d2bec973f1f6f8ca81162177559e734e32e8ee6728e0fd4c1a9a"
+    },
+    "ai-generations/2026-09-17_clawd-poses-3d/final/efeonce-clawd-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:clawd/frente",
+      "sha256": "f93da26cbbc4595e381fda24c0ea88350af976157a09272927618c447d8af792"
+    },
+    "ai-generations/2026-09-17_clawd-poses-3d/final/efeonce-clawd-3d-02-saludo-tres-cuartos-izquierda-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:clawd/saludo",
+      "sha256": "198dc209adcb8ec7d99682368b1c32e4af693df35ec00d65f75afffdc63bd8dd"
+    },
+    "ai-generations/2026-09-17_clawd-poses-3d/final/efeonce-clawd-3d-03-perfil-caminando-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:clawd/perfil",
+      "sha256": "e64bef6e5c683e0409f55892c0a720dea5c5be51ff11ff893b64798d057b352c"
+    },
+    "ai-generations/2026-09-17_codex-poses-3d/final/efeonce-codex-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:codex/frente",
+      "sha256": "a34a295de62b3d27210a5bac0c43d27e36e52616aa0b5d1836aad7d75dc0aef3"
+    },
+    "ai-generations/2026-09-17_codex-poses-3d/final/efeonce-codex-3d-02-saludo-tres-cuartos-izquierda-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:codex/saludo",
+      "sha256": "37828c82d4032174c75453e6514a751e4d93660e7c9678335da6e7f033af4abe"
+    },
+    "ai-generations/2026-09-17_codex-poses-3d/final/efeonce-codex-3d-03-perfil-caminando-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:codex/perfil",
+      "sha256": "b287cc1134999871384abfc205cf62aac67d206af6194cc85a5bafbd85dde39a"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/frente",
+      "sha256": "05aa5938e6fdbeecd6ae478eeede1d1a3d95676ca4ae1dffa8840131498c356c"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-02-espalda-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/espalda",
+      "sha256": "80617479db7c7fdc1f8a2dbadf99aeda14429d8b8577cd5c15a0b79a9cfbe30d"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/tres-cuartos-izq",
+      "sha256": "a348c7c2e14dd5aa5a9551212765237ada44aeb2f107ecc55c770d454a1545c0"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-04-tres-cuartos-derecha-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/tres-cuartos-der",
+      "sha256": "09d66f71d5e7ae6332c7cb7dc66b06b1c73e9b491c73569667aa0199025e22f0"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-05-lateral-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/lateral",
+      "sha256": "ac1eceeb85217ad68df2f06a03036c9f8ed2c701dc327b8826e1ca7a1e6b0131"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-06-cierre-abierto-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/abierta",
+      "sha256": "6687b27d43aee92acc3b3b095dead475babee8cb86802016d0f648d5c2f45c62"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-bomber-efeonce/frente",
+      "sha256": "768de3537fb362456ce9c20595a958551bfe89883446cc6455d5e6d70b8a44ff"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-02-espalda-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-bomber-efeonce/espalda",
+      "sha256": "d1cd6755c31b24b23dc0aacf2f69cd5e9206f3a530ae78b05505515e29d71500"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
+      "rol": "kit:chaqueta-bomber-efeonce/tres-cuartos-izq",
+      "sha256": "b3f4269bb674804fd9b61d5247c6d9c41b7efc0750091a405240e6ecb609a47b"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/frente",
+      "sha256": "7b11063a107bc0dcbeb7ea39096c7bb3e0aedb2b9b5ef7af47b0f91caa944000"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-02-lateral-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/lateral",
+      "sha256": "76b1547bbc5b80e1b1d3c1456d75b4e8c48c0bdf91e1b46e77ff4d95cde4c656"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-03-trasera-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/trasera",
+      "sha256": "e8e11130a18f734e2011fd9911abbed4958092d0d1eea374e8c145ea1037c434"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-05-cenital-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/cenital",
+      "sha256": "bd9b7cd005ad3afc2450ef06f57d373b10f5ce7ccd46b7105ddbe17e4ae53d21"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-navy-logotipo-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/navy-logotipo",
+      "sha256": "f5834bff6f464309a564a1f2c8334b02cc8eeb3b835525a6de81214a1b3b3fe0"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v3-navy-isotipo-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/navy-isotipo",
+      "sha256": "f082b243a1fb12fd1725565e8de539481e1c57a69aa99657de108b78a8823b75"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v5-trucker-navy-1600x1600-v01-transparente.png": {
+      "rol": "kit:gorra-efeonce/trucker-navy",
+      "sha256": "c6f2aa8c617838ca59955115baa570ec74b55168104e097439a817243ea19213"
+    },
+    "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-01-conjunto-1200x1600-v01-transparente.png": {
+      "rol": "kit:lanyard-efeonce/conjunto",
+      "sha256": "db2c460171134eac45581d29f81a924e293efafdd3e93a648ebcc2bbf550f232"
+    },
+    "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-12-conjunto-colgado-1200x1600-v01-transparente.png": {
+      "rol": "kit:lanyard-efeonce/colgado",
+      "sha256": "30cbcd292b19c340baa4f7ffa71f9a84c18352f991255fe6722b0bc5989a31e6"
+    },
+    "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-10-portacarnet-vacio-1200x1600-v01-transparente.png": {
+      "rol": "kit:lanyard-efeonce/portacarnet-vacio",
+      "sha256": "b3fbafdd8519d95b4f8a6cdd1c2be2a21e3a030862463a4ccf9884e31760a838"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:polo-efeonce/frente",
+      "sha256": "dbcf1f1ca14e354c21873d521f93b929f18591992a709979cc6f40e020d6ba3a"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-02-espalda-1600x1600-v01-transparente.png": {
+      "rol": "kit:polo-efeonce/espalda",
+      "sha256": "a6b2294ab026548e32e4e9c9ea11afeb4085c50fa3cc08aab840aa2bbac4543c"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
+      "rol": "kit:polo-efeonce/tres-cuartos-izq",
+      "sha256": "49321dc2ea66b8dc119377140c10d665f89e9f211353e6f0ad966cc2abab5057"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:hoodie-efeonce/frente",
+      "sha256": "fb65b41f0fe2f5d91221304411916dc04c4a38cf1685290850d581b516225be4"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-02-espalda-1600x1600-v01-transparente.png": {
+      "rol": "kit:hoodie-efeonce/espalda",
+      "sha256": "1769edcf2d9039abc852cdad886c8a49f4775afead29ce2d632eb7f86c835c43"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
+      "rol": "kit:hoodie-efeonce/tres-cuartos-izq",
+      "sha256": "d505b3b621969df5704499ff28866138b5436646105f5da5026efd11734ec717"
+    }
+  }
+}

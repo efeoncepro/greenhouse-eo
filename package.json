@@ -366,7 +366,9 @@
     "mcp:skills:check": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-skill-catalog-artifact.ts",
     "mcp:selection-eval": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/mcp/tool-selection-eval.ts",
     "auth-server:verify-contrast": "node scripts/auth-server/verify-contrast.mjs",
-    "auth-server:verify-passkey": "node scripts/auth-server/verify-passkey-lane.mjs"
+    "auth-server:verify-passkey": "node scripts/auth-server/verify-passkey-lane.mjs",
+    "foto:assets:lock": "node scripts/foto/assets-lock.mjs",
+    "foto:assets:check": "node scripts/foto/assets-lock.mjs --check"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,mts,js,jsx}": [

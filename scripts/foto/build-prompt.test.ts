@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest'
 // El .mjs no lleva tipos a propósito: es una herramienta de corrida, no código de producto. Ya no
 // hace falta `@ts-expect-error` — al exportar OBJETOS y PALANCAS, TS resuelve el módulo y la
 // directiva quedaría sin uso (TS2578 rompe el pre-push).
-import { auditarEscena, auditarVestuario, construirPrompt, detectarValorDeFormato, OBJETOS, PALANCAS } from './build-prompt.mjs'
+import { auditarEscena, auditarVestuario, construirPrompt, detectarValorDeFormato, OBJETOS, PALANCAS, PERSONAS } from './build-prompt.mjs'
 
 const raiz = path.resolve(__dirname, '../..')
 const BLOQUES = path.join(raiz, 'scripts/foto/bloques')
@@ -557,5 +557,40 @@ describe('foto:prompt · palancas de encuadre', () => {
   it('la larga exposición marca que el aviso de momento no aplica', () => {
     expect(construirPrompt({ ...fichaBase, palanca: 'larga-exposicion' }).sinMomento).toBe(true)
     expect(construirPrompt({ ...fichaBase, palanca: 'pov' }).sinMomento).toBe(false)
+  })
+})
+
+// ── Integridad del catálogo sin los binarios ─────────────────────────────────────────────────────
+// Esta es la verificación que se perdió al saltar los tests que tocan disco: los assets pesan 640 MB
+// y viven fuera de git, así que CI no los tiene. El lock de huellas SÍ está versionado, y con él se
+// comprueba que cada vista declarada por el catálogo exista de verdad — sin descargar un byte.
+describe('foto:prompt · el catálogo coincide con el lock de assets', () => {
+  const lock = JSON.parse(readFileSync(path.join(raiz, 'scripts/foto/assets.lock.json'), 'utf8')) as {
+    assets: Record<string, { rol: string; sha256: string }>
+  }
+
+  it('el lock no está vacío', () => {
+    expect(Object.keys(lock.assets).length).toBeGreaterThan(40)
+  })
+
+  it.each(
+    Object.entries(OBJETOS as Record<string, { base: string; patron: string; vistas: Record<string, string> }>).flatMap(
+      ([clave, o]) => Object.entries(o.vistas).map(([vista, sufijo]) => [clave, vista, o.base + o.patron.replace('<V>', sufijo)] as const)
+    )
+  )('kit %s · vista %s está en el lock', (_clave, _vista, ruta) => {
+    expect(lock.assets[ruta]).toBeDefined()
+  })
+
+  it.each(
+    Object.entries(PERSONAS as Record<string, { refs: string[]; vistas?: Record<string, string> }>).flatMap(([clave, p]) => [
+      ...p.refs.map(r => [clave, r] as const),
+      ...Object.values(p.vistas ?? {}).map(r => [clave, r] as const)
+    ])
+  )('referencia de %s está en el lock', (_clave, ruta) => {
+    expect(lock.assets[ruta]).toBeDefined()
+  })
+
+  it('cada huella es un sha256 con forma válida', () => {
+    for (const entrada of Object.values(lock.assets)) expect(entrada.sha256).toMatch(/^[0-9a-f]{64}$/)
   })
 })

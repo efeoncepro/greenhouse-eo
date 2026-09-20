@@ -49,11 +49,31 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 - **La luz con carácter va sobre el SUJETO; la reserva vive en la sombra que esa luz deja, nunca en su camino.**
   Vale también para el **lecho**: medido, 3,16 → 3,93 → **11,55:1** sólo por sacarlo del haz.
 - **Nunca un scrim.** Si el contraste no da, se **regenera** el plate; no se oscurece en post.
-- **El plate nace sin logo ni texto.** La firma es el SVG oficial compuesto después, **20% del lienzo**
+- **El plate nace sin logo ni texto.** La firma es el SVG oficial compuesto después, **20% del lado corto del lienzo**
   (decisión del operador 2026-09-20), contraste ≥ 4,5:1 medido.
 - **Tope de tanda:** más de 6 fichas exige que cada una declare un `piloto` ya generado en disco. La calidad sale
   de generar poco y **mirar cada plate**.
 - **Nunca ancles la serie en la categoría de un cliente** (pintura = Berel). El comando aborta.
+
+## Los assets viven fuera de git — y el lock los vigila
+
+Los renders de referencia y los kits pesan **640 MB** y están en `.gitignore`. Viven en la máquina y en OneDrive
+(`5. Contenidos/13- Branding/` y `14. Mascotas de partners/`). Lo que **sí** está versionado es
+`scripts/foto/assets.lock.json`: la huella SHA-256 de los **54** assets que el catálogo declara.
+
+```bash
+pnpm foto:assets:check   # ¿el catálogo y el lock coinciden?
+pnpm foto:assets:lock    # resella el lock (tras agregar un kit o cambiar un asset a propósito)
+```
+
+Para qué sirve:
+
+- **CI verifica el catálogo sin descargar nada.** Si agregas un kit con la ruta mal escrita, falla ahí.
+- **Detecta que tu copia local difiere de la aprobada.** `pnpm foto:prompt` avisa antes de generar, y
+  `pnpm foto:doctor` lo chequea entre sus pasos. Sin esto, una copia derivada produce una pieza con una
+  referencia que el equipo nunca aprobó, y nada lo delata.
+
+**Si agregas un kit o una vista al catálogo, resella el lock y commitéalo**, o el test lo marca como faltante.
 
 ## Al cerrar
 

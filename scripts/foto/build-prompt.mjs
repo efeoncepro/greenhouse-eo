@@ -13,6 +13,7 @@
 //
 // Canon: docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md (bloques)
 //        docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md (reservas)
+import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -161,7 +162,7 @@ const INCOMPATIBLES = {
 // Sin esto, una toma con Julio o Nexa se armaba a mano — justo lo que este comando existe para
 // impedir. El modo de falla no era estético: un prompt sin IDENTITY ni REFERENCES genera una cara
 // inventada, se ve "bien" en la hoja de contacto y se paga igual.
-const PERSONAS = {
+export const PERSONAS = {
   julio: {
     etiqueta: 'Julio',
     // Geometría, no adjetivos. Cuatro iteraciones el 2026-09-20 probaron que «cara delgada» no
@@ -609,6 +610,40 @@ function bloquePalanca(ficha) {
   return { texto, sinMomento: Boolean(palanca.sinMomento) }
 }
 
+
+// ── Deriva de assets ────────────────────────────────────────────────────────────────────────────
+// Los binarios viven fuera de git, así que una copia local puede diferir de la aprobada sin que nada
+// lo note, y la pieza saldría con una referencia que el equipo no aprobó. Se comprueban SÓLO los
+// assets que esta ficha usa (3 a 5), no los 54: es barato y ataja el caso real.
+function derivaDeAssets(imagenes) {
+  const lockPath = path.join(raiz, 'scripts/foto/assets.lock.json')
+
+  if (!imagenes.length || !existsSync(lockPath)) return []
+
+  let lock
+
+  try {
+    lock = JSON.parse(readFileSync(lockPath, 'utf8'))
+  } catch {
+    return []
+  }
+
+  const derivados = []
+
+  for (const ref of imagenes) {
+    const esperado = lock.assets?.[ref]?.sha256
+    const abs = path.join(raiz, ref)
+
+    if (!esperado || !existsSync(abs)) continue
+
+    const real = createHash('sha256').update(readFileSync(abs)).digest('hex')
+
+    if (real !== esperado) derivados.push(ref)
+  }
+
+  return derivados
+}
+
 const FICHA_EJEMPLO = {
   id: 'ejemplo-picado-mesa-oscura',
   formato: '4:5',
@@ -843,6 +878,18 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
 
     // El aviso de derechos viaja con el kit, no con la memoria de quien lo usa.
     for (const a of avisosObjeto ?? []) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: ${a}`)
+  }
+
+  for (const { ficha, imagenes } of resueltas) {
+    const derivados = derivaDeAssets(imagenes)
+
+    for (const d of derivados) {
+      console.error(
+        `  ⚠ ${ficha.id ?? 'ficha'}: "${d}" NO coincide con el asset aprobado (assets.lock.json). ` +
+          'Generar con él usaría una referencia distinta de la que el equipo aprobó. ' +
+          'Restaura la copia buena, o si el cambio es intencional corre `pnpm foto:assets:lock` y commitea.'
+      )
+    }
   }
 
   // `pnpm ai:image --batch` NO transporta `--image`: un batch con identidad genera caras inventadas

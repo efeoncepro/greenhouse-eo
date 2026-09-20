@@ -196,6 +196,58 @@ const main = async () => {
   }
 
   // ── Salida ───────────────────────────────────────────────────────────────────────────────────────
+  // ── Assets del catálogo contra el lock de huellas ───────────────────────────────────────────────
+  // Los renders de referencia y los kits pesan 640 MB y viven fuera de git, así que una copia local
+  // puede diferir de la aprobada sin que nada lo note y la pieza saldría con una referencia que el
+  // equipo no aprobó. Faltar NO bloquea (en una máquina sin el set se puede preparar igual); diferir
+  // SÍ, porque generaría con la referencia equivocada.
+  try {
+    const { verificar } = await import('./assets-lock.mjs')
+    const r = verificar()
+
+    if (r.sinLock) {
+      añadir({
+        nombre: 'Assets del catálogo',
+        estado: 'aviso',
+        detalle: 'sin assets.lock.json',
+        arreglo: 'pnpm foto:assets:lock',
+        bloquea: false
+      })
+    } else if (r.sinDeclarar.length) {
+      añadir({
+        nombre: 'Assets del catálogo',
+        estado: 'falla',
+        detalle: `${r.sinDeclarar.length} vista(s) del catálogo no están en el lock`,
+        arreglo: 'pnpm foto:assets:lock && commitear',
+        bloquea: true
+      })
+    } else if (r.cambiados.length) {
+      añadir({
+        nombre: 'Assets del catálogo',
+        estado: 'falla',
+        detalle: `${r.cambiados.length} asset(s) difieren del aprobado: ${r.cambiados[0]}`,
+        arreglo: 'restaura la copia buena, o pnpm foto:assets:lock si el cambio es intencional',
+        bloquea: true
+      })
+    } else if (r.faltanEnDisco.length) {
+      añadir({
+        nombre: 'Assets del catálogo',
+        estado: 'aviso',
+        detalle: `${r.faltanEnDisco.length} no están en esta máquina (se pueden bajar de OneDrive)`,
+        bloquea: false
+      })
+    } else {
+      añadir({ nombre: 'Assets del catálogo', estado: 'ok', detalle: 'coinciden con el lock', bloquea: false })
+    }
+  } catch (e) {
+    añadir({
+      nombre: 'Assets del catálogo',
+      estado: 'aviso',
+      detalle: `no se pudo verificar: ${(e as Error).message.slice(0, 60)}`,
+      bloquea: false
+    })
+  }
+
   const bloqueantes = chequeos.filter(c => c.estado === 'falla' && c.bloquea)
 
   if (process.argv.includes('--json')) {
