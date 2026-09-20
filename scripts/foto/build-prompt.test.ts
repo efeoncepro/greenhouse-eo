@@ -14,6 +14,7 @@ import {
   auditarAcentoDeTanda,
   auditarColor,
   auditarEscena,
+  auditarRegistroVestuario,
   auditarReservas,
   auditarVestuario,
   construirPrompt,
@@ -831,5 +832,30 @@ describe('acento cálido — la dosis vive en la tanda, no en la pieza', () => {
   // Una pieza suelta no es una tanda: no hay dosis que medir sobre una sola.
   it('no opina sobre una pieza suelta', () => {
     expect(auditarAcentoDeTanda([sinAcento])).toHaveLength(0)
+  })
+})
+
+describe('código de vestuario — la prenda dice el registro', () => {
+  // Dictado por el operador el 2026-09-20. No es variedad visual: una reunión importante en hoodie
+  // dice lo contrario de lo que la escena cuenta.
+  it('avisa cuando se mezclan registros incompatibles', () => {
+    expect(auditarRegistroVestuario(['chaqueta-softshell-efeonce', 'gorra-efeonce']).join(' ')).toMatch(/mezcla registros/)
+    expect(auditarRegistroVestuario(['hoodie-efeonce', 'chaqueta-bomber-efeonce'])).toHaveLength(1)
+  })
+
+  // El polo vive en DOS registros: solo es oficina casual, con gorra es terreno.
+  it('el polo con gorra es terreno, y no avisa', () => {
+    expect(auditarRegistroVestuario(['polo-efeonce', 'gorra-efeonce'])).toHaveLength(0)
+  })
+
+  // El lanyard marca pertenencia, no registro: acompaña a cualquier prenda.
+  it('el lanyard es transversal: va en casual y en reunión por igual', () => {
+    expect(auditarRegistroVestuario(['polo-efeonce', 'lanyard-efeonce'])).toHaveLength(0)
+    expect(auditarRegistroVestuario(['chaqueta-softshell-efeonce', 'lanyard-efeonce'])).toHaveLength(0)
+  })
+
+  it('una sola prenda nunca se contradice a sí misma', () => {
+    expect(auditarRegistroVestuario(['hoodie-efeonce'])).toHaveLength(0)
+    expect(auditarRegistroVestuario([])).toHaveLength(0)
   })
 })

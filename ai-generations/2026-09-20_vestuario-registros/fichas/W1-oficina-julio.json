@@ -1,0 +1,11 @@
+{
+  "id": "W1-oficina-julio",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "escucha",
+  "identidad": ["julio"],
+  "objetos": ["polo-efeonce", "lanyard-efeonce"],
+  "reservas": { "texto": { "muro": "a tall wall of vertical oak acoustic slats, each batten casting its own fine shadow line", "tinta": "blanca" } },
+  "escena": "SCENE (a working session, studio in Santiago, morning): he wears the Efeonce team polo with the Efeonce lanyard around his neck, the badge resting against his chest — office register, relaxed. He is RECEIVING, not speaking: mouth closed, gaze lowered and going out of frame to the left towards whoever is talking, one hand resting near his jaw, body still. He sits LOW in the lower half of the frame. The light is a hard shaft of morning sun that lands on HIM and on the desk; the reserved slat wall above stays in its own even shadow, outside the beam. An AZURE-BLUE screen glows at the left edge, out of frame. Caught AT THE INSTANT he tilts his head a degree to catch a word. In the very near foreground, a stack of matte black sample boxes stands against the lens, unlit and outside the beam. 85mm at f/1.8. Everything is completely unbranded beyond the Efeonce garments.",
+  "lecho": { "objeto": "a stack of matte black sample boxes right against the lens, unlit", "tono": "DARK near black, matte" }
+}

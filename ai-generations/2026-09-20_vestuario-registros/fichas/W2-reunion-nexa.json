@@ -1,0 +1,11 @@
+{
+  "id": "W2-reunion-nexa",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "pov",
+  "identidad": ["nexa"],
+  "objetos": ["chaqueta-softshell-efeonce", "lanyard-efeonce"],
+  "reservas": { "texto": { "muro": "a wall of raw board-formed concrete with the grain of the planks still printed in it", "tinta": "blanca" } },
+  "escena": "SCENE (a review with the client, meeting room in Santiago, morning): she wears the Efeonce team softshell jacket with the Efeonce lanyard — the high register, an important meeting. The camera takes THE CLIENT'S PLACE at the table: it sits at seated eye level, she is on the far side facing it, and she addresses that place — she looks at the work between them, never into the lens. The nearest edge of the viewer's own chair enters at the bottom. She sits LOW in the frame; the reserved concrete wall above her stays in even shadow with nothing crossing it. An AZURE-BLUE screen on the side wall lights her jaw. Caught AT THE INSTANT she turns a printed sheet towards the empty chair. 50mm at f/2. Everything is completely unbranded beyond the Efeonce garments.",
+  "lecho": { "objeto": "the near edge of the viewer's own chair back, right against the lens, unlit", "tono": "DARK near black, matte" }
+}

@@ -51,6 +51,11 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 
 - **Identidad:** el set de Julio es `2026-09-20_identidad-julio-nexa/refs-aprobadas/` (+ 6 ángulos derivados).
   El set viejo de `2026-09-17_equipo-vestuario/` **idealizaba el rostro** y arrastraba deriva.
+- **Código de vestuario Efeonce** **[operador, 2026-09-20]**: la prenda dice el REGISTRO de la escena.
+  **Polera piqué** = oficina casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno ·
+  **Hoodie** = terreno · **Lanyard y carnet** = transversales, van en casual y en formal por igual. Se elige por
+  el registro de la escena, NUNCA por variedad visual: una reunión importante en hoodie dice lo contrario de lo
+  que la foto cuenta.
 - **`ignore their clothing` NO alcanza:** con identidad, **declara el vestuario en la escena** o el modelo copia
   la ropa de las referencias. El comando avisa.
 - **Editar conserva, generar reconstruye.** Para un ángulo nuevo de una persona, **edita su foto aprobada**;

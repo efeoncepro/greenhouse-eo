@@ -1,0 +1,12 @@
+{
+  "id": "W4-terreno-nexa",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "atraviesa",
+  "atmosfera": "polvo",
+  "identidad": ["nexa"],
+  "objetos": ["polo-efeonce", "gorra-efeonce"],
+  "reservas": { "margen": { "superficie": "the unlit brick wall of the warehouse, its mortar lines running evenly", "tinta": "blanca" } },
+  "escena": "SCENE (a set being rigged, warehouse in Lima, late afternoon): she wears the Efeonce team polo and the Efeonce cap — field register, on location. A steel rail crosses the RIGHT half of the frame in a hard diagonal, sharp along its whole length, passing in front of her WITHOUT covering her face. A hard low sun beam comes from the right and lights her and the dust in the air; the reserved brick wall down the LEFT side stays in its own even shadow, nothing crossing it. A large AZURE-BLUE lighting panel stands lit in the right background. An ORANGE strip of marking tape runs along the floor at the right edge. Caught AT THE INSTANT she locks a clamp shut. 35mm at f/4. Everything is completely unbranded beyond the Efeonce garments.",
+  "lecho": { "objeto": "the near edge of a matte black flight case at the bottom of the frame, unlit", "tono": "DARK near black, matte" }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "W3-reunion-ambos",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "entre-dos",
+  "identidad": ["julio", "nexa"],
+  "objetos": ["chaqueta-bomber-efeonce", "lanyard-efeonce"],
+  "reservas": { "margen": { "superficie": "the unlit plaster wall of the meeting room, its trowel marks still visible", "tinta": "blanca" } },
+  "escena": "SCENE (working through a problem, meeting room in Santiago, evening): both wear the Efeonce team bomber jacket with the Efeonce lanyard — the register of an important instance. The camera sits IN THE SPACE BETWEEN them: he is at the RIGHT edge of the frame and she is further right, both cut by the frame, and NEITHER looks at the camera — they look ACROSS it at each other. The reserved plaster wall runs down the LEFT side of the frame, unbroken and in its own shadow, with nothing crossing it. An AZURE-BLUE wall screen behind them edges both faces. Caught AT THE INSTANT he stops speaking and she draws breath. 35mm at f/2.8. Everything is completely unbranded beyond the Efeonce garments.",
+  "lecho": { "objeto": "the out-of-focus edge of the table right against the lens, unlit", "tono": "DARK walnut in shadow, matte" }
+}

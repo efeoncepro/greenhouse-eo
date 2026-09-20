@@ -182,6 +182,12 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 > terceros y producía un mundo sin letras que delata la generación: «con lomos de libros y etiquetas en cuadro,
 > cero texto legible es estadísticamente imposible». Corregido en `bloque-realismo-v3`.
 
+> **Código de vestuario** **[operador, 2026-09-20]**: la prenda dice el REGISTRO. **Polera piqué** = oficina
+> casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno · **Hoodie** = terreno ·
+> **Lanyard y carnet** = transversales, van igual en casual y en formal. Se elige por el registro de la escena,
+> nunca por variedad visual. Detalle:
+> [personas, identidad y vestuario](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
+
 > **Dos categorías de pieza** **[operador, 2026-09-20]**: la **muda** —sólo foto y firma— es legítima y sirve de
 > **descanso visual** para relajar el feed; la **con voz** lleva la capa gráfica. La diferencia se decide **antes**
 > de generar, no después. Muda: `foto:prompt` → `foto:validar`. Con voz: `foto:prompt` con `reservas` →

@@ -269,3 +269,27 @@ que el real**, y además lo vestían siempre formal (8/8 formal, 6/8 azul o navy
 
 Las imágenes están gitignoreadas: viven en esta máquina y en OneDrive. Lo versionado es el manifiesto y los
 prompts. Otra sesión en otro equipo **no tiene el set** hasta que se copie desde OneDrive.
+
+## Delta 2026-09-20 — código de vestuario Efeonce **[decisión del operador]**
+
+La ropa corporativa **no es intercambiable**: cada prenda dice en qué registro está ocurriendo la escena, y
+elegir mal contradice lo que la foto cuenta. Dictado por el operador el 2026-09-20 y vigente para toda pieza con
+personas de Efeonce.
+
+| Registro | Prenda | Qué comunica |
+|---|---|---|
+| **Oficina, casual** | **Polera piqué** (`polo-efeonce`) | El día a día relajado, trabajo de escritorio y de estudio |
+| **Reunión / importante** | **Chaqueta** (`chaqueta-softshell-efeonce`, `chaqueta-bomber-efeonce`) | Reuniones, instancias importantes, oficio que se presenta. No es traje: es el registro alto de Efeonce |
+| **Terreno** | **Gorra** (`gorra-efeonce`) **+ polera piqué** | Trabajo fuera de la oficina: rodaje, activación, visita, montaje |
+| **Terreno** | **Hoodie** (`hoodie-efeonce`) | Terreno, igual que la gorra; el registro de campo cuando hace frío o la jornada es larga |
+| **Transversal** | **Lanyard y carnet** (`lanyard-efeonce`) | **Van en cualquier registro**, casual o de reunión. No marcan registro: marcan pertenencia |
+
+**Reglas que se siguen de esto:**
+
+- **La prenda se elige por el registro de la escena, no por variedad visual.** Una reunión importante en hoodie
+  dice lo contrario de lo que la escena cuenta; un montaje en terreno con chaqueta de reunión, también.
+- **Gorra y polo van juntos en terreno**: la gorra no es un accesorio suelto de oficina.
+- **El lanyard no decide el registro.** Puede acompañar al polo en la oficina o a la chaqueta en una reunión, y
+  su arte se compone con el kit —nunca se le pide al modelo que invente el carnet.
+- Sigue vigente la regla anterior: **con identidad declarada, el vestuario se declara en la escena**. `ignore
+  their clothing` no alcanza — el modelo copia la ropa de las referencias si no se le dice qué lleva.

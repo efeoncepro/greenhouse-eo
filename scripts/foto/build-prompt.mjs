@@ -832,6 +832,36 @@ const ACENTO =
 // las doce piezas de la auditoría ciega: NINGUNA la declaró y las doce reprobaron la banda de texto (la
 // mejor llegó a 0,10 del alto contra un mínimo de 0,28). Una pieza sin texto es legítima; una que va a
 // llevar titular y no reservó espacio ya nació sin él, y eso no se arregla en composición.
+// CÓDIGO DE VESTUARIO [operador, 2026-09-20]: la prenda dice el REGISTRO de la escena y no es
+// intercambiable. Una reunión importante en hoodie dice lo contrario de lo que la foto cuenta.
+// El polo vive en dos registros: solo es oficina casual, con gorra es terreno.
+// El lanyard y el carnet son TRANSVERSALES: marcan pertenencia, no registro.
+const REGISTRO_PRENDA = {
+  'polo-efeonce': ['oficina', 'terreno'],
+  'chaqueta-softshell-efeonce': ['reunion'],
+  'chaqueta-bomber-efeonce': ['reunion'],
+  'gorra-efeonce': ['terreno'],
+  'hoodie-efeonce': ['terreno'],
+  'lanyard-efeonce': ['oficina', 'reunion', 'terreno']
+}
+
+export const auditarRegistroVestuario = objetos => {
+  const prendas = (objetos ?? []).filter(o => REGISTRO_PRENDA[o])
+
+  if (prendas.length < 2) return []
+
+  // Compatible si queda al menos un registro que TODAS las prendas admiten.
+  const comun = prendas.reduce((acc, o) => acc.filter(r => REGISTRO_PRENDA[o].includes(r)), REGISTRO_PRENDA[prendas[0]])
+
+  if (comun.length > 0) return []
+
+  return [
+    `mezcla registros de vestuario: ${prendas.map(o => `${o} (${REGISTRO_PRENDA[o].join('/')})`).join(' + ')}. ` +
+      'La prenda dice el registro de la escena — polo=oficina casual · chaqueta=reunión · gorra+polo y hoodie=terreno · ' +
+      'lanyard=transversal — y se elige por lo que la escena ES, nunca por variedad visual.'
+  ]
+}
+
 export const auditarReservas = ficha => {
   // `reservas` es un OBJETO con claves (`texto`, `margen`, `seleccion`), no un array: comprobar
   // `Array.isArray` daba el aviso incluso a una ficha que SÍ reservaba. Error propio del 2026-09-20,
@@ -1153,6 +1183,7 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     avisos.push(...auditarColor(ficha.escena))
 
     avisos.push(...auditarReservas(ficha))
+    avisos.push(...auditarRegistroVestuario(ficha.objetos))
 
     if (vestuario) avisos.push(vestuario)
 
