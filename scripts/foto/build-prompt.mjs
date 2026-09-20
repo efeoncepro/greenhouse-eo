@@ -555,8 +555,10 @@ const ANCLAS_PROHIBIDAS = [
 // `daylight` y `midday` faltaban y marcaban falso negativo en una escena que SÍ declaraba luz dura
 // de vitrina a mediodía [medido 2026-09-20]. Un aviso que grita donde no debe se vuelve ruido y deja
 // de leerse justo cuando acierta.
+// Cuarto falso negativo del día: la LUZ MOTIVADA por una pantalla o un monitor visible en cuadro es
+// una fuente legítima —de hecho es la que más realismo da— y el detector no la conocía.
 const LUZ =
-  /\b(sun|sunlight|sunbeam|daylight|midday|noon|beam|backlit|rim-?lit|lit only|lamp|window light|golden hour|hard light|directional|shaft|raking|rakes|silhouett|spot|spotlight|stage light|practical|key light|candlelit|firelight|neon)/i
+  /\b(sun|sunlight|sunbeam|daylight|midday|noon|beam|backlit|rim-?lit|lit only|only light|lamp|window light|golden hour|hard light|directional|shaft|raking|rakes|silhouett|spot|spotlight|stage light|practical|key light|candlelit|firelight|neon|monitor|screen|display|glow|glowing|lights? (?:her|him|them|his|the)\b)/i
 
 // Tercer falso negativo de vocabulario en un día (tras `daylight` y `stage spot`): una escena decía
 // «at the instant the marker lifts off the glass» y el aviso saltaba igual. Un aviso que grita donde

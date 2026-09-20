@@ -477,3 +477,14 @@ describe('foto:prompt · acción suspendida', () => {
     expect(construirPrompt({ ...fichaBase, suspendido: 'the loose sheets of paper' }).llevaSuspendido).toBe(true)
   })
 })
+
+// La luz motivada —una pantalla o un monitor visible en cuadro que ilumina al sujeto— es la fuente
+// que más realismo da, y el detector no la reconocía [cuarto falso negativo, 2026-09-20].
+describe('foto:prompt · luz motivada por una fuente en cuadro', () => {
+  it.each([
+    'SCENE: the ONLY light is the calibration monitor in frame, and that screen is what lights her as she turns.',
+    'SCENE: the wide display glowing cool blue lights him as he leans in at the instant it swings into view.'
+  ])('la reconoce como fuente declarada', escena => {
+    expect(auditarEscena(escena)).not.toContainEqual(expect.stringContaining('FUENTE DE LUZ'))
+  })
+})
