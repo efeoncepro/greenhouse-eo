@@ -7,7 +7,9 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-// @ts-expect-error -- .mjs sin tipos, a propósito: es una herramienta de corrida, no código de producto.
+// El .mjs no lleva tipos a propósito: es una herramienta de corrida, no código de producto. Ya no
+// hace falta `@ts-expect-error` — al exportar OBJETOS y PALANCAS, TS resuelve el módulo y la
+// directiva quedaría sin uso (TS2578 rompe el pre-push).
 import { auditarEscena, auditarVestuario, construirPrompt, detectarValorDeFormato, OBJETOS, PALANCAS } from './build-prompt.mjs'
 
 const raiz = path.resolve(__dirname, '../..')
