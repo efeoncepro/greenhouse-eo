@@ -133,6 +133,28 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
   elemento nítido que ancla. **No tiene momento decisivo** y es correcto que no lo tenga.
 - **Oclusión** (`palanca: oclusion` + `ocluye`) — la cámara **miró desde detrás de algo**. Debe cubrir **una parte
   real** del sujeto: pedida a medias se lee «hay algo delante» y la palanca se anula **[medido]**.
+- **Silueta** (`palanca: silueta`) — contraluz que **borra el rostro**: deja el gesto y quita la identidad.
+- **Reflejo** (`palanca: reflejo`) — dos realidades en un cuadro a través de un vidrio, **ambas visibles a la vez**.
+- **Ausencia** (`palanca: ausencia`) — **no hay nadie**; queda la huella del trabajo recién ocurrido. Sin momento,
+  y es correcto.
+- **Fragmento** (`palanca: fragmento` + `corta`) — el sujeto **no cabe**. «Radical» no significa nada: se declara
+  **por dónde corta el borde**.
+- **Instrumento** (`palanca: instrumento` + `instrumento`) — a través de la herramienta del oficio (lupa, visor,
+  prisma). **Pasa el test de sustitución por construcción**.
+- **Cenital** (`palanca: cenital`) — perpendicular sobre la mesa, oficio en curso, manos por los bordes. Sin lecho.
+- **Suelo oblicuo** (`palanca: suelo-oblicuo`) — la cámara **apoyada en el piso**, ladeada y rotada.
+- **Little planet** (`palanca: little-planet`) — proyección estereográfica: horizonte **circular cerrado**. Sin lecho.
+- **Sombra** (`palanca: sombra`) — **la sombra es el sujeto**, la forma más detallada del cuadro.
+- **Dentro del objeto** (`palanca: dentro-del-objeto` + `objetoContenedor`) — el lente vive dentro y mira afuera.
+
+> **Las quince, con cómo se logra cada una, sus marcadores verbatim, su evidencia y las cuatro descartadas con su
+> razón medida:** [catálogo de palancas](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
+
+> **El sistema de color va en TODAS.** Al probar una palanca nueva es fácil concentrarse en la geometría y
+> dejar la paleta fuera: pasó en **21 de 21** fichas y las piezas salieron como fotografía genérica en vez de
+> Efeonce **[medido 2026-09-20]**. El azul va **en un portador visible** (pantalla, panel, lona, carpeta, tinta
+> cian de un pliego), nunca como HEX suelto; el acento naranja o lima, 1–5%, **nace de la situación** (cinta de
+> marcaje, post-it, lápiz graso, sandbag). `pnpm foto:prompt` avisa si la escena no declara ninguno.
 
 > **UNA palanca dominante por pieza.** Combinar dos las diluye: cada una pide el control de la escena y el
 > resultado tiene un poco de cada una y lo mejor de ninguna **[medido 2026-09-20]**. El comando rechaza una lista.
@@ -159,7 +181,7 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 | Macro · barrido · noche · dron | 100 mm f/4 · 35 mm lento · 50 mm f/1,8 · cenital 25 m | textura · Run & Gun · cierre · eventos | según toma (dron: sin lecho) |
 
 El operador aprobó **dos ángulos de Nexa**: ojo de pez fuerte (N1b) y ojo de pez a ras del borde de la mesa (N1).
-Todo se probó en **4:5 1152×1440**; 9:16 y 16:9 nativos están **pendientes**. Catálogo completo con mediciones:
+El lenguaje se probó en **4:5 1152×1440**, **9:16 1152×2048** y **16:9 2048×1152** nativos; 1:1 no tiene ronda validada. El catálogo de tomas conserva sus mediciones históricas por encuadre:
 [cámara, lente y ángulo](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md).
 
 ## 8. Realismo sin suciedad
@@ -191,7 +213,7 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
 
 - Motor **`gpt-image-2.5-sunburst`** `--quality high` 1152×1440, referencias con rol («Images 1-3 are Julio
   (identity only; ignore their clothing and backgrounds)») + bloque **IDENTITY** con rasgos.
-- Referencias: Julio `ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-01.png`, `-04.png`, `-07.png`;
+- Referencias: Julio `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/` (selección según vista mediante `foto:prompt`; el set de 2026-09-17 quedó retirado como ancla de identidad);
   Nexa `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`, `nexa-the-point.png`,
   `nexa-the-listen.png`. Identidad sostenida en 5 tomas (135/24/200/50/200 mm).
 - Uniforme: kit del polo como Images 4-5; **revisar el emblema letra por letra** antes de publicar.
@@ -245,7 +267,7 @@ todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `
 - **`pnpm foto:prompt <ficha.json> [--batch <out.json>]`** — arma el prompt desde una ficha de toma. El formato,
   el porcentaje del lecho y el límite de sujetos salen de **una tabla**, no de un bloque copiado. La ficha declara
   además `identidad` (personas, con vista por ángulo), `objetos` (kits de marca: logo, mascota, prenda, merch),
-  `palanca` (una de `pov`/`manos`/`luz-motivada`/`larga-exposicion`/`oclusion`), `atmosfera`
+  `palanca` (**una** de las 15 del catálogo, con su campo obligatorio si lo pide), `atmosfera`
   (`polvo`/`bruma`/`vapor`/`humo`) y `suspendido` (qué está en el aire). Aborta si un
   bloque compartido trae un valor de formato adentro, si se pide una reserva en una toma que no la admite, o si un
   batch mezcla formatos. `--ficha-ejemplo` imprime la plantilla.

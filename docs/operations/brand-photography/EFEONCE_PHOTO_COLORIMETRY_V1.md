@@ -3,7 +3,7 @@
 > **Tipo de documento:** Especificación técnica de marca (colorimetría y medición)
 > **Versión:** 1.0
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-19 por Claude
+> **Última actualización:** 2026-09-20
 > **Documentación relacionada:** [Índice](./README.md) · [Lenguaje fotográfico (maestro)](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma: primer plano y logo](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Cámaras, lentes y ángulos](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Bloques de prompt y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Manual de uso](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 
 Este documento fija **cómo se ve el color** en una foto de marca propia de Efeonce y **cómo se mide**. El objetivo
@@ -312,7 +312,7 @@ piezas (I1 24°, I2 30°, I3b 14°, I6b 27°; I4 52° e I5 69° quedaron altas) 
 
 Re-medido el 2026-09-19 sobre los plates (`*-plate.png`, sin firma). Columnas: Lm = L* media; Q = % quemado;
 A = % aplastado; Con = contraste; Cp95; Disp = dispersión de tono; bA/bS = b* altas/sombras; Az/Na/Li = área
-azul/naranja/lima; Piel = L/C. Logo = color y contraste peor caso con `LOGO=0.15`. Lecho = `max`/`p99`/`lum` de
+azul/naranja/lima; Piel = L/C. Logo = color y contraste peor caso de la corrida histórica con `LOGO=0.15` (la firma vigente usa `0.20`). Lecho = `max`/`p99`/`lum` de
 Sobel en la caja estándar x 0,30–0,70 × y 0,87–0,995 **[medido]**.
 
 ### 8.1 Set curado de 12 (`curado/set-curado-12.jpg`)
@@ -453,7 +453,7 @@ Nunca: aplicar LUT, curvas de color, split-toning o el grade V0 **[decisión del
 
 | # | Pendiente |
 |---|---|
-| 1 | Validar rangos en 9:16 y 16:9 (todo se midió en 4:5) **[pendiente]** |
+| 1 | Validar los rangos colorimétricos por contexto en 9:16 y 16:9; existen plates nativos, pero esta tabla de métricas se midió en 4:5 **[pendiente]** |
 | 2 | Contrapicado hacia tragaluz: probar «skylight keeps detail» para bajar el quemado de 5–6,5 % **[pendiente]** |
 | 3 | Promover `metricas.cjs` y `medir.mjs` a comando `pnpm` con umbrales por contexto **[pendiente]** |
 | 4 | Prueba de reconocimiento (n ≥ 100) antes de llamar a la colorimetría «activo distintivo» **[pendiente]** |

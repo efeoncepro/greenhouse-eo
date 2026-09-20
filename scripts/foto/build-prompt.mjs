@@ -552,7 +552,7 @@ export const PALANCAS = {
     etiqueta: 'luz motivada por una fuente en cuadro',
     // La diferencia entre luz real y un grade —que el operador rechazó— es que la fuente se ve.
     bloque:
-      'MOTIVATED LIGHT: the light on the subject comes from a SOURCE THAT IS VISIBLE IN THE FRAME — a monitor, a screen, a practical lamp, a window — and that source is what lights them. The fall-off is visible: the side of the face nearest the source is lit and the far side drops into darkness, with the direction reading unmistakably from the source. Colour comes from the real source, never from a colour filter or a grade over the whole image.',
+      'MOTIVATED LIGHT — verify it by these landmarks: the light on the subject comes from a SOURCE THAT IS VISIBLE IN THE FRAME — a monitor, a screen, a practical lamp, a window — and that source is what lights them. The fall-off is visible: the side of the face nearest the source is lit and the far side drops into darkness, with the direction reading unmistakably from the source. Colour comes from the real source, never from a colour filter or a grade over the whole image.',
     requiere: null
   },
   'larga-exposicion': {
@@ -564,12 +564,78 @@ export const PALANCAS = {
     sinMomento: true,
     requiere: null
   },
+  instrumento: {
+    etiqueta: 'a través del instrumento del oficio',
+    // La que mejor pasa el test de sustitución: sólo la toma quien usa esa herramienta.
+    bloque:
+      'THROUGH THE INSTRUMENT: the photograph is taken LOOKING THROUGH <QUE> — the glass of the instrument fills the centre of the frame and what is seen inside it is razor sharp and magnified or distorted, while everything outside its barrel falls away into soft blur. The barrel itself is real, with a visible edge and a thin reflection. This is REAL optical distortion through a real piece of glass — not a digital effect, not a vignette, not a circular crop.',
+    requiere: 'instrumento'
+  },
+  cenital: {
+    etiqueta: 'cenital de oficio en curso',
+    bloque:
+      'OVERHEAD, PERPENDICULAR: the camera looks STRAIGHT DOWN from about two metres, exactly perpendicular, so the work surface becomes a flat graphic plane with no perspective on its edges. What is on it is caught MID-PROCESS, not tidily arranged. HANDS enter from different edges of the frame — reaching in, holding down, pulling out — and no faces, heads or bodies appear at all.',
+    requiere: null
+  },
+  silueta: {
+    etiqueta: 'contraluz y silueta',
+    // La otra vía a piezas sin identidad: el gesto carga todo el sentido.
+    bloque:
+      'BACKLIT SILHOUETTE: the camera faces straight into the light source and the subject is between it and the lens. Verify it by these landmarks: the figure reads as a NEARLY BLACK SILHOUETTE with NO facial features visible at all — no eyes, no mouth, only the outline; the edges of shoulders, hair and limbs are rimmed by a bright line of light; the background behind is blown to clean white. The gesture alone carries the meaning, so the pose must be legible as a shape.',
+    requiere: null
+  },
+  reflejo: {
+    etiqueta: 'reflejo como capa',
+    // Dos realidades en un cuadro: es «construimos contigo» dicho en imagen.
+    bloque:
+      'REFLECTION AS A LAYER: the photograph is taken through glass so TWO REALITIES OVERLAP in one frame. Verify it by these landmarks: what is beyond the glass is sharp and clearly readable; and ACROSS THE SAME GLASS the reflection of what is behind the camera is superimposed over it, both visible AT THE SAME TIME, neither hiding the other. The light behind the camera is strong enough to make the reflection hold.',
+    requiere: null
+  },
+  ausencia: {
+    etiqueta: 'presencia por ausencia',
+    bloque:
+      'NOBODY IN FRAME: there is not a single person, hand or body anywhere in the picture — verify it. What remains is the TRACE of the work that just happened: a chair pushed back at an angle, things left where they were set down, a cap off a marker, one lamp still on. The room must read as if the people stepped out a minute ago, not as a tidy empty room.',
+    // No hay acción porque el punto es que nadie está: pedirle momento es contradictorio.
+    sinMomento: true,
+    requiere: null
+  },
+  fragmento: {
+    etiqueta: 'fragmento radical',
+    // «Radical» no significa nada para el modelo: hay que decirle POR DÓNDE corta el borde.
+    bloque:
+      'EXTREME CROP — verify it by the cut, not by feeling: <QUE>. The face or object fills the entire frame at this crop: no shoulders, no body, no room around it, at most a sliver of light at one edge. The frame must read as if the photographer was too close for the subject to fit.',
+    requiere: 'corta'
+  },
+  'suelo-oblicuo': {
+    etiqueta: 'cámara en el suelo, oblicua',
+    bloque:
+      'CAMERA ON THE GROUND, TILTED: the camera body actually RESTS ON THE FLOOR, tilted up about 30 degrees AND rotated so the horizon runs DIAGONALLY across the frame. Verify it by these landmarks: the floor fills the entire bottom third, out of focus and enormous, with its grain and grit right at the lens; legs and objects rise like columns out of it; the ceiling converges steeply overhead; and every vertical in the room leans because of the tilt.',
+    requiere: null
+  },
+  'little-planet': {
+    etiqueta: 'little planet (proyección estereográfica)',
+    bloque:
+      'LITTLE PLANET stereographic projection of a full 360-degree panorama — verify it by these landmarks: the ground curves into a COMPLETE SPHERE at the centre of the frame, so the whole place wraps around a round floor that reads like a small planet; walls and objects radiate OUTWARD from that sphere like spokes, leaning away in every direction; the sky fills all four corners; and the horizon is a CLOSED CIRCLE with no beginning or end. This is a real stereographic reprojection of a spherical panorama — NOT a fisheye rectangle and NOT a circular crop.',
+    requiere: null
+  },
+  sombra: {
+    etiqueta: 'la sombra es el sujeto',
+    bloque:
+      'THE SHADOW IS THE SUBJECT, not the person casting it — verify it: a hard low light throws a LONG, SHARP, GRAPHIC shadow that occupies the centre and most of the frame, and it is the clearest, most detailed shape in the image: the tool, the arms and the stance can be read in it. Of the person themselves only a fragment enters at the very edge of the picture — feet, or nothing at all.',
+    requiere: null
+  },
+  'dentro-del-objeto': {
+    etiqueta: 'desde dentro del objeto',
+    bloque:
+      'THE CAMERA IS INSIDE <QUE>, LOOKING OUT — verify it by these landmarks: its inner walls frame the picture on all four sides, dark and slightly out of focus, forming a rectangular window. Through that opening the lit scene is seen from an unusual low or enclosed angle, and someone reaches TOWARDS the lens. The inside is dark and the world beyond is bright, so the opening reads as a bright rectangle inside blackness.',
+    requiere: 'objetoContenedor'
+  },
   oclusion: {
     etiqueta: 'oclusión',
     // Medido en B5: pedida «a medias» se lee como «hay algo delante» y no como punto de vista.
     // Por eso exige declarar QUÉ tapa y obliga a que tape de verdad.
     bloque:
-      'OCCLUSION (the camera watched from where it stood and moved nothing): <QUE> sits in the near ground and PARTIALLY COVERS the subject — it must cover a real part of them, roughly a third of the frame and clearly overlapping their body or face edge, not merely sit beside them. It is closer to the lens than the subject and falls out of focus. The effect is of having watched past something, not of an object placed in the corner.',
+      'OCCLUSION — verify it by what it covers (the camera watched from where it stood and moved nothing): <QUE> sits in the near ground and PARTIALLY COVERS the subject — it must cover a real part of them, roughly a third of the frame and clearly overlapping their body or face edge, not merely sit beside them. It is closer to the lens than the subject and falls out of focus. The effect is of having watched past something, not of an object placed in the corner.',
     requiere: 'ocluye'
   }
 }
@@ -644,6 +710,37 @@ function derivaDeAssets(imagenes) {
   return derivados
 }
 
+
+// ── Sistema de color: el azul en todas, un acento único ─────────────────────────────────────────
+// El canon es explícito —«Azul activo: la casa, EN TODAS» y «un solo acento (naranja o lima) por
+// pieza, 1–5%, nacido de la situación»— pero al probar palancas nuevas es fácil concentrarse en la
+// geometría y dejar la paleta fuera: pasó en las tres rondas del 2026-09-20 y las piezas salieron
+// como buena fotografía genérica en vez de Efeonce. El portador se declara en la escena; un HEX en
+// un bloque genérico no basta.
+const PORTADOR_AZUL =
+  /\b(azure|cobalt|ink[- ]blue|blue (?:screen|monitor|display|panel|light|glow|sign|folder|case|wall|door|tarp|crate|cloth))|blue[- ](?:lit|edged|rimmed)|glowing (?:cool )?(?:azure|blue)/i
+
+const ACENTO =
+  /\b(orange|lime|lime-green|amber)\b/i
+
+export const auditarColor = escena => {
+  const avisos = []
+
+  if (!PORTADOR_AZUL.test(escena ?? '')) {
+    avisos.push(
+      'no declara un PORTADOR del azul de marca (el canon lo pide en todas: una pantalla, un panel, una luz, un objeto azul de la escena). Un HEX suelto no basta: el azul tiene que estar en algo'
+    )
+  }
+
+  if (!ACENTO.test(escena ?? '')) {
+    avisos.push(
+      'no declara el ACENTO (naranja o lima, 1–5% del cuadro, nacido de la situación: una marca en el piso, un post-it, una luz REC, una tarjeta)'
+    )
+  }
+
+  return avisos
+}
+
 const FICHA_EJEMPLO = {
   id: 'ejemplo-picado-mesa-oscura',
   formato: '4:5',
@@ -677,7 +774,7 @@ const ANCLAS_PROHIBIDAS = [
 // Cuarto falso negativo del día: la LUZ MOTIVADA por una pantalla o un monitor visible en cuadro es
 // una fuente legítima —de hecho es la que más realismo da— y el detector no la conocía.
 const LUZ =
-  /\b(sun|sunlight|sunbeam|daylight|midday|noon|beam|backlit|rim-?lit|lit only|only light|lamp|window light|golden hour|hard light|directional|shaft|raking|rakes|silhouett|spot|spotlight|stage light|practical|key light|candlelit|firelight|neon|monitor|screen|display|glow|glowing|lights? (?:her|him|them|his|the)\b)/i
+  /\b(sun|sunlight|sunbeam|daylight|midday|noon|beam|backlit|rim-?lit|lit only|only light|lamp|window light|golden hour|hard light|directional|shaft|raking|rakes|silhouett|spot|spotlight|stage light|practical|key light|candlelit|firelight|neon|monitor|screen|display|glow|glowing|flash|strobe|lights? (?:her|him|them|his|the)\b)/i
 
 // Tercer falso negativo de vocabulario en un día (tras `daylight` y `stage spot`): una escena decía
 // «at the instant the marker lifts off the glass» y el aviso saltaba igual. Un aviso que grita donde
@@ -722,8 +819,22 @@ export const construirPrompt = ficha => {
     )
   }
 
-  if (!ficha.lecho?.objeto || !ficha.lecho?.tono) {
-    throw new Error('La ficha necesita `lecho.objeto` y `lecho.tono`. La firma SIEMPRE necesita su lecho: no es opcional.')
+  // El canon contempla tomas SIN lecho —dron y todo-enfocadas— y el comando no lo sabía: abortaba
+  // una toma legítima (caso: cenital perpendicular, 2026-09-20). Se declara `lecho: "sin-lecho"` con
+  // la razón, y esas piezas resuelven la firma aparte (pavimento sereno, url-lum), no se quedan sin.
+  if (ficha.lecho === 'sin-lecho') {
+    if (typeof ficha.sinLechoPorque !== 'string' || ficha.sinLechoPorque.trim().length < 10) {
+      throw new Error(
+        'Una toma `sin-lecho` debe declarar `sinLechoPorque` (por ejemplo "cenital perpendicular: no hay primer ' +
+          'plano posible"). El lecho no es opcional por comodidad: sólo por geometría de la toma.'
+      )
+    }
+  } else if (!ficha.lecho?.objeto || !ficha.lecho?.tono) {
+    throw new Error(
+      'La ficha necesita `lecho.objeto` y `lecho.tono`. La firma SIEMPRE necesita su lecho: no es opcional. ' +
+        'Si la geometría de la toma no admite primer plano (cenital, dron, todo-enfocada), usa `lecho: "sin-lecho"` ' +
+        'y declara `sinLechoPorque`.'
+    )
   }
 
   if (ficha.toma) {
@@ -784,6 +895,19 @@ export const construirPrompt = ficha => {
   partes.push(ficha.escena)
 
   // El lecho, con el porcentaje del formato. Nunca escrito a mano.
+  if (ficha.lecho === 'sin-lecho') {
+    return {
+      prompt: partes.join('\n\n'),
+      size: fmt.size,
+      sinValidar: Boolean(fmt.sinValidar),
+      imagenes: [...(identidad?.imagenes ?? []), ...(objetos?.imagenes ?? [])],
+      avisosObjeto: objetos?.avisos ?? [],
+      llevaSuspendido: Boolean(suspendido),
+      sinMomento: Boolean(palanca?.sinMomento),
+      sinLecho: true
+    }
+  }
+
   partes.push(
     `FOREGROUND (planned): ${ficha.lecho.objeto}, so close to the lens that it dissolves into a soft abstract blur with no visible edges or details, spanning the ENTIRE width of the bottom ${fmt.lecho} of the frame (never a hard band), ${ficha.lecho.tono}; its center calm and even.`
   )
@@ -871,6 +995,8 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     // apaga ese aviso concreto, no todos.
     const avisos = auditarEscena(ficha.escena).filter(a => !(sinMomento && a.includes('MOMENTO')))
     const vestuario = auditarVestuario(ficha.escena, ficha.identidad)
+
+    avisos.push(...auditarColor(ficha.escena))
 
     if (vestuario) avisos.push(vestuario)
 

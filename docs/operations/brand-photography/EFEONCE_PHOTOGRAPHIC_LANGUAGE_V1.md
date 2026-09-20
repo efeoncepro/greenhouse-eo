@@ -3,7 +3,7 @@
 > **Tipo de documento:** Especificación canónica de marca (documento maestro)
 > **Versión:** 1.0
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-19 por Claude
+> **Última actualización:** 2026-09-20
 > **Estado:** Aprobado por el operador (Julio Reyes, dueño de Efeonce) el 2026-09-19. Sistema consistente; **no** es todavía un activo distintivo medido.
 > **Documentación relacionada:** [Índice](./README.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md) · [Marca de agencia](../../context/09_marca-agencia.md) · [Quiénes somos](../../context/01_quienes-somos.md) · [Marca en escena](../../../.claude/skills/social-media-studio/references/brand-in-scene.md)
 
@@ -17,7 +17,7 @@ Julio Reyes · **[criterio]** = recomendación propia, revisable · **[pendiente
 | Qué es | La forma en que Efeonce fotografía su propia marca: qué se muestra, con qué luz y color, con qué cámara y cómo firma |
 | Estado | Aprobado el 2026-09-19. El operador pidió documentarlo tras ver todas las rondas: «todas me gustaron» **[decisión del operador]** |
 | Aplica a | Fotografía e imagen fotorrealista de la marca propia: social, sitio, presentaciones, piezas de equipo, eventos, espacios, objetos |
-| Formatos | Probado sólo en 4:5 (1152×1440). 9:16 y 16:9 nativos **[pendiente]** |
+| Formatos | Probados en 4:5 (1152×1440), 9:16 (1152×2048) y 16:9 (2048×1152) nativos; 1:1 **[pendiente]** |
 | No aplica a | Piezas de clientes (cada cliente tiene su lenguaje); trendjacking que toma prestada una estética ajena; ilustración; infografía |
 | Qué no es todavía | Un activo distintivo. Para llamarlo así falta la prueba de reconocimiento (§9) |
 
@@ -120,13 +120,23 @@ Detalle en [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md
 | **Luz motivada** **[2026-09-20]** | La luz viene de una **fuente visible en cuadro**; es lo que separa luz real de un grade | `B3` |
 | **Larga exposición** **[2026-09-20]** | **Duración acumulada** en vez de instante: estelas, con un elemento nítido que ancla | `B4` |
 | **Oclusión** **[2026-09-20]** | La cámara **miró desde detrás de algo** y no movió nada | `B5` (pedida a medias, se anula) |
+| **Diez más** **[2026-09-20, tarde]** | Tras tres rondas de prueba el catálogo cerró en **quince**: se suman `silueta`, `reflejo`, `ausencia`, `fragmento`, `instrumento`, `cenital`, `suelo-oblicuo`, `little-planet`, `sombra` y `dentro-del-objeto`. Cada una con su definición, sus marcadores verbatim y su evidencia en el [catálogo de palancas](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md), que también registra las **cuatro descartadas** y por qué | `C1`–`C4`, `D1`–`D4`, `E1`–`E6`, `F1`–`F7` |
 
-Las siete últimas se piden **por ficha** (`palanca`, `atmosfera`, `suspendido`) (`atmosfera`, `suspendido` en `pnpm foto:prompt`), nunca desde el bloque
+**El catálogo completo, con cómo se logra cada una, vive en [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md)**; esta tabla es el resumen.
+
+Las palancas se piden **por ficha** (`palanca`, `atmosfera`, `suspendido` en `pnpm foto:prompt`), nunca desde el bloque
 fijo de impacto: ese bloque se emite en todos los prompts, y si llevara «algo volando», volaría algo en cada
 pieza. La atmósfera **exige un haz declarado** —sin luz con dirección no tiene qué revelar y se lee pegada— y la
 acción suspendida tiene **dosis: 1 de cada 4 piezas** **[decisión del operador]**. Y va **UNA palanca de encuadre
 por pieza**: combinar dos las diluye, porque cada una pide el control de la escena **[medido]**. Fragmentos
-verbatim, guardas y evidencia medida: [prompts y pipeline §3.9](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+verbatim, guardas y evidencia medida: [prompts y pipeline §3.9](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) y el [catálogo de palancas](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
+
+> **El sistema de color va en TODAS las palancas** **[medido 2026-09-20]**. Al probar una palanca nueva es fácil
+> concentrarse en la geometría y dejar la paleta fuera: pasó en **21 de 21** fichas de las tres rondas, y las
+> piezas salieron como buena fotografía genérica en vez de Efeonce. El azul va **en un portador visible** —una
+> pantalla, un panel, una lona, una carpeta, la tinta cian de un pliego—, no como HEX en un bloque; y el acento
+> naranja o lima, del 1 al 5%, **nace de la situación** (cinta de marcaje, post-it, lápiz graso, sandbag).
+> `pnpm foto:prompt` avisa cuando la escena no declara ninguno de los dos.
 
 > **«Épica» no es la palabra.** En publicidad arrastra escala grandilocuente y gente mirando al horizonte: el
 > stock premium que este lenguaje rechaza. Lo que se busca es **realismo cinematográfico** —parece un fotograma,
@@ -162,10 +172,10 @@ compara la misma toma en `high` y `xhigh`; `xhigh` cuesta 1,8× y mejora poco el
 
 | Sistema | Regla central | Documento |
 |---|---|---|
-| Firma | Un primer plano desenfocado **planeado desde la toma** (herramienta o superficie del oficio) sirve de lecho al logo centrado, ancho 15%, centro vertical ≈ 93,5% del alto, contraste ≥ 4,5:1. Lecho p99 ≤ ~20, tono declarado en el prompt | [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) |
+| Firma | Un primer plano desenfocado **planeado desde la toma** (herramienta o superficie del oficio) sirve de lecho al logo centrado, ancho 20% del lado corto, contraste ≥ 4,5:1. Lecho p99 ≤ ~20, tono declarado en el prompt | [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) |
 | Colorimetría | Sin grade; color natural; blancos ~5200 K neutro-cálido; sombras nunca azules. Azul activo `#0375DB` = la casa, integrado naturalmente en la composición; naranja `#F55D01` = la idea; lima `#6EC207` = el resultado; un solo acento además del azul, sin objeto obligatorio | [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) |
 | Cámaras | Lente, ángulo y lecho se eligen juntos; el modelo respeta la sensación del lente, no la física exacta | [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) |
-| Prompts y pipeline | Prompt = bloque realismo + bloque impacto + color + escena + FOREGROUND. Generar → medir lecho → curar pantallas → componer firma → métricas → QA al zoom | [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) |
+| Prompts y pipeline | `foto:prompt` incorpora realismo, impacto/color, escena y FOREGROUND. Generar → validar plate → curar pantallas si aplica → componer firma → métricas → QA al zoom | [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) |
 | Personas | Casting real, nadie mira a cámara salvo decisión, identidad de Julio y Nexa con referencias y bloque IDENTITY, uniforme sin firma cuando el emblema se lee | [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) |
 
 ## 6. Qué NO es Efeonce
@@ -184,7 +194,7 @@ compara la misma toma en `high` y `xhigh`; `xhigh` cuesta 1,8× y mejora poco el
 | Azul intermedio en ropa grande | Ni acento ni campo: camisa azul Miami 16% del cuadro, hoodie del contrapicado 17% **[medido]** | `oficio3/1-aeo-miami`, `camaras/4-contrapicado` |
 | Paneles azules grandes de fondo en cada escenario/podcast | Se repiten entre piezas | `personas/J3`, `personas/JN2` |
 | Composiciones determinísticas como pieza final | «no me gustan tanto a menos que sean referencias para pasarla al modelo y curar con IA generativa» | UI de referencia `scripts/ui-ref.cjs`, `scripts/ui-ia.cjs` usadas sólo como insumo |
-| Logo como sello o marca de agua | Al 20% de ancho se leía como sello; bajó a 15% | Rondas `asiento`/`territorios` vs `oficio` en adelante |
+| Logo como sello o marca de agua | La conclusión inicial de bajar al 15% se corrigió: las piezas aprobadas incluían firmas al 20%; decisión vigente: 20% del lado corto | [Firma, delta 2026-09-20](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) |
 
 ## 7. Historia de decisiones
 

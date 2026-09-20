@@ -3,10 +3,10 @@
 > **Tipo de documento:** Especificación técnica de producción (prompts, comandos, scripts, QA)
 > **Versión:** 1.0
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-19 por Claude
+> **Última actualización:** 2026-09-20
 > **Documentación relacionada:** [Índice](./README.md) · [Lenguaje fotográfico (maestro)](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma: primer plano y logo](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Manual de uso](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 
-Este documento es el **cómo se produce**: los bloques de texto que se pegan en cada prompt (verbatim), la ficha de
+Este documento es el **cómo se produce**: los bloques de texto que incorpora `pnpm foto:prompt` en cada prompt, la ficha de
 toma, el pipeline paso a paso con los comandos exactos, la medición, la curación de pantallas, la composición de la
 firma, el QA, los costos y las trampas conocidas.
 
@@ -25,7 +25,7 @@ cualquier generador (GPT Image, Gemini/Imagen, Seedream, Firefly, Midjourney, el
 
 | Parte de este documento | Portabilidad |
 |---|---|
-| §1 anatomía del prompt · §2 ficha de toma · **§3 bloques verbatim** | **Portable**: se pegan tal cual en cualquier motor |
+| §1 anatomía del prompt · §2 ficha de toma · **§3 bloques verbatim** | **Portable**: `foto:prompt` los incorpora en el flujo local; con otro motor se conserva su contenido y orden |
 | §5 umbrales de medición · §7 QA y reglas duras | **Portable**: se verifican sobre el archivo resultante, no sobre el motor |
 | §4 pipeline (`pnpm ai:image`, batches, hoja de contacto) · §6 curación con máscara | **Específico de nuestro CLI**: con otro motor se replica la intención, no los comandos |
 
@@ -42,8 +42,9 @@ cualquier generador (GPT Image, Gemini/Imagen, Seedream, Firefly, Midjourney, el
    regla evita la obligación, no prohíbe los objetos **[aclaración del operador, 2026-09-20]**. Leer la skill o copiar un prompt
    anterior no acredita esta comparación visual. Si los binarios aprobados no están disponibles, recuperar esa
    referencia antes de generar una persona o una foto de marca.
-1. Pegar los bloques verbatim de §3 (realismo, color system, balance de blancos, lecho/FOREGROUND, y IDENTITY +
-   REFERENCES cuando hay personas reales). Un prompt de marca Efeonce sin estos bloques **no es del lenguaje**.
+1. Usar `pnpm foto:prompt` para incorporar los bloques verbatim de §3 (realismo, color system, balance de blancos,
+   lecho/FOREGROUND, y IDENTITY + REFERENCES cuando hay personas reales). Con otro motor, trasladar el prompt
+   resultante sin reconstruirlo por concatenación manual. Un prompt sin estos bloques **no es del lenguaje**.
 2. El plate se genera **sin logo, sin texto y sin marcas inventadas**. La firma es el SVG oficial **compuesto
    después** (20% del lado corto, centrado sobre el lecho desenfocado, contraste ≥ 4,5:1 medido; decisión del
    operador 2026-09-20). Un logo generado
@@ -76,8 +77,8 @@ SCENE: servicio · ciudad · luz y hora · momento · acento y su origen · lent
 FOREGROUND (planned): ...     ← §3.8, siempre al final, con tono declarado
 ```
 
-Todo prompt pide **4:5 vertical** hoy (el bloque de realismo lo dice). Otros formatos: [pendiente], ver
-[catálogo §5](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md#5-formatos).
+El formato se declara una sola vez en la sección de composición: **4:5, 9:16 y 16:9 nativos** ya se probaron.
+`1:1` sigue sin ronda validada. Ver [catálogo §5](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md#5-formatos).
 
 ---
 
@@ -98,7 +99,7 @@ Se llena **antes** de escribir el prompt. Una ficha = una foto.
 | Azul (la casa) | Dónde vive `#0375DB` en la relación entre luz, material, espacio y planos; no exige un objeto | Reflejo azul de una escena en uso sobre el vidrio de la cabina |
 | Acento de historia | Cómo se integra el naranja (idea) **o** lima (resultado) a la situación sin utilería impuesta | Un borde cálido de luz de la acción, coherente con el lugar |
 | Lecho + tono | Primer plano planeado + DARK / VERY LIGHT | Borde de la mesa de luz, VERY LIGHT |
-| Formato | 4:5 (probado) | 4:5 1152×1440 |
+| Formato | 4:5, 9:16 o 16:9 nativo (probados); 1:1 sin validar | 4:5 1152×1440 |
 | Firma | Logo / selección AXIS / sin firma | Logo |
 | Personas | Casting, o Julio/Nexa con referencias | Sólo manos |
 
@@ -211,8 +212,8 @@ Rutas de referencia:
 
 | Referencia | Ruta |
 |---|---|
-| Julio (rostro) | `ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-01.png`, `-04.png` |
-| Julio (cuerpo) | `ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-07.png` |
+| Julio (rostro) | `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`; `foto:prompt` selecciona según la vista (`julio-ap-04` es primera opción) |
+| Julio (cuerpo) | El mismo set aprobado; `julio-ap-11` es primera opción. No usar el set de 2026-09-17 como ancla |
 | Nexa | `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`, `nexa-the-point.png`, `nexa-the-listen.png` |
 | Polo | `ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-01-frente…png`, `…-10-detalle-bordado…png` |
 
@@ -580,8 +581,7 @@ Todo lo demás —bloques, tabla de formatos, umbrales, arnés— vive en `scrip
 ```bash
 cd /Users/jreye/Documents/greenhouse-eo
 RUN=ai-generations/$(date +%F)_<slug>
-mkdir -p $RUN/rondas/<ronda> $RUN/prompts $RUN/scripts
-cp ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/bloque-*.txt $RUN/prompts/
+mkdir -p $RUN/rondas/<ronda> $RUN/scripts
 cp ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/{medir.mjs,metricas.cjs,componer.mjs} $RUN/scripts/
 ```
 
@@ -672,19 +672,17 @@ pnpm ai:image --batch $RUN/rondas/<ronda>/batch.json --out $RUN/rondas/<ronda> \
 |---|---|---|
 | `--model` | `gpt-image-2.5-flare` para escenas sin identidad; `gpt-image-2.5-sunburst` con referencias de identidad o ediciones | Sunburst sostuvo mejor la identidad al mismo costo por quality×size **[medido]** |
 | `--quality` | `high` para explorar; `xhigh` sólo masters | xhigh ≈ 1,8× costo, mejora modesta ([catálogo §6](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md#6-high-vs-xhigh)) |
-| `--size` | `1152x1440` (4:5) | Único formato probado |
+| `--size` | El que imprime `foto:prompt` para 4:5, 9:16 o 16:9 | Formato nativo probado; no mezclar tamaños en un batch |
 | `--out` | **Directorio** (sin extensión) en modo `--batch` | Desde el commit `5946f14a0`; antes se ignoraba y las imágenes caían en `public/images/generated` (§9) |
 
 Con referencias (una sola imagen, no batch):
 
 ```bash
-R="--image ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-01.png --image ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-04.png --image ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-07.png"
-pnpm ai:image ${=R} --prompt-file $RUN/rondas/personas/J1-retrato.txt \
-  --out $RUN/rondas/personas/J1-retrato-plate.png \
-  --model gpt-image-2.5-sunburst --quality high --size 1152x1440
+pnpm foto:prompt $RUN/rondas/personas/J1-ficha.json --batch $RUN/rondas/personas/J1-batch.json
+# Ejecuta el pnpm ai:image que imprime el comando, con las referencias aprobadas y el tamaño resueltos.
 ```
 
-`${=R}` es obligatorio en zsh (§9).
+Los comandos históricos de 2026-09-19 con `${=R}` y referencias antiguas quedan sólo como evidencia; no son receta vigente.
 
 ### 4.4 Revisar la hoja de contacto
 
@@ -879,7 +877,7 @@ LOGO=0.20 CSCALE=1.8 node scripts/componer.mjs rondas/cruce/X1-final-plate.png r
 
 | Parámetro | Qué hace | Valor canónico |
 |---|---|---|
-| `LOGO` (env) | Ancho del logo como fracción del ancho del lienzo. El default del script histórico sigue en `0.15`: declarar el valor al invocarlo | **0.20** **[decisión del operador, 2026-09-20]**; contraste ≥ 4,5:1 medido |
+| `LOGO` (env) | Ancho del logo como fracción del lado corto del lienzo; el default del script es `0.20` | **0.20** **[decisión del operador, 2026-09-20]**; contraste ≥ 4,5:1 medido |
 | `CSCALE` (env) | Escala de las etiquetas de los cursores colaboradores | 1.8 (default) |
 | Posición | Centrado horizontal; centro vertical a 93,5 % del alto | Fija en el script |
 | Color del logo | Compara blanco (`public/branding/logo-negative.svg`) vs navy (`logo-full.svg`) contra el píxel más claro / más oscuro del área del logo; elige el de mayor contraste | Mínimo 4,5:1 |
@@ -910,7 +908,7 @@ Salida: `…-final.png logo blanco 18.82:1 selección OK`.
 | 5 | Azul y un solo acento (naranja **o** lima) integrados naturalmente en la composición; ningún objeto de color obligatorio ni cuota rígida de píxeles | Mirar + `metricas.cjs` como apoyo | Sí |
 | 6 | Sin grade; b* sombras −3 a +3; quemado/aplastado en rango | `metricas.cjs` | Revisar |
 | 7 | Lecho desenfocado, tono declarado, transición gradual (≥ 5 % del alto) | `medir.mjs` + zoom | Sí |
-| 8 | Logo ≥ 4,5:1, 15 % de ancho, no parece sello | `componer.mjs` | Sí |
+| 8 | Logo ≥ 4,5:1, 20 % del lado corto, sin duplicar una marca protagonista | `componer.mjs` | Sí |
 | 9 | Sin marcas de terceros ni inscripciones (cámaras, botellas, autos) | Zoom | Sí |
 | 10 | Sin categoría de un cliente real ni insinuación de trabajo con él | Leer la escena | Sí |
 | 11 | Identidad de Julio/Nexa y emblema del polo letra por letra | Zoom junto a la referencia | Sí |
@@ -944,8 +942,8 @@ Salida: `…-final.png logo blanco 18.82:1 selección OK`.
 | Máscara rectangular | Persona delante de la pantalla sale fantasma | Máscara desde el chroma |
 | Marcas de terceros | Cámara con «Blackmagic»; quedó una inscripción diminuta en I6b | «completely unbranded, generic … (no brand names, no text, no logos anywhere on the body)» + zoom |
 | Lecho de tono medio | Logo sin contraste (6+ fallos, lum 139–171) | Declarar tono siempre |
-| JSON a mano | Comillas rotas | `json.dump` (§4.2) |
-| `componer.mjs` sin `LOGO` | Antes: logo al 20 % | Default corregido a 0,15 el 2026-09-19; `LOGO` sólo para variar |
+| JSON de prompts a mano | Comillas rotas y valores de formato duplicados | `pnpm foto:prompt <ficha.json> --batch <out.json>` (§4.2) |
+| `componer.mjs` sin `LOGO` | Logo al 20 % del lado corto | Default alineado con la decisión del operador de 2026-09-20; `LOGO=0.20` lo hace explícito |
 | Medir la pieza firmada | El logo contamina las métricas | Medir el plate |
 
 ---

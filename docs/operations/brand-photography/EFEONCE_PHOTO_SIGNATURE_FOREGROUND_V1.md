@@ -3,7 +3,7 @@
 > **Tipo de documento:** Especificación técnica y funcional de marca
 > **Versión:** 1.0
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-19 por Claude
+> **Última actualización:** 2026-09-20
 > **Estado:** Aprobado por el operador el 2026-09-19 (con pendientes en §8)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Marca en escena (regla previa)](../../../.claude/skills/social-media-studio/references/brand-in-scene.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · Scripts `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/{medir.mjs,componer.mjs}`
 
@@ -117,7 +117,7 @@ material** entre piezas consecutivas (hallazgo del revisor adversarial) **[crite
 | Composición | Determinística con `scripts/componer.mjs` (sharp), rasterizado a densidad 600 | — |
 | Posición horizontal | Centrado | `left = (W − ancho) / 2` |
 | Posición vertical | Centro del logo ≈ **94%** del alto (4:5) | `top = 0,94·H − alto/2`. Las piezas al 20% usaron 94% (territorios) y 91,5% (asiento); las de personas, 93,5% |
-| Ancho | **20%** del lienzo | Cerrada la revisión: el operador eligió 20% el 2026-09-20 sobre piezas con identidad **[decisión del operador]**. Ver el delta de abajo: la frase «al 20% se leía como sello» no describía lo aprobado |
+| Ancho | **20% del lado corto** del lienzo | Cerrada la revisión: el operador eligió 20% el 2026-09-20 sobre piezas con identidad **[decisión del operador]**. Ver el delta de abajo: la frase «al 20% se leía como sello» no describía lo aprobado |
 | Proporción | Alto = ancho × 196,68 / 837,07 (proporción del SVG) | `componer.mjs` |
 | Color | Por contraste medido: blanco contra el píxel **más claro** del área del logo; navy contra el píxel **más oscuro**; gana el mayor | `componer.mjs` calcula ambos con luminancia relativa WCAG |
 | Contraste mínimo | **≥ 4,5:1** | Si ninguno pasa, se regenera el plate (no se oscurece el lecho en post) |
@@ -128,7 +128,7 @@ material** entre piezas consecutivas (hallazgo del revisor adversarial) **[crite
 Uso:
 
 ```bash
-LOGO=0.15 node ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/componer.mjs <plate.png> <final.png>
+LOGO=0.20 node ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/componer.mjs <plate.png> <final.png>
 # salida: <final.png> logo blanco|navy <contraste>:1
 ```
 
@@ -174,8 +174,8 @@ azul; esa ronda es anterior a la asignación de colores por rol, que es la vigen
 ## 8. Pendientes
 
 - Firma en dron y tomas todo-enfocadas: decidir si se usa una firma alternativa (url-lum) **[pendiente]**.
-- Posición y tamaño del logo en 9:16, 16:9 y 1:1 (propuesta del subagente de composición: lecho 4:5 22–28%; 9:16
-  18–22% con logo a 85–88% del alto; 16:9 25–30%; 1:1 20–25%) **[pendiente, sin probar]**.
+- Ajuste de la posición del logo en 9:16 y 16:9 sobre piezas finales, y validación de 1:1 **[pendiente]**. Las
+  propuestas históricas de lecho anteriores a `foto:prompt` no sustituyen los valores medidos: 18%, 22% y 16%.
 - Convivencia con el espacio para texto que pidió el operador **[pendiente]**.
 - Promover `medir.mjs` y `componer.mjs` a comando `pnpm` **[pendiente]**.
 
@@ -241,11 +241,10 @@ plate↔firmada sobre **sus propias piezas aprobadas** del 2026-09-19:
 Este documento afirmaba que se bajó a 15% «porque al 20% se leía como sello o marca de agua». **Eso no describía
 lo aprobado:** más de la mitad de las piezas firmadas que el operador aprobó están al 20%. La causa no fue una
 decisión sino un accidente de herramienta: `scripts/firmar.mjs` tiene `0.2` por defecto y `scripts/componer.mjs`
-tiene `0.15`, así que el tamaño dependía de qué script corrió cada ronda.
+tenía `0.15`, así que el tamaño dependía de qué script corrió cada ronda.
 
 **Decisión del operador, 2026-09-20: 20%.** Evidencia de la comparación (las mismas tres piezas firmadas a 15% y
 a 20%): `ai-generations/2026-09-20_identidad-julio-nexa/final/` y `final-20/`.
 
-**[pendiente]** Unificar el default de los dos scripts al promoverlos a comando `pnpm` (pendiente ya abierto en el
-maestro §9). Mientras vivan en una carpeta de corrida, el valor sigue dependiendo de cuál se invoque: pasarlo
-siempre explícito.
+El default de `componer.mjs` se alineó a `0.20` el 2026-09-20. `firmar.mjs` ya usaba `0.20`; se recomienda pasar
+`LOGO=0.20` explícito en cualquier receta para que la decisión quede visible.

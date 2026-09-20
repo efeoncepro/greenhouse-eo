@@ -1,0 +1,13 @@
+{
+  "id": "F5-fragmento-julio-color",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "fragmento",
+  "corta": "el borde izquierdo corta su cara verticalmente entre los ojos: sólo su ojo derecho está en el cuadro",
+  "identidad": ["julio"],
+  "escena": "SCENE (colour session, post studio in Mexico City, evening): an EXTREME CROP — verify it by these landmarks, not by feel: the LEFT EDGE OF THE FRAME cuts through his face vertically between his eyes, so ONLY HIS RIGHT EYE is in the picture and his left eye is entirely OUTSIDE it; the top edge cuts across his forehead above the eyebrow, so the top of his head is NOT in the picture; his beard runs off the bottom edge. His face fills the whole frame at this crop — no shoulders, no body, no room visible around him. THE ONLY LIGHT ON HIS FACE COMES FROM A CALIBRATION MONITOR JUST OUT OF FRAME TO THE RIGHT, glowing a deep azure blue: that cool azure glow rakes across his cheekbone, the rim of his glasses and his beard, and a sliver of the blue screen itself shows at the right edge of the frame. The far side of what is visible falls to near black. Low in the right corner, well out of focus, a single small ORANGE tally light on the monitor bezel burns as the only warm point in the picture, no more than three percent of the frame. Caught at the instant he narrows that eye to judge a detail. He wears a faded olive linen shirt, of which only a fragment of collar shows. He looks at the work, never at the camera. 85mm at f/1.8, extremely close. Everything is unbranded, no readable text anywhere.",
+  "lecho": {
+    "objeto": "the out-of-focus edge of the console immediately against the lens",
+    "tono": "DARK near black, matte"
+  }
+}

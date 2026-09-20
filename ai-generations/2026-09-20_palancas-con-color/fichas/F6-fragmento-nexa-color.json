@@ -1,0 +1,13 @@
+{
+  "id": "F6-fragmento-nexa-color",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "fragmento",
+  "corta": "el borde derecho corta su cara pasando el puente de la nariz: su ojo lejano NO está en el cuadro",
+  "identidad": ["nexa"],
+  "escena": "SCENE (shelf audit, store aisle in Mexico City, midday): an EXTREME CROP — verify it by these landmarks: the RIGHT EDGE OF THE FRAME cuts through her face vertically just past the bridge of her nose, so her far eye is NOT in the picture at all; the top edge cuts across her forehead above the eyebrows; her hair runs off the bottom edge. Her face fills the entire frame at this crop — no shoulders, no aisle, no room around her. THE LIGHT ON HER FACE IS BOUNCED OFF A WALL OF INK-BLUE PACKAGING on the shelf just out of frame to the left, so a cool azure cast falls across her forehead, cheek and the near side of her jaw, and a narrow band of that ink-blue shelf shows at the very left edge of the picture. Hard midday daylight from the storefront rakes in over it and keeps the highlights clean. At the bottom left corner, thrown far out of focus, a small plain ORANGE shelf tag sits as the only warm accent in the picture, no more than three percent of the frame and carrying no text. Caught at the instant she narrows her eye to read a shelf label. She wears a fine light heather-grey knit sweater, of which only a thread of collar shows. She looks at the shelf, never at the camera. 85mm at f/1.8, extremely close. Everything is completely unbranded, no readable text anywhere.",
+  "lecho": {
+    "objeto": "the out-of-focus edge of a shelf immediately against the lens",
+    "tono": "DARK near black, matte"
+  }
+}

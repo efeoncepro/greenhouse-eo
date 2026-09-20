@@ -3,7 +3,7 @@
 > **Tipo de documento:** Catálogo técnico de tomas (dirección de fotografía)
 > **Versión:** 1.0
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-19 por Claude
+> **Última actualización:** 2026-09-20
 > **Documentación relacionada:** [Índice](./README.md) · [Lenguaje fotográfico (maestro)](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma: primer plano y logo](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Bloques de prompt y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Manual de uso](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 
 Este catálogo reúne **las 20 tomas probadas** en la corrida del 2026-09-19 (`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/`).
@@ -14,7 +14,7 @@ comunes están en [bloques de prompt](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE
 Marcas: **[medido]**, **[decisión del operador]**, **[criterio]**, **[pendiente]** (ver [índice](./README.md)).
 
 Métricas de cada ficha (re-medidas el 2026-09-19 sobre el plate): **Logo** = color y contraste peor caso con
-`LOGO=0.15` (`componer.mjs`); **Lecho** = Sobel `max`/`p99`/`lum media` en la caja x 0,30–0,70 × y 0,87–0,995
+`LOGO=0.15` (`componer.mjs`, medición histórica; valor vigente `0.20`); **Lecho** = Sobel `max`/`p99`/`lum media` en la caja x 0,30–0,70 × y 0,87–0,995
 (`medir.mjs`); **Q** = % quemado; **A** = % aplastado; **Con** = contraste p95−p5. Definiciones exactas en
 [Colorimetría §7](./EFEONCE_PHOTO_COLORIMETRY_V1.md#7-métricas-definición-exacta).
 
@@ -79,7 +79,7 @@ Formato de cada ficha: **Ajuste** · **Qué comunica** · **Usar en** · **Lecho
 - **Medido:** JN1 logo blanco 13,8:1; lecho 14/9/39; Q 2,10 %; Con 85 **[medido]**.
 - **Fallos y fix:** la versión `asiento/A-mesa` (lecho sin tono) dio madera media: logo **3,20:1 (falla)**, lecho lum 145;
   `asiento/A2-mesa` declaró «DARK band in soft shadow … bottom 14%» → logo **18,96:1**, lecho lum 16 **[medido]**.
-- **Formatos:** 4:5 probado; 16:9 natural (mesa a lo ancho) **[pendiente]**.
+- **Formatos de esta toma:** 4:5 probado; adaptación de este encuadre a 16:9 (mesa a lo ancho) **[pendiente]**.
 
 ### 3.2 Asiento a ras + ojo de pez (N1, original)
 
@@ -133,7 +133,7 @@ Formato de cada ficha: **Ajuste** · **Qué comunica** · **Usar en** · **Lecho
   lecho 89/35/224 (nítido pero sereno) **[medido]**.
 - **Fallos:** la franja clara se lee «algo puesta» **[criterio, revisor]**. Decisión abierta: ¿firma distinta para
   tomas todo-enfocado? **[pendiente]**.
-- **Formatos:** 1:1 y 4:5; 16:9 muy apto (instalación a lo ancho) **[pendiente]**.
+- **Formatos de esta toma:** 4:5 probado; 1:1 y adaptación de este encuadre a 16:9 (instalación a lo ancho) **[pendiente]**.
 
 ### 3.6 Tilt-shift
 
@@ -246,7 +246,7 @@ Formato de cada ficha: **Ajuste** · **Qué comunica** · **Usar en** · **Lecho
   > FOREGROUND (planned): the pale polished concrete floor close to the lens, very close to the lens, spanning the ENTIRE width of the bottom 18% of the frame, dissolved into a smooth out-of-focus blur (never a hard band), VERY LIGHT, luminous pale concrete; its center calm and even.
 - **Medido:** logo navy **4,92:1** (el más bajo que pasa); azul 18,4 %; Cp95 71 **[medido]**. El reflejo azul en el
   piso ensucia el lecho: pedir «the floor near the lens receives no screen reflection» **[criterio, pendiente]**.
-- **Formatos:** 16:9 ideal (espacio negativo lateral) **[pendiente]**.
+- **Formatos de esta toma:** adaptación a 16:9 con espacio negativo lateral **[pendiente]**.
 
 ### 3.14 Barrido (movimiento)
 
@@ -352,9 +352,9 @@ reflejo en X3). Más palancas = imagen de stock recargada.
 
 | Formato | Estado | Regla de lecho y logo |
 |---|---|---|
-| **4:5 1152×1440** | **Probado** en todas las piezas | Lecho 18–20 % inferior pedido; medido en la corrida 22–28 % de la altura útil; logo centro a 93,5 %, ancho 15 % **[medido]** |
-| 9:16 | **[pendiente]** | Propuesta: lecho 18–22 %, logo con centro a 85–88 % (fuera de la zona de UI de Stories/Reels) **[criterio, subagente de composición]** |
-| 16:9 | **[pendiente]** | Propuesta: lecho 25–30 % **[criterio]**; tomas naturales: tilt-shift, escala, mesa larga, dron |
+| **4:5 1152×1440** | **Probado** | Lecho 18 % en `foto:prompt`; firma vigente 20 % del lado corto. La corrida inicial midió logos al 15 % **[histórico]** |
+| **9:16 1152×2048** | **Probado en plates nativos** | Lecho 22 % en `foto:prompt`; ubicación final de la firma en Stories/Reels pendiente de aprobación |
+| **16:9 2048×1152** | **Probado en plates nativos** | Lecho 16 % en `foto:prompt`; tomas naturales: tilt-shift, escala, mesa larga, dron |
 | 1:1 | **[pendiente]** | Propuesta: lecho 20–25 % **[criterio]**; tomas naturales: ojo de pez, macro |
 
 Recomendación **[criterio]**: generar **nativo** en el formato final (el `--size` de `pnpm ai:image`), no recortar un
@@ -383,7 +383,7 @@ detalle **[medido]**. No sirve para «arreglar» una pieza.
 
 | # | Pendiente |
 |---|---|
-| 1 | 9:16, 16:9 y 1:1 nativos con reglas de lecho/logo **[pendiente]** |
+| 1 | 1:1 nativo y posición final de firma en 9:16 y 16:9 **[pendiente]**; los plates de 9:16 y 16:9 ya fueron probados |
 | 2 | Firma para tomas todo-enfocado (dron) **[pendiente]** |
 | 3 | Re-medir lechos con cajas ajustadas por pieza (este catálogo usa una caja estándar) **[pendiente]** |
 | 4 | Contrapicado sin quemado de tragaluz **[pendiente]** |

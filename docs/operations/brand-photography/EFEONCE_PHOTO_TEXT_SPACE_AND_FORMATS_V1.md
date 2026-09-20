@@ -49,6 +49,10 @@ La zona de texto es a la parte alta lo que el lecho es a la baja: **se planifica
 
 ## 3. Zonas por formato (valores usados)
 
+**Evidencia histórica, no receta vigente:** estas composiciones gráficas no fueron aprobadas. Los plates nativos
+sí prueban las reservas por formato; para una nueva foto se usa `foto:prompt` y la firma aprobada es 20% del lado
+corto, según [firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md). Los valores de 15% siguientes describen la prueba.
+
 | Formato | Tamaño | Zona de titular (x0,y0,x1,y1 en fracciones) | Sujeto | Lecho | Firma (centro, ancho) |
 |---|---|---|---|---|---|
 | 4:5 feed | 1152×1440 | 0,08 · 0,05 · 0,92 · 0,29 (tercio superior) | 30–80% alto | 18% inferior | y 0,935 · 15% del lado corto |
@@ -57,7 +61,7 @@ La zona de texto es a la parte alta lo que el lecho es a la baja: **se planifica
 
 - 16:9 es el formato que mejor reserva espacio: el costado queda limpio casi siempre.
 - 9:16 comparte el problema de 4:5 (cabezas que suben) y necesita el límite de cabezas.
-- El 15% se calcula sobre el **lado corto** para que la firma pese igual en los tres formatos.
+- En esta prueba se usó 15% del **lado corto**; desde 2026-09-20 la firma aprobada usa 20%.
 
 ## 4. Compositor de titular (`scripts/titular.mjs`)
 
@@ -129,7 +133,7 @@ y cursor multiplayer, distintas voces o tipografías como Guttery y Poppins». L
 | Selección | AXIS `renderCollaborationSelection` | enmarca el objeto real | variantes válidas: `eight-handles`, `four-corners`, `open-brackets` |
 | Cursor solo | selección con **un** cursor y `local: false` | presencia de un rol o de Nexa | |
 | Cursores multiplayer | 2–3 cursores + cursor local | co-creación cliente ↔ Efeonce | colores por rol: Cliente lima `#6ec207` o azul, Arte naranja `#f55d01`, RevOps/Efeonce `#0375db`, Nexa `#d6246e` |
-| Firma | SVG oficial | cierre | 15% del lado corto |
+| Firma de esta prueba rechazada | SVG oficial | cierre | 15% del lado corto; vigente: 20% |
 
 ### 8.2 Qué reservar en la toma
 

@@ -1,9 +1,9 @@
 # Fotografía de marca Efeonce — índice
 
 > **Tipo de documento:** Índice operativo de carpeta
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-19 por Claude
+> **Última actualización:** 2026-09-20
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Bitácora del caso](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida de evidencia](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md)
 
 Esta carpeta guarda el **Lenguaje Fotográfico de la marca propia de Efeonce**, aprobado por el operador (Julio
@@ -13,9 +13,10 @@ piezas de clientes ni a trendjacking que toma prestada una estética ajena.
 Estado: **sistema aprobado y consistente, no activo distintivo medido**. Llamarlo activo distintivo exige antes la
 prueba de reconocimiento descrita en los pendientes del documento maestro.
 
-## Los dos comandos (empieza por acá)
+## Comandos de producción (empieza por acá)
 
 ```bash
+pnpm foto:doctor                         # comprueba la cadena local sin generar ni gastar
 pnpm foto:prompt --ficha-ejemplo          # plantilla de ficha de toma
 pnpm foto:prompt <ficha.json> --batch <out.json>   # arma el prompt; el formato sale de UNA tabla
 pnpm foto:validar <plate.png>             # valida las seis reservas sobre el plate limpio
@@ -36,6 +37,7 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | 4 | [`EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md`](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) | Catálogo de cámaras, lentes y ángulos probados, con su uso, su lecho y lo medido | Otro agente |
 | 5 | [`EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md`](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) | Bloques de prompt (realismo, impacto, FOREGROUND), ficha de toma y pipeline de producción con scripts | Otro agente |
 | 6 | [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) | Personas: casting, gesto, mirada, piel; Julio y Nexa (referencias, identidad, QA); uniforme | Claude |
+| 7 | [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) | **Catálogo de palancas**: las quince aprobadas (qué es, cómo se logra, marcadores verbatim, evidencia, qué no), las cuatro descartadas con su razón medida y las tres reglas que gobiernan el catálogo | Claude |
 
 ## Registros y evidencia
 
@@ -51,8 +53,8 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | Perfil | Orden |
 |---|---|
 | Quien decide o revisa la marca | 1 → 2 → bitácora |
-| Quien produce una foto con IA | Manual → 5 → 2 → 3 → 4 → 6 |
-| Quien produce una foto con personas reales o con Julio/Nexa | 6 → 2 → 4 |
+| Quien produce una foto con IA | Manual → 5 → **7** → 2 → 3 → 4 → 6 |
+| Quien produce una foto con personas reales o con Julio/Nexa | 6 → 2 → 4 → **7** |
 | Quien quiere entender por qué es así | Bitácora → 1 |
 
 ## Reglas de la carpeta

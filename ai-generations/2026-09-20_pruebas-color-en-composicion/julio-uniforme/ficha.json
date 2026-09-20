@@ -1,0 +1,27 @@
+{
+  "id": "julio-uniforme-control-proyeccion",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio"],
+  "preflightVisual": {
+    "aprobadosVistos": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/J2-rodaje-polo-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/J1-retrato-final.png"
+    ],
+    "comparacion": "J2 muestra a Julio dirigiendo con el polo en un set claro, brazo activo y maleta negra desenfocada como lecho; J1 sostiene rostro, barba, lentes y luz direccional con azul en una libreta funcional. El set curado combina azul activo en partes plausibles de la escena y naranja pequeno en la accion. Esta toma cambia el oficio a revision fisica de una proyeccion antes de abrir puertas, con luz del sol sobre Julio y una sola senal ambar del equipo. El azul vive en la imagen proyectada y, de modo secundario, en una cinta corporativa del kit; no se agrega utileria cromatica.",
+    "refsVistas": [
+      "ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-01.png",
+      "ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-04.png",
+      "ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-07.png",
+      "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-01-frente-1600x1600-v01-fondo-estudio.png",
+      "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-04-puesto-1200x1600-v01-fondo-estudio.png"
+    ]
+  },
+  "escena": "SCENE (Efeonce event experience quality check, Santiago, late afternoon): Julio in the exact official Efeonce team uniform, a deep navy cotton-pique polo with ribbed collar and a SMALL white embroidered Efeonce ship emblem on his LEFT chest, based on Image 4, is checking the sightline of an abstract moving image projected for a live presentation on a pale warm plaster wall. Image 5 is the Efeonce blue team lanyard kit, which he wears around the neck; its badge hangs below the frame and no writing is visible. The lanyard drops to his right so the left-chest emblem remains clear and the polo is not concealed. Images 1-3 are Julio's identity only; ignore their suits and backgrounds. Catch the moment just as Julio extends one hand to line up the projected frame boundary while the other hand holds a small unbranded proof, eyes tracking the alignment instead of looking at camera. This is a real technical check before the room opens, not a posed meeting. A firm low beam of actual late-afternoon sunlight enters from camera left and sculpts his face, raised hand and pique texture; the wall stays in quiet shade. 50mm lens at f/2.8 from a three-quarter, waist-up documentary position, Julio sharp and a soft technical background. The projection carries a clean bright azure #0375DB abstract shape with no letters or symbols, occupying a modest region behind his raised hand; it belongs to the work being checked, never a generic blue backdrop. One tiny amber-orange cue light on the actual projector housing at the back is the only orange accent; no added color props, no lime. The setting is pale plaster, natural timber and warm daylight so his navy polo separates. The only permitted marks are the exact white embroidered ship and the kit lanyard; no other logos, no invented letters or badge text. Keep the ship geometry faithful: orbit and sphere, three circular windows, tail fins; do not turn it into a generic rocket.",
+  "lecho": {
+    "objeto": "the real charcoal felt-padded near edge of the projection technician's console, immediately in front of the lens",
+    "tono": "DARK charcoal, even and matte"
+  }
+}

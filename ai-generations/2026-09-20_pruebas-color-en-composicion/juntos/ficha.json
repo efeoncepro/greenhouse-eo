@@ -1,0 +1,24 @@
+{
+  "id": "jn-rodaje-exterior-color-en-composicion",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio", "nexa"],
+  "preflightVisual": {
+    "aprobadasVistas": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/JN2-podcast-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/JN3-calle-final.png"
+    ],
+    "comparacion": "JN2 integra el azul como área espacial del fondo; JN3 da naturalidad al gesto y a la luz cálida sin utilería cromática. Evitar el patrón de taza JN1 y la tarjeta naranja forzada de la prueba previa.",
+    "azul": "Reflejo del cielo de tarde sobre la fachada de vidrio del lugar de rodaje: un plano de profundidad que enmarca a las personas sin convertirse en una pantalla lisa añadida.",
+    "acento": "Naranja de la luz de tarde sobre la mampostería de terracota del lugar. Calidez localizada en el espacio, no un objeto naranja aislado ni un tinte sobre toda la foto.",
+    "lecho": "Borde muy próximo, negro y desenfocado, de un matte box real de cámara; primer plano útil para la firma blanca.",
+    "diferencia": "Julio y Nexa deciden la composición de un rodaje exterior en plena acción. La cámara es parte del oficio; el color llega del lugar y la luz, no de accesorios de marca."
+  },
+  "escena": "SCENE (Efeonce creative direction on an outdoor editorial shoot, Santiago, late afternoon): just as the camera crew prepares to roll, Julio and Nexa stand together in an open urban courtyard, actively refining the shot. Julio, the same real man as references 1-2, holds the side of a neutral black field monitor at left and looks toward the real scene; his complete face is visible in three-quarter view. Nexa, the same real woman as references 3-4, stands beside him at right, pointing across the courtyard to correct the framing; her complete face is visible in three-quarter view. Their gazes and hands connect through the decision, not toward the photographer. A real unbranded cinema camera and its black rig enter from the left edge but never obscure either face. The location's existing glass facade catches a naturally rich azure-blue #0375DB reflection of the clear sky behind them, creating one coherent cool spatial plane. Low hard afternoon sunlight grazes the existing warm terracotta masonry at the far side of the courtyard, giving the one local orange #F55D01 family accent as a relation of architecture and light, not as a colored object or global orange grade. The azure reflection and warm masonry are part of the actual location and the camera framing they are deciding, never decorative colored props, blank panels, or artificial gels. Natural skin and neutral-warm white balance remain intact; shadows are not blue. Julio wears an off-white linen overshirt over charcoal; Nexa wears a stone cotton blouse, both with ordinary fabric creases, no navy uniform. One light stand and a reflector at the periphery show the real operation without clutter. Human faces and working hands sharp, 35mm full-frame documentary photograph at f/2.8 from a slightly low side angle, three distinct depth planes and imperfect candid timing. The visible work is making a framing decision during a live location shoot, never a posed publicity portrait or generic meeting. No additional identifiable people, no colored cue cards, bottles, bags or clips, no signage, no written words, no generated logos.",
+  "lecho": {
+    "objeto": "the very near black matte box edge of the cinema camera, genuinely out of focus across the bottom of the photograph",
+    "tono": "DARK charcoal near black"
+  }
+}

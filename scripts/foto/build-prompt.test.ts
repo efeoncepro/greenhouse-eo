@@ -594,3 +594,58 @@ describe('foto:prompt · el catálogo coincide con el lock de assets', () => {
     for (const entrada of Object.values(lock.assets)) expect(entrada.sha256).toMatch(/^[0-9a-f]{64}$/)
   })
 })
+
+// ── Las quince palancas ──────────────────────────────────────────────────────────────────────────
+// Probadas en tres rondas el 2026-09-20. Las que fallaron NO están en el catálogo y su razón vive en
+// el catálogo maestro: baño de color (el modelo se niega a teñir la piel), split diopter (devuelve
+// profundidad de campo normal), clave baja (duplica luz con carácter + lecho oscuro).
+describe('foto:prompt · el catálogo de palancas', () => {
+  const claves = Object.keys(PALANCAS as Record<string, unknown>)
+
+  it('tiene las quince aprobadas y ninguna descartada', () => {
+    expect(claves).toHaveLength(15)
+
+    for (const descartada of ['bano-de-color', 'split-diopter', 'clave-baja', 'flash-duro']) {
+      expect(claves).not.toContain(descartada)
+    }
+  })
+
+  it.each(claves)('%s emite un bloque con marcadores verificables', clave => {
+    const p = PALANCAS as Record<string, { bloque: string; requiere: string | null }>
+    const extra = p[clave].requiere ? { [p[clave].requiere as string]: 'un objeto concreto de prueba' } : {}
+    const prompt = construirPrompt({ ...fichaBase, palanca: clave, ...extra }).prompt
+
+    // «verify it», «NOT a…», «no faces»: la marca de que el bloque describe qué se ve, no una intención.
+    expect(prompt).toMatch(/verify it|NOT a|NO facial|not a digital effect|nobody|no faces/i)
+  })
+
+  it.each(claves.filter(c => (PALANCAS as Record<string, { requiere: string | null }>)[c].requiere))(
+    '%s aborta si falta su campo obligatorio',
+    clave => {
+      expect(() => construirPrompt({ ...fichaBase, palanca: clave })).toThrow(/exige el campo/)
+    }
+  )
+
+  // La ausencia y la larga exposición no tienen instante por naturaleza.
+  it('las palancas sin momento están marcadas', () => {
+    expect(construirPrompt({ ...fichaBase, palanca: 'ausencia' }).sinMomento).toBe(true)
+    expect(construirPrompt({ ...fichaBase, palanca: 'larga-exposicion' }).sinMomento).toBe(true)
+    expect(construirPrompt({ ...fichaBase, palanca: 'silueta' }).sinMomento).toBe(false)
+  })
+
+  it('el instrumento inserta la herramienta declarada', () => {
+    const p = construirPrompt({ ...fichaBase, palanca: 'instrumento', instrumento: 'a chrome loupe resting on a printed proof' }).prompt
+
+    expect(p).toContain('LOOKING THROUGH a chrome loupe resting on a printed proof')
+  })
+
+  it('el fragmento inserta por dónde corta el borde', () => {
+    const p = construirPrompt({
+      ...fichaBase,
+      palanca: 'fragmento',
+      corta: 'the right edge cuts through her face just past the bridge of her nose'
+    }).prompt
+
+    expect(p).toContain('the right edge cuts through her face just past the bridge of her nose')
+  })
+})

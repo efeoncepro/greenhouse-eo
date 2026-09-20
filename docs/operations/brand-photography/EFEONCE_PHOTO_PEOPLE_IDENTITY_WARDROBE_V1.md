@@ -3,7 +3,7 @@
 > **Tipo de documento:** Especificación técnica y funcional de marca
 > **Versión:** 1.0
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-19 por Claude
+> **Última actualización:** 2026-09-20
 > **Estado:** Aprobado por el operador el 2026-09-19 (piezas de exploración; ninguna publicada)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Guía de kits de marca](../social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md) · [Biblioteca de Nexa](../social/NEXA_CREATIVE_RESOURCE_LIBRARY.md) · Evidencia `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/`
 
@@ -53,9 +53,8 @@ Requisito del operador: el sistema funciona en los tres **[decisión del operado
 
 | Persona | Rol de la imagen | Ruta |
 |---|---|---|
-| Julio | Rostro | `ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-01.png` |
-| Julio | Rostro | `ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-04.png` |
-| Julio | Cuerpo | `ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-07.png` |
+| Julio | Rostro | `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/` (`julio-ap-04` primero; vista resuelta por `foto:prompt`) |
+| Julio | Cuerpo | El mismo set aprobado (`julio-ap-11` primero) |
 | Nexa | Cuerpo completo | `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png` |
 | Nexa | Rostro/gesto | `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-point.png` |
 | Nexa | Rostro/gesto | `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-listen.png` |
@@ -230,9 +229,8 @@ Eso empuja al modelo a vestirlo formal y de navy aunque el prompt diga «ignore 
 falla medido ese día con las referencias de Nexa. Mientras el set sea así, **toda toma con identidad debe declarar
 el vestuario en la escena** (ya hay aviso en `pnpm foto:prompt`).
 
-**[pendiente]** Ampliar el set de referencia con vestuario neutro y no formal, y con ángulos que hoy no existen
-(perfil, tres cuartos izquierda y derecha, expresión hablando). Las ocho actuales son frontales o de tres cuartos
-suave.
+El set de 2026-09-17 es evidencia histórica y **no se usa como ancla**. El set aprobado vigente y sus ángulos
+derivados se describen en el delta siguiente. Sigue pendiente ampliar expresiones y vestuario neutro sin deriva.
 
 ## Delta 2026-09-20 (tarde) — set de identidad de Julio reconstruido **[decisión del operador]**
 

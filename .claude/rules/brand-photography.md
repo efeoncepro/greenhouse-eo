@@ -28,7 +28,7 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 | `formato` | tamaño, % del lecho y límite de sujetos, de UNA tabla |
 | `identidad` | bloques `IDENTITY` + `REFERENCES` verbatim, con **vista por ángulo** (`{ persona, vista }`) |
 | `objetos` | kits de marca como **referencia de forma** (logo, mascota, prenda, merch), numerados tras la identidad |
-| `palanca` | **una** palanca de encuadre: `pov` · `manos` · `luz-motivada` · `larga-exposicion` · `oclusion` |
+| `palanca` | **una** de las **15** aprobadas → [catálogo de palancas](../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) |
 | `atmosfera` | `polvo` · `bruma` · `vapor` · `humo` — aire con materia que hace visible la luz |
 | `suspendido` | qué está congelado en el aire |
 | `lecho` | objeto y **tono declarado** del primer plano desenfocado |
