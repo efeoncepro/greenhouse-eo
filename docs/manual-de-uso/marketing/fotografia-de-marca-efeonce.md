@@ -9,6 +9,7 @@
 ## Lo más corto que funciona
 
 ```bash
+pnpm foto:doctor                                  # 0. ¿esta máquina puede generar? (no cuesta nada)
 pnpm foto:prompt --ficha-ejemplo > ficha.json     # 1. plantilla; editá escena, lecho y reservas
 pnpm foto:prompt ficha.json --batch batch.json    # 2. arma el prompt (imprime el ai:image exacto)
 pnpm ai:image --batch batch.json --out <dir> --model gpt-image-2.5-flare --quality high --size <el que imprimió>

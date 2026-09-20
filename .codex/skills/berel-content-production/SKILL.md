@@ -77,6 +77,7 @@ CMS Drupal ........................................................ modules/08_P
 Correcciones y pedidos fechados del cliente ........................ modules/09_RECOMENDACIONES_DEL_CLIENTE.md
 Revisión y respuesta de comentarios del cliente .................... modules/18_REVISION_COMENTARIOS_CLIENTE.md
 Revisión amplia V2 y lentes adversariales .......................... modules/18_REVISION_COMENTARIOS_CLIENTE.md
+Feedback visual en Frame.io y QA de artes .......................... modules/20_REVISION_VISUAL_FRAMEIO.md
 Formatos de infografía ............................................. modules/10_FORMATOS_DE_INFOGRAFIA.md
 Ficha de producción de infografía ................................. modules/11_FICHA_DE_PRODUCCION_INFOGRAFIA.md
 Datos verificados de catálogo ...................................... modules/12_DATOS_VERIFICADOS_DEL_CATALOGO.md
@@ -293,6 +294,15 @@ Plantillas ......................................................... templates/
 68. 🔴 **Autoría = Pinturas Berel como organización.** Ninguna persona firma: `author` y `publisher` =
     `Organization` «Pinturas Berel» con `url` `/somos-berel`, también en lugar del `Person` «Equipo Editorial
     Berel» del sitio. La experiencia se respalda con expertos por disciplina y datos de fichas técnicas. Módulo 03.
+69. 🔴 **Feedback visual con diagnóstico antes del remedio.** En Frame.io leer la versión exacta y todos sus
+    hilos; separar error comprobable, ajuste visual medible, preferencia con motivo y comentario vago. Corregir
+    nombres/códigos contra el catálogo y datos de producto contra ficha; una preferencia aislada no crea regla
+    universal ni cancela un canal. No declarar un arte actualizado sin master, nueva versión y readback.
+    Módulo 20.
+70. 🔴 **QA preventivo de infografías antes del share.** Recalcular cifras y unidades, comprobar que cada
+    imagen muestre la acción rotulada y que título, subtítulo, contenido y cierre cumplan una misma función.
+    Anotar un riesgo como hipótesis de Efeonce, nunca como comentario ya hecho por Berel; en Frame.io
+    comentar la versión exacta y verificar el envío. Módulo 20.
 
 ## Lo que no se toca
 

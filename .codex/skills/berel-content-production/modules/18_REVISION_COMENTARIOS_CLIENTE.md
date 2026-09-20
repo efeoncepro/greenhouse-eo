@@ -229,6 +229,33 @@ completo como consumidor y comprobar continuidad entre oraciones antes de optimi
 La segunda señal fue producto: categorías genéricas no sustituyen el nombre exacto, el acabado ni la explicación
 de cuándo corresponde cada sistema.
 
+### Claridad del pedido y costo de interpretación
+
+El [corte histórico de cuatro meses](../../../../docs/operations/BEREL_FEEDBACK_CLARITY_BASELINE_2026-09-19.md)
+revisó 239 comentarios Berel fechados entre junio y septiembre en 33 artículos/tutoriales
+con fecha de publicación en ese intervalo. Identificó **22 pedidos abiertos en 15 artículos**:
+junio 2, julio 4, agosto 5 y septiembre 11. Sus 22 hilos tienen **28 respuestas de Efeonce**.
+El patrón se repite en los cuatro meses; las respuestas no son equivalentes a tareas nuevas ni
+prueban horas atribuibles al cliente. Ejemplos de la clase abierta: «igual ajustar este tip»,
+«reformular», «suena raro y artificial» o «refrasear u omitir», sin resultado o criterio de
+elección. Un adjetivo subjetivo con instrucción acotada queda fuera de esta clase.
+
+No confundir **causa del comentario** (tabla anterior) con **suficiencia de la instrucción**.
+La [lectura comparada de texto y arte del 19-09-2026](../../../../docs/operations/BEREL_FEEDBACK_CLARITY_BASELINE_2026-09-19.md)
+encontró 31 pedidos de contenido en las tres páginas de campaña: 21 instrucciones específicas
+o comprobables, 8 preferencias subjetivas con acción acotada y 2 pedidos abiertos que requieren
+propuesta. En los mismos 26 hilos hubo 48 respuestas de Efeonce y se preparó una V2 por página;
+estas cifras muestran trabajo, pero no atribuyen todas las respuestas ni las V2 a la vaguedad.
+El corte anterior de 25 observaciones por **causa primaria** permanece como tal y no se suma
+como si fuera otro lote.
+
+Para un pedido abierto, conservar el ancla, cotejar fuentes, proponer una o dos opciones y pedir
+una elección acotada en el mismo hilo. Registrar `fragmento → problema → resultado esperado →
+opción → criterio de aceptación` y si la decisión aplica solo a la pieza o a toda la campaña.
+Una expresión subjetiva con acción clara (por ejemplo, «omitir esta tabla») sí se puede ejecutar;
+el equipo no debe abrir una discusión innecesaria solo porque el motivo sea de gusto. Nunca
+declarar «actualizado» sin releer la versión exacta.
+
 ## Contrato de respuesta
 
 Usar [`../templates/respuesta-comentario-cliente.md`](../templates/respuesta-comentario-cliente.md) como

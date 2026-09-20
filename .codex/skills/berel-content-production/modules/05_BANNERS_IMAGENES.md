@@ -212,3 +212,4 @@ La posición N# sigue existiendo en el artículo, pero su ficha cambia:
 - Oficio de imagen editorial y su contrato HTML/SEO → `seo-aeo/references/editorial-image-seo.md`
 - Dirección de arte y sistema visual editorial →
   `content-marketing-studio/references/agentic-editorial-visual-system.md`
+- QA de versiones y comentarios visuales en Frame.io → [`20_REVISION_VISUAL_FRAMEIO.md`](20_REVISION_VISUAL_FRAMEIO.md)

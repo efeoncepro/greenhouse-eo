@@ -30,7 +30,8 @@
         "foto:validar",
         "ficha de toma",
         "generar un plate",
-        "validar un plate"
+        "validar un plate",
+        "foto:doctor"
       ],
       "skills": [
         "design-studio",
@@ -49,7 +50,8 @@
         ".codex/skills/design-studio/references/efeonce-photographic-language.md",
         "scripts/foto/build-prompt.mjs",
         "scripts/foto/validar-reservas.mjs",
-        "docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md"
+        "docs/manual-de-uso/marketing/fotografia-de-marca-efeonce.md",
+        "scripts/foto/doctor.ts"
       ]
     },
     {

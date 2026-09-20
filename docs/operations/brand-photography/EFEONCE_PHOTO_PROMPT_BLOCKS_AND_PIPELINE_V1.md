@@ -303,7 +303,16 @@ material** y la paleta cálida sin azul en sala («NO blue elements in the room 
 
 ### 4.0 Requisitos de la máquina (lo único que no viaja con el repo)
 
-Los comandos y los bloques están versionados; **la credencial no**. Para generar hacen falta dos cosas:
+```bash
+pnpm foto:doctor          # ¿puede esta máquina producir un plate? Si no, dice exactamente qué falta
+pnpm foto:doctor --json   # para encadenar; sale con código 1 si algo bloquea
+```
+
+**No lista variables: ejercita la cadena.** Una variable presente no prueba que el secreto resuelva, y un secreto
+que resuelve no prueba que la clave sirva. Los seis chequeos hacen la operación real, y el de la clave usa
+`/v1/models`, que **no cobra**. La clave nunca se imprime.
+
+Los comandos y los bloques están versionados; **la credencial no**. Lo que el doctor verifica:
 
 | Requisito | Cómo se verifica | Si falta |
 |---|---|---|
@@ -313,6 +322,10 @@ Los comandos y los bloques están versionados; **la credencial no**. Para genera
 `pnpm foto:prompt` y `pnpm foto:validar` **no** necesitan credencial: arman el prompt y miden archivos locales. La
 credencial la necesita sólo `pnpm ai:image`. Eso permite preparar y revisar una tanda entera sin acceso, y pedir la
 generación después.
+
+El doctor también verifica que los bloques compartidos no traigan un valor de formato adentro, con la misma guarda
+de `foto:prompt`, y que `sharp` esté disponible (es lo que mide). Un fallo de resolución de secreto **casi siempre
+es la ADC vencida**, no la clave: el doctor los distingue.
 
 Todo lo demás —bloques, tabla de formatos, umbrales, arnés— vive en `scripts/foto/` y viaja con el repo.
 

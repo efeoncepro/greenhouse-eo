@@ -67,6 +67,12 @@ emojis · hashtags y keywords · CTA · surface del contenido.
 un proyecto, el contenido vive meses o años y es una de las mejores fuentes de tráfico evergreen al
 blog. Por eso su registro es keyword-first y no poético.
 
+Antes de producir un Pin, comprobar que la imagen y el overlay muestran un color, producto o proyecto
+identificable y ofrecen una razón para guardar la pieza. Si falta ese valor, evaluar `No aplica` para
+ese artículo según el módulo 15; el comentario sobre un Pin concreto no elimina el canal del catálogo.
+Para revisar texto, composición y consistencia entre variantes, aplicar el
+[módulo 20](20_REVISION_VISUAL_FRAMEIO.md).
+
 ## Catálogo del ciclo mensual: cuatro opciones, selección por artículo
 
 Se identifican en la base `Tareas` filtrando por la relación `Artículo (Content Hub)`. Naming:
