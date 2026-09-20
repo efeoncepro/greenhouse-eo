@@ -8,7 +8,7 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 // @ts-expect-error -- .mjs sin tipos, a propósito: es una herramienta de corrida, no código de producto.
-import { auditarEscena, construirPrompt, detectarValorDeFormato } from './build-prompt.mjs'
+import { auditarEscena, auditarVestuario, construirPrompt, detectarValorDeFormato } from './build-prompt.mjs'
 
 const raiz = path.resolve(__dirname, '../..')
 const BLOQUES = path.join(raiz, 'scripts/foto/bloques')
@@ -195,5 +195,93 @@ describe('foto:prompt · anclas prohibidas y auditoría de escena', () => {
     expect(
       auditarEscena('SCENE: a single hard shaft of low sun crosses the room as she throws the proof onto the table mid-sentence.')
     ).toEqual([])
+  })
+})
+
+// ── Identidad ────────────────────────────────────────────────────────────────────────────────────
+// Antes de esto, una toma con Julio o Nexa se armaba a mano: exactamente lo que este comando existe
+// para impedir. El modo de falla es silencioso y facturable — un prompt sin IDENTITY ni REFERENCES
+// devuelve una cara inventada que en la hoja de contacto pasa por buena.
+describe('foto:prompt · identidad', () => {
+  it('sin identidad no emite IDENTITY ni REFERENCES, y no pide referencias', () => {
+    const r = construirPrompt(fichaBase)
+
+    expect(r.prompt).not.toContain('IDENTITY')
+    expect(r.prompt).not.toContain('REFERENCES')
+    expect(r.imagenes).toEqual([])
+  })
+
+  it('una persona sola lleva 3 referencias y el "ignore" en la misma frase', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: ['julio'] })
+
+    expect(r.imagenes).toHaveLength(3)
+    expect(r.prompt).toContain('REFERENCES: Images 1-3 are Julio (identity only; ignore their clothing and backgrounds).')
+  })
+
+  it('dos personas llevan 2 referencias cada una, numeradas por tramo', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa'] })
+
+    expect(r.imagenes).toHaveLength(4)
+    expect(r.prompt).toContain(
+      'REFERENCES: Images 1-2 are Julio (identity only). Images 3-4 are Nexa (identity only). Ignore the clothing and backgrounds of all references.'
+    )
+  })
+
+  // El orden del canon (§3.6/§3.7) no es decorativo: IDENTITY y REFERENCES condicionan la escena que
+  // viene después, y FOREGROUND cierra siempre.
+  it('respeta el orden canónico realismo → impacto → IDENTITY → REFERENCES → SCENE → FOREGROUND', () => {
+    const p = construirPrompt({ ...fichaBase, identidad: ['julio'] }).prompt
+
+    expect(p.indexOf('IDENTITY (critical)')).toBeGreaterThan(p.indexOf('THREE distinct depth planes'))
+    expect(p.indexOf('REFERENCES:')).toBeGreaterThan(p.indexOf('IDENTITY (critical)'))
+    expect(p.indexOf('SCENE (test)')).toBeGreaterThan(p.indexOf('REFERENCES:'))
+    expect(p.indexOf('FOREGROUND (planned)')).toBeGreaterThan(p.indexOf('SCENE (test)'))
+  })
+
+  // El bloque tiene que ser el del canon, letra por letra: si el doc cambia y el comando no, la
+  // identidad deriva sin que nadie lo note.
+  it('el bloque IDENTITY es verbatim el del canon', () => {
+    const doc = readFileSync(DOC, 'utf8')
+
+    for (const persona of ['julio', 'nexa']) {
+      const emitido = construirPrompt({ ...fichaBase, identidad: [persona] })
+        .prompt.split('\n\n')
+        .find((b: string) => b.startsWith('IDENTITY (critical)'))
+
+      expect(doc).toContain(emitido)
+    }
+  })
+
+  it('aborta con una persona desconocida en vez de generar un desconocido', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['juan'] })).toThrow(/desconocida/)
+  })
+
+  it('aborta sobre dos personas: el tope está medido, no supuesto', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa', 'julio'] })).toThrow(/no está medido/)
+  })
+
+  it('exige que `identidad` sea una lista', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: 'julio' })).toThrow(/debe ser una lista/)
+  })
+})
+
+describe('foto:prompt · avisos que faltaban', () => {
+  // Falso negativo real: la escena declaraba "hard midday daylight pours in through the storefront
+  // glass" y el aviso saltaba igual.
+  it('reconoce la luz de día y de mediodía como fuente declarada', () => {
+    expect(auditarEscena('SCENE: hard midday daylight pours through the glass as she seats the divider at the moment it clicks.')).toEqual([])
+  })
+
+  // El aviso que habría evitado dos piezas en navy.
+  it('avisa cuando hay identidad y la escena no declara vestuario', () => {
+    expect(auditarVestuario('SCENE: she crouches at the end of the aisle in hard daylight.', ['nexa'])).toMatch(/VESTUARIO/)
+  })
+
+  it('no avisa si la escena declara la prenda', () => {
+    expect(auditarVestuario('SCENE: she crouches in a faded grey cotton work t-shirt.', ['nexa'])).toBeNull()
+  })
+
+  it('no avisa de vestuario cuando no hay identidad', () => {
+    expect(auditarVestuario('SCENE: an empty studio at dawn.', [])).toBeNull()
   })
 })

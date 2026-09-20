@@ -1,0 +1,11 @@
+{
+  "id": "P2-nexa-retail-cdmx",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["nexa"],
+  "escena": "SCENE (shelf audit, personal-care aisle of a large store in Mexico City, midday): hard midday daylight pours in through the storefront glass and falls ONTO THE WOMAN, cutting a sharp graphic shadow across her back and the floor beside her; she crouches low at the end of the aisle, one knee down, sliding a printed shelf divider into place with both hands at the moment it seats, and a small lime-green approved sticker sits on the card in her hand. She looks at the shelf, never at the camera. Deep behind her the aisle recedes into soft focus and a single cool azure-blue promotional panel glows small at the far end. 35mm lens at f/4, focus on her hands and the divider. All products and packaging are completely unbranded, no brand names, no readable text anywhere.",
+  "lecho": {
+    "objeto": "the near edge of a matte dark steel restocking cart parked between the camera and the aisle",
+    "tono": "DARK charcoal in shadow"
+  }
+}

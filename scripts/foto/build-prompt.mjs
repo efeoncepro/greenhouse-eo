@@ -157,6 +157,93 @@ const INCOMPATIBLES = {
 // resolverlo con una tercera medición, la 19 NO entra en la lista: bloquear por una sola observación
 // tira una toma que ya demostró funcionar.
 
+// ── Personas con identidad. Bloques verbatim del canon §3.6; rutas reales de §3.7. ──────────────
+// Sin esto, una toma con Julio o Nexa se armaba a mano — justo lo que este comando existe para
+// impedir. El modo de falla no era estético: un prompt sin IDENTITY ni REFERENCES genera una cara
+// inventada, se ve "bien" en la hoja de contacto y se paga igual.
+const PERSONAS = {
+  julio: {
+    etiqueta: 'Julio',
+    identity:
+      'IDENTITY (critical): the man is the SAME real person shown in the Julio reference images: a Venezuelan man in his mid-forties with short salt-and-pepper curly hair, thin rectangular silver-rim glasses, a full dark beard with grey, warm brown skin. Preserve his face, glasses, beard and build EXACTLY as in the references; only pose, clothing, light and setting change. Do not beautify or change his age.',
+    refs: [
+      'ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-01.png',
+      'ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-04.png',
+      'ai-generations/2026-09-17_equipo-vestuario/refs/julio-reyes-07.png'
+    ]
+  },
+  nexa: {
+    etiqueta: 'Nexa',
+    identity:
+      'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images: a woman in her early thirties with long dark wavy hair, fair olive skin, dark eyes and defined brows. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.',
+    refs: [
+      'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png',
+      'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-point.png',
+      'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-listen.png'
+    ]
+  }
+}
+
+// Una persona sola lleva 3 referencias; dos personas llevan 2 cada una (medido en la ronda de
+// personas: 6 referencias sostuvieron identidad de dos personas y dos mascotas).
+const REFS_POR_PERSONA = { 1: 3, 2: 2 }
+
+function resolverIdentidad(ficha) {
+  const pedidas = ficha.identidad ?? []
+
+  if (!Array.isArray(pedidas)) throw new Error('`identidad` debe ser una lista, por ejemplo ["julio"] o ["julio", "nexa"].')
+  if (!pedidas.length) return null
+
+  if (pedidas.length > 2) {
+    throw new Error(
+      'Más de dos personas con identidad en una toma no está medido: la ronda de personas llegó a dos personas ' +
+        '(más dos mascotas con su propio bloque). Divide la pieza o documenta la medición antes de subir el tope.'
+    )
+  }
+
+  const cupo = REFS_POR_PERSONA[pedidas.length]
+  const imagenes = []
+  const tramos = []
+
+  for (const clave of pedidas) {
+    const persona = PERSONAS[clave]
+
+    if (!persona) {
+      throw new Error(`Persona "${clave}" desconocida. Personas con identidad canónica: ${Object.keys(PERSONAS).join(', ')}.`)
+    }
+
+    const refs = persona.refs.slice(0, cupo)
+
+    for (const ref of refs) {
+      if (!existsSync(path.join(raiz, ref))) {
+        throw new Error(
+          `La referencia de ${persona.etiqueta} no existe en disco: ${ref}. ` +
+            'Sin ella el modelo inventa la cara y la corrida se paga igual.'
+        )
+      }
+    }
+
+    const desde = imagenes.length + 1
+    const hasta = imagenes.length + refs.length
+
+    imagenes.push(...refs)
+    tramos.push({ persona, desde, hasta })
+  }
+
+  // Texto verbatim de §3.7: una persona lo lleva todo en una frase; dos lo dicen por tramo y cierran
+  // con el "ignore" común.
+  const rango = t => (t.desde === t.hasta ? `Image ${t.desde}` : `Images ${t.desde}-${t.hasta}`)
+
+  const references =
+    tramos.length === 1
+      ? `REFERENCES: ${rango(tramos[0])} are ${tramos[0].persona.etiqueta} (identity only; ignore their clothing and backgrounds).`
+      : `REFERENCES: ${tramos
+          .map(t => `${rango(t)} are ${t.persona.etiqueta} (identity only).`)
+          .join(' ')} Ignore the clothing and backgrounds of all references.`
+
+  return { identity: tramos.map(t => t.persona.identity).join('\n\n'), references, imagenes }
+}
+
 const FICHA_EJEMPLO = {
   id: 'ejemplo-picado-mesa-oscura',
   formato: '4:5',
@@ -191,7 +278,12 @@ const AZUL_COMO_TEMA =
 // Vocabulario con el que una escena declara LUZ y MOMENTO. La ronda que el operador aprobó el 19/09
 // los tiene en el 100% de sus escenas; la tanda de 34 que perdió calidad, en 64% y 26%. No es una
 // medición fuerte —mis propios pilotos aprobados sacan 66/33— así que AVISA, no bloquea. [medido]
-const LUZ = /\b(sun|sunlight|sunbeam|beam|backlit|rim-?lit|lit only|lamp|window light|golden hour|hard light|directional|shaft|raking|silhouett)/i
+// `daylight` y `midday` faltaban y marcaban falso negativo en una escena que SÍ declaraba luz dura
+// de vitrina a mediodía [medido 2026-09-20]. Un aviso que grita donde no debe se vuelve ruido y deja
+// de leerse justo cuando acierta.
+const LUZ =
+  /\b(sun|sunlight|sunbeam|daylight|midday|noon|beam|backlit|rim-?lit|lit only|lamp|window light|golden hour|hard light|directional|shaft|raking|silhouett)/i
+
 const MOMENTO = /\b(mid-|at the peak|throws|laughing|mid-sentence|reaching|turning|just as|the moment|catches)/i
 
 export const auditarEscena = escena => {
@@ -203,6 +295,19 @@ export const auditarEscena = escena => {
 
   return avisos
 }
+
+// `ignore their clothing` NO alcanza [medido 2026-09-20]: las referencias de Nexa la muestran con
+// blazer navy y el modelo lo copió en las dos piezas, pese a la instrucción explícita del canon §3.7.
+// Choca con dos reglas duras a la vez — «azul nunca intermedio en ropa grande» y «la colorimetría no
+// es vestir de navy» — y de paso empuja la escena al arquetipo consultora. Con identidad, el
+// vestuario se declara en la escena o lo decide la referencia por nosotros.
+const VESTUARIO =
+  /\b(wear|wearing|dressed|shirt|t-?shirt|sweater|jumper|hoodie|polo|blouse|apron|overall|coverall|jacket|vest|linen|denim|cotton|knit|sleeves?)\b/i
+
+export const auditarVestuario = (escena, identidad) =>
+  identidad?.length && !VESTUARIO.test(escena)
+    ? 'no declara el VESTUARIO y hay identidad: el modelo copia la ropa de las referencias aunque el prompt diga "ignore their clothing"'
+    : null
 
 export const construirPrompt = ficha => {
   const fmt = FORMATOS[ficha.formato]
@@ -252,6 +357,15 @@ export const construirPrompt = ficha => {
   }
 
   partes.push(comp.join(' '))
+
+  // Orden canónico: realismo → impacto → IDENTITY → REFERENCES → SCENE → FOREGROUND.
+  const identidad = resolverIdentidad(ficha)
+
+  if (identidad) {
+    partes.push(identidad.identity)
+    partes.push(identidad.references)
+  }
+
   partes.push(ficha.escena)
 
   // El lecho, con el porcentaje del formato. Nunca escrito a mano.
@@ -259,7 +373,12 @@ export const construirPrompt = ficha => {
     `FOREGROUND (planned): ${ficha.lecho.objeto}, so close to the lens that it dissolves into a soft abstract blur with no visible edges or details, spanning the ENTIRE width of the bottom ${fmt.lecho} of the frame (never a hard band), ${ficha.lecho.tono}; its center calm and even.`
   )
 
-  return { prompt: partes.join('\n\n'), size: fmt.size, sinValidar: Boolean(fmt.sinValidar) }
+  return {
+    prompt: partes.join('\n\n'),
+    size: fmt.size,
+    sinValidar: Boolean(fmt.sinValidar),
+    imagenes: identidad?.imagenes ?? []
+  }
 }
 
 // ── CLI ──────────────────────────────────────────────────────────────────────────────────────────
@@ -319,8 +438,24 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
   // Aviso de escena (no bloquea): luz, momento y azul como tema.
   for (const { ficha } of resueltas) {
     const avisos = auditarEscena(ficha.escena)
+    const vestuario = auditarVestuario(ficha.escena, ficha.identidad)
+
+    if (vestuario) avisos.push(vestuario)
 
     for (const a of avisos) console.error(`  ⚠ ${ficha.id ?? 'ficha'}: la escena ${a}`)
+  }
+
+  // `pnpm ai:image --batch` NO transporta `--image`: un batch con identidad genera caras inventadas,
+  // se ve plausible en la hoja de contacto y se paga igual. Abortar es la única salida honesta.
+  const conIdentidad = resueltas.filter(r => r.imagenes.length)
+
+  if (i >= 0 && conIdentidad.length) {
+    throw new Error(
+      `Estas fichas declaran identidad y NO pueden ir en un --batch: ${conIdentidad.map(r => r.ficha.id ?? '<sin id>').join(', ')}.\n` +
+        '`pnpm ai:image --batch` no transporta `--image`, así que el modelo generaría una cara inventada ' +
+        'con el prompt de identidad adentro: plausible en la hoja de contacto y facturado igual.\n' +
+        'Emití cada una sin --batch y usá el comando que imprime este mismo comando.'
+    )
   }
 
   if (i >= 0) {
@@ -331,7 +466,20 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     console.log(`${batch.length} prompt(s) → ${out}`)
     console.log(`\nAhora:\n  pnpm ai:image --batch ${out} --out <dir> --model gpt-image-2.5-flare --quality high --size ${size}`)
   } else {
-    for (const r of resueltas) console.log(`${r.prompt}\n\n─── size: ${r.size} ───\n`)
+    for (const r of resueltas) {
+      console.log(`${r.prompt}\n\n─── size: ${r.size} ───\n`)
+
+      // Con identidad el motor es Sunburst y las referencias van en orden: el comando sale armado
+      // para que nadie lo reconstruya de memoria ni olvide una referencia.
+      if (r.imagenes.length) {
+        const imgs = r.imagenes.map(ref => `--image ${ref}`).join(' ')
+
+        console.log(
+          `  pnpm ai:image --model gpt-image-2.5-sunburst --quality high --size ${r.size} \\\n` +
+            `    ${imgs} \\\n    --prompt-file <ruta al prompt> --out <dir>/${r.ficha.id ?? 'plate'}-plate.png\n`
+        )
+      }
+    }
   }
 
   // Las piezas que el operador aprobó son el estándar, y hoy ninguna sesión las tiene delante al
