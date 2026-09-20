@@ -94,11 +94,14 @@ Se llena **antes** de escribir el prompt. Una ficha = una foto.
 
 ### 3.1 Realismo v2
 
-> ⚠️ **El formato NO va dentro del bloque.** Hasta 2026-09-20 este bloque terminaba con «Vertical 4:5.»
-> hardcodeado, y los prompts **aprobados** de la ronda `texto` NO lo contienen: el formato se declara **sólo**
-> por `--size`, y el porcentaje del lecho cambia por formato (**4:5 → 18%**, **9:16 → 22%**, **16:9 → 16%**,
-> medido en `rondas/texto/bv2-{45,916,169}.json`). Copiar el bloque con la cola vieja mete una instrucción
-> contradictoria en todo 9:16, 16:9 y 1:1. La cola ya fue removida.
+> ⚠️ **El formato NO va dentro de este bloque, pero SÍ va en el prompt.** Hasta 2026-09-20 este bloque terminaba
+> con «Vertical 4:5.» hardcodeado; copiarlo así mete una instrucción contradictoria en todo 9:16, 16:9 y 1:1. La cola
+> ya fue removida. Lo que hacen los prompts **aprobados** de la ronda `texto` **[medido en
+> `rondas/texto/bv2-{45,916,169}.json`]**: declaran el formato **una sola vez, en la sección de composición/reserva**,
+> con su texto propio por formato — «VERTICAL 4:5 composition.», «VERTICAL 9:16 composition for Stories/Reels.»,
+> «HORIZONTAL 16:9 composition.» — y ahí mismo va el límite de sujetos y la zona reservada. El porcentaje del lecho
+> también cambia: **4:5 → 18%**, **9:16 → 22%**, **16:9 → 16%**. Regla: el formato vive donde vive la composición,
+> nunca dentro de un bloque que se reusa en los cuatro formatos.
 
 Archivo: `prompts/bloque-realismo-v2.txt`. Nace de la regla del operador «una buena imagen de IA es la que no se
 siente que es IA» y de su rechazo a la suciedad **[decisión del operador]**.

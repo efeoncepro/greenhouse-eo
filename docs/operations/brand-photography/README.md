@@ -50,6 +50,24 @@ prueba de reconocimiento descrita en los pendientes del documento maestro.
   **[pendiente]**.
 - Una regla nueva entra con su evidencia (ruta de la pieza y medición), no de memoria.
 
+## Piloto de reservas nuevas — 2026-09-20 **[medido]**
+
+Tres plates que prueban los bloques `SELECTION TARGET` (§3.8.1) y `MARGIN FIELD` (§3.8.2). **Son la referencia
+vigente** para pedirle a la IA una foto que después aloje una caja de selección o una cita al margen.
+
+| Dónde | Qué hay |
+|---|---|
+| Repo (índice + medición) | [`ai-generations/2026-09-20_piloto-reservas/README.md`](../../../ai-generations/2026-09-20_piloto-reservas/README.md) |
+| Repo (prompts verbatim) | `ai-generations/2026-09-20_piloto-reservas/rondas/p1/batch-{45,169}.json` |
+| **OneDrive (imágenes)** | `5. Contenidos/13- Branding/Lenguaje Fotografico Efeonce/v01/referencias/11-piloto-reservas-2026-09-20/` |
+
+Las imágenes del repo están gitignoreadas: **la copia compartible es la de OneDrive**, con su `LEEME.md` al lado.
+
+Resultados: `MARGIN FIELD` pasa en 4:5 y en 16:9 nativo con **banda continua hasta 0,60 del alto** (el caso
+aprobado «¿Claude o Codex?» llegaba a 0,35). `SELECTION TARGET` sirve **con padding de 0,02 del lienzo** (3,29:1);
+pegado al objeto falla (1,02:1) porque el objeto trae su propio borde claro, y con 0,04 vuelve a fallar porque la
+caja toca a las personas. Hay punto dulce, no monotonía.
+
 ## Delta 2026-09-19 (tarde)
 
 - [**Reserva de espacio en la toma**](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — **aprobado (capa fotográfica)**: las cuatro reservas (texto, objeto para enmarcar, lecho de firma, aire para cursores), tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.
