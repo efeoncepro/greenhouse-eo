@@ -155,8 +155,35 @@ their catalogs/model exist; the asset id returned by the run is not a download �
 TASK-1848. The `MetricsSplit` `unit` slot has a pre-existing visual defect (glued/wrapped) visible in delivered
 tender decks: separate issue for the catalog owner.
 
-## TASK-1847 — charts and catalogs (to-do)
-_Fill at closure._
+## TASK-1847 — charts and catalogs (in-progress desde 2026-09-21)
+
+**Estado: código local, sin push, sin rollout.** Slice 1 cerrado (dirección + ADR); Slice 2 en curso.
+
+**Lo que existe:**
+- ADR `GREENHOUSE_ARTIFACT_VERTICAL_PAGINATION_DECISION_V1.md` (`Accepted`, indexado): el motor no pagina pero
+  ya sabe medir. `measureSlideFit()` expone la medición que `assertSlideFitsCanvas` hacía; `paginateFlow()` es
+  PURO (recibe alturas, no toca el navegador) y vive domain-free en el composer, no dentro del catálogo.
+- Dirección visual sellada: ficha de evidencia (deck) + cuaderno analítico (A4); tablero impreso rechazado.
+- `chart-geometry.ts`: **15 familias** con geometría probada — bar/grouped/stacked, line, pie/donut (techo 3),
+  scatter, bullet, funnel, waterfall, gauge, heatmap, waffle, Venn-2 (áreas proporcionales reales, por bisección)
+  y UpSet. Sankey y Venn-3 deliberadamente fuera (ver `lessons.md`).
+- `compile-catalog-tokens.ts`: la marca se compila UNA vez y se materializa por catálogo. `deck-axis` recompila
+  byte-idéntico.
+- Catálogo `insights-report` (A4 794×1123): registry, resolvers, tokens, fuentes, assets y la plantilla
+  `ReportAnalysisPage`, que **renderiza** a PDF/PNG.
+
+**Lo que NO existe todavía:** las otras 7 plantillas A4, el catálogo `insights-deck` completo, `src/lib/copy/insights.ts`,
+el mapper que conecta plan editorial → páginas, y la admisión de `report_pdf` (Slice 3, el backend va último).
+
+**Gap heredado que esta task NO cierra:** el planner determinista emite **2 de 15** familias (`bar`,
+`bar_grouped`). Las otras 13 tienen geometría probada con fixtures y **ningún productor**. Ampliar el planner es
+trabajo nuevo del dominio Insights — TASK-1845 lo entregó y ya está cerrada, así que no se le "devuelve" nada; los
+Follow-ups de TASK-1847 dicen que los gráficos adicionales se evalúan por demanda y **no se abren tasks
+preventivas**. Queda acá como gap conocido, no como deuda silenciosa.
+
+**Drift de documentación corregido en la spec:** `SeoReportPrint.tsx` NO es precedente de A4 paginado (trunca y no
+tiene pipeline PDF); la dedupe de `plan.limits` ya la entregó TASK-1846; los umbrales de calidad declarados
+(4,2/3) eran inoperantes frente a los que el gate tiene fijos (4,5/4).
 
 ## TASK-1848 — sharing, delivery, schedules (in-progress; in production with flags OFF since 2026-09-18)
 

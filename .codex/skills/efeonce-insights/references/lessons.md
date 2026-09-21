@@ -1,5 +1,40 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-21 · Una guarda que no puede fallar es una afirmación, no un mecanismo.** Escribí en el resolver del
+  catálogo A4 una verificación de que la etiqueta impresa representara el valor que dibuja la barra, y la anuncié en
+  el commit. Estaba muerta: `printedValue` es `string` por contrato y el helper sólo aceptaba `number`, así que
+  siempre daba `null` y la comparación se saltaba entera. El render pasaba. Regla: para toda guarda, escribir primero
+  el test que la hace SALTAR (etiqueta que contradice el dato, etiqueta ilegible); si no se puede escribir ese test,
+  la guarda no existe. Y una entrada ilegible nunca desactiva una verificación: la convierte en error.
+- **2026-09-21 · Los tests verdes NO son typecheck.** 263 tests del composer pasaban con cuatro errores TS vivos
+  (`ResolverRegistry`/`FieldEffect` importados del módulo equivocado): Vitest transpila con esbuild y no verifica
+  tipos. Regla: `pnpm typecheck` es un gate propio, no una consecuencia de la suite; correrlo antes de cada commit
+  de código, no sólo al cerrar.
+- **2026-09-21 · El `composer:visual-gate` da rojo en `develop` limpio, y es más ancho que ISSUE-122.** Sin tocar
+  nada: 19 de 33 plantillas, 1–443 píxeles. El runbook documenta la variación de rasterización entre entornos, pero
+  ISSUE-122 la acota a láminas con FOTOS, y acá fallan también `ProcessStepsFull` (443), `TimelineFull` (332) y
+  `MaturityLadderFull` (197), que son geometría y texto. El gate no corre en CI: es local. Regla: al tocar el
+  composer, exigir cero píxeles SÓLO en los frames que uno introduce, y nunca re-congelar frames ajenos para
+  ponerse en verde — el runbook llama a eso «rebaseline silencioso».
+- **2026-09-21 · La tubería de marca estaba atada al primer catálogo.** El ADR del Composer sostiene que agregar un
+  catálogo no toca el motor — cierto para el motor, falso para `compile-tokens`, que derivaba TODAS sus rutas de
+  `deckAxisCatalogDir`. Mientras hubo un solo catálogo, «el catálogo es dato» no se probó en esa frontera. Regla: al
+  extraer una tubería compartida, la no-regresión se verifica con el mecanismo que el repo YA tiene
+  (`brand-pack-sync` compara CSS compilado vs committeado) y con `sha256`, no con un script inventado para la ocasión.
+- **2026-09-21 · Un redondeo cosmético puede romper la promesa del gráfico.** El Venn de dos conjuntos resuelve por
+  bisección la distancia entre centros cuya lente vale exactamente la intersección. Redondear esa distancia a 4
+  decimales degradaba el área fuera de tolerancia; su propio test lo detectó porque **recalcula el área desde la
+  geometría devuelta** con una implementación independiente. Regla: cuando un valor alimenta otra magnitud, la
+  precisión del intermedio es parte del contrato. Y un test de geometría que sólo comprueba que el código corre no
+  prueba nada.
+- **2026-09-21 · Venn de tres conjuntos no se implementa, y no por costo.** Con tres conjuntos las áreas
+  proporcionales exactas en general NO existen: es una limitación matemática. Un Venn de tres con números adentro es
+  un esquema, y si aparenta proporcionalidad, miente. El caso de 3+ es UpSet (longitud de barra, escala a N).
+- **2026-09-21 · Contrato de catálogo: `item.shape`, no `item.fields`; y `consumer`.** Un campo del item que no se
+  imprime se declara `consumer: 'resolver-only'` o `'validation-only'`; si no, el motor exige un
+  `[data-slot-field]` en el HTML y falla con «quedaría el contenido de ejemplo del prototipo». `composeArtifact`
+  tiene firma POSICIONAL `(catalog, deckPlan, outDir, options)`.
+
 - **2026-09-18 · Release from an explicit SHA, not from the tip of `develop`.** TASK-1848's release was cut from an explicit
   SHA to exclude a peer commit on `develop` that had not been validated. Rule: dispatch the release from the explicit, validated SHA so an
   unvalidated peer commit stays out; verify the manifest's `target_sha` before approving.
