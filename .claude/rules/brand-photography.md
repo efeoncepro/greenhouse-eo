@@ -191,6 +191,19 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   pide un bordado (`satin-stitch`, no tinta plana), que el emblema **no se redimensiona**, y que **vestir a una
   persona real exige una foto de CUERPO ENTERO** además del rostro. Reconstruirlo de memoria costó una jornada
   el 2026-09-20 y el resultado fue un emblema inventado en cinco piezas.
+- 🔴 **Una criatura de partner en cuadro CONTAMINA el emblema del uniforme** **[medido 2026-09-21, 4 pasadas]**.
+  Con la figura de Codex grande en cuadro, la primera pasada bordó **la nube con `>_` de OpenAI en el pecho de
+  Nexa**. Y el remedio intuitivo —describir nuestro emblema para desambiguar— **lo inventa**: pasada 2 dio un
+  cohete genérico de una ventana, pasada 3 unas alas. Describir el logotipo lo tergiversa, igual que en el
+  lanyard. **Lo que funcionó**: nombrar el símbolo de la criatura como PROHIBIDO en la ropa (*«the creature's
+  cloud body and bracket symbol belong ONLY to the creature»*) **sin describir el nuestro**, dejando que la
+  referencia del kit mande. La cuarta pasada devolvió los cuatro elementos —nave, tres ventanas, órbita, esfera—.
+  Verificar siempre con `pnpm foto:emblema` y comparar contra el macro del kit.
+- 🔴 **A la altura de la mesa, el canto de la mesa NO sirve de lecho** **[medido 2026-09-21: 2,98 y 1,75]**.
+  Con la cámara al nivel del tablero, el borde cercano recibe la luz rasante y queda gris. Es el mismo hecho que
+  el canon ya fija para el retrato 4:5, aquí con la cámara baja. **Pero la reserva de lecho se mide como BANDA y
+  la firma se mide bajo SU caja**: la misma pieza dio banda 1,75 ✗ y **logo 9,82 ✓**, porque la firma centrada
+  cae en la zona en sombra. Si la banda falla, mide el logo antes de descartar la pieza.
 - 🔴 **El emblema bordado NO se genera.** Medido 2026-09-20: tres prendas dieron **tres emblemas distintos y
   ninguno era el de Efeonce** (una espiral, dos barras, otras dos). Es el mismo hecho que gobierna la firma. En
   orden: que **no se lea** (de espaldas, en sombra, pequeño) · **componerlo** después · **editar con máscara**.

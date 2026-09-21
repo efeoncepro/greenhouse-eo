@@ -1,0 +1,45 @@
+[
+  {
+    "id": "d2-la-revisa",
+    "dominante": [
+      "Nadie la audita."
+    ],
+    "ratioDominanteEntrada": 3.9,
+    "contraste": {
+      "entrada": 14.58,
+      "dominante": 12.57,
+      "cierre-frase": 14.52,
+      "logo": 9.82
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 26,
+        "ratioDominante": 0.153
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 20,
+        "ratioDominante": 0.117
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "local"
+        }
+      ]
+    }
+  }
+]

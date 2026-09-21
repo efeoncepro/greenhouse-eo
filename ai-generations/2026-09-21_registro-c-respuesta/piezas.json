@@ -24,9 +24,55 @@
       "overlay": "subtle",
       "scale": 1.7,
       "cursors": [
-        { "id": "local", "kind": "local", "anchor": "end-center", "action": "select" }
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
       ]
     },
-    "logo": { "width": 0.2, "x": 0.5 }
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
+  },
+  {
+    "id": "d2-la-revisa",
+    "plate": "plates/d2-lupa-45-plate.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.84,
+    "lead": "Contesta por tu marca todo el día.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 44,
+    "leadGap": 0.15,
+    "dominant": "Nadie la audita.",
+    "dominantSize": 175,
+    "dominantMax": 0.7,
+    "after": "Ese es **el trabajo**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 40,
+    "afterGap": 0.12,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.7,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
   }
 ]
