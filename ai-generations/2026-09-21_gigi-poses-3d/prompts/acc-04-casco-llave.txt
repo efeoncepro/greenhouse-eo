@@ -1,0 +1,34 @@
+High quality 3D render of this exact character: Gigi, the official Google Gemini mascot. Image 1 is the approved 3D
+figure and image 2 is its official 2D model sheet by the studio that created it. Keep the character's identity
+EXACTLY as in image 1 in every pose:
+
+- BODY: ONE single continuous soft blob. No separate parts, no seams, no neck, no torso division. Rounded dome/
+  teardrop silhouette, slightly taller than wide, with a FLAT BOTTOM that rests on the ground, and ONE pointed tip
+  at the TOP-LEFT that leans and curls over to the right like a soft flame or a leaf tip. Exactly one tip, never two.
+- MATERIAL: soft satin vinyl designer toy, slightly translucent like coloured gel, with a gentle internal glow so
+  light passes a little through the edges. Smooth, no texture, no fabric, no fur, no metal, no glass.
+- COLOUR: one continuous diagonal gradient baked into the body, measured from the official art: warm RED #D93B2B at
+  the top-left tip, blending through magenta/violet, into a DOMINANT BLUE #3B7DF5 that fills the right two thirds
+  and the centre, and into YELLOW-GREEN #9ED957 at the lower-left and bottom. Blue always dominates. The red never
+  spreads past the upper-left quarter. No other colours on the body.
+- INK LINE: the character's signature is a HAND-DRAWN black outline. Keep it: a wobbly, slightly uneven, matte black
+  #1E2021 hand-painted contour line traced around the front silhouette of the form, with visible variation in
+  thickness like a felt-tip marker, never a perfect mechanical line, never a glow, never an emissive edge.
+- FACE, painted flat on the front surface in that same wobbly matte black hand-drawn line, placed in the UPPER-LEFT
+  third of the body: two short curved arcs side by side for closed happy eyes, and below them one wide open smile
+  curve. Nothing else.
+- Never add a mouth opening, teeth, ears, a nose, eyebrows, pupils, legs, feet, fingers, hands, clothing, text or
+  logos. Never make the body opaque plastic, never make it shiny chrome, never break it into blocks or cubes, never
+  add a second tip, never let the green or the red take over the blue.
+- ARMS, only when a pose or a prop needs them: two soft wobbly stubs of the same material that extrude from the body
+  edge and end bluntly. No hands, no fingers. When no prop is held, there are NO arms at all.
+
+
+- PROPS STYLE (measured from the official campaign art): every object Gigi holds or wears is a soft matte WARM BONE #D3C8B4 toy object (a warm cream, clearly warmer and a little darker than the cool light-gray studio background so it separates from it — never pure white, never the same value as the background) with the SAME wobbly hand-drawn matte black #1E2021 ink contour as the character, same felt-tip line quality. Props are never realistic, never metallic, never colourful, never branded, never carry text. Only small functional details may be a second muted tone. The props never change Gigi's body, colour, face or silhouette.
+
+POSE AND CAMERA: THREE-QUARTER VIEW turned about 30 degrees to its left, camera at eye level, the painted face clearly readable, flat bottom on the floor with a soft contact shadow. Gigi building: a soft warm bone hard hat with a short brim sits on top of the blob, the curled tip bending out from under its back edge. One soft blunt arm extrudes and holds a large warm bone adjustable wrench across the body.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim
+light, soft ambient occlusion, realistic soft contact shadow, crisp focus on the whole figure, physically based
+materials. Plain seamless light warm-gray studio background, nothing else in the frame. The whole figure fully
+visible with generous margin, centered.

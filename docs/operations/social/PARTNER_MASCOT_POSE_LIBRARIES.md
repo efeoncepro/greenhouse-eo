@@ -24,17 +24,49 @@ Nombre de cada pose: `efeonce-<mascota>-3d-<nn>-<pose>-1x1-1600x1600-v01-{fondo-
 
 ## Inventario por mascota
 
-| Campo | Clawd (Claude · Anthropic) | Codex (Codex/ChatGPT · OpenAI) |
+| Campo | Clawd (Claude · Anthropic) | Codex (Codex/ChatGPT · OpenAI) | Gigi (Gemini · Google) |
+| --- | --- | --- | --- |
+| Carpeta | `Clawd (Claude)` | `Codex (OpenAI)` | `Gigi (Google Gemini)` |
+| Fuente oficial | Arte de bloques del binario de Claude Code 2.1.x y su color `rgb(215,119,87)`; píxel 1:2 (la celda de terminal mide el doble de alto). | Atlas `webview/assets/codex-spritesheet-v6-*.webp` del `app.asar` de la app ChatGPT para macOS 26.911 (contrato V2: 1536×2288, 8×11 celdas de 192×208; filas 9–10 = 16 direcciones de mirada). | **No está en el producto**: `/Applications/Gemini.app` no la trae (`GelIdle.mp4` es el degradado aurora del asistente, no la mascota). Es un personaje de campaña, así que la fuente es **Gasta**, el estudio que la creó para Google ([portafolio «Gigi – Gemini Free For Students»](https://www.gasta.org/portfolio/gemini-free/)): 7 MP4 + GIF + PNG de producción. |
+| Contenido de `Fuente oficial` | `clawd-sprite-reconstruido-claude-code-2.1.png` y `clawd-3d-referencia-neutral-transparente.png` (Clawd 3D validado en el KV). | `codex-spritesheet-v6-oficial-app-chatgpt-26.911.webp` y 11 cuadros clave ×4 (frente, tranquilo, saludo, brazos arriba, pensando, laptop, feliz, 4 miradas). | La **hoja de modelo oficial** (`dudes_05.mp4`, 1800×2000) con **15 siluetas canónicas** — el equivalente del spritesheet de Codex — más el hero de campaña, los audífonos canónicos, la chispa de 4 puntas, la cara de puntos y la gota con punta. |
+| Material 3D | Cubos de vinilo mate (anatomía rígida y pixelada): cuerpo en bloque, ojos rectangulares, brazos y cuatro patas en cubos 1×2, sin boca. | Vinilo suave con visor de vidrio y glifos cian emisivos (anatomía blanda y redondeada): cabeza de nube, visor navy que es la cara, emblema `>_`. | Vinilo/gel satinado ligeramente translúcido (anatomía blanda de dibujo a mano): degradado horneado en el material y **la línea de tinta ondulada conservada como contorno negro mate pintado**. En cubos se habría borrado lo único que la hace Gigi. | Vinilo/gel satinado ligeramente translúcido (anatomía blanda de dibujo a mano): degradado horneado en el material y **la línea de tinta ondulada conservada como contorno negro mate pintado**. En cubos se habría borrado lo único que la hace Gigi. |
+| Poses 3D | 01 frente héroe · 02 saludo tres cuartos izquierda · 03 perfil caminando · 04 contrapicado celebrando · 05 cenital mirando arriba · 06 espalda tres cuartos · 07 salto en el aire · 08 idea tres cuartos derecha. | Mismos 8 ángulos; el visor cambia de glifo según la emoción (`>_`, `^^`, `||`). | Mismos 8 ángulos. Sin patas: «caminando» es un estiramiento del blob y la espalda es un degradado espejado sin cara. La «idea» usa **la chispa de 4 puntas de su propia hoja de modelo**, no un «!». |
+| Accesorios | 01 detective y lupa · 02 boina y pincel · 03 megáfono · 04 casco y llave · 05 audífonos y micrófono · 06 claqueta · 07 carpetas y cajas · 08 birrete y libro. Todos en cubos. | Mismos 01–07 en estilo de juguete liso; 08 = laptop canónica de su propio atlas (reemplaza al birrete). | Mismos 01–08, en **utilería de hueso cálido `#D3C8B4`** con la misma línea de tinta — el estilo de props de su campaña oficial. El birrete es su terreno natural: es la mascota del back-to-school. | Mismos 01–08, en **utilería de hueso cálido `#D3C8B4`** con la misma línea de tinta — el estilo de props de su campaña oficial. El birrete es su terreno natural: es la mascota del back-to-school. |
+| Versión | `v01` (16 + 16 PNG). | `v01` (16 + 16 PNG). | `v01` (16 + 16 + **16** PNG: tiene una **tercera familia propia**, búsqueda y AEO). | `v01` (16 + 16 + **16** PNG: tiene una **tercera familia propia**, búsqueda y AEO). |
+| Producción | [`ai-generations/2026-09-17_clawd-poses-3d/`](../../../ai-generations/2026-09-17_clawd-poses-3d/LEEME.md) | [`ai-generations/2026-09-17_codex-poses-3d/`](../../../ai-generations/2026-09-17_codex-poses-3d/LEEME.md) | [`ai-generations/2026-09-21_gigi-poses-3d/`](../../../ai-generations/2026-09-21_gigi-poses-3d/LEEME.md) | [`ai-generations/2026-09-21_gigi-poses-3d/`](../../../ai-generations/2026-09-21_gigi-poses-3d/LEEME.md) |
+| Límites conocidos | Algunas poses salen con el cuerpo algo más alto que el sprite; el perfil tomó 3 intentos y la cenital 2. La variante transparente del salto pierde la sombra. | La cenital es un picado alto (~70°), no cenital puro. El recorte de «saludo» se reparó (hueco en el emblema). | El perfil estricto salió **a la primera** (Clawd necesitó 3); contrapicado y cenital necesitaron v02/v03, y el cenital además exigió **declarar la escala**. El lente de la lupa queda transparente en el recorte: es vidrio, correcto. | El perfil estricto salió **a la primera** (Clawd necesitó 3); contrapicado y cenital necesitaron v02/v03, y el cenital además exigió **declarar la escala**. El lente de la lupa queda transparente en el recorte: es vidrio, correcto. |
+
+### Gigi: la tercera familia — búsqueda y AEO
+
+Gigi es la única mascota con una familia propia además de los 8 ángulos y los 8 accesorios de servicio, porque su
+papel en la narrativa de Efeonce es distinto: **Gigi no es quien hace marketing, es la máquina que responde**. Es
+exactamente el personaje del pitch «Tu IA no conoce tu negocio».
+
+`Poses 3D busqueda y AEO/v01/` — 8 poses × fondo de estudio y transparente, sin una sola letra en la utilería:
+
+| # | Pose | A qué se ata |
 | --- | --- | --- |
-| Carpeta | `Clawd (Claude)` | `Codex (OpenAI)` |
-| Fuente oficial | Arte de bloques del binario de Claude Code 2.1.x y su color `rgb(215,119,87)`; píxel 1:2 (la celda de terminal mide el doble de alto). | Atlas `webview/assets/codex-spritesheet-v6-*.webp` del `app.asar` de la app ChatGPT para macOS 26.911 (contrato V2: 1536×2288, 8×11 celdas de 192×208; filas 9–10 = 16 direcciones de mirada). |
-| Contenido de `Fuente oficial` | `clawd-sprite-reconstruido-claude-code-2.1.png` y `clawd-3d-referencia-neutral-transparente.png` (Clawd 3D validado en el KV). | `codex-spritesheet-v6-oficial-app-chatgpt-26.911.webp` y 11 cuadros clave ×4 (frente, tranquilo, saludo, brazos arriba, pensando, laptop, feliz, 4 miradas). |
-| Material 3D | Cubos de vinilo mate (anatomía rígida y pixelada): cuerpo en bloque, ojos rectangulares, brazos y cuatro patas en cubos 1×2, sin boca. | Vinilo suave con visor de vidrio y glifos cian emisivos (anatomía blanda y redondeada): cabeza de nube, visor navy que es la cara, emblema `>_`. |
-| Poses 3D | 01 frente héroe · 02 saludo tres cuartos izquierda · 03 perfil caminando · 04 contrapicado celebrando · 05 cenital mirando arriba · 06 espalda tres cuartos · 07 salto en el aire · 08 idea tres cuartos derecha. | Mismos 8 ángulos; el visor cambia de glifo según la emoción (`>_`, `^^`, `||`). |
-| Accesorios | 01 detective y lupa · 02 boina y pincel · 03 megáfono · 04 casco y llave · 05 audífonos y micrófono · 06 claqueta · 07 carpetas y cajas · 08 birrete y libro. Todos en cubos. | Mismos 01–07 en estilo de juguete liso; 08 = laptop canónica de su propio atlas (reemplaza al birrete). |
-| Versión | `v01` (16 + 16 PNG). | `v01` (16 + 16 PNG). |
-| Producción | [`ai-generations/2026-09-17_clawd-poses-3d/`](../../../ai-generations/2026-09-17_clawd-poses-3d/LEEME.md) | [`ai-generations/2026-09-17_codex-poses-3d/`](../../../ai-generations/2026-09-17_codex-poses-3d/LEEME.md) |
-| Límites conocidos | Algunas poses salen con el cuerpo algo más alto que el sprite; el perfil tomó 3 intentos y la cenital 2. La variante transparente del salto pierde la sombra. | La cenital es un picado alto (~70°), no cenital puro. El recorte de «saludo» se reparó (hueco en el emblema). |
+| 01 | La pregunta — un cursor solo, parpadeando en una barra vacía | el momento en que preguntan por tu categoría |
+| 02 | La respuesta con citas — tres tarjetas-fuente, una destacada | citación: quién sale mencionado |
+| 03 | **No te conoce** — una tarjeta completamente vacía, el objeto más grande del cuadro | **el KV del pitch** |
+| 04 | El podio — tres bloques de distinta altura, la mano sobre el más alto | Share of Voice |
+| 05 | Leyendo tu sitio — asomada sobre la estructura de una página | crawleabilidad y contenido citable |
+| 06 | Datos estructurados — encajando una pieza en su ranura | JSON-LD / schema |
+| 07 | La entidad — un nodo con tres brazos | knowledge graph de marca |
+| 08 | El diagnóstico — un medidor con aguja y sin un solo número | Radiografía AEO · AI Visibility Grader |
+
+🔴 **Gigi se queda con el sistema de color de la pieza.** No «porta un color»: **es el espectro completo de Google**
+—rojo `#D93B2B`, azul `#3B7DF5` dominando dos tercios, verde-lima `#9ED957`—. Con Gigi en cuadro, buscar otro
+portador para el azul de Efeonce es competir con un degradado de tres colores y perder. Lo correcto es que **Gigi sea
+el único acento de color** y que Efeonce viva en el navy y en la estructura. Si además hay ropa Efeonce en la pieza,
+prohibir explícitamente el degradado arcoíris y la punta enroscada sobre la prenda, **sin describir nuestro emblema**
+(describirlo lo tergiversa; manda la referencia del kit).
+
+🔴 **Utilería blanca sobre fondo de estudio claro: no se recorta.** Medido en esta corrida: props en `(222,221,223)`
+contra un fondo de `(218,217,220)` — **Δ = 4 por canal**, cuando `fill-alpha-holes` usa tolerancia 18. Gorro, lente,
+audífonos y birrete quedaron como agujeros. **Ninguna tolerancia lo arregla: son el mismo valor.** Se corrige **en la
+generación**: utilería en **hueso cálido `#D3C8B4`**. Y todo prop debe **tocar** al personaje — un objeto suelto se lo
+come el matting (pasó con la chispa de la pose «idea»).
 
 ## Reglas de uso
 

@@ -13,6 +13,9 @@ Nunca de memoria ni desde copias de fans. Extraer el arte desde el producto ofic
 |---|---|---|
 | Clawd | Binario de Claude Code 2.1.x | Arte de bloques (` ▐▛███▜▌ / ▝▜█████▛▘ / ▘▘ ▝▝`) + color `rgb(215,119,87)` del mismo binario; sprite reconstruido con píxel **1:2** (la celda de terminal mide el doble de alto; renderizarlo cuadrado aplana a Clawd) |
 | Codex | App ChatGPT macOS 26.911 | `npx @electron/asar extract-file` sobre `Resources/app.asar` → `webview/assets/codex-spritesheet-v6-*.webp`. Contrato V2: atlas 1536×2288, 8×11, celdas 192×208; filas 0–8 estados, filas 9–10 = 16 direcciones de mirada (000 = arriba). Script de cuadros clave: `sprites/extract.mjs` |
+| Gigi | **Estudio de la campaña, no el producto** | `/Applications/Gemini.app` NO la trae (`GelIdle.mp4` es el degradado aurora del asistente). Gigi nació para el back-to-school de Gemini, así que la fuente es **[Gasta](https://www.gasta.org/portfolio/gemini-free/)**, el estudio que la creó para Google: su portafolio publica los assets de producción (7 MP4 + GIF + PNG), incluida la **hoja de modelo oficial** con 15 siluetas canónicas — el equivalente del spritesheet |
+
+**Si la mascota no está en el binario ni en el bundle de la app, no es de producto: es de campaña.** Entonces la fuente correcta es **el estudio que la diseñó** — su portafolio suele publicar los assets de producción, incluida la hoja de modelo, que es mejor fuente que cualquier captura. Buscar por el nombre del personaje + «portfolio»/«case study», no por imágenes sueltas: una hoja de modelo del autor vale más que 30 capturas de fans.
 
 Anotar la anatomía medida (proporciones, cara, extremidades, colores HEX) antes de escribir prompts: es el bloque de
 invariantes.
@@ -108,6 +111,49 @@ fondo (caso: el `_` del emblema de Codex «saludo»). El fondo real encerrado (d
 conserva: si el color del hueco ≈ mediana del borde del original, sigue transparente. Corre en proceso aparte
 (`scripts/ai/fill-alpha-holes-cli.ts`) porque el paquete de matting trae su propio sharp/libvips. Prueba:
 `scripts/ai/fill-alpha-holes.test.ts`. Un recorte pierde la sombra del piso (salto de Clawd): esperado.
+
+### Dos trampas del recorte que sólo se ven sobre navy
+
+🔴 **Utilería clara sobre fondo de estudio claro: el matting se la come, y no hay tolerancia que lo arregle.**
+Medido con Gigi (2026-09-21): props renderizados en `(222,221,223)` contra un fondo de estudio de `(218,217,220)` —
+**Δ = 4 por canal**, cuando `fill-alpha-holes` clasifica como fondo todo lo que esté a ≤ 18. Gorro de detective,
+lente, audífonos y birrete volvieron como agujeros; sobre navy eran manchas oscuras. Subir la tolerancia no sirve:
+**son el mismo valor**. Se corrige **en la generación, no en el recorte** — utilería en un tono que se separe del
+fondo (Gigi usa **hueso cálido `#D3C8B4`**, Δ ≈ 40, que sigue leyéndose «blanco»). Es el corolario que le faltaba a
+la regla «objeto claro sobre fondo claro no se recorta».
+
+🔴 **Un objeto suelto en el aire se lo come el segmentador.** La chispa de 4 puntas de la pose «idea» de Gigi
+flotaba separada del cuerpo: el transparente volvía sin ella. Por eso el bloque de utilería debe exigir que **todo
+prop toque al personaje o se apoye contra él**, nunca que flote lejos en el cuadro.
+
+### Un accesorio nunca va delante de la cara
+
+La lupa de Gigi v01 quedó **sobre el rostro** y magnificó un arco del ojo: el personaje parecía tener tres ojos (lo
+detectó el operador, no el QA). Cualquier prop translúcido —lupa, visor, vidrio— va **fuera de la silueta de la
+cara**, sobre el fondo, y el prompt debe declarar el conteo: «exactamente DOS ojos y UNA sonrisa, todos sobre el
+cuerpo, nunca repetidos dentro del vidrio».
+
+### Declarar TODAS las vistas en el catálogo, no tres
+
+Clawd y Codex declaran sólo 3 vistas en `OBJETOS` de `scripts/foto/build-prompt.mjs`; las otras 13 existen en disco
+y son **invisibles** para `pnpm foto:prompt`. Gigi declara las 16 (más 8 de su familia AEO en una entrada aparte).
+Al cerrar un kit, declarar todas y sellar con `pnpm foto:assets:lock`.
+
+### Una familia propia cuando el papel narrativo lo pide
+
+Los 8 ángulos y los 8 accesorios son la serie común. Pero si la mascota tiene un **papel específico** en la
+narrativa comercial, merece una familia extra. Gigi es el caso: como mascota de Gemini **no es quien hace
+marketing, es la máquina que responde**, así que tiene 8 poses de búsqueda/AEO (la pregunta · la respuesta con citas
+· **no te conoce** · el podio · leyendo tu sitio · datos estructurados · la entidad · el diagnóstico), atadas a lo
+que Efeonce vende: Radiografía AEO, AI Visibility Grader, Share of Voice, schema. Regla de utilería: **ni una letra
+ni un número** en ningún prop.
+
+### Una mascota con degradado se queda con el sistema de color
+
+Gigi no «porta un color»: **es el espectro completo de Google** (rojo `#D93B2B`, azul `#3B7DF5` dominante,
+verde-lima `#9ED957`). Con ella en cuadro, buscar otro portador para el azul de la marca propia es competir con un
+degradado de tres colores y perder. Lo correcto es que **la mascota sea el único acento de color** y que la marca
+propia viva en el navy y en la estructura.
 
 ## 8. QA
 

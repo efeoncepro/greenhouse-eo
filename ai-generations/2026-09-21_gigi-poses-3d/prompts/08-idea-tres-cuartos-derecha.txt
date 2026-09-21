@@ -1,0 +1,31 @@
+High quality 3D render of this exact character: Gigi, the official Google Gemini mascot. Image 1 is the approved 3D
+figure and image 2 is its official 2D model sheet by the studio that created it. Keep the character's identity
+EXACTLY as in image 1 in every pose:
+
+- BODY: ONE single continuous soft blob. No separate parts, no seams, no neck, no torso division. Rounded dome/
+  teardrop silhouette, slightly taller than wide, with a FLAT BOTTOM that rests on the ground, and ONE pointed tip
+  at the TOP-LEFT that leans and curls over to the right like a soft flame or a leaf tip. Exactly one tip, never two.
+- MATERIAL: soft satin vinyl designer toy, slightly translucent like coloured gel, with a gentle internal glow so
+  light passes a little through the edges. Smooth, no texture, no fabric, no fur, no metal, no glass.
+- COLOUR: one continuous diagonal gradient baked into the body, measured from the official art: warm RED #D93B2B at
+  the top-left tip, blending through magenta/violet, into a DOMINANT BLUE #3B7DF5 that fills the right two thirds
+  and the centre, and into YELLOW-GREEN #9ED957 at the lower-left and bottom. Blue always dominates. The red never
+  spreads past the upper-left quarter. No other colours on the body.
+- INK LINE: the character's signature is a HAND-DRAWN black outline. Keep it: a wobbly, slightly uneven, matte black
+  #1E2021 hand-painted contour line traced around the front silhouette of the form, with visible variation in
+  thickness like a felt-tip marker, never a perfect mechanical line, never a glow, never an emissive edge.
+- FACE, painted flat on the front surface in that same wobbly matte black hand-drawn line, placed in the UPPER-LEFT
+  third of the body: two short curved arcs side by side for closed happy eyes, and below them one wide open smile
+  curve. Nothing else.
+- Never add a mouth opening, teeth, ears, a nose, eyebrows, pupils, legs, feet, fingers, hands, clothing, text or
+  logos. Never make the body opaque plastic, never make it shiny chrome, never break it into blocks or cubes, never
+  add a second tip, never let the green or the red take over the blue.
+- ARMS, only when a pose or a prop needs them: two soft wobbly stubs of the same material that extrude from the body
+  edge and end bluntly. No hands, no fingers. When no prop is held, there are NO arms at all.
+
+POSE AND CAMERA: having an idea: the body perks up and leans back slightly, delighted, and a separate small FOUR-POINTED SPARKLE rests directly against the very end of its curled tip, TOUCHING it, just above and to the right. The sparkle is a separate little object in the same soft gel material and the same red-to-blue-to-green gradient, with the same hand-drawn black ink contour, physically in contact with the tip so it reads as one connected silhouette, and much smaller than the body. THREE-QUARTER VIEW FROM ITS RIGHT: camera at eye level rotated about 35 degrees to its right, the painted face readable and tilted up toward the sparkle. Contact shadow to the left.
+
+Lighting and render: premium product photography, soft large key light from upper left, gentle fill, subtle rim
+light, soft ambient occlusion, realistic soft contact shadow, crisp focus on the whole figure, physically based
+materials. Plain seamless light warm-gray studio background, nothing else in the frame. The whole figure fully
+visible with generous margin, centered.
