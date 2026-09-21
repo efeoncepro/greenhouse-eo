@@ -963,7 +963,12 @@ export class SlideGeometryError extends Error {
 }
 
 /**
- * Verifica que lo que el contrato llenó QUEPA de verdad.
+ * MIDE qué nodos del contrato se salen del lienzo. Responde; no lanza.
+ *
+ * Es la primitive de medición del motor: `assertSlideFitsCanvas` la usa para fallar cerrado, y la
+ * paginación vertical la usa para repartir contenido entre páginas sin adivinar
+ * (`GREENHOUSE_ARTIFACT_VERTICAL_PAGINATION_DECISION_V1.md`). Separarlas importa porque un
+ * paginador necesita PREGUNTAR si algo cabe; una función que lanza sólo sirve para abortar.
  *
  * La validación de `validate.ts` cuenta caracteres contra `maxCharacters` — pero un contrato puede
  * mentir: la lámina `FourPillarsFull` declaraba `thesis: max 150` mientras su grid (columnas en `%`
@@ -976,12 +981,8 @@ export class SlideGeometryError extends Error {
  * decorativos (glows, paneles a sangre, el burbujeo de la URL) se salen del lienzo A PROPÓSITO, y
  * auditarlos daría falsos positivos.
  */
-export const assertSlideFitsCanvas = async (
-  page: Page,
-  slide: SlideSpec,
-  contract: TemplateContract
-): Promise<void> => {
-  const clipped = await page.evaluate(
+export const measureSlideFit = async (page: Page, contract: TemplateContract): Promise<ClippedSlot[]> =>
+  page.evaluate(
     ({ width, height }) => {
       // 2px: absorbe el redondeo sub-pixel del layout. Una palabra amputada nunca mide 2px.
       const TOLERANCE = 2
@@ -1052,6 +1053,16 @@ export const assertSlideFitsCanvas = async (
     },
     { width: contract.viewport.width, height: contract.viewport.height }
   )
+
+/**
+ * Falla cerrado si algo del contrato quedó recortado. Primer consumidor de `measureSlideFit`.
+ */
+export const assertSlideFitsCanvas = async (
+  page: Page,
+  slide: SlideSpec,
+  contract: TemplateContract
+): Promise<void> => {
+  const clipped = await measureSlideFit(page, contract)
 
   if (clipped.length > 0) {
     throw new SlideGeometryError(slide.slideId, clipped)

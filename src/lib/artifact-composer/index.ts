@@ -120,3 +120,11 @@ export {
 
 // TASK-1846 — hash canónico del manifest (domain-free: lo comparten todos los consumers del worker)
 export { canonicalManifestJson, hashResolvedManifest } from './manifest-hash'
+export {
+  BlockTooTallError,
+  paginateFlow,
+  type FlowBlock,
+  type PageBudget,
+  type PaginatedPage
+} from './paginate'
+

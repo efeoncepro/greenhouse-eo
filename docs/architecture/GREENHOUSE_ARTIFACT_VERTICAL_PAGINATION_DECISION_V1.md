@@ -10,6 +10,22 @@
 
 ---
 
+## Delta 2026-09-21 — el reparto es una función PURA (implementación del Slice 2)
+
+Al implementar se precisó la frontera que este ADR describía como «medición + reparto». `measureSlideFit()`
+responde **qué nodos del contrato se salen del lienzo** —es la medición que `assertSlideFitsCanvas` ya
+hacía, ahora expuesta como consulta en vez de como aserción—, y `paginateFlow()` **no toca el navegador**:
+recibe los bloques con su alto ya medido y reparte con aritmética.
+
+La consecuencia importante es de verificación: el reparto completo —viudas, margen de guarda,
+determinismo, rechazo de un bloque imposible, y la propiedad de que ningún bloque se pierda ni se
+reordene— se prueba **sin levantar Chromium**. Un paginador que midiera dentro de un bucle de render
+costaría un render por iteración y sólo sería observable a través de un PDF.
+
+Lo que no cambia: la medición sigue siendo del motor, el reparto sigue siendo domain-free y fuera del
+catálogo, y `OverflowPolicy = 'reject'` se respeta — un bloque que no cabe ni en una página vacía es
+`BlockTooTallError`, nunca un corte.
+
 ## Context
 
 `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` §6 compromete un informe vertical A4 con «retícula editorial
