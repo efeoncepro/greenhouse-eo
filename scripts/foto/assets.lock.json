@@ -200,19 +200,19 @@
     },
     "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-1.png": {
       "rol": "persona:nexa/lifestyle-1",
-      "sha256": "cbc32f5fd74962c9d138b86846dcb2c311284a69bbe0fb4d18840139fb5108ed"
+      "sha256": "c865217aea19489a485eed835a36e07a4e316e7f7dbca7018b10ea6090babdb8"
     },
     "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-2.png": {
       "rol": "persona:nexa/lifestyle-2",
-      "sha256": "c8a9c8ca3ec573d655d630e0ebd1e56b777088698f2fe2d600bd76ef375086f0"
+      "sha256": "dc91577fde2c59e2edd81ad00c5bd0088319652355fc530c5a3f2e1b25b324c5"
     },
     "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-3.png": {
       "rol": "persona:nexa/lifestyle-3",
-      "sha256": "260a6823e006803eab3173f89b710b400bfc30293ec910d581d3308c14c3ff26"
+      "sha256": "3d5065db6799234b534d8578b083ac0670904691a8886b26a4718df480cf4ba6"
     },
     "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-4.png": {
       "rol": "persona:nexa/lifestyle-4",
-      "sha256": "c3bbe6e928c6209dd30058fbd83f7585dbc32c8c431c0e827dec27e8110ba063"
+      "sha256": "336317422a32b20e680ed478daf9ed451f08be5c163ce67ea4084d5844a40203"
     },
     "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:sprocket-hubspot/frente",

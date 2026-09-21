@@ -34,6 +34,23 @@ identidad y no sólo de outfit.
 Las cuatro con **Golden Nexa** (§9.2): sol bajo y direccional, sombras largas y suaves, nunca mediodía.
 Las cuatro son de cuerpo entero y están declaradas en `vestuarioDeCuerpo`.
 
+## Delta 2026-09-21 — las cuatro pasan a SMARTWATCH
+
+Se generaron con el bloque de accesorios anterior, que pedía un reloj analógico. Tras la decisión del
+operador —*«Nexa es tecnológica»*, [props tecnológicos](../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md)—
+las cuatro se **editaron** para llevar smartwatch, y de paso se corrigió el dedo del anillo al índice.
+
+**Editar y no regenerar, por dos razones:** «editar conserva, generar reconstruye», y porque el dedo sólo se
+gana editando. **Sin padear**, porque estas cuatro ya son **1024×1536 = 2:3**, que es un tamaño nativo del
+modelo: el problema del reencuadre sólo aparece cuando el ratio del original no coincide con el `--size`.
+
+Verificado con la misma grilla de veinteavos: **mentón, hombros, cintura y pies caen en las mismas líneas
+que el original.** Sin reencuadre, como estaba previsto. Y el smartwatch al 100 %: caja rectangular
+redondeada, pantalla y correa navy tejida.
+
+USD 0,164 las cuatro ediciones. Los originales quedan en esta carpeta como `lifestyle-*.png`; lo que entró
+al set son los `-smartwatch`.
+
 ## 🔴 El hallazgo: el DEDO del anillo no se sostiene por prompt **[medido]**
 
 El bloque `accesorios` del catálogo pide, literal: *«a geometric matte-silver statement ring on the INDEX
@@ -56,8 +73,10 @@ clase que el emblema bordado: **lo sensible no se genera**. Las salidas posibles
 que no se lea, componerlo después, o editarlo con máscara— más una cuarta que es decisión de marca: aceptar
 el dedo que salga y bajar esa precisión de §5.1.
 
-Queda **abierto para el operador**. Lo que no se puede es seguir pidiéndolo por prompt y suponer que se
-cumple: cuatro piezas y una auditoría dicen que no.
+**Cerrado el mismo día:** el dedo **se gana editando**. Se comprobó en el ancla de manos y se aplicó a estas
+cuatro en la misma pasada del smartwatch. La regla operativa que queda: **el dedo no se pide, se hereda** —
+si la referencia que se antepone lo lleva bien, la pieza lo hereda; pedirlo por texto en una generación
+desde cero da metal y forma correctos y el dedo equivocado.
 
 ## Reproducir
 
