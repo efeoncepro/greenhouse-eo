@@ -204,10 +204,10 @@ reconocieron como un mismo autor —eso cierra la mitad del pendiente del maestr
 | # | Qué | Por qué | Cómo se sabe que se logró |
 |---|---|---|---|
 | 5 | **Ronda «obra real»** (abajo) | Cierra el hallazgo 1, el de mayor impacto comercial | Un evaluador ciego nombra qué trabajo se hizo |
-| 6 | **Reabrir `ausencia`** con marcadores de «se fueron hace un minuto» —silla girada, taza a medias, lámpara encendida, algo a mitad— o descartarla | Falla su contrato **[medido]** | Un evaluador ciego dice «acaban de salir», no «oficina vacía» |
-| 7 | **Corregir el contrato de `variantes`**: diferencias **mínimas pero comparables** en UN eje declarado (el mismo encuadre, cambiando sólo el color / sólo el peso) | Hoy cae en el doble filo del hallazgo 5 | Se puede señalar en qué se diferencian sin que parezcan archivos distintos |
-| 8 | **Decidir sobre `little-planet`** | Dos lecturas independientes la llamaron truco | Decisión del operador, registrada |
-| 9 | **Variar el lecho o declararlo explícito** | Hallazgo 10, tensión con la firma | Una serie donde el lecho no sea el mismo recurso siete veces |
+| 6 | ~~Reabrir `ausencia` con marcadores de «se fueron hace un minuto»~~ **cerrado 2026-09-21, y el plan estaba mal formulado** | Falla su contrato **[medido]** | Ver «El diagnóstico corregido» abajo: los marcadores **ya estaban**; lo que faltaba era impedir que la escena los contradiga |
+| 7 | ~~Corregir el contrato de `variantes`~~ **cerrado 2026-09-21** | Hoy cae en el doble filo del hallazgo 5 | `variantes` exige el campo `eje`: UN eje declarado, y el bloque prohíbe que varíe cualquier otra cosa. El comando aborta sin él |
+| 8 | ~~Decidir sobre `little-planet`~~ **cerrada 2026-09-21: se conserva** | Dos lecturas independientes la llamaron truco | **Decisión del operador registrada**: «a mí me gusta, no la descartaré». La tensión de las tres vías queda aceptada, no resuelta |
+| 9 | ~~Variar el lecho o declararlo explícito~~ **cerrado 2026-09-21 por conteo** | Hallazgo 10, tensión con la firma | El lecho se cuenta por **familia**, no por objeto, y el comando avisa cuando una familia pasa de la mitad de la tanda |
 | 10 | **Aprobar la capa de la pieza con voz**: plates que reserven desde la toma + `foto:componer` encima, iterando hasta que el operador la apruebe | Es el trabajo que el operador puso como siguiente: *«me gustan como están; sólo tenemos que construir la capa para piezas que con el mismo lenguaje tendrán texto»*. La capa sigue **sin aprobar** desde el 2026-09-19 | Una serie con voz aprobada por el operador, con contraste medido bajo cada caja |
 | 11 | **Repetir esta auditoría después de 5 y 6** | Sin segunda medición no se sabe si mejoró | Comparar contra este documento |
 | 12 | **Prueba de reconocimiento** (pendiente desde el maestro) | Consistente ≠ distintivo | Alguien reconoce las piezas como Efeonce sin logo |
@@ -240,3 +240,49 @@ decisión. Si la serie empieza a tratarse de pintura, volvió a fallar.
 de todos los clientes**, así que la ronda puede producirse para publicar y no sólo para uso interno. Si en alguna
 cuenta futura el contrato no lo cubriera, vuelve a aplicar el gate: se consultan `creative-practice` (derechos de
 uso en el SOW) y `legal-privacy-ip-operator` **antes** de producir.
+
+
+## El diagnóstico corregido — 2026-09-21
+
+Al ejecutar los puntos 6 a 9 apareció que **tres de los cuatro no eran lo que este plan suponía**. Queda escrito
+acá porque el error de diagnóstico es más instructivo que la corrección.
+
+### El hallazgo de raíz: la escena puede contradecir a su propia palanca, y nada lo detectaba
+
+El bloque de la palanca y el campo `escena` se concatenan en el mismo prompt **sin que nada verifique que no se
+peleen**. Cuando se pelean **gana la escena**, por ser más específica, y la palanca se anula en silencio.
+
+Es un defecto del **constructor**, no de ninguna palanca: por eso el aviso nuevo (`auditarContradicciones`) es
+por palanca y no un caso especial de `ausencia`.
+
+### 6 · `ausencia` no falló por falta de marcadores: los tenía
+
+El plan pedía «reabrir `ausencia` con marcadores de se-fueron-hace-un-minuto». Esos marcadores —silla empujada
+en ángulo, las cosas donde se dejaron, el marcador destapado, una lámpara encendida— **ya estaban en el bloque**,
+y entraron en `0012e6c4b`, **el mismo commit que produjo el plate reprobado**. Agregar lo que ya existía no
+habría cambiado nada.
+
+El fallo real está en [`F4-ausencia.json`](../../../ai-generations/2026-09-20_palancas-con-color/fichas/F4-ausencia.json):
+su escena dice **dos veces «the empty chair»** y ahí pone el foco. La silla nunca queda empujada. Contra el
+bloque, que la pide corrida, ganó la escena y salió la sala ordenada que el contrato prohíbe.
+
+**La comparación que lo prueba.** [`C4-ausencia.json`](../../../ai-generations/2026-09-20_palancas-complemento/fichas/C4-ausencia.json),
+que sí funcionó, **también dice «the empty chair»**. La diferencia es que además dice «a chair pushed back at an
+angle from the table». Por eso el detector no busca la palabra «empty»: busca la silla nombrada **sin su huella**.
+La primera versión del patrón, más burda, daba falso positivo en `C4` — se descubrió al probarlo contra las dos
+fichas reales, no contra casos inventados.
+
+### 9 · El lecho: la variedad léxica escondía la monotonía formal
+
+Contar objetos da **12 de 12 distintos** y el sistema parece sano. Contando la **gramática** —«el borde o la
+esquina de una superficie, desenfocado, abajo»— da **7 de 12**, que es exactamente el número que reportó el
+evaluador ciego. El clasificador (`familiaDeLecho`) lo reprodujo **sin haber visto ese número**; un conteo previo
+a mano había dado 8 por clasificar el cuerpo de un proyector entre las superficies.
+
+### Lo que queda abierto de esta ronda
+
+| Qué | Estado |
+|---|---|
+| **La gramática del color**, no su dosis | **[pendiente]** Las tres piezas que ambos evaluadores salvaron ponen el color en **herramientas y materiales en uso** (los puntos cian del rosetón bajo el cuentahílos, un panel de luz azul encendido, gaffer naranja marcando posición, un lápiz graso donde se dejó). Las falladas lo ponen en **objetos depositados** (carpeta, post-it, taza, botella, bolsa, tarjeta, pinza). La dosis de 1-de-2 baja la frecuencia del tic pero no lo cura: una carpeta puesta sigue siendo utilería aunque aparezca la mitad de las veces. La regla que falta es de **gramática**, no de cantidad |
+| Las cinco palancas de las rondas G y H cuyo bloque **nunca se ejercitó** | **[pendiente]** 7 de las 12 piezas auditadas no usaron el campo `palanca`: la escribieron a mano en `escena` y el bloque se codificó después. Método legítimo, pero el bloque de esas siete nunca produjo una imagen. Se revisó `proyeccion` (la destilación conserva los landmarks) y `variantes` (había perdido el número y la rejilla, ya corregido). **Quedan cinco sin revisar**: `escucha`, `entre-dos`, `quien-sostiene`, `descarte`, `marcado` |
+| Puntos 5, 10, 11 y 12 del plan | Sin tocar: ronda «obra real», capa de la pieza con voz, repetir la auditoría y prueba de reconocimiento |

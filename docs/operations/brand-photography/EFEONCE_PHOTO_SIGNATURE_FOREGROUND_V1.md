@@ -30,6 +30,15 @@ decirlo **[criterio]**.
 
 ## 2. Catálogo de lechos
 
+> 🔴 **El lecho se cuenta por FAMILIA, no por objeto** **[medido 2026-09-21]**. La auditoría ciega lo leyó como
+> muletilla —«es el mismo recurso de profundidad siete veces»— y contar objetos no lo detecta: los doce lechos de
+> la serie auditada eran **literalmente distintos, 12 de 12**. Lo que se repetía era la **forma**: «el borde o la
+> esquina de una superficie, desenfocado, abajo», en **7 de 12**. El clasificador de `pnpm foto:prompt`
+> (`familiaDeLecho`) reprodujo ese mismo 7 sin haber visto el número del evaluador. La tabla de abajo tiene **21
+> lechos medidos**: no falta repertorio, faltaba que alguien contara. El comando ahora avisa cuando una familia
+> pasa de la mitad de la tanda, igual que con la dosis del acento cálido.
+
+
 Texto de prompt: se usa la plantilla canónica (§3) cambiando `<objeto>` y `<tono>`. Las mediciones son de la corrida
 del 2026-09-19. «p99» = percentil 99 del gradiente Sobel dentro del lecho (`medir.mjs`); el rostro típico mide
 200–780 de máximo.

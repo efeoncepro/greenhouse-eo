@@ -181,7 +181,12 @@ redondo que se lee como un pequeño planeta.
 inclinándose; el cielo llena las cuatro esquinas; **el horizonte es un círculo cerrado**. No es un ojo de pez
 rectangular ni un recorte circular.
 **Ojo.** No admite lecho: se declara `lecho: "sin-lecho"` con su razón. Formato cuadrado.
-**Evidencia.** `E3` (estudio completo, Santiago).
+**Conservada por decisión del operador** **[2026-09-21]**. La auditoría ciega pidió decidir sobre ella: los dos
+evaluadores la llamaron «un truco de lente sin idea detrás», «de 2015», «no pertenece a ninguna de las otras
+once», y se sale del sistema por **tres vías a la vez** —única cuadrada, única sin lecho, única que fotografía
+una proyección en vez de un oficio—. El operador la conserva: «a mí me gusta, no la descartaré». La tensión
+queda **registrada y aceptada**, no resuelta: si se usa, que sea con trabajo en curso dentro de la esfera.
+**Evidencia.** `E3` (estudio completo, Santiago) · `F7` (reprobada en la auditoría ciega).
 
 ### De encuadre
 
@@ -239,7 +244,10 @@ ser fuerte para que el reflejo aguante.
 destapado, una lámpara encendida. Debe leerse como **si se hubieran ido hace un minuto**, no como una sala
 ordenada y vacía.
 **Ojo.** **No tiene momento** y es correcto: el punto es que nadie está. El comando apaga ese aviso.
-**Evidencia.** `C4` y `F4` (después de la sesión, Miami).
+🔴 **La escena no puede contradecir esto** **[medido 2026-09-21]**. Si nombras la silla, déjala **empujada,
+corrida o girada**; una silla sólo «vacía» dice lo contrario y **gana**, porque es más específica que el bloque.
+El comando lo detecta (`auditarContradicciones`) y avisa.
+**Evidencia.** `C4` (funcionó) y `F4` (**reprobada por dos evaluadores ciegos**, ver abajo).
 
 ---
 
@@ -295,11 +303,20 @@ suaves y fuera de foco**, de espalda, sin un rasgo legible. **El ojo tiene que l
 
 #### `variantes` — la misma cosa repetida, y una elegida
 **Qué es.** El sujeto es **la elección**, no el objeto.
-**Cómo se logra.** El cuadro lo llena la **misma pieza repetida** con diferencias **mínimas** —el mismo layout, la
-misma imagen, cambiando un peso, un encuadre de milímetros, un campo un tono más frío— y **una sola** queda
-**apartada**: adelantada, levantada, girada o marcada. La repetición casi idéntica **es** el tema. Mano y antebrazo
-pueden entrar por el borde; cara nunca.
-**Evidencia.** `H1` (Santiago) · a la primera.
+**Cómo se logra.** El cuadro lo llenan **nueve a doce copias de la misma pieza** en una **rejilla regular**, y
+**una sola** queda **apartada**: adelantada, levantada, girada o marcada. La repetición casi idéntica **es** el
+tema. Mano y antebrazo pueden entrar por el borde; cara nunca.
+🔴 **Exige el campo `eje`: UN solo eje declarado** **[corregido 2026-09-21]**. Las copias son idénticas en todo
+salvo ese eje —«the weight of the type, **and nothing else**»— y el bloque **prohíbe explícitamente** que varíe
+cualquier otra cosa: ni el ángulo, ni el recorte, ni las proporciones, ni la luz sobre ellas, ni la distancia.
+Son impresiones de **un** archivo. El comando aborta sin `eje`.
+**Por qué.** El contrato viejo pedía mover **tres ejes a la vez** (peso, recorte y color). Los dos evaluadores
+ciegos se contradijeron en el dato y coincidieron en el veredicto: uno vio nueve copias idénticas —«no es un
+proceso de decisión, es un patrón decorativo»— y el otro vio que **no** lo eran —«el ángulo del muro y la
+proporción del cielo cambian de copia en copia; nueve impresiones del mismo archivo no pueden diferir entre
+sí»—. Las dos lecturas son el mismo defecto: **si no se ve, no hay decisión; si se ve de más, delata la
+generación**. Con un solo eje el doble filo desaparece.
+**Evidencia.** `H1` (Santiago) · a la primera, y **reprobada** en la auditoría ciega.
 
 #### `descarte` — lo que no se eligió
 **Qué es.** Enseña el **volumen real** del trabajo, que es justo lo que se esconde cuando se presume de IA.

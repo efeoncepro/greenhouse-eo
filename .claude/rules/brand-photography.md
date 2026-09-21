@@ -96,6 +96,18 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   (decisión del operador 2026-09-20), contraste ≥ 4,5:1 medido.
 - **Tope de tanda:** más de 6 fichas exige que cada una declare un `piloto` ya generado en disco. La calidad sale
   de generar poco y **mirar cada plate**.
+- 🔴 **La `escena` NO puede contradecir al bloque de su palanca** **[medido 2026-09-21]**. Los dos viajan juntos
+  en el mismo prompt y **gana la escena**, por más específica: la palanca se anula sin que nada lo delate. Así
+  reprobó `ausencia` en la auditoría ciega —bloque «chair pushed back at an angle», escena «the empty chair» dos
+  veces— y fue llamada la peor de las doce, «foto de inmobiliaria». No es un defecto de esa palanca sino del
+  constructor: el aviso (`auditarContradicciones`) es por palanca. **Los marcadores ya estaban en el bloque**;
+  lo que faltaba era impedir que la escena los contradiga.
+- **`variantes` exige el campo `eje`: UNO solo.** Pedir tres a la vez producía el doble filo medido —si no se ve
+  la diferencia no hay decisión; si se ve de más, dos copias del mismo archivo difieren y delatan la generación—.
+- **El lecho se cuenta por FAMILIA, no por objeto** **[medido 2026-09-21]**. Los doce lechos de la serie auditada
+  eran literalmente distintos (12/12) y aun así se leyó «el mismo recurso de profundidad siete veces»: lo que se
+  repite es la forma —«el borde de una superficie, desenfocado, abajo»— en **7 de 12**. El catálogo tiene **21
+  lechos medidos**; el comando avisa cuando una familia pasa de la mitad de la tanda.
 - **Nunca ancles la serie en la categoría de un cliente** (pintura = Berel). El comando aborta.
 
 ## Los assets viven fuera de git — y el lock los vigila

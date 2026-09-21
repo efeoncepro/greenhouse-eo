@@ -2,7 +2,7 @@
 // «Vertical 4:5.» y la plantilla del lecho traía «bottom 18%». Los dos vivieron dentro de bloques que
 // se reusan en TODOS los formatos, el doc decía otra cosa que el archivo, y nadie lo vio hasta medir
 // 80 prompts. Cada `it` de acá es una de esas puertas cerrada con llave.
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -13,13 +13,16 @@ import { describe, expect, it } from 'vitest'
 import {
   auditarAcentoDeTanda,
   auditarColor,
+  auditarContradicciones,
   auditarEmblema,
   auditarEscena,
+  auditarLechoDeTanda,
   auditarRegistroVestuario,
   auditarReservas,
   auditarVestuario,
   construirPrompt,
   detectarValorDeFormato,
+  familiaDeLecho,
   OBJETOS,
   PALANCAS,
   PERSONAS
@@ -742,11 +745,15 @@ describe('palancas del oficio digital', () => {
   }
 
   // Sin «diferencias mínimas» el modelo devuelve nueve piezas distintas, que es un muro de trabajo,
-  // no una decisión: la repetición casi idéntica ES el tema.
+  // no una decisión: la repetición casi idéntica ES el tema. Desde el 2026-09-21 esas diferencias
+  // viven en UN eje declarado y el resto queda prohibido — la auditoría ciega midió que pedir tres
+  // ejes a la vez producía el doble filo: o no se veía la diferencia, o se veía donde dos copias del
+  // mismo archivo no pueden diferir. El contrato completo se verifica en el describe de palancas
+  // corregidas; acá sólo queda que la palanca siga pidiendo sus dos piezas irrenunciables.
   it('variantes exige repetición casi idéntica y una apartada', () => {
-    const { prompt: p } = construirPrompt({ ...base, palanca: 'variantes' })
+    const { prompt: p } = construirPrompt({ ...base, palanca: 'variantes', eje: 'the weight of the type, and nothing else' })
 
-    expect(p).toMatch(/MINIMAL differences/)
+    expect(p).toMatch(/identical in every single respect EXCEPT ONE declared axis/)
     expect(p).toMatch(/SET APART/)
   })
 
@@ -935,5 +942,148 @@ describe('la prenda se copia tal cual; el macro sólo refuerza el detalle', () =
 
   it('un objeto sin bordado sigue aportando una sola', () => {
     expect(construirPrompt({ ...base, objetos: ['nave-efeonce'] }).imagenes).toHaveLength(1)
+  })
+})
+
+// Las tres palancas que la auditoría ciega del 2026-09-20 reprobó, corregidas el 2026-09-21. Cada
+// `it` de acá está anclado a una ficha REAL de la corrida auditada, no a un caso inventado: es la
+// única forma de saber que la corrección ataja el defecto que ocurrió y no un primo suyo.
+describe('palancas corregidas tras la auditoría ciega', () => {
+  const base = {
+    id: 'test',
+    formato: '4:5',
+    escena: 'SCENE (test): una escena cualquiera. 50mm at f/4.',
+    lecho: { objeto: 'the near edge of the table', tono: 'DARK near black' }
+  }
+
+  // El hallazgo de raíz: el bloque de la palanca y el campo `escena` viajan juntos en el mismo
+  // prompt y nada verificaba que no se peleen. Cuando se pelean gana la escena, por más específica,
+  // y la palanca se anula en silencio. `ausencia` no reprobó por falta de marcadores —los tenía
+  // desde `0012e6c4b`, el mismo commit que produjo el plate— sino porque su escena los contradecía.
+  describe('una escena no puede contradecir a su propia palanca', () => {
+    // Verbatim de `ai-generations/2026-09-20_palancas-con-color/fichas/F4-ausencia.json`, la que los
+    // dos evaluadores ciegos llamaron la peor de las doce: «foto de inmobiliaria», «hay mobiliario».
+    const F4 =
+      'SCENE (after the session, studio in Miami, late afternoon): a hard low sun beam comes through ' +
+      'the window and lands across the empty chair. On the table, an ink-blue folder lies open where ' +
+      'it was left. A marker with its cap off, a half-drunk glass, one lamp still on. 35mm at f/2.8, ' +
+      'focus on the empty chair.'
+
+    // Verbatim de `…_palancas-complemento/fichas/C4-ausencia.json`, la que sí funcionó. Nombra el
+    // vacío IGUAL que la otra: por eso un patrón que sólo busque «empty chair» da falso positivo.
+    const C4 =
+      'SCENE (after the session, studio in Miami, NOBODY IN FRAME): what remains is the trace of the ' +
+      'work that just happened: a chair pushed back at an angle from the table, printed layouts still ' +
+      'spread where they were left, a marker with its cap off, one lamp still on. A hard low sun beam ' +
+      'lands across the empty chair. The room reads as if the people stepped out a minute ago.'
+
+    it('atrapa la ficha que reprobó', () => {
+      const avisos = auditarContradicciones({ palanca: 'ausencia', escena: F4 })
+
+      expect(avisos).toHaveLength(1)
+      expect(avisos[0]).toMatch(/CONTRADICE a su propia palanca "ausencia"/)
+    })
+
+    it('deja pasar la que describía la huella, aunque nombre el vacío igual', () => {
+      expect(auditarContradicciones({ palanca: 'ausencia', escena: C4 })).toHaveLength(0)
+    })
+
+    it('la silla empujada es la diferencia, no la palabra «empty»', () => {
+      // Las dos dicen «the empty chair»; sólo una deja la silla corrida. Si este test se cae porque
+      // alguien simplificó el patrón a «busca empty», el falso positivo volvió.
+      expect(F4).toMatch(/empty chair/)
+      expect(C4).toMatch(/empty chair/)
+      expect(auditarContradicciones({ palanca: 'ausencia', escena: F4 })).toHaveLength(1)
+      expect(auditarContradicciones({ palanca: 'ausencia', escena: C4 })).toHaveLength(0)
+    })
+
+    it('una palanca sin contrato de contradicción no inventa avisos', () => {
+      expect(auditarContradicciones({ palanca: 'manos', escena: F4 })).toHaveLength(0)
+      expect(auditarContradicciones({ escena: F4 })).toHaveLength(0)
+    })
+  })
+
+  // Los dos evaluadores se contradijeron en el dato y coincidieron en el veredicto: uno vio nueve
+  // copias idénticas («un patrón decorativo»), el otro vio que NO lo eran («nueve impresiones del
+  // mismo archivo no pueden diferir entre sí»). Las dos lecturas son el mismo defecto: el contrato
+  // pedía mover TRES ejes a la vez.
+  describe('`variantes` exige UN eje declarado', () => {
+    it('sin `eje` no se puede construir el prompt', () => {
+      expect(() => construirPrompt({ ...base, palanca: 'variantes' })).toThrow(/exige el campo `eje`/)
+    })
+
+    it('el error enseña la forma: un eje «y nada más»', () => {
+      expect(() => construirPrompt({ ...base, palanca: 'variantes' })).toThrow(/and nothing else/)
+    })
+
+    it('con el eje declarado, prohíbe explícitamente que varíe cualquier otra cosa', () => {
+      const { prompt } = construirPrompt({
+        ...base,
+        palanca: 'variantes',
+        eje: 'the weight of the type, and nothing else'
+      })
+
+      expect(prompt).toMatch(/EXCEPT ONE declared axis: the weight of the type, and nothing else/)
+      expect(prompt).toMatch(/NOTHING else varies between them/)
+      // El número y la rejilla se habían perdido al destilar el texto que de verdad se probó
+      // («NINE printed sheets pinned in a grid on a pale studio wall» → «repeated many times»).
+      expect(prompt).toMatch(/NINE TO TWELVE copies/)
+      expect(prompt).toMatch(/REGULAR GRID/)
+    })
+  })
+
+  // El lecho ES la firma y no se puede quitar, pero se leyó como muletilla. Contar OBJETOS no lo
+  // detecta: los doce lechos de la serie auditada eran literalmente distintos, 12 de 12. Lo que se
+  // repetía era la forma.
+  describe('el lecho se cuenta por familia, no por objeto', () => {
+    // Las fichas REALES de la corrida que la auditoría ciega miró, leídas del disco. La primera
+    // versión de este test transcribía los textos a mano y recortaba: el recorte cambió la
+    // clasificación de `G1` y el conteo cayó de 7 a 6, con el detector intacto. Una guarda que
+    // copia el dato codifica un modelo del dato; ésta lee la evidencia.
+    const DOCE = ['F1', 'F2', 'F4', 'F5', 'F7', 'G1', 'G3', 'G4', 'H1', 'H2', 'H3', 'H4'].map(id => {
+      const dir = ['con-color', 'podcast', 'oficio-digital']
+        .map(r => path.join(raiz, `ai-generations/2026-09-20_palancas-${r}/fichas`))
+        .find(d => existsSync(d) && readdirSync(d).some(n => n.startsWith(`${id}-`)))
+
+      if (!dir) throw new Error(`Ficha ${id} no encontrada: son la evidencia del test y están versionadas`)
+
+      const archivo = readdirSync(dir).find(n => n.startsWith(`${id}-`)) as string
+
+      return { ...JSON.parse(readFileSync(path.join(dir, archivo), 'utf8')), id }
+    })
+
+    it('los doce objetos son distintos: contar objetos no habría detectado nada', () => {
+      const objetos = DOCE.map(f => (typeof f.lecho === 'string' ? f.lecho : f.lecho.objeto))
+
+      expect(new Set(objetos).size).toBe(12)
+    })
+
+    it('reproduce el conteo del evaluador ciego: siete de doce', () => {
+      const avisos = auditarLechoDeTanda(DOCE)
+
+      expect(avisos).toHaveLength(1)
+      expect(avisos[0]).toMatch(/"borde de superficie" en 7 de 12/)
+    })
+
+    it('el cuerpo de un proyector no es una superficie', () => {
+      // El conteo a mano daba 8 justamente por meter esto entre las mesas.
+      expect(familiaDeLecho('the out-of-focus corner of the projector body at the bottom')).toBe('equipo de rodaje')
+      expect(familiaDeLecho('the near edge of the mixing desk immediately under the lens')).toBe('borde de superficie')
+    })
+
+    it('una tanda variada no dispara el aviso', () => {
+      const variada = [
+        { id: 'a', lecho: { objeto: 'the near edge of the pale oak table', tono: 'VERY LIGHT' } },
+        { id: 'b', lecho: { objeto: 'the pale polished concrete floor close to the lens', tono: 'VERY LIGHT' } },
+        { id: 'c', lecho: { objeto: 'the matte-black matte box of the cinema camera rig', tono: 'DARK' } },
+        { id: 'd', lecho: { objeto: 'the heads and shoulders of the audience in the front rows', tono: 'DARK' } }
+      ]
+
+      expect(auditarLechoDeTanda(variada)).toHaveLength(0)
+    })
+
+    it('una tanda de menos de tres no se audita: no hay serie que leer', () => {
+      expect(auditarLechoDeTanda(DOCE.slice(0, 2))).toHaveLength(0)
+    })
   })
 })

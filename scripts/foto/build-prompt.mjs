@@ -392,7 +392,18 @@ export const OBJETOS = {
       'trucker-navy': 'v5-trucker-navy'
     },
     vistaDefecto: 'frente',
-    tipoEmblema: 'logotipo',
+    // La gorra existe en dos marcas distintas: el logotipo completo y el isotipo solo. El tipo va por
+    // VISTA, no por kit — declararlo arriba hacía que pedir la v3 heredara la descripción del logotipo
+    // y el modelo terminara construyendo una marca a mitad de camino (2026-09-20).
+    tipoPorVista: {
+      frente: 'logotipo',
+      lateral: 'logotipo',
+      trasera: 'sin-marca',
+      cenital: 'sin-marca',
+      'navy-logotipo': 'logotipo',
+      'navy-isotipo': 'isotipo',
+      'trucker-navy': 'isotipo'
+    },
   },
   'lanyard-efeonce': {
     etiqueta: 'the Efeonce lanyard with its retractable reel and rigid-frame badge holder',
@@ -456,7 +467,7 @@ const LOGOTIPO =
   'rocket-and-orbit mark — the rocket sits inside the elliptical orbit, in the position the letter "o" would ' +
   'occupy, with the filled dot above it. The letters and the mark are ONE single lockup.'
 
-const formaDeLaMarca = objeto => (objeto.tipoEmblema === 'logotipo' ? LOGOTIPO : ISOTIPO)
+const formaDeLaMarca = tipo => (tipo === 'logotipo' ? LOGOTIPO : ISOTIPO)
 
 function resolverObjetos(ficha, desde) {
   const pedidos = ficha.objetos ?? []
@@ -500,8 +511,10 @@ function resolverObjetos(ficha, desde) {
 
     // Cómo se pide un bordado y por qué no se redimensiona: ambas de `garment-reference-kit.md`
     // (§«Cómo se pide un bordado» y §4 «Proporciones declaradas», corrección expresa del operador).
-    const queMarca = objeto.tipoEmblema
-      ? ` The mark it carries is ${formaDeLaMarca(objeto)} Render it as satin-stitch embroidery with visible ` +
+    const tipoDeMarca = objeto.tipoPorVista?.[vista] ?? objeto.tipoEmblema
+
+    const queMarca = tipoDeMarca && tipoDeMarca !== 'sin-marca'
+      ? ` The mark it carries is ${formaDeLaMarca(tipoDeMarca)} Render it as satin-stitch embroidery with visible ` +
         'stitch direction, slightly raised over the knit — never flat ink. Do not resize or move it: it keeps ' +
         'exactly the size and position it has in the reference.'
       : ''
@@ -527,7 +540,7 @@ function resolverObjetos(ficha, desde) {
 
       imagenes.push(macro)
       bloques.push(
-        `IMAGE ${nm} (detail reference): Image ${nm} shows, in macro, the mark THAT IS ALREADY ON that garment — ${formaDeLaMarca(objeto)} ` +
+        `IMAGE ${nm} (detail reference): Image ${nm} shows, in macro, the mark THAT IS ALREADY ON that garment — ${formaDeLaMarca(objeto.tipoPorVista?.[vista] ?? objeto.tipoEmblema)} ` +
           `It is here only so the small mark in the previous image is not lost or reinterpreted at its real scale. ` +
           'Keep its proportions, its thread colour and its embroidered relief exactly as in the macro. Do NOT invent, ' +
           'simplify, redraw or substitute it with a spiral, an @ or any other shape, and do NOT change which of the ' +
@@ -703,6 +716,32 @@ export const PALANCAS = {
       'NOBODY IN FRAME: there is not a single person, hand or body anywhere in the picture — verify it. What remains is the TRACE of the work that just happened: a chair pushed back at an angle, things left where they were set down, a cap off a marker, one lamp still on. The room must read as if the people stepped out a minute ago, not as a tidy empty room.',
     // No hay acción porque el punto es que nadie está: pedirle momento es contradictorio.
     sinMomento: true,
+    // El bloque de arriba YA pedía la huella —silla empujada en ángulo, cosas donde se dejaron, una
+    // lámpara encendida— desde `0012e6c4b`, el mismo commit que produjo el plate que la auditoría
+    // ciega reprobó. No faltaban marcadores: faltaba impedir que la ESCENA los contradiga. Medido en
+    // `ai-generations/2026-09-20_palancas-con-color/fichas/F4-ausencia.json`, cuya escena decía dos
+    // veces «the empty chair» contra el «chair pushed back at an angle» del bloque. Cuando las dos
+    // instrucciones se pelean gana la escena, por más específica, y salió exactamente la sala
+    // ordenada y vacía que el contrato prohíbe: los dos evaluadores ciegos la llamaron la peor de las
+    // doce, «foto de inmobiliaria», «no hay oficio, no hay persona, no hay decisión: hay mobiliario».
+    // Primera versión de este patrón: «la escena nombra el mueble vacío». Probada contra las dos
+    // fichas reales de `ausencia`, dio un FALSO POSITIVO en `C4`, que también dice «the empty chair»
+    // y sin embargo salió bien. Nombrar el vacío no es el defecto: las dos lo nombran. La diferencia
+    // medida es la SILLA — `C4` dice «a chair pushed back at an angle from the table» y `F4` sólo
+    // «the empty chair», dos veces, y es además donde pone el foco. La silla es el sujeto de esta
+    // palanca; si se la nombra sin su huella, la palanca ya se anuló.
+    contradice: [
+      {
+        patron: /\b(the |an? )?(empty|unoccupied|vacant|deserted|abandoned)\s+(chair|seat|desk|workstation)\b/i,
+        salvo: /\bchair\b[^.]*\b(pushed back|pulled out|shoved|swivell?ed|turned (away|aside)|at an angle|askew|half.?turned)\b|\b(pushed back|pulled out|swivell?ed|turned)\b[^.]*\bchair\b/i,
+        porque:
+          'la escena nombra la silla VACÍA y en ningún momento la deja EMPUJADA, corrida o girada. El bloque ' +
+          'pide la huella del trabajo —la silla empujada en ángulo, las cosas donde se dejaron, el marcador ' +
+          'destapado, una lámpara encendida— y una silla simplemente vacía dice lo contrario: sala ordenada. ' +
+          'Medido: es la diferencia exacta entre la ficha que funcionó y la que dos evaluadores ciegos ' +
+          'llamaron la peor de las doce, «foto de inmobiliaria»'
+      }
+    ],
     requiere: null
   },
   fragmento: {
@@ -782,9 +821,24 @@ export const PALANCAS = {
   // Probadas en `ai-generations/2026-09-20_palancas-oficio-digital/`.
   variantes: {
     etiqueta: 'la misma cosa repetida, y una elegida',
+    // Reescrita el 2026-09-21 tras la auditoría ciega. Los dos evaluadores se CONTRADIJERON en el dato
+    // y coincidieron en el veredicto: uno vio nueve copias idénticas («no es un proceso de decisión,
+    // es un patrón decorativo») y el otro vio que NO lo eran («el ángulo del muro y la proporción del
+    // cielo cambian de copia en copia; nueve impresiones del mismo archivo no pueden diferir entre
+    // sí»). Las dos lecturas son el mismo defecto: el contrato pedía variar TRES ejes a la vez —peso,
+    // recorte y color— así que o la diferencia no se veía, o se veía donde ninguna impresión puede
+    // diferir y delataba la generación. Ahora el eje es UNO y se declara; lo demás queda prohibido
+    // explícitamente. Y vuelven el número y la rejilla, que la destilación del texto probado había
+    // perdido: lo que se generó decía «NINE printed sheets pinned in a grid on a pale studio wall» y
+    // el bloque había quedado en «repeated many times».
     bloque:
-      'THE SUBJECT IS THE CHOICE (this is the frame, not a detail): the picture is filled with the SAME piece repeated many times with only MINIMAL differences between the versions — the same layout, the same image, differing in tiny things: a slightly different weight, a crop a few millimetres tighter, one field of colour a shade cooler. ONE of them is physically SET APART from the rest: pulled forward, lifted, turned, or carrying a mark. The near-identical repetition is what the photograph is about: not the piece, but the decision between versions of it. A hand and forearm may enter from the frame edge, never a face.',
-    requiere: null
+      'THE SUBJECT IS THE CHOICE (this is the frame, not a detail): the picture is filled with NINE TO TWELVE copies of THE SAME piece, pinned or laid out in a REGULAR GRID that fills the frame. Every copy is identical in every single respect EXCEPT ONE declared axis: <QUE>. NOTHING else varies between them — not the angle they are seen at, not the crop, not the proportions, not the light falling on them, not the distance from the camera: these are prints of ONE file, so no difference the camera itself did not cause may appear anywhere except in that one axis. ONE copy is physically SET APART from the rest: pulled forward, lifted, turned, or carrying a mark. The near-identical repetition IS what the photograph is about: not the piece, but the decision between versions of it. A hand and forearm may enter from the frame edge, never a face.',
+    requiere: 'eje',
+    // UN eje y sólo uno. El error tiene que enseñar la forma, porque el defecto medido fue
+    // justamente declarar tres a la vez.
+    ejemplo:
+      '"the weight of the type, and nothing else" · "the warmth of one colour field, and nothing else" · ' +
+      '"the size of the logo, and nothing else"'
   },
   descarte: {
     etiqueta: 'lo que no se eligió',
@@ -846,7 +900,8 @@ function bloquePalanca(ficha) {
     if (typeof valor !== 'string' || valor.trim().length < 8) {
       throw new Error(
         `La palanca "${pedida}" exige el campo \`${palanca.requiere}\` diciendo QUÉ, en concreto ` +
-          '(por ejemplo "the dark back of a monitor"). Sin eso el modelo la aplica a medias y la palanca se anula.'
+          `(por ejemplo ${palanca.ejemplo ?? '"the dark back of a monitor"'}). ` +
+          'Sin eso el modelo la aplica a medias y la palanca se anula.'
       )
     }
 
@@ -974,6 +1029,88 @@ export const auditarReservas = ficha => {
       '`"reservas": { "texto": { "muro": "<materia con nombre>", "tinta": "blanca|oscura" } }` — y valida con ' +
       '`pnpm foto:validar <plate> --zona-texto`. Reservar después de generar no existe: o está en la toma, o no cabe.'
   ]
+}
+
+// Una palanca puede declarar qué NO puede decir la escena que la acompaña. Nace del hallazgo de
+// raíz del 2026-09-21: el bloque de la palanca y el campo `escena` se concatenan en el mismo prompt
+// sin que nada verifique que no se peleen, y cuando se pelean gana la escena por ser más específica.
+// Así reprobó `ausencia` en la auditoría ciega —bloque «chair pushed back at an angle», escena «the
+// empty chair»— y así puede reprobar cualquier otra: el aviso es por palanca, no un caso especial.
+export const auditarContradicciones = ficha => {
+  const palanca = PALANCAS[ficha?.palanca]
+  const escena = ficha?.escena ?? ''
+
+  if (!palanca?.contradice) return []
+
+  return palanca.contradice
+    .filter(({ patron, salvo }) => patron.test(escena) && !(salvo && salvo.test(escena)))
+    .map(
+      ({ porque }) =>
+        `CONTRADICE a su propia palanca "${ficha.palanca}": ${porque}. ` +
+        'El bloque de la palanca y la escena viajan juntos en el mismo prompt: cuando se pelean gana ' +
+        'la escena, por más específica, y la palanca se anula sin que nada lo delate.'
+    )
+}
+
+// El lecho es la firma —es donde va el logo— así que no se puede quitar sin más. Pero la auditoría
+// ciega lo leyó como muletilla en siete de doce: «es el mismo recurso de profundidad siete veces».
+// Contar OBJETOS no lo detecta: los doce lechos de la serie eran literalmente distintos, 12 de 12.
+// Lo que se repetía era la GRAMÁTICA —el borde o la esquina de una superficie, desenfocado, abajo—
+// en 8 de 12 con este criterio, y el material «dark walnut» en 3. El catálogo tiene 21 lechos
+// medidos (EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md §2) y la serie usó una sola familia: no falta
+// repertorio, faltaba que alguien contara. Mismo mecanismo que la dosis del acento cálido.
+export const FAMILIAS_DE_LECHO = [
+  ['borde de superficie', /\b(near |out-of-focus |nearest )*(edge|corner|lip|rim) of (the |a |an )?[a-z ]*\b(table|desk|worktop|counter|console|bench|sill|plinth|shelf|surface|top)\b/i],
+  ['suelo a ras del lente', /\b(floor|ground|pavement|concrete|asphalt)\b/i],
+  ['equipo de rodaje', /\b(matte box|camera rig|studio camera|projector|mixing desk|grading|tripod|light panel|softbox)\b/i],
+  ['respaldo o asiento', /\b(backrest|headrest|chair back|seat back|upholstery)\b/i],
+  ['cuerpo o persona', /\b(shoulder|head|back of the|audience|hair|arm)\b/i],
+  ['objeto del oficio', /\b(bottle|can|cart handle|fruit|stall|proof sheet|print|foam|microphone|case|cable)\b/i],
+  ['vehículo', /\b(car|van|roof of)\b/i]
+]
+
+export const familiaDeLecho = objeto => {
+  const texto = String(objeto ?? '')
+
+  for (const [nombre, patron] of FAMILIAS_DE_LECHO) if (patron.test(texto)) return nombre
+
+  return 'sin clasificar'
+}
+
+// Umbral: más de la mitad de la tanda compartiendo familia es lo que se lee desde fuera como
+// «el mismo recurso otra vez». La serie auditada estaba en 8 de 12.
+const DOSIS_LECHO = 2
+
+export const auditarLechoDeTanda = fichas => {
+  if (fichas.length < 3) return []
+
+  const cuenta = new Map()
+
+  for (const f of fichas) {
+    const l = f?.lecho
+
+    if (!l || l === 'sin-lecho') continue
+
+    const fam = familiaDeLecho(typeof l === 'string' ? l : l.objeto)
+
+    cuenta.set(fam, [...(cuenta.get(fam) ?? []), f.id ?? 'ficha'])
+  }
+
+  const avisos = []
+
+  for (const [fam, ids] of cuenta) {
+    if (ids.length * DOSIS_LECHO > fichas.length) {
+      avisos.push(
+        `el lecho repite la familia "${fam}" en ${ids.length} de ${fichas.length} fichas (${ids.join(', ')}). ` +
+          'Medido desde fuera: leído como «el mismo recurso de profundidad» otra vez. Contar objetos no lo ' +
+          'detecta —los doce lechos de la serie auditada eran literalmente distintos— porque lo que se repite ' +
+          'es la forma, no la palabra. El catálogo tiene 21 lechos medidos: ' +
+          'docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md §2'
+      )
+    }
+  }
+
+  return avisos
 }
 
 export const auditarColor = escena => {
@@ -1267,6 +1404,12 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     console.error(`  ⚠ ${aviso}`)
   }
 
+  // El lecho se cuenta por FAMILIA, no por objeto: los doce lechos de la serie auditada eran
+  // literalmente distintos y aun así se leyó «el mismo recurso de profundidad siete veces».
+  for (const aviso of auditarLechoDeTanda(resueltas.map(r => r.ficha))) {
+    console.error(`  ⚠ ${aviso}`)
+  }
+
   if (conSuspendido * DOSIS_SUSPENDIDO > resueltas.length && resueltas.length > 1) {
     console.error(
       `  ⚠ acción suspendida en ${conSuspendido} de ${resueltas.length} fichas (dosis: 1 de cada ${DOSIS_SUSPENDIDO}). ` +
@@ -1285,6 +1428,7 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     avisos.push(...auditarReservas(ficha))
     avisos.push(...auditarRegistroVestuario(ficha.objetos))
     avisos.push(...auditarEmblema(ficha.objetos))
+    avisos.push(...auditarContradicciones(ficha))
 
     if (vestuario) avisos.push(vestuario)
 
