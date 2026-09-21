@@ -63,6 +63,14 @@ uso»**. El arte plano y la pieza aislada son assets de taller.
 | **Composición determinística** del arte sobre el trazado | encaja el arte correcto, pero a 22 px de ancho de cinta el logotipo queda en ~15 px: mancha igual. **El límite es de escala física, no de método** |
 | La **foto del producto terminado** | «efeonce» legible con la nave en la «o», el eslogan limpio, y apareció el regulador negro que la pieza real tiene |
 
+**Confirmado en los dos kits y con las dos personas** **[2026-09-21]**:
+
+| Prueba | Asset usado | Resultado |
+|---|---|---|
+| Nexa, terreno | `gorra/out/prueba-nexa.png` | logotipo completo legible e isotipo del polo correcto, **a la primera** |
+| Julio, terreno | `gorra/out/prueba-julio.png` | ídem, **a la primera** |
+| Julio, reunión | conjunto determinístico terminado | logotipo de la cinta legible, **el mejor de cinco intentos** |
+
 En la **gorra** ocurrió lo mismo el mismo día: tres intentos peleando un problema que ya estaba
 resuelto en `out/prueba-julio.png`, un asset que llevaba días en el kit sin usarse, y cuyo propio
 LEEME decía que ahí «el logotipo se mantiene legible y el emblema conserva su orientación».
@@ -80,6 +88,13 @@ LEEME decía que ahí «el logotipo se mantiene legible y el emblema conserva su
    separadas.
 4. **¿Hay una prueba en persona?** Si el kit la tiene, **ésa es el punto de partida**, no un extra: ya
    resolvió calce, orientación y legibilidad.
+
+> **La prueba en persona arregla dos cosas a la vez** **[medido 2026-09-21]**. Esas pruebas son de
+> **cuerpo entero**, así que usarlas como asset de uso cumple de paso la regla de
+> [`garment-reference-kit`](../../.claude/skills/greenhouse-ai-image-generator/references/garment-reference-kit.md)
+> §«vestir a una persona real»: *«nunca sólo retratos, pasar siempre al menos una foto de cuerpo
+> entero»*. Pasar tres retratos es exactamente lo que hace al modelo **construir el cuerpo desde la
+> cara** y sacar la cabeza más grande que el cuerpo. Se estaba incumpliendo sin darse cuenta.
 
 ### Y el registro manda sobre la variedad visual
 
