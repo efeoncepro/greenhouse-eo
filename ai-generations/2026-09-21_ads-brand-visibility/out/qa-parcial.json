@@ -7,8 +7,8 @@
     ],
     "contraste": {
       "etiqueta": 11.64,
-      "entrada": 10.82,
-      "dominante": 7.14,
+      "entrada": 10.88,
+      "dominante": 6.59,
       "logo": 6.78
     },
     "gapsTinta": [
@@ -19,8 +19,8 @@
       },
       {
         "entre": "entrada→dominante",
-        "px": 10,
-        "ratioDominante": 0.089
+        "px": 34,
+        "ratioDominante": 0.304
       }
     ],
     "seleccion": {
@@ -43,9 +43,9 @@
           "id": "seo",
           "labelBounds": {
             "left": 544.6,
-            "top": 101.365,
+            "top": 507.648,
             "right": 632.736,
-            "bottom": 154.864
+            "bottom": 561.147
           }
         }
       ]
@@ -58,15 +58,15 @@
       "citada."
     ],
     "contraste": {
-      "entrada": 15.97,
-      "dominante": 13.76,
+      "entrada": 16.01,
+      "dominante": 13.73,
       "logo": 11.23
     },
     "gapsTinta": [
       {
         "entre": "entrada→dominante",
-        "px": 11,
-        "ratioDominante": 0.089
+        "px": 32,
+        "ratioDominante": 0.258
       }
     ],
     "seleccion": {
@@ -89,9 +89,9 @@
           "id": "data",
           "labelBounds": {
             "left": 436.807,
-            "top": 138.589,
+            "top": 558.448,
             "right": 538.605,
-            "bottom": 192.088
+            "bottom": 611.947
           }
         },
         {
@@ -114,8 +114,8 @@
     ],
     "contraste": {
       "etiqueta": 15.22,
-      "entrada": 14.82,
-      "dominante": 14.62,
+      "entrada": 15.26,
+      "dominante": 14.65,
       "logo": 6.75
     },
     "gapsTinta": [
@@ -126,8 +126,8 @@
       },
       {
         "entre": "entrada→dominante",
-        "px": 8,
-        "ratioDominante": 0.093
+        "px": 36,
+        "ratioDominante": 0.419
       }
     ],
     "seleccion": {
@@ -150,28 +150,12 @@
           "id": "seo",
           "labelBounds": {
             "left": 605.168,
-            "top": 87.181,
+            "top": 586.93,
             "right": 744.445,
-            "bottom": 171.722
+            "bottom": 671.471
           }
         }
       ]
     }
-  },
-  {
-    "id": "a1-muda",
-    "contraste": {
-      "logo": 19.32
-    },
-    "gapsTinta": [],
-    "seleccion": null
-  },
-  {
-    "id": "a2-muda",
-    "contraste": {
-      "logo": 16.85
-    },
-    "gapsTinta": [],
-    "seleccion": null
   }
 ]

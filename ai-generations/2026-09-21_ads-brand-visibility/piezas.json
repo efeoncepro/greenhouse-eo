@@ -4,51 +4,143 @@
     "plate": "plates/b1-reflejo-45-plate.png",
     "align": "left",
     "top": 0.05,
-    "textWidth": 0.8,
-    "label": "VISIBILIDAD EN IA",
-    "lead": "Antes de hablar con tu equipo,",
-    "leadSize": 50,
-    "dominant": "ya te evaluó|una IA.",
-    "dominantSize": 104,
-    "dominantMax": 0.82,
-    "logo": { "width": 0.2, "x": 0.5 }
+    "textWidth": 0.78,
+    "label": "BRAND VISIBILITY GRADER",
+    "lead": "Le preguntaron a **ChatGPT** por tu categoría.",
+    "leadSize": 46,
+    "dominant": "No dijo|tu nombre.",
+    "dominantSize": 112,
+    "dominantMax": 0.6,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.8,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        },
+        {
+          "id": "seo",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "SEO",
+          "who": "role",
+          "color": "#12afa2"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "leadGap": 0.3
   },
   {
     "id": "b2-stories",
     "plate": "plates/b2-larga-916-plate.png",
     "align": "left",
     "top": 0.1,
-    "textWidth": 0.82,
-    "label": "VISIBILIDAD EN IA",
-    "lead": "Preguntaron por tu marca.",
-    "leadSize": 50,
-    "dominant": "Respondió|una IA.",
-    "dominantSize": 112,
-    "dominantMax": 0.84,
-    "logo": { "width": 0.2, "x": 0.5 }
+    "textWidth": 0.8,
+    "lead": "Tu competencia no es más rápida.",
+    "leadSize": 48,
+    "dominant": "Es más|citada.",
+    "dominantSize": 124,
+    "dominantMax": 0.62,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.8,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        },
+        {
+          "id": "data",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Data",
+          "who": "role",
+          "color": "#5d50ff"
+        },
+        {
+          "id": "nexa",
+          "state": "moving",
+          "region": "lower-end",
+          "label": "Nexa",
+          "who": "person",
+          "color": "#d6246e"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "leadGap": 0.26
   },
   {
     "id": "b3-display",
     "plate": "plates/b3-larga-169-plate.png",
     "align": "left",
-    "top": 0.16,
-    "textWidth": 0.34,
-    "label": "VISIBILIDAD EN IA",
-    "lead": "Qué haces, para quién, contra quién.",
-    "leadSize": 42,
-    "dominant": "Ya hay|una respuesta.",
-    "dominantSize": 92,
-    "dominantMax": 0.38,
-    "logo": { "width": 0.2, "x": 0.21 }
+    "top": 0.14,
+    "textWidth": 0.33,
+    "label": "BRAND VISIBILITY GRADER",
+    "labelSize": 34,
+    "lead": "**ChatGPT**, **Perplexity** y **Gemini** ya describen tu marca.",
+    "leadSize": 38,
+    "dominant": "Nadie revisó|qué dicen.",
+    "dominantSize": 86,
+    "dominantMax": 0.33,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.6,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        },
+        {
+          "id": "seo",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "SEO",
+          "who": "role",
+          "color": "#12afa2"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.21
+    },
+    "leadGap": 0.42
   },
   {
     "id": "a1-muda",
     "plate": "plates/a1-marcado-45-plate.png",
-    "logo": { "width": 0.2, "x": 0.5 }
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
   },
   {
     "id": "a2-muda",
     "plate": "plates/a2-proyeccion-45-plate.png",
-    "logo": { "width": 0.2, "x": 0.5 }
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
   }
 ]
