@@ -122,6 +122,10 @@ Sequencing is **vertical-slice-first**, not horizontal-platform-first (Arch §18
 - `TASK-1510` — [ui-ux/flow] **Native Meeting Scheduler Portable Experience**: calendario mensual, agenda diaria,
   formulario/confirmación, recipes adaptativas y action `open_meeting_scheduler`. Piloto `/agenda/` native-only activo;
   graduación a otras superficies permanece gateada.
+- `TASK-1885` — [backend-data/integration] **Atribución de campaña en la reunión agendada**: cierra la pierna
+  Greenhouse/GTM de la mitigación de PDR-009 — captura `utm*`/`referrerHost` en el origen, reader gobernado de
+  reservas por campaña y parámetros de campaña en `gh_meeting_booking_confirmed`; decide por escrito la pierna
+  `context.hutk`. Sin esto, pautear hacia `/agenda/` no es atribuible. Consume TASK-1509/1510; no reabre su autoridad.
 - Deferred demand-driven — `download_asset`, `embed_growth_form` and bounded `hubspot_handoff` only when a real consumer supplies the asset/form/CRM contract and runtime evidence.
 - `TASK-TBD` (deferred, post-V1) — [backend-data] Experimentation layer: stable assignment, mutual exclusion, sample ratio mismatch detection, powered-test metadata and guardrail reporting. **Deferred out of V1** (Arch §18 / ADR §Deferred): built only when public traffic supports a powered test; candidate `growth.experiment` split.
 

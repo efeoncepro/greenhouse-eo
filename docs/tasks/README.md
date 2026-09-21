@@ -34,8 +34,9 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1874](to-do/TASK-1874-application-360-discarded-link-notice.md) | Application 360: aviso «Envió un enlace de LinkedIn/portafolio que no pudimos leer; pídelo en el primer contacto» en «Perfil del candidato» y empty state coherente en «Portafolio y enlaces»; copy en diccionarios es-CL/en-US, `Alert info` reutilizado (EPIC-011) | TASK-1873 |
 | [TASK-1877](to-do/TASK-1877-equipos-humano-agente-landing.md) | landing transversal de transformación de equipos humano-agente, con marketing/AEO, revenue, servicio y operaciones (EPIC-047, rank 03) | none |
 | [TASK-1878](to-do/TASK-1878-public-landing-entrypaths-human-agent.md) | entradas contextuales desde Home, HubSpot y AEO hacia TASK-1877, sólo tras publicación verificada (EPIC-047, H2) | TASK-1877 |
+| [TASK-1885](to-do/TASK-1885-meeting-booking-campaign-attribution.md) | Atribución de campaña en la reunión agendada (EPIC-023): el contrato server-side ya acepta `utm*`/`referrerHost` y la tabla ya tiene `attribution_json`, pero el renderer sólo envía `placement`+`pagePath` y nadie lee el campo de vuelta — sin esto, pautear hacia `/agenda/` gasta presupuesto sin poder atribuir la reunión. Cierra la pierna Greenhouse/GTM de PDR-009 y decide por escrito la de `context.hutk` | none |
 
-Siguiente ID libre `TASK-1885`. Insights TASK-1845–1849 (+ TASK-1875, vista web compartida en Think) y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1886`. Insights TASK-1845–1849 (+ TASK-1875, vista web compartida en Think) y notificaciones conservan sus dueñas.
 
 ## Liderazgo operativo: EPIC-048
 
