@@ -1,9 +1,9 @@
 # Lenguaje Fotográfico Efeonce V1 — «El oficio a la vista»
 
 > **Tipo de documento:** Especificación canónica de marca (documento maestro)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-20
+> **Última actualización:** 2026-09-21 — el sistema se declara en **dos registros** (documental y puesta en escena); ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena)
 > **Estado:** Aprobado por el operador (Julio Reyes, dueño de Efeonce) el 2026-09-19. Sistema consistente; **no** es todavía un activo distintivo medido.
 > **Documentación relacionada:** [Índice](./README.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Bitácora](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md) · [Marca de agencia](../../context/09_marca-agencia.md) · [Quiénes somos](../../context/01_quienes-somos.md) · [Marca en escena](../../../.claude/skills/social-media-studio/references/brand-in-scene.md)
 
@@ -15,8 +15,9 @@ Julio Reyes · **[criterio]** = recomendación propia, revisable · **[pendiente
 | Tema | Definición |
 |---|---|
 | Qué es | La forma en que Efeonce fotografía su propia marca: qué se muestra, con qué luz y color, con qué cámara y cómo firma |
-| Estado | Aprobado el 2026-09-19. El operador pidió documentarlo tras ver todas las rondas: «todas me gustaron» **[decisión del operador]** |
-| Aplica a | Fotografía e imagen fotorrealista de la marca propia: social, sitio, presentaciones, piezas de equipo, eventos, espacios, objetos |
+| **Son DOS registros** **[2026-09-21]** | **A — documental** («el oficio a la vista»): la foto **es** el mensaje, documenta obra, mecanismo y personas decidiendo. Es el que describen §2 a §6 de este documento. **B — puesta en escena**: la foto es **soporte de una idea**, con composición armada y aire para el titular. Existía de facto desde antes y no estaba escrito: por eso una pieza publicada y aprobada podía no pasar la barra de §2.3 y el operador sentía que «el lenguaje me limita». Comparten identidad, vestuario, realismo, **colorimetría entera**, firma, las seis reservas y el **bloque de impacto**; se separan en qué se fotografía, con qué barra se juzga, si el sujeto mira al lente y si lleva capa gráfica. Definiciones, barras y evidencia: [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena) |
+| Estado | Aprobado el 2026-09-19. El operador pidió documentarlo tras ver todas las rondas: «todas me gustaron» **[decisión del operador]**. El registro B se documenta desde el 2026-09-21 |
+| Aplica a | Fotografía e imagen fotorrealista de la marca propia **en los dos registros**: social, sitio, presentaciones, piezas de equipo, eventos, espacios, objetos, KV y piezas de campaña propia |
 | Formatos | Probados en 4:5 (1152×1440), 9:16 (1152×2048) y 16:9 (2048×1152) nativos; 1:1 **[pendiente]** |
 | No aplica a | Piezas de clientes (cada cliente tiene su lenguaje); trendjacking que toma prestada una estética ajena; ilustración; infografía |
 | Qué no es todavía | Un activo distintivo. Para llamarlo así falta la prueba de reconocimiento (§9) |
@@ -44,7 +45,12 @@ La referencia de ambición fue «agencia A1 de clase mundial»: premium, sofisti
 ### 2.3 La barra de juicio
 
 Criterios con los que se aceptó o rechazó cada pieza (propuestos por el subagente estratega y usados en todas las
-rondas desde «El oficio a la vista»):
+rondas desde «El oficio a la vista»).
+
+> 🔴 **Esta barra juzga el registro A (documental)** **[2026-09-21]**. Aplicarla a una pieza de puesta en escena
+> la reprueba sin que esté mal: el registro B tiene **barra propia** (idea clara · marca sostenida · texto legible ·
+> identidad y colorimetría intactas). Antes de juzgar, mira **si el sujeto mira al lente**: ése es el marcador del
+> registro. Ver el [delta 2026-09-21](#delta-2026-09-21--dos-registros-documental-y-puesta-en-escena).
 
 | # | Criterio | Pregunta de control |
 |---|---|---|
@@ -81,6 +87,8 @@ creativa también»).
 | Channel & Commerce | Góndola y retail (`oficio3/2-gondola-cdmx`, `curado/K2b-retail-bebidas`) |
 | Eventos / activación | Instalación de cuadrados azules vista desde dron (`camaras/2-drone-cenital`), Julio en escenario (`personas/J3`) |
 | Datos / escala | Persona pequeña frente a pantalla gigante (`impacto/I4-escala`) |
+| **Podcast / contenido propio** **[2026-09-21]** | **Se fotografía la ESCUCHA, no la conversación**: el sujeto no habla, sigue un argumento que va a contestar, con auriculares puestos y la mano en la copa; el otro existe pero es **sólo una mano fuera de foco**, nunca un segundo retrato. El mecanismo va a la vista: micro de brazo entrando por el borde, **forma de onda** corriendo en el laptop, interfaz con **LEDs de nivel**, fieltro acústico real (`F-podcast-v1.png`, palanca `escucha`). **Los dos intentos previos fallaron por fotografiar la conversación** —dos personas simpáticas hablando en una mesa: genérico, reprueba el test de sustitución **[medido]**—: `rondas/paleta/P2-podcast` fue **rechazada** por lámparas prácticas encendidas (**b\* de altas luces +20,1**, look de podcast de stock) y `rondas/personas/JN2-podcast` quedó marcada por **paneles azules grandes de fondo** repetidos entre piezas. En la buena, las dos causas cerradas y medidas: prácticas apagadas, llave = panel LED neutro fuera de cuadro → **b\* −0,3**; y ningún panel azul, el azul entra sólo por el polo, que es el portador legítimo |
+| **Estudio como oficio** **[2026-09-21]** | **El estudio EN OPERACIÓN, no el fondo liso**: el ciclorama con la luz montada, el softbox, alguien corrigiendo, el monitor con la toma tirada (`E-estudio-v2.png`, palanca `luz-motivada`). Es la vía que acopla el look de estudio al lenguaje, y entra en esta tabla bajo Creative Services. **Un retrato contra fondo liso falla cuatro de los siete criterios** —obra, mecanismo, idea y paleta en la composición **[medido]**— y choca con dos prohibiciones explícitas de §6: «salas tonales genéricas» y «paneles azules grandes de fondo». Regla que salió de ahí **[medido]**: **con fuente visible en cuadro, la lámpara se riggea BAJA**, entre rodilla y pecho —que además es como se ilumina de verdad un objeto pequeño—, porque `luz-motivada` pide la fuente visible y como lo más brillante del cuadro mientras la reserva pide el tercio superior limpio. Con el softbox a la altura del pecho la banda midió **0,00** (inservible); riggeado bajo sube a **0,28**. **Lámpara baja, o no hay banda de texto** |
 
 Vista de conjunto: `rondas/curado/set-curado-12.jpg` (12 piezas, sin pintura) y `rondas/oficio/oficio-a-la-vista.jpg`
 (6 piezas de la primera ronda de la idea).
@@ -240,6 +248,7 @@ Recorrido completo ronda por ronda en la [bitácora](../social/2026-09-19-efeonc
 |---|---|---|
 | ~~Espacio para texto~~ **cerrado en el plate (2026-09-19)** | Pedido explícito del operador | Reglas de reserva en [`EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md`](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md). **Ojo:** cerrado del lado de la TOMA; la capa gráfica encima NO está aprobada, y su retícula definitiva puede corregir los porcentajes por formato |
 | ~~Formatos 9:16 y 16:9 nativos~~ **cerrado (2026-09-19)** | Ya NO es cierto que «todo se probó en 4:5»: hay **7 plates nativos 1152×2048 y 8 nativos 2048×1152** (`rondas/texto/S1|S1v2|S2|S2v2|S3|S3v2-*-{916,169}-plate.png`, `rondas/capas/CB-916-plate.png`, `rondas/capas/CC-169-plate.png`) **[medido con sharp]** | Falta sólo **1:1**. Propuesta original del subagente de composición, aún sin validar (propuesta del subagente de composición: lecho 4:5 22–28%; 9:16 18–22% con logo a 85–88%; 16:9 25–30%; 1:1 20–25%) |
+| 🔴 **El canon se contradice sobre la capa gráfica** **[2026-09-21]** | El canon declara que **la capa gráfica sobre la foto NO está aprobada** (2026-09-19, y así lo repiten la fila anterior de esta tabla y `.claude/rules/brand-photography.md`), pero **todas las piezas publicadas del registro B la usan**: titular, cursores, bounding box, chip. Hoy la documentación se contradice consigo misma, y quien llegue nuevo no sabe si una pieza con titular está permitida o prohibida | **Decisión del operador**: o **se aprueba** la capa gráfica —y entonces se retira el «sin aprobar» del canon, de la fila de espacio para texto y de la regla auto-load—, o **se declara que esas piezas viven bajo otro contrato** y el canon nombra cuál. Mientras no se decida, ninguna de las dos lecturas es la vigente |
 | Firma en dron y tomas todo-enfocadas | Sin desenfoque, la franja se ve algo puesta | Decisión del operador sobre la firma alternativa (url-lum) |
 | Promover scripts a comando `pnpm` | Hoy viven en la carpeta de la corrida | Comando canónico con tests |
 | Prueba de reconocimiento | Sin ella no hay «activo distintivo» | n ≥ 100 del público objetivo, distractores coherentes, medición antes y después |
@@ -258,3 +267,110 @@ Recorrido completo ronda por ronda en la [bitácora](../social/2026-09-19-efeonc
 ## Delta 2026-09-19 (tarde) — espacio para texto y formatos
 
 Resuelto el pendiente «espacio para texto» y probados 9:16 y 16:9 nativos: ver [espacio para texto y formatos](EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md). Regla central: la zona del titular se planifica en la toma **con tono declarado y límite de cabezas**, igual que el lecho.
+
+## Delta 2026-09-21 — dos registros: documental y puesta en escena
+
+Cambio estructural: **el canon V1 documentó sólo la mitad del sistema**. Lo que faltaba no era una excepción ni un
+error, era **otro registro**, que ya existía de facto en las piezas publicadas y nunca se había escrito. De ahí la
+sensación del operador de que «el lenguaje me limita» al intentar meter una pieza del segundo registro por la
+puerta del primero. Evidencia de la tanda: `ai-generations/2026-09-21_copiloto/plates/`; inventario verbatim en
+`ai-generations/2026-09-21_copiloto/HECHOS-REGISTROS.md`.
+
+### 1. El hallazgo: una pieza aprobada que no pasa la barra **[medido]**
+
+La pieza «¿Claude o Codex?» (`ai-generations/2026-09-17_claude-o-codex/out/claude-o-codex-4x5-1080x1350.png`) está
+**publicada, aprobada y funciona**, y **no pasa la barra de juicio** de §2.3:
+
+| Criterio de la barra (§2.3) | «¿Claude o Codex?» |
+|---|---|
+| Hay obra | **No** — no se ve nada hecho ni en proceso |
+| Hay mecanismo | **No** — no hay sistema, traza ni dato |
+| Hay idea | Sí |
+| Verdad operativa | Sí |
+| Test de sustitución | Parcial: lo anclan las mascotas de partner y el polo |
+
+Las tres piezas del registro que faltaba documentar, con sus rutas:
+
+| Pieza | Ruta |
+|---|---|
+| «¿Claude o Codex?» | `ai-generations/2026-09-17_claude-o-codex/out/claude-o-codex-4x5-1080x1350.png` |
+| KV de Clawd («Tu IA no conoce tu negocio») | `ai-generations/2026-09-17_kv-tu-ia-no-conoce/` |
+| `copiloto` | `ai-generations/2026-09-21_copiloto/` |
+
+### 2. Los dos registros
+
+**Registro A — DOCUMENTAL · «el oficio a la vista».** La foto **es** el mensaje: documenta obra, mecanismo y
+personas decidiendo. Es lo que describe este documento de §2 a §6.
+
+- **Barra**: los siete criterios completos de §2.3 (sustitución · obra · mecanismo · idea · 3 modos y 390 px ·
+  verdad operativa · paleta en la composición).
+- **Nadie mira al lente.**
+- **Para qué sirve**: credibilidad — sitio, piezas de equipo, «esto es lo que hacemos».
+- **Evidencia nueva**: `F-podcast-v1.png` (la escucha) y `E-estudio-v2.png` (el estudio en operación), ambas en
+  `ai-generations/2026-09-21_copiloto/plates/`.
+
+**Registro B — PUESTA EN ESCENA.** La foto es **soporte de una idea**: composición armada, sujeto centrado, fondo
+controlado, aire para el titular, y elementos de marca (mascotas, cursores, bounding box, tipografía) en la escena
+o encima.
+
+- **No documenta nada, y no tiene por qué**: su trabajo es que la idea entre en dos segundos.
+- **El sujeto SÍ mira al lente.**
+- **Barra propia**: idea clara · marca sostenida · texto legible · identidad y colorimetría intactas.
+- **Evidencia**: «¿Claude o Codex?», el KV de Clawd, `copiloto`, `G-podcast-v5.png`.
+
+### 3. Qué comparten y qué los separa
+
+| | Se comparte — **no se negocia en ninguno de los dos** | Se separa |
+|---|---|---|
+| Identidad | Set de referencias aprobado, idéntico | — |
+| Vestuario | El código por **registro de escena** (§ regla auto-load): polera piqué, chaqueta, gorra + polo, hoodie, lanyard | — |
+| Realismo | El bloque completo: «no se siente IA», sin suciedad (§4.1) | — |
+| Colorimetría | **Entera**: sin grade, sin navy en ropa grande, sin paneles azules de fondo, lámparas prácticas apagadas, acento dosificado 1 de cada 2 (§5, [Colorimetría](./EFEONCE_PHOTO_COLORIMETRY_V1.md)) | — |
+| Firma | La misma: SVG oficial compuesto después, 20% del lado corto, contraste ≥ 4,5:1 medido, con **lecho** en los dos | — |
+| Reservas del plate | **Las seis**, declaradas en la toma ([reserva de espacio](./EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md)) | — |
+| Bloque de impacto | **También en el registro B** (ver §5 de este delta) | — |
+| Qué se fotografía | — | Obra en operación **vs.** puesta en escena |
+| Con qué barra se juzga | — | Los siete criterios de §2.3 **vs.** la barra propia del B |
+| Mirada | — | Nadie mira al lente **vs.** el sujeto mira al lente |
+| Capa gráfica | — | El A no la lleva **vs.** el B sí (titular, cursores, bounding box, chip) |
+
+### 4. El marcador visible: la mirada **[criterio]**
+
+En el registro A **nadie mira a cámara** —está trabajando—. En el B **el sujeto mira al lente** y la pieza invita.
+Es la forma más rápida de saber en qué registro está una foto **antes de juzgarla con la barra equivocada**, que
+es exactamente el error que produjo este delta.
+
+### 5. El registro B TAMBIÉN lleva el bloque de impacto **[decisión del operador, 2026-09-21]**
+
+> «la de puesta en escena necesito un poco las palancas del documental no? luz, etc etc etc impacto»
+
+Un retrato centrado bien expuesto y sin más **queda plano**. La corrección, medida en la misma ficha, son tres
+cosas concretas:
+
+1. **Luz con carácter**: llave **dura y baja** muy a la izquierda, **rasante**, con un lado del rostro en sombra
+   abierta y **la sombra de la nariz legible en la mejilla**; **segunda fuente detrás y baja** que recorta un
+   **rim** en el pelo, el hombro y el micrófono, separándola de la pared.
+2. **Atmósfera**: `bruma`, con el haz de la contra visible cruzando la sala. El haz, su resplandor y **cada mancha
+   que proyecta** quedan **bajo la mitad del cuadro** — si sube al tercio superior, rompe la banda de texto.
+3. **Tres planos**: primer plano desenfocado · sujeto nítido · al fondo, fuera de foco, **un segundo brazo con pop
+   filter tomando el rim**, para que la sala tenga profundidad en vez de ser una pared plana.
+
+Comparación directa: `G-podcast-v2.png` (**plana**, correcta pero sin golpe) contra `G-podcast-v4.png` y
+`G-podcast-v5.png` (**con el bloque**).
+
+### 6. Piezas de esta tanda
+
+| Archivo | Registro | Palanca | Reservas |
+|---|---|---|---|
+| `E-estudio-v1.png` | A | `luz-motivada` | banda **0,00** ✗ (lámpara alta) |
+| `E-estudio-v2.png` | A | `luz-motivada` | banda 0,28 ✓ · lecho 9,92 ✓ |
+| `F-podcast-v1.png` | A | `escucha` | banda 0,26 · lecho 4,17 · b\* −0,3 ✓ |
+| `G-podcast-v2.png` | B | — | banda 0,30 ✓ · lecho 1,85 ✗ · **plana** |
+| `G-podcast-v4.png` | B | — + `bruma` | banda 0,34 ✓ · lecho 2,84 ✗ · con impacto |
+| `G-podcast-v5.png` | B | — + `bruma` | **banda 0,34 ✓ · lecho 8,32 ✓** · emblema verificado |
+
+### 7. Lo que queda abierto
+
+La **contradicción documental** sobre la capa gráfica: el canon la declara no aprobada y todas las piezas
+publicadas del registro B la usan. Queda registrada en §9 como pendiente con su condición de cierre; es del
+operador, no de esta documentación.

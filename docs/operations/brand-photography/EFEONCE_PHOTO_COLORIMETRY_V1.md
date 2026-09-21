@@ -3,7 +3,7 @@
 > **Tipo de documento:** Especificación técnica de marca (colorimetría y medición)
 > **Versión:** 1.0
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-20
+> **Última actualización:** 2026-09-21
 > **Documentación relacionada:** [Índice](./README.md) · [Lenguaje fotográfico (maestro)](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma: primer plano y logo](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Cámaras, lentes y ángulos](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Bloques de prompt y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas, identidad y vestuario](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) · [Manual de uso](../../manual-de-uso/marketing/fotografia-de-marca-efeonce.md)
 
 Este documento fija **cómo se ve el color** en una foto de marca propia de Efeonce y **cómo se mide**. El objetivo
@@ -457,3 +457,48 @@ Nunca: aplicar LUT, curvas de color, split-toning o el grade V0 **[decisión del
 | 2 | Contrapicado hacia tragaluz: probar «skylight keeps detail» para bajar el quemado de 5–6,5 % **[pendiente]** |
 | 3 | Promover `metricas.cjs` y `medir.mjs` a comando `pnpm` con umbrales por contexto **[pendiente]** |
 | 4 | Prueba de reconocimiento (n ≥ 100) antes de llamar a la colorimetría «activo distintivo» **[pendiente]** |
+
+---
+
+## Delta 2026-09-21 — el caso del podcast queda cerrado, y la causa de fondo no era la luz
+
+Cierra el caso que §5.3 (lámparas prácticas, `paleta/P2-podcast` con **b\* altas +20,1**) y §3.4 (paneles azules
+de fondo) dejaron registrados como rechazados. Evidencia: `ai-generations/2026-09-21_copiloto/plates/`.
+
+### 1. Las dos piezas previas fallaban por algo más profundo que la luz **[medido]**
+
+| Pieza | Qué se midió / marcó |
+|---|---|
+| `rondas/paleta/P2-podcast` | **Rechazada.** Lámparas prácticas encendidas → **b\* altas +20,1**; look de podcast de stock |
+| `rondas/personas/JN2-podcast` | Marcada por **paneles azules grandes de fondo**, repetidos entre piezas |
+
+🔴 **Causa común, y es anterior al color: las dos fotografían la CONVERSACIÓN** —dos personas simpáticas hablando
+en una mesa—, que es genérica y **falla el test de sustitución**. Ninguna fotografía el oficio. Corregir sólo la
+colorimetría habría dado una pieza con números en rango y el mismo problema intacto: **la medición no rescata una
+escena que no tiene qué documentar.**
+
+### 2. La pieza nueva cierra las dos causas medidas **[medido]**
+
+`F-podcast-v1.png` fotografía **la escucha**, no la conversación, y con eso resuelve las dos marcas de color
+sin negociar nada del canon:
+
+| Causa registrada | Corrección aplicada | Resultado |
+|---|---|---|
+| Lámparas prácticas encendidas (b\* altas **+20,1**) | Lámparas prácticas **apagadas**; la llave pasa a un **panel LED neutro fuera de cuadro** | **b\* altas −0,3** |
+| Paneles azules grandes de fondo | **Ningún panel azul**: el azul entra **sólo por el polo**, que es el portador legítimo | Fondo de fieltro acústico real, sin campo azul añadido |
+
+La regla de §5.3 se mantiene tal cual —lámparas apagadas, la llave es la ventana o una fuente neutra— y ahora
+tiene su caso resuelto además del rechazado.
+
+### 3. Piezas nuevas y su b\* de altas luces **[medido]**
+
+| Pieza | b\* altas |
+|---|---:|
+| `F-podcast-v1.png` | **−0,3** |
+| `G-podcast-v5.png` | **−0,7** |
+| `E-estudio-v2.png` | **0,1** |
+
+Las tres quedan dentro del rango neutro-cálido del canon, contra los **+20,1** de la rechazada.
+
+> **Regla que queda:** antes de pedir una corrección de color, pregunta **qué está fotografiando la pieza**. Si lo
+> que está en cuadro es genérico, la colorimetría correcta sólo produce una foto de stock bien medida.

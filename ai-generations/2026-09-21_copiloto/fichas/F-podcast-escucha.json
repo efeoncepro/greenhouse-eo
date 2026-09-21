@@ -1,0 +1,18 @@
+{
+  "id": "F-podcast-escucha",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "escucha",
+  "objetos": ["polo-efeonce"],
+  "escena": "SCENE (the agency's own podcast, mid-recording, in a treated room — NOT a living room): the person IN FOCUS is WEARING CLOSED-BACK HEADPHONES and is LISTENING, not talking: her lips are closed, her chin is slightly down, one hand rests flat on the table and the other holds the edge of the headphone cup against her ear, and her eyes are fixed on a point off to the side, not on the camera and not on the other person — the concentration of someone following an argument they are about to answer. She wears the navy blue Efeonce piqué polo. A large studio microphone on a black boom arm ENTERS FROM THE LEFT EDGE at her jaw height, close to the lens and slightly out of focus, its grille and shockmount cradle clearly readable as professional equipment. Across the table, far out of focus, the OTHER voice is only a shoulder and a hand caught mid-gesture — no face, no second portrait. Behind her right shoulder and out of the key light, an audio interface sits on the table with its gain knobs and a row of small level LEDs lit, and a laptop shows a WAVEFORM running across the screen, small and dim. The walls are dark grey acoustic felt panels in a visible grid, the real material of a treated room — there is NO blue panel, NO bookshelf, NO plant and NO domestic decor anywhere. CRITICAL ON LIGHT: every practical lamp in the room is SWITCHED OFF and none appears lit in frame; the only light is a single white LED work panel high on the right, outside the frame, so the light is neutral and slightly cool — the highlights on her skin and on the polo must stay NEUTRAL, never yellow or amber, and nothing in the picture glows warm. The whole TOP THIRD of the picture is the dark acoustic felt, unbroken: no lamp, no microphone, no boom arm, no screen and no light patch may enter that band. The room is real and in use: a coiled XLR cable on the table edge and a glass of water, nothing else. Everything is completely unbranded except her polo. 85mm at f/2, focus on her eyes and the headphone cup.",
+  "lecho": {
+    "objeto": "the black foam body of a second microphone standing right at the lens, crossing the ENTIRE bottom of the frame from left edge to right edge",
+    "tono": "DEEP MATTE BLACK, even across its whole width — NOTHING else appears in that bottom strip: no cable, no highlight, no reflection, no lettering"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark grey acoustic felt panelling filling the top third behind her",
+      "tinta": "blanca"
+    }
+  }
+}

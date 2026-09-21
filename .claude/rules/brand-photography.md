@@ -12,6 +12,59 @@ y el [índice del canon](../../docs/operations/brand-photography/README.md) **an
 sesión que reconstruyó el oficio a pedazos en vez de cargar la skill perdió un día entero y ~USD 5
 (`ai-generations/2026-09-20_formatos-catalogo/ESTADO.md`).
 
+## Los DOS registros. Saber en cuál estás ANTES de juzgar
+
+🔴 **Efeonce tiene dos registros visuales y el canon V1 escribió sólo uno** **[medido 2026-09-21]**. Juzgar una
+pieza con la barra del otro es lo que produce la sensación del operador de que «el lenguaje me limita».
+
+| | **A · DOCUMENTAL** «el oficio a la vista» | **B · PUESTA EN ESCENA** |
+|---|---|---|
+| Qué es la foto | **ES** el mensaje: obra, mecanismo, personas decidiendo | **SOPORTE** de una idea: composición armada, sujeto centrado, fondo controlado, aire para el titular |
+| Barra | los **siete criterios** completos: sustitución · obra · mecanismo · idea · 3 modos y 390 px · verdad operativa · paleta en la composición | propia: idea clara · marca sostenida · texto legible · identidad y colorimetría intactas |
+| ¿Mira al lente? | **Nadie mira al lente** | **El sujeto SÍ mira al lente** |
+| Para qué | credibilidad: sitio, piezas de equipo, «esto es lo que hacemos» | que la idea entre en dos segundos |
+| Evidencia | `F-podcast-v1.png` (la escucha) · `E-estudio-v2.png` (el estudio en operación) | «¿Claude o Codex?» · KV de Clawd · `copiloto` · `G-podcast-v5.png` |
+
+**Mirar al lente es el marcador visible del registro**: es la forma más rápida de saber en cuál está una foto
+antes de juzgarla con la barra equivocada.
+
+🔴 **Caso fuente:** «¿Claude o Codex?»
+(`ai-generations/2026-09-17_claude-o-codex/out/claude-o-codex-4x5-1080x1350.png`) está **publicada, aprobada y
+funciona**, y **NO pasa la barra documental** **[medido]**: no hay obra, no hay mecanismo y el test de sustitución
+queda **parcial** —lo anclan las mascotas de partner y el polo—. No es una excepción ni un error: **es el otro
+registro**, que existía de facto y no estaba escrito. Lo mismo el KV de Clawd y la pieza `copiloto`.
+
+**Qué COMPARTEN los dos, sin negociación:** identidad y set de referencias · código de vestuario por registro de
+escena · el bloque de realismo («no se siente IA», sin suciedad) · **la colorimetría entera** (sin grade, sin navy
+en ropa grande, sin paneles azules de fondo, lámparas prácticas apagadas, acento 1 de cada 2) · la firma · **las
+seis reservas del plate** · **y el bloque de impacto**.
+
+**Qué los SEPARA:** qué se fotografía · con qué barra se juzga · si el sujeto mira al lente · si lleva capa gráfica.
+
+🔴 **El registro de puesta en escena TAMBIÉN lleva el bloque de impacto** **[decisión del operador, 2026-09-21]**:
+«*la de puesta en escena necesito un poco las palancas del documental no? luz, etc etc etc impacto*». Un retrato
+centrado bien expuesto y sin más **queda plano** (`G-podcast-v2.png`, correcta y plana, contra `G-podcast-v4/v5`).
+Los tres que lo corrigen, medidos en la misma ficha: **luz con carácter** (llave dura y baja muy a la izquierda,
+rasante, un lado del rostro en sombra abierta y la sombra de la nariz legible en la mejilla; **segunda fuente
+detrás y baja** que recorta rim en pelo, hombro y micrófono y separa de la pared) · **atmósfera** (`bruma`, con el
+haz de la contra visible cruzando la sala; el haz, su resplandor y **cada mancha que proyecta** quedan **bajo la
+mitad del cuadro**) · **tres planos** (primer plano desenfocado · sujeto nítido · al fondo, fuera de foco, un
+segundo brazo con pop filter tomando el rim).
+
+**Contradicción documental abierta [pendiente]:** el canon declara que **la capa gráfica sobre la foto NO está
+aprobada** (2026-09-19) y **todas las piezas publicadas del registro B la usan** (titular, cursores, bounding box,
+chip). O se aprueba, o se declara que esas piezas viven bajo otro contrato.
+
+**El podcast, medido:** las dos piezas previas fallaron —`rondas/paleta/P2-podcast` **rechazada** por lámparas
+prácticas encendidas (**b\* de altas luces +20,1**, look de podcast de stock) y `rondas/personas/JN2-podcast`
+marcada por **paneles azules grandes de fondo**—, pero la causa común es más profunda que la luz: **las dos
+fotografían la CONVERSACIÓN**, dos personas simpáticas hablando en una mesa, que es genérica y **falla el test de
+sustitución**. Ninguna fotografía el oficio. La solución documental fue fotografiar **la ESCUCHA**
+(`F-podcast-v1.png`, palanca `escucha`): el sujeto no habla, el otro existe pero es **sólo una mano fuera de
+foco**, y el mecanismo está a la vista (micro de brazo entrando por el borde, forma de onda en el laptop, LEDs de
+nivel, fieltro acústico). Con las dos causas del rechazo cerradas y medidas: **b\* −0,3** contra los +20,1, y
+ningún panel azul — el azul entra sólo por el polo, que es el portador legítimo.
+
 ## Los tres comandos. NUNCA a mano
 
 ```bash
@@ -148,6 +201,20 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   **0,30–0,36** cuando entraban bajo. Corrección que funcionó dos veces: declarar que la ventana, la diagonal
   iluminada y **cada mancha que proyecta** quedan **bajo la mitad del cuadro**, y que el tercio superior es un campo
   de azul tinta sin interrupción.
+- 🔴 **Con fuente visible en cuadro, la lámpara se riggea BAJA** **[medido 2026-09-21]**. `luz-motivada` pide que la
+  fuente sea visible y sea lo más brillante del cuadro; la reserva pide el tercio superior limpio. Con el softbox a
+  la altura del pecho la banda midió **0,00** (inservible); riggeado **entre rodilla y pecho** —que además es como
+  se ilumina de verdad un objeto pequeño— sube a **0,28**. **O lámpara baja, o no hay banda de texto.**
+- 🔴 **En el retrato centrado 4:5 las dos reservas COMPITEN por el alto** **[medido en 3 pasadas]**: banda 0,22 ✗ ·
+  lecho 2,45 ✗ | banda **0,30 ✓** · lecho 1,85 ✗ | banda 0,26 ✗ · lecho 3,72 ✗. Bajar al sujeto hace crecer la
+  banda pero las manos y la mesa invaden el borde inferior y matan el lecho; subirlo hace respirar el lecho y mata
+  la banda. **Ninguna combinación de encuadre cierra las dos.** Firmar sobre el muro **está descartado** aunque
+  mida de sobra (el fieltro daba **13,9:1**): «*la puesta en escena también debe tener lecho igual que la
+  documental*» **[decisión del operador, 2026-09-21]**. **La salida correcta es un objeto propio del oficio en
+  PRIMER PLANO, fuera de toda luz** —no el canto de la mesa, que recibe relleno y queda gris—: el micrófono del
+  invitado cruzando el borde inferior, desenfocado y fuera del alcance de la llave y del rim, dio **banda 0,34 ✓ y
+  lecho 8,32 ✓ en la misma pieza** (`G-podcast-v5.png`). El lecho no es «la superficie de abajo»: es **un objeto
+  del oficio puesto ahí a propósito y sacado de la luz**.
 - **Nunca un scrim.** Si el contraste no da, se **regenera** el plate; no se oscurece en post.
 - **El plate nace sin logo ni texto.** La firma es el SVG oficial compuesto después, **20% del lado corto del lienzo**
   (decisión del operador 2026-09-20), contraste ≥ 4,5:1 medido.

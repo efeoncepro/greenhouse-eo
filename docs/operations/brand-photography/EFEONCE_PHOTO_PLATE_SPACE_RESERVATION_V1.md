@@ -152,3 +152,57 @@ cursores, campo profundo—, donde el gradiente fino sí es la medida correcta.
 > **Regla que queda:** cuando una guarda reprueba algo que a ojo está bien y el contraste sobra por cuatro veces,
 > sospecha del instrumento antes que de la pieza. Y si dos reglas del sistema no se pueden satisfacer a la vez,
 > una de las dos llegó después y dejó a la otra obsoleta.
+
+## Delta 2026-09-21 — las dos reservas compiten por el alto, y la lámpara visible se riggea baja
+
+Dos reglas nuevas, las dos medidas sobre la tanda de `ai-generations/2026-09-21_copiloto/plates/`.
+
+### 1. En el retrato centrado 4:5, la banda de texto y el lecho de la firma COMPITEN por el alto **[medido en 3 pasadas]**
+
+| Pasada | Banda de texto | Lecho de la firma |
+|---|---|---|
+| v1 | 0,22 ✗ | 2,45 ✗ |
+| v2 | **0,30 ✓** | 1,85 ✗ |
+| v3 | 0,26 ✗ | 3,72 ✗ |
+
+**Bajar al sujeto hace crecer la banda, pero las manos y la mesa invaden el borde inferior y matan el lecho;
+subirlo hace respirar el lecho y mata la banda. Ninguna combinación de encuadre cierra las dos.** No es un
+problema de ajuste fino: el alto del cuadro es uno solo y las dos reservas se lo disputan desde extremos
+opuestos.
+
+**Salida descartada: firmar sobre el muro.** El fieltro acústico daba **13,9:1**, de sobra para la firma
+**[medido]**. El operador la rechazó **[decisión del operador]**:
+
+> **«la puesta en escena también debe tener lecho igual que la documental»**
+
+🔴 **Salida correcta: un objeto propio del oficio en PRIMER PLANO, fuera de toda luz.** No el canto de la mesa
+—que recibe relleno y queda gris—, sino un objeto que la escena ya justifica y que se saca deliberadamente del
+alcance de la llave y del rim. En el caso medido, el **micrófono del invitado** cruzando el borde inferior,
+desenfocado y sin luz encima: **banda 0,34 ✓ · lecho 8,32 ✓ en la misma pieza** (`G-podcast-v5.png`)
+**[medido]** — las dos reservas cerradas sin mover el encuadre del sujeto.
+
+> **Formulación general:** el lecho **no es «la superficie de abajo»**. Es **un objeto del oficio puesto ahí a
+> propósito y sacado de la luz**. Buscarlo entre las superficies que ya están abajo es lo que produce el empate:
+> se declara como objeto, con su nombre y su razón para estar en sombra.
+
+Esto se acopla con la regla ya vigente de que la luz con carácter va sobre el sujeto y la reserva vive en la
+sombra que esa luz deja, nunca en su camino: el lecho se gana sacando el objeto del haz, no agrandando el
+margen inferior.
+
+### 2. Con fuente visible en cuadro, la lámpara se riggea BAJA **[medido]**
+
+La palanca `luz-motivada` pide que **la fuente sea visible y sea lo más brillante del cuadro**; la reserva de
+texto pide el **tercio superior limpio**. Las dos se cruzan en el mismo tercio y, a la altura habitual de un
+softbox, gana la lámpara.
+
+| Pieza | Altura de la fuente | Banda de texto |
+|---|---|---|
+| `E-estudio-v1.png` | softbox a la altura del pecho | **0,00 ✗** (inservible) |
+| `E-estudio-v2.png` | riggeado entre rodilla y pecho | **0,28 ✓** (lecho 9,92 ✓) |
+
+Riggear bajo no es una concesión a la reserva: **es como se ilumina de verdad un objeto pequeño**, así que la
+corrección mejora la escena en vez de deformarla.
+
+> **Regla que queda:** **con fuente visible en cuadro, lámpara baja, o no hay banda de texto.** Es el mismo
+> mecanismo que el haz que sube al tercio superior: lo que entra a la zona reservada la rompe, sea el haz, la
+> ventana, una mancha proyectada o la fuente misma.

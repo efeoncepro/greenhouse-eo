@@ -40,6 +40,80 @@ Arquetipos a evitar: **consultora** (talleres, post-its, mesas genéricas), **pe
 5. **Paleta = luz y material, no ropa.** «La colorimetría no es vestir de navy».
 6. **Regla madre:** «una buena imagen de IA es la que no se siente que es IA».
 
+> Esta barra es la del **registro documental**. El de **puesta en escena** tiene la suya, y juzgar una pieza con la
+> barra del otro registro es el error que describe la sección siguiente.
+
+## Los DOS registros — y por qué la barra de §2 es la del documental **[2026-09-21]**
+
+El canon V1 describió **un** registro. Existían dos, y el segundo ya estaba publicado y aprobado sin estar escrito:
+de ahí la sensación del operador de que «el lenguaje me limita» al intentar meter una pieza del segundo por la
+puerta del primero.
+
+**Se decide ANTES de producir, con una sola pregunta: ¿la foto ES el mensaje, o es el SOPORTE de una idea?**
+Y se reconoce a simple vista por **si el sujeto mira al lente**.
+
+### A · Documental — «el oficio a la vista»
+
+Es §1 y §2 de esta guía: obra, mecanismo y personas decidiendo. La foto **es** el mensaje, **nadie mira al lente**
+y se juzga con los **siete criterios completos**. Sirve para credibilidad: sitio, piezas de equipo, «esto es lo que
+hacemos». Evidencia nueva: `F-podcast-v1.png` (la escucha) y `E-estudio-v2.png` (el estudio en operación).
+
+### B · Puesta en escena
+
+La foto **no documenta nada, y no tiene por qué**: su trabajo es que la idea entre en dos segundos. Lo que cambia
+en la dirección de arte es acotado y concreto: **composición armada** en vez de encontrada · **sujeto centrado** ·
+fondo **controlado** · **aire reservado para el titular** · elementos de marca —mascotas, cursores, caja de
+selección, tipografía— **en la escena o encima** · y **el sujeto SÍ mira al lente**, que es el marcador del
+registro. Barra propia: **idea clara · marca sostenida · texto legible · identidad y colorimetría intactas**.
+Evidencia: «¿Claude o Codex?», el KV de Clawd, `copiloto`, `G-podcast-v5.png`.
+
+**«¿Claude o Codex?» está publicada, aprobada y funciona, y NO pasa la barra de §2** **[medido]**: no hay obra, no
+hay mecanismo, y el test de sustitución queda **parcial** —lo anclan las mascotas de partner y el polo—. No es una
+excepción ni un error: es el otro registro.
+
+### Qué NO cambia entre uno y otro
+
+Identidad y set de referencias · **código de vestuario por el registro de la escena** · el bloque de realismo («no
+se siente IA», sin suciedad) · **la colorimetría entera** —sin grade, sin navy en ropa grande, sin paneles azules
+grandes de fondo, lámparas prácticas apagadas, acento cálido 1 de cada 2— · la firma · **las seis reservas del
+plate** · y **el bloque de impacto**.
+
+### 🔴 La puesta en escena también lleva el bloque de impacto **[decisión del operador, 2026-09-21]**
+
+> «la de puesta en escena necesito un poco las palancas del documental no? luz, etc etc etc impacto»
+
+Un retrato centrado, bien expuesto y sin más, **queda plano**: es exactamente `G-podcast-v2.png`, correcta y sin
+nada. Lo que lo corrige, medido en la misma ficha (`G-podcast-v4/v5.png`):
+
+- **Luz con carácter** — llave **dura y baja muy a la izquierda**, rasante, con un lado del rostro en sombra
+  abierta y la sombra de la nariz legible en la mejilla; **segunda fuente detrás y baja** que recorta un rim en el
+  pelo, el hombro y el micrófono, separándola de la pared.
+- **Atmósfera** — `bruma`, con el haz de la contra **visible** cruzando la sala. El haz, su resplandor y **cada
+  mancha que proyecta** quedan **bajo la mitad del cuadro**; arriba va el campo limpio del titular.
+- **Tres planos** — primer plano desenfocado · sujeto nítido · al fondo, fuera de foco, un segundo brazo con pop
+  filter tomando el rim, para que la sala tenga profundidad en vez de ser una pared plana.
+
+Y la firma tampoco se negocia: en el retrato centrado 4:5 la banda de texto y el lecho **compiten por el alto**
+—tres pasadas de encuadre y ninguna cerró las dos—, y firmar sobre el muro está **descartado** («la puesta en
+escena también debe tener lecho igual que la documental»). La salida es **un objeto del oficio en primer plano,
+fuera de toda luz**: el micrófono del invitado cruzando el borde inferior dio **banda 0,34 y lecho 8,32** en la
+misma pieza.
+
+### El «estudio como oficio»: la vía que acopla el look de estudio **[medido]**
+
+**Un retrato contra fondo liso falla cuatro de los siete criterios** —obra, mecanismo, idea y paleta en la
+composición— y choca con dos prohibiciones explícitas de esta guía: «salas tonales genéricas» y «paneles azules
+grandes de fondo». El estudio no está prohibido: **el fondo liso no es el estudio**.
+
+La vía que sí acopla es **fotografiar el estudio EN OPERACIÓN** — el ciclorama con la luz montada, el softbox,
+alguien corrigiendo, el monitor con la toma ya tirada. Cumple la barra entera y encaja en la tabla de servicios
+bajo Creative Services. Evidencia: `E-estudio-v2.png`, palanca `luz-motivada`.
+
+**Regla que salió de ahí — la lámpara se riggea BAJA** **[medido]**: `luz-motivada` pide fuente visible y que sea lo
+más brillante del cuadro; la reserva pide el tercio superior limpio. Con el softbox a la altura del pecho la banda
+midió **0,00** (inservible); riggeado **entre rodilla y pecho** —que además es como se ilumina de verdad un objeto
+pequeño— sube a **0,28**. **Con fuente visible en cuadro: lámpara baja, o no hay banda de texto.**
+
 ## 3. La firma: lecho planeado + logo compuesto
 
 - El primer plano desenfocado es una **herramienta o superficie del oficio** entre cámara y sujeto,

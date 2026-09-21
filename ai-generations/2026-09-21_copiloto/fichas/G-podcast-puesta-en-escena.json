@@ -1,0 +1,23 @@
+{
+  "id": "G-podcast-puesta-en-escena",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    "polo-efeonce"
+  ],
+  "escena": "SCENE (a staged announcement portrait for the agency's own podcast, shot in its treated recording room): this is a PUT-TOGETHER picture, not a documentary moment. Nexa sits at the podcast table, squarely facing the camera and LOOKING STRAIGHT INTO THE LENS, chin level, with an open, confident half smile — she is inviting, not caught. Her head stays FRONTAL to the camera: both eyes and both eyebrows fully visible, both cheeks visible, the bridge of her nose does not cut across either cheek. Her irises are VERY DARK BROWN, almost black, so dark that the iris barely separates from the pupil — never hazel, amber or honey, and no golden ring inside the iris. She wears the navy blue Efeonce piqué polo, and closed-back black headphones rest AROUND HER NECK, not on her ears. A large studio microphone on a black boom arm enters the frame from the RIGHT at shoulder height, angled towards her, its grille and shockmount cradle clearly readable as professional equipment; it is close enough to belong to her but it does not cover her face. Her forearms rest on the dark table, hands relaxed and open, and BOTH her hands and the table edge stay WELL ABOVE the bottom fifth of the picture — that strip belongs entirely to the out-of-focus microphone in front of the lens. THREE PLANES, and they must all read: the out-of-focus near edge of the table across the bottom; Nexa sharp in the middle; and behind her, far out of focus and small, a second boom arm and a pop filter catching the rim light, so the room has depth instead of being a flat wall. The wall behind her is dark grey acoustic felt in a visible grid — the real material of a treated room. There is NO blue panel, NO bookshelf, NO plant and NO domestic decor. CRITICAL ON LIGHT — this is where the picture gets its character, and every practical lamp in the room is SWITCHED OFF: the KEY is a single hard white LED source low and far to the LEFT, raking across her at a steep angle, so one side of her face is bright and the other falls into open shadow with the nose casting a short, readable shadow on the cheek — modelled, not flat. A second hard source sits BEHIND her at the right and LOW, aimed back at the camera: it cuts a clean RIM of light along her hair, her shoulder and the edge of the microphone, separating her from the wall. That back light throws a visible SHAFT across the room through the haze, and the shaft, its glow and every pool it makes stay BELOW THE MIDDLE OF THE FRAME. Both sources are white: the highlights on her skin and on the polo stay NEUTRAL, never yellow or amber, and nothing in the picture glows warm. The fall-off is steep — the far corners of the room sink to black. The composition is deliberately CENTRED and calm, and she sits LOW: measure it — the very top of her head is at or BELOW 38% of the frame height, so there is a wide, quiet field of felt above her. The whole TOP THIRD of the picture is that dark acoustic felt, completely unbroken — no microphone, no boom arm, no headphone, no cable, no screen and no light patch may enter that band, and no glow may wash up into it. Everything is completely unbranded except her polo. Chest-up medium close-up on an 85mm lens at f/2.8, focus on her eyes — never a wide lens, which would widen and distort her face.",
+  "lecho": {
+    "objeto": "the SECOND microphone — the guest's — standing right at the lens on its own boom, its foam windscreen and shockmount crossing the ENTIRE bottom of the frame from left edge to right edge, a hand's width from the camera and dissolved completely out of focus. It sits OUTSIDE every light: neither the key nor the rim reaches it",
+    "tono": "NEAR-BLACK, the darkest thing in the picture and even across its whole width — NOTHING else appears in that bottom strip: no hands, no arms, no table edge, no cable, no highlight, no reflection, no lettering"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark grey acoustic felt panelling filling the top third behind her",
+      "tinta": "blanca"
+    }
+  },
+  "atmosfera": "bruma"
+}

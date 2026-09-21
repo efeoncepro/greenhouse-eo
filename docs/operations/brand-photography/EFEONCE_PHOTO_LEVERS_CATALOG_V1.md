@@ -123,6 +123,14 @@ una lámpara práctica, una ventana. Es lo que separa luz real de un grade, que 
 **Cómo se logra.** La caída tiene que leerse: el lado cercano a la fuente iluminado, el lejano cayendo a negro, y
 la dirección inequívoca desde la fuente. El color viene de la fuente, nunca de un filtro sobre la imagen.
 **Evidencia.** `B3` (monitor de calibración, Bogotá) · lecho 17,26:1.
+**Evidencia 2026-09-21 — el estudio en operación.** `E-estudio-v2.png`: ciclorama con la luz montada, softbox,
+alguien corrigiendo y el monitor con la toma ya tirada. Es la vía por la que el look de estudio entra al lenguaje,
+porque **un retrato contra fondo liso falla cuatro de los siete criterios** (obra, mecanismo, idea y paleta en la
+composición) y choca con «salas tonales genéricas» y «paneles azules grandes de fondo».
+**Ojo — la altura de la lámpara.** Esta palanca pide fuente visible y que sea lo más brillante del cuadro, y la
+reserva pide el tercio superior limpio: las dos chocan. Con el softbox a la altura del pecho la banda de texto
+midió **0,00** (inservible); riggeado **entre rodilla y pecho** —que además es como se ilumina de verdad un objeto
+pequeño— sube a **0,28**. **Con fuente visible en cuadro: lámpara baja, o no hay banda de texto.**
 
 #### `larga-exposicion` — duración en vez de instante
 **Qué es.** Personas y luces se disuelven en estelas continuas mientras **un elemento queda perfectamente nítido**
@@ -267,6 +275,16 @@ adelante, una mano cerca de la oreja o la mandíbula. La herramienta con la que 
 teclado— **está en el cuadro y sin usar**. La tensión es la atención, no la acción.
 **Por qué importa.** Es lo contrario exacto de una selfie: la persona no está actuando.
 **Evidencia.** `G1` (sesión de grabación, Santiago) · a la primera.
+**Evidencia 2026-09-21 — resolvió el podcast que dos intentos previos habían fallado.** `F-podcast-v1.png`. Los dos
+rechazos anteriores se leyeron como problemas de luz y color —`rondas/paleta/P2-podcast` por lámparas prácticas
+encendidas (**b\* de altas luces +20,1**, look de podcast de stock) y `rondas/personas/JN2-podcast` por **paneles
+azules grandes de fondo**—, pero la causa común era más profunda: **las dos fotografiaban la CONVERSACIÓN**, dos
+personas simpáticas hablando en una mesa, que es genérica y **falla el test de sustitución**. Ninguna fotografiaba
+el oficio. Fotografiar la escucha lo cierra: el sujeto no habla, el otro existe pero es **sólo una mano fuera de
+foco** —no un segundo retrato—, y el mecanismo queda a la vista (micro de brazo entrando por el borde, forma de
+onda corriendo en el laptop, interfaz con LEDs de nivel, fieltro acústico real). Con las dos causas del rechazo
+cerradas y medidas: lámparas prácticas apagadas (llave = panel LED neutro fuera de cuadro) → **b\* −0,3** contra
+los +20,1, y ningún panel azul: el azul entra sólo por el polo, que es el portador legítimo.
 
 #### `atraviesa` — un objeto del oficio cruza el cuadro
 **Qué es.** Un objeto largo y rígido del oficio —brazo articulado, riel, regla, tendido de cable, viga— **manda
