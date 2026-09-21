@@ -1087,3 +1087,40 @@ describe('palancas corregidas tras la auditoría ciega', () => {
     })
   })
 })
+
+describe('el polo existe en dos colores y la principal es la navy', () => {
+  const base = {
+    id: 'c',
+    formato: '4:5',
+    escena: 'SCENE: a hard beam at the instant she lifts it. an azure screen. a real walnut worktop',
+    lecho: { objeto: 'the near edge of a real walnut worktop', tono: 'DARK walnut in shadow, matte' }
+  }
+
+  // El patrón estaba fijo en la variante SECUNDARIA. Como la referencia gana sobre la escena, una
+  // escena que pedía «deep navy polo» salía en BLANCO (medido 2026-09-21). La navy es la principal:
+  // 15 vistas contra 6, y es la referencia del uniforme en EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.
+  it('sin declarar color, usa la navy', () => {
+    const { imagenes } = construirPrompt({ ...base, objetos: ['polo-efeonce'] })
+
+    expect(imagenes[0]).toMatch(/polo-navy/)
+    expect(imagenes[1]).toMatch(/polo-navy-10-detalle-bordado/)
+  })
+
+  it('la blanca se puede pedir, y arrastra su propio macro', () => {
+    const { imagenes } = construirPrompt({ ...base, objetos: [{ objeto: 'polo-efeonce', color: 'blanco' }] })
+
+    expect(imagenes[0]).toMatch(/polo-blanco/)
+    expect(imagenes[1]).toMatch(/polo-blanco-10-detalle-bordado/)
+  })
+
+  it('un color que no existe se rechaza en vez de caer en silencio a otro', () => {
+    expect(() => construirPrompt({ ...base, objetos: [{ objeto: 'polo-efeonce', color: 'verde' }] })).toThrow(
+      /El color "verde" no existe/
+    )
+  })
+
+  // El emblema sobredimensionado es el fallo más común del kit y su ancla vivía sólo en la doc.
+  it('el bloque lleva el ancla de tamaño, no sólo la doc', () => {
+    expect(construirPrompt({ ...base, objetos: ['polo-efeonce'] }).prompt).toMatch(/NO WIDER THAN A THIRD/)
+  })
+})

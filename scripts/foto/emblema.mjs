@@ -19,9 +19,16 @@ if (files.length === 0) {
 pnpm foto:emblema <plate.png> [más plates...]
 
 Amplía las zonas donde vive un bordado (pecho, gorra, manga) y las junta en una hoja para mirarlas
-al 100%. Compara letra por letra contra el kit: «e», «f», nave, órbita con sus cortes, tres ventanas.
-UNA letra distinta obliga a regenerar. El modelo NO reproduce el emblema fiel: inventa una forma
-parecida, y a tamaño de feed pasa por buena.
+al 100% y compáralo contra el kit. OJO, no todas las prendas llevan la misma marca:
+
+  PECHO (polo, hoodie, chaquetas) → ISOTIPO: nave apuntando a la derecha con la nariz redondeada a la
+    derecha y las dos aletas abajo a la izquierda, órbita elíptica con cortes, punto arriba, tres
+    ventanas. SIN letras: si aparecen letras, está mal.
+  GORRA (frente y lateral)        → LOGOTIPO: «efeonce» con la nave en el lugar de la «o». Algunas
+    variantes de gorra llevan sólo el isotipo, y la trasera y la cenital NO llevan marca.
+
+Una forma distinta de la que toca obliga a regenerar. El modelo NO reproduce la marca fiel: inventa
+una parecida, la mueve, la agranda o la espeja, y a tamaño de feed pasa por buena.
 
 Si el emblema no se sostiene, muestra la prenda donde no se lea —de espaldas, en sombra, pequeña—
 en vez de publicar un logo inventado.
@@ -75,5 +82,7 @@ await sharp({ create: { width: x - 12, height: 520, channels: 3, background: '#1
   .toFile(destino)
 
 console.log(`→ ${destino}`)
-console.log(`  ${out.length} recortes de ${files.length} plate(s). MÍRALOS: el emblema es «e», «f», nave,`)
-console.log('  órbita con sus cortes y tres ventanas. Una letra distinta obliga a regenerar.')
+console.log(`  ${out.length} recortes de ${files.length} plate(s) — las zonas son FIJAS (pecho y cabeza), no`)
+console.log('  detectan el bordado: si un recorte sale sin marca, es que ahí no había prenda, no un fallo.')
+console.log('  MÍRALOS: el PECHO lleva ISOTIPO (nave, órbita, tres ventanas, SIN letras) y la GORRA de frente')
+console.log('  lleva LOGOTIPO («efeonce» con la nave en la «o»). Una forma distinta obliga a regenerar.')

@@ -359,3 +359,21 @@ resuelto.
 > también lleva su propia referencia» —6 de 21 vistas del polo volvieron invertidas— y no se resuelve con más
 > descripción. Para una pieza donde la marca deba leerse fiel: edición con máscara, o un ángulo donde la marca no
 > cargue el peso.
+
+### Delta 2026-09-21 — la variante de COLOR también se elige, y por defecto va la principal
+
+Misma clase que la variante de gorra, un día después y en otro kit: `polo-efeonce` tenía el patrón **fijo** en
+la variante **blanca**, que es la segunda (6 vistas), cuando la principal es la **navy** (15 vistas) y es la
+declarada como referencia del uniforme. Como **la referencia gana sobre la escena**, una escena que pedía «deep
+navy Efeonce pique polo» devolvió el plate con polo **blanco** — medido por la sesión peer en
+`ai-generations/2026-09-21_palancas-corregidas/`.
+
+**La regla completa, para cualquier prenda que exista en más de una versión:** lo que se elige por ficha es la
+**vista** (ángulo), el **color** y, cuando aplica, la **variante de marca**. Nada de eso puede quedar fijo en el
+kit: lo que quede fijo se impone sobre lo que pida la escena, en silencio y sin aviso.
+
+`pnpm foto:prompt` resuelve hoy los tres: `{ objeto, vista, color }`, con la principal por defecto, y **rechaza
+un color que no existe** en vez de caer a otro. El **ancla de tamaño del emblema** —«no más ancho que un tercio
+del panel del pecho, apenas más ancho que el carnet que cuelga en la misma toma»— viaja ahora dentro del bloque
+que emite el comando y no sólo en esta doc: el emblema sobredimensionado es el fallo más repetido del kit, y un
+marcador que vive sólo en la documentación no llega al prompt.

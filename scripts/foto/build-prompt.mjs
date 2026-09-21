@@ -426,10 +426,23 @@ export const OBJETOS = {
       'same colour, collar, fabric, and the mark exactly where and as it appears here. Do NOT redraw, restyle or ' +
       'reinterpret the mark: it is not yours to design, only to copy. Do not copy its studio background.',
     base: 'ai-generations/2026-09-17_polo-efeonce/final/',
-    patron: 'efeonce-polo-blanco-<V>-1600x1600-v01-transparente.png',
+    // El polo existe en DOS colores y la PRINCIPAL es la navy (15 vistas; la blanca tiene 6), declarada
+    // como referencia del uniforme en EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1 §6. El patrón fijo
+    // apuntaba a la secundaria, y la referencia gana sobre la escena: una escena que pedía «deep navy
+    // polo» salía en BLANCO (medido 2026-09-21, sesión peer). El color se pide por ficha.
+    patronPorColor: {
+      navy: 'efeonce-polo-navy-<V>-1600x1600-v01-transparente.png',
+      blanco: 'efeonce-polo-blanco-<V>-1600x1600-v01-transparente.png'
+    },
+    macroPorColor: {
+      navy: 'efeonce-polo-navy-10-detalle-bordado-1600x1600-v01-fondo-estudio.png',
+      blanco: 'efeonce-polo-blanco-10-detalle-bordado-1600x1600-v01-fondo-estudio.png'
+    },
+    colorDefecto: 'navy',
+    patron: 'efeonce-polo-navy-<V>-1600x1600-v01-transparente.png',
     vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
     vistaDefecto: 'frente',
-    macroEmblema: 'efeonce-polo-blanco-10-detalle-bordado-1600x1600-v01-fondo-estudio.png',
+    macroEmblema: 'efeonce-polo-navy-10-detalle-bordado-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
   },
   'hoodie-efeonce': {
@@ -496,7 +509,16 @@ function resolverObjetos(ficha, desde) {
       )
     }
 
-    const ref = objeto.base + objeto.patron.replace('<V>', sufijo)
+    const color = (typeof pedido === 'string' ? null : pedido?.color) ?? objeto.colorDefecto
+    const patron = objeto.patronPorColor?.[color] ?? objeto.patron
+
+    if (color && objeto.patronPorColor && !objeto.patronPorColor[color]) {
+      throw new Error(
+        `El color "${color}" no existe para "${clave}". Colores del kit: ${Object.keys(objeto.patronPorColor).join(', ')}.`
+      )
+    }
+
+    const ref = objeto.base + patron.replace('<V>', sufijo)
 
     if (!existsSync(path.join(raiz, ref))) {
       throw new Error(
@@ -516,7 +538,9 @@ function resolverObjetos(ficha, desde) {
     const queMarca = tipoDeMarca && tipoDeMarca !== 'sin-marca'
       ? ` The mark it carries is ${formaDeLaMarca(tipoDeMarca)} Render it as satin-stitch embroidery with visible ` +
         'stitch direction, slightly raised over the knit — never flat ink. Do not resize or move it: it keeps ' +
-        'exactly the size and position it has in the reference.'
+        'exactly the size and position it has in the reference — NO WIDER THAN A THIRD of the chest panel, ' +
+        'barely wider than a lanyard badge hanging in the same shot. An oversized emblem is the most common ' +
+        'failure of this kit.'
       : ''
 
     bloques.push(`IMAGE ${n} (object reference): Image ${n} is ${objeto.etiqueta}. ${objeto.instruccion}${queMarca} Ignore its studio background.`)
@@ -527,7 +551,7 @@ function resolverObjetos(ficha, desde) {
     // YA traían su macro; lo que faltaba era exponerlo. No se compone encima —probado y rechazado
     // por el operador: se ve impreso, no bordado—: se le da al modelo el emblema en grande.
     if (objeto.macroEmblema) {
-      const macro = objeto.base + objeto.macroEmblema
+      const macro = objeto.base + (objeto.macroPorColor?.[color] ?? objeto.macroEmblema)
 
       if (!existsSync(path.join(raiz, macro))) {
         throw new Error(

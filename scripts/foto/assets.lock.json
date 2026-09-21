@@ -1,6 +1,6 @@
 {
   "_comentario": "Huellas de los assets que el catálogo de foto:prompt declara. Los binarios viven fuera de git (640 MB); esto los verifica sin descargarlos. Regenerar con `pnpm foto:assets:lock` y commitear.",
-  "sellado": "2026-09-20",
+  "sellado": "2026-09-21",
   "assets": {
     "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-04.png": {
       "rol": "persona:julio",
@@ -194,17 +194,17 @@
       "rol": "kit:lanyard-efeonce/portacarnet-vacio",
       "sha256": "b3fbafdd8519d95b4f8a6cdd1c2be2a21e3a030862463a4ccf9884e31760a838"
     },
-    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-01-frente-1600x1600-v01-transparente.png": {
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:polo-efeonce/frente",
-      "sha256": "dbcf1f1ca14e354c21873d521f93b929f18591992a709979cc6f40e020d6ba3a"
+      "sha256": "16c4a977d0283f0b8f1e4b0ad7fc0341173f303c9269124e6909d6ff46952263"
     },
-    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-02-espalda-1600x1600-v01-transparente.png": {
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-02-espalda-1600x1600-v01-transparente.png": {
       "rol": "kit:polo-efeonce/espalda",
-      "sha256": "a6b2294ab026548e32e4e9c9ea11afeb4085c50fa3cc08aab840aa2bbac4543c"
+      "sha256": "66d232d457e44c21e872e14101a6b48e0d85ecddff1100b46030af3a3cf7ba5e"
     },
-    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
       "rol": "kit:polo-efeonce/tres-cuartos-izq",
-      "sha256": "49321dc2ea66b8dc119377140c10d665f89e9f211353e6f0ad966cc2abab5057"
+      "sha256": "a623a14b4ab8c08c076509ae355dd782b95da992ade018c6aac527ebcb6b35f0"
     },
     "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:hoodie-efeonce/frente",
