@@ -1,0 +1,12 @@
+{
+  "id": "A-ausencia-corregida",
+  "formato": "4:5",
+  "impacto": true,
+  "atmosfera": "polvo",
+  "palanca": "ausencia",
+  "escena": "SCENE (five minutes after the review ended, design studio in Santiago, late afternoon): a hard low sun beam comes through the window and rakes across the worktop, dust still drifting in it. The chair is pushed back at a hard angle and half turned away from the table, exactly where someone shoved it standing up. The work is left mid-decision: printed sheets fanned out where they were dropped, two of them pulled apart from the rest, a marker lying uncapped across them with its cap a hand's width away, a glass half drunk. The monitor is still awake and its azure-blue interface is the only cool light in the room, throwing blue across the near edge of the sheets. One desk lamp is still on. 35mm at f/2.8, focus on the pushed-back chair. Small printed text exists on the sheets but sits at a sharp angle and far outside the focal plane, so no word can be read. Everything is completely unbranded.",
+  "lecho": {
+    "objeto": "the near edge of the pale oak worktop on the camera side",
+    "tono": "VERY LIGHT bleached pale oak lit by the low sun, almost white, the brightest surface in the lower frame"
+  }
+}

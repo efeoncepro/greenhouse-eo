@@ -1,0 +1,22 @@
+{
+  "id": "F-quien-sostiene-nexa-terreno",
+  "formato": "4:5",
+  "impacto": true,
+  "atmosfera": "polvo",
+  "palanca": "quien-sostiene",
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "gorra-efeonce",
+      "vista": "trucker-navy"
+    },
+    "polo-efeonce"
+  ],
+  "escena": "SCENE (Run and Gun shoot at a coffee roastery, Lima, mid morning): sharp in the near third of the frame is NEXA, the one MAKING IT POSSIBLE: she is at the monitor cart in three-quarter view, one hand steadying the rig and her eyes on the waveform, not on the talent. She wears the navy Efeonce trucker cap and the deep navy Efeonce pique polo: the cap sits snug and LOW-PROFILE, adult size, the distance from her brow to the top of the crown about a third of her head height, the band resting on her brows with no gap at the sides, the peak short and curved and no wider than her forehead. Well behind her and clearly OUT OF FOCUS, the roaster talks to camera under a hard shaft of window light with roasting dust drifting in it. The monitor she watches throws azure blue across her face and the cap's peak. On the floor at her feet, a short strip of ORANGE gaffer tape marks the cart's position, pressed down and already scuffed by the crew. 50mm at f/1.8, focus locked on Nexa. Printed call sheets are clipped to the cart but are creased and far outside the focal plane, unreadable. Everything is completely unbranded except the Efeonce garments.",
+  "lecho": {
+    "objeto": "the pale sunlit concrete floor of the roastery rising into the bottom of the frame right at the lens",
+    "tono": "VERY LIGHT almost white sunlit concrete"
+  }
+}

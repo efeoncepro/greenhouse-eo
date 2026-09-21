@@ -1,0 +1,13 @@
+{
+  "id": "E-entre-dos-julio-nexa-polo",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "entre-dos",
+  "identidad": ["julio", "nexa"],
+  "objetos": ["polo-efeonce"],
+  "escena": "SCENE (deciding the last cut of a bakery campaign, Efeonce studio in Santiago, late afternoon): the camera sits in the air BETWEEN the two of them at eye height, close enough that each fills one side of the frame in three-quarter view, turned towards each other and NEITHER looking at the lens. Julio is on the left, mid-sentence with one hand open low over the table; Nexa is on the right, already answering, her chin lifted. Both wear the deep navy Efeonce pique polo, collar open, sleeves at the bicep, the small embroidered emblem on the left chest catching the light. Between and below them an editing monitor lies flat and awake, its azure-blue timeline the cool light that separates their two faces from the warm room. A hard low sun beam comes through the window behind Julio and rims his shoulder. 50mm at f/2, focus split between the two faces. Captions and file names exist on the monitor but sit at a grazing angle far below the focal plane, unreadable. Everything else is completely unbranded.",
+  "lecho": {
+    "objeto": "the matte-black top of the studio camera on its tripod we shoot past",
+    "tono": "DARK near black, matte"
+  }
+}

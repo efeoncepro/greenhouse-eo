@@ -1,0 +1,12 @@
+{
+  "id": "B-variantes-eje-unico",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "variantes",
+  "eje": "the weight of the headline type, from light to bold, and nothing else",
+  "escena": "SCENE (choosing the final weight, design studio in Bogota, morning, NO faces): twelve printed sheets of one poster are pinned in a strict four-by-three grid on a pale studio wall, lit by a single hard window light from the left that rakes across the paper so each sheet throws its own small shadow. One sheet, second row, is unpinned and held forward into the light by a hand entering from the right edge, the rest of the arm out of frame. A large azure-blue calibration monitor stands at the far left of the frame, switched on and facing away, its light spilling cool across the wall. 50mm at f/4, focus on the held sheet. The headline text on the sheets is real but small and thrown out of focus by the shallow plane, unreadable at any size. Everything is completely unbranded.",
+  "lecho": {
+    "objeto": "the matte-black top of the studio camera on its tripod that we shoot past",
+    "tono": "DARK near black, matte"
+  }
+}
