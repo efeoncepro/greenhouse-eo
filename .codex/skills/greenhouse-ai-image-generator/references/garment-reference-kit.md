@@ -377,3 +377,17 @@ un color que no existe** en vez de caer a otro. El **ancla de tamaño del emblem
 del panel del pecho, apenas más ancho que el carnet que cuelga en la misma toma»— viaja ahora dentro del bloque
 que emite el comando y no sólo en esta doc: el emblema sobredimensionado es el fallo más repetido del kit, y un
 marcador que vive sólo en la documentación no llega al prompt.
+
+### Delta 2026-09-21 — dos trampas de la EDICIÓN, medidas
+
+Valen para cualquier edición con `--image`, no sólo para prendas.
+
+1. **`--mask` no preserva píxeles.** Editando sólo la zona del lanyard, el delta medio **en el rostro** dio
+   **88 de 255**: la edición recompone el encuadre entero, no parchea la zona. La identidad se sostiene, pero es
+   una pasada nueva. **Después de editar una prenda con máscara, vuelve a mirar la cara** contra la referencia.
+2. **La edición perdía la relación de aspecto en silencio.** Sin `--size`, `pnpm ai:image` aplicaba su default
+   horizontal (`1536x1024`) también al editar, así que un plate 4:5 volvía apaisado sin aviso. **Corregido**: al
+   editar sin `--size` explícito, el tamaño se **hereda de la imagen base** y el comando lo dice; si la base mide
+   algo que el modelo no acepta, avisa que la relación **va a cambiar** en vez de hacerlo callado.
+
+Medidas por la sesión peer durante la corrección del lanyard.

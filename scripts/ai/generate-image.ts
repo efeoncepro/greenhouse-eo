@@ -5,6 +5,7 @@ import { basename, dirname, isAbsolute, join } from 'node:path'
 import { spawn } from 'node:child_process'
 
 import { config as loadEnv } from 'dotenv'
+import sharp from 'sharp'
 
 import {
   assertOpenAIImageQualitySupported,
@@ -139,6 +140,11 @@ Concept mode:
 Defaults: model gpt-image-2 · size 1536x1024 · quality high · background opaque · out-dir public/images/generated
 Requires OPENAI_API_KEY_SECRET_REF (or OPENAI_API_KEY) — resolved server-side, never printed.`
 
+// Editar una imagen sin declarar `--size` devolvía el default horizontal (1536x1024) y CAMBIABA la
+// relación de aspecto en silencio: un plate 4:5 volvía apaisado. Medido por la sesión peer el
+// 2026-09-21. Al editar, el tamaño de la base es lo que uno espera, así que se hereda y se avisa.
+let sizeExplicito = false
+
 const parseArgs = (argv: string[]): CliArgs => {
   const args: CliArgs = {
     size: '1536x1024',
@@ -194,6 +200,7 @@ const parseArgs = (argv: string[]): CliArgs => {
         break
       case '--size':
         args.size = next() as OpenAIImageSize
+        sizeExplicito = true
         break
 
       case '--quality': {
@@ -427,6 +434,24 @@ const main = async () => {
   // La combinación model × quality se valida acá y no por pieza: dentro del loop, un --count 5 repetiría
   // el mismo error cinco veces y ya habría creado directorios de salida.
   assertOpenAIImageQualitySupported({ model: args.model, quality: args.quality })
+
+  if (!sizeExplicito && args.image?.length) {
+    const base = sharp(args.image[0])
+    const meta = await base.metadata()
+
+    if (meta.width && meta.height) {
+      const heredado = `${meta.width}x${meta.height}` as OpenAIImageSize
+
+      try {
+        assertOpenAIImageSizeSupported({ model: args.model, size: heredado })
+        console.error(`  ⚠ editando sin --size: se hereda ${heredado} de la imagen base (el default habría sido ${args.size} y habría cambiado la relación de aspecto).`)
+        args.size = heredado
+      } catch {
+        console.error(`  ⚠ editando sin --size y la base mide ${meta.width}x${meta.height}, que el modelo no acepta: se usa ${args.size}. La relación de aspecto VA A CAMBIAR — pasa --size explícito.`)
+      }
+    }
+  }
+
   assertOpenAIImageSizeSupported({ model: args.model, size: args.size })
 
   if (args.background === 'transparent' && args.format === 'jpeg') {
