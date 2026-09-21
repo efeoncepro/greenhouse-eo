@@ -512,3 +512,46 @@ Una primera pasada volvió con **fondo y prenda correctos** y la rotación **ign
 salió en el mismo ángulo de la referencia. Que dos instrucciones se cumplan **no dice nada** de la tercera:
 cada una se verifica por separado. Con la inversión declarada respecto a la referencia más el ancla «su nariz
 apunta al BORDE DERECHO del cuadro», seis de seis salieron a la primera.
+
+### Una referencia que no se usa NO avisa **[medido 2026-09-21 · commit `1911d293f`]**
+
+Con **dos personas** en cuadro el cupo baja a 2 referencias por cabeza y se tomaban las dos primeras de la
+lista. Las dos primeras de Julio son **ambas de rostro** según su propio `MANIFIESTO.json`, así que **se
+quedaba sin cuerpo entero siempre** que hubiera dos personas; en Nexa el cuerpo se caía en cuanto se pedía una
+vista, porque la vista desplaza una posición. El modelo **inventaba la silueta**.
+
+🔴 **Estuvo latente porque la pieza sale igual**: no hay error, no hay aviso, y el cuerpo no es lo que uno mira
+para juzgar identidad. La ronda P3 no lo destapó por ser plano medio.
+
+**El recorte lo decide el ORDEN de una lista que nadie escribió pensando en eso.** Es el reverso del hecho de
+que el modelo obedece dos instrucciones y calla la tercera: acá **el que calla es el contrato**.
+
+Arreglo vigente: cada persona declara `cuerpo: '<ruta>'` y esa referencia **viaja siempre que quepa**,
+sustituyendo la última (la vista va primera y manda). Con su reverso obligatorio: **si la vista pedida ya es de
+cuerpo entero, no se añade el cuerpo frontal** — dos cuerpos y ningún rostro cercano es justo lo que hace
+derivar la cara. Cubierto por cuatro tests, verificados desactivando la condición.
+
+**Siluetas nuevas de Nexa**: `cuerpo-perfil-izq` y `cuerpo-espalda`, generadas a **1536×2304** y no a 1024,
+porque a página entera el rostro cae a ~120 px y el modelo lo rellena.
+
+**Deuda declarada**: el manifiesto ya trae `tipo: rostro|cuerpo` y el catálogo TS lo declara otra vez. Hay dos
+fuentes para el mismo dato; lo correcto sería que el catálogo leyera el manifiesto. Es un refactor y no se hizo
+sin acordarlo.
+
+### 🔴 Antes de construir, buscar si ya existe **[tres casos medidos el 2026-09-21]**
+
+| Lo que ya existía | Dónde | Qué costó no mirarlo |
+|---|---|---|
+| El brief del plate aprobado: encuadre, lente, escala de la mascota y pose ya resueltos | `ai-generations/2026-09-17_kv-tu-ia-no-conoce/brief/plate-kv-4x5.prompt.txt` | ~20 generaciones reconstruyendo el encargo de memoria |
+| Un turnaround de Nexa con 9 vistas | `01. Material/01. Avatar/hf_20260327_182342_…png` | se iba a construir el set de ángulos desde cero |
+| `tipo: rostro\|cuerpo` por referencia | `refs-aprobadas/MANIFIESTO.json` | el código no lo leía y el cupo recortaba el cuerpo en silencio |
+
+**El reflejo de reconstruir de memoria es el error más caro medido en esta jornada.** Antes de construir:
+el brief de la pieza aprobada equivalente, el kit con la vista o pose pedida, y el manifiesto del set.
+
+### Curaduría de `01. Material/01. Avatar/` **[medido]**
+
+De los 58 archivos, los **cuatro retratos grandes del 27/03 son AMBIGUOS**: cejas gruesas como A pero sin el
+delineado del párpado. **No están clasificados en ninguna identidad y no deben cablearse por parecerse.**
+Tampoco entran como ancla de rostro el traje naranja (arrastra color, igual que el navy del set viejo de
+Julio) ni las series `Poses y expresiones/` y `Vestuario/`, que son identidad B.

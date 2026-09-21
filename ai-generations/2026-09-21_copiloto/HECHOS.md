@@ -270,3 +270,45 @@ piezas — el mismo defecto que el navy del set viejo de Julio. El set neutro se
 
 Gates: `pnpm foto:assets:check` → 60 assets · `build-prompt.test.ts` → 296 verdes · la vista resuelve y una
 inexistente aborta con la lista de disponibles. Registro: `ai-generations/2026-09-21_nexa-angulos/LEEME.md`.
+
+### 27. Una referencia que no se usa NO avisa **[medido · commit `1911d293f`]**
+
+Con dos personas en cuadro el cupo baja a 2 referencias por cabeza y se tomaban `refs[0]` y `refs[1]`. Las dos
+primeras de Julio son **ambas de rostro** según su propio manifiesto, así que **se quedaba sin cuerpo entero
+siempre** que hubiera dos personas; en Nexa el cuerpo se caía en cuanto se pedía una vista, porque la vista
+desplaza una posición. El modelo les **inventaba la silueta**.
+
+🔴 **Por qué estuvo latente: la pieza sale igual.** No hay error, no hay aviso, y el cuerpo no es lo que uno
+mira para juzgar identidad. La ronda P3 no lo destapó porque es plano medio.
+
+**El recorte lo decide el ORDEN de una lista que nadie escribió pensando en eso.** Es primo del hecho 25 (el
+modelo obedece dos instrucciones y calla la tercera), pero acá **el que calla es el contrato, no el modelo**.
+
+Arreglo: cada persona declara `cuerpo: '<ruta>'` y esa referencia viaja siempre que quepa, sustituyendo la
+última (la menos decisiva: la vista va primera y manda). Con su reverso: **si la vista pedida ya es de cuerpo
+entero, no se añade el cuerpo frontal**, o la toma queda con dos cuerpos y ningún rostro cercano — que es justo
+lo que hace derivar la cara.
+
+### 28. 🔴 El patrón del día: el trabajo YA ESTABA HECHO y no se consultó **[tres casos medidos]**
+
+| Lo que ya existía | Dónde | Qué costó no mirarlo |
+|---|---|---|
+| El brief del plate aprobado, con encuadre, lente, escala de la mascota y pose resueltos | `ai-generations/2026-09-17_kv-tu-ia-no-conoce/brief/plate-kv-4x5.prompt.txt` | ~20 generaciones reconstruyendo el encargo de memoria |
+| Un turnaround de Nexa con 9 vistas | `01. Material/01. Avatar/hf_20260327_182342_…png` | se iba a construir el set desde cero |
+| `tipo: rostro\|cuerpo` por referencia | `refs-aprobadas/MANIFIESTO.json` | el código no lo miraba: el cupo recortaba el cuerpo en silencio |
+
+**Antes de construir cualquier cosa en este dominio, buscar si ya existe**: el brief de la pieza aprobada
+equivalente, el kit con la vista o la pose pedida, y el manifiesto del set. El reflejo de reconstruir de
+memoria es el error más caro medido en esta jornada.
+
+### 29. Pendiente declarado: el manifiesto debería ser la fuente **[no ejecutado]**
+
+`MANIFIESTO.json` ya declara `tipo: rostro|cuerpo` por referencia y el catálogo TS lo declara **otra vez** por
+su cuenta. Hay dos fuentes para el mismo dato. Lo correcto sería que el catálogo leyera el manifiesto, pero es
+un refactor y **no se hizo sin hablarlo**. Queda como deuda con dueño.
+
+### 30. Curaduría de `01. Material/01. Avatar/`: 4 archivos AMBIGUOS **[medido]**
+
+De los 58, los cuatro retratos grandes del 27/03 tienen **cejas gruesas como A pero sin el delineado del
+párpado**: no se clasificaron en ninguna identidad. **No cablearlos por parecerse.** Tampoco entran como ancla
+el traje naranja (arrastra color, como el navy del set viejo de Julio) ni las series de poses y vestuario (son B).

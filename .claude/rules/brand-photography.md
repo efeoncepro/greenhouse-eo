@@ -95,6 +95,15 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   **Hoodie** = terreno · **Lanyard y carnet** = transversales, van en casual y en formal por igual. Se elige por
   el registro de la escena, NUNCA por variedad visual: una reunión importante en hoodie dice lo contrario de lo
   que la foto cuenta.
+- 🔴 **Una referencia que no se usa NO avisa** **[medido 2026-09-21]**. Con DOS personas el cupo baja a 2 por
+  cabeza y recortaba **por orden de lista**: Julio se quedaba sin cuerpo entero siempre (sus dos primeras son
+  de rostro) y Nexa lo perdía al pedir una vista. El modelo **inventaba la silueta y la pieza salía igual**.
+  Hoy cada persona declara `cuerpo:` y esa referencia viaja siempre que quepa; si la vista YA es de cuerpo
+  entero, el cuerpo frontal no se añade (dos cuerpos sin rostro cercano hacen derivar la cara).
+- 🔴 **Antes de construir, busca si ya existe.** Tres casos medidos el mismo día: el brief del plate aprobado
+  (`2026-09-17_kv-tu-ia-no-conoce/brief/`) costó ~20 generaciones; un turnaround de Nexa con 9 vistas se iba a
+  rehacer desde cero; y el `tipo: rostro|cuerpo` del `MANIFIESTO.json` existía sin que el código lo leyera.
+  **Reconstruir de memoria es el error más caro de esta jornada.**
 - **`ignore their clothing` NO alcanza:** con identidad, **declara el vestuario en la escena** o el modelo copia
   la ropa de las referencias. El comando avisa.
 - **Editar conserva, generar reconstruye.** Para un ángulo nuevo de una persona, **edita su foto aprobada**;
