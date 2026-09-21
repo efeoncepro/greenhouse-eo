@@ -158,7 +158,7 @@ export const requestInsightRender = async (input: RequestInsightRenderInput): Pr
 
     const planInput =
       output === 'report_pdf'
-        ? buildInsightReportPlanInput({ edition, report, plan: plan.plan })
+        ? buildInsightReportPlanInput({ edition, report, plan: plan.plan, snapshot })
         : buildInsightDeckPlanInput({ edition, report, plan: plan.plan, snapshot })
 
     const manifest: Record<string, unknown> = { input: planInput as unknown as Record<string, unknown> }

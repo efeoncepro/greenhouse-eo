@@ -22,8 +22,10 @@ import { paginateFlow, type FlowBlock } from '@/lib/artifact-composer'
 import type { CompositionPlanInput, CompositionSlideInput } from '@/lib/artifact-composer'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
+import type { ChartSpecV1 } from '../contracts/chart-spec'
 import type { EditorialPlanV1, PlanChapterV1 } from '../contracts/plan'
-import type { InsightEditionRecord, InsightReportRecord } from '../stores/records'
+import type { EvidenceFactV1 } from '../contracts/evidence'
+import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord } from '../stores/records'
 import { InsightsRenderRejectedError } from '../errors'
 import { withDedupedLimits } from './plan-limits'
 
@@ -71,6 +73,59 @@ export interface BuildInsightReportInput {
   readonly edition: InsightEditionRecord
   readonly report: InsightReportRecord
   readonly plan: EditorialPlanV1
+  readonly snapshot: EvidenceSnapshotRecord
+}
+
+/**
+ * Formatea la cifra tal como se imprime junto a su marca.
+ *
+ * El resolver del catálogo vuelve a leer este texto y falla si no representa el valor que dibuja la
+ * barra: por eso el formato se produce en un solo lugar y con el mismo criterio es-CL (coma
+ * decimal) que el parser espera.
+ */
+const printedValueOf = (fact: EvidenceFactV1): string => {
+  const value = fact.value ?? 0
+  const rounded = Math.round(value * 10) / 10
+  const text = String(rounded).replace('.', ',')
+
+  return fact.unit === 'percent' ? `${rounded > 0 ? '+' : ''}${text}%` : text
+}
+
+/**
+ * Una figura del plan → los slots de la página analítica.
+ *
+ * Devuelve `null` cuando la figura no se puede dibujar con lo que hay: una serie sin hechos
+ * medibles no se rellena con ceros — el capítulo se narra y el faltante viaja a la página de
+ * límites, que es donde el lector lo va a buscar.
+ */
+const figureSlots = (
+  chart: ChartSpecV1,
+  factsById: ReadonlyMap<string, EvidenceFactV1>
+): Record<string, unknown> | null => {
+  const rows = chart.series.flatMap(serie =>
+    serie.factIds
+      .map(id => factsById.get(id))
+      .filter((fact): fact is EvidenceFactV1 => fact != null && fact.value != null)
+      .map((fact, index) => ({
+        name: serie.label || chart.dimensionLabels[index] || serie.seriesId,
+        printedValue: printedValueOf(fact),
+        valuePct: fact.value as number,
+        evidenceRef: fact.evidenceRef
+      }))
+  )
+
+  if (rows.length < 2) return null
+
+  const max = Math.max(...rows.map(r => r.valuePct))
+
+  return {
+    figureTitle: chart.title,
+    figureSeries: rows
+      .slice(0, 6)
+      .map(row => ({ ...row, emphasis: row.valuePct === max ? 'lead' : 'rest' })),
+    figureUnit: chart.unit,
+    figureSource: 'Evidencia sellada de la edición'
+  }
 }
 
 /**
@@ -92,7 +147,11 @@ const periodLabelOf = (edition: InsightEditionRecord): string => {
 const issuedLabelOf = (edition: InsightEditionRecord): string =>
   edition.issuedAt ? edition.issuedAt.slice(0, 10) : 'Sin emitir'
 
-const chapterPages = (chapter: PlanChapterV1, periodLabel: string): Omit<CompositionSlideInput, 'slideId'>[] => {
+const chapterPages = (
+  chapter: PlanChapterV1,
+  periodLabel: string,
+  factsById: ReadonlyMap<string, EvidenceFactV1>
+): Omit<CompositionSlideInput, 'slideId'>[] => {
   const chapterLabel = chapter.title
   const running = { runningChapter: chapterLabel, runningPeriod: periodLabel }
   const claims = chapter.claims.map(c => c.text)
@@ -106,6 +165,23 @@ const chapterPages = (chapter: PlanChapterV1, periodLabel: string): Omit<Composi
 
   const [headline, ...rest] = claims
   const pages: Omit<CompositionSlideInput, 'slideId'>[] = []
+
+  for (const chart of chapter.charts) {
+    const figure = figureSlots(chart, factsById)
+
+    if (!figure) continue
+
+    pages.push({
+      contentType: 'report-analysis',
+      slots: {
+        ...running,
+        assertion: rejectIfLonger(headline!, BUDGET.assertion, `${chapter.chapterId}.assertion`),
+        conclusion: rejectIfLonger(rest[0] ?? headline!, BUDGET.lead, `${chapter.chapterId}.conclusion`),
+        ...figure,
+        development: [rest[1] ?? 'El detalle de esta figura está en la tabla de respaldo.']
+      }
+    })
+  }
 
   // Un capítulo SIN figura no se omite: se narra. Desaparecerlo convertiría la falta de datos en
   // silencio, que es justo lo que la página de límites existe para impedir.
@@ -156,10 +232,12 @@ const chapterPages = (chapter: PlanChapterV1, periodLabel: string): Omit<Composi
 export const buildInsightReportPlanInput = ({
   edition,
   report,
-  plan
+  plan,
+  snapshot
 }: BuildInsightReportInput): CompositionPlanInput => {
   const frozen = withDedupedLimits(plan)
   const periodLabel = periodLabelOf(edition)
+  const factsById = new Map(snapshot.facts.map(fact => [fact.factId, fact] as const))
 
   if (frozen.chapters.length === 0) {
     throw new InsightsRenderRejectedError('El plan no tiene capítulos: no hay informe que componer.')
@@ -194,7 +272,7 @@ export const buildInsightReportPlanInput = ({
   }
 
   for (const chapter of frozen.chapters) {
-    pages.push(...chapterPages(chapter, periodLabel))
+    pages.push(...chapterPages(chapter, periodLabel, factsById))
   }
 
   // El cierre es obligatorio aunque no haya límites: declarar que no los hay también es información.

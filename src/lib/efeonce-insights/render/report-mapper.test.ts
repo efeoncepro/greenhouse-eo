@@ -17,6 +17,8 @@ const edition = {
   issuedAt: '2026-09-03T12:00:00.000Z'
 } as never
 
+const snapshot = { snapshotId: 'insn-1', editionId: 'insed-1', facts: [], sources: [], rejections: [] } as never
+
 const report = {
   reportId: 'insrp-1',
   reportCode: 'EO-INS-000014',
@@ -52,14 +54,14 @@ const plan = (over: Partial<EditorialPlanV1> = {}): EditorialPlanV1 =>
 
 describe('buildInsightReportPlanInput', () => {
   it('abre con la portada y cierra con los límites', () => {
-    const types = buildInsightReportPlanInput({ edition, report, plan: plan() }).slides.map(s => s.contentType)
+    const types = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan() }).slides.map(s => s.contentType)
 
     expect(types[0]).toBe('report-cover')
     expect(types.at(-1)).toBe('report-limits')
   })
 
   it('numera los folios de corrido, que es lo que permite resolver el índice sin segunda pasada', () => {
-    const input = buildInsightReportPlanInput({ edition, report, plan: plan() })
+    const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan() })
 
     expect(input.slides.map(s => (s.slots as { pageFolio: string }).pageFolio)).toEqual(
       input.slides.map((_s, i) => String(i + 1))
@@ -67,7 +69,7 @@ describe('buildInsightReportPlanInput', () => {
   })
 
   it('NO omite un capítulo sin figura: lo narra', () => {
-    const input = buildInsightReportPlanInput({ edition, report, plan: plan() })
+    const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan() })
 
     expect(input.slides.some(s => s.contentType === 'report-narrative')).toBe(true)
   })
@@ -81,7 +83,7 @@ describe('buildInsightReportPlanInput', () => {
       ]
     })
 
-    const tablePages = buildInsightReportPlanInput({ edition, report, plan: withTable }).slides.filter(
+    const tablePages = buildInsightReportPlanInput({ edition, report, snapshot, plan: withTable }).slides.filter(
       s => s.contentType === 'report-table'
     )
 
@@ -97,14 +99,14 @@ describe('buildInsightReportPlanInput', () => {
       chapters: [chapter({ tables: [{ tableId: 't1', title: 'T', columns: ['a', 'b', 'c'], rows }] as never })]
     })
 
-    for (const page of buildInsightReportPlanInput({ edition, report, plan: withTable }).slides) {
+    for (const page of buildInsightReportPlanInput({ edition, report, snapshot, plan: withTable }).slides) {
       if (page.contentType !== 'report-table') continue
       expect((page.slots as { tableRows: unknown[] }).tableRows.length).toBeLessThanOrEqual(26)
     }
   })
 
   it('emite la página de cierre incluso sin límites: declarar que no los hay también informa', () => {
-    const closing = buildInsightReportPlanInput({ edition, report, plan: plan({ limits: [] }) }).slides.filter(
+    const closing = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ limits: [] }) }).slides.filter(
       s => s.contentType === 'report-limits'
     )
 
@@ -113,7 +115,7 @@ describe('buildInsightReportPlanInput', () => {
   })
 
   it('separa el límite en sujeto y causa, porque «sin datos» a secas no dice qué conectar', () => {
-    const input = buildInsightReportPlanInput({ edition, report, plan: plan({ limits: ['ico: sin datos.'] }) })
+    const input = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ limits: ['ico: sin datos.'] }) })
     const closing = input.slides.find(s => s.contentType === 'report-limits')!
 
     expect((closing.slots as { limits: { subject: string; cause: string }[] }).limits[0]).toEqual({
@@ -123,7 +125,7 @@ describe('buildInsightReportPlanInput', () => {
   })
 
   it('rechaza un plan sin capítulos en vez de componer un informe vacío', () => {
-    expect(() => buildInsightReportPlanInput({ edition, report, plan: plan({ chapters: [] }) })).toThrow(
+    expect(() => buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ chapters: [] }) })).toThrow(
       InsightsRenderRejectedError
     )
   })
@@ -133,12 +135,80 @@ describe('buildInsightReportPlanInput', () => {
       chapters: [chapter({ claims: [{ claimId: 'c', text: 'x'.repeat(200), factIds: [] }] })]
     })
 
-    expect(() => buildInsightReportPlanInput({ edition, report, plan: withLong })).toThrow(/No se recorta/)
+    expect(() => buildInsightReportPlanInput({ edition, report, snapshot, plan: withLong })).toThrow(/No se recorta/)
   })
 
   it('rechaza un capítulo sin ninguna afirmación', () => {
-    expect(() => buildInsightReportPlanInput({ edition, report, plan: plan({ chapters: [chapter({ claims: [] })] }) })).toThrow(
+    expect(() => buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ chapters: [chapter({ claims: [] })] }) })).toThrow(
       /no tiene ninguna afirmación/
     )
+  })
+
+  it('emite una página analítica cuando la figura tiene hechos medibles', () => {
+    const facts = [
+      { factId: 'f1', value: 61.4, unit: 'percent', evidenceRef: 'ev1' },
+      { factId: 'f2', value: 3.1, unit: 'percent', evidenceRef: 'ev2' }
+    ]
+
+    const withChart = plan({
+      chapters: [
+        chapter({
+          charts: [
+            {
+              specVersion: 'chart_spec_v1',
+              chartId: 'ch1',
+              family: 'bar',
+              relation: 'comparison',
+              title: 'Variación por tipo de página',
+              unit: 'percent',
+              dimensionLabels: ['Nuevas', 'Optimizadas'],
+              series: [{ seriesId: 's1', label: 'Impresiones', factIds: ['f1', 'f2'], unit: 'percent' }]
+            }
+          ] as never
+        })
+      ]
+    })
+
+    const pages = buildInsightReportPlanInput({
+      edition,
+      report,
+      snapshot: { facts, sources: [], rejections: [] } as never,
+      plan: withChart
+    }).slides
+
+    const analysis = pages.find(p => p.contentType === 'report-analysis')
+
+    expect(analysis).toBeDefined()
+
+    const series = (analysis!.slots as { figureSeries: { printedValue: string; emphasis: string }[] }).figureSeries
+
+    expect(series).toHaveLength(2)
+    expect(series[0]!.printedValue).toBe('+61,4%')
+    expect(series[0]!.emphasis).toBe('lead')
+  })
+
+  it('NO dibuja una figura cuyos hechos no son medibles: el capítulo se narra', () => {
+    const withChart = plan({
+      chapters: [
+        chapter({
+          charts: [
+            {
+              specVersion: 'chart_spec_v1', chartId: 'ch1', family: 'bar', relation: 'comparison',
+              title: 'Sin datos', unit: 'percent', dimensionLabels: ['a', 'b'],
+              series: [{ seriesId: 's1', label: 'x', factIds: ['f1'], unit: 'percent' }]
+            }
+          ] as never
+        })
+      ]
+    })
+
+    const pages = buildInsightReportPlanInput({
+      edition, report,
+      snapshot: { facts: [{ factId: 'f1', value: null, unit: 'percent', evidenceRef: 'ev' }], sources: [], rejections: [] } as never,
+      plan: withChart
+    }).slides
+
+    expect(pages.some(p => p.contentType === 'report-analysis')).toBe(false)
+    expect(pages.some(p => p.contentType === 'report-narrative')).toBe(true)
   })
 })
