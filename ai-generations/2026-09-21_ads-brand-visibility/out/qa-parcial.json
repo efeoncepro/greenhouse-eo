@@ -1,5 +1,122 @@
 [
   {
+    "id": "b1-feed",
+    "dominante": [
+      "No estabas."
+    ],
+    "contraste": {
+      "etiqueta": 11.98,
+      "entrada": 11.38,
+      "dominante": 8.65,
+      "cierre-frase": 9.15,
+      "logo": 6.78
+    },
+    "gapsTinta": [
+      {
+        "entre": "etiqueta→entrada",
+        "px": 21,
+        "ratioDominante": 0.12
+      },
+      {
+        "entre": "entrada→dominante",
+        "px": 26,
+        "ratioDominante": 0.149
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 21,
+        "ratioDominante": 0.12
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "local"
+        },
+        {
+          "id": "seo",
+          "labelBounds": {
+            "left": 806.97,
+            "top": 359.583,
+            "right": 890.209,
+            "bottom": 410.11
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "b2-stories",
+    "dominante": [
+      "La citan."
+    ],
+    "contraste": {
+      "entrada": 16.02,
+      "dominante": 13.89,
+      "cierre-frase": 15.62,
+      "logo": 11.23
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 27,
+        "ratioDominante": 0.142
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 21,
+        "ratioDominante": 0.111
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "local"
+        },
+        {
+          "id": "data",
+          "labelBounds": {
+            "left": 648.185,
+            "top": 478.058,
+            "right": 744.327,
+            "bottom": 528.585
+          }
+        },
+        {
+          "id": "nexa",
+          "labelBounds": {
+            "left": 1003.392,
+            "top": 1738.112,
+            "right": 1102.918,
+            "bottom": 1788.639
+          }
+        }
+      ]
+    }
+  },
+  {
     "id": "b3-display",
     "dominante": [
       "Nadie revisó"
@@ -7,25 +124,25 @@
     "contraste": {
       "etiqueta": 14.99,
       "entrada": 14.41,
-      "dominante": 13.05,
-      "cierre-frase": 14.78,
+      "dominante": 13.12,
+      "cierre-frase": 14.88,
       "logo": 11.88
     },
     "gapsTinta": [
       {
         "entre": "etiqueta→entrada",
         "px": 26,
-        "ratioDominante": 0.283
+        "ratioDominante": 0.203
       },
       {
         "entre": "entrada→dominante",
-        "px": 39,
-        "ratioDominante": 0.424
+        "px": 33,
+        "ratioDominante": 0.258
       },
       {
         "entre": "dominante→cierre",
-        "px": 31,
-        "ratioDominante": 0.337
+        "px": 28,
+        "ratioDominante": 0.219
       }
     ],
     "seleccion": {

@@ -480,7 +480,12 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   if (s.lead) {
     const lr = R.ideaLead
     const leadPoppins = (s.leadFamily ?? 'poppins') === 'poppins'
-    const le = richBlock({ text: s.lead, fonts: leadPoppins ? POP : BRIC(lr, lr.width, 760), size: s.leadSize ?? 70, tracking: leadPoppins ? em(R.structureCopy.tracking) : em(lr.tracking), leading: leadPoppins ? 1.5 : lr.lineHeight, x, topY: y, maxWidth: W * (s.textWidth ?? 0.8), fill: SOFT, accentFill: INK, align: s.align })
+    // `leadFill` es opcional y simétrico al `afterFill` que ya existía. Por defecto la entrada va en
+    // `softOnDark` (#cfe4fa), que es token AXIS y funciona sobre un fondo FRÍO — nació en una pieza de
+    // cielo violeta. Sobre FOTOGRAFÍA DE MARCA el fondo es neutro-cálido por contrato de colorimetría, y
+    // ahí ese pastel azul pelea con la luz de la escena en vez de acompañarla: la jerarquía sobre foto se
+    // construye con escala, peso y familia, y el color lo pone la fotografía.
+    const le = richBlock({ text: s.lead, fonts: leadPoppins ? POP : BRIC(lr, lr.width, 760), size: s.leadSize ?? 70, tracking: leadPoppins ? em(R.structureCopy.tracking) : em(lr.tracking), leading: leadPoppins ? 1.5 : lr.lineHeight, x, topY: y, maxWidth: W * (s.textWidth ?? 0.8), fill: s.leadFill ?? SOFT, accentFill: INK, align: s.align })
 
     body += le.svg
     checks.push({ id: 'entrada', box: le.box, inkL: INK_L }); tramos.push(['entrada', le.box, s.leadSize ?? 70])

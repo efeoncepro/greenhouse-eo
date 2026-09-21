@@ -6,20 +6,20 @@
     "top": 0.045,
     "textWidth": 0.84,
     "label": "BRAND VISIBILITY GRADER",
-    "labelSize": 26,
-    "labelGap": 0.22,
+    "labelSize": 24,
+    "labelGap": 0.12,
     "lead": "Le preguntaron a **ChatGPT** por tu categoría.",
     "leadFamily": "bricolage",
     "leadSize": 44,
-    "leadGap": 0.16,
+    "leadGap": 0.15,
     "dominant": "No estabas.",
-    "dominantSize": 124,
-    "dominantMax": 0.62,
+    "dominantSize": 175,
+    "dominantMax": 0.8,
     "after": "Tu competencia **sí**.",
-    "afterFamily": "bricolage",
-    "afterSize": 50,
-    "afterGap": 0.14,
-    "afterFill": "#cfe4fa",
+    "afterFamily": "poppins",
+    "afterSize": 40,
+    "afterGap": 0.12,
+    "afterFill": "#ffffff",
     "selection": {
       "variant": "eight-handles",
       "padding": "standard",
@@ -45,7 +45,8 @@
     "logo": {
       "width": 0.2,
       "x": 0.5
-    }
+    },
+    "leadFill": "#ffffff"
   },
   {
     "id": "b2-stories",
@@ -56,15 +57,15 @@
     "lead": "Tu competencia no corre más rápido.",
     "leadFamily": "bricolage",
     "leadSize": 46,
-    "leadGap": 0.16,
+    "leadGap": 0.14,
     "dominant": "La citan.",
-    "dominantSize": 142,
-    "dominantMax": 0.6,
+    "dominantSize": 190,
+    "dominantMax": 0.76,
     "after": "A ti **no**.",
-    "afterFamily": "bricolage",
-    "afterSize": 56,
-    "afterGap": 0.13,
-    "afterFill": "#cfe4fa",
+    "afterFamily": "poppins",
+    "afterSize": 42,
+    "afterGap": 0.11,
+    "afterFill": "#ffffff",
     "selection": {
       "variant": "eight-handles",
       "padding": "standard",
@@ -98,7 +99,8 @@
     "logo": {
       "width": 0.2,
       "x": 0.5
-    }
+    },
+    "leadFill": "#ffffff"
   },
   {
     "id": "b3-display",
@@ -108,19 +110,19 @@
     "textWidth": 0.4,
     "label": "BRAND VISIBILITY GRADER",
     "labelSize": 28,
-    "labelGap": 0.28,
+    "labelGap": 0.2,
     "lead": "**ChatGPT**, **Perplexity** y **Gemini** ya describen tu marca.",
     "leadFamily": "bricolage",
     "leadSize": 36,
-    "leadGap": 0.42,
+    "leadGap": 0.26,
     "dominant": "Nadie revisó",
-    "dominantSize": 92,
-    "dominantMax": 0.34,
+    "dominantSize": 128,
+    "dominantMax": 0.4,
     "after": "**qué dicen**.",
     "afterFamily": "poppins",
-    "afterSize": 40,
-    "afterGap": 0.34,
-    "afterFill": "#cfe4fa",
+    "afterSize": 34,
+    "afterGap": 0.22,
+    "afterFill": "#ffffff",
     "selection": {
       "variant": "eight-handles",
       "padding": "standard",
@@ -138,7 +140,8 @@
     "logo": {
       "width": 0.2,
       "x": 0.5
-    }
+    },
+    "leadFill": "#ffffff"
   },
   {
     "id": "a1-muda",
