@@ -279,6 +279,21 @@ empresa— viste el uniforme, no su estilo propio. El código de prendas es el d
 **La prenda se elige por el registro de la escena, NUNCA por variedad visual:** una reunión importante en
 hoodie dice lo contrario de lo que la foto cuenta.
 
+🔴 **Este contexto se pide DISTINTO a los otros cinco.** Los contextos 1-5 son ropa propia y viven como
+referencias de outfit en `4-vestuario/`. El 6 es **ropa con marca**, y la marca no se genera: va por el
+mecanismo de kits, declarando `objetos` en la ficha con su vista **puesta**.
+
+```json
+{ "objetos": [{ "objeto": "polo-efeonce", "usoDe": "nexa" },
+              { "objeto": "lanyard-efeonce", "usoDe": "nexa" }] }
+{ "objetos": [{ "objeto": "hoodie-efeonce", "puesta": "espalda-mujer" }] }
+```
+
+**No falta producirlas: existen 19 referencias de prenda puesta** —frente, espalda, espalda-mujer y
+frente-cuerpo-b de softshell, bomber, polo y hoodie, más pruebas en persona de gorra y lanyard— de las cuales
+**dos son específicamente de Nexa**: `gorra-efeonce` con `usoDe: 'nexa'` (gorra + polo, cuerpo 3/4) y el
+lanyard determinístico con su carnet.
+
 **Los signature elements de §5.1 no cambian en este contexto.** Son de la persona, no del outfit: anillo,
 reloj, aretes y uñas siguen igual bajo el uniforme. Es lo que mantiene a Nexa reconocible vestida de Efeonce.
 
@@ -551,6 +566,7 @@ semana** · **1 pieza de contenido largo al mes** (artículo, video extendido, t
 | Expertise | Medición de impacto, estrategia de contenido, IA generativa con gobernanza, personalización a escala |
 | Motivación core | Demostrar que el marketing LATAM puede operar con la sofisticación que el talento de la región merece |
 | Rol en Efeonce | Evangelizadora del modelo, voz del ecosistema, puente entre metodología y audiencia |
+| **Cargo en el carnet** | **AI Specialist** **[operador, 2026-09-21]** — es el cargo que va impreso en la credencial; el «rol» de arriba describe qué hace, no qué dice su tarjeta. No se contradicen |
 | Piel | Oliva cálida, Fitzpatrick IV |
 | Ojos | Castaño oscuro / ámbar con luz directa, almendrados |
 | Cabello | Castaño oscuro, ondulado, bajo los hombros |
@@ -575,8 +591,8 @@ Cuatro cosas quedaron abiertas al traer el documento al repo. Están detalladas,
 
 1. ~~**Ropa corporativa Efeonce**~~ — **resuelto el 2026-09-21**: es el **contexto 6** de §5.3, por decisión
    del operador. Los contextos son situaciones y la prenda la dicta la situación.
-2. **El cargo**: el carnet del lanyard dice «AI Specialist»; §14 define el rol como «evangelizadora del
-   modelo, voz del ecosistema».
+2. ~~**El cargo**~~ — **resuelto el 2026-09-21**: el cargo del carnet es **AI Specialist**, y el «rol» de §14
+   describe qué hace, no qué dice su credencial. No eran dos versiones de lo mismo.
 3. **«Terracota»** está prohibida en ropa (§5.2) y recetada para labios (§3.1, §3.4). Mismo nombre de color
    prohibido y prescrito en el mismo documento.
 4. **§13.2 contra §11**: «no finge experiencias humanas» convive con una backstory de nueve secciones que

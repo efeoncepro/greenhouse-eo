@@ -60,7 +60,7 @@ Las ocho son **planos medios**: ninguna es de cuerpo entero.
 | Tech / Conferencias como speaker | `speaker-1` … `speaker-3` | ✓ 3 · las tres de cuerpo |
 | Behind-the-scenes / Home office | `home-1` … `home-5` | ✓ 5 · `home-2` y `home-4` de cuerpo |
 | Lifestyle / Exterior urbano | `lifestyle-1` … `lifestyle-4` | ✓ 4 · las cuatro de cuerpo · **producidas 2026-09-21** · 🔴 **no se pudieron injertar**: las 6 de B llevan gafas de sol y §5.3 las pide, así que se generaron desde las anclas — **las únicas sin deuda de acabado sintético**. `lifestyle-1` y `-3` van sin gafas para servir de referencia de identidad |
-| **Terreno y operación Efeonce** (contexto 6) | — | 🔴 **sin referencias de vestuario**. Decisión del operador 2026-09-21. Hay 6 *plates* de piezas en `2026-09-21_nexa-uniforme-{terreno,documental}/`, que son piezas, no referencias |
+| **Terreno y operación Efeonce** (contexto 6) | *(no aplica)* | ✓ **cubierto por otro mecanismo**: es ropa con marca, así que va por `objetos` + `puesta`/`usoDe`, no por `vestuario`. **19 referencias de prenda puesta** existen y están cableadas; **2 son de Nexa** (`gorra-efeonce` con `usoDe: nexa`, y el lanyard determinístico) |
 
 Cuáles ya muestran la silueta completa está declarado en `vestuarioDeCuerpo`, verificado mirando las 17 en
 hoja de contacto: si la referencia ya es de cuerpo, añadir además el cuerpo frontal mete dos cuerpos sin
@@ -177,8 +177,8 @@ Sony o Canon— son **props de escena** y se declaran en la `escena` de la ficha
 
 | Pendiente | Quién decide |
 |---|---|
-| ~~Ropa corporativa Efeonce~~ — **resuelto 2026-09-21**: es el **contexto 6** de §5.3. Los contextos son situaciones y la prenda la dicta la situación. Falta producir sus referencias de vestuario | ~~Operador~~ → Producción |
-| **El cargo**: el carnet del lanyard dice «AI Specialist»; §14 dice «evangelizadora del modelo, voz del ecosistema» | Operador |
+| ~~Ropa corporativa Efeonce~~ — **cerrado 2026-09-21**: es el **contexto 6** de §5.3 y **ya está operativo**. No necesita referencias en `4-vestuario/` porque la ropa con marca se pide por `objetos`, que es el mecanismo que existe justamente porque el emblema no se genera | ✓ |
+| ~~El cargo~~ — **resuelto 2026-09-21**: el carnet dice **AI Specialist**; el «rol» de §14 describe qué hace, no su credencial | ✓ |
 | **Reinyectar los signature elements a las ANCLAS** — o bajarlos de §5.1. Salida barata dentro del canon («editar conserva, generar reconstruye»): editar **una sola** imagen, `1-anclas/nexa-ancla-8-manos.png`, que es la vista `manos`. Re-sellar después con `pnpm foto:assets:lock` | Operador |
 | 🔴 **El DEDO del anillo no se sostiene por prompt** **[medido 2026-09-21]**. El bloque lo pide en el índice derecho de forma explícita («not on another finger») y el piloto lo puso en el **medio**. El texto SÍ ganó metal, forma y presencia —aretes de plata contra dorados en 5 de 5, reloj presente con correa navy— pero el dedo no. Pone al anillo en la clase del emblema bordado: o no se lee, o se compone, o se edita con máscara, o se baja esa precisión de §5.1 | Operador |
 | ~~Falta Lifestyle / Exterior urbano~~ — **producido 2026-09-21**, 4 referencias, USD 0,164 | ~~Producción~~ ✓ |
