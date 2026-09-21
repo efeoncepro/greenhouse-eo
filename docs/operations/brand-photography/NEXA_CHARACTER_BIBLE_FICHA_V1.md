@@ -100,7 +100,7 @@ cuatro**, y un conteo que se asienta en tres deja la cuarta fuera del checklist.
 | §5.1 pide | Observado en la muestra |
 |---|---|
 | Anillo geométrico plata mate, **índice derecho** | **0 de 5** con manos visibles. `Avatar Cuerpo Completo v2`: anillos finos **dorados** en los **anulares**. The Breakdown: dorado en anular. Contenido casual: cuadrado y plateado —lo más cercano— con piedra azul, y no en el índice |
-| Reloj muñeca izquierda, **carátula pequeña y limpia** | **1 de 5**. El único presente tiene carátula **grande y ornamentada** |
+| Reloj muñeca izquierda | **1 de 5**. 🔴 **Superado por decisión del operador 2026-09-21: el reloj es un SMARTWATCH**, no un analógico — [props tecnológicos](./NEXA_TECH_PROPS_V1.md). Toda referencia con reloj de agujas queda obsoleta |
 | Aretes siempre, **predominantemente plata** | 5 de 5 presentes ✓ · **dorados en 5 de 5** ✗ |
 | Uñas de un color, navy o nude | Una pieza con **azul-púrpura y fucsia en la misma mano** ✗ |
 
@@ -166,7 +166,14 @@ renderizarlos *«whenever the relevant body part is in frame AND large enough to
 vista `manos`, en un busto con manos en cuadro y en primeros planos — que es exactamente el **Detail Shot**
 de §10, *«donde los signature accessories brillan»*.
 
-## 5. Lo que queda abierto
+## 5. Props tecnológicos
+
+Los **objetos que Nexa toca** no están en el Bible de febrero y se canonizaron el 2026-09-21:
+[`NEXA_TECH_PROPS_V1.md`](./NEXA_TECH_PROPS_V1.md). El **smartwatch** es signature element y viaja en el
+bloque `accesorios`; el resto —iPhone, iPad, MacBook, AirPods, DJI Osmo y Mic, lavalier Rode, Shure, cuerpo
+Sony o Canon— son **props de escena** y se declaran en la `escena` de la ficha, no en el bloque de identidad.
+
+## 6. Lo que queda abierto
 
 | Pendiente | Quién decide |
 |---|---|

@@ -107,7 +107,7 @@ IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa refere
 ```
 
 ```text
-SIGNATURE ACCESSORIES (Nexa always wears these; render them whenever the relevant body part is in frame AND large enough to resolve): a geometric matte-silver statement ring on the INDEX finger of her right hand — not a plain band, not gold, not on another finger; a watch on her LEFT wrist with a navy leather or silver mesh strap and a small, clean dial; small silver earrings, geometric studs or medium hoops depending on context, never gold and never ornate. Nails are neatly kept, short to medium, in a single colour across both hands: dark navy or rosy nude.
+SIGNATURE ACCESSORIES (Nexa always wears these; render them whenever the relevant body part is in frame AND large enough to resolve): a geometric matte-silver statement ring on the INDEX finger of her right hand — not a plain band, not gold, not on another finger; a modern SMARTWATCH on her LEFT wrist — a rounded-square aluminium or titanium case with a bright rectangular screen and a plain sport or woven band in navy or graphite, NEVER a round analogue dial with hands; small silver earrings, geometric studs or medium hoops depending on context, never gold and never ornate. Nails are neatly kept, short to medium, in a single colour across both hands: dark navy or rosy nude.
 ```
 
 Orden del prompt: bloque de realismo → bloque de impacto → IDENTITY → REFERENCES → SCENE → FOREGROUND. Prompts

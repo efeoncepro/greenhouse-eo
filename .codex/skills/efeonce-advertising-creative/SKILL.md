@@ -144,6 +144,13 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
 
 ## Reglas duras
 
+- 🔴 **Los gadgets de Nexa son identidad, no atrezzo** [operador, 2026-09-21]. Su reloj es un **SMARTWATCH**,
+  nunca analógico, y su equipo es siempre tecnología premium de la **generación vigente**: iPhone, iPad con
+  Pencil, MacBook, AirPods · **DJI Osmo Pocket/Action** y **DJI Mic 3** o lavalier **Rode** para grabar ·
+  **Shure** en podcast · cuerpo **Sony α** o **Canon EOS R**. Encendidos y en uso, **ningún logotipo de
+  tercero legible**, un objeto manda por escena. Canon:
+  [props tecnológicos](../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
+
 - Usa archivos tipográficos reales y `font-synthesis: none`; no simules cursiva, bold ni Guttery con otra
   familia. Si falta el archivo autorizado, detén esa capa y usa una receta permitida que sí exista.
 - Bricolage puede dominar titulares; Poppins ordena apoyo, continuidad y énfasis breve; Guttery funciona como

@@ -344,8 +344,24 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
   Nexa `ai-generations/_identidad-nexa/1-anclas/` (resuelto por `foto:prompt`). 🔴 Las rutas anteriores
   —`nexa-the-point.png`, `nexa-the-listen.png`— **son identidad B y quedan retiradas como ancla de rostro**
   [2026-09-21]. Identidad sostenida en 5 tomas (135/24/200/50/200 mm) con el set anterior.
-- Uniforme: kit del polo como Images 4-5; **revisar el emblema letra por letra** antes de publicar.
-- Detalle: [personas, identidad y vestuario](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
+- Uniforme: kit del polo como Images 4-5; **revisar el emblema letra por letra** antes de publicar. El
+  uniforme es el **contexto 6** del wardrobe de Nexa [operador, 2026-09-21]: los contextos son situaciones y
+  la prenda la dicta la situación.
+- 🔴 **Los CUATRO signature elements de Nexa viajan en toda pieza suya** (los resuelve `foto:prompt`, no se
+  escriben a mano): anillo geométrico plata mate en el **índice derecho** · **SMARTWATCH** en la muñeca
+  izquierda —**nunca** un reloj analógico— · aretes de **plata**, nunca dorados · uñas de un solo color.
+  Medido: el bloque gana metal, forma y presencia, pero **el DEDO sólo se gana editando**, no generando.
+- 🔴 **Gadgets y equipo: siempre tecnología premium y de la generación vigente.** Apple Watch, iPhone, iPad
+  con Pencil, MacBook, Mac de escritorio, AirPods; para grabar **DJI Osmo Pocket/Action**, **DJI Mic 3** o
+  lavalier **Rode**, **Shure** en podcast, cuerpo **Sony α** o **Canon EOS R**. Encendidos y en uso, nunca de
+  adorno; ningún logotipo de tercero legible; un objeto manda por escena. Canon:
+  [props tecnológicos](../../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
+- 🔴 **Editar en otro aspect ratio REENCUADRA al sujeto.** El canon es 4:5 y el modelo sólo entrega 1:1, 2:3
+  y 3:2: hay que **padear, editar y recortar** o la cabeza sale desproporcionada. Receta medida en
+  [bloques y pipeline](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
+- Detalle: [personas, identidad y vestuario](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md)
+  · [ficha del Character Bible](../../../../docs/operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md)
+  · [el Bible completo](../../../../docs/operations/social/NEXA_CHARACTER_BIBLE_V1.md).
 
 ## 12. Flujo de producción (resumen)
 

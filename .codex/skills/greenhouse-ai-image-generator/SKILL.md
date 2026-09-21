@@ -413,6 +413,21 @@ marca), 1152×1440, `high`, ≈ USD 2–2,5 en total.
   nada sexual en el pedido. Pasó reescrito como escena de contexto explícito y vestuario declarado: «street
   festival … fully clothed tourists and locals in t-shirts, caps and sundresses». Ante un bloqueo, reescribir
   contexto y ropa; no insistir con la misma redacción ni forzar otro proveedor para saltarse el filtro.
+- 🔴 **Nexa: sus accesorios y su equipo son parte de la identidad, no atrezzo.** Los cuatro signature
+  elements viajan solos en el bloque `accesorios` de `foto:prompt` —anillo geométrico plata mate en el
+  índice derecho, **SMARTWATCH** en la muñeca izquierda (nunca analógico), aretes de plata, uñas de un
+  color— y los **gadgets de escena** se declaran en la `escena`: Apple Watch, iPhone, iPad con Pencil,
+  MacBook, AirPods, **DJI Osmo Pocket/Action**, **DJI Mic 3** o lavalier **Rode**, **Shure** en podcast,
+  cuerpo **Sony α** o **Canon EOS R**. Siempre la generación vigente, nunca un modelo descontinuado;
+  encendidos y en uso; ningún logotipo de tercero legible. Canon:
+  [props tecnológicos](../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
+- 🔴 **El DEDO del anillo se gana editando, no generando** [medido 2026-09-21]. Pedirlo por prompt en una
+  generación desde cero da metal y forma correctos pero el dedo equivocado; editar una foto existente con
+  instrucción posicional sí lo coloca. Es «editar conserva, generar reconstruye» aplicado a dos centímetros.
+- 🔴 **Editar con un `--size` de distinto aspect ratio REENCUADRA al sujeto** [medido 2026-09-21]. No
+  recorta ni rellena: cambia la escala de la persona dentro del cuadro y la cabeza sale desproporcionada. El
+  canon es 4:5 y el modelo entrega 1:1, 2:3 y 3:2, así que **hay que padear, editar y recortar**. Receta en
+  [bloques y pipeline](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 - **Nexa en estilo pintado: pedir el navy explícito.** Con la referencia de cuerpo completo
   (hoy `ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png`; en esa corrida era
   `2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`) + la vista frontal transparente

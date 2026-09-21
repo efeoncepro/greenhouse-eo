@@ -282,6 +282,19 @@ conAssets('foto:prompt · identidad', () => {
     }
   })
 
+  // El bloque de accesorios NO estaba cubierto: al cambiar el reloj por un smartwatch, los dos docs del
+  // canon quedaron con el texto viejo y ningún gate lo detectó. Mismo contrato que IDENTITY.
+  it('el bloque de accesorios es verbatim el del canon', () => {
+    const doc = readFileSync(DOC, 'utf8')
+
+    const emitido = construirPrompt({ ...fichaBase, identidad: ['nexa'] })
+      .prompt.split('\n\n')
+      .find((b: string) => b.startsWith('SIGNATURE ACCESSORIES'))
+
+    expect(emitido).toBeDefined()
+    expect(doc).toContain(emitido)
+  })
+
   it('aborta con una persona desconocida en vez de generar un desconocido', () => {
     expect(() => construirPrompt({ ...fichaBase, identidad: ['juan'] })).toThrow(/desconocida/)
   })

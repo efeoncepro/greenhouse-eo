@@ -221,7 +221,7 @@ recurrentes funcionan como **anclas visuales que la identifican aunque no se le 
 | Elemento | Especificación |
 |---|---|
 | **Anillo statement** | Índice de la **mano derecha**. Geométrico, plata mate. No ostentoso pero con diseño. Aparece en todo: primer plano, medio cuerpo, al gesticular. **Ancla visual más fuerte — incluir en cada prompt** |
-| **Reloj** | **Muñeca izquierda.** Correa navy de cuero o mesh metálica plateada. Carátula pequeña y limpia. Contrapunto femenino-elegante al anillo |
+| **Reloj** | 🔴 **Muñeca izquierda — SMARTWATCH** **[adición del operador, 2026-09-21]**. Caja cuadrada de esquinas redondeadas en aluminio o titanio, pantalla rectangular, correa deportiva o tejida en navy o grafito. *El original de febrero decía «correa navy de cuero o mesh metálica plateada, carátula pequeña y limpia»: un reloj analógico contradice a un personaje cuyo valor §1.3 es «tecnología con criterio»* |
 | **Aretes** | Siempre presentes, variables por contexto: desde studs geométricos pequeños (profesional) hasta aros medianos (casual). Predominantemente plata o con detalles en azul. Nunca recargados |
 | **Uñas** | Siempre arregladas, cortas-medianas. Default navy oscuro o nude rosado. Para contenido bold: naranja o fucsia de la paleta |
 
@@ -292,6 +292,25 @@ reloj, aretes y uñas siguen igual bajo el uniforme. Es lo que mantiene a Nexa r
   mucha calidad que se le suba.
 
 ---
+
+### 🔴 §5.4 — Props y ecosistema tecnológico **[adición del operador, 2026-09-21 · no está en el original de febrero]**
+
+> *«Nexa es tecnológica… sus accesorios deben ser siempre tecnología premium»*. El documento de febrero cubre
+> joyas y ropa, pero no **los objetos que Nexa toca**. Canon completo, con reglas de escena y qué NO es
+> Nexa: [`NEXA_TECH_PROPS_V1.md`](../brand-photography/NEXA_TECH_PROPS_V1.md).
+
+**La regla antes que la lista: siempre la generación vigente, nunca un modelo descontinuado.** Se nombran
+**familias**, no números de modelo, para que no envejezca.
+
+| Lleva encima | Usa para trabajar |
+|---|---|
+| **Apple Watch** (reemplaza el reloj de §5.1) · **iPhone Pro** · **AirPods Pro** o **Max** · **iPad Pro + Pencil** | **MacBook Pro** · **Mac Studio** o **iMac** · cuerpo **Sony α** o **Canon EOS R** vigente · **DJI Osmo Pocket** y **Osmo Action** · **DJI Mic 3** o lavalier **Rode** · micrófono **Shure** en podcast |
+
+**Cómo entran:** encendidos y en uso, nunca de adorno · la silueta sí, el logotipo de tercero **nunca
+legible** · premium se lee en el material, no en el precio · un objeto manda por escena.
+
+**No es decoración:** §1.3 es «tecnología con criterio» y §11.8 dice que Nexa sabe que ella misma es producto
+de IA gobernada. Los objetos son donde eso se ve sin decirlo.
 
 ## 6. Expresiones canónicas
 

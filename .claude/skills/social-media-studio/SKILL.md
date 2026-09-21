@@ -44,6 +44,13 @@ Cuando el pedido sea para vender, diseñar o entregar el servicio de Efeonce, es
 
 La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels, community, Social Search y Run & Gun son capacidades dentro de ese sistema, no sustitutos del posicionamiento.
 
+- 🔴 **Los gadgets de Nexa son identidad, no atrezzo** [operador, 2026-09-21]. Su reloj es un **SMARTWATCH**,
+  nunca analógico, y su equipo es siempre tecnología premium de la **generación vigente**: iPhone, iPad con
+  Pencil, MacBook, AirPods · **DJI Osmo Pocket/Action** y **DJI Mic 3** o lavalier **Rode** para grabar ·
+  **Shure** en podcast · cuerpo **Sony α** o **Canon EOS R**. Encendidos y en uso, **ningún logotipo de
+  tercero legible**, un objeto manda por escena. Canon:
+  [props tecnológicos](../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
+
 ## 1. Cómo se usa esta skill (router)
 
 Para fotohistorias, globos y PDF social, cargar
