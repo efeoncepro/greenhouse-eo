@@ -1,15 +1,15 @@
 [
   {
-    "id": "b1-feed",
+    "id": "c2-actionable",
     "dominante": [
-      "No estabas."
+      "No pudo."
     ],
     "contraste": {
-      "etiqueta": 11.98,
-      "entrada": 11.38,
-      "dominante": 8.65,
-      "cierre-frase": 9.15,
-      "logo": 6.78
+      "etiqueta": 12.25,
+      "entrada": 12.16,
+      "dominante": 10.34,
+      "cierre-frase": 11.59,
+      "logo": 16.37
     },
     "gapsTinta": [
       {
@@ -45,123 +45,23 @@
           "id": "local"
         },
         {
-          "id": "seo",
+          "id": "dev",
           "labelBounds": {
-            "left": 806.97,
-            "top": 359.583,
-            "right": 890.209,
-            "bottom": 410.11
+            "left": 642.481,
+            "top": 380.758,
+            "right": 726.355,
+            "bottom": 431.285
           }
         }
       ]
     }
   },
   {
-    "id": "b2-stories",
-    "dominante": [
-      "La citan."
-    ],
+    "id": "c1-muda",
     "contraste": {
-      "entrada": 16.02,
-      "dominante": 13.89,
-      "cierre-frase": 15.62,
-      "logo": 11.23
+      "logo": 17.84
     },
-    "gapsTinta": [
-      {
-        "entre": "entrada→dominante",
-        "px": 27,
-        "ratioDominante": 0.142
-      },
-      {
-        "entre": "dominante→cierre",
-        "px": 21,
-        "ratioDominante": 0.111
-      }
-    ],
-    "seleccion": {
-      "selection": {
-        "variant": "eight-handles",
-        "padding": "standard",
-        "paddingRatio": {
-          "inline": 0.012,
-          "block": 0.01
-        },
-        "overlay": "subtle",
-        "overlayOpacity": 0.1,
-        "overlayBlendMode": "luminosity"
-      },
-      "cursores": [
-        {
-          "id": "local"
-        },
-        {
-          "id": "data",
-          "labelBounds": {
-            "left": 648.185,
-            "top": 478.058,
-            "right": 744.327,
-            "bottom": 528.585
-          }
-        },
-        {
-          "id": "nexa",
-          "labelBounds": {
-            "left": 1003.392,
-            "top": 1738.112,
-            "right": 1102.918,
-            "bottom": 1788.639
-          }
-        }
-      ]
-    }
-  },
-  {
-    "id": "b3-display",
-    "dominante": [
-      "Nadie revisó"
-    ],
-    "contraste": {
-      "etiqueta": 14.99,
-      "entrada": 14.41,
-      "dominante": 13.12,
-      "cierre-frase": 14.88,
-      "logo": 11.88
-    },
-    "gapsTinta": [
-      {
-        "entre": "etiqueta→entrada",
-        "px": 26,
-        "ratioDominante": 0.203
-      },
-      {
-        "entre": "entrada→dominante",
-        "px": 33,
-        "ratioDominante": 0.258
-      },
-      {
-        "entre": "dominante→cierre",
-        "px": 28,
-        "ratioDominante": 0.219
-      }
-    ],
-    "seleccion": {
-      "selection": {
-        "variant": "eight-handles",
-        "padding": "standard",
-        "paddingRatio": {
-          "inline": 0.012,
-          "block": 0.01
-        },
-        "overlay": "subtle",
-        "overlayOpacity": 0.1,
-        "overlayBlendMode": "luminosity"
-      },
-      "cursores": [
-        {
-          "id": "local"
-        }
-      ]
-    }
+    "gapsTinta": [],
+    "seleccion": null
   }
 ]

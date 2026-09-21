@@ -1,0 +1,15 @@
+{
+  "id": "c2-pov-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "pov",
+  "objetos": ["polo-efeonce", "chaqueta-bomber-efeonce"],
+  "escena": "SCENE (Efeonce meeting room, Santiago, late afternoon): two people sit on the far side of the table facing the empty chair the camera occupies, caught at the moment one of them turns a laptop around so its screen faces that seat. Both are wearing the Efeonce bomber jacket over the Efeonce navy piqué polo, exactly as in the references, with the embroidered chest marks clearly in frame. The laptop's cool blue glow falls up onto their hands and the table between them. A hard low sun through a window on the left rakes across the table surface and leaves the far side of the room in open shadow. Above them the poured-concrete ceiling soffit is one smooth unbroken surface in deep shadow, with no lamp, no beam and no bright spot in it. 35mm lens at f/2.8 at seated eye level.",
+  "reservas": {
+    "texto": { "muro": "the smooth poured-concrete ceiling soffit above the table", "tinta": "blanca" }
+  },
+  "lecho": {
+    "objeto": "the near edge of the meeting table in the immediate foreground, running unbroken across the whole width of the frame",
+    "tono": "DARK near-black oak in deep shadow, matte, its grain still faintly visible, outside the light"
+  }
+}

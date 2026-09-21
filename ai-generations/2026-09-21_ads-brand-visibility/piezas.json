@@ -107,21 +107,21 @@
     "plate": "plates/b3-larga-169-plate.png",
     "align": "left",
     "top": 0.13,
-    "textWidth": 0.4,
+    "textWidth": 0.44,
     "label": "BRAND VISIBILITY GRADER",
-    "labelSize": 28,
-    "labelGap": 0.2,
+    "labelSize": 40,
+    "labelGap": 0.16,
     "lead": "**ChatGPT**, **Perplexity** y **Gemini** ya describen tu marca.",
     "leadFamily": "bricolage",
-    "leadSize": 36,
-    "leadGap": 0.26,
+    "leadSize": 52,
+    "leadGap": 0.22,
     "dominant": "Nadie revisó",
-    "dominantSize": 128,
-    "dominantMax": 0.4,
+    "dominantSize": 150,
+    "dominantMax": 0.42,
     "after": "**qué dicen**.",
     "afterFamily": "poppins",
-    "afterSize": 34,
-    "afterGap": 0.22,
+    "afterSize": 48,
+    "afterGap": 0.18,
     "afterFill": "#ffffff",
     "selection": {
       "variant": "eight-handles",
@@ -144,6 +144,55 @@
     "leadFill": "#ffffff"
   },
   {
+    "id": "c2-actionable",
+    "plate": "plates/c2-pov-45-plate.png",
+    "align": "left",
+    "top": 0.045,
+    "textWidth": 0.84,
+    "label": "BRAND VISIBILITY GRADER",
+    "labelSize": 24,
+    "labelGap": 0.12,
+    "lead": "Un agente entró a tu sitio a comprar.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 44,
+    "leadGap": 0.15,
+    "dominant": "No pudo.",
+    "dominantSize": 175,
+    "dominantMax": 0.62,
+    "after": "Y no **volvió**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 40,
+    "afterGap": 0.12,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.7,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        },
+        {
+          "id": "dev",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Dev",
+          "who": "role",
+          "color": "#0375db"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
+  },
+  {
     "id": "a1-muda",
     "plate": "plates/a1-marcado-45-plate.png",
     "logo": {
@@ -154,6 +203,14 @@
   {
     "id": "a2-muda",
     "plate": "plates/a2-proyeccion-45-plate.png",
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
+  },
+  {
+    "id": "c1-muda",
+    "plate": "plates/c1-oclusion-45-plate.png",
     "logo": {
       "width": 0.2,
       "x": 0.5

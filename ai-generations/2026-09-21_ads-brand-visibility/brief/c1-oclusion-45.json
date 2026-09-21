@@ -1,0 +1,16 @@
+{
+  "id": "c1-oclusion-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "oclusion",
+  "ocluye": "a large sheet of tracing paper hanging from a clamp, translucent and milky, covered in printed lines of text that read as grey texture",
+  "objetos": ["polo-efeonce", "chaqueta-bomber-efeonce"],
+  "escena": "SCENE (Efeonce studio, Santiago, late afternoon): a woman stands at a worktable and looks STRAIGHT INTO THE LENS through the gap beside the hanging sheet, steady and unhurried, caught at the instant the sheet swings a little in the draught. She is wearing the Efeonce bomber jacket over the Efeonce navy piqué polo, both exactly as in the references, with the jacket's embroidered chest mark clearly in frame. A hard low sun from a window on the left rakes across her and throws the sheet's shadow over the wall behind. A cool blue glow from a monitor low at the table edge picks out the underside of the paper. Behind her head the plaster wall is one smooth unbroken surface in deep shadow, with nothing hanging on it. 85mm lens at f/2.",
+  "reservas": {
+    "texto": { "muro": "the smooth plaster studio wall behind her", "tinta": "blanca" }
+  },
+  "lecho": {
+    "objeto": "a dark equipment road case standing in the immediate foreground, its top edge running unbroken across the whole width of the frame",
+    "tono": "DARK charcoal road-case panel in deep shadow, matte, its texture still faintly visible, far outside the light"
+  }
+}
