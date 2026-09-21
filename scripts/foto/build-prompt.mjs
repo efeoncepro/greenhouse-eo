@@ -845,6 +845,31 @@ const REGISTRO_PRENDA = {
   'lanyard-efeonce': ['oficina', 'reunion', 'terreno']
 }
 
+// EMBLEMA EN PRENDA: el modelo NO lo reproduce fiel. Lo sabe el canon desde el principio —por eso la
+// firma se COMPONE y no se genera, y por eso el carnet del lanyard sale de `arte-carnet.mjs`—, y cada
+// kit de prenda ya lo dice en su instrucción («never let the model spell the emblem by itself —
+// inspect it at 100% before publishing»). Pero decirlo en el prompt sólo se lo dice AL MODELO.
+//
+// Caso fuente 2026-09-20: cinco piezas con polo, gorra y chaqueta salieron con una espiral inventada
+// en lugar del emblema —sin «e», sin «f», sin nave ni órbita— y se reportaron como «coherentes y
+// reconocibles» porque el QA se hizo sobre una hoja de contacto de 520 px, donde un bordado no se lee.
+// La instrucción existía; lo que faltaba era que ALGUIEN la pusiera delante de quien cierra.
+const PRENDAS_CON_EMBLEMA = ['polo-efeonce', 'hoodie-efeonce', 'gorra-efeonce', 'chaqueta-softshell-efeonce', 'chaqueta-bomber-efeonce']
+
+export const auditarEmblema = objetos => {
+  const prendas = (objetos ?? []).filter(o => PRENDAS_CON_EMBLEMA.includes(o))
+
+  if (prendas.length === 0) return []
+
+  return [
+    `lleva emblema bordado (${prendas.join(', ')}) y el modelo NO lo reproduce fiel: inventa una forma parecida. ` +
+      'ANTES de dar la pieza por buena, amplía el bordado con `pnpm foto:emblema <plate.png>` y compáralo ' +
+      'letra por letra contra el kit: «e», «f», nave, órbita con sus cortes, tres ventanas. Una letra distinta ' +
+      'obliga a regenerar. Si el emblema no se puede sostener, muestra la prenda donde no se lea (de espaldas, ' +
+      'en sombra, a escala pequeña) en vez de publicar un logo inventado.'
+  ]
+}
+
 export const auditarRegistroVestuario = objetos => {
   const prendas = (objetos ?? []).filter(o => REGISTRO_PRENDA[o])
 
@@ -1184,6 +1209,7 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
 
     avisos.push(...auditarReservas(ficha))
     avisos.push(...auditarRegistroVestuario(ficha.objetos))
+    avisos.push(...auditarEmblema(ficha.objetos))
 
     if (vestuario) avisos.push(vestuario)
 

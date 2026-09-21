@@ -293,3 +293,34 @@ personas de Efeonce.
   su arte se compone con el kit —nunca se le pide al modelo que invente el carnet.
 - Sigue vigente la regla anterior: **con identidad declarada, el vestuario se declara en la escena**. `ignore
   their clothing` no alcanza — el modelo copia la ropa de las referencias si no se le dice qué lleva.
+
+### El emblema bordado NO se genera **[medido 2026-09-20]**
+
+**El modelo no reproduce el emblema: inventa uno distinto cada vez.** Medido sobre la tanda
+`2026-09-20_vestuario-registros/`: tres prendas dieron **tres emblemas diferentes entre sí y ninguno
+era el de Efeonce** — una espiral tipo arroba en un polo, dos barras verticales en otro, otras dos
+distintas en la gorra. Ninguno tiene «e», «f», nave ni órbita.
+
+**Es el mismo hecho que ya gobierna la firma**, sólo que nadie lo había escrito para las prendas: la
+firma se **compone** y no se genera precisamente porque el modelo no sostiene una marca. Un bordado
+pequeño es el caso más fácil de que la invente y el más difícil de notar.
+
+**Cómo se trabaja una prenda con emblema, en orden de preferencia:**
+
+1. **Que no se lea.** La prenda de espaldas, en sombra, a escala pequeña o cortada por el encuadre. Es
+   la salida más limpia y casi siempre suficiente: la prenda se reconoce por corte y color.
+2. **Componerlo después**, como la firma y como el carnet del lanyard (`arte-carnet.mjs`).
+3. **Editar con máscara** sobre la zona del emblema, partiendo del kit.
+
+**Nunca**: publicar el emblema tal como sale del generador.
+
+> **Por qué falló el control que ya existía.** La instrucción estaba en el kit —«never let the model
+> spell the emblem by itself — inspect it at 100% before publishing»— y se emitía en cada prompt. Pero
+> emitirla en el prompt **se lo dice al modelo**, no a quien cierra; y el QA se hizo sobre una hoja de
+> contacto de 520 px de alto, donde un bordado no se lee. El mecanismo existía y dependía de que
+> alguien se acordara.
+>
+> Desde el 2026-09-20 hay dos: `pnpm foto:prompt` **avisa** cuando la ficha pide una prenda con
+> emblema, y **`pnpm foto:emblema <plate.png>`** recorta y amplía las zonas del bordado en una hoja
+> para mirarlas. No deciden —un emblema se compara letra por letra contra el kit, no por píxeles—:
+> quitan la excusa de no haberlo mirado.

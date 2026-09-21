@@ -19,6 +19,7 @@ pnpm foto:doctor                    # ¿puede esta máquina generar? seis cheque
 pnpm foto:prompt <ficha.json>       # arma el prompt desde la ficha
 pnpm foto:validar <plate.png>       # mide las seis reservas sobre el plate limpio
 pnpm foto:componer <piezas.json>    # la CAPA GRÁFICA encima: voces, selección AXIS, firma y QA
+pnpm foto:emblema <plate.png>       # amplía el bordado para mirarlo al 100% (no decide: quita la excusa)
 ```
 
 **Dos categorías de pieza, y la diferencia se decide ANTES de generar:**
@@ -51,6 +52,11 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 
 - **Identidad:** el set de Julio es `2026-09-20_identidad-julio-nexa/refs-aprobadas/` (+ 6 ángulos derivados).
   El set viejo de `2026-09-17_equipo-vestuario/` **idealizaba el rostro** y arrastraba deriva.
+- 🔴 **El emblema bordado NO se genera.** Medido 2026-09-20: tres prendas dieron **tres emblemas distintos y
+  ninguno era el de Efeonce** (una espiral, dos barras, otras dos). Es el mismo hecho que gobierna la firma. En
+  orden: que **no se lea** (de espaldas, en sombra, pequeño) · **componerlo** después · **editar con máscara**.
+  **NUNCA** publicar el emblema tal como sale del generador, y **NUNCA** cerrar sin `pnpm foto:emblema`: el QA
+  sobre una hoja de contacto no sirve, a 520 px un bordado no se lee y pasa por bueno.
 - **Código de vestuario Efeonce** **[operador, 2026-09-20]**: la prenda dice el REGISTRO de la escena.
   **Polera piqué** = oficina casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno ·
   **Hoodie** = terreno · **Lanyard y carnet** = transversales, van en casual y en formal por igual. Se elige por

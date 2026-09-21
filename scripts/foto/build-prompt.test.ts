@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest'
 import {
   auditarAcentoDeTanda,
   auditarColor,
+  auditarEmblema,
   auditarEscena,
   auditarRegistroVestuario,
   auditarReservas,
@@ -857,5 +858,29 @@ describe('código de vestuario — la prenda dice el registro', () => {
   it('una sola prenda nunca se contradice a sí misma', () => {
     expect(auditarRegistroVestuario(['hoodie-efeonce'])).toHaveLength(0)
     expect(auditarRegistroVestuario([])).toHaveLength(0)
+  })
+})
+
+describe('emblema bordado — el modelo no lo reproduce', () => {
+  // 2026-09-20: tres prendas dieron tres emblemas distintos y ninguno era el de Efeonce. La
+  // instrucción del kit existía y se emitía en el prompt, pero eso se lo dice AL MODELO: quien
+  // cierra necesitaba el aviso delante. El verificador real es mirar el bordado ampliado
+  // (`pnpm foto:emblema`), que este aviso es el que lo pone en el camino.
+  it('avisa por cada prenda con emblema y manda a ampliarlo', () => {
+    const aviso = auditarEmblema(['polo-efeonce']).join(' ')
+
+    expect(aviso).toMatch(/NO lo reproduce fiel/)
+    expect(aviso).toMatch(/pnpm foto:emblema/)
+    expect(aviso).toMatch(/letra por letra/)
+  })
+
+  it('cubre las cinco prendas con bordado', () => {
+    for (const p of ['polo-efeonce', 'hoodie-efeonce', 'gorra-efeonce', 'chaqueta-softshell-efeonce', 'chaqueta-bomber-efeonce']) {
+      expect(auditarEmblema([p])).toHaveLength(1)
+    }
+  })
+
+  it('no opina sobre objetos sin bordado', () => {
+    expect(auditarEmblema(['nave-efeonce', 'lanyard-efeonce'])).toHaveLength(0)
   })
 })

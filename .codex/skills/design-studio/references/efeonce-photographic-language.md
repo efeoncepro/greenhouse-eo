@@ -182,6 +182,11 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 > terceros y producía un mundo sin letras que delata la generación: «con lomos de libros y etiquetas en cuadro,
 > cero texto legible es estadísticamente imposible». Corregido en `bloque-realismo-v3`.
 
+> 🔴 **El emblema bordado NO se genera** **[medido 2026-09-20]**: tres prendas dieron tres emblemas distintos y
+> ninguno era el de Efeonce. Mismo hecho que gobierna la firma. En orden: que **no se lea**, **componerlo**
+> después, o **editar con máscara**. **NUNCA** publicarlo como sale del generador; **NUNCA** cerrar sin
+> `pnpm foto:emblema <plate.png>`, que lo amplía — a tamaño de feed un bordado inventado pasa por bueno.
+
 > **Código de vestuario** **[operador, 2026-09-20]**: la prenda dice el REGISTRO. **Polera piqué** = oficina
 > casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno · **Hoodie** = terreno ·
 > **Lanyard y carnet** = transversales, van igual en casual y en formal. Se elige por el registro de la escena,
