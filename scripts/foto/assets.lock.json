@@ -190,6 +190,14 @@
       "rol": "kit:chaqueta-softshell-efeonce/abierta",
       "sha256": "6687b27d43aee92acc3b3b095dead475babee8cb86802016d0f648d5c2f45c62"
     },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-02-espalda-1024x1024-v02-fondo-estudio.png": {
+      "rol": "kit:chaqueta-softshell-efeonce/espalda",
+      "sha256": "0e4b4634162b39a8fadf976865627f418ee6c19966911711a972d1845a9d30f8"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-14-puesto-frente-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-softshell-efeonce/defecto",
+      "sha256": "a10cb56bae90155270d4ffd6fa0703a6ee0e62c22672e1bc1be43b488daccede"
+    },
     "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:chaqueta-bomber-efeonce/frente",
       "sha256": "768de3537fb362456ce9c20595a958551bfe89883446cc6455d5e6d70b8a44ff"
@@ -201,6 +209,10 @@
     "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
       "rol": "kit:chaqueta-bomber-efeonce/tres-cuartos-izq",
       "sha256": "b3f4269bb674804fd9b61d5247c6d9c41b7efc0750091a405240e6ecb609a47b"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-14-puesto-frente-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-bomber-efeonce/defecto",
+      "sha256": "b25ae2c2db7c2f5344db9fc246f21d278dc7a63c5e3087735432544f7ededdb6"
     },
     "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:gorra-efeonce/frente",
@@ -230,6 +242,14 @@
       "rol": "kit:gorra-efeonce/trucker-navy",
       "sha256": "c6f2aa8c617838ca59955115baa570ec74b55168104e097439a817243ea19213"
     },
+    "ai-generations/2026-09-17_gorra-efeonce/out/prueba-julio.png": {
+      "rol": "uso:gorra-efeonce/persona:julio",
+      "sha256": "051cdbfc7660a6fac1d4c4d6c06fe6735ad43bd4986f71f3f61c6101ceb5b14b"
+    },
+    "ai-generations/2026-09-17_gorra-efeonce/out/prueba-nexa.png": {
+      "rol": "uso:gorra-efeonce/persona:nexa",
+      "sha256": "6a9761c1fe023698fedc1160ba6e5f5b1ed8ad6bfc401e1f5f4d810ba47a9db8"
+    },
     "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-01-conjunto-1200x1600-v01-transparente.png": {
       "rol": "kit:lanyard-efeonce/conjunto",
       "sha256": "db2c460171134eac45581d29f81a924e293efafdd3e93a648ebcc2bbf550f232"
@@ -242,17 +262,45 @@
       "rol": "kit:lanyard-efeonce/portacarnet-vacio",
       "sha256": "b3fbafdd8519d95b4f8a6cdd1c2be2a21e3a030862463a4ccf9884e31760a838"
     },
+    "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-15-conjunto-deterministico-nexa-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:lanyard-efeonce/persona:nexa",
+      "sha256": "adc49569110943463c1f0840df41d1544ccfadf8f8287c32b2e6c983a78ebd28"
+    },
+    "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-14-conjunto-deterministico-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:lanyard-efeonce/persona:generico",
+      "sha256": "62edf6a5a6776af55cff037a050986dd66a7a9ae727070f80f671b6671a55d66"
+    },
     "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-01-frente-1600x1600-v01-transparente.png": {
-      "rol": "kit:polo-efeonce/frente",
+      "rol": "kit:polo-efeonce/navy/frente",
       "sha256": "16c4a977d0283f0b8f1e4b0ad7fc0341173f303c9269124e6909d6ff46952263"
     },
     "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-02-espalda-1600x1600-v01-transparente.png": {
-      "rol": "kit:polo-efeonce/espalda",
+      "rol": "kit:polo-efeonce/navy/espalda",
       "sha256": "66d232d457e44c21e872e14101a6b48e0d85ecddff1100b46030af3a3cf7ba5e"
     },
     "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
-      "rol": "kit:polo-efeonce/tres-cuartos-izq",
+      "rol": "kit:polo-efeonce/navy/tres-cuartos-izq",
       "sha256": "a623a14b4ab8c08c076509ae355dd782b95da992ade018c6aac527ebcb6b35f0"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-01-frente-1600x1600-v01-transparente.png": {
+      "rol": "kit:polo-efeonce/blanco/frente",
+      "sha256": "dbcf1f1ca14e354c21873d521f93b929f18591992a709979cc6f40e020d6ba3a"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-02-espalda-1600x1600-v01-transparente.png": {
+      "rol": "kit:polo-efeonce/blanco/espalda",
+      "sha256": "a6b2294ab026548e32e4e9c9ea11afeb4085c50fa3cc08aab840aa2bbac4543c"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
+      "rol": "kit:polo-efeonce/blanco/tres-cuartos-izq",
+      "sha256": "49321dc2ea66b8dc119377140c10d665f89e9f211353e6f0ad966cc2abab5057"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-13-puesto-frente-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:polo-efeonce/color:navy",
+      "sha256": "4c9ae41f72fbe82500cc6f0d603515f58a3b1c607163b8880fcaa47e91dc7d4d"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-13-puesto-frente-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:polo-efeonce/color:blanco",
+      "sha256": "5788d3c98db35d240db6f41a91c7de2bbef3fd10c9aaa02e78ea23d79d94a422"
     },
     "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:hoodie-efeonce/frente",
@@ -265,6 +313,10 @@
     "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-03-tres-cuartos-izquierda-1600x1600-v01-transparente.png": {
       "rol": "kit:hoodie-efeonce/tres-cuartos-izq",
       "sha256": "d505b3b621969df5704499ff28866138b5436646105f5da5026efd11734ec717"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-15-puesto-frente-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:hoodie-efeonce/defecto",
+      "sha256": "4586cbb398d0f7387b808c89ae33f36ce9b9e72d66fbd5cad737b5350172c744"
     }
   }
 }

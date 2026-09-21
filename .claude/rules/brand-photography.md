@@ -219,11 +219,16 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   lanyard determinístico se entregó como `1024x1536` y el `patron` del kit está fijo a `1200x1600`: el
   nombre nunca calza, así que las vistas 14 y 15 no podían declararse en `vistas` aunque existieran en
   `final/`. Por eso el lanyard existía desde esa misma mañana y una sesión lo «redescubrió» por la tarde —
-  **no fue descuido de quien lo produjo**. Se cableó por `usoPorPersona`, que sí acepta el nombre completo.
-  Al agregar una vista a un kit, **verifica que el nombre calce con su `patron`** o decláralo por el otro
-  camino. **[pendiente]** `pnpm foto:assets:check` **no sella los assets de uso**: recorre `persona.refs`,
-  `persona.vistas` y las vistas de kit por patrón, pero ni `assetDeUso` ni `usoPorPersona` — que son los que
-  viajan a las escenas. Si alguien los sustituye, ningún gate lo detecta.
+  **no fue descuido de quien lo produjo**. **Cerrado el mismo día en el MECANISMO**: una vista puede
+  declararse por nombre completo con **`vistasPorNombre`**, que gana sobre el `patron`. El hueco era más
+  ancho de lo reportado — le pasaba igual a la **espalda bordada de la softshell** (`1024x1024`, `v02`),
+  que existía en `final/` mientras el catálogo seguía sirviendo la estampada. Al agregar una vista a un
+  kit, **verifica que el nombre calce con su `patron`**; si no calza, decláralo en `vistasPorNombre` —
+  nunca dejes el archivo bueno en la carpeta esperando que alguien lo encuentre.
+  **Cerrado también el sellador**: `rutasDeclaradas()` recorría sólo `objeto.patron`, así que ni
+  `assetDeUso`, ni `usoPorPersona`/`usoPorColor` —la pieza PUESTA, la que viaja a la escena—, ni las
+  vistas de `patronPorColor` entraban al lock; sustituir cualquiera de esos archivos no despertaba
+  ningún gate. Hoy sella **las cuatro formas** en que un kit declara un archivo: **66 → 79 assets**.
 - **Código de vestuario Efeonce** **[operador, 2026-09-20]**: la prenda dice el REGISTRO de la escena.
   **Polera piqué** = oficina casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno ·
   **Hoodie** = terreno · **Lanyard y carnet** = transversales, van en casual y en formal por igual. Se elige por

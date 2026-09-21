@@ -404,6 +404,14 @@ export const OBJETOS = {
       lateral: '05-lateral',
       abierta: '06-cierre-abierto'
     },
+    // La espalda del v01 lleva la marca ESTAMPADA, y la softshell es tela técnica: se borda (corrección
+    // del operador, 2026-09-21). El v02 corregido no calza con el `patron` —salió `1024x1024` y `v02`—,
+    // así que sin esta línea el catálogo seguía sirviendo la prenda mal fabricada aunque el archivo
+    // bueno estuviera al lado. Las otras espaldas (`10-plano-espalda`, `15/17-puesto-espalda`) y las tres
+    // del bomber siguen estampadas: no hay vista corregida que declarar todavía.
+    vistasPorNombre: {
+      espalda: 'efeonce-chaqueta-softshell-02-espalda-1024x1024-v02-fondo-estudio.png'
+    },
     vistaDefecto: 'frente',
     assetDeUso: 'efeonce-chaqueta-softshell-14-puesto-frente-1200x1600-v01-fondo-estudio.png',
     macroEmblema: 'efeonce-chaqueta-softshell-11-macro-bordado-1600x1600-v01-fondo-estudio.png',
@@ -586,11 +594,16 @@ function resolverObjetos(ficha, desde) {
 
     const vista = vistaPedida ?? objeto.vistaDefecto
     const sufijo = objeto.vistas[vista]
+    // Una vista puede declararse por NOMBRE COMPLETO cuando el archivo no calza con el `patron` del kit
+    // (otra resolución, otra versión). Sin esta salida, una vista corregida existe en `final/` y el
+    // catálogo sigue sirviendo la vieja sin que nada lo delate: le pasó al lanyard determinístico y a la
+    // espalda bordada de la softshell, el mismo 2026-09-21. Gana sobre el patrón: es la vista correcta.
+    const porNombre = objeto.vistasPorNombre?.[vista]
 
-    if (!sufijo) {
-      throw new Error(
-        `La vista "${vista}" no existe para "${clave}". Vistas del kit: ${Object.keys(objeto.vistas).join(', ')}.`
-      )
+    if (!sufijo && !porNombre) {
+      const disponibles = [...Object.keys(objeto.vistas), ...Object.keys(objeto.vistasPorNombre ?? {})]
+
+      throw new Error(`La vista "${vista}" no existe para "${clave}". Vistas del kit: ${disponibles.join(', ')}.`)
     }
 
     const color = (typeof pedido === 'string' ? null : pedido?.color) ?? objeto.colorDefecto
@@ -616,7 +629,11 @@ function resolverObjetos(ficha, desde) {
       )
     }
 
-    const ref = enUso ? path.normalize(objeto.base + enUso) : objeto.base + patron.replace('<V>', sufijo)
+    const ref = enUso
+      ? path.normalize(objeto.base + enUso)
+      : porNombre
+        ? path.normalize(objeto.base + porNombre)
+        : objeto.base + patron.replace('<V>', sufijo)
 
     if (!existsSync(path.join(raiz, ref))) {
       throw new Error(

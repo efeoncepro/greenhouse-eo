@@ -18,7 +18,18 @@ import { OBJETOS, PERSONAS } from './build-prompt.mjs'
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const LOCK = path.join(raiz, 'scripts/foto/assets.lock.json')
 
-/** Todo lo que el catálogo declara: referencias de personas, sus vistas, y cada vista de cada kit. */
+/**
+ * Todo lo que el catálogo puede pedirle al disco: referencias de personas, sus vistas, y de cada kit
+ * **las cuatro formas** en que declara un archivo — por patrón, por patrón de color, por nombre
+ * completo y como asset de uso.
+ *
+ * 🔴 Recorrer sólo `objeto.patron` dejaba fuera justo lo que viaja a las escenas: `assetDeUso`,
+ * `usoPorPersona` y `usoPorColor` son la prenda PUESTA, y las vistas de `patronPorColor` y
+ * `vistasPorNombre` no pasan por el patrón por defecto. Medido el 2026-09-21: cablear el lanyard
+ * determinístico dejó el lock en 66 sin moverse. Sustituir cualquiera de esos archivos no despertaba
+ * ningún gate, que es exactamente el fallo para el que existe este lock. Hallazgo de la sesión
+ * «Poses de Nexa en advertising y design studio».
+ */
 export function rutasDeclaradas() {
   const rutas = new Map()
 
@@ -28,12 +39,33 @@ export function rutasDeclaradas() {
   }
 
   for (const [clave, objeto] of Object.entries(OBJETOS)) {
-    for (const [vista, sufijo] of Object.entries(objeto.vistas)) {
-      rutas.set(objeto.base + objeto.patron.replace('<V>', sufijo), `kit:${clave}/${vista}`)
+    const patrones = { '': objeto.patron, ...(objeto.patronPorColor ?? {}) }
+
+    for (const [color, patron] of Object.entries(patrones)) {
+      for (const [vista, sufijo] of Object.entries(objeto.vistas)) {
+        const etiqueta = color ? `kit:${clave}/${color}/${vista}` : `kit:${clave}/${vista}`
+
+        rutas.set(objeto.base + patron.replace('<V>', sufijo), etiqueta)
+      }
+    }
+
+    for (const [vista, nombre] of Object.entries(objeto.vistasPorNombre ?? {})) {
+      rutas.set(path.normalize(objeto.base + nombre), `kit:${clave}/${vista}`)
+    }
+
+    for (const [etiqueta, nombre] of assetsDeUso(objeto)) {
+      rutas.set(path.normalize(objeto.base + nombre), `uso:${clave}/${etiqueta}`)
     }
   }
 
   return rutas
+}
+
+/** Las tres formas de declarar la pieza PUESTA: una sola, por persona o por color. */
+function* assetsDeUso(objeto) {
+  if (objeto.assetDeUso) yield ['defecto', objeto.assetDeUso]
+  for (const [persona, nombre] of Object.entries(objeto.usoPorPersona ?? {})) yield [`persona:${persona}`, nombre]
+  for (const [color, nombre] of Object.entries(objeto.usoPorColor ?? {})) yield [`color:${color}`, nombre]
 }
 
 const huella = ruta => createHash('sha256').update(readFileSync(path.join(raiz, ruta))).digest('hex')
