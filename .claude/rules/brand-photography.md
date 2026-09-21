@@ -65,6 +65,33 @@ foco**, y el mecanismo está a la vista (micro de brazo entrando por el borde, f
 nivel, fieltro acústico). Con las dos causas del rechazo cerradas y medidas: **b\* −0,3** contra los +20,1, y
 ningún panel azul — el azul entra sólo por el polo, que es el portador legítimo.
 
+### 🔴 La prueba dura del registro B: **significar SIN titular** [medido 2026-09-21]
+
+Una pieza de puesta en escena **debe entenderse sin el titular**. Si necesita el texto para que se entienda, **la
+idea no está en la foto y la pieza no está resuelta** — el titular estaría cargando lo que la imagen no logró.
+Probado con tres piezas, cada una con su palanca: `J-pov-v1` (`pov`) = **te estoy hablando a ti** · `K-larga-v1`
+(`larga-exposicion`) = **el que no se mueve** · `L-proyeccion-v1` (`proyeccion`) = **estoy dentro de mi trabajo**.
+La que cerró **5 de 5 reservas**, primera de toda la tanda: `H-julio-v1`.
+
+### 🔴 Qué palanca sirve en qué registro **[criterio]**
+
+**El marcador de la mirada al lente ordena el catálogo entero.** Antes de elegir palanca, sabe en qué registro
+estás:
+
+| | Palancas |
+|---|---|
+| **Nativas de B** — la mirada al lente la justifica la palanca misma | `pov` (la cámara ocupa el asiento del cliente: no «mira al lente», **te habla a ti**) · `oclusion` (algo cubre un tercio y el sujeto sigue mirando; **el objeto que ocluye puede ser el lecho**) · `fragmento` (crop extremo del rostro: la que más golpea a 390 px) · `copiloto` (nació en B) |
+| **Se adaptan bien a B** | `larga-exposicion` · `reflejo` · `proyeccion` · `instrumento` · `cenital` · `suelo-oblicuo` · `atraviesa` |
+| **Sin personas y aun así B** | `variantes` (la decisión como sujeto) · `descarte` · `ausencia` |
+| 🔴 **Incompatibles con B, por construcción** | `escucha` —**el sujeto no mira a nadie: está recibiendo**, documental puro— más `manos`, `sombra`, `silueta`, `marcado` y `quien-sostiene`: **pierden el marcador de la mirada** |
+
+**Las incompatibles NO están prohibidas** en una pieza de campaña. Pero si las usas, **la pieza ya no se juzga
+con la barra de B** — se juzga con la documental. Decídelo antes de generar, no al revisar.
+
+**Lo que NO consume la cuota de palanca** (varía libre): formato (9:16 story · 16:9 portada) · cuántos (una
+persona, dos, persona + mascota de partner) · prenda por registro de escena · atmósfera (`polvo`/`bruma`/`vapor`/
+`humo`) · con o sin capa gráfica encima.
+
 ## Los tres comandos. NUNCA a mano
 
 ```bash
@@ -124,6 +151,9 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   turnaround, que es B; y `nexa-the-point` y `nexa-the-breakdown` son B, así que **no pueden estar en `refs`**
   del bloque `nexa`. B no se borra: queda como **banco de material** —poses, vestuario, escenarios, gesto—,
   todo lo que NO sea rostro.
+  🔴 **Home canónico de Nexa: `ai-generations/_identidad-nexa/`** (`1-anclas/`, `2-angulos/`, `3-poses/`,
+  `4-vestuario/` y un LEEME que explica las dos identidades). **No es una carpeta de corrida**: las carpetas
+  fechadas son **histórico**, y el catálogo de `build-prompt.mjs` apunta **sólo ahí**. Busca a Nexa ahí primero.
 - 🔴 **Antes de reconstruir un encargo de memoria, busca el brief de la pieza aprobada equivalente.** El del KV estaba
   guardado en `ai-generations/2026-09-17_kv-tu-ia-no-conoce/brief/plate-kv-4x5.prompt.txt` y no se leyó: traía
   resueltos el encuadre, la escala de la mascota (20 % del ancho), el lente y la pose.

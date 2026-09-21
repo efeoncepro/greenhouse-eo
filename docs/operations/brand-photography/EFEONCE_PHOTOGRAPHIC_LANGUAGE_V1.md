@@ -369,8 +369,85 @@ Comparación directa: `G-podcast-v2.png` (**plana**, correcta pero sin golpe) co
 | `G-podcast-v4.png` | B | — + `bruma` | banda 0,34 ✓ · lecho 2,84 ✗ · con impacto |
 | `G-podcast-v5.png` | B | — + `bruma` | **banda 0,34 ✓ · lecho 8,32 ✓** · emblema verificado |
 
-### 7. Lo que queda abierto
+### 7. Las variaciones del registro B: seis piezas, seis ideas **[medido]**
+
+Continuación de la misma tanda, ya con el registro B escrito: seis piezas producidas para probar **hasta dónde
+llega** el registro. **Las seis tienen el emblema verificado al 100%.** Inventario verbatim en
+`ai-generations/2026-09-21_copiloto/HECHOS-VARIACIONES.md`; evidencia en `plates/`.
+
+| Pieza | Palanca | La IDEA que lleva | Reservas |
+|---|---|---|---|
+| `G-podcast-v5` | — + `bruma` | el podcast existe y te invita | banda 0,34 ✓ · lecho 8,32 ✓ · b\* −0,7 |
+| `H-julio-v1` | — + `polvo` | quien ya sabe la respuesta | **5/5 reservas** · banda 0,30 · lecho 8,69 · b\* −1,2 |
+| `I-nexa-v1` | — + `bruma` | complicidad: el cuerpo va, la cara vuelve | banda 0,34 ✓ · lecho 3,99 ✗ · b\* −3,8 |
+| `J-pov-v1` | `pov` | **te estoy hablando a ti** | banda 0,32 ✓ · lecho 5,18 ✓ · b\* −0,6 |
+| `K-larga-v1` | `larga-exposicion` | **el que no se mueve** | banda 0,30 ✓ · lecho 2,27 ✗ · b\* −0,6 |
+| `L-proyeccion-v1` | `proyeccion` | **estoy dentro de mi trabajo** | banda 0,28 ✓ · lecho 6,41 ✓ · b\* −0,4 |
+
+🔴 **`H-julio-v1` cerró 5 de 5 reservas — la primera de toda la tanda.** Es la prueba de que el registro B, con
+el bloque de impacto puesto y el lecho resuelto como objeto del oficio, cierra la plancha completa.
+
+#### 🔴 La prueba dura del registro B: significar SIN titular
+
+Una pieza de puesta en escena **debe significar sin titular**. Si necesita el texto para que se entienda, **la
+idea no está en la foto** y la pieza **no está resuelta** — el titular estaría cargando lo que la imagen no logró.
+No es una preferencia de estilo: es la barra de cierre del registro.
+
+**Las tres últimas piezas prueban que se puede**, y cada una lo hace con una palanca distinta:
+
+| Pieza | Palanca | Lo que se lee sin una sola palabra |
+|---|---|---|
+| `J-pov-v1` | `pov` | **te estoy hablando a ti** |
+| `K-larga-v1` | `larga-exposicion` | **el que no se mueve** |
+| `L-proyeccion-v1` | `proyeccion` | **estoy dentro de mi trabajo** |
+
+### 8. Qué palanca sirve en qué registro **[criterio, derivado del marcador de la mirada]**
+
+El registro B se reconoce porque **el sujeto mira al lente** (§4). Ese marcador ordena el catálogo entero de
+palancas — ver [catálogo de palancas](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
+
+**Nativas de B** — la mirada al lente está justificada por la propia palanca:
+
+| Palanca | Por qué es nativa |
+|---|---|
+| `pov` | La cámara ocupa el asiento del cliente: no «mira al lente», **te habla a ti**. La coartada narrativa más fuerte del registro |
+| `oclusion` | Algo cubre un tercio y el sujeto sigue mirando: da intriga, **y el objeto que ocluye puede ser el lecho** |
+| `fragmento` | Crop extremo del rostro mirando al lente: la que más golpea a 390 px |
+| `copiloto` | Nació en B: la criatura del partner comparte el gesto |
+
+**Se adaptan bien a B:** `larga-exposicion` (el sujeto quieto mirando al lente mientras todo se disuelve) ·
+`reflejo` (mira al lente a través del vidrio, con dos realidades superpuestas) · `proyeccion` (la obra proyectada
+sobre él y el muro) · `instrumento` · `cenital` · `suelo-oblicuo` · `atraviesa`.
+
+**Sin personas y aun así registro B:** `variantes` (la decisión como sujeto: nueve a doce copias idénticas salvo
+un eje) · `descarte` (la pila de lo no elegido) · `ausencia`.
+
+🔴 **Incompatibles con B, por construcción:** `escucha` —**el sujeto no mira a nadie: está recibiendo**, es
+documental puro—, más `manos`, `sombra`, `silueta`, `marcado` y `quien-sostiene`: todas pierden el marcador de la
+mirada. **No están prohibidas** en una pieza de campaña, pero si se usan, **la pieza ya no se juzga con la barra
+de B**.
+
+### 9. Variaciones que NO son palanca **[criterio]**
+
+La palanca es **una sola y dominante** por pieza. Lo siguiente **varía libre** y no consume esa cuota:
+
+- **Formato** — 9:16 para stories, con su reserva propia; 16:9 para portada.
+- **Cuántos** — una persona, dos, persona + mascota de partner.
+- **Prenda por registro de escena** — chaqueta = instancia importante · polo = oficina y estudio · hoodie o gorra
+  = terreno.
+- **Atmósfera** — `polvo` · `bruma` · `vapor` · `humo`.
+- **Con o sin capa gráfica encima.**
+
+### 10. Lo que queda abierto
 
 La **contradicción documental** sobre la capa gráfica: el canon la declara no aprobada y todas las piezas
 publicadas del registro B la usan. Queda registrada en §9 como pendiente con su condición de cierre; es del
 operador, no de esta documentación.
+
+**Reservas sin cerrar en tres de las piezas nuevas** — se documentan, no se esconden:
+
+| Pieza | Reserva abierta | Causa |
+|---|---|---|
+| `K-larga-v1` | lecho **2,27** | Las estelas de luz pasan **por encima** del road case. Se cierra sacándolo del paso de los trazos — misma lógica que sacarlo de la llave |
+| `L-proyeccion-v1` | aire para cursores **1,02** | El muro proyectado tiene **mucha estructura en los costados** |
+| `I-nexa-v1` | lecho **3,99** | El panel de color **recibe algo del rim** |

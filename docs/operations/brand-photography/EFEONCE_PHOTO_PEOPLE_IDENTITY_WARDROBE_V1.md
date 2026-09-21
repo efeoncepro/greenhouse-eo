@@ -555,3 +555,58 @@ De los 58 archivos, los **cuatro retratos grandes del 27/03 son AMBIGUOS**: ceja
 delineado del párpado. **No están clasificados en ninguna identidad y no deben cablearse por parecerse.**
 Tampoco entran como ancla de rostro el traje naranja (arrastra color, igual que el navy del set viejo de
 Julio) ni las series `Poses y expresiones/` y `Vestuario/`, que son identidad B.
+
+## Delta 2026-09-21 (cierre) — home canónico de Nexa y anclas fotográficas
+
+Continuación directa del delta anterior. Cerradas las seis vistas y la identidad única, quedaba dónde vive todo
+eso y con qué referencia se ancla la piel. Hechos verbatim en
+`ai-generations/2026-09-21_copiloto/HECHOS-VARIACIONES.md` §4.
+
+### Todo lo de Nexa vive en `ai-generations/_identidad-nexa/` **[commit `ffa7d65d9`]**
+
+| Subcarpeta | Qué guarda |
+|---|---|
+| `1-anclas/` | las referencias base de rostro y piel |
+| `2-angulos/` | las seis vistas del set de identidad |
+| `3-poses/` | pose y gesto corporal |
+| `4-vestuario/` | prenda y registro de escena |
+
+Más un `LEEME` que explica **las dos identidades** —el atajo para distinguirlas es el **delineado del párpado**
+(ver §`Los cuatro rasgos que discriminan A de B`)—.
+
+🔴 **No es una carpeta de corrida.** Las carpetas fechadas siguen siendo histórico y no se tocan; el material
+vigente de identidad vive sólo acá. **El catálogo de `build-prompt.mjs` apunta sólo ahí**, así que una referencia
+que quede fuera de este home no entra a ningún prompt.
+
+### Las anclas nuevas: de maestro sintético a fotografía **[medido]**
+
+Las referencias base pasaron a ser **anclas fotográficas de 2560×3200**, y ya no el **maestro sintético de
+1024×1536**.
+
+Causa, con su cadena completa: el operador señaló que la Nexa anterior se veía **«muy sintética»**, y al mirarla
+**al 100%** se confirmó — **piel sin poros**, un **patrón de micro-arrugas uniforme**, **cero vello facial** y
+**tono perfectamente parejo**. Las anclas nuevas tienen **poros irregulares**, **vello fino** y **luz de ventana
+con dirección real**.
+
+**Primera pieza que las usa: `K-larga-v1`.**
+
+### Tres reglas de esa corrida **[medidas, son receta y no anécdota]**
+
+1. 🔴 **Pedir textura produce piel castigada si no se acota.** La formulación que falló, verbatim: «Rojez sutil,
+   manchitas, brillo disparejo, líneas de expresión». Dio **una mujer de 40 con la piel manchada** y el operador
+   la rechazó. Lo que funciona: que la textura venga **sólo de poros y vello**, con **tono parejo**, **piel sana**
+   y **luz de ventana con relleno**. **Realismo ≠ castigo.**
+2. 🔴 **Más resolución no es más fidelidad.** El maestro es 1024×1536; **a 2560×3200 el modelo inventa el detalle
+   de poros**. Hay que **verificar al 100% contra el maestro** y nunca asumir que subir píxeles mejora la
+   identidad.
+3. **`quality: max` a 2560×3200 cuesta USD 0,565 por imagen** — **diez veces** una de 1024² en `high`. Saberlo
+   antes de presupuestar una tanda.
+
+### Deuda declarada — el acabado sintético sigue en tres subcarpetas **[pendiente]**
+
+`2-angulos/`, `3-poses/` y `4-vestuario/` **conservan el acabado sintético** porque se derivaron del maestro
+viejo. Sirven para **ángulo, pose y vestuario**, pero **si una pieza necesita piel creíble en primer plano, la
+referencia es un ancla** de `1-anclas/`.
+
+**Condición de cierre:** regenerarlas es **decisión del operador**; hasta que la tome, la deuda queda abierta y la
+regla de arriba es la mitigación vigente.

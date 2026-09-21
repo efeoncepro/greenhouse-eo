@@ -1,0 +1,20 @@
+{
+  "id": "L-proyeccion-julio",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "proyeccion",
+  "identidad": ["julio"],
+  "objetos": ["polo-efeonce"],
+  "atmosfera": "polvo",
+  "escena": "SCENE (a staged piece for a campaign, shot in the agency's production room): a projector behind the camera throws the WORK ITSELF onto the rough plaster wall and onto Julio standing against it — a large layout of a campaign in progress, blocks of image and columns of type with no legible words at this size. The wall's grain, its hairline cracks and its uneven patches SHOW THROUGH the projection, and the same layout falls across his shoulder, his chest and one side of his face, bending where his body turns. He stands with his weight on one leg, hands loose at his sides, and he LOOKS STRAIGHT INTO THE LENS: steady, unhurried, mouth closed, eyebrows level, the look of someone standing inside his own work. His head stays FRONTAL: both eyes and both eyebrows fully visible, both cheeks visible, the bridge of his nose does not cut across either cheek. The projected light must NOT flatten him: his eyes stay clear of the brightest blocks so the gaze reads, and the cast layout never covers both eyes. He wears the navy blue Efeonce piqué polo. CRITICAL ON LIGHT, and every practical lamp is SWITCHED OFF: the projector is the main source and its beam is VISIBLE through the floating dust as a widening cone coming from behind the camera — that cone, its glow and every pool it makes stay BELOW THE MIDDLE OF THE FRAME. A single soft white fill from the LEFT keeps his skin from going to black in the unprojected areas, and a low hard source BEHIND him at the right cuts a thin RIM along his shoulder and hair so he separates from the wall. All sources are white: his skin stays NEUTRAL, never yellow or amber, and the projected image is the only colour in the room. THREE PLANES: the out-of-focus black body of the projector at the very front; Julio sharp in the middle against the wall; and at the far right, small and out of focus, a rolling stand with a folded print catching the rim. He stands LOW in the frame: the very top of his head is at or BELOW 38% of the frame height, and the whole TOP THIRD of the picture is bare plaster wall with NO projection on it at all, completely unbroken — the layout, the cone and every light patch stay below that band. Everything is unbranded except his polo. 50mm at f/2.8, focus on his eyes.",
+  "lecho": {
+    "objeto": "the black body of the projector itself standing right at the lens, its casing and lens barrel crossing the ENTIRE bottom of the frame from left edge to right edge, a hand's width from the camera and dissolved completely out of focus. It sits BEHIND its own beam, so no projected light and no fill falls on it",
+    "tono": "NEAR-BLACK, the darkest thing in the picture and even across its whole width — NOTHING else appears in that bottom strip: no hands, no cable, no projected pattern, no highlight, no reflection, no lettering"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the bare plaster wall filling the top third above the projection",
+      "tinta": "blanca"
+    }
+  }
+}

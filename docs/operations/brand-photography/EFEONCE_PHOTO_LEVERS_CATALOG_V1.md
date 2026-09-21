@@ -1,7 +1,7 @@
 # Catálogo de palancas fotográficas Efeonce V1
 
 > **Tipo de documento:** Catálogo canónico de oficio (maestro de palancas)
-> **Versión:** 2.3 · **Creado:** 2026-09-20 por Claude · **Última actualización:** 2026-09-21 por Claude
+> **Versión:** 2.4 · **Creado:** 2026-09-20 por Claude · **Última actualización:** 2026-09-21 por Claude
 > **Estado:** treinta y cuatro palancas en cuatro familias. Treinta y tres aprobadas por el operador tras tres rondas de prueba
 > medidas el 2026-09-20; `copiloto` entra el 2026-09-21 desde una pieza aprobada (el KV «Tu IA no conoce tu negocio», 17/09).
 > **Relacionado:** [maestro](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [reservas](./EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md)
@@ -20,7 +20,9 @@ Una **palanca** es una decisión de oficio que cambia lo que la foto *hace*, no 
 Son **34 palancas**, y se combinan con las **[20 tomas de cámara](#las-veinte-tomas-del-catálogo-de-cámara)**
 —ojo de pez, dron cenital, tilt-shift, contrapicado, macro, tele, barrido…— que dicen **con qué** se fotografía.
 Además hay [otros ejes](#otros-ejes-que-deciden-la-pieza-y-no-son-palancas) —formato, reserva,
-lecho, cámara, objetos de marca, identidad— que deciden la pieza pero tienen documento propio. El maestro define el
+lecho, cámara, objetos de marca, identidad— que deciden la pieza pero tienen documento propio. Y no todas sirven
+en los dos registros visuales: el [mapa palanca ↔ registro](#en-qué-registro-sirve-cada-palanca) dice cuál va en
+cuál. El maestro define el
 lenguaje —«El oficio a la vista», la barra de juicio, el color, la firma—; este catálogo define **con qué recursos
 se construye una pieza dentro de ese lenguaje**.
 
@@ -140,6 +142,12 @@ reconocible.
 **Ojo.** **No tiene momento decisivo** y es correcto que no lo tenga: su tensión es la duración. El comando apaga
 ese aviso para esta palanca, y sólo ese.
 **Evidencia.** `B4` (montaje nocturno, Miami) · lecho 19,91:1.
+**Evidencia 2026-09-21 — se adapta bien al registro de puesta en escena.** `K-larga-v1`, con la idea **«el que no
+se mueve»**: el sujeto quieto mirando al lente mientras todo lo demás se disuelve. Pasa la prueba dura del
+registro —**significa sin titular**—. Medido: banda **0,30 ✓** · lecho **2,27 ✗** · b\* **−0,6**, con el emblema
+verificado al 100%.
+**Reserva abierta — el lecho no cierra.** Mide **2,27** porque **las estelas de luz pasan por encima del road
+case**. Se cierra **sacándolo del paso de los trazos**: la misma lógica que sacarlo de la llave.
 
 #### `silueta` — contraluz que borra el rostro
 **Qué es.** La figura contra la luz, reducida a contorno. **Deja el gesto y quita la identidad.**
@@ -158,6 +166,11 @@ apenas pasando el lente, nunca al lente; el borde del asiento propio visible aba
 **Por qué importa.** Es el Why de Efeonce hecho encuadre y **la que mejor pasa el test de sustitución**: otra
 agencia no la copia sin tener esa idea.
 **Evidencia.** `B1` (revisión desde la cabecera, Santiago) · lecho 18,84:1.
+**Evidencia 2026-09-21 — la coartada narrativa más fuerte del registro de puesta en escena.** `J-pov-v1`, con la
+idea **«te estoy hablando a ti»**. Es **nativa del registro B** y la que mejor lo resuelve, porque la cámara
+**ocupa el asiento del cliente**: no es que el sujeto «mire al lente», es que **te habla a ti**. Pasa la prueba
+dura del registro —**significa sin titular**—. Medido: banda **0,32 ✓** · lecho **5,18 ✓** · b\* **−0,6**, con el
+emblema verificado al 100%.
 
 #### `oclusion` — mirar desde detrás de algo
 **Qué es.** Un objeto en primer término **cubre parcialmente** al sujeto: la cámara miró desde donde estaba y no
@@ -274,6 +287,10 @@ desenfocada que sale **fuera del cuadro** hacia quien habla, nunca al lente; cue
 adelante, una mano cerca de la oreja o la mandíbula. La herramienta con la que hablaría —micrófono, lápiz,
 teclado— **está en el cuadro y sin usar**. La tensión es la atención, no la acción.
 **Por qué importa.** Es lo contrario exacto de una selfie: la persona no está actuando.
+🔴 **Incompatible con el registro de puesta en escena, por construcción** **[criterio 2026-09-21]**. Ese registro
+se reconoce porque el sujeto mira al lente, y acá **el sujeto no mira a nadie: está recibiendo**. Es documental
+puro. No queda prohibida en una pieza de campaña, pero si se usa, **la pieza ya no se juzga con la barra de B**
+([mapa palanca ↔ registro](#en-qué-registro-sirve-cada-palanca)).
 **Evidencia.** `G1` (sesión de grabación, Santiago) · a la primera.
 **Evidencia 2026-09-21 — resolvió el podcast que dos intentos previos habían fallado.** `F-podcast-v1.png`. Los dos
 rechazos anteriores se leyeron como problemas de luz y color —`rondas/paleta/P2-podcast` por lámparas prácticas
@@ -373,6 +390,12 @@ de espaldas y la obra **le cae encima**, así que parte está en el muro y parte
 negro** en la imagen. **Ni pantalla ni monitor**: la imagen vive sobre material, no sobre vidrio.
 **Ojo.** No es `luz-motivada`: ahí la fuente es luz; acá **lo que se proyecta es la obra**.
 **Evidencia.** `H4` (Ciudad de México) · a la primera.
+**Evidencia 2026-09-21 — se adapta bien al registro de puesta en escena.** `L-proyeccion-v1`, con la idea
+**«estoy dentro de mi trabajo»**: la obra proyectada sobre la persona y el muro a la vez. Pasa la prueba dura del
+registro —**significa sin titular**—. Medido: banda **0,28 ✓** · lecho **6,41 ✓** · b\* **−0,4**, con el emblema
+verificado al 100%.
+**Reserva abierta — el aire para cursores.** Mide **1,02**: **el muro proyectado tiene mucha estructura en los
+costados**.
 
 ### De la relación con la máquina **[2026-09-21, desde una pieza aprobada]**
 
@@ -403,6 +426,40 @@ que hace todo el mundo, y acá lo que se fotografía es que la máquina **no** s
 a ciencia ficción.
 **Evidencia.** Nace de una pieza **pre-canon aprobada por el operador** —el KV «Tu IA no conoce tu negocio»,
 2026-09-17— y de su encargo de convertirla en palanca. Implementada en `build-prompt.mjs`, commit `cdb1fabad`.
+
+## En qué registro sirve cada palanca **[criterio, derivado del marcador de la mirada]**
+
+Efeonce tiene **dos registros visuales**: el **documental** —«el oficio a la vista», donde la foto *es* el
+mensaje y **nadie mira al lente**— y el de **puesta en escena** (**B**), donde la foto es **soporte de una idea**
+y **el sujeto sí mira al lente**. Esa mirada es el marcador visible del registro, y **ordena el catálogo entero**:
+decide qué palanca sirve en B, cuál se adapta y cuál no cabe ahí.
+
+### Nativas de B — la mirada al lente está justificada por la propia palanca
+
+| Palanca | Por qué es nativa |
+|---|---|
+| `pov` | La cámara ocupa el asiento del cliente: no «mira al lente», **te habla a ti**. La coartada narrativa más fuerte del registro |
+| `oclusion` | Algo cubre un tercio y el sujeto sigue mirando: da intriga, **y el objeto que ocluye puede ser el lecho** |
+| `fragmento` | Crop extremo del rostro mirando al lente: la que más golpea a 390 px |
+| `copiloto` | Nació en B: la criatura del partner comparte el gesto |
+
+### Se adaptan bien a B
+
+`larga-exposicion` (el sujeto quieto mirando al lente mientras todo se disuelve) · `reflejo` (mira al lente a
+través del vidrio, con dos realidades superpuestas) · `proyeccion` (la obra proyectada sobre él y el muro) ·
+`instrumento` · `cenital` · `suelo-oblicuo` · `atraviesa`.
+
+### Sin personas y aun así registro B
+
+`variantes` (la decisión como sujeto: nueve a doce copias idénticas salvo un eje) · `descarte` (la pila de lo no
+elegido) · `ausencia`.
+
+### 🔴 Incompatibles con B, por construcción
+
+`escucha` — **el sujeto no mira a nadie: está recibiendo**, es documental puro. Más `manos`, `sombra`,
+`silueta`, `marcado` y `quien-sostiene`: **pierden el marcador de la mirada**.
+
+**No están prohibidas en una pieza de campaña**, pero si se usan, **la pieza ya no se juzga con la barra de B**.
 
 ## Las cinco descartadas y por qué **[medido]**
 
