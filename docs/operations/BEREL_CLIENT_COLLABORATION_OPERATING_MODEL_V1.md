@@ -31,6 +31,27 @@ resueltos los hilos del cliente ni duplica su discusión en Teams o correo. Si l
 la versión nueva va debajo de la anterior, que queda como histórico con todos sus hilos, y la ronda se cierra con
 un comentario de página que describe el estado final.
 
+Para los artes, [la revisión visual en Frame.io](../../.codex/skills/berel-content-production/modules/20_REVISION_VISUAL_FRAMEIO.md)
+separa error comprobable, preferencia razonada y comentario sin criterio suficiente. En la muestra de
+versiones vigentes N35–N42 de «Mes Octubre» (lectura del 19-09-2026), 27 de 45 comentarios
+solicitaron revisión y 18 fueron aprobaciones. De los 27 pedidos, 13 (48,1 %) no fueron
+puramente objetivos, pero solo 6 (22,2 %) carecieron de un criterio ejecutable: tres nombres de
+color sin identificar, un juicio sobre la portada sin cambio esperado y dos pedidos de «mejorar
+copy» sin objetivo concreto. Esta es una señal de ese share, no una tasa histórica de Berel.
+
+La [auditoría posterior de comentarios de texto](BEREL_FEEDBACK_CLARITY_BASELINE_2026-09-19.md)
+sí confirma recurrencia: en cuatro meses de comentarios (junio–septiembre de 2026), 22 pedidos
+abiertos aparecieron en 15 artículos distintos. Los 22 hilos acumulan 28 respuestas de
+Efeonce; esto demuestra trabajo de interpretación y seguimiento, no 28 rondas o tareas extra
+atribuibles al cliente. El corte por mes y cada comentario anclado están en esa auditoría.
+
+Ante un comentario impreciso, Efeonce coteja primero fuentes y variantes, documenta el problema
+que sí puede demostrar y propone una corrección concreta en el hilo de la versión. Si quedan
+alternativas creativas razonables, solicita una elección acotada. La ronda no se declara cerrada
+por haber interpretado una frase vaga como aprobación de una solución específica. El seguimiento
+mensual distingue pedidos vagos, preferencias razonadas, errores comprobables, comentarios
+mixtos y aprobaciones, con denominador, versión y fecha.
+
 ## Cadencia mensual
 
 - La reunión semanal se sustituye por **una reunión mensual de 45 minutos**.

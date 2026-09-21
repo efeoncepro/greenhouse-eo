@@ -127,8 +127,8 @@ Ejecución audiovisual por formato, tipografía exacta, audio aprobado y program
 [manual de seasonalities](docs/manual-de-uso/social/producir-y-programar-seasonalities.md), con referencias de oficio Codex/Claude.
 Berel: `berel-content-production` · [plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
 [informes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) ·
-[colaboración](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md). Preservar análisis, N1–N4 y
-arte producido; la cadencia mensual requiere aceptación del cliente.
+[colaboración](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md) ·
+[QA Frame.io](.codex/skills/berel-content-production/modules/20_REVISION_VISUAL_FRAMEIO.md).
 
 WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md),
 [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) y [misceláneas](docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md).
