@@ -146,6 +146,23 @@ la ficha del Bible —verificado contra §3.1— pero los accesorios no.
 `home`, acento naranja y azul eléctrico en `speaker`, blazer navy sobre blanco en `prof`). **La brecha está
 concentrada en las anclas, no en todo el set.**
 
+**La referencia para esa edición está DENTRO del set, no hay que inventarla** **[verificado 2026-09-21]**.
+Revisadas las 17 de `4-vestuario/` al 100% en la franja de manos:
+
+| Candidata | Anillo | Uñas | Dedo |
+|---|---|---|---|
+| `nexa-vest-casual-1` | **plata mate, facetado/sello angular** — el más «geométrico» | navy, un color ✓ | **anular** ✗ |
+| `nexa-vest-home-2` | plateado con piedra rectangular, con diseño | nude rosado ✓ | **medio** ✗ |
+| `nexa-vest-home-1` | plata mate, banda ancha lisa | navy, un color ✓ | **medio** ✗ |
+
+Y varias llevan **reloj de correa navy con carátula pequeña** (`home-1`, `home-2`, `casual-4`), que es §5.1
+literal.
+
+🔴 **Matiz importante: ninguna cumple el DEDO.** Cumplen metal (plata), forma (geométrica) y uñas (un solo
+color), y fallan el índice que pide el Bible — están en medio o anular. Así que sirven como referencia de
+**material y estilo**, y el dedo hay que corregirlo en la edición. Decir que `4-vestuario/` «porta los
+signature elements» es cierto en 3 de 4 atributos, no en los cuatro.
+
 **Salida propuesta, dentro del canon** («editar conserva, generar reconstruye»): editar **una sola** imagen,
 `1-anclas/nexa-ancla-8-manos.png` — es la vista `manos` y la única de las ocho que muestra mano y muñeca.
 Una edición en vez de ocho regeneraciones. Si se edita, **re-sellar**: `pnpm foto:assets:lock`.
