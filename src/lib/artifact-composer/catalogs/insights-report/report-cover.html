@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportCoverPage — portada del informe A4.
+
+  Lleva pie institucional completo como cualquier otra página: el estándar lo exige explícitamente
+  "incluida la portada, adaptando contraste y espacio sin omitir los datos".
+
+  Identidad de la edición arriba y grande: identificador, período y versión. Un informe sin esos
+  tres datos no se puede citar ni auditar después.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-mold.css" />
+<style>
+  .cover-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+
+  .edition-id {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--axis-report-role-accentDeep);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .client { font-size: 11px; color: var(--axis-report-role-fieldMid); text-align: right; }
+
+  .cover-title {
+    margin: 120px 0 0;
+    font-family: var(--axis-report-type-display);
+    font-size: 40px;
+    line-height: 1.12;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    max-width: 16ch;
+  }
+
+  .cover-subtitle {
+    margin: 20px 0 0;
+    font-size: 15px;
+    line-height: 1.5;
+    max-width: 48ch;
+    color: var(--axis-report-role-fieldMid);
+  }
+
+  .cover-meta {
+    margin-top: auto;
+    display: flex;
+    gap: 40px;
+    padding-top: 24px;
+    border-top: 2px solid var(--axis-report-role-accent);
+  }
+
+  .cover-meta dt {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--axis-report-role-fieldMid);
+  }
+
+  .cover-meta dd {
+    margin: 4px 0 0;
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="cover-top">
+      <span class="edition-id" data-slot="editionId">EO-INS-000014</span>
+      <span class="client" data-slot="clientName">Nombre del cliente</span>
+    </header>
+
+    <h1 class="cover-title" data-slot="reportTitle">Informe de visibilidad y entrega</h1>
+    <p class="cover-subtitle" data-slot="reportSubtitle">
+      Evidencia sellada de la ventana declarada, con sus límites explícitos.
+    </p>
+
+    <dl class="cover-meta">
+      <div><dt>Período</dt><dd data-slot="periodLabel">Agosto 2026</dd></div>
+      <div><dt>Versión</dt><dd data-slot="versionLabel">v1</dd></div>
+      <div><dt>Emitido</dt><dd data-slot="issuedLabel">2026-09-03</dd></div>
+    </dl>
+
+    <footer class="foot">
+      <div class="foot-contact" data-slot="contactDetails">
+        <span class="foot-line">
+          <img src="assets/contact/map-point-bold.svg" alt="" />
+          <span>Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile</span>
+        </span>
+        <span class="foot-line">
+          <img src="assets/contact/phone-calling-bold.svg" alt="" />
+          <span>+56 9 3732 3064</span>
+        </span>
+      </div>
+      <span class="foot-bubble" data-slot="urlBubble">
+        <img src="assets/url-lum.svg" alt="efeoncepro.com" />
+      </span>
+      <span class="folio" data-slot="pageFolio">1</span>
+    </footer>
+  </div>
+</body>
+</html>

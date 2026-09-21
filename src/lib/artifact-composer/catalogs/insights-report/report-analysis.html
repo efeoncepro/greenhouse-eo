@@ -17,59 +17,8 @@
 -->
 <link rel="stylesheet" href="report-tokens.css" />
 <link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-mold.css" />
 <style>
-  *, *::before, *::after { box-sizing: border-box; }
-
-  html, body { margin: 0; padding: 0; }
-
-  .page {
-    position: relative;
-    width: 794px;
-    height: 1123px;
-    overflow: hidden;
-    background: var(--axis-report-role-surfaceBright);
-    color: var(--axis-report-role-ink);
-    font-family: var(--axis-report-type-text);
-    /* Banda del pie reservada ANTES de componer: el estándar prohíbe que el pie invada el texto. */
-    padding: 56px 68px 96px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .running {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--axis-report-role-surfaceEdge);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    color: var(--axis-report-role-fieldMid);
-  }
-
-  .running .chapter { font-weight: 600; text-transform: uppercase; }
-
-  .assertion {
-    margin: 28px 0 0;
-    font-family: var(--axis-report-type-display);
-    font-size: 27px;
-    line-height: 1.22;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-  }
-
-  .assertion em { font-style: italic; color: var(--axis-report-role-accentDeep); }
-
-  .conclusion {
-    margin: 14px 0 0;
-    font-size: 14px;
-    line-height: 1.55;
-    max-width: 58ch;
-    color: var(--axis-report-role-fieldMid);
-  }
-
-  .conclusion b { font-weight: 600; color: var(--axis-report-role-ink); }
-
   .analysis {
     margin-top: 30px;
     display: grid;
@@ -137,45 +86,8 @@
 
   .marginalia dd { margin: 3px 0 0; }
 
-  .development {
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    font-size: 13px;
-    line-height: 1.62;
-    max-width: 66ch;
-  }
+  .development { margin-top: 30px; display: flex; flex-direction: column; gap: 12px; }
 
-  .development p { margin: 0; }
-
-  .development b { font-weight: 600; }
-
-  .foot {
-    position: absolute;
-    left: 68px;
-    right: 68px;
-    bottom: 34px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 16px;
-    padding-top: 12px;
-    border-top: 1px solid var(--axis-report-role-surfaceEdge);
-    font-size: 9px;
-    line-height: 1.45;
-    color: var(--axis-report-role-fieldMid);
-  }
-
-  .foot-contact { display: flex; flex-direction: column; gap: 3px; }
-
-  .foot-line { display: flex; align-items: center; gap: 6px; }
-
-  .foot-line img { width: 9px; height: 9px; }
-
-  .foot-bubble img { height: 15px; width: auto; display: block; }
-
-  .folio { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 11px; }
 </style>
 </head>
 <body>
@@ -189,7 +101,7 @@
       La visibilidad creció donde se publicó, y <em>no</em> donde se optimizó
     </h1>
 
-    <p class="conclusion" data-slot="conclusion">
+    <p class="lead" data-slot="conclusion">
       <b>Las páginas nuevas explican el alza.</b> Las que recibieron optimización técnica sin contenido
       nuevo se mantuvieron planas en el mismo período.
     </p>
@@ -225,7 +137,7 @@
       </dl>
     </section>
 
-    <div class="development" data-slot="development">
+    <div class="development body-text" data-slot="development">
       <p>
         <b>El patrón se sostiene al excluir las páginas sin tráfico previo.</b> La diferencia entre
         ambos grupos no se explica por el punto de partida: las páginas optimizadas ya tenían

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportLimitsPage — «Lo que esta edición no puede afirmar».
+
+  Es una pieza deliberada, no una nota al pie. Un informe que sólo muestra lo que midió invita a
+  suponer que el resto también está medido; declarar el límite es lo que vuelve auditable a lo que
+  sí se afirma.
+
+  Cada límite lleva su causa. «Sin datos» a secas no le sirve a nadie para decidir qué conectar.
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<link rel="stylesheet" href="report-mold.css" />
+<style>
+  .limits { margin-top: 30px; display: flex; flex-direction: column; gap: 0; }
+
+  .limit {
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    gap: 20px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--axis-report-role-surfaceEdge);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .limit:first-child { border-top: 1.5px solid var(--axis-report-role-accent); }
+
+  .limit-subject { font-weight: 600; }
+
+  .limit-cause { color: var(--axis-report-role-fieldMid); }
+
+  .method { margin-top: 34px; }
+
+  .method h2 {
+    margin: 0 0 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--axis-report-role-fieldMid);
+  }
+
+  .method ul { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 7px; }
+
+  .method li { font-size: 11px; line-height: 1.55; color: var(--axis-report-role-fieldMid); }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="running">
+      <span class="chapter" data-slot="runningChapter">LÍMITES Y METODOLOGÍA</span>
+      <span data-slot="runningPeriod">Agosto 2026</span>
+    </header>
+
+    <h1 class="assertion" data-slot="assertion">Lo que esta edición <em>no</em> puede afirmar</h1>
+
+    <div class="limits" data-slot="limits">
+      <div class="limit">
+        <span class="limit-subject" data-slot-field="subject">Entrega y cumplimiento</span>
+        <span class="limit-cause" data-slot-field="cause">sin datos</span>
+      </div>
+    </div>
+
+    <section class="method">
+      <h2>Metodología</h2>
+      <ul data-slot="methodology">
+        <li data-slot-field="item">Las cifras provienen del snapshot sellado de la edición.</li>
+      </ul>
+    </section>
+
+    <footer class="foot">
+      <div class="foot-contact" data-slot="contactDetails">
+        <span class="foot-line">
+          <img src="assets/contact/map-point-bold.svg" alt="" />
+          <span>Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile</span>
+        </span>
+        <span class="foot-line">
+          <img src="assets/contact/phone-calling-bold.svg" alt="" />
+          <span>+56 9 3732 3064</span>
+        </span>
+      </div>
+      <span class="foot-bubble" data-slot="urlBubble">
+        <img src="assets/url-lum.svg" alt="efeoncepro.com" />
+      </span>
+      <span class="folio" data-slot="pageFolio">29</span>
+    </footer>
+  </div>
+</body>
+</html>
