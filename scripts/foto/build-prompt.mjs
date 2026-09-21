@@ -835,7 +835,10 @@ export const PALANCAS = {
       'THE SUBJECT IS THE CHOICE (this is the frame, not a detail): the picture is filled with NINE TO TWELVE copies of THE SAME piece, pinned or laid out in a REGULAR GRID that fills the frame. Every copy is identical in every single respect EXCEPT ONE declared axis: <QUE>. NOTHING else varies between them — not the angle they are seen at, not the crop, not the proportions, not the light falling on them, not the distance from the camera: these are prints of ONE file, so no difference the camera itself did not cause may appear anywhere except in that one axis. ONE copy is physically SET APART from the rest: pulled forward, lifted, turned, or carrying a mark. The near-identical repetition IS what the photograph is about: not the piece, but the decision between versions of it. A hand and forearm may enter from the frame edge, never a face.',
     requiere: 'eje',
     // UN eje y sólo uno. El error tiene que enseñar la forma, porque el defecto medido fue
-    // justamente declarar tres a la vez.
+    // justamente declarar tres a la vez. Los tres ejemplos son ejes que el modelo SOSTIENE: por
+    // debajo de cierto umbral —«un encuadre unos milímetros más cerrado»— no reproduce la diferencia
+    // sino que introduce deriva, y sale ruido en vez de un eje. Es lo que vio el evaluador que juró
+    // que las nueve copias no eran idénticas: tenía razón, y no estaba viendo el eje pedido.
     ejemplo:
       '"the weight of the type, and nothing else" · "the warmth of one colour field, and nothing else" · ' +
       '"the size of the logo, and nothing else"'

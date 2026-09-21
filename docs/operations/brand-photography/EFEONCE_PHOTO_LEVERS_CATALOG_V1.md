@@ -316,6 +316,11 @@ proceso de decisión, es un patrón decorativo»— y el otro vio que **no** lo 
 proporción del cielo cambian de copia en copia; nueve impresiones del mismo archivo no pueden diferir entre
 sí»—. Las dos lecturas son el mismo defecto: **si no se ve, no hay decisión; si se ve de más, delata la
 generación**. Con un solo eje el doble filo desaparece.
+**El eje tiene un piso duro.** Elige uno que el modelo **sostenga**: el peso de la tipografía, la calidez de un
+campo de color, el tamaño del logo. **NO** sirve un eje por debajo de su control —«un encuadre unos milímetros
+más cerrado»—: ahí el modelo no reproduce la diferencia, introduce **deriva**, y lo que sale es ruido en vez de
+un eje. Es la razón por la que un evaluador vio que las nueve copias **no** eran idénticas: tenía razón, y lo
+que veía no era el eje pedido sino lo que el modelo no controla.
 **Evidencia.** `H1` (Santiago) · a la primera, y **reprobada** en la auditoría ciega.
 
 #### `descarte` — lo que no se eligió
