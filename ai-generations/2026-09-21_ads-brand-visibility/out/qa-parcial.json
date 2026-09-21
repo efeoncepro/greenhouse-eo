@@ -1,31 +1,26 @@
 [
   {
-    "id": "c1-readable",
+    "id": "b3-display",
     "dominante": [
-      "Lo inventó."
+      "Nadie revisó"
     ],
+    "ratioDominanteEntrada": 3,
     "contraste": {
-      "etiqueta": 13.42,
-      "entrada": 13.38,
-      "dominante": 11.98,
-      "cierre-frase": 13.14,
-      "logo": 18.93
+      "entrada": 14.67,
+      "dominante": 13.61,
+      "cierre-frase": 13.92,
+      "logo": 11.88
     },
     "gapsTinta": [
       {
-        "entre": "etiqueta→entrada",
-        "px": 21,
-        "ratioDominante": 0.12
-      },
-      {
         "entre": "entrada→dominante",
-        "px": 26,
-        "ratioDominante": 0.149
+        "px": 35,
+        "ratioDominante": 0.222
       },
       {
         "entre": "dominante→cierre",
-        "px": 21,
-        "ratioDominante": 0.12
+        "px": 28,
+        "ratioDominante": 0.177
       }
     ],
     "seleccion": {
@@ -43,15 +38,6 @@
       "cursores": [
         {
           "id": "local"
-        },
-        {
-          "id": "contenido",
-          "labelBounds": {
-            "left": 737.82,
-            "top": 362.817,
-            "right": 901.856,
-            "bottom": 413.344
-          }
         }
       ]
     }

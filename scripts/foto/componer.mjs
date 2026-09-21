@@ -696,7 +696,23 @@ return k.ink.right - k.ink.left }))
   const gaps = []
 
   for (let i = 1; i < tramos.length; i++) gaps.push({ entre: `${tramos[i - 1][0]}→${tramos[i][0]}`, px: +(tramos[i][1].top - tramos[i - 1][1].bottom).toFixed(1), ratioDominante: +((tramos[i][1].top - tramos[i - 1][1].bottom) / domSize).toFixed(3) })
-  qa.push({ id: s.id, dominante: dom.lines, contraste, gapsTinta: gaps, seleccion: selEvidence })
+  // REGLA DE LAS TRES VECES [operador, 2026-09-21]: el dominante manda sólo si mide al menos 3× la
+  // entrada. Medido en esta misma pieza a lo largo de cuatro versiones: a 2,8× el operador dijo que la
+  // jerarquía no estaba resuelta; a 4,0× la aprobó. El caso canónico («Nivel de búsqueda») está en 3,8×.
+  // Es condición NECESARIA, no suficiente: la versión de 2,8× fallaba además por color y por no tener
+  // cierre. Avisa, no aborta — en columna angosta (16:9) el ratio compite con la legibilidad a 390 px y
+  // ahí gana la legibilidad, pero entonces la excepción se declara mirando el número, no por descuido.
+  const ratio = s.lead && !muda ? +(domSize / (s.leadSize ?? 70)).toFixed(1) : null
+
+  if (ratio !== null && ratio < 3) {
+    console.warn(
+      `  ⚠ ${s.id}: el dominante mide ${ratio}× la entrada (regla de las tres veces: ≥3×). ` +
+        'Debajo de 3× la jerarquía se aplana. Sube `dominantSize` o baja `leadSize`; si es un formato de ' +
+        'columna angosta y el ratio compite con la legibilidad a 390 px, declara la excepción.'
+    )
+  }
+
+  qa.push({ id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence })
 }
 
 fs.writeFileSync(`${PLAN_DIR}/out/qa${only.length ? '-parcial' : ''}.json`, JSON.stringify(qa, null, 2))

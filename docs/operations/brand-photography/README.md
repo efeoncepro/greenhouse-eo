@@ -55,6 +55,7 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | Recurso | Ruta | Qué contiene |
 |---|---|---|
 | Character Bible de Nexa | [`docs/operations/social/NEXA_CHARACTER_BIBLE_V1.md`](../social/NEXA_CHARACTER_BIBLE_V1.md) | El documento de marca completo y legible: valores, voz, retrato físico, audio, wardrobe, expresiones, lenguaje corporal, entornos, iluminación, composiciones, backstory, transparencia y reglas de interacción. Original en OneDrive |
+| Método de producción de ADS | [`social/2026-09-21-ads-brand-visibility-production-method.md`](../social/2026-09-21-ads-brand-visibility-production-method.md) | La capa gráfica **por formato** (4:5 · 9:16 · 16:9) con sus valores medidos, las cuatro voces, las seis trampas y la receta copiable |
 | Bitácora del caso | [`docs/operations/social/2026-09-19-efeonce-photographic-language-production-method.md`](../social/2026-09-19-efeonce-photographic-language-production-method.md) | Ronda por ronda: qué se probó, qué resultó, qué decidió el operador, qué se aprendió, fallos con números |
 | Corrida de evidencia | [`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/`](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md) | Prompts verbatim por ronda (`batch*.json`, `*.txt`), bloques de prompt, scripts de medición y composición. Las imágenes son locales (gitignoreadas) |
 | Entrega en OneDrive | `5. Contenidos/13- Branding/Lenguaje Fotografico Efeonce/v01/` | Carpeta de entrega de la versión 1 para el equipo |

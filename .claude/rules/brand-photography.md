@@ -103,6 +103,21 @@ pnpm foto:emblema <plate.png>       # amplía el bordado para mirarlo al 100% (n
 pnpm foto:lanyard --nombre … --cargo … --foto …   # arma el lanyard determinístico; el modelo sólo lo termina
 ```
 
+🔴 **Para un AD con titular, los valores por formato ya están medidos — no los redescubras.**
+[`RECETA-POR-FORMATO.json`](../../ai-generations/2026-09-21_ads-brand-visibility/RECETA-POR-FORMATO.json)
+trae `top`, `textWidth`, tamaños de las tres voces, gaps, anclas de cursores y firma para **4:5, 9:16 y
+16:9**, listos para copiar y cambiar sólo el copy y el plate. El porqué de cada número y las seis trampas
+medidas están en el [método de producción](../../docs/operations/social/2026-09-21-ads-brand-visibility-production-method.md).
+🔴 **La regla de las tres veces:** el **dominante mide al menos 3× la entrada**, o la jerarquía se aplana
+—medido en cuatro versiones de la misma pieza: a 2,8× el operador la rechazó, a 4,0× la aprobó—. Ya está
+cableada en `foto:componer`, que imprime el ratio y avisa bajo 3×. Es condición **necesaria, no
+suficiente**.
+
+Tres que muerden siempre: el **dominante va en 1–3 palabras con un CIERRE que remata** (meter la frase
+entera lo aplana), la **entrada es Bricolage** (el default del compositor es Poppins) y el **colaborador va
+en `bottom-end`** — en `top-end` su etiqueta cae sobre la entrada y se come el nombre propio, con
+`withinCanvas` en `true`. **1:1 no se usa: está `sinValidar`.**
+
 **Dos categorías de pieza, y la diferencia se decide ANTES de generar:**
 
 | | Pieza **muda** | Pieza **con voz** |

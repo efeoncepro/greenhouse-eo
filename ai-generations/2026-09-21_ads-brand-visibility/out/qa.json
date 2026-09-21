@@ -4,28 +4,23 @@
     "dominante": [
       "No estabas."
     ],
+    "ratioDominanteEntrada": 4,
     "contraste": {
-      "etiqueta": 11.98,
-      "entrada": 11.29,
-      "dominante": 9.02,
-      "cierre-frase": 8.74,
+      "entrada": 11.34,
+      "dominante": 8.62,
+      "cierre-frase": 9.48,
       "logo": 6.78
     },
     "gapsTinta": [
       {
-        "entre": "etiqueta→entrada",
-        "px": 27,
-        "ratioDominante": 0.218
-      },
-      {
         "entre": "entrada→dominante",
-        "px": 20,
-        "ratioDominante": 0.161
+        "px": 26,
+        "ratioDominante": 0.149
       },
       {
         "entre": "dominante→cierre",
-        "px": 17,
-        "ratioDominante": 0.137
+        "px": 21,
+        "ratioDominante": 0.12
       }
     ],
     "seleccion": {
@@ -47,10 +42,10 @@
         {
           "id": "seo",
           "labelBounds": {
-            "left": 616.552,
-            "top": 325.474,
-            "right": 699.792,
-            "bottom": 376.001
+            "left": 806.97,
+            "top": 364.527,
+            "right": 890.209,
+            "bottom": 415.054
           }
         }
       ]
@@ -61,22 +56,23 @@
     "dominante": [
       "La citan."
     ],
+    "ratioDominanteEntrada": 4.1,
     "contraste": {
       "entrada": 16.02,
-      "dominante": 13.97,
-      "cierre-frase": 15.19,
+      "dominante": 13.89,
+      "cierre-frase": 15.62,
       "logo": 11.23
     },
     "gapsTinta": [
       {
         "entre": "entrada→dominante",
-        "px": 23,
-        "ratioDominante": 0.162
+        "px": 27,
+        "ratioDominante": 0.142
       },
       {
         "entre": "dominante→cierre",
-        "px": 18,
-        "ratioDominante": 0.127
+        "px": 21,
+        "ratioDominante": 0.111
       }
     ],
     "seleccion": {
@@ -98,10 +94,10 @@
         {
           "id": "data",
           "labelBounds": {
-            "left": 523.231,
-            "top": 439.546,
-            "right": 619.373,
-            "bottom": 490.073
+            "left": 648.185,
+            "top": 478.058,
+            "right": 744.327,
+            "bottom": 528.585
           }
         },
         {
@@ -121,28 +117,66 @@
     "dominante": [
       "Nadie revisó"
     ],
+    "ratioDominanteEntrada": 2.9,
     "contraste": {
-      "etiqueta": 14.99,
-      "entrada": 14.84,
-      "dominante": 13.04,
-      "cierre-frase": 13.59,
+      "entrada": 14.67,
+      "dominante": 13.6,
+      "cierre-frase": 14.1,
       "logo": 11.88
     },
     "gapsTinta": [
       {
-        "entre": "etiqueta→entrada",
-        "px": 26,
-        "ratioDominante": 0.283
-      },
-      {
         "entre": "entrada→dominante",
-        "px": 18,
-        "ratioDominante": 0.196
+        "px": 33,
+        "ratioDominante": 0.22
       },
       {
         "entre": "dominante→cierre",
-        "px": 15,
-        "ratioDominante": 0.163
+        "px": 27,
+        "ratioDominante": 0.18
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "local"
+        }
+      ]
+    }
+  },
+  {
+    "id": "c2-actionable",
+    "dominante": [
+      "No pudo."
+    ],
+    "ratioDominanteEntrada": 4,
+    "contraste": {
+      "entrada": 12.16,
+      "dominante": 10.34,
+      "cierre-frase": 11.65,
+      "logo": 16.37
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 26,
+        "ratioDominante": 0.149
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 21,
+        "ratioDominante": 0.12
       }
     ],
     "seleccion": {
@@ -162,12 +196,12 @@
           "id": "local"
         },
         {
-          "id": "seo",
+          "id": "dev",
           "labelBounds": {
-            "left": 622.695,
-            "top": 457.074,
-            "right": 753.267,
-            "bottom": 536.332
+            "left": 642.481,
+            "top": 385.702,
+            "right": 726.355,
+            "bottom": 436.229
           }
         }
       ]
@@ -175,6 +209,7 @@
   },
   {
     "id": "a1-muda",
+    "ratioDominanteEntrada": null,
     "contraste": {
       "logo": 19.32
     },
@@ -183,10 +218,63 @@
   },
   {
     "id": "a2-muda",
+    "ratioDominanteEntrada": null,
     "contraste": {
       "logo": 16.85
     },
     "gapsTinta": [],
     "seleccion": null
+  },
+  {
+    "id": "c1-readable",
+    "dominante": [
+      "Lo inventó."
+    ],
+    "ratioDominanteEntrada": 4,
+    "contraste": {
+      "entrada": 13.29,
+      "dominante": 11.98,
+      "cierre-frase": 13.14,
+      "logo": 18.93
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 26,
+        "ratioDominante": 0.149
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 21,
+        "ratioDominante": 0.12
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "local"
+        },
+        {
+          "id": "contenido",
+          "labelBounds": {
+            "left": 737.82,
+            "top": 367.761,
+            "right": 901.856,
+            "bottom": 418.288
+          }
+        }
+      ]
+    }
   }
 ]
