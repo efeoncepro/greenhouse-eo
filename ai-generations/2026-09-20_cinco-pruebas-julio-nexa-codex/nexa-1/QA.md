@@ -1,0 +1,10 @@
+# Nexa 1 — revisión de medio exterior
+
+- **Estado:** prueba para revisión de Julio; no aprobada ni publicada. Plate nativo 1122×1402 (4:5). Generado con el prompt emitido por `pnpm foto:prompt` y las tres referencias canónicas de Nexa; el SVG oficial se compuso después, sin logo ni texto generados.
+- **Preflight:** ficha registra las dos hojas aprobadas, N1 y N2 a tamaño completo y las dos pruebas recientes de Nexa. En la primera generación, la pantalla era un rectángulo azul de calibración demasiado vacío. Se regeneró con una fotografía real de arquitectura azul dentro de la pantalla; `plate-v1.png`, `ficha-v1.json` y `prompt-v1.txt` conservan esa comparación.
+- **Lectura visual:** Nexa conserva pelo oscuro ondulado, cejas y rostro comparables a las referencias. Está midiendo reflejo y visibilidad en terreno; el azul se integra a la obra de medios y al vidrio. El naranja procede de las luces del bus y se percibe muy pequeño. El entorno no lleva marcas ni tipografía visible. El tono de piel y la sombra son naturales. A 390 px, el gesto de medición se entiende; el contenido de la pantalla todavía puede leerse como una simulación de placement y requiere opinión del operador.
+- **Métricas de `metricas.cjs`:** azul 5,9%; naranja 0,03%; lima 0%; contraste tonal 73; altas quemadas 0,20%; negros aplastados 0,4%; piel L/C 48/26. Son apoyo, no cuotas de marca.
+- **`pnpm foto:validar`:** lecho blanco 12,31:1 y sombras neutras **pasan**. El comando sale 1 porque no hay aire para cursores ni campo profundo al margen. Esta pieza sólo pide foto y firma; no reserva texto, selección ni cursores. El chequeo de nitidez de lecho del script está marcado como señal frágil; se revisó también visualmente y el marco cercano es desenfoque óptico gradual.
+- **Firma:** logo blanco oficial, 20% del ancho, contraste medido 18,42:1. Sin scrim ni grade.
+- **Provenance local de la generación elegida:** `/Users/jreye/.codex/generated_images/01a0be77-5531-7203-83a7-aab50fa57aa4/exec-a53b4795-d48d-4f88-af31-036f7ea25100.png`.
+

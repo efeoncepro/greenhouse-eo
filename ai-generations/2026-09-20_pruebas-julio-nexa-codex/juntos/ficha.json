@@ -1,0 +1,24 @@
+{
+  "id": "jn-produccion-en-set-santiago",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio", "nexa"],
+  "preflightVisual": {
+    "aprobadasVistas": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/JN2-podcast-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/JN3-calle-final.png",
+      "ai-generations/2026-09-20_identidad-julio-nexa/final-20/P3-juntos-taller-miami-v2-logo20.png"
+    ],
+    "azul": "Display LED en uso durante una grabación real; campo de azul activo #0375DB, no un fondo decorativo.",
+    "acento": "Naranja #F55D01 de una tarjeta física de cue junto a la cámara y el tally de REC; marcan la toma en curso, 1–2% del cuadro.",
+    "lecho": "Tapa mate de un flight case de cámara, oscura, muy próxima y desenfocada; deja la franja inferior para firma blanca.",
+    "diferencia": "Julio y Nexa dirigen juntos una grabación sobre un set activo; interacción de trabajo y no pose ante cámara, escritorio o micrófonos de pódcast."
+  },
+  "escena": "SCENE (Efeonce creative production at work, Santiago studio, late morning): a candid behind-the-scenes still from a small live content shoot, just as recording begins. Julio, matching his two identity references exactly, is standing at the left of a professional camera, looking up from its monitor toward Nexa; his whole face remains visible in three-quarter view. Nexa, matching her two identity references exactly, stands at the right of the camera and cues the next take with one open hand; her whole face is visible in three-quarter view. Their eye lines and gestures connect across the camera, focused and relaxed, not smiling at the photographer. The camera monitor displays only a plain abstract crop of the set, no interface text. Behind the camera, a functioning LED display belonging to the scene being filmed gives a substantial clean azure-blue #0375DB area, around one fifth of the background, with neutral white elsewhere; it must read as a real lit display in use, not a color gel or a floating graphic. Nexa uses a plain saturated-orange #F55D01 physical cue card, held beside the camera in her left hand, to mark the exact moment recording begins; its visible face occupies around 1–2% of the picture and has no words or markings. The camera recording tally glows the same orange. These are one functional story accent from the live take, never a decorative prop. Julio wears a soft off-white overshirt over a charcoal tee; Nexa wears a warm sand cotton shirt with rolled sleeves, neither in navy or bright brand colors. Real cables, one light stand, a neatly arranged lens case, and practical studio equipment establish the operation without clutter. Natural late-morning window light mixed with clean studio fill, neutral skin and white balance, no blue tint in shadows. Human faces and hands are sharp, slight natural motion in Nexa's cueing hand. Intimate documentary framing from a slightly low side angle, full-frame 35 mm lens at f/2.8. Keep both people anatomically believable and equally important. The work of directing a live take, not a posed publicity photo, is the subject. No other people, no written words, no logos, no signs, no invented branding.",
+  "lecho": {
+    "objeto": "the very near matte-black lid of a professional camera flight case, genuinely out of focus along the bottom of the frame",
+    "tono": "DARK charcoal near black"
+  }
+}

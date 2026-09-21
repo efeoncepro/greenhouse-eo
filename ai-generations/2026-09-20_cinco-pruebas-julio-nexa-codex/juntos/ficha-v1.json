@@ -1,0 +1,23 @@
+{
+  "id": "jn-prueba-impresion-en-produccion",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio", "nexa"],
+  "preflightVisual": {
+    "aprobadasVistas": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/JN1-mesa-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/JN3-calle-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/K1-kv-cafe-final.png"
+    ],
+    "comparacion": "JN1 y K1 ya muestran una revisión sentada de impresos con utilería azul y naranja; esta toma ocurre de pie, al lado de una prensa de formato grande en marcha. JN3 aporta el gesto compartido y la naturalidad de la luz, sin repetir la caminata.",
+    "azul": "La propia imagen abstracta de arquitectura de vidrio azul que sale de la prensa; superficie de trabajo con motivo real, no un panel de color añadido.",
+    "acento": "Un par de pequeñas marcas de registro naranja en el margen de la prueba: acento funcional, elegante y subordinado a la fotografía.",
+    "lecho": "El riel gris carbón de la prensa, muy próximo y desenfocado en el borde inferior, reserva para firma blanca posterior.",
+    "diferencia": "Julio y Nexa supervisan la prueba en producción, corrigiendo juntos el color y el encuadre. El azul está en el contenido que imprimen y el naranja en marcas técnicas útiles."
+  },
+  "escena": "SCENE (Efeonce creative direction in an independent professional large-format print workshop, Santiago): A candid documentary instant beside an operating wide-format fine-art inkjet printer as one fresh 4:5 photographic proof emerges from the feed. Julio, the same real man as identity references 1-2, stands to the left of the machine, lightly guiding the leading edge of the paper with one hand while checking the printed blue tones. Nexa, the same real woman as references 3-4, stands to the right and indicates a subtle technical registration detail near the print margin. Both full faces are clearly visible in natural three-quarter profiles above the emerging print; their attention connects through this actual work, not a posed camera smile. Their hands must be anatomically credible and separate from the paper mechanism. The emerging proof shows an unbranded, full-bleed documentary photograph of glass architecture with a naturally saturated azure #0375DB sky reflection and enough real texture to look like photographic work rather than a flat blue rectangle. A pair of very small warm orange #F55D01 registration marks belongs to the proof margin; it is a purposeful functional accent, not a color-coded prop. The workshop has neutral gray equipment, off-white walls and one genuine high window. Warm-neutral daylight and a practical inspection lamp preserve natural skin, neutral shadows and accurate whites; no global orange, blue or lime grade. Julio wears a charcoal fine-knit layer over an off-white shirt, Nexa a light stone cotton shirt with natural creases, no invented company mark. Capture from a low diagonal side angle at the press, 35mm full-frame documentary camera at f/2.8, with a soft machine rail in the foreground, two accurately rendered faces and the moving proof in the middle plane, press mechanism and high window in the back plane. The charcoal press rail occupies the bottom 19 percent of the vertical frame as a dark, softly defocused foreground bed reserved for a post-composed white official logo. It must connect visibly to the actual machine, not look like a digital gradient or a scrim. The photo is intimate, editorial, spatial, imperfectly timed and convincingly real, with the shared craft of proofing as the narrative. Exactly two identifiable people, no other people, no written words, no signage, no client brand, no generated logo, no large isolated orange or lime objects, no tabletop coffee meeting.",
+  "lecho": {
+    "objeto": "the very near charcoal metal feed rail of the operating wide-format printer, physically connected to the press and softly out of focus across the bottom of the photograph",
+    "tono": "DARK charcoal near black"
+  }
+}

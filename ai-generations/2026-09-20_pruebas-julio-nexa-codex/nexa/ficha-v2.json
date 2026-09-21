@@ -1,0 +1,27 @@
+{
+  "id": "nexa-direccion-rodaje-luz-azul-v2",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "preflightVisual": {
+    "abiertas": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/julio-nexa-firmadas.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/N1-ojo-pez-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/N1b-ojo-pez-plate.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/N2-reflejo-final.png"
+    ],
+    "comparacion": "N1/N1b fija ojos, cejas, pelo y gesto de Nexa con perspectiva dinámica; N2 muestra su concentración sobre una decisión real. Esta toma cambia la mesa y el vidrio por un rodaje activo, con una obra iluminada y una decisión de luz, no una pose. El set curado alterna material oscuro y claro, luz con carácter y portador azul nacido de la obra.",
+    "azul": "Panel real de luz de set, saturado azure #0375DB, ilumina sólo el fondo del producto y ocupa aproximadamente 6% del cuadro; no ropa ni taza.",
+    "acento": "Dos piezas conectadas del mismo rig de seguridad: pinza naranja que Nexa ajusta y un contrapeso naranja de tela en la base del soporte. Juntas deben ocupar aproximadamente 1-2% del cuadro, nacen del oficio y no son utilería.",
+    "lecho": "Tapa de una maleta real de cámara, carbón mate casi negro, muy cerca del lente, desenfoque óptico.",
+    "vestuario": "Camisa de lino crudo con mangas arremangadas, pantalón grafito; sin blazer, sin navy y sin marcas."
+  },
+  "escena": "SCENE (Efeonce creative direction on a small commercial product film set in Santiago, hard late-afternoon daylight): Nexa is the ONLY person in frame, seen in a candid three-quarter profile, adjusting the angle of a large black lighting flag by its vivid orange safety clamp just as the light becomes right; the matching vivid orange fabric counterweight bag securing the stand is visible below her hand. Both pieces are part of the SAME essential professional lighting rig and together occupy approximately 1.5 percent of the photograph, a clearly visible orange story accent integral to her action. She studies the shadow it casts on a simple unbranded glass beverage bottle on a low stone plinth; a camera with a matte box sits beside the plinth, clearly showing that this is a working production set and a creative lighting decision. Behind the bottle, one practical AZURE BLUE (#0375DB) light panel creates a saturated, clean field occupying about 6 percent of the full photograph, clearly visible and integral to the shot being made. The orange safety pieces of this single lighting rig are the ONLY story accent; no lime and no other saturated colors. Nexa wears a natural ecru linen shirt with sleeves rolled up and graphite trousers, no jacket, no blazer, no navy or blue garments. Her face, defined brows and long dark wavy hair remain recognizable from the references. She looks at the bottle and flag, never at the camera. 35mm lens at f/2.8 from a low position behind the camera flight case; focus on Nexa's face, hand and the orange clamp, bottle still readable. A sharp sunbeam intersects the light flag and leaves graphic shadows on the warm plaster wall; clean, cared-for set, unbranded equipment, no readable lettering, logos, numbers or text anywhere.",
+  "lecho": {
+    "objeto": "the matte charcoal-black lid of a real closed camera flight case set between the low camera and Nexa's lighting flag, so close to the lens it becomes optical blur",
+    "tono": "DARK near black, charcoal matte equipment material in shade with subtle real texture, never a flat black slab"
+  }
+}

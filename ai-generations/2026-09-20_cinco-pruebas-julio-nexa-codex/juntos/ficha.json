@@ -1,0 +1,23 @@
+{
+  "id": "jn-prueba-impresion-luz-direccional",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": ["julio", "nexa"],
+  "preflightVisual": {
+    "aprobadasVistas": [
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/curado/set-curado-12.jpg",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/JN1-mesa-final.png",
+      "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/JN3-calle-final.png"
+    ],
+    "fuenteActual": "ai-generations/2026-09-20_cinco-pruebas-julio-nexa-codex/juntos/plate-v1.png",
+    "comparacion": "La placa de imprenta conserva acción, rostros y color, pero su iluminación ambiental es demasiado uniforme frente al haz duro, el contraluz y las sombras gráficas de la hoja aprobada. Se corrige la luz de la misma composición, no el oficio ni la identidad.",
+    "luz": "Sol bajo lateral entrando desde la ventana alta de la derecha; haz oblicuo sobre prueba y manos, sombras estructurales de montantes sobre pared y carcasa, borde cálido estrecho en cabello y perfiles, rebote neutro en rostros. La lámpara de inspección queda apagada.",
+    "color": "Azul fotográfico en la prueba impresa con reflejo solar localizado; diminutas marcas de registro naranja útiles y legibles. Sin grade global ni sombras azules.",
+    "lecho": "El riel gris carbón de la prensa queda oscuro, suave y sin rayas de sol en el borde inferior para la firma oficial posterior."
+  },
+  "escena": "EDIT THE EXISTING PHOTOGRAPH IN IMAGE 5. Image 5 is the current Efeonce print-workshop plate and is the strict source for the composition. This is a controlled photographic re-light of exactly that still, not a new scene. Preserve the two people as the same Julio and Nexa from references 1-4 AND as they appear in Image 5: exact facial structure, skin texture, glasses, hair, expressions, body proportions, hand positions, gaze, the live wide-format printer, its paper feed, the blue architectural photograph emerging from it, the tiny orange registration marks, camera angle, frame boundaries, depth of field, and unbranded workshop. Julio wears the same charcoal fine-knit sweater over an off-white shirt as Image 5; Nexa wears the same light stone cotton blouse as Image 5. MOMENT: just as the fresh print emerges, one single low late-afternoon sunbeam enters through the existing tall high windows at frame right. The sunlight rakes diagonally across the middle of the workshop, landing decisively on the emerging photographic proof and their working hands; it also grazes part of each face without blowing out either face. The window mullions cast strong, believable graphic diagonal shadow shapes onto the rear wall and the printer housing, but never across their eyes, glasses or key facial features. Give Nexa's hair a narrow warm rim and Julio's beard, temple and glasses a subtle warm edge; a soft neutral bounce from the white paper keeps both faces fully detailed and recognizable. Make the workshop ambient one to two stops deeper with visible texture in clothing and equipment, so the real sunbeam and shadow geometry provide the impact. The inspection lamp is off or merely an insignificant background detail. A small natural specular streak touches the actual blue photograph on the moving proof, keeping its paper texture, sky detail, architectural detail and orange registration marks intact; it is not a glowing LED, neon effect or color wash. Warm-neutral daylight around 5200 K, very slightly warm accurate whites, natural skin, neutral shadows, highlights exposed to retain detail. The charcoal printer rail in the entire bottom foreground remains the same naturally out-of-focus smooth DARK bed, completely untouched by sun streaks or graphic shadows, ready for a post-composed official white SVG. Keep the same 4:5 native format and photo-real documentary character. No new person, prop, logo, text, signage, color gel, fog machine, theatrical spotlight, vignette, scrim or global color grade. Preserve the original image's particular faces and working gestures with near-identical geometry.",
+  "lecho": {
+    "objeto": "the existing very near charcoal metal feed rail of the operating printer in Image 5, physically connected to the press and softly out of focus across the bottom of the photograph",
+    "tono": "DARK charcoal near black"
+  }
+}
