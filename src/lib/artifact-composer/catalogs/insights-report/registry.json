@@ -11,6 +11,7 @@
   "figmaFileKey": null,
   "contentTypeTaxonomy": [
     "report-cover",
+    "report-narrative",
     "report-analysis",
     "report-table",
     "report-limits"
@@ -67,6 +68,19 @@
       ],
       "prototype": "report-limits.html",
       "slotsRef": "report-limits.slots.json"
+    },
+    {
+      "name": "ReportNarrativePage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": [
+        "report-narrative"
+      ],
+      "prototype": "report-narrative.html",
+      "slotsRef": "report-narrative.slots.json"
     }
   ],
   "selector": {
@@ -75,9 +89,11 @@
       "report-cover": "ReportCoverPage",
       "report-analysis": "ReportAnalysisPage",
       "report-table": "ReportTablePage",
-      "report-limits": "ReportLimitsPage"
+      "report-limits": "ReportLimitsPage",
+      "report-narrative": "ReportNarrativePage"
     },
     "disambiguation": [
+      "capítulo cuya evidencia no alcanzó para una figura, y el resumen ejecutivo => ReportNarrativePage. NUNCA se omite el capítulo: desaparecerlo convierte la falta de datos en silencio.",
       "página analítica: una afirmación con la figura que la prueba => ReportAnalysisPage.",
       "filas comparables que el lector va a auditar => ReportTablePage. Una tabla NO es una figura: no se convierte en gráfico para «verse mejor».",
       "lo que la edición no puede afirmar, con su causa => ReportLimitsPage. Nunca se omite porque «quedó pobre»."

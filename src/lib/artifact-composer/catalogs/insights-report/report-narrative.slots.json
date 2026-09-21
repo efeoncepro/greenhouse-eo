@@ -1,5 +1,5 @@
 {
-  "template": "ReportCoverPage",
+  "template": "ReportNarrativePage",
   "figmaNodeId": null,
   "version": "0.1",
   "viewport": {
@@ -7,77 +7,70 @@
     "height": 1123
   },
   "slots": {
-    "editionId": {
-      "selector": "[data-slot='editionId']",
+    "runningChapter": {
+      "selector": "[data-slot='runningChapter']",
       "type": "string",
       "required": true,
       "constraints": {
-        "maxCharacters": 20,
+        "maxCharacters": 40,
+        "maxLines": 1,
+        "transform": "uppercase",
+        "overflow": "reject"
+      }
+    },
+    "runningPeriod": {
+      "selector": "[data-slot='runningPeriod']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 32,
         "maxLines": 1,
         "overflow": "reject"
-      },
-      "notes": "Identificador público de la edición. Sin él el informe no se puede citar."
+      }
     },
-    "clientName": {
-      "selector": "[data-slot='clientName']",
-      "type": "string",
+    "assertion": {
+      "selector": "[data-slot='assertion']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 130,
+        "maxLines": 3,
+        "allowedTags": [
+          "em"
+        ],
+        "overflow": "reject"
+      }
+    },
+    "lead": {
+      "selector": "[data-slot='lead']",
+      "type": "rich-string",
       "required": false,
       "constraints": {
-        "maxCharacters": 48,
-        "maxLines": 2,
+        "maxCharacters": 260,
+        "maxLines": 4,
+        "allowedTags": [
+          "b"
+        ],
+        "overflow": "reject"
+      }
+    },
+    "paragraphs": {
+      "selector": "[data-slot='paragraphs']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 1,
+        "maxItems": 7,
+        "maxCharactersPerItem": 420,
         "overflow": "reject"
       },
-      "notes": "Opcional: la edición no lo trae hoy. Un informe sin nombre de cliente es correcto; uno con un nombre inventado, no."
-    },
-    "reportTitle": {
-      "selector": "[data-slot='reportTitle']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 64,
-        "maxLines": 3,
-        "overflow": "reject"
-      }
-    },
-    "reportSubtitle": {
-      "selector": "[data-slot='reportSubtitle']",
-      "type": "string",
-      "required": false,
-      "constraints": {
-        "maxCharacters": 150,
-        "maxLines": 3,
-        "overflow": "reject"
-      }
-    },
-    "periodLabel": {
-      "selector": "[data-slot='periodLabel']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 28,
-        "maxLines": 1,
-        "overflow": "reject"
-      }
-    },
-    "versionLabel": {
-      "selector": "[data-slot='versionLabel']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 10,
-        "maxLines": 1,
-        "overflow": "reject"
-      }
-    },
-    "issuedLabel": {
-      "selector": "[data-slot='issuedLabel']",
-      "type": "string",
-      "required": true,
-      "constraints": {
-        "maxCharacters": 16,
-        "maxLines": 1,
-        "overflow": "reject"
-      }
+      "item": {
+        "type": "rich-string",
+        "allowedTags": [
+          "b"
+        ]
+      },
+      "notes": "El TECHO de 7 párrafos es del molde: más no cabe en el alto útil y el reparto entre páginas lo hace paginateFlow() antes de imprimir."
     },
     "fixed-urlBubble": {
       "selector": "[data-slot='urlBubble']",

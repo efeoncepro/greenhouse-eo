@@ -33,8 +33,9 @@ import { getInsightEditorialPlanByEdition } from '../stores/plan-store'
 import { getInsightReportById } from '../stores/report-store'
 import { getInsightEvidenceSnapshotByEdition } from '../stores/snapshot-store'
 
-import { INSIGHT_RENDER_CATALOG_NAME, INSIGHT_RENDERABLE_OUTPUTS, type InsightOutputRecord, type InsightRenderRunRecord } from './contracts'
+import { INSIGHT_RENDER_CATALOG_BY_OUTPUT, INSIGHT_RENDERABLE_OUTPUTS, type InsightOutputRecord, type InsightRenderRunRecord } from './contracts'
 import { buildInsightDeckPlanInput } from './deck-mapper'
+import { buildInsightReportPlanInput } from './report-mapper'
 import {
   cancelInsightRenderRun,
   findInsightOutputsForEdition,
@@ -149,9 +150,28 @@ export const requestInsightRender = async (input: RequestInsightRenderInput): Pr
   // input que emite el composer no coincide, es `manifest_drift` y no se publica. La validación
   // autoritativa de slots/semántica corre en el worker contra los contratos reales del catálogo;
   // el mapper ya rechaza acá lo que excede los presupuestos conocidos.
-  const planInput = buildInsightDeckPlanInput({ edition, report, plan: plan.plan, snapshot })
-  const manifest: Record<string, unknown> = { input: planInput as unknown as Record<string, unknown> }
-  const manifestHash = hashResolvedManifest(manifest)
+  // Un manifest POR SALIDA: el deck y el informe componen desde el mismo plan sellado pero con
+  // catálogos distintos, así que sellar uno solo haría que el worker detectara `manifest_drift` en
+  // cuanto la segunda salida compusiera lo suyo.
+  const plannedOutputs = outputs.map(output => {
+    const catalogName = INSIGHT_RENDER_CATALOG_BY_OUTPUT[output as keyof typeof INSIGHT_RENDER_CATALOG_BY_OUTPUT]
+
+    const planInput =
+      output === 'report_pdf'
+        ? buildInsightReportPlanInput({ edition, report, plan: plan.plan })
+        : buildInsightDeckPlanInput({ edition, report, plan: plan.plan, snapshot })
+
+    const manifest: Record<string, unknown> = { input: planInput as unknown as Record<string, unknown> }
+
+    return { output, catalogName, manifest, manifestHash: hashResolvedManifest(manifest) }
+  })
+
+  // El evento describe el RUN, no una salida. Con más de una, un hash singular mentiría: se sella
+  // el conjunto. El hash autoritativo de cada salida sigue viviendo en su propia fila, que es lo
+  // que el worker compara para detectar `manifest_drift`.
+  const runManifestHash = hashResolvedManifest({
+    outputs: plannedOutputs.map(o => ({ output: o.output, manifestHash: o.manifestHash }))
+  })
 
   return withGreenhousePostgresTransaction(async client => {
     const inserted = await insertInsightRenderRun({
@@ -165,7 +185,7 @@ export const requestInsightRender = async (input: RequestInsightRenderInput): Pr
       requestedByKind: grant.actor.kind,
       requestedByUserId: grant.actor.userId,
       requestedByMemberId: grant.actor.memberId,
-      outputs: outputs.map(output => ({ output, catalogName: INSIGHT_RENDER_CATALOG_NAME, manifest, manifestHash }))
+      outputs: plannedOutputs
     })
 
     await publishInsightRenderRequested(client as never, {
@@ -175,7 +195,7 @@ export const requestInsightRender = async (input: RequestInsightRenderInput): Pr
       organizationId: edition.organizationId,
       audience: edition.audience,
       outputs,
-      manifestHash,
+      manifestHash: runManifestHash,
       actorKind: grant.actor.kind
     })
 

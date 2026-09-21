@@ -18,7 +18,13 @@ export interface FlowBlock {
   /** Identificador estable del bloque dentro del flujo. */
   readonly blockId: string
 
-  /** Alto medido, en píxeles del lienzo. */
+  /**
+   * Cuánto ocupa el bloque, en las MISMAS unidades que el presupuesto de página.
+   *
+   * La unidad es del consumer: filas de una tabla, párrafos, o píxeles medidos. El reparto no
+   * cambia — por eso el mismo algoritmo sirve para paginar por capacidad declarada hoy y por
+   * medición real mañana, sin reescribirlo.
+   */
   readonly heightPx: number
 
   /**
@@ -29,7 +35,7 @@ export interface FlowBlock {
 }
 
 export interface PageBudget {
-  /** Alto útil de una página, ya descontados cabecera, pie y márgenes. */
+  /** Capacidad útil de una página, ya descontados cabecera, pie y márgenes, en la unidad del flujo. */
   readonly contentHeightPx: number
 
   /**

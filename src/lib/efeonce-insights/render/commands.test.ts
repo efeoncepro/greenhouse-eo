@@ -91,8 +91,10 @@ describe('requestInsightRender', () => {
     stores.getInsightEditionById.mockResolvedValue(edition({ state: 'collecting' }))
     await expect(requestInsightRender(scope)).rejects.toMatchObject({ code: 'not_ready' })
 
-    stores.getInsightEditionById.mockResolvedValue(edition({ outputs: ['deck_pdf', 'report_pdf'] }))
-    await expect(requestInsightRender({ ...scope, outputs: ['report_pdf'] })).rejects.toMatchObject({ code: 'render_rejected', details: { unsupported: ['report_pdf'] } })
+    // TASK-1847: `report_pdf` pasó a renderizable (catálogo `insights-report`). El output que sigue
+    // sin catálogo es `web`, que es de TASK-1848 — y por eso es el que debe rechazarse acá.
+    stores.getInsightEditionById.mockResolvedValue(edition({ outputs: ['deck_pdf', 'web'] }))
+    await expect(requestInsightRender({ ...scope, outputs: ['web'] })).rejects.toMatchObject({ code: 'render_rejected', details: { unsupported: ['web'] } })
     expect(render.insertInsightRenderRun).not.toHaveBeenCalled()
   })
 

@@ -26,7 +26,21 @@ import type { InsightAudience, InsightOutput } from '../contracts/request'
  */
 export const INSIGHT_RENDER_CATALOG_NAME = 'deck-axis'
 
-export const INSIGHT_RENDERABLE_OUTPUTS = ['deck_pdf'] as const satisfies readonly InsightOutput[]
+/**
+ * Catálogo por salida. Antes era UNA constante para todas, que es lo que impedía una segunda
+ * salida: el deck horizontal y el informe vertical no comparten molde, presupuestos ni vocabulario.
+ * Sigue siendo un STRING por la misma razón de siempre — importar el catálogo como valor arrastra
+ * sus fuentes y assets al bundle de Vercel.
+ */
+export const INSIGHT_RENDER_CATALOG_BY_OUTPUT = {
+  deck_pdf: 'deck-axis',
+  report_pdf: 'insights-report'
+} as const satisfies Partial<Record<InsightOutput, string>>
+
+export const INSIGHT_RENDERABLE_OUTPUTS = [
+  'deck_pdf',
+  'report_pdf'
+] as const satisfies readonly InsightOutput[]
 
 /** Estado del run agregado. `partial_failed` existe porque un output puede caer sin arrastrar al resto. */
 export const INSIGHT_RENDER_RUN_STATES = [
