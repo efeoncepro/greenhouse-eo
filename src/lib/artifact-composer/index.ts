@@ -127,4 +127,20 @@ export {
   type PageBudget,
   type PaginatedPage
 } from './paginate'
+export {
+  barGeometry,
+  ChartGeometryError,
+  lineGeometry,
+  MAX_SLICES,
+  resolveScale,
+  scatterGeometry,
+  sliceGeometry,
+  type AxisScale,
+  type BarGeometry,
+  type GeometrySeries,
+  type LineGeometry,
+  type LinePoint,
+  type ScatterPoint,
+  type SliceGeometry
+} from './chart-geometry'
 
