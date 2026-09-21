@@ -1,133 +1,31 @@
 [
   {
-    "id": "b1-feed",
-    "dominante": [
-      "No dijo",
-      "tu nombre."
-    ],
-    "contraste": {
-      "etiqueta": 11.64,
-      "entrada": 10.88,
-      "dominante": 6.59,
-      "logo": 6.78
-    },
-    "gapsTinta": [
-      {
-        "entre": "etiqueta→entrada",
-        "px": 11,
-        "ratioDominante": 0.098
-      },
-      {
-        "entre": "entrada→dominante",
-        "px": 34,
-        "ratioDominante": 0.304
-      }
-    ],
-    "seleccion": {
-      "selection": {
-        "variant": "eight-handles",
-        "padding": "standard",
-        "paddingRatio": {
-          "inline": 0.012,
-          "block": 0.01
-        },
-        "overlay": "subtle",
-        "overlayOpacity": 0.1,
-        "overlayBlendMode": "luminosity"
-      },
-      "cursores": [
-        {
-          "id": "local"
-        },
-        {
-          "id": "seo",
-          "labelBounds": {
-            "left": 544.6,
-            "top": 507.648,
-            "right": 632.736,
-            "bottom": 561.147
-          }
-        }
-      ]
-    }
-  },
-  {
-    "id": "b2-stories",
-    "dominante": [
-      "Es más",
-      "citada."
-    ],
-    "contraste": {
-      "entrada": 16.01,
-      "dominante": 13.73,
-      "logo": 11.23
-    },
-    "gapsTinta": [
-      {
-        "entre": "entrada→dominante",
-        "px": 32,
-        "ratioDominante": 0.258
-      }
-    ],
-    "seleccion": {
-      "selection": {
-        "variant": "eight-handles",
-        "padding": "standard",
-        "paddingRatio": {
-          "inline": 0.012,
-          "block": 0.01
-        },
-        "overlay": "subtle",
-        "overlayOpacity": 0.1,
-        "overlayBlendMode": "luminosity"
-      },
-      "cursores": [
-        {
-          "id": "local"
-        },
-        {
-          "id": "data",
-          "labelBounds": {
-            "left": 436.807,
-            "top": 558.448,
-            "right": 538.605,
-            "bottom": 611.947
-          }
-        },
-        {
-          "id": "nexa",
-          "labelBounds": {
-            "left": 1006.848,
-            "top": 1741.568,
-            "right": 1112.228,
-            "bottom": 1795.067
-          }
-        }
-      ]
-    }
-  },
-  {
     "id": "b3-display",
     "dominante": [
-      "Nadie revisó",
-      "qué dicen."
+      "Nadie revisó"
     ],
     "contraste": {
-      "etiqueta": 15.22,
-      "entrada": 15.26,
-      "dominante": 14.65,
-      "logo": 6.75
+      "etiqueta": 14.99,
+      "entrada": 14.41,
+      "dominante": 13.05,
+      "cierre-frase": 14.78,
+      "logo": 11.88
     },
     "gapsTinta": [
       {
         "entre": "etiqueta→entrada",
-        "px": 9,
-        "ratioDominante": 0.105
+        "px": 26,
+        "ratioDominante": 0.283
       },
       {
         "entre": "entrada→dominante",
-        "px": 36,
-        "ratioDominante": 0.419
+        "px": 39,
+        "ratioDominante": 0.424
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 31,
+        "ratioDominante": 0.337
       }
     ],
     "seleccion": {
@@ -145,15 +43,6 @@
       "cursores": [
         {
           "id": "local"
-        },
-        {
-          "id": "seo",
-          "labelBounds": {
-            "left": 605.168,
-            "top": 586.93,
-            "right": 744.445,
-            "bottom": 671.471
-          }
         }
       ]
     }

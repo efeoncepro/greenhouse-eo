@@ -3,19 +3,28 @@
     "id": "b1-feed",
     "plate": "plates/b1-reflejo-45-plate.png",
     "align": "left",
-    "top": 0.05,
-    "textWidth": 0.78,
+    "top": 0.045,
+    "textWidth": 0.84,
     "label": "BRAND VISIBILITY GRADER",
+    "labelSize": 26,
+    "labelGap": 0.22,
     "lead": "Le preguntaron a **ChatGPT** por tu categoría.",
-    "leadSize": 46,
-    "dominant": "No dijo|tu nombre.",
-    "dominantSize": 112,
-    "dominantMax": 0.6,
+    "leadFamily": "bricolage",
+    "leadSize": 44,
+    "leadGap": 0.16,
+    "dominant": "No estabas.",
+    "dominantSize": 124,
+    "dominantMax": 0.62,
+    "after": "Tu competencia **sí**.",
+    "afterFamily": "bricolage",
+    "afterSize": 50,
+    "afterGap": 0.14,
+    "afterFill": "#cfe4fa",
     "selection": {
       "variant": "eight-handles",
       "padding": "standard",
       "overlay": "subtle",
-      "scale": 1.8,
+      "scale": 1.7,
       "cursors": [
         {
           "id": "local",
@@ -36,25 +45,31 @@
     "logo": {
       "width": 0.2,
       "x": 0.5
-    },
-    "leadGap": 0.3
+    }
   },
   {
     "id": "b2-stories",
     "plate": "plates/b2-larga-916-plate.png",
     "align": "left",
     "top": 0.1,
-    "textWidth": 0.8,
-    "lead": "Tu competencia no es más rápida.",
-    "leadSize": 48,
-    "dominant": "Es más|citada.",
-    "dominantSize": 124,
-    "dominantMax": 0.62,
+    "textWidth": 0.84,
+    "lead": "Tu competencia no corre más rápido.",
+    "leadFamily": "bricolage",
+    "leadSize": 46,
+    "leadGap": 0.16,
+    "dominant": "La citan.",
+    "dominantSize": 142,
+    "dominantMax": 0.6,
+    "after": "A ti **no**.",
+    "afterFamily": "bricolage",
+    "afterSize": 56,
+    "afterGap": 0.13,
+    "afterFill": "#cfe4fa",
     "selection": {
       "variant": "eight-handles",
       "padding": "standard",
       "overlay": "subtle",
-      "scale": 1.8,
+      "scale": 1.7,
       "cursors": [
         {
           "id": "local",
@@ -83,49 +98,47 @@
     "logo": {
       "width": 0.2,
       "x": 0.5
-    },
-    "leadGap": 0.26
+    }
   },
   {
     "id": "b3-display",
     "plate": "plates/b3-larga-169-plate.png",
     "align": "left",
-    "top": 0.14,
-    "textWidth": 0.33,
+    "top": 0.13,
+    "textWidth": 0.4,
     "label": "BRAND VISIBILITY GRADER",
-    "labelSize": 34,
+    "labelSize": 28,
+    "labelGap": 0.28,
     "lead": "**ChatGPT**, **Perplexity** y **Gemini** ya describen tu marca.",
-    "leadSize": 38,
-    "dominant": "Nadie revisó|qué dicen.",
-    "dominantSize": 86,
-    "dominantMax": 0.33,
+    "leadFamily": "bricolage",
+    "leadSize": 36,
+    "leadGap": 0.42,
+    "dominant": "Nadie revisó",
+    "dominantSize": 92,
+    "dominantMax": 0.34,
+    "after": "**qué dicen**.",
+    "afterFamily": "poppins",
+    "afterSize": 40,
+    "afterGap": 0.34,
+    "afterFill": "#cfe4fa",
     "selection": {
       "variant": "eight-handles",
       "padding": "standard",
       "overlay": "subtle",
-      "scale": 1.6,
+      "scale": 1.5,
       "cursors": [
         {
           "id": "local",
           "kind": "local",
           "anchor": "end-center",
           "action": "select"
-        },
-        {
-          "id": "seo",
-          "anchor": "bottom-end",
-          "action": "select",
-          "label": "SEO",
-          "who": "role",
-          "color": "#12afa2"
         }
       ]
     },
     "logo": {
       "width": 0.2,
-      "x": 0.21
-    },
-    "leadGap": 0.42
+      "x": 0.5
+    }
   },
   {
     "id": "a1-muda",
