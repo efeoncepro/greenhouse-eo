@@ -125,6 +125,36 @@ peinado y las gafas se conservan de la imagen original.
 aporta el registro; las otras 16 son duplicados caros. Y de las 23 de vestuario, 6 llevan gafas de sol: ahí no
 hay cara que injertar.
 
+## Los cuatro signature elements — y dónde NO están **[2026-09-21]**
+
+El [Character Bible](../../docs/operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md), de febrero
+2026 y puenteado al repo recién el 2026-09-21, define en §5.1 **cuatro** elementos que Nexa lleva siempre —
+son **cuatro, no tres**: la lista incluye las **uñas** con el mismo rango que las joyas.
+
+| Elemento | Especificación |
+|---|---|
+| **Anillo** | índice de la mano **derecha**, geométrico, **plata mate**. El Bible lo llama «el ancla visual más fuerte — incluir en cada prompt» |
+| **Reloj** | muñeca **izquierda**, correa navy de cuero o mesh plateada, carátula pequeña y limpia |
+| **Aretes** | siempre, de studs geométricos a aros medianos. **Predominantemente plata** |
+| **Uñas** | arregladas, cortas-medianas, **un solo color**: navy oscuro o nude rosado |
+
+🔴 **Las `1-anclas/` NO los cumplen.** Se produjeron antes de que el Bible existiera en el repo: llevan aros
+**dorados**, anillos finos dorados en los **anulares** y ninguna lleva reloj. La estructura facial sí cumple
+la ficha del Bible —verificado contra §3.1— pero los accesorios no.
+
+✅ **`4-vestuario/` sí los porta** y además clava los contextos de §5.3 (moño alto y lentes de luz azul en
+`home`, acento naranja y azul eléctrico en `speaker`, blazer navy sobre blanco en `prof`). **La brecha está
+concentrada en las anclas, no en todo el set.**
+
+**Salida propuesta, dentro del canon** («editar conserva, generar reconstruye»): editar **una sola** imagen,
+`1-anclas/nexa-ancla-8-manos.png` — es la vista `manos` y la única de las ocho que muestra mano y muñeca.
+Una edición en vez de ocho regeneraciones. Si se edita, **re-sellar**: `pnpm foto:assets:lock`.
+
+🔴 **El «incluir en cada prompt» del anillo no es físicamente sostenible en todo encuadre.** Un anillo en
+plano medio tiene menos píxeles que la cinta del lanyard que volvió como manchas a ~12 px de ancho. El
+prompt puede pedirlo siempre; sólo se resuelve donde la mano tiene tamaño en el cuadro. Ver la regla del
+encuadre en `.claude/rules/brand-photography.md`.
+
 ## Deuda declarada **[pendiente]**
 
 `2-angulos/`, `3-poses/` y `4-vestuario/` conservan el **acabado sintético** anterior, porque se derivaron del
