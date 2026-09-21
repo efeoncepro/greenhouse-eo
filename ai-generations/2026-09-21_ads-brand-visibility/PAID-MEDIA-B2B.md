@@ -85,8 +85,21 @@ cotización solicitada** en `/aeo-2/` (AEO) o `/servicios/posicionamiento-seo/` 
 por sí sola UTK/UTM**. Sin la mitigación (GTM + Forms API con `context.hutk`), **se puede gastar y no saber qué
 campaña trajo la reunión** — que es el peor escenario posible para un test de canal.
 
-🔴 **La landing de contenidos NO existe** (seis variantes probadas, todas 404 el 2026-09-21). Esa rama del
-embudo no se puede pautear hasta que exista destino.
+| | Destino | Verificado 2026-09-21 |
+|---|---|---|
+| **AEO** | **`/aeo-2/`** (`/servicios/aeo` redirige ahí) | ✅ 200 |
+| **SEO** | **`/servicios/posicionamiento-seo/`** | ✅ 200 |
+| **Contenidos** | **`/servicio-marketing-de-contenidos/`** | ✅ 200 |
+| **Agendar** | **`/agenda/`** — scheduler nativo (PDR-009) | ✅ 200 |
+
+🔴 **Las rutas NO siguen un patrón único: hay cuatro.** `/aeo-2/` sin prefijo · `/servicio-marketing-de-contenidos/`
+singular con guión · `/servicios-contratar-hubspot/` plural con guión · `/servicios/posicionamiento-seo/` en
+subcarpeta. **Inferir una ruta es adivinar** — seis variantes del patrón `/servicios/` dieron 404 mientras la
+página existía. El inventario sale del REST de WordPress (`/wp-json/wp/v2/pages`), no de suposición.
+
+🔴 **Hay DOS páginas de agendamiento y eso puede partir la medición:** `/agenda/` («Agenda una reunión», el
+scheduler nativo de PDR-009) y **`/agendar/`** («¡Habla con un experto!»). Antes de pautear hay que declarar
+cuál es la canónica y qué pasa con la otra, o las reuniones van a contarse en dos lugares.
 
 ## Veredicto por plataforma (de la práctica, no de mi opinión)
 
@@ -139,5 +152,5 @@ los de la tabla son supuestos.
 | 2 | Eventos `gh_grader_*` en GTM | Medir coste por informe, no por clic |
 | 3 | Audiencias de retargeting creadas (Meta pixel + LinkedIn insight tag) | E3 y E4 completas |
 | 4 | **Atribución del scheduler** (GTM + Forms API con `context.hutk`) | 🔴 **Medir reuniones por campaña** |
-| 5 | **Landing de contenidos** (hoy 404) | La rama de contenidos |
+| 5 | **Declarar la página canónica de agendamiento** (`/agenda/` vs `/agendar/`) | Que las reuniones no se cuenten dos veces |
 | 6 | Presupuesto y ventana de test aprobados | Todo |

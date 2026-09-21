@@ -33,12 +33,21 @@ la cicatriz del prospecto.
 **La conversión es que agenden reunión o pidan cotización** en las landings de servicio. El Grader es el paso
 que se gana el derecho a pedirlo — no el objetivo.
 
-| | Destino | Estado verificado 2026-09-21 |
+| | Destino | Verificado 2026-09-21 |
 |---|---|---|
-| **AEO** | `/servicios/aeo` → redirige a **`/aeo-2/`** | ✅ 200 |
+| **AEO** | **`/aeo-2/`** (`/servicios/aeo` redirige ahí) | ✅ 200 |
 | **SEO** | **`/servicios/posicionamiento-seo/`** | ✅ 200 |
-| **Contenidos** | — | 🔴 **NO EXISTE.** Probadas seis variantes, todas 404 |
-| **Agendar** | **`/agenda/`** (scheduler nativo, HubSpot server-side) | ✅ 200 |
+| **Contenidos** | **`/servicio-marketing-de-contenidos/`** | ✅ 200 |
+| **Agendar** | **`/agenda/`** — scheduler nativo (PDR-009) | ✅ 200 |
+
+🔴 **Las rutas NO siguen un patrón único: hay cuatro.** `/aeo-2/` sin prefijo · `/servicio-marketing-de-contenidos/`
+singular con guión · `/servicios-contratar-hubspot/` plural con guión · `/servicios/posicionamiento-seo/` en
+subcarpeta. **Inferir una ruta es adivinar** — seis variantes del patrón `/servicios/` dieron 404 mientras la
+página existía. El inventario sale del REST de WordPress (`/wp-json/wp/v2/pages`), no de suposición.
+
+🔴 **Hay DOS páginas de agendamiento y eso puede partir la medición:** `/agenda/` («Agenda una reunión», el
+scheduler nativo de PDR-009) y **`/agendar/`** («¡Habla con un experto!»). Antes de pautear hay que declarar
+cuál es la canónica y qué pasa con la otra, o las reuniones van a contarse en dos lugares.
 
 🔴 **Consecuencia para la medición:** la métrica norte deja de ser «informe entregado» y pasa a ser **reunión
 agendada / cotización solicitada**. Un embudo optimizado al informe optimiza el lead magnet, no el negocio.
