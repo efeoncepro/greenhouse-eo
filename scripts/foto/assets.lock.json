@@ -38,17 +38,17 @@
       "rol": "persona:julio/espalda",
       "sha256": "640f278f70d13bb816b9889c0d8060623880f70ace639d4fa70b40894abd8c07"
     },
+    "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-34-v2.png": {
+      "rol": "persona:nexa",
+      "sha256": "91b581b0c952232bc2c284e830c2ac44a65296de01bb7cf5b0de0c1f12f372c3"
+    },
     "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png": {
       "rol": "persona:nexa",
       "sha256": "7f34d10b67f1c2da1cf316fbcfd99c6dcf2505bc070470beeccd2953c46b1818"
     },
-    "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-point.png": {
+    "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-breakdown.png": {
       "rol": "persona:nexa",
-      "sha256": "8caff285df54e18545abcbd9bca04069ad94f7e326c5bbae879db639ab9a70ff"
-    },
-    "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-listen.png": {
-      "rol": "persona:nexa",
-      "sha256": "e76ce55dc9b0fd49b2fd66bbe0aec697fda4f22b6df6c681f28d984bada97bd8"
+      "sha256": "f05fbcab3655a39af5f1fc210e767dc9fcb20e83620d0516982b4416fbebd52c"
     },
     "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:sprocket-hubspot/frente",

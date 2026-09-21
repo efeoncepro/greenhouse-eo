@@ -193,10 +193,13 @@ export const PERSONAS = {
     etiqueta: 'Nexa',
     identity:
       'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images: a woman in her early thirties with long dark wavy hair, fair olive skin, dark eyes and defined brows. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.',
+    // La PRIMERA es un retrato CERCANO en tres cuartos. Sin ella el set sólo tenía planos generales,
+    // donde el rostro ocupa pocos píxeles, y cada generación lo reconstruía: es la referencia con la
+    // que se hizo el KV «Tu IA no conoce tu negocio» que el operador aprobó el 2026-09-17.
     refs: [
+      'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-34-v2.png',
       'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png',
-      'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-point.png',
-      'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-listen.png'
+      'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-breakdown.png'
     ]
   }
 }
@@ -918,6 +921,39 @@ export const PALANCAS = {
     bloque:
       'THE SUBJECT IS THE CORRECTION, NOT THE HAND THAT MADE IT (this is the frame, not a detail): the work fills the whole picture, seen at a steep angle so its material and texture are razor sharp; drawn ON TOP of it are the marks of a review — a circle around one element, an arrow dragging it across, a firm crossing-out, a bracket in the margin. Those marks are the SHARPEST, most deliberate and most contrasted thing in the picture and the eye lands on them FIRST. The tool that made them lies where it was put down. ANY hand is at most a blurred fragment leaving the frame at the far edge, NEVER the subject. Raking light makes the physical ridge of each stroke throw its own small shadow, so the marks read as material, not as graphics added afterwards.',
     requiere: null
+  },
+  // ── Copiloto, 2026-09-21 ────────────────────────────────────────────────────────────────────
+  // Nace de una pieza que el operador aprobó ANTES del lenguaje fotográfico («Tu IA no conoce tu
+  // negocio») y que pidió convertir en palanca. Fotografía el LÍMITE de la IA, no su poder: por eso
+  // no cae en la prohibición de robots del catálogo —«nunca robots, circuitos ni interfaces
+  // flotantes»—, que existe contra fotografiar la máquina como si fuera mágica. Acá la máquina está
+  // presente y NO SABE, que es justo la tesis de Efeonce.
+  copiloto: {
+    etiqueta: 'la IA está, y no sabe',
+    bloque:
+      'THE AI IS PRESENT AND IT DOES NOT KNOW (this is the frame, not a detail): a small brand mascot — a toy-sized ' +
+      'character about 25cm tall, real and physical, finely made, with correct scale and contact shadows — sits or ' +
+      'perches ON the person (shoulder, forearm, the desk right beside them) and is visibly STUCK: waiting, puzzled, ' +
+      'out of its depth. The person reacts to that gap — a shrug, raised brows, hands open — and looks AT the ' +
+      'creature or past it, never at the lens. The photograph is about the LIMIT of the machine, not its power: ' +
+      'there is no glowing interface, no circuitry, no floating hologram anywhere. ONE creature only, and it is ' +
+      'never redrawn: it is copied from its reference exactly as it is.',
+    // La criatura SIEMPRE sale de un kit de mascota (Clawd, Codex, Nexa): el campo obliga a declararla,
+    // para que nadie invente un robot genérico. La POSE puede derivarse si la interacción lo pide
+    // —así nació la pieza fuente— pero la FORMA se copia del kit.
+    requiere: 'criatura',
+    ejemplo:
+      '"Clawd, sitting on her shoulder with a question mark floating above it" · ' +
+      '"Codex, standing on the desk beside the laptop, looking up and waiting"',
+    contradice: [
+      {
+        patron: /\b(hologram|holographic|glowing interface|floating (ui|interface|screen)|circuit|neural network|data stream)\b/i,
+        porque:
+          'la escena mete una interfaz flotante, un circuito o un holograma, y esta palanca existe justamente para ' +
+          'NO fotografiar eso. El catálogo lo prohíbe —«nunca robots, circuitos ni interfaces flotantes: es la parte ' +
+          'que no vale nada y la que hace todo el mundo»— y acá lo que se fotografía es que la máquina NO sabe'
+      }
+    ]
   },
   proyeccion: {
     etiqueta: 'la obra proyectada sobre materia física',
