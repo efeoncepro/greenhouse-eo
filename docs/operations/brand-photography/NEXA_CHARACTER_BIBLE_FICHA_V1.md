@@ -92,6 +92,10 @@ rostro tiene que ser un ancla.**
 
 ### Signature elements — el metal estaba invertido
 
+🔴 **Son CUATRO: anillo · reloj · aretes · uñas.** §5.1 lista las uñas con el mismo rango y el mismo
+«siempre» que las otras tres, no como grooming aparte. Se anota porque **la auditoría encontró falla en las
+cuatro**, y un conteo que se asienta en tres deja la cuarta fuera del checklist.
+
 | §5.1 pide | Observado en la muestra |
 |---|---|
 | Anillo geométrico plata mate, **índice derecho** | **0 de 5** con manos visibles. `Avatar Cuerpo Completo v2`: anillos finos **dorados** en los **anulares**. The Breakdown: dorado en anular. Contenido casual: cuadrado y plateado —lo más cercano— con piedra azul, y no en el índice |

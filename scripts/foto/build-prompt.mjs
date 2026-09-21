@@ -206,11 +206,16 @@ export const PERSONAS = {
     // Entra como marcador de continuidad con el material aprobado.
     identity:
       'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.',
-    // Los tres signature elements del Bible §5.1, que el pipeline no pedía. El documento dice del anillo que
-    // es «el ancla visual más fuerte — incluir en cada prompt»: son las anclas que la identifican aunque no
-    // se le vea la cara. Medido sobre 7 imágenes: anillo correcto en 0 de 5 con manos visibles, reloj en 1
-    // de 5, y aretes DORADOS en 5 de 5 donde la ficha pide plata. El metal estaba invertido de forma
-    // sistemática en las dos identidades — no era deriva del modelo, era una instrucción que nunca viajó.
+    // Los CUATRO signature elements del Bible §5.1 —anillo, reloj, aretes y UÑAS— que el pipeline no pedía.
+    // Son cuatro, no tres: §5.1 lista las uñas con el mismo rango y el mismo «siempre» que las otras, no
+    // como grooming aparte. Importa contarlas bien: la auditoría encontró falla en las cuatro, y si el
+    // conteo se asienta en tres, la cuarta se cae del checklist y nadie la vuelve a mirar.
+    //
+    // El documento dice del anillo que es «el ancla visual más fuerte — incluir en cada prompt»: son las
+    // anclas que la identifican aunque no se le vea la cara. Medido sobre 7 imágenes: anillo correcto en 0
+    // de 5 con manos visibles, reloj en 1 de 5, aretes DORADOS en 5 de 5 donde la ficha pide plata, y una
+    // pieza con dos colores de uña en la misma mano. El metal estaba invertido de forma sistemática en las
+    // dos identidades — no era deriva del modelo, era una instrucción que nunca viajó.
     //
     // 🔴 «En cada prompt» no es físicamente sostenible y el texto lo dice: la marca se pierde por el
     // ENCUADRE, no por la referencia. Medido el 2026-09-21 sobre la misma ficha y las mismas entradas: la
