@@ -397,6 +397,13 @@ mismo ojo da **rgb(47,37,27) en sombra** y **rgb(95,67,53) iluminado**.
 Pero **sí sirve como QA de salida**: un ángulo generado salió en **rgb(117,78,61)** contra **rgb(95,67,53)** del
 mismo ojo en la referencia — visiblemente más miel — y hubo que endurecer el prompt.
 
+🔴 **Pero el número es una REFERENCIA, no un procedimiento automático** **[medido, corrige el método de
+ambas sesiones]**. Al verificar cinco salidas muestreando **un punto fijo por ojo**, tres de cinco cayeron en
+piel (rgb ~210,150,120) o en la pupila, y habrían dado un «pasa» o un «falla» inventados; en la otra sesión la
+primera muestra sobre `nexa-avatar-34-v2` devolvió rgb(189,142,108), que es piel. **El punto de muestreo se
+ubica mirando la ampliación del ojo**; recién entonces la cifra significa algo. Un QA que promedia una
+coordenada fija sobre un rostro que se mueve mide cualquier cosa.
+
 **Formulación que sí bajó el iris**: «marrón plano y uniforme, tan oscuro que la pupila apenas se distingue del
 iris, **sin anillo más claro ni brillo limbal**». **«Muy oscuro, nunca miel» NO alcanza.**
 
@@ -478,3 +485,30 @@ Una primera pasada volvió con la cabeza **en el mismo ángulo de la referencia*
 `ai-generations/2026-09-21_nexa-angulos/salidas/`: `nexa-45-izq-v02` y `nexa-perfil-izq-v02`, verificados (fondo
 gris, camiseta gris, giro correcto, consistentes con la convención de Julio). Prompts v02 versionados en
 `prompts/`. **Quedan cuatro ángulos si se elige A; se descartan si se elige B.**
+
+### Cierre 2026-09-21 — Nexa tiene sus seis vistas y una sola identidad **[commit `94e8704b5`]**
+
+`set-identidad/angulos/nexa-{45-izq,45-der,perfil-izq,perfil-der,135-trasero,espalda}.png`, 1024×1024, fondo
+gris liso y camiseta gris neutra, mismo formato que los de Julio, **derivados por EDICIÓN** desde
+`nexa-avatar-34-v2`. El bloque `nexa` declara `vistas` y sus tres referencias son ya todas de la serie Avatar:
+`the-breakdown` (identidad B) salió y entró `nexa-avatar-frontal-v2`.
+
+**Por qué la tercera referencia NO es uno de los bustos con hoodie**: el hoodie es azul y arrastraría el azul
+de marca a las piezas — el mismo defecto que el navy del set viejo de Julio. **El set neutro se construye
+neutro a propósito.**
+
+### La convención de nombres se dedujo de las IMÁGENES, no de los prompts **[medido 2026-09-21]**
+
+El sufijo de cada vista nombra **hacia dónde gira la persona**, no qué lado de la cara se ve.
+
+🔴 El prompt `_edit-perfil.txt` del set de Julio dice a la vez «*camera perpendicular to his left side*» y
+«*only the right side of his head is visible*», que **no pueden ser ciertas juntas**; la imagen resultante sí
+respeta la convención. **Quien documente el canon leyendo ese prompt lo documentará al revés.** Para deducir
+una convención, mirar las salidas aprobadas, nunca los prompts que las produjeron.
+
+### El modelo puede obedecer dos instrucciones y callar la tercera **[medido 2026-09-21]**
+
+Una primera pasada volvió con **fondo y prenda correctos** y la rotación **ignorada en silencio**: la cabeza
+salió en el mismo ángulo de la referencia. Que dos instrucciones se cumplan **no dice nada** de la tercera:
+cada una se verifica por separado. Con la inversión declarada respecto a la referencia más el ancla «su nariz
+apunta al BORDE DERECHO del cuadro», seis de seis salieron a la primera.

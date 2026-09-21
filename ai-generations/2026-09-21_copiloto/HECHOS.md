@@ -232,3 +232,41 @@ que el KV aprobado muestra A. Consecuencias:
 - **B no se borra: pasa a banco de material** — poses corporales, vestuario, escenarios, gesto, encuadres —
   todo lo que NO sea rostro. Esa parte (combinar el material) sigue **abierta** y es decisión aparte.
 - `nexa-the-breakdown` y `nexa-the-point` son B: **no pueden seguir en `refs` del catálogo de identidad**.
+
+### 23. Medir el iris por coordenada fija NO sirve **[medido · corrige el método de los hechos 17 y 22]**
+
+Al verificar cinco salidas muestreando un punto por ojo, **tres de cinco cayeron en piel (rgb ~210,150,120) o
+en la pupila**, y habrían dado un «pasa» o un «falla» inventados. Ocurrió en las dos sesiones: en ésta, la
+primera muestra sobre `nexa-avatar-34-v2` devolvió rgb(189,142,108) — piel.
+
+**El número del iris es una REFERENCIA, no un procedimiento automático.** El punto de muestreo se ubica
+mirando la ampliación del ojo; recién entonces la cifra significa algo. Un QA que promedia una coordenada fija
+sobre un rostro que se mueve mide cualquier cosa.
+
+### 24. La convención de nombres de los ángulos se dedujo de las IMÁGENES, no de los prompts **[medido]**
+
+El sufijo nombra **hacia dónde gira la persona**, no qué lado de la cara se ve. El prompt `_edit-perfil.txt`
+del set de Julio dice a la vez «*camera perpendicular to his left side*» y «*only the right side of his head is
+visible*», que **no pueden ser ciertas juntas**; la imagen resultante sí respeta la convención.
+
+🔴 **Quien documente el canon leyendo ese prompt lo documentará al revés.** Para deducir una convención, mirar
+las salidas aprobadas, no los prompts que las produjeron.
+
+### 25. El modelo puede obedecer 2 de 3 instrucciones y callar la tercera **[medido]**
+
+La v01 de un ángulo volvió con **fondo y prenda correctos** y la rotación **ignorada en silencio**: la cabeza
+salió en el mismo ángulo de la referencia. Que dos instrucciones se cumplan no dice nada de la tercera; cada
+una se verifica por separado. Con la inversión declarada más el ancla de la nariz a un borde del cuadro,
+**seis de seis salieron a la primera**.
+
+### 26. Cierre: Nexa tiene sus seis vistas y una sola identidad **[commit `94e8704b5`]**
+
+`set-identidad/angulos/nexa-{45-izq,45-der,perfil-izq,perfil-der,135-trasero,espalda}.png`, 1024×1024, fondo
+gris liso y camiseta gris neutra, mismo formato que los de Julio. El bloque `nexa` declara `vistas` y las tres
+referencias son de la serie Avatar: `the-breakdown` (B) salió y entró `nexa-avatar-frontal-v2`.
+
+**Por qué la tercera NO es un busto con hoodie**: el hoodie es azul y arrastraría el azul de marca a las
+piezas — el mismo defecto que el navy del set viejo de Julio. El set neutro se construye neutro.
+
+Gates: `pnpm foto:assets:check` → 60 assets · `build-prompt.test.ts` → 296 verdes · la vista resuelve y una
+inexistente aborta con la lista de disponibles. Registro: `ai-generations/2026-09-21_nexa-angulos/LEEME.md`.

@@ -61,6 +61,12 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   (rgb(47,37,27) en sombra contra rgb(95,67,53) iluminado, el mismo ojo) que entre las dos identidades. **Verifica
   cuál estás usando antes de anclar una pieza:** generar con una y validar contra la otra costó ~20 pasadas, con el
   QA diciendo «la identidad coincide» mientras el operador veía que no.
+  **Cerrado el 2026-09-21** (commit `94e8704b5`): Nexa ya tiene sus **seis vistas** en
+  `set-identidad/angulos/` y el bloque `nexa` quedó con **una sola identidad**. 🔴 **El número del iris es una
+  REFERENCIA, no un QA automático**: muestrear una coordenada fija cayó en piel o pupila en **3 de 5** salidas;
+  el punto se ubica mirando la ampliación del ojo. 🔴 **La convención de nombres de las vistas dice hacia dónde
+  GIRA la persona, no qué lado se ve**, y se dedujo de las imágenes: el prompt `_edit-perfil.txt` de Julio se
+  contradice solo, así que documentarla leyendo ese prompt la deja al revés.
   **Consecuencia:** el set de ángulos se construye **editando desde `nexa-avatar-34-v2`**, no recortando el
   turnaround, que es B; y `nexa-the-point` y `nexa-the-breakdown` son B, así que **no pueden estar en `refs`**
   del bloque `nexa`. B no se borra: queda como **banco de material** —poses, vestuario, escenarios, gesto—,
