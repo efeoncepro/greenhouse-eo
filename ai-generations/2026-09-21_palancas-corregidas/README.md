@@ -105,3 +105,31 @@ Salida: `plates/G2-escucha-julio-lanyard-oficial.png`. La versión anterior se c
   máscara exige volver a mirar la cara, siempre.**
 - **La edición pierde la relación de aspecto si no se declara.** La primera pasada devolvió 1536×1024 sobre un
   plate 4:5. Hay que pasar `--size` explícito también al editar.
+
+
+## Delta 2026-09-21 (noche) — el logo del lanyard: cuatro intentos y qué funcionó
+
+El operador detectó que el logotipo de la cinta estaba mal y preguntó si lo había reimaginado.
+**Sí.** El asset existía y no se pasó.
+
+| # | Qué se le dio al modelo | Resultado del logotipo |
+|---|---|---|
+| v2 | dos **fotos de producto** + el logotipo **descrito con palabras** en el prompt | **reimaginado**: un borrón con forma de flecha. El kit prohíbe justamente esto — «el texto exacto nunca se le pide a la generación» |
+| v3 | el **arte plano canónico** (`arte-cinta-canonica.png`), sin describir nada | mejor: «Empower your Growth» sale bien, pero el logotipo sigue siendo un borrón ilegible |
+| det | **composición determinística**: warp del arte sobre el trazado real de la cinta | encaja el arte correcto, pero **no resuelve la legibilidad**: a 22 px de ancho de cinta el logotipo queda en ~15 px y es una mancha igual. El límite es de escala física, no de método |
+| **v4** | la **FOTO del lanyard ya construido y aprobado** (`04-puesto` + `02-detalle-cinta`), sin describir nada | ✅ **«efeonce» legible con la nave en la «o», «Empower your Growth» limpio, y hasta apareció el regulador negro que la pieza real tiene** |
+
+### La regla que sale de esto **[operador, 2026-09-21]**
+
+**Para USAR un kit en una escena, la referencia es la FOTO del producto terminado y aprobado, no el arte
+plano.** Los dos son assets legítimos del kit y sirven para cosas distintas:
+
+- el **arte plano** es para PRODUCIR las vistas del kit (entra como imagen 2 al generar la pieza de catálogo);
+- la **foto del producto ya construido** es para VESTIR a alguien o poner la pieza en una escena.
+
+Dárselo al revés fue lo que produjo tres pasadas fallidas. Como dijo el operador: «gpt-image-2.5 es
+especialmente potente en esto si le pasas bien la referencia» — y la referencia correcta es la pieza
+fotografiada, con su volumen, su luz y su caída, no el arte en plano.
+
+Salida: `plates/G3-escucha-julio-lanyard-referencia-real.png`, con el carnet compuesto encima —ése sí
+determinístico, porque es plano y rígido—.
