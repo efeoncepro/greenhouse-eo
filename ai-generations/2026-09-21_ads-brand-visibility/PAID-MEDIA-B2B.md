@@ -97,9 +97,8 @@ singular con guión · `/servicios-contratar-hubspot/` plural con guión · `/se
 subcarpeta. **Inferir una ruta es adivinar** — seis variantes del patrón `/servicios/` dieron 404 mientras la
 página existía. El inventario sale del REST de WordPress (`/wp-json/wp/v2/pages`), no de suposición.
 
-🔴 **Hay DOS páginas de agendamiento y eso puede partir la medición:** `/agenda/` («Agenda una reunión», el
-scheduler nativo de PDR-009) y **`/agendar/`** («¡Habla con un experto!»). Antes de pautear hay que declarar
-cuál es la canónica y qué pasa con la otra, o las reuniones van a contarse en dos lugares.
+✅ **La canónica de agendamiento es `/agenda/`** [operador, 2026-09-21]. El REST devuelve también `/agendar/`
+(«¡Habla con un experto!»), que **no es destino de pauta**: no se usa en campañas ni se cuenta como conversión.
 
 ## Veredicto por plataforma (de la práctica, no de mi opinión)
 
@@ -152,5 +151,5 @@ los de la tabla son supuestos.
 | 2 | Eventos `gh_grader_*` en GTM | Medir coste por informe, no por clic |
 | 3 | Audiencias de retargeting creadas (Meta pixel + LinkedIn insight tag) | E3 y E4 completas |
 | 4 | **Atribución del scheduler** (GTM + Forms API con `context.hutk`) | 🔴 **Medir reuniones por campaña** |
-| 5 | **Declarar la página canónica de agendamiento** (`/agenda/` vs `/agendar/`) | Que las reuniones no se cuenten dos veces |
+
 | 6 | Presupuesto y ventana de test aprobados | Todo |

@@ -25,6 +25,11 @@ pieza con la barra del otro es lo que produce la sensación del operador de que 
 | Para qué | credibilidad: sitio, piezas de equipo, «esto es lo que hacemos» | que la idea entre en dos segundos |
 | Evidencia | `F-podcast-v1.png` (la escucha) · `E-estudio-v2.png` (el estudio en operación) | «¿Claude o Codex?» · KV de Clawd · `copiloto` · `G-podcast-v5.png` |
 
+🔴 **El lenguaje completo del registro C vive en [`EFEONCE_PHOTO_REGISTER_C_V1.md`](../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_C_V1.md)**
+— elenco, escala, palancas, lechos con cámara baja, la capa gráfica y las dos trampas medidas: **el azul ajeno**
+(si la criatura del partner porta color, el azul de Efeonce entra por OTRO portador — medido: en una pieza el
+único azul era de OpenAI) y **la contaminación del emblema**.
+
 🔴 **Hay un TERCER registro desde el 2026-09-21: C · «la respuesta a la vista»** — el sujeto es **la respuesta
 de la máquina y quién la da**, sin personas del equipo. Nació porque las cinco piezas con persona de los ads del
 grader **fallaron la prueba de significar sin titular**: la foto muestra al proveedor, el titular habla del

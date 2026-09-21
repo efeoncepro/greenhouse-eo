@@ -45,9 +45,8 @@ singular con guión · `/servicios-contratar-hubspot/` plural con guión · `/se
 subcarpeta. **Inferir una ruta es adivinar** — seis variantes del patrón `/servicios/` dieron 404 mientras la
 página existía. El inventario sale del REST de WordPress (`/wp-json/wp/v2/pages`), no de suposición.
 
-🔴 **Hay DOS páginas de agendamiento y eso puede partir la medición:** `/agenda/` («Agenda una reunión», el
-scheduler nativo de PDR-009) y **`/agendar/`** («¡Habla con un experto!»). Antes de pautear hay que declarar
-cuál es la canónica y qué pasa con la otra, o las reuniones van a contarse en dos lugares.
+✅ **La canónica de agendamiento es `/agenda/`** [operador, 2026-09-21]. El REST devuelve también `/agendar/`
+(«¡Habla con un experto!»), que **no es destino de pauta**: no se usa en campañas ni se cuenta como conversión.
 
 🔴 **Consecuencia para la medición:** la métrica norte deja de ser «informe entregado» y pasa a ser **reunión
 agendada / cotización solicitada**. Un embudo optimizado al informe optimiza el lead magnet, no el negocio.
