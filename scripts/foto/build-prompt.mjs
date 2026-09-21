@@ -352,7 +352,8 @@ export const OBJETOS = {
       lateral: '05-lateral',
       abierta: '06-cierre-abierto'
     },
-    vistaDefecto: 'frente'
+    vistaDefecto: 'frente',
+    macroEmblema: 'efeonce-chaqueta-softshell-11-macro-bordado-1600x1600-v01-fondo-estudio.png',
   },
   'chaqueta-bomber-efeonce': {
     etiqueta: 'the Efeonce team bomber jacket',
@@ -362,7 +363,8 @@ export const OBJETOS = {
     base: 'ai-generations/2026-09-17_chaqueta-efeonce/final/',
     patron: 'efeonce-chaqueta-bomber-<V>-1600x1600-v01-transparente.png',
     vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
-    vistaDefecto: 'frente'
+    vistaDefecto: 'frente',
+    macroEmblema: 'efeonce-chaqueta-bomber-11-macro-bordado-1600x1600-v01-fondo-estudio.png',
   },
   'gorra-efeonce': {
     etiqueta: 'the Efeonce cap',
@@ -381,7 +383,8 @@ export const OBJETOS = {
       'navy-isotipo': 'v3-navy-isotipo',
       'trucker-navy': 'v5-trucker-navy'
     },
-    vistaDefecto: 'frente'
+    vistaDefecto: 'frente',
+    macroEmblema: 'efeonce-gorra-v2-04-macro-bordado-1600x1600-v01-fondo-estudio.png',
   },
   'lanyard-efeonce': {
     etiqueta: 'the Efeonce lanyard with its retractable reel and rigid-frame badge holder',
@@ -404,7 +407,8 @@ export const OBJETOS = {
     base: 'ai-generations/2026-09-17_polo-efeonce/final/',
     patron: 'efeonce-polo-blanco-<V>-1600x1600-v01-transparente.png',
     vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
-    vistaDefecto: 'frente'
+    vistaDefecto: 'frente',
+    macroEmblema: 'efeonce-polo-blanco-10-detalle-bordado-1600x1600-v01-fondo-estudio.png',
   },
   'hoodie-efeonce': {
     etiqueta: 'the Efeonce team hoodie',
@@ -414,7 +418,8 @@ export const OBJETOS = {
     base: 'ai-generations/2026-09-17_hoodie-efeonce/final/',
     patron: 'efeonce-hoodie-<V>-1600x1600-v01-transparente.png',
     vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
-    vistaDefecto: 'frente'
+    vistaDefecto: 'frente',
+    macroEmblema: 'efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png',
   }
 }
 
@@ -459,6 +464,34 @@ function resolverObjetos(ficha, desde) {
 
     imagenes.push(ref)
     bloques.push(`IMAGE ${n} (object reference): Image ${n} is ${objeto.etiqueta}. ${objeto.instruccion} Ignore its studio background.`)
+
+    // El MACRO DEL BORDADO va como referencia aparte. En la vista de la prenda entera el emblema
+    // mide unos pocos píxeles: el modelo lo lee como una mancha y la reinventa. Medido el
+    // 2026-09-20: tres prendas dieron tres emblemas distintos y ninguno era el de Efeonce. Los kits
+    // YA traían su macro; lo que faltaba era exponerlo. No se compone encima —probado y rechazado
+    // por el operador: se ve impreso, no bordado—: se le da al modelo el emblema en grande.
+    if (objeto.macroEmblema) {
+      const macro = objeto.base + objeto.macroEmblema
+
+      if (!existsSync(path.join(raiz, macro))) {
+        throw new Error(
+          `El kit de "${clave}" declara macro del bordado pero no está en disco: ${macro}. ` +
+            'Sin el emblema en grande, el modelo lo inventa.'
+        )
+      }
+
+      const nm = desde + imagenes.length + 1
+
+      imagenes.push(macro)
+      bloques.push(
+        `IMAGE ${nm} (emblem reference, CRITICAL): Image ${nm} is a macro of the embroidered Efeonce emblem on ${objeto.etiqueta}. ` +
+          'Reproduce THIS EXACT emblem on the garment — a rocket with three round windows seen from the side, ' +
+          'crossed by a single elliptical orbit that passes behind it and in front of it, with a filled dot above. ' +
+          'Keep its proportions, its navy thread colour and its embroidered relief. Do NOT invent, simplify, ' +
+          'redraw or substitute it with a spiral, an @, letters or any other shape. It sits small on the left chest ' +
+          '(or the front panel of a cap), at the scale it has in a real garment. Ignore its studio background.'
+      )
+    }
 
     if (objeto.aviso) avisos.push(`"${clave}" es ${objeto.aviso}`)
     if (objeto.nota) avisos.push(`"${clave}": ${objeto.nota}`)

@@ -305,11 +305,27 @@ distintas en la gorra. Ninguno tiene «e», «f», nave ni órbita.
 firma se **compone** y no se genera precisamente porque el modelo no sostiene una marca. Un bordado
 pequeño es el caso más fácil de que la invente y el más difícil de notar.
 
+**Lo que faltaba era simple y estaba en el kit.** Cada kit de prenda trae su **macro del bordado**
+—`10-detalle-bordado` en el polo, `04-macro-bordado` en la gorra, `11-macro-bordado` en las chaquetas,
+`09-detalle-pecho` en el hoodie— y el catálogo sólo exponía las vistas de la prenda entera, donde el
+emblema mide unos pocos píxeles: el modelo lo lee como una mancha y la reinventa. **Desde el
+2026-09-20 una prenda con emblema aporta DOS referencias**, la prenda y el emblema en grande, con un
+bloque que lo describe («rocket with three round windows crossed by a single elliptical orbit») y
+prohíbe explícitamente las formas que inventó: espiral, arroba, letras.
+
+**Descartado: componerlo encima.** Se probó con el isotipo vectorial y con el bordado recortado, y el
+operador lo rechazó: **«se ve horrible, ese no es el logo»** — queda impreso, no bordado. La firma se
+compone porque vive sobre un lecho desenfocado y plano; un bordado sobre tela con pliegues y luz
+propia, no.
+
 **Cómo se trabaja una prenda con emblema, en orden de preferencia:**
 
-1. **Que no se lea.** La prenda de espaldas, en sombra, a escala pequeña o cortada por el encuadre. Es
-   la salida más limpia y casi siempre suficiente: la prenda se reconoce por corte y color.
-2. **Componerlo después**, como la firma y como el carnet del lanyard (`arte-carnet.mjs`).
+1. **Dar el macro del bordado como referencia** y pedir el pecho libre y bien iluminado. Es lo que hace
+   el comando desde el 2026-09-20 y es la única vía que produce un emblema reconocible.
+2. **Que no se lea** (de espaldas, en sombra, cortado) **sólo si la prenda se reconoce por otra cosa** —
+   un corte propio, un color propietario—. **Ojo:** el polo blanco liso y la chaqueta navy lisa NO se
+   reconocen sin emblema; ahí esta salida convierte el uniforme en ropa genérica, que fue justamente lo
+   que el operador rechazó.
 3. **Editar con máscara** sobre la zona del emblema, partiendo del kit.
 
 **Nunca**: publicar el emblema tal como sale del generador.

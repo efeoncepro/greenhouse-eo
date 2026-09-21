@@ -884,3 +884,40 @@ describe('emblema bordado — el modelo no lo reproduce', () => {
     expect(auditarEmblema(['nave-efeonce', 'lanyard-efeonce'])).toHaveLength(0)
   })
 })
+
+describe('macro del bordado — el kit aporta el emblema en grande', () => {
+  const base = {
+    id: 'k',
+    formato: '4:5',
+    escena: 'SCENE: a hard beam at the instant she lifts it. an azure screen. a real walnut worktop',
+    lecho: { objeto: 'the near edge of a real walnut worktop', tono: 'DARK walnut in shadow, matte' }
+  }
+
+  // 2026-09-20: tres prendas dieron tres emblemas distintos porque en la vista de la prenda entera
+  // el bordado mide unos pocos píxeles y el modelo lo lee como una mancha. Los kits YA traían su
+  // macro; lo que faltaba era exponerlo. El verificador real sigue siendo mirar el bordado ampliado.
+  it('una prenda con emblema aporta DOS referencias: la prenda y el macro', () => {
+    const { imagenes, prompt } = construirPrompt({ ...base, objetos: ['polo-efeonce'] })
+
+    expect(imagenes).toHaveLength(2)
+    expect(imagenes[1]).toMatch(/detalle-bordado/)
+    expect(prompt).toMatch(/emblem reference, CRITICAL/)
+    expect(prompt).toMatch(/rocket with three round windows/)
+  })
+
+  it('el bloque prohíbe las formas que el modelo inventó', () => {
+    const { prompt } = construirPrompt({ ...base, objetos: ['gorra-efeonce'] })
+
+    expect(prompt).toMatch(/Do NOT invent, simplify, redraw or substitute it with a spiral, an @/)
+  })
+
+  it('las cinco prendas con bordado declaran su macro', () => {
+    for (const p of ['polo-efeonce', 'hoodie-efeonce', 'gorra-efeonce', 'chaqueta-softshell-efeonce', 'chaqueta-bomber-efeonce']) {
+      expect(construirPrompt({ ...base, objetos: [p] }).imagenes).toHaveLength(2)
+    }
+  })
+
+  it('un objeto sin bordado sigue aportando una sola', () => {
+    expect(construirPrompt({ ...base, objetos: ['nave-efeonce'] }).imagenes).toHaveLength(1)
+  })
+})
