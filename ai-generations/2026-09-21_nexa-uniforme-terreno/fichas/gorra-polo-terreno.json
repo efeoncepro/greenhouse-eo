@@ -1,0 +1,20 @@
+{
+  "id": "nexa-terreno-gorra-polo",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "gorra-efeonce",
+      "usoDe": "nexa"
+    }
+  ],
+  "palanca": "atraviesa",
+  "escena": "SCENE (loading bay of a supermarket at first light, on location): AT THE EXACT MOMENT she seats the last shelf panel into place, she crouches beside the half-built retail display and looks from the printed planogram to the row she has just set — one hand still steadying the panel as it clicks home, the other holding a marker mid-air. A handheld inventory scanner rests on the shelf beside her with its screen awake, throwing a small patch of bright azure blue onto the white shelf edge and onto her knuckles: that screen is the only bright blue in the picture. She wears the NAVY EFEONCE TRUCKER CAP and the NAVY EFEONCE PIQUÉ POLO with dark utility trousers; no jacket, no hoodie and no other blue garment. Low hard morning sun comes through the open bay door behind her left shoulder and cuts a long graphic shadow of the display across the concrete. She looks at the planogram, never at the camera. Behind her and out of focus, two people lift a second panel into place, seen from behind and small in frame. Unbranded packaging everywhere, no readable text. 50mm at f/3.2, focus on her hands and the planogram.",
+  "lecho": {
+    "objeto": "the near corner of a matte black road case standing between the camera and the display",
+    "tono": "DARK charcoal in shadow"
+  }
+}

@@ -474,6 +474,16 @@ export const OBJETOS = {
     base: 'ai-generations/2026-09-17_lanyard-efeonce/final/',
     patron: 'efeonce-lanyard-<V>-1200x1600-v01-transparente.png',
     vistas: { conjunto: '01-conjunto', colgado: '12-conjunto-colgado', 'portacarnet-vacio': '10-portacarnet-vacio' },
+    // El lanyard TERMINADO por persona, armado determinísticamente el 2026-09-21: la cinta, el yoyo y el
+    // carnet salen de los artes oficiales y al modelo sólo se le pidió el acabado, porque describirle el
+    // logotipo lo tergiversa (cuatro pasadas dieron cuatro naves distintas, la peor un borrón con forma
+    // de flecha). En una escena con el carnet a la vista ésta es la referencia correcta: la genérica
+    // `colgado` lleva un portacarnet sin datos, así que el modelo inventa el nombre y el cargo.
+    // Que exista no garantiza fidelidad al meterlo en una escena — el modelo vuelve a redibujarlo —, así
+    // que el carnet legible se verifica ampliado y, si no se sostiene, se compone encima.
+    usoPorPersona: {
+      nexa: '../../2026-09-21_lanyard-deterministico/nexa/lanyard-nexa-terminado.png'
+    },
     vistaDefecto: 'colgado'
   },
   'polo-efeonce': {

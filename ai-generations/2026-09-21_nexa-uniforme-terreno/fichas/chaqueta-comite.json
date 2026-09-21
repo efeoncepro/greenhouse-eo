@@ -1,0 +1,23 @@
+{
+  "id": "nexa-chaqueta-comite-v2",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "chaqueta-softshell-efeonce"
+    },
+    {
+      "objeto": "lanyard-efeonce",
+      "usoDe": "nexa"
+    }
+  ],
+  "palanca": "entre-dos",
+  "escena": "SCENE (client boardroom, late afternoon): AT THE EXACT MOMENT one of them stops talking and the other draws breath to answer, they face each other across the corner of the table — she at the RIGHT edge of the frame cut by it, the client at the LEFT edge cut by it, both the same distance from the lens, the empty air between them holding the centre of the picture. Their eyelines cross in front of the lens; neither looks at the camera. Between them on the table lie printed boards with a campaign laid out, one pulled forward and turned toward her. She wears the NAVY EFEONCE SOFTSHELL JACKET over a plain shirt, with the EFEONCE LANYARD around her neck, its card hanging FLAT AND FACING THE CAMERA on her chest, fully visible and lit; no other blue garment. On the far wall a large display is awake and throws a wash of bright azure blue across the back of the room: that screen is the only bright blue in the picture. Low sun rakes through the blinds and lays hard stripes across the table and their shoulders. 50mm at f/2.8, focus on the boards between them.",
+  "lecho": {
+    "objeto": "the near corner of a matte black equipment case standing between the camera and the table",
+    "tono": "DARK charcoal in shadow"
+  }
+}

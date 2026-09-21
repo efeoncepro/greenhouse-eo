@@ -1,0 +1,17 @@
+{
+  "id": "nexa-terreno-hoodie",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    "hoodie-efeonce"
+  ],
+  "palanca": "luz-motivada",
+  "escena": "SCENE (exterior shoot, before dawn, on location): AT THE MOMENT the shot lands, she leans in to the field monitor at the video village and stops — one hand shading the screen, the other frozen on the focus wheel as the frame settles. The monitor is the only light on her and it is BRIGHT AZURE BLUE: it lights the side of her face nearest it, spills onto the hood and the back of her hand, and the far side of her face drops into darkness. She wears the BLUE EFEONCE HOODIE over dark trousers, hood down, sleeves pushed up. She looks at the monitor, never at the camera. Behind her, far out of focus, a camera operator works by the rig against the first cold light of the sky. Real gear, cables taped down, breath visible in the cold. 50mm at f/2.5, focus on the monitor and her hand.",
+  "lecho": {
+    "objeto": "the near edge of a matte black grip cart standing between the camera and the monitor",
+    "tono": "DARK charcoal in shadow"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "nexa-polo-blanco-proyeccion",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    {
+      "objeto": "polo-efeonce",
+      "color": "blanco"
+    }
+  ],
+  "palanca": "proyeccion",
+  "escena": "SCENE (review room in a production studio, blinds down): AT THE MOMENT the next frame lands, she stands inside the beam with her BACK TO THE CAMERA, head tilted as the new image settles across the wall and across her. The work is a campaign layout with a broad field of bright azure blue in it, and that projected blue is the only bright blue and the only light in the room: it falls over the rough plaster wall and over her shoulders, breaking on the wall's grain and on the folds of her polo, and her own shadow punches a hard black hole through the middle of it. She wears the WHITE EFEONCE PIQUÉ POLO with charcoal-grey trousers; no jacket, no other blue garment. Her hand is half raised toward the projected layout, stopped mid-gesture. She never turns toward the camera. 35mm at f/2.8, focus on the wall where the work lands.",
+  "lecho": {
+    "objeto": "the near edge of a matte black flight case standing between the camera and the room",
+    "tono": "DARK charcoal in shadow"
+  }
+}
