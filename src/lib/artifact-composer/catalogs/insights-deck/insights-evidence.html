@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  InsightsEvidenceSlide — la ficha de evidencia: una conclusión por lámina.
+
+  Afirmación arriba, la figura que la prueba al centro, procedencia al pie. El orden no es estético:
+  un gráfico sin su lectura obliga al espectador a inventarla mientras alguien habla.
+-->
+<link rel="stylesheet" href="deck-tokens.css" />
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="deck-mold.css" />
+<style>
+  .headline { font-size: 50px; max-width: 26ch; }
+
+  .figure { margin-top: 64px; display: flex; flex-direction: column; gap: 44px; max-width: 1400px; }
+
+  .row { display: flex; flex-direction: column; gap: 12px; }
+
+  .row-head { display: flex; justify-content: space-between; align-items: baseline; gap: 32px; font-size: 24px; }
+
+  .row-name { color: var(--axis-deck-role-surfaceEdge); }
+
+  .row-value { font-weight: 700; font-size: 30px; font-variant-numeric: tabular-nums; }
+
+  /*
+   * El riel casi no se ve, y es deliberado: con `fieldMid` (#023c70) sobre el fondo navy se leía
+   * como una barra llena y hacía parecer grande al valor chico. Un riel que compite con su relleno
+   * no es un fondo: es un segundo dato que nadie declaró.
+   */
+  .track { position: relative; height: 26px; border-radius: 4px; background: var(--axis-deck-role-fieldEdge); }
+
+  .fill { position: absolute; inset: 0 auto 0 0; border-radius: 4px; }
+
+  /* Lead y resto se separan por LUMINANCIA: el deck también se imprime y se fotocopia. */
+  .fill.lead { background: var(--axis-deck-role-accent); }
+  .fill.rest { background: var(--axis-deck-role-surfaceEdge); opacity: 0.6; }
+
+  .provenance {
+    margin-top: auto;
+    display: flex;
+    gap: 56px;
+    font-size: 17px;
+    color: var(--axis-deck-role-surfaceEdge);
+  }
+
+  .provenance b { font-weight: 700; color: var(--axis-deck-role-accent); text-transform: uppercase; letter-spacing: 0.08em; font-size: 14px; display: block; margin-bottom: 5px; }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <span class="eyebrow" data-slot="chapterLabel">VISIBILIDAD ORGÁNICA</span>
+    <h1 class="headline" data-slot="assertion">La visibilidad creció donde se publicó, y <em>no</em> donde se optimizó</h1>
+
+    <div class="figure" data-slot="figureSeries">
+      <div class="row">
+        <div class="row-head">
+          <span class="row-name" data-slot-field="name">Páginas publicadas en el período</span>
+          <span class="row-value" data-slot-field="printedValue">+61,4%</span>
+        </div>
+        <div class="track"><div class="fill lead"></div></div>
+      </div>
+      <div class="row">
+        <div class="row-head">
+          <span class="row-name" data-slot-field="name">Páginas optimizadas</span>
+          <span class="row-value" data-slot-field="printedValue">+3,1%</span>
+        </div>
+        <div class="track"><div class="fill rest"></div></div>
+      </div>
+    </div>
+
+    <div class="provenance">
+      <span><b>Unidad</b><span data-slot="figureUnit">Variación % de impresiones</span></span>
+      <span><b>Fuente</b><span data-slot="figureSource">Search Console del cliente</span></span>
+    </div>
+
+    <footer class="deck-foot"><span data-slot="urlBubble"><img src="assets/url-lum.svg" alt="efeoncepro.com" /></span></footer>
+  </div>
+</body>
+</html>

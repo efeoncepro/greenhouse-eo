@@ -29,6 +29,12 @@ import {
   REPORT_FONTS_PATH,
   REPORT_TOKENS_PATH
 } from '@/lib/artifact-composer/catalogs/insights-report/compile-tokens'
+import {
+  buildInsightsDeckTokensCss,
+  syncInsightsDeckFontBinaries,
+  INSIGHTS_DECK_FONTS_PATH,
+  INSIGHTS_DECK_TOKENS_PATH
+} from '@/lib/artifact-composer/catalogs/insights-deck/compile-tokens'
 import type { CatalogTokensBuild, PackFontEntry } from '@/lib/artifact-composer/compile-catalog-tokens'
 
 /**
@@ -49,6 +55,13 @@ const CATALOGS: {
     tokensPath: DECK_TOKENS_PATH,
     fontsPath: DECK_FONTS_PATH,
     syncFonts: syncPackFontBinaries
+  },
+  {
+    name: 'insights-deck',
+    build: buildInsightsDeckTokensCss,
+    tokensPath: INSIGHTS_DECK_TOKENS_PATH,
+    fontsPath: INSIGHTS_DECK_FONTS_PATH,
+    syncFonts: syncInsightsDeckFontBinaries
   },
   {
     name: 'insights-report',

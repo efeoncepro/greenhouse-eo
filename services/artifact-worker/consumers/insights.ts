@@ -23,6 +23,7 @@ import type { InsightOutputRecord, InsightRenderFailureCode } from '@/lib/efeonc
 import { hashResolvedManifest } from '@/lib/artifact-composer/manifest-hash'
 import { storeSystemGeneratedPrivateAsset } from '@/lib/storage/greenhouse-assets'
 
+import { insightsDeckCatalog } from '@/lib/artifact-composer/catalogs/insights-deck'
 import { insightsReportCatalog } from '@/lib/artifact-composer/catalogs/insights-report'
 
 import type { RenderConsumer, RenderJobView, RenderedArtifact } from '../consumer-contract'
@@ -34,6 +35,7 @@ const WORKER_ACTOR_USER = null
 // catálogo que no tiene. TASK-1847 suma el A4 del informe vertical.
 const CATALOGS = new Map([
   [deckAxisCatalog.name, deckAxisCatalog],
+  [insightsDeckCatalog.name, insightsDeckCatalog],
   [insightsReportCatalog.name, insightsReportCatalog]
 ])
 

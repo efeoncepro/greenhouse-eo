@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!-- InsightsCoverSlide — portada del deck. Reemplaza a CoverFull, que imprime vocabulario de propuesta comercial. -->
+<link rel="stylesheet" href="deck-tokens.css" />
+<link rel="stylesheet" href="deck-fonts.css" />
+<link rel="stylesheet" href="deck-mold.css" />
+<style>
+  .cover-meta {
+    margin-top: auto;
+    display: flex;
+    gap: 72px;
+    padding-top: 36px;
+    border-top: 2px solid var(--axis-deck-role-accent);
+  }
+
+  .cover-meta dt {
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--axis-deck-role-accent);
+  }
+
+  .cover-meta dd { margin: 8px 0 0; font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <span class="eyebrow" data-slot="editionId">EO-INS-000014</span>
+    <h1 class="headline" data-slot="reportTitle">Informe de visibilidad y entrega</h1>
+    <p class="deck-lead" data-slot="reportSubtitle">Evidencia sellada de la ventana declarada, con sus límites explícitos.</p>
+    <dl class="cover-meta">
+      <div><dt>Período</dt><dd data-slot="periodLabel">Agosto 2026</dd></div>
+      <div><dt>Versión</dt><dd data-slot="versionLabel">v1</dd></div>
+    </dl>
+    <footer class="deck-foot"><span data-slot="urlBubble"><img src="assets/url-lum.svg" alt="efeoncepro.com" /></span></footer>
+  </div>
+</body>
+</html>

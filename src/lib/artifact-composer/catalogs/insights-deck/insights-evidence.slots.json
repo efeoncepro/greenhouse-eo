@@ -1,0 +1,116 @@
+{
+  "template": "InsightsEvidenceSlide",
+  "figmaNodeId": null,
+  "version": "0.1",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "slots": {
+    "chapterLabel": {
+      "selector": "[data-slot='chapterLabel']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 40,
+        "maxLines": 1,
+        "transform": "uppercase",
+        "overflow": "reject"
+      }
+    },
+    "assertion": {
+      "selector": "[data-slot='assertion']",
+      "type": "rich-string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 120,
+        "maxLines": 3,
+        "allowedTags": [
+          "em"
+        ],
+        "overflow": "reject"
+      },
+      "notes": "AFIRMA la conclusión; no etiqueta el tema. El deck queda circulando sin quien lo presente."
+    },
+    "figureSeries": {
+      "selector": "[data-slot='figureSeries']",
+      "type": "array",
+      "required": true,
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 5,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "name": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 46,
+            "maxLines": 2
+          },
+          "printedValue": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 12,
+            "maxLines": 1,
+            "requires": [
+              "valuePct",
+              "evidenceRef"
+            ]
+          },
+          "valuePct": {
+            "type": "number",
+            "required": true,
+            "min": 0,
+            "consumer": "resolver-only",
+            "resolver": "insights-bar-geometry"
+          },
+          "emphasis": {
+            "type": "enum",
+            "required": true,
+            "values": [
+              "lead",
+              "rest"
+            ],
+            "consumer": "resolver-only"
+          },
+          "evidenceRef": {
+            "type": "string",
+            "required": true,
+            "consumer": "validation-only"
+          }
+        }
+      },
+      "notes": "LAS BARRAS SON ANCHOS CALCULADOS. El resolver recalcula desde valuePct con la geometría del motor y falla si la etiqueta no representa el mismo dato."
+    },
+    "figureUnit": {
+      "selector": "[data-slot='figureUnit']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 34,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "figureSource": {
+      "selector": "[data-slot='figureSource']",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 44,
+        "maxLines": 1,
+        "overflow": "reject"
+      }
+    },
+    "fixed-urlBubble": {
+      "selector": "[data-slot='urlBubble']",
+      "type": "fixed-asset",
+      "required": true,
+      "agentMayOverride": false,
+      "note": "template-owned. El pie de una lámina lleva COMO MÁXIMO la URL bubble: dirección, teléfonos y folio son del informe escrito."
+    }
+  }
+}
