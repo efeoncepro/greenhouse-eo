@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Diseño; tres hijas TASK-1879–1881 registradas to-do, sin implementación ni cambio de bono`
+- Status real: `Diseño; seis hijas to-do — TASK-1879–1881 (liderazgo) y TASK-1882–1884 (riesgo operativo, Delta 2026-09-21); sin implementación ni cambio de bono`
 - Rank: `TBD`
 - Domain: `delivery|ico|people|ui|payroll-boundary`
 - Owner: `unassigned`
@@ -93,6 +93,30 @@ Specs nuevos y extensión de liderazgo están **In design**, ADR **Proposed**; n
 
 **Diseño:** task UI `ui-standard` con dirección `repo-native-benchmark`, 2–3 alternativas, wireframe y flow cuando haya drill-down/sidecar, decisión de primitives `reuse` antes de `extend`, `CompositionShell` para composición nueva, copy en `src/lib/copy/*` y GVC premium desktop + 390 px. Evitar “card soup”, semáforo como lenguaje principal y gráficos vacíos de muestras pequeñas. Reusar el trabajo de storytelling de EPIC-018/TASK-1075–1076; no duplicar primitives ni rehacer Agency ICO. La task UI documentará el contrato de implementación y `UI ready` seguirá `no` hasta pasar los gates de diseño.
 
+## Workstream 3 — Operational risk surface and decision delivery
+
+Los ritmos 1 (daily) y 2 (weekly) de la cadencia de abajo estaban declarados y **sin superficie**: nada en el repo responde "qué compromiso está en riesgo" ni alimenta la cola de riesgos/ownership que ACC y FRM necesitan. Este workstream la construye y, en el camino, corrige el artefacto que hoy ocupa el lugar del ritmo semanal.
+
+### Por qué entra a este epic
+
+ACC pregunta *"¿Tiene dueño el trabajo y cabe en la capacidad?"* y FRM *"¿Se atienden riesgos con evidencia y a tiempo?"*. Ninguna de las dos se puede calcular sin una lectura del trabajo abierto contra su compromiso, y esa lectura no existe: un barrido de `src/lib/ico-engine/`, `src/lib/delivery/` y `src/lib/agency/` por ventanas futuras (`due_date >= CURRENT_DATE`) devuelve cero coincidencias. El único predicado prospectivo del motor (`CARRY_OVER_SQL`) se materializa y no lo lee nadie.
+
+### Evidencia de origen — auditoría del 2026-09-21
+
+El digest semanal de ese lunes presentó 5 insights con el mismo número visible (`score 85`, constante en el 86,3 % de 9 849 enrichments), tres de ellos del período **agosto** bajo un encabezado que decía "14 SEPT - 21 SEPT", y atribuyó a un proyecto de 12 tareas —1 completada— un OTD de 20 % que en realidad era el del espacio completo. A la misma hora, con los datos ya materializados:
+
+- **156 tareas vencían en ≤7 días; 78 (50 %) sin movimiento reciente** (Berel 37 de 104, Sky 41 de 52).
+- **369 compromisos vencidos y abiertos**, de los cuales **272 (74 %) sin responsable**, ~235 días de antigüedad promedio.
+- **Sky Airline: OTD 94,5 % y 164 incumplimientos arrastrados** — el denominador del OTD sólo cuenta vencimientos del mes, así que la métrica verde y la deuda conviven sin contradecirse.
+- La proyección PostgreSQL de `ai_signals` tenía **6 de 63 señales (9,5 %)**, y el `INNER JOIN` del digest convertía ese drift en un filtro editorial silencioso (`ISSUE-176`).
+
+### Frontera con los otros workstreams
+
+- W3 **no calcula** POTD, FTR, RpA, ACC ni FRM: produce el insumo. El cálculo sigue siendo de `TASK-1880`.
+- W3 **no evalúa a nadie**. La cola de riesgo nombra responsables porque una tarea sin dueño es información operativa, no un juicio de desempeño. Nada de W3 entra al scorecard de liderazgo ni a Payroll.
+- W3 **no crea dashboard paralelo a Person 360** (ver Non-goals): su superficie es el correo semanal existente, reescrito, más un contrato de lectura que las demás superficies consumen.
+- La distinción que W3 aporta y que el resto del epic necesita: **"el equipo va atrasado" y "el tablero no se mantiene" exigen decisiones opuestas.** En Efeonce, 178 vencidas abiertas con 87 sin responsable y 4 tareas completadas en el mes es lo segundo; el digest lo reportó como caída de desempeño y recomendó revisar recursos.
+
 ## Cadence and rollout
 
 1. **Daily:** captura/materialización y cola de riesgos/ownership; operativo, provisional, sin puntuación salarial.
@@ -108,6 +132,13 @@ Tres unidades registradas en orden de dependencia; todas `to-do`, sólo planific
 - [TASK-1879](../../tasks/to-do/TASK-1879-leadership-accountability-source-foundation.md) — **[backend-data, foundation]** ADR, resolver de cartera dinámica, cobertura por cuenta y atribución temporal, capacidad interna y captura gobernada faltante. Entrega fuentes/fixtures al cálculo sin inventar historia.
 - [TASK-1880](../../tasks/to-do/TASK-1880-ico-leadership-performance-engine.md) — **[backend-data]** Proyección ICO POTD/FTR/RpA/ACC/FRM/STI, snapshots/revisiones, confianza, reader/API parity, cierre e intervenciones auditadas, migración/rollback y shadow. Depende de TASK-1879.
 - [TASK-1881](../../tasks/to-do/TASK-1881-person-360-leadership-performance-ui.md) — **[ui-ux]** Person 360/Actividad con dirección, wireframe, flow/motion, cobertura/estados, drill-down y GVC. Depende de TASK-1880; sin cálculos cliente.
+
+
+Workstream 3 suma tres unidades más, independientes de la cadena 1879→1880→1881 salvo por el consumo de ACC/FRM:
+
+- [TASK-1882](../../tasks/to-do/TASK-1882-delivery-commitment-risk-reader.md) — **[backend-data, foundation]** Lectura prospectiva de compromisos en riesgo: cohortes de compromiso y banderas de higiene ortogonales, contrato de plataforma, snapshot diario que habilita calibrar más adelante, y dos reliability signals. No calcula ninguna métrica ICO. Sin dependencias.
+- [TASK-1883](../../tasks/to-do/TASK-1883-ico-insight-severity-and-evidence-honesty.md) — **[backend-data]** Severidad por umbral de negocio además del z-score, denominador/confianza/período/recurrencia en el DTO, orden sin `quality_score`, validación de las cifras que el modelo cita, y cierre de `ISSUE-176`. No cambia fórmulas ni el insumo del bono. Sin dependencias.
+- [TASK-1884](../../tasks/to-do/TASK-1884-weekly-operational-risk-digest.md) — **[ui-ux]** Digest semanal reescrito en cinco bloques (riesgo prospectivo · deuda · higiene de registro · indicadores fuera de banda · qué cambió), consumer puro de las dos anteriores. Depende de TASK-1882 y TASK-1883.
 
 Política de compensación fuera del alcance: sólo una solicitud nueva y explícita de HR/Finance podría originar otra unidad. No es cuarta hija ni prerrequisito de estas tres.
 
@@ -134,6 +165,10 @@ Política de compensación fuera del alcance: sólo una solicitud nueva y explí
 - [ ] UI cumple dirección visual, readiness, desktop/390px, teclado, reduced motion, ausencia de overflow y GVC premium con revisión enterprise.
 - [ ] Shadow compare de al menos dos cierres mensuales y una revisión trimestral explicable; owner operativo valida utilidades/false positives.
 - [ ] Payroll/compensaciones y períodos históricos permanecen intactos; ninguna vinculación salarial entra sin decisión HR/Finance separada y prospectiva.
+- [ ] Existe una lectura prospectiva de compromisos en riesgo, consumida por ACC/FRM y por el digest, sin que ningún consumer recompute la cohorte.
+- [ ] Riesgo operativo e higiene de registro quedan separados en toda superficie que los muestre; ninguna decisión de capacidad se dispara por deuda de tablero.
+- [ ] Ningún insight se presenta sin denominador, severidad de negocio, período del hecho y marca de recurrencia.
+- [ ] `ISSUE-176` cerrado con paridad BigQuery↔PostgreSQL verificada y vigilada por signal.
 - [ ] Tasks hijas, documentación funcional/manual, observabilidad, rollout/rollback y readback runtime registrados antes de mover el epic a `complete`.
 
 ## Non-goals
@@ -170,3 +205,17 @@ LEADERSHIP_RPA_V1 concentra definición/cálculo, intensidad frente a FTR, cober
 [Informe y fixtures exigibles](../../audits/EPIC-048_LEADERSHIP_METRICS_ADVERSARIAL_REVIEW_2026-09-19.md). La dependencia TASK-1879→1880→1881 es por entrega técnica: technicalShadowReady de 1880 desbloquea UI shadow interna, no requiere esperar todo Slice 4 ni seis meses. Evaluación y STI conservan sus gates. Ninguna hija se marca complete sin sus criterios verificables.
 
 El manifest operativo y el de atribución histórica son distintos; un líder sin cuentas actuales puede tener resultados del período. No confundir attributedAccountCount con assignedAccountCount. Capacidad global requiere permiso explícito; cobertura usa fraction [0,1]. Reapertura corrige período ancla, FRM conserva cohorte y observa hasta maduración, STI normaliza sólo cohorte comparable.
+
+## Delta 2026-09-21 — Workstream 3: superficie de riesgo operativo
+
+Por pedido del operador tras auditar el digest semanal del 2026-09-21 contra producción, el epic incorpora un tercer workstream y tres hijas nuevas (`TASK-1882`, `TASK-1883`, `TASK-1884`). Motivo: los ritmos diario y semanal que este epic ya declaraba no tenían superficie ni insumo, y ACC/FRM no son calculables sin una lectura prospectiva del trabajo abierto contra su compromiso — lectura que no existe en el repo.
+
+Alcance y límites de la incorporación:
+
+- **No cambia el alcance de las tres hijas originales.** La cadena 1879→1880→1881 conserva su orden, sus gates y su ADR.
+- **No cambia ninguna fórmula de métrica.** OTD, FTR, RpA y cycle time quedan idénticos; el insumo del bono no se toca. El cutover de OTD a atraso imputable sigue siendo exclusivamente `TASK-1170`, frenado por decisión del CEO.
+- **No introduce evaluación de personas.** La cola de riesgo nombra responsables como información operativa; no alimenta scorecard ni compensación.
+- **No contradice el Non-goal de dashboard paralelo**: la superficie es el correo semanal existente reescrito, más un contrato de lectura que las superficies ya existentes consumen.
+- `ISSUE-176` (drift de proyección que filtra en silencio lo que llega a liderazgo) queda registrado y asignado a `TASK-1883` Slice 1.
+
+Estado estrictamente documental: sin implementación, migraciones aplicadas, cambio de acceso ni impacto salarial. Dos decisiones quedan abiertas y bloquean ejecución: cuál umbral de OTD es autoritativo (Contrato de Métricas `<90` vs registry TypeScript `0-70`, hoy en contradicción), y si el digest V1 incluye los cinco bloques o sólo los tres que no dependen de `TASK-1883`.

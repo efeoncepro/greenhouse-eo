@@ -35,11 +35,11 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1877](to-do/TASK-1877-equipos-humano-agente-landing.md) | landing transversal de transformación de equipos humano-agente, con marketing/AEO, revenue, servicio y operaciones (EPIC-047, rank 03) | none |
 | [TASK-1878](to-do/TASK-1878-public-landing-entrypaths-human-agent.md) | entradas contextuales desde Home, HubSpot y AEO hacia TASK-1877, sólo tras publicación verificada (EPIC-047, H2) | TASK-1877 |
 
-Siguiente ID libre `TASK-1882`. Insights TASK-1845–1849 (+ TASK-1875, vista web compartida en Think) y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1885`. Insights TASK-1845–1849 (+ TASK-1875, vista web compartida en Think) y notificaciones conservan sus dueñas.
 
 ## Liderazgo operativo: EPIC-048
 
-[EPIC-048](../epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md) tiene tres hijas `to-do`, P1/Alto: planificación de código, DB y UI, sin implementación ni cambio de bono.
+[EPIC-048](../epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md) tiene seis hijas `to-do`, P1/Alto: planificación de código, DB y UI, sin implementación ni cambio de bono.
 Orden obligatorio: foundation → ICO → Person 360. Cartera dinámica por responsabilidad/vigencia: el piloto no limita el universo; quinta cuenta sin código/deploy y 51/201 cuentas son casos exigibles. Umbrales y bindings runtime siguen sujetos a los gates.
 
 | Task | Entrega | Dependencia |
@@ -47,6 +47,16 @@ Orden obligatorio: foundation → ICO → Person 360. Cartera dinámica por resp
 | [TASK-1879](to-do/TASK-1879-leadership-accountability-source-foundation.md) | Cartera dinámica, atribución temporal, cobertura y capacidad interna | none |
 | [TASK-1880](to-do/TASK-1880-ico-leadership-performance-engine.md) | Métricas ICO con RpA/FTR, cohortes históricas/reaperturas; API y technicalShadowReady separado de evaluación | TASK-1879 |
 | [TASK-1881](to-do/TASK-1881-person-360-leadership-performance-ui.md) | Perfil/Actividad: liderazgo, evidencia y separación individual; dirección, wireframe, flow y motion | TASK-1880 |
+
+### Workstream 3 — Superficie de riesgo operativo y entrega de decisión
+
+Los ritmos diario y semanal que el epic declara (cola de riesgos/ownership; revisión de cartera con excepciones y capacidad) no tenían superficie. Estas tres la construyen y, de paso, arreglan el artefacto que hoy ocupa ese lugar. Origen: auditoría del digest del 2026-09-21 contra producción. Ninguna cambia fórmulas de métrica ni el insumo del bono.
+
+| Task | Entrega | Dependencia |
+|---|---|---|
+| [TASK-1882](to-do/TASK-1882-delivery-commitment-risk-reader.md) | Lectura prospectiva de compromisos en riesgo; cohortes riesgo vs higiene; contrato de plataforma; snapshot diario para calibrar. Insumo de ACC/FRM | none |
+| [TASK-1883](to-do/TASK-1883-ico-insight-severity-and-evidence-honesty.md) | Severidad por umbral de negocio, denominador/confianza/período/recurrencia, orden sin `quality_score`; cierra ISSUE-176 (paridad BQ↔PG) | none |
+| [TASK-1884](to-do/TASK-1884-weekly-operational-risk-digest.md) | Digest semanal reescrito en cinco bloques, consumer puro de las dos anteriores; ui-ux/layout, UI ready no | TASK-1882 + TASK-1883 |
 
 ## Programa Efeonce Insights: EPIC-045
 
