@@ -10,6 +10,11 @@ import path from 'node:path'
 const KIT = 'ai-generations/2026-09-17_lanyard-efeonce'
 const OUT = 'ai-generations/2026-09-21_lanyard-deterministico'
 
+// El carnet es lo único que cambia entre personas. Se pasa por argumento para no clonar el script:
+//   node construir.mjs [arte-carnet.png] [salida.png]
+const CARNET = process.argv[2] ?? path.join(KIT, 'ref/arte-carnet-julio.png')
+const SALIDA = process.argv[3] ?? path.join(OUT, 'piezas/lanyard-armado-plano.png')
+
 const W = 1100, H = 1750
 const FONDO = { r: 232, g: 230, b: 227 }          // gris cálido de estudio, como el resto del kit
 const NAVY = { r: 2, g: 60, b: 112 }              // #023c70
@@ -102,7 +107,7 @@ const carcasa = Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w
 // taparía el carnet. La distinción portacarnet ≠ portacredencial está en el manifiesto del kit.
 const carnetW = 300, carnetH = Math.round(carnetW * 86 / 54)
 const CW = carnetW + 34, CH = carnetH + 44
-const carnet = await sharp(path.join(KIT, 'ref/arte-carnet-julio.png')).resize(carnetW, carnetH, { fit: 'fill' }).png().toBuffer()
+const carnet = await sharp(CARNET).resize(carnetW, carnetH, { fit: 'fill' }).png().toBuffer()
 
 const PX = Math.round(CX - CW / 2), PY = 1136
 const marco = Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
@@ -121,8 +126,8 @@ const armado = await base.composite([
   { input: marco, top: 0, left: 0 }
 ]).png().toBuffer()
 
-await sharp(armado).toFile(path.join(OUT, 'piezas/lanyard-armado-plano.png'))
+await sharp(armado).toFile(SALIDA)
 console.log(
-  `armado determinístico · ${W}x${H} · cinta ${ANCHO}px · unidad del patrón ${LARGO_UNIDAD.toFixed(0)}px ` +
+  `armado determinístico → ${SALIDA}\n  ${W}x${H} · cinta ${ANCHO}px · unidad del patrón ${LARGO_UNIDAD.toFixed(0)}px ` +
   `(proporción ${(UNIDAD / AH).toFixed(2)}:1) · yoyo r${R} · carnet ${carnetW}x${carnetH}`
 )

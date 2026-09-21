@@ -157,6 +157,15 @@
         "patron": "la unidad (logotipo + eslogan) mide 7,05 veces el ancho de la cinta; se CALCULA desde el arte, no se fija a ojo",
         "yoyo": "diametro = 1,6 x el ancho de la cinta (32 mm contra 20 mm reales)"
       }
+    },
+    {
+      "id": "15-conjunto-deterministico-nexa",
+      "descripcion": "El mismo conjunto determinístico, con el carnet de Nexa (AI Specialist).",
+      "cuando_usarla": "Cuando el lanyard aparezca en una escena con Nexa. Misma regla que la vista 14: es la referencia para USO en escena.",
+      "archivo_fondo": "final/efeonce-lanyard-15-conjunto-deterministico-nexa-1024x1536-v01-fondo-estudio.png",
+      "archivo_transparente": "final/efeonce-lanyard-15-conjunto-deterministico-nexa-1024x1536-v01-transparente.png",
+      "resolucion": "1024x1536",
+      "carnet": "ref/arte-carnet-nexa.png — Nexa · AI Specialist. El cargo es el que le corresponde como AI influencer de Efeonce [operador, 2026-09-21]"
     }
   ],
   "como_usarla": "Elegir la vista por lo que la pieza tiene que mostrar: conjunto para catálogo, macros para verificar arte, reverso y herrajes para construcción, portacarnet vacío para la pieza sola, cinta plana para mockups, en mano para escala y puesto para piezas con persona. Pasar siempre las artes canónicas junto con la vista.",

@@ -10,7 +10,8 @@ oficiales, y al modelo se le pide **sólo el acabado**: textura de tela, relieve
 plástico, metal, acrílico, sombras de contacto. Ninguna marca se genera.
 
 ```bash
-node ai-generations/2026-09-21_lanyard-deterministico/construir.mjs   # arma el plano
+# arma el plano; el carnet es lo único que cambia entre personas
+node ai-generations/2026-09-21_lanyard-deterministico/construir.mjs [arte-carnet.png] [salida.png]
 # y después, el acabado (el prompt completo está en el commit):
 pnpm ai:image --model gpt-image-2.5-sunburst --size 1024x1536 --image piezas/lanyard-armado-plano.png --prompt "…"
 ```
@@ -48,3 +49,23 @@ transparente, declarada en su manifiesto con su `cuando_usarla`:
 
 > **Para USAR el lanyard en una escena, la referencia es esta foto del producto terminado.** El arte
 > plano sirve para PRODUCIR vistas del kit, no para vestir a alguien.
+
+
+## Delta 2026-09-21 — Nexa
+
+Mismo conjunto con el carnet de **Nexa · AI Specialist** **[cargo dictado por el operador]**: es el que le
+corresponde como **AI influencer** de Efeonce.
+
+```bash
+# 1. el retrato: la referencia es de cuerpo entero, así que se recorta cabeza y hombros ANTES
+#    (pasada directa al script, el encuadre salió con la cara diminuta dentro del círculo)
+node .../retrato-carnet.mjs nexa-busto.png nexa/retrato-nexa.png 0.06
+# 2. el carnet, determinístico
+node .../arte-carnet.mjs nexa/retrato-nexa.png "Nexa" "AI Specialist" nexa/arte-carnet-nexa.png
+# 3. el armado y su acabado
+node construir.mjs nexa/arte-carnet-nexa.png nexa/lanyard-armado-nexa.png
+```
+
+Entregado como vista **`15-conjunto-deterministico-nexa`**, con fondo y transparente. El retrato de
+partida es `nexa-mic-drop.png`, la única frontal mirando a cámara — que es lo que un carnet pide,
+aunque el lenguaje fotográfico diga lo contrario para las piezas de marca.
