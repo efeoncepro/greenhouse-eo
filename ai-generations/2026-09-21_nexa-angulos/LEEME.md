@@ -5,7 +5,7 @@ rostro derivara en cada generación: sin referencia del ángulo, el modelo recon
 seis desde el 2026-09-20; Nexa tenía cero.
 
 Motor `gpt-image-2.5-sunburst` `high` 1024×1024, **edición** (`--image`) desde
-`ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-34-v2.png`. Gasto: 7 imágenes ≈ USD 0,37 de salida (una v01 descartada + las seis v02).
+`ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-34-v2.png`. Gasto: 9 imágenes ≈ USD 0,50 de salida (una v01 descartada, las seis v02 de cabeza y hombros, y dos de cuerpo entero a 1536×2304).
 Las imágenes están gitignoreadas; lo versionado son los prompts verbatim y este registro.
 
 Entregables en `ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-*.png`,
@@ -70,6 +70,48 @@ visible: castaño oscuro uniforme, sin anillo dorado.
 Nota de método: **medir el iris por coordenada fija no sirve**. Tres de cinco mediciones cayeron en piel
 (rgb ~210,150,120) o en la pupila. El iris se verifica mirándolo ampliado, que además es el criterio con el
 que el operador rechazó las pasadas anteriores.
+
+## Segunda tanda: cuerpo entero y el cupo de dos personas
+
+El set de cabeza y hombros dejaba una pregunta abierta: ¿hace falta cuerpo entero por ángulo? Medido, la
+respuesta fue **casi no**, y el hueco real estaba en otro sitio.
+
+**Lo que NO hacía falta.** El cuerpo no es lo que deriva. P2 —Nexa agachada en la góndola, postura
+compleja— salió bien partiendo de una sola referencia de cuerpo, y esa referencia es de ella de pie y de
+frente: el modelo extrapola la postura. Lo que no extrapola es el rostro, que es donde ya están los seis
+ángulos.
+
+**Lo que sí hacía falta, y no era una pose.** Con DOS personas en cuadro el cupo baja a dos referencias
+por cabeza y se tomaban las dos primeras de la lista. Las dos primeras de Julio son **ambas de rostro**
+(`ap-04` y `ap-08`; la de cuerpo es `ap-11`), así que se quedaba sin cuerpo entero — siempre. Y en Nexa la
+de cuerpo se caía en cuanto se pedía una vista. O sea: en piezas de dos personas a cuerpo entero el modelo
+estaba inventando las dos siluetas, en silencio, porque la pieza sale igual.
+
+Arreglado declarando qué referencia lleva el cuerpo (`cuerpo:`) y garantizando que viaje siempre que
+quepa, sustituyendo la última —la menos decisiva, porque la vista va primera y manda—. Con la otra cara de
+la regla: si la vista pedida **ya** es de cuerpo entero, no se añade el cuerpo frontal, o la toma quedaría
+con dos cuerpos y ningún rostro cercano. Cubierto por cuatro tests, verificados desactivando el arreglo:
+dos de ellos fallan sin él.
+
+**Las dos vistas de cuerpo que sí se produjeron:** `cuerpo-perfil-izq` y `cuerpo-espalda`. Son las siluetas
+que ninguna referencia cubría —todos los cuerpos enteros que existen son frontales— y las que más cambian
+la proporción percibida en una serie. Generadas a **1536×2304**, no a 1024: a página entera el rostro cae a
+~120 px y el modelo lo rellena, que es la regla 3 del canon aplicada al cuerpo.
+
+## Por qué no se cablearon más referencias de la carpeta
+
+La carpeta `01. Material/01. Avatar/` tiene 58 archivos, pero para **ancla de identidad** casi ninguno
+sirve, y conviene dejarlo escrito para que nadie lo reintente:
+
+- Los 4 retratos grandes del 2026-03-27 son **ambiguos**: cejas gruesas como A, pero sin el delineado del
+  párpado que define a A. No se clasifican con confianza en ninguna de las dos, así que no entran.
+- El turnaround del mismo día y las 24 poses y 23 de vestuario son **identidad B**.
+- La sesión de estudio con blazer naranja es A y tiene cuerpos enteros limpios sobre fondo blanco, pero
+  **todos frontales** —el ángulo que ya está cubierto— y el naranja es acento de marca en bloque grande:
+  como referencia arrastra color igual que el navy.
+
+El set de referencia se mantiene estrecho y verificable a propósito: tres referencias de la serie Avatar
+más las ocho vistas derivadas, todas ancladas al mismo retrato cercano.
 
 ## Lo que sigue
 

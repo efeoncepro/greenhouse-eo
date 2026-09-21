@@ -74,6 +74,14 @@
       "rol": "persona:nexa/espalda",
       "sha256": "01f1fd94e7470fd3b306b7b4b1409b0da47df89b7adbcc18f3395ca5798bb1df"
     },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-cuerpo-perfil-izq.png": {
+      "rol": "persona:nexa/cuerpo-perfil-izq",
+      "sha256": "d499480d4dafab2ee5605527ffb422fbac0e1bb59d6955449b29b6f3c3d3e7af"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-cuerpo-espalda.png": {
+      "rol": "persona:nexa/cuerpo-espalda",
+      "sha256": "70e643fb200fba5b497d1ff038d02c281af174cf64f603ccc77616393ba12693"
+    },
     "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:sprocket-hubspot/frente",
       "sha256": "4bb97bc7fb7382b898fbdd76c4b97073dbe27e5e401c8c9a612ccf6a3026caf3"

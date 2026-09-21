@@ -178,6 +178,10 @@ export const PERSONAS = {
       'ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-08.png',
       'ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-11.png'
     ],
+    // Cuál de `refs` lleva el CUERPO ENTERO. Sin esto, con dos personas en cuadro el cupo baja a dos
+    // referencias por cabeza y se tomaban las dos primeras — que en Julio son AMBAS de rostro, así que
+    // se quedaba sin referencia de cuerpo y el modelo le inventaba la silueta. Medido el 2026-09-21.
+    cuerpo: 'ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-11.png',
     // Vistas que las referencias frontales NO cubren. Derivadas por EDICIÓN desde julio-ap-08,
     // no generadas de cero: generar reconstruye el rostro y lo redondea.
     vistas: {
@@ -212,6 +216,7 @@ export const PERSONAS = {
       'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png',
       'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-frontal-v2.png'
     ],
+    cuerpo: 'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png',
     // Vistas que las referencias frontales NO cubren, derivadas por EDICIÓN desde `nexa-avatar-34-v2`
     // el 2026-09-21 — no generadas de cero, por la misma razón que en Julio. Dos cosas medidas en esa
     // corrida: pedir «45 degrees» NO gira la cabeza (la v01 volvió en el mismo ángulo de la
@@ -225,8 +230,17 @@ export const PERSONAS = {
       'perfil-izq': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-izq.png',
       'perfil-der': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-der.png',
       trasero: 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-135-trasero.png',
-      espalda: 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-espalda.png'
-    }
+      espalda: 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-espalda.png',
+      // Cuerpo ENTERO en los dos ángulos que ninguna referencia cubría: la silueta de perfil y la de
+      // espaldas. El cuerpo frontal ya existe (`cuerpo`), y el modelo extrapola bien una postura —P2
+      // salió agachada partiendo sólo del frontal—, pero no extrapola una silueta lateral. Generadas a
+      // 1536×2304 y no a 1024: a pie de página entera el rostro cae a ~120 px y el modelo lo rellena.
+      'cuerpo-perfil-izq': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-cuerpo-perfil-izq.png',
+      'cuerpo-espalda': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-cuerpo-espalda.png'
+    },
+    // Vistas que YA son de cuerpo entero: pedir además la referencia de cuerpo dejaría la toma con dos
+    // cuerpos y ningún rostro cercano.
+    vistasDeCuerpo: ['cuerpo-perfil-izq', 'cuerpo-espalda']
   }
 }
 
@@ -280,6 +294,18 @@ function resolverIdentidad(ficha) {
       }
 
       refs = [disponibles[vista], ...persona.refs.slice(0, Math.max(0, cupo - 1))]
+    }
+
+    // El CUERPO ENTERO tiene que viajar siempre que quepa. Con una persona sola el cupo es 3 y entra
+    // por orden, pero con DOS personas baja a 2 y se colaba este agujero: se tomaban las dos primeras
+    // de la lista, que en Julio son ambas de rostro, y con una vista pedida desplazaban también la de
+    // Nexa. Resultado: piezas de dos personas a cuerpo entero donde el modelo inventaba las dos
+    // siluetas. Se sustituye la ÚLTIMA (la menos decisiva: la vista va primera y manda) por la de
+    // cuerpo. Medido el 2026-09-21.
+    const yaEsDeCuerpo = vista && (persona.vistasDeCuerpo ?? []).includes(vista)
+
+    if (persona.cuerpo && cupo >= 2 && !yaEsDeCuerpo && !refs.includes(persona.cuerpo)) {
+      refs[refs.length - 1] = persona.cuerpo
     }
 
     for (const ref of refs) {

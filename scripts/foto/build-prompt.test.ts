@@ -293,6 +293,46 @@ conAssets('foto:prompt · identidad', () => {
   it('exige que `identidad` sea una lista', () => {
     expect(() => construirPrompt({ ...fichaBase, identidad: 'julio' })).toThrow(/debe ser una lista/)
   })
+
+  // Agujero real medido el 2026-09-21: con dos personas el cupo baja a 2 y se tomaban las dos primeras
+  // referencias de la lista. Las dos primeras de Julio son AMBAS de rostro, así que se quedaba sin
+  // cuerpo entero y el modelo le inventaba la silueta. Pasaba en silencio: la pieza salía, sólo que
+  // con un cuerpo que no era el suyo.
+  const CUERPOS = {
+    julio: 'ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-11.png',
+    nexa: 'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png'
+  }
+
+  it('una persona sola lleva su cuerpo entero', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: ['julio'] })
+
+    expect(r.imagenes).toContain(CUERPOS.julio)
+  })
+
+  it('con dos personas CADA UNA conserva su cuerpo entero', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: ['julio', 'nexa'] })
+
+    expect(r.imagenes).toContain(CUERPOS.julio)
+    expect(r.imagenes).toContain(CUERPOS.nexa)
+  })
+
+  it('una vista pedida no desplaza al cuerpo entero: la vista va primera y el cuerpo entra igual', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: 'perfil-izq' }, 'julio'] })
+
+    expect(r.imagenes[0]).toContain('nexa-perfil-izq.png')
+    expect(r.imagenes).toContain(CUERPOS.nexa)
+    expect(r.imagenes).toContain(CUERPOS.julio)
+  })
+
+  // La otra cara de la misma regla: si la vista YA es de cuerpo entero, añadir el cuerpo frontal
+  // dejaría la toma con dos cuerpos y ningún rostro cercano, que es justo lo que hace derivar la cara.
+  it('una vista que ya es de cuerpo entero conserva el rostro en vez de duplicar cuerpo', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: 'cuerpo-perfil-izq' }, 'julio'] })
+
+    expect(r.imagenes[0]).toContain('nexa-cuerpo-perfil-izq.png')
+    expect(r.imagenes).toContain('ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-34-v2.png')
+    expect(r.imagenes).not.toContain(CUERPOS.nexa)
+  })
 })
 
 describe('foto:prompt · avisos que faltaban', () => {
