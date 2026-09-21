@@ -144,7 +144,21 @@
         1200,
         1600
       ]
+    },
+    {
+      "id": "14-conjunto-deterministico",
+      "descripcion": "Conjunto completo armado PIEZA POR PIEZA de forma determinística y terminado por el modelo: cinta serigrafiada, regulador, yoyo, clip, portacarnet y carnet de Julio Reyes.",
+      "cuando_usarla": "SIEMPRE que el lanyard deba aparecer en una escena generada (vestir a una persona, bodegon, pieza de marca). Es la referencia canónica para USO en escena: ninguna marca suya fue dibujada por un modelo. El arte plano (ref/arte-cinta.png) sirve para PRODUCIR vistas del kit, no para usar la pieza en escena.",
+      "archivo_fondo": "final/efeonce-lanyard-14-conjunto-deterministico-1024x1536-v01-fondo-estudio.png",
+      "archivo_transparente": "final/efeonce-lanyard-14-conjunto-deterministico-1024x1536-v01-transparente.png",
+      "resolucion": "1024x1536",
+      "como_se_hizo": "ai-generations/2026-09-21_lanyard-deterministico/construir.mjs; el modelo solo aporto material y luz, nunca dibujo",
+      "proporciones_medidas": {
+        "patron": "la unidad (logotipo + eslogan) mide 7,05 veces el ancho de la cinta; se CALCULA desde el arte, no se fija a ojo",
+        "yoyo": "diametro = 1,6 x el ancho de la cinta (32 mm contra 20 mm reales)"
+      }
     }
   ],
-  "como_usarla": "Elegir la vista por lo que la pieza tiene que mostrar: conjunto para catálogo, macros para verificar arte, reverso y herrajes para construcción, portacarnet vacío para la pieza sola, cinta plana para mockups, en mano para escala y puesto para piezas con persona. Pasar siempre las artes canónicas junto con la vista."
+  "como_usarla": "Elegir la vista por lo que la pieza tiene que mostrar: conjunto para catálogo, macros para verificar arte, reverso y herrajes para construcción, portacarnet vacío para la pieza sola, cinta plana para mockups, en mano para escala y puesto para piezas con persona. Pasar siempre las artes canónicas junto con la vista.",
+  "delta_2026_09_21": "Se agrega la vista 14: el conjunto armado deterministicamente. Nace porque el modelo TERGIVERSA el logotipo cuando se lo describe o cuando se le pasa el arte plano: en cuatro pasadas del 2026-09-21 la nave de la «o» salio distinta cada vez. Regla nueva: para USAR el lanyard en una escena, la referencia es una FOTO del producto terminado (esta vista), nunca el arte plano ni una descripcion."
 }
