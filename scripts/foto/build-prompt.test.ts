@@ -904,7 +904,7 @@ describe('la prenda se copia tal cual; el macro sólo refuerza el detalle', () =
   // el bordado mide unos pocos píxeles y el modelo lo lee como una mancha. Los kits YA traían su
   // macro; lo que faltaba era exponerlo. El verificador real sigue siendo mirar el bordado ampliado.
   it('una prenda con emblema aporta DOS referencias: la prenda y el macro', () => {
-    const { imagenes, prompt } = construirPrompt({ ...base, objetos: ['polo-efeonce'] })
+    const { imagenes, prompt } = construirPrompt({ ...base, objetos: [{ objeto: 'polo-efeonce', vista: 'frente' }] })
 
     expect(imagenes).toHaveLength(2)
     expect(imagenes[1]).toMatch(/detalle-bordado/)
@@ -919,8 +919,8 @@ describe('la prenda se copia tal cual; el macro sólo refuerza el detalle', () =
   // una sola forma para las cinco prendas fue el error del 2026-09-20: el bloque genérico decía
   // «do NOT substitute it with letters» y le prohibía al modelo exactamente lo que la gorra lleva.
   it('cada prenda declara QUÉ marca lleva y el bloque la describe', () => {
-    const gorra = construirPrompt({ ...base, objetos: ['gorra-efeonce'] }).prompt
-    const polo = construirPrompt({ ...base, objetos: ['polo-efeonce'] }).prompt
+    const gorra = construirPrompt({ ...base, objetos: [{ objeto: 'gorra-efeonce', vista: 'frente' }] }).prompt
+    const polo = construirPrompt({ ...base, objetos: [{ objeto: 'polo-efeonce', vista: 'frente' }] }).prompt
 
     expect(gorra).toMatch(/letters e-f-e-o-n-c-e/)
     expect(polo).toMatch(/carries NO letters and NO words/)
@@ -931,12 +931,12 @@ describe('la prenda se copia tal cual; el macro sólo refuerza el detalle', () =
   // Su logotipo ya es grande y legible en la vista frontal: pasarle además el macro lo empujaba a
   // redibujarlo en vez de copiarlo.
   it('la gorra va sin macro: su marca ya se lee en la prenda', () => {
-    expect(construirPrompt({ ...base, objetos: ['gorra-efeonce'] }).imagenes).toHaveLength(1)
+    expect(construirPrompt({ ...base, objetos: [{ objeto: 'gorra-efeonce', vista: 'frente' }] }).imagenes).toHaveLength(1)
   })
 
   it('las prendas de emblema pequeño declaran su macro', () => {
     for (const p of ['polo-efeonce', 'hoodie-efeonce', 'chaqueta-softshell-efeonce', 'chaqueta-bomber-efeonce']) {
-      expect(construirPrompt({ ...base, objetos: [p] }).imagenes).toHaveLength(2)
+      expect(construirPrompt({ ...base, objetos: [{ objeto: p, vista: 'frente' }] }).imagenes).toHaveLength(2)
     }
   })
 
@@ -1154,14 +1154,14 @@ describe('el polo existe en dos colores y la principal es la navy', () => {
   // escena que pedía «deep navy polo» salía en BLANCO (medido 2026-09-21). La navy es la principal:
   // 15 vistas contra 6, y es la referencia del uniforme en EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.
   it('sin declarar color, usa la navy', () => {
-    const { imagenes } = construirPrompt({ ...base, objetos: ['polo-efeonce'] })
+    const { imagenes } = construirPrompt({ ...base, objetos: [{ objeto: 'polo-efeonce', vista: 'frente' }] })
 
     expect(imagenes[0]).toMatch(/polo-navy/)
     expect(imagenes[1]).toMatch(/polo-navy-10-detalle-bordado/)
   })
 
   it('la blanca se puede pedir, y arrastra su propio macro', () => {
-    const { imagenes } = construirPrompt({ ...base, objetos: [{ objeto: 'polo-efeonce', color: 'blanco' }] })
+    const { imagenes } = construirPrompt({ ...base, objetos: [{ objeto: 'polo-efeonce', color: 'blanco', vista: 'frente' }] })
 
     expect(imagenes[0]).toMatch(/polo-blanco/)
     expect(imagenes[1]).toMatch(/polo-blanco-10-detalle-bordado/)
@@ -1175,6 +1175,47 @@ describe('el polo existe en dos colores y la principal es la navy', () => {
 
   // El emblema sobredimensionado es el fallo más común del kit y su ancla vivía sólo en la doc.
   it('el bloque lleva el ancla de tamaño, no sólo la doc', () => {
-    expect(construirPrompt({ ...base, objetos: ['polo-efeonce'] }).prompt).toMatch(/NO WIDER THAN A THIRD/)
+    expect(construirPrompt({ ...base, objetos: [{ objeto: 'polo-efeonce', vista: 'frente' }] }).prompt).toMatch(/NO WIDER THAN A THIRD/)
+  })
+})
+
+
+describe('el asset de USO es la prenda puesta, y es el defecto', () => {
+  const base = {
+    id: 'u',
+    formato: '4:5',
+    escena: 'SCENE: a hard beam at the instant she lifts it. an azure screen. a real walnut worktop',
+    lecho: { objeto: 'the near edge of a real walnut worktop', tono: 'DARK walnut in shadow, matte' }
+  }
+
+  // Contrato EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1: arte plano → producir vistas · prenda aislada
+  // → construir · prenda PUESTA → usar en escena. Medido: con la prenda puesta el logotipo sale legible
+  // a la primera en las dos personas; con la prenda aislada falló cuatro veces seguidas.
+  it('sin vista declarada usa la prenda PUESTA, y entonces el macro sobra', () => {
+    const { imagenes, prompt } = construirPrompt({ ...base, objetos: ['polo-efeonce'] })
+
+    expect(imagenes).toHaveLength(1)
+    expect(imagenes[0]).toMatch(/puesto-frente/)
+    expect(prompt).toMatch(/ALREADY WORN/)
+  })
+
+  // La prenda puesta trae una persona que NO es la de la escena: si no se dice, el modelo mezcla.
+  it('declara que la persona de la referencia no cuenta', () => {
+    const { prompt } = construirPrompt({ ...base, objetos: ['polo-efeonce'] })
+
+    expect(prompt).toMatch(/PERSON in that image is NOT the person in this scene/)
+  })
+
+  it('pedir la vista explícita devuelve la prenda aislada, para construir', () => {
+    const { imagenes } = construirPrompt({ ...base, objetos: [{ objeto: 'polo-efeonce', vista: 'frente' }] })
+
+    expect(imagenes[0]).toMatch(/01-frente/)
+    expect(imagenes).toHaveLength(2)
+  })
+
+  // La gorra tiene prueba en persona, así que su asset de uso se elige por persona.
+  it('la gorra resuelve su asset de uso por persona', () => {
+    expect(construirPrompt({ ...base, objetos: [{ objeto: 'gorra-efeonce', usoDe: 'julio' }] }).imagenes[0]).toMatch(/prueba-julio/)
+    expect(() => construirPrompt({ ...base, objetos: [{ objeto: 'gorra-efeonce', usoDe: 'pedro' }] })).toThrow(/no tiene prueba en persona/)
   })
 })

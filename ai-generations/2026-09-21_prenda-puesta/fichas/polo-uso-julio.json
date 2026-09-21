@@ -1,0 +1,11 @@
+{
+  "id": "polo-uso-julio",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "escucha",
+  "identidad": ["julio"],
+  "objetos": ["polo-efeonce"],
+  "reservas": { "texto": { "muro": "a tall wall of vertical oak acoustic slats, each batten casting its own fine shadow line", "tinta": "blanca" } },
+  "escena": "SCENE (a working session, studio in Santiago, morning): he is RECEIVING, not speaking: mouth closed, gaze lowered and going out of frame to the left, his right hand near his jaw, his left arm down and away from his chest so his LEFT CHEST IS VISIBLE AND EVENLY LIT. He sits LOW in the lower half of the frame. A hard shaft of morning sun lands on him and the desk; the reserved slat wall above stays in its own even shadow, outside the beam. An AZURE-BLUE screen glows out of frame at the left. Caught AT THE INSTANT he tilts his head a degree to catch a word. 85mm at f/1.8.",
+  "lecho": { "objeto": "a stack of matte black sample boxes right against the lens, unlit", "tono": "DARK near black, matte" }
+}

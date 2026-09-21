@@ -355,6 +355,7 @@ export const OBJETOS = {
       abierta: '06-cierre-abierto'
     },
     vistaDefecto: 'frente',
+    assetDeUso: 'efeonce-chaqueta-softshell-14-puesto-frente-1200x1600-v01-fondo-estudio.png',
     macroEmblema: 'efeonce-chaqueta-softshell-11-macro-bordado-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
   },
@@ -369,6 +370,7 @@ export const OBJETOS = {
     patron: 'efeonce-chaqueta-bomber-<V>-1600x1600-v01-transparente.png',
     vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
     vistaDefecto: 'frente',
+    assetDeUso: 'efeonce-chaqueta-bomber-14-puesto-frente-1200x1600-v01-fondo-estudio.png',
     macroEmblema: 'efeonce-chaqueta-bomber-11-macro-bordado-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
   },
@@ -392,6 +394,12 @@ export const OBJETOS = {
       'trucker-navy': 'v5-trucker-navy'
     },
     vistaDefecto: 'frente',
+    // El asset de uso de la gorra es POR PERSONA (el kit trae la prueba con Julio y con Nexa), así que
+    // no se resuelve solo: se declara en la ficha con `usoDe: 'julio' | 'nexa'`.
+    usoPorPersona: {
+      julio: '../out/prueba-julio.png',
+      nexa: '../out/prueba-nexa.png'
+    },
     // La gorra existe en dos marcas distintas: el logotipo completo y el isotipo solo. El tipo va por
     // VISTA, no por kit — declararlo arriba hacía que pedir la v3 heredara la descripción del logotipo
     // y el modelo terminara construyendo una marca a mitad de camino (2026-09-20).
@@ -442,6 +450,10 @@ export const OBJETOS = {
     patron: 'efeonce-polo-navy-<V>-1600x1600-v01-transparente.png',
     vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
     vistaDefecto: 'frente',
+    usoPorColor: {
+      navy: 'efeonce-polo-navy-13-puesto-frente-1200x1600-v01-fondo-estudio.png',
+      blanco: 'efeonce-polo-blanco-13-puesto-frente-1200x1600-v01-fondo-estudio.png'
+    },
     macroEmblema: 'efeonce-polo-navy-10-detalle-bordado-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
   },
@@ -456,6 +468,7 @@ export const OBJETOS = {
     patron: 'efeonce-hoodie-<V>-1600x1600-v01-transparente.png',
     vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
     vistaDefecto: 'frente',
+    assetDeUso: 'efeonce-hoodie-15-puesto-frente-1200x1600-v01-fondo-estudio.png',
     macroEmblema: 'efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
   }
@@ -495,12 +508,15 @@ function resolverObjetos(ficha, desde) {
   for (const pedido of pedidos) {
     const clave = typeof pedido === 'string' ? pedido : pedido?.objeto
     const objeto = OBJETOS[clave]
+    // Pedir una VISTA explícita significa que se quiere la prenda aislada (construcción); sin vista, la
+    // pieza va a una escena y el asset correcto es la prenda puesta.
+    const vistaPedida = typeof pedido === 'string' ? null : pedido?.vista
 
     if (!objeto) {
       throw new Error(`Objeto "${clave}" desconocido. Kits disponibles: ${Object.keys(OBJETOS).join(', ')}.`)
     }
 
-    const vista = (typeof pedido === 'string' ? null : pedido?.vista) ?? objeto.vistaDefecto
+    const vista = vistaPedida ?? objeto.vistaDefecto
     const sufijo = objeto.vistas[vista]
 
     if (!sufijo) {
@@ -510,6 +526,20 @@ function resolverObjetos(ficha, desde) {
     }
 
     const color = (typeof pedido === 'string' ? null : pedido?.color) ?? objeto.colorDefecto
+    const usoDe = typeof pedido === 'string' ? null : pedido?.usoDe
+
+    // ASSET DE USO: la prenda PUESTA, no la prenda aislada. Contrato
+    // `EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md`: arte plano → producir vistas · prenda aislada →
+    // construir · prenda PUESTA → usar en escena. Medido el 2026-09-21: con la prenda puesta el logotipo
+    // sale legible a la primera en las dos personas; con la prenda aislada falló cuatro veces seguidas.
+    const enUso = vistaPedida ? null : (objeto.usoPorPersona?.[usoDe] ?? objeto.usoPorColor?.[color] ?? objeto.assetDeUso)
+
+    if (objeto.usoPorPersona && usoDe && !objeto.usoPorPersona[usoDe]) {
+      throw new Error(
+        `"${clave}" no tiene prueba en persona para "${usoDe}". Hay: ${Object.keys(objeto.usoPorPersona).join(', ')}.`
+      )
+    }
+
     const patron = objeto.patronPorColor?.[color] ?? objeto.patron
 
     if (color && objeto.patronPorColor && !objeto.patronPorColor[color]) {
@@ -518,7 +548,7 @@ function resolverObjetos(ficha, desde) {
       )
     }
 
-    const ref = objeto.base + patron.replace('<V>', sufijo)
+    const ref = enUso ? path.normalize(objeto.base + enUso) : objeto.base + patron.replace('<V>', sufijo)
 
     if (!existsSync(path.join(raiz, ref))) {
       throw new Error(
@@ -543,14 +573,24 @@ function resolverObjetos(ficha, desde) {
         'failure of this kit.'
       : ''
 
-    bloques.push(`IMAGE ${n} (object reference): Image ${n} is ${objeto.etiqueta}. ${objeto.instruccion}${queMarca} Ignore its studio background.`)
+    // Con la prenda PUESTA, la referencia trae una persona que NO es la de la escena: hay que decirlo,
+    // o el modelo mezcla identidades. Con la prenda aislada esto no hacía falta.
+    const instruccion = enUso
+      ? `Image ${n} shows this garment ALREADY WORN, with its Efeonce mark already applied. Copy the GARMENT ` +
+        'exactly as it appears there — same colour, same cut, same mark at the same size and position, and the ' +
+        'way it sits and creases on a body. The PERSON in that image is NOT the person in this scene and their ' +
+        'face, body and pose do not carry over; ignore them and ignore the background entirely. Do NOT redraw, ' +
+        'resize or restyle the mark: it is not yours to design, only to copy.'
+      : `${objeto.instruccion}${queMarca} Ignore its studio background.`
+
+    bloques.push(`IMAGE ${n} (object reference): Image ${n} is ${objeto.etiqueta}. ${instruccion}`)
 
     // El MACRO DEL BORDADO va como referencia aparte. En la vista de la prenda entera el emblema
     // mide unos pocos píxeles: el modelo lo lee como una mancha y la reinventa. Medido el
     // 2026-09-20: tres prendas dieron tres emblemas distintos y ninguno era el de Efeonce. Los kits
     // YA traían su macro; lo que faltaba era exponerlo. No se compone encima —probado y rechazado
     // por el operador: se ve impreso, no bordado—: se le da al modelo el emblema en grande.
-    if (objeto.macroEmblema) {
+    if (objeto.macroEmblema && !enUso) {
       const macro = objeto.base + (objeto.macroPorColor?.[color] ?? objeto.macroEmblema)
 
       if (!existsSync(path.join(raiz, macro))) {

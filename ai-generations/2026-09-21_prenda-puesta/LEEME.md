@@ -36,3 +36,21 @@ La regla queda cerrada con evidencia de los dos lados. **Bonus no menor:** las p
 se estaba cumpliendo — se pasaban tres retratos.
 
 Contrato canónico de selección de referencia: `docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md`.
+
+## Cableado en el comando (2026-09-21)
+
+Los cinco kits tenían su asset de uso y el comando resolvía la vista de **producción**. Ahora:
+
+- **Sin `vista` declarada** → la prenda **puesta** (escena). Con ella el macro del bordado **sobra**: la marca ya
+  se ve aplicada en su sitio.
+- **Con `vista` explícita** → la prenda **aislada** + su macro (construcción). Los dos caminos siguen vivos.
+- La **gorra** resuelve su asset de uso **por persona** (`usoDe: 'julio' | 'nexa'`), porque su kit trae prueba en
+  persona; pedir una persona sin prueba falla en vez de caer a otra.
+
+**La trampa de este asset, y su antídoto:** la prenda puesta trae **una persona que no es la de la escena**. El
+bloque lo declara —«The PERSON in that image is NOT the person in this scene and their face, body and pose do not
+carry over»— y **medido: la identidad no se contaminó** al usar el polo, cuyo asset muestra a un modelo genérico,
+junto a las referencias de Julio.
+
+**Deriva observada:** el polo navy salió un punto más claro que la referencia. Menor, pero real: si el color
+importa, declararlo también en la escena.
