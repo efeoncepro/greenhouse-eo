@@ -257,6 +257,40 @@ recurrentes funcionan como **anclas visuales que la identifican aunque no se le 
    sutil en acetato navy oscuro **sólo en exteriores**. Los acentos vibrantes funcionan bien compitiendo con
    luz natural.
 
+### 🔴 Contexto 6 — Terreno y operación Efeonce **[adición del operador, 2026-09-21 · no está en el original de febrero]**
+
+> El documento de febrero define cinco contextos y **no contempla ropa corporativa**. Se agrega un sexto por
+> decisión del operador: *«el uniforme es sexto contexto; cuando hay trabajo de campo hay ropa corporativa
+> para eso»*. El criterio que lo ordena es el mismo que el de los otros cinco: **los contextos son
+> situaciones, y la prenda la dicta la situación.**
+
+Cuando Nexa está operando como Efeonce —terreno, instalación, rodaje, reunión con cliente representando a la
+empresa— viste el uniforme, no su estilo propio. El código de prendas es el del canon fotográfico
+([`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](../brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md)):
+
+| Prenda | Registro de escena |
+|---|---|
+| **Gorra trucker + polo** | Terreno |
+| **Hoodie** | Terreno |
+| **Polo piqué** | Oficina casual, cliente |
+| **Chaqueta** softshell o bomber | Reunión o instancia importante |
+| **Lanyard y carnet** | **Transversales** — van en casual y en formal por igual |
+
+**La prenda se elige por el registro de la escena, NUNCA por variedad visual:** una reunión importante en
+hoodie dice lo contrario de lo que la foto cuenta.
+
+**Los signature elements de §5.1 no cambian en este contexto.** Son de la persona, no del outfit: anillo,
+reloj, aretes y uñas siguen igual bajo el uniforme. Es lo que mantiene a Nexa reconocible vestida de Efeonce.
+
+**Dos reglas duras heredadas del canon fotográfico, que aquí pesan más que en los otros cinco contextos:**
+
+- 🔴 **El emblema bordado NO se genera.** Tres prendas dieron tres emblemas distintos y ninguno era el de
+  Efeonce. En orden: que no se lea (de espaldas, en sombra, pequeño) · componerlo después · editar con
+  máscara. Nunca publicar el emblema tal como sale del generador.
+- 🔴 **Si la marca tiene que leerse, el encuadre se decide por ella.** Medido: la cinta del lanyard falla a
+  ~12 px de ancho y se lee a ~40. Plano corto (chest-up) la sostiene; plano medio con dos personas no, por
+  mucha calidad que se le suba.
+
 ---
 
 ## 6. Expresiones canónicas
@@ -520,9 +554,8 @@ semana** · **1 pieza de contenido largo al mes** (artículo, video extendido, t
 Cuatro cosas quedaron abiertas al traer el documento al repo. Están detalladas, con dueño, en
 [§10 de la ficha](../brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md):
 
-1. **Ropa corporativa Efeonce** (hoodie, polo, gorra, softshell, bomber, lanyard): §5 define cinco contextos
-   con estilo propio y **no contempla uniforme**. Son dos sistemas de vestuario para la misma persona sin
-   árbitro entre ellos.
+1. ~~**Ropa corporativa Efeonce**~~ — **resuelto el 2026-09-21**: es el **contexto 6** de §5.3, por decisión
+   del operador. Los contextos son situaciones y la prenda la dicta la situación.
 2. **El cargo**: el carnet del lanyard dice «AI Specialist»; §14 define el rol como «evangelizadora del
    modelo, voz del ecosistema».
 3. **«Terracota»** está prohibida en ropa (§5.2) y recetada para labios (§3.1, §3.4). Mismo nombre de color

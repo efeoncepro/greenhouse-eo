@@ -59,7 +59,8 @@ Las ocho son **planos medios**: ninguna es de cuerpo entero.
 | Contenido casual / Redes | `casual-1` … `casual-6` | ✓ 6 · `casual-3..6` de cuerpo |
 | Tech / Conferencias como speaker | `speaker-1` … `speaker-3` | ✓ 3 · las tres de cuerpo |
 | Behind-the-scenes / Home office | `home-1` … `home-5` | ✓ 5 · `home-2` y `home-4` de cuerpo |
-| **Lifestyle / Exterior urbano** | — | 🔴 **falta entero** |
+| **Lifestyle / Exterior urbano** | — | 🔴 **falta entero** · el material fuente de B **lleva gafas de sol**, así que no había cara que injertar: no fue olvido, el método no aplicaba |
+| **Terreno y operación Efeonce** (contexto 6) | — | 🔴 **sin referencias de vestuario**. Decisión del operador 2026-09-21. Hay 6 *plates* de piezas en `2026-09-21_nexa-uniforme-{terreno,documental}/`, que son piezas, no referencias |
 
 Cuáles ya muestran la silueta completa está declarado en `vestuarioDeCuerpo`, verificado mirando las 17 en
 hoja de contacto: si la referencia ya es de cuerpo, añadir además el cuerpo frontal mete dos cuerpos sin
@@ -106,15 +107,32 @@ cuatro**, y un conteo que se asienta en tres deja la cuarta fuera del checklist.
 *Nota de método: en imágenes generadas no se puede garantizar izquierda/derecha por el espejado. Lo robusto
 es el **dedo** (anular en vez de índice) y el **metal**, que no dependen de eso.*
 
-### 🔴 Corrección a esa auditoría: `4-vestuario/` sí cumple
+### 🔴 Corrección a esa auditoría: `4-vestuario/` cumple, salvo el dedo
 
-La muestra de arriba miró **anclas y material de OneDrive**. Verificado después sobre las 17 del set en hoja
-de contacto, `4-vestuario/` **porta los signature elements y cumple el contexto con precisión**: reloj y
-anillo visibles en varias, bun alto y lentes de luz azul en `home` (§5.3 contexto 4 exacto), acento naranja y
-azul eléctrico en `speaker`, blazer navy sobre blanco en `prof`.
+La muestra de arriba miró **anclas y material de OneDrive**. Verificado después sobre las 17 del set,
+`4-vestuario/` **cumple el contexto con precisión** —bun alto y lentes de luz azul en `home` (§5.3 contexto 4
+exacto), acento naranja y azul eléctrico en `speaker`, blazer navy sobre blanco en `prof`— **y porta los
+accesorios en material y estilo**, que es mucho más de lo que hacen las anclas.
 
-**La brecha de accesorios está concentrada en las ANCLAS, no en todo el set.** Y las anclas son justo lo que
-se antepone siempre, así que sigue importando.
+Tres candidatas reales para tomar como referencia del anillo, verificadas al 100 % en la franja de manos:
+
+| Candidata | Anillo | Uñas | Dedo |
+|---|---|---|---|
+| `casual-1` | **plata mate, facetado/sello angular** — el más geométrico del set | navy, un color ✓ | **anular** ✗ |
+| `home-2` | plateado con piedra rectangular, con diseño | nude rosado ✓ | **medio** ✗ |
+| `home-1` | plata mate, banda ancha lisa | navy, un color ✓ | **medio** ✗ |
+
+`home-1`, `home-2` y `casual-4` llevan además **reloj de correa navy con carátula pequeña**, que es §5.1
+literal.
+
+🔴 **Ninguna cumple el DEDO.** Cumplen metal, forma y uñas —tres de los cuatro atributos del anillo— y todas
+lo llevan en **medio o anular**, no en el índice. Para tomarlas como referencia sirve igual —son infinitamente
+mejores que las anclas, que son **doradas** y en anulares— pero **el dedo hay que corregirlo explícitamente o
+el resultado repite el mismo error con mejor metal**.
+
+Las dos señales verificables —**metal** y **dedo**— apuntan en direcciones distintas y ninguna depende del
+espejado. **La brecha de accesorios está concentrada en las ANCLAS**, que son justo lo que se antepone
+siempre. Hallazgo de la sesión «Poses de Nexa en advertising y design studio».
 
 ### Paleta
 
@@ -152,10 +170,10 @@ de §10, *«donde los signature accessories brillan»*.
 
 | Pendiente | Quién decide |
 |---|---|
-| 🔴 **Ropa corporativa Efeonce** (hoodie, polo, gorra, softshell, bomber, lanyard): §5 define cinco contextos con **estilo propio** y no contempla uniforme. Dos sistemas de vestuario para la misma persona sin árbitro | Operador |
+| ~~Ropa corporativa Efeonce~~ — **resuelto 2026-09-21**: es el **contexto 6** de §5.3. Los contextos son situaciones y la prenda la dicta la situación. Falta producir sus referencias de vestuario | ~~Operador~~ → Producción |
 | **El cargo**: el carnet del lanyard dice «AI Specialist»; §14 dice «evangelizadora del modelo, voz del ecosistema» | Operador |
 | **Reinyectar los signature elements a las ANCLAS** — o bajarlos de §5.1. Salida barata dentro del canon («editar conserva, generar reconstruye»): editar **una sola** imagen, `1-anclas/nexa-ancla-8-manos.png`, que es la vista `manos`. Re-sellar después con `pnpm foto:assets:lock` | Operador |
-| Falta el contexto **Lifestyle / Exterior urbano** | Producción |
+| Falta **Lifestyle / Exterior urbano**. 🔴 **No se puede injertar**: las 6 de B llevan gafas de sol y §5.3 las pide («cat-eye sutil, sólo en exteriores»), así que el material es correcto en outfit e inservible como referencia de identidad. Hay que **generar desde las anclas**, y conviene al menos una SIN gafas | Producción |
 | Deuda de **acabado sintético** en ángulos, poses y vestuario | Operador (ya declarada en el LEEME del set) |
 | Desambiguar **terracota** (prohibida en ropa, recetada en labios) en el original | Marca |
 | **§13.2 contra §11**: «no finge experiencias humanas» contra una backstory que §11 declara fuente de verdad para referirse a su experiencia. Falta la regla de **cómo** la refiere | Marca |
