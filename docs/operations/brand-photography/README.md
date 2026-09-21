@@ -48,6 +48,7 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | 7 | [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) | **Catálogo de palancas**: el índice de las **33 en cuatro familias** (5 siempre activas · 4 atmósferas · 1 acción suspendida · 23 de encuadre), qué campo pide cada una y cuántas admite una pieza; ficha completa de las 23 de encuadre; las 20 tomas de cámara nombradas; las cinco descartadas con su razón medida | Claude |
 | 8 | [`EFEONCE_PHOTO_BLIND_AUDIT_2026-09-20.md`](./EFEONCE_PHOTO_BLIND_AUDIT_2026-09-20.md) | **Auditoría ciega**: dos evaluadores independientes sin acceso al canon; qué coincidió, los tells de generación, el plan derivado y la ronda «obra real» | Claude |
 | 9 | [`NEXA_CHARACTER_BIBLE_FICHA_V1.md`](./NEXA_CHARACTER_BIBLE_FICHA_V1.md) | **Nexa, el Bible aplicado a producción**: qué referencia del repo corresponde a cada nombre del documento de marca (las 8 expresiones, los 5 contextos), la auditoría medida de qué cumple el material, el veredicto A/B contra la ficha y lo que queda abierto | Claude |
+| 10 | [`NEXA_TECH_PROPS_V1.md`](./NEXA_TECH_PROPS_V1.md) | **Nexa, props y ecosistema tecnológico**: qué dispositivos lleva y usa —smartwatch, iPhone, iPad, MacBook, DJI, Rode, Shure, Sony/Canon—, cómo entran en la escena y qué NO es Nexa. La regla es la familia vigente, nunca un modelo descontinuado | Claude |
 
 ## Registros y evidencia
 
@@ -66,7 +67,7 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | Quien decide o revisa la marca | 1 → 2 → bitácora |
 | Quien produce una foto con IA | Manual → 5 → **7** → 2 → 3 → 4 → 6 |
 | Quien produce una foto con personas reales o con Julio/Nexa | 6 → 2 → 4 → **7** |
-| Quien produce una pieza **con Nexa** | **9** → 6 → 2 → **7** |
+| Quien produce una pieza **con Nexa** | **9** → **10** → 6 → 2 → **7** |
 | Quien quiere entender por qué es así | Bitácora → 1 |
 
 ## Reglas de la carpeta

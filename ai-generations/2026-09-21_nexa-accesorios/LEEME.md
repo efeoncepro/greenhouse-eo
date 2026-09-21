@@ -33,7 +33,45 @@ aretes dorados. Así que no fue reemplazar sino **añadir**, que es una edición
 
 Verificado ampliando cada zona al 100 %, no sobre la hoja de contacto.
 
-## 🔴 El costo de la edición: resolución
+## 🔴 v01 deformó al sujeto: editar con otro aspect ratio REENCUADRA **[medido]**
+
+**`v01` quedó descartada.** El ancla es **2560×3200 (4:5)** y se editó pidiendo `--size 1024x1536`, que es
+**2:3**. El modelo no recortó ni rellenó: **reencuadró**, y el sujeto cambió de escala. Medido sobre una
+grilla de veinteavos con ambas normalizadas al mismo ancho: la cabeza pasó de ocupar **~30 %** del alto a
+**~38 %**, y los hombros de ~45 % a ~55 %.
+
+Lo detectó el operador a ojo antes que cualquier medición: *«la cabeza se ve más grande con respecto a su
+cuerpo… parece una cabeza de caballo»*. Yo lo había reportado como simple pérdida de resolución, y era otra
+cosa.
+
+**Muerde siempre con el canon**, porque los tamaños del modelo son 1:1, 2:3 y 3:2 — **4:5 no está entre
+ellos** y 4:5 es el formato de los plates y las anclas.
+
+### `v02`: padear, editar, recortar
+
+Se padea el original hasta 2:3 **espejando los bordes** (un pad de color sólido invita al modelo a
+rellenarlo con invento), se edita declarando en el prompt que esas bandas son padding, y se recorta de
+vuelta:
+
+```
+2560×3200 (4:5) → pad 320 arriba y abajo → 2560×3840 (2:3) → editar 1024×1536 → recortar 128 → 1024×1280 (4:5)
+```
+
+Medido con la misma grilla: **mentón, hombros y manos caen en las mismas líneas que el original.** La
+proporción vuelve exacta. La receta quedó en el canon
+([`EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md`](../../docs/operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md)).
+
+## 🔴 El reloj ahora es un SMARTWATCH **[decisión del operador, 2026-09-21]**
+
+*«Nexa es tecnológica»*: el reloj analógico de §5.1 —correa navy, carátula pequeña y limpia— queda
+reemplazado por un **smartwatch**, caja rectangular redondeada con pantalla y correa navy. `v01` llevaba el
+analógico y por eso también quedó obsoleta; `v02` lleva el smartwatch.
+
+El ecosistema completo de dispositivos de Nexa —iPhone, iPad, MacBook, AirPods, DJI Osmo, DJI Mic, lavalier
+Rode, Shure de podcast, cuerpo Sony o Canon— está en
+[`NEXA_TECH_PROPS_V1.md`](../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
+
+## El costo que SÍ queda: resolución
 
 El ancla original es **2560×3200** (`max`, USD 0,565). El modelo entrega vertical a **1024×1536**, así que la
 candidata **pierde resolución**. En la ampliación del rostro se nota: el detalle de poros que el original
@@ -54,7 +92,7 @@ Tres salidas, si se quiere conservar la resolución:
 ## Si se aprueba el reemplazo
 
 ```bash
-cp ai-generations/2026-09-21_nexa-accesorios/salidas/manos-accesorios-v01.png \
+cp ai-generations/2026-09-21_nexa-accesorios/salidas/manos-accesorios-v02.png \
    ai-generations/_identidad-nexa/1-anclas/nexa-ancla-8-manos.png
 pnpm foto:assets:lock    # cambia el sha: sin esto, foto:assets:check falla
 ```

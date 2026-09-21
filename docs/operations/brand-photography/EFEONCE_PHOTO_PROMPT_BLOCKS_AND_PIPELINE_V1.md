@@ -572,6 +572,49 @@ material** y la paleta cálida sin azul en sala («NO blue elements in the room 
 
 ---
 
+## 🔴 Editar con otro aspect ratio REENCUADRA al sujeto **[medido 2026-09-21]**
+
+Editar una imagen pidiendo un `--size` cuyo **aspect ratio no coincide** con el del original no recorta ni
+rellena: el modelo **reencuadra**, y el sujeto cambia de escala dentro del cuadro. No es pérdida de
+resolución — es deformación de proporción, y se lee como que la persona tiene la cabeza grande.
+
+**Caso fuente.** Se editó el ancla de manos de Nexa, **2560×3200 (4:5)**, pidiendo `--size 1024x1536`, que es
+**2:3**. Medido sobre una grilla de veinteavos, con las dos imágenes normalizadas al mismo ancho:
+
+| | Original 4:5 | Editada a 2:3 |
+|---|---|---|
+| La cabeza ocupa | ~30 % del alto | **~38 %** |
+| Los hombros caen en | ~45 % | ~55 % |
+
+El operador lo detectó a ojo antes que cualquier medición: *«la cabeza se ve más grande con respecto a su
+cuerpo… parece una cabeza de caballo»*.
+
+**Por qué muerde.** Los tamaños del modelo son 1:1, 2:3 y 3:2. **4:5 no existe entre ellos**, y 4:5 es el
+formato del canon. Así que editar cualquier plate o ancla 4:5 cae en este agujero **siempre**, sin que nada
+lo avise: la imagen vuelve con buena pinta y el sujeto adentro es otro.
+
+**La receta que lo cierra — padear, editar, recortar:**
+
+```js
+// 1. padear el original hasta el ratio que el modelo SÍ entrega, espejando los bordes
+//    (un pad de color sólido invita al modelo a rellenarlo con invento)
+const target = Math.round(W * 1.5)          // 2560 → 3840, es decir 2:3
+const pad    = Math.round((target - H) / 2) // 320 arriba y 320 abajo
+
+// 2. editar a 1024x1536, declarando en el prompt que las bandas son padding
+//    «the blurred bands at the very top and very bottom are padding: leave them as they are
+//     and do not use them to re-frame the picture»
+
+// 3. recortar el pad de vuelta
+extract({ left: 0, top: 128, width: 1024, height: 1280 })   // 1024x1280 = 4:5 exacto
+```
+
+Medido con la misma grilla, la versión padeada devuelve **mentón, hombros y manos en las mismas líneas que
+el original**. El coste que queda es sólo resolución, que es el coste honesto de editar.
+
+**Regla corta: antes de editar, compara el ratio del original con el `--size` que vas a pedir. Si no
+coinciden, padea primero.**
+
 ## 4. Pipeline paso a paso
 
 | Paso | Qué | Herramienta | Salida |

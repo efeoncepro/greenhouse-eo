@@ -207,6 +207,9 @@ export const PERSONAS = {
     identity:
       'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.',
     // Los CUATRO signature elements del Bible §5.1 —anillo, reloj, aretes y UÑAS— que el pipeline no pedía.
+    // 🔴 El reloj dejó de ser analógico: es un SMARTWATCH **[decisión del operador, 2026-09-21]**. Nexa es
+    // tecnológica y sus objetos lo dicen; un reloj de agujas la contradice. Ecosistema completo de props en
+    // `docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md`.
     // Son cuatro, no tres: §5.1 lista las uñas con el mismo rango y el mismo «siempre» que las otras, no
     // como grooming aparte. Importa contarlas bien: la auditoría encontró falla en las cuatro, y si el
     // conteo se asienta en tres, la cuarta se cae del checklist y nadie la vuelve a mirar.
@@ -230,7 +233,7 @@ export const PERSONAS = {
     // que es la vista `manos` y la que se antepone cuando hay manos en cuadro— en vez de regenerar las ocho.
     // Pendiente de decisión del operador; hasta entonces el texto al menos deja de estar ausente.
     accesorios:
-      'SIGNATURE ACCESSORIES (Nexa always wears these; render them whenever the relevant body part is in frame AND large enough to resolve): a geometric matte-silver statement ring on the INDEX finger of her right hand — not a plain band, not gold, not on another finger; a watch on her LEFT wrist with a navy leather or silver mesh strap and a small, clean dial; small silver earrings, geometric studs or medium hoops depending on context, never gold and never ornate. Nails are neatly kept, short to medium, in a single colour across both hands: dark navy or rosy nude.',
+      'SIGNATURE ACCESSORIES (Nexa always wears these; render them whenever the relevant body part is in frame AND large enough to resolve): a geometric matte-silver statement ring on the INDEX finger of her right hand — not a plain band, not gold, not on another finger; a modern SMARTWATCH on her LEFT wrist — a rounded-square aluminium or titanium case with a bright rectangular screen and a plain sport or woven band in navy or graphite, NEVER a round analogue dial with hands; small silver earrings, geometric studs or medium hoops depending on context, never gold and never ornate. Nails are neatly kept, short to medium, in a single colour across both hands: dark navy or rosy nude.',
     // TODO lo de Nexa vive en `ai-generations/_identidad-nexa/`, que NO es una carpeta de corrida: es el
     // estado vigente, con su LEEME. Las carpetas con fecha son el histórico de cada sesión.
     //
