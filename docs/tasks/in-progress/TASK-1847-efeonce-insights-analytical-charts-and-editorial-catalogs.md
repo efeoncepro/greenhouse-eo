@@ -12,6 +12,29 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-21 — construido en local, sin rollout
+
+**Hecho y probado:** ADR de paginación vertical (`Accepted`, indexado) · `measureSlideFit` +
+`paginateFlow` (puro, agnóstico de unidad) · 15 familias de geometría, incluido un Venn de dos
+conjuntos con áreas proporcionales reales · la marca se compila una vez para N catálogos ·
+catálogo `insights-report` (A4 794×1123) con molde compartido y 5 plantillas que renderizan ·
+`src/lib/copy/insights.ts` · `report-mapper` con figuras, tablas paginadas y límites ·
+`report_pdf` admitido en los 4 puntos (contrato, command, mapper, worker).
+
+**Pendiente declarado, no silenciado:**
+
+1. **Catálogo `insights-deck` propio** — el deck sigue componiendo con `deck-axis`, cuyos budgets
+   están dimensionados para copy de licitación y cuya portada imprime vocabulario de propuesta.
+2. **Baseline del gate visual** para el catálogo nuevo. Además, `pnpm composer:visual-gate` da rojo
+   en `develop` limpio (19/33 plantillas, 1–443 px) por variación de rasterización entre entornos:
+   más ancho que ISSUE-122, que sólo cubre láminas con fotos. El cierre debe exigir cero píxeles
+   **sólo en los frames nuevos**, sin re-congelar frames ajenos.
+3. **`UI ready: yes`** — falta GVC premium desktop/390px, scorecard y dossier.
+4. **Triple documentación** (arquitectura/funcional/manual) y actualización final de la skill viva.
+5. **Runtime**: nada desplegado, sin canary, sin push. `report_pdf` es `code complete`, no operativo.
+6. **13 de 15 familias sin productor**: el planner emite `bar` y `bar_grouped`. Ampliarlo es trabajo
+   nuevo del dominio y los Follow-ups de esta task prohíben abrir tasks preventivas.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -27,7 +50,7 @@
 - Motion: `docs/ui/motion/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs-motion.md`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `In-progress desde 2026-09-21 (Claude). Slice 1 en curso: sellar dirección visual, primitive/component mapping concreto y plan GVC para pasar a UI ready yes; no se escribe JSX ni catálogo hasta cerrar ese gate. Sin código todavía; TASK-1845/1846 en producción proveen ChartSpec/plan/snapshot y el render durable (hoy sólo deck_pdf; report_pdf se rechaza).`
+- Status real: `Code complete parcial, SIN rollout (2026-09-21). Slices 1-3 construidos y probados en local: ADR de paginación Accepted; measureSlideFit + paginateFlow (puro) en el motor; 15 familias de geometría con tests; la marca se compila una vez para N catálogos (deck-axis byte-idéntico); catálogo insights-report A4 con molde compartido y 5 plantillas que RENDERIZAN a PDF; src/lib/copy/insights.ts cierra el drift planner/mapper; report-mapper produce el informe completo con figuras, tablas paginadas y límites; report_pdf admitido y catálogo registrado en el artifact-worker. 424 tests verdes, typecheck limpio, gates del worker OK. NO verificado en runtime: nada desplegado, sin canary, sin push. UI ready sigue en no: falta GVC premium, scorecard y dossier. Pendiente: catálogo insights-deck propio (el deck sigue en deck-axis), baseline del gate visual para el catálogo nuevo, y la triple documentación.`
 - Rank: `TBD`
 - Domain: `ui|platform`
 - Blocked by: `none`
@@ -397,12 +420,12 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 ## Acceptance Criteria
 
 - [ ] Barras, líneas, circular/donut y dispersión se renderizan desde el mismo ChartSpec validado en HTML/SVG/PDF; valores y geometría coinciden con evidencia.
-- [ ] Pie/donut rechaza totales incompatibles; dispersión rechaza pares ausentes; nulos y negativos no se ocultan ni deforman.
+- [x] Pie/donut rechaza totales incompatibles; dispersión rechaza pares ausentes; nulos y negativos no se ocultan ni deforman. — `chart-geometry.ts` + 46 tests (`chart-geometry.test.ts`, `chart-geometry-extended.test.ts`): techo de 3 porciones, rechazo de porción negativa, pares incompletos, negativo bajo base cero y hueco que corta el trazo.
 - [ ] Deck 16:9 e informe A4 vertical tienen composiciones propias, fuentes/brand pack reales, logo opcional cliente y ID/versión/período visibles.
 - [ ] A4 soporta 30 páginas, índice real, cabeceras repetidas y cortes legibles; deck soporta 25 slides sin truncado silencioso ni minificar cuerpo para encajar.
 - [ ] Texto seleccionable, fuentes incrustadas, enlaces/índice, folios y pies se verifican en el PDF final; se inspeccionaron todas las páginas exportadas.
-- [ ] No se crea registry VisualProfile paralelo a TASK-1644 ni se altera el catálogo Proposal; cualquier primitive genérica necesaria se devuelve a TASK-1846.
-- [ ] UI ready permanece no hasta mapping/GVC/design log completos; wireframe existe y ui:wireframe-check pasa.
+- [x] No se crea registry VisualProfile paralelo a TASK-1644 ni se altera el catálogo Proposal. — `deck-axis` recompila byte-idéntico (sha256 sin mover, `brand-pack-sync` verde); las primitives genéricas (`measureSlideFit`, `paginateFlow`, `chart-geometry`, `compile-catalog-tokens`) viven en el motor, no en el catálogo.
+- [x] UI ready permanece `no`; wireframe existe con dirección sellada, inventario de 15 composiciones y decision log. `pnpm task:lint --task TASK-1847` sin findings. — Falta GVC/scorecard, por eso sigue en `no`.
 - [ ] Reuso/extend documentado, copy reusable canónico, estados partial/empty/error y reduced motion sin pérdida de información; no se introducen animaciones.
 - [ ] GVC premium desktop y 390px del harness observado, scrollWidth igual a clientWidth; páginas PDF se validan a tamaño físico y en escala de grises.
 - [ ] Regresión visual del Composer y test cuantitativo funcional pasan; rollout de catálogo versionado con worker se verifica antes de declarar formatos disponibles.
