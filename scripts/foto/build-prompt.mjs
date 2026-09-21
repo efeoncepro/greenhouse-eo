@@ -287,8 +287,12 @@ export const PERSONAS = {
       'the-listen': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-listen.png',
       'mic-drop': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png'
     },
-    // Los cinco contextos de vestuario del Bible §5.3 — falta entero el quinto, «Lifestyle / Exterior
-    // urbano». Misma deuda de acabado que las expresiones.
+    // Los cinco contextos de vestuario del Bible §5.3. `lifestyle-*` se produjo el 2026-09-21 y NO arrastra la
+    // deuda de acabado: las otras cuatro familias vienen de injerto sobre el maestro sintético, y éstas se
+    // generaron desde las anclas fotográficas. No se pudieron injertar porque las 6 imágenes fuente de B
+    // llevan GAFAS DE SOL —§5.3 las pide en exteriores— y bajo gafas no hay rostro que injertar; por eso este
+    // contexto faltaba, y no por descuido. `lifestyle-1` y `lifestyle-3` van sin gafas a propósito, para que
+    // sirvan de referencia de identidad y no sólo de outfit.
     //
     // Verificado en hoja de contacto el 2026-09-21: estas referencias SÍ portan los signature elements de
     // §5.1 (reloj, anillo, uñas navy) y cumplen el contexto con precisión — `home` lleva bun alto y lentes
@@ -311,12 +315,16 @@ export const PERSONAS = {
       'home-5': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-5.png',
       'speaker-1': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-1.png',
       'speaker-2': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-2.png',
-      'speaker-3': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-3.png'
+      'speaker-3': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-3.png',
+      'lifestyle-1': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-1.png',
+      'lifestyle-2': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-2.png',
+      'lifestyle-3': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-3.png',
+      'lifestyle-4': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-4.png'
     },
     // Cuáles del vestuario YA muestran la silueta completa, verificado mirando las 17. Mismo criterio que
     // `vistasDeCuerpo`: si la referencia ya es de cuerpo, añadir además el cuerpo frontal mete dos cuerpos
     // sin rostro cercano y hace derivar la cara.
-    vestuarioDeCuerpo: ['casual-3', 'casual-4', 'casual-5', 'casual-6', 'home-2', 'home-4', 'prof-1', 'prof-2', 'prof-3', 'speaker-1', 'speaker-2', 'speaker-3']
+    vestuarioDeCuerpo: ['casual-3', 'casual-4', 'casual-5', 'casual-6', 'home-2', 'home-4', 'prof-1', 'prof-2', 'prof-3', 'speaker-1', 'speaker-2', 'speaker-3', 'lifestyle-1', 'lifestyle-2', 'lifestyle-3', 'lifestyle-4']
   }
 }
 

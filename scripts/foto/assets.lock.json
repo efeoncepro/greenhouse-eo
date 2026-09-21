@@ -198,6 +198,22 @@
       "rol": "persona:nexa/speaker-3",
       "sha256": "ba68e1dd02ec183d99ab5b8e84b1237c64c13cbaeca4d9b8eb58906d1c5a00f6"
     },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-1.png": {
+      "rol": "persona:nexa/lifestyle-1",
+      "sha256": "cbc32f5fd74962c9d138b86846dcb2c311284a69bbe0fb4d18840139fb5108ed"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-2.png": {
+      "rol": "persona:nexa/lifestyle-2",
+      "sha256": "c8a9c8ca3ec573d655d630e0ebd1e56b777088698f2fe2d600bd76ef375086f0"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-3.png": {
+      "rol": "persona:nexa/lifestyle-3",
+      "sha256": "260a6823e006803eab3173f89b710b400bfc30293ec910d581d3308c14c3ff26"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-lifestyle-4.png": {
+      "rol": "persona:nexa/lifestyle-4",
+      "sha256": "c3bbe6e928c6209dd30058fbd83f7585dbc32c8c431c0e827dec27e8110ba063"
+    },
     "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:sprocket-hubspot/frente",
       "sha256": "4bb97bc7fb7382b898fbdd76c4b97073dbe27e5e401c8c9a612ccf6a3026caf3"

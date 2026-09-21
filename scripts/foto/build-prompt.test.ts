@@ -369,8 +369,10 @@ conAssets('foto:prompt · expresiones y vestuario de Nexa', () => {
     )
   })
 
+  // El nombre de ejemplo tiene que ser uno que NO vaya a existir: la primera versión de este test usaba
+  // `lifestyle-1` y se invalidó sola en cuanto se produjo ese contexto, cuatro horas después.
   it('un vestuario inexistente lista los vestuarios', () => {
-    expect(() => construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vestuario: 'lifestyle-1' }] })).toThrow(
+    expect(() => construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vestuario: 'submarino-9' }] })).toThrow(
       /Vestuarios disponibles/
     )
   })

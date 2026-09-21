@@ -59,7 +59,7 @@ Las ocho son **planos medios**: ninguna es de cuerpo entero.
 | Contenido casual / Redes | `casual-1` … `casual-6` | ✓ 6 · `casual-3..6` de cuerpo |
 | Tech / Conferencias como speaker | `speaker-1` … `speaker-3` | ✓ 3 · las tres de cuerpo |
 | Behind-the-scenes / Home office | `home-1` … `home-5` | ✓ 5 · `home-2` y `home-4` de cuerpo |
-| **Lifestyle / Exterior urbano** | — | 🔴 **falta entero** · el material fuente de B **lleva gafas de sol**, así que no había cara que injertar: no fue olvido, el método no aplicaba |
+| Lifestyle / Exterior urbano | `lifestyle-1` … `lifestyle-4` | ✓ 4 · las cuatro de cuerpo · **producidas 2026-09-21** · 🔴 **no se pudieron injertar**: las 6 de B llevan gafas de sol y §5.3 las pide, así que se generaron desde las anclas — **las únicas sin deuda de acabado sintético**. `lifestyle-1` y `-3` van sin gafas para servir de referencia de identidad |
 | **Terreno y operación Efeonce** (contexto 6) | — | 🔴 **sin referencias de vestuario**. Decisión del operador 2026-09-21. Hay 6 *plates* de piezas en `2026-09-21_nexa-uniforme-{terreno,documental}/`, que son piezas, no referencias |
 
 Cuáles ya muestran la silueta completa está declarado en `vestuarioDeCuerpo`, verificado mirando las 17 en
@@ -173,7 +173,8 @@ de §10, *«donde los signature accessories brillan»*.
 | ~~Ropa corporativa Efeonce~~ — **resuelto 2026-09-21**: es el **contexto 6** de §5.3. Los contextos son situaciones y la prenda la dicta la situación. Falta producir sus referencias de vestuario | ~~Operador~~ → Producción |
 | **El cargo**: el carnet del lanyard dice «AI Specialist»; §14 dice «evangelizadora del modelo, voz del ecosistema» | Operador |
 | **Reinyectar los signature elements a las ANCLAS** — o bajarlos de §5.1. Salida barata dentro del canon («editar conserva, generar reconstruye»): editar **una sola** imagen, `1-anclas/nexa-ancla-8-manos.png`, que es la vista `manos`. Re-sellar después con `pnpm foto:assets:lock` | Operador |
-| Falta **Lifestyle / Exterior urbano**. 🔴 **No se puede injertar**: las 6 de B llevan gafas de sol y §5.3 las pide («cat-eye sutil, sólo en exteriores»), así que el material es correcto en outfit e inservible como referencia de identidad. Hay que **generar desde las anclas**, y conviene al menos una SIN gafas | Producción |
+| 🔴 **El DEDO del anillo no se sostiene por prompt** **[medido 2026-09-21]**. El bloque lo pide en el índice derecho de forma explícita («not on another finger») y el piloto lo puso en el **medio**. El texto SÍ ganó metal, forma y presencia —aretes de plata contra dorados en 5 de 5, reloj presente con correa navy— pero el dedo no. Pone al anillo en la clase del emblema bordado: o no se lee, o se compone, o se edita con máscara, o se baja esa precisión de §5.1 | Operador |
+| ~~Falta Lifestyle / Exterior urbano~~ — **producido 2026-09-21**, 4 referencias, USD 0,164 | ~~Producción~~ ✓ |
 | Deuda de **acabado sintético** en ángulos, poses y vestuario | Operador (ya declarada en el LEEME del set) |
 | Desambiguar **terracota** (prohibida en ropa, recetada en labios) en el original | Marca |
 | **§13.2 contra §11**: «no finge experiencias humanas» contra una backstory que §11 declara fuente de verdad para referirse a su experiencia. Falta la regla de **cómo** la refiere | Marca |
