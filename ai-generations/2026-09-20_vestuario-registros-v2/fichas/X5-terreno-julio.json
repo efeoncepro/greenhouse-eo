@@ -1,0 +1,11 @@
+{
+  "id": "X5-terreno-julio",
+  "formato": "9:16",
+  "impacto": true,
+  "palanca": "quien-sostiene",
+  "identidad": ["julio"],
+  "objetos": ["hoodie-efeonce"],
+  "reservas": { "texto": { "muro": "a wall of stacked grey road cases, their latches and edges running in even rows", "tinta": "blanca" } },
+  "escena": "SCENE (a night shoot being run, rooftop location in Mexico City, night): he wears the Efeonce team hoodie — its hood, drawstrings and heavy jersey clearly legible, field register on a long cold night. NO EMBROIDERED EMBLEM IS VISIBLE — verify it by this landmark: he is seen FROM BEHIND AND OVER HIS SHOULDER, so only the back of the hoodie and the hood face the lens and his chest is entirely out of view; no part of the garment carries a readable mark, and his face is visible only in three-quarter profile as he turns towards the monitor. He sits LOW in the frame at the monitor cart, sharp, one hand on a dial; further back the crew filming are small, soft and out of focus. The eye lands on HIM first and on the crew last. The AZURE-BLUE glow of the monitor is the only light on his face and hands and stays down there; the reserved wall of road cases above him is in even shadow, nothing crossing it. Caught AT THE INSTANT he eases the dial and the waveform settles. 50mm at f/2.",
+  "lecho": { "objeto": "the matte black shoulder of a flight case right against the lens, unlit", "tono": "DARK near black, matte" }
+}

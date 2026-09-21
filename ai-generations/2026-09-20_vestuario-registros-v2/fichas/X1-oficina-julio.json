@@ -1,0 +1,11 @@
+{
+  "id": "X1-oficina-julio",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "escucha",
+  "identidad": ["julio"],
+  "objetos": ["polo-efeonce"],
+  "reservas": { "texto": { "muro": "a tall wall of vertical oak acoustic slats, each batten casting its own fine shadow line", "tinta": "blanca" } },
+  "escena": "SCENE (a working session, studio in Santiago, morning): he wears the Efeonce team polo — white piqué, its collar and short sleeves clearly legible, office register. THE EMBROIDERED EMBLEM IS NOT VISIBLE ANYWHERE IN THE FRAME — verify it by these landmarks: his chest is turned AWAY from the lens in three-quarter view and the whole left side of his chest, where the emblem would sit, falls in DEEP UNLIT SHADOW and is additionally crossed by his own forearm resting on the desk; no part of the garment carries a readable mark. He is RECEIVING, not speaking: mouth closed, gaze lowered and going out of frame to the left, one hand near his jaw, body still. He sits LOW in the lower half of the frame. A hard shaft of morning sun lands on HIS FACE and the desk; the reserved slat wall above stays in its own even shadow, outside the beam. An AZURE-BLUE screen glows out of frame at the left. Caught AT THE INSTANT he tilts his head a degree to catch a word. 85mm at f/1.8.",
+  "lecho": { "objeto": "a stack of matte black sample boxes right against the lens, unlit", "tono": "DARK near black, matte" }
+}
