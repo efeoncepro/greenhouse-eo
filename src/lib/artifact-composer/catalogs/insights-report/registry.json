@@ -1,0 +1,34 @@
+{
+  "$schema": "../deck-axis/registry.schema.json",
+  "version": "0.1",
+  "status": "draft",
+  "note": "Registry del catálogo `insights-report` — informe editorial A4 vertical de Efeonce Insights (TASK-1847). Canvas A4 retrato: 794×1123 px a 96 dpi = 210,06 × 297,04 mm. El motor imprime `${viewport}px`, así que el canvas se declara en píxeles enteros; esa es la aproximación más cercana a A4 exacto y queda dentro de la tolerancia de ±0,5 mm. Cada página es una lámina autocontenida: el pie institucional y el folio son slots de la plantilla, nunca post-proceso sobre el PDF. El reparto de contenido entre páginas lo resuelve `paginateFlow()` antes de imprimir — decisión en GREENHOUSE_ARTIFACT_VERTICAL_PAGINATION_DECISION_V1.md.",
+  "canvas": { "w": 794, "h": 1123, "aspect": "A4-portrait" },
+  "figmaFileKey": null,
+  "contentTypeTaxonomy": ["report-analysis"],
+  "templates": [
+    {
+      "name": "ReportAnalysisPage",
+      "kind": "full-bleed",
+      "source": "design",
+      "figmaNode": null,
+      "owner": "claude",
+      "status": "built",
+      "contentTypes": ["report-analysis"],
+      "prototype": "report-analysis.html",
+      "slotsRef": "report-analysis.slots.json"
+    }
+  ],
+  "selector": {
+    "model": "El autor clasifica el contenido de cada página en un content-type de la taxonomía; el selector devuelve la plantilla cuyo `contentTypes` lo incluye. Un autor NUNCA elige plantilla: eso es autoridad del catálogo.",
+    "map": { "report-analysis": "ReportAnalysisPage" },
+    "disambiguation": [
+      "página analítica: una afirmación con la figura que la prueba => ReportAnalysisPage. Si la página no tiene figura, no es analítica: es narrativa o de tabla, y esas plantillas aún no existen en este catálogo."
+    ],
+    "rules": [
+      "Una página = un content-type = una plantilla. Si el contenido mezcla dos intenciones, son dos páginas.",
+      "NUNCA componer freehand: si ningún content-type calza, es un gap del catálogo — se abre y se diseña la plantilla.",
+      "El folio y el pie institucional son slots de la plantilla. NUNCA se estampan sobre el PDF después de paginar."
+    ]
+  }
+}

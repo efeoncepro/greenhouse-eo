@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<!--
+  ReportAnalysisPage — página analítica del informe A4 (TASK-1847).
+
+  El molde: cuaderno analítico. Columna ancha para el desarrollo y columna angosta de marginalia
+  que sostiene unidad, fuente y cobertura. La marginalia no es decoración: el estándar de informes
+  exige que cada figura declare período, unidad, fuente y denominador, y apretar eso bajo la figura
+  la vuelve ilegible.
+
+  Jerarquía en papel: tamaño, peso y aire. Sin sombras, sin tarjetas, sin fondos decorativos — en un
+  documento impreso la tarjeta no tiene hover ni drill que la justifiquen y queda como contorno.
+
+  Cero HEX literal: todo sale de los roles del brand pack (`composer:color-ledger` lo verifica).
+-->
+<link rel="stylesheet" href="report-tokens.css" />
+<link rel="stylesheet" href="report-fonts.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; }
+
+  .page {
+    position: relative;
+    width: 794px;
+    height: 1123px;
+    overflow: hidden;
+    background: var(--axis-report-role-surfaceBright);
+    color: var(--axis-report-role-ink);
+    font-family: var(--axis-report-type-text);
+    /* Banda del pie reservada ANTES de componer: el estándar prohíbe que el pie invada el texto. */
+    padding: 56px 68px 96px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .running {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--axis-report-role-surfaceEdge);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--axis-report-role-fieldMid);
+  }
+
+  .running .chapter { font-weight: 600; text-transform: uppercase; }
+
+  .assertion {
+    margin: 28px 0 0;
+    font-family: var(--axis-report-type-display);
+    font-size: 27px;
+    line-height: 1.22;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .assertion em { font-style: italic; color: var(--axis-report-role-accentDeep); }
+
+  .conclusion {
+    margin: 14px 0 0;
+    font-size: 14px;
+    line-height: 1.55;
+    max-width: 58ch;
+    color: var(--axis-report-role-fieldMid);
+  }
+
+  .conclusion b { font-weight: 600; color: var(--axis-report-role-ink); }
+
+  .analysis {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: 450px 180px;
+    gap: 28px;
+  }
+
+  .figure { min-width: 0; }
+
+  .figure-title {
+    margin: 0 0 16px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .series { display: flex; flex-direction: column; gap: 11px; }
+
+  .row { display: grid; grid-template-columns: 1fr; gap: 4px; }
+
+  .row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 11px;
+  }
+
+  .row-name { color: var(--axis-report-role-fieldMid); }
+
+  /* El valor viaja con su marca: en papel no hay hover que lo revele. */
+  .row-value { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .track {
+    position: relative;
+    height: 9px;
+    border-radius: 2px;
+    background: var(--axis-report-role-surfaceEdge);
+  }
+
+  .fill { position: absolute; inset: 0 auto 0 0; border-radius: 2px; }
+
+  /* Lead vs resto se distinguen por LUMINANCIA, no por tono: el informe se revisa impreso en gris. */
+  .fill.lead { background: var(--axis-report-role-accentDeep); }
+  .fill.rest { background: var(--axis-report-role-fieldMid); opacity: 0.3; }
+
+  .marginalia {
+    border-left: 2px solid var(--axis-report-role-accent);
+    padding-left: 14px;
+    font-size: 10px;
+    line-height: 1.5;
+    color: var(--axis-report-role-fieldMid);
+    align-self: start;
+  }
+
+  .marginalia dt {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-size: 9px;
+    margin-top: 12px;
+  }
+
+  .marginalia dt:first-child { margin-top: 0; }
+
+  .marginalia dd { margin: 3px 0 0; }
+
+  .development {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 13px;
+    line-height: 1.62;
+    max-width: 66ch;
+  }
+
+  .development p { margin: 0; }
+
+  .development b { font-weight: 600; }
+
+  .foot {
+    position: absolute;
+    left: 68px;
+    right: 68px;
+    bottom: 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--axis-report-role-surfaceEdge);
+    font-size: 9px;
+    line-height: 1.45;
+    color: var(--axis-report-role-fieldMid);
+  }
+
+  .foot-contact { display: flex; flex-direction: column; gap: 3px; }
+
+  .foot-line { display: flex; align-items: center; gap: 6px; }
+
+  .foot-line img { width: 9px; height: 9px; }
+
+  .foot-bubble img { height: 15px; width: auto; display: block; }
+
+  .folio { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 11px; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="running">
+      <span class="chapter" data-slot="runningChapter">VISIBILIDAD ORGÁNICA</span>
+      <span data-slot="runningPeriod">Agosto 2026</span>
+    </header>
+
+    <h1 class="assertion" data-slot="assertion">
+      La visibilidad creció donde se publicó, y <em>no</em> donde se optimizó
+    </h1>
+
+    <p class="conclusion" data-slot="conclusion">
+      <b>Las páginas nuevas explican el alza.</b> Las que recibieron optimización técnica sin contenido
+      nuevo se mantuvieron planas en el mismo período.
+    </p>
+
+    <section class="analysis">
+      <div class="figure">
+        <h2 class="figure-title" data-slot="figureTitle">Variación de impresiones por tipo de página</h2>
+        <div class="series" data-slot="figureSeries">
+          <div class="row">
+            <div class="row-head">
+              <span class="row-name" data-slot-field="name">Páginas publicadas en el período</span>
+              <span class="row-value" data-slot-field="printedValue">+61,4%</span>
+            </div>
+            <div class="track"><div class="fill lead"></div></div>
+          </div>
+          <div class="row">
+            <div class="row-head">
+              <span class="row-name" data-slot-field="name">Páginas optimizadas</span>
+              <span class="row-value" data-slot-field="printedValue">+3,1%</span>
+            </div>
+            <div class="track"><div class="fill rest"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <dl class="marginalia">
+        <dt>Unidad</dt>
+        <dd data-slot="figureUnit">Variación % de impresiones</dd>
+        <dt>Fuente</dt>
+        <dd data-slot="figureSource">Search Console, propiedad verificada del cliente</dd>
+        <dt>Cobertura</dt>
+        <dd data-slot="figureCoverage">184 de 197 páginas con dato en ambos períodos</dd>
+      </dl>
+    </section>
+
+    <div class="development" data-slot="development">
+      <p>
+        <b>El patrón se sostiene al excluir las páginas sin tráfico previo.</b> La diferencia entre
+        ambos grupos no se explica por el punto de partida: las páginas optimizadas ya tenían
+        impresiones al inicio del período y su base era comparable.
+      </p>
+    </div>
+
+    <footer class="foot">
+      <div class="foot-contact" data-slot="contactDetails">
+        <span class="foot-line">
+          <img src="assets/contact/map-point-bold.svg" alt="" />
+          <span>Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile</span>
+        </span>
+        <span class="foot-line">
+          <img src="assets/contact/phone-calling-bold.svg" alt="" />
+          <span>+56 9 3732 3064</span>
+        </span>
+      </div>
+      <span class="foot-bubble" data-slot="urlBubble">
+        <img src="assets/url-lum.svg" alt="efeoncepro.com" />
+      </span>
+      <span class="folio" data-slot="pageFolio">7</span>
+    </footer>
+  </div>
+</body>
+</html>
