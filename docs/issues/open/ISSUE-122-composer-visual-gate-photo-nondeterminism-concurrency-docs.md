@@ -72,3 +72,31 @@ sobre el mismo artefacto compartido (que es, literalmente, la causa 2).
 - `TASK-1393` (Artifact Composer primitive) · `TASK-1391` (render pipeline) · `TASK-1414` (Codex, plantillas
   reutilizables — la sesión concurrente que expuso este issue).
 - Runbook: `docs/operations/runbooks/composer-visual-gate.md`.
+
+## Delta 2026-09-21 — el fenómeno es MÁS ANCHO que las fotos (medido desde TASK-1847)
+
+Al tomar TASK-1847 se corrió `pnpm composer:visual-gate` sobre `develop` **limpio, antes de tocar
+nada**, para conocer el estado de partida. Resultado: **19 de 33 plantillas difieren**, entre 1 y
+443 píxeles (suma 1 744). Ninguna lámina del deck SKY falló.
+
+Lo relevante para este issue: **no son sólo láminas con fotos.** Entre las que fallan están
+`ProcessStepsFull` (443 px), `TimelineFull` (332), `MaturityLadderFull` (197),
+`RequirementsTableFull` (129), `PricingFull` (121) y `ToolStackFull` (138) — composiciones de
+geometría y texto, sin un solo retrato. El diagnóstico actual del issue («Chromium rasteriza las
+FOTOS con variación entre corridas») no cubre ese conjunto: la variación alcanza también al
+rasterizado de texto y de geometría entre entornos.
+
+Entorno de la medición: macOS, Playwright 1.59.1 (coincide con el lock). El gate **no corre en
+ningún workflow** — es local, así que el baseline committeado refleja el entorno de quien lo
+congeló, y cualquier otra máquina arranca en rojo.
+
+**Consecuencia práctica, y por qué TASK-1847 no lo rebaselinea:** un catálogo nuevo no puede
+promover su baseline mientras el gate esté rojo por causa ajena — el runbook prohíbe congelar con
+el composer sucio por otro agente, y re-congelar los 19 frames sería el «rebaseline silencioso» que
+este gate existe para impedir. TASK-1847 exige cero píxeles sólo en los frames que introduce.
+
+**Lo que esto sugiere para la mitigación pendiente:** pre-rasterizar avatares resolvería la parte de
+fotos, pero no ésta. Si el objetivo es que el gate sea cumplible en más de una máquina, hace falta
+además fijar el entorno de render (correrlo en un contenedor con la misma versión de Chromium y las
+mismas fuentes) o aceptar un umbral de tolerancia distinto de cero para el rasterizado de texto.
+Esa decisión es del dueño del gate, no de una task consumidora.
