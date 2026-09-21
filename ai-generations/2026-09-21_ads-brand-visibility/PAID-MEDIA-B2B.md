@@ -35,7 +35,7 @@ cicatriz. Arriba se habla de **motores de respuesta**; «SEO» entra abajo, con 
 | **Google: pujar por el problema, NUNCA por la categoría** | «por qué bajó mi tráfico orgánico» · «aparecer en ChatGPT» · «AI Overviews tráfico» · «mi web perdió visitas» |
 | **Piezas** | Las cinco capas: `b1` `c1` `b3` `c2` `b2` — una por capa, rotando |
 | **CTA** | **Ver qué dicen de ti** → Grader |
-| **Mide** | Coste por informe entregado (`gh_grader_report_view`), no por clic |
+| **Mide** | Coste por informe entregado — **métrica intermedia, no el objetivo** |
 
 🔴 **NUNCA pujar por «agencia SEO»**: CPC alto, intención comoditizada, compites con freelancers — y el CTR
 pagado de esa categoría cayó 68%.
@@ -57,7 +57,7 @@ pagado de esa categoría cayó 68%.
 | **Plataforma** | LinkedIn (retargeting de quienes vieron el informe) + Meta lookalike sobre clientes |
 | **Pieza** | 🔴 **FALTA** — la eficiencia de medios |
 | **Ángulo** | La citación no es un canal nuevo: es la condición para que el canal que ya pagas siga rindiendo |
-| **CTA** | Agendar diagnóstico de prospecto / reunión |
+| **CTA** | **Agendar en `/agenda/`** o pedir cotización en la landing del servicio |
 | **Por qué** | Es lo único que hace entrar al CFO, y casi nadie en la categoría lo está diciendo |
 
 ### E5 · Expansión y prueba — *post-venta*
@@ -69,6 +69,24 @@ pagado de esa categoría cayó 68%.
 | **Nota** | El cross-sell **no se pautea**: se corre el Grader a la cartera actual y se lleva al QBR. Es el pipeline más barato que existe y tiene fricción cero |
 
 ---
+
+## 🔴 La conversión es la reunión, no el informe [operador, 2026-09-21]
+
+El Grader es el **medio**: se regala para ganarse el derecho a pedir la reunión. **El fin es reunión agendada o
+cotización solicitada** en `/aeo-2/` (AEO) o `/servicios/posicionamiento-seo/` (SEO).
+
+| Métrica | Papel |
+|---|---|
+| Coste por informe entregado | **Intermedia.** Dice si la cuña funciona |
+| **Coste por reunión agendada** | **La norte.** Es la que decide si se escala |
+| Coste por cotización solicitada | La norte, en la rama de demanda caliente |
+
+🔴 **Antes de pautear al agendamiento hay que cerrar la atribución.** PDR-009: la Scheduler API **no preserva
+por sí sola UTK/UTM**. Sin la mitigación (GTM + Forms API con `context.hutk`), **se puede gastar y no saber qué
+campaña trajo la reunión** — que es el peor escenario posible para un test de canal.
+
+🔴 **La landing de contenidos NO existe** (seis variantes probadas, todas 404 el 2026-09-21). Esa rama del
+embudo no se puede pautear hasta que exista destino.
 
 ## Veredicto por plataforma (de la práctica, no de mi opinión)
 
@@ -120,4 +138,6 @@ los de la tabla son supuestos.
 | 1 | Las 3 piezas de E3, E4 y E5 | Las etapas que convierten |
 | 2 | Eventos `gh_grader_*` en GTM | Medir coste por informe, no por clic |
 | 3 | Audiencias de retargeting creadas (Meta pixel + LinkedIn insight tag) | E3 y E4 completas |
-| 4 | Presupuesto y ventana de test aprobados | Todo |
+| 4 | **Atribución del scheduler** (GTM + Forms API con `context.hutk`) | 🔴 **Medir reuniones por campaña** |
+| 5 | **Landing de contenidos** (hoy 404) | La rama de contenidos |
+| 6 | Presupuesto y ventana de test aprobados | Todo |

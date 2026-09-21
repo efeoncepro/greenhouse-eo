@@ -28,6 +28,26 @@ curiosidad y se vuelve eficiencia del SEO y del paid.
 Gemini), no de «SEO». La palabra SEO aparece abajo, cuando ya hay evidencia — porque es la palabra que carga
 la cicatriz del prospecto.
 
+## 🔴 El Grader es el MEDIO, no el fin [operador, 2026-09-21]
+
+**La conversión es que agenden reunión o pidan cotización** en las landings de servicio. El Grader es el paso
+que se gana el derecho a pedirlo — no el objetivo.
+
+| | Destino | Estado verificado 2026-09-21 |
+|---|---|---|
+| **AEO** | `/servicios/aeo` → redirige a **`/aeo-2/`** | ✅ 200 |
+| **SEO** | **`/servicios/posicionamiento-seo/`** | ✅ 200 |
+| **Contenidos** | — | 🔴 **NO EXISTE.** Probadas seis variantes, todas 404 |
+| **Agendar** | **`/agenda/`** (scheduler nativo, HubSpot server-side) | ✅ 200 |
+
+🔴 **Consecuencia para la medición:** la métrica norte deja de ser «informe entregado» y pasa a ser **reunión
+agendada / cotización solicitada**. Un embudo optimizado al informe optimiza el lead magnet, no el negocio.
+
+🔴 **Y un problema de atribución que hay que resolver ANTES de pautear al agendamiento:** PDR-009 declara que
+la Scheduler API **no preserva por sí sola el tracking de UTK/UTM**. Sin la mitigación documentada —medición
+Greenhouse/GTM + envío complementario por Forms API con `context.hutk`— **las reuniones que traiga la pauta no
+se van a poder atribuir a la campaña**. Se puede gastar y no saber qué funcionó.
+
 ## La tesis que ordena el embudo
 
 Vender SEO no se parece a vender nada más: **el 100% del prospecto ya compró SEO y tiene una cicatriz.** Le
