@@ -134,13 +134,18 @@ son **cuatro, no tres**: la lista incluye las **uñas** con el mismo rango que l
 | Elemento | Especificación |
 |---|---|
 | **Anillo** | índice de la mano **derecha**, geométrico, **plata mate**. El Bible lo llama «el ancla visual más fuerte — incluir en cada prompt» |
-| **Reloj** | muñeca **izquierda**, correa navy de cuero o mesh plateada, carátula pequeña y limpia |
+| **Reloj** | muñeca **izquierda**, correa navy o mesh plateada, carátula pequeña. 🔴 **Es un smartwatch**, no analógico [decisión del operador, 2026-09-21]. Ecosistema de dispositivos en [`NEXA_TECH_PROPS_V1.md`](../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md): familias, nunca números de modelo |
 | **Aretes** | siempre, de studs geométricos a aros medianos. **Predominantemente plata** |
 | **Uñas** | arregladas, cortas-medianas, **un solo color**: navy oscuro o nude rosado |
 
 🔴 **Las `1-anclas/` NO los cumplen.** Se produjeron antes de que el Bible existiera en el repo: llevan aros
-**dorados**, anillos finos dorados en los **anulares** y ninguna lleva reloj. La estructura facial sí cumple
-la ficha del Bible —verificado contra §3.1— pero los accesorios no.
+**dorados** donde la ficha pide plata, y `nexa-ancla-8-manos` —la única que muestra manos y muñeca— las tiene
+**desnudas**: sin anillo, sin reloj y sin esmalte. La estructura facial sí cumple la ficha del Bible
+—verificado contra §3.1— pero los accesorios no.
+
+*(Corrección 2026-09-21: una versión anterior de este LEEME decía que las anclas llevaban «anillos finos
+dorados en los anulares». Era falso y estaba repetido sin verificar: esos anillos son de `Avatar Cuerpo
+Completo v2`, material de OneDrive, no del set. La edición del ancla de manos es **añadir**, no reemplazar.)*
 
 ✅ **`4-vestuario/` sí los porta** y además clava los contextos de §5.3 (moño alto y lentes de luz azul en
 `home`, acento naranja y azul eléctrico en `speaker`, blazer navy sobre blanco en `prof`). **La brecha está
@@ -162,6 +167,21 @@ literal.
 color), y fallan el índice que pide el Bible — están en medio o anular. Así que sirven como referencia de
 **material y estilo**, y el dedo hay que corregirlo en la edición. Decir que `4-vestuario/` «porta los
 signature elements» es cierto en 3 de 4 atributos, no en los cuatro.
+
+🔴 **Antes de editar CUALQUIER ancla, lee esto: cambiar el aspect ratio REENCUADRA** **[medido 2026-09-21]**.
+Editar con un `--size` de otra proporción no recorta ni rellena: el sujeto **cambia de escala dentro del
+cuadro**. Medido al editar `nexa-ancla-8-manos` (2560×3200, **4:5**) pidiendo 1024×1536 (**2:3**): la cabeza
+pasó de ~30 % del alto a ~38 % y los hombros de ~45 % a ~55 %. Vuelve con buena pinta y el sujeto adentro es
+otro. **Muerde siempre aquí** porque los tamaños del modelo son 1:1, 2:3 y 3:2 — y **4:5 no está entre
+ellos**, que es justo el formato de las anclas y de los plates.
+
+Receta que lo cierra: padear el original hasta 2:3 **espejando los bordes** (un pad de color sólido invita al
+modelo a rellenarlo con invento), editar declarando en el prompt que esas bandas son padding, y recortar de
+vuelta — 2560×3200 → pad 320 → 2560×3840 → editar 1024×1536 → recortar 128 → **1024×1280, que es 4:5 exacto**.
+Detalle en `EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md`.
+
+*Nota: los encuadres distintos entre `1-anclas/`, `2-angulos/` y el maestro **no** son este efecto: cada uno
+se pidió explícitamente en su prompt. El agujero aparece cuando se edita sin querer cambiar el encuadre.*
 
 **Salida propuesta, dentro del canon** («editar conserva, generar reconstruye»): editar **una sola** imagen,
 `1-anclas/nexa-ancla-8-manos.png` — es la vista `manos` y la única de las ocho que muestra mano y muñeca.

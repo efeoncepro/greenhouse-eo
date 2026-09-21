@@ -182,6 +182,16 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   corrígelo ANTES de generar** — generar sobre un manifiesto equivocado propaga el error a todas las vistas.
   **[pendiente]** sólo está corregida `02-espalda` de la softshell (`v02`,
   `ai-generations/2026-09-21_espalda-bordada/`); el resto de espaldas de **softshell y bomber** siguen estampadas.
+- 🔴 **Editar con otro aspect ratio REENCUADRA: el sujeto cambia de escala** **[medido 2026-09-21]**. No
+  recorta ni rellena. Medido editando un ancla de 2560×3200 (**4:5**) con `--size 1024x1536` (**2:3**): la
+  cabeza pasó de ~30 % del alto a ~38 % y los hombros de ~45 % a ~55 % — el operador lo vio a ojo («parece una
+  cabeza de caballo») antes que cualquier medición. **Muerde siempre** porque los tamaños del modelo son 1:1,
+  2:3 y 3:2, y **4:5 no está entre ellos**: es el formato de los plates y de las anclas, así que editar
+  cualquiera cae en el agujero **sin que nada lo avise** — vuelve con buena pinta y el sujeto adentro es otro.
+  Es primo del caso del lanyard (el archivo bueno existía y el catálogo servía el viejo) pero peor: aquí no
+  hay archivo bueno, lo que vuelve está mal y parece bien. **Receta:** padear a 2:3 **espejando los bordes**
+  (un pad sólido invita al modelo a rellenarlo con invento), editar declarando en el prompt que esas bandas
+  son padding, y recortar de vuelta. Detalle en `EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md`.
 - 🔴 **Realismo NO es castigo** **[medido 2026-09-21]**. El operador rechazó la primera receta de piel real
   porque «la envejeció mucho y la puso un poco fea»: pedir rojeces, manchitas, brillo disparejo y líneas de
   expresión produce una persona de 40 años, manchada y cansada. **Lo que hace humana a una cara son poros
