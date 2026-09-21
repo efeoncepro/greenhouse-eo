@@ -200,3 +200,25 @@ Registro: `ai-generations/2026-09-17_efeonce-ship-3d/LEEME.md`. Tres reglas apre
 - **Objeto claro sobre fondo oscuro:** el matting deja opacos los huecos que muestran fondo (cortes, ventanas); vaciarlos
   con `pnpm ai:image:rmbg … --key-background [umbral] [minPx]`. Objeto claro sobre fondo claro no se recorta: se entrega
   solo como escena.
+
+
+## 🔴 Elegir la referencia correcta — contrato canónico
+
+**Antes de usar este kit, carga el [contrato de selección de referencias](../../../../docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md).** Vale para el logo 3D,
+el isotipo, la nave y las mascotas igual que para la ropa: los kits 3D traen **ocho poses o ángulos
+cada uno**, con fondo de estudio y transparente, y el logo está resuelto además por **escala**
+(pequeña, mediana, grande, monumental) **y color** (blanco, navy). **Ninguna vista hay que inventarla:
+hay que elegir la que corresponde.**
+
+Las tres reglas que gobiernan la elección:
+
+1. **Arte plano → producir vistas del kit · pieza aislada → construir · pieza en uso → USAR en una
+   escena.** Darlos al revés hace que el modelo reinvente la marca.
+2. **Lo sensible se compone; el modelo sólo pone material y luz.** Un modelo no sostiene una marca:
+   medido, cuatro pasadas sobre la misma pieza dieron cuatro logotipos distintos, y en prendas tres
+   dieron tres emblemas y ninguno era el de Efeonce.
+3. **Las proporciones se calculan del objeto real** —y para el 3D, la **escala** y la **luminancia**
+   deciden qué variante entra: blanca para materiales claros, navy para oscuros.
+
+**Y el QA de una marca es letra por letra** —«e», «f», nave, órbita con sus cortes, tres ventanas—:
+una letra distinta obliga a regenerar, nunca a publicar.

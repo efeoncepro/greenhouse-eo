@@ -20,6 +20,7 @@ pnpm foto:prompt <ficha.json>       # arma el prompt desde la ficha
 pnpm foto:validar <plate.png>       # mide las seis reservas sobre el plate limpio
 pnpm foto:componer <piezas.json>    # la CAPA GRÁFICA encima: voces, selección AXIS, firma y QA
 pnpm foto:emblema <plate.png>       # amplía el bordado para mirarlo al 100% (no decide: quita la excusa)
+pnpm foto:lanyard --nombre … --cargo … --foto …   # arma el lanyard determinístico; el modelo sólo lo termina
 ```
 
 **Dos categorías de pieza, y la diferencia se decide ANTES de generar:**
@@ -113,6 +114,13 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   eran literalmente distintos (12/12) y aun así se leyó «el mismo recurso de profundidad siete veces»: lo que se
   repite es la forma —«el borde de una superficie, desenfocado, abajo»— en **7 de 12**. El catálogo tiene **21
   lechos medidos**; el comando avisa cuando una familia pasa de la mitad de la tanda.
+- 🔴 **Lo sensible se COMPONE; el modelo sólo TERMINA** **[operador, 2026-09-21]**. Toda marca, texto
+  exacto o arte oficial se arma aparte y determinístico, y al modelo se le pasa el armado para que
+  ponga materia y luz, nunca dibujo. Un modelo no sostiene una marca: cuatro pasadas sobre la misma
+  pieza dieron cuatro logotipos distintos. Comando: **`pnpm foto:lanyard`**. Dos corolarios medidos:
+  las **proporciones se calculan del objeto real** (la unidad del patrón mide 7,05 veces el ancho de la
+  cinta; el yoyo 1,6 veces) y el **arte plano sirve para PRODUCIR vistas del kit, la foto del producto
+  terminado para USARLO en escena**.
 - **Nunca ancles la serie en la categoría de un cliente** (pintura = Berel). El comando aborta.
 
 ## Los assets viven fuera de git — y el lock los vigila
@@ -139,3 +147,19 @@ Para qué sirve:
 
 `pnpm foto:validar` sobre el plate limpio y **mirar la imagen al 100%**: identidad contra la referencia, emblema
 letra por letra, y que no haya texto ni marcas de terceros. Un contraste que pasa no prueba que la pieza esté bien.
+
+
+🔴 **ANTES de generar una pieza con un asset de marca —ropa corporativa, lanyard, merch, logo 3D,
+isotipo, nave o mascotas— carga el [contrato de selección de referencias](../../docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md).** Hay **279 archivos en
+10 kits**: el problema nunca es que falte la vista, es **elegir la correcta**. Resume tres reglas:
+
+1. **Tres clases de asset, no intercambiables.** Arte plano → **producir** vistas del kit · pieza
+   aislada → **construir** · **pieza en uso / producto terminado → USAR en una escena**. Darlos al
+   revés hace que el modelo **reinvente la marca**.
+2. **Lo sensible se compone; el modelo sólo termina.** Toda marca, texto exacto o arte oficial se arma
+   determinístico y al modelo se le pide **sólo material y luz**. Un modelo no sostiene una marca:
+   cuatro pasadas sobre la misma pieza dieron cuatro logotipos distintos.
+3. **Las proporciones se calculan del objeto real**, nunca a ojo.
+
+Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
+corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.

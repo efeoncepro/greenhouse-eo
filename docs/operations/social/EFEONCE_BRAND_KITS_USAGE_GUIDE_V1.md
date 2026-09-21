@@ -126,3 +126,46 @@ estampa de espalda. Esos elementos se componen.
 Antes de dar una pieza por lista: QA al 100 %, nombre y ubicación en la carpeta que corresponde, manifiesto
 actualizado si la pieza entra a un kit, y registro en la bitácora de la corrida. Publicar o programar requiere
 autorización explícita del operador.
+
+
+## Delta 2026-09-21 — qué asset del kit se usa para qué
+
+**Un kit tiene tres clases de asset y no son intercambiables.** Confundirlos es lo que hace que el
+modelo **reinvente la marca**:
+
+| Asset | Para qué sirve | Ejemplo |
+|---|---|---|
+| **Arte plano** | **PRODUCIR** las vistas del kit | `ref/arte-cinta.png`, `ref/arte-carnet-*.png` |
+| **Pieza aislada** (transparente) | **CONSTRUIR** un armado nuevo | `…-01-frente-…-transparente.png` |
+| **Pieza PUESTA / producto terminado** | **USAR** la pieza en una escena | `…-04-puesto-…`, `out/prueba-julio.png`, `…-14-conjunto-deterministico-…` |
+
+**Medido el 2026-09-21.** Para vestir a alguien con el lanyard se le pasó primero una descripción del
+logotipo (borrón con forma de flecha), después el arte plano (ilegible) y sólo funcionó con la **foto
+del producto terminado**. En la gorra pasó lo mismo: el asset que resolvía el problema —la prueba en
+persona, con el logotipo legible y el emblema bien orientado— llevaba días en el kit sin usarse.
+
+### Y si la pieza lleva marca, se compone: no se genera
+
+Para una pieza con marca, arte exacto o texto, el camino es **armarla determinísticamente** y pedirle
+al modelo **sólo el acabado** —material y luz—, nunca el dibujo. Comando: **`pnpm foto:lanyard`**.
+Método completo y medido: `ai-generations/2026-09-21_lanyard-deterministico/LEEME.md`.
+
+**Las proporciones se calculan del objeto real, no se estiman:** la unidad del patrón de la cinta mide
+7,05 veces su ancho y el yoyo 1,6 veces ese ancho (32 mm contra 20 mm reales). Puestas a ojo, el
+operador detectó las dos a la primera.
+
+
+🔴 **ANTES de generar una pieza con un asset de marca —ropa corporativa, lanyard, merch, logo 3D,
+isotipo, nave o mascotas— carga el [contrato de selección de referencias](../EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md).** Hay **279 archivos en
+10 kits**: el problema nunca es que falte la vista, es **elegir la correcta**. Resume tres reglas:
+
+1. **Tres clases de asset, no intercambiables.** Arte plano → **producir** vistas del kit · pieza
+   aislada → **construir** · **pieza en uso / producto terminado → USAR en una escena**. Darlos al
+   revés hace que el modelo **reinvente la marca**.
+2. **Lo sensible se compone; el modelo sólo termina.** Toda marca, texto exacto o arte oficial se arma
+   determinístico y al modelo se le pide **sólo material y luz**. Un modelo no sostiene una marca:
+   cuatro pasadas sobre la misma pieza dieron cuatro logotipos distintos.
+3. **Las proporciones se calculan del objeto real**, nunca a ojo.
+
+Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
+corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.

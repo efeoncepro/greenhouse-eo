@@ -23,6 +23,7 @@ pnpm foto:prompt --ficha-ejemplo          # plantilla de ficha de toma
 pnpm foto:prompt <ficha.json> --batch <out.json>   # arma el prompt; el formato sale de UNA tabla
 pnpm foto:validar <plate.png>             # valida las seis reservas sobre el plate limpio
 pnpm foto:componer <piezas.json>          # la CAPA GRÁFICA encima: voces, selección AXIS, firma y QA
+pnpm foto:lanyard --nombre "<N>" --cargo "<C>" --foto <r.png>   # arma el lanyard PIEZA POR PIEZA
 ```
 
 **Dos categorías de pieza** **[operador, 2026-09-20]**: la **muda** —sólo foto y firma— es legítima y sirve de
@@ -100,3 +101,51 @@ caja toca a las personas. Hay punto dulce, no monotonía.
 > prompts/pipeline). **NO aprobada** la capa de composición gráfica sobre la foto: las pruebas de
 > `EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1.md` fueron rechazadas por el operador y ese documento vale por sus
 > reglas y prohibiciones, no por sus ejemplos.
+
+
+## 🔴 Componer lo sensible, y que el modelo sólo TERMINE **[operador, 2026-09-21]**
+
+**Para resultados óptimos, la composición se arma con todos sus elementos sensibles APARTE, se juntan
+determinísticamente, y recién entonces se le pasa esa referencia al modelo, que aporta ACABADO y nunca
+DIBUJO.**
+
+Sensible es toda **marca, texto exacto, cifra o arte oficial**. Un modelo no sostiene una marca:
+medido el 2026-09-21 en cuatro pasadas sobre la misma pieza, describirle el logotipo dio un borrón con
+forma de flecha, pasarle el arte plano lo dejó ilegible y, aun con la foto del producto delante, la
+nave de la «o» salió distinta cada vez. No se arregla pidiéndoselo mejor: se arregla **no
+pidiéndoselo**.
+
+| Paso | Qué se hace |
+|---|---|
+| 1 | **Separar lo sensible** y componerlo desde el archivo oficial; lo neutro va en SVG plano |
+| 2 | **Armar** la pieza con esas partes ya resueltas (warp/composite determinístico) |
+| 3 | **Pasarle el armado al modelo** pidiéndole SÓLO material y luz — tejido, relieve, plástico, metal, acrílico, sombras—, repitiendo que las marcas no se tocan |
+| 4 | **Mirar el resultado al 100%** antes de usarlo |
+
+Dos reglas que salieron del mismo caso:
+
+- **Las proporciones se CALCULAN desde el objeto real, no se fijan a ojo.** El operador cazó dos a la
+  primera: la unidad del patrón de la cinta mide **7,05 veces** su ancho (puesta a ojo en 3,4 el
+  logotipo salió alargado y el eslogan achatado) y el yoyo **1,6 veces** ese ancho —32 mm contra 20 mm
+  reales— cuando estaba en 2,5.
+- **Arte plano ≠ foto del producto.** El arte plano sirve para **producir** vistas de un kit; para
+  **usar** la pieza en una escena, la referencia es la **foto del producto terminado**.
+
+Herramienta: **`pnpm foto:lanyard`**. Caso completo y medido:
+`ai-generations/2026-09-21_lanyard-deterministico/LEEME.md`.
+
+
+🔴 **ANTES de generar una pieza con un asset de marca —ropa corporativa, lanyard, merch, logo 3D,
+isotipo, nave o mascotas— carga el [contrato de selección de referencias](../EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md).** Hay **279 archivos en
+10 kits**: el problema nunca es que falte la vista, es **elegir la correcta**. Resume tres reglas:
+
+1. **Tres clases de asset, no intercambiables.** Arte plano → **producir** vistas del kit · pieza
+   aislada → **construir** · **pieza en uso / producto terminado → USAR en una escena**. Darlos al
+   revés hace que el modelo **reinvente la marca**.
+2. **Lo sensible se compone; el modelo sólo termina.** Toda marca, texto exacto o arte oficial se arma
+   determinístico y al modelo se le pide **sólo material y luz**. Un modelo no sostiene una marca:
+   cuatro pasadas sobre la misma pieza dieron cuatro logotipos distintos.
+3. **Las proporciones se calculan del objeto real**, nunca a ojo.
+
+Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
+corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.

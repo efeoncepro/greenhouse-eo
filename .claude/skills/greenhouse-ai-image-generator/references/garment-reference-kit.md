@@ -391,3 +391,53 @@ Valen para cualquier edición con `--image`, no sólo para prendas.
    algo que el modelo no acepta, avisa que la relación **va a cambiar** en vez de hacerlo callado.
 
 Medidas por la sesión peer durante la corrección del lanyard.
+
+
+## Delta 2026-09-21 — componer lo sensible, y que el modelo sólo termine
+
+**El modelo no sostiene una marca, ni con el arte delante.** Medido sobre el lanyard en cuatro
+pasadas: descrito en palabras dio un borrón con forma de flecha; con el arte plano quedó ilegible; y
+con la foto del producto delante la nave de la «o» seguía cambiando.
+
+**La salida es no pedírselo.** Se arma la pieza **determinísticamente** —cada elemento sensible
+compuesto desde su archivo oficial, lo neutro en SVG plano— y al modelo se le pasa ese armado para que
+ponga **sólo material y luz**: tejido, relieve de serigrafía, plástico, níquel, acrílico y sombras de
+contacto. Comando: **`pnpm foto:lanyard`**; caso completo en
+`ai-generations/2026-09-21_lanyard-deterministico/LEEME.md`.
+
+### Arte plano ≠ prenda aislada ≠ prenda puesta
+
+Los tres son assets legítimos del kit y **sirven para cosas distintas**:
+
+| Asset | Para qué |
+|---|---|
+| **Arte plano** (`ref/arte-*.png`) | **PRODUCIR** las vistas del kit |
+| **Prenda o pieza aislada** (transparente) | **CONSTRUIR** el armado |
+| **Prenda o pieza PUESTA / producto terminado** | **USAR** en una escena: vestir a alguien, bodegón |
+
+Dárselos al revés es lo que hace que el modelo reinvente la marca. En el lanyard costó tres pasadas;
+en la gorra, el asset que resolvía el problema —`out/prueba-julio.png`, con el logotipo legible y el
+emblema bien orientado— llevaba días en el kit sin usarse.
+
+### Las proporciones se CALCULAN del objeto real
+
+Dos correcciones del operador el mismo día, las dos cazadas a la primera: la unidad del patrón de la
+cinta mide **7,05 veces** su ancho (a ojo en 3,4 el logotipo salía alargado y el eslogan achatado) y
+el yoyo **1,6 veces** ese ancho —32 mm contra 20 mm reales— cuando estaba en 2,5. Rima con los cinco
+marcadores de calce de la gorra: **la medida sale del objeto, no del ojo**.
+
+
+🔴 **ANTES de generar una pieza con un asset de marca —ropa corporativa, lanyard, merch, logo 3D,
+isotipo, nave o mascotas— carga el [contrato de selección de referencias](../../../../docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md).** Hay **279 archivos en
+10 kits**: el problema nunca es que falte la vista, es **elegir la correcta**. Resume tres reglas:
+
+1. **Tres clases de asset, no intercambiables.** Arte plano → **producir** vistas del kit · pieza
+   aislada → **construir** · **pieza en uso / producto terminado → USAR en una escena**. Darlos al
+   revés hace que el modelo **reinvente la marca**.
+2. **Lo sensible se compone; el modelo sólo termina.** Toda marca, texto exacto o arte oficial se arma
+   determinístico y al modelo se le pide **sólo material y luz**. Un modelo no sostiene una marca:
+   cuatro pasadas sobre la misma pieza dieron cuatro logotipos distintos.
+3. **Las proporciones se calculan del objeto real**, nunca a ojo.
+
+Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
+corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.
