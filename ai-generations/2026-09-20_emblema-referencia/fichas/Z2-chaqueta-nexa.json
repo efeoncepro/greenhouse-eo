@@ -1,0 +1,23 @@
+{
+  "id": "Z2-chaqueta-nexa",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "pov",
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    "chaqueta-softshell-efeonce"
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "a wall of raw board-formed concrete with the grain of the planks still printed in it",
+      "tinta": "blanca"
+    }
+  },
+  "escena": "SCENE (a review with the client, meeting room in Santiago, morning): she wears the Efeonce team softshell jacket — navy, its collar, zip line and technical fabric clearly legible, the high register. HER LEFT CHEST PANEL IS FULLY VISIBLE AND EVENLY LIT, facing the lens, so the small embroidered emblem reads clearly at its real scale; the jacket is worn zipped or lightly open but the emblem panel is never folded away nor covered by an arm. The camera takes THE CLIENT'S PLACE at the table: seated eye level, she is on the far side facing it and addresses that place, looking at the work between them, never into the lens. The nearest edge of the viewer's own chair enters at the bottom. She sits LOW in the frame; the reserved concrete wall above her stays in even shadow with nothing crossing it. An AZURE-BLUE screen on the side wall lights her jaw. An ORANGE grease pencil lies on the table. Caught AT THE INSTANT she turns a printed sheet towards the empty chair. 50mm at f/2.",
+  "lecho": {
+    "objeto": "the near edge of the viewer's own chair back, right against the lens, unlit",
+    "tono": "DARK near black, matte"
+  }
+}

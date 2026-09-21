@@ -1,0 +1,42 @@
+[
+  {
+    "id": "Z1-polo-julio",
+    "contraste": {
+      "logo": 8.69
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "Z2-chaqueta-nexa",
+    "contraste": {
+      "logo": 18.08
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "Z3-bomber-ambos",
+    "contraste": {
+      "logo": 7.16
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "Z4-terreno-nexa",
+    "contraste": {
+      "logo": 7.66
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "Z5-hoodie-julio",
+    "contraste": {
+      "logo": 19.58
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  }
+]

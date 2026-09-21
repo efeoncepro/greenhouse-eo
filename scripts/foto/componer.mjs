@@ -449,8 +449,14 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
 
  defs += hudEl.defs; body += hudEl.svg }
 
+  // PIEZA MUDA: sólo foto, firma y nada más. Es una categoría legítima del lenguaje —sirve de
+  // descanso visual en el feed— y el compositor no la soportaba: sin `dominant` reventaba al medir
+  // el ancho del bloque dominante. Una pieza sin voz salta toda la capa de texto y llega derecho al
+  // logo y a la firma web.
+  const muda = !s.dominant && !s.label && !s.lead
+
   const x = s.align === 'center' ? W / 2 : M
-  let y = s.top * H
+  let y = (s.top ?? 0.05) * H
 
   // 1 · etiqueta
   if (s.label) {
@@ -481,23 +487,29 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
     y = le.box.bottom + Math.round((s.leadGap ?? 0.09) * (s.dominantSize ?? 160))
   }
 
-  // 3 · dominante (+ selección colaborativa)
+  // 3 · dominante (+ selección colaborativa) — sólo en la pieza con voz
   const ir = R.ideaImpact
   const domFont = fontFor(ir, DOMINANT_WIDTH)
   // Ajuste al ancho máximo declarado (deja aire para etiquetas de colaboradores fuera de la caja).
   let domSize = s.dominantSize
 
-  const widest = Math.max(...s.dominant.replace(/\*\*|\[\[|\]\]/g, '').split('|').map(t => { const k = shape(t.trim(), domFont, domSize, em(ir.tracking));
+  const widest = muda ? 0 : Math.max(...s.dominant.replace(/\*\*|\[\[|\]\]/g, '').split('|').map(t => { const k = shape(t.trim(), domFont, domSize, em(ir.tracking));
 
  
 
 return k.ink.right - k.ink.left }))
 
   if (s.dominantMax && widest > s.dominantMax * W) domSize = domSize * (s.dominantMax * W) / widest
-  const dom = richBlock({ text: s.dominant, fonts: { base: domFont, bold: domFont }, size: domSize, tracking: em(ir.tracking), leading: ir.lineHeight, x, topY: y, maxWidth: W * 0.9, fill: INK, align: s.align })
 
-  checks.push({ id: 'dominante', box: dom.box, inkL: INK_L }); tramos.push(['dominante', dom.box, domSize])
-  dom.accentBoxes.forEach((b, i) => checks.push({ id: `dominante-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
+  const dom = muda
+    ? { svg: '', box: { left: 0, right: 0, top: 0, bottom: 0 }, accentBoxes: [] }
+    : richBlock({ text: s.dominant, fonts: { base: domFont, bold: domFont }, size: domSize, tracking: em(ir.tracking), leading: ir.lineHeight, x, topY: y, maxWidth: W * 0.9, fill: INK, align: s.align })
+
+  if (!muda) {
+    checks.push({ id: 'dominante', box: dom.box, inkL: INK_L })
+    tramos.push(['dominante', dom.box, domSize])
+    dom.accentBoxes.forEach((b, i) => checks.push({ id: `dominante-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
+  }
 
   let selection = ''
   let selEvidence = null

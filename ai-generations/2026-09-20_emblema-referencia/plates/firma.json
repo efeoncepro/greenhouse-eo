@@ -1,0 +1,7 @@
+[
+ { "id": "Z1-polo-julio",    "plate": "Z1-polo-julio.png",    "logo": { "width": 0.20 } },
+ { "id": "Z2-chaqueta-nexa", "plate": "Z2-chaqueta-nexa.png", "logo": { "width": 0.20 } },
+ { "id": "Z3-bomber-ambos",  "plate": "Z3-bomber-ambos.png",  "logo": { "width": 0.20 } },
+ { "id": "Z4-terreno-nexa",  "plate": "Z4-terreno-nexa.png",  "logo": { "width": 0.20 } },
+ { "id": "Z5-hoodie-julio",  "plate": "Z5-hoodie-julio.png",  "logo": { "width": 0.20 } }
+]
