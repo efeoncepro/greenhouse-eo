@@ -19,7 +19,8 @@ const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const LOCK = path.join(raiz, 'scripts/foto/assets.lock.json')
 
 /**
- * Todo lo que el catálogo puede pedirle al disco: referencias de personas, sus vistas, y de cada kit
+ * Todo lo que el catálogo puede pedirle al disco: referencias de personas, sus vistas, expresiones y
+ * vestuarios, y de cada kit
  * **las cuatro formas** en que declara un archivo — por patrón, por patrón de color, por nombre
  * completo y como asset de uso.
  *
@@ -33,9 +34,16 @@ const LOCK = path.join(raiz, 'scripts/foto/assets.lock.json')
 export function rutasDeclaradas() {
   const rutas = new Map()
 
+  // Las TRES dimensiones de una persona, no sólo `vistas`: una expresión o un vestuario se antepone a las
+  // referencias igual que un ángulo, así que sustituirlos cambia la pieza lo mismo. Mismo fallo que el de
+  // los assets de uso, un nivel más arriba: declarar un mapa nuevo en el catálogo sin sellarlo lo deja
+  // fuera de todo gate.
   for (const [clave, persona] of Object.entries(PERSONAS)) {
     for (const ref of persona.refs) rutas.set(ref, `persona:${clave}`)
-    for (const [vista, ref] of Object.entries(persona.vistas ?? {})) rutas.set(ref, `persona:${clave}/${vista}`)
+
+    for (const mapa of ['vistas', 'expresiones', 'vestuario']) {
+      for (const [nombre, ref] of Object.entries(persona[mapa] ?? {})) rutas.set(ref, `persona:${clave}/${nombre}`)
+    }
   }
 
   for (const [clave, objeto] of Object.entries(OBJETOS)) {

@@ -195,8 +195,37 @@ export const PERSONAS = {
   },
   nexa: {
     etiqueta: 'Nexa',
+    // Los marcadores salen del Character Bible §3.1-3.4 (ficha en
+    // `docs/operations/brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md`). El bloque anterior decía
+    // «long dark wavy hair, fair olive skin, dark eyes and defined brows», que describe a CUALQUIERA y no
+    // discrimina entre las dos identidades que convivieron bajo este nombre: por eso el material derivaba.
+    //
+    // Una excepción de procedencia, declarada para que nadie la cite como documento de marca: el
+    // `winged upper lash line` NO está en el Bible. Sale del LEEME de `_identidad-nexa/`, donde es el rasgo
+    // que separa la identidad canónica de la descartada («el más rápido de verificar es el delineado»).
+    // Entra como marcador de continuidad con el material aprobado.
     identity:
-      'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images: a woman in her early thirties with long dark wavy hair, fair olive skin, dark eyes and defined brows. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.',
+      'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.',
+    // Los tres signature elements del Bible §5.1, que el pipeline no pedía. El documento dice del anillo que
+    // es «el ancla visual más fuerte — incluir en cada prompt»: son las anclas que la identifican aunque no
+    // se le vea la cara. Medido sobre 7 imágenes: anillo correcto en 0 de 5 con manos visibles, reloj en 1
+    // de 5, y aretes DORADOS en 5 de 5 donde la ficha pide plata. El metal estaba invertido de forma
+    // sistemática en las dos identidades — no era deriva del modelo, era una instrucción que nunca viajó.
+    //
+    // 🔴 «En cada prompt» no es físicamente sostenible y el texto lo dice: la marca se pierde por el
+    // ENCUADRE, no por la referencia. Medido el 2026-09-21 sobre la misma ficha y las mismas entradas: la
+    // cinta del lanyard a ~12 px de ancho volvió como manchas sin una sola letra y a ~40 px salió legible.
+    // Un anillo en plano entero tiene MENOS píxeles que esa cinta fallida, así que ahí va a salir como un
+    // aro indefinido y eso no es culpa del texto. Se sostiene en la vista `manos`, en un busto con manos en
+    // cuadro y en primeros planos.
+    //
+    // 🔴 Conflicto abierto con las referencias: las anclas llevan anillos finos DORADOS en los anulares y
+    // ninguna lleva reloj, y en este pipeline gana la referencia sobre la frase. La salida barata, dentro
+    // del canon («editar conserva, generar reconstruye»), es editar UNA sola imagen —`1-anclas/nexa-ancla-8-manos.png`,
+    // que es la vista `manos` y la que se antepone cuando hay manos en cuadro— en vez de regenerar las ocho.
+    // Pendiente de decisión del operador; hasta entonces el texto al menos deja de estar ausente.
+    accesorios:
+      'SIGNATURE ACCESSORIES (Nexa always wears these; render them whenever the relevant body part is in frame AND large enough to resolve): a geometric matte-silver statement ring on the INDEX finger of her right hand — not a plain band, not gold, not on another finger; a watch on her LEFT wrist with a navy leather or silver mesh strap and a small, clean dial; small silver earrings, geometric studs or medium hoops depending on context, never gold and never ornate. Nails are neatly kept, short to medium, in a single colour across both hands: dark navy or rosy nude.',
     // TODO lo de Nexa vive en `ai-generations/_identidad-nexa/`, que NO es una carpeta de corrida: es el
     // estado vigente, con su LEEME. Las carpetas con fecha son el histórico de cada sesión.
     //
@@ -235,13 +264,70 @@ export const PERSONAS = {
       'cuerpo-perfil-izq': 'ai-generations/_identidad-nexa/2-angulos/nexa-cuerpo-perfil-izq.png',
       'cuerpo-espalda': 'ai-generations/_identidad-nexa/2-angulos/nexa-cuerpo-espalda.png'
     },
-    vistasDeCuerpo: ['cuerpo-tresquartos', 'cuerpo-perfil-der', 'cuerpo-perfil-izq', 'cuerpo-espalda']
+    vistasDeCuerpo: ['cuerpo-tresquartos', 'cuerpo-perfil-der', 'cuerpo-perfil-izq', 'cuerpo-espalda'],
+    // Las OCHO expresiones canónicas del Character Bible §6, que pide usar estos nombres como shorthand de
+    // producción. Existían en disco desde el 2026-09-21 y no eran direccionables: `vistas` sólo declaraba
+    // anclas y ángulos, así que nadie podía pedir «the-read» desde una ficha.
+    //
+    // 🔴 Conservan el ACABADO SINTÉTICO del maestro anterior (se derivaron de él por injerto de rostro).
+    // Sirven para gesto, expresión y encuadre; si la pieza necesita piel creíble en primer plano, la
+    // referencia de rostro tiene que ser un ancla. Las ocho son planos medios: ninguna es de cuerpo entero.
+    expresiones: {
+      'the-spark': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-spark.png',
+      'the-breakdown': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-breakdown.png',
+      'the-read': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-read.png',
+      'deep-work': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-deep-work.png',
+      'the-point': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-point.png',
+      'got-it': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-got-it.png',
+      'the-listen': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-the-listen.png',
+      'mic-drop': 'ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png'
+    },
+    // Los cinco contextos de vestuario del Bible §5.3 — falta entero el quinto, «Lifestyle / Exterior
+    // urbano». Misma deuda de acabado que las expresiones.
+    //
+    // Verificado en hoja de contacto el 2026-09-21: estas referencias SÍ portan los signature elements de
+    // §5.1 (reloj, anillo, uñas navy) y cumplen el contexto con precisión — `home` lleva bun alto y lentes
+    // de luz azul, `speaker` lleva el acento naranja o azul eléctrico, `prof` el blazer navy sobre blanco.
+    // Son mejor referencia de accesorios que las propias anclas.
+    vestuario: {
+      'prof-1': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-1.png',
+      'prof-2': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-2.png',
+      'prof-3': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-3.png',
+      'casual-1': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-1.png',
+      'casual-2': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-2.png',
+      'casual-3': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-3.png',
+      'casual-4': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-4.png',
+      'casual-5': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-5.png',
+      'casual-6': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-6.png',
+      'home-1': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-1.png',
+      'home-2': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-2.png',
+      'home-3': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-3.png',
+      'home-4': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-4.png',
+      'home-5': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-5.png',
+      'speaker-1': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-1.png',
+      'speaker-2': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-2.png',
+      'speaker-3': 'ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-3.png'
+    },
+    // Cuáles del vestuario YA muestran la silueta completa, verificado mirando las 17. Mismo criterio que
+    // `vistasDeCuerpo`: si la referencia ya es de cuerpo, añadir además el cuerpo frontal mete dos cuerpos
+    // sin rostro cercano y hace derivar la cara.
+    vestuarioDeCuerpo: ['casual-3', 'casual-4', 'casual-5', 'casual-6', 'home-2', 'home-4', 'prof-1', 'prof-2', 'prof-3', 'speaker-1', 'speaker-2', 'speaker-3']
   }
 }
 
 // Una persona sola lleva 3 referencias; dos personas llevan 2 cada una (medido en la ronda de
 // personas: 6 referencias sostuvieron identidad de dos personas y dos mascotas).
 const REFS_POR_PERSONA = { 1: 3, 2: 2 }
+
+// Las tres dimensiones de una persona resuelven a la MISMA ranura —la referencia que se antepone a las
+// frontales— así que una ficha puede pedir UNA, no dos. `vista` es el ángulo, `expresion` una de las ocho
+// canónicas del Bible §6 y `vestuario` uno de sus contextos. Cada una dice su propio error: antes, pedir
+// una expresión inexistente listaba las 12 vistas y no se entendía qué había fallado.
+const DIMENSIONES_DE_IDENTIDAD = [
+  { campo: 'vista', mapa: 'vistas', deCuerpo: 'vistasDeCuerpo', etiqueta: 'Vistas' },
+  { campo: 'expresion', mapa: 'expresiones', deCuerpo: null, etiqueta: 'Expresiones' },
+  { campo: 'vestuario', mapa: 'vestuario', deCuerpo: 'vestuarioDeCuerpo', etiqueta: 'Vestuarios' }
+]
 
 function resolverIdentidad(ficha) {
   const pedidas = ficha.identidad ?? []
@@ -266,29 +352,42 @@ function resolverIdentidad(ficha) {
   const tramos = []
 
   for (const pedido of pedidas) {
-    // Una entrada puede ser "julio" (vista frontal) o { persona: 'julio', vista: 'perfil-izq' }.
+    // Una entrada puede ser "julio" (vista frontal), { persona: 'julio', vista: 'perfil-izq' },
+    // { persona: 'nexa', expresion: 'the-read' } o { persona: 'nexa', vestuario: 'speaker-1' }.
     const clave = typeof pedido === 'string' ? pedido : pedido?.persona
-    const vista = typeof pedido === 'string' ? null : pedido?.vista
     const persona = PERSONAS[clave]
 
     if (!persona) {
       throw new Error(`Persona "${clave}" desconocida. Personas con identidad canónica: ${Object.keys(PERSONAS).join(', ')}.`)
     }
 
-    // La vista manda: si la toma es de perfil, mandar sólo retratos frontales obliga al modelo a
-    // inventar el giro, y lo que inventa ensancha la cara. La vista va PRIMERA por ser la decisiva.
+    const pedidas = typeof pedido === 'string' ? [] : DIMENSIONES_DE_IDENTIDAD.filter(d => pedido?.[d.campo])
+
+    if (pedidas.length > 1) {
+      throw new Error(
+        `Para ${persona.etiqueta} se pidió ${pedidas.map(d => `\`${d.campo}\``).join(' y ')} a la vez, y las tres ` +
+          'dimensiones ocupan la MISMA ranura: la referencia que se antepone. Elige una.'
+      )
+    }
+
+    const dimension = pedidas[0] ?? null
+    const pedidaEnDimension = dimension ? pedido[dimension.campo] : null
+
+    // La dimensión manda: si la toma es de perfil, mandar sólo retratos frontales obliga al modelo a
+    // inventar el giro, y lo que inventa ensancha la cara. Va PRIMERA por ser la decisiva.
     let refs = persona.refs.slice(0, cupo)
 
-    if (vista) {
-      const disponibles = persona.vistas ?? {}
+    if (dimension) {
+      const disponibles = persona[dimension.mapa] ?? {}
 
-      if (!disponibles[vista]) {
+      if (!disponibles[pedidaEnDimension]) {
         throw new Error(
-          `La vista "${vista}" no existe para ${persona.etiqueta}. Vistas disponibles: ${Object.keys(disponibles).join(', ') || 'ninguna'}.`
+          `La ${dimension.campo} "${pedidaEnDimension}" no existe para ${persona.etiqueta}. ` +
+            `${dimension.etiqueta} disponibles: ${Object.keys(disponibles).join(', ') || 'ninguna'}.`
         )
       }
 
-      refs = [disponibles[vista], ...persona.refs.slice(0, Math.max(0, cupo - 1))]
+      refs = [disponibles[pedidaEnDimension], ...persona.refs.slice(0, Math.max(0, cupo - 1))]
     }
 
     // El CUERPO ENTERO tiene que viajar siempre que quepa. Con una persona sola el cupo es 3 y entra
@@ -297,7 +396,9 @@ function resolverIdentidad(ficha) {
     // Nexa. Resultado: piezas de dos personas a cuerpo entero donde el modelo inventaba las dos
     // siluetas. Se sustituye la ÚLTIMA (la menos decisiva: la vista va primera y manda) por la de
     // cuerpo. Medido el 2026-09-21.
-    const yaEsDeCuerpo = vista && (persona.vistasDeCuerpo ?? []).includes(vista)
+    const yaEsDeCuerpo = Boolean(
+      dimension?.deCuerpo && (persona[dimension.deCuerpo] ?? []).includes(pedidaEnDimension)
+    )
 
     if (persona.cuerpo && cupo >= 2 && !yaEsDeCuerpo && !refs.includes(persona.cuerpo)) {
       refs[refs.length - 1] = persona.cuerpo
@@ -330,7 +431,16 @@ function resolverIdentidad(ficha) {
           .map(t => `${rango(t)} are ${t.persona.etiqueta} (identity only).`)
           .join(' ')} Ignore the clothing and backgrounds of all references.`
 
-  return { identity: tramos.map(t => t.persona.identity).join('\n\n'), references, imagenes }
+  // Los accesorios van como BLOQUE APARTE, separados por \n\n, no pegados al IDENTITY. Si se unieran con
+  // un espacio, el bloque emitido dejaría de existir verbatim en el canon y el test que lo verifica
+  // fallaría — y, peor, IDENTITY dejaría de ser citable como unidad.
+  return {
+    identity: tramos
+      .flatMap(t => [t.persona.identity, t.persona.accesorios].filter(Boolean))
+      .join('\n\n'),
+    references,
+    imagenes
+  }
 }
 
 // ── Objetos de marca con kit 3D propio ──────────────────────────────────────────────────────────

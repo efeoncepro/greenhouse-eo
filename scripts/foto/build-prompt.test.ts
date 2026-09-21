@@ -343,6 +343,92 @@ conAssets('foto:prompt · identidad', () => {
   })
 })
 
+const CUERPOS_NEXA = (PERSONAS as Record<string, { cuerpo: string }>).nexa.cuerpo
+
+conAssets('foto:prompt · expresiones y vestuario de Nexa', () => {
+  // Las 8 expresiones y los 17 vestuarios existían en disco desde el 2026-09-21 y NO eran direccionables:
+  // `vistas` sólo declaraba anclas y ángulos. Los nombres de las expresiones son los del Character Bible
+  // §6, que pide usarlos como shorthand de producción.
+  it('antepone la expresión pedida a las referencias frontales', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', expresion: 'the-read' }] })
+
+    expect(r.imagenes[0]).toContain('nexa-pose-the-read.png')
+  })
+
+  it('antepone el vestuario pedido', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vestuario: 'speaker-1' }] })
+
+    expect(r.imagenes[0]).toContain('nexa-vest-speaker-1.png')
+  })
+
+  // Cada dimensión dice su propio error: antes, pedir una expresión inexistente habría listado las 12
+  // vistas y no se entendía qué falló.
+  it('una expresión inexistente lista las expresiones, no las vistas', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', expresion: 'the-smirk' }] })).toThrow(
+      /Expresiones disponibles/
+    )
+  })
+
+  it('un vestuario inexistente lista los vestuarios', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vestuario: 'lifestyle-1' }] })).toThrow(
+      /Vestuarios disponibles/
+    )
+  })
+
+  // Las tres dimensiones ocupan la MISMA ranura —la referencia que se antepone— así que pedir dos es
+  // ambiguo y el comando tiene que decirlo en vez de elegir por su cuenta.
+  it('aborta si se piden dos dimensiones a la vez', () => {
+    expect(() =>
+      construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: 'perfil-izq', expresion: 'the-read' }] })
+    ).toThrow(/MISMA ranura/)
+  })
+
+  it('un vestuario que ya es de cuerpo entero no duplica cuerpo', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vestuario: 'prof-1' }, 'julio'] })
+
+    expect(r.imagenes[0]).toContain('nexa-vest-prof-1.png')
+    expect(r.imagenes).not.toContain(CUERPOS_NEXA)
+  })
+
+  it('un vestuario de medio cuerpo sí trae la referencia de cuerpo entero', () => {
+    const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vestuario: 'home-1' }, 'julio'] })
+
+    expect(r.imagenes).toContain(CUERPOS_NEXA)
+  })
+})
+
+conAssets('foto:prompt · signature elements de Nexa', () => {
+  // Bible §5.1. No viajaban al prompt, y por eso el material los perdía: medido sobre 7 imágenes, anillo
+  // correcto en 0 de 5 con manos visibles y aretes dorados en 5 de 5 donde la ficha pide plata.
+  it('el bloque de accesorios viaja con Nexa', () => {
+    const p = construirPrompt({ ...fichaBase, identidad: ['nexa'] }).prompt
+
+    expect(p).toContain('SIGNATURE ACCESSORIES')
+    expect(p).toContain('INDEX finger of her right hand')
+  })
+
+  it('Julio no hereda los accesorios de Nexa', () => {
+    expect(construirPrompt({ ...fichaBase, identidad: ['julio'] }).prompt).not.toContain('SIGNATURE ACCESSORIES')
+  })
+
+  // Van como bloque APARTE: si se pegaran al IDENTITY con un espacio, el bloque dejaría de existir
+  // verbatim en el canon y de ser citable como unidad.
+  it('los accesorios son su propio bloque, no parte de IDENTITY', () => {
+    const bloques = construirPrompt({ ...fichaBase, identidad: ['nexa'] }).prompt.split('\n\n')
+
+    expect(bloques.find(b => b.startsWith('IDENTITY (critical)'))).not.toContain('SIGNATURE ACCESSORIES')
+    expect(bloques.some(b => b.startsWith('SIGNATURE ACCESSORIES'))).toBe(true)
+  })
+
+  // 🔴 «Incluir en cada prompt» no es físicamente sostenible: la marca se pierde por el ENCUADRE. La cinta
+  // del lanyard falla a ~12 px de ancho y se lee a ~40; un anillo en plano entero tiene menos píxeles que
+  // esa cinta fallida. El texto tiene que decir la condición o alguien va a medir «el anillo falló» y
+  // culpar al prompt.
+  it('el bloque condiciona el render a que la parte del cuerpo se resuelva', () => {
+    expect(construirPrompt({ ...fichaBase, identidad: ['nexa'] }).prompt).toContain('large enough to resolve')
+  })
+})
+
 describe('foto:prompt · avisos que faltaban', () => {
   // Falso negativo real: la escena declaraba "hard midday daylight pours in through the storefront
   // glass" y el aviso saltaba igual.
@@ -648,10 +734,20 @@ describe('foto:prompt · el catálogo coincide con el lock de assets', () => {
     expect(lock.assets[ruta]).toBeDefined()
   })
 
+  // Las TRES dimensiones, no sólo `vistas`: una expresión o un vestuario se antepone a las referencias
+  // igual que un ángulo, así que sustituirlos cambia la pieza lo mismo. Recorrer sólo `vistas` dejaba 25
+  // referencias de Nexa fuera de todo gate desde el momento en que se declararon.
   it.each(
-    Object.entries(PERSONAS as Record<string, { refs: string[]; vistas?: Record<string, string> }>).flatMap(([clave, p]) => [
+    Object.entries(
+      PERSONAS as Record<
+        string,
+        { refs: string[]; vistas?: Record<string, string>; expresiones?: Record<string, string>; vestuario?: Record<string, string> }
+      >
+    ).flatMap(([clave, p]) => [
       ...p.refs.map(r => [clave, r] as const),
-      ...Object.values(p.vistas ?? {}).map(r => [clave, r] as const)
+      ...Object.values(p.vistas ?? {}).map(r => [clave, r] as const),
+      ...Object.values(p.expresiones ?? {}).map(r => [clave, r] as const),
+      ...Object.values(p.vestuario ?? {}).map(r => [clave, r] as const)
     ])
   )('referencia de %s está en el lock', (_clave, ruta) => {
     expect(lock.assets[ruta]).toBeDefined()

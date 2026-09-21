@@ -191,8 +191,33 @@ IDENTITY (critical): the man is the SAME real person shown in the reference imag
 ```
 
 ```text
-IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images: a woman in her early thirties with long dark wavy hair, fair olive skin, dark eyes and defined brows. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.
+IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images. Chilean-Brazilian, early thirties. Warm olive skin, Fitzpatrick IV, with real texture: visible pores, a few faint freckles and a small mole near the cheekbone — never poreless synthetic skin. Almond-shaped eyes, dark brown turning warm amber in direct light, outer corners angled slightly upward, with a defined winged upper lash line. Thick, defined brows with a medium arch. Straight nose with a subtle bridge and a slightly upturned tip. Full lips in a natural rosy tone. Medium-high cheekbones, soft jaw, slightly rounded chin. Dark brown, almost black wavy hair with warm natural highlights (never artificial streaks), falling below the shoulders. Make-up is always natural-elevated, never heavy or editorial. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.
 ```
+
+```text
+SIGNATURE ACCESSORIES (Nexa always wears these; render them whenever the relevant body part is in frame AND large enough to resolve): a geometric matte-silver statement ring on the INDEX finger of her right hand — not a plain band, not gold, not on another finger; a watch on her LEFT wrist with a navy leather or silver mesh strap and a small, clean dial; small silver earrings, geometric studs or medium hoops depending on context, never gold and never ornate. Nails are neatly kept, short to medium, in a single colour across both hands: dark navy or rosy nude.
+```
+
+> **Delta 2026-09-21 — el bloque de Nexa pasó de adjetivos a la ficha del Character Bible, y ganó un
+> bloque de accesorios.** El anterior («long dark wavy hair, fair olive skin, dark eyes and defined
+> brows») describía a cualquiera y **no discriminaba entre las dos identidades** que convivieron bajo
+> este nombre: por eso el material derivaba. Los marcadores nuevos salen del Character Bible §3.1-3.4
+> ([ficha](./NEXA_CHARACTER_BIBLE_FICHA_V1.md)), con **una excepción de procedencia declarada**: el
+> `winged upper lash line` **no está en el Bible** — sale del LEEME de `_identidad-nexa/`, donde es el
+> rasgo que separa la identidad canónica de la descartada. Entra como marcador de continuidad con el
+> material aprobado, no como cita del documento de marca.
+>
+> El segundo bloque son los **signature elements de §5.1**, que el pipeline no pedía: medido sobre 7
+> imágenes, anillo correcto en 0 de 5 con manos visibles, reloj en 1 de 5 y aretes **dorados** en 5 de 5
+> donde la ficha pide plata. El metal estaba invertido de forma sistemática — no era deriva del modelo,
+> era una instrucción que nunca viajó. Va como bloque **aparte**, separado por línea en blanco, para que
+> IDENTITY siga siendo citable como unidad.
+>
+> 🔴 El «incluir en cada prompt» del Bible **no es físicamente sostenible y el texto lo dice**: la marca
+> se pierde por el **encuadre**, no por la referencia. La cinta del lanyard falla a ~12 px de ancho y se
+> lee a ~40 px; un anillo en plano entero tiene **menos** píxeles que esa cinta fallida. Por eso el
+> bloque pide renderizarlos «whenever the relevant body part is in frame **and large enough to
+> resolve**»: se sostiene en la vista `manos`, en un busto con manos en cuadro y en primeros planos.
 
 > **Delta 2026-09-20 — el bloque de Julio pasó de adjetivos a geometría.** El anterior («short
 > salt-and-pepper curly hair, thin rectangular silver-rim glasses, a full dark beard with grey»)

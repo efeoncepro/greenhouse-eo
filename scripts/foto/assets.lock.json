@@ -98,6 +98,106 @@
       "rol": "persona:nexa/cuerpo-espalda",
       "sha256": "70e643fb200fba5b497d1ff038d02c281af174cf64f603ccc77616393ba12693"
     },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-the-spark.png": {
+      "rol": "persona:nexa/the-spark",
+      "sha256": "64c2af69b180abdd043d4ef7cc423fdbeeb38288dbdf32c5d4725422d6a0a5e9"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-the-breakdown.png": {
+      "rol": "persona:nexa/the-breakdown",
+      "sha256": "52c6d4de265bc056a70c268927a01af48422a329934d43f6b5b417a63da7d686"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-the-read.png": {
+      "rol": "persona:nexa/the-read",
+      "sha256": "00d7140cfed4d82453c5723f6c0c9b16b9ae5c46cbb8dea96b30254d980aea4e"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-deep-work.png": {
+      "rol": "persona:nexa/deep-work",
+      "sha256": "76b3826aba48abdaca02e5b9c462c5f0ec58c2d8faf3dfcb5b7dda712700932e"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-the-point.png": {
+      "rol": "persona:nexa/the-point",
+      "sha256": "b5d5cac47d72893d22b57cdd6a265ef09725d3a8475c2782d2397d291731abce"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-got-it.png": {
+      "rol": "persona:nexa/got-it",
+      "sha256": "2a415d34051bea57daed7357611fabce6451da53014612d8720ff5fe0b764742"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-the-listen.png": {
+      "rol": "persona:nexa/the-listen",
+      "sha256": "44ad8456ceea26da3ce0e5d047db0862cce0d967bb5d8247e53b94bb566db631"
+    },
+    "ai-generations/_identidad-nexa/3-poses/nexa-pose-mic-drop.png": {
+      "rol": "persona:nexa/mic-drop",
+      "sha256": "1e05a848669405bd073522e703786802dbbbf6fd92c5fc4532471804f3b89df9"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-1.png": {
+      "rol": "persona:nexa/prof-1",
+      "sha256": "8f3935509c4f1d87eb8a222b27ad19bfabb20f83b6b6f5da5376e5c7f6cd0fb6"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-2.png": {
+      "rol": "persona:nexa/prof-2",
+      "sha256": "106bfbac395037b4d044c21c2f87e9b484919dcaaa1c747e1d6af423a0ee8a72"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-prof-3.png": {
+      "rol": "persona:nexa/prof-3",
+      "sha256": "4cca6593f6cb09d22d0111fbf4a0d81804744806f1a7bd9b25dbdfe6e8b3df02"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-1.png": {
+      "rol": "persona:nexa/casual-1",
+      "sha256": "21e1ca77dd2e8224af04d0c8930261629fd4337db6b79d529862da48fbd9750f"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-2.png": {
+      "rol": "persona:nexa/casual-2",
+      "sha256": "685b07cfe563d29dd0945bdd108e3c2c4632fd03ca995fad4b0e9c8e3dd11ceb"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-3.png": {
+      "rol": "persona:nexa/casual-3",
+      "sha256": "dfbc51d622a56adc2a967f97b919b5053f48890fc272a3cf1c801281c4232152"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-4.png": {
+      "rol": "persona:nexa/casual-4",
+      "sha256": "6df38932848b3cc171df6da96bc9cfee02a2912e1955a8bb1d56f71b2c3c5a6a"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-5.png": {
+      "rol": "persona:nexa/casual-5",
+      "sha256": "e3f176d80606e2b817c07cdf483518c5f353b5cccbd9ea893c9717261d6970ee"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-casual-6.png": {
+      "rol": "persona:nexa/casual-6",
+      "sha256": "c3422a5fdc8580dd2b75ec62684791e8a8e44c7e9a4c9953a1c8507440f1f508"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-1.png": {
+      "rol": "persona:nexa/home-1",
+      "sha256": "e7aa502e3ca1bfcc4618d0a6ad194807de4adb8eed010ad39c875cb8186cf30d"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-2.png": {
+      "rol": "persona:nexa/home-2",
+      "sha256": "a6dad7ab3b3239899be9e5b8c4556c563c1f72ceb954cdb07a20993c1fe54b45"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-3.png": {
+      "rol": "persona:nexa/home-3",
+      "sha256": "1bd0191b73f28c6808cd5f5108c1dd09477c31158d2b1b376927715a36271e99"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-4.png": {
+      "rol": "persona:nexa/home-4",
+      "sha256": "f71230187fa034cca34fa4efcb6cb2077092d64b157a13926a8b5a22fea644ed"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-home-5.png": {
+      "rol": "persona:nexa/home-5",
+      "sha256": "92ba24865f45e600688c9fcac125e6e97b3f41c39178ada0ed23250c9af0e595"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-1.png": {
+      "rol": "persona:nexa/speaker-1",
+      "sha256": "140816a5e0bb153be90dc863d3b60330491bae874513485f77274a72447cdccb"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-2.png": {
+      "rol": "persona:nexa/speaker-2",
+      "sha256": "d5e4548f54fa3512e70b2ec972bcd6d4d4d87f17c9790956a087324622d06a78"
+    },
+    "ai-generations/_identidad-nexa/4-vestuario/nexa-vest-speaker-3.png": {
+      "rol": "persona:nexa/speaker-3",
+      "sha256": "ba68e1dd02ec183d99ab5b8e84b1237c64c13cbaeca4d9b8eb58906d1c5a00f6"
+    },
     "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:sprocket-hubspot/frente",
       "sha256": "4bb97bc7fb7382b898fbdd76c4b97073dbe27e5e401c8c9a612ccf6a3026caf3"
