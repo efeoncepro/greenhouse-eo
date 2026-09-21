@@ -1,0 +1,24 @@
+{
+  "id": "b1-reflejo-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "reflejo",
+  "identidad": [
+    "julio"
+  ],
+  "objetos": [
+    "polo-efeonce",
+    "chaqueta-bomber-efeonce"
+  ],
+  "escena": "SCENE (Efeonce meeting room, Santiago, late afternoon): a chest-up medium close-up taken from the corridor, through the glass wall of the room. Beyond the glass the man stands close to it, squared to the camera, looking STRAIGHT INTO THE LENS, calm and unhurried, his long lean face turned fully to the camera. He is wearing the Efeonce bomber jacket, open, over the Efeonce navy piqué polo, both exactly as in the references, with the jacket's embroidered chest mark clearly in frame. Across the same glass, the reflection of a large wall display behind the camera is superimposed over him: a page of running text far out of focus and skewed by the angle of the glass, its words softened past reading, with no logos, no icons, no brand marks and no readable words anywhere in it, caught at the instant it lands across his shoulder without covering his face. Hard low sun through the corridor window rakes his face from the left and leaves the far side of it in open shadow. He stands LOW in the frame, his head well down from the top edge, and above the glass wall the poured-concrete ceiling soffit fills the entire upper third of the picture as one smooth unbroken surface in deep shadow, with no window, no lamp, no beam and no bright spot anywhere in it. 85mm lens at f/2.",
+  "reservas": {
+    "texto": {
+      "muro": "the smooth poured-concrete ceiling soffit above the glass wall",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the corridor's dark steel handrail running past the lens",
+    "tono": "DARK graphite steel in shadow, matte, its brushed grain still visible"
+  }
+}

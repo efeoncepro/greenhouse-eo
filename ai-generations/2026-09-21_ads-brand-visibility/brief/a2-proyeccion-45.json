@@ -1,0 +1,17 @@
+{
+  "id": "a2-proyeccion-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "proyeccion",
+  "objetos": [
+    {
+      "objeto": "chaqueta-bomber-efeonce",
+      "puesta": "espalda-mujer"
+    }
+  ],
+  "escena": "SCENE (Efeonce studio after dark, Santiago): the work thrown by the beam is a page of an AI assistant's written answer about a company — plain running prose, no logos, no icons and no brand marks of any kind — projected onto a board-formed concrete wall, where the timber grain, the form-tie holes and a hairline crack run straight through the words and break the lines apart. The projector throws a cold blue light and it is the only light in the room. A woman stands inside the beam with her back to the camera, close to the wall, wearing the Efeonce navy bomber jacket from the reference seen from behind, its back carrying the embroidered Efeonce wordmark and slogan exactly as in the reference image, at the same size and position on her back, caught at the instant she steps into it, and the projected paragraph falls across her shoulders and the back of her head. 35mm lens at f/2.",
+  "lecho": {
+    "objeto": "the back of a wooden chair left in the foreground",
+    "tono": "DARK walnut in shadow, matte, with the grain still readable"
+  }
+}

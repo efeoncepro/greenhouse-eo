@@ -537,6 +537,14 @@ export const OBJETOS = {
     },
     vistaDefecto: 'frente',
     assetDeUso: 'efeonce-chaqueta-softshell-14-puesto-frente-1200x1600-v01-fondo-estudio.png',
+    // Vistas PUESTAS: las de ESCENA. `vista` da la prenda aislada (construcción); estas son las que
+    // se le pasan al modelo cuando hay una persona en cuadro. Existían en `final/` desde el 2026-09-17
+    // y no eran direccionables: sólo el frente lo era, vía `assetDeUso`.
+    usoPorVista: {
+      espalda: 'efeonce-chaqueta-softshell-15-puesto-espalda-1200x1600-v01-fondo-estudio.png',
+      'espalda-mujer': 'efeonce-chaqueta-softshell-17-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-cuerpo-b': 'efeonce-chaqueta-softshell-16-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png'
+    },
     macroEmblema: 'efeonce-chaqueta-softshell-11-macro-bordado-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
   },
@@ -552,6 +560,14 @@ export const OBJETOS = {
     vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
     vistaDefecto: 'frente',
     assetDeUso: 'efeonce-chaqueta-bomber-14-puesto-frente-1200x1600-v01-fondo-estudio.png',
+    // Vistas PUESTAS: las de ESCENA. `vista` da la prenda aislada (construcción); estas son las que
+    // se le pasan al modelo cuando hay una persona en cuadro. Existían en `final/` desde el 2026-09-17
+    // y no eran direccionables: sólo el frente lo era, vía `assetDeUso`.
+    usoPorVista: {
+      espalda: 'efeonce-chaqueta-bomber-16-puesto-espalda-1024x1536-v01-fondo-estudio.png',
+      'espalda-mujer': 'efeonce-chaqueta-bomber-15-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-cuerpo-b': 'efeonce-chaqueta-bomber-17-puesto-frente-cuerpo-b-1024x1536-v01-fondo-estudio.png'
+    },
     macroEmblema: 'efeonce-chaqueta-bomber-11-macro-bordado-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
   },
@@ -653,6 +669,15 @@ export const OBJETOS = {
       navy: 'efeonce-polo-navy-13-puesto-frente-1200x1600-v01-fondo-estudio.png',
       blanco: 'efeonce-polo-blanco-13-puesto-frente-1200x1600-v01-fondo-estudio.png'
     },
+    // Vistas PUESTAS de ESCENA. Sólo existen en NAVY: la blanca tiene únicamente su frente, así que
+    // pedir una espalda blanca falla con el mensaje del resolver en vez de servir la navy en silencio.
+    // Las de espalda apuntan a `v02`, que es la corregida con la espalda BORDADA (la v01 la llevaba
+    // estampada, y sobre piqué eso es el error que el operador corrigió el 2026-09-21).
+    usoPorVista: {
+      espalda: 'efeonce-polo-navy-14-puesto-espalda-1024x1536-v02-fondo-estudio.png',
+      'espalda-mujer': 'efeonce-polo-navy-16-puesto-espalda-mujer-1024x1536-v02-fondo-estudio.png',
+      'frente-cuerpo-b': 'efeonce-polo-navy-15-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png'
+    },
     macroEmblema: 'efeonce-polo-navy-10-detalle-bordado-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
   },
@@ -668,6 +693,14 @@ export const OBJETOS = {
     vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
     vistaDefecto: 'frente',
     assetDeUso: 'efeonce-hoodie-15-puesto-frente-1200x1600-v01-fondo-estudio.png',
+    // Vistas PUESTAS: las de ESCENA. `vista` da la prenda aislada (construcción); estas son las que
+    // se le pasan al modelo cuando hay una persona en cuadro. Existían en `final/` desde el 2026-09-17
+    // y no eran direccionables: sólo el frente lo era, vía `assetDeUso`.
+    usoPorVista: {
+      espalda: 'efeonce-hoodie-16-puesto-espalda-1200x1600-v01-fondo-estudio.png',
+      'espalda-mujer': 'efeonce-hoodie-22-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png',
+      'frente-cuerpo-b': 'efeonce-hoodie-17-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png'
+    },
     macroEmblema: 'efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png',
     tipoEmblema: 'isotipo',
   }
@@ -736,7 +769,29 @@ function resolverObjetos(ficha, desde) {
     // `EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md`: arte plano → producir vistas · prenda aislada →
     // construir · prenda PUESTA → usar en escena. Medido el 2026-09-21: con la prenda puesta el logotipo
     // sale legible a la primera en las dos personas; con la prenda aislada falló cuatro veces seguidas.
-    const enUso = vistaPedida ? null : (objeto.usoPorPersona?.[usoDe] ?? objeto.usoPorColor?.[color] ?? objeto.assetDeUso)
+    // VISTA PUESTA EXPLÍCITA: el hueco que faltaba. `vista` significa prenda AISLADA (construcción) y
+    // sin vista caía siempre en el asset de uso FRONTAL, así que una escena de espaldas no tenía forma
+    // de pedir su referencia: pedir `vista: 'espalda'` devolvía la prenda sola y el modelo inventaba la
+    // marca de la espalda. Medido el 2026-09-21 en `ai-generations/2026-09-21_ads-brand-visibility/`: la
+    // pieza salió con un isotipo suelto donde el kit lleva el logotipo completo + «Empower your Growth».
+    // `puesta` es el camino de ESCENA; `vista` sigue siendo el de construcción.
+    const puestaPedida = typeof pedido === 'string' ? null : pedido?.puesta
+
+    if (puestaPedida && !objeto.usoPorVista?.[puestaPedida]) {
+      const hay = Object.keys(objeto.usoPorVista ?? {})
+
+      throw new Error(
+        hay.length
+          ? `"${clave}" no tiene vista PUESTA "${puestaPedida}". Hay: ${hay.join(', ')}.`
+          : `"${clave}" no declara vistas puestas (\`usoPorVista\`). Las de escena de este kit son las que llevan "puesto" en el nombre.`
+      )
+    }
+
+    const enUso = puestaPedida
+      ? objeto.usoPorVista[puestaPedida]
+      : vistaPedida
+        ? null
+        : (objeto.usoPorPersona?.[usoDe] ?? objeto.usoPorColor?.[color] ?? objeto.assetDeUso)
 
     if (objeto.usoPorPersona && usoDe && !objeto.usoPorPersona[usoDe]) {
       throw new Error(

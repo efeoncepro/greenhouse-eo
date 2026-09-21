@@ -314,6 +314,18 @@
       "rol": "uso:chaqueta-softshell-efeonce/defecto",
       "sha256": "a10cb56bae90155270d4ffd6fa0703a6ee0e62c22672e1bc1be43b488daccede"
     },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-15-puesto-espalda-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-softshell-efeonce/puesta:espalda",
+      "sha256": "96f2cd79715af1c4646a207dd23e6ea94a20071ab1eb377287da63b000537a9a"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-17-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-softshell-efeonce/puesta:espalda-mujer",
+      "sha256": "01b09794863326773ebbeb8f92e426fc076d0062211a46cec15f80a3fa0d086b"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-16-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-softshell-efeonce/puesta:frente-cuerpo-b",
+      "sha256": "0e1323b343d549e7290b29b129702ca5d29a63565607d3395901d63382f613d0"
+    },
     "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:chaqueta-bomber-efeonce/frente",
       "sha256": "768de3537fb362456ce9c20595a958551bfe89883446cc6455d5e6d70b8a44ff"
@@ -329,6 +341,18 @@
     "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-14-puesto-frente-1200x1600-v01-fondo-estudio.png": {
       "rol": "uso:chaqueta-bomber-efeonce/defecto",
       "sha256": "b25ae2c2db7c2f5344db9fc246f21d278dc7a63c5e3087735432544f7ededdb6"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-16-puesto-espalda-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-bomber-efeonce/puesta:espalda",
+      "sha256": "28cdce55b7b3e29ab653945d7342503f3db36f39be35fe027e97d0c1c64d5f9e"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-15-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-bomber-efeonce/puesta:espalda-mujer",
+      "sha256": "dbd4e61b5335c15629fb0715d563dc8cb615ce876b302bf5e12474357c947488"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-17-puesto-frente-cuerpo-b-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:chaqueta-bomber-efeonce/puesta:frente-cuerpo-b",
+      "sha256": "da6a724c899c3a669b20b5c740fd70d4d7df62abdcbe1b3404bff2c08583a7ff"
     },
     "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:gorra-efeonce/frente",
@@ -418,6 +442,18 @@
       "rol": "uso:polo-efeonce/color:blanco",
       "sha256": "5788d3c98db35d240db6f41a91c7de2bbef3fd10c9aaa02e78ea23d79d94a422"
     },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-14-puesto-espalda-1024x1536-v02-fondo-estudio.png": {
+      "rol": "uso:polo-efeonce/puesta:espalda",
+      "sha256": "2afb6445ed3daf026236b1ee177eb503c5c93e33901345993eca7d62bed5546d"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-16-puesto-espalda-mujer-1024x1536-v02-fondo-estudio.png": {
+      "rol": "uso:polo-efeonce/puesta:espalda-mujer",
+      "sha256": "d7bfd495c507c50296db00b9ae9e704627a18a72e349249c9e2174b5b44bd46f"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-15-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:polo-efeonce/puesta:frente-cuerpo-b",
+      "sha256": "3ad2b06f809ff66e2482a2e6edfde00909704f06819e872256bb7e1501905adc"
+    },
     "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:hoodie-efeonce/frente",
       "sha256": "fb65b41f0fe2f5d91221304411916dc04c4a38cf1685290850d581b516225be4"
@@ -433,6 +469,18 @@
     "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-15-puesto-frente-1200x1600-v01-fondo-estudio.png": {
       "rol": "uso:hoodie-efeonce/defecto",
       "sha256": "4586cbb398d0f7387b808c89ae33f36ce9b9e72d66fbd5cad737b5350172c744"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-16-puesto-espalda-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:hoodie-efeonce/puesta:espalda",
+      "sha256": "a4ac8e4d6d3f21ab516c96a4c0ae2f026016461b4cccfd487b84b29c965e24b1"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-22-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png": {
+      "rol": "uso:hoodie-efeonce/puesta:espalda-mujer",
+      "sha256": "2111878d4fd3cf4d1fb8eef5d9e33443013d4ff770995ca169bfa33e10060334"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-17-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png": {
+      "rol": "uso:hoodie-efeonce/puesta:frente-cuerpo-b",
+      "sha256": "a208765f8265ef13d7078f3e5eed622a576382ea8c69bd526355e57c6909f62b"
     }
   }
 }

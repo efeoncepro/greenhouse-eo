@@ -215,6 +215,16 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   plano falla, y las vistas de espalda del mismo día salieron exactas **con** arte plano — aquéllas son
   vistas de kit, donde la estampa ocupa medio cuadro. Es el mismo hecho visto desde el otro lado.
   Caso fuente: `ai-generations/2026-09-21_nexa-uniforme-terreno/LEEME.md`.
+- 🔴 **`vista` es CONSTRUCCIÓN; `puesta` es ESCENA** **[medido 2026-09-21]**. Pedir `vista: 'espalda'` devuelve la
+  prenda **aislada**, y sin vista se cae siempre en el asset de uso **frontal**: una escena de espaldas no tenía
+  forma de pedir su referencia. Resultado medido en `ai-generations/2026-09-21_ads-brand-visibility/`: la pieza
+  salió con un **isotipo suelto inventado** donde la espalda del kit lleva el **logotipo completo + «Empower your
+  Growth»**. Se pide `{ objeto: '<kit>', puesta: 'espalda' | 'espalda-mujer' | 'frente-cuerpo-b' }`. Las doce
+  vistas puestas de bomber, softshell, polo y hoodie ya son direccionables y están selladas (`usoPorVista` entra
+  al lock como cuarta forma de declarar la pieza puesta). **El conteo honesto del hueco:** de ~19 vistas puestas
+  existentes había **6 direccionables**; el resto del banco (macro, plano, percha, doblado, detalle) es de
+  **producción del kit y NO aplica a una escena** — no era un hueco de 137 archivos, era de 13, pero eran los 13
+  que se usan con una persona en cuadro.
 - 🔴 **Un kit que entrega en otra resolución es INVISIBLE para el catálogo** **[medido 2026-09-21]**. El
   lanyard determinístico se entregó como `1024x1536` y el `patron` del kit está fijo a `1200x1600`: el
   nombre nunca calza, así que las vistas 14 y 15 no podían declararse en `vistas` aunque existieran en

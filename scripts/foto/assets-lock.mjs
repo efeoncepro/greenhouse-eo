@@ -69,11 +69,19 @@ export function rutasDeclaradas() {
   return rutas
 }
 
-/** Las tres formas de declarar la pieza PUESTA: una sola, por persona o por color. */
+/**
+ * Las CUATRO formas de declarar la pieza PUESTA: una sola, por persona, por color o por vista.
+ *
+ * `usoPorVista` entró el 2026-09-21 con las espaldas y los cuerpos B, y sellarla acá no es opcional:
+ * es exactamente el hueco del que ya nos quemamos con `assetDeUso` y `usoPorColor` — un mapa nuevo en
+ * el catálogo que nadie sella queda fuera de todo gate, y sustituir uno de esos archivos no despierta
+ * nada. La pieza PUESTA es la que viaja a la escena: es la que más importa que esté sellada.
+ */
 function* assetsDeUso(objeto) {
   if (objeto.assetDeUso) yield ['defecto', objeto.assetDeUso]
   for (const [persona, nombre] of Object.entries(objeto.usoPorPersona ?? {})) yield [`persona:${persona}`, nombre]
   for (const [color, nombre] of Object.entries(objeto.usoPorColor ?? {})) yield [`color:${color}`, nombre]
+  for (const [vista, nombre] of Object.entries(objeto.usoPorVista ?? {})) yield [`puesta:${vista}`, nombre]
 }
 
 const huella = ruta => createHash('sha256').update(readFileSync(path.join(raiz, ruta))).digest('hex')

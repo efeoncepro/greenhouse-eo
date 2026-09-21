@@ -1,0 +1,21 @@
+{
+  "id": "b2-larga-916",
+  "formato": "9:16",
+  "impacto": true,
+  "palanca": "larga-exposicion",
+  "objetos": [
+    "polo-efeonce",
+    "chaqueta-bomber-efeonce"
+  ],
+  "escena": "SCENE (Efeonce studio at dusk, Santiago): a woman sits at a worktable, elbows on the table, and looks STRAIGHT INTO THE LENS, completely still and razor sharp — she is the one element that holds. She is wearing the Efeonce bomber jacket over the Efeonce navy piqué polo, both exactly as in the references, with the jacket's embroidered chest mark clearly in frame. Around her the studio keeps moving: colleagues crossing behind her and a monitor being lifted and carried past dissolve into long translucent streaks, and a cool blue glow draws continuous light trails low across the room behind her. A LIME-GREEN sticky note on the table edge beside her hand stays sharp with her. Behind her head the plaster wall is one smooth unbroken surface in deep shadow, with nothing hanging on it. 85mm lens at f/8 on a tripod.",
+  "reservas": {
+    "texto": {
+      "muro": "the smooth plaster studio wall behind her",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the near edge of the worktable, a dark laminate top",
+    "tono": "DARK charcoal laminate in shadow, matte, with its fine texture still visible"
+  }
+}

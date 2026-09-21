@@ -1,0 +1,96 @@
+[
+  {
+    "id": "b1-feed",
+    "dominante": [
+      "ya te evaluó",
+      "una IA."
+    ],
+    "contraste": {
+      "etiqueta": 11.69,
+      "entrada": 11.29,
+      "dominante": 9.1,
+      "logo": 6.78
+    },
+    "gapsTinta": [
+      {
+        "entre": "etiqueta→entrada",
+        "px": 10,
+        "ratioDominante": 0.096
+      },
+      {
+        "entre": "entrada→dominante",
+        "px": 9,
+        "ratioDominante": 0.087
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "b2-stories",
+    "dominante": [
+      "Respondió",
+      "una IA."
+    ],
+    "contraste": {
+      "etiqueta": 15.96,
+      "entrada": 15.92,
+      "dominante": 15.29,
+      "logo": 11.23
+    },
+    "gapsTinta": [
+      {
+        "entre": "etiqueta→entrada",
+        "px": 11,
+        "ratioDominante": 0.098
+      },
+      {
+        "entre": "entrada→dominante",
+        "px": 10,
+        "ratioDominante": 0.089
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "b3-display",
+    "dominante": [
+      "Ya hay",
+      "una respuesta."
+    ],
+    "contraste": {
+      "etiqueta": 15.26,
+      "entrada": 15.14,
+      "dominante": 15.87,
+      "logo": 6.75
+    },
+    "gapsTinta": [
+      {
+        "entre": "etiqueta→entrada",
+        "px": 9,
+        "ratioDominante": 0.098
+      },
+      {
+        "entre": "entrada→dominante",
+        "px": 8,
+        "ratioDominante": 0.087
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "a1-muda",
+    "contraste": {
+      "logo": 19.32
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "a2-muda",
+    "contraste": {
+      "logo": 16.85
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  }
+]

@@ -1,0 +1,54 @@
+[
+  {
+    "id": "b1-feed",
+    "plate": "plates/b1-reflejo-45-plate.png",
+    "align": "left",
+    "top": 0.05,
+    "textWidth": 0.8,
+    "label": "VISIBILIDAD EN IA",
+    "lead": "Antes de hablar con tu equipo,",
+    "leadSize": 50,
+    "dominant": "ya te evaluó|una IA.",
+    "dominantSize": 104,
+    "dominantMax": 0.82,
+    "logo": { "width": 0.2, "x": 0.5 }
+  },
+  {
+    "id": "b2-stories",
+    "plate": "plates/b2-larga-916-plate.png",
+    "align": "left",
+    "top": 0.1,
+    "textWidth": 0.82,
+    "label": "VISIBILIDAD EN IA",
+    "lead": "Preguntaron por tu marca.",
+    "leadSize": 50,
+    "dominant": "Respondió|una IA.",
+    "dominantSize": 112,
+    "dominantMax": 0.84,
+    "logo": { "width": 0.2, "x": 0.5 }
+  },
+  {
+    "id": "b3-display",
+    "plate": "plates/b3-larga-169-plate.png",
+    "align": "left",
+    "top": 0.16,
+    "textWidth": 0.34,
+    "label": "VISIBILIDAD EN IA",
+    "lead": "Qué haces, para quién, contra quién.",
+    "leadSize": 42,
+    "dominant": "Ya hay|una respuesta.",
+    "dominantSize": 92,
+    "dominantMax": 0.38,
+    "logo": { "width": 0.2, "x": 0.21 }
+  },
+  {
+    "id": "a1-muda",
+    "plate": "plates/a1-marcado-45-plate.png",
+    "logo": { "width": 0.2, "x": 0.5 }
+  },
+  {
+    "id": "a2-muda",
+    "plate": "plates/a2-proyeccion-45-plate.png",
+    "logo": { "width": 0.2, "x": 0.5 }
+  }
+]
