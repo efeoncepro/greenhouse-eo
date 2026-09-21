@@ -203,7 +203,7 @@ activos canónicos como referencia de forma (edición con `--image`, intención 
 
 | Activo | Referencia usada el 2026-09-19 | Lo que se exige |
 |---|---|---|
-| Nexa | `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png` + hoodie de `ai-generations/2026-09-17_hoodie-efeonce/final/` | color nombrado (`deep navy #023c70, not royal blue`); la v1 salió azul rey |
+| Nexa | **hoy:** `ai-generations/_identidad-nexa/1-anclas/` vía `foto:prompt` · *(el 2026-09-19 fue `2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`, ruta retirada)* + hoodie de `ai-generations/2026-09-17_hoodie-efeonce/final/` | color nombrado (`deep navy #023c70, not royal blue`); la v1 salió azul rey |
 | Logo 3D monumental | kit `ai-generations/2026-09-17_efeonce-logo-3d/kit/monumental-blanco/` (frente o contrapicado) + `ai-generations/2026-09-17_efeonce-logo-3d/ref/logo-silueta.png` | contrato de prompt del kit |
 | Nave | OneDrive `13- Branding/Nave Efeonce 3D/Blanco/Angulos 3D/v01/` vistas 01 y 17 | ventanas, esfera, aleta y cortes de la órbita |
 | Mascotas de partners | OneDrive `14. Mascotas de partners/<Clawd (Claude)\|Codex (OpenAI)>/Poses 3D con accesorios/v01/` | fidelidad de silueta y accesorio |

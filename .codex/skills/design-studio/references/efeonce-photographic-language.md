@@ -267,8 +267,9 @@ pantalla desde el plate original. La máscara no preserva píxeles: verificar id
 - Motor **`gpt-image-2.5-sunburst`** `--quality high` 1152×1440, referencias con rol («Images 1-3 are Julio
   (identity only; ignore their clothing and backgrounds)») + bloque **IDENTITY** con rasgos.
 - Referencias: Julio `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/` (selección según vista mediante `foto:prompt`; el set de 2026-09-17 quedó retirado como ancla de identidad);
-  Nexa `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`, `nexa-the-point.png`,
-  `nexa-the-listen.png`. Identidad sostenida en 5 tomas (135/24/200/50/200 mm).
+  Nexa `ai-generations/_identidad-nexa/1-anclas/` (resuelto por `foto:prompt`). 🔴 Las rutas anteriores
+  —`nexa-the-point.png`, `nexa-the-listen.png`— **son identidad B y quedan retiradas como ancla de rostro**
+  [2026-09-21]. Identidad sostenida en 5 tomas (135/24/200/50/200 mm) con el set anterior.
 - Uniforme: kit del polo como Images 4-5; **revisar el emblema letra por letra** antes de publicar.
 - Detalle: [personas, identidad y vestuario](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md).
 

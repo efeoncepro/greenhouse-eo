@@ -223,7 +223,7 @@ Rutas de referencia:
 |---|---|
 | Julio (rostro) | `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/`; `foto:prompt` selecciona según la vista (`julio-ap-04` es primera opción) |
 | Julio (cuerpo) | El mismo set aprobado; `julio-ap-11` es primera opción. No usar el set de 2026-09-17 como ancla |
-| Nexa | `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`, `nexa-the-point.png`, `nexa-the-listen.png` |
+| Nexa | `ai-generations/_identidad-nexa/1-anclas/`; `foto:prompt` selecciona según la vista (`nexa-ancla-2-rostro-tresquartos` es primera opción, `nexa-ancla-5-cuerpo-frontal` para cuerpo). 🔴 Las rutas anteriores quedan retiradas [2026-09-21]: `nexa-the-point` y `nexa-the-listen` **son identidad B** |
 | Polo | `ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-01-frente…png`, `…-10-detalle-bordado…png` |
 
 ### 3.7.1 Objetos de marca con kit 3D — `objetos` en la ficha **[2026-09-20]**

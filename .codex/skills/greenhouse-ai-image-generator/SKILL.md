@@ -414,7 +414,8 @@ marca), 1152×1440, `high`, ≈ USD 2–2,5 en total.
   festival … fully clothed tourists and locals in t-shirts, caps and sundresses». Ante un bloqueo, reescribir
   contexto y ropa; no insistir con la misma redacción ni forzar otro proveedor para saltarse el filtro.
 - **Nexa en estilo pintado: pedir el navy explícito.** Con la referencia de cuerpo completo
-  (`ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`) + la vista frontal transparente
+  (hoy `ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png`; en esa corrida era
+  `2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`) + la vista frontal transparente
   del kit hoodie (`ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-…-transparente.png`), la
   v1 salió con hoodie **azul rey**. Corrigió «deep navy (#023c70), not royal blue». La identidad de Nexa se conservó
   en el estilo pintado; aun así el hoodie quedó algo más brillante que `#023c70`: revisar el color al 100 %.

@@ -55,9 +55,14 @@ Requisito del operador: el sistema funciona en los tres **[decisión del operado
 |---|---|---|
 | Julio | Rostro | `ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/` (`julio-ap-04` primero; vista resuelta por `foto:prompt`) |
 | Julio | Cuerpo | El mismo set aprobado (`julio-ap-11` primero) |
-| Nexa | Cuerpo completo | `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png` |
-| Nexa | Rostro/gesto | `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-point.png` |
-| Nexa | Rostro/gesto | `ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-listen.png` |
+| Nexa | Rostro | `ai-generations/_identidad-nexa/1-anclas/` (`nexa-ancla-2-rostro-tresquartos` primero; vista resuelta por `foto:prompt`) |
+| Nexa | Cuerpo | El mismo home (`nexa-ancla-5-cuerpo-frontal` primero) |
+
+🔴 **Las rutas anteriores de Nexa quedan RETIRADAS** **[2026-09-21]**. Esta tabla mandaba a
+`nexa-the-point.png` y `nexa-the-listen.png` como «rostro/gesto», y **ambas son la identidad B** — la que el
+operador descartó. Quien siguiera esta tabla anclaba la cara equivocada. Todo el material vigente de Nexa
+vive en `ai-generations/_identidad-nexa/` con su LEEME; lo demás es histórico o banco de poses, nunca ancla
+de rostro.
 
 En tomas con ambos se usaron 2 referencias por persona (Images 1-2 Julio, 3-4 Nexa).
 
