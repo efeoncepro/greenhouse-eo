@@ -7,6 +7,27 @@
 >
 > **Gobierna:** `seo-aeo-practice` (el negocio) · `seo-aeo` (el oficio) · modelo en `business-models/search-visibility-360/`
 
+## 🔴 Qué se promociona: AEO como gancho, SEO como base [operador, 2026-09-21]
+
+El servicio es **SEO y AEO** — pero **hoy el AEO es más comercial**: es lo nuevo, lo urgente y lo que nadie
+tiene resuelto. El SEO es la base que sostiene la promesa y el terreno donde el resultado se mide.
+
+**Matiz que conviene tener a la vista:** la práctica escribe el reframe como *«vendes visibilidad, **entras por
+SEO**»* (`seo-aeo-practice` §3). No se contradice con lo anterior si se separan dos cosas distintas:
+
+| | Qué es | Papel en el embudo |
+|---|---|---|
+| **AEO** | El gancho comercial | Abre la conversación: urgencia, novedad, nadie lo tiene resuelto (etapas 1–3) |
+| **SEO** | La base | Sostiene la promesa y es donde el resultado se ve (etapas 4–5) |
+
+Y las dos se juntan exactamente en la etapa 4, que es el argumento más fuerte del set: **la citación no es un
+canal nuevo — es la condición para que el canal que ya pagas siga rindiendo.** Ahí el AEO deja de ser una
+curiosidad y se vuelve eficiencia del SEO y del paid.
+
+🔴 **Consecuencia para el copy:** arriba del embudo se habla de **motores de respuesta** (ChatGPT, Perplexity,
+Gemini), no de «SEO». La palabra SEO aparece abajo, cuando ya hay evidencia — porque es la palabra que carga
+la cicatriz del prospecto.
+
 ## La tesis que ordena el embudo
 
 Vender SEO no se parece a vender nada más: **el 100% del prospecto ya compró SEO y tiene una cicatriz.** Le
