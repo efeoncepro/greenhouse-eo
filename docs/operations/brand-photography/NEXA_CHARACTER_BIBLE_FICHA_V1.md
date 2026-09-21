@@ -1,120 +1,82 @@
-# Nexa — la ficha del Character Bible, y qué cumple el material
+# Nexa — la ficha del Bible aplicada a producción
 
-> **Qué es esto:** el puente entre el **Character Bible de Nexa Valdés Moreira** —que se declara a sí mismo
-> *«source of truth para toda generación de Nexa»*— y el repositorio, que hasta el 2026-09-21 no lo
-> mencionaba **ni una sola vez**. Aquí vive la parte **verificable** de ese documento (rasgos, accesorios,
-> paleta, expresiones, contextos) y la **medición** de qué cumple el material existente.
+> **Qué es esto:** el puente entre el **Character Bible de Nexa Valdés Moreira** y la producción. El
+> documento completo, transcrito y legible, vive en
+> [`docs/operations/social/NEXA_CHARACTER_BIBLE_V1.md`](../social/NEXA_CHARACTER_BIBLE_V1.md); el original
+> es `Nexa_Character_Bible_Efeonce.docx` (OneDrive `Alineación/7. Branding & Diseño/01. Material Marca
+> (Axis)/07. Proyecto Nexa/`, febrero 2026).
 >
-> **El original manda.** `Nexa_Character_Bible_Efeonce.docx`, febrero 2026, 14 secciones, en OneDrive
-> `Alineación/7. Branding & Diseño/01. Material Marca (Axis)/07. Proyecto Nexa/`. No está versionado.
-> Este archivo **no lo reemplaza ni lo resume**: extrae lo que un agente necesita para generar y validar.
-> Voz, valores, backstory, transparencia y reglas de interacción **sólo** viven en el original.
+> **Este archivo no transcribe: mapea y mide.** Qué referencia del repo corresponde a cada nombre del Bible,
+> qué cumple el material y qué falta.
 
-## Por qué existe este archivo
+## Por qué existe
 
 El Bible cierra diciendo: *«Si algo no está aquí, no se asume — se define primero y se agrega al
 documento»*. Todo el aparato de generación de Nexa se construyó en septiembre de 2026 —anclas, ángulos,
 poses, vestuario, el catálogo de [`build-prompt.mjs`](../../../scripts/foto/build-prompt.mjs), los comandos
-`foto:*`— **sin que ese documento participara**. La decisión de cuál de las dos caras era la canónica
+`foto:*`— **sin que ese documento participara**. La decisión de cuál de las dos caras era canónica
 (2026-09-21) se tomó comparando imágenes entre sí, teniendo una ficha de rostro escrita desde febrero.
 
-No es una crítica a esa decisión: **la decisión fue correcta y este documento la respalda** (ver §Veredicto).
-Es que el árbitro existía y nadie lo abrió.
+La decisión fue correcta y este documento la respalda (ver §Veredicto). El punto es que el árbitro existía y
+no se abrió.
 
-## 1. Ficha física verificable — Bible §3
+## 1. Mapeo — nombre del Bible → referencia del repo
 
-Marcadores para prompt y para QA. Los que deciden identidad van en **negrita**.
+Todo lo de Nexa vive en `ai-generations/_identidad-nexa/`. Se pide por ficha, nunca por ruta a mano:
 
-| Rasgo | Especificación del Bible |
-|---|---|
-| Piel | Oliva cálida, **Fitzpatrick IV**. Ni clara ni oscura. Textura real: **un par de lunares sutiles, uno cerca del pómulo izquierdo**. Explícito: *«no piel de porcelana sintética de IA — piel que se ve vivida»* |
-| Ojos | Castaño oscuro, casi café negro en luz baja, **ámbar cálido con luz directa**. **Forma almendrada, ligeramente rasgados hacia arriba en las esquinas exteriores** |
-| Cejas | **Definidas y expresivas**, naturales, **arco medio**. Cejas que se mueven |
-| Nariz | **Recta con bridge sutil, ligeramente respingada en la punta**. Proporcional |
-| Labios | **Llenos**, naturales, no exagerados. Color natural rosado-terracota. Sonrisa que llega a los ojos |
-| Pómulos y mandíbula | **Pómulos medios-altos**, definidos pero suaves. **Mandíbula suave, mentón ligeramente redondeado** |
-| Cabello | Castaño oscuro casi negro, reflejos cálidos naturales (**no highlights artificiales**), **ondulado con onda suelta**, largo hasta debajo de los hombros |
-| Complexión | Delgada estilizada con presencia, no frágil. Altura aparente 1,70–1,72 m |
-| Maquillaje | Natural-elevado siempre. Cejas definidas, labios terracota/rosado nude/rojo sutil, máscara que abre la mirada. **Nunca pesado ni editorial** |
+```bash
+pnpm foto:prompt <ficha.json>
+```
 
-**Latinidad declarada (§3):** *«latina, inequívocamente latina. No ambiguamente internacional ni étnicamente
-neutral»*.
+```json
+{ "identidad": [{ "persona": "nexa", "expresion": "the-read" }] }
+{ "identidad": [{ "persona": "nexa", "vestuario": "speaker-1" }] }
+{ "identidad": [{ "persona": "nexa", "vista": "perfil-izq" }] }
+```
 
-## 2. Signature elements — Bible §5.1
+Las tres dimensiones ocupan **la misma ranura** —la referencia que se antepone— así que pedir dos aborta.
 
-🔴 El Bible dice del anillo que es **«el ancla visual más fuerte — incluir en cada prompt»**. Son las anclas
-que la identifican *aunque no se le vea la cara*.
+### Las ocho expresiones canónicas (Bible §6)
 
-| Elemento | Especificación |
-|---|---|
-| **Anillo statement** | **Índice de la mano derecha**. **Geométrico, plata mate**. No ostentoso pero con diseño. Aparece en primer plano, medio cuerpo y al gesticular |
-| **Reloj** | **Muñeca izquierda**. Correa **navy de cuero o mesh metálica plateada**. **Carátula pequeña y limpia** |
-| **Aretes** | **Siempre presentes**, variables por contexto: studs geométricos pequeños (profesional) a aros medianos (casual). **Predominantemente plata o con detalles en azul.** Nunca recargados |
-| **Uñas** | Arregladas, cortas-medianas. **Default navy oscuro o nude rosado.** Para contenido bold: naranja o fucsia de la paleta |
-
-## 3. Paleta de wardrobe — Bible §5.2
-
-- **Base dominante (70 %):** navy profundo, negro, blanco crudo, gris antracita. *El navy reemplaza al negro
-  como primera opción.*
-- **Acentos de energía:** naranja, fucsia/magenta, azul eléctrico. **Uno a la vez**, nunca los tres juntos.
-- **Acentos secundarios:** púrpura, verde lima, sólo en accesorios o detalles pequeños.
-- 🔴 **Lo que NO usa:** neón, pasteles, estampados llamativos, animal print, logos visibles de marcas, y
-  *«colores fuera de la paleta Efeonce (nada de **terracota**, burdeo, verde oliva)»*.
-
-**Ambigüedad del original [pendiente]:** §5.2 prohíbe *terracota* en ropa mientras §3.1 y §3.4 lo prescriben
-para labios. Mismo nombre de color prohibido y recetado en el mismo documento — corregir el término en el
-original, o el prompt hereda la contradicción.
-
-## 4. Las ocho expresiones canónicas — Bible §6 → `3-poses/`
-
-El Bible pide usar **estos nombres como shorthand de producción**. El set del repo ya los cubre uno a uno;
-lo que falta es que el catálogo los conozca.
-
-| Nombre interno | Archivo en `_identidad-nexa/3-poses/` | Descripción facial (Bible) |
+| Nombre del Bible | `expresion` | Archivo |
 |---|---|---|
-| The Spark | `nexa-pose-the-spark.png` | Sonrisa con ojos, tilt de cabeza 2-3° derecha, mirada directa. **Expresión default** |
-| The Breakdown | `nexa-pose-the-breakdown.png` | Boca abierta a media frase, cejas levantadas, mano explicando |
-| The Read | `nexa-pose-the-read.png` | Una ceja más arriba (izquierda), media sonrisa asimétrica. Ironía inteligente |
-| Deep Work | `nexa-pose-deep-work.png` | Mirada abajo y a un lado, leve frunce de concentración |
-| The Point | `nexa-pose-the-point.png` | Mirada directa, seria pero no dura, sin sonrisa |
-| Got It | `nexa-pose-got-it.png` | Mid-laugh, ojos entrecerrados, cabeza atrás o al lado |
-| The Listen | `nexa-pose-the-listen.png` | Cabeza inclinada a la izquierda, micro-sonrisa, ojos atentos |
-| Mic Drop | `nexa-pose-mic-drop.png` | Mirada directa, ceja levantada, sombra de sonrisa. Confiada, no arrogante |
+| The Spark · **default** | `the-spark` | `3-poses/nexa-pose-the-spark.png` |
+| The Breakdown | `the-breakdown` | `3-poses/nexa-pose-the-breakdown.png` |
+| The Read | `the-read` | `3-poses/nexa-pose-the-read.png` |
+| Deep Work | `deep-work` | `3-poses/nexa-pose-deep-work.png` |
+| The Point | `the-point` | `3-poses/nexa-pose-the-point.png` |
+| Got It | `got-it` | `3-poses/nexa-pose-got-it.png` |
+| The Listen | `the-listen` | `3-poses/nexa-pose-the-listen.png` |
+| Mic Drop | `mic-drop` | `3-poses/nexa-pose-mic-drop.png` |
 
-## 5. Los cinco contextos de vestuario — Bible §5.3 → `4-vestuario/`
+Las ocho son **planos medios**: ninguna es de cuerpo entero.
 
-| Contexto del Bible | Archivos | Estado |
+### Los cinco contextos de vestuario (Bible §5.3)
+
+| Contexto del Bible | `vestuario` | Estado |
 |---|---|---|
-| Profesional / Presentaciones | `nexa-vest-prof-1..3` | ✓ 3 |
-| Contenido casual / Redes | `nexa-vest-casual-1..6` | ✓ 6 |
-| Tech / Conferencias como speaker | `nexa-vest-speaker-1..3` | ✓ 3 |
-| Behind-the-scenes / Home office | `nexa-vest-home-1..5` | ✓ 5 |
+| Profesional / Presentaciones | `prof-1` … `prof-3` | ✓ 3 · las tres de cuerpo entero |
+| Contenido casual / Redes | `casual-1` … `casual-6` | ✓ 6 · `casual-3..6` de cuerpo |
+| Tech / Conferencias como speaker | `speaker-1` … `speaker-3` | ✓ 3 · las tres de cuerpo |
+| Behind-the-scenes / Home office | `home-1` … `home-5` | ✓ 5 · `home-2` y `home-4` de cuerpo |
 | **Lifestyle / Exterior urbano** | — | 🔴 **falta entero** |
 
-**Look signature más fuerte (§5.3):** blazer navy profundo sobre top blanco. `Avatar Cuerpo Completo v2` lo
-cumple exacto, con pantalón navy y stilettos negros puntiagudos.
+Cuáles ya muestran la silueta completa está declarado en `vestuarioDeCuerpo`, verificado mirando las 17 en
+hoja de contacto: si la referencia ya es de cuerpo, añadir además el cuerpo frontal mete dos cuerpos sin
+rostro cercano y hace derivar la cara.
 
-## 6. Entornos e iluminación — Bible §8 y §9 (no auditados)
+🔴 **Deuda de acabado:** `2-angulos/`, `3-poses/` y `4-vestuario/` conservan el **acabado sintético** del
+maestro anterior (se derivaron de él por injerto de rostro), contra el *«piel que se ve vivida»* de §3.1.
+Sirven para gesto, encuadre y outfit; **si la pieza necesita piel creíble en primer plano, la referencia de
+rostro tiene que ser un ancla.**
 
-Seis entornos tipo: **The Studio** · **The Office** · **The Stage** · **The Café** · **Home Base** ·
-**Urban**. Tres esquemas de luz canónicos:
-
-- **Nexa Light** (principal): softbox 45° a la izquierda, algo por encima de los ojos; rim suave
-  atrás-derecha; **4000-4200 K**; ratio máximo 2:1. Para Studio, Office y Home Base.
-- **Golden Nexa** (natural): golden hour, cálida y direccional. Para Café y Urban.
-- **Stage Nexa** (dramática): key frontal más dura, backlight visible, spill de color. Para Stage y opinión
-  con mood intenso.
-
-§9 advierte que **la iluminación es el segundo factor de consistencia después de los rasgos faciales**.
-Estos tres esquemas **no** se contrastaron contra el material en la auditoría de abajo.
-
-## 7. Auditoría contra el material — 2026-09-21 **[medido]**
+## 2. Auditoría contra el material — 2026-09-21 **[medido]**
 
 **Muestra: 7 imágenes de un universo de ~100.** No es un inventario.
 
 - Identidad **A**: `01-GPT-Image-2-empatica.png`, `Avatar 3,4 v2.png`, `Avatar Cuerpo Completo v2.png` y
-  `_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png`.
-- Identidad **B**: `hf_20260409_205637_2285abe3…png` (avatar), `Poses y expresiones/The Breakdown/hf_20260409_212045_60104fe1…png`,
+  `1-anclas/nexa-ancla-1-rostro-frontal.png`.
+- Identidad **B**: `hf_20260409_205637_2285abe3…png`, `Poses y expresiones/The Breakdown/hf_20260409_212045_60104fe1…png`,
   `Vestuario/Contenido casual  Redes/hf_20260401_202852_4031f191…png`.
 
 ### Rostro — cumple A, no cumple B
@@ -128,67 +90,80 @@ Estos tres esquemas **no** se contrastaron contra el material en la auditoría d
 | Lunares sutiles, piel vivida | ✓ pecas y lunar visibles | ✗ piel más limpia |
 | Piel oliva cálida Fitzpatrick IV | ✓ | ~ |
 
-### Signature elements — falla en las dos identidades
+### Signature elements — el metal estaba invertido
 
 | §5.1 pide | Observado en la muestra |
 |---|---|
-| Anillo geométrico plata mate, **índice derecho** | **0 de 5** con manos visibles. `Avatar Cuerpo Completo v2`: anillos finos **dorados** en los **anulares** de ambas manos. The Breakdown: dorado en anular. Contenido casual: cuadrado y plateado —lo más cercano— con piedra azul, y no en el índice |
+| Anillo geométrico plata mate, **índice derecho** | **0 de 5** con manos visibles. `Avatar Cuerpo Completo v2`: anillos finos **dorados** en los **anulares**. The Breakdown: dorado en anular. Contenido casual: cuadrado y plateado —lo más cercano— con piedra azul, y no en el índice |
 | Reloj muñeca izquierda, **carátula pequeña y limpia** | **1 de 5**. El único presente tiene carátula **grande y ornamentada** |
 | Aretes siempre, **predominantemente plata** | 5 de 5 presentes ✓ · **dorados en 5 de 5** ✗ |
 | Uñas de un color, navy o nude | Una pieza con **azul-púrpura y fucsia en la misma mano** ✗ |
 
-🔴 **El metal está invertido de forma sistemática**: la ficha pide plata, el material entrega oro, en las dos
-identidades y en todas las piezas. Eso no es deriva del modelo: **es una instrucción que nunca viajó al
-prompt** (ver §Causa raíz).
-
-🔴 **El set canonizado es el que menos cumple.** El anillo geométrico plateado aparece en material de **B**,
-que quedó como banco de poses. **A** gana en rostro y no tiene ni anillo correcto ni reloj.
-
 *Nota de método: en imágenes generadas no se puede garantizar izquierda/derecha por el espejado. Lo robusto
 es el **dedo** (anular en vez de índice) y el **metal**, que no dependen de eso.*
 
+### 🔴 Corrección a esa auditoría: `4-vestuario/` sí cumple
+
+La muestra de arriba miró **anclas y material de OneDrive**. Verificado después sobre las 17 del set en hoja
+de contacto, `4-vestuario/` **porta los signature elements y cumple el contexto con precisión**: reloj y
+anillo visibles en varias, bun alto y lentes de luz azul en `home` (§5.3 contexto 4 exacto), acento naranja y
+azul eléctrico en `speaker`, blazer navy sobre blanco en `prof`.
+
+**La brecha de accesorios está concentrada en las ANCLAS, no en todo el set.** Y las anclas son justo lo que
+se antepone siempre, así que sigue importando.
+
 ### Paleta
 
-- Un `hf_` del avatar lleva **chaqueta terracota completa**: §5.2 la prohíbe por nombre, y ahí no es acento,
-  es el outfit entero.
-- `Avatar Cuerpo Completo v2` (navy + blanco crudo + stilettos negros) y la pieza casual (suéter navy, denim
-  oscuro, botines blancos) **cumplen**.
+Un `hf_` del avatar lleva **chaqueta terracota completa**: §5.2 la prohíbe por nombre y ahí no es acento, es
+el outfit entero. `Avatar Cuerpo Completo v2` (navy + blanco crudo + stilettos negros) cumple el «look
+signature más fuerte».
 
-## 8. Veredicto A/B contra el documento
+## 3. Veredicto A/B contra el documento
 
-**La identidad A es la canónica también según el Bible**, no sólo por decisión del operador del 2026-09-21.
-Cinco de seis rasgos de §3.1 la favorecen y ninguno favorece a B. La decisión queda respaldada por la ficha.
+**La identidad A es la canónica también según el Bible**, no sólo por decisión del operador. Cinco de seis
+rasgos de §3.1 la favorecen y ninguno favorece a B. La decisión queda respaldada por la ficha; esto no
+reabre nada, le da árbitro escrito para la próxima vez.
 
-Esto **no** reabre nada: confirma lo decidido y le da árbitro escrito para la próxima vez.
+## 4. Lo que se corrigió — 2026-09-21
 
-## 9. Causa raíz de la deriva de accesorios **[medido]**
+El campo `identity` del bloque `nexa` describía a **cualquiera**: *«long dark wavy hair, fair olive skin,
+dark eyes and defined brows»*. No discriminaba entre las dos identidades, y por eso el material derivaba: el
+prompt no pedía los rasgos. Hoy lleva los marcadores de §3.1-3.4, y los signature elements de §5.1 viajan
+como **bloque aparte**. Bloques verbatim en
+[`EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md`](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 
-El campo `identity` del bloque `nexa` en [`build-prompt.mjs`](../../../scripts/foto/build-prompt.mjs)
-describe hoy a una persona genérica:
+🔴 **Una excepción de procedencia, declarada:** el `winged upper lash line` **no está en el Bible**. Sale del
+LEEME de `_identidad-nexa/`, donde es el rasgo que separa la identidad canónica de la descartada. Entra como
+marcador de continuidad con el material aprobado, **no como cita del documento de marca**.
 
-> *«a woman in her early thirties with long dark wavy hair, fair olive skin, dark eyes and defined brows»*
+🔴 **El «incluir en cada prompt» del anillo no es físicamente sostenible**, y el bloque lo dice. La marca se
+pierde por el **encuadre**, no por la referencia: medido el 2026-09-21 sobre la misma ficha y las mismas
+entradas, la cinta del lanyard a ~12 px de ancho volvió como manchas sin una sola letra y a ~40 px salió
+legible. **Un anillo en plano entero tiene menos píxeles que esa cinta fallida.** Por eso el texto pide
+renderizarlos *«whenever the relevant body part is in frame AND large enough to resolve»*: se sostiene en la
+vista `manos`, en un busto con manos en cuadro y en primeros planos — que es exactamente el **Detail Shot**
+de §10, *«donde los signature accessories brillan»*.
 
-Ninguno de los marcadores de §3.1 viaja ahí, y **ninguno de los tres signature elements existe en el
-pipeline**. El material no los tiene porque nunca se pidieron. Cualquier corrección que no arregle el
-catálogo va a volver a derivar.
-
-## 10. Lo que este documento NO resuelve
+## 5. Lo que queda abierto
 
 | Pendiente | Quién decide |
 |---|---|
-| 🔴 **Ropa corporativa Efeonce** (hoodie, polo, gorra, softshell, bomber, lanyard): el Bible define cinco contextos con **estilo propio** y **no contempla uniforme**. Son dos sistemas de vestuario para la misma persona sin árbitro | Operador |
-| **El cargo**: el carnet del lanyard dice *«AI Specialist»*; el Bible §14 define el rol como *«Evangelizadora del modelo, voz del ecosistema»* | Operador |
-| Falta el contexto **Lifestyle / Exterior urbano** (§5) | Producción |
-| `2-angulos/`, `3-poses/` y `4-vestuario/` conservan el **acabado sintético** del maestro anterior, contra el *«piel que se ve vivida»* de §3.1 | Operador (deuda ya declarada en el LEEME del set) |
-| Reinyectar los signature elements a las **anclas** — o bajarlos de §5.1 | Operador |
-| Desambiguar **terracota** en el original | Marca |
+| 🔴 **Ropa corporativa Efeonce** (hoodie, polo, gorra, softshell, bomber, lanyard): §5 define cinco contextos con **estilo propio** y no contempla uniforme. Dos sistemas de vestuario para la misma persona sin árbitro | Operador |
+| **El cargo**: el carnet del lanyard dice «AI Specialist»; §14 dice «evangelizadora del modelo, voz del ecosistema» | Operador |
+| **Reinyectar los signature elements a las ANCLAS** — o bajarlos de §5.1. Salida barata dentro del canon («editar conserva, generar reconstruye»): editar **una sola** imagen, `1-anclas/nexa-ancla-8-manos.png`, que es la vista `manos`. Re-sellar después con `pnpm foto:assets:lock` | Operador |
+| Falta el contexto **Lifestyle / Exterior urbano** | Producción |
+| Deuda de **acabado sintético** en ángulos, poses y vestuario | Operador (ya declarada en el LEEME del set) |
+| Desambiguar **terracota** (prohibida en ropa, recetada en labios) en el original | Marca |
+| **§13.2 contra §11**: «no finge experiencias humanas» contra una backstory que §11 declara fuente de verdad para referirse a su experiencia. Falta la regla de **cómo** la refiere | Marca |
 | Entornos (§8), iluminación (§9) y composiciones (§10) **sin auditar** contra el material | Producción |
 
 ## Verificación
 
 ```bash
-pnpm foto:assets:check   # catálogo y lock coinciden por sha256
+pnpm foto:assets:check   # catálogo y lock coinciden por sha256 · 104 assets
+pnpm vitest run scripts/foto/build-prompt.test.ts
 ```
 
-Ese comando vigila `_identidad-nexa/`. **No** vigila el original en OneDrive ni los assets declarados por
-`assetDeUso`/`usoPorPersona` — pendiente registrado en el LEEME de la corrida de uniforme del 2026-09-21.
+El sellador cubre las **tres** dimensiones de una persona (`vistas`, `expresiones`, `vestuario`): recorrer
+sólo `vistas` habría dejado 25 referencias fuera de todo gate desde el momento de declararlas. **No** vigila
+el original en OneDrive.

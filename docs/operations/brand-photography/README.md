@@ -47,12 +47,13 @@ nadie. Detalle en [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELIN
 | 6 | [`EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md`](./EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) | Personas: casting, gesto, mirada, piel; Julio y Nexa (referencias, identidad, QA); uniforme | Claude |
 | 7 | [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) | **Catálogo de palancas**: el índice de las **33 en cuatro familias** (5 siempre activas · 4 atmósferas · 1 acción suspendida · 23 de encuadre), qué campo pide cada una y cuántas admite una pieza; ficha completa de las 23 de encuadre; las 20 tomas de cámara nombradas; las cinco descartadas con su razón medida | Claude |
 | 8 | [`EFEONCE_PHOTO_BLIND_AUDIT_2026-09-20.md`](./EFEONCE_PHOTO_BLIND_AUDIT_2026-09-20.md) | **Auditoría ciega**: dos evaluadores independientes sin acceso al canon; qué coincidió, los tells de generación, el plan derivado y la ronda «obra real» | Claude |
-| 9 | [`NEXA_CHARACTER_BIBLE_FICHA_V1.md`](./NEXA_CHARACTER_BIBLE_FICHA_V1.md) | **Nexa — la ficha del Character Bible**: rasgos verificables, signature elements, paleta, las 8 expresiones canónicas y los 5 contextos de vestuario del documento de marca (OneDrive, febrero 2026) mapeados al set del repo; la auditoría medida de qué cumple el material y el veredicto A/B contra la ficha | Claude |
+| 9 | [`NEXA_CHARACTER_BIBLE_FICHA_V1.md`](./NEXA_CHARACTER_BIBLE_FICHA_V1.md) | **Nexa, el Bible aplicado a producción**: qué referencia del repo corresponde a cada nombre del documento de marca (las 8 expresiones, los 5 contextos), la auditoría medida de qué cumple el material, el veredicto A/B contra la ficha y lo que queda abierto | Claude |
 
 ## Registros y evidencia
 
 | Recurso | Ruta | Qué contiene |
 |---|---|---|
+| Character Bible de Nexa | [`docs/operations/social/NEXA_CHARACTER_BIBLE_V1.md`](../social/NEXA_CHARACTER_BIBLE_V1.md) | El documento de marca completo y legible: valores, voz, retrato físico, audio, wardrobe, expresiones, lenguaje corporal, entornos, iluminación, composiciones, backstory, transparencia y reglas de interacción. Original en OneDrive |
 | Bitácora del caso | [`docs/operations/social/2026-09-19-efeonce-photographic-language-production-method.md`](../social/2026-09-19-efeonce-photographic-language-production-method.md) | Ronda por ronda: qué se probó, qué resultó, qué decidió el operador, qué se aprendió, fallos con números |
 | Corrida de evidencia | [`ai-generations/2026-09-19_lenguaje-fotografico-efeonce/`](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md) | Prompts verbatim por ronda (`batch*.json`, `*.txt`), bloques de prompt, scripts de medición y composición. Las imágenes son locales (gitignoreadas) |
 | Entrega en OneDrive | `5. Contenidos/13- Branding/Lenguaje Fotografico Efeonce/v01/` | Carpeta de entrega de la versión 1 para el equipo |

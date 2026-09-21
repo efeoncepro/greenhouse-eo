@@ -3,6 +3,11 @@
 Inventario local verificado el 2026-09-13; es un recurso de Marketing Efeonce, no el contrato del
 asistente conversacional de Greenhouse. No confundir ambos dominios.
 
+**Quién es Nexa:** [`NEXA_CHARACTER_BIBLE_V1.md`](./NEXA_CHARACTER_BIBLE_V1.md) — valores, voz, retrato
+físico, wardrobe, expresiones canónicas, backstory y reglas de interacción. Esta biblioteca es el MATERIAL;
+ese documento es el PERSONAJE. Para producir con el set del repo, la
+[ficha aplicada](../brand-photography/NEXA_CHARACTER_BIBLE_FICHA_V1.md).
+
 ## Ubicación
 
 `/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/10. Nexa (Influencer IA)`
