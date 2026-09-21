@@ -182,6 +182,31 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   corrígelo ANTES de generar** — generar sobre un manifiesto equivocado propaga el error a todas las vistas.
   **[pendiente]** sólo está corregida `02-espalda` de la softshell (`v02`,
   `ai-generations/2026-09-21_espalda-bordada/`); el resto de espaldas de **softshell y bomber** siguen estampadas.
+- 🔴 **La marca se pierde por el ENCUADRE, no por la referencia** **[medido 2026-09-21]**. Si el emblema, la
+  cinta del lanyard o el carnet quedan chicos en el cuadro, el modelo los sustituye por una mancha con forma
+  parecida **aunque la referencia oficial esté entre las imágenes de entrada**. Prueba controlada sobre la
+  MISMA ficha, la MISMA referencia y las mismas cinco imágenes, cambiando una variable por vez: plano medio
+  con dos personas + `high` → cinta sin una letra y carnet ilegible; **plano corto (chest-up) + `high`** →
+  «Empower your Growth», «efeonce», y el carnet con cabecera, foto, «Nexa» y «AI Specialist»; plano corto +
+  `xhigh` → igual, con el remate algo más limpio. **Manda el encuadre: subir la calidad sin cerrar el plano
+  no arregla nada y cuesta más.** Umbral orientativo medido sobre los recortes: la cinta falla a ~12 px de
+  ancho y se lee a ~40 px; el carnet falla a ~38 px de alto y funciona a ~100 px.
+  **Regla: si la marca tiene que leerse, el encuadre se decide por ella.** Si la escena exige un plano
+  abierto, entonces sí corresponde el otro camino — que no se lea (de espaldas, en sombra, pequeña; la
+  palanca `proyeccion` lo resuelve por construcción) o componerla encima.
+  Esto **reconcilia** dos cosas del canon que parecían chocar: el manifiesto del lanyard dice que el arte
+  plano falla, y las vistas de espalda del mismo día salieron exactas **con** arte plano — aquéllas son
+  vistas de kit, donde la estampa ocupa medio cuadro. Es el mismo hecho visto desde el otro lado.
+  Caso fuente: `ai-generations/2026-09-21_nexa-uniforme-terreno/LEEME.md`.
+- 🔴 **Un kit que entrega en otra resolución es INVISIBLE para el catálogo** **[medido 2026-09-21]**. El
+  lanyard determinístico se entregó como `1024x1536` y el `patron` del kit está fijo a `1200x1600`: el
+  nombre nunca calza, así que las vistas 14 y 15 no podían declararse en `vistas` aunque existieran en
+  `final/`. Por eso el lanyard existía desde esa misma mañana y una sesión lo «redescubrió» por la tarde —
+  **no fue descuido de quien lo produjo**. Se cableó por `usoPorPersona`, que sí acepta el nombre completo.
+  Al agregar una vista a un kit, **verifica que el nombre calce con su `patron`** o decláralo por el otro
+  camino. **[pendiente]** `pnpm foto:assets:check` **no sella los assets de uso**: recorre `persona.refs`,
+  `persona.vistas` y las vistas de kit por patrón, pero ni `assetDeUso` ni `usoPorPersona` — que son los que
+  viajan a las escenas. Si alguien los sustituye, ningún gate lo detecta.
 - **Código de vestuario Efeonce** **[operador, 2026-09-20]**: la prenda dice el REGISTRO de la escena.
   **Polera piqué** = oficina casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno ·
   **Hoodie** = terreno · **Lanyard y carnet** = transversales, van en casual y en formal por igual. Se elige por

@@ -645,3 +645,59 @@ referencia es un ancla** de `1-anclas/`.
 
 **Condición de cierre:** regenerarlas es **decisión del operador**; hasta que la tome, la deuda queda abierta y la
 regla de arriba es la mitigación vigente.
+
+## Delta 2026-09-21 (tarde) — la marca se pierde por el ENCUADRE, no por la referencia **[medido]**
+
+Cierra una pregunta que estaba abierta de facto: por qué el emblema bordado y el lanyard salen a veces
+exactos y a veces como una mancha, **con la misma referencia oficial entre las imágenes de entrada**.
+
+### La prueba
+
+Misma ficha, misma referencia (`efeonce-lanyard-15-conjunto-deterministico-nexa`, sha `adc49569…`), las
+mismas cinco imágenes de entrada, `gpt-image-2.5-sunburst`. Se cambió **una variable por vez**:
+
+| Variante | Encuadre | Calidad | Tamaño | Cinta del lanyard | Carnet |
+|---|---|---|---|---|---|
+| `chaqueta-comite-v02` | plano medio, dos personas | `high` | 1152×1440 | ✗ manchas, ni una letra | ✗ ilegible |
+| `chaqueta-v04-cerrado-high` | **plano corto** (chest-up) | `high` | 1024×1536 | ✓ «Empower your Growth», «efeonce» | ✓ cabecera, foto, «Nexa», «AI Specialist», eslogan |
+| `chaqueta-v03-cerrado` | plano corto | `xhigh` | 1024×1536 | ✓ | ✓ remate algo más limpio |
+
+**Manda el encuadre.** Con `high` y plano corto ya sale legible: `xhigh` mejora el remate pero **no** es lo
+que decide. **Subir la calidad sin cerrar el plano no arregla nada y cuesta más.**
+
+Umbral orientativo, medido sobre los recortes (estimación, no límite exacto): la cinta falla a **~12 px** de
+ancho y se lee a **~40 px**; el carnet falla a **~38 px** de alto y funciona a **~100 px**.
+
+> **Regla: si la marca tiene que leerse, el encuadre se decide por ella.** Si la escena exige un plano
+> abierto donde la marca queda chica, entonces sí corresponde el otro camino — que no se lea (de espaldas,
+> en sombra, a escala pequeña; la palanca `proyeccion` lo resuelve por construcción, porque pone a la
+> persona de espaldas dentro del haz) o componerla encima.
+
+### Qué reconcilia
+
+El manifiesto del lanyard dice que el modelo tergiversa el logotipo **también cuando se le pasa el arte
+plano**, y sin embargo las vistas de espalda del 2026-09-21 salieron exactas **usando** arte plano. No se
+contradicen: aquéllas son **vistas de kit**, donde la estampa ocupa medio cuadro. Es el mismo hecho del
+encuadre visto desde el otro lado.
+
+### Dos afirmaciones anteriores que quedan CORREGIDAS
+
+- «No hay camino generativo para el emblema, hay que componer»: **falso**. Lo hay, con plano corto.
+  Componer es el camino cuando la escena exige plano abierto, no siempre.
+- «La solución es pasar el arte plano de la marca»: **falso**, y ya lo decía el manifiesto del lanyard.
+
+### Dos huecos de mecanismo que aparecieron en la misma corrida **[pendiente]**
+
+1. **Un kit que entrega en otra resolución es invisible para el catálogo.** El lanyard determinístico se
+   entregó como `1024x1536` y el `patron` del kit está fijo a `1200x1600`: el nombre nunca calza, así que
+   las vistas 14 y 15 **no podían declararse** en `vistas` aunque existieran en `final/`. Por eso el
+   lanyard existía desde esa misma mañana y una sesión lo «redescubrió» por la tarde — no fue descuido de
+   quien lo produjo. Quedó cableado por `usoPorPersona`, que sí acepta el nombre completo. **Al agregar una
+   vista a un kit, verifica que el nombre calce con su `patron`.**
+2. **`pnpm foto:assets:check` no sella los assets de uso.** `rutasDeclaradas()` recorre `persona.refs`,
+   `persona.vistas` y las vistas de kit construidas por patrón, pero **ni `assetDeUso` ni `usoPorPersona`**
+   — que son justamente los que viajan a las escenas. Verificado: al cablear el lanyard el lock siguió
+   marcando 66 assets. Si alguien sustituye uno de esos archivos, ningún gate lo detecta.
+
+Bitácora con las seis piezas, sus palancas y los errores de proceso:
+`ai-generations/2026-09-21_nexa-uniforme-terreno/LEEME.md`.
