@@ -126,6 +126,26 @@ Comando: **`pnpm foto:lanyard --nombre "<N>" --cargo "<C>" --foto <retrato.png> 
 
 **Nunca:** publicar una marca tal como sale del generador.
 
+## 4 bis. Cuándo hace falta armar, y cuándo NO **[operador, 2026-09-21]**
+
+🔴 **Armar sólo cuando la pieza lleva algo que CAMBIA por persona u ocasión.** Si lo que lleva es
+**fijo**, ya está resuelto en el kit y el trabajo es **elegir la vista**, no reconstruirla.
+
+| Pieza | ¿Qué lleva? | ¿Hay que armar? |
+|---|---|---|
+| **Lanyard** | el **carnet**, que cambia por persona — Julio, Nexa, cada quien el suyo | **Sí.** No puede existir una vista fija: se arma cada vez con `pnpm foto:lanyard` |
+| **Hoodie** | la estampa de espalda: logo + «Empower your Growth», **siempre la misma** | **No.** Se compuso una vez con `estampa-espalda.mjs`, entró como referencia a las 35 vistas del kit y quedó lista — incluida `16-puesto-espalda`, con la estampa impecable sobre la prenda puesta |
+| **Polo, chaqueta, gorra** | emblema o logotipo **fijo** | **No.** Mismo caso que el hoodie |
+
+**Este documento nació de un error de esta clase y estuvo a punto de repetirlo.** Tras resolver el
+lanyard se anotó «el parche de la espalda del hoodie es el siguiente candidato» — y el operador
+corrigió en el acto: *«el hoodie ya está así con el logo y eslogan armado y listo»*. Tenía razón; se
+propuso reconstruir lo que llevaba días resuelto, que es exactamente el error que este contrato existe
+para evitar.
+
+**La pregunta que hay que hacerse antes de armar nada: ¿lo que lleva esta pieza cambia según quién la
+use o la ocasión? Si la respuesta es no, abre el kit.**
+
 ## 5. Las proporciones se calculan del objeto real
 
 **Ninguna medida se estima a ojo.** Dos correcciones del operador el 2026-09-21, ambas detectadas a la
