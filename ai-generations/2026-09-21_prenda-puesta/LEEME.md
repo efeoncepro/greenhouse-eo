@@ -22,3 +22,17 @@ Hallazgo paralelo de la sesión peer en el kit del lanyard, mismo día.
 Instrucción que acompaña a la referencia: «Image 3 shows this same person ALREADY WEARING the exact uniform for
 this scene. Copy that uniform EXACTLY as it appears there… Ignore the office background of image 3 entirely;
 only the garments and how they sit on her carry over.»
+
+## Confirmado en las dos personas (2026-09-21)
+
+| Prueba | Asset de uso | Resultado |
+|---|---|---|
+| Nexa, terreno | `gorra-efeonce/out/prueba-nexa.png` | logotipo completo legible + isotipo del polo correcto, **a la primera** |
+| Julio, terreno | `gorra-efeonce/out/prueba-julio.png` | idem, **a la primera** |
+| Lanyard en reunión (sesión peer) | conjunto terminado | logotipo de la cinta legible, el mejor de cinco intentos |
+
+La regla queda cerrada con evidencia de los dos lados. **Bonus no menor:** las pruebas en persona son de
+**cuerpo entero**, que es lo que el canon exige para vestir a una persona real («nunca sólo retratos») y que no
+se estaba cumpliendo — se pasaban tres retratos.
+
+Contrato canónico de selección de referencia: `docs/operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md`.
