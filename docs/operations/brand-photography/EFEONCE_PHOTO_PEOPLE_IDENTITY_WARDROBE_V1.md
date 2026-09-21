@@ -341,6 +341,41 @@ propia, no.
 > para mirarlas. No deciden —un emblema se compara letra por letra contra el kit, no por píxeles—:
 > quitan la excusa de no haberlo mirado.
 
+### La técnica de aplicación la decide la TELA, no la costumbre del kit **[decisión del operador, 2026-09-21]**
+
+La prenda no es sólo un color y un corte: también es una **técnica de aplicación**, y la técnica no la
+elige el kit, la **impone la tela**. El operador vio la espalda de la chaqueta softshell en una pieza y la
+rechazó con una sola frase: **«esa tela se borda no se estampa»**.
+
+Se verificó y era cierto: las **cuatro vistas de espalda** de la softshell mostraban logotipo y eslogan en
+**tinta plana**, sin relieve ni puntada — y **el propio manifiesto del kit lo declaraba así**: «lleva la
+estampa canónica».
+
+| Tela | Técnica | Por qué |
+|---|---|---|
+| **Softshell y chaquetas técnicas** | **Bordado** | La serigrafía sobre tela técnica se **agrieta y se despega** |
+| **Piqué** (polo) | **Bordado** | Ya era así |
+| **Algodón afelpado** (hoodie) | **Abierta** **[pendiente]** | La serigrafía es legítima y el bordado también se hace. **No la des por resuelta:** es decisión del operador |
+
+**El kit estaba inconsistente consigo mismo**: el polo recibió su arte de espalda **bordado** el mismo día
+en que chaqueta y hoodie seguían declarando «estampa».
+
+🔴 **El error venía del MANIFIESTO, no del prompt.** De ahí la regla operativa: **antes de generar
+cualquier vista de una prenda, verifica qué técnica declara su manifiesto; si contradice la tela, corrige
+el manifiesto ANTES de generar.** Generar sobre un manifiesto equivocado **propaga el error a todas las
+vistas**, y cada vista lo vuelve más caro de deshacer. Es el mismo patrón ya medido en esta jornada: **el
+dato existía y nadie lo miró** (ver §`Antes de construir, buscar si ya existe`).
+
+**Evidencia de la corrección:** `ai-generations/2026-09-21_espalda-bordada/out/softshell-02-espalda-bordada-v01.png`,
+con el prompt verbatim en `ai-generations/2026-09-21_espalda-bordada/prompts/softshell-02-espalda.txt`. El arte
+con texto se pasó como **imagen determinística**; **nunca se le pidió al modelo que lo dibujara** —el mismo
+contrato que gobierna el emblema y la firma—.
+
+**Deuda declarada [pendiente]:** sólo está corregida la vista **`02-espalda` de la softshell**, que queda en
+el kit como **`v02`**. Las demás vistas de espalda de **softshell y bomber** —plano cenital, puesta en hombre,
+puesta en mujer— **siguen estampadas**. **Condición de cierre:** regenerarlas con el arte bordado y resellar
+el manifiesto del kit, de modo que ninguna vista de esas dos prendas siga declarando «estampa».
+
 ## Delta 2026-09-21 — dos identidades conviven como «Nexa» y el oficio del retrato cercano
 
 Fuente: corrida `copiloto` (Nexa + Clawd), ~20 generaciones, con verificación cruzada de la sesión peer

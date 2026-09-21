@@ -103,6 +103,53 @@ La prenda base fija la prenda, pero **no fija la orientación del emblema**: se 
 - **Tono sobre tono sólo si la marca se lee por relieve.** En el polo no se leía y el operador lo descartó: «el logo
   se pierde». Para uso corporativo, hilo de contraste: blanco sobre navy, navy sobre blanco.
 
+### La aplicación de marca la decide LA TELA, no la costumbre del kit
+
+**Delta 2026-09-21 [decisión del operador].** El operador vio una pieza con la espalda de la chaqueta softshell y
+la corrigió de inmediato: **«esa tela se borda no se estampa»**. Se verificó y era cierto **[medido]**: las vistas
+`efeonce-chaqueta-softshell-02-espalda`, `10-plano-espalda`, `15-puesto-espalda` y `17-puesto-espalda-mujer`
+mostraban el logotipo y el eslogan en **tinta plana**, sin relieve ni puntada, y el propio manifiesto del kit lo
+declaraba así —«lleva la **estampa** canónica»—. El kit estaba además inconsistente consigo mismo: el polo recibió
+ese mismo día su arte de espalda **bordado**, mientras chaqueta y hoodie seguían declarando estampa.
+
+La regla, por tela:
+
+| Tela | Aplicación | Por qué |
+|---|---|---|
+| **Softshell y chaquetas técnicas** | **BORDADO** | la serigrafía sobre tela técnica **se agrieta y se despega**; no es un capricho estético |
+| **Piqué (polo)** | **bordado** | ya era así; es la prenda más formal frente a cliente |
+| **Algodón afelpado (hoodie)** | la **serigrafía es legítima**; el bordado grande en espalda también se hace, más caro | **decisión abierta del operador** — no darla por resuelta en ninguna dirección |
+
+🔴 **Antes de generar cualquier vista de una prenda, verificar en el manifiesto qué técnica declara. Si la técnica
+declarada contradice la tela, se corrige el manifiesto ANTES de generar** — generar sobre un manifiesto equivocado
+propaga el error a todas las vistas, y el error queda con aspecto de decisión.
+
+#### La formulación que produjo un bordado convincente
+
+Pieza de evidencia: `ai-generations/2026-09-21_espalda-bordada/out/softshell-02-espalda-bordada-v01.png`, prompt
+verbatim en `prompts/softshell-02-espalda.txt`. Los marcadores que funcionaron conviene listarlos porque son
+**verificables a ojo**:
+
+- cada letra y cada forma **rellena de puntada satinada densa**, con la **dirección** de la puntada visible y
+  cambiando de un trazo de letra al siguiente, atrapando la luz distinto en cada trazo;
+- el bordado **levemente elevado** sobre la tela, con sombra en el borde inferior de cada forma y brillo en el
+  superior, para que tenga espesor real;
+- el **borde festoneado** que deja el satén, nunca un canto vectorial perfectamente liso;
+- el **brillo sutil del hilo de rayón**, más luminoso que la tela mate de alrededor;
+- la tela **levemente fruncida y tensada** por la puntada, como tira el bordado real;
+- y la **negación explícita**: sin tinta, sin vinilo, sin transfer, sin serigrafía, **sin ninguna zona de color
+  plano liso** en toda la prenda.
+
+**El texto nunca se le pide al modelo**, tampoco acá. El arte de espalda —logotipo + «Empower your Growth»— entra
+como **imagen 2** desde el archivo determinístico
+`ai-generations/2026-09-17_chaqueta-efeonce/ref/estampa-espalda.png`, con la instrucción de reproducirlo exacto
+(§3). Lo que cambia entre estampado y bordado es **cómo se aplica**, no de dónde sale el arte.
+
+⚠️ **Deuda declarada.** De las vistas de espalda de las **dos chaquetas** (softshell y bomber), en cada una
+producto, plano cenital, puesta en hombre y puesta en mujer, sólo está corregida la `02-espalda` de la softshell,
+como `v02`. **Las demás siguen estampadas** y hay que rehacerlas con esta formulación antes de usarlas en una pieza
+donde la espalda se lea.
+
 ## 4. Proporciones declaradas (el modelo las mueve si no se fijan)
 
 - **Emblema del pecho:** mismo tamaño y posición que el asset oficial. **Nunca se reduce** — corrección expresa del
@@ -233,7 +280,7 @@ descarte, y más si la prenda lleva emblema bordado: ahí los descartes son por 
 
 ## Delta 2026-09-17 — dónde va la estampa de espalda
 
-La estampa canónica (logo completo + eslogan al 38 % del ancho de la espalda) va en el **hoodie** y en las **chaquetas (softshell y bomber) sí la llevan**, por decisión del operador. **Revertido el 2026-09-21: el polo también la lleva, BORDADA.** (ver delta al final). Si una serie ya se produjo con la regla anterior, se rehacen sólo las vistas de espalda (prenda sola, plano cenital y puesta) con la estampa como imagen 2.
+El arte canónico de espalda (logo completo + eslogan al 38 % del ancho de la espalda) va en el **hoodie** y en las **chaquetas (softshell y bomber)**, por decisión del operador. **Revertido el 2026-09-21: el polo también lo lleva, BORDADO** (ver delta al final). **Qué técnica se usa lo decide la tela, no el kit** — softshell y chaquetas técnicas van bordadas: ver §3, «La aplicación de marca la decide LA TELA». Si una serie ya se produjo con la regla anterior, se rehacen sólo las vistas de espalda (prenda sola, plano cenital y puesta) con la estampa como imagen 2.
 
 ## Delta 2026-09-17 — elegir la vista por cómo se usa la prenda
 

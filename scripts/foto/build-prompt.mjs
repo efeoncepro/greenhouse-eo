@@ -481,8 +481,16 @@ export const OBJETOS = {
     // `colgado` lleva un portacarnet sin datos, así que el modelo inventa el nombre y el cargo.
     // Que exista no garantiza fidelidad al meterlo en una escena — el modelo vuelve a redibujarlo —, así
     // que el carnet legible se verifica ampliado y, si no se sostiene, se compone encima.
+    // Apunta a la ENTREGA del kit, no a la carpeta de trabajo donde se armó: mismo archivo byte por byte
+    // (sha adc49569…), pero la carpeta de una corrida es histórico y puede moverse.
+    //
+    // 🔴 Estas dos vistas NO pueden declararse arriba en `vistas`: la entrega salió como `1024x1536` y el
+    // `patron` del kit está fijo a `1200x1600`, así que el nombre nunca calza. Ésa es la razón mecánica
+    // por la que el lanyard determinístico existía desde la mañana del 2026-09-21 y el catálogo no lo
+    // veía — no fue descuido de quien lo produjo, fue un patrón que no admite otra resolución.
     usoPorPersona: {
-      nexa: '../../2026-09-21_lanyard-deterministico/nexa/lanyard-nexa-terminado.png'
+      nexa: 'efeonce-lanyard-15-conjunto-deterministico-nexa-1024x1536-v01-fondo-estudio.png',
+      generico: 'efeonce-lanyard-14-conjunto-deterministico-1024x1536-v01-fondo-estudio.png'
     },
     vistaDefecto: 'colgado'
   },

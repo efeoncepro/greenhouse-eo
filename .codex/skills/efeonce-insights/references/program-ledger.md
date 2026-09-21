@@ -172,8 +172,14 @@ tender decks: separate issue for the catalog owner.
 - Catálogo `insights-report` (A4 794×1123): registry, resolvers, tokens, fuentes, assets y la plantilla
   `ReportAnalysisPage`, que **renderiza** a PDF/PNG.
 
-**Lo que NO existe todavía:** las otras 7 plantillas A4, el catálogo `insights-deck` completo, `src/lib/copy/insights.ts`,
-el mapper que conecta plan editorial → páginas, y la admisión de `report_pdf` (Slice 3, el backend va último).
+**Cerrado después (mismo día):** las plantillas A4 (5 con molde compartido), el catálogo `insights-deck` (16:9, 4
+composiciones), `src/lib/copy/insights.ts` como SSOT del copy, el `report-mapper` con figuras/tablas paginadas/límites,
+y `report_pdf` admitido en sus 4 puntos (contrato, command por output, mapper, worker). Triple documentación
+actualizada: arquitectura §14.7, funcional v1.7 y manual.
+
+**Lo que NO existe:** rollout. Nada desplegado, sin canary, sin push. El `deck_pdf` productivo sigue componiendo con
+`deck-axis` — ese cutover es un cambio de comportamiento y necesita su propio canary. Falta el baseline del gate
+visual para los catálogos nuevos, `UI ready: yes` (GVC premium + scorecard) y la verificación runtime.
 
 **Gap heredado que esta task NO cierra:** el planner determinista emite **2 de 15** familias (`bar`,
 `bar_grouped`). Las otras 13 tienen geometría probada con fixtures y **ningún productor**. Ampliar el planner es

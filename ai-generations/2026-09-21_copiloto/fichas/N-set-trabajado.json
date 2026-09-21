@@ -1,0 +1,20 @@
+{
+  "id": "N-set-trabajado",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "identidad": ["nexa"],
+  "objetos": ["polo-efeonce"],
+  "atmosfera": "bruma",
+  "escena": "SCENE (a staged piece for a campaign, shot on a BUILT SET on the agency's stage — not a found wall): the background is designed and has DEPTH IN LAYERS. Directly behind her, about two metres back, stands a wall of VERTICAL DARK OAK SLATS with narrow black gaps between them, the acoustic slat panelling of a real stage: the wood grain is visible and the slats cast their own thin vertical shadows. That panelled wall does not fill the frame: it ENDS at the right, and beyond its edge the stage keeps going into darkness, where a black truss upright and a folded black flag on a C-stand are just readable, small and far out of focus. A slim vertical LED tube burning deep saturated ACTIVE BLUE, rgb(3,117,219), stands BEHIND the slat wall at the left, BELOW THE MIDDLE OF THE FRAME, so its blue escapes BETWEEN THE SLATS in thin vertical bars and rims the edge of her hair and shoulder — the wall is drawn by light, not painted. Nexa stands slightly off centre to the left, her body angled a few degrees to her right while she LOOKS STRAIGHT INTO THE LENS, one hand in the pocket of her trousers, shoulders relaxed, chin level, lips closed with a faint lift at one corner. Her head stays FRONTAL: both eyes and both eyebrows fully visible, both cheeks visible, the bridge of her nose does not cut across either cheek. Her irises are VERY DARK BROWN, almost black, so dark that the iris barely separates from the pupil — never hazel, amber or honey, and no golden ring. She wears the navy blue Efeonce piqué polo. 🔴 CRITICAL — HER SKIN STAYS NEUTRAL: the KEY is a single WHITE LED panel low and to the LEFT, off camera, stronger on her than the blue tube, so her face, her arms and the front of the polo read in TRUE, NEUTRAL SKIN AND FABRIC COLOUR, never tinted blue, never cyan, never cold-cast; the blue only touches the slats, the haze and the edges of her silhouette, and NEVER washes over the front of her face. The key gives the short readable shadow of her nose on the cheek, so she is modelled and not flat. The ONE warm accent is a small ORANGE rgb(245,93,1) tally light on a camera body at the far right, tiny and out of focus — nothing else glows warm. THREE PLANES: the out-of-focus black corner of a road case at the very front; Nexa sharp in the middle; the slat wall and, beyond its edge, the dark depth of the stage with the truss. There is NO blue painted panel, NO printed backdrop, NO bookshelf, NO plant and NO domestic decor: the blue is LIGHT and the texture is REAL WOOD. She stands LOW: the very top of her head is at or BELOW 38% of the frame height, and the whole TOP THIRD of the picture is the upper part of the slat wall in shadow, completely unbroken — no tube, no glow, no truss, no blue bar and no light patch may enter that band. Everything is unbranded except her polo. 85mm at f/2.8, focus on her eyes.",
+  "lecho": {
+    "objeto": "the black corner of a road case standing right at the lens, its metal edge and latch crossing the ENTIRE bottom of the frame from left edge to right edge, a hand's width from the camera and dissolved completely out of focus. It sits OUTSIDE every light: neither the white key nor the blue tube reaches it",
+    "tono": "NEAR-BLACK and NEUTRAL, the darkest thing in the picture and even across its whole width, with NO blue cast on it — NOTHING else appears in that bottom strip: no hands, no cable, no highlight, no reflection, no lettering"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the upper part of the dark oak slat wall, in shadow, filling the top third",
+      "tinta": "blanca"
+    }
+  }
+}

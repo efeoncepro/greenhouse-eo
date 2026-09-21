@@ -173,6 +173,15 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   orden: que **no se lea** (de espaldas, en sombra, pequeño) · **componerlo** después · **editar con máscara**.
   **NUNCA** publicar el emblema tal como sale del generador, y **NUNCA** cerrar sin `pnpm foto:emblema`: el QA
   sobre una hoja de contacto no sirve, a 520 px un bordado no se lee y pasa por bueno.
+- 🔴 **La técnica de aplicación de marca la decide la TELA, no la costumbre del kit** **[operador, 2026-09-21]**:
+  «*esa tela se borda no se estampa*». **Softshell y chaquetas técnicas → bordado** (la serigrafía sobre tela
+  técnica se agrieta y se despega) · **piqué → bordado** (ya lo era) · **algodón afelpado del hoodie → abierto**,
+  lo decide el operador. **El error venía del MANIFIESTO, no del prompt**: las cuatro vistas de espalda de la
+  softshell declaraban «la estampa canónica» mientras el polo ya recibía su espalda bordada. Por eso, **antes de
+  generar cualquier vista de una prenda, verifica qué técnica declara su manifiesto; si contradice la tela,
+  corrígelo ANTES de generar** — generar sobre un manifiesto equivocado propaga el error a todas las vistas.
+  **[pendiente]** sólo está corregida `02-espalda` de la softshell (`v02`,
+  `ai-generations/2026-09-21_espalda-bordada/`); el resto de espaldas de **softshell y bomber** siguen estampadas.
 - **Código de vestuario Efeonce** **[operador, 2026-09-20]**: la prenda dice el REGISTRO de la escena.
   **Polera piqué** = oficina casual · **Chaqueta** = reunión o instancia importante · **Gorra + polo** = terreno ·
   **Hoodie** = terreno · **Lanyard y carnet** = transversales, van en casual y en formal por igual. Se elige por

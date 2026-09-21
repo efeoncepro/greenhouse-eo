@@ -393,3 +393,34 @@ Códigos de rechazo de evidencia: `unsupported_window` (grano no servible; suele
 - Estado, rollout, límites e invariantes: arquitectura §14.
 - Señales: `src/lib/reliability/queries/insights-edition-signals.ts`. Eventos: `insights.*` en `GREENHOUSE_EVENT_CATALOG_V1.md`.
 - Tests: `pnpm vitest run --project unit src/lib/efeonce-insights` · `pnpm test:live src/lib/efeonce-insights`.
+
+## Revisar un informe o un deck antes de que exista en producción (2026-09-21)
+
+Los catálogos de Insights componen en local sin depender de nada desplegado. Sirve para revisar el
+documento **antes** de encargarlo de verdad.
+
+1. Compila la marca de los tres catálogos y verifica que ninguno quedó desincronizado:
+
+   ```bash
+   pnpm composer:brand-pack --check
+   ```
+
+2. Comprueba que no se coló ningún color literal en una plantilla:
+
+   ```bash
+   pnpm composer:color-ledger
+   ```
+
+3. Los PDF y PNG quedan bajo `.captures/`, que **no es un entregable**: es taller local. Un archivo
+   ahí no acredita que la salida exista en producción.
+
+**Qué mirar, y por qué no basta con que los tests estén verdes.** Los defectos que aparecieron en
+este trabajo no los vio ninguna suite: un riel de barra que se leía como si fuera el dato, un valor
+impreso sin su unidad, y una verificación de coherencia que no podía fallar nunca. Todos salieron de
+abrir el archivo y mirarlo. Revisa **todas** las páginas exportadas, a tamaño físico, y también en
+escala de grises: el informe se imprime.
+
+**Si el render se rechaza, léelo como información, no como falla.** El sistema se detiene cuando una
+afirmación excede el molde, cuando una etiqueta no representa el valor que dibuja su barra, o cuando
+una figura no tiene hechos medibles. En los tres casos el mensaje dice la causa, y la corrección va
+en el plan o en el catálogo — nunca en recortar el texto.

@@ -798,6 +798,40 @@ canary productivo. Los huérfanos en `running` sin lease requieren decisión hum
   ejecuciones del Job aún en curso antes de lanzar otra.
 - **Sigue fuera:** `INSIGHTS_ISSUANCE_ENABLED` OFF (paso de producto); `report_pdf` → TASK-1847; `web` → TASK-1848.
 
+### 14.7 Estado de TASK-1847 — catálogos y gráficos (construido en local, 2026-09-21)
+
+**Qué existe y está probado** (424 tests verdes entre `efeonce-insights` y `artifact-composer`,
+typecheck limpio, gates del worker OK):
+
+- **Decisión de paginación:** `GREENHOUSE_ARTIFACT_VERTICAL_PAGINATION_DECISION_V1.md` (`Accepted`).
+  El motor no pagina pero ya sabía medir: `measureSlideFit()` expone esa medición como consulta y
+  `assertSlideFitsCanvas` pasa a consumirla. `paginateFlow()` es **puro** —recibe capacidades, no
+  toca el navegador— y vive domain-free en el composer para que un segundo informe vertical
+  (TASK-1672) pueda usarlo sin copiarlo.
+- **Geometría de 15 familias** en `artifact-composer/chart-geometry.ts`, domain-free: barras
+  (simple/agrupada/apilada), línea, circular/dona con techo de 3 porciones, dispersión, bullet,
+  embudo, cascada, medidor, heatmap, waffle, Venn de dos conjuntos con áreas proporcionales reales
+  y UpSet. Venn de tres NO se implementa: con tres conjuntos las áreas proporcionales exactas en
+  general no existen, y uno que las aparente miente.
+- **Marca:** `compile-catalog-tokens.ts` compila una vez para N catálogos. `deck-axis` recompila
+  byte-idéntico.
+- **Catálogos nuevos:** `insights-report` (A4 794×1123, 5 plantillas + molde compartido) e
+  `insights-deck` (16:9, 4 composiciones + molde). Ambos con brand pack `axis`, sin HEX literal y
+  con contraste WCAG AA verificado.
+- **Copy:** `src/lib/copy/insights.ts` es SSOT y cierra un drift real — el planner y el mapper
+  tenían títulos de módulo **distintos**, de modo que el plan sellado y su render se contradecían.
+- **`report_pdf` admitido:** el catálogo se resuelve **por output** (era una constante única, y eso
+  era lo que impedía una segunda salida), cada salida sella su propio manifest, el evento del run
+  sella el hash del conjunto, y el worker registra los dos catálogos nuevos.
+
+**Qué NO existe:** rollout. Nada desplegado, sin canary, sin push. El `deck_pdf` productivo sigue
+componiendo con `deck-axis`: ese cutover es un cambio de comportamiento y necesita su propio canary.
+Falta también el baseline del gate visual para los catálogos nuevos, `UI ready: yes` (GVC premium y
+scorecard) y la verificación runtime.
+
+**Límite honesto de las familias:** el planner determinista emite `bar` y `bar_grouped`. Las otras
+13 tienen geometría probada con fixtures y **ningún productor**; no se ofrecen como disponibles.
+
 ### 14.6 Estado de TASK-1848 — sharing, correo y recurrencia (en producción con flags OFF, 2026-09-18)
 
 > Los bloques «Construido» y «Pendiente» de abajo registran el estado al cerrar el código (commits locales, sin

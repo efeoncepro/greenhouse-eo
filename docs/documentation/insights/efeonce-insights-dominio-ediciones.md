@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-18 por Claude (TASK-1848 en producción con los interruptores apagados: compartir por enlace, envío por correo y recurrencia)
+> **Ultima actualizacion:** 2026-09-21 por Claude (TASK-1847: el informe A4 y los gráficos del deck, construidos en local y sin desplegar)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -60,7 +60,45 @@ Como emitir todavía no es posible, hoy un cliente que pide una edición la ver�
 cifras visibles: eso es lo esperado hasta que su deck esté renderizado y un interno la emita (el render del deck
 ya corre en staging y producción, pero la emisión sigue apagada en todos los ambientes).
 
-## Estado de disponibilidad (2026-09-18)
+## Los dos formatos y sus gráficos (2026-09-21, construido sin desplegar)
+
+Una edición produce **el mismo contenido en dos formatos**, y la diferencia no es de estilo sino de
+cómo se lee cada uno:
+
+| | **Deck** | **Informe A4** |
+|---|---|---|
+| Para qué | proyectarse y hojearse | leerse sentado, sin quien lo presente |
+| Densidad | una conclusión por lámina | capítulos continuos, con notas al margen |
+| Pie | sólo la dirección web | dirección, teléfono y folio en **cada** página |
+| Largo | acotado | hasta decenas de páginas, con índice |
+
+**Los gráficos salen del dato, nunca se dibujan a mano.** El sistema calcula cada barra desde el
+número que la acompaña y **se detiene si el texto impreso no coincide con lo que dibuja**. Un
+gráfico cuya barra no corresponde a su etiqueta no se publica: se rechaza con la causa.
+
+**Qué puede graficar hoy:** barras simples, agrupadas y apiladas, líneas, circular y dona,
+dispersión, embudo, cascada, medidor, mapa de calor, waffle, bullet, Venn de dos conjuntos y UpSet.
+**De todas ellas, el sistema hoy produce automáticamente sólo barras**: el resto está construido y
+probado, pero todavía no hay quien genere esos datos. No están ofrecidas como disponibles.
+
+**Tres cosas que el sistema se niega a hacer**, porque harían mentir al informe:
+
+- **Circular con más de tres porciones.** Pasadas unas pocas, nadie compara ángulos: adivina. Se
+  ofrece una barra en su lugar.
+- **Rellenar un hueco.** Si falta un dato, la línea se corta y la ausencia viaja a la página de
+  límites. No se une el trazo ni se dibuja un cero.
+- **Recortar para que quepa.** Si una afirmación o una tabla exceden el espacio, el informe se
+  rechaza con la causa. Nunca sale un texto amputado.
+
+**Un capítulo sin datos no desaparece**: se cuenta en palabras y su falta queda declarada en la
+página de cierre, «Lo que esta edición no puede afirmar». Desaparecerlo convertiría la falta de
+datos en silencio.
+
+## Estado de disponibilidad (2026-09-21)
+
+> **Delta 2026-09-21 (TASK-1847):** el informe A4 y el catálogo propio del deck están construidos y
+> renderizan, pero **no están desplegados**: nada de esto se puede pedir todavía desde el portal ni
+> por API en producción. El deck que hoy se produce sigue usando el catálogo comercial.
 
 **Disponible en producción** desde el 2026-09-15 para las organizaciones que tengan el módulo `insights_v1`
 asignado. Lo que está encendido y lo que no:

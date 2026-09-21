@@ -1,5 +1,17 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-21 · El riel de una barra puede leerse como el dato.** En el deck, el fondo del riel usaba `fieldMid`
+  (#023c70) sobre el navy del molde y se leía como una barra llena: el valor chico (3,1 %) parecía grande. Ningún
+  test lo vio; salió de abrir el PNG. Regla: el riel va un escalón por encima del fondo (`fieldEdge`), nunca a media
+  distancia entre fondo y relleno — un riel que compite con su relleno es un segundo dato que nadie declaró.
+- **2026-09-21 · `CompositionPlanInput` usa `artifactId`, no `deckId`.** Una sonda con el campo equivocado compone
+  igual y deja un `undefined.manifest.json` y un `undefined.pdf` junto a los archivos buenos. No es un bug del motor:
+  es el campo mal escrito, y el motor no lo reclama.
+- **2026-09-21 · El llenador clona el PRIMER HIJO del contenedor.** Un campo declarado directamente sobre ese hijo
+  (`<th data-slot-field="label">`) no se encuentra: el campo va DENTRO del elemento repetible
+  (`<th><span data-slot-field="label">`). Y un dato de presentación que se repetiría por fila —la alineación de una
+  columna numérica— se resuelve en el CSS del molde por posición, no declarándolo en cada item.
+
 - **2026-09-21 · Una guarda que no puede fallar es una afirmación, no un mecanismo.** Escribí en el resolver del
   catálogo A4 una verificación de que la etiqueta impresa representara el valor que dibuja la barra, y la anuncié en
   el commit. Estaba muerta: `printedValue` es `string` por contrato y el helper sólo aceptaba `number`, así que
