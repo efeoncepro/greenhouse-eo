@@ -1,8 +1,9 @@
 # Catálogo de palancas fotográficas Efeonce V1
 
 > **Tipo de documento:** Catálogo canónico de oficio (maestro de palancas)
-> **Versión:** 2.2 · **Creado:** 2026-09-20 por Claude
-> **Estado:** treinta y tres palancas en cuatro familias, aprobadas por el operador tras tres rondas de prueba medidas el 2026-09-20.
+> **Versión:** 2.3 · **Creado:** 2026-09-20 por Claude · **Última actualización:** 2026-09-21 por Claude
+> **Estado:** treinta y cuatro palancas en cuatro familias. Treinta y tres aprobadas por el operador tras tres rondas de prueba
+> medidas el 2026-09-20; `copiloto` entra el 2026-09-21 desde una pieza aprobada (el KV «Tu IA no conoce tu negocio», 17/09).
 > **Relacionado:** [maestro](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [reservas](./EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md)
 
 Una **palanca** es una decisión de oficio que cambia lo que la foto *hace*, no lo que muestra.
@@ -14,9 +15,9 @@ Una **palanca** es una decisión de oficio que cambia lo que la foto *hace*, no 
 | [A. Siempre activas](#a-las-cinco-siempre-activas-el-bloque-de-impacto) | 5 | van solas en cada prompt (`impacto: false` las apaga) | las cinco |
 | [B. Atmósfera](#b-atmósfera--el-aire-que-hace-visible-la-luz) | 4 | `atmosfera` | una, opcional |
 | [C. Acción suspendida](#c-acción-suspendida--lo-que-está-en-vuelo) | 1 | `suspendido` | opcional, **1 de cada 4 piezas** |
-| [D. Encuadre y punto de vista](#d-las-veintitrés-de-encuadre-y-punto-de-vista) | 23 | `palanca` | **una sola** |
+| [D. Encuadre y punto de vista](#d-las-veinticuatro-de-encuadre-y-punto-de-vista) | 24 | `palanca` | **una sola** |
 
-Son **33 palancas**, y se combinan con las **[20 tomas de cámara](#las-veinte-tomas-del-catálogo-de-cámara)**
+Son **34 palancas**, y se combinan con las **[20 tomas de cámara](#las-veinte-tomas-del-catálogo-de-cámara)**
 —ojo de pez, dron cenital, tilt-shift, contrapicado, macro, tele, barrido…— que dicen **con qué** se fotografía.
 Además hay [otros ejes](#otros-ejes-que-deciden-la-pieza-y-no-son-palancas) —formato, reserva,
 lecho, cámara, objetos de marca, identidad— que deciden la pieza pero tienen documento propio. El maestro define el
@@ -112,7 +113,7 @@ de menos de ocho caracteres, porque dejarlo abierto hace que el modelo elija, **
 > **Dosis: 1 de cada 4 piezas** **[decisión del operador]**. El comando cuenta la tanda y avisa con el número.
 > Es también la razón por la que no vive en el bloque siempre activo: ahí volaría algo en cada foto.
 
-## D. Las veintitrés de encuadre y punto de vista
+## D. Las veinticuatro de encuadre y punto de vista
 
 ### De luz y tiempo
 
@@ -355,6 +356,36 @@ negro** en la imagen. **Ni pantalla ni monitor**: la imagen vive sobre material,
 **Ojo.** No es `luz-motivada`: ahí la fuente es luz; acá **lo que se proyecta es la obra**.
 **Evidencia.** `H4` (Ciudad de México) · a la primera.
 
+### De la relación con la máquina **[2026-09-21, desde una pieza aprobada]**
+
+> **Por qué es su propia familia.** «Del oficio de decidir» fotografía el juicio humano y deja a la máquina
+> fuera del cuadro. Ésta la **mete** — y la fotografía perdiendo. Comparte con ese grupo la misma prohibición:
+> nunca robots, circuitos ni interfaces flotantes.
+
+#### `copiloto` — la IA está, y no sabe
+**Qué es.** La criatura de un partner **acompaña a la persona**, y **las dos comparten el gesto**. La foto trata
+del **límite** de la máquina, no de su poder: la IA está presente y **no sabe**.
+**Cómo se logra.** Una mascota de marca de tamaño juguete —unos 25 cm, real y física, bien hecha, con escala
+correcta y sombras de contacto— **se posa SOBRE la persona**: hombro, antebrazo, o el escritorio justo al lado.
+Está visiblemente **atascada**: esperando, desconcertada, fuera de su alcance. La persona reacciona a ese hueco
+—encogimiento de hombros, cejas arriba, manos abiertas— y mira **a la criatura o más allá**, nunca al lente.
+**Una sola criatura**, y **nunca se redibuja**: se copia de su referencia tal como es.
+🔴 **Exige el campo `criatura`** y sale siempre de un kit de mascota (Clawd, Codex, Nexa). El campo obliga a
+declararla para que nadie invente un robot genérico. Ejemplos que el comando trae: *«Clawd, sitting on her
+shoulder with a question mark floating above it»* · *«Codex, standing on the desk beside the laptop, looking up
+and waiting»*.
+**Ojo — la POSE se elige del kit, no se pide** **[medido, 5 pasadas]**. Pedirle al modelo una pose que la
+referencia no tiene lo hace **redibujar el asset**: Clawd volvió con cinco formas distintas (patas largas, cuerpo
+cuadrado, ojos chicos). Se resolvió pasando la pose que el kit **ya tenía**: `efeonce-clawd-3d-07-salto-en-el-aire`
+trae **los dos brazos levantados y separados** — exactamente el encogimiento que la pieza necesitaba. La
+interacción puede derivarse; la **forma** se copia del kit.
+**Guarda `contradice`.** El bloque aborta si la escena mete *hologram*, *holographic*, *glowing interface*,
+*floating ui/interface/screen*, *circuit*, *neural network* o *data stream*: son la parte que no vale nada y la
+que hace todo el mundo, y acá lo que se fotografía es que la máquina **no** sabe. Sin esa guarda la pieza se iba
+a ciencia ficción.
+**Evidencia.** Nace de una pieza **pre-canon aprobada por el operador** —el KV «Tu IA no conoce tu negocio»,
+2026-09-17— y de su encargo de convertirla en palanca. Implementada en `build-prompt.mjs`, commit `cdb1fabad`.
+
 ## Las cinco descartadas y por qué **[medido]**
 
 Valen tanto como las aprobadas: evitan repetir el gasto.
@@ -454,13 +485,14 @@ comunica, para qué servicios sirve, su lecho y el **contraste del logo medido**
 | `fragmento` | `corta` — por dónde corta el borde |
 | `oclusion` | `ocluye` — qué cubre al sujeto |
 | `dentro-del-objeto` | `objetoContenedor` — dentro de qué está la cámara |
+| `copiloto` | `criatura` — qué mascota de partner acompaña, y cómo está puesta |
 | `cenital`, `little-planet` | normalmente `lecho: "sin-lecho"` + `sinLechoPorque` |
 
 Las demás no exigen campos extra. El comando aborta si falta uno, listando qué espera.
 
 ## Qué falta **[pendiente]**
 
-- **Tabla de selección por tipo de pieza.** Con quince palancas, el problema ya no es cuáles existen sino **cuál
+- **Tabla de selección por tipo de pieza.** Con veinticuatro palancas de encuadre, el problema ya no es cuáles existen sino **cuál
   usar cuándo**. Un retrato de equipo no pide lo mismo que una pieza de oficio sin personas ni que una de evento.
 - **Prueba de reconocimiento.** Sigue abierta desde el maestro: sin ella el lenguaje es un sistema consistente,
   no un activo distintivo medido.

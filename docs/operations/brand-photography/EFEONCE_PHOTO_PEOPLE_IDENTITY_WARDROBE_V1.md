@@ -3,7 +3,7 @@
 > **Tipo de documento:** Especificación técnica y funcional de marca
 > **Versión:** 1.0
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-20
+> **Última actualización:** 2026-09-21
 > **Estado:** Aprobado por el operador el 2026-09-19 (piezas de exploración; ninguna publicada)
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](./EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Cámaras](./EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Prompts y pipeline](./EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Guía de kits de marca](../social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md) · [Biblioteca de Nexa](../social/NEXA_CREATIVE_RESOURCE_LIBRARY.md) · Evidencia `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/rondas/personas/`
 
@@ -340,3 +340,141 @@ propia, no.
 > emblema, y **`pnpm foto:emblema <plate.png>`** recorta y amplía las zonas del bordado en una hoja
 > para mirarlas. No deciden —un emblema se compara letra por letra contra el kit, no por píxeles—:
 > quitan la excusa de no haberlo mirado.
+
+## Delta 2026-09-21 — dos identidades conviven como «Nexa» y el oficio del retrato cercano
+
+Fuente: corrida `copiloto` (Nexa + Clawd), ~20 generaciones, con verificación cruzada de la sesión peer
+«Poses de Nexa en advertising y design studio». Hechos verbatim en
+`ai-generations/2026-09-21_copiloto/HECHOS.md`.
+
+### Bajo el nombre «Nexa» conviven DOS identidades; la canónica es la **A** **[medido · decisión del operador, 2026-09-21]**
+
+El hallazgo lo inició la sesión peer comparando por hash contra OneDrive y se verificó de forma independiente
+en esta sesión, recortando los rostros al mismo tamaño y poniéndolos lado a lado.
+
+| | **Identidad A** | **Identidad B** |
+|---|---|---|
+| Rostro | cara ancha, cejas gruesas y rectas, delineado marcado, labios llenos | cara larga y angulosa, cejas finas arqueadas, sin delineado, labios medianos |
+| Dónde vive | `5. Contenidos/10. Nexa (Influencer IA)/01. Material/01. Avatar/`: `01-GPT-Image-2-empatica.png`, `02..05-NanoBanana-*.png` (bustos con hoodie, fondo neutro) + `Avatar 3,4 v2` + `Avatar Cuerpo Completo v2` | mismo `01. Avatar/` (los `hf_2026*` con blazer) + `Poses y expresiones/` (24 img) + `Vestuario/` (23 img) |
+| Aprobación | **la del KV «Tu IA no conoce tu negocio» aprobado el 2026-09-17** | sin aprobación documentada como identidad canónica |
+| Material | poco | mucho, **incluido un turnaround de 9 vistas** |
+
+- **Las dos conviven DENTRO de la misma carpeta `01. Avatar/`**: los bustos con hoodie son A, los `hf_*` con
+  blazer son B.
+- Consecuencia que causó ~20 pasadas: **se generaba con una y se validaba contra la otra**, así que el QA decía
+  «la identidad coincide» mientras el operador veía que no.
+- **La identidad canónica es la A** **[decisión del operador, 2026-09-21, tomada en la sesión «Poses de Nexa en
+  advertising y design studio» sobre la lámina `ai-generations/2026-09-21_copiloto/dos-identidades-nexa.jpg`]**.
+  Consecuencias operativas:
+  - El set de ángulos se construye **editando desde `nexa-avatar-34-v2`**, no recortando el turnaround, que es B.
+  - `nexa-the-point` y `nexa-the-breakdown` son B y **no pueden seguir en `refs`** del bloque `nexa` del catálogo
+    de identidad. La tercera referencia sale de los bustos con hoodie de `01. Material/01. Avatar/`.
+  - **B no se borra: pasa a banco de material** —poses corporales, vestuario, escenarios, gesto, encuadres—,
+    todo lo que NO sea rostro. Usar B como referencia de ROSTRO queda prohibido; usarla como referencia de POSE
+    es una decisión aparte, aún abierta al cierre de esta sesión.
+- **Por qué estuvo latente desde abril** **[medido]**: la cara publicada en el KV aprobado es A pese a que esa
+  corrida mezcló las tres referencias, porque **2 de 3 eran A** y el promedio cayó de ese lado. La mezcla no
+  dejó de existir: ganó por mayoría en esa pieza concreta.
+
+### Los cuatro rasgos que discriminan A de B **[verificados por la peer en el macro]**
+
+1. **Delineado del párpado superior con rabillo**: A lo tiene, B no.
+2. **Nariz**: B más larga y con el puente más alto.
+3. **Labios**: B más finos.
+4. **Óvalo**: B más largo.
+
+Matiz honesto: la ceja del turnaround es más gruesa que la de `the-point`, así que **no es un clon exacto de B**
+— pero en el eje A/B cae claramente del lado B.
+
+### El iris NO discrimina identidades; sí es QA de salida **[medido]**
+
+El color de iris fue una hipótesis descartada por medición: **A rgb(64,49,34) · B rgb(51,43,36)**, ambas castaño
+muy oscuro. Lo que las separa es la ESTRUCTURA (óvalo, cejas, labios, delineado).
+
+**El iris varía más por LUZ dentro de una misma cara que entre las dos identidades.** En `nexa-avatar-34-v2`, el
+mismo ojo da **rgb(47,37,27) en sombra** y **rgb(95,67,53) iluminado**.
+
+Pero **sí sirve como QA de salida**: un ángulo generado salió en **rgb(117,78,61)** contra **rgb(95,67,53)** del
+mismo ojo en la referencia — visiblemente más miel — y hubo que endurecer el prompt.
+
+**Formulación que sí bajó el iris**: «marrón plano y uniforme, tan oscuro que la pupila apenas se distingue del
+iris, **sin anillo más claro ni brillo limbal**». **«Muy oscuro, nunca miel» NO alcanza.**
+
+### El turnaround de 9 vistas YA EXISTE — no hay que construirlo **[medido]**
+
+`5. Contenidos/10. Nexa (Influencer IA)/01. Material/01. Avatar/hf_20260327_182342_3bd94421-25ee-4f45-bc2c-5e30d1acfbe1.png`
+
+- **3072×5504**, grilla **3×3**, celdas de **1024×1835**.
+- Vistas: frontal cuerpo entero · tres cuartos busto · **perfil** · frontal · espalda girada · tres cuartos
+  opuesto · **cabeza inclinada hacia abajo** · espalda de perfil · **macro del rostro**.
+- **Pertenece a la identidad B** (verificado recortando la celda (1,2) contra `nexa-avatar-34-v2` y
+  `nexa-the-point`).
+- Si el operador elige B, el set de ángulos se obtiene **recortando**, sin que intervenga ningún modelo.
+
+Lectura de las 9 celdas contra la convención del set de Julio:
+
+| Celda | Vista | Estado |
+|---|---|---|
+| (1,2) | `45-der` | ✓ cubierta |
+| (1,3) | `perfil-izq` | ✓ cubierta |
+| (2,2) | `135-trasero` | ✓ cubierta |
+| (3,2) | trasero del otro lado | aprovechable |
+| (1,1) · (2,1) | frontales | extra |
+| (2,3) | tres cuartos suave | extra |
+| (3,1) | cabeza inclinada | extra valioso |
+| (3,3) | macro del rostro | extra valioso (base de edición: tiene píxeles de sobra) |
+
+**Faltan `45-izq`, `perfil-der` y espalda pura a 180°.** Incluso eligiendo la identidad B hay que producir tres
+ángulos, editando desde el macro (3,3) o desde (1,1), que son de la misma identidad.
+
+### El catálogo de identidad de Nexa no tenía ningún retrato cercano **[corregido, commit `cdb1fabad`]**
+
+Las tres referencias eran planos generales donde el rostro ocupa pocos píxeles → el modelo lo **reconstruye**. La
+primera pasa a ser `nexa-avatar-34-v2.png` (retrato cercano en tres cuartos), copiada de
+`ai-generations/2026-09-17_kv-tu-ia-no-conoce/refs/`.
+
+🔴 **El brief del KV aprobado estaba guardado y no se leyó**:
+`ai-generations/2026-09-17_kv-tu-ia-no-conoce/brief/plate-kv-4x5.prompt.txt`. Traía resueltos el encuadre, la
+escala de la mascota (20 % del ancho), el lente y la pose. **Antes de reconstruir un encargo de memoria, buscar
+el brief de la pieza aprobada equivalente.**
+
+### Lente: **85 mm f/2**, nunca 35 mm de cerca **[del brief aprobado]**
+
+El gran angular a distancia de retrato **ensancha y distorsiona el rostro**. Parte de lo que se leía como «no es
+ella» era distorsión de lente, no deriva de identidad. La pieza aprobada usa *chest-up medium close-up, 85 mm f/2*.
+
+### La cabeza casi NO gira: giran los ojos **[del brief aprobado + medido]**
+
+Pedir «gira la cabeza hacia el hombro» = pedir un **tres cuartos marcado**, ángulo que el set de referencias **no
+cubre** → reconstrucción del rostro. En la pieza aprobada la cabeza está casi frontal y **sólo los ojos** van
+hacia la mascota. Marcadores que funcionan: ambos ojos y ambas cejas visibles, ambas mejillas visibles, la oreja
+lejana en cuadro, el puente de la nariz NO corta la mejilla lejana.
+
+### Mirada muy descendida destruye los ojos **[medido]**
+
+Con la cabeza en tres cuartos y la mirada muy abajo, el párpado superior baja con el globo ocular y **devora el
+iris**; el ojo lejano queda como **ranura sin globo**. Es anatómicamente correcto y fotográficamente el peor caso.
+Agravante medido: **editar «cejas altas» sobre esa pose lo empeora** — el modelo sube la ceja pero no reconstruye
+el párpado, y queda un párpado largo sin pliegue con la línea de pestañas fundida en la sombra.
+
+Marcadores de ojo que sí funcionaron:
+
+- el iris del ojo cercano se ve **como círculo completo**, nunca media luna recortada por el párpado;
+- **esclerótica visible a ambos lados**;
+- el párpado superior por encima del iris con **su pliegue como línea propia**, bien por debajo de la ceja;
+- línea de pestañas como **borde oscuro definido**, nunca fundida;
+- el ojo lejano **abierto con su propio iris**, nunca una ranura oscura.
+
+### «45 degrees» no gira la cabeza **[medido, confirma la regla de marcadores]**
+
+Una primera pasada volvió con la cabeza **en el mismo ángulo de la referencia**. Lo que sí la movió:
+
+1. **Declarar la inversión explícita**: «en la referencia está girada hacia SU DERECHA; aquí debe girar al lado
+   OPUESTO».
+2. **Marcador de destino**: «su nariz apunta al BORDE DERECHO del cuadro».
+
+### Trabajo ya producido en identidad A
+
+`ai-generations/2026-09-21_nexa-angulos/salidas/`: `nexa-45-izq-v02` y `nexa-perfil-izq-v02`, verificados (fondo
+gris, camiseta gris, giro correcto, consistentes con la convención de Julio). Prompts v02 versionados en
+`prompts/`. **Quedan cuatro ángulos si se elige A; se descartan si se elige B.**

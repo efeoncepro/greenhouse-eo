@@ -53,6 +53,21 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 
 - **Identidad:** el set de Julio es `2026-09-20_identidad-julio-nexa/refs-aprobadas/` (+ 6 ángulos derivados).
   El set viejo de `2026-09-17_equipo-vestuario/` **idealizaba el rostro** y arrastraba deriva.
+- 🔴 **Dos identidades conviven bajo el nombre «Nexa». La canónica es la A** **[decisión del operador, 2026-09-21]**.
+  Conviven **dentro de la misma carpeta** `01. Avatar/`: los bustos con hoodie son **A** (la del KV «Tu IA no conoce
+  tu negocio», aprobado el 2026-09-17); los `hf_*` con blazer son **B** (la del turnaround de 9 vistas, `Poses y
+  expresiones/` y `Vestuario/`). Las separa la **estructura** —óvalo, cejas, labios, delineado con rabillo—, **no el
+  iris**: medido **A rgb(64,49,34) · B rgb(51,43,36)**, y dentro de una misma cara el iris varía más por LUZ
+  (rgb(47,37,27) en sombra contra rgb(95,67,53) iluminado, el mismo ojo) que entre las dos identidades. **Verifica
+  cuál estás usando antes de anclar una pieza:** generar con una y validar contra la otra costó ~20 pasadas, con el
+  QA diciendo «la identidad coincide» mientras el operador veía que no.
+  **Consecuencia:** el set de ángulos se construye **editando desde `nexa-avatar-34-v2`**, no recortando el
+  turnaround, que es B; y `nexa-the-point` y `nexa-the-breakdown` son B, así que **no pueden estar en `refs`**
+  del bloque `nexa`. B no se borra: queda como **banco de material** —poses, vestuario, escenarios, gesto—,
+  todo lo que NO sea rostro.
+- 🔴 **Antes de reconstruir un encargo de memoria, busca el brief de la pieza aprobada equivalente.** El del KV estaba
+  guardado en `ai-generations/2026-09-17_kv-tu-ia-no-conoce/brief/plate-kv-4x5.prompt.txt` y no se leyó: traía
+  resueltos el encuadre, la escala de la mascota (20 % del ancho), el lente y la pose.
 - 🔴 **Antes del prompt, abre el `LEEME.md` y el manifiesto del kit de la prenda.** El manifiesto declara
   `cuando_usarla` por vista: la variante se elige por el **rol de la escena** (la gorra de terreno es la trucker,
   no la del sitio). **El tipo de marca va por VARIANTE, no por kit** —una prenda puede existir con logotipo y con
@@ -78,11 +93,27 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   la ropa de las referencias. El comando avisa.
 - **Editar conserva, generar reconstruye.** Para un ángulo nuevo de una persona, **edita su foto aprobada**;
   generar desde cero redondea el rostro (cuatro iteraciones lo probaron).
+- **Retrato: 85 mm f/2, nunca 35 mm de cerca** **[del brief aprobado]**. El gran angular a distancia de retrato
+  **ensancha y distorsiona el rostro**: parte de lo que se lee como «no es ella» es el lente, no deriva de identidad.
+  La pieza aprobada es *chest-up medium close-up, 85 mm f/2*.
+- 🔴 **La cabeza casi no gira: giran los ojos.** Pedir «gira la cabeza hacia el hombro» es pedir un **tres cuartos
+  marcado**, y **pedir un ángulo que el set de referencias no cubre hace que el modelo reconstruya el rostro**. En la
+  pieza aprobada la cabeza está casi frontal y **sólo los ojos** van hacia la mascota. Marcadores del casi-frontal:
+  **ambos** ojos y **ambas** cejas visibles, ambas mejillas visibles, la oreja lejana **en cuadro**, el puente de la
+  nariz **NO** corta la mejilla lejana.
+- 🔴 **La mirada muy descendida destruye los ojos** **[medido 2026-09-21]**. Con la cabeza en tres cuartos y la mirada
+  muy abajo, el párpado superior baja con el globo ocular y **devora el iris**; el ojo lejano queda como **ranura sin
+  globo**. Editar «cejas altas» sobre esa pose **lo empeora**: sube la ceja y no reconstruye el párpado. Marcadores de
+  ojo que sí funcionaron: el iris del ojo cercano **como círculo completo**, nunca media luna recortada por el
+  párpado; **esclerótica visible a ambos lados**; el párpado superior por encima del iris con **su pliegue como línea
+  propia**; línea de pestañas como **borde oscuro definido**, nunca fundida; el ojo lejano **abierto con su propio
+  iris**, nunca una ranura oscura.
 - **Marcadores verificables, no magnitudes.** «Gira 45 grados» da una cabeza inclinada; «la oreja lejana no se ve,
-  el puente de la nariz corta la mejilla lejana» da el tres cuartos real.
+  el puente de la nariz corta la mejilla lejana» da el tres cuartos real. El casi-frontal se pide con los marcadores
+  **inversos** (ver arriba), y antes de pedir cualquier giro, revisa si el set cubre ese ángulo.
 - **Una palanca DE ENCUADRE dominante por pieza.** Combinar dos las diluye: cada una pide el control de la escena.
-  Las otras tres familias sí se combinan con ella: **33 palancas en total** —5 siempre activas (bloque de impacto,
-  incluido el sistema de color) · 4 atmósferas · 1 acción suspendida · **23 de encuadre**— más las **20 tomas de
+  Las otras tres familias sí se combinan con ella: **34 palancas en total** —5 siempre activas (bloque de impacto,
+  incluido el sistema de color) · 4 atmósferas · 1 acción suspendida · **24 de encuadre**— más las **20 tomas de
   cámara** (ojo de pez, dron, tilt-shift, contrapicado, macro, tele, barrido…), que dicen *con qué* se fotografía
   y **no** son palancas. Índice: [catálogo de palancas](../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
 - **La atmósfera exige un haz declarado** (el comando aborta sin él) y **la acción suspendida tiene dosis: 1 de
@@ -97,9 +128,23 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   **nunca por estar en blanco**: doce piezas sin una sola letra delataron la generación (`bloque-realismo-v3`).
 - **La luz con carácter va sobre el SUJETO; la reserva vive en la sombra que esa luz deja, nunca en su camino.**
   Vale también para el **lecho**: medido, 3,16 → 3,93 → **11,55:1** sólo por sacarlo del haz.
+- 🔴 **El haz que sube al tercio superior rompe la banda de texto** **[medido 2026-09-21]**. En la misma ficha, la
+  reserva cayó a **0,06** y **0,22** del alto cuando el haz o la ventana alcanzaban el tercio superior, contra
+  **0,30–0,36** cuando entraban bajo. Corrección que funcionó dos veces: declarar que la ventana, la diagonal
+  iluminada y **cada mancha que proyecta** quedan **bajo la mitad del cuadro**, y que el tercio superior es un campo
+  de azul tinta sin interrupción.
 - **Nunca un scrim.** Si el contraste no da, se **regenera** el plate; no se oscurece en post.
 - **El plate nace sin logo ni texto.** La firma es el SVG oficial compuesto después, **20% del lado corto del lienzo**
   (decisión del operador 2026-09-20), contraste ≥ 4,5:1 medido.
+- 🔴 **En un plate limpio, no sugieras criaturas ni siquiera de refilón** **[medido 2026-09-21]**. La frase «*as if
+  something small were there asking her a question*» hizo que el modelo **materializara un robot blanco flotando**.
+  Si la criatura se compone después, la mirada se describe como **geometría** y el vacío se **declara**: «*the air
+  above that shoulder is EMPTY: no object, no creature, no robot, no toy, no figure*».
+- 🔴 **Recorrido de la vista** **[operador, 2026-09-21]**: la mirada entra por el titular, baja por el **eje central**
+  a la escena y sale por la firma. Un elemento al **margen y a media altura** queda fuera de ese recorrido: es un
+  desvío lateral sin destino y se lee como adorno pegado, **aunque no tape nada y aunque su contraste pase**. Si va,
+  va **sobre el eje**, como escalón entre titular y escena — la pieza aprobada lleva el chip «Contexto: 0 %»
+  **centrado bajo el titular**.
 - **Tope de tanda:** más de 6 fichas exige que cada una declare un `piloto` ya generado en disco. La calidad sale
   de generar poco y **mirar cada plate**.
 - 🔴 **La `escena` NO puede contradecir al bloque de su palanca** **[medido 2026-09-21]**. Los dos viajan juntos
@@ -145,7 +190,7 @@ Para qué sirve:
 
 ## Al cerrar
 
-`pnpm foto:validar` sobre el plate limpio y **mirar la imagen al 100%**: identidad contra la referencia, emblema
+`pnpm foto:validar` sobre el plate limpio y **mirar la imagen al 100%**: identidad contra la referencia **de la identidad que elegiste**, emblema
 letra por letra, y que no haya texto ni marcas de terceros. Un contraste que pasa no prueba que la pieza esté bien.
 
 

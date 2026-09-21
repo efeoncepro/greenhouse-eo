@@ -439,6 +439,29 @@ como leading; `foto:componer` lo reporta en `qa.json`.
 > revisión humana: un contraste que pasa NO prueba que la composición esté bien.
 
 
+## Recorrido de la vista **[criterio del operador, 2026-09-21]**
+
+> «Tienes que añadir o entrenar un criterio, y es la capacidad de ver hacia dónde se guía la vista del lector.»
+
+La mirada **entra por el titular, baja por el eje central hasta la escena y sale por la firma**. Un elemento puesto
+al **margen y a media altura** queda fuera de ese recorrido: es un desvío lateral sin destino y se lee como un adorno
+pegado, **aunque no tape nada y aunque su contraste pase**. No es un problema de oclusión ni de contraste sino de
+jerarquía. Si el elemento va, **va sobre el eje**, como escalón entre el titular y la escena. La pieza aprobada lo
+confirma: el chip «Contexto: 0 %» está **centrado bajo el titular**.
+
+**NUNCA** cuelgues un chip, una nota o una tarjeta al costado «porque ahí hay espacio libre»: el espacio libre no es
+un destino de lectura. Y **NUNCA** des por buena la posición de un elemento sólo porque pasó el contraste — ese
+número responde otra pregunta.
+
+## Guarda medida para un elemento gráfico sobre la foto **[implementada, 2026-09-21]**
+
+«No puede tapar a Nexa» **no se afirma: se mide.** Del plate se extrae la caja del elemento **más un aire de la mitad
+de su alto** y se promedia el **gradiente horizontal** de ese recorte: un muro liso da **< 3** (medido **0,76–1,67**),
+un rostro o una figura dan bordes y lo suben. **Sobre 3, aborta.**
+
+El aire no es adorno del método: la primera versión midió la **caja estricta**, pasó, y el borde del chip **rozaba el
+signo de interrogación**. Un elemento gráfico no compite sólo con lo que cubre, también con lo que toca.
+
 ## 🔴 Componer lo sensible, y que el modelo sólo TERMINE **[operador, 2026-09-21]**
 
 **Para resultados óptimos, la composición se arma con todos sus elementos sensibles APARTE, se juntan

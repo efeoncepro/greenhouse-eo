@@ -1,0 +1,47 @@
+[
+  {
+    "id": "copiloto-nexa-clawd",
+    "plate": "plates/A-copiloto-v2.png",
+    "campo": "oscuro",
+    "align": "left",
+    "top": 0.055,
+    "textWidth": 0.52,
+    "label": "Claude",
+    "lead": "Tu IA no conoce",
+    "dominant": "tu negocio.",
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "bottom-start",
+          "action": "select"
+        },
+        {
+          "id": "clawd",
+          "anchor": "top-end",
+          "action": "select",
+          "label": "Clawd",
+          "who": "role",
+          "color": "#d77757"
+        }
+      ],
+      "box": [
+        0.055,
+        0.105,
+        0.6,
+        0.205
+      ],
+      "targetKind": "text"
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.935,
+      "variant": "auto"
+    }
+  }
+]

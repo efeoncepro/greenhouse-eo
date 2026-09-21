@@ -1,7 +1,8 @@
 # Selección de referencias de marca para generación — V1
 
 > **Tipo de documento:** Contrato operativo de producción
-> **Versión:** 1.0 · **Creado:** 2026-09-21 por Claude, dictado por el operador (Julio Reyes)
+> **Versión:** 1.1 · **Creado:** 2026-09-21 por Claude, dictado por el operador (Julio Reyes)
+> **Última actualización:** 2026-09-21 — delta de la corrida `copiloto` (Nexa + Clawd), al final del documento
 > **Aplica a:** toda pieza generada donde aparezca un asset de marca Efeonce — ropa corporativa, lanyard,
 > merch, logo 3D, isotipo 3D, nave, mascotas de partners
 > **Relacionado:** [guía de kits](social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md) · [kit de prendas](../../.claude/skills/greenhouse-ai-image-generator/references/garment-reference-kit.md) · [lenguaje fotográfico](brand-photography/README.md) · [caso fuente](../../ai-generations/2026-09-21_lanyard-deterministico/LEEME.md)
@@ -171,3 +172,89 @@ repitió el patrón: el aviso existía, se emitía en cada prompt, y se ignoró.
 **Un aviso más no arregla un aviso ignorado.** Lo que sí funciona es convertirlo en algo que hay que
 **mirar** (`pnpm foto:emblema` recorta y amplía) o en algo que el comando **resuelve solo** (la vista,
 el color, el tamaño heredado, el armado determinístico).
+
+---
+
+## Delta 2026-09-21 — lo que enseñó la corrida `copiloto`
+
+> **Fuente:** `ai-generations/2026-09-21_copiloto/HECHOS.md`. Una corrida de ~20 generaciones con Nexa y Clawd.
+> Los cuatro puntos de abajo son **extensiones de este contrato**, no excepciones: siguen diciendo que el
+> problema es **elegir**, y que lo sensible **se compone**.
+
+### 7. La POSE también se elige del kit — pedírsela al modelo lo hace REDIBUJAR el asset **[medido, 5 pasadas]**
+
+Esto **extiende la doctrina de las tres clases de asset** (§2). Ahí la regla era *qué* archivo pasar; acá es
+*cuál de sus vistas*: una pose que el kit no tiene es, para el modelo, permiso para reinventar la forma.
+
+Clawd salió con **cinco formas distintas en cinco pasadas** —patas largas, cuerpo cuadrado, ojos chicos— mientras
+se le pedía una pose que la referencia no tenía. Es el mismo fenómeno que hace que cuatro pasadas den cuatro
+logotipos (§4): **un modelo no sostiene una forma de marca**, y una mascota es forma de marca igual que un
+logotipo.
+
+Se resolvió **sin generar nada nuevo**: la pose ya estaba en el kit. `efeonce-clawd-3d-07-salto-en-el-aire` trae
+**los dos brazos levantados y separados**, que es exactamente el encogimiento de hombros que la pieza pedía.
+
+🔴 **Regla: elegir la pose que el kit ya tiene antes de pedirle una al modelo.** Los kits 3D traen **ocho poses o
+ángulos** cada uno (§1). Antes de describir una pose en el prompt, recorrer las ocho y preguntarse cuál de ellas
+**ya es** el gesto que la escena necesita. La interacción con la escena puede derivarse; la **forma se copia**.
+
+### 8. Un adjetivo es una instrucción sin control; un número medido, no **[medido]**
+
+Extiende §5 («las proporciones se calculan del objeto real») al caso en que el objeto **está en el kit** y aun así
+se describió con palabras.
+
+El prompt decía *«roughly one and a half times wider than it is high… widen it and LOWER it»* y el modelo **lo
+aplastó**. El operador lo cazó a la primera: «quedó achatado». El adjetivo —*ensánchalo*, *bájalo*— no tiene
+escala: el modelo elige cuánto, y eligió mal.
+
+- **Proporción real del bloque de Clawd: 1,45 de ancho/alto** (kit 01 = 1,43 · kit 07 = 1,46).
+- **Cómo se mide** **[medido]**: **erosionar el canal alfa** —`blur(14)` + `threshold(215)`— elimina los apéndices
+  finos (brazos, patas) y deja el **bloque** del cuerpo; el bbox del resultado da la proporción.
+- **Por qué hay que erosionar:** contar píxeles por fila **sin erosionar** da **7,69 y 9,15**, porque la fila más
+  ancha incluye los brazos extendidos. Ese número no describe el cuerpo de nada.
+
+**Regla: si vas a pedir una proporción, mídela primero sobre el PNG del kit. Si no la mediste, no la pidas.**
+
+### 9. Pegar un render 3D sobre una foto se ve pegado — cuándo sí y cuándo no **[medido, camino descartado]**
+
+§4 dice «lo sensible se compone y el modelo sólo pone material y luz». Este punto marca **dónde ese camino se
+acaba**: se probó la composición determinística completa (plate limpio + pieza del kit + sombra) y **no sirvió
+aquí**.
+
+| | |
+|---|---|
+| **Cuándo SÍ componer sobre el plate** | Piezas donde el asset es **plano** —carnet, tarjeta, etiqueta, firma— o donde el **plate se diseñó para recibirlo** |
+| **Cuándo NO** | Integrar un **render 3D con luz propia** dentro de una escena fotográfica **con luz de carácter** |
+
+Las dos razones, medidas:
+
+1. **La luz no coincide.** El kit trae **luz de estudio frontal**; la foto, **luz dura lateral**. El objeto no
+   pertenece a la escena, y ninguna sombra añadida lo arregla.
+2. **El plate tiene que tener el hombro en el sitio.** Medido en ese plate: el hombro cae en **y≈1045** y la cara
+   empieza en **x≈621**. A escala real la figura **o queda flotando o invade la mejilla**. No hay un tercer
+   resultado.
+
+**Lo que sí funciona de ese camino es la escala**, y se calcula igual que las proporciones de §5, **anclada a un
+objeto del mismo cuadro**: cara **pómulo a pómulo 160 px ≈ 13,5 cm → 11,85 px/cm**, comprobado contra la cabeza
+(**260 px ≈ 22,4 cm**). Esa cifra vale aunque el camino se descarte.
+
+🔴 **Bug propio a evitar al construir la sombra.** Usar `dest-in` sobre un **lienzo creado** devuelve un
+**rectángulo opaco**, no la silueta. Lo correcto es **teñir la silueta**: tres canales planos del color de la
+sombra + `joinChannel(alfa)` + blur.
+
+### 10. Cuando el modelo no suelta un defecto pedido tres veces, se resuelve determinísticamente **[medido]**
+
+Es §4 aplicada a la **corrección**: si pedirlo no funciona, **se deja de pedir**.
+
+El signo de interrogación venía unido a la cabeza por una **varilla**. Tres pedidos explícitos de «sin tallo, sin
+antena, sin hilo» y la varilla seguía ahí.
+
+**Detección — medir, no mirar.** Comparar cada píxel con la **mediana de su fila** en una ventana ancha; lo que se
+desvía de su fila es la varilla. Medida así: **2 px de ancho, x 495–497, de y=684 a y=702**.
+
+**Parche — copiar muro vecino del lado limpio.** Se copió desde la **izquierda** (la derecha ya tenía la cabeza),
+caja **13×24 en (490,679)**, alfa con `blur(0.6)`.
+
+**Por qué fallaron los dos intentos anteriores: se estimó el tamaño a ojo en vez de medirlo.** Uno se comió el
+punto del signo y tapó la cabeza; el otro dejó restos arriba y abajo. Es exactamente el error de §5 —«ninguna
+medida se estima a ojo»— trasladado a la reparación: **la caja del parche es una medida como cualquier otra.**
