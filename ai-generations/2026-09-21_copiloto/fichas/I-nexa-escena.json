@@ -1,0 +1,19 @@
+{
+  "id": "I-nexa-escena",
+  "formato": "4:5",
+  "impacto": true,
+  "identidad": [{ "persona": "nexa", "vista": "45-der" }],
+  "objetos": ["polo-efeonce"],
+  "atmosfera": "bruma",
+  "escena": "SCENE (a staged portrait for a campaign piece, in the agency's edit room): this is a PUT-TOGETHER picture, not a documentary moment. Nexa stands with her BODY TURNED AWAY to her right, three quarters from the camera, and then TURNS HER HEAD BACK OVER HER SHOULDER to LOOK STRAIGHT INTO THE LENS — the body goes one way, the face comes back. Her expression is complicity, not a posed smile: one eyebrow slightly raised, the corner of her mouth pulled up on one side, lips closed, as if she had just caught the viewer thinking the same thing she is. Check the turn by what is visible: her far cheek is partly hidden behind the bridge of her nose, her far eye is foreshortened but OPEN with its own visible iris, and her near ear is in full view. Her irises are VERY DARK BROWN, almost black, so dark that the iris barely separates from the pupil — never hazel, amber or honey, and no golden ring inside the iris. She wears the navy blue Efeonce piqué polo. One hand rests on the back of an empty chair beside her. CRITICAL ON LIGHT, and every practical lamp in the room is SWITCHED OFF: the KEY is a single hard white source low and far to the RIGHT — on the side her face turns towards — raking across her so the turned side of her face is bright and the rest falls into open shadow, with the shadow of her nose short and readable. A second hard source sits BEHIND her on the left and LOW, cutting a clean RIM along her hair, her shoulder and the line of her jaw, separating her from the wall. That back light throws a visible SHAFT across the room through the haze, and the shaft, its glow and every pool it makes stay BELOW THE MIDDLE OF THE FRAME. Both sources are white: the highlights on her skin and on the polo stay NEUTRAL, never yellow or amber, and nothing in the picture glows warm. THREE PLANES, all readable: the out-of-focus corner of a colour-grading panel at the very front; Nexa sharp in the middle; and behind her, far out of focus and small, a dimmed reference monitor on its stand catching the rim light, so the room has depth instead of being a flat wall. The wall behind her is dark grey painted brick — there is NO blue panel, NO bookshelf, NO plant and NO domestic decor. She sits LOW in the frame: the very top of her head is at or BELOW 38% of the frame height, and the whole TOP THIRD of the picture is that dark wall, completely unbroken — no lamp, no stand, no monitor, no shaft and no light patch may enter that band, and no glow may wash up into it. Everything is completely unbranded except her polo. Chest-up medium close-up on an 85mm lens at f/2.8, focus on her eyes — never a wide lens, which would widen and distort her face.",
+  "lecho": {
+    "objeto": "the black corner of the colour-grading panel standing right at the lens, its trackball and rubberised edge crossing the ENTIRE bottom of the frame from left edge to right edge, a hand's width from the camera and dissolved completely out of focus. It sits OUTSIDE every light: neither the key nor the rim reaches it",
+    "tono": "NEAR-BLACK, the darkest thing in the picture and even across its whole width — NOTHING else appears in that bottom strip: no hands, no table edge, no cable, no highlight, no reflection, no lettering"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark grey painted brick wall filling the top third behind her",
+      "tinta": "blanca"
+    }
+  }
+}

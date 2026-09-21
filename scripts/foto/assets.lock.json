@@ -38,47 +38,63 @@
       "rol": "persona:julio/espalda",
       "sha256": "640f278f70d13bb816b9889c0d8060623880f70ace639d4fa70b40894abd8c07"
     },
-    "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-34-v2.png": {
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png": {
       "rol": "persona:nexa",
-      "sha256": "91b581b0c952232bc2c284e830c2ac44a65296de01bb7cf5b0de0c1f12f372c3"
+      "sha256": "a0d4864f6ae1829de110af860a973e8b41a51b03fb3c58728e9c8a0c12ae4a6d"
     },
-    "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png": {
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png": {
       "rol": "persona:nexa",
-      "sha256": "7f34d10b67f1c2da1cf316fbcfd99c6dcf2505bc070470beeccd2953c46b1818"
+      "sha256": "c152b98b86e58ad50556bc00cebce9cce5cd98a6f4333389a50e6dd077c905f1"
     },
-    "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-frontal-v2.png": {
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png": {
       "rol": "persona:nexa",
-      "sha256": "51e606e258521aff52068465ce906644a42415a53f6578edfcf35873dddd5f4e"
+      "sha256": "0903de95472ed4eb4c1029da00ec05dcd976628910d8f062961c17db7a29f219"
     },
-    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-45-izq.png": {
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-3-rostro-perfil.png": {
+      "rol": "persona:nexa/perfil-der",
+      "sha256": "0f44e931ee5a32fa9d03df110fa4a2afbe292140c18ab8d894bc31d1205b147d"
+    },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-4-busto-tresquartos.png": {
+      "rol": "persona:nexa/busto",
+      "sha256": "9222178fba792b103f185f809037e62bbc85876a45d5170112ec7fb0ec8a23ee"
+    },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-6-cuerpo-tresquartos.png": {
+      "rol": "persona:nexa/cuerpo-tresquartos",
+      "sha256": "0a354d1f974188246925dc130cc60616d3bc66b63de0fe08f6b620debd9eef12"
+    },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-7-cuerpo-perfil.png": {
+      "rol": "persona:nexa/cuerpo-perfil-der",
+      "sha256": "71b7cb619741a6bc7ddadbe89e3a1e9147f02e02f9b4bebfb1bf224c2dbfca85"
+    },
+    "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-8-manos.png": {
+      "rol": "persona:nexa/manos",
+      "sha256": "6211aed68c243821ad4a441e3678395f5843700c3efb8aa10508430996f495a5"
+    },
+    "ai-generations/_identidad-nexa/2-angulos/nexa-45-izq.png": {
       "rol": "persona:nexa/45-izq",
       "sha256": "505ec26df0c3755c498517c36764983321a2f6bdfeaf6bc48b491bf1c9b4dcbd"
     },
-    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-45-der.png": {
+    "ai-generations/_identidad-nexa/2-angulos/nexa-45-der.png": {
       "rol": "persona:nexa/45-der",
       "sha256": "f9f53cfd6d3ab08671039c122778a08c4659dccae8c6a8b85a55a59ad3c038b3"
     },
-    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-izq.png": {
+    "ai-generations/_identidad-nexa/2-angulos/nexa-perfil-izq.png": {
       "rol": "persona:nexa/perfil-izq",
       "sha256": "7159cc484e9beb6b7ed555708a812e34a37cad8ef4fef25d5bc0a70f2d93576d"
     },
-    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-der.png": {
-      "rol": "persona:nexa/perfil-der",
-      "sha256": "06148f4a74cc5264a3151c5987f7559a3c75f094417a5a0ffb6d809806718878"
-    },
-    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-135-trasero.png": {
+    "ai-generations/_identidad-nexa/2-angulos/nexa-135-trasero.png": {
       "rol": "persona:nexa/trasero",
       "sha256": "9bdff6dde641a10abfcd2e2e66228fac82a05e9d9a1379625f0a34116b12d530"
     },
-    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-espalda.png": {
+    "ai-generations/_identidad-nexa/2-angulos/nexa-espalda.png": {
       "rol": "persona:nexa/espalda",
       "sha256": "01f1fd94e7470fd3b306b7b4b1409b0da47df89b7adbcc18f3395ca5798bb1df"
     },
-    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-cuerpo-perfil-izq.png": {
+    "ai-generations/_identidad-nexa/2-angulos/nexa-cuerpo-perfil-izq.png": {
       "rol": "persona:nexa/cuerpo-perfil-izq",
       "sha256": "d499480d4dafab2ee5605527ffb422fbac0e1bb59d6955449b29b6f3c3d3e7af"
     },
-    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-cuerpo-espalda.png": {
+    "ai-generations/_identidad-nexa/2-angulos/nexa-cuerpo-espalda.png": {
       "rol": "persona:nexa/cuerpo-espalda",
       "sha256": "70e643fb200fba5b497d1ff038d02c281af174cf64f603ccc77616393ba12693"
     },

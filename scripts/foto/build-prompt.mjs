@@ -197,50 +197,45 @@ export const PERSONAS = {
     etiqueta: 'Nexa',
     identity:
       'IDENTITY (critical): the woman is NEXA, the SAME person shown in the Nexa reference images: a woman in her early thirties with long dark wavy hair, fair olive skin, dark eyes and defined brows. Preserve her face and hair EXACTLY as in the references; only pose, clothing, light and setting change.',
-    // La PRIMERA es un retrato CERCANO en tres cuartos. Sin ella el set sólo tenía planos generales,
-    // donde el rostro ocupa pocos píxeles, y cada generación lo reconstruía: es la referencia con la
-    // que se hizo el KV «Tu IA no conoce tu negocio» que el operador aprobó el 2026-09-17.
+    // TODO lo de Nexa vive en `ai-generations/_identidad-nexa/`, que NO es una carpeta de corrida: es el
+    // estado vigente, con su LEEME. Las carpetas con fecha son el histórico de cada sesión.
     //
-    // Las TRES son de la serie «Avatar» de OneDrive. Esto NO es una preferencia de encuadre: desde
-    // abril conviven dos rostros distintos bajo el nombre «Nexa» y hasta hoy este bloque mezclaba los
-    // dos. Medido por sha256 el 2026-09-21: `nexa-the-breakdown` es `Poses y expresiones/The
-    // Breakdown/hf_20260409_212045_aff0e…`, que pertenece a la OTRA identidad — cara más larga, cejas
-    // finas arqueadas y sin delineado del párpado. Con dos referencias de una cara y una de la otra el
-    // modelo promedia, y en el KV aprobado ganó la serie Avatar sólo por mayoría (2 de 3). El operador
-    // eligió la serie Avatar como Nexa canónica el 2026-09-21, así que `the-breakdown` sale y entra
-    // `nexa-avatar-frontal-v2` (= `Avatar Frontal v2.png`), de la misma serie.
-    // La serie «Poses y expresiones» y `Vestuario/` siguen siendo material válido de pose, vestuario y
-    // escenario — pero NUNCA como ancla de rostro.
+    // Por qué importa que sea un solo sitio: desde abril de 2026 convivían DOS rostros distintos bajo el
+    // nombre «Nexa», y este bloque llegó a mezclarlos —dos referencias de una cara y una de la otra—, así
+    // que el modelo promediaba. En el KV aprobado ganó la cara correcta por MAYORÍA, no porque la mezcla
+    // no existiera; por eso el defecto estuvo cinco meses sin detectarse. El rasgo que las separa más
+    // rápido es el delineado del párpado superior: la canónica lo tiene, la otra no.
+    //
+    // Las tres referencias son ANCLAS fotográficas de 2560×3200 / 2304×3456 generadas el 2026-09-21: piel
+    // con poros irregulares y vello facial real, no la piel sin poros del maestro sintético anterior.
+    // Orden: rostro tres cuartos (la más decisiva), cuerpo entero, rostro frontal.
     refs: [
-      'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-34-v2.png',
-      'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png',
-      'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-frontal-v2.png'
+      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-2-rostro-tresquartos.png',
+      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png',
+      'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png'
     ],
-    cuerpo: 'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png',
-    // Vistas que las referencias frontales NO cubren, derivadas por EDICIÓN desde `nexa-avatar-34-v2`
-    // el 2026-09-21 — no generadas de cero, por la misma razón que en Julio. Dos cosas medidas en esa
-    // corrida: pedir «45 degrees» NO gira la cabeza (la v01 volvió en el mismo ángulo de la
-    // referencia); lo que la movió fue declarar la inversión respecto a la referencia más el marcador
-    // «su nariz apunta al BORDE DERECHO del cuadro». Y el iris salía miel hasta que se pidió «marrón
-    // plano y uniforme, tan oscuro que la pupila apenas se distingue, sin anillo más claro».
-    // Prompts verbatim: `ai-generations/2026-09-21_nexa-angulos/prompts/`.
+    cuerpo: 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png',
+    // Vistas que las referencias base no cubren. Las que vienen de `1-anclas/` son fotográficas y de alta
+    // resolución; las de `2-angulos/` conservan el acabado SINTÉTICO del maestro anterior (deuda declarada
+    // en el LEEME): sirven para ángulo y encuadre, pero si la pieza necesita piel creíble en primer plano,
+    // prefiere un ancla.
     vistas: {
-      '45-izq': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-45-izq.png',
-      '45-der': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-45-der.png',
-      'perfil-izq': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-izq.png',
-      'perfil-der': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-der.png',
-      trasero: 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-135-trasero.png',
-      espalda: 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-espalda.png',
-      // Cuerpo ENTERO en los dos ángulos que ninguna referencia cubría: la silueta de perfil y la de
-      // espaldas. El cuerpo frontal ya existe (`cuerpo`), y el modelo extrapola bien una postura —P2
-      // salió agachada partiendo sólo del frontal—, pero no extrapola una silueta lateral. Generadas a
-      // 1536×2304 y no a 1024: a pie de página entera el rostro cae a ~120 px y el modelo lo rellena.
-      'cuerpo-perfil-izq': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-cuerpo-perfil-izq.png',
-      'cuerpo-espalda': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-cuerpo-espalda.png'
+      // fotográficas, alta resolución
+      'perfil-der': 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-3-rostro-perfil.png',
+      busto: 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-4-busto-tresquartos.png',
+      'cuerpo-tresquartos': 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-6-cuerpo-tresquartos.png',
+      'cuerpo-perfil-der': 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-7-cuerpo-perfil.png',
+      manos: 'ai-generations/_identidad-nexa/1-anclas/nexa-ancla-8-manos.png',
+      // acabado anterior — ángulos que las anclas no cubren
+      '45-izq': 'ai-generations/_identidad-nexa/2-angulos/nexa-45-izq.png',
+      '45-der': 'ai-generations/_identidad-nexa/2-angulos/nexa-45-der.png',
+      'perfil-izq': 'ai-generations/_identidad-nexa/2-angulos/nexa-perfil-izq.png',
+      trasero: 'ai-generations/_identidad-nexa/2-angulos/nexa-135-trasero.png',
+      espalda: 'ai-generations/_identidad-nexa/2-angulos/nexa-espalda.png',
+      'cuerpo-perfil-izq': 'ai-generations/_identidad-nexa/2-angulos/nexa-cuerpo-perfil-izq.png',
+      'cuerpo-espalda': 'ai-generations/_identidad-nexa/2-angulos/nexa-cuerpo-espalda.png'
     },
-    // Vistas que YA son de cuerpo entero: pedir además la referencia de cuerpo dejaría la toma con dos
-    // cuerpos y ningún rostro cercano.
-    vistasDeCuerpo: ['cuerpo-perfil-izq', 'cuerpo-espalda']
+    vistasDeCuerpo: ['cuerpo-tresquartos', 'cuerpo-perfil-der', 'cuerpo-perfil-izq', 'cuerpo-espalda']
   }
 }
 

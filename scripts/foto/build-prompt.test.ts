@@ -298,10 +298,18 @@ conAssets('foto:prompt · identidad', () => {
   // referencias de la lista. Las dos primeras de Julio son AMBAS de rostro, así que se quedaba sin
   // cuerpo entero y el modelo le inventaba la silueta. Pasaba en silencio: la pieza salía, sólo que
   // con un cuerpo que no era el suyo.
-  const CUERPOS = {
-    julio: 'ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-11.png',
-    nexa: 'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png'
-  }
+  // La ruta la declara el catálogo, no este test: escribirla a mano lo rompía cada vez que el set de
+  // identidad se movía, y un test que hay que editar tras cada mudanza deja de vigilar nada.
+  const CUERPOS = Object.fromEntries(
+    Object.entries(PERSONAS as Record<string, { cuerpo?: string }>).map(([clave, p]) => [clave, p.cuerpo])
+  ) as Record<string, string>
+
+  it('cada persona con identidad declara cuál de sus referencias es la de cuerpo entero', () => {
+    for (const [clave, ruta] of Object.entries(CUERPOS)) {
+      expect(ruta, `${clave} no declara \`cuerpo\``).toBeDefined()
+      expect((PERSONAS as Record<string, { refs: string[] }>)[clave].refs).toContain(ruta)
+    }
+  })
 
   it('una persona sola lleva su cuerpo entero', () => {
     const r = construirPrompt({ ...fichaBase, identidad: ['julio'] })
@@ -330,7 +338,7 @@ conAssets('foto:prompt · identidad', () => {
     const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vista: 'cuerpo-perfil-izq' }, 'julio'] })
 
     expect(r.imagenes[0]).toContain('nexa-cuerpo-perfil-izq.png')
-    expect(r.imagenes).toContain('ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-34-v2.png')
+    expect(r.imagenes).toContain((PERSONAS as Record<string, { refs: string[] }>).nexa.refs[0])
     expect(r.imagenes).not.toContain(CUERPOS.nexa)
   })
 })
