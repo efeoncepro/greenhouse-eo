@@ -121,7 +121,7 @@ pendiente. A diferencia del hoodie, **no existe asset oficial** de la mayoría d
 
 > **Elegir la vista por cómo se usa la prenda, no sólo por el ángulo.** Si en la pieza la chaqueta va abierta, la referencia es su vista de `cierre-abierto`, no la de frente; si van dos prendas (polo bajo chaqueta), se pasan las dos como referencias separadas. Caso: [`2026-09-17_nexa-vestuario`](../../../ai-generations/2026-09-17_nexa-vestuario/LEEME.md).
 
-> **Delta 2026-09-17 (operador):** la estampa canónica de espalda —logo completo + «Empower your Growth» al 38 %— va también en las **chaquetas** (softshell y bomber), igual que en el hoodie. La prenda que mantiene la **espalda limpia** es el **polo**, por ser la de uso más formal frente a cliente.
+> **Delta 2026-09-17 (operador):** la estampa canónica de espalda —logo completo + «Empower your Growth» al 38 %— va también en las **chaquetas** (softshell y bomber), igual que en el hoodie. La prenda que mantenía la **espalda limpia** era el **polo** — **revertido el 2026-09-21**: ahora también la lleva, bordada (ver delta al final).
 Decisión del operador (2026-09-17), tomada al preguntarse si la polera servía como ropa corporativa. El cliente de
 Efeonce es corporativo —retainer Sky, RevOps/CRM con HubSpot y Salesforce, comités, licitaciones—, así que una polera
 de algodón con estampa **no** es la ropa corporativa del equipo. La cápsula reparte las prendas por contexto de uso:
@@ -248,3 +248,13 @@ La lista del lanyard, leída como criterio transferible a cualquier merch:
 
 **Pendiente conocido:** el cargo del operador no está declarado en el repo, así que su carnet real queda sin esa línea
 hasta que lo confirme.
+
+
+> 🔴 **Delta 2026-09-21 — el polo YA NO lleva la espalda limpia.** El operador **revirtió** su decisión
+> del 2026-09-17: desde hoy el polo lleva en la espalda el **logo completo + «Empower your Growth»**,
+> igual que el hoodie y las chaquetas, pero **BORDADO** en puntada satinada con relieve —no
+> serigrafiado—, porque es la prenda más formal frente a cliente y su emblema de pecho ya es bordado.
+> Motivo: de espaldas, un polo sin marca no se reconoce como Efeonce. El arte se compone con
+> `ai-generations/2026-09-17_polo-efeonce/estampa-espalda.mjs` (hilo blanco sobre el navy, hilo navy
+> sobre el blanco) y las cinco vistas de espalda están rehechas como `-v02-`; **las `-v01-` de espalda
+> quedan obsoletas**.

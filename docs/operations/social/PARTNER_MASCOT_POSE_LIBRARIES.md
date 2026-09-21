@@ -130,7 +130,7 @@ caída. El mismo contrato cubre el **merch con arte impreso**, donde la referenc
   tamaño del asset oficial y no se reduce.
 - **Polo piqué Efeonce:** `5. Contenidos/13- Branding/Polo Efeonce/v01/` — 21 vistas (navy con bordado blanco, kit
   completo de 15; blanco con bordado navy, set esencial de 6), 13 con transparente, más `efeonce-polo-manifiesto.json`.
-  Emblema **bordado** de ~7 cm en el pecho izquierdo y **espalda limpia**.
+  Emblema **bordado** de ~7 cm en el pecho izquierdo y, desde el 2026-09-21, **logo + eslogan bordados en la espalda**.
   [`LEEME`](../../../ai-generations/2026-09-17_polo-efeonce/LEEME.md).
 - **Chaqueta Efeonce:** `5. Contenidos/13- Branding/Chaqueta Efeonce/v01/` — 22 vistas (softshell navy oficial del
   equipo, kit completo de 16; bomber ligera navy, set esencial de 6), 14 con transparente, más

@@ -113,7 +113,7 @@ estampa de espalda. Esos elementos se componen.
 - La **forma** de marca —logo, isotipo, estampa, carnet— nunca se le deja inventar al modelo.
 - El **texto exacto** se compone, no se genera.
 - En prendas formales el emblema va **bordado** y sin eslogan; la estampa de espalda va en hoodie y chaquetas, y el
-  polo mantiene la espalda limpia.
+  polo también la lleva desde el 2026-09-21, bordada (ver delta al final).
 - Sobre navy impreso, el prefijo del eslogan va en **gris claro `#C8CEDA`**; el gris de marca no resuelve impreso. Es
   excepción de sustrato, no un cambio de color de marca.
 - Si la pieza **ya existe** (una foto real), esa foto es la fuente de construcción y las variantes se piden sobre ella.
@@ -169,3 +169,13 @@ isotipo, nave o mascotas— carga el [contrato de selección de referencias](../
 
 Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
 corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.
+
+
+> 🔴 **Delta 2026-09-21 — el polo YA NO lleva la espalda limpia.** El operador **revirtió** su decisión
+> del 2026-09-17: desde hoy el polo lleva en la espalda el **logo completo + «Empower your Growth»**,
+> igual que el hoodie y las chaquetas, pero **BORDADO** en puntada satinada con relieve —no
+> serigrafiado—, porque es la prenda más formal frente a cliente y su emblema de pecho ya es bordado.
+> Motivo: de espaldas, un polo sin marca no se reconoce como Efeonce. El arte se compone con
+> `ai-generations/2026-09-17_polo-efeonce/estampa-espalda.mjs` (hilo blanco sobre el navy, hilo navy
+> sobre el blanco) y las cinco vistas de espalda están rehechas como `-v02-`; **las `-v01-` de espalda
+> quedan obsoletas**.

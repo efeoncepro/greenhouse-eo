@@ -187,7 +187,7 @@ Cuando **no existe** asset oficial de la prenda, el kit tiene un paso 0 que el h
    al operador**. Ésta es la única aprobación que bloquea: todo lo demás se copia de aquí.
 3. **Congelar la aprobada como imagen 1** de toda la serie y escribir su bloque base verbatim.
 4. **Preparar las referencias del emblema:** el isotipo oficial rasterizado si va bordado, y la estampa compuesta con
-   el script determinístico si la prenda lleva texto (§3). El polo no lleva estampa: espalda limpia.
+   el script determinístico si la prenda lleva texto (§3). Desde el 2026-09-21 el polo TAMBIÉN lleva arte de espalda, bordado (ver delta al final).
 5. **Recién entonces generar las vistas** (§2), todas con el mismo bloque base + el delta de cada una.
 6. **QA (§6), recorte selectivo (§7), manifiesto y entrega (§9).**
 
@@ -233,7 +233,7 @@ descarte, y más si la prenda lleva emblema bordado: ahí los descartes son por 
 
 ## Delta 2026-09-17 — dónde va la estampa de espalda
 
-La estampa canónica (logo completo + eslogan al 38 % del ancho de la espalda) va en el **hoodie** y en las **chaquetas (softshell y bomber) sí la llevan**, por decisión del operador. La única prenda con **espalda limpia** es el **polo**, la más formal frente a cliente. Si una serie ya se produjo con la regla anterior, se rehacen sólo las vistas de espalda (prenda sola, plano cenital y puesta) con la estampa como imagen 2.
+La estampa canónica (logo completo + eslogan al 38 % del ancho de la espalda) va en el **hoodie** y en las **chaquetas (softshell y bomber) sí la llevan**, por decisión del operador. **Revertido el 2026-09-21: el polo también la lleva, BORDADA.** (ver delta al final). Si una serie ya se produjo con la regla anterior, se rehacen sólo las vistas de espalda (prenda sola, plano cenital y puesta) con la estampa como imagen 2.
 
 ## Delta 2026-09-17 — elegir la vista por cómo se usa la prenda
 
@@ -441,3 +441,13 @@ isotipo, nave o mascotas— carga el [contrato de selección de referencias](../
 
 Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
 corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.
+
+
+> 🔴 **Delta 2026-09-21 — el polo YA NO lleva la espalda limpia.** El operador **revirtió** su decisión
+> del 2026-09-17: desde hoy el polo lleva en la espalda el **logo completo + «Empower your Growth»**,
+> igual que el hoodie y las chaquetas, pero **BORDADO** en puntada satinada con relieve —no
+> serigrafiado—, porque es la prenda más formal frente a cliente y su emblema de pecho ya es bordado.
+> Motivo: de espaldas, un polo sin marca no se reconoce como Efeonce. El arte se compone con
+> `ai-generations/2026-09-17_polo-efeonce/estampa-espalda.mjs` (hilo blanco sobre el navy, hilo navy
+> sobre el blanco) y las cinco vistas de espalda están rehechas como `-v02-`; **las `-v01-` de espalda
+> quedan obsoletas**.

@@ -179,7 +179,7 @@ del equipo: hay una cápsula por contexto**, decidida por el operador:
 
 | Contexto | Prenda |
 |---|---|
-| **Frente a cliente** (prenda principal) | polo piqué navy `#023c70` con **emblema bordado**, espalda limpia |
+| **Frente a cliente** (prenda principal) | polo piqué navy `#023c70` con **emblema bordado** al pecho y, desde el 2026-09-21, **logo + eslogan bordados en la espalda** |
 | **Reunión formal, comité, licitación** | camisa o blusa blanca + chaqueta softshell o blazer navy, emblema bordado discreto |
 | **Evento, feria, stand** | polera navy |
 | **Producción, terreno, grabación, streaming** | hoodie, polera royal y gorra |
