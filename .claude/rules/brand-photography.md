@@ -182,6 +182,23 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   corrígelo ANTES de generar** — generar sobre un manifiesto equivocado propaga el error a todas las vistas.
   **[pendiente]** sólo está corregida `02-espalda` de la softshell (`v02`,
   `ai-generations/2026-09-21_espalda-bordada/`); el resto de espaldas de **softshell y bomber** siguen estampadas.
+- 🔴 **Realismo NO es castigo** **[medido 2026-09-21]**. El operador rechazó la primera receta de piel real
+  porque «la envejeció mucho y la puso un poco fea»: pedir rojeces, manchitas, brillo disparejo y líneas de
+  expresión produce una persona de 40 años, manchada y cansada. **Lo que hace humana a una cara son poros
+  IRREGULARES y vello facial fino**, no imperfecciones. La receta aprobada (v3) pide la textura **sólo** de
+  poros y vello, con tono **parejo**, piel sana y luminosa, sin rojeces ni ojeras, frente **lisa en relieve**,
+  y **luz de ventana CON relleno** — una sola fuente sin rebote marca las sombras y suma años. Y **más
+  resolución no es más fidelidad**: a 2560×3200 el modelo inventa el detalle de poros que el maestro de
+  1024×1536 no tiene, así que hay que verificar al 100% contra el maestro. Costo: `max` a 2560×3200 son
+  **USD 0,565** por imagen, diez veces una de 1024² en `high`. Receta completa y las tres iteraciones:
+  `ai-generations/_identidad-nexa/LEEME.md`.
+- 🔴 **Para vestir a alguien con material de otra identidad, injerta el rostro; no describas el pelo**
+  **[medido 2026-09-21]**. Imagen 1 la escena original, imagen 2 el ancla de identidad, y se pide cambiar
+  **sólo los rasgos de la cara** conservando pose, gesto, vestuario, fondo y luz. Aguantó los casos difíciles
+  (risa con ojos cerrados, boca abierta, mano ocluyendo el mentón). **Trampa:** pedir «cambia cara **y pelo**»
+  y describir el pelo del ancla **suelta los recogidos y borra las gafas** — cinco piezas de home office
+  salieron sin moño ni montura. Hay que declarar que el peinado y los accesorios se conservan de la imagen
+  original.
 - 🔴 **La marca se pierde por el ENCUADRE, no por la referencia** **[medido 2026-09-21]**. Si el emblema, la
   cinta del lanyard o el carnet quedan chicos en el cuadro, el modelo los sustituye por una mancha con forma
   parecida **aunque la referencia oficial esté entre las imágenes de entrada**. Prueba controlada sobre la
