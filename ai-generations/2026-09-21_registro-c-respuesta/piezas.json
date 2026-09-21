@@ -74,5 +74,119 @@
       "width": 0.2,
       "x": 0.5
     }
+  },
+  {
+    "id": "e3-descalificacion",
+    "plate": "plates/e3-descarte-45-plate.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.84,
+    "lead": "No le servimos a todas las marcas.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 44,
+    "leadGap": 0.15,
+    "dominant": "Quizá ni a la tuya.",
+    "dominantSize": 175,
+    "dominantMax": 0.66,
+    "after": "Te lo decimos **antes** de cobrarte.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 40,
+    "afterGap": 0.12,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.7,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
+  },
+  {
+    "id": "e4-eficiencia",
+    "plate": "plates/e4-instrumento-45-plate.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.84,
+    "lead": "No te vendemos estar en ChatGPT.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 44,
+    "leadGap": 0.15,
+    "dominant": "Que tu pauta rinda.",
+    "dominantSize": 175,
+    "dominantMax": 0.74,
+    "after": "A las marcas citadas les sube **+91%** el clic pagado.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 40,
+    "afterGap": 0.12,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.7,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
+  },
+  {
+    "id": "e5-transparencia",
+    "plate": "plates/e5-ausencia-45-plate.png",
+    "align": "left",
+    "top": 0.075,
+    "textWidth": 0.84,
+    "lead": "No tienes que confiar en nosotros.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 44,
+    "leadGap": 0.15,
+    "dominant": "Míralo tú.",
+    "dominantSize": 175,
+    "dominantMax": 0.66,
+    "after": "Cada decisión, con **su porqué**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 40,
+    "afterGap": 0.12,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.7,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    }
   }
 ]

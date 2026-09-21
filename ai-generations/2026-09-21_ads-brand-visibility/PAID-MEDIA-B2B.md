@@ -134,6 +134,20 @@ reconciliado. Un lead magnet gratis para el prospecto no es gratis para nosotros
 coste por Grader, % que acepta reunión y % que cierra. **Recién con esos tres números se decide el escalado** —
 los de la tabla son supuestos.
 
+## ✅ La convención de UTM ya es compatible con el scheduler — verificado
+
+`TASK-1885` (creada hoy para cerrar la atribución) dejó una pregunta abierta: la allowlist del scheduler es
+**estrecha a propósito** (`^[A-Za-z0-9._~-]+$`) y **descarta en silencio** cualquier valor con espacios. Probados
+los 10 valores de nuestra convención contra esa expresión: **10/10 pasan.**
+
+🔴 **La regla que hay que respetar al crear las campañas en las plataformas:** minúsculas, guiones y guiones
+bajos. **Nunca espacios, `+`, tildes ni `&`.** Un `utm_campaign` autogenerado por Ads o LinkedIn suele traer
+espacios — si se deja el valor por defecto, la campaña se pierde aunque todo el cableado funcione.
+
+⚠️ Y el hallazgo de la task que cambia el orden de trabajo: el schema es `.strict()` y **tumba la reserva entera**
+ante un campo inválido. Hasta que TASK-1885 cierre, mandar UTM crudos al booking convertiría cada reserva de
+campaña en `validation_failed`. **No se pautea al agendamiento antes de esa task.**
+
 ## Formatos por plataforma
 
 | Plataforma | Formato | Receta |

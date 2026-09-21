@@ -1,0 +1,17 @@
+{
+  "id": "e3-descarte-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "descarte",
+  "escena": "SCENE (Efeonce studio, Santiago, late afternoon): the rejected work is a deep pile of printed diagnostics — dozens of sheets at every angle, each carrying rows of INK-BLUE printed bars and dense text too small and too steeply angled to be read, some creased, some face down, several crossed out edge to edge. The pile sits on a dark worktop and fills the centre and lower half of the picture. Where the chosen one used to be there is a clean empty rectangle of bare worktop, lighter than the wood around it. A stubby ORANGE grease pencil lies at the edge of the gap. Caught at the exact moment the low afternoon sun clears the window frame on the left and rakes hard across the pile so every single sheet edge casts its own shadow, and the light stays BELOW the middle of the frame: it never reaches the wall above. Above the worktop the plaster wall is one smooth unbroken surface in deep shadow, with nothing on it and no window, no lamp and no bright spot anywhere in it. 50mm lens at f/4.",
+  "reservas": {
+    "texto": {
+      "muro": "the smooth plaster studio wall above the worktop",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "a dark equipment road case standing in the immediate foreground, its top edge running unbroken across the whole width of the frame",
+    "tono": "DARK charcoal road-case panel in deep shadow, matte, its texture still faintly visible, far outside the light"
+  }
+}

@@ -1,26 +1,26 @@
 [
   {
-    "id": "d2-la-revisa",
+    "id": "e4-eficiencia",
     "dominante": [
-      "Nadie la audita."
+      "Que tu pauta rinda."
     ],
-    "ratioDominanteEntrada": 3.9,
+    "ratioDominanteEntrada": 3.3,
     "contraste": {
-      "entrada": 14.58,
-      "dominante": 12.57,
-      "cierre-frase": 14.52,
-      "logo": 9.82
+      "entrada": 13.74,
+      "dominante": 12.52,
+      "cierre-frase": 14.5,
+      "logo": 20.14
     },
     "gapsTinta": [
       {
         "entre": "entrada→dominante",
         "px": 26,
-        "ratioDominante": 0.153
+        "ratioDominante": 0.178
       },
       {
         "entre": "dominante→cierre",
-        "px": 20,
-        "ratioDominante": 0.117
+        "px": 18,
+        "ratioDominante": 0.123
       }
     ],
     "seleccion": {

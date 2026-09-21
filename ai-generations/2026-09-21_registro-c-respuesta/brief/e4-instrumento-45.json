@@ -1,0 +1,15 @@
+{
+  "id": "e4-instrumento-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "instrumento",
+  "instrumento": "a modern anodised-aluminium inspection loupe on a slim machined stand, standing over the sheet",
+  "escena": "SCENE (Efeonce studio, Santiago, late afternoon): the camera sits DOWN AT TABLE HEIGHT. Beyond the glass and sharp inside it, a printed media plan lies on the table: a column of channel rows with INK-BLUE printed bars beside each one, two of those rows carrying bars visibly longer than all the rest, magnified by the loupe so their length is unmistakable. Everything outside the barrel of the loupe falls away into soft blur. Caught at the instant the low afternoon sun clears the window frame on the left and rakes across the paper and the machined aluminium, staying BELOW the middle of the frame: it never reaches the wall above. NOBODY is in the picture: no person, no hand, no forearm anywhere. The loupe and every object stay in the LOWER TWO THIRDS. Above them the plaster wall is one smooth unbroken surface in deep shadow, with nothing on it and no window, no lamp and no bright spot anywhere in it. 100mm macro lens at f/4.",
+  "reservas": {
+    "texto": { "muro": "the smooth plaster studio wall above the table", "tinta": "blanca" }
+  },
+  "lecho": {
+    "objeto": "the matte-black back of a monitor standing in the immediate foreground, its dark body running unbroken across the whole width of the frame",
+    "tono": "DARK matte-black monitor shell in deep shadow, its fine texture still faintly visible, completely outside the light"
+  }
+}
