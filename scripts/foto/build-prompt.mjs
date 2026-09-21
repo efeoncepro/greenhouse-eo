@@ -196,11 +196,37 @@ export const PERSONAS = {
     // La PRIMERA es un retrato CERCANO en tres cuartos. Sin ella el set sólo tenía planos generales,
     // donde el rostro ocupa pocos píxeles, y cada generación lo reconstruía: es la referencia con la
     // que se hizo el KV «Tu IA no conoce tu negocio» que el operador aprobó el 2026-09-17.
+    //
+    // Las TRES son de la serie «Avatar» de OneDrive. Esto NO es una preferencia de encuadre: desde
+    // abril conviven dos rostros distintos bajo el nombre «Nexa» y hasta hoy este bloque mezclaba los
+    // dos. Medido por sha256 el 2026-09-21: `nexa-the-breakdown` es `Poses y expresiones/The
+    // Breakdown/hf_20260409_212045_aff0e…`, que pertenece a la OTRA identidad — cara más larga, cejas
+    // finas arqueadas y sin delineado del párpado. Con dos referencias de una cara y una de la otra el
+    // modelo promedia, y en el KV aprobado ganó la serie Avatar sólo por mayoría (2 de 3). El operador
+    // eligió la serie Avatar como Nexa canónica el 2026-09-21, así que `the-breakdown` sale y entra
+    // `nexa-avatar-frontal-v2` (= `Avatar Frontal v2.png`), de la misma serie.
+    // La serie «Poses y expresiones» y `Vestuario/` siguen siendo material válido de pose, vestuario y
+    // escenario — pero NUNCA como ancla de rostro.
     refs: [
       'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-34-v2.png',
       'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png',
-      'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-breakdown.png'
-    ]
+      'ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-frontal-v2.png'
+    ],
+    // Vistas que las referencias frontales NO cubren, derivadas por EDICIÓN desde `nexa-avatar-34-v2`
+    // el 2026-09-21 — no generadas de cero, por la misma razón que en Julio. Dos cosas medidas en esa
+    // corrida: pedir «45 degrees» NO gira la cabeza (la v01 volvió en el mismo ángulo de la
+    // referencia); lo que la movió fue declarar la inversión respecto a la referencia más el marcador
+    // «su nariz apunta al BORDE DERECHO del cuadro». Y el iris salía miel hasta que se pidió «marrón
+    // plano y uniforme, tan oscuro que la pupila apenas se distingue, sin anillo más claro».
+    // Prompts verbatim: `ai-generations/2026-09-21_nexa-angulos/prompts/`.
+    vistas: {
+      '45-izq': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-45-izq.png',
+      '45-der': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-45-der.png',
+      'perfil-izq': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-izq.png',
+      'perfil-der': 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-der.png',
+      trasero: 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-135-trasero.png',
+      espalda: 'ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-espalda.png'
+    }
   }
 }
 

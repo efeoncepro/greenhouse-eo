@@ -46,9 +46,33 @@
       "rol": "persona:nexa",
       "sha256": "7f34d10b67f1c2da1cf316fbcfd99c6dcf2505bc070470beeccd2953c46b1818"
     },
-    "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-the-breakdown.png": {
+    "ai-generations/2026-09-17_nexa-logo-estudio/refs/nexa-avatar-frontal-v2.png": {
       "rol": "persona:nexa",
-      "sha256": "f05fbcab3655a39af5f1fc210e767dc9fcb20e83620d0516982b4416fbebd52c"
+      "sha256": "51e606e258521aff52068465ce906644a42415a53f6578edfcf35873dddd5f4e"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-45-izq.png": {
+      "rol": "persona:nexa/45-izq",
+      "sha256": "505ec26df0c3755c498517c36764983321a2f6bdfeaf6bc48b491bf1c9b4dcbd"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-45-der.png": {
+      "rol": "persona:nexa/45-der",
+      "sha256": "f9f53cfd6d3ab08671039c122778a08c4659dccae8c6a8b85a55a59ad3c038b3"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-izq.png": {
+      "rol": "persona:nexa/perfil-izq",
+      "sha256": "7159cc484e9beb6b7ed555708a812e34a37cad8ef4fef25d5bc0a70f2d93576d"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-perfil-der.png": {
+      "rol": "persona:nexa/perfil-der",
+      "sha256": "06148f4a74cc5264a3151c5987f7559a3c75f094417a5a0ffb6d809806718878"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-135-trasero.png": {
+      "rol": "persona:nexa/trasero",
+      "sha256": "9bdff6dde641a10abfcd2e2e66228fac82a05e9d9a1379625f0a34116b12d530"
+    },
+    "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/nexa-espalda.png": {
+      "rol": "persona:nexa/espalda",
+      "sha256": "01f1fd94e7470fd3b306b7b4b1409b0da47df89b7adbcc18f3395ca5798bb1df"
     },
     "ai-generations/2026-09-17_sprocket-3d/final/efeonce-sprocket-hubspot-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
       "rol": "kit:sprocket-hubspot/frente",
