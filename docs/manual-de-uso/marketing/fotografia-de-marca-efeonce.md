@@ -3,17 +3,18 @@
 > **Tipo de documento:** Manual de uso (operador)
 > **Versión:** 1.0
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-19 por Claude
+> **Última actualización:** 2026-09-20
 > **Documentación relacionada:** [Índice de fotografía de marca](../../operations/brand-photography/README.md) · [Lenguaje fotográfico (maestro)](../../operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Firma](../../operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) · [Colorimetría](../../operations/brand-photography/EFEONCE_PHOTO_COLORIMETRY_V1.md) · [Cámaras, lentes y ángulos](../../operations/brand-photography/EFEONCE_PHOTO_CAMERA_LENS_ANGLE_CATALOG_V1.md) · [Bloques de prompt y pipeline](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md) · [Personas](../../operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md)
 
 ## Lo más corto que funciona
 
 ```bash
 pnpm foto:doctor                                  # 0. ¿esta máquina puede generar? (no cuesta nada)
-pnpm foto:prompt --ficha-ejemplo > ficha.json     # 1. plantilla; editá escena, lecho y reservas
+pnpm foto:prompt --ficha-ejemplo > ficha.json     # 1. plantilla; edita escena, lecho y reservas
 pnpm foto:prompt ficha.json --batch batch.json    # 2. arma el prompt (imprime el ai:image exacto)
 pnpm ai:image --batch batch.json --out <dir> --model gpt-image-2.5-flare --quality high --size <el que imprimió>
 pnpm foto:validar <dir>/<archivo>-plate.png       # 3. ¿sirve? con números, no a ojo
+pnpm foto:emblema <plate.png>                     # 4. si hay prenda: amplía el bordado para mirarlo
 ```
 
 Tres reglas que ahorran plata:
@@ -21,7 +22,7 @@ Tres reglas que ahorran plata:
 1. **No escribas el prompt a mano.** El comando resuelve el formato, el porcentaje del lecho y el límite de
    sujetos desde una tabla. Armarlo a mano fue la vía por la que un valor de 4:5 terminó dentro de un bloque que
    corría en todos los formatos, sin que nadie lo viera.
-2. **Validá antes de componer.** Si el plate no pasa, se **regenera**; no se parcha con un scrim ni al componer.
+2. **Valida antes de componer.** Si el plate no pasa, se **regenera**; no se parcha con un scrim ni al componer.
 3. **Piloto antes de la tanda.** Tres plates cuestan USD 0,15 y te dicen si el prompt sirve. Cincuenta cuestan
    USD 2,50 y te dejan cincuenta imágenes que alguien tiene que mirar.
 
@@ -54,9 +55,8 @@ No sirve para piezas de clientes ni para trendjacking que toma prestada una est�
 
 ```bash
 cd /Users/jreye/Documents/greenhouse-eo
-RUN=ai-generations/$(date +%F)_<tema>
-mkdir -p $RUN/rondas/r1 $RUN/prompts $RUN/scripts
-cp ai-generations/2026-09-19_lenguaje-fotografico-efeonce/prompts/bloque-*.txt $RUN/prompts/
+RUN=ai-generations/$(date +%F)_tema
+mkdir -p $RUN/rondas/r1 $RUN/scripts
 cp ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/{medir.mjs,metricas.cjs,componer.mjs} $RUN/scripts/
 ```
 
@@ -78,31 +78,19 @@ Lo mínimo:
 
 ### 3. Arma el prompt
 
-Copia en este orden (textos verbatim en
-[pipeline §3](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#3-bloques-verbatim)):
-
-1. Bloque de **realismo v2**.
-2. Bloque de **impacto v1** (o **color system** para una pieza serena).
-3. Si hay mesa de luz o mucho blanco: bloque de **balance de blancos y exposición**.
-4. **SCENE:** tu ficha en inglés, con lente y foco («50mm lens at f/2, focus on her eyes»).
-5. Si es de noche: la **regla de noche** dentro de SCENE.
-6. **FOREGROUND (planned):** la plantilla con tu lecho y su tono («DARK near black» o «VERY LIGHT, almost white»).
+Parte de `pnpm foto:prompt --ficha-ejemplo` y completa la ficha JSON. Declara escena, fuente de luz, momento,
+materia y tono del lecho, formato y reservas. Cuando aplique, agrega `identidad` con la vista, `objetos`, una sola
+`palanca`, `atmosfera` con su haz y `suspendido` con la dosis de la serie. `foto:prompt` incorpora los bloques
+canónicos, el formato, el porcentaje del lecho y el límite de sujetos; **no concatenes bloques a mano**.
+Detalle de cada campo y sus guardas en el [pipeline §4.2](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md).
 
 ### 4. Genera
 
-Para varias fotos, arma el lote con Python (no a mano: las comillas se rompen):
+Para varias fotos, guarda las fichas en un JSON y deja que `foto:prompt` arme el lote:
 
 ```bash
-cd $RUN
-python3 - <<'EOF'
-import json
-R=open('prompts/bloque-realismo-v2.txt').read().strip(); I=open('prompts/bloque-impacto-v1.txt').read().strip()
-shots=[("A1-plate.png","SCENE: ...","FOREGROUND (planned): ...")]
-json.dump([{"filename":f,"prompt":f"{R}\n\n{I}\n\n{s}\n\n{fg}"} for f,s,fg in shots],open('rondas/r1/batch.json','w'),ensure_ascii=False,indent=1)
-EOF
-cd /Users/jreye/Documents/greenhouse-eo
-pnpm ai:image --batch $RUN/rondas/r1/batch.json --out $RUN/rondas/r1 \
-  --model gpt-image-2.5-flare --quality high --size 1152x1440
+pnpm foto:prompt $RUN/rondas/r1/fichas.json --batch $RUN/rondas/r1/batch.json
+# Ejecuta el comando pnpm ai:image que imprime foto:prompt: modelo, tamaño y referencias dependen de la ficha.
 ```
 
 - Con **Julio o Nexa** (referencias de identidad): usa `--model gpt-image-2.5-sunburst` y el procedimiento de
@@ -133,10 +121,10 @@ completa en [pipeline §6](../../operations/brand-photography/EFEONCE_PHOTO_PROM
 ### 8. Firma
 
 ```bash
-LOGO=0.15 node scripts/componer.mjs rondas/r1/A1-plate.png rondas/r1/A1-final.png
+LOGO=0.20 node scripts/componer.mjs rondas/r1/A1-plate.png rondas/r1/A1-final.png
 ```
 
-Pasa **siempre** `LOGO=0.15` (sin eso el logo sale al 20 % y parece un sello). El script elige blanco o navy y te
+Usa **`LOGO=0.20`** para hacer explícita la decisión vigente; el script también usa 20 % por defecto. El script elige blanco o navy y te
 dice el contraste: debe ser **≥ 4,5:1**. Para la selección con cursores (1 de cada 3 piezas, aprox.) ver
 [pipeline §7](../../operations/brand-photography/EFEONCE_PHOTO_PROMPT_BLOCKS_AND_PIPELINE_V1.md#7-composición-de-la-firma-y-selección-axis-componermjs).
 
@@ -218,7 +206,7 @@ al 200 %: manos, caras, identidad, emblemas letra por letra, marcas de terceros,
 | Un `cp` con `*` aborta entero | Glob sin coincidencias en zsh | `setopt nullglob` |
 | Las imágenes del lote aparecen en `public/images/generated` | Versión antigua del CLI | Actualizar el repo (arreglado en el commit `5946f14a0`) y pasar `--out <carpeta>` |
 | La edición de pantalla deja una persona «fantasma» | Máscara rectangular | Máscara desde el verde, con `extractChannel(0)` |
-| El logo parece sello o marca de agua | Ancho 20 % | `LOGO=0.15` |
+| El logo parece sello o marca de agua | Lecho, posición o doble presencia de marca | Revisa la composición y conserva el ancho aprobado de 20 %; evita firmar si otro emblema ya protagoniza la foto |
 | La foto se ve genérica | Reunión sin obra ni dato | Volver a la ficha: ¿qué oficio se ve trabajando? |
 
 ## Referencias técnicas
@@ -233,3 +221,34 @@ al 200 %: manos, caras, identidad, emblemas letra por letra, marcas de terceros,
 | Julio, Nexa y uniforme | [Personas](../../operations/brand-photography/EFEONCE_PHOTO_PEOPLE_IDENTITY_WARDROBE_V1.md) |
 | Evidencia (prompts y scripts) | `ai-generations/2026-09-19_lenguaje-fotografico-efeonce/` |
 | CLI de imagen | `scripts/ai/generate-image.ts` (`pnpm ai:image --help`) |
+
+
+## Si en la foto aparece ropa, el lanyard, el logo 3D o una mascota
+
+🔴 **No le pidas al modelo que dibuje la marca.** No la sostiene: medido, cuatro pasadas sobre la misma
+pieza dieron cuatro logotipos distintos, y tres prendas dieron tres emblemas de los que ninguno era el
+de Efeonce.
+
+**Hay 279 archivos en 10 kits.** La vista que necesitas casi seguro ya existe; el trabajo es elegirla:
+
+| Si vas a… | Pásale al modelo |
+|---|---|
+| Vestir a alguien o poner la pieza en la escena | la **pieza en uso**: la vista `puesto`, la prueba en persona del kit, o el conjunto terminado |
+| Construir un armado o un bodegón | la **pieza aislada** sobre transparente |
+| Producir una vista nueva del kit | el **arte plano** |
+
+**Antes del prompt, abre el `LEEME.md` y el manifiesto del kit**: dicen `cuando_usarla` por vista. Y si
+el kit trae **prueba en persona**, empieza por ahí: ya resolvió calce, orientación y legibilidad.
+
+Para armar una pieza con marca desde cero —un lanyard con el carnet de alguien— el comando es:
+
+```bash
+pnpm foto:lanyard --nombre "<Nombre>" --cargo "<Cargo>" --foto <retrato.png> --generar
+```
+
+Arma la pieza determinísticamente y le pide al modelo **sólo el acabado**: tejido, relieve, plástico,
+metal, sombras. Si el retrato es de cuerpo entero, recorta cabeza y hombros antes o la cara queda
+diminuta en el carnet.
+
+Contrato completo, con el inventario y los casos medidos:
+[selección de referencias de marca](../../operations/EFEONCE_BRAND_ASSET_REFERENCE_SELECTION_V1.md).
