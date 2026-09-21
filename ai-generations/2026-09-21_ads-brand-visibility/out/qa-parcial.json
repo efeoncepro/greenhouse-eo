@@ -1,15 +1,15 @@
 [
   {
-    "id": "c2-actionable",
+    "id": "c1-readable",
     "dominante": [
-      "No pudo."
+      "Lo inventó."
     ],
     "contraste": {
-      "etiqueta": 12.25,
-      "entrada": 12.16,
-      "dominante": 10.34,
-      "cierre-frase": 11.59,
-      "logo": 16.37
+      "etiqueta": 13.42,
+      "entrada": 13.38,
+      "dominante": 11.98,
+      "cierre-frase": 13.14,
+      "logo": 18.93
     },
     "gapsTinta": [
       {
@@ -45,23 +45,15 @@
           "id": "local"
         },
         {
-          "id": "dev",
+          "id": "contenido",
           "labelBounds": {
-            "left": 642.481,
-            "top": 380.758,
-            "right": 726.355,
-            "bottom": 431.285
+            "left": 737.82,
+            "top": 362.817,
+            "right": 901.856,
+            "bottom": 413.344
           }
         }
       ]
     }
-  },
-  {
-    "id": "c1-muda",
-    "contraste": {
-      "logo": 17.84
-    },
-    "gapsTinta": [],
-    "seleccion": null
   }
 ]

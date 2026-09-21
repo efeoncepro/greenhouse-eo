@@ -209,8 +209,49 @@
     }
   },
   {
-    "id": "c1-muda",
+    "id": "c1-readable",
     "plate": "plates/c1-oclusion-45-plate.png",
+    "align": "left",
+    "top": 0.045,
+    "textWidth": 0.84,
+    "label": "BRAND VISIBILITY GRADER",
+    "labelSize": 24,
+    "labelGap": 0.12,
+    "lead": "La IA no entendió a qué te dedicas.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 44,
+    "leadGap": 0.15,
+    "dominant": "Lo inventó.",
+    "dominantSize": 175,
+    "dominantMax": 0.62,
+    "after": "Con lo que **encontró**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 40,
+    "afterGap": 0.12,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.7,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        },
+        {
+          "id": "contenido",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "Contenido",
+          "who": "role",
+          "color": "#ff6500"
+        }
+      ]
+    },
     "logo": {
       "width": 0.2,
       "x": 0.5
