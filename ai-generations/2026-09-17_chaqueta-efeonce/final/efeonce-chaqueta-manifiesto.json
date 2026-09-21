@@ -289,6 +289,22 @@
       "archivo_fondo": "final/efeonce-chaqueta-bomber-15-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png",
       "resolucion": "1024x1536",
       "brief": "brief/bomber-puesto-espalda-mujer.prompt.txt"
+    },
+    {
+      "id": "bomber-16-puesto-espalda",
+      "descripcion": "La bomber puesta, vista de espalda, en cuerpo masculino, sin rostro.",
+      "cuando_usarla": "Alguien de espaldas con la bomber, cuerpo masculino. La 15 es la misma toma en cuerpo femenino.",
+      "archivo_fondo": "final/efeonce-chaqueta-bomber-16-puesto-espalda-1024x1536-v01-fondo-estudio.png",
+      "resolucion": "1024x1536",
+      "brief": "brief/bomber-puesto-espalda.prompt.txt"
+    },
+    {
+      "id": "bomber-17-puesto-frente-cuerpo-b",
+      "descripcion": "La bomber puesta de frente en un segundo cuerpo, de complexión más llena y tono de piel más oscuro, sin rostro.",
+      "cuando_usarla": "Para ver cómo cae la bomber en otra contextura; equivalente a la 16 de la softshell.",
+      "archivo_fondo": "final/efeonce-chaqueta-bomber-17-puesto-frente-cuerpo-b-1024x1536-v01-fondo-estudio.png",
+      "resolucion": "1024x1536",
+      "brief": "brief/bomber-puesto-frente-cuerpo-b.prompt.txt"
     }
   ],
   "delta_2026_09_21": "Se agregan las vistas PUESTAS DE ESPALDA EN CUERPO FEMENINO. El kit sólo tenía la espalda puesta en cuerpo masculino, así que para una pieza con una mujer había que elegir entre una vista del ángulo correcto pero del cuerpo equivocado, o ninguna. Generadas con el método del kit: mismo bloque base, mismo contrato de realismo, mismo cierre de estudio, y la estampa canónica como imagen 2 — el texto nunca se le pide al modelo. Detectado por el operador el 2026-09-21."

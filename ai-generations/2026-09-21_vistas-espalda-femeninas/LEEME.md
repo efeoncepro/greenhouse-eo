@@ -30,10 +30,25 @@ El delta que se agregó, igual en las tres: mujer de complexión más delgada, p
 hombro **para que no tape la estampa**, sin rostro, y cómo cae la prenda unisex en un cuerpo femenino
 —las costuras de hombro algo más anchas, el cuerpo suelto sobre una cintura más estrecha—.
 
-## Lo que sigue faltando **[pendiente]**
+## Segunda tanda, mismo día — los tres huecos que quedaban
 
-- **Polo navy**: espalda puesta en cuerpo femenino (tiene 13-frente, 14-espalda y 15-frente-cuerpo-b).
-- **Bomber**: espalda puesta en cuerpo masculino, y frente en cuerpo B.
+| Vista nueva | Kit | Qué cerraba |
+|---|---|---|
+| `efeonce-polo-navy-16-puesto-espalda-mujer` | polo | la 14 es la misma toma en cuerpo masculino |
+| `efeonce-chaqueta-bomber-16-puesto-espalda` | chaqueta | empareja con la femenina de la primera tanda |
+| `efeonce-chaqueta-bomber-17-puesto-frente-cuerpo-b` | chaqueta | equivalente a la 16 de la softshell |
+
+🔴 **El polo se generó SIN referencia de arte, a propósito.** Es la única prenda de **espalda limpia**
+—la más formal frente a cliente— y el kit ya tenía medido que pasarle la estampa **empuja al modelo a
+imprimirla igual**. En su brief la espalda limpia se declara además de forma explícita: *«no print, no
+logo, no text of any kind»*. Salió limpia a la primera.
+
+**QA del emblema:** en `bomber-17-puesto-frente-cuerpo-b` se revisó el emblema del pecho contra la
+referencia del kit, recortado y ampliado, porque el espejado es el fallo recurrente documentado (6 de
+21 vistas del polo volvieron invertidas). **Orientación correcta**: nave a la derecha, aletas abajo a
+la izquierda, planeta arriba.
+
+Las seis vistas de la jornada salieron **a la primera**, sin descartes.
 
 ## Entrega
 

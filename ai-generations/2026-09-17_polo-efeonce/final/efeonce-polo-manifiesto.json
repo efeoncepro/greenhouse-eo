@@ -260,6 +260,16 @@
         1200,
         1600
       ]
+    },
+    {
+      "id": "navy-16-puesto-espalda-mujer",
+      "descripcion": "El polo navy puesto, vista de espalda, en cuerpo femenino, sin rostro. La espalda va LIMPIA.",
+      "cuando_usarla": "Cuando la pieza muestre a una MUJER de espaldas con el polo. La vista 14 es la misma toma en cuerpo masculino.",
+      "archivo_fondo": "final/efeonce-polo-navy-16-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png",
+      "resolucion": "1024x1536",
+      "brief": "brief/polo-navy-puesto-espalda-mujer.prompt.txt",
+      "nota": "Generada SIN referencia de arte: el polo es la única prenda de espalda limpia, y pasarle la estampa empuja al modelo a imprimirla igual."
     }
-  ]
+  ],
+  "delta_2026_09_21": "Se agrega la espalda puesta en cuerpo femenino. El kit sólo la tenía en cuerpo masculino."
 }
