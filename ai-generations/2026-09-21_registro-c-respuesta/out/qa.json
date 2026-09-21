@@ -1,0 +1,45 @@
+[
+  {
+    "id": "d1-la-respuesta",
+    "dominante": [
+      "La IA no."
+    ],
+    "ratioDominanteEntrada": 4,
+    "contraste": {
+      "entrada": 15.64,
+      "dominante": 13.93,
+      "cierre-frase": 15.48,
+      "logo": 17.98
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 26,
+        "ratioDominante": 0.149
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 21,
+        "ratioDominante": 0.12
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "local"
+        }
+      ]
+    }
+  }
+]

@@ -451,3 +451,59 @@ operador, no de esta documentación.
 | `K-larga-v1` | lecho **2,27** | Las estelas de luz pasan **por encima** del road case. Se cierra sacándolo del paso de los trazos — misma lógica que sacarlo de la llave |
 | `L-proyeccion-v1` | aire para cursores **1,02** | El muro proyectado tiene **mucha estructura en los costados** |
 | `I-nexa-v1` | lecho **3,99** | El panel de color **recibe algo del rim** |
+
+## Delta 2026-09-21 (tarde) — tercer registro: C · «la respuesta a la vista»
+
+**Origen.** Produciendo los ads del Brand Visibility Grader, las cinco piezas con persona **fallaron la prueba
+de significar sin titular** —la del registro B—. No por ejecución: por estructura. Hay una **desconexión de
+sujeto**: la foto muestra al *proveedor*, el titular habla del problema del *cliente*, y **el actor del problema
+—el motor que responde— no está en cuadro**. Una persona del equipo Efeonce comunica «existimos y somos
+profesionales»; no puede comunicar «la IA te describe mal». El operador lo detectó primero y pidió el registro.
+
+### Qué es
+
+**El sujeto es la respuesta de la máquina y quien la encarna.** Nadie del equipo Efeonce protagoniza. Sirve
+exactamente para los servicios donde la persona **no porta el mensaje**: SEO, AEO, el grader, visibilidad, datos.
+
+| | Registro C |
+|---|---|
+| Qué es la foto | **La respuesta**, y quién la da cuando tú no estás |
+| Protagonista | La criatura del motor (partnership declarado), **Nexa**, o el objeto donde la respuesta se materializa |
+| ¿Personas del equipo? | **No.** Si hay persona, *recibe* la respuesta y no mira al lente |
+| Barra | **significar sin titular** (el actor del problema está en cuadro) · la respuesta se lee **como respuesta** (impresa, proyectada, en pantalla) · identidad y colorimetría intactas · las seis reservas |
+| Para qué | Dramatizar el problema **del cliente** sin nosotros en cuadro |
+
+**Comparte sin negociación** con A y B: realismo, colorimetría entera, firma, las seis reservas y el bloque de
+impacto. **Lo separa:** quién protagoniza y qué se fotografía.
+
+### Palancas que sirven
+
+`ausencia` (nadie en cuadro, el rastro de lo que acaba de pasar) · `variantes` (la decisión como sujeto) ·
+`descarte` · `proyeccion` · `instrumento` · `marcado`. **`copiloto` NO es de este registro**: exige que la
+criatura se pose sobre una persona.
+
+### Evidencia — la primera pieza
+
+`ai-generations/2026-09-21_registro-c-respuesta/` · palanca `ausencia` + la figura de Codex del kit.
+La sala minutos después de la sesión: el pliego donde se quedó, el marcador sin tapa, y **la única presencia
+que queda de pie sobre la mesa es la máquina**. Significa sin titular: *cuando tu equipo se va, alguien sigue
+respondiendo por tu marca*.
+
+**Cerró 5 de 5 reservas** —la segunda pieza del canon en lograrlo— con zona de texto **0,44**, lecho **15,7:1**
+y el azul portador resuelto por el propio color de la criatura, sin objeto azul añadido.
+
+### 🔴 El límite de IP, que no lo resuelve la foto
+
+Efeonce tiene **partnership con Google, Google Cloud y OpenAI** [operador, 2026-09-21], y eso hace defendible
+usar a **Codex** (OpenAI) y a **Gigi** (mascota oficial de Gemini, lanzada por Google en septiembre de 2026).
+Pero **un partnership comercial no es automáticamente una licencia de mascota**: antes de PAUTA con una criatura
+de tercero, pasar por `greenhouse-ai-creative-rights-governance` + `legal-privacy-ip-operator` y verificar qué
+permite el programa de partners.
+
+**`Clawd` es distinto y más frágil:** no es mascota oficial de Anthropic —sale del binario de Claude Code— y
+no hay partnership declarado. Sirve en orgánico como referencia nominativa; **no** como aval en pauta.
+
+**Nunca** las tres criaturas juntas como panel de jueces: es la composición que más se lee como endoso.
+
+**El vehículo más seguro del registro es propio: Nexa.** Tiene Character Bible, ocho expresiones y cinco
+vestuarios, y *es* la tesis de la narrativa del período —la IA que sí conoce tu negocio—.

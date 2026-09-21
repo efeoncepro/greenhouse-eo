@@ -25,6 +25,14 @@ pieza con la barra del otro es lo que produce la sensación del operador de que 
 | Para qué | credibilidad: sitio, piezas de equipo, «esto es lo que hacemos» | que la idea entre en dos segundos |
 | Evidencia | `F-podcast-v1.png` (la escucha) · `E-estudio-v2.png` (el estudio en operación) | «¿Claude o Codex?» · KV de Clawd · `copiloto` · `G-podcast-v5.png` |
 
+🔴 **Hay un TERCER registro desde el 2026-09-21: C · «la respuesta a la vista»** — el sujeto es **la respuesta
+de la máquina y quién la da**, sin personas del equipo. Nació porque las cinco piezas con persona de los ads del
+grader **fallaron la prueba de significar sin titular**: la foto muestra al proveedor, el titular habla del
+problema del cliente y **el actor del problema no estaba en cuadro**. Es el registro de SEO, AEO, visibilidad y
+datos, donde la persona no porta el mensaje. Barra, palancas (`ausencia`, `variantes`, `descarte`, `proyeccion`)
+y el límite de IP de las criaturas de terceros: [delta 2026-09-21 (tarde)](../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#delta-2026-09-21-tarde--tercer-registro-c--la-respuesta-a-la-vista).
+**`copiloto` NO es de C**: exige que la criatura se pose sobre una persona.
+
 **Mirar al lente es el marcador visible del registro**: es la forma más rápida de saber en cuál está una foto
 antes de juzgarla con la barra equivocada.
 
