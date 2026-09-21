@@ -1063,20 +1063,88 @@ export const auditarReservas = ficha => {
 // sin que nada verifique que no se peleen, y cuando se pelean gana la escena por ser más específica.
 // Así reprobó `ausencia` en la auditoría ciega —bloque «chair pushed back at an angle», escena «the
 // empty chair»— y así puede reprobar cualquier otra: el aviso es por palanca, no un caso especial.
+// Cómo se nombra en una escena el color de cada variante del kit. Sólo colores explícitos: el
+// detector tiene que ser objetivo, no adivinar por el tono de la luz.
+const COLOR_EN_ESCENA = {
+  navy: /\b(navy|deep blue|dark blue|ink blue|midnight blue)\b/i,
+  blanco: /\b(white|off-white|ivory|cream)\b/i,
+  negro: /\bblack\b/i,
+  gris: /\b(grey|gray|heather)\b/i
+}
+
+// Cómo se nombra la prenda en la escena, para saber a qué kit se refiere el color.
+const PRENDA_EN_ESCENA = {
+  'polo-efeonce': /\bpolo\b/i,
+  'hoodie-efeonce': /\bhoodie\b/i,
+  'gorra-efeonce': /\b(cap|trucker)\b/i,
+  'chaqueta-softshell-efeonce': /\b(softshell|jacket)\b/i,
+  'chaqueta-bomber-efeonce': /\b(bomber|jacket)\b/i
+}
+
 export const auditarContradicciones = ficha => {
-  const palanca = PALANCAS[ficha?.palanca]
   const escena = ficha?.escena ?? ''
+  const avisos = []
 
-  if (!palanca?.contradice) return []
+  // ── 1. La escena contra su palanca
+  const palanca = PALANCAS[ficha?.palanca]
 
-  return palanca.contradice
-    .filter(({ patron, salvo }) => patron.test(escena) && !(salvo && salvo.test(escena)))
-    .map(
-      ({ porque }) =>
-        `CONTRADICE a su propia palanca "${ficha.palanca}": ${porque}. ` +
-        'El bloque de la palanca y la escena viajan juntos en el mismo prompt: cuando se pelean gana ' +
-        'la escena, por más específica, y la palanca se anula sin que nada lo delate.'
-    )
+  if (palanca?.contradice) {
+    for (const { patron, salvo, porque } of palanca.contradice) {
+      if (patron.test(escena) && !(salvo && salvo.test(escena))) {
+        avisos.push(
+          `CONTRADICE a su propia palanca "${ficha.palanca}": ${porque}. ` +
+            'El bloque de la palanca y la escena viajan juntos en el mismo prompt: cuando se pelean gana ' +
+            'la escena, por más específica, y la palanca se anula sin que nada lo delate.'
+        )
+      }
+    }
+  }
+
+  // ── 2. La escena contra el COLOR de la prenda que la ficha declara.
+  //
+  // Éste no es heurístico: si `objetos` resuelve el polo navy y la escena dice «white polo», las dos
+  // instrucciones se contradicen y punto. Y acá gana la REFERENCIA, no la escena — al revés que con la
+  // palanca—, porque una imagen pesa más que una frase. Medido el 2026-09-21: una escena que pedía
+  // «deep navy Efeonce pique polo» con el catálogo apuntando al blanco produjo un plate BLANCO
+  // (`ai-generations/2026-09-21_palancas-corregidas/plates/F-quien-sostiene-nexa-terreno.png`).
+  //
+  // Es el tercer caso en dos días de la misma clase: lo que queda FIJO en el kit —la variante de marca
+  // de la gorra, su vista, el color del polo— se impone sobre lo que pide la escena, en silencio.
+  for (const pedido of ficha?.objetos ?? []) {
+    const clave = typeof pedido === 'string' ? pedido : pedido?.objeto
+    const objeto = OBJETOS[clave]
+
+    if (!objeto?.patronPorColor) continue
+
+    const resuelto = (typeof pedido === 'string' ? null : pedido?.color) ?? objeto.colorDefecto
+    const comoSeLlama = PRENDA_EN_ESCENA[clave]
+
+    if (!comoSeLlama || !comoSeLlama.test(escena)) continue
+
+    for (const [color, patron] of Object.entries(COLOR_EN_ESCENA)) {
+      if (color === resuelto || !patron.test(escena)) continue
+
+      // Sólo cuenta si el color aparece PEGADO al nombre de la prenda: «navy polo», «polo in white».
+      // Un panel azul al fondo no es el color del polo.
+      const pegado = new RegExp(
+        `(${patron.source})[^.]{0,40}?(${comoSeLlama.source})|(${comoSeLlama.source})[^.]{0,40}?(${patron.source})`,
+        'i'
+      )
+
+      if (!pegado.test(escena)) continue
+
+      avisos.push(
+        `CONTRADICE la referencia que ella misma declara: \`objetos\` resuelve "${clave}" en ${resuelto.toUpperCase()} ` +
+          `y la escena lo describe en ${color.toUpperCase()}. Acá gana la REFERENCIA, no la escena — una imagen pesa ` +
+          `más que una frase— así que el plate saldrá ${resuelto}. ` +
+          (objeto.patronPorColor[color]
+            ? `Si lo quieres ${color}, pídelo por ficha: { "objeto": "${clave}", "color": "${color}" }.`
+            : `El kit no tiene ese color: ${Object.keys(objeto.patronPorColor).join(', ')}.`)
+      )
+    }
+  }
+
+  return avisos
 }
 
 // El lecho es la firma —es donde va el logo— así que no se puede quitar sin más. Pero la auditoría

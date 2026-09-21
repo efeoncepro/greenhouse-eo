@@ -66,3 +66,42 @@ pnpm foto:generar ai-generations/2026-09-21_palancas-corregidas/fichas/<ficha>.j
 pnpm foto:validar <plate>.png
 pnpm foto:emblema <plate>.png   # obligatorio en piezas con prenda
 ```
+
+
+## Delta 2026-09-21 (tarde) — el lanyard y el carnet no eran los oficiales
+
+**Corrección del operador** sobre `G-escucha-julio-chaqueta`: «refleja perfectamente mi postura, rostro
+incluso el uniforme pero el lanyard y el carnet están mal, no son los oficiales, corrígelo para no guardar
+referencias equivocadas».
+
+Tenía razón y el comando ya lo había avisado —«el carnet se genera determinísticamente con `arte-carnet.mjs`»—
+y el aviso se ignoró. Medido contra el kit (`ai-generations/2026-09-17_lanyard-efeonce/`):
+
+| Pieza | Lo que salió | Lo oficial |
+|---|---|---|
+| Cinta | isotipos sueltos repetidos, deformes, sin una letra | patrón que **alterna** el logotipo «efeonce» con «Empower your Growth» («Empower your» gris claro, «Growth» blanco) |
+| Yoyo | carcasa navy con disco claro | disco **blanco con el isotipo navy** bajo cúpula de resina |
+| Carnet | rectángulo **vacío** | CR80 con cabecera navy, retrato circular, «Julio Reyes / Managing & GTM Director» — **ya existía compuesto** en el kit |
+
+### Cómo se corrigió, y por qué en dos pasos distintos
+
+El canon separa las dos cosas y acá se ve por qué: **«lo plano no se genera: el carnet es el arte compuesto»**,
+mientras que la cinta es tela curva con pliegues, donde componer encima produce el mismo rechazo que tuvo el
+emblema bordado («queda impreso, no bordado»).
+
+1. **Cinta y yoyo → edición con máscara**, pasando como referencia el macro de la cinta oficial y la vista
+   puesta del kit. Resultado: el patrón alterna logotipo y eslogan, y el yoyo queda blanco con isotipo navy.
+2. **Carnet → composición determinística** del PNG oficial, escalado a los 60×74 px visibles, dentro del marco
+   rígido (no encima), atenuado a la luz medida de la zona (135/255) y con un reflejo diagonal de plástico.
+
+Salida: `plates/G2-escucha-julio-lanyard-oficial.png`. La versión anterior se conserva: las dos son evidencia.
+
+### Dos cosas medidas que conviene no olvidar
+
+- **`--mask` NO preserva píxeles.** El delta medio en la zona del rostro dio **88 de 255**: la edición
+  recompuso el encuadre entero en vez de tocar sólo la zona enmascarada. Comparados los dos rostros lado a
+  lado, la identidad se sostiene —misma estructura, mismos lentes, misma expresión— con micro-deriva en barba
+  y pelo, que es la que el canon ya registraba («las caras cambiaron poco pero cambiaron»). **Una edición con
+  máscara exige volver a mirar la cara, siempre.**
+- **La edición pierde la relación de aspecto si no se declara.** La primera pasada devolvió 1536×1024 sobre un
+  plate 4:5. Hay que pasar `--size` explícito también al editar.

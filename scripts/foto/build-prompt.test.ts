@@ -997,6 +997,60 @@ describe('palancas corregidas tras la auditoría ciega', () => {
       expect(auditarContradicciones({ palanca: 'ausencia', escena: C4 })).toHaveLength(0)
     })
 
+    // Tercer caso en dos días de la MISMA clase: lo que queda fijo en el kit —la variante de marca de
+    // la gorra, su vista, el color del polo— se impone sobre lo que pide la escena, en silencio. Acá
+    // gana la REFERENCIA y no la escena, al revés que con la palanca: una imagen pesa más que una frase.
+    describe('una escena no puede pedir un color que la referencia no tiene', () => {
+      const escenaCon = (color: string) =>
+        `SCENE (Run and Gun at a roastery): she wears the navy Efeonce trucker cap and the ${color} ` +
+        'Efeonce pique polo, sharp at the monitor cart. A hard shaft of window light with dust.'
+
+      it('atrapa el caso medido: escena navy con el kit resuelto en blanco', () => {
+        const avisos = auditarContradicciones({
+          objetos: [{ objeto: 'polo-efeonce', color: 'blanco' }],
+          escena: escenaCon('deep navy')
+        })
+
+        expect(avisos).toHaveLength(1)
+        expect(avisos[0]).toMatch(/resuelve "polo-efeonce" en BLANCO y la escena lo describe en NAVY/)
+      })
+
+      it('atrapa el inverso, con el color por defecto', () => {
+        expect(auditarContradicciones({ objetos: ['polo-efeonce'], escena: escenaCon('white') })).toHaveLength(1)
+      })
+
+      it('deja pasar la ficha coherente', () => {
+        expect(auditarContradicciones({ objetos: ['polo-efeonce'], escena: escenaCon('deep navy') })).toHaveLength(0)
+      })
+
+      // El detector exige que el color esté PEGADO al nombre de la prenda. Sin eso, cualquier escena
+      // con el azul portador de marca al fondo —que el canon pide en TODAS— daría falso positivo.
+      it('un panel azul al fondo no es el color del polo', () => {
+        const avisos = auditarContradicciones({
+          objetos: [{ objeto: 'polo-efeonce', color: 'blanco' }],
+          escena:
+            'SCENE: she wears the white Efeonce pique polo. Far behind her a large navy blue panel glows on the wall.'
+        })
+
+        expect(avisos).toHaveLength(0)
+      })
+
+      it('nombra los colores que el kit sí tiene cuando se pide uno inexistente', () => {
+        const avisos = auditarContradicciones({
+          objetos: ['polo-efeonce'],
+          escena: 'SCENE: he wears the black Efeonce pique polo at his desk.'
+        })
+
+        expect(avisos[0]).toMatch(/El kit no tiene ese color: navy, blanco/)
+      })
+
+      it('no opina sobre un kit sin variantes de color', () => {
+        expect(
+          auditarContradicciones({ objetos: ['hoodie-efeonce'], escena: 'SCENE: he wears the white hoodie.' })
+        ).toHaveLength(0)
+      })
+    })
+
     it('una palanca sin contrato de contradicción no inventa avisos', () => {
       expect(auditarContradicciones({ palanca: 'manos', escena: F4 })).toHaveLength(0)
       expect(auditarContradicciones({ escena: F4 })).toHaveLength(0)
