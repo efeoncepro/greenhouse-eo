@@ -11,7 +11,7 @@
       "sha256": "ef836ea26aa5f347a16413675d8aed835dc643e4e68369a4d5f907bfaedfb80a"
     },
     "ai-generations/2026-09-20_identidad-julio-nexa/refs-aprobadas/julio-ap-11.png": {
-      "rol": "persona:julio",
+      "rol": "persona:julio/cuerpo",
       "sha256": "687e7e650443e6425d6b273b1c0cc2f9f3a8198ce89f6afabe5b8ffbfe5dd65a"
     },
     "ai-generations/2026-09-20_identidad-julio-nexa/set-identidad/angulos/julio-45-izq.png": {
@@ -43,7 +43,7 @@
       "sha256": "a0d4864f6ae1829de110af860a973e8b41a51b03fb3c58728e9c8a0c12ae4a6d"
     },
     "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-5-cuerpo-frontal.png": {
-      "rol": "persona:nexa",
+      "rol": "persona:nexa/cuerpo",
       "sha256": "c152b98b86e58ad50556bc00cebce9cce5cd98a6f4333389a50e6dd077c905f1"
     },
     "ai-generations/_identidad-nexa/1-anclas/nexa-ancla-1-rostro-frontal.png": {
@@ -282,6 +282,102 @@
       "rol": "kit:codex/perfil",
       "sha256": "b287cc1134999871384abfc205cf62aac67d206af6194cc85a5bafbd85dde39a"
     },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/frente",
+      "sha256": "38e7028de382eafe4409b89826eac83e57ebd898bb5639be229eb32078c1feea"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-02-saludo-tres-cuartos-izquierda-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/saludo",
+      "sha256": "0b726ed80a47b683a18a4385658a1c197835b505a577a1b77e8fceee21d6378c"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-03-perfil-caminando-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/perfil",
+      "sha256": "7df294a7c81ab17f235b526f6c5ac3df94602fca613933794a4d0da2eba23159"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-04-contrapicado-celebrando-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/celebrando",
+      "sha256": "8dd00e818b96941c248aebd71d5f035f5fcb71e34b28562e4a6c4c8075f4007f"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-05-cenital-mirando-arriba-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/cenital",
+      "sha256": "9293303e83fce694ca7cfdf380c4f23997c3567da8bcc99c832d073bac09e842"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-06-espalda-tres-cuartos-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/espalda",
+      "sha256": "3eddaab8e356e8dce5b391902ad6aa0b54ceb15f231ce5831435cc1821282160"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-07-salto-en-el-aire-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/salto",
+      "sha256": "011b2e8ddc9755d03e5dc46282f1bd7a7bed07178bc6f2928d0cbf3658d7790b"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-08-idea-tres-cuartos-derecha-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/idea",
+      "sha256": "9bbadddbd1251bf5cf50ed959e55847b3ab59b8d21ae0ba903778e50f2ad3ae9"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-01-detective-lupa-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/detective",
+      "sha256": "047cde5b40258f61d5be4aa54669b3ed8e3be85110e4752466ed526cffaee6c0"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-02-artista-boina-pincel-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/artista",
+      "sha256": "7ab688e1aeed6eb2c71f199951cecb9e10290a52d50eeea8ea41d3d1ffff2270"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-03-megafono-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/megafono",
+      "sha256": "368f348aa005fe6e76d1845fe58689128fc6c9ae351518e82233021eb112f64b"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-04-casco-llave-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/casco",
+      "sha256": "e79ad5a4cd270e077130d14cbcf825b6999da8f0d0b74369cc8a18ecd7376667"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-05-audifonos-microfono-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/podcast",
+      "sha256": "5474cdb0e57255a5817692145df2ebcaa4ade81f225c59eb879b2495df8a6ce7"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-06-claqueta-cine-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/claqueta",
+      "sha256": "c7851d16cca201c5614d3b03872df601e7fbc190259491fab1fe91a628d1d211"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-07-carpetas-ordenadas-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/carpetas",
+      "sha256": "b744ddd57a15d6828a1ea5efd36ffbdbe1cec6ca5c355b0ab1d035ba311701a0"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final/efeonce-gigi-3d-08-birrete-libro-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi/birrete",
+      "sha256": "ed8d82acaeb2369dbcd254ee4fcae9aee78c5c0eb042118d7b8f878f60621708"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-01-la-pregunta-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/pregunta",
+      "sha256": "aa14494ac1523f6ccb900239a7071c581068c4b51d7ae061965b41797a9caef7"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-02-la-respuesta-con-citas-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/citas",
+      "sha256": "3d298bb8c4aca95524d7e2ef0efdd30964db4b07f4bc6049a099eb0a78e1692d"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-03-no-te-conoce-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/no-te-conoce",
+      "sha256": "b3f8f9aa323eac6c5f8e7864f164688976ee690c45e56e1cd8df76e7e44d96ef"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-04-el-podio-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/podio",
+      "sha256": "a13a5bfb938fad12360a4070be541ecdd4f8520976990ff3900d7c302382d6a9"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-05-leyendo-tu-sitio-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/lee-tu-sitio",
+      "sha256": "6f497f9a0a1b25944fe829b593f0ad1f94dd68db9ce9efff8e8066176d5cabd3"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-06-datos-estructurados-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/schema",
+      "sha256": "cbc919b9d060744c599e0784120b74e66dbb19b426dcd96a3168f96e73f3c2d5"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-07-la-entidad-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/entidad",
+      "sha256": "9ece4e95da48b800f6e418e960820c8c6838aa42cd340405879bb9877e95d0f7"
+    },
+    "ai-generations/2026-09-21_gigi-poses-3d/final-aeo/efeonce-gigi-3d-aeo-08-el-diagnostico-1x1-1600x1600-v01-transparente.png": {
+      "rol": "kit:gigi-aeo/diagnostico",
+      "sha256": "d58fab31cbeb2d256c6a63894893b20dbb195e5d4d0a9754e9526b51ce264491"
+    },
     "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:chaqueta-softshell-efeonce/frente",
       "sha256": "05aa5938e6fdbeecd6ae478eeede1d1a3d95676ca4ae1dffa8840131498c356c"
@@ -315,16 +411,20 @@
       "sha256": "a10cb56bae90155270d4ffd6fa0703a6ee0e62c22672e1bc1be43b488daccede"
     },
     "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-15-puesto-espalda-1200x1600-v01-fondo-estudio.png": {
-      "rol": "uso:chaqueta-softshell-efeonce/puesta:espalda",
+      "rol": "uso:chaqueta-softshell-efeonce/usoPorVista:espalda",
       "sha256": "96f2cd79715af1c4646a207dd23e6ea94a20071ab1eb377287da63b000537a9a"
     },
     "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-17-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png": {
-      "rol": "uso:chaqueta-softshell-efeonce/puesta:espalda-mujer",
+      "rol": "uso:chaqueta-softshell-efeonce/usoPorVista:espalda-mujer",
       "sha256": "01b09794863326773ebbeb8f92e426fc076d0062211a46cec15f80a3fa0d086b"
     },
     "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-16-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png": {
-      "rol": "uso:chaqueta-softshell-efeonce/puesta:frente-cuerpo-b",
+      "rol": "uso:chaqueta-softshell-efeonce/usoPorVista:frente-cuerpo-b",
       "sha256": "0e1323b343d549e7290b29b129702ca5d29a63565607d3395901d63382f613d0"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-softshell-11-macro-bordado-1600x1600-v01-fondo-estudio.png": {
+      "rol": "macro:chaqueta-softshell-efeonce",
+      "sha256": "aa3f2ce8a9ea87e9d7620156bcce3025ed7c3484b657f7d3c5af056bf5fda928"
     },
     "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:chaqueta-bomber-efeonce/frente",
@@ -343,16 +443,20 @@
       "sha256": "b25ae2c2db7c2f5344db9fc246f21d278dc7a63c5e3087735432544f7ededdb6"
     },
     "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-16-puesto-espalda-1024x1536-v01-fondo-estudio.png": {
-      "rol": "uso:chaqueta-bomber-efeonce/puesta:espalda",
+      "rol": "uso:chaqueta-bomber-efeonce/usoPorVista:espalda",
       "sha256": "28cdce55b7b3e29ab653945d7342503f3db36f39be35fe027e97d0c1c64d5f9e"
     },
     "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-15-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png": {
-      "rol": "uso:chaqueta-bomber-efeonce/puesta:espalda-mujer",
+      "rol": "uso:chaqueta-bomber-efeonce/usoPorVista:espalda-mujer",
       "sha256": "dbd4e61b5335c15629fb0715d563dc8cb615ce876b302bf5e12474357c947488"
     },
     "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-17-puesto-frente-cuerpo-b-1024x1536-v01-fondo-estudio.png": {
-      "rol": "uso:chaqueta-bomber-efeonce/puesta:frente-cuerpo-b",
+      "rol": "uso:chaqueta-bomber-efeonce/usoPorVista:frente-cuerpo-b",
       "sha256": "da6a724c899c3a669b20b5c740fd70d4d7df62abdcbe1b3404bff2c08583a7ff"
+    },
+    "ai-generations/2026-09-17_chaqueta-efeonce/final/efeonce-chaqueta-bomber-11-macro-bordado-1600x1600-v01-fondo-estudio.png": {
+      "rol": "macro:chaqueta-bomber-efeonce",
+      "sha256": "f6fc75d7c4080593cb4be2f9a7aa27eb508ccfeb7edd2fc7929b715c00ef9513"
     },
     "ai-generations/2026-09-17_gorra-efeonce/final/efeonce-gorra-v2-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:gorra-efeonce/frente",
@@ -383,11 +487,11 @@
       "sha256": "c6f2aa8c617838ca59955115baa570ec74b55168104e097439a817243ea19213"
     },
     "ai-generations/2026-09-17_gorra-efeonce/out/prueba-julio.png": {
-      "rol": "uso:gorra-efeonce/persona:julio",
+      "rol": "uso:gorra-efeonce/usoPorPersona:julio",
       "sha256": "051cdbfc7660a6fac1d4c4d6c06fe6735ad43bd4986f71f3f61c6101ceb5b14b"
     },
     "ai-generations/2026-09-17_gorra-efeonce/out/prueba-nexa.png": {
-      "rol": "uso:gorra-efeonce/persona:nexa",
+      "rol": "uso:gorra-efeonce/usoPorPersona:nexa",
       "sha256": "6a9761c1fe023698fedc1160ba6e5f5b1ed8ad6bfc401e1f5f4d810ba47a9db8"
     },
     "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-01-conjunto-1200x1600-v01-transparente.png": {
@@ -403,11 +507,11 @@
       "sha256": "b3fbafdd8519d95b4f8a6cdd1c2be2a21e3a030862463a4ccf9884e31760a838"
     },
     "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-15-conjunto-deterministico-nexa-1024x1536-v01-fondo-estudio.png": {
-      "rol": "uso:lanyard-efeonce/persona:nexa",
+      "rol": "uso:lanyard-efeonce/usoPorPersona:nexa",
       "sha256": "adc49569110943463c1f0840df41d1544ccfadf8f8287c32b2e6c983a78ebd28"
     },
     "ai-generations/2026-09-17_lanyard-efeonce/final/efeonce-lanyard-14-conjunto-deterministico-1024x1536-v01-fondo-estudio.png": {
-      "rol": "uso:lanyard-efeonce/persona:generico",
+      "rol": "uso:lanyard-efeonce/usoPorPersona:generico",
       "sha256": "62edf6a5a6776af55cff037a050986dd66a7a9ae727070f80f671b6671a55d66"
     },
     "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-01-frente-1600x1600-v01-transparente.png": {
@@ -435,24 +539,32 @@
       "sha256": "49321dc2ea66b8dc119377140c10d665f89e9f211353e6f0ad966cc2abab5057"
     },
     "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-13-puesto-frente-1200x1600-v01-fondo-estudio.png": {
-      "rol": "uso:polo-efeonce/color:navy",
+      "rol": "uso:polo-efeonce/usoPorColor:navy",
       "sha256": "4c9ae41f72fbe82500cc6f0d603515f58a3b1c607163b8880fcaa47e91dc7d4d"
     },
     "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-13-puesto-frente-1200x1600-v01-fondo-estudio.png": {
-      "rol": "uso:polo-efeonce/color:blanco",
+      "rol": "uso:polo-efeonce/usoPorColor:blanco",
       "sha256": "5788d3c98db35d240db6f41a91c7de2bbef3fd10c9aaa02e78ea23d79d94a422"
     },
     "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-14-puesto-espalda-1024x1536-v02-fondo-estudio.png": {
-      "rol": "uso:polo-efeonce/puesta:espalda",
+      "rol": "uso:polo-efeonce/usoPorVista:espalda",
       "sha256": "2afb6445ed3daf026236b1ee177eb503c5c93e33901345993eca7d62bed5546d"
     },
     "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-16-puesto-espalda-mujer-1024x1536-v02-fondo-estudio.png": {
-      "rol": "uso:polo-efeonce/puesta:espalda-mujer",
+      "rol": "uso:polo-efeonce/usoPorVista:espalda-mujer",
       "sha256": "d7bfd495c507c50296db00b9ae9e704627a18a72e349249c9e2174b5b44bd46f"
     },
     "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-15-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png": {
-      "rol": "uso:polo-efeonce/puesta:frente-cuerpo-b",
+      "rol": "uso:polo-efeonce/usoPorVista:frente-cuerpo-b",
       "sha256": "3ad2b06f809ff66e2482a2e6edfde00909704f06819e872256bb7e1501905adc"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-navy-10-detalle-bordado-1600x1600-v01-fondo-estudio.png": {
+      "rol": "macro:polo-efeonce/navy",
+      "sha256": "48c566eb57bbc69b8416b69386bcddfaf125f57a96ac3f97e750ba31050eddff"
+    },
+    "ai-generations/2026-09-17_polo-efeonce/final/efeonce-polo-blanco-10-detalle-bordado-1600x1600-v01-fondo-estudio.png": {
+      "rol": "macro:polo-efeonce/blanco",
+      "sha256": "02461ec89f8c759cb20a12b2851377a865079539067c5ffbbe54aa4ea59df117"
     },
     "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-01-frente-1600x1600-v01-transparente.png": {
       "rol": "kit:hoodie-efeonce/frente",
@@ -471,16 +583,20 @@
       "sha256": "4586cbb398d0f7387b808c89ae33f36ce9b9e72d66fbd5cad737b5350172c744"
     },
     "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-16-puesto-espalda-1200x1600-v01-fondo-estudio.png": {
-      "rol": "uso:hoodie-efeonce/puesta:espalda",
+      "rol": "uso:hoodie-efeonce/usoPorVista:espalda",
       "sha256": "a4ac8e4d6d3f21ab516c96a4c0ae2f026016461b4cccfd487b84b29c965e24b1"
     },
     "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-22-puesto-espalda-mujer-1024x1536-v01-fondo-estudio.png": {
-      "rol": "uso:hoodie-efeonce/puesta:espalda-mujer",
+      "rol": "uso:hoodie-efeonce/usoPorVista:espalda-mujer",
       "sha256": "2111878d4fd3cf4d1fb8eef5d9e33443013d4ff770995ca169bfa33e10060334"
     },
     "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-17-puesto-frente-cuerpo-b-1200x1600-v01-fondo-estudio.png": {
-      "rol": "uso:hoodie-efeonce/puesta:frente-cuerpo-b",
+      "rol": "uso:hoodie-efeonce/usoPorVista:frente-cuerpo-b",
       "sha256": "a208765f8265ef13d7078f3e5eed622a576382ea8c69bd526355e57c6909f62b"
+    },
+    "ai-generations/2026-09-17_hoodie-efeonce/final/efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png": {
+      "rol": "macro:hoodie-efeonce",
+      "sha256": "05adae8b6b020bd3d4395c6f640d39cd3607336e10ca5d5c8db5c0f0363535f6"
     }
   }
 }

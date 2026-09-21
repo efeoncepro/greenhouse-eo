@@ -397,9 +397,21 @@ function resolverIdentidad(ficha) {
       const disponibles = persona[dimension.mapa] ?? {}
 
       if (!disponibles[pedidaEnDimension]) {
+        // 🔴 El error ENSEÑA el cajón correcto. La ropa CON MARCA no vive en `vestuario`: va por
+        // `objetos`, porque las dos vías dan instrucciones opuestas sobre la misma imagen —`identidad`
+        // dice «ignora la ropa» y `objetos` dice «copia la prenda»—. Sin esta pista, buscar en el
+        // cajón equivocado termina en «hay que producirlo» sobre algo que ya existe: pasó el
+        // 2026-09-21 con las 19 referencias de prenda puesta.
+        const esKit = Object.keys(OBJETOS).includes(pedidaEnDimension)
+
         throw new Error(
           `La ${dimension.campo} "${pedidaEnDimension}" no existe para ${persona.etiqueta}. ` +
-            `${dimension.etiqueta} disponibles: ${Object.keys(disponibles).join(', ') || 'ninguna'}.`
+            `${dimension.etiqueta} disponibles: ${Object.keys(disponibles).join(', ') || 'ninguna'}.` +
+            (esKit
+              ? ` — "${pedidaEnDimension}" SÍ existe, pero es un kit de marca: la ropa con marca se pide ` +
+                `por \`objetos\`, no por \`${dimension.campo}\`. Por ejemplo: ` +
+                `{ "objetos": [{ "objeto": "${pedidaEnDimension}", "usoDe": "${clave}" }] }.`
+              : '')
         )
       }
 
@@ -512,6 +524,30 @@ export const OBJETOS = {
     patron: 'efeonce-codex-3d-<V>-1x1-1600x1600-v01-transparente.png',
     vistas: { frente: '01-frente-heroe', saludo: '02-saludo-tres-cuartos-izquierda', perfil: '03-perfil-caminando' },
     vistaDefecto: 'frente'
+  },
+  gigi: {
+    etiqueta: 'the official 3D figure of Gigi, the Google Gemini mascot',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small collectible figure about 25 cm tall, at correct scale with contact shadows. Do not redraw it, do not restyle it and do not change its proportions. Its red-to-blue-to-green gradient and its single curled tip belong ONLY to this figure: never put them on clothing, on a wall or on any other object in the scene.',
+    base: 'ai-generations/2026-09-21_gigi-poses-3d/final/',
+    patron: 'efeonce-gigi-3d-<V>-1x1-1600x1600-v01-transparente.png',
+    vistas: {
+      frente: '01-frente-heroe', saludo: '02-saludo-tres-cuartos-izquierda', perfil: '03-perfil-caminando',
+      celebrando: '04-contrapicado-celebrando', cenital: '05-cenital-mirando-arriba', espalda: '06-espalda-tres-cuartos',
+      salto: '07-salto-en-el-aire', idea: '08-idea-tres-cuartos-derecha',
+      detective: '01-detective-lupa', artista: '02-artista-boina-pincel', megafono: '03-megafono', casco: '04-casco-llave',
+      podcast: '05-audifonos-microfono', claqueta: '06-claqueta-cine', carpetas: '07-carpetas-ordenadas', birrete: '08-birrete-libro'
+    },
+    vistaDefecto: 'frente'
+  },
+  'gigi-aeo': {
+    etiqueta: 'the official 3D figure of Gigi, the Google Gemini mascot, in its search and AEO poses',
+    instruccion:
+      'Reproduce EXACTLY this figure as a real, physical, finely made small collectible figure about 25 cm tall, at correct scale with contact shadows. Do not redraw it, do not restyle it and do not change its proportions. Its red-to-blue-to-green gradient and its single curled tip belong ONLY to this figure: never put them on clothing, on a wall or on any other object in the scene.',
+    base: 'ai-generations/2026-09-21_gigi-poses-3d/final-aeo/',
+    patron: 'efeonce-gigi-3d-aeo-<V>-1x1-1600x1600-v01-transparente.png',
+    vistas: { pregunta: '01-la-pregunta', citas: '02-la-respuesta-con-citas', 'no-te-conoce': '03-no-te-conoce', podio: '04-el-podio', 'lee-tu-sitio': '05-leyendo-tu-sitio', schema: '06-datos-estructurados', entidad: '07-la-entidad', diagnostico: '08-el-diagnostico' },
+    vistaDefecto: 'no-te-conoce'
   },
   'chaqueta-softshell-efeonce': {
     etiqueta: 'the Efeonce team softshell jacket',
@@ -730,6 +766,109 @@ const LOGOTIPO =
 
 const formaDeLaMarca = tipo => (tipo === 'logotipo' ? LOGOTIPO : ISOTIPO)
 
+// ── Enumerador canónico de referencias ──────────────────────────────────────────────────────────
+//
+// 🔴 UN SOLO SITIO dice qué archivos puede pedirle el catálogo al disco, y con qué ROL entra cada uno
+// al prompt. Antes cada consumidor enumeraba a su manera —el constructor por campo, el sellador por
+// una lista de campos propia, los tests por literales— así que agregar una forma nueva de declarar un
+// archivo exigía tocar tres sitios y **olvidar uno no fallaba**.
+//
+// Medido dos veces en 24 h: (a) `assetDeUso`/`usoPorPersona`/`usoPorColor` no entraban al lock (66→79
+// al cerrarlo), (b) `expresiones`/`vestuario` tampoco (79→104). En ambos casos el archivo quedaba
+// fuera de TODO gate sin que nada avisara, que es exactamente el fallo contra el que existe el lock.
+//
+// El ROL no es taxonomía: dice **qué se copia y qué se ignora** de esa imagen, y las dos vías dan
+// instrucciones OPUESTAS sobre la misma clase de imagen. Por eso una referencia no se puede mover de
+// cajón sin cambiar lo que el prompt afirma sobre ella.
+
+/** Qué copia y qué ignora el modelo de una referencia, según su rol. */
+export const ROLES_DE_REFERENCIA = {
+  identidad: 'Copia la CARA; ignora la ropa y el fondo. Entra en el bloque REFERENCES.',
+  'objeto-forma': 'Copia la FORMA de la pieza aislada; ignora su fondo de estudio.',
+  'prenda-puesta': 'Copia la PRENDA tal como cae en un cuerpo; ignora a la persona que la lleva.',
+  'macro-marca': 'El emblema en grande, para que el modelo no lo reinvente cuando mide pocos píxeles.'
+}
+
+/** Clave del catálogo → rol de las referencias que declara. */
+export const CLAVES_DE_REFERENCIA = {
+  persona: { refs: 'identidad', cuerpo: 'identidad', vistas: 'identidad', expresiones: 'identidad', vestuario: 'identidad' },
+  objeto: {
+    patron: 'objeto-forma',
+    patronPorColor: 'objeto-forma',
+    vistasPorNombre: 'objeto-forma',
+    assetDeUso: 'prenda-puesta',
+    usoPorVista: 'prenda-puesta',
+    usoPorPersona: 'prenda-puesta',
+    usoPorColor: 'prenda-puesta',
+    macroEmblema: 'macro-marca',
+    macroPorColor: 'macro-marca'
+  }
+}
+
+// Claves que NO declaran archivos: texto, selectores o listas de nombres. `vistas` de un OBJETO son
+// sufijos que se combinan con `patron`, no rutas. Si aparece una clave que no está ni aquí ni arriba,
+// el detector de drift de forma falla pidiendo clasificarla — ésa es la red que faltaba.
+export const CLAVES_SIN_ARCHIVO = {
+  persona: ['etiqueta', 'identity', 'accesorios', 'vistasDeCuerpo', 'vestuarioDeCuerpo'],
+  objeto: ['etiqueta', 'aviso', 'instruccion', 'nota', 'base', 'vistas', 'vistaDefecto', 'tipo', 'tipoEmblema', 'tipoPorVista', 'colorDefecto']
+}
+
+/**
+ * Todas las referencias que el catálogo puede pedirle al disco, con su rol y su dueño.
+ *
+ * Lo consumen el sellador de assets y los gates. Agregar un rol nuevo es una entrada en
+ * `CLAVES_DE_REFERENCIA`; no hay que tocar a los consumidores, y el detector de drift impide que
+ * una clave nueva pase sin clasificar.
+ */
+export function referenciasDeclaradas() {
+  const out = []
+  const push = (ruta, rol, etiqueta) => out.push({ ruta: path.normalize(ruta), rol, etiqueta })
+
+  for (const [clave, persona] of Object.entries(PERSONAS)) {
+    for (const ref of persona.refs) push(ref, 'identidad', `persona:${clave}`)
+    if (persona.cuerpo) push(persona.cuerpo, 'identidad', `persona:${clave}/cuerpo`)
+
+    for (const mapa of ['vistas', 'expresiones', 'vestuario']) {
+      for (const [nombre, ref] of Object.entries(persona[mapa] ?? {})) {
+        push(ref, 'identidad', `persona:${clave}/${nombre}`)
+      }
+    }
+  }
+
+  for (const [clave, objeto] of Object.entries(OBJETOS)) {
+    // `patron` y `patronPorColor` GENERAN rutas combinándose con los sufijos de `vistas`.
+    for (const [color, patron] of Object.entries({ '': objeto.patron, ...(objeto.patronPorColor ?? {}) })) {
+      for (const [vista, sufijo] of Object.entries(objeto.vistas)) {
+        push(objeto.base + patron.replace('<V>', sufijo), 'objeto-forma', color ? `kit:${clave}/${color}/${vista}` : `kit:${clave}/${vista}`)
+      }
+    }
+
+    // Una vista puede declararse por NOMBRE COMPLETO cuando el kit entrega en otra resolución y el
+    // `patron` nunca calza. Sin esto el archivo bueno queda invisible para el catálogo, en silencio.
+    for (const [vista, nombre] of Object.entries(objeto.vistasPorNombre ?? {})) {
+      push(objeto.base + nombre, 'objeto-forma', `kit:${clave}/${vista}`)
+    }
+
+    // Las CUATRO formas de declarar la pieza PUESTA: una sola, por persona, por color o por vista.
+    // Es la que viaja a la escena, así que es la que más importa que esté sellada.
+    if (objeto.assetDeUso) push(objeto.base + objeto.assetDeUso, 'prenda-puesta', `uso:${clave}/defecto`)
+
+    for (const mapa of ['usoPorPersona', 'usoPorColor', 'usoPorVista']) {
+      for (const [sel, nombre] of Object.entries(objeto[mapa] ?? {})) {
+        push(objeto.base + nombre, 'prenda-puesta', `uso:${clave}/${mapa}:${sel}`)
+      }
+    }
+
+    if (objeto.macroEmblema) push(objeto.base + objeto.macroEmblema, 'macro-marca', `macro:${clave}`)
+
+    for (const [color, nombre] of Object.entries(objeto.macroPorColor ?? {})) {
+      push(objeto.base + nombre, 'macro-marca', `macro:${clave}/${color}`)
+    }
+  }
+
+  return out
+}
+
 function resolverObjetos(ficha, desde) {
   const pedidos = ficha.objetos ?? []
 
@@ -748,7 +887,17 @@ function resolverObjetos(ficha, desde) {
     const vistaPedida = typeof pedido === 'string' ? null : pedido?.vista
 
     if (!objeto) {
-      throw new Error(`Objeto "${clave}" desconocido. Kits disponibles: ${Object.keys(OBJETOS).join(', ')}.`)
+      // Simétrico al de las dimensiones: si el nombre es una prenda propia del set de una persona,
+      // el cajón correcto es `identidad`, no `objetos`.
+      const comoVestuario = Object.entries(PERSONAS).find(([, p]) => p.vestuario?.[clave] || p.expresiones?.[clave])
+
+      throw new Error(
+        `Objeto "${clave}" desconocido. Kits disponibles: ${Object.keys(OBJETOS).join(', ')}.` +
+          (comoVestuario
+            ? ` — "${clave}" SÍ existe, pero es una referencia de ${comoVestuario[0]}: se pide por ` +
+              `\`identidad\`, por ejemplo { "identidad": [{ "persona": "${comoVestuario[0]}", "vestuario": "${clave}" }] }.`
+            : '')
+      )
     }
 
     const vista = vistaPedida ?? objeto.vistaDefecto

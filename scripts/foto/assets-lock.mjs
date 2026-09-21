@@ -13,75 +13,26 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { OBJETOS, PERSONAS } from './build-prompt.mjs'
+import { referenciasDeclaradas } from './build-prompt.mjs'
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const LOCK = path.join(raiz, 'scripts/foto/assets.lock.json')
 
 /**
- * Todo lo que el catálogo puede pedirle al disco: referencias de personas, sus vistas, expresiones y
- * vestuarios, y de cada kit
- * **las cuatro formas** en que declara un archivo — por patrón, por patrón de color, por nombre
- * completo y como asset de uso.
+ * El sellador NO enumera: consume el enumerador canónico del catálogo.
  *
- * 🔴 Recorrer sólo `objeto.patron` dejaba fuera justo lo que viaja a las escenas: `assetDeUso`,
- * `usoPorPersona` y `usoPorColor` son la prenda PUESTA, y las vistas de `patronPorColor` y
- * `vistasPorNombre` no pasan por el patrón por defecto. Medido el 2026-09-21: cablear el lanyard
- * determinístico dejó el lock en 66 sin moverse. Sustituir cualquiera de esos archivos no despertaba
- * ningún gate, que es exactamente el fallo para el que existe este lock. Hallazgo de la sesión
- * «Poses de Nexa en advertising y design studio».
+ * 🔴 Antes tenía su propia lista de formas de declarar un archivo, y cada forma nueva había que
+ * acordarse de agregarla aquí. Olvidarlo dejaba el archivo fuera de TODO gate sin que nada avisara —
+ * medido tres veces: `assetDeUso`/`usoPorPersona`/`usoPorColor` (66→79), luego `expresiones`/
+ * `vestuario` (79→104), y al centralizar apareció la que faltaba: **los cinco MACROS del emblema**,
+ * que existían en disco, se pasaban al modelo como referencia y no estaban sellados. Son justo los
+ * archivos que existen para que el emblema no se reinvente.
+ *
+ * Con el enumerador canónico esto no vuelve a pasar por olvido: una clave nueva sin clasificar rompe
+ * el detector de drift de forma en `build-prompt.test.ts`.
  */
 export function rutasDeclaradas() {
-  const rutas = new Map()
-
-  // Las TRES dimensiones de una persona, no sólo `vistas`: una expresión o un vestuario se antepone a las
-  // referencias igual que un ángulo, así que sustituirlos cambia la pieza lo mismo. Mismo fallo que el de
-  // los assets de uso, un nivel más arriba: declarar un mapa nuevo en el catálogo sin sellarlo lo deja
-  // fuera de todo gate.
-  for (const [clave, persona] of Object.entries(PERSONAS)) {
-    for (const ref of persona.refs) rutas.set(ref, `persona:${clave}`)
-
-    for (const mapa of ['vistas', 'expresiones', 'vestuario']) {
-      for (const [nombre, ref] of Object.entries(persona[mapa] ?? {})) rutas.set(ref, `persona:${clave}/${nombre}`)
-    }
-  }
-
-  for (const [clave, objeto] of Object.entries(OBJETOS)) {
-    const patrones = { '': objeto.patron, ...(objeto.patronPorColor ?? {}) }
-
-    for (const [color, patron] of Object.entries(patrones)) {
-      for (const [vista, sufijo] of Object.entries(objeto.vistas)) {
-        const etiqueta = color ? `kit:${clave}/${color}/${vista}` : `kit:${clave}/${vista}`
-
-        rutas.set(objeto.base + patron.replace('<V>', sufijo), etiqueta)
-      }
-    }
-
-    for (const [vista, nombre] of Object.entries(objeto.vistasPorNombre ?? {})) {
-      rutas.set(path.normalize(objeto.base + nombre), `kit:${clave}/${vista}`)
-    }
-
-    for (const [etiqueta, nombre] of assetsDeUso(objeto)) {
-      rutas.set(path.normalize(objeto.base + nombre), `uso:${clave}/${etiqueta}`)
-    }
-  }
-
-  return rutas
-}
-
-/**
- * Las CUATRO formas de declarar la pieza PUESTA: una sola, por persona, por color o por vista.
- *
- * `usoPorVista` entró el 2026-09-21 con las espaldas y los cuerpos B, y sellarla acá no es opcional:
- * es exactamente el hueco del que ya nos quemamos con `assetDeUso` y `usoPorColor` — un mapa nuevo en
- * el catálogo que nadie sella queda fuera de todo gate, y sustituir uno de esos archivos no despierta
- * nada. La pieza PUESTA es la que viaja a la escena: es la que más importa que esté sellada.
- */
-function* assetsDeUso(objeto) {
-  if (objeto.assetDeUso) yield ['defecto', objeto.assetDeUso]
-  for (const [persona, nombre] of Object.entries(objeto.usoPorPersona ?? {})) yield [`persona:${persona}`, nombre]
-  for (const [color, nombre] of Object.entries(objeto.usoPorColor ?? {})) yield [`color:${color}`, nombre]
-  for (const [vista, nombre] of Object.entries(objeto.usoPorVista ?? {})) yield [`puesta:${vista}`, nombre]
+  return new Map(referenciasDeclaradas().map(({ ruta, etiqueta }) => [ruta, etiqueta]))
 }
 
 const huella = ruta => createHash('sha256').update(readFileSync(path.join(raiz, ruta))).digest('hex')

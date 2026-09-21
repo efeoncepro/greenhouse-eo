@@ -20,12 +20,16 @@ import {
   auditarRegistroVestuario,
   auditarReservas,
   auditarVestuario,
+  CLAVES_DE_REFERENCIA,
+  CLAVES_SIN_ARCHIVO,
   construirPrompt,
   detectarValorDeFormato,
   familiaDeLecho,
   OBJETOS,
   PALANCAS,
-  PERSONAS
+  PERSONAS,
+  referenciasDeclaradas,
+  ROLES_DE_REFERENCIA
 } from './build-prompt.mjs'
 
 const raiz = path.resolve(__dirname, '../..')
@@ -273,7 +277,10 @@ conAssets('foto:prompt · identidad', () => {
   it('el bloque IDENTITY es verbatim el del canon', () => {
     const doc = readFileSync(DOC, 'utf8')
 
-    for (const persona of ['julio', 'nexa']) {
+    // Deriva del catálogo, NO de una lista literal. Con `['julio', 'nexa']` una persona nueva pasaba
+    // el gate sin que su bloque estuviera en el canon: el gate era el test de regresión de las dos
+    // primeras, no del contrato.
+    for (const persona of Object.keys(PERSONAS)) {
       const emitido = construirPrompt({ ...fichaBase, identidad: [persona] })
         .prompt.split('\n\n')
         .find((b: string) => b.startsWith('IDENTITY (critical)'))
@@ -409,6 +416,34 @@ conAssets('foto:prompt · expresiones y vestuario de Nexa', () => {
     const r = construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vestuario: 'home-1' }, 'julio'] })
 
     expect(r.imagenes).toContain(CUERPOS_NEXA)
+  })
+})
+
+conAssets('foto:prompt · el error enseña el cajón correcto', () => {
+  // Las dos vías dan instrucciones OPUESTAS sobre la misma clase de imagen: `identidad` dice «ignora
+  // la ropa» y `objetos` dice «copia la prenda». Por eso una referencia no se puede mover de cajón, y
+  // por eso el error tiene que decir cuál es el correcto en vez de sólo listar lo que hay.
+  // Caso fuente: buscar uniforme en `vestuario` y concluir que faltaba producir 19 referencias que ya
+  // existían en `objetos` (2026-09-21).
+  it('pedir un kit de marca como vestuario manda a `objetos`', () => {
+    expect(() =>
+      construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vestuario: 'polo-efeonce' }] })
+    ).toThrow(/es un kit de marca.*se pide por `objetos`/s)
+  })
+
+  it('pedir una referencia de vestuario como objeto manda a `identidad`', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: ['nexa'], objetos: [{ objeto: 'prof-1' }] })).toThrow(
+      /es una referencia de nexa.*se pide por `identidad`/s
+    )
+  })
+
+  it('un nombre que no existe en ningún cajón no inventa una sugerencia', () => {
+    expect(() => construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vestuario: 'submarino-9' }] })).toThrow(
+      /Vestuarios disponibles/
+    )
+    expect(() => construirPrompt({ ...fichaBase, identidad: [{ persona: 'nexa', vestuario: 'submarino-9' }] })).not.toThrow(
+      /SÍ existe/
+    )
   })
 })
 
@@ -749,23 +784,48 @@ describe('foto:prompt · el catálogo coincide con el lock de assets', () => {
     expect(lock.assets[ruta]).toBeDefined()
   })
 
-  // Las TRES dimensiones, no sólo `vistas`: una expresión o un vestuario se antepone a las referencias
-  // igual que un ángulo, así que sustituirlos cambia la pieza lo mismo. Recorrer sólo `vistas` dejaba 25
-  // referencias de Nexa fuera de todo gate desde el momento en que se declararon.
-  it.each(
-    Object.entries(
-      PERSONAS as Record<
-        string,
-        { refs: string[]; vistas?: Record<string, string>; expresiones?: Record<string, string>; vestuario?: Record<string, string> }
-      >
-    ).flatMap(([clave, p]) => [
-      ...p.refs.map(r => [clave, r] as const),
-      ...Object.values(p.vistas ?? {}).map(r => [clave, r] as const),
-      ...Object.values(p.expresiones ?? {}).map(r => [clave, r] as const),
-      ...Object.values(p.vestuario ?? {}).map(r => [clave, r] as const)
-    ])
-  )('referencia de %s está en el lock', (_clave, ruta) => {
-    expect(lock.assets[ruta]).toBeDefined()
+  // El gate consume el ENUMERADOR CANÓNICO, no su propia lista de campos. Recorrer campos a mano es
+  // justo el fallo que se repitió tres veces: una forma nueva de declarar un archivo se olvida y el
+  // archivo queda fuera de todo gate sin que nada avise.
+  it.each(referenciasDeclaradas().map(r => [r.rol, r.etiqueta, r.ruta] as const))(
+    'referencia %s · %s está en el lock',
+    (_rol, _etiqueta, ruta) => {
+      expect(lock.assets[ruta]).toBeDefined()
+    }
+  )
+
+  // 🔴 Detector de DRIFT DE FORMA. No mira contenido: mira que toda clave del catálogo esté
+  // clasificada como «declara archivos» o «no declara archivos». Una clave nueva sin clasificar
+  // falla aquí, que es la red que faltaba: antes se descubría cuando un asset ya estaba sin sellar.
+  it('toda clave del catálogo está clasificada como referencia o como no-referencia', () => {
+    const revisar = (tipo: 'persona' | 'objeto', tabla: Record<string, Record<string, unknown>>) => {
+      const conocidas = new Set([
+        ...Object.keys(CLAVES_DE_REFERENCIA[tipo]),
+        ...CLAVES_SIN_ARCHIVO[tipo]
+      ])
+
+      for (const [nombre, entrada] of Object.entries(tabla)) {
+        for (const clave of Object.keys(entrada)) {
+          expect(
+            conocidas.has(clave),
+            `"${clave}" de ${tipo} "${nombre}" no está clasificada. Si declara archivos, agrégala a ` +
+              `CLAVES_DE_REFERENCIA.${tipo} con su rol; si no, a CLAVES_SIN_ARCHIVO.${tipo}. ` +
+              'Sin clasificar, sus archivos quedan fuera del lock y de todo gate.'
+          ).toBe(true)
+        }
+      }
+    }
+
+    revisar('persona', PERSONAS as Record<string, Record<string, unknown>>)
+    revisar('objeto', OBJETOS as Record<string, Record<string, unknown>>)
+  })
+
+  // Cada rol declara qué se copia y qué se ignora. Un rol sin descripción es un rol que nadie sabe
+  // usar, y mezclar dos roles en la misma imagen es lo que produjo el isotipo inventado.
+  it('cada rol usado tiene su contrato declarado', () => {
+    for (const { rol } of referenciasDeclaradas()) {
+      expect(ROLES_DE_REFERENCIA[rol as keyof typeof ROLES_DE_REFERENCIA], `rol "${rol}" sin contrato`).toBeTruthy()
+    }
   })
 
   it('cada huella es un sha256 con forma válida', () => {
