@@ -27,11 +27,12 @@ import { InsightsRenderRejectedError } from '../errors'
 import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord } from '../stores/records'
 
 import { withDedupedLimits } from './plan-limits'
+import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 const MODULE_TITLES: Record<InsightModule, string> = {
-  seo: 'Visibilidad orgánica',
-  aeo: 'Respuesta de IA',
-  ico: 'Entrega y cumplimiento'
+  seo: GH_INSIGHTS.modules.seo.label,
+  aeo: GH_INSIGHTS.modules.aeo.label,
+  ico: GH_INSIGHTS.modules.ico.label
 }
 
 const KPI_KIND: Record<InsightModule, 'visibility' | 'engines' | 'authority' | 'gap'> = {

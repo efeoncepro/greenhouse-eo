@@ -9,24 +9,15 @@ import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSnapshotContentV1 } f
 import type { EditorialPlanV1, PlanChapterV1, PlanClaimV1, PlanTableV1 } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
 import { formatDeltaPercent, formatFactValue } from './format'
+import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 const MODULE_TITLES: Record<InsightModule, string> = {
-  seo: 'Visibilidad orgánica (SEO)',
-  aeo: 'Visibilidad en motores de respuesta (AEO)',
-  ico: 'Entrega y desempeño (ICO)'
+  seo: GH_INSIGHTS.modules.seo.title,
+  aeo: GH_INSIGHTS.modules.aeo.title,
+  ico: GH_INSIGHTS.modules.ico.title
 }
 
-const REJECTION_TEXT: Record<EvidenceRejectionV1['reason'], string> = {
-  unsupported_window: 'la fuente no sirve esta ventana con exactitud',
-  method_mismatch: 'la metodología disponible no es comparable',
-  insufficient_data: 'no hay datos suficientes',
-  suppressed: 'la métrica está suprimida por su política de evidencia',
-  review_required: 'el análisis requiere revisión humana',
-  module_disabled: 'el módulo está apagado',
-  not_connected: 'la fuente no está conectada',
-  target_ambiguous: 'hay más de un mercado activo',
-  no_data: 'sin datos'
-}
+const REJECTION_TEXT: Record<EvidenceRejectionV1['reason'], string> = GH_INSIGHTS.rejections
 
 const windowLabel = (fact: EvidenceFactV1): string => `${fact.window.start} a ${fact.window.endExclusive}`
 
