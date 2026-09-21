@@ -25,7 +25,7 @@
 - Wireframe: `docs/ui/wireframes/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md`
 - Flow: `none`
 - Motion: `docs/ui/motion/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs-motion.md`
-- Backend impact: `none`
+- Backend impact: `command`
 - Epic: `EPIC-045`
 - Status real: `In-progress desde 2026-09-21 (Claude). Slice 1 en curso: sellar dirección visual, primitive/component mapping concreto y plan GVC para pasar a UI ready yes; no se escribe JSX ni catálogo hasta cerrar ese gate. Sin código todavía; TASK-1845/1846 en producción proveen ChartSpec/plan/snapshot y el render durable (hoy sólo deck_pdf; report_pdf se rechaza).`
 - Rank: `TBD`
@@ -41,7 +41,7 @@ Entrega la biblioteca visual analítica y dos catálogos del Composer: deck hori
 
 ## Why This Task Exists
 
-ChartSplit admite 2–4 barras porcentuales y el catálogo actual no resuelve un informe vertical multipágina. Hace falta un sistema editorial y cuantitativo que no deforme datos ni copie slides a una hoja A4.
+ChartSplit admite 2–4 barras porcentuales (único tipo de gráfico del catálogo, dibujado como anchos CSS recalculados por resolver) y el catálogo actual no resuelve un informe vertical multipágina. **Verificado 2026-09-21:** el mapper de render nunca lee `chapter.charts`, así que hoy **ningún gráfico llega al PDF**; y el planner determinista sólo emite 2 de las 7 familias de `ChartSpecV1`. La dedupe de `plan.limits` que esta task tenía pendiente **ya la entregó TASK-1846** (`render/plan-limits.ts`) y sale del alcance. Hace falta un sistema editorial y cuantitativo que no deforme datos ni copie slides a una hoja A4.
 
 ## Goal
 
@@ -103,7 +103,7 @@ El ADR acepta planificación, no acredita implementación. Rutas/tablas nuevas s
 
 - `src/lib/artifact-composer/catalogs/deck-axis/chart-split.slots.json`.
 - `src/lib/artifact-composer/brand-packs/axis`.
-- `src/components/growth/seo/report-artifact/print/SeoReportPrint.tsx`.
+- ~~`src/components/growth/seo/report-artifact/print/SeoReportPrint.tsx`~~ — **verificado 2026-09-21: NO es precedente de A4 paginado.** Es un artículo web MUI cuyo print variant *trunca* contenido (8 cuadrantes), sin `@page`, sin índice, sin folio, sin cabecera repetida y sin pipeline PDF: su único consumidor es `window.print()`. El precedente real de documento vertical largo es el informe Berel Agosto 2026 (55 páginas), un script one-off fuera de `src/`.
 
 ### Gap
 
@@ -220,6 +220,94 @@ ChartSplit admite 2–4 barras porcentuales y el catálogo actual no resuelve un
 - Known visual debt: sin implementación ni evidencia visual aún.
 - Visual scorecard: docs/ui/reviews/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.scorecard.json (a producir durante ejecución).
 - Quality threshold: average >= 4.2; floor >= 3; fidelity/template resistance >= 4, evaluado con evidencia.
+
+## Hybrid Execution Justification
+
+La task pasó a híbrida el 2026-09-21 al declarar honestamente su `Backend impact`: sin tocar
+`render/contracts.ts`, `render/commands.ts` y el consumer del worker, `report_pdf` nunca se puede encargar
+y el informe A4 no existe como salida. Ocultarlo bajo `Backend impact: none` habría dejado el Slice 3 sin
+contrato declarado.
+
+**Por qué no se parte en dos tasks.** El criterio de CLAUDE.md pide partir cuando el backend es una
+fundación con riesgo propio. Acá es lo contrario: son tres puntos localizados —una constante, resolver el
+catálogo por output en vez de por constante única, y registrar el catálogo en el consumer— **sin tabla,
+sin migración, sin schema, sin capability nueva y sin cambio de contrato para `deck_pdf`**. Una task
+backend-data para eso sería una task de tres líneas que no puede verificarse sola: su única evidencia
+posible es exportar el A4, que es el entregable de esta unidad.
+
+**Orden interno de ejecución, no negociable:** Slice 1 (dirección, contrato, ADR) → Slice 2 (motor,
+reparto y catálogos, con su gate visual) → **Slice 3, y sólo entonces el backend**: admitir `report_pdf`
+es el último paso, cuando ya existe un catálogo A4 que pasó su gate. Activar el consumer antes de su
+contrato es precisamente lo que la regla de ordenamiento de slices prohíbe.
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-lite`
+- Impacto principal: `command`
+- Source of truth afectado: `INSIGHT_RENDERABLE_OUTPUTS` (`src/lib/efeonce-insights/render/contracts.ts:29`) y el registro de catálogos del worker
+- Consumidores afectados: `UI/API/MCP` (el encargo de salidas), `worker` (artifact-worker)
+- Runtime target: `worker` + `production` (el gate por entorno es el enqueue en Vercel)
+
+### Contract surface
+
+- Contrato existente a respetar: `render/commands.ts`, `render/contracts.ts`, `services/artifact-worker/consumers/insights.ts`, ADR `GREENHOUSE_ARTIFACT_VERTICAL_PAGINATION_DECISION_V1.md`
+- Contrato nuevo o modificado: admitir `report_pdf` como salida renderizable y **resolver el catálogo por output** (hoy `INSIGHT_RENDER_CATALOG_NAME` es constante única para todas)
+- Backward compatibility: `compatible` — `deck_pdf` conserva catálogo, manifest y hash; `web` sigue rechazándose (es de TASK-1848)
+- Full API parity: no nace capability nueva. El encargo de salidas ya es command gobernado de TASK-1845/1846; esta task amplía el conjunto de valores que ese command acepta, y los consumers (UI, MCP, Nexa) lo heredan por construcción
+
+### Data model and invariants
+
+- Entidades/tablas/views afectadas: **ninguna** — sin tablas nuevas, sin migración
+- Invariantes que no se pueden romper:
+  - Un target no renderizable es `render_rejected` con causa, **nunca** «para más adelante»
+  - El mapper no trunca una figura ni una afirmación para que entre en un slot
+  - El manifest sella el catálogo y el plan de páginas; el worker detecta drift por hash
+  - `deck_pdf` no cambia de manifest ni de hash por este trabajo
+- Write-target allowlist: `N/A` — esta task no escribe tablas
+- Tenant/space boundary: sin cambio; el render recibe una edición ya autorizada por org
+- Idempotency/concurrency: sin cambio — claim atómico + fencing de TASK-1846
+- Audit/outbox/history: sin cambio; los eventos de run ya existen
+
+### Migration, backfill and rollout
+
+- Migration posture: `none`
+- Default state: `report_pdf` sólo se ofrece cuando el catálogo A4 pasa su gate visual; hasta entonces sigue rechazándose
+- Backfill plan: `N/A`
+- Rollback path: revertir el PR devuelve `report_pdf` a `render_rejected`; las ediciones ya emitidas conservan sus salidas
+- External coordination: ninguna — sin secretos, sin env vars nuevas, sin redeploy fuera del release normal
+
+### Security and access
+
+- Auth/access gate: sin cambio (el del encargo de salidas)
+- Sensitive data posture: el documento contiene datos de cliente; el catálogo no los consulta, los recibe proyectados
+- Error contract: `render_rejected` canónico (HTTP 422) con causa; sin error crudo al cliente
+- Abuse/rate-limit posture: sin cambio; el throughput lo gobierna el tick del dispatcher
+
+### Runtime evidence
+
+- Local checks: `pnpm vitest run src/lib/artifact-composer src/lib/efeonce-insights`, `pnpm composer:visual-gate`, `pnpm composer:brand-pack --check`
+- DB/runtime checks: `N/A` (sin schema)
+- Integration checks: canary del render por el camino real (encargo → tick del dispatcher → Job), **nunca** ejecutando el Job a mano — lección de TASK-1846
+- Reliability signals/logs: los existentes `insights.editions.failed_recent` / `insights.editions.stuck_generation`; los dos signals que esta task proponía (`insights_output_visual_rejected`, `insights_access_denied`) **no existen** y quedan como propuesta, no como hecho
+- Production verification sequence: release autorizado → verificar `report_pdf` aceptado en el encargo → PDF real inspeccionado página por página
+
+### Acceptance criteria additions
+
+- [ ] Source of truth, contract surface y consumidores nombrados con rutas reales.
+- [ ] Invariantes, frontera de tenant y postura de idempotencia explícitas.
+- [ ] `N/A` — esta task no crea tablas, no aplica allowlist de destinos de escritura.
+- [ ] Postura de migración/rollback explícita y proporcional (no hay migración).
+- [ ] Evidencia runtime listada para el cambio de contrato de salidas.
+- [ ] Errores canónicos sin fuga de dato del cliente.
+
+## Capability Definition of Done — Full API Parity gate
+
+`N/A — no capability nueva.` Esta task amplía el conjunto de valores aceptados por un command ya gobernado
+(el encargo de salidas de TASK-1845/1846). Regla touch-it/fix-it: el punto que sí se corrige es que el
+catálogo dejó de resolverse por constante única y pasa a resolverse **por output**, que era el acoplamiento
+que impedía una segunda salida.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
