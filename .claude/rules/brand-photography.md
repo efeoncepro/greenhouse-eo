@@ -52,6 +52,11 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 
 - **Identidad:** el set de Julio es `2026-09-20_identidad-julio-nexa/refs-aprobadas/` (+ 6 ángulos derivados).
   El set viejo de `2026-09-17_equipo-vestuario/` **idealizaba el rostro** y arrastraba deriva.
+- 🔴 **Antes del prompt, abre el `LEEME.md` y el manifiesto del kit de la prenda.** El manifiesto declara
+  `cuando_usarla` por vista: la variante se elige por el **rol de la escena** (la gorra de terreno es la trucker,
+  no la del sitio). **El tipo de marca va por VARIANTE, no por kit** —una prenda puede existir con logotipo y con
+  isotipo, y la trasera puede no llevar marca—. Si el kit trae **pruebas en persona**, ésas son el punto de
+  partida. El 2026-09-20 se falló tres veces seguidas teniendo las tres respuestas en el LEEME.
 - 🔴 **Al declarar `objetos` con una PRENDA, carga primero**
   [`garment-reference-kit.md`](../skills/greenhouse-ai-image-generator/references/garment-reference-kit.md):
   tiene la geometría verbatim del emblema (se espeja: 6 de 21 vistas del polo volvieron invertidas), cómo se

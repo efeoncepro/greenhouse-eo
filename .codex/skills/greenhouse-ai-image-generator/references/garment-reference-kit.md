@@ -323,3 +323,39 @@ Si la prenda o el merch ya tiene una foto real (por ejemplo la gorra del héroe 
 ## Delta 2026-09-17 — el calce se declara, no se asume
 
 Al vestir a alguien con una pieza cuya referencia es una **foto de producto** (gorra, mochila, accesorio), el modelo tiende a escalarla de más: la gorra sale oversized y domina la cara. Describir el **ajuste**, no el objeto: talla adulta normal, calce ceñido y perfil bajo; de la ceja a lo alto de la copa ≈ un tercio de la altura de la cabeza; banda sobre las cejas y laterales sin hueco; visera corta y curva del ancho de la frente. Vale para cualquier accesorio que se lleve puesto. Caso: `ai-generations/2026-09-17_gorra-efeonce/LEEME.md`.
+
+## Delta 2026-09-20 — el kit ya trae la respuesta: ábrelo antes de teorizar
+
+Tres intentos fallidos de vestir a una persona con la gorra, y las tres respuestas estaban en el propio kit,
+a un `cat` de distancia. **Antes de escribir un prompt con una prenda, se abren su `LEEME.md` y su
+manifiesto.** No es una recomendación de prolijidad: es el paso que evita reconstruir mal lo que ya está
+resuelto.
+
+**Lo que estaba escrito y no se leyó** (`ai-generations/2026-09-17_gorra-efeonce/`):
+
+| Estaba en el kit | Lo que pasó por no leerlo |
+|---|---|
+| **Cinco variantes con su rol**, y el manifiesto con `cuando_usarla` por vista | Se usó la de continuidad con el sitio para una escena de **terreno**, cuyo rol declarado corresponde a la **trucker navy** |
+| El rol distingue **logotipo completo** e **isotipo solo** | Se declaró el tipo de marca a nivel de **kit** en vez de por **variante**, así que pedir una heredaba la descripción de la otra y el modelo construía una marca a mitad de camino |
+| «El logotipo se lee pequeño en los paneles, sin estirarse» y la corrección del operador **«muy grandes las gorras»**, con cinco marcadores de calce | No se declaró ninguno |
+| **Pruebas en persona ya resueltas** (`out/prueba-nexa.png`, `out/prueba-julio.png`), donde «el logotipo se mantiene legible y el emblema conserva su orientación» | Se intentó resolver desde cero lo que ya tenía solución y evidencia |
+| «La trasera se declara **sin bordado**; si no, el modelo tiende a repetir el logotipo detrás» | — |
+
+**La regla que sale de esto, y vale para cualquier kit:**
+
+1. **Abrir `LEEME.md` y el manifiesto del kit ANTES del prompt.** El manifiesto dice `cuando_usarla` por vista:
+   la variante se elige por el **rol de la escena**, no por la que esté primero en la lista.
+2. **El tipo de marca va por VARIANTE, no por kit.** Una misma prenda puede existir con logotipo completo y con
+   isotipo, y una vista puede no llevar marca (trasera, cenital). Declararlo arriba hace que el modelo mezcle.
+3. **Si el kit trae pruebas en persona, esas son el punto de partida**, no un extra: ya resolvieron calce,
+   orientación y legibilidad.
+4. **El calce se declara con marcadores, no con el nombre del objeto.** La referencia es una foto de producto y el
+   modelo la escala de más: ceñida, perfil bajo, un tercio de la altura de la cabeza de ceja a copa, banda sobre
+   las cejas, visera corta y curva.
+
+> **Lo que el modelo no sostiene, medido el 2026-09-20.** Con la variante correcta, la referencia correcta y la
+> posición y escala declaradas, la **posición y el tamaño se corrigen**, pero **la forma del emblema sigue
+> espejándose**: la nave sale apuntando al lado contrario. Coincide con lo que ya registraba §«El emblema bordado
+> también lleva su propia referencia» —6 de 21 vistas del polo volvieron invertidas— y no se resuelve con más
+> descripción. Para una pieza donde la marca deba leerse fiel: edición con máscara, o un ángulo donde la marca no
+> cargue el peso.
