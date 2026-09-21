@@ -143,4 +143,27 @@ export {
   type ScatterPoint,
   type SliceGeometry
 } from './chart-geometry'
+export {
+  bulletGeometry,
+  funnelGeometry,
+  gaugeGeometry,
+  heatmapGeometry,
+  upsetGeometry,
+  vennTwoGeometry,
+  waffleGeometry,
+  waterfallGeometry,
+  WAFFLE_CELLS,
+  type BulletGeometry,
+  type FunnelStage,
+  type FunnelStageGeometry,
+  type GaugeGeometry,
+  type HeatmapCell,
+  type HeatmapCellGeometry,
+  type UpsetGeometry,
+  type UpsetIntersection,
+  type VennTwoGeometry,
+  type WaffleCellGeometry,
+  type WaterfallBar,
+  type WaterfallStep
+} from './chart-geometry'
 
