@@ -2177,7 +2177,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-1846` | `complete` | **Efeonce Insights: render durable y Artifact Worker multiconsumidor.** Complete 2026-09-16: en producción (release `917491fd02e4`, primer deploy productivo del Job `artifact-worker`, `INSIGHTS_RENDER_ENABLED` ON en los 3 runtimes, gateway v1.6.0 desplegado, canary productivo en org sandbox). EPIC-045; P1/Alto/Alto; backend-data, UI none, backend integration. | `docs/tasks/complete/TASK-1846-efeonce-insights-durable-artifact-rendering.md` |
 
-| `TASK-1847` | `to-do` | **Efeonce Insights: gráficos y catálogos premium para deck e informe vertical.** EPIC-045; P1/Alto/Alto; ui-ux, UI layout, backend none. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/to-do/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md` |
+| `TASK-1847` | `in-progress` | **Efeonce Insights: gráficos y catálogos premium para deck e informe vertical.** EPIC-045; P1/Alto/Alto; ui-ux, UI layout, backend none. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/in-progress/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md` |
 
 | `TASK-1848` | `in-progress` | **Efeonce Insights: acceso compartido, correo y recurrencia gobernados.** EPIC-045; P1/Alto/Alto; backend-data, UI none, backend command. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/in-progress/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md` |
 

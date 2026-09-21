@@ -14,7 +14,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -27,7 +27,7 @@
 - Motion: `docs/ui/motion/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-045`
-- Status real: `Diseno`
+- Status real: `In-progress desde 2026-09-21 (Claude). Slice 1 en curso: sellar dirección visual, primitive/component mapping concreto y plan GVC para pasar a UI ready yes; no se escribe JSX ni catálogo hasta cerrar ese gate. Sin código todavía; TASK-1845/1846 en producción proveen ChartSpec/plan/snapshot y el render durable (hoy sólo deck_pdf; report_pdf se rechaza).`
 - Rank: `TBD`
 - Domain: `ui|platform`
 - Blocked by: `none`
