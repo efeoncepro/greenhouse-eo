@@ -885,7 +885,7 @@ describe('emblema bordado — el modelo no lo reproduce', () => {
   })
 })
 
-describe('macro del bordado — el kit aporta el emblema en grande', () => {
+describe('la prenda se copia tal cual; el macro sólo refuerza el detalle', () => {
   const base = {
     id: 'k',
     formato: '4:5',
@@ -901,18 +901,34 @@ describe('macro del bordado — el kit aporta el emblema en grande', () => {
 
     expect(imagenes).toHaveLength(2)
     expect(imagenes[1]).toMatch(/detalle-bordado/)
-    expect(prompt).toMatch(/emblem reference, CRITICAL/)
-    expect(prompt).toMatch(/rocket with three round windows/)
+    expect(prompt).toMatch(/ALREADY FINISHED/)
+    expect(prompt).toMatch(/not yours to design, only to copy/)
+    expect(prompt).toMatch(/THREE\s+round windows/)
+    expect(prompt).toMatch(/satin-stitch embroidery/)
+    expect(prompt).toMatch(/Do not resize or move it/)
   })
 
-  it('el bloque prohíbe las formas que el modelo inventó', () => {
-    const { prompt } = construirPrompt({ ...base, objetos: ['gorra-efeonce'] })
+  // La gorra lleva el LOGOTIPO completo («efeonce» con la nave en la «o»), no el isotipo. Describir
+  // una sola forma para las cinco prendas fue el error del 2026-09-20: el bloque genérico decía
+  // «do NOT substitute it with letters» y le prohibía al modelo exactamente lo que la gorra lleva.
+  it('cada prenda declara QUÉ marca lleva y el bloque la describe', () => {
+    const gorra = construirPrompt({ ...base, objetos: ['gorra-efeonce'] }).prompt
+    const polo = construirPrompt({ ...base, objetos: ['polo-efeonce'] }).prompt
 
-    expect(prompt).toMatch(/Do NOT invent, simplify, redraw or substitute it with a spiral, an @/)
+    expect(gorra).toMatch(/letters e-f-e-o-n-c-e/)
+    expect(polo).toMatch(/carries NO letters and NO words/)
+    // La geometría es verbatim del kit: el emblema se espeja si no se declara el lado.
+    expect(polo).toMatch(/rocket points to the RIGHT/)
   })
 
-  it('las cinco prendas con bordado declaran su macro', () => {
-    for (const p of ['polo-efeonce', 'hoodie-efeonce', 'gorra-efeonce', 'chaqueta-softshell-efeonce', 'chaqueta-bomber-efeonce']) {
+  // Su logotipo ya es grande y legible en la vista frontal: pasarle además el macro lo empujaba a
+  // redibujarlo en vez de copiarlo.
+  it('la gorra va sin macro: su marca ya se lee en la prenda', () => {
+    expect(construirPrompt({ ...base, objetos: ['gorra-efeonce'] }).imagenes).toHaveLength(1)
+  })
+
+  it('las prendas de emblema pequeño declaran su macro', () => {
+    for (const p of ['polo-efeonce', 'hoodie-efeonce', 'chaqueta-softshell-efeonce', 'chaqueta-bomber-efeonce']) {
       expect(construirPrompt({ ...base, objetos: [p] }).imagenes).toHaveLength(2)
     }
   })

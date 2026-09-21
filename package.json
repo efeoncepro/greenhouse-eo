@@ -299,6 +299,7 @@
     "foto:validar": "node scripts/foto/validar-reservas.mjs",
     "foto:componer": "node scripts/foto/componer.mjs",
     "foto:emblema": "node scripts/foto/emblema.mjs",
+    "foto:generar": "node scripts/foto/generar.mjs",
     "tender:new": "node scripts/commercial/new-tender.mjs",
     "tender:canonical-gate": "node scripts/commercial/canonical-tender-gate.mjs",
     "tender:canonical-gate:test": "node --test scripts/commercial/__tests__/tender-closure-gate.test.mjs",

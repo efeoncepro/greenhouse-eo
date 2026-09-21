@@ -341,7 +341,9 @@ export const OBJETOS = {
     etiqueta: 'the Efeonce team softshell jacket',
     tipo: 'prenda',
     instruccion:
-      'Use it as the exact garment the person wears: same navy colour, cut, collar, zip, pockets and the embroidered emblem in the same position and size. Do not copy its studio background or presentation.',
+      'THIS GARMENT IS ALREADY FINISHED and already carries its embroidered Efeonce mark: copy it AS IT IS — ' +
+      'same navy colour, cut, collar, zip and pockets, and the mark exactly where and as it appears here. Do NOT redraw, restyle or reinterpret ' +
+      'the mark: it is not yours to design, only to copy. Do not copy its studio background.',
     base: 'ai-generations/2026-09-17_chaqueta-efeonce/final/',
     patron: 'efeonce-chaqueta-softshell-<V>-1600x1600-v01-transparente.png',
     vistas: {
@@ -354,23 +356,29 @@ export const OBJETOS = {
     },
     vistaDefecto: 'frente',
     macroEmblema: 'efeonce-chaqueta-softshell-11-macro-bordado-1600x1600-v01-fondo-estudio.png',
+    tipoEmblema: 'isotipo',
   },
   'chaqueta-bomber-efeonce': {
     etiqueta: 'the Efeonce team bomber jacket',
     tipo: 'prenda',
     instruccion:
-      'Use it as the exact garment the person wears: same colour, cut, ribbed collar and cuffs, and the embroidered emblem in the same position and size. Do not copy its studio background or presentation.',
+      'THIS GARMENT IS ALREADY FINISHED and already carries its embroidered Efeonce mark: copy it AS IT IS — ' +
+      'same colour, cut, ribbed collar and cuffs, and the mark exactly where and as it appears here. Do NOT redraw, restyle or ' +
+      'reinterpret the mark: it is not yours to design, only to copy. Do not copy its studio background.',
     base: 'ai-generations/2026-09-17_chaqueta-efeonce/final/',
     patron: 'efeonce-chaqueta-bomber-<V>-1600x1600-v01-transparente.png',
     vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
     vistaDefecto: 'frente',
     macroEmblema: 'efeonce-chaqueta-bomber-11-macro-bordado-1600x1600-v01-fondo-estudio.png',
+    tipoEmblema: 'isotipo',
   },
   'gorra-efeonce': {
     etiqueta: 'the Efeonce cap',
     tipo: 'prenda',
     instruccion:
-      'Use it as the exact cap the person wears: same colour, crown shape, brim and the embroidered mark in the same position and size. Do not copy its studio background.',
+      'THIS GARMENT IS ALREADY FINISHED and already carries its embroidered Efeonce mark: copy it AS IT IS — ' +
+      'same colour, crown shape and brim, and the mark exactly where and as it appears here. Do NOT redraw, restyle or reinterpret ' +
+      'the mark: it is not yours to design, only to copy. Do not copy its studio background.',
     base: 'ai-generations/2026-09-17_gorra-efeonce/final/',
     patron: 'efeonce-gorra-<V>-1600x1600-v01-transparente.png',
     // La gorra tiene variantes de diseño además de ángulos: v2 es la canónica.
@@ -384,7 +392,7 @@ export const OBJETOS = {
       'trucker-navy': 'v5-trucker-navy'
     },
     vistaDefecto: 'frente',
-    macroEmblema: 'efeonce-gorra-v2-04-macro-bordado-1600x1600-v01-fondo-estudio.png',
+    tipoEmblema: 'logotipo',
   },
   'lanyard-efeonce': {
     etiqueta: 'the Efeonce lanyard with its retractable reel and rigid-frame badge holder',
@@ -403,27 +411,53 @@ export const OBJETOS = {
     etiqueta: 'the Efeonce team polo',
     tipo: 'prenda',
     instruccion:
-      'Use it as the exact garment the person wears: same colour, collar, fabric and embroidered emblem in the same position and size. Do not copy its studio background or presentation, and never let the model spell the emblem by itself — inspect it at 100% before publishing.',
+      'THIS GARMENT IS ALREADY FINISHED and already carries its embroidered Efeonce mark: copy the garment AS IT IS — ' +
+      'same colour, collar, fabric, and the mark exactly where and as it appears here. Do NOT redraw, restyle or ' +
+      'reinterpret the mark: it is not yours to design, only to copy. Do not copy its studio background.',
     base: 'ai-generations/2026-09-17_polo-efeonce/final/',
     patron: 'efeonce-polo-blanco-<V>-1600x1600-v01-transparente.png',
     vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
     vistaDefecto: 'frente',
     macroEmblema: 'efeonce-polo-blanco-10-detalle-bordado-1600x1600-v01-fondo-estudio.png',
+    tipoEmblema: 'isotipo',
   },
   'hoodie-efeonce': {
     etiqueta: 'the Efeonce team hoodie',
     tipo: 'prenda',
     instruccion:
-      'Use it as the exact garment the person wears: same colour, cut, fabric and embroidered emblem in the same position and size. Do not copy its studio background or presentation.',
+      'THIS GARMENT IS ALREADY FINISHED and already carries its embroidered Efeonce mark: copy it AS IT IS — ' +
+      'same colour, cut, fabric, and the mark exactly where and as it appears here. Do NOT redraw, restyle or ' +
+      'reinterpret the mark: it is not yours to design, only to copy. Do not copy its studio background.',
     base: 'ai-generations/2026-09-17_hoodie-efeonce/final/',
     patron: 'efeonce-hoodie-<V>-1600x1600-v01-transparente.png',
     vistas: { frente: '01-frente', espalda: '02-espalda', 'tres-cuartos-izq': '03-tres-cuartos-izquierda' },
     vistaDefecto: 'frente',
     macroEmblema: 'efeonce-hoodie-09-detalle-pecho-1600x1600-v01-fondo-estudio.png',
+    tipoEmblema: 'isotipo',
   }
 }
 
 // La vista se elige por el ÁNGULO DE LA TOMA, no por costumbre: de espaldas → vista de espalda.
+// La marca NO es la misma en todas las prendas, y describirla igual fue el error del 2026-09-20: el
+// polo y las chaquetas llevan el ISOTIPO (la nave sola); la GORRA lleva el LOGOTIPO COMPLETO —«efeonce»
+// con la nave en el lugar de la «o»—. El bloque genérico decía «do NOT substitute it with letters» y le
+// prohibía al modelo exactamente lo que la gorra lleva.
+// Geometría VERBATIM de `garment-reference-kit.md` §«El emblema bordado también lleva su propia
+// referencia»: la imagen sola no basta y el emblema se espeja con facilidad — 6 de 21 vistas del polo
+// volvieron con la nave apuntando al lado contrario. Reconstruirla de memoria fue el error del
+// 2026-09-20; esta descripción ya estaba escrita y medida.
+const ISOTIPO =
+  'the rocket points to the RIGHT with its rounded nose on the right and its two fins low on the left, the orbit ' +
+  'is a wide ellipse with breaks where it passes behind the rocket, the planet dot sits above, and there are THREE ' +
+  'round windows along the body. It carries NO letters and NO words.'
+
+const LOGOTIPO =
+  'the full Efeonce wordmark: the letters e-f-e-o-n-c-e in a rounded sans, where the "o" is REPLACED by the ' +
+  'rocket-and-orbit mark — the rocket sits inside the elliptical orbit, in the position the letter "o" would ' +
+  'occupy, with the filled dot above it. The letters and the mark are ONE single lockup.'
+
+const formaDeLaMarca = objeto => (objeto.tipoEmblema === 'logotipo' ? LOGOTIPO : ISOTIPO)
+
 function resolverObjetos(ficha, desde) {
   const pedidos = ficha.objetos ?? []
 
@@ -463,7 +497,16 @@ function resolverObjetos(ficha, desde) {
     const n = desde + imagenes.length + 1
 
     imagenes.push(ref)
-    bloques.push(`IMAGE ${n} (object reference): Image ${n} is ${objeto.etiqueta}. ${objeto.instruccion} Ignore its studio background.`)
+
+    // Cómo se pide un bordado y por qué no se redimensiona: ambas de `garment-reference-kit.md`
+    // (§«Cómo se pide un bordado» y §4 «Proporciones declaradas», corrección expresa del operador).
+    const queMarca = objeto.tipoEmblema
+      ? ` The mark it carries is ${formaDeLaMarca(objeto)} Render it as satin-stitch embroidery with visible ` +
+        'stitch direction, slightly raised over the knit — never flat ink. Do not resize or move it: it keeps ' +
+        'exactly the size and position it has in the reference.'
+      : ''
+
+    bloques.push(`IMAGE ${n} (object reference): Image ${n} is ${objeto.etiqueta}. ${objeto.instruccion}${queMarca} Ignore its studio background.`)
 
     // El MACRO DEL BORDADO va como referencia aparte. En la vista de la prenda entera el emblema
     // mide unos pocos píxeles: el modelo lo lee como una mancha y la reinventa. Medido el
@@ -484,12 +527,11 @@ function resolverObjetos(ficha, desde) {
 
       imagenes.push(macro)
       bloques.push(
-        `IMAGE ${nm} (emblem reference, CRITICAL): Image ${nm} is a macro of the embroidered Efeonce emblem on ${objeto.etiqueta}. ` +
-          'Reproduce THIS EXACT emblem on the garment — a rocket with three round windows seen from the side, ' +
-          'crossed by a single elliptical orbit that passes behind it and in front of it, with a filled dot above. ' +
-          'Keep its proportions, its navy thread colour and its embroidered relief. Do NOT invent, simplify, ' +
-          'redraw or substitute it with a spiral, an @, letters or any other shape. It sits small on the left chest ' +
-          '(or the front panel of a cap), at the scale it has in a real garment. Ignore its studio background.'
+        `IMAGE ${nm} (detail reference): Image ${nm} shows, in macro, the mark THAT IS ALREADY ON that garment — ${formaDeLaMarca(objeto)} ` +
+          `It is here only so the small mark in the previous image is not lost or reinterpreted at its real scale. ` +
+          'Keep its proportions, its thread colour and its embroidered relief exactly as in the macro. Do NOT invent, ' +
+          'simplify, redraw or substitute it with a spiral, an @ or any other shape, and do NOT change which of the ' +
+          'two forms it is. It sits at the scale it has in the real garment. Ignore its studio background.'
       )
     }
 

@@ -52,6 +52,12 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 
 - **Identidad:** el set de Julio es `2026-09-20_identidad-julio-nexa/refs-aprobadas/` (+ 6 ángulos derivados).
   El set viejo de `2026-09-17_equipo-vestuario/` **idealizaba el rostro** y arrastraba deriva.
+- 🔴 **Al declarar `objetos` con una PRENDA, carga primero**
+  [`garment-reference-kit.md`](../skills/greenhouse-ai-image-generator/references/garment-reference-kit.md):
+  tiene la geometría verbatim del emblema (se espeja: 6 de 21 vistas del polo volvieron invertidas), cómo se
+  pide un bordado (`satin-stitch`, no tinta plana), que el emblema **no se redimensiona**, y que **vestir a una
+  persona real exige una foto de CUERPO ENTERO** además del rostro. Reconstruirlo de memoria costó una jornada
+  el 2026-09-20 y el resultado fue un emblema inventado en cinco piezas.
 - 🔴 **El emblema bordado NO se genera.** Medido 2026-09-20: tres prendas dieron **tres emblemas distintos y
   ninguno era el de Efeonce** (una espiral, dos barras, otras dos). Es el mismo hecho que gobierna la firma. En
   orden: que **no se lea** (de espaldas, en sombra, pequeño) · **componerlo** después · **editar con máscara**.
