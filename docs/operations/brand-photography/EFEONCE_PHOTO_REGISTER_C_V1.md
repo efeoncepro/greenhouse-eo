@@ -59,6 +59,30 @@ ajeno: el rojo y el verde también, y entre los tres se llevan la paleta entera.
   tarjeta es lo más grande y brillante del cuadro. **El titular no puede repetir lo que la tarjeta ya dice**:
   tiene que hablar del paso siguiente.
 
+### El kit de Gigi (Google Gemini) — 24 vistas **[de la sesión que lo produjo, 2026-09-21]**
+
+OneDrive `5. Contenidos/14. Mascotas de partners/Gigi (Google Gemini)/`, en tres familias: `Poses 3D/v01`
+(8 ángulos) · `Poses 3D con accesorios/v01` (8 de servicio) · `Poses 3D busqueda y AEO/v01` (8 propias).
+Nombre: `efeonce-gigi-3d-<vista>-1x1-1600x1600-v01-{fondo-estudio|transparente}.png`.
+
+**Las ocho de búsqueda y AEO son las del registro C:** `aeo-01-la-pregunta` (un cursor solo en una barra
+vacía) · `aeo-02-la-respuesta-con-citas` · **`aeo-03-no-te-conoce`** (tarjeta vacía; **el sujeto es el vacío,
+no Gigi**) · `aeo-04-el-podio` (Share of Voice) · `aeo-05-leyendo-tu-sitio` · `aeo-06-datos-estructurados` ·
+`aeo-07-la-entidad` · `aeo-08-el-diagnostico` (medidor con aguja, sin un solo número). **Ni una letra ni un
+número en ninguna utilería.**
+
+Se piden con `{ objeto: 'gigi-aeo', vista: 'no-te-conoce' }` (ésa es la `vistaDefecto`); las otras 16, con
+`{ objeto: 'gigi', vista: … }`.
+
+🔴 **Gobernanza.** Gigi es propiedad de **Google**, como Clawd de Anthropic, Codex de OpenAI y el sprocket de
+HubSpot: es una **interpretación 3D** de la mascota de un tercero, de **uso interno y orgánico**. Orgánico
+aprobado **no es pauta**: antes de pautar hay que validar contra la guía de marca de Google. Y sigue vigente
+**una sola mascota de partner por imagen** salvo pedido explícito del operador, registrado en el LEEME.
+
+✅ **Ese aviso ya no vive sólo en los docs:** hasta el `cb86ccf7e` sólo el sprocket llevaba el campo `aviso` en
+el catálogo, así que quien generaba con Clawd, Codex o Gigi **nunca lo veía**. Las cuatro claves avisan ahora,
+con un test que lo mantiene cableado.
+
 ## 4. La escala es un recurso propio de C
 
 Las criaturas son **figuras físicas de ~25 cm**. Esa desproporción no es un accidente que haya que disimular:

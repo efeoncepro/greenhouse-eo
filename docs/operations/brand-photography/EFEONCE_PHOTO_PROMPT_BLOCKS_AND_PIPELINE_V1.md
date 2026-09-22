@@ -272,13 +272,19 @@ Kits en el catálogo, por tipo:
 | Prenda (viste a la persona) | `polo-efeonce` · `hoodie-efeonce` · `chaqueta-softshell-efeonce` · `chaqueta-bomber-efeonce` · `gorra-efeonce` |
 | Merch | `lanyard-efeonce` (cinta, yoyo y portacarnet de marco rígido) |
 | Marca propia | `nave-efeonce` |
-| Mascota de partner | `clawd` · `codex` |
+| Mascota de partner | `clawd` · `codex` · `gigi` (16 vistas) · `gigi-aeo` (8 vistas propias de búsqueda y AEO) |
 | Marca de tercero | `sprocket-hubspot` |
 
 **La vista de una prenda se elige por el ángulo de la toma**, no por costumbre: de espaldas → vista de espalda.
 Agregar un kit nuevo es una entrada de datos —base, patrón de archivo y tabla de vistas—, no un cambio de lógica.
 Un test recorre **todas** las vistas de **todos** los kits y falla si alguna ruta no existe en disco, así que un
 kit mal escrito o una corrida renombrada se detectan antes de gastar en una tanda.
+
+🔴 **Los cuatro kits de mascota de partner llevan `aviso` de derechos y lo emiten al construir el prompt**
+(desde el 2026-09-21): son interpretaciones 3D de marcas de terceros —Anthropic, OpenAI, Google—, de **uso
+interno y orgánico**, y orgánico aprobado **no es pauta**. Antes de pautar hay que validar contra la guía de
+marca del partner, y por defecto va **una sola mascota de partner por imagen**. Hasta esa fecha la regla vivía
+sólo en los docs y quien generaba nunca la veía: el sprocket avisaba y las mascotas no.
 
 > **El carnet no se genera.** `lanyard-efeonce` emite su propia nota: el carnet se compone con
 > `node ai-generations/2026-09-17_lanyard-efeonce/arte-carnet.mjs <foto.png> "<Nombre>" "<Cargo>" <salida.png>`

@@ -411,10 +411,15 @@ correcta y sombras de contacto— **se posa SOBRE la persona**: hombro, antebraz
 Está visiblemente **atascada**: esperando, desconcertada, fuera de su alcance. La persona reacciona a ese hueco
 —encogimiento de hombros, cejas arriba, manos abiertas— y mira **a la criatura o más allá**, nunca al lente.
 **Una sola criatura**, y **nunca se redibuja**: se copia de su referencia tal como es.
-🔴 **Exige el campo `criatura`** y sale siempre de un kit de mascota (Clawd, Codex, Nexa). El campo obliga a
+🔴 **Exige el campo `criatura`** y sale siempre de un kit de mascota (Clawd, Codex, **Gigi**, Nexa). El campo obliga a
 declararla para que nadie invente un robot genérico. Ejemplos que el comando trae: *«Clawd, sitting on her
 shoulder with a question mark floating above it»* · *«Codex, standing on the desk beside the laptop, looking up
 and waiting»*.
+**Gigi** (Google Gemini, kit del 2026-09-21) es la que mejor encaja en esta palanca cuando la pieza habla de
+búsqueda o de motores de respuesta, porque tiene **8 poses propias de AEO** que las otras dos no tienen: la que
+dice exactamente «la máquina no sabe» es `efeonce-gigi-3d-aeo-03-no-te-conoce`, donde sostiene una tarjeta
+**completamente vacía**. Ahí el sujeto es el vacío de la tarjeta, no la criatura — si le pones titular, que no
+repita lo que la imagen ya dijo.
 **Ojo — la POSE se elige del kit, no se pide** **[medido, 5 pasadas]**. Pedirle al modelo una pose que la
 referencia no tiene lo hace **redibujar el asset**: Clawd volvió con cinco formas distintas (patas largas, cuerpo
 cuadrado, ojos chicos). Se resolvió pasando la pose que el kit **ya tenía**: `efeonce-clawd-3d-07-salto-en-el-aire`
