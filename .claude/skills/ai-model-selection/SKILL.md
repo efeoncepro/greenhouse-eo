@@ -40,8 +40,31 @@ avise. Acá vive el **método**; allá, el **dato**. Si necesitas el número, á
 **Contratos de código (lo que el CLI puede ejecutar de verdad):**
 `src/lib/ai/fal-capabilities.ts` · `src/lib/ai/higgsfield-capabilities.ts` · `src/lib/ai/openai-image.ts`
 
-🔴 **Ante conflicto entre la guía y el código, gana el código** — es lo que se ejecuta. Y la
-divergencia **es un hallazgo que se arregla**, no una elección de la fuente más conveniente.
+**Fichas de ruta (capacidad declarada por endpoint, con evidencia por cable):**
+[`docs/architecture/creative-studio/model-fleet/routes/*.json`](../../../docs/architecture/creative-studio/model-fleet/routes/)
+— 11 fichas hoy. 🔴 **No son «cosas de Globe»**, y confundirlas con eso hace perder su mejor dato:
+además del gobierno de rutas traen **`endpointId` real** (el mismo slug que usa `pnpm ai:fal`),
+`model`, `version`, los **`controls` con su `valueShape` y su mecanismo** (`resolution:
+enum(480p|720p)`, `audio-mode` vía `generate_audio`), los `inputs` por slot, la forma del `output` y
+los `providerSurfaces` con lo que el proveedor promete pero **nadie verificó**. Su formato es más
+estricto que el de la guía: obliga a `unknown` y `unsupported` explícitos en vez de omitir la columna.
+
+### Las tres fuentes no dicen lo mismo, y ése es el punto
+
+| Fuente | Qué responde | Cuándo manda |
+|---|---|---|
+| **Contrato de código** | qué se puede ejecutar **hoy** y qué cobra | ante conflicto operativo: es lo que corre |
+| **Guía canónica** | qué conviene elegir, con costo, trampas y «cuándo NO» | para decidir |
+| **Fichas de ruta** | qué declara el endpoint por control, con evidencia por cable | para saber qué está **verificado** y qué es promesa |
+
+🔴 **Una discrepancia entre las tres es un HALLAZGO, no un menú.** No elijas la fuente que te conviene:
+la divergencia es justo donde alguien va a equivocarse, y se cierra verificando contra el proveedor.
+
+**Caso medido, 2026-09-22.** Seedance 2.5 a 1080p: las tres fichas de ruta declaraban
+`enum(480p|720p)`, la guía lo marcaba como *«1080p en OpenAPI, no verificado — contradicción»* y pedía
+**probar 5 s antes de usarlo como hero**, y el contrato de código decía «techo 1080p». Se corrieron dos
+tomas a 1080p sin leer el aviso (USD 12,48) y el endpoint **sí entregó 1080×1920**. Resolvió media
+contradicción por accidente y pagando de más: la mitad barata era una prueba de 5 s.
 
 ## 2. El orden. No saltes al comando
 
