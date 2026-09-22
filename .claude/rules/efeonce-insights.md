@@ -26,7 +26,7 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
 - **Emitir exige outputs validados + gate humano**: el `InsightOutputsPort` real (TASK-1846, conectado al cargar
   `commands/index.ts`) sólo valida outputs `completed` con asset de la MISMA audiencia; faltar uno es `not_ready`
   con `missing`. El actor del gate es `member`/`client_user`, nunca un binding MCP (ecosystem no emite ni retira).
-- **Render durable (`render/**`)**: sólo `INSIGHT_RENDERABLE_OUTPUTS` (hoy `deck_pdf`) se encola; otro target es
+- **Render durable (`render/**`)**: sólo `INSIGHT_RENDERABLE_OUTPUTS` (`deck_pdf` → catálogo `insights-deck`, `report_pdf` → `insights-report`; `INSIGHT_RENDER_CATALOG_BY_OUTPUT`, string para no arrastrar el catálogo al bundle de Vercel) se encola; otro target es
   `render_rejected`, nunca "para después". **NUNCA** truncar cifras/afirmaciones para caber en un slot (el mapper
   rechaza con causa). **NUNCA** separar lease de fencing ni finalizar sin presentar el `fence_token`. El worker
   despacha por `RenderConsumer` (`services/artifact-worker/consumers/*`): Proposal es un adapter compatible.

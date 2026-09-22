@@ -59,7 +59,7 @@ runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-0
 | Domain | `render/store.ts` | claim (lease+fence+reclaim+org quota), transitions (+events), retry, cancel, inserts, readers by edition/run |
 | Domain | `render/commands.ts` · `render/readers.ts` | `requestInsightRender`, `retryInsightRender`, `cancelInsightRender`; `readInsightRenderRun(s)` |
 | Domain | `render/outputs-port.ts` | real `InsightOutputsPort` + `wireInsightOutputsPort()` (called from `commands/index.ts`) |
-| Domain | `render/deck-mapper.ts` · `render/plan-limits.ts` | frozen plan → deck-axis slides (V1); limits dedupe at render |
+| Domain | `render/insights-deck-mapper.ts` · `render/report-mapper.ts` · `render/figure-pages.ts` · `render/composition-helpers.ts` · `render/labels.ts` · `render/plan-limits.ts` | frozen plan → `insights-deck` slides (deck_pdf, since 2026-09-22; the deck-axis mapper was retired) and `insights-report` pages (report_pdf); figures, limits, period labels and length rejections are shared by both mappers; limits dedupe at render |
 | Composer | `src/lib/artifact-composer/manifest-hash.ts` | `hashResolvedManifest` domain-free (re-exported by Proposal `render-jobs.ts`) |
 | Worker | `services/artifact-worker/consumer-contract.ts`, `consumers/{proposal,insights,index}.ts`, `main.ts` | registry dispatch; `INSIGHTS_RENDER_ENABLED` in `deploy.sh` (+ `deploy-contract.test.ts`) |
 | Lanes | `src/lib/api-platform/resources/{app,ecosystem}-insights.ts` + routes `…/insights/editions/[editionId]/render`, `…/insights/render-runs/[renderRunId]{,/retry,/cancel}` | request/list/get/retry/cancel |

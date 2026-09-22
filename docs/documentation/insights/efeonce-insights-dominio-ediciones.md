@@ -1,9 +1,9 @@
 # Efeonce Insights — Dominio de ediciones (deck, informe A4 y web)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-09-21 por Claude (TASK-1847: el informe A4 y los gráficos del deck, construidos en local y sin desplegar)
+> **Ultima actualizacion:** 2026-09-22 por Claude (TASK-1847: informe A4 y deck nuevo en staging, probados con datos reales; sin producción)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) · [ADR](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md) · EPIC-045
 
 ## Qué es
@@ -60,7 +60,7 @@ Como emitir todavía no es posible, hoy un cliente que pide una edición la ver�
 cifras visibles: eso es lo esperado hasta que su deck esté renderizado y un interno la emita (el render del deck
 ya corre en staging y producción, pero la emisión sigue apagada en todos los ambientes).
 
-## Los dos formatos y sus gráficos (2026-09-21, construido sin desplegar)
+## Los dos formatos y sus gráficos (2026-09-22, en staging)
 
 Una edición produce **el mismo contenido en dos formatos**, y la diferencia no es de estilo sino de
 cómo se lee cada uno:
@@ -94,11 +94,27 @@ probado, pero todavía no hay quien genere esos datos. No están ofrecidas como 
 página de cierre, «Lo que esta edición no puede afirmar». Desaparecerlo convertiría la falta de
 datos en silencio.
 
-## Estado de disponibilidad (2026-09-21)
+**Cómo se lee una figura que compara períodos.** Cada métrica aparece como un par: la barra de color es el
+período del informe y la gris, el período anterior. Cada par se mide en su propia escala, porque comparar el largo de
+«clics» contra el de «impresiones» no dice nada (son magnitudes de cientos de veces de diferencia). Si una figura
+no cabe en una página, sigue en la siguiente con «(continuación)»: nunca se descartan barras.
 
-> **Delta 2026-09-21 (TASK-1847):** el informe A4 y el catálogo propio del deck están construidos y
-> renderizan, pero **no están desplegados**: nada de esto se puede pedir todavía desde el portal ni
-> por API en producción. El deck que hoy se produce sigue usando el catálogo comercial.
+**Qué dicen el período, los límites y la metodología.** El período es la ventana que la edición midió: una edición
+del 1 al 20 de septiembre dice «1–20 de septiembre de 2026», no «Septiembre». Los límites y la metodología nombran
+las métricas y las fuentes en palabras («Posiciones en buscadores», «Google Search Console, corte al 19 de septiembre
+de 2026»), nunca con códigos internos.
+
+**Probado con datos reales (2026-09-22, staging).** Con Grupo Berel (visibilidad orgánica y en motores de
+respuesta) y Sky Airlines (entrega), en ediciones internas y sin emitir. La prueba encontró y corrigió errores que los
+datos de ejemplo no mostraban, entre ellos que **la tasa de entregas a tiempo (OTD) nunca llegaba al informe** de
+entrega por un nombre de métrica distinto: ahora aparece (Sky, agosto: 81,9 %).
+
+## Estado de disponibilidad (2026-09-22)
+
+> **Delta 2026-09-22 (TASK-1847):** el informe A4 y el deck nuevo están **en staging**, probados con datos reales de
+> Berel y Sky. En staging el deck ya usa el formato propio de Insights (antes usaba el de propuestas comerciales, que
+> recortaba textos y omitía métricas). **En producción todavía no**: ahí el informe A4 se rechaza al pedirlo y el deck
+> sale con el formato anterior, hasta el próximo release.
 
 **Disponible en producción** desde el 2026-09-15 para las organizaciones que tengan el módulo `insights_v1`
 asignado. Lo que está encendido y lo que no:
@@ -110,7 +126,8 @@ asignado. Lo que está encendido y lo que no:
 | Redacción asistida por IA | Apagada | Flag `INSIGHTS_AUTHORING_AI_ENABLED` OFF; el plan sale del redactor determinista |
 | Pedir el render del **deck PDF** de una edición | **Encendido en staging y producción** (desde 2026-09-16) | Staging: probado con cinco decks reales, un reintento y una cancelación. Producción: probado el 2026-09-16 en la organización de prueba — el deck salió solo, al primer intento, y pedir la vista web fue rechazado como corresponde. Ver «Pedir el deck de una edición» |
 | Enlace compartido, envío por correo y recurrencia | **En producción, pero apagados** (2026-09-18) | El código salió a producción el 2026-09-18 con los tres interruptores apagados a propósito: se encenderán cuando exista la página pública del enlace en Think (TASK-1875). En staging están encendidos y se probaron completos con una organización de prueba; los dos correos de prueba llegaron al buzón autorizado. Ver las tres secciones siguientes |
-| Informe A4 y pantalla pública del enlace | No existen todavía | TASK-1847 (A4) y TASK-1875 (la página en `think.efeoncepro.com` que muestra el enlace) |
+| Pedir el **informe A4** de una edición | **En staging** (2026-09-22); no en producción | Probado con datos reales de Berel y Sky; sale junto con el deck si se piden los dos. En producción se rechaza hasta el próximo release (TASK-1847) |
+| Pantalla pública del enlace | No existe todavía | TASK-1875 (la página en `think.efeoncepro.com` que muestra el enlace) |
 | Usar Insights desde un agente externo por el gateway MCP (`mcp.efeonce.org`) | Lectura sí; escritura todavía no | Gateway v1.7.0 (2026-09-18). Además de ediciones y render, un agente puede **ver** enlaces, envíos y recurrencias (cinco herramientas de lectura). Crear y revocar enlaces existen, pero exigen un permiso de escritura que ningún cliente tiene aún; lo mismo crear ediciones. **Enviar por correo y programar recurrencias sólo se hacen desde el portal**, no por MCP |
 
 **Pedir el deck de una edición (render).** Cuando una edición está `ready_for_review`, quien tenga permiso sobre
@@ -135,7 +152,7 @@ proceso en segundo plano lo produce.
   "no existe" (no encontrado) y no se crea nada.
 - **Registro.** Cada pedido, reintento y cancelación queda a nombre de la persona que lo hizo, también si es un
   usuario cliente (antes todo quedaba como "sistema").
-- **Qué no hace todavía.** Sólo existe el deck. El informe A4 y la vista web se rechazan al pedirlos. Tener el deck
+- **Qué no hace todavía.** En producción sólo existe el deck (en staging también el informe A4). La vista web se rechaza al pedirla. Tener el deck
   no lo envía ni lo comparte: descargarlo, compartirlo y emitir siguen siendo pasos aparte.
 
 ## Compartir un informe por enlace

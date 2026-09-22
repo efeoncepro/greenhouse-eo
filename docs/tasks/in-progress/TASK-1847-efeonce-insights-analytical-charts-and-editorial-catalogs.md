@@ -12,6 +12,31 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-22 — canary con datos reales en staging y cutover del deck
+
+**Desplegado a staging** (`develop` hasta `21c991999`; worker `artifact-worker` por su workflow). **Sin release a
+producción.** Módulo `insights_v1` asignado a Grupo Berel y Sky Airlines (autorizado por el operador). Ediciones del
+canary, audiencia interna y sin emitir: Demo `EO-INS-000018`, Berel SEO+AEO `EO-INS-000019` (1–20 sep), Sky ICO
+`EO-INS-000020` (agosto).
+
+**Lo que el canary encontró y quedó cerrado** (los fixtures no veían ninguno):
+
+1. Validador de cifras: la fecha `2026-08` se partía en `-08`, y las cifras de la etiqueta del hecho (`(≤10)`, el mes)
+   contaban como inventadas. Una fecha es un token; la etiqueta literal de un hecho referenciado se enmascara. La
+   guarda anti-fabricación no se relajó (commit `465e9f487`).
+2. Límites y metodología imprimían ids internos y el nombre de la función lectora (`908384706`).
+3. OTD nunca llegó a un informe: `otd` vs `otd_pct` en el registro ICO, omitido en silencio. AEO con ids de
+   proveedor y dimensiones en inglés; conteos sin su total (`5639547ca`).
+4. Figuras del A4: formato propio en vez del canónico, barras sin nombre de métrica, recorte `slice(0, 6)`, barra
+   destacada invisible (colisión con `.lead` del molde), guarda que rechazaba todo redondeo, resumen recortado a 7
+   (`5639547ca`).
+5. El deck productivo sobre `deck-axis` recortaba con «…», duplicaba filas y callaba métricas: **cutover de
+   `deck_pdf` a `insights-deck`** con mapper nuevo; período rotulado desde la ventana medida (`21c991999`).
+
+**Vista previa local sobre datos reales** (adapters → planner → validador → mapper → composer): Berel A4 15 págs y deck
+13 láminas; Sky A4 7 y deck 5; 0 violaciones, sin rechazos, OTD 81,9 %. Pendiente del runtime: re-render en staging de
+ediciones revisadas con el código nuevo (los planes ya sellados conservan el texto viejo).
+
 ## Delta 2026-09-21 — construido en local, sin rollout
 
 **Hecho y probado:** ADR de paginación vertical (`Accepted`, indexado) · `measureSlideFit` +
@@ -55,7 +80,7 @@ catálogo `insights-report` (A4 794×1123) con molde compartido y 5 plantillas q
 - Motion: `docs/ui/motion/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs-motion.md`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `Code complete, rollout pendiente (2026-09-22). Construido y probado en local: ADR de paginación; measureSlideFit + paginateFlow; 15 familias de geometría; la marca se compila una vez para 3 catálogos (deck-axis byte-idéntico); catálogos insights-report (A4, 5 plantillas) e insights-deck (16:9, 4 composiciones), ambos renderizando; copy SSOT; report-mapper con figuras/tablas/límites; report_pdf admitido y ambos catálogos registrados en el artifact-worker; el gate visual del Composer generalizado a los 3 catálogos. Gates verdes: 424 tests, typecheck, design-contract:lint, ui:code-lint, ui:quality (4,50 · piso 4,0), worker gates, docs:closure-check. UI ready = n/a: la superficie es un documento sin ruta y ui:visual-gate exige route del portal. NO desplegado: sin canary, sin push; deck_pdf productivo sigue en deck-axis (ese cutover necesita su canary). Baseline visual de los 9 frames nuevos DECLARADO y NO promovido, bloqueado por ISSUE-122 (drift entre corridas, evidencia nueva aportada).`
+- Status real: `Code complete, rollout pendiente (2026-09-22). Desplegado en staging (develop hasta 21c991999), NO en producción. Canary con datos reales (Berel SEO+AEO, Sky ICO) encontró y cerró: falsos positivos del validador, ids internos en límites/metodología, OTD nunca leído (otd vs otd_pct), figuras del A4 (formato, nombres, recortes, barra destacada invisible, guarda sin tolerancia de redondeo) y el deck sobre deck-axis; deck_pdf pasó a insights-deck. Vista previa local con datos reales: Berel 15 págs/13 láminas, Sky 7/5, 0 violaciones. Falta: re-render de ediciones revisadas en staging, release a producción cuando haya consumidor, baseline visual (ISSUE-122), índice paginado A4 y alcance del rechazo (actual vs comparación) en el contrato de evidencia.`
 - Rank: `TBD`
 - Domain: `ui|platform`
 - Blocked by: `none`
@@ -431,13 +456,13 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [ ] Barras, líneas, circular/donut y dispersión se renderizan desde el mismo ChartSpec validado en HTML/SVG/PDF; valores y geometría coinciden con evidencia.
 - [x] Pie/donut rechaza totales incompatibles; dispersión rechaza pares ausentes; nulos y negativos no se ocultan ni deforman. — `chart-geometry.ts` + 46 tests (`chart-geometry.test.ts`, `chart-geometry-extended.test.ts`): techo de 3 porciones, rechazo de porción negativa, pares incompletos, negativo bajo base cero y hueco que corta el trazo.
 - [x] Deck 16:9 e informe A4 vertical tienen composiciones propias, brand pack real e ID/versión/período visibles. — catálogos `insights-deck` (4) e `insights-report` (5), ambos renderizando; evidencia en `docs/ui/reviews/TASK-1847-…/`. El logo de cliente queda como slot opcional deliberado: la edición no trae el dato y no se inventa un nombre.
-- [ ] A4 soporta 30 páginas, índice real, cabeceras repetidas y cortes legibles; deck soporta 25 slides sin truncado silencioso ni minificar cuerpo para encajar.
+- [ ] A4 soporta 30 páginas, índice real, cabeceras repetidas y cortes legibles; deck soporta 25 slides sin truncado silencioso ni minificar cuerpo para encajar. — Avance 2026-09-22: el deck ya no trunca (cutover a `insights-deck`, rechazo con causa) y el A4 pagina figuras y resumen en vez de recortarlos; cabeceras repetidas y folios verificados. Sin marcar: el índice paginado no se construyó y no se probó una edición de 30 páginas.
 - [x] Fuentes incrustadas (font pack local, render hermético sin red), folios y pie institucional en cada página del A4; se inspeccionaron todas las páginas exportadas, a tamaño físico y en escala de grises. — Falta verificar enlaces clicables e índice paginado: la plantilla de índice no se construyó en este tramo.
 - [x] No se crea registry VisualProfile paralelo a TASK-1644 ni se altera el catálogo Proposal. — `deck-axis` recompila byte-idéntico (sha256 sin mover, `brand-pack-sync` verde); las primitives genéricas (`measureSlideFit`, `paginateFlow`, `chart-geometry`, `compile-catalog-tokens`) viven en el motor, no en el catálogo.
 - [x] UI ready permanece `no`; wireframe existe con dirección sellada, inventario de 15 composiciones y decision log. `pnpm task:lint --task TASK-1847` sin findings. — Falta GVC/scorecard, por eso sigue en `no`.
-- [ ] Reuso/extend documentado, copy reusable canónico, estados partial/empty/error y reduced motion sin pérdida de información; no se introducen animaciones.
+- [ ] Reuso/extend documentado, copy reusable canónico, estados partial/empty/error y reduced motion sin pérdida de información; no se introducen animaciones. — Avance 2026-09-22: copy canónico en `GH_INSIGHTS` (métricas, fuentes, unidades, documento); capítulo sin datos narrado, métrica ausente como límite, texto excedido rechaza con causa; sin animaciones. Sin marcar hasta cerrar la documentación de reuso en arquitectura.
 - [x] Páginas PDF validadas a tamaño físico y en escala de grises (evidencia `*-gris.png` en el dossier). — GVC desktop/390px **no aplica**: `scenario.route` exige ruta del portal y la superficie es un documento. El harness es el gate visual del Composer, generalizado a los 3 catálogos. Hallazgo del gris registrado como deuda: el acento teal pierde contraste.
-- [ ] Regresión visual del Composer y test cuantitativo funcional pasan; rollout de catálogo versionado con worker se verifica antes de declarar formatos disponibles.
+- [ ] Regresión visual del Composer y test cuantitativo funcional pasan; rollout de catálogo versionado con worker se verifica antes de declarar formatos disponibles. — Avance 2026-09-22: tests cuantitativos verdes (465 de Insights, composer y worker); los catálogos viajan con el worker (despliegue verde). Sin marcar: la regresión visual sigue bloqueada por ISSUE-122 (frames nuevos declarados, sin promover) y falta el re-render en staging.
 
 ## Verification
 

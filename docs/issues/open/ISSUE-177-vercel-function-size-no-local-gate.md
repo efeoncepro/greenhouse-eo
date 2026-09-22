@@ -7,8 +7,10 @@ staging (el deploy de `develop` falla); el mismo commit habría bloqueado un rel
 ## Detectado
 
 2026-09-22, deploy de staging `greenhouse-okyodjbgq` en `Error` durante el rollout de TASK-1847 (Claude, sesión
-"Task 1846"). Es la **segunda vez en tres semanas**: el 2026-09-02 (TASK-1804) tres builds de staging fallaron con
-`The Vercel Function "api/mcp/greenhouse" is 397mb uncompressed (limit 250mb)`.
+"Task 1846"). Es la **tercera vez en tres semanas**: el 2026-09-02 (TASK-1804) tres builds de staging fallaron con
+`The Vercel Function "api/mcp/greenhouse" is 397mb uncompressed (limit 250mb)`, y el 2026-09-16 (TASK-1846) la función
+`insights/catalog` llegó a 434 MB por importar el catálogo como valor (documentado en
+`src/lib/efeonce-insights/render/contracts.ts`).
 
 ## Síntoma
 

@@ -1,5 +1,35 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-22 · OTD nunca llegó a un informe, y nada falló.** El adapter ICO buscaba `metricId === 'otd'`; el
+  registro del motor lo llama `otd_pct`. Sin match, el `if (otd)` sin `else` omitía la métrica en silencio, y el
+  fixture del test repetía el id equivocado, así que el test confirmaba el error en vez de detectarlo. Regla: los ids que
+  un adapter lee de otro dominio van en una constante exportada (`ICO_SNAPSHOT_METRIC_IDS`) que un test cruza contra
+  el registro dueño (`ICO_METRIC_REGISTRY`); y una métrica esperada que no llega se narra como límite, nunca se omite.
+- **2026-09-22 · La barra destacada era invisible.** El molde A4 define `.lead` (párrafo introductorio con
+  `margin-top`); la barra usaba la clase de tono `lead`, heredaba el margen y quedaba fuera de su riel. Ningún test ni
+  gate lo vio: sólo mirar el PDF. Regla: las clases de estado de un resolver van con espacio de nombres propio
+  (`tone-lead`/`tone-rest`), nunca con nombres que un molde pueda usar para tipografía.
+- **2026-09-22 · La guarda barra↔etiqueta rechazaba toda etiqueta bien redondeada.** Exigía igualdad exacta entre
+  «1,9 %» y 1,88. Regla: la tolerancia es media unidad del último decimal IMPRESO (`roundingToleranceOf`); una cifra
+  distinta sigue fallando. La guarda vive una sola vez en `artifact-composer/bar-figure.ts` (las copias por catálogo
+  ya habían divergido).
+- **2026-09-22 · El deck productivo sobre `deck-axis` no servía con datos reales.** Recortaba con «…», imprimía el
+  período anterior como otra métrica con el mismo nombre y callaba lo que no cabía (2 de 6 métricas SEO). Cutover a
+  `insights-deck` (`insights-deck-mapper.ts`): toda afirmación aparece en alguna lámina, nada se recorta. Lo ya
+  encolado con `deck-axis` sigue componiendo con su input sellado.
+- **2026-09-22 · Una figura de comparación necesita pares con escala propia.** En escala compartida, 9 mil clics
+  junto a 488 mil impresiones quedan como una raya; y nombrar la barra por la serie («Período») no dice qué mide.
+  `figure-pages.ts`: cada métrica es un grupo (período + anterior, `scaleGroup`), la figura se pagina sin partir
+  pares ni dejar una barra sola, y cada página se narra con las afirmaciones que citan sus hechos.
+- **2026-09-22 · El período se rotulaba con el mes de inicio.** Una edición del 1 al 20 de septiembre decía
+  «Septiembre de 2026». `render/labels.ts` rotula la ventana civil medida, dentro del presupuesto de 28.
+- **2026-09-22 · Límites y metodología imprimían identificadores internos.** `ico`, `rank`, el `detail` del adapter
+  («Rank evolution: no_data») y el nombre de la función lectora (`readSeoOverviewKpisForWindow`) llegaban tal cual al
+  documento. El planner los redacta desde `GH_INSIGHTS` (`metrics`, `sources`, `units`); un test barre todo
+  identificador conocido. AEO usa el copy es-CL que el grader ya declara para clientes.
+- **2026-09-22 · La edición de Demo no ejercita nada.** Sin datos, el A4 de Demo salió «perfecto» y no mostró ninguno
+  de los defectos anteriores: todos aparecieron con Berel y Sky. El canary de un render se hace con datos reales, y la
+  vista previa local (adapters → planner → validador → mapper → composer) los encuentra antes de desplegar.
 - **2026-09-22 · El validador de cifras rechazaba toda edición SEO real, y la de ICO iba a caer igual.** Síntoma:
   la edición de Berel falló con `unreferenced_number` por `"10"` y `"-08"`. Causas: el lector de cifras partía
   `2026-08` en `2026` + `-08` (el mes, leído como negativo), y la etiqueta del hecho —texto del adapter— traía cifras

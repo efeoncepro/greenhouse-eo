@@ -798,7 +798,7 @@ canary productivo. Los huérfanos en `running` sin lease requieren decisión hum
   ejecuciones del Job aún en curso antes de lanzar otra.
 - **Sigue fuera:** `INSIGHTS_ISSUANCE_ENABLED` OFF (paso de producto); `report_pdf` → TASK-1847; `web` → TASK-1848.
 
-### 14.7 Estado de TASK-1847 — catálogos y gráficos (construido en local, 2026-09-21)
+### 14.7 Estado de TASK-1847 — catálogos y gráficos (staging con canary real, 2026-09-22; sin producción)
 
 **Qué existe y está probado** (424 tests verdes entre `efeonce-insights` y `artifact-composer`,
 typecheck limpio, gates del worker OK):
@@ -824,10 +824,36 @@ typecheck limpio, gates del worker OK):
   era lo que impedía una segunda salida), cada salida sella su propio manifest, el evento del run
   sella el hash del conjunto, y el worker registra los dos catálogos nuevos.
 
-**Qué NO existe:** rollout. Nada desplegado, sin canary, sin push. El `deck_pdf` productivo sigue
-componiendo con `deck-axis`: ese cutover es un cambio de comportamiento y necesita su propio canary.
-Falta también el baseline del gate visual para los catálogos nuevos, `UI ready: yes` (GVC premium y
-scorecard) y la verificación runtime.
+**Rollout a staging y canary con datos reales (2026-09-22).** Desplegado en `develop` (staging + Job
+`artifact-worker`); **no en producción**. Canary interno y sin emitir sobre Berel (SEO+AEO) y Sky (ICO), con
+`insights_v1` asignado a ambas orgs. Lo que encontró y quedó cerrado:
+
+- **Validador de cifras** (`editorial/plan-validation.ts`, `format.ts`): una fecha ISO es un solo token, y la
+  etiqueta LITERAL de un hecho referenciado se enmascara antes de leer cifras (sus números son identidad del hecho,
+  no afirmación). La guarda no se relajó: una cifra fuera de la etiqueta, o la etiqueta de un hecho no referenciado,
+  sigue rechazándose.
+- **Texto del plan sin identificadores internos:** límites, metodología, títulos de gráfico y unidades salen de
+  `GH_INSIGHTS` (`metrics`, `sources`, `units`); el `detail` del adapter y el reader quedan en el snapshot. AEO usa el
+  copy es-CL del grader (`GH_GROWTH_AI_VISIBILITY`). Un conteo parte de un total se escribe «21 de 31».
+- **ICO:** el adapter leía `otd` y el registro dueño lo llama `otd_pct` — OTD nunca llegó a un informe. Los ids leídos
+  viven en `ICO_SNAPSHOT_METRIC_IDS`, cruzados por test con `ICO_METRIC_REGISTRY`; una métrica esperada ausente se
+  narra como límite.
+- **Figuras compartidas** (`render/figure-pages.ts` + `artifact-composer/bar-figure.ts`): formato canónico, barra
+  nombrada por su métrica, comparación de períodos en pares con escala propia (`scaleGroup`), paginación sin partir
+  pares ni recortar, guarda barra↔etiqueta con tolerancia de redondeo (media unidad del último decimal impreso) y
+  tono con espacio de nombres propio (`tone-lead`/`tone-rest`: `lead` chocaba con el `.lead` tipográfico del molde y
+  la barra destacada quedaba invisible).
+- **Cutover de `deck_pdf` a `insights-deck`** (`render/insights-deck-mapper.ts`): `deck-axis` recortaba con «…»,
+  duplicaba filas y callaba métricas. Toda afirmación del plan aparece en alguna lámina; nada se recorta. Lo ya
+  encolado con `deck-axis` compone con su input sellado. Proposal sigue en `deck-axis`, intacto.
+- **Rótulo de período** (`render/labels.ts`): desde la ventana civil medida («1–20 de septiembre de 2026»), no desde
+  el mes de inicio, dentro del presupuesto de 28.
+
+Vista previa local sobre datos reales (adapters → planner → validador → mapper → composer): Berel A4 15 páginas y
+deck 13 láminas, Sky 7 y 5, cero violaciones. **Falta:** re-render en staging de ediciones revisadas (los planes ya
+sellados conservan su texto), release a producción cuando haya consumidor, baseline visual (ISSUE-122), índice paginado
+del A4 y el alcance del rechazo en el contrato de evidencia (hoy un rechazo de la ventana de comparación se lee como
+si fuera de la actual).
 
 **Límite honesto de las familias:** el planner determinista emite `bar` y `bar_grouped`. Las otras
 13 tienen geometría probada con fixtures y **ningún productor**; no se ofrecen como disponibles.

@@ -7,7 +7,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | --- | --- | --- | --- | --- |
 | TASK-1845 | Domain, evidence, adapters, lanes, MCP, gateway federation | **complete** | Cloud SQL (single instance), Vercel staging + Production (generation ON), gateway v1.5.0, Entra scope | 2026-09-16 |
 | TASK-1846 | Durable rendering + Artifact Worker (RenderRun / InsightOutput), outputs port | **complete** | Cloud SQL (migrations applied), Vercel staging + Production (render ON), Cloud Run Job `artifact-worker` (first productive deploy in release `917491fd02e4`) + `ops-worker` dispatcher (flag ON, shared by staging/prod), gateway v1.6.0 deployed | 2026-09-16 |
-| TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | to-do | — | — |
+| TASK-1847 | Analytical charts and editorial catalogs (deck / A4) | **in-progress — staging only** (code complete; canary with real data) | `develop` → staging + Job `artifact-worker`: `report_pdf` on `insights-report`, `deck_pdf` on `insights-deck` (cutover 2026-09-22). NOT in production | — |
 | TASK-1848 | Sharing, delivery (email), schedules; web-model resolver/proxy for Think | **in-progress — in production with flags OFF** | Cloud SQL (4 migrations applied); release `bda1cf2cd938` (2026-09-18, Vercel + 6 Cloud Run); staging flags ON (sharing/delivery/schedules/issuance), production OFF until TASK-1875; gateway `efeonce-mcp` 1.7.0 (rev `00055-gk6`, 58 tools); open: in-app/Teams channels, portal route (1849), ISSUE-174 → TASK-1876 | 2026-09-18 |
 | TASK-1849 | Library, builder and shared-web experience in the portal | to-do (blocked by 1847/1848) | — | — |
 | TASK-1875 | Shared web report rendered in `efeonce-think` from `InsightWebModelV1` | to-do (blocked by 1848) | — | — |
@@ -157,7 +157,18 @@ tender decks: separate issue for the catalog owner.
 
 ## TASK-1847 — charts and catalogs (in-progress desde 2026-09-21)
 
-**Estado: código local, sin push, sin rollout.** Slice 1 cerrado (dirección + ADR); Slice 2 en curso.
+**Estado (2026-09-22): code complete, desplegado en staging, sin release a producción.** Canary con datos reales
+(Berel SEO+AEO `EO-INS-000019`, Sky ICO `EO-INS-000020`, audiencia interna, sin emitir) y módulo `insights_v1`
+asignado a ambas orgs. El canary encontró y cerró: validador de cifras con falsos positivos (fecha partida, cifras de
+la etiqueta), OTD que nunca llegó (`otd` vs `otd_pct`), ids internos en límites/metodología, dimensiones AEO en inglés,
+figuras del A4 (formato propio, nombres, recortes, barra destacada invisible), rótulo de período y el deck productivo
+sobre `deck-axis`, reemplazado por `insights-deck` (`insights-deck-mapper.ts`). Vista previa local sobre datos reales:
+Berel A4 15 págs / deck 13 láminas, Sky A4 7 / deck 5, 0 violaciones. Pendiente: re-render en staging tras el deploy
+de `21c991999` (ediciones revisadas con el código nuevo), release a producción cuando haya consumidor, baseline visual
+(ISSUE-122) y contrato de evidencia con alcance del rechazo (ventana actual vs comparación).
+
+**Módulos compartidos nuevos:** `artifact-composer/bar-figure.ts` (guarda barra↔etiqueta con tolerancia de redondeo,
+escala por `scaleGroup`, tono `tone-*`), `render/figure-pages.ts`, `render/composition-helpers.ts`, `render/labels.ts`.
 
 **Lo que existe:**
 - ADR `GREENHOUSE_ARTIFACT_VERTICAL_PAGINATION_DECISION_V1.md` (`Accepted`, indexado): el motor no pagina pero
@@ -177,9 +188,8 @@ composiciones), `src/lib/copy/insights.ts` como SSOT del copy, el `report-mapper
 y `report_pdf` admitido en sus 4 puntos (contrato, command por output, mapper, worker). Triple documentación
 actualizada: arquitectura §14.7, funcional v1.7 y manual.
 
-**Lo que NO existe:** rollout. Nada desplegado, sin canary, sin push. El `deck_pdf` productivo sigue componiendo con
-`deck-axis` — ese cutover es un cambio de comportamiento y necesita su propio canary. Falta el baseline del gate
-visual para los catálogos nuevos, `UI ready: yes` (GVC premium + scorecard) y la verificación runtime.
+**Superado el 2026-09-22 (ver Estado arriba):** el rollout a staging, el canary y el cutover de `deck_pdf`.
+Sigue faltando el baseline visual de los catálogos nuevos (ISSUE-122) y el release a producción.
 
 **Gap heredado que esta task NO cierra:** el planner determinista emite **2 de 15** familias (`bar`,
 `bar_grouped`). Las otras 13 tienen geometría probada con fixtures y **ningún productor**. Ampliar el planner es

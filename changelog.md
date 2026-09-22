@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-22 — Efeonce Insights: informe A4 y deck nuevo en staging, probados con datos reales
+
+TASK-1847 en staging (`develop` hasta `21c991999`), sin producción. El canary con Berel (SEO+AEO) y Sky (ICO), en
+ediciones internas y sin emitir y con `insights_v1` asignado a ambas orgs, encontró y cerró:
+
+- el validador de cifras rechazaba toda edición SEO real (fecha partida, cifras de la etiqueta del hecho);
+- OTD nunca llegaba a un informe (`otd` frente a `otd_pct`);
+- límites y metodología mostraban identificadores internos;
+- las figuras del A4 tenían formato propio, recortes y la barra destacada invisible;
+- el deck sobre `deck-axis` recortaba y callaba métricas, así que `deck_pdf` pasa a `insights-deck`.
+
+Vista previa con datos reales en `scripts/insights/preview-edition.ts`. Se abre ISSUE-177: no hay gate que mida el
+tamaño de las funciones de Vercel.
+
 ## 2026-09-22 — «Tu IA no conoce tu negocio»: el carril HubSpot
 
 [CDR-004](docs/campaigns/decisions/CDR-004-tu-ia-no-conoce-carril-hubspot.md) (`Proposed`) resuelve cómo se vende
@@ -656,16 +670,3 @@ Typography, Copy, Brand, Motion, Audio y Social actualizadas en ambos agentes, c
 Fiestas Patrias18/09 (LinkedIn11:00, Instagram19:00) y Día de Muertos02/11 (11:00/18:00), horaChile:
 programadas con video/copy/portada; publicación efectiva pendiente. Aprobación posterior supera el estado
 histórico de candidato de las entradas previas. No cambia runtime ni habilita proveedores de Globe.
-
-## 2026-09-13 — Release TASK-1604 / TASK-1719 D4
-
-- PR #235 promovida a `main` con SHA `cc3ec449495ba6b866ecdb8fa4fe309a9a991fd9` mediante el
-  orquestador `34754161855`; manifiesto `cc3ec449495b-58fdc69f-3223-4348-8767-382008593b54`
-  en estado `released`.
-- Vercel Production, `/api/auth/health` y los cinco workers Cloud Run quedaron verificados para
-  el SHA exacto. Azure cerró sus health checks y omitió Bicep por `no_infra_diff`.
-- Canary interno productivo confirmó las ocho revisiones SEO activas y la frontera de asignación
-  manual (`canAssign=true`, `proposal=null`) sin crear propuestas, instancias ni correos.
-- La captura inmutable D4 se conserva para el primer recorrido sintético autorizado; no se presenta
-  una asignación de candidato como evidencia. Calibración independiente y trigger `on_stage_entry`
-  siguen pendientes.

@@ -114,8 +114,10 @@ lectura con el scope base `efeonce.mcp.read`; `create_insight_edition` exige la 
 
 Cuando una edición está en `ready_for_review`, se puede encargar su **deck PDF**. El encargo es
 asíncrono: la respuesta es un `run` con un `output` por target en cola; el archivo lo produce el
-worker de render y se consulta después. Hoy sólo `deck_pdf` es renderizable; pedir `report_pdf` o
-`web` responde `422 render_rejected` y no encola nada.
+worker de render y se consulta después. **En staging** (desde 2026-09-22) son renderizables `deck_pdf` (catálogo
+`insights-deck`) y `report_pdf` (informe A4, catálogo `insights-report`). **En producción**, hasta el próximo release,
+sólo `deck_pdf` y con el catálogo anterior (`deck-axis`); `report_pdf` se rechaza. `web` responde siempre
+`422 render_rejected` y no encola nada.
 
 1. `POST /api/platform/app/insights/editions/{editionId}/render` con `{ "organizationId": "…" }`
    (interno) y opcionalmente `"outputs": ["deck_pdf"]`. Respuesta `202` con `run`, `outputs` e
@@ -380,7 +382,9 @@ Códigos de rechazo de evidencia: `unsupported_window` (grano no servible; suele
 | Output `queued` que no arranca pasado varios ticks | Cola larga (1 output por tick de 2 min; Proposal gana el tick) **o** el `ops-worker` sin el flag (logs del dispatcher con `insightsQueued=0` y outputs en cola) | Calcular ≈ 2·N min por posición en la cola; si excede, revisar el flag en la revisión activa del `ops-worker` |
 | `retry` sobre un run `cancelled` responde `200` y no pasa nada | Cancelado es terminal | Pedir un render nuevo |
 | Output falla de nuevo tras `retry` con `render_error` | Causa de contenido (p. ej. validación de slots) que reintentar no arregla; `attempts` sube hasta 3 y termina en `dead_letter` | Corregir la edición (`revise`) y pedir el render de la nueva versión |
-| `422 render_rejected` al pedir el render | Output no renderizable todavía (`report_pdf`/`web`), o el plan excede un presupuesto del catálogo | Pedir sólo `deck_pdf`; si es presupuesto, la causa viene en `details` — no se trunca copy en silencio |
+| `422 render_rejected` al pedir el render | Output no renderizable en ese ambiente (`web` siempre; `report_pdf` en producción hasta el próximo release), o el plan excede un presupuesto del catálogo | Pedir sólo lo renderizable; si es presupuesto, la causa viene en `details` — no se trunca copy en silencio |
+| El output queda `failed` con `render_error` y un detalle que empieza con `report-bar-geometry`/`insights-bar-geometry` | La etiqueta de una barra no representa su valor (más allá del redondeo impreso) | Es un bug de datos o de formato, no de layout: reproducirlo con la vista previa local (abajo) y corregir en el plan o el mapper |
+| En un informe falta una métrica que el módulo debería traer | El adapter no la encontró en su fuente | Desde 2026-09-22 la falta aparece como límite («Entregas a tiempo: sin datos»); si no aparece ni como cifra ni como límite, es un bug del adapter (así se descubrió que OTD nunca llegaba) |
 | Run en `partial_failed` | Un output salió y otro falló | Leer cada output; `retry` re-encola sólo los fallidos |
 | Output `running` que no avanza | Worker caído o flag OFF en su revisión activa (señal `insights.render.orphaned_output`) | Verificar el Job y el flag en Cloud Run; los reclamos por lease vencido son automáticos si el worker corre. Un `running` **sin lease** no se reclama solo: decisión humana |
 | `failed` en `validating` con `evidence_rejected` | Un módulo requerido no aportó hechos | Revisar rechazos; pedir meses completos o `policy.allowPartial=true` explícito |
@@ -394,10 +398,28 @@ Códigos de rechazo de evidencia: `unsupported_window` (grano no servible; suele
 - Señales: `src/lib/reliability/queries/insights-edition-signals.ts`. Eventos: `insights.*` en `GREENHOUSE_EVENT_CATALOG_V1.md`.
 - Tests: `pnpm vitest run --project unit src/lib/efeonce-insights` · `pnpm test:live src/lib/efeonce-insights`.
 
-## Revisar un informe o un deck antes de que exista en producción (2026-09-21)
+## Revisar un informe o un deck antes de que exista en producción (2026-09-21, ampliado 2026-09-22)
 
 Los catálogos de Insights componen en local sin depender de nada desplegado. Sirve para revisar el
 documento **antes** de encargarlo de verdad.
+
+**Con datos reales de una edición (recomendado).** El script recorre la misma cadena que producción —adapters (sólo
+lectura) → planner → validador de cifras → mapper → composer— con el código de tu árbol de trabajo, y deja los PDF en
+`.captures/insights-preview/`. No escribe en la base ni encola nada. Recolecta la evidencia de nuevo, así que muestra
+lo que produciría una edición **nueva o revisada** con esa ventana, no el plan ya sellado:
+
+```bash
+pnpm pg:connect
+GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false \
+  pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts \
+  --edition=insed-... --org=org-... --output=both
+```
+
+Si el validador encuentra una cifra sin respaldo, el script lo informa y no compone, igual que producción. Todos los
+defectos del canary del 2026-09-22 aparecieron así, con datos reales; la edición de demostración, sin datos, no mostró
+ninguno.
+
+**Sólo la marca y los colores** (sin datos):
 
 1. Compila la marca de los tres catálogos y verifica que ninguno quedó desincronizado:
 

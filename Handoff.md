@@ -53,7 +53,7 @@ blend raster `luminosity` `0.72` verificado. Templates: `efeonce-advertising-cre
 y [Pódcast](docs/operations/social/2026-09-13-podcast-fotohistoria-production-method.md) están programados/PENDING,
 no publicados; el video del Pódcast sigue suspendido. MCP sigue sin tool creativa federada.
 
-**Efeonce Insights:** 1845/1846 en producción (emisión/IA OFF); TASK-1848 en producción 2026-09-18 (release `bda1cf2cd938`, flags sharing/delivery/schedules OFF hasta TASK-1875) + gateway 1.7.0; abierta por 1849/1875/Teams y TASK-1876. **TASK-1847 in-progress (21/09):** catálogos deck 16:9 + informe A4; `UI ready: no`, Slice 1 sella dirección antes de JSX; sin código.
+**Efeonce Insights:** 1845/1846 en producción (emisión/IA OFF); TASK-1848 en producción 2026-09-18 (release `bda1cf2cd938`, flags sharing/delivery/schedules OFF hasta TASK-1875) + gateway 1.7.0; abierta por 1849/1875/Teams y TASK-1876. **TASK-1847 (22/09):** staging, no prod; canary real Berel/Sky y cutover `deck_pdf`→`insights-deck`. Falta release.
 Estado vivo: arquitectura §14 y la skill `efeonce-insights`.
 
 **Agentes HubSpot y ANAM (2026-09-13, documental):** Customer Agent de ANAM **activo en producción** (operador);
