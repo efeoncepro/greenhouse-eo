@@ -41,7 +41,28 @@ un brief ya resuelto ni delega el ownership del resultado.
 Para atención visual, cinematic ads y métricas hook/hold, la orquestadora carga el
 [playbook de paid visual](../../.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md),
 espejado en Claude. Separa registro, hipótesis, ejecución y medición; los recursos son candidatos a pruebas,
-no lifts prometidos. Conserva el ownership AXIS y fotográfico existente; no cambia enums del generador,
+no lifts prometidos.
+
+Su documento hermano es
+[evidencia de creatividad publicitaria](../../.claude/skills/efeonce-advertising-creative/references/ad-creative-evidence-2026.md)
+(`as-of 2026-09-21`, caduca **2027-03**; espejado en Codex). **No se duplican: el playbook dice cómo se produce
+y cómo se mide; la evidencia dice qué está medido y con qué muestra.** Lo que aporta y no está en ningún otro
+lado del repo:
+
+- 🔴 **§5 — las doce cifras que NO se citan.** Doce afirmaciones que circulan como hechos y cuya fuente
+  primaria no existe, murió o está mal copiada: entre ellas la regla del 20% de texto de Meta (retirada en
+  2020 y todavía citada), el CTR de los Thought Leader Ads (artefacto de medición: el 91% de esos clics nunca
+  llega a la landing) y un lift de VidMob mal transcrito en al menos tres sitios. **Consultarla antes de poner
+  un número en una lámina, una propuesta o un anuncio.**
+- **§2.3 — el riesgo «AI slop»**, con los seis *tells* que la industria reconoce, utilizables como checklist
+  de QA propio; y sus antídotos, encabezados por *que la restricción de producción sea la idea*.
+- **§2.4 — medición propia:** el motor de imagen resuelve **toda escena imposible en idioma de render**;
+  la imperfección hay que pedirla explícitamente o sale CGI con la misma física y el mismo encuadre.
+- **§7 — el orden de decisión en dirección de foto**, ordenado por fuerza de evidencia, no por intuición.
+
+⚠️ **Dos límites que esa evidencia declara sobre sí misma, y que esta orquestadora hereda:** los premios
+**no** prueban rendimiento paid —un Grand Prix mide juicio de jurado, no CTR—, y **no encontrar** estudio o
+premio para un recurso **no lo prohíbe**: lo deja como candidato a validar contra un control. Conserva el ownership AXIS y fotográfico existente; no cambia enums del generador,
 autoridad de publicación ni modelo de autonomía. ADR aplicable: ownership AXIS enlazado arriba y
 [contexto router-first](../architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md); esta ampliación de
 conocimiento no introduce una decisión de arquitectura ni una nueva superficie runtime.

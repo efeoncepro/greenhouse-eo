@@ -47,7 +47,7 @@ Datos-ancla de la investigación de autoría (reverificar antes de citar):
 
 🔴 **Canon:** [`efeonce-advertising-creative/references/ad-creative-evidence-2026.md`](../efeonce-advertising-creative/references/ad-creative-evidence-2026.md)
 (caduca **2027-03**). Tres frentes de investigación web con fuentes verificadas. **Cárgalo antes de citar
-cualquier número de creatividad publicitaria**, y en especial su **§5 — las once cifras que NO se citan**.
+cualquier número de creatividad publicitaria**, y en especial su **§5 — las doce cifras que NO se citan**.
 
 | Dato | Valor | Fuente · muestra | Volatilidad |
 |---|---|---|---|
