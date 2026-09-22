@@ -33,9 +33,15 @@ canary, audiencia interna y sin emitir: Demo `EO-INS-000018`, Berel SEO+AEO `EO-
 5. El deck productivo sobre `deck-axis` recortaba con «…», duplicaba filas y callaba métricas: **cutover de
    `deck_pdf` a `insights-deck`** con mapper nuevo; período rotulado desde la ventana medida (`21c991999`).
 
-**Vista previa local sobre datos reales** (adapters → planner → validador → mapper → composer): Berel A4 15 págs y deck
-13 láminas; Sky A4 7 y deck 5; 0 violaciones, sin rechazos, OTD 81,9 %. Pendiente del runtime: re-render en staging de
-ediciones revisadas con el código nuevo (los planes ya sellados conservan el texto viejo).
+6. Un rechazo del período de comparación se leía como falta de la ventana actual: `EvidenceRejectionV1.scope` opcional
+   y aditivo; el planner dice «en el período anterior, …» (`b6e32a09e`).
+
+**Verificado en el runtime de staging** (revisiones v2 generadas y renderizadas por Vercel + dispatcher + Job
+`artifact-worker`, sin intervención manual): Berel `EO-INS-000019 v2` — deck `insights-deck` 13 láminas + A4 15
+páginas; Sky `EO-INS-000020 v2` — deck 5 láminas + A4 7 páginas con OTD 81,9 % (el arreglo de `otd_pct`, visible en el
+runtime real). Las cuatro salidas completaron al primer intento y se revisaron página por página; coinciden con la
+vista previa local (`scripts/insights/preview-edition.ts`, nuevo). Ese render mostró una última frase falsa —el resumen
+decía «Sin hallazgos adicionales» con OTD en el capítulo—, corregida después y cubierta por test.
 
 ## Delta 2026-09-21 — construido en local, sin rollout
 
@@ -80,7 +86,7 @@ catálogo `insights-report` (A4 794×1123) con molde compartido y 5 plantillas q
 - Motion: `docs/ui/motion/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs-motion.md`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `Code complete, rollout pendiente (2026-09-22). Desplegado en staging (develop hasta 21c991999), NO en producción. Canary con datos reales (Berel SEO+AEO, Sky ICO) encontró y cerró: falsos positivos del validador, ids internos en límites/metodología, OTD nunca leído (otd vs otd_pct), figuras del A4 (formato, nombres, recortes, barra destacada invisible, guarda sin tolerancia de redondeo) y el deck sobre deck-axis; deck_pdf pasó a insights-deck. Vista previa local con datos reales: Berel 15 págs/13 láminas, Sky 7/5, 0 violaciones. Falta: re-render de ediciones revisadas en staging, release a producción cuando haya consumidor, baseline visual (ISSUE-122), índice paginado A4 y alcance del rechazo (actual vs comparación) en el contrato de evidencia.`
+- Status real: `Code complete, rollout pendiente (2026-09-22). Desplegado en staging (develop hasta 21c991999), NO en producción. Canary con datos reales (Berel SEO+AEO, Sky ICO) encontró y cerró: falsos positivos del validador, ids internos en límites/metodología, OTD nunca leído (otd vs otd_pct), figuras del A4 (formato, nombres, recortes, barra destacada invisible, guarda sin tolerancia de redondeo) y el deck sobre deck-axis; deck_pdf pasó a insights-deck. Vista previa local con datos reales: Berel 15 págs/13 láminas, Sky 7/5, 0 violaciones. Verificado en el runtime de staging (Berel v2 deck 13 + A4 15; Sky v2 deck 5 + A4 7 con OTD; las 4 salidas al primer intento). Falta: release a producción cuando haya consumidor, baseline visual (ISSUE-122) e índice paginado A4.`
 - Rank: `TBD`
 - Domain: `ui|platform`
 - Blocked by: `none`
@@ -462,7 +468,7 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [x] UI ready permanece `no`; wireframe existe con dirección sellada, inventario de 15 composiciones y decision log. `pnpm task:lint --task TASK-1847` sin findings. — Falta GVC/scorecard, por eso sigue en `no`.
 - [ ] Reuso/extend documentado, copy reusable canónico, estados partial/empty/error y reduced motion sin pérdida de información; no se introducen animaciones. — Avance 2026-09-22: copy canónico en `GH_INSIGHTS` (métricas, fuentes, unidades, documento); capítulo sin datos narrado, métrica ausente como límite, texto excedido rechaza con causa; sin animaciones. Sin marcar hasta cerrar la documentación de reuso en arquitectura.
 - [x] Páginas PDF validadas a tamaño físico y en escala de grises (evidencia `*-gris.png` en el dossier). — GVC desktop/390px **no aplica**: `scenario.route` exige ruta del portal y la superficie es un documento. El harness es el gate visual del Composer, generalizado a los 3 catálogos. Hallazgo del gris registrado como deuda: el acento teal pierde contraste.
-- [ ] Regresión visual del Composer y test cuantitativo funcional pasan; rollout de catálogo versionado con worker se verifica antes de declarar formatos disponibles. — Avance 2026-09-22: tests cuantitativos verdes (465 de Insights, composer y worker); los catálogos viajan con el worker (despliegue verde). Sin marcar: la regresión visual sigue bloqueada por ISSUE-122 (frames nuevos declarados, sin promover) y falta el re-render en staging.
+- [ ] Regresión visual del Composer y test cuantitativo funcional pasan; rollout de catálogo versionado con worker se verifica antes de declarar formatos disponibles. — Avance 2026-09-22: tests cuantitativos verdes (465 de Insights, composer y worker); los catálogos viajan con el worker (despliegue verde). El re-render en staging se verificó (Berel v2 y Sky v2, las cuatro salidas al primer intento). Sin marcar: la regresión visual sigue bloqueada por ISSUE-122 (frames nuevos declarados, sin promover).
 
 ## Verification
 

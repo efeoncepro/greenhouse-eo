@@ -163,9 +163,9 @@ asignado a ambas orgs. El canary encontró y cerró: validador de cifras con fal
 la etiqueta), OTD que nunca llegó (`otd` vs `otd_pct`), ids internos en límites/metodología, dimensiones AEO en inglés,
 figuras del A4 (formato propio, nombres, recortes, barra destacada invisible), rótulo de período y el deck productivo
 sobre `deck-axis`, reemplazado por `insights-deck` (`insights-deck-mapper.ts`). Vista previa local sobre datos reales:
-Berel A4 15 págs / deck 13 láminas, Sky A4 7 / deck 5, 0 violaciones. Pendiente: re-render en staging tras el deploy
-de `21c991999` (ediciones revisadas con el código nuevo), release a producción cuando haya consumidor, baseline visual
-(ISSUE-122) y contrato de evidencia con alcance del rechazo (ventana actual vs comparación).
+Berel A4 15 págs / deck 13 láminas, Sky A4 7 / deck 5, 0 violaciones. **Runtime de staging verificado**: Berel v2
+(`EO-INS-000019 v2`) y Sky v2 (`EO-INS-000020 v2`, con OTD) renderizaron deck + A4 al primer intento. Rechazos con `scope` (`b6e32a09e`). Pendiente: release a
+producción cuando haya consumidor, baseline visual (ISSUE-122) e índice paginado del A4.
 
 **Módulos compartidos nuevos:** `artifact-composer/bar-figure.ts` (guarda barra↔etiqueta con tolerancia de redondeo,
 escala por `scaleGroup`, tono `tone-*`), `render/figure-pages.ts`, `render/composition-helpers.ts`, `render/labels.ts`.

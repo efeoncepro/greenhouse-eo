@@ -52,7 +52,8 @@ Internal bindings must pass `organizationId`; org-scoped bindings read their own
 
 - `POST …/insights/editions/{editionId}/render` body `{ organizationId?, outputs?: InsightOutput[] }` → `202 { run, outputs, idempotent:false }`
   or `200 { …, idempotent:true }` when a live run already covers the targets. Precondition: edition `ready_for_review`
-  with sealed snapshot + frozen plan; `outputs` ⊆ edition outputs and ⊆ `INSIGHT_RENDERABLE_OUTPUTS` (`deck_pdf`).
+  with sealed snapshot + frozen plan; `outputs` ⊆ edition outputs and ⊆ `INSIGHT_RENDERABLE_OUTPUTS` (`deck_pdf`, `report_pdf` since
+  TASK-1847: staging 2026-09-22, production at the next release). Catalog per output: `deck_pdf` → `insights-deck`, `report_pdf` → `insights-report`.
 - `GET …/insights/editions/{editionId}/render` (paginated runs) · `GET …/insights/render-runs/{renderRunId}` → run DTO
   `{ renderRunId, editionId, audience, requestedOutputs, state, startedAt, finishedAt, cancelledAt, createdAt, outputs[] }`,
   output DTO `{ insightOutputId, output, state, attempts, failureCode, outputAssetId, manifestHash, finishedAt }`.
@@ -71,6 +72,15 @@ Internal bindings must pass `organizationId`; org-scoped bindings read their own
 - Errors: `render_disabled` → 503 `service_unavailable`; `render_rejected` → 422 `bad_request` (details carry the cause; nothing is truncated).
 - Events: `insights.render.requested`, `insights.render.output_completed`, `insights.render.output_failed` (aggregate `insight_render_run`).
 - Port: `assertOutputsValidated(edition)` requires every `edition.outputs` `completed` with asset, same audience → `{ outputs: [{ output, assetId, manifestHash }] }`.
+
+## Evidence rejections — `scope` (TASK-1847, 2026-09-22)
+
+- `EvidenceRejectionV1.scope?: 'current' | 'comparison'` (optional, additive). Absent = the current window (every snapshot
+  sealed before 2026-09-22). Adapters mark what they collected for the comparison window with `asComparisonRejections`;
+  the planner writes it as «<métrica>: en el período anterior, <causa>». Never read a comparison rejection as a gap of the
+  current window.
+- Plan text (limits, methodology, chart titles, units) never carries `metricId`, `method.name`, reader names or the
+  adapter `detail`: it comes from `GH_INSIGHTS` (`metrics`, `sources`, `units`).
 
 ## Sharing, delivery, schedules (TASK-1848) — verified against code 2026-09-18
 

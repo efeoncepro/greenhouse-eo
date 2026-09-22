@@ -849,11 +849,14 @@ typecheck limpio, gates del worker OK):
 - **Rótulo de período** (`render/labels.ts`): desde la ventana civil medida («1–20 de septiembre de 2026»), no desde
   el mes de inicio, dentro del presupuesto de 28.
 
-Vista previa local sobre datos reales (adapters → planner → validador → mapper → composer): Berel A4 15 páginas y
-deck 13 láminas, Sky 7 y 5, cero violaciones. **Falta:** re-render en staging de ediciones revisadas (los planes ya
-sellados conservan su texto), release a producción cuando haya consumidor, baseline visual (ISSUE-122), índice paginado
-del A4 y el alcance del rechazo en el contrato de evidencia (hoy un rechazo de la ventana de comparación se lee como
-si fuera de la actual).
+- **Alcance del rechazo** (`EvidenceRejectionV1.scope?: 'current' | 'comparison'`, opcional y aditivo; ausente = ventana
+  actual): los adapters marcan lo recolectado para la comparación (`asComparisonRejections`) y el planner lo redacta
+  «en el período anterior, …». Antes, un rechazo de la comparación se leía como falta de la ventana actual.
+
+Verificado en el runtime de staging: las revisiones v2 de Berel (deck `insights-deck` 13 láminas + A4 15 páginas) y Sky
+(deck 5 + A4 7, con OTD) completaron al primer intento, idénticas a la vista previa local
+(`scripts/insights/preview-edition.ts`). **Falta:** release
+a producción cuando haya consumidor, baseline visual (ISSUE-122) e índice paginado del A4.
 
 **Límite honesto de las familias:** el planner determinista emite `bar` y `bar_grouped`. Las otras
 13 tienen geometría probada con fixtures y **ningún productor**; no se ofrecen como disponibles.
