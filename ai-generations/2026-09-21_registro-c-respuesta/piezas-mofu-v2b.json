@@ -71,7 +71,7 @@
       ]
     },
     "subjectProtection": {
-      "top": 757,
+      "top": 583,
       "minClearance": 24
     }
   },
@@ -126,7 +126,7 @@
       "inkToken": "growthOnDark"
     },
     "subjectProtection": {
-      "top": 500,
+      "top": 499,
       "minClearance": 24
     }
   }

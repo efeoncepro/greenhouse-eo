@@ -51,7 +51,7 @@
       "cursorScale": 1.1
     },
     "subjectProtection": {
-      "top": 1170,
+      "top": 803,
       "minClearance": 24
     }
   },
@@ -128,7 +128,7 @@
       ]
     },
     "subjectProtection": {
-      "top": 1145,
+      "top": 1143,
       "minClearance": 24
     }
   },
@@ -184,13 +184,13 @@
       "cursorScale": 1.1
     },
     "subjectProtection": {
-      "top": 844,
+      "top": 843,
       "minClearance": 24
     }
   },
   {
     "align": "left",
-    "top": 0.2,
+    "top": 0.13,
     "textWidth": 0.44,
     "leadFamily": "bricolage",
     "leadFill": "#ffffff",
@@ -238,11 +238,14 @@
       "descriptorGap": 16,
       "cursorScale": 1.1
     },
-    "subjectProtection": false
+    "subjectProtection": {
+      "top": 783,
+      "minClearance": 24
+    }
   },
   {
     "align": "left",
-    "top": 0.2,
+    "top": 0.13,
     "textWidth": 0.44,
     "leadFamily": "bricolage",
     "leadFill": "#ffffff",
@@ -290,11 +293,14 @@
       "descriptorGap": 16,
       "cursorScale": 1.1
     },
-    "subjectProtection": false
+    "subjectProtection": {
+      "top": 594,
+      "minClearance": 24
+    }
   },
   {
     "align": "left",
-    "top": 0.2,
+    "top": 0.13,
     "textWidth": 0.44,
     "leadFamily": "bricolage",
     "leadFill": "#ffffff",
@@ -342,6 +348,9 @@
       "descriptorGap": 16,
       "cursorScale": 1.1
     },
-    "subjectProtection": false
+    "subjectProtection": {
+      "top": 898,
+      "minClearance": 24
+    }
   }
 ]

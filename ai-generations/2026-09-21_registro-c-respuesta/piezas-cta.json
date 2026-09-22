@@ -63,7 +63,7 @@
       ]
     },
     "subjectProtection": {
-      "top": 586,
+      "top": 585,
       "minClearance": 24
     }
   },
@@ -116,7 +116,7 @@
       "cursorScale": 1.1
     },
     "subjectProtection": {
-      "top": 656,
+      "top": 655,
       "minClearance": 24
     }
   },
@@ -169,7 +169,7 @@
       "cursorScale": 1.1
     },
     "subjectProtection": {
-      "top": 732,
+      "top": 560,
       "minClearance": 24
     }
   }

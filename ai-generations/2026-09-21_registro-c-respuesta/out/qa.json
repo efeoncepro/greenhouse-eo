@@ -77,10 +77,10 @@
     ],
     "ratioDominanteEntrada": null,
     "contraste": {
-      "dominante": 19.32,
-      "nota": 19.59,
-      "cta": 10.86,
-      "descriptor": 19.92,
+      "dominante": 19.2,
+      "nota": 19.47,
+      "cta": 10.8,
+      "descriptor": 19.83,
       "logo": 7.09
     },
     "gapsTinta": [],
@@ -93,10 +93,10 @@
     ],
     "ratioDominanteEntrada": null,
     "contraste": {
-      "dominante": 20.39,
-      "nota": 20.29,
+      "dominante": 20.4,
+      "nota": 20.19,
       "cta": 11.25,
-      "descriptor": 19.11,
+      "descriptor": 20.6,
       "logo": 13.1
     },
     "gapsTinta": [],
@@ -109,10 +109,10 @@
     ],
     "ratioDominanteEntrada": null,
     "contraste": {
-      "dominante": 19.41,
-      "nota": 19.52,
-      "cta": 10.91,
-      "descriptor": 19.93,
+      "dominante": 19.28,
+      "nota": 19.44,
+      "cta": 10.85,
+      "descriptor": 19.82,
       "logo": 15.84
     },
     "gapsTinta": [],

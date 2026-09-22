@@ -78,7 +78,7 @@
         "anchor": "end-center",
         "hotspot": {
           "x": 632.144,
-          "y": 523.642
+          "y": 443.002
         },
         "touchesTarget": true
       }
@@ -90,20 +90,20 @@
   "textBounds": {
     "left": 167.36,
     "right": 591.7600000000001,
-    "top": 501.72200000000004,
-    "bottom": 545.562
+    "top": 421.082,
+    "bottom": 464.92199999999997
   },
   "descriptorBounds": {
     "left": 143.36,
     "right": 555.6319999999998,
-    "top": 575.562,
-    "bottom": 604.15
+    "top": 494.922,
+    "bottom": 523.51
   },
   "surface": {
     "left": 143.36,
-    "top": 487.722,
+    "top": 407.082,
     "right": 615.7600000000001,
-    "bottom": 559.562
+    "bottom": 478.92199999999997
   },
   "variant": "outline",
   "colors": {
