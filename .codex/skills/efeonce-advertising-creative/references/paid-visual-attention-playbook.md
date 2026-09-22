@@ -186,5 +186,11 @@ Cada variante incluye: `concepto`, `registro`, `hipótesis`, `palanca_visual`, `
 - **S12 — Ipsos, The power of you (2020):** https://www.ipsos.com/en/power-you-why-distinctive-brand-assets-are-driving-force-creative-effectiveness
   Meta-análisis observacional de video; asociación, no garantía causal por activo.
 
-La investigación anterior en `ad-creative-evidence-2026.md` se conserva como antecedente: sus cifras
-sin URL/metodología revalidada no se promueven a benchmarks; no encontrar evidencia no prueba inexistencia.
+**Documento hermano — `ad-creative-evidence-2026.md`.** El reparo original de esta sección («sus cifras sin
+URL no se promueven a benchmarks») **quedó atendido el 2026-09-21: su §8 trae ahora 46 URLs primarias**, con
+la naturaleza y el alcance de cada fuente. **Las dos listas son complementarias, no rivales:** las `S1-S12` de
+acá son mayormente **guías de plataforma** y cubren sobre todo **video** y el diccionario de métricas; las de
+allá son **investigación con muestra declarada** —peer-reviewed de eye-tracking, System1/IPA, VidMob,
+Kiin Labs— y son **las únicas de las dos listas que cubren imagen fija**. Se usan juntas: una define qué
+significa la métrica, la otra qué se midió. Sigue vigente lo demás: no encontrar evidencia no prueba
+inexistencia, y los premios no prueban rendimiento paid.

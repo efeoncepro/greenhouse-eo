@@ -271,3 +271,94 @@ cualquier métrica de atención.
 10. **El peso del texto es un tradeoff por pieza**, no una regla — sube la atención total pero suma carga *(§1.2 vs §1.1)*.
 11. Para respuesta, separar **clic saliente, visita y conversión**; CTR total no equivale a tráfico.
     Para atención, usar medición específica. Véase el playbook vigente.
+
+## 8. Fuentes primarias — URL, naturaleza y alcance
+
+🔴 **Escritas a pedido de la sesión Codex, y el reparo era correcto:** este documento exigía fuente
+verificable para todo y no traía una sola URL. **Sin enlace no es evidencia, es memoria.**
+
+📎 **Complementariedad con el playbook hermano, dicha explícita:** sus fuentes (`S1-S12`) son en su mayoría
+**guías de plataforma** —Google ABCDs, TikTok Creative Codes, diccionarios de métricas de LinkedIn/TikTok/
+YouTube— y tratan sobre todo **video**. Las de acá son **investigación con muestra declarada**, y son las
+únicas de las dos listas que cubren **imagen fija**. **Un diccionario de métricas y un estudio de atención
+no se sustituyen: se usan juntos.**
+
+### Peer-reviewed *(el núcleo de §1)*
+- **Pieters, Wedel & Batra**, *The Stopping Power of Advertising*, J. of Marketing 74(5), 2010 —
+  https://journals.sagepub.com/doi/abs/10.1509/jmkg.74.5.048
+- **Pieters & Wedel**, *Attention Capture and Transfer in Advertising*, J. of Marketing 68(2), 2004 —
+  https://journals.sagepub.com/doi/abs/10.1509/jmkg.68.2.36.27794 ·
+  PDF: https://www.tilburguniversity.edu/sites/default/files/download/PietersWedel_2.pdf
+- *Face Presence and Gaze Direction In Print Advertisements*, J. of Advertising Research 58(4), 2018 —
+  https://www.tandfonline.com/doi/abs/10.2501/JAR-2018-004
+- *Judgments at Gaze Value: Gaze Cuing in Banner Advertisements*, Frontiers in Psychology, 2017 —
+  https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5454066/
+- *Banner ads: human faces with averted gaze*, 2014 — https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3941030/
+- **Nielsen Norman Group**, *Photos as Web Content* — https://www.nngroup.com/articles/photos-as-web-content/
+  ⚠️ usabilidad web, no feed publicitario.
+
+### Estudios con muestra declarada *(§3 y §3.6)*
+- **System1 / eatbigfish / Peter Field**, *The Extraordinary Cost of Dull*, ene-2025 (>100.000 ads × IPA
+  Databank) — https://system1group.com/the-extraordinary-cost-of-dull ·
+  el 2,6× vía https://www.westwoodone.com/blog/2025/01/27/the-extraordinary-cost-of-dull-boring-ads-require-2x-to-2-6x-greater-media-spend-to-achieve-same-impact-as-interesting-ads/
+- **LinkedIn B2B Institute + System1**, *Defeating Dullness* (1.600 ads, 6M personas, 4 años) —
+  https://system1group.com/blog/defeating-dullness-in-b2b-advertising ·
+  cobertura: https://www.marketingweek.com/majority-b2b-creative-ineffective/
+- **LinkedIn B2B Institute × MediaScience**, oct-2024 (109 ads B2B, 770 personas, biometría) —
+  https://www.marketingweek.com/b2b-video-ads-fail-attention/
+- **Romaniuk (Ehrenberg-Bass)**, *Category Entry Points In A B2B World* (PDF primario) —
+  https://business.linkedin.com/content/dam/me/business/en-us/amp/marketing-solutions/images/lms-b2b-institute/pdf/b2bi-cepinb2b-final.pdf
+- **LinkedIn B2B Institute + WARC + LIONS**, *The B2B Effectiveness Code* —
+  https://business.linkedin.com/content/dam/lem/business/en/advertise/resources/b2b-institute/the-b2b-effectiveness-code-27-october.pdf
+- **VidMob × LinkedIn**, *2024 Creative Trends Report* — **PDF primario**, el único que trae los lifts sobre
+  ESTÁTICOS (+41% contraste, +14% personas) —
+  https://vidblog.vidmob.com/hubfs/LinkedIn%20Trends_B2B%20Cheat%20Sheet.pdf
+- **VCCP Media × Nelson-Field**, may-2025 (72 video ads, >20.000 vistas) —
+  https://www.vccp.com/uk/news/2025/may/hacking-the-attention-economy-vccp-media-and-dr-karen-nelson-field-reveal-1-5-second-formula-for-effective-digital-advertising ·
+  umbral: https://www.amplified.co/insight/why-does-the-attention-memory-threshold-matter
+- **Meta + Realeyes + EyeSquare + VidMob** (6.076 personas, 16.835 impresiones) —
+  https://adverteyes.ai/resource/meta-decodes-advertising-attention-by-environments-in-the-wild/
+- **Neurons**, eye-tracking global 2023 (177 participantes, 5 países) —
+  https://www.neuronsinc.com/insights/predict-viewer-percentage-view-time-advertising
+- **IAB**, *The AI Ad Gap Widens* (505 consumidores + 104 ejecutivos) — https://www.iab.com/insights/the-ai-gap-widens/
+- **STFO**, *State of B2B Brand Distinctiveness 2026* — https://www.stfo.io/research/b2b-brand-distinctiveness-2026/
+  ⚠️ no peer-review: scoring inicial por IA con rúbrica, revisión de una sola persona.
+
+### Benchmarks con método publicado *(§3.7)*
+- **Cognism 2026** (761 creatividades, TLA excluidos) — https://www.cognism.com/reports/study/linkedin-ad-creative-peformance-2026
+- **Metadata 2026** (153 anunciantes, $57,6M, ponderado) — https://metadata.io/b2b-advertising-benchmarks
+- **ZenABM 2026** (161.256 anuncios) — https://zenabm.com/blog/linkedin-ads-benchmarks
+- 🔴 **Kiin Labs** ($31M, comparaciones pareadas, IC bootstrap 95%) — **la fuente que desarma el CTR de los
+  TLA** — https://kiin.co/research/linkedin-thought-leader-ads-benchmarks
+
+### Reglas de plataforma *(§3.5 — verificadas contra la fuente vigente)*
+- **Meta Advertising Standards** (no hay restricción porcentual de texto) — https://transparency.meta.com/policies/ad-standards/
+- Retiro de la regla del 20%, 2020 — https://www.searchenginejournal.com/facebook-removes-the-20-text-limit-on-facebook-ad-images/381844/
+- **Meta safe zones** Reels/Stories — https://www.facebook.com/business/help/980593475366490/
+- **LinkedIn single image specs** — https://www.linkedin.com/help/lms/answer/a426534/single-image-ads-advertising-specifications
+- **IAB + MRC**, *Attention Measurement Guidelines v1.0*, nov-2025 —
+  https://www.iab.com/wp-content/uploads/2025/11/IAB_MRC_Attention_Measurement_Guidelines_November_2025.pdf
+
+### Piezas de §2.1 *(gráfica premiada — juicio de jurado, NO rendimiento paid)*
+- Grand Prix Cannes 2026 — https://www.creativereview.co.uk/cannes-lions-2026-all-the-grand-prix-winners/
+- **Magnum** (LOLA Madrid) — https://www.creativereview.co.uk/magnum-summer-winter-ad-campaign-lola-madrid/
+- **BMW «Moving Landscapes»** — https://www.house-of-communication.com/es/en/newsroom/2026/01/moving-landscapes.html
+- **Melanoma Fund «Peak Exposure»** — https://melanoma-fund.co.uk/peak-exposure-the-mountains-youre-looking-at-are-melanoma/
+- **Heinz «Look Familiar?»** — https://www.adweek.com/creativity/heinz-uncovers-an-iconic-duo-thats-been-hiding-in-plain-sight/
+- **Jeep «The Silent Edition»** — https://lbbonline.com/news/How-the-Jeep-Cherokee-Hybrid-Made-Wildlife-Photos-Possible
+- **Musée de la Grande Guerre «Broken Souls»** — https://lbbonline.com/news/The-Museum-of-the-Great-War-BBDO-Paris-BROKEN-SOULS
+- **mycar «The Sunburnt Car»** — https://www.creativereview.co.uk/sunburnt-car-campaign-tbwa-eleven-australia-mycar/
+- **Apple TV / Optical Arts** — https://www.itsnicethat.com/articles/optical-arts-advertisements-and-idents-film-animation-project-020926
+- **IKEA «Wherever Life Goes»** — https://adage.com/creativity/work/aa-ikea-sweden-wherever-life-goes/
+- Un fotógrafo comercial sobre el look de IA — https://petapixel.com/2026/05/10/a-commercial-photographers-take-on-when-to-use-ai-and-when-not-to/
+
+### Origen de §5 *(lo que NO se cita)*
+- El 95-5 declarado heurística **por su propio autor** — https://johndawes.info/the-955-rule/
+- El 71% de ads B2B sin efecto — https://marketingscience.info/news-and-insights/71-of-b2b-ads-are-a-waste-of-money-zero-attention-zero-sales-why-marketers-should-forget-voiceovers-and-heavy-text-and-get-the-logo-in-much-earlier
+- Nielsen 2017 (creatividad = 47%) — https://www.nielsen.com/insights/2017/perspectives-want-a-successful-ad-get-creative/
+- EBI sobre juicio de activos, vía WARC — https://www.warc.com/content/feed/marketers-are-terrible-at-judging-the-fame-and-uniqueness-of-their-brand-assets-ebi-research/en-GB/10802
+
+### Bloqueadas — declaradas, no omitidas *(§6)*
+- *Measuring Gaining and Holding Attention to Social Media Ads with Viewport Logging*, J. of Advertising 2025
+  — **403** — https://www.tandfonline.com/doi/full/10.1080/00913367.2025.2524186
+- *Shape-based assets are strongest*, Int. J. of Advertising 2026 — **403**, sin cifras reportadas.
