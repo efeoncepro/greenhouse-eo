@@ -118,3 +118,7 @@ operación concreta que lo corrige.
 ## Gate de cobertura Paid Media
 
 Por defecto: cada concepto ×4:5/1:1/9:16/16:9; exclusiones sólo con brief explícito. Verificar cuatro exports y cuatro composiciones, no cuatro recortes. Registrar tamaños, fuentes editables, prompts/referencias y QA visual/contraste por ratio. El conteo parcial no se anuncia como campaña completa. Ver el canon Tres voces + acción para matriz, contraste mínimo y conservación del lecho/firma.
+
+## Gate para Finales
+
+Registrar placement/tipo de medio, perfil y fuente de safe area, bounds de texto/cursor/firma, máscara QA separada y revisión de escena. No basta contraste. Handoff: concepto, audiencia, fase de embudo, hipótesis, CTA/destino, KPI, prompts/referencias, editables, comandos, hashes, autorización y limitaciones. Aplicar el canon Tres voces + acción.

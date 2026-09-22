@@ -372,7 +372,9 @@
     "auth-server:verify-contrast": "node scripts/auth-server/verify-contrast.mjs",
     "auth-server:verify-passkey": "node scripts/auth-server/verify-passkey-lane.mjs",
     "foto:assets:lock": "node scripts/foto/assets-lock.mjs",
-    "foto:assets:check": "node scripts/foto/assets-lock.mjs --check"
+    "foto:assets:check": "node scripts/foto/assets-lock.mjs --check",
+    "foto:componer:cta": "node scripts/foto/componer-cta.mjs",
+    "foto:cta:gate": "node scripts/foto/componer-cta.gate.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,mts,js,jsx}": [

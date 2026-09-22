@@ -59,6 +59,11 @@ El **relleno acotado del CTA funcional está autorizado**: no contradice la proh
 
 Canon de aplicación creativa: este documento, cargado desde `efeonce-advertising-creative`. AXIS conserva tokens, recetas tipográficas y contrato de selección bajo el [ADR de ownership](../architecture/EFEONCE_AXIS_DESIGN_SYSTEM_OWNERSHIP_DECISION_V1.md). Esta adopción no modifica paquetes, schemas, primitivas UI, runtime ni autoridad de publicación; no crea una API CTA de AXIS ni promueve contratos `trial/candidate` a estables.
 
+✅ **Delta 2026-09-22 — el comando canónico ya existe.** El paso que este párrafo dejaba abierto
+(«no se anuncia como compatible hasta una implementación y verificación explícitas») está hecho:
+**`pnpm foto:componer:cta` + `pnpm foto:cta:gate`**, con las cinco copias de corrida consolidadas y el hueco
+de medición del relleno cerrado. Canon: [`EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md`](EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
+
 El compositor de campaña extiende el [compositor fotográfico canónico](../../scripts/foto/componer.mjs) y reutiliza el renderer AXIS. Los campos `cta` del JSON piloto son locales de corrida: el comando canónico no se anuncia como compatible hasta una implementación y verificación explícitas.
 
 ## Evidencia del caso, no presets globales
@@ -120,3 +125,51 @@ reservas ni promover el catálogo1:1. Mover elementos exige nueva medición.
 - Revisar maestro y tamaño de consumo de **cada formato**, sin choques de tinta, etiquetas o cursor con personaje/firma. Registrar revisión y límites.
 - Guardar pruebas en Pilotos; sólo aprobación explícita de pieza habilita su clasificación como Final. Publicar exige autorización separada.
 - CRO evalúa resultado calificado y costo; CTR es diagnóstico de respuesta, no prueba de atención o conversión. La aceptación visual del operador no demuestra eficacia comercial.
+
+## Zonas seguras, placement y promoción a Finales — 2026-09-22
+
+La reserva fotográfica y la zona segura de la interfaz son contratos diferentes: cumplir su intersección.
+**Un ratio no identifica un placement.** Registrar plataforma, superficie, tipo de medio y versión del perfil.
+En 9:16 proteger entrada, titular, CTA, descriptor, cursor completo, firma y detalle narrativo clave; no sólo
+el origen Y del texto. Contraste alto no compensa oclusión por avatar, nombre, acciones, captions o CTA nativo.
+
+### Perfil aplicado a SEO/AEO v05
+
+- `meta-fullscreen-conservative-v1`: ventana x=8–88%, y=16–65%; a1080×1920, límites conservadores
+  x=87–950, y=308–1248. Reserva16% superior,35% inferior,8% izquierda y12% derecha. Son **márgenes internos
+  conservadores**, no coordenadas oficiales universales. Contenido clave dentro; fondo/escenografía pueden continuar fuera.
+- El35% inferior se apoya en la guía primaria de Meta Reels, p.4. Se aplica también a la versión compartida
+  para Stories como guardia conservadora. Las rutas actuales del Ads Guide exigen login; no se afirma haber
+  verificado cada variante live de interfaz. La preview del placement en Ads Manager sigue siendo el gate de tráfico.
+- Feed4:5/1:1/16:9: inset editorial interno2,5%; no inventar un overlay fullscreen donde no existe. Revisar
+  el recorte real y las especificaciones del destino. LinkedIn Single Image prioriza aquí4:5/1:1;9:16 es
+  fuente para eventual video vertical, **no un PNG listo para publicarse como Video Ad**. No existe en las
+  fuentes consultadas una banda porcentual universal de LinkedIn equiparable a Meta.
+- No dejar la firma debajo de la interfaz como solución por defecto. El centro93,5% es una receta de feed,
+  no una obligación para fullscreen. Reencuadrar la foto y subir su **lecho físico**, conservando SVG oficial,
+  ancho20%lado corto, contraste≥4,5:1 y desenfoque natural. No moverla sobre piel/pantalla ni añadir scrim.
+- Medir bounds completos de la capa gráfica y firma contra la ventana; revisar también sujeto, manos y objeto
+  principal. Exportar una preview **diagnóstica separada** con la máscara de exclusión, sin guías en el final.
+  Una máscara geométrica no es captura real de la app; no rotularla como validación live.
+
+Fuentes revisadas22/09/2026: [Meta, Reels ads guide, p.4](https://d3m889aznlr23d.cloudfront.net/img/events/458925814/assets/e042d2be.reels_ads_guide1.pdf),
+[LinkedIn Single Image](https://www.linkedin.com/help/linkedin/answer/a426534/single-image-ads-advertising-specifications?lang=en-us)
+y [LinkedIn Video Ads](https://business.linkedin.com/advertise/ads/sponsored-content/video-ads/specs).
+
+### Entrega operativa y autorización
+
+El operador autorizó pasar esta campaña a **Finales después de los ajustes**. Esa autorización permite la
+promoción de los exports que superen QA; conservar Pilotos y descartes como historia. No requiere repetir
+la aprobación del movimiento, ni autoriza publicar, pautar, contratar medios o afirmar rendimiento.
+
+Cada final debe viajar con: concepto/territorio, tensión u objetivo deseado, audiencia/estado de entrada,
+fase del embudo principal y secundaria, hipótesis, progreso esperado, CTA/descriptor/destino, KPI primario
+y diagnóstico, ratio/placement, textos editables, prompts exactos y referencias por hash, motor, compositor,
+comandos y dependencias, evidencia de contraste/safe areas, aprobación y limitaciones. Una fase es una
+hipótesis de uso, no rendimiento demostrado. TOFU/MOFU/BOFU describen función, no un embudo rígido ni una
+asignación automática del estilo de CTA.
+
+Caso y paquete: `ai-generations/2026-09-22_aeo-final-safe-v05/`; archivo OneDrive en
+`03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v05-Codex-safe-zones`. Su LEEME y matriz gobiernan qué se
+promovió, sus límites y cómo reproducirlo. Los prompts IA conservan trazabilidad; reproducir el gráfico
+es determinista, regenerar fotografía no garantiza los mismos píxeles.

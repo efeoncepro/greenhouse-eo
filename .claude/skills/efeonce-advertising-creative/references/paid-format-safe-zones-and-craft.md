@@ -109,7 +109,42 @@ Puesta en la raíz de la ficha, el comando resuelve la **pose por defecto** y no
 Gigi en pose héroe en lugar de con megáfono, y sólo se habría visto en la salida.
 ✅ **Verificar la ruta `--image` que imprime el comando antes de gastar.**
 
-## 5. El CTA sólido no reporta su contraste
+## 5. ✅ El CTA se compone con el comando canónico *(resuelto 2026-09-22)*
+
+```bash
+pnpm foto:componer:cta <plan.json>   # compone
+pnpm foto:cta:gate     <plan.json>   # verifica los mínimos — van en pareja y en ese orden
+```
+
+🔴 **NO copiar el compositor a la carpeta de corrida.** Vivía duplicado en **cinco** copias ya divergentes, y
+dos mejoras reales estaban en copias distintas, así que ninguna corrida las tenía juntas. Canon:
+[`EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md`](../../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
+
+### Lo que el gate arregló, y por qué era invisible
+
+En variante `solid` el compositor marcaba `skipContrast` y **la clave `contraste.cta` nunca se escribía**:
+
+> **El QA salía limpio porque el dato NO EXISTÍA, no porque hubiera pasado.**
+
+⚠️ `skipContrast` estaba bien puesto —medir la tinta contra la escena bajo un relleno opaco no significa
+nada— pero saltar el bloque entero se llevó **la medición que sí hacía falta y nadie hacía: el relleno contra
+la escena**, la que decide si el botón se despega del plate.
+
+Ahora `solid` emite **`contraste.cta`** (tinta/relleno, ≥4,5:1) **y**
+**`contraste.cta_superficie_vs_escena`** (medido sobre el píxel, ≥3:1). Y **el gate EXIGE la clave**: si
+falta, falla. *Un gate que sólo valida lo presente no detecta una ausencia — y la ausencia era el bug.*
+
+## 5b. Un beneficio por pieza — no se reutiliza entre piezas
+
+El grupo `beneficio → CTA → descriptor` **cambia en cada pieza**. Reutilizar el mismo beneficio en dos
+ejecuciones distintas diluye el «un CEP por ejecución» de Romaniuk, que es la regla más accionable del B2B:
+*«a single, clear message is more easily remembered… focus on one CEP per execution»*.
+
+Caso observado: dos piezas del mismo set llevaban «Descubre qué dice de tu marca» como beneficio. Cada una
+ataca un momento de compra distinto, así que el puente al servicio también tiene que ser distinto:
+`«Descubre qué dice de tu marca»` · `«Mira con qué te describe»` · `«Mira qué responde por tu categoría»`.
+
+## 5c. Apéndice — cómo se veía el hueco antes de arreglarlo
 
 `componer-cta.mjs` marca `skipContrast` en variante `solid` y **la clave `contraste.cta` nunca se escribe** —
 el QA sale limpio porque el dato no existe, no porque haya pasado. El valor teórico sí se computa como
@@ -150,3 +185,7 @@ Beneficio  hace el puente al servicio    ← no acciona
 CTA        acciona                       ← no explica
 Descriptor identifica la oferta          ← no repite el botón
 ```
+
+## Aplicación SEO/AEO Codex v05: perfil explícito, sin extrapolar Stories a Reels
+
+El caso previo de firma82–85% es una solución de Stories bajo su supuesto de interfaz, **no una certificación para Reels ads**. La campaña Codex v05 usa otra composición: reencuadra el lecho físico y conserva la firma completa antes del65%, debajo de su escena, con contraste medido. Perfil interno conservador x8–88%,y16–65%; no son coordenadas oficiales de LinkedIn. No aplicar un único perfil a todas las plataformas. Fuentes primarias, límites de preview y paquete final en [Tres voces + acción](../../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md#zonas-seguras-placement-y-promoción-a-finales--2026-09-22). La máscara diagnóstica es local; el gestor verifica el placement real antes de pautar.

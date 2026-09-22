@@ -45,14 +45,17 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    [safe zones y trampas de formato](references/paid-format-safe-zones-and-craft.md) (`as-of 2026-09-22`,
    todo medido en producción). Lo que más caro sale ignorar:
    - 🔴 **la reserva del comando NO es la safe zone de la plataforma.** En 9:16 la banda del comando empieza
-     en 10% y la UI de Instagram/LinkedIn ocupa hasta el **14%**: obedecer sólo al comando pone el titular
+     en 10% y la UI del placement puede invadir esa banda; el14% es referencia de Meta, no regla de LinkedIn: obedecer sólo al comando pone el titular
      debajo del nombre de la cuenta. Manda la más restrictiva;
    - **en 16:9 el cursor no cabe** —tacha el cierre a cualquier escala— y `cursors: []` aborta con
      `cursor-required`: la salida es cursor a 0,9 + cierre corto;
    - **la vista del personaje puesta en la raíz de la ficha se ignora en silencio** y resuelve la pose por
      defecto: verificar la ruta `--image` que imprime el comando antes de gastar;
-   - **el CTA `solid` no reporta `contraste.cta`**: el QA sale limpio porque el dato no existe. Medir a mano
-     tinta/relleno y relleno/escena;
+   - **el CTA se compone con `pnpm foto:componer:cta` y se verifica con `pnpm foto:cta:gate`**, en pareja
+     y en ese orden. **Nunca copiar el compositor a la carpeta de corrida** (vivió en cinco copias
+     divergentes). El gate **exige** `contraste.cta`: antes, la variante sólida pasaba porque el dato no
+     existía, no porque cumpliera;
+   - **un beneficio por pieza**: el grupo beneficio → CTA → descriptor no se reutiliza entre ejecuciones;
    - 🎯 **la metáfora entra POR el objeto del oficio, no al lado de él.** Prueba: quítale el objeto; si la
      escena sigue funcionando igual, estaba al lado.
 
@@ -337,3 +340,11 @@ En **carrusel sobre ilustración** (2026-09-19, «Nivel de búsqueda», `compone
 - `presentation` del caso: `collaboratorScale: 1.8`, `localCursorScale: 1.2`, `participantColors` por id en `#rrggbb`
   (Clawd `#d77757`, Codex `#2f67db`, Nexa `#d6246e`, SEO `#12afa2`, Contenido `#ff6500`, Data `#5d50ff`, Dev
   `#0375db`). Los colores de rol son del caso, no una paleta canónica.
+
+## Cierre por placement y entrega a Finales
+
+Aplicar el canon Tres voces + acción, §Zonas seguras: comprobar bounds de texto, CTA, cursor y **firma**;
+reencuadrar el lecho cuando la UI inferior lo tape. No usar el ratio como sustituto del placement ni
+presentar una máscara de QA como captura live. Con autorización de promoción, pasar sólo exports
+verificados a Finales, conservando pilotos. Acompañar concepto, audiencia, fase del embudo, hipótesis,
+CTA/destino, KPI, prompts/referencias, editables, comandos, hashes y evidencia. Final creativo ≠ publicación.
