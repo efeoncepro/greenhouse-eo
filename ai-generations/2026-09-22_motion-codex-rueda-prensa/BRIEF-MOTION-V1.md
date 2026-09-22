@@ -225,3 +225,47 @@ y no del enfoque; Seedance 2.5 es mejor en consistencia. Por eso la corrección 
 🔴 **Corrección al §7 de este mismo brief:** decía que la sonda costaba «centavos» hablando de la toma de
 Seedance 2.5. Falso: la toma cuesta USD 2,77–6,24. Centavos es la sonda con el mini, que se encontró después.
 El CLI imprime el costo antes de encolar — **se lee, no se recuerda**.
+
+## 12. Evidencia · la toma 1080p **[2026-09-22, USD 6,24]**
+
+`seedance25-i2v` · 1080×1920 · 24 fps · 145 cuadros · `--end-image` = plate · `--no-audio` · prompt **v2**
+→ `out/loop-9x16-1080p.mp4` · request `01a0c8aa-a603-7ab0-958b-5467ff04307f`
+
+### ✅ Las cuatro fallas de la sonda: corregidas
+| Falla de la sonda | En la toma 1080p |
+|---|---|
+| escala y posición derivan | **estables** en los cinco cuadros medidos |
+| el emblema se volvió una `X` | **`>_` en los cinco** — el `IDENTITY LOCK` aguantó |
+| micrófonos se reordenan | quietos |
+| apareció una cortina | fondo negro limpio |
+
+**El loop cierra.** Diferencia media del último cuadro contra el primero: **1,85** sobre 255 (0,7 %). La
+costura no se ve al reproducir en bucle.
+
+**La cara vuelve a actuar sola:** `>_` → `>_` con el brazo alzado → **`^^`** → `^^` → `>_`.
+
+### 🔴 Lo que se perdió, y es culpa del prompt v2
+**El gesto quedó corto.** En el pico los brazos **no se abren**: siguen a los costados. Medido, la diferencia
+media máxima contra el cuadro 0 es **4,3/255 (1,7 %)** — movimiento sutil, no declarativo.
+
+**La causa es mía y es un trade-off que me comí entero:** el v2 lleva cuatro bloqueos enfáticos —no cambies de
+tamaño, no te muevas de posición, el cuerpo queda plantado, nada entra al cuadro— y el modelo los obedeció
+**sacrificando la amplitud del gesto**. Maté la deriva y de paso maté la actuación. La sonda gesticulaba más y
+derivaba más; ésta no deriva y casi no gesticula.
+
+**La salida no es aflojar los bloqueos** —vuelve la deriva—: es `seedance25-r2v` con las **poses del kit** como
+referencia (`inputMedia: 'many'`, hasta 30 imágenes), que es lo que el operador pidió desde el principio.
+`codex-3d-04-contrapicado-celebrando` **ya trae los dos brazos arriba con la anatomía correcta**: da amplitud
+*y* forma, en vez de pedirle al modelo que invente el gesto mientras le prohíbo moverse.
+
+**Por qué no se hizo así la primera vez:** `seedance25-i2v` acepta `inputMedia: 'one'`, una sola imagen, y se
+gastó en el plate. Fue límite del endpoint, no decisión de dirección. El trade-off que se eligió sin consultar:
+i2v garantiza encuadre exacto y loop (`--end-image`); r2v da consistencia de forma pero no asegura que el primer
+cuadro sea el plate.
+
+### Gasto acumulado
+| | USD |
+|---|---|
+| sonda mini 480p | 0,35 |
+| toma 1080p Seedance 2.5 | 6,24 |
+| **total** | **6,59** · saldo `FAL_API_KEY_B` ≈ **34,87** |
