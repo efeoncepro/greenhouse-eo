@@ -97,7 +97,7 @@ las corridas haya sido incorporado ni que el gate cubra todo el contrato creativ
 | `centerX` de v06 | No consumido: centra en `W/2`. Migrar sin adaptación puede desplazar CTA al sujeto/proyección |
 | `signatureY` de v06 | No consumido. Es centro en el firmador archivado; convertir a `logo.y = centro - altoLogo/(2*altoCanvas)` |
 | `safeArea`, `signatureSafeArea`, `editorialReserve` | Metadatos de corrida, no guards implementados por este comando |
-| `subjectProtection` | Comprueba borde inferior del descriptor; no toda la envolvente de cursor, titular o personaje |
+| `subjectProtection` | Comprueba borde inferior del descriptor; no toda la envolvente de cursor, titular o personaje. **Declaración obligatoria desde 2026-09-22**: el gate falla si una pieza con CTA no la declara. `{top, minClearance}` en px del plate cuando hay persona bajo el bloque; `false` cuando no la hay. Se mide en el plate, no en la composición |
 | Render parcial por IDs | Emite `qa-parcial.json`; el gate lee `qa.json`. Para la pareja de comandos usar un plan completo en carpeta exclusiva |
 | Descriptor/cursor sin CTA | No inferir soporte opcional: el camino de layout accede a `s.cta` y al descriptor. El help heredado no demuestra soporte de pieza muda |
 
@@ -106,6 +106,8 @@ CTA 1,5:1 y descriptor 1,7:1 porque perdió su eje desplazado y cayó sobre la p
 no se sustituyeron por este resultado. No anunciar reproducción idéntica desde el comando nuevo.
 
 ### Cobertura del gate
+
+**Delta 2026-09-22 (CMP-002).** Dos huecos cerrados: (1) un `qa.json` anterior al plan falla — el compositor aborta en la primera pieza que viola `subjectProtection` y deja el QA de la corrida previa, que el gate leía como verde; (2) `subjectProtection` sin declarar falla — la guarda existía, pero ninguna pieza la declaraba y el CTA del KV-01 quedó sobre la cabeza de Nexa con el gate verde.
 
 Fixtures locales: un CTA válido pasa y un CTA sin `contraste.cta` falla, como se buscaba. Sin embargo,
 QA vacío, IDs ajenos, descriptor ausente y filas duplicadas terminan con exit 0. Por tanto, **exit 0 solo

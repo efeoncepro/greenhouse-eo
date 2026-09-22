@@ -165,6 +165,8 @@ Consecuencias vinculantes:
 - **Caso ANAM Customer Agent** — publicado, autorizado, con evidence ledger y estado vigente confirmado. Es la única
   prueba de cliente publicable del carril; sostiene el dolor «mi postventa es invisible» y, parcialmente, «el
   directorio pidió IA».
+- **El caso se cita en su página y en conversación, nunca en un anuncio de venta.** Ningún titular, apoyo ni
+  descriptor de pieza pautada nombra a ANAM (ver Delta 2026-09-22 noche, punto 4).
 - **Caso ANAM RevOps** — existe writing packet y spec, sin publicación autorizada en este corte. Hasta que la tenga,
   no se cita en piezas externas.
 - **Sin caso, se publica el método con su límite.** Los capítulos 1, 2, 3 y 5 no heredan la prueba del 4.
@@ -208,6 +210,36 @@ del pillar.
 
 No cambia el criterio del CDR: regla de sujeto, unidad por dolor, fórmula de dos tiempos, los tres gates y la
 decisión de no usar paleta HubSpot siguen vigentes. Asignación por pieza y conceptos en **CMP-002**.
+
+## Delta 2026-09-22 (noche) — la fórmula de dos tiempos deja de ser obligatoria
+
+**La §4 convirtió un recurso en regla, y la regla produjo un tic.** Los seis titulares de CMP-002 salieron con
+la misma cadencia —premisa corta con punto, remate—: «Aprobaron la IA. / Los permisos los firmas tú.», «Tu CRM
+ya se actualiza solo. / El criterio no.», «Pagas Pro. / Operas como Starter.». Sueltos parecían ingeniosos;
+armados como serie, el operador los leyó como *«muy extraña la forma en que estás comunicando»* y, peor, como
+titulares que **no atacan ni el servicio que vendemos ni el dolor**.
+
+La causa la nombra la skill de copywriting como su antipatrón número uno (`03_HEADLINES_HOOKS_LEADS.md` §6.b):
+**poner el CONCEPTO en el lugar del título. Un titular promete; el concepto sólo nombra.** «El criterio no.»
+nombra una idea y no promete nada. Además fallaban dos de las 4 U's —*useful* y *ultra-specific*— y no usaban
+ni un nombre propio del catálogo que el comprador ya reconoce: HubSpot, Customer Agent.
+
+**Lo que cambia:**
+
+1. La fórmula de dos tiempos pasa a ser **un recurso más**, no una obligación. Una serie **varía la fórmula por
+   pieza** —how-to, voz del cliente, pregunta, directo, contra-intuitivo, número—, porque la repetición de cadencia se
+   lee como receta igual que el acento cálido repetido.
+2. **Cada titular promete algo concreto** y nombra el dolor o el servicio. Si el titular se entiende como el
+   nombre interno de una idea, todavía no es titular.
+3. **Se usan los nombres propios del catálogo** cuando existen: son propietarios, el comprador los busca y
+   cargan significado que un adjetivo no compra.
+4. 🔴 **El cliente no se nombra en los ads de venta** (decisión del operador, 2026-09-22). La autorización de
+   ANAM cubre el caso publicado, no usar su nombre para vender en pauta. El caso vive en el destino, no en la
+   pieza: el KV-02 pasó de «Así atiende ANAM con IA» a la frase del propio cliente final —«Quiero hablar con
+   una persona.»—, que nombra el dolor sin nombrar a nadie.
+
+**Lo que se conserva de la §4:** reconocer la capacidad del partner sin atacarla. Ningún titular puede leerse
+como «HubSpot no sirve»; eso sigue siendo regla.
 
 ## Alternativas descartadas
 

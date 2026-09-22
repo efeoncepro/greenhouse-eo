@@ -4,7 +4,7 @@
 // y la clave `contraste.cta` nunca se escribía, así que el QA salía limpio **porque el dato no existía**,
 // no porque hubiera pasado. Un gate que sólo mira las claves presentes no puede detectar una ausencia:
 // por eso éste EXIGE la clave y falla si falta.
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync, statSync } from 'node:fs'
 import path from 'node:path'
 
 const plan = process.argv[2]
@@ -16,9 +16,42 @@ const qaPath = path.join(dir, 'out', 'qa.json')
 
 if (!existsSync(qaPath)) { console.error(`✗ no existe ${qaPath}. Corre \`pnpm foto:componer:cta ${plan}\` primero.`); process.exit(1) }
 
+// 🔴 Una salida más vieja que el plan NO es la salida del plan [2026-09-22, CMP-002].
+// El compositor aborta a mitad de corrida cuando una pieza viola `subjectProtection`, y deja el
+// `qa.json` de la corrida ANTERIOR intacto. El gate lo leía y daba verde sobre números que ya no
+// describían el plan: vio pasar el set completo mientras el compositor estaba en rojo.
+if (statSync(qaPath).mtimeMs < statSync(path.resolve(plan)).mtimeMs) {
+  console.error(
+    `✗ ${qaPath} es anterior al plan: la última composición no terminó o no se corrió. ` +
+      `Corre \`pnpm foto:componer:cta ${plan}\` y resuelve su error antes del gate.`
+  )
+  process.exit(1)
+}
+
 const piezas = JSON.parse(readFileSync(path.resolve(plan), 'utf8'))
 const qa = JSON.parse(readFileSync(qaPath, 'utf8'))
 const conCta = new Set(piezas.filter(p => p.cta).map(p => p.id))
+
+// 🔴 La protección del sujeto se DECLARA en cada pieza, aunque sea para decir que no hay sujeto
+// [2026-09-22, CMP-002]. La guarda existía en el compositor (`subjectProtection` → el descriptor no
+// baja de `top - minClearance`) pero sólo actuaba si la pieza la declaraba, y ninguna lo hacía: el
+// CTA del KV-01 quedó encima de la cabeza de Nexa con el gate verde. Un mecanismo opcional que nadie
+// declara es un mecanismo apagado. `false` es una declaración válida: dice «debajo del texto no hay
+// persona», y queda escrito para quien revise.
+for (const p of piezas.filter(p => p.cta)) {
+  const sp = p.subjectProtection
+  const declarada = sp === false || (sp && typeof sp.top === 'number' && typeof sp.minClearance === 'number')
+
+  if (!declarada) {
+    console.error(
+      `✗ ${p.id}: falta \`subjectProtection\`. Declara { "top": <px donde empieza la cabeza en el plate>, ` +
+        '"minClearance": 24 } si hay una persona bajo el bloque de texto, o `false` si no la hay.'
+    )
+    process.exitCode = 1
+  }
+}
+
+if (process.exitCode) process.exit(1)
 
 // Umbrales del canon (EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1 §accesibilidad).
 const MIN_TEXTO = 4.5   // CTA y descriptor

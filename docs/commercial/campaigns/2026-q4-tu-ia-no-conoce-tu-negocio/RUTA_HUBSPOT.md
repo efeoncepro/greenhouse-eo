@@ -94,7 +94,7 @@ Cada ficha es una unidad de producción. Una pieza resuelve **un dolor para un c
 | **Prueba** | **Caso ANAM Customer Agent — publicado, autorizado, activo en producción.** La prueba más fuerte del carril. |
 | **Registro** | Provider-specific habilitado |
 | **Destino** | caso ANAM (`200`) → conversación |
-| **Prohibido** | Extender la autorización de ANAM a datos, capturas o logos no incluidos en el artículo aprobado |
+| **Prohibido** | Extender la autorización de ANAM a datos, capturas o logos no incluidos en el artículo aprobado · **nombrar a ANAM en la pieza pautada**: el caso es el destino, no la copy (operador, 2026-09-22) |
 
 ### 2.6 · «El directorio pidió IA» — CEO
 
