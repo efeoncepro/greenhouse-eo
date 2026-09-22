@@ -54,13 +54,17 @@ export interface BuildInsightsDeckInput {
 
 type Slide = Omit<CompositionSlideInput, 'slideId'>
 
-/** Láminas narrativas: el primer texto es el titular y el resto se reparte en puntos, sin recortar. */
-const narrativeSlides = (chapterLabel: string, texts: readonly string[], field: string): Slide[] => {
+/**
+ * Láminas narrativas: el primer texto es el titular y el resto se reparte en puntos, sin recortar. La plantilla exige
+ * al menos un punto; si no hay más texto, `fallback` dice DÓNDE está el resto — nunca «no hay más», que era falso
+ * cuando las otras afirmaciones del capítulo ya titulaban figuras.
+ */
+const narrativeSlides = (chapterLabel: string, texts: readonly string[], field: string, fallback: string): Slide[] => {
   const [headline, ...rest] = texts
 
   if (!headline) return []
 
-  const chunks = chunkByCapacity(rest.length > 0 ? rest : [GH_INSIGHTS.document.summaryNoMore], CAPACITY.points, (_t, i) => `${field}-${i}`)
+  const chunks = chunkByCapacity(rest.length > 0 ? rest : [fallback], CAPACITY.points, (_t, i) => `${field}-${i}`)
 
   return chunks.map(points => ({
     contentType: 'insights-narrative',
@@ -98,10 +102,10 @@ const chapterSlides = (chapter: PlanChapterV1, factsById: ReadonlyMap<string, Ev
   const remaining = chapter.claims.map(claim => claim.text).filter(text => !used.has(text))
 
   if (remaining.length > 0) {
-    slides.push(...narrativeSlides(chapter.title, remaining, chapter.chapterId))
+    slides.push(...narrativeSlides(chapter.title, remaining, chapter.chapterId, GH_INSIGHTS.document.chapterInFigures))
   } else if (slides.length === 0) {
     // Un capítulo sin datos se cuenta, no se omite.
-    slides.push(...narrativeSlides(chapter.title, [chapter.title, GH_INSIGHTS.document.chapterNoFindings], chapter.chapterId))
+    slides.push(...narrativeSlides(chapter.title, [chapter.title, GH_INSIGHTS.document.chapterNoFindings], chapter.chapterId, GH_INSIGHTS.document.chapterNoFindings))
   }
 
   return slides
@@ -127,7 +131,7 @@ export const buildInsightsDeckPlanInput = ({ edition, report, plan, snapshot }: 
     }
   ]
 
-  slides.push(...narrativeSlides(GH_INSIGHTS.document.executiveSummary, frozen.executiveSummary.map(claim => claim.text), 'summary'))
+  slides.push(...narrativeSlides(GH_INSIGHTS.document.executiveSummary, frozen.executiveSummary.map(claim => claim.text), 'summary', GH_INSIGHTS.document.summaryInChapters))
 
   for (const chapter of frozen.chapters) slides.push(...chapterSlides(chapter, factsById, frozen.locale))
 

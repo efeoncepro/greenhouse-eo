@@ -107,7 +107,9 @@ export const GH_INSIGHTS = {
     evidenceAbsent: 'Ausente',
     unissued: 'Sin emitir',
     executiveSummary: 'Resumen ejecutivo',
-    summaryNoMore: 'Sin hallazgos adicionales en el período.',
+    // El resumen toma una afirmación por módulo: decir «no hay más» era falso cuando el capítulo traía otras.
+    summaryInChapters: 'El detalle de cada módulo, con todas sus cifras, está en los capítulos siguientes.',
+    chapterInFigures: 'Las demás cifras de este capítulo están en sus figuras.',
     chapterNoFindings: 'Esta sección no registró hallazgos en el período.',
     figureContinued: '(continuación)',
     figureLegendComparison: 'La barra de color es el período del informe; la gris, el período anterior. Cada métrica se mide en su propia escala.',

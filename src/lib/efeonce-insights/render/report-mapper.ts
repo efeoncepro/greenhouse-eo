@@ -200,7 +200,7 @@ export const buildInsightReportPlanInput = ({
     // El resumen se pagina como cualquier narrativa: recortarlo a la capacidad de una página callaba
     // afirmaciones del resumen sin avisar.
     const summaryPages = chunkByCapacity(
-      rest.length > 0 ? rest : [GH_INSIGHTS.document.summaryNoMore],
+      rest.length > 0 ? rest : [GH_INSIGHTS.document.summaryInChapters],
       CAPACITY.paragraphs,
       (_p, i) => `summary-p${i}`
     )

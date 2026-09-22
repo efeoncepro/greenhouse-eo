@@ -99,6 +99,16 @@ describe('buildInsightsDeckPlanInput', () => {
     expect(() => buildInsightsDeckPlanInput({ edition, report, plan: plan({ chapters: [chapter({ claims: [long] })] }), snapshot: { facts: [] } as never })).toThrow(InsightsRenderRejectedError)
   })
 
+  it('el resumen con una sola afirmación dice dónde está el resto, nunca que no hay más', () => {
+    // Caso real (Sky): el resumen toma una afirmación por módulo; el capítulo traía además OTD.
+    const slides = buildInsightsDeckPlanInput({ edition, report, plan: plan({ executiveSummary: [claim('s0', 'RpA: 1,33.')] }), snapshot: { facts: [] } as never }).slides
+    const summary = slides.find(slide => slide.slots.chapterLabel === 'Resumen ejecutivo')!
+
+    expect((summary.slots.points as { text: string }[]).map(point => point.text)).toEqual([
+      'El detalle de cada módulo, con todas sus cifras, está en los capítulos siguientes.'
+    ])
+  })
+
   it('pagina los límites de seis en seis', () => {
     const limits = Array.from({ length: 8 }, (_, i) => `Métrica ${i}: sin datos.`)
     const slides = buildInsightsDeckPlanInput({ edition, report, plan: plan({ limits }), snapshot: { facts: [] } as never }).slides.filter(slide => slide.contentType === 'insights-limits')
