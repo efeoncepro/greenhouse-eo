@@ -1,0 +1,23 @@
+{
+  "id": "m1-recomienda-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    {
+      "objeto": "clawd",
+      "vista": "perfil"
+    }
+  ],
+  "escena": "SCENE (a bare desk in a dark modern office, seen straight on at desk height): SIX identical bezel-less display panels stand side by side in a shallow ARC across the desk, all the same size and shape. Each one shows a rounded ANSWER CARD glowing on a dark field — a plain empty rounded rectangle with short bright underlines beneath it and nothing else: no letters, no numbers, no words, no icons, no interface chrome, and ALL SIX are lit — every one of them is visibly on. But ONE single panel, third from the left, is additionally struck by a hard directional beam of light from above that separates it completely from the other five: it reads as CHOSEN, not as the only one present. The other five remain softly lit but plainly secondary. Standing on the desk in front of the arc, small and seen from behind, the Clawd figure from the reference is turned towards that one chosen panel and not towards the camera. The six panels and the beam are the ONLY light: everything else falls to deep navy black. Fine dust hangs in the beam. 50mm at f/2.8, camera at desk height. NOTHING IN THIS SCENE MAY READ AS OLD OR ANALOGUE. Absolutely NO books, NO paper, NO plants, NO mugs, NO pencil cups, NO clutter anywhere in frame, including out of focus in the background. Every object is current-generation hardware with clean machined surfaces: anodised aluminium, matte glass, seamless edges. Screens are bezel-less, edge to edge. The desk is bare except for what the scene names. The room behind is empty architectural darkness, not a cosy study.",
+  "reservas": {
+    "texto": {
+      "muro": "the empty dark office wall above the panels, unbroken and unlit",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the near edge of the desk in the immediate foreground, running unbroken across the whole width of the frame",
+    "tono": "DARK near-black anodised aluminium in deep shadow, matte, outside the light"
+  }
+}

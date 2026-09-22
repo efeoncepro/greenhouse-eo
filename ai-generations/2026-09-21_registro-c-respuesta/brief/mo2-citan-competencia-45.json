@@ -1,0 +1,20 @@
+{
+  "id": "mo2-citan-competencia-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    { "objeto": "clawd", "vista": "saludo" }
+  ],
+  "escena": "SCENE (the SAME press-conference lectern as the campaign's opening frame, seen straight on at lectern height, in the same dark hall): the lectern's whole front face is a single long horizontal SEARCH BAR, a rounded rectangular slot lit softly from within, holding a visible gradient across its length and a faint matte inner texture — never a flat white blank. Standing behind the lectern, only its upper half visible above the bar, the small Clawd figure from the reference is turned three-quarters and EXTENDS ONE ARM to its right, giving the floor to a single reporter. FOUR fat foam press microphones on long stems crowd in from the extreme LEFT and RIGHT edges, angled up towards the figure; each one carries a square plastic MIC FLAG below its head, and every flag bears a short brand wordmark that is physically unreadable — too small, out of focus, tilted away from camera or clipped by the frame edge, but unmistakably lettering, never blank. CRITICAL: the light from the bar narrows into one clean wedge that reaches ONLY the single microphone the figure points at — that one flag catches a hard specular edge and reads brightest in the frame — while the other THREE microphones and their flags fall into deep unlit shadow, their shapes barely separating from the black. The central third of the glowing bar stays completely UNOBSTRUCTED: no stem and no cable crosses in front of it. The hall behind is empty and falls to black: no audience, no seats, no banners, no windows, no paper, no printed matter of any kind, no plants, no mugs. The air above and behind the lectern is EMPTY: no object, no creature, no figure. The glowing bar is the ONLY light source and sits low in the frame; its wedge, its spill and every patch it throws stay BELOW the middle of the image, while the upper third is an unbroken field of ink-blue darkness. Fine dust hangs in the wedge. Modern moulded-plastic microphone flags and current-generation foam windscreens, matte and slightly scuffed from use. 50mm lens at f/2.8, camera at bar height.",
+  "reservas": {
+    "texto": {
+      "muro": "the empty dark hall above the lectern, unbroken and unlit",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "a black flight case standing in the immediate foreground, running unbroken across the whole width of the frame below the microphones",
+    "tono": "matte black textured road-case shell in full shadow, outside the light"
+  }
+}

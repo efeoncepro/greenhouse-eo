@@ -17,6 +17,7 @@ paths:
 | Realismo anti-IA (`printed matter exists…`) | **oficina de 2010**: libros, plantas, tazas, monitores con marco | declarar hardware de generación actual, superficie desnuda y pantallas sin marco, **prohibiendo lo analógico incluso fuera de foco** |
 | Escena físicamente imposible | **idioma del render** (CGI) | pedir la imperfección: polvo, micro-rayas, grano, profundidad de campo real |
 | Palanca con marcadores | los marcadores mandan | ya cubierto por `auditarContradicciones` |
+| **Criatura de partner CÁLIDA en cuadro** (Clawd) | **estética ochentera**: luz tungsteno ámbar, glow naranja, look retro | declarar la temperatura del cuadro: *«the whole frame is cool and contemporary… nothing is warm, amber, orange or golden; no tungsten, no retro glow»* |
 
 ⚠️ **El agujero:** el aviso existe **por palanca** y salta cuando la escena **contradice** un bloque.
 **Nada avisa cuando la escena CALLA** y el default se impone — eso sólo se ve en la salida, tarde y pagada.
@@ -58,6 +59,14 @@ era de OpenAI. Con **Gigi es peor y la regla cambia**: no «porta un color», **
 —rojo, azul dominante y verde-lima—, así que buscar otro portador es competir contra un degradado de tres colores
 y perder. La regla correcta es **la criatura como único acento de color, y Efeonce en el navy y en la
 estructura**) y **la contaminación del emblema**.
+
+🔴 **Tercera trampa, medida el 2026-09-22: la criatura cálida arrastra la pieza a los ochenta.** Es el reverso
+exacto del azul ajeno. Con **Clawd** (naranja terracota) en cuadro y la escena callada sobre temperatura, el
+modelo armoniza toda la iluminación hacia **tungsteno ámbar** y la pieza sale con look retro — envejecida,
+analógica, lo contrario de un servicio que habla de motores de respuesta. **El validador la da por buena**: las
+reservas pasaron 5/5. Se contrarresta declarando el frío del cuadro de forma explícita y negando el cálido por
+su nombre; con **Codex** (azul) el problema no aparece, porque su acento ya empuja hacia el navy del sistema.
+**Regla corta: si la criatura es cálida, la temperatura del cuadro se declara — el silencio la envejece.**
 
 🔴 **Hay un TERCER registro desde el 2026-09-21: C · «la respuesta a la vista»** — el sujeto es **la respuesta
 de la máquina y quién la da**, sin personas del equipo. Nació porque las cinco piezas con persona de los ads del

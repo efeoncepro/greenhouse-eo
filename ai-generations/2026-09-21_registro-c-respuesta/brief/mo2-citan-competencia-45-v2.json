@@ -1,0 +1,20 @@
+{
+  "id": "mo2-citan-competencia-45-v2",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    { "objeto": "codex", "vista": "frente" }
+  ],
+  "escena": "SCENE (the SAME dark press hall as the campaign's opening frame, seen straight on at lectern height): TWO identical lecterns stand side by side, each one's whole front face a long horizontal SEARCH BAR — a rounded rectangular slot. The RIGHT lectern's bar is ALIVE: lit softly from within in cool blue-white, holding a visible gradient across its length and a faint matte inner texture, never a flat white blank, with one thin vertical text cursor at its left end. The small Codex figure from the reference stands behind that right lectern, only its upper half visible above the bar, facing front and lit from below by its own bar. The LEFT lectern is IDENTICAL in shape and build but its bar is DEAD: unlit, a cold dark recess with no glow, no cursor and no gradient, its rounded outline only just catching a faint edge of spill from the other bar — clearly the same instrument, clearly switched off. Nobody stands behind it; the air above that left lectern is EMPTY: no object, no creature, no figure, no silhouette. SIX fat foam press microphones on long stems crowd in from the extreme LEFT and RIGHT edges; EVERY SINGLE ONE is turned and angled towards the RIGHT lectern, including the ones planted on the left, whose stems lean visibly across and away from the dead bar — not one microphone points at the left lectern. Each carries a square plastic MIC FLAG below its head bearing a short wordmark kept physically unreadable — too small, out of focus, tilted away or clipped by the frame edge, but unmistakably lettering, never blank. CRITICAL: the central third of the GLOWING bar stays completely UNOBSTRUCTED — no stem and no cable crosses in front of it. The hall behind is empty and falls to black: no audience, no seats, no banners, no windows, no paper, no printed matter of any kind, no plants, no mugs. The glowing bar is the ONLY light source and sits low in the frame; its light, its spill and every patch it throws stay BELOW the middle of the image, while the upper third is an unbroken field of ink-blue darkness. COLOUR: the whole frame is cool — deep ink-blue blacks, the bar a clean blue-white, the microphone foams black and deep navy. Nothing in the scene is warm, amber or orange. Fine dust hangs in the light. Modern moulded-plastic mic flags and current-generation foam windscreens, matte and slightly scuffed from use. 50mm lens at f/2.8, camera at bar height.",
+  "reservas": {
+    "texto": {
+      "muro": "the empty dark hall above the two lecterns, unbroken and unlit",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "a black flight case standing in the immediate foreground, running unbroken across the whole width of the frame below the microphones",
+    "tono": "matte black textured road-case shell in full shadow, outside the light"
+  }
+}
