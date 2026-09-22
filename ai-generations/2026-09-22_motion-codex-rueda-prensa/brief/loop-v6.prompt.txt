@@ -29,23 +29,20 @@ TEXT SIZE AND LAYOUT — match image 1 exactly, do not shrink it:
 - The lime button is about 40% of the frame width, with its descriptor line directly beneath it.
 Text is crisp, perfectly legible, correctly spelled Spanish, never warped and never handwritten.
 
-AUDIO — there is NO VOICE anywhere in this video. This is absolute:
+AUDIO — the tone is dry institutional comedy, never celebration:
 
-The character NEVER speaks. It has no mouth — it is a terminal with a screen for a face. There is no voice, no voice actor, no speech, no gibberish, no babbling, no singing, no chanting, no whispering, no crowd and no vocal performance of any kind. Nobody talks. Not one syllable in any language is uttered at any point. Its silence is the joke: it delivers a statement about someone else without saying anything at all.
+VOICE — THIS IS THE CRITICAL INSTRUCTION AND IT FAILED TWICE ALREADY. Both previous attempts leaked real language: Spanish words were audible and the delivery drifted into something that sounded like Portuguese. That must not happen again.
 
-Instead the soundtrack is built from TWO layers only:
+The character HAS NO MOUTH. It is a terminal with a screen for a face. It does NOT speak and there is NO VOICE in this video — no human voice, no voice actor, no vocal performance, no singing, no chanting, no crowd, no whispering, no babbling mouth sounds of any kind. Do not generate speech.
 
-1. SOUND EFFECTS SYNCED TO ITS MOVEMENT, in the classic cartoon scoring tradition where every gesture gets its own sound:
-   - a soft microphone thump at the very start;
-   - a light whoosh as it leans toward the microphones;
-   - a short bright accent — a xylophone or woodblock note — on the beat when its arm goes up to list a point;
-   - a small descending swipe as it makes the dismissive "that concludes it" gesture and its arms come down;
-   - a tiny soft mechanical click when the white cursor clicks the lime button;
-   - COMPLETE SILENCE, except the music, during the long still hold at the end. Nothing rattles, nothing beeps, nothing moves.
-   These are crisp, short and light. No comedy honks, no slide whistles, no boings, no cartoon slapstick.
+What it emits instead is SYNTHESISED ELECTRONIC SIGNAL: short modulated beeps, chirps, warbles and data blips, like a small machine reporting. Think of a retro computer terminal or a modem processing, pitched high and quick.
 
-2. MUSIC: a short, pompous institutional newsreel fanfare — stately brass and strings in the style of a mid-century official announcement, solemn and self-important, as if something of great consequence were being declared. The comedy comes from that solemnity being completely out of proportion to what actually happens, which is nothing. Restrained and dignified, NOT wacky, NOT a cartoon chase, NOT celebratory, NO marching band, NO bagpipes, NO singing. It must loop perfectly: the final bar leads straight back into the first with no gap and no fade.
+Those blips are PHRASED with emotional prosody — they rise and fall, cluster and pause, as if the machine were making a statement — but they are made of pure tone, never of syllables, vowels or consonants. NOT Spanish. NOT Portuguese. NOT Italian. NOT any Romance language. NOT any human language at all. If a listener could transcribe a single syllable, it is wrong.
 
-Nothing else. No ending sting: the loop is continuous.
+Keep it SOFT and SECONDARY, well under the music: the viewer must READ the screen. Busier during the listing gesture, and COMPLETELY SILENT during the final still hold.
+
+MUSIC — a short, pompous institutional newsreel fanfare: stately brass and strings in the style of a mid-century official announcement or a government newsreel, solemn and self-important, as if something of great consequence were being declared. The comedy comes from that solemnity being completely out of proportion to what actually happens — which is nothing. Restrained and dignified, NOT wacky, NOT a cartoon chase, NOT celebratory, NO marching band, NO bagpipes, NO singing. It must loop perfectly: the final bar leads straight back into the first with no gap and no fade.
+
+Plus subtle room tone and one soft microphone thump at the very start. No ending sting: the loop is continuous.
 
 Photographic, real physical object on a real set, subtle grain, true depth of field. Not a cartoon, not a 3D render.
