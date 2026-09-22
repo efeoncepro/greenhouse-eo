@@ -53,6 +53,33 @@ copy, estructura de brief, nomenclatura ni criterios creativos.** Se conserva po
 ⚠️ **Método:** la fecha de modificación en OneDrive **no prueba vigencia** — sincronizar reescribe el mtime.
 Una carpeta parecía activa de julio 2026 y estaba muerta desde 2024. **Para saber si algo vive, preguntar.**
 
+## 5b. 🔴 Dónde vive cada cosa — repo vs OneDrive
+
+**Greenhouse es el harness.** El **trabajo gobernado** de una campaña vive en el repo; el **pensamiento y los
+assets**, en OneDrive.
+
+| Repo `docs/campaigns/` | OneDrive `2. Campañas/CMP-###_…` |
+|---|---|
+| **Epics, tasks, mini-tasks, issues** | Brief, conceptos, copy, JTBD |
+| 🆕 **CDR — Campaign Decision Record** | Media plan, tracking, índice de assets |
+
+**Regla:** si tiene **lifecycle** y alguien lo ejecuta y lo cierra → **repo**. Si es criterio, narrativa o
+entregable → **OneDrive**. 🔴 **Nada se escribe en los dos lados: se referencia.**
+
+### CDR · el ADR de las campañas
+
+| | Cuándo | Dónde |
+|---|---|---|
+| **ADR** | arquitectura o contrato técnico | `docs/architecture/` |
+| **PDR** | producto del sitio público | `docs/public-site/` |
+| 🆕 **CDR** | **decisión de UNA campaña**: territorio, canales, presupuesto, ventana, cortes | `docs/campaigns/decisions/` |
+
+🎯 **Cómo se reconoce un CDR:** *si la campaña no existiera, la decisión no tendría sentido.*
+⚠️ **Lo transversal NO es CDR.** El sistema de CTA, el contrato de safe zones o las reglas del registro
+fotográfico no pertenecen a una campaña: siguen siendo ADR u operations.
+🔴 **Los IDs de `TASK-###` e `ISSUE-###` salen del registry global**, no de uno paralelo. Una campaña **es
+trabajo del mismo harness**.
+
 ## 6. 🔴 El brief es la fuente única de criterios — para TODOS los canales
 
 > **Antes de producir una pieza para cualquier canal, lee el `BRIEF.md` de su campaña.**

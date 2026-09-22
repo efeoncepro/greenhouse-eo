@@ -65,6 +65,10 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    🔴 **Nunca copiar un asset a la carpeta de campaña**: dos copias garantizan que nadie sepa cuál se publicó.
    Canon: [`EFEONCE_CAMPAIGN_REGISTRY_V1.md`](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
    ⚠️ **`aprobada` ≠ autorizada a pautar**, y lo archivado en `Archivo/pre-CMP_2024/` **no es referencia**.
+   🔴 **El trabajo gobernado va al repo, no a OneDrive:** epics, tasks, issues y **CDR** (*Campaign Decision
+   Record*, el ADR de las campañas) viven en `docs/campaigns/`. Regla: **con lifecycle → repo; criterio o
+   entregable → OneDrive**, y nada en los dos lados. Un CDR se reconoce porque **si la campaña no existiera,
+   la decisión no tendría sentido**; lo transversal sigue siendo ADR.
 
 ### Motor de IA: cómo elegir (as-of 2026-09-16)
 
