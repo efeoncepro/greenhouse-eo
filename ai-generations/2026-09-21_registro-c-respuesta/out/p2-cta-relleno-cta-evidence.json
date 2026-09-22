@@ -1,0 +1,114 @@
+{
+  "intent": {
+    "targetId": "cta",
+    "targetKind": "group",
+    "variant": "open-brackets",
+    "padding": "compact",
+    "overlay": "none",
+    "cursors": [
+      {
+        "id": "usuario",
+        "kind": "local",
+        "targetId": "cta",
+        "anchor": "end-center",
+        "action": "select"
+      }
+    ]
+  },
+  "manifest": {
+    "schema": "axis.collaboration-selection-composition.v1",
+    "contract": {
+      "id": "efeonce.collaboration-selection",
+      "version": "0.2.0"
+    },
+    "target": {
+      "id": "cta",
+      "kind": "group"
+    },
+    "selection": {
+      "variant": "open-brackets",
+      "padding": "compact",
+      "paddingRatio": {
+        "inline": 0.008,
+        "block": 0.007
+      },
+      "overlay": "none",
+      "overlayOpacity": 0,
+      "overlayBlendMode": "luminosity"
+    },
+    "cursors": [
+      {
+        "id": "usuario",
+        "kind": "local",
+        "targetId": "cta",
+        "anchor": "end-center",
+        "action": "select",
+        "orientation": "screen-fixed",
+        "direction": "north-west"
+      }
+    ]
+  },
+  "geometry": {
+    "schema": "axis.collaboration-selection-composition.v1",
+    "contract": {
+      "id": "efeonce.collaboration-selection",
+      "version": "0.2.0"
+    },
+    "target": {
+      "id": "cta",
+      "kind": "group"
+    },
+    "selection": {
+      "variant": "open-brackets",
+      "padding": "compact",
+      "paddingRatio": {
+        "inline": 0.008,
+        "block": 0.007
+      },
+      "overlay": "none",
+      "overlayOpacity": 0,
+      "overlayBlendMode": "luminosity"
+    },
+    "cursorEvidence": [
+      {
+        "id": "usuario",
+        "state": "acting",
+        "action": "select",
+        "direction": "north-west",
+        "anchor": "end-center",
+        "hotspot": {
+          "x": 521.936,
+          "y": 452.18
+        },
+        "touchesTarget": true
+      }
+    ],
+    "noFreeCoordinates": true,
+    "targetGeometrySource": "rendered-content-bounds",
+    "withinCanvas": true
+  },
+  "textBounds": {
+    "left": 104.64000000000001,
+    "right": 488.72,
+    "top": 430.00000000000006,
+    "bottom": 474.36000000000007
+  },
+  "descriptorBounds": {
+    "left": 80.64000000000001,
+    "right": 393.8760000000001,
+    "top": 504.3600000000001,
+    "bottom": 534.0120000000001
+  },
+  "surface": {
+    "left": 80.64000000000001,
+    "top": 416.00000000000006,
+    "right": 512.72,
+    "bottom": 488.36000000000007
+  },
+  "variant": "solid",
+  "colors": {
+    "surface": "#7ed600",
+    "ink": "#00284d"
+  },
+  "solidTextContrast": 8.156167080587064
+}

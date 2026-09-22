@@ -1,0 +1,256 @@
+[
+  {
+    "align": "left",
+    "top": 0.105,
+    "textWidth": 0.84,
+    "lead": "Hoy alguien habló en nombre de tu empresa.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 44,
+    "leadGap": 0.15,
+    "dominant": "No fuiste tú.",
+    "dominantSize": 176,
+    "dominantMax": 0.62,
+    "after": "Medimos qué responden de ti. **Pide el diagnóstico**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 40,
+    "afterGap": 0.12,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.7,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        },
+        {
+          "id": "ia",
+          "anchor": "bottom-end",
+          "action": "select",
+          "label": "IA",
+          "who": "role",
+          "color": "#12afa2"
+        }
+      ]
+    },
+    "label": "SEO + AEO",
+    "labelSize": 30,
+    "labelStar": true,
+    "id": "p1-atril-busqueda-9x16-texto",
+    "plate": "plates/p1-atril-busqueda-9x16-plate.png"
+  },
+  {
+    "align": "left",
+    "top": 0.16,
+    "textWidth": 0.4,
+    "lead": "Hoy alguien habló en nombre de tu empresa.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 34,
+    "leadGap": 0.15,
+    "dominant": "No fuiste tú.",
+    "dominantSize": 132,
+    "dominantMax": 0.38,
+    "after": "**Pide el diagnóstico**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.22,
+    "logo": {
+      "width": 0.13,
+      "x": 0.5
+    },
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 0.9,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "label": "SEO + AEO",
+    "labelSize": 24,
+    "labelStar": true,
+    "id": "p1-atril-busqueda-16x9-texto",
+    "plate": "plates/p1-atril-busqueda-16x9-plate.png"
+  },
+  {
+    "align": "left",
+    "top": 0.105,
+    "textWidth": 0.84,
+    "lead": "Te describe con seguridad.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 44,
+    "leadGap": 0.15,
+    "dominant": "No te leyó.",
+    "dominantSize": 176,
+    "dominantMax": 0.62,
+    "after": "Trabajamos para que te lea bien. **Pide el diagnóstico**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 40,
+    "afterGap": 0.12,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.6,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "label": "SEO + AEO",
+    "labelSize": 30,
+    "labelStar": true,
+    "id": "p2-expediente-9x16-texto",
+    "plate": "plates/p2-expediente-9x16-plate.png"
+  },
+  {
+    "align": "left",
+    "top": 0.16,
+    "textWidth": 0.4,
+    "lead": "Te describe con seguridad.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 34,
+    "leadGap": 0.15,
+    "dominant": "No te leyó.",
+    "dominantSize": 132,
+    "dominantMax": 0.38,
+    "after": "**Pide el diagnóstico**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.22,
+    "logo": {
+      "width": 0.13,
+      "x": 0.5
+    },
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 0.9,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "label": "SEO + AEO",
+    "labelSize": 24,
+    "labelStar": true,
+    "id": "p2-expediente-16x9-texto",
+    "plate": "plates/p2-expediente-16x9-plate.png"
+  },
+  {
+    "align": "left",
+    "top": 0.105,
+    "textWidth": 0.84,
+    "label": "SEO + AEO",
+    "labelSize": 30,
+    "labelStar": true,
+    "lead": "Anuncia tu categoría todos los días.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 44,
+    "leadGap": 0.15,
+    "dominant": "Sin tu nombre.",
+    "dominantSize": 176,
+    "dominantMax": 0.62,
+    "after": "Lo medimos y lo trabajamos. **Pide el diagnóstico**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 38,
+    "afterGap": 0.12,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.6,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "id": "p3-megafono-9x16-texto",
+    "plate": "plates/p3-megafono-9x16-plate.png"
+  },
+  {
+    "align": "left",
+    "top": 0.16,
+    "textWidth": 0.4,
+    "label": "SEO + AEO",
+    "labelSize": 24,
+    "labelStar": true,
+    "lead": "Anuncia tu categoría todos los días.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 34,
+    "leadGap": 0.15,
+    "dominant": "Sin tu nombre.",
+    "dominantSize": 132,
+    "dominantMax": 0.38,
+    "after": "**Pide el diagnóstico**.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.22,
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 0.9,
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    },
+    "logo": {
+      "width": 0.13,
+      "x": 0.5
+    },
+    "id": "p3-megafono-16x9-texto",
+    "plate": "plates/p3-megafono-16x9-plate.png"
+  }
+]

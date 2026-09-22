@@ -1,26 +1,29 @@
 [
   {
-    "id": "e4-eficiencia",
+    "id": "p1-atril-busqueda-9x16-cta",
     "dominante": [
-      "Que tu pauta rinda."
+      "No fuiste tú."
     ],
-    "ratioDominanteEntrada": 3.3,
+    "ratioDominanteEntrada": 4.7,
     "contraste": {
-      "entrada": 13.74,
-      "dominante": 12.52,
-      "cierre-frase": 14.5,
-      "logo": 20.14
+      "entrada": 19.56,
+      "dominante": 18.1,
+      "cierre-frase": 19.68,
+      "nota": 19.78,
+      "cta": 10.84,
+      "descriptor": 19.8,
+      "logo": 17.85
     },
     "gapsTinta": [
       {
         "entre": "entrada→dominante",
-        "px": 26,
-        "ratioDominante": 0.178
+        "px": 25,
+        "ratioDominante": 0.149
       },
       {
         "entre": "dominante→cierre",
-        "px": 18,
-        "ratioDominante": 0.123
+        "px": 20,
+        "ratioDominante": 0.119
       }
     ],
     "seleccion": {
@@ -37,9 +40,72 @@
       },
       "cursores": [
         {
-          "id": "local"
+          "id": "ia",
+          "labelBounds": {
+            "left": 796.695,
+            "top": 562.84,
+            "right": 834.899,
+            "bottom": 594.048
+          }
         }
       ]
     }
+  },
+  {
+    "id": "p2-expediente-9x16-cta",
+    "dominante": [
+      "No te leyó."
+    ],
+    "ratioDominanteEntrada": 4.7,
+    "contraste": {
+      "entrada": 17.61,
+      "dominante": 17.43,
+      "cierre-frase": 17.42,
+      "nota": 17.55,
+      "descriptor": 17.62,
+      "logo": 8.94
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 25,
+        "ratioDominante": 0.149
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 20,
+        "ratioDominante": 0.119
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "p3-megafono-9x16-cta",
+    "dominante": [
+      "Sin tu nombre."
+    ],
+    "ratioDominanteEntrada": 4.3,
+    "contraste": {
+      "entrada": 18.26,
+      "dominante": 18.12,
+      "cierre-frase": 18.4,
+      "nota": 18.12,
+      "cta": 10.08,
+      "descriptor": 18.42,
+      "logo": 11.76
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 25,
+        "ratioDominante": 0.163
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 18,
+        "ratioDominante": 0.118
+      }
+    ],
+    "seleccion": null
   }
 ]

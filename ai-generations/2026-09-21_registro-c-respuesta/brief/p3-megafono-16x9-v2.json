@@ -1,0 +1,23 @@
+{
+  "id": "p3-megafono-16x9-v2",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    {
+      "objeto": "gigi",
+      "vista": "megafono"
+    }
+  ],
+  "escena": "SCENE (a bare desk in a dark empty modern office at night, seen straight on at desk height): standing ON TOP of an ultra-low-profile aluminium keyboard with flat chiclet keys and no visible frame, the small Gigi figure from the reference holds its megaphone raised and turned AWAY from the camera towards the empty dark room, mid-announcement. The keycaps are clearly LARGER than the figure's feet, so it reads unmistakably as a physical figurine about 25 cm tall. To the right, angled towards it, a large bezel-less display shows one single rounded ANSWER CARD glowing on a dark field — a plain empty rounded rectangle with a short bright underline beneath it and nothing else: no letters, no numbers, no words, no icons, no interface chrome. That display is the ONLY light source: it rakes hard across the flat keys picking out their edges, lights one side of the figure and leaves the other falling to black. The room it announces into is completely empty and unlit — no people, no chairs, no other screens, nothing listening. Fine dust hangs in the light. The figure is the ONLY colour in the frame. 50mm lens at f/2.8, camera at keyboard height. NOTHING IN THIS SCENE MAY READ AS OLD OR ANALOGUE. Absolutely NO books, NO bound volumes, NO paper, NO plants, NO mugs, NO pencil cups, NO clutter of any kind anywhere in frame, including out of focus in the background. Every object is current-generation hardware with clean machined surfaces: anodised aluminium, matte glass, seamless edges. Screens are bezel-less, edge to edge. The desk is bare except for what the scene names. The room behind is empty architectural darkness, not a cosy study. FRAMING FOR THIS FORMAT: the keyboard and the figure sit in the RIGHT THIRD of the frame, the display at the far right. The figure faces LEFT and its megaphone points across the empty LEFT HALF of the frame, which is bare unlit room falling to black — it is announcing into that void.",
+  "reservas": {
+    "texto": {
+      "muro": "the empty dark office wall above the desk, unbroken and unlit",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the near edge of the desk in the immediate foreground, running unbroken across the whole width of the frame",
+    "tono": "DARK near-black oak in deep shadow, matte, its grain still faintly visible, outside the light"
+  }
+}
