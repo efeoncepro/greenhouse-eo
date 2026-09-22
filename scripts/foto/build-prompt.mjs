@@ -1388,6 +1388,93 @@ export const PALANCAS = {
     bloque:
       'THE WORK IS PROJECTED ONTO PHYSICAL MATTER (this is the frame, not a detail): a beam from behind the camera throws the work itself onto a rough physical surface — plaster, brick, cloth, timber — and that surface\'s grain, cracks and unevenness SHOW THROUGH the projected image, bending and breaking it. The projection is the ONLY light in the room. A person stands INSIDE the beam with their back to the camera and the work FALLS ACROSS their shoulders and body, so part of the image is on the surface and part is on them; their own shadow punches a hard black hole through it. NO screen and NO monitor anywhere: the image lives on material, not on glass.',
     requiere: null
+  },
+  // ── Las tres de física, 2026-09-21 (noche) ──────────────────────────────────────────────────
+  // Probadas una pasada cada una, USD 0,05, sin identidad ni objetos de marca: sólo la física, para
+  // averiguar barato cuáles existe el motor. De cinco propuestas pasaron tres. Las dos que no están
+  // acá viven en el catálogo con su causa medida: `impacto` (el motor AÑADE la onda concéntrica que
+  // el marcador prohíbe, y la corona de líquido es el cliché número uno del stock de alta
+  // velocidad) y `estallido` (el motor NO proyecta las sombras entre capas, y sin ellas el exploded
+  // view se lee como render de CAD — que es justo lo que el canon rechaza).
+  // Lo que las tres comparten: fotografían un instante que el ojo no puede ver quieto, y esa
+  // imposibilidad es lo que frena el scroll. Ninguna lleva personas.
+  'justo-antes': {
+    etiqueta: 'la fracción previa a la caída',
+    bloque:
+      'THE SUBJECT IS AN OBJECT PAST ITS BALANCE POINT (this is the frame, not a detail): <QUE> is tilted BEYOND ' +
+      'the point where it could recover, and its base has already lifted off the surface on one side, leaving a ' +
+      'visible wedge of empty air underneath. NOTHING holds it: no hand, no support, no wire, nothing entering the ' +
+      'frame. Everything else in the picture is perfectly still and razor sharp — there is NO motion trail and NO ' +
+      'motion blur anywhere, because this is the fraction of a second BEFORE the fall and not the fall itself. The ' +
+      'contact shadow appears ONLY beneath the single remaining point of support, and the lifted side casts no ' +
+      'contact shadow at all. NOBODY is present.',
+    // El campo obliga a nombrar el objeto: el desequilibrio se lee en SU forma. Una pila de láminas
+    // funcionó a la primera porque cada canto repite el ángulo y la inclinación se vuelve legible.
+    requiere: 'cae',
+    ejemplo:
+      '"a stack of thin dark rectangular plates" · "a tall narrow stack of index cards" · ' +
+      '"a single upright ceramic tile"',
+    contradice: [
+      {
+        patron: /\b(motion blur|blurred motion|mid-fall|already falling|has fallen|toppled|a hand (holds|holding|supports)|held by|propped (up )?(by|against))\b/i,
+        porque:
+          'la escena describe la caída YA ocurriendo, o algo que sostiene el objeto, y esta palanca vive ' +
+          'exactamente en el instante anterior: si cae, o si algo lo sujeta, la tensión no resuelta desaparece ' +
+          'y con ella lo único que frena el pulgar'
+      }
+    ]
+  },
+  corte: {
+    etiqueta: 'el interior expuesto',
+    bloque:
+      'THE SUBJECT IS THE INTERIOR OF A SECTIONED OBJECT (this is the frame, not a detail): <QUE> has been cut ' +
+      'clean in half by a precision saw. The cut is a perfectly FLAT, smooth plane — NOT broken, NOT torn, NOT ' +
+      'splintered — and it faces the camera square. The exposed interior reads as clearly DISTINGUISHABLE layers, ' +
+      'each one a different material: outer shell, internal frame, board, cavity. The cut half STANDS with its cut ' +
+      'face upright and presented, never tipped over and never lying flat. There is NO tool in the frame, NO ' +
+      'shavings and NO debris. Raking light crosses the cut plane so every layer edge throws its own shadow and ' +
+      'the real depth of the section is legible. Any coloured component inside — boards, cells, wiring — stays ' +
+      'DARK and desaturated so that nothing inside competes with the warm accent. NOBODY is present.',
+    // Medido en la pasada de prueba: el interior llega con color propio (una placa verde saturada y una
+    // celda amarilla) que el sistema de color no contempla. Son 0,5% del área con color y aun así caen
+    // en el centro de interés, porque el corte ES el sujeto. Por eso el bloque los apaga explícitamente.
+    requiere: 'secciona',
+    ejemplo:
+      '"a wireless computer mouse" · "a mechanical keyboard switch" · "a thick bound report"',
+    contradice: [
+      {
+        patron: /\b(broken|shattered|smashed|torn|splintered|cracked open|saw in frame|shavings|debris|lying (flat|down)|tipped over)\b/i,
+        porque:
+          'la escena rompe el objeto en vez de seccionarlo, o lo acuesta. Lo que detiene la vista acá es la ' +
+          'contradicción entre un corte de laboratorio y un objeto cotidiano: si está roto, es basura, y si está ' +
+          'acostado deja de presentar el interior'
+      }
+    ]
+  },
+  sumergido: {
+    etiqueta: 'el medio equivocado',
+    bloque:
+      'THE SUBJECT IS AN EVERYDAY OBJECT IN THE WRONG MEDIUM (this is the frame, not a detail): <QUE> is fully ' +
+      'submerged in deep dark water. Bubbles of clearly DIFFERENT sizes cling to its surface, some large, some ' +
+      'tiny. The waterline is NOT in the frame: the object is completely surrounded by water with no air above it. ' +
+      'Fine particles drift suspended around it, and the object is SINKING slowly, angled downward — it does NOT ' +
+      'float and it does NOT rest on anything. There are NO fish, NO plants, NO pool floor and NO tiles: nothing ' +
+      'identifies the place as a pool or an aquarium. NOBODY is present.',
+    // La más metafórica de las tres y la que mejor salió, al revés de lo que la propuesta apostaba.
+    // Ojo con la dosis del acento: el haz bajo el agua se come mucho cuadro (22,7% de los píxeles con
+    // color en la pasada de prueba, contra 3–7% en las otras cuatro).
+    requiere: 'sumerge',
+    ejemplo:
+      '"a wireless desk keyboard" · "a stack of printed pages" · "a desk telephone"',
+    contradice: [
+      {
+        patron: /\b(fish|aquarium|pool floor|tiles|coral|seaweed|underwater plants?|waterline|surface of the water|splash|floats|floating)\b/i,
+        porque:
+          'la escena convierte el agua en un LUGAR (una piscina, un acuario) o pone el objeto a flotar. La palanca ' +
+          'es disrupción por contexto: funciona porque el objeto está donde no debe y se HUNDE, en ninguna parte ' +
+          'reconocible'
+      }
+    ]
   }
 }
 
