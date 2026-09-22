@@ -7,6 +7,27 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-22 — «Tu IA no conoce tu negocio»: el carril HubSpot
+
+[CDR-004](docs/campaigns/decisions/CDR-004-tu-ia-no-conoce-carril-hubspot.md) (`Proposed`) resuelve cómo se vende
+HubSpot dentro de una narrativa que declara no ser una campaña de HubSpot: el carril es provider-specific, no una
+campaña paralela, y rige la regla de sujeto —el problema del comprador es el qué, HubSpot es el cómo—. La unidad de
+producción pasa a ser el dolor del mapa del pillar, no el Hub ni la familia; tres registros de mención con gate
+propio; mitigación del riesgo «HubSpot no sirve» moviendo la pregunta en vez de atacar la herramienta; herencia de la
+regla del vacío. Tres gates medidos el mismo día: destino (pillar y caso ANAM `200`, otras cuatro `404`), partner
+(tier declarado, no revalidado) y prueba (un solo caso publicado). El cruce deja dos huecos declarados, no rellenados:
+Revenue Lifecycle/CFO sin capítulo y el capítulo 5 sin dolor en el mapa. Brief ejecutable de las siete fichas en
+[RUTA_HUBSPOT.md](docs/commercial/campaigns/2026-q4-tu-ia-no-conoce-tu-negocio/RUTA_HUBSPOT.md). Los capítulos 1 y 2
+quedan con brief por primera vez. Sin producir, publicar, pautar ni declarar tier de partner.
+
+## 2026-09-22 — «Tu IA no conoce tu negocio»: del output a la pieza
+
+[CDR-003](docs/campaigns/decisions/CDR-003-tu-ia-no-conoce-del-output-a-la-pieza.md) acepta la extensión 5B del
+capítulo 5: entrada «A nosotros tampoco nos gusta el AI Slop», tesis durable «El output fue generado. La pieza fue
+diseñada» y Design Context de seis capas. Se distingue descarte de entrega: los modelos pueden producir salidas
+mediocres; Efeonce no las confunde con trabajo terminado. Narrativa y brief incorporan build completo, muro de
+rechazados, serie Behind the Build, estados, límites de claims y medición. Sin producir, publicar, pautar ni crear SKU.
+
 ## 2026-09-22 — Campañas CMP: brief y continuidad entre agentes
 
 [Contrato ampliado](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md): templates de brief, índice de exports y ficha
@@ -641,45 +662,3 @@ histórico de candidato de las entradas previas. No cambia runtime ni habilita p
 - La captura inmutable D4 se conserva para el primer recorrido sintético autorizado; no se presenta
   una asignación de candidato como evidencia. Calibración independiente y trigger `on_stage_entry`
   siguen pendientes.
-
-## 2026-09-12 — Criterio y ejecución de seasonality/trendjacking para Codex y Claude
-
-Ampliación 2026-09-13: criterio espejo video/estático por mecanismo, complementariedad y comparación
-de resultados; adelantar la transformación sigue como propuesta, no como mejora ejecutada en v02.
-
-Workflow espejo de video estacional desde metáfora visual: previs y keyframes, Seedance 2.5,
-preflight/costo, tipografía/logo exactos, audio medido, QA temporal y MP4 en OneDrive.
-Caso «Hay abrazos que encendemos»: candidato técnico; escucha/revisión completa y aprobación pendientes.
-
-[Protocolo compartido](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md) y skills espejo: clasificación,
-evidencia, elegibilidad, mecanismos creativos, papel de marca, dirección por formato, producción por defecto y
-cinco revisiones separadas. Routers AGENTS/CLAUDE/JSON y studios adyacentes apuntan al canon social.
-Módulo 12 añade mecanismos/innovación, emoción-atención-memoria y heurísticas/pruebas, con fuentes académicas,
-alcance de acceso, contrapesos y aplicaciones como hipótesis. Se corrigen recetas psicológicas universales en
-fundamentos visuales/dirección/copy. [Investigación](docs/audits/social/2026-09-12-creative-cognition-research.md).
-Se corrigen firma vs placement físico, activo aprobado vs reconocimiento demostrado y concepto vs permiso de
-render. La materialización puede usar logo oficial como referencia; titulares y firmas editoriales siguen exactos.
-Prueba Día de Muertos: v5 rechazada por deformación; v6 es iteración con referencia, no aprobación ni performance.
-[Evidencia, escenarios y límites](docs/audits/social/2026-09-12-social-creative-production.md). Base en `87b05206e`.
-[V8](docs/audits/social/2026-09-12-editorial-type-brand-v8.md): tres formatos corregidos, firma agrupada,
-espaciado por tinta, contraste final y pruebas de fusión; protocolo espejo de auditoría editorial.
-Delta v8 local, revisión pendiente y sin publicación. Entrega PNG a OneDrive Marketing con carpetas
-semánticas y verificación de integridad; `5. Contenidos` es la biblioteca general para buscar, adaptar y
-organizar assets, no sólo seasonalities. Convención en `social-media-studio/efeonce/ONEDRIVE_DELIVERY.md`.
-
-## 2026-09-12 — Hiring: incidente P1 del Banco de Talento resuelto y liberado (ISSUE-171/172/173)
-
-`lpad(nextval::text, 5, '0')` recortaba el `public_id` de `talent_pool_membership` pasado 99 999: diez valores de
-secuencia colapsaban contra `UNIQUE`, el cron `ops-hiring-talent-pool-reconcile` fallaba en cada corrida y el consumer
-que crea postulaciones desde el Growth Form abrió su circuito — hasta 38 personas reales sin proyectar durante horas,
-sin ninguna señal (nada se borró). Migración a una función que rellena sin recortar + `setval`; anti-join en la
-projection (cortaba ~71k `nextval`/día); parser público que ya no rechaza una postulación por un enlace opcional
-(href canónico https); señal `sync.reactive.circuit_open`; el sender propaga el `error.name` de Resend; revive
-gobernado de `dead_letter` (excluye buzones bloqueados y cierres inciertos, ventana por `updated_at`); tablero
-del pipeline que sigue al snapshot del servidor; `reason_code` en la señal de aviso de rotación (Sentry 91/96);
-`denyUrls` contra el filename crudo (Sentry 94). Recuperación por replay gobernado: 0 sin postulación, 164 acuses
-(el plan Free de Resend se agotó en la ráfaga; ahora Pro). Release `586a8627568a` (PR #234), watchdog 5/5, canary
-verde. `ISSUE-173` (el drain del dominio deja huérfano al handler que el breaker saltó) queda abierta con diseño.
-Docs y skills sincronizadas el mismo día (arquitectura ATS §Delta 2026-09-12, `.claude/rules/hiring.md`, invariantes
-SQL/Ops, playbook reactivo, skills talento/resend/email/release con espejos `.codex/`, desk/careers/emails) y follow-ups
-formalizados: `TASK-1872` (fix de ISSUE-173), `TASK-1873`/`TASK-1874` (enlace descartado en intake y Application 360).

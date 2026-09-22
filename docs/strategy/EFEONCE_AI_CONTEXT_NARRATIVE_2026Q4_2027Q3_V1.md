@@ -9,6 +9,7 @@
 > Efeonce bajo una tesis común para el período.
 > **Ajuste 2026-09-19:** el capítulo 4 pasa de explicar agentes a demostrar una oferta humano-agente comercialmente aprobada y probada, sin convertir cada claim de resultado en publicable por inferencia.
 > **Extensión de marketing 2026-09-19:** los capítulos 3, 4 y 5 forman una ruta propia para CMO; no es una derivación obligatoria a CRM.
+> **Extensión creativa aprobada 2026-09-22:** el capítulo 5 incorpora «Del output a la pieza» como posición y demostración contra el AI Slop; no abre un sexto capítulo ni promete que cada generación salga lista.
 
 ## 1. Decisión
 
@@ -57,7 +58,7 @@ La tesis se desdobla en cinco tipos de contexto. Cada capítulo responde una pre
 | 2 | **Lo que tu IA cree que es cierto** | Contexto y autoridad de datos | ¿Qué puede incorporar o cambiar sin revisión? | Un CRM que se actualiza solo también necesita fuentes, permisos, corrección y dueño |
 | 3 | **Lo que la IA dice de ti** | Contexto público | ¿Me recomiendan cuando alguien busca? | Tu próximo comprador no es humano · El anuncio que conversa |
 | 4 | **Un equipo, no una herramienta** | Trabajo, autoridad y aprendizaje | ¿Cómo pongo agentes a trabajar con personas sin perder el control? | Un proceso concreto · ficha de rol · handoff · excepción · resultado válido |
-| 5 | **Campañas en días, con tu marca** | Contexto de marca | ¿Cómo voy más rápido sin parecerme a todos? | Cuando todos tienen agentes, gana quien tenga algo que decir |
+| 5 | **Campañas en días, con tu marca** | Contexto de marca | ¿Cómo voy más rápido sin parecerme a todos? | Cuando todos tienen agentes, gana quien tenga algo que decir · Del output a la pieza |
 | Capa transversal | **Resultados, no output** | Qué funcionó y por qué | ¿Qué mejoró realmente? | Prueba propia verificable primero; cifras de proveedor como contexto, nunca como resultado Efeonce |
 
 ### 3.1 Capítulo 1 · Lo que tu IA no sabe
@@ -122,7 +123,30 @@ La tesis se desdobla en cinco tipos de contexto. Cada capítulo responde una pre
 - **Puente con el capítulo 4:** un agente de campaña recibe un job, contexto de marca aprobado y un supervisor;
   investigación y borradores no equivalen a permiso para publicar, enviar, cambiar audiencias o gastar medios.
 
-### 3.5.1 Ruta para marketing · descubrimiento afuera, trabajo adentro
+### 3.5.1 Extensión aprobada · Del output a la pieza
+
+**Entrada cultural:** «A nosotros tampoco nos gusta el AI Slop». **Nombre durable:** «Del output a la pieza».
+No es un capítulo 6: demuestra el capítulo 5 y hace visible el criterio humano-agente del capítulo 4.
+
+La posición no afirma que los modelos de Efeonce produzcan siempre una gran pieza en el primer intento. Pueden
+producir descartes porque generan salidas plausibles, no porque posean por sí solos criterio, verdad de negocio,
+autoridad de marca o responsabilidad de aprobación. La promesa es más precisa: **una generación mediocre no se
+confunde con trabajo terminado**. La frase rectora es **«El output fue generado. La pieza fue diseñada.»**
+
+La demostración explica seis contextos —negocio, marca, visual, producción, distribución y evidencia— y muestra un
+build completo: encargo, tesis, referencias/anti-referencias, técnica, pruebas, descartes diagnosticados, anchor,
+composición nativa por formato, finishing y QA. Los finales usan un registro cinematográfico/táctil; el proceso, uno
+forense/editorial con evidencia real. El muro de rechazados no ridiculiza al modelo: prueba que Efeonce sabe detectar,
+explicar y corregir lo que no merece representar a una marca.
+
+`Impacto visual`, `craft` y capacidad productiva se sostienen con el archivo y el método. Rendimiento, lift o impacto
+comercial requieren medición comparable. La extensión alimenta las ofertas Creative existentes; no crea una SKU
+«Anti-Slop», no autoriza publicación/pauta y no convierte una demostración en caso de resultados.
+
+Decisión completa, copy rector, sistema editorial, medición y límites:
+[CDR-003](../campaigns/decisions/CDR-003-tu-ia-no-conoce-del-output-a-la-pieza.md).
+
+### 3.5.2 Ruta para marketing · descubrimiento afuera, trabajo adentro
 
 Para una CMO, el problema no empieza en el CRM: (1) ¿qué responden hoy los motores sobre la marca y con qué
 precisión? (capítulo 3); (2) ¿qué estrategia, audiencia, oferta, voz y claims aprobados necesita el equipo para
@@ -181,7 +205,7 @@ exista una nueva SKU conjunta. Cada oferta conserva su alcance, estado comercial
 | 2 | Carrusel «El mismo cliente, tres versiones» | Retargeting a quienes interactuaron con 1 y 4 | Chequeo de salud de datos | 15 % |
 | 3 | Índice mensual de qué dicen los asistentes de IA sobre una categoría | Search y Microsoft Ads; ChatGPT Ads sólo en mercados habilitados (hoy no Chile) | Radiografía AEO | 20 % |
 | 4 | Serie «Así trabaja un equipo humano-agente»: un proceso, ficha de rol, excepción, supervisor y medición; variante de marketing con brief, claims y autoridad de publicación; contraste de proveedores sólo cuando ayuda a elegir | LinkedIn por job a operaciones, revenue, servicio **o CMO/Marketing Ops**; retargeting sólo con audiencia y consentimiento elegibles | Landing neutral del servicio verificada → conversación de fit → Blueprint o primer equipo; CMO puede entrar antes por AEO/campaña | 25 % orientativo, sin autorización de gasto |
-| 5 | Mismo prompt con y sin contexto de marca; timelapse de campaña | Meta/Instagram y LinkedIn a marketing | Sprint «Campaña en 5 días» · Kit de contexto de marca para IA | 15 % |
+| 5 | «Del output a la pieza»: build completo, descartes diagnosticados y Behind the Build; comparación con/sin contexto rotulada como demostración | Meta/Instagram y LinkedIn a marketing | Sprint «Campaña en 5 días» · Creative Diagnostic · Kit de contexto de marca para IA | 15 % |
 
 Piezas ya existentes en el calendario de contenidos de Notion que encajan: capítulo 3 («60 % de búsquedas sin clic»,
 «4 métodos para saber si la IA te recomienda», «Share of AI Voice»); capítulo 4 («Los 3 roles humanos del equipo
@@ -286,6 +310,8 @@ Detalle: [bitácora de producción](../operations/social/2026-09-17-kv-tu-ia-no-
 10. Readback de publicación del KV el 2026-09-21 (confirmar `PUBLISHED` y URL pública).
 11. Archivar la guía de marca de Google y validar el uso de Gigi 3D antes de pautar. Hoy su uso es **interno y
    orgánico**: Gigi es propiedad de Google, igual que Clawd lo es de Anthropic y Codex de OpenAI.
+12. Para «Del output a la pieza», inventariar un build publicable con permisos, provenance, referencias, descartes,
+    editables, QA y estados reales antes de seleccionar el caso hero o producir derivados.
 
 ## 10. Evidencia y estado de verificación (corte ampliado 2026-09-18)
 

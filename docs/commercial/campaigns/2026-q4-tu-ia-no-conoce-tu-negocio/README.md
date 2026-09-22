@@ -1,8 +1,9 @@
 # Brief operativo — «Tu IA no conoce tu negocio» · equipos y marketing
 
-> Estado: brief documental de lanzamiento, no calendario ni autorización para publicar/pautar · 2026-09-19.
+> Estado: brief documental de lanzamiento, no calendario ni autorización para publicar/pautar · actualizado 2026-09-22.
 > Canon de tesis y claims: [narrativa Q4–Q3](../../../strategy/EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md).
 > Oferta vigente: [Transformación de equipos humano-agente](../../../services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md), aprobada y probada por confirmación del operador; prueba pública por inventariar.
+> Carril provider-specific HubSpot: [RUTA_HUBSPOT.md](RUTA_HUBSPOT.md) + [CDR-004](../../../campaigns/decisions/CDR-004-tu-ia-no-conoce-carril-hubspot.md). Este brief es provider-neutral; ahí vive lo que nombra a HubSpot como oferta.
 
 ## Decisión de comunicación
 
@@ -12,6 +13,11 @@ marketing. En marketing, el capítulo 3 pregunta qué dice la IA de la marca hac
 construye una campaña propia y el 4 cómo trabajan personas y agentes hacia adentro. Son contextos con fuentes y
 permisos distintos. Dreamforce y UNBOUND son disparadores de conversación y fuentes sobre productos, no la idea ni
 la prueba de Efeonce.
+
+El capítulo 5 incorpora la extensión aprobada **«Del output a la pieza»**. No abre un capítulo 6, una campaña nueva,
+una franquicia ni una SKU. Usa la conversación sobre AI Slop para demostrar cómo contexto, dirección, producción y QA
+convierten output generativo en trabajo diseñado. Decisión canónica:
+[CDR-003](../../../campaigns/decisions/CDR-003-tu-ia-no-conoce-del-output-a-la-pieza.md).
 
 **Audiencias por trabajo:** COO/VP Service (calidad y excepciones), CRO/RevOps (pipeline y CRM), **CMO/Marketing Ops**
 (visibilidad, marca, campañas y autoridad de publicación), CIO/IT/Security (fuentes, permisos y reversibilidad),
@@ -68,6 +74,37 @@ trendjacking conservan sus líneas independientes.
   versión del artefacto, estado de producto (GA/beta/pilot/demo) y claim que realmente soporta. Si falla,
   publicar sólo el método con límites claros o mantener la pieza privada.
 
+### Extensión 5B · Del output a la pieza
+
+**Hook:** «A nosotros tampoco nos gusta el AI Slop». **Tesis:** «El output fue generado. La pieza fue diseñada».
+La posición aprobada distingue descarte de entrega: los modelos pueden producir resultados mediocres; Efeonce no
+promete un primer intento perfecto ni dice «no generamos AI Slop». Promete que una generación mediocre no será
+confundida con trabajo terminado.
+
+La pieza matriz debe mostrar un build completo y verificable:
+
+`encargo → seis contextos → tesis visual → referencias/anti-referencias → técnica → pruebas → descartes → anchor → formatos → composición exacta → finishing → QA → pieza`.
+
+Los seis contextos son negocio, marca, visual, producción, distribución y evidencia. Un prompt más largo no los
+sustituye. Cada operación declara qué herramienta decide y qué autoridad conserva una persona.
+
+**Prueba mínima:** un caso hero con al menos un descarte diagnosticado y su corrección; hasta tres cortes breves de
+identidad/continuidad, composición multiformato y still→motion. El muro de rechazados usa fallos reales con razón
+observable; nunca fabrica una versión mala para exagerar el contraste. Comparaciones con/sin contexto son
+demostraciones pedagógicas, no A/B tests ni evidencia causal.
+
+**Serie derivada:** el brief no es el prompt · por qué una sola herramienta no hizo la pieza · qué rechazamos y por
+qué · una imagen no son cuatro crops · por qué no generamos logos ni copy crítico · cómo sabemos que una pieza está
+lista.
+
+**Gramática:** finales cinematográficos/táctiles; proceso forense/editorial con capas, máscaras, referencias, crops,
+versiones y QA reales. No usar robots, cerebros luminosos, partículas, glows, interfaces holográficas, timelines o
+dashboards ficticios como shorthand de IA. Texto, logos, CTA y legales exactos se componen con sus assets y contratos.
+
+**Estados por activo:** `explorado → producido → revisado → aprobado → publicado → medido`. Ninguno implica el
+siguiente. `Impacto visual`, `craft` y capacidad productiva se prueban con el archivo/método; performance y negocio
+requieren datos comparables.
+
 ## Producción, distribución y medición
 
 | Decisión | Responsable funcional | Gate |
@@ -85,6 +122,10 @@ contarlas como la misma conversión. Guardrails: calidad del lead, rechazo/no-fi
 Sends, saves, dwell o visualizaciones se leen por canal con su propio denominador; no se suman como revenue.
 Sin baseline de tráfico y conversión no declarar uplift ni diseñar un A/B test clásico.
 
+Para «Del output a la pieza», medir además comprensión de la tesis, atribución a Efeonce, confianza en el criterio,
+interés por el build y conversaciones calificadas hacia una oferta Creative vigente. Cantidad de generaciones o
+exports no es éxito. CTA de trabajo: **«Tu equipo ya puede generar más. La pregunta es si puede diseñar mejor.»**
+
 ## Dependencias antes de ejecutar
 
 1. Inventariar evidencia de servicio ya prestado y permisos; no exigir «primera prueba» como si la oferta siguiera
@@ -98,3 +139,5 @@ Sin baseline de tráfico y conversión no declarar uplift ni diseñar un A/B tes
    lo representan con claridad; no crearlo en Notion, ni modificar el schema, sólo por este brief.
 5. Comprobar por readback el estado del KV paraguas programado para el 2026-09-21; `PENDING` no equivale a
    publicado. Este brief no lo reprograma, aprueba marcas de terceros ni altera piezas calendarizadas.
+6. Inventariar el caso hero de «Del output a la pieza»: permiso, provenance, versiones, descartes, editables, QA y
+   estado de cada salida. La aceptación del territorio no autoriza producción, publicación, pauta ni nueva oferta.

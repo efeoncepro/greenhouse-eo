@@ -57,3 +57,5 @@ Sólo `CDR-###` y `EPIC-CMP-###` tienen numeración propia.
 
 - [CDR-001](decisions/CDR-001-cmp001-always-on-q4-2026.md) · Accepted: ventana, seasonality y derechos declarados.
 - [CDR-002](decisions/CDR-002-cmp001-set-unico-produccion.md) · Proposed: acuerdo creativo Claude/Codex para pilotos; copy y fichas en OneDrive.
+- [CDR-003](decisions/CDR-003-tu-ia-no-conoce-del-output-a-la-pieza.md) · Accepted: extensión 5B «Del output a la pieza», posición anti-AI Slop, sistema de prueba y límites de claims.
+- [CDR-004](decisions/CDR-004-tu-ia-no-conoce-carril-hubspot.md) · Proposed: carril HubSpot de la narrativa; la unidad de producción es el dolor, no el Hub; gates de destino, partner y prueba.

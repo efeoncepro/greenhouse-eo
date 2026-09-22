@@ -1,0 +1,181 @@
+# CDR-004 · «Tu IA no conoce tu negocio»: el carril HubSpot
+
+**Estado:** `Proposed` · **Fecha:** 2026-09-22 · **Decide:** el operador · **Campaña:** narrativa Q4 2026–Q3 2027
+«Tu IA no conoce tu negocio» · **Ámbito:** carril provider-specific HubSpot sobre los cinco capítulos.
+
+## Contexto
+
+La narrativa canónica declara: **«No es una campaña de temporada ni una campaña de HubSpot»**. Al mismo tiempo,
+HubSpot es la práctica con mayor superficie comercial de Efeonce, tiene una arquitectura de oferta vigente de seis
+familias, un hub público con SSOT propio y el único caso de cliente publicado del período. Sin una decisión
+explícita, cada pieza vuelve a litigar qué se puede decir de HubSpot, y la narrativa se desliza hacia el catálogo
+de un proveedor.
+
+Este CDR no revierte la frase del canon. La precisa: **la narrativa es provider-neutral; el carril HubSpot es una
+de sus rutas de venta, no una campaña paralela**.
+
+**Estado verificado el 2026-09-22 (no inferido):**
+
+| Hecho | Medición |
+|---|---|
+| Capítulos 1 y 2 | Escritos en la narrativa, **sin brief operativo**; el capítulo 2 además sin cifra HubSpot verificada |
+| Destinos del hub `/servicios/hubspot/*` | **2 live** (pillar `200`, caso ANAM `200`) · **4 en `404`** (`/precios/`, `/agentes/`, `cuando-no-usar-hubspot`, `hubspot-vs-salesforce`) |
+| Estado de partnership HubSpot | «Partnership declarado por el CEO; estado contractual/tier **no revalidado** en este corte» (`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`) |
+| Prueba propia publicada | Caso ANAM Customer Agent, `/hubspot/ia-atencion-cliente-caso-anam/`, activo en producción confirmado 2026-09-13 |
+
+## Decisión
+
+### 1. Qué es y qué no es
+
+El carril HubSpot es la **ruta provider-specific** de la misma narrativa. Rige una regla de sujeto:
+
+> **El sujeto de una pieza es siempre el problema del comprador. HubSpot es el cómo, nunca el qué.**
+
+No se abre un capítulo nuevo, una franquicia editorial, una campaña paralela ni un segundo catálogo. No se produce
+una pieza cuyo sujeto sea un Hub, una feature o un anuncio de release: eso es contenido del proveedor, y el
+proveedor lo hace mejor y primero.
+
+### 2. La unidad de producción es el dolor, no el Hub ni la familia
+
+Cruzar cinco capítulos por seis familias produce treinta celdas y un catálogo. La unidad correcta ya existe y está
+validada: **los siete dolores del mapa del pillar**, escritos en el lenguaje del comprador. El capítulo los envuelve;
+la familia los vende.
+
+| Dolor (lenguaje del comprador) | Capítulo | Familia HubSpot | Comprador |
+|---|---|---|---|
+| «No sé cuánto pipeline tengo.» | 1 · Lo que tu IA no sabe | Sales & AI Pipeline (sobre Smart CRM) | CRO |
+| «Marketing y ventas miran números distintos.» | 2 · Lo que tu IA cree que es cierto | Data, Integration & CRM Intelligence | CMO + CRO |
+| «Mis datos están en cinco sistemas.» | 2 · Lo que tu IA cree que es cierto | Data, Integration & CRM Intelligence (Data Hub) | RevOps / IT |
+| «Nadie me encuentra, ni en Google ni en ChatGPT.» | 3 · Lo que la IA dice de ti | Marketing, Content & AEO | CMO |
+| «Mi postventa es invisible.» | 4 · Un equipo, no una herramienta | Service, Customer Success & Delivery | COO / CS |
+| «El directorio pidió IA.» | 4 · Un equipo, no una herramienta | Agent Hub & Agentic Operations | CEO |
+| «Cotizo en Word y pierdo margen.» | **sin capítulo** — ver §10 | Revenue Lifecycle | CFO |
+
+Una pieza resuelve **un dolor para un comprador**. No se fusionan dos dolores para «cubrir más».
+
+### 3. Tres registros de mención, y una pieza no cambia de registro entre canales
+
+| Registro | HubSpot aparece como | Uso | Gate |
+|---|---|---|---|
+| **Neutral** | no se nombra | Piezas que instalan la tesis del capítulo; sirven a cualquier stack. **Default del orgánico de marca.** | Ninguno adicional |
+| **Nombrado** | contexto o fuente | Cifra atribuida, anuncio como trigger de conversación, estado de producto. | Atribución explícita + estado GA/beta/demo correcto |
+| **Provider-specific** | la oferta que se compra | Venta del carril: casos, precios, agentes, destino al hub. | §6 completo |
+
+Una misma idea puede existir en dos registros como **piezas distintas**. Lo que no ocurre es que una pieza neutral
+se repostee como provider-specific agregando un logo.
+
+### 4. Mitigación del riesgo de lectura: mover la pregunta, no atacar la herramienta
+
+Los capítulos 1 y 2 preguntan qué no sabe la IA y quién revisa lo que el CRM entendió, **justo cuando HubSpot
+anuncia Smart CRM self-updating, Growth Context y Context Home como la solución**. Sin cuidado, la pieza lee como
+«HubSpot no sirve» — el mismo riesgo que el canon ya registró para el key visual con la mascota del partner.
+
+Fórmula obligatoria en todo el carril, en este orden:
+
+1. **Reconocer la capacidad nueva** como real y buena.
+2. **Nombrar la decisión que esa capacidad no toma** —fuentes, permisos, autoridad, corrección, dueño.
+3. **Ahí entra Efeonce.**
+
+El pillar ya tiene la versión validada de esta figura: HubSpot se autodenomina Agentic Customer Platform con tres
+capas, y **la tercera —decidir qué hacen los agentes solos y qué queda con humanos— la nombra y no la llena**.
+
+Queda prohibido el encuadre de carencia del producto: «tu CRM no se enteró», «HubSpot no te dice», «lo que tu
+plataforma te oculta». El cuello de botella se ubica en el contexto y la autoridad, no en la capacidad del partner.
+
+### 5. Herencia de la regla del vacío
+
+El carril hereda la regla §0 del hub: **Efeonce solo se cita donde HubSpot no puede o no quiere hablar, y donde ese
+vacío no esté ya lleno.** Aplicada a campaña, ordena la fuerza de las piezas:
+
+| Ángulo | ¿HubSpot no puede hablar? | ¿El vacío sigue vacío? | Fuerza |
+|---|---|---|---|
+| Cuándo **no** conviene HubSpot para este caso | jamás lo escribirán | vacío real | **la más fuerte** |
+| Cuánto cuesta de verdad, con créditos y seats | no publican sus trampas | vacío en español | fuerte, y la única con demanda medida |
+| Qué agente sirve para **tu** caso, qué cuesta y cómo se gobierna | cambia por release y portal | vacío, es nuevo | fuerte |
+| Qué hace un Hub o qué se anunció en UNBOUND | lo hacen mejor y primero | saturado | **no se produce** |
+
+Antes de declarar que una pieza llena un vacío, **medirlo**. Saturación no es vacío.
+
+### 6. Gates de claim de partner
+
+- **Ninguna pieza externa declara tier, nivel, badge ni categoría de partner HubSpot** hasta revalidar el estado
+  contractual. El registro dice «declarado por el CEO, no revalidado»; una declaración interna no es un derecho de uso
+  de marca. Revalidar tier, portal, certificaciones y derechos es prerrequisito de cualquier pieza provider-specific
+  pagada.
+- **Cifras de HubSpot siempre atribuidas** («según HubSpot») y nunca como resultado comprometido por Efeonce. Las
+  vigentes: 3,6× MQL, 3,2× deals, 2× tickets, 81 % más campañas, 2,2× leads, ~50 % menos tiempo de cierre. El
+  **capítulo 2 no tiene cifra verificada**: se apoya en método y casos, no se le presta una cifra de otro capítulo.
+- **Estados no equivalentes**, según la matriz de `HUBSPOT_FALL_2026_UNBOUND_RELEASES_2026-09-16.md`: ChatGPT Lead
+  Gen Ads y Scheduled Prompts como beta pública; Smart CRM self-updating, Growth Context, Context Home, Breeze
+  reconstruido y Marketing Studio como lanzamiento con disponibilidad por cuenta y plan; Agent Hub/Builder como
+  pilot-first; Customer Agent Voice, HubSpot Work y Agent CLI como first look o demo; Universal Record Page como
+  private beta. Una demo de evento no es GA, pricing ni runtime.
+- **Claims prohibidos** heredados del hub: «líder en CRM según Gartner» (es Challenger en el MQ de CRM Sales
+  Platforms 2026), Forrester Wave, ISO 27001 de HubSpot, residencia de datos en LATAM, «flota de agentes». Sí es
+  citable: Leader en B2B Marketing Automation (Gartner, 5.º año) y SOC 2 Type II + SOC 3.
+- **Nomenclatura 2026:** Revenue Hub, Data Hub, UNBOUND. HubSpot ya no se presenta como CRM.
+- **Salesforce** solo en orgánico de liderazgo de opinión, con tono de comparación y nunca en pauta.
+
+### 7. Destinos y conversión
+
+Medición del 2026-09-22: **el pillar y el caso ANAM responden `200`; `/precios/`, `/agentes/`,
+`cuando-no-usar-hubspot` y `hubspot-vs-salesforce` responden `404`.** Consecuencias vinculantes:
+
+- **Orgánico habilitado** en todo el carril, con destino al pillar, al caso ANAM o a conversación directa.
+- **Pauta bloqueada** hacia cualquier destino que no sea uno de los dos vivos. No se pauta hacia una URL prevista.
+- **`/precios/` es la palanca declarada del hub** (~1.500 búsquedas/mes medidas) y su `404` es el bloqueo número uno
+  del carril. Desbloquearla habilita más superficie de captura que cualquier pieza social adicional.
+- Antes de cada activación se vuelve a medir el código de respuesta. Una URL que estuvo viva no se asume viva.
+
+### 8. Prueba disponible y su límite
+
+- **Caso ANAM Customer Agent** — publicado, autorizado, con evidence ledger y estado vigente confirmado. Es la única
+  prueba de cliente publicable del carril; sostiene el dolor «mi postventa es invisible» y, parcialmente, «el
+  directorio pidió IA».
+- **Caso ANAM RevOps** — existe writing packet y spec, sin publicación autorizada en este corte. Hasta que la tenga,
+  no se cita en piezas externas.
+- **Sin caso, se publica el método con su límite.** Los capítulos 1, 2, 3 y 5 no heredan la prueba del 4.
+
+### 9. Medición
+
+Se mide **por dolor y por familia**, no por capítulo agregado: un capítulo alimenta ofertas distintas y sumarlas
+oculta cuál funcionó. Métrica primaria: conversaciones calificadas que llegan a evaluación inicial o a un modo de
+entrega pagado. La propiedad de campaña por capítulo en HubSpot es una escritura que requiere autorización y no se
+crea por este CDR.
+
+### 10. Los dos huecos que revela el cruce
+
+El cruce de §2 deja dos casillas sin par. Se declaran, no se rellenan por simetría:
+
+1. **«Cotizo en Word y pierdo margen» (Revenue Lifecycle, CFO) no tiene capítulo.** Es un dolor comercial vivo del
+   mapa del pillar que la narrativa del período no envuelve. Opciones: entra por la capa transversal «Resultados, no
+   output» por el lado de margen y costo, o se declara explícitamente fuera de la narrativa y se vende por el hub sin
+   envoltorio de campaña. **Pendiente de decisión del operador; hasta entonces no se le fabrica un capítulo.**
+2. **El capítulo 5 no tiene dolor equivalente en el mapa del pillar.** Marketing Studio y Campaign Agent viven en la
+   familia Marketing, Content & AEO, pero el dolor «producimos lento y todo se parece» pertenece al beachhead
+   Creative Velocity & Production. En el carril HubSpot el capítulo 5 entra **solo cuando el cliente ya opera en
+   HubSpot** y el problema es producción de campaña sobre ese stack; en cualquier otro caso es Creative, no HubSpot.
+
+## Alternativas descartadas
+
+- **Una campaña por familia de solución:** seis campañas simultáneas, seis presupuestos, seis medidas. Fragmenta la
+  narrativa y reproduce el catálogo que la arquitectura de oferta evitó.
+- **Una pieza por Hub:** ya descartado en la regla §0 del hub por razones de citabilidad; no mejora por mudarse a
+  social.
+- **Usar los anuncios de UNBOUND como sujeto de campaña:** envejece en un trimestre, regala el protagonismo al
+  proveedor y obliga a rehacer todo en el siguiente release.
+- **Declarar el carril como campaña independiente de la narrativa:** duplica territorio, compite por el mismo
+  presupuesto y rompe la razón por la que existe una plataforma narrativa única.
+- **Esperar a que el hub esté completo para producir:** el orgánico no depende de las cuatro páginas en `404`, y
+  esperar regala el trimestre de mayor atención del mercado.
+
+## Consecuencias y pendientes
+
+- El brief ejecutable del carril vive en
+  [`RUTA_HUBSPOT.md`](../../commercial/campaigns/2026-q4-tu-ia-no-conoce-tu-negocio/RUTA_HUBSPOT.md); este CDR fija el
+  criterio, el brief fija el trabajo.
+- Los capítulos 1 y 2 quedan con brief por primera vez; el 3, 4 y 5 conservan el suyo y aquí solo reciben el carril.
+- **Esta aceptación no autoriza producir, publicar, programar, pautar, crear propiedades en HubSpot ni declarar tier
+  de partner.**
+- Pendientes bloqueantes, en orden de impacto: revalidar el estado de partnership · desbloquear `/precios/` ·
+  decidir el hueco de Revenue Lifecycle · autorizar o archivar el caso ANAM RevOps.
