@@ -14,6 +14,7 @@ const edition = {
   periodTimeZone: 'America/Santiago',
   periodStartUtc: '2026-08-01T04:00:00.000Z',
   periodEndUtc: '2026-09-01T04:00:00.000Z',
+  request: { period: { start: '2026-08-01', endExclusive: '2026-09-01', timeZone: 'America/Santiago' } },
   issuedAt: '2026-09-03T12:00:00.000Z'
 } as never
 

@@ -112,7 +112,7 @@ describe('requestInsightRender', () => {
 
     expect(inserted.audience).toBe('client')
     expect(inserted.outputs[0]!.manifestHash).toMatch(/^[0-9a-f]{64}$/)
-    expect(inserted.outputs[0]!.catalogName).toBe('deck-axis')
+    expect(inserted.outputs[0]!.catalogName).toBe('insights-deck')
     // El catálogo NO se importa acá: se sella el input canónico y el worker resuelve (bundle de Vercel).
     expect((infra.publish.mock.calls as unknown as Array<[{ eventType: string }]>).map(c => c[0].eventType)).toEqual(['insights.render.requested'])
   })

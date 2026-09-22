@@ -34,7 +34,7 @@ import { getInsightReportById } from '../stores/report-store'
 import { getInsightEvidenceSnapshotByEdition } from '../stores/snapshot-store'
 
 import { INSIGHT_RENDER_CATALOG_BY_OUTPUT, INSIGHT_RENDERABLE_OUTPUTS, type InsightOutputRecord, type InsightRenderRunRecord } from './contracts'
-import { buildInsightDeckPlanInput } from './deck-mapper'
+import { buildInsightsDeckPlanInput } from './insights-deck-mapper'
 import { buildInsightReportPlanInput } from './report-mapper'
 import {
   cancelInsightRenderRun,
@@ -159,7 +159,7 @@ export const requestInsightRender = async (input: RequestInsightRenderInput): Pr
     const planInput =
       output === 'report_pdf'
         ? buildInsightReportPlanInput({ edition, report, plan: plan.plan, snapshot })
-        : buildInsightDeckPlanInput({ edition, report, plan: plan.plan, snapshot })
+        : buildInsightsDeckPlanInput({ edition, report, plan: plan.plan, snapshot })
 
     const manifest: Record<string, unknown> = { input: planInput as unknown as Record<string, unknown> }
 
