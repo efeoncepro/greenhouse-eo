@@ -59,3 +59,20 @@ Validar IDs únicos y referencias, conteos entre JSON/CSV/MD, rutas/bytes, carac
 Generar todas las vistas después de la última edición. Verificar enlaces y que cada perfil/configuración aparezca completo en el Markdown. Pruebas documentales no sustituyen revisión visual, live conversion, permisos ni activación. Reportar estados por separado.
 
 Ejemplo instanciado: CMP-001, 25 PNG + 3 MP4, 48 perfiles de copy y 72 alternativas. Fuentes/estado actual: [CDR-006](../campaigns/decisions/CDR-006-cmp001-manifiesto-copy-y-pauta.md) y [handoff](social/2026-09-22-cmp-001-campaign-brief-handoff.md). No convertir esos conteos ni países en defaults de campañas nuevas.
+
+
+## 6. Lanzamientos orgánicos derivados de assets paid
+
+Un asset puede compartirse; el permiso, copy, destino y estado pertenecen a cada publicación.
+Conservar el plan paid y un registro de lanzamiento explícito, enlazado desde sus vistas: no reemplazar todos
+los destinos de una campaña para resolver un lanzamiento. Para CMP-001, `LANZAMIENTO-GRADER.json` posee el copy
+de salida y `PROGRAMACION-GRADER-APROBADA.json` es el registro de ejecución existente equivalente a
+`EJECUCIONES-MCP.json`; no crear un segundo ledger con los mismos IDs. El handoff del caso enlazado arriba
+registra la programación y sus límites. Los videos del catálogo deben tener reproductor, controles y enlace
+alternativo, no sólo enlaces a MP4; cambiar el generador para conservarlo al regenerar.
+
+Preservar texto aprobado y anotar únicamente los cambios autorizados (p. ej. menciones). No sustituir su URL por
+otra landing o agregar UTM en silencio. La sintaxis de mención, el readback y la separación orgánico/paid viven en
+`social-media-studio/references/video-delivery-metricool.md`. Registrar nombre de cuenta, ID, zona, horario local/UTC,
+copy literal, media, portada, estado y evidencia. No inferir publicación por PENDING ni apertura de enlaces en bio
+por existir un caption con URL. No reintentar un post ya identificado sin leer su estado.

@@ -193,3 +193,32 @@ subirla mucho destruye el cierre, elevar ligeramente el inicio del lecho para al
 de la zona segura, con aire, manteniéndola visualmente al pie. No convertir el 90% ni la franja de v07 en preset.
 No agrandar de nuevo el lecho hasta comprimir la escena. Verificar ambos límites sobre el export y el preview
 del placement; esta instrucción no afirma que los exports históricos ya hayan sido recompuestos.
+
+## 🔴 El concepto completo no es opcional — y el compositor no lo verifica
+
+**Medido el 2026-09-22 en CMP-001.** Nueve piezas de MOFU y BOFU se compusieron y pasaron el gate con
+**sólo titular + beneficio + CTA + descriptor**: sin **entrada** y sin **remate**. El operador lo detectó
+mirando las piezas, no ninguna herramienta.
+
+**Por qué nada lo atrapó:** `componer-cta.mjs` resuelve la entrada y el remate con `if (s.lead)` y
+`if (s.after)`, así que su ausencia no es un error para el compositor — simplemente no los dibuja. El gate
+mide contraste y protección de sujeto, no completitud del concepto. **Una pieza incompleta sale verde.**
+
+🔴 **De dónde vino el error, que es lo que importa:** ante un «excesivo texto» del operador, el agente
+ofreció en una pregunta la opción «dominante + puente + CTA» y el operador la eligió. **La opción no era
+válida y el agente no la verificó contra este contrato antes de ofrecerla.** El exceso de texto se resuelve
+**acortando cada voz** (§Jerarquía punto 5: *ajustar copy, cortes, escala o composición*), nunca eliminando
+voces del concepto.
+
+✅ **Dos comprobaciones antes de dar una pieza por terminada:**
+
+1. **Cuenta las voces.** Concepto = entrada · titular · remate. Acción = beneficio · CTA · descriptor
+   (beneficio y descriptor sólo cuando aportan información; entrada y remate **no** son de ese grupo).
+2. **Lee el `ratioDominanteEntrada` del QA.** Restituir la entrada puede bajarlo sin que nada avise: el
+   compositor **achica el dominante solo** cuando no cabe en `dominantMax`, y ahí la jerarquía se aplana.
+   Medido en `mo3`: con el dominante de cuatro palabras el ratio cayó a **2,9** —bajo el mínimo de 3×, y a
+   2,8 el operador ya había rechazado una pieza—; acortarlo a tres palabras lo devolvió a **3,7**.
+
+**Propuesta de mecanismo (no implementada):** el gate podría exigir `lead` y `after` no vacíos salvo que la
+pieza declare explícitamente `conceptoReducido` con su razón, igual que hoy exige `surfaceToken` y
+`subjectProtection`.

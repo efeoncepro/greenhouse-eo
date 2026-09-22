@@ -2,33 +2,59 @@
   {
     "id": "mo1-canal-nuevo-916",
     "dominante": [
-      "−68% en tus clics pagados."
+      "−68% de clics."
     ],
-    "ratioDominanteEntrada": null,
+    "ratioDominanteEntrada": 3.9,
     "contraste": {
-      "dominante": 19.75,
-      "nota": 19.94,
+      "entrada": 19.72,
+      "dominante": 19.81,
+      "cierre-frase": 19.94,
+      "nota": 20.04,
       "cta": 10.99,
       "descriptor": 19.85,
       "logo": 15.29
     },
-    "gapsTinta": [],
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 17,
+        "ratioDominante": 0.121
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 17,
+        "ratioDominante": 0.121
+      }
+    ],
     "seleccion": null
   },
   {
     "id": "mo2-no-te-citan-916",
     "dominante": [
-      "+35% en tus clics orgánicos."
+      "+35% de clics."
     ],
-    "ratioDominanteEntrada": null,
+    "ratioDominanteEntrada": 3.9,
     "contraste": {
-      "dominante": 19.96,
-      "nota": 20.13,
+      "entrada": 20.07,
+      "dominante": 20.05,
+      "cierre-frase": 20.36,
+      "nota": 20.16,
       "cta": 11.12,
       "descriptor": 20.38,
       "logo": 13.73
     },
-    "gapsTinta": [],
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 17,
+        "ratioDominante": 0.121
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 17,
+        "ratioDominante": 0.121
+      }
+    ],
     "seleccion": {
       "selection": {
         "variant": "eight-handles",
@@ -57,65 +83,117 @@
   {
     "id": "mo3-no-creernos-916",
     "dominante": [
-      "48% ya trae respuesta."
+      "48% ya responde."
     ],
-    "ratioDominanteEntrada": null,
+    "ratioDominanteEntrada": 3.9,
     "contraste": {
-      "dominante": 19.38,
-      "nota": 19.57,
-      "cta": 10.68,
-      "descriptor": 19.49,
+      "entrada": 19.35,
+      "dominante": 19.4,
+      "cierre-frase": 19.71,
+      "nota": 19.58,
+      "cta": 10.73,
+      "descriptor": 19.58,
       "logo": 19.44
     },
-    "gapsTinta": [],
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 17,
+        "ratioDominante": 0.121
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 17,
+        "ratioDominante": 0.121
+      }
+    ],
     "seleccion": null
   },
   {
     "id": "mo1-canal-nuevo-169",
     "dominante": [
-      "−68% en tus clics pagados."
+      "−68% de clics."
     ],
-    "ratioDominanteEntrada": null,
+    "ratioDominanteEntrada": 3.5,
     "contraste": {
-      "dominante": 19.21,
-      "nota": 19.49,
+      "entrada": 19.32,
+      "dominante": 19.46,
+      "cierre-frase": 19.59,
+      "nota": 19.58,
       "cta": 10.85,
       "descriptor": 19.91,
       "logo": 7.09
     },
-    "gapsTinta": [],
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 13,
+        "ratioDominante": 0.116
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 13,
+        "ratioDominante": 0.116
+      }
+    ],
     "seleccion": null
   },
   {
     "id": "mo2-no-te-citan-169",
     "dominante": [
-      "+35% en tus clics orgánicos."
+      "+35% de clics."
     ],
-    "ratioDominanteEntrada": null,
+    "ratioDominanteEntrada": 3.5,
     "contraste": {
-      "dominante": 20.16,
+      "entrada": 20.49,
+      "dominante": 20.49,
+      "cierre-frase": 20.52,
       "nota": 20.19,
       "cta": 11.24,
-      "descriptor": 20.6,
+      "descriptor": 20.61,
       "logo": 13.1
     },
-    "gapsTinta": [],
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 13,
+        "ratioDominante": 0.116
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 13,
+        "ratioDominante": 0.116
+      }
+    ],
     "seleccion": null
   },
   {
     "id": "mo3-no-creernos-169",
     "dominante": [
-      "48% ya trae respuesta."
+      "48% ya responde."
     ],
-    "ratioDominanteEntrada": null,
+    "ratioDominanteEntrada": 3.5,
     "contraste": {
+      "entrada": 19.13,
       "dominante": 19.28,
-      "nota": 19.42,
-      "cta": 10.85,
-      "descriptor": 19.91,
+      "cierre-frase": 19.42,
+      "nota": 19.54,
+      "cta": 10.79,
+      "descriptor": 19.81,
       "logo": 15.84
     },
-    "gapsTinta": [],
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 13,
+        "ratioDominante": 0.116
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 13,
+        "ratioDominante": 0.116
+      }
+    ],
     "seleccion": null
   }
 ]

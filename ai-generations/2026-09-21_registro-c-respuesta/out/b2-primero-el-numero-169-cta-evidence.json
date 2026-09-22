@@ -77,14 +77,14 @@
         "direction": "north-west",
         "anchor": "end-center",
         "hotspot": {
-          "x": 694.984,
-          "y": 393.769
+          "x": 621.898,
+          "y": 398.899
         },
         "bounds": {
-          "left": 691.912,
-          "top": 390.697,
-          "right": 797.709,
-          "bottom": 499.608
+          "left": 618.826,
+          "top": 395.827,
+          "right": 724.623,
+          "bottom": 504.738
         },
         "touchesTarget": true
       }
@@ -95,21 +95,21 @@
   },
   "textBounds": {
     "left": 167.36,
-    "right": 654.6,
-    "top": 372.4290087329866,
-    "bottom": 415.1090087329866
+    "right": 581.5140000000001,
+    "top": 380.76,
+    "bottom": 417.03799999999995
   },
   "descriptorBounds": {
     "left": 143.36,
-    "right": 488.376,
-    "top": 460.44499999999994,
-    "bottom": 488.44499999999994
+    "right": 439.08799999999985,
+    "top": 461.374,
+    "bottom": 485.374
   },
   "surface": {
     "left": 143.36,
-    "top": 358.4290087329866,
-    "right": 678.6,
-    "bottom": 429.1090087329866
+    "top": 366.76,
+    "right": 605.5140000000001,
+    "bottom": 431.03799999999995
   },
   "variant": "outline",
   "colors": {

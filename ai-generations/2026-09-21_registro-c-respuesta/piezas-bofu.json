@@ -1,19 +1,19 @@
 [
   {
     "align": "left",
-    "top": 0.08,
+    "top": 0.05,
     "textWidth": 0.84,
     "leadFamily": "bricolage",
     "leadFill": "#ffffff",
-    "leadSize": 36,
-    "leadGap": 0.15,
-    "dominantSize": 176,
+    "leadSize": 32,
+    "leadGap": 0.12,
+    "dominantSize": 124,
     "dominantMax": 0.62,
     "dominantTracking": -0.02,
     "afterFamily": "poppins",
     "afterFill": "#ffffff",
-    "afterSize": 34,
-    "afterGap": 0.15,
+    "afterSize": 30,
+    "afterGap": 0.12,
     "label": null,
     "labelSize": 30,
     "labelStar": false,
@@ -23,9 +23,9 @@
     },
     "id": "b2-primero-el-numero",
     "plate": "plates/b2-primero-el-numero-45-plate.png",
-    "lead": null,
-    "dominant": "Primero el número.",
-    "after": null,
+    "lead": "Antes de cualquier propuesta.",
+    "dominant": "El número primero.",
+    "after": "Nunca **al revés**.",
     "subjectProtection": {
       "top": 544,
       "minClearance": 24
@@ -38,20 +38,20 @@
       "surfaceToken": "growthOnDark",
       "inkToken": "growthOnDark",
       "x": 0.07,
-      "gapAfterNote": 26,
+      "gapAfterNote": 18,
       "paddingX": 24,
       "paddingY": 14,
-      "fontSize": 40,
-      "descriptorSize": 28,
+      "fontSize": 36,
+      "descriptorSize": 25,
       "descriptorGap": 16,
       "cursorScale": 1.1
     },
     "note": {
-      "text": "Después la propuesta. Nunca al revés.",
-      "size": 34,
+      "text": "Te mostramos tu panel en la primera reunión.",
+      "size": 30,
       "x": 0.07,
       "width": 0.8,
-      "gapAfterClosure": 40
+      "gapAfterClosure": 30
     }
   }
 ]

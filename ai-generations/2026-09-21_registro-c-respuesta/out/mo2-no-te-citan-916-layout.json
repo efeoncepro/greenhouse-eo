@@ -9,49 +9,67 @@
   },
   "elements": [
     {
+      "id": "entrada",
+      "box": {
+        "left": 81,
+        "right": 601.538272,
+        "top": 296.96,
+        "bottom": 327.02
+      }
+    },
+    {
       "id": "dominante",
       "box": {
         "left": 81,
-        "right": 971.7968846306895,
-        "top": 337.92,
-        "bottom": 419.31992741793545
+        "right": 731.9018844444446,
+        "top": 344.02,
+        "bottom": 447.62
+      }
+    },
+    {
+      "id": "cierre-frase",
+      "box": {
+        "left": 81,
+        "right": 452.144,
+        "top": 464.62,
+        "bottom": 502.19000000000005
       }
     },
     {
       "id": "nota",
       "box": {
         "left": 80.64000000000001,
-        "right": 937.9199999999997,
-        "top": 459.31992741793545,
-        "bottom": 610.9599274179354
+        "right": 942.0980000000002,
+        "top": 532.19,
+        "bottom": 567.958
       }
     },
     {
       "id": "cta",
       "box": {
         "left": 104.64000000000001,
-        "right": 571.48,
-        "top": 646.9599274179354,
-        "bottom": 695.1839274179354
+        "right": 529.0400000000001,
+        "top": 599.958,
+        "bottom": 643.798
       }
     },
     {
       "id": "descriptor",
       "box": {
         "left": 80.64000000000001,
-        "right": 522.3599999999999,
-        "top": 735.248,
-        "bottom": 765.878
+        "right": 492.9119999999999,
+        "top": 682.862,
+        "bottom": 711.4499999999999
       }
     }
   ],
   "typography": {
     "lead": 36,
-    "dominant": 95.42781643368747,
+    "dominant": 140,
     "closure": 34,
-    "benefit": 40,
-    "cta": 44,
-    "descriptor": 30
+    "benefit": 34,
+    "cta": 40,
+    "descriptor": 28
   },
   "selection": {
     "selection": {
