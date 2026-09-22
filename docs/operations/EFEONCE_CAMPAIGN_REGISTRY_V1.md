@@ -102,6 +102,30 @@ el ad promete una cosa, el post otra, el correo una tercera, y el prospecto los 
 | **La medición** | incluido el **guardrail**, sin el cual se apagan piezas que funcionan |
 | **Los límites de uso** | derechos, mascotas de partner, autorizaciones pendientes |
 
+### 🔴 Recursos y recipe — y por qué NO puede ser «corre este comando»
+
+**Los agentes de la flota no comparten motor.** Unos producen imagen con la CLI de Greenhouse; otros tienen
+generación nativa y no la necesitan. **Una recipe escrita como una secuencia de comandos es inservible para
+la mitad de la flota** — y peor: empuja a quien no puede seguirla a improvisar el prompt, que es justo donde
+se pierde el resultado.
+
+**Por eso la recipe tiene tres capas y sólo una depende del agente:**
+
+| Capa | Qué incluye | ¿Varía? |
+|---|---|---|
+| **1 · Recursos** | referencia EXACTA del kit (ruta + `sha256`), ficha de escena, **prompt resuelto**, tokens, fuentes, plan de composición | **no** |
+| **2 · Contrato de resultado** | reservas, identidad fiel, cero letras en utilería, jerarquía 3×, contrastes, safe zones | **no** — se mide sobre la imagen |
+| **3 · Vía de producción** | CLI · motor nativo · otra | **sí** — se declara cuál se usó |
+
+🎯 **El prompt resuelto es el puente entre vías, y es el recurso más importante.** `foto:prompt` no arma un
+texto: **inyecta el bloque anti-IA, el de impacto, la palanca con sus marcadores, la reserva del formato y el
+aviso de derechos del partner**. Eso es lo que garantiza el resultado, y **es portable a cualquier motor**.
+🔴 **Un agente con motor propio no reescribe el prompt a mano: consume el resuelto.**
+
+⚠️ **La equivalencia entre vías no se asume: se demuestra con los gates**, que se aplican al **archivo**, no
+al método. Si una vía no puede pasar un gate, **eso es un hallazgo que se documenta** — no un gate que se
+omite.
+
 ### 🔴 Buying group — obligatorio en B2B
 
 **Nadie compra B2B solo:** el comité promedia **~11 stakeholders** *(referencia de industria, no medida en

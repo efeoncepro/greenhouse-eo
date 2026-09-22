@@ -69,6 +69,12 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    Record*, el ADR de las campañas) viven en `docs/campaigns/`. Regla: **con lifecycle → repo; criterio o
    entregable → OneDrive**, y nada en los dos lados. Un CDR se reconoce porque **si la campaña no existiera,
    la decisión no tendría sentido**; lo transversal sigue siendo ADR.
+   🎯 **Declara la RECIPE en tres capas, porque la flota no comparte motor:** (1) **recursos** —referencia
+   exacta del kit con `sha256`, ficha, **prompt resuelto**, tokens, plan de composición—; (2) **contrato de
+   resultado** —reservas, identidad fiel, cero letras, jerarquía 3×, contrastes—, que se mide **sobre la
+   imagen y no sobre el método**; y (3) **vía de producción**, la única que varía: declara cuál usaste.
+   🔴 **Si tienes motor propio, NO reescribas el prompt a mano: consume el `.prompt.txt` resuelto** — ahí es
+   donde viven el bloque anti-IA, la palanca y las reservas, y es portable a cualquier motor.
 
 ### Motor de IA: cómo elegir (as-of 2026-09-16)
 
