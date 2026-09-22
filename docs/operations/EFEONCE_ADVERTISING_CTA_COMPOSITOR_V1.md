@@ -169,19 +169,25 @@ etapa no está definida — está partida en dos campañas.
 
 Contrato del embudo: [`CDR-005`](../campaigns/decisions/CDR-005-cmp001-embudo-momento-y-accion.md).
 
-## 10. El acento del CTA no compite con la marca del partner que esté en cuadro
+## 10. El acento del CTA se elige por la atribución que se BUSCA, cuando hay un partner en cuadro
 
-**Hallazgo de CMP-002 (carril HubSpot), 2026-09-22.** Las siete piezas llevan el Sprocket de HubSpot como
-product placement, y el Sprocket es **naranja `#FF5C35`** — casi el mismo tono que `accentSurface` (`#ff6500`).
-Un CTA naranja en esa pieza no se lee como la acción de Efeonce: se lee como parte del producto del partner.
+**Hallazgo de CMP-002 (carril HubSpot), 2026-09-22, corregido por el operador el mismo día.** Las piezas
+llevan el Sprocket de HubSpot como product placement, y el Sprocket es **naranja `#FF5C35`**, casi el mismo
+tono que `accentSurface` (`#ff6500`). La primera lectura fue «un CTA naranja se le atribuye al partner» y el
+set se compuso en lima. El operador lo revirtió: *«en verde no se vincula tanto a HubSpot»*. En una campaña que
+**vende el servicio sobre HubSpot**, que la acción se asocie al partner es lo que se busca, no un riesgo.
 
-> **Regla: cuando hay una marca de tercero en cuadro, el acento del CTA se elige por CONTRASTE DE
-> ATRIBUCIÓN, no sólo por composición. El acento de Efeonce tiene que ser distinguible del color de esa
-> marca, o la acción se le atribuye al partner.**
+> **Regla: con una marca de tercero en cuadro, el acento del CTA se decide por la atribución que la pieza
+> BUSCA. Si la campaña vende el servicio sobre ese partner (carril HubSpot), el acento puede y debe
+> vincularse a su color. Si el partner aparece de paso en una pieza sobre la oferta propia de Efeonce, el
+> acento se diferencia de su color.** Se declara en el brief. No se deja al default del compositor: en
+> CMP-001 las MOFU llegaron a lima por el default, no por decisión.
 
-En CMP-002 eso resolvió el acento a **lima `growthOnDark`**, que además contrasta mejor que el naranja sobre
-los fondos oscuros de ese carril. En CMP-001 las piezas MOFU llegaron a lima **por el default del compositor**,
-no por decisión; con esta regla, la elección queda declarada.
+**Límite físico del naranja como texto, medido.** `#ff6500` tiene luminancia 0,306: sobre negro puro llega a
+7,1:1, pero pasa 4,5:1 sólo si el fondo bajo el texto tiene luminancia ≤ ~0,029. Un techo o muro gris oscuro
+ya no alcanza (CMP-002 KV-06: fondo p98 0,032 → 4,33:1). En `outline` se aplica la degradación canónica: **el
+borde queda naranja y la tinta pasa a `inkOnDark`**. Si la pieza exige texto naranja, se regenera el plate con
+ese fondo más oscuro; no se agrega scrim.
 
 Aplica a cualquier criatura o marca de partner en cuadro —Clawd naranja terracota, Codex azul, Gigi con su
 espectro completo— y se resuelve junto con las dos reglas de color que ya existen: la del portador por

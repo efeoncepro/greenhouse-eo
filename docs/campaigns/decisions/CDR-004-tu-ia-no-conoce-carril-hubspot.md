@@ -241,6 +241,18 @@ ni un nombre propio del catálogo que el comprador ya reconoce: HubSpot, Custome
 **Lo que se conserva de la §4:** reconocer la capacidad del partner sin atacarla. Ningún titular puede leerse
 como «HubSpot no sirve»; eso sigue siendo regla.
 
+## Delta 2026-09-22 (revisión del operador sobre el set compuesto)
+
+- **El CTA del carril va en naranja**, con contorno y texto naranja cuando el contraste lo permite. El lima se
+  descartó porque *«en verde no se vincula tanto a HubSpot»*: en un carril que vende el servicio sobre HubSpot,
+  la asociación con el partner es lo que se busca. Regla general y límite físico del naranja como texto en
+  `EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md` §10.
+- **El concepto del KV-07 es Hybrid Workforce**: personas y agentes de IA trabajando juntos, con el beneficio a
+  escala. Se nombra con su nombre de catálogo. Una cifra inventada («cuatro casos a la vez») no lo expresa y se
+  lee rara.
+- **Léxico chileno:** «sacar» se lee como «quitar». «Saca de HubSpot todo lo que ya pagaste» pasaba por
+  «retira de HubSpot»; se cambió a «Aprovecha».
+
 ## Alternativas descartadas
 
 - **Una campaña por familia de solución:** seis campañas simultáneas, seis presupuestos, seis medidas. Fragmenta la
