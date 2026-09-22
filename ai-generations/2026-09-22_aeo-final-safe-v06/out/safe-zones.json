@@ -1,0 +1,629 @@
+{
+  "method": "Bounds of all visible graphic pixels including cursor and descriptor plus official signature box evaluated against a separately declared editorial footer. Reels overlap is reported, never converted into a full platform PASS. Thresholds evaluated before rounding. Editorial profiles are explicit and are not official universal UI templates.",
+  "results": [
+    {
+      "id": "01-fuera-916",
+      "profile": "meta-fullscreen-conservative-v1",
+      "graphicBoundsNative": {
+        "left": 410,
+        "top": 275,
+        "right": 739,
+        "bottom": 489
+      },
+      "safeNative": {
+        "left": 75.28,
+        "top": 267.52,
+        "right": 828.08,
+        "bottom": 1086.8
+      },
+      "signatureBoundsExport": {
+        "left": 432,
+        "top": 1574,
+        "right": 648,
+        "bottom": 1625
+      },
+      "safeExport": {
+        "left": 87,
+        "top": 308,
+        "right": 950,
+        "bottom": 1248
+      },
+      "signatureContrast": 19.193306739726594,
+      "signatureEditorialBounds": {
+        "left": 87,
+        "top": 1498,
+        "right": 950,
+        "bottom": 1670
+      },
+      "signatureInsideReelsGuard": false,
+      "placementLimitation": "Firma editorial al pie como referencia Claude; fuera de la reserva conservadora de Reels. Puede solaparse con captions/controles. Preview del placement obligatoria antes de pauta; no certificación universal.",
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "01-fuera-169",
+      "profile": "feed-editorial-inset-v1",
+      "graphicBoundsNative": {
+        "left": 102,
+        "top": 108,
+        "right": 582,
+        "bottom": 448
+      },
+      "safeNative": {
+        "left": 41.800000000000004,
+        "top": 23.525000000000002,
+        "right": 1630.2,
+        "bottom": 917.475
+      },
+      "signatureBoundsExport": {
+        "left": 852,
+        "top": 984,
+        "right": 1068,
+        "bottom": 1035
+      },
+      "safeExport": {
+        "left": 48,
+        "top": 27,
+        "right": 1872,
+        "bottom": 1053
+      },
+      "signatureContrast": 19.34164761614972,
+      "signatureEditorialBounds": {
+        "left": 48,
+        "top": 27,
+        "right": 1872,
+        "bottom": 1053
+      },
+      "signatureInsideReelsGuard": true,
+      "placementLimitation": null,
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "02-reconoces-916",
+      "profile": "meta-fullscreen-conservative-v1",
+      "graphicBoundsNative": {
+        "left": 241,
+        "top": 275,
+        "right": 662,
+        "bottom": 474
+      },
+      "safeNative": {
+        "left": 75.28,
+        "top": 267.52,
+        "right": 828.08,
+        "bottom": 1086.8
+      },
+      "signatureBoundsExport": {
+        "left": 432,
+        "top": 1574,
+        "right": 648,
+        "bottom": 1625
+      },
+      "safeExport": {
+        "left": 87,
+        "top": 308,
+        "right": 950,
+        "bottom": 1248
+      },
+      "signatureContrast": 18.114476982934196,
+      "signatureEditorialBounds": {
+        "left": 87,
+        "top": 1498,
+        "right": 950,
+        "bottom": 1670
+      },
+      "signatureInsideReelsGuard": false,
+      "placementLimitation": "Firma editorial al pie como referencia Claude; fuera de la reserva conservadora de Reels. Puede solaparse con captions/controles. Preview del placement obligatoria antes de pauta; no certificación universal.",
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "02-reconoces-169",
+      "profile": "feed-editorial-inset-v1",
+      "graphicBoundsNative": {
+        "left": 102,
+        "top": 108,
+        "right": 566,
+        "bottom": 486
+      },
+      "safeNative": {
+        "left": 41.800000000000004,
+        "top": 23.525000000000002,
+        "right": 1630.2,
+        "bottom": 917.475
+      },
+      "signatureBoundsExport": {
+        "left": 852,
+        "top": 984,
+        "right": 1068,
+        "bottom": 1035
+      },
+      "safeExport": {
+        "left": 48,
+        "top": 27,
+        "right": 1872,
+        "bottom": 1053
+      },
+      "signatureContrast": 10.490749548915973,
+      "signatureEditorialBounds": {
+        "left": 48,
+        "top": 27,
+        "right": 1872,
+        "bottom": 1053
+      },
+      "signatureInsideReelsGuard": true,
+      "placementLimitation": null,
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "03-referencia-916",
+      "profile": "meta-fullscreen-conservative-v1",
+      "graphicBoundsNative": {
+        "left": 81,
+        "top": 275,
+        "right": 465,
+        "bottom": 463
+      },
+      "safeNative": {
+        "left": 75.28,
+        "top": 267.52,
+        "right": 828.08,
+        "bottom": 1086.8
+      },
+      "signatureBoundsExport": {
+        "left": 432,
+        "top": 1574,
+        "right": 648,
+        "bottom": 1625
+      },
+      "safeExport": {
+        "left": 87,
+        "top": 308,
+        "right": 950,
+        "bottom": 1248
+      },
+      "signatureContrast": 5.0141394737923655,
+      "signatureEditorialBounds": {
+        "left": 87,
+        "top": 1498,
+        "right": 950,
+        "bottom": 1670
+      },
+      "signatureInsideReelsGuard": false,
+      "placementLimitation": "Firma editorial al pie como referencia Claude; fuera de la reserva conservadora de Reels. Puede solaparse con captions/controles. Preview del placement obligatoria antes de pauta; no certificación universal.",
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "03-referencia-169",
+      "profile": "feed-editorial-inset-v1",
+      "graphicBoundsNative": {
+        "left": 102,
+        "top": 108,
+        "right": 628,
+        "bottom": 527
+      },
+      "safeNative": {
+        "left": 41.800000000000004,
+        "top": 23.525000000000002,
+        "right": 1630.2,
+        "bottom": 917.475
+      },
+      "signatureBoundsExport": {
+        "left": 852,
+        "top": 984,
+        "right": 1068,
+        "bottom": 1035
+      },
+      "safeExport": {
+        "left": 48,
+        "top": 27,
+        "right": 1872,
+        "bottom": 1053
+      },
+      "signatureContrast": 7.74126238793938,
+      "signatureEditorialBounds": {
+        "left": 48,
+        "top": 27,
+        "right": 1872,
+        "bottom": 1053
+      },
+      "signatureInsideReelsGuard": true,
+      "placementLimitation": null,
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "04-elegida-916",
+      "profile": "meta-fullscreen-conservative-v1",
+      "graphicBoundsNative": {
+        "left": 214,
+        "top": 275,
+        "right": 614,
+        "bottom": 493
+      },
+      "safeNative": {
+        "left": 75.28,
+        "top": 267.52,
+        "right": 828.08,
+        "bottom": 1086.8
+      },
+      "signatureBoundsExport": {
+        "left": 432,
+        "top": 1574,
+        "right": 648,
+        "bottom": 1625
+      },
+      "safeExport": {
+        "left": 87,
+        "top": 308,
+        "right": 950,
+        "bottom": 1248
+      },
+      "signatureContrast": 19.388077475995708,
+      "signatureEditorialBounds": {
+        "left": 87,
+        "top": 1498,
+        "right": 950,
+        "bottom": 1670
+      },
+      "signatureInsideReelsGuard": false,
+      "placementLimitation": "Firma editorial al pie como referencia Claude; fuera de la reserva conservadora de Reels. Puede solaparse con captions/controles. Preview del placement obligatoria antes de pauta; no certificación universal.",
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "04-elegida-169",
+      "profile": "feed-editorial-inset-v1",
+      "graphicBoundsNative": {
+        "left": 102,
+        "top": 108,
+        "right": 532,
+        "bottom": 589
+      },
+      "safeNative": {
+        "left": 41.800000000000004,
+        "top": 23.5,
+        "right": 1630.2,
+        "bottom": 916.5
+      },
+      "signatureBoundsExport": {
+        "left": 852,
+        "top": 984,
+        "right": 1068,
+        "bottom": 1035
+      },
+      "safeExport": {
+        "left": 48,
+        "top": 27,
+        "right": 1872,
+        "bottom": 1053
+      },
+      "signatureContrast": 17.768542397610478,
+      "signatureEditorialBounds": {
+        "left": 48,
+        "top": 27,
+        "right": 1872,
+        "bottom": 1053
+      },
+      "signatureInsideReelsGuard": true,
+      "placementLimitation": null,
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "01-fuera-45",
+      "profile": "feed-editorial-inset-v1",
+      "graphicBoundsNative": {
+        "left": 364,
+        "top": 53,
+        "right": 788,
+        "bottom": 313
+      },
+      "safeNative": {
+        "left": 28.05,
+        "top": 35.050000000000004,
+        "right": 1093.95,
+        "bottom": 1366.95
+      },
+      "signatureBoundsExport": {
+        "left": 432,
+        "top": 1237,
+        "right": 648,
+        "bottom": 1288
+      },
+      "safeExport": {
+        "left": 27,
+        "top": 34,
+        "right": 1053,
+        "bottom": 1316
+      },
+      "signatureContrast": 19.24507547312759,
+      "signatureEditorialBounds": {
+        "left": 27,
+        "top": 34,
+        "right": 1053,
+        "bottom": 1316
+      },
+      "signatureInsideReelsGuard": true,
+      "placementLimitation": null,
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "01-fuera-11",
+      "profile": "feed-editorial-inset-v1",
+      "graphicBoundsNative": {
+        "left": 429,
+        "top": 40,
+        "right": 858,
+        "bottom": 299
+      },
+      "safeNative": {
+        "left": 31.35,
+        "top": 31.35,
+        "right": 1222.6499999999999,
+        "bottom": 1222.6499999999999
+      },
+      "signatureBoundsExport": {
+        "left": 432,
+        "top": 984,
+        "right": 648,
+        "bottom": 1035
+      },
+      "safeExport": {
+        "left": 27,
+        "top": 27,
+        "right": 1053,
+        "bottom": 1053
+      },
+      "signatureContrast": 19.387179831133732,
+      "signatureEditorialBounds": {
+        "left": 27,
+        "top": 27,
+        "right": 1053,
+        "bottom": 1053
+      },
+      "signatureInsideReelsGuard": true,
+      "placementLimitation": null,
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "02-reconoces-45",
+      "profile": "feed-editorial-inset-v1",
+      "graphicBoundsNative": {
+        "left": 301,
+        "top": 53,
+        "right": 821,
+        "bottom": 312
+      },
+      "safeNative": {
+        "left": 28.05,
+        "top": 35.050000000000004,
+        "right": 1093.95,
+        "bottom": 1366.95
+      },
+      "signatureBoundsExport": {
+        "left": 432,
+        "top": 1237,
+        "right": 648,
+        "bottom": 1288
+      },
+      "safeExport": {
+        "left": 27,
+        "top": 34,
+        "right": 1053,
+        "bottom": 1316
+      },
+      "signatureContrast": 17.78664411795214,
+      "signatureEditorialBounds": {
+        "left": 27,
+        "top": 34,
+        "right": 1053,
+        "bottom": 1316
+      },
+      "signatureInsideReelsGuard": true,
+      "placementLimitation": null,
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "02-reconoces-11",
+      "profile": "feed-editorial-inset-v1",
+      "graphicBoundsNative": {
+        "left": 367,
+        "top": 40,
+        "right": 887,
+        "bottom": 299
+      },
+      "safeNative": {
+        "left": 31.35,
+        "top": 31.35,
+        "right": 1222.6499999999999,
+        "bottom": 1222.6499999999999
+      },
+      "signatureBoundsExport": {
+        "left": 432,
+        "top": 984,
+        "right": 648,
+        "bottom": 1035
+      },
+      "safeExport": {
+        "left": 27,
+        "top": 27,
+        "right": 1053,
+        "bottom": 1053
+      },
+      "signatureContrast": 18.504227599798664,
+      "signatureEditorialBounds": {
+        "left": 27,
+        "top": 27,
+        "right": 1053,
+        "bottom": 1053
+      },
+      "signatureInsideReelsGuard": true,
+      "placementLimitation": null,
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "03-referencia-45",
+      "profile": "feed-editorial-inset-v1",
+      "graphicBoundsNative": {
+        "left": 281,
+        "top": 53,
+        "right": 841,
+        "bottom": 301
+      },
+      "safeNative": {
+        "left": 28.05,
+        "top": 35.050000000000004,
+        "right": 1093.95,
+        "bottom": 1366.95
+      },
+      "signatureBoundsExport": {
+        "left": 432,
+        "top": 1237,
+        "right": 648,
+        "bottom": 1288
+      },
+      "safeExport": {
+        "left": 27,
+        "top": 34,
+        "right": 1053,
+        "bottom": 1316
+      },
+      "signatureContrast": 5.516317447118737,
+      "signatureEditorialBounds": {
+        "left": 27,
+        "top": 34,
+        "right": 1053,
+        "bottom": 1316
+      },
+      "signatureInsideReelsGuard": true,
+      "placementLimitation": null,
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "03-referencia-11",
+      "profile": "feed-editorial-inset-v1",
+      "graphicBoundsNative": {
+        "left": 347,
+        "top": 40,
+        "right": 907,
+        "bottom": 288
+      },
+      "safeNative": {
+        "left": 31.35,
+        "top": 31.35,
+        "right": 1222.6499999999999,
+        "bottom": 1222.6499999999999
+      },
+      "signatureBoundsExport": {
+        "left": 432,
+        "top": 984,
+        "right": 648,
+        "bottom": 1035
+      },
+      "safeExport": {
+        "left": 27,
+        "top": 27,
+        "right": 1053,
+        "bottom": 1053
+      },
+      "signatureContrast": 7.346868369924454,
+      "signatureEditorialBounds": {
+        "left": 27,
+        "top": 27,
+        "right": 1053,
+        "bottom": 1053
+      },
+      "signatureInsideReelsGuard": true,
+      "placementLimitation": null,
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "04-elegida-45",
+      "profile": "feed-editorial-inset-v1",
+      "graphicBoundsNative": {
+        "left": 340,
+        "top": 53,
+        "right": 788,
+        "bottom": 316
+      },
+      "safeNative": {
+        "left": 28.05,
+        "top": 35.050000000000004,
+        "right": 1093.95,
+        "bottom": 1366.95
+      },
+      "signatureBoundsExport": {
+        "left": 432,
+        "top": 1237,
+        "right": 648,
+        "bottom": 1288
+      },
+      "safeExport": {
+        "left": 27,
+        "top": 34,
+        "right": 1053,
+        "bottom": 1316
+      },
+      "signatureContrast": 18.177359375574497,
+      "signatureEditorialBounds": {
+        "left": 27,
+        "top": 34,
+        "right": 1053,
+        "bottom": 1316
+      },
+      "signatureInsideReelsGuard": true,
+      "placementLimitation": null,
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    },
+    {
+      "id": "04-elegida-11",
+      "profile": "feed-editorial-inset-v1",
+      "graphicBoundsNative": {
+        "left": 406,
+        "top": 40,
+        "right": 858,
+        "bottom": 303
+      },
+      "safeNative": {
+        "left": 31.35,
+        "top": 31.35,
+        "right": 1222.6499999999999,
+        "bottom": 1222.6499999999999
+      },
+      "signatureBoundsExport": {
+        "left": 432,
+        "top": 984,
+        "right": 648,
+        "bottom": 1035
+      },
+      "safeExport": {
+        "left": 27,
+        "top": 27,
+        "right": 1053,
+        "bottom": 1053
+      },
+      "signatureContrast": 18.3284064828274,
+      "signatureEditorialBounds": {
+        "left": 27,
+        "top": 27,
+        "right": 1053,
+        "bottom": 1053
+      },
+      "signatureInsideReelsGuard": true,
+      "placementLimitation": null,
+      "pass": true,
+      "preview": "local exclusion mask; not a live app screenshot"
+    }
+  ]
+}

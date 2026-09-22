@@ -186,6 +186,6 @@ CTA        acciona                       ← no explica
 Descriptor identifica la oferta          ← no repite el botón
 ```
 
-## Aplicación SEO/AEO Codex v05: perfil explícito, sin extrapolar Stories a Reels
+## Aplicación SEO/AEO Codex v06: la firma cierra al pie
 
-El caso previo de firma82–85% es una solución de Stories bajo su supuesto de interfaz, **no una certificación para Reels ads**. La campaña Codex v05 usa otra composición: reencuadra el lecho físico y conserva la firma completa antes del65%, debajo de su escena, con contraste medido. Perfil interno conservador x8–88%,y16–65%; no son coordenadas oficiales de LinkedIn. No aplicar un único perfil a todas las plataformas. Fuentes primarias, límites de preview y paquete final en [Tres voces + acción](../../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md#zonas-seguras-placement-y-promoción-a-finales--2026-09-22). La máscara diagnóstica es local; el gestor verifica el placement real antes de pautar.
+El operador rechazó la v05 con firma al 63% por quedar casi al centro. La v06 sigue la referencia visual de Claude: centro al 83,3%, lecho físico y contraste ≥4,5:1. Texto, CTA y cursor conservan ventana interna x=8–88%, y=16–65%. La firma editorial se evalúa por separado y queda fuera del guardrail inferior conservador de Reels; declarar el posible solapamiento y verificar el placement antes de pautar. **No elevar la firma al centro para optimizar un gate ni etiquetar toda la pieza como segura para Reels.** Canon y evidencia: [Tres voces + acción](../../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md#zonas-seguras-placement-y-promoción-a-finales--2026-09-22).

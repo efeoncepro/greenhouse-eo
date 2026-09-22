@@ -257,3 +257,11 @@ a 20%): `ai-generations/2026-09-20_identidad-julio-nexa/final/` y `final-20/`.
 
 El default de `componer.mjs` se alineó a `0.20` el 2026-09-20. `firmar.mjs` ya usaba `0.20`; se recomienda pasar
 `LOGO=0.20` explícito en cualquier receta para que la decisión quede visible.
+
+## Aplicación en fullscreen con interfaz — 22/09/2026
+
+La firma cierra al pie sobre lecho físico, con SVG oficial al 20% del lado corto y contraste ≥4,5:1.
+El operador rechazó la v05 al 63%: no subirla al centro para aprobar safe zones. La v06 sigue la referencia
+visual de Claude, centro al 83,3%. La firma puede quedar fuera del guardrail de Reels; declarar el riesgo
+por placement y verificar la preview real antes de pauta. Texto/CTA/cursor mantienen su ventana protegida.
+No añadir scrims. [Canon y limitaciones](../EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md#zonas-seguras-placement-y-promoción-a-finales--2026-09-22).

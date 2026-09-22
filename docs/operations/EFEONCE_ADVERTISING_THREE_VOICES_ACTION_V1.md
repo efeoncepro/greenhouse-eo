@@ -130,14 +130,14 @@ reservas ni promover el catálogo1:1. Mover elementos exige nueva medición.
 
 La reserva fotográfica y la zona segura de la interfaz son contratos diferentes: cumplir su intersección.
 **Un ratio no identifica un placement.** Registrar plataforma, superficie, tipo de medio y versión del perfil.
-En 9:16 proteger entrada, titular, CTA, descriptor, cursor completo, firma y detalle narrativo clave; no sólo
+En 9:16 proteger entrada, titular, CTA, descriptor, cursor completo y detalle narrativo clave; no sólo
 el origen Y del texto. Contraste alto no compensa oclusión por avatar, nombre, acciones, captions o CTA nativo.
 
-### Perfil aplicado a SEO/AEO v05
+### Perfil aplicado a SEO/AEO v06 — corrección de firma
 
 - `meta-fullscreen-conservative-v1`: ventana x=8–88%, y=16–65%; a1080×1920, límites conservadores
   x=87–950, y=308–1248. Reserva16% superior,35% inferior,8% izquierda y12% derecha. Son **márgenes internos
-  conservadores**, no coordenadas oficiales universales. Contenido clave dentro; fondo/escenografía pueden continuar fuera.
+  conservadores**, no coordenadas oficiales universales. Texto/CTA/cursor dentro; fondo/escenografía pueden continuar fuera. La firma tiene un criterio editorial separado, con la limitación de interfaz declarada abajo.
 - El35% inferior se apoya en la guía primaria de Meta Reels, p.4. Se aplica también a la versión compartida
   para Stories como guardia conservadora. Las rutas actuales del Ads Guide exigen login; no se afirma haber
   verificado cada variante live de interfaz. La preview del placement en Ads Manager sigue siendo el gate de tráfico.
@@ -145,12 +145,18 @@ el origen Y del texto. Contraste alto no compensa oclusión por avatar, nombre, 
   el recorte real y las especificaciones del destino. LinkedIn Single Image prioriza aquí4:5/1:1;9:16 es
   fuente para eventual video vertical, **no un PNG listo para publicarse como Video Ad**. No existe en las
   fuentes consultadas una banda porcentual universal de LinkedIn equiparable a Meta.
-- No dejar la firma debajo de la interfaz como solución por defecto. El centro93,5% es una receta de feed,
-  no una obligación para fullscreen. Reencuadrar la foto y subir su **lecho físico**, conservando SVG oficial,
-  ancho20%lado corto, contraste≥4,5:1 y desenfoque natural. No moverla sobre piel/pantalla ni añadir scrim.
-- Medir bounds completos de la capa gráfica y firma contra la ventana; revisar también sujeto, manos y objeto
-  principal. Exportar una preview **diagnóstica separada** con la máscara de exclusión, sin guías en el final.
-  Una máscara geométrica no es captura real de la app; no rotularla como validación live.
+- **La firma debe cerrar la composición al pie.** El operador rechazó expresamente la v05 con firma al
+  63%: cumplía el guardrail geométrico pero flotaba casi al centro. La v06 toma como referencia visual las
+  piezas de Claude: centro al 83,3%, sobre el lecho físico, SVG oficial al 20% del lado corto y contraste
+  ≥4,5:1. No elegir altura por el mayor contraste ni subirla al centro para aprobar un gate.
+- La franja editorial de firma es y=78–87% para esta ejecución, **no una safe zone oficial universal**.
+  No cumple el guardrail conservador inferior de Reels. Captions/controles pueden solaparla; registrar
+  esta limitación y revisar el placement real antes de pautar. No convertir esa excepción en un PASS
+  universal ni afirmar que una guía de Meta deja de incluir logos entre sus elementos clave.
+- Medir por separado la envolvente de texto/CTA/cursor y la firma. La máscara local muestra también la
+  firma fuera del guardrail de Reels: no esconderla ni alterar el guardrail para conseguir verde. Revisión
+  visual de jerarquía y cierre al pie prevalece sobre el número aislado. Si un placement exige mantener
+  todo dentro de otra ventana, producir una adaptación específica, sin subir automáticamente la firma.
 
 Fuentes revisadas22/09/2026: [Meta, Reels ads guide, p.4](https://d3m889aznlr23d.cloudfront.net/img/events/458925814/assets/e042d2be.reels_ads_guide1.pdf),
 [LinkedIn Single Image](https://www.linkedin.com/help/linkedin/answer/a426534/single-image-ads-advertising-specifications?lang=en-us)
@@ -169,7 +175,7 @@ comandos y dependencias, evidencia de contraste/safe areas, aprobación y limita
 hipótesis de uso, no rendimiento demostrado. TOFU/MOFU/BOFU describen función, no un embudo rígido ni una
 asignación automática del estilo de CTA.
 
-Caso y paquete: `ai-generations/2026-09-22_aeo-final-safe-v05/`; archivo OneDrive en
-`03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v05-Codex-safe-zones`. Su LEEME y matriz gobiernan qué se
+Caso y paquete: `ai-generations/2026-09-22_aeo-final-safe-v06/`; archivo OneDrive en
+`03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v06-Codex-firma-al-pie`. Su LEEME y matriz gobiernan qué se
 promovió, sus límites y cómo reproducirlo. Los prompts IA conservan trazabilidad; reproducir el gráfico
 es determinista, regenerar fotografía no garantiza los mismos píxeles.

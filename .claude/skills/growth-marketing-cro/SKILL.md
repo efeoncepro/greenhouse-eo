@@ -317,3 +317,13 @@ referrals, IDs de campaña o evidencia CRM cuando exista. Alcance correlacionado
 8. **Cero dark patterns.** Scarcity falsa, opt-out engañoso, roach motels: castigados
    por confianza, por regulación (FTC/Ley 21.719) y por deliverability. El growth de
    Efeonce es honesto por diseño (`ANTIPATTERNS.md`).
+
+## Paid Media: zonas seguras y handoff completo
+
+Cargar `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md`, §Zonas seguras, al adaptar o
+cerrar anuncios. Declarar placement además de ratio; proteger texto, CTA y cursor de la UI.
+La firma cierra al pie sobre lecho físico: no elevarla al centro para aprobar un gate. Medirla por separado,
+declarar cualquier solapamiento posible y revisar el placement; nunca resolverlo con scrim.
+Entregar concepto, audiencia, fase del embudo, hipótesis, progreso, CTA/destino y KPI junto con prompts,
+referencias, editables, comandos/dependencias y QA. Promover a Finales según autorización del operador;
+conservar pilotos y separar final creativo de tráfico/publicación y de resultados medidos.

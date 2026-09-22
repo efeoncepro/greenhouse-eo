@@ -1,0 +1,23 @@
+{
+  "id": "03-referencia-916",
+  "formato": "9:16",
+  "impacto": true,
+  "palanca": "proyeccion",
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    "polo-efeonce"
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the fine-grained graphite plaster of the real studio wall, naturally in deep even shadow",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "A very near real foreground object that ALREADY OCCUPIES THE ENTIRE LOWER 44 PERCENT, starting at 56 percent down the frame, not merely at the bottom: the very near pale review table seen in the edit target, optically defocused across the bottom",
+    "tono": "near white softly defocused physical tabletop, with no dark seams in the signature area; IMPORTANT extend this same foreground upward to 56 percent of frame height so the whole lower 44 percent is empty and softly blurred"
+  },
+  "escena": "Edit ONLY the physical foreground table: move this very near table closer to the camera and higher in the composition so its soft white surface already covers the WHOLE width by 58 percent image height, about y970 on this image. The entire lower42 percent must be the same nearly-white optically defocused real tabletop. Keep the upper scene, Nexa face, hands, tablet and projection EXACTLY as in the attached target. Do not move those objects. No logos or text. This is a natural camera occlusion by the same physical table, not an added panel or scrim. Its center between61 and65 percent image height must be pale and smooth, without dark seams or body edges."
+}

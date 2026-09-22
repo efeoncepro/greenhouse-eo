@@ -314,3 +314,13 @@ La **capa de composición gráfica** sobre la foto (tipografía, jerarquía, cur
 ## Adaptaciones Paid Media
 
 Cuando el brief sea Paid Media multiformato, aplicar la matriz del canon **Tres voces + acción**: 4:5, 1:1, 9:16 y 16:9 por concepto, salvo exclusión explícita. Resolver reservas y foto nativas para cada ratio, conservar identidad/manos/pantallas al editar y pasar QA individual. No convertir un recorte o un resize en evidencia de composición validada. El QA local 1:1 no cambia el estado global de validación del catálogo.
+
+## Paid Media: zonas seguras y handoff completo
+
+Cargar `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md`, §Zonas seguras, al adaptar o
+cerrar anuncios. Declarar placement además de ratio; proteger texto, CTA y cursor de la UI.
+La firma cierra al pie sobre lecho físico: no elevarla al centro para aprobar un gate. Medirla por separado,
+declarar cualquier solapamiento posible y revisar el placement; nunca resolverlo con scrim.
+Entregar concepto, audiencia, fase del embudo, hipótesis, progreso, CTA/destino y KPI junto con prompts,
+referencias, editables, comandos/dependencias y QA. Promover a Finales según autorización del operador;
+conservar pilotos y separar final creativo de tráfico/publicación y de resultados medidos.

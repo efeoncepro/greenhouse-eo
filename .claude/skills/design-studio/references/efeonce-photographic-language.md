@@ -611,3 +611,11 @@ Para convertir los registros A/B/C en anuncios, cargar
 La hipótesis publicitaria se declara en el brief y se traduce a una palanca fotográfica admitida por el
 compilador; no cambia identidad, colorimetría, reservas ni aprobación del registro C. Comparar estático,
 video o híbrido con métricas propias del formato. La calidad cinematográfica no acredita performance.
+
+## Firma en fullscreen 9:16 y UI de plataforma
+
+La altura de firma de feed no es universal. Texto, CTA y puntero respetan la intersección de reserva
+fotográfica y zona segura. La firma debe cerrar al pie sobre el lecho físico; no subirla al centro para
+satisfacer un guardrail. El operador rechazó la v05 al 63% y señaló como referencia la firma baja de Claude.
+La v06 usa centro 83,3%, SVG oficial y contraste ≥4,5:1. Es un criterio editorial, no certificación Reels:
+registrar el posible solapamiento y revisar el placement real. Ver §Zonas seguras de Tres voces + acción.

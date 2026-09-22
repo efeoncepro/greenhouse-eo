@@ -16,7 +16,10 @@ Codex/Claude; excepción acotada al relleno CTA sobre foto, sin scrims. Color a 
 tinta/borde/relleno medidos por separado. v04 completa16 pilotos:4conceptos×4:5/1:1/9:16/16:9,
 composición/contraste16/16 y firma≥5,52:1; arnés fotográfico genérico con límites explícitos.
 Prompts, editables, matriz y evidencia en OneDrive; cobertura de cuatro ratios documentada en skills espejo.
-Sin cambios runtime ni publicación.
+v05 recompuso los cuatro verticales; el operador rechazó la firma alta. v06 la baja al pie según Claude,
+con texto/CTA protegidos y posible solapamiento de firma en Reels declarado; QA separado.
+16 finales autorizados en OneDrive, con conceptos/embudo, prompts, editables y reproducción; sin publicación.
+Sin cambios runtime.
 
 ## 2026-09-21 — Paid visual: palancas, cinematic ads y medición por formato
 

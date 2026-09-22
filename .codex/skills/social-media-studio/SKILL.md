@@ -314,3 +314,13 @@ Para elegir **video o estático** en una seasonality, aplicar
 `efeonce/SEASONAL_CONTENT.md` → «Elegir video o estático por el mecanismo creativo»: transformación temporal
 frente a asociación inmediata, funciones complementarias y evaluación comparable sin promesas de rendimiento.
 El criterio de formato es transferible; el ejemplo y los activos Efeonce no se trasladan a otras marcas.
+
+## Paid Media: zonas seguras y handoff completo
+
+Cargar `docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md`, §Zonas seguras, al adaptar o
+cerrar anuncios. Declarar placement además de ratio; proteger texto, CTA y cursor de la UI.
+La firma cierra al pie sobre lecho físico: no elevarla al centro para aprobar un gate. Medirla por separado,
+declarar cualquier solapamiento posible y revisar el placement; nunca resolverlo con scrim.
+Entregar concepto, audiencia, fase del embudo, hipótesis, progreso, CTA/destino y KPI junto con prompts,
+referencias, editables, comandos/dependencias y QA. Promover a Finales según autorización del operador;
+conservar pilotos y separar final creativo de tráfico/publicación y de resultados medidos.

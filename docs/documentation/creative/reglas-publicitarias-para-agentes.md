@@ -80,3 +80,7 @@ Manual: [usar reglas publicitarias con agentes](../../manual-de-uso/creative/usa
 ## Entrega Paid Media en cuatro ratios
 
 Por defecto, preparar cada key visual en **4:5, 1:1, 9:16 y 16:9**. Cuatro conceptos son dieciséis exports; si el brief excluye alguno, dejarlo explícito. Recomponer foto y tipografía por formato y revisar CTA, puntero, personaje, lecho/firma y contraste mínimo en cada export. Entregar la matriz concepto×ratio con editables, prompts y QA en Pilotos. Es cobertura interna; antes de pautar se verifican specs y safe areas de cada placement.
+
+## Safe areas y paquete final
+
+Aplicar el canon Tres voces + acción, §Zonas seguras: placement y medio explícitos; UI fuera de texto/CTA/cursor/firma, con foto reencuadrada si el lecho queda tapado. Export limpio más máscara QA separada. Entregar concepto, audiencia, fase de embudo, hipótesis, CTA/destino, KPI, prompts/referencias, editables, comandos/dependencias y hashes. El operador autorizó promover la campaña SEO/AEO ajustada a Finales; conservar Pilotos. Final creativo no equivale a publicación ni a validación live del placement.

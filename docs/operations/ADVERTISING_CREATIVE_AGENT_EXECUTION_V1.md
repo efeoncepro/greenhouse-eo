@@ -222,3 +222,7 @@ fuga, release Greenhouse y readback del front door; no ocurre por publicar esta 
 
 Manual diario: [usar reglas publicitarias con agentes](../manual-de-uso/creative/usar-reglas-publicitarias-con-agentes.md).
 Descripción funcional: [reglas publicitarias para agentes](../documentation/creative/reglas-publicitarias-para-agentes.md).
+
+## Safe areas y paquete final
+
+Aplicar el canon Tres voces + acción, §Zonas seguras: placement y medio explícitos; UI fuera de texto/CTA/cursor/firma, con foto reencuadrada si el lecho queda tapado. Export limpio más máscara QA separada. Entregar concepto, audiencia, fase de embudo, hipótesis, CTA/destino, KPI, prompts/referencias, editables, comandos/dependencias y hashes. El operador autorizó promover la campaña SEO/AEO ajustada a Finales; conservar Pilotos. Final creativo no equivale a publicación ni a validación live del placement.
