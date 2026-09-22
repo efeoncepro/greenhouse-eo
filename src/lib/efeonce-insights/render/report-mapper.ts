@@ -165,14 +165,14 @@ const chapterPages = (
   const running = { runningChapter: chapterLabel, runningPeriod: periodLabel }
   const claims = chapter.claims.map(c => c.text)
 
-  if (claims.length === 0) {
-    throw new InsightsRenderRejectedError(
-      `El capítulo "${chapter.chapterId}" no tiene ninguna afirmación. Una página sin afirmación no dice nada ` +
-        'y no se compone: el plan debe corregirse, no el render.'
-    )
-  }
+  // Un capítulo SIN afirmaciones no bloquea el informe ni desaparece: se narra con su título y la
+  // ausencia queda dicha. Bloquear habría contradicho la regla que este catálogo defiende —el
+  // capítulo sin datos se cuenta, no se omite— y además es un caso REAL: el plan de una edición con
+  // un módulo sin hallazgos llega así, y el deck lo compone sin problema. Lo encontró el canary con
+  // datos reales, no los tests: los fixtures siempre traían al menos una afirmación.
+  const [headline, ...rest] =
+    claims.length > 0 ? claims : [chapter.title, 'Esta sección no registró hallazgos en el período.']
 
-  const [headline, ...rest] = claims
   const pages: Omit<CompositionSlideInput, 'slideId'>[] = []
 
   for (const chart of chapter.charts) {

@@ -138,10 +138,22 @@ describe('buildInsightReportPlanInput', () => {
     expect(() => buildInsightReportPlanInput({ edition, report, snapshot, plan: withLong })).toThrow(/No se recorta/)
   })
 
-  it('rechaza un capítulo sin ninguna afirmación', () => {
-    expect(() => buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ chapters: [chapter({ claims: [] })] }) })).toThrow(
-      /no tiene ninguna afirmación/
-    )
+  it('un capítulo SIN afirmaciones se narra con su título, no bloquea el informe', () => {
+    // Caso real: una edición con un módulo sin hallazgos llega con el capítulo vacío. Bloquear
+    // contradecía la regla del catálogo —el capítulo sin datos se cuenta, no se omite— y el deck
+    // compone ese mismo plan sin problema. Lo encontró el canary con datos reales.
+    const pages = buildInsightReportPlanInput({
+      edition,
+      report,
+      snapshot,
+      plan: plan({ chapters: [chapter({ claims: [] })] })
+    }).slides
+
+    const narrative = pages.find(p => p.contentType === 'report-narrative')
+
+    expect(narrative).toBeDefined()
+    expect((narrative!.slots as { assertion: string }).assertion).toBe('Visibilidad orgánica')
+    expect((narrative!.slots as { paragraphs: string[] }).paragraphs[0]).toMatch(/no registró hallazgos/)
   })
 
   it('emite una página analítica cuando la figura tiene hechos medibles', () => {
