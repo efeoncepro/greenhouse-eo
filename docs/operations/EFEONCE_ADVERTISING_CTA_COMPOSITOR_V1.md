@@ -166,3 +166,46 @@ etapa no está definida — está partida en dos campañas.
 | `mo3` | No tienes que creernos. | `Mira cómo lo medimos` | Panel competitivo · SEO + AEO |
 
 Contrato del embudo: [`CDR-005`](../campaigns/decisions/CDR-005-cmp001-embudo-momento-y-accion.md).
+
+## 10. El acento del CTA no compite con la marca del partner que esté en cuadro
+
+**Hallazgo de CMP-002 (carril HubSpot), 2026-09-22.** Las siete piezas llevan el Sprocket de HubSpot como
+product placement, y el Sprocket es **naranja `#FF5C35`** — casi el mismo tono que `accentSurface` (`#ff6500`).
+Un CTA naranja en esa pieza no se lee como la acción de Efeonce: se lee como parte del producto del partner.
+
+> **Regla: cuando hay una marca de tercero en cuadro, el acento del CTA se elige por CONTRASTE DE
+> ATRIBUCIÓN, no sólo por composición. El acento de Efeonce tiene que ser distinguible del color de esa
+> marca, o la acción se le atribuye al partner.**
+
+En CMP-002 eso resolvió el acento a **lima `growthOnDark`**, que además contrasta mejor que el naranja sobre
+los fondos oscuros de ese carril. En CMP-001 las piezas MOFU llegaron a lima **por el default del compositor**,
+no por decisión; con esta regla, la elección queda declarada.
+
+Aplica a cualquier criatura o marca de partner en cuadro —Clawd naranja terracota, Codex azul, Gigi con su
+espectro completo— y se resuelve junto con las dos reglas de color que ya existen: la del portador por
+variante (§ abajo) y la de degradación por contraste.
+
+### El portador del acento cambia por variante — y el gate lo verifica
+
+**Verificado en `componer-cta.mjs:638` por la sesión «Ads con lenguaje fotográfico Efeonce», 2026-09-22.**
+En `variant: 'text'` el rect **no se dibuja**, así que `surfaceToken` es un campo **inerte**:
+
+| Variante | Quién porta el acento | Qué se degrada si falla el contraste |
+|---|---|---|
+| `solid` | el **relleno** (`surfaceToken`) | la tinta (`inkToken`, a `inkOnLight`) |
+| `outline` | el **borde** (`surfaceToken`) | la tinta |
+| `text` | **la tinta** (`inkToken`) — no hay superficie | **nada: aquí degradar la tinta ES apagar el acento** |
+
+🔴 **Consecuencia medida:** `03-referencia` de `aeo-cta-v03` (text + `inkOnDark`) **no tiene acento**. Es el
+contraejemplo, no el ejemplo — y una sesión dedujo de ahí la regla inversa («el acento siempre va en la
+superficie») y compuso seis piezas sin color con el gate en verde.
+
+**Por qué el gate no lo veía, y por qué se cerró ahí:** `foto:cta:gate` sólo medía contraste, y **el contraste
+mejora cuanto más neutro es el color**. Ante cada fallo, la corrección que el gate premiaba era quitar más
+acento: la métrica y la regla apuntaban en direcciones opuestas. Hoy el gate valida el portador **por
+variante**, no exige declarar el token —la ausencia resuelve a lima, que es acento válido, y exigirla rompía
+planes aprobados— y **falla con cero piezas evaluadas**, porque recorría el `qa.json` de la última corrida y
+bendecía un plan que nadie había compuesto.
+
+**Y si el acento no alcanza el mínimo, se regenera el plate.** No se cambia de variante para esquivar la
+medición: eso apaga el color. Es la misma regla que el canon fotográfico aplica al scrim.
