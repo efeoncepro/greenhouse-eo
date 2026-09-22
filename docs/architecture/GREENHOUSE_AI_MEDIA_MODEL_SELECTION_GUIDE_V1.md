@@ -62,7 +62,7 @@ Formato: *si necesitas X → usa Y · por qué · alternativa · qué evitar*.
 |---|---|---|
 | Un raster final para marca, UI, pieza editorial o edición con máscara | `pnpm ai:image` (OpenAI) | Máscara real, transparencia plena en 2.5, #1–#2 en Arena/AA [tercero] |
 | Materialidad, atmósfera, look development, lotes baratos, capas editables | `pnpm ai:fal` (Seedream 5) | Rango de aspecto 1/16–16, Lite a USD 0,035, único con layerize [oficial] |
-| Modelos propios de Higgsfield (SOUL 2, Marketing Studio) o familias que fal no expone (Ideogram 4.0, Qwen Image 3, Z-Image, PixVerse 6, LTX 2.5, Happy Horse, Kling 3.0/Omni/O3, Grok Imagine) | `pnpm ai:fal --capability hf-*` (Higgsfield API) | Precio exacto por API antes de encolar [contrato]; **ninguna generación real verificada: la cuenta de API no tiene créditos** (§5.8) |
+| Modelos propios de Higgsfield (SOUL 2, Marketing Studio) o familias que fal no expone (Ideogram 4.0, Qwen Image 3, Z-Image, PixVerse 6, LTX 2.5, Happy Horse, Kling 3.0/Omni/O3, Grok Imagine) | `pnpm ai:fal --capability hf-*` (Higgsfield API) | Precio exacto por API antes de encolar [contrato]; **sólo 1 de 44 verificada en real** (`hf-zimage-turbo`, 2026-09-17); las demás tienen precio y esquema validados pero **no salida**. Los créditos ya se cargaron [verificado 2026-09-22] (§5.8) |
 | Vectores reales (SVG) | Recraft V4.1 vía Higgsfield CLI | GPT Image y Seedream son raster [contrato]; **hoy sin sesión** (§8). El Recraft de la **API** de Higgsfield (`hf-recraft41`): SVG **sin confirmar** (§5.8) |
 | Nano Banana 2 / Pro | Google directo (Vertex) | [decisión] nunca por fal; no hay CLI (§10) |
 
@@ -885,7 +885,7 @@ Canon del flujo híbrido: skill `greenhouse-ai-image-generator`, referencia `see
 
 | Brecha | Efecto | Mitigación |
 |---|---|---|
-| Cuenta de API sin créditos (`403 not_enough_credits`) | Ninguna generación real verificada | Recargar en console.higgsfield.ai/billing y verificar una generación por familia (anotar `verifiedAt`) |
+| Carril Higgsfield casi sin verificar en real | **1 de 44** con `verifiedAt` (`hf-zimage-turbo`, 2026-09-17, USD 0,015). Los créditos **ya se cargaron**: el `403 not_enough_credits` dejó de ser el bloqueo [verificado 2026-09-22] | Verificar **por CAPACIDAD, no por familia** — una generación exitosa verifica su capacidad y nada más (así lo declara `higgsfield-capabilities.ts`). Las otras 43 tienen sólo `estimateVerifiedAt`, que prueba acceso, esquema y precio, **no la salida** |
 | Sin API de saldo documentada | `--balance` no muestra monto | Consola del proveedor |
 | Seedance/Wan 3.0: la estimación devuelve fórmula | La CLI calcula una cota antes de descuento | Si falta la duración de un video remoto de entrada, pide `--yes` |
 | Validador local = subconjunto de JSON Schema | Lo no cubierto lo rechaza la estimación (sin cobrar) | Mensaje del proveedor en inglés en ese caso |

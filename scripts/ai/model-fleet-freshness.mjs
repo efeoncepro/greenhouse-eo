@@ -96,8 +96,13 @@ const falla = sinFicha.length > 0 || vencidas.length > 0 || sinFecha.length > 0
 if (!falla) console.log('  ✓ flota cubierta y dentro de ventana\n')
 
 console.log('  ALCANCE — este gate mide SÓLO el carril fal de `src/lib/ai/fal-capabilities.ts`.')
-console.log('           NO mide el carril Higgsfield (`src/lib/ai/higgsfield-capabilities.ts`, ~44 endpoints)')
-console.log('           ni los modelos de `pnpm ai:image`. Un verde acá no es un verde de toda la flota.\n')
+console.log('           NO mide el carril Higgsfield (44 capacidades) ni los modelos de `pnpm ai:image`.')
+console.log('           Un verde acá NO es un verde de toda la flota.')
+console.log('           Higgsfield NO se mide por el PARSER, no por falta de datos [medido 2026-09-22]:')
+console.log('           sí tiene relojes (`verifiedAt` 1/44 · `estimateVerifiedAt` 44/44 · snapshot de esquemas),')
+console.log('           pero declara sus capacidades con una factory posicional — `capability(id, endpoint, …)` —')
+console.log('           y las regex de acá asumen objeto literal, así que dan CERO matches. Apuntar el gate a ese')
+console.log('           archivo abortaría con FATAL, no daría un falso verde.\n')
 
 if (falla && strict) {
   console.error('FATAL: la flota tiene huecos de cobertura o datos vencidos. Revalida contra el proveedor')
