@@ -1,0 +1,23 @@
+{
+  "id": "KV-04-criterio-v02",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "quien-sostiene",
+  "atmosfera": "bruma",
+  "identidad": [{ "persona": "nexa", "vista": "busto" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "frente-cuerpo-b" },
+    { "objeto": "sprocket-hubspot", "vista": "lateral" }
+  ],
+  "escena": "SCENE (revenue operations room at night, Santiago): the INVERSION is the point — Nexa is razor sharp and completely still, and the system that is doing the work is a soft blur. Behind and beside her a wall of glowing cool blue displays refreshes itself, rows sliding and repopulating, all of it far out of focus and reduced to streaks of blue light. She is almost frontal to the lens in a navy piqué polo, eyes turned down-right, not touching anything: she is the one deciding, not the one operating. She has just stopped: her hand lifted off the desk a second ago and is still raised, mid-gesture. A hard low key light from the left carves her face with very high contrast, one side near black; a low rim from behind separates her from the blue wall. The rim beam is visible in thin haze and stays BELOW the middle of the frame. Three planes: a blurred desk edge at the bottom, Nexa sharp, the blue wall dissolving behind. A small orange sculpture sits on the desk at the right edge, out of focus. Her head and hands stay BELOW 36% of the frame height. 85mm lens at f/2, focus on her eyes. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on her clothing, and no symbol of it is printed, embroidered or reflected on the polo. Everything except the sculpture is completely unbranded and no text anywhere is readable: the refreshing rows read as movement, never as words.",
+  "lecho": {
+    "objeto": "the near edge of the operations desk crossing the very bottom against the lens, outside every light",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark painted ceiling soffit above the display wall, unlit and even, its matte paint texture visible",
+      "tinta": "blanca"
+    }
+  }
+}

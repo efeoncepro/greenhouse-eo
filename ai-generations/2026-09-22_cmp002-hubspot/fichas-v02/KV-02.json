@@ -1,0 +1,23 @@
+{
+  "id": "KV-02-faq-v02",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "escucha",
+  "atmosfera": "bruma",
+  "identidad": [{ "persona": "nexa", "vista": "45-der" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "frente-cuerpo-b" },
+    { "objeto": "sprocket-hubspot", "vista": "frente" }
+  ],
+  "escena": "SCENE (support floor after hours, Santiago): Nexa is RECEIVING — mouth closed, almost frontal to the lens with only her eyes turned off-frame to the left toward something she is reading, her headset resting on the desk beside her, present and unused, her hands still. She wears a navy piqué polo. A hard, low key light rakes in from the far left, leaving one side of her face in open shadow with the shadow of her nose legible on her cheek; a second low source behind her cuts a bright rim along her hair and shoulder and separates her from the dark room. Very high contrast. The haze makes the rim beam visible, and that beam and every patch it throws stay BELOW the middle of the frame. A glowing cool blue display at her side carries a long conversation thread, deliberately out of focus. On the desk behind, small and out of focus, a solid orange sculpture. Her head and hands stay BELOW 36% of the frame height. 85mm lens at f/2, focus on her eyes. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on her clothing, and no symbol of it is printed, embroidered or reflected on the polo. Everything except the sculpture is completely unbranded and no text anywhere is readable.",
+  "lecho": {
+    "objeto": "the boom arm of a second headset crossing the very bottom of the frame right against the lens, far outside both lights",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark acoustic felt wall of the support floor continuing above, unlit and even, its fibre texture visible",
+      "tinta": "blanca"
+    }
+  }
+}

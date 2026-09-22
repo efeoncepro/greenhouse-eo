@@ -1,0 +1,18 @@
+{
+  "id": "KV-04-el-criterio-no",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "marcado",
+  "escena": "SCENE (sales operations desk, Santiago, late morning): the subject is the REVISION MARKS on top of the work. A printed deal record lies on the desk, tidy and complete, and across it someone has written by hand in ink — a short note in the margin and a circled line. Those handwritten marks are the sharpest, most detailed thing in the frame and the first place the eye lands. A low raking window light lifts the tooth of the paper and the relief of the ink. At most a blurred fragment of a forearm touches the very edge of the frame; no face, no hand as subject. Behind, far out of focus, a monitor is a glowing cool blue display with a CRM record open, and a small orange shape sits at the corner of its bezel. 100mm macro lens at f/4, focus on the handwriting. Everything except that small orange shape is completely unbranded. No readable text anywhere: the handwriting and the printed lines are legible as marks but too small, angled and shallow-focused to read as words.",
+  "objetos": [{ "objeto": "sprocket-hubspot", "vista": "lateral" }],
+  "lecho": {
+    "objeto": "the near edge of the dark oak desk against the lens",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the bare dark oak desktop continuing above, evenly lit and empty, its grain visible",
+      "tinta": "blanca"
+    }
+  }
+}

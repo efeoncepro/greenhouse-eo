@@ -1,0 +1,33 @@
+{
+  "id": "KV-02-169",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "identidad": [
+    {
+      "persona": "nexa",
+      "vista": "busto"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "polo-efeonce",
+      "puesta": "frente-cuerpo-b"
+    },
+    {
+      "objeto": "sprocket-hubspot",
+      "vista": "tres-cuartos-izq"
+    }
+  ],
+  "escena": "SCENE (customer support floor at night, Santiago, almost completely dark): the ONE light in the whole picture is a single monitor at her station that has JUST LIT UP, in the lower right third of the frame. Its glowing cool blue screen shows ONE chat conversation as a column of rounded message bubbles, and the newest bubble at the bottom glows noticeably brighter than all the others: the conversation has just been handed to her. Nexa, in a navy piqué polo, is caught at the instant she turns out of the dark towards that screen in three-quarter view, lifting a slim headset microphone to her ear with one hand, lips just parted as she is about to answer. The screen light falls on the near side of her face, her hand and her chest; the far side of her face drops into darkness. Behind her the rest of the floor is dark, empty stations barely readable as shapes. The orange sculpture stands on the desk right beside the monitor, clearly visible and a real presence in the picture — about as tall as the monitor's stand, its matte enamel lit by the screen glow. Very high contrast. 50mm lens at f/2, focus on her eyes. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on her clothing. Everything except the sculpture and the polo is completely unbranded and no text is readable: the bubbles read as shapes, never as words. CRITICAL FRAMING (horizontal 16:9): the ACTION AREA is the RIGHT 55% of the frame. The LEFT 45% of the frame, top to bottom, is one single dark, evenly toned surface with NOTHING in it: no person, no object, no screen, no lamp, no window, no light beam, no bright spot, no shadow edge. Every person, every object, all the action, all the light and every bright patch stay inside the right 55%.",
+  "lecho": {
+    "objeto": "the dark near edge of her desk crossing the very bottom against the lens, outside the screen's light",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark, empty support floor — unlit ceiling and back wall, evenly toned, matte texture visible",
+      "tinta": "blanca"
+    }
+  }
+}

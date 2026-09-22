@@ -1,0 +1,14 @@
+{
+  "id": "KV-07-criterio-si-v04",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "sombra",
+  "identidad": [{ "persona": "nexa", "vista": "cuerpo-tresquartos" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "frente-cuerpo-b" },
+    { "objeto": "sprocket-hubspot", "vista": "tres-cuartos-izq" }
+  ],
+  "escena": "SCENE (open workspace at night, Santiago): THE SHADOWS ARE THE SUBJECT. Nexa stands ONCE, alone, in a navy piqué polo, small in frame and turned three-quarters away — and on the concrete wall behind her FOUR separate hard-edged shadows of her are thrown by four separate low lights, each falling across a different workstation. Each shadow is caught in a different working posture and lands on its own desk with its own glowing cool blue screen. She is one person; the wall is doing four jobs. The shadows are the sharpest, most graphic things in the picture. CRITICAL: the four lights are rigged LOW, at desk height, so the shadows are SHORT and WIDE and their heads reach only to about 55% of the frame height — the concrete wall ABOVE them is bare, unlit and in deep even shadow, with no shadow, no light and no object entering it. Very high contrast between the lit patches and the dark wall. A small orange sculpture sits on the nearest desk. Her head stays BELOW 55% of the frame height. 35mm lens at f/4, focus on the shadows. CRITICAL FRAMING: the ENTIRE UPPER HALF of the frame — everything above 50% of the frame height — is one single dark, evenly toned surface with NOTHING in it: no object, no screen, no lamp, no window, no light beam, no bright spot. All action, all light and every bright patch stay strictly BELOW the middle of the frame. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. Everything except the sculpture is completely unbranded and no text is readable.",
+  "lecho": { "objeto": "the near edge of the first desk crossing the very bottom against the lens, outside every beam", "tono": "DARK near black, matte" },
+  "reservas": { "texto": { "muro": "the bare concrete wall filling the whole upper half above the shadows, unlit and evenly toned in deep shadow, its texture visible", "tinta": "blanca" } }
+}

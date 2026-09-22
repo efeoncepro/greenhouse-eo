@@ -1,0 +1,19 @@
+{
+  "id": "KV-05-operas-como-starter",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (operations room, evening, NOBODY IN FRAME): a single wide control panel fills the lower half of the frame, and it is ONE system, not two. Only a few of its modules are lit — their glowing cool blue panel faces are the brightest thing in the picture and the only strong light source in the room, a visible beam spilling low across the panel with thin haze making it visible. The rest of the same panel stays dark but keeps its shape: the unlit modules are clearly there, same chassis, same rows, simply off. A cooling fan is still turning slowly behind one of the dark modules, the only movement in the room. The light fixture sits LOW, rigged between knee and chest height, so the upper part of the room stays clear. A small orange emblem is cast into the panel chassis near the lit modules, catching their light. The whole panel stays BELOW 36% of the frame height. 50mm lens at f/2, focus on the boundary between the lit modules and the dark ones. Everything except that emblem is completely unbranded. No readable text anywhere: module labels are small, angled and out of focus.",
+  "objetos": [{ "objeto": "sprocket-hubspot", "vista": "frente" }],
+  "lecho": {
+    "objeto": "the near edge of the equipment rack against the lens",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the same panel chassis continuing up into deep unlit shadow, its brushed metal texture visible",
+      "tinta": "blanca"
+    }
+  }
+}

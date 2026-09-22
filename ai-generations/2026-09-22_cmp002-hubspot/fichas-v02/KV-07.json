@@ -1,0 +1,27 @@
+{
+  "id": "KV-07-criterio-si-v02",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "pov",
+  "atmosfera": "bruma",
+  "identidad": [{ "persona": "nexa", "vista": "manos" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "frente-cuerpo-b" },
+    { "objeto": "sprocket-hubspot", "vista": "frente" }
+  ],
+  "escena": "SCENE (case desk at night, Santiago): the camera sits exactly where the person working the case sits, at seated eye height, looking down at her own hands and her own desk — her forearms in the navy piqué polo enter from the bottom of the frame, one hand just come to rest beside a single glowing cool blue case card open on the screen, the decision taken a second ago. She is reading it right now, in the middle of the work: it is ONE card and ONE piece of work, a suggested line already drafted on it, and on the very same card the human decision written beside it. Never two panels, never two columns, never a split screen. The screen's own light is hard and directional from below-left, throwing her hands' shadows across the desk with very high contrast; the rest of the room falls to near black. Thin haze makes a low side beam visible, and it stays BELOW the middle of the frame. A SMALL orange sculpture sits on the desk at the right edge, no taller than her hand and partly out of focus — it is a small object on the desk, NEVER on the screen and never larger than a coffee cup. Her hands stay BELOW 36% of the frame height. 35mm lens at f/2.8, focus on the case card. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on her clothing, and no symbol of it is printed, embroidered or reflected on the polo. Everything except the sculpture is completely unbranded and no text anywhere is readable.",
+  "lecho": {
+    "objeto": "the near edge of the desk and her blurred forearms against the lens, outside the screen light",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark painted wall beyond the desk, unlit and even, its matte texture visible",
+      "tinta": "blanca"
+    },
+    "seleccion": {
+      "objeto": "the single open case card on the screen",
+      "campo": "the screen's own dark interface and the dark desk surface around it"
+    }
+  }
+}

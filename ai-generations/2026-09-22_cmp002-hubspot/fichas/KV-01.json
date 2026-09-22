@@ -1,0 +1,23 @@
+{
+  "id": "KV-01-permisos-los-firmas-tu",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "ausencia",
+  "atmosfera": "bruma",
+  "escena": "SCENE (IT lead's desk after everyone left, Santiago, early evening, NOBODY IN FRAME): verify it — there is not a single person, hand or body anywhere in the picture. What remains is the trace of a decision waiting: the chair pushed back and turned away from the desk, a closed laptop resting on its side, a cold mug. The only strong light is a hard low beam from a window at the left, raking across the empty desk, with thin haze drifting in it so the beam is visible. A wide desktop monitor stands at the right, still awake, its glowing cool blue display the second light source in the room: it shows a plain work chart of narrow rows and four short columns, and the last column is conspicuously empty — every row in it blank. The empty column is the calmest, most isolated thing on the desk, separated from everything else. 105mm lens at f/2, focus on that empty column. The office behind falls into deep shadow. Everything except the small sculpture is completely unbranded, with no readable text anywhere: any lettering on screen or paper is small, angled or out of focus.",
+  "objetos": [{ "objeto": "sprocket-hubspot", "vista": "tres-cuartos-izq" }],
+  "lecho": {
+    "objeto": "the near edge of the dark walnut desk in shadow against the lens",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "a plain painted concrete wall in deep warm shadow, its texture visible",
+      "tinta": "blanca"
+    },
+    "seleccion": {
+      "objeto": "the empty last column of the work chart on the monitor",
+      "campo": "the monitor's own dark interface panel in shadow"
+    }
+  }
+}

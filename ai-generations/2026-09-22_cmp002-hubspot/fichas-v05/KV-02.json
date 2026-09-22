@@ -1,0 +1,15 @@
+{
+  "id": "KV-02-faq-v05",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "variantes",
+  "eje": "how each conversation arrives: ordered and closable, or not",
+  "identidad": [{ "persona": "nexa", "vista": "cuerpo-espalda" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "espalda-mujer" },
+    { "objeto": "sprocket-hubspot", "vista": "frente" }
+  ],
+  "escena": "SCENE (support floor at night, Santiago): a long row of identical attention stations runs across the LOWER half of the frame. Every station's glowing cool blue screen shows the SAME calm, orderly pattern — short even blocks, evenly spaced. ONE station, just left of centre, is the exception: its screen carries a single thread that has outgrown the pattern, one long unbroken block running past the bottom of its own screen, brighter and denser than every other. Nexa stands in front of exactly that one with her BACK to the camera in a navy piqué polo, seen from behind so the back of the polo is clearly visible, stopped mid-step with one hand on the back of the chair. The stations are LOW: their screens and her head all stay BELOW 55% of the frame height. A hard low light rakes along the row and dies before the upper half. Very high contrast. A small orange sculpture sits on the desk of that one exceptional station. 35mm lens at f/4, focus on the exceptional screen. CRITICAL FRAMING: the ENTIRE UPPER HALF of the frame — everything above 50% of the frame height — is one single dark, evenly toned surface with NOTHING in it: no object, no screen, no lamp, no window, no light beam, no bright spot. All action, all light and every bright patch stay strictly BELOW the middle of the frame. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on her clothing. Everything except the sculpture and the polo is completely unbranded and no text is readable: the blocks read as structure, never as words.",
+  "lecho": { "objeto": "the out-of-focus back of the nearest chair crossing the very bottom against the lens, outside the raking light", "tono": "DARK near black, matte" },
+  "reservas": { "texto": { "muro": "the bare dark painted wall filling the whole upper half above the row of stations, unlit and evenly toned, its matte texture visible", "tinta": "blanca" } }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "KV-01-permisos-v02",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "proyeccion",
+  "atmosfera": "bruma",
+  "identidad": [{ "persona": "nexa", "vista": "45-izq" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "frente-cuerpo-b" },
+    { "objeto": "sprocket-hubspot", "vista": "tres-cuartos-izq" }
+  ],
+  "escena": "SCENE (server room at night, Santiago): a work chart is PROJECTED onto her and onto the rough concrete wall behind her — the concrete's grain reads straight through the projected image, and the chart's rows and columns bend across her shoulder and chest. She stands inside the beam wearing a navy piqué polo, almost frontal to the lens, only her eyes turned down-left to where the projection falls on her. One column of that chart is empty, and it is the empty column that lands on her chest. The projector is the single hard light source, low and to the left, its beam visible through thin haze; the beam and every patch it throws stay BELOW the middle of the frame. Very high contrast: her lit side is bright, the other side falls to near black, and the shadow she casts on the wall is a hard graphic shape. Three planes: a blurred server rack edge at the bottom, Nexa sharp, the dark room falling away behind. A glowing cool blue display on the rack beside her throws a second, softer blue light across the concrete. A small orange sculpture sits on a low shelf at the right, catching a sliver of the beam. Her head and hands stay BELOW 36% of the frame height. 85mm lens at f/2, focus on her eyes. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on her clothing, and no symbol of it is printed, embroidered or reflected on the polo. Everything except the sculpture is completely unbranded, and no text anywhere is readable: the projected rows are legible as structure, never as words.",
+  "lecho": {
+    "objeto": "the near edge of a server rack crossing the very bottom, right against the lens and completely outside the projector beam",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the same rough concrete wall continuing up above the projection, in deep unlit shadow, its grain visible",
+      "tinta": "blanca"
+    }
+  }
+}

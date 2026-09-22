@@ -1,0 +1,24 @@
+{
+  "id": "KV-03-cuando-no-v02",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "variantes",
+  "eje": "how well each account actually fits the platform",
+  "atmosfera": "bruma",
+  "identidad": [{ "persona": "nexa", "vista": "45-izq" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "frente-cuerpo-b" },
+    { "objeto": "sprocket-hubspot", "vista": "cenital" }
+  ],
+  "escena": "SCENE (Efeonce studio at night, Santiago): five identical glowing cool blue account panels stand in a row on a matt dark worktop, all the same size and the same layout, differing only in one small detail each. Nexa has pulled ONE of them out of the row and set it apart, face down. The decision is the subject, not the panels. She is almost frontal to the lens in a navy piqué polo, eyes down-left on the one she set aside, Her hand has just come off that panel and is still lifted, caught mid-motion a second after she pulled it out. A hard low light from the left rakes across the row, throwing five sharp parallel shadows across the worktop; very high contrast, the room behind near black. The beam is visible in thin haze and stays BELOW the middle of the frame. A small orange sculpture sits at the far end of the row, half in shadow. Her head and hands stay BELOW 36% of the frame height. 85mm lens at f/2, focus on the panel she set apart. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on her clothing, and no symbol of it is printed, embroidered or reflected on the polo. Everything except the sculpture is completely unbranded and no text anywhere is readable.",
+  "lecho": {
+    "objeto": "the near edge of the dark worktop against the lens, outside the raking beam",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark studio wall above the worktop, unlit and even, its plaster texture visible",
+      "tinta": "blanca"
+    }
+  }
+}

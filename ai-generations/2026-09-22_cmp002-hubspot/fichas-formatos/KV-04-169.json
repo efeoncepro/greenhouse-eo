@@ -1,0 +1,33 @@
+{
+  "id": "KV-04-169",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "larga-exposicion",
+  "identidad": [
+    {
+      "persona": "nexa",
+      "vista": "busto"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "polo-efeonce",
+      "puesta": "frente-cuerpo-b"
+    },
+    {
+      "objeto": "sprocket-hubspot",
+      "vista": "lateral"
+    }
+  ],
+  "escena": "SCENE (revenue operations floor at night, Santiago): a LONG EXPOSURE on a tripod. Everything that moves by itself has dissolved into soft translucent streaks — colleagues crossing behind her are smeared ribbons, the glowing cool blue records on the low display wall have pulled into continuous horizontal light trails. Nexa is the ONE thing perfectly sharp: seated, still, almost frontal in a navy piqué polo, hands quiet on the desk, eyes down-right on one record she has not let go. Her stillness against all that motion is the picture. CRITICAL: the display wall and every light trail stay inside the action area, and everything outside it is bare dark painted soffit. A single hard low light from the left holds her edge crisp, very high contrast. A small orange sculpture sits sharp on the desk at the right, because it never moved. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. Everything except the sculpture is completely unbranded and no text is readable: the trails read as movement, never as words. CRITICAL FRAMING (horizontal 16:9): the ACTION AREA is the RIGHT 55% of the frame. The LEFT 45% of the frame, top to bottom, is one single dark, evenly toned surface with NOTHING in it: no person, no object, no screen, no lamp, no window, no light beam, no bright spot, no shadow edge. Every person, every object, all the action, all the light and every bright patch stay inside the right 55%.",
+  "lecho": {
+    "objeto": "the near edge of the operations desk crossing the very bottom against the lens, outside every light",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the bare dark painted soffit and back wall of the operations floor, unlit and evenly toned, matte texture visible",
+      "tinta": "blanca"
+    }
+  }
+}

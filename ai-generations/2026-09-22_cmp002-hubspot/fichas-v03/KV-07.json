@@ -1,0 +1,19 @@
+{
+  "id": "KV-07-criterio-si-v03",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "reflejo",
+  "identidad": [{ "persona": "nexa", "vista": "45-izq" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "frente-cuerpo-b" },
+    { "objeto": "sprocket-hubspot", "vista": "tres-cuartos-izq" }
+  ],
+  "escena": "SCENE (a row of glass meeting pods at night, Santiago): the photograph is taken through glass so TWO REALITIES OVERLAP. Nexa stands once, real, on the near side in a navy piqué polo, almost frontal, eyes down-left — she has just straightened up from the nearest case a second ago, her hand still lifted from the glass. But the row of angled glass panels beside her repeats her REFLECTION four times down the line — and in EACH reflection she is leaning over a DIFFERENT open case, each pod lit by its own glowing cool blue screen showing a different record. One person, four cases, all at once. The real Nexa and her reflections are visible at the same time and never hide each other. A hard low light from the left keeps the real her in very high contrast; the reflections fall away in cooler, dimmer blue as the row recedes. A small orange sculpture sits on the ledge of the nearest pod. Her head and hands stay BELOW 36% of the frame height. 85mm lens at f/2, focus on the real Nexa. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on her clothing, and no symbol of it is printed, embroidered or reflected on the polo. Everything except the sculpture is completely unbranded and no text anywhere is readable: the records read as structure, never as words.",
+  "lecho": {
+    "objeto": "the near edge of the dark metal glazing frame crossing the very bottom against the lens",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": { "muro": "the dark unlit ceiling slab above the row of pods, even in tone, its concrete texture visible", "tinta": "blanca" }
+  }
+}

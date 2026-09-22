@@ -1,0 +1,24 @@
+{
+  "id": "KV-06-y-en-el-resultado",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "instrumento",
+  "escena": "SCENE (finance desk, Santiago, evening): the frame looks THROUGH the tool of the trade — a heavy glass reading loupe held over a printed budget sheet, its lens filling much of the picture. Through the glass, one cost line is crisp and magnified; immediately beside it, the results column is visibly empty, with no figure against that cost. A hard low desk lamp throws a long shadow of the folder across the sheet. At most a blurred cuff of a jacket sleeve enters at the edge. A dark blue folder lies under the sheet, and a small orange shape rests on its cover, half in shadow. 100mm macro lens at f/4, focus on the magnified line inside the glass. Everything except that orange shape is completely unbranded. No readable text or numbers anywhere: the figures are small, angled and out of focus outside the loupe, and inside it they read as marks, not as amounts.",
+  "objetos": [
+    {
+      "objeto": "sprocket-hubspot",
+      "vista": "rodando"
+    }
+  ],
+  "lecho": {
+    "objeto": "the near edge of the walnut desk against the lens",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the bare desktop continuing above in even shadow, its grain visible",
+      "tinta": "blanca"
+    }
+  },
+  "instrumento": "a heavy glass reading loupe held over the printed budget sheet"
+}

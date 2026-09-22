@@ -1,0 +1,22 @@
+{
+  "id": "KV-07-su-criterio-si",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "pov",
+  "escena": "SCENE (case worker's desk, Santiago, afternoon): the camera sits exactly where the person who owns the case would sit, at seated eye height, looking down at their own desk. ONE case file is open on the screen in front of them — a single card, complete and whole, with a suggested line already drafted on it and, on the very same card, the human decision written beside it. It is one object and one piece of work, never two panels or two columns. The screen is the motivated light, a glowing cool blue display, with a low practical lamp from the left adding a warm edge. One of the person's forearms has just come to rest over the card, mid-gesture, the decision taken a second ago. Three planes: the blurred near edge of the desk and those forearms at the bottom, the case card sharp in the middle, the rest of the team far out of focus behind. The case card sits clearly separated on the desk with generous empty room on all four sides of it. A small orange emblem sits at the corner of the file's own frame. 35mm lens at f/2.8, focus on the case card. Everything except that emblem is completely unbranded. No readable text anywhere: the lines on the card are small and shallow-focused.",
+  "objetos": [{ "objeto": "sprocket-hubspot", "vista": "tres-cuartos-izq" }],
+  "lecho": {
+    "objeto": "the near edge of the desk and the blurred forearms against the lens",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark painted wall beyond the desk, evenly lit and empty, its matte texture visible",
+      "tinta": "blanca"
+    },
+    "seleccion": {
+      "objeto": "the single open case card on the screen",
+      "campo": "the dark desk surface and the screen's own dark interface around it"
+    }
+  }
+}

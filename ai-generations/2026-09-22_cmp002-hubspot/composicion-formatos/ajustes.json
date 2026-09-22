@@ -1,0 +1,83 @@
+{
+  "KV-01-169": {
+    "textWidth": 0.34,
+    "dominantMax": 0.34,
+    "top": 0.18
+  },
+  "KV-02-169": {
+    "textWidth": 0.34,
+    "dominantMax": 0.34,
+    "dominant": "Tu agente|ya la llamó.",
+    "top": 0.18
+  },
+  "KV-04-169": {
+    "textWidth": 0.36,
+    "dominantMax": 0.36,
+    "top": 0.18
+  },
+  "KV-05-169": {
+    "textWidth": 0.33,
+    "dominantMax": 0.33,
+    "top": 0.18
+  },
+  "KV-06-169": {
+    "textWidth": 0.3,
+    "dominantMax": 0.3,
+    "top": 0.18,
+    "cta": {
+      "inkToken": "accentSurface"
+    }
+  },
+  "KV-07-169": {
+    "textWidth": 0.27,
+    "dominantMax": 0.27,
+    "dominant": "tu equipo,|multiplicado.",
+    "top": 0.18
+  },
+  "KV-01-916": {
+    "top": 0.14,
+    "dominantSize": 130
+  },
+  "KV-02-916": {
+    "top": 0.135
+  },
+  "KV-04-916": {
+    "top": 0.13,
+    "dominantSize": 110
+  },
+  "KV-05-916": {
+    "top": 0.14
+  },
+  "KV-06-916": {
+    "top": 0.13,
+    "textWidth": 0.64,
+    "dominantMax": 0.64,
+    "dominantSize": 118,
+    "cta": {
+      "inkToken": "accentSurface"
+    }
+  },
+  "KV-07-916": {
+    "top": 0.14,
+    "dominantSize": 118
+  },
+  "KV-05-11": {
+    "dominantSize": 94
+  },
+  "KV-06-11": {
+    "textWidth": 0.68,
+    "dominantMax": 0.68,
+    "dominantSize": 96,
+    "cta": {
+      "inkToken": "accentSurface"
+    }
+  },
+  "KV-01-11": {
+    "dominant": "sin exponer tus datos.",
+    "dominantSize": 100
+  },
+  "KV-04-11": {
+    "dominantSize": 90,
+    "top": 0.04
+  }
+}

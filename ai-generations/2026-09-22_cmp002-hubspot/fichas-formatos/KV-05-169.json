@@ -1,0 +1,24 @@
+{
+  "id": "KV-05-169",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "fragmento",
+  "corta": "the bank of faders runs off the right edge and off the bottom — no console body, no room, no operator is ever visible, only the channel strip itself",
+  "objetos": [
+    {
+      "objeto": "sprocket-hubspot",
+      "vista": "lateral"
+    }
+  ],
+  "escena": "SCENE (production suite at night, extreme macro): a long bank of identical channel faders fills the action area of the frame, cropped hard at the right edge. EVERY fader is pulled all the way DOWN to zero — a dead flat line of forty identical caps, their scales unlit. ONE fader, just right of centre, is pushed ALL THE WAY UP: it stands alone above the flat line, its channel strip the only one with a glowing cool blue level showing. The eye lands on that one raised fader first, then reads the dead flat row it is standing in. A hard low raking light from the left skims across the caps and throws a row of sharp parallel shadows; the light dies before it reaches the text area. A small orange sculpture sits at the far right end of the strip, cropped by the edge. 100mm macro lens at f/4, focus on the raised fader. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. Everything except the sculpture is completely unbranded and no text anywhere is readable: the channel markings are tiny, angled and shallow-focused. CRITICAL FRAMING (horizontal 16:9): the ACTION AREA is the RIGHT 55% of the frame. The LEFT 45% of the frame, top to bottom, is one single dark, evenly toned surface with NOTHING in it: no person, no object, no screen, no lamp, no window, no light beam, no bright spot, no shadow edge. Every person, every object, all the action, all the light and every bright patch stay inside the right 55%.",
+  "lecho": {
+    "objeto": "the out-of-focus near edge of the console apron running along the very bottom against the lens",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the dark unlit console housing, evenly toned and free of any light, its matte finish visible",
+      "tinta": "blanca"
+    }
+  }
+}

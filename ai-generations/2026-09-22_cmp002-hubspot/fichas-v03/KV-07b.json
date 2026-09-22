@@ -1,0 +1,19 @@
+{
+  "id": "KV-07-criterio-si-v03b",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "sombra",
+  "identidad": [{ "persona": "nexa", "vista": "cuerpo-tresquartos" }],
+  "objetos": [
+    { "objeto": "polo-efeonce", "puesta": "frente-cuerpo-b" },
+    { "objeto": "sprocket-hubspot", "vista": "tres-cuartos-izq" }
+  ],
+  "escena": "SCENE (open workspace at night, Santiago): THE SHADOWS ARE THE SUBJECT. Nexa stands ONCE, alone, in a navy piqué polo, small in frame and turned three-quarters away — and on the long pale concrete wall behind her, FOUR separate hard-edged shadows of her are thrown by four separate low lights, each one falling across a different workstation along the wall. Each shadow is caught in a different working posture — one leaning in, one reaching, one with the head tilted reading, one straightening up — and each one lands on its own desk with its own glowing cool blue screen. She is one person; the wall is doing four jobs. The shadows are the sharpest, most detailed, most graphic things in the picture, far crisper than the room itself, and they are what the eye reads first. Very high contrast: the wall is bright where the light hits and the room falls to near black between the beams. A small orange sculpture sits on the nearest desk, inside the first shadow's reach. Her head stays BELOW 36% of the frame height. 35mm lens at f/4, focus on the shadows on the wall. The whole frame is COOL and contemporary: daylight-neutral white balance, blue-leaning shadows, nothing warm, amber, golden or tungsten anywhere, no retro glow — the ONLY warm colour in the entire picture is the small orange sculpture itself. The sculpture's ring-and-nodes symbol belongs ONLY to the sculpture: it never appears on any garment. Everything except the sculpture is completely unbranded and no text anywhere is readable.",
+  "lecho": {
+    "objeto": "the near edge of the first desk crossing the very bottom against the lens, outside every beam",
+    "tono": "DARK near black, matte"
+  },
+  "reservas": {
+    "texto": { "muro": "the same concrete wall continuing above the shadows, unlit and evenly toned, its texture visible", "tinta": "blanca" }
+  }
+}
