@@ -237,10 +237,20 @@ tres salieron el mismo día, de dos sesiones.
 4. **`false` sólo medido:** «sin sujeto bajo la huella del texto», comprobado con el paso 2.
 
 **Límite de la guarda: es vertical.** Compara `descriptorBox.bottom` con `top - minClearance` y no mira el eje
-X. En layouts de columna (16:9 con texto a la izquierda y sujeto a la derecha) declarar el `top` real del
-sujeto hace abortar sin superposición: ahí lo correcto es `false`, **medido** bajo la huella.
+X. **Eso describe el mecanismo; no autoriza declarar `false` en 16:9.** Medido bajo la huella, las seis piezas
+16:9 de CMP-001 tenían estructura debajo del texto —suelo, canto de mesa, el cuello negro de un micrófono que
+arrancaba justo donde terminaba el descriptor en `mo2-no-te-citan-169`—, y ninguna quedó en `false`.
 
-**Por qué no se automatiza todavía:** la propuesta natural es que el compositor mida el sujeto él mismo bajo el
-`descriptorBox` real. Las dos primeras trampas fallan en direcciones opuestas según el plate, y la de
-luminancia falla hacia el daño —texto sobre la cabeza— justo en el registro nocturno que usa la mayoría de
-las piezas. Automatizarlo exige detectar la silueta (segmentación de persona), no brillo.
+**Por qué no se automatiza todavía — dos métodos medidos:**
+
+| Método | Dónde acierta | Dónde falla |
+|---|---|---|
+| Umbral de brillo bajo la huella | Sujetos claros | Se salta el sujeto oscuro y da un `top` más bajo: CMP-002 KV-02 735 contra 465; CMP-001 `p3-megafono-45` 732 contra ~560 |
+| Borde: primera fila con σ > 4× la del muro, 3 filas seguidas (versión actual del script) | Sujetos claros y bordes marcados: CMP-002 KV-04 506 contra 518, KV-07 644 contra 645; CMP-001 dentro de 1–2 px en las piezas claras | 🔴 **Coronillas oscuras sobre la banda oscura:** KV-01 591 contra 500 (91 px más bajo; disparó con la proyección, no con la cabeza) · KV-02 498 contra 465 · y falsa alarma en KV-06, 353 contra 510 |
+
+**Causa de la segunda falla:** la banda oscura que el canon pide para el texto es, por construcción, del mismo
+tono que el pelo de Nexa. En KV-01 la σ por fila sube de 5,8 a 13,6 entre las filas 460 y 580 —del orden de la
+textura del muro— y en KV-02 ningún píxel del pelo se aparta más de 25 niveles de la mediana de su fila antes de
+la 500. Además, una coronilla es angosta: en una huella de ~800 px, sus primeras filas pesan poco en cualquier
+estadística de fila. No hay umbral que separe pelo de muro. **Automatizar exige segmentación de persona**; hasta
+entonces, el ojo sobre la regla manda y los scripts son cota.
