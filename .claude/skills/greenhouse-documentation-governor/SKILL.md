@@ -126,6 +126,7 @@ Use this matrix to choose the smallest complete update set.
 | New or changed local skill                                                                                                                                                             | Update both `.codex/skills/<name>/SKILL.md` and `.claude/skills/<name>/SKILL.md` when the behavior must be shared; update changelog/canonical docs, `project_context.md` only for a durable operating-contract change, `Handoff.md` only for active continuity, and agent routers only when their route/standing rule changes                                                                                                                                                                                                                                                                                                                                                     |
 | New canonical gate, `pnpm` script/command, token/visual convention, or standing agent rule                                                                                             | Verify the task-implementation harness command `.claude/commands/implement-task.md` still names the right gates/commands/paths; update it if it drifted. It is a process harness, not a fact dump — only edit it when a gate/command/path/convention it references actually changed (the canonical rules stay in `CLAUDE.md`/skills, which the harness points to)                                                                                                                                                                                                                                                                                                                 |
 | **Domain-specific invariant** (`NUNCA`/`SIEMPRE` of one subsystem: payroll, finance, ICO, contractor, notion, hubspot, identity, knowledge, a UI primitive, etc.)                      | Canonize it in **that domain's spec or its `docs/architecture/agent-invariants/<DOMAIN>_AGENT_INVARIANTS.md` companion** (§"Invariantes operativos para agentes"), and in `CLAUDE.md`/`AGENTS.md` add **at most a 1-2 line pointer** (+ the router-table row) — **NEVER a full inline block.** `CLAUDE.md` is a router (TASK-1160), not a spec-store: it loads every turn and every subagent inherits it, so domain invariants must be load-on-demand. After editing, run `pnpm claude-md check` (= budget `--strict` + rule-audit; hard ceiling 35k tokens, CI fails if breached + alerts if a rule became unreachable). CLI: `pnpm claude-md {inventory\|budget\|audit\|check}` |
+| **Trabajo de campaña** (pieza nueva, canal nuevo, cambio de brief, media plan, tracking, activación o pausa) | **CDR** en `docs/campaigns/decisions/` si la decisión sólo tiene sentido con esa campaña (territorio, canales, presupuesto, ventana, cortes) — si tendría sentido sin ella, es ADR u operations. Registrar la fila en el `ASSETS.md` de la campaña, **nunca copiar el asset**. Actualizar el overview de `2. Campañas/LEEME.md` cuando cambie estado o ventana. Canon: `EFEONCE_CAMPAIGN_REGISTRY_V1.md` |
 | Audit performed                                                                                                                                                                        | Create/update dated `docs/audits/...`; link from task, handoff, or architecture only if it remains operationally relevant                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | Docs-only clarification with no behavior change                                                                                                                                        | Update the canonical doc; changelog only if workflow/contract changed                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 
@@ -237,3 +238,33 @@ Al cerrar una campaña o actualizar su brief, comprobar versión/decisiones, lin
 estados separados; preservar aportes de otros agentes y no copiar assets. Si cambia el modelo reusable,
 sincronizar templates versionados Claude/Codex y copias de OneDrive. Un documento no certifica runtime,
 sincronización cloud, publicación ni permiso. No replicar el brief completo en Handoff/skills.
+
+### Lo que el governor tiene que saber para no cerrar en falso
+
+**La división, que es lo que evita duplicar:** con **lifecycle** y alguien que lo ejecuta y lo cierra →
+**repo** (`docs/campaigns/`: epics, tasks, mini-tasks, issues y **CDR**). Criterio, narrativa o entregable →
+**OneDrive**. 🔴 **Nada se escribe en los dos lados: se referencia.**
+Los IDs de `TASK-###` e `ISSUE-###` salen del **registry global**; sólo `CDR-###` y `EPIC-CMP-###` numeran
+aparte. Una campaña **no es un universo aparte: es trabajo del mismo harness**.
+
+**CDR — Campaign Decision Record.** El ADR de las campañas. Se reconoce con una prueba:
+🎯 *si la campaña no existiera, ¿la decisión seguiría teniendo sentido?* Si **sí**, no es CDR —el sistema de
+CTA, el contrato de safe zones o las reglas del registro fotográfico son transversales y van a ADR u
+operations. Estados: `Proposed` · `Accepted` · `Superseded by CDR-###` · `Rejected` *(se conserva con razón)*.
+
+**El brief es la fuente única de criterios, e igual para todos los canales.** Una campaña la ejecutan varios
+agentes en varias sesiones; sin fuente única **diverge sin que nadie lo note** —el ad promete una cosa, el
+post otra, el correo una tercera, y el prospecto los recibe todos—. Si una pieza necesita una promesa que el
+brief no tiene, **el brief se actualiza primero con el operador**; no se improvisa en la pieza.
+
+🔴 **Tres cierres en falso que este dominio produce, y que hay que bloquear:**
+
+| Parece cerrado | Y no lo está |
+|---|---|
+| «La pieza está en `03. Finales`» | **Finales = creatividad aprobada, NO autorización de medios.** Derechos, guías de marca de terceros y destinos son gates aparte |
+| «Está medido, tenemos el evento» | **Web y CRM miden cosas distintas.** GA4 mide comportamiento; **HubSpot mide negocio**. Y el trabajo real no es el evento: es que `utm_campaign` **viaje del clic al contacto y del contacto al deal**. Sin ese puente, el CRM sabe que hubo un negocio y no sabe qué campaña lo produjo |
+| «El concepto quedó descartado» | **Un concepto rechazado SIN su razón se vuelve a proponer en tres semanas y se vuelve a pagar.** La razón va a `decisiones/` |
+
+⚠️ **Y un umbral que el governor no define:** la definición de «reunión calificada» la fija **quien opera el
+pipeline**, no un agente — en CMP-001 quedó en **`opportunity`**, no en `salesqualifiedlead`. De ella depende
+el guardrail, y sin guardrail se apaga la pieza que baja volumen **a propósito** y mejor protege el pipeline.
