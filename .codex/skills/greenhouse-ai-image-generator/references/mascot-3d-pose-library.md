@@ -129,7 +129,9 @@ prop toque al personaje o se apoye contra él**, nunca que flote lejos en el cua
 ### Un accesorio nunca va delante de la cara
 
 La lupa de Gigi v01 quedó **sobre el rostro** y magnificó un arco del ojo: el personaje parecía tener tres ojos (lo
-detectó el operador, no el QA). Cualquier prop translúcido —lupa, visor, vidrio— va **fuera de la silueta de la
+detectó el operador, no el QA). **Y este defecto es invisible en hoja de contacto**: a ~1100 px de alto un arco
+duplicado en la cara de una mascota se lee como sombra y pasa por bueno — es la misma regla del bordado, aplicada a
+una cara. El QA de la cara se mira **al 100 %**, pose por pose, nunca en la grilla. Cualquier prop translúcido —lupa, visor, vidrio— va **fuera de la silueta de la
 cara**, sobre el fondo, y el prompt debe declarar el conteo: «exactamente DOS ojos y UNA sonrisa, todos sobre el
 cuerpo, nunca repetidos dentro del vidrio».
 
