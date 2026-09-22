@@ -211,3 +211,36 @@ bendecía un plan que nadie había compuesto.
 
 **Y si el acento no alcanza el mínimo, se regenera el plate.** No se cambia de variante para esquivar la
 medición: eso apaga el color. Es la misma regla que el canon fotográfico aplica al scrim.
+
+## 11. Cómo medir `subjectProtection`
+
+Desde el 22/09/2026 el gate exige declarar la guarda en toda pieza con CTA (§7, Delta CMP-002). El número
+que se declara es **la primera fila del sujeto en el plate**, y hay tres maneras medidas de equivocarse. Las
+tres salieron el mismo día, de dos sesiones.
+
+| Trampa | Qué pasa | Caso medido |
+|---|---|---|
+| Medir en el **ancho completo** o bajo `textWidth` | Captura una luz del fondo fuera del eje del texto y da un `top` **más alto** que el real: el compositor aborta sin que el texto toque nada | CMP-001 `p2-expediente`: 492–498 contra 656 reales, bajo la huella (sesión «Ads con lenguaje fotográfico») |
+| Medir por **umbral de luminancia** | El pelo oscuro sobre fondo oscuro no supera el umbral: da un `top` **más bajo** que el real y **deja pasar texto sobre la cabeza**. Es la dirección peligrosa | CMP-002 con `_medir-sujeto.mjs` (umbral 0,42): KV-02 735 contra 465 reales · KV-01 594 contra 500 · KV-04 540 contra 518 |
+| Declarar `false` **por criterio** | Una pieza que «no tiene a nadie debajo» puede tenerlo cuando el dominante se alarga | CMP-001 `mo3-no-creernos-169`: declarado `false`, medido `top=292`. Se corrigió la pieza (dominante 158→126), no la declaración |
+
+**Método:**
+
+1. **Compón una vez** para obtener `out/<id>-layout.json`. La huella del texto es `min(left)…max(right)` de
+   sus `elements`. Sólo esa columna importa.
+2. **Mira la silueta del sujeto dentro de esa columna** sobre un recorte del plate con regla horizontal cada
+   20 px. En registros oscuros —pelo, ropa navy, fondos en sombra— el ojo sobre la regla manda. Un script de
+   luminancia (`ai-generations/2026-09-21_registro-c-respuesta/_medir-sujeto.mjs`) sirve como **cota**: si da
+   un `top` más alto que el que ves, investiga. Nunca lo uses como el valor en un plate oscuro.
+3. **`minClearance: 24`** por defecto. Declara el `top` que ves, no uno inflado para que el compositor pase:
+   si aborta, se ajusta la pieza (dominante, `top`, apoyo en una línea).
+4. **`false` sólo medido:** «sin sujeto bajo la huella del texto», comprobado con el paso 2.
+
+**Límite de la guarda: es vertical.** Compara `descriptorBox.bottom` con `top - minClearance` y no mira el eje
+X. En layouts de columna (16:9 con texto a la izquierda y sujeto a la derecha) declarar el `top` real del
+sujeto hace abortar sin superposición: ahí lo correcto es `false`, **medido** bajo la huella.
+
+**Por qué no se automatiza todavía:** la propuesta natural es que el compositor mida el sujeto él mismo bajo el
+`descriptorBox` real. Las dos primeras trampas fallan en direcciones opuestas según el plate, y la de
+luminancia falla hacia el daño —texto sobre la cabeza— justo en el registro nocturno que usa la mayoría de
+las piezas. Automatizarlo exige detectar la silueta (segmentación de persona), no brillo.

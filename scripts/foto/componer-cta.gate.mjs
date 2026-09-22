@@ -44,8 +44,11 @@ for (const p of piezas.filter(p => p.cta)) {
 
   if (!declarada) {
     console.error(
-      `✗ ${p.id}: falta \`subjectProtection\`. Declara { "top": <px donde empieza la cabeza en el plate>, ` +
-        '"minClearance": 24 } si hay una persona bajo el bloque de texto, o `false` si no la hay.'
+      `✗ ${p.id}: falta \`subjectProtection\`. Declara { "top": <px>, "minClearance": 24 } si hay una persona ` +
+        'bajo el bloque de texto, o `false` si no la hay. El `top` se mide en el plate, dentro de la huella REAL ' +
+        'del texto (min left…max right de `out/<id>-layout.json`), no en el ancho completo, y mirando la ' +
+        'silueta: umbral de luminancia no sirve con pelo oscuro sobre fondo oscuro. Método y trampas medidas: ' +
+        'docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md §«Cómo medir subjectProtection».'
     )
     process.exitCode = 1
   }
