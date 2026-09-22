@@ -1,6 +1,40 @@
 ---
 name: digital-marketing
-description: Diseña, ejecuta y audita marketing digital por canales y campañas. Use for paid media, social, content, email, creative testing, video, integrated campaigns, martech y AI marketing; separa media spend de Creative Studio production y delega conversión/atribución a Growth+CRO.
+description: >-
+  Skill experta y robusta de Marketing Digital (canales, craft y campañas) al
+  estado del arte 2026. Úsala para planear, ejecutar y auditar marketing por
+  canal: marca y arquitectura de mensaje en digital, content marketing (estrategia
+  editorial, formatos, distribución, thought leadership, GEO como canal), paid
+  media / performance advertising (Google/Meta/LinkedIn/TikTok, PMax/Advantage+,
+  programmatic, retargeting, estructura de cuenta, bidding, presupuesto/pacing,
+  creative testing, signal loss post-cookie, IA en pauta), social orgánico +
+  comunidad (creator/influencer economy, dark social, community-led), creatividad
+  y video (creative-as-targeting, hooks, UGC, IA creativa), email marketing y
+  marketing automation como canal (newsletters, nurture/drip, segmentación, MAP),
+  campañas integradas y GTM launches (PR digital, influencer, ABM), martech y
+  marketing ops (stack, CDP, first-party data, taxonomía UTM, tag management,
+  reporting) e IA en marketing (generativo, agentes, gobernanza/brand safety).
+  COMPLEMENTARIA pero DISTINTA de growth-marketing-cro: Digital Marketing TRAE y
+  ENGANCHA a la audiencia por canales; Growth+CRO la CONVIERTE, ACTIVA, RETIENE y
+  MIDE como sistema. Delega a growth-marketing-cro (CRO/conversión, experimentación,
+  activación, retención, arquitectura de atribución/tracking, loops, PLG), a seo-aeo
+  (SEO técnico/AEO/GEO por-motor/schema), a commercial-expert (pricing/pipeline/
+  quote-to-cash), a efeonce-agency (doctrina marca/GTM/ASaaS), a efeonce-public-site-
+  wordpress (publishing + AI Content Factory) y a greenhouse-email (plantillas/entrega
+  runtime). Incluye overlay Efeonce/Greenhouse. Triggers: "marketing digital",
+  "campaña", "campaign brief", "paid media", "pauta", "publicidad", "Google Ads",
+  "Meta Ads", "Facebook Ads", "Instagram Ads", "LinkedIn Ads", "TikTok Ads",
+  "programmatic", "PMax", "Performance Max", "Advantage+", "retargeting",
+  "remarketing", "ROAS", "CPM", "CPC", "CPA", "content marketing", "calendario de
+  contenido", "content calendar", "thought leadership", "social media", "redes
+  sociales", "community", "comunidad", "influencer", "creator", "UGC", "creative",
+  "ad creative", "video marketing", "email marketing", "newsletter", "nurture",
+  "drip", "marketing automation", "MAP", "campaña integrada", "GTM launch",
+  "lanzamiento", "ABM", "account-based marketing", "digital PR", "martech", "CDP",
+  "first-party data", "UTM", "media mix", "brand awareness", "IA en marketing",
+  "generative marketing", "agentic marketing".
+user-invocable: true
+argument-hint: "[canal/campaña o pregunta específica — ej: 'plan de paid media para /aeo-2', 'campaña de lanzamiento del grader', 'calendario de contenido del blog', 'estrategia de LinkedIn B2B']"
 ---
 
 # Marketing Digital — Skill operativa 2026
@@ -228,3 +262,18 @@ marketing), **nómbralo y encadena** a la skill dueña.
    línea. Digital Marketing define hipótesis, matriz y canal;
    las skills de producción estiman operaciones generativas bajo Studio Credits. Layout, edición, QA y export
    determinísticos consumen 0 credits, pero tienen costo humano; rights/creator/whitelisting quedan separados.
+
+## Campañas — el brief manda
+
+🔴 **Si la pieza pertenece a una campaña, lee su `BRIEF.md` ANTES de producir.** Vive en OneDrive
+`Alineación/2. Campañas/CMP-###_…`. Gobierna **la promesa, lo que NO se promete, la audiencia y su job, el
+vocabulario permitido, los destinos, la medición y los límites de uso** — y lo hace **igual para todos los
+canales**, porque una campaña la ejecutan varios agentes en varias sesiones y sin fuente única **diverge sin
+que nadie lo note**.
+
+- **Los assets van a la carpeta de su canal**, nunca a la de campaña; la campaña los referencia por ruta en
+  su `ASSETS.md`, donde hay que **registrar la fila** al sumar una pieza.
+- Si tu pieza necesita una promesa que el brief no tiene, **el brief se actualiza primero** (con el operador).
+- Un brief **crece con aportes de varios agentes**: léelo de nuevo antes de producir, **no de memoria**.
+
+Canon: `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md`.

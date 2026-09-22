@@ -262,3 +262,18 @@ marketing), **nómbralo y encadena** a la skill dueña.
    línea. Digital Marketing define hipótesis, matriz y canal;
    las skills de producción estiman operaciones generativas bajo Studio Credits. Layout, edición, QA y export
    determinísticos consumen 0 credits, pero tienen costo humano; rights/creator/whitelisting quedan separados.
+
+## Campañas — el brief manda
+
+🔴 **Si la pieza pertenece a una campaña, lee su `BRIEF.md` ANTES de producir.** Vive en OneDrive
+`Alineación/2. Campañas/CMP-###_…`. Gobierna **la promesa, lo que NO se promete, la audiencia y su job, el
+vocabulario permitido, los destinos, la medición y los límites de uso** — y lo hace **igual para todos los
+canales**, porque una campaña la ejecutan varios agentes en varias sesiones y sin fuente única **diverge sin
+que nadie lo note**.
+
+- **Los assets van a la carpeta de su canal**, nunca a la de campaña; la campaña los referencia por ruta en
+  su `ASSETS.md`, donde hay que **registrar la fila** al sumar una pieza.
+- Si tu pieza necesita una promesa que el brief no tiene, **el brief se actualiza primero** (con el operador).
+- Un brief **crece con aportes de varios agentes**: léelo de nuevo antes de producir, **no de memoria**.
+
+Canon: `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md`.
