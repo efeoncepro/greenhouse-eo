@@ -79,6 +79,20 @@ Fórmula obligatoria en todo el carril, en este orden:
 El pillar ya tiene la versión validada de esta figura: HubSpot se autodenomina Agentic Customer Platform con tres
 capas, y **la tercera —decidir qué hacen los agentes solos y qué queda con humanos— la nombra y no la llena**.
 
+🔴 **De qué está hecho el primer tiempo** *(delta 2026-09-22, tras rechazo del operador a tres titulares)*:
+
+> **El primer tiempo es un hecho que el lector ya vivió y puede verificar en su propia semana.
+> Nunca una suposición sobre lo que compró.**
+
+«Tu CRM ya se actualiza solo» funciona porque él lo vio anunciado. «La IA ya está en el presupuesto» funciona
+porque él lo firmó. «Ya tienes agentes» **falla** porque asume un lector product-aware cuando el gerente de
+mid-market está problem-aware: le pidieron IA, está evaluando, no tiene nada corriendo. Es el error #1 de
+Schwartz —usar el framework de un nivel de consciencia que el lector no tiene— y quien no se reconoce en el
+primer renglón no llega al segundo.
+
+**Consecuencia de proceso:** el nivel de consciencia del lector se declara **antes** de escribir el titular, no
+después. Caso fuente y reescrituras: `CMP-002/conceptos/CONCEPTOS-REVISION-v02.md`.
+
 Queda prohibido el encuadre de carencia del producto: «tu CRM no se enteró», «HubSpot no te dice», «lo que tu
 plataforma te oculta». El cuello de botella se ubica en el contexto y la autoridad, no en la capacidad del partner.
 
