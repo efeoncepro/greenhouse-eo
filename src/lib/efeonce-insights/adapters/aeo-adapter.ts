@@ -13,7 +13,7 @@ import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
-import { type AdapterCollectInput, type ModuleReportAdapterV1, evidenceWindow, factId } from './contract'
+import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, evidenceWindow, factId } from './contract'
 
 export const AEO_ADAPTER_VERSION = 'aeo_report_adapter_v1'
 
@@ -103,7 +103,7 @@ export const aeoReportAdapter: ModuleReportAdapterV1 = {
     return {
       facts: [...current.facts, ...(comparison?.facts ?? [])],
       sources: [current.source, comparison?.source ?? null].filter((source): source is EvidenceSourceV1 => source !== null),
-      rejections: [...current.rejections, ...(comparison?.rejections ?? [])]
+      rejections: [...current.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
     }
   }
 }

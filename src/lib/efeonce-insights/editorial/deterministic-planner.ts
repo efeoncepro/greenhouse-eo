@@ -28,7 +28,11 @@ const REJECTION_TEXT: Record<EvidenceRejectionV1['reason'], string> = GH_INSIGHT
 const limitFor = (rejection: EvidenceRejectionV1): string => {
   const subject = (rejection.metricId ? GH_INSIGHTS.metrics[rejection.metricId] : undefined) ?? GH_INSIGHTS.modules[rejection.module].label
 
-  return `${subject}: ${REJECTION_TEXT[rejection.reason]}.`
+  // Un rechazo de la ventana de COMPARACIÓN se dice como tal: sin eso, «la fuente no sirve esta ventana»
+  // aparecía al lado de las cifras del período actual que sí existen.
+  return rejection.scope === 'comparison'
+    ? `${subject}: ${GH_INSIGHTS.document.comparisonLimitPrefix} ${REJECTION_TEXT[rejection.reason]}.`
+    : `${subject}: ${REJECTION_TEXT[rejection.reason]}.`
 }
 
 const cutoffLabel = (asOf: string | null, locale: string): string => {

@@ -193,6 +193,21 @@ describe('TASK-1847 — límites y metodología sin identificadores internos', (
     ])
   })
 
+  it('un rechazo del período de comparación se dice como tal, no como falta de la ventana actual', () => {
+    const withComparison = buildDeterministicPlan(
+      { facts: leaky.facts, sources: [], rejections: [{ module: 'aeo', metricId: null, reason: 'unsupported_window', detail: 'x', scope: 'comparison' }] },
+      { modules: ['aeo'], locale: 'es-CL' }
+    )
+
+    expect(withComparison.limits).toEqual(['Motores de respuesta: en el período anterior, la fuente no sirve esta ventana con exactitud.'])
+  })
+
+  it('toda causa de límite, también la de comparación, cabe en el presupuesto más estrecho (96, lámina del deck)', () => {
+    for (const reason of Object.values(GH_INSIGHTS.rejections)) {
+      expect(`${GH_INSIGHTS.document.comparisonLimitPrefix} ${reason}`.length, reason).toBeLessThanOrEqual(96)
+    }
+  })
+
   it('cada sujeto de límite cabe en el presupuesto del informe A4 (38)', () => {
     const subjects = [...Object.values(GH_INSIGHTS.metrics), ...Object.values(GH_INSIGHTS.modules).map(module => module.label)]
 

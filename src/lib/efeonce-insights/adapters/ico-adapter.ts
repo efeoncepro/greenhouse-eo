@@ -13,7 +13,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
-import { type AdapterCollectInput, type ModuleReportAdapterV1, factId } from './contract'
+import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, factId } from './contract'
 
 export const ICO_ADAPTER_VERSION = 'ico_report_adapter_v1'
 
@@ -143,7 +143,7 @@ export const icoReportAdapter: ModuleReportAdapterV1 = {
     return {
       facts: [...current.facts, ...(comparison?.facts ?? [])],
       sources: [current.source, comparison?.source ?? null].filter((source): source is EvidenceSourceV1 => source !== null),
-      rejections: [...current.rejections, ...(comparison?.rejections ?? [])]
+      rejections: [...current.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
     }
   }
 }

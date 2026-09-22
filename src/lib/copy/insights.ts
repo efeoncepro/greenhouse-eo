@@ -100,6 +100,7 @@ export const GH_INSIGHTS = {
     limitsTitle: 'Lo que esta edición no puede afirmar',
     limitsAndMethod: 'Límites y metodología',
     limitNote: 'Nota',
+    comparisonLimitPrefix: 'en el período anterior,',
     limitNoCause: 'sin causa declarada',
     limitsNoneSubject: 'Sin límites',
     limitsNoneCause: 'esta edición no registró límites de evidencia',

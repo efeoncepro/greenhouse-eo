@@ -15,7 +15,7 @@ import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
 
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
-import { type AdapterCollectInput, type ModuleReportAdapterV1, evidenceWindow, factId } from './contract'
+import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, evidenceWindow, factId } from './contract'
 
 export const SEO_ADAPTER_VERSION = 'seo_report_adapter_v1'
 
@@ -241,7 +241,7 @@ export const seoReportAdapter: ModuleReportAdapterV1 = {
     return {
       facts: [...current.facts, ...(comparison?.facts ?? [])],
       sources: [...current.sources, ...(comparison?.sources ?? [])],
-      rejections: [...rejections, ...current.rejections, ...(comparison?.rejections ?? [])]
+      rejections: [...rejections, ...current.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
     }
   }
 }

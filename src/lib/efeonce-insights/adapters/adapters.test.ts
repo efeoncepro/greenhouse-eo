@@ -169,6 +169,17 @@ describe('AEO adapter', () => {
     expect(result.rejections).toEqual([expect.objectContaining({ reason: 'unsupported_window' })])
   })
 
+  it('el rechazo del período de comparación queda marcado como tal; el de la ventana actual, no', async () => {
+    // Caso real (Berel): el análisis del 3/9 cae en la ventana actual y el período anterior no tiene uno propio.
+    aeoMocks.readClientGraderReport.mockResolvedValue(report('2026-09-03', 'ready'))
+    const { aeoReportAdapter } = await import('./aeo-adapter')
+    const windows = month('2026-09-01', '2026-09-21', 'previous_period')
+    const result = await aeoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [] })
+
+    expect(result.facts.find(fact => fact.metricId === 'overall_score')).toBeDefined()
+    expect(result.rejections).toEqual([expect.objectContaining({ reason: 'unsupported_window', scope: 'comparison' })])
+  })
+
   it('review_required e insufficient_data se respetan; not_found es not_connected', async () => {
     const { aeoReportAdapter, } = await import('./aeo-adapter')
     const windows = month('2026-08-01', '2026-09-01')
