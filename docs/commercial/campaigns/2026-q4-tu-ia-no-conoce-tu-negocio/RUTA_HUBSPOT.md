@@ -6,6 +6,8 @@
 > Sistema creativo, proof gate y reglas de canal: [brief general](README.md) — **no se duplican acá**.
 > Oferta: [HubSpot as a Service V2](../../../services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md) ·
 > Destinos: [spec del hub](../../../public-site/HUBSPOT_HUB_LANDINGS_SPEC.md).
+> Campaña registrada: **CMP-002_tu-ia-no-conoce-tu-negocio-hubspot** en OneDrive `Alineación/2. Campañas/`
+> (brief, conceptos, descartes y assets). El repo lleva el criterio; el pensamiento y los entregables viven allá.
 
 Este brief cubre **el carril provider-specific**. El brief general cubre el capítulo 4 provider-neutral, la ruta CMO
 y la extensión 5B; acá no se repiten. La regla de sujeto manda en todo lo que sigue: **el problema del comprador es
@@ -18,12 +20,12 @@ detiene esa columna, no el carril completo.
 
 | Gate | Estado al 2026-09-22 | Qué habilita | Qué bloquea |
 |---|---|---|---|
-| **Destino** | pillar `200` · caso ANAM `200` · otras cuatro `404` | Orgánico completo; pauta hacia los dos destinos vivos | Pauta hacia precios, agentes, `cuando-no-usar` y `vs-salesforce` |
+| **Destino** | **sólo el caso ANAM** sirve; el pillar `200` redirige a un artículo de 2024; otras cuatro `404` | Orgánico completo; pauta al caso ANAM y a `/agenda/` | Pauta a pillar, precios, agentes, `cuando-no-usar` y `vs-salesforce` |
 | **Partner** | tier declarado, **no revalidado** | Cifras atribuidas; HubSpot como contexto y como plataforma de entrega | Declarar tier, badge o nivel; piezas pagadas provider-specific con marca de partner |
 | **Prueba** | un caso publicado (ANAM Customer Agent) | Los dos dolores de capítulo 4 con prueba real | Cualquier otro dolor con caso de cliente; el resto va con método y límite |
 
-**Lectura corta:** hoy se produce y se publica orgánico en los siete dolores; se pauta poco y solo a dos destinos; se
-afirma con prueba de cliente en uno solo.
+**Lectura corta:** hoy se produce y se publica orgánico en los siete dolores; se pauta poco y sólo al caso ANAM o
+a `/agenda/`; se afirma con prueba de cliente en un solo dolor.
 
 ## 2. Las siete fichas
 
@@ -39,7 +41,7 @@ Cada ficha es una unidad de producción. Una pieza resuelve **un dolor para un c
 | **Objeto de la pieza** | Un deal real anonimizado: lo que el sistema capturó, lo que infirió y lo que una persona tuvo que confirmar. Tres columnas, un caso. |
 | **Prueba** | Método propio + cifra HubSpot atribuida (3,6× MQL con contexto de calidad). **Sin caso de cliente publicable.** |
 | **Registro** | Neutral para instalar la tesis; nombrado cuando el trigger es el anuncio de Smart CRM self-updating |
-| **Destino** | pillar → evaluación inicial sin costo |
+| **Destino** | `/agenda/` o conversación directa — **el pillar no existe como landing** |
 | **Prohibido** | «tu CRM nunca se enteró» sin comprobarlo en ese caso; presentar la cifra de HubSpot como resultado Efeonce |
 
 ### 2.2 · «Marketing y ventas miran números distintos» — CMO + CRO
@@ -52,7 +54,7 @@ Cada ficha es una unidad de producción. Una pieza resuelve **un dolor para un c
 | **Objeto de la pieza** | La misma métrica calculada de dos formas legítimas, lado a lado, con el punto exacto donde divergen. |
 | **Prueba** | Método. **El capítulo 2 no tiene cifra HubSpot verificada y no toma prestada la de otro capítulo.** |
 | **Registro** | Neutral por defecto |
-| **Destino** | pillar → evaluación inicial; chequeo de salud de datos dentro de ella |
+| **Destino** | `/agenda/` o conversación directa |
 | **Prohibido** | «limpia todo el CRM antes de sumar agentes» como condición universal |
 
 ### 2.3 · «Mis datos están en cinco sistemas» — RevOps / IT
@@ -65,7 +67,7 @@ Cada ficha es una unidad de producción. Una pieza resuelve **un dolor para un c
 | **Objeto de la pieza** | Tres registros del mismo cliente y la regla de precedencia que decide cuál sobrevive — con el dueño de la corrección nombrado. |
 | **Prueba** | Método + artefacto de trabajo recompuesto |
 | **Registro** | Neutral; provider-specific solo para hablar de Data Hub como lugar de ejecución |
-| **Destino** | pillar → evaluación inicial |
+| **Destino** | `/agenda/` o conversación directa |
 | **Prohibido** | Dashboards fabricados como evidencia; capturas simuladas presentadas como portal real |
 
 ### 2.4 · «Nadie me encuentra, ni en Google ni en ChatGPT» — CMO
@@ -104,7 +106,7 @@ Cada ficha es una unidad de producción. Una pieza resuelve **un dolor para un c
 | **Objeto de la pieza** | Mapa de trabajo con autoridad por acción, capacidad de supervisión y costo por resultado válido. |
 | **Prueba** | Caso ANAM parcialmente + método de Hybrid Workforce Blueprint |
 | **Registro** | Provider-specific, con estados correctos: Agent Hub/Builder **pilot-first**, no GA |
-| **Destino** | `/agentes/` **está en `404`** → hoy pillar o conversación directa |
+| **Destino** | `/agentes/` **está en `404`** → hoy caso ANAM o conversación directa |
 | **Prohibido** | «flota de agentes»; roster fijo de agentes; convertir una demo de UNBOUND en disponibilidad |
 
 ### 2.7 · «Cotizo en Word y pierdo margen» — CFO
@@ -122,8 +124,7 @@ HubSpot para un caso concreto**: HubSpot jamás lo escribirá y el vacío sigue 
 éxito incluye que el lector se vaya— y es lo que gana credibilidad frente a RevOps.
 
 El artículo `/hubspot/cuando-no-usar-hubspot/` está en `404`. Mientras tanto, el ángulo puede vivir en orgánico como
-pieza de método con límites declarados, y el artículo queda como el segundo desbloqueo de mayor retorno después de
-`/precios/`.
+pieza de método con límites declarados. En la cola de desbloqueo va después del pillar y de `/precios/`.
 
 ## 4. Orden de producción propuesto
 
@@ -136,8 +137,9 @@ No son olas con fecha: son tramos ordenados por prueba disponible y bloqueo.
 | **3** | Ficha 2.4 (capítulo 3) | Activo existente, pero es el dolor menos dependiente de HubSpot | Decidir si entra como neutral o provider-specific |
 | **4** | Capítulo 5 en clave HubSpot | Solo cuando el cliente ya opera en HubSpot; si no, es Creative | Estado de Marketing Studio por cuenta y plan |
 
-**Transversal a los cuatro tramos:** desbloquear `/precios/` habilita más captura que cualquier pieza adicional
-—~1.500 búsquedas/mes medidas— y hoy responde `404`.
+**Transversal a los cuatro tramos:** el hub necesita **cinco** páginas, no cuatro — el pillar tampoco existe como
+landing. Orden de desbloqueo por retorno: **pillar** (la página que reparte) → `/precios/` (~1.500 búsquedas/mes
+medidas) → `cuando-no-usar` → `/agentes/`.
 
 ## 5. Medición
 
@@ -153,7 +155,8 @@ se suma como pipeline. La propiedad de campaña por capítulo en HubSpot requier
 
 1. **Revalidar el estado de partnership HubSpot** —tier, portal, certificaciones y derechos de marca—. Bloquea toda
    pieza pagada provider-specific.
-2. **Desbloquear `/precios/`**. Es el destino con demanda medida y el bloqueo número uno del carril.
+2. **Construir el pillar y desbloquear `/precios/`**. Hoy el carril no tiene página que reparta: `/servicios/hubspot/`
+   redirige a un artículo de 2024 y `/servicios-contratar-hubspot/` sigue viva sin su 301.
 3. **Decidir el hueco de Revenue Lifecycle** (CDR-004 §10.1).
 4. **Autorizar o archivar el caso ANAM RevOps.** Hasta entonces no se cita afuera.
 5. **Volver a medir los códigos de respuesta antes de cada activación.** Una URL viva ayer no se asume viva hoy.

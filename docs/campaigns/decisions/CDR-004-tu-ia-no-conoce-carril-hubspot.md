@@ -19,7 +19,7 @@ de sus rutas de venta, no una campaña paralela**.
 | Hecho | Medición |
 |---|---|
 | Capítulos 1 y 2 | Escritos en la narrativa, **sin brief operativo**; el capítulo 2 además sin cifra HubSpot verificada |
-| Destinos del hub `/servicios/hubspot/*` | **2 live** (pillar `200`, caso ANAM `200`) · **4 en `404`** (`/precios/`, `/agentes/`, `cuando-no-usar-hubspot`, `hubspot-vs-salesforce`) |
+| Destinos del hub `/servicios/hubspot/*` | **1 destino útil**: el caso ANAM (`200`, contenido alineado). El pillar **no existe**: `/servicios/hubspot/` da `200` pero redirige a `/hubspot/hubspot-marketing-ventas/`, artículo de blog de 2024; `/servicios-contratar-hubspot/` sigue `200` sin el 301 del spec. Las otras cuatro, `404` |
 | Estado de partnership HubSpot | «Partnership declarado por el CEO; estado contractual/tier **no revalidado** en este corte» (`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`) |
 | Prueba propia publicada | Caso ANAM Customer Agent, `/hubspot/ia-atencion-cliente-caso-anam/`, activo en producción confirmado 2026-09-13 |
 
@@ -118,14 +118,28 @@ Antes de declarar que una pieza llena un vacío, **medirlo**. Saturación no es 
 
 ### 7. Destinos y conversión
 
-Medición del 2026-09-22: **el pillar y el caso ANAM responden `200`; `/precios/`, `/agentes/`,
-`cuando-no-usar-hubspot` y `hubspot-vs-salesforce` responden `404`.** Consecuencias vinculantes:
+Medición del 2026-09-22, **por contenido y no sólo por código de respuesta**:
 
-- **Orgánico habilitado** en todo el carril, con destino al pillar, al caso ANAM o a conversación directa.
-- **Pauta bloqueada** hacia cualquier destino que no sea uno de los dos vivos. No se pauta hacia una URL prevista.
-- **`/precios/` es la palanca declarada del hub** (~1.500 búsquedas/mes medidas) y su `404` es el bloqueo número uno
-  del carril. Desbloquearla habilita más superficie de captura que cualquier pieza social adicional.
-- Antes de cada activación se vuelve a medir el código de respuesta. Una URL que estuvo viva no se asume viva.
+| URL | Código | Qué sirve realmente |
+|---|---|---|
+| `/hubspot/ia-atencion-cliente-caso-anam/` | `200` | **El caso ANAM.** Único destino del carril con contenido alineado |
+| `/servicios/hubspot/` | `200` → redirige | `/hubspot/hubspot-marketing-ventas/`, **artículo de blog de 2024**. No es el pillar del spec |
+| `/servicios-contratar-hubspot/` | `200` | Viva y **sin el 301** que el spec ordena hacia el pillar |
+| `/servicios/hubspot/precios/` · `/agentes/` · `cuando-no-usar-hubspot` · `hubspot-vs-salesforce` | `404` | No existen |
+| `/agenda/` | `200` | Destino genérico de conversación, no del carril |
+
+Consecuencias vinculantes:
+
+- 🔴 **El pillar no existe.** Un `200` que redirige a un artículo de 2024 no es una landing de conversión: no
+  tiene el mapa de dolores, el CTA de evaluación ni la sección «cuándo NO es para ti». Ninguna pieza lo usa
+  como destino mientras siga así.
+- **Hoy el carril tiene un destino propio —el caso ANAM— y uno genérico —`/agenda/`.** Todo lo demás es
+  conversación directa.
+- **Orgánico habilitado** en los siete dolores. **Pauta acotada** a esos dos destinos.
+- **El bloqueo número uno no son cuatro páginas, son cinco**, y el pillar va primero: es la página que reparte.
+  `/precios/` lo sigue por demanda medida (~1.500 búsquedas/mes).
+- **Se verifica el contenido, no el código.** Un `200` puede ser una redirección a otra cosa; esta medición
+  nació de ese error.
 
 ### 8. Prueba disponible y su límite
 
