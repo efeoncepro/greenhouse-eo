@@ -48,12 +48,24 @@ opciones: al pie se tapa, arriba cae sobre el sujeto iluminado y baja a **1,2–
    > enters it… Everything sits either ABOVE or BELOW that band.*
 2. ⚠️ **No confiar en que el modelo la respete: medirla.** En la primera pasada el monitor y el sujeto la
    cruzaron igual. **Medir el fondo en el ANCHO REAL de la firma** (0,2 del lado menor, centrada) barriendo
-   alturas, y quedarse con la mejor. Salieron **y = 0,42 · 0,52 · 0,40**, con 17,9–19,9:1.
+   alturas.
+   🔴 **Pero NO elegir por contraste solo — el máximo está a media altura y ahí la firma NO es una firma.**
+   Rechazado por el operador: con `y = 0,42–0,52` el contraste era el mejor del barrido (17,9–19,9) **y la
+   pieza se veía mal**: una firma flotando en el centro de la foto es un objeto suelto, no una firma.
+   ✅ **La firma va ABAJO. Se elige la altura MÁS BAJA que aún pase el umbral**, no la de mejor número:
+   **`y = 0,82`**, que la hace terminar hacia el **85%** — por encima de la barra de mensaje de Stories (87%).
+   Contraste 17,9 · 8,9 · 11,8. *Optimizar la métrica en vez de mirar la pieza es el mismo error que produce
+   copy que aprueba el checklist y no detiene a nadie.*
 3. **Forzar `logo.variant: "negative"`.** En `auto` el compositor eligió navy y el contraste se desplomó a
    **1,2:1** sobre la misma banda oscura donde el blanco daba 19,9.
 4. `componer-cta-safe.mjs` agrega **`logo.y`** (fracción del alto, retrocompatible) para poder ubicarla.
 
-**Resultado:** texto desde 16,5%, firma entre 40% y 52%, y el 20–35% inferior libre para la UI.
+**Resultado:** texto desde **16,5%**, firma en **82–85%**, y la barra de mensaje de Stories libre.
+
+⚠️ **Limitación declarada:** el guardrail de Meta para ads en **Reels** reserva hasta el **65%**, así que con
+caption largo la firma puede solaparse. Subirla ahí rompe la composición, y ese guardrail existe sobre todo
+para **elementos críticos** —titular y CTA—, que sí quedan fuera. La firma es identidad, no información
+accionable. **Declararlo, no esconderlo.**
 
 ⚠️ **Y la trampa de medición que costó dos rondas:** midiendo «firma blanca vs fondo» a mano daban 4,9 · 9,1 ·
 4,7 y parecía que pasaba; el compositor mide **la firma real**, que en `auto` es navy. **Medir el elemento que
