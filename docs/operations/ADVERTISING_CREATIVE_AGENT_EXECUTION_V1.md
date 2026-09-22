@@ -183,7 +183,7 @@ Contrato que se suma al de ejecución:
 `renderCollaborationSelection` + `compositeLuminosity`) vive en la carpeta de la corrida y es el patrón a promover.
 Follow-up posible, sin task creada: extraer texto enriquecido, medición de contraste por nivel y tarjeta de vidrio a
 `scripts/creative/layout-compiler/` o a un adapter del Campaign Layout Compiler cuando aparezca un segundo consumidor
-real. Hasta entonces, una corrida nueva copia y adapta ese archivo declarándolo en su evidencia; no lo importa desde
+real. Esa receta histórica queda congelada; para nuevos ads con CTA usar `foto:componer:cta` y su gate. No copiarla ni importarla desde
 `ai-generations/`.
 
 ## Invariantes
@@ -225,4 +225,8 @@ Descripción funcional: [reglas publicitarias para agentes](../documentation/cre
 
 ## Safe areas y paquete final
 
-Aplicar el canon Tres voces + acción, §Zonas seguras: placement y medio explícitos; UI fuera de texto/CTA/cursor/firma, con foto reencuadrada si el lecho queda tapado. Export limpio más máscara QA separada. Entregar concepto, audiencia, fase de embudo, hipótesis, CTA/destino, KPI, prompts/referencias, editables, comandos/dependencias y hashes. El operador autorizó promover la campaña SEO/AEO ajustada a Finales; conservar Pilotos. Final creativo no equivale a publicación ni a validación live del placement.
+Aplicar el canon Tres voces + acción, §Zonas seguras: placement y medio explícitos; texto/CTA/cursor protegidos; firma al pie con límites de UI declarados, sin inflar el lecho. Export limpio más máscara QA separada. Entregar concepto, audiencia, fase de embudo, hipótesis, CTA/destino, KPI, prompts/referencias, editables, comandos/dependencias y hashes. El operador autorizó promover la campaña SEO/AEO ajustada a Finales; conservar Pilotos. Final creativo no equivale a publicación ni a validación live del placement.
+
+## Método completo y compatibilidad verificada
+
+Consultar el [método SEO/AEO](social/2026-09-22-seo-aeo-paid-media-production-method.md) para dirección, registro, referencias, prompts, composición, lecho proporcionado, formatos, embudo y archivo local. El [compositor CTA](EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) es la ruta de trabajo nuevo; revisar §7 antes de migrar una corrida. Los runners históricos conservan reproducción exacta, no sustituyen el canon. QA vacío o sólo p98 no certifican contraste ni cobertura.

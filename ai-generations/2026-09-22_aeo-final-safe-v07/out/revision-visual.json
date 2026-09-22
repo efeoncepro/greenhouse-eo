@@ -1,0 +1,14 @@
+{
+  "method": "Revisión visual del export/contacto a 390 px y plate nativo, no detector automático de materia.",
+  "reviewed": [
+    "01-fuera-916",
+    "02-reconoces-916",
+    "03-referencia-916",
+    "04-elegida-916"
+  ],
+  "finding": "Lecho físico reducido al tramo inferior, aproximadamente 17–22% según transición óptica. Firma completa dentro de superficie desenfocada, con aire respecto a su inicio; escena recuperada.",
+  "signatureCenter": 0.9,
+  "anatomyAndScreens": "Tablet hacia quien la consulta, manos en agarre natural; dedo y reflejo coherentes en elección.",
+  "changeToCTA": "01-fuera-916: tinta blanca dentro de contorno naranja tras fallo de naranja 4,22:1.",
+  "limits": "La firma puede ser tapada por UI del placement; no se validó live ni se publicó."
+}

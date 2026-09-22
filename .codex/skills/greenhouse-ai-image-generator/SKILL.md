@@ -979,3 +979,7 @@ Conservar input oficial, plate, resultado del pase físico, detalle comparativo 
 revisiones identificables. Reportar por separado idea/pertinencia, identidad, geometría, material, lectura móvil
 y checks técnicos. V5 de la silla fue rechazada pese a checks verdes; V6 no implica aprobación humana ni
 resultados de audiencia. No publicar, reutilizar como aprobado ni promover a release por completar una generación.
+
+## Ediciones de campaña Efeonce y procedencia
+
+Para la foto de un ad propio, cargar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) junto al lenguaje fotográfico: ficha por ratio, prompt íntegro compilado, referencias exactas con hash, motor realmente usado y cadena de correcciones. Una corrección de tablet/manos/lecho edita el plate aprobado; no reconstruye identidad de memoria. Texto, CTA y firma editorial se componen después. Una nueva altura de firma exige revisar la extensión física del primer plano: no conservar un lecho gigante por inercia. Registrar descartes y límites de QA, sin elevarlos al catálogo aprobado.

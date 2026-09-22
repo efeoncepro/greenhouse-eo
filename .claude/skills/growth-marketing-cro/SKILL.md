@@ -327,3 +327,7 @@ declarar cualquier solapamiento posible y revisar el placement; nunca resolverlo
 Entregar concepto, audiencia, fase del embudo, hipótesis, progreso, CTA/destino y KPI junto con prompts,
 referencias, editables, comandos/dependencias y QA. Promover a Finales según autorización del operador;
 conservar pilotos y separar final creativo de tráfico/publicación y de resultados medidos.
+
+## Creatividad, etapa y continuidad Paid Media
+
+El [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) registra audiencia/estado de entrada, progreso, fase principal/secundaria y KPI por concepto. Ser fuente preferida es objetivo deseado, no garantía. Ausencia/representación abren problema; referencia/elección trabajan consideración. No inferir eficacia por estética, color o fase. Conservar CTA–destino, solicitudes calificadas, costo y métricas diagnósticas; hook temporal N/A en estáticos. Usar la matriz y el paquete compartido para que otro agente pueda modificar una variable sin perder el control.

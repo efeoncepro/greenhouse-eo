@@ -194,3 +194,7 @@ allá son **investigación con muestra declarada** —peer-reviewed de eye-track
 Kiin Labs— y son **las únicas de las dos listas que cubren imagen fija**. Se usan juntas: una define qué
 significa la métrica, la otra qué se midió. Sigue vigente lo demás: no encontrar evidencia no prueba
 inexistencia, y los premios no prueban rendimiento paid.
+
+## Caso operativo SEO/AEO: de dirección a archivo
+
+El [método de producción del 22/09](../../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) conecta los dos territorios (riesgo / fuente preferida), recursos canónicos, registro C, objeto digital, anatomía/pantallas, CTA y cuatro ratios. Documenta también los fallos: firma alta, lecho excesivo y migración no equivalente al compositor consolidado. Las piezas producidas no acreditan rendimiento paid; el embudo describe hipótesis de uso.

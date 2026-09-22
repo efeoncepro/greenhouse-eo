@@ -1049,3 +1049,7 @@ Salida: `…-final.png logo blanco 18.82:1 selección OK`.
 | `efeonce-look.mjs` | Ídem | **Descartado** (grade V0) |
 | Script de máscara | No persistido | Receta en §6.2 **[pendiente: persistir]** |
 | Comando `pnpm` (p. ej. `pnpm brand-photo:measure`) | — | **[pendiente]**: promover a `scripts/` del repo con tests y umbrales por contexto |
+
+## Ads: proporción del lecho y continuidad
+
+El lecho debe sostener la firma sin quitar protagonismo a la escena. La sesión SEO/AEO rechazó primero una firma alta y después el primer plano excesivo que seguía tapando casi media foto. Corregir juntos el encuadre físico y el SVG, conservar materia/desenfoque óptico y no imponer el porcentaje de un caso a todo el catálogo. [Método completo](../social/2026-09-22-seo-aeo-paid-media-production-method.md): ficha/prompt compilado, referencias, anatomía, composición, formatos, embudo y handoff. [Compositor CTA vigente y límites](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).

@@ -298,7 +298,7 @@ conserva la metodología completa con evidencia y programación.
 
 Para fotografía o imagen fotorrealista de **la marca Efeonce** (no de clientes), cargar
 [lenguaje fotográfico de Efeonce](references/efeonce-photographic-language.md), aprobado el 2026-09-19:
-«El oficio a la vista», barra de juicio, firma con primer plano **planeado** y logo SVG al 15%, roles de color,
+«El oficio a la vista», barra de juicio, firma con primer plano **planeado** y logo SVG al 20% del lado corto, roles de color,
 WB sin grade, catálogo de tomas y checklist QA. **NUNCA** anclar la serie en la categoría de un cliente real.
 El [documento maestro](../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) conserva el
 contrato completo; la producción del pixel sigue en `greenhouse-ai-image-generator`.
@@ -324,3 +324,7 @@ declarar cualquier solapamiento posible y revisar el placement; nunca resolverlo
 Entregar concepto, audiencia, fase del embudo, hipótesis, progreso, CTA/destino y KPI junto con prompts,
 referencias, editables, comandos/dependencias y QA. Promover a Finales según autorización del operador;
 conservar pilotos y separar final creativo de tráfico/publicación y de resultados medidos.
+
+## Dirección de ads: escena, lecho y continuidad
+
+El [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) conecta registro, idea, referencias y producción. El lecho sirve a la firma; no domina el encuadre ni comprime la escena para satisfacer una safe zone. Si baja la firma, revisar también la foto y reducir el primer plano excesivo mediante edición, conservando materia y profundidad. En la corrección SEO/AEO se buscó el quinto inferior; es una decisión del caso, no porcentaje universal. Verificar tablet orientada hacia su usuario, agarre/manos, identidad y colores en píxeles. Cambiar sólo el gráfico no resuelve una mala composición fotográfica.

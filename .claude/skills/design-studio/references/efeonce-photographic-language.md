@@ -43,7 +43,7 @@ Arquetipos a evitar: **consultora** (talleres, post-its, mesas genéricas), **pe
 > Esta barra es la del **registro documental**. El de **puesta en escena** tiene la suya, y juzgar una pieza con la
 > barra del otro registro es el error que describe la sección siguiente.
 
-## Los DOS registros — y por qué la barra de §2 es la del documental **[2026-09-21]**
+## Registros A/B y extensión C — la barra depende del mensaje
 
 El canon V1 describió **un** registro. Existían dos, y el segundo ya estaba publicado y aprobado sin estar escrito:
 de ahí la sensación del operador de que «el lenguaje me limita» al intentar meter una pieza del segundo por la
@@ -70,6 +70,10 @@ Evidencia: «¿Claude o Codex?», el KV de Clawd, `copiloto`, `G-podcast-v5.png`
 **«¿Claude o Codex?» está publicada, aprobada y funciona, y NO pasa la barra de §2** **[medido]**: no hay obra, no
 hay mecanismo, y el test de sustitución queda **parcial** —lo anclan las mascotas de partner y el polo—. No es una
 excepción ni un error: es el otro registro.
+
+### C · La respuesta a la vista
+
+El [maestro, registro C](../../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md#delta-2026-09-21-tarde--tercer-registro-c--la-respuesta-a-la-vista) incorpora como sujeto la respuesta y quien la encarna: Nexa, criatura del motor u objeto digital. Si hay persona, recibe la respuesta, sin protagonismo corporativo genérico. Debe significar sin titular y conservar identidad, materia, luz, color, reservas y firma. C no es un filtro ni una licencia para HUD/scrims. La mirada al lente distingue casos A/B; no basta para clasificar C.
 
 ### Qué NO cambia entre uno y otro
 
@@ -619,3 +623,9 @@ fotográfica y zona segura. La firma debe cerrar al pie sobre el lecho físico; 
 satisfacer un guardrail. El operador rechazó la v05 al 63% y señaló como referencia la firma baja de Claude.
 La v06 usa centro 83,3%, SVG oficial y contraste ≥4,5:1. Es un criterio editorial, no certificación Reels:
 registrar el posible solapamiento y revisar el placement real. Ver §Zonas seguras de Tres voces + acción.
+
+## Lecho proporcionado: corregir la foto, no sólo la firma
+
+El operador rechazó el lecho de los verticales SEO/AEO v05/v06: había nacido para la firma alta y ocupaba casi media foto. Bajar el SVG dejó la escena comprimida. Corregir el plate para recuperar área narrativa, conservar un primer plano físico desenfocado sólo donde necesita descansar la firma y revisar el conjunto a 390 px. La v07 busca aproximadamente el quinto inferior; no convertirlo en nueva tabla universal. Prohibidos banda añadida, scrim o desenfoque artificial usado como sustituto de materia. [Método y evidencia](../../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md).
+
+**Corrección del operador, misma sesión:** además de reducir el lecho, la firma debe estar DENTRO de su materia desenfocada, separada del borde de transición. No trasladar el Y de Claude o de v06 a otra foto. Si el logo queda encima del lecho, es REWORK aunque contraste y bounds den PASS. V07 usa centro 90% después de esa revisión; es caso, no token.

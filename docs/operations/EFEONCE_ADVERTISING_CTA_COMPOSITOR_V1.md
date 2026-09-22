@@ -40,7 +40,7 @@ plate, y justo la que falla al elegir `solid` sobre un plate claro.
 | Clave | Qué mide | Cómo | Mínimo |
 |---|---|---|---|
 | `contraste.cta` | tinta contra relleno | teórico desde los tokens *(basta: el relleno es plano)* | **4,5:1** |
-| `contraste.cta_superficie_vs_escena` | **relleno contra la foto** | sobre el píxel, mínimo local | **3:1** |
+| `contraste.cta_superficie_vs_escena` | **relleno contra la foto** | sobre el píxel, p98; mínimo adicional exigido (§7) | **3:1** |
 
 `contraste.cta` se emite **siempre**, sea cual sea la variante, con el mismo nombre — el QA no necesita saber
 qué variante era.
@@ -62,8 +62,7 @@ que sólo valida las claves presentes no puede detectar una ausencia — y la au
 ## 4. Retrocompatibilidad
 
 Un plan sin `surfaceToken`/`inkToken` usa el par por defecto de la familia aprobada: relleno = superficie de
-acento con tinta oscura; texto y contorno = tinta de acento. **Los planes de las corridas anteriores siguen
-corriendo sin cambios.** `surfaceToken`/`inkToken` permiten variar el color por pieza, que es lo que la regla
+acento con tinta oscura; texto y contorno = tinta de acento. **Los campos de la base v03 conservan sus defaults; no implica equivalencia visual con todas las corridas posteriores (ver §7).** `surfaceToken`/`inkToken` permiten variar el color por pieza, que es lo que la regla
 habilita al decir «lima no obligatorio».
 
 ## 5. Las copias de corrida quedan obsoletas
@@ -76,7 +75,59 @@ reintroduce el problema que este documento cierra — y la próxima corrección 
 
 ## 6. Extensiones sobre v03
 
-- **`logo.y`** *(fracción del alto, opcional)* — ubica la firma. Sin el campo, al pie, como siempre.
+- **`logo.y`** *(fracción del alto, opcional)* — ubica el borde superior de la firma. Sin el campo, al pie, como siempre.
   🔴 En **9:16 de pauta la firma al pie cae dentro de la UI**: receta completa en la skill.
 - **`logo.variant`** — forzar `negative`. En `auto` el compositor puede elegir navy sobre banda oscura y el
   contraste se desploma a **1,2:1** donde el blanco da 19,9.
+
+## 7. Auditoría de compatibilidad y alcance — 22/09/2026
+
+Revisión directa del código en `3934d4e26`, posterior a la consolidación `f864e0d9c`; pruebas locales en
+`ai-generations/2026-09-22_aeo-compositor-audit/audit.json`, con hashes de ambos scripts. **No se modificó
+el runtime del compositor en esta revisión.** La consolidación existe; no implica que todo campo de todas
+las corridas haya sido incorporado ni que el gate cubra todo el contrato creativo.
+
+| Capacidad | Estado comprobado |
+|---|---|
+| `text`, `outline`, `solid`, `surfaceToken`, `inkToken` | Implementados; prueba de cuatro piezas con las tres variantes |
+| Tinta/relleno sólido | Ratio teórico emitido como `contraste.cta` |
+| Relleno/foto | Emitido como `cta_superficie_vs_escena`, pero el helper usa **p98 de luminancia**, no mínimo local |
+| `logo.y` | **Borde superior** fraccional del logo; no centro. `logo.width <= 1` es fracción del lado corto |
+| `logo.variant: auto` con `logo.y` | La elección de tinta sigue muestreando el pie por defecto, no el Y personalizado. Declarar variante y validar donde se pinta |
+| `centerX` de v06 | No consumido: centra en `W/2`. Migrar sin adaptación puede desplazar CTA al sujeto/proyección |
+| `signatureY` de v06 | No consumido. Es centro en el firmador archivado; convertir a `logo.y = centro - altoLogo/(2*altoCanvas)` |
+| `safeArea`, `signatureSafeArea`, `editorialReserve` | Metadatos de corrida, no guards implementados por este comando |
+| `subjectProtection` | Comprueba borde inferior del descriptor; no toda la envolvente de cursor, titular o personaje |
+| Render parcial por IDs | Emite `qa-parcial.json`; el gate lee `qa.json`. Para la pareja de comandos usar un plan completo en carpeta exclusiva |
+| Descriptor/cursor sin CTA | No inferir soporte opcional: el camino de layout accede a `s.cta` y al descriptor. El help heredado no demuestra soporte de pieza muda |
+
+**Prueba de migración:** el render de cuatro piezas termina, pero el gate rechaza «Sé la referencia»:
+CTA 1,5:1 y descriptor 1,7:1 porque perdió su eje desplazado y cayó sobre la proyección. Los finales v06
+no se sustituyeron por este resultado. No anunciar reproducción idéntica desde el comando nuevo.
+
+### Cobertura del gate
+
+Fixtures locales: un CTA válido pasa y un CTA sin `contraste.cta` falla, como se buscaba. Sin embargo,
+QA vacío, IDs ajenos, descriptor ausente y filas duplicadas terminan con exit 0. Por tanto, **exit 0 solo
+no certifica cobertura**. Antes de aceptar el resultado exigir externamente:
+
+1. Un plan por carpeta, sin IDs duplicados; QA recién compuesto desde ese mismo plan y esos mismos plates.
+2. Exactamente una fila de QA por ID esperado, sin ausencias, duplicados ni filas ajenas.
+3. Datos numéricos finitos para CTA, descriptor cuando exista y superficie cuando sea `solid`.
+4. Medición adicional del **mínimo** local, contorno, cursor/controles, firma y zona segura. El helper
+   p98 redondea a dos decimales; no usarlo para rescatar un valor real bajo el umbral.
+5. Revisión visual por ratio, a tamaño completo y de consumo. El gate no comprueba identidad, dedos,
+   orientación de tablet, tamaño del lecho ni cierre visual de firma.
+
+Estas son limitaciones abiertas del comando, no fallos corregidos por documentarlas. Para ampliar el
+runtime, hacerlo en el módulo canónico y verificar estos casos; no crear una sexta copia independiente.
+
+### Dos modos de continuidad
+
+- **Trabajo nuevo:** `pnpm foto:componer:cta` y `pnpm foto:cta:gate`, más las comprobaciones anteriores.
+- **Reproducción histórica exacta:** ejecutar el runner/dependencias archivados con la entrega. Es una
+  excepción de preservación de evidencia, no una base para nuevas campañas. Cualquier migración cambia
+  versión y pasa comparación de composición y QA antes de reemplazar un final.
+
+Método creativo, prompts, formatos, embudo y archivo:
+[SEO/AEO Paid Media](social/2026-09-22-seo-aeo-paid-media-production-method.md).

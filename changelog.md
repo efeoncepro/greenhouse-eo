@@ -19,6 +19,8 @@ Prompts, editables, matriz y evidencia en OneDrive; cobertura de cuatro ratios d
 v05 recompuso los cuatro verticales; el operador rechazó la firma alta. v06 la baja al pie según Claude,
 con texto/CTA protegidos y posible solapamiento de firma en Reels declarado; QA separado.
 16 finales autorizados en OneDrive, con conceptos/embudo, prompts, editables y reproducción; sin publicación.
+v07 reduce el lecho y ancla la firma dentro de su materia. Método completo y ocho skills actualizados;
+auditoría del compositor CTA: p98, cobertura del gate y campos no compatibles documentados, sin cambiar código.
 Sin cambios runtime.
 
 ## 2026-09-21 — Paid visual: palancas, cinematic ads y medición por formato

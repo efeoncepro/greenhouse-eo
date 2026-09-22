@@ -346,3 +346,7 @@ una estimación como medición.
 7. **Una verdad, dos interfaces.** En Content Engineering, la experiencia humana y la representación computable
    deben derivar del mismo contenido gobernado. Schema, FAQ, entidades y respuestas nunca mantienen una versión
    manual paralela a lo visible.
+
+## Promesa creativa AEO en anuncios
+
+El [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) aplica el objetivo deseado de ser **fuente preferida en la respuesta** y los riesgos de ausencia o representación incorrecta. Es una aspiración estratégica, no una posición 1 garantizada ni evidencia de que un motor describa mal una marca concreta. Mantener la diferencia entre aparecer, ser citado, ser elegido por el usuario y convertir. La campaña del servicio usa diagnóstico SEO+AEO como siguiente paso; no sustituirlo automáticamente por un grader ni prometer gratuidad.

@@ -1,6 +1,6 @@
 # Formatos de pauta: safe zones, cursores y las trampas medidas
 
-> **as-of 2026-09-22** · todo lo de acá está **medido en producción**, no inferido. Caduca 2027-03.
+> **as-of 2026-09-22** · evidencia de composición local; separar mediciones, decisiones editoriales y especificaciones de plataforma. Caduca 2027-03.
 > Hermanos: [evidencia](ad-creative-evidence-2026.md) (qué está medido) ·
 > [playbook](paid-visual-attention-playbook.md) (cómo se produce y se mide) ·
 > [Tres voces + acción](../../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md) (el CTA).
@@ -189,3 +189,11 @@ Descriptor identifica la oferta          ← no repite el botón
 ## Aplicación SEO/AEO Codex v06: la firma cierra al pie
 
 El operador rechazó la v05 con firma al 63% por quedar casi al centro. La v06 sigue la referencia visual de Claude: centro al 83,3%, lecho físico y contraste ≥4,5:1. Texto, CTA y cursor conservan ventana interna x=8–88%, y=16–65%. La firma editorial se evalúa por separado y queda fuera del guardrail inferior conservador de Reels; declarar el posible solapamiento y verificar el placement antes de pautar. **No elevar la firma al centro para optimizar un gate ni etiquetar toda la pieza como segura para Reels.** Canon y evidencia: [Tres voces + acción](../../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md#zonas-seguras-placement-y-promoción-a-finales--2026-09-22).
+
+## Lecho y compositor: revisión posterior de la misma sesión
+
+Bajar la firma sin reducir un lecho que ocupa casi media foto no corrige la composición: el operador rechazó los verticales v06 por ese motivo. Editar el primer plano físico y recuperar la escena. En la corrección se buscó el quinto inferior, no una nueva reserva obligatoria global.
+
+El comando consolidado es la ruta para trabajo nuevo, pero no todo plan histórico es compatible: `centerX` se ignora y `logo.y` significa borde superior. Su gate tampoco detecta QA vacío/ajeno/duplicado y su contraste de fondo usa p98. [Auditoría ejecutada](../../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#7-auditoría-de-compatibilidad-y-alcance--22092026); [método integral](../../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md). No atribuir a la documentación una corrección de código que no ocurrió.
+
+**Corrección del operador, misma sesión:** además de reducir el lecho, la firma debe estar DENTRO de su materia desenfocada, separada del borde de transición. No trasladar el Y de Claude o de v06 a otra foto. Si el logo queda encima del lecho, es REWORK aunque contraste y bounds den PASS. V07 usa centro 90% después de esa revisión; es caso, no token.

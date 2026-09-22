@@ -265,3 +265,9 @@ El operador rechazó la v05 al 63%: no subirla al centro para aprobar safe zones
 visual de Claude, centro al 83,3%. La firma puede quedar fuera del guardrail de Reels; declarar el riesgo
 por placement y verificar la preview real antes de pauta. Texto/CTA/cursor mantienen su ventana protegida.
 No añadir scrims. [Canon y limitaciones](../EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md#zonas-seguras-placement-y-promoción-a-finales--2026-09-22).
+
+## Ads: proporción del lecho y continuidad
+
+El lecho debe sostener la firma sin quitar protagonismo a la escena. La sesión SEO/AEO rechazó primero una firma alta y después el primer plano excesivo que seguía tapando casi media foto. Corregir juntos el encuadre físico y el SVG, conservar materia/desenfoque óptico y no imponer el porcentaje de un caso a todo el catálogo. [Método completo](../social/2026-09-22-seo-aeo-paid-media-production-method.md): ficha/prompt compilado, referencias, anatomía, composición, formatos, embudo y handoff. [Compositor CTA vigente y límites](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
+
+**Anclaje físico, corrección v07:** comprobar que la caja completa de la firma está dentro de la superficie desenfocada y deja aire respecto a su inicio; no basta estar cerca del borde inferior ni cumplir contraste. No poner el SVG sobre la zona nítida encima del lecho. La posición se decide sobre el plate real; copiar 83,3% de otra imagen produjo el error.

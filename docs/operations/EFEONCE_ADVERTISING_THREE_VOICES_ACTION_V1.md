@@ -64,7 +64,7 @@ Canon de aplicación creativa: este documento, cargado desde `efeonce-advertisin
 **`pnpm foto:componer:cta` + `pnpm foto:cta:gate`**, con las cinco copias de corrida consolidadas y el hueco
 de medición del relleno cerrado. Canon: [`EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md`](EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
 
-El compositor de campaña extiende el [compositor fotográfico canónico](../../scripts/foto/componer.mjs) y reutiliza el renderer AXIS. Los campos `cta` del JSON piloto son locales de corrida: el comando canónico no se anuncia como compatible hasta una implementación y verificación explícitas.
+El compositor canónico de CTA reutiliza el renderer AXIS. Sus campos efectivamente soportados y límites se verifican en el contrato técnico, §7; no asumir que campos posteriores como `centerX` o `signatureY` migran por nombre. Los runners archivados conservan reproducción histórica, no autoridad para nuevas copias.
 
 ## Evidencia del caso, no presets globales
 
@@ -175,7 +175,15 @@ comandos y dependencias, evidencia de contraste/safe areas, aprobación y limita
 hipótesis de uso, no rendimiento demostrado. TOFU/MOFU/BOFU describen función, no un embudo rígido ni una
 asignación automática del estilo de CTA.
 
-Caso y paquete: `ai-generations/2026-09-22_aeo-final-safe-v06/`; archivo OneDrive en
-`03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v06-Codex-firma-al-pie`. Su LEEME y matriz gobiernan qué se
+Caso histórico v06: `ai-generations/2026-09-22_aeo-final-safe-v06/`, sustituido tras corrección de lecho. Paquete vigente:
+`03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado`. Su LEEME y matriz gobiernan qué se
 promovió, sus límites y cómo reproducirlo. Los prompts IA conservan trazabilidad; reproducir el gráfico
 es determinista, regenerar fotografía no garantiza los mismos píxeles.
+
+## Continuidad integral de la campaña
+
+El [método SEO/AEO](social/2026-09-22-seo-aeo-paid-media-production-method.md) conecta dirección creativa, registro C, identidad/kits, prompts compilados, anatomía/pantallas, composición, formatos, embudo y archivo. La corrección de firma no termina moviendo el SVG: si el lecho nació para una firma alta, reducir su extensión física y devolver área a la escena; no dejar media imagen vacía. Validar el conjunto antes de promover.
+
+## Corrección de lecho y firma v07
+
+La v06 también fue corregida: había bajado el logo pero conservaba un primer plano que ocultaba casi media foto. La v07 edita las cuatro tomas 9:16 para recuperar escena y limitar el lecho al tramo inferior. **Ubicar el SVG dentro de la materia ya desenfocada, con aire bajo su transición; nunca por encima o montado en el canto.** La referencia de Claude orienta el cierre, no impone un Y universal. En estos plates la última revisión sitúa el centro al 90%; eso no acredita safe zone de plataforma. Medir contraste allí y declarar oclusión posible antes de pauta. Las coordenadas de §v06 son historia del caso, no receta a heredar.

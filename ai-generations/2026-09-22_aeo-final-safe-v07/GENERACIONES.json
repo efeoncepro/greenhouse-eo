@@ -1,0 +1,12 @@
+{
+  "engine": "image_gen integrado",
+  "intent": "edit",
+  "outputs": {
+    "01-fuera": "exec-e2b81016-7bff-4bf2-8512-62d4cccda79d.png",
+    "02-reconoces": "exec-f4e18e48-8663-4883-814d-83f55c8927a5.png",
+    "03-referencia": "exec-1c81880a-ab57-4cac-9355-8b957f58a6e3.png",
+    "04-elegida": "exec-8d1a79b0-a5d6-4fab-8eff-297efaaff3a5.png"
+  },
+  "references": "origen-v06/<id>-916.png",
+  "change": "reducir lecho alto, recuperar escena; sin cambios de concepto"
+}

@@ -122,3 +122,9 @@ Por defecto: cada concepto ×4:5/1:1/9:16/16:9; exclusiones sólo con brief expl
 ## Gate para Finales
 
 Registrar placement/tipo de medio, perfil y fuente de safe area, bounds de texto/cursor/firma, máscara QA separada y revisión de escena. No basta contraste. Handoff: concepto, audiencia, fase de embudo, hipótesis, CTA/destino, KPI, prompts/referencias, editables, comandos, hashes, autorización y limitaciones. Aplicar el canon Tres voces + acción.
+
+## Gate de continuidad y cobertura real
+
+Antes de aceptar `foto:cta:gate`, comprobar que QA contiene exactamente una fila por ID del plan, con claves numéricas finitas y descriptor/superficie cuando apliquen. La auditoría vigente detectó exit 0 con QA vacío, IDs ajenos o duplicados; no convertirlo en aprobación. El compositor usa p98 para fondo y no verifica toda la envolvente. [Compatibilidad y límites](../../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#7-auditoría-de-compatibilidad-y-alcance--22092026).
+
+Revisar el lecho y la firma como composición única: logo bajo con media imagen tapada sigue siendo REWORK. Incluir en el handoff concepto/embudo, archivos literales, referencias/hashes y comandos reproducibles. El [método completo](../../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) reúne los casos y la secuencia vigente.

@@ -1,7 +1,7 @@
 # Handoff activo
 
 **Ads (22/09):** [Tres voces + acción](docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md):
-16 piezas/4 ratios; firma v06 al pie, límite Reels; embudo y QA. Sin pauta.
+16 piezas/4 ratios; v07 corrige lecho/firma; CTA auditado (§7), sin pauta.
 
 **Paid visual (21/09):** [playbook](.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md)
 Codex/Claude: doce palancas sin resultados paid; registro C en construcción.

@@ -324,3 +324,7 @@ declarar cualquier solapamiento posible y revisar el placement; nunca resolverlo
 Entregar concepto, audiencia, fase del embudo, hipótesis, progreso, CTA/destino y KPI junto con prompts,
 referencias, editables, comandos/dependencias y QA. Promover a Finales según autorización del operador;
 conservar pilotos y separar final creativo de tráfico/publicación y de resultados medidos.
+
+## Paid Media: ratio, placement y entrega reproducible
+
+Aplicar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md): cuatro ratios por KV salvo exclusión, foto y copy recompuestos, archivo local en Recursos/Pilotos/Finales y matriz por versión. Distinguir foto/reserva, safe zone de UI y criterio editorial de firma. No certificar Reels por una máscara local; registrar la excepción de firma al pie y verificar el placement real. No convertir PNG 9:16 en Video Ad por nombre. El lecho físico no debe crecer para reemplazar una zona de interfaz. Prompts, referencias, edición, embudo y comandos acompañan cada export.

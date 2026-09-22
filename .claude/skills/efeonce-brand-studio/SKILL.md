@@ -231,3 +231,7 @@ vez del gris de marca `#848484`, que da 2,98:1 de contraste y no resuelve en ser
 da 7,06:1; «Growth» en blanco, 11,15:1). Es una excepción de legibilidad para sustratos oscuros impresos, **no
 drift**: en pantalla y sobre fondos claros el gris de marca sigue vigente. Método:
 [merch con arte impreso](../greenhouse-ai-image-generator/references/garment-reference-kit.md#merch-con-arte-impreso-y-piezas-mecánicas).
+
+## Recursos canónicos en anuncios Efeonce
+
+Para Nexa, mascotas, vestuario y espacios en Paid Media, aplicar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md). Separar referencia de identidad por ángulo, kit de prenda/objeto y plate. Verificar rasgos, accesorios, ropa y emblemas sobre el render; nombrar un recurso en el prompt no acredita su uso. La firma editorial proviene del SVG oficial y cierra al pie sobre materia real. No agrandar el lecho hasta borrar media escena. Conservar derechos y procedencia por uso previsto; Finales no significa pauta autorizada.

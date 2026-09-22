@@ -43,11 +43,11 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
 
 7. **Al adaptar una pieza a 9:16 o 16:9, o al componer un CTA**, carga
    [safe zones y trampas de formato](references/paid-format-safe-zones-and-craft.md) (`as-of 2026-09-22`,
-   todo medido en producción). Lo que más caro sale ignorar:
+   evidencia local de producción creativa; no resultados de pauta). Lo que más caro sale ignorar:
    - 🔴 **la reserva del comando NO es la safe zone de la plataforma.** En 9:16 la banda del comando empieza
      en 10% y la UI del placement puede invadir esa banda; el14% es referencia de Meta, no regla de LinkedIn: obedecer sólo al comando pone el titular
      debajo del nombre de la cuenta. Manda la más restrictiva;
-   - **en 16:9 el cursor no cabe** —tacha el cierre a cualquier escala— y `cursors: []` aborta con
+   - **en el caso 16:9 auditado el cursor chocó con el cierre** y `cursors: []` aborta con
      `cursor-required`: la salida es cursor a 0,9 + cierre corto;
    - **la vista del personaje puesta en la raíz de la ficha se ignora en silencio** y resuelve la pose por
      defecto: verificar la ruta `--image` que imprime el comando antes de gastar;
@@ -343,8 +343,12 @@ En **carrusel sobre ilustración** (2026-09-19, «Nivel de búsqueda», `compone
 
 ## Cierre por placement y entrega a Finales
 
-Aplicar el canon Tres voces + acción, §Zonas seguras: comprobar bounds de texto, CTA, cursor y **firma**;
-reencuadrar el lecho cuando la UI inferior lo tape. No usar el ratio como sustituto del placement ni
+Aplicar el canon Tres voces + acción, §Zonas seguras: comprobar texto/CTA/cursor y firma por separado;
+la firma cierra al pie y cualquier solapamiento se declara. Ajustar la extensión del lecho a la composición. No usar el ratio como sustituto del placement ni
 presentar una máscara de QA como captura live. Con autorización de promoción, pasar sólo exports
 verificados a Finales, conservando pilotos. Acompañar concepto, audiencia, fase del embudo, hipótesis,
 CTA/destino, KPI, prompts/referencias, editables, comandos, hashes y evidencia. Final creativo ≠ publicación.
+
+## Continuidad de producción Paid Media
+
+Cargar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) al retomar conceptos, prompts, composición o entrega entre agentes. Integra los dos territorios AEO, registro C, metáfora digital, kits, anatomía/pantallas, cuatro ratios, embudo y paquete reproducible. Para trabajo nuevo usar el compositor canónico de CTA; para reconstruir un final histórico, su runner congelado. Auditar compatibilidad: `centerX` y `signatureY` de las corridas no migran automáticamente. Un gate con cero piezas o sólo p98 no acredita el contrato. La firma y el tamaño físico del lecho se revisan juntos: bajar el SVG no corrige una foto con media imagen vacía.
