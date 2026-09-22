@@ -227,3 +227,13 @@ Documentation closure:
 - Verification: <commands/evidence>
 - Closure state: complete | code complete, rollout pendiente | operativamente bloqueado
 ```
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+Al cerrar una campaña o actualizar su brief, comprobar versión/decisiones, links y una fila por export con
+estados separados; preservar aportes de otros agentes y no copiar assets. Si cambia el modelo reusable,
+sincronizar templates versionados Claude/Codex y copias de OneDrive. Un documento no certifica runtime,
+sincronización cloud, publicación ni permiso. No replicar el brief completo en Handoff/skills.

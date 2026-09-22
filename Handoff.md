@@ -1,7 +1,6 @@
 # Handoff activo
 
-**Ads (22/09):** [Tres voces + acción](docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md):
-16 piezas/4 ratios; v07 corrige lecho/firma; CTA auditado (§7), sin pauta.
+**Ads (22/09):** [CMP-001 y templates](docs/operations/social/2026-09-22-cmp-001-campaign-brief-handoff.md): 25 exports; v07 lecho/firma; CTA auditado; sin pauta.
 
 **Paid visual (21/09):** [playbook](.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md)
 Codex/Claude: doce palancas sin resultados paid; registro C en construcción.

@@ -629,3 +629,9 @@ registrar el posible solapamiento y revisar el placement real. Ver §Zonas segur
 El operador rechazó el lecho de los verticales SEO/AEO v05/v06: había nacido para la firma alta y ocupaba casi media foto. Bajar el SVG dejó la escena comprimida. Corregir el plate para recuperar área narrativa, conservar un primer plano físico desenfocado sólo donde necesita descansar la firma y revisar el conjunto a 390 px. La v07 busca aproximadamente el quinto inferior; no convertirlo en nueva tabla universal. Prohibidos banda añadida, scrim o desenfoque artificial usado como sustituto de materia. [Método y evidencia](../../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md).
 
 **Corrección del operador, misma sesión:** además de reducir el lecho, la firma debe estar DENTRO de su materia desenfocada, separada del borde de transición. No trasladar el Y de Claude o de v06 a otra foto. Si el logo queda encima del lecho, es REWORK aunque contraste y bounds den PASS. V07 usa centro 90% después de esa revisión; es caso, no token.
+
+**Criterio vigente para nuevas adaptaciones 9:16 (operador):** si bajar la firma la saca de la zona segura y
+subirla mucho destruye el cierre, elevar ligeramente el inicio del lecho para alojarla dentro de su materia y
+de la zona segura, con aire, manteniéndola visualmente al pie. No convertir el 90% ni la franja de v07 en preset.
+No agrandar de nuevo el lecho hasta comprimir la escena. Verificar ambos límites sobre el export y el preview
+del placement; esta instrucción no afirma que los exports históricos ya hayan sido recompuestos.

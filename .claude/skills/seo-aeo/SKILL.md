@@ -349,4 +349,14 @@ una estimación como medición.
 
 ## Promesa creativa AEO en anuncios
 
-El [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) aplica el objetivo deseado de ser **fuente preferida en la respuesta** y los riesgos de ausencia o representación incorrecta. Es una aspiración estratégica, no una posición 1 garantizada ni evidencia de que un motor describa mal una marca concreta. Mantener la diferencia entre aparecer, ser citado, ser elegido por el usuario y convertir. La campaña del servicio usa diagnóstico SEO+AEO como siguiente paso; no sustituirlo automáticamente por un grader ni prometer gratuidad.
+El [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) aplica el objetivo deseado de ser **fuente preferida en la respuesta** y los riesgos de ausencia o representación incorrecta. Es una aspiración estratégica, no una posición 1 garantizada ni evidencia de que un motor describa mal una marca concreta. Mantener la diferencia entre aparecer, ser citado, ser elegido por el usuario y convertir. El lote TOFU documentado usa diagnóstico SEO+AEO como siguiente paso; no sustituirlo automáticamente por un grader ni prometer gratuidad. En MOFU/BOFU, usar la acción y el destino del brief vigente según el avance del comprador.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+En campañas, separar mención, cita de URL, exactitud/atribución, recomendación, preferencia del usuario y
+conversión. Fuente preferida es aspiración, no posición garantizada. Auditar contenido+técnica+entidad/autoridad
+según la brecha; no prometer más citas por publicar más. La campaña gobierna el siguiente paso: diagnóstico
+para entrada, demostración/evaluación para MOFU, alcance/conversación para BOFU cuando corresponda.

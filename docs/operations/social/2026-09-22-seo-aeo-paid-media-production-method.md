@@ -158,3 +158,16 @@ población, periodo, placement y denominador. Hook temporal de video no aplica a
 atribución a Efeonce, intención y conversión son preguntas diferentes; no inferir una desde otra.
 Comparar estilos de CTA manteniendo concepto, oferta, foto y condiciones de medios; no atribuir lift al
 color ni declarar ganador sin muestra y calidad comparables.
+
+## 9. Campaña registrada y extensión MOFU/BOFU
+
+El pensamiento de campaña se consolida en OneDrive `Alineación/2. Campañas/CMP-001_la-ia-dice-de-ti/BRIEF.md`;
+los archivos de esta corrida continúan en Paid Media. [Continuidad CMP-001](2026-09-22-cmp-001-campaign-brief-handoff.md)
+y [contrato reusable](../EFEONCE_CAMPAIGN_REGISTRY_V1.md) gobiernan brief, templates, ASSETS, decisiones y medición.
+Las etiquetas de fase de §2 describen la corrida histórica, no restringen el journey: el operador sitúa el lote
+de diagnóstico como entrada TOFU. MOFU demuestra método/evidencia; BOFU define alcance y conversación. Content
+Marketing se conecta a SEO/AEO por cobertura, conocimiento propio y decisión del comprador. No producir más
+piezas por defecto ni prometer citas/ventas; el brief distingue hipótesis y evidencia.
+
+La última corrección de lecho exige elevarlo ligeramente para alojar firma al pie dentro de material y safe
+zone, no bajar la firma fuera de ella ni llevarla al centro. No se han regenerado finales por documentarlo.

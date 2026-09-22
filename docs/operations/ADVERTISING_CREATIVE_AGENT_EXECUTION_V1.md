@@ -230,3 +230,11 @@ Aplicar el canon Tres voces + acción, §Zonas seguras: placement y medio explí
 ## Método completo y compatibilidad verificada
 
 Consultar el [método SEO/AEO](social/2026-09-22-seo-aeo-paid-media-production-method.md) para dirección, registro, referencias, prompts, composición, lecho proporcionado, formatos, embudo y archivo local. El [compositor CTA](EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) es la ruta de trabajo nuevo; revisar §7 antes de migrar una corrida. Los runners históricos conservan reproducción exacta, no sustituyen el canon. QA vacío o sólo p98 no certifican contraste ni cobertura.
+
+## Brief, assets y continuidad de campaña
+
+Antes de producir, cargar el [registro CMP y templates](EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+Ficha por pieza con job, promesa/prueba, copy literal, canal/placement, referencias, receta y QA. El brief
+instanciado vive en campaña; export y editables viven en canal, con una fila por archivo en ASSETS. No deducir
+aprobación de un nombre FINAL ni pauta de la aprobación creativa. Caso de continuidad:
+[CMP-001](social/2026-09-22-cmp-001-campaign-brief-handoff.md).

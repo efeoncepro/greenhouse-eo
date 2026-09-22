@@ -331,3 +331,13 @@ conservar pilotos y separar final creativo de tráfico/publicación y de resulta
 ## Creatividad, etapa y continuidad Paid Media
 
 El [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) registra audiencia/estado de entrada, progreso, fase principal/secundaria y KPI por concepto. Ser fuente preferida es objetivo deseado, no garantía. Ausencia/representación abren problema; referencia/elección trabajan consideración. No inferir eficacia por estética, color o fase. Conservar CTA–destino, solicitudes calificadas, costo y métricas diagnósticas; hook temporal N/A en estáticos. Usar la matriz y el paquete compartido para que otro agente pueda modificar una variable sin perder el control.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+El plan de campaña distingue clicks, consultas recibidas, diagnóstico entregado, reserva confirmada, reunión
+realizada, encaje y oportunidad. Cada KPI declara denominador/fuente/ventana; utm_content en URL no prueba
+persistencia en booking. Verificar el recorrido y sus dependencias antes de gasto; sin causalidad automática
+entre citación IA e ingresos. Hipótesis de experimento no es resultado.

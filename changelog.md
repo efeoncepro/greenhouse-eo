@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-22 — Campañas CMP: brief y continuidad entre agentes
+
+[Contrato ampliado](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md): templates de brief, índice de exports y ficha
+por pieza, versionados Claude/Codex y sincronizados con OneDrive. Skills de estrategia, producción y medición
+rutean al mismo brief, con JTBD/evidencia, estados separados y receta reproducible. CMP-001 consolida SEO/AEO y
+Content, 25 exports por ruta; historial preservado. Corrección del lecho para nuevas adaptaciones documentada;
+sin regenerar finales, modificar runtime ni publicar/pautar.
+
 ## 2026-09-22 — Ads: Tres voces + acción
 
 [Regla aprobada](docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md): CTA Poppins en texto, contorno o
@@ -673,13 +681,3 @@ verde. `ISSUE-173` (el drain del dominio deja huérfano al handler que el breake
 Docs y skills sincronizadas el mismo día (arquitectura ATS §Delta 2026-09-12, `.claude/rules/hiring.md`, invariantes
 SQL/Ops, playbook reactivo, skills talento/resend/email/release con espejos `.codex/`, desk/careers/emails) y follow-ups
 formalizados: `TASK-1872` (fix de ISSUE-173), `TASK-1873`/`TASK-1874` (enlace descartado en intake y Application 360).
-
-## 2026-09-12 — Bricolage Grotesque disponible para assets creativos Efeonce
-
-Se incorporó `BricolageGrotesque-Variable.ttf` desde el repositorio oficial de Google Fonts, junto con su licencia SIL
-OFL 1.1 y nota de procedencia/hash en `src/assets/fonts/`. `DESIGN.md`,
-`docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` y las skills espejo de tipografía, `design-studio` e
-`greenhouse-ai-image-generator` documentan su uso como display expresiva para campañas y piezas editoriales fuera de
-la UI. Se fijó además la regla de que toda seasonality debe incluir product placement reconocible de Efeonce, con
-Bricolage para la idea display y Poppins para contexto/apoyo, sin invadir elementos rituales. No cambia el runtime:
-Greenhouse mantiene Poppins + Geist como sus únicas familias activas de producto.

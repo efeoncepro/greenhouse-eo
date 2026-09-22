@@ -187,3 +187,9 @@ El [método SEO/AEO](social/2026-09-22-seo-aeo-paid-media-production-method.md) 
 ## Corrección de lecho y firma v07
 
 La v06 también fue corregida: había bajado el logo pero conservaba un primer plano que ocultaba casi media foto. La v07 edita las cuatro tomas 9:16 para recuperar escena y limitar el lecho al tramo inferior. **Ubicar el SVG dentro de la materia ya desenfocada, con aire bajo su transición; nunca por encima o montado en el canto.** La referencia de Claude orienta el cierre, no impone un Y universal. En estos plates la última revisión sitúa el centro al 90%; eso no acredita safe zone de plataforma. Medir contraste allí y declarar oclusión posible antes de pauta. Las coordenadas de §v06 son historia del caso, no receta a heredar.
+
+**Criterio vigente para nuevas adaptaciones 9:16 (operador):** si bajar la firma la saca de la zona segura y
+subirla mucho destruye el cierre, elevar ligeramente el inicio del lecho para alojarla dentro de su materia y
+de la zona segura, con aire, manteniéndola visualmente al pie. No convertir el 90% ni la franja de v07 en preset.
+No agrandar de nuevo el lecho hasta comprimir la escena. Verificar ambos límites sobre el export y el preview
+del placement; esta instrucción no afirma que los exports históricos ya hayan sido recompuestos.

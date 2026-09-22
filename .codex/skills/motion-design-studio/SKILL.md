@@ -271,3 +271,12 @@ Para campañas gastronómicas estacionales, cargar
 `workflows/food-table-native-reel-and-exact-post.md`: plate limpio, toma generativa, texto/logo
 compuestos, cursor que no deforma el alimento, grade localizado, audio aprobado conservado,
 nueva toma 9:16 cuando el encuadre lo exige y QA del export/portada. Caso validado: Fiestas Patrias 2026.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+La ficha de campaña añade duración, primeros fotogramas, ritmo, audio/subtítulos y cierre; se conserva el
+medio real exportado. Un PNG 9:16 no es video. Definir hook/hold con fuente de plataforma, versiones y muestras;
+no extrapolar atención de referencias a performance. Storyboard y receta viven con el asset en canal.

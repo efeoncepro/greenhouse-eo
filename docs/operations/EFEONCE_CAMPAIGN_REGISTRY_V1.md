@@ -43,7 +43,7 @@ CMP-###_nombre/
 
 🎯 **`decisiones/` no es opcional y es lo que más se ahorra:** un concepto rechazado **sin su razón** se
 vuelve a proponer en tres semanas y se vuelve a pagar. En `CMP-001` hay ocho territorios descartados con su
-causa medida.
+razón registrada; una razón creativa no equivale a evidencia de performance.
 
 ## 5. Lo archivado NO es referencia
 
@@ -96,3 +96,60 @@ Antes de producir, léelo de nuevo — no de memoria.
 2. **Nunca copies un asset** a la carpeta de campaña. Referencia su ruta.
 3. Los territorios descartados van a `decisiones/` **con su razón**.
 4. Al cerrar, escribe la lectura **aunque haya ido mal** — sobre todo si fue mal.
+
+## 8. Contrato del brief ampliado y templates
+
+El brief es la fuente de criterios de una campaña; el canon técnico de cada disciplina sigue en su skill y
+contrato dueño. No duplicar los valores de AXIS, el lenguaje fotográfico o el tracking plan para cambiarlos
+localmente. ADR aplicable: [router-first](../architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md);
+esta extensión documental usa el registro aceptado, sin cambiar runtime, autonomía ni autoridad de publicación.
+
+Los templates reutilizables se versionan en la skill `digital-marketing` (espejos Claude/Codex):
+
+- [Brief](../../.codex/skills/digital-marketing/templates/campaign-brief.md).
+- [Índice de assets](../../.codex/skills/digital-marketing/templates/campaign-assets.md).
+- [Ficha por pieza](../../.codex/skills/digital-marketing/templates/campaign-piece.md).
+
+Las copias para uso local viven en OneDrive `Alineación/2. Campañas/_templates/`. Sincronizarlas al cambiar el
+modelo; `_templates` no reserva un CMP. Los briefs instanciados se mantienen en su campaña, nunca se regeneran
+sobre aportes de otro agente desde el template. Comparar contenido antes de escribir, conservar antecedentes y
+resolver conflicto de criterios con evidencia/decisión del operador. `FINAL`, mtime o carpeta Finales no prueban
+vigencia, QA ni autorización. La instrucción ya autorizada del operador permite actualizar el brief dentro de
+ese alcance; este contrato no añade una reconfirmación por cada edición documental.
+
+### Contenido obligatorio
+
+1. Identidad, versión, estado, responsables, geografía/idioma y alcance; incógnitas explícitas.
+2. Objetivo de negocio, KPI/meta/ventana y presupuesto separado de producción; no inventar cifras para llenar campos.
+3. JTBD situado, trigger, operador, sponsor y validadores; separar evidencia de hipótesis. El tamaño de empresa
+   no determina por sí solo quién decide ni qué dolor tiene.
+4. Promesa, prueba, exclusiones, claims con fuente/fecha y condición de vigencia.
+5. Journey TOFU/MOFU/BOFU por conocimiento y progreso, con una acción y destino por pieza. No repetir diagnóstico
+   obligatoriamente a quien ya lo recibió ni tratar reenvío/CTR como conversión comercial.
+6. Canal, plataforma, placement, medio y ratio por separado; especificación vigente por verificar antes de salida.
+7. Conceptos/IDs, copy literal de imagen y plataforma, variantes/control, estado y descartes con razón.
+8. Recursos canónicos por ruta/vista/hash y permiso de uso, registro visual, reservas, lecho/firma y safe zones.
+9. Receta: ficha, prompt íntegro compilado, motor, referencias, ediciones, copy/layout editable, capas, comandos,
+   versiones/dependencias, QA y checksum. Un prompt escrito no demuestra generación.
+10. Destino exacto, formulario/reserva y tracking realmente verificados; UTM y campos persistidos distinguidos.
+11. Métricas con definición/denominador/fuente, guardrails, experimento, umbral y criterio de parada/inconcluso.
+12. Fechas separadas de producción/revisión/aprobación/publicación, responsables, permisos y pendientes con criterio de salida.
+13. Handoff: índices, decisión vigente, histórico y próxima acción. No borrar aportes previos ni rehacer un aprobado sin encargo.
+
+### Índice de archivos y estados independientes
+
+`ASSETS.md` registra **una fila por export** con ID estable, concepto/versión, fase de uso, canal/placement,
+medio/ratio/dimensiones, ruta exacta, evidencia/fecha y estados separados. No renumerar IDs existentes al sumar
+filas; los conceptos aún no producidos van en otra tabla. Vincular el paquete de editables/receta/QA sin copiarlo.
+
+Distinguir existencia local, QA, aprobación creativa, derechos, autorización de medios, publicación y resultados.
+Inventariar archivos no verifica integridad visual, sincronización remota ni permisos. Un recurso de cliente
+accesible/tokenizado no habilita difusión. La aprobación de un recurso para orgánico no se extiende a paid.
+
+### QA de cierre documental
+
+Verificar links/rutas, cobertura real por ratio y estados contradictorios; conservar versiones anteriores con
+procedencia. Registrar cantidad verificada, hashes de documentos y límites de comprobación. No certificar runtime
+por una task o un brief: una dependencia pendiente sólo se levanta con evidencia de su cierre aplicable.
+
+Caso aplicado: [CMP-001 y continuidad](social/2026-09-22-cmp-001-campaign-brief-handoff.md).

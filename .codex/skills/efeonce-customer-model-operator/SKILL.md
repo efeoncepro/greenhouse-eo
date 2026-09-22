@@ -245,3 +245,12 @@ JTBD y oportunidad concreta. Mantener el mapa de estados y su fecha en el audit 
 - `.codex/skills/gtm-architect/modules/01_MARKET_SEGMENT_SELECTION.md` — segmentación y beachhead.
 - `.codex/skills/commercial-expert/` — ejecución comercial y qualification.
 - `.codex/skills/research-benchmark-operator/` — rigor de research y confidence.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+El brief CMP registra JTBD situado y roles operador/sponsor/validadores; mid-market/enterprise son contextos,
+no equivalencias rígidas entre cargo, autoridad o conversión. Etiquetar inferencias y validar con compradores;
+una skill o una recepción positiva del concepto no certifica demanda. Conservar alternativas y frenos de compra.

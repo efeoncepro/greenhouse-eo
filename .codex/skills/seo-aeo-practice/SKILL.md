@@ -345,3 +345,14 @@ Canon (no repetir acá): ADR `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD
 5. ¿Es una decisión de método de venta genérica? → **es de `commercial-expert`**, no de acá.
 6. ¿Vas a citar tráfico estimado? → **versión de fórmula + as-of + aviso del corte 2026-11-01** (§4d). Con
    `truncated=true`, es un piso.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+La prueba comercial distingue intervención controlable de aparición/citación/elección observada. No garantizar
+inclusión en motores ni recuperación/ahorro en paid por una correlación; no presumir caída de tráfico o mala
+experiencia previa para todo prospecto. Medir conversiones de referencia cuando existan datos no prueba el efecto
+causal de una cita. Estas precisiones prevalecen para copy sobre formulaciones absolutas de módulos históricos.
+No reiniciar el Grader por defecto en MOFU/BOFU: evidencia, muestra autorizada y alcance según avance real.

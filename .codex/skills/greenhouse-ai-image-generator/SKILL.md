@@ -983,3 +983,12 @@ resultados de audiencia. No publicar, reutilizar como aprobado ni promover a rel
 ## Ediciones de campaña Efeonce y procedencia
 
 Para la foto de un ad propio, cargar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) junto al lenguaje fotográfico: ficha por ratio, prompt íntegro compilado, referencias exactas con hash, motor realmente usado y cadena de correcciones. Una corrección de tablet/manos/lecho edita el plate aprobado; no reconstruye identidad de memoria. Texto, CTA y firma editorial se componen después. Una nueva altura de firma exige revisar la extensión física del primer plano: no conservar un lecho gigante por inercia. Registrar descartes y límites de QA, sin elevarlos al catálogo aprobado.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+Para una imagen de campaña, consumir ficha, prompt compilado y referencias canónicas del brief vigente.
+Guardar prompt íntegro, motor real, referencias/hashes, intentos y cadena de ediciones en canal; no confundir
+prompt preparado con ejecución. Texto, firma y CTA editables se componen según canon, con QA de export.

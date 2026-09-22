@@ -359,3 +359,12 @@ CTA/destino, KPI, prompts/referencias, editables, comandos, hashes y evidencia. 
 ## Continuidad de producción Paid Media
 
 Cargar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) al retomar conceptos, prompts, composición o entrega entre agentes. Integra los dos territorios AEO, registro C, metáfora digital, kits, anatomía/pantallas, cuatro ratios, embudo y paquete reproducible. Para trabajo nuevo usar el compositor canónico de CTA; para reconstruir un final histórico, su runner congelado. Auditar compatibilidad: `centerX` y `signatureY` de las corridas no migran automáticamente. Un gate con cero piezas o sólo p98 no acredita el contrato. La firma y el tamaño físico del lecho se revisan juntos: bajar el SVG no corrige una foto con media imagen vacía.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+Antes del prompt releer brief y decisiones vigentes: un archivo llamado FINAL puede conservar copy descartado.
+Registrar job, tensión, prueba, copy literal, CTA/destino y una palanca por ficha. La aprobación de dirección no
+aprueba todos los renders; QA editorial, preview de placement y autorización paid se registran separados.

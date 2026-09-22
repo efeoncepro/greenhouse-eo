@@ -2,9 +2,11 @@
 
 ## Estado vigente para agentes
 
+CMP: [brief y templates](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
+
 ## Actualización documental reciente
 
-Los ledgers CRM de Dreamforce/UNBOUND están actualizados al 2026-09-19; el provider-fit admite
+Ledgers CRM Dreamforce/UNBOUND al 2026-09-19; el provider-fit admite
 `HubSpot-first | Salesforce-first | híbrida | no-fit`. La [transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md)
 está aprobado y probado comercialmente por confirmación del operador; pruebas publicables, pricing y elegibilidad
 de cada capacidad siguen sujetos a verificación.

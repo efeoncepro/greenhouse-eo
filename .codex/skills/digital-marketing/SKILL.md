@@ -277,3 +277,12 @@ que nadie lo note**.
 - Un brief **crece con aportes de varios agentes**: léelo de nuevo antes de producir, **no de memoria**.
 
 Canon: `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md`.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+Usar los templates versionados `templates/campaign-brief.md`, `campaign-assets.md` y `campaign-piece.md`;
+sus copias operativas viven en OneDrive `2. Campañas/_templates/`. Distinguir canal, placement, medio y ratio;
+presupuesto, fechas y metas pendientes no se inventan. Cada export tiene fila estable en ASSETS y receta en canal.

@@ -301,3 +301,12 @@ que nadie lo note**.
 - Un brief **crece con aportes de varios agentes**: léelo de nuevo antes de producir, **no de memoria**.
 
 Canon: `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md`.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+Conservar copy literal por imagen y plataforma, headline, botón nativo, CTA y descriptor en ficha editable.
+Mantener promesa, exclusiones y vocabulario del brief; adaptar expresión al canal sin inventar resultados.
+Identificar qué hook es propuesta, aprobado o descartado; no usar copy de archivo FINAL contra una decisión más nueva.

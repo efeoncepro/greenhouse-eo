@@ -235,3 +235,12 @@ drift**: en pantalla y sobre fondos claros el gris de marca sigue vigente. Méto
 ## Recursos canónicos en anuncios Efeonce
 
 Para Nexa, mascotas, vestuario y espacios en Paid Media, aplicar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md). Separar referencia de identidad por ángulo, kit de prenda/objeto y plate. Verificar rasgos, accesorios, ropa y emblemas sobre el render; nombrar un recurso en el prompt no acredita su uso. La firma editorial proviene del SVG oficial y cierra al pie sobre materia real. No agrandar el lecho hasta borrar media escena. Conservar derechos y procedencia por uso previsto; Finales no significa pauta autorizada.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+Referencias de identidad/vestuario/mascotas/logos se registran con ruta, vista, versión y permiso por canal.
+Accesibilidad del archivo o aprobación orgánica no habilita paid. La firma editorial se compone desde recurso
+oficial. No inventar certificaciones, clientes, derechos o recursos para completar el brief.

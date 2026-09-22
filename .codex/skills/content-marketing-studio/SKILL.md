@@ -217,3 +217,13 @@ que nadie lo note**.
 - Un brief **crece con aportes de varios agentes**: léelo de nuevo antes de producir, **no de memoria**.
 
 Canon: `docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md`.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+En campañas de visibilidad, conectar Content con SEO/AEO: conocimiento propio y evidencia que resuelven
+preguntas/decisiones pertinentes. Investigar cobertura antes de producir; actualizar/consolidar puede ser mejor
+que otro artículo. Multiformato es capacidad, no el job central. Conservar revisión experta y aprobación;
+un ejemplo ficticio de landing no es caso de cliente.

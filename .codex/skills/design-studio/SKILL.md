@@ -300,3 +300,13 @@ conservar pilotos y separar final creativo de tráfico/publicación y de resulta
 ## Dirección de ads: escena, lecho y continuidad
 
 El [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) conecta registro, idea, referencias y producción. El lecho sirve a la firma; no domina el encuadre ni comprime la escena para satisfacer una safe zone. Si baja la firma, revisar también la foto y reducir el primer plano excesivo mediante edición, conservando materia y profundidad. En la corrección SEO/AEO se buscó el quinto inferior; es una decisión del caso, no porcentaje universal. Verificar tablet orientada hacia su usuario, agarre/manos, identidad y colores en píxeles. Cambiar sólo el gráfico no resuelve una mala composición fotográfica.
+
+## Continuidad de campañas CMP
+
+Canon: [registro y contrato de brief](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md#8-contrato-del-brief-ampliado-y-templates).
+El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la carpeta del canal.
+
+La ficha por pieza declara referencias reales por vista, identidad, prenda, espacio/prop y hash; abrir referencias
+aprobadas comparables antes de producir. Conservar plate, prompt íntegro, copy/layout editable, capas y receta en
+canal. Para firma 9:16, elevar ligeramente el lecho si hace falta para alojarla dentro de materia y zona segura,
+sin subirla al centro ni agrandar excesivamente el primer plano; verificar cada placement.
