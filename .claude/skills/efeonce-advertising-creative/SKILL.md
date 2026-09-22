@@ -75,6 +75,11 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    imagen y no sobre el método**; y (3) **vía de producción**, la única que varía: declara cuál usaste.
    🔴 **Si tienes motor propio, NO reescribas el prompt a mano: consume el `.prompt.txt` resuelto** — ahí es
    donde viven el bloque anti-IA, la palanca y las reservas, y es portable a cualquier motor.
+   🔴 **Y para adjuntar referencias a tu modelo: los kits pesan ~640 MB y están FUERA de git — un clone no
+   los trae.** Búscalas en la ruta local o en las copias fijadas de la campaña
+   (`15. Paid Media/01. Recursos/`). **Verifica con `pnpm foto:assets:check` ANTES de generar:** si el hash
+   difiere, produces una identidad distinta de la aprobada **y el resultado se ve plausible — no revienta,
+   miente**. Anota la referencia con su `sha256`, no sólo con su ruta.
 
 ### Motor de IA: cómo elegir (as-of 2026-09-16)
 
