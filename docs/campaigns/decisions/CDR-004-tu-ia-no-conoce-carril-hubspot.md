@@ -170,6 +170,26 @@ El cruce de §2 deja dos casillas sin par. Se declaran, no se rellenan por simet
    Creative Velocity & Production. En el carril HubSpot el capítulo 5 entra **solo cuando el cliente ya opera en
    HubSpot** y el problema es producción de campaña sobre ese stack; en cualquier otro caso es Creative, no HubSpot.
 
+## Delta 2026-09-22 — el buying group real corrige la columna «comprador»
+
+El operador declaró, el mismo día de aceptación, que **la conversación comercial ocurre con gerencias —Marketing,
+Ventas, Finanzas y CTO/IT— y casi nunca con el CEO**, y que **enterprise es más difícil con HubSpot**. Es
+evidencia de operación propia y prevalece sobre la columna «Comprador» de §2, que fue tomada del mapa de dolores
+del pillar.
+
+1. **La columna «Comprador» de §2 describe a quién le duele, no con quién se habla.** Un dolor cuyo dueño nominal
+   es el CEO llega a una pieza dirigida a la gerencia que tiene que ejecutarlo: «el directorio pidió IA» le habla
+   al **CTO/IT**, no al CEO. El CEO permanece como sponsor que aprueba, no como destinatario de una pieza.
+2. **§10.1 cambia de prioridad.** El hueco de Revenue Lifecycle / CFO se declaró diferido por no tener capítulo.
+   Con Finanzas como interlocutor habitual, **ese dolor está en la puerta de entrada**, no en el margen. Siguen
+   abiertas las dos puertas posibles —costo por resultado válido, transversal, o cotización/margen, Revenue
+   Lifecycle— y siguen siendo jobs distintos: la decisión sigue pendiente, pero deja de ser de baja prioridad.
+3. **En enterprise el carril no lidera con la plataforma.** Lidera el problema y HubSpot aparece si hay fit. Es la
+   regla de sujeto de §1, ahora con motivo comercial además de editorial.
+
+No cambia el criterio del CDR: regla de sujeto, unidad por dolor, fórmula de dos tiempos, los tres gates y la
+decisión de no usar paleta HubSpot siguen vigentes. Asignación por pieza y conceptos en **CMP-002**.
+
 ## Alternativas descartadas
 
 - **Una campaña por familia de solución:** seis campañas simultáneas, seis presupuestos, seis medidas. Fragmenta la
