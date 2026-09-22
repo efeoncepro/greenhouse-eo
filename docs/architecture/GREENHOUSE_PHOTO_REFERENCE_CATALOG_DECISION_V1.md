@@ -81,6 +81,32 @@ por eso el cajón equivocado no es un problema de orden: es un problema de contr
 el mensaje que dice exactamente qué hacer; al revertirla, vuelve a verde. Un detector que nunca se vio
 fallar no está probado.
 
+## Verificación en vivo — el mismo día
+
+**Un kit nuevo entró y el sellador lo absorbió sin una línea de cambio.** Menos de una hora después de
+esta decisión, otra sesión agregó el kit de Gigi al catálogo: **24 referencias** de rol `objeto-forma`.
+`git log` no registra **ningún** commit sobre `assets-lock.mjs` posterior, y `pnpm foto:assets:check`
+da verde en **149 assets**. Antes, ese kit habría exigido acordarse de tocar el sellador — y el
+historial dice que eso se olvida.
+
+Ésa es la prueba que el ADR necesitaba y que ninguna revisión de código da: **el segundo consumidor
+llegó solo**.
+
+## Lo que estaba en juego — caso medido, no hipotético
+
+El mismo día, otra sesión tuvo **cuatro pasadas seguidas con el emblema inventado** en una pieza con
+una criatura de partner grande en cuadro: salió la nube de OpenAI bordada en el polo, después un cohete
+genérico, después unas alas, y sólo la cuarta devolvió la nave con sus tres ventanas y la órbita.
+
+Ese fallo tenía otra causa —contaminación de la criatura— pero ocurrió **mientras el constructor
+pasaba al modelo un macro del emblema que no estaba sellado**. Si ese archivo hubiera estado
+sustituido, quien depuraba habría pasado horas afinando el prompt **contra una referencia equivocada,
+sin que nada se lo dijera**.
+
+Eso es el pilar de Safety en concreto: el riesgo no es abstracto ni de permisos, es **horas de
+depuración contra una referencia que nadie aprobó, en el asset que existe justamente para que la marca
+no se reinvente**.
+
 ## Los cuatro pilares
 
 - **Safety** — el riesgo es de **marca**, no de permisos: un asset fuera del lock puede sustituirse y
