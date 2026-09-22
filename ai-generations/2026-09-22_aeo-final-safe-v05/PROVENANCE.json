@@ -1,0 +1,203 @@
+[
+  {
+    "id": "01-fuera-916",
+    "chain": [
+      {
+        "prompt": "brief/01-fuera-916.prompt.txt",
+        "reference": "plates/01-fuera-45.png",
+        "referenceSHA256": "856999869c69681684ac57bb1b6fca0c0e5fe97a3c23599f0030a6d26a4d949c"
+      }
+    ],
+    "plateSHA256": "2976aa8d60740a7b802979c61fb4489e7e1e260fd92a2a703edd2a747236e833",
+    "exportSHA256": "ee7d686f2397c2499ed1b0970fe9cc53565329fab60f450b07f3b3dccf7fa426",
+    "originalV04ExportPreserved": false
+  },
+  {
+    "id": "01-fuera-169",
+    "chain": [
+      {
+        "promptDirectory": "origen-prompts-y-conceptos/01-fuera/16x9/prompts",
+        "continuity": "origen-prompts-y-conceptos/01-fuera/16x9/CONCEPTO-Y-CONTINUIDAD.md"
+      }
+    ],
+    "plateSHA256": "1013917024780dbcd30e75ce9299639bbe1bf62cbd4383e2f4eb59e15cef8315",
+    "exportSHA256": "59b106eda4d73c2a664544b2b630c9c9b926d082904e9debb07397cccdef0bfe",
+    "originalV04ExportPreserved": true
+  },
+  {
+    "id": "02-reconoces-916",
+    "chain": [
+      {
+        "prompt": "brief/02-reconoces-916.prompt.txt",
+        "reference": "plates/02-reconoces-45.png",
+        "referenceSHA256": "092972e5ca0738be37eb9951dbfb8d52b388bcead251b1d68048861a3de2cd70"
+      }
+    ],
+    "plateSHA256": "c759b7fe980c4978381e722c19ee2ac016795f3f81afb3649a8800ac65a14e88",
+    "exportSHA256": "b4bd11a09a247837479d270cb95173636e4d7282c3341f81ca1559129f1d62d1",
+    "originalV04ExportPreserved": false
+  },
+  {
+    "id": "02-reconoces-169",
+    "chain": [
+      {
+        "promptDirectory": "origen-prompts-y-conceptos/02-reconoces/16x9/prompts",
+        "continuity": "origen-prompts-y-conceptos/02-reconoces/16x9/CONCEPTO-Y-CONTINUIDAD.md"
+      }
+    ],
+    "plateSHA256": "2659e296a69e3172167e3aa039063dc5f0e102c900bf9fdc56afbb97ec8345d5",
+    "exportSHA256": "0bcd0eec7acca8957e19c5fa18d171d763b1786576c04484d8714668411565b0",
+    "originalV04ExportPreserved": true
+  },
+  {
+    "id": "03-referencia-916",
+    "chain": [
+      {
+        "prompt": "brief/03-referencia-916.prompt.txt",
+        "reference": "plates/03-referencia-45.png",
+        "referenceSHA256": "a8b426e6282a69669eb01a6186b5c350481effcd1dda6d0c1f5866b585268d68"
+      },
+      {
+        "prompt": "brief/03-referencia-916-correction.prompt.txt",
+        "reference": "referencias/03-referencia-916-antes-correccion.png",
+        "referenceSHA256": "42634b5cdc4baef03ebd0120c32fdde67133ba4ec518e70bb30b69b7371b7802"
+      }
+    ],
+    "plateSHA256": "4c55cbeeca432d9f8252fefe45085c34b323a8308dda84411ccacacfb49926a4",
+    "exportSHA256": "f3dcda0a02f336fb7031a0544e22a0317c66bb64d16860e0525173839359d92f",
+    "originalV04ExportPreserved": false
+  },
+  {
+    "id": "03-referencia-169",
+    "chain": [
+      {
+        "promptDirectory": "origen-prompts-y-conceptos/03-referencia/16x9/prompts",
+        "continuity": "origen-prompts-y-conceptos/03-referencia/16x9/CONCEPTO-Y-CONTINUIDAD.md"
+      }
+    ],
+    "plateSHA256": "5acbef7d4e6843676f00528d397a38328f96dc76b12245f9e0bac6e33220f040",
+    "exportSHA256": "ad92e2c1e9fca242ea53f0bc6ab52e5f965dd2fab49f6177e4ecac017d6c7926",
+    "originalV04ExportPreserved": true
+  },
+  {
+    "id": "04-elegida-916",
+    "chain": [
+      {
+        "prompt": "brief/04-elegida-916.prompt.txt",
+        "reference": "plates/04-elegida-45.png",
+        "referenceSHA256": "e04b514589a2b56045e52b84fdcd2eac3f79d33978d2af1231bb5d00b8dccb6b"
+      }
+    ],
+    "plateSHA256": "ae8324fe3518c5dbf95c82e68cb00e09319d17c8d41d95cc4fa302351346c44e",
+    "exportSHA256": "e8075d5b9bdf2434e4397af59ec3ff2acc66be2adfae19d566c9549a9d011576",
+    "originalV04ExportPreserved": false
+  },
+  {
+    "id": "04-elegida-169",
+    "chain": [
+      {
+        "promptDirectory": "origen-prompts-y-conceptos/04-elegida/16x9/prompts",
+        "continuity": "origen-prompts-y-conceptos/04-elegida/16x9/CONCEPTO-Y-CONTINUIDAD.md"
+      }
+    ],
+    "plateSHA256": "fe174c066b9b91b804b55e8e7afd6be9716680c8235e08ad238d1c6101e6f4cc",
+    "exportSHA256": "0b59d65fedb92ab131a563dbc7c919a686ca8a19456bc2b08e2307387d3d4196",
+    "originalV04ExportPreserved": true
+  },
+  {
+    "id": "01-fuera-45",
+    "chain": [
+      {
+        "prompt": "origen-v04/brief/01-fuera-45.prompt.txt",
+        "reference": "origen-v04/plates/01-fuera-916.png"
+      }
+    ],
+    "plateSHA256": "856999869c69681684ac57bb1b6fca0c0e5fe97a3c23599f0030a6d26a4d949c",
+    "exportSHA256": "d8888ad927b0afd6c8058681ab4278d9073fe675b7cf89b5c3f0236b64211e35",
+    "originalV04ExportPreserved": true
+  },
+  {
+    "id": "01-fuera-11",
+    "chain": [
+      {
+        "prompt": "origen-v04/brief/01-fuera-11.prompt.txt",
+        "reference": "origen-v04/plates/01-fuera-916.png"
+      }
+    ],
+    "plateSHA256": "256357f5185bc25b8045da5ead15174f17c9e54616718602684196670f8444b4",
+    "exportSHA256": "bbb97e53009db263694c127f5267d76748b32d3b7de8f4b2a7e197971bb0a5fc",
+    "originalV04ExportPreserved": true
+  },
+  {
+    "id": "02-reconoces-45",
+    "chain": [
+      {
+        "prompt": "origen-v04/brief/02-reconoces-45.prompt.txt",
+        "reference": "origen-v04/plates/02-reconoces-916.png"
+      }
+    ],
+    "plateSHA256": "092972e5ca0738be37eb9951dbfb8d52b388bcead251b1d68048861a3de2cd70",
+    "exportSHA256": "59730047014fe4c410ff7d5b14331cb1e4b129515111be97a3c546da27d6b160",
+    "originalV04ExportPreserved": true
+  },
+  {
+    "id": "02-reconoces-11",
+    "chain": [
+      {
+        "prompt": "origen-v04/brief/02-reconoces-11.prompt.txt",
+        "reference": "origen-v04/plates/02-reconoces-916.png"
+      }
+    ],
+    "plateSHA256": "c722be4695789a669d90fdc4b9c0ad324fa6be46cfefde968d50e4675feb6397",
+    "exportSHA256": "ac0e53ea3af1aa05fead19db62d406f6496749f89cb554a9bc0f01fa10ac5c8b",
+    "originalV04ExportPreserved": true
+  },
+  {
+    "id": "03-referencia-45",
+    "chain": [
+      {
+        "prompt": "origen-v04/brief/03-referencia-45.prompt.txt",
+        "reference": "origen-v04/plates/03-referencia-916.png"
+      }
+    ],
+    "plateSHA256": "a8b426e6282a69669eb01a6186b5c350481effcd1dda6d0c1f5866b585268d68",
+    "exportSHA256": "1516bd63c7d4851b8c7163a5c8a424fdcebff05c34a2bd05cff75972513a5eb6",
+    "originalV04ExportPreserved": true
+  },
+  {
+    "id": "03-referencia-11",
+    "chain": [
+      {
+        "prompt": "origen-v04/brief/03-referencia-11.prompt.txt",
+        "reference": "origen-v04/plates/03-referencia-916.png"
+      }
+    ],
+    "plateSHA256": "f17db172416e820cad0ca584a49d8d8d30835a69d09753479ac3e5a745a39573",
+    "exportSHA256": "8339943a0b5ab15cdcacf38a2258408d70905a85c8484885fec42dd2af53972e",
+    "originalV04ExportPreserved": true
+  },
+  {
+    "id": "04-elegida-45",
+    "chain": [
+      {
+        "prompt": "origen-v04/brief/04-elegida-45.prompt.txt",
+        "reference": "origen-v04/plates/04-elegida-916.png"
+      }
+    ],
+    "plateSHA256": "e04b514589a2b56045e52b84fdcd2eac3f79d33978d2af1231bb5d00b8dccb6b",
+    "exportSHA256": "6f3cb0e3728716496597cec68d3cdc9b4ebf449650beafae07c2fb827e601a9d",
+    "originalV04ExportPreserved": true
+  },
+  {
+    "id": "04-elegida-11",
+    "chain": [
+      {
+        "prompt": "origen-v04/brief/04-elegida-11.prompt.txt",
+        "reference": "origen-v04/plates/04-elegida-916.png"
+      }
+    ],
+    "plateSHA256": "b2df1437c9727c8d266588b98d5ea2d3a77eab2efe504da60ee646556916af74",
+    "exportSHA256": "d5db682c4f5a849fa4a985119b62175d5ae02265f02942d0347f5aa468285dda",
+    "originalV04ExportPreserved": true
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "id": "03-referencia-11",
+  "formato": "1:1",
+  "impacto": true,
+  "palanca": "proyeccion",
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    "polo-efeonce"
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the fine-grained graphite plaster of the real studio wall, naturally in deep even shadow",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the very near pale review table seen in the edit target, optically defocused across the bottom",
+    "tono": "near white softly defocused physical tabletop, with no dark seams in the signature area"
+  },
+  "escena": "EDIT THE PROVIDED PHOTOGRAPH, keeping its exact character identity, wardrobe, material palette, lighting character, physical screen orientation, anatomically correct hand grip and visual story. Output a native 1:1 photograph, NOT a crop or letterbox. Re-stage the framing for this ratio. The edit target is the already corrected campaign photograph, not a generic inspiration. Keep the upper 36% as the existing real graphite wall in deep even shadow, with no head, projection, screen or bright beam in that area. The storytelling action must be clear and impactful, placed between 42% and 80% of image height. The bottom 18% is the natural defocused foreground object described below. No baked headline, CTA, signature or logos. Preserve exact Nexa in side/rear view, navy polo, naturally holding tablet and looking toward the physically projected answer and one large blue source card on real concrete. Projector beam terminates below the reserved wall. Keep the bright nearly white physical table blurred across bottom. No pointing fingers or screen facing away from user."
+}

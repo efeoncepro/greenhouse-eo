@@ -1,0 +1,23 @@
+{
+  "id": "03-referencia-169",
+  "formato": "16:9",
+  "impacto": true,
+  "palanca": "proyeccion",
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    "polo-efeonce"
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the fine-grained graphite plaster of the real studio wall, naturally in deep even shadow",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the near edge of the real pale review table between the camera and the projection work area, extremely close to lens",
+    "tono": "VERY LIGHT almost white matte surface, naturally illuminated by soft daylight, completely defocused"
+  },
+  "escena": "Localized photographic correction ONLY of the existing pale foreground surface in the supplied photo. Preserve every other feature: Nexa, hands, tablet, projection, wall and camera composition. The existing foreground is the pale review table from which the viewer observes. It must be ALMOST WHITE, neutral warm off-white, evenly illuminated by soft daylight. Its entire bottom central area needs to be nearly white with no grey patches, no brown tint, no dark reflections. Preserve real optical gradual defocus over at least5% image height, no flat graphic strip or overlay. Do not enlarge its existing extent. Do not change light or colour anywhere else. No logo or text added."
+}

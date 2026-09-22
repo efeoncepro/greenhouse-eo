@@ -1,0 +1,50 @@
+[
+  {
+    "id": "01-fuera-916",
+    "folder": "01-fuera/9x16",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "plate_version": 1
+  },
+  {
+    "id": "01-fuera-169",
+    "folder": "01-fuera/16x9",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "plate_version": 1
+  },
+  {
+    "id": "02-reconoces-916",
+    "folder": "02-reconoces/9x16",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "plate_version": 2
+  },
+  {
+    "id": "02-reconoces-169",
+    "folder": "02-reconoces/16x9",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "plate_version": 2
+  },
+  {
+    "id": "03-referencia-916",
+    "folder": "03-referencia/9x16",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "plate_version": 3
+  },
+  {
+    "id": "03-referencia-169",
+    "folder": "03-referencia/16x9",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "plate_version": 3
+  },
+  {
+    "id": "04-elegida-916",
+    "folder": "04-elegida/9x16",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "plate_version": 1
+  },
+  {
+    "id": "04-elegida-169",
+    "folder": "04-elegida/16x9",
+    "status": "PILOTO_PENDIENTE_APROBACION",
+    "plate_version": 1
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "id": "04-elegida-916",
+  "status": "PILOTO_PENDIENTE_APROBACION",
+  "creator": "Codex",
+  "engine": "image_gen.imagegen (model/version/seed not exposed)",
+  "concept": "Que te elijan.",
+  "territory": "Elección de fuente",
+  "mechanism": "Dedo a punto de tocar fuente destacada; tensión del instante anterior al clic.",
+  "photographic_lever": "instrumento en ficha original (clasificación incorrecta; corresponde revisar como manos)",
+  "current_plate_version": 1,
+  "history": [
+    {
+      "version": "v01",
+      "operation": "generate",
+      "prompt": "prompts/v01-prompt-exacto.txt",
+      "references_in_order": [
+        "../../../../../01. Recursos/2026-09-22_SEO-AEO_kit-referencias/referencias/efeonce-codex-3d-01-frente-heroe-1x1-1600x1600-v01-transparente.png"
+      ],
+      "output": "historial/v01-plate.png",
+      "selected_for_current_pilot": true
+    }
+  ],
+  "feedback_and_limits": "No interpretar interfaz como captura real. Instrumento exige mirar a través: revisar clasificación sin reescribir prompt histórico.",
+  "approval": null
+}

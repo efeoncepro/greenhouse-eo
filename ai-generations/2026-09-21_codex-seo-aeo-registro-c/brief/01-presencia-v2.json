@@ -1,0 +1,22 @@
+{
+  "formato": "4:5",
+  "impacto": true,
+  "objetos": [],
+  "reservas": {
+    "texto": {
+      "muro": "the smooth graphite plaster wall of the actual photography studio behind the workbench",
+      "tinta": "blanca"
+    },
+    "margen": {
+      "superficie": "the actual finely finished graphite plaster studio wall, smooth matte painted plaster in even shadow with only nearly invisible texture",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the out-of-focus back of a navy upholstered studio chair very close to camera",
+    "tono": "deep navy nearly black cloth in natural shadow, continuous soft defocus without a hard edge"
+  },
+  "id": "01-presencia-v2",
+  "palanca": "ausencia",
+  "escena": "EDIT THE INPUT PHOTOGRAPH, preserve its composition, character identity and all essential foreground actions exactly. Do not redesign the character or touch the visor. Change ONLY the physical background wall finish: make the upper 43 percent of the photograph one smooth matte graphite painted-plaster wall with a virtually uniform dark neutral tone, NOT blue, no obvious texture, no mottling, no highlights, no gradients. Keep that wall as actual photographic material, no scrim or graphic rectangle. Remove all plants, pencil holders, pencils and the desk lamp: they are clutter and not essential to the narrative. Keep hard side lighting on objects below the wall, tablet and lens geometry, hands, contact shadows, blue stand and orange accent, foreground blurred navy chair. No typography, no logo, no new props. This is a precise local cleanup, not a new composition."
+}

@@ -1,0 +1,149 @@
+[
+  {
+    "id": "01-presencia",
+    "dominante": [
+      "¿Sales tú?"
+    ],
+    "ratioDominanteEntrada": 4.9,
+    "contraste": {
+      "etiqueta": 13.63,
+      "entrada": 13.66,
+      "dominante": 12.44,
+      "cierre-frase": 13.94,
+      "logo": 20.12
+    },
+    "gapsTinta": [
+      {
+        "entre": "etiqueta→entrada",
+        "px": 23,
+        "ratioDominante": 0.152
+      },
+      {
+        "entre": "entrada→dominante",
+        "px": 26,
+        "ratioDominante": 0.172
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 26,
+        "ratioDominante": 0.172
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "local"
+        }
+      ]
+    }
+  },
+  {
+    "id": "02-relevancia",
+    "dominante": [
+      "Sé relevante."
+    ],
+    "ratioDominanteEntrada": 4.9,
+    "contraste": {
+      "etiqueta": 11.57,
+      "entrada": 11.4,
+      "dominante": 10.42,
+      "cierre-frase": 11.76,
+      "logo": 20.08
+    },
+    "gapsTinta": [
+      {
+        "entre": "etiqueta→entrada",
+        "px": 23,
+        "ratioDominante": 0.152
+      },
+      {
+        "entre": "entrada→dominante",
+        "px": 26,
+        "ratioDominante": 0.172
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 26,
+        "ratioDominante": 0.172
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "local"
+        }
+      ]
+    }
+  },
+  {
+    "id": "03-diagnostico",
+    "dominante": [
+      "Mídelo."
+    ],
+    "ratioDominanteEntrada": 4.9,
+    "contraste": {
+      "etiqueta": 13.36,
+      "entrada": 13.57,
+      "dominante": 12.55,
+      "cierre-frase": 14.44,
+      "logo": 19.41
+    },
+    "gapsTinta": [
+      {
+        "entre": "etiqueta→entrada",
+        "px": 23,
+        "ratioDominante": 0.152
+      },
+      {
+        "entre": "entrada→dominante",
+        "px": 26,
+        "ratioDominante": 0.172
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 26,
+        "ratioDominante": 0.172
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "local"
+        }
+      ]
+    }
+  }
+]

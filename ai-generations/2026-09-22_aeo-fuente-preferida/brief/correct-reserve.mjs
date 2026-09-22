@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import {construirPrompt} from '../../../scripts/foto/build-prompt.mjs';
+const d='ai-generations/2026-09-22_aeo-fuente-preferida/brief';let jobs=[];
+for(const suffix of ['916','169']){
+ const id='03-referencia-'+suffix,f=JSON.parse(fs.readFileSync(`${d}/${id}.json`));
+ f.lecho={objeto:'the pale polished concrete floor close to the very low camera lens, naturally dissolving into gradual defocus',tono:'VERY LIGHT almost white warm-neutral concrete, calm and even, no sharp edges'};
+ f.escena='EDIT THE PROVIDED APPROVED IMAGE WITH MINIMAL CHANGE: preserve Nexa, her face profile, her natural hands holding the inward-facing tablet, corporate clothing, projected AI answer and giant blue source card, natural colours, projector and composition. Remove any third-party logo from the projected answer; use a plain neutral circle. The projection is the motivated key light; tablet is secondary passive content. Replace the large intrusive dark foreground chair with the natural pale polished concrete floor seen from a low camera position, VERY LIGHT almost white, gradually optically defocused near lens. Nothing pasted over the image, no graphic strips. '+(suffix==='916'?'For the vertical layout only, move the TOP of the projection down to 36% of image height, retaining the large blue source card prominent at mid-height. Top 8–32% is a continuous real graphite wall in natural deep shadow, no projected light, no bright window or shadows across it. Head, hands and display content remain below36%. Lower22% is the almost-white floor with soft gradual optical defocus.':'Preserve the horizontal layout and all action positions. Bottom16% is a calm almost-white floor with gradual optical defocus. Left42% remains graphite wall in deep shadow.')+' No headlines, CTA, signature or watermark.';
+ const p=construirPrompt(f);fs.writeFileSync(`${d}/${id}-v2.json`,JSON.stringify(f,null,2));fs.writeFileSync(`${d}/${id}-v2.prompt.txt`,p.prompt);jobs.push({id,prompt:p.prompt});
+}
+fs.writeFileSync(`${d}/reserve-jobs.json`,JSON.stringify(jobs));

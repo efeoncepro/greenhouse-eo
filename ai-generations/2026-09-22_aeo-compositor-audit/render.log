@@ -1,0 +1,4 @@
+01-fuera-916 contraste {"entrada":14.61,"dominante":13.69,"dominante-acento-0":5.18,"cta":4.59,"descriptor":14.52,"logo":19.25} gaps [{"entre":"entrada→dominante","px":17,"ratioDominante":0.179}]
+02-reconoces-916 contraste {"entrada":15.7,"dominante":15.14,"dominante-acento-0":5.32,"cta":5.04,"cta_superficie_vs_escena":5.17,"descriptor":15.21,"logo":18.21} gaps [{"entre":"entrada→dominante","px":10,"ratioDominante":0.118}]
+03-referencia-916 contraste {"entrada":14.41,"dominante":11.97,"dominante-acento-0":4.12,"cta":1.5,"descriptor":1.7,"logo":5.74} gaps [{"entre":"entrada→dominante","px":17,"ratioDominante":0.236}]
+04-elegida-169 contraste {"entrada":12.16,"dominante":13.17,"dominante-acento-0":4.64,"cta":5.04,"cta_superficie_vs_escena":5.17,"descriptor":15.47,"logo":17.56} gaps [{"entre":"entrada→dominante","px":33,"ratioDominante":0.231}]

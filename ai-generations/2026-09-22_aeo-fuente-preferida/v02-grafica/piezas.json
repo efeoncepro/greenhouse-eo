@@ -1,0 +1,329 @@
+[
+  {
+    "id": "01-fuera-916",
+    "plate": "../plates/01-fuera-916.png",
+    "align": "center",
+    "top": 0.08,
+    "textWidth": 0.83,
+    "label": null,
+    "labelSize": 22,
+    "labelGap": 0.13,
+    "lead": "La IA responde.",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.45,
+    "dominant": "¿Sales [[tú]]?",
+    "dominantSize": 137,
+    "dominantMax": 0.58,
+    "after": "Solicita tu diagnóstico.|**SEO + AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 26,
+    "afterGap": 0.54,
+    "final": [
+      1080,
+      1920
+    ],
+    "selection": {
+      "variant": "open-brackets",
+      "padding": "standard",
+      "overlay": "none",
+      "scale": 1.5,
+      "cursors": [
+        {
+          "id": "seo",
+          "label": "SEO",
+          "anchor": "top-end",
+          "color": "#12afa2"
+        },
+        {
+          "id": "cliente",
+          "label": "Cliente",
+          "anchor": "bottom-end",
+          "color": "#6ec207"
+        }
+      ]
+    }
+  },
+  {
+    "id": "01-fuera-169",
+    "plate": "../plates/01-fuera-169.png",
+    "align": "left",
+    "top": 0.13,
+    "textWidth": 0.3,
+    "label": null,
+    "labelSize": 27,
+    "labelGap": 0.13,
+    "lead": "La IA responde.",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 32,
+    "leadGap": 0.45,
+    "dominant": "¿Sales [[tú]]?",
+    "dominantSize": 143,
+    "dominantMax": 0.3,
+    "after": "Solicita tu diagnóstico.|**SEO + AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.54,
+    "final": [
+      1920,
+      1080
+    ],
+    "selection": {
+      "variant": "open-brackets",
+      "padding": "standard",
+      "overlay": "none",
+      "scale": 1.2,
+      "cursors": [
+        {
+          "id": "seo",
+          "label": "SEO",
+          "anchor": "top-end",
+          "color": "#12afa2"
+        },
+        {
+          "id": "cliente",
+          "label": "Cliente",
+          "anchor": "bottom-end",
+          "color": "#6ec207"
+        }
+      ]
+    }
+  },
+  {
+    "id": "02-reconoces-916",
+    "plate": "../plates/02-reconoces-916.png",
+    "align": "center",
+    "top": 0.08,
+    "textWidth": 0.83,
+    "label": null,
+    "labelSize": 22,
+    "labelGap": 0.13,
+    "lead": "La IA describe tu negocio.",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "¿Te [[reconoces]]?",
+    "dominantSize": 137,
+    "dominantMax": 0.65,
+    "after": "Revisa cómo interpreta|**tu marca.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 26,
+    "afterGap": 0.48,
+    "final": [
+      1080,
+      1920
+    ],
+    "selection": {
+      "variant": "four-corners",
+      "padding": "standard",
+      "overlay": "none",
+      "scale": 1.45,
+      "cursors": [
+        {
+          "id": "nexa",
+          "label": "Nexa",
+          "anchor": "bottom-end",
+          "color": "#d6246e"
+        }
+      ]
+    }
+  },
+  {
+    "id": "02-reconoces-169",
+    "plate": "../plates/02-reconoces-169.png",
+    "align": "left",
+    "top": 0.13,
+    "textWidth": 0.3,
+    "label": null,
+    "labelSize": 27,
+    "labelGap": 0.13,
+    "lead": "La IA describe tu negocio.",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 32,
+    "leadGap": 0.23,
+    "dominant": "¿Te|[[reconoces]]?",
+    "dominantSize": 143,
+    "dominantMax": 0.265,
+    "after": "Revisa cómo interpreta|**tu marca.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.48,
+    "final": [
+      1920,
+      1080
+    ],
+    "selection": {
+      "variant": "four-corners",
+      "padding": "standard",
+      "overlay": "none",
+      "scale": 1.2,
+      "cursors": [
+        {
+          "id": "nexa",
+          "label": "Nexa",
+          "anchor": "bottom-end",
+          "color": "#d6246e"
+        }
+      ]
+    }
+  },
+  {
+    "id": "03-referencia-916",
+    "plate": "../plates/03-referencia-916.png",
+    "align": "center",
+    "top": 0.08,
+    "textWidth": 0.83,
+    "label": null,
+    "labelSize": 22,
+    "labelGap": 0.13,
+    "lead": "En la respuesta de la IA,",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "Sé la [[referencia]].",
+    "dominantSize": 137,
+    "dominantMax": 0.84,
+    "after": "Trabajemos tu **SEO + AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 26,
+    "afterGap": 0.34,
+    "final": [
+      1080,
+      1920
+    ],
+    "gesture": {
+      "text": "Que cuente.",
+      "size": 43,
+      "x": 0.4,
+      "y": 0.265,
+      "rotate": -5,
+      "color": "#ffffff"
+    }
+  },
+  {
+    "id": "03-referencia-169",
+    "plate": "../plates/03-referencia-169.png",
+    "align": "left",
+    "top": 0.13,
+    "textWidth": 0.3,
+    "label": null,
+    "labelSize": 27,
+    "labelGap": 0.13,
+    "lead": "En la respuesta de la IA,",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 32,
+    "leadGap": 0.23,
+    "dominant": "sé la|[[referencia]].",
+    "dominantSize": 143,
+    "dominantMax": 0.32,
+    "after": "Trabajemos tu **SEO + AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.34,
+    "final": [
+      1920,
+      1080
+    ],
+    "gesture": {
+      "text": "Que cuente.",
+      "size": 59,
+      "x": 0.09,
+      "y": 0.65,
+      "rotate": -5,
+      "color": "#ffffff"
+    }
+  },
+  {
+    "id": "04-elegida-916",
+    "plate": "../plates/04-elegida-916.png",
+    "align": "center",
+    "top": 0.08,
+    "textWidth": 0.83,
+    "label": null,
+    "labelSize": 22,
+    "labelGap": 0.13,
+    "lead": "En las respuestas de la IA,",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 29,
+    "leadGap": 0.23,
+    "dominant": "Que te [[elijan]].",
+    "dominantSize": 137,
+    "dominantMax": 0.72,
+    "after": "Trabajemos tu **SEO + AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 26,
+    "afterGap": 0.34,
+    "final": [
+      1080,
+      1920
+    ],
+    "selection": {
+      "variant": "open-brackets",
+      "padding": "standard",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ]
+    }
+  },
+  {
+    "id": "04-elegida-169",
+    "plate": "../plates/04-elegida-169.png",
+    "align": "left",
+    "top": 0.13,
+    "textWidth": 0.3,
+    "label": null,
+    "labelSize": 27,
+    "labelGap": 0.13,
+    "lead": "Entre las fuentes de la respuesta,",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 32,
+    "leadGap": 0.23,
+    "dominant": "que te|[[elijan]].",
+    "dominantSize": 143,
+    "dominantMax": 0.29,
+    "after": "Trabajemos tu **SEO + AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.34,
+    "final": [
+      1920,
+      1080
+    ],
+    "selection": {
+      "variant": "open-brackets",
+      "padding": "standard",
+      "overlay": "none",
+      "cursors": [
+        {
+          "id": "local",
+          "kind": "local",
+          "anchor": "end-center",
+          "action": "select"
+        }
+      ],
+      "scale": 1.2
+    }
+  }
+]

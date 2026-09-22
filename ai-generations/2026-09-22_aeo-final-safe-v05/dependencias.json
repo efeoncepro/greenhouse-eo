@@ -1,0 +1,50 @@
+[
+  {
+    "path": "scripts/foto/componer.mjs",
+    "sha256": "570fe8fa297318c333ae91bcc52dd09402c3607d28bce8f237aedb8c0f2cbc86"
+  },
+  {
+    "path": "scripts/creative/layout-compiler/axis-advertising.mjs",
+    "sha256": "4977d5cc7eeeabb9bd3ba3751ff25387e2557b22f50220f55b47cfa3d3267bb9"
+  },
+  {
+    "path": "scripts/creative/layout-compiler/compiler.mjs",
+    "sha256": "a47381c5e11312a94709f84283f8d6dd1ff52fd4a163e0fd1073d1d17ac12203"
+  },
+  {
+    "path": "scripts/creative/layout-compiler/contract.mjs",
+    "sha256": "fbcdc8a3ce8631a7ffdda6ac6c601e15e45af56e67c6e10cf095e3e44d00f8c2"
+  },
+  {
+    "path": "src/assets/fonts/BricolageGrotesque-Variable.ttf",
+    "sha256": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+  },
+  {
+    "path": "src/assets/fonts/Poppins-Regular.ttf",
+    "sha256": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+  },
+  {
+    "path": "src/assets/fonts/Poppins-Medium.ttf",
+    "sha256": "90373e7d838d32468438fc3e152dca0bdb12edcab99ea639f158790b1ba1fd05"
+  },
+  {
+    "path": "src/assets/fonts/Poppins-SemiBold.ttf",
+    "sha256": "d3bf1bdaf0550e83da9ac0b1d1d9fe6db086835a83aa28578e609a394b9a0286"
+  },
+  {
+    "path": "src/assets/fonts/Poppins-Bold.ttf",
+    "sha256": "983676516167748b74de6f4771fb384c664fd913acb8b471122ecacf5da5ea6c"
+  },
+  {
+    "path": "public/branding/logo-negative.svg",
+    "sha256": "f221fc925c15cddad307a81362a0ec948e1b850fc6679a49a1bc88bad2eb6b3f"
+  },
+  {
+    "path": "ai-generations/2026-09-19_lenguaje-fotografico-efeonce/scripts/componer.mjs",
+    "sha256": "102b10c4037c502c0f7b050e767db45f8f24e3c898e8afed51c2cebc997ade24"
+  },
+  {
+    "path": "public/branding/logo-full.svg",
+    "sha256": "c647119e75eff0b13cab36c1485e2ff5a7b501125c43509ad6a4013ec2fdb49e"
+  }
+]

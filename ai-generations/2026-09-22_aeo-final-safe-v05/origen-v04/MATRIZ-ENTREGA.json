@@ -1,0 +1,322 @@
+[
+  {
+    "id": "01-fuera-916",
+    "ratio": "9:16",
+    "dimensions": [
+      1080,
+      1920
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/01-fuera-916.png",
+    "plate": "plates/01-fuera-916.png",
+    "exportSHA256": "1ea0a1e99a391b081c0ef7deea43121e911727b286fadd9d6dcb268b466d2bac",
+    "plateSHA256": "d656f1448ee7302eb5ba1db8dfe59f149d0ad03e68919db2a0f0460e85ec1c85",
+    "editable": "piezas.json",
+    "prompt": "origen-prompts-y-conceptos/",
+    "imageGeneration": "plate corregido de v03, sin regeneración",
+    "newGenerationReference": null,
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Heredado v03"
+  },
+  {
+    "id": "01-fuera-169",
+    "ratio": "16:9",
+    "dimensions": [
+      1920,
+      1080
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/01-fuera-169.png",
+    "plate": "plates/01-fuera-169.png",
+    "exportSHA256": "59b106eda4d73c2a664544b2b630c9c9b926d082904e9debb07397cccdef0bfe",
+    "plateSHA256": "1013917024780dbcd30e75ce9299639bbe1bf62cbd4383e2f4eb59e15cef8315",
+    "editable": "piezas.json",
+    "prompt": "origen-prompts-y-conceptos/",
+    "imageGeneration": "plate corregido de v03, sin regeneración",
+    "newGenerationReference": null,
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Heredado v03"
+  },
+  {
+    "id": "02-reconoces-916",
+    "ratio": "9:16",
+    "dimensions": [
+      1080,
+      1920
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/02-reconoces-916.png",
+    "plate": "plates/02-reconoces-916.png",
+    "exportSHA256": "895da3835fa1a0fdc7459e3563ff7999f9047c11dab2ac754f738da1f11d5a6f",
+    "plateSHA256": "4be8c9c983992a904d6f7564a0391601fce9f5ab222db0735a3b7570d5086f55",
+    "editable": "piezas.json",
+    "prompt": "origen-prompts-y-conceptos/",
+    "imageGeneration": "plate corregido de v03, sin regeneración",
+    "newGenerationReference": null,
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Heredado v03"
+  },
+  {
+    "id": "02-reconoces-169",
+    "ratio": "16:9",
+    "dimensions": [
+      1920,
+      1080
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/02-reconoces-169.png",
+    "plate": "plates/02-reconoces-169.png",
+    "exportSHA256": "0bcd0eec7acca8957e19c5fa18d171d763b1786576c04484d8714668411565b0",
+    "plateSHA256": "2659e296a69e3172167e3aa039063dc5f0e102c900bf9fdc56afbb97ec8345d5",
+    "editable": "piezas.json",
+    "prompt": "origen-prompts-y-conceptos/",
+    "imageGeneration": "plate corregido de v03, sin regeneración",
+    "newGenerationReference": null,
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Heredado v03"
+  },
+  {
+    "id": "03-referencia-916",
+    "ratio": "9:16",
+    "dimensions": [
+      1080,
+      1920
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/03-referencia-916.png",
+    "plate": "plates/03-referencia-916.png",
+    "exportSHA256": "3b4cc648d70cb00eabaf9482686c9cdd716a2b8cf5f5dd2f23198f3aac060593",
+    "plateSHA256": "3d785c3d6fbb3dbe596576be887d1629fcf2f4798620db1238c09641792cda48",
+    "editable": "piezas.json",
+    "prompt": "origen-prompts-y-conceptos/",
+    "imageGeneration": "plate corregido de v03, sin regeneración",
+    "newGenerationReference": null,
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Heredado v03"
+  },
+  {
+    "id": "03-referencia-169",
+    "ratio": "16:9",
+    "dimensions": [
+      1920,
+      1080
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/03-referencia-169.png",
+    "plate": "plates/03-referencia-169.png",
+    "exportSHA256": "ad92e2c1e9fca242ea53f0bc6ab52e5f965dd2fab49f6177e4ecac017d6c7926",
+    "plateSHA256": "5acbef7d4e6843676f00528d397a38328f96dc76b12245f9e0bac6e33220f040",
+    "editable": "piezas.json",
+    "prompt": "origen-prompts-y-conceptos/",
+    "imageGeneration": "plate corregido de v03, sin regeneración",
+    "newGenerationReference": null,
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Heredado v03"
+  },
+  {
+    "id": "04-elegida-916",
+    "ratio": "9:16",
+    "dimensions": [
+      1080,
+      1920
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/04-elegida-916.png",
+    "plate": "plates/04-elegida-916.png",
+    "exportSHA256": "f944aec4fb82ab92a1b2a8e1351891fe81e028362a725cbfd959529659f8d194",
+    "plateSHA256": "16382fc95d1801ca9610d8271014678fa6416346fc095794052b7fa6593e22d2",
+    "editable": "piezas.json",
+    "prompt": "origen-prompts-y-conceptos/",
+    "imageGeneration": "plate corregido de v03, sin regeneración",
+    "newGenerationReference": null,
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Heredado v03"
+  },
+  {
+    "id": "04-elegida-169",
+    "ratio": "16:9",
+    "dimensions": [
+      1920,
+      1080
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/04-elegida-169.png",
+    "plate": "plates/04-elegida-169.png",
+    "exportSHA256": "0b59d65fedb92ab131a563dbc7c919a686ca8a19456bc2b08e2307387d3d4196",
+    "plateSHA256": "fe174c066b9b91b804b55e8e7afd6be9716680c8235e08ad238d1c6101e6f4cc",
+    "editable": "piezas.json",
+    "prompt": "origen-prompts-y-conceptos/",
+    "imageGeneration": "plate corregido de v03, sin regeneración",
+    "newGenerationReference": null,
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Heredado v03"
+  },
+  {
+    "id": "01-fuera-45",
+    "ratio": "4:5",
+    "dimensions": [
+      1080,
+      1350
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/01-fuera-45.png",
+    "plate": "plates/01-fuera-45.png",
+    "exportSHA256": "d8888ad927b0afd6c8058681ab4278d9073fe675b7cf89b5c3f0236b64211e35",
+    "plateSHA256": "856999869c69681684ac57bb1b6fca0c0e5fe97a3c23599f0030a6d26a4d949c",
+    "editable": "piezas.json",
+    "prompt": "brief/01-fuera-45.prompt.txt",
+    "imageGeneration": "built-in image_gen edit",
+    "newGenerationReference": "01-fuera-916",
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Ver out/qa-reservas-fotograficas.json y LEEME: arnés genérico no está verde."
+  },
+  {
+    "id": "01-fuera-11",
+    "ratio": "1:1",
+    "dimensions": [
+      1080,
+      1080
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/01-fuera-11.png",
+    "plate": "plates/01-fuera-11.png",
+    "exportSHA256": "bbb97e53009db263694c127f5267d76748b32d3b7de8f4b2a7e197971bb0a5fc",
+    "plateSHA256": "256357f5185bc25b8045da5ead15174f17c9e54616718602684196670f8444b4",
+    "editable": "piezas.json",
+    "prompt": "brief/01-fuera-11.prompt.txt",
+    "imageGeneration": "built-in image_gen edit",
+    "newGenerationReference": "01-fuera-916",
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Ver out/qa-reservas-fotograficas.json y LEEME: arnés genérico no está verde."
+  },
+  {
+    "id": "02-reconoces-45",
+    "ratio": "4:5",
+    "dimensions": [
+      1080,
+      1350
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/02-reconoces-45.png",
+    "plate": "plates/02-reconoces-45.png",
+    "exportSHA256": "59730047014fe4c410ff7d5b14331cb1e4b129515111be97a3c546da27d6b160",
+    "plateSHA256": "092972e5ca0738be37eb9951dbfb8d52b388bcead251b1d68048861a3de2cd70",
+    "editable": "piezas.json",
+    "prompt": "brief/02-reconoces-45.prompt.txt",
+    "imageGeneration": "built-in image_gen edit",
+    "newGenerationReference": "02-reconoces-916",
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Ver out/qa-reservas-fotograficas.json y LEEME: arnés genérico no está verde."
+  },
+  {
+    "id": "02-reconoces-11",
+    "ratio": "1:1",
+    "dimensions": [
+      1080,
+      1080
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/02-reconoces-11.png",
+    "plate": "plates/02-reconoces-11.png",
+    "exportSHA256": "ac0e53ea3af1aa05fead19db62d406f6496749f89cb554a9bc0f01fa10ac5c8b",
+    "plateSHA256": "c722be4695789a669d90fdc4b9c0ad324fa6be46cfefde968d50e4675feb6397",
+    "editable": "piezas.json",
+    "prompt": "brief/02-reconoces-11.prompt.txt",
+    "imageGeneration": "built-in image_gen edit",
+    "newGenerationReference": "02-reconoces-916",
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Ver out/qa-reservas-fotograficas.json y LEEME: arnés genérico no está verde."
+  },
+  {
+    "id": "03-referencia-45",
+    "ratio": "4:5",
+    "dimensions": [
+      1080,
+      1350
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/03-referencia-45.png",
+    "plate": "plates/03-referencia-45.png",
+    "exportSHA256": "1516bd63c7d4851b8c7163a5c8a424fdcebff05c34a2bd05cff75972513a5eb6",
+    "plateSHA256": "a8b426e6282a69669eb01a6186b5c350481effcd1dda6d0c1f5866b585268d68",
+    "editable": "piezas.json",
+    "prompt": "brief/03-referencia-45.prompt.txt",
+    "imageGeneration": "built-in image_gen edit",
+    "newGenerationReference": "03-referencia-916",
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Ver out/qa-reservas-fotograficas.json y LEEME: arnés genérico no está verde."
+  },
+  {
+    "id": "03-referencia-11",
+    "ratio": "1:1",
+    "dimensions": [
+      1080,
+      1080
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/03-referencia-11.png",
+    "plate": "plates/03-referencia-11.png",
+    "exportSHA256": "8339943a0b5ab15cdcacf38a2258408d70905a85c8484885fec42dd2af53972e",
+    "plateSHA256": "f17db172416e820cad0ca584a49d8d8d30835a69d09753479ac3e5a745a39573",
+    "editable": "piezas.json",
+    "prompt": "brief/03-referencia-11.prompt.txt",
+    "imageGeneration": "built-in image_gen edit",
+    "newGenerationReference": "03-referencia-916",
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Ver out/qa-reservas-fotograficas.json y LEEME: arnés genérico no está verde."
+  },
+  {
+    "id": "04-elegida-45",
+    "ratio": "4:5",
+    "dimensions": [
+      1080,
+      1350
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/04-elegida-45.png",
+    "plate": "plates/04-elegida-45.png",
+    "exportSHA256": "6f3cb0e3728716496597cec68d3cdc9b4ebf449650beafae07c2fb827e601a9d",
+    "plateSHA256": "e04b514589a2b56045e52b84fdcd2eac3f79d33978d2af1231bb5d00b8dccb6b",
+    "editable": "piezas.json",
+    "prompt": "brief/04-elegida-45.prompt.txt",
+    "imageGeneration": "built-in image_gen edit",
+    "newGenerationReference": "04-elegida-916",
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Ver out/qa-reservas-fotograficas.json y LEEME: arnés genérico no está verde."
+  },
+  {
+    "id": "04-elegida-11",
+    "ratio": "1:1",
+    "dimensions": [
+      1080,
+      1080
+    ],
+    "status": "PILOTO — pendiente aprobación de pieza",
+    "export": "out/04-elegida-11.png",
+    "plate": "plates/04-elegida-11.png",
+    "exportSHA256": "d5db682c4f5a849fa4a985119b62175d5ae02265f02942d0347f5aa468285dda",
+    "plateSHA256": "b2df1437c9727c8d266588b98d5ea2d3a77eab2efe504da60ee646556916af74",
+    "editable": "piezas.json",
+    "prompt": "brief/04-elegida-11.prompt.txt",
+    "imageGeneration": "built-in image_gen edit",
+    "newGenerationReference": "04-elegida-916",
+    "contrastAndLayoutPass": true,
+    "visualReview": "Revisado plate, export/contacto y preview. Tablet orientada hacia Nexa, agarres naturales, sin señalamiento; foto y gráficos separados.",
+    "photoHarness": "Ver out/qa-reservas-fotograficas.json y LEEME: arnés genérico no está verde."
+  }
+]

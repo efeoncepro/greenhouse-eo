@@ -1,0 +1,38 @@
+{
+  "id": "02-reconoces-169",
+  "status": "PILOTO_PENDIENTE_APROBACION",
+  "creator": "Codex",
+  "engine": "image_gen.imagegen (model/version/seed not exposed)",
+  "concept": "¿Te reconoces?",
+  "territory": "Representación incorrecta",
+  "mechanism": "Contraste ilustrativo entre torre en web y bodega en respuesta de IA. No corresponde a un diagnóstico real.",
+  "photographic_lever": "luz-motivada; v1 usó reflejo",
+  "current_plate_version": 2,
+  "history": [
+    {
+      "version": "v01",
+      "operation": "generate",
+      "prompt": "prompts/v01-prompt-exacto.txt",
+      "references_in_order": [
+        "../../../../../01. Recursos/2026-09-22_SEO-AEO_kit-referencias/referencias/nexa-ancla-2-rostro-tresquartos.png",
+        "../../../../../01. Recursos/2026-09-22_SEO-AEO_kit-referencias/referencias/nexa-ancla-5-cuerpo-frontal.png",
+        "../../../../../01. Recursos/2026-09-22_SEO-AEO_kit-referencias/referencias/nexa-ancla-1-rostro-frontal.png",
+        "../../../../../01. Recursos/2026-09-22_SEO-AEO_kit-referencias/referencias/efeonce-polo-navy-13-puesto-frente-1200x1600-v01-fondo-estudio.png"
+      ],
+      "output": "historial/v01-plate.png",
+      "selected_for_current_pilot": false
+    },
+    {
+      "version": "v02",
+      "operation": "edit",
+      "prompt": "prompts/v02-prompt-exacto.txt",
+      "references_in_order": [
+        "historial/v01-plate.png"
+      ],
+      "output": "historial/v02-plate.png",
+      "selected_for_current_pilot": true
+    }
+  ],
+  "feedback_and_limits": "No recuperar v1: dedos/gesto defectuosos y tablet presentada a cámara. v2 sostiene tablet con ambas manos, pantalla hacia Nexa y mirada a ella.",
+  "approval": null
+}

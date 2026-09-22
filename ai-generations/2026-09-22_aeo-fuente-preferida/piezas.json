@@ -1,0 +1,250 @@
+[
+  {
+    "id": "01-fuera-916",
+    "plate": "plates/01-fuera-916.png",
+    "align": "center",
+    "top": 0.07,
+    "textWidth": 0.83,
+    "label": "SEO + AEO",
+    "labelSize": 22,
+    "labelGap": 0.13,
+    "lead": "La IA responde.",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 28,
+    "leadGap": 0.15,
+    "dominant": "¿Sales tú?",
+    "dominantSize": 135,
+    "dominantMax": 0.84,
+    "after": "**Solicita tu diagnóstico SEO + AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 26,
+    "afterGap": 0.2,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "final": [
+      1080,
+      1920
+    ]
+  },
+  {
+    "id": "01-fuera-169",
+    "plate": "plates/01-fuera-169.png",
+    "align": "left",
+    "top": 0.15,
+    "textWidth": 0.3,
+    "label": "SEO + AEO",
+    "labelSize": 27,
+    "labelGap": 0.13,
+    "lead": "La IA responde.",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 32,
+    "leadGap": 0.15,
+    "dominant": "¿Sales tú?",
+    "dominantSize": 138,
+    "dominantMax": 0.32,
+    "after": "**Solicita tu diagnóstico SEO + AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.2,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "final": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "id": "02-reconoces-916",
+    "plate": "plates/02-reconoces-916.png",
+    "align": "center",
+    "top": 0.07,
+    "textWidth": 0.83,
+    "label": "SEO + AEO",
+    "labelSize": 22,
+    "labelGap": 0.13,
+    "lead": "La IA describe tu negocio.",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 28,
+    "leadGap": 0.15,
+    "dominant": "¿Te reconoces?",
+    "dominantSize": 135,
+    "dominantMax": 0.84,
+    "after": "**Revisa cómo interpreta tu marca.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 26,
+    "afterGap": 0.2,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "final": [
+      1080,
+      1920
+    ]
+  },
+  {
+    "id": "02-reconoces-169",
+    "plate": "plates/02-reconoces-169.png",
+    "align": "left",
+    "top": 0.15,
+    "textWidth": 0.3,
+    "label": "SEO + AEO",
+    "labelSize": 27,
+    "labelGap": 0.13,
+    "lead": "La IA describe tu negocio.",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 32,
+    "leadGap": 0.15,
+    "dominant": "¿Te|reconoces?",
+    "dominantSize": 138,
+    "dominantMax": 0.32,
+    "after": "**Revisa cómo interpreta tu marca.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.2,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "final": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "id": "03-referencia-916",
+    "plate": "plates/03-referencia-916.png",
+    "align": "center",
+    "top": 0.07,
+    "textWidth": 0.83,
+    "label": "SEO + AEO",
+    "labelSize": 22,
+    "labelGap": 0.13,
+    "lead": "En la respuesta de la IA,",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 28,
+    "leadGap": 0.15,
+    "dominant": "Sé la referencia.",
+    "dominantSize": 135,
+    "dominantMax": 0.84,
+    "after": "**Trabajemos tu SEO + AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 26,
+    "afterGap": 0.2,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "final": [
+      1080,
+      1920
+    ]
+  },
+  {
+    "id": "03-referencia-169",
+    "plate": "plates/03-referencia-169.png",
+    "align": "left",
+    "top": 0.15,
+    "textWidth": 0.3,
+    "label": "SEO + AEO",
+    "labelSize": 27,
+    "labelGap": 0.13,
+    "lead": "En la respuesta de la IA,",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 32,
+    "leadGap": 0.15,
+    "dominant": "sé la|referencia.",
+    "dominantSize": 138,
+    "dominantMax": 0.32,
+    "after": "**Trabajemos tu SEO + AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.2,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "final": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "id": "04-elegida-916",
+    "plate": "plates/04-elegida-916.png",
+    "align": "center",
+    "top": 0.07,
+    "textWidth": 0.83,
+    "label": "SEO + AEO",
+    "labelSize": 22,
+    "labelGap": 0.13,
+    "lead": "En las respuestas de la IA,",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 28,
+    "leadGap": 0.15,
+    "dominant": "Que te elijan.",
+    "dominantSize": 135,
+    "dominantMax": 0.84,
+    "after": "**Trabajemos tu SEO + AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 26,
+    "afterGap": 0.2,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "final": [
+      1080,
+      1920
+    ]
+  },
+  {
+    "id": "04-elegida-169",
+    "plate": "plates/04-elegida-169.png",
+    "align": "left",
+    "top": 0.15,
+    "textWidth": 0.3,
+    "label": "SEO + AEO",
+    "labelSize": 27,
+    "labelGap": 0.13,
+    "lead": "Entre las fuentes de la respuesta,",
+    "leadFamily": "poppins",
+    "leadFill": "#ffffff",
+    "leadSize": 32,
+    "leadGap": 0.15,
+    "dominant": "que te|elijan.",
+    "dominantSize": 138,
+    "dominantMax": 0.32,
+    "after": "**Trabajemos tu SEO + AEO.**",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 29,
+    "afterGap": 0.2,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "final": [
+      1920,
+      1080
+    ]
+  }
+]

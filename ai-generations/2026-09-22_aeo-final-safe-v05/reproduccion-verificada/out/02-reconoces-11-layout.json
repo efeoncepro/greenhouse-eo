@@ -1,0 +1,61 @@
+{
+  "canvas": {
+    "width": 1254,
+    "height": 1254
+  },
+  "elements": [
+    {
+      "id": "entrada",
+      "box": {
+        "left": 425.43199999999996,
+        "right": 828.568,
+        "top": 40.128,
+        "bottom": 73.12
+      }
+    },
+    {
+      "id": "dominante",
+      "box": {
+        "left": 367.27046,
+        "right": 886.72954,
+        "top": 94.12,
+        "bottom": 179.695
+      }
+    },
+    {
+      "id": "dominante-acento-0",
+      "box": {
+        "left": 488.91491333333335,
+        "right": 851.46126,
+        "top": 108.08500000000001,
+        "bottom": 165.94
+      }
+    },
+    {
+      "id": "cta",
+      "box": {
+        "left": 462.21900000000005,
+        "right": 788.687,
+        "top": 215.695,
+        "bottom": 253.40099999999998
+      }
+    },
+    {
+      "id": "descriptor",
+      "box": {
+        "left": 559.824,
+        "right": 694.1759999999999,
+        "top": 279.40099999999995,
+        "bottom": 298.652
+      }
+    }
+  ],
+  "typography": {
+    "lead": 32,
+    "dominant": 105,
+    "closure": 26,
+    "cta": 34,
+    "descriptor": 27
+  },
+  "selection": null
+}

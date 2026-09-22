@@ -1,0 +1,23 @@
+{
+  "id": "02-reconoces-11",
+  "formato": "1:1",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "identidad": [
+    "nexa"
+  ],
+  "objetos": [
+    "polo-efeonce"
+  ],
+  "reservas": {
+    "texto": {
+      "muro": "the fine-grained graphite plaster of the real studio wall, naturally in deep even shadow",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the lower matte charcoal mullion and sill of the actual studio glass partition very close to the camera, completely outside the key light",
+    "tono": "DARK near black, dissolving gradually into soft optical blur, no sharp edge, not a graphic strip"
+  },
+  "escena": "EDIT THE PROVIDED PHOTOGRAPH, keeping its exact character identity, wardrobe, material palette, lighting character, physical screen orientation, anatomically correct hand grip and visual story. Output a native 1:1 photograph, NOT a crop or letterbox. Re-stage the framing for this ratio. The edit target is the already corrected campaign photograph, not a generic inspiration. Keep the upper 36% as the existing real graphite wall in deep even shadow, with no head, projection, screen or bright beam in that area. The storytelling action must be clear and impactful, placed between 42% and 80% of image height. The bottom 18% is the natural defocused foreground object described below. No baked headline, CTA, signature or logos. Preserve Nexa in side/rear view, exact navy polo, curly hair, naturally holding the tablet with both hands at waist height. Screen faces up and inward toward HER, never presented to camera or backward. No pointing finger. The physical wall monitor shows a warehouse, the tablet a modern tower. Preserve contrast between those representations. Foreground is dark defocused windowsill."
+}

@@ -1,0 +1,16 @@
+
+> vuexy-mui-nextjs-admin-template@5.0.1 foto:validar /Users/jreye/Documents/greenhouse-eo
+> node scripts/foto/validar-reservas.mjs ai-generations/2026-09-21_codex-seo-aeo-registro-c/plates/02-relevancia.png --zona-texto
+
+02-relevancia.png  1122×1402  · formato 4:5
+
+  reserva                                 medido                                              pasa
+  1 · zona de texto (banda)               blanca 0.34 · oscura 0.00 del alto                  ✓
+  2 · objeto para enmarcar                no declarado (--objeto x0,y0,x1,y1)                 —
+  3 · lecho de la firma (18% · señal débil)blanco 9.49 · navy 1.84 · nitidez 0.0003 (frágil)   ✓
+  color · sombras no azules               b* del cuartil oscuro -1.8 (negativo = azul; ojo si hay un objeto azul grande)✓
+  4 · aire para cursores                  costados calma 0.97 / 0.41                          ✓
+  5 · campo profundo al margen            banda continua hasta 0.10 (tinta blanca)            ✗
+
+  4/5 reservas cumplidas
+ ELIFECYCLE  Command failed with exit code 1.

@@ -1,0 +1,32 @@
+{"signatureBounds":{"left":432,"top":1574,"right":648,"bottom":1625},"signatureContrast":19.193306739726594,"variant":"white"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/01-fuera-916.png logo blanco 19.19:1 
+{"signatureBounds":{"left":852,"top":984,"right":1068,"bottom":1035},"signatureContrast":19.34164761614972,"variant":"white"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/01-fuera-169.png logo blanco 19.34:1 
+{"signatureBounds":{"left":432,"top":1574,"right":648,"bottom":1625},"signatureContrast":18.114476982934196,"variant":"white"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/02-reconoces-916.png logo blanco 18.11:1 
+{"signatureBounds":{"left":852,"top":984,"right":1068,"bottom":1035},"signatureContrast":10.490749548915973,"variant":"white"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/02-reconoces-169.png logo blanco 10.49:1 
+{"signatureBounds":{"left":432,"top":1574,"right":648,"bottom":1625},"signatureContrast":5.0141394737923655,"variant":"navy"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/03-referencia-916.png logo navy 5.01:1 
+{"signatureBounds":{"left":852,"top":984,"right":1068,"bottom":1035},"signatureContrast":7.74126238793938,"variant":"navy"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/03-referencia-169.png logo navy 7.74:1 
+{"signatureBounds":{"left":432,"top":1574,"right":648,"bottom":1625},"signatureContrast":19.388077475995708,"variant":"white"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/04-elegida-916.png logo blanco 19.39:1 
+{"signatureBounds":{"left":852,"top":984,"right":1068,"bottom":1035},"signatureContrast":17.768542397610478,"variant":"white"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/04-elegida-169.png logo blanco 17.77:1 
+{"signatureBounds":{"left":432,"top":1237,"right":648,"bottom":1288},"signatureContrast":19.24507547312759,"variant":"white"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/01-fuera-45.png logo blanco 19.25:1 
+{"signatureBounds":{"left":432,"top":984,"right":648,"bottom":1035},"signatureContrast":19.387179831133732,"variant":"white"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/01-fuera-11.png logo blanco 19.39:1 
+{"signatureBounds":{"left":432,"top":1237,"right":648,"bottom":1288},"signatureContrast":17.78664411795214,"variant":"white"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/02-reconoces-45.png logo blanco 17.79:1 
+{"signatureBounds":{"left":432,"top":984,"right":648,"bottom":1035},"signatureContrast":18.504227599798664,"variant":"white"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/02-reconoces-11.png logo blanco 18.50:1 
+{"signatureBounds":{"left":432,"top":1237,"right":648,"bottom":1288},"signatureContrast":5.516317447118737,"variant":"navy"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/03-referencia-45.png logo navy 5.52:1 
+{"signatureBounds":{"left":432,"top":984,"right":648,"bottom":1035},"signatureContrast":7.346868369924454,"variant":"navy"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/03-referencia-11.png logo navy 7.35:1 
+{"signatureBounds":{"left":432,"top":1237,"right":648,"bottom":1288},"signatureContrast":18.177359375574497,"variant":"white"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/04-elegida-45.png logo blanco 18.18:1 
+{"signatureBounds":{"left":432,"top":984,"right":648,"bottom":1035},"signatureContrast":18.3284064828274,"variant":"white"}
+/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v06/reproduccion-verificada/out/04-elegida-11.png logo blanco 18.33:1 

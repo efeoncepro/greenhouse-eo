@@ -1,0 +1,134 @@
+[
+  {
+    "id": "01-fuera",
+    "nombre": "¿Sales tú?",
+    "territorio": "Lo que la IA dice de ti — ausencia",
+    "idea": "La IA responde con fuentes, pero tu marca puede no estar entre ellas.",
+    "palanca": "Ausencia visible: dos fuentes presentes y un lugar vacío; Codex personifica el sistema.",
+    "audiencia": "BP1 CMO / BP2 Head of Digital; decisor que todavía evalúa el cambio en la búsqueda.",
+    "fasePrincipal": "TOFU — reconocimiento del problema",
+    "faseSecundaria": "MOFU — diagnóstico de visibilidad",
+    "entrada": "Desconoce o sospecha su ausencia en respuestas de IA.",
+    "progreso": "Reconocer la necesidad de comprobar si aparece y pedir diagnóstico.",
+    "hipotesis": "El vacío explícito vuelve concreta la omisión y motiva una revisión de visibilidad.",
+    "oferta": "Servicio SEO + AEO",
+    "cta": "Pide el diagnóstico",
+    "descriptor": "SEO + AEO",
+    "objetivoDeseado": "Preferred source: fuente preferida en la respuesta, aspiración de marca; no ranking1 ni selección garantizados.",
+    "destino": {
+      "tipo": "Landing o formulario de solicitud de diagnóstico SEO+AEO",
+      "url": null,
+      "estado": "Definir URL exacta y comprobar congruencia al traficar; no inventada en la pieza"
+    },
+    "kpiPrimario": "Solicitudes de diagnóstico calificadas y costo por solicitud calificada",
+    "metricasDiagnosticas": [
+      "CTR saliente = clics salientes / impresiones",
+      "Visitas reales a landing",
+      "Tasa solicitud / visitas a landing",
+      "Aceptación comercial de las solicitudes"
+    ],
+    "guardrail": "No interpretar CTR como atención demostrada ni como venta. Sin métricas de video para estas imágenes.",
+    "tracking": "utm_source={plataforma}&utm_medium=paid_social&utm_campaign=seo-aeo-fuente-preferida&utm_content=01-fuera-{ratio}-{placement}-v06",
+    "estadoEvidencia": "Hipótesis creativa sin resultados de campaña medidos",
+    "aprobacion": "Operador autoriza promoción a Finales tras ajustes de safe zones; sin autorización de publicación"
+  },
+  {
+    "id": "02-reconoces",
+    "nombre": "¿Te reconoces?",
+    "territorio": "Lo que la IA dice de ti — representación",
+    "idea": "Aparecer no basta: la respuesta puede representar mal el negocio.",
+    "palanca": "Discrepancia entre el edificio real en la tablet y la representación de almacén en pantalla.",
+    "audiencia": "BP1 CMO, BP2 Head of Digital y BP6 Brand Manager; preocupación por identidad y precisión.",
+    "fasePrincipal": "TOFU — reconocimiento del riesgo",
+    "faseSecundaria": "MOFU — evaluar fidelidad de respuestas",
+    "entrada": "No sabe qué imagen de su negocio construyen los motores IA.",
+    "progreso": "Querer revisar cómo lo describen y con qué fuentes.",
+    "hipotesis": "La discrepancia visual genera reconocimiento y curiosidad sin afirmar que todas las IA tergiversan marcas.",
+    "oferta": "Servicio SEO + AEO",
+    "cta": "Pide el diagnóstico",
+    "descriptor": "SEO + AEO",
+    "objetivoDeseado": "Preferred source: fuente preferida en la respuesta, aspiración de marca; no ranking1 ni selección garantizados.",
+    "destino": {
+      "tipo": "Landing o formulario de solicitud de diagnóstico SEO+AEO",
+      "url": null,
+      "estado": "Definir URL exacta y comprobar congruencia al traficar; no inventada en la pieza"
+    },
+    "kpiPrimario": "Solicitudes de diagnóstico calificadas y costo por solicitud calificada",
+    "metricasDiagnosticas": [
+      "CTR saliente = clics salientes / impresiones",
+      "Visitas reales a landing",
+      "Tasa solicitud / visitas a landing",
+      "Aceptación comercial de las solicitudes"
+    ],
+    "guardrail": "No interpretar CTR como atención demostrada ni como venta. Sin métricas de video para estas imágenes.",
+    "tracking": "utm_source={plataforma}&utm_medium=paid_social&utm_campaign=seo-aeo-fuente-preferida&utm_content=02-reconoces-{ratio}-{placement}-v06",
+    "estadoEvidencia": "Hipótesis creativa sin resultados de campaña medidos",
+    "aprobacion": "Operador autoriza promoción a Finales tras ajustes de safe zones; sin autorización de publicación"
+  },
+  {
+    "id": "03-referencia",
+    "nombre": "Sé la referencia",
+    "territorio": "Objetivo deseado — preferred source",
+    "idea": "Construir condiciones para que tu marca sea una fuente preferida en la respuesta.",
+    "palanca": "Escala de una fuente destacada en proyección real, revisada por Nexa.",
+    "audiencia": "BP1 CMO / BP2 Head of Digital; audiencia consciente de AEO o visitantes de contenido SEO/AEO.",
+    "fasePrincipal": "MOFU — consideración de solución",
+    "faseSecundaria": "TOFU — aspiración e introducción de categoría",
+    "entrada": "Entiende la búsqueda con IA y quiere avanzar desde aparecer hacia ser referencia.",
+    "progreso": "Considerar el diagnóstico como punto de partida para un plan SEO+AEO.",
+    "hipotesis": "Mostrar una fuente destacada vuelve visible el resultado deseado y eleva el interés por evaluar brechas.",
+    "oferta": "Servicio SEO + AEO",
+    "cta": "Pide el diagnóstico",
+    "descriptor": "SEO + AEO",
+    "objetivoDeseado": "Preferred source: fuente preferida en la respuesta, aspiración de marca; no ranking1 ni selección garantizados.",
+    "destino": {
+      "tipo": "Landing o formulario de solicitud de diagnóstico SEO+AEO",
+      "url": null,
+      "estado": "Definir URL exacta y comprobar congruencia al traficar; no inventada en la pieza"
+    },
+    "kpiPrimario": "Solicitudes de diagnóstico calificadas y costo por solicitud calificada",
+    "metricasDiagnosticas": [
+      "CTR saliente = clics salientes / impresiones",
+      "Visitas reales a landing",
+      "Tasa solicitud / visitas a landing",
+      "Aceptación comercial de las solicitudes"
+    ],
+    "guardrail": "No interpretar CTR como atención demostrada ni como venta. Sin métricas de video para estas imágenes.",
+    "tracking": "utm_source={plataforma}&utm_medium=paid_social&utm_campaign=seo-aeo-fuente-preferida&utm_content=03-referencia-{ratio}-{placement}-v06",
+    "estadoEvidencia": "Hipótesis creativa sin resultados de campaña medidos",
+    "aprobacion": "Operador autoriza promoción a Finales tras ajustes de safe zones; sin autorización de publicación"
+  },
+  {
+    "id": "04-elegida",
+    "nombre": "Que te elijan",
+    "territorio": "Objetivo deseado — elección de fuente",
+    "idea": "Conectar la presencia en respuestas de IA con una fuente que el usuario decide consultar.",
+    "palanca": "Momento antes del toque sobre una fuente digital, dedo/reflejo y Codex al fondo.",
+    "audiencia": "BP1/BP2; audiencia con interés previo, visitantes o contactos conocidos elegibles.",
+    "fasePrincipal": "MOFU — intención de diagnóstico",
+    "faseSecundaria": "BOFU — retargeting de audiencia cálida, como hipótesis de uso",
+    "entrada": "Conoce la propuesta y necesita concretar el siguiente paso.",
+    "progreso": "Solicitar un diagnóstico SEO+AEO.",
+    "hipotesis": "El gesto de elección facilita entender la acción; no demuestra clic ni conversión real.",
+    "oferta": "Servicio SEO + AEO",
+    "cta": "Pide el diagnóstico",
+    "descriptor": "SEO + AEO",
+    "objetivoDeseado": "Preferred source: fuente preferida en la respuesta, aspiración de marca; no ranking1 ni selección garantizados.",
+    "destino": {
+      "tipo": "Landing o formulario de solicitud de diagnóstico SEO+AEO",
+      "url": null,
+      "estado": "Definir URL exacta y comprobar congruencia al traficar; no inventada en la pieza"
+    },
+    "kpiPrimario": "Solicitudes de diagnóstico calificadas y costo por solicitud calificada",
+    "metricasDiagnosticas": [
+      "CTR saliente = clics salientes / impresiones",
+      "Visitas reales a landing",
+      "Tasa solicitud / visitas a landing",
+      "Aceptación comercial de las solicitudes"
+    ],
+    "guardrail": "No interpretar CTR como atención demostrada ni como venta. Sin métricas de video para estas imágenes.",
+    "tracking": "utm_source={plataforma}&utm_medium=paid_social&utm_campaign=seo-aeo-fuente-preferida&utm_content=04-elegida-{ratio}-{placement}-v06",
+    "estadoEvidencia": "Hipótesis creativa sin resultados de campaña medidos",
+    "aprobacion": "Operador autoriza promoción a Finales tras ajustes de safe zones; sin autorización de publicación"
+  }
+]

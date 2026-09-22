@@ -1,0 +1,359 @@
+[
+  {
+    "id": "01-fuera-916",
+    "dominante": [
+      "¿Sales tú?"
+    ],
+    "ratioDominanteEntrada": 4.7,
+    "contraste": {
+      "entrada": 16.1,
+      "dominante": 15.3,
+      "dominante-acento-0": 5.52,
+      "cierre-frase": 15.01
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 62,
+        "ratioDominante": 0.453
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 74,
+        "ratioDominante": 0.54
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "open-brackets",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "seo",
+          "labelBounds": {
+            "left": 740.534,
+            "top": 136.588,
+            "right": 800.529,
+            "bottom": 173.005
+          }
+        },
+        {
+          "id": "cliente",
+          "labelBounds": {
+            "left": 740.534,
+            "top": 389.814,
+            "right": 829.696,
+            "bottom": 426.231
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "01-fuera-169",
+    "dominante": [
+      "¿Sales tú?"
+    ],
+    "ratioDominanteEntrada": 4.5,
+    "contraste": {
+      "entrada": 15.88,
+      "dominante": 15.89,
+      "dominante-acento-0": 5.38,
+      "cierre-frase": 16.07
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 64,
+        "ratioDominante": 0.448
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 77,
+        "ratioDominante": 0.538
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "open-brackets",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "seo",
+          "labelBounds": {
+            "left": 649.005,
+            "top": 89.653,
+            "right": 734.285,
+            "bottom": 141.418
+          }
+        },
+        {
+          "id": "cliente",
+          "labelBounds": {
+            "left": 649.005,
+            "top": 413.503,
+            "right": 775.745,
+            "bottom": 465.268
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "02-reconoces-916",
+    "dominante": [
+      "¿Te reconoces?"
+    ],
+    "ratioDominanteEntrada": 4.5,
+    "contraste": {
+      "entrada": 15.15,
+      "dominante": 14.93,
+      "dominante-acento-0": 5.06,
+      "cierre-frase": 14.99
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 32,
+        "ratioDominante": 0.244
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 63,
+        "ratioDominante": 0.481
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "four-corners",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "nexa",
+          "labelBounds": {
+            "left": 836.942,
+            "top": 352.767,
+            "right": 906.283,
+            "bottom": 387.97
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "02-reconoces-169",
+    "dominante": [
+      "¿Te",
+      "reconoces?"
+    ],
+    "ratioDominanteEntrada": 3.8,
+    "contraste": {
+      "entrada": 14.88,
+      "dominante": 14.85,
+      "dominante-acento-0": 5.11,
+      "cierre-frase": 15.27
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 33,
+        "ratioDominante": 0.269
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 59,
+        "ratioDominante": 0.481
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "four-corners",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "nexa",
+          "labelBounds": {
+            "left": 647.465,
+            "top": 458.266,
+            "right": 749.43,
+            "bottom": 510.031
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "03-referencia-916",
+    "dominante": [
+      "Sé la referencia."
+    ],
+    "ratioDominanteEntrada": 4.7,
+    "contraste": {
+      "entrada": 15.25,
+      "dominante": 13.89,
+      "dominante-acento-0": 4.71,
+      "cierre-frase": 13.54,
+      "gesto": 12.54
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 32,
+        "ratioDominante": 0.234
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 47,
+        "ratioDominante": 0.343
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "03-referencia-169",
+    "dominante": [
+      "sé la",
+      "referencia."
+    ],
+    "ratioDominanteEntrada": 4.5,
+    "contraste": {
+      "entrada": 16.17,
+      "dominante": 16.12,
+      "dominante-acento-0": 5.51,
+      "cierre-frase": 16.17,
+      "gesto": 16.29
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 33,
+        "ratioDominante": 0.231
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 49,
+        "ratioDominante": 0.343
+      }
+    ],
+    "seleccion": null
+  },
+  {
+    "id": "04-elegida-916",
+    "dominante": [
+      "Que te elijan."
+    ],
+    "ratioDominanteEntrada": 4.7,
+    "contraste": {
+      "entrada": 13.58,
+      "dominante": 13.6,
+      "dominante-acento-0": 4.71,
+      "cierre-frase": 13.71
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 32,
+        "ratioDominante": 0.234
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 47,
+        "ratioDominante": 0.343
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "open-brackets",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "local"
+        }
+      ]
+    }
+  },
+  {
+    "id": "04-elegida-169",
+    "dominante": [
+      "que te",
+      "elijan."
+    ],
+    "ratioDominanteEntrada": 4.5,
+    "contraste": {
+      "entrada": 12.27,
+      "dominante": 13.26,
+      "dominante-acento-0": 4.66,
+      "cierre-frase": 15.66
+    },
+    "gapsTinta": [
+      {
+        "entre": "entrada→dominante",
+        "px": 33,
+        "ratioDominante": 0.231
+      },
+      {
+        "entre": "dominante→cierre",
+        "px": 49,
+        "ratioDominante": 0.343
+      }
+    ],
+    "seleccion": {
+      "selection": {
+        "variant": "open-brackets",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "none",
+        "overlayOpacity": 0,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "local"
+        }
+      ]
+    }
+  }
+]

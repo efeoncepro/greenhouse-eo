@@ -1,0 +1,32 @@
+{
+  "id": "03-referencia-916",
+  "plate": "plate-actual.png",
+  "align": "center",
+  "top": 0.07,
+  "textWidth": 0.83,
+  "label": "SEO + AEO",
+  "labelSize": 22,
+  "labelGap": 0.13,
+  "lead": "En la respuesta de la IA,",
+  "leadFamily": "poppins",
+  "leadFill": "#ffffff",
+  "leadSize": 28,
+  "leadGap": 0.15,
+  "dominant": "Sé la referencia.",
+  "dominantSize": 135,
+  "dominantMax": 0.84,
+  "after": "**Trabajemos tu SEO + AEO.**",
+  "afterFamily": "poppins",
+  "afterFill": "#ffffff",
+  "afterSize": 26,
+  "afterGap": 0.2,
+  "logo": {
+    "width": 0.2,
+    "x": 0.5
+  },
+  "final": [
+    1080,
+    1920
+  ],
+  "signature_note": "Compose text without logo, then canonical documented signature compositor at 93.5% height, width20% shortest side."
+}

@@ -1,0 +1,167 @@
+[
+  {
+    "id": "a-texto-cursor",
+    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/2026-09-22_p2-cta-comparativa-Codex/v01/plates/p2.png",
+    "align": "left",
+    "top": 0.05,
+    "textWidth": 0.84,
+    "lead": "Te describe con seguridad.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominant": "No te leyó.",
+    "dominantSize": 156,
+    "dominantMax": 0.62,
+    "after": "Y responde igual todos los días.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.15,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "selection": null,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "note": {
+      "text": "Descubre qué dice de tu marca.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.78,
+      "gapAfterClosure": 36
+    },
+    "cta": {
+      "variant": "text",
+      "radius": 0,
+      "text": "Pide el diagnóstico",
+      "descriptor": "Diagnóstico SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 20,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    },
+    "subjectProtection": {
+      "top": 588,
+      "minClearance": 64,
+      "source": "Visual inspection: uppermost floating cube of Clawd, included in protected subject"
+    },
+    "dominantTracking": -0.02
+  },
+  {
+    "id": "b-contorno-redondeado",
+    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/2026-09-22_p2-cta-comparativa-Codex/v01/plates/p2.png",
+    "align": "left",
+    "top": 0.05,
+    "textWidth": 0.84,
+    "lead": "Te describe con seguridad.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominant": "No te leyó.",
+    "dominantSize": 156,
+    "dominantMax": 0.62,
+    "after": "Y responde igual todos los días.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.15,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "selection": null,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "note": {
+      "text": "Descubre qué dice de tu marca.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.78,
+      "gapAfterClosure": 36
+    },
+    "cta": {
+      "variant": "outline",
+      "radius": 16,
+      "text": "Pide el diagnóstico",
+      "descriptor": "Diagnóstico SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 20,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    },
+    "subjectProtection": {
+      "top": 588,
+      "minClearance": 64,
+      "source": "Visual inspection: uppermost floating cube of Clawd, included in protected subject"
+    },
+    "dominantTracking": -0.02
+  },
+  {
+    "id": "c-boton-lima",
+    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/02. Pilotos/2026-09-22_p2-cta-comparativa-Codex/v01/plates/p2.png",
+    "align": "left",
+    "top": 0.05,
+    "textWidth": 0.84,
+    "lead": "Te describe con seguridad.",
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominant": "No te leyó.",
+    "dominantSize": 156,
+    "dominantMax": 0.62,
+    "after": "Y responde igual todos los días.",
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.15,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "selection": null,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "note": {
+      "text": "Descubre qué dice de tu marca.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.78,
+      "gapAfterClosure": 36
+    },
+    "cta": {
+      "variant": "solid",
+      "radius": 16,
+      "text": "Pide el diagnóstico",
+      "descriptor": "Diagnóstico SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 20,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    },
+    "subjectProtection": {
+      "top": 588,
+      "minClearance": 64,
+      "source": "Visual inspection: uppermost floating cube of Clawd, included in protected subject"
+    },
+    "dominantTracking": -0.02
+  }
+]

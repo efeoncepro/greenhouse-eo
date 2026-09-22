@@ -1,0 +1,9 @@
+Firma oficial 20% del lado corto; centro vertical 93.5%.
+ai-generations/2026-09-22_aeo-fuente-preferida/out/01-fuera-916.png logo blanco 19.25:1 
+ai-generations/2026-09-22_aeo-fuente-preferida/out/01-fuera-169.png logo blanco 19.34:1 
+ai-generations/2026-09-22_aeo-fuente-preferida/out/02-reconoces-916.png logo blanco 18.35:1 
+ai-generations/2026-09-22_aeo-fuente-preferida/out/02-reconoces-169.png logo blanco 10.49:1 
+ai-generations/2026-09-22_aeo-fuente-preferida/out/03-referencia-916.png logo navy 7.97:1 
+ai-generations/2026-09-22_aeo-fuente-preferida/out/03-referencia-169.png logo navy 7.74:1 
+ai-generations/2026-09-22_aeo-fuente-preferida/out/04-elegida-916.png logo blanco 19.02:1 
+ai-generations/2026-09-22_aeo-fuente-preferida/out/04-elegida-169.png logo blanco 17.77:1 
