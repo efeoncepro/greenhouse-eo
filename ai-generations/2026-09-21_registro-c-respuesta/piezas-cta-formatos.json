@@ -63,6 +63,10 @@
           "color": "#12afa2"
         }
       ]
+    },
+    "subjectProtection": {
+      "top": 1017,
+      "minClearance": 24
     }
   },
   {
@@ -127,7 +131,8 @@
           "color": "#12afa2"
         }
       ]
-    }
+    },
+    "subjectProtection": false
   },
   {
     "id": "p2-expediente-9x16-cta",
@@ -178,6 +183,10 @@
       "descriptorSize": 28,
       "descriptorGap": 16,
       "cursorScale": 1.1
+    },
+    "subjectProtection": {
+      "top": 998,
+      "minClearance": 24
     }
   },
   {
@@ -227,7 +236,8 @@
       "descriptorSize": 20,
       "descriptorGap": 12,
       "cursorScale": 0.85
-    }
+    },
+    "subjectProtection": false
   },
   {
     "id": "p3-megafono-9x16-cta",
@@ -278,6 +288,10 @@
       "descriptorSize": 28,
       "descriptorGap": 16,
       "cursorScale": 1.1
+    },
+    "subjectProtection": {
+      "top": 1138,
+      "minClearance": 24
     }
   },
   {
@@ -327,6 +341,7 @@
       "descriptorSize": 20,
       "descriptorGap": 12,
       "cursorScale": 0.85
-    }
+    },
+    "subjectProtection": false
   }
 ]

@@ -69,6 +69,10 @@
           "color": "#12afa2"
         }
       ]
+    },
+    "subjectProtection": {
+      "top": 685,
+      "minClearance": 24
     }
   }
 ]

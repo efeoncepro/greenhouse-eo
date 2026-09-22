@@ -69,6 +69,10 @@
           "color": "#12afa2"
         }
       ]
+    },
+    "subjectProtection": {
+      "top": 757,
+      "minClearance": 24
     }
   },
   {
@@ -120,6 +124,10 @@
       "cursorScale": 1.1,
       "surfaceToken": "growthOnDark",
       "inkToken": "growthOnDark"
+    },
+    "subjectProtection": {
+      "top": 500,
+      "minClearance": 24
     }
   }
 ]

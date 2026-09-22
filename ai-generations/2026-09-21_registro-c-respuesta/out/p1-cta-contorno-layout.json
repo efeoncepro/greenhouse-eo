@@ -3,6 +3,10 @@
     "width": 1152,
     "height": 1440
   },
+  "subjectProtection": {
+    "top": 586,
+    "minClearance": 24
+  },
   "elements": [
     {
       "id": "entrada",

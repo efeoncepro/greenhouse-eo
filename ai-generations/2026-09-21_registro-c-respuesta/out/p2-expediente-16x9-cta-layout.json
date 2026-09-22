@@ -3,6 +3,7 @@
     "width": 2048,
     "height": 1152
   },
+  "subjectProtection": false,
   "elements": [
     {
       "id": "entrada",

@@ -3,6 +3,10 @@
     "width": 1152,
     "height": 2048
   },
+  "subjectProtection": {
+    "top": 844,
+    "minClearance": 24
+  },
   "elements": [
     {
       "id": "dominante",

@@ -61,6 +61,10 @@
           "color": "#12afa2"
         }
       ]
+    },
+    "subjectProtection": {
+      "top": 586,
+      "minClearance": 24
     }
   },
   {
@@ -110,6 +114,10 @@
       "descriptorSize": 28,
       "descriptorGap": 16,
       "cursorScale": 1.1
+    },
+    "subjectProtection": {
+      "top": 656,
+      "minClearance": 24
     }
   },
   {
@@ -159,6 +167,10 @@
       "descriptorSize": 28,
       "descriptorGap": 16,
       "cursorScale": 1.1
+    },
+    "subjectProtection": {
+      "top": 732,
+      "minClearance": 24
     }
   }
 ]
