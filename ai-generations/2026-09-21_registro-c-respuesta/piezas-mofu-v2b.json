@@ -45,7 +45,9 @@
       "fontSize": 40,
       "descriptorSize": 28,
       "descriptorGap": 16,
-      "cursorScale": 1.1
+      "cursorScale": 1.1,
+      "surfaceToken": "growthOnDark",
+      "inkToken": "growthOnDark"
     },
     "selection": {
       "box": [
@@ -115,7 +117,9 @@
       "fontSize": 40,
       "descriptorSize": 28,
       "descriptorGap": 16,
-      "cursorScale": 1.1
+      "cursorScale": 1.1,
+      "surfaceToken": "growthOnDark",
+      "inkToken": "growthOnDark"
     }
   }
 ]
