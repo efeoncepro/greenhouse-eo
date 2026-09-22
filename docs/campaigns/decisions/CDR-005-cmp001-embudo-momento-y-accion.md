@@ -54,7 +54,7 @@ Lo que cambia entre etapas es **el ángulo del mismo hecho**:
 |---|---|---|
 | **TOFU** | La máquina **habla** por ti sin conocerte | atril de prensa · expediente · megáfono |
 | **MOFU** | La máquina **elige**, y el que elige tiene consecuencias | *(esta decisión)* |
-| **BOFU** | Alguien **corrige** a la máquina — y se puede ver | *(pendiente)* |
+| **BOFU** | **Cambia de registro**: el oficio a la vista, sin cara | manos que descartan sobre el panel |
 
 🔴 **El objeto tiene que ser icónico ANTES de la pieza.** Una barra de búsqueda, un atril de prensa y un megáfono
 se leen sin explicación. Un podio con marcadores de color y una card con subrayados **no dicen nada**: son formas
@@ -115,8 +115,17 @@ outbound o para nurture — **no para paid**.
 
 - Las tres piezas MOFU del 2026-09-21 (`m1-no-te-eligen`, `m2-ya-no-puedes`, `m3-que-rompiste`) quedan
   **descartadas**. Sus plates y fichas se conservan como histórico en `ai-generations/`, no pasan a `03. Finales`.
-- El BOFU nace de este mismo contrato: registro A (personas reales), dominante + CTA, y su acción consume el
-  panel competitivo.
+- **BOFU cambia de registro, y la razón está medida.** El registro C nació porque las piezas con persona
+  «fallaban la prueba de significar sin titular»: la foto mostraba al proveedor mientras el titular hablaba del
+  problema del cliente, y **el actor del problema no estaba en cuadro**. En BOFU esa objeción desaparece —
+  el mensaje **es** sobre nosotros, así que el proveedor en cuadro es el sujeto correcto. Se usa el registro
+  **documental** con la palanca `manos` (el oficio se ve en las manos antes que en la cara), que además da
+  piezas sin depender de identidad.
+- **El dominante de BOFU es la descalificación honesta: «Te decimos que no.»** En una categoría donde el 100%
+  de los prospectos ya compró SEO y tiene una cicatriz, el cierre no se gana prometiendo más: se gana siendo
+  el primero que dice para qué NO sirve (`seo-aeo-practice` §0). Su CTA —`Habla con quien lo hace`— y su
+  descriptor —`Con tu panel en pantalla`— **consumen explícitamente el entregable de MOFU**, que es la prueba
+  de encadenamiento que exige esta decisión.
 - La producción de MOFU arranca por **un piloto**, no por la tanda: el canon de fotografía ya lo exige
   («generar poco y mirar cada plate»), y tres tandas rechazadas lo confirman.
 
