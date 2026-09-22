@@ -417,6 +417,26 @@ Para qué sirve:
 
 **Si agregas un kit o una vista al catálogo, resella el lock y commitéalo**, o el test lo marca como faltante.
 
+## 🔴 Un validador que pasa NO valida el concepto **[medido 2026-09-21]**
+
+`foto:validar` mide que la pieza sea **usable**: que quepa el titular, que la firma tenga contraste, que el lecho
+exista. **No mide que la pieza diga algo.** Y un verde **se siente** como confirmación de que está bien, que es
+justo lo que lo hace peligroso.
+
+**Caso medido:** tres piezas del registro C para ads de SEO/AEO dieron **4/5 y 5/5 reservas**, zona de texto
+0,44 en las tres y contraste de 12 a 20. El operador las rechazó enteras: *«escenas muy poco tecnológicas, no
+incluyen personaje, no van con el registro»*. Eran tres bodegones de **papel impreso** para un servicio que
+habla de motores de respuesta.
+
+🔴 **La causa está antes del plate: elegir la palanca por si PASA el validador, en vez de por lo que la pieza
+tiene que decir.** Las tres palancas (`descarte`, `instrumento`, `ausencia`) se eligieron porque respetaban la
+reserva de texto y el lecho — optimización contra el síntoma medible, no contra el encargo.
+
+✅ **El orden correcto:** concepto → elenco → palanca que lo sirve → y recién entonces resolver las reservas.
+Si la palanca correcta pelea con la reserva, se corrige la ESCENA (la dirección del objeto, la altura del
+sujeto, el lecho), no se cambia de concepto. **El registro C tiene elenco: una pieza suya sin protagonista es
+una señal de que se eligió por conveniencia.**
+
 ## Al cerrar
 
 `pnpm foto:validar` sobre el plate limpio y **mirar la imagen al 100%**: identidad contra la referencia **de la identidad que elegiste**, emblema
