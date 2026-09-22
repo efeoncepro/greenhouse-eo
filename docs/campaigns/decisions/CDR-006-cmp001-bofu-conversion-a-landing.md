@@ -14,11 +14,18 @@ lo que hay que tener medido antes de gastar el primer peso.
 
 ## Destinos — verificados en vivo el 2026-09-22
 
-| Línea | URL | HTTP | Canonical | Conversión disponible **hoy** |
+⚠️ **Cómo se verificó, porque importa:** la primera pasada se hizo con `curl` y **fue inútil** — estas landings
+montan sus formularios y su agendamiento **por JavaScript**, así que el HTML inicial no los contiene. Concluyó
+«no hay formularios HubSpot» y era falso. **Auditar una landing de conversión exige un navegador real.**
+
+| Línea | URL | Canonical | Formulario (Growth Form) | Agendamiento |
 |---|---|---|---|---|
-| **SEO** | `/servicios/posicionamiento-seo/` | 200 | ✅ propia | ancla `#contacto` + 2 formularios HubSpot |
-| **AEO** | `/servicios/aeo/` | 200 | 🔴 **apunta a `/aeo-2/`** | ancla `#diagnostico` |
-| **AEO** | `/aeo-2/` | 200 | ✅ propia | ancla `#diagnostico` |
+| **SEO** | `/servicios/posicionamiento-seo/` | ✅ propia | **contacto**: nombre, email, empresa, sitio, **contexto**, rol, consentimiento | pop-up por evento + `Hablemos` → `/contacto` |
+| **AEO** | `/servicios/aeo/` | 🔴 **apunta a `/aeo-2/`** | **diagnóstico**: nombre, email, marca, sitio, **competidor principal** | `meetings.hubspot.com/efeoncepro/agenda-discovery` |
+| **AEO** | `/aeo-2/` | ✅ propia | idem | idem |
+
+🔴 **Las dos líneas NO convierten con lo mismo.** El Growth Form de AEO pide *competidor principal* — alimenta el
+grader, es la oferta de diagnóstico. El de SEO pide *contexto, rol y consentimiento* — es un lead comercial.
 
 ## 🔴 Dos bloqueos que se resuelven ANTES de pautar
 
@@ -32,15 +39,17 @@ entre dos rutas y ensucia el reporting del propio servicio que estamos vendiendo
 resto del catálogo—, o (b) pautar a `/aeo-2/`, asumiendo un slug sin significado en el anuncio. **Es decisión del
 operador; el trabajo es del carril de sitio público.**
 
-### B2 · La landing AEO sólo ofrece la conversión de TOFU
+### B2 · La landing AEO ofrece DOS conversiones de etapas distintas, y la que cierra la página es la de TOFU
 
-Su última sección es **«Empieza con tu diagnóstico gratis»**, que es exactamente el CTA de TOFU. Un BOFU que
-aterriza ahí **le pide a quien ya recorrió el embudo lo mismo que al que recién llega**, y aplana la progresión
-que el CDR-005 vino a construir.
+**Corrección de la primera versión de este CDR**, que afirmó que la acción de mayor compromiso no existía: sí
+existe — `meetings.hubspot.com/efeoncepro/agenda-discovery`. El error vino de auditar con `curl`.
 
-**Regla del embudo: cada etapa pide más compromiso que la anterior.** BOFU necesita una acción de mayor
-compromiso —reunión agendada, solicitud de propuesta, contacto con alcance— disponible en la landing. Hoy no
-existe en AEO; en SEO sí (`#contacto`).
+Lo que sí es un problema: la landing ofrece **las dos** —diagnóstico gratis (TOFU) y agenda discovery (BOFU)— y
+**la sección de cierre es el diagnóstico**. Un BOFU que aterriza sin dirigir cae en la oferta de la etapa que el
+usuario ya pasó.
+
+**Regla del embudo: cada etapa pide más compromiso que la anterior.** No falta la acción; **falta dirigir a
+ella**: ancla o parámetro que lleve el clic BOFU a la agenda y no al formulario de diagnóstico.
 
 ## Decisión
 
@@ -50,8 +59,12 @@ BOFU se parte por servicio, porque el destino y la intención son distintos:
 
 | | Destino | Momento del usuario | Acción |
 |---|---|---|---|
-| **BOFU-SEO** | landing SEO | sabe que su orgánico cae y quiere que alguien lo opere | contacto con alcance |
-| **BOFU-AEO** | landing AEO (canónica) | sabe que no lo citan y quiere corregirlo | *(pendiente de B2)* |
+| **BOFU-SEO** | landing SEO | sabe que su orgánico cae y quiere que alguien lo opere | Growth Form de contacto (contexto + rol) |
+| **BOFU-AEO** | landing AEO (canónica) | sabe que no lo citan y quiere corregirlo | **agenda discovery**, no el diagnóstico |
+
+🔴 **El evento de conversión se define POR LÍNEA, no para la campaña:** un envío del Growth Form de SEO y una
+reunión agendada en AEO no son la misma acción ni valen lo mismo. Contarlas juntas haría que el optimizador
+persiga la más barata.
 
 ### 2. El objetivo es conversión, y eso obliga a definir el evento
 
