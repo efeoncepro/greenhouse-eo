@@ -1,0 +1,298 @@
+{
+  "method": "WCAG relative luminance; conservative minimum across full text bounding boxes on native photograph (not p98); solid text versus surface; boundary band versus photograph; opaque light cursor/selection core pixels versus photograph. Antialiased edges excluded for controls, not text boxes.",
+  "thresholds": {
+    "text": 4.5,
+    "boundary": 3,
+    "controls": 3
+  },
+  "results": [
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 15.843,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 14.726,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 5.394,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "01-fuera-916",
+      "style": "outline",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#ff6500"
+      },
+      "ctaTextMin": 4.988,
+      "descriptorMin": 14.785,
+      "boundaryMin": 4.918,
+      "cursorAndControlsMin": 9.231,
+      "controlCorePixels": 284,
+      "overlayBounds": {
+        "right": 693,
+        "bottom": 427
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 13.184,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 11.399,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 5.059,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "01-fuera-169",
+      "style": "outline",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#ff6500"
+      },
+      "ctaTextMin": 5.196,
+      "descriptorMin": 14.38,
+      "boundaryMin": 5.186,
+      "cursorAndControlsMin": 9.023,
+      "controlCorePixels": 816,
+      "overlayBounds": {
+        "right": 581,
+        "bottom": 447
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 14.543,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 14.072,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.817,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "02-reconoces-916",
+      "style": "solid",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#00284d"
+      },
+      "ctaTextMin": 5.043,
+      "descriptorMin": 14.987,
+      "boundaryMin": 4.975,
+      "cursorAndControlsMin": 8.551,
+      "controlCorePixels": 282,
+      "overlayBounds": {
+        "right": 781,
+        "bottom": 387
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 13.238,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 11.7,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.164,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "02-reconoces-169",
+      "style": "solid",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#00284d"
+      },
+      "ctaTextMin": 5.043,
+      "descriptorMin": 14.312,
+      "boundaryMin": 4.475,
+      "cursorAndControlsMin": 8.298,
+      "controlCorePixels": 811,
+      "overlayBounds": {
+        "right": 565,
+        "bottom": 485
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 14.52,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 10.256,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 3.474,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "03-referencia-916",
+      "style": "text",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#ffffff"
+      },
+      "ctaTextMin": 12.066,
+      "descriptorMin": 11.649,
+      "boundaryMin": null,
+      "cursorAndControlsMin": 7.646,
+      "controlCorePixels": 288,
+      "overlayBounds": {
+        "right": 835,
+        "bottom": 382
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 14.424,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 13.306,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.664,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "03-referencia-169",
+      "style": "text",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#ffffff"
+      },
+      "ctaTextMin": 12.847,
+      "descriptorMin": 13.531,
+      "boundaryMin": null,
+      "cursorAndControlsMin": 8.783,
+      "controlCorePixels": 824,
+      "overlayBounds": {
+        "right": 627,
+        "bottom": 526
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 12.254,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 12.222,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 4.338,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "04-elegida-916",
+      "style": "solid",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#00284d"
+      },
+      "ctaTextMin": 5.043,
+      "descriptorMin": 13.744,
+      "boundaryMin": 4.387,
+      "cursorAndControlsMin": 8.175,
+      "controlCorePixels": 274,
+      "overlayBounds": {
+        "right": 757,
+        "bottom": 402
+      },
+      "contrastPass": true
+    },
+    {
+      "otherText": [
+        {
+          "id": "entrada",
+          "min": 7.956,
+          "threshold": 4.5
+        },
+        {
+          "id": "dominante",
+          "min": 9.454,
+          "threshold": 3
+        },
+        {
+          "id": "dominante-acento-0",
+          "min": 3.203,
+          "threshold": 3
+        }
+      ],
+      "compositionPass": true,
+      "id": "04-elegida-169",
+      "style": "solid",
+      "colors": {
+        "surface": "#ff6500",
+        "ink": "#00284d"
+      },
+      "ctaTextMin": 5.043,
+      "descriptorMin": 12.368,
+      "boundaryMin": 4.502,
+      "cursorAndControlsMin": 9.021,
+      "controlCorePixels": 822,
+      "overlayBounds": {
+        "right": 531,
+        "bottom": 588
+      },
+      "contrastPass": true
+    }
+  ]
+}

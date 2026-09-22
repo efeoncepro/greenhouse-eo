@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-22 — Ads: Tres voces + acción
+
+[Regla aprobada](docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md): CTA Poppins en texto, contorno o
+relleno a demanda, complemento de las tres voces. Define jerarquía, gaps de tinta,
+protección de sujeto/firma, cursor semántico y editables. Publicidad, Design y Growth/CRO sincronizados en
+Codex/Claude; excepción acotada al relleno CTA sobre foto, sin scrims. Color a demanda según composición,
+tinta/borde/relleno medidos por separado. v04 completa16 pilotos:4conceptos×4:5/1:1/9:16/16:9,
+composición/contraste16/16 y firma≥5,52:1; arnés fotográfico genérico con límites explícitos.
+Prompts, editables, matriz y evidencia en OneDrive; cobertura de cuatro ratios documentada en skills espejo.
+Sin cambios runtime ni publicación.
+
 ## 2026-09-21 — Paid visual: palancas, cinematic ads y medición por formato
 
 Skills de publicidad, Design, Motion, Digital Marketing y Growth/CRO conectadas al
@@ -597,7 +608,7 @@ espejado; manual, funcional y protocolo enlazan la fuente. Fechas propuestas sin
 
 [Bitácora del caso](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md), manual y descripción
 funcional: dirección gastronómica/cultural, tipografía por tinta, storytelling, Seedance + post exacta,
-cueca preservada, adaptación nativa9:16, portadas, entrega y readback Metricool. Skills de Design,
+cueca preservada, adaptación nativa 9:16, portadas, entrega y readback Metricool. Skills de Design,
 Typography, Copy, Brand, Motion, Audio y Social actualizadas en ambos agentes, conservando overlays propios.
 Fiestas Patrias18/09 (LinkedIn11:00, Instagram19:00) y Día de Muertos02/11 (11:00/18:00), horaChile:
 programadas con video/copy/portada; publicación efectiva pendiente. Aprobación posterior supera el estado
@@ -667,27 +678,3 @@ OFL 1.1 y nota de procedencia/hash en `src/assets/fonts/`. `DESIGN.md`,
 la UI. Se fijó además la regla de que toda seasonality debe incluir product placement reconocible de Efeonce, con
 Bricolage para la idea display y Poppins para contexto/apoyo, sin invadir elementos rituales. No cambia el runtime:
 Greenhouse mantiene Poppins + Geist como sus únicas familias activas de producto.
-
-## 2026-09-11 — Conocimiento de las «AI Skills» de DataForSEO incorporado a las skills propias
-
-Seis skills públicas del proveedor (licencia libre de uso, copia, modificación y redistribución) descargadas y
-analizadas como datos, más 62 páginas de la API AI Optimization y 11 templates n8n/Make. Ninguna se instala: duplican
-capacidades existentes y comprarían API fuera del ledger de gasto. Se incorporó el delta real —comportamiento de
-endpoints que falla en silencio (`domain_intersection` AND vs unión, `rank_scale: one_hundred` en `bulk_ranks`,
-`info.target_spam_score` ≠ `backlinks_spam_score`, lost-link spike derivado, asimetría V1/V3 en `historical_serps`,
-referencias de AI Overview anidadas en varios niveles) y el método (scoring de visibilidad en IA, umbral de
-significancia, higiene de denominador, canibalización SERP-first, 28 checks de cartera, offer bank). Las curvas de CTR
-del proveedor quedaron declaradas como discrepantes ~6× frente a las mediciones propias, que gobiernan.
-`ai_optimization` permanece fuera del allowlist. [RESEARCH-011](docs/research/RESEARCH-011-dataforseo-ai-skills-competitive-review.md).
-
-**Decisiones y consecuencias del mismo día.** Las cuatro preguntas abiertas quedaron resueltas:
-screening masivo de toxicidad (`TASK-1871`) y rotación de URL en el SERP derivada a costo cero de
-`seo_serp_top_results` (`TASK-1870`), ambas con `task:lint` limpio; disavow **descartado** como
-entregable automático, con el criterio de cuándo sí escrito en `seo-aeo/modules/05_OFFPAGE_AUTHORITY.md`;
-y gate de `rank_scale` implementado (`dataforseo-backlinks-rank-scale-guard.test.ts`, verificado en
-ambos sentidos), que destapó que `prospect/` pedía `rank` en escala 0–1000 sin declararlo — corregido.
-Abierto `ISSUE-170`: el link gap del diagnóstico de prospecto pasa hasta 5 competidores juntos a
-`domain_intersection` y el default `all` devolvería sólo los dominios que enlazan a todos; registrado
-con experimento definido, no afirmado. `project_context.md` compactado de 11.997 a 11.297 tokens con
-control de no-pérdida verificado (148 rutas antes y después). La copia de `seo-aeo` en `~/.claude/skills`
-quedó sincronizada con marcador de procedencia.

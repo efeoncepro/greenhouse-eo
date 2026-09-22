@@ -1,12 +1,14 @@
 # Handoff activo
 
+**Ads (22/09):** [Tres voces + acción](docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md):
+16 pilotos/4 ratios en OneDrive; QA y límites en matriz v04. Sin publicación.
+
 **Paid visual (21/09):** [playbook](.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md)
 Codex/Claude: doce palancas sin resultados paid; registro C en construcción.
 
-**Fotografía Efeonce (19–20/09):** lenguaje aprobado; capa gráfica NO. `pnpm foto:{doctor,prompt,validar}`
-(27 tests); sin prompts manuales. Abrir finales aprobados comparables, declarar/medir azul y acento; firma 20 %.
-Abierta reserva 2. [Estado/canon](docs/operations/brand-photography/README.md) ·
-[prueba de la guarda](ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa/README.md).
+**Fotografía (19–20/09):** lenguaje aprobado; gráficos históricos rechazados; CTA: ver arriba.
+`pnpm foto:{doctor,prompt,validar}`; reserva 2 abierta.
+[Canon y estado](docs/operations/brand-photography/README.md).
 
 [EPIC-048](docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md): revisión adversarial aplicada; ADR Proposed, tasks to-do; sin runtime/bono.
 

@@ -46,6 +46,14 @@ La firma web usa el asset fijo de Artifact Composer `assets/url-lum.svg`, no una
 compone contra el fondo final con el blend no separable `luminosity` y opacidad `0.72`; su QA comprueba hash,
 geometría vectorial y diferencia raster visible. Por eso un SVG declarado pero invisible no cuenta como entrega.
 
+## Tres voces + acción
+
+Los ads con CTA usan [Tres voces + acción](../../operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md),
+aprobado el 2026-09-22: Bricolage idea, Poppins estructura/acción y Guttery gesto opcional. Texto, contorno y relleno
+son tres estilos disponibles según la composición; no hace falta elegir uno para toda la campaña. La acción
+no suma una cuarta familia ni otro titular. Se protege personaje/firma y se entregan textos/espaciados editables.
+La aprobación de estos estilos no aprueba las piezas completas ni demuestra conversión.
+
 ## Qué evita
 
 - titulares pesados por usar ExtraBold como receta automática;
@@ -68,3 +76,7 @@ de Codex/Claude funciona sin MCP y no depende de un estado de conexión.
 
 Contrato operativo: [Advertising Creative Agent Execution V1](../../operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md).
 Manual: [usar reglas publicitarias con agentes](../../manual-de-uso/creative/usar-reglas-publicitarias-con-agentes.md).
+
+## Entrega Paid Media en cuatro ratios
+
+Por defecto, preparar cada key visual en **4:5, 1:1, 9:16 y 16:9**. Cuatro conceptos son dieciséis exports; si el brief excluye alguno, dejarlo explícito. Recomponer foto y tipografía por formato y revisar CTA, puntero, personaje, lecho/firma y contraste mínimo en cada export. Entregar la matriz concepto×ratio con editables, prompts y QA en Pilotos. Es cobertura interna; antes de pautar se verifican specs y safe areas de cada placement.

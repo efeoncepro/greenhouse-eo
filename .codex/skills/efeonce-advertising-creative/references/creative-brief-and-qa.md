@@ -26,6 +26,16 @@ shotlist/timeline, audio y versión silenciada; en estáticos marcar hook tempor
 breve de comprensión y atribución es QA cualitativo, no rendimiento observado. Conservar resultado
 inconcluso si no existe muestra suficiente; un PASS creativo no prueba eficacia paid.
 
+## CTA — Tres voces + acción
+
+Cargar [el canon aprobado](../../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md).
+Registrar texto/contorno/relleno y razón, copy/destino, beneficio/descriptor, Poppins estructural, gaps/padding/radio,
+bounds del cursor completo y reserva del sujeto/firma. Medir contraste y revisar móvil por formato; conservar
+editables y reproducción. Registrar color de tinta/borde/relleno según pieza (lima no obligatorio), CTA y
+descriptor ≥4,5:1, borde/controles ≥3:1 y mínimo local, no sólo p98. **Sin excepción de aprobación
+visual para un CTA que falle estos mínimos**; el criterio flexible de otros niveles del punto8 no lo reemplaza. Un único local hacia CTA si se usa selección; no duplicarlo en titular. El relleno
+funcional del CTA es excepción acotada a la prohibición de paneles en foto, no permiso para tarjetas o scrims.
+
 ## Ficha tipográfica
 
 Registra el identificador/versión del contrato AXIS leído y, por cada tramo, `rol → familia → archivo →
@@ -104,3 +114,7 @@ necesitan gritar a la vez, el problema es de jerarquía, no de tamaño.
 Registra `PASS | REWORK | DON’T` por jerarquía, tipografía, contraste, marca, safe area, formato, motion y
 derechos. Un PASS técnico no equivale a aprobación humana ni publicación. Si hay REWORK, nombra el defecto y la
 operación concreta que lo corrige.
+
+## Gate de cobertura Paid Media
+
+Por defecto: cada concepto ×4:5/1:1/9:16/16:9; exclusiones sólo con brief explícito. Verificar cuatro exports y cuatro composiciones, no cuatro recortes. Registrar tamaños, fuentes editables, prompts/referencias y QA visual/contraste por ratio. El conteo parcial no se anuncia como campaña completa. Ver el canon Tres voces + acción para matriz, contraste mínimo y conservación del lecho/firma.

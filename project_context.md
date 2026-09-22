@@ -119,8 +119,9 @@ ETV DataForSEO: producción sirve `improved_layout_clickstream_v2` desde 2026-09
 Efeonce Insights (EPIC-045): [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14 = estado real.
 
 Informes: skill `report-studio` (evidencia, diseño, QA PDF).
-Fotografía propia Efeonce: [`design-studio` y su preflight visual](.codex/skills/design-studio/references/efeonce-photographic-language.md); abrir finales aprobados antes de generar, verificar azul/acento en píxeles y componer firma oficial al 20 %.
+Fotografía Efeonce: [Design Studio](.codex/skills/design-studio/references/efeonce-photographic-language.md)
 Paid: `efeonce-advertising-creative/references/paid-visual-attention-playbook.md`.
+Ads: [Tres voces + acción](docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md), CTA y cuatro ratios.
 Seasonalities: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.
 [Referente Metricool](.codex/skills/social-media-studio/references/seasonality-reference-calendar.md): inspiración para Efeonce/clientes; separado del calendario editorial y del scheduler.
 Producción seasonality/trendjacking: [protocolo de agentes](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md); canon en skills espejo `social-media-studio` (idea, marca, dirección, producción y QA).

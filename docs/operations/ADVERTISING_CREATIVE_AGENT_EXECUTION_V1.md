@@ -67,6 +67,14 @@ autoridad de publicación ni modelo de autonomía. ADR aplicable: ownership AXIS
 [contexto router-first](../architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md); esta ampliación de
 conocimiento no introduce una decisión de arquitectura ni una nueva superficie runtime.
 
+## Tres voces + acción — 2026-09-22
+
+[Canon de aplicación aprobado](EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md): tres voces tipográficas con
+CTA funcional en Poppins, **texto, contorno o relleno a demanda**.
+El grupo de acción conserva jerarquía, espacios y reserva de sujeto/firma; un cursor local hacia CTA cuando
+se use selección, colaboradores sólo con significado. La superficie rellena es una excepción funcional acotada,
+no permiso para tarjetas HUD o scrims. No cambia ownership, contratos AXIS ni autorización de publicación.
+
 ## Contrato de ejecución
 
 1. Resolver marca, objetivo, soporte, dimensiones/duración, audiencia, copy literal, CTA, activos, derechos y

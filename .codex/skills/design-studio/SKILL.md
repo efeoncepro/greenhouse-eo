@@ -68,6 +68,10 @@ reutilizado un prompt no lo cumple.
    Model canónicos enlazados en `efeonce/CLIENT_DELIVERY.md`. Cotiza la producción generativa por operación;
    nunca conviertas una pieza, una hora o el costo de un provider en la unidad de crédito.
 
+Para **ads con CTA**, aplicar [Tres voces + acción](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md) junto con publicidad:
+texto/contorno/relleno aprobados a demanda, CTA Poppins como función y no cuarta voz, aire medido respecto del sujeto
+y firma. La superficie funcional de acción no autoriza tarjetas de contenido ni scrims sobre foto.
+
 ## 2. Árbol de decisión (a qué skill pertenece)
 
 - ¿Producir el asset IA canónico para la **UI de Greenhouse** (icono, empty state, banner,
@@ -278,3 +282,7 @@ Para fotografía o imagen fotorrealista de **la marca Efeonce** (no de clientes)
 WB sin grade, catálogo de tomas y checklist QA. **NUNCA** anclar la serie en la categoría de un cliente real.
 El [documento maestro](../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) conserva el
 contrato completo; la producción del pixel sigue en `greenhouse-ai-image-generator`.
+
+## Adaptaciones Paid Media
+
+Cuando el brief sea Paid Media multiformato, aplicar la matriz del canon **Tres voces + acción**: 4:5, 1:1, 9:16 y 16:9 por concepto, salvo exclusión explícita. Resolver reservas y foto nativas para cada ratio, conservar identidad/manos/pantallas al editar y pasar QA individual. No convertir un recorte o un resize en evidencia de composición validada. El QA local 1:1 no cambia el estado global de validación del catálogo.

@@ -106,6 +106,22 @@ Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1
    tipográficas, provenance y resultado del gate. Distingue prueba producida, revisada, aprobada, programada,
    publicada y medida.
 
+## Tres voces + acción — ads con CTA
+
+**Paid Media multiformato:** entregar cada key visual en **4:5, 1:1, 9:16 y 16:9**, salvo reducción explícita del brief. Matriz concepto×ratio, recomposición nativa y QA propio; ocho piezas de cuatro conceptos en dos ratios son cobertura parcial. Detalle y tamaños en el canon enlazado abajo.
+
+**Regla aprobada por el operador, 2026-09-22.** Cargar [Tres voces + acción](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md)
+al componer o auditar ads con CTA: Bricolage idea, Poppins estructura, Guttery gesto opcional y acción en Poppins.
+Tres tratamientos a demanda: **texto (`text`), contorno (`outline`) y relleno (`solid`)**.
+El CTA no es una cuarta voz/familia ni otro titular. Elegir por composición y registrar el motivo, sin prometer lift.
+Un único cursor local hacia la acción cuando se use selección; multiplayer sólo con significado. Proteger personaje,
+firma y envolvente completa del cursor; medir gaps de tinta, contraste y cada formato. El relleno acotado del CTA
+está autorizado sobre foto; no habilita tarjetas de contenido, paneles HUD ni scrims. Los tamaños de pilotos son
+casos, no nuevos tokens AXIS. Entregar copy/parámetros/compositor editables y conservar el estado de cada pieza.
+**Color a demanda:** lima no es obligatorio; naranja, teal u otro autorizado según composición. Elegir tinta,
+contorno y relleno por separado: CTA/descriptor ≥4,5:1; borde/silueta y controles significativos ≥3:1. Medir
+el fondo real desfavorable, no sólo paleta o p98; documentar color resuelto y prueba. Ver método en el canon.
+
 ## Jerarquía por voces: receta probada en carrusel (2026-09-19)
 
 Caso: carrusel «Nivel de búsqueda» (GTA VI, 9 láminas 1080×1350 + pieza suelta), aprobado tras una pasada pedida
@@ -192,14 +208,16 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
   a mano**: se emiten con `pnpm foto:prompt <ficha.json>` y se miden con `pnpm foto:validar <plate.png>`. Canon:
   [reserva de espacio en el plate](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md).
   La **capa de composición gráfica** encima de la foto —tipografía, jerarquía, cursores— sigue siendo canon **de esta
-  skill** y **NO está aprobada**; los ejemplos de la carpeta de fotografía no la aprueban.
+  skill**; las pruebas fotográficas históricas no la aprueban. Desde 2026-09-22 está aprobado el sistema
+  **Tres voces + acción** (texto/contorno/relleno), no automáticamente cada pieza completa.
 - **Una reserva sin materia es el DON’T, en cualquier tono** (**[decisión del operador, 2026-09-20]**). Una zona
   oscura está perfecta cuando la superficie oscura existe de verdad y **tiene nombre**; el error es decidir el tono por
   regla global, clara u oscura. El detector de la «losa» está en la **entrada** —la guarda de materia de `foto:prompt`,
   que rechaza «a wall» o «the surface»—, **no en una métrica**: planitud, canto y calma no distinguen la versión
   rechazada de la buena, porque la diferencia es **semántica**.
 - No uses rectángulos decorativos detrás de palabras como solución automática. Un plate existe para asegurar
-  contraste y debe responder a la composición, no parecer una etiqueta accidental.
+  contraste y debe responder a la composición, no parecer una etiqueta accidental. El CTA funcional de
+  **Tres voces + acción** sí admite su superficie acotada de relleno; no extenderla al copy de apoyo.
 - No conviertas un ejemplo aprobado en regla universal ni un mockup didáctico en campaña publicada.
 - No presentes una receta del Workbench como aprobación creativa. La recomendación aún requiere composición,
   QA tipográfico, contraste sobre píxeles reales y las aprobaciones de marca/cliente que correspondan.

@@ -97,6 +97,12 @@ aprobado «¿Claude o Codex?» llegaba a 0,35). `SELECTION TARGET` sirve **con p
 pegado al objeto falla (1,02:1) porque el objeto trae su propio borde claro, y con 0,04 vuelve a fallar porque la
 caja toca a las personas. Hay punto dulce, no monotonía.
 
+## Delta 2026-09-22 — CTA aprobado sobre foto
+
+[Tres voces + acción](../EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md) aprueba la capa funcional de CTA en
+texto/contorno/relleno. No aprueba automáticamente piezas completas ni rehabilita los ejemplos rechazados del 19/09.
+Conserva foto sin scrims, reservas y firma; la superficie del CTA no habilita paneles para contenido.
+
 ## Delta 2026-09-19 (tarde)
 
 - [**Reserva de espacio en la toma**](EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md) — **aprobado (capa fotográfica)**: las cuatro reservas (texto, objeto para enmarcar, lecho de firma, aire para cursores), tono declarado, límite de cabezas, formato nativo, nunca scrim, medir antes de componer.

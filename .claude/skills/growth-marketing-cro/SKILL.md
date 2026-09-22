@@ -70,6 +70,11 @@ No declarar ganador sin calidad de resultado y muestra comparable.
 
 
 
+Para **CTA dentro de una imagen publicitaria**, cargar [Tres voces + acción](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md) y
+`efeonce-advertising-creative`: estilos texto/contorno/relleno, una acción y coherencia con destino. Separar aprobación
+visual de eficacia CRO; comparar estilos con copy/oferta/medios constantes y medir resultado calificado. No
+trasladar este tratamiento de anuncio a botones de producto ni atribuir conversiones al color por sí solo.
+
 `diagnose → model → prioritize → experiment → measure`
 
 1. **Diagnostica primero.** Nunca prescribas una lista genérica de "10 growth

@@ -52,6 +52,18 @@ intenciones `growth` o `intervention`. El agente debe conservar el orden y los e
 la frase contra el ancho del lockup y mostrar el resultado en el formato final. La receta funciona con cualquier
 copy; no depende de las palabras “escalar” o “automatizar”.
 
+## Pedir un ad con Tres voces + acción
+
+```text
+Usa Tres voces + acción para este anuncio. CTA en texto, contorno o relleno según la composición;
+explica la elección. Conserva la tesis dominante, una acción y aire respecto del personaje y firma.
+Entrega cada formato nativo revisado, copy y espaciados editables, compositor y contraste medido.
+```
+
+[Regla vigente](../../operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md). Revisar el cursor completo,
+no sólo el botón. El CTA usa Poppins; Guttery no es obligatoria. Las tres variantes pertenecen al
+sistema aprobado. Los valores de los pilotos 4:5 no se copian a 9:16/16:9 sin recomposición y revisión.
+
 ## Cómo revisar la respuesta
 
 - La tesis debe leerse primero al tamaño real y en miniatura.
@@ -95,7 +107,8 @@ Firma con url-lum. Toma como referencia ai-generations/2026-09-19_nivel-de-busqu
 
 - No pidas «un cursor solo sin caja»: el cursor que pasea sin seleccionar es un colaborador en movimiento, y la
   pieza siempre conserva un objeto seleccionado.
-- No aceptes rectángulos de color detrás del texto como tarjeta: la tarjeta es vidrio esmerilado de la propia escena.
+- En foto, no aceptes tarjetas de contenido ni scrims. La superficie funcional acotada del CTA contorno/relleno
+  de **Tres voces + acción** sí está autorizada. El vidrio HUD sigue limitado a ilustración de género.
 - No pidas Guttery en más de un gesto por pieza ni en frases largas; si la máquina no tiene la fuente, esa capa se
   omite.
 - No trates los pesos o colores del caso como plantilla fija: se revalidan con cada fondo y copy.
@@ -137,3 +150,7 @@ como una capability de runtime que todavía no existe.
 
 Descripción funcional: [reglas publicitarias para agentes](../../documentation/creative/reglas-publicitarias-para-agentes.md).
 Contrato: [Advertising Creative Agent Execution V1](../../operations/ADVERTISING_CREATIVE_AGENT_EXECUTION_V1.md).
+
+## Entrega Paid Media en cuatro ratios
+
+Por defecto, preparar cada key visual en **4:5, 1:1, 9:16 y 16:9**. Cuatro conceptos son dieciséis exports; si el brief excluye alguno, dejarlo explícito. Recomponer foto y tipografía por formato y revisar CTA, puntero, personaje, lecho/firma y contraste mínimo en cada export. Entregar la matriz concepto×ratio con editables, prompts y QA en Pilotos. Es cobertura interna; antes de pautar se verifican specs y safe areas de cada placement.
