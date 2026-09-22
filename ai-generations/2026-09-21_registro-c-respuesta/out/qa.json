@@ -1,17 +1,41 @@
 [
   {
-    "id": "b1-te-decimos-que-no",
+    "id": "mo2-no-te-citan",
     "dominante": [
-      "Te decimos que no."
+      "+35% en tus clics orgánicos."
     ],
     "ratioDominanteEntrada": null,
     "contraste": {
-      "dominante": 19.95,
-      "cta": 11,
-      "descriptor": 20.17,
-      "logo": 18.45
+      "dominante": 19.16,
+      "nota": 19.2,
+      "cta": 10.6,
+      "descriptor": 19.34,
+      "logo": 18.12
     },
     "gapsTinta": [],
-    "seleccion": null
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "tu",
+          "labelBounds": {
+            "left": 965.952,
+            "top": 1034.208,
+            "right": 1060.693,
+            "bottom": 1065.416
+          }
+        }
+      ]
+    }
   }
 ]
