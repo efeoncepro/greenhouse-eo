@@ -23,12 +23,14 @@ catálogo `insights-report` (A4 794×1123) con molde compartido y 5 plantillas q
 
 **Pendiente declarado, no silenciado:**
 
-1. **Catálogo `insights-deck` propio** — el deck sigue componiendo con `deck-axis`, cuyos budgets
-   están dimensionados para copy de licitación y cuya portada imprime vocabulario de propuesta.
-2. **Baseline del gate visual** para el catálogo nuevo. Además, `pnpm composer:visual-gate` da rojo
-   en `develop` limpio (19/33 plantillas, 1–443 px) por variación de rasterización entre entornos:
-   más ancho que ISSUE-122, que sólo cubre láminas con fotos. El cierre debe exigir cero píxeles
-   **sólo en los frames nuevos**, sin re-congelar frames ajenos.
+1. **Cutover del `deck_pdf` al catálogo propio.** El catálogo `insights-deck` ya existe, renderiza y está
+   registrado en el worker, pero `deck_pdf` sigue componiendo con `deck-axis`. Cambiarlo altera un
+   comportamiento productivo y necesita su canary; no es el final de una sesión.
+2. **Promoción del baseline visual.** El gate ya fotografía los tres catálogos y los 9 frames nuevos están
+   declarados en `BASELINE_DELTAS.md`, pero **sin promover**: `--freeze` exige declarar todos los frames
+   cambiados, y los de `deck-axis` difieren entre corridas (19 y 20 en dos corridas de la misma máquina).
+   Congelar los propios obligaría a rebaselinear los ajenos — el rebaseline silencioso que el gate impide.
+   Bloqueado por ISSUE-122, que ahora tiene esa evidencia.
 3. ~~**`UI ready: yes`**~~ — resuelto como **`n/a`** el 2026-09-22: el contrato de `UI ready` mide una pantalla
    del portal y esta superficie es un documento exportado a PDF. Los gates que aplican están verdes
    (`design-contract:lint`, `ui:code-lint`, `ui:quality` 4,50/piso 4,0) con dossier y scorecard sobre el render
