@@ -134,7 +134,11 @@ runtime, hacerlo en el módulo canónico y verificar estos casos; no crear una s
 Método creativo, prompts, formatos, embudo y archivo:
 [SEO/AEO Paid Media](social/2026-09-22-seo-aeo-paid-media-production-method.md).
 
-## 8. 🔴 El cursor del CTA tapa el descriptor cuando el botón es corto
+## 8. El cursor del CTA tapaba el descriptor cuando el botón era corto — resuelto en el compositor
+
+> **Desde el 22/09/2026 el compositor lo impide solo** (§12): si la caja del cursor cae sobre el descriptor en
+> el eje X, el descriptor baja bajo la flecha. La regla de largo de abajo queda como criterio de ritmo —un
+> botón mucho más corto que su descriptor se ve desbalanceado—, ya no como protección.
 
 **Medido el 2026-09-22 en dos piezas de la misma tanda.** El cursor del botón se dibuja pegado al borde
 derecho del CTA; el descriptor arranca en el mismo `x` que el botón y corre hacia la derecha. Cuando el
@@ -264,3 +268,27 @@ textura del muro— y en KV-02 ningún píxel del pelo se aparta más de 25 nive
 la 500. Además, una coronilla es angosta: en una huella de ~800 px, sus primeras filas pesan poco en cualquier
 estadística de fila. No hay umbral que separe pelo de muro. **Automatizar exige segmentación de persona**; hasta
 entonces, el ojo sobre la regla manda y los scripts son cota.
+
+## 12. El descriptor se separa del GRUPO del CTA, no del botón
+
+**Pedido del operador, 22/09/2026:** *«el texto debajo del CTA está muy pegado al CTA»*. La causa era de
+medida, no de valor. `descriptorGap` se medía desde el borde del **botón**, pero los corchetes de selección se
+dibujan ~8 px por fuera de ese borde (`paddingRatio.block` 0,007 × ancho) y el cursor cuelga ~15 px bajo él.
+Con el gap de 14 que usaban todos los planes, entre la esquina del corchete y el descriptor quedaban **~6 px**.
+
+**Lo que hace ahora el compositor, para todos los planes:**
+
+1. Resuelve la selección **antes** de ubicar el descriptor. Sólo depende de la caja del botón.
+2. Mide `descriptorGap` desde el **borde inferior de la selección** (los corchetes), con un **piso de
+   0,6 × `descriptorSize`**: con el cuerpo de 26 px usado hoy, 16 px. Ningún plan puede dejarlo pegado.
+3. Si la caja del cursor (`cursorEvidence[].bounds`, que el renderer AXIS expone desde esta fecha) cae sobre el
+   descriptor en el eje X, el descriptor baja bajo la flecha con el mismo gap.
+
+**Efecto medido:** el aire corchete→descriptor pasa de ~6 a 16 px y el descriptor baja ~10 px en todas las
+piezas. Composición en seco de los planes vivos: los seis de CMP-001 (`registro-c-respuesta`, 19 piezas)
+componen sin cambios. En CMP-002 tres piezas quedaban 2–7 px sobre su `subjectProtection` y se ajustaron
+bajando el dominante 4–5 px. Los pilotos cerrados `cta-p1-v02` y `cta-p2` tenían 1 px de holgura declarada y
+ahora la guarda los frena: si se reabren, se ajusta la pieza, no el `top`.
+
+**Si recompones un plan anterior:** el descriptor bajará ~10 px. Revisa la guarda y la pieza a ojo.
+

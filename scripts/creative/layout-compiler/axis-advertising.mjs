@@ -249,6 +249,36 @@ const selectionControls = ({ bounds, variant, stroke, handleSize }) => {
   return `${boundary}${handles}`
 }
 
+// Caja que ocupa el cursor en el lienzo, calculada con la MISMA geometría que dibuja `cursorPath`.
+// Existe para que quien compone debajo de la selección (el descriptor del CTA) pueda despejar la flecha:
+// el cursor cuelga desde el centro del botón y baja ~15 px bajo su borde, y sin su caja el vecino
+// sólo conocía el rectángulo de la selección [2026-09-22].
+const CURSOR_POINTS = [
+  [0, 0],
+  [32, 13],
+  [19, 18],
+  [14, 33]
+]
+
+const cursorBounds = ({ hotspot, direction, size, strokeWidth = 0 }) => {
+  const rad = (directionVectors[direction].angle * Math.PI) / 180
+  const scale = size / 34
+
+  const pts = CURSOR_POINTS.map(([x, y]) => [
+    hotspot.x + (x * Math.cos(rad) - y * Math.sin(rad)) * scale,
+    hotspot.y + (x * Math.sin(rad) + y * Math.cos(rad)) * scale
+  ])
+
+  const half = strokeWidth / 2
+
+  return {
+    left: round(Math.min(...pts.map(p => p[0])) - half),
+    top: round(Math.min(...pts.map(p => p[1])) - half),
+    right: round(Math.max(...pts.map(p => p[0])) + half),
+    bottom: round(Math.max(...pts.map(p => p[1])) + half)
+  }
+}
+
 const cursorPath = ({ hotspot, direction, size, fill, stroke, strokeWidth, id, kind, state, action }) => {
   const angle = directionVectors[direction].angle
   const scale = size / 34
@@ -346,6 +376,12 @@ export const renderCollaborationSelection = ({ manifest, targetBounds, canvas, m
         direction: cursor.direction,
         anchor: cursor.anchor,
         hotspot: { x: round(hotspot.x), y: round(hotspot.y) },
+        bounds: cursorBounds({
+          hotspot,
+          direction: cursor.direction,
+          size: localSize,
+          strokeWidth: Math.max(2, canvas.width * 0.003)
+        }),
         touchesTarget: true
       })
       continue
@@ -395,6 +431,7 @@ export const renderCollaborationSelection = ({ manifest, targetBounds, canvas, m
       anchor: state === 'acting' ? cursor.anchor : undefined,
       canvasRegion: state === 'moving' ? cursor.canvasRegion : undefined,
       hotspot: { x: round(hotspot.x), y: round(hotspot.y) },
+      bounds: cursorBounds({ hotspot, direction: cursor.direction, size: collaboratorSize, strokeWidth: 1 }),
       touchesTarget: state === 'acting',
       clearOfTarget: state === 'moving' ? !pointInside(hotspot, bounds, collaboratorSize * 2.5) : undefined,
       label: cursor.label,

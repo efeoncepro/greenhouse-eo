@@ -646,12 +646,28 @@ return k.ink.right - k.ink.left }))
     //   · surfaceBox       — para medir el RELLENO contra la escena sobre el píxel (mínimo local)
     checks.push({id:'cta',box:t.box,inkL:hexLum(ink),
       ...(solid?{skipContrast:true,ctaTextoTeorico:(Math.max(hexLum(surfaceColor),hexLum(ink))+.05)/(Math.min(hexLum(surfaceColor),hexLum(ink))+.05),surfaceBox:b,surfaceL:hexLum(surfaceColor)}:{})});
-    const descriptor=block({text:c.descriptor,font:pop[400],size:c.descriptorSize,tracking:0,leading:1.2,x:c.align==='center'?W/2:cx,topY:b.bottom+c.descriptorGap,maxWidth:W*.7,fill:'#ffffff',align:c.align});
-
-    body+=descriptor.svg;checks.push({id:'descriptor',box:descriptor.box,inkL:1});
+    // La selección se resuelve ANTES del descriptor: sólo depende de la caja del botón, y el descriptor
+    // tiene que ubicarse bajo TODO el grupo —botón, corchetes y cursor—, no bajo el botón solo.
     const ci={targetId:'cta',targetKind:'group',variant:'open-brackets',padding:'compact',overlay:'none',cursors:[{id:'usuario',kind:'local',targetId:'cta',anchor:'end-center',action:'select'}]};
     const cm=resolveCollaborationSelectionIntent(ci);
     const cr=renderCollaborationSelection({manifest:cm,targetBounds:b,canvas:{width:W,height:H},measureLabel,presentation:{localCursorScale:c.cursorScale}});
+
+    // 🔴 Descriptor bajo el GRUPO, no bajo el botón [2026-09-22, operador: «el texto debajo del CTA está
+    // muy pegado»]. Antes se medía `descriptorGap` desde el borde del botón, pero los corchetes se dibujan
+    // ~8 px por fuera de ese borde: con el gap de 14 que usaban los planes, entre el corchete y el texto
+    // quedaban ~6 px. Ahora el gap se mide desde el borde de la selección y tiene un piso de 0,6 × el
+    // cuerpo del descriptor, así que ningún plan puede dejarlo pegado. Y si el cursor cae sobre el
+    // descriptor en el eje X (botón más angosto que el descriptor, §8 del doc), el descriptor baja
+    // bajo la flecha: el choque que antes sólo se veía mirando la pieza ya no puede ocurrir.
+    const descGap=Math.max(c.descriptorGap??0,Math.round(c.descriptorSize*0.6));
+    const cursorBox=cr.evidence.cursorEvidence.find(k=>k.id==='usuario')?.bounds;
+    const descAt=topY=>block({text:c.descriptor,font:pop[400],size:c.descriptorSize,tracking:0,leading:1.2,x:c.align==='center'?W/2:cx,topY,maxWidth:W*.7,fill:'#ffffff',align:c.align});
+    let descriptor=descAt(cr.bounds.bottom+descGap);
+
+    if(cursorBox&&descriptor.box.left<cursorBox.right&&descriptor.box.right>cursorBox.left&&descriptor.box.top<cursorBox.bottom+descGap)
+      descriptor=descAt(cursorBox.bottom+descGap);
+
+    body+=descriptor.svg;checks.push({id:'descriptor',box:descriptor.box,inkL:1});
 
     if(!cr.evidence.withinCanvas)throw Error('CTA selection outside canvas');
     body+=cr.underlay+labelToPaths(cr.overlay);

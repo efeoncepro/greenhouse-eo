@@ -45,3 +45,19 @@ test('participantColors rechaza colores inválidos o sin contraste suficiente', 
   assert.throws(() => renderCollaborationSelection({ ...base, presentation: { participantColors: { partner: 'orange' } } }), /#rrggbb/)
   assert.throws(() => renderCollaborationSelection({ ...base, presentation: { participantColors: { partner: '#8a8a8a' } } }), /4\.5:1/)
 })
+
+// El descriptor del CTA se ubica bajo la caja del cursor (componer-cta.mjs). Si esta caja deja de venir
+// o deja de crecer con la escala, el descriptor vuelve a quedar bajo la flecha sin que nada lo avise.
+test('cada cursor declara su caja en el lienzo, con la punta en el hotspot, y crece con la escala', () => {
+  const local = result => result.evidence.cursorEvidence.find(cursor => cursor.id === 'local')
+  const plain = local(renderCollaborationSelection(base))
+  const scaled = local(renderCollaborationSelection({ ...base, presentation: { localCursorScale: 2 } }))
+
+  for (const c of [plain, scaled, partnerEvidence(renderCollaborationSelection(base))]) {
+    assert.ok(c.bounds, `${c.id} sin bounds`)
+    assert.ok(c.bounds.left <= c.hotspot.x && c.hotspot.x <= c.bounds.right, `${c.id}: hotspot fuera de su caja en X`)
+    assert.ok(c.bounds.top <= c.hotspot.y && c.hotspot.y <= c.bounds.bottom, `${c.id}: hotspot fuera de su caja en Y`)
+  }
+
+  assert.ok(scaled.bounds.bottom - scaled.bounds.top > (plain.bounds.bottom - plain.bounds.top) * 1.9)
+})
