@@ -151,38 +151,44 @@ obligatoria**: omitir una columna la convierte en un `false` implícito que nadi
 | Capacidad estructural (cupos, formatos, flags) | **180 días** | cambian con versiones |
 | Craft y método | no vence | no depende del proveedor |
 
-### 4.4 El gate, que sí falla
+### 4.4 Dos mecanismos, y cada uno cierra una clase distinta
 
 ```bash
+pnpm models:inventory            # ¿la guía documenta todo lo ejecutable?
+pnpm models:inventory --write    # regenera la tabla desde los contratos
 pnpm models:freshness            # advisory
 pnpm models:freshness --strict   # falla (exit 1)
 ```
 
-Mide **dos cosas que se confunden**:
-- **Cobertura** — toda capacidad del contrato de código debe aparecer en la guía. *Si el CLI puede
-  gastar en un endpoint que la guía no menciona, la guía no sirve para decidir.*
-- **Frescura** — cada `verifiedAt` contra su ventana, más las capacidades **sin fecha**, que son
-  peores que las vencidas: nada puede vencerlas.
+🔴 **`models:inventory` cierra la clase «capacidad ejecutable sin documentar» por CONSTRUCCIÓN.** La guía
+tiene una sección **generada** desde `fal-capabilities.ts` y `higgsfield-capabilities.ts` con los **99 ids**
+que el CLI puede ejecutar —y por tanto **gastar**—. Si alguien agrega un endpoint y no la regenera, el check
+falla. **No se edita a mano.** Arreglar esas ausencias caso por caso las cerraba un día y las reabría al
+siguiente; generarlas las cierra para siempre.
 
-🔴 **El gate declara su propio alcance y hay que leerlo.** Hoy mide el carril fal; **no** mide el carril
-Higgsfield ni los modelos de `pnpm ai:image`. **Un verde suyo no es un verde de toda la flota** — y esa
-línea se imprime siempre, a propósito.
+**`models:freshness` mide lo que no se puede generar**, y separa tres cosas que se confunden:
 
-**Hallazgo de su primera corrida (2026-09-22):** cinco capacidades ejecutables que la guía no menciona,
-entre ellas `seedance20-mini-i2v` — **la que se usó ese mismo día para una sonda pagada**. Y ocho sin
-`verifiedAt`. El gate encontró en un minuto lo que la prosa no detectó en meses.
+| Eje | Qué mide | Si falla |
+|---|---|---|
+| **Frescura** | cada `verifiedAt` contra su ventana | bloquea |
+| **Ficha propia** | que el id tenga su §5 con «cuándo NO» y trampas | bloquea |
+| **Fichas de ruta** | evidencia pasada de **su propio `ttlDays`** | **avisa, no bloquea** |
 
-### 4.5 Dónde está cableado, y en qué modo
+🔴 **Tres precisiones que hacen la diferencia entre un gate que sirve y uno que se apaga:**
 
-En **`docs:closure-check`**, que ya corre al cerrar trabajo. **Un gate que no está en el camino de
-alguien está apagado**: construirlo no basta, hay que ponerlo donde ya se pasa.
+- **Hay capacidades que NO se verifican con una corrida normal** —entrenadores de LoRA, stream en vivo— y
+  exigirles `verifiedAt` es pedir un gasto que nadie hará. Están **exentas por naturaleza** y el gate lo dice
+  en vez de contarlas como deuda. *Un gate que pide imposibles se termina ignorando entero.*
+- **El `ttlDays` de una ficha de ruta significa «revalida antes de USAR», no «el documento venció».** Por eso
+  avisa y no bloquea: hoy **57 de 60** evidencias están pasadas, y convertir eso en fallo dejaría el cierre en
+  rojo permanente por algo que no es un error.
+- **Una capacidad sin fecha es peor que una vencida**: nada puede vencerla.
 
-🔴 **Hoy entra en modo ADVISORY, a propósito.** Ponerlo en `--strict` de entrada rompería el cierre de
-todos los agentes por hallazgos preexistentes que no causaron. Informa en cada cierre y **pasa a
-`--strict` cuando los hallazgos de su primera corrida estén cerrados**: las cinco capacidades sin
-mención en la guía y las ocho sin `verifiedAt`. Esa promoción es la tarea que hace al contrato
-ejecutable; mientras no ocurra, el gate avisa pero no obliga — y eso hay que decirlo, no dejarlo
-implícito.
+### 4.5 Dónde está cableado
+
+Los dos entran a **`docs:closure-check`**, que ya corre al cerrar trabajo, y **`models:freshness` corre en
+`--strict`** desde el 2026-09-22, cuando se cerraron los hallazgos que lo tenían en advisory. **Un gate que no
+está en el camino de alguien está apagado**: construirlo no basta, hay que ponerlo donde ya se pasa.
 
 ## 5. Al responder
 

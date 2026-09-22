@@ -40,14 +40,25 @@ let m
 while ((m = re.exec(contrato)) !== null) caps.push({ id: m[1], verifiedAt: m[2] })
 
 const idsTotales = [...contrato.matchAll(/^\s+id: '([a-z0-9-]+)',/gm)].map(x => x[1])
-const sinFecha = idsTotales.filter(id => !caps.some(c => c.id === id))
+
+// No toda capacidad se verifica con una corrida normal. Un entrenador de LoRA exige dataset y un
+// minimo facturable de steps; un endpoint de stream en vivo no pasa por la cola. Exigirles
+// `verifiedAt` seria pedir un gasto que nadie va a hacer, y un gate que pide imposibles se apaga.
+const noVerificablePorNaturaleza = id =>
+  /lora|train/.test(id) || new RegExp(`id: '${id}'[\\s\\S]{0,900}?unsupportedReason`).test(contrato)
+
+const sinFechaTodas = idsTotales.filter(id => !caps.some(c => c.id === id))
+const sinFecha = sinFechaTodas.filter(id => !noVerificablePorNaturaleza(id))
+const exentas = sinFechaTodas.filter(noVerificablePorNaturaleza)
 
 if (caps.length === 0) {
   console.error('FATAL: no se pudo leer ninguna capacidad de fal-capabilities.ts — ¿cambió el shape?')
   process.exit(1)
 }
 
-// ── 2. Cobertura: ¿la guía nombra cada capacidad?
+// ── 2. Cobertura. Desde 2026-09-22 la garantiza por construcción el inventario GENERADO
+// (`pnpm models:inventory`), que emite la tabla completa desde los contratos y falla si alguien
+// agrega un endpoint sin regenerarla. Acá queda el eje que no se puede generar: tener FICHA propia.
 const sinFicha = caps.filter(c => !guia.includes(c.id))
 
 // ── 3. Frescura
@@ -101,6 +112,12 @@ if (evTotal) {
   console.log('')
 }
 
+if (exentas.length) {
+  console.log(`  · ${exentas.length} exentas de fecha por naturaleza (entrenadores de LoRA, stream en vivo):`)
+  console.log('    no se verifican con una corrida normal, así que no se les exige `verifiedAt`.')
+  console.log('')
+}
+
 if (sinFecha.length) {
   console.log('  ✗ SIN FECHA — declaradas en el contrato y sin `verifiedAt`, así que nada puede vencerlas:')
   for (const id of sinFecha) console.log(`      ${id}`)
@@ -120,13 +137,14 @@ if (vencidas.length) {
 }
 
 if (evVencida) {
-  console.log('  ⚠ FICHAS DE RUTA — evidencia pasada del TTL que ellas mismas declararon:')
+  console.log('  ⚠ FICHAS DE RUTA (informativo, no bloquea) — evidencia pasada del TTL que ellas mismas declararon:')
 
   for (const c of fichas.filter(x => x.vencida).sort((a, b) => b.vencida - a.vencida)) {
     console.log(`      ${c.nombre.padEnd(26)} ${c.vencida}/${c.total}`)
   }
 
-  console.log('      Muchas traen `revalidateBeforeUse: true`: su propio contrato pide revalidar antes de usarlas.')
+  console.log('      Su `ttlDays` dice «revalida antes de USAR», no «el documento venció»: es aviso, no fallo.')
+  console.log('      Si vas a programar una ruta desde una ficha, revalídala primero contra el proveedor.')
   console.log('')
 }
 
@@ -140,14 +158,11 @@ const falla = sinFicha.length > 0 || vencidas.length > 0 || sinFecha.length > 0
 
 if (!falla) console.log('  ✓ flota cubierta y dentro de ventana\n')
 
-console.log('  ALCANCE — este gate mide SÓLO el carril fal de `src/lib/ai/fal-capabilities.ts`.')
-console.log('           NO mide el carril Higgsfield (44 capacidades) ni los modelos de `pnpm ai:image`.')
-console.log('           Un verde acá NO es un verde de toda la flota.')
-console.log('           Higgsfield NO se mide por el PARSER, no por falta de datos [medido 2026-09-22]:')
-console.log('           sí tiene relojes (`verifiedAt` 1/44 · `estimateVerifiedAt` 44/44 · snapshot de esquemas),')
-console.log('           pero declara sus capacidades con una factory posicional — `capability(id, endpoint, …)` —')
-console.log('           y las regex de acá asumen objeto literal, así que dan CERO matches. Apuntar el gate a ese')
-console.log('           archivo abortaría con FATAL, no daría un falso verde.\n')
+console.log('  ALCANCE — este gate mide la FRESCURA del carril fal. El carril Higgsfield (44 capacidades)')
+console.log('           no tiene ventana propia acá: declara sus capacidades con una factory posicional y')
+console.log('           sólo 1 de 44 tiene `verifiedAt`. Su COBERTURA sí está cubierta desde 2026-09-22')
+console.log('           por el inventario generado (`pnpm models:inventory`), que lee los dos carriles.')
+console.log('           Los modelos de `pnpm ai:image` siguen fuera. Un verde acá no es un verde de todo.\n')
 
 if (falla && strict) {
   console.error('FATAL: la flota tiene huecos de cobertura o datos vencidos. Revalida contra el proveedor')

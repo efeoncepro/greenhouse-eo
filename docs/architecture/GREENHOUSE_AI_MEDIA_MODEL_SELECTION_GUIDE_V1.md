@@ -987,6 +987,128 @@ Conectar cualquiera exige: slug + contrato en `fal-capabilities.ts`, corrida rea
 
 ---
 
+<!-- INVENTARIO-GENERADO:INICIO -->
+<!-- NO EDITAR A MANO: lo regenera `pnpm models:inventory --write` desde los contratos de código. -->
+
+> **Inventario generado el 2026-09-22** desde `src/lib/ai/fal-capabilities.ts` y
+> `src/lib/ai/higgsfield-capabilities.ts`. Es la lista COMPLETA de lo que `pnpm ai:fal` puede ejecutar
+> —y por tanto de lo que puede **gastar**—. Si un id aparece acá y no tiene ficha en §5, la ficha es la que
+> falta. La columna «verificado» es la fecha de una generación real nuestra; `—` significa que **nadie la
+> ha corrido**, no que no funcione.
+
+**Carril fal · 55 capacidades** (50 con corrida real)
+
+| id | slug | tipo | operación | verificado |
+|---|---|---|---|---|
+| `flux3-edit` | `blackforestlabs/flux-3/edit-video` | video | video-edit | 2026-09-16 |
+| `flux3-enhance` | `blackforestlabs/flux-3/draft-enhance` | video | draft-enhance | 2026-09-16 |
+| `flux3-extend` | `blackforestlabs/flux-3/extend-video` | video | video-extend | 2026-09-16 |
+| `flux3-extend-draft` | `blackforestlabs/flux-3/extend-video/draft` | video | video-extend | 2026-09-16 |
+| `flux3-flf` | `blackforestlabs/flux-3/first-last-frame-to-video` | video | first-last-frame-to-video | 2026-09-16 |
+| `flux3-flf-draft` | `blackforestlabs/flux-3/first-last-frame-to-video/draft` | video | first-last-frame-to-video | 2026-09-16 |
+| `flux3-i2v` | `blackforestlabs/flux-3/image-to-video` | video | image-to-video | 2026-09-16 |
+| `flux3-i2v-draft` | `blackforestlabs/flux-3/image-to-video/draft` | video | image-to-video | 2026-09-16 |
+| `flux3-keyframes` | `blackforestlabs/flux-3/keyframes-to-video` | video | keyframes-to-video | 2026-09-16 |
+| `flux3-keyframes-draft` | `blackforestlabs/flux-3/keyframes-to-video/draft` | video | keyframes-to-video | 2026-09-16 |
+| `flux3-t2v` | `blackforestlabs/flux-3/text-to-video` | video | text-to-video | 2026-09-16 |
+| `flux3-t2v-draft` | `blackforestlabs/flux-3/text-to-video/draft` | video | text-to-video | 2026-09-16 |
+| `h3-i2v` | `minimax/h3/image-to-video` | video | image-to-video | 2026-09-16 |
+| `h3-i2v-lora` | `minimax/h3/image-to-video/lora` | video | image-to-video | 2026-09-16 |
+| `h3-r2v` | `minimax/h3/reference-to-video` | video | reference-to-video | 2026-09-16 |
+| `h3-r2v-lora` | `minimax/h3/reference-to-video/lora` | video | reference-to-video | 2026-09-16 |
+| `h3-t2v` | `minimax/h3/text-to-video` | video | text-to-video | 2026-09-16 |
+| `h3-t2v-lora` | `minimax/h3/text-to-video/lora` | video | text-to-video | — |
+| `h3-train-flf2v` | `minimax/h3/flf2v/trainer` | training | lora-training | — |
+| `h3-train-i2v` | `minimax/h3/i2v/trainer` | training | lora-training | — |
+| `h3-train-ref2va` | `minimax/h3/ref2va/trainer` | training | lora-training | 2026-09-16 |
+| `h3-train-t2v` | `minimax/h3/t2v/trainer` | training | lora-training | — |
+| `h3max-camera` | `minimax/h3-max/camera-controls` | video | camera-control | 2026-09-16 |
+| `h3max-director` | `minimax/h3-max/director` | video | realtime-stream | — |
+| `h3max-i2v` | `minimax/h3-max/image-to-video` | video | image-to-video | 2026-09-16 |
+| `h3max-r2v` | `minimax/h3-max/reference-to-video` | video | reference-to-video | 2026-09-16 |
+| `h3max-t2v` | `minimax/h3-max/text-to-video` | video | text-to-video | 2026-09-16 |
+| `h3turbo-i2v` | `minimax/h3-max-turbo/image-to-video` | video | image-to-video | 2026-09-16 |
+| `h3turbo-t2v` | `minimax/h3-max-turbo/text-to-video` | video | text-to-video | 2026-09-16 |
+| `seedance20-fast-i2v` | `bytedance/seedance-2.0/fast/image-to-video` | video | image-to-video | 2026-09-16 |
+| `seedance20-fast-r2v` | `bytedance/seedance-2.0/fast/reference-to-video` | video | reference-to-video | 2026-09-16 |
+| `seedance20-fast-t2v` | `bytedance/seedance-2.0/fast/text-to-video` | video | text-to-video | 2026-09-16 |
+| `seedance20-i2v` | `bytedance/seedance-2.0/image-to-video` | video | image-to-video | 2026-09-16 |
+| `seedance20-mini-i2v` | `bytedance/seedance-2.0/mini/image-to-video` | video | image-to-video | 2026-09-16 |
+| `seedance20-mini-r2v` | `bytedance/seedance-2.0/mini/reference-to-video` | video | reference-to-video | 2026-09-16 |
+| `seedance20-mini-t2v` | `bytedance/seedance-2.0/mini/text-to-video` | video | text-to-video | 2026-09-16 |
+| `seedance20-r2v` | `bytedance/seedance-2.0/reference-to-video` | video | reference-to-video | 2026-09-16 |
+| `seedance20-t2v` | `bytedance/seedance-2.0/text-to-video` | video | text-to-video | 2026-09-16 |
+| `seedance20-us-i2v` | `bytedance/seedance-2.0/us/image-to-video` | video | image-to-video | 2026-09-16 |
+| `seedance20-us-r2v` | `bytedance/seedance-2.0/us/reference-to-video` | video | reference-to-video | 2026-09-16 |
+| `seedance20-us-t2v` | `bytedance/seedance-2.0/us/text-to-video` | video | text-to-video | 2026-09-16 |
+| `seedance25-i2v` | `bytedance/seedance-2.5/image-to-video` | video | image-to-video | 2026-09-16 |
+| `seedance25-r2v` | `bytedance/seedance-2.5/reference-to-video` | video | reference-to-video | 2026-09-16 |
+| `seedance25-t2v` | `bytedance/seedance-2.5/text-to-video` | video | text-to-video | 2026-09-16 |
+| `seedream5-lite` | `bytedance/seedream/v5/lite/text-to-image` | image | text-to-image | 2026-09-16 |
+| `seedream5-lite-edit` | `bytedance/seedream/v5/lite/edit` | image | edit | 2026-09-16 |
+| `seedream5-pro` | `bytedance/seedream/v5/pro/text-to-image` | image | text-to-image | 2026-09-16 |
+| `seedream5-pro-edit` | `bytedance/seedream/v5/pro/edit` | image | edit | 2026-09-16 |
+| `seedream5-pro-layerize` | `bytedance/seedream/v5/pro/layerize` | image | layerize | 2026-09-16 |
+| `wan3-i2v` | `alibaba/wan-3.0/image-to-video` | video | image-to-video | 2026-09-16 |
+| `wan3-r2v` | `alibaba/wan-3.0/reference-to-video` | video | reference-to-video | 2026-09-16 |
+| `wan3-t2v` | `alibaba/wan-3.0/text-to-video` | video | text-to-video | 2026-09-16 |
+| `wan3prime-i2v` | `alibaba/wan-3.0-prime/image-to-video` | video | image-to-video | 2026-09-16 |
+| `wan3prime-r2v` | `alibaba/wan-3.0-prime/reference-to-video` | video | reference-to-video | 2026-09-16 |
+| `wan3prime-t2v` | `alibaba/wan-3.0-prime/text-to-video` | video | text-to-video | 2026-09-16 |
+
+**Carril Higgsfield · 44 capacidades** (4 con corrida real)
+
+| id | slug | tipo | operación | verificado |
+|---|---|---|---|---|
+| `hf-grok-image2` | `xai/grok-imagine-image-2.0` | image | image-edit | — |
+| `hf-grok-video15-r2v` | `xai/grok-imagine-video/v1.5/reference-to-video` | video | reference-to-video | — |
+| `hf-h3-t2v` | `minimax/h3/text-to-video` | video | text-to-video | — |
+| `hf-hailuo23-t2v` | `minimax/hailuo-2.3/standard/text-to-video` | video | text-to-video | — |
+| `hf-happyhorse1-t2v` | `alibaba/happy-horse/text-to-video` | video | text-to-video | — |
+| `hf-happyhorse11-t2v` | `alibaba/happy-horse/v1.1/text-to-video` | video | text-to-video | — |
+| `hf-ideogram4` | `ideogram/v4.0` | image | text-to-image | 2026-09-17 |
+| `hf-kling-o3-flf` | `kling-video/o3/first-last-frame` | video | first-last-frame | — |
+| `hf-kling-omni-flf` | `kling-video/omni/first-last-frame` | video | first-last-frame | — |
+| `hf-kling25turbo-i2v` | `kling-video/v2.5-turbo/standard/image-to-video` | video | image-to-video | — |
+| `hf-kling26-pro-t2v` | `kling-video/v2.6/pro/text-to-video` | video | text-to-video | — |
+| `hf-kling3-4k-i2v` | `kling-video/v3.0/4k/image-to-video` | video | image-to-video | — |
+| `hf-kling3-4k-t2v` | `kling-video/v3.0/4k/text-to-video` | video | text-to-video | — |
+| `hf-kling3-pro-i2v` | `kling-video/v3.0/pro/image-to-video` | video | image-to-video | — |
+| `hf-kling3-pro-t2v` | `kling-video/v3.0/pro/text-to-video` | video | text-to-video | — |
+| `hf-kling3-std-i2v` | `kling-video/v3.0/std/image-to-video` | video | image-to-video | — |
+| `hf-kling3-std-t2v` | `kling-video/v3.0/std/text-to-video` | video | text-to-video | — |
+| `hf-kling3turbo-i2v` | `kling-video/v3.0-turbo/image-to-video` | video | image-to-video | — |
+| `hf-kling3turbo-t2v` | `kling-video/v3.0-turbo/text-to-video` | video | text-to-video | — |
+| `hf-ltx25-fast` | `lightricks/ltx-2.5/text-to-video/fast` | video | text-to-video | — |
+| `hf-ltx25-pro` | `lightricks/ltx-2.5/text-to-video/pro` | video | text-to-video | — |
+| `hf-marketing-studio` | `marketing-studio/image` | image | image-edit | — |
+| `hf-pixverse6-t2v` | `pixverse/v6/text-to-video` | video | text-to-video | — |
+| `hf-qwen-image3` | `alibaba/qwen-image-3/text-to-image` | image | text-to-image | 2026-09-17 |
+| `hf-recraft41` | `recraft/v4.1/text-to-image` | image | text-to-image | — |
+| `hf-recraft41-pro` | `recraft/v4.1/pro/text-to-image` | image | text-to-image | 2026-09-17 |
+| `hf-seedance2-i2v` | `bytedance/seedance-2.0/image-to-video` | video | image-to-video | — |
+| `hf-seedance2-r2v` | `bytedance/seedance-2.0/reference-to-video` | video | reference-to-video | — |
+| `hf-seedance2-t2v` | `bytedance/seedance-2.0/text-to-video` | video | text-to-video | — |
+| `hf-seedance25-edit` | `bytedance/seedance-2.5/video-edit` | video | video-edit | — |
+| `hf-seedance25-extend` | `bytedance/seedance-2.5/video-extend` | video | video-extend | — |
+| `hf-seedance25-i2v` | `bytedance/seedance-2.5/image-to-video` | video | image-to-video | — |
+| `hf-seedance25-r2v` | `bytedance/seedance-2.5/reference-to-video` | video | reference-to-video | — |
+| `hf-seedance25-t2v` | `bytedance/seedance-2.5/text-to-video` | video | text-to-video | — |
+| `hf-soul` | `higgsfield-ai/soul/standard` | image | text-to-image | — |
+| `hf-soul-cinema` | `higgsfield-ai/soul/cinema` | image | text-to-image | — |
+| `hf-soul2` | `higgsfield-ai/soul/v2/standard` | image | text-to-image | — |
+| `hf-wan26-t2v` | `wan/v2.6/text-to-video` | video | text-to-video | — |
+| `hf-wan27-t2v` | `wan/v2.7/text-to-video` | video | text-to-video | — |
+| `hf-wan3-i2v` | `alibaba/wan-3.0/image-to-video` | video | image-to-video | — |
+| `hf-wan3-r2v` | `alibaba/wan-3.0/reference-to-video` | video | reference-to-video | — |
+| `hf-wan3-t2v` | `alibaba/wan-3.0/text-to-video` | video | text-to-video | — |
+| `hf-wan3prime-t2v` | `alibaba/wan-3.0-prime/text-to-video` | video | text-to-video | — |
+| `hf-zimage-turbo` | `z-image/turbo` | image | text-to-image | 2026-09-17 |
+
+<!-- INVENTARIO-GENERADO:FIN -->
+
+---
+
 ## 11. Regla de mantenimiento
 
 Al **conectar**, **verificar** o **medir** un modelo (precio real, latencia, resolución nativa, rechazo de contenido), actualiza **en el mismo commit**:
