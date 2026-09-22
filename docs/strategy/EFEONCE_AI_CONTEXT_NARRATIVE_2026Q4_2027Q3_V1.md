@@ -9,7 +9,7 @@
 > Efeonce bajo una tesis común para el período.
 > **Ajuste 2026-09-19:** el capítulo 4 pasa de explicar agentes a demostrar una oferta humano-agente comercialmente aprobada y probada, sin convertir cada claim de resultado en publicable por inferencia.
 > **Extensión de marketing 2026-09-19:** los capítulos 3, 4 y 5 forman una ruta propia para CMO; no es una derivación obligatoria a CRM.
-> **Extensión creativa aprobada 2026-09-22:** el capítulo 5 incorpora «Del output a la pieza» como posición y demostración contra el AI Slop; no abre un sexto capítulo ni promete que cada generación salga lista.
+> **Extensión creativa aprobada 2026-09-22:** el capítulo 5 incorpora «Del output a la pieza» como territorio creativo y demostración contra el AI Slop; no abre un sexto capítulo, no crea otra marca ni promete que cada generación salga lista.
 
 ## 1. Decisión
 
@@ -125,19 +125,37 @@ La tesis se desdobla en cinco tipos de contexto. Cada capítulo responde una pre
 
 ### 3.5.1 Extensión aprobada · Del output a la pieza
 
-**Entrada cultural:** «A nosotros tampoco nos gusta el AI Slop». **Nombre durable:** «Del output a la pieza».
-No es un capítulo 6: demuestra el capítulo 5 y hace visible el criterio humano-agente del capítulo 4.
+**Entrada cultural:** «A nosotros tampoco nos gusta el AI Slop». **Territorio creativo durable:** «Del output a la
+pieza». No es un capítulo 6: demuestra el capítulo 5 y hace visible el criterio humano-agente del capítulo 4.
+
+La arquitectura de marca se mantiene deliberadamente simple: **Efeonce es la única marca que se construye**. El
+territorio organiza la conversación; no es una submarca. La metodología se presenta como **la metodología de
+Efeonce**, sin nombre comercial propio. `Design Context` es su artefacto operativo central y `Behind the Build`, un
+formato editorial para demostrar el proceso. Ninguno compite por recordación con Efeonce.
 
 La posición no afirma que los modelos de Efeonce produzcan siempre una gran pieza en el primer intento. Pueden
 producir descartes porque generan salidas plausibles, no porque posean por sí solos criterio, verdad de negocio,
 autoridad de marca o responsabilidad de aprobación. La promesa es más precisa: **una generación mediocre no se
 confunde con trabajo terminado**. La frase rectora es **«El output fue generado. La pieza fue diseñada.»**
 
+El problema no es sólo el defecto visible: es la homogeneización. Algo puede verse bien y seguir siendo
+intercambiable. Para una PYME, el acceso económico a producción puede pesar más que esa genericidad; para mid-market
+y enterprise, repetirla entre equipos, canales y mercados erosiona diferenciación y multiplica retrabajo y riesgo.
+La tesis empresarial es: **la IA democratizó la producción; Efeonce convierte la diferencia de una empresa en
+capacidad de diseño escalable**.
+
 La demostración explica seis contextos —negocio, marca, visual, producción, distribución y evidencia— y muestra un
 build completo: encargo, tesis, referencias/anti-referencias, técnica, pruebas, descartes diagnosticados, anchor,
 composición nativa por formato, finishing y QA. Los finales usan un registro cinematográfico/táctil; el proceso, uno
 forense/editorial con evidencia real. El muro de rechazados no ridiculiza al modelo: prueba que Efeonce sabe detectar,
 explicar y corregir lo que no merece representar a una marca.
+
+`Design Context` no nombra la metodología. Es el contexto operativo que el método construye y mantiene antes de
+traducirlo al contrato específico de cualquier disciplina de diseño presente o futura. Diseño gráfico, UI, UX, web,
+3D y motion son ejemplos, no el límite. El núcleo y su patrón de impacto son transversales; cada oficio conserva
+reglas, owners, técnica, QA y medición propios. La consistencia buscada es parentesco reconocible, no clonación
+estética. Contrato interno:
+[método operativo de diseño asistido por IA](../operations/EFEONCE_AI_ASSISTED_DESIGN_METHOD_V1.md).
 
 `Impacto visual`, `craft` y capacidad productiva se sostienen con el archivo y el método. Rendimiento, lift o impacto
 comercial requieren medición comparable. La extensión alimenta las ofertas Creative existentes; no crea una SKU

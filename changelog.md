@@ -24,9 +24,16 @@ quedan con brief por primera vez. Sin producir, publicar, pautar ni declarar tie
 
 [CDR-003](docs/campaigns/decisions/CDR-003-tu-ia-no-conoce-del-output-a-la-pieza.md) acepta la extensión 5B del
 capítulo 5: entrada «A nosotros tampoco nos gusta el AI Slop», tesis durable «El output fue generado. La pieza fue
-diseñada» y Design Context de seis capas. Se distingue descarte de entrega: los modelos pueden producir salidas
-mediocres; Efeonce no las confunde con trabajo terminado. Narrativa y brief incorporan build completo, muro de
-rechazados, serie Behind the Build, estados, límites de claims y medición. Sin producir, publicar, pautar ni crear SKU.
+diseñada» y Design Context de seis capas. El ajuste aprobado mantiene a **Efeonce como única marca a posicionar**:
+«Del output a la pieza» es territorio creativo, la metodología se comunica sin nombre comercial propio, Design
+Context es el artefacto que construye y Behind the Build es un formato demostrativo. También documenta su aplicación
+a cualquier disciplina de diseño, con contratos propios por oficio; gráfico, UI, UX, web, 3D y motion son ejemplos,
+no una lista cerrada. La tesis empresarial distingue
+acceso PYME de diferenciación/gobierno a escala en mid-market y enterprise: el fallo más costoso puede ser que todo
+se vea intercambiable. El
+[contrato interno](docs/operations/EFEONCE_AI_ASSISTED_DESIGN_METHOD_V1.md), la narrativa y el brief incorporan la
+distinción, el build completo, Behind the Build, límites de prueba y medición. Sin producir, publicar, pautar, fusionar
+ofertas ni crear SKU.
 
 ## 2026-09-22 — Campañas CMP: brief y continuidad entre agentes
 

@@ -17,12 +17,12 @@ que un modelo entrega excelencia por sí solo ni presentar exploraciones como fi
 
 ## Decisión
 
-### 1. Ubicación y nombre durable
+### 1. Ubicación y territorio creativo durable
 
 La idea se incorpora como **extensión 5B del capítulo 5 · «Campañas en días, con tu marca»**. No abre un sexto
 capítulo, una campaña nueva, una franquicia editorial ni una SKU.
 
-- **Nombre canónico durable:** **Del output a la pieza**.
+- **Territorio creativo canónico:** **Del output a la pieza**.
 - **Entrada cultural / hook:** **A nosotros tampoco nos gusta el AI Slop.**
 - **Tesis:** **El output fue generado. La pieza fue diseñada.**
 - **Posición:** Efeonce no es anti-IA; es **anti-automático**.
@@ -30,10 +30,16 @@ capítulo, una campaña nueva, una franquicia editorial ni una SKU.
 `AI Slop` funciona como término de entrada mientras sea relevante. La propiedad intelectual durable es la distinción
 entre output y pieza, y el sistema que permite cruzarla.
 
+**Efeonce es la única marca que se busca posicionar.** El territorio no crea una submarca, un método con nombre,
+una identidad independiente ni una nueva arquitectura que el mercado deba recordar. En comunicación pública se habla
+de **la metodología de Efeonce**; `Design Context` permanece como artefacto operativo y `Behind the Build` como formato
+descriptivo de demostración. Todo reconocimiento del territorio debe regresar a Efeonce.
+
 ### 2. Definición operativa
 
 En esta campaña, **AI Slop es output de alta velocidad y baja intención que parece terminado antes de haber sido
-diseñado**. No se limita a una imagen fea.
+diseñado**. No se limita a una imagen fea. Su fallo más costoso puede ser la **intercambiabilidad**: una salida
+técnicamente correcta que podría pertenecerle a cualquier empresa.
 
 | | Poco craft | Mucho craft |
 |---|---|---|
@@ -48,6 +54,12 @@ La evaluación distingue al menos seis fallos:
 4. **De producción:** un master estirado a todos los ratios, texto crítico generado o archivo sin editables.
 5. **De evidencia:** una simulación, cifra, captura o resultado presentado como real sin prueba.
 6. **Estratégico:** más output sin una función, un comprador, una decisión o un siguiente paso.
+
+La severidad del problema no es idéntica por segmento. Para una PYME que antes no podía producir, una herramienta
+gratuita o accesible puede generar una mejora neta aunque el resultado todavía sea genérico. En mid-market y
+enterprise, el volumen multiplica esa genericidad entre equipos, canales y mercados: lo que parecía eficiencia puede
+convertirse en erosión de marca, retrabajo y riesgo acumulado. El discurso no ataca la democratización; explica qué
+problema aparece después del acceso.
 
 ### 3. Ajuste de honestidad aprobado
 
@@ -72,7 +84,18 @@ La confesión no tiene que liderar todos los anuncios. Puede aparecer como giro 
 Build. El hook público puede usar una formulación más aspiracional: **«La IA puede generar una imagen en segundos.
 Saber si merece convertirse en una pieza requiere algo más.»**
 
-### 4. El Design Context como explicación propia
+### 4. Método y papel del Design Context
+
+**Design Context no es el nombre de la metodología.** Es el contexto operativo que el método construye, utiliza y
+actualiza para que personas y sistemas puedan decidir qué expresa a la empresa, qué debe permanecer, qué debe
+evitarse y cómo se valida. El método completo también incluye descubrimiento, traducción por disciplina, producción,
+selección, finishing, QA, entrega y aprendizaje.
+
+El contrato transversal vive en
+[Método operativo de diseño asistido por IA](../../operations/EFEONCE_AI_ASSISTED_DESIGN_METHOD_V1.md). Es aplicable
+a cualquier disciplina de diseño presente o futura, pero no indiferente a sus reglas: cada oficio conserva sus
+contratos, owners, técnica y quality gates. Diseño gráfico, UI, UX, web, 3D, motion y audiovisual son ejemplos, no
+una frontera del método.
 
 La campaña no reduce el método a *prompt engineering*. Explica seis contextos que no deben colapsar en una
 instrucción genérica:
@@ -90,6 +113,10 @@ La secuencia demostrable es:
 
 Los contratos de oficio permanecen en `design-studio`, `efeonce-advertising-creative`, AXIS, fotografía, motion y
 derechos creativos. Este CDR no duplica sus valores ni autoriza atajos.
+
+La distinción narrativa es: **consistencia no significa que todo se vea igual; significa que expresiones distintas
+parecen provenir de la misma inteligencia de marca**. Sin contexto propio, mayor generación escala el promedio. Con
+contexto construido y ejecución especializada, puede escalar variedad reconocible y diferenciación.
 
 ### 5. Sistema editorial y de prueba
 
@@ -149,7 +176,7 @@ días» y Globe cuando corresponda.
 
 CTA de trabajo:
 
-> **Tu equipo ya puede generar más. La pregunta es si puede diseñar mejor.**
+> **Tu equipo ya puede generar más. La pregunta es si puede escalar lo que hace distinta a tu marca.**
 
 ## Alternativas descartadas
 
@@ -157,6 +184,10 @@ CTA de trabajo:
 - **Afirmar que Efeonce nunca genera AI Slop:** confunde exploración con entrega y promete un primer intento perfecto.
 - **Montaje de finales espectaculares sin proceso:** demuestra acceso a herramientas, no criterio.
 - **Tutorial centrado en prompts o modelos:** vuelve volátil el territorio y entrega protagonismo al proveedor.
+- **Llamar Design Context a toda la metodología:** confunde un artefacto central con el ciclo completo y oculta la
+  traducción, dirección, producción, selección, QA y aprendizaje.
+- **Asignar ahora un nombre comercial a la metodología:** divide la recordación entre Efeonce y una propiedad que
+  todavía no necesita autonomía comercial. El territorio ya organiza la conversación sin crear otra marca.
 - **Usar un caso sin descartes ni trazabilidad:** no permite distinguir dirección de arte de una salida afortunada.
 
 ## Consecuencias y pendientes
@@ -166,5 +197,6 @@ CTA de trabajo:
   reales; un archivo llamado `FINAL` no acredita nada de eso.
 - El artículo/film/carrusel y sus canales requieren su propia ficha, copy, formatos, rights gate y aprobación.
 - Esta aceptación **no autoriza producir, publicar, programar, pautar, modificar Notion ni crear una oferta nueva**.
+- Ninguna ejecución debe presentar `Del output a la pieza`, `Design Context` o `Behind the Build` como una marca,
+  producto o metodología nombrada independiente de Efeonce.
 - La medición comercial conserva destinos y atribución verificados; la serie no hereda automáticamente una URL.
-

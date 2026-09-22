@@ -14,9 +14,10 @@ construye una campaña propia y el 4 cómo trabajan personas y agentes hacia ade
 permisos distintos. Dreamforce y UNBOUND son disparadores de conversación y fuentes sobre productos, no la idea ni
 la prueba de Efeonce.
 
-El capítulo 5 incorpora la extensión aprobada **«Del output a la pieza»**. No abre un capítulo 6, una campaña nueva,
-una franquicia ni una SKU. Usa la conversación sobre AI Slop para demostrar cómo contexto, dirección, producción y QA
-convierten output generativo en trabajo diseñado. Decisión canónica:
+El capítulo 5 incorpora el territorio creativo aprobado **«Del output a la pieza»**. No abre un capítulo 6, una
+campaña nueva, una franquicia, una submarca ni una SKU. Usa la conversación sobre AI Slop para demostrar cómo
+contexto, dirección, producción y QA convierten output generativo en trabajo diseñado. **Efeonce es la única marca
+que se busca posicionar**; el territorio organiza la conversación y le devuelve toda la autoridad. Decisión canónica:
 [CDR-003](../../../campaigns/decisions/CDR-003-tu-ia-no-conoce-del-output-a-la-pieza.md).
 
 **Audiencias por trabajo:** COO/VP Service (calidad y excepciones), CRO/RevOps (pipeline y CRM), **CMO/Marketing Ops**
@@ -79,7 +80,17 @@ trendjacking conservan sus líneas independientes.
 **Hook:** «A nosotros tampoco nos gusta el AI Slop». **Tesis:** «El output fue generado. La pieza fue diseñada».
 La posición aprobada distingue descarte de entrega: los modelos pueden producir resultados mediocres; Efeonce no
 promete un primer intento perfecto ni dice «no generamos AI Slop». Promete que una generación mediocre no será
-confundida con trabajo terminado.
+confundida con trabajo terminado. El problema central no es sólo que una salida se vea mal, sino que se vea bien y
+pueda pertenecerle a cualquiera.
+
+**Regla de marca:** la metodología se presenta como **la metodología de Efeonce**, sin nombre comercial propio.
+`Del output a la pieza` es un territorio creativo, `Design Context` es un artefacto operativo y `Behind the Build`
+es un formato demostrativo. Ninguno recibe logo, cuenta, oferta, registro de marca, personalidad o presencia independiente.
+
+El discurso reconoce la economía por segmento: para una PYME, acceder a producción gratuita o económica puede ser
+una mejora neta aunque el resultado aún sea genérico. En mid-market y enterprise, la misma genericidad se multiplica
+entre equipos, canales y mercados, y se convierte en erosión de marca, retrabajo y riesgo. La campaña no combate el
+acceso: demuestra cómo pasar del acceso a capacidad diferenciada y gobernada.
 
 La pieza matriz debe mostrar un build completo y verificable:
 
@@ -87,6 +98,13 @@ La pieza matriz debe mostrar un build completo y verificable:
 
 Los seis contextos son negocio, marca, visual, producción, distribución y evidencia. Un prompt más largo no los
 sustituye. Cada operación declara qué herramienta decide y qué autoridad conserva una persona.
+
+**Taxonomía:** `Design Context` no es el nombre de la metodología. Es el contexto operativo que el método construye,
+usa y actualiza. El ciclo completo descubre la diferencia, construye ese contexto, lo traduce al contrato de cada
+disciplina, produce, selecciona, termina, valida y aprende. Es aplicable a cualquier disciplina de diseño presente o
+futura; diseño gráfico, UI, UX, web, 3D y motion son ejemplos, no una lista cerrada. El patrón de impacto permanece
+—velocidad, consistencia, calidad y diferenciación a escala— sin fusionar técnicas, owners, ofertas ni métricas. Canon:
+[método operativo de diseño asistido por IA](../../../operations/EFEONCE_AI_ASSISTED_DESIGN_METHOD_V1.md).
 
 **Prueba mínima:** un caso hero con al menos un descarte diagnosticado y su corrección; hasta tres cortes breves de
 identidad/continuidad, composición multiformato y still→motion. El muro de rechazados usa fallos reales con razón
@@ -124,7 +142,8 @@ Sin baseline de tráfico y conversión no declarar uplift ni diseñar un A/B tes
 
 Para «Del output a la pieza», medir además comprensión de la tesis, atribución a Efeonce, confianza en el criterio,
 interés por el build y conversaciones calificadas hacia una oferta Creative vigente. Cantidad de generaciones o
-exports no es éxito. CTA de trabajo: **«Tu equipo ya puede generar más. La pregunta es si puede diseñar mejor.»**
+exports no es éxito. CTA de trabajo: **«Tu equipo ya puede generar más. La pregunta es si puede escalar lo que hace
+distinta a tu marca.»**
 
 ## Dependencias antes de ejecutar
 

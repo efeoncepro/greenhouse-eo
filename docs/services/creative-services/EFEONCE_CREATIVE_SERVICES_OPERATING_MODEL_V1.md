@@ -93,6 +93,20 @@ dirección humana + craft especializado + Creative Operations
 La IA reduce carga operativa y acelera exploración. No reemplaza gusto, autoridad creativa, aprobación, derechos,
 presupuesto, publicación ni responsabilidad contractual.
 
+Creative Services consume el
+[contrato transversal del método operativo de diseño asistido por IA](../../operations/EFEONCE_AI_ASSISTED_DESIGN_METHOD_V1.md).
+Ese método no se llama `Design Context`: construye un Design Context como representación operativa de la diferencia,
+los límites y los criterios de una empresa, y después lo traduce al contrato del oficio que corresponda. Su núcleo y
+patrón de impacto son aplicables a cualquier disciplina de diseño; la técnica, el owner comercial, la aceptación, la
+medición y el QA siguen siendo específicos.
+
+No se le asigna por ahora un nombre comercial propio. Hacia el mercado se presenta como **la metodología de
+Efeonce**: el objetivo de marca es acumular reconocimiento en Efeonce, no pedirle al comprador que recuerde otra
+propiedad. `Del output a la pieza` funciona como territorio creativo, no como oferta o submarca.
+
+En Creative Services, esto permite escalar variedad reconocible sin convertir consistencia en repetición estética.
+No cambia la frontera con Product Design o Web Experience ni autoriza venderlas como una sola oferta.
+
 ### 4.3 Captura de valor
 
 La arquitectura económica separa cinco líneas:
