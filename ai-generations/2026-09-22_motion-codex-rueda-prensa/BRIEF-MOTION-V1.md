@@ -180,3 +180,48 @@ son los cuadros clave y la composición. **Costo ×4 en generación**, no en dir
    la primera mano. La sonda de 5 s resuelve la duda por centavos.
 2. **¿9:16 primero, o 9:16 + 16:9?** El canon de paid pide los cuatro ratios, pero para el **primer** motion
    propongo cerrar uno bien y recién después abrir la matriz.
+
+---
+
+## 11. Evidencia · la sonda de filtro **[2026-09-22, USD 0,35]**
+
+`seedance20-mini-i2v` · 480p · 5 s · plate 9:16 · `--no-audio` · cuenta `FAL_API_KEY_B`
+→ `out/sonda-filtro-480p.mp4` · tira de QA en `out/qa-tira.png` · request `01a0c8a6-a36b-76e3-9e95-af30bbb54da4`
+
+**Para qué sirvió, que fueron dos cosas:** probar el filtro de ByteDance con una marca de tercero en cuadro,
+y revelar los modos de falla **antes** de pagar la toma buena.
+
+### ✅ El filtro NO rechazó
+Seedance acepta a Codex en cuadro. El contrato advierte que rechaza marcas *tras encolar y cobrando*; con este
+personaje —figura de vinilo, sin logotipo legible— pasa. **No generaliza a otras marcas**, pero para esta línea
+de piezas el riesgo queda despejado por USD 0,35.
+
+### ✅ Lo que salió, y fue más de lo pedido
+- El arco completo existe: reposo → «punto uno» con un brazo → pico con ambos brazos → vuelta a reposo.
+- 🎯 **La cara actúa sola.** `>_` en reposo → ojos `vv` al señalar → **`^^` en el pico** → `>_` al volver. La
+  pantalla es el músculo facial y el modelo la usó sin que hubiera que animarla a mano.
+- La barra del atril **vacía en los cuatro cuadros**, con su cursor. Cero texto en todo el cuadro.
+- El personaje no invadió la mitad superior.
+
+### 🔴 Los cuatro modos de falla, y su corrección en el prompt v2
+| Falla observada | Por qué importa | Corrección |
+|---|---|---|
+| **El personaje cambia de escala y posición** (crece y se desplaza) | **rompe el loop**: el último cuadro no empata con el primero | bloqueo explícito de tamaño, distancia y punto en cuadro |
+| **El emblema del torso se volvió una `X`** en el pico | es la deriva del asset que el canon mide con Clawd, en vivo | `IDENTITY LOCK`: los glifos nunca cambian a otro símbolo |
+| Los micrófonos se reordenan | delata la generación y mueve el encuadre | los micrófonos no se reordenan ni se multiplican |
+| Apareció una cortina en el fondo | el plate es negro plano | el fondo permanece negro y vacío |
+
+**Salvedad:** es el **mini a 480p**, el modelo más débil del catálogo. Parte de estos defectos pueden ser suyos
+y no del enfoque; Seedance 2.5 es mejor en consistencia. Por eso la corrección va al prompt y no al concepto.
+
+### Costos reales medidos (no estimados de memoria)
+| Corrida | USD |
+|---|---|
+| Sonda mini 480p × 5 s | **0,35** |
+| Seedance 2.5 · 720p × 6 s | 2,77 |
+| Seedance 2.5 · **1080p × 6 s** | **6,24** ← la elegida |
+| Los cuatro formatos a 1080p | ~24,96 |
+
+🔴 **Corrección al §7 de este mismo brief:** decía que la sonda costaba «centavos» hablando de la toma de
+Seedance 2.5. Falso: la toma cuesta USD 2,77–6,24. Centavos es la sonda con el mini, que se encontró después.
+El CLI imprime el costo antes de encolar — **se lee, no se recuerda**.

@@ -1,0 +1,24 @@
+The small blue cloud-shaped vinyl character in the image is giving a press conference at the lectern.
+
+LOCKED CAMERA AND LOCKED STAGING — this is the most important instruction:
+- The camera never pans, tilts, zooms, dollies or drifts. The framing of the last frame is identical to the first.
+- The character NEVER changes size in frame and NEVER changes its position: it stays at exactly the same distance behind the lectern, at exactly the same point in the frame, for every single frame. It does not step forward, does not grow, does not drift left or right.
+- The microphones stay in exactly the same arrangement and position for the whole shot; they never rearrange, never multiply, never change shape.
+- The background stays flat black and empty. No curtain, no drapery, no texture, no new object ever appears in it.
+
+The character performs one continuous beat and returns exactly to its starting pose:
+1. Rest: facing front, arms down, dark screen-face showing the glowing prompt glyphs.
+2. It leans slightly forward toward the microphones and raises ONE short arm in a deliberate "point one" gesture.
+3. Peak: it straightens and opens BOTH short arms wide and upward in a confident, declarative gesture. At the peak its screen-face changes: the glyphs become two bright arched shapes, like happy squinting eyes.
+4. It holds completely still for a beat, as if waiting for a follow-up question that never comes.
+5. It settles back to the exact starting pose, arms down, screen-face back to the prompt glyphs.
+
+The movement is only in its arms, its slight forward lean and its screen-face. Its body stays planted.
+
+IDENTITY LOCK: the glowing glyphs on its torso are ALWAYS the same prompt symbols as in the image. They NEVER change into an X, a cross, a letter or any other symbol. The character has no mouth, no ears, no fingers, no clothing. Its shape, proportions, material and colour stay EXACTLY as in the image at every moment. Do not restyle, do not redraw, do not add glow around its body.
+
+The glowing horizontal bar on the lectern stays COMPLETELY EMPTY for the entire shot: the small text cursor inside it blinks slowly and steadily, and NO text, NO letters, NO words ever appear in it. No text appears anywhere in the frame.
+
+The upper half of the frame stays empty black and nothing enters it.
+
+Real photographic footage of a real physical object on a real set: subtle sensor grain, true depth of field with the foreground edge soft, real studio falloff into darkness. Not a 3D render, not CGI, not a cartoon.
