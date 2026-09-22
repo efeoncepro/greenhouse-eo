@@ -27,8 +27,11 @@ pieza con la barra del otro es lo que produce la sensación del operador de que 
 
 🔴 **El lenguaje completo del registro C vive en [`EFEONCE_PHOTO_REGISTER_C_V1.md`](../../docs/operations/brand-photography/EFEONCE_PHOTO_REGISTER_C_V1.md)**
 — elenco, escala, palancas, lechos con cámara baja, la capa gráfica y las dos trampas medidas: **el azul ajeno**
-(si la criatura del partner porta color, el azul de Efeonce entra por OTRO portador — medido: en una pieza el
-único azul era de OpenAI) y **la contaminación del emblema**.
+(una criatura de partner en cuadro se queda con el sistema de color: con Codex, medido, el único azul de la pieza
+era de OpenAI. Con **Gigi es peor y la regla cambia**: no «porta un color», **es el espectro completo de Google**
+—rojo, azul dominante y verde-lima—, así que buscar otro portador es competir contra un degradado de tres colores
+y perder. La regla correcta es **la criatura como único acento de color, y Efeonce en el navy y en la
+estructura**) y **la contaminación del emblema**.
 
 🔴 **Hay un TERCER registro desde el 2026-09-21: C · «la respuesta a la vista»** — el sujeto es **la respuesta
 de la máquina y quién la da**, sin personas del equipo. Nació porque las cinco piezas con persona de los ads del
@@ -152,7 +155,7 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 | `formato` | tamaño, % del lecho y límite de sujetos, de UNA tabla |
 | `identidad` | bloques `IDENTITY` + `REFERENCES` verbatim, con **vista por ángulo** (`{ persona, vista }`) |
 | `objetos` | kits de marca como **referencia de forma** (logo, mascota, prenda, merch), numerados tras la identidad |
-| `palanca` | **una sola** de las **23 de encuadre** → [catálogo de palancas](../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) |
+| `palanca` | **una sola** de las **27 de encuadre** → [catálogo de palancas](../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) |
 | `atmosfera` | `polvo` · `bruma` · `vapor` · `humo` — aire con materia que hace visible la luz. **Exige haz** |
 | `suspendido` | qué está congelado en el aire |
 | `lecho` | objeto y **tono declarado** del primer plano desenfocado |
@@ -327,8 +330,8 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   el puente de la nariz corta la mejilla lejana» da el tres cuartos real. El casi-frontal se pide con los marcadores
   **inversos** (ver arriba), y antes de pedir cualquier giro, revisa si el set cubre ese ángulo.
 - **Una palanca DE ENCUADRE dominante por pieza.** Combinar dos las diluye: cada una pide el control de la escena.
-  Las otras tres familias sí se combinan con ella: **34 palancas en total** —5 siempre activas (bloque de impacto,
-  incluido el sistema de color) · 4 atmósferas · 1 acción suspendida · **24 de encuadre**— más las **20 tomas de
+  Las otras tres familias sí se combinan con ella: **37 palancas en total** —5 siempre activas (bloque de impacto,
+  incluido el sistema de color) · 4 atmósferas · 1 acción suspendida · **27 de encuadre**— más las **20 tomas de
   cámara** (ojo de pez, dron, tilt-shift, contrapicado, macro, tele, barrido…), que dicen *con qué* se fotografía
   y **no** son palancas. Índice: [catálogo de palancas](../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
 - **La atmósfera exige un haz declarado** (el comando aborta sin él) y **la acción suspendida tiene dosis: 1 de

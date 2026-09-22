@@ -241,8 +241,8 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 - **Proyección** (`palanca: proyeccion`) — la obra proyectada sobre materia áspera, cuyo grano **se ve a través**
   de ella, y sobre el cuerpo de quien está en el haz. **Ni pantalla ni monitor.**
 
-> **Las 33 palancas en cuatro familias —5 siempre activas · 4 atmósferas · 1 acción suspendida · estas 23 de
-> encuadre—, las 20 tomas de cámara y las cinco descartadas con su
+> **Las 37 palancas en cuatro familias —5 siempre activas · 4 atmósferas · 1 acción suspendida · estas 27 de
+> encuadre—, las 20 tomas de cámara y las seis descartadas con su
 > razón medida:** [catálogo de palancas](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
 
 > **Dosis del acento: 1 de cada 2** **[auditoría ciega 2026-09-20]**. El azul portador es estructura y va en
@@ -411,7 +411,7 @@ todo-enfocadas, scripts como comando `pnpm`, prueba de reconocimiento, masters `
 - **`pnpm foto:prompt <ficha.json> [--batch <out.json>]`** — arma el prompt desde una ficha de toma. El formato,
   el porcentaje del lecho y el límite de sujetos salen de **una tabla**, no de un bloque copiado. La ficha declara
   además `identidad` (personas, con vista por ángulo), `objetos` (kits de marca: logo, mascota, prenda, merch),
-  `palanca` (**una sola** de las 23 de encuadre, con su campo obligatorio si lo pide), `atmosfera`
+  `palanca` (**una sola** de las 27 de encuadre, con su campo obligatorio si lo pide), `atmosfera`
   (`polvo`/`bruma`/`vapor`/`humo`) y `suspendido` (qué está en el aire). Aborta si un
   bloque compartido trae un valor de formato adentro, si se pide una reserva en una toma que no la admite, o si un
   batch mezcla formatos. `--ficha-ejemplo` imprime la plantilla.
