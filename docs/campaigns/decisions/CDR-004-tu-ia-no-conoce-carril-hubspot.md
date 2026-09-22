@@ -128,6 +128,11 @@ Antes de declarar que una pieza llena un vacío, **medirlo**. Saturación no es 
   Platforms 2026), Forrester Wave, ISO 27001 de HubSpot, residencia de datos en LATAM, «flota de agentes». Sí es
   citable: Leader en B2B Marketing Automation (Gartner, 5.º año) y SOC 2 Type II + SOC 3.
 - **Nomenclatura 2026:** Revenue Hub, Data Hub, UNBOUND. HubSpot ya no se presenta como CRM.
+- 🔴 **Isotipo ≠ badge de partner.** El Sprocket como **product placement en escena** es uso de producto y se
+  gobierna por las guías de marca del partner. El **badge de Solutions Partner** afirma una relación contractual
+  y **no se usa hasta revalidar el tier**. Y ninguno de los dos se **genera**: el modelo no reproduce una marca
+  ajena de forma fiable —medido con el emblema bordado propio—, así que entra por kit 3D o composición
+  determinística, nunca desde el generador.
 - **Salesforce** solo en orgánico de liderazgo de opinión, con tono de comparación y nunca en pauta.
 
 ### 7. Destinos y conversión
