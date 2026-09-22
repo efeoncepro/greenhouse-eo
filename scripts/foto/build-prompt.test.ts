@@ -600,6 +600,27 @@ conAssets('foto:prompt · objetos de marca', () => {
   it('un kit propio no arrastra aviso de derechos', () => {
     expect(construirPrompt({ ...fichaBase, objetos: ['nave-efeonce'] }).avisosObjeto).toEqual([])
   })
+
+  // Las TRES mascotas de partner son marcas de terceros (Anthropic, OpenAI, Google). La regla de gobernanza
+  // vivía sólo en los docs: el sprocket llevaba `aviso` y las mascotas no, así que quien generaba una pieza
+  // nunca la veía (detectado 2026-09-21, al declarar el kit de Gigi). Este test la mantiene cableada.
+  it.each(['clawd', 'codex', 'gigi', 'gigi-aeo'])('%s avisa que es marca de un tercero', clave => {
+    const avisos = construirPrompt({ ...fichaBase, objetos: [clave] }).avisosObjeto
+
+    expect(avisos.join(' ')).toMatch(/uso INTERNO y orgánico/)
+    expect(avisos.join(' ')).toMatch(/antes de pautar/)
+  })
+
+  // Tres sesiones editan este catálogo el mismo día y el kit de Gigi ya desapareció una vez dentro del
+  // `git add` de otra sesión. Si vuelve a pasar, falla acá y no en medio de una tanda ya pagada.
+  it('las tres mascotas de partner siguen declaradas, con Gigi completa', () => {
+    const kits = OBJETOS as Record<string, { vistas: Record<string, string> }>
+
+    expect(Object.keys(kits)).toEqual(expect.arrayContaining(['clawd', 'codex', 'gigi', 'gigi-aeo']))
+    expect(Object.keys(kits.gigi.vistas)).toHaveLength(16)
+    expect(Object.keys(kits['gigi-aeo'].vistas)).toHaveLength(8)
+    expect(Object.keys(kits['gigi-aeo'].vistas)).toContain('no-te-conoce')
+  })
 })
 
 // Guarda de integridad del catálogo: si alguien agrega un kit con una ruta mal escrita, o alguien

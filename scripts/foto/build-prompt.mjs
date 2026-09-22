@@ -508,6 +508,10 @@ export const OBJETOS = {
     vistaDefecto: 'tres-cuartos-izq'
   },
   clawd: {
+    // Gobernanza que antes sólo vivía en los docs y nunca llegaba al operador en el momento de generar:
+    // el sprocket llevaba aviso y las tres mascotas de partner no (detectado 2026-09-21).
+    aviso:
+      'una interpretación 3D de la mascota de Anthropic: uso INTERNO y orgánico. Orgánico aprobado no es pauta — antes de pautar hay que validar contra la guía de marca de Anthropic. Por defecto va UNA sola mascota de partner por imagen; juntas sólo con pedido explícito del operador.',
     etiqueta: 'the official 3D figure of Clawd, the Claude mascot',
     instruccion:
       'Reproduce EXACTLY this figure as a real, physical, finely made small collectible figure about 25 cm tall, at correct scale with contact shadows. Do not redraw it, do not restyle it and do not change its proportions.',
@@ -517,6 +521,10 @@ export const OBJETOS = {
     vistaDefecto: 'frente'
   },
   codex: {
+    // Gobernanza que antes sólo vivía en los docs y nunca llegaba al operador en el momento de generar:
+    // el sprocket llevaba aviso y las tres mascotas de partner no (detectado 2026-09-21).
+    aviso:
+      'una interpretación 3D de la mascota de OpenAI: uso INTERNO y orgánico. Orgánico aprobado no es pauta — antes de pautar hay que validar contra la guía de marca de OpenAI. Por defecto va UNA sola mascota de partner por imagen; juntas sólo con pedido explícito del operador.',
     etiqueta: 'the official 3D figure of Codex, the OpenAI mascot',
     instruccion:
       'Reproduce EXACTLY this figure as a real, physical, finely made small collectible figure about 25 cm tall, at correct scale with contact shadows. Do not redraw it, do not restyle it and do not change its proportions.',
@@ -526,6 +534,10 @@ export const OBJETOS = {
     vistaDefecto: 'frente'
   },
   gigi: {
+    // Gobernanza que antes sólo vivía en los docs y nunca llegaba al operador en el momento de generar:
+    // el sprocket llevaba aviso y las tres mascotas de partner no (detectado 2026-09-21).
+    aviso:
+      'una interpretación 3D de la mascota de Google: uso INTERNO y orgánico. Orgánico aprobado no es pauta — antes de pautar hay que validar contra la guía de marca de Google. Por defecto va UNA sola mascota de partner por imagen; juntas sólo con pedido explícito del operador.',
     etiqueta: 'the official 3D figure of Gigi, the Google Gemini mascot',
     instruccion:
       'Reproduce EXACTLY this figure as a real, physical, finely made small collectible figure about 25 cm tall, at correct scale with contact shadows. Do not redraw it, do not restyle it and do not change its proportions. Its red-to-blue-to-green gradient and its single curled tip belong ONLY to this figure: never put them on clothing, on a wall or on any other object in the scene.',
@@ -541,6 +553,10 @@ export const OBJETOS = {
     vistaDefecto: 'frente'
   },
   'gigi-aeo': {
+    // Gobernanza que antes sólo vivía en los docs y nunca llegaba al operador en el momento de generar:
+    // el sprocket llevaba aviso y las tres mascotas de partner no (detectado 2026-09-21).
+    aviso:
+      'una interpretación 3D de la mascota de Google: uso INTERNO y orgánico. Orgánico aprobado no es pauta — antes de pautar hay que validar contra la guía de marca de Google. Por defecto va UNA sola mascota de partner por imagen; juntas sólo con pedido explícito del operador.',
     etiqueta: 'the official 3D figure of Gigi, the Google Gemini mascot, in its search and AEO poses',
     instruccion:
       'Reproduce EXACTLY this figure as a real, physical, finely made small collectible figure about 25 cm tall, at correct scale with contact shadows. Do not redraw it, do not restyle it and do not change its proportions. Its red-to-blue-to-green gradient and its single curled tip belong ONLY to this figure: never put them on clothing, on a wall or on any other object in the scene.',
