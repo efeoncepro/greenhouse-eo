@@ -1,0 +1,113 @@
+[
+  {
+    "align": "left",
+    "top": 0.165,
+    "textWidth": 0.84,
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominantSize": 190,
+    "dominantMax": 0.76,
+    "dominantTracking": -0.02,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.15,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5,
+      "y": 0.82
+    },
+    "id": "b2-primero-el-numero-916",
+    "plate": "plates/b2-primero-el-numero-916-plate.png",
+    "lead": null,
+    "dominant": "Primero el número.",
+    "after": null,
+    "subjectProtection": {
+      "top": 773,
+      "minClearance": 24
+    },
+    "cta": {
+      "variant": "outline",
+      "radius": 10,
+      "text": "Habla con quien lo hace",
+      "descriptor": "Con tu panel en pantalla",
+      "surfaceToken": "growthOnDark",
+      "inkToken": "growthOnDark",
+      "x": 0.07,
+      "gapAfterNote": 26,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 44,
+      "descriptorSize": 30,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    },
+    "note": {
+      "text": "Después la propuesta. Nunca al revés.",
+      "size": 40,
+      "x": 0.07,
+      "width": 0.8,
+      "gapAfterClosure": 40
+    }
+  },
+  {
+    "align": "left",
+    "top": 0.13,
+    "textWidth": 0.44,
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominantSize": 158,
+    "dominantMax": 0.44,
+    "dominantTracking": -0.02,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.15,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "logo": {
+      "width": 0.14,
+      "x": 0.5
+    },
+    "id": "b2-primero-el-numero-169",
+    "plate": "plates/b2-primero-el-numero-169-plate.png",
+    "lead": null,
+    "dominant": "Primero el número.",
+    "after": null,
+    "subjectProtection": {
+      "top": 904,
+      "minClearance": 24
+    },
+    "cta": {
+      "variant": "outline",
+      "radius": 10,
+      "text": "Habla con quien lo hace",
+      "descriptor": "Con tu panel en pantalla",
+      "surfaceToken": "growthOnDark",
+      "inkToken": "growthOnDark",
+      "x": 0.07,
+      "gapAfterNote": 26,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    },
+    "note": {
+      "text": "Después la propuesta. Nunca al revés.",
+      "size": 36,
+      "x": 0.07,
+      "width": 0.42,
+      "gapAfterClosure": 40
+    }
+  }
+]

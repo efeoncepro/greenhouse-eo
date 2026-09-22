@@ -1,10 +1,10 @@
 {
   "canvas": {
     "width": 1152,
-    "height": 2048
+    "height": 1440
   },
   "subjectProtection": {
-    "top": 803,
+    "top": 544,
     "minClearance": 24
   },
   "elements": [
@@ -12,46 +12,46 @@
       "id": "dominante",
       "box": {
         "left": 81,
-        "right": 972.356622360961,
-        "top": 337.92,
-        "bottom": 422.30238174148406
+        "right": 804.5189896427463,
+        "top": 115.20000000000002,
+        "bottom": 198.54887908097518
       }
     },
     {
       "id": "nota",
       "box": {
         "left": 80.64000000000001,
-        "right": 915.76,
-        "top": 462.30238174148406,
-        "bottom": 553.102381741484
+        "right": 724.396,
+        "top": 238.54887908097518,
+        "bottom": 273.97687908097515
       }
     },
     {
       "id": "cta",
       "box": {
         "left": 104.64000000000001,
-        "right": 698.156,
-        "top": 589.102381741484,
-        "bottom": 626.150381741484
+        "right": 591.88,
+        "top": 313.97687908097515,
+        "bottom": 356.65687908097516
       }
     },
     {
       "id": "descriptor",
       "box": {
         "left": 80.64000000000001,
-        "right": 522.3599999999999,
-        "top": 666.214,
-        "bottom": 696.844
+        "right": 425.656,
+        "top": 395.721,
+        "bottom": 423.721
       }
     }
   ],
   "typography": {
     "lead": 36,
-    "dominant": 98.92424588685117,
+    "dominant": 115.92333669120329,
     "closure": 34,
-    "benefit": 40,
-    "cta": 44,
-    "descriptor": 30
+    "benefit": 34,
+    "cta": 40,
+    "descriptor": 28
   },
   "selection": null
 }

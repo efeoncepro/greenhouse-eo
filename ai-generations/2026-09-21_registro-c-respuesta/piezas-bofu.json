@@ -21,13 +21,13 @@
       "width": 0.2,
       "x": 0.5
     },
-    "id": "b1-te-decimos-que-no",
-    "plate": "plates/b1-te-decimos-que-no-45-plate.png",
+    "id": "b2-primero-el-numero",
+    "plate": "plates/b2-primero-el-numero-45-plate.png",
     "lead": null,
-    "dominant": "Te decimos que no.",
+    "dominant": "Primero el número.",
     "after": null,
     "subjectProtection": {
-      "top": 676,
+      "top": 544,
       "minClearance": 24
     },
     "cta": {
@@ -45,6 +45,13 @@
       "descriptorSize": 28,
       "descriptorGap": 16,
       "cursorScale": 1.1
+    },
+    "note": {
+      "text": "Después la propuesta. Nunca al revés.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.8,
+      "gapAfterClosure": 40
     }
   }
 ]

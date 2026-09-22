@@ -1,41 +1,34 @@
 [
   {
-    "id": "mo2-no-te-citan",
+    "id": "b2-primero-el-numero-916",
     "dominante": [
-      "+35% en tus clics orgánicos."
+      "Primero el número."
     ],
     "ratioDominanteEntrada": null,
     "contraste": {
-      "dominante": 19.16,
-      "nota": 19.2,
-      "cta": 10.6,
-      "descriptor": 19.34,
-      "logo": 18.12
+      "dominante": 19.75,
+      "nota": 19.85,
+      "cta": 10.88,
+      "descriptor": 19.96,
+      "logo": 9.75
     },
     "gapsTinta": [],
-    "seleccion": {
-      "selection": {
-        "variant": "eight-handles",
-        "padding": "standard",
-        "paddingRatio": {
-          "inline": 0.012,
-          "block": 0.01
-        },
-        "overlay": "subtle",
-        "overlayOpacity": 0.1,
-        "overlayBlendMode": "luminosity"
-      },
-      "cursores": [
-        {
-          "id": "tu",
-          "labelBounds": {
-            "left": 965.952,
-            "top": 1034.208,
-            "right": 1060.693,
-            "bottom": 1065.416
-          }
-        }
-      ]
-    }
+    "seleccion": null
+  },
+  {
+    "id": "b2-primero-el-numero-169",
+    "dominante": [
+      "Primero el número."
+    ],
+    "ratioDominanteEntrada": null,
+    "contraste": {
+      "dominante": 19.15,
+      "nota": 19.24,
+      "cta": 10.66,
+      "descriptor": 19.62,
+      "logo": 19.35
+    },
+    "gapsTinta": [],
+    "seleccion": null
   }
 ]

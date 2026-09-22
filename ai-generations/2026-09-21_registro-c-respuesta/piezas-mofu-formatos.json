@@ -25,10 +25,10 @@
     "id": "mo1-canal-nuevo-916",
     "plate": "plates/mo1-canal-nuevo-916-v2-plate.png",
     "lead": null,
-    "dominant": "No es un canal nuevo.",
+    "dominant": "−68% en tus clics pagados.",
     "after": null,
     "note": {
-      "text": "Citado en la IA, tu SEO rinde hasta 35% más.",
+      "text": "Cuando Google pone su respuesta arriba, antes de tus anuncios.",
       "size": 40,
       "x": 0.07,
       "width": 0.8,
@@ -79,12 +79,12 @@
       "y": 0.82
     },
     "id": "mo2-no-te-citan-916",
-    "plate": "plates/mo2-no-te-citan-916-v2-plate.png",
+    "plate": "plates/mo2-no-te-citan-916-v3-plate.png",
     "lead": null,
-    "dominant": "No te citan.",
+    "dominant": "+35% en tus clics orgánicos.",
     "after": null,
     "note": {
-      "text": "Los seis motores, la misma pregunta, el mismo día.",
+      "text": "Eso ganan las marcas que la IA sí cita. Los seis motores, la misma pregunta, el mismo día.",
       "size": 40,
       "x": 0.07,
       "width": 0.8,
@@ -128,7 +128,7 @@
       ]
     },
     "subjectProtection": {
-      "top": 1143,
+      "top": 1033,
       "minClearance": 24
     }
   },
@@ -158,10 +158,10 @@
     "id": "mo3-no-creernos-916",
     "plate": "plates/mo3-no-creernos-916-plate.png",
     "lead": null,
-    "dominant": "No tienes que creernos.",
+    "dominant": "1% del tráfico viene de la IA.",
     "after": null,
     "note": {
-      "text": "Te entregamos la pregunta, la respuesta y la fecha.",
+      "text": "Por eso no te vendemos un canal nuevo: medimos lo que le hace a los que ya tienes.",
       "size": 40,
       "x": 0.07,
       "width": 0.8,
@@ -213,10 +213,10 @@
     "id": "mo1-canal-nuevo-169",
     "plate": "plates/mo1-canal-nuevo-169-plate.png",
     "lead": null,
-    "dominant": "No es un canal nuevo.",
+    "dominant": "−68% en tus clics pagados.",
     "after": null,
     "note": {
-      "text": "Citado en la IA, tu SEO rinde hasta 35% más.",
+      "text": "Cuando Google pone su respuesta arriba, antes de tus anuncios.",
       "size": 36,
       "x": 0.07,
       "width": 0.42,
@@ -268,10 +268,10 @@
     "id": "mo2-no-te-citan-169",
     "plate": "plates/mo2-no-te-citan-169-plate.png",
     "lead": null,
-    "dominant": "No te citan.",
+    "dominant": "+35% en tus clics orgánicos.",
     "after": null,
     "note": {
-      "text": "Los seis motores, la misma pregunta, el mismo día.",
+      "text": "Eso ganan las marcas que la IA sí cita. Los seis motores, la misma pregunta, el mismo día.",
       "size": 36,
       "x": 0.07,
       "width": 0.42,
@@ -323,10 +323,10 @@
     "id": "mo3-no-creernos-169",
     "plate": "plates/mo3-no-creernos-169-plate.png",
     "lead": null,
-    "dominant": "No tienes que creernos.",
+    "dominant": "1% del tráfico viene de la IA.",
     "after": null,
     "note": {
-      "text": "Te entregamos la pregunta, la respuesta y la fecha.",
+      "text": "Por eso no te vendemos un canal nuevo: medimos lo que le hace a los que ya tienes.",
       "size": 36,
       "x": 0.07,
       "width": 0.42,
