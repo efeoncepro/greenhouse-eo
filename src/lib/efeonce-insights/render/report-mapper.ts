@@ -319,7 +319,7 @@ export const buildInsightReportPlanInput = ({
         methodology:
           frozen.methodology.length > 0
             ? frozen.methodology
-            : ['Las cifras provienen del snapshot sellado de la edición.']
+            : [GH_INSIGHTS.methodology.fallback]
       }
     })
   })

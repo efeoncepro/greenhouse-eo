@@ -51,6 +51,37 @@ export const GH_INSIGHTS = {
     no_data: 'sin datos'
   },
 
+  /**
+   * Nombre legible de la métrica que un límite menciona (por `metricId` del rechazo). Sin entrada,
+   * el límite habla del módulo: un identificador interno (`rank`, `gsc`) nunca llega al documento.
+   */
+  metrics: {
+    gsc: 'Search Console',
+    rank: 'Posiciones en buscadores',
+    organic_etv: 'Tráfico orgánico estimado',
+    overall_score: 'Puntaje de visibilidad en IA',
+    rpa: 'Rondas de revisión por pieza',
+    otd: 'Entregas a tiempo'
+  } as Readonly<Record<string, string>>,
+
+  /**
+   * Fuente legible de cada método del snapshot (por `method.name`). El nombre de la función lectora
+   * es trazabilidad interna: queda en el snapshot sellado, no en la metodología que lee el cliente.
+   */
+  sources: {
+    gsc_window_aggregate: 'Google Search Console',
+    dataforseo_serp_rank: 'mediciones de posiciones en buscadores',
+    dataforseo_etv: 'estimación de tráfico orgánico',
+    ai_visibility_grader: 'análisis de visibilidad en motores de respuesta',
+    ico_engine_monthly: 'métricas mensuales de entrega'
+  } as Readonly<Record<string, string>>,
+
+  methodology: {
+    cutoff: 'corte al',
+    cutoffUndeclared: 'sin fecha de corte declarada',
+    fallback: 'Las cifras provienen del snapshot sellado de la edición.'
+  },
+
   /** Piezas fijas del documento. */
   document: {
     limitsTitle: 'Lo que esta edición no puede afirmar',

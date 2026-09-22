@@ -5,7 +5,7 @@
  */
 
 import type { ChartSpecV1 } from '../contracts/chart-spec'
-import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSnapshotContentV1 } from '../contracts/evidence'
+import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSnapshotContentV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { EditorialPlanV1, PlanChapterV1, PlanClaimV1, PlanTableV1 } from '../contracts/plan'
 import type { InsightModule } from '../contracts/request'
 import { formatDeltaPercent, formatFactValue } from './format'
@@ -18,6 +18,37 @@ const MODULE_TITLES: Record<InsightModule, string> = {
 }
 
 const REJECTION_TEXT: Record<EvidenceRejectionV1['reason'], string> = GH_INSIGHTS.rejections
+
+/**
+ * Límites y metodología son texto que leen deck, informe y web tal cual: se redactan con copy
+ * legible, nunca con el `metricId`, el `method.name` ni el nombre de la función lectora (eso queda
+ * en el snapshot sellado). El `detail` del rechazo es diagnóstico del adapter —a veces en inglés o
+ * con códigos— y tampoco entra al texto. Líneas idénticas se colapsan.
+ */
+const limitFor = (rejection: EvidenceRejectionV1): string => {
+  const subject = (rejection.metricId ? GH_INSIGHTS.metrics[rejection.metricId] : undefined) ?? GH_INSIGHTS.modules[rejection.module].label
+
+  return `${subject}: ${REJECTION_TEXT[rejection.reason]}.`
+}
+
+const cutoffLabel = (asOf: string | null, locale: string): string => {
+  const civil = asOf?.match(/^(\d{4})-(\d{2})-(\d{2})/)
+
+  if (!civil) return GH_INSIGHTS.methodology.cutoffUndeclared
+
+  const date = new Date(Date.UTC(Number(civil[1]), Number(civil[2]) - 1, Number(civil[3])))
+
+  return `${GH_INSIGHTS.methodology.cutoff} ${new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date)}`
+}
+
+const methodologyFor = (source: EvidenceSourceV1, locale: string): string => {
+  const moduleLabel = GH_INSIGHTS.modules[source.module].title
+  const origin = GH_INSIGHTS.sources[source.method.name]
+
+  return origin ? `${moduleLabel}: ${origin}, ${cutoffLabel(source.asOf, locale)}.` : `${moduleLabel}: ${cutoffLabel(source.asOf, locale)}.`
+}
+
+const unique = (lines: string[]): string[] => [...new Set(lines)]
 
 const windowLabel = (fact: EvidenceFactV1): string => `${fact.window.start} a ${fact.window.endExclusive}`
 
@@ -119,7 +150,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
       claims,
       charts,
       tables: facts.length > 0 ? [tableFor(`table.${moduleKey}`, `${MODULE_TITLES[moduleKey]} · resumen`, facts, byId, input.locale)] : [],
-      limits: rejections.map(rejection => `${rejection.metricId ?? 'módulo'}: ${REJECTION_TEXT[rejection.reason]} (${rejection.detail}).`)
+      limits: unique(rejections.map(limitFor))
     })
   }
 
@@ -133,8 +164,8 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     executiveSummary: summary,
     chapters,
     actions: [],
-    limits: snapshot.rejections.map(rejection => `${rejection.module}: ${REJECTION_TEXT[rejection.reason]}.`),
-    methodology: snapshot.sources.map(source => `${source.module}: ${source.reader} · ${source.method.name} ${source.method.version} · corte ${source.asOf ?? 'no declarado'}`),
+    limits: unique(snapshot.rejections.map(limitFor)),
+    methodology: unique(snapshot.sources.map(source => methodologyFor(source, input.locale))),
     references
   }
 }
