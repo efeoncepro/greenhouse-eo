@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type * as MetricRegistry from '@/lib/ico-engine/metric-registry'
+
 import { resolveInsightWindows } from '../window'
 
 /**
@@ -186,7 +188,7 @@ describe('ICO adapter', () => {
     spaceId: 'sp-1', clientId: null, clientName: null, periodYear: 2026, periodMonth: 8,
     metrics: [
       { metricId: 'rpa', value: rpa.value, zone: null, dataStatus: rpa.dataStatus, suppressionReason: rpa.suppressionReason ?? null, evidence: { completedTasks: 10, eligibleTasks: 8, missingTasks: 2, nonPositiveTasks: 0 } },
-      { metricId: 'otd', value: otd.value, zone: null }
+      { metricId: 'otd_pct', value: otd.value, zone: null }
     ],
     cscDistribution: null,
     context: { totalTasks: 12, completedTasks: 10, activeTasks: 2, onTimeTasks: otd.onTime, lateDropTasks: otd.late, overdueTasks: otd.overdue, carryOverTasks: 0, overdueCarriedForwardTasks: 0 },
@@ -220,6 +222,26 @@ describe('ICO adapter', () => {
 
     expect(result.facts).toEqual([])
     expect(result.rejections.map(rejection => [rejection.metricId, rejection.reason])).toEqual([['rpa', 'suppressed'], ['otd', 'insufficient_data']])
+  })
+
+  it('lee cada métrica por el id que declara el registro canónico del motor ICO', async () => {
+    // El fixture de este archivo es un espejo escrito a mano: si repite un id equivocado, el test lo confirma en vez
+    // de detectarlo (así pasó con 'otd'). Este cruce contra ICO_METRIC_REGISTRY es la verdad del motor.
+    const { ICO_METRIC_REGISTRY } = await vi.importActual<typeof MetricRegistry>('@/lib/ico-engine/metric-registry')
+    const { ICO_SNAPSHOT_METRIC_IDS } = await import('./ico-adapter')
+    const registryIds = new Set(ICO_METRIC_REGISTRY.map(metric => metric.id))
+
+    for (const id of Object.values(ICO_SNAPSHOT_METRIC_IDS)) expect(registryIds.has(id), id).toBe(true)
+  })
+
+  it('una métrica que el snapshot no trae se narra como límite, nunca se omite en silencio', async () => {
+    icoMocks.readSpaceMetrics.mockResolvedValue({ ...snapshot({ value: 1.1, dataStatus: 'valid' }, { value: 80, onTime: 8, late: 1, overdue: 1 }), metrics: [] })
+    const { icoReportAdapter } = await import('./ico-adapter')
+    const windows = month('2026-08-01', '2026-09-01')
+    const result = await icoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+    expect(result.facts).toEqual([])
+    expect(result.rejections.map(rejection => [rejection.metricId, rejection.reason])).toEqual([['rpa', 'no_data'], ['otd', 'no_data']])
   })
 
   it('ventana no mensual es unsupported_window sin llamar al reader; sin spaces es not_connected', async () => {

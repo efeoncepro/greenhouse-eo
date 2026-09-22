@@ -8,6 +8,8 @@ import 'server-only'
  */
 
 import { ClientGraderReportError, readClientGraderReport } from '@/lib/growth/ai-visibility/client/command'
+import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
+import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
@@ -63,18 +65,22 @@ const collectForWindow = async (organizationId: string, window: ResolvedInsightW
     evidenceRef: `grader_report:${organizationId}:${asOf}:${report.provenance.scoreVersion}`
   }
 
-  facts.push({ ...base, factId: factId('aeo', 'overall_score', window), metricId: 'overall_score', label: 'Score de visibilidad en IA', value: report.overallScore, unit: 'score', numerator: null, denominator: null, comparisonFactId: comparisonIds.overall_score ?? null })
+  facts.push({ ...base, factId: factId('aeo', 'overall_score', window), metricId: 'overall_score', label: GH_INSIGHTS.metrics.overall_score!, value: report.overallScore, unit: 'score', numerator: null, denominator: null, comparisonFactId: comparisonIds.overall_score ?? null })
 
   for (const dimension of report.dimensions) {
     const key = `dimension.${dimension.key}`
 
-    facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label: dimension.label, value: dimension.score, unit: 'score', numerator: null, denominator: null, comparisonFactId: comparisonIds[key] ?? null, dimension: { dimension: dimension.key } })
+    // El label del contrato del grader es inglés («Entity Clarity»); el documento usa el label es-CL que el propio grader
+    // declara para superficies de cliente. Sin entrada, el del contrato (nunca la key cruda).
+    const label = (GH_GROWTH_AI_VISIBILITY.dimension_label as Readonly<Record<string, string>>)[dimension.key] ?? dimension.label
+
+    facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label, value: dimension.score, unit: 'score', numerator: null, denominator: null, comparisonFactId: comparisonIds[key] ?? null, dimension: { dimension: dimension.key } })
   }
 
   for (const presence of report.providerPresence) {
     const key = `presence.${presence.provider}`
 
-    facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label: `Presencia en ${presence.provider}`, value: presence.present, unit: 'count', numerator: presence.present, denominator: presence.resolved, comparisonFactId: comparisonIds[key] ?? null, dimension: { provider: presence.provider } })
+    facts.push({ ...base, factId: factId('aeo', key, window), metricId: key, label: `Presencia en ${(GH_GROWTH_AI_VISIBILITY.provider_display_label as Readonly<Record<string, string>>)[presence.provider] ?? presence.provider}`, value: presence.present, unit: 'count', numerator: presence.present, denominator: presence.resolved, comparisonFactId: comparisonIds[key] ?? null, dimension: { provider: presence.provider } })
   }
 
   return { facts, rejections, source: { module: 'aeo', adapterVersion: AEO_ADAPTER_VERSION, reader: 'readClientGraderReport', asOf, method, coverage, servedWindow: { start: asOf, endExclusive: asOf, granularity: 'period', partial: false } } as EvidenceSourceV1 }

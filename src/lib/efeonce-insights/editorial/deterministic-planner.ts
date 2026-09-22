@@ -54,7 +54,10 @@ const windowLabel = (fact: EvidenceFactV1): string => `${fact.window.start} a ${
 
 const claimFor = (fact: EvidenceFactV1, byId: Map<string, EvidenceFactV1>, locale: string): PlanClaimV1 => {
   const comparison = fact.comparisonFactId ? byId.get(fact.comparisonFactId) : null
-  const value = formatFactValue(fact.value, fact.unit, locale)
+  // Un conteo que es parte de un total («21 keywords en primera página», «presente en 2 consultas») sin su total no
+  // dice nada: se escribe «21 de 31». El total sale del mismo hecho (denominador), que la validación ya admite.
+  const partOfTotal = fact.unit === 'count' && fact.value !== null && fact.numerator === fact.value && fact.denominator !== null && fact.denominator > 0
+  const value = `${formatFactValue(fact.value, fact.unit, locale)}${partOfTotal ? ` de ${formatFactValue(fact.denominator, 'count', locale)}` : ''}`
   const factIds = [fact.factId]
   let text = fact.value === null ? `${fact.label}: sin dato para el período.` : `${fact.label}: ${value}.`
 
@@ -136,7 +139,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     for (const fact of facts) byUnit.set(fact.unit, [...(byUnit.get(fact.unit) ?? []), fact])
 
     for (const [unit, unitFacts] of byUnit) {
-      const chart = chartFor(moduleKey, unitFacts, byId, unit, `chart.${moduleKey}.${unit}`, `${MODULE_TITLES[moduleKey]} · ${unit}`)
+      const chart = chartFor(moduleKey, unitFacts, byId, unit, `chart.${moduleKey}.${unit}`, GH_INSIGHTS.units[unit] ? `${GH_INSIGHTS.modules[moduleKey].label} · ${GH_INSIGHTS.units[unit]}` : GH_INSIGHTS.modules[moduleKey].label)
 
       if (chart) charts.push(chart)
     }

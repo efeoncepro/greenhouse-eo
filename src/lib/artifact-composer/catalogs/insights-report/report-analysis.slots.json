@@ -103,6 +103,12 @@
             "consumer": "resolver-only",
             "resolver": "report-bar-geometry"
           },
+          "scaleGroup": {
+            "type": "string",
+            "required": false,
+            "consumer": "resolver-only",
+            "resolver": "report-bar-geometry"
+          },
           "emphasis": {
             "type": "enum",
             "required": true,

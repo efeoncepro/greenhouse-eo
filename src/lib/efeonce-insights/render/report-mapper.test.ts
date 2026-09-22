@@ -195,8 +195,91 @@ describe('buildInsightReportPlanInput', () => {
     const series = (analysis!.slots as { figureSeries: { printedValue: string; emphasis: string }[] }).figureSeries
 
     expect(series).toHaveLength(2)
-    expect(series[0]!.printedValue).toBe('+61,4%')
+    // El formateador canónico del plan (el de tablas y afirmaciones), no uno propio: un nivel no lleva «+».
+    expect(series[0]!.printedValue).toBe('61,4 %')
     expect(series[0]!.emphasis).toBe('lead')
+    // Cada barra se nombra por su métrica (dimensionLabels), no por la etiqueta de la serie.
+    expect((analysis!.slots as { figureSeries: { name: string }[] }).figureSeries.map(row => row.name)).toEqual(['Nuevas', 'Optimizadas'])
+    expect((analysis!.slots as { figureUnit: string }).figureUnit).toBe('Porcentaje')
+  })
+
+  // Forma real de un plan SEO (canary Berel, 2026-09-22): comparación de períodos por métrica.
+  const periodComparison = (metrics: number) => {
+    const facts = Array.from({ length: metrics }, (_, i) => [
+      { factId: `cur${i}`, value: (i + 1) * 1000, unit: 'count', evidenceRef: `ev-c${i}` },
+      { factId: `prev${i}`, value: (i + 1) * 900, unit: 'count', evidenceRef: `ev-p${i}` }
+    ]).flat()
+
+    const chart = {
+      specVersion: 'chart_spec_v1', chartId: 'chart.seo.count', family: 'bar_grouped', relation: 'comparison',
+      title: 'Visibilidad orgánica · Cantidad', unit: 'count',
+      dimensionLabels: Array.from({ length: metrics }, (_, i) => `Métrica ${i + 1}`),
+      series: [
+        { seriesId: 'prev', label: 'Período anterior', factIds: Array.from({ length: metrics }, (_, i) => `prev${i}`), unit: 'count' },
+        { seriesId: 'cur', label: 'Período', factIds: Array.from({ length: metrics }, (_, i) => `cur${i}`), unit: 'count' }
+      ]
+    }
+
+    return buildInsightReportPlanInput({
+      edition, report,
+      snapshot: { facts, sources: [], rejections: [] } as never,
+      plan: plan({ chapters: [chapter({ charts: [chart] as never })] })
+    }).slides.filter(p => p.contentType === 'report-analysis').map(p => p.slots as { figureTitle: string; figureSeries: { name: string; printedValue: string; scaleGroup?: string }[] })
+  }
+
+  it('una comparación de períodos dibuja pares con nombre de métrica y escala propia', () => {
+    const [figure] = periodComparison(2)
+
+    expect(figure!.figureSeries.map(row => [row.name, row.printedValue, row.scaleGroup])).toEqual([
+      ['Métrica 1', '1.000', 'dimension-0'],
+      ['Período anterior', '900', 'dimension-0'],
+      ['Métrica 2', '2.000', 'dimension-1'],
+      ['Período anterior', '1.800', 'dimension-1']
+    ])
+  })
+
+  it('una figura que no cabe se PAGINA sin recortar barras ni partir un par', () => {
+    const figures = periodComparison(6)
+    const rows = figures.flatMap(figure => figure.figureSeries)
+
+    expect(rows).toHaveLength(12)
+    expect(figures.map(figure => figure.figureSeries.length)).toEqual([6, 6])
+    expect(figures[1]!.figureTitle).toBe('Visibilidad orgánica · Cantidad (continuación)')
+
+    for (const figure of figures) {
+      const groups = figure.figureSeries.map(row => row.scaleGroup)
+
+      for (const group of new Set(groups)) expect(groups.filter(g => g === group)).toHaveLength(2)
+    }
+  })
+
+  it('reparte las barras de una serie para que ninguna página quede con una sola', () => {
+    const facts = Array.from({ length: 7 }, (_, i) => ({ factId: `f${i}`, value: i + 1, unit: 'score', evidenceRef: `ev${i}` }))
+
+    const chart = {
+      specVersion: 'chart_spec_v1', chartId: 'ch', family: 'bar', relation: 'comparison', title: 'Dimensiones', unit: 'score',
+      dimensionLabels: facts.map((_, i) => `Dimensión ${i + 1}`),
+      series: [{ seriesId: 's', label: 'Período', factIds: facts.map(f => f.factId), unit: 'score' }]
+    }
+
+    const figures = buildInsightReportPlanInput({
+      edition, report,
+      snapshot: { facts, sources: [], rejections: [] } as never,
+      plan: plan({ chapters: [chapter({ charts: [chart] as never })] })
+    }).slides.filter(p => p.contentType === 'report-analysis').map(p => (p.slots as { figureSeries: unknown[] }).figureSeries.length)
+
+    expect(figures).toEqual([4, 3])
+  })
+
+  it('pagina el resumen ejecutivo en vez de recortarlo', () => {
+    const claims = Array.from({ length: 10 }, (_, i) => ({ claimId: `s${i}`, text: `Hallazgo ${i + 1}.`, factIds: [] }))
+
+    const narrative = buildInsightReportPlanInput({ edition, report, snapshot, plan: plan({ executiveSummary: claims }) })
+      .slides.filter(p => (p.slots as { runningChapter?: string }).runningChapter === 'Resumen ejecutivo')
+      .flatMap(p => (p.slots as { paragraphs: string[] }).paragraphs)
+
+    expect(narrative).toHaveLength(9)
+    expect(narrative.at(-1)).toBe('Hallazgo 10.')
   })
 
   it('NO dibuja una figura cuyos hechos no son medibles: el capítulo se narra', () => {

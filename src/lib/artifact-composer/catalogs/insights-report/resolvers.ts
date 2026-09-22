@@ -56,6 +56,21 @@ export const parsePrintedNumber = (value: unknown): number | null => {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+/**
+ * Cuánto puede separarse una etiqueta del valor exacto por puro redondeo: media unidad del último
+ * decimal impreso. `"1,9 %"` representa honestamente 1,88 (tolera 0,05); `"2"` representa 1,88 (tolera
+ * 0,5); `"3"` no. La guarda compara con esta tolerancia, no con igualdad exacta: exigir igualdad
+ * rechazaba toda etiqueta redondeada, que es TODA etiqueta bien formateada (lo encontró el canary con
+ * el CTR real de un cliente). No es una relajación: una etiqueta que dice otra cifra sigue fallando.
+ */
+export const roundingToleranceOf = (printed: unknown): number => {
+  if (typeof printed !== 'string') return 1e-9
+
+  const decimals = printed.match(/,(\d+)/)?.[1]?.length ?? 0
+
+  return 0.5 * 10 ** -decimals + 1e-9
+}
+
 export const insightsReportResolvers: ResolverRegistry = {
   /**
    * `report-bar-geometry` — el largo de cada barra sale de su valor, recalculado desde el dato.
@@ -67,11 +82,18 @@ export const insightsReportResolvers: ResolverRegistry = {
   'report-bar-geometry': {
     known: ['<derivado de value/valuePct>'],
     build: (_value, ctx) => {
-      const rows = Array.isArray(ctx.slots.figureSeries)
+      const allRows = Array.isArray(ctx.slots.figureSeries)
         ? (ctx.slots.figureSeries as Record<string, unknown>[])
         : []
 
-      if (rows.length === 0) return null
+      if (allRows.length === 0) return null
+
+      // `scaleGroup` (opcional) acota la escala: cada grupo mide sus barras contra su propio máximo. Sirve
+      // a la comparación de períodos, donde cada par (período vs anterior) se compara consigo mismo — en
+      // una escala compartida, 9 mil clics junto a 488 mil impresiones quedan como una raya. Sin grupo, la
+      // escala es la de toda la figura.
+      const group = ctx.item.scaleGroup ?? null
+      const rows = allRows.filter(row => (row.scaleGroup ?? null) === group)
 
       const series: GeometrySeries[] = [
         {
@@ -100,7 +122,7 @@ export const insightsReportResolvers: ResolverRegistry = {
         )
       }
 
-      if (Math.abs(printed - own) > 0.001) {
+      if (Math.abs(printed - own) > roundingToleranceOf(ctx.item.printedValue)) {
         throw new Error(
           `report-bar-geometry detectó una etiqueta inconsistente: "${String(ctx.item.printedValue)}" ` +
             `no representa valuePct=${own}. La etiqueta y la barra deben afirmar el mismo dato.`
@@ -117,7 +139,9 @@ export const insightsReportResolvers: ResolverRegistry = {
       const emphasis = ctx.item.emphasis === 'lead' ? 'lead' : 'rest'
 
       const effects: FieldEffect[] = [
-        { selector: '.fill', toneClass: emphasis, toneGroup: ['lead', 'rest'] },
+        // Tono con espacio de nombres propio: `lead`/`rest` a secas chocaban con clases tipográficas del
+        // molde (`.lead` del párrafo introductorio le ponía margen a la barra y la sacaba de su riel).
+        { selector: '.fill', toneClass: `tone-${emphasis}`, toneGroup: ['tone-lead', 'tone-rest'] },
         { selector: '.fill', styleProp: 'width', styleValue: `${bar.lengthPct}%` }
       ]
 

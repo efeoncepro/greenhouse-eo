@@ -114,7 +114,7 @@ describe('TASK-1847 — nombres de métrica con cifras o meses (formas reales de
   it('el plan determinista con etiquetas reales pasa la validación sin falsos positivos', () => {
     const plan = buildDeterministicPlan(labelled, { modules: ['seo', 'ico'], locale: 'es-CL' })
 
-    expect(plan.chapters.flatMap(chapter => chapter.claims).map(claim => claim.text)).toContain('Keywords en primera página (≤10): 21.')
+    expect(plan.chapters.flatMap(chapter => chapter.claims).map(claim => claim.text)).toContain('Keywords en primera página (≤10): 21 de 31.')
     expect(validateEditorialPlan(plan, labelled)).toEqual([])
   })
 

@@ -90,7 +90,9 @@ export const insightsDeckResolvers: ResolverRegistry = {
       const emphasis = ctx.item.emphasis === 'lead' ? 'lead' : 'rest'
 
       const effects: FieldEffect[] = [
-        { selector: '.fill', toneClass: emphasis, toneGroup: ['lead', 'rest'] },
+        // Tono con espacio de nombres propio: `lead`/`rest` a secas chocaban con clases tipográficas del
+        // molde (`.lead` del párrafo introductorio le ponía margen a la barra y la sacaba de su riel).
+        { selector: '.fill', toneClass: `tone-${emphasis}`, toneGroup: ['tone-lead', 'tone-rest'] },
         { selector: '.fill', styleProp: 'width', styleValue: `${bar.lengthPct}%` }
       ]
 

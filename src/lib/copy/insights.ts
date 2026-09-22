@@ -76,6 +76,19 @@ export const GH_INSIGHTS = {
     ico_engine_monthly: 'métricas mensuales de entrega'
   } as Readonly<Record<string, string>>,
 
+  /** Unidad legible de una figura (por `EvidenceUnit`). La unidad cruda (`count`) nunca llega al documento. */
+  units: {
+    count: 'Cantidad',
+    percent: 'Porcentaje',
+    ratio: 'Índice',
+    position: 'Posición media',
+    score: 'Puntaje (0 a 100)',
+    days: 'Días',
+    visits_estimated: 'Visitas estimadas',
+    usd: 'Dólares (USD)',
+    clp: 'Pesos chilenos (CLP)'
+  } as Readonly<Record<string, string>>,
+
   methodology: {
     cutoff: 'corte al',
     cutoffUndeclared: 'sin fecha de corte declarada',
@@ -87,6 +100,14 @@ export const GH_INSIGHTS = {
     limitsTitle: 'Lo que esta edición no puede afirmar',
     limitsAndMethod: 'Límites y metodología',
     evidenceAbsent: 'Ausente',
+    executiveSummary: 'Resumen ejecutivo',
+    summaryNoMore: 'Sin hallazgos adicionales en el período.',
+    figureContinued: '(continuación)',
+    figureLegendComparison: 'La barra de color es el período del informe; la gris, el período anterior. Cada métrica se mide en su propia escala.',
+    figureLegendSingle: 'Las barras comparten escala; la de color marca el valor más alto de la figura.',
+    figureDetailInTable: 'El detalle de esta figura está en la tabla de respaldo.',
+    figureMoreInNarrative: 'Las demás cifras de esta figura se narran en el capítulo y están en la tabla de respaldo.',
+    evidenceSource: 'Evidencia sellada de la edición',
     unitLabel: 'Unidad',
     sourceLabel: 'Fuente',
     coverageLabel: 'Cobertura'

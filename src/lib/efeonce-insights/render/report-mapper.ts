@@ -34,6 +34,7 @@ import { GH_INSIGHTS } from '@/lib/copy/insights'
 import type { ChartSpecV1 } from '../contracts/chart-spec'
 import type { EditorialPlanV1, PlanChapterV1 } from '../contracts/plan'
 import type { EvidenceFactV1 } from '../contracts/evidence'
+import { formatFactValue } from '../editorial/format'
 import type { EvidenceSnapshotRecord, InsightEditionRecord, InsightReportRecord } from '../stores/records'
 import { InsightsRenderRejectedError } from '../errors'
 import { withDedupedLimits } from './plan-limits'
@@ -48,8 +49,12 @@ const CAPACITY = {
   limits: 14
 } as const
 
+/** Párrafos de desarrollo que admite la página analítica (`development.maxItems`). */
+const DEVELOPMENT_ITEMS = 3
+
 const BUDGET = {
   assertion: 130,
+  development: 340,
   lead: 260,
   paragraph: 420,
   limitCause: 110,
@@ -92,49 +97,133 @@ export interface BuildInsightReportInput {
  * barra: por eso el formato se produce en un solo lugar y con el mismo criterio es-CL (coma
  * decimal) que el parser espera.
  */
-const printedValueOf = (fact: EvidenceFactV1): string => {
-  const value = fact.value ?? 0
-  const rounded = Math.round(value * 10) / 10
-  const text = String(rounded).replace('.', ',')
+/** Barras por figura: lo que declara la plantilla (`figureSeries.maxItems`), no una preferencia. */
+const FIGURE_ROWS = 6
 
-  return fact.unit === 'percent' ? `${rounded > 0 ? '+' : ''}${text}%` : text
+interface FigureRow {
+  /** Interno: con qué afirmaciones del plan se narra la página. No viaja al slot. */
+  factId: string
+  name: string
+  printedValue: string
+  valuePct: number
+  emphasis: 'lead' | 'rest'
+  evidenceRef: string
+  scaleGroup?: string
+}
+
+const figureRowOf = (name: string, fact: EvidenceFactV1, locale: string, emphasis: 'lead' | 'rest', scaleGroup?: string): FigureRow => ({
+  factId: fact.factId,
+  name,
+  // El formateador canónico del plan, el mismo que escribe tablas y afirmaciones: una figura con su
+  // propio formato dice «+1,9%» donde la tabla dice «1,9 %» (y el «+» vuelve variación a un nivel).
+  printedValue: formatFactValue(fact.value, fact.unit, locale),
+  valuePct: fact.value as number,
+  emphasis,
+  evidenceRef: fact.evidenceRef,
+  ...(scaleGroup ? { scaleGroup } : {})
+})
+
+/**
+ * Grupos de barras de una figura. Un grupo NO se parte entre páginas.
+ *
+ * - Una serie: cada hecho es una barra con el nombre de su métrica, en escala compartida.
+ * - Comparación de períodos (varias series): cada métrica es un grupo —la barra del período con el
+ *   nombre de la métrica y, debajo, la de cada referencia con el nombre que le da el plan («Período
+ *   anterior»)— y mide contra su propio máximo (`scaleGroup`). Métricas de magnitudes distintas no se
+ *   aplastan entre sí, y la barra nunca queda sin decir qué mide.
+ *
+ * Un hecho sin valor no se dibuja como cero: se omite de la figura y su ausencia está en la tabla y en
+ * los límites.
+ */
+const figureGroupsOf = (chart: ChartSpecV1, factsById: ReadonlyMap<string, EvidenceFactV1>, locale: string): FigureRow[][] => {
+  const current = chart.series[chart.series.length - 1]
+  const references = chart.series.slice(0, -1)
+
+  if (!current) return []
+
+  const measured = (id: string | undefined) => {
+    const fact = id ? factsById.get(id) : undefined
+
+    return fact && fact.value !== null ? fact : null
+  }
+
+  if (references.length === 0) {
+    const facts = current.factIds.map((id, index) => ({ fact: measured(id), name: chart.dimensionLabels[index] }))
+    const drawn = facts.filter((entry): entry is { fact: EvidenceFactV1; name: string } => entry.fact !== null && Boolean(entry.name))
+    const max = Math.max(...drawn.map(entry => entry.fact.value as number))
+
+    return drawn.map(entry => [figureRowOf(entry.name, entry.fact, locale, entry.fact.value === max ? 'lead' : 'rest')])
+  }
+
+  return current.factIds.flatMap((id, index) => {
+    const now = measured(id)
+    const name = chart.dimensionLabels[index]
+    const before = references.map(serie => ({ serie, fact: measured(serie.factIds[index]) }))
+
+    if (!now || !name || before.some(entry => entry.fact === null)) return []
+
+    const group = `dimension-${index}`
+
+    return [[
+      figureRowOf(name, now, locale, 'lead', group),
+      ...before.map(entry => figureRowOf(entry.serie.label, entry.fact!, locale, 'rest', group))
+    ]]
+  })
 }
 
 /**
- * Una figura del plan → los slots de la página analítica.
+ * Una figura del plan → una o más páginas analíticas. Si las barras no caben en una figura, la figura
+ * se PAGINA con el primitivo del motor (cada grupo es un bloque indivisible); nunca se recortan barras.
+ * Las páginas se equilibran para que ninguna quede con una sola barra.
  *
- * Devuelve `null` cuando la figura no se puede dibujar con lo que hay: una serie sin hechos
- * medibles no se rellena con ceros — el capítulo se narra y el faltante viaja a la página de
- * límites, que es donde el lector lo va a buscar.
+ * Devuelve `[]` cuando la figura no se puede dibujar con lo que hay: una serie sin hechos medibles no se
+ * rellena con ceros — el capítulo se narra y el faltante viaja a la página de límites.
  */
-const figureSlots = (
+const figurePagesOf = (
   chart: ChartSpecV1,
-  factsById: ReadonlyMap<string, EvidenceFactV1>
-): Record<string, unknown> | null => {
-  const rows = chart.series.flatMap(serie =>
-    serie.factIds
-      .map(id => factsById.get(id))
-      .filter((fact): fact is EvidenceFactV1 => fact != null && fact.value != null)
-      .map((fact, index) => ({
-        name: serie.label || chart.dimensionLabels[index] || serie.seriesId,
-        printedValue: printedValueOf(fact),
-        valuePct: fact.value as number,
-        evidenceRef: fact.evidenceRef
-      }))
+  factsById: ReadonlyMap<string, EvidenceFactV1>,
+  locale: string
+): { factIds: string[]; comparison: boolean; slots: Record<string, unknown> }[] => {
+  const groups = figureGroupsOf(chart, factsById, locale)
+  const total = groups.reduce((sum, group) => sum + group.length, 0)
+
+  if (total < 2) return []
+
+  const groupSize = Math.max(...groups.map(group => group.length))
+  const pageCount = Math.ceil(total / FIGURE_ROWS)
+  const capacity = Math.min(FIGURE_ROWS, Math.ceil(Math.ceil(total / pageCount) / groupSize) * groupSize)
+  const blocks: FlowBlock[] = groups.map((group, index) => ({ blockId: `g${index}`, heightPx: group.length }))
+
+  const pages = paginateFlow(blocks, { contentHeightPx: capacity, guardPx: 0 }).map(page =>
+    page.blockIds.flatMap(id => groups[Number(id.slice(1))]!)
   )
 
-  if (rows.length < 2) return null
+  // Una página con una sola barra no es una figura (la plantilla exige dos): toma una de la anterior.
+  const last = pages[pages.length - 1]
+  const previous = pages[pages.length - 2]
 
-  const max = Math.max(...rows.map(r => r.valuePct))
+  if (last && previous && last.length < 2 && previous.length > 2 && groupSize === 1) last.unshift(previous.pop()!)
 
-  return {
-    figureTitle: chart.title,
-    figureSeries: rows
-      .slice(0, 6)
-      .map(row => ({ ...row, emphasis: row.valuePct === max ? 'lead' : 'rest' })),
-    figureUnit: chart.unit,
-    figureSource: 'Evidencia sellada de la edición'
-  }
+  const unit = GH_INSIGHTS.units[chart.unit] ?? GH_INSIGHTS.document.unitLabel
+
+  return pages.map((rows, index) => ({
+    factIds: rows.map(row => row.factId),
+    comparison: chart.series.length > 1,
+    slots: {
+      figureTitle: index === 0 ? chart.title : `${chart.title} ${GH_INSIGHTS.document.figureContinued}`,
+      // El slot valida su forma: el factId interno no viaja.
+      figureSeries: rows.map(row => ({
+        name: row.name,
+        printedValue: row.printedValue,
+        valuePct: row.valuePct,
+        emphasis: row.emphasis,
+        evidenceRef: row.evidenceRef,
+        ...(row.scaleGroup ? { scaleGroup: row.scaleGroup } : {})
+      })),
+      figureUnit: unit,
+      figureSource: GH_INSIGHTS.document.evidenceSource
+    }
+  }))
 }
 
 /**
@@ -159,7 +248,8 @@ const issuedLabelOf = (edition: InsightEditionRecord): string =>
 const chapterPages = (
   chapter: PlanChapterV1,
   periodLabel: string,
-  factsById: ReadonlyMap<string, EvidenceFactV1>
+  factsById: ReadonlyMap<string, EvidenceFactV1>,
+  locale: string
 ): Omit<CompositionSlideInput, 'slideId'>[] => {
   const chapterLabel = chapter.title
   const running = { runningChapter: chapterLabel, runningPeriod: periodLabel }
@@ -175,19 +265,35 @@ const chapterPages = (
 
   const pages: Omit<CompositionSlideInput, 'slideId'>[] = []
 
-  for (const chart of chapter.charts) {
-    const figure = figureSlots(chart, factsById)
-
-    if (!figure) continue
+  // Cada página de figura se narra con las afirmaciones del plan que citan los hechos que dibuja: la
+  // figura y su texto afirman lo mismo. Repetir el titular del capítulo en cada página (lo que hacía
+  // antes) dejaba cuatro páginas seguidas con el mismo texto y figuras distintas.
+  for (const figure of chapter.charts.flatMap(chart => figurePagesOf(chart, factsById, locale))) {
+    const drawn = new Set(figure.factIds)
+    const own = chapter.claims.filter(claim => claim.factIds.some(id => drawn.has(id))).map(claim => claim.text)
+    const [figureHeadline, figureLead, ...figureRest] = own.length > 0 ? own : [headline!, rest[0] ?? headline!]
 
     pages.push({
       contentType: 'report-analysis',
       slots: {
         ...running,
-        assertion: rejectIfLonger(headline!, BUDGET.assertion, `${chapter.chapterId}.assertion`),
-        conclusion: rejectIfLonger(rest[0] ?? headline!, BUDGET.lead, `${chapter.chapterId}.conclusion`),
-        ...figure,
-        development: [rest[1] ?? 'El detalle de esta figura está en la tabla de respaldo.']
+        assertion: rejectIfLonger(figureHeadline!, BUDGET.assertion, `${chapter.chapterId}.assertion`),
+        // Con una sola afirmación, repetirla como conclusión no dice nada: la bajada lee la figura (qué
+        // significa cada color), que es lo que el lector necesita para no malinterpretarla.
+        conclusion: rejectIfLonger(
+          figureLead ?? (figure.comparison ? GH_INSIGHTS.document.figureLegendComparison : GH_INSIGHTS.document.figureLegendSingle),
+          BUDGET.lead,
+          `${chapter.chapterId}.conclusion`
+        ),
+        ...figure.slots,
+        // El molde admite 3 párrafos: con más, van 2 y un aviso. Ninguna cifra se pierde del documento —
+        // todas las afirmaciones del capítulo se narran completas en sus páginas narrativas y en la tabla.
+        development: (figureRest.length === 0
+          ? [GH_INSIGHTS.document.figureDetailInTable]
+          : figureRest.length <= DEVELOPMENT_ITEMS
+            ? figureRest
+            : [...figureRest.slice(0, DEVELOPMENT_ITEMS - 1), GH_INSIGHTS.document.figureMoreInNarrative]
+        ).map(text => rejectIfLonger(text, BUDGET.development, `${chapter.chapterId}.development`))
       }
     })
   }
@@ -229,7 +335,7 @@ const chapterPages = (
             valueA: String(row[1] ?? '—'),
             ...(row[2] != null ? { valueB: String(row[2]) } : {})
           })),
-          tableSource: 'Evidencia sellada de la edición'
+          tableSource: GH_INSIGHTS.document.evidenceSource
         }
       })
     })
@@ -268,20 +374,29 @@ export const buildInsightReportPlanInput = ({
   if (frozen.executiveSummary.length > 0) {
     const [headline, ...rest] = frozen.executiveSummary.map(c => c.text)
 
-    pages.push({
-      contentType: 'report-narrative',
-      slots: {
-        runningChapter: 'Resumen ejecutivo',
-        runningPeriod: periodLabel,
-        assertion: rejectIfLonger(headline!, BUDGET.assertion, 'executiveSummary.assertion'),
-        paragraphs:
-          rest.length > 0 ? rest.slice(0, CAPACITY.paragraphs) : ['Sin hallazgos adicionales en el período.']
-      }
+    // El resumen se pagina como cualquier narrativa: recortarlo a la capacidad de una página callaba
+    // afirmaciones del resumen sin avisar.
+    const summaryPages = chunkByCapacity(
+      rest.length > 0 ? rest : [GH_INSIGHTS.document.summaryNoMore],
+      CAPACITY.paragraphs,
+      (_p, i) => `summary-p${i}`
+    )
+
+    summaryPages.forEach(paragraphs => {
+      pages.push({
+        contentType: 'report-narrative',
+        slots: {
+          runningChapter: GH_INSIGHTS.document.executiveSummary,
+          runningPeriod: periodLabel,
+          assertion: rejectIfLonger(headline!, BUDGET.assertion, 'executiveSummary.assertion'),
+          paragraphs: paragraphs.map(p => rejectIfLonger(p, BUDGET.paragraph, 'executiveSummary.paragraph'))
+        }
+      })
     })
   }
 
   for (const chapter of frozen.chapters) {
-    pages.push(...chapterPages(chapter, periodLabel, factsById))
+    pages.push(...chapterPages(chapter, periodLabel, factsById, frozen.locale))
   }
 
   // El cierre es obligatorio aunque no haya límites: declarar que no los hay también es información.

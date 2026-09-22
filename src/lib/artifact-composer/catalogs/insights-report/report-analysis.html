@@ -62,8 +62,11 @@
   .fill { position: absolute; inset: 0 auto 0 0; border-radius: 2px; }
 
   /* Lead vs resto se distinguen por LUMINANCIA, no por tono: el informe se revisa impreso en gris. */
-  .fill.lead { background: var(--axis-report-role-accentDeep); }
-  .fill.rest { background: var(--axis-report-role-fieldMid); opacity: 0.3; }
+  .fill.tone-lead { background: var(--axis-report-role-accentDeep); }
+  .fill.tone-rest { background: var(--axis-report-role-fieldMid); opacity: 0.3; }
+  /* Un dato opcional ausente se calla ENTERO: el motor vacía el valor, y el rótulo sin valor («Cobertura»
+     y nada) se leía como una cobertura que falta en vez de una que no aplica. */
+  dt:has(+ dd:empty), dd:empty { display: none; }
 
   .marginalia {
     border-left: 2px solid var(--axis-report-role-accent);
@@ -115,14 +118,14 @@
               <span class="row-name" data-slot-field="name">Páginas publicadas en el período</span>
               <span class="row-value" data-slot-field="printedValue">+61,4%</span>
             </div>
-            <div class="track"><div class="fill lead"></div></div>
+            <div class="track"><div class="fill tone-lead"></div></div>
           </div>
           <div class="row">
             <div class="row-head">
               <span class="row-name" data-slot-field="name">Páginas optimizadas</span>
               <span class="row-value" data-slot-field="printedValue">+3,1%</span>
             </div>
-            <div class="track"><div class="fill rest"></div></div>
+            <div class="track"><div class="fill tone-rest"></div></div>
           </div>
         </div>
       </div>
