@@ -41,6 +41,21 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    escena imposible en idioma de render. Sus cifras traen fuente, muestra y `as-of`; aun así, reverifica
    fecha y aplicabilidad antes de citarlas.
 
+7. **Al adaptar una pieza a 9:16 o 16:9, o al componer un CTA**, carga
+   [safe zones y trampas de formato](references/paid-format-safe-zones-and-craft.md) (`as-of 2026-09-22`,
+   todo medido en producción). Lo que más caro sale ignorar:
+   - 🔴 **la reserva del comando NO es la safe zone de la plataforma.** En 9:16 la banda del comando empieza
+     en 10% y la UI de Instagram/LinkedIn ocupa hasta el **14%**: obedecer sólo al comando pone el titular
+     debajo del nombre de la cuenta. Manda la más restrictiva;
+   - **en 16:9 el cursor no cabe** —tacha el cierre a cualquier escala— y `cursors: []` aborta con
+     `cursor-required`: la salida es cursor a 0,9 + cierre corto;
+   - **la vista del personaje puesta en la raíz de la ficha se ignora en silencio** y resuelve la pose por
+     defecto: verificar la ruta `--image` que imprime el comando antes de gastar;
+   - **el CTA `solid` no reporta `contraste.cta`**: el QA sale limpio porque el dato no existe. Medir a mano
+     tinta/relleno y relleno/escena;
+   - 🎯 **la metáfora entra POR el objeto del oficio, no al lado de él.** Prueba: quítale el objeto; si la
+     escena sigue funcionando igual, estaba al lado.
+
 ### Motor de IA: cómo elegir (as-of 2026-09-16)
 
 Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Detalle de imagen en `greenhouse-ai-image-generator` §Elegir modelo y de video en

@@ -128,6 +128,29 @@ fuente como lo más brillante mientras la reserva pide el tercio superior limpio
 pecho **la banda de texto midió 0,00** (inservible); riggeado bajo sube a **0,28**. **Lámpara baja, o no hay
 banda de texto.**
 
+## 5b. 🎯 La metáfora entra POR el objeto del oficio **[medido 2026-09-22]**
+
+> **El objeto que identifica el servicio no puede ser decoración ni fondo: tiene que ser el que SOSTIENE
+> la acción de la escena.**
+
+Una rueda de prensa con una criatura capta atención — pero **no dice de qué categoría hablamos**, y sólo el
+**19%** de los avisos B2B se recuerda *y* se atribuye a la marca correcta (LinkedIn B2B Institute ×
+MediaScience, 109 avisos, biometría). **Atención sin atribución es gasto.**
+
+Por eso, en la pieza del atril, el atril **no está junto a** una pantalla: **el atril ES la barra de
+búsqueda**, vacía y con un solo cursor. Un objeto carga la autoridad usurpada *y* la categoría.
+
+✅ **Prueba para saberlo antes de generar:** quítale el objeto del oficio a la escena. **Si sigue funcionando
+igual, el objeto estaba al lado y no adentro** — hay que rehacerla.
+
+Es gemela de la regla de luz de §5: *la luz digital entra por el objeto, nunca por el fondo*.
+
+⚠️ **Y lo que envejece una escena de oficina:** el bloque de realismo pide materia impresa, así que **si la
+escena calla, el default es una oficina de 2010** — libros encuadernados, plantas, tazas, monitores con marco
+grueso. Declarar **hardware de generación actual, superficie desnuda y pantallas sin marco**, prohibiendo lo
+analógico incluso fuera de foco. Caso medido: dos plates de la corrida de ads salieron viejos **con el gate
+en verde**.
+
 ## 6. Palancas
 
 | | |

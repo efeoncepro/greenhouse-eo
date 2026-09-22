@@ -7,6 +7,22 @@ paths:
 
 # Fotografía de marca Efeonce — invariantes (auto-load por path)
 
+🔴 **El DEFAULT del bloque compartido gana cuando la escena calla** *(medido 3 veces el 2026-09-22)*:
+
+> **Entre un bloque compartido y la escena, gana el más específico — y el bloque compartido es el default
+> cuando la escena no dice nada.**
+
+| Bloque | Su default si la escena calla | Cómo se contrarresta |
+|---|---|---|
+| Realismo anti-IA (`printed matter exists…`) | **oficina de 2010**: libros, plantas, tazas, monitores con marco | declarar hardware de generación actual, superficie desnuda y pantallas sin marco, **prohibiendo lo analógico incluso fuera de foco** |
+| Escena físicamente imposible | **idioma del render** (CGI) | pedir la imperfección: polvo, micro-rayas, grano, profundidad de campo real |
+| Palanca con marcadores | los marcadores mandan | ya cubierto por `auditarContradicciones` |
+
+⚠️ **El agujero:** el aviso existe **por palanca** y salta cuando la escena **contradice** un bloque.
+**Nada avisa cuando la escena CALLA** y el default se impone — eso sólo se ve en la salida, tarde y pagada.
+Envejeció dos plates de la corrida de ads **con el gate en verde**.
+✅ En toda escena de oficina/escritorio, **declarar el material explícitamente**: el silencio elige por ti.
+
 🔴 **Si la pieza es un ANUNCIO (paid media, no orgánico), carga primero
 [`ad-creative-evidence-2026.md`](../skills/efeonce-advertising-creative/references/ad-creative-evidence-2026.md)**
 (`as-of 2026-09-21`, caduca 2027-03). Lo que más cambia la toma, medido:
