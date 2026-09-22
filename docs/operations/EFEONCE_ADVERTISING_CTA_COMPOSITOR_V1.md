@@ -173,6 +173,16 @@ etapa no está definida — está partida en dos campañas.
 
 Contrato del embudo: [`CDR-005`](../campaigns/decisions/CDR-005-cmp001-embudo-momento-y-accion.md).
 
+🔴 **El descriptor nombra lo que recibe quien hace clic, en palabras del comprador; nunca el nombre interno del
+servicio** [CMP-002, 22/09/2026]. El canon dice que el descriptor «identifica oferta/servicio», y esa palabra
+dejó pasar las etiquetas del catálogo: «Gobierno de agentes», «RevOps & CRM», «Optimización de tu portal»,
+«Equipos humano-agente». Bajo el botón se leían sueltas. El operador: *«si lees como un humano los textos, esa
+línea pareciera que no hiciera sentido»*. La prueba es leer botón y descriptor seguidos, en voz alta: «Veamos
+qué puede tocar · Evaluación inicial sin costo» se entiende; «Veamos qué puede tocar · Gobierno de agentes» no.
+En CMP-002 las seis piezas llevan a la misma puerta, la evaluación inicial sin costo
+(`docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md`), y llevan el mismo descriptor, como en
+CMP-001. **Verifica además que la landing diga lo mismo:** `/agenda/` sólo dice «Reunión de 30 minutos».
+
 ## 10. El acento del CTA se elige por la atribución que se BUSCA, cuando hay un partner en cuadro
 
 **Hallazgo de CMP-002 (carril HubSpot), 2026-09-22, corregido por el operador el mismo día.** Las piezas
