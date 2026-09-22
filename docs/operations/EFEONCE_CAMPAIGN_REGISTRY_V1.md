@@ -118,6 +118,25 @@ canal necesita decirlo distinto, eso es una decisión de campaña y va al brief;
 bueno: **lo que no puede pasar es que un agente produzca contra una versión del brief que ya cambió.**
 Antes de producir, léelo de nuevo — no de memoria.
 
+## 6b. La medición de negocio vive en HubSpot, no en la web
+
+**Web y CRM miden cosas distintas y no se sustituyen.** GA4 mide comportamiento; **HubSpot mide negocio.**
+
+| Hasta | Sistema |
+|---|---|
+| clic → visita → conversión de formulario | **GA4 / web** |
+| contacto → MQL → **SQL** → opportunity → deal | 🔴 **HubSpot** |
+
+**Lifecycle dual asimétrico** (`docs/context/11_hubspot-bowtie.md`): los stages **no son iguales** en
+contactos y empresas — el contrato es con la empresa, las personas actúan dentro de ella.
+
+🔴 **El trabajo real nunca es instrumentar el evento: es tender el puente.** Si `utm_campaign` no viaja del
+clic al contacto y del contacto al deal, el CRM sabrá que hubo un SQL y **no sabrá qué campaña lo produjo**.
+**Una campaña que no puede probar su contribución no sobrevive a la primera revisión de presupuesto.**
+
+⚠️ **La definición de «calificada» la fija quien opera el pipeline, no un agente** — y de ella depende el
+guardrail entero.
+
 ## 7. Para agentes
 1. Antes de crear una campaña, **lee el overview**: puede existir y estar `pausada`.
 2. **Nunca copies un asset** a la carpeta de campaña. Referencia su ruta.
