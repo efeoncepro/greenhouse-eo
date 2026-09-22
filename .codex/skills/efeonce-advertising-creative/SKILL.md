@@ -81,6 +81,9 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    difiere, produces una identidad distinta de la aprobada **y el resultado se ve plausible — no revienta,
    miente**. Anota la referencia con su `sha256`, no sólo con su ruta.
 
+
+**Límite verificado del checker:** `foto:assets:check` tolera archivos ausentes para CI y comprueba sólo rutas de catálogo. Antes de generar, verificar también disponibilidad/lectura del archivo que se adjunta al motor y comparar su SHA-256 con la entrada del lock. Esto incluye copias OneDrive; exit 0 no basta para validarlas. No regenerar el lock para legitimar una diferencia sin revisión de la referencia.
+
 ### Motor de IA: cómo elegir (as-of 2026-09-16)
 
 Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Detalle de imagen en `greenhouse-ai-image-generator` §Elegir modelo y de video en

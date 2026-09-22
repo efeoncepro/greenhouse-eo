@@ -15,6 +15,8 @@ rutean al mismo brief, con JTBD/evidencia, estados separados y receta reproducib
 Content, 25 exports por ruta; historial preservado. Corrección del lecho para nuevas adaptaciones documentada;
 sin regenerar finales, modificar runtime ni publicar/pautar.
 
+Reconciliación: CDR-002 registra el set de seis pilotos; BRIEF asigna roles vigentes. Template y guía separan recursos, contrato y motor; comprobar archivo adjunto/hash además del checker, que tolera ausentes en CI. Sin generación nueva.
+
 ## 2026-09-22 — Ads: Tres voces + acción
 
 [Regla aprobada](docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md): CTA Poppins en texto, contorno o

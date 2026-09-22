@@ -2,7 +2,7 @@
 
 ## Estado vigente para agentes
 
-CMP: [brief y templates](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
+CMP: [roles y recetas](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
 ## Actualización documental reciente
 

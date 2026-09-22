@@ -1,6 +1,6 @@
 # Handoff activo
 
-**Ads (22/09):** [CMP-001 y templates](docs/operations/social/2026-09-22-cmp-001-campaign-brief-handoff.md): 25 exports; v07 lecho/firma; CTA auditado; sin pauta.
+**Ads (22/09):** [CMP-001](docs/operations/social/2026-09-22-cmp-001-campaign-brief-handoff.md): seis pilotos definidos; roles, receta portable y hashes; 25 exports existentes, sin pauta.
 
 **Paid visual (21/09):** [playbook](.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md)
 Codex/Claude: doce palancas sin resultados paid; registro C en construcción.

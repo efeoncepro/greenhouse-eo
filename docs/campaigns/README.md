@@ -52,3 +52,8 @@ Sólo `CDR-###` y `EPIC-CMP-###` tienen numeración propia.
 2. **Una decisión que cambia la campaña se escribe como CDR** — si no, en tres semanas nadie sabe por qué
    se pausó un canal.
 3. **No dupliques el brief acá.** Referencia su ruta.
+
+## Registro de decisiones
+
+- [CDR-001](decisions/CDR-001-cmp001-always-on-q4-2026.md) · Accepted: ventana, seasonality y derechos declarados.
+- [CDR-002](decisions/CDR-002-cmp001-set-unico-produccion.md) · Proposed: acuerdo creativo Claude/Codex para pilotos; copy y fichas en OneDrive.

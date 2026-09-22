@@ -125,9 +125,12 @@ a git— sella el `sha256` de cada referencia: **`pnpm foto:assets:check` respon
 **En la ficha se anota la referencia con su hash, no sólo su ruta** — la ruta dice dónde buscar, el hash dice
 si encontraste lo correcto.
 
+
+**Límite verificado del checker:** `foto:assets:check` tolera archivos ausentes para CI y comprueba sólo rutas de catálogo. Antes de generar, verificar también disponibilidad/lectura del archivo que se adjunta al motor y comparar su SHA-256 con la entrada del lock. Esto incluye copias OneDrive; exit 0 no basta para validarlas. No regenerar el lock para legitimar una diferencia sin revisión de la referencia.
+
 🎯 **El prompt resuelto es el puente entre vías, y es el recurso más importante.** `foto:prompt` no arma un
 texto: **inyecta el bloque anti-IA, el de impacto, la palanca con sus marcadores, la reserva del formato y el
-aviso de derechos del partner**. Eso es lo que garantiza el resultado, y **es portable a cualquier motor**.
+aviso de derechos del partner**. Esto preserva las instrucciones de dirección entre motores; el render exige validación visual.
 🔴 **Un agente con motor propio no reescribe el prompt a mano: consume el resuelto.**
 
 ⚠️ **La equivalencia entre vías no se asume: se demuestra con los gates**, que se aplican al **archivo**, no
@@ -136,9 +139,7 @@ omite.
 
 ### 🔴 Buying group — obligatorio en B2B
 
-**Nadie compra B2B solo:** el comité promedia **~11 stakeholders** *(referencia de industria, no medida en
-nuestras cuentas)*. Un ad le habla a **una** persona; los otros diez **nunca lo ven**. Un brief que describe
-«la audiencia» como una sola persona produce piezas que le hablan a todos y **no mueven a nadie**.
+Modelar el grupo de compra por cuenta, sin asumir un número fijo de stakeholders ni roles excluyentes. Una pieza prioriza un interlocutor y aporta un argumento que pueda compartir con quienes participan en la decisión.
 
 > ## 🎯 El ad no convence al comité: ARMA AL CAMPEÓN.
 > Él lleva el argumento a una reunión donde no estamos. Por eso una pieza se juzga también por **si se puede
@@ -146,11 +147,9 @@ nuestras cuentas)*. Un ad le habla a **una** persona; los otros diez **nunca lo 
 
 **Modelar como mínimo:** campeón *(arma el caso)* · sponsor económico *(aprueba)* · owner técnico
 *(viabilidad y accesos)* · owner de datos *(si la evidencia vale)* · 🔴 **bloqueadores** —procurement, legal,
-security— · incumbente *(no decide y sí opina)*.
+security— · incumbente *(influencia y autoridad a verificar)*.
 
-🔴 **El bloqueador es el rol que más campañas ignoran:** **puede detener todo sin sponsorear nada**, y
-aparece tarde. No se le vende — se evita **darle razones para frenar**, y eso es lo que sostiene el «cero
-promesas de resultado, cero cifras sin fuente, cero claims que legal tenga que defender».
+Procurement, Legal y Security pueden condicionar la decisión y aparecer en distintos momentos. Identificar sus requisitos; evitar claims sin evidencia ayuda, pero no reemplaza resolver alcance, datos y terceros. Un campeón también puede aprobar presupuesto: validar autoridad real, no deducirla del rol.
 
 **Más una tabla de asignación pieza → rol.**
 🔴 **Una pieza sin rol asignado no se produce.** Si no puedes nombrar a quién le habla, le habla a «el

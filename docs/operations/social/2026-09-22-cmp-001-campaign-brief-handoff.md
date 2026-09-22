@@ -1,3 +1,9 @@
+> **Corrección de continuidad:** roles de compra reconciliados en BRIEF §3b; recetas en tres capas y template `campaign-piece.md` sincronizados con OneDrive. Comprobar hash/disponibilidad del archivo adjunto, además del checker de catálogo. Set creativo documentado; prompts de corrida y nuevos renders aún no ejecutados.
+
+> **Estado vigente v04:** [CDR-001](../../campaigns/decisions/CDR-001-cmp001-always-on-q4-2026.md) acepta Q4 y derechos paid declarados. [CDR-002](../../campaigns/decisions/CDR-002-cmp001-set-unico-produccion.md) registra acuerdo creativo tras revisión real de Claude CLI: un set de seis pilotos, después cuatro ratios. Continuar en OneDrive `conceptos/PLAN-PRODUCCION-v04.md`; acta en `decisiones/REVISION-CLAUDE-CODEX-v04.md`. KPI operador: `opportunity` en HubSpot; asistencia aparte. Medios/atribución siguen pendientes, no producción realizada.
+
+> El cuerpo siguiente conserva la revisión v2 como historia; sus dos líneas y permisos pendientes están superados por los documentos anteriores.
+
 # CMP-001 · Continuidad del brief y paquete operativo
 
 22/09/2026 · Documentación y planificación, sin generación ni pauta. Canon general:
