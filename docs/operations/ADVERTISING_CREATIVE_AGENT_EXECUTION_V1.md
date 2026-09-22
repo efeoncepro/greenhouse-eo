@@ -36,6 +36,16 @@ La orquestadora carga sólo lo necesario. En social compone con `social-media-st
 `motion-design-studio`; en generación, con la skill de imagen y derechos; en copy, con `copywriting`. No reinicia
 un brief ya resuelto ni delega el ownership del resultado.
 
+## Aplicación paid: imagen, video e híbridos
+
+Para atención visual, cinematic ads y métricas hook/hold, la orquestadora carga el
+[playbook de paid visual](../../.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md),
+espejado en Claude. Separa registro, hipótesis, ejecución y medición; los recursos son candidatos a pruebas,
+no lifts prometidos. Conserva el ownership AXIS y fotográfico existente; no cambia enums del generador,
+autoridad de publicación ni modelo de autonomía. ADR aplicable: ownership AXIS enlazado arriba y
+[contexto router-first](../architecture/GREENHOUSE_AGENT_CONTEXT_ROUTER_DECISION_V1.md); esta ampliación de
+conocimiento no introduce una decisión de arquitectura ni una nueva superficie runtime.
+
 ## Contrato de ejecución
 
 1. Resolver marca, objetivo, soporte, dimensiones/duración, audiencia, copy literal, CTA, activos, derechos y

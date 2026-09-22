@@ -13,9 +13,14 @@ que diga algo.
 
 ## 2. La regla que faltaba: cómo se fotografía «lo digital» acá
 
-El canon prohíbe **paneles azules grandes de fondo**, **lámparas prácticas encendidas** y —en el bloque de
-`copiloto`— **interfaces brillantes, circuitos y hologramas**. Así que «digital» no puede ser el cliché de
-pantallas encendidas. Pero mirando lo que **sí** funcionó:
+🔴 **Corregido 2026-09-21 — el operador tenía razón y este párrafo estaba mal.** Decía que «digital no puede
+ser el cliché de pantallas encendidas» y de ahí se deslizaba a no usar ninguna. **El canon no prohíbe la
+pantalla encendida: tiene una palanca para usarla** (`luz-motivada` = fuente visible en cuadro, *«monitor,
+pantalla, práctica o ventana»*), y dos piezas aprobadas la usan — `E-estudio-v2` con el monitor de la toma
+tirada, `F-podcast-v1` con la forma de onda en el laptop y los LEDs de la interfaz.
+
+Lo que la colorimetría prohíbe es otra cosa, y es específico: **paneles azules grandes DE FONDO** (campo de
+color añadido) y **lámparas prácticas encendidas** (b* +20,1, podcast de stock). Mirando lo que **sí** funcionó:
 
 | Pieza | De dónde salía la luz digital |
 |---|---|

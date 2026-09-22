@@ -66,6 +66,13 @@ argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una
 
 ## 1. Cómo se usa esta skill (router)
 
+Para **paid media / scroll-stop / estáticos e híbridos**, carga
+[palancas visuales para ads](../efeonce-advertising-creative/references/paid-visual-attention-playbook.md).
+Elige una hipótesis de atención, su ejecución y control; distingue contraste perceptual de semántico.
+El recurso publicitario no reemplaza el registro fotográfico ni agrega enums a `foto:prompt`.
+
+
+
 Para Marketing con Manzanitas, consultar la
 [biblioteca gráfica](../../../docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md):
 logos completos, versiones sin manzana y cinco símbolos; conservar el SVG original y distinguir

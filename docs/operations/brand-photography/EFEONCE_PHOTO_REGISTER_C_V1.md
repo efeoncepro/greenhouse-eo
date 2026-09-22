@@ -102,14 +102,37 @@ cable trenzado, disco portátil, lupa de inspección de aluminio mecanizado.
 🔴 **Lo que delata y envejece la pieza:** lupa de latón con mango (cliché de detective victoriano), tarro de
 lápices, pilas de libros, tazas. *Caso fuente: la primera versión de `d2` fue rechazada por esto.*
 
-⚠️ **Pero digital NO significa pantallas encendidas:** la colorimetría prohíbe paneles azules grandes de fondo y
-lámparas prácticas encendidas. Los aparatos van **apagados o en reposo** — su presencia es material, no lumínica.
+⚠️ **Digital tampoco es el cliché de pantallas de fondo** — pero **la pantalla encendida SÍ sirve, y es
+lenguaje aprobado.** 🔴 *Corregido 2026-09-21: este bloque decía «los aparatos van apagados o en reposo», y era
+falso.* Salía de un salto inválido: la colorimetría prohíbe **paneles azules grandes DE FONDO** (campo de color
+añadido, repetido entre piezas — caso `rondas/personas/JN2-podcast`) y **lámparas prácticas encendidas**
+(b\* de altas luces **+20,1**, look de podcast de stock — caso `rondas/paleta/P2-podcast`). De ahí **no** se
+sigue apagar los aparatos.
+
+**Lo que el canon tiene, y es lo contrario:** la palanca **`luz-motivada`** pide explícitamente una fuente
+visible en cuadro — *«monitor, pantalla, práctica o ventana en el encuadre»*— con caída visible y **el color de
+la fuente, nunca un filtro**. Dos piezas aprobadas del lenguaje la usan con pantalla encendida:
+
+| Pieza | Qué está encendido | Qué NO |
+|---|---|---|
+| `E-estudio-v2.png` | el **monitor con la toma tirada**, más los dos softbox | ningún panel azul añadido: el fondo es el ciclorama real del estudio |
+| `F-podcast-v1.png` | el **laptop con la forma de onda** + los LEDs de nivel de la interfaz | prácticas apagadas; llave = panel LED neutro fuera de cuadro → **b\* −0,3** |
+
+🎯 **La distinción que sí manda:** la luz digital entra **por el objeto** —un monitor, un visor, una forma de
+onda, un standby, una proyección— **nunca por un campo de color de fondo**. Un aparato apagado es una opción
+narrativa (`d1` usa el standby), no una obligación.
+
+🔴 **Regla medida que viene con la palanca:** con fuente visible en cuadro, **la lámpara se riggea BAJA**, entre
+rodilla y pecho —que además es como se ilumina de verdad un objeto pequeño—, porque `luz-motivada` pide la
+fuente como lo más brillante mientras la reserva pide el tercio superior limpio. Con el softbox a la altura del
+pecho **la banda de texto midió 0,00** (inservible); riggeado bajo sube a **0,28**. **Lámpara baja, o no hay
+banda de texto.**
 
 ## 6. Palancas
 
 | | |
 |---|---|
-| **Sirven** | `ausencia` (nadie en cuadro, el rastro de lo que pasó) · `variantes` · `descarte` · `proyeccion` · `instrumento` · `marcado` |
+| **Sirven** | `ausencia` (nadie en cuadro, el rastro de lo que pasó) · `variantes` · `descarte` · `proyeccion` · `instrumento` · `marcado` · **`luz-motivada`** (la pantalla encendida COMO fuente; ver §5 y su regla de lámpara baja) |
 | 🔴 **No es de C** | **`copiloto`** — exige que la criatura se pose sobre una persona, y eso la vuelve acompañante: es B |
 
 ## 7. El lecho, con la cámara baja **[medido 2026-09-21]**
@@ -153,3 +176,11 @@ a la referencia del kit. Verificar siempre con `pnpm foto:emblema`.
 
 **Pendiente:** el registro no tiene prueba de reconocimiento. Con dos piezas es un sistema coherente,
 **no un activo distintivo medido** — la misma condición que el maestro fija para A y B.
+
+## Paid media: primera aplicación y validación pendiente
+
+Para hipótesis visuales de estático, video e híbrido, usar el
+[playbook de atención visual](../../../.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md).
+El brief separa palanca publicitaria de `palanca` fotográfica: usar las admitidas por el compilador sin
+redefinir el registro. Ausencia, demostración y revelado son candidatos para C; no implican aprobación
+visual ni rendimiento medido. El estado «en construcción» y la prueba de reconocimiento pendiente se conservan.

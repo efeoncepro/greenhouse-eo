@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-21 — Paid visual: palancas, cinematic ads y medición por formato
+
+Skills de publicidad, Design, Motion, Digital Marketing y Growth/CRO conectadas al
+[playbook de atención visual](.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md),
+con investigación primaria en tres frentes, doce palancas, recetas de estático/video/híbrido y definiciones
+por plataforma. Se distingue hipótesis de rendimiento, CTR de atención y palanca publicitaria de ficha foto;
+registro C sigue en construcción. Contenido sincronizado Codex/Claude; sin generación ni publicación.
+
 ## 2026-09-20 — Fotografía Efeonce: comparación visual obligatoria antes del prompt
 
 El pipeline y las skills espejo de Design Studio y publicidad ahora exigen abrir los finales aprobados comparables,
@@ -683,11 +691,3 @@ Abierto `ISSUE-170`: el link gap del diagnóstico de prospecto pasa hasta 5 comp
 con experimento definido, no afirmado. `project_context.md` compactado de 11.997 a 11.297 tokens con
 control de no-pérdida verificado (148 rutas antes y después). La copia de `seo-aeo` en `~/.claude/skills`
 quedó sincronizada con marcador de procedencia.
-
-## 2026-09-11 — CLAUDE.md: bloque del outbox a su companion y fila de Channel & Commerce en el router
-
-El bloque "Outbox publisher canónico" (TASK-773) se movió verbatim a
-`docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md` y en `CLAUDE.md` queda un puntero con sus
-dos reglas más peligrosas. Con ese espacio entra la fila de Channel & Commerce en el router de dominios, que el ADR
-`EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1` dejaba pendiente por el techo de 35.000 tokens; se retira del ADR la
-sección de pendiente. `pnpm claude-md check`: presupuesto al 98% y 0 huérfanos en ambos niveles del audit.

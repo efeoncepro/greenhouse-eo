@@ -1,5 +1,12 @@
 # SOURCES — design-studio
 
+> **Revisión de alcance 2026-09-21 (Codex):** para decisiones operativas y definiciones de métricas,
+> cargar [el playbook de atención visual](../efeonce-advertising-creative/references/paid-visual-attention-playbook.md).
+> Este antecedente conserva la investigación previa; sus cifras no revalidadas con URL primaria,
+> fecha y metodología **no son benchmarks aprobados**. Premios no demuestran eficacia paid;
+> ausencia de hallazgo no prueba inexistencia; CTR no mide atención. La referencia STFO fechada
+> octubre de 2026 es posterior a esta revisión y queda excluida como evidencia vigente.
+
 > **Núcleo verificado as-of 2026-07.** En diseño, los **fundamentos** (composición,
 > gestalt, jerarquía, color, contraste) son **estables** y no se reverifican. Lo que se
 > mueve rápido es el **landscape de modelos IA** (por mes) y las **tendencias visuales**
@@ -195,3 +202,26 @@ tokens de fal (lo que subestimaba ~2× era la equivalencia de OpenArt).
   **draft barato de video → enhance, trayectoria por cuadros o video a video → Flux 3 (Fal; en Fal es video, no imagen)**;
   **toma de hasta 30 s con duración inteligente o video desde una web/documento → Wan 3.0 (Fal)**.
 - Sora 2 deprecado (shutdown 2026-09-24) — no basar nada nuevo en él.
+
+## Dirección de arte publicitaria + el look de IA — as-of 2026-09-21
+
+🔴 Canon: [`efeonce-advertising-creative/references/ad-creative-evidence-2026.md`](../efeonce-advertising-creative/references/ad-creative-evidence-2026.md)
+(caduca **2027-03**). Relevante para esta skill:
+
+- **§2.1 — lo que está ganando**, con pieza nombrable detrás: escala invertida con lectura en dos tiempos
+  (Melanoma Fund, 6 Gold Clios) · luz dura con la sombra del producto como logo (Magnum) · blur largo
+  sincronizado a movimiento real (BMW) · silueta en alto contraste sin logo (Heinz, **Grand Prix Print,
+  Cannes 2026**) · someter el material a un proceso físico real · construir en físico en vez de renderizar.
+- **§2.2 — lo que NO tiene respaldo**, no localizado en la búsqueda previa (no prueba inexistencia): exploded view, cross-section, high-speed/freeze
+  motion, levitación y color blocking. **Sólo aparecen en blogs SEO de fotografía de producto.**
+- **§2.3 — el riesgo «AI slop»**: **71%** cree haber visto avisos hechos con IA (54% en 2024), **57%**
+  sentimiento negativo (+12 pts) — IAB, oct-2025 a ene-2026. **Los seis tells** sirven como checklist de QA:
+  luz de un solo softbox gigante · micro-variación aplanada · piel de plástico · física incoherente ·
+  tipografía deformada · **ausencia de acontecimiento**. Antídoto más fuerte: **que la restricción de
+  producción sea la idea**.
+- **§2.4 — hallazgo propio [medido, USD 0,079]:** el motor resuelve **toda escena imposible en idioma de
+  render**; la imperfección (polvo, micro-rayas, grano, profundidad de campo genuina) **hay que pedirla
+  explícitamente** o sale CGI con el mismo encuadre y la misma física.
+- **§1.3 — la mirada**: el sujeto mirando **al producto/dato** gana más atención para el producto, el logo y
+  el aviso completo que la mirada a cámara *(J. of Advertising Research, 2018)*. Coincide con el registro A
+  del lenguaje Efeonce.

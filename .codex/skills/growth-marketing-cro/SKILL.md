@@ -62,6 +62,14 @@ argument-hint: "[área de growth/CRO o pregunta específica — ej: 'auditar con
 
 ## 0. Cómo se usa esta skill (orden obligatorio)
 
+Para **medir creatividades paid, thumb-stop, hook rate o hold rate**, carga
+[el diccionario y diseño de experimentos](../efeonce-advertising-creative/references/paid-visual-attention-playbook.md#5-diccionario-de-medición-sin-falsas-equivalencias).
+Exige numerador/denominador, población, periodo, placement, duración y KPI primario. TikTok 6-second views
+puede incluir interacción; estáticos no tienen hook temporal de video; CTR no mide atención.
+No declarar ganador sin calidad de resultado y muestra comparable.
+
+
+
 `diagnose → model → prioritize → experiment → measure`
 
 1. **Diagnostica primero.** Nunca prescribas una lista genérica de "10 growth

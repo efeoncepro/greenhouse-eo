@@ -1,10 +1,12 @@
 # Handoff activo
 
-**Fotografía de marca Efeonce (19–20/09):** lenguaje **aprobado**, capa gráfica sobre la foto **NO**. Comandos
-`pnpm foto:{doctor,prompt,validar}` (27 tests); nunca armar el prompt a mano. Abierto: sólo la **reserva 2**.
-Antes de generar, abrir finales aprobados comparables y declarar/medir el portador del azul y el acento de historia;
-firma vigente **20 %** explícito. [Prueba que motivó la guarda](ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa/README.md).
-Todo el detalle y el estado en [`brand-photography/README.md`](docs/operations/brand-photography/README.md).
+**Paid visual (21/09):** [playbook](.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md)
+Codex/Claude: doce palancas sin resultados paid; registro C en construcción.
+
+**Fotografía Efeonce (19–20/09):** lenguaje aprobado; capa gráfica NO. `pnpm foto:{doctor,prompt,validar}`
+(27 tests); sin prompts manuales. Abrir finales aprobados comparables, declarar/medir azul y acento; firma 20 %.
+Abierta reserva 2. [Estado/canon](docs/operations/brand-photography/README.md) ·
+[prueba de la guarda](ai-generations/2026-09-20_prueba-motor-integrado-julio-nexa/README.md).
 
 [EPIC-048](docs/epics/to-do/EPIC-048-operational-leadership-performance-ico-person-360.md): revisión adversarial aplicada; ADR Proposed, tasks to-do; sin runtime/bono.
 

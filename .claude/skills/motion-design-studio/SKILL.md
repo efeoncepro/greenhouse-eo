@@ -73,6 +73,14 @@ description: >-
 
 ## 1. Cómo se usa esta skill (router)
 
+Para **cinematic ads, video de performance o híbridos foto-video**, carga
+[palancas visuales para ads](../efeonce-advertising-creative/references/paid-visual-attention-playbook.md),
+especialmente §3 y §5–7. Convierte el tratamiento en planos, acción y tiempos; compara con una ejecución
+nativa/documental cuando corresponda. Hook/hold no demuestran eficacia comercial. Los timelines son
+hipótesis de montaje, no benchmarks; revisar secuencia completa y no sólo el primer cuadro.
+
+
+
 1. **Clasifica la intención** (§2). ¿Es producción cinematográfica/broadcast? Si es motion de UI
    runtime, **delega** (§5) y para.
 2. **Carga el módulo o módulos** que apliquen (§3). No cargues todos — carga lo justo. Si la tarea

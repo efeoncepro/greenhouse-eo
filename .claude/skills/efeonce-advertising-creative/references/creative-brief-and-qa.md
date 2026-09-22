@@ -17,6 +17,15 @@ evidencia junto a la versión revisada.
 | Selección colaborativa | Target real, variante, aire, overlay, cursores local/acting/moving, labels y adapter |
 | Estado esperado | Explorar, producir, corregir, aprobar, programar o publicar |
 
+## Extensión paid media (cuando aplica)
+
+Usar [el playbook de atención visual](paid-visual-attention-playbook.md). Registrar hipótesis, registro
+A/B/C, palanca visual dominante, recurso fotográfico compatible, primer cuadro, resolución, variante
+control, variable que cambia, KPI primario, diagnóstico con fórmula y guardrail. En video incluir
+shotlist/timeline, audio y versión silenciada; en estáticos marcar hook temporal como N/A. La prueba
+breve de comprensión y atribución es QA cualitativo, no rendimiento observado. Conservar resultado
+inconcluso si no existe muestra suficiente; un PASS creativo no prueba eficacia paid.
+
 ## Ficha tipográfica
 
 Registra el identificador/versión del contrato AXIS leído y, por cada tramo, `rol → familia → archivo →

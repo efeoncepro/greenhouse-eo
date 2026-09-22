@@ -120,6 +120,7 @@ Efeonce Insights (EPIC-045): [arquitectura](docs/architecture/EFEONCE_INSIGHTS_A
 
 Informes: skill `report-studio` (evidencia, diseño, QA PDF).
 Fotografía propia Efeonce: [`design-studio` y su preflight visual](.codex/skills/design-studio/references/efeonce-photographic-language.md); abrir finales aprobados antes de generar, verificar azul/acento en píxeles y componer firma oficial al 20 %.
+Paid: `efeonce-advertising-creative/references/paid-visual-attention-playbook.md`.
 Seasonalities: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.
 [Referente Metricool](.codex/skills/social-media-studio/references/seasonality-reference-calendar.md): inspiración para Efeonce/clientes; separado del calendario editorial y del scheduler.
 Producción seasonality/trendjacking: [protocolo de agentes](docs/operations/SOCIAL_CREATIVE_AGENT_EXECUTION_V1.md); canon en skills espejo `social-media-studio` (idea, marca, dirección, producción y QA).

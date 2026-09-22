@@ -599,3 +599,11 @@ isotipo, nave o mascotas— carga el [contrato de selección de referencias](../
 
 Y **abre el `LEEME.md` y el manifiesto del kit antes del prompt**: su `cuando_usarla` dice qué vista
 corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida.
+
+## Paid media como consumidor: atención sin cambiar el lenguaje (2026-09-21)
+
+Para convertir los registros A/B/C en anuncios, cargar
+[palancas visuales para paid media](../../efeonce-advertising-creative/references/paid-visual-attention-playbook.md).
+La hipótesis publicitaria se declara en el brief y se traduce a una palanca fotográfica admitida por el
+compilador; no cambia identidad, colorimetría, reservas ni aprobación del registro C. Comparar estático,
+video o híbrido con métricas propias del formato. La calidad cinematográfica no acredita performance.

@@ -64,6 +64,13 @@ argument-hint: "[canal/campaña o pregunta específica — ej: 'plan de paid med
 
 ## 0. Cómo se usa esta skill (orden obligatorio)
 
+Para **creative testing, thumb-stop, hook/hold o performance visual**, carga
+[palancas visuales para ads](../efeonce-advertising-creative/references/paid-visual-attention-playbook.md).
+Define objetivo/placement y KPI primario; Design/Motion producen la hipótesis y Growth valida el experimento.
+No trasladar definiciones de vistas entre plataformas ni confundir CTR con atención de un estático.
+
+
+
 `objetivo → audiencia/mensaje → canal-mix → creatividad → ejecución → medición`
 
 1. **Objetivo de negocio primero.** ¿Awareness, demanda, leads, engagement, lanzamiento?

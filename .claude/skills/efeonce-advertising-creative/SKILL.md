@@ -28,6 +28,18 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    Si una de esas skills ya inició el encargo, no la vuelvas a cargar ni reinicies el brief.
 5. Usa [brief y gate de calidad](references/creative-brief-and-qa.md) para registrar la decisión y revisar
    el archivo final.
+6. **Para paid media, scroll-stop, hook/hold, cinematic ads o híbridos**, carga primero
+   [palancas visuales y medición](references/paid-visual-attention-playbook.md): biblioteca de doce
+   recursos, recetas por formato, diccionario de métricas y experimentos. Declara hipótesis, palanca
+   dominante, control y KPI antes de producir. Para Efeonce conserva el registro A/B/C y el pipeline de foto.
+   `Cinematic` es tratamiento; `thumb-stop` es una ratio custom con fórmula, no un estilo ni garantía.
+   Estáticos: hook temporal de video N/A; CTR es respuesta, no atención. La
+   [evidencia medida](references/ad-creative-evidence-2026.md) es su hermano y aporta lo que el playbook
+   no duplica: **§5, las once cifras famosas que NO se citan** porque su fuente no existe o está mal copiada
+   —consúltala **antes** de poner un número en una lámina, propuesta o ad—; **§2.3**, el riesgo «AI slop»
+   con sus seis tells como checklist de QA; y **§2.4**, la medición propia de que el motor resuelve toda
+   escena imposible en idioma de render. Sus cifras traen fuente, muestra y `as-of`; aun así, reverifica
+   fecha y aplicabilidad antes de citarlas.
 
 ### Motor de IA: cómo elegir (as-of 2026-09-16)
 
