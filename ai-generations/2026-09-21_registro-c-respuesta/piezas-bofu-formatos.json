@@ -24,9 +24,9 @@
     },
     "id": "b2-primero-el-numero-916",
     "plate": "plates/b2-primero-el-numero-916-plate.png",
-    "lead": "Antes de cualquier propuesta.",
-    "dominant": "El número primero.",
-    "after": "Nunca **al revés**.",
+    "lead": "El tablero ya te mostró el problema.",
+    "dominant": "Cerrarlo es otra cosa.",
+    "after": "Eso es lo que **operamos**.",
     "subjectProtection": {
       "top": 773,
       "minClearance": 24
@@ -34,8 +34,8 @@
     "cta": {
       "variant": "outline",
       "radius": 10,
-      "text": "Habla con quien lo hace",
-      "descriptor": "Con tu panel en pantalla",
+      "text": "Agenda tu discovery",
+      "descriptor": "AEO para LatAm · 30 minutos",
       "surfaceToken": "growthOnDark",
       "inkToken": "growthOnDark",
       "x": 0.07,
@@ -48,7 +48,7 @@
       "cursorScale": 1.1
     },
     "note": {
-      "text": "Te mostramos tu panel en la primera reunión.",
+      "text": "Método, no improvisación: los seis motores, cada mes.",
       "size": 34,
       "x": 0.07,
       "width": 0.8,
@@ -79,9 +79,9 @@
     },
     "id": "b2-primero-el-numero-169",
     "plate": "plates/b2-primero-el-numero-169-plate.png",
-    "lead": "Antes de cualquier propuesta.",
-    "dominant": "El número primero.",
-    "after": "Nunca **al revés**.",
+    "lead": "El tablero ya te mostró el problema.",
+    "dominant": "Cerrarlo es otra cosa.",
+    "after": "Eso es lo que **operamos**.",
     "subjectProtection": {
       "top": 904,
       "minClearance": 24
@@ -89,8 +89,8 @@
     "cta": {
       "variant": "outline",
       "radius": 10,
-      "text": "Habla con quien lo hace",
-      "descriptor": "Con tu panel en pantalla",
+      "text": "Agenda tu discovery",
+      "descriptor": "AEO para LatAm · 30 minutos",
       "surfaceToken": "growthOnDark",
       "inkToken": "growthOnDark",
       "x": 0.07,
@@ -103,7 +103,7 @@
       "cursorScale": 1.1
     },
     "note": {
-      "text": "Te mostramos tu panel en la primera reunión.",
+      "text": "Método, no improvisación: los seis motores, cada mes.",
       "size": 30,
       "x": 0.07,
       "width": 0.42,

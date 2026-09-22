@@ -1,186 +1,47 @@
 [
   {
-    "id": "mo1-canal-nuevo-916",
+    "id": "b2-primero-el-numero-916",
     "dominante": [
-      "−68% de clics."
-    ],
-    "ratioDominanteEntrada": 3.9,
-    "contraste": {
-      "entrada": 19.72,
-      "dominante": 19.81,
-      "cierre-frase": 19.94,
-      "nota": 20.04,
-      "cta": 10.99,
-      "descriptor": 19.85,
-      "logo": 15.29
-    },
-    "gapsTinta": [
-      {
-        "entre": "entrada→dominante",
-        "px": 17,
-        "ratioDominante": 0.121
-      },
-      {
-        "entre": "dominante→cierre",
-        "px": 17,
-        "ratioDominante": 0.121
-      }
-    ],
-    "seleccion": null
-  },
-  {
-    "id": "mo2-no-te-citan-916",
-    "dominante": [
-      "+35% de clics."
-    ],
-    "ratioDominanteEntrada": 3.9,
-    "contraste": {
-      "entrada": 20.07,
-      "dominante": 20.05,
-      "cierre-frase": 20.36,
-      "nota": 20.16,
-      "cta": 11.12,
-      "descriptor": 20.38,
-      "logo": 13.73
-    },
-    "gapsTinta": [
-      {
-        "entre": "entrada→dominante",
-        "px": 17,
-        "ratioDominante": 0.121
-      },
-      {
-        "entre": "dominante→cierre",
-        "px": 17,
-        "ratioDominante": 0.121
-      }
-    ],
-    "seleccion": {
-      "selection": {
-        "variant": "eight-handles",
-        "padding": "standard",
-        "paddingRatio": {
-          "inline": 0.012,
-          "block": 0.01
-        },
-        "overlay": "subtle",
-        "overlayOpacity": 0.1,
-        "overlayBlendMode": "luminosity"
-      },
-      "cursores": [
-        {
-          "id": "tu",
-          "labelBounds": {
-            "left": 988.992,
-            "top": 1505.984,
-            "right": 1083.733,
-            "bottom": 1537.192
-          }
-        }
-      ]
-    }
-  },
-  {
-    "id": "mo3-no-creernos-916",
-    "dominante": [
-      "48% ya responde."
-    ],
-    "ratioDominanteEntrada": 3.9,
-    "contraste": {
-      "entrada": 19.35,
-      "dominante": 19.4,
-      "cierre-frase": 19.71,
-      "nota": 19.58,
-      "cta": 10.73,
-      "descriptor": 19.58,
-      "logo": 19.44
-    },
-    "gapsTinta": [
-      {
-        "entre": "entrada→dominante",
-        "px": 17,
-        "ratioDominante": 0.121
-      },
-      {
-        "entre": "dominante→cierre",
-        "px": 17,
-        "ratioDominante": 0.121
-      }
-    ],
-    "seleccion": null
-  },
-  {
-    "id": "mo1-canal-nuevo-169",
-    "dominante": [
-      "−68% de clics."
+      "Cerrarlo es otra cosa."
     ],
     "ratioDominanteEntrada": 3.5,
     "contraste": {
-      "entrada": 19.32,
-      "dominante": 19.46,
-      "cierre-frase": 19.59,
-      "nota": 19.58,
-      "cta": 10.85,
-      "descriptor": 19.91,
-      "logo": 7.09
+      "entrada": 19.71,
+      "dominante": 19.75,
+      "cierre-frase": 19.86,
+      "nota": 19.85,
+      "cta": 10.93,
+      "descriptor": 19.97,
+      "logo": 9.75
     },
     "gapsTinta": [
       {
         "entre": "entrada→dominante",
-        "px": 13,
-        "ratioDominante": 0.116
+        "px": 17,
+        "ratioDominante": 0.135
       },
       {
         "entre": "dominante→cierre",
-        "px": 13,
-        "ratioDominante": 0.116
+        "px": 15,
+        "ratioDominante": 0.119
       }
     ],
     "seleccion": null
   },
   {
-    "id": "mo2-no-te-citan-169",
+    "id": "b2-primero-el-numero-169",
     "dominante": [
-      "+35% de clics."
+      "Cerrarlo es otra cosa."
     ],
     "ratioDominanteEntrada": 3.5,
     "contraste": {
-      "entrada": 20.49,
-      "dominante": 20.49,
-      "cierre-frase": 20.52,
-      "nota": 20.19,
-      "cta": 11.24,
-      "descriptor": 20.61,
-      "logo": 13.1
-    },
-    "gapsTinta": [
-      {
-        "entre": "entrada→dominante",
-        "px": 13,
-        "ratioDominante": 0.116
-      },
-      {
-        "entre": "dominante→cierre",
-        "px": 13,
-        "ratioDominante": 0.116
-      }
-    ],
-    "seleccion": null
-  },
-  {
-    "id": "mo3-no-creernos-169",
-    "dominante": [
-      "48% ya responde."
-    ],
-    "ratioDominanteEntrada": 3.5,
-    "contraste": {
-      "entrada": 19.13,
-      "dominante": 19.28,
-      "cierre-frase": 19.42,
-      "nota": 19.54,
-      "cta": 10.79,
-      "descriptor": 19.81,
-      "logo": 15.84
+      "entrada": 19.2,
+      "dominante": 19.12,
+      "cierre-frase": 19.3,
+      "nota": 19.31,
+      "cta": 10.67,
+      "descriptor": 19.6,
+      "logo": 19.35
     },
     "gapsTinta": [
       {

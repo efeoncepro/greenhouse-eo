@@ -10,7 +10,7 @@ seasonality) · [CDR-005](decisions/CDR-005-cmp001-embudo-momento-y-accion.md) (
 | # | Input | Por qué bloquea | Quién lo da |
 |---|---|---|---|
 | **I1** | **Presupuesto y su techo mensual** | Sin monto no hay reparto, ni CPL objetivo, ni criterio de corte. Un plan sin techo es una lista de deseos (CDR-001) | operador |
-| **I2** | **Qué cuentas de pauta existen y con qué acceso** | 🔴 **No hay ninguna documentada en el repo.** Ni Meta, ni LinkedIn, ni Google Ads. El plan asume plataformas que quizá no estén abiertas | operador |
+| **I2** | Cuentas de pauta | ✅ **Meta conectado por MCP** *(operador, 2026-09-22)*. 🔴 LinkedIn y Google Ads siguen sin confirmar, y ninguna está documentada en el repo | operador |
 | **I3** | Las dos decisiones abiertas de CDR-006 | canonical de AEO (B1) y cómo se dirige el clic BOFU a la agenda (B2) | operador + sitio público |
 
 ✅ **Lo que sí está verificado:** GA4 `G-KYPPY57M14` y GTM `GTM-K2X4ZTTK` existen en el sitio. Los formularios
@@ -35,12 +35,11 @@ entrega al más barato y deja de alimentar el embudo.
 |---|---|---|---|---|
 | `CMP-001-TOFU` | alcance / tráfico | **frío** — ICP mid-market y enterprise LATAM | **9** (3 conceptos × 3 ratios) | diagnóstico gratis |
 | `CMP-001-MOFU` | tráfico / consideración | retargeting TOFU + visitantes sin conversión | **9** | panel competitivo |
-| `CMP-001-BOFU-SEO` | **conversión** | retargeting MOFU + visitantes de landing SEO | 3 *(a reescribir, CDR-006)* | landing SEO → Growth Form |
-| `CMP-001-BOFU-AEO` | **conversión** | retargeting MOFU + visitantes de landing AEO | 3 *(a reescribir)* | landing AEO → **agenda discovery** |
+| `CMP-001-BOFU-AEO` | **conversión** | retargeting MOFU + visitantes de landing AEO | **3** ✅ | `/aeo-2/` → **agenda discovery** |
 
-🔴 **BOFU son dos campañas, no una**, porque sus eventos de conversión son distintos y no valen lo mismo
-(CDR-006): un lead comercial en SEO contra una reunión agendada en AEO. Contarlos juntos hace que el
-optimizador persiga el más barato.
+**Alcance reducido a AEO** por decisión del operador (CDR-006 §Delta). La razón por la que SEO y AEO habrían
+sido campañas separadas sigue vigente si la línea SEO vuelve: sus eventos de conversión no valen lo mismo —un
+lead comercial contra una reunión agendada— y contarlos juntos hace que el optimizador persiga el más barato.
 
 ## 2. El reparto cambia en el tiempo, no es una tabla fija
 
@@ -98,5 +97,5 @@ rotación del punto 3 se decide a ojo.
 |---|---|
 | TOFU 9 piezas | ✅ aprobadas |
 | MOFU 9 piezas | ✅ aprobadas |
-| BOFU-SEO y BOFU-AEO, 3 ratios cada una | 🔴 **a reescribir** tras I3: el copy depende de la acción que ofrezca la landing |
+| BOFU-AEO, 3 ratios | ✅ **producidas** — copy tomado de la propia landing, CTA a la agenda |
 | Variantes de rotación Nov–Dic | 🔴 no producidas |

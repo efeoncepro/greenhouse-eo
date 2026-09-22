@@ -1,6 +1,6 @@
 # CDR-006 · CMP-001: BOFU pasa a campaña de conversión, con destino a las landings de servicio
 
-**Estado:** `Proposed` · **Fecha:** 2026-09-22 · **Decide:** el operador · **Campaña:** CMP-001 «La IA dice de ti»
+**Estado:** `Accepted` *(alcance reducido a AEO el 2026-09-22)* · **Fecha:** 2026-09-22 · **Decide:** el operador · **Campaña:** CMP-001 «La IA dice de ti»
 · **Ámbito:** objetivo, destino, estructura y medición del nivel BOFU.
 
 ## Contexto
@@ -107,3 +107,41 @@ El copy nuevo se escribe **después** de resolver B2, porque la acción que ofre
 - Carril de sitio público — corrección del canonical AEO (B1) y la acción de conversión BOFU (B2).
 - [`CDR-001`](CDR-001-cmp001-always-on-q4-2026.md) — ventana, permisos y derechos ya resueltos; el media plan y
   el plan de tracking siguen pendientes y este CDR los condiciona.
+
+
+## Delta 2026-09-22 — alcance reducido a AEO, y B1/B2 resueltos
+
+**Decisión del operador: BOFU se hace sólo con la página de AEO.** La línea SEO queda fuera de este alcance;
+si vuelve, hereda este mismo contrato.
+
+**B1 resuelto — el destino es `https://efeoncepro.com/aeo-2/`**, la URL canónica. Pautar a `/servicios/aeo/`
+sería mandar tráfico pagado a una página que declara que la buena es otra: parte la atribución del servicio que
+se está vendiendo. El costo es un slug sin significado, que en un anuncio viaja dentro del botón y casi no se
+ve. **Si el canonical se corrige más adelante, el destino se mueve a `/servicios/aeo/` sin tocar el creativo.**
+
+**B2 resuelto por el copy, no por la landing.** La página ofrece diagnóstico (TOFU) y agenda discovery (BOFU),
+y su sección de cierre es el diagnóstico. En vez de pedir un cambio de página, **el anuncio nombra la acción
+que queremos**: el CTA dice `Agenda tu discovery` y el descriptor `AEO para LatAm · 30 minutos`. Quien llega
+sabe a qué va antes de aterrizar.
+
+**El mensaje sale de la propia landing**, que es lo que evita la incoherencia que este CDR advertía: una de sus
+secciones dice *«Un tablero te muestra el problema. Cerrarlo es otra cosa»* — el paso exacto después del panel
+de MOFU.
+
+| | |
+|---|---|
+| entrada | El tablero ya te mostró el problema. |
+| **titular** | **Cerrarlo es otra cosa.** |
+| remate | Eso es lo que **operamos**. |
+| beneficio | Método, no improvisación: los seis motores, cada mes. |
+| CTA · descriptor | `Agenda tu discovery` · AEO para LatAm · 30 minutos |
+
+**URL con tracking** (convención del media plan):
+
+```
+https://efeoncepro.com/aeo-2/?utm_source=meta&utm_medium=paid_social
+  &utm_campaign=cmp001_bofu_aeo&utm_content=<pieza>_<ratio>&utm_term=retarget_mofu
+```
+
+⚠️ **Los ids internos de las piezas siguen diciendo `b2-primero-el-numero`**, del copy anterior. No se renombran
+porque el id ancla el `layout.json` y el `subjectProtection` medido; **el id es interno y no viaja al anuncio.**
