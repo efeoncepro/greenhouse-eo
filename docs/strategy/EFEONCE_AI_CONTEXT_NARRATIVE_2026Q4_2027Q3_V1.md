@@ -255,6 +255,14 @@ Las fechas de eventos 2027 se confirman antes de amarrar hitos.
 - **Sistema de mascota intercambiable:** Nexa es central (versión humana con hoodie Efeonce). El hombro lleva **una sola
   mascota de partner por imagen** (Clawd de Claude hoy; Codex Pet de OpenAI después), nunca dos mascotas de terceros
   juntas. El nombre y color del cursor colaborador y la insignia de partner cambian junto con la mascota.
+- **Gigi (Google Gemini) no ocupa el hombro: es la máquina que responde.** Desde el 2026-09-21 existe su biblioteca
+  3D —tercera mascota de partner, después de Clawd y Codex— y su papel en esta narrativa es otro: Gigi **no es quien
+  hace marketing**, es el motor que contesta cuando alguien pregunta por la categoría. Por eso es la única con una
+  **familia propia de búsqueda y AEO** (8 vistas: la pregunta, la respuesta con citas, «no te conoce», el podio de
+  Share of Voice, leyendo tu sitio, datos estructurados, la entidad y el diagnóstico) que alimenta el **capítulo 3 ·
+  Lo que la IA dice de ti** y la Radiografía AEO. Su vista `aeo-03-no-te-conoce` —una tarjeta de respuesta completamente vacía, el
+  objeto más grande del cuadro— es el **key visual literal del paraguas**. Ninguna utilería lleva letras ni números.
+  Ficha y reglas: [bibliotecas de mascotas de partners](../operations/social/PARTNER_MASCOT_POSE_LIBRARIES.md).
 - **Riesgo de lectura:** el cursor «Claude» sobre «tu negocio» con la mascota confundida puede leerse como «la IA del
   partner no sirve». Mitigación: el copy ubica el problema en el contexto, no en la capacidad («Claude razona
   increíble. Nadie le ha contado cómo funciona tu empresa.»), y se valida contra la guía de marca del partner antes de
@@ -276,6 +284,8 @@ Detalle: [bitácora de producción](../operations/social/2026-09-17-kv-tu-ia-no-
 8. Archivar la guía de marca de Anthropic y validar Clawd 3D, el «?» y el cursor «Claude» antes de pautar.
 9. Versión Codex Pet del KV (sistema modular listo; pieza no producida) tras recibir la guía de marca de OpenAI.
 10. Readback de publicación del KV el 2026-09-21 (confirmar `PUBLISHED` y URL pública).
+11. Archivar la guía de marca de Google y validar el uso de Gigi 3D antes de pautar. Hoy su uso es **interno y
+   orgánico**: Gigi es propiedad de Google, igual que Clawd lo es de Anthropic y Codex de OpenAI.
 
 ## 10. Evidencia y estado de verificación (corte ampliado 2026-09-18)
 

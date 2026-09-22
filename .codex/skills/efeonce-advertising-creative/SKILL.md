@@ -151,6 +151,17 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
   tercero legible**, un objeto manda por escena. Canon:
   [props tecnológicos](../../../docs/operations/brand-photography/NEXA_TECH_PROPS_V1.md).
 
+- 🔴 **Con Gigi en cuadro, el sistema de color de la pieza ya está decidido** (2026-09-21). Gigi —mascota de
+  Google Gemini y tercera mascota de partner con biblioteca 3D, después de Clawd y Codex— no «porta un color»:
+  **es el espectro completo de Google** (rojo en la punta, azul dominante, verde-lima abajo, y su contorno de
+  tinta negra dibujado a mano como firma). Por eso es el **único acento de color** de la pieza y Efeonce vive en
+  el **navy y la estructura**; buscar otro portador para el azul de Efeonce compite con un degradado de tres
+  colores y pierde. Si hay ropa Efeonce en la misma pieza, prohibir explícitamente el degradado arcoíris y la
+  punta enroscada sobre la prenda, **sin describir nuestro emblema** —describirlo lo tergiversa: manda la
+  referencia del kit—. Gigi es propiedad de Google: interpretación 3D de uso interno y orgánico, y orgánico
+  aprobado **no** es pauta (antes de pautar, validar contra su guía de marca). Poses, familia AEO y reglas de
+  producción: [`mascot-3d-pose-library.md`](../greenhouse-ai-image-generator/references/mascot-3d-pose-library.md).
+
 - Usa archivos tipográficos reales y `font-synthesis: none`; no simules cursiva, bold ni Guttery con otra
   familia. Si falta el archivo autorizado, detén esa capa y usa una receta permitida que sí exista.
 - Bricolage puede dominar titulares; Poppins ordena apoyo, continuidad y énfasis breve; Guttery funciona como

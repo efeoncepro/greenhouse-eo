@@ -20,7 +20,7 @@ Todos viven en OneDrive `5. Contenidos/`:
 | Credencial | `13- Branding/Lanyard Efeonce/v01/` | Lanyard, yoyo, portacarnet y carnet |
 | Hoja maestra | `13- Branding/efeonce-kit-marca-fisica-v01-A4.png` | Vista general y reglas |
 | Personas del equipo | `13- Branding/Equipo/<Nombre>/v01/` | Identidad de una persona real |
-| Mascotas de partners | `14. Mascotas de partners/` | Clawd, Codex, sprocket |
+| Mascotas de partners | `14. Mascotas de partners/` | Clawd, Codex, Gigi, sprocket |
 | Nexa | `10. Nexa (Influencer IA)/` | Identidad y poses de Nexa |
 
 Cada kit trae un **manifiesto** que dice qué es cada vista y **cuándo usarla**. Leerlo antes de elegir.
@@ -179,3 +179,25 @@ corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida
 > `ai-generations/2026-09-17_polo-efeonce/estampa-espalda.mjs` (hilo blanco sobre el navy, hilo navy
 > sobre el blanco) y las cinco vistas de espalda están rehechas como `-v02-`; **las `-v01-` de espalda
 > quedan obsoletas**.
+
+
+## Delta 2026-09-21 — Gigi (Google Gemini), tercera mascota de partner
+
+En `14. Mascotas de partners/Gigi (Google Gemini)/` hay **24 vistas × fondo de estudio y transparente**: los mismos
+8 ángulos y 8 accesorios de servicio de Clawd y Codex, más una familia propia, `Poses 3D busqueda y AEO/v01/`, que
+ninguna otra mascota tiene —porque **Gigi no es quien hace marketing: es la máquina que responde**—. Nombre:
+`efeonce-gigi-3d-<vista>-1x1-1600x1600-v01-{fondo-estudio|transparente}.png`, con `aeo-` en la vista para esa
+familia. Ficha comparada en [bibliotecas de mascotas de partners](PARTNER_MASCOT_POSE_LIBRARIES.md).
+
+- 🔴 **Gigi es el único acento de color de la pieza.** No «porta un color»: **es el espectro completo de Google**
+  (rojo `#D93B2B` → azul `#3B7DF5` en dos tercios → verde-lima `#9ED957`, con el contorno de tinta negro `#1E2021`
+  como firma). Con ella en cuadro, Efeonce vive en el **navy y la estructura**; si hay ropa Efeonce en la misma
+  pieza, prohibir el degradado arcoíris y la punta enroscada sobre la prenda **sin describir nuestro emblema**
+  —describirlo lo tergiversa—: manda la referencia del kit.
+- 🔴 **Utilería clara sobre fondo claro no se recorta** (Δ 4 por canal contra tolerancia 18) y no hay tolerancia
+  que lo arregle: se pide en **hueso cálido `#D3C8B4`**, que sigue leyéndose «blanca». **Todo prop debe tocar al
+  personaje** y **nunca va un prop translúcido delante de la cara** (la lupa magnificó un arco del ojo y pareció un
+  tercer ojo, invisible en hoja de contacto). QA de la cara **al 100 %, pose por pose**.
+- **Gobernanza:** es propiedad de Google, como Clawd de Anthropic y Codex de OpenAI. Uso **interno y orgánico**;
+  orgánico aprobado ≠ pauta, y antes de pautar se valida la guía de marca de Google. **Una sola mascota de partner
+  por imagen** por defecto.

@@ -68,7 +68,7 @@ parecidos, nombres de lugares ficticios registrados, capturas o fotogramas, recr
 literales de la UI del juego. Los nombres de producto sólo como referencia nominativa en el texto. Dibujar la UI
 propia (estrellas, tarjetas, íconos genéricos) en vez de imitar la del juego. **Orgánico** con estas reglas: OK.
 **Pauta**, boost o uso comercial ampliado: revisión previa con `legal-privacy-ip-operator`; incluye validar con las
-guías de marca de partners cualquier mascota de terceros (Clawd, Codex) que aparezca.
+guías de marca de partners cualquier mascota de terceros (Clawd, Codex, Gigi) que aparezca.
 
 Escribir una frase por pregunta:
 
@@ -206,12 +206,16 @@ activos canónicos como referencia de forma (edición con `--image`, intención 
 | Nexa | **hoy:** `ai-generations/_identidad-nexa/1-anclas/` vía `foto:prompt` · *(el 2026-09-19 fue `2026-09-17_nexa-logo-estudio/refs/nexa-cuerpo-completo-v2.png`, ruta retirada)* + hoodie de `ai-generations/2026-09-17_hoodie-efeonce/final/` | color nombrado (`deep navy #023c70, not royal blue`); la v1 salió azul rey |
 | Logo 3D monumental | kit `ai-generations/2026-09-17_efeonce-logo-3d/kit/monumental-blanco/` (frente o contrapicado) + `ai-generations/2026-09-17_efeonce-logo-3d/ref/logo-silueta.png` | contrato de prompt del kit |
 | Nave | OneDrive `13- Branding/Nave Efeonce 3D/Blanco/Angulos 3D/v01/` vistas 01 y 17 | ventanas, esfera, aleta y cortes de la órbita |
-| Mascotas de partners | OneDrive `14. Mascotas de partners/<Clawd (Claude)\|Codex (OpenAI)>/Poses 3D con accesorios/v01/` | fidelidad de silueta y accesorio |
+| Mascotas de partners | OneDrive `14. Mascotas de partners/<Clawd (Claude)\|Codex (OpenAI)\|Gigi (Google Gemini)>/Poses 3D con accesorios/v01/` — Gigi suma `Poses 3D busqueda y AEO/v01/`, la familia de la máquina que responde | fidelidad de silueta y accesorio |
 
 Hasta cuatro referencias en una sola pasada funcionaron (Clawd + Codex + logo + silueta). QA obligatorio por
 activo, recortado al 100 %: **letra por letra** para el logo (letras, órbita con sus cortes), color sin deriva,
 perspectiva coherente. Donde el logo 3D ya es héroe, la firma es la URL (`url-lum.svg`), no un segundo logo plano.
 Dos mascotas de partners juntas sólo con pedido explícito del operador (la regla del KV paraguas dice una).
+Con **Gigi** en cuadro, el color de la pieza ya está tomado: es el espectro completo de Google, así que ella es el
+único acento de color y Efeonce vive en el navy y la estructura. Si hay ropa Efeonce en la misma pieza, prohibir
+explícitamente el degradado arcoíris y la punta enroscada sobre la prenda, **sin describir nuestro emblema**:
+describirlo lo tergiversa, manda la referencia del kit.
 
 Una marca no tiene que apropiarse de un objeto ritual para estar presente. En contexto cultural, investigar y
 respetar la función de los elementos; no estampar retratos, alimentos u objetos sagrados para resolver branding.

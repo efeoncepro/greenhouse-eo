@@ -93,3 +93,19 @@ Las reglas ya están en las skills `efeonce-advertising-creative` (bloque `prese
 - **Riesgo de lectura del cursor «Claude»:** vigilar comentarios tras la publicación; la mitigación depende del caption.
 - **Versión Codex Pet:** el sistema modular la admite; no está producida.
 - Nexa y Clawd son generados; el rostro de Nexa se validó a ojo contra sus referencias.
+
+## Delta 2026-09-21 — hay una tercera mascota de partner, y su papel aquí no es el hombro
+
+El sistema modular de §2 enumeraba dos ocupantes para el hombro (Clawd hoy, Codex Pet después). Desde el
+2026-09-21 existe una tercera biblioteca 3D de mascota de partner: **Gigi**, la mascota oficial de **Google
+Gemini** ([ficha comparada](PARTNER_MASCOT_POSE_LIBRARIES.md);
+[producción](../../../ai-generations/2026-09-21_gigi-poses-3d/LEEME.md)). **No cambia nada de lo producido en esta
+corrida**, pero sí evita una lectura equivocada del sistema modular:
+
+- **Gigi no es intercambiable con Clawd y Codex en el hombro.** En esta narrativa **no es quien hace marketing: es
+  la máquina que responde**. Por eso tiene una familia propia de búsqueda y AEO (8 vistas) que ninguna otra
+  mascota tiene, y su key visual es `aeo-03-no-te-conoce` —una tarjeta de respuesta completamente vacía—, que dice
+  el paraguas sin apoyarse en el gesto de «no sé» del hombro.
+- **Sigue vigente la regla del operador:** una sola mascota de partner por imagen; nunca dos de terceros juntas.
+- **Mismo gate de pauta:** Gigi es propiedad de Google y su uso es interno y orgánico; validar la guía de marca de
+  Google antes de pautar, igual que los pendientes de Anthropic y OpenAI en §5.

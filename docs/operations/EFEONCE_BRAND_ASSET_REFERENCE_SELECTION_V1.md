@@ -2,7 +2,8 @@
 
 > **Tipo de documento:** Contrato operativo de producción
 > **Versión:** 1.1 · **Creado:** 2026-09-21 por Claude, dictado por el operador (Julio Reyes)
-> **Última actualización:** 2026-09-21 — delta de la corrida `copiloto` (Nexa + Clawd), al final del documento
+> **Última actualización:** 2026-09-21 — deltas de la corrida `copiloto` (Nexa + Clawd) y de la corrida de **Gigi**
+> (Google Gemini, tercera mascota de partner), al final del documento
 > **Aplica a:** toda pieza generada donde aparezca un asset de marca Efeonce — ropa corporativa, lanyard,
 > merch, logo 3D, isotipo 3D, nave, mascotas de partners
 > **Relacionado:** [guía de kits](social/EFEONCE_BRAND_KITS_USAGE_GUIDE_V1.md) · [kit de prendas](../../.claude/skills/greenhouse-ai-image-generator/references/garment-reference-kit.md) · [lenguaje fotográfico](brand-photography/README.md) · [caso fuente](../../ai-generations/2026-09-21_lanyard-deterministico/LEEME.md)
@@ -35,12 +36,16 @@ inventar una vista: casi siempre ya está.
 | `2026-09-17_clawd-poses-3d` (mascota) | 16 | 8 | — | — |
 | `2026-09-17_codex-poses-3d` (mascota) | 16 | 8 | — | — |
 | `2026-09-17_sprocket-3d` (mascota HubSpot) | 16 | 8 | — | — |
+| `2026-09-21_gigi-poses-3d` (mascota Google Gemini) | 48 | 24 | — | — |
 | `2026-09-17_efeonce-logo-3d` | 414 archivos en `kit/`, por **escala × color** | — | LEEME | `prueba/` |
 
 Los kits 3D traen **ocho poses o ángulos** cada uno —frente héroe, tres cuartos izquierda y derecha,
 perfil, contrapicado, cenital, espalda, y una de acción— **cada una con fondo de estudio y
-transparente**. El logo 3D está además resuelto por **escala** (pequeña, mediana, grande, monumental)
-**y color** (blanco, navy), porque una pieza monumental y una de sobremesa no se iluminan igual.
+transparente**. **Gigi es la excepción y entró el mismo día, después de esa medición** —el total de 279 no la
+incluye—: trae **24 vistas**, los mismos 8 ángulos, los mismos 8 accesorios de servicio y **8 propias de
+búsqueda y AEO** que ninguna otra mascota tiene (ver delta al final). El logo 3D está además
+resuelto por **escala** (pequeña, mediana, grande, monumental) **y color** (blanco, navy), porque una
+pieza monumental y una de sobremesa no se iluminan igual.
 
 ## 2. Las tres clases de asset, y para qué sirve cada una
 
@@ -258,3 +263,59 @@ caja **13×24 en (490,679)**, alfa con `blur(0.6)`.
 **Por qué fallaron los dos intentos anteriores: se estimó el tamaño a ojo en vez de medirlo.** Uno se comió el
 punto del signo y tapó la cabeza; el otro dejó restos arriba y abajo. Es exactamente el error de §5 —«ninguna
 medida se estima a ojo»— trasladado a la reparación: **la caja del parche es una medida como cualquier otra.**
+
+---
+
+## Delta 2026-09-21 — lo que enseñó la corrida de Gigi (tercera mascota de partner)
+
+> **Fuente:** `ai-generations/2026-09-21_gigi-poses-3d/LEEME.md`. **Gigi** es la mascota oficial de **Google
+> Gemini** —nombre y grafía elegidos por votación de fans, ago-2025, para la campaña *back-to-school*— y es la
+> **tercera mascota de partner** con biblioteca 3D, después de **Clawd** (Anthropic) y **Codex** (OpenAI). El
+> sprocket de HubSpot no cuenta: es un logo, no una mascota. Los cuatro puntos de abajo **extienden** este
+> contrato; ninguno lo excepciona.
+
+### 11. Si la mascota no está en el binario ni en el bundle de la app, la fuente es el estudio que la diseñó
+
+Extiende §6 («abrir el LEEME y el manifiesto antes del prompt») al paso anterior: **de dónde sale la forma**.
+
+🔴 **Gigi NO está en el producto.** `/Applications/Gemini.app` no la trae; `Resources/GelIdle.mp4` (412×456, 30 s)
+parecía prometerla y resultó ser el **degradado aurora azul del asistente**, verificado extrayendo y mirando los
+cuadros. **Es un personaje de CAMPAÑA**, así que la fuente correcta es el estudio que la creó para Google —
+**Gasta**, `https://www.gasta.org/portfolio/gemini-free/`, con los assets de producción: 7 MP4 + 1 GIF + 1 PNG. De
+ahí salió la **hoja de modelo oficial** (`dudes_05.mp4`, 1800×2000) con **15 siluetas canónicas**, el equivalente
+del spritesheet de Codex.
+
+**Regla generalizable:** buscar «<personaje> portfolio / case study», no imágenes sueltas.
+
+### 12. Utilería clara sobre fondo claro no se recorta, y se corrige en la GENERACIÓN **[medido]**
+
+Es §5 aplicada al matting: **una tolerancia no arregla un problema de contraste**. Props en `(222,221,223)` contra
+fondo `(218,217,220)` son **Δ 4 por canal** contra la tolerancia **18** de `fill-alpha-holes`: gorro, lente,
+audífonos y birrete volvieron como agujeros. Se corrige pidiendo la utilería en **hueso cálido `#D3C8B4`**
+(Δ ≈ 40), que sigue leyéndose «blanca».
+
+Dos reglas hermanas de la misma corrida:
+
+- 🔴 **Todo prop debe TOCAR al personaje.** Un objeto suelto se lo come el matting: la chispa de 4 puntas de la
+  pose «idea» volvía sin ella hasta que se pidió que tocara la punta.
+- 🔴 **Nunca un prop translúcido delante de la cara.** La lupa v01 magnificó un arco del ojo y Gigi parecía tener
+  tres ojos. **Invisible en hoja de contacto**: a ~1100 px un arco duplicado se lee como sombra. El QA de la cara
+  se mira **al 100 %, pose por pose**.
+
+### 13. Gigi se queda con el sistema de color de la pieza **[regla dura]**
+
+Extiende §4 («lo sensible se compone») al **color**: Gigi no «porta un color», **es el espectro completo de
+Google** —rojo `#D93B2B` en la punta → magenta/violeta → **azul `#3B7DF5` dominando dos tercios** → verde-lima
+`#9ED957` abajo a la izquierda, con el contorno de tinta negro `#1E2021` dibujado a mano como firma—.
+
+🔴 Con ella en cuadro, buscar otro portador para el azul de Efeonce es competir con un degradado de tres colores y
+perder. Lo correcto: **Gigi es el ÚNICO acento de color** y Efeonce vive en el **navy y la estructura**. Si hay
+ropa Efeonce en la misma pieza, prohibir explícitamente el degradado arcoíris y la punta enroscada sobre la
+prenda, **sin describir nuestro emblema** (describirlo lo tergiversa; manda la referencia del kit).
+
+### 14. Gobernanza: es propiedad de Google
+
+🔴 Igual que Clawd (Anthropic), Codex (OpenAI) y el sprocket (HubSpot), la Gigi 3D es una **interpretación** de la
+mascota de un tercero, de **uso interno y orgánico**. **Orgánico aprobado ≠ pauta:** antes de pautar hay que
+validar contra la **guía de marca de Google**. Sigue vigente **una sola mascota de partner por imagen** por
+defecto; juntas sólo con pedido explícito del operador.

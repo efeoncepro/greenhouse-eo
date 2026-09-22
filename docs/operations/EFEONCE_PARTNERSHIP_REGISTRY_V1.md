@@ -2,7 +2,7 @@
 
 > **Estado:** `Activo — requiere actualización por evidencia`
 > **Owner:** Strategy + Commercial + práctica dueña + Finance/Legal
-> **Última revisión:** 2026-09-19 (programmatic: Real Audiences y Basis); 2026-09-10 (plataformas publicitarias y retail media); resto 2026-08-28
+> **Última revisión:** 2026-09-21 (uso de la mascota Gigi / Google Gemini); 2026-09-19 (programmatic: Real Audiences y Basis); 2026-09-10 (plataformas publicitarias y retail media); resto 2026-08-28
 > **Empresa:** Efeonce Group SpA · RUT 77.357.182-1 · 55 personas · Santiago, Chile
 > **Contacto operativo:** Julio César Reyes Rangel, CEO · `julio.reyes@efeonce.org`
 
@@ -32,7 +32,7 @@ estado por relación, la evidencia observable y el siguiente paso.
 
 | Relación | Programa o vía | Estado al 2026-08-28 | Rol para Efeonce | Próximo paso / owner | Evidencia |
 | --- | --- | --- | --- | --- | --- |
-| **Google Cloud** | Google Cloud Partner Network / Partner Network Hub | **Partner registrado**. Todas las rutas visibles aparecen como `Registrado`; debida diligencia `En curso`; no hay nivel Select/Premier/Diamond activo | Rail enterprise, Cloud/AI, Services y posible Co-sell | Completar due diligence y revisar requisitos de nivel; owner: Julio | [ficha detallada](#google-cloud) |
+| **Google Cloud** | Google Cloud Partner Network / Partner Network Hub | **Partner registrado**. Todas las rutas visibles aparecen como `Registrado`; debida diligencia `En curso`; no hay nivel Select/Premier/Diamond activo | Rail enterprise, Cloud/AI, Services y posible Co-sell. Aparte del programa: desde el 2026-09-21 existe una biblioteca 3D de **Gigi**, la mascota oficial de Google Gemini, usada en la narrativa «Tu IA no conoce tu negocio» | Completar due diligence y revisar requisitos de nivel; owner: Julio. **Gigi no se apoya en este programa**: es una interpretación 3D de una marca de terceros, de uso interno y orgánico — archivar la guía de marca de Google y validarla antes de pautar cualquier pieza con ella (2026-09-21) | [ficha detallada](#google-cloud) |
 | **Google for Education / Chrome** | Partner Advantage / Chrome y soluciones de administración | Onboarding iniciado; credenciales y autorizaciones no confirmadas | Educación, Chrome Enterprise y distribución | Verificar si sigue siendo una vía estratégica separada de Google Cloud | Correo de Arthur Guedes, 2025-11-17 |
 | **Google Ads** | Google Partners | Bienvenida recibida en 2024; badge y estado actual no verificados. Requisitos vigentes verificados 2026-09-10: optimization score ≥70% en la cuenta de administrador, USD 10.000 de gasto en 90 días y ≥50% de strategists certificados. Premier = top 3% del país: no es objetivo planificable | Performance & Commerce, ambos motions; piso de credibilidad | Verificar estado y cuenta de administrador en el portal de Partners; si cumple, mantener; owner: Julio + owner comercial de Performance | Correo `partners-noreply@google.com`, 2024-06-07; [market update 2026-09-10](../audits/commercial/PERFORMANCE_MEDIA_CHANNELS_PARTNERS_PRICING_RESEARCH_2026-09-10.md) |
 | **Meta** | Meta Business Partners | **No iniciado** (2026-09-10). El badge exige negocio verificado; los umbrales de gasto no son públicos | Performance & Commerce, motion A core | Verificar el negocio de Efeonce en Business Manager; no perseguir badge hasta tener volumen; owner por asignar | Market update 2026-09-10 |

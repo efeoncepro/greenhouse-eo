@@ -561,6 +561,14 @@ verificar **delta máximo 0** en la zona protegida. Receta y trampa de canales a
   imagen 1 del edit con «cada píxel = pila de 1×2 cubos» y material declarado; verificar silueta, ojos y extremidades
   contra el sprite antes de usarlo. Biblioteca completa (8 ángulos + 8 accesorios, recorte, QA, entrega y cómo
   aplicarlo a Nexa): [`references/mascot-3d-pose-library.md`](references/mascot-3d-pose-library.md).
+- **Si la mascota no está en el binario ni en el bundle de la app, no es de producto: es de campaña**, y la fuente
+  correcta es **el estudio que la diseñó**, no imágenes sueltas. Buscar «<personaje> portfolio / case study». Caso
+  Gigi (Google Gemini, 2026-09-21), la **tercera** mascota de partner con biblioteca 3D después de Clawd y Codex:
+  `/Applications/Gemini.app` no la trae —`GelIdle.mp4` es el degradado aurora del asistente, verificado mirando los
+  cuadros— y los assets de producción, incluida la **hoja de modelo oficial** con 15 siluetas canónicas, los publica
+  [Gasta](https://www.gasta.org/portfolio/gemini-free/), el estudio que la creó para el back-to-school de Gemini.
+  Sus tres reglas duras de utilería (tono hueso, prop que toca al personaje, nada translúcido sobre la cara) están en
+  la misma biblioteca.
 - **Cambiar el fondo detrás de una persona o mascota: regenerar, no recortar.** Repintar un muro alrededor de un
   sujeto con matte + máscara deja bordes «mordidos» en pelo y deforma partes finas o sueltas (el «?» de Clawd).
   Acabado profesional = plate nativo con el set nuevo, guiado por un **boceto de composición** de formas planas

@@ -185,6 +185,14 @@ negocio»**. Canon: [`EFEONCE_AI_CONTEXT_NARRATIVE_2026Q4_2027Q3_V1.md`](../../.
 - Riesgo de partner: la mascota confundida puede leerse «Claude no sirve». Mitigar en caption (el problema es el
   contexto, no la capacidad) y validar con la guía de marca del partner antes de pautar. Caso:
   [`LEEME.md`](../../../../ai-generations/2026-09-17_kv-tu-ia-no-conoce/LEEME.md).
+- **Gigi (Google Gemini) es la tercera mascota de partner** con biblioteca 3D, y entra con un papel distinto:
+  no es quien hace marketing, es **la máquina que responde**. Por eso tiene una familia propia de 8 poses de
+  búsqueda y AEO que Clawd y Codex no tienen —la pregunta, la respuesta con citas, el podio, el diagnóstico— y
+  `no-te-conoce` (una tarjeta completamente vacía) es el KV del capítulo. Sigue valiendo una sola mascota de
+  partner por imagen. 🔴 **Gigi se queda con el sistema de color de la pieza:** no «porta un color», es el
+  espectro completo de Google, así que con ella en cuadro es el **único acento de color** y Efeonce vive en el
+  navy y la estructura; buscar otro portador para el azul de Efeonce es competir con un degradado de tres colores
+  y perder. Es propiedad de Google: interpretación 3D de uso interno y orgánico, y orgánico aprobado no es pauta.
 
 ## Coherencia con las skills hermanas del repo
 
