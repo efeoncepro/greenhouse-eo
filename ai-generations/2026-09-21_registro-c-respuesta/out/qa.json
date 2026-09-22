@@ -1,16 +1,32 @@
 [
   {
-    "id": "mo1-canal-nuevo",
+    "id": "mo1-canal-nuevo-916",
     "dominante": [
       "No es un canal nuevo."
     ],
     "ratioDominanteEntrada": null,
     "contraste": {
-      "dominante": 18.16,
-      "nota": 18.26,
-      "cta": 9.73,
-      "descriptor": 17.52,
-      "logo": 15.06
+      "dominante": 19.75,
+      "nota": 19.94,
+      "cta": 10.99,
+      "descriptor": 20.04,
+      "logo": 15.29
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "mo2-no-te-citan-916",
+    "dominante": [
+      "No te citan."
+    ],
+    "ratioDominanteEntrada": null,
+    "contraste": {
+      "dominante": 19.69,
+      "nota": 19.82,
+      "cta": 10.92,
+      "descriptor": 20.03,
+      "logo": 15.53
     },
     "gapsTinta": [],
     "seleccion": {
@@ -29,27 +45,75 @@
         {
           "id": "tu",
           "labelBounds": {
-            "left": 764.352,
-            "top": 1171.008,
-            "right": 837.204,
-            "bottom": 1202.216
+            "left": 988.992,
+            "top": 1505.984,
+            "right": 1083.733,
+            "bottom": 1537.192
           }
         }
       ]
     }
   },
   {
-    "id": "mo3-no-creernos",
+    "id": "mo3-no-creernos-916",
     "dominante": [
       "No tienes que creernos."
     ],
     "ratioDominanteEntrada": null,
     "contraste": {
-      "dominante": 18.15,
-      "nota": 18.48,
-      "cta": 10.22,
-      "descriptor": 18.94,
-      "logo": 19.69
+      "dominante": 19.38,
+      "nota": 19.58,
+      "cta": 10.69,
+      "descriptor": 19.49,
+      "logo": 19.44
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "mo1-canal-nuevo-169",
+    "dominante": [
+      "No es un canal nuevo."
+    ],
+    "ratioDominanteEntrada": null,
+    "contraste": {
+      "dominante": 19.32,
+      "nota": 19.59,
+      "cta": 10.86,
+      "descriptor": 19.92,
+      "logo": 7.09
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "mo2-no-te-citan-169",
+    "dominante": [
+      "No te citan."
+    ],
+    "ratioDominanteEntrada": null,
+    "contraste": {
+      "dominante": 20.39,
+      "nota": 20.29,
+      "cta": 11.25,
+      "descriptor": 19.11,
+      "logo": 13.1
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "mo3-no-creernos-169",
+    "dominante": [
+      "No tienes que creernos."
+    ],
+    "ratioDominanteEntrada": null,
+    "contraste": {
+      "dominante": 19.29,
+      "nota": 19.53,
+      "cta": 10.91,
+      "descriptor": 19.94,
+      "logo": 15.84
     },
     "gapsTinta": [],
     "seleccion": null

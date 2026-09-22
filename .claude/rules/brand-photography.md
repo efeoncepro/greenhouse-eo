@@ -69,6 +69,15 @@ en dos pasadas sin decir por qué**; el número que importa lo da `foto:componer
 real de la firma. **Regla: cuando el lecho falle y la luz ya esté fuera de él, sospecha de una superficie
 CLARA cerca — el reflejo llega donde la luz no.**
 
+✅ **Y el mismo fix apaga el tinte azul de las sombras** **[medido 2026-09-22 en los 9:16 de la misma serie]**.
+Un torniquete con pedestales de aluminio cepillado dio **lecho 3,33 ✗ y b\* −15,6 ✗** a la vez; pasar el
+pedestal a **negro mate** —sin tocar luz, encuadre ni fuente— lo dejó en **lecho 12,07 ✓ y b\* −1,7 ✓**.
+🔴 **Contraintuitivo y por eso vale escribirlo: el culpable NO era la fuente azul.** Con una sola luz
+azul-blanca en sala negra, la tentación es concluir que las sombras salen azules por física y dejarlo pasar;
+lo que las teñía era el **derrame rebotando en el metal claro**. El formato alto lo agrava porque hay más
+área de sombra y el promedio del cuartil oscuro se corre. **Dos reservas que fallan juntas suelen tener UNA
+causa: busca la superficie clara antes de tocar la luz.**
+
 🔴 **Tercera trampa, medida el 2026-09-22: la criatura cálida arrastra la pieza a los ochenta.** Es el reverso
 exacto del azul ajeno. Con **Clawd** (naranja terracota) en cuadro y la escena callada sobre temperatura, el
 modelo armoniza toda la iluminación hacia **tungsteno ámbar** y la pieza sale con look retro — envejecida,

@@ -1,0 +1,53 @@
+{
+  "canvas": {
+    "width": 2048,
+    "height": 1152
+  },
+  "elements": [
+    {
+      "id": "dominante",
+      "box": {
+        "left": 143,
+        "right": 725.5540755555555,
+        "top": 230.39999999999998,
+        "bottom": 344.00199999999995
+      }
+    },
+    {
+      "id": "nota",
+      "box": {
+        "left": 143.36,
+        "right": 980.828,
+        "top": 384.00199999999995,
+        "bottom": 465.722
+      }
+    },
+    {
+      "id": "cta",
+      "box": {
+        "left": 167.36,
+        "right": 591.7600000000001,
+        "top": 501.72200000000004,
+        "bottom": 545.562
+      }
+    },
+    {
+      "id": "descriptor",
+      "box": {
+        "left": 143.36,
+        "right": 555.6319999999998,
+        "top": 575.562,
+        "bottom": 604.15
+      }
+    }
+  ],
+  "typography": {
+    "lead": 36,
+    "dominant": 158,
+    "closure": 34,
+    "benefit": 36,
+    "cta": 40,
+    "descriptor": 28
+  },
+  "selection": null
+}

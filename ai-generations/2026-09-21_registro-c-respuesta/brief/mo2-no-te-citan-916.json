@@ -1,0 +1,23 @@
+{
+  "id": "mo2-no-te-citan-916",
+  "formato": "9:16",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    {
+      "objeto": "codex",
+      "vista": "frente"
+    }
+  ],
+  "escena": "SCENE (a long curved conference table in a dark room, seen straight on at table height): the table is a single slab of dark smoked glass over brushed anodised aluminium — contemporary, precise, no wood, no leather, no brass. Set into the table, spaced evenly across the whole width of the frame, are FIVE identical modern gooseneck delegate microphones: slim matte-black stems, small capsule heads, and around the base of each one a flush circular LED RING set into the glass. FOUR of those rings are DEAD — cold dark grey circles with no glow at all, their stems barely separating from the black. ONE ring, slightly right of centre, is ALIVE: a clean blue-white ring of light, crisp and even, bright enough to be the only real light source in the frame, throwing a hard pool onto the glass around it and a sharp reflection down into the slab. Standing at that one live position, only its upper half visible above the table edge, the small Codex figure from the reference faces front, lit from below by its own ring. The other four positions are EMPTY: no object, no creature, no figure, no silhouette behind any of them. The room behind falls to black: no audience, no chairs, no screens, no banners, no windows, no paper, no printed matter of any kind, no plants, no mugs. COLOUR: the whole frame is cool and contemporary — deep ink-blue blacks, the ring a clean blue-white, the metal neutral grey. Nothing in the scene is warm, amber, orange or golden; no tungsten, no candlelight, no retro glow. The live ring sits low in the frame; its light, its spill and every reflection it throws stay BELOW the middle of the image, while the upper third is an unbroken field of ink-blue darkness. Fine dust hangs in the light. 50mm lens at f/2.8, camera at table height. COMPOSITION FOR A TALL VERTICAL FRAME: everything described above sits in the LOWER HALF of the image; the entire UPPER HALF is empty unlit air — an unbroken field of ink-blue darkness with no object, no creature, no light patch and no reflection in it.",
+  "reservas": {
+    "texto": {
+      "muro": "the empty dark room above the table, unbroken and unlit",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the near edge of the smoked glass table in the immediate foreground, running unbroken across the whole width of the frame",
+    "tono": "dark smoked glass in full shadow, outside the ring light, holding a faint matte sheen"
+  }
+}
