@@ -861,32 +861,17 @@ describe('foto:prompt · el catálogo coincide con el lock de assets', () => {
 describe('foto:prompt · el catálogo de palancas', () => {
   const claves = Object.keys(PALANCAS as Record<string, unknown>)
 
-  it('tiene las veintisiete aprobadas y ninguna descartada ni pendiente', () => {
+  it('tiene las veinticuatro aprobadas y ninguna descartada ni pendiente', () => {
     // 24 desde el 2026-09-21: entra `copiloto` (la criatura de un partner comparte el gesto con la persona).
-    // 27 esa misma noche: entran las tres de física que pasaron su prueba —una pasada por palanca, USD 0,05
-    // cada una, sin identidad ni marca— de cinco propuestas.
-    expect(claves).toHaveLength(27)
+    expect(claves).toHaveLength(24)
 
-    // Se nombran para que quitarlas del catálogo ponga el test en rojo, no sólo cambiar la cuenta.
+    // Se nombra para que quitarla del catálogo ponga el test en rojo, no sólo cambiar la cuenta.
     expect(claves).toContain('copiloto')
-    for (const nueva of ['justo-antes', 'corte', 'sumergido']) expect(claves).toContain(nueva)
 
     // `doble-exposicion` no está descartada: quedó pendiente de un intento (el modelo produjo la
     // superposición, pero con un borde duro que su propio contrato prohíbe). Hasta que pase su
     // comprobación no entra al catálogo: aprobar una que falla su marcador vacía el criterio de todas.
-    // `estallido` está en la misma situación desde el 2026-09-21: la causa de su fallo es accionable
-    // (el motor no proyectó las sombras entre capas), así que espera una segunda pasada, no un entierro.
-    // `impacto` sí está descartada: el motor desobedece su marcador negativo.
-    for (const fuera of [
-      'bano-de-color',
-      'split-diopter',
-      'clave-baja',
-      'flash-duro',
-      'trama',
-      'doble-exposicion',
-      'estallido',
-      'impacto'
-    ]) {
+    for (const fuera of ['bano-de-color', 'split-diopter', 'clave-baja', 'flash-duro', 'trama', 'doble-exposicion']) {
       expect(claves).not.toContain(fuera)
     }
   })

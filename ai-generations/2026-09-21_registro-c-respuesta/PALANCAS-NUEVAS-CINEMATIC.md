@@ -3,8 +3,8 @@
 > **Encargo:** palancas que el catálogo **no tiene**, de impacto cinematográfico, para paid media del registro C.
 > **Contrato del canon:** marcadores verificables (qué se ve y qué NO), nunca magnitudes. Una palanca sin frase
 > de verificación **no está terminada**. Y el sistema de color va en todas.
-> **Estado:** 🔴 **PROBADAS el 2026-09-21 a las 21:14 — pasaron 3 de 5.** Veredicto medido en §8; la propuesta
-> original queda abajo sin retocar, para poder contrastar el pronóstico contra el resultado.
+> **Estado:** 🔴 **PROBADAS — 4 de 5 existen. NINGUNA APROBADA: esperan decisión del operador.**
+> Veredicto en §8. La propuesta original queda abajo sin retocar, para contrastar pronóstico contra resultado.
 
 ## Por qué éstas y no otras
 
@@ -143,50 +143,82 @@ re-probado con el marcador de imperfección.
 
 ---
 
-## 8. 🔴 Veredicto — probadas las cinco, pasaron tres **[2026-09-21, USD 0,25]**
+## 8. Veredicto — probadas las cinco **[2026-09-21]**
 
-Una pasada por palanca, `flare`, sin identidad ni objetos de marca. Salidas en `prueba-palancas/`.
+> **Procedencia, que es parte de la evidencia.** Las imágenes son de la corrida del hilo «Ads con lenguaje
+> fotográfico»: **USD 0,079 en total** —USD 0,066 las cinco primeras, USD 0,013 el segundo intento de
+> `estallido`—, **`gpt-image-2.5-flare`, 1024², medium**. Evidencia en `prueba-palancas/`. Esta sesión **no
+> generó ninguna**: las juzgó. Quien lea esta ficha en tres meses necesita saber qué se corrió, con qué modelo
+> y a qué tamaño para poder repetirlo o refutarlo.
+
+> 🔴 **Nada de esto está escrito en el catálogo ni en `build-prompt.mjs`, y así debe quedar hasta que el
+> operador apruebe.** Se escribió una vez sin aprobación y se revirtió entero (commits `a7f4ae8a5` y
+> `1ba3c8d0b`, revertidos la misma noche).
 
 | # | Palanca | Marcadores | Veredicto |
 |---|---|---|---|
-| 1 | `impacto` | **3 de 4** | ✗ **descartada** — el motor **añade la onda concéntrica que el bloque prohíbe** |
-| 2 | `justo-antes` | **4 de 4** | ✅ **al catálogo** |
-| 3 | `estallido` | **3 de 4** | ⏸ **a un intento** — sin sombras entre capas, se lee como render de CAD |
-| 4 | `corte` | **4 de 4** | ✅ **al catálogo**, con un reparo y una corrección de color |
-| 5 | `sumergido` | **4 de 4** | ✅ **al catálogo** — la mejor de las cinco |
+| 1 | `impacto` | **4 de 4** | existe · **reparo de criterio**: look de banco de imágenes |
+| 2 | `justo-antes` | **4 de 4** | existe, limpia |
+| 3 | `estallido` | 3 de 4 en la 1.ª · **4 de 4 en la 2.ª** | existe, **recuperada pidiendo imperfección** |
+| 4 | `corte` | **4 de 4** | existe · dos reparos menores |
+| 5 | `sumergido` | **4 de 4** | existe, la mejor de la tanda |
 
 **Sistema de color: lo aguantan las cinco.** Medido sobre los píxeles con color (saturación ≥ 0,10): azul entre
-**77 % y 94 %**, naranja entre **3,5 % y 22,7 %**, y prácticamente nada fuera de esos dos. El único color ajeno
-es la placa verde de `corte`, **0,5 %** — chico en área y grande en efecto, porque cae en el centro de interés.
-El `sumergido` es el que más acento gasta (22,7 %): cuenta para la dosis de 1 de cada 2.
+**77 % y 94 %**, naranja entre **3,5 % y 22,7 %**, casi nada fuera de esos dos. Único color ajeno: la placa verde
+de `corte`, **0,5 %** — chico en área y grande en efecto, porque cae en el centro de interés. `sumergido` es el
+que más acento gasta (22,7 %): cuenta para la dosis de 1 de cada 2.
 
-### Las dos que no pasaron fallaron de maneras distintas, y eso decide qué hacer con cada una
+### 🔴 Dos correcciones a un veredicto anterior de esta misma noche
 
-- **`impacto` no es «el motor no la hace»: la hace de MÁS.** La corona salió con sus puntas rematadas en gota
-  desprendida y sus satélites en el aire, o sea la física difícil estaba. Lo que el motor ignoró fue el marcador
-  **negativo** —«las ondas concéntricas todavía no existen»—: ampliando la base se ve el anillo de onda ya
-  formado alrededor. Es una clase de fallo que conviene tener nombrada, porque las descartadas anteriores
-  (baño de color, trama) fallaron por lo contrario: no llegaban. **Y la razón que pesa más es otra**: la corona
-  de líquido es **el cliché número uno del stock de alta velocidad**. Falla por el mismo lado que el canon ya
-  rechaza en otras piezas — no dice nada que no esté en cualquier banco de imágenes.
-- **`estallido` falló por una causa accionable, y por eso no se entierra.** Las cinco capas del teclado salieron
-  separadas, en su eje, sin hilos ni manos. Pero **sólo la base proyecta sombra**: ninguna capa la tira sobre la
-  de abajo, y sin esas sombras el despiece flota como un exploded view de CAD. Un solo cambio y otros USD 0,05:
-  pedir verbatim que **cada capa proyecte sombra visible sobre la capa inmediatamente inferior**, y que la
-  separación se lea por esa sombra, no sólo por el hueco. **La propuesta ya lo había anticipado** («el riesgo más
-  alto de las cinco: es la que más fácil se va a CGI»): acertó el diagnóstico antes de probar.
+Se escribió primero que `impacto` quedaba descartada porque **el motor añade la onda concéntrica que el bloque
+prohíbe**. **No se sostiene, y la corrección importa más que el caso**:
+
+- Un perfil de luminancia horizontal bajo la base, a tres alturas (y = 640, 680, 700; de x = 20 a x = 300), da
+  **plano: 16 a 20, sin una sola cresta**. La superficie alrededor está lisa.
+- Lo que hay es **un** rodete anular en el **cuello** de la corona, con brillo propio y un valle que lo separa
+  de la pared. Y **toda corona real lo tiene**.
+- El marcador decía «las ondas concéntricas todavía no existen», en plural, y **eso se cumple**.
+
+O sea: **el defecto era del marcador, que prohibía algo que la física exige — no del motor.** Dar por «causa
+medida» algo que no resiste es exactamente lo que vacía el criterio de todas las demás fichas del catálogo.
+Queda de `impacto` sólo el reparo de criterio, que **decide el operador**, no la medición: la corona de líquido
+es estética de banco de imágenes.
+
+Y **`estallido` no está a un intento: pasó.** `p3b-estallido-foto.png`, USD 0,013, se lee fotográfica sin
+discusión — grano, profundidad de campo real (capa cercana y lejana fuera de foco), polvo en las caras planas,
+cantos gastados, y una sombra proyectada compleja. El diagnóstico anterior («no proyecta sombras entre capas»)
+apuntaba al síntoma.
+
+### 🎯 El hallazgo, que es más ancho que las cinco palancas
+
+> **Cuando una palanca produce una escena imposible —partes flotando, un instante congelado—, el motor la
+> resuelve por defecto en el IDIOMA DEL RENDER**, porque de ahí vienen esas imágenes en su entrenamiento.
+> **La imperfección hay que pedirla explícitamente.**
+
+Lo que la recuperó, verbatim: polvo en las caras planas · micro-rayas y huellas · cantos gastados con brillo
+disparejo · grano de sensor · **profundidad de campo real** (capa cercana y lejana fuera de foco, el medio nítido).
+
+**Si esto entra, entra a nivel de FAMILIA, no de `estallido`.** Las tres que salieron limpias a la primera lo
+hicieron en parte por el material que les tocó —la pila trae textura de fieltro, el agua trae partículas—, no
+porque el bloque lo garantice. La próxima palanca con material liso vuelve a salir CGI y nadie va a saber por qué.
 
 ### El pronóstico, contrastado
 
-La apuesta de §7 fue `justo-antes` → `impacto` → `corte` → `estallido` → `sumergido`. El resultado:
-**acertó la primera y falló los dos extremos** — `sumergido`, que iba última y con la recomendación explícita de
-no empezar por ella, pasó limpia y es la mejor de la tanda; `impacto`, que iba segunda, quedó descartada. Vale
-registrarlo: **la intuición sobre qué hace bien el motor no es fiable, que es exactamente por qué existe la
-prueba de USD 0,05.**
+La apuesta de §7 fue `justo-antes` → `impacto` → `corte` → `estallido` → `sumergido`. `sumergido`, que iba
+última y con recomendación explícita de no empezar por ella, es la mejor de la tanda. **La intuición sobre qué
+hace bien el motor no es fiable, que es exactamente por qué existe la prueba barata.**
 
-### Qué quedó cableado
+### 🔴 Lo que hay que sopesar ANTES de aprobar, y no es de oficio
 
-Las tres aprobadas están en `PALANCAS` de `scripts/foto/build-prompt.mjs` (24 → **27 de encuadre**, 37 en total),
-cada una con su campo obligatorio —`cae`, `secciona`, `sumerge`—, su `ejemplo` y su guarda `contradice`
-verificada en los dos sentidos. Ficha completa de cada una, y las dos que no pasaron con su causa, en el
-[catálogo de palancas](../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
+> **Procedencia: viene de la investigación del otro hilo** (`.claude/skills/efeonce-advertising-creative/references/ad-creative-evidence-2026.md`,
+> `as-of 2026-09-21`), **no está verificado por esta sesión.** Pesa sobre la decisión, así que va acá:
+
+- **Medido por ausencia** —se buscó y no existe—: exploded view, cross-section/cutaway, high-speed (splash,
+  corona) y levitación **no tienen tendencia premiada 2025-2026**. Sólo blogs SEO de fotografía de producto.
+  Eso cubre `corte`, `estallido` e `impacto`. Y en high-speed **lo contrario sí está premiado**: el blur largo.
+- **IAB: 71 % de los consumidores cree haber visto avisos hechos con IA** (54 % en 2024) y **57 % tiene
+  sentimiento negativo, +12 puntos**. Una escena imposible es la que más fácil cae ahí.
+
+Dicho de otro modo: el reparo sobre `impacto` no era sólo gusto — **hay evidencia externa de que esta familia
+entera es estética de stock premium, no gráfica premiada**. Se pueden usar igual, sabiéndolo, y el marcador de
+imperfección es justamente el antídoto. Pero la decisión de si el registro C quiere jugar ahí es del operador.

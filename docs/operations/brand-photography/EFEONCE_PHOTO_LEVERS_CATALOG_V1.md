@@ -15,9 +15,9 @@ Una **palanca** es una decisión de oficio que cambia lo que la foto *hace*, no 
 | [A. Siempre activas](#a-las-cinco-siempre-activas-el-bloque-de-impacto) | 5 | van solas en cada prompt (`impacto: false` las apaga) | las cinco |
 | [B. Atmósfera](#b-atmósfera--el-aire-que-hace-visible-la-luz) | 4 | `atmosfera` | una, opcional |
 | [C. Acción suspendida](#c-acción-suspendida--lo-que-está-en-vuelo) | 1 | `suspendido` | opcional, **1 de cada 4 piezas** |
-| [D. Encuadre y punto de vista](#d-las-veintisiete-de-encuadre-y-punto-de-vista) | 27 | `palanca` | **una sola** |
+| [D. Encuadre y punto de vista](#d-las-veinticuatro-de-encuadre-y-punto-de-vista) | 24 | `palanca` | **una sola** |
 
-Son **37 palancas**, y se combinan con las **[20 tomas de cámara](#las-veinte-tomas-del-catálogo-de-cámara)**
+Son **34 palancas**, y se combinan con las **[20 tomas de cámara](#las-veinte-tomas-del-catálogo-de-cámara)**
 —ojo de pez, dron cenital, tilt-shift, contrapicado, macro, tele, barrido…— que dicen **con qué** se fotografía.
 Además hay [otros ejes](#otros-ejes-que-deciden-la-pieza-y-no-son-palancas) —formato, reserva,
 lecho, cámara, objetos de marca, identidad— que deciden la pieza pero tienen documento propio. Y no todas sirven
@@ -115,7 +115,7 @@ de menos de ocho caracteres, porque dejarlo abierto hace que el modelo elija, **
 > **Dosis: 1 de cada 4 piezas** **[decisión del operador]**. El comando cuenta la tanda y avisa con el número.
 > Es también la razón por la que no vive en el bloque siempre activo: ahí volaría algo en cada foto.
 
-## D. Las veintisiete de encuadre y punto de vista
+## D. Las veinticuatro de encuadre y punto de vista
 
 ### De luz y tiempo
 
@@ -432,73 +432,6 @@ a ciencia ficción.
 **Evidencia.** Nace de una pieza **pre-canon aprobada por el operador** —el KV «Tu IA no conoce tu negocio»,
 2026-09-17— y de su encargo de convertirla en palanca. Implementada en `build-prompt.mjs`, commit `cdb1fabad`.
 
-### De física imposible **[2026-09-21 noche, probadas con USD 0,25]**
-
-> **Por qué son su propia familia.** Las demás eligen **qué** se fotografía. Éstas eligen un **instante** que el
-> ojo no puede ver quieto: una masa pasada de su equilibrio, un objeto abierto por un plano de sierra, algo de
-> oficina hundiéndose. El cerebro sabe que no debería estar viendo eso detenido, y esa fracción de duda es lo
-> que frena el pulgar. **Ninguna lleva personas**, así que ninguna es nativa del registro B.
->
-> 🔴 **Nacieron de una prueba barata, y ése es el método**: cinco propuestas, una pasada cada una —USD 0,05—,
-> **sin identidad ni objetos de marca, sólo la física**. Pasaron tres. Averiguar antes de diseñar una serie
-> alrededor de una palanca que el motor no hace cuesta veinticinco centavos; averiguarlo después cuesta una
-> jornada, y ya pasó tres veces (baño de color, split diopter, trama).
-
-#### `justo-antes` — la fracción previa a la caída
-**Qué es.** El objeto ya pasó su punto de equilibrio y **todavía no cae**. La tensión sin resolver es el
-mecanismo: el cerebro completa la caída solo, y para completarla tiene que quedarse mirando.
-**Cómo se logra.** Marcadores, los cuatro verificados en la pasada de prueba: el objeto inclinado **más allá del
-punto donde podría recuperarse**, con la base **ya despegada de la superficie por un lado** y una cuña de aire
-visible debajo · **nada lo sostiene** —sin mano, soporte, hilo ni nada entrando al cuadro— · **todo lo demás
-perfectamente quieto y nítido**, sin estela y sin desenfoque de movimiento, porque esto es el instante **anterior**
-a la caída y no la caída · la **sombra de contacto sólo bajo el único punto de apoyo** que queda, y el lado
-levantado sin sombra de contacto.
-🔴 **Exige el campo `cae`.** El desequilibrio se lee en la **forma** del objeto: una pila de láminas delgadas salió
-a la primera porque cada canto repite el ángulo y vuelve legible la inclinación. Ejemplos del comando: *«a stack
-of thin dark rectangular plates»* · *«a tall narrow stack of index cards»*.
-**Guarda `contradice`.** Aborta si la escena mete *motion blur*, *mid-fall*, *already falling*, *toppled*, o algo
-que sostenga el objeto: si cae, o si algo lo sujeta, la tensión desaparece y con ella lo único que frena el pulgar.
-**En el registro C:** tu marca saliéndose del podio — te nombran, pero ya no primero.
-**Evidencia.** `prueba-palancas/p2-justo-antes.png`, 2026-09-21. Cuatro de cuatro marcadores, y se lee
-fotográfica: la superficie tiene grano y las láminas, textura de fieltro.
-
-#### `corte` — el interior expuesto
-**Qué es.** El objeto seccionado por un plano limpio, mostrando lo que nunca se ve. Detiene por **contradicción
-de registro**: un corte de laboratorio practicado sobre un objeto cotidiano.
-**Cómo se logra.** El corte es **un plano perfectamente liso, de sierra de precisión** —no roto, no rasgado, no
-astillado— y **da de frente a la cámara** · el interior se lee como **capas distinguibles** entre sí, cada una de
-otro material · la mitad cortada **de pie con la cara del corte presentada**, nunca volcada ni acostada · **sin
-herramienta en cuadro, sin virutas y sin restos** · luz rasante cruzando el plano del corte para que cada canto
-de capa tire su propia sombra.
-🔴 **Exige el campo `secciona`.** Ejemplos: *«a wireless computer mouse»* · *«a mechanical keyboard switch»*.
-🔴 **El bloque APAGA el color de los componentes internos, y no es cosmético** **[medido]**: el interior llega
-con color propio —una placa verde saturada, una celda amarilla— que el sistema de color no contempla. Son apenas
-**0,5 % del área con color**, y aun así muerden, porque caen **en el centro de interés**: el corte *es* el sujeto.
-Es el caso donde una magnitud chica no basta para absolver.
-**Guarda `contradice`.** Aborta con *broken*, *shattered*, *splintered*, *shavings*, *lying flat*, *tipped over*:
-roto es basura, y acostado deja de presentar el interior.
-**En el registro C:** 🎯 qué hay **dentro** de una respuesta. Es la palanca natural para **transparencia**.
-**Evidencia.** `prueba-palancas/p4-corte.png`, 2026-09-21.
-**Reparo abierto:** el prompt pedía «de pie en su posición normal de reposo» y devolvió el objeto **en vertical
-sobre su parte trasera**, que no es el reposo de un mouse. Se lee bien —es la convención de sección de museo—
-pero el marcador quedó ambiguo; por eso el bloque ahora pide la **cara del corte presentada**, no «reposo».
-
-#### `sumergido` — el medio equivocado
-**Qué es.** Un objeto de oficina dentro del agua. Disrupción **por contexto**, no por movimiento: es la única de
-las tres que no depende de congelar nada.
-**Cómo se logra.** **Burbujas adheridas** a la superficie, **de tamaños claramente distintos** · la **línea del
-agua NO está en el cuadro**: el objeto está completamente rodeado, sin aire encima · **partículas suspendidas**
-derivando alrededor · el objeto **se hunde despacio, inclinado hacia abajo** — no flota y no se apoya en nada ·
-**sin peces, sin plantas, sin fondo de piscina y sin azulejos**: nada que identifique el lugar.
-🔴 **Exige el campo `sumerge`.** Ejemplos: *«a wireless desk keyboard»* · *«a stack of printed pages»*.
-⚠️ **Ojo con la dosis del acento:** el haz bajo el agua se come mucho cuadro — **22,7 % de los píxeles con color**
-en la pasada de prueba, contra 3–7 % en las otras cuatro. Cuenta como acento de la tanda.
-**Guarda `contradice`.** Aborta con *fish*, *aquarium*, *pool floor*, *tiles*, *waterline*, *floating*: convierten
-el agua en un **lugar**, y la palanca vive en que el objeto está donde no debe.
-**Evidencia.** `prueba-palancas/p5-sumergido.png`, 2026-09-21. **La mejor de las cinco, al revés de lo que la
-propuesta apostaba** —la puso última y recomendó no empezar por ella—. Vale registrar el error de pronóstico: el
-orden de apuesta acertó la primera (`justo-antes`) y falló los dos extremos siguientes.
-
 ## En qué registro sirve cada palanca **[criterio, derivado del marcador de la mirada]**
 
 Efeonce tiene **dos registros visuales**: el **documental** —«el oficio a la vista», donde la foto *es* el
@@ -533,7 +466,7 @@ elegido) · `ausencia`.
 
 **No están prohibidas en una pieza de campaña**, pero si se usan, **la pieza ya no se juzga con la barra de B**.
 
-## Las seis descartadas y por qué **[medido]**
+## Las cinco descartadas y por qué **[medido]**
 
 Valen tanto como las aprobadas: evitan repetir el gasto.
 
@@ -543,7 +476,6 @@ Valen tanto como las aprobadas: evitan repetir el gasto.
 | **Split diopter** (dos planos nítidos a distinta distancia) | **Descartada dos veces.** Devuelve **profundidad de campo normal** sin la costura característica: pliego nítido + persona nítida + fondo suave es lo que da cualquier lente a f/5.6, así que la palanca no existe en el resultado. Reintentada con el sistema de color el 2026-09-20 y **rechazada por el operador: «se ve muy IA»** — el intento de forzar dos campos de foco produce una nitidez pareja que delata la generación. No volver a probarla por prompt. |
 | **Clave baja** (la escena en sombra, sólo emerge lo esencial) | Funciona, pero **no se distingue** de luz con carácter + lecho oscuro, que ya está en el canon. Duplicar una palanca es lo que diluye el sistema. |
 | **Trama** (a través de una malla perforada que fragmenta al sujeto) | **No se logró** (2026-09-20). El grill del micrófono salió espectacular como textura, pero detrás **no se lee que haya una persona**: sólo una mancha. La palanca exige una cara **rota por la rejilla**, no borrada, y lo que queda es un bodegón del objeto. Vecina de `instrumento` por diseño; si se reintenta, con la cara mucho más cerca de la malla y perforación más abierta. |
-| **Impacto** (la corona de líquido en el milisegundo del choque) | **El motor desobedece su marcador NEGATIVO** (2026-09-21). La física sí la hace —corona con sus puntas, cada una rematada en gota desprendida, y satélites en el aire—, pero el bloque pedía explícitamente que la superficie alrededor siguiera **lisa y quieta, sin ondas concéntricas todavía**, y el motor **añadió el anillo de onda por su cuenta**, verificado ampliando la base. Es una clase de fallo distinta a «no la hace»: la hace, y **de más**. Segunda causa, y la que pesa: la corona de líquido es **el cliché número uno del stock de alta velocidad** —hay miles idénticas—, así que falla por el mismo lado que el canon ya rechaza en otras piezas: no significa nada que no esté en cualquier banco de imágenes. |
 | **Flash duro editorial** | Funciona y **confirma que es otro idioma**: puesto junto a las demás, no pertenece. Si se adopta, va declarado como **territorio aparte** (trendjacking, cultura), nunca mezclado con el lenguaje principal. |
 
 **Lección transversal:** hay extremos que el motor **no hace**. Conviene averiguarlo con una prueba barata antes
@@ -551,7 +483,7 @@ de diseñar una serie alrededor de uno.
 
 ---
 
-## Las que quedaron a un intento de distancia **[pendiente]**
+## La que quedó a un intento de distancia **[pendiente]**
 
 **`doble-exposicion`** — dos momentos del proceso superpuestos en un cuadro, visibles **uno a través del otro**.
 Probada el 2026-09-20 (`H5`): el modelo **sí produjo superposición real** —el boceto a lápiz atraviesa la pieza
@@ -562,18 +494,6 @@ No se descarta y **tampoco se aprueba**: el catálogo vale porque cada palanca d
 una que no pasa su propia comprobación vacía el criterio de todas las demás. Para retomarla: insistir en que las
 zonas claras de una exposición rellenan las oscuras de la otra **en todo el cuadro**, sin que ninguna tenga canto,
 y no describir ninguna de las dos como una hoja o un papel —de ahí salió el borde.
-
-**`estallido`** — el objeto desarmado en el aire, cada pieza suspendida en el eje por el que se ensambla. Probada
-el 2026-09-21: el motor **sí produjo la separación** —cinco capas de un teclado, ninguna tocando a otra, todas en
-el mismo eje, sin hilos ni soportes—, pero **sólo la base proyecta sombra**. El bloque pedía que *cada* pieza
-tirara la suya sobre la de abajo, y sin esas sombras interproyectadas las capas flotan como un despiece de CAD:
-**se lee como render, que es justo lo que el canon rechaza**.
-
-Vale distinguir la causa, porque decide qué hacer: no es que el motor **no pueda** —es que **no lo hizo sin que
-se lo pidieran explícitamente**. Para retomarla, un solo cambio y otros USD 0,05: exigir verbatim que **cada capa
-proyecte una sombra visible sobre la capa inmediatamente inferior**, y que la separación entre capas se lea por
-esa sombra y no sólo por el hueco. La propuesta ya la había marcado como **«el riesgo más alto de las cinco: es
-la que más fácil se va a CGI»** — acertó el diagnóstico antes de la prueba.
 
 ## Otros ejes que deciden la pieza (y no son palancas)
 

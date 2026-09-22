@@ -241,8 +241,8 @@ Detalle: [colorimetría](../../../../docs/operations/brand-photography/EFEONCE_P
 - **Proyección** (`palanca: proyeccion`) — la obra proyectada sobre materia áspera, cuyo grano **se ve a través**
   de ella, y sobre el cuerpo de quien está en el haz. **Ni pantalla ni monitor.**
 
-> **Las 37 palancas en cuatro familias —5 siempre activas · 4 atmósferas · 1 acción suspendida · estas 27 de
-> encuadre—, las 20 tomas de cámara y las seis descartadas con su
+> **Las 34 palancas en cuatro familias —5 siempre activas · 4 atmósferas · 1 acción suspendida · estas 24 de
+> encuadre—, las 20 tomas de cámara y las cinco descartadas con su
 > razón medida:** [catálogo de palancas](../../../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
 
 > **Dosis del acento: 1 de cada 2** **[auditoría ciega 2026-09-20]**. El azul portador es estructura y va en

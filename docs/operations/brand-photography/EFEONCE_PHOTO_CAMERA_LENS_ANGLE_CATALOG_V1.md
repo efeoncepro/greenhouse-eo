@@ -331,7 +331,7 @@ Formato de cada ficha: **Ajuste** · **Qué comunica** · **Usar en** · **Lecho
 ## 4. Palancas de impacto (nivel +1)
 
 > **Dónde vive qué (2026-09-20).** El catálogo de palancas es
-> [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md): **37 en cuatro familias**, con la
+> [`EFEONCE_PHOTO_LEVERS_CATALOG_V1.md`](./EFEONCE_PHOTO_LEVERS_CATALOG_V1.md): **34 en cuatro familias**, con la
 > ficha de cada una. Esta sección conserva **lo medido en cámara** —qué le hace cada palanca al contraste y al
 > b\*— que es lo que este documento aporta y no está en el otro. **Una toma no es una palanca:** una toma dice
 > *con qué* se fotografía (lente, altura, distancia) y una palanca *qué hace* la foto; se combinan.

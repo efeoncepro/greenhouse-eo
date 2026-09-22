@@ -7,6 +7,16 @@ paths:
 
 # Fotografía de marca Efeonce — invariantes (auto-load por path)
 
+🔴 **Si la pieza es un ANUNCIO (paid media, no orgánico), carga primero
+[`ad-creative-evidence-2026.md`](../skills/efeonce-advertising-creative/references/ad-creative-evidence-2026.md)**
+(`as-of 2026-09-21`, caduca 2027-03). Lo que más cambia la toma, medido:
+**exploded view, cross-section, freeze motion de alta velocidad, levitación y color blocking NO tienen
+ningún respaldo** en gráfica premiada 2025-2026 — son estética de banco de imágenes; **lo premiado es casi
+lo contrario** (escala invertida con lectura en dos tiempos · luz dura con la sombra como logo · blur largo
+real · silueta en alto contraste). **Alto contraste de color = +41% engagement**, el único lift medido sobre
+estáticos B2B. Y **71% de los consumidores cree ver avisos hechos con IA, 57% con sentimiento negativo**
+(IAB, ene-2026): el antídoto más fuerte es **que la restricción de producción sea la idea**.
+
 Carga [`design-studio` → lenguaje fotográfico](../skills/design-studio/references/efeonce-photographic-language.md)
 y el [índice del canon](../../docs/operations/brand-photography/README.md) **antes de escribir un prompt**. La
 sesión que reconstruyó el oficio a pedazos en vez de cargar la skill perdió un día entero y ~USD 5
@@ -155,7 +165,7 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
 | `formato` | tamaño, % del lecho y límite de sujetos, de UNA tabla |
 | `identidad` | bloques `IDENTITY` + `REFERENCES` verbatim, con **vista por ángulo** (`{ persona, vista }`) |
 | `objetos` | kits de marca como **referencia de forma** (logo, mascota, prenda, merch), numerados tras la identidad |
-| `palanca` | **una sola** de las **27 de encuadre** → [catálogo de palancas](../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) |
+| `palanca` | **una sola** de las **24 de encuadre** → [catálogo de palancas](../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md) |
 | `atmosfera` | `polvo` · `bruma` · `vapor` · `humo` — aire con materia que hace visible la luz. **Exige haz** |
 | `suspendido` | qué está congelado en el aire |
 | `lecho` | objeto y **tono declarado** del primer plano desenfocado |
@@ -330,8 +340,8 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   el puente de la nariz corta la mejilla lejana» da el tres cuartos real. El casi-frontal se pide con los marcadores
   **inversos** (ver arriba), y antes de pedir cualquier giro, revisa si el set cubre ese ángulo.
 - **Una palanca DE ENCUADRE dominante por pieza.** Combinar dos las diluye: cada una pide el control de la escena.
-  Las otras tres familias sí se combinan con ella: **37 palancas en total** —5 siempre activas (bloque de impacto,
-  incluido el sistema de color) · 4 atmósferas · 1 acción suspendida · **27 de encuadre**— más las **20 tomas de
+  Las otras tres familias sí se combinan con ella: **34 palancas en total** —5 siempre activas (bloque de impacto,
+  incluido el sistema de color) · 4 atmósferas · 1 acción suspendida · **24 de encuadre**— más las **20 tomas de
   cámara** (ojo de pez, dron, tilt-shift, contrapicado, macro, tele, barrido…), que dicen *con qué* se fotografía
   y **no** son palancas. Índice: [catálogo de palancas](../../docs/operations/brand-photography/EFEONCE_PHOTO_LEVERS_CATALOG_V1.md).
 - **La atmósfera exige un haz declarado** (el comando aborta sin él) y **la acción suspendida tiene dosis: 1 de
