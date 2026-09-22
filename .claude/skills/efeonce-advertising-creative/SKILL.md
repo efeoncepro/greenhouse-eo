@@ -59,6 +59,13 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    - 🎯 **la metáfora entra POR el objeto del oficio, no al lado de él.** Prueba: quítale el objeto; si la
      escena sigue funcionando igual, estaba al lado.
 
+8. **Toda pieza publicitaria pertenece a una campaña registrada.** El pensamiento —brief, conceptos, JTBD,
+   copy, medición y **decisiones descartadas con su razón**— vive en OneDrive `Alineación/2. Campañas/CMP-###_…`;
+   **los assets viven en la carpeta de su canal** y la campaña los referencia por ruta en su `ASSETS.md`.
+   🔴 **Nunca copiar un asset a la carpeta de campaña**: dos copias garantizan que nadie sepa cuál se publicó.
+   Canon: [`EFEONCE_CAMPAIGN_REGISTRY_V1.md`](../../../docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
+   ⚠️ **`aprobada` ≠ autorizada a pautar**, y lo archivado en `Archivo/pre-CMP_2024/` **no es referencia**.
+
 ### Motor de IA: cómo elegir (as-of 2026-09-16)
 
 Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Detalle de imagen en `greenhouse-ai-image-generator` §Elegir modelo y de video en
