@@ -35,6 +35,7 @@
 | **Omni in-place edit → deterministic finish** | editar un clip existente con Omni sólo si faltan píxeles; si no, retime/composite/foley sobre el mismo master | **validado con caveat** 2026-07-11 | `omni-in-place-edit-and-deterministic-finish.md` |
 | **Selección por contrato de fidelidad** | elegir Omni, Seedance o post según reinterpretación permitida, practical y física; no por canal | **evidencia limitada** 2026-07-11 | `engine-selection-by-fidelity-contract.md` |
 | **Clean shot → deterministic 15/10/6 family** | convertir un shot 5–10 s + stills exactos en masters 15/10/6 con arco propio, format wall y audio medido | **validado** 2026-07-18 | `single-shot-to-deterministic-campaign-hero.md` |
+| **Key visual estático → loop de social** ⭐ | llevar una pieza estática aprobada a movimiento sin inventar un lenguaje paralelo: referencias, arco entrada→sostén→fade, sonido por sustracción y QA del loop | **validado** 2026-09-22 | `static-key-visual-to-looping-social-motion.md` |
 
 ## Estructura estándar de un workflow
 
@@ -68,3 +69,14 @@ clasificación, previs, referencias, preflight, post exacta, sonido, QA y entreg
 [Mesa gastronómica → video nativo por formato + post exacta](food-table-native-reel-and-exact-post.md):
 validado y aprobado 2026-09-13 en Fiestas Patrias. Separa plate/movimiento/overlays, preserva cueca,
 resuelve 9:16 con una nueva toma cuando corresponde y verifica masters/portadas con evidencia real.
+
+## Del estático aprobado al movimiento
+
+[Key visual estático → loop de social](static-key-visual-to-looping-social-motion.md): validado 2026-09-22 con el
+**primer motion de Efeonce** (CMP-001, «No fuiste tú»). Trae tres cosas que cuestan caro descubrir solo: el gesto
+del personaje **no celebra** cuando el copy señala al espectador; el audio se corrige **quitando los términos que
+inducen habla**, no prohibiendo más fuerte (13 inductores contra 2 prohibiciones); y el loop se mide entre el
+**primer y el último cuadro reales**, no contra una muestra cómoda. Capacidades, tarifas y ratios reales por motor
+—incluido que **4:5 no existe en ningún motor de video**— viven en la
+[guía canónica de selección de modelos](../../../../docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md),
+no en el workflow.

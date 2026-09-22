@@ -1,9 +1,9 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-09-22 por Claude — v1.4: Seedance 2.5 **entrega 1080×1920 verificado** en dos corridas reales (i2v y r2v); nitidez nativa vs reescalado sigue [sin dato]. La contradicción con la tabla oficial (480p/720p) queda parcialmente resuelta. · v1.3: la máscara de 2.5 orienta pero no preserva: la «deriva fuera de zona 2,4/255» es una media; el 2026-09-17 la zona protegida llegó a delta máximo 221/255 (media 4,85) y se recompone desde la base. v1.2: carril **Higgsfield API** dentro de `pnpm ai:fal` (§5.8): 44 capacidades con esquema real y precio exacto por API; Recraft de Higgsfield API: SVG **sin confirmar**. v1.1: brechas de los CLIs corregidas (commit `17196ead1`): estimación de costo previa con confirmación en `ai:fal`, resolución barata por defecto, formato real, `--seed` y tope de referencias validados, flags de LoRA/entrenador; `ai:image` valida `--size`/`--background`, agrega `--format` y estima costo
+> **Ultima actualizacion:** 2026-09-22 por Claude — v1.5: primer motion de Efeonce producido («No fuiste tú», CMP-001). Tres hallazgos medidos: **`h3max-r2v` SÍ acepta `--aspect`, y sin él devuelve 1920×1080 horizontal** aunque todas las referencias sean verticales (§5.5); **`--aspect adaptive` NO adopta el ratio de las referencias** (1152×1440 → 1920×1080); y 🔴 **ningún motor de video del carril soporta 4:5** — medido en los cinco, todos ofrecen `3:4` — siendo 4:5 el formato principal de los estáticos de Efeonce: se genera en 3:4 y se recorta (§3, §4.2). · v1.4: Seedance 2.5 **entrega 1080×1920 verificado** en dos corridas reales (i2v y r2v); nitidez nativa vs reescalado sigue [sin dato]. La contradicción con la tabla oficial (480p/720p) queda parcialmente resuelta. · v1.3: la máscara de 2.5 orienta pero no preserva: la «deriva fuera de zona 2,4/255» es una media; el 2026-09-17 la zona protegida llegó a delta máximo 221/255 (media 4,85) y se recompone desde la base. v1.2: carril **Higgsfield API** dentro de `pnpm ai:fal` (§5.8): 44 capacidades con esquema real y precio exacto por API; Recraft de Higgsfield API: SVG **sin confirmar**. v1.1: brechas de los CLIs corregidas (commit `17196ead1`): estimación de costo previa con confirmación en `ai:fal`, resolución barata por defecto, formato real, `--seed` y tope de referencias validados, flags de LoRA/entrenador; `ai:image` valida `--size`/`--background`, agrega `--format` y estima costo
 > **Alcance:** todos los modelos de imagen y video disponibles en `pnpm ai:image` (OpenAI) y `pnpm ai:fal` (55 capacidades de fal + 44 de Higgsfield API), más los carriles fuera de esos CLIs y los candidatos evaluados que NO están conectados.
 > **Documentación relacionada (no se duplica acá):**
 > [Catálogo de modelos fal](GREENHOUSE_FAL_AI_MODEL_CATALOG_V1.md) ·
@@ -113,9 +113,16 @@ Todo el video vive en `pnpm ai:fal`, salvo Gemini Omni Flash (Google directo, si
 | **Video con residencia de procesamiento en EE. UU.** | `seedance20-us-*` | "US hosted version" [oficial]; +20 % por token y techo 720p [contrato] | — | Elegirla por calidad: no hay diferencia declarada [oficial] |
 | **Prompt exacto, sin reinterpretación** | `wan3-* --no-prompt-expansion` o H3 base `--prompt-expansion disabled` | [contrato] | — | H3 Max/Turbo: expansión obligatoria (el CLI envía `balanced`) [contrato] |
 | **Video sin audio** | `--no-audio` en Seedance, Flux 3 y Wan | [contrato] | Quitar la pista en post | H3: **no tiene toggle y siempre entrega audio** [contrato] |
+| 🔴 **Una pieza social en 4:5** (el formato principal de los estáticos aprobados de Efeonce) | Generar en **`3:4`** (1080×1440) con el motor que pida la toma y **recortar a 1080×1350** en post | **Ningún motor de video del carril soporta 4:5** — medido en los cinco: Seedance 2.5, Seedance 2.0, Wan 3.0, Flux 3 y H3; todos ofrecen `3:4` como lo más cercano [verificado 2026-09-22] | Entregar sólo 9:16 y 1:1 y declarar el 4:5 fuera del set, si el brief lo permite | Recortar sin medir antes que las franjas sacrificadas estén vacías; y subir un 3:4 donde la plataforma espera 4:5: **ella** recorta y decide dónde |
 | **Stream en tiempo real dirigido** | Ninguno operable | `h3max-director` exige cliente realtime AsyncAPI, no cola [contrato] [oficial] | — | Intentarlo con el CLI (se detiene) [contrato] |
 
 **Audio generado = provisional.** Seedance, Wan, Flux 3 y H3 generan audio; si la pieza tiene diseño sonoro, reemplázalo en post. [decisión]
+
+🔴 **4:5 no existe en video, y la diferencia no es cosmética.** `3:4` es 0,750 y `4:5` es 0,800: a 1080 de ancho son 1440 contra 1350, **90 px, un 6,7 %**. Quien planifique motion en 4:5 tiene que **contar con el recorte desde el brief** — reservar el espacio en el encuadre y medir que las franjas que se van estén vacías antes de cortar (en la pieza de referencia: luminancia 1,8/255 arriba y 0,2/255 abajo). [verificado 2026-09-22]
+
+```bash
+ffmpeg -i toma-3x4.mp4 -vf "crop=1080:1350:0:45" -c:v libx264 -preset slow -crf 18 -c:a copy pieza-4x5.mp4
+```
 
 ---
 
@@ -159,6 +166,8 @@ Precio: **registro** = lo que guarda `fal-capabilities.ts` (escalón más bajo d
 | **Flux 3 extend** · `flux3-extend`, `flux3-extend-draft` | `--video` **con pista de audio**, < 50 MB [contrato] | 720p/1080p [contrato] | `--duration` = segundos **nuevos** (5–20 o `auto`; `auto` entregó 15 s) [contrato] [verificado] | 24 | Sí | — | Usa hasta 4 s de video+audio como contexto; entrega **sólo la continuación** [oficial] [verificado] | extend 0,205/s registro → **720p 0,41 · 1080p 0,53** [oficial]; extend-draft 0,06/s registro, publicado [sin dato] | [sin dato] | Verificadas 2026-09-16 | — |
 | **Wan 3.0** · `wan3-t2v`, `-i2v`, `-r2v` | Texto · imagen (prompt opcional, `--end-image`) · refs; web/documento en r2v [contrato] | 1080p (default del proveedor; el CLI envía 480p si omites `--resolution`) [contrato] | 2–30 s o `auto` (se envía `null`; verificado → 5,04 s) [contrato] [verificado] | **30** [oficial] | Sí, `--no-audio` [contrato] | 10 img · 5 video (≤ 15 s total, ≥ 16 fps) · 5 audio [contrato] | `--thinking`, `--web-url`, `--file` (r2v), `--no-prompt-expansion`, `--seed` [contrato] | 0,05/s registro → 480p 0,05 · 720p 0,10 · **1080p 0,20** [oficial] | Sin expansión ahorra 20–60 s [contrato]; típica 1–5 min [tercero] | Verificadas 2026-09-16 (`--file` sin corrida) | OpenArt #2; AA T2V con y sin audio **#1** [tercero] |
 | **Wan 3.0 Prime** · `wan3prime-t2v`, `-i2v`, `-r2v` | Igual que base [contrato] | 1080p [contrato] | Igual | 30 | Igual | Igual | Igual; "versión acelerada" [oficial] | 0,05/s registro → 480p 0,068 · 720p 0,14 · **1080p 0,28** (más cara que base) [oficial] | Más rápida [oficial]; "hasta 7×" [tercero]; sin medir | Verificadas 2026-09-16 | No figura [tercero] |
+
+🔴 **Ninguna familia de esta matriz ofrece `4:5`** — medido en las cinco [verificado 2026-09-22]. El aspecto más cercano es `3:4`, y el camino a 4:5 es generar en 3:4 y recortar: ver la fila de 4:5 en §3.
 
 ---
 
@@ -454,7 +463,7 @@ pnpm ai:fal --capability seedance20-r2v --image personaje.png --video movimiento
 **Capacidades y límites** [contrato].
 - Duración entera 5–15 s. Resolución en **MAYÚSCULAS** (`480P`, `768P`, `2K`, `4K`, `1080P`).
 - i2v **sin** `--aspect` (encuadre del medio de entrada); `--end-image` opcional.
-- r2v: 9 imágenes, 3 videos, 3 audios; aspecto `adaptive` + ratios.
+- r2v: 9 imágenes, 3 videos, 3 audios; aspecto `adaptive` + ratios. 🔴 **`h3max-r2v` SÍ acepta `--aspect`, y SIN él devuelve 1920×1080 HORIZONTAL aunque las cuatro referencias sean verticales** — el «sin aspect ratio» del registro vale sólo para `-i2v`. Y **`--aspect adaptive` NO adopta el ratio de las referencias**: con referencias de 1152×1440 devolvió 1920×1080. Pasa siempre el ratio explícito (`9:16`, `3:4`, `1:1`); descubrirlo costó dos tomas. [verificado 2026-09-22]
 - camera: `--camera-trajectory` JSON con ≤ 12 keyframes `{distance, elevation, azimuth, time}`; `elevation` −90..90, `time` 0..1 (el CLI valida ambos); unidades de `distance` y rango de `azimuth` [sin dato]; prompt opcional; guía oficial: empezar y terminar en el encuadre original, luz y focal sin cambios [oficial].
 - Audio 48 kHz estéreo, 24 fps [oficial].
 - LoRA: `--lora <path|url|repo HF>[@<escala 0–4>][#<weight_name>]`, hasta 3; `weight_name` elige el archivo de pesos dentro de un repo de Hugging Face [contrato].
@@ -477,8 +486,8 @@ pnpm ai:fal --capability h3turbo-t2v --prompt "<escena y acción>" --duration 5 
 # Max desde imagen con último cuadro (sin --aspect)
 pnpm ai:fal --capability h3max-i2v --image inicio.png --end-image final.png --prompt "<transición>" --duration 6 --resolution 768P --out ai-generations/2026-09-16_mi-pieza/h3max-i2v.mp4
 
-# Max con referencias
-pnpm ai:fal --capability h3max-r2v --image personaje.png --image producto.png --prompt "<cómo aparecen juntos>" --aspect adaptive --duration 6 --resolution 768P --out ai-generations/2026-09-16_mi-pieza/h3max-r2v.mp4
+# Max con referencias (ratio SIEMPRE explícito: sin él, y también con `adaptive`, sale 1920×1080 horizontal)
+pnpm ai:fal --capability h3max-r2v --image personaje.png --image producto.png --prompt "<cómo aparecen juntos>" --aspect 9:16 --duration 6 --resolution 768P --out ai-generations/2026-09-16_mi-pieza/h3max-r2v.mp4
 
 # Base con prompt literal y 4K (reescalado desde 768P)
 pnpm ai:fal --capability h3-t2v --prompt "<texto exacto>" --prompt-expansion disabled --duration 5 --resolution 4K --aspect 16:9 --out ai-generations/2026-09-16_mi-pieza/h3-4k.mp4
@@ -493,7 +502,7 @@ pnpm ai:fal --capability h3-t2v-lora --prompt "<frase disparadora> <escena>" --l
 pnpm ai:fal --capability h3-train-t2v --training-data dataset.zip --steps 100 --rank 32 --trigger "tronl0g0" --detach
 ```
 
-**Trampas.** Resolución en minúsculas → rechazo local [contrato]; audio siempre presente [contrato]; precios del registro subestiman [oficial]; clips cortos descartados en silencio [oficial]. Sin `--resolution`, el CLI ya no hereda el 2K del proveedor en H3 base: envía el escalón más barato y lo avisa; para entrega pasa `--resolution` explícito [contrato].
+**Trampas.** `h3max-r2v` sin `--aspect` —o con `--aspect adaptive`— entrega horizontal aunque todo lo que le pases sea vertical [verificado 2026-09-22]; resolución en minúsculas → rechazo local [contrato]; audio siempre presente [contrato]; precios del registro subestiman [oficial]; clips cortos descartados en silencio [oficial]. Sin `--resolution`, el CLI ya no hereda el 2K del proveedor en H3 base: envía el escalón más barato y lo avisa; para entrega pasa `--resolution` explícito [contrato].
 **Estado.** 9 verificadas 2026-09-16 (base ×3, Max ×3, camera ×1, Turbo ×2); LoRA ×3 y entrenadores ×4 **sin verificar** por [decisión] del operador; Director no operable [contrato].
 **Fuentes.** V7–V14, V47–V53 (§12).
 

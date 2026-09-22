@@ -58,6 +58,14 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
    - **un beneficio por pieza**: el grupo beneficio → CTA → descriptor no se reutiliza entre ejecuciones;
    - 🎯 **la metáfora entra POR el objeto del oficio, no al lado de él.** Prueba: quítale el objeto; si la
      escena sigue funcionando igual, estaba al lado.
+   - 🔴 **en MOTION el 4:5 no existe: ningún motor de video del carril lo ofrece** (medido en los cinco,
+     `as-of 2026-09-22`). El más cercano es 3:4, así que un 4:5 en movimiento se **genera en 3:4 y se recorta**,
+     midiendo antes que las franjas sacrificadas estén vacías — y subir un 3:4 donde la plataforma espera 4:5
+     deja que **ella** decida dónde cortar. Como el 4:5 es el formato principal de los estáticos, el brief de
+     motion **reserva ese espacio desde el encuadre**. Medidas, ratios por motor y el comando de recorte:
+     [guía canónica de selección de modelos](../../../docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md)
+     §3; la receta completa de estático → loop, en
+     [`motion-design-studio`](../motion-design-studio/workflows/static-key-visual-to-looping-social-motion.md).
 
 8. **Toda pieza publicitaria pertenece a una campaña registrada.** El pensamiento —brief, conceptos, JTBD,
    copy, medición y **decisiones descartadas con su razón**— vive en OneDrive `Alineación/2. Campañas/CMP-###_…`;
