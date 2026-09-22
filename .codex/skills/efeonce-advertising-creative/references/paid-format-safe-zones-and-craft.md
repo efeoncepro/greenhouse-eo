@@ -19,7 +19,47 @@ para que quepa el texto; la plataforma reserva espacio **en la pantalla** para s
 🎯 **En 9:16 obedecer sólo al comando pone el titular debajo del nombre de la cuenta.** La banda del comando
 empieza en 10%; la UI ocupa hasta el 14%. **Manda la más restrictiva.**
 
-## 2. La firma al pie es un trade-off declarado, no un descuido
+## 2. 🔴 En 9:16 para pauta, la firma NO va al pie — y el plate tiene que nacer sabiéndolo
+
+**Medido:** la firma al pie cae entre el **75% y el 96%** del alto. Eso está dentro de la zona de UI **en los
+tres criterios**, incluido el más permisivo:
+
+| Criterio | La UI empieza en | Firma al pie |
+|---|---|---|
+| Stories orgánico (~250 px de 1920) | 87% | 🔴 dentro |
+| Guardrail de Meta para ads en Stories/Reels | **65%** | 🔴 dentro |
+| Reels con disclaimer | 60% | 🔴 dentro |
+
+En Reels esa zona lleva caption, audio y botones: la firma queda tapada.
+
+### El error de planteamiento, y la salida
+
+Durante un rato intenté **mover la firma sobre un plate que no la previó**, y por eso sólo había malas
+opciones: al pie se tapa, arriba cae sobre el sujeto iluminado y baja a **1,2–2,0:1**.
+
+🎯 **El plate tiene que nacer con su banda de firma dentro de la zona segura.** El comando reserva un lecho
+—reserva 3— pero **lo pone en el 22% inferior**, que es correcto para 4:5 y equivocado para 9:16.
+
+✅ **Receta para 9:16 de pauta** *(tres pasadas, USD 0,15; no afecta a 4:5 ni 16:9)*:
+
+1. **En la ficha**, agregar a la escena una banda de firma explícita:
+   > *a horizontal band running the FULL width of the frame between 54% and 66% of the frame height is
+   > completely EMPTY, unlit and evenly dark — no object, no edge, no highlight and no part of the subject
+   > enters it… Everything sits either ABOVE or BELOW that band.*
+2. ⚠️ **No confiar en que el modelo la respete: medirla.** En la primera pasada el monitor y el sujeto la
+   cruzaron igual. **Medir el fondo en el ANCHO REAL de la firma** (0,2 del lado menor, centrada) barriendo
+   alturas, y quedarse con la mejor. Salieron **y = 0,42 · 0,52 · 0,40**, con 17,9–19,9:1.
+3. **Forzar `logo.variant: "negative"`.** En `auto` el compositor eligió navy y el contraste se desplomó a
+   **1,2:1** sobre la misma banda oscura donde el blanco daba 19,9.
+4. `componer-cta-safe.mjs` agrega **`logo.y`** (fracción del alto, retrocompatible) para poder ubicarla.
+
+**Resultado:** texto desde 16,5%, firma entre 40% y 52%, y el 20–35% inferior libre para la UI.
+
+⚠️ **Y la trampa de medición que costó dos rondas:** midiendo «firma blanca vs fondo» a mano daban 4,9 · 9,1 ·
+4,7 y parecía que pasaba; el compositor mide **la firma real**, que en `auto` es navy. **Medir el elemento que
+se va a dibujar, no una idealización — y en el ancho que va a ocupar, no en una franja cualquiera.**
+
+## 2b. Apéndice — la versión anterior de esta sección, y por qué estaba mal
 
 Subir la firma fuera de la safe zone **inferior** la deja sobre el sujeto iluminado, y ahí su contraste cae a
 **1,2–1,5:1** — ilegible siempre. Al pie mide **14–20:1**.
