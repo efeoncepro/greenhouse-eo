@@ -31,15 +31,7 @@ Text is crisp, perfectly legible, correctly spelled Spanish, never warped and ne
 
 AUDIO — the tone is dry institutional comedy, never celebration:
 
-VOICE — THIS IS THE CRITICAL INSTRUCTION AND IT FAILED TWICE ALREADY. Both previous attempts leaked real language: Spanish words were audible and the delivery drifted into something that sounded like Portuguese. That must not happen again.
-
-The character HAS NO MOUTH. It is a terminal with a screen for a face. It does NOT speak and there is NO VOICE in this video — no human voice, no voice actor, no vocal performance, no singing, no chanting, no crowd, no whispering, no babbling mouth sounds of any kind. Do not generate speech.
-
-What it emits instead is SYNTHESISED ELECTRONIC SIGNAL: short modulated beeps, chirps, warbles and data blips, like a small machine reporting. Think of a retro computer terminal or a modem processing, pitched high and quick.
-
-Those blips are PHRASED with emotional prosody — they rise and fall, cluster and pause, as if the machine were making a statement — but they are made of pure tone, never of syllables, vowels or consonants. NOT Spanish. NOT Portuguese. NOT Italian. NOT any Romance language. NOT any human language at all. If a listener could transcribe a single syllable, it is wrong.
-
-Keep it SOFT and SECONDARY, well under the music: the viewer must READ the screen. Busier during the listing gesture, and COMPLETELY SILENT during the final still hold.
+VOICE — the character is a MACHINE, so it must not sound human. Its speech is synthetic vocalisation: modulated electronic blips, chirps and warbles, pitched high, strung together with the cadence and phrasing of someone reading an official statement. It must NOT sound like any human language — not like a person speaking gibberish, not like a foreign tongue a listener might try to place. A listener should immediately classify it as "machine noise with the rhythm of speech" and stop trying to decode it, because the viewer has to READ the screen. Never sung, never shouted, never a crowd. Keep it SOFT and SECONDARY, under the music. It is busier during the listing gesture and falls COMPLETELY SILENT during the final still hold.
 
 MUSIC — a short, pompous institutional newsreel fanfare: stately brass and strings in the style of a mid-century official announcement or a government newsreel, solemn and self-important, as if something of great consequence were being declared. The comedy comes from that solemnity being completely out of proportion to what actually happens — which is nothing. Restrained and dignified, NOT wacky, NOT a cartoon chase, NOT celebratory, NO marching band, NO bagpipes, NO singing. It must loop perfectly: the final bar leads straight back into the first with no gap and no fade.
 
