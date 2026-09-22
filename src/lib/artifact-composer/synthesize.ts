@@ -61,6 +61,14 @@ export const synthesizeSlotValue = (slot: SlotContract): unknown => {
 
     if (typeof field.resolver === 'string' && GEOMETRY_RESOLVERS.includes(field.resolver)) return '1'
 
+    // Derivado del CONTRATO, no de una lista de nombres: cualquier campo declarado `number` recibe
+    // el mismo 1 que la etiqueta `requires valuePct` imprime como "1%". Sin esto, un catálogo nuevo
+    // fallaba el probe POR HACER LO CORRECTO —su resolver no estaba en la lista de arriba, su campo
+    // caía al fallback de más abajo y el par quedaba incoherente ("1%" contra 10), que es
+    // exactamente lo que la guarda anti-fabricación debe rechazar. Un gate que hay que editar por
+    // cada catálogo no prueba que el motor sea reutilizable: prueba que el primero sigue igual.
+    if (field.type === 'number') return '1'
+
     // Un resolver de geometría deriva de los campos VECINOS del item (`beforeValue`/`afterValue`, el
     // eje del timeline). Si el probe les diera texto, el resolver no podría calcular y abortaría —
     // correctamente: una barra sin dato es una barra que miente. El probe tiene que darle números.

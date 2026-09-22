@@ -8,8 +8,23 @@
 import type { FieldEffect, ResolverRegistry } from '../../resolver-contract'
 import { barGeometry, type GeometrySeries } from '../../chart-geometry'
 
-const toNumber = (value: unknown): number | null =>
-  typeof value === 'number' && Number.isFinite(value) ? value : null
+/**
+ * `valuePct` se declara `number` en el contrato, pero puede llegar como TEXTO: el payload sintético
+ * del gate visual entrega los campos de geometría como string. Aceptar un número expresado como
+ * texto no relaja la guarda —sigue rechazando cualquier cosa que no sea un número— y evita que el
+ * catálogo dependa de que el probe adivine su forma.
+ */
+const toNumber = (value: unknown): number | null => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value.replace(',', '.'))
+
+    return Number.isFinite(parsed) ? parsed : null
+  }
+
+  return null
+}
 
 /** Igual criterio que el informe: es-CL, coma decimal, signo y sufijo descartados. */
 export const parsePrintedNumber = (value: unknown): number | null => {

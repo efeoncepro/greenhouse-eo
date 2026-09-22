@@ -44,13 +44,29 @@ import {
   type SlideSpec
 } from '@/lib/artifact-composer'
 import { deckAxisCatalog, deckAxisCatalogDir } from '@/lib/artifact-composer/catalogs/deck-axis'
+import { insightsDeckCatalog, insightsDeckCatalogDir } from '@/lib/artifact-composer/catalogs/insights-deck'
+import { insightsReportCatalog, insightsReportCatalogDir } from '@/lib/artifact-composer/catalogs/insights-report'
 
 import { compareImages, loadPng } from '../frontend/lib/visual-diff'
 
 const ROOT = process.cwd()
 
 /** El home del catálogo lo declara el propio catálogo (Slice 1b: los assets viven con él). */
-const TEMPLATES_DIR = deckAxisCatalogDir
+
+/**
+ * Los catálogos que el gate fotografía. Cada uno escribe en SU carpeta de frames: así un catálogo
+ * nuevo no puede pisar el baseline de otro, y el de `deck-axis` conserva su ruta histórica
+ * (`templates/`) sin renombrar nada.
+ *
+ * Este es el harness real del Composer: compone cada plantilla con el payload sintético compartido
+ * y captura el frame. Un harness web aparte sería una copia peor —y rompería la autocontención del
+ * catálogo, que se sirve por `file://` con sus assets relativos.
+ */
+const PROBE_CATALOGS = [
+  { catalog: deckAxisCatalog, dir: deckAxisCatalogDir, frameDir: 'templates' },
+  { catalog: insightsDeckCatalog, dir: insightsDeckCatalogDir, frameDir: 'templates-insights-deck' },
+  { catalog: insightsReportCatalog, dir: insightsReportCatalogDir, frameDir: 'templates-insights-report' }
+]
 
 /** El deck real que protege este gate: 15 láminas de la oferta SKY. */
 const SKY_PLAN_PATH = path.resolve(ROOT, 'docs/commercial/tenders/sky-blog-2026/deck-plan.json')
@@ -113,12 +129,26 @@ const mapWithConcurrency = async <T, R>(
  * test y el del baseline divergieran, el gate compararía láminas distintas y mentiría.
  */
 const renderCatalogProbes = async (browser: Browser, outDir: string): Promise<string[]> => {
-  const registry = await loadRegistry({ templatesDir: TEMPLATES_DIR })
+  const all: string[] = []
 
-  await fs.mkdir(path.join(outDir, 'templates'), { recursive: true })
+  for (const target of PROBE_CATALOGS) {
+    all.push(...(await renderOneCatalogProbes(browser, outDir, target)))
+  }
+
+  return all
+}
+
+const renderOneCatalogProbes = async (
+  browser: Browser,
+  outDir: string,
+  target: (typeof PROBE_CATALOGS)[number]
+): Promise<string[]> => {
+  const registry = await loadRegistry({ templatesDir: target.dir })
+
+  await fs.mkdir(path.join(outDir, target.frameDir), { recursive: true })
 
   const frames = await mapWithConcurrency(registry.templates, CONCURRENCY, async entry => {
-    const contract = await loadTemplateContract({ templatesDir: TEMPLATES_DIR }, registry, entry.name)
+    const contract = await loadTemplateContract({ templatesDir: target.dir }, registry, entry.name)
 
     const slide = {
       slideId: `probe-${entry.name}`,
@@ -127,7 +157,7 @@ const renderCatalogProbes = async (browser: Browser, outDir: string): Promise<st
       slots: synthesizeProbeSlots(contract)
     } as unknown as SlideSpec
 
-    const rel = path.join('templates', `${entry.name}.png`)
+    const rel = path.join(target.frameDir, `${entry.name}.png`)
 
     // Mismo camino que `template-composability.test.ts`: fill SIN `assertSlideFitsCanvas`. El probe
     // sintético es un payload mínimo de regresión visual, no una lámina de oferta — sus literales
@@ -140,7 +170,7 @@ const renderCatalogProbes = async (browser: Browser, outDir: string): Promise<st
     })
 
     try {
-      await fillSlide(page, path.join(TEMPLATES_DIR, entry.prototype), slide, contract, deckAxisCatalog)
+      await fillSlide(page, path.join(target.dir, entry.prototype), slide, contract, target.catalog)
       await page.screenshot({ path: path.join(outDir, rel) })
     } finally {
       await page.close()

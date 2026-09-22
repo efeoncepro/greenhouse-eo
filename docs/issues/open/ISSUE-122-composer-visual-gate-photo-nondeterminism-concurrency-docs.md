@@ -100,3 +100,24 @@ fotos, pero no ésta. Si el objetivo es que el gate sea cumplible en más de una
 además fijar el entorno de render (correrlo en un contenedor con la misma versión de Chromium y las
 mismas fuentes) o aceptar un umbral de tolerancia distinto de cero para el rasterizado de texto.
 Esa decisión es del dueño del gate, no de una task consumidora.
+
+### Evidencia adicional (mismo día): el conjunto cambia ENTRE CORRIDAS, en la misma máquina
+
+Dos corridas del gate en la misma máquina, el mismo día, sin tocar `deck-axis`: la primera reportó
+**19** plantillas con diferencia; la segunda, **20** — con **7 frames entrando** (`BulletListSplit`,
+`CardGridFull`, `CaseStudySplit`, `ChartSplit`, `ComparisonSplit`, `CredentialsFull`,
+`HighlightWave`) y 6 saliendo.
+
+Se descartó que lo causara el cambio al probe sintético hecho en TASK-1847: cinco de esos siete
+**no tienen ningún campo `type: 'number'`**, así que ese cambio no podía alcanzarlos; y los dos que
+sí lo tienen (`case-study-split.barScale`, `chart-split.valuePct`) declaran resolvers que ya estaban
+en la lista previa, evaluada antes, de modo que siguen recibiendo el mismo valor.
+
+Esto agrava el diagnóstico: no es sólo variación **entre entornos**, es variación **entre corridas
+del mismo entorno**. El `--selftest` no lo atrapa porque corre dos veces dentro del mismo proceso;
+el no-determinismo aparece entre procesos.
+
+**Consecuencia para cualquier catálogo nuevo:** no puede promover su baseline. El `--freeze` exige
+declarar *todos* los frames cambiados, así que congelar los propios obliga a rebaselinear de paso
+los ajenos — el rebaseline silencioso que este gate existe para impedir. TASK-1847 dejó sus 9 frames
+declarados en `BASELINE_DELTAS.md` **sin promover**, a la espera de la mitigación.
