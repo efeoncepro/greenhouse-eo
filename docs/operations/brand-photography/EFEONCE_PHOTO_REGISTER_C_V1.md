@@ -42,6 +42,23 @@ En `d1` el único portador de azul es **una criatura de OpenAI**. El canon pide 
 > ## Regla: si la criatura del partner porta color, el azul de Efeonce entra por OTRO portador.
 > Uniforme navy, un material, una superficie. **Nunca dejar que el único azul del cuadro sea el de otra marca.**
 
+🔴 **Con Gigi esa regla NO alcanza, y la corrección es de la sesión que produjo su kit [2026-09-21].** Gigi no
+«tiene un color propio»: **Gigi ES el espectro de Google.** Medido sobre su arte oficial — rojo `#D93B2B`,
+**azul `#3B7DF5` dominando dos tercios**, verde-lima `#9ED957`. Con ella en cuadro no es sólo que el azul sea
+ajeno: el rojo y el verde también, y entre los tres se llevan la paleta entera.
+
+> ## Con Gigi: ella es el ÚNICO acento de color, y Efeonce vive en el navy y en la estructura.
+> Buscarle otro portador de azul es competir contra un degradado de tres colores, y se pierde.
+
+**Y dos cosas de producción con Gigi**, medidas por esa misma sesión:
+
+- 🔴 **Un prop translúcido delante de su cara le DUPLICA el ojo.** Con una lupa encima salió con tres ojos, y lo
+  cazó el operador, no el QA: a tamaño de feed un arco duplicado pasa por sombra. Nada translúcido sobre los
+  arcos de los ojos ni sobre la boca — tampoco un cursor, un bounding box o un chip compuestos después.
+- **En `aeo-03-no-te-conoce` el sujeto es el VACÍO de la tarjeta, no Gigi.** Ella la sostiene en alto y la
+  tarjeta es lo más grande y brillante del cuadro. **El titular no puede repetir lo que la tarjeta ya dice**:
+  tiene que hablar del paso siguiente.
+
 ## 4. La escala es un recurso propio de C
 
 Las criaturas son **figuras físicas de ~25 cm**. Esa desproporción no es un accidente que haya que disimular:
