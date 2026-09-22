@@ -1,32 +1,119 @@
 [
   {
-    "id": "b2-primero-el-numero-916",
+    "id": "mo1-canal-nuevo-916",
     "dominante": [
-      "Primero el número."
+      "−68% en tus clics pagados."
     ],
     "ratioDominanteEntrada": null,
     "contraste": {
       "dominante": 19.75,
-      "nota": 19.85,
-      "cta": 10.88,
-      "descriptor": 19.96,
-      "logo": 9.75
+      "nota": 19.94,
+      "cta": 10.99,
+      "descriptor": 19.85,
+      "logo": 15.29
     },
     "gapsTinta": [],
     "seleccion": null
   },
   {
-    "id": "b2-primero-el-numero-169",
+    "id": "mo2-no-te-citan-916",
     "dominante": [
-      "Primero el número."
+      "+35% en tus clics orgánicos."
     ],
     "ratioDominanteEntrada": null,
     "contraste": {
-      "dominante": 19.15,
-      "nota": 19.24,
-      "cta": 10.66,
-      "descriptor": 19.62,
-      "logo": 19.35
+      "dominante": 19.96,
+      "nota": 20.13,
+      "cta": 11.12,
+      "descriptor": 20.38,
+      "logo": 13.73
+    },
+    "gapsTinta": [],
+    "seleccion": {
+      "selection": {
+        "variant": "eight-handles",
+        "padding": "standard",
+        "paddingRatio": {
+          "inline": 0.012,
+          "block": 0.01
+        },
+        "overlay": "subtle",
+        "overlayOpacity": 0.1,
+        "overlayBlendMode": "luminosity"
+      },
+      "cursores": [
+        {
+          "id": "tu",
+          "labelBounds": {
+            "left": 988.992,
+            "top": 1505.984,
+            "right": 1083.733,
+            "bottom": 1537.192
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "mo3-no-creernos-916",
+    "dominante": [
+      "48% ya trae respuesta."
+    ],
+    "ratioDominanteEntrada": null,
+    "contraste": {
+      "dominante": 19.38,
+      "nota": 19.57,
+      "cta": 10.68,
+      "descriptor": 19.49,
+      "logo": 19.44
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "mo1-canal-nuevo-169",
+    "dominante": [
+      "−68% en tus clics pagados."
+    ],
+    "ratioDominanteEntrada": null,
+    "contraste": {
+      "dominante": 19.21,
+      "nota": 19.49,
+      "cta": 10.85,
+      "descriptor": 19.91,
+      "logo": 7.09
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "mo2-no-te-citan-169",
+    "dominante": [
+      "+35% en tus clics orgánicos."
+    ],
+    "ratioDominanteEntrada": null,
+    "contraste": {
+      "dominante": 20.16,
+      "nota": 20.19,
+      "cta": 11.24,
+      "descriptor": 20.6,
+      "logo": 13.1
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "mo3-no-creernos-169",
+    "dominante": [
+      "48% ya trae respuesta."
+    ],
+    "ratioDominanteEntrada": null,
+    "contraste": {
+      "dominante": 19.28,
+      "nota": 19.42,
+      "cta": 10.85,
+      "descriptor": 19.91,
+      "logo": 15.84
     },
     "gapsTinta": [],
     "seleccion": null

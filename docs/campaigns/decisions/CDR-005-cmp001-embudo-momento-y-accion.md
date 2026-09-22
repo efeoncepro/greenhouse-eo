@@ -101,6 +101,27 @@ claim y lo vuelve inventado.
 🔴 **NUNCA** una pieza MOFU promete el diagnóstico gratis: ése es el CTA de TOFU. Repetirlo aplana el embudo y
 le pide a alguien que ya avanzó que vuelva al primer escalón.
 
+### 5b. 🔴 Un ad CREA INTERÉS; no maneja objeciones
+
+**Medido dos veces en CMP-001, con el mismo error de forma las dos.** La práctica de SEO/AEO tiene respuestas
+honestas a objeciones que **construyen confianza en una conversación de venta** — cuando el prospecto ya tiene
+interés y pregunta si le estás inflando el caso. Convertidas en titular de ad, **minimizan la categoría y
+regalan la venta.**
+
+| Titular que escribí | De dónde salió | Por qué falla en un ad |
+|---|---|---|
+| «Te decimos que no.» | *La descalificación honesta gana la confianza en una categoría de humo* (§0) | En un feed se lee como «no te vamos a atender» |
+| «1% del tráfico viene de la IA.» | *No hay atribución LLM→revenue; decirlo en voz alta es el activo* (§1c) | Le dice al prospecto que el problema que le vendes no importa |
+
+🔴 **La regla: en el ad va el dato que abre los ojos; en la reunión va el dato que matiza.** Un ad tiene un
+segundo y ninguna pregunta previa — nadie objetó todavía, así que no hay nada que desactivar. El movimiento de
+honestidad radical **sigue siendo correcto**, pero su lugar es el guion de venta, el discovery y la propuesta,
+no el titular.
+
+✅ **Prueba antes de aprobar un dominante: ¿este número le da MÁS urgencia al lector, o se la quita?** Si se la
+quita, por verdadero que sea, no va en el ad. «48% de las búsquedas ya trae respuesta» y «1% del tráfico viene
+de la IA» son los dos verificados y los dos honestos; sólo uno de los dos vende.
+
 ### 6. Supuestos de segmento: el tamaño del momento manda
 
 🔴 **Un ad no se construye sobre un momento que le ocurre a poca gente**, por urgente que sea ese momento para
