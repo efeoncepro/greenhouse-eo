@@ -58,7 +58,25 @@ estricto que el de la guía: obliga a `unknown` y `unsupported` explícitos en v
 | **Fichas de ruta** | qué declara el endpoint por control, con evidencia por cable | para saber qué está **verificado** y qué es promesa |
 
 🔴 **Una discrepancia entre las tres es un HALLAZGO, no un menú.** No elijas la fuente que te conviene:
-la divergencia es justo donde alguien va a equivocarse, y se cierra verificando contra el proveedor.
+la divergencia es justo donde alguien va a equivocarse.
+
+🔴 **Pero antes de "arreglar" una discrepancia, pregúntate si miden el MISMO sistema** **[medido 2026-09-22]**.
+Muchas no son drift: **la guía describe los carriles CLI out-of-band** (qué puede pedir un operador desde la
+terminal) y **las fichas describen las rutas gobernadas de Globe** (qué puede pedir su runtime). Una ruta Globe
+suele **estrechar a propósito** el endpoint del proveedor. Medido: la guía tiene **cero** menciones de «Globe»
+en 1.090 líneas y **ninguna** ficha cita la guía — los dos documentos nunca se han hablado, y ninguno declara
+de qué sistema habla.
+
+**Ejemplo que lo separa:** las tres rutas de Seedance 2.5 declaran `enum(480p|720p)` mientras el CLI entregó
+1080p verificado. Eso puede ser una ficha vencida **o** un estrechamiento deliberado de la ruta. **No lo
+resuelvas por inferencia**: «corregir» la ficha a 1080p podría romper el contrato de Globe, y dejarla podría
+bloquear un escalón real. Se resuelve preguntando a quien gobierna la ruta.
+
+### Frescura de las fichas: su propio TTL, y está vencido
+
+Las fichas declaran `ttlDays` y `revalidateBeforeUse` **por entrada de evidencia**. No hay que imponerles una
+ventana: ya se pusieron una. Medido hoy: **57 de 60 evidencias pasadas de su propio TTL (95%)** — Kling 3 y
+Seedance 2.5 al 100%. El gate las cuenta y las nombra; **su propio contrato dice revalidar antes de usarlas.**
 
 **Caso medido, 2026-09-22.** Seedance 2.5 a 1080p: las tres fichas de ruta declaraban
 `enum(480p|720p)`, la guía lo marcaba como *«1080p en OpenAPI, no verificado — contradicción»* y pedía

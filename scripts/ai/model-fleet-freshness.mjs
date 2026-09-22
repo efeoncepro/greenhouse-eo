@@ -13,12 +13,13 @@
  *
  * Sin --strict informa y sale 0 (advisory). Con --strict falla.
  */
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const ROOT = resolve(import.meta.dirname, '../..')
 const CONTRATO = resolve(ROOT, 'src/lib/ai/fal-capabilities.ts')
 const GUIA = resolve(ROOT, 'docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md')
+const FICHAS = resolve(ROOT, 'docs/architecture/creative-studio/model-fleet/routes')
 
 // Ventanas en días. Lo que cambia rápido vence rápido: un precio de proveedor se mueve por mes,
 // una capacidad estructural (cuántas referencias acepta) dura mucho más.
@@ -58,6 +59,31 @@ const porVencer = caps
   .map(c => ({ ...c, edad: dias(c.verifiedAt) }))
   .filter(c => c.edad > VENTANAS.precio && c.edad <= VENTANAS.capacidad)
 
+// ── 3b. Fichas de ruta: cada evidencia declara su `ttlDays`. No imponemos ventana:
+// se respeta la que la ficha misma se puso, que es más exigente y ya es un compromiso escrito.
+const fichas = []
+
+try {
+  for (const f of readdirSync(FICHAS).filter(n => n.endsWith('.json'))) {
+    const card = JSON.parse(readFileSync(resolve(FICHAS, f), 'utf8'))
+    let total = 0
+    let vencida = 0
+
+    for (const e of card.evidence ?? []) {
+      if (!e?.observedAt || e.ttlDays === undefined || e.ttlDays === null) continue
+      total += 1
+      if (dias(e.observedAt) > e.ttlDays) vencida += 1
+    }
+
+    if (total) fichas.push({ nombre: f.replace('_ROUTE_CARD_V1.json', ''), total, vencida })
+  }
+} catch {
+  // el directorio puede no existir en un checkout parcial: no es motivo para fallar
+}
+
+const evTotal = fichas.reduce((a, c) => a + c.total, 0)
+const evVencida = fichas.reduce((a, c) => a + c.vencida, 0)
+
 // ── 4. Edad de la guía misma
 const mGuia = guia.match(/\*\*Ultima actualizacion:\*\*\s*(\d{4}-\d{2}-\d{2})/)
 const edadGuia = mGuia ? dias(mGuia[1]) : null
@@ -65,7 +91,15 @@ const edadGuia = mGuia ? dias(mGuia[1]) : null
 console.log(`\nFlota de modelos · ${caps.length}/${idsTotales.length} capacidades fechadas en ${CONTRATO.replace(ROOT + '/', '')}\n`)
 console.log(`  guía canónica     ${mGuia ? `${mGuia[1]} (${edadGuia} días)` : 'SIN fecha legible'}`)
 console.log(`  cobertura         ${caps.length - sinFicha.length}/${caps.length} con mención en la guía`)
-console.log(`  frescura          ${vencidas.length} vencidas (>${VENTANAS.capacidad}d) · ${porVencer.length} por revalidar (>${VENTANAS.precio}d)\n`)
+console.log(`  frescura          ${vencidas.length} vencidas (>${VENTANAS.capacidad}d) · ${porVencer.length} por revalidar (>${VENTANAS.precio}d)`)
+
+if (evTotal) {
+  const pct = Math.round((evVencida / evTotal) * 100)
+
+  console.log(`  fichas de ruta    ${evVencida}/${evTotal} evidencias pasadas de SU PROPIO ttlDays (${pct}%)\n`)
+} else {
+  console.log('')
+}
 
 if (sinFecha.length) {
   console.log('  ✗ SIN FECHA — declaradas en el contrato y sin `verifiedAt`, así que nada puede vencerlas:')
@@ -82,6 +116,17 @@ if (sinFicha.length) {
 if (vencidas.length) {
   console.log(`  ✗ FRESCURA — verificadas hace más de ${VENTANAS.capacidad} días:`)
   for (const c of vencidas.sort((a, b) => b.edad - a.edad)) console.log(`      ${c.id.padEnd(24)} ${c.verifiedAt} (${c.edad}d)`)
+  console.log('')
+}
+
+if (evVencida) {
+  console.log('  ⚠ FICHAS DE RUTA — evidencia pasada del TTL que ellas mismas declararon:')
+
+  for (const c of fichas.filter(x => x.vencida).sort((a, b) => b.vencida - a.vencida)) {
+    console.log(`      ${c.nombre.padEnd(26)} ${c.vencida}/${c.total}`)
+  }
+
+  console.log('      Muchas traen `revalidateBeforeUse: true`: su propio contrato pide revalidar antes de usarlas.')
   console.log('')
 }
 
