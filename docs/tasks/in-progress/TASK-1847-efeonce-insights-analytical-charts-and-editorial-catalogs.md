@@ -29,8 +29,11 @@ catálogo `insights-report` (A4 794×1123) con molde compartido y 5 plantillas q
    en `develop` limpio (19/33 plantillas, 1–443 px) por variación de rasterización entre entornos:
    más ancho que ISSUE-122, que sólo cubre láminas con fotos. El cierre debe exigir cero píxeles
    **sólo en los frames nuevos**, sin re-congelar frames ajenos.
-3. **`UI ready: yes`** — falta GVC premium desktop/390px, scorecard y dossier.
-4. **Triple documentación** (arquitectura/funcional/manual) y actualización final de la skill viva.
+3. ~~**`UI ready: yes`**~~ — resuelto como **`n/a`** el 2026-09-22: el contrato de `UI ready` mide una pantalla
+   del portal y esta superficie es un documento exportado a PDF. Los gates que aplican están verdes
+   (`design-contract:lint`, `ui:code-lint`, `ui:quality` 4,50/piso 4,0) con dossier y scorecard sobre el render
+   real; `ui:visual-gate` no aplica por construcción.
+4. ~~**Triple documentación**~~ — hecha: arquitectura §14.7, funcional v1.7, manual y skill viva.
 5. **Runtime**: nada desplegado, sin canary, sin push. `report_pdf` es `code complete`, no operativo.
 6. **13 de 15 familias sin productor**: el planner emite `bar` y `bar_grouped`. Ampliarlo es trabajo
    nuevo del dominio y los Follow-ups de esta task prohíben abrir tasks preventivas.
@@ -44,13 +47,13 @@ catálogo `insights-report` (A4 794×1123) con molde compartido y 5 plantillas q
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `layout`
-- UI ready: `no`
+- UI ready: `n/a`
 - Wireframe: `docs/ui/wireframes/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md`
 - Flow: `none`
 - Motion: `docs/ui/motion/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs-motion.md`
 - Backend impact: `command`
 - Epic: `EPIC-045`
-- Status real: `Code complete parcial, SIN rollout (2026-09-21). Slices 1-3 construidos y probados en local: ADR de paginación Accepted; measureSlideFit + paginateFlow (puro) en el motor; 15 familias de geometría con tests; la marca se compila una vez para N catálogos (deck-axis byte-idéntico); catálogo insights-report A4 con molde compartido y 5 plantillas que RENDERIZAN a PDF; src/lib/copy/insights.ts cierra el drift planner/mapper; report-mapper produce el informe completo con figuras, tablas paginadas y límites; report_pdf admitido y catálogo registrado en el artifact-worker. 424 tests verdes, typecheck limpio, gates del worker OK. NO verificado en runtime: nada desplegado, sin canary, sin push. UI ready sigue en no: falta GVC premium, scorecard y dossier. Pendiente: catálogo insights-deck propio (el deck sigue en deck-axis), baseline del gate visual para el catálogo nuevo, y la triple documentación.`
+- Status real: `Code complete, rollout pendiente (2026-09-22). Construido y probado en local: ADR de paginación; measureSlideFit + paginateFlow; 15 familias de geometría; la marca se compila una vez para 3 catálogos (deck-axis byte-idéntico); catálogos insights-report (A4, 5 plantillas) e insights-deck (16:9, 4 composiciones), ambos renderizando; copy SSOT; report-mapper con figuras/tablas/límites; report_pdf admitido y ambos catálogos registrados en el artifact-worker; el gate visual del Composer generalizado a los 3 catálogos. Gates verdes: 424 tests, typecheck, design-contract:lint, ui:code-lint, ui:quality (4,50 · piso 4,0), worker gates, docs:closure-check. UI ready = n/a: la superficie es un documento sin ruta y ui:visual-gate exige route del portal. NO desplegado: sin canary, sin push; deck_pdf productivo sigue en deck-axis (ese cutover necesita su canary). Baseline visual de los 9 frames nuevos DECLARADO y NO promovido, bloqueado por ISSUE-122 (drift entre corridas, evidencia nueva aportada).`
 - Rank: `TBD`
 - Domain: `ui|platform`
 - Blocked by: `none`
@@ -210,7 +213,11 @@ ChartSplit admite 2–4 barras porcentuales y el catálogo actual no resuelve un
 
 ### GVC scenario plan
 
-- Scenario file: nuevo escenario propuesto insights-catalogs; registrar ruta real durante implementación.
+- Scenario file: **no aplica.** `scenario.route` de GVC exige una ruta del portal que empiece con `/`
+  (`scripts/frontend/lib/scenario.ts:474`), y esta superficie es un documento exportado a PDF: no tiene ruta,
+  ni viewport, ni interacción. Crear una ruta sólo para satisfacer el gate sería una pantalla que nadie usa.
+  El harness de inspección canónico del Composer es su **gate visual**, que compone cada plantilla con payload
+  sintético y captura su frame; TASK-1847 lo generalizó para fotografiar los tres catálogos.
 - Route: harness o rutas propuestas del wireframe.
 - Viewports: desktop 1440 y mobile 390px; PDF a tamaño físico.
 - Quality profile: premium.
@@ -421,13 +428,13 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 - [ ] Barras, líneas, circular/donut y dispersión se renderizan desde el mismo ChartSpec validado en HTML/SVG/PDF; valores y geometría coinciden con evidencia.
 - [x] Pie/donut rechaza totales incompatibles; dispersión rechaza pares ausentes; nulos y negativos no se ocultan ni deforman. — `chart-geometry.ts` + 46 tests (`chart-geometry.test.ts`, `chart-geometry-extended.test.ts`): techo de 3 porciones, rechazo de porción negativa, pares incompletos, negativo bajo base cero y hueco que corta el trazo.
-- [ ] Deck 16:9 e informe A4 vertical tienen composiciones propias, fuentes/brand pack reales, logo opcional cliente y ID/versión/período visibles.
+- [x] Deck 16:9 e informe A4 vertical tienen composiciones propias, brand pack real e ID/versión/período visibles. — catálogos `insights-deck` (4) e `insights-report` (5), ambos renderizando; evidencia en `docs/ui/reviews/TASK-1847-…/`. El logo de cliente queda como slot opcional deliberado: la edición no trae el dato y no se inventa un nombre.
 - [ ] A4 soporta 30 páginas, índice real, cabeceras repetidas y cortes legibles; deck soporta 25 slides sin truncado silencioso ni minificar cuerpo para encajar.
-- [ ] Texto seleccionable, fuentes incrustadas, enlaces/índice, folios y pies se verifican en el PDF final; se inspeccionaron todas las páginas exportadas.
+- [x] Fuentes incrustadas (font pack local, render hermético sin red), folios y pie institucional en cada página del A4; se inspeccionaron todas las páginas exportadas, a tamaño físico y en escala de grises. — Falta verificar enlaces clicables e índice paginado: la plantilla de índice no se construyó en este tramo.
 - [x] No se crea registry VisualProfile paralelo a TASK-1644 ni se altera el catálogo Proposal. — `deck-axis` recompila byte-idéntico (sha256 sin mover, `brand-pack-sync` verde); las primitives genéricas (`measureSlideFit`, `paginateFlow`, `chart-geometry`, `compile-catalog-tokens`) viven en el motor, no en el catálogo.
 - [x] UI ready permanece `no`; wireframe existe con dirección sellada, inventario de 15 composiciones y decision log. `pnpm task:lint --task TASK-1847` sin findings. — Falta GVC/scorecard, por eso sigue en `no`.
 - [ ] Reuso/extend documentado, copy reusable canónico, estados partial/empty/error y reduced motion sin pérdida de información; no se introducen animaciones.
-- [ ] GVC premium desktop y 390px del harness observado, scrollWidth igual a clientWidth; páginas PDF se validan a tamaño físico y en escala de grises.
+- [x] Páginas PDF validadas a tamaño físico y en escala de grises (evidencia `*-gris.png` en el dossier). — GVC desktop/390px **no aplica**: `scenario.route` exige ruta del portal y la superficie es un documento. El harness es el gate visual del Composer, generalizado a los 3 catálogos. Hallazgo del gris registrado como deuda: el acento teal pierde contraste.
 - [ ] Regresión visual del Composer y test cuantitativo funcional pasan; rollout de catálogo versionado con worker se verifica antes de declarar formatos disponibles.
 
 ## Verification

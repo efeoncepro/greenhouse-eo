@@ -104,7 +104,9 @@ no concuerdan (patrón ya canonizado en `chart-bar-geometry`, `catalogs/deck-axi
 
 - Quality profile: premium.
 - Desktop 1440 y mobile 390px; states ready/loading/empty/partial/error/denied y long content.
-- Scenario: insights-catalogs propuesto; harness/rutas se materializan en ejecución.
+- Scenario: **no aplica** — GVC exige `route` del portal y un documento no la tiene. El harness real es el
+  gate visual del Composer, generalizado en TASK-1847 para fotografiar los tres catálogos. La evidencia
+  vive en `docs/ui/reviews/TASK-1847-…/` con el render real y su versión en escala de grises.
 - Capturas: first fold, figura analítica, tabla densa y estado crítico; PDF todas las páginas exportadas.
 - Assertions: valores iguales a snapshot, identity visible, fuentes y ausencia de información interna.
 - Scroll-width: scrollWidth === clientWidth.
@@ -127,5 +129,8 @@ Dos direcciones y no una porque el deck se proyecta (una idea por lámina) y el 
 Se decide además **dos catálogos propios** en vez de extender `deck-axis`, porque sus budgets protegen el
 copy comercial, y que la **geometría genérica de gráfico sea domain-free** para que ambos la compartan.
 
-Falta para `UI ready: yes`: evidencia visual del primer fold y de la página densa (Slice 2). El mapping,
-la dirección y el plan GVC ya están cerrados.
+**`UI ready` queda en `n/a`, no en `yes` ni en `no`.** El contrato de `UI ready` mide una pantalla del
+portal; esta superficie es un documento exportado a PDF. Los gates que sí aplican están verdes
+(`design-contract:lint` PASS, `ui:code-lint` PASS, `ui:quality` PASS con 4,50 y piso 4,0) y la evidencia es
+el artefacto real, revisado a tamaño físico y en escala de grises. `ui:visual-gate` no aplica por construcción:
+exige una ruta del portal.
