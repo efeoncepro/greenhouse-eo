@@ -227,7 +227,11 @@ tres salieron el mismo día, de dos sesiones.
 **Método:**
 
 1. **Compón una vez** para obtener `out/<id>-layout.json`. La huella del texto es `min(left)…max(right)` de
-   sus `elements`. Sólo esa columna importa.
+   **todos** sus `elements`. Sólo esa columna importa. 🔴 **No la angostes al descriptor**, aunque la guarda
+   compare sólo su borde inferior: la guarda usa ese borde como el piso de TODO el bloque, y eso vale sólo si el
+   `top` se midió bajo el ancho de todo el bloque. Caso CMP-002 KV-02: bajo el descriptor (x 92–293) el sujeto
+   aparece en 639; la cabeza está en 465, a la derecha, justo bajo el CTA (hasta x ≈ 555). Con 639 declarado,
+   el CTA podría bajar sobre la cabeza con la guarda en verde.
 2. **Mira la silueta del sujeto dentro de esa columna** sobre un recorte del plate con regla horizontal cada
    20 px. En registros oscuros —pelo, ropa navy, fondos en sombra— el ojo sobre la regla manda. Un script de
    luminancia (`ai-generations/2026-09-21_registro-c-respuesta/_medir-sujeto.mjs`) sirve como **cota**: si da
