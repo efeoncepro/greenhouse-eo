@@ -117,6 +117,14 @@ se pierde el resultado.
 | **2 · Contrato de resultado** | reservas, identidad fiel, cero letras en utilería, jerarquía 3×, contrastes, safe zones | **no** — se mide sobre la imagen |
 | **3 · Vía de producción** | CLI · motor nativo · otra | **sí** — se declara cuál se usó |
 
+🔴 **Y nombrar la referencia no basta: hay que poder LLEGAR a ella.** Un agente con motor propio adjunta el
+archivo a su modelo, y los kits **pesan ~640 MB y están fuera de git** — **un clone no los trae**. Por eso
+cada campaña fija sus copias en `15. Paid Media/01. Recursos/`, y por eso `assets.lock.json` —que **sí** entra
+a git— sella el `sha256` de cada referencia: **`pnpm foto:assets:check` responde si tu copia es la aprobada.**
+⚠️ **Si el hash difiere, generas con otra identidad y el resultado se ve plausible: no revienta, miente.**
+**En la ficha se anota la referencia con su hash, no sólo su ruta** — la ruta dice dónde buscar, el hash dice
+si encontraste lo correcto.
+
 🎯 **El prompt resuelto es el puente entre vías, y es el recurso más importante.** `foto:prompt` no arma un
 texto: **inyecta el bloque anti-IA, el de impacto, la palanca con sus marcadores, la reserva del formato y el
 aviso de derechos del partner**. Eso es lo que garantiza el resultado, y **es portable a cualquier motor**.
