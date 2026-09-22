@@ -80,6 +80,12 @@
           "x": 483.804,
           "y": 395.229
         },
+        "bounds": {
+          "left": 480.732,
+          "top": 392.157,
+          "right": 563.881,
+          "bottom": 477.712
+        },
         "touchesTarget": true
       }
     ],
@@ -96,8 +102,8 @@
   "descriptorBounds": {
     "left": 143.36,
     "right": 367.1,
-    "top": 434.86400000000003,
-    "bottom": 456.044
+    "top": 449.20000000000005,
+    "bottom": 470.38
   },
   "surface": {
     "left": 143.36,
