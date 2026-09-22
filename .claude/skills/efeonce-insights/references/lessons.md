@@ -1,5 +1,22 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-09-22 · El validador de cifras rechazaba toda edición SEO real, y la de ICO iba a caer igual.** Síntoma:
+  la edición de Berel falló con `unreferenced_number` por `"10"` y `"-08"`. Causas: el lector de cifras partía
+  `2026-08` en `2026` + `-08` (el mes, leído como negativo), y la etiqueta del hecho —texto del adapter— traía cifras
+  propias (`Keywords en primera página (≤10)`, `Tráfico orgánico estimado 2026-08`, y en ICO `RpA · <space> · <mes>`).
+  Los fixtures sólo usaban etiquetas sin cifras: el gate probaba la forma del primer caso, no la de los adapters.
+  Regla: una fecha ISO es UN token; la etiqueta LITERAL de un hecho **referenciado** se enmascara antes de leer
+  cifras (una cifra fuera de ella, o la etiqueta de un hecho no referenciado, se sigue rechazando). **NUNCA** se
+  arregla renombrando la etiqueta en el adapter (el snapshot ya sellado la conserva) ni agregando las cifras de la
+  etiqueta al conjunto permitido (eso sí relaja la guarda). Los fixtures del validador usan etiquetas reales.
+- **2026-09-22 · Un import de VALOR desde el barrel del composer rompe la función de Vercel.** Síntoma: staging
+  falló el deploy con una función de 441 MB (límite 250 MB). `report-mapper.ts` corre en Vercel (encola) e importaba
+  `paginateFlow` desde `@/lib/artifact-composer`, que arrastra Playwright, pdf-lib y los catálogos. `pnpm build` local
+  no lo detecta. Regla: código que corre en Vercel importa del composer sólo TIPOS o deep-imports de módulos puros
+  (`@/lib/artifact-composer/paginate`); el catálogo viaja como string (`INSIGHT_RENDER_CATALOG_BY_OUTPUT`).
+- **2026-09-22 · Un capítulo sin afirmaciones se narra, no se rechaza.** Mi guarda del mapper A4 rechazaba el
+  capítulo vacío y contradecía la filosofía de narrar lo que falta. Ahora el titular es el título del capítulo y el
+  cuerpo dice que la sección no registró hallazgos en el período.
 - **2026-09-21 · El riel de una barra puede leerse como el dato.** En el deck, el fondo del riel usaba `fieldMid`
   (#023c70) sobre el navy del molde y se leía como una barra llena: el valor chico (3,1 %) parecía grande. Ningún
   test lo vio; salió de abrir el PNG. Regla: el riel va un escalón por encima del fondo (`fieldEdge`), nunca a media

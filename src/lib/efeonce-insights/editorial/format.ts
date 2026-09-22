@@ -74,10 +74,14 @@ export const allowedNumbersForFacts = (facts: EvidenceFactV1[], byId: Map<string
   return allowed
 }
 
-/** Extrae tokens numéricos tal como aparecen (con separadores, signo, %, #, US$). */
+/**
+ * Extrae tokens numéricos tal como aparecen (con separadores, signo, %, #, US$). Una fecha ISO
+ * (`AAAA-MM` o `AAAA-MM-DD`) es UN token: sin esa alternativa, «2026-08» se partía en «2026» y
+ * «-08», y el mes se leía como un número negativo que ningún hecho respalda.
+ */
 export const extractNumberTokens = (text: string): string[] => {
   const tokens: string[] = []
-  const pattern = /(?:US\$ |\$ |#)?[+\-−]?\d[\d.,]*(?: %)?/g
+  const pattern = /\d{4}-\d{2}(?:-\d{2})?(?!\d)|(?:US\$ |\$ |#)?[+\-−]?\d[\d.,]*(?: %)?/g
 
   // Un separador al final del token es puntuación de la frase («1.000,»), no parte de la cifra.
   for (const match of text.matchAll(pattern)) tokens.push(match[0].replace(/[.,]+$/, ''))
