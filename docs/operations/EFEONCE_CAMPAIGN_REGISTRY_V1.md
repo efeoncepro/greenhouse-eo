@@ -255,3 +255,25 @@ procedencia. Registrar cantidad verificada, hashes de documentos y límites de c
 por una task o un brief: una dependencia pendiente sólo se levanta con evidencia de su cierre aplicable.
 
 Caso aplicado: [CMP-001 y continuidad](social/2026-09-22-cmp-001-campaign-brief-handoff.md).
+
+## Entrega de pauta compartida entre personas y agentes
+
+En `Paid Media/03. Finales/<CMP-ID - Nombre legible>/`, mantener un solo punto de entrada:
+`ABRIR CATALOGO.html`, `CONTROL-DE-PAUTA.csv`, `GUIA-DE-PAUTA.md`, `PAUTA-PARA-AGENTES-MCP.md`, `LEEME.md`, `01 - Imagenes/<ratio>/` y
+`02 - Videos/<ratio>/`. Archivos: `<ID estable> - <Titular legible> - <ratio>.<ext>`. El autor,
+fecha y versión pertenecen a metadata; no dividir la entrega por agente ni por tanda.
+
+Recetas y paquetes históricos viven en `01. Recursos/<CMP-ID - Produccion y editables>/`.
+Allí, `MANIFIESTO-PAUTA.json` es el inventario operativo único: IDs de concepto/export, tipo, ratio,
+ruta relativa, bytes/hash y evidencia, disponibilidad, CTA/destino, estados separados y rutas a receta/registro.
+El brief/CDR siguen gobernando estrategia y aprobación. HTML/CSV/Markdown son vistas generadas desde ese JSON;
+no mantener tres inventarios editados manualmente. Cambios humanos se incorporan al manifiesto y se regeneran
+las vistas con `actualizar-catalogo.py`. La ausencia de URL/hash queda explícita, sin inventar verificación.
+
+Una reorganización mueve exports sin alterar sus bytes, conserva recetas y publica mapa de rutas anteriores
+a actuales. Las recetas históricas no se reescriben como si se hubieran ejecutado en la ubicación nueva.
+Validar IDs únicos, conteos, enlaces y tamaños; hashes y QA visual son evidencias distintas. Un placeholder
+OneDrive listado no acredita contenido descargado. CMP-001 usa esta estructura para 25 PNG y 3 MP4; los seis
+KVs nuevos planificados no se inventarían como exports.
+
+Contrato completo, esquema operativo, copy externo y protocolo MCP: [manifiesto y handoff](EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md). Template reusable: `digital-marketing/templates/campaign-paid-manifest.md`, espejado Claude/Codex y OneDrive.

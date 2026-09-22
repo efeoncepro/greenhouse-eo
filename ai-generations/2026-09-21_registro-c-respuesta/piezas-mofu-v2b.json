@@ -1,0 +1,121 @@
+[
+  {
+    "align": "left",
+    "top": 0.07,
+    "textWidth": 0.84,
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominantSize": 150,
+    "dominantMax": 0.62,
+    "dominantTracking": -0.02,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.15,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "id": "mo1-canal-nuevo",
+    "plate": "plates/mo1-canal-nuevo-45-plate.png",
+    "lead": null,
+    "dominant": "No es un canal nuevo.",
+    "after": null,
+    "note": {
+      "text": "Citado en la IA, tu SEO rinde hasta 35% más.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.8,
+      "gapAfterClosure": 40
+    },
+    "cta": {
+      "variant": "outline",
+      "radius": 10,
+      "text": "Mide tu brecha de citación",
+      "descriptor": "Panel competitivo · SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 22,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    },
+    "selection": {
+      "box": [
+        0.4,
+        0.69,
+        0.62,
+        0.78
+      ],
+      "variant": "eight-handles",
+      "padding": "standard",
+      "overlay": "subtle",
+      "scale": 1.05,
+      "cursors": [
+        {
+          "id": "tu",
+          "label": "Tu SEO",
+          "who": "role",
+          "anchor": "bottom-end",
+          "color": "#12afa2"
+        }
+      ]
+    }
+  },
+  {
+    "align": "left",
+    "top": 0.07,
+    "textWidth": 0.84,
+    "leadFamily": "bricolage",
+    "leadFill": "#ffffff",
+    "leadSize": 36,
+    "leadGap": 0.15,
+    "dominantSize": 150,
+    "dominantMax": 0.62,
+    "dominantTracking": -0.02,
+    "afterFamily": "poppins",
+    "afterFill": "#ffffff",
+    "afterSize": 34,
+    "afterGap": 0.15,
+    "label": null,
+    "labelSize": 30,
+    "labelStar": false,
+    "logo": {
+      "width": 0.2,
+      "x": 0.5
+    },
+    "id": "mo3-no-creernos",
+    "plate": "plates/mo3-no-creernos-45-v3-plate.png",
+    "lead": null,
+    "dominant": "No tienes que creernos.",
+    "after": null,
+    "note": {
+      "text": "Te entregamos la pregunta, la respuesta y la fecha.",
+      "size": 34,
+      "x": 0.07,
+      "width": 0.8,
+      "gapAfterClosure": 40
+    },
+    "cta": {
+      "variant": "outline",
+      "radius": 10,
+      "text": "Mira cómo lo medimos",
+      "descriptor": "Panel competitivo · SEO + AEO",
+      "x": 0.07,
+      "gapAfterNote": 22,
+      "paddingX": 24,
+      "paddingY": 14,
+      "fontSize": 40,
+      "descriptorSize": 28,
+      "descriptorGap": 16,
+      "cursorScale": 1.1
+    }
+  }
+]

@@ -1,16 +1,16 @@
 [
   {
-    "id": "mo2-no-te-citan",
+    "id": "mo1-canal-nuevo",
     "dominante": [
-      "No te citan."
+      "No es un canal nuevo."
     ],
     "ratioDominanteEntrada": null,
     "contraste": {
-      "dominante": 19.16,
-      "nota": 19.29,
-      "cta": 10.59,
-      "descriptor": 19.34,
-      "logo": 18.12
+      "dominante": 18.16,
+      "nota": 18.26,
+      "cta": 9.73,
+      "descriptor": 17.52,
+      "logo": 15.06
     },
     "gapsTinta": [],
     "seleccion": {
@@ -29,13 +29,29 @@
         {
           "id": "tu",
           "labelBounds": {
-            "left": 965.952,
-            "top": 1034.208,
-            "right": 1060.693,
-            "bottom": 1065.416
+            "left": 764.352,
+            "top": 1171.008,
+            "right": 837.204,
+            "bottom": 1202.216
           }
         }
       ]
     }
+  },
+  {
+    "id": "mo3-no-creernos",
+    "dominante": [
+      "No tienes que creernos."
+    ],
+    "ratioDominanteEntrada": null,
+    "contraste": {
+      "dominante": 18.15,
+      "nota": 18.48,
+      "cta": 10.22,
+      "descriptor": 18.94,
+      "logo": 19.69
+    },
+    "gapsTinta": [],
+    "seleccion": null
   }
 ]

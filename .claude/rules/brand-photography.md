@@ -60,6 +60,15 @@ era de OpenAI. Con **Gigi es peor y la regla cambia**: no «porta un color», **
 y perder. La regla correcta es **la criatura como único acento de color, y Efeonce en el navy y en la
 estructura**) y **la contaminación del emblema**.
 
+🔴 **El lecho de la firma lo mata el REFLEJO, no la luz directa** **[medido 2026-09-22]**. Una vitrina de
+museo sobre un **plinto de aluminio cepillado claro** dio la firma en **3,55:1** con el LED ya apantallado
+hacia adentro y el suelo declarado en sombra: lo que contaminaba era el **reflejo especular del plinto en el
+piso**, justo bajo la firma centrada. Cambiar sólo el MATERIAL del plinto —a acero negro mate, no
+reflectante— llevó la firma a **19,69:1** sin tocar luz ni encuadre. ⚠️ **`foto:validar` medía 3,03 y 3,86
+en dos pasadas sin decir por qué**; el número que importa lo da `foto:componer:cta`, que mide bajo la caja
+real de la firma. **Regla: cuando el lecho falle y la luz ya esté fuera de él, sospecha de una superficie
+CLARA cerca — el reflejo llega donde la luz no.**
+
 🔴 **Tercera trampa, medida el 2026-09-22: la criatura cálida arrastra la pieza a los ochenta.** Es el reverso
 exacto del azul ajeno. Con **Clawd** (naranja terracota) en cuadro y la escena callada sobre temperatura, el
 modelo armoniza toda la iluminación hacia **tungsteno ámbar** y la pieza sale con look retro — envejecida,

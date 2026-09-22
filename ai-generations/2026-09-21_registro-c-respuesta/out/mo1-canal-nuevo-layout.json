@@ -1,0 +1,76 @@
+{
+  "canvas": {
+    "width": 1152,
+    "height": 1440
+  },
+  "elements": [
+    {
+      "id": "dominante",
+      "box": {
+        "left": 81,
+        "right": 811.6424651517332,
+        "top": 100.80000000000001,
+        "bottom": 172.2137911992413
+      }
+    },
+    {
+      "id": "nota",
+      "box": {
+        "left": 80.64000000000001,
+        "right": 819.3580000000001,
+        "top": 212.2137911992413,
+        "bottom": 243.6637911992413
+      }
+    },
+    {
+      "id": "cta",
+      "box": {
+        "left": 104.64000000000001,
+        "right": 644.1999999999999,
+        "top": 279.6637911992413,
+        "bottom": 313.3437911992413
+      }
+    },
+    {
+      "id": "descriptor",
+      "box": {
+        "left": 80.64000000000001,
+        "right": 492.9119999999999,
+        "top": 343.3437911992413,
+        "bottom": 371.9317911992413
+      }
+    }
+  ],
+  "typography": {
+    "lead": 36,
+    "dominant": 102.45881090278523,
+    "closure": 34,
+    "benefit": 34,
+    "cta": 40,
+    "descriptor": 28
+  },
+  "selection": {
+    "selection": {
+      "variant": "eight-handles",
+      "padding": "standard",
+      "paddingRatio": {
+        "inline": 0.012,
+        "block": 0.01
+      },
+      "overlay": "subtle",
+      "overlayOpacity": 0.1,
+      "overlayBlendMode": "luminosity"
+    },
+    "cursores": [
+      {
+        "id": "tu",
+        "labelBounds": {
+          "left": 764.352,
+          "top": 1171.008,
+          "right": 837.204,
+          "bottom": 1202.216
+        }
+      }
+    ]
+  }
+}

@@ -1,43 +1,28 @@
-> **Corrección de continuidad:** roles de compra reconciliados en BRIEF §3b; recetas en tres capas y template `campaign-piece.md` sincronizados con OneDrive. Comprobar hash/disponibilidad del archivo adjunto, además del checker de catálogo. Set creativo documentado; prompts de corrida y nuevos renders aún no ejecutados.
+# CMP-001 · Handoff vigente para producción y pauta
 
-> **Estado vigente v04:** [CDR-001](../../campaigns/decisions/CDR-001-cmp001-always-on-q4-2026.md) acepta Q4 y derechos paid declarados. [CDR-002](../../campaigns/decisions/CDR-002-cmp001-set-unico-produccion.md) registra acuerdo creativo tras revisión real de Claude CLI: un set de seis pilotos, después cuatro ratios. Continuar en OneDrive `conceptos/PLAN-PRODUCCION-v04.md`; acta en `decisiones/REVISION-CLAUDE-CODEX-v04.md`. KPI operador: `opportunity` en HubSpot; asistencia aparte. Medios/atribución siguen pendientes, no producción realizada.
+22/09/2026. Canon: [registro CMP](../EFEONCE_CAMPAIGN_REGISTRY_V1.md) y [manifiesto/MCP](../EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
 
-> El cuerpo siguiente conserva la revisión v2 como historia; sus dos líneas y permisos pendientes están superados por los documentos anteriores.
+## Entrada para personas y agentes
 
-# CMP-001 · Continuidad del brief y paquete operativo
+OneDrive local, bajo `Alineación/5. Contenidos/15. Paid Media/`:
+- `03. Finales/CMP-001 - Lo que la IA dice de ti/ABRIR CATALOGO.html`: elegir por imagen/titular y copiar texto externo.
+- En la misma carpeta: `CONTROL-DE-PAUTA.csv`, `GUIA-DE-PAUTA.md` y **`PAUTA-PARA-AGENTES-MCP.md`** completo.
+- `01. Recursos/CMP-001 - Produccion y editables/MANIFIESTO-PAUTA.json`: única fuente operativa; `actualizar-catalogo.py` regenera vistas.
+- Recetas originales conservadas en Recursos; `MAPA-DE-RUTAS.json` resuelve las ubicaciones anteriores. Finales separa imágenes/videos y ratios, sin nombres de agentes.
 
-22/09/2026 · Documentación y planificación, sin generación ni pauta. Canon general:
-[registro CMP](../EFEONCE_CAMPAIGN_REGISTRY_V1.md). ADR existente: contexto router-first; no nueva autoridad runtime.
+28 exports existentes: 25 PNG y 3 MP4. 48 perfiles de copy y 72 alternativas de archivo/canal/placement/variante; no activar todas. JSON/CSV/MD contrastados: IDs, caracteres, UTMs, copy literal y configuraciones completos. Los archivos bajo demanda/hash pendiente están declarados. No se ejecutó QA visual nuevo, upload ni pauta.
 
-## Dónde continuar
+## Decisiones y estado
 
-OneDrive local `Alineación/2. Campañas/CMP-001_la-ia-dice-de-ti/`:
-- `BRIEF.md`: v2, SEO/AEO + Content Marketing, JTBD, objetivos, promesas y límites; campaña `borrador`.
-- `conceptos/DIRECCION-CONSOLIDADA-v03.md`: líneas Claude/Codex, estados y conflictos; no aprobar desde filename.
-- `conceptos/GUIA-PRODUCCION-AGENTES.md`: recursos por ruta, skills/comandos, receta y QA.
-- `medicion/PLAN-CANALES-Y-MEDICION.md`: canales, destinos, UTM, definiciones y experimentos propuestos.
-- `ASSETS.md`: 25 PNG en carpetas de canal (9 Claude + 16 Codex), rutas verificadas, sin copias de imágenes.
-- `decisiones/`: auditoría SEO/AEO, consolidación e histórico anterior; hashes/verificación documental JSON.
+- [CDR-001](../../campaigns/decisions/CDR-001-cmp001-always-on-q4-2026.md) Accepted: Q4/renovación Q1 y derechos de criaturas declarados por operador; no reabrir permisos.
+- [CDR-006](../../campaigns/decisions/CDR-006-cmp001-manifiesto-copy-y-pauta.md) Proposed: CL/CO/MX/PE confirmados; US$4.000/mes base sugeridos, diciembre US$3.000; Q4 US$11.000. Presupuesto sin aprobación.
+- [CDR-005](../../campaigns/decisions/CDR-005-cmp001-embudo-momento-y-accion.md) Proposed: propuesta posterior del embudo. No resolver su dirección contra CDR-002 por fecha solamente. Este manifiesto cubre artes existentes de diagnóstico; nuevos MOFU/BOFU no producidos ni activados.
+- Destino seleccionado: landing AEO. Lectura pública confirma oferta; formulario, CRM y atribución no probados en este corte.
+- Calificación del operador: contacto `opportunity` en HubSpot; reserva/asistencia y deal se observan por separado.
+- MCP: descubrir herramientas/cuentas reales y leer estado persistido; el handoff no acredita capacidad paid ni autorización de gasto. No hay operaciones externas ejecutadas.
 
-La revisión local comprobó 44 links sin roturas. Esto no es QA visual de imágenes, readback de OneDrive remoto ni
-aprobación de medios. El brief registra restricciones de mascotas y dependencia de atribución de agenda; no se
-han levantado en este trabajo. TASK-1885 se consultó como dependencia, no se implementó.
+## Continuidad
 
-## Criterios que deben sobrevivir al handoff
+Estrategia/copy viven en `Alineación/2. Campañas/CMP-001_la-ia-dice-de-ti/`, con BRIEF y `medicion/COPY-Y-CONFIGURACION-DE-ANUNCIOS.md` apuntando al manifiesto. Para ejecutar, leer primero el Markdown MCP, no los LEEME históricos de paquetes técnicos. La historia anterior queda en git y `decisiones/historico-handoff-repo-pre-manifiesto.md` de la campaña.
 
-- JTBD de consideración, experiencia demostrada y paso de diagnóstico a ejecución; lanzamientos/expansión son
-  variantes por contexto. Mid-market/enterprise no determinan rígidamente roles ni autoridad.
-- Content sirve preguntas/decisiones con evidencia y cobertura; formatos son capacidades. Puede corresponder
-  actualizar/consolidar, no otro artículo. Mención/cita/exactitud/preferencia/conversión son hechos diferentes.
-- Promesa del servicio se verifica; no importar claims absolutos de skills antiguas, lifts ajenos o permisos
-  presumidos por URL accesible. Las observaciones de mercado no prueban causalidad para un prospecto.
-- La versión llamada MOFU-CONCEPTOS-FINAL conserva copy/CTA anterior; el consolidado registra la discrepancia.
-- Elevar ligeramente lecho para alojar firma en zona segura, sin centrarla ni comprimir escena. No nuevo preset Y.
-
-## Templates y próximos pasos
-
-Modelo versionado en `digital-marketing/templates/campaign-{brief,assets,piece}.md`, espejado Claude/Codex;
-copias OneDrive en `2. Campañas/_templates/`. No copiar briefs instanciados de vuelta como template.
-Pendientes de campaña: selección/copy de pilotos, fechas/presupuesto/metas, permisos por pieza, destinos y tracking
-verificados. Ninguno se completa por sincronizar estos documentos. El pedido actual autoriza documentación, no
-publicación ni resolución automática de las dependencias de producto.
+Pendientes de lanzamiento: inversión autorizada, cuenta/pagador/moneda/horarios/owners, audiencia disponible, conversión y persistencia de UTMs verificadas, preview real por placement. No se implementó TASK-1885 ni se alteraron artes.

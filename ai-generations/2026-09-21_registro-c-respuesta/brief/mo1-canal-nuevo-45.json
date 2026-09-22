@@ -1,0 +1,17 @@
+{
+  "id": "mo1-canal-nuevo-45",
+  "formato": "4:5",
+  "impacto": true,
+  "palanca": "luz-motivada",
+  "objetos": [
+    { "objeto": "gigi", "vista": "frente" }
+  ],
+  "escena": "SCENE (a single modern speed-gate access turnstile in a dark empty lobby, seen straight on at reader height): the turnstile is a contemporary office speed gate — two slim pedestals of brushed anodised aluminium with a pane of clear tempered glass rising from each, the two glass wings closed together in the middle. Set flush into the top of the near pedestal is a rectangular CARD READER whose surface glows a clean blue-white from within, crisp and even, the ONLY real light source in the frame, throwing a hard pool across the brushed metal and a sharp reflection into the glass wings. Standing ON TOP of that pedestal right beside the glowing reader, the small Gigi figure from the reference faces front, lit from below by the reader. Behind the closed glass wings the lobby corridor runs away and falls to black: no people, no doors, no signage, no screens, no plants, no paper, no printed matter of any kind. There is only ONE turnstile: no second gate, no row, no queue. COLOUR: the frame is cool and contemporary — deep ink-blue blacks, the reader a clean blue-white, the metal neutral grey; the figure's own colours are the only saturated thing in the image. Nothing in the environment is warm, amber, orange or golden; no tungsten, no retro glow. The reader sits low in the frame; its light, its spill and every reflection it throws stay BELOW the middle of the image, while the upper third is an unbroken field of ink-blue darkness. Fine dust hangs in the light. 50mm lens at f/2.8, camera at reader height.",
+  "reservas": {
+    "texto": { "muro": "the empty dark lobby above the turnstile, unbroken and unlit", "tinta": "blanca" }
+  },
+  "lecho": {
+    "objeto": "the near pedestal's brushed metal flank in the immediate foreground, running unbroken across the whole width of the frame",
+    "tono": "brushed dark anodised aluminium in full shadow, outside the reader light, holding a faint matte grain"
+  }
+}

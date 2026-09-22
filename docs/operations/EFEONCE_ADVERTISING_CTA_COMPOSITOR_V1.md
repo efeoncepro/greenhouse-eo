@@ -131,3 +131,38 @@ runtime, hacerlo en el módulo canónico y verificar estos casos; no crear una s
 
 Método creativo, prompts, formatos, embudo y archivo:
 [SEO/AEO Paid Media](social/2026-09-22-seo-aeo-paid-media-production-method.md).
+
+## 8. 🔴 El cursor del CTA tapa el descriptor cuando el botón es corto
+
+**Medido el 2026-09-22 en dos piezas de la misma tanda.** El cursor del botón se dibuja pegado al borde
+derecho del CTA; el descriptor arranca en el mismo `x` que el botón y corre hacia la derecha. Cuando el
+botón es **más angosto que el descriptor**, el cursor aterriza justo encima del texto:
+
+| Pieza | CTA | Descriptor | Resultado |
+|---|---|---|---|
+| `mo2-no-te-citan` | `Compárate con ellos` (19) | `Panel competitivo · SEO + AEO` (29) | ✅ limpio |
+| `mo1-canal-nuevo` v1 | `Mide tu brecha` (14) | `Brecha de citación · SEO + AEO` (30) | 🔴 la flecha se come `AEO` |
+| `mo3-no-creernos` v1 | `Ve el método` (12) | `Seis motores, cada mes · SEO + AEO` (34) | 🔴 la flecha se come el `·` |
+
+🔴 **El gate NO lo ve.** `foto:cta:gate` mide contraste de texto y superficie, y las tres pasaron: el
+solape es geométrico, no de luminancia. **Sólo se ve mirando la pieza.**
+
+✅ **Regla: el CTA se escribe con al menos tantos caracteres como el descriptor menos ~10.** En la práctica,
+un botón de **19 caracteres o más** deja al cursor fuera de un descriptor de hasta 30. Si el copy del botón
+tiene que ser corto por punch, acorta el descriptor en la misma proporción — no dejes que el cursor decida.
+
+## 9. El CTA expresa el DESTINO de la etapa, no el ángulo de la pieza
+
+Varias piezas de la **misma etapa del embudo** convergen en **una sola acción**; lo que cambia entre ellas
+es el fraseo, no el lugar al que llevan. Si dos piezas de la misma etapa mandan a destinos distintos, la
+etapa no está definida — está partida en dos campañas.
+
+**Ejemplo vivo (CMP-001, MOFU):** tres objeciones distintas, un destino — el panel competitivo.
+
+| Pieza | Dominante | CTA (fraseo) | Descriptor (destino) |
+|---|---|---|---|
+| `mo1` | No es un canal nuevo. | `Mide tu brecha de citación` | Panel competitivo · SEO + AEO |
+| `mo2` | No te citan. | `Compárate con ellos` | Panel competitivo · SEO + AEO |
+| `mo3` | No tienes que creernos. | `Mira cómo lo medimos` | Panel competitivo · SEO + AEO |
+
+Contrato del embudo: [`CDR-005`](../campaigns/decisions/CDR-005-cmp001-embudo-momento-y-accion.md).
