@@ -102,6 +102,28 @@ el ad promete una cosa, el post otra, el correo una tercera, y el prospecto los 
 | **La medición** | incluido el **guardrail**, sin el cual se apagan piezas que funcionan |
 | **Los límites de uso** | derechos, mascotas de partner, autorizaciones pendientes |
 
+### 🔴 Buying group — obligatorio en B2B
+
+**Nadie compra B2B solo:** el comité promedia **~11 stakeholders** *(referencia de industria, no medida en
+nuestras cuentas)*. Un ad le habla a **una** persona; los otros diez **nunca lo ven**. Un brief que describe
+«la audiencia» como una sola persona produce piezas que le hablan a todos y **no mueven a nadie**.
+
+> ## 🎯 El ad no convence al comité: ARMA AL CAMPEÓN.
+> Él lleva el argumento a una reunión donde no estamos. Por eso una pieza se juzga también por **si se puede
+> repetir de memoria y reenviar sin contexto**.
+
+**Modelar como mínimo:** campeón *(arma el caso)* · sponsor económico *(aprueba)* · owner técnico
+*(viabilidad y accesos)* · owner de datos *(si la evidencia vale)* · 🔴 **bloqueadores** —procurement, legal,
+security— · incumbente *(no decide y sí opina)*.
+
+🔴 **El bloqueador es el rol que más campañas ignoran:** **puede detener todo sin sponsorear nada**, y
+aparece tarde. No se le vende — se evita **darle razones para frenar**, y eso es lo que sostiene el «cero
+promesas de resultado, cero cifras sin fuente, cero claims que legal tenga que defender».
+
+**Más una tabla de asignación pieza → rol.**
+🔴 **Una pieza sin rol asignado no se produce.** Si no puedes nombrar a quién le habla, le habla a «el
+cliente». **Al sumar una pieza, esa tabla crece con ella.**
+
 ### Sumar una pieza a un canal
 
 1. **Lee el `BRIEF.md`.** Si tu pieza necesita una promesa que no está ahí, **el brief se actualiza primero**
