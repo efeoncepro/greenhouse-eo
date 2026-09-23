@@ -986,13 +986,72 @@ correr el comando varias veces, en paralelo o interrumpido.
   arreglos, dieron 6 de 6 más canarios 2 de 2.
 - **Pendiente:** marcar cada guarda en el código (`// @guarda`) con un mutante por marca.
 
-### Tercera certificación — siguiente paso
+### Tercera certificación (2026-09-23): dos auditores, NO CERTIFICA
 
-Con los nueve tramos cerrados, corre la tercera certificación con **dos auditores adversariales nuevos** (diseño y
-arquitectura) que, como en la segunda, corren sus propias reproducciones en vez de leer lo declarado. Hasta que
-dictaminen, el estado es «tramos 1–9 cerrados, tercera certificación pendiente» y ningún pilar sube de nota. El gesto
-manuscrito queda fuera de alcance (decisión del operador, 2026-09-23): una pieza con gesto sale con 3 y no entra en la
-certificación.
+Dos auditores adversariales nuevos (diseño y arquitectura) corrieron sus propias reproducciones. **Veredicto de los
+dos: NO CERTIFICA.** Lo que los tramos 6–9 prometían, en su mayoría, se sostuvo (formato anterior, `placement`,
+bloqueo y señales, rangos, columna, corchetes, variante sin margen). Lo nuevo entra más hondo: con `--reproducir`, el
+gate salía con 0 en piezas que violan reglas que bloquean.
+
+| Severidad | Hallazgo (auditor) | Tramo |
+|---|---|---|
+| 🔴 | Una selección sobre un objeto de la foto (`selection.box`) quedaba fuera de las invariantes, de la guarda del sujeto y de `protect`: su etiqueta tapaba texto o la mano (los dos) | 10 |
+| 🔴 | `signatureSafeArea` era `z.any()`: una zona incompleta daba NaN y apagaba la zona de la firma; una firma externa con `signatureY: 0.995` quedaba fuera de la imagen (arquitectura) | 10 |
+| 🔴 | El aprobador `suite-pruebas` valía en un plan del repo escrito con otras mayúsculas, por un enlace o con `--origen` (los dos) | 10 |
+| 🔴 | Un campo interno (`ctaVarianteResuelta`) en la raíz del plan reescribía el CTA después de validarlo (arquitectura) | 10 |
+| 🟠 | El HUD y la url no pasaban por ninguna guarda (los dos) | 10 |
+| 🟠 | Un espacio Unicode que la fuente no tiene (U+202F, U+3000) salía como cuadro vacío (arquitectura) | 10 |
+| 🟠 | El texto alternativo y el QA entregados no tenían huella (los dos) | 10 |
+| 🟠 | `--comando` hacía pasar cualquier compositor por el vigente (arquitectura) | 10 |
+| 🟠 | Orden de lectura sin verificar; jerarquía con puntos ciegos (tamaños declarados, no resueltos); firma arriba, a media pieza o gigante (diseño) | 11 |
+| 🟡 | Accesibilidad medida en el máster y no en lo entregado; relleno del CTA contra lo que tapa; suite y regresión dependientes de plates de campaña; mutantes con falsos positivos; regresión que no ve cambios del gate; bloqueo vacío; aprobaciones no atadas al plate; padding 0 en el CTA; residuos | 10–12 |
+
+**Regla de término** (decisión del operador, 2026-09-23): la certificación se da por cerrada con **cero hallazgos 🔴 y
+🟠 abiertos** en lo que usan las piezas reales. Lo que ninguna guarda mide no se certifica (sale con 3, como el gesto
+y la tarjeta). Lo 🟡/🟢 que quede queda registrado como deuda con dueño.
+
+### Tramo 10 — integridad (cerrado, 2026-09-23)
+
+Todo lo de este tramo aplica a todas las piezas y **no cambia ninguna imagen aprobada**.
+
+- **Selección sobre un objeto:** su marco, cursores y etiquetas entran en las invariantes con destino «objeto» (no
+  tapan ninguna voz, botón ni firma), y cursores y etiquetas entran en la guarda del sujeto y en `protect`.
+- **Zona de la firma con forma:** `signatureSafeArea` se valida como `safeArea` (cuatro fracciones, `x0 < x1`,
+  `y0 < y1`); ninguna firma —logo, externa o url— puede caer fuera de la imagen.
+- **Aprobador de la suite:** vale sólo si la ruta REAL del plan (enlaces y mayúsculas resueltos) está fuera del repo
+  **y** la suite dejó su marca `.suite-pruebas` —con el valor que exporta en `FOTO_SUITE_NONCE`— en la carpeta del plan
+  o una superior. `--origen` dejó de ser un flag: sale con 2; `--reproducir` pasa el origen por un archivo interno.
+- **Estado interno fuera del plan:** la variante resuelta de `auto` viaja por el compositor, no por el plan; un plan
+  con `ctaVarianteResuelta` se rechaza, y el gate verifica el acento y el relleno sobre la variante que se dibujó (el
+  QA registra sus tokens).
+- **HUD, url y cierre inferior** (`footer`): salen con 3. Ninguna pieza con CTA del repo los usa.
+- **Espacios Unicode:** sólo el espacio común y el salto de línea se dibujan sin glifo; cualquier otro que la fuente
+  no tenga se rechaza al validar. Un texto sin nada que dibujar (sólo U+200B, por ejemplo) también.
+- **Lo entregado, completo:** el texto alternativo lleva huella (`huellas.alt`); `--reproducir` compara además el
+  `.alt.txt` y la fila del QA (sin huellas ni máscara). El 0 del modo rápido ya no dice «certificadas»: dice que las
+  piezas cumplen según su QA; la imagen se certifica con `--reproducir`.
+- **Comando ajeno:** con un `--comando` que no es el compositor del repo, el gate sale a lo sumo con 3, salvo en la
+  suite de pruebas.
+- **`final`:** no puede bajar del 85 % del ancho del máster ni de 780 px (las piezas del repo reducen hasta el 86 %):
+  la accesibilidad se mide en el máster y lo entregado no se aleja. Medir sobre el PNG entregado queda como deuda.
+- **Jerarquía:** el layout registra los tamaños RESUELTOS (el cierre por defecto de 74 px, la nota, la etiqueta y el
+  pie), y `dominante-mayor` compara también la etiqueta y el pie. Techo a las escalas de la selección (`cursorScale`
+  ≤ 2, `seleccion.escala` y `selection.scale` ≤ 2,5; el repo usa como máximo 1,1 y 1,35).
+- **Aprobaciones atadas al plate:** `firma: { modo: "sin-firma" }`, `conceptoReducido` y cada zona de
+  `subjectGuard.ignore` nombran el sha256 del plate, como las excepciones. Un registro de aprobadores con cambios sin
+  commit no certifica una pieza que use una aprobación.
+- **Descriptor:** 4,5:1 a cualquier tamaño, como el CTA.
+- **Bloqueo vacío:** un `.componer.lock` o un `.reclamo` vacío con más de 10 s se reclama; el error nombra el archivo.
+
+**Evidencia:** 10 de 10 pruebas unitarias (integridad y esquema nuevo, `cta-esquema.test.mjs`); P01 y P03–P10 en verde,
+con 21 casos nuevos en P06, P07 y P10; P02: 129 de 132 piezas idénticas y 3 con diferencias previstas —las tres con
+selección sobre un objeto; su layout registra el marco, el cursor y la etiqueta, con píxeles, veredicto y avisos
+idénticos—, y 3 piezas omitidas porque su plate vive en OneDrive y el archivo no respondió (ETIMEDOUT) al correrla;
+21 de 21 mutantes nuevos detectados por la razón esperada, canarios 2 de 2.
+
+**Queda para los tramos 11 y 12:** el canon nuevo con las decisiones de abajo (orden de lectura, jerarquía por rol,
+firma en el pie y con tamaño máximo, velo, tamaño mínimo) y el banco de pruebas propio (piezas de prueba versionadas,
+mutantes por aserción, regresión que juzga cada versión con su gate). Después, la cuarta certificación.
 
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
@@ -1050,6 +1109,20 @@ Nada de esto cambia una pieza aprobada.
   reproducciones no se tocaron).
 - **El gesto manuscrito queda fuera de alcance:** no se certifica (sale con 3).
 
+**Tomadas (2026-09-23, segunda ronda):**
+
+- **Canon nuevo, sólo hacia adelante.** Las piezas aprobadas se reconocen por su huella (el plate y la pieza del plan)
+  y siguen con las reglas de hoy; todo lo demás nace con el canon 2026-09-23. No se regenera ninguna imagen ya hecha.
+- **Firma 16:9:** 25 % del lado corto en los formatos horizontales de las piezas nuevas (20 % en verticales y
+  cuadrados). Se pueden generar unas pocas imágenes de prueba, no el set.
+- **Firma dentro de AXIS** en las piezas nuevas. En las existentes, se sube donde el lecho ya cubre la nueva posición;
+  donde no, queda como está.
+- **Zona AXIS por defecto** en las piezas nuevas, con la corrección del crecimiento (el marco del CTA que no se pinta
+  no frena el crecimiento).
+- **Sin velo:** el lecho sale siempre del prompt; `scrimTop`/`scrimBottom` dejan de existir. Ninguna pieza aprobada
+  los usa.
+- **Regla de término de la certificación:** cero 🔴 y 🟠 abiertos (arriba).
+
 **Pendientes** (sin respuesta; lo implementado mientras tanto va entre paréntesis):
 
 1. **Firma en 16:9.** Medido en la misma campaña: en 16:9 la firma ocupa 7,3–7,9 % del ancho del cuadro, contra 20 % en
@@ -1070,8 +1143,11 @@ Nada de esto cambia una pieza aprobada.
    (§10)—, pero el compositor acepta `scrimTop`/`scrimBottom` y el gate sólo avisa cuando una voz pasa gracias al velo
    (`accesibilidad.rescate`, medido sobre la foto sin él). ¿Se permite por defecto (hoy avisa) o necesita aprobación?
 5. **Variante del CTA elegida sin margen:** ¿aviso (hoy, `ctaVariante.sinMargen`) o bloqueo?
-6. **Piso de legibilidad por rol** (texto bajo 9 CSS px en el teléfono; hoy aviso). *(La excepción `legibilidad` se
-   acepta, pero hoy no hay regla que bloquee; `placement` ya no quita el aviso: sólo endurece.)*
+6. **Piso de legibilidad por rol** (texto bajo 9 CSS px en el teléfono; hoy aviso). En discusión con el operador el
+   2026-09-23, con la única referencia externa verificada: Apple fija 11 pt como mínimo de texto en iPhone (17 por
+   defecto); WCAG no fija un tamaño mínimo. Medido en las 62 piezas: el CTA cumple 11 px en todas las 9:16 y 4:5 y en
+   ninguna 16:9. *(Hoy no hay regla que bloquee, y la excepción `legibilidad` no existe en el esquema: un plan que la
+   declara se rechaza. Vuelve cuando la regla bloquee.)*
 7. **Grosor de los corchetes AXIS** (≈ 0,69 CSS px en el teléfono, en todos los formatos): cambiarlo es cambiar el
    contrato AXIS. *(El gate avisa con `accesibilidad.corchetes`.)*
 
@@ -1144,7 +1220,7 @@ imagen (§15). Y un 3 nunca es un pase. Si la firma la pone otra herramienta, ce
 | Comando | Qué hace | Opciones | Deja |
 |---|---|---|---|
 | `pnpm foto:componer:cta <plan> [id...]` | Compone las piezas del plan; con ids, sólo esas, y su QA se fusiona con el que ya había | `--variantes`: los tres tratamientos del CTA en `out/variantes/`, con una hoja comparativa por pieza; no toca el QA del plan | `out/<id>.png`, `<id>-layout.json`, `<id>.alt.txt`, `<id>-overlay.svg`, `<id>-cta-evidence.json`, `preview-390/<id>.png` y `qa-<plan>.json`; el bloqueo `out/.componer.lock` mientras corre |
-| `pnpm foto:cta:gate <plan>` | Certifica lo compuesto: huellas y reglas del canon | `--reproducir`: certifica recomponiendo · `--comando <archivo>`: certifica contra otra versión del compositor (la usan la suite y la regresión) · `--origen <plan>`: interno de `--reproducir` | Código 0, 1, 2 o 3 (§19.5) |
+| `pnpm foto:cta:gate <plan>` | Verifica lo compuesto: huellas y reglas del canon según el QA; con `--reproducir`, certifica la imagen | `--reproducir`: recompone en un temporal y exige lo entregado idéntico (PNG, layout, texto alternativo y fila del QA) · `--comando <archivo>`: juzga contra otra versión del compositor; fuera de la suite de pruebas nunca sale con 0 | Código 0, 1, 2 o 3 (§19.5) |
 | `pnpm foto:accesibilidad <plan>` | Reporte para mirar, a partir del QA ya compuesto | — | `out/accesibilidad/reporte.md` (tabla por pieza y voz) y `<id>-daltonismo.png` (la pieza a 390 px en visión típica, protanopía, deuteranopía y tritanopía; Machado 2009) |
 | `pnpm foto:componer:cta:regresion` | Compone todas las piezas con CTA del repo con la referencia y con tu versión, y compara (§19.10) | `--ref <git-ref>` (HEAD) · `--candidato <archivo>` (el del árbol de trabajo) · `--solo <texto>` (subcadena de la ruta del plan) · `--jobs <n>` · `--conservar` · `--cobertura <archivo>` · `--actualizar-cobertura` | `<tmp>/reporte.json` y las carpetas de las piezas con diferencias |
 | `pnpm foto:componer:cta:pruebas` | Las 10 pruebas de punta a punta, P01–P10 | `--solo P01,P07` · `--ref` · `--compositor <archivo>` · `--gate <archivo>` · `--regresion <archivo>` · `--p02-rapido` · `--conservar` | `reporte.json` y `reporte.md` en su temporal; el resto se borra salvo con `--conservar` |
@@ -1152,7 +1228,8 @@ imagen (§15). Y un 3 nunca es un pase. Si la firma la pone otra herramienta, ce
 
 Variables de entorno: `FOTO_MASCARAS_DIR` aísla la caché de máscaras (la usan las pruebas; una pieza compuesta con una
 caché ajena sale como no certificable) y `FOTO_EVIDENCIA=1` deja además la capa de texto y el fondo de cada pieza
-(`<id>-texto.png` y `<id>-fondo.png`), que P09 usa como oráculo.
+(`<id>-texto.png` y `<id>-fondo.png`), que P09 usa como oráculo. `FOTO_SUITE_NONCE` la pone la suite de pruebas junto
+con su marca `.suite-pruebas`; no se define a mano (es lo que distingue un plan de la suite de uno real).
 
 Las 10 pruebas: P01 determinismo · P02 no regresión · P03 guarda de sujeto · P04 crecer respira · P05 crecer no degrada
 el contraste · P06 zona segura, eje y firma · P07 validación del plan · P08 cortes de línea · P09 accesibilidad y
@@ -1262,10 +1339,10 @@ de tu corrida: compón y corre el gate.
 
 | Código | Significa | Qué hacer |
 |---|---|---|
-| **0** | Certificado: calzan las huellas del plan, el plate, el PNG, el layout y el comando vigente, y cada pieza cumple las reglas que bloquean | Leer los `⚠`, que no bloquean pero alguien decide; antes de entregar, `--reproducir` |
+| **0** | Sin `--reproducir`: calzan las huellas del plan, el plate, el PNG, el layout, el texto alternativo y el comando, y cada pieza cumple las reglas que bloquean **según su QA**. Con `--reproducir`: además, lo entregado es idéntico a lo que produce el comando del repo —**certificado**— | Leer los `⚠`, que no bloquean pero alguien decide; antes de entregar, `--reproducir` (el QA solo se puede reescribir con huellas coherentes; la reproducción no) |
 | **1** | Falla: una pieza incumple una regla; algo cambió después de componer (plan, plate, PNG o layout); o falta el QA, hay piezas del plan sin QA o hay 0 piezas evaluadas | Leer cada `✗`, corregir el plan o el plate y recomponer (§19.11) |
-| **2** | Uso incorrecto: no se pasó un plan | `pnpm foto:cta:gate <plan.json>` |
-| **3** | **No certificable** (`⊘`): no es un pase ni una falla; el gate no tiene cómo probar lo que certificaría | Recomponer; si la causa es la versión del comando o la caché de máscaras, `--reproducir`; con gesto o tarjeta no hay forma (§19.11) |
+| **2** | Uso incorrecto: no se pasó un plan, o se pasó `--origen` (ya no existe) | `pnpm foto:cta:gate <plan.json>` |
+| **3** | **No certificable** (`⊘`): no es un pase ni una falla; el gate no tiene cómo probar lo que certificaría | Recomponer; si la causa es la versión del comando o la caché de máscaras, `--reproducir`; con gesto, tarjeta, HUD, url o cierre inferior no hay forma, y con un `--comando` ajeno tampoco (§19.11) |
 
 **Orden en que decide.** Primero la integridad: huellas, piezas sin QA y piezas sin máscara salen con 1 antes de mirar
 el contenido. Después, el contenido. Un motivo de «no certificable» saca 3 sólo si no hubo ninguna falla: ante un 1,
@@ -1365,12 +1442,13 @@ Copiarlo sólo vale si el operador re-aprueba la excepción para ese plate.
 | `acento-cta` | CTA sin acento (p. ej. con Gigi en cuadro) | no se mide: sin `hasta` |
 | `cta-perceptual` | CTA bajo APCA o, con daltonismo, bajo 4,5:1 | no se mide: sin `hasta` |
 | `concepto-completo` | Pieza sin entrada o sin cierre | no se mide: sin `hasta` (la forma canónica es `conceptoReducido`) |
-| `legibilidad` | Texto bajo 9 CSS px en el teléfono | hoy la regla sólo avisa (pendiente 6): la excepción se acepta y no tiene nada que apagar |
+| — | Texto bajo 9 CSS px en el teléfono | hoy sólo avisa (pendiente 6) y no hay excepción: `legibilidad` no está en el esquema y un plan que la declara se rechaza |
 
 Una excepción **vale** sólo si se cumplen las tres condiciones del tramo 7:
 
-1. `aprobadoPor` está en `scripts/foto/aprobadores.json`. `suite-pruebas` sólo vale para los temporales de la suite,
-   fuera del repo.
+1. `aprobadoPor` está en `scripts/foto/aprobadores.json`. `suite-pruebas` sólo vale en los planes de la suite: ruta
+   real fuera del repo y la marca `.suite-pruebas` de la suite (tramo 10). Si el registro tiene cambios sin commit, la
+   pieza que usa una aprobación no se certifica.
 2. `plate` es el sha256 del plate con que se aprobó: si el plate se regenera, se vuelve a aprobar.
 3. Si la regla se mide con un número, `hasta` declara el valor aprobado y la medida no lo supera: ≥ en contrastes,
    tamaños y razones; ≤ en px.
@@ -1378,21 +1456,22 @@ Una excepción **vale** sólo si se cumplen las tres condiciones del tramo 7:
 Si no vale, **no apaga nada**: la regla bloquea y el gate dice por qué (§19.11). Y **ninguna excepción cambia cuánto
 crece la pieza**: la búsqueda del tamaño no las mira.
 
-**Otras salidas que exigen un aprobador del registro:** `firma: { modo: "sin-firma", razon, aprobadoPor }`,
-`conceptoReducido: { razon, aprobadoPor }` y cada zona de `subjectGuard.ignore`. El gate las imprime con su razón; sin
-un aprobador válido, fallan.
+**Otras salidas que exigen un aprobador del registro:** `firma: { modo: "sin-firma", razon, aprobadoPor, plate }`,
+`conceptoReducido: { razon, aprobadoPor, plate }` y cada zona de `subjectGuard.ignore` (con `plate`). Desde el tramo 10
+nombran el sha256 del plate, como las excepciones: con un plate regenerado se vuelven a aprobar. El gate las imprime
+con su razón; sin un aprobador válido o con otro plate, fallan.
 
 **El registro** (`scripts/foto/aprobadores.json`): hoy `julio-reyes` (Julio Reyes, operador de marca y del compositor) y
-`suite-pruebas` (sólo planes fuera del repo; también al certificar por reproducción, porque `--origen` le dice al gate
-de qué plan viene la copia). Agregar a alguien es decisión del operador y va con commit. 🔴 Un agente nunca inventa un
+`suite-pruebas` (sólo los planes de la suite; al certificar por reproducción, el gate hijo sabe de qué plan viene la
+copia por un archivo interno, no por un flag). Agregar a alguien es decisión del operador y va con commit. 🔴 Un agente nunca inventa un
 aprobador ni copia `suite-pruebas` a un plan real: si falta la aprobación, pregunta.
 
 ### 19.8 Qué bloquea y qué avisa el gate
 
 **Bloquea** (código 1), salvo excepción auditada donde la regla lo permite:
 
-- **Integridad:** las huellas del plan, el plate, el PNG y el layout; el tamaño entregado del PNG (el `final` del plan o
-  el del plate); toda pieza con CTA presente en el QA; al menos una pieza evaluada.
+- **Integridad:** las huellas del plan, el plate, el PNG, el layout y el texto alternativo; el tamaño entregado del PNG
+  (el `final` del plan o el del plate); toda pieza con CTA presente en el QA; al menos una pieza evaluada.
 - **Sujeto:** sin máscara (`guardaSujeto: sin-mascara`) no se certifica; una zona ignorada sin aprobador del registro
   falla.
 - **Accesibilidad por voz:** WCAG 2.2 AA según el tamaño en pantalla (390 CSS px de ancho; 4,5:1 texto normal, 3:1
@@ -1408,11 +1487,19 @@ aprobador ni copia `suite-pruebas` a un plan real: si falta la aprobación, preg
 - **Concepto y jerarquía:** entrada, dominante y cierre (`concepto-completo`, o `conceptoReducido` aprobado); el
   dominante ≥ 3× la entrada (`jerarquia`); el dominante es la voz mayor (`dominante-mayor`).
 - **Maquetación:** la reserva editorial (`reserva-editorial`) y las invariantes recalculadas sobre el layout: nada se
-  encima y ninguna selección tapa una voz.
+  encima y ninguna selección tapa una voz que no es su destino; una selección sobre un objeto de la foto no tapa
+  ninguna.
+
+**Rechaza al validar** (el compositor, antes de componer): un espacio o carácter que la fuente de su voz no tiene, un
+texto sin nada que dibujar, `signatureSafeArea` incompleta, un campo interno del compositor en el plan, escalas de la
+selección sobre su techo, un `final` bajo el 85 % del máster o bajo 780 px, y una firma que cae fuera de la imagen.
+
+**No certificable** (código 3): gesto, tarjeta, HUD, url y cierre inferior —ninguna guarda los mide—, una pieza de otra
+versión del comando o con máscara de una caché ajena, y un `--comando` que no es el compositor del repo.
 
 **Avisa** (`⚠`, no bloquea; alguien lo mira):
 
-- una voz que pasa sólo gracias al velo, medida sobre la foto sin él (pendiente 4);
+- una voz que pasa sólo gracias al velo, medida sobre la foto sin él (el velo sale en el tramo 11);
 - la variante del CTA elegida sin margen (pendiente 5);
 - `placement` declarado;
 - texto de menos de 9 CSS px en el teléfono (pendiente 6);

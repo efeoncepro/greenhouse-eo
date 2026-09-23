@@ -480,7 +480,7 @@ Reglas que se pueden exceptuar:
 | `jerarquia` | Dominante bajo tres veces la entrada |
 | `dominante-mayor` | Otra voz más grande que el titular |
 | `reserva-editorial` | Texto fuera de la reserva editorial del plan |
-| `legibilidad` | Reservada para el piso de legibilidad por rol: hoy ese piso sólo avisa, así que esta excepción no tiene efecto |
+| — | El piso de legibilidad por rol todavía sólo avisa: no hay excepción `legibilidad` (un plan que la declara se rechaza) |
 
 **Lo que nunca se exceptúa:** WCAG de cada voz y de su trazo, el CTA o el descriptor bajo 4,5:1, el relleno bajo 3:1,
 el borde del CTA en el teléfono, las huellas, la falta de silueta, una firma automática por encima del contenido y los
@@ -498,8 +498,10 @@ Una excepción que no vale **no apaga nada**: la regla bloquea y el gate explica
 
 **El registro de aprobadores** es `scripts/foto/aprobadores.json`. Hoy tiene a Julio Reyes (`julio-reyes`, operador de
 marca y del compositor) y a la suite de pruebas (`suite-pruebas`), que sólo vale para los planes temporales de las
-pruebas, fuera del repositorio. Sumar a alguien es decisión del operador y queda en un commit. Un agente nunca inventa
-un aprobador: si falta, pregunta.
+pruebas: fuera del repositorio por su ruta real y con la marca que deja la propia suite. Sumar a alguien es decisión del
+operador y queda en un commit; si el registro tiene cambios sin commit, una pieza que usa una aprobación no se
+certifica. Un agente nunca inventa un aprobador: si falta, pregunta. Desde el tramo 10, la pieza sin firma, el concepto
+reducido y cada zona del sujeto ignorada nombran también el plate aprobado, como las excepciones.
 
 Tres salidas que no se miden también exigen un aprobador del registro, y el gate las imprime: la pieza **sin firma**, el
 **concepto reducido** y las **zonas del sujeto ignoradas**.
@@ -582,13 +584,16 @@ los que el gate daba verde sobre una pieza mala. Cada hallazgo se cerró en un t
 | 7 · Umbrales que no se aflojan | `placement` sólo endurece, CTA a 4,5:1 siempre, dominante mayor, excepciones con plate, `hasta` y aprobador registrado |
 | 8 · Entradas y bordes | Rangos, entidades inválidas, ids que difieren en mayúsculas, plate ilegible, columna sólo a la izquierda, texto alternativo, corchetes medidos, tamaño entregado |
 | 9 · Proceso | Bloqueo sin carreras que Ctrl-C suelta, aviso entre planes, suite que limpia sus temporales, veredicto del gate en la regresión, huella con fuentes y logos, mutantes contra una corrida base y canarios |
+| 10 · Integridad (tras la tercera certificación) | Selección sobre un objeto dentro de las guardas, zona de la firma validada y firma dentro de la imagen, aprobador de pruebas sólo en la suite, sin estado interno en el plan, HUD/url/pie no certificables, espacios Unicode, huella del texto alternativo y reproducción que compara todo lo entregado, comando ajeno que no certifica, piso de `final`, jerarquía con tamaños resueltos, aprobaciones atadas al plate |
 
 Entre los tramos 5 y 6 se sumaron la medición de la firma externa, el bloqueo de APCA y daltonismo en el CTA y la zona
 `"axis"` también por arriba.
 
 **Lo que falta:**
 
-- Una **tercera certificación** con dos auditores nuevos, después del tramo 9.
+- La **tercera certificación** (2026-09-23) dio NO CERTIFICA en los dos auditores. El tramo 10 cerró lo de integridad;
+  faltan el tramo 11 (canon nuevo: orden de lectura, jerarquía por rol, firma en el pie, velo, tamaño mínimo) y el 12
+  (banco de pruebas propio), y después una cuarta certificación. Se da por cerrada con cero hallazgos graves y medios.
 - Marcar cada guarda en el código con un mutante por marca.
 - Las **decisiones pendientes del operador**: tamaño de la firma en 16:9, margen por defecto del compositor, firma de
   las tres stories de v07 en la franja que Reels tapa, si el velo necesita aprobación, si una variante sin margen debe

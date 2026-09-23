@@ -45,10 +45,12 @@ const texto = z.string().trim().min(1, 'no puede estar vacío')
 const razon = z.string().trim().min(10, 'la razón necesita al menos 10 caracteres')
 const aprobado = z.string().trim().min(3, 'nombra quién aprobó')
 const caja = z.tuple([fraccion, fraccion, fraccion, fraccion])
+// sha256 del plate para el que se aprobó algo: un plate regenerado se vuelve a aprobar.
+const shaPlate = z.string().regex(/^[0-9a-f]{64}$/, 'el sha256 del plate, 64 hex')
 
 // `plate`: sha256 del plate para el que se aprobó (un plate regenerado se vuelve a aprobar). `hasta`: el valor que se
 // aprueba cuando la regla se mide con un número (el gate lo exige ahí). Tramo 7; auditoría de arquitectura, N7.
-const excepcion = z.object({ regla: z.enum(REGLAS_EXCEPTUABLES), razon, aprobadoPor: aprobado, plate: z.string().regex(/^[0-9a-f]{64}$/, 'el sha256 del plate, 64 hex').optional(), hasta: z.number().finite().optional() }).strict()
+const excepcion = z.object({ regla: z.enum(REGLAS_EXCEPTUABLES), razon, aprobadoPor: aprobado, plate: shaPlate.optional(), hasta: z.number().finite().optional() }).strict()
 
 const cursorCta = z
   .object({
@@ -78,14 +80,14 @@ const cta = z
     radius: noNegativo.optional(),
     gapAfterNote: noNegativo,
     descriptorGap: noNegativo.optional(),
-    cursorScale: positivo.optional(),
+    cursorScale: positivo.max(2).optional(),
     surfaceToken: z.enum(TOKENS).optional(),
     inkToken: z.enum(TOKENS).optional(),
     seleccion: z
       .object({
         marco: z.enum(['open-brackets', 'four-corners', 'eight-handles', 'ninguno']).optional(),
         padding: z.enum(['compact', 'standard', 'open']).optional(),
-        escala: positivo.optional(),
+        escala: positivo.max(2.5).optional(),
         cursores: z.array(cursorCta).min(1).optional()
       })
       .strict()
@@ -132,7 +134,7 @@ const seleccion = z
     variant: z.enum(['eight-handles', 'four-corners', 'open-brackets']).optional(),
     padding: z.enum(['compact', 'standard', 'open']).optional(),
     overlay: z.enum(['none', 'subtle', 'emphasized']).optional(),
-    scale: positivo.optional(),
+    scale: positivo.max(2.5).optional(),
     box: caja.optional(),
     targetKind: z.enum(['text', 'object', 'group']).optional(),
     cursors: z.array(cursorSeleccion).min(1)
@@ -189,7 +191,7 @@ export const esquemaPieza = z
     subjectGuard: z
       .object({
         ignore: z
-          .array(z.object({ box: caja, reason: razon, aprobadoPor: aprobado }).strict())
+          .array(z.object({ box: caja, reason: razon, aprobadoPor: aprobado, plate: shaPlate.optional() }).strict())
           .optional()
       })
       .strict()
@@ -216,12 +218,15 @@ export const esquemaPieza = z
       .optional(),
     textGrowth: z.boolean().optional(),
     placement: z.object({ anchoCssPx: positivo, razon }).strict().optional(),
-    conceptoReducido: z.object({ razon, aprobadoPor: aprobado.optional() }).strict().optional(),
+    // Las aprobaciones que apagan una medición —concepto reducido, pieza sin firma, zona del sujeto ignorada— nombran el
+    // plate para el que se aprobaron, como las excepciones: con un plate regenerado, la zona ignorada seguía apagando la
+    // guarda sin re-aprobación (tramo 10; auditoría de arquitectura, hallazgo 16). El gate lo exige.
+    conceptoReducido: z.object({ razon, aprobadoPor: aprobado.optional(), plate: shaPlate.optional() }).strict().optional(),
     // `firma`: la pone otra herramienta (`externa`, p. ej. firmar.mjs) o la pieza no lleva (`sin-firma`). En la externa,
     // `y` es el CENTRO vertical (fracción del alto, como `signatureY`) y `ancho` la fracción del lado corto (20 % por
     // defecto): el compositor reserva esa caja para que nada caiga donde después va la firma.
     // La altura de una firma externa se declara en `signatureY`, que es lo que lee `firmar.mjs`.
-    firma: z.object({ modo: z.enum(['sin-firma', 'externa']), razon, aprobadoPor: aprobado.optional() }).strict().optional(),
+    firma: z.object({ modo: z.enum(['sin-firma', 'externa']), razon, aprobadoPor: aprobado.optional(), plate: shaPlate.optional() }).strict().optional(),
     excepciones: z.array(excepcion).optional(),
     scrimTop: z.object({ opacity: fraccion, to: fraccion, color: hex.optional() }).strict().optional(),
     scrimBottom: z.object({ opacity: fraccion, from: fraccion }).strict().optional(),
@@ -237,11 +242,22 @@ export const esquemaPieza = z
     copyFormula: z.any().optional(),
     placementLimitation: z.any().optional(),
     signatureY: fraccion.optional(),
-    signatureSafeArea: z.any().optional()
+    // La zona de la firma con la misma forma que `safeArea` (tramo 10; auditoría de arquitectura, hallazgo 2): era
+    // `z.any()`, y con `{ x0: 0.1 }` las coordenadas faltantes quedaban en NaN y la zona se apagaba.
+    signatureSafeArea: z
+      .object({ x0: fraccion, y0: fraccion, x1: fraccion, y1: fraccion, profile: z.string().optional(), status: z.string().optional() })
+      .strict()
+      .refine(a => a.x0 < a.x1 && a.y0 < a.y1, 'la zona de la firma necesita x0 < x1 e y0 < y1')
+      .optional()
   })
   .passthrough()
 
 export const CAMPOS_CONOCIDOS = new Set(Object.keys(esquemaPieza.shape))
+
+// Nombres que el compositor usa para su estado INTERNO (tramo 10; auditoría de arquitectura, hallazgo 4): en la raíz del
+// plan, `ctaVarianteResuelta` reescribía el CTA después de validarlo —un botón blanco, sin acento, con un emoji como
+// cuadro vacío— y el QA lo registraba como una decisión «auto». El estado ya no vive en el plan; el nombre se rechaza.
+export const CAMPOS_INTERNOS = new Set(['ctaVarianteResuelta'])
 
 // Traduce un problema de zod a un mensaje que nombra el campo y lo que se esperaba, en español.
 const traducir = issue => {
@@ -310,7 +326,10 @@ export function validarPiezaEsquema(p) {
 
   if (!r.success) for (const issue of r.error.issues) errores.push(traducir(issue))
   errores.push(...reglasCruzadas(limpia))
-  const desconocidos = p && typeof p === 'object' ? Object.keys(p).filter(k => !CAMPOS_CONOCIDOS.has(k)) : []
+  const internos = p && typeof p === 'object' ? Object.keys(p).filter(k => CAMPOS_INTERNOS.has(k)) : []
+
+  if (internos.length) errores.push(`${internos.map(k => `\`${k}\``).join(', ')}: campo interno del compositor, no se declara en el plan`)
+  const desconocidos = p && typeof p === 'object' ? Object.keys(p).filter(k => !CAMPOS_CONOCIDOS.has(k) && !CAMPOS_INTERNOS.has(k)) : []
 
   return { errores, avisos: desconocidos.length ? [`campos que este comando no lee — ${desconocidos.join(', ')}`] : [] }
 }

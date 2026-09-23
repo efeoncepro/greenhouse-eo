@@ -14,6 +14,50 @@ export const REPO = fileURLToPath(new URL('../../', import.meta.url))
 
 export const sha = datos => createHash('sha256').update(datos).digest('hex')
 
+// ── Identidad de la suite de pruebas (tramo 10; auditorías de arquitectura, hallazgo 3, y de diseño, hallazgo 6) ────────
+// El aprobador `soloPruebas` valía en cualquier plan cuya ruta no EMPEZARA con la del repo: con otras mayúsculas, por un
+// enlace simbólico o con `--origen`, un plan del repo lo usaba (el repo responde también a /USERS/JREYE/…). Ahora decide
+// la ruta REAL —resuelve enlaces y, en macOS, las mayúsculas— y, además, una marca que sólo pone la suite: `.suite-pruebas`
+// junto al plan, con el mismo valor que la suite exporta en `FOTO_SUITE_NONCE`. Un plan fuera del repo sin esa marca (un
+// piloto en OneDrive) tampoco lo usa.
+export const MARCA_SUITE = '.suite-pruebas'
+
+export const rutaReal = p => {
+  try {
+    return fs.realpathSync.native(p)
+  } catch {
+    return path.resolve(p)
+  }
+}
+
+const INSENSIBLE = process.platform === 'darwin' || process.platform === 'win32'
+const normal = p => (INSENSIBLE ? p.toLowerCase() : p)
+
+// ¿La ruta (un plan que existe) está dentro del repo? Por su ruta real, no por cómo se escribió.
+export const dentroDelRepo = p => {
+  const repo = normal(rutaReal(REPO)).replace(/[/\\]+$/, '')
+  const r = normal(rutaReal(p))
+
+  return r === repo || r.startsWith(repo + path.sep)
+}
+
+// La marca vale en la carpeta del plan o en una superior (la suite la deja en la raíz de su temporal).
+export function marcaDeSuite(dirPlan) {
+  const nonce = process.env.FOTO_SUITE_NONCE
+
+  if (!nonce || nonce.length < 32) return false
+
+  for (let d = rutaReal(dirPlan); ; d = path.dirname(d)) {
+    try {
+      if (fs.readFileSync(path.join(d, MARCA_SUITE), 'utf8').trim() === nonce) return true
+    } catch {
+      // sin marca aquí: se sigue hacia arriba
+    }
+
+    if (path.dirname(d) === d) return false
+  }
+}
+
 // JSON con claves ordenadas: la misma pieza da la misma huella aunque el plan reordene sus campos.
 export const estable = v =>
   Array.isArray(v)
@@ -113,6 +157,19 @@ const vivo = pid => {
 
 const esperar = ms => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms)
 
+// Un bloqueo o un reclamo VACÍO es de un proceso que murió entre crear el archivo y escribir su pid (p. ej. con el disco
+// lleno): pasado este plazo se reclama como uno de un proceso muerto. Antes dejaba la carpeta tomada para siempre, con
+// «no se pudo tomar el bloqueo» y sin nombrar el archivo (tramo 10; auditoría de arquitectura, hallazgo 15).
+const HUERFANO_MS = 10e3
+
+const edad = ruta => {
+  try {
+    return Date.now() - fs.statSync(ruta).mtimeMs
+  } catch {
+    return 0
+  }
+}
+
 // La ruta de ESTE archivo: la prueba de señales la carga en un proceso hijo (y así prueba también a un mutante).
 export const RUTA_MODULO = fileURLToPath(import.meta.url)
 const SENALES = { SIGINT: 130, SIGTERM: 143, SIGHUP: 129 }
@@ -141,8 +198,13 @@ export function tomarBloqueo(dirOut) {
 
     const pid = leerPid(ruta)
 
-    if (pid == null) continue // se soltó entre medio: se reintenta
-    if (pid !== process.pid && vivo(pid)) throw new Error(`otra composición usa ${dirOut} (proceso ${pid}). Espera a que termine: dos composiciones en la misma carpeta se mezclan.`)
+    // Sin pid: o se soltó entre medio, o otro proceso lo está escribiendo (milisegundos), o quedó huérfano.
+    if (pid == null && (!fs.existsSync(ruta) || edad(ruta) < HUERFANO_MS)) {
+      esperar(25)
+      continue
+    }
+
+    if (pid != null && pid !== process.pid && vivo(pid)) throw new Error(`otra composición usa ${dirOut} (proceso ${pid}). Espera a que termine: dos composiciones en la misma carpeta se mezclan.`)
 
     try {
       fs.writeFileSync(reclamo, String(process.pid), { flag: 'wx' })
@@ -151,7 +213,7 @@ export function tomarBloqueo(dirOut) {
       // Otro proceso está reclamando. Si su reclamo quedó huérfano (murió en medio), se limpia; si no, se espera.
       const quien = leerPid(reclamo)
 
-      if (quien != null && !vivo(quien)) fs.rmSync(reclamo, { force: true })
+      if ((quien != null && !vivo(quien)) || (quien == null && edad(reclamo) >= HUERFANO_MS)) fs.rmSync(reclamo, { force: true })
       esperar(25)
       continue
     }
@@ -163,5 +225,5 @@ export function tomarBloqueo(dirOut) {
     }
   }
 
-  throw new Error(`no se pudo tomar el bloqueo de ${dirOut}`)
+  throw new Error(`no se pudo tomar el bloqueo de ${dirOut}: \`${ruta}\` sigue tomado${leerPid(ruta) == null ? ' y vacío' : ` por el proceso ${leerPid(ruta)}`}. Si no hay otra composición corriendo en esa carpeta, bórralo.`)
 }

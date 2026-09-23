@@ -7,10 +7,11 @@
 import { readFileSync, existsSync, statSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { spawnSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
+import { randomBytes } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 
-import { COMPOSITOR, REPO, huellaComando, huellaPieza, rutaQa, sha } from './cta-integridad.mjs'
+import { COMPOSITOR, REPO, dentroDelRepo, estable, huellaComando, huellaPieza, marcaDeSuite, rutaQa, rutaReal, sha } from './cta-integridad.mjs'
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
 import { copiaEnEscena } from './accesibilidad.mjs'
 
@@ -27,13 +28,37 @@ const dimensionesPng = b => (b.length >= 24 && b.readUInt32BE(12) === 0x49484452
 // decía «2 a 6 px» aprobaba un desborde de 956×724 px y cualquier texto servía de aprobador. Una excepción que no vale
 // no apaga nada: la regla bloquea y el gate dice por qué.
 const exceptuada = (p, regla) => (p.excepciones ?? []).find(e => e.regla === regla)
-const APROBADORES = JSON.parse(readFileSync(new URL('./aprobadores.json', import.meta.url), 'utf8')).aprobadores
+const TEXTO_APROBADORES = readFileSync(new URL('./aprobadores.json', import.meta.url), 'utf8')
+const APROBADORES = JSON.parse(TEXTO_APROBADORES).aprobadores
 
-// Un aprobador `soloPruebas` vale únicamente para planes fuera del repo: los temporales de la suite de pruebas.
-const aprobadorValido = id => {
+// El registro se lee del árbol de trabajo: una edición sin commit —alguien que se agrega a sí mismo— aprobaba sin aviso
+// (tramo 10; auditoría de arquitectura, hallazgo 16). Si difiere del commit vigente, una pieza que USA una aprobación no se
+// certifica.
+const registroAlterado = (() => {
+  try {
+    return execFileSync('git', ['show', 'HEAD:scripts/foto/aprobadores.json'], { cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }) !== TEXTO_APROBADORES
+  } catch {
+    return false
+  }
+})()
+
+// ¿El plan es de la suite de pruebas? Su ruta REAL está fuera del repo y la suite dejó su marca al lado (tramo 10). Antes
+// bastaba con que la ruta escrita no empezara con la del repo: con otras mayúsculas, un enlace o `--origen`, un plan del
+// repo pasaba por uno de la suite.
+const deLaSuite = () => {
+  const origen = ORIGEN ?? path.resolve(plan)
+
+  return !dentroDelRepo(origen) && marcaDeSuite(path.dirname(origen))
+}
+
+// `null` si el aprobador vale; si no, por qué. Un aprobador `soloPruebas` vale únicamente en los planes de la suite.
+const motivoAprobador = id => {
   const a = APROBADORES.find(x => x.id === id)
 
-  return Boolean(a) && (!a.soloPruebas || !(ORIGEN ?? path.resolve(plan)).startsWith(REPO))
+  if (!a) return `«${id}» no está en el registro de aprobadores (scripts/foto/aprobadores.json)`
+  if (registroAlterado) noCertificable.push(`el registro de aprobadores (scripts/foto/aprobadores.json) tiene cambios sin commit: una aprobación no se certifica con un registro que no está en el historial`)
+
+  return a.soloPruebas && !deLaSuite() ? `«${id}» sólo vale en los planes de la suite de pruebas` : null
 }
 
 const shaPlates = new Map()
@@ -56,7 +81,9 @@ const bloquea = (p, regla, mensaje, medida = null) => {
   const e = exceptuada(p, regla)
 
   if (e) {
-    const invalida = !aprobadorValido(e.aprobadoPor) ? `«${e.aprobadoPor}» no está en el registro de aprobadores (scripts/foto/aprobadores.json)`
+    const motivo = motivoAprobador(e.aprobadoPor)
+
+    const invalida = motivo ? motivo
       : e.plate !== plateDe(p) ? `se aprobó para otro plate${e.plate ? '' : ' (no nombra ninguno)'}: declara \`plate: "${plateDe(p)}"\` si se re-aprueba para éste`
         : medida && typeof e.hasta !== 'number' ? `no declara \`hasta\`, el valor que aprueba (hoy la medida es ${cifra(medida.valor)})`
           : medida && !(medida.sentido === 'min' ? medida.valor >= e.hasta : medida.valor <= e.hasta) ? `la medida (${cifra(medida.valor)}) va más allá de lo aprobado (${medida.sentido === 'min' ? '≥' : '≤'} ${e.hasta})`
@@ -80,14 +107,18 @@ const bloquea = (p, regla, mensaje, medida = null) => {
 
 // Salidas del canon que no se miden —pieza sin firma, concepto reducido—: exigen un aprobador del registro, y el gate
 // las imprime para que quien revise las vea (antes pasaban sin aprobador y en silencio).
+// Tramo 10: la aprobación nombra el plate (como las excepciones); con un plate regenerado se vuelve a aprobar.
 const salidaAprobada = (p, que, declaracion) => {
-  if (aprobadorValido(declaracion?.aprobadoPor)) {
+  const motivo = declaracion?.aprobadoPor ? motivoAprobador(declaracion.aprobadoPor) : null
+
+  if (!declaracion?.aprobadoPor) console.error(`✗ ${p.id}: ${que} sin aprobador del registro (declara \`aprobadoPor\`).`)
+  else if (motivo) console.error(`✗ ${p.id}: ${que} sin aprobador válido: ${motivo}.`)
+  else if (declaracion.plate !== plateDe(p)) console.error(`✗ ${p.id}: ${que} se aprobó para otro plate${declaracion.plate ? '' : ' (no nombra ninguno)'}: declara \`plate: "${plateDe(p)}"\` si se re-aprueba para éste.`)
+  else {
     console.warn(`⚠ ${p.id}: ${que} — ${declaracion.razon} (aprobó ${declaracion.aprobadoPor}).`)
 
     return true
   }
-
-  console.error(`✗ ${p.id}: ${que} sin aprobador del registro${declaracion?.aprobadoPor ? ` («${declaracion.aprobadoPor}» no está en scripts/foto/aprobadores.json)` : ' (declara `aprobadoPor`)'}.`)
 
   return false
 }
@@ -100,16 +131,40 @@ const salidaAprobada = (p, que, declaracion) => {
 const noCertificable = []
 
 const args = process.argv.slice(2)
-const plan = args.find((a, i) => !a.startsWith('--') && !['--comando', '--origen'].includes(args[i - 1]))
-// `--origen <plan>`: interno de `--reproducir` (el gate corre sobre una copia temporal del plan; el origen decide qué
-// aprobadores valen).
-const ORIGEN = args.includes('--origen') ? path.resolve(args[args.indexOf('--origen') + 1]) : null
+const plan = args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--comando')
+
+// `--origen` era un flag público y cualquiera lo pasaba para que un plan del repo se juzgara como uno de la suite (tramo
+// 10; auditorías de arquitectura, hallazgo 3, y de diseño, hallazgo 6). Ahora el origen es interno de `--reproducir`: el
+// gate padre lo escribe en `.origen` junto a la copia temporal, con un valor aleatorio que sólo le pasa a su hijo.
+if (args.includes('--origen')) { console.error('`--origen` ya no existe: es interno de `--reproducir`. Uso: pnpm foto:cta:gate <plan.json> [--reproducir]'); process.exit(2) }
+
+const ORIGEN = (() => {
+  const nonce = process.env.FOTO_GATE_ORIGEN_NONCE
+
+  if (!nonce || !plan) return null
+
+  try {
+    const o = JSON.parse(readFileSync(path.join(path.dirname(path.resolve(plan)), '.origen'), 'utf8'))
+
+    return o.nonce === nonce && typeof o.origen === 'string' ? o.origen : null
+  } catch {
+    return null
+  }
+})()
+
 const REPRODUCIR = args.includes('--reproducir')
 // `--comando <archivo>`: certifica contra OTRA versión del compositor (la suite de pruebas la usa con sus mutantes). Sin
 // el flag, la vigente del repo.
 const COMANDO = args.includes('--comando') ? path.resolve(args[args.indexOf('--comando') + 1]) : path.join(REPO, COMPOSITOR)
 
 if (!plan) { console.error('uso: pnpm foto:cta:gate <plan.json> [--reproducir]'); process.exit(2) }
+
+// Un compositor que no es el del repo no certifica (tramo 10; auditoría de arquitectura, hallazgo 9): con `--comando
+// <mutante>` el gate decía «comando vigente» y salía con 0, también con `--reproducir`. Sólo la suite de pruebas juzga con
+// otro comando (sus mutantes y la referencia de la regresión).
+const COMANDO_CANONICO = rutaReal(COMANDO) === rutaReal(path.join(REPO, COMPOSITOR))
+
+if (!COMANDO_CANONICO && !deLaSuite()) noCertificable.push(`se juzga con \`--comando ${COMANDO}\`, que no es el compositor del repo: sólo la suite de pruebas certifica con otro comando`)
 
 const dir = path.dirname(path.resolve(plan))
 const qaPlan = rutaQa(path.join(dir, 'out'), plan)
@@ -128,6 +183,9 @@ if (REPRODUCIR) {
     const planTmp = path.join(tmp, path.basename(plan))
 
     writeFileSync(planTmp, JSON.stringify(piezasPlan, null, 2))
+    const nonce = randomBytes(24).toString('hex')
+
+    writeFileSync(path.join(tmp, '.origen'), JSON.stringify({ origen: ORIGEN ?? path.resolve(plan), nonce }))
     console.log(`Reproduciendo ${piezasPlan.length} pieza(s) con el comando vigente y segmentación nueva…`)
     const c = spawnSync(process.execPath, [COMANDO, planTmp], { encoding: 'utf8', env: { ...process.env, FOTO_MASCARAS_DIR: path.join(tmp, '.mascaras') }, maxBuffer: 64e6 })
 
@@ -136,8 +194,36 @@ if (REPRODUCIR) {
     } else {
       const distintos = []
 
+      // Lo ENTREGADO completo (tramo 10): el PNG, el layout, el texto alternativo y la fila del QA. Antes el `.alt.txt` y el
+      // QA no se comparaban: reemplazarlos daba 0. De la fila se excluyen las huellas (la del plan cambia con la ruta del
+      // plate en la copia; las demás se comparan archivo por archivo) y la máscara (su origen es otro por construcción).
+      const qaDe = f => {
+        try {
+          return JSON.parse(readFileSync(f, 'utf8'))
+        } catch {
+          return []
+        }
+      }
+
+      const qaEntregado = qaDe(rutaQa(path.join(dir, 'out'), plan))
+      const qaReproducido = qaDe(rutaQa(path.join(tmp, 'out'), planTmp))
+
+      const fila = (q, id) => {
+        const r = q.find(x => x?.id === id)
+
+        if (!r) return null
+        const resto = { ...r }
+
+        delete resto.huellas
+        delete resto.mascara
+
+        return estable(resto)
+      }
+
       for (const p of piezasPlan.filter(p => p.cta)) {
-        for (const f of [`${p.id}.png`, `${p.id}-layout.json`]) {
+        if (fila(qaEntregado, p.id) !== fila(qaReproducido, p.id)) distintos.push(`la fila de ${p.id} en el QA entregado`)
+
+        for (const f of [`${p.id}.png`, `${p.id}-layout.json`, `${p.id}.alt.txt`]) {
           const entregado = path.join(dir, 'out', f)
           const reproducido = path.join(tmp, 'out', f)
 
@@ -150,7 +236,7 @@ if (REPRODUCIR) {
         console.error(`✗ lo entregado no es lo que produce el comando vigente: ${distintos.join(', ')}. Recompón con \`pnpm foto:componer:cta ${plan}\`.`)
       } else {
         console.log('✓ lo entregado es idéntico a la reproducción. Veredicto sobre el QA reproducido:')
-        codigo = spawnSync(process.execPath, [fileURLToPath(import.meta.url), planTmp, '--comando', COMANDO, '--origen', path.resolve(plan)], { stdio: 'inherit' }).status ?? 1
+        codigo = spawnSync(process.execPath, [fileURLToPath(import.meta.url), planTmp, '--comando', COMANDO], { stdio: 'inherit', env: { ...process.env, FOTO_GATE_ORIGEN_NONCE: nonce } }).status ?? 1
       }
     }
   } finally {
@@ -233,6 +319,13 @@ if (!legado) {
       else if (esperado && (dims[0] !== esperado[0] || dims[1] !== esperado[1])) fallas.push(`\`out/${p.id}.png\` mide ${dims.join('×')} y el plan pide ${esperado.join('×')}`)
     }
 
+    // El texto alternativo ENTREGADO (tramo 10; auditorías de arquitectura, hallazgo 8, y de diseño, N11).
+    const alt = path.join(dir, 'out', `${p.id}.alt.txt`)
+
+    if (!h.alt) noCertificable.push(`${p.id}: el QA no trae la huella del texto alternativo (versión anterior del comando) — recompón`)
+    else if (!existsSync(alt)) fallas.push(`falta \`out/${p.id}.alt.txt\``)
+    else if (h.alt !== sha(readFileSync(alt))) fallas.push(`\`out/${p.id}.alt.txt\` no es el texto alternativo que registró la composición`)
+
     // Tramo 3: el layout también lleva huella, porque el gate recalcula las invariantes de maquetación sobre él.
     if (!h.layout) fallas.push('el QA no trae la huella del layout (versión anterior del comando)')
     else if (!existsSync(layout)) fallas.push(`falta \`out/${p.id}-layout.json\``)
@@ -304,6 +397,11 @@ for (const p of piezas.filter(p => p.cta)) {
   // alcance por ahora. Una pieza que lo lleva no se certifica a ciegas.
   if (p.card) noCertificable.push(`${p.id}: lleva tarjeta, cuyo texto no entra en la guarda del sujeto, la zona ni la medición por voz`)
   if (p.gesture) noCertificable.push(`${p.id}: lleva gesto manuscrito, que ni el compositor ni el gate miden (sujeto, zona, contraste)`)
+  // Tramo 10 (auditorías de arquitectura, hallazgos 5 y 6, y de diseño, hallazgo 5): lo que ninguna guarda mide no sale con
+  // 0. Ninguna pieza con CTA del repo los usa.
+  if (p.hud) noCertificable.push(`${p.id}: lleva HUD («NIVEL DE BÚSQUEDA», estrellas e íconos), que no entra en la zona segura, el layout, la medición por voz ni el texto alternativo`)
+  if (p.url) noCertificable.push(`${p.id}: lleva la url de la firma, que se dibuja sin medir su contraste y fuera de la guarda del sujeto`)
+  if (p.footer) noCertificable.push(`${p.id}: lleva cierre inferior (\`footer\`), que no entra en la jerarquía ni en el orden de lectura`)
 
   const declarada = segmentada || sp === false || (sp && typeof sp.top === 'number' && typeof sp.minClearance === 'number')
 
@@ -345,7 +443,13 @@ for (const r of qa) {
   if (!conCta.has(r.id)) continue
   const c = r.contraste ?? {}
   const pieza = piezas.find(p => p.id === r.id)
-  const solid = pieza.cta.variant === 'solid'
+  // `auto` se juzga con la variante y los tokens que se DIBUJARON (tramo 10; auditoría de arquitectura, hallazgo 4): el
+  // plan dice «auto» y el acento o el relleno se verificaban sobre lo declarado, no sobre lo resuelto.
+  const resuelta = pieza.cta.variant === 'auto' ? r.ctaVariante : null
+
+  if (pieza.cta.variant === 'auto' && !resuelta?.tokens) noCertificable.push(`${r.id}: el CTA es «auto» y el QA no registra la variante resuelta con sus tokens (versión anterior del comando) — recompón`)
+  const variante = resuelta?.elegida ?? pieza.cta.variant
+  const solid = variante === 'solid'
 
   // 🔴 La ausencia ES el fallo: sin esta comprobación, `solid` pasaba sin medirse.
   if (typeof c.cta !== 'number') {
@@ -366,9 +470,9 @@ for (const r of qa) {
   //
   // Y la AUSENCIA de token no es un fallo: el compositor resuelve a `growthOnDark` (lima), que es un
   // acento válido. Exigir la declaración rompía planes aprobados que dependen de ese default.
-  const esText = pieza.cta.variant === 'text'
+  const esText = variante === 'text'
   const campo = esText ? 'inkToken' : 'surfaceToken'
-  const token = pieza.cta[campo]
+  const token = resuelta?.tokens ? resuelta.tokens[campo] : pieza.cta[campo]
 
   if (token && !ACENTOS.has(token) && bloquea(
     pieza, 'acento-cta',
@@ -526,14 +630,16 @@ const desbordeZona = r => {
   })))
 }
 
-const NOMBRE_VOZ = { lead: 'entrada', closure: 'cierre', benefit: 'nota', cta: 'CTA', descriptor: 'descriptor' }
+const NOMBRE_VOZ = { label: 'etiqueta', lead: 'entrada', closure: 'cierre', benefit: 'nota', footer: 'cierre inferior', cta: 'CTA', descriptor: 'descriptor' }
 
 for (const r of qa.filter(x => conCta.has(x.id))) {
   const p = piezas.find(x => x.id === r.id)
 
   for (const z of r.zonasIgnoradas ?? []) {
-    if (aprobadorValido(z.aprobadoPor)) console.warn(`⚠ ${r.id}: zona del sujeto ignorada [${z.box.join(', ')}] — ${z.reason} (aprobó ${z.aprobadoPor})`)
-    else { console.error(`✗ ${r.id}: zona del sujeto ignorada [${z.box.join(', ')}] sin aprobador del registro${z.aprobadoPor ? ` («${z.aprobadoPor}» no está en scripts/foto/aprobadores.json)` : ''}.`); fallos++ }
+    const motivo = motivoAprobador(z.aprobadoPor)
+
+    if (!motivo && z.plate === plateDe(p)) console.warn(`⚠ ${r.id}: zona del sujeto ignorada [${z.box.join(', ')}] — ${z.reason} (aprobó ${z.aprobadoPor})`)
+    else { console.error(`✗ ${r.id}: zona del sujeto ignorada [${z.box.join(', ')}] ${motivo ? `sin aprobador válido: ${motivo}` : `aprobada para otro plate${z.plate ? '' : ' (no nombra ninguno)'}: declara \`plate: "${plateDe(p)}"\``}.`); fallos++ }
   }
 
   if (legado) {
@@ -647,4 +753,10 @@ if (noCertificable.length) {
   process.exit(3)
 }
 
-console.log(`✓ ${n} pieza(s) con CTA certificadas: huellas del plan, el plate, el PNG, el layout y el comando vigente · texto ≥${MIN_TEXTO}:1 · superficie ≥${MIN_BORDE}:1 · toda voz en WCAG 2.2 AA por su trazo, según su tamaño en pantalla · firma y zona segura del canon.`)
+// El 0 del modo rápido verifica el QA contra las huellas, no la imagen: quien reescribe el QA entero con huellas coherentes lo
+// engaña. Sólo `--reproducir` certifica la imagen (tramo 10; auditoría de arquitectura, «conocido y abierto»). El mensaje lo dice.
+const como = ORIGEN
+  ? 'certificadas por reproducción: lo entregado es idéntico a lo que produce el comando del repo'
+  : 'cumplen el canon según su QA (verificación rápida: confía en el QA; la imagen se certifica con `--reproducir`)'
+
+console.log(`✓ ${n} pieza(s) con CTA ${como} · huellas del plan, el plate, el PNG, el layout, el texto alternativo y el comando · texto ≥${MIN_TEXTO}:1 · superficie ≥${MIN_BORDE}:1 · toda voz en WCAG 2.2 AA por su trazo, según su tamaño en pantalla · firma y zona segura del canon.`)

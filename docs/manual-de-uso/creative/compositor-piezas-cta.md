@@ -437,7 +437,7 @@ problema que se arregla acortando el copy o regenerando el plate.
 | `acento-cta` | no | — | — |
 | `cta-perceptual` | no | — | — |
 | `concepto-completo` | no | — | — |
-| `legibilidad` | no | Hoy no tiene efecto: el texto bajo 9 px CSS sólo avisa | — |
+| — | — | No hay excepción `legibilidad`: el texto bajo 9 px CSS sólo avisa, y un plan que la declara se rechaza | — |
 
 Si el plate se regenera, la excepción deja de valer hasta que se vuelva a aprobar con la huella nueva.
 

@@ -297,10 +297,11 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    escena o si `altText` transcribe el copy.
 7. **Escena y tamaño:** `protect: [{ box: [x0, y0, x1, y1], reason }]` (fracciones del lienzo) para lo que el texto no
    puede tapar aunque no sea una persona; `editorialReserve: { maxRight, maxBottom }` (px) si el plan reserva área;
-   `final: [ancho, alto]` si el PNG no mide lo mismo que el plate (320–8192 px por lado; el gate verifica el tamaño
-   entregado). Ojo con los nombres: `protect` y `subjectGuard.ignore` usan `reason`; `excepciones`, `firma`,
+   `final: [ancho, alto]` si el PNG no mide lo mismo que el plate (misma proporción; al menos el 85 % del ancho del
+   máster y 780 px, porque la accesibilidad se mide en el máster; el gate verifica el tamaño entregado). Ojo con los nombres: `protect` y `subjectGuard.ignore` usan `reason`; `excepciones`, `firma`,
    `conceptoReducido` y `placement` usan `razon` (≥ 10 caracteres).
-8. **Sin `gesture` ni `card`** si la pieza tiene que salir certificada (ver el código 3).
+8. **Sin `gesture`, `card`, `hud`, `url` ni `footer`** si la pieza tiene que salir certificada: ninguna guarda los mide
+   y salen con 3.
 
 **Flujo.** Corre cada comando sin tubería (`| tail`, `| grep`): el código de salida sería el del último comando.
 
@@ -313,7 +314,10 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    `out/qa-<plan>.json`, con huellas del plan, el plate, el PNG, el layout y el comando. Sin ids rehace ese QA; con ids
    recompone esas piezas y las fusiona. Un plan mal escrito falla antes de componer, nombrando pieza y campo (campo
    desconocido, rango como `dominantTracking` −0,08…0,12 em, entidad que no es un carácter Unicode, ids que sólo
-   difieren en mayúsculas, glifo que la fuente no tiene, plate ilegible). Si una pieza aborta —texto sobre el sujeto o
+   difieren en mayúsculas, glifo que la fuente no tiene —también un espacio que no es el común, como U+202F o U+3000—,
+   texto sin nada que dibujar, `signatureSafeArea` incompleta, un campo interno del compositor como
+   `ctaVarianteResuelta`, escalas de la selección sobre su techo, `final` bajo su piso, firma fuera de la imagen,
+   plate ilegible). Si una pieza aborta —texto sobre el sujeto o
    sobre una zona `protect`, choque de maquetación—, la corrida se detiene y el mensaje dice qué mover; lo que no se
    compuso sale como falla en el gate. Dos avisos previos que no se ignoran:
    - **otro plan de la misma carpeta registra ese id** (otro `out/qa-*.json`): al recomponerlo, su PNG deja de ser el
@@ -323,12 +327,13 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
      Espera a que termine y no lo borres a mano. Para probar, copia plan y plate a una carpeta temporal: nunca compongas
      en la carpeta de otra sesión.
 4. Mira `out/preview-390/` y la pieza completa: el gate no ve ritmo, escena ni destino del CTA.
-5. `pnpm foto:cta:gate <plan>` y lee el código (tabla). No edites plan, plate ni PNG después de componer: se rompen las
-   huellas; se recompone.
+5. `pnpm foto:cta:gate <plan>` y lee el código (tabla). Es la verificación rápida: confía en el QA, cuyas huellas
+   (plan, plate, PNG, layout, texto alternativo y comando) recalcula. No edites plan, plate, PNG ni `.alt.txt` después
+   de componer: se rompen las huellas; se recompone.
 6. `pnpm foto:cta:gate <plan> --reproducir`: **la certificación que no se falsifica** y la que se corre antes de
    entregar. Recompone el plan entero en un temporal con el comando vigente y segmentación nueva, exige que cada
-   `out/<id>.png` y `out/<id>-layout.json` sea idéntico byte a byte al reproducido y da el veredicto del gate sobre el QA
-   reproducido (0, 1 o 3), sin tocar tu `out/`. Si algo difiere, la pieza cambió con el comando: recompón y vuelve a
+   `out/<id>.png`, `out/<id>-layout.json` y `out/<id>.alt.txt` sea idéntico byte a byte al reproducido —y la fila del QA
+   igual, salvo huellas y máscara— y da el veredicto del gate sobre el QA reproducido (0, 1 o 3), sin tocar tu `out/`. Si algo difiere, la pieza cambió con el comando: recompón y vuelve a
    mirarla.
 7. `pnpm foto:accesibilidad <plan>` escribe `out/accesibilidad/reporte.md` (por pieza y voz: WCAG según el tamaño en el
    teléfono, APCA, área bajo el umbral, daltonismo y texto alternativo) y `<id>-daltonismo.png` (la pieza a 390 px con
@@ -336,9 +341,9 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
 
 | Código | Qué dice | Qué haces |
 |---|---|---|
-| 0 | `✓ … certificadas`: huellas del plan, el plate, el PNG, el layout y el comando vigente, y todas las reglas | Mira igual los `⚠` |
+| 0 | Sin `--reproducir`: `✓ … cumplen el canon según su QA` (huellas y todas las reglas). Con `--reproducir`: `✓ … certificadas por reproducción` | Mira igual los `⚠`; la certificación que se reporta es la de `--reproducir` |
 | 1 | `✗`: una regla falla, falta el QA de una pieza o una huella no calza (plan, plate, PNG o layout cambiaron después de componer) | Corrige el plan o recompón. Las huellas cortan antes que las reglas del canon: tras arreglarlas, corre el gate de nuevo |
-| 2 | Uso incorrecto (falta el plan) | — |
+| 2 | Uso incorrecto (falta el plan, o se pasó `--origen`, que ya no existe) | — |
 | 3 | `⊘ NO CERTIFICABLE`: nada falla en lo que pudo verificar, pero no puede probar lo que certificaría | **Nunca es un pase.** Resuélvelo por su causa |
 
 Causas del 3 (si además hay un `✗`, sale 1):
@@ -347,6 +352,8 @@ Causas del 3 (si además hay un `✗`, sale 1):
   incluye su código y sus módulos, las versiones de sus paquetes, las fuentes (Bricolage, Poppins; Guttery no), los
   logos y el SVG de la firma web: actualizar cualquiera deja en 3 las piezas compuestas antes.
 - **Máscara del sujeto de una caché ajena** (`FOTO_MASCARAS_DIR`) → `--reproducir`, que segmenta de nuevo.
+- **`--comando` que no es el compositor del repo** → no se certifica con otro comando fuera de la suite de pruebas.
+- **`hud`, `url` o `footer`:** ninguna guarda los mide; no se certifican (tramo 10).
 - **`gesture` o `card`:** ninguna guarda los mide, y ni recomponer ni reproducir lo resuelve. El gesto manuscrito está
   fuera de alcance por decisión del operador (2026-09-23): si la pieza tiene que certificarse, no lo lleva; si el gesto
   es parte del concepto, la pieza se reporta como **no certificable**, con esas palabras.
@@ -383,10 +390,12 @@ gate la imprime con su razón y quién la aprobó.
 ```
 
 - **Reglas:** `zona-segura`, `firma-contraste`, `firma-tamano`, `firma-sobre-sujeto`, `acento-cta`,
-  `concepto-completo`, `jerarquia`, `reserva-editorial`, `cta-perceptual` y `dominante-mayor`. (`legibilidad` figura
-  en el esquema, pero hoy no tiene efecto —el texto bajo 9 px sólo avisa—: no la declares.)
-- **`aprobadoPor`:** un `id` de `scripts/foto/aprobadores.json` (hoy `julio-reyes`; `suite-pruebas` vale sólo para los
-  temporales de la suite, fuera del repo). Sumar a alguien lo decide el operador, con commit.
+  `concepto-completo`, `jerarquia`, `reserva-editorial`, `cta-perceptual` y `dominante-mayor`. (`legibilidad` no existe
+  hoy: el texto bajo 9 px sólo avisa y un plan que la declara se rechaza.)
+- **`aprobadoPor`:** un `id` de `scripts/foto/aprobadores.json` (hoy `julio-reyes`; `suite-pruebas` vale sólo en los
+  planes de la suite: ruta real fuera del repo y su marca `.suite-pruebas`). Sumar a alguien lo decide el operador, con
+  commit; con el registro editado sin commit, una pieza que usa una aprobación no se certifica.
+- **`sin-firma`, `conceptoReducido` y `subjectGuard.ignore`** también llevan `aprobadoPor` y el `plate` aprobado.
 - **`plate`:** el sha256 del plate aprobado (`shasum -a 256 <plate>`; el gate también lo imprime). Un plate regenerado
   se vuelve a aprobar.
 - **`hasta`**, obligatorio cuando la regla se mide con un número: px máximos fuera de la zona (`zona-segura`), fuera

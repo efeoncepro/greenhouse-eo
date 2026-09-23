@@ -514,7 +514,13 @@ const qa = []
 // ════════════════════════════════════════════════════════════════════════════════════════════════
 // Qué fuente dibuja cada campo de texto (el mismo mapa que usa composePiece).
 const POPS = [pop[400], pop[700]]
-const sinGlifo = (texto, fuentes) => [...new Set([...String(texto ?? '').replace(/\*\*|\[\[|\]\]|\|/g, '')].filter(ch => !/\s/u.test(ch)).filter(ch => fuentes.some(f => !f.hasGlyphForCodePoint(ch.codePointAt(0)))))]
+// Sólo el espacio común (U+0020) y el salto de línea se dibujan sin glifo. Cualquier otro espacio —U+3000, U+202F, que es
+// habitual en copy tipográfico y en texto generado por IA— sale como un cuadro vacío si la fuente no lo tiene: antes se
+// descartaba con `\s` ANTES de revisar la cobertura (tramo 10; auditoría de arquitectura, hallazgo 7).
+const sinGlifo = (texto, fuentes) => [...new Set([...String(texto ?? '').replace(/\*\*|\[\[|\]\]|\|/g, '')].filter(ch => ch !== ' ' && ch !== '\n').filter(ch => fuentes.some(f => !f.hasGlyphForCodePoint(ch.codePointAt(0)))))]
+// Un texto sin nada que dibujar (sólo espacios o caracteres invisibles, como U+200B) no es una voz: abortaba más tarde con
+// un error que culpaba a la selección del CTA (tramo 10; auditoría de arquitectura, residuo 17).
+const sinTinta = texto => !/[^\s\u200B-\u200D\u2060\uFEFF\u00AD]/u.test(String(texto ?? '').replace(/\*\*|\[\[|\]\]|\|/g, ''))
 
 function camposConFuente(p) {
   const familia = f => (f === 'bricolage' ? [bric] : POPS)
@@ -578,6 +584,7 @@ function validarPlan(plan) {
       const faltan = sinGlifo(desescaparXml(textoCampo), fuentes)
 
       if (faltan.length) e(`\`${campo}\` usa caracteres que su fuente no tiene (saldrían como cuadros vacíos): ${faltan.map(ch => `«${ch}» U+${ch.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`).join(', ')}`)
+      else if (sinTinta(desescaparXml(textoCampo))) e(`\`${campo}\` no tiene nada que dibujar (sólo espacios o caracteres invisibles)`)
     }
 
     if (p.cta.seleccion != null) {
@@ -995,6 +1002,14 @@ async function composePiece(s, opts = {}) {
     throw new Error(`${s.id}: \`final\` ${s.final.join('×')} no tiene la proporción del plate ${W}×${H} — el reescalado recortaría la pieza`)
   }
 
+  // `final` no puede alejar lo entregado de lo medido (tramo 10; auditorías de arquitectura, hallazgo 10, y de diseño,
+  // hallazgo 7): la accesibilidad se mide en el máster, y con `final: [320, 569]` el CTA medido a 11,04:1 llegaba a 3,42:1.
+  // Piso: el 85 % del ancho del máster (las piezas del repo reducen hasta el 86 %) y 780 px, la densidad 2× de un teléfono
+  // de 390 CSS px. Medir sobre el PNG entregado queda registrado como deuda.
+  const pisoFinal = Math.max(780, Math.ceil(W * 0.85))
+
+  if (s.final && s.final[0] < pisoFinal) throw new Error(`${s.id}: \`final\` ${s.final.join('×')} reduce demasiado la pieza: la accesibilidad se mide en el máster de ${W} px y lo entregado se alejaría de lo medido (piso: ${pisoFinal} px de ancho)`)
+
   // La escala tipográfica ya NO se decide aquí con una heurística de alto: la decide el driver del final
   // probando factores y midiendo colisiones reales contra la máscara del sujeto (ver GUARDA DE SUJETO).
 
@@ -1162,8 +1177,14 @@ return k.ink.right - k.ink.left }))
     if (/<text/.test(selection)) throw new Error(`${s.id}: quedó <text>`)
     selEvidence = { selection: rendered.evidence.selection, cursores: rendered.evidence.cursorEvidence.map(c => ({ id: c.id, labelBounds: c.labelBounds })) }
     if (!onObject) for (const c of rendered.evidence.cursorEvidence) { guard.push({ id: `cursor-${c.id}`, box: c.bounds }, { id: `etiqueta-${c.id}`, box: c.labelBounds }) }
+    // Sobre un OBJETO de la foto (`selection.box`), cursores y etiquetas también entran en la guarda del sujeto y en
+    // `protect` (el marco no: envuelve al objeto por construcción). Antes quedaban fuera de todo: la etiqueta tapaba la
+    // mano y el gate daba 0 (tramo 10; auditorías de arquitectura y de diseño, hallazgo 1).
+    else for (const c of rendered.evidence.cursorEvidence) guard.push({ id: `cursor-${c.id}`, box: c.bounds }, ...(c.labelBounds ? [{ id: `etiqueta-${c.id}`, box: c.labelBounds }] : []))
     visibles.push({ id: 'seleccion', box: rendered.bounds }, ...rendered.evidence.cursorEvidence.flatMap(c => [{ id: `cursor-${c.id}`, box: c.bounds }, { id: `etiqueta-${c.id}`, box: c.labelBounds }]))
     if (!onObject) elementosSeleccion.push(...rendered.evidence.cursorEvidence.flatMap(c => [{ id: `cursor «${c.label ?? c.id}»`, box: c.bounds, destino: 'dominante' }, ...(c.labelBounds ? [{ id: `etiqueta «${c.label}»`, box: c.labelBounds, destino: 'dominante' }] : [])]))
+    // Sobre un objeto, el destino es el objeto: el marco, los cursores y las etiquetas no tapan NINGUNA voz, botón ni firma.
+    else elementosSeleccion.push({ id: 'marco de la selección sobre el objeto', box: rendered.bounds, destino: 'objeto' }, ...rendered.evidence.cursorEvidence.flatMap(c => [{ id: `cursor «${c.label ?? c.id}» sobre el objeto`, box: c.bounds, destino: 'objeto' }, ...(c.labelBounds ? [{ id: `etiqueta «${c.label}» sobre el objeto`, box: c.labelBounds, destino: 'objeto' }] : [])]))
   }
 
   body += dom.svg
@@ -1251,9 +1272,12 @@ return k.ink.right - k.ink.left }))
     // texto | contorno | relleno) y la medición sobre la escena decide si la permite; si no, se escala a la variante
     // que separa más, nunca a una menos visible (scripts/foto/cta-variantes.mjs). La geometría del botón no depende
     // de la variante, así que se mide sobre la caja real antes de pintar.
-    if(c.variant==='auto'&&s.ctaVarianteResuelta){
-      c={...c,...s.ctaVarianteResuelta.tokens,variant:s.ctaVarianteResuelta.elegida};
-      ctaVariante=s.ctaVarianteResuelta.qa;
+    // La variante resuelta viaja por `opts`, nunca por el objeto del plan (tramo 10; auditoría de arquitectura, hallazgo
+    // 4): en la raíz del plan, `ctaVarianteResuelta` reescribía el CTA después de validarlo.
+    if(c.variant==='auto'&&opts.varianteResuelta){
+      c={...c,...opts.varianteResuelta.tokens,variant:opts.varianteResuelta.elegida};
+      ctaVariante=opts.varianteResuelta.qa;
+      ctaVarianteTokens=opts.varianteResuelta.tokens;
     } else if(c.variant==='auto'){
       if(c.align==='center')cx=AXIS_X-(shape(c.text,pop[700],c.fontSize).advance+padX*2)/2;
       const t0=block({text:c.text,font:pop[700],size:c.fontSize,tracking:0,leading:1.2,x:cx+padX,topY:cy+padY,maxWidth:W*.65,fill:'#ffffff'});
@@ -1264,7 +1288,8 @@ return k.ink.right - k.ink.left }))
       const tokens=e.elegida==='solid'?{surfaceToken:acento,inkToken:'inkOnLight'}:e.elegida==='outline'?{surfaceToken:acento,inkToken:e.degradada?'inkOnDark':(c.inkToken??acento)}:{surfaceToken:acento,inkToken:acento};
 
       c={...c,variant:e.elegida,...tokens};
-      ctaVariante={prominencia:s.cta.prominencia??'delimitada',elegida:e.elegida,escalo:e.escalo,motivo:e.motivo,...(e.degradada?{tintaDegradada:true}:{}),...(e.sinMargen?{sinMargen:true}:{})};
+      // Los tokens resueltos quedan en el QA: el gate verifica el acento sobre la variante que se DIBUJÓ (tramo 10).
+      ctaVariante={prominencia:s.cta.prominencia??'delimitada',elegida:e.elegida,escalo:e.escalo,motivo:e.motivo,tokens,...(e.degradada?{tintaDegradada:true}:{}),...(e.sinMargen?{sinMargen:true}:{})};
       ctaVarianteTokens=tokens;
       cx=xCta(c);
     }
@@ -1352,7 +1377,9 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
     // contorno son límites no textuales (WCAG 1.4.11, 3:1): el borde del contorno no se medía antes.
     voces.push({id:'cta',box:t.box,tinta:ink,peso:700,px:c.fontSize,lineas:t.lines.length,daltonismo:true,pisoTexto:UMBRALES.normalTextContrast,...(solid?{sobreColor:surfaceColor}:{})});
     if(solid||outline)voces.push({id:solid?'cta-relleno':'cta-borde',box:b,tinta:surfaceColor,limite:true,daltonismo:true});
-    voces.push({id:'descriptor',box:descriptor.box,tinta:'#ffffff',peso:400,px:c.descriptorSize,lineas:descriptor.lines.length});
+    // El canon pide 4,5:1 al CTA y al descriptor sea cual sea su tamaño (tramo 10; auditoría de diseño, N6): un
+    // descriptor grande se medía con 3:1.
+    voces.push({id:'descriptor',box:descriptor.box,tinta:'#ffffff',peso:400,px:c.descriptorSize,lineas:descriptor.lines.length,pisoTexto:UMBRALES.normalTextContrast});
 
     if(!cr.evidence.withinCanvas){
       // Decir QUÉ se sale y POR DÓNDE: «se sale del lienzo» a secas no le dice al autor qué ancla cambiar.
@@ -1400,6 +1427,11 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
     ...(s.url ? [{ id: 'url', box: await cajaUrl(s) }] : [])
   ]
 
+  // Ninguna firma cae fuera de la imagen (tramo 10; auditoría de arquitectura, hallazgo 2): con `signatureY: 0.995` la
+  // firma externa quedaba en 2011–2065 px de un lienzo de 2048 y el gate daba 0.
+  const firmaFuera = firmaPrevista.filter(f => f.box.left < 0 || f.box.top < 0 || f.box.right > W || f.box.bottom > H)
+
+  if (firmaFuera.length) throw new Error(`${s.id}: ${firmaFuera.map(f => `${f.id} (${Math.round(f.box.top)}–${Math.round(f.box.bottom)} px en un alto de ${H})`).join(', ')} cae fuera de la imagen. Ajusta \`signatureY\` o \`logo.y\`.`)
   const maquetacion = invariantesMaquetacion({ ancho: W, alto: H, elementos: elementosMaquetacion(firmaPrevista) })
   // La búsqueda del tamaño respeta SIEMPRE la reserva: una excepción cambia el veredicto del gate sobre la pieza, nunca
   // cuánto crece (antes una excepción «reserva-editorial» la hacía crecer ×1,251 en vez de ×1,236; tramo 7).
@@ -1592,11 +1624,12 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
   const fueraDe = (b, z) => b.left < z.x0 * W - 0.5 || b.right > z.x1 * W + 0.5 || b.top < z.y0 * H - 0.5 || b.bottom > z.y1 * H + 0.5
 
   // Un solo recorrido, en el orden de la maquetación: cada elemento contra SU zona (la firma, contra la de la firma).
-  const fueraDeZonaFinal = [...new Set([...elementosFinales.filter(e => e.tipo !== 'acento'), ...visibles.filter(v => v.id !== 'cta-seleccion' || ctaMarcoPintado)].filter(e => e.box && fueraDe(e.box, e.tipo === 'firma' ? ZF : ZE)).map(e => e.id))]
+  // Las partes de una selección sobre un objeto ya están en `visibles` (con su nombre de siempre): no se listan dos veces.
+  const fueraDeZonaFinal = [...new Set([...elementosFinales.filter(e => e.tipo !== 'acento' && e.destino !== 'objeto'), ...visibles.filter(v => v.id !== 'cta-seleccion' || ctaMarcoPintado)].filter(e => e.box && fueraDe(e.box, e.tipo === 'firma' ? ZF : ZE)).map(e => e.id))]
 
   if (fueraDeZonaFinal.length) console.warn(`  ⚠ ${s.id}: fuera de la zona segura ${ZE.perfil} de AXIS: ${fueraDeZonaFinal.join(', ')}`)
   // El layout se escribe con la firma incluida y con los elementos que el gate vuelve a verificar.
-  const layoutJson = JSON.stringify({ canvas: { width: W, height: H }, subjectProtection: s.subjectProtection, elements: checks.map(({ id, box }) => ({ id, box })), typography: { lead: s.leadSize, dominant: domSize, closure: s.afterSize, benefit: s.note?.size, cta: s.cta.fontSize, descriptor: s.cta.descriptorSize }, selection: selEvidence, maquetacion: { elementos: elementosFinales }, columna: s.align === 'center' ? null : x, ctaMarco, zonaSegura: { ...ZE } }, null, 2)
+  const layoutJson = JSON.stringify({ canvas: { width: W, height: H }, subjectProtection: s.subjectProtection, elements: checks.map(({ id, box }) => ({ id, box })), typography: { ...(s.label ? { label: s.labelSize ?? Math.round(W * 0.024) } : {}), lead: s.lead ? (s.leadSize ?? 70) : s.leadSize, dominant: domSize, closure: s.after ? (s.afterSize ?? 74) : s.afterSize, benefit: s.note ? (s.note.size ?? Math.round(W * 0.026)) : undefined, ...(s.footer ? { footer: s.footer.size } : {}), cta: s.cta.fontSize, descriptor: s.cta.descriptorSize }, selection: selEvidence, maquetacion: { elementos: elementosFinales }, columna: s.align === 'center' ? null : x, ctaMarco, zonaSegura: { ...ZE } }, null, 2)
 
   salidas.push([`${s.id}-layout.json`, layoutJson])
   const out = s.final ? sharp(master).resize({ width: s.final[0], height: s.final[1] }) : sharp(master)
@@ -1722,7 +1755,9 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
     )
   }
 
-  const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson) }
+  // El texto alternativo entregado también lleva huella (tramo 10; auditorías de arquitectura, hallazgo 8, y de diseño,
+  // N11): reemplazarlo por «Imagen decorativa.» daba 0, también con `--reproducir`.
+  const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson), alt: sha(`${accesibilidad.altText}\n`) }
   const registro = { id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
 
   for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
@@ -1776,9 +1811,9 @@ function maskForPiece(mask, s, canvasW, canvasH) {
 }
 
 // Una prueba de tamaño que se sale del lienzo descarta ese factor; cualquier otro error sigue siendo un error.
-async function probar(s, mask) {
+async function probar(s, mask, varianteResuelta = null) {
   try {
-    return await composePiece(s, { dry: true, mask })
+    return await composePiece(s, { dry: true, mask, varianteResuelta })
   } catch (e) {
     if (e instanceof LienzoError) return { ok: false, hits: [] }
     throw e
@@ -1827,20 +1862,22 @@ for (let s0 of trabajo) {
   // que el crecimiento lo cambie (medido 2026-09-22: 40 piezas aprobadas cambiarían de tamaño al recomponer).
   // `variant: "auto"` se resuelve UNA vez, a tamaño original, y queda fija mientras el texto crece: si se volviera a
   // decidir en cada prueba de tamaño, el crecimiento compararía contrastes de variantes distintas.
+  let varianteResuelta = null
+
   if (s0.cta?.variant === 'auto') {
     const r = await probar(scaleSpec(s0, 1, pw), mask)
 
-    if (r.resuelta) s0 = { ...s0, ctaVarianteResuelta: r.resuelta }
+    varianteResuelta = r.resuelta ?? null
   }
 
   if (s0.textGrowth !== false && (pw > ph || ph / pw > 1.5) && fill > 1.01) {
     if (mask) {
-      const base = await probar(scaleSpec(s0, 1, pw), mask)
+      const base = await probar(scaleSpec(s0, 1, pw), mask, varianteResuelta)
 
       const ok = async f => {
         if (!base.ok) return false
 
-        const r = await probar(scaleSpec(s0, f, pw), mask)
+        const r = await probar(scaleSpec(s0, f, pw), mask, varianteResuelta)
 
         if (!r.ok) return false
 
@@ -1876,7 +1913,7 @@ for (let s0 of trabajo) {
     }
   }
 
-  await composePiece(scaleSpec(s0, factor, pw), { mask, factor, plateSha, huellaPieza: huellaBase })
+  await composePiece(scaleSpec(s0, factor, pw), { mask, factor, plateSha, huellaPieza: huellaBase, varianteResuelta })
 }
 
 // Hoja comparativa: las tres variantes a 390 px con lo que dice la medición de cada una.

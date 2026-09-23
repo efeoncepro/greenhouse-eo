@@ -180,7 +180,9 @@ const GATE = path.join(ROOT, 'scripts/foto/componer-cta.gate.mjs')
 async function veredicto(compositor, dir) {
   const r = await run(process.execPath, [GATE, path.join(dir, 'piezas.json'), '--comando', compositor], { cwd: ROOT, maxBuffer: 16e6, timeout: 10 * 60e3 }).then(x => x.stdout + x.stderr, e => String(e.stdout ?? '') + String(e.stderr ?? ''))
 
-  return [...new Set(r.split('\n').map(l => l.trim()).filter(l => /^✗ |^· /.test(l) && !/otra versión del comando/.test(l)).map(l => l.replaceAll(dir, '<dir>')))].sort()
+  // Tramo 10: tampoco las de «versión anterior del comando» (una huella que la referencia no escribía) ni la del comando
+  // ajeno (la referencia corre desde una copia extraída de git, fuera de la suite).
+  return [...new Set(r.split('\n').map(l => l.trim()).filter(l => /^✗ |^· /.test(l) && !/otra versión del comando|versión anterior del comando|no es el compositor del repo/.test(l)).map(l => l.replaceAll(dir, '<dir>')))].sort()
 }
 
 // Activos fuera de la referencia hermética: fuentes, logos y paquetes se leen del árbol de trabajo en los DOS lados,
