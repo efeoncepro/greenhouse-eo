@@ -224,6 +224,8 @@ Si el método cambia (nueva fase, nueva skill en la orquesta, nueva regla), actu
 
 ## Caso de referencia (primera destilación)
 
+🏆 **Primer caso GANADO con este flujo agéntico (2026-09-23)** — validación en el mercado del playbook + Artifact Composer; la relación, la ronda 2 y la negociación humana también pesaron.
+
 Primer caso end-to-end que produjo este playbook: **SKY Airline — Producción de Contenido Blog** (Wherex, jul-2026; cliente existente de Efeonce en otra área — la agencia creativa que atiende al equipo de Performance; el blog lo compra el equipo de Marca). **✅ Adjudicada a Efeonce el 2026-09-23** (finalista entre ~15 propuestas; HubSpot deal `62535094842`, Cierre ganado). Condiciones finales: **CLP 3.000.000 netos/mes + IVA · 24 meses · TCV CLP 72.000.000** · capacidad gobernada 45–50 contenidos/mes · newsletter incluida · addons aparte · **sin precio unitario por artículo**; formalizada como **adenda al contrato vigente con Marketing**; inicio del servicio 2026-11-01. 🔴 Los precios de la oferta original (5,2M · 8 artículos · TCV 124,8M; BAFO 4,3M; piso 5,0M) son **historia de la negociación, superseded**. Ejercitó las 10 fases + la Fase 4-bis + la Fase 4-ter:
 
 - **Bases → admisibilidad → fit → diferenciadores** (Berel como caso SEO+AEO por Wherex, portal Greenhouse, Surround Discovery, WordPress + partner de Automattic).
