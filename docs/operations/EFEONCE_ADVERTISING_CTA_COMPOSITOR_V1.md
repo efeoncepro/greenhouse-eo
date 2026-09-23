@@ -597,3 +597,84 @@ Ninguno era un error de dibujo: los tres componen bien. Eran dos causas:
 | (comparando `auto` con `--variantes`) | la tolerancia de medición (0,05) dejaba a una voz terminar en 4,47:1 con el mínimo en 4,5 | la tolerancia nunca cruza el umbral: si la voz cumplía a ×1, cumple crecida |
 | P04 | el «3,5 % de aire» no era exacto: la guarda toleraba 8 px de máscara también al CRECER, y esos 8 px eran una fila real de pelo (el descriptor de 02-reconoces-916 quedaba a 3,36 %) | al crecer, tolerancia 0 (en la duda, crecer menos); los 8 px quedan sólo para el bloqueo duro. Efecto medido: 02-reconoces-916 ×1,208 → ×1,201 y 04-elegida-916 ×1,125 → ×1,122 |
 
+## 18. Certificación adversarial (2026-09-23) y plan para lo que no pasó
+
+**Encargo del operador:** «10 pruebas y con 2 subagentes adversariales certifiques que funciona con todos los
+estándares de calidad; los que no pasen, planea cómo resolverlo de forma robusta y escalable, apoyándote en las
+skills de arquitectura y de diseño».
+
+**Veredicto de los dos auditores (arquitectura y diseño): NO CERTIFICA.** El camino feliz es determinista y las
+defensas del día resisten (validación, eje, margen de zona segura, guarda de sujeto contra la máscara, matemática de
+WCAG/APCA/Machado, rechazo del CTA sin acento). Pero cada uno encontró, verificado corriendo y mirando, caminos en los
+que el gate da verde sobre una pieza mala. Evidencia: `/tmp/claude-501/adversarial-arq/` y
+`/tmp/claude-501/adversarial-diseno/` (scripts de medición, mutantes y recortes).
+
+### Decisión
+
+No se da por certificado. Se cierra en **cinco tramos**, en orden de riesgo. Cada tramo sale con tres pruebas: la
+regresión sin diferencias no declaradas, las 10 pruebas en verde y **un mutante por guarda nueva** que demuestre que
+alguna prueba lo detecta. Una guarda que ningún mutante hace fallar no está probada. Lo que cambia la salida de
+piezas aprobadas se muestra antes y después y lo aprueba el operador.
+
+### Hallazgos consolidados
+
+| # | Severidad | Hallazgo (auditor) | Corrección robusta y escalable |
+|---|---|---|---|
+| 1 | 🔴 | **El gate certifica salidas que no son del plan** (arq): decide la vigencia por fecha de archivo; todos los planes de una carpeta comparten `out/qa.json`; dos composiciones concurrentes se mezclan (7/8 corridas certificaron contenido ajeno) | el QA guarda **huellas sha** de la pieza del plan, del plate, del compositor y sus dependencias, y de cada PNG, y el gate las **recalcula**; un QA por plan; escritura en temporal + renombrado atómico; bloqueo por carpeta `out/` |
+| 2 | 🔴 | **La guarda de sujeto se puede apagar o envenenar** (arq): `subjectGuard.ignore` con la caja `[0,0,1,1]` apaga todo; una máscara corrupta en caché pasa como `segmentacion`; si la segmentación falla vuelve a un `subjectProtection` que ya se probó equivocado | caché con metadatos verificados al leer (sha del plate, modelo y versión, dimensiones, sha de la máscara); zonas `ignore` con área máxima y aprobación registrada; el gate bloquea `sin-mascara` y zonas ignoradas sin aprobación; una declaración manual nunca contradice la máscara |
+| 3 | 🔴 | **Contraste medido en la caja, no en el glifo** (diseño): en 01-fuera-916 crecida, el p1 del trazo de «+ AEO» da 2,4–3,1:1 sobre el canto iluminado de un monitor y el gate reporta 4,53 | medición por **máscara de glifos**: cada voz se rinde sola como alfa y se exige p1 ≥ umbral; al crecer, piso de umbral × 1,1; objetos declarables como protegidos (`protect: [{box, reason}]`) |
+| 4 | 🟠 | **Sin esquema del plan** (arq): emoji y hebreo salen como cuadros vacíos; `dominantSize: 0` deja la pieza sin titular; tamaños negativos invierten el texto; entidades literales en etiquetas; `align: 'centre'` salta la regla del eje; un `id` con `../` escribe fuera de `out/`; una voz sin medición se descarta en silencio | **un esquema declarativo como fuente única** (enums, rangos, fracciones, hex, `id` con patrón), cobertura de glifos con fontkit, entidades decodificadas, medición nula = falla |
+| 5 | 🟠 | **El crecimiento ignora restricciones declaradas** (arq): `editorialReserve` no se lee; el botón puede quedar bajo la firma | **una sola función de invariantes** posteriores a la maquetación —cajas no degeneradas, sin choques entre texto, CTA, firma y selección, reservas— que usan la búsqueda del tamaño, la composición final y el gate |
+| 6 | 🟠 | **Texto diminuto pero «AA»** (diseño): en 16:9, 19 de 22 descriptores bajo 9 px en el teléfono (mínimo 3,8 px) | token AXIS nuevo `minReadableCssPx` por rol, **bloqueante**; si el formato no alcanza, recomponer o declarar un placement de escritorio |
+| 7 | 🟠 | **La firma no tiene contrato en el gate** (diseño): b2-916 a 2,44:1; KV-01-916 sobre la persona; 16:9 al 13–14 % y 1:1 al 18 % del lado corto, cuando el canon pide 4,5:1 y 20 % | exigir `logo` o `firma: false` con razón; contraste ≥ 4,5:1 y tamaño desde el canon; firma sobre la máscara = falla con excepción auditada; el compositor busca en el lecho una Y que cumpla |
+| 8 | 🟡 | Zonas seguras AXIS nunca leídas (diseño): margen 7 % contra 7,5 % feed y 10 % story; texto a 3–5 % del borde en 4:5 y 1:1 | `axisAdvertising.safeArea` por formato como defecto; el plan sólo puede estrecharla; salir = falla |
+| 9 | 🟡 | Alineación de columna (diseño): en CMP-002 botón y descriptor 11–21 px a la derecha de la columna; CTA de texto sangrado | `cta.x` derivado de la columna; descriptor siempre en la columna; `paddingX: 0` en texto; piso de aire sobre los corchetes |
+| 10 | 🟡 | Concepto y jerarquía (diseño): 40 de 40 piezas AEO sin remate; la regla de 3× sólo avisa en consola | `lead` y `after` obligatorios salvo `conceptoReducido` con razón; ratio ≥ 3 en el gate |
+| 11 | 🟡 | CTA perceptual (diseño): APCA bajo Bronze en 54 de 86 y daltonismo bajo 4,5 en 42 | APCA y daltonismo bloqueantes **sólo para el CTA**; `auto` prueba la degradación canónica (borde naranja + tinta `inkOnDark`) antes del relleno |
+| 12 | 🟡 | Borde del contorno fijo de 2 px (diseño): 2,5–2,9:1 efectivo en 16:9 a DPR 2 | grosor ≥ 1 CSS px en pantalla; medir el anillo, no la caja |
+| 13 | 🟡 | Harness con puntos ciegos (arq): 0 casos sale en verde; 84 de 188 piezas sin plate se saltan en silencio; la referencia usa las dependencias del árbol de trabajo | manifiesto de piezas aprobadas con **piso de cobertura**; fallar ante faltantes; extraer de git también las dependencias de la referencia; comparar avisos |
+| 14 | 🟡 | Una falla deja artefactos y errores opacos (arq) | escritura atómica de salidas; los errores de esquema nombran pieza y campo |
+| 15 | 🟢 | Texto alternativo (diseño): «Botón:» anuncia un control que no existe; falta texto de selección y gesto | «Llamado a la acción:»; sumar etiquetas y gesto; no duplicar si `altText` ya trae el copy |
+| 16 | 🟢 | Pruebas débiles (arq): P09 se verifica a sí misma; P06 no detecta un mutante sin zona segura; faltan piezas de prueba donde cada guarda sea la que frena | oráculo independiente para P09 (máscara de glifos); piezas de prueba por guarda; medir la **puntuación de mutantes** |
+
+Ya corregido en `29393afe5`: la búsqueda del tamaño mide relleno y borde del CTA (P05); la tolerancia nunca cruza el
+umbral; tolerancia de máscara 0 al crecer (P04); P04 y P08 ya no pueden pasar vacías; P05 suma una pieza que el
+contraste sí frena.
+
+### Tramos
+
+| Tramo | Contenido | Por qué en este orden |
+|---|---|---|
+| 1 · Integridad | hallazgos 1, 2, 4 (esquema mínimo: `id`, rangos, medición nula) y 14 | hoy el gate puede certificar una pieza ajena o una guarda apagada: sin esto, ningún otro número es confiable |
+| 2 · Contraste real | 3, 11, 12 y el oráculo de P09 | cierra la brecha entre lo que el gate mide y lo que se ve |
+| 3 · Esquema e invariantes | 4 completo y 5 | una sola fuente de verdad del plan y de la geometría válida, compartida por búsqueda, composición y gate |
+| 4 · Canon hecho regla | 6, 7, 8, 9, 10 y 15 | convierte en bloqueo lo que el canon ya dice (firma, zonas, concepto) y agrega lo que falta en AXIS |
+| 5 · Harness y pruebas | 13 y 16 | cobertura y puntuación de mutantes: que la red de seguridad no tenga agujeros |
+
+### Cuatro pilares (hoy → al cerrar los tramos)
+
+| Pilar | Hoy | Meta | Qué lo sube |
+|---|---|---|---|
+| Safety | 2/5 | 4/5 | guardas no desactivables sin aprobación registrada, caché verificada, `id` restringido |
+| Robustness | 2/5 | 4/5 | esquema, invariantes compartidas, escritura atómica, QA atado por huellas |
+| Resilience | 3/5 | 4/5 | caché que se regenera sola, artefactos que no quedan a medias, errores que nombran la causa |
+| Scalability | 3/5 | 4/5 | harness con manifiesto y cobertura, referencia hermética |
+
+### Reglas duras que deja esta auditoría
+
+- **NUNCA** un gate que decide por fecha de archivo: decide por huellas del contenido.
+- **NUNCA** una guarda que el plan pueda apagar entera; las excepciones son acotadas, con razón y aprobación registrada.
+- **NUNCA** una medición ausente cuenta como pase.
+- **NUNCA** calibrar un umbral nuevo sólo contra lo ya aprobado: es circular (así pasó 01-fuera-916). Se calibra contra
+  el canon y se muestra qué piezas aprobadas lo incumplen.
+- **SIEMPRE** una guarda nueva con un mutante que alguna prueba detecte.
+
+### Decisiones pendientes del operador
+
+1. Valores de `minReadableCssPx` por rol (CTA, descriptor, apoyo) y qué hacer con 16:9 en teléfono: recomponer o
+   declarar placement de escritorio.
+2. Firma: ¿el compositor busca la Y automáticamente, o el plan la declara y el gate sólo verifica?
+3. APCA y daltonismo: ¿bloqueantes para el CTA?
+4. Con Gigi en cuadro, ¿el acento del CTA se cede a Gigi (`acento.cedidoA` auditado)?
+5. Canon de variantes: «escalar sí, degradar no» frente a §10 («no se cambia de variante para esquivar la medición»).
+

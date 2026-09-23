@@ -214,6 +214,17 @@ contraste y protección de sujeto, no completitud del concepto ni geometría del
   un cambio que no debería alterar nada sale sin diferencias. Para recomponer un set aprobado sin que el texto
   crezca: `"textGrowth": false`. Si un plan está mal escrito, el comando ahora falla antes de componer y nombra la
   pieza y el campo. §15.
+- **CTA: corchetes sólo en el de texto** (operador, 2026-09-23). Contorno y relleno van sin marco —su rectángulo ya
+  delimita la acción—; el de texto conserva los corchetes porque sin rectángulo queda huérfano. El cursor va en los
+  tres. El CTA es un destino seleccionable del contrato AXIS (`cta.seleccion`: 8 anclas, colaboradores con etiqueta
+  en las esquinas); ningún cursor ni etiqueta puede tapar otra voz. §17.
+- **La variante del CTA se elige mirando, no copiando el plan anterior.** `--variantes` compone las tres lado a
+  lado; `variant: "auto"` + `prominencia` (discreta/delimitada/destacada) respeta la intención y sólo escala si la
+  escena no la permite, también con daltonismo. Registra `variantReason`. §17.
+- **Certificación adversarial del compositor (2026-09-23): NO CERTIFICA todavía.** 10/10 pruebas en verde, pero dos
+  auditores encontraron caminos donde el gate aprueba piezas malas (QA sin huellas, guarda de sujeto desactivable,
+  contraste medido en la caja y no en el glifo, texto diminuto en 16:9, firma sin contrato). Plan en cinco tramos en
+  §18: no presentes el gate como garantía total hasta cerrarlos.
 - **Un bloque centrado no se ancla lejos del centro.** Con `align: 'center'` y `|centerX − 0,5| > 0,15`, el
   compositor aborta: si el aire está a un costado, el bloque se alinea a ese costado (`align: 'left'`). Operador
   sobre 03-referencia-916: «se vería mejor alineada a la izquierda por la posición». §14.
