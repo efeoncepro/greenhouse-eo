@@ -121,6 +121,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
@@ -245,6 +249,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
@@ -369,6 +377,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
@@ -493,6 +505,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
@@ -555,6 +571,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
@@ -617,6 +637,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
@@ -679,6 +703,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
@@ -741,6 +769,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
@@ -803,6 +835,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
@@ -865,6 +901,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
@@ -927,6 +967,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
@@ -989,6 +1033,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   }
 ]
