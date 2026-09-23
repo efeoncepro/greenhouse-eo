@@ -60,9 +60,8 @@ Sólo `CDR-###` y `EPIC-CMP-###` tienen numeración propia.
 - [CDR-003](decisions/CDR-003-tu-ia-no-conoce-del-output-a-la-pieza.md) · Accepted: extensión 5B «Del output a la pieza», posición anti-AI Slop, sistema de prueba y límites de claims.
 - [CDR-004](decisions/CDR-004-tu-ia-no-conoce-carril-hubspot.md) · Proposed: carril HubSpot de la narrativa; la unidad de producción es el dolor, no el Hub; gates de destino, partner y prueba.
 - [CDR-005](decisions/CDR-005-cmp001-embudo-momento-y-accion.md) · Proposed: el embudo se ordena por momento del usuario y acción encadenada; mismo mundo otro ángulo; densidad de texto por etapa; el tamaño del momento manda sobre su urgencia.
-- [CDR-006](decisions/CDR-006-cmp001-bofu-conversion-a-landing.md) · Proposed: BOFU pasa a conversión con destino a las landings de servicio; dos bloqueos verificados (canonical AEO no propio · la landing AEO sólo ofrece la conversión de TOFU) y el evento medido como prerrequisito.
-- [CMP-001 · Media plan Q4 2026](CMP-001-MEDIA-PLAN-Q4-2026.md) · Borrador: estructura por etapa×objetivo, reparto que cambia en el tiempo, rotación y convención UTM. Bloqueado por presupuesto, cuentas de pauta y las dos decisiones de CDR-006.
-
 - [CDR-006](decisions/CDR-006-cmp001-manifiesto-copy-y-pauta.md) · Proposed: países confirmados, copy externo y presupuesto sugerido; manifiesto operativo en OneDrive.
+- [CDR-007](decisions/CDR-007-cmp001-bofu-conversion-a-landing.md) · Proposed: BOFU pasa a conversión con destino a las landings de servicio; dos bloqueos verificados (canonical AEO no propio · la landing AEO sólo ofrece la conversión de TOFU) y el evento medido como prerrequisito.
+- [CMP-001 · Media plan Q4 2026](CMP-001-MEDIA-PLAN-Q4-2026.md) · Borrador: estructura por etapa×objetivo, reparto que cambia en el tiempo, rotación y convención UTM. Bloqueado por presupuesto, cuentas de pauta y las dos decisiones de CDR-007.
 
 Handoff operativo de pauta: [contrato transversal](../operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md). El Markdown completo se genera junto a catálogo/CSV en Finales desde el JSON de Recursos; no duplicar copy en el repo.

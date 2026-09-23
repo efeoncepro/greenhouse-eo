@@ -3,7 +3,7 @@
 **Estado:** `Borrador — bloqueado por tres inputs` · **2026-09-22** · **Ventana:** 2026-10-01 → 2026-12-31
 · **Decisiones que lo gobiernan:** [CDR-001](decisions/CDR-001-cmp001-always-on-q4-2026.md) (ventana, derechos,
 seasonality) · [CDR-005](decisions/CDR-005-cmp001-embudo-momento-y-accion.md) (embudo) ·
-[CDR-006](decisions/CDR-006-cmp001-bofu-conversion-a-landing.md) (BOFU a conversión).
+[CDR-007](decisions/CDR-007-cmp001-bofu-conversion-a-landing.md) (BOFU a conversión).
 
 ## 🔴 Lo que este plan NO puede decidir
 
@@ -11,10 +11,10 @@ seasonality) · [CDR-005](decisions/CDR-005-cmp001-embudo-momento-y-accion.md) (
 |---|---|---|---|
 | **I1** | **Presupuesto y su techo mensual** | Sin monto no hay reparto, ni CPL objetivo, ni criterio de corte. Un plan sin techo es una lista de deseos (CDR-001) | operador |
 | **I2** | Cuentas de pauta | ✅ **Meta conectado por MCP** *(operador, 2026-09-22)*. 🔴 LinkedIn y Google Ads siguen sin confirmar, y ninguna está documentada en el repo | operador |
-| **I3** | Las dos decisiones abiertas de CDR-006 | canonical de AEO (B1) y cómo se dirige el clic BOFU a la agenda (B2) | operador + sitio público |
+| **I3** | Las dos decisiones abiertas de CDR-007 | canonical de AEO (B1) y cómo se dirige el clic BOFU a la agenda (B2) | operador + sitio público |
 
 ✅ **Lo que sí está verificado:** GA4 `G-KYPPY57M14` y GTM `GTM-K2X4ZTTK` existen en el sitio. Los formularios
-y el agendamiento de ambas landings están comprobados en navegador (CDR-006).
+y el agendamiento de ambas landings están comprobados en navegador (CDR-007).
 
 ## 🔴 Contradicción entre decisiones, a resolver antes de octubre
 
@@ -37,7 +37,7 @@ entrega al más barato y deja de alimentar el embudo.
 | `CMP-001-MOFU` | tráfico / consideración | retargeting TOFU + visitantes sin conversión | **9** | panel competitivo |
 | `CMP-001-BOFU-AEO` | **conversión** | retargeting MOFU + visitantes de landing AEO | **3** ✅ | `/aeo-2/` → **agenda discovery** |
 
-**Alcance reducido a AEO** por decisión del operador (CDR-006 §Delta). La razón por la que SEO y AEO habrían
+**Alcance reducido a AEO** por decisión del operador (CDR-007 §Delta). La razón por la que SEO y AEO habrían
 sido campañas separadas sigue vigente si la línea SEO vuelve: sus eventos de conversión no valen lo mismo —un
 lead comercial contra una reunión agendada— y contarlos juntos hace que el optimizador persiga el más barato.
 
@@ -69,7 +69,7 @@ El CDR-001 lo dice y cambia la producción: **un always-on no se produce una vez
 
 ## 4. Medición
 
-**Nada se pautea a conversión sin el evento medido** (CDR-006).
+**Nada se pautea a conversión sin el evento medido** (CDR-007).
 
 | Capa | Estado |
 |---|---|

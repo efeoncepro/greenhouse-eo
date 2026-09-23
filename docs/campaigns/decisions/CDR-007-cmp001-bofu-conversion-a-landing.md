@@ -1,4 +1,4 @@
-# CDR-006 · CMP-001: BOFU pasa a campaña de conversión, con destino a las landings de servicio
+# CDR-007 · CMP-001: BOFU pasa a campaña de conversión, con destino a las landings de servicio
 
 **Estado:** `Accepted` *(alcance reducido a AEO el 2026-09-22)* · **Fecha:** 2026-09-22 · **Decide:** el operador · **Campaña:** CMP-001 «La IA dice de ti»
 · **Ámbito:** objetivo, destino, estructura y medición del nivel BOFU.
