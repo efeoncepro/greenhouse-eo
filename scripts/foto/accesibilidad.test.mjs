@@ -163,7 +163,10 @@ test('Texto alternativo: el rol del CTA se anuncia siempre, se compara por palab
 test('Una medición imposible se reconoce: más contraste del que da su tinta, o un umbral que no es el de su tamaño (tramo 13)', () => {
   assert.equal(medicionImposible({ tinta: '#ffffff', medidas: [20.27, 19.98], umbral: 3, umbralEsperado: 3 }), null)
   assert.equal(medicionImposible({ tinta: '#7ed600', medidas: [11.08, null] }), null, 'la lima medida en la corrida secuencial es posible')
-  assert.match(medicionImposible({ tinta: '#7ed600', medidas: [20.27] }), /contra ningún fondo pasa de 11\.\d\d:1/)
+  assert.match(medicionImposible({ tinta: '#7ed600', medidas: [20.27] }), /contra ningún fondo pasan de 11\.\d\d:1/)
+  // Tramo 14 (sexta certificación, Y3): una entrada celeste con énfasis blanco puede medir lo que mide el blanco.
+  assert.match(medicionImposible({ tinta: '#cfe4fa', medidas: [20.27] }), /contra ningún fondo pasan de 1\d\.\d\d:1/)
+  assert.equal(medicionImposible({ tinta: '#cfe4fa', tintasExtra: ['#ffffff'], medidas: [20.27] }), null)
   assert.match(medicionImposible({ tinta: '#ffffff', medidas: [20.27], umbral: 4.5, umbralEsperado: 3 }), /umbral 4\.5:1 para una voz que por su tamaño exige 3:1/)
   assert.equal(medicionImposible({ tinta: '#ffffff', medidas: [], umbral: null, umbralEsperado: 3 }), null, 'sin medición de trazo no hay umbral que comparar')
 })

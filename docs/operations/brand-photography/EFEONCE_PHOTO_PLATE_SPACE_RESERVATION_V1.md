@@ -58,6 +58,13 @@ encima pertenece a `efeonce-advertising-creative` y a su ficha tipográfica.
 Son puntos de partida medidos en esta corrida, **no una retícula aprobada**: la retícula definitiva debe salir de
 una pieza compuesta y aprobada, no de estas pruebas.
 
+**Delta 2026-09-23 · 16:9 con CTA y el piso de legibilidad.** Desde el piso de legibilidad del compositor de CTA (en un
+teléfono, CTA ≥ 11 CSS px y las demás voces ≥ 9), el texto de un 16:9 nuevo ocupa cerca del **57 % izquierdo** del ancho:
+la receta verificada, en un lienzo de 2048, es entrada, cierre y descriptor de 48 px, CTA de 60 y titular de 160, sin
+nota. Con la reserva de 42 % sólo 3 de los 17 plates 16:9 actuales certifican (el resto choca con el sujeto). **Pendiente
+de decisión del operador:** reservar ~58 % izquierdo en los plates 16:9 de piezas con CTA, o llevar menos texto en 16:9.
+`foto:prompt` sigue pidiendo el 42 % hasta que se decida.
+
 ## 3.1 El tono no es el problema: la materia lo es **[decisión del operador, 2026-09-20]**
 
 > **«No, no todo tiene que ser claro; de hecho faltaba probar los oscuros. El tema era que el modelo estaba poniendo

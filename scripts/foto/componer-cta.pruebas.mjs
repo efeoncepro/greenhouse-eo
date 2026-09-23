@@ -553,6 +553,11 @@ const PRUEBAS = [
 
       v03Nueva.canon = '2026-09-23'
       v03Exc.canon = '2026-09-23'
+      // Tramo 14: en el canon vigente la zona de AXIS por defecto ya frenaba el crecimiento antes que la reserva y la excepción
+      // no cambiaba nada (el mutante t7 sobrevivía). Con una zona declarada amplia, la que frena vuelve a ser la reserva
+      // (medido: ×1,236 con reserva, ×1,251 sin ella).
+      v03Nueva.safeArea = { x0: 0.05, y0: 0.05, x1: 0.95, y1: 0.95 }
+      v03Exc.safeArea = { x0: 0.05, y0: 0.05, x1: 0.95, y1: 0.95 }
 
       v03Exc.excepciones = [{ regla: 'reserva-editorial', razon: 'prueba: la reserva se revisa aparte', aprobadoPor: 'suite-pruebas', plate: sha(fs.readFileSync(v03Exc.plate)), hasta: 5000 }]
       const [conExc, sinExc] = await Promise.all([componer('P06-reserva-excepcion', [v03Exc]), componer('P06-reserva-sin-excepcion', [v03Nueva])])
@@ -739,6 +744,15 @@ const PRUEBAS = [
       await sharp(base().plate).ensureAlpha(0.5).toColourspace('rgb16').png().toFile(alfa16.plate)
       await sharp(base().plate).greyscale().ensureAlpha(0.5).toColourspace('b-w').png().toFile(grisAlfa.plate)
       entidadDigito.cta.text = 'Cotiza tus 50 m&sup2;'
+      // Tramo 14 (sexta certificación, O1 e Y7): un plate SVG que enlaza la foto y una entidad sin punto y coma.
+      const conSvg = base()
+      const entidadSinPunto = base()
+      const { width: anchoSvg, height: altoSvg } = await sharp(base().plate).metadata()
+
+      fs.copyFileSync(base().plate, path.join(TMP, 'P07-plates', 'foto-enlazada.png'))
+      conSvg.plate = path.join(TMP, 'P07-plates', 'enlaza-la-foto.svg')
+      fs.writeFileSync(conSvg.plate, `<svg xmlns="http://www.w3.org/2000/svg" width="${anchoSvg}" height="${altoSvg}"><image href="foto-enlazada.png" width="${anchoSvg}" height="${altoSvg}"/></svg>`)
+      entidadSinPunto.lead = 'Marketing &amp ventas'
 
       const casos = [
         ['falta cta.fontSize', [sinFont], [], /falta `cta\.fontSize`/],
@@ -768,7 +782,7 @@ const PRUEBAS = [
         ['texto sin tinta (U+200B)', [sinTinta], [], /`dominant` no tiene nada que dibujar/],
         ['zona de la firma incompleta', [zonaFirma], [], /falta `signatureSafeArea\.y0`/],
         ['campo interno en la raíz', [interno], [], /`ctaVarianteResuelta`: campo interno del compositor/],
-        ['escala del cursor sin techo', [escala], [], /`cta\.cursorScale` debe ser ≤ 2/],
+        ['escala del cursor sin techo', [escala], [], /`cta\.cursorScale` debe ser ≤ 1\.2/],
         ['final que se aleja de lo medido', [lejano], [], /reduce demasiado la pieza/],
         ['firma externa fuera de la imagen', [firmaFuera], [], /firma-externa .* cae fuera de la imagen/],
         ['velo (el lecho sale del prompt)', [conVelo], [], /`scrimTop`: el velo no se usa/],
@@ -779,7 +793,9 @@ const PRUEBAS = [
         ['plate con transparencia', [conAlfa], [], /tiene transparencia/],
         ['plate con transparencia en 16 bits', [alfa16], [], /tiene transparencia/],
         ['plate gris con alfa', [grisAlfa], [], /tiene transparencia/],
-        ['entidad con dígitos en el nombre', [entidadDigito], [], /`cta\.text` trae la entidad «&sup2;»/]
+        ['entidad con dígitos en el nombre', [entidadDigito], [], /`cta\.text` trae la entidad «&sup2;»/],
+        ['plate SVG que enlaza la foto', [conSvg], [], /es svg: usa una imagen raster/],
+        ['entidad sin punto y coma', [entidadSinPunto], [], /`lead` trae la entidad «&amp» sin punto y coma/]
       ]
 
       const rs = await Promise.all(casos.map(([, piezas, ids], i) => componer(`P07-${i}`, piezas, ids)))
@@ -1446,7 +1462,8 @@ const PRUEBAS = [
       c11FirmaGigante.logo = { width: 0.45, x: 0.5, y: 'auto' }
       Object.assign(c11Desordenada, { top: 0.3, note: { ...c11Desordenada.note, y: 0.14, gapAfterClosure: undefined } })
       Object.assign(c11RolAlto, { dominantSize: 60, textGrowth: false })
-      Object.assign(c11SinAire.cta, { paddingX: 0, paddingY: 0 })
+      // Relleno positivo pero bajo el piso de `cta-aire`: con 0 el borde toca el texto y aborta el compositor (tramo 14).
+      Object.assign(c11SinAire.cta, { paddingX: 8, paddingY: 4 })
       delete c11ExternaNueva.logo
       c11ExternaNueva.firma = { modo: 'externa', razon: 'prueba: la firma la pone firmar.mjs' }
       c11ExternaNueva.signatureY = 0.8
@@ -1504,14 +1521,15 @@ const PRUEBAS = [
 
       Object.assign(c13Losa.cta, { paddingX: 110, paddingY: 70 })
       Object.assign(c13LosaAprobada.cta, { paddingX: 110, paddingY: 70 })
-      c13LosaAprobada.excepciones = [{ regla: 'cta-relleno', razon: 'prueba: botón grande aprobado a propósito', aprobadoPor: 'suite-pruebas', plate: plateB2, hasta: 2.5 }]
+      // Un botón-losa también pasa el área del titular (`cta-tamano`, tramo 14): la aprobación cubre las dos reglas.
+      c13LosaAprobada.excepciones = [{ regla: 'cta-relleno', razon: 'prueba: botón grande aprobado a propósito', aprobadoPor: 'suite-pruebas', plate: plateB2, hasta: 2.5 }, { regla: 'cta-tamano', razon: 'prueba: botón grande aprobado a propósito', aprobadoPor: 'suite-pruebas', plate: plateB2, hasta: 2 }]
       // 1,5× el cuerpo del CTA (40 px). El caso de la auditoría —150 px— no cabe en esta escena: el descriptor invade la
       // protección del sujeto y el compositor aborta antes de llegar al gate.
       c13Lejos.cta.descriptorGap = 60
       c13CtaChico.afterSize = 48
       c13Tinta.leadFill = '#39ff14'
       // La caja de la auditoría de diseño (h02): una pared vacía.
-      c13Nada.selection = { variant: 'eight-handles', padding: 'standard', overlay: 'subtle', box: [0.12, 0.47, 0.28, 0.55], targetKind: 'object', cursors: [{ id: 'ia', kind: 'collaborator', anchor: 'top-end', label: 'IA', who: 'role' }] }
+      c13Nada.selection = { variant: 'eight-handles', padding: 'standard', overlay: 'subtle', box: [0.12, 0.47, 0.28, 0.55], targetKind: 'object', razon: 'prueba: aprobada para medir sólo la cobertura', aprobadoPor: 'suite-pruebas', plate: plateB2, cursors: [{ id: 'ia', kind: 'collaborator', anchor: 'top-end', label: 'IA', who: 'role' }] }
       // Sin crecer: el QA mide el tamaño en pantalla ya crecido, y el 9:16 crece.
       c13Chica.textGrowth = false
       c13Chica.note.size = 22
@@ -1519,6 +1537,65 @@ const PRUEBAS = [
       const c13Rs = await Promise.all([['P10-losa', c13Losa], ['P10-losa-aprobada', c13LosaAprobada], ['P10-descriptor-lejos', c13Lejos], ['P10-cta-chico', c13CtaChico], ['P10-tinta-fuera', c13Tinta], ['P10-seleccion-nada', c13Nada], ['P10-legibilidad', c13Chica], ['P10-esquina', c13Esquina]].map(([n, p]) => componer(n, [p])))
       const [gC13Losa, gC13LosaAprobada, gC13Lejos, gC13CtaChico, gC13Tinta, gC13Nada, gC13Chica] = await Promise.all(c13Rs.slice(0, 7).map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
       const rC13Esquina = c13Rs[7]
+      // ── Tramo 14 · sexta certificación ──
+      const c14Cierre = canon('b2_916')
+      const c14DescColab = canon('b2_916')
+      const c14CtaGrande = canon('b2_916')
+      const c14SelSinAprobar = canon('b2_916')
+      const c14NadaProtect = canon('b2_916')
+      const c14Etiqueta = canon('b2_916')
+      const c14Borde = canon('b2_916')
+      const c14Vacia = canon('b2_916')
+
+      c14Cierre.after = '[[Eso es lo que operamos.]]'
+      c14DescColab.cta.text = 'Agenda ya'
+      c14DescColab.cta.seleccion = { cursores: [{ id: 'eq', kind: 'collaborator', anchor: 'bottom-end', label: 'Equipo AEO', who: 'department' }] }
+      // Sin la nota, para que el descriptor no llegue a la protección del sujeto: la única falla es el tamaño del CTA.
+      delete c14CtaGrande.note
+      Object.assign(c14CtaGrande.cta, { text: 'Agenda ya', fontSize: 75, paddingX: 90, paddingY: 60 })
+      // Sobre el monitor (79 % de sujeto): la única falla es que nadie la aprobó.
+      c14SelSinAprobar.selection = { variant: 'eight-handles', padding: 'standard', overlay: 'subtle', box: [0.3, 0.52, 0.62, 0.66], targetKind: 'object', cursors: [{ id: 'ia', kind: 'collaborator', anchor: 'top-start', label: 'IA', who: 'role' }] }
+      c14NadaProtect.selection = structuredClone(c13Nada.selection)
+      c14NadaProtect.protect = [{ box: [0.12, 0.47, 0.28, 0.55], reason: 'prueba: zona protegida falsa sobre la pared vacía' }]
+      Object.assign(c14Etiqueta, { label: 'CASO REAL', labelSize: 28, top: 0.14 })
+      Object.assign(c14Borde.cta, { paddingX: 0, paddingY: 0 })
+      fs.mkdirSync(path.join(TMP, 'P10-plates'), { recursive: true })
+      c14Vacia.plate = path.join(TMP, 'P10-plates', 'uniforme.png')
+      const { width: anchoB2, height: altoB2 } = await sharp(c14Cierre.plate).metadata()
+
+      await sharp({ create: { width: anchoB2, height: altoB2, channels: 3, background: '#0b0d12' } }).png().toFile(c14Vacia.plate)
+      const c14Rs = await Promise.all([['P10-cierre-acento', c14Cierre, { FOTO_EVIDENCIA: '1' }], ['P10-descriptor-colaborador', c14DescColab], ['P10-cta-grande', c14CtaGrande], ['P10-seleccion-sin-aprobar', c14SelSinAprobar], ['P10-seleccion-protect', c14NadaProtect], ['P10-etiqueta', c14Etiqueta], ['P10-borde', c14Borde], ['P10-mascara-vacia', c14Vacia]].map(([n, p, env]) => componer(n, [p], [], env)))
+      const [rC14Cierre, , , , , rC14Etiqueta, rC14Borde] = c14Rs
+      const [gC14Cierre, gC14DescColab, gC14CtaGrande, gC14SelSinAprobar, gC14NadaProtect] = await Promise.all(c14Rs.slice(0, 5).map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
+      const gC14Vacia = c14Rs[7].ok ? await gate(c14Rs[7].planPath) : { code: -1, salida: c14Rs[7].error }
+      // El remate del cierre, en la capa de texto: ningún píxel naranja dentro de su caja.
+      let naranjaCierre = Infinity
+
+      if (rC14Cierre.ok) {
+        const Lc = leer(rC14Cierre.dir, 'b2-primero-el-numero-916-layout.json')
+        const caja = Lc.maquetacion.elementos.find(e => e.id === 'cierre-frase').box
+        const tx = await sharp(path.join(rC14Cierre.dir, 'out', 'b2-primero-el-numero-916-texto.png')).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+
+        naranjaCierre = 0
+
+        for (let y = Math.floor(caja.top); y < Math.ceil(caja.bottom); y++) {
+          for (let x = Math.floor(caja.left); x < Math.ceil(caja.right); x++) {
+            const i = (y * tx.info.width + x) * 4
+
+            if (tx.data[i + 3] > 128 && tx.data[i] > 200 && tx.data[i + 1] > 60 && tx.data[i + 1] < 140 && tx.data[i + 2] < 60) naranjaCierre++
+          }
+        }
+      }
+
+      let etiquetaEnColumna = false
+
+      if (rC14Etiqueta.ok) {
+        const Le = leer(rC14Etiqueta.dir, 'b2-primero-el-numero-916-layout.json')
+        const et = Le.maquetacion.elementos.find(e => e.id === 'etiqueta')?.box
+
+        etiquetaEnColumna = Boolean(et) && typeof Le.columna === 'number' && Math.abs(et.left - Le.columna) <= 1
+      }
+
       // Una selección cuyo QA no trae la medición de sujeto no pasa: la ausencia es la falla.
       let gC13SinMedida = { code: -1, salida: 'no compuso' }
 
@@ -1573,6 +1650,14 @@ const PRUEBAS = [
         'rechaza selección sin su medición': gC13SinMedida.code === 3 && /la selección no trae su medición de sujeto/.test(gC13SinMedida.salida),
         'rechaza texto chico en el teléfono (canon nuevo)': gC13Chica.code === 1 && /texto chico en un teléfono .*nota [\d.]+ px \(piso 9\)/.test(gC13Chica.salida),
         'rechaza esquina del botón sobre el texto': !rC13Esquina.ok && /la esquina del botón entra en el texto del CTA/.test(rC13Esquina.error ?? ''),
+        'el cierre en [[ ]] sale blanco, no naranja': rC14Cierre.ok && gC14Cierre.code === 0 && naranjaCierre < 30,
+        'rechaza descriptor que el cursor empuja': gC14DescColab.code === 1 && /el descriptor queda lejos de su botón/.test(gC14DescColab.salida),
+        'rechaza CTA que compite con el titular': gC14CtaGrande.code === 1 && /el CTA compite con el titular/.test(gC14CtaGrande.salida),
+        'selección sobre un objeto exige aprobación (canon nuevo)': gC14SelSinAprobar.code === 1 && /selección sobre un OBJETO .* sin aprobador del registro/.test(gC14SelSinAprobar.salida),
+        'rechaza selección sobre nada aunque declare protect': gC14NadaProtect.code === 1 && /la selección no encierra nada/.test(gC14NadaProtect.salida),
+        'la etiqueta arranca en la columna': etiquetaEnColumna,
+        'rechaza borde del botón sobre el texto': !rC14Borde.ok && /el borde del botón toca el texto del CTA/.test(rC14Borde.error ?? ''),
+        'rechaza máscara vacía': gC14Vacia.code === 1 && /la máscara no marca ningún sujeto/.test(gC14Vacia.salida),
         'el QA queda en qa-<plan>.json': qaPorPlan && bueno.ok && fs.existsSync(path.join(bueno.dir, 'out/qa-piezas.json')),
         'rechaza pieza sin firma declarada': gSinFirma.code !== 0 && /no declara firma/.test(gSinFirma.salida),
         'acepta la firma externa declarada y la mide': rExterna.ok && !/no declara firma/.test(gExterna.salida) && typeof rExterna.qa[0].contraste.firmaExterna === 'number',

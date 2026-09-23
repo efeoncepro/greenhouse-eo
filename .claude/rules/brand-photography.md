@@ -451,7 +451,8 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   **En 16:9, 25 % del lado corto** en las piezas nuevas (decisión del operador del 2026-09-23: al 20 % la firma quedaba
   en ≈ 44 px en un teléfono, contra 78 px en 4:5); 20 % en verticales y cuadrados. Las piezas ya hechas no se regeneran.
   En una pieza nueva con CTA, además, el texto respeta el piso de legibilidad en el teléfono (CTA 11 CSS px, las demás
-  voces 9), que en 16:9 pide un texto mucho más grande.
+  voces 9), que en 16:9 pide un texto mucho más grande: cerca del 57 % izquierdo del ancho, contra el 42 % que reserva
+  hoy `foto:prompt` (pendiente de decisión; detalle en la reserva del plate, delta 2026-09-23).
 - 🔴 **En un plate limpio, no sugieras criaturas ni siquiera de refilón** **[medido 2026-09-21]**. La frase «*as if
   something small were there asking her a question*» hizo que el modelo **materializara un robot blanco flotando**.
   Si la criatura se compone después, la mirada se describe como **geometría** y el vacío se **declara**: «*the air

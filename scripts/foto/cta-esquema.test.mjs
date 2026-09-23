@@ -36,10 +36,15 @@ test('Un campo interno del compositor en la raíz se rechaza (no se inyecta esta
 })
 
 test('Las escalas de la selección tienen techo (una etiqueta de 148 px pasaba con escala 5)', () => {
-  assert.ok(errores({ ...base(), cta: { ...base().cta, cursorScale: 4.5 } }).some(e => /`cta\.cursorScale` debe ser ≤ 2/.test(e)))
+  assert.ok(errores({ ...base(), cta: { ...base().cta, cursorScale: 4.5 } }).some(e => /`cta\.cursorScale` debe ser ≤ 1\.2/.test(e)))
+  assert.ok(errores({ ...base(), cta: { ...base().cta, cursorScale: 2 } }).some(e => /`cta\.cursorScale` debe ser ≤ 1\.2/.test(e)), 'tramo 14: con 2 el cursor empujaba el descriptor')
   assert.ok(errores({ ...base(), cta: { ...base().cta, seleccion: { escala: 5 } } }).some(e => /`cta\.seleccion\.escala` debe ser ≤ 2\.5/.test(e)))
   assert.ok(errores({ ...base(), selection: { scale: 3, cursors: [{ id: 'c', kind: 'collaborator', anchor: 'top-start', label: 'Cliente' }] } }).some(e => /`selection\.scale` debe ser ≤ 2\.5/.test(e)))
   assert.deepEqual(errores({ ...base(), cta: { ...base().cta, cursorScale: 1.1 } }), [])
+  // Tramo 14 (decisión del operador): las etiquetas no entran en el piso de legibilidad, pero no bajan de lo aprobado.
+  assert.ok(errores({ ...base(), selection: { scale: 0.5, cursors: [{ id: 'c', kind: 'collaborator', anchor: 'top-start', label: 'Cliente' }] } }).some(e => /`selection\.scale` debe ser ≥ 1/.test(e)))
+  assert.ok(errores({ ...base(), cta: { ...base().cta, seleccion: { escala: 0.5 } } }).some(e => /`cta\.seleccion\.escala` debe ser ≥ 1/.test(e)))
+  assert.deepEqual(errores({ ...base(), selection: { scale: 1.05, box: [0.3, 0.5, 0.6, 0.66], targetKind: 'object', razon: 'prueba: el objeto que nombra la selección', aprobadoPor: 'julio-reyes', plate: 'a'.repeat(64), cursors: [{ id: 'c', kind: 'collaborator', anchor: 'top-start', label: 'Cliente' }] } }), [], 'la selección aprobada se declara en el plan')
 })
 
 test('Las aprobaciones que apagan una medición aceptan el sha del plate', () => {
@@ -75,6 +80,11 @@ test('Marcado, entidades, saltos de línea y placement chico se rechazan donde s
   assert.ok(errores({ ...base(), cta: { ...base().cta, text: 'Cotiza tus 50 m&sup2;' } }).some(e => /`cta\.text` trae la entidad «&sup2;»/.test(e)))
   assert.ok(errores({ ...base(), dominant: 'Medio &frac12; paso' }).some(e => /`dominant` trae la entidad «&frac12;»/.test(e)))
   assert.deepEqual(errores({ ...base(), lead: 'Marketing &2 ventas; hoy' }), [], '& seguido de un dígito no es una entidad')
+  // Tramo 14 (sexta certificación, Y7): también sin punto y coma, en sus formas numéricas y con los nombres que un navegador acepta.
+  assert.ok(errores({ ...base(), lead: 'Marketing &amp ventas' }).some(e => /`lead` trae la entidad «&amp» sin punto y coma/.test(e)))
+  assert.ok(errores({ ...base(), cta: { ...base().cta, text: 'Cotiza tus 50 m&#178' } }).some(e => /`cta\.text` trae la entidad «&#178» sin punto y coma/.test(e)))
+  assert.ok(errores({ ...base(), dominant: 'Medio &sup2 paso' }).some(e => /`dominant` trae la entidad «&sup2» sin punto y coma/.test(e)))
+  assert.deepEqual(errores({ ...base(), lead: 'R&D y AT&T' }), [], 'un & dentro de una sigla es texto')
   assert.ok(errores({ ...base(), dominant: 'Uno\ndos' }).some(e => /`dominant` trae un salto de línea/.test(e)))
   assert.ok(errores({ ...base(), placement: { anchoCssPx: 15, razon: 'prueba: pantalla diminuta' } }).some(e => /`placement\.anchoCssPx` debe ser ≥ 320/.test(e)))
   assert.deepEqual(errores({ ...base(), placement: { anchoCssPx: 1600, razon: 'prueba: sitio de escritorio' } }), [])

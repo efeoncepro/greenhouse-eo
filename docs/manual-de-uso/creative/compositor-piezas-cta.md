@@ -1,7 +1,7 @@
 # Compositor de piezas con CTA — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-23 por Claude
 > **Ultima actualizacion:** 2026-09-23 por Claude
 > **Modulo:** Creative · piezas publicitarias y sociales con CTA sobre fotografía
@@ -484,6 +484,8 @@ El operador todavía no decide estos puntos. Mientras tanto, rige lo que dice la
 | 5 | Variante del CTA elegida sin margen: ¿aviso o bloqueo? | Aviso |
 | 6 | ~~Piso de legibilidad por rol~~ | **Decidido:** en las piezas nuevas el CTA mide al menos 11 px CSS en el teléfono y las demás voces 9 (bloquea); en las aprobadas, aviso |
 | 7 | Grosor de los corchetes de AXIS (cerca de 0,69 px CSS en el teléfono) | Aviso; cambiarlo es cambiar el contrato AXIS |
+| 8 | ~~Nombres de los cursores y el piso de legibilidad~~ | **Decidido:** quedan fuera del piso; la escala de la selección no baja de 1 |
+| 9 | Reserva de texto del plate 16:9 para piezas con CTA | Hoy 42 % izquierdo (`foto:prompt`); con el piso de legibilidad el texto usa cerca del 57 % |
 
 **1 · La firma en 16:9 (decidido el 2026-09-23: 25 % en las piezas nuevas).** Medido en una misma campaña: en 16:9 la firma ocupa entre 7,3 % y 7,9 % del ancho del cuadro,
 contra 20 % en 4:5 y 9:16 (18 % en 1:1). En el feed de un teléfono (390 px de ancho) mide 31 px contra 78 px en el 4:5:
@@ -568,6 +570,10 @@ con `dominantMax` y `textWidth` 0,5, y sin nota.
 | `la esquina del botón entra en el texto del CTA (radius R con relleno X×Y)` | El radio del botón es tan grande que la esquina corta las letras | Baja `cta.radius` hasta el máximo que da el mensaje, o sube el relleno |
 | `medición imposible en «voz»` | Un defecto del comando, visto una sola vez | Recompón; si se repite, avisa al responsable del comando con el registro y la salida completa |
 | `tiene transparencia: aplánalo sobre su fondo` | El plate tiene alfa, también en 16 bits o en gris | Exporta el plate sin transparencia |
+| `es svg: usa una imagen raster` | El plate no es PNG, JPEG, WebP, AVIF ni TIFF | Exporta la foto como imagen |
+| `el borde del botón toca el texto del CTA` | El relleno del botón es menor que medio trazo del contorno | Sube `paddingX` y `paddingY` |
+| `trae la entidad «&amp» sin punto y coma` | Una entidad HTML sin su punto y coma | Escribe el carácter |
+| `voces repetidas` | Un defecto del comando | Avisa al responsable del comando con la salida completa |
 
 ### Al certificar
 
@@ -611,10 +617,13 @@ con `dominantMax` y `textWidth` 0,5, y sin nota.
 | `⊘ … la máscara del sujeto salió de una caché ajena al repo` | Se compuso con `FOTO_MASCARAS_DIR` | `--reproducir` |
 | `⊘ … lleva gesto manuscrito` / `lleva tarjeta` | Elementos que ninguna guarda mide | No se certifica hoy; quita el elemento si necesitas la certificación |
 | `el botón es una losa: padding …` | El relleno del botón pasa 1,2 y 0,8 veces el tamaño de su letra | Baja `paddingX` y `paddingY`; lo aprobado va de 0,6 a 0,8 y de 0,35 a 0,47 veces |
-| `el descriptor queda lejos de su botón` | `descriptorGap` pasa el tamaño de la letra del CTA | Bájalo; lo aprobado va de 0,35 a 0,57 veces |
+| `el descriptor queda lejos de su botón` | El descriptor dibujado queda a más de 1,5 veces la letra del CTA del botón: un `descriptorGap` grande o un cursor que lo empuja | Baja `descriptorGap` o cambia la esquina del cursor del CTA |
+| `el CTA compite con el titular` | El CTA pasa la mitad del titular o el botón pasa su área | Baja `cta.fontSize` o el relleno |
+| `selección sobre un OBJETO … sin aprobador del registro` | En una pieza nueva la selección sobre un objeto se aprueba | Pide la aprobación y declara `razon`, `aprobadoPor` y `plate` en `selection` |
+| `la máscara no marca ningún sujeto` | La segmentación no encontró a nadie en la foto | Si hay sujeto, `--reproducir`; si la foto no tiene protagonista, pide la excepción `mascara-vacia` |
 | `el CTA (N px) es menor que el cuerpo` | El CTA mide menos de 0,9 veces la entrada, el cierre o la nota | Sube `cta.fontSize` o baja esa voz |
 | `tinta fuera de la paleta de AXIS para el cuerpo` | `leadFill` o `afterFill` con un color fuera de la paleta | Sobre fondo oscuro, `#ffffff` o `#cfe4fa`; sobre claro, `#00284d` o `#6d6777`. El naranja y el lima son del titular y del CTA |
-| `la selección no encierra nada` | La caja de la selección cae donde no hay sujeto | Pon `selection.box` sobre el objeto que nombra; si la silueta no lo marca, decláralo con `protect` |
+| `la selección no encierra nada` | La caja de la selección cae donde no hay sujeto (una zona `protect` no cuenta) | Pon `selection.box` sobre el objeto que nombra; si la silueta no lo marca, pide la excepción `seleccion-objeto` |
 | `⊘ … la selección no trae su medición de sujeto` | El registro viene de una versión anterior del comando, o se tocó | Recompón |
 | `texto chico en un teléfono (390 CSS px de ancho)` | Pieza nueva con voces bajo el piso: CTA 11 px CSS, las demás 9 | Sube los tamaños o recorta el texto; en 16:9, la receta del punto 6 de las decisiones |
 

@@ -1188,6 +1188,61 @@ planes reales); el eje centrado se mide por caja y no por línea (N6); con `.ori
 botón; acentos descompuestos (NFD) con un mensaje confuso; `&amp;` literal en el `.alt.txt`; «cortar el objeto» con la
 selección, que la máscara no permite juzgar (una aprobada encierra sólo el 9 % de su componente; un ataque, el 24 %).
 
+### Sexta certificación (2026-09-23): dos auditores, NO CERTIFICA
+
+Sobre el commit `41c16b439`. Dan por **cerrados** los 🟠 de arquitectura de la quinta (radio del botón, transparencia en
+cualquier profundidad, entidades con dígitos) y, en diseño, el CTA menor que el cuerpo. Ningún 🔴. Abiertos:
+
+| Severidad | Hallazgo (auditor) | Uso real |
+|---|---|---|
+| 🟠 | El cierre escrito entero en `[[ ]]` salía naranja: `paleta-voces` miraba `afterFill`, no lo dibujado (diseño, H1; arquitectura, Y6) | ninguna usa `[[ ]]` en el cierre |
+| 🟠 | El descriptor quedaba a 3,9× el cuerpo del CTA al esquivar un cursor o su etiqueta, con `descriptorGap` en 0,4× (diseño, H2; arquitectura, Y5) | — |
+| 🟠 | Un CTA de 0,6× el titular, con un botón de 1,49× el área del titular, pasaba con el relleno en su techo (diseño, H3) | CTA 0,20–0,44×; área 0,17–0,77× |
+| 🟠 | Selección sobre nada con una zona `protect` declarada encima (99 %); y el piso de 1 % no separa un marco que roza un borde de uno que encierra un objeto delgado (diseño, H4; arquitectura, Y4) | aprobadas 3,3–20 % |
+| 🟠 | Las etiquetas de los cursores (4,9–6,3 CSS px en las aprobadas) no entran en el piso de legibilidad (diseño, H5; arquitectura, O2) | 16 selecciones |
+| 🟠 | La etiqueta (`label`) quedaba 41 px corrida de la columna: se reservaba el lugar de una estrella que no estaba (diseño, H6) | ninguna |
+| 🟠 | Un plate SVG que enlaza la foto dejaba la segmentación ciega (máscara vacía) y el texto tapaba a la persona con `--reproducir` en 0 (arquitectura, O1) | los 178 plates son PNG |
+
+Además, un **falso positivo** de la guarda del tramo 13: una entrada escrita entera en `[[ ]]` abortaba como «medición
+imposible», porque el tope se calculaba con la tinta de la voz y no con la del énfasis blanco (arquitectura, Y3). La
+medición no determinista no se reprodujo (104 composiciones simultáneas del mismo plate); el auditor de diseño vio abortar
+la guarda una vez, en paralelo, con el umbral del titular: el aborto es lo que dispone el tramo 13.
+
+### Tramo 14 — sexta certificación (cerrado)
+
+- **Compositor (todas):** en el cierre, `[[ ]]` es el remate blanco de la tabla de voces, como el énfasis de la entrada;
+  la etiqueta arranca en la columna cuando no lleva estrella; `protect` ya no cuenta como sujeto en `seleccionSujeto`; el
+  borde del botón que toca las letras (relleno menor que medio trazo) aborta en vez de delegarse en `cta-aire`, que se
+  exceptúa; el descriptor usa la tinta del cuerpo (se podía certificar un fondo claro con el descriptor blanco a 1,29:1);
+  **sólo plates raster** (PNG, JPEG, WebP, AVIF o TIFF); el tope de «medición imposible» considera la tinta del énfasis; y
+  dos diagnósticos: el mensaje lleva el tamaño, el lienzo y la medición, y una voz repetida aborta.
+- **Esquema (todas):** `cta.cursorScale` ≤ 1,2 (lo aprobado, 0,45–1,1); `selection.scale` y `cta.seleccion.escala` ≥ 1,
+  el piso propio de las etiquetas de los cursores (4,68 × escala CSS px; aprobadas 1,05 y 1,35); entidades sin punto y
+  coma rechazadas (formas numéricas y nombres que un navegador acepta sin él: «R&D» sigue siendo texto).
+- **Gate:** `descriptor-distancia` mide lo dibujado, del borde inferior del botón al descriptor, con techo 1,5× el cuerpo
+  del CTA (aprobadas 0,57–1,14×); `cta-tamano`, CTA ≤ 0,5× el titular y botón ≤ el área del titular; `mascara-vacia`
+  bloquea una máscara sin sujeto (las 178 del repo marcan al menos 2,2 %); en las piezas **nuevas**, una selección sobre un
+  objeto es una salida aprobada (`razon`, `aprobadoPor` y `plate` en `selection`), porque el gate mide que la caja
+  encierre sujeto pero no que encierre lo que nombra; el aviso de columna incluye la etiqueta; y en `--reproducir` el
+  origen es siempre el plan que se certifica (el heredado dejaba a un falso repo aprobar un plan del repo).
+- **Decisión del operador (2026-09-23):** las etiquetas de los cursores quedan **fuera** del piso de legibilidad —son parte
+  gráfica del recurso multiplayer y su texto va en el alternativo—, con el piso propio de la escala.
+- **Consecuencia de producción del piso de legibilidad:** en 16:9 el texto nuevo necesita cerca del 57 % izquierdo del
+  ancho, y la reserva del plate (§3 de `EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md`, y `foto:prompt`) pide el 42 %: con
+  la receta legible sólo 3 de los 17 plates 16:9 actuales certifican. Pendiente de decisión: subir la reserva de los plates
+  16:9 de piezas con CTA (propuesta: 58 % izquierdo) o llevar menos texto en 16:9.
+- **Pruebas:** P06 recupera el caso de la reserva (una zona declarada amplia: la reserva vuelve a frenar, ×1,236 contra
+  ×1,251), P07 +2 casos, P10 +8, unitarias actualizadas; mutantes 152: `t2` y `t4` rediseñados (el de la zona ya no rompe
+  el programa), `t7` vuelve a ser detectable, tres reapuntados y 12 nuevos.
+- **Regresión:** 132 de 132 aprobadas idénticas contra el tramo 13 (píxel, layout, QA y veredicto).
+
+**Deuda 🟡/🟢 que queda registrada:** N5 (`--reproducir` sale con 3 en planes que repiten plate) y N6 (eje por caja);
+`.origen` forjado en modo rápido; la estrella de `labelStar`; voces despegadas sin techo; firma fuera del eje en un bloque
+centrado; selección contra selección; acentos NFD; `&amp;` en el `.alt.txt`; el color del colaborador acepta cualquier
+`#rrggbb`; una etiqueta mayor que el CTA; `cssPx` redondeado antes de compararlo con el piso (10,96 pasa como 11); el borde
+interior del contorno modelado como elipse (0,5–1,6 px de error); `preview-390` y los SVG auxiliares sin huella; y la
+causa de la medición no determinista, que sigue sin encontrarse (la guarda la convierte en un aborto).
+
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
 | Pilar | Al auditar | Meta | Al cerrar los tramos 1–5 | Qué lo sostiene |
@@ -1265,6 +1320,8 @@ Nada de esto cambia una pieza aprobada.
   CMP001-04 quedó pendiente porque OneDrive no deja descargarla ni sobrescribirla.
 - **Piso de legibilidad** (pendiente 6): en las piezas nuevas, el CTA mide al menos 11 CSS px en un teléfono y las demás
   voces 9 (tramo 13, regla `legibilidad`). Las aprobadas conservan el aviso.
+- **Etiquetas de los cursores fuera del piso de legibilidad** (sexta certificación): son parte gráfica del recurso
+  multiplayer y su texto va en el alternativo. Tienen su propio piso: la escala de la selección no baja de 1 (tramo 14).
 
 **Pendientes** (sin respuesta; lo implementado mientras tanto va entre paréntesis):
 
@@ -1604,10 +1661,12 @@ Copiarlo sólo vale si el operador re-aprueba la excepción para ese plate.
 | `tracking-titular` | Canon nuevo: tracking del titular fuera de −0,035…0,02 em | no se mide: sin `hasta` |
 | `legibilidad` | Canon nuevo: texto bajo el piso en un teléfono de 390 CSS px (CTA 11 px, las demás voces 9) | CSS px mínimos aprobados (p. ej. `8.5`) |
 | `cta-relleno` | Padding del botón sobre 1,2× y 0,8× el cuerpo del CTA (botón-losa) | veces el techo, 1 = el techo (p. ej. `1.4`) |
-| `descriptor-distancia` | `descriptorGap` sobre 1× el cuerpo del CTA | razón máxima aprobada (p. ej. `1.3`) |
+| `descriptor-distancia` | El descriptor dibujado a más de 1,5× el cuerpo del CTA del borde inferior del botón (tramo 14; antes, `descriptorGap` declarado) | razón máxima aprobada (p. ej. `1.8`) |
 | `cta-cuerpo` | CTA bajo 0,9× la voz de cuerpo mayor (entrada, cierre o nota) | razón mínima aprobada (p. ej. `0.8`) |
 | `paleta-voces` | Entrada o cierre con una tinta fuera de la paleta de AXIS para el cuerpo | no se mide: sin `hasta` |
-| `seleccion-objeto` | Una selección sobre un objeto con menos de 1 % de sujeto en su caja | fracción mínima aprobada (p. ej. `0.005`) |
+| `seleccion-objeto` | Una selección sobre un objeto con menos de 1 % de sujeto en su caja (`protect` no cuenta) | fracción mínima aprobada (p. ej. `0.005`) |
+| `cta-tamano` | El CTA sobre 0,5× el titular o el botón sobre el área del titular | veces el techo, 1 = el techo (p. ej. `1.3`) |
+| `mascara-vacia` | Una máscara que no marca ningún sujeto (una foto sin persona ni objeto protagonista) | no se mide: sin `hasta` |
 
 Una excepción **vale** sólo si se cumplen las tres condiciones del tramo 7:
 
@@ -1663,18 +1722,22 @@ aprobador ni copia `suite-pruebas` a un plan real: si falta la aprobación, preg
 - **Todas las piezas:** un cursor o una etiqueta de selección no tapan ningún texto, ni el de su destino; en un bloque
   centrado, cada voz, el botón y el descriptor en el eje (±4 px, `eje-centrado`). Desde el tramo 13: botón-losa
   (`cta-relleno`), descriptor lejos de su botón (`descriptor-distancia`), CTA menor que el cuerpo (`cta-cuerpo`), tinta
-  del cuerpo fuera de la paleta (`paleta-voces`) y selección sobre nada (`seleccion-objeto`).
+  del cuerpo fuera de la paleta (`paleta-voces`) y selección sobre nada (`seleccion-objeto`). Desde el tramo 14: CTA que
+  compite con el titular (`cta-tamano`) y máscara vacía (`mascara-vacia`); en las piezas nuevas, la selección sobre un
+  objeto es una salida aprobada (`razon`, `aprobadoPor` y `plate` en `selection`).
 
 **Rechaza al validar** (el compositor, antes de componer): un espacio o carácter que la fuente de su voz no tiene, un
 texto sin nada que dibujar, `signatureSafeArea` incompleta, el velo (`scrimTop`/`scrimBottom`), una nota con
 `gapAfterClosure` negativo, `**`/`[[ ]]` fuera de entrada, titular, cierre, nota y pie, una entidad (también con dígitos
 en el nombre, como `&sup2;`), un salto de línea o una tabulación, `placement` bajo 320 CSS px, un plate con
 transparencia (en cualquier profundidad y con cualquier canal), un campo interno del compositor en el plan, escalas de la
-selección sobre su techo, un `final` bajo el 85 % del máster o bajo 780 px, y una firma que cae fuera de la imagen.
+selección sobre su techo, un `final` bajo el 85 % del máster o bajo 780 px, y una firma que cae fuera de la imagen. Desde
+el tramo 14 también: un plate que no es raster (un SVG que enlaza la foto dejaba la segmentación ciega), una entidad sin
+punto y coma, `cta.cursorScale` sobre 1,2 y una escala de la selección bajo 1.
 
-**Aborta al componer** (tramo 13): la esquina redondeada del botón que entra en el texto del CTA (el mensaje da el radio
-máximo para ese relleno) y una medición imposible —más contraste del que su tinta puede dar, o un umbral que no es el de
-su tamaño—, que no se escribe en el QA.
+**Aborta al componer** (tramos 13 y 14): la esquina redondeada del botón que entra en el texto del CTA (el mensaje da el
+radio máximo para ese relleno), el borde del botón que toca las letras, una medición imposible —más contraste del que sus
+tintas pueden dar, o un umbral que no es el de su tamaño—, que no se escribe en el QA, y una voz repetida.
 
 **No certificable** (código 3): gesto, tarjeta, HUD, url y cierre inferior —ninguna guarda los mide—, una pieza de otra
 versión del comando o con máscara de una caché ajena, y un `--comando` que no es el compositor del repo.
@@ -1794,10 +1857,13 @@ el 6 y 12 de 12 los del 7; el tramo 8 sumó ocho y el 9, la corrida base, los ca
 | `✗ <id>: el dominante mide N× la entrada (regla de las tres veces: ≥ 3×)` | La jerarquía se aplana; sin `leadSize`, la entrada mide 70 px | Subir `dominantSize` o bajar `leadSize`; si es decisión de diseño, excepción `jerarquia` con `hasta` |
 | `✗ no existe …/out/qa-<plan>.json` · `✗ 0 piezas evaluadas…` · `✗ piezas del plan sin QA…` | No se compuso el plan, o no entero | Componer el plan completo y resolver sus errores antes del gate |
 | `✗ <id>: el botón es una losa: padding …` | El relleno del botón pasa 1,2× y 0,8× el cuerpo del CTA (tramo 13) | Bajar `paddingX`/`paddingY`; lo aprobado va de 0,6× a 0,8× y de 0,35× a 0,47× el cuerpo |
-| `✗ <id>: el descriptor queda lejos de su botón…` | `descriptorGap` pasa 1× el cuerpo del CTA (tramo 13) | Bajarlo; lo aprobado va de 0,35× a 0,57× el cuerpo del CTA |
+| `✗ <id>: el descriptor queda lejos de su botón…` | El descriptor dibujado queda a más de 1,5× el cuerpo del CTA del botón: un `descriptorGap` grande, o un cursor o su etiqueta que lo empujan hacia abajo (tramo 14) | Bajar `descriptorGap`, o cambiar la esquina del cursor del CTA; lo aprobado va de 0,57× a 1,14× |
+| `✗ <id>: el CTA compite con el titular: …` | El CTA pasa 0,5× el titular o el botón pasa su área (tramo 14) | Bajar `cta.fontSize` o el relleno; lo aprobado va de 0,20× a 0,44× y de 0,17× a 0,77× |
 | `✗ <id>: el CTA (N px) es menor que el cuerpo: …` | El CTA mide menos de 0,9× la voz de cuerpo mayor (tramo 13) | Subir `cta.fontSize` o bajar esa voz |
 | `✗ <id>: tinta fuera de la paleta de AXIS para el cuerpo: …` | `leadFill` o `afterFill` fuera de la paleta del cuerpo (tramo 13) | Sobre fondo oscuro `#ffffff` o `#cfe4fa`; sobre claro `#00284d` o `#6d6777`. El acento va en el titular y el CTA |
-| `✗ <id>: la selección no encierra nada: …` | La caja de la selección cae sobre una zona sin sujeto (tramo 13) | Poner `selection.box` sobre el objeto que nombra; si la segmentación no lo marca, declararlo con `protect` |
+| `✗ <id>: la selección no encierra nada: …` | La caja de la selección cae sobre una zona sin sujeto (tramo 13); `protect` no cuenta (tramo 14) | Poner `selection.box` sobre el objeto que nombra; si la segmentación no lo marca, excepción `seleccion-objeto` aprobada |
+| `✗ <id>: selección sobre un OBJETO … sin aprobador del registro` | En una pieza nueva, la selección sobre un objeto es una salida aprobada (tramo 14) | `razon`, `aprobadoPor` y `plate` en `selection`, con la aprobación del operador |
+| `✗ <id>: la máscara no marca ningún sujeto…` | La segmentación no encontró sujeto: una foto sin protagonista, o un plate que la segmentación no lee (tramo 14) | Si la foto tiene sujeto, `--reproducir`; si no lo tiene, excepción `mascara-vacia` aprobada |
 | `✗ <id>: texto chico en un teléfono (390 CSS px de ancho): …` | Pieza nueva con voces bajo el piso: CTA 11 CSS px, las demás 9 (tramo 13) | Subir los tamaños o recortar el texto. En 16:9, la receta de §18 (tramo 13): entrada, cierre y descriptor 48 px, CTA 60, titular 160 |
 
 **El gate avisa algo que no se resuelve como sugiere:** `⚠ <id>: menos de 9 px en pantalla… Si la pieza no va a un
@@ -1833,4 +1899,7 @@ piezas del canon anterior; en una nueva el piso bloquea (`legibilidad`, tramo 13
 | `⚠ N pieza(s) eligen variante de CTA sin cta.variantReason…` | Variante sin motivo | `variantReason`, o `variant: "auto"` con `prominencia`, o comparar con `--variantes` |
 | `⚠ <id>: campos que este comando no lee — …` | Un campo desconocido en la raíz del plan (dentro de un objeto propio es error) | Quitarlo o corregir el nombre |
 | `<id>: la esquina del botón entra en el texto del CTA (radius R con relleno X×Y)…` | El radio vuelve el botón una elipse que corta las letras (tramo 13) | Bajar `cta.radius` hasta el máximo que da el mensaje, o subir el relleno |
-| `<id>: medición imposible en «voz»: …` | Un defecto del comando: se vio una vez, en una corrida en paralelo (tramo 13) | Recomponer; si se repite, reportarlo con el QA y la salida completa |
+| `<id>: medición imposible en «voz»: …` | Un defecto del comando: se vio dos veces, en corridas en paralelo (tramos 13 y 14); el mensaje trae el tamaño, el lienzo y la medición | Recomponer; si se repite, reportarlo con el mensaje completo |
+| `<id>: el borde del botón toca el texto del CTA…` | El relleno es menor que medio trazo del contorno (tramo 14) | Subir `paddingX`/`paddingY` |
+| `` <id>: el plate `…` es svg: usa una imagen raster… `` | El plate no es PNG, JPEG, WebP, AVIF ni TIFF (tramo 14) | Exportar la foto como imagen raster |
+| `` `<campo>` trae la entidad «&amp» sin punto y coma `` | Una entidad HTML sin su punto y coma (tramo 14) | Escribir el carácter |

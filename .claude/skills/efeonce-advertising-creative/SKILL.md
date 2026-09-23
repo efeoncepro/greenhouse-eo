@@ -276,9 +276,12 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    `eje-centrado`): usa `cta.align: "center"` y la nota sin `x`.
    **Tramo 13 (todas):** el CTA mide ≥ 0,9× la voz de cuerpo mayor (`cta-cuerpo`), y la entrada y el cierre usan sólo
    tintas de cuerpo de AXIS (`leadFill`/`afterFill`: `#ffffff` o `#cfe4fa` sobre fondo oscuro, `#00284d` o `#6d6777`
-   sobre claro; nunca el acento del CTA: `paleta-voces`). **Nuevo:** en el teléfono (390 CSS px) el CTA mide ≥ 11 px y
-   las demás voces ≥ 9 (`legibilidad`); en 16:9 eso pide mucho más texto: en un lienzo de 2048, entrada, cierre y
-   descriptor de 48 px, CTA de 60 y titular de 160 (receta en el contrato, §18, tramo 13).
+   sobre claro; nunca el acento del CTA: `paleta-voces`); en el cierre, `[[ ]]` es el remate BLANCO (tramo 14). El CTA
+   no compite con el titular: ≤ 0,5× el titular y botón ≤ el área del titular (`cta-tamano`). **Nuevo:** en el teléfono
+   (390 CSS px) el CTA mide ≥ 11 px y las demás voces ≥ 9 (`legibilidad`); los nombres de los cursores quedan fuera
+   (decisión del operador). En 16:9 eso pide mucho más texto: en un lienzo de 2048, entrada, cierre y descriptor de 48 px,
+   CTA de 60 y titular de 160, sin nota; y el plate tiene que dejarle cerca del 57 % izquierdo (hoy `foto:prompt` reserva
+   42 %: pendiente de decisión).
    **Copy:** `|` corta la línea (nunca `\n`); `**negrita**` y `[[acento]]` sólo en entrada, titular, cierre, nota y pie;
    escribe los caracteres, no entidades (`&`, no `&amp;`; tampoco `&sup2;`). El compositor rechaza lo demás.
 4. **Firma declarada siempre**, de una de tres formas:
@@ -311,14 +314,16 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    `accentInkOnLight`, y omitirlo resuelve lima. Si el acento no alcanza, se regenera el plate: el color no se apaga.
    **Nuevo:** en contorno y relleno, padding ≥ 0,5× (horizontal) y 0,25× (vertical) el cuerpo del CTA (`cta-aire`).
    **Tramo 13 (todas):** padding ≤ 1,2× y 0,8× el cuerpo (`cta-relleno`; lo aprobado va de 0,6× a 0,8× y de 0,35× a
-   0,47×); `descriptorGap` ≤ 1× el cuerpo (`descriptor-distancia`; lo aprobado, 0,35–0,57×); y el radio no mete la
-   esquina en el texto: si lo hace, el compositor aborta y dice el radio máximo (lo aprobado, 0–16 px).
+   0,47×); el descriptor DIBUJADO queda a ≤ 1,5× el cuerpo del botón (`descriptor-distancia`, tramo 14: un cursor o su
+   etiqueta lo empujaban hasta 3,9×; lo aprobado, 0,57–1,14×); el radio no mete la esquina en el texto y el borde no toca
+   las letras (el compositor aborta); `cta.cursorScale` ≤ 1,2.
 6. **Selección:** el marco de la selección del titular y el del CTA cuando se pinta no tapan otra voz, y ningún cursor ni
    etiqueta tapa texto, ni el de su destino. En una pieza nueva bloquea (y la columna deja sola el lugar de los corchetes
    del CTA de texto y del marco del titular); en una aprobada se avisa. Una selección sobre un objeto encierra sujeto: al
-   menos 1 % de su caja (`seleccion-objeto`); si la segmentación no marca el objeto, decláralo con `protect`.
-   `placement`, si lo declaras, desde 320 CSS px. Un plate con transparencia se rechaza, también en 16 bits o en gris con
-   alfa: aplánalo.
+   menos 1 % de su caja (`seleccion-objeto`; `protect` no cuenta). **Nuevo:** en una pieza nueva es una salida aprobada:
+   `razon`, `aprobadoPor` y `plate` en `selection`. La escala de la selección no baja de 1 (piso de las etiquetas).
+   `placement`, si lo declaras, desde 320 CSS px. El plate es raster (PNG, JPEG, WebP, AVIF o TIFF), sin transparencia en
+   ninguna profundidad, y su máscara marca un sujeto: una máscara vacía bloquea (`mascara-vacia`).
 7. **`altText`:** describe la escena —quién, qué hace, dónde, con qué luz— sin transcribir el copy (ni entre comillas
    ni en frases de dos palabras o más). El texto de la imagen lo agrega el compositor en `out/<id>.alt.txt` y en el QA,
    en orden de lectura, y **anuncia siempre el rol del CTA** («Llamado a la acción: «…»», nunca «Botón»: en una imagen
@@ -404,9 +409,10 @@ las huellas ni una firma automática por encima del contenido.
   por poco y puede no alcanzar en otra pantalla o con compresión: prueba otra tinta, otro acento u otro plate.
 - **Corchetes del CTA de texto bajo 1 CSS px o bajo 3:1:** el trazo de AXIS mide ≈ 0,69 CSS px en un teléfono en todos
   los formatos. Es un valor del contrato AXIS: no lo engroses por tu cuenta.
-- Texto bajo 9 CSS px en el teléfono · `altText` ausente o que transcribe el copy · APCA o daltonismo fuera del CTA ·
-  máscara que no marca ningún sujeto (si la foto tiene protagonista, `--reproducir`) · `placement` declarado · CTA o
-  descriptor fuera de la columna · poco aire sobre los corchetes · cada excepción y salida aprobada.
+- Texto bajo 9 CSS px en el teléfono, en una pieza del canon anterior (en una nueva bloquea: `legibilidad`) · `altText`
+  ausente o que transcribe el copy · APCA o daltonismo fuera del CTA · `placement` declarado · CTA, descriptor, nota o
+  etiqueta fuera de la columna · poco aire sobre los corchetes · cada excepción y salida aprobada. (Una máscara que no
+  marca ningún sujeto ya no avisa: bloquea, `mascara-vacia`.)
 
 **Excepciones y salidas con aprobador.** Una excepción exceptúa **una regla en una pieza** y no apaga la medición: el
 gate la imprime con su razón y quién la aprobó.
@@ -417,8 +423,10 @@ gate la imprime con su razón y quién la aprobó.
 ```
 
 - **Reglas:** `zona-segura`, `firma-contraste`, `firma-tamano`, `firma-sobre-sujeto`, `acento-cta`,
-  `concepto-completo`, `jerarquia`, `reserva-editorial`, `cta-perceptual` y `dominante-mayor`. (`legibilidad` no existe
-  hoy: el texto bajo 9 px sólo avisa y un plan que la declara se rechaza.)
+  `concepto-completo`, `jerarquia`, `reserva-editorial`, `cta-perceptual`, `dominante-mayor`, `eje-centrado`,
+  `cta-relleno`, `descriptor-distancia`, `cta-cuerpo`, `paleta-voces`, `seleccion-objeto`, `cta-tamano` y
+  `mascara-vacia`; en las piezas nuevas también `firma-posicion`, `orden-lectura`, `jerarquia-rol`, `cta-aire`,
+  `tracking-titular` y `legibilidad`. La lista vigente es `REGLAS_EXCEPTUABLES` en `scripts/foto/cta-esquema.mjs`.
 - **`aprobadoPor`:** un `id` de `scripts/foto/aprobadores.json` (hoy `julio-reyes`; `suite-pruebas` vale sólo en los
   planes de la suite: ruta real fuera del repo y su marca `.suite-pruebas`). Sumar a alguien lo decide el operador, con
   commit; con el registro editado sin commit, una pieza que usa una aprobación no se certifica.
@@ -451,8 +459,9 @@ sí); firma de 25 % en horizontales; firma dentro de AXIS en las piezas nuevas (
 lecho ya cubre la nueva posición); zona AXIS por defecto; sin velo.
 
 **Pendientes del operador** (no los decidas tú; si tu pieza depende de uno, pregunta): si la variante sin margen pasa a
-bloqueo; el piso de legibilidad por rol (en discusión: la única referencia externa es el mínimo de 11 pt de Apple para
-iPhone); y el grosor de los corchetes AXIS. Detalle: §18 del
+bloqueo; el grosor de los corchetes AXIS; y la reserva de texto de los plates 16:9 de piezas con CTA (hoy 42 %; el piso
+de legibilidad pide cerca de 57 %). El piso de legibilidad ya está decidido: CTA 11 CSS px y las demás voces 9 en las
+piezas nuevas, con los nombres de los cursores fuera. Detalle: §18 del
 [compositor de CTA](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
 
 ## Jerarquía por voces: receta probada en carrusel (2026-09-19)

@@ -217,12 +217,18 @@ export function medirContraColor({ tinta, fondo, cssPx, peso = 400, lineas = 1, 
 // tamaño en pantalla y su peso (o su piso). En una corrida en paralelo de la quinta certificación, el QA salió una vez con el
 // titular y el CTA medidos como el descriptor: 20,27:1 para una tinta lima que no pasa de 11,5:1, y umbral 4,5 para un titular
 // de 50 CSS px. No se reprodujo en 44 corridas. Devuelve el motivo, o null si la medición es posible.
-export function medicionImposible({ tinta, medidas = [], umbral = null, umbralEsperado = null }) {
-  const lum = luminanciaWcag(hexARgb(tinta))
-  const tope = Math.max(razonWcag(lum, 0), razonWcag(lum, 1))
+// `tintasExtra`: otras tintas que la voz dibuja —el énfasis blanco de la entrada, de la nota o del cierre—; el tope es el de la
+// tinta que más contraste puede dar (tramo 14: una entrada entera en `[[ ]]` abortaba por un tope calculado con el celeste).
+export function medicionImposible({ tinta, tintasExtra = [], medidas = [], umbral = null, umbralEsperado = null }) {
+  const tope = Math.max(...[tinta, ...tintasExtra].map(t => {
+    const lum = luminanciaWcag(hexARgb(t))
+
+    return Math.max(razonWcag(lum, 0), razonWcag(lum, 1))
+  }))
+
   const peor = Math.max(...medidas.filter(Number.isFinite))
 
-  if (peor > tope + 0.02) return `${peor}:1 con una tinta que contra ningún fondo pasa de ${tope.toFixed(2)}:1`
+  if (peor > tope + 0.02) return `${peor}:1 con tintas que contra ningún fondo pasan de ${tope.toFixed(2)}:1`
   if (umbral != null && umbralEsperado != null && umbral !== umbralEsperado) return `umbral ${umbral}:1 para una voz que por su tamaño exige ${umbralEsperado}:1`
 
   return null

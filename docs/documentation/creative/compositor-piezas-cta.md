@@ -1,7 +1,7 @@
 # Compositor de piezas con CTA — Composición y certificación
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-23 por Claude
 > **Ultima actualizacion:** 2026-09-23 por Claude
 > **Documentacion tecnica:** [Compositor de CTA — comando canónico](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) (§14 guarda de sujeto · §15 red de seguridad · §16 accesibilidad · §17 variantes · §18 certificación y tramos)
@@ -355,7 +355,9 @@ quedaban bajo 9 px en pantalla, con un mínimo de 3,8 px.
 mide al menos **11 px CSS** en el teléfono —el mínimo de Apple para texto— y las demás voces **9**. Es un piso, no un
 tamaño fijo: la jerarquía se mantiene y sólo crecen los textos que estaban debajo. En 16:9 obliga a un texto bastante más
 grande o a menos texto: una receta que pasa en un lienzo de 2048 px es entrada, cierre y descriptor de 48 px, CTA de 60 y
-titular de 160, sin nota. Las piezas aprobadas conservan el aviso de siempre.
+titular de 160, sin nota. Las piezas aprobadas conservan el aviso de siempre. Los nombres de los cursores de una
+selección quedan fuera del piso (decisión del operador): son parte gráfica del recurso multiplayer y su texto va en el
+alternativo; tienen su propio piso para no achicarse más que en las piezas aprobadas.
 
 Con ese tamaño se decide el umbral de WCAG:
 
@@ -489,13 +491,18 @@ La quinta auditoría encontró piezas que pasaban el gate y se veían mal. Desde
 
 - **El botón no es una losa:** su relleno interior no pasa 1,2 veces el tamaño de su letra a los lados ni 0,8 veces
   arriba y abajo.
-- **El descriptor acompaña a su botón:** no se aleja más que el tamaño de la letra del CTA.
+- **El descriptor acompaña a su botón:** se mide lo que se dibuja, desde el borde del botón, y no se aleja más de 1,5 veces
+  la letra del CTA aunque un cursor lo empuje hacia abajo.
 - **El CTA no es más chico que el texto de cuerpo:** mide al menos 0,9 veces la entrada, el cierre o la nota más grande.
+- **El CTA tampoco compite con el titular:** mide como máximo la mitad del titular, y el botón no pasa el área del titular.
 - **La esquina del botón no corta las letras:** un radio muy grande volvía el botón una elipse.
 - **La entrada y el cierre usan la paleta de AXIS para texto:** blanco o celeste sobre fondo oscuro, azul tinta o gris
-  sobre fondo claro. El naranja y el lima son del titular y del CTA.
-- **Una selección sobre un objeto encierra algo:** al menos el 1 % de su caja tiene que ser sujeto. Una sobre una pared
-  vacía ya no pasa.
+  sobre fondo claro. El naranja y el lima son del titular y del CTA. En el cierre, `[[ ]]` marca el remate en blanco.
+- **Una selección sobre un objeto encierra algo:** al menos el 1 % de su caja tiene que ser sujeto, y una zona `protect` no
+  cuenta. Una sobre una pared vacía ya no pasa. En una pieza nueva, además, la aprueba el operador: el gate puede medir
+  que la caja encierre algo, pero no que encierre el objeto que nombra.
+- **La foto tiene que ser una imagen y tener a alguien:** el plate es PNG, JPEG, WebP, AVIF o TIFF, y si la máscara no
+  encuentra ningún sujeto la pieza se bloquea, salvo excepción aprobada para una foto sin protagonista.
 
 Ninguna de las 132 piezas aprobadas incumple estos límites: se calibraron con ellas.
 
@@ -627,6 +634,7 @@ los que el gate daba verde sobre una pieza mala. Cada hallazgo se cerró en un t
 | 9 · Proceso | Bloqueo sin carreras que Ctrl-C suelta, aviso entre planes, suite que limpia sus temporales, veredicto del gate en la regresión, huella con fuentes y logos, mutantes contra una corrida base y canarios |
 | 12 · Cuarta certificación | Marcos de selección dentro de las reglas (y avisados en las aprobadas), cursores que no tapan texto, columna con lugar para los corchetes, eje de los bloques centrados, tracking del titular, `placement` con piso, marcado, entidades y saltos de línea rechazados, plates con transparencia rechazados |
 | 11 · Canon 2026-09-23 | Registro de las piezas aprobadas; en las nuevas, zona AXIS por defecto, firma de 25 % en horizontales y en el cuarto inferior, orden de lectura, jerarquía por rol, aire del botón y firma externa aprobada; sin velo |
+| 14 · Sexta certificación | Cierre en `[[ ]]` blanco, descriptor medido en lo dibujado, CTA que compite con el titular, selección aprobada en las piezas nuevas y sin contar `protect`, etiqueta en la columna, plates sólo raster, máscara vacía, borde del botón sobre las letras, entidades sin punto y coma y techo y piso de las escalas de los cursores |
 | 13 · Quinta certificación | Esquina del botón, botón-losa, descriptor lejos, CTA menor que el cuerpo, tinta del cuerpo fuera de la paleta, selección sobre nada, transparencia en cualquier profundidad, entidades con dígitos, medición imposible que aborta y piso de legibilidad en las piezas nuevas |
 | 10 · Integridad (tras la tercera certificación) | Selección sobre un objeto dentro de las guardas, zona de la firma validada y firma dentro de la imagen, aprobador de pruebas sólo en la suite, sin estado interno en el plan, HUD/url/pie no certificables, espacios Unicode, huella del texto alternativo y reproducción que compara todo lo entregado, comando ajeno que no certifica, piso de `final`, jerarquía con tamaños resueltos, aprobaciones atadas al plate |
 
@@ -635,8 +643,11 @@ Entre los tramos 5 y 6 se sumaron la medición de la firma externa, el bloqueo d
 
 **Lo que falta:**
 
-- La **quinta certificación** (2026-09-23) dio NO CERTIFICA, sin hallazgos graves y con ocho medios que cerró el tramo 13;
-  sigue una sexta. La certificación se da por cerrada con cero hallazgos graves y medios.
+- La **sexta certificación** (2026-09-23) dio NO CERTIFICA, sin hallazgos graves y con siete medios que cerró el tramo 14
+  (uno, el de los nombres de los cursores, por decisión del operador); sigue una séptima. La certificación se da por
+  cerrada con cero hallazgos graves y medios.
+- Decidir la **reserva de texto de los plates 16:9** de piezas con CTA: con el piso de legibilidad el texto necesita cerca
+  del 57 % del ancho y la receta de toma pide 42 %.
 - Marcar cada guarda en el código con un mutante por marca.
 - Las **decisiones pendientes del operador**: si una variante sin margen debe bloquear y el grosor de los corchetes de
   AXIS. El

@@ -190,7 +190,8 @@ if (REPRODUCIR) {
     writeFileSync(planTmp, JSON.stringify(piezasPlan, null, 2))
     const nonce = randomBytes(24).toString('hex')
 
-    writeFileSync(path.join(tmp, '.origen'), JSON.stringify({ origen: ORIGEN ?? path.resolve(plan), nonce }))
+    // El origen es SIEMPRE el plan que se certifica: heredado del entorno, un falso repo aprobaba un plan del repo (sexta, Y1).
+    writeFileSync(path.join(tmp, '.origen'), JSON.stringify({ origen: path.resolve(plan), nonce }))
     console.log(`Reproduciendo ${piezasPlan.length} pieza(s) con el comando vigente y segmentación nueva…`)
     const c = spawnSync(process.execPath, [COMANDO, planTmp], { encoding: 'utf8', env: { ...process.env, FOTO_MASCARAS_DIR: path.join(tmp, '.mascaras') }, maxBuffer: 64e6 })
 
@@ -397,7 +398,9 @@ for (const p of piezas.filter(p => p.cta)) {
   const mascara = qa.find(r => r.id === p.id)?.mascara
 
   if (!legado && segmentada && mascara?.origen !== 'fresca' && mascara?.origen !== 'cache-canonica') noCertificable.push(`${p.id}: la máscara del sujeto ${mascara ? 'salió de una caché ajena al repo (`FOTO_MASCARAS_DIR`)' : 'no dice de dónde salió (versión anterior del comando)'} — certifícala con \`--reproducir\`, que segmenta de nuevo`)
-  if (!legado && segmentada && mascara && mascara.cobertura === 0) console.warn(`⚠ ${p.id}: la máscara no marca ningún sujeto. Si la foto tiene una persona u objeto protagonista, certifica con \`--reproducir\`.`)
+  // Una máscara vacía no protege a nadie (tramo 14; sexta certificación, O1): bloquea salvo excepción auditada. Las 178
+  // máscaras de las piezas con CTA del repo marcan sujeto (la menor, 2,2 %).
+  if (!legado && segmentada && mascara && mascara.cobertura === 0 && bloquea(p, 'mascara-vacia', 'la máscara no marca ningún sujeto: la guarda del texto sobre las personas no protege nada. Si la foto tiene sujeto, recompón con `--reproducir`; si no lo tiene, pide la excepción')) process.exitCode = 1
   // El gesto manuscrito no entra en ninguna guarda (sujeto, zona, contraste): decisión del operador 2026-09-23, fuera de
   // alcance por ahora. Una pieza que lo lleva no se certifica a ciegas.
   if (p.card) noCertificable.push(`${p.id}: lleva tarjeta, cuyo texto no entra en la guarda del sujeto, la zona ni la medición por voz`)
@@ -635,7 +638,11 @@ const TRACKING_TITULAR = [-0.035, 0.02] // em; AXIS `ideaImpact` usa −0,035
 // ninguna incumple: relleno del botón 0,6–0,8× y 0,35–0,47× el cuerpo del CTA; descriptor a 0,35–0,57× del botón; CTA ≥
 // 0,97× la voz de cuerpo mayor; entrada y cierre, siempre blancos; una selección sobre un objeto encierra 3,3–20 % de sujeto.
 const TECHO_RELLENO_CTA = { x: 1.2, y: 0.8 } // padding máximo del botón, en cuerpos del CTA
-const TECHO_DESCRIPTOR = 1 // `descriptorGap` máximo, en cuerpos del CTA
+// Distancia DIBUJADA del botón (o del texto del CTA sin botón) al descriptor, en cuerpos del CTA (tramo 14).
+const TECHO_DESCRIPTOR = 1.5
+// El CTA no compite con el titular (tramo 14): lo aprobado, CTA 0,20–0,44× el titular y botón 0,17–0,77× su área.
+const TECHO_CTA_TITULAR = 0.5
+const TECHO_BOTON_AREA = 1
 const PISO_CTA_CUERPO = 0.9 // el CTA mide al menos 0,9× la voz de cuerpo mayor (entrada, cierre, nota)
 const PISO_SELECCION_SUJETO = 0.01 // fracción mínima de sujeto dentro de la caja de una selección sobre un objeto
 
@@ -768,7 +775,7 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
     const boton = p.cta.variant === 'text' ? el('cta') : el('cta-boton')
     const desc = el('descriptor')
     const nota = el('nota')
-    const corrido = [boton && Math.abs(boton.left - L.columna) > 4 && `el CTA arranca ${Math.round(boton.left - L.columna)} px`, desc && Math.abs(desc.left - L.columna) > 4 && `el descriptor arranca ${Math.round(desc.left - L.columna)} px`, nota && Math.abs(nota.left - L.columna) > 4 && `la nota arranca ${Math.round(nota.left - L.columna)} px`].filter(Boolean)
+    const corrido = [boton && Math.abs(boton.left - L.columna) > 4 && `el CTA arranca ${Math.round(boton.left - L.columna)} px`, desc && Math.abs(desc.left - L.columna) > 4 && `el descriptor arranca ${Math.round(desc.left - L.columna)} px`, nota && Math.abs(nota.left - L.columna) > 4 && `la nota arranca ${Math.round(nota.left - L.columna)} px`, el('etiqueta') && Math.abs(el('etiqueta').left - L.columna) > 4 && `la etiqueta arranca ${Math.round(el('etiqueta').left - L.columna)} px`].filter(Boolean)
 
     if (corrido.length) console.warn(`⚠ ${r.id}: ${corrido.join(' y ')} fuera de la columna del texto. Usa \`cta.x: "columna"\` (y \`note.x: "columna"\`).`)
   }
@@ -789,8 +796,24 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
 
   if (relleno > 1 + 1e-9 && bloquea(p, 'cta-relleno', `el botón es una losa: padding ${p.cta.paddingX} × ${p.cta.paddingY} px para un CTA de ${p.cta.fontSize} px (techo: ${TECHO_RELLENO_CTA.x}× y ${TECHO_RELLENO_CTA.y}× el cuerpo; mide ${relleno.toFixed(2)}× el techo)`, { valor: +relleno.toFixed(2), sentido: 'max' })) fallos++
 
-  // Descriptor separado de su botón (N1): `descriptorGap` tenía piso y no techo; a 3,9× el cuerpo del CTA caía sobre la escena.
-  if (typeof p.cta.descriptorGap === 'number' && p.cta.descriptorGap > p.cta.fontSize * TECHO_DESCRIPTOR + 1e-9 && bloquea(p, 'descriptor-distancia', `el descriptor queda lejos de su botón: \`descriptorGap\` ${p.cta.descriptorGap} px para un CTA de ${p.cta.fontSize} px (techo: ${TECHO_DESCRIPTOR}× el cuerpo); a esa distancia deja de leerse como parte de la acción`, { valor: +(p.cta.descriptorGap / p.cta.fontSize).toFixed(2), sentido: 'max' })) fallos++
+  // Descriptor separado de su botón (quinta, N1; sexta, H2): se mide lo DIBUJADO —del borde inferior del botón (o del texto
+  // del CTA, si no hay botón) al descriptor— y no el `descriptorGap` declarado: para esquivar un cursor o su etiqueta el
+  // descriptor bajaba hasta 3,9× el cuerpo del CTA. Desde el botón y no desde el texto: el relleno ya tiene su regla.
+  const baseD = el('cta-boton') ?? el('cta')
+  const descD = el('descriptor')
+  const distDesc = baseD && descD && typeof tipografia.cta === 'number' ? (descD.top - baseD.bottom) / tipografia.cta : null
+
+  if (distDesc != null && distDesc > TECHO_DESCRIPTOR + 1e-9 && bloquea(p, 'descriptor-distancia', `el descriptor queda lejos de su botón: ${distDesc.toFixed(2)}× el cuerpo del CTA entre el botón y el descriptor (techo: ${TECHO_DESCRIPTOR}×). Baja \`descriptorGap\` o cambia la esquina del cursor que lo empuja`, { valor: +distDesc.toFixed(2), sentido: 'max' })) fallos++
+
+  // CTA que compite con el titular (sexta, H3): el relleno tenía techo, pero el CTA subía hasta 0,6× el titular y el botón
+  // llegaba a 1,5× su área.
+  const botonT = el('cta-boton')
+  const titularT = el('dominante')
+  const ratioCta = typeof tipografia.cta === 'number' && typeof tipografia.dominant === 'number' ? tipografia.cta / tipografia.dominant : null
+  const ratioArea = botonT && titularT ? ((botonT.right - botonT.left) * (botonT.bottom - botonT.top)) / ((titularT.right - titularT.left) * (titularT.bottom - titularT.top)) : null
+  const tamanoCta = Math.max(ratioCta != null ? ratioCta / TECHO_CTA_TITULAR : 0, ratioArea != null ? ratioArea / TECHO_BOTON_AREA : 0)
+
+  if (tamanoCta > 1 + 1e-9 && bloquea(p, 'cta-tamano', `el CTA compite con el titular: mide ${ratioCta?.toFixed(2)}× el titular${ratioArea != null ? ` y el botón ${ratioArea.toFixed(2)}× su área` : ''} (techo: ${TECHO_CTA_TITULAR}× y ${TECHO_BOTON_AREA}×; mide ${tamanoCta.toFixed(2)}× el techo)`, { valor: +tamanoCta.toFixed(2), sentido: 'max' })) fallos++
 
   // CTA más chico que el cuerpo (N2): la jerarquía por rol sólo ponía techos; con el CTA a 0,36× la nota salía sin avisos.
   const cuerpo = [['lead', p.lead], ['closure', p.after], ['benefit', p.note]].filter(([k, v]) => v && typeof tipografia[k] === 'number').map(([k]) => k)
@@ -803,6 +826,10 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   const fueraDePaleta = [['entrada', p.lead && p.leadFill], ['cierre', p.after && p.afterFill]].filter(([, f]) => f && !tintas.includes(String(f).toLowerCase())).map(([v, f]) => `${v} ${f}`)
 
   if (fueraDePaleta.length && bloquea(p, 'paleta-voces', `tinta fuera de la paleta de AXIS para el cuerpo: ${fueraDePaleta.join(' · ')} (sobre fondo ${p.ink === 'dark' ? 'claro' : 'oscuro'}: ${tintas.join(' o ')}). El acento es del titular y del CTA`)) fallos++
+
+  // En una pieza NUEVA, la selección sobre un objeto es una salida aprobada (sexta, H4): el gate mide que la caja encierre
+  // sujeto, no que encierre el objeto que nombra; el micrófono aprobado (3,3 %) mide lo mismo que un marco que roza un borde.
+  if (nuevo && p.selection?.box && !salidaAprobada(p, 'selección sobre un OBJETO (el gate no puede juzgar si encierra lo que nombra)', p.selection)) fallos++
 
   // Selección sobre nada (N3): el marco de un objeto se aceptaba sobre una pared vacía. «Cortar el objeto» no se puede juzgar
   // con esta máscara —una aprobada encierra sólo el 9 % de su componente; un ataque, el 24 %— y queda como deuda.

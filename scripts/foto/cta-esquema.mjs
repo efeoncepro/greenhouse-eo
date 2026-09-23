@@ -43,7 +43,10 @@ export const REGLAS_EXCEPTUABLES = [
   'descriptor-distancia',
   'cta-cuerpo',
   'paleta-voces',
-  'seleccion-objeto'
+  'seleccion-objeto',
+  // Tramo 14
+  'cta-tamano',
+  'mascara-vacia'
 ]
 
 // Límites de las zonas de sujeto ignoradas: cada una ≤ 10 % del lienzo y todas juntas ≤ 15 %. Una zona del tamaño del
@@ -95,14 +98,15 @@ const cta = z
     radius: noNegativo.optional(),
     gapAfterNote: noNegativo,
     descriptorGap: noNegativo.optional(),
-    cursorScale: positivo.max(2).optional(),
+    // Techo 1,2 (tramo 14; sexta certificación, H2): con 2 el cursor empujaba el descriptor lejos del botón. Lo aprobado: 0,45–1,1.
+    cursorScale: positivo.max(1.2).optional(),
     surfaceToken: z.enum(TOKENS).optional(),
     inkToken: z.enum(TOKENS).optional(),
     seleccion: z
       .object({
         marco: z.enum(['open-brackets', 'four-corners', 'eight-handles', 'ninguno']).optional(),
         padding: z.enum(['compact', 'standard', 'open']).optional(),
-        escala: positivo.max(2.5).optional(),
+        escala: positivo.min(1).max(2.5).optional(),
         cursores: z.array(cursorCta).min(1).optional()
       })
       .strict()
@@ -150,9 +154,15 @@ const seleccion = z
     variant: z.enum(['eight-handles', 'four-corners', 'open-brackets']).optional(),
     padding: z.enum(['compact', 'standard', 'open']).optional(),
     overlay: z.enum(['none', 'subtle', 'emphasized']).optional(),
-    scale: positivo.max(2.5).optional(),
+    // Piso 1 (tramo 14; decisión del operador del 2026-09-23): las etiquetas de los cursores quedan fuera del piso de
+    // legibilidad, pero no bajan de lo que usan las aprobadas (4,68 × escala CSS px en un teléfono; aprobadas: 1,05 y 1,35).
+    scale: positivo.min(1).max(2.5).optional(),
     box: caja.optional(),
     targetKind: z.enum(['text', 'object', 'group']).optional(),
+    // En una pieza nueva, la selección sobre un objeto es una salida aprobada (tramo 14): razón, aprobador y plate.
+    razon: razon.optional(),
+    aprobadoPor: aprobado.optional(),
+    plate: shaPlate.optional(),
     cursors: z.array(cursorSeleccion).min(1)
   })
   .strict()
@@ -341,6 +351,11 @@ function reglasCruzadas(p) {
     const ent = t.match(/&(#\d+|#x[0-9a-f]+|[a-z][a-z0-9]*);/i)
 
     if (ent) e.push(`\`${campo}\` trae la entidad «${ent[0]}»: escribe el carácter; la entidad se dibujaría literal`)
+    // Sin punto y coma también (tramo 14; sexta certificación, Y7): `&#178`, `&amp` o `&sup2` se dibujaban literales. Sólo las
+    // formas numéricas y los nombres que un navegador acepta sin punto y coma: «R&D» o «AT&T» siguen siendo texto.
+    const entSin = t.match(/&#\d+(?![\d;])|&#x[0-9a-f]+(?![0-9a-f;])|&(?:amp|lt|gt|quot|apos|nbsp|copy|reg|trade|deg|sup[123]|frac(?:12|14|34)|middot|laquo|raquo|ndash|mdash|hellip|bull|times|divide|plusmn|iexcl|iquest|euro|cent|pound|yen|sect|para|micro|shy)(?![a-z0-9;])/i)
+
+    if (!ent && entSin) e.push(`\`${campo}\` trae la entidad «${entSin[0]}» sin punto y coma: escribe el carácter; se dibujaría literal`)
     if (/[\n\r\t]/.test(t)) e.push(`\`${campo}\` trae un salto de línea o una tabulación: se dibujaría como un cuadro vacío; para cortar la línea usa \`|\``)
   }
 

@@ -1103,7 +1103,7 @@ async function composePiece(s, opts = {}) {
     const gapS = lsize * 0.55
     const totalW = (s.labelStar ? starR * 2 + gapS : 0) + (probe.ink.right - probe.ink.left)
     const lx0 = s.align === 'center' ? x - totalW / 2 : x
-    const lab = block({ text: s.label, font: pop[700], size: lsize, tracking: em(R.structureLabel.tracking), leading: 1.2, x: lx0 + starR * 2 + gapS, topY: y, fill: INK, align: 'left' })
+    const lab = block({ text: s.label, font: pop[700], size: lsize, tracking: em(R.structureLabel.tracking), leading: 1.2, x: lx0 + (s.labelStar ? starR * 2 + gapS : 0), topY: y, fill: INK, align: 'left' })
     const scy = (lab.box.top + lab.box.bottom) / 2
 
     // La estrella fue un marcador de misión propio del post de GTA VI: aquí es opt-in y por defecto NO va.
@@ -1126,7 +1126,7 @@ async function composePiece(s, opts = {}) {
 
     body += le.svg
     lineas.entrada = le.lines
-    voces.push({ id: 'entrada', box: le.box, tinta: s.leadFill ?? SOFT, peso: leadPoppins ? 400 : lr.weight, px: s.leadSize ?? 70, lineas: le.lines.length })
+    voces.push({ id: 'entrada', box: le.box, tinta: s.leadFill ?? SOFT, acento: INK, peso: leadPoppins ? 400 : lr.weight, px: s.leadSize ?? 70, lineas: le.lines.length })
     checks.push({ id: 'entrada', box: le.box, inkL: INK_L }); tramos.push(['entrada', le.box, s.leadSize ?? 70])
     y = le.box.bottom + Math.round((s.leadGap ?? 0.09) * (s.dominantSize ?? 160))
   }
@@ -1220,14 +1220,17 @@ return k.ink.right - k.ink.left }))
   if (s.after) {
     const ar = R.ideaMedium
     const afterPoppins = (s.afterFamily ?? 'poppins') === 'poppins'
-    const af = richBlock({ text: s.after, fonts: afterPoppins ? POP : BRIC(ar, ar.width, 800), size: s.afterSize ?? 74, tracking: afterPoppins ? em(R.structureCopy.tracking) : em(ar.tracking), leading: afterPoppins ? 1.5 : ar.lineHeight, x, topY: y + Math.round((s.afterGap ?? 0.09) * domSize), maxWidth: W * (s.textWidth ?? 0.8) - reservaMarcos, fill: s.afterFill ?? INK, align: s.align })
+    const af = richBlock({ text: s.after, fonts: afterPoppins ? POP : BRIC(ar, ar.width, 800), size: s.afterSize ?? 74, tracking: afterPoppins ? em(R.structureCopy.tracking) : em(ar.tracking), leading: afterPoppins ? 1.5 : ar.lineHeight, x, topY: y + Math.round((s.afterGap ?? 0.09) * domSize), maxWidth: W * (s.textWidth ?? 0.8) - reservaMarcos, fill: s.afterFill ?? INK, accentFill: INK, align: s.align })
 
-    af.accentBoxes.forEach((b, i) => checks.push({ id: `cierre-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
-    af.accentBoxes.forEach((b, i) => voces.push({ id: `cierre-acento-${i}`, box: b, tinta: ACCENT, peso: afterPoppins ? 700 : ar.weight, px: s.afterSize ?? 74, lineas: 1, daltonismo: true }))
+    // En el cierre, `[[ ]]` es el remate BLANCO de la tabla de voces —como el énfasis de la entrada—, no el acento: el naranja
+    // es del titular y del CTA (tramo 14; auditoría de diseño de la sexta certificación, H1: un cierre entero en `[[ ]]` salía
+    // naranja y certificaba). Ninguna de las 132 aprobadas usa `[[ ]]` en el cierre.
+    af.accentBoxes.forEach((b, i) => checks.push({ id: `cierre-acento-${i}`, box: b, inkL: INK_L }))
+    af.accentBoxes.forEach((b, i) => voces.push({ id: `cierre-acento-${i}`, box: b, tinta: INK, peso: afterPoppins ? 700 : ar.weight, px: s.afterSize ?? 74, lineas: 1 }))
 
     body += af.svg
     lineas.cierre = af.lines
-    voces.push({ id: 'cierre-frase', box: af.box, tinta: s.afterFill ?? INK, peso: afterPoppins ? 400 : ar.weight, px: s.afterSize ?? 74, lineas: af.lines.length })
+    voces.push({ id: 'cierre-frase', box: af.box, tinta: s.afterFill ?? INK, acento: INK, peso: afterPoppins ? 400 : ar.weight, px: s.afterSize ?? 74, lineas: af.lines.length })
     checks.push({ id: 'cierre-frase', box: af.box, inkL: s.afterFill ? undefined : INK_L }); tramos.push(['cierre', af.box, s.afterSize ?? 74])
     y = af.box.bottom
   }
@@ -1253,7 +1256,7 @@ return k.ink.right - k.ink.left }))
 
     body += ft.svg
     checks.push({ id: 'cierre-inferior', box: ft.box })
-    voces.push({ id: 'cierre-inferior', box: ft.box, tinta: SOFT, peso: fr.weight, px: s.footer.size, lineas: ft.lines.length })
+    voces.push({ id: 'cierre-inferior', box: ft.box, tinta: SOFT, acento: INK, peso: fr.weight, px: s.footer.size, lineas: ft.lines.length })
   }
 
   // 4 · nota de dato: Poppins sobre la foto limpia (la tarjeta de vidrio era del post de GTA VI, no del lenguaje)
@@ -1267,7 +1270,7 @@ return k.ink.right - k.ink.left }))
 
     body += nt.svg
     lineas.nota = nt.lines
-    voces.push({ id: 'nota', box: nt.box, tinta: SOFT, peso: 400, px: s.note.size ?? Math.round(W * 0.026), lineas: nt.lines.length })
+    voces.push({ id: 'nota', box: nt.box, tinta: SOFT, acento: INK, peso: 400, px: s.note.size ?? Math.round(W * 0.026), lineas: nt.lines.length })
     checks.push({ id: 'nota', box: nt.box, inkL: INK_L }); y=nt.box.bottom
   }
 
@@ -1351,8 +1354,11 @@ return k.ink.right - k.ink.left }))
       const g=outline?grosorBorde/2:0;
       const rx=Math.max(0,Math.min(c.radius??0,(b.right-b.left)/2)-g),ry=Math.max(0,Math.min(c.radius??0,(b.bottom-b.top)/2)-g);
       const dx=Math.min(t.box.left-b.left,b.right-t.box.right)-g,dy=Math.min(t.box.top-b.top,b.bottom-t.box.bottom)-g;
-      // Si el texto ya toca el BORDE (relleno menor que el trazo), no es la esquina: eso lo juzga `cta-aire`.
-      const dentro=dx<0||dy<0||dx>=rx||dy>=ry||((rx-dx)/rx)**2+((ry-dy)/ry)**2<=1;
+
+      // Si el texto ya toca el BORDE (relleno menor que medio trazo), aborta: antes se delegaba en `cta-aire`, que se exceptúa,
+      // y con la excepción la elipse cruzaba las letras con el gate en 0 (tramo 14; sexta certificación, Y2).
+      if(dx<0||dy<0)throw new Error(`${s.id}: el borde del botón toca el texto del CTA (relleno ${padX}×${padY}, trazo de ${Math.round(2*g)} px): sube el relleno`);
+      const dentro=dx>=rx||dy>=ry||((rx-dx)/rx)**2+((ry-dy)/ry)**2<=1;
 
       if(!dentro)throw new Error(`${s.id}: la esquina del botón entra en el texto del CTA (radius ${c.radius} con relleno ${padX}×${padY}): baja \`cta.radius\` —con este relleno, hasta ${Math.max(0,Math.floor(dx+dy+Math.sqrt(2*Math.max(0,dx)*Math.max(0,dy))+g))} px— o sube el relleno`);
     }
@@ -1402,7 +1408,7 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
     const descGap=Math.max(c.descriptorGap??0,Math.round(c.descriptorSize*0.6));
     // El descriptor esquiva CUALQUIER cursor o etiqueta de la selección del CTA que caiga sobre él en el eje X.
     const obstaculos=cr.evidence.cursorEvidence.flatMap(k=>[k.bounds,k.labelBounds].filter(Boolean));
-    const descAt=topY=>block({text:c.descriptor,font:pop[400],size:c.descriptorSize,tracking:0,leading:1.2,x:c.align==='center'?AXIS_X:(c.x==='columna'?x:cx),topY,maxWidth:W*.7,fill:'#ffffff',align:c.align});
+    const descAt=topY=>block({text:c.descriptor,font:pop[400],size:c.descriptorSize,tracking:0,leading:1.2,x:c.align==='center'?AXIS_X:(c.x==='columna'?x:cx),topY,maxWidth:W*.7,fill:INK,align:c.align});
     let descriptor=descAt(cr.bounds.bottom+descGap);
 
     for(let paso=0;paso<obstaculos.length;paso++){
@@ -1412,7 +1418,7 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
       descriptor=descAt(choque.bottom+descGap);
     }
 
-    body+=descriptor.svg;checks.push({id:'descriptor',box:descriptor.box,inkL:1});
+    body+=descriptor.svg;checks.push({id:'descriptor',box:descriptor.box,inkL:INK_L});
     lineas.cta=t.lines;lineas.descriptor=descriptor.lines;
     // CTA: en `solid` la tinta se mide contra su relleno; en las otras, contra la escena. El relleno y el BORDE del
     // contorno son límites no textuales (WCAG 1.4.11, 3:1): el borde del contorno no se medía antes.
@@ -1420,7 +1426,7 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
     if(solid||outline)voces.push({id:solid?'cta-relleno':'cta-borde',box:b,tinta:surfaceColor,limite:true,daltonismo:true});
     // El canon pide 4,5:1 al CTA y al descriptor sea cual sea su tamaño (tramo 10; auditoría de diseño, N6): un
     // descriptor grande se medía con 3:1.
-    voces.push({id:'descriptor',box:descriptor.box,tinta:'#ffffff',peso:400,px:c.descriptorSize,lineas:descriptor.lines.length,pisoTexto:UMBRALES.normalTextContrast});
+    voces.push({id:'descriptor',box:descriptor.box,tinta:INK,peso:400,px:c.descriptorSize,lineas:descriptor.lines.length,pisoTexto:UMBRALES.normalTextContrast});
 
     if(!cr.evidence.withinCanvas){
       // Decir QUÉ se sale y POR DÓNDE: «se sale del lienzo» a secas no le dice al autor qué ancla cambiar.
@@ -1712,6 +1718,10 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
   // área bajo el umbral, daltonismo en las tintas de color y el texto alternativo con todo el texto visible.
   // Se mide sobre `bare` (plate + underlay, sin el texto). No cambia un solo píxel de la pieza.
   const { data: bareRgb } = await sharp(bare).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+  // Cada voz se mide una vez: un id repetido haría que una medición pisara a otra en el QA (tramo 14).
+  const repetidas = [...new Set(voces.map(v => v.id).filter((id, i, a) => a.indexOf(id) !== i))]
+
+  if (repetidas.length) throw new Error(`${s.id}: voces repetidas (${repetidas.join(', ')}): cada voz se mide una vez. Es un defecto del comando.`)
   const accesibilidad = { voces: {} }
 
   for (const v of voces) {
@@ -1768,9 +1778,10 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
     const m = accesibilidad.voces[v.id]
 
     if (!m) continue
-    const motivo = medicionImposible({ tinta: v.tinta, medidas: [m.wcag, m.glifo?.wcag], umbral: m.glifo?.umbralWcag ?? null, umbralEsperado: v.limite ? null : (v.pisoTexto ?? umbralWcag(tamanoEnPantalla(v.px, W, ANCHO), v.peso)) })
+    const motivo = medicionImposible({ tinta: v.tinta, tintasExtra: v.acento ? [v.acento] : [], medidas: [m.wcag, m.glifo?.wcag], umbral: m.glifo?.umbralWcag ?? null, umbralEsperado: v.limite ? null : (v.pisoTexto ?? umbralWcag(tamanoEnPantalla(v.px, W, ANCHO), v.peso)) })
 
-    if (motivo) throw new Error(`${s.id}: medición imposible en «${v.id}»: ${motivo}. Recompón; si se repite, es un defecto del comando.`)
+    // El mensaje lleva lo que decide el umbral: si vuelve, se ve si fue el tamaño, el lienzo o la medición (tramo 14).
+    if (motivo) throw new Error(`${s.id}: medición imposible en «${v.id}»: ${motivo} (voz de ${v.px} px en un lienzo de ${W}: ${tamanoEnPantalla(v.px, W, ANCHO).toFixed(2)} CSS px, peso ${v.peso}; medido ${JSON.stringify(m.glifo ?? { wcag: m.wcag })}). Recompón; si se repite, es un defecto del comando.`)
   }
 
   // Corchetes: el peor contraste de las cuatro esquinas (tinta del marco AXIS #a6cdf5 contra la escena, 3:1 de límite).
@@ -1807,7 +1818,7 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
   // El texto alternativo entregado también lleva huella (tramo 10; auditorías de arquitectura, hallazgo 8, y de diseño,
   // N11): reemplazarlo por «Imagen decorativa.» daba 0, también con `--reproducir`.
   const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson), alt: sha(`${accesibilidad.altText}\n`) }
-  const registro = { id: s.id, canon: opts.canon, ...(marcoSobreVoz.length ? { marcoSobreVoz } : {}), dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(s.selection?.box && opts.mask ? { seleccionSujeto: fraccionSujeto(opts.mask, s.selection.box, s.protect ?? []) } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
+  const registro = { id: s.id, canon: opts.canon, ...(marcoSobreVoz.length ? { marcoSobreVoz } : {}), dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(s.selection?.box && opts.mask ? { seleccionSujeto: fraccionSujeto(opts.mask, s.selection.box) } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
 
   for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
   qa.push(registro)
@@ -1837,6 +1848,8 @@ function registrarQa(registro) {
 // lo que tenía a tamaño original (con techo de exigencia 4,5). Sin máscara no se crece: la ausencia de
 // prueba no es permiso.
 const GROW_CAP = 1.6
+// Formatos de plate que la segmentación y el compositor leen igual (tramo 14): `heif` incluye AVIF.
+const FORMATOS_PLATE = new Set(['png', 'jpeg', 'webp', 'heif', 'tiff'])
 // Canon 2026-09-23: la firma automática sólo se busca en el cuarto inferior de la pieza (las aprobadas la tienen en
 // 0,82–0,92 del alto).
 const PISO_FIRMA = 0.75
@@ -1846,9 +1859,11 @@ const MARGEN_CRECER = 1.1
 // Zonas que la pieza declara como falso positivo de la segmentación (un afiche, una pantalla del fondo que el
 // modelo tomó por sujeto). Se apagan SÓLO para esta pieza, cada una con su razón, y quedan en el QA para
 // quien revise. Nunca se apaga la guarda entera.
-// Fracción de la caja de una selección sobre un OBJETO que es sujeto: la segmentación (ya con sus zonas ignoradas) o una zona
-// `protect` (tramo 13; auditoría de diseño de la quinta certificación, N3: el marco se aceptaba sobre una pared vacía).
-function fraccionSujeto(mask, [x0, y0, x1, y1], protect = []) {
+// Fracción de la caja de una selección sobre un OBJETO que la segmentación (ya con sus zonas ignoradas) marca como sujeto
+// (tramo 13; auditoría de diseño de la quinta certificación, N3: el marco se aceptaba sobre una pared vacía). Una zona
+// `protect` NO cuenta (tramo 14; sexta certificación, H4): protege del texto, no prueba que ahí haya algo, y declararla
+// sobre la pared vacía llevaba la medida a 99 %.
+function fraccionSujeto(mask, [x0, y0, x1, y1]) {
   const X0 = Math.max(0, Math.floor(x0 * mask.W)), X1 = Math.min(mask.W, Math.ceil(x1 * mask.W))
   const Y0 = Math.max(0, Math.floor(y0 * mask.H)), Y1 = Math.min(mask.H, Math.ceil(y1 * mask.H))
   let n = 0
@@ -1856,10 +1871,8 @@ function fraccionSujeto(mask, [x0, y0, x1, y1], protect = []) {
 
   for (let y = Y0; y < Y1; y++) {
     for (let x = X0; x < X1; x++) {
-      const fx = (x + 0.5) / mask.W, fy = (y + 0.5) / mask.H
-
       n++
-      if (mask.data[y * mask.W + x] > 127 || protect.some(z => fx >= z.box[0] && fx < z.box[2] && fy >= z.box[1] && fy < z.box[3])) sujeto++
+      if (mask.data[y * mask.W + x] > 127) sujeto++
     }
   }
 
@@ -1924,6 +1937,12 @@ for (const s0 of trabajo) {
   // el texto blanco desaparecía y el QA decía 21:1 (tramo 12; auditoría de arquitectura de la cuarta certificación, N4).
   // `isOpaque` y no `channels[3].min < 255` (tramo 13; auditoría de arquitectura de la quinta certificación, N2): en 16
   // bits el mínimo va de 0 a 65535 y un alfa de 32768 pasaba; un gris con alfa (2 canales) o con tRNS ni se miraba.
+  // Sólo plates raster (tramo 14; auditoría de arquitectura de la sexta certificación, O1): un SVG que enlaza la foto se
+  // dibuja desde su ruta, pero la segmentación lee los bytes sin ruta y no resuelve el enlace: la máscara salía vacía y el
+  // texto tapaba a la persona con el gate en 0. Los 178 plates de las piezas con CTA del repo son PNG.
+  const formato = (await sharp(path.resolve(PLAN_DIR, s0.plate)).metadata()).format
+
+  if (!FORMATOS_PLATE.has(formato)) throw new Error(`${s0.id}: el plate \`${s0.plate}\` es ${formato ?? 'de un formato desconocido'}: usa una imagen raster (PNG, JPEG, WebP, AVIF o TIFF)`)
   if (st.isOpaque === false) throw new Error(`${s0.id}: el plate \`${s0.plate}\` tiene transparencia: aplánalo sobre su fondo antes de componer (el contraste se mediría contra un color que no se ve)`)
 }
 
