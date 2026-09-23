@@ -29,9 +29,9 @@ export const CATALOGO = [
   { nombre: 't1-sin-bloqueo', objetivo: 'compositor', cambios: [['tomarBloqueo(`${PLAN_DIR}/out`)', '// mutante: sin bloqueo']], pruebas: 'P10', espera: /rechaza composición concurrente ✗/ },
   { nombre: 't1-cache-confiada', objetivo: 'compositor', cambios: [["if (m.plateSha === plateSha && m.modelo === 'medium' && m.version === VERSION_SEGMENTACION && m.ancho === pw && m.alto === ph && m.mascaraSha === sha(png)) alphaPng = png", 'alphaPng = png']], pruebas: 'P03', espera: /caché envenenada también aborta: false/ },
   { nombre: 't1-escribe-durante', objetivo: 'compositor', cambios: [['  const salidas = []\n', '  const salidas = { push: (...xs) => { for (const [rel, d] of xs) escribirAtomico(`${OUT}/${rel}`, d) }, [Symbol.iterator]: function* () {} }\n']], pruebas: 'P03', espera: /sin archivos tras abortar: false/ },
-  { nombre: 't1-qa-compartido', objetivo: 'compositor', cambios: [['const QA_FILE = rutaQa(OUT, PLAN)', "const QA_FILE = path.join(OUT, 'qa.json')"]], pruebas: 'P10', espera: /el QA queda en qa-<plan>\.json ✗/ },
+  { nombre: 't1-qa-compartido', amplio: true, objetivo: 'compositor', cambios: [['const QA_FILE = rutaQa(OUT, PLAN)', "const QA_FILE = path.join(OUT, 'qa.json')"]], pruebas: 'P10', espera: /el QA queda en qa-<plan>\.json ✗/ },
   { nombre: 't1-parcial-pisa', objetivo: 'compositor', cambios: [['if (!only.length) fs.rmSync(QA_FILE, { force: true })', 'fs.rmSync(QA_FILE, { force: true })']], pruebas: 'P10', espera: /la corrida parcial conserva el resto ✗/ },
-  { nombre: 't1-sin-esquema', objetivo: 'compositor', cambios: [['    const r = validarPiezaEsquema(p)\n', '    const r = { errores: [], avisos: [] }\n']], pruebas: 'P07', espera: /id con ruta \(\.\.\/\) ✗/ },
+  { nombre: 't1-sin-esquema', amplio: true, objetivo: 'compositor', cambios: [['    const r = validarPiezaEsquema(p)\n', '    const r = { errores: [], avisos: [] }\n']], pruebas: 'P07', espera: /id con ruta \(\.\.\/\) ✗/ },
   { nombre: 'gate-sin-huellas', objetivo: 'gate', cambios: [['if (!legado) {\n  const comando = huellaComando({ compositor: COMANDO })', 'if (false) {\n  const comando = huellaComando({ compositor: COMANDO })']], pruebas: 'P10', espera: /rechaza plan cambiado ✗/ },
   { nombre: 'gate-acepta-sin-mascara', objetivo: 'gate', cambios: [["if (!legado && guarda === 'sin-mascara') {", 'if (false) {']], pruebas: 'P10', espera: /rechaza sin máscara ✗/ },
   { nombre: 'gate-ignora-nulo', objetivo: 'gate', cambios: [['    if (!m) {\n      console.error(`✗ ${r.id}: «${voz}» no tiene medición de accesibilidad. Una voz sin medir no pasa.`)\n      fallos++\n      continue\n    }\n', '    if (!m) continue\n']], pruebas: 'P10', espera: /rechaza medición ausente ✗/ },
@@ -92,6 +92,21 @@ export const CATALOGO = [
   { nombre: 't8-alt-sin-rol', objetivo: 'modulo', modulo: 'accesibilidad.mjs', prueba: 'accesibilidad.test.mjs', cambios: [['    ? [accion[0] && `Llamado a la acción: «${accion[0]}»`', '    ? [accion[0] && !yaDicho(accion[0]) && `Llamado a la acción: «${accion[0]}»`']], espera: /el rol del CTA se anuncia siempre/ },
   { nombre: 't8-alt-subcadena', objetivo: 'modulo', modulo: 'accesibilidad.mjs', prueba: 'accesibilidad.test.mjs', cambios: [['  const yaDicho = t => citas(escena).some(c => contieneFrase(c, t))', '  const yaDicho = t => Boolean(escena) && escena.toLowerCase().includes(t.toLowerCase())']], espera: /el rol del CTA se anuncia siempre/ },
   { nombre: 't8-entidad-revienta', objetivo: 'modulo', modulo: 'svg-texto.mjs', prueba: 'svg-texto.test.mjs', cambios: [["const desdeCodigo = cp => (Number.isFinite(cp) && cp <= 0x10ffff && !(cp >= 0xd800 && cp <= 0xdfff) ? String.fromCodePoint(cp) : '\\ufffd')", 'const desdeCodigo = cp => String.fromCodePoint(cp)']], espera: /Una entidad fuera de Unicode no revienta/ },
+  // ── Tramo 9 · Proceso
+  { nombre: 't9-reclamo-sin-candado', objetivo: 'modulo', modulo: 'cta-integridad.mjs', prueba: 'cta-integridad.test.mjs', cambios: [['      fs.writeFileSync(reclamo, String(process.pid), { flag: \'wx\' })', '      void 0']], espera: /Reclamar un bloqueo muerto deja un solo dueño/ },
+  { nombre: 't9-senal-deja-bloqueo', objetivo: 'modulo', modulo: 'cta-integridad.mjs', prueba: 'cta-integridad.test.mjs', cambios: [['      for (const [senal, codigo] of Object.entries(SENALES)) process.once(senal, () => { soltar(); process.exit(codigo) })', '      void SENALES']], espera: /Ctrl-C suelta el bloqueo/ },
+  { nombre: 't9-sin-aviso-entre-planes', objetivo: 'compositor', cambios: [['  if (compartidos.length) console.warn(', '  if (false) console.warn(']], pruebas: 'P10', espera: /avisa id que otro plan de la carpeta registra ✗/ },
+  { nombre: 'reg-sin-manifiesto-verde', objetivo: 'regresion', cambios: [["} else if (!fs.existsSync(COBERTURA) && (!SOLO || args.includes('--cobertura'))) {", '} else if (false) {']], pruebas: 'P02', rapido: true, espera: /sin manifiesto de cobertura falla ✗/ },
+  { nombre: 'reg-sin-veredicto-gate', objetivo: 'regresion', cambios: [["    else if (gateNuevas.length || gateQuitadas.length) r.tipo = 'gate'", "    else if (false) r.tipo = 'gate'"]], pruebas: 'P02', rapido: true, espera: /un cambio del veredicto del gate es una diferencia ✗/ },
+  { nombre: 'gate-t9-firma-caja', objetivo: 'gate', cambios: [['} else if (c < FIRMA_MIN_CONTRASTE && bloquea(p, \'firma-contraste\', `la firma mide ${c}:1 contra su fondo', '} else if (false && bloquea(p, \'firma-contraste\', `la firma mide ${c}:1 contra su fondo']], pruebas: 'P10', espera: /rechaza firma bajo 4,5:1 en su caja ✗/ },
+  { nombre: 'gate-t9-cta-caja', objetivo: 'gate', cambios: [['  } else if (c.cta < MIN_TEXTO) {', '  } else if (false) {']], pruebas: 'P10', espera: /rechaza CTA bajo 4,5:1 en su caja ✗/ },
+  { nombre: 'gate-t9-descriptor-caja', objetivo: 'gate', cambios: [["  if (typeof c.descriptor === 'number' && c.descriptor < MIN_TEXTO) {", '  if (false) {']], pruebas: 'P10', espera: /rechaza descriptor bajo 4,5:1 en su caja ✗/ },
+  { nombre: 'gate-t9-jerarquia', objetivo: 'gate', cambios: [["  if (typeof r.ratioDominanteEntrada === 'number' && r.ratioDominanteEntrada < 3 && bloquea(", '  if (false && bloquea(']], pruebas: 'P10', espera: /rechaza jerarquía bajo tres veces ✗/ },
+  { nombre: 't9-firma-ignora-protect', objetivo: 'compositor', cambios: [['      const protect = (s.protect ?? []).map(z => ({ left: z.box[0] * W, top: z.box[1] * H, right: z.box[2] * W, bottom: z.box[3] * H }))', '      const protect = (s.protect ?? []).map(z => ({ left: z.x0 * W, top: z.y0 * H, right: z.x1 * W, bottom: z.y1 * H }))']], pruebas: 'P06', espera: /la firma automática respeta las zonas protect: false/ },
+  { nombre: 't9-gate-sin-rol-alt', objetivo: 'gate', cambios: [["  if (!legado && piezas.find(x => x.id === r.id)?.cta && !/Llamado a la acción: «/.test(a.altText ?? '')) {", '  if (false) {']], pruebas: 'P10', espera: /rechaza texto alternativo sin el rol del CTA ✗/ },
+  // Canarios: rompen algo AJENO al patrón. El arnés tiene que clasificarlos como «falla por otra razón».
+  { nombre: 'canario-compositor-revienta', canario: true, objetivo: 'compositor', cambios: [['const QA_FILE = rutaQa(OUT, PLAN)', "const QA_FILE = (() => { throw new Error('canario: el compositor revienta') })()"]], pruebas: 'P10', espera: /rechaza plan cambiado ✗/ },
+  { nombre: 'canario-modulo-ajeno', canario: true, objetivo: 'modulo', modulo: 'accesibilidad.mjs', prueba: 'accesibilidad.test.mjs', cambios: [['export const razonWcag = (l1, l2) =>', 'export const razonWcag = (l1, l2) => 1 || ']], espera: /Texto alternativo: el rol del CTA se anuncia siempre/ },
   // ── Firma externa (seguimiento del 2026-09-23: la firma la pone otra herramienta después del compositor)
   { nombre: 'fx-compositor-ignora-firma-externa', objetivo: 'compositor', cambios: [["    ...(firmaExternaDeclarada(s) ? [{ id: 'firma-externa', box: cajaFirmaExterna(s) }] : []),\n", ''], ["...(firmaExternaDeclarada(s) ? [{ id: 'firma-externa', box: cajaFirmaExterna(s) }] : [])]", ']']], pruebas: 'P06', espera: /firma externa sobre el texto rechazada: false/ },
   { nombre: 'gate-sin-contrato-firma-externa', objetivo: 'gate', cambios: [['  if (externa) {', '  if (false) {']], pruebas: 'P10', espera: /mide el contrato de la firma externa ✗/ },
@@ -129,6 +144,77 @@ function mutar(m) {
   return { archivos: [archivo, prueba], comando: ['--test', path.relative(ROOT, prueba)] }
 }
 
+// ── Tramo 9 (auditoría de arquitectura, N5): la puntuación sobrestimaba. Un mutante que sólo hacía reventar al
+// compositor ponía en ✗ TODAS las verificaciones de P10, incluida la que buscaba su patrón, y contaba como «detectado
+// por la razón esperada»; y en los módulos el patrón era el nombre de la prueba, que también aparece con ✔. Ahora:
+//   · cada conjunto de pruebas corre una vez SIN mutante (corrida base), y la razón esperada tiene que CAMBIAR: el
+//     patrón aparece con el mutante y no en la base;
+//   · en los módulos, el patrón se busca sólo en las líneas `✖` (la prueba que falla, no la que pasa);
+//   · si el mutante tumba más de la mitad de lo que pasaba en la base —o revienta una prueba— es un COLAPSO: falla por
+//     otra razón, aunque el patrón aparezca;
+//   · los mutantes `canario` rompen algo AJENO a su patrón a propósito: el arnés tiene que clasificarlos como «falla
+//     por otra razón». Si los da por detectados, el arnés volvió a sobrestimar.
+const correr = comando => run(process.execPath, comando, { cwd: ROOT, timeout: 60 * 60e3, maxBuffer: 64e6 }).then(r => ({ code: 0, texto: r.stdout + r.stderr }), e => ({ code: e.code ?? 1, texto: String(e.stdout ?? '') + String(e.stderr ?? '') }))
+
+const comandoBase = m => (m.objetivo === 'modulo' ? ['--test', `scripts/foto/${m.prueba}`] : ['scripts/foto/componer-cta.pruebas.mjs', '--solo', m.pruebas, ...(m.rapido ? ['--p02-rapido'] : [])])
+const bases = new Map()
+
+const base = m => {
+  const k = comandoBase(m).join(' ')
+
+  if (!bases.has(k)) bases.set(k, correr(comandoBase(m)))
+
+  return bases.get(k)
+}
+
+// Verificaciones con nombre en la salida: `nombre ✓|✗` (P07, P10, arnés), `nombre: true|false` (P03–P06) y las líneas
+// `✔|✖ nombre` de node:test.
+export function chequeos(texto) {
+  const m = new Map()
+
+  for (const linea of String(texto).split('\n')) {
+    const t = linea.trim()
+    const nodo = t.match(/^([✔✖]) (.+?)(?: \([\d.]+ms\))?$/)
+
+    if (nodo) { m.set(nodo[2], nodo[1] === '✔'); continue }
+
+    for (const seg of t.split(' · ')) {
+      const a = seg.match(/^(.+?) ([✓✗])(?: \(.*\))?$/)
+
+      if (a && !/^[✓✗] P\d\d /.test(seg)) { m.set(a[1], a[2] === '✓'); continue }
+      const b = seg.match(/^(.+?): (true|false)\b/)
+
+      if (b) m.set(b[1], b[2] === 'true')
+    }
+  }
+
+  return m
+}
+
+// En los módulos el patrón vale en una línea `✖` o en el informe de fallas de node:test (el mensaje de una aserción),
+// nunca en una línea `✔`.
+const aparece = (m, texto) => {
+  if (m.objetivo !== 'modulo') return m.espera.test(texto)
+  const t = String(texto)
+  const i = t.indexOf('failing tests:')
+
+  return t.split('\n').some(l => l.trim().startsWith('✖') && m.espera.test(l)) || (i >= 0 && m.espera.test(t.slice(i)))
+}
+
+export function clasificar(m, salidaBase, salida) {
+  if (salida.code === 0) return 'sobrevive'
+  const b = chequeos(salidaBase.texto)
+  const x = chequeos(salida.texto)
+  const pasaban = [...b].filter(([, ok]) => ok).map(([k]) => k)
+  const caidos = pasaban.filter(k => x.get(k) !== true)
+  const revienta = /error de la prueba/.test(salida.texto) && !/error de la prueba/.test(salidaBase.texto)
+  // `amplio`: una guarda de la que dependen muchas verificaciones (el esquema) tumba legítimamente más de la mitad.
+  const colapso = revienta || (!m.amplio && pasaban.length >= 4 && caidos.length > pasaban.length / 2)
+  const cambia = aparece(m, salida.texto) && !aparece(m, salidaBase.texto)
+
+  return cambia && !colapso ? 'detectado' : 'falla-por-otra-razon'
+}
+
 async function evaluar(m) {
   let archivos = []
 
@@ -136,10 +222,12 @@ async function evaluar(m) {
     const mut = mutar(m)
 
     archivos = mut.archivos
-    const salida = await run(process.execPath, mut.comando, { cwd: ROOT, timeout: 60 * 60e3, maxBuffer: 64e6 }).then(r => ({ code: 0, texto: r.stdout + r.stderr }), e => ({ code: e.code ?? 1, texto: String(e.stdout ?? '') + String(e.stderr ?? '') }))
-    const detectado = salida.code !== 0 && m.espera.test(salida.texto)
+    const [salidaBase, salida] = await Promise.all([base(m), correr(mut.comando)])
 
-    return { nombre: m.nombre, estado: detectado ? 'detectado' : salida.code !== 0 ? 'falla-por-otra-razon' : 'sobrevive' }
+    if (salidaBase.code !== 0) return { nombre: m.nombre, estado: 'base-falla', error: `la corrida base (${comandoBase(m).slice(-3).join(' ')}) no pasa: el catálogo no se puede juzgar` }
+    const estado = clasificar(m, salidaBase, salida)
+
+    return { nombre: m.nombre, estado, canario: Boolean(m.canario) }
   } catch (e) {
     return { nombre: m.nombre, estado: 'catalogo-viejo', error: e.message }
   } finally {
@@ -159,12 +247,17 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
       const r = await evaluar(m)
 
       resultados.push(r)
-      console.log(`${r.estado === 'detectado' ? '✓' : '✗'} ${r.nombre}: ${r.estado}${r.error ? ` — ${r.error}` : ''}`)
+      const bien = r.canario ? r.estado === 'falla-por-otra-razon' : r.estado === 'detectado'
+
+      console.log(`${bien ? '✓' : '✗'} ${r.nombre}: ${r.canario ? `canario, ${r.estado === 'falla-por-otra-razon' ? 'el arnés lo clasifica como falla por otra razón' : `el arnés lo dio por ${r.estado} (sobrestima)`}` : r.estado}${r.error ? ` — ${r.error}` : ''}`)
     }
   }))
 
-  const detectados = resultados.filter(r => r.estado === 'detectado').length
+  const reales = resultados.filter(r => !r.canario)
+  const canarios = resultados.filter(r => r.canario)
+  const detectados = reales.filter(r => r.estado === 'detectado').length
+  const canariosBien = canarios.filter(r => r.estado === 'falla-por-otra-razon').length
 
-  console.log(`\nPuntuación: ${detectados} de ${resultados.length} mutantes detectados por la razón esperada.`)
-  process.exitCode = detectados === resultados.length ? 0 : 1
+  console.log(`\nPuntuación: ${detectados} de ${reales.length} mutantes detectados por la razón esperada${canarios.length ? ` · canarios: ${canariosBien} de ${canarios.length} clasificados como falla por otra razón` : ''}.`)
+  process.exitCode = detectados === reales.length && canariosBien === canarios.length ? 0 : 1
 }

@@ -616,6 +616,23 @@ const QA_FILE = rutaQa(OUT, PLAN)
 // La huella se toma del archivo que CORRE: un mutante o una copia del comando se delatan en el gate.
 const HUELLA_COMANDO = huellaComando({ compositor: fileURLToPath(import.meta.url) })
 
+// Otro plan de esta misma carpeta que registra alguno de estos ids (tramo 9; auditoría de arquitectura, N9): los
+// artefactos se nombran por id, así que al recomponerlos aquí su PNG deja de ser el que certificó ese plan y su gate va
+// a fallar. Se AVISA antes de componer (en `aeo-cta-v04`, dos planes comparten 8 ids).
+for (const f of fs.existsSync(OUT) ? fs.readdirSync(OUT).filter(n => /^qa-.+\.json$/.test(n) && path.join(OUT, n) !== QA_FILE) : []) {
+  let otros = []
+
+  try {
+    otros = JSON.parse(fs.readFileSync(path.join(OUT, f), 'utf8')).map(r => r?.id)
+  } catch {
+    continue
+  }
+
+  const compartidos = SLIDES.filter(x => (!only.length || only.includes(x?.id)) && otros.includes(x?.id)).map(x => x.id)
+
+  if (compartidos.length) console.warn(`  ⚠ ${compartidos.join(', ')}: también los registra out/${f} (otro plan de esta carpeta). Al recomponerlos aquí, su PNG deja de ser el que certificó ese plan: su gate va a fallar hasta que lo recompongas.`)
+}
+
 if (!only.length) fs.rmSync(QA_FILE, { force: true })
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════
@@ -826,11 +843,14 @@ function cajaLogo(s) {
 // `signatureY` en los planes que ya lo usan.
 const firmaExternaDeclarada = s => !s.logo && (s.firma?.modo === 'externa' || (s.firma == null && typeof s.signatureY === 'number'))
 
+// La geometría se lee del MISMO campo que lee la herramienta que firma (`firmar.mjs` → `signatureY`, centro vertical,
+// 0,935 por defecto; 20 % del lado corto): si el compositor leyera otra altura, el gate certificaría una caja donde la
+// firma no cae (revisión documental del tramo 9). `firma` sólo declara el modo y la razón.
 function cajaFirmaExterna(s) {
-  const ancho = Math.round(Math.min(W, H) * (s.firma?.ancho ?? 0.2))
+  const ancho = Math.round(Math.min(W, H) * 0.2)
   const alto = Math.round(ancho * ASPECTO_LOGO)
   const left = Math.round((W - ancho) / 2)
-  const top = Math.round((s.firma?.y ?? s.signatureY ?? 0.935) * H - alto / 2)
+  const top = Math.round((s.signatureY ?? 0.935) * H - alto / 2)
 
   return { left, top, right: left + ancho, bottom: top + alto }
 }
@@ -1473,7 +1493,9 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
 
     if (s.logo.y === 'auto') {
       const ocupados = [...elementosMaquetacion([]).filter(e => e.tipo !== 'acento').map(e => e.box), ...visibles.map(v => v.box).filter(Boolean), ...(cardEl ? [cardEl.box] : [])]
-      const protect = (s.protect ?? []).map(z => ({ left: z.x0 * W, top: z.y0 * H, right: z.x1 * W, bottom: z.y1 * H }))
+      // `protect` es `[{ box: [x0, y0, x1, y1], reason }]` (fracciones), igual que en la guarda del texto. La primera
+      // versión lo leía como `{ x0, … }`: con un plan válido daba NaN y la búsqueda nunca evitaba esas zonas.
+      const protect = (s.protect ?? []).map(z => ({ left: z.box[0] * W, top: z.box[1] * H, right: z.box[2] * W, bottom: z.box[3] * H }))
       const r = await buscarYFirma(s, bare, opts.mask, zonaFirma(s, W, H), ocupados, protect)
 
       buscada = r.y

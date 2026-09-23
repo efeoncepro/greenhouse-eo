@@ -155,6 +155,11 @@ let faltantes = []
 if (ACTUALIZAR_COBERTURA) {
   fs.writeFileSync(COBERTURA, `${JSON.stringify({ nota: 'Piezas con CTA que la regresión DEBE verificar en esta máquina. Se regenera con --actualizar-cobertura.', generado: new Date().toISOString().slice(0, 10), piezas: [...presentes].sort() }, null, 2)}\n`)
   console.log(`Cobertura actualizada: ${presentes.size} piezas en ${path.relative(ROOT, COBERTURA)}`)
+} else if (!fs.existsSync(COBERTURA) && (!SOLO || args.includes('--cobertura'))) {
+  // Tramo 9 (auditoría de arquitectura, hallazgo 13): sin manifiesto, la red no sabe cuánto debía verificar y antes
+  // salía con 0 sin mencionarlo.
+  console.error(`✗ no existe el manifiesto de cobertura ${path.relative(ROOT, COBERTURA)}: la red no sabe qué piezas debía verificar. Genéralo con --actualizar-cobertura.`)
+  process.exit(1)
 } else if (fs.existsSync(COBERTURA) && !SOLO) {
   faltantes = JSON.parse(fs.readFileSync(COBERTURA, 'utf8')).piezas.filter(k => !presentes.has(k))
 } else if (SOLO && fs.existsSync(COBERTURA) && args.includes('--cobertura')) {
@@ -165,6 +170,23 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'foto-regresion-'))
 
 console.log(`Regresión del compositor de CTA — referencia ${REF} (${refSha}, ${REF_DEPS.length} archivos extraídos de git) contra ${path.relative(ROOT, CANDIDATO)}`)
 console.log(`${casos.size} piezas únicas de ${new Set([...casos.values()].flatMap(c => c.planes.map(x => x.split('#')[0]))).size} planes · ${JOBS} en paralelo · ${TMP}`)
+
+// El VEREDICTO del gate también es comportamiento (tramo 9; auditoría de arquitectura, hallazgo 13): un candidato que
+// agrega una voz que falla sólo sumaba claves al QA («🔵», no falla) y su salida no pasaba el gate. Se corre el gate
+// vigente sobre las dos salidas —cada una contra SU compositor— y se comparan las líneas de falla y de «no
+// certificable». Se ignora la de «otra versión del comando», que difiere por construcción entre referencia y candidato.
+const GATE = path.join(ROOT, 'scripts/foto/componer-cta.gate.mjs')
+
+async function veredicto(compositor, dir) {
+  const r = await run(process.execPath, [GATE, path.join(dir, 'piezas.json'), '--comando', compositor], { cwd: ROOT, maxBuffer: 16e6, timeout: 10 * 60e3 }).then(x => x.stdout + x.stderr, e => String(e.stdout ?? '') + String(e.stderr ?? ''))
+
+  return [...new Set(r.split('\n').map(l => l.trim()).filter(l => /^✗ |^· /.test(l) && !/otra versión del comando/.test(l)).map(l => l.replaceAll(dir, '<dir>')))].sort()
+}
+
+// Activos fuera de la referencia hermética: fuentes, logos y paquetes se leen del árbol de trabajo en los DOS lados,
+// así que un cambio en ellos no aparece como diferencia. Se avisa.
+const ACTIVOS_REF = ['src/assets/fonts', 'public/branding/logo-full.svg', 'public/branding/logo-negative.svg', 'src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg', 'pnpm-lock.yaml']
+const activosCambiados = execFileSync('git', ['diff', '--name-only', refSha, '--', ...ACTIVOS_REF], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n').filter(Boolean)
 
 // 3 · Componer una pieza sola con un compositor dado, en su propio directorio.
 async function componer(compositor, dir, pieza) {
@@ -264,10 +286,16 @@ async function evaluar(caso) {
     const avisosNuevos = ref.avisos.filter(a => !cand.avisos.includes(a))
     const avisosPerdidos = cand.avisos.filter(a => !ref.avisos.includes(a))
 
+    const [gRef, gCand] = await Promise.all([veredicto(REF_FILE, path.join(dir, 'ref')), veredicto(CANDIDATO, path.join(dir, 'cand'))])
+    const gateNuevas = gCand.filter(l => !gRef.includes(l))
+    const gateQuitadas = gRef.filter(l => !gCand.includes(l))
+
     if (d.length) { r.tipo = 'layout'; r.diferencias = d }
     else if (ref.pngSha !== cand.pngSha) r.tipo = 'pixeles'
     else if (avisosNuevos.length || avisosPerdidos.length) r.tipo = 'avisos'
+    else if (gateNuevas.length || gateQuitadas.length) r.tipo = 'gate'
     else r.tipo = nuevas.length ? 'qa-nuevo' : 'igual'
+    if (gateNuevas.length || gateQuitadas.length) r.gate = { nuevas: gateNuevas, quitadas: gateQuitadas }
     if (avisosNuevos.length || avisosPerdidos.length) r.avisos = { antes: avisosNuevos, ahora: avisosPerdidos }
     if (nuevas.length) r.qaNuevo = nuevas
     if (ref.pngSha !== cand.pngSha) r.pixeles = await pixeles(ref.png, cand.png)
@@ -307,7 +335,7 @@ await pool(resto)
 
 // 5 · Reporte.
 const cuenta = t => resultados.filter(r => r.tipo === t)
-const orden = ['estado', 'layout', 'pixeles', 'avisos', 'mensaje', 'qa-nuevo']
+const orden = ['estado', 'layout', 'pixeles', 'avisos', 'gate', 'mensaje', 'qa-nuevo']
 
 fs.writeFileSync(path.join(TMP, 'reporte.json'), JSON.stringify({ ref: REF, refSha, candidato: path.relative(ROOT, CANDIDATO), resultados }, null, 2))
 
@@ -326,7 +354,7 @@ for (const t of orden) {
     continue
   }
 
-  console.log(`\n${{ estado: '🔴 Cambia el ESTADO', layout: '🟠 Cambia el LAYOUT o el QA', pixeles: '🟡 Sólo cambian PÍXELES', avisos: '🟣 Cambian los AVISOS del compositor', mensaje: '⚪ Cambia el mensaje de error', 'qa-nuevo': '🔵 El QA suma claves (la pieza no cambia)' }[t]} (${lista.length})`)
+  console.log(`\n${{ estado: '🔴 Cambia el ESTADO', layout: '🟠 Cambia el LAYOUT o el QA', pixeles: '🟡 Sólo cambian PÍXELES', avisos: '🟣 Cambian los AVISOS del compositor', gate: '⛔ Cambia el VEREDICTO del gate (la pieza no cambia)', mensaje: '⚪ Cambia el mensaje de error', 'qa-nuevo': '🔵 El QA suma claves (la pieza no cambia)' }[t]} (${lista.length})`)
 
   for (const r of lista) {
     console.log(`  · ${r.id}  [${r.planes[0]}${r.planes.length > 1 ? ` +${r.planes.length - 1}` : ''}]`)
@@ -337,12 +365,15 @@ for (const t of orden) {
     if (r.pixeles) console.log(`      píxeles: ${JSON.stringify(r.pixeles)}`)
     for (const a of r.avisos?.antes ?? []) console.log(`      aviso que ya no sale: ${a}`)
     for (const a of r.avisos?.ahora ?? []) console.log(`      aviso nuevo: ${a}`)
+    for (const l of r.gate?.nuevas ?? []) console.log(`      el gate suma: ${l}`)
+    for (const l of r.gate?.quitadas ?? []) console.log(`      el gate ya no dice: ${l}`)
   }
 }
 
 if (omitidas.length) console.log(`\n⛔ Piezas OMITIDAS — no se verificaron, así que la corrida no puede dar verde (${omitidas.length}):\n${omitidas.map(o => `  · ${o}`).join('\n')}`)
 if (faltantes.length) console.log(`\n⛔ Faltan piezas del manifiesto de COBERTURA (${faltantes.length}) — la red se achicó; si fue a propósito, --actualizar-cobertura:\n${faltantes.map(o => `  · ${o}`).join('\n')}`)
 if (sinPlate.length) console.log(`\nℹ️  ${sinPlate.length} pieza(s) con CTA no tienen plate en esta máquina y no se verificaron.`)
+if (activosCambiados.length) console.log(`\n⚠ Cambiaron activos que la referencia hermética no cubre (fuentes, logos o paquetes) desde ${REF}: ${activosCambiados.join(', ')}. Los dos lados los leen del árbol de trabajo, así que esa diferencia NO aparece arriba: compara esas piezas a ojo.`)
 
 // Limpieza: se conservan sólo las piezas con diferencias (son la evidencia a mirar) y el reporte.
 if (!CONSERVAR) for (const r of resultados.filter(x => x.tipo === 'igual' || x.tipo === 'qa-nuevo')) fs.rmSync(r.dir, { recursive: true, force: true })

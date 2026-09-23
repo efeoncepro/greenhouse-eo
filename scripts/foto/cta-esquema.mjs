@@ -27,9 +27,7 @@ export const REGLAS_EXCEPTUABLES = [
   'acento-cta',
   'concepto-completo',
   'jerarquia',
-  'legibilidad',
   'reserva-editorial',
-  'cta-perceptual',
   'dominante-mayor'
 ]
 
@@ -222,7 +220,8 @@ export const esquemaPieza = z
     // `firma`: la pone otra herramienta (`externa`, p. ej. firmar.mjs) o la pieza no lleva (`sin-firma`). En la externa,
     // `y` es el CENTRO vertical (fracción del alto, como `signatureY`) y `ancho` la fracción del lado corto (20 % por
     // defecto): el compositor reserva esa caja para que nada caiga donde después va la firma.
-    firma: z.object({ modo: z.enum(['sin-firma', 'externa']), razon, aprobadoPor: aprobado.optional(), y: fraccion.optional(), ancho: z.number().finite().positive().max(1).optional() }).strict().optional(),
+    // La altura de una firma externa se declara en `signatureY`, que es lo que lee `firmar.mjs`.
+    firma: z.object({ modo: z.enum(['sin-firma', 'externa']), razon, aprobadoPor: aprobado.optional() }).strict().optional(),
     excepciones: z.array(excepcion).optional(),
     scrimTop: z.object({ opacity: fraccion, to: fraccion, color: hex.optional() }).strict().optional(),
     scrimBottom: z.object({ opacity: fraccion, from: fraccion }).strict().optional(),

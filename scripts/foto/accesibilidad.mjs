@@ -5,7 +5,8 @@
 // (`pnpm foto:cta:gate`) y el reporte (`pnpm foto:accesibilidad`).
 //
 // Política (skill greenhouse-typography-accessibility + a11y-architect): se APRUEBA con WCAG 2.2 AA; APCA es
-// verificación perceptual de respaldo y avisa, no bloquea. Los umbrales NO viven acá: salen del contrato
+// verificación perceptual de respaldo: avisa en las voces y, en el CTA, BLOQUEA junto con el daltonismo (decisión del
+// operador, 2026-09-23; el gate lo aplica, exceptuable como `cta-perceptual`). Los umbrales NO viven acá: salen del contrato
 // AXIS `axisAdvertising.accessibility` (SSOT), que es el que gobierna los pisos de la publicidad.
 //
 // Fuentes verificadas el 2026-09-22:

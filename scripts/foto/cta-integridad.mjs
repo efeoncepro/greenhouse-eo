@@ -41,6 +41,17 @@ const DEPENDENCIAS = [
   'scripts/creative/layout-compiler/contract.mjs'
 ]
 
+export const ACTIVOS = [
+  'src/assets/fonts/BricolageGrotesque-Variable.ttf',
+  'src/assets/fonts/Poppins-Regular.ttf',
+  'src/assets/fonts/Poppins-Medium.ttf',
+  'src/assets/fonts/Poppins-SemiBold.ttf',
+  'src/assets/fonts/Poppins-Bold.ttf',
+  'public/branding/logo-full.svg',
+  'public/branding/logo-negative.svg',
+  'src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg'
+]
+
 const PAQUETES = ['@efeoncepro/axis-tokens', '@efeoncepro/axis-ui-contracts', 'sharp', 'fontkit', '@imgly/background-removal-node', 'zod']
 
 export const versionPaquete = nombre => {
@@ -55,6 +66,9 @@ export function huellaComando({ compositor = path.join(REPO, COMPOSITOR) } = {})
   const partes = [`compositor:${sha(fs.readFileSync(compositor))}`, ...DEPENDENCIAS.map(f => `${f}:${sha(fs.readFileSync(path.join(REPO, f)))}`)]
 
   for (const p of PAQUETES) partes.push(`${p}@${versionPaquete(p)}`)
+  // Tramo 9 (auditoría de arquitectura, hallazgo 13): las fuentes, los logos y el SVG de la firma web deciden el píxel
+  // igual que el código. Guttery (fuera del repo) no entra: sólo la usa el gesto, que no se certifica.
+  for (const f of ACTIVOS) partes.push(`${f}:${fs.existsSync(path.join(REPO, f)) ? sha(fs.readFileSync(path.join(REPO, f))) : 'ausente'}`)
 
   return sha(partes.join('\n'))
 }
@@ -72,42 +86,80 @@ export function escribirAtomico(ruta, datos) {
   fs.renameSync(tmp, ruta)
 }
 
-// Bloqueo por carpeta de salida: dos composiciones en la misma `out/` no pueden correr a la vez. Un bloqueo de un
-// proceso que ya no existe se toma (quedó de una corrida que murió).
+// Bloqueo por carpeta de salida: dos composiciones en la misma `out/` no pueden correr a la vez.
+//
+// Tramo 9 (auditoría de arquitectura, N8): reclamar el bloqueo de un proceso muerto tenía una carrera —dos procesos
+// veían el mismo bloqueo muerto, el primero lo borraba y tomaba uno nuevo, y el segundo borraba ESE (medido: 3 de 60
+// corridas con dos dueños; con 6 procesos, 16 de 40)—. Ahora sólo quien toma el RECLAMO (`.reclamo`, creado con `wx`,
+// atómico) puede borrar el bloqueo muerto, y antes verifica que sigue siendo el mismo (el mismo pid muerto). Y el
+// bloqueo se suelta también con Ctrl-C, SIGTERM y SIGHUP: antes Ctrl-C lo dejaba tomado.
+const leerPid = ruta => {
+  try {
+    return Number(fs.readFileSync(ruta, 'utf8')) || null
+  } catch {
+    return null
+  }
+}
+
+const vivo = pid => {
+  try {
+    process.kill(pid, 0)
+
+    return true
+  } catch (e) {
+    return e.code === 'EPERM'
+  }
+}
+
+const esperar = ms => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms)
+
+// La ruta de ESTE archivo: la prueba de señales la carga en un proceso hijo (y así prueba también a un mutante).
+export const RUTA_MODULO = fileURLToPath(import.meta.url)
+const SENALES = { SIGINT: 130, SIGTERM: 143, SIGHUP: 129 }
+
 export function tomarBloqueo(dirOut) {
   const ruta = path.join(dirOut, '.componer.lock')
+  const reclamo = `${ruta}.reclamo`
 
   fs.mkdirSync(dirOut, { recursive: true })
 
-  for (let intento = 0; intento < 2; intento++) {
+  for (let intento = 0; intento < 40; intento++) {
     try {
       fs.writeFileSync(ruta, String(process.pid), { flag: 'wx' })
 
       const soltar = () => {
-        try {
-          if (fs.readFileSync(ruta, 'utf8') === String(process.pid)) fs.rmSync(ruta, { force: true })
-        } catch {
-          // ya no está
-        }
+        if (leerPid(ruta) === process.pid) fs.rmSync(ruta, { force: true })
       }
 
       process.on('exit', soltar)
+      for (const [senal, codigo] of Object.entries(SENALES)) process.once(senal, () => { soltar(); process.exit(codigo) })
 
       return soltar
     } catch (e) {
       if (e.code !== 'EEXIST') throw e
-      const pid = Number(fs.readFileSync(ruta, 'utf8'))
-      let vivo = false
+    }
 
-      try {
-        process.kill(pid, 0)
-        vivo = true
-      } catch {
-        vivo = false
-      }
+    const pid = leerPid(ruta)
 
-      if (vivo && pid !== process.pid) throw new Error(`otra composición usa ${dirOut} (proceso ${pid}). Espera a que termine: dos composiciones en la misma carpeta se mezclan.`)
-      fs.rmSync(ruta, { force: true })
+    if (pid == null) continue // se soltó entre medio: se reintenta
+    if (pid !== process.pid && vivo(pid)) throw new Error(`otra composición usa ${dirOut} (proceso ${pid}). Espera a que termine: dos composiciones en la misma carpeta se mezclan.`)
+
+    try {
+      fs.writeFileSync(reclamo, String(process.pid), { flag: 'wx' })
+    } catch (e) {
+      if (e.code !== 'EEXIST') throw e
+      // Otro proceso está reclamando. Si su reclamo quedó huérfano (murió en medio), se limpia; si no, se espera.
+      const quien = leerPid(reclamo)
+
+      if (quien != null && !vivo(quien)) fs.rmSync(reclamo, { force: true })
+      esperar(25)
+      continue
+    }
+
+    try {
+      if (leerPid(ruta) === pid) fs.rmSync(ruta, { force: true })
+    } finally {
+      fs.rmSync(reclamo, { force: true })
     }
   }
 

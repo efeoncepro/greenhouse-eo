@@ -483,8 +483,15 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
 
   if (apca.length) console.warn(`⚠ ${r.id}: bajo APCA Bronze — ${apca.join(' · ')}`)
   if (dalt.length) console.warn(`⚠ ${r.id}: bajo el umbral con daltonismo — ${dalt.join(' · ')}`)
-  if (chicas.length) console.warn(`⚠ ${r.id}: menos de ${LEGIBLE_PX} px en pantalla (${r.anchoPantalla ?? 390} CSS px de ancho) — ${chicas.join(' · ')}. Si la pieza no va a un teléfono, declara \`placement: { anchoCssPx, razon }\` (decisión pendiente: piso por rol).`)
+  if (chicas.length) console.warn(`⚠ ${r.id}: menos de ${LEGIBLE_PX} px en pantalla (${r.anchoPantalla ?? 390} CSS px de ancho) — ${chicas.join(' · ')}. Decisión pendiente del operador: piso de legibilidad por rol (\`placement\` ya no afloja esta medición).`)
   if (!a.altTextEscena) console.warn(`⚠ ${r.id}: el texto alternativo trae el texto de la imagen pero no describe la escena — agrega \`altText\` al plan.`)
+
+  // El rol del CTA en el texto alternativo lo escribe el compositor; el gate lo VERIFICA (antes sólo se confiaba en él).
+  if (!legado && piezas.find(x => x.id === r.id)?.cta && !/Llamado a la acción: «/.test(a.altText ?? '')) {
+    console.error(`✗ ${r.id}: el texto alternativo no anuncia el rol del CTA («Llamado a la acción: «…»»). Recompón con el comando vigente.`)
+    fallos++
+  }
+
   const copia = copiaEnEscena(piezas.find(x => x.id === r.id))
 
   if (copia.length) console.warn(`⚠ ${r.id}: la descripción de la escena (\`altText\`) transcribe el copy (${copia.map(c => `«${c}»`).join(', ')}): la escena se describe y el texto de la imagen se transcribe aparte.`)
