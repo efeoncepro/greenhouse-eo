@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { validarPiezaEsquema } from './cta-esquema.mjs'
+import { ENTIDADES_LEGADO, validarPiezaEsquema } from './cta-esquema.mjs'
 
 // Una pieza mínima válida, sin depender de ningún plan del repo.
 const base = () => ({
@@ -88,4 +88,25 @@ test('Marcado, entidades, saltos de línea y placement chico se rechazan donde s
   assert.ok(errores({ ...base(), dominant: 'Uno\ndos' }).some(e => /`dominant` trae un salto de línea/.test(e)))
   assert.ok(errores({ ...base(), placement: { anchoCssPx: 15, razon: 'prueba: pantalla diminuta' } }).some(e => /`placement\.anchoCssPx` debe ser ≥ 320/.test(e)))
   assert.deepEqual(errores({ ...base(), placement: { anchoCssPx: 1600, razon: 'prueba: sitio de escritorio' } }), [])
+})
+
+test('Entidades sin punto y coma con la lista oficial de HTML5, y el CTA en la columna del bloque (tramo 15)', () => {
+  // Séptima certificación, R1: las tildes del castellano pasaban y se dibujaban literales.
+  assert.equal(ENTIDADES_LEGADO.length, 106)
+  assert.ok(ENTIDADES_LEGADO.includes('eacute') && ENTIDADES_LEGADO.includes('ntilde') && !ENTIDADES_LEGADO.includes('ndash'), 'la lista es la de HTML5, no una hecha a mano')
+  assert.ok(errores({ ...base(), cta: { ...base().cta, text: 'Agenda tu caf&eacute hoy' } }).some(e => /`cta\.text` trae la entidad «&eacute» sin punto y coma/.test(e)))
+  assert.ok(errores({ ...base(), after: 'Cada a&ntildeo' }).some(e => /`after` trae la entidad «&ntilde» sin punto y coma/.test(e)))
+  assert.ok(errores({ ...base(), lead: 'Primero &ordm lugar' }).some(e => /`lead` trae la entidad «&ordm» sin punto y coma/.test(e)))
+  assert.ok(errores({ ...base(), dominant: 'Es &nothing' }).some(e => /«&not» sin punto y coma/.test(e)), 'el navegador toma el nombre legado más largo que empieza en el «&»')
+  assert.ok(errores({ ...base(), lead: 'Uno &ndash dos' }).some(e => /«&ndash» sin punto y coma/.test(e)), 'los nombres tipográficos se rechazan igual')
+  assert.deepEqual(errores({ ...base(), lead: 'Q&A, H&M y S&P 500' }), [], 'un & dentro de una sigla es texto')
+  // Séptima, diseño N2: `cta.align: "center"` en un bloque a la izquierda dejaba el botón fuera de la columna.
+  const ctaSinX = { ...base().cta }
+
+  delete ctaSinX.x
+
+  assert.ok(errores({ ...base(), cta: { ...ctaSinX, align: 'center' } }).some(e => /`cta\.align: "center"` en un bloque alineado a la izquierda/.test(e)))
+  assert.deepEqual(errores({ ...base(), align: 'center', cta: { ...ctaSinX, align: 'center' } }), [], 'en un bloque centrado es lo correcto')
+  assert.ok(errores({ ...base(), cta: ctaSinX }).some(e => /falta `cta\.x`: en un bloque alineado a la izquierda usa `cta\.x: "columna"`/.test(e)))
+  assert.ok(errores({ ...base(), align: 'center', cta: ctaSinX }).some(e => /en un bloque centrado usa `cta\.align: "center"`/.test(e)))
 })

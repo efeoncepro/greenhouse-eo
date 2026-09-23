@@ -46,7 +46,10 @@ export const REGLAS_EXCEPTUABLES = [
   'seleccion-objeto',
   // Tramo 14
   'cta-tamano',
-  'mascara-vacia'
+  'mascara-vacia',
+  // Tramo 15 (séptima certificación): `holgura` en todas; `cta-columna` sólo en las piezas nuevas.
+  'holgura',
+  'cta-columna'
 ]
 
 // Límites de las zonas de sujeto ignoradas: cada una ≤ 10 % del lienzo y todas juntas ≤ 15 %. Una zona del tamaño del
@@ -68,6 +71,44 @@ const shaPlate = z.string().regex(/^[0-9a-f]{64}$/, 'el sha256 del plate, 64 hex
 
 // `plate`: sha256 del plate para el que se aprobó (un plate regenerado se vuelve a aprobar). `hasta`: el valor que se
 // aprueba cuando la regla se mide con un número (el gate lo exige ahí). Tramo 7; auditoría de arquitectura, N7.
+// Nombres que HTML5 decodifica SIN punto y coma: los 106 «legados» de la tabla de referencias nombradas de WHATWG. Un
+// navegador lee «caf&eacute hoy» como «café hoy» y el compositor dibujaría «&eacute» tal cual (tramo 15; séptima
+// certificación, R1: la lista de antes estaba hecha a mano, dejaba pasar todas las tildes del castellano y mezclaba nombres
+// que ningún navegador acepta sin «;»). Verificada el 2026-09-23 contra `character-entities-legacy` 3.0.0 y contra el
+// decodificador de `entities` 4.5.0 en modo legado: las 106 se decodifican sin «;»; `ndash`, `hellip` o `euro`, no.
+export const ENTIDADES_LEGADO = Object.freeze([
+  'AElig', 'AMP', 'Aacute', 'Acirc', 'Agrave', 'Aring', 'Atilde', 'Auml', 'COPY', 'Ccedil', 'ETH', 'Eacute', 'Ecirc',
+  'Egrave', 'Euml', 'GT', 'Iacute', 'Icirc', 'Igrave', 'Iuml', 'LT', 'Ntilde', 'Oacute', 'Ocirc', 'Ograve', 'Oslash',
+  'Otilde', 'Ouml', 'QUOT', 'REG', 'THORN', 'Uacute', 'Ucirc', 'Ugrave', 'Uuml', 'Yacute', 'aacute', 'acirc',
+  'acute', 'aelig', 'agrave', 'amp', 'aring', 'atilde', 'auml', 'brvbar', 'ccedil', 'cedil', 'cent', 'copy',
+  'curren', 'deg', 'divide', 'eacute', 'ecirc', 'egrave', 'eth', 'euml', 'frac12', 'frac14', 'frac34', 'gt',
+  'iacute', 'icirc', 'iexcl', 'igrave', 'iquest', 'iuml', 'laquo', 'lt', 'macr', 'micro', 'middot', 'nbsp', 'not',
+  'ntilde', 'oacute', 'ocirc', 'ograve', 'ordf', 'ordm', 'oslash', 'otilde', 'ouml', 'para', 'plusmn', 'pound',
+  'quot', 'raquo', 'reg', 'sect', 'shy', 'sup1', 'sup2', 'sup3', 'szlig', 'thorn', 'times', 'uacute', 'ucirc',
+  'ugrave', 'uml', 'uuml', 'yacute', 'yen', 'yuml'
+])
+
+// Nombres tipográficos que un navegador NO decodifica sin «;» pero que nadie escribe a propósito: sin «;» también se dibujan
+// literales. Se rechazan igual; no son parte de la lista de HTML5.
+const ENTIDADES_TIPOGRAFICAS = ['ndash', 'mdash', 'hellip', 'bull', 'trade', 'euro', 'apos', 'lsquo', 'rsquo', 'ldquo', 'rdquo']
+const NOMBRES_SIN_PUNTO = [...ENTIDADES_LEGADO, ...ENTIDADES_TIPOGRAFICAS].sort((a, b) => b.length - a.length)
+
+// La primera entidad escrita sin punto y coma, o `null`. El navegador toma el nombre legado MÁS LARGO que empieza donde está
+// el «&» (`&notin` sin «;» se lee «¬in»): por eso se busca por prefijo y no por palabra. «R&D», «AT&T» o «Q&A» son texto.
+export function entidadSinPuntoYComa(t) {
+  const numerica = String(t).match(/&#\d+(?![\d;])|&#x[0-9a-f]+(?![0-9a-f;])/i)
+
+  if (numerica) return numerica[0]
+
+  for (let i = t.indexOf('&'); i >= 0; i = t.indexOf('&', i + 1)) {
+    const nombre = NOMBRES_SIN_PUNTO.find(n => t.startsWith(n, i + 1))
+
+    if (nombre && t[i + 1 + nombre.length] !== ';') return `&${nombre}`
+  }
+
+  return null
+}
+
 const excepcion = z.object({ regla: z.enum(REGLAS_EXCEPTUABLES), razon, aprobadoPor: aprobado, plate: shaPlate.optional(), hasta: z.number().finite().optional() }).strict()
 
 const cursorCta = z
@@ -351,11 +392,11 @@ function reglasCruzadas(p) {
     const ent = t.match(/&(#\d+|#x[0-9a-f]+|[a-z][a-z0-9]*);/i)
 
     if (ent) e.push(`\`${campo}\` trae la entidad «${ent[0]}»: escribe el carácter; la entidad se dibujaría literal`)
-    // Sin punto y coma también (tramo 14; sexta certificación, Y7): `&#178`, `&amp` o `&sup2` se dibujaban literales. Sólo las
-    // formas numéricas y los nombres que un navegador acepta sin punto y coma: «R&D» o «AT&T» siguen siendo texto.
-    const entSin = t.match(/&#\d+(?![\d;])|&#x[0-9a-f]+(?![0-9a-f;])|&(?:amp|lt|gt|quot|apos|nbsp|copy|reg|trade|deg|sup[123]|frac(?:12|14|34)|middot|laquo|raquo|ndash|mdash|hellip|bull|times|divide|plusmn|iexcl|iquest|euro|cent|pound|yen|sect|para|micro|shy)(?![a-z0-9;])/i)
+    // Sin punto y coma también (tramo 14; sexta certificación, Y7): `&#178`, `&amp` o `&sup2` se dibujaban literales. Desde el
+    // tramo 15 (séptima, R1), con la lista oficial de HTML5 y el prefijo más largo: `&eacute` o `&ntilde` también.
+    const entSin = entidadSinPuntoYComa(t)
 
-    if (!ent && entSin) e.push(`\`${campo}\` trae la entidad «${entSin[0]}» sin punto y coma: escribe el carácter; se dibujaría literal`)
+    if (!ent && entSin) e.push(`\`${campo}\` trae la entidad «${entSin}» sin punto y coma: escribe el carácter; se dibujaría literal`)
     if (/[\n\r\t]/.test(t)) e.push(`\`${campo}\` trae un salto de línea o una tabulación: se dibujaría como un cuadro vacío; para cortar la línea usa \`|\``)
   }
 
@@ -367,7 +408,10 @@ function reglasCruzadas(p) {
 
   const c = p?.cta
 
-  if (c && typeof c === 'object' && c.align !== 'center' && c.x == null) e.push('falta `cta.x` (una fracción, "columna", o `cta.align: "center"`)')
+  // El mensaje depende de la alineación del bloque (tramo 15; séptima, diseño N2): antes sugería `cta.align: "center"` también
+  // en un bloque a la izquierda, y así el botón quedaba fuera de la columna del texto.
+  if (c && typeof c === 'object' && c.align !== 'center' && c.x == null) e.push(p?.align === 'center' ? 'falta la posición del CTA: en un bloque centrado usa `cta.align: "center"`' : 'falta `cta.x`: en un bloque alineado a la izquierda usa `cta.x: "columna"` (o una fracción)')
+  if (c && typeof c === 'object' && c.align === 'center' && p?.align !== 'center') e.push('`cta.align: "center"` en un bloque alineado a la izquierda deja el botón fuera de la columna del texto: usa `cta.x: "columna"`')
   if (p?.note && typeof p.note === 'object' && p.note.gapAfterClosure == null && p.note.y == null) e.push('la nota necesita `note.gapAfterClosure` (encadenada) o `note.y` (ubicada a mano)')
 
   return e

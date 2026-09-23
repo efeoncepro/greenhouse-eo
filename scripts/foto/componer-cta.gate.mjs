@@ -642,7 +642,17 @@ const TECHO_RELLENO_CTA = { x: 1.2, y: 0.8 } // padding máximo del botón, en c
 const TECHO_DESCRIPTOR = 1.5
 // El CTA no compite con el titular (tramo 14): lo aprobado, CTA 0,20–0,44× el titular y botón 0,17–0,77× su área.
 const TECHO_CTA_TITULAR = 0.5
-const TECHO_BOTON_AREA = 1
+// Techo del área por variante DIBUJADA (tramo 15; séptima, diseño H3): un botón de relleno pesa toda su área y, con el techo
+// único de 1, llegaba a 0,98× la del titular. Canon: el titular es la voz dominante. Lo aprobado: relleno ≤ 0,57, contorno
+// ≤ 0,77 y la caja del texto de un CTA sin botón ≤ 0,29; ninguna aprobada lo incumple.
+const TECHO_BOTON_AREA = { solid: 0.7, outline: 1, text: 0.45 }
+// Texto, botón y firma no se tocan (tramo 15; séptima, diseño N1): la misma holgura que ya separa una selección de lo que no
+// es su destino, 0,4 % del lado corto, medida sobre lo DIBUJADO. Lo aprobado: 0,69 % como mínimo; ninguna lo incumple.
+const HOLGURA_PRINCIPALES = 0.004
+// En una pieza nueva, CTA, descriptor, nota y etiqueta arrancan en la columna del texto (tramo 15; séptima, diseño N2), con la
+// tolerancia del eje centrado. 30 aprobadas se corren hasta 27 px (cta.x 0,08 en la familia KV; CTA de texto con fracción):
+// siguen con el aviso, porque son del canon anterior.
+const TOLERANCIA_COLUMNA_PX = 4
 const PISO_CTA_CUERPO = 0.9 // el CTA mide al menos 0,9× la voz de cuerpo mayor (entrada, cierre, nota)
 const PISO_SELECCION_SUJETO = 0.01 // fracción mínima de sujeto dentro de la caja de una selección sobre un objeto
 
@@ -767,17 +777,59 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
 
   if (mayores.length && bloquea(p, 'dominante-mayor', `el dominante (${tipografia.dominant} px) no es la voz mayor: ${mayores.map(k => `${NOMBRE_VOZ[k]} ${tipografia[k]} px`).join(' · ')}`, { valor: +(tipografia.dominant / Math.max(...mayores.map(k => tipografia[k]))).toFixed(2), sentido: 'min' })) fallos++
 
-  // Columna (aviso): en un bloque alineado a la izquierda, botón y descriptor arrancan en la columna del texto.
+  // Columna: en un bloque alineado a la izquierda, CTA, descriptor, nota y etiqueta arrancan en la columna del texto. Se mide lo
+  // DIBUJADO: en un CTA de texto, el texto (tramo 15; antes se leía la variante del plan y un `auto` resuelto a texto medía
+  // la caja que no se dibuja). En una pieza nueva bloquea (séptima, diseño N2: un CTA a 224 px de la columna daba 0); en las
+  // aprobadas, avisa. La etiqueta con estrella no se mide: su caja empieza después de la estrella.
   const L = JSON.parse(readFileSync(path.join(dir, 'out', `${r.id}-layout.json`), 'utf8'))
   const el = id => L.maquetacion?.elementos?.find(e => e.id === id)?.box
+  const varianteDibujada = r.ctaVariante?.elegida ?? p.cta.variant
 
-  if (typeof L.columna === 'number') {
+  if (typeof L.columna === 'number' && !nuevo) {
+    // Las aprobadas conservan el aviso tal cual era (tramo 13; mismo texto, para que la regresión no vea diferencias).
     const boton = p.cta.variant === 'text' ? el('cta') : el('cta-boton')
     const desc = el('descriptor')
     const nota = el('nota')
     const corrido = [boton && Math.abs(boton.left - L.columna) > 4 && `el CTA arranca ${Math.round(boton.left - L.columna)} px`, desc && Math.abs(desc.left - L.columna) > 4 && `el descriptor arranca ${Math.round(desc.left - L.columna)} px`, nota && Math.abs(nota.left - L.columna) > 4 && `la nota arranca ${Math.round(nota.left - L.columna)} px`, el('etiqueta') && Math.abs(el('etiqueta').left - L.columna) > 4 && `la etiqueta arranca ${Math.round(el('etiqueta').left - L.columna)} px`].filter(Boolean)
 
     if (corrido.length) console.warn(`⚠ ${r.id}: ${corrido.join(' y ')} fuera de la columna del texto. Usa \`cta.x: "columna"\` (y \`note.x: "columna"\`).`)
+  } else if (typeof L.columna === 'number') {
+    const corridos = [['el CTA', varianteDibujada === 'text' ? el('cta') : el('cta-boton')], ['el descriptor', el('descriptor')], ['la nota', el('nota')], ['la etiqueta', p.labelStar ? null : el('etiqueta')]]
+      .filter(([, b]) => b && Math.abs(b.left - L.columna) > TOLERANCIA_COLUMNA_PX)
+      .map(([n, b]) => [n, Math.round(b.left - L.columna)])
+
+    const msg = `${corridos.map(([n, d]) => `${n} arranca ${d} px`).join(' y ')} fuera de la columna del texto (tolerancia: ${TOLERANCIA_COLUMNA_PX} px). Usa \`cta.x: "columna"\` (y \`note.x: "columna"\`)`
+
+    if (corridos.length && bloquea(p, 'cta-columna', msg, { valor: Math.max(...corridos.map(([, d]) => Math.abs(d))), sentido: 'max' })) fallos++
+  }
+
+  // Texto, botón y firma no se tocan (tramo 15; séptima, diseño N1). `invariantesMaquetacion` compara con holgura 0 y
+  // desigualdad estricta: dos cajas que se tocaban, o a 1–3 px, pasaban; y la caja del botón no incluye la mitad exterior del
+  // trazo del contorno, que pisaba la tinta. Aquí se mide sobre lo dibujado: el botón de contorno con medio trazo por fuera, y
+  // sin botón cuando el CTA es de texto.
+  if (Array.isArray(L.maquetacion?.elementos)) {
+    const lado = Math.min(L.canvas.width, L.canvas.height)
+    const piso = lado * HOLGURA_PRINCIPALES
+    const medioTrazo = varianteDibujada === 'outline' ? Math.max(2, Math.ceil(L.canvas.width / (r.anchoPantalla ?? 390))) / 2 : 0
+
+    const dibujados = L.maquetacion.elementos
+      .filter(e => ['texto', 'cta', 'firma'].includes(e.tipo) && !(e.id === 'cta-boton' && varianteDibujada === 'text'))
+      .map(e => (e.id === 'cta-boton' && medioTrazo ? { ...e, box: { left: e.box.left - medioTrazo, top: e.box.top - medioTrazo, right: e.box.right + medioTrazo, bottom: e.box.bottom + medioTrazo } } : e))
+
+    const pegados = []
+
+    for (let i = 0; i < dibujados.length; i++) {
+      for (let j = i + 1; j < dibujados.length; j++) {
+        const [a, b] = [dibujados[i], dibujados[j]]
+
+        if (a.dentroDe === b.id || b.dentroDe === a.id) continue
+        const separacion = Math.max(b.box.left - a.box.right, a.box.left - b.box.right, b.box.top - a.box.bottom, a.box.top - b.box.bottom)
+
+        if (separacion < piso) pegados.push([a.id, b.id, separacion])
+      }
+    }
+
+    if (pegados.length && bloquea(p, 'holgura', `texto, botón y firma no se tocan: ${pegados.map(([a, b, s]) => `«${a}» y «${b}» a ${s.toFixed(1)} px`).join(' · ')} (piso: ${piso.toFixed(1)} px, el 0,4 % del lado corto; el botón de contorno cuenta medio trazo por fuera). Sube \`leadGap\`, \`afterGap\`, \`note.gapAfterClosure\` o \`cta.gapAfterNote\``, { valor: +Math.min(...pegados.map(([, , s]) => s)).toFixed(1), sentido: 'min' })) fallos++
   }
 
   // Bloque CENTRADO (todas las piezas; tramo 12, auditoría de diseño de la cuarta certificación, N4): cada voz, el botón y
@@ -799,7 +851,9 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   // Descriptor separado de su botón (quinta, N1; sexta, H2): se mide lo DIBUJADO —del borde inferior del botón (o del texto
   // del CTA, si no hay botón) al descriptor— y no el `descriptorGap` declarado: para esquivar un cursor o su etiqueta el
   // descriptor bajaba hasta 3,9× el cuerpo del CTA. Desde el botón y no desde el texto: el relleno ya tiene su regla.
-  const baseD = el('cta-boton') ?? el('cta')
+  // En un CTA de texto no hay botón dibujado: se mide desde el texto (tramo 15; séptima, arquitectura N4: se medía la caja del
+  // relleno, que no se dibuja, y un descriptor a 2,25× pasaba como 1,45×).
+  const baseD = varianteDibujada === 'text' ? el('cta') : el('cta-boton') ?? el('cta')
   const descD = el('descriptor')
   const distDesc = baseD && descD && typeof tipografia.cta === 'number' ? (descD.top - baseD.bottom) / tipografia.cta : null
 
@@ -807,13 +861,14 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
 
   // CTA que compite con el titular (sexta, H3): el relleno tenía techo, pero el CTA subía hasta 0,6× el titular y el botón
   // llegaba a 1,5× su área.
-  const botonT = el('cta-boton')
+  const botonT = varianteDibujada === 'text' ? el('cta') : el('cta-boton')
+  const techoArea = TECHO_BOTON_AREA[varianteDibujada] ?? TECHO_BOTON_AREA.outline
   const titularT = el('dominante')
   const ratioCta = typeof tipografia.cta === 'number' && typeof tipografia.dominant === 'number' ? tipografia.cta / tipografia.dominant : null
   const ratioArea = botonT && titularT ? ((botonT.right - botonT.left) * (botonT.bottom - botonT.top)) / ((titularT.right - titularT.left) * (titularT.bottom - titularT.top)) : null
-  const tamanoCta = Math.max(ratioCta != null ? ratioCta / TECHO_CTA_TITULAR : 0, ratioArea != null ? ratioArea / TECHO_BOTON_AREA : 0)
+  const tamanoCta = Math.max(ratioCta != null ? ratioCta / TECHO_CTA_TITULAR : 0, ratioArea != null ? ratioArea / techoArea : 0)
 
-  if (tamanoCta > 1 + 1e-9 && bloquea(p, 'cta-tamano', `el CTA compite con el titular: mide ${ratioCta?.toFixed(2)}× el titular${ratioArea != null ? ` y el botón ${ratioArea.toFixed(2)}× su área` : ''} (techo: ${TECHO_CTA_TITULAR}× y ${TECHO_BOTON_AREA}×; mide ${tamanoCta.toFixed(2)}× el techo)`, { valor: +tamanoCta.toFixed(2), sentido: 'max' })) fallos++
+  if (tamanoCta > 1 + 1e-9 && bloquea(p, 'cta-tamano', `el CTA compite con el titular: mide ${ratioCta?.toFixed(2)}× el titular${ratioArea != null ? ` y el botón ${ratioArea.toFixed(2)}× su área` : ''} (techo: ${TECHO_CTA_TITULAR}× y, para un CTA ${varianteDibujada === 'solid' ? 'de relleno' : varianteDibujada === 'text' ? 'de texto' : 'de contorno'}, ${techoArea}× el área; mide ${tamanoCta.toFixed(2)}× el techo)`, { valor: +tamanoCta.toFixed(2), sentido: 'max' })) fallos++
 
   // CTA más chico que el cuerpo (N2): la jerarquía por rol sólo ponía techos; con el CTA a 0,36× la nota salía sin avisos.
   const cuerpo = [['lead', p.lead], ['closure', p.after], ['benefit', p.note]].filter(([k, v]) => v && typeof tipografia[k] === 'number').map(([k]) => k)

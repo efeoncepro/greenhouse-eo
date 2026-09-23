@@ -753,6 +753,14 @@ const PRUEBAS = [
       conSvg.plate = path.join(TMP, 'P07-plates', 'enlaza-la-foto.svg')
       fs.writeFileSync(conSvg.plate, `<svg xmlns="http://www.w3.org/2000/svg" width="${anchoSvg}" height="${altoSvg}"><image href="foto-enlazada.png" width="${anchoSvg}" height="${altoSvg}"/></svg>`)
       entidadSinPunto.lead = 'Marketing &amp ventas'
+      // Tramo 15 (séptima, R1 y diseño N2): una tilde escrita como entidad sin punto y coma, y el CTA centrado en un bloque
+      // alineado a la izquierda.
+      const entidadTilde = base()
+      const ctaCentrado = base()
+
+      entidadTilde.cta.text = 'Agenda tu caf&eacute hoy'
+      delete ctaCentrado.cta.x
+      ctaCentrado.cta.align = 'center'
 
       const casos = [
         ['falta cta.fontSize', [sinFont], [], /falta `cta\.fontSize`/],
@@ -795,7 +803,9 @@ const PRUEBAS = [
         ['plate gris con alfa', [grisAlfa], [], /tiene transparencia/],
         ['entidad con dígitos en el nombre', [entidadDigito], [], /`cta\.text` trae la entidad «&sup2;»/],
         ['plate SVG que enlaza la foto', [conSvg], [], /es svg: usa una imagen raster/],
-        ['entidad sin punto y coma', [entidadSinPunto], [], /`lead` trae la entidad «&amp» sin punto y coma/]
+        ['entidad sin punto y coma', [entidadSinPunto], [], /`lead` trae la entidad «&amp» sin punto y coma/],
+        ['tilde escrita como entidad sin punto y coma', [entidadTilde], [], /`cta\.text` trae la entidad «&eacute» sin punto y coma/],
+        ['CTA centrado en un bloque a la izquierda', [ctaCentrado], [], /`cta\.align: "center"` en un bloque alineado a la izquierda/]
       ]
 
       const rs = await Promise.all(casos.map(([, piezas, ids], i) => componer(`P07-${i}`, piezas, ids)))
@@ -1617,6 +1627,70 @@ const PRUEBAS = [
         gAcentoForjado = await gate(rAutoCanon.planPath)
       }
 
+      // ── Tramo 15 · séptima certificación ──
+      const c15Pegadas = canon('b2_916')
+      const c15Trazo = canon('b2_916')
+      const c15Columna = canon('b2_916')
+      const c15Losa = canon('b2_916')
+      const c15Texto = canon('b2_916')
+
+      // Diseño N1: voces pegadas (con 0 el gate daba 0) y el borde del contorno, que pisa la tinta con su medio trazo exterior.
+      Object.assign(c15Pegadas, { leadGap: 0, afterGap: 0 })
+      // Con 0 el cierre y la nota se solapan y ya aborta el compositor; con 2 px se tocan sin solaparse, que es lo que pasaba.
+      c15Pegadas.note.gapAfterClosure = 2
+      c15Pegadas.cta.gapAfterNote = 0
+      Object.assign(c15Trazo.cta, { variant: 'outline', gapAfterNote: 5.3 })
+      // Diseño N2: el CTA en una fracción lejos de la columna, en una pieza nueva.
+      c15Columna.cta.x = 0.25
+      // Diseño H3: losa de relleno. Pasa el techo de CTA/titular; sólo la frena el techo del área del relleno.
+      Object.assign(c15Losa.cta, { variant: 'solid', text: 'Agenda ya', fontSize: 61, paddingX: 73, paddingY: 48 })
+      // Arquitectura N4: CTA de texto con el descriptor lejos de su TEXTO (la caja del relleno no se dibuja).
+      Object.assign(c15Texto.cta, { variant: 'text', paddingY: 20, descriptorGap: 45 })
+      const c15Rs = await Promise.all([['P10-pegadas', c15Pegadas], ['P10-trazo', c15Trazo], ['P10-columna', c15Columna], ['P10-losa', c15Losa], ['P10-cta-texto', c15Texto]].map(([n, pz]) => componer(n, [pz])))
+      const [gC15Pegadas, gC15Trazo, gC15Columna, gC15Losa, gC15Texto] = await Promise.all(c15Rs.map(x => (x.ok ? gate(x.planPath) : { code: -1, salida: x.error })))
+      // El caso del trazo tiene que caer en la ventana que sólo el medio trazo cierra: la caja de la nota queda a ≥ el piso del
+      // botón, y a menos del piso si se cuenta el medio trazo exterior. Si el plan deriva, la prueba lo dice.
+      let trazoEnVentana = false
+
+      if (c15Rs[1].ok) {
+        const Lt = leer(c15Rs[1].dir, 'b2-primero-el-numero-916-layout.json')
+        const cajas = Object.fromEntries(Lt.maquetacion.elementos.map(e => [e.id, e.box]))
+        const piso = Math.min(Lt.canvas.width, Lt.canvas.height) * 0.004
+        const medio = Math.max(2, Math.ceil(Lt.canvas.width / 390)) / 2
+        const hueco = cajas['cta-boton'].top - cajas.nota.bottom
+
+        trazoEnVentana = hueco >= piso && hueco - medio < piso
+      }
+
+      // Arquitectura N7 (el arreglo de Y1, tramo 14, no tenía prueba): un plan DEL REPO con un `.origen` forjado que apunta a la
+      // suite, el nonce en el entorno y `--reproducir --comando <otro compositor>`. El hijo de `--reproducir` heredaba ese origen,
+      // se juzgaba como suite y certificaba con 0 un compositor ajeno. Ahora el origen es el plan que se certifica: sale con 3.
+      let gY1 = { code: -1, salida: 'no se preparó' }
+      const rY1 = await componer('P10-y1', [canon('b2_916')])
+      const dirY1 = fs.mkdtempSync(path.join(ROOT, 'ai-generations', '.cta-prueba-y1-'))
+      const copiaY1 = path.join(path.dirname(COMPOSITOR), `.componer-cta@prueba-y1-${process.pid}.regresion.mjs`)
+
+      try {
+        if (rY1.ok) {
+          fs.cpSync(rY1.dir, dirY1, { recursive: true })
+          fs.copyFileSync(COMPOSITOR, copiaY1)
+          const nonceY1 = randomBytes(24).toString('hex')
+
+          fs.writeFileSync(path.join(dirY1, '.origen'), JSON.stringify({ origen: path.join(TMP, 'P10-y1-suite', 'piezas.json'), nonce: nonceY1 }))
+
+          try {
+            const x = await run(process.execPath, [GATE, path.join(dirY1, 'piezas.json'), '--reproducir', '--comando', copiaY1], { cwd: ROOT, maxBuffer: 16e6, timeout: 20 * 60e3, env: { ...process.env, FOTO_GATE_ORIGEN_NONCE: nonceY1 } })
+
+            gY1 = { code: 0, salida: x.stdout + x.stderr }
+          } catch (e) {
+            gY1 = { code: e.code ?? 1, salida: String(e.stdout ?? '') + String(e.stderr ?? '') }
+          }
+        }
+      } finally {
+        fs.rmSync(dirY1, { recursive: true, force: true })
+        fs.rmSync(copiaY1, { force: true })
+      }
+
       const r = {
         'aprueba el plan bueno': gBueno.code === 0,
         'rechaza texto alternativo reemplazado': gAltCambiado.code === 1 && /no es el texto alternativo que registró la composición/.test(gAltCambiado.salida),
@@ -1658,6 +1732,12 @@ const PRUEBAS = [
         'la etiqueta arranca en la columna': etiquetaEnColumna,
         'rechaza borde del botón sobre el texto': !rC14Borde.ok && /el borde del botón toca el texto del CTA/.test(rC14Borde.error ?? ''),
         'rechaza máscara vacía': gC14Vacia.code === 1 && /la máscara no marca ningún sujeto/.test(gC14Vacia.salida),
+        'rechaza voces pegadas': gC15Pegadas.code === 1 && /texto, botón y firma no se tocan: «entrada» y «dominante» a 0\.0 px/.test(gC15Pegadas.salida),
+        'el borde del contorno cuenta medio trazo': trazoEnVentana && gC15Trazo.code === 1 && /«nota» y «cta-boton» a/.test(gC15Trazo.salida),
+        'rechaza CTA fuera de la columna (canon nuevo)': gC15Columna.code === 1 && /el CTA arranca \d+ px .*fuera de la columna del texto/.test(gC15Columna.salida),
+        'rechaza losa de relleno por área': gC15Losa.code === 1 && /el CTA compite con el titular: .*para un CTA de relleno, 0\.7× el área/.test(gC15Losa.salida),
+        'mide el descriptor desde el texto del CTA': gC15Texto.code === 1 && /el descriptor queda lejos de su botón/.test(gC15Texto.salida),
+        'el origen heredado no certifica un compositor ajeno': gY1.code === 3 && /no es el compositor del repo/.test(gY1.salida),
         'el QA queda en qa-<plan>.json': qaPorPlan && bueno.ok && fs.existsSync(path.join(bueno.dir, 'out/qa-piezas.json')),
         'rechaza pieza sin firma declarada': gSinFirma.code !== 0 && /no declara firma/.test(gSinFirma.salida),
         'acepta la firma externa declarada y la mide': rExterna.ok && !/no declara firma/.test(gExterna.salida) && typeof rExterna.qa[0].contraste.firmaExterna === 'number',
