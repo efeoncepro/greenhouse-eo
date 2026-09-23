@@ -679,6 +679,30 @@ contraste sí frena.
   mutantes** (sin bloqueo, caché confiada, escribe antes, QA compartido, parcial que pisa, sin esquema, gate sin
   huellas, gate que acepta sin máscara, gate que ignora el nulo): **las nueve los detecta alguna prueba**.
 
+**Tramo 2 · Contraste real — cerrado (2026-09-23).**
+
+- **Contraste sobre el trazo, no sobre la caja.** El compositor rinde la capa de texto sola y compara cada píxel de
+  glifo (alfa ≥ 50 %) con SU fondo y con la tinta que realmente tiene; se exige el **1 % peor** ≥ umbral WCAG según el
+  tamaño en pantalla (`accesibilidad.voces[v].glifo`, con la `caja` exacta medida). El gate lo **bloquea**; la caja
+  sigue registrada para comparar. Caso fuente reproducido en P10: 01-fuera-916 al tamaño al que crecía antes (×1,48)
+  pasa en la caja y falla en el trazo.
+- **Crecer exige margen en el trazo:** umbral × 1,1, o lo que la voz ya tenía a ×1 (menos 0,05 de ruido). Medido:
+  01-fuera-916 ahora crece a ×1,42; las otras cuatro piezas de P04 no cambian.
+- **Zonas protegidas** (`protect: [{ box, reason }]`): objetos de la escena que el texto no tapa aunque no sean una
+  persona. Al crecer descartan el factor; a tamaño final, abortan.
+- **Borde del contorno de al menos 1 CSS px en un teléfono** (`max(2, ⌈ancho/390⌉)` px; el relleno conserva 2 px) y
+  medición del **anillo** en la pieza reducida a 390 CSS px × DPR 2: grosor en CSS px y contraste de la mediana del
+  trazo contra el peor fondo exterior. El gate bloquea < 1 CSS px o < 3:1.
+- **`auto` con degradación canónica:** antes del relleno prueba el contorno con tinta `inkOnDark` y el acento en el
+  borde (§10); si nada alcanza con margen, queda la que **más separa** (antes, siempre el relleno). Medido al
+  corregirlo: sobre gris oscuro con protanopía el relleno naranja **también** falla —la tinta oscura del botón cae a
+  ~3,6:1— y el motivo decía «se funde con la escena» aunque la separación era 5,76:1; ahora nombra la condición que
+  falló.
+- **P09 deja de verificarse a sí misma:** con `FOTO_EVIDENCIA=1` el compositor deja la capa de texto y el fondo, y la
+  prueba recalcula el 1 % peor del trazo con aritmética propia (27 voces, 0 desacuerdos) y mide el grosor del borde en
+  el PNG final; corre además las pruebas unitarias de los módulos puros.
+- **APCA y daltonismo del CTA siguen avisando, sin bloquear** (decisión pendiente 3).
+
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
 | Pilar | Hoy | Meta | Qué lo sube |

@@ -28,7 +28,7 @@ import { resolveCollaborationSelectionIntent } from '@efeoncepro/axis-ui-contrac
 import { renderCollaborationSelection } from '../../scripts/creative/layout-compiler/axis-advertising.mjs'
 import { compositeLuminosity } from '../../scripts/creative/layout-compiler/compiler.mjs'
 
-import { UMBRALES, hexARgb, medirContraColor, medirVoz, tamanoEnPantalla, textoAlternativo } from './accesibilidad.mjs'
+import { ANCHO_PANTALLA, DPR_REFERENCIA, UMBRALES, hexARgb, medirAnillo, medirContraColor, medirGlifos, medirVoz, tamanoEnPantalla, textoAlternativo } from './accesibilidad.mjs'
 import { ORDEN as ORDEN_VARIANTES, elegirVariante } from './cta-variantes.mjs'
 import { validarPiezaEsquema } from './cta-esquema.mjs'
 import { escribirAtomico, huellaComando, huellaPieza, rutaQa, sha, tomarBloqueo, versionPaquete } from './cta-integridad.mjs'
@@ -1015,11 +1015,11 @@ return k.ink.right - k.ink.left }))
       const caja={left:cx,top:cy,right:t0.box.right+padX,bottom:t0.box.bottom+padY};
       const escena=await sharp(plate).removeAlpha().raw().toBuffer();
       const acento=c.surfaceToken??'growthOnDark';
-      const e=elegirVariante({prominencia:c.prominencia??'delimitada',rgb:escena,ancho:W,alto:H,caja,cssPx:tamanoEnPantalla(c.fontSize,W),tokens:{acento:C[acento],tintaDeclarada:c.inkToken?C[c.inkToken]:null,tintaSobreRelleno:C.inkOnLight}});
-      const tokens=e.elegida==='solid'?{surfaceToken:acento,inkToken:'inkOnLight'}:e.elegida==='outline'?{surfaceToken:acento,inkToken:c.inkToken??acento}:{surfaceToken:acento,inkToken:acento};
+      const e=elegirVariante({prominencia:c.prominencia??'delimitada',rgb:escena,ancho:W,alto:H,caja,cssPx:tamanoEnPantalla(c.fontSize,W),tokens:{acento:C[acento],tintaDeclarada:c.inkToken?C[c.inkToken]:null,tintaSobreRelleno:C.inkOnLight,tintaSegura:C.inkOnDark}});
+      const tokens=e.elegida==='solid'?{surfaceToken:acento,inkToken:'inkOnLight'}:e.elegida==='outline'?{surfaceToken:acento,inkToken:e.degradada?'inkOnDark':(c.inkToken??acento)}:{surfaceToken:acento,inkToken:acento};
 
       c={...c,variant:e.elegida,...tokens};
-      ctaVariante={prominencia:s.cta.prominencia??'delimitada',elegida:e.elegida,escalo:e.escalo,motivo:e.motivo,...(e.sinMargen?{sinMargen:true}:{})};
+      ctaVariante={prominencia:s.cta.prominencia??'delimitada',elegida:e.elegida,escalo:e.escalo,motivo:e.motivo,...(e.degradada?{tintaDegradada:true}:{}),...(e.sinMargen?{sinMargen:true}:{})};
       ctaVarianteTokens=tokens;
       cx=xCta(c);
     }
@@ -1036,8 +1036,13 @@ return k.ink.right - k.ink.left }))
     const t=block({text:c.text,font:pop[700],size:c.fontSize,tracking:0,leading:1.2,x:cx+padX,topY:cy+padY,maxWidth:W*.65,fill:ink});
     const b={left:cx,top:cy,right:t.box.right+padX,bottom:t.box.bottom+padY};
 
-    if(outline)ctaBorde={box:b,L:hexLum(surfaceColor)};
-    if(solid||outline)body+=`<rect x="${b.left}" y="${b.top}" width="${b.right-b.left}" height="${b.bottom-b.top}" rx="${c.radius}" fill="${solid?surfaceColor:'none'}" stroke="${surfaceColor}" stroke-width="2"/>`;
+    // El borde del contorno mide al menos 1 CSS px en un teléfono (390 px de ancho): 2 px fijos en un lienzo de 1920
+    // eran 0,4 CSS px y se mezclaban con la escena (auditoría 2026-09-23, hallazgo 12). El relleno conserva su trazo
+    // de 2 px: ahí separa el relleno, no la línea.
+    const grosorBorde=outline?Math.max(2,Math.ceil(W/ANCHO_PANTALLA)):2;
+
+    if(outline)ctaBorde={box:b,L:hexLum(surfaceColor),radio:c.radius??0,grosor:grosorBorde};
+    if(solid||outline)body+=`<rect x="${b.left}" y="${b.top}" width="${b.right-b.left}" height="${b.bottom-b.top}" rx="${c.radius}" fill="${solid?surfaceColor:'none'}" stroke="${surfaceColor}" stroke-width="${grosorBorde}"/>`;
     body+=t.svg;
     // 🔴 En `solid` NO se mide la tinta contra la escena: bajo un relleno opaco ese número no
     // significa nada, y por eso existía `skipContrast`. Pero saltar el bloque entero dejaba la clave
@@ -1149,7 +1154,17 @@ return k.ink.right - k.ink.left }))
 
   const resuelta = ctaVariante && ctaVarianteTokens ? { elegida: ctaVariante.elegida, tokens: ctaVarianteTokens, qa: ctaVariante } : null
 
-  if (opts.dry && (violaDeclarada || hits.length || fuera || fueraDeZona.length)) return { ok: false, hits, resuelta }
+  // Zonas PROTEGIDAS (`protect`): objetos de la escena que el texto no tapa aunque no sean una persona —el canto
+  // iluminado de un monitor, un producto— (auditoría 2026-09-23, hallazgo 3). Mismo trato que el sujeto: al crecer
+  // se descarta el factor; a tamaño final, aborta.
+  const protegidas = (s.protect ?? []).flatMap(z => {
+    const zb = { left: z.box[0] * W, top: z.box[1] * H, right: z.box[2] * W, bottom: z.box[3] * H }
+
+    return [...checks.filter(c => GUARD_IDS.has(c.id)), ...guard].filter(c => c.box.left < zb.right && c.box.right > zb.left && c.box.top < zb.bottom && c.box.bottom > zb.top).map(c => `${c.id} tapa «${z.reason}»`)
+  })
+
+  if (opts.dry && (violaDeclarada || hits.length || fuera || fueraDeZona.length || protegidas.length)) return { ok: false, hits, resuelta }
+  if (protegidas.length) throw Error(`${s.id}: el texto tapa una zona protegida — ${[...new Set(protegidas)].join(', ')}. Mueve el texto o acota la zona.`)
   if (fueraDeZona.length) console.warn(`  ⚠ ${s.id}: fuera de la zona segura declarada${s.safeArea.profile ? ` (${s.safeArea.profile})` : ''}: ${[...new Set(fueraDeZona)].join(', ')}`)
   if (violaDeclarada) throw Error(`${s.id}: el descriptor invade \`subjectProtection\` (baja hasta ${Math.round(descriptorBox.bottom)} px; el límite es ${s.subjectProtection.top - s.subjectProtection.minClearance})`)
   if (hits.length) throw Error(`${s.id}: el texto tapa al sujeto — ${hits.map(h => `${h.id} (${h.px} px)`).join(', ')}. Sube el \`top\`, acorta el copy o regenera el plate con más reserva.`)
@@ -1169,6 +1184,10 @@ return k.ink.right - k.ink.left }))
     layers.push({ input: rounded, left: L, top: T })
   }
 
+  // Capa de TEXTO sola (RGBA): el cuerpo tal como se pinta, sin plate ni selección. Contra el fondo sin texto (`bare`)
+  // da el contraste de cada TRAZO (auditoría 2026-09-23, hallazgo 3: la caja promediaba el aire entre letras).
+  const capaTexto = async () => (await sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${defs}</defs>${body}</svg>`)).ensureAlpha().raw().toBuffer({ resolveWithObject: true })).data
+  const medirTrazos = (fondoRgb, texto) => Object.fromEntries(voces.filter(v => !v.limite && !v.sobreColor).map(v => [v.id, medirGlifos({ rgb: fondoRgb, texto, ancho: W, alto: H, caja: v.box, cssPx: tamanoEnPantalla(v.px, W), peso: v.peso })]))
   const underSvg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${defs}</defs>${under}${cardEl ? cardEl.svg.split('\n')[0] : ''}</svg>`)
   const bare = await sharp(baseBuf).composite([...layers, { input: underSvg, left: 0, top: 0 }]).png().toBuffer()
 
@@ -1184,7 +1203,11 @@ return k.ink.right - k.ink.left }))
     for (const c of checks) if (c.surfaceBox) contraste[`${c.id}_superficie_vs_escena`] = await contrastUnder(bare, c.surfaceBox, c.surfaceL)
     if (ctaBorde) contraste.cta_borde_vs_escena = await contrastUnder(bare, ctaBorde.box, ctaBorde.L)
 
-    return { ok: true, hits, contraste, resuelta }
+    // Y el TRAZO de cada voz (tramo 2): el crecimiento lo exige con margen, no sólo la caja.
+    const { data: fondoRgb } = await sharp(bare).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+    const glifos = Object.fromEntries(Object.entries(medirTrazos(fondoRgb, await capaTexto())).filter(([, m]) => m).map(([k, m]) => [k, { wcag: m.wcag, umbral: m.umbralWcag }]))
+
+    return { ok: true, hits, contraste, glifos, resuelta }
   }
 
   const top = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${defs}</defs>${body}${cardEl ? cardEl.svg.split('\n').slice(1).join('\n') : ''}${selection}</svg>`)
@@ -1277,12 +1300,15 @@ return k.ink.right - k.ink.left }))
   const accesibilidad = { voces: {} }
 
   for (const v of voces) {
-    accesibilidad.voces[v.id] = v.sobreColor
+    const m = v.sobreColor
       ? medirContraColor({ tinta: hexARgb(v.tinta), fondo: hexARgb(v.sobreColor), cssPx: tamanoEnPantalla(v.px, W), peso: v.peso, lineas: v.lineas })
       : medirVoz({
           rgb: bareRgb, ancho: W, alto: H, caja: v.box, tinta: hexARgb(v.tinta), daltonismo: Boolean(v.daltonismo),
           ...(v.limite ? { umbral: UMBRALES.essentialBoundaryContrast, apca: false } : { cssPx: tamanoEnPantalla(v.px, W), peso: v.peso, lineas: v.lineas })
         })
+
+    // `metodo` le dice al gate qué medición exigir: sobre el píxel (y su trazo), contra un color plano, o un límite.
+    accesibilidad.voces[v.id] = m && { ...m, metodo: v.sobreColor ? 'color' : v.limite ? 'limite' : 'pixel' }
   }
 
   // Una voz que no se pudo medir NO pasa por no tener dato (su caja no tiene píxeles dentro del lienzo). Antes el
@@ -1290,11 +1316,36 @@ return k.ink.right - k.ink.left }))
   const sinMedir = Object.entries(accesibilidad.voces).filter(([, m]) => !m).map(([id]) => id)
 
   if (sinMedir.length) throw new Error(`${s.id}: no se pudo medir ${sinMedir.map(v => `«${v}»`).join(', ')} — su caja no tiene píxeles dentro del lienzo`)
+
+  // El TRAZO de cada voz sobre el píxel (tramo 2). Una voz sin trazos visibles en su caja no pasa por no tener dato.
+  const texto = await capaTexto()
+
+  for (const [id, m] of Object.entries(medirTrazos(bareRgb, texto))) {
+    if (!m) throw new Error(`${s.id}: «${id}» no tiene trazos visibles en su caja — no se puede medir su contraste`)
+    const b = voces.find(v => v.id === id).box
+
+    // `caja`: el rango EXACTO de píxeles medido (el mismo redondeo que medirGlifos), para que un oráculo lo repita.
+    accesibilidad.voces[id].glifo = { ...m, caja: [Math.max(0, Math.floor(b.left)), Math.max(0, Math.floor(b.top)), Math.min(W, Math.ceil(b.right)), Math.min(H, Math.ceil(b.bottom))] }
+  }
+
+  // El BORDE del contorno como se ve en un teléfono: la pieza reducida a 390 CSS px × DPR 2 (tramo 2).
+  if (ctaBorde && accesibilidad.voces['cta-borde']) {
+    const k = (ANCHO_PANTALLA * DPR_REFERENCIA) / W
+    const [fin, fon] = await Promise.all([master, bare].map(b => sharp(b).resize({ width: Math.round(W * k) }).removeAlpha().raw().toBuffer({ resolveWithObject: true })))
+    const esc = b => ({ left: b.left * k, top: b.top * k, right: b.right * k, bottom: b.bottom * k })
+    const anillo = medirAnillo({ final: fin.data, fondo: fon.data, ancho: fin.info.width, alto: fin.info.height, caja: esc(ctaBorde.box), radio: ctaBorde.radio * k, grosor: ctaBorde.grosor * k })
+
+    if (!anillo) throw new Error(`${s.id}: no se pudo medir el borde del CTA en la vista de teléfono`)
+    accesibilidad.voces['cta-borde'].anillo = anillo
+  }
+
+  if (process.env.FOTO_EVIDENCIA === '1') salidas.push([`${s.id}-texto.png`, await sharp(texto, { raw: { width: W, height: H, channels: 4 } }).png().toBuffer()], [`${s.id}-fondo.png`, bare])
   const medidas = Object.values(accesibilidad.voces)
 
   accesibilidad.cumpleWcag = medidas.every(m => m.cumpleWcag)
   accesibilidad.cumpleApca = medidas.filter(m => m.cumpleApca != null).every(m => m.cumpleApca)
   accesibilidad.cumpleDaltonismo = medidas.filter(m => m.daltonismo).every(m => m.cumpleDaltonismo)
+  accesibilidad.cumpleTrazo = medidas.filter(m => m.glifo).every(m => m.glifo.cumpleWcag) && medidas.filter(m => m.anillo).every(m => m.anillo.cumpleWcag)
   accesibilidad.altText = textoAlternativo(s)
   accesibilidad.altTextEscena = Boolean(String(s.altText ?? '').trim())
   salidas.push([`${s.id}.alt.txt`, `${accesibilidad.altText}\n`])
@@ -1351,6 +1402,7 @@ function registrarQa(registro) {
 // prueba no es permiso.
 const GROW_CAP = 1.6
 const CONTRAST_FLOOR = 4.5
+const MARGEN_CRECER = 1.1
 
 // Zonas que la pieza declara como falso positivo de la segmentación (un afiche, una pantalla del fondo que el
 // modelo tomó por sujeto). Se apagan SÓLO para esta pieza, cada una con su razón, y quedan en el QA para
@@ -1435,7 +1487,13 @@ for (let s0 of trabajo) {
 
         // La tolerancia de 0,05 es para ruido de medición y nunca cruza el umbral: una voz que cumplía a ×1 no puede
         // quedar en 4,47 al crecer (hallado 2026-09-22 comparando \`auto\` con \`--variantes\`).
-        return Object.entries(base.contraste ?? {}).every(([k, v]) => (r.contraste[k] ?? 0) >= Math.min(v - 0.05, techo(k)))
+        const cajas = Object.entries(base.contraste ?? {}).every(([k, v]) => (r.contraste[k] ?? 0) >= Math.min(v - 0.05, techo(k)))
+
+        // El TRAZO, con margen (tramo 2): crecer mueve el texto sobre fondo nuevo, y una voz que queda justo en el umbral
+        // en el plate queda bajo él en la primera compresión de la red. Piso: umbral × 1,1, o lo que ya tenía a ×1.
+        const trazos = Object.entries(base.glifos ?? {}).every(([k, g]) => (r.glifos?.[k]?.wcag ?? 0) >= Math.min(g.wcag - 0.05, g.umbral * MARGEN_CRECER))
+
+        return cajas && trazos
       }
 
       const hi0 = Math.min(fill, GROW_CAP)

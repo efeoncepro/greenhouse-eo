@@ -197,6 +197,11 @@ export const esquemaPieza = z
       })
       .optional(),
     editorialReserve: z.object({ maxBottom: positivo, maxRight: positivo }).strict().optional(),
+    // Objetos de la escena que el texto no tapa aunque no sean una persona (el canto iluminado de un monitor, un
+    // producto). Cada zona en fracciones del lienzo y con su razón: queda en el plan para quien revise.
+    protect: z
+      .array(z.object({ box: caja, reason: razon }).strict().refine(z0 => z0.box[0] < z0.box[2] && z0.box[1] < z0.box[3], 'la zona necesita x0 < x1 e y0 < y1'))
+      .optional(),
     textGrowth: z.boolean().optional(),
     placement: z.object({ anchoCssPx: positivo, razon }).strict().optional(),
     conceptoReducido: z.object({ razon }).strict().optional(),

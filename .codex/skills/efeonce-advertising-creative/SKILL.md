@@ -227,8 +227,10 @@ contraste y protección de sujeto, no completitud del concepto ni geometría del
   escena no la permite, también con daltonismo. Registra `variantReason`. §17.
 - **Certificación adversarial del compositor (2026-09-23): se cierra en cinco tramos (§18).** Tramo 1 (integridad)
   cerrado: QA por plan con huellas, escritura atómica, bloqueo por carpeta, caché de máscaras verificada, esquema
-  declarativo y guarda de sujeto no desactivable. Lo que falta (contraste en el glifo, texto diminuto en 16:9,
-  firma sin contrato) está en §18: no presentes el gate como garantía total hasta cerrarlos.
+  declarativo y guarda de sujeto no desactivable. Tramo 2 (contraste real) cerrado: el contraste se mide en el
+  **trazo** (1 % peor de los píxeles de glifo), crecer exige margen ×1,1, `protect` para objetos de la escena, borde
+  del contorno ≥ 1 CSS px medido como se ve en el teléfono, y `auto` degrada la tinta del contorno antes de pasar al
+  relleno. Lo que falta (texto diminuto en 16:9, firma sin contrato, zonas seguras AXIS) está en §18.
 - **Un bloque centrado no se ancla lejos del centro.** Con `align: 'center'` y `|centerX − 0,5| > 0,15`, el
   compositor aborta: si el aire está a un costado, el bloque se alinea a ese costado (`align: 'left'`). Operador
   sobre 03-referencia-916: «se vería mejor alineada a la izquierda por la posición». §14.

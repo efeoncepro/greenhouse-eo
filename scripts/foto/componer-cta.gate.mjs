@@ -231,6 +231,36 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
       console.error(`✗ ${r.id}: «${voz}» mide ${m.wcag}:1 y necesita ${m.umbralWcag}:1 (WCAG 2.2 AA${m.cssPx == null ? ', límite no textual' : `, ${m.cssPx} px en pantalla`}).`)
       fallos++
     }
+
+    // 🔴 El TRAZO, no la caja [auditoría 2026-09-23, hallazgo 3]: en 01-fuera-916 la caja de «+ AEO» daba 4,53:1 y el
+    // 1 % peor del trazo, 2,4–3,1:1 sobre el canto de un monitor. En el formato actual la medición es obligatoria.
+    if (legado) continue
+
+    if (!m.metodo) {
+      console.error(`✗ ${r.id}: «${voz}» no dice cómo se midió (QA de una versión anterior del comando). Recompón.`)
+      fallos++
+      continue
+    }
+
+    if (m.metodo === 'pixel' && !m.glifo) {
+      console.error(`✗ ${r.id}: «${voz}» no trae la medición del trazo. Recompón con el comando vigente.`)
+      fallos++
+    } else if (m.metodo === 'pixel' && !m.glifo.cumpleWcag) {
+      console.error(
+        `✗ ${r.id}: «${voz}»: el 1 % peor del trazo mide ${m.glifo.wcag}:1 y necesita ${m.glifo.umbralWcag}:1 ` +
+          `(la caja da ${m.wcag}:1; ${m.glifo.pctBajoUmbral} % del trazo queda bajo el umbral). Mueve el texto, protege la zona con \`protect\` o regenera el plate.`
+      )
+      fallos++
+    }
+
+    // El borde del contorno como se ve en el teléfono (hallazgo 12): grosor ≥ 1 CSS px y anillo ≥ 3:1.
+    if (voz === 'cta-borde' && !m.anillo) {
+      console.error(`✗ ${r.id}: el borde del CTA no trae la medición del anillo en la vista de teléfono. Recompón.`)
+      fallos++
+    } else if (voz === 'cta-borde' && (!m.anillo.cumpleWcag || m.anillo.grosorCssPx < 1)) {
+      console.error(`✗ ${r.id}: en un teléfono el borde del CTA mide ${m.anillo.grosorCssPx} CSS px y ${m.anillo.wcag}:1 (necesita ≥ 1 CSS px y ${m.anillo.umbralWcag}:1): se mezcla con la escena.`)
+      fallos++
+    }
   }
 
   const medidas = Object.entries(a.voces).filter(([, m]) => m)

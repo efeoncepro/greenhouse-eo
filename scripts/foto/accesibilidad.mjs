@@ -211,6 +211,101 @@ export function medirContraColor({ tinta, fondo, cssPx, peso = 400, lineas = 1 }
   }
 }
 
+// ── Contraste sobre el TRAZO, no sobre la caja ───────────────────────────────────────────────────────
+// Auditoría 2026-09-23 (hallazgo 3): en 01-fuera-916 crecida, la caja de «+ AEO» medía 4,53:1 y el 1 % peor del
+// trazo, 2,4–3,1:1, sobre el canto iluminado de un monitor. La caja mezcla el aire entre letras con el fondo de los
+// glifos; lo que se lee es el trazo. Cada píxel de glifo se compara con SU fondo y con la tinta que realmente tiene
+// (una voz puede mezclar tintas: el acento dentro de la entrada), y se toma el 1 % peor.
+//   · `rgb`: el fondo SIN el texto (3 canales); `texto`: la capa de texto SOLA (RGBA), del mismo tamaño.
+//   · Un píxel es glifo si su alfa es ≥ 50 %: el borde suavizado se mezcla con el fondo y no es tinta.
+const LIN8 = Float64Array.from({ length: 256 }, (_, i) => lineal(i))
+const lum8 = (r, g, b) => 0.2126 * LIN8[r] + 0.7152 * LIN8[g] + 0.0722 * LIN8[b]
+
+export const PERCENTIL_TRAZO = 0.01
+
+export function medirGlifos({ rgb, texto, ancho, alto, caja, cssPx = null, peso = 400, umbral: umbralFijo = null }) {
+  const x0 = Math.max(0, Math.floor(caja.left))
+  const y0 = Math.max(0, Math.floor(caja.top))
+  const x1 = Math.min(ancho, Math.ceil(caja.right))
+  const y1 = Math.min(alto, Math.ceil(caja.bottom))
+  const umbral = umbralFijo ?? umbralWcag(cssPx, peso)
+  const razones = new Float64Array(Math.max(0, (x1 - x0) * (y1 - y0)))
+  let n = 0
+  let bajo = 0
+
+  for (let y = y0; y < y1; y++) {
+    for (let x = x0; x < x1; x++) {
+      const j = (y * ancho + x) * 4
+
+      if (texto[j + 3] < 128) continue
+      const i = (y * ancho + x) * 3
+      const r = razonWcag(lum8(texto[j], texto[j + 1], texto[j + 2]), lum8(rgb[i], rgb[i + 1], rgb[i + 2]))
+
+      razones[n++] = r
+      if (r < umbral) bajo++
+    }
+  }
+
+  if (!n) return null
+  const orden = razones.subarray(0, n).sort()
+  const wcag = orden[Math.min(n - 1, Math.floor(n * PERCENTIL_TRAZO))]
+
+  return { wcag: +wcag.toFixed(2), umbralWcag: umbral, cumpleWcag: wcag >= umbral, pctBajoUmbral: +((bajo * 100) / n).toFixed(2), pixeles: n }
+}
+
+// ── El borde del botón como se VE en el teléfono ─────────────────────────────────────────────────────
+// Auditoría 2026-09-23 (hallazgo 12): un borde de 2 px en un lienzo de 1920 mide 0,4 CSS px en un teléfono y se
+// mezcla con la escena: 2,5–2,9:1 efectivos en 16:9 a DPR 2 mientras la caja reportaba más de 3:1. Se mide el
+// ANILLO en la pieza reducida a 390 CSS px × DPR 2 —la luminancia mediana del trazo tal como quedó al reducir—
+// contra el peor fondo de una franja exterior. Sólo los tramos rectos: la esquina redondeada mezcla dos lados.
+//   · `final`/`fondo`: RGB (3 canales) de la pieza y de su fondo sin texto, ya reducidos, del mismo tamaño.
+//   · `caja`, `radio` y `grosor` en px de la imagen reducida.
+export const DPR_REFERENCIA = 2
+
+export function medirAnillo({ final, fondo, ancho, alto, caja, radio = 0, grosor }) {
+  const mitad = Math.max(0.5, grosor / 2)
+  const trazo = []
+  const exterior = []
+  const lumEn = (buf, x, y) => (x < 0 || y < 0 || x >= ancho || y >= alto ? null : lum8(buf[(y * ancho + x) * 3], buf[(y * ancho + x) * 3 + 1], buf[(y * ancho + x) * 3 + 2]))
+
+  const tramo = (borde, desde, hasta, signo, horizontal) => {
+    const filas = []
+
+    for (let k = Math.floor(borde - mitad - 1); k <= Math.ceil(borde + mitad + 1); k++) if (Math.abs(k + 0.5 - borde) <= mitad) filas.push(k)
+    if (!filas.length) filas.push(Math.floor(borde))
+
+    for (let t = Math.ceil(desde); t < Math.floor(hasta); t++) {
+      for (const k of filas) {
+        const l = horizontal ? lumEn(final, t, k) : lumEn(final, k, t)
+
+        if (l != null) trazo.push(l)
+      }
+
+      for (let d = Math.ceil(mitad + 1); d <= Math.ceil(mitad + 4); d++) {
+        const k = Math.floor(borde + signo * d)
+        const l = horizontal ? lumEn(fondo, t, k) : lumEn(fondo, k, t)
+
+        if (l != null) exterior.push(l)
+      }
+    }
+  }
+
+  tramo(caja.top, caja.left + radio, caja.right - radio, -1, true)
+  tramo(caja.bottom, caja.left + radio, caja.right - radio, 1, true)
+  tramo(caja.left, caja.top + radio, caja.bottom - radio, -1, false)
+  tramo(caja.right, caja.top + radio, caja.bottom - radio, 1, false)
+  if (!trazo.length || !exterior.length) return null
+  const orden = arr => Float64Array.from(arr).sort()
+  const t = orden(trazo)
+  const e = orden(exterior)
+  const p = (arr, q) => arr[Math.min(arr.length - 1, Math.floor(arr.length * q))]
+  const lTrazo = p(t, 0.5)
+  const wcag = Math.min(razonWcag(lTrazo, p(e, 0.98)), razonWcag(lTrazo, p(e, 0.02)))
+  const umbral = UMBRALES.essentialBoundaryContrast
+
+  return { wcag: +wcag.toFixed(2), umbralWcag: umbral, cumpleWcag: wcag >= umbral, grosorCssPx: +(grosor / DPR_REFERENCIA).toFixed(2) }
+}
+
 // ── Texto alternativo ────────────────────────────────────────────────────────────────────────────────
 // WCAG 1.1.1 + 1.4.5: una pieza publicitaria es una imagen de texto, así que su alternativa lleva TODO el texto
 // visible, en orden de lectura, además de la descripción de la escena si el plan la trae.

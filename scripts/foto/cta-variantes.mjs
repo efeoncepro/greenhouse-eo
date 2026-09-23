@@ -53,8 +53,17 @@ export function evaluarVariante(variante, { rgb, ancho, alto, caja, cssPx, color
     const separacion = Math.min(...bordes.map(m => m.wcag))
     const separacionDalt = Math.min(...bordes.map(peorDaltonismo))
     const viable = texto.wcag >= umbral && peorDaltonismo(texto) >= umbral && separacion >= limite * MARGEN && separacionDalt >= limite
+    const margen = Math.min(texto.wcag / umbral, peorDaltonismo(texto) / umbral, separacion / limite, separacionDalt / limite)
 
-    return { variante, viable, texto: texto.wcag, separacion, motivo: viable ? `relleno ${separacion}:1 contra la escena y tinta ${texto.wcag}:1 sobre el relleno` : `el relleno se funde con la escena (${separacion}:1 < ${+(limite * MARGEN).toFixed(2)}:1)` }
+    // El motivo nombra la condición que falló: antes decía siempre «se funde con la escena», también cuando lo que
+    // caía era la tinta sobre el relleno (medido 2026-09-23: naranja con protanopía, 5,76:1 de separación y el texto
+    // del botón bajo 4,5:1).
+    const falla = texto.wcag < umbral ? `la tinta sobre el relleno mide ${texto.wcag}:1 (< ${umbral}:1)`
+      : peorDaltonismo(texto) < umbral ? `con daltonismo la tinta sobre el relleno cae a ${+peorDaltonismo(texto).toFixed(2)}:1 (< ${umbral}:1)`
+        : separacion < limite * MARGEN ? `el relleno se funde con la escena (${separacion}:1 < ${+(limite * MARGEN).toFixed(2)}:1)`
+          : `con daltonismo el relleno se funde con la escena (${+separacionDalt.toFixed(2)}:1 < ${limite}:1)`
+
+    return { variante, viable, margen: +margen.toFixed(3), texto: texto.wcag, separacion, motivo: viable ? `relleno ${separacion}:1 contra la escena y tinta ${texto.wcag}:1 sobre el relleno` : falla }
   }
 
   const texto = medir(caja, colores.tinta, { cssPx, peso: 700, daltonismo: true })
@@ -62,32 +71,51 @@ export function evaluarVariante(variante, { rgb, ancho, alto, caja, cssPx, color
 
   if (variante === 'text') {
     const viable = texto.wcag >= umbral * MARGEN && texto.pctBajoUmbral === 0 && textoDalt >= umbral
+    const margen = Math.min(texto.wcag / umbral, textoDalt / umbral)
 
-    return { variante, viable, texto: texto.wcag, daltonismo: textoDalt, motivo: viable ? `el fondo permite distinguirla: tinta ${texto.wcag}:1 (${textoDalt}:1 con daltonismo) y ningún píxel bajo ${umbral}:1` : textoDalt < umbral && texto.wcag >= umbral * MARGEN ? `con daltonismo la tinta cae a ${textoDalt}:1 (< ${umbral}:1)` : `el fondo no la sostiene sola (${texto.wcag}:1, ${texto.pctBajoUmbral} % del área bajo ${umbral}:1)` }
+    return { variante, viable, margen: +margen.toFixed(3), texto: texto.wcag, daltonismo: textoDalt, motivo: viable ? `el fondo permite distinguirla: tinta ${texto.wcag}:1 (${textoDalt}:1 con daltonismo) y ningún píxel bajo ${umbral}:1` : textoDalt < umbral && texto.wcag >= umbral * MARGEN ? `con daltonismo la tinta cae a ${textoDalt}:1 (< ${umbral}:1)` : `el fondo no la sostiene sola (${texto.wcag}:1, ${texto.pctBajoUmbral} % del área bajo ${umbral}:1)` }
   }
 
   const bordes = franja(caja).map(b => medir(b, colores.borde, { umbral: limite, apca: false, daltonismo: true })).filter(Boolean)
   const borde = Math.min(...bordes.map(m => m.wcag))
   const bordeDalt = Math.min(...bordes.map(peorDaltonismo))
   const viable = texto.wcag >= umbral * MARGEN && texto.pctBajoUmbral === 0 && textoDalt >= umbral && borde >= limite * MARGEN && bordeDalt >= limite
+  const margen = Math.min(texto.wcag / umbral, textoDalt / umbral, borde / limite, bordeDalt / limite)
 
-  return { variante, viable, texto: texto.wcag, borde, daltonismo: Math.min(textoDalt, bordeDalt), motivo: viable ? `tinta ${texto.wcag}:1 y borde ${borde}:1 contra la escena (con daltonismo ≥ ${+Math.min(textoDalt, bordeDalt).toFixed(2)}:1)` : `no delimita con seguridad (tinta ${texto.wcag}:1, borde ${borde}:1, daltonismo ${+Math.min(textoDalt, bordeDalt).toFixed(2)}:1)` }
+  return { variante, viable, margen: +margen.toFixed(3), texto: texto.wcag, borde, daltonismo: Math.min(textoDalt, bordeDalt), motivo: viable ? `tinta ${texto.wcag}:1 y borde ${borde}:1 contra la escena (con daltonismo ≥ ${+Math.min(textoDalt, bordeDalt).toFixed(2)}:1)` : `no delimita con seguridad (tinta ${texto.wcag}:1, borde ${borde}:1, daltonismo ${+Math.min(textoDalt, bordeDalt).toFixed(2)}:1)` }
 }
 
 // Parte de la variante que pide la intención y escala hacia la que separa más hasta encontrar una legible.
+//
+// Degradación canónica (auditoría 2026-09-23, hallazgo 11; canon §10 del compositor): antes de pasar del contorno al
+// relleno se prueba el MISMO contorno con la tinta en blanco (`inkOnDark`) y el acento en el borde. Es lo que hizo a
+// mano «Sé la referencia»: la tinta se degrada, el acento se conserva en su portador. En `text` no se degrada: ahí
+// la tinta ES el portador del acento y un CTA de texto blanco no lleva ninguno.
+//
+// Si ninguna alcanza con margen, queda la que MÁS separa (antes era siempre el relleno, aunque separara menos).
 export function elegirVariante({ prominencia = 'delimitada', ...medicion }) {
   const inicial = PROMINENCIA[prominencia]
 
   if (!inicial) throw new Error(`prominencia desconocida: ${prominencia} (discreta | delimitada | destacada)`)
   const evaluadas = []
+  const tintaSegura = medicion.tokens?.tintaSegura
 
   for (const v of ORDEN.slice(ORDEN.indexOf(inicial))) {
-    const e = evaluarVariante(v, { ...medicion, colores: coloresDe(v, medicion.tokens) })
+    const colores = coloresDe(v, medicion.tokens)
+    const intentos = [{ colores, degradada: false }]
 
-    evaluadas.push(e)
-    if (e.viable) return { elegida: v, escalo: v !== inicial, motivo: `${prominencia} → ${v}: ${e.motivo}`, evaluadas }
+    if (v === 'outline' && tintaSegura && tintaSegura !== colores.tinta) intentos.push({ colores: { ...colores, tinta: tintaSegura }, degradada: true })
+
+    for (const intento of intentos) {
+      const e = { ...evaluarVariante(v, { ...medicion, colores: intento.colores }), degradada: intento.degradada }
+
+      evaluadas.push(e)
+      if (e.viable) return { elegida: v, degradada: e.degradada, escalo: v !== inicial, motivo: `${prominencia} → ${v}${e.degradada ? ' (tinta blanca, acento en el borde)' : ''}: ${e.motivo}`, evaluadas }
+    }
   }
 
-  // Ninguna alcanza con margen: queda la que más separa y el gate decide con los umbrales exactos.
-  return { elegida: 'solid', escalo: inicial !== 'solid', motivo: `${prominencia} → solid sin margen: ${evaluadas.at(-1).motivo}`, evaluadas, sinMargen: true }
+  // Empate: gana la más prominente (la última evaluada), que es la dirección en que el canon permite moverse.
+  const mejor = evaluadas.reduce((a, b) => (b.margen >= a.margen ? b : a))
+
+  return { elegida: mejor.variante, degradada: mejor.degradada, escalo: mejor.variante !== inicial, motivo: `${prominencia} → ${mejor.variante} sin margen (la que más separa): ${mejor.motivo}`, evaluadas, sinMargen: true }
 }

@@ -257,9 +257,12 @@ const PRUEBAS = [
         const techo = v => (/superficie|relleno|borde/.test(v) ? 3 : 4.5)
         const peores = Object.entries(base).filter(([v, x]) => (c.qa.contraste[v] ?? 0) < Math.min(x, techo(v)) - 0.05)
         const fijaEsUno = r.qa[0].escala === 1
+        // Tramo 2: el TRAZO de cada voz, con margen — umbral × 1,1 o lo que ya tenía a ×1 (menos 0,05 de ruido).
+        const trazoBase = Object.entries(r.qa[0].accesibilidad?.voces ?? {}).filter(([, m]) => m?.glifo)
+        const trazoPeor = trazoBase.filter(([v, m]) => (c.qa.accesibilidad?.voces?.[v]?.glifo?.wcag ?? 0) < Math.min(m.glifo.wcag - 0.05, m.glifo.umbralWcag * 1.1) - 0.01)
 
-        ok &&= !peores.length && fijaEsUno
-        filas.push(`${c.id} ×${c.qa.escala.toFixed(2)}: ${peores.length ? `✗ ${peores.map(([v, x]) => `${v} ${x}→${c.qa.contraste[v]}`).join(', ')}` : '✓'}${fijaEsUno ? '' : ' (textGrowth:false no congeló)'}`)
+        ok &&= !peores.length && fijaEsUno && trazoBase.length > 0 && !trazoPeor.length
+        filas.push(`${c.id} ×${c.qa.escala.toFixed(2)}: ${peores.length || trazoPeor.length ? `✗ ${[...peores.map(([v, x]) => `${v} ${x}→${c.qa.contraste[v]}`), ...trazoPeor.map(([v, m]) => `trazo ${v} ${m.glifo.wcag}→${c.qa.accesibilidad.voces[v].glifo.wcag}`)].join(', ')}` : '✓'}${fijaEsUno ? '' : ' (textGrowth:false no congeló)'}${trazoBase.length ? '' : ' (sin medición del trazo)'}`)
       }
 
       if (!Object.keys(crecidas).length) return { ok: false, detalle: 'depende de P04' }
@@ -301,7 +304,14 @@ const PRUEBAS = [
         return p
       }
 
-      const [original, alineada, choca, cabe] = await Promise.all([componer('P06-eje', [pieza('ref_916')]), componer('P06-izquierda', [izquierda]), componer('P06-choque', [conIA('top-end')]), componer('P06-cabe', [conIA('bottom-end')])])
+      // Zona protegida (tramo 2): un objeto de la escena que el texto no puede tapar aunque no sea una persona.
+      const protegida = pieza('mo2_916')
+
+      protegida.textGrowth = false
+      protegida.protect = [{ box: [0, 0, 1, 0.5], reason: 'prueba: toda la mitad superior protegida' }]
+
+      const [original, alineada, choca, cabe, tapaZona] = await Promise.all([componer('P06-eje', [pieza('ref_916')]), componer('P06-izquierda', [izquierda]), componer('P06-choque', [conIA('top-end')]), componer('P06-cabe', [conIA('bottom-end')]), componer('P06-protect', [protegida])])
+      const protegeZona = !tapaZona.ok && /zona protegida/.test(tapaZona.error)
       const choqueRechazado = !choca.ok && /tapa «nota»/.test(choca.error)
       const ejeRechazado = !original.ok && /eje corrido/.test(original.error)
       let margen = false
@@ -312,7 +322,7 @@ const PRUEBAS = [
         margen = Math.min(...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.left)) >= izquierda.safeArea.x0 * L.canvas.width - 0.5
       }
 
-      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok, detalle: `${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok}` }
+      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona, detalle: `${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona}` }
     }
   },
   {
@@ -436,6 +446,84 @@ const PRUEBAS = [
         if (faltan.length) incompletas.push(`${id}: ${faltan.join(' / ')}`)
       }
 
+      // Hallazgos del TRAZO en las piezas del repo: se reportan, no hacen fallar la prueba — son de las piezas, no del
+      // comando (el gate las rechaza). Lo que esta prueba exige es que la medición sea correcta.
+      const trazos = fuentes.flatMap(([id, q]) => Object.entries(q.accesibilidad?.voces ?? {}).filter(([, m]) => m?.glifo && !m.glifo.cumpleWcag).map(([v, m]) => `${id}:${v} ${m.glifo.wcag}<${m.glifo.umbralWcag}`))
+
+      fs.writeFileSync(path.join(TMP, 'P09-trazos-bajo-umbral.json'), JSON.stringify(trazos, null, 2))
+
+      // ORÁCULO INDEPENDIENTE (tramo 2; hallazgo 16: P09 se verificaba a sí misma). Con FOTO_EVIDENCIA=1 el compositor
+      // deja la capa de texto sola y el fondo sin texto; aquí se recalcula, con aritmética propia de WCAG, el 1 % peor
+      // del trazo de cada voz, y se mide en el PNG final el grosor del borde del contorno.
+      const evid = await componer('P09-evidencia', ['mo2_916', 'mo1_169', 'fue_916', 'p1_45', 'rec_916'].map(pieza), [], { FOTO_EVIDENCIA: '1' })
+
+      const lin = c => {
+        const v = c / 255
+
+        return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+      }
+
+      const lumO = (r, g, b) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+      const razon = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
+      const desacuerdos = []
+      const delgados = []
+      let vocesOraculo = 0
+      let bordes = 0
+
+      for (const q of evid.ok ? evid.qa : []) {
+        const tx = await sharp(path.join(evid.dir, 'out', `${q.id}-texto.png`)).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+        const fo = await sharp(path.join(evid.dir, 'out', `${q.id}-fondo.png`)).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+        const ancho = tx.info.width
+
+        for (const [voz, m] of Object.entries(q.accesibilidad.voces)) {
+          if (!m?.glifo) continue
+          const [l, t, r, b] = m.glifo.caja
+          const rs = []
+
+          for (let y = t; y < b; y++) {
+            for (let x = l; x < r; x++) {
+              const j = (y * ancho + x) * 4
+
+              if (tx.data[j + 3] < 128) continue
+              const i = (y * ancho + x) * 3
+
+              rs.push(razon(lumO(tx.data[j], tx.data[j + 1], tx.data[j + 2]), lumO(fo.data[i], fo.data[i + 1], fo.data[i + 2])))
+            }
+          }
+
+          rs.sort((a, b2) => a - b2)
+          const p1 = rs[Math.min(rs.length - 1, Math.floor(rs.length * 0.01))]
+
+          vocesOraculo++
+          if (!rs.length || Math.abs(p1 - m.glifo.wcag) > 0.011) desacuerdos.push(`${q.id}:${voz} QA ${m.glifo.wcag} · oráculo ${p1?.toFixed(3)}`)
+        }
+
+        if (!q.accesibilidad.voces['cta-borde']) continue
+        // Grosor del borde en el PNG final: filas cuyo color está a menos de 60 del color del borde, en el centro del
+        // tramo superior. Se lleva a CSS px de un teléfono de 390 px de ancho.
+        const E = leer(evid.dir, `${q.id}-cta-evidence.json`)
+        const L = leer(evid.dir, `${q.id}-layout.json`)
+        const png = await sharp(path.join(evid.dir, 'out', `${q.id}.png`)).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+        const k = png.info.width / L.canvas.width
+        const [br, bg, bb] = [1, 3, 5].map(i => parseInt(E.colors.surface.slice(i, i + 2), 16))
+        const cx = Math.round(((E.surface.left + E.surface.right) / 2) * k)
+        let filas = 0
+
+        for (let y = Math.floor((E.surface.top - 12) * k); y <= Math.ceil((E.surface.top + 12) * k); y++) {
+          const i = (y * png.info.width + cx) * 3
+
+          if (Math.max(Math.abs(png.data[i] - br), Math.abs(png.data[i + 1] - bg), Math.abs(png.data[i + 2] - bb)) <= 60) filas++
+        }
+
+        const css = (filas * 390) / png.info.width
+
+        bordes++
+        if (css < 0.95 || !q.accesibilidad.voces['cta-borde'].anillo) delgados.push(`${q.id} ${css.toFixed(2)} CSS px${q.accesibilidad.voces['cta-borde'].anillo ? '' : ' (sin anillo en el QA)'}`)
+      }
+
+      // Las pruebas unitarias de los módulos puros (WCAG, APCA, Machado, variantes) también son parte de esta prueba.
+      const unitarias = await run(process.execPath, ['--test', 'scripts/foto/accesibilidad.test.mjs', 'scripts/foto/cta-variantes.test.mjs'], { cwd: ROOT }).then(() => true, () => false)
+
       // Y la herramienta de reporte corre sobre un plan compuesto y deja las vistas de daltonismo.
       const plan = crecidas.mo2_916 && path.join(crecidas.mo2_916.dir, 'piezas.json')
       let reporte = false
@@ -446,8 +534,8 @@ const PRUEBAS = [
       }
 
       return {
-        ok: fuentes.length > 0 && !fallas.length && !incompletas.length && reporte,
-        detalle: `${fuentes.length} piezas · voces bajo WCAG AA: ${fallas.length}${fallas.length ? ` (${fallas.slice(0, 4).join(', ')})` : ''} · alternativas incompletas: ${incompletas.length}${incompletas.length ? ` (${incompletas.slice(0, 3).join('; ')})` : ''} · avisos APCA/daltonismo: ${avisos} · reporte y vistas de daltonismo: ${reporte}`,
+        ok: fuentes.length > 0 && !fallas.length && !incompletas.length && reporte && evid.ok && vocesOraculo > 0 && !desacuerdos.length && bordes > 0 && !delgados.length && unitarias,
+        detalle: `${fuentes.length} piezas · voces bajo WCAG AA: ${fallas.length}${fallas.length ? ` (${fallas.slice(0, 4).join(', ')})` : ''} · alternativas incompletas: ${incompletas.length}${incompletas.length ? ` (${incompletas.slice(0, 3).join('; ')})` : ''} · avisos APCA/daltonismo: ${avisos} · reporte y vistas de daltonismo: ${reporte} · oráculo del trazo: ${evid.ok ? `${vocesOraculo} voces, ${desacuerdos.length} desacuerdos${desacuerdos.length ? ` (${desacuerdos.slice(0, 3).join('; ')})` : ''}` : `no compuso (${evid.error})`} · bordes ≥ 1 CSS px: ${bordes - delgados.length}/${bordes}${delgados.length ? ` (${delgados.join(', ')})` : ''} · unitarias: ${unitarias} · piezas del repo con trazo bajo umbral: ${trazos.length}`,
         evidencia: plan && path.join(crecidas.mo2_916.dir, 'out/accesibilidad/reporte.md')
       }
     }
@@ -520,6 +608,20 @@ const PRUEBAS = [
       const gNulo = await editarQa(r => { r.accesibilidad.voces.cta = null })
       const gSinHuellas = await editarQa(r => { delete r.huellas })
 
+      const gTrazo = await editarQa(r => {
+        const v = Object.values(r.accesibilidad.voces).find(m => m?.glifo)
+
+        Object.assign(v.glifo, { wcag: 2.1, cumpleWcag: false })
+      })
+
+      const gSinMetodo = await editarQa(r => { for (const m of Object.values(r.accesibilidad.voces)) if (m) delete m.metodo })
+
+      const gAnillo = await editarQa(r => {
+        const b = r.accesibilidad.voces['cta-borde']
+
+        if (b?.anillo) Object.assign(b.anillo, { wcag: 1.8, cumpleWcag: false })
+      })
+
       fs.renameSync(archivo('out/qa-piezas.json'), archivo('out/qa.json'))
       const gLegado = await gate(h.planPath)
 
@@ -546,6 +648,21 @@ const PRUEBAS = [
       fs.writeFileSync(path.join(dirC, 'piezas.json'), JSON.stringify([pieza('b2_916')], null, 2))
       const correr = () => run(process.execPath, [COMPOSITOR, path.join(dirC, 'piezas.json')], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 }).then(() => 'ok', e => String(e.stderr ?? '') + String(e.stdout ?? ''))
       const concurrentes = await Promise.all([correr(), correr()])
+
+      // 01-fuera-916 al tamaño al que la hacía crecer el compositor anterior (×1.48, medido el 2026-09-23 en P04 sobre
+      // 27eb6bc08): la caja de sus voces pasa y el trazo, no (hallazgo 3). El gate tiene que rechazarla.
+      const vieja = pieza('fue_916')
+      const f = 1.48
+      const px = v => (typeof v === 'number' ? Math.round(v * f) : v)
+
+      vieja.textGrowth = false
+      if (vieja.lead && vieja.leadSize == null) vieja.leadSize = 70
+      if (vieja.after && vieja.afterSize == null) vieja.afterSize = 74
+      for (const k of ['leadSize', 'dominantSize', 'afterSize', 'labelSize']) vieja[k] = px(vieja[k])
+      if (vieja.note) for (const k of ['size', 'gapAfterClosure']) vieja.note[k] = px(vieja.note[k])
+      for (const k of ['fontSize', 'descriptorSize', 'paddingX', 'paddingY', 'radius', 'descriptorGap', 'gapAfterNote']) vieja.cta[k] = px(vieja.cta[k])
+      const crecida = await componer('P10-trazo-real', [vieja])
+      const gCrecida = crecida.ok ? await gate(crecida.planPath) : { code: -1, salida: crecida.error }
 
       const sinAcento = await componer('P10-sin-acento', [pieza('ref_169')])
       const gSinAcento = await gate(sinAcento.planPath)
@@ -589,6 +706,10 @@ const PRUEBAS = [
         'rechaza sin máscara': gSinMascara.code !== 0 && /segmentación del sujeto no corrió/.test(gSinMascara.salida),
         'rechaza medición ausente': gNulo.code !== 0 && /no tiene medición/.test(gNulo.salida),
         'rechaza QA sin huellas': gSinHuellas.code !== 0 && /no trae huellas/.test(gSinHuellas.salida),
+        'rechaza trazo bajo umbral': gTrazo.code !== 0 && /1 % peor del trazo/.test(gTrazo.salida),
+        'rechaza QA sin método de medición': gSinMetodo.code !== 0 && /no dice cómo se midió/.test(gSinMetodo.salida),
+        'rechaza borde que se mezcla en el teléfono': gAnillo.code !== 0 && /borde del CTA mide/.test(gAnillo.salida),
+        'rechaza 01-fuera-916 al tamaño anterior (caja pasa, trazo no)': gCrecida.code !== 0 && /1 % peor del trazo/.test(gCrecida.salida),
         'avisa formato anterior': /no puede certificarlo/.test(gLegado.salida),
         'rechaza composición concurrente': concurrentes.filter(x => x === 'ok').length === 1 && concurrentes.some(x => /otra composición usa/.test(x)),
         'rechaza CTA sin acento': gSinAcento.code !== 0 && /no es un acento/.test(gSinAcento.salida),
