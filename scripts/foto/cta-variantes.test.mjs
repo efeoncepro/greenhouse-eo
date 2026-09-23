@@ -59,3 +59,15 @@ test('El contorno exige tinta Y borde legibles', () => {
   assert.equal(e.viable, false)
   assert.ok(typeof e.borde === 'number')
 })
+
+test('Naranja como tinta sobre un gris oscuro de foto: con protanopía no alcanza y se escala al relleno', () => {
+  // Sobre negro casi puro el naranja SÍ se lee con protanopía (4,98:1); el caso real es el gris oscuro de las fotos,
+  // donde pasa WCAG con margen en visión típica (~5,7:1) y cae bajo 4,5:1 con protanopía.
+  const grisFoto = escena(() => [28, 28, 30])
+  const naranja = { acento: C.accentSurface, tintaDeclarada: null, tintaSobreRelleno: C.inkOnLight }
+  const r = elegirVariante({ prominencia: 'discreta', rgb: grisFoto, ancho, alto, caja, cssPx: 12, tokens: naranja })
+
+  assert.equal(r.elegida, 'solid', r.motivo)
+  assert.match(r.evaluadas[0].motivo, /daltonismo/)
+})
+

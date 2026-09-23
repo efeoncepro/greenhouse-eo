@@ -21,6 +21,11 @@ export const PROMINENCIA = { discreta: 'text', delimitada: 'outline', destacada:
 // Margen sobre el umbral: una variante que pasa raspando en el plate pasa raspando en cada compresión de la red.
 export const MARGEN = 1.1
 
+// Una variante sólo es viable si también se lee con daltonismo (Machado 2009, severidad 1): medido en el repo, el
+// naranja como TINTA sobre oscuro cae a ~3,6:1 con protanopía aunque pase WCAG en visión típica. En ese caso la
+// variante que se lee es la que lleva el naranja como RELLENO con tinta oscura encima.
+const peorDaltonismo = m => (m?.daltonismo ? Math.min(...Object.values(m.daltonismo)) : Infinity)
+
 // Colores de cada variante a partir de los tokens de la pieza (el acento es el mismo; cambia quién lo porta).
 export function coloresDe(variante, { acento, tintaDeclarada, tintaSobreRelleno }) {
   if (variante === 'solid') return { tinta: tintaSobreRelleno, relleno: acento }
@@ -44,26 +49,29 @@ export function evaluarVariante(variante, { rgb, ancho, alto, caja, cssPx, color
 
   if (variante === 'solid') {
     const texto = medirContraColor({ tinta: hexARgb(colores.tinta), fondo: hexARgb(colores.relleno), cssPx, peso: 700 })
-    const bordes = franja(caja).map(b => medir(b, colores.relleno, { umbral: limite, apca: false })).filter(Boolean)
+    const bordes = franja(caja).map(b => medir(b, colores.relleno, { umbral: limite, apca: false, daltonismo: true })).filter(Boolean)
     const separacion = Math.min(...bordes.map(m => m.wcag))
-    const viable = texto.wcag >= umbral && separacion >= limite * MARGEN
+    const separacionDalt = Math.min(...bordes.map(peorDaltonismo))
+    const viable = texto.wcag >= umbral && peorDaltonismo(texto) >= umbral && separacion >= limite * MARGEN && separacionDalt >= limite
 
     return { variante, viable, texto: texto.wcag, separacion, motivo: viable ? `relleno ${separacion}:1 contra la escena y tinta ${texto.wcag}:1 sobre el relleno` : `el relleno se funde con la escena (${separacion}:1 < ${+(limite * MARGEN).toFixed(2)}:1)` }
   }
 
-  const texto = medir(caja, colores.tinta, { cssPx, peso: 700 })
+  const texto = medir(caja, colores.tinta, { cssPx, peso: 700, daltonismo: true })
+  const textoDalt = peorDaltonismo(texto)
 
   if (variante === 'text') {
-    const viable = texto.wcag >= umbral * MARGEN && texto.pctBajoUmbral === 0
+    const viable = texto.wcag >= umbral * MARGEN && texto.pctBajoUmbral === 0 && textoDalt >= umbral
 
-    return { variante, viable, texto: texto.wcag, motivo: viable ? `el fondo permite distinguirla: tinta ${texto.wcag}:1 y ningún píxel bajo ${umbral}:1` : `el fondo no la sostiene sola (${texto.wcag}:1, ${texto.pctBajoUmbral} % del área bajo ${umbral}:1)` }
+    return { variante, viable, texto: texto.wcag, daltonismo: textoDalt, motivo: viable ? `el fondo permite distinguirla: tinta ${texto.wcag}:1 (${textoDalt}:1 con daltonismo) y ningún píxel bajo ${umbral}:1` : textoDalt < umbral && texto.wcag >= umbral * MARGEN ? `con daltonismo la tinta cae a ${textoDalt}:1 (< ${umbral}:1)` : `el fondo no la sostiene sola (${texto.wcag}:1, ${texto.pctBajoUmbral} % del área bajo ${umbral}:1)` }
   }
 
-  const bordes = franja(caja).map(b => medir(b, colores.borde, { umbral: limite, apca: false })).filter(Boolean)
+  const bordes = franja(caja).map(b => medir(b, colores.borde, { umbral: limite, apca: false, daltonismo: true })).filter(Boolean)
   const borde = Math.min(...bordes.map(m => m.wcag))
-  const viable = texto.wcag >= umbral * MARGEN && texto.pctBajoUmbral === 0 && borde >= limite * MARGEN
+  const bordeDalt = Math.min(...bordes.map(peorDaltonismo))
+  const viable = texto.wcag >= umbral * MARGEN && texto.pctBajoUmbral === 0 && textoDalt >= umbral && borde >= limite * MARGEN && bordeDalt >= limite
 
-  return { variante, viable, texto: texto.wcag, borde, motivo: viable ? `tinta ${texto.wcag}:1 y borde ${borde}:1 contra la escena` : `no delimita con seguridad (tinta ${texto.wcag}:1, borde ${borde}:1)` }
+  return { variante, viable, texto: texto.wcag, borde, daltonismo: Math.min(textoDalt, bordeDalt), motivo: viable ? `tinta ${texto.wcag}:1 y borde ${borde}:1 contra la escena (con daltonismo ≥ ${+Math.min(textoDalt, bordeDalt).toFixed(2)}:1)` : `no delimita con seguridad (tinta ${texto.wcag}:1, borde ${borde}:1, daltonismo ${+Math.min(textoDalt, bordeDalt).toFixed(2)}:1)` }
 }
 
 // Parte de la variante que pide la intención y escala hacia la que separa más hasta encontrar una legible.

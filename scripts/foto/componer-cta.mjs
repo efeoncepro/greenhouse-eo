@@ -30,6 +30,7 @@ import { renderCollaborationSelection } from '../../scripts/creative/layout-comp
 import { compositeLuminosity } from '../../scripts/creative/layout-compiler/compiler.mjs'
 
 import { UMBRALES, hexARgb, medirContraColor, medirVoz, tamanoEnPantalla, textoAlternativo } from './accesibilidad.mjs'
+import { ORDEN as ORDEN_VARIANTES, PROMINENCIA, elegirVariante } from './cta-variantes.mjs'
 
 // ADAPTACIÓN del compositor de «Nivel de búsqueda» (GTA VI) a FOTOGRAFÍA de marca y multiformato.
 // Original: ai-generations/2026-09-19_nivel-de-busqueda/componer-v2.mjs (jerarquía por voces, richBlock,
@@ -434,6 +435,23 @@ const labelToPaths = svg =>
     (_, x, y, fill, size, label) => `<g fill="${fill}" transform="translate(${x} ${y})">${shape(label.replaceAll('&amp;', '&'), pop[700], Number(size)).paths}</g>`
   )
 
+// Intención AXIS de la selección del CTA. La usan el render y la validación del plan: una sola definición.
+// Marco de la selección del CTA: el declarado o, por defecto, según el tratamiento (decisión del operador).
+const marcoCta = c => c.seleccion?.marco ?? (c.variant === 'text' ? 'open-brackets' : 'ninguno')
+
+function intencionSeleccionCta(c) {
+  const sel = c.seleccion ?? {}
+  const marco = marcoCta(c)
+
+  const cursores = (sel.cursores ?? [{ id: 'usuario', kind: 'local', anchor: 'end-center', action: 'select' }]).map(k =>
+    k.kind === 'local'
+      ? { id: k.id, kind: 'local', targetId: 'cta', anchor: k.anchor ?? 'end-center', action: k.action ?? 'select' }
+      : { id: k.id, kind: 'collaborator', targetId: 'cta', anchor: k.anchor, action: k.action ?? 'select', label: k.label, participantKind: k.who ?? 'role' }
+  )
+
+  return { targetId: 'cta', targetKind: 'group', variant: marco === 'ninguno' ? 'open-brackets' : marco, padding: sel.padding ?? 'compact', overlay: 'none', cursors: cursores }
+}
+
 // Una caja que se sale del lienzo. En la búsqueda del tamaño (dry) significa «este factor no sirve» y se
 // descarta; en la composición final aborta como siempre. Antes se lanzaba igual en ambos casos, y una prueba
 // de crecimiento que empujaba el CTA fuera del borde tumbaba el comando entero en vez de probar un factor menor.
@@ -472,7 +490,12 @@ Canon: docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1
 
 const SLIDES = JSON.parse(fs.readFileSync(PLAN, 'utf8'))
 const PLAN_DIR = path.dirname(path.resolve(PLAN))
-const only = process.argv.slice(3)
+// `--variantes`: compone cada pieza en sus TRES tratamientos (texto · contorno · relleno) en out/variantes/, con una
+// hoja comparativa por pieza. Existe porque dos de tres agentes terminaron usando una sola variante: no veían las
+// otras sobre la foto real (operador, 2026-09-22). No toca el QA ni las salidas del plan.
+const VARIANTES = process.argv.includes('--variantes')
+const OUT = `${PLAN_DIR}/out${VARIANTES ? '/variantes' : ''}`
+const only = process.argv.slice(3).filter(a => !a.startsWith('--'))
 const qa = []
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════
@@ -497,6 +520,7 @@ const CAMPOS = new Set([
 function validarPlan(plan) {
   const errores = []
   const avisos = []
+  const sinMotivo = []
 
   if (!Array.isArray(plan) || !plan.length) return { errores: ['el plan debe ser un arreglo con al menos una pieza'], avisos }
   const ids = plan.map(p => p?.id)
@@ -522,7 +546,20 @@ function validarPlan(plan) {
     const c = p.cta
 
     for (const k of ['text', 'descriptor']) if (typeof c[k] !== 'string' || !c[k].trim()) e(`falta \`cta.${k}\``)
-    if (!['solid', 'outline', 'text'].includes(c.variant)) e(`\`cta.variant\` debe ser solid, outline o text (vino ${JSON.stringify(c.variant)})`)
+    if (!['solid', 'outline', 'text', 'auto'].includes(c.variant)) e(`\`cta.variant\` debe ser solid, outline, text o auto (vino ${JSON.stringify(c.variant)})`)
+
+    if (c.seleccion != null) {
+      if (!['open-brackets', 'four-corners', 'eight-handles', 'ninguno'].includes(marcoCta(c))) e(`\`cta.seleccion.marco\` debe ser open-brackets, four-corners, eight-handles o ninguno (vino ${JSON.stringify(c.seleccion.marco)})`)
+
+      try {
+        resolveCollaborationSelectionIntent(intencionSeleccionCta(c))
+      } catch (err) {
+        e(`\`cta.seleccion\` no cumple el contrato AXIS de selección: ${String(err.message).split('\n')[0]}`)
+      }
+    }
+
+    if (c.prominencia != null && !PROMINENCIA[c.prominencia]) e(`\`cta.prominencia\` debe ser discreta, delimitada o destacada (vino ${JSON.stringify(c.prominencia)})`)
+    if (c.variant !== 'auto' && !String(c.variantReason ?? '').trim()) sinMotivo.push(p.id)
     for (const k of ['fontSize', 'descriptorSize', 'paddingX', 'paddingY', 'gapAfterNote']) if (!num(c[k])) e(`falta \`cta.${k}\` numérico`)
     if (c.align !== 'center' && !num(c.x)) e('falta `cta.x` numérico (o `cta.align: "center"`)')
     for (const k of ['surfaceToken', 'inkToken']) if (c[k] != null && !C[c[k]]) e(`\`cta.${k}: ${c[k]}\` no existe en los tokens AXIS de publicidad`)
@@ -536,6 +573,11 @@ function validarPlan(plan) {
     }
   }
 
+  // El canon pide registrar el estilo del CTA y su motivo; sin motivo, la variante se copia del plan anterior.
+  if (sinMotivo.length) {
+    avisos.push(`${sinMotivo.length} pieza(s) eligen variante de CTA sin \`cta.variantReason\` (el canon pide registrar el motivo). Usa \`variant: "auto"\` con \`prominencia\`, o compara las tres con \`--variantes\`.`)
+  }
+
   return { errores, avisos }
 }
 
@@ -544,10 +586,10 @@ const validacion = validarPlan(SLIDES)
 for (const a of validacion.avisos) console.warn(`  ⚠ ${a}`)
 if (validacion.errores.length) throw new Error(`plan inválido — ${validacion.errores.join(' · ')}`)
 
-fs.mkdirSync(`${PLAN_DIR}/out/preview-390`, { recursive: true })
+fs.mkdirSync(`${OUT}/preview-390`, { recursive: true })
 
 // Un QA de una corrida ANTERIOR no puede sobrevivir a una corrida que falla: el gate lo leería como vigente.
-fs.rmSync(`${PLAN_DIR}/out/qa${only.length ? '-parcial' : ''}.json`, { force: true })
+fs.rmSync(`${OUT}/qa${only.length ? '-parcial' : ''}.json`, { force: true })
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════
 // 🔴 GUARDA DE SUJETO EN 2D [operador, 2026-09-22]
@@ -616,7 +658,10 @@ const CLEAR_TOUCH = 0.012
 const CLEAR_GROW = 0.035
 const MASK_NOISE_PX = 8
 
-function guardHits(mask, boxes, canvasW, canvasH, clearFrac = CLEAR_TOUCH) {
+// `ruido`: píxeles de máscara tolerados. Al CRECER es 0 —en la duda, crecer menos—: la prueba P04 mostró que los 8 px
+// tolerados eran una fila real de pelo y dejaban el descriptor a 3,36 % en vez de 3,5 %. Los 8 px quedan sólo para el
+// bloqueo duro, donde un falso positivo frena el trabajo.
+function guardHits(mask, boxes, canvasW, canvasH, clearFrac = CLEAR_TOUCH, ruido = MASK_NOISE_PX) {
   const sx = mask.W / canvasW, sy = mask.H / canvasH
   const clear = Math.min(canvasW, canvasH) * clearFrac
   const hits = []
@@ -639,7 +684,7 @@ function guardHits(mask, boxes, canvasW, canvasH, clearFrac = CLEAR_TOUCH) {
       }
     }
 
-    if (px > MASK_NOISE_PX) hits.push({ id, px })
+    if (px > ruido) hits.push({ id, px })
   }
 
   return hits
@@ -688,6 +733,12 @@ async function composePiece(s, opts = {}) {
   const lineas = {}
   // Voces para la medición de accesibilidad: tinta, peso y tamaño tal como se compusieron (ver accesibilidad.mjs).
   const voces = []
+  // Borde del CTA con contorno: la búsqueda del tamaño lo mide como límite (P05). Y la elección de variante en `auto`.
+  // Cursores, etiquetas y marcos de TODA selección, con su destino: ninguno puede tapar otra voz de texto.
+  const elementosSeleccion = []
+  let ctaBorde = null
+  let ctaVariante = null
+  let ctaVarianteTokens = null
   const plate = path.resolve(PLAN_DIR, s.plate)
   const meta = await sharp(plate).metadata()
 
@@ -863,6 +914,7 @@ return k.ink.right - k.ink.left }))
     selEvidence = { selection: rendered.evidence.selection, cursores: rendered.evidence.cursorEvidence.map(c => ({ id: c.id, labelBounds: c.labelBounds })) }
     if (!onObject) for (const c of rendered.evidence.cursorEvidence) { guard.push({ id: `cursor-${c.id}`, box: c.bounds }, { id: `etiqueta-${c.id}`, box: c.labelBounds }) }
     visibles.push({ id: 'seleccion', box: rendered.bounds }, ...rendered.evidence.cursorEvidence.flatMap(c => [{ id: `cursor-${c.id}`, box: c.bounds }, { id: `etiqueta-${c.id}`, box: c.labelBounds }]))
+    if (!onObject) elementosSeleccion.push(...rendered.evidence.cursorEvidence.flatMap(c => [{ id: `cursor «${c.label ?? c.id}»`, box: c.bounds, destino: 'dominante' }, ...(c.labelBounds ? [{ id: `etiqueta «${c.label}»`, box: c.labelBounds, destino: 'dominante' }] : [])]))
   }
 
   body += dom.svg
@@ -937,8 +989,32 @@ return k.ink.right - k.ink.left }))
   // Campaign-only CTA experiment explicitly requested by operator. Existing AXIS renderer,
   // shaping and contrast helpers reused unchanged; no shared contract modified.
   if (s.cta) {
-    const c=s.cta, cy=y+c.gapAfterNote, padX=c.paddingX, padY=c.paddingY;
+    let c=s.cta;
+    const cy=y+c.gapAfterNote, padX=c.paddingX, padY=c.paddingY;
     let cx=W*c.x;
+
+    // `variant: "auto"`: el autor declara la intención del canon (`prominencia`: discreta | delimitada | destacada →
+    // texto | contorno | relleno) y la medición sobre la escena decide si la permite; si no, se escala a la variante
+    // que separa más, nunca a una menos visible (scripts/foto/cta-variantes.mjs). La geometría del botón no depende
+    // de la variante, así que se mide sobre la caja real antes de pintar.
+    if(c.variant==='auto'&&s.ctaVarianteResuelta){
+      c={...c,...s.ctaVarianteResuelta.tokens,variant:s.ctaVarianteResuelta.elegida};
+      ctaVariante=s.ctaVarianteResuelta.qa;
+    } else if(c.variant==='auto'){
+      if(c.align==='center')cx=AXIS_X-(shape(c.text,pop[700],c.fontSize).advance+padX*2)/2;
+      const t0=block({text:c.text,font:pop[700],size:c.fontSize,tracking:0,leading:1.2,x:cx+padX,topY:cy+padY,maxWidth:W*.65,fill:'#ffffff'});
+      const caja={left:cx,top:cy,right:t0.box.right+padX,bottom:t0.box.bottom+padY};
+      const escena=await sharp(plate).removeAlpha().raw().toBuffer();
+      const acento=c.surfaceToken??'growthOnDark';
+      const e=elegirVariante({prominencia:c.prominencia??'delimitada',rgb:escena,ancho:W,alto:H,caja,cssPx:tamanoEnPantalla(c.fontSize,W),tokens:{acento:C[acento],tintaDeclarada:c.inkToken?C[c.inkToken]:null,tintaSobreRelleno:C.inkOnLight}});
+      const tokens=e.elegida==='solid'?{surfaceToken:acento,inkToken:'inkOnLight'}:e.elegida==='outline'?{surfaceToken:acento,inkToken:c.inkToken??acento}:{surfaceToken:acento,inkToken:acento};
+
+      c={...c,variant:e.elegida,...tokens};
+      ctaVariante={prominencia:s.cta.prominencia??'delimitada',elegida:e.elegida,escalo:e.escalo,motivo:e.motivo,...(e.sinMargen?{sinMargen:true}:{})};
+      ctaVarianteTokens=tokens;
+      cx=W*c.x;
+    }
+
     const solid=c.variant==='solid', outline=c.variant==='outline';
     // Retrocompatible: un plan que no declara tokens usa el par por defecto de la familia aprobada
     // (relleno = superficie de acento con tinta oscura; texto/contorno = tinta de acento).
@@ -951,6 +1027,7 @@ return k.ink.right - k.ink.left }))
     const t=block({text:c.text,font:pop[700],size:c.fontSize,tracking:0,leading:1.2,x:cx+padX,topY:cy+padY,maxWidth:W*.65,fill:ink});
     const b={left:cx,top:cy,right:t.box.right+padX,bottom:t.box.bottom+padY};
 
+    if(outline)ctaBorde={box:b,L:hexLum(surfaceColor)};
     if(solid||outline)body+=`<rect x="${b.left}" y="${b.top}" width="${b.right-b.left}" height="${b.bottom-b.top}" rx="${c.radius}" fill="${solid?surfaceColor:'none'}" stroke="${surfaceColor}" stroke-width="2"/>`;
     body+=t.svg;
     // 🔴 En `solid` NO se mide la tinta contra la escena: bajo un relleno opaco ese número no
@@ -963,9 +1040,19 @@ return k.ink.right - k.ink.left }))
       ...(solid?{skipContrast:true,ctaTextoTeorico:(Math.max(hexLum(surfaceColor),hexLum(ink))+.05)/(Math.min(hexLum(surfaceColor),hexLum(ink))+.05),surfaceBox:b,surfaceL:hexLum(surfaceColor)}:{})});
     // La selección se resuelve ANTES del descriptor: sólo depende de la caja del botón, y el descriptor
     // tiene que ubicarse bajo TODO el grupo —botón, corchetes y cursor—, no bajo el botón solo.
-    const ci={targetId:'cta',targetKind:'group',variant:'open-brackets',padding:'compact',overlay:'none',cursors:[{id:'usuario',kind:'local',targetId:'cta',anchor:'end-center',action:'select'}]};
+    // El CTA es un destino SELECCIONABLE completo del contrato AXIS (8 anclas: esquinas y centros de cada lado).
+    // `cta.seleccion` (opcional; sin ella: marco según el tratamiento y cursor local en `end-center`):
+    //   · marco: open-brackets | four-corners | eight-handles | ninguno. Por defecto (operador, 2026-09-23):
+    //     contorno y relleno SIN marco —su rectángulo ya delimita la acción y los corchetes no cumplían ninguna
+    //     función—; el de TEXTO conserva los corchetes, porque sin rectángulo «queda huérfano».
+    //   · padding: compact | standard | open
+    //   · cursores: [{ id, kind: local|collaborator, anchor, action, label, who, color }] — los colaboradores se
+    //     anclan a esquinas (regla AXIS) y llevan etiqueta; la validación del plan los revisa antes de componer.
+    const ci=intencionSeleccionCta(c);
     const cm=resolveCollaborationSelectionIntent(ci);
-    const cr=renderCollaborationSelection({manifest:cm,targetBounds:b,canvas:{width:W,height:H},measureLabel,presentation:{localCursorScale:c.cursorScale}});
+    const sel=c.seleccion??{};
+    const coloresCta=Object.fromEntries((sel.cursores??[]).filter(k=>k.color).map(k=>[k.id,k.color]));
+    const cr=renderCollaborationSelection({manifest:cm,targetBounds:b,canvas:{width:W,height:H},measureLabel,presentation:{localCursorScale:c.cursorScale,collaboratorScale:sel.escala??1.8,participantColors:coloresCta,frame:marcoCta(c)!=='ninguno'}});
 
     // 🔴 Descriptor bajo el GRUPO, no bajo el botón [2026-09-22, operador: «el texto debajo del CTA está
     // muy pegado»]. Antes se medía `descriptorGap` desde el borde del botón, pero los corchetes se dibujan
@@ -975,12 +1062,17 @@ return k.ink.right - k.ink.left }))
     // descriptor en el eje X (botón más angosto que el descriptor, §8 del doc), el descriptor baja
     // bajo la flecha: el choque que antes sólo se veía mirando la pieza ya no puede ocurrir.
     const descGap=Math.max(c.descriptorGap??0,Math.round(c.descriptorSize*0.6));
-    const cursorBox=cr.evidence.cursorEvidence.find(k=>k.id==='usuario')?.bounds;
+    // El descriptor esquiva CUALQUIER cursor o etiqueta de la selección del CTA que caiga sobre él en el eje X.
+    const obstaculos=cr.evidence.cursorEvidence.flatMap(k=>[k.bounds,k.labelBounds].filter(Boolean));
     const descAt=topY=>block({text:c.descriptor,font:pop[400],size:c.descriptorSize,tracking:0,leading:1.2,x:c.align==='center'?AXIS_X:cx,topY,maxWidth:W*.7,fill:'#ffffff',align:c.align});
     let descriptor=descAt(cr.bounds.bottom+descGap);
 
-    if(cursorBox&&descriptor.box.left<cursorBox.right&&descriptor.box.right>cursorBox.left&&descriptor.box.top<cursorBox.bottom+descGap)
-      descriptor=descAt(cursorBox.bottom+descGap);
+    for(let paso=0;paso<obstaculos.length;paso++){
+      const choque=obstaculos.find(o=>descriptor.box.left<o.right&&descriptor.box.right>o.left&&descriptor.box.top<o.bottom+descGap&&descriptor.box.bottom>o.top);
+
+      if(!choque)break;
+      descriptor=descAt(choque.bottom+descGap);
+    }
 
     body+=descriptor.svg;checks.push({id:'descriptor',box:descriptor.box,inkL:1});
     lineas.cta=t.lines;lineas.descriptor=descriptor.lines;
@@ -990,23 +1082,51 @@ return k.ink.right - k.ink.left }))
     if(solid||outline)voces.push({id:solid?'cta-relleno':'cta-borde',box:b,tinta:surfaceColor,limite:true,daltonismo:true});
     voces.push({id:'descriptor',box:descriptor.box,tinta:'#ffffff',peso:400,px:c.descriptorSize,lineas:descriptor.lines.length});
 
-    if(!cr.evidence.withinCanvas)throw new LienzoError(`${s.id}: la selección del CTA se sale del lienzo`);
+    if(!cr.evidence.withinCanvas){
+      // Decir QUÉ se sale y POR DÓNDE: «se sale del lienzo» a secas no le dice al autor qué ancla cambiar.
+      const lados=box=>[box.left<0&&'izquierda',box.top<0&&'arriba',box.right>W&&'derecha',box.bottom>H&&'abajo'].filter(Boolean);
+      const fuera=[{id:'marco',box:cr.bounds},...cr.evidence.cursorEvidence.flatMap(k=>[{id:`cursor «${k.label??k.id}»`,box:k.bounds},...(k.labelBounds?[{id:`etiqueta «${k.label}»`,box:k.labelBounds}]:[])])].filter(o=>o.box&&lados(o.box).length);
+
+      throw new LienzoError(`${s.id}: la selección del CTA se sale del lienzo — ${fuera.map(o=>`${o.id} por ${lados(o.box).join(' y ')}`).join(', ')||'(sin detalle)'}. Prueba otra esquina para el colaborador o acerca el CTA al centro.`);
+    }
+
     guard.push({ id: 'cta-grupo', box: { left: b.left - 14, top: b.top - 14, right: b.right + 14, bottom: b.bottom + 14 } });
-    for (const cc of cr.evidence.cursorEvidence) guard.push({ id: `cursor-cta`, box: cc.bounds });
-    visibles.push({ id: 'cta-seleccion', box: cr.bounds }, ...cr.evidence.cursorEvidence.map(cc => ({ id: 'cursor-cta', box: cc.bounds })));
+    elementosSeleccion.push(...cr.evidence.cursorEvidence.flatMap(k => [{ id: `cursor «${k.label ?? k.id}» del CTA`, box: k.bounds, destino: 'cta' }, ...(k.labelBounds ? [{ id: `etiqueta «${k.label}» del CTA`, box: k.labelBounds, destino: 'cta' }] : [])]));
+
+    for (const cc of cr.evidence.cursorEvidence) {
+      guard.push({ id: `cursor-cta`, box: cc.bounds });
+      if (cc.labelBounds) guard.push({ id: `etiqueta-cta-${cc.id}`, box: cc.labelBounds });
+    }
+
+    visibles.push({ id: 'cta-seleccion', box: cr.bounds }, ...cr.evidence.cursorEvidence.flatMap(cc => [{ id: 'cursor-cta', box: cc.bounds }, ...(cc.labelBounds ? [{ id: `etiqueta-cta-${cc.id}`, box: cc.labelBounds }] : [])]));
     const ctaOverlay=labelToPaths(cr.overlay);
 
     if(/<text/.test(ctaOverlay))throw new Error(`${s.id}: el overlay del CTA quedó con <text> — se pintaría con una fuente del sistema`);
     body+=cr.underlay+ctaOverlay;
-    fs.writeFileSync(`${PLAN_DIR}/out/${s.id}-controls.svg`,`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${cr.overlay}</svg>`);
-    fs.writeFileSync(`${PLAN_DIR}/out/${s.id}-cta-evidence.json`,JSON.stringify({intent:ci,manifest:cm,geometry:cr.evidence,textBounds:t.box,descriptorBounds:descriptor.box,surface:b,variant:c.variant,colors:{surface:surfaceColor,ink},solidTextContrast:solid?(Math.max(hexLum(surfaceColor),hexLum(ink))+.05)/(Math.min(hexLum(surfaceColor),hexLum(ink))+.05):null},null,2));
+    fs.writeFileSync(`${OUT}/${s.id}-controls.svg`,`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${cr.overlay}</svg>`);
+    fs.writeFileSync(`${OUT}/${s.id}-cta-evidence.json`,JSON.stringify({intent:ci,manifest:cm,geometry:cr.evidence,textBounds:t.box,descriptorBounds:descriptor.box,surface:b,variant:c.variant,colors:{surface:surfaceColor,ink},solidTextContrast:solid?(Math.max(hexLum(surfaceColor),hexLum(ink))+.05)/(Math.min(hexLum(surfaceColor),hexLum(ink))+.05):null},null,2));
   }
 
-  fs.writeFileSync(`${PLAN_DIR}/out/${s.id}-layout.json`,JSON.stringify({canvas:{width:W,height:H},subjectProtection:s.subjectProtection,elements:checks.map(({id,box})=>({id,box})),typography:{lead:s.leadSize,dominant:domSize,closure:s.afterSize,benefit:s.note?.size,cta:s.cta.fontSize,descriptor:s.cta.descriptorSize},selection:selEvidence},null,2));
+  fs.writeFileSync(`${OUT}/${s.id}-layout.json`,JSON.stringify({canvas:{width:W,height:H},subjectProtection:s.subjectProtection,elements:checks.map(({id,box})=>({id,box})),typography:{lead:s.leadSize,dominant:domSize,closure:s.afterSize,benefit:s.note?.size,cta:s.cta.fontSize,descriptor:s.cta.descriptorSize},selection:selEvidence},null,2));
   const descriptorBox=checks.find(c=>c.id==='descriptor').box;
 
+  // Ningún cursor ni etiqueta de selección tapa una voz de texto que no es su destino (hallado 2026-09-22: un
+  // colaborador anclado arriba del CTA caía sobre la nota). Medido en las piezas aprobadas: 0 choques, así que la
+  // regla bloquea sin romper nada. En la búsqueda del tamaño descarta el factor; a tamaño final, aborta.
+  const VOCES_TEXTO = new Set(['etiqueta', 'entrada', 'dominante', 'cierre-frase', 'nota', 'cta', 'descriptor', 'cierre-inferior'])
+  const holguraChoque = Math.min(W, H) * 0.004
+
+  const choques = elementosSeleccion.flatMap(el => checks
+    .filter(c => VOCES_TEXTO.has(c.id) && c.id !== el.destino)
+    .filter(c => el.box && el.box.left < c.box.right + holguraChoque && el.box.right > c.box.left - holguraChoque && el.box.top < c.box.bottom + holguraChoque && el.box.bottom > c.box.top - holguraChoque)
+    .map(c => `${el.id} tapa «${c.id}»`))
+
+  if (choques.length) {
+    throw new LienzoError(`${s.id}: ${[...new Set(choques)].join(', ')}. Cambia la esquina del colaborador o el ancla del cursor.`)
+  }
+
   const violaDeclarada = Boolean(s.subjectProtection && descriptorBox.bottom > s.subjectProtection.top - s.subjectProtection.minClearance)
-  const hits = opts.mask ? guardHits(opts.mask, [...checks.filter(c => GUARD_IDS.has(c.id)).map(c => ({ id: c.id, box: c.box })), ...guard], W, H, opts.dry ? CLEAR_GROW : CLEAR_TOUCH) : []
+  const hits = opts.mask ? guardHits(opts.mask, [...checks.filter(c => GUARD_IDS.has(c.id)).map(c => ({ id: c.id, box: c.box })), ...guard], W, H, opts.dry ? CLEAR_GROW : CLEAR_TOUCH, opts.dry ? 0 : MASK_NOISE_PX) : []
 
   const fuera = checks.some(c => c.box.left < 0 || c.box.right > W || c.box.top < 0 || c.box.bottom > H)
 
@@ -1018,7 +1138,9 @@ return k.ink.right - k.ink.left }))
     ? [...checks.filter(c => GUARD_IDS.has(c.id)), ...visibles].filter(({ box }) => box && (box.left < zona.left || box.right > zona.right || box.top < zona.top || box.bottom > zona.bottom)).map(b => b.id)
     : []
 
-  if (opts.dry && (violaDeclarada || hits.length || fuera || fueraDeZona.length)) return { ok: false, hits }
+  const resuelta = ctaVariante && ctaVarianteTokens ? { elegida: ctaVariante.elegida, tokens: ctaVarianteTokens, qa: ctaVariante } : null
+
+  if (opts.dry && (violaDeclarada || hits.length || fuera || fueraDeZona.length)) return { ok: false, hits, resuelta }
   if (fueraDeZona.length) console.warn(`  ⚠ ${s.id}: fuera de la zona segura declarada${s.safeArea.profile ? ` (${s.safeArea.profile})` : ''}: ${[...new Set(fueraDeZona)].join(', ')}`)
   if (violaDeclarada) throw Error(`${s.id}: el descriptor invade \`subjectProtection\` (baja hasta ${Math.round(descriptorBox.bottom)} px; el límite es ${s.subjectProtection.top - s.subjectProtection.minClearance})`)
   if (hits.length) throw Error(`${s.id}: el texto tapa al sujeto — ${hits.map(h => `${h.id} (${h.px} px)`).join(', ')}. Sube el \`top\`, acorta el copy o regenera el plate con más reserva.`)
@@ -1048,12 +1170,17 @@ return k.ink.right - k.ink.left }))
 
     for (const c of checks) if (!c.skipContrast) contraste[c.id] = await contrastUnder(bare, c.box, c.inkL ?? 1)
 
-    return { ok: true, hits, contraste }
+    // Los LÍMITES del CTA también se miden al crecer (hallado por P05, 2026-09-22): el relleno del sólido y el borde
+    // del contorno contra la escena. Antes el crecimiento podía mover el botón a una zona clara sin enterarse.
+    for (const c of checks) if (c.surfaceBox) contraste[`${c.id}_superficie_vs_escena`] = await contrastUnder(bare, c.surfaceBox, c.surfaceL)
+    if (ctaBorde) contraste.cta_borde_vs_escena = await contrastUnder(bare, ctaBorde.box, ctaBorde.L)
+
+    return { ok: true, hits, contraste, resuelta }
   }
 
   const top = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${defs}</defs>${body}${cardEl ? cardEl.svg.split('\n').slice(1).join('\n') : ''}${selection}</svg>`)
 
-  fs.writeFileSync(`${PLAN_DIR}/out/${s.id}-overlay.svg`,top);
+  fs.writeFileSync(`${OUT}/${s.id}-overlay.svg`,top);
   const topLayers = [{ input: top, left: 0, top: 0 }]
 
   let firmaSobreSujeto = null
@@ -1113,8 +1240,8 @@ return k.ink.right - k.ink.left }))
 
   const out = s.final ? sharp(master).resize({ width: s.final[0], height: s.final[1] }) : sharp(master)
 
-  await out.png().toFile(`${PLAN_DIR}/out/${s.id}.png`)
-  await sharp(master).resize({ width: 390 }).png().toFile(`${PLAN_DIR}/out/preview-390/${s.id}.png`)
+  await out.png().toFile(`${OUT}/${s.id}.png`)
+  await sharp(master).resize({ width: 390 }).png().toFile(`${OUT}/preview-390/${s.id}.png`)
 
   const contraste = {}
 
@@ -1155,7 +1282,7 @@ return k.ink.right - k.ink.left }))
   accesibilidad.cumpleDaltonismo = medidas.filter(m => m.daltonismo).every(m => m.cumpleDaltonismo)
   accesibilidad.altText = textoAlternativo(s)
   accesibilidad.altTextEscena = Boolean(String(s.altText ?? '').trim())
-  fs.writeFileSync(`${PLAN_DIR}/out/${s.id}.alt.txt`, `${accesibilidad.altText}\n`)
+  fs.writeFileSync(`${OUT}/${s.id}.alt.txt`, `${accesibilidad.altText}\n`)
 
   // Gap de tinta real entre tramos (no leading): top(siguiente) − bottom(anterior)
   const gaps = []
@@ -1177,7 +1304,7 @@ return k.ink.right - k.ink.left }))
     )
   }
 
-  qa.push({ id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}) })
+  qa.push({ id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}) })
 }
 
 // Driver: decide el factor de escala MIDIENDO, no estimando. Sólo formatos donde el texto se pierde en el
@@ -1217,7 +1344,24 @@ async function probar(s, mask) {
   }
 }
 
-for (const s0 of SLIDES.filter(x => !only.length || only.includes(x.id))) {
+// En `--variantes`, cada pieza se compone en sus tres tratamientos con el mismo acento: el sólido lo porta en el
+// relleno (tinta oscura encima), el contorno en el borde y la tinta, el de texto en la tinta (canon).
+function especVariante(s0, v) {
+  const s = structuredClone(s0)
+  const acento = s.cta.surfaceToken ?? 'growthOnDark'
+
+  s.id = `${s0.id}--${v}`
+  s.cta.variant = v
+  if (v === 'solid') Object.assign(s.cta, { surfaceToken: acento, inkToken: 'inkOnLight' })
+  else if (v === 'outline') Object.assign(s.cta, { surfaceToken: acento, inkToken: s0.cta.variant === 'outline' ? (s0.cta.inkToken ?? acento) : acento })
+  else Object.assign(s.cta, { surfaceToken: acento, inkToken: acento })
+
+  return s
+}
+
+const trabajo = SLIDES.filter(x => !only.length || only.includes(x.id)).flatMap(s0 => (VARIANTES ? ORDEN_VARIANTES.map(v => especVariante(s0, v)) : [s0]))
+
+for (let s0 of trabajo) {
   const plate0 = path.resolve(PLAN_DIR, s0.plate)
   const { width: pw, height: ph } = await sharp(plate0).metadata()
   const mask = maskForPiece(await subjectMask(plate0), s0, pw, ph)
@@ -1228,6 +1372,14 @@ for (const s0 of SLIDES.filter(x => !only.length || only.includes(x.id))) {
 
   // `textGrowth: false` congela la pieza a su tamaño declarado: sirve para recomponer un set YA APROBADO sin
   // que el crecimiento lo cambie (medido 2026-09-22: 40 piezas aprobadas cambiarían de tamaño al recomponer).
+  // `variant: "auto"` se resuelve UNA vez, a tamaño original, y queda fija mientras el texto crece: si se volviera a
+  // decidir en cada prueba de tamaño, el crecimiento compararía contrastes de variantes distintas.
+  if (s0.cta?.variant === 'auto') {
+    const r = await probar(scaleSpec(s0, 1, pw), mask)
+
+    if (r.resuelta) s0 = { ...s0, ctaVarianteResuelta: r.resuelta }
+  }
+
   if (s0.textGrowth !== false && (pw > ph || ph / pw > 1.5) && fill > 1.01) {
     if (mask) {
       const base = await probar(scaleSpec(s0, 1, pw), mask)
@@ -1239,7 +1391,12 @@ for (const s0 of SLIDES.filter(x => !only.length || only.includes(x.id))) {
 
         if (!r.ok) return false
 
-        return Object.entries(base.contraste ?? {}).every(([k, v]) => (r.contraste[k] ?? 0) >= Math.min(v, CONTRAST_FLOOR) - 0.05)
+        // Techo por tipo (AXIS): texto 4,5:1; los límites no textuales del CTA, 3:1.
+        const techo = k => (/superficie|borde/.test(k) ? UMBRALES.essentialBoundaryContrast : CONTRAST_FLOOR)
+
+        // La tolerancia de 0,05 es para ruido de medición y nunca cruza el umbral: una voz que cumplía a ×1 no puede
+        // quedar en 4,47 al crecer (hallado 2026-09-22 comparando \`auto\` con \`--variantes\`).
+        return Object.entries(base.contraste ?? {}).every(([k, v]) => (r.contraste[k] ?? 0) >= Math.min(v - 0.05, techo(k)))
       }
 
       const hi0 = Math.min(fill, GROW_CAP)
@@ -1263,5 +1420,40 @@ for (const s0 of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   await composePiece(scaleSpec(s0, factor, pw), { mask, factor })
 }
 
-fs.writeFileSync(`${PLAN_DIR}/out/qa${only.length ? '-parcial' : ''}.json`, JSON.stringify(qa, null, 2))
+fs.writeFileSync(`${OUT}/qa${only.length ? '-parcial' : ''}.json`, JSON.stringify(qa, null, 2))
+
+// Hoja comparativa: las tres variantes a 390 px con lo que dice la medición de cada una.
+if (VARIANTES) {
+  for (const s0 of SLIDES.filter(x => !only.length || only.includes(x.id))) {
+    const paneles = []
+
+    for (const v of ORDEN_VARIANTES) {
+      const q = qa.find(r => r.id === `${s0.id}--${v}`)
+      const f = `${OUT}/preview-390/${s0.id}--${v}.png`
+
+      if (!q || !fs.existsSync(f)) continue
+      const m = q.accesibilidad?.voces ?? {}
+      const limite = m['cta-relleno'] ?? m['cta-borde']
+      const peorDalt = m.cta?.daltonismo ? Math.min(...Object.values(m.cta.daltonismo)) : null
+
+      const rotulo = [`${{ text: 'texto', outline: 'contorno', solid: 'relleno' }[v]}${q.accesibilidad?.cumpleWcag ? '' : ' · ✗ WCAG'}`,
+        `tinta ${m.cta?.wcag ?? '—'}:1${limite ? ` · límite ${limite.wcag}:1` : ''} · APCA ${m.cta?.apca ?? '—'}${peorDalt != null ? ` · daltonismo ${peorDalt}:1` : ''}`]
+
+      paneles.push({ img: await sharp(f).png().toBuffer(), rotulo })
+    }
+
+    if (!paneles.length) continue
+    const meta = await sharp(paneles[0].img).metadata()
+    const alto = meta.height + 46
+
+    const capas = paneles.flatMap((p, i) => [
+      { input: p.img, left: i * (meta.width + 12), top: 46 },
+      { input: Buffer.from(`<svg width="${meta.width}" height="46"><text x="4" y="18" font-family="Helvetica" font-size="14" font-weight="700" fill="#fff">${p.rotulo[0]}</text><text x="4" y="38" font-family="Helvetica" font-size="11" fill="#ccc">${p.rotulo[1]}</text></svg>`), left: i * (meta.width + 12), top: 0 }
+    ])
+
+    await sharp({ create: { width: paneles.length * (meta.width + 12) - 12, height: alto, channels: 3, background: '#161616' } }).composite(capas).png().toFile(`${OUT}/${s0.id}.png`)
+    console.log(`variantes: ${OUT}/${s0.id}.png`)
+  }
+}
+
 for (const q of qa) console.log(q.id, 'contraste', JSON.stringify(q.contraste), 'gaps', JSON.stringify(q.gapsTinta))

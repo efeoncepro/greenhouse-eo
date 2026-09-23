@@ -314,6 +314,9 @@ const labelInkFor = color => (contrastRatio('#ffffff', color) >= contrastRatio('
  * - `localCursorScale`: multiplica el cursor local.
  * - `participantColors`: color por id de cursor colaborador (p. ej. color de marca de un partner). Debe ser #rrggbb y
  *   la tinta resultante debe alcanzar 4,5:1 o el render falla.
+ * - `frame`: `false` omite el marco (corchetes, esquinas o manijas) y conserva los cursores anclados a la frontera
+ *   semántica. Para un destino que YA dibuja su frontera —un botón con relleno o contorno— el marco la duplica
+ *   («evitar acumulación de marcos», canon Tres voces + acción). La geometría y la evidencia no cambian.
  * Sin `presentation` el resultado es idéntico al contrato por defecto.
  */
 export const renderCollaborationSelection = ({ manifest, targetBounds, canvas, measureLabel, presentation = {} }) => {
@@ -328,7 +331,7 @@ export const renderCollaborationSelection = ({ manifest, targetBounds, canvas, m
 
   const bounds = expandedBounds(targetBounds, manifest.selection.paddingRatio, canvas.width)
   const handleSize = Math.max(7, canvas.width * 0.008)
-  const { collaboratorScale = 1, localCursorScale = 1, participantColors = {} } = presentation
+  const { collaboratorScale = 1, localCursorScale = 1, participantColors = {}, frame = true } = presentation
 
   for (const [id, value] of Object.entries(participantColors))
     if (!/^#[0-9a-f]{6}$/i.test(value)) throw new Error(`participantColors.${id} must be #rrggbb`)
@@ -346,7 +349,7 @@ export const renderCollaborationSelection = ({ manifest, targetBounds, canvas, m
       ? `<rect data-axis-selection-overlay-layer="true" x="${round(bounds.left)}" y="${round(bounds.top)}" width="${round(bounds.right - bounds.left)}" height="${round(bounds.bottom - bounds.top)}" fill="#808080" opacity="${manifest.selection.overlayOpacity}" style="mix-blend-mode:${manifest.selection.overlayBlendMode}"/>`
       : ''
 
-  const controls = selectionControls({ bounds, variant: manifest.selection.variant, stroke: '#a6cdf5', handleSize })
+  const controls = frame ? selectionControls({ bounds, variant: manifest.selection.variant, stroke: '#a6cdf5', handleSize }) : ''
   const cursors = []
   const cursorEvidence = []
   let collaboratorIndex = 0

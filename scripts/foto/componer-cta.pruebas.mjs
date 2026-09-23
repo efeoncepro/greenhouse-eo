@@ -52,7 +52,8 @@ const FIX = {
   ele_169: [V07, '04-elegida-169'],
   ref_916: [V07, '03-referencia-916'],
   ref_169: [V07, '03-referencia-169'],
-  kv07_916: [CMP002, 'KV-07-916']
+  kv07_916: [CMP002, 'KV-07-916'],
+  fue_916: [V07, '01-fuera-916']
 }
 
 const pieza = k => {
@@ -189,7 +190,7 @@ const PRUEBAS = [
   {
     id: 'P04', nombre: 'Crecer respira: el texto crecido queda a ≥ 3,5 % del sujeto (medición independiente)',
     async correr() {
-      const claves = ['mo2_916', 'mo1_169', 'rec_916', 'ele_169']
+      const claves = ['mo2_916', 'mo1_169', 'rec_916', 'ele_169', 'fue_916']
       const rs = await Promise.all(claves.map(k => componer(`P04-${k}`, [pieza(k)])))
       const filas = []
       let ok = true
@@ -212,6 +213,12 @@ const PRUEBAS = [
         ok &&= bien
         filas.push(`${p.id} ×${q.escala.toFixed(2)} → ${Number.isFinite(d) ? `${((d / Math.min(W, H)) * 100).toFixed(2)} %` : 'sin sujeto cerca'} ${bien ? '✓' : '✗'}`)
       }
+
+      // Una prueba de crecimiento donde nada crece no prueba nada (auditor adversarial, 2026-09-23): con la
+      // segmentación rota, las piezas quedan a ×1 y la prueba pasaba de oficio.
+      const crecieron = Object.values(crecidas).filter(c => c.qa.escala > 1).length
+
+      if (crecieron < 3) { ok = false; filas.push(`sólo ${crecieron} pieza(s) crecieron: la prueba no tiene qué medir`) }
 
       return { ok, detalle: filas.join(' · ') }
     }
@@ -266,7 +273,18 @@ const PRUEBAS = [
       Object.assign(izquierda, { align: 'left' })
       delete izquierda.centerX
       Object.assign(izquierda.cta, { align: 'left', x: 0.08 })
-      const [original, alineada] = await Promise.all([componer('P06-eje', [pieza('ref_916')]), componer('P06-izquierda', [izquierda])])
+
+      const conIA = anc => {
+        const p = pieza('mo2_916')
+
+        p.textGrowth = false
+        p.cta.seleccion = { cursores: [{ id: 'usuario', kind: 'local', anchor: 'end-center' }, { id: 'ia', kind: 'collaborator', anchor: anc, label: 'IA', who: 'role' }] }
+
+        return p
+      }
+
+      const [original, alineada, choca, cabe] = await Promise.all([componer('P06-eje', [pieza('ref_916')]), componer('P06-izquierda', [izquierda]), componer('P06-choque', [conIA('top-end')]), componer('P06-cabe', [conIA('bottom-end')])])
+      const choqueRechazado = !choca.ok && /tapa «nota»/.test(choca.error)
       const ejeRechazado = !original.ok && /eje corrido/.test(original.error)
       let margen = false
 
@@ -276,34 +294,34 @@ const PRUEBAS = [
         margen = Math.min(...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.left)) >= izquierda.safeArea.x0 * L.canvas.width - 0.5
       }
 
-      return { ok: dentro && ejeRechazado && alineada.ok && margen, detalle: `${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen}` }
+      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok, detalle: `${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok}` }
     }
   },
   {
     id: 'P07', nombre: 'Validación: un plan mal escrito falla ANTES de componer, nombrando pieza y campo',
     async correr() {
       const base = () => pieza('p1_45')
-      const sinFont = base();
+      const sinFont = base()
+      const token = base()
+      const final = base()
+      const muda = base()
+      const plate = base()
+      const ignorar = base()
+      const extra = base()
+      const ancla = base()
+      const prom = base()
 
- delete sinFont.cta.fontSize
-      const token = base();
-
- token.cta.surfaceToken = 'accentSurfce'
-      const final = base();
-
- final.final = [1080, 1080]
-      const muda = base();
-
- delete muda.dominant; delete muda.lead; delete muda.label
-      const plate = base();
-
- plate.plate = path.join(ROOT, 'no/existe.png')
-      const ignorar = base();
-
- ignorar.subjectGuard = { ignore: [{ box: [0, 0, 0.1, 0.1] }] }
-      const extra = base();
-
- extra.colorFondo = '#000'
+      delete sinFont.cta.fontSize
+      token.cta.surfaceToken = 'accentSurfce'
+      final.final = [1080, 1080]
+      delete muda.dominant
+      delete muda.lead
+      delete muda.label
+      plate.plate = path.join(ROOT, 'no/existe.png')
+      ignorar.subjectGuard = { ignore: [{ box: [0, 0, 0.1, 0.1] }] }
+      extra.colorFondo = '#000'
+      ancla.cta.seleccion = { cursores: [{ id: 'ia', kind: 'collaborator', anchor: 'end-center', label: 'IA', who: 'role' }] }
+      Object.assign(prom.cta, { variant: 'auto', prominencia: 'enorme' })
 
       const casos = [
         ['falta cta.fontSize', [sinFont], [], /falta `cta\.fontSize`/],
@@ -313,7 +331,9 @@ const PRUEBAS = [
         ['final con otra proporción', [final], [], /no tiene la proporción/],
         ['pieza muda', [muda], [], /pieza muda/],
         ['plate inexistente', [plate], [], /no existe el plate/],
-        ['zona ignorada sin razón', [ignorar], [], /reason/]
+        ['zona ignorada sin razón', [ignorar], [], /reason/],
+        ['colaborador anclado fuera de una esquina (regla AXIS)', [ancla], [], /collaborator-anchor-not-corner/],
+        ['prominencia inexistente', [prom], [], /prominencia/]
       ]
 
       const rs = await Promise.all(casos.map(([, piezas, ids], i) => componer(`P07-${i}`, piezas, ids)))
@@ -349,7 +369,8 @@ const PRUEBAS = [
         for (const voz of ['entrada', 'cierre', 'nota']) for (const d of defectosCorte(q.lineas?.[voz] ?? [])) malos.push(`${id} ${voz}: ${d}`)
       }
 
-      return { ok: !malos.length, detalle: `${fuentes.length} piezas revisadas · ${malos.length} defectos${malos.length ? `: ${malos.slice(0, 6).join(' · ')}` : ''}` }
+      // Cero piezas revisadas no es un pase (auditor adversarial, 2026-09-23).
+      return { ok: fuentes.length > 0 && !malos.length, detalle: `${fuentes.length} piezas revisadas · ${malos.length} defectos${malos.length ? `: ${malos.slice(0, 6).join(' · ')}` : ''}` }
     }
   },
   {
@@ -429,8 +450,26 @@ const PRUEBAS = [
       const firma = await componer('P10-firma', [pieza('mo3_916')])
       const gFirma = await gate(firma.planPath)
 
+      const variantesPlan = await componer('P10-variantes-base', [pieza('b2_916')])
+      let hoja = false
+
+      try {
+        await run(process.execPath, [COMPOSITOR, variantesPlan.planPath, '--variantes'], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 })
+        hoja = fs.existsSync(path.join(variantesPlan.dir, 'out/variantes/b2-primero-el-numero-916.png')) && ['text', 'outline', 'solid'].every(v => fs.existsSync(path.join(variantesPlan.dir, `out/variantes/b2-primero-el-numero-916--${v}.png`)))
+      } catch {
+        hoja = false
+      }
+
+      const auto = pieza('b2_916')
+
+      Object.assign(auto.cta, { variant: 'auto', prominencia: 'discreta' })
+      const rAuto = await componer('P10-auto', [auto])
+      const eleccion = rAuto.ok ? rAuto.qa[0].ctaVariante : null
+
       const r = {
         'aprueba el plan bueno': gBueno.code === 0,
+        '--variantes arma la hoja de las tres': hoja,
+        'auto elige y deja el motivo': Boolean(eleccion?.elegida && eleccion.motivo),
         'rechaza QA incompleto': gIncompleto.code !== 0 && /sin QA/.test(gIncompleto.salida),
         'rechaza QA viejo': gViejo.code !== 0 && /anterior al plan/.test(gViejo.salida),
         'rechaza CTA sin acento': gSinAcento.code !== 0 && /no es un acento/.test(gSinAcento.salida),

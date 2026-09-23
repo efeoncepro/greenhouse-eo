@@ -553,3 +553,47 @@ el teléfono y alternativa sin escena.
 | Texto diminuto en el teléfono, sobre todo en 16:9 | 43 de 86 descriptores bajo 9 px; mínimo 3,8 px (KV-04-169) |
 | Alternativas sin descripción de escena | 46 de 86 piezas (CMP-001 y CMP-002 no traen `altText`) |
 
+## 17. Variantes, selección y anclas del CTA
+
+**Preguntas del operador, 2026-09-22/23:** «los CTA hay 3 tipos pero los agentes solo usan 1, ¿será porque no lo
+ven o por qué quedó mal cableado?»; «en el modo relleno, ¿es realmente necesario los corchetes?»; «si los CTA
+necesitan puntos de anclaje como el bounding box para que queden seleccionables por los cursores, dales esa
+capacidad»; y la decisión: «en los CTA no es necesario esos corchetes, no cumplen ninguna función en ninguno de los
+tipos»; y el ajuste: «la versión sin rectángulo redondeado sí necesita los corchetes porque queda huérfana».
+
+### Por qué los agentes usaban un solo tratamiento — medido, no supuesto
+
+| Plan | Tratamientos usados |
+|---|---|
+| Sets AEO de Codex (v03–v07) | los tres: 8 relleno · 4 contorno · 4 texto |
+| CMP-002 (24 piezas) | **sólo contorno** |
+| CMP-001 MOFU y BOFU | **sólo contorno lima** (los tres se probaron en TOFU) |
+
+Ninguno era un error de dibujo: los tres componen bien. Eran dos causas:
+
+1. **No se veían.** El canon pide elegir «por composición» y registrar el motivo, pero nada mostraba los tres
+   sobre la foto real y nada pedía el motivo: cada agente copiaba el bloque de CTA de su plan anterior.
+2. **El gate era asimétrico.** Medía el relleno del sólido contra la escena y exigía acento en la tinta del de
+   texto, pero **no medía el borde del contorno**: el contorno era el único que nunca podía fallar, y los agentes
+   aprenden del gate. Con §16 el borde se mide (1.4.11, 3:1) y los tres quedan parejos.
+
+### Lo que se agregó
+
+| Herramienta | Qué hace |
+|---|---|
+| `pnpm foto:componer:cta <plan> --variantes` | compone cada pieza en sus tres tratamientos en `out/variantes/` y arma una hoja por pieza con la medición de cada uno (tinta, límite, APCA, daltonismo, ✗ WCAG). No toca el QA del plan |
+| `cta.variant: "auto"` + `cta.prominencia` | el autor declara la intención del canon —`discreta` (texto) · `delimitada` (contorno) · `destacada` (relleno)— y la medición sobre la escena decide si la permite; si no, **escala** a la que separa más, nunca a una menos visible. Viable = WCAG con margen 1,1, ningún píxel bajo el umbral **y también con daltonismo** (el naranja como tinta sobre el gris oscuro de una foto pasa en visión típica y cae bajo 4,5:1 con protanopía). Se decide UNA vez, a tamaño original, y queda fija mientras el texto crece. El motivo queda en `qa.ctaVariante` |
+| aviso `cta.variantReason` | si una pieza elige tratamiento sin motivo, el comando lo avisa (el canon lo pide) |
+| `cta.seleccion` | el CTA es un destino **seleccionable** completo del contrato AXIS: 8 anclas (esquinas y centros de cada lado); `marco`: open-brackets · four-corners · eight-handles · ninguno —por defecto, **sin marco en contorno y relleno, corchetes en texto**—; `cursores`: el local en cualquier ancla y colaboradores con etiqueta en las esquinas (regla AXIS). Un ancla inválida falla antes de componer con la regla de AXIS que rompe (`collaborator-anchor-not-corner`) |
+| **corchetes sólo en texto** | decisión del operador (2026-09-23): en contorno y relleno el rectángulo ya delimita la acción y los corchetes no cumplían función; en texto se conservan porque sin rectángulo el CTA queda huérfano. El cursor se conserva en los tres. Las piezas de contorno y relleno cambian sólo los píxeles de los corchetes (0,01–0,02 % de la imagen); ninguna cambia de posición |
+| choque selección ↔ texto | ningún cursor, etiqueta ni marco de selección —del titular o del CTA— puede tapar otra voz de texto. Hallado componiendo un colaborador arriba del CTA: su cursor caía sobre la nota. Medido en las piezas aprobadas: 0 choques, así que bloquea sin romper nada |
+| mensajes de lienzo | «se sale del lienzo» ahora dice QUÉ y POR DÓNDE: «etiqueta «IA» por izquierda. Prueba otra esquina…» |
+
+### Correcciones que encontraron las 10 pruebas (§15)
+
+| Prueba | Hallazgo | Corrección |
+|---|---|---|
+| P05 | la búsqueda del tamaño **no medía** el relleno ni el borde del CTA | ahora los mide, con el umbral de límites (3:1). Efecto real: 01-fuera-916 (Codex) crecía a ×1,36 con su borde naranja en 3,42:1 (2,62:1 con protanopía); ahora frena en ×1,30 con el borde en 4,47:1 |
+| (comparando `auto` con `--variantes`) | la tolerancia de medición (0,05) dejaba a una voz terminar en 4,47:1 con el mínimo en 4,5 | la tolerancia nunca cruza el umbral: si la voz cumplía a ×1, cumple crecida |
+| P04 | el «3,5 % de aire» no era exacto: la guarda toleraba 8 px de máscara también al CRECER, y esos 8 px eran una fila real de pelo (el descriptor de 02-reconoces-916 quedaba a 3,36 %) | al crecer, tolerancia 0 (en la duda, crecer menos); los 8 px quedan sólo para el bloqueo duro. Efecto medido: 02-reconoces-916 ×1,208 → ×1,201 y 04-elegida-916 ×1,125 → ×1,122 |
+
