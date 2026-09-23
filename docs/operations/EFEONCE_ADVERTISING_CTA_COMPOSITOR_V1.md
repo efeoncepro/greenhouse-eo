@@ -703,6 +703,25 @@ contraste sí frena.
   el PNG final; corre además las pruebas unitarias de los módulos puros.
 - **APCA y daltonismo del CTA siguen avisando, sin bloquear** (decisión pendiente 3).
 
+**Tramo 3 · Esquema e invariantes — cerrado (2026-09-23).**
+
+- **Cobertura de glifos:** cada campo de texto se valida con la fuente que lo dibuja (Poppins, Bricolage, Guttery; las
+  etiquetas de cursor con Poppins 700). Un carácter que la fuente no tiene —emoji, hebreo— salía como un cuadro vacío
+  con todas las mediciones en verde; ahora el plan falla antes de componer, nombrando campo y punto de código.
+- **Entidades de XML** en las etiquetas de cursor (`scripts/foto/svg-texto.mjs`): se decodifican las cinco
+  nombradas y las numéricas, con `&amp;` al final para no decodificar dos veces. «IA <3» salía dibujada «IA &lt;3».
+- **Una sola función de invariantes** (`scripts/foto/cta-invariantes.mjs`) para la búsqueda del tamaño, la
+  composición final y el gate: cajas no degeneradas; texto, botón y firma sin tocarse; ninguna selección sobre una voz
+  que no es su destino (la regla de 2026-09-22, ahora compartida). La firma y la url se ubican con la misma fórmula que
+  el dibujo, así el crecimiento las ve antes de pintarlas. El gate las recalcula sobre el `layout.json`, que ahora
+  lleva huella (`huellas.layout`) y los elementos de la maquetación.
+- **Reserva editorial** (`editorialReserve`, px del plate): el crecimiento no la cruza; la composición final avisa y
+  el gate la bloquea. **No aborta la composición** porque piezas aprobadas de v05–v07 declaran una reserva que nadie
+  verificaba (01-fuera-916 a su tamaño anterior bajaba hasta y=600 con la reserva en 560).
+- **La guarda de sujeto se evalúa antes que la maquetación** en la composición final, así cada pieza aborta por su
+  causa principal (el orden cambiaba el mensaje de P03).
+- Regresión contra e68d28885: 18 iguales (las que ya abortaban), 78 sólo suman claves con los píxeles idénticos, y 8 crecen menos porque ahora respetan su reserva editorial (01-fuera y 04-elegida de v03, v05–v07 y la auditoría: ×1,10→×1,05, ×1,25→×1,24, ×1,12→×1,04, ×1,42→×1,29). **Ninguna pieza cambia de estado.** Seis piezas 1:1 de v04–v07 quedan 2–6 px fuera de la reserva que declaran a su tamaño original: esas reservas se midieron antes de que el descriptor se separara del grupo del CTA (§12), y el gate ahora las marca (se resuelve corrigiendo la reserva o con excepción auditada).
+
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
 | Pilar | Hoy | Meta | Qué lo sube |

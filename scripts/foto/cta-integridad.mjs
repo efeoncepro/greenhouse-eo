@@ -34,6 +34,8 @@ const DEPENDENCIAS = [
   'scripts/foto/cta-variantes.mjs',
   'scripts/foto/cta-esquema.mjs',
   'scripts/foto/cta-integridad.mjs',
+  'scripts/foto/cta-invariantes.mjs',
+  'scripts/foto/svg-texto.mjs',
   'scripts/creative/layout-compiler/axis-advertising.mjs',
   'scripts/creative/layout-compiler/compiler.mjs',
   'scripts/creative/layout-compiler/contract.mjs'

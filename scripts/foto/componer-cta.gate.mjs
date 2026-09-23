@@ -8,6 +8,7 @@ import { readFileSync, existsSync, statSync } from 'node:fs'
 import path from 'node:path'
 
 import { huellaComando, huellaPieza, rutaQa, sha } from './cta-integridad.mjs'
+import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
 
 const plan = process.argv[2]
 
@@ -56,6 +57,9 @@ if (sinQa.length) {
 // 🔴 HUELLAS: el QA vale sólo para el plan, el plate y el PNG que lo produjeron [auditoría 2026-09-23]. Antes decidía
 // una fecha de archivo, y el gate certificó en verde piezas de otro plan, un QA viejo tras cambiar el plate y salidas
 // empalmadas por dos composiciones simultáneas. Cada huella se RECALCULA acá: si no coincide, el QA describe otra cosa.
+// Reserva editorial rota, por pieza: se reporta con las reglas de contenido (no corta el gate como la integridad).
+const reservasRotas = new Map()
+
 if (!legado) {
   const comando = huellaComando()
 
@@ -74,6 +78,24 @@ if (!legado) {
 
     if (!existsSync(png)) fallas.push(`falta \`out/${p.id}.png\``)
     else if (h.png !== sha(readFileSync(png))) fallas.push(`\`out/${p.id}.png\` no es el PNG que registró la composición`)
+    const layout = path.join(dir, 'out', `${p.id}-layout.json`)
+
+    // Tramo 3: el layout también lleva huella, porque el gate recalcula las invariantes de maquetación sobre él.
+    if (!h.layout) fallas.push('el QA no trae la huella del layout (versión anterior del comando)')
+    else if (!existsSync(layout)) fallas.push(`falta \`out/${p.id}-layout.json\``)
+    else if (h.layout !== sha(readFileSync(layout))) fallas.push(`\`out/${p.id}-layout.json\` no es el que registró la composición`)
+    else {
+      // Invariantes recalculadas aquí, con la misma función que usa el compositor (cta-invariantes.mjs).
+      const L = JSON.parse(readFileSync(layout, 'utf8'))
+      const inv = L.maquetacion?.elementos ? invariantesMaquetacion({ ancho: L.canvas.width, alto: L.canvas.height, elementos: L.maquetacion.elementos }) : ['el layout no trae los elementos de la maquetación']
+
+      if (inv.length) fallas.push(`la maquetación no cumple — ${inv.join(' · ')}`)
+      // La reserva editorial se recalcula aquí. No es un error de composición (recomponer no la arregla): es la
+      // pieza la que no cabe en lo que el plan reservó.
+      const reserva = L.maquetacion?.elementos ? fueraDeReserva({ elementos: L.maquetacion.elementos, reserva: p.editorialReserve }) : []
+
+      if (reserva.length) reservasRotas.set(p.id, reserva)
+    }
 
     if (fallas.length) {
       console.error(`✗ ${p.id}: ${fallas.join(' · ')}. Recompón con \`pnpm foto:componer:cta ${plan} ${p.id}\`.`)
@@ -202,6 +224,11 @@ for (const r of qa) {
 }
 
 const n = qa.filter(r => conCta.has(r.id)).length
+
+for (const [id, reserva] of reservasRotas) {
+  console.error(`✗ ${id}: fuera de la reserva editorial — ${reserva.join(' · ')}. Acota el texto o corrige la reserva del plan.`)
+  fallos++
+}
 
 // ── Accesibilidad sobre el píxel (medida por el compositor con scripts/foto/accesibilidad.mjs) ─────────────
 // BLOQUEA: cualquier voz bajo WCAG 2.2 AA según su tamaño EN PANTALLA (texto normal 4,5:1, grande 3:1) y los

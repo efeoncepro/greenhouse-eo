@@ -54,7 +54,8 @@ const FIX = {
   ref_916: [V07, '03-referencia-916'],
   ref_169: [V07, '03-referencia-169'],
   kv07_916: [CMP002, 'KV-07-916'],
-  fue_916: [V07, '01-fuera-916']
+  fue_916: [V07, '01-fuera-916'],
+  v03_fue: ['ai-generations/2026-09-22_aeo-cta-v03/piezas.json', '01-fuera-916']
 }
 
 const pieza = k => {
@@ -310,8 +311,33 @@ const PRUEBAS = [
       protegida.textGrowth = false
       protegida.protect = [{ box: [0, 0, 1, 0.5], reason: 'prueba: toda la mitad superior protegida' }]
 
-      const [original, alineada, choca, cabe, tapaZona] = await Promise.all([componer('P06-eje', [pieza('ref_916')]), componer('P06-izquierda', [izquierda]), componer('P06-choque', [conIA('top-end')]), componer('P06-cabe', [conIA('bottom-end')]), componer('P06-protect', [protegida])])
+      // Tramo 3: invariantes de maquetación compartidas por búsqueda, composición y gate.
+      const firmaEncima = pieza('mo2_916')
+
+      firmaEncima.textGrowth = false
+      firmaEncima.logo = { ...firmaEncima.logo, y: firmaEncima.top ?? 0.05 }
+      const reservaChica = pieza('mo2_916')
+
+      reservaChica.textGrowth = false
+      reservaChica.editorialReserve = { maxBottom: 200, maxRight: 900 }
+
+      const [original, alineada, choca, cabe, tapaZona, firmaSobre, fueraReserva, v03] = await Promise.all([componer('P06-eje', [pieza('ref_916')]), componer('P06-izquierda', [izquierda]), componer('P06-choque', [conIA('top-end')]), componer('P06-cabe', [conIA('bottom-end')]), componer('P06-protect', [protegida]), componer('P06-firma', [firmaEncima]), componer('P06-reserva', [reservaChica]), componer('P06-v03', [pieza('v03_fue')])])
       const protegeZona = !tapaZona.ok && /zona protegida/.test(tapaZona.error)
+      const firmaRechazada = !firmaSobre.ok && /choca con «logo»|«logo» choca/.test(firmaSobre.error)
+      // La reserva no aborta la composición (hay piezas aprobadas con reservas que nadie verificaba): la bloquea el gate.
+      const gReserva = fueraReserva.ok ? await gate(fueraReserva.planPath) : { code: -1, salida: fueraReserva.error }
+      const reservaRechazada = gReserva.code !== 0 && /fuera de la reserva editorial/.test(gReserva.salida)
+      let dentroReserva = false
+
+      if (v03.ok) {
+        // Medición independiente: todo lo dibujado (menos la firma) dentro de la reserva que declara el plan.
+        const p = pieza('v03_fue')
+        const L = leer(v03.dir, `${p.id}-layout.json`)
+        const dibujado = L.maquetacion.elementos.filter(e => e.tipo !== 'firma')
+
+        dentroReserva = dibujado.length > 0 && Math.max(...dibujado.map(e => e.box.right)) <= p.editorialReserve.maxRight + 0.5 && Math.max(...dibujado.map(e => e.box.bottom)) <= p.editorialReserve.maxBottom + 0.5
+      }
+
       const choqueRechazado = !choca.ok && /tapa «nota»/.test(choca.error)
       const ejeRechazado = !original.ok && /eje corrido/.test(original.error)
       let margen = false
@@ -322,7 +348,7 @@ const PRUEBAS = [
         margen = Math.min(...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.left)) >= izquierda.safeArea.x0 * L.canvas.width - 0.5
       }
 
-      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona, detalle: `${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona}` }
+      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva, detalle: `${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
     }
   },
   {
@@ -361,6 +387,12 @@ const PRUEBAS = [
       ignorarTodo.subjectGuard = { ignore: [{ box: [0, 0, 1, 1], reason: 'no hay sujeto en esta foto', aprobadoPor: 'prueba' }] }
       sinAprobador.subjectGuard = { ignore: [{ box: [0, 0, 0.05, 0.05], reason: 'afiche del fondo detectado' }] }
       nulo.cta.fontSize = null
+      // Tramo 3: un carácter que la fuente no tiene saldría como un cuadro vacío.
+      const emoji = base()
+      const hebreo = base()
+
+      emoji.cta.text = 'Hablemos 🚀'
+      hebreo.lead = 'שלום a todos'
 
       const casos = [
         ['falta cta.fontSize', [sinFont], [], /falta `cta\.fontSize`/],
@@ -376,7 +408,9 @@ const PRUEBAS = [
         ['id con ruta (../)', [idMalo], [], /`id`: sólo letras/],
         ['guarda de sujeto apagada entera', [ignorarTodo], [], /una guarda no se apaga entera/],
         ['zona ignorada sin quien la aprobó', [sinAprobador], [], /aprobadoPor/],
-        ['campo obligatorio en null', [nulo], [], /falta `cta\.fontSize`/]
+        ['campo obligatorio en null', [nulo], [], /falta `cta\.fontSize`/],
+        ['emoji que la fuente no tiene', [emoji], [], /`cta\.text` usa caracteres que su fuente no tiene.*U\+1F680/],
+        ['hebreo que la fuente no tiene', [hebreo], [], /`lead` usa caracteres que su fuente no tiene/]
       ]
 
       const rs = await Promise.all(casos.map(([, piezas, ids], i) => componer(`P07-${i}`, piezas, ids)))
@@ -420,11 +454,19 @@ const PRUEBAS = [
     id: 'P09', nombre: 'Accesibilidad y contraste: WCAG 2.2 AA por voz, límites del CTA, alternativa completa',
     async correr() {
       const fuentes = []
+      const claves = ['mo2_916', 'mo1_169', 'fue_916', 'p1_45', 'rec_916']
+      // ORÁCULO INDEPENDIENTE (tramo 2; hallazgo 16: P09 se verificaba a sí misma). Con FOTO_EVIDENCIA=1 el compositor
+      // deja la capa de texto sola y el fondo sin texto; más abajo se recalcula, con aritmética propia de WCAG, el 1 %
+      // peor del trazo de cada voz, y se mide en el PNG final el grosor del borde del contorno.
+      const evid = await componer('P09-evidencia', claves.map(pieza), [], { FOTO_EVIDENCIA: '1' })
 
       if (harness) {
         for (const r of JSON.parse(fs.readFileSync(harness, 'utf8')).resultados.filter(x => x.cand === 'compone')) {
           fuentes.push([r.id, JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/out/qa-piezas.json'), 'utf8'))[0], JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/piezas.json'), 'utf8'))[0]])
         }
+      } else if (evid.ok) {
+        // Corrida parcial (sin P02): las piezas del set de evidencia hacen de fuente, para que P09 pruebe algo solo.
+        for (const q of evid.qa) fuentes.push([q.id, q, claves.map(pieza).find(p => p.id === q.id)])
       }
 
       const fallas = []
@@ -452,10 +494,6 @@ const PRUEBAS = [
 
       fs.writeFileSync(path.join(TMP, 'P09-trazos-bajo-umbral.json'), JSON.stringify(trazos, null, 2))
 
-      // ORÁCULO INDEPENDIENTE (tramo 2; hallazgo 16: P09 se verificaba a sí misma). Con FOTO_EVIDENCIA=1 el compositor
-      // deja la capa de texto sola y el fondo sin texto; aquí se recalcula, con aritmética propia de WCAG, el 1 % peor
-      // del trazo de cada voz, y se mide en el PNG final el grosor del borde del contorno.
-      const evid = await componer('P09-evidencia', ['mo2_916', 'mo1_169', 'fue_916', 'p1_45', 'rec_916'].map(pieza), [], { FOTO_EVIDENCIA: '1' })
 
       const lin = c => {
         const v = c / 255
@@ -522,21 +560,23 @@ const PRUEBAS = [
       }
 
       // Las pruebas unitarias de los módulos puros (WCAG, APCA, Machado, variantes) también son parte de esta prueba.
-      const unitarias = await run(process.execPath, ['--test', 'scripts/foto/accesibilidad.test.mjs', 'scripts/foto/cta-variantes.test.mjs'], { cwd: ROOT }).then(() => true, () => false)
+      const unitarias = await run(process.execPath, ['--test', 'scripts/foto/accesibilidad.test.mjs', 'scripts/foto/cta-variantes.test.mjs', 'scripts/foto/cta-invariantes.test.mjs', 'scripts/foto/svg-texto.test.mjs'], { cwd: ROOT }).then(() => true, () => false)
 
       // Y la herramienta de reporte corre sobre un plan compuesto y deja las vistas de daltonismo.
-      const plan = crecidas.mo2_916 && path.join(crecidas.mo2_916.dir, 'piezas.json')
+      // El plan de P04 si corrió; si no, el del set de evidencia (que también trae mo2-no-te-citan-916).
+      const dirReporte = crecidas.mo2_916?.dir ?? (evid.ok ? evid.dir : null)
+      const plan = dirReporte && path.join(dirReporte, 'piezas.json')
       let reporte = false
 
       if (plan) {
         await run(process.execPath, [REPORTE_A11Y, plan], { cwd: ROOT })
-        reporte = fs.existsSync(path.join(crecidas.mo2_916.dir, 'out/accesibilidad/reporte.md')) && fs.existsSync(path.join(crecidas.mo2_916.dir, 'out/accesibilidad/mo2-no-te-citan-916-daltonismo.png'))
+        reporte = fs.existsSync(path.join(dirReporte, 'out/accesibilidad/reporte.md')) && fs.existsSync(path.join(dirReporte, 'out/accesibilidad/mo2-no-te-citan-916-daltonismo.png'))
       }
 
       return {
         ok: fuentes.length > 0 && !fallas.length && !incompletas.length && reporte && evid.ok && vocesOraculo > 0 && !desacuerdos.length && bordes > 0 && !delgados.length && unitarias,
         detalle: `${fuentes.length} piezas · voces bajo WCAG AA: ${fallas.length}${fallas.length ? ` (${fallas.slice(0, 4).join(', ')})` : ''} · alternativas incompletas: ${incompletas.length}${incompletas.length ? ` (${incompletas.slice(0, 3).join('; ')})` : ''} · avisos APCA/daltonismo: ${avisos} · reporte y vistas de daltonismo: ${reporte} · oráculo del trazo: ${evid.ok ? `${vocesOraculo} voces, ${desacuerdos.length} desacuerdos${desacuerdos.length ? ` (${desacuerdos.slice(0, 3).join('; ')})` : ''}` : `no compuso (${evid.error})`} · bordes ≥ 1 CSS px: ${bordes - delgados.length}/${bordes}${delgados.length ? ` (${delgados.join(', ')})` : ''} · unitarias: ${unitarias} · piezas del repo con trazo bajo umbral: ${trazos.length}`,
-        evidencia: plan && path.join(crecidas.mo2_916.dir, 'out/accesibilidad/reporte.md')
+        evidencia: plan && path.join(dirReporte, 'out/accesibilidad/reporte.md')
       }
     }
   },
@@ -615,6 +655,26 @@ const PRUEBAS = [
       })
 
       const gSinMetodo = await editarQa(r => { for (const m of Object.values(r.accesibilidad.voces)) if (m) delete m.metodo })
+
+      // Layout alterado CON su huella al día: el gate no confía en el QA, recalcula las invariantes y lo rechaza.
+      const layoutRel = `out/${idH}-layout.json`
+      const layoutOriginal = fs.readFileSync(archivo(layoutRel))
+      const qaOriginal = fs.readFileSync(archivo('out/qa-piezas.json'))
+      const Lmal = JSON.parse(layoutOriginal)
+      const cajaDom = Lmal.maquetacion.elementos.find(e => e.id === 'dominante').box
+
+      Lmal.maquetacion.elementos.push({ id: 'firma-de-prueba', tipo: 'firma', box: { ...cajaDom } })
+      const layoutMal = JSON.stringify(Lmal, null, 2)
+
+      fs.writeFileSync(archivo(layoutRel), layoutMal)
+      const qaMal = JSON.parse(qaOriginal)
+
+      qaMal[0].huellas.layout = sha(layoutMal)
+      fs.writeFileSync(archivo('out/qa-piezas.json'), JSON.stringify(qaMal))
+      const gMaquetacion = await gate(h.planPath)
+
+      fs.writeFileSync(archivo(layoutRel), layoutOriginal)
+      fs.writeFileSync(archivo('out/qa-piezas.json'), qaOriginal)
 
       const gAnillo = await editarQa(r => {
         const b = r.accesibilidad.voces['cta-borde']
@@ -709,7 +769,8 @@ const PRUEBAS = [
         'rechaza trazo bajo umbral': gTrazo.code !== 0 && /1 % peor del trazo/.test(gTrazo.salida),
         'rechaza QA sin método de medición': gSinMetodo.code !== 0 && /no dice cómo se midió/.test(gSinMetodo.salida),
         'rechaza borde que se mezcla en el teléfono': gAnillo.code !== 0 && /borde del CTA mide/.test(gAnillo.salida),
-        'rechaza 01-fuera-916 al tamaño anterior (caja pasa, trazo no)': gCrecida.code !== 0 && /1 % peor del trazo/.test(gCrecida.salida),
+        'recalcula las invariantes sobre el layout': gMaquetacion.code !== 0 && /la maquetación no cumple/.test(gMaquetacion.salida),
+        'rechaza 01-fuera-916 al tamaño anterior (el trazo no alcanza)': gCrecida.code !== 0 && /1 % peor del trazo/.test(gCrecida.salida),
         'avisa formato anterior': /no puede certificarlo/.test(gLegado.salida),
         'rechaza composición concurrente': concurrentes.filter(x => x === 'ok').length === 1 && concurrentes.some(x => /otra composición usa/.test(x)),
         'rechaza CTA sin acento': gSinAcento.code !== 0 && /no es un acento/.test(gSinAcento.salida),

@@ -31,6 +31,8 @@ import { compositeLuminosity } from '../../scripts/creative/layout-compiler/comp
 import { ANCHO_PANTALLA, DPR_REFERENCIA, UMBRALES, hexARgb, medirAnillo, medirContraColor, medirGlifos, medirVoz, tamanoEnPantalla, textoAlternativo } from './accesibilidad.mjs'
 import { ORDEN as ORDEN_VARIANTES, elegirVariante } from './cta-variantes.mjs'
 import { validarPiezaEsquema } from './cta-esquema.mjs'
+import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
+import { desescaparXml } from './svg-texto.mjs'
 import { escribirAtomico, huellaComando, huellaPieza, rutaQa, sha, tomarBloqueo, versionPaquete } from './cta-integridad.mjs'
 
 // ADAPTACIÓN del compositor de «Nivel de búsqueda» (GTA VI) a FOTOGRAFÍA de marca y multiformato.
@@ -433,7 +435,7 @@ const measureLabel = (label, size) => shape(label, pop[700], size).advance
 const labelToPaths = svg =>
   svg.replace(
     /<text x="(-?[\d.]+)" y="(-?[\d.]+)" fill="([^"]+)" font-family="[^"]*" font-size="([\d.]+)" font-weight="700">([^<]*)<\/text>/g,
-    (_, x, y, fill, size, label) => `<g fill="${fill}" transform="translate(${x} ${y})">${shape(label.replaceAll('&amp;', '&'), pop[700], Number(size)).paths}</g>`
+    (_, x, y, fill, size, label) => `<g fill="${fill}" transform="translate(${x} ${y})">${shape(desescaparXml(label), pop[700], Number(size)).paths}</g>`
   )
 
 // Intención AXIS de la selección del CTA. La usan el render y la validación del plan: una sola definición.
@@ -510,6 +512,30 @@ const qa = []
 // outside canvas»). Ahora el plan se valida entero primero: cada error nombra pieza y campo, y los campos que el
 // comando no lee se avisan. Los metadatos que usan OTRAS herramientas están declarados abajo para no avisar.
 // ════════════════════════════════════════════════════════════════════════════════════════════════
+// Qué fuente dibuja cada campo de texto (el mismo mapa que usa composePiece).
+const POPS = [pop[400], pop[700]]
+const sinGlifo = (texto, fuentes) => [...new Set([...String(texto ?? '').replace(/\*\*|\[\[|\]\]|\|/g, '')].filter(ch => !/\s/u.test(ch)).filter(ch => fuentes.some(f => !f.hasGlyphForCodePoint(ch.codePointAt(0)))))]
+
+function camposConFuente(p) {
+  const familia = f => (f === 'bricolage' ? [bric] : POPS)
+
+  return [
+    ['label', p.label, [pop[700]]],
+    ['lead', p.lead, familia(p.leadFamily ?? 'poppins')],
+    ['dominant', p.dominant, [bric]],
+    ['after', p.after, familia(p.afterFamily ?? 'poppins')],
+    ['note.text', p.note?.text, POPS],
+    ['footer.text', p.footer?.text, [bric]],
+    ['card.header', p.card?.header, POPS],
+    ['card.body', p.card?.body, POPS],
+    ['cta.text', p.cta?.text, [pop[700]]],
+    ['cta.descriptor', p.cta?.descriptor, [pop[400]]],
+    ...(p.cta?.seleccion?.cursores ?? []).map((k, i) => [`cta.seleccion.cursores.${i}.label`, k.label, [pop[700]]]),
+    ...(p.selection?.cursors ?? []).map((k, i) => [`selection.cursors.${i}.label`, k.label, [pop[700]]]),
+    ...(p.gesture && gutt ? [['gesture.text', p.gesture.text, [gutt]]] : [])
+  ].filter(([, t]) => typeof t === 'string' && t)
+}
+
 function validarPlan(plan) {
   const errores = []
   const avisos = []
@@ -538,6 +564,15 @@ function validarPlan(plan) {
     if (r.errores.length) continue
 
     if (!fs.existsSync(path.resolve(PLAN_DIR, p.plate))) e(`no existe el plate \`${p.plate}\``)
+
+    // Cobertura de glifos (tramo 3): un carácter que la fuente no tiene sale como un cuadro vacío —emoji, hebreo—
+    // y ningún chequeo de contraste lo ve (auditoría 2026-09-23, hallazgo 4). Se valida con la fuente que dibuja
+    // cada voz.
+    for (const [campo, textoCampo, fuentes] of camposConFuente(p)) {
+      const faltan = sinGlifo(desescaparXml(textoCampo), fuentes)
+
+      if (faltan.length) e(`\`${campo}\` usa caracteres que su fuente no tiene (saldrían como cuadros vacíos): ${faltan.map(ch => `«${ch}» U+${ch.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`).join(', ')}`)
+    }
 
     if (p.cta.seleccion != null) {
       try {
@@ -727,6 +762,35 @@ function scaleSpec(s0, f, canvasW) {
   return s
 }
 
+// Caja del logo con la fórmula del dibujo: ancho fracción del lado corto (o px), centro en `logo.x`, borde superior en
+// `logo.y` o al pie. La usan la elección de variante, las invariantes y el dibujo.
+const ASPECTO_LOGO = 196.68 / 837.07
+
+function cajaLogo(s) {
+  const lw = Math.round(s.logo.width <= 1 ? s.logo.width * Math.min(W, H) : s.logo.width)
+  const lh = Math.round(lw * ASPECTO_LOGO)
+  const lx = Math.round((s.logo.x != null ? s.logo.x * W : W / 2) - lw / 2)
+  const ly = typeof s.logo.y === 'number' ? Math.round(s.logo.y * H) : Math.round(H - M * 0.85 - lh)
+
+  return { left: lx, top: ly, right: lx + lw, bottom: ly + lh }
+}
+
+let aspectoUrl = null
+
+async function cajaUrl(s) {
+  if (aspectoUrl == null) {
+    const { width, height } = await sharp(await sharp(repo('src/lib/artifact-composer/catalogs/deck-axis/assets/url-lum.svg'), { density: 600 }).png().toBuffer()).metadata()
+
+    aspectoUrl = height / width
+  }
+
+  const uw = Math.round(s.url.width * W)
+  const left = Math.round(W / 2 - uw / 2)
+  const top = Math.round(s.url.y * H)
+
+  return { left, top, right: left + uw, bottom: top + Math.round(uw * aspectoUrl) }
+}
+
 async function composePiece(s, opts = {}) {
   // Salidas de la pieza: se escriben JUNTAS al final, sólo si la pieza pasó todos los chequeos y no es una prueba de
   // tamaño. Antes el SVG de controles y la evidencia se escribían en cada prueba del crecimiento, y el PNG antes de
@@ -743,6 +807,7 @@ async function composePiece(s, opts = {}) {
   // Cursores, etiquetas y marcos de TODA selección, con su destino: ninguno puede tapar otra voz de texto.
   const elementosSeleccion = []
   let ctaBorde = null
+  let ctaBoton = null
   let ctaVariante = null
   let ctaVarianteTokens = null
   const plate = path.resolve(PLAN_DIR, s.plate)
@@ -1036,6 +1101,8 @@ return k.ink.right - k.ink.left }))
     const t=block({text:c.text,font:pop[700],size:c.fontSize,tracking:0,leading:1.2,x:cx+padX,topY:cy+padY,maxWidth:W*.65,fill:ink});
     const b={left:cx,top:cy,right:t.box.right+padX,bottom:t.box.bottom+padY};
 
+    ctaBoton=b;
+
     // El borde del contorno mide al menos 1 CSS px en un teléfono (390 px de ancho): 2 px fijos en un lienzo de 1920
     // eran 0,4 CSS px y se mezclaban con la escena (auditoría 2026-09-23, hallazgo 12). El relleno conserva su trazo
     // de 2 px: ahí separa el relleno, no la línea.
@@ -1121,23 +1188,28 @@ return k.ink.right - k.ink.left }))
     salidas.push([`${s.id}-cta-evidence.json`,JSON.stringify({intent:ci,manifest:cm,geometry:cr.evidence,textBounds:t.box,descriptorBounds:descriptor.box,surface:b,variant:c.variant,colors:{surface:surfaceColor,ink},solidTextContrast:solid?(Math.max(hexLum(surfaceColor),hexLum(ink))+.05)/(Math.min(hexLum(surfaceColor),hexLum(ink))+.05):null},null,2)]);
   }
 
-  salidas.push([`${s.id}-layout.json`,JSON.stringify({canvas:{width:W,height:H},subjectProtection:s.subjectProtection,elements:checks.map(({id,box})=>({id,box})),typography:{lead:s.leadSize,dominant:domSize,closure:s.afterSize,benefit:s.note?.size,cta:s.cta.fontSize,descriptor:s.cta.descriptorSize},selection:selEvidence},null,2)]);
   const descriptorBox=checks.find(c=>c.id==='descriptor').box;
 
-  // Ningún cursor ni etiqueta de selección tapa una voz de texto que no es su destino (hallado 2026-09-22: un
-  // colaborador anclado arriba del CTA caía sobre la nota). Medido en las piezas aprobadas: 0 choques, así que la
-  // regla bloquea sin romper nada. En la búsqueda del tamaño descarta el factor; a tamaño final, aborta.
-  const VOCES_TEXTO = new Set(['etiqueta', 'entrada', 'dominante', 'cierre-frase', 'nota', 'cta', 'descriptor', 'cierre-inferior'])
-  const holguraChoque = Math.min(W, H) * 0.004
+  // INVARIANTES DE MAQUETACIÓN (tramo 3): una sola función —cta-invariantes.mjs— para la búsqueda del tamaño, la
+  // composición final y el gate. Cajas no degeneradas; texto, botón y firma sin tocarse; ninguna selección sobre una
+  // voz que no es su destino (la regla que existía desde el 2026-09-22, ahora compartida); reserva editorial. La firma
+  // y la url se ubican con la misma fórmula que el dibujo, así el crecimiento las ve antes de pintarlas.
+  const elementosMaquetacion = cajasFirma => [
+    ...checks.filter(c => GUARD_IDS.has(c.id)).map(c => ({ id: c.id, tipo: 'texto', box: c.box, ...(c.id === 'cta' && ctaBoton ? { dentroDe: 'cta-boton' } : {}) })),
+    ...checks.filter(c => /-acento-/.test(c.id)).map(c => ({ id: c.id, tipo: 'acento', box: c.box })),
+    ...(ctaBoton ? [{ id: 'cta-boton', tipo: 'cta', box: ctaBoton }] : []),
+    ...(cardEl ? [{ id: 'tarjeta', tipo: 'texto', box: { left: cardEl.rect.left, top: cardEl.rect.top, right: cardEl.rect.left + cardEl.rect.width, bottom: cardEl.rect.top + cardEl.rect.height } }] : []),
+    ...cajasFirma.map(f => ({ id: f.id, tipo: 'firma', box: f.box })),
+    ...elementosSeleccion.map(el => ({ id: el.id, tipo: 'seleccion', box: el.box, destino: el.destino === 'cta' ? 'cta-boton' : el.destino }))
+  ]
 
-  const choques = elementosSeleccion.flatMap(el => checks
-    .filter(c => VOCES_TEXTO.has(c.id) && c.id !== el.destino)
-    .filter(c => el.box && el.box.left < c.box.right + holguraChoque && el.box.right > c.box.left - holguraChoque && el.box.top < c.box.bottom + holguraChoque && el.box.bottom > c.box.top - holguraChoque)
-    .map(c => `${el.id} tapa «${c.id}»`))
+  const firmaPrevista = [
+    ...(s.logo ? [{ id: 'logo', box: cajaLogo(s) }] : []),
+    ...(s.url ? [{ id: 'url', box: await cajaUrl(s) }] : [])
+  ]
 
-  if (choques.length) {
-    throw new LienzoError(`${s.id}: ${[...new Set(choques)].join(', ')}. Cambia la esquina del colaborador o el ancla del cursor.`)
-  }
+  const maquetacion = invariantesMaquetacion({ ancho: W, alto: H, elementos: elementosMaquetacion(firmaPrevista) })
+  const reservaRota = fueraDeReserva({ elementos: elementosMaquetacion(firmaPrevista), reserva: s.editorialReserve })
 
   const violaDeclarada = Boolean(s.subjectProtection && descriptorBox.bottom > s.subjectProtection.top - s.subjectProtection.minClearance)
   const hits = opts.mask ? guardHits(opts.mask, [...checks.filter(c => GUARD_IDS.has(c.id)).map(c => ({ id: c.id, box: c.box })), ...guard], W, H, opts.dry ? CLEAR_GROW : CLEAR_TOUCH, opts.dry ? 0 : MASK_NOISE_PX) : []
@@ -1163,11 +1235,12 @@ return k.ink.right - k.ink.left }))
     return [...checks.filter(c => GUARD_IDS.has(c.id)), ...guard].filter(c => c.box.left < zb.right && c.box.right > zb.left && c.box.top < zb.bottom && c.box.bottom > zb.top).map(c => `${c.id} tapa «${z.reason}»`)
   })
 
-  if (opts.dry && (violaDeclarada || hits.length || fuera || fueraDeZona.length || protegidas.length)) return { ok: false, hits, resuelta }
+  if (opts.dry && (violaDeclarada || hits.length || fuera || fueraDeZona.length || protegidas.length || maquetacion.length || reservaRota.length)) return { ok: false, hits, resuelta }
   if (protegidas.length) throw Error(`${s.id}: el texto tapa una zona protegida — ${[...new Set(protegidas)].join(', ')}. Mueve el texto o acota la zona.`)
   if (fueraDeZona.length) console.warn(`  ⚠ ${s.id}: fuera de la zona segura declarada${s.safeArea.profile ? ` (${s.safeArea.profile})` : ''}: ${[...new Set(fueraDeZona)].join(', ')}`)
   if (violaDeclarada) throw Error(`${s.id}: el descriptor invade \`subjectProtection\` (baja hasta ${Math.round(descriptorBox.bottom)} px; el límite es ${s.subjectProtection.top - s.subjectProtection.minClearance})`)
   if (hits.length) throw Error(`${s.id}: el texto tapa al sujeto — ${hits.map(h => `${h.id} (${h.px} px)`).join(', ')}. Sube el \`top\`, acorta el copy o regenera el plate con más reserva.`)
+  if (maquetacion.length) throw new LienzoError(`${s.id}: la maquetación no cumple — ${[...new Set(maquetacion)].join(' · ')}. Cambia la esquina del colaborador, el ancla del cursor o la posición de la firma.`)
   const base = sharp(plate)
   const baseBuf = await base.png().toBuffer()
 
@@ -1220,11 +1293,10 @@ return k.ink.right - k.ink.left }))
   if (s.logo) {
     // Variante automática por contraste medido en la zona real del logo (salvo que la pieza la declare).
     if (!s.logo.variant || s.logo.variant === 'auto') {
-      const lwTmp = Math.round(s.logo.width <= 1 ? s.logo.width * Math.min(W, H) : s.logo.width)
-      const lhTmp = Math.round(lwTmp * 196.68 / 837.07)
-      const lxTmp = Math.round((s.logo.x != null ? s.logo.x * W : W / 2) - lwTmp / 2)
+      const { left: lxTmp, top: lyTmp, right: rxTmp, bottom: byTmp } = cajaLogo(s)
+      const lwTmp = rxTmp - lxTmp
+      const lhTmp = byTmp - lyTmp
       // Se mide DONDE va la firma: antes se medía al pie aunque la pieza declarara `logo.y`.
-      const lyTmp = typeof s.logo.y === 'number' ? Math.round(s.logo.y * H) : Math.round(H - M * 0.85 - lhTmp)
       const cNeg = await contrastUnder(bare, { left: lxTmp, right: lxTmp + lwTmp, top: lyTmp, bottom: lyTmp + lhTmp }, 1)
       const cCol = await contrastUnder(bare, { left: lxTmp, right: lxTmp + lwTmp, top: lyTmp, bottom: lyTmp + lhTmp }, lum(2, 60, 112))
 
@@ -1270,6 +1342,18 @@ return k.ink.right - k.ink.left }))
     checks.push({ id: 'url', box: { left, right: left + uw, top: topU, bottom: topU + uh }, skipContrast: true })
   }
 
+  // Con la firma y la url REALES (su tamaño sale del SVG rasterizado), las invariantes se verifican otra vez.
+  const firmaReal = checks.filter(c => c.id === 'logo' || c.id === 'url').map(c => ({ id: c.id, box: c.box }))
+  const elementosFinales = elementosMaquetacion(firmaReal)
+  const maquetacionFinal = invariantesMaquetacion({ ancho: W, alto: H, elementos: elementosFinales })
+  const reservaFinal = fueraDeReserva({ elementos: elementosFinales, reserva: s.editorialReserve })
+
+  if (maquetacionFinal.length) throw new LienzoError(`${s.id}: la maquetación no cumple — ${[...new Set(maquetacionFinal)].join(' · ')}. Cambia la esquina del colaborador, el ancla del cursor o la posición de la firma.`)
+  if (reservaFinal.length) console.warn(`  ⚠ ${s.id}: ${reservaFinal.join(' · ')} (el gate lo bloquea salvo excepción «reserva-editorial»).`)
+  // El layout se escribe con la firma incluida y con los elementos que el gate vuelve a verificar.
+  const layoutJson = JSON.stringify({ canvas: { width: W, height: H }, subjectProtection: s.subjectProtection, elements: checks.map(({ id, box }) => ({ id, box })), typography: { lead: s.leadSize, dominant: domSize, closure: s.afterSize, benefit: s.note?.size, cta: s.cta.fontSize, descriptor: s.cta.descriptorSize }, selection: selEvidence, maquetacion: { elementos: elementosFinales } }, null, 2)
+
+  salidas.push([`${s.id}-layout.json`, layoutJson])
   const out = s.final ? sharp(master).resize({ width: s.final[0], height: s.final[1] }) : sharp(master)
 
   const pngFinal = await out.png().toBuffer()
@@ -1370,8 +1454,8 @@ return k.ink.right - k.ink.left }))
     )
   }
 
-  const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal) }
-  const registro = { id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), huellas }
+  const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson) }
+  const registro = { id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), huellas }
 
   for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
   qa.push(registro)
