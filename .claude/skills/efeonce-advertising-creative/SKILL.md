@@ -237,6 +237,12 @@ contraste y protección de sujeto, no completitud del concepto ni geometría del
   `after`. Si la firma la pone otra herramienta después (`firmar.mjs`), el plan declara `firma: { modo:
   "externa", razon, y }`: el compositor reserva su caja y el gate le exige el mismo contrato (4,5:1, 20 %, fuera del
   sujeto y dentro de la zona de AXIS estrechada por `signatureSafeArea`).
+- **El gate distingue falla de «no certificable» (tramo 6, §18).** Sale con **3** —no con 0— si el QA es del formato
+  anterior, si la pieza se compuso con otra versión del comando, si la máscara del sujeto salió de una caché ajena o si
+  la pieza lleva gesto manuscrito o tarjeta (nadie los mide). **3 no es un pase**: recompón, o certifica con
+  `pnpm foto:cta:gate <plan> --reproducir`, que recompone en un temporal con el comando vigente y segmentación nueva y
+  exige que lo entregado sea idéntico byte a byte. `logo.y: "auto"` busca sólo en la banda del pie y mide el trazo del
+  logo; si no encuentra lugar, la firma queda al pie y el gate decide.
 - **Un bloque centrado no se ancla lejos del centro.** Con `align: 'center'` y `|centerX − 0,5| > 0,15`, el
   compositor aborta: si el aire está a un costado, el bloque se alinea a ese costado (`align: 'left'`). Operador
   sobre 03-referencia-916: «se vería mejor alineada a la izquierda por la posición». §14.

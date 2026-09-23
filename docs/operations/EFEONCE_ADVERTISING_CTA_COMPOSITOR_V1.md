@@ -784,9 +784,42 @@ cambio pusiera texto donde después iba a caer. Ahora:
 - Medido en los nueve 9:16 de v05–v07 que declaran `signatureY`: **ningún píxel cambia**; contraste de 7,56 a 19,39:1;
   **v05/02-reconoces-916 cae sobre la persona** (245 px de su silueta); **v07 cae en la franja inferior que Reels tapa**
   (0,887–0,913 del alto contra 0,87 de AXIS), como reconoce su propio LEEME; v06 queda dentro.
-- Queda para decidir: los otros formatos de esos sets (16:9, 4:5, 1:1) no declaran la altura de su firma —`firmar.mjs`
-  usa 0,935 por defecto— y el gate los marca «sin firma declarada» hasta que el plan declare `firma: { modo:
-  "externa", … }`. No se tocaron los planes aprobados.
+- Los otros formatos de esos sets (16:9, 4:5, 1:1) no declaraban su firma —`firmar.mjs` usa 0,935 por defecto— y el gate
+  los marcaba «sin firma declarada». **Decisión del operador (2026-09-23): se declara.** Las 60 piezas que no declaraban
+  nada llevan `firma: { modo: "externa", razon }` (8 de v03, 16 de v04, 12 por plan en v05–v07); sin `y`, el compositor
+  reserva la misma caja que firma esa herramienta. Regresión de los 13 planes AEO: 72 de 72 iguales. Los paquetes de
+  origen y las reproducciones verificadas no se tocaron: son registros de procedencia.
+
+### Segunda certificación (2026-09-23): dos auditores, NO CERTIFICA
+
+Sobre los cinco tramos cerrados, dos subagentes adversariales —diseño y arquitectura— corrieron sus propias
+reproducciones. Lo que declaraban los tramos se cumplía (10 de 10 pruebas, 104 de 104 piezas iguales), pero quedaban
+caminos donde el gate salía con 0 sobre una pieza mala. El más grave estaba activo en un plan real: el gate de
+`cmp002-hubspot/composicion-formatos/piezas-formatos.json` decía «✓ 18 piezas… WCAG 2.2 AA» sin una sola medición de
+accesibilidad, y una de ellas (KV-07-916) la rechaza el compositor vigente porque el texto tapa al sujeto. El gesto
+manuscrito quedó fuera de alcance por decisión del operador (2026-09-23); todo lo demás se planificó en tramos 6 a 9.
+
+**Tramo 6 · El gate no miente.**
+
+- **«No certificable» no es un pase.** El gate sale con **3** —ni 0 ni 1— cuando no puede probar lo que certificaría: QA
+  del formato anterior, pieza compuesta con otra versión del comando, máscara del sujeto leída de una caché ajena al
+  repo (`FOTO_MASCARAS_DIR`), y piezas con gesto manuscrito o tarjeta (elementos que ninguna guarda mide). La línea final
+  dice lo que se midió. Códigos: 0 certificado · 1 falla · 2 uso · 3 no certificable.
+- **Certificación por reproducción:** `pnpm foto:cta:gate <plan> --reproducir` recompone el plan en un temporal con el
+  comando vigente y una segmentación nueva, exige que cada PNG y layout entregado sea idéntico byte a byte, y da el
+  veredicto sobre el QA reproducido. Es lo que no se falsifica: la huella del comando la escribe el propio compositor, y
+  una caché envenenada con metadatos coherentes pasaba.
+- **La máscara dice de dónde salió** (`mascara.origen`: `fresca`, `cache-canonica`, `cache-externa`) y cuánto marca; una
+  máscara que no marca sujeto se avisa.
+- **`logo.y: "auto"` busca sólo en la banda del pie**, debajo de todo lo compuesto, y exige ≥ 4,5:1 en la caja **y en el
+  trazo** del logo (el 1 % peor, como las voces), lejos del sujeto y de las zonas `protect`. Antes subía sin tope y en
+  KV-06-169 dejaba la firma encima del titular; ahora esa pieza no encuentra lugar en su banda, la firma queda al pie y
+  el gate la mide ahí. El gate recalcula la banda sobre el layout y exige el trazo de toda firma.
+- La suite certifica contra el compositor que prueba (`--comando`): un mutante ya no «muere» por ser otra versión.
+- Pruebas: P06 (la firma automática nunca sube por encima del contenido, en KV-06-169) y P10 (formato anterior, otra
+  versión del comando, caché ajena y gesto salen con 3; `--reproducir` certifica lo idéntico y rechaza un layout alterado;
+  firma automática sobre el contenido y trazo de la firma bajo 4,5:1 rechazados). **Mutantes: 48 de 48** detectados por
+  la razón esperada (10 nuevos).
 
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
@@ -818,12 +851,14 @@ Lo que se implementó mientras tanto va entre paréntesis; nada de esto cambia u
    declarar placement de escritorio. *(Aviso bajo 9 px en pantalla; `placement: { anchoCssPx, razon }` disponible.)*
 2. Firma: ¿el compositor busca la Y automáticamente, o el plan la declara y el gate sólo verifica? *(Las dos: el plan
    declara por defecto y `logo.y: "auto"` busca; el gate verifica contraste, tamaño, zona y sujeto.)*
-3. APCA y daltonismo: ¿bloqueantes para el CTA? *(Siguen como aviso.)*
+3. ~~APCA y daltonismo: ¿bloqueantes para el CTA?~~ **Decidido (2026-09-23): bloquean en el CTA** (texto, borde y
+   relleno), exceptuable como `cta-perceptual`; en las demás voces siguen como aviso.
 4. Con Gigi en cuadro, ¿el acento del CTA se cede a Gigi? *(Excepción auditada `acento-cta` disponible; no se creó un
    campo `acento.cedidoA`.)*
 5. Canon de variantes: «escalar sí, degradar no» frente a §10. *(`auto` degrada la TINTA del contorno —el acento queda
    en el borde— antes de escalar al relleno, como pide §10; el texto del canon no se tocó.)*
-6. **Piezas del repo que el canon ahora reprueba** (86 de 86, ninguna cambió): zona segura 77, concepto sin cierre 40,
+6. **Piezas del repo que el canon ahora reprueba** — **decidido (2026-09-23): se dejan como están y se corrigen al
+   recomponer** (86 de 86, ninguna cambió): zona segura 77, concepto sin cierre 40,
    firma sin declarar 37, firma bajo 20 % 19, reserva editorial 6, acento 7 (ya fallaba), firma sobre el sujeto 3,
    firma bajo 4,5:1 1, regla de las tres veces 1. Por set: recomponer con `safeArea: "axis"` y `cta.x`/`note.x:
    "columna"`, declarar `firma` en los que firma otra herramienta, o excepciones auditadas con tu nombre.

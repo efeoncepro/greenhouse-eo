@@ -57,6 +57,7 @@ const FIX = {
   ref_916: [V07, '03-referencia-916'],
   ref_169: [V07, '03-referencia-169'],
   kv07_916: [CMP002, 'KV-07-916'],
+  kv06_169: [CMP002, 'KV-06-169'],
   fue_916: [V07, '01-fuera-916'],
   v03_fue: ['ai-generations/2026-09-22_aeo-cta-v03/piezas.json', '01-fuera-916']
 }
@@ -104,9 +105,9 @@ async function componer(nombre, piezas, ids = [], env = {}) {
   }
 }
 
-async function gate(planPath) {
+async function gate(planPath, extra = []) {
   try {
-    const r = await run(process.execPath, [GATE, planPath], { cwd: ROOT, maxBuffer: 16e6 })
+    const r = await run(process.execPath, [GATE, planPath, '--comando', COMPOSITOR, ...extra], { cwd: ROOT, maxBuffer: 16e6, timeout: 20 * 60e3 })
 
     return { code: 0, salida: r.stdout + r.stderr }
   } catch (e) {
@@ -453,7 +454,25 @@ const PRUEBAS = [
         enColumna = Boolean(boton && desc) && Math.abs(boton.left - L.columna) <= 1 && Math.abs(desc.left - L.columna) <= 1
         const logo = cajas.find(e => e.id === 'logo')?.box
 
-        firmaAuto = q.firma?.auto === true && q.firma.encontrada === true && Boolean(logo) && dentro(logo) && q.contraste.logo >= 4.5 && Math.abs(q.firma.anchoLadoCorto - 0.2) <= 0.005
+        // Tramo 6: debajo de todo lo compuesto, y con el trazo medido ≥ 4,5:1 (no sólo la caja).
+        const contenido = Math.max(...cajas.filter(e => e.tipo !== 'firma').map(e => e.box.bottom))
+
+        firmaAuto = q.firma?.auto === true && q.firma.encontrada === true && Boolean(logo) && dentro(logo) && logo.top >= contenido && q.contraste.logo >= 4.5 && q.firma.trazo?.cumpleWcag === true && Math.abs(q.firma.anchoLadoCorto - 0.2) <= 0.005
+      }
+
+      // KV-06-169 al canon: la búsqueda subía hasta encima del titular (auditoría de diseño, N1). Ahora la firma queda en
+      // la banda del pie o no se encuentra (y entonces el gate la mide al pie); nunca por encima del contenido.
+      const kv06 = await componer('P06-firma-banda', [canon('kv06_169')])
+      let firmaEnBanda = false
+      let detalleBanda = kv06.ok ? '' : kv06.error
+
+      if (kv06.ok) {
+        const L = leer(kv06.dir, 'KV-06-169-layout.json')
+        const logo = L.maquetacion.elementos.find(e => e.id === 'logo')?.box
+        const contenido = Math.max(...L.maquetacion.elementos.filter(e => e.tipo !== 'firma' && e.tipo !== 'acento').map(e => e.box.bottom))
+
+        firmaEnBanda = Boolean(logo) && logo.top >= contenido
+        detalleBanda = `firma en ${logo ? Math.round(logo.top) : '—'} px, contenido hasta ${Math.round(contenido)} px, encontrada ${kv06.qa[0].firma?.encontrada}`
       }
 
       const [original, alineada, choca, cabe, tapaZona, firmaSobre, fueraReserva, v03, externaSobre] = await Promise.all([componer('P06-eje', [pieza('ref_916')]), componer('P06-izquierda', [izquierda]), componer('P06-choque', [conIA('top-end')]), componer('P06-cabe', [conIA('bottom-end')]), componer('P06-protect', [protegida]), componer('P06-firma', [firmaEncima]), componer('P06-reserva', [reservaChica]), componer('P06-v03', [pieza('v03_fue')]), componer('P06-firma-externa', [externaEncima])])
@@ -484,7 +503,7 @@ const PRUEBAS = [
         margen = Math.min(...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.left)) >= izquierda.safeArea.x0 * L.canvas.width - 0.5
       }
 
-      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva && zonaAxis && enColumna && firmaAuto && zonaFrena && externaRechazada && respetaArriba, detalle: `con "axis" el texto arranca dentro de la zona por arriba: ${respetaArriba}${arriba.ok ? '' : ` (${arriba.error})`} · firma externa sobre el texto rechazada: ${externaRechazada} · crecimiento frenado por la zona declarada: ${zonaFrena} (${detalleZona}) · zona de AXIS con safeArea "axis": ${zonaAxis}${enCanon.ok ? '' : ` (${enCanon.error})`} · CTA y descriptor en la columna: ${enColumna} · firma automática 20 % legible dentro de la zona: ${firmaAuto} · ${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
+      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva && zonaAxis && enColumna && firmaAuto && zonaFrena && externaRechazada && respetaArriba && firmaEnBanda, detalle: `la firma automática nunca sube por encima del contenido (KV-06-169): ${firmaEnBanda} (${detalleBanda}) · con "axis" el texto arranca dentro de la zona por arriba: ${respetaArriba}${arriba.ok ? '' : ` (${arriba.error})`} · firma externa sobre el texto rechazada: ${externaRechazada} · crecimiento frenado por la zona declarada: ${zonaFrena} (${detalleZona}) · zona de AXIS con safeArea "axis": ${zonaAxis}${enCanon.ok ? '' : ` (${enCanon.error})`} · CTA y descriptor en la columna: ${enColumna} · firma automática 20 % legible dentro de la zona: ${firmaAuto} · ${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
     }
   },
   {
@@ -836,6 +855,66 @@ const PRUEBAS = [
         if (b?.anillo) Object.assign(b.anillo, { wcag: 1.8, cumpleWcag: false })
       })
 
+      // TRAMO 6 · «no certificable» no es un pase (auditoría de arquitectura, N1, N2 y N4): sale con 3, no con 0.
+      const gComando = await editarQa(r => { r.huellas.compositor = 'otra-version-del-comando' })
+      const gTrazoFirma = await editarQa(r => { Object.assign(r.firma.trazo, { wcag: 2.2, cumpleWcag: false, pctBajoUmbral: 12 }) })
+      // La firma automática por encima del contenido: se sube la caja del logo en el layout y se re-firma su huella, para
+      // que el gate llegue a la regla (si no, lo frena la huella del layout, que es otra guarda).
+      let gFirmaArriba = { code: -1, salida: 'falta el layout' }
+
+      if (fs.existsSync(archivo(`out/${idH}-layout.json`)) && qaPorPlan) {
+        const rutaL = archivo(`out/${idH}-layout.json`)
+        const rutaQ = archivo('out/qa-piezas.json')
+        const [lOrig, qOrig] = [fs.readFileSync(rutaL), fs.readFileSync(rutaQ)]
+        const L = JSON.parse(lOrig)
+        const logo = L.maquetacion.elementos.find(e => e.id === 'logo')
+
+        if (logo) {
+          const alto = logo.box.bottom - logo.box.top
+
+          logo.box.top = 10
+          logo.box.bottom = 10 + alto
+          const nuevo = JSON.stringify(L, null, 2)
+          const q = JSON.parse(qOrig)
+
+          q[0].huellas.layout = sha(Buffer.from(nuevo))
+          q[0].firma = { ...q[0].firma, auto: true, encontrada: true }
+          fs.writeFileSync(rutaL, nuevo)
+          fs.writeFileSync(rutaQ, JSON.stringify(q))
+          gFirmaArriba = await gate(h.planPath)
+        }
+
+        fs.writeFileSync(rutaL, lOrig)
+        fs.writeFileSync(rutaQ, qOrig)
+      }
+
+      // Certificación por reproducción: lo entregado idéntico → certifica; un layout alterado → lo rechaza.
+      const gReproduce = h.ok ? await gate(h.planPath, ['--reproducir']) : { code: -1, salida: h.error }
+      let gReproduceMal = { code: -1, salida: 'falta el layout' }
+
+      if (fs.existsSync(archivo(`out/${idH}-layout.json`))) {
+        const rutaL = archivo(`out/${idH}-layout.json`)
+        const orig = fs.readFileSync(rutaL)
+
+        fs.writeFileSync(rutaL, Buffer.concat([orig, Buffer.from(' ')]))
+        gReproduceMal = await gate(h.planPath, ['--reproducir'])
+        fs.writeFileSync(rutaL, orig)
+      }
+
+      // Caché de máscaras ajena: la primera composición segmenta (fresca); la segunda lee esa caché (ajena al repo).
+      const cacheAjena = path.join(TMP, 'P10-cache-ajena')
+      const ajena1 = await componer('P10-cache-ajena-1', [canon('b2_916')], [], { FOTO_MASCARAS_DIR: cacheAjena })
+      const ajena2 = await componer('P10-cache-ajena-2', [canon('b2_916')], [], { FOTO_MASCARAS_DIR: cacheAjena })
+      const ajenaFresca = ajena1.ok && ajena1.qa[0].mascara?.origen === 'fresca'
+      const ajenaCache = ajena2.ok && ajena2.qa[0].mascara?.origen === 'cache-externa'
+      const gAjena = ajena2.ok ? await gate(ajena2.planPath) : { code: -1, salida: ajena2.error }
+      // Gesto manuscrito: compone, pero no se certifica (decisión del operador 2026-09-23: fuera de alcance).
+      const conGesto = canon('b2_916')
+
+      conGesto.gesture = { text: 'mírala', size: 110, x: 0.3, y: 0.66 }
+      const rGesto = await componer('P10-gesto', [conGesto])
+      const gGesto = rGesto.ok ? await gate(rGesto.planPath) : { code: -1, salida: rGesto.error }
+
       let gLegado = { code: -1, salida: 'falta out/qa-piezas.json' }
 
       if (qaPorPlan) {
@@ -981,7 +1060,14 @@ const PRUEBAS = [
         'rechaza CTA bajo el piso perceptual': gPerceptual.code !== 0 && /el CTA no alcanza el piso perceptual/.test(gPerceptual.salida),
         'recalcula las invariantes sobre el layout': gMaquetacion.code !== 0 && /la maquetación no cumple/.test(gMaquetacion.salida),
         'rechaza 01-fuera-916 al tamaño anterior (el trazo no alcanza)': gCrecida.code !== 0 && /1 % peor del trazo/.test(gCrecida.salida),
-        'avisa formato anterior': /no puede certificarlo/.test(gLegado.salida),
+        'formato anterior: no certificable (sale con 3)': gLegado.code === 3 && /NO CERTIFICABLE/.test(gLegado.salida) && /formato anterior/.test(gLegado.salida),
+        'otra versión del comando: no certificable (3)': gComando.code === 3 && /otra versión del comando/.test(gComando.salida),
+        'caché de máscaras ajena: no certificable (3)': ajenaFresca && ajenaCache && gAjena.code === 3 && /caché ajena/.test(gAjena.salida),
+        'gesto manuscrito: no certificable (3)': gGesto.code === 3 && /gesto manuscrito/.test(gGesto.salida),
+        '--reproducir certifica lo idéntico': gReproduce.code === 0 && /idéntico a la reproducción/.test(gReproduce.salida),
+        '--reproducir rechaza lo que el comando no produce': gReproduceMal.code === 1 && /no es lo que produce el comando vigente/.test(gReproduceMal.salida),
+        'rechaza firma automática por encima del contenido': gFirmaArriba.code === 1 && /por encima del contenido/.test(gFirmaArriba.salida),
+        'rechaza trazo de la firma bajo 4,5:1': gTrazoFirma.code === 1 && /trazo de la firma/.test(gTrazoFirma.salida),
         'rechaza composición concurrente': concurrentes.filter(x => x === 'ok').length === 1 && concurrentes.some(x => /otra composición usa/.test(x)),
         'rechaza CTA sin acento': gSinAcento.code !== 0 && /no es un acento/.test(gSinAcento.salida),
         'rechaza voz bajo WCAG': gBajo.code !== 0 && /entrada.*WCAG 2\.2 AA/.test(gBajo.salida),

@@ -10,7 +10,7 @@ import path from 'node:path'
 import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 
-const REPO = fileURLToPath(new URL('../../', import.meta.url))
+export const REPO = fileURLToPath(new URL('../../', import.meta.url))
 
 export const sha = datos => createHash('sha256').update(datos).digest('hex')
 
@@ -27,7 +27,7 @@ export const huellaPieza = pieza => sha(estable(pieza))
 // Huella del COMANDO: su código y el de sus dependencias locales, más las versiones de los paquetes que deciden la
 // geometría y el color. Si cambia, la pieza se compuso con otras reglas. El compositor se hashea desde el archivo que
 // CORRE (`compositor`), no desde la ruta canónica: así una copia o un mutante del comando no se hace pasar por él.
-const COMPOSITOR = 'scripts/foto/componer-cta.mjs'
+export const COMPOSITOR = 'scripts/foto/componer-cta.mjs'
 
 const DEPENDENCIAS = [
   'scripts/foto/accesibilidad.mjs',

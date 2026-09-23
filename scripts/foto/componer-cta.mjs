@@ -628,7 +628,8 @@ if (!only.length) fs.rmSync(QA_FILE, { force: true })
 // cachea por SHA-256 del plate, así que regenerar el plate la invalida sola.
 // ════════════════════════════════════════════════════════════════════════════════════════════════
 // `FOTO_MASCARAS_DIR` aísla la caché (las pruebas la envenenan a propósito sin tocar la compartida).
-const MASK_CACHE = process.env.FOTO_MASCARAS_DIR ? path.resolve(process.env.FOTO_MASCARAS_DIR) : repo('node_modules/.cache/foto-sujeto')
+const MASK_CACHE_REPO = repo('node_modules/.cache/foto-sujeto')
+const MASK_CACHE = process.env.FOTO_MASCARAS_DIR ? path.resolve(process.env.FOTO_MASCARAS_DIR) : MASK_CACHE_REPO
 const GUARD_IDS = new Set(['etiqueta', 'entrada', 'dominante', 'cierre-frase', 'cierre-inferior', 'nota', 'cta', 'descriptor'])
 
 // La entrada de caché sólo vale si sus METADATOS calzan: sha del plate, modelo y versión del segmentador, tamaño y sha
@@ -640,6 +641,8 @@ async function subjectMask(platePath) {
   const bytes = fs.readFileSync(platePath)
   const plateSha = sha(bytes)
   const cached = path.join(MASK_CACHE, `${plateSha}.png`)
+  // De dónde salió la máscara (tramo 6): el gate no certifica una leída de una caché ajena al repo.
+  let origen = MASK_CACHE === MASK_CACHE_REPO ? 'cache-canonica' : 'cache-externa'
   const metaRuta = path.join(MASK_CACHE, `${plateSha}.json`)
   const { width: pw, height: ph } = await sharp(bytes).metadata()
   let alphaPng = null
@@ -664,6 +667,7 @@ async function subjectMask(platePath) {
       if (info.width !== pw || info.height !== ph) throw new Error(`la segmentación devolvió ${info.width}×${info.height} para un plate de ${pw}×${ph}`)
       escribirAtomico(cached, alphaPng)
       escribirAtomico(metaRuta, JSON.stringify({ plateSha, modelo: 'medium', version: VERSION_SEGMENTACION, ancho: pw, alto: ph, mascaraSha: sha(alphaPng) }))
+      origen = 'fresca'
     } catch (e) {
       // Sin máscara no se inventa protección: la pieza se compone sin agrandar y el gate la rechaza (`sin-mascara`).
       console.warn(`  ⚠ no se pudo segmentar ${path.basename(platePath)}: ${e.message}`)
@@ -678,8 +682,11 @@ async function subjectMask(platePath) {
   const { data, info } = await sharp(alphaPng).extractChannel(0).raw().toBuffer({ resolveWithObject: true })
 
   if (info.channels !== 1) throw new Error(`máscara de sujeto con ${info.channels} canales; se esperaba 1`)
+  let marcados = 0
 
-  return { data, W: info.width, H: info.height, plateSha }
+  for (let i = 0; i < data.length; i++) if (data[i] > 127) marcados++
+
+  return { data, W: info.width, H: info.height, plateSha, origen, sha: sha(alphaPng), cobertura: +(marcados / data.length).toFixed(4) }
 }
 
 // Dos reglas con dos distancias (fracción del lado corto, medida como distancia REAL al borde de la caja,
@@ -846,26 +853,68 @@ async function contrasteFirmaExterna(buf, caja) {
 
 let aspectoUrl = null
 
-// Busca una Y para la firma (ver `logo.y: "auto"`). Paso de 0,5 % del alto; contraste con la tinta que mejor se lea.
-async function buscarYFirma(s, bare, mask, zona, ocupados) {
+// El logo rasterizado como se dibuja (mismo SVG, misma densidad, mismo ancho), en RGBA crudo: la búsqueda y el QA miden
+// el trazo real que se va a componer.
+async function rasterLogo(variante, ancho) {
+  const { data, info } = await sharp(await sharp(repo(`public/branding/${variante === 'color' ? 'logo-full.svg' : 'logo-negative.svg'}`), { density: 600 }).resize({ width: ancho }).png().toBuffer()).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+
+  return { variante, data, w: info.width, h: info.height }
+}
+
+// Contraste del TRAZO del logo en (left, top): cada píxel de la firma contra el fondo que tapa, el 1 % peor (el mismo
+// método que las voces, `medirGlifos`). `rgb` es el fondo sin texto, crudo, de 3 canales y del tamaño del lienzo.
+function trazoLogo(rgb, logo, left, top) {
+  const x0 = Math.max(0, left)
+  const y0 = Math.max(0, top)
+  const w = Math.min(W, left + logo.w) - x0
+  const h = Math.min(H, top + logo.h) - y0
+
+  if (w <= 0 || h <= 0) return null
+  const fondo = Buffer.alloc(w * h * 3)
+  const tinta = Buffer.alloc(w * h * 4)
+
+  for (let y = 0; y < h; y++) {
+    rgb.copy(fondo, y * w * 3, ((y0 + y) * W + x0) * 3, ((y0 + y) * W + x0 + w) * 3)
+    logo.data.copy(tinta, y * w * 4, ((y0 - top + y) * logo.w + (x0 - left)) * 4, ((y0 - top + y) * logo.w + (x0 - left) + w) * 4)
+  }
+
+  return medirGlifos({ rgb: fondo, texto: tinta, ancho: w, alto: h, caja: { left: 0, top: 0, right: w, bottom: h }, umbral: UMBRALES.normalTextContrast })
+}
+
+// Busca una Y para la firma (ver `logo.y: "auto"`) DENTRO DE LA BANDA DEL PIE (tramo 6; auditoría de diseño, N1): entre
+// lo último compuesto —texto, CTA, selección, tarjeta— más una holgura, y el borde inferior de la zona. Antes subía sin
+// tope y encontraba «su» Y por encima del titular (KV-06-169): la firma dejaba de ser firma. Parte del pie histórico y
+// sube; en cada Y exige, con alguna de las dos tintas oficiales, ≥ 4,5:1 en la caja Y en el trazo; no toca al sujeto
+// (con holgura) ni una zona `protect`. Devuelve la Y y la tinta que la cumple, o `y: null` con la banda que recorrió.
+async function buscarYFirma(s, bare, mask, zona, ocupados, protegidas = []) {
   const pie = cajaLogo({ ...s, logo: { ...s.logo, y: undefined } })
   const alto = pie.bottom - pie.top
   const holgura = Math.round(Math.min(W, H) * 0.02)
   const paso = Math.max(4, Math.round(H * 0.005))
+  const techo = Math.max(Math.ceil(zona.y0 * H), ...ocupados.map(o => Math.ceil(o.bottom + holgura)))
+  const piso = Math.min(pie.top, Math.floor(zona.y1 * H - alto))
+  const banda = [+(techo / H).toFixed(4), +((piso + alto) / H).toFixed(4)]
 
-  if (pie.left < zona.x0 * W - 0.5 || pie.right > zona.x1 * W + 0.5) return null
+  if (pie.left < zona.x0 * W - 0.5 || pie.right > zona.x1 * W + 0.5 || piso < techo) return { y: null, banda }
+  const tintas = await Promise.all(['negative', 'color'].map(v => rasterLogo(v, pie.right - pie.left)))
+  const { data: rgb } = await sharp(bare).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+  const toca = (a, b, m) => a.left < b.right + m && a.right > b.left - m && a.top < b.bottom + m && a.bottom > b.top - m
 
-  for (let top = Math.min(pie.top, Math.floor(zona.y1 * H - alto)); top >= Math.ceil(zona.y0 * H); top -= paso) {
+  for (let top = piso; top >= techo; top -= paso) {
     const caja = { left: pie.left, right: pie.right, top, bottom: top + alto }
 
-    if (ocupados.some(o => caja.left < o.right + holgura && caja.right > o.left - holgura && caja.top < o.bottom + holgura && caja.bottom > o.top - holgura)) continue
-    if (mask && guardHits(mask, [{ id: 'firma', box: caja }], W, H, 0).length) continue
-    const c = Math.max(await contrastUnder(bare, caja, 1), await contrastUnder(bare, caja, lum(2, 60, 112)))
+    if (ocupados.some(o => toca(caja, o, holgura)) || protegidas.some(z => toca(caja, z, 0))) continue
+    if (mask && guardHits(mask, [{ id: 'firma', box: caja }], W, H, CLEAR_TOUCH).length) continue
 
-    if (c >= UMBRALES.normalTextContrast) return top / H
+    for (const t of tintas) {
+      const enCaja = await contrastUnder(bare, caja, t.variante === 'color' ? lum(2, 60, 112) : 1)
+      const trazo = trazoLogo(rgb, t, caja.left, top)
+
+      if (trazo && Math.min(enCaja, trazo.wcag) >= UMBRALES.normalTextContrast) return { y: top / H, variante: t.variante, banda }
+    }
   }
 
-  return null
+  return { y: null, banda }
 }
 
 async function cajaUrl(s) {
@@ -1404,12 +1453,18 @@ return k.ink.right - k.ink.left }))
     // `logo.y: "auto"` (tramo 4, hallazgo 7): desde el pie hacia arriba, la primera Y donde la firma mide ≥ 4,5:1, queda
     // dentro de la zona segura, no toca al sujeto y no choca con nada. Si no la hay, queda al pie y el gate la mide.
     let buscada
+    let banda = null
 
     if (s.logo.y === 'auto') {
-      const ocupados = [...elementosMaquetacion([]).filter(e => e.tipo !== 'acento').map(e => e.box), ...visibles.map(v => v.box).filter(Boolean)]
+      const ocupados = [...elementosMaquetacion([]).filter(e => e.tipo !== 'acento').map(e => e.box), ...visibles.map(v => v.box).filter(Boolean), ...(cardEl ? [cardEl.box] : [])]
+      const protect = (s.protect ?? []).map(z => ({ left: z.x0 * W, top: z.y0 * H, right: z.x1 * W, bottom: z.y1 * H }))
+      const r = await buscarYFirma(s, bare, opts.mask, zonaFirma(s, W, H), ocupados, protect)
 
-      buscada = await buscarYFirma(s, bare, opts.mask, zonaEfectiva(s, W, H), ocupados)
-      if (buscada == null) console.warn(`  ⚠ ${s.id}: \`logo.y: "auto"\` no encontró una Y que cumpla: la firma queda al pie y el gate la mide.`)
+      buscada = r.y
+      banda = r.banda
+      if (buscada == null) console.warn(`  ⚠ ${s.id}: \`logo.y: "auto"\` no encontró en la banda del pie (${Math.round(r.banda[0] * 100)}–${Math.round(r.banda[1] * 100)} % del alto) una Y con ≥ 4,5:1 en la caja y el trazo, lejos del sujeto: la firma queda al pie y el gate la mide. Opciones: acortar o subir el texto para abrir la banda, \`logo.y\` explícito o un plate con lecho más oscuro/claro.`)
+      // La tinta que cumplió en la búsqueda es la que se dibuja (si el plan no fija una).
+      if (buscada != null && (!s.logo.variant || s.logo.variant === 'auto')) s.logo = { ...s.logo, variant: r.variante }
       s.logo = { ...s.logo, y: buscada ?? undefined }
     }
 
@@ -1434,7 +1489,12 @@ return k.ink.right - k.ink.left }))
     const ly = typeof s.logo.y === 'number' ? Math.round(s.logo.y * H) : Math.round(H - M * 0.85 - lh)
 
     topLayers.push({ input: lb, left: lx, top: ly })
-    firmaQa = { anchoLadoCorto: +(lw / Math.min(W, H)).toFixed(3), y: +(ly / H).toFixed(4), ...(buscada !== undefined ? { auto: true, encontrada: buscada != null } : {}) }
+    // El trazo de la firma tal como se dibuja (tramo 6): el gate lo exige ≥ 4,5:1, como la caja.
+    const { data: rgbFirma } = await sharp(bare).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+    const { data: lbCrudo, info: lbInfo } = await sharp(lb).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+    const trazoFirma = trazoLogo(rgbFirma, { data: lbCrudo, w: lbInfo.width, h: lbInfo.height }, lx, ly)
+
+    firmaQa = { anchoLadoCorto: +(lw / Math.min(W, H)).toFixed(3), y: +(ly / H).toFixed(4), ...(trazoFirma ? { trazo: { wcag: trazoFirma.wcag, umbralWcag: trazoFirma.umbralWcag, cumpleWcag: trazoFirma.cumpleWcag, pctBajoUmbral: trazoFirma.pctBajoUmbral } } : {}), ...(buscada !== undefined ? { auto: true, encontrada: buscada != null, banda } : {}) }
     checks.push({ id: 'logo', box: { left: lx, right: lx + lw, top: ly, bottom: ly + lh }, inkL: s.logo.variant === 'color' ? lum(2, 60, 112) : 1 })
 
     // La firma sobre el sujeto se AVISA, no aborta: hay piezas aprobadas así (medido 2026-09-22: KV-01-916 con la
@@ -1600,7 +1660,7 @@ return k.ink.right - k.ink.left }))
   }
 
   const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson) }
-  const registro = { id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
+  const registro = { id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
 
   for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
   qa.push(registro)

@@ -4,10 +4,13 @@
 // y la clave `contraste.cta` nunca se escribía, así que el QA salía limpio **porque el dato no existía**,
 // no porque hubiera pasado. Un gate que sólo mira las claves presentes no puede detectar una ausencia:
 // por eso éste EXIGE la clave y falla si falta.
-import { readFileSync, existsSync, statSync } from 'node:fs'
+import { readFileSync, existsSync, statSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
+import { spawnSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
 
-import { huellaComando, huellaPieza, rutaQa, sha } from './cta-integridad.mjs'
+import { COMPOSITOR, REPO, huellaComando, huellaPieza, rutaQa, sha } from './cta-integridad.mjs'
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
 
 // EXCEPCIONES AUDITADAS (tramo 4): una regla del canon puede exceptuarse en UNA pieza, declarando `excepciones:
@@ -29,12 +32,71 @@ const bloquea = (p, regla, mensaje) => {
   return true
 }
 
-const plan = process.argv[2]
+// CÓDIGOS DE SALIDA (tramo 6): 0 certificado · 1 falla · 2 uso · 3 NO CERTIFICABLE. «No certificable» no es un pase
+// ni una falla de la pieza: el gate no tiene cómo probar lo que certificaría —QA del formato anterior, pieza compuesta
+// con otra versión del comando, máscara del sujeto sacada de una caché ajena o un elemento que nadie mide (el gesto
+// manuscrito)—. Antes esos casos salían con 0 y «✓»: la auditoría de arquitectura certificó así 18 piezas de CMP-002
+// sin una sola medición de accesibilidad, entre ellas KV-07-916, que el compositor vigente rechaza.
+const noCertificable = []
 
-if (!plan) { console.error('uso: pnpm foto:cta:gate <plan.json>'); process.exit(2) }
+const args = process.argv.slice(2)
+const plan = args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--comando')
+const REPRODUCIR = args.includes('--reproducir')
+// `--comando <archivo>`: certifica contra OTRA versión del compositor (la suite de pruebas la usa con sus mutantes). Sin
+// el flag, la vigente del repo.
+const COMANDO = args.includes('--comando') ? path.resolve(args[args.indexOf('--comando') + 1]) : path.join(REPO, COMPOSITOR)
+
+if (!plan) { console.error('uso: pnpm foto:cta:gate <plan.json> [--reproducir]'); process.exit(2) }
 
 const dir = path.dirname(path.resolve(plan))
 const qaPlan = rutaQa(path.join(dir, 'out'), plan)
+
+// CERTIFICACIÓN POR REPRODUCCIÓN (tramo 6; auditoría de arquitectura, N4). La huella del comando la escribe el propio
+// compositor en el QA: un QA armado a mano, o una caché de máscaras envenenada con metadatos coherentes, la trae
+// correcta y pasaba. Lo que no se falsifica es reproducir: se recompone el plan en un temporal con el comando VIGENTE
+// y una segmentación nueva (caché vacía), cada PNG y layout entregado tiene que ser idéntico byte a byte al reproducido
+// (P01 prueba que el compositor es determinista), y el veredicto es el de este gate sobre el QA reproducido.
+if (REPRODUCIR) {
+  const tmp = mkdtempSync(path.join(os.tmpdir(), 'foto-certificar-'))
+  let codigo = 1
+
+  try {
+    const piezasPlan = JSON.parse(readFileSync(path.resolve(plan), 'utf8')).map(p => ({ ...p, plate: path.resolve(dir, p.plate) }))
+    const planTmp = path.join(tmp, path.basename(plan))
+
+    writeFileSync(planTmp, JSON.stringify(piezasPlan, null, 2))
+    console.log(`Reproduciendo ${piezasPlan.length} pieza(s) con el comando vigente y segmentación nueva…`)
+    const c = spawnSync(process.execPath, [COMANDO, planTmp], { encoding: 'utf8', env: { ...process.env, FOTO_MASCARAS_DIR: path.join(tmp, '.mascaras') }, maxBuffer: 64e6 })
+
+    if (c.status !== 0) {
+      console.error(`✗ la reproducción no compuso: ${(String(c.stderr).match(/Error: ([^\n]+)/) ?? [null, 'ver la salida del compositor'])[1]}`)
+    } else {
+      const distintos = []
+
+      for (const p of piezasPlan.filter(p => p.cta)) {
+        for (const f of [`${p.id}.png`, `${p.id}-layout.json`]) {
+          const entregado = path.join(dir, 'out', f)
+          const reproducido = path.join(tmp, 'out', f)
+
+          if (!existsSync(entregado)) distintos.push(`falta out/${f}`)
+          else if (!existsSync(reproducido) || sha(readFileSync(entregado)) !== sha(readFileSync(reproducido))) distintos.push(`out/${f}`)
+        }
+      }
+
+      if (distintos.length) {
+        console.error(`✗ lo entregado no es lo que produce el comando vigente: ${distintos.join(', ')}. Recompón con \`pnpm foto:componer:cta ${plan}\`.`)
+      } else {
+        console.log('✓ lo entregado es idéntico a la reproducción. Veredicto sobre el QA reproducido:')
+        codigo = spawnSync(process.execPath, [fileURLToPath(import.meta.url), planTmp, '--comando', COMANDO], { stdio: 'inherit' }).status ?? 1
+      }
+    }
+  } finally {
+    rmSync(tmp, { recursive: true, force: true })
+  }
+
+  process.exit(codigo)
+}
+
 const qaLegado = path.join(dir, 'out', 'qa.json')
 
 // QA POR PLAN, con huellas [2026-09-23]. El formato anterior (`out/qa.json` compartido por todos los planes de la
@@ -47,6 +109,7 @@ if (!existsSync(qaPath)) { console.error(`✗ no existe ${qaPlan}. Corre \`pnpm 
 
 if (legado) {
   console.warn(`⚠ ${qaLegado} es del formato anterior (compartido y sin huellas): este gate no puede certificarlo. Recompón con \`pnpm foto:componer:cta ${plan}\` para certificar.`)
+  noCertificable.push(`${qaLegado} es del formato anterior (compartido, sin huellas ni mediciones del trazo): no hay cómo probar que describe este plan, este plate y este PNG — recompón`)
 
   // 🔴 Una salida más vieja que el plan NO es la salida del plan [2026-09-22, CMP-002]. Sólo en el formato anterior:
   // el actual lo decide con huellas del contenido, que no dependen de la fecha de un archivo.
@@ -80,7 +143,7 @@ if (sinQa.length) {
 const reservasRotas = new Map()
 
 if (!legado) {
-  const comando = huellaComando()
+  const comando = huellaComando({ compositor: COMANDO })
 
   for (const p of piezas.filter(p => p.cta)) {
     const h = qa.find(r => r.id === p.id)?.huellas
@@ -120,7 +183,7 @@ if (!legado) {
       console.error(`✗ ${p.id}: ${fallas.join(' · ')}. Recompón con \`pnpm foto:componer:cta ${plan} ${p.id}\`.`)
       process.exitCode = 1
     } else if (h.compositor !== comando) {
-      console.warn(`⚠ ${p.id}: se compuso con otra versión del comando. Recompón para certificarla con la vigente.`)
+      noCertificable.push(`${p.id}: se compuso con otra versión del comando — recompón, o certifícala con \`--reproducir\` si el comando vigente produce el mismo PNG`)
     }
   }
 
@@ -154,6 +217,17 @@ for (const p of piezas.filter(p => p.cta)) {
     process.exitCode = 1
     continue
   }
+
+  // La máscara que protegió al sujeto tiene que ser de confianza: segmentada en esta corrida o leída de la caché del repo.
+  // Una caché ajena (`FOTO_MASCARAS_DIR`) con una máscara en negro y metadatos coherentes componía texto sobre el pelo con
+  // el gate en 0 (auditoría de arquitectura, hallazgo 2). `--reproducir` segmenta de nuevo y la resuelve.
+  const mascara = qa.find(r => r.id === p.id)?.mascara
+
+  if (!legado && segmentada && mascara?.origen !== 'fresca' && mascara?.origen !== 'cache-canonica') noCertificable.push(`${p.id}: la máscara del sujeto ${mascara ? 'salió de una caché ajena al repo (`FOTO_MASCARAS_DIR`)' : 'no dice de dónde salió (versión anterior del comando)'} — certifícala con \`--reproducir\`, que segmenta de nuevo`)
+  if (!legado && segmentada && mascara && mascara.cobertura === 0) console.warn(`⚠ ${p.id}: la máscara no marca ningún sujeto. Si la foto tiene una persona u objeto protagonista, certifica con \`--reproducir\`.`)
+  // El gesto manuscrito no entra en ninguna guarda (sujeto, zona, contraste): decisión del operador 2026-09-23, fuera de
+  // alcance por ahora. Una pieza que lo lleva no se certifica a ciegas.
+  if (p.gesture) noCertificable.push(`${p.id}: lleva gesto manuscrito, que ni el compositor ni el gate miden (sujeto, zona, contraste)`)
 
   const declarada = segmentada || sp === false || (sp && typeof sp.top === 'number' && typeof sp.minClearance === 'number')
 
@@ -259,7 +333,10 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   const a = r.accesibilidad
 
   if (!a) {
-    console.warn(`⚠ ${r.id}: el QA no trae medición de accesibilidad (compositor anterior). Recompón para certificarla.`)
+    // En el formato actual la medición es obligatoria: su ausencia es una falla, no un aviso.
+    if (legado) console.warn(`⚠ ${r.id}: el QA no trae medición de accesibilidad (compositor anterior). Recompón para certificarla.`)
+    else { console.error(`✗ ${r.id}: el QA no trae la medición de accesibilidad. Una pieza sin medir no pasa.`); fallos++ }
+
     continue
   }
 
@@ -372,6 +449,22 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   if (p.logo) {
     const c = r.contraste?.logo
     const ancho = r.firma?.anchoLadoCorto
+    const trazo = r.firma?.trazo
+
+    // El TRAZO del logo (tramo 6), como las voces: el 1 % peor de sus píxeles contra su fondo. La caja sola mezcla el
+    // aire entre letras con el fondo de los trazos.
+    if (!trazo) { console.error(`✗ ${r.id}: la firma no trae la medición de su trazo (versión anterior del comando). Recompón.`); fallos++ } else if (!trazo.cumpleWcag && bloquea(p, 'firma-contraste', `el 1 % peor del trazo de la firma mide ${trazo.wcag}:1 (canon: ≥ ${FIRMA_MIN_CONTRASTE}:1; ${trazo.pctBajoUmbral} % del trazo queda bajo el umbral)`)) fallos++
+
+    // `logo.y: "auto"` busca sólo en la BANDA DEL PIE, debajo de todo lo compuesto (auditoría de diseño N1: subía hasta
+    // encima del titular). Se recalcula sobre el layout: una firma automática por encima del contenido es un error del
+    // compositor, no una decisión de diseño, y no se exceptúa.
+    if (r.firma?.auto && r.firma.encontrada) {
+      const Lf = JSON.parse(readFileSync(path.join(dir, 'out', `${r.id}-layout.json`), 'utf8'))
+      const logo = Lf.maquetacion?.elementos?.find(e => e.id === 'logo')?.box
+      const contenido = Math.max(...(Lf.maquetacion?.elementos ?? []).filter(e => e.tipo !== 'firma' && e.tipo !== 'acento').map(e => e.box.bottom))
+
+      if (!logo || logo.top < contenido) { console.error(`✗ ${r.id}: la firma automática quedó por encima del contenido (su borde superior en ${logo ? Math.round(logo.top) : '—'} px; el contenido termina en ${Math.round(contenido)} px). La búsqueda sólo puede ubicarla en la banda del pie.`); fallos++ }
+    }
 
     if (typeof c !== 'number') { console.error(`✗ ${r.id}: la firma no tiene medición de contraste.`); fallos++ } else if (c < FIRMA_MIN_CONTRASTE && bloquea(p, 'firma-contraste', `la firma mide ${c}:1 contra su fondo (canon: ≥ ${FIRMA_MIN_CONTRASTE}:1). Prueba \`logo.y: "auto"\``)) fallos++
     if (typeof ancho !== 'number') { console.error(`✗ ${r.id}: el QA no trae el tamaño de la firma. Recompón.`); fallos++ } else if (ancho < FIRMA_ANCHO_LADO_CORTO - 0.005 && bloquea(p, 'firma-tamano', `la firma mide ${(ancho * 100).toFixed(1)} % del lado corto (canon: ${FIRMA_ANCHO_LADO_CORTO * 100} %)`)) fallos++
@@ -416,4 +509,11 @@ if (n === 0) {
 }
 
 if (fallos) { console.error(`\n✗ ${fallos} fallo(s) en ${n} pieza(s) con CTA.`); process.exit(1) }
-console.log(`✓ ${n} pieza(s) con CTA cumplen los mínimos (texto ≥${MIN_TEXTO}:1 · superficie ≥${MIN_BORDE}:1 · toda voz en WCAG 2.2 AA según su tamaño en pantalla).`)
+
+if (noCertificable.length) {
+  console.error(`\n⊘ NO CERTIFICABLE — ${n} pieza(s) sin fallas en lo que se pudo verificar, pero el gate no puede certificarlas:`)
+  for (const m of [...new Set(noCertificable)]) console.error(`  · ${m}`)
+  process.exit(3)
+}
+
+console.log(`✓ ${n} pieza(s) con CTA certificadas: huellas del plan, el plate, el PNG, el layout y el comando vigente · texto ≥${MIN_TEXTO}:1 · superficie ≥${MIN_BORDE}:1 · toda voz en WCAG 2.2 AA por su trazo, según su tamaño en pantalla · firma y zona segura del canon.`)
