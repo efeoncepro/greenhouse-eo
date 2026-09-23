@@ -11,6 +11,8 @@ import { execFileSync, spawnSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 
+import { axisAdvertising } from '@efeoncepro/axis-tokens'
+
 import { CANON_ANTERIOR, CANON_VIGENTE, COMPOSITOR, REPO, canonDe, dentroDelRepo, estable, huellaComando, huellaPieza, marcaDeSuite, registroCanonAlterado, rutaQa, rutaReal, sha } from './cta-integridad.mjs'
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
 import { copiaEnEscena } from './accesibilidad.mjs'
@@ -511,6 +513,10 @@ for (const [id, { reserva, px }] of reservasRotas) {
 // AVISA: APCA bajo Bronze, daltonismo bajo el umbral, texto de menos de 9 px en el teléfono y alternativa sin
 // descripción de la escena. Son hallazgos de diseño que se miran: WCAG aprueba, esto no.
 const LEGIBLE_PX = 9
+// Piso de legibilidad del canon nuevo (decisión del operador del 2026-09-23: «desde 9 px se lee bien»): en un teléfono de
+// 390 CSS px de ancho, el CTA mide al menos 11 px —el mínimo de Apple para texto que se toca— y las demás voces, 9. En una
+// pieza nueva BLOQUEA (regla `legibilidad`, más abajo); en una del canon anterior queda el aviso de siempre.
+const LEGIBLE_CTA_PX = 11
 
 for (const r of qa.filter(x => conCta.has(x.id))) {
   const a = r.accesibilidad
@@ -590,7 +596,7 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
 
   if (apca.length) console.warn(`⚠ ${r.id}: bajo APCA Bronze — ${apca.join(' · ')}`)
   if (dalt.length) console.warn(`⚠ ${r.id}: bajo el umbral con daltonismo — ${dalt.join(' · ')}`)
-  if (chicas.length) console.warn(`⚠ ${r.id}: menos de ${LEGIBLE_PX} px en pantalla (${r.anchoPantalla ?? 390} CSS px de ancho) — ${chicas.join(' · ')}. Decisión pendiente del operador: piso de legibilidad por rol (\`placement\` ya no afloja esta medición).`)
+  if (chicas.length && canonDe(piezas.find(x => x.id === r.id), plateDe(piezas.find(x => x.id === r.id))) !== CANON_VIGENTE) console.warn(`⚠ ${r.id}: menos de ${LEGIBLE_PX} px en pantalla (${r.anchoPantalla ?? 390} CSS px de ancho) — ${chicas.join(' · ')}. Pieza del canon anterior: queda como aviso; en una pieza nueva el piso bloquea (CTA ${LEGIBLE_CTA_PX} px, las demás voces ${LEGIBLE_PX}).`)
   if (!a.altTextEscena) console.warn(`⚠ ${r.id}: el texto alternativo trae el texto de la imagen pero no describe la escena — agrega \`altText\` al plan.`)
 
   // El rol del CTA en el texto alternativo lo escribe el compositor; el gate lo VERIFICA (antes sólo se confiaba en él).
@@ -625,6 +631,19 @@ const PISO_FIRMA = 0.75 // la firma arranca en el cuarto inferior
 const TOPE_ROL = 0.6 // ninguna voz pasa de 0,6× el titular
 const AIRE_CTA = { x: 0.5, y: 0.25 } // padding mínimo del botón, en cuerpos del CTA
 const TRACKING_TITULAR = [-0.035, 0.02] // em; AXIS `ideaImpact` usa −0,035
+// Tramo 13 (quinta certificación, auditoría de diseño): TODAS las piezas. Calibrado contra las 132 aprobadas únicas, que
+// ninguna incumple: relleno del botón 0,6–0,8× y 0,35–0,47× el cuerpo del CTA; descriptor a 0,35–0,57× del botón; CTA ≥
+// 0,97× la voz de cuerpo mayor; entrada y cierre, siempre blancos; una selección sobre un objeto encierra 3,3–20 % de sujeto.
+const TECHO_RELLENO_CTA = { x: 1.2, y: 0.8 } // padding máximo del botón, en cuerpos del CTA
+const TECHO_DESCRIPTOR = 1 // `descriptorGap` máximo, en cuerpos del CTA
+const PISO_CTA_CUERPO = 0.9 // el CTA mide al menos 0,9× la voz de cuerpo mayor (entrada, cierre, nota)
+const PISO_SELECCION_SUJETO = 0.01 // fracción mínima de sujeto dentro de la caja de una selección sobre un objeto
+
+// La tinta del cuerpo (entrada y cierre) sale de la paleta de AXIS para su fondo; el acento es del titular y del CTA.
+const TINTAS_CUERPO = {
+  oscuro: [axisAdvertising.color.inkOnDark, axisAdvertising.color.softOnDark].map(c => c.toLowerCase()),
+  claro: [axisAdvertising.color.inkOnLight, axisAdvertising.color.mutedOnLight].map(c => c.toLowerCase())
+}
 
 // Cuánto se sale de su zona lo que se sale (px del lienzo, el peor elemento): la medida que una excepción «zona-segura»
 // tiene que cubrir con `hasta`. Un elemento que el layout no trae no se puede acotar (sin medir).
@@ -764,6 +783,35 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
     if (fuera.length && bloquea(p, 'eje-centrado', `en un bloque centrado, fuera del eje: ${fuera.join(' · ')}. Usa \`cta.align: "center"\` y la nota sin \`x\``)) fallos++
   }
 
+  // ── Tramo 13 (quinta certificación, auditoría de diseño): TODAS las piezas ──────────────────────────────────────────
+  // Botón-losa (N5): el relleno tenía piso (`cta-aire`) y no techo; con 110 × 70 px el botón medía 2,5× el titular.
+  const relleno = Math.max(p.cta.paddingX / (p.cta.fontSize * TECHO_RELLENO_CTA.x), p.cta.paddingY / (p.cta.fontSize * TECHO_RELLENO_CTA.y))
+
+  if (relleno > 1 + 1e-9 && bloquea(p, 'cta-relleno', `el botón es una losa: padding ${p.cta.paddingX} × ${p.cta.paddingY} px para un CTA de ${p.cta.fontSize} px (techo: ${TECHO_RELLENO_CTA.x}× y ${TECHO_RELLENO_CTA.y}× el cuerpo; mide ${relleno.toFixed(2)}× el techo)`, { valor: +relleno.toFixed(2), sentido: 'max' })) fallos++
+
+  // Descriptor separado de su botón (N1): `descriptorGap` tenía piso y no techo; a 3,9× el cuerpo del CTA caía sobre la escena.
+  if (typeof p.cta.descriptorGap === 'number' && p.cta.descriptorGap > p.cta.fontSize * TECHO_DESCRIPTOR + 1e-9 && bloquea(p, 'descriptor-distancia', `el descriptor queda lejos de su botón: \`descriptorGap\` ${p.cta.descriptorGap} px para un CTA de ${p.cta.fontSize} px (techo: ${TECHO_DESCRIPTOR}× el cuerpo); a esa distancia deja de leerse como parte de la acción`, { valor: +(p.cta.descriptorGap / p.cta.fontSize).toFixed(2), sentido: 'max' })) fallos++
+
+  // CTA más chico que el cuerpo (N2): la jerarquía por rol sólo ponía techos; con el CTA a 0,36× la nota salía sin avisos.
+  const cuerpo = [['lead', p.lead], ['closure', p.after], ['benefit', p.note]].filter(([k, v]) => v && typeof tipografia[k] === 'number').map(([k]) => k)
+  const mayorCuerpo = cuerpo.length ? Math.max(...cuerpo.map(k => tipografia[k])) : null
+
+  if (mayorCuerpo && typeof tipografia.cta === 'number' && tipografia.cta < mayorCuerpo * PISO_CTA_CUERPO - 1e-9 && bloquea(p, 'cta-cuerpo', `el CTA (${tipografia.cta} px) es menor que el cuerpo: ${cuerpo.filter(k => tipografia[k] * PISO_CTA_CUERPO > tipografia.cta).map(k => `${NOMBRE_VOZ[k]} ${tipografia[k]} px`).join(' · ')} (piso: ${PISO_CTA_CUERPO}× la voz de cuerpo mayor)`, { valor: +(tipografia.cta / mayorCuerpo).toFixed(2), sentido: 'min' })) fallos++
+
+  // Tinta del cuerpo fuera de la paleta (N4): `leadFill` y `afterFill` aceptaban cualquier #rrggbb, también el acento del CTA.
+  const tintas = p.ink === 'dark' ? TINTAS_CUERPO.claro : TINTAS_CUERPO.oscuro
+  const fueraDePaleta = [['entrada', p.lead && p.leadFill], ['cierre', p.after && p.afterFill]].filter(([, f]) => f && !tintas.includes(String(f).toLowerCase())).map(([v, f]) => `${v} ${f}`)
+
+  if (fueraDePaleta.length && bloquea(p, 'paleta-voces', `tinta fuera de la paleta de AXIS para el cuerpo: ${fueraDePaleta.join(' · ')} (sobre fondo ${p.ink === 'dark' ? 'claro' : 'oscuro'}: ${tintas.join(' o ')}). El acento es del titular y del CTA`)) fallos++
+
+  // Selección sobre nada (N3): el marco de un objeto se aceptaba sobre una pared vacía. «Cortar el objeto» no se puede juzgar
+  // con esta máscara —una aprobada encierra sólo el 9 % de su componente; un ataque, el 24 %— y queda como deuda.
+  // Sin la medición, la pieza no se certifica: un QA sin un dato que el comando vigente siempre escribe viene de una versión
+  // anterior del comando o fue tocado (como el QA sin canon).
+  if (p.selection?.box && r.guardaSujeto === 'segmentacion' && typeof r.seleccionSujeto !== 'number') noCertificable.push(`${r.id}: la selección no trae su medición de sujeto (\`seleccionSujeto\`): versión anterior del comando o QA tocado — recompón`)
+
+  if (p.selection?.box && typeof r.seleccionSujeto === 'number' && r.seleccionSujeto < PISO_SELECCION_SUJETO && bloquea(p, 'seleccion-objeto', `la selección no encierra nada: el ${(r.seleccionSujeto * 100).toFixed(1)} % de su caja es sujeto (piso: ${PISO_SELECCION_SUJETO * 100} %). Pon el marco sobre el objeto que nombra`, { valor: r.seleccionSujeto, sentido: 'min' })) fallos++
+
   // Aire sobre los corchetes del CTA de texto (aviso): al menos media altura del CTA hasta la voz de arriba.
   if (p.cta.variant === 'text' && L.ctaMarco) {
     const arriba = Math.max(...(L.maquetacion?.elementos ?? []).filter(e => e.tipo === 'texto' && e.box.bottom <= L.ctaMarco.top + 1).map(e => e.box.bottom))
@@ -824,6 +872,11 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
 
     // Aire del botón (auditoría de diseño, hallazgo 8): con padding 0 el borde cortaba las letras.
     const variante = r.ctaVariante?.elegida ?? p.cta.variant
+
+    // Piso de legibilidad (decisión del operador del 2026-09-23): el CTA, 11 px en el teléfono; las demás voces, 9.
+    const chicas = Object.entries(r.accesibilidad?.voces ?? {}).filter(([v, m]) => m?.cssPx != null && m.cssPx < (v === 'cta' ? LEGIBLE_CTA_PX : LEGIBLE_PX))
+
+    if (chicas.length && bloquea(p, 'legibilidad', `texto chico en un teléfono (${r.anchoPantalla ?? 390} CSS px de ancho): ${chicas.map(([v, m]) => `${v} ${m.cssPx} px (piso ${v === 'cta' ? LEGIBLE_CTA_PX : LEGIBLE_PX})`).join(' · ')}. Sube el tamaño o recorta el texto; en 16:9 el titular también crece`, { valor: Math.min(...chicas.map(([, m]) => m.cssPx)), sentido: 'min' })) fallos++
 
     if (variante !== 'text' && (p.cta.paddingX < p.cta.fontSize * AIRE_CTA.x || p.cta.paddingY < p.cta.fontSize * AIRE_CTA.y) && bloquea(p, 'cta-aire', `el botón tiene poco aire: padding ${p.cta.paddingX} × ${p.cta.paddingY} px para un CTA de ${p.cta.fontSize} px (canon: al menos ${AIRE_CTA.x}× y ${AIRE_CTA.y}× el cuerpo)`)) fallos++
   }

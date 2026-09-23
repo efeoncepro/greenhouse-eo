@@ -212,6 +212,22 @@ export function medirContraColor({ tinta, fondo, cssPx, peso = 400, lineas = 1, 
   }
 }
 
+// ── Una medición POSIBLE (tramo 13) ──────────────────────────────────────────────────────────────────
+// Ninguna medición supera el contraste máximo de su tinta —contra negro o contra blanco— y el umbral de una voz lo fija su
+// tamaño en pantalla y su peso (o su piso). En una corrida en paralelo de la quinta certificación, el QA salió una vez con el
+// titular y el CTA medidos como el descriptor: 20,27:1 para una tinta lima que no pasa de 11,5:1, y umbral 4,5 para un titular
+// de 50 CSS px. No se reprodujo en 44 corridas. Devuelve el motivo, o null si la medición es posible.
+export function medicionImposible({ tinta, medidas = [], umbral = null, umbralEsperado = null }) {
+  const lum = luminanciaWcag(hexARgb(tinta))
+  const tope = Math.max(razonWcag(lum, 0), razonWcag(lum, 1))
+  const peor = Math.max(...medidas.filter(Number.isFinite))
+
+  if (peor > tope + 0.02) return `${peor}:1 con una tinta que contra ningún fondo pasa de ${tope.toFixed(2)}:1`
+  if (umbral != null && umbralEsperado != null && umbral !== umbralEsperado) return `umbral ${umbral}:1 para una voz que por su tamaño exige ${umbralEsperado}:1`
+
+  return null
+}
+
 // ── Contraste sobre el TRAZO, no sobre la caja ───────────────────────────────────────────────────────
 // Auditoría 2026-09-23 (hallazgo 3): en 01-fuera-916 crecida, la caja de «+ AEO» medía 4,53:1 y el 1 % peor del
 // trazo, 2,4–3,1:1, sobre el canto iluminado de un monitor. La caja mezcla el aire entre letras con el fondo de los

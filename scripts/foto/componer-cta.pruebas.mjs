@@ -91,6 +91,19 @@ const canon = k => {
   return p
 }
 
+// Un 16:9 NUEVO con el piso de legibilidad (decisión del operador del 2026-09-23: en un teléfono de 390 CSS px, el CTA mide
+// 11 px y las demás voces 9). El lienzo mide 2048 de ancho: son ≥ 58 y ≥ 48 px del lienzo, y el titular sube para seguir
+// midiendo 3× la entrada. Sin crecer (juzga los tamaños declarados) y sin la nota (el bloque cabe). Es la receta de un 16:9.
+const canonLegible169 = k => {
+  const p = canon(k)
+
+  delete p.note
+  Object.assign(p, { textGrowth: false, leadSize: 48, dominantSize: 160, dominantMax: 0.5, textWidth: 0.5, afterSize: 48 })
+  Object.assign(p.cta, { fontSize: 60, descriptorSize: 48, paddingX: 39, paddingY: 22, descriptorGap: 24 })
+
+  return p
+}
+
 async function componer(nombre, piezas, ids = [], env = {}) {
   const dir = path.join(TMP, nombre)
   const planPath = path.join(dir, 'piezas.json')
@@ -715,6 +728,17 @@ const PRUEBAS = [
       pantallaChica.placement = { anchoCssPx: 15, razon: 'prueba: una pantalla diminuta' }
       conAlfa.plate = path.join(TMP, 'P07-plates', 'con-alfa.png')
       await sharp(base().plate).ensureAlpha(0.5).png().toFile(conAlfa.plate)
+      // Tramo 13 (quinta certificación, N2 y N3): transparencia en 16 bits y en gris con alfa, que el chequeo por
+      // `channels[3].min < 255` no veía, y una entidad con dígitos en el nombre.
+      const alfa16 = base()
+      const grisAlfa = base()
+      const entidadDigito = base()
+
+      alfa16.plate = path.join(TMP, 'P07-plates', 'alfa-16-bits.png')
+      grisAlfa.plate = path.join(TMP, 'P07-plates', 'gris-con-alfa.png')
+      await sharp(base().plate).ensureAlpha(0.5).toColourspace('rgb16').png().toFile(alfa16.plate)
+      await sharp(base().plate).greyscale().ensureAlpha(0.5).toColourspace('b-w').png().toFile(grisAlfa.plate)
+      entidadDigito.cta.text = 'Cotiza tus 50 m&sup2;'
 
       const casos = [
         ['falta cta.fontSize', [sinFont], [], /falta `cta\.fontSize`/],
@@ -752,7 +776,10 @@ const PRUEBAS = [
         ['entidad que se dibujaría literal', [entidadLiteral], [], /`lead` trae la entidad «&amp;»/],
         ['salto de línea que sale como cuadro', [salto], [], /`dominant` trae un salto de línea/],
         ['placement bajo 320 CSS px', [pantallaChica], [], /`placement\.anchoCssPx` debe ser ≥ 320/],
-        ['plate con transparencia', [conAlfa], [], /tiene transparencia/]
+        ['plate con transparencia', [conAlfa], [], /tiene transparencia/],
+        ['plate con transparencia en 16 bits', [alfa16], [], /tiene transparencia/],
+        ['plate gris con alfa', [grisAlfa], [], /tiene transparencia/],
+        ['entidad con dígitos en el nombre', [entidadDigito], [], /`cta\.text` trae la entidad «&sup2;»/]
       ]
 
       const rs = await Promise.all(casos.map(([, piezas, ids], i) => componer(`P07-${i}`, piezas, ids)))
@@ -933,7 +960,7 @@ const PRUEBAS = [
   {
     id: 'P10', nombre: 'Gate: aprueba lo bueno y rechaza QA incompleto, viejo, CTA sin acento y voz bajo WCAG',
     async correr() {
-      const bueno = await componer('P10-bueno', [canon('b2_916'), canon('b2_169')])
+      const bueno = await componer('P10-bueno', [canon('b2_916'), canonLegible169('b2_169')])
       const gBueno = bueno.ok ? await gate(bueno.planPath) : { code: -1, salida: bueno.error }
 
       // Corrida parcial: recompone una pieza y el QA conserva la otra (antes iba a un `qa-parcial.json` aparte).
@@ -945,7 +972,7 @@ const PRUEBAS = [
 
       fs.mkdirSync(dirDos, { recursive: true })
       fs.writeFileSync(path.join(dirDos, 'piezas-a.json'), JSON.stringify([canon('b2_916')], null, 2))
-      fs.writeFileSync(path.join(dirDos, 'piezas-b.json'), JSON.stringify([canon('b2_169')], null, 2))
+      fs.writeFileSync(path.join(dirDos, 'piezas-b.json'), JSON.stringify([canonLegible169('b2_169')], null, 2))
       const dos = await ['piezas-a.json', 'piezas-b.json'].reduce((cadena, f) => cadena.then(ok => ok && run(process.execPath, [COMPOSITOR, path.join(dirDos, f)], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 }).then(() => true, () => false)), Promise.resolve(true))
       const [gDosA, gDosB] = dos ? [await gate(path.join(dirDos, 'piezas-a.json')), await gate(path.join(dirDos, 'piezas-b.json'))] : [{ code: -1 }, { code: -1 }]
 
@@ -1465,6 +1492,45 @@ const PRUEBAS = [
       const c12Rs = await Promise.all([['P10-centrada-fuera-eje', c12Centrada], ['P10-tracking', c12Tracking], ['P10-firma-pegada', c12Pegada]].map(([n, p]) => componer(n, [p])))
       const [gC12Centrada, gC12Tracking, gC12Pegada] = await Promise.all(c12Rs.map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
 
+      // ── Tramo 13 · quinta certificación ──
+      const c13Losa = canon('b2_916')
+      const c13LosaAprobada = canon('b2_916')
+      const c13Lejos = canon('b2_916')
+      const c13CtaChico = canon('b2_916')
+      const c13Tinta = canon('b2_916')
+      const c13Nada = canon('b2_916')
+      const c13Chica = canon('b2_916')
+      const c13Esquina = canon('b2_916')
+
+      Object.assign(c13Losa.cta, { paddingX: 110, paddingY: 70 })
+      Object.assign(c13LosaAprobada.cta, { paddingX: 110, paddingY: 70 })
+      c13LosaAprobada.excepciones = [{ regla: 'cta-relleno', razon: 'prueba: botón grande aprobado a propósito', aprobadoPor: 'suite-pruebas', plate: plateB2, hasta: 2.5 }]
+      // 1,5× el cuerpo del CTA (40 px). El caso de la auditoría —150 px— no cabe en esta escena: el descriptor invade la
+      // protección del sujeto y el compositor aborta antes de llegar al gate.
+      c13Lejos.cta.descriptorGap = 60
+      c13CtaChico.afterSize = 48
+      c13Tinta.leadFill = '#39ff14'
+      // La caja de la auditoría de diseño (h02): una pared vacía.
+      c13Nada.selection = { variant: 'eight-handles', padding: 'standard', overlay: 'subtle', box: [0.12, 0.47, 0.28, 0.55], targetKind: 'object', cursors: [{ id: 'ia', kind: 'collaborator', anchor: 'top-end', label: 'IA', who: 'role' }] }
+      // Sin crecer: el QA mide el tamaño en pantalla ya crecido, y el 9:16 crece.
+      c13Chica.textGrowth = false
+      c13Chica.note.size = 22
+      c13Esquina.cta.radius = 200
+      const c13Rs = await Promise.all([['P10-losa', c13Losa], ['P10-losa-aprobada', c13LosaAprobada], ['P10-descriptor-lejos', c13Lejos], ['P10-cta-chico', c13CtaChico], ['P10-tinta-fuera', c13Tinta], ['P10-seleccion-nada', c13Nada], ['P10-legibilidad', c13Chica], ['P10-esquina', c13Esquina]].map(([n, p]) => componer(n, [p])))
+      const [gC13Losa, gC13LosaAprobada, gC13Lejos, gC13CtaChico, gC13Tinta, gC13Nada, gC13Chica] = await Promise.all(c13Rs.slice(0, 7).map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
+      const rC13Esquina = c13Rs[7]
+      // Una selección cuyo QA no trae la medición de sujeto no pasa: la ausencia es la falla.
+      let gC13SinMedida = { code: -1, salida: 'no compuso' }
+
+      if (c13Rs[5].ok) {
+        const qaF = path.join(c13Rs[5].dir, 'out', 'qa-piezas.json')
+        const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
+
+        delete q[0].seleccionSujeto
+        fs.writeFileSync(qaF, JSON.stringify(q))
+        gC13SinMedida = await gate(c13Rs[5].planPath)
+      }
+
       if (rAutoCanon.ok) {
         const qaF = path.join(rAutoCanon.dir, 'out', 'qa-piezas.json')
         const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
@@ -1493,11 +1559,20 @@ const PRUEBAS = [
         'rechaza jerarquía por rol (canon nuevo)': c11GRolAlto.code === 1 && /la jerarquía por rol no se sostiene .*CTA 40 px/.test(c11GRolAlto.salida),
         'rechaza botón sin aire (canon nuevo)': c11GSinAire.code === 1 && /el botón tiene poco aire/.test(c11GSinAire.salida),
         'firma externa del canon nuevo exige aprobación': c11GExternaNueva.code === 1 && /firma EXTERNA .* sin aprobador del registro/.test(c11GExternaNueva.salida) && /firma EXTERNA .* \(aprobó suite-pruebas\)/.test(c11GExternaAprobada.salida),
-        'la pieza aprobada sigue con su canon': c11RLegadoCanon.ok && c11RLegadoCanon.qa[0].canon === '2026-09-22' && !/firma EXTERNA|orden de lectura|jerarquía por rol/.test(c11GLegado.salida),
+        'la pieza aprobada sigue con su canon': c11RLegadoCanon.ok && c11RLegadoCanon.qa[0].canon === '2026-09-22' && !/firma EXTERNA|orden de lectura|jerarquía por rol|texto chico en un teléfono/.test(c11GLegado.salida),
         'rechaza QA con otro canon': c11GCanonForjado.code === 1 && /el QA dice canon 2026-09-22 y la pieza es del canon 2026-09-23/.test(c11GCanonForjado.salida),
         'rechaza bloque centrado fuera del eje': gC12Centrada.code === 1 && /en un bloque centrado, fuera del eje/.test(gC12Centrada.salida),
         'rechaza tracking del titular fuera de rango (canon nuevo)': gC12Tracking.code === 1 && /el tracking del titular \(-0\.07 em\)/.test(gC12Tracking.salida),
         'rechaza firma pegada al contenido (canon nuevo)': gC12Pegada.code === 1 && /queda pegada al contenido/.test(gC12Pegada.salida),
+        'rechaza botón-losa': gC13Losa.code === 1 && /el botón es una losa/.test(gC13Losa.salida),
+        'acepta botón-losa con excepción auditada': gC13LosaAprobada.code === 0 && /excepción auditada «cta-relleno»/.test(gC13LosaAprobada.salida),
+        'rechaza descriptor lejos del botón': gC13Lejos.code === 1 && /el descriptor queda lejos de su botón/.test(gC13Lejos.salida),
+        'rechaza CTA menor que el cuerpo': gC13CtaChico.code === 1 && /el CTA \(\d+ px\) es menor que el cuerpo: cierre/.test(gC13CtaChico.salida),
+        'rechaza tinta de cuerpo fuera de la paleta': gC13Tinta.code === 1 && /tinta fuera de la paleta de AXIS para el cuerpo: entrada #39ff14/.test(gC13Tinta.salida),
+        'rechaza selección sobre nada': gC13Nada.code === 1 && /la selección no encierra nada/.test(gC13Nada.salida),
+        'rechaza selección sin su medición': gC13SinMedida.code === 3 && /la selección no trae su medición de sujeto/.test(gC13SinMedida.salida),
+        'rechaza texto chico en el teléfono (canon nuevo)': gC13Chica.code === 1 && /texto chico en un teléfono .*nota [\d.]+ px \(piso 9\)/.test(gC13Chica.salida),
+        'rechaza esquina del botón sobre el texto': !rC13Esquina.ok && /la esquina del botón entra en el texto del CTA/.test(rC13Esquina.error ?? ''),
         'el QA queda en qa-<plan>.json': qaPorPlan && bueno.ok && fs.existsSync(path.join(bueno.dir, 'out/qa-piezas.json')),
         'rechaza pieza sin firma declarada': gSinFirma.code !== 0 && /no declara firma/.test(gSinFirma.salida),
         'acepta la firma externa declarada y la mide': rExterna.ok && !/no declara firma/.test(gExterna.salida) && typeof rExterna.qa[0].contraste.firmaExterna === 'number',

@@ -36,7 +36,14 @@ export const REGLAS_EXCEPTUABLES = [
   'cta-aire',
   // Tramo 12
   'eje-centrado',
-  'tracking-titular'
+  'tracking-titular',
+  // Tramo 13: `legibilidad` sólo en las piezas nuevas; las demás, en todas.
+  'legibilidad',
+  'cta-relleno',
+  'descriptor-distancia',
+  'cta-cuerpo',
+  'paleta-voces',
+  'seleccion-objeto'
 ]
 
 // Límites de las zonas de sujeto ignoradas: cada una ≤ 10 % del lienzo y todas juntas ≤ 15 %. Una zona del tamaño del
@@ -329,7 +336,9 @@ function reglasCruzadas(p) {
     // CTA, el descriptor y las etiquetas se dibujaban literales. Una entidad (`&amp;`) se dibujaba tal cual en cualquier voz,
     // y un salto de línea `\n` salía como un cuadro con «?» (el corte de línea es `|`).
     if (/\*\*|\[\[|\]\]/.test(t) && !['lead', 'dominant', 'after', 'note.text', 'footer.text'].includes(campo)) e.push(`\`${campo}\` no admite \`**\` ni \`[[ ]]\`: se dibujarían literales (sólo entrada, titular, cierre, nota y pie los interpretan)`)
-    const ent = t.match(/&(#\d+|#x[0-9a-f]+|[a-z]+);/i)
+    // El nombre de una entidad puede llevar dígitos (`&sup2;`, `&frac12;`): con `[a-z]+` pasaban y se dibujaban literales
+    // (tramo 13; auditoría de arquitectura de la quinta certificación, N3).
+    const ent = t.match(/&(#\d+|#x[0-9a-f]+|[a-z][a-z0-9]*);/i)
 
     if (ent) e.push(`\`${campo}\` trae la entidad «${ent[0]}»: escribe el carácter; la entidad se dibujaría literal`)
     if (/[\n\r\t]/.test(t)) e.push(`\`${campo}\` trae un salto de línea o una tabulación: se dibujaría como un cuadro vacío; para cortar la línea usa \`|\``)

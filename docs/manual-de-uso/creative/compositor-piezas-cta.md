@@ -1,7 +1,7 @@
 # Compositor de piezas con CTA — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-23 por Claude
 > **Ultima actualizacion:** 2026-09-23 por Claude
 > **Modulo:** Creative · piezas publicitarias y sociales con CTA sobre fotografía
@@ -479,10 +479,10 @@ El operador todavía no decide estos puntos. Mientras tanto, rige lo que dice la
 |---|---|---|
 | 1 | ~~Tamaño de la firma en 16:9~~ | **Decidido:** 25 % del lado corto en las piezas nuevas; las hechas no se regeneran |
 | 2 | ~~Margen por defecto del compositor~~ | **Decidido:** en una pieza nueva la zona de AXIS es la de por defecto |
-| 3 | Firma de las tres stories de v07 en la franja que Reels tapa | **Decidido:** se sube sólo donde el lecho de la foto ya cubre la nueva posición; si no, queda como está (nada se regenera) |
+| 3 | ~~Firma de las stories de v07 en la franja que Reels tapa~~ | **Decidido:** se movió sólo en las cuatro stories finales de v07, dentro de la zona de AXIS; ninguna imagen se regenera |
 | 4 | ~~Velo~~ | **Decidido:** no existe; el lecho sale del prompt |
 | 5 | Variante del CTA elegida sin margen: ¿aviso o bloqueo? | Aviso |
-| 6 | Piso de legibilidad por rol | Aviso bajo 9 px CSS en el teléfono |
+| 6 | ~~Piso de legibilidad por rol~~ | **Decidido:** en las piezas nuevas el CTA mide al menos 11 px CSS en el teléfono y las demás voces 9 (bloquea); en las aprobadas, aviso |
 | 7 | Grosor de los corchetes de AXIS (cerca de 0,69 px CSS en el teléfono) | Aviso; cambiarlo es cambiar el contrato AXIS |
 
 **1 · La firma en 16:9 (decidido el 2026-09-23: 25 % en las piezas nuevas).** Medido en una misma campaña: en 16:9 la firma ocupa entre 7,3 % y 7,9 % del ancho del cuadro,
@@ -498,9 +498,16 @@ en verticales y cuadrados. Si se aprueba, cambian el gate, el compositor y `firm
 ajuste que hace arrancar el texto dentro de la zona también por arriba ya está aplicado). Cambiar el defecto movería
 todas las piezas alineadas a la izquierda al recomponerlas.
 
-**3 · Las stories de v07.** Ponen la firma con su centro en 0,90 de la altura, en la franja inferior que Reels tapa (la
-zona de AXIS termina en 0,87), como reconoce el propio LEEME del set. Está por decidir si se aprueba como excepción
-`zona-segura` con el nombre del operador o si la firma se sube al recomponer.
+**3 · Las stories de v07 (decidido el 2026-09-23).** Ponían la firma con su centro en 0,90 de la altura, bajo el límite de
+la zona de AXIS (0,87). Se subió a 0,8565 en las cuatro stories finales, sin tocar nada más (las otras 12 piezas quedaron
+idénticas). Sigue fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla, así que
+se revisa el placement antes de pautar. El LEEME de v07 explica cómo reproducir el set hoy.
+
+**6 · Piso de legibilidad (decidido el 2026-09-23).** En una pieza nueva, el CTA mide al menos 11 px CSS en un teléfono de
+390 px de ancho y las demás voces 9. Es un piso, no un tamaño fijo: la jerarquía se mantiene y sólo crecen los textos que
+estaban bajo el piso. En 9:16 y 4:5 casi nunca cambia nada. En 16:9 obliga a un texto bastante más grande, o a menos
+texto. Esta receta pasa el gate en un lienzo de 2048 px: entrada, cierre y descriptor de 48 px, CTA de 60, titular de 160
+con `dominantMax` y `textWidth` 0,5, y sin nota.
 
 ## Qué no hacer
 
@@ -558,6 +565,9 @@ zona de AXIS termina en 0,87), como reconoce el propio LEEME del set. Está por 
 | `` declara `gesture` y la fuente Guttery no está en … `` | Falta la fuente del gesto | Instálala o quita el gesto (el gesto no se certifica) |
 | `pieza muda (sin texto)` / `` falta `cta` `` | Pieza sin texto o sin CTA | Usa `pnpm foto:componer` |
 | `la tarjeta de vidrio con línea naranja fue puntual del post de GTA VI` | `card` sin `allowGtaCard` | Usa `note` |
+| `la esquina del botón entra en el texto del CTA (radius R con relleno X×Y)` | El radio del botón es tan grande que la esquina corta las letras | Baja `cta.radius` hasta el máximo que da el mensaje, o sube el relleno |
+| `medición imposible en «voz»` | Un defecto del comando, visto una sola vez | Recompón; si se repite, avisa al responsable del comando con el registro y la salida completa |
+| `tiene transparencia: aplánalo sobre su fondo` | El plate tiene alfa, también en 16 bits o en gris | Exporta el plate sin transparencia |
 
 ### Al certificar
 
@@ -600,6 +610,13 @@ zona de AXIS termina en 0,87), como reconoce el propio LEEME del set. Está por 
 | `⊘ … se compuso con otra versión del comando` | El comando cambió desde la composición | `--reproducir`; si no calza, recompón |
 | `⊘ … la máscara del sujeto salió de una caché ajena al repo` | Se compuso con `FOTO_MASCARAS_DIR` | `--reproducir` |
 | `⊘ … lleva gesto manuscrito` / `lleva tarjeta` | Elementos que ninguna guarda mide | No se certifica hoy; quita el elemento si necesitas la certificación |
+| `el botón es una losa: padding …` | El relleno del botón pasa 1,2 y 0,8 veces el tamaño de su letra | Baja `paddingX` y `paddingY`; lo aprobado va de 0,6 a 0,8 y de 0,35 a 0,47 veces |
+| `el descriptor queda lejos de su botón` | `descriptorGap` pasa el tamaño de la letra del CTA | Bájalo; lo aprobado va de 0,35 a 0,57 veces |
+| `el CTA (N px) es menor que el cuerpo` | El CTA mide menos de 0,9 veces la entrada, el cierre o la nota | Sube `cta.fontSize` o baja esa voz |
+| `tinta fuera de la paleta de AXIS para el cuerpo` | `leadFill` o `afterFill` con un color fuera de la paleta | Sobre fondo oscuro, `#ffffff` o `#cfe4fa`; sobre claro, `#00284d` o `#6d6777`. El naranja y el lima son del titular y del CTA |
+| `la selección no encierra nada` | La caja de la selección cae donde no hay sujeto | Pon `selection.box` sobre el objeto que nombra; si la silueta no lo marca, decláralo con `protect` |
+| `⊘ … la selección no trae su medición de sujeto` | El registro viene de una versión anterior del comando, o se tocó | Recompón |
+| `texto chico en un teléfono (390 CSS px de ancho)` | Pieza nueva con voces bajo el piso: CTA 11 px CSS, las demás 9 | Sube los tamaños o recorta el texto; en 16:9, la receta del punto 6 de las decisiones |
 
 ### Al reproducir y en los demás comandos
 

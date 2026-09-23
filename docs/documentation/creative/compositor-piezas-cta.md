@@ -1,7 +1,7 @@
 # Compositor de piezas con CTA — Composición y certificación
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-23 por Claude
 > **Ultima actualizacion:** 2026-09-23 por Claude
 > **Documentacion tecnica:** [Compositor de CTA — comando canónico](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) (§14 guarda de sujeto · §15 red de seguridad · §16 accesibilidad · §17 variantes · §18 certificación y tramos)
@@ -351,6 +351,12 @@ tamaño de letra se traduce a cómo se ve ahí: px en la imagen × 390 ÷ ancho 
 parece grande puede quedar diminuto en el teléfono, sobre todo en 16:9: en la primera medición, 43 de 86 descriptores
 quedaban bajo 9 px en pantalla, con un mínimo de 3,8 px.
 
+**El piso de legibilidad** (decisión del operador del 2026-09-23, «desde 9 px se lee bien»): en una pieza nueva, el CTA
+mide al menos **11 px CSS** en el teléfono —el mínimo de Apple para texto— y las demás voces **9**. Es un piso, no un
+tamaño fijo: la jerarquía se mantiene y sólo crecen los textos que estaban debajo. En 16:9 obliga a un texto bastante más
+grande o a menos texto: una receta que pasa en un lienzo de 2048 px es entrada, cierre y descriptor de 48 px, CTA de 60 y
+titular de 160, sin nota. Las piezas aprobadas conservan el aviso de siempre.
+
 Con ese tamaño se decide el umbral de WCAG:
 
 | Texto | Mínimo |
@@ -387,7 +393,7 @@ en visión típica pasara.
 Estos casos no bloquean, pero el gate los muestra para que alguien los mire:
 
 - APCA o daltonismo bajos en voces que no son el CTA.
-- Texto de menos de 9 px CSS en el teléfono. El piso de legibilidad por rol está pendiente de decisión.
+- En una pieza aprobada, texto de menos de 9 px CSS en el teléfono. En una pieza nueva ya no es aviso: bloquea (abajo).
 - Una variante del CTA elegida **sin margen**: pasa por poco y puede no alcanzar en otra pantalla o con compresión.
 - Los **corchetes** del CTA de texto: el trazo que dibuja AXIS mide cerca de 0,69 px CSS en un teléfono en todos los
   formatos. Es un valor del contrato AXIS; cambiarlo es decisión del operador.
@@ -476,6 +482,24 @@ Reglas:
 
 > Detalle técnico: `textoAlternativo` y `copiaEnEscena` en [`accesibilidad.mjs`](../../../scripts/foto/accesibilidad.mjs);
 > contrato §16 y §18 (tramos 4 y 8).
+
+## Límites del botón, del descriptor y de las tintas
+
+La quinta auditoría encontró piezas que pasaban el gate y se veían mal. Desde el tramo 13, en todas las piezas:
+
+- **El botón no es una losa:** su relleno interior no pasa 1,2 veces el tamaño de su letra a los lados ni 0,8 veces
+  arriba y abajo.
+- **El descriptor acompaña a su botón:** no se aleja más que el tamaño de la letra del CTA.
+- **El CTA no es más chico que el texto de cuerpo:** mide al menos 0,9 veces la entrada, el cierre o la nota más grande.
+- **La esquina del botón no corta las letras:** un radio muy grande volvía el botón una elipse.
+- **La entrada y el cierre usan la paleta de AXIS para texto:** blanco o celeste sobre fondo oscuro, azul tinta o gris
+  sobre fondo claro. El naranja y el lima son del titular y del CTA.
+- **Una selección sobre un objeto encierra algo:** al menos el 1 % de su caja tiene que ser sujeto. Una sobre una pared
+  vacía ya no pasa.
+
+Ninguna de las 132 piezas aprobadas incumple estos límites: se calibraron con ellas.
+
+> Detalle técnico: contrato §18 (quinta certificación y tramo 13) y §19.8.
 
 ## Excepciones: cuando una regla no aplica, con nombre y apellido
 
@@ -603,6 +627,7 @@ los que el gate daba verde sobre una pieza mala. Cada hallazgo se cerró en un t
 | 9 · Proceso | Bloqueo sin carreras que Ctrl-C suelta, aviso entre planes, suite que limpia sus temporales, veredicto del gate en la regresión, huella con fuentes y logos, mutantes contra una corrida base y canarios |
 | 12 · Cuarta certificación | Marcos de selección dentro de las reglas (y avisados en las aprobadas), cursores que no tapan texto, columna con lugar para los corchetes, eje de los bloques centrados, tracking del titular, `placement` con piso, marcado, entidades y saltos de línea rechazados, plates con transparencia rechazados |
 | 11 · Canon 2026-09-23 | Registro de las piezas aprobadas; en las nuevas, zona AXIS por defecto, firma de 25 % en horizontales y en el cuarto inferior, orden de lectura, jerarquía por rol, aire del botón y firma externa aprobada; sin velo |
+| 13 · Quinta certificación | Esquina del botón, botón-losa, descriptor lejos, CTA menor que el cuerpo, tinta del cuerpo fuera de la paleta, selección sobre nada, transparencia en cualquier profundidad, entidades con dígitos, medición imposible que aborta y piso de legibilidad en las piezas nuevas |
 | 10 · Integridad (tras la tercera certificación) | Selección sobre un objeto dentro de las guardas, zona de la firma validada y firma dentro de la imagen, aprobador de pruebas sólo en la suite, sin estado interno en el plan, HUD/url/pie no certificables, espacios Unicode, huella del texto alternativo y reproducción que compara todo lo entregado, comando ajeno que no certifica, piso de `final`, jerarquía con tamaños resueltos, aprobaciones atadas al plate |
 
 Entre los tramos 5 y 6 se sumaron la medición de la firma externa, el bloqueo de APCA y daltonismo en el CTA y la zona
@@ -610,14 +635,11 @@ Entre los tramos 5 y 6 se sumaron la medición de la firma externa, el bloqueo d
 
 **Lo que falta:**
 
-- La **cuarta certificación** (2026-09-23) también dio NO CERTIFICA, con hallazgos nuevos que cerró el tramo 12;
-  sigue una quinta. La tercera también había dado NO CERTIFICA en los dos auditores. El tramo 10 cerró lo de integridad;
-  faltan el tramo 11 (canon nuevo: orden de lectura, jerarquía por rol, firma en el pie, velo, tamaño mínimo) y el 12
-  (banco de pruebas propio), y después una cuarta certificación. Se da por cerrada con cero hallazgos graves y medios.
+- La **quinta certificación** (2026-09-23) dio NO CERTIFICA, sin hallazgos graves y con ocho medios que cerró el tramo 13;
+  sigue una sexta. La certificación se da por cerrada con cero hallazgos graves y medios.
 - Marcar cada guarda en el código con un mutante por marca.
-- Las **decisiones pendientes del operador**: tamaño de la firma en 16:9, margen por defecto del compositor, firma de
-  las tres stories de v07 en la franja que Reels tapa, si el velo necesita aprobación, si una variante sin margen debe
-  bloquear, el piso de legibilidad por rol y el grosor de los corchetes de AXIS. El
+- Las **decisiones pendientes del operador**: si una variante sin margen debe bloquear y el grosor de los corchetes de
+  AXIS. El
   [manual](../../manual-de-uso/creative/compositor-piezas-cta.md#decisiones-pendientes-que-te-afectan) las detalla.
 
 **El velo ya no existe** (2026-09-23): la sombra que se pintaba encima de la foto para que un texto se leyera se
@@ -626,7 +648,8 @@ rechaza al validar el plan. El lugar oscuro donde va el texto o la firma sale de
 **Decisiones ya tomadas (2026-09-23):** canon nuevo sólo hacia adelante; firma de 25 % en horizontales, abajo y dentro de
 AXIS; zona AXIS por defecto; sin velo; APCA y daltonismo bloquean sólo en el CTA; las piezas aprobadas que el canon
 reprueba se dejan como están y se corrigen al recomponer; los planes v03–v07 declaran su firma externa; el gesto
-manuscrito queda fuera de alcance.
+manuscrito queda fuera de alcance; la firma de las stories finales de v07 se movió dentro de AXIS; y el piso de
+legibilidad en las piezas nuevas es de 11 px CSS para el CTA y 9 para las demás voces.
 
 > Detalle técnico: contrato §18 (hallazgos consolidados, estado de los tramos, segunda certificación y decisiones
 > pendientes).

@@ -274,8 +274,13 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    **Nuevo:** tracking del titular entre −0,035 y 0,02 em (`tracking-titular`): más allá funde o separa las letras.
    En un bloque centrado —pieza nueva o aprobada— cada voz, el botón y el descriptor van en el eje (±4 px,
    `eje-centrado`): usa `cta.align: "center"` y la nota sin `x`.
+   **Tramo 13 (todas):** el CTA mide ≥ 0,9× la voz de cuerpo mayor (`cta-cuerpo`), y la entrada y el cierre usan sólo
+   tintas de cuerpo de AXIS (`leadFill`/`afterFill`: `#ffffff` o `#cfe4fa` sobre fondo oscuro, `#00284d` o `#6d6777`
+   sobre claro; nunca el acento del CTA: `paleta-voces`). **Nuevo:** en el teléfono (390 CSS px) el CTA mide ≥ 11 px y
+   las demás voces ≥ 9 (`legibilidad`); en 16:9 eso pide mucho más texto: en un lienzo de 2048, entrada, cierre y
+   descriptor de 48 px, CTA de 60 y titular de 160 (receta en el contrato, §18, tramo 13).
    **Copy:** `|` corta la línea (nunca `\n`); `**negrita**` y `[[acento]]` sólo en entrada, titular, cierre, nota y pie;
-   escribe los caracteres, no entidades (`&`, no `&amp;`). El compositor rechaza lo demás.
+   escribe los caracteres, no entidades (`&`, no `&amp;`; tampoco `&sup2;`). El compositor rechaza lo demás.
 4. **Firma declarada siempre**, de una de tres formas:
    - `logo: { width: 0.2, x: 0.5, y: "auto" }`, la recomendada (`width: 0.25` en un formato horizontal nuevo; la tinta,
      blanca o navy, la elige la medición salvo que fijes `variant`). `width` es fracción del lado corto. `y: "auto"` busca sólo en la **banda del pie**, debajo de
@@ -288,8 +293,8 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    - `firma: { modo: "externa", razon }` si otra herramienta firma después (v03–v07: `firmar.mjs` →
      `firma-placement.mjs`). El compositor no la dibuja: reserva su caja (20 % del lado corto, centrada) y mide su
      contraste como esa herramienta. **Declara su centro vertical dentro de la zona de AXIS** (la Y máxima por formato
-     está en §19.6 del contrato): sin Y queda en 0,935, fuera de la zona, y qué hacer con ese defecto es decisión
-     pendiente del operador. Con `firmar.mjs`, la Y va en `signatureY`, que es la que esa herramienta lee (el esquema
+     está en §19.6 del contrato): sin Y queda en 0,935, fuera de la zona (las stories de v07 usan 0,8565 desde el
+     2026-09-23). Con `firmar.mjs`, la Y va en `signatureY`, que es la que esa herramienta lee (el esquema
      ya no acepta `firma.y` ni `firma.ancho`), y el ancho queda en 20 %: la caja que se mide tiene
      que ser la firma que se dibuja. `signatureY` sin `firma` también declara firma externa; `signatureSafeArea` (`{ x0, y0, x1, y1 }`)
      sólo estrecha la zona de la firma. **Certifica antes de firmar:** `firmar.mjs` reescribe `out/<id>.png` y desde
@@ -305,10 +310,15 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    obligatorio: `surfaceToken` (contorno y relleno) o `inkToken` (texto) sólo aceptan `accentSurface`, `growthOnDark` o
    `accentInkOnLight`, y omitirlo resuelve lima. Si el acento no alcanza, se regenera el plate: el color no se apaga.
    **Nuevo:** en contorno y relleno, padding ≥ 0,5× (horizontal) y 0,25× (vertical) el cuerpo del CTA (`cta-aire`).
+   **Tramo 13 (todas):** padding ≤ 1,2× y 0,8× el cuerpo (`cta-relleno`; lo aprobado va de 0,6× a 0,8× y de 0,35× a
+   0,47×); `descriptorGap` ≤ 1× el cuerpo (`descriptor-distancia`; lo aprobado, 0,35–0,57×); y el radio no mete la
+   esquina en el texto: si lo hace, el compositor aborta y dice el radio máximo (lo aprobado, 0–16 px).
 6. **Selección:** el marco de la selección del titular y el del CTA cuando se pinta no tapan otra voz, y ningún cursor ni
    etiqueta tapa texto, ni el de su destino. En una pieza nueva bloquea (y la columna deja sola el lugar de los corchetes
-   del CTA de texto y del marco del titular); en una aprobada se avisa. `placement`, si lo declaras, desde 320 CSS px.
-   Un plate con transparencia se rechaza: aplánalo.
+   del CTA de texto y del marco del titular); en una aprobada se avisa. Una selección sobre un objeto encierra sujeto: al
+   menos 1 % de su caja (`seleccion-objeto`); si la segmentación no marca el objeto, decláralo con `protect`.
+   `placement`, si lo declaras, desde 320 CSS px. Un plate con transparencia se rechaza, también en 16 bits o en gris con
+   alfa: aplánalo.
 7. **`altText`:** describe la escena —quién, qué hace, dónde, con qué luz— sin transcribir el copy (ni entre comillas
    ni en frases de dos palabras o más). El texto de la imagen lo agrega el compositor en `out/<id>.alt.txt` y en el QA,
    en orden de lectura, y **anuncia siempre el rol del CTA** («Llamado a la acción: «…»», nunca «Botón»: en una imagen

@@ -71,6 +71,10 @@ test('Marcado, entidades, saltos de línea y placement chico se rechazan donde s
   assert.deepEqual(errores({ ...base(), dominant: 'Cerrarlo es **otra** cosa.' }), [], 'en el titular el marcado se interpreta')
   assert.ok(errores({ ...base(), lead: 'Marketing &amp; ventas' }).some(e => /`lead` trae la entidad «&amp;»/.test(e)))
   assert.deepEqual(errores({ ...base(), lead: 'Marketing & ventas' }), [], 'un & suelto es el carácter')
+  // Tramo 13 (quinta certificación, N3): el nombre de una entidad puede llevar dígitos.
+  assert.ok(errores({ ...base(), cta: { ...base().cta, text: 'Cotiza tus 50 m&sup2;' } }).some(e => /`cta\.text` trae la entidad «&sup2;»/.test(e)))
+  assert.ok(errores({ ...base(), dominant: 'Medio &frac12; paso' }).some(e => /`dominant` trae la entidad «&frac12;»/.test(e)))
+  assert.deepEqual(errores({ ...base(), lead: 'Marketing &2 ventas; hoy' }), [], '& seguido de un dígito no es una entidad')
   assert.ok(errores({ ...base(), dominant: 'Uno\ndos' }).some(e => /`dominant` trae un salto de línea/.test(e)))
   assert.ok(errores({ ...base(), placement: { anchoCssPx: 15, razon: 'prueba: pantalla diminuta' } }).some(e => /`placement\.anchoCssPx` debe ser ≥ 320/.test(e)))
   assert.deepEqual(errores({ ...base(), placement: { anchoCssPx: 1600, razon: 'prueba: sitio de escritorio' } }), [])

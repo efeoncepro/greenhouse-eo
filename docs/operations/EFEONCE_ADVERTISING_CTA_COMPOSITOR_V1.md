@@ -812,8 +812,8 @@ medición, el gate la imprime con su razón y quién la aprobó. Reglas exceptua
   descriptor la sigue. El gate avisa cuando el CTA o el descriptor quedan corridos más de 4 px, y cuando sobre los
   corchetes del CTA de texto queda menos de media altura del CTA.
 - **Tamaño en pantalla:** `placement: { anchoCssPx, razon }` declara dónde se publica la pieza si no es un teléfono
-  (**desde el tramo 7 sólo endurece**: una pantalla más ancha ya no afloja la medición); el piso legible por rol sigue
-  en aviso hasta la decisión pendiente 6.
+  (**desde el tramo 7 sólo endurece**: una pantalla más ancha ya no afloja la medición); el piso legible por rol
+  bloquea en las piezas nuevas desde el tramo 13 (CTA 11 CSS px, las demás voces 9) y avisa en las del canon anterior.
 - **Texto alternativo:** «Llamado a la acción» en vez de «Botón» (la imagen no tiene un control que activar); suma el
   gesto manuscrito y las etiquetas de los cursores; no repite lo que la descripción de la escena ya dice.
 - Regresión (referencia hermética) contra 4d36b01c3: **ningún píxel cambia**; el texto alternativo cambia en las 86 piezas («Llamado a la acción») y el layout suma `columna`, `ctaMarco` y `zonaSegura`. Con las reglas nuevas **ninguna de las 86 piezas del repo pasa el gate completo**: zona segura 77 (el margen del compositor es 7 % y AXIS pide 7,5 % en feed y 10 % en story), concepto sin cierre 40 (las piezas AEO), firma sin declarar 37 (v03–v07 firman con otra herramienta), firma bajo 20 % 19 (CMP-002 y los 16:9 de registro-c), reserva editorial 6, acento 7 (ya fallaba antes), firma sobre el sujeto 3, firma bajo 4,5:1 1 y regla de las tres veces 1. Son decisiones del operador —recomponer con `safeArea: "axis"` y `cta.x`/`note.x: "columna"`, declarar `firma`, o excepciones auditadas—; ninguna pieza se tocó.
@@ -1053,7 +1053,7 @@ idénticos—, y 3 piezas omitidas porque su plate vive en OneDrive y el archivo
 firma en el pie y con tamaño máximo, velo, tamaño mínimo) y el banco de pruebas propio (piezas de prueba versionadas,
 mutantes por aserción, regresión que juzga cada versión con su gate). Después, la cuarta certificación.
 
-### Tramo 11 — canon 2026-09-23, sólo hacia adelante (cerrado salvo el piso de legibilidad)
+### Tramo 11 — canon 2026-09-23, sólo hacia adelante (cerrado; el piso de legibilidad entró en el tramo 13)
 
 **Cómo se decide el canon de una pieza.** `scripts/foto/canon-anterior.json` es una foto, al corte del 2026-09-23, de las
 132 piezas con CTA aprobadas: cada una por el sha256 de su plate y la huella de su definición en el plan **sin la ruta
@@ -1091,10 +1091,9 @@ mutantes viejos se reapuntaron al código nuevo: `t6-firma-sube-sin-tope` (con l
 encuentra lugar legible y no sube; la banda la vigila la pieza con el pie protegido) y el del velo, que se retiró con el
 velo.
 
-**Pendiente de este tramo:** el piso de legibilidad por rol (pendiente 6), a la espera de la decisión del operador; y
-subir la firma de las piezas existentes que la tienen fuera de AXIS donde el lecho ya cubre la nueva posición (aprobado
-por el operador: 46 de 47 piezas; KV-06 no alcanza 4,5:1 y queda como está). Se hace después del tramo 12, con el
-compositor final, para recomponer una sola vez.
+**Pendiente de este tramo, ya resuelto:** el piso de legibilidad por rol entró en el tramo 13. Subir la firma de las
+piezas existentes quedó acotado por el operador (2026-09-23, tercera ronda): no se regenera ninguna imagen y sólo se
+movió la firma de las cuatro stories finales de v07 (commit `64a9b99c5`, su LEEME tiene el detalle).
 
 ### Cuarta certificación (2026-09-23): dos auditores, NO CERTIFICA
 
@@ -1136,6 +1135,58 @@ objeto no protegido; CTA sólido medido contra su color; CTA de texto que se con
 etiquetas de cursor fuera del orden de lectura y la jerarquía; `logo` junto a una firma externa (3 aprobadas lo
 declaran); `.reclamo` huérfano; aviso de columna con la variante declarada; suite y regresión dependientes de plates de
 campaña; mutantes por nombre de prueba; regresión juzgada con el gate del árbol de trabajo; medición en el máster.
+
+### Quinta certificación (2026-09-23): dos auditores, NO CERTIFICA
+
+Los dos dan por **cerrados** los 🔴 de la cuarta (marcos de selección y `placement` chico) y casi todos sus 🟠 (tracking,
+eje, `\n`, marcado). Ningún 🔴 nuevo. Abiertos:
+
+| Severidad | Hallazgo (auditor) | Uso real |
+|---|---|---|
+| 🟠 | `cta.radius` sin techo: el botón se vuelve una elipse; en el relleno las puntas de las letras quedan sobre la escena sin medir (2,3 % de la tinta a 1,39:1, con el QA diciendo 8,16:1) y en el contorno el borde cruza la «D» y la «y» (arquitectura, N1) | radios reales 0–16 px |
+| 🟠 | Plate con transparencia en 16 bits o en gris con alfa: el chequeo miraba el alfa crudo de 8 bits (arquitectura, N2; de la cuarta) | ninguno |
+| 🟠 | Entidades con dígitos (`&sup2;`, `&frac12;`) se dibujaban literales (arquitectura, N3; residuo de la cuarta) | ninguna |
+| 🟠 | Descriptor separado de su botón: `descriptorGap` sin techo; a 3,9× el cuerpo del CTA caía sobre la escena (diseño) | 0,35–0,57× el cuerpo del CTA |
+| 🟠 | CTA más chico que el cuerpo: la jerarquía por rol sólo ponía techos (diseño) | ≥ 0,97× la voz de cuerpo mayor |
+| 🟠 | Selección sobre nada: `selection.box` no se comparaba con la máscara (diseño) | 3 piezas, con 3,3–20 % de sujeto en la caja |
+| 🟠 | Tinta de la entrada y del cierre fuera de la paleta de AXIS, también el acento del CTA (diseño) | todas blancas |
+| 🟠 | Botón-losa: el relleno del botón tenía piso y no techo (diseño) | 0,6–0,8× y 0,35–0,47× el cuerpo del CTA |
+
+**Visto una vez y no reproducido:** en una corrida en paralelo del auditor de diseño, la fila del QA de un caso salió con
+el titular y el CTA medidos como el descriptor (20,27:1 con umbral 4,5; lo correcto era 19,98 con 3 y 11,08). El PNG y el
+layout eran idénticos, `--reproducir` lo atajó con 1 y no se repitió en 8 intentos del auditor ni en 36 composiciones en
+paralelo del tramo 13. La causa no se encontró: ninguna llamada del código produce esa fila (los píxeles medidos eran los
+de cada voz, el valor y el umbral los del descriptor). Desde el tramo 13 una medición así aborta la composición.
+
+### Tramo 13 — quinta certificación (cerrado)
+
+- **Validación (todas):** el nombre de una entidad puede llevar dígitos y se rechaza igual; un plate con transparencia
+  se rechaza en cualquier profundidad y con cualquier canal (`isOpaque`: 16 bits, gris con alfa, tRNS).
+- **Compositor (todas):** la esquina redondeada del botón no entra en la caja del texto del CTA —con la geometría efectiva
+  de SVG (el radio se recorta a la mitad del ancho y del alto) y, en el contorno, contra el borde interior del trazo—; si
+  entra, aborta y el mensaje da el radio máximo para ese relleno. Una **medición imposible** (más contraste del que su
+  tinta puede dar contra cualquier fondo, o un umbral que no es el de su tamaño) aborta en vez de quedar en el QA. El QA
+  registra `seleccionSujeto`: la fracción de la caja de una selección sobre un objeto que es sujeto (máscara o `protect`).
+- **Gate (todas),** calibrado contra las 132 aprobadas únicas, que ninguna incumple: `cta-relleno` (padding ≤ 1,2× y
+  0,8× el cuerpo del CTA), `descriptor-distancia` (`descriptorGap` ≤ 1× el cuerpo del CTA), `cta-cuerpo` (CTA ≥ 0,9× la
+  voz de cuerpo mayor), `paleta-voces` (entrada y cierre con `inkOnDark` o `softOnDark` sobre fondo oscuro, `inkOnLight`
+  o `mutedOnLight` sobre claro) y `seleccion-objeto` (≥ 1 % de sujeto; sin la medición, no se certifica).
+- **Canon nuevo:** `legibilidad` (decisión del operador, «desde 9 px se lee bien»): en un teléfono de 390 CSS px, el CTA
+  ≥ 11 px y las demás voces ≥ 9. En 16:9 obliga a un texto mucho más grande; la receta verificada en la suite (lienzo de
+  2048 px): entrada, cierre y descriptor 48 px, CTA 60, titular 160 con `dominantMax` y `textWidth` 0,5, sin nota.
+- **Pruebas:** P07 +3 casos, P10 +10 (una por regla, una excepción auditada, la selección sin medición y la esquina) y
+  +2 pruebas unitarias; mutantes +13 (140) y `t12-alfa-libre` reapuntado.
+- **Regresión:** las 132 aprobadas únicas componen igual. Las tres con selección suman `seleccionSujeto` al QA (3,3 %,
+  10,3 % y 20,2 %); su veredicto no cambia.
+
+**Deuda 🟡/🟢 registrada** (no bloquea según la regla de término): `--reproducir` propaga el origen heredado al hijo
+(N4); `--reproducir` sale con 3 en un plan válido que repite plate, y su mensaje pide justo `--reproducir` (N5; 7 de 33
+planes reales); el eje centrado se mide por caja y no por línea (N6); con `.origen` forjado el modo rápido imprime
+«certificadas por reproducción»; la estrella de `labelStar` fuera de toda caja; voces despegadas (`leadGap`, `afterGap`,
+`gapAfterClosure` y `gapAfterNote` sin techo); firma fuera del eje en un bloque centrado; selección contra selección
+(cursor sobre cursor); el titular entero en acento con un CTA lima; CTA en dos líneas y descriptor más ancho que el
+botón; acentos descompuestos (NFD) con un mensaje confuso; `&amp;` literal en el `.alt.txt`; «cortar el objeto» con la
+selección, que la máscara no permite juzgar (una aprobada encierra sólo el 9 % de su componente; un ataque, el 24 %).
 
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
@@ -1200,12 +1251,20 @@ Nada de esto cambia una pieza aprobada.
 - **Firma 16:9:** 25 % del lado corto en los formatos horizontales de las piezas nuevas (20 % en verticales y
   cuadrados). Se pueden generar unas pocas imágenes de prueba, no el set.
 - **Firma dentro de AXIS** en las piezas nuevas. En las existentes, se sube donde el lecho ya cubre la nueva posición;
-  donde no, queda como está.
+  donde no, queda como está *(acotado en la tercera ronda: sólo las stories finales de v07)*.
 - **Zona AXIS por defecto** en las piezas nuevas, con la corrección del crecimiento (el marco del CTA que no se pinta
   no frena el crecimiento).
 - **Sin velo:** el lecho sale siempre del prompt; `scrimTop`/`scrimBottom` dejan de existir. Ninguna pieza aprobada
   los usa.
 - **Regla de término de la certificación:** cero 🔴 y 🟠 abiertos (arriba).
+
+**Tomadas (2026-09-23, tercera ronda):**
+
+- **Firma de las piezas existentes:** sólo se mueve en las stories finales de v07, dentro de la zona story de AXIS
+  (centro 0,8565; commit `64a9b99c5`). Ninguna imagen se regenera. En OneDrive se reemplazaron CMP001-05 a 07;
+  CMP001-04 quedó pendiente porque OneDrive no deja descargarla ni sobrescribirla.
+- **Piso de legibilidad** (pendiente 6): en las piezas nuevas, el CTA mide al menos 11 CSS px en un teléfono y las demás
+  voces 9 (tramo 13, regla `legibilidad`). Las aprobadas conservan el aviso.
 
 **Pendientes** (sin respuesta; lo implementado mientras tanto va entre paréntesis):
 
@@ -1220,12 +1279,13 @@ Nada de esto cambia una pieza aprobada.
 2. ~~**Margen por defecto del compositor**~~ → resuelta el 2026-09-23: AXIS por defecto en las piezas nuevas (tramo 11). Margen por defecto (7 %) frente a AXIS (7,5 % en feed, 10 % en story). Recomendación: mantener
    el 7 % y exigir `safeArea: "axis"` en los planes nuevos. *(Con `safeArea: "axis"` el texto ya arranca dentro de la
    zona también por arriba, commit `4cb6dd154`.)*
-3. **Las tres stories de v07 ponen la firma en la franja inferior que Reels tapa** (centro en 0,90; AXIS termina en
-   0,87), como reconoce su LEEME: ¿se aprueban como excepción `zona-segura` con tu nombre, o la firma se sube al
-   recomponer?
+3. ~~**Las stories de v07 ponen la firma en la franja inferior que Reels tapa**~~ → resuelta el 2026-09-23: la firma se
+   subió dentro de AXIS en las cuatro stories finales (tercera ronda, arriba). Sigue fuera de la guarda conservadora de
+   Reels (65 %), como dice su LEEME.
 4. ~~**Velo que rescata una voz**~~ → resuelta el 2026-09-23: sin velo (tramo 11).
 5. **Variante del CTA elegida sin margen:** ¿aviso (hoy, `ctaVariante.sinMargen`) o bloqueo?
-6. **Piso de legibilidad por rol** (texto bajo 9 CSS px en el teléfono; hoy aviso). En discusión con el operador el
+6. ~~**Piso de legibilidad por rol**~~ → resuelta el 2026-09-23: CTA 11 CSS px y las demás voces 9 en las piezas nuevas
+   (tramo 13). Lo que sigue es el registro de la discusión. (Texto bajo 9 CSS px en el teléfono; era aviso.) En discusión con el operador el
    2026-09-23, con la única referencia externa verificada: Apple fija 11 pt como mínimo de texto en iPhone (17 por
    defecto); WCAG no fija un tamaño mínimo. Medido en las 62 piezas: el CTA cumple 11 px en todas las 9:16 y 4:5 y en
    ninguna 16:9. *(Hoy no hay regla que bloquee, y la excepción `legibilidad` no existe en el esquema: un plan que la
@@ -1542,7 +1602,12 @@ Copiarlo sólo vale si el operador re-aprueba la excepción para ese plate.
 | `cta-aire` | Canon nuevo: padding del botón bajo 0,5× y 0,25× el cuerpo del CTA | no se mide: sin `hasta` |
 | `eje-centrado` | Una voz, el botón o el descriptor de un bloque centrado a más de 4 px del eje | no se mide: sin `hasta` |
 | `tracking-titular` | Canon nuevo: tracking del titular fuera de −0,035…0,02 em | no se mide: sin `hasta` |
-| — | Texto bajo 9 CSS px en el teléfono | hoy sólo avisa (pendiente 6) y no hay excepción: `legibilidad` no está en el esquema y un plan que la declara se rechaza |
+| `legibilidad` | Canon nuevo: texto bajo el piso en un teléfono de 390 CSS px (CTA 11 px, las demás voces 9) | CSS px mínimos aprobados (p. ej. `8.5`) |
+| `cta-relleno` | Padding del botón sobre 1,2× y 0,8× el cuerpo del CTA (botón-losa) | veces el techo, 1 = el techo (p. ej. `1.4`) |
+| `descriptor-distancia` | `descriptorGap` sobre 1× el cuerpo del CTA | razón máxima aprobada (p. ej. `1.3`) |
+| `cta-cuerpo` | CTA bajo 0,9× la voz de cuerpo mayor (entrada, cierre o nota) | razón mínima aprobada (p. ej. `0.8`) |
+| `paleta-voces` | Entrada o cierre con una tinta fuera de la paleta de AXIS para el cuerpo | no se mide: sin `hasta` |
+| `seleccion-objeto` | Una selección sobre un objeto con menos de 1 % de sujeto en su caja | fracción mínima aprobada (p. ej. `0.005`) |
 
 Una excepción **vale** sólo si se cumplen las tres condiciones del tramo 7:
 
@@ -1593,15 +1658,23 @@ aprobador ni copia `suite-pruebas` a un plan real: si falta la aprobación, preg
   (`firma-tamano`); firma debajo del contenido —con al menos 2 % del lado corto de aire—, en el cuarto inferior y fuera
   de `protect` (`firma-posicion`); firma externa aprobada; orden de lectura (`orden-lectura`); jerarquía por rol
   (`jerarquia-rol`); aire del botón (`cta-aire`); tracking del titular (`tracking-titular`); el marco de la selección
-  del titular y el del CTA cuando se pinta, dentro de las invariantes; y un QA cuyo canon no calza con el registro.
+  del titular y el del CTA cuando se pinta, dentro de las invariantes; el piso de legibilidad en el teléfono
+  (`legibilidad`, tramo 13); y un QA cuyo canon no calza con el registro.
 - **Todas las piezas:** un cursor o una etiqueta de selección no tapan ningún texto, ni el de su destino; en un bloque
-  centrado, cada voz, el botón y el descriptor en el eje (±4 px, `eje-centrado`).
+  centrado, cada voz, el botón y el descriptor en el eje (±4 px, `eje-centrado`). Desde el tramo 13: botón-losa
+  (`cta-relleno`), descriptor lejos de su botón (`descriptor-distancia`), CTA menor que el cuerpo (`cta-cuerpo`), tinta
+  del cuerpo fuera de la paleta (`paleta-voces`) y selección sobre nada (`seleccion-objeto`).
 
 **Rechaza al validar** (el compositor, antes de componer): un espacio o carácter que la fuente de su voz no tiene, un
 texto sin nada que dibujar, `signatureSafeArea` incompleta, el velo (`scrimTop`/`scrimBottom`), una nota con
-`gapAfterClosure` negativo, `**`/`[[ ]]` fuera de entrada, titular, cierre, nota y pie, una entidad, un salto de línea
-o una tabulación, `placement` bajo 320 CSS px, un plate con transparencia, un campo interno del compositor en el plan, escalas de la
+`gapAfterClosure` negativo, `**`/`[[ ]]` fuera de entrada, titular, cierre, nota y pie, una entidad (también con dígitos
+en el nombre, como `&sup2;`), un salto de línea o una tabulación, `placement` bajo 320 CSS px, un plate con
+transparencia (en cualquier profundidad y con cualquier canal), un campo interno del compositor en el plan, escalas de la
 selección sobre su techo, un `final` bajo el 85 % del máster o bajo 780 px, y una firma que cae fuera de la imagen.
+
+**Aborta al componer** (tramo 13): la esquina redondeada del botón que entra en el texto del CTA (el mensaje da el radio
+máximo para ese relleno) y una medición imposible —más contraste del que su tinta puede dar, o un umbral que no es el de
+su tamaño—, que no se escribe en el QA.
 
 **No certificable** (código 3): gesto, tarjeta, HUD, url y cierre inferior —ninguna guarda los mide—, una pieza de otra
 versión del comando o con máscara de una caché ajena, y un `--comando` que no es el compositor del repo.
@@ -1612,7 +1685,7 @@ versión del comando o con máscara de una caché ajena, y un `--comando` que no
 
 - la variante del CTA elegida sin margen (pendiente 5);
 - `placement` declarado;
-- texto de menos de 9 CSS px en el teléfono (pendiente 6);
+- texto de menos de 9 CSS px en el teléfono, en una pieza del canon anterior (en una nueva bloquea: `legibilidad`);
 - APCA y daltonismo en las voces que no son el CTA;
 - una alternativa sin escena, o una escena (`altText`) que transcribe el copy;
 - corchetes del CTA de texto bajo 1 CSS px o bajo 3:1: el trazo que dibuja AXIS mide ≈ 0,69 CSS px en un teléfono en
@@ -1720,10 +1793,16 @@ el 6 y 12 de 12 los del 7; el tramo 8 sumó ocho y el 9, la corrida base, los ca
 | `✗ <id>: falta la entrada…` o `falta el cierre que remata…` | Concepto incompleto | Agregar `lead` o `after`, o `conceptoReducido` con aprobador |
 | `✗ <id>: el dominante mide N× la entrada (regla de las tres veces: ≥ 3×)` | La jerarquía se aplana; sin `leadSize`, la entrada mide 70 px | Subir `dominantSize` o bajar `leadSize`; si es decisión de diseño, excepción `jerarquia` con `hasta` |
 | `✗ no existe …/out/qa-<plan>.json` · `✗ 0 piezas evaluadas…` · `✗ piezas del plan sin QA…` | No se compuso el plan, o no entero | Componer el plan completo y resolver sus errores antes del gate |
+| `✗ <id>: el botón es una losa: padding …` | El relleno del botón pasa 1,2× y 0,8× el cuerpo del CTA (tramo 13) | Bajar `paddingX`/`paddingY`; lo aprobado va de 0,6× a 0,8× y de 0,35× a 0,47× el cuerpo |
+| `✗ <id>: el descriptor queda lejos de su botón…` | `descriptorGap` pasa 1× el cuerpo del CTA (tramo 13) | Bajarlo; lo aprobado va de 0,35× a 0,57× el cuerpo del CTA |
+| `✗ <id>: el CTA (N px) es menor que el cuerpo: …` | El CTA mide menos de 0,9× la voz de cuerpo mayor (tramo 13) | Subir `cta.fontSize` o bajar esa voz |
+| `✗ <id>: tinta fuera de la paleta de AXIS para el cuerpo: …` | `leadFill` o `afterFill` fuera de la paleta del cuerpo (tramo 13) | Sobre fondo oscuro `#ffffff` o `#cfe4fa`; sobre claro `#00284d` o `#6d6777`. El acento va en el titular y el CTA |
+| `✗ <id>: la selección no encierra nada: …` | La caja de la selección cae sobre una zona sin sujeto (tramo 13) | Poner `selection.box` sobre el objeto que nombra; si la segmentación no lo marca, declararlo con `protect` |
+| `✗ <id>: texto chico en un teléfono (390 CSS px de ancho): …` | Pieza nueva con voces bajo el piso: CTA 11 CSS px, las demás 9 (tramo 13) | Subir los tamaños o recortar el texto. En 16:9, la receta de §18 (tramo 13): entrada, cierre y descriptor 48 px, CTA 60, titular 160 |
 
 **El gate avisa algo que no se resuelve como sugiere:** `⚠ <id>: menos de 9 px en pantalla… Si la pieza no va a un
-teléfono, declara placement…`. Desde el tramo 7, `placement` sólo endurece y ya no quita este aviso. El aviso queda
-hasta que se decida el piso por rol (pendiente 6); si molesta, agranda esa voz o recompón el formato.
+teléfono, declara placement…`. Desde el tramo 7, `placement` sólo endurece y ya no quita este aviso. Queda en las
+piezas del canon anterior; en una nueva el piso bloquea (`legibilidad`, tramo 13): agranda esa voz o recompón el formato.
 
 **El compositor rechaza el plan** (`plan inválido — <id>: …`, antes de componer):
 
@@ -1753,3 +1832,5 @@ hasta que se decida el piso por rol (pendiente 6); si molesta, agranda esa voz o
 | `` <id>: `final` A×B no tiene la proporción del plate … `` | `final` con otra proporción: el reescalado recortaría la pieza | La proporción del plate; para otro formato, otro plate |
 | `⚠ N pieza(s) eligen variante de CTA sin cta.variantReason…` | Variante sin motivo | `variantReason`, o `variant: "auto"` con `prominencia`, o comparar con `--variantes` |
 | `⚠ <id>: campos que este comando no lee — …` | Un campo desconocido en la raíz del plan (dentro de un objeto propio es error) | Quitarlo o corregir el nombre |
+| `<id>: la esquina del botón entra en el texto del CTA (radius R con relleno X×Y)…` | El radio vuelve el botón una elipse que corta las letras (tramo 13) | Bajar `cta.radius` hasta el máximo que da el mensaje, o subir el relleno |
+| `<id>: medición imposible en «voz»: …` | Un defecto del comando: se vio una vez, en una corrida en paralelo (tramo 13) | Recomponer; si se repite, reportarlo con el QA y la salida completa |

@@ -439,19 +439,19 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   invitado cruzando el borde inferior, desenfocado y fuera del alcance de la llave y del rim, dio **banda 0,34 ✓ y
   lecho 8,32 ✓ en la misma pieza** (`G-podcast-v5.png`). El lecho no es «la superficie de abajo»: es **un objeto
   del oficio puesto ahí a propósito y sacado de la luz**.
-- **Nunca un scrim.** Si el contraste no da, se **regenera** el plate; no se oscurece en post. El compositor CTA
-  acepta `scrimTop`/`scrimBottom` y hoy el gate sólo **avisa** cuando una voz pasa gracias al velo (decisión pendiente
-  del operador): esta regla no la hace cumplir el gate, la cumples tú.
+- **Nunca un scrim.** Si el contraste no da, se **regenera** el plate; no se oscurece en post. Desde el 2026-09-23
+  (decisión del operador: «todo se genera desde el prompt») el compositor CTA **rechaza** `scrimTop`/`scrimBottom` al
+  validar el plan.
 - **El plate nace sin logo ni texto.** La firma es el SVG oficial compuesto después, **20% del lado corto del lienzo**
   (decisión del operador 2026-09-20), contraste ≥ 4,5:1 medido. En una pieza con CTA, `foto:cta:gate` lo exige —en la
   caja y, si el logo lo dibuja el compositor, también en su trazo; fuera del sujeto y dentro de la zona de AXIS— y la
   firma se declara siempre:
   `logo.y: "auto"` busca una Y legible sólo en la banda del pie, debajo de todo lo compuesto; `firma: { modo:
   "externa", razon }` si la pone otra herramienta; `sin-firma`, sólo con aprobador del registro.
-  **[pendiente]** Tamaño en 16:9 (medido 2026-09-23): las piezas 16:9 de CMP-002 y del registro C, hechas al 13–14 %,
-  dan una firma de 31 px en un teléfono contra 78 px en 4:5, y aun al 20 % quedaría en ≈ 44 px. Opción recomendada,
-  sin aprobar: 25 % del lado corto en horizontales y 20 % en verticales y cuadrados. Hasta que el operador decida,
-  rige el 20 %.
+  **En 16:9, 25 % del lado corto** en las piezas nuevas (decisión del operador del 2026-09-23: al 20 % la firma quedaba
+  en ≈ 44 px en un teléfono, contra 78 px en 4:5); 20 % en verticales y cuadrados. Las piezas ya hechas no se regeneran.
+  En una pieza nueva con CTA, además, el texto respeta el piso de legibilidad en el teléfono (CTA 11 CSS px, las demás
+  voces 9), que en 16:9 pide un texto mucho más grande.
 - 🔴 **En un plate limpio, no sugieras criaturas ni siquiera de refilón** **[medido 2026-09-21]**. La frase «*as if
   something small were there asking her a question*» hizo que el modelo **materializara un robot blanco flotando**.
   Si la criatura se compone después, la mirada se describe como **geometría** y el vacío se **declara**: «*the air

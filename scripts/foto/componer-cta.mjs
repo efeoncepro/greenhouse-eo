@@ -28,7 +28,7 @@ import { AXIS_COLLABORATION_SELECTION_SPEC, resolveCollaborationSelectionIntent 
 import { renderCollaborationSelection } from '../../scripts/creative/layout-compiler/axis-advertising.mjs'
 import { compositeLuminosity } from '../../scripts/creative/layout-compiler/compiler.mjs'
 
-import { ANCHO_PANTALLA, DPR_REFERENCIA, UMBRALES, hexARgb, medirAnillo, medirContraColor, medirGlifos, medirVoz, tamanoEnPantalla, textoAlternativo } from './accesibilidad.mjs'
+import { ANCHO_PANTALLA, DPR_REFERENCIA, UMBRALES, hexARgb, medicionImposible, medirAnillo, medirContraColor, medirGlifos, medirVoz, tamanoEnPantalla, textoAlternativo, umbralWcag } from './accesibilidad.mjs'
 import { ORDEN as ORDEN_VARIANTES, elegirVariante } from './cta-variantes.mjs'
 import { validarPiezaEsquema } from './cta-esquema.mjs'
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
@@ -1342,6 +1342,21 @@ return k.ink.right - k.ink.left }))
     const grosorBorde=outline?Math.max(2,Math.ceil(W/ANCHO)):2;
 
     if(outline)ctaBorde={box:b,L:hexLum(surfaceColor),radio:c.radius??0,grosor:grosorBorde};
+
+    // La ESQUINA del botón no entra en el texto (tramo 13; auditoría de arquitectura de la quinta certificación, N1). Sin
+    // techo, `radius` volvía el botón una elipse que cortaba las letras: en el relleno sus puntas quedaban sobre la escena,
+    // sin medir (el CTA sólido se mide contra su color); en el contorno, el borde las cruzaba. SVG recorta rx a la mitad del
+    // ancho y ry a la mitad del alto: se mide con esa geometría y, en el contorno, contra el borde INTERIOR del trazo.
+    if(solid||outline){
+      const g=outline?grosorBorde/2:0;
+      const rx=Math.max(0,Math.min(c.radius??0,(b.right-b.left)/2)-g),ry=Math.max(0,Math.min(c.radius??0,(b.bottom-b.top)/2)-g);
+      const dx=Math.min(t.box.left-b.left,b.right-t.box.right)-g,dy=Math.min(t.box.top-b.top,b.bottom-t.box.bottom)-g;
+      // Si el texto ya toca el BORDE (relleno menor que el trazo), no es la esquina: eso lo juzga `cta-aire`.
+      const dentro=dx<0||dy<0||dx>=rx||dy>=ry||((rx-dx)/rx)**2+((ry-dy)/ry)**2<=1;
+
+      if(!dentro)throw new Error(`${s.id}: la esquina del botón entra en el texto del CTA (radius ${c.radius} con relleno ${padX}×${padY}): baja \`cta.radius\` —con este relleno, hasta ${Math.max(0,Math.floor(dx+dy+Math.sqrt(2*Math.max(0,dx)*Math.max(0,dy))+g))} px— o sube el relleno`);
+    }
+
     if(solid||outline)body+=`<rect x="${b.left}" y="${b.top}" width="${b.right-b.left}" height="${b.bottom-b.top}" rx="${c.radius}" fill="${solid?surfaceColor:'none'}" stroke="${surfaceColor}" stroke-width="${grosorBorde}"/>`;
     body+=t.svg;
     // 🔴 En `solid` NO se mide la tinta contra la escena: bajo un relleno opaco ese número no
@@ -1747,6 +1762,17 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
   accesibilidad.cumpleDaltonismo = medidas.filter(m => m.daltonismo).every(m => m.cumpleDaltonismo)
   accesibilidad.cumpleTrazo = medidas.filter(m => m.glifo).every(m => m.glifo.cumpleWcag) && medidas.filter(m => m.anillo).every(m => m.anillo.cumpleWcag)
 
+  // Una medición IMPOSIBLE aborta (tramo 13; `medicionImposible` en accesibilidad.mjs): si vuelve lo que se vio una vez en la
+  // quinta certificación, falla aquí y no queda escrito en el QA (`--reproducir` lo había atajado).
+  for (const v of voces) {
+    const m = accesibilidad.voces[v.id]
+
+    if (!m) continue
+    const motivo = medicionImposible({ tinta: v.tinta, medidas: [m.wcag, m.glifo?.wcag], umbral: m.glifo?.umbralWcag ?? null, umbralEsperado: v.limite ? null : (v.pisoTexto ?? umbralWcag(tamanoEnPantalla(v.px, W, ANCHO), v.peso)) })
+
+    if (motivo) throw new Error(`${s.id}: medición imposible en «${v.id}»: ${motivo}. Recompón; si se repite, es un defecto del comando.`)
+  }
+
   // Corchetes: el peor contraste de las cuatro esquinas (tinta del marco AXIS #a6cdf5 contra la escena, 3:1 de límite).
   if (corchetes) {
     const medidas = corchetes.esquinas.map(b => medirVoz({ rgb: bareRgb, ancho: W, alto: H, caja: b, tinta: hexARgb('#a6cdf5'), umbral: UMBRALES.essentialBoundaryContrast, apca: false })).filter(Boolean)
@@ -1781,7 +1807,7 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
   // El texto alternativo entregado también lleva huella (tramo 10; auditorías de arquitectura, hallazgo 8, y de diseño,
   // N11): reemplazarlo por «Imagen decorativa.» daba 0, también con `--reproducir`.
   const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson), alt: sha(`${accesibilidad.altText}\n`) }
-  const registro = { id: s.id, canon: opts.canon, ...(marcoSobreVoz.length ? { marcoSobreVoz } : {}), dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
+  const registro = { id: s.id, canon: opts.canon, ...(marcoSobreVoz.length ? { marcoSobreVoz } : {}), dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(s.selection?.box && opts.mask ? { seleccionSujeto: fraccionSujeto(opts.mask, s.selection.box, s.protect ?? []) } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
 
   for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
   qa.push(registro)
@@ -1820,6 +1846,26 @@ const MARGEN_CRECER = 1.1
 // Zonas que la pieza declara como falso positivo de la segmentación (un afiche, una pantalla del fondo que el
 // modelo tomó por sujeto). Se apagan SÓLO para esta pieza, cada una con su razón, y quedan en el QA para
 // quien revise. Nunca se apaga la guarda entera.
+// Fracción de la caja de una selección sobre un OBJETO que es sujeto: la segmentación (ya con sus zonas ignoradas) o una zona
+// `protect` (tramo 13; auditoría de diseño de la quinta certificación, N3: el marco se aceptaba sobre una pared vacía).
+function fraccionSujeto(mask, [x0, y0, x1, y1], protect = []) {
+  const X0 = Math.max(0, Math.floor(x0 * mask.W)), X1 = Math.min(mask.W, Math.ceil(x1 * mask.W))
+  const Y0 = Math.max(0, Math.floor(y0 * mask.H)), Y1 = Math.min(mask.H, Math.ceil(y1 * mask.H))
+  let n = 0
+  let sujeto = 0
+
+  for (let y = Y0; y < Y1; y++) {
+    for (let x = X0; x < X1; x++) {
+      const fx = (x + 0.5) / mask.W, fy = (y + 0.5) / mask.H
+
+      n++
+      if (mask.data[y * mask.W + x] > 127 || protect.some(z => fx >= z.box[0] && fx < z.box[2] && fy >= z.box[1] && fy < z.box[3])) sujeto++
+    }
+  }
+
+  return n ? +(sujeto / n).toFixed(4) : 0
+}
+
 function maskForPiece(mask, s, canvasW, canvasH) {
   const zonas = s.subjectGuard?.ignore ?? []
 
@@ -1876,7 +1922,9 @@ for (const s0 of trabajo) {
 
   // Un plate con transparencia se medía contra el color guardado bajo el alfa y se entregaba con alfa: sobre fondo blanco
   // el texto blanco desaparecía y el QA decía 21:1 (tramo 12; auditoría de arquitectura de la cuarta certificación, N4).
-  if (st.channels.length === 4 && st.channels[3].min < 255) throw new Error(`${s0.id}: el plate \`${s0.plate}\` tiene transparencia: aplánalo sobre su fondo antes de componer (el contraste se mediría contra un color que no se ve)`)
+  // `isOpaque` y no `channels[3].min < 255` (tramo 13; auditoría de arquitectura de la quinta certificación, N2): en 16
+  // bits el mínimo va de 0 a 65535 y un alfa de 32768 pasaba; un gris con alfa (2 canales) o con tRNS ni se miraba.
+  if (st.isOpaque === false) throw new Error(`${s0.id}: el plate \`${s0.plate}\` tiene transparencia: aplánalo sobre su fondo antes de componer (el contraste se mediría contra un color que no se ve)`)
 }
 
 for (let s0 of trabajo) {
