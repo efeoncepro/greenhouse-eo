@@ -510,3 +510,46 @@ Medido con el harness: **cambia 7 piezas únicas** —4 de CMP-001 (b2 en 16:9 y
 Codex y KV-01-169 y KV-06-169 de CMP-002—, todas sólo en el corte; cero cambios de estado. El QA registra ahora
 `lineas` por voz (entrada, cierre, nota, CTA, descriptor): los cortes se verifican sin mirar la imagen.
 
+## 16. Accesibilidad y contraste sobre el píxel
+
+**Pedido del operador, 2026-09-22:** «provee al comando de herramientas robustas y de alta calidad de
+accesibilidad y contraste».
+
+**Política** (skills `greenhouse-typography-accessibility` y `a11y-architect`): **se aprueba con WCAG 2.2 AA**;
+APCA es verificación perceptual de respaldo y **avisa, no bloquea**. Los umbrales no viven en el código: salen del
+contrato AXIS `axisAdvertising.accessibility` (texto normal 4,5:1 · texto grande 3:1 desde 24 px o 18,66 px en
+negrita · límites no textuales 3:1).
+
+**Módulo puro `scripts/foto/accesibilidad.mjs`** — probado contra valores publicados
+(`node --test scripts/foto/accesibilidad.test.mjs`, 8 de 8):
+
+| Herramienta | Fuente verificada (2026-09-22) |
+|---|---|
+| razón WCAG 2.2 y luminancia relativa | W3C Rec oct. 2023 — referencias WebAIM: 21:1, #767676 = 4,54:1 |
+| APCA-W3 0.1.9 con signo (Lc) | constantes y algoritmo copiados de `Myndex/apca-w3/src/apca-w3.js` — #888/#fff = 63,06 · negro/blanco = 106,04 |
+| umbrales APCA Bronze | readtech.org/ARC (2023-02-10): Lc 45 contenido > 36 px · 60 contenido · 75 texto corrido > 2 líneas |
+| simulación de daltonismo | Machado, Oliveira y Fernandes, IEEE TVCG 15(6), 2009 — severidad 1,0, en RGB lineal |
+| tamaño EN PANTALLA | px del lienzo × 390 / ancho del lienzo: la pieza tal como se ve en un teléfono |
+| texto alternativo | WCAG 1.1.1 + 1.4.5: toda voz visible en orden de lectura, más la escena si el plan trae `altText` |
+
+**En el compositor** (sin cambiar un píxel: regresión 86 de 86 idénticas): cada pieza registra en el QA
+`accesibilidad.voces.<voz>` —WCAG según su tamaño en pantalla, APCA, % del área bajo el umbral y, en tintas de
+color, el contraste con cada tipo de daltonismo— y escribe `out/<id>.alt.txt`. Se mide por primera vez el **borde
+del CTA con contorno** (antes sólo el relleno del sólido).
+
+**En el gate:** **bloquea** cualquier voz bajo WCAG 2.2 AA y cualquier límite del CTA bajo 3:1 (calibrado contra
+las 86 piezas: 0 fallas, no rompe nada aprobado). **Avisa** APCA bajo Bronze, daltonismo, texto de menos de 9 px en
+el teléfono y alternativa sin escena.
+
+**`pnpm foto:accesibilidad <piezas.json>`** escribe `out/accesibilidad/reporte.md` (tabla por pieza y voz) y
+`<id>-daltonismo.png` (la pieza a 390 px en visión típica, protanopía, deuteranopía y tritanopía).
+
+**Lo que midió la primera corrida sobre las 86 piezas** (hallazgos de diseño, no fallas de WCAG):
+
+| Hallazgo | Medido |
+|---|---|
+| El naranja de marca como TEXTO sobre oscuro es débil para APCA | Lc ≈ 44 contra 45–60 (94 avisos); WCAG lo aprueba (~6:1) |
+| El CTA naranja con protanopía | cae a ~3,6:1 (48 casos); relleno o borde a 2,6–2,8:1 |
+| Texto diminuto en el teléfono, sobre todo en 16:9 | 43 de 86 descriptores bajo 9 px; mínimo 3,8 px (KV-04-169) |
+| Alternativas sin descripción de escena | 46 de 86 piezas (CMP-001 y CMP-002 no traen `altText`) |
+

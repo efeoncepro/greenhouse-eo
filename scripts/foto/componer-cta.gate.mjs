@@ -145,6 +145,40 @@ for (const r of qa) {
 
 const n = qa.filter(r => conCta.has(r.id)).length
 
+// ── Accesibilidad sobre el píxel (medida por el compositor con scripts/foto/accesibilidad.mjs) ─────────────
+// BLOQUEA: cualquier voz bajo WCAG 2.2 AA según su tamaño EN PANTALLA (texto normal 4,5:1, grande 3:1) y los
+// límites del CTA —relleno o borde— bajo 3:1 (1.4.11). Calibrado 2026-09-22 contra las 86 piezas que componen
+// en el repo: 0 fallas, así que la regla no rompe nada aprobado.
+// AVISA: APCA bajo Bronze, daltonismo bajo el umbral, texto de menos de 9 px en el teléfono y alternativa sin
+// descripción de la escena. Son hallazgos de diseño que se miran: WCAG aprueba, esto no.
+const LEGIBLE_PX = 9
+
+for (const r of qa.filter(x => conCta.has(x.id))) {
+  const a = r.accesibilidad
+
+  if (!a) {
+    console.warn(`⚠ ${r.id}: el QA no trae medición de accesibilidad (compositor anterior). Recompón para certificarla.`)
+    continue
+  }
+
+  for (const [voz, m] of Object.entries(a.voces)) {
+    if (m && !m.cumpleWcag) {
+      console.error(`✗ ${r.id}: «${voz}» mide ${m.wcag}:1 y necesita ${m.umbralWcag}:1 (WCAG 2.2 AA${m.cssPx == null ? ', límite no textual' : `, ${m.cssPx} px en pantalla`}).`)
+      fallos++
+    }
+  }
+
+  const medidas = Object.entries(a.voces).filter(([, m]) => m)
+  const apca = medidas.filter(([, m]) => m.cumpleApca === false).map(([v, m]) => `${v} Lc ${Math.abs(m.apca)}/${m.umbralApca}`)
+  const dalt = medidas.filter(([, m]) => m.cumpleDaltonismo === false).map(([v, m]) => `${v} (P ${m.daltonismo.protan} · D ${m.daltonismo.deutan} · T ${m.daltonismo.tritan})`)
+  const chicas = medidas.filter(([, m]) => m.cssPx != null && m.cssPx < LEGIBLE_PX).map(([v, m]) => `${v} ${m.cssPx} px`)
+
+  if (apca.length) console.warn(`⚠ ${r.id}: bajo APCA Bronze — ${apca.join(' · ')}`)
+  if (dalt.length) console.warn(`⚠ ${r.id}: bajo el umbral con daltonismo — ${dalt.join(' · ')}`)
+  if (chicas.length) console.warn(`⚠ ${r.id}: menos de ${LEGIBLE_PX} px en un teléfono (390 px de ancho) — ${chicas.join(' · ')}`)
+  if (!a.altTextEscena) console.warn(`⚠ ${r.id}: el texto alternativo trae el texto de la imagen pero no describe la escena — agrega \`altText\` al plan.`)
+}
+
 // Avisos (no fallan): se leen antes de aprobar, porque el número solo no alcanza para decidir.
 for (const r of qa.filter(x => conCta.has(x.id))) {
   // La firma es un logotipo: la norma de contraste no la exige, pero una firma que no se lee no firma.
@@ -169,4 +203,4 @@ if (n === 0) {
 }
 
 if (fallos) { console.error(`\n✗ ${fallos} fallo(s) en ${n} pieza(s) con CTA.`); process.exit(1) }
-console.log(`✓ ${n} pieza(s) con CTA cumplen los mínimos (texto ≥${MIN_TEXTO}:1 · superficie ≥${MIN_BORDE}:1).`)
+console.log(`✓ ${n} pieza(s) con CTA cumplen los mínimos (texto ≥${MIN_TEXTO}:1 · superficie ≥${MIN_BORDE}:1 · toda voz en WCAG 2.2 AA según su tamaño en pantalla).`)

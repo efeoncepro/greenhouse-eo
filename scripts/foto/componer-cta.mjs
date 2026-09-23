@@ -29,6 +29,8 @@ import { resolveCollaborationSelectionIntent } from '@efeoncepro/axis-ui-contrac
 import { renderCollaborationSelection } from '../../scripts/creative/layout-compiler/axis-advertising.mjs'
 import { compositeLuminosity } from '../../scripts/creative/layout-compiler/compiler.mjs'
 
+import { UMBRALES, hexARgb, medirContraColor, medirVoz, tamanoEnPantalla, textoAlternativo } from './accesibilidad.mjs'
+
 // ADAPTACIÓN del compositor de «Nivel de búsqueda» (GTA VI) a FOTOGRAFÍA de marca y multiformato.
 // Original: ai-generations/2026-09-19_nivel-de-busqueda/componer-v2.mjs (jerarquía por voces, richBlock,
 // selección AXIS, tarjeta de vidrio, QA de contraste). Cambios: lienzo tomado del plate (4:5, 9:16, 16:9),
@@ -684,6 +686,8 @@ async function composePiece(s, opts = {}) {
   // Líneas tal como quedaron compuestas, por voz: el QA las registra para que los cortes se puedan VERIFICAR
   // (viudas, cortes en palabra corta) sin mirar la imagen.
   const lineas = {}
+  // Voces para la medición de accesibilidad: tinta, peso y tamaño tal como se compusieron (ver accesibilidad.mjs).
+  const voces = []
   const plate = path.resolve(PLAN_DIR, s.plate)
   const meta = await sharp(plate).metadata()
 
@@ -769,6 +773,7 @@ async function composePiece(s, opts = {}) {
     // La estrella fue un marcador de misión propio del post de GTA VI: aquí es opt-in y por defecto NO va.
     body += (s.labelStar ? `<path d="${starPath(lx0 + starR, scy, starR)}" fill="${ACCENT}"/>` : '') + lab.svg
     checks.push({ id: 'etiqueta', box: lab.box, inkL: INK_L }); tramos.push(['etiqueta', lab.box, s.labelSize ?? lsize])
+    voces.push({ id: 'etiqueta', box: lab.box, tinta: INK, peso: 700, px: lsize, lineas: lab.lines.length })
     y = lab.box.bottom + Math.round((s.labelGap ?? 0.10) * (s.dominantSize ?? 160))
   }
 
@@ -785,6 +790,7 @@ async function composePiece(s, opts = {}) {
 
     body += le.svg
     lineas.entrada = le.lines
+    voces.push({ id: 'entrada', box: le.box, tinta: s.leadFill ?? SOFT, peso: leadPoppins ? 400 : lr.weight, px: s.leadSize ?? 70, lineas: le.lines.length })
     checks.push({ id: 'entrada', box: le.box, inkL: INK_L }); tramos.push(['entrada', le.box, s.leadSize ?? 70])
     y = le.box.bottom + Math.round((s.leadGap ?? 0.09) * (s.dominantSize ?? 160))
   }
@@ -811,6 +817,8 @@ return k.ink.right - k.ink.left }))
     checks.push({ id: 'dominante', box: dom.box, inkL: INK_L })
     tramos.push(['dominante', dom.box, domSize])
     dom.accentBoxes.forEach((b, i) => checks.push({ id: `dominante-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
+    voces.push({ id: 'dominante', box: dom.box, tinta: INK, peso: ir.weight, px: domSize, lineas: dom.lines.length })
+    dom.accentBoxes.forEach((b, i) => voces.push({ id: `dominante-acento-${i}`, box: b, tinta: ACCENT, peso: ir.weight, px: domSize, lineas: 1, daltonismo: true }))
   }
 
   let selection = ''
@@ -867,9 +875,11 @@ return k.ink.right - k.ink.left }))
     const af = richBlock({ text: s.after, fonts: afterPoppins ? POP : BRIC(ar, ar.width, 800), size: s.afterSize ?? 74, tracking: afterPoppins ? em(R.structureCopy.tracking) : em(ar.tracking), leading: afterPoppins ? 1.5 : ar.lineHeight, x, topY: y + Math.round((s.afterGap ?? 0.09) * domSize), maxWidth: W * (s.textWidth ?? 0.8), fill: s.afterFill ?? INK, align: s.align })
 
     af.accentBoxes.forEach((b, i) => checks.push({ id: `cierre-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
+    af.accentBoxes.forEach((b, i) => voces.push({ id: `cierre-acento-${i}`, box: b, tinta: ACCENT, peso: afterPoppins ? 700 : ar.weight, px: s.afterSize ?? 74, lineas: 1, daltonismo: true }))
 
     body += af.svg
     lineas.cierre = af.lines
+    voces.push({ id: 'cierre-frase', box: af.box, tinta: s.afterFill ?? INK, peso: afterPoppins ? 400 : ar.weight, px: s.afterSize ?? 74, lineas: af.lines.length })
     checks.push({ id: 'cierre-frase', box: af.box, inkL: s.afterFill ? undefined : INK_L }); tramos.push(['cierre', af.box, s.afterSize ?? 74])
     y = af.box.bottom
   }
@@ -895,6 +905,7 @@ return k.ink.right - k.ink.left }))
 
     body += ft.svg
     checks.push({ id: 'cierre-inferior', box: ft.box })
+    voces.push({ id: 'cierre-inferior', box: ft.box, tinta: SOFT, peso: fr.weight, px: s.footer.size, lineas: ft.lines.length })
   }
 
   // 4 · nota de dato: Poppins sobre la foto limpia (la tarjeta de vidrio era del post de GTA VI, no del lenguaje)
@@ -906,6 +917,7 @@ return k.ink.right - k.ink.left }))
 
     body += nt.svg
     lineas.nota = nt.lines
+    voces.push({ id: 'nota', box: nt.box, tinta: SOFT, peso: 400, px: s.note.size ?? Math.round(W * 0.026), lineas: nt.lines.length })
     checks.push({ id: 'nota', box: nt.box, inkL: INK_L }); y=nt.box.bottom
   }
 
@@ -972,6 +984,11 @@ return k.ink.right - k.ink.left }))
 
     body+=descriptor.svg;checks.push({id:'descriptor',box:descriptor.box,inkL:1});
     lineas.cta=t.lines;lineas.descriptor=descriptor.lines;
+    // CTA: en `solid` la tinta se mide contra su relleno; en las otras, contra la escena. El relleno y el BORDE del
+    // contorno son límites no textuales (WCAG 1.4.11, 3:1): el borde del contorno no se medía antes.
+    voces.push({id:'cta',box:t.box,tinta:ink,peso:700,px:c.fontSize,lineas:t.lines.length,daltonismo:true,...(solid?{sobreColor:surfaceColor}:{})});
+    if(solid||outline)voces.push({id:solid?'cta-relleno':'cta-borde',box:b,tinta:surfaceColor,limite:true,daltonismo:true});
+    voces.push({id:'descriptor',box:descriptor.box,tinta:'#ffffff',peso:400,px:c.descriptorSize,lineas:descriptor.lines.length});
 
     if(!cr.evidence.withinCanvas)throw new LienzoError(`${s.id}: la selección del CTA se sale del lienzo`);
     guard.push({ id: 'cta-grupo', box: { left: b.left - 14, top: b.top - 14, right: b.right + 14, bottom: b.bottom + 14 } });
@@ -1115,6 +1132,31 @@ return k.ink.right - k.ink.left }))
 
   if (cardEl) contraste.tarjeta = await contrastUnder(bare, cardEl.textBoxes[0])
 
+  // ── Accesibilidad sobre el píxel (scripts/foto/accesibilidad.mjs) ──────────────────────────────────
+  // WCAG 2.2 AA por voz según su tamaño EN PANTALLA (390 CSS px), APCA Bronze como verificación de respaldo,
+  // área bajo el umbral, daltonismo en las tintas de color y el texto alternativo con todo el texto visible.
+  // Se mide sobre `bare` (plate + underlay, sin el texto). No cambia un solo píxel de la pieza.
+  const { data: bareRgb } = await sharp(bare).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+  const accesibilidad = { voces: {} }
+
+  for (const v of voces) {
+    accesibilidad.voces[v.id] = v.sobreColor
+      ? medirContraColor({ tinta: hexARgb(v.tinta), fondo: hexARgb(v.sobreColor), cssPx: tamanoEnPantalla(v.px, W), peso: v.peso, lineas: v.lineas })
+      : medirVoz({
+          rgb: bareRgb, ancho: W, alto: H, caja: v.box, tinta: hexARgb(v.tinta), daltonismo: Boolean(v.daltonismo),
+          ...(v.limite ? { umbral: UMBRALES.essentialBoundaryContrast, apca: false } : { cssPx: tamanoEnPantalla(v.px, W), peso: v.peso, lineas: v.lineas })
+        })
+  }
+
+  const medidas = Object.values(accesibilidad.voces).filter(Boolean)
+
+  accesibilidad.cumpleWcag = medidas.every(m => m.cumpleWcag)
+  accesibilidad.cumpleApca = medidas.filter(m => m.cumpleApca != null).every(m => m.cumpleApca)
+  accesibilidad.cumpleDaltonismo = medidas.filter(m => m.daltonismo).every(m => m.cumpleDaltonismo)
+  accesibilidad.altText = textoAlternativo(s)
+  accesibilidad.altTextEscena = Boolean(String(s.altText ?? '').trim())
+  fs.writeFileSync(`${PLAN_DIR}/out/${s.id}.alt.txt`, `${accesibilidad.altText}\n`)
+
   // Gap de tinta real entre tramos (no leading): top(siguiente) − bottom(anterior)
   const gaps = []
 
@@ -1135,7 +1177,7 @@ return k.ink.right - k.ink.left }))
     )
   }
 
-  qa.push({ id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}) })
+  qa.push({ id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}) })
 }
 
 // Driver: decide el factor de escala MIDIENDO, no estimando. Sólo formatos donde el texto se pierde en el
