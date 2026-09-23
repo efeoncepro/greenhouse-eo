@@ -716,10 +716,17 @@ contraste sí frena.
 | 7 · Umbrales que no se aflojan; excepciones auditadas de verdad | cerrado | `a595922e3` |
 | 8 · Entradas y bordes | cerrado | `f3c87eb95` |
 | 9 · Proceso | cerrado | `95c9b7b48` |
-| Tercera certificación | siguiente paso, con dos auditores nuevos | — |
+| 10 · Integridad, tras la tercera certificación | cerrado | `5a5acff86` |
+| 11 · Canon 2026-09-23, sólo hacia adelante | cerrado | `5c624eeab` |
+| 12 · Cuarta certificación | cerrado | `5c8f81342` |
+| 13 · Quinta certificación | cerrado | `41c16b439` |
+| 14 · Sexta certificación | cerrado | `00732f136` |
+| 15 · Séptima certificación | en curso | — |
+| Octava certificación | siguiente paso, al cerrar el tramo 15 | — |
 
 Los tramos 1–5 cierran la primera certificación; la segunda (NO CERTIFICA) abrió los tramos 6–9, y el gesto manuscrito
-quedó fuera de alcance. El detalle de cada tramo sigue abajo.
+quedó fuera de alcance. La tercera abrió los tramos 10 y 11 y, desde la cuarta, cada certificación abre el suyo (12 a
+15); todas dieron NO CERTIFICA. El detalle de cada tramo sigue abajo.
 
 **Tramo 1 · Integridad — cerrado (2026-09-23).**
 
@@ -1243,6 +1250,85 @@ centrado; selección contra selección; acentos NFD; `&amp;` en el `.alt.txt`; e
 interior del contorno modelado como elipse (0,5–1,6 px de error); `preview-390` y los SVG auxiliares sin huella; y la
 causa de la medición no determinista, que sigue sin encontrarse (la guarda la convierte en un aborto).
 
+### Séptima certificación (2026-09-23): dos auditores, NO CERTIFICA
+
+Sobre el commit `00732f136` (tramo 14), todo reproducido con `--reproducir`. Dan por **cerrados** de la sexta: en
+diseño, H1 (el cierre entero en `[[ ]]` sale blanco), H2 (`cursorScale: 2` lo rechaza el esquema), H4 (`protect` ya no
+cuenta como sujeto y una selección sin aprobador da 1) y H6 (la etiqueta arranca en la columna), y de H5, que decidió el
+operador, verificaron el piso propio (`selection.scale` 0,3 y `cta.seleccion.escala` 0,5 se rechazan); en arquitectura,
+O1 (el SVG se rechaza por su contenido aunque se llame `.png`, y AVIF, WebP animado, TIFF de varias páginas, 16 bits y
+JPEG con orientación EXIF se leen igual en la segmentación y en el compositor), Y1 (el origen heredado, para planes
+dentro del repo), Y2 (ahora aborta), Y3, Y5 en la forma que tenía (su residuo es N4 de arquitectura, abajo) e Y6. Las
+reglas del tramo 14 se sostienen: la selección aprobada no se esquiva (el registro del canon calza 132 de 132),
+`cta-tamano` y `mascara-vacia` funcionan y su excepción sin plate no vale, los abortos no dan falsos positivos en
+configuraciones legítimas y la «medición imposible» no apareció en 80 composiciones simultáneas. Ningún 🔴, y ninguna
+pieza aprobada está afectada. Cada auditor numera por su cuenta: los N1 y N2 de diseño no son los de arquitectura.
+Abiertos:
+
+| Severidad | Hallazgo (auditor) | Uso real |
+|---|---|---|
+| 🟠 | **Voces pegadas y borde del botón sobre el texto** (diseño, N1). «Texto, botón y firma no se tocan» se verificaba con `choca(…, 0)`, de desigualdad estricta: dos cajas que se tocan a 0 px pasan, y a 1–3 px también; y la caja del botón no suma la mitad exterior del trazo del contorno (3 px en un lienzo de 1152, 6 px en uno de 2048), que pisa la tinta. Con `leadGap`, `afterGap`, `note.gapAfterClosure` y `cta.gapAfterNote` en 0 el gate da 0, con las voces apiladas sin aire y «cada mes.» apoyada sobre el borde lima; en 16:9, con `gapAfterNote: 2`, el borde corta la «q» y la «p» del cierre. En el 1:1 real de v07, con las separaciones normales la pieza aborta por el sujeto y con las separaciones en 0 cabe y certifica: pegar las voces es justo la palanca para hacer caber el texto | ninguna aprobada usa 0: tinta entre voces ≥ 0,079× el titular (≈ 10 px), `leadGap` ≥ 0,12, `afterGap` ≥ 0,08 y `gapAfterNote` ≥ 0,40× el CTA |
+| 🟠 | **CTA fuera de la columna** (diseño, N2). En un bloque a la izquierda, `cta.align: "center"` o una fracción lejos de la columna sólo avisan: con `cta.align: "center"` el botón queda 224 px fuera de la columna; con `cta.x: 0.25`, 173 px; y con `cta.x` y `note.x` en 0,2, 115 px, con la nota también corrida. Todos con el gate en 0. Y cuando falta `cta.x`, el mensaje del esquema sugiere `cta.align: "center"` sin mirar la alineación del bloque: la misma clase que el mensaje que llevaba al defecto en la cuarta y que H6 en la sexta | en bloques a la izquierda, `cta.x` va de 0,07 a 0,08; ninguna de las 132 usa `cta.align: "center"` en uno |
+| 🟠 | **Losa sólida** (diseño; H3 de la sexta, cerrado sólo en parte). `cta-tamano` compara el área de la caja del botón con la del titular sin mirar si es relleno o contorno, y sus dos topes son independientes. Con `solid` —o `auto` con `prominencia: "destacada"`, que da el mismo PNG byte a byte—, «Agenda ya», `fontSize` 61 y padding 73×48, el CTA mide 0,485× el titular y el botón 0,98× su área, con el gate en 0: una losa lima de 482×158 px, con 18 % más área que la de la sexta, que hoy se bloquea. En 16:9 y en un bloque centrado da 0 con 0,49× y 1,00× | variante relleno (`solid`): CTA 0,20–0,44× el titular y área 0,25–0,57× (42 piezas); el techo de 1,0× sólo lo justifica el contorno, que llega a 0,77× |
+| 🟠 | **Entidades sin punto y coma, cerradas sólo en parte** (arquitectura, R1; lo que quedó de Y7 de la sexta). HTML5 acepta 106 nombres sin «;», y 71 pasaban la validación y se dibujaban tal cual, entre ellos todas las letras con tilde del castellano (`&eacute`, `&oacute`, `&ntilde`, `&uuml`), `&ordm` y `&acute`. La lista de `cta-esquema.mjs` estaba escrita a mano, no cumplía lo que prometen su comentario y este contrato (tramo 14, §19.8 y §19.11) y además incluía nombres que un navegador no acepta sin «;» (`ndash`, `hellip`, `euro`). Certificaban con 0, también con `--reproducir`, `Agenda tu caf&eacute hoy` en el CTA, `mostr&oacute` en la entrada y `a&ntildeo` en el cierre, con la entidad literal también en el texto alternativo. Es 🟠 porque es una guarda documentada que no se cumple; en la sexta, la misma clase se había calificado 🟡 | — |
+
+El auditor de diseño recompuso cinco piezas aprobadas reales (mo1, mo2, mo2-916 y, de v07, 02-reconoces-11 y
+04-elegida-45): salen idénticas, fallan sólo por lo ya documentado (zona segura, APCA del naranja, concepto y reserva
+editorial) y ninguna regla del tramo 14 las bloquea. **Quedó sin verificar:** la losa en 1:1 (el único plate 1:1 real
+que se probó aborta por el sujeto); que el crecimiento escale todo en proporción (se leyó en el código, no se vio); las
+132 aprobadas completas, la suite P01–P10 y los 152 mutantes (la máquina ya los estaba corriendo); perfiles ICC que
+lcms 2.15 y 2.17 interpreten distinto; un HEIC real; un ataque contra el modelo de segmentación; y si el N2 de
+arquitectura escribe en la caché canónica, que no se podía tocar. La caché de máscaras del repo quedó igual (162
+archivos). Evidencia: `/tmp/claude-501/adv7-dis-evidencia/` y `/tmp/claude-501/adv7-arq-evidencia/`, cada una con su
+`INDICE.txt`.
+
+**Deuda 🟡/🟢 nueva** (no bloquea según la regla de término; numeración de esta certificación; N4 y N7 de arquitectura
+entran en el tramo 15). Arquitectura, 🟡: la certificación no está atada al compositor versionado —el gate compara con
+HEAD los registros de aprobadores y del canon, pero no el compositor, sus módulos ni el propio gate: con el compositor
+editado sin commit y la guarda del sujeto apagada, una pieza con el texto sobre el monitor y las manos certifica con 0,
+también con `--reproducir`, y el mensaje dice que la produjo «el comando del repo» (N1)—; el modelo de segmentación se
+carga desde la carpeta en que se corre el comando y ni la huella ni la caché registran cuál se usó (desde otra carpeta
+no segmenta y el mensaje engaña; con un `resources.json` que apunta «medium» al small, la máscara queda guardada como
+«medium 1.4.5»; `--reproducir` hereda la carpeta; N2); los plates en gris o CMYK nunca se segmentan y el mensaje pide
+recomponer «cuando la segmentación esté disponible», que no va a pasar (N3); en el CTA de texto,
+`descriptor-distancia` y `cta-tamano` miden la caja del relleno, que no se dibuja (en `c20` el descriptor queda a
+2,25× el cuerpo del CTA, el gate mide 1,45 y certifica; N4); fuera del repo, la marca de la suite se puede forjar y
+`--reproducir --comando <mutante>` da 0 diciendo «comando del repo» (N5); `mascara-vacia` exige 0 después de redondear
+a cuatro decimales (en 1152×2048 pasan 118 píxeles marcados; las aprobadas marcan al menos 2,2 %; N6); y el arreglo de
+Y1 no tiene prueba ni mutante (N7). Arquitectura, 🟢: un TIFF Lab con alfa cuelga `stats()` más de 200 s con la carpeta
+bloqueada; el aviso de corchetes en un CTA de texto que no los dibuja (`c20`); y «comando del repo» con un `--comando`
+ajeno dentro de la suite. Diseño, 🟡: la aprobación de una selección ata aprobador y plate, no la caja (vale para
+cualquier marco con ≥ 1 % de sujeto en ese plate, y el aviso no muestra caja ni porcentaje); el descriptor puede medir
+0,97× el CTA (el tope es «menor que el CTA»; lo aprobado, 0,65–0,85×). Diseño, 🟢: `[[ ]]` en el cierre sólo cambia el
+color (nada sobre un cierre blanco; sobre celeste, el remate blanco mide 1,30:1 contra su base); y la etiqueta con
+estrella (aviso falso de 41 px fuera de la columna a la izquierda; centrada, `eje-centrado` la bloquea a 21 px aunque
+el grupo está centrado, y en dos líneas el bloqueo es correcto pero el consejo no aplica).
+
+### Tramo 15 — séptima certificación (en curso)
+
+**En curso: nada de esto está implementado todavía.** El plan cubre los cuatro 🟠 y dos 🟡 de arquitectura que tocan
+las mismas reglas, y empieza cuando termine la corrida completa de mutantes que está en marcha:
+
+- **Entidades (arquitectura, R1):** validar contra la lista completa de HTML5 —los 106 nombres de
+  `character-entities-legacy` 3.0.0, verificada contra el decodificador de `entities` 4.5.0 en modo legado—: un «&»
+  seguido del nombre legado **más largo** que empiece ahí se rechaza (`&notin` sin «;» se lee «¬in»), y «R&D», «AT&T» y
+  «Q&A» siguen siendo texto. Con prueba y mutante con `eacute` y `ntilde`.
+- **Holgura entre voces (diseño, N1):** exigir una holgura mínima entre texto, botón y firma, medida sobre lo dibujado
+  —el botón con medio trazo cuando es contorno— y calibrada contra las 114 aprobadas que componen con el compositor
+  actual.
+- **Columna (diseño, N2):** que el esquema rechace `cta.align: "center"` en un bloque a la izquierda y que el mensaje
+  por `cta.x` faltante dependa de la alineación del bloque; en las piezas nuevas, CTA, descriptor, nota y etiqueta
+  fuera de la columna pasan a bloquear (hoy sólo avisan).
+- **Losa (diseño, H3):** un techo de área por variante dibujada —el del relleno, más bajo que el del contorno—, con la
+  variante que resolvió el compositor (`auto` puede dibujar relleno).
+- **CTA de texto (arquitectura, N4, 🟡):** que `descriptor-distancia` y `cta-tamano` midan el texto del CTA y no la
+  caja del relleno, que no se dibuja.
+- **Prueba del origen heredado (arquitectura, N7, 🟡):** darle prueba y mutante al arreglo de Y1 del tramo 14, como
+  exige la regla dura de esta sección.
+
+Como todo tramo, tiene que salir con la regresión sin diferencias no declaradas, las 10 pruebas en verde y un mutante
+por guarda nueva que alguna prueba detecte por la razón esperada. Después, la octava certificación.
+
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
 | Pilar | Al auditar | Meta | Al cerrar los tramos 1–5 | Qué lo sostiene |
@@ -1318,6 +1404,15 @@ Nada de esto cambia una pieza aprobada.
 - **Firma de las piezas existentes:** sólo se mueve en las stories finales de v07, dentro de la zona story de AXIS
   (centro 0,8565; commit `64a9b99c5`). Ninguna imagen se regenera. En OneDrive se reemplazaron CMP001-05 a 07;
   CMP001-04 quedó pendiente porque OneDrive no deja descargarla ni sobrescribirla.
+- **Lecho de «Que te elijan» (v07, 04-elegida-916):** con la firma ya subida, en esta story quedaba sobre el canto
+  iluminado del lecho y no dentro de su materia desenfocada —lo detectó el operador; la revisión había mirado el
+  contraste (6,53:1, pasaba) y no el pie al 100 %—, así que se sube el primer plano completo, lecho y apoyabrazos, como
+  una sola capa rígida: 60 px del plate (69 en la pieza), como con la cámara un poco más baja, con el corte pegado al
+  objeto, sin IA y sin deformar el canto (`ai-generations/2026-09-23_v07-lecho-04-elegida/subir-primer-plano-v4.cjs`).
+  La firma no se mueve y su contraste sube de 6,53 a 11,58:1; las otras 15 piezas de v07 salen idénticas byte a byte
+  con la receta congelada; la pieza pasa al plate nuevo `plates/04-elegida-916-lecho.png` (el original queda) y el
+  registro del canon (`scripts/foto/canon-anterior.json`) cambia el sha256 del plate y suma la enmienda: sigue con el
+  canon 2026-09-22, como en la enmienda de la firma; en OneDrive se reemplazó CMP001-07 (la anterior quedó respaldada).
 - **Piso de legibilidad** (pendiente 6): en las piezas nuevas, el CTA mide al menos 11 CSS px en un teléfono y las demás
   voces 9 (tramo 13, regla `legibilidad`). Las aprobadas conservan el aviso.
 - **Etiquetas de los cursores fuera del piso de legibilidad** (sexta certificación): son parte gráfica del recurso

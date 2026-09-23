@@ -309,6 +309,13 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    Con logo o con firma externa el canon es el mismo: ≥ 20 % del lado corto, ≥ 4,5:1, fuera del sujeto y dentro de la
    zona de AXIS. **Nuevo:** ≥ 25 % del lado corto en los formatos horizontales y ≤ 35 % en todos (`firma-tamano`;
    decisión del operador, 2026-09-23: en 16:9 el 20 % dejaba la firma en ≈ 44 px en un teléfono).
+
+   🔴 **Y dentro de la materia calma del lecho, nunca sobre su canto** **[medido 2026-09-23]**: al ubicar o mover la
+   firma —también al subirla a la zona de AXIS en una pieza existente, «donde el lecho ya cubre la nueva posición»—,
+   mírala al 100 %. Un contraste que pasa no lo descarta: en la story `04-elegida-916` de v07 la caja estaba sobre el
+   canto iluminado y medía 6,53:1. Altura real del lecho contra la caja, método si no alcanza y lo que no funcionó:
+   regla auto-load `.claude/rules/brand-photography.md` y el delta 2026-09-23 de la
+   [reserva de espacio en el plate](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md#delta-2026-09-23--el-lecho-se-valida-contra-la-caja-de-la-firma).
 5. **CTA:** `variant: "auto"` + `prominencia` (ver arriba) o una variante fija con `cta.variantReason`. El acento es
    obligatorio: `surfaceToken` (contorno y relleno) o `inkToken` (texto) sólo aceptan `accentSurface`, `growthOnDark` o
    `accentInkOnLight`, y omitirlo resuelve lima. Si el acento no alcanza, se regenera el plate: el color no se apaga.

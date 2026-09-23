@@ -453,6 +453,43 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   En una pieza nueva con CTA, además, el texto respeta el piso de legibilidad en el teléfono (CTA 11 CSS px, las demás
   voces 9), que en 16:9 pide un texto mucho más grande: cerca del 57 % izquierdo del ancho, contra el 42 % que reserva
   hoy `foto:prompt` (pendiente de decisión; detalle en la reserva del plate, delta 2026-09-23).
+- 🔴 **Al ubicar o MOVER la firma, mírala al 100 %: su caja tiene que caer DENTRO de la materia calma del lecho, nunca
+  sobre su canto** **[medido 2026-09-23]**. El canon ya lo pedía («nunca por encima o montado en el canto»,
+  [Tres voces + acción](../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md#corrección-de-lecho-y-firma-v07))
+  y volvió a pasar al **mover** la firma. Al subirla a la zona de AXIS en las stories de v07 («Que te elijan»: centro
+  85,65 %, caja 1619–1670 px de 1920), en `04-elegida-916` quedó sobre el **canto iluminado** del lecho, junto a un
+  apoyabrazos cromado desenfocado —el canto iba de y≈1394 a 1420 en el plate de 941×1672 y cruzaba la caja
+  (1418–1452 en el plate)—, **con el contraste medido pasando: 6,53:1**. La revisión visual dijo que la firma «se apoya
+  en la materia desenfocada del lecho»; lo vio el operador. Se miró el número, no el pie al 100 %. Con la firma dentro
+  de la materia (no se movió: se subió el lecho), el mismo logo mide **11,58:1**. Es el complemento de «si la banda
+  falla, mide el logo» (arriba): un logo que pasa tampoco dice dónde cae su caja.
+- 🔴 **La altura del lecho se MIDE en el plate contra la caja de la firma: la brief no la garantiza**
+  **[medido 2026-09-23]**. La brief de ese plate pedía el borde superior del primer plano en y≈79–80 % («lowest
+  fifth») y una zona calma en 82–85 % para la firma; el plate generado dejó el canto en ≈83–84 %, y nadie lo midió
+  contra la caja. El choque apareció al subir la firma a la zona de AXIS. Antes de aceptar el plate —y cada vez que la
+  firma cambie de posición— ubica el canto real (donde sube la luminancia) y compáralo con la caja de la firma en ese
+  formato: en story con AXIS, la firma de 20 % pegada al límite inferior (87 %) ocupa 1619–1670 px de 1920
+  (84,3–87,0 % del alto) y no puede bajar más.
+- 🔴 **Si el lecho no alcanza la caja: sube el primer plano ENTERO como UNA capa rígida, lo que haría una cámara un
+  poco más baja** **[medido 2026-09-23]**. Fue lo único que se vio natural en `04-elegida-916` (el operador: «Si, ahí
+  si quedó bien») y es una forma de «elevar ligeramente el inicio del lecho» —criterio del operador para 9:16 en la
+  [firma](../../docs/operations/brand-photography/EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md)— sobre un plate ya
+  generado. **Alcance: es un arreglo para una pieza ya aprobada, con el visto bueno del operador; en una pieza nueva el plate se rehace con la reserva del lecho** ([regla 6 de la reserva](../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md): el plate se rehace, no se parcha al componer). Lecho y apoyabrazos subieron juntos 60 px del plate (69 en la pieza): lo cercano sube y el fondo no, como
+  en un paralaje real. El corte va **pegado al borde del propio objeto y en zonas oscuras** —6 px sobre el canto del
+  lecho, medido columna a columna; 4 px sobre el halo del apoyabrazos—, por **una curva suave** trazada sobre la
+  medición de luminancia (sin escalones entre columnas) y con **10 px de fundido**; lo que falta al pie se completa
+  estirando la franja inferior, que es desenfoque parejo. Sin IA y sin deformar la forma del canto: no pinta ni
+  oscurece nada, mueve la materia de la propia foto. La firma no se movió y pasó de 6,53 a 11,58:1. Script:
+  `ai-generations/2026-09-23_v07-lecho-04-elegida/subir-primer-plano-v4.cjs` (el halo del apoyabrazos y los rangos de
+  búsqueda están medidos para ese plate de 941×1672: en otro se vuelven a medir). **Lo que NO funcionó, y por qué:**
+  **inpainting con máscara sobre la franja** (GPT Image 2.5 Sunburst, `--mask`) — los dos candidatos llenaron TODA la
+  zona editable con un panel oscuro plano, de borde superior recto justo en el límite de la máscara, y borraron el
+  apoyabrazos: el modelo rellena la zona transparente entera con «el objeto» aunque el prompt pida conservar lo que
+  queda sobre el nuevo borde, y se lee como un velo · **levantar sólo el centro del lecho** (deformación con caída +
+  inpainting chico junto al apoyabrazos) — un montículo con un hombro artificial; el operador: «demasiado forzado» ·
+  **mate por brillo** (mover sólo lo claro) — el apoyabrazos quedó semitransparente, como un fantasma, con un brillo
+  naranja flotando suelto · **corte por envolvente ancha** — al separarse del objeto, arrastraba bandas de la manga y
+  del pantalón y rompía su contorno y la esquina de la mesa (visible con el contraste aumentado).
 - 🔴 **En un plate limpio, no sugieras criaturas ni siquiera de refilón** **[medido 2026-09-21]**. La frase «*as if
   something small were there asking her a question*» hizo que el modelo **materializara un robot blanco flotando**.
   Si la criatura se compone después, la mirada se describe como **geometría** y el vacío se **declara**: «*the air
@@ -528,7 +565,8 @@ una señal de que se eligió por conveniencia.**
 ## Al cerrar
 
 `pnpm foto:validar` sobre el plate limpio y **mirar la imagen al 100%**: identidad contra la referencia **de la identidad que elegiste**, emblema
-letra por letra, y que no haya texto ni marcas de terceros. Un contraste que pasa no prueba que la pieza esté bien.
+letra por letra, y que no haya texto ni marcas de terceros; en la pieza firmada, que la caja de la firma caiga dentro de
+la materia calma del lecho y no sobre su canto. Un contraste que pasa no prueba que la pieza esté bien.
 
 
 🔴 **ANTES de generar una pieza con un asset de marca —ropa corporativa, lanyard, merch, logo 3D,

@@ -213,3 +213,38 @@ corrección mejora la escena en vez de deformarla.
 > **Regla que queda:** **con fuente visible en cuadro, lámpara baja, o no hay banda de texto.** Es el mismo
 > mecanismo que el haz que sube al tercio superior: lo que entra a la zona reservada la rompe, sea el haz, la
 > ventana, una mancha proyectada o la fuente misma.
+
+## Delta 2026-09-23 — el lecho se valida contra la caja de la firma
+
+**El porcentaje del lecho por formato (§1, §3) no basta.** La reserva del lecho se da por cumplida cuando la caja de la
+firma, **en su posición final**, cae dentro de la materia calma del lecho, con el canto por encima. Se mide en el plate
+—dónde sube la luminancia— y se mira al 100 %: ni la brief ni un contraste que pasa lo prueban **[medido 2026-09-23]**.
+En una story con la zona segura de AXIS (su borde inferior está al 87 % del alto), la firma de 20 % del lado corto
+pegada a ese límite ocupa **1619–1670 px de 1920** (84,3–87,0 %) y no puede bajar más: el canto tiene que quedar por
+encima de esa caja.
+
+**Caso.** Story `04-elegida-916` de «Que te elijan» (v07). La brief del plate pedía el borde superior del primer plano en
+y≈79–80 % («lowest fifth») y una zona calma en 82–85 % para la firma; el plate generado dejó el canto en ≈83–84 %, y
+nadie lo verificó contra la caja de la firma. Cuando la firma subió a centro 85,65 % para entrar en la zona de AXIS, su
+caja (1418–1452 en el plate de 941×1672) quedó sobre el canto iluminado —la subida de luminancia iba de y≈1394 a 1420—,
+junto a un apoyabrazos cromado desenfocado. El contraste medido pasaba (**6,53:1**) y la revisión visual dijo que la
+firma «se apoya en la materia desenfocada del lecho»; lo vio el operador.
+
+**Método aprobado por el operador.** Subir el primer plano completo —lecho y apoyabrazos— como **una sola capa rígida**,
+60 px del plate (69 en la pieza), como si la cámara estuviera un poco más baja: lo cercano sube, el fondo no. El corte va
+pegado al objeto y en zonas oscuras —6 px sobre el canto del lecho, medido columna a columna; 4 px sobre el halo del
+apoyabrazos—, por una curva suave trazada sobre la medición de luminancia, sin escalones entre columnas, con 10 px de
+fundido; lo que falta al pie se completa estirando la franja inferior, que es desenfoque uniforme. Sin IA y sin deformar
+la forma del canto: no pinta ni oscurece nada. La firma no se movió y su contraste pasó a **11,58:1**. Script:
+`ai-generations/2026-09-23_v07-lecho-04-elegida/subir-primer-plano-v4.cjs` (el halo y los rangos de búsqueda están
+medidos para ese plate). Descartados: inpainting con máscara sobre la franja (panel plano de borde recto que se lee como
+velo y borra objetos), levantar sólo el centro del lecho (montículo forzado, rechazado por el operador), mate por brillo
+(objeto fantasma) y corte por envolvente ancha (arrastra la manga y rompe contornos). Detalle y porqués en
+`.claude/rules/brand-photography.md`.
+
+Se acopla con la [firma](EFEONCE_PHOTO_SIGNATURE_FOREGROUND_V1.md) (§ Ads: proporción del lecho y continuidad), que ya
+exigía la caja completa dentro de la superficie desenfocada y, para 9:16, «elevar ligeramente el inicio del lecho»: este
+caso agrega que la verificación se repite al mover la firma y que la altura del lecho se mide, no se hereda de la brief.
+
+> **Regla que queda:** la reserva del lecho se valida contra la caja real de la firma, no contra un porcentaje ni
+> contra la brief, y se vuelve a validar cada vez que la firma cambia de posición.
