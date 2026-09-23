@@ -27,7 +27,10 @@ const args0 = process.argv.slice(2)
 const COMPOSITOR = path.resolve(ROOT, args0.includes('--compositor') ? args0[args0.indexOf('--compositor') + 1] : 'scripts/foto/componer-cta.mjs')
 // `--gate <archivo>`: lo mismo para el gate — un gate mutante que deja de verificar algo debe hacer fallar a P10.
 const GATE = path.resolve(ROOT, args0.includes('--gate') ? args0[args0.indexOf('--gate') + 1] : 'scripts/foto/componer-cta.gate.mjs')
-const REGRESION = path.join(ROOT, 'scripts/foto/componer-cta.regresion.mjs')
+// `--regresion <archivo>`: lo mismo para el arnés de regresión (P02 lo pone a prueba con casos hechos a propósito).
+const REGRESION = path.resolve(ROOT, args0.includes('--regresion') ? args0[args0.indexOf('--regresion') + 1] : 'scripts/foto/componer-cta.regresion.mjs')
+// `--p02-rapido`: P02 sólo verifica el arnés (vacío, cobertura, avisos, referencia hermética), sin la regresión completa.
+const P02_RAPIDO = args0.includes('--p02-rapido')
 const REPORTE_A11Y = path.join(ROOT, 'scripts/foto/accesibilidad-reporte.mjs')
 const MASCARAS = path.join(ROOT, 'node_modules/.cache/foto-sujeto')
 const args = process.argv.slice(2)
@@ -176,17 +179,45 @@ const PRUEBAS = [
   {
     id: 'P02', nombre: `No regresión: todas las piezas con CTA del repo contra ${REF}`,
     async correr() {
+      // El ARNÉS también se prueba (tramo 5; auditoría 2026-09-23, hallazgo 13): una red de seguridad con agujeros da
+      // verde sin mirar. Cuatro casos hechos a propósito, cada uno con lo que el arnés tiene que decir.
+      const arnes = async (extra, env = {}) => run(process.execPath, [REGRESION, ...extra], { cwd: ROOT, timeout: 30 * 60e3, maxBuffer: 64e6, env: { ...process.env, ...env } }).then(r => ({ code: 0, salida: r.stdout + r.stderr }), e => ({ code: e.code ?? 1, salida: String(e.stdout ?? '') + String(e.stderr ?? '') }))
+      const vacio = await arnes(['--solo', 'zzz-ningun-plan-se-llama-asi'])
+      const PLAN_CHICO = '2026-09-21_registro-c-respuesta/piezas-cta.json'
+      const coberturaFalsa = path.join(TMP, 'P02-cobertura.json')
+
+      fs.writeFileSync(coberturaFalsa, JSON.stringify({ piezas: [`ai-generations/${PLAN_CHICO}#pieza-que-ya-no-esta`] }))
+      // Un candidato que sólo agrega un aviso: el píxel no cambia, así que sólo la comparación de avisos lo ve.
+      const candidatoAviso = path.join(ROOT, `scripts/foto/.componer-cta@p02-aviso-${process.pid}.regresion.mjs`)
+
+      fs.writeFileSync(candidatoAviso, fs.readFileSync(COMPOSITOR, 'utf8').replace('async function composePiece(s, opts = {}) {', "async function composePiece(s, opts = {}) {\n  if (!opts.dry) console.warn(`  ⚠ ${s.id}: aviso de prueba del arnés`)"))
+      const conAviso = await arnes(['--solo', PLAN_CHICO, '--candidato', candidatoAviso, '--cobertura', coberturaFalsa])
+
+      fs.rmSync(candidatoAviso, { force: true })
+      const hermetica = await run(process.execPath, ['--test', 'scripts/foto/regresion-ref.test.mjs'], { cwd: ROOT }).then(() => true, () => false)
+
+      const arnesOk = {
+        'vacío falla': vacio.code !== 0 && /0 piezas que verificar/.test(vacio.salida),
+        'pieza faltante de la cobertura falla': conAviso.code !== 0 && /Faltan piezas del manifiesto de COBERTURA/.test(conAviso.salida),
+        'un aviso nuevo es una diferencia': conAviso.code !== 0 && /Cambian los AVISOS/.test(conAviso.salida) && /aviso de prueba del arnés/.test(conAviso.salida),
+        'referencia hermética': hermetica
+      }
+
+      const detalleArnes = Object.entries(arnesOk).map(([k, v]) => `${k} ${v ? '✓' : '✗'}`).join(' · ')
+
+      if (P02_RAPIDO) return { ok: Object.values(arnesOk).every(Boolean), detalle: `arnés: ${detalleArnes} (sin la regresión completa: --p02-rapido)` }
+
       try {
         // `--conservar`: P08 y P09 leen las 86 piezas que deja la regresión; la suite borra esa carpeta al final.
         const r = await run(process.execPath, [REGRESION, '--ref', REF, '--candidato', COMPOSITOR, '--conservar'], { cwd: ROOT, timeout: 60 * 60e3, maxBuffer: 64e6 })
 
         harness = r.stdout.match(/Reporte: (\S+)/)?.[1]
 
-        return { ok: true, detalle: r.stdout.split('\n').filter(l => /^Iguales|^🔵/.test(l)).join(' · '), evidencia: harness }
+        return { ok: Object.values(arnesOk).every(Boolean), detalle: `${r.stdout.split('\n').filter(l => /^Iguales|^🔵|^ℹ️/.test(l)).join(' · ')} · arnés: ${detalleArnes}`, evidencia: harness }
       } catch (e) {
         harness = String(e.stdout).match(/Reporte: (\S+)/)?.[1]
 
-        return { ok: false, detalle: String(e.stdout).split('\n').filter(l => /^Iguales|^🔴|^🟠|^🟡|^⚪/.test(l)).join(' · '), evidencia: harness }
+        return { ok: false, detalle: `${String(e.stdout).split('\n').filter(l => /^Iguales|^🔴|^🟠|^🟡|^🟣|^⚪|^⛔/.test(l)).join(' · ')} · arnés: ${detalleArnes}`, evidencia: harness }
       }
     }
   },
@@ -281,15 +312,43 @@ const PRUEBAS = [
 
       if (!Object.keys(crecidas).length) return { ok: false, detalle: 'depende de P04' }
 
+      // Una pieza donde el PISO DEL TRAZO es el que frena (hallazgo 16; visto por la puntuación de mutantes el
+      // 2026-09-23): desde el tramo 3, a 01-fuera-916 la frena antes su reserva editorial, y un mutante sin el piso del
+      // trazo pasaba. Sin la reserva, el trazo vuelve a ser el freno: crecida y fija se comparan con la misma regla.
+      const libre = pieza('fue_916')
+
+      delete libre.editorialReserve
+      const [crecidaLibre, fijaLibre] = await Promise.all([componer('P05-fue-libre', [libre]), componer('P05-fue-libre-fija', [{ ...structuredClone(libre), textGrowth: false }])])
+
+      if (!crecidaLibre.ok || !fijaLibre.ok) {
+        ok = false
+        filas.push(`01-fuera-916 sin reserva no compuso: ${crecidaLibre.error ?? fijaLibre.error}`)
+      } else {
+        const base = Object.entries(fijaLibre.qa[0].accesibilidad.voces).filter(([, m]) => m?.glifo)
+        const vc = crecidaLibre.qa[0].accesibilidad.voces
+        const peor = base.filter(([v, m]) => (vc[v]?.glifo?.wcag ?? 0) < Math.min(m.glifo.wcag - 0.05, m.glifo.umbralWcag * 1.1) - 0.01)
+
+        ok &&= base.length > 0 && !peor.length && crecidaLibre.qa[0].escala > 1
+        filas.push(`01-fuera-916 sin reserva ×${crecidaLibre.qa[0].escala.toFixed(2)}: ${peor.length ? `✗ ${peor.map(([v, m]) => `trazo ${v} ${m.glifo.wcag}→${vc[v]?.glifo?.wcag}`).join(', ')}` : '✓'}`)
+      }
+
       return { ok, detalle: filas.join(' · ') }
     }
   },
   {
     id: 'P06', nombre: 'Zona segura declarada y eje del bloque',
     async correr() {
-      const rec = crecidas.rec_916
+      // Sin P04 (corrida parcial), P06 compone su propia pieza crecida: una prueba no depende del orden de otra.
+      let rec = crecidas.rec_916
+
+      if (!rec) {
+        const r = await componer('P06-rec', [pieza('rec_916')])
+
+        rec = r.ok ? { dir: r.dir, id: r.qa[0].id, qa: r.qa[0] } : null
+      }
+
       let dentro = false
-      let detalleA = 'depende de P04'
+      let detalleA = 'no compuso 02-reconoces-916'
 
       if (rec) {
         const p = pieza('rec_916')
@@ -335,6 +394,30 @@ const PRUEBAS = [
       reservaChica.editorialReserve = { maxBottom: 200, maxRight: 900 }
 
       const enCanon = await componer('P06-canon', [canon('b2_916')])
+
+      // La zona declarada como freno: mo1-canal-nuevo-169 crece ×1,6 sin sujeto cerca; con el borde derecho de la zona a
+      // 5 % del ancho de su texto a ×1, sólo la zona puede detener el crecimiento.
+      const fija = { ...pieza('mo1_169'), textGrowth: false }
+      const rFija = await componer('P06-zona-base', [fija])
+      let zonaFrena = false
+      let detalleZona = 'no compuso la base'
+
+      if (rFija.ok) {
+        const Lf = leer(rFija.dir, `${fija.id}-layout.json`)
+        const derecha = Math.max(...Lf.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.right))
+        const x1 = +(derecha / Lf.canvas.width + 0.05).toFixed(3)
+        const acotada = { ...pieza('mo1_169'), safeArea: { x0: 0.05, y0: 0.04, x1, y1: 0.96 } }
+        const rZona = await componer('P06-zona-frena', [acotada])
+
+        if (rZona.ok) {
+          const Lz = leer(rZona.dir, `${acotada.id}-layout.json`)
+          const derechaZ = Math.max(...Lz.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.right))
+
+          zonaFrena = rZona.qa[0].escala > 1 && rZona.qa[0].escala < 1.5 && derechaZ <= x1 * Lz.canvas.width + 0.5
+          detalleZona = `×${rZona.qa[0].escala.toFixed(2)}, texto hasta ${(derechaZ / Lz.canvas.width).toFixed(3)} con la zona en ${x1}`
+        } else detalleZona = rZona.error
+      }
+
       let zonaAxis = false
       let enColumna = false
       let firmaAuto = false
@@ -385,7 +468,7 @@ const PRUEBAS = [
         margen = Math.min(...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.left)) >= izquierda.safeArea.x0 * L.canvas.width - 0.5
       }
 
-      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva && zonaAxis && enColumna && firmaAuto, detalle: `zona de AXIS con safeArea "axis": ${zonaAxis}${enCanon.ok ? '' : ` (${enCanon.error})`} · CTA y descriptor en la columna: ${enColumna} · firma automática 20 % legible dentro de la zona: ${firmaAuto} · ${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
+      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva && zonaAxis && enColumna && firmaAuto && zonaFrena, detalle: `crecimiento frenado por la zona declarada: ${zonaFrena} (${detalleZona}) · zona de AXIS con safeArea "axis": ${zonaAxis}${enCanon.ok ? '' : ` (${enCanon.error})`} · CTA y descriptor en la columna: ${enColumna} · firma automática 20 % legible dentro de la zona: ${firmaAuto} · ${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
     }
   },
   {
@@ -521,7 +604,10 @@ const PRUEBAS = [
           if (m && (m.cumpleApca === false || m.cumpleDaltonismo === false)) avisos++
         }
 
-        const faltan = [p.lead, p.dominant, p.after, p.note?.text, p.cta?.text, p.cta?.descriptor].map(plano).filter(t => t && !a.altText.includes(t))
+        // Sin distinguir mayúsculas: si la descripción de la escena ya dice el texto («…sé la referencia…»), la alternativa
+        // no lo repite (tramo 4), y un lector de pantalla lo lee igual en mayúscula o minúscula.
+        const alt = a.altText.toLowerCase()
+        const faltan = [p.lead, p.dominant, p.after, p.note?.text, p.cta?.text, p.cta?.descriptor].map(plano).filter(t => t && !alt.includes(t.toLowerCase()))
 
         if (faltan.length) incompletas.push(`${id}: ${faltan.join(' / ')}`)
         if (/Botón:/.test(a.altText) || (p.cta && !/Llamado a la acción/.test(a.altText) && !a.altText.includes(plano(p.cta.text)))) conBoton.push(id)
@@ -649,8 +735,12 @@ const PRUEBAS = [
       const h = await componer('P10-huellas', [canon('b2_916')])
       const idH = 'b2-primero-el-numero-916'
       const archivo = rel => path.join(h.dir, rel)
+      // El QA de la pieza tiene que estar en qa-<plan>.json; sin él, los casos que lo alteran fallan sin reventar.
+      const qaPorPlan = fs.existsSync(archivo('out/qa-piezas.json'))
 
       const conCambio = async (rel, cambiar) => {
+        // Si el archivo no está donde debe (p. ej. el QA no quedó en qa-<plan>.json), el caso falla sin reventar la prueba.
+        if (!fs.existsSync(archivo(rel))) return { code: -1, salida: `falta ${rel}` }
         const original = fs.readFileSync(archivo(rel))
 
         cambiar(archivo(rel), original)
@@ -697,23 +787,27 @@ const PRUEBAS = [
 
       // Layout alterado CON su huella al día: el gate no confía en el QA, recalcula las invariantes y lo rechaza.
       const layoutRel = `out/${idH}-layout.json`
-      const layoutOriginal = fs.readFileSync(archivo(layoutRel))
-      const qaOriginal = fs.readFileSync(archivo('out/qa-piezas.json'))
-      const Lmal = JSON.parse(layoutOriginal)
-      const cajaDom = Lmal.maquetacion.elementos.find(e => e.id === 'dominante').box
+      let gMaquetacion = { code: -1, salida: 'falta el QA o el layout' }
 
-      Lmal.maquetacion.elementos.push({ id: 'firma-de-prueba', tipo: 'firma', box: { ...cajaDom } })
-      const layoutMal = JSON.stringify(Lmal, null, 2)
+      if (qaPorPlan && fs.existsSync(archivo(layoutRel))) {
+        const layoutOriginal = fs.readFileSync(archivo(layoutRel))
+        const qaOriginal = fs.readFileSync(archivo('out/qa-piezas.json'))
+        const Lmal = JSON.parse(layoutOriginal)
+        const cajaDom = Lmal.maquetacion.elementos.find(e => e.id === 'dominante').box
 
-      fs.writeFileSync(archivo(layoutRel), layoutMal)
-      const qaMal = JSON.parse(qaOriginal)
+        Lmal.maquetacion.elementos.push({ id: 'firma-de-prueba', tipo: 'firma', box: { ...cajaDom } })
+        const layoutMal = JSON.stringify(Lmal, null, 2)
 
-      qaMal[0].huellas.layout = sha(layoutMal)
-      fs.writeFileSync(archivo('out/qa-piezas.json'), JSON.stringify(qaMal))
-      const gMaquetacion = await gate(h.planPath)
+        fs.writeFileSync(archivo(layoutRel), layoutMal)
+        const qaMal = JSON.parse(qaOriginal)
 
-      fs.writeFileSync(archivo(layoutRel), layoutOriginal)
-      fs.writeFileSync(archivo('out/qa-piezas.json'), qaOriginal)
+        qaMal[0].huellas.layout = sha(layoutMal)
+        fs.writeFileSync(archivo('out/qa-piezas.json'), JSON.stringify(qaMal))
+        gMaquetacion = await gate(h.planPath)
+
+        fs.writeFileSync(archivo(layoutRel), layoutOriginal)
+        fs.writeFileSync(archivo('out/qa-piezas.json'), qaOriginal)
+      }
 
       const gAnillo = await editarQa(r => {
         const b = r.accesibilidad.voces['cta-borde']
@@ -721,10 +815,13 @@ const PRUEBAS = [
         if (b?.anillo) Object.assign(b.anillo, { wcag: 1.8, cumpleWcag: false })
       })
 
-      fs.renameSync(archivo('out/qa-piezas.json'), archivo('out/qa.json'))
-      const gLegado = await gate(h.planPath)
+      let gLegado = { code: -1, salida: 'falta out/qa-piezas.json' }
 
-      fs.renameSync(archivo('out/qa.json'), archivo('out/qa-piezas.json'))
+      if (qaPorPlan) {
+        fs.renameSync(archivo('out/qa-piezas.json'), archivo('out/qa.json'))
+        gLegado = await gate(h.planPath)
+        fs.renameSync(archivo('out/qa.json'), archivo('out/qa-piezas.json'))
+      }
 
       // Plate cambiado: una copia del plate, compuesta y alterada después (el real no se toca).
       const conPlate = pieza('b2_916')
@@ -810,6 +907,7 @@ const PRUEBAS = [
 
       const r = {
         'aprueba el plan bueno': gBueno.code === 0,
+        'el QA queda en qa-<plan>.json': qaPorPlan && bueno.ok && fs.existsSync(path.join(bueno.dir, 'out/qa-piezas.json')),
         'rechaza pieza sin firma declarada': gSinFirma.code !== 0 && /no declara firma/.test(gSinFirma.salida),
         'rechaza firma bajo el 20 % del lado corto': gFirmaChica.code !== 0 && /del lado corto/.test(gFirmaChica.salida),
         'acepta la excepción auditada y la imprime': gFirmaAuditada.code === 0 && /excepción auditada «firma-tamano»/.test(gFirmaAuditada.salida),

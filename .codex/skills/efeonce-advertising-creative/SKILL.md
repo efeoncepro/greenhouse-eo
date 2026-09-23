@@ -225,12 +225,16 @@ contraste y protección de sujeto, no completitud del concepto ni geometría del
 - **La variante del CTA se elige mirando, no copiando el plan anterior.** `--variantes` compone las tres lado a
   lado; `variant: "auto"` + `prominencia` (discreta/delimitada/destacada) respeta la intención y sólo escala si la
   escena no la permite, también con daltonismo. Registra `variantReason`. §17.
-- **Certificación adversarial del compositor (2026-09-23): se cierra en cinco tramos (§18).** Tramo 1 (integridad)
-  cerrado: QA por plan con huellas, escritura atómica, bloqueo por carpeta, caché de máscaras verificada, esquema
-  declarativo y guarda de sujeto no desactivable. Tramo 2 (contraste real) cerrado: el contraste se mide en el
-  **trazo** (1 % peor de los píxeles de glifo), crecer exige margen ×1,1, `protect` para objetos de la escena, borde
-  del contorno ≥ 1 CSS px medido como se ve en el teléfono, y `auto` degrada la tinta del contorno antes de pasar al
-  relleno. Lo que falta (texto diminuto en 16:9, firma sin contrato, zonas seguras AXIS) está en §18.
+- **Certificación adversarial del compositor (2026-09-23): los cinco tramos cerrados (§18).** Integridad (QA por
+  plan con huellas, escritura atómica, bloqueo, caché verificada, esquema, guarda no desactivable); contraste real
+  (medido en el **trazo**, crecer con margen ×1,1, `protect`, borde ≥ 1 CSS px en el teléfono, `auto` degrada la
+  tinta del contorno antes del relleno); esquema e invariantes (cobertura de glifos, entidades, una sola función de
+  invariantes para búsqueda, composición y gate, reserva editorial); **el canon hecho regla** (zona segura de AXIS
+  como piso —declara `safeArea: "axis"`—, firma de 20 % y ≥ 4,5:1 con `logo.y: "auto"`, concepto completo, regla de
+  las tres veces, `cta.x: "columna"`, texto alternativo sin «Botón») con **excepciones auditadas**; y arnés y pruebas
+  (referencia hermética, cobertura, avisos comparados, `pnpm foto:componer:cta:mutantes`). **Un plan nuevo que quiera
+  pasar el gate declara** `safeArea: "axis"`, `cta.x: "columna"` y `logo: { width: 0.2, y: "auto" }`, más `lead` y
+  `after`.
 - **Un bloque centrado no se ancla lejos del centro.** Con `align: 'center'` y `|centerX − 0,5| > 0,15`, el
   compositor aborta: si el aire está a un costado, el bloque se alinea a ese costado (`align: 'left'`). Operador
   sobre 03-referencia-916: «se vería mejor alineada a la izquierda por la posición». §14.

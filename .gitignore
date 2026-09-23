@@ -146,3 +146,6 @@ data/bank/
 
 # Compositor de referencia extraído de git por `pnpm foto:componer:cta:regresion` (temporal)
 scripts/foto/.componer-cta@*.regresion.mjs
+# Referencia HERMÉTICA de la regresión y mutantes de `pnpm foto:componer:cta:mutantes` (temporales)
+scripts/foto/.ref-*
+scripts/creative/layout-compiler/.ref-*

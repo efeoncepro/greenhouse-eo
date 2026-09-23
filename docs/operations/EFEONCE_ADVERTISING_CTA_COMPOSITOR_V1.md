@@ -468,8 +468,14 @@ pnpm foto:componer:cta:regresion --solo cmp002                # sólo los planes
 ```
 
 Categorías del reporte: 🔴 cambia el estado · 🟠 cambia el layout o el QA · 🟡 sólo cambian píxeles ·
-⚪ cambia el mensaje de error · 🔵 el QA suma claves (informativo). Sale con 1 ante cualquier diferencia salvo
-la 🔵. **Regla: antes de commitear un cambio al compositor, correr el harness.** Si el cambio no debería alterar
+🟣 cambian los avisos · ⚪ cambia el mensaje de error · 🔵 el QA suma claves (informativo). Sale con 1 ante cualquier
+diferencia salvo la 🔵, ante una pieza del manifiesto de cobertura que falte, y con 0 casos.
+
+**Desde el tramo 5 (§18) la referencia es hermética**: se extraen de git el compositor y todas sus dependencias
+locales. Antes la referencia usaba las dependencias del árbol de trabajo, y un cambio en ellas no aparecía: así pasó
+inadvertido el cambio del texto alternativo en las 86 piezas hasta que se midió con la referencia hermética.
+`--actualizar-cobertura` reescribe `scripts/foto/componer-cta.cobertura.json`. La puntuación de mutantes vive en
+`pnpm foto:componer:cta:mutantes`. **Regla: antes de commitear un cambio al compositor, correr el harness.** Si el cambio no debería alterar
 nada, tiene que salir sin 🔴🟠🟡. Si altera algo, el reporte dice qué piezas y cuánto, y eso se aprueba mirando.
 
 **Es determinista:** dos corridas del mismo código dan 104 de 104 iguales, PNG incluido. Una diferencia es
@@ -746,14 +752,35 @@ medición, el gate la imprime con su razón y quién la aprobó. Reglas exceptua
   gesto manuscrito y las etiquetas de los cursores; no repite lo que la descripción de la escena ya dice.
 - Regresión (referencia hermética) contra 4d36b01c3: **ningún píxel cambia**; el texto alternativo cambia en las 86 piezas («Llamado a la acción») y el layout suma `columna`, `ctaMarco` y `zonaSegura`. Con las reglas nuevas **ninguna de las 86 piezas del repo pasa el gate completo**: zona segura 77 (el margen del compositor es 7 % y AXIS pide 7,5 % en feed y 10 % en story), concepto sin cierre 40 (las piezas AEO), firma sin declarar 37 (v03–v07 firman con otra herramienta), firma bajo 20 % 19 (CMP-002 y los 16:9 de registro-c), reserva editorial 6, acento 7 (ya fallaba antes), firma sobre el sujeto 3, firma bajo 4,5:1 1 y regla de las tres veces 1. Son decisiones del operador —recomponer con `safeArea: "axis"` y `cta.x`/`note.x: "columna"`, declarar `firma`, o excepciones auditadas—; ninguna pieza se tocó.
 
+**Tramo 5 · Arnés y pruebas — cerrado (2026-09-23).**
+
+- **Referencia hermética:** la regresión extrae de git el compositor **y todas sus dependencias locales** tal como
+  estaban en la referencia (`scripts/foto/regresion-ref.mjs`): cada archivo junto a su original como
+  `.ref-<sha>-<pid>--<nombre>`, con sus imports relativos reescritos a esas copias. Antes la «referencia» corría con las
+  dependencias del árbol de trabajo y un cambio en ellas no aparecía como diferencia.
+- **La red no se achica en silencio:** 0 casos falla; las piezas sin plate se cuentan; el manifiesto
+  `scripts/foto/componer-cta.cobertura.json` lista las piezas que la red DEBE verificar en esta máquina y una faltante
+  falla (`--actualizar-cobertura` lo reescribe a propósito).
+- **Avisos comparados:** un aviso nuevo o perdido del compositor es una diferencia (🟣). Una clave nueva sólo informa si
+  es del QA; en el layout es un cambio a aprobar.
+- **Piezas de prueba por guarda:** P06 suma una pieza donde la zona declarada es la que frena el crecimiento (antes el
+  sujeto frenaba primero y un mutante sin zona pasaba); P02 prueba el propio arnés (vacío, cobertura, avisos, referencia).
+- **Puntuación de mutantes como comando:** `pnpm foto:componer:cta:mutantes` rompe a propósito cada guarda del catálogo
+  —compositor, gate, arnés y módulos puros— y exige que alguna prueba falle **por la razón esperada**.
+- Regresión hermética contra 38d465e89: 104 de 104 iguales (el tramo 5 no toca el compositor); el manifiesto de cobertura quedó con 205 piezas (104 únicas) y 84 piezas con CTA no tienen plate en esta máquina. **Puntuación de mutantes: 35 de 35 detectados por la razón esperada** (9 del tramo 1, 7 del 2, 6 del 3, 8 del 4 y 5 del 5). La primera pasada dio 33 de 35 y enseñó dos cosas: el piso del trazo había dejado de tener pieza de prueba (desde el tramo 3 a 01-fuera-916 la frena su reserva; P05 suma la misma pieza sin reserva) y un mutante del QA compartido se detectaba por un error de la prueba, no por su razón (P10 suma «el QA queda en qa-<plan>.json»).
+
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
-| Pilar | Hoy | Meta | Qué lo sube |
-|---|---|---|---|
-| Safety | 2/5 | 4/5 | guardas no desactivables sin aprobación registrada, caché verificada, `id` restringido |
-| Robustness | 2/5 | 4/5 | esquema, invariantes compartidas, escritura atómica, QA atado por huellas |
-| Resilience | 3/5 | 4/5 | caché que se regenera sola, artefactos que no quedan a medias, errores que nombran la causa |
-| Scalability | 3/5 | 4/5 | harness con manifiesto y cobertura, referencia hermética |
+| Pilar | Al auditar | Meta | Al cerrar (2026-09-23) | Qué lo sostiene |
+|---|---|---|---|---|
+| Safety | 2/5 | 4/5 | 4/5 | guardas que no se apagan sin razón y aprobador; caché verificada; `id` sin rutas; excepciones auditadas que no apagan la medición |
+| Robustness | 2/5 | 4/5 | 4/5 | esquema declarativo; invariantes compartidas por búsqueda, composición y gate; escritura atómica; QA atado por huellas; contraste en el trazo |
+| Resilience | 3/5 | 4/5 | 4/5 | caché que se regenera sola; nada a medias tras abortar; bloqueo por carpeta; errores que nombran pieza, campo y causa |
+| Scalability | 3/5 | 4/5 | 4/5 | referencia hermética; manifiesto de cobertura; avisos comparados; puntuación de mutantes como comando |
+
+Por qué no 5/5: la cobertura depende de los plates de esta máquina (84 piezas con CTA no tienen plate aquí), el
+umbral de legibilidad por rol y la severidad de APCA/daltonismo en el CTA siguen como aviso hasta que decidas (abajo),
+y ninguna pieza del repo pasa todavía el gate completo con el canon.
 
 ### Reglas duras que deja esta auditoría
 
@@ -766,10 +793,21 @@ medición, el gate la imprime con su razón y quién la aprobó. Reglas exceptua
 
 ### Decisiones pendientes del operador
 
+Lo que se implementó mientras tanto va entre paréntesis; nada de esto cambia una pieza aprobada.
+
 1. Valores de `minReadableCssPx` por rol (CTA, descriptor, apoyo) y qué hacer con 16:9 en teléfono: recomponer o
-   declarar placement de escritorio.
-2. Firma: ¿el compositor busca la Y automáticamente, o el plan la declara y el gate sólo verifica?
-3. APCA y daltonismo: ¿bloqueantes para el CTA?
-4. Con Gigi en cuadro, ¿el acento del CTA se cede a Gigi (`acento.cedidoA` auditado)?
-5. Canon de variantes: «escalar sí, degradar no» frente a §10 («no se cambia de variante para esquivar la medición»).
+   declarar placement de escritorio. *(Aviso bajo 9 px en pantalla; `placement: { anchoCssPx, razon }` disponible.)*
+2. Firma: ¿el compositor busca la Y automáticamente, o el plan la declara y el gate sólo verifica? *(Las dos: el plan
+   declara por defecto y `logo.y: "auto"` busca; el gate verifica contraste, tamaño, zona y sujeto.)*
+3. APCA y daltonismo: ¿bloqueantes para el CTA? *(Siguen como aviso.)*
+4. Con Gigi en cuadro, ¿el acento del CTA se cede a Gigi? *(Excepción auditada `acento-cta` disponible; no se creó un
+   campo `acento.cedidoA`.)*
+5. Canon de variantes: «escalar sí, degradar no» frente a §10. *(`auto` degrada la TINTA del contorno —el acento queda
+   en el borde— antes de escalar al relleno, como pide §10; el texto del canon no se tocó.)*
+6. **Piezas del repo que el canon ahora reprueba** (86 de 86, ninguna cambió): zona segura 77, concepto sin cierre 40,
+   firma sin declarar 37, firma bajo 20 % 19, reserva editorial 6, acento 7 (ya fallaba), firma sobre el sujeto 3,
+   firma bajo 4,5:1 1, regla de las tres veces 1. Por set: recomponer con `safeArea: "axis"` y `cta.x`/`note.x:
+   "columna"`, declarar `firma` en los que firma otra herramienta, o excepciones auditadas con tu nombre.
+7. **Margen por defecto del compositor** (7 %) frente a AXIS (7,5 % feed, 10 % story): ¿se cambia el defecto —mueve
+   todas las piezas alineadas a la izquierda al recomponer— o se sigue exigiendo `safeArea: "axis"` en el plan?
 

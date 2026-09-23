@@ -1,4 +1,5 @@
-// `pnpm foto:componer:cta:regresion [--ref <git-ref>] [--candidato <archivo>] [--solo <texto>] [--jobs <n>] [--conservar]`
+// `pnpm foto:componer:cta:regresion [--ref <git-ref>] [--candidato <archivo>] [--solo <texto>] [--jobs <n>] [--conservar]
+//                                   [--cobertura <archivo>] [--actualizar-cobertura]`
 //
 // Red de seguridad del compositor de CTA. Compone TODAS las piezas de TODOS los planes con CTA del repo con dos
 // versiones del compositor —la de referencia (`--ref`, HEAD por defecto) y la candidata (`--candidato`, el
@@ -18,6 +19,13 @@
 // qué piezas mueve y cuánto, para aprobarlo mirando — no suponiendo.
 //
 // Sale con código 1 si hay cualquier diferencia. El reporte completo queda en `<tmp>/reporte.json`.
+//
+// Tramo 5 de la certificación (auditoría 2026-09-23, hallazgo 13) — la red de seguridad tenía agujeros:
+//   · la referencia corría con las dependencias del árbol de trabajo → ahora se extrae COMPLETA de git (regresion-ref.mjs);
+//   · 0 casos salía en verde → ahora falla;
+//   · las piezas sin plate se saltaban en silencio → se cuentan, y las del manifiesto de cobertura FALLAN si faltan;
+//   · los avisos no se comparaban → ahora un aviso nuevo o perdido es una diferencia;
+//   · una clave nueva sólo informa si es del QA (`qa.…`); en el layout es un cambio a aprobar.
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -27,6 +35,8 @@ import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 
 import sharp from 'sharp'
+
+import { extraerReferencia } from './regresion-ref.mjs'
 
 const run = promisify(execFile)
 const ROOT = fileURLToPath(new URL('../../', import.meta.url))
@@ -45,22 +55,24 @@ const JOBS = Number(opt('--jobs', Math.max(2, Math.min(6, os.cpus().length - 2))
 // Por defecto se borran las carpetas de las piezas IGUALES al terminar: cada corrida completa dejaba ~535 MB en el
 // temporal y diez corridas llevaron el disco al 97 % (2026-09-22). `--conservar` las guarda todas.
 const CONSERVAR = args.includes('--conservar')
+// Manifiesto de cobertura: las piezas que esta red DEBE verificar. Si una falta (plan movido, plate que ya no está), la
+// corrida falla en vez de achicarse en silencio. `--actualizar-cobertura` lo reescribe con lo que hay hoy.
+const COBERTURA = path.resolve(ROOT, opt('--cobertura', 'scripts/foto/componer-cta.cobertura.json'))
+const ACTUALIZAR_COBERTURA = args.includes('--actualizar-cobertura')
 const TOL_PX = 0.05
 const sha = bytes => createHash('sha256').update(bytes).digest('hex')
 
-// 1 · El compositor de referencia se extrae de git JUNTO al canónico: sus imports relativos y la caché de
-//     máscaras dependen de vivir en scripts/foto/. El archivo es temporal y está en .gitignore.
+// 1 · La referencia se extrae de git COMPLETA —el compositor y todas sus dependencias locales, como estaban en REF—,
+//     cada archivo junto a su original con nombre `.ref-<sha>-<pid>--<nombre>` (regresion-ref.mjs). Única por PROCESO:
+//     dos regresiones en paralelo no se pisan. Los archivos son temporales y están en .gitignore.
 const refSha = execFileSync('git', ['rev-parse', '--short', REF], { cwd: ROOT, encoding: 'utf8' }).trim()
-// Único por PROCESO: dos regresiones en paralelo contra la misma versión escribían y borraban el MISMO archivo, y la
-// que terminaba primero dejaba a la otra componiendo contra un archivo que ya no existía.
-const REF_FILE = path.join(ROOT, `scripts/foto/.componer-cta@${refSha}-${process.pid}.regresion.mjs`)
+const { entrada: REF_FILE, archivos: REF_ARCHIVOS, dependencias: REF_DEPS } = extraerReferencia({ raiz: ROOT, ref: REF, entrada: 'scripts/foto/componer-cta.mjs', etiqueta: `${refSha}-${process.pid}` })
 
-fs.writeFileSync(REF_FILE, execFileSync('git', ['show', `${REF}:scripts/foto/componer-cta.mjs`], { cwd: ROOT }))
-
-const limpiar = () => fs.rmSync(REF_FILE, { force: true })
+const limpiar = () => { for (const f of REF_ARCHIVOS) fs.rmSync(f, { force: true }) }
 
 process.on('exit', limpiar)
 process.on('SIGINT', () => process.exit(130))
+process.on('SIGTERM', () => process.exit(143))
 
 // 2 · Casos: toda pieza de todo `piezas*.json` bajo ai-generations/ que lleve CTA y cuyo plate exista.
 //     Las piezas idénticas (mismo contenido y mismo plate, p. ej. las copias de reproducción) corren una vez.
@@ -81,6 +93,7 @@ walk(path.join(ROOT, 'ai-generations'))
 const casos = new Map()
 const plateSha = new Map()
 const omitidas = []
+const sinPlate = []
 
 // Un plate que no se puede leer (p. ej. un archivo de iCloud/OneDrive evictado con el disco lleno: ETIMEDOUT) se
 // reintenta y, si sigue fallando, la pieza queda OMITIDA con su causa. Antes tumbaba la corrida entera; y una pieza
@@ -108,7 +121,10 @@ for (const plan of planes.sort()) {
     if (!p?.plate) continue
     const plate = path.resolve(path.dirname(plan), p.plate)
 
-    if (!fs.existsSync(plate)) continue
+    if (!fs.existsSync(plate)) {
+      sinPlate.push(`${rel}#${p.id}`)
+      continue
+    }
 
     if (!plateSha.has(plate)) {
       try {
@@ -127,9 +143,27 @@ for (const plan of planes.sort()) {
   }
 }
 
+// Cero casos NO es un verde: es que la red no encontró qué verificar (un --solo mal escrito, una carpeta movida).
+if (!casos.size) {
+  console.error(`✗ 0 piezas que verificar${SOLO ? ` con --solo «${SOLO}»` : ''}: una regresión vacía no prueba nada.`)
+  process.exit(1)
+}
+
+const presentes = new Set([...casos.values()].flatMap(c => c.planes))
+let faltantes = []
+
+if (ACTUALIZAR_COBERTURA) {
+  fs.writeFileSync(COBERTURA, `${JSON.stringify({ nota: 'Piezas con CTA que la regresión DEBE verificar en esta máquina. Se regenera con --actualizar-cobertura.', generado: new Date().toISOString().slice(0, 10), piezas: [...presentes].sort() }, null, 2)}\n`)
+  console.log(`Cobertura actualizada: ${presentes.size} piezas en ${path.relative(ROOT, COBERTURA)}`)
+} else if (fs.existsSync(COBERTURA) && !SOLO) {
+  faltantes = JSON.parse(fs.readFileSync(COBERTURA, 'utf8')).piezas.filter(k => !presentes.has(k))
+} else if (SOLO && fs.existsSync(COBERTURA) && args.includes('--cobertura')) {
+  faltantes = JSON.parse(fs.readFileSync(COBERTURA, 'utf8')).piezas.filter(k => k.includes(SOLO) && !presentes.has(k))
+}
+
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'foto-regresion-'))
 
-console.log(`Regresión del compositor de CTA — referencia ${REF} (${refSha}) contra ${path.relative(ROOT, CANDIDATO)}`)
+console.log(`Regresión del compositor de CTA — referencia ${REF} (${refSha}, ${REF_DEPS.length} archivos extraídos de git) contra ${path.relative(ROOT, CANDIDATO)}`)
 console.log(`${casos.size} piezas únicas de ${new Set([...casos.values()].flatMap(c => c.planes.map(x => x.split('#')[0]))).size} planes · ${JOBS} en paralelo · ${TMP}`)
 
 // 3 · Componer una pieza sola con un compositor dado, en su propio directorio.
@@ -137,8 +171,12 @@ async function componer(compositor, dir, pieza) {
   fs.mkdirSync(dir, { recursive: true })
   fs.writeFileSync(path.join(dir, 'piezas.json'), JSON.stringify([pieza], null, 2))
 
+  let salida = ''
+
   try {
-    await run(process.execPath, [compositor, path.join(dir, 'piezas.json')], { cwd: ROOT, timeout: 15 * 60e3, maxBuffer: 64e6 })
+    const r = await run(process.execPath, [compositor, path.join(dir, 'piezas.json')], { cwd: ROOT, timeout: 15 * 60e3, maxBuffer: 64e6 })
+
+    salida = `${r.stdout}\n${r.stderr}`
   } catch (e) {
     const texto = String(e.stderr || '') + String(e.message || '')
 
@@ -148,8 +186,12 @@ async function componer(compositor, dir, pieza) {
   const out = path.join(dir, 'out')
   const png = path.join(out, `${pieza.id}.png`)
 
+  // Los avisos del compositor también son comportamiento: uno nuevo o uno perdido es una diferencia (antes no se miraban).
+  const avisos = [...new Set(salida.split('\n').filter(l => l.includes('⚠')).map(l => l.trim().replaceAll(dir, '<dir>')))].sort()
+
   return {
     estado: 'compone',
+    avisos,
     layout: JSON.parse(fs.readFileSync(path.join(out, `${pieza.id}-layout.json`), 'utf8')),
     // El QA es POR PLAN desde 2026-09-23 (`qa-<plan>.json`); una referencia anterior escribe `qa.json`. Las huellas
     // no se comparan: la del comando difiere por construcción y la del PNG ya la juzga la comparación de píxeles.
@@ -215,12 +257,18 @@ async function evaluar(caso) {
   else if (ref.estado === 'aborta') r.tipo = ref.error === cand.error ? 'igual' : 'mensaje'
   else {
     const todas = [...diferencias(ref.layout, cand.layout, 'layout'), ...diferencias(ref.qa, cand.qa, 'qa')]
-    // Una clave que la referencia no tenía es QA NUEVO (el contrato creció), no un cambio de la pieza.
-    const nuevas = todas.filter(x => /: undefined → /.test(x))
+    // Una clave que la referencia no tenía en el QA es QA NUEVO (el contrato creció), no un cambio de la pieza. En el
+    // LAYOUT, en cambio, una clave nueva es un cambio de la maquetación y se aprueba mirando.
+    const nuevas = todas.filter(x => /^qa\..*: undefined → /.test(x))
     const d = todas.filter(x => !nuevas.includes(x))
+    const avisosNuevos = ref.avisos.filter(a => !cand.avisos.includes(a))
+    const avisosPerdidos = cand.avisos.filter(a => !ref.avisos.includes(a))
 
     if (d.length) { r.tipo = 'layout'; r.diferencias = d }
-    else r.tipo = ref.pngSha === cand.pngSha ? (nuevas.length ? 'qa-nuevo' : 'igual') : 'pixeles'
+    else if (ref.pngSha !== cand.pngSha) r.tipo = 'pixeles'
+    else if (avisosNuevos.length || avisosPerdidos.length) r.tipo = 'avisos'
+    else r.tipo = nuevas.length ? 'qa-nuevo' : 'igual'
+    if (avisosNuevos.length || avisosPerdidos.length) r.avisos = { antes: avisosNuevos, ahora: avisosPerdidos }
     if (nuevas.length) r.qaNuevo = nuevas
     if (ref.pngSha !== cand.pngSha) r.pixeles = await pixeles(ref.png, cand.png)
   }
@@ -259,7 +307,7 @@ await pool(resto)
 
 // 5 · Reporte.
 const cuenta = t => resultados.filter(r => r.tipo === t)
-const orden = ['estado', 'layout', 'pixeles', 'mensaje', 'qa-nuevo']
+const orden = ['estado', 'layout', 'pixeles', 'avisos', 'mensaje', 'qa-nuevo']
 
 fs.writeFileSync(path.join(TMP, 'reporte.json'), JSON.stringify({ ref: REF, refSha, candidato: path.relative(ROOT, CANDIDATO), resultados }, null, 2))
 
@@ -278,7 +326,7 @@ for (const t of orden) {
     continue
   }
 
-  console.log(`\n${{ estado: '🔴 Cambia el ESTADO', layout: '🟠 Cambia el LAYOUT o el QA', pixeles: '🟡 Sólo cambian PÍXELES', mensaje: '⚪ Cambia el mensaje de error', 'qa-nuevo': '🔵 El QA suma claves (la pieza no cambia)' }[t]} (${lista.length})`)
+  console.log(`\n${{ estado: '🔴 Cambia el ESTADO', layout: '🟠 Cambia el LAYOUT o el QA', pixeles: '🟡 Sólo cambian PÍXELES', avisos: '🟣 Cambian los AVISOS del compositor', mensaje: '⚪ Cambia el mensaje de error', 'qa-nuevo': '🔵 El QA suma claves (la pieza no cambia)' }[t]} (${lista.length})`)
 
   for (const r of lista) {
     console.log(`  · ${r.id}  [${r.planes[0]}${r.planes.length > 1 ? ` +${r.planes.length - 1}` : ''}]`)
@@ -287,14 +335,18 @@ for (const t of orden) {
     for (const d of (r.diferencias ?? r.qaNuevo ?? []).slice(0, 4)) console.log(`      ${d}`)
     if ((r.diferencias?.length ?? 0) > 4) console.log(`      … y ${r.diferencias.length - 4} más`)
     if (r.pixeles) console.log(`      píxeles: ${JSON.stringify(r.pixeles)}`)
+    for (const a of r.avisos?.antes ?? []) console.log(`      aviso que ya no sale: ${a}`)
+    for (const a of r.avisos?.ahora ?? []) console.log(`      aviso nuevo: ${a}`)
   }
 }
 
 if (omitidas.length) console.log(`\n⛔ Piezas OMITIDAS — no se verificaron, así que la corrida no puede dar verde (${omitidas.length}):\n${omitidas.map(o => `  · ${o}`).join('\n')}`)
+if (faltantes.length) console.log(`\n⛔ Faltan piezas del manifiesto de COBERTURA (${faltantes.length}) — la red se achicó; si fue a propósito, --actualizar-cobertura:\n${faltantes.map(o => `  · ${o}`).join('\n')}`)
+if (sinPlate.length) console.log(`\nℹ️  ${sinPlate.length} pieza(s) con CTA no tienen plate en esta máquina y no se verificaron.`)
 
 // Limpieza: se conservan sólo las piezas con diferencias (son la evidencia a mirar) y el reporte.
 if (!CONSERVAR) for (const r of resultados.filter(x => x.tipo === 'igual' || x.tipo === 'qa-nuevo')) fs.rmSync(r.dir, { recursive: true, force: true })
 
 console.log(`\nReporte: ${path.join(TMP, 'reporte.json')}${CONSERVAR ? '' : ' (se borraron las carpetas de las piezas iguales; --conservar las guarda)'}`)
 // Claves nuevas en el QA no dañan nada: informan, no fallan. Todo lo demás es una diferencia a aprobar mirando.
-process.exitCode = omitidas.length === 0 && resultados.every(r => r.tipo === 'igual' || r.tipo === 'qa-nuevo') ? 0 : 1
+process.exitCode = omitidas.length === 0 && faltantes.length === 0 && resultados.every(r => r.tipo === 'igual' || r.tipo === 'qa-nuevo') ? 0 : 1
