@@ -18,15 +18,16 @@
 
 import 'server-only'
 
-// Deep-import DELIBERADO al módulo puro, no al barrel.
+// Del barrel del composer, SÓLO tipos.
 //
-// El barrel del composer arrastra el motor de render —Playwright, pdf-lib y los catálogos con sus
-// fuentes embebidas— y este archivo lo consume un command que corre en Vercel. Importar de él un
-// VALOR (no un tipo) llevó la función `insights/catalog` a 441 MB y rompió el build de staging,
-// exactamente la misma bug class que el 2026-09-16 obligó a que el catálogo viajara como STRING.
+// El barrel arrastra el motor de render —Playwright, pdf-lib y los catálogos con sus fuentes
+// embebidas— y este archivo lo consume un command que corre en Vercel. Importar de él un VALOR (no
+// un tipo) llevó la función `insights/catalog` a 441 MB y rompió el build de staging (ISSUE-177),
+// la misma bug class que el 2026-09-16 obligó a que el catálogo viajara como STRING.
 //
-// `paginate.ts` no tiene un solo import: su cierre transitivo es él mismo. El deck-mapper, que
-// convive en esta carpeta, sólo importa TIPOS del barrel — y por eso nunca pesó.
+// Los valores del composer que necesita el render (`paginateFlow`) entran por la entrada liviana
+// `@/lib/artifact-composer/pure`, vía `composition-helpers.ts` y `figure-pages.ts`. La regla eslint
+// `greenhouse/no-worker-only-module-in-vercel-code` rechaza un valor del barrel en este archivo.
 import type { CompositionPlanInput, CompositionSlideInput } from '@/lib/artifact-composer'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 

@@ -19,7 +19,7 @@ import 'server-only'
  * mientras su output no esté en `dead_letter`/`cancelled`; nunca produce un segundo asset final.
  */
 
-import { hashResolvedManifest } from '@/lib/artifact-composer/manifest-hash'
+import { hashResolvedManifest } from '@/lib/artifact-composer/pure'
 import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 

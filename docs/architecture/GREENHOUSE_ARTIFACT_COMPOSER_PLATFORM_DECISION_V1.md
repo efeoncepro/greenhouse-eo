@@ -230,6 +230,33 @@ que la extracción sea **near-term, no hipotética**, y agrega una obligación *
   el frame con ella. **NO** se fusionan, **NO** se duplican.
 - **NUNCA** EPIC-028 construye un segundo motor de composición de slots. Si lo necesita, **extrae éste**.
 
+> **Delta 2026-09-22 (ISSUE-177) — el motor tiene DOS entradas públicas, no una.** "Cero deep-imports"
+> sigue vigente, pero un solo barrel no alcanzaba: re-exporta `render.ts` (Playwright y pdf-lib al tope) y
+> `catalog.ts` (lecturas `node:fs`), así que un import de **valor** desde el barrel en código que corre en
+> Vercel mete el motor entero en la función. Pasó dos veces con la misma función,
+> `api/platform/app/insights/catalog`: 434 MB el 2026-09-16 y 441 MB el 2026-09-22, contra un límite de
+> 250 MB, y ningún gate local lo vio. La mitigación del 2026-09-22 fue un deep-import a `paginate`, que
+> violaba esta misma regla — había cuatro vivos en `src/` (`paginate` ×2 y `manifest-hash` ×2).
+>
+> Desde este delta el paquete declara dos entradas, como dos subpath exports de un `package.json`:
+>
+> | Entrada | Qué trae | Quién la importa con valores |
+> |---|---|---|
+> | `@/lib/artifact-composer` (barrel) | el motor completo: selector, catálogos, render en Chromium, pdf-lib, quality gates | `services/artifact-worker`, `scripts/**`, tests. Desde `src/**`, **sólo tipos** |
+> | `@/lib/artifact-composer/pure` | paginación, geometría de gráficos, figura de barras, hash del manifest y tipos | cualquier código, incluido el que corre en Vercel (encolar, mapear, sellar) |
+>
+> `pure` **no es un deep-import**: es API pública y el día que EPIC-027 extraiga el paquete será su
+> `exports["./pure"]`. Su contrato —nunca re-exportar nada cuyo cierre alcance Playwright, pdf-lib,
+> `pngjs`, `node:fs`, `catalogs/**` o `brand-packs/**`— lo mide
+> `src/lib/artifact-composer/__tests__/pure-entry-boundary.test.ts` sobre el grafo real con esbuild (con
+> control positivo: el barrel sí alcanza Playwright). En `src/**` lo hace cumplir la regla eslint
+> **`greenhouse/no-worker-only-module-in-vercel-code`** (`error` desde commit-1): valor del barrel,
+> `export … from`, `import()` o `require()` del barrel → error; cualquier deep-import al motor, alias o
+> relativo, **incluso de tipos** → error; `playwright`/`pdf-lib`/`puppeteer`/`@sparticuz/chromium` como
+> valor → error. Quedan exentos el propio motor, los tests y todo lo que vive fuera de `src/`. La regla no
+> ve la otra causa de ISSUE-177 (un `node:fs` con rutas dinámicas que Turbopack traza entero): eso es del
+> gate de tamaño trazado.
+
 **Task:** `TASK-1393` (extracción + catálogos + brand pack), predecesora de TASK-1391.
 
 ---
@@ -488,6 +515,9 @@ Composer es el candidato natural a `domain-package` el día que EPIC-027 lo auto
   explícito, no la ausencia de dato). **NUNCA** gatees esta capability por rol: va por **entitlement
   per-ORG** — un rol no se factura, un módulo sí.
 - **NUNCA** un catálogo consume assets de otro dominio (social ⇄ propuestas). El scope se declara.
+- **NUNCA** `src/**` importa un **valor** del barrel del motor ni hace un deep-import (ni de tipos): tipos
+  desde el barrel, valores livianos desde `@/lib/artifact-composer/pure`, y el render en
+  `services/artifact-worker`. Lo rompe `greenhouse/no-worker-only-module-in-vercel-code`. *(Delta 2026-09-22 — §6)*
 - **NUNCA** llames `TechnicalProposal` al aggregate (nombra una de sus tres partes).
 - **NUNCA** agregues un `kind` que duplique `origin`.
 - **NUNCA** el Proposal calcula precio (eso es `quote-to-cash` sobre loaded cost). **NUNCA** un GO sin

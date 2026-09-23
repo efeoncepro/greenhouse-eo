@@ -19,6 +19,7 @@
 //   - no-inline-ftr-calculation                     (TASK-909) — prohibe recomputar el veredicto FTR inline; usar helper canonical calculateFtr
 //   - no-dynamic-app-react-apexcharts               — ApexCharts wrapper owns the only ssr:false dynamic boundary
 //   - growth-substrate-boundary                     (TASK-1697) — probes/** privado del dominio AEO; site-substrate no importa growth/*
+//   - no-worker-only-module-in-vercel-code          (ISSUE-177) — src/** no importa valores del motor de composición ni paquetes de navegador/PDF (función de Vercel >250 MB)
 
 import noRawTableWithoutShell from './rules/no-raw-table-without-shell.mjs'
 import noHardcodedFontfamily from './rules/no-hardcoded-fontfamily.mjs'
@@ -46,11 +47,12 @@ import noDirectMuiElevationInPrimitives from './rules/no-direct-mui-elevation-in
 import noDynamicAppReactApexCharts from './rules/no-dynamic-app-react-apexcharts.mjs'
 import noDirectKnowledgeChunkQuery from './rules/no-direct-knowledge-chunk-query.mjs'
 import noAdHocLayoutMorph from './rules/no-ad-hoc-layout-morph.mjs'
+import noWorkerOnlyModuleInVercelCode from './rules/no-worker-only-module-in-vercel-code.mjs'
 
 const plugin = {
   meta: {
     name: 'eslint-plugin-greenhouse',
-    version: '1.15.0'
+    version: '1.16.0'
   },
   rules: {
     'growth-substrate-boundary': growthSubstrateBoundary,
@@ -78,7 +80,8 @@ const plugin = {
     'no-direct-mui-elevation-in-primitives': noDirectMuiElevationInPrimitives,
     'no-dynamic-app-react-apexcharts': noDynamicAppReactApexCharts,
     'no-direct-knowledge-chunk-query': noDirectKnowledgeChunkQuery,
-    'no-ad-hoc-layout-morph': noAdHocLayoutMorph
+    'no-ad-hoc-layout-morph': noAdHocLayoutMorph,
+    'no-worker-only-module-in-vercel-code': noWorkerOnlyModuleInVercelCode
   }
 }
 

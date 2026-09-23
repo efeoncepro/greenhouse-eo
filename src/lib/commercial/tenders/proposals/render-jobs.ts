@@ -139,7 +139,7 @@ const mapJobRow = (row: Record<string, unknown>): ProposalRenderJobRecord => ({
 
 // TASK-1846 — el hash canónico se movió VERBATIM al composer (domain-free) y se re-exporta acá
 // para que ningún consumer histórico cambie: Proposal sigue produciendo los mismos hashes.
-import { hashResolvedManifest } from '@/lib/artifact-composer/manifest-hash'
+import { hashResolvedManifest } from '@/lib/artifact-composer/pure'
 
 export { hashResolvedManifest }
 

@@ -4,7 +4,7 @@
  * en qué slot de su plantilla cae cada pieza.
  */
 
-import { paginateFlow, type FlowBlock } from '@/lib/artifact-composer/paginate'
+import { paginateFlow, type FlowBlock } from '@/lib/artifact-composer/pure'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 import { InsightsRenderRejectedError } from '../errors'

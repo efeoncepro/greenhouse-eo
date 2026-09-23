@@ -17,7 +17,7 @@
  *   en los límites. Una figura con menos de dos barras no se emite: el capítulo se narra.
  */
 
-import { paginateFlow, type FlowBlock } from '@/lib/artifact-composer/paginate'
+import { paginateFlow, type FlowBlock } from '@/lib/artifact-composer/pure'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 import type { ChartSpecV1 } from '../contracts/chart-spec'
