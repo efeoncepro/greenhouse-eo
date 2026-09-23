@@ -11,7 +11,7 @@ import { execFileSync, spawnSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 
-import { COMPOSITOR, REPO, dentroDelRepo, estable, huellaComando, huellaPieza, marcaDeSuite, rutaQa, rutaReal, sha } from './cta-integridad.mjs'
+import { CANON_ANTERIOR, CANON_VIGENTE, COMPOSITOR, REPO, canonDe, dentroDelRepo, estable, huellaComando, huellaPieza, marcaDeSuite, rutaQa, rutaReal, sha } from './cta-integridad.mjs'
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
 import { copiaEnEscena } from './accesibilidad.mjs'
 
@@ -603,7 +603,6 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   // grosor es un valor del contrato AXIS, y cambiarlo es decisión del operador.
   if (a.corchetes && (a.corchetes.grosorCssPx < 1 || (a.corchetes.wcag != null && a.corchetes.wcag < a.corchetes.umbralWcag))) console.warn(`⚠ ${r.id}: los corchetes del CTA miden ${a.corchetes.grosorCssPx} CSS px en el teléfono y ${a.corchetes.wcag ?? '—'}:1 contra la escena (piso: 1 CSS px y ${a.corchetes.umbralWcag}:1).`)
   // Lo que pasa «por poco» o gracias a una ayuda se MUESTRA (tramo 7): son decisiones de diseño que alguien mira.
-  if (a.rescate) console.warn(`⚠ ${r.id}: ${a.rescate.voces.map(v => `«${v.voz}» ${v.sinVelo}:1 → ${v.conVelo}:1`).join(' · ')} pasa(n) sólo gracias al velo (${a.rescate.por.join(', ')}): la foto se oscurece para leerse.`)
   if (r.ctaVariante?.sinMargen) console.warn(`⚠ ${r.id}: la variante del CTA se eligió SIN margen (${r.ctaVariante.motivo}): pasa por poco; en otra pantalla o con compresión puede no alcanzar.`)
   if (piezas.find(x => x.id === r.id)?.placement) console.warn(`⚠ ${r.id}: declara \`placement\` (${piezas.find(x => x.id === r.id).placement.anchoCssPx} CSS px): sólo puede endurecer la medición; se midió a ${r.anchoPantalla} CSS px.`)
 }
@@ -613,6 +612,15 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
 // de las tres veces. Bloquean, salvo excepción auditada. Las del formato anterior del QA quedan como avisos.
 const FIRMA_MIN_CONTRASTE = 4.5
 const FIRMA_ANCHO_LADO_CORTO = 0.2
+
+// Canon 2026-09-23 (tramo 11; decisiones del operador y auditoría de diseño de la tercera certificación). Calibrado contra
+// las 62 piezas aprobadas únicas de la regresión, que ninguna incumple: firma entre 0,82 y 0,92 del alto; cada voz ≤ 0,44×
+// el titular; descriptor ≤ 0,79× el CTA; padding del botón ≥ 0,6× y 0,35× el cuerpo.
+const FIRMA_ANCHO_HORIZONTAL = 0.25 // lado corto, en 16:9 y demás horizontales
+const FIRMA_ANCHO_MAX = 0.35
+const PISO_FIRMA = 0.75 // la firma arranca en el cuarto inferior
+const TOPE_ROL = 0.6 // ninguna voz pasa de 0,6× el titular
+const AIRE_CTA = { x: 0.5, y: 0.25 } // padding mínimo del botón, en cuerpos del CTA
 
 // Cuánto se sale de su zona lo que se sale (px del lienzo, el peor elemento): la medida que una excepción «zona-segura»
 // tiene que cubrir con `hasta`. Un elemento que el layout no trae no se puede acotar (sin medir).
@@ -648,6 +656,17 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
     continue
   }
 
+  // El CANON de la pieza lo decide el registro de las aprobadas (scripts/foto/canon-anterior.json), recalculado aquí: el QA
+  // no puede declararse de otro canon (tramo 11).
+  const canonPieza = canonDe(p, plateDe(p))
+
+  if (r.canon == null) noCertificable.push(`${r.id}: el QA no registra el canon de la pieza (versión anterior del comando) — recompón`)
+  else if (r.canon !== canonPieza) { console.error(`✗ ${r.id}: el QA dice canon ${r.canon} y la pieza es del canon ${canonPieza} (su huella ${canonPieza === CANON_ANTERIOR ? 'está' : 'no está'} en scripts/foto/canon-anterior.json). Recompón.`); fallos++ }
+
+  const nuevo = canonPieza === CANON_VIGENTE
+  const lienzo = JSON.parse(readFileSync(path.join(dir, 'out', `${r.id}-layout.json`), 'utf8')).canvas
+  const minFirma = nuevo && lienzo.width > lienzo.height * 1.2 ? FIRMA_ANCHO_HORIZONTAL : FIRMA_ANCHO_LADO_CORTO
+
   // Zona segura: la de AXIS como piso (feed 7,5 % × 6 %, story 10 % × 13 %).
   if (!r.zonaSegura) {
     console.error(`✗ ${r.id}: el QA no trae la zona segura verificada (versión anterior del comando). Recompón.`)
@@ -671,7 +690,7 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
     const ancho = r.firma?.anchoLadoCorto
 
     if (typeof c !== 'number') { console.error(`✗ ${r.id}: la firma externa no tiene medición de contraste (versión anterior del comando). Recompón.`); fallos++ } else if (c < FIRMA_MIN_CONTRASTE && bloquea(p, 'firma-contraste', `donde va la firma externa, la mejor tinta mide ${c}:1 (canon: ≥ ${FIRMA_MIN_CONTRASTE}:1)`, { valor: c, sentido: 'min' })) fallos++
-    if (typeof ancho === 'number' && ancho < FIRMA_ANCHO_LADO_CORTO - 0.005 && bloquea(p, 'firma-tamano', `la firma externa mide ${(ancho * 100).toFixed(1)} % del lado corto (canon: ${FIRMA_ANCHO_LADO_CORTO * 100} %)`, { valor: ancho, sentido: 'min' })) fallos++
+    if (typeof ancho === 'number' && ancho < minFirma - 0.005 && bloquea(p, 'firma-tamano', `la firma externa mide ${(ancho * 100).toFixed(1)} % del lado corto (canon: ${minFirma * 100} %)`, { valor: ancho, sentido: 'min' })) fallos++
     if (r.firmaSobreSujeto && bloquea(p, 'firma-sobre-sujeto', `la firma externa cae sobre el sujeto (${r.firmaSobreSujeto} px de su silueta)`, { valor: r.firmaSobreSujeto, sentido: 'max' })) fallos++
   }
 
@@ -696,7 +715,8 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
     }
 
     if (typeof c !== 'number') { console.error(`✗ ${r.id}: la firma no tiene medición de contraste.`); fallos++ } else if (c < FIRMA_MIN_CONTRASTE && bloquea(p, 'firma-contraste', `la firma mide ${c}:1 contra su fondo (canon: ≥ ${FIRMA_MIN_CONTRASTE}:1). Prueba \`logo.y: "auto"\``, { valor: c, sentido: 'min' })) fallos++
-    if (typeof ancho !== 'number') { console.error(`✗ ${r.id}: el QA no trae el tamaño de la firma. Recompón.`); fallos++ } else if (ancho < FIRMA_ANCHO_LADO_CORTO - 0.005 && bloquea(p, 'firma-tamano', `la firma mide ${(ancho * 100).toFixed(1)} % del lado corto (canon: ${FIRMA_ANCHO_LADO_CORTO * 100} %)`, { valor: ancho, sentido: 'min' })) fallos++
+    if (typeof ancho !== 'number') { console.error(`✗ ${r.id}: el QA no trae el tamaño de la firma. Recompón.`); fallos++ } else if (ancho < minFirma - 0.005 && bloquea(p, 'firma-tamano', `la firma mide ${(ancho * 100).toFixed(1)} % del lado corto (canon: ${minFirma * 100} %${minFirma > FIRMA_ANCHO_LADO_CORTO ? ' en los formatos horizontales' : ''})`, { valor: ancho, sentido: 'min' })) fallos++
+    else if (nuevo && ancho > FIRMA_ANCHO_MAX + 0.005 && bloquea(p, 'firma-tamano', `la firma mide ${(ancho * 100).toFixed(1)} % del lado corto (canon: hasta ${FIRMA_ANCHO_MAX * 100} %)`, { valor: ancho, sentido: 'max' })) fallos++
     if (r.firmaSobreSujeto && bloquea(p, 'firma-sobre-sujeto', `la firma queda sobre el sujeto (${r.firmaSobreSujeto} px de su silueta)`, { valor: r.firmaSobreSujeto, sentido: 'max' })) fallos++
   }
 
@@ -730,6 +750,54 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
     const aire = L.ctaMarco.top - arriba
 
     if (Number.isFinite(aire) && aire < 0.5 * (L.typography?.cta ?? 0)) console.warn(`⚠ ${r.id}: sobre los corchetes del CTA quedan ${Math.round(aire)} px de aire (piso: media altura del CTA).`)
+  }
+
+  // ── CANON 2026-09-23 (tramo 11): sólo las piezas NUEVAS. Las aprobadas siguen con las reglas de arriba. ──────────────
+  if (nuevo) {
+    const elems = L.maquetacion?.elementos ?? []
+    const { width: cw, height: ch } = L.canvas
+    const contenidoAbajo = Math.max(...elems.filter(e => e.tipo !== 'firma' && e.tipo !== 'acento').map(e => e.box.bottom))
+    const firmaEl = elems.find(e => e.id === 'logo' || e.id === 'firma-externa')
+
+    // Firma en el pie: debajo de todo el contenido, en el cuarto inferior y fuera de las zonas `protect` (auditoría de
+    // diseño, hallazgo 4: como cabecera, a media pieza o sobre un objeto protegido, el gate daba 0).
+    if (firmaEl) {
+      const b = firmaEl.box
+
+      const razones = [
+        b.top < contenidoAbajo - 0.5 && `queda por encima del final del contenido (arranca en ${Math.round(b.top)} px; el contenido termina en ${Math.round(contenidoAbajo)} px)`,
+        b.top < ch * PISO_FIRMA - 0.5 && `arranca en el ${Math.round((b.top / ch) * 100)} % del alto (canon: en el cuarto inferior, desde el ${PISO_FIRMA * 100} %)`,
+        ...(p.protect ?? []).filter(z => b.left < z.box[2] * cw && b.right > z.box[0] * cw && b.top < z.box[3] * ch && b.bottom > z.box[1] * ch).map(z => `tapa la zona protegida «${z.reason}»`)
+      ].filter(Boolean)
+
+      if (razones.length && bloquea(p, 'firma-posicion', `la firma ${razones.join(' y ')}`, { valor: +(b.top / ch).toFixed(3), sentido: 'min' })) fallos++
+    }
+
+    // La firma EXTERNA la pone otra herramienta después: el PNG certificado no la lleva (auditoría de diseño, «firma
+    // externa»). En el canon nuevo es una salida aprobada, como la pieza sin firma.
+    if (externa && !salidaAprobada(p, 'firma EXTERNA (el PNG certificado no la lleva: la pone otra herramienta después)', p.firma)) fallos++
+
+    // Orden de lectura (auditoría de diseño, hallazgo 2): entrada → titular → cierre → nota → CTA → descriptor.
+    const orden = ['etiqueta', 'entrada', 'dominante', 'cierre-frase', 'nota', 'cta-boton', 'descriptor'].map(id => [id, elems.find(e => e.id === id)?.box]).filter(([, b]) => b)
+    const fueraDeOrden = orden.slice(1).filter(([, b], i) => b.top < orden[i][1].top - 1).map(([id], i) => `«${id}» arriba de «${orden[i][0]}»`)
+
+    if (fueraDeOrden.length && bloquea(p, 'orden-lectura', `el orden de lectura no es el del canon (entrada → titular → cierre → nota → CTA → descriptor): ${fueraDeOrden.join(' · ')}`)) fallos++
+
+    // Jerarquía por rol, con los tamaños RESUELTOS (auditoría de diseño, hallazgo 3): ninguna voz pasa de 0,6× el
+    // titular y el descriptor es menor que el CTA.
+    const t = L.typography ?? {}
+    const ROLES = ['label', 'lead', 'closure', 'benefit', 'footer', 'cta'].filter(k => typeof t[k] === 'number' && typeof t.dominant === 'number')
+    const sobreTope = ROLES.filter(k => t[k] > t.dominant * TOPE_ROL).map(k => `${NOMBRE_VOZ[k]} ${Math.round(t[k])} px (${(t[k] / t.dominant).toFixed(2)}× el titular)`)
+
+    if (typeof t.descriptor === 'number' && typeof t.cta === 'number' && t.descriptor >= t.cta) sobreTope.push(`descriptor ${Math.round(t.descriptor)} px ≥ CTA ${Math.round(t.cta)} px`)
+    const peorRol = ROLES.length ? Math.max(...ROLES.map(k => t[k] / t.dominant)) : 0
+
+    if (sobreTope.length && bloquea(p, 'jerarquia-rol', `la jerarquía por rol no se sostiene (cada voz ≤ ${TOPE_ROL}× el titular; el descriptor, menor que el CTA): ${sobreTope.join(' · ')}`, { valor: +peorRol.toFixed(2), sentido: 'max' })) fallos++
+
+    // Aire del botón (auditoría de diseño, hallazgo 8): con padding 0 el borde cortaba las letras.
+    const variante = r.ctaVariante?.elegida ?? p.cta.variant
+
+    if (variante !== 'text' && (p.cta.paddingX < p.cta.fontSize * AIRE_CTA.x || p.cta.paddingY < p.cta.fontSize * AIRE_CTA.y) && bloquea(p, 'cta-aire', `el botón tiene poco aire: padding ${p.cta.paddingX} × ${p.cta.paddingY} px para un CTA de ${p.cta.fontSize} px (canon: al menos ${AIRE_CTA.x}× y ${AIRE_CTA.y}× el cuerpo)`)) fallos++
   }
 }
 

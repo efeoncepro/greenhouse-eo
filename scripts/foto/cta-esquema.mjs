@@ -28,7 +28,12 @@ export const REGLAS_EXCEPTUABLES = [
   'concepto-completo',
   'jerarquia',
   'reserva-editorial',
-  'dominante-mayor'
+  'dominante-mayor',
+  // Canon 2026-09-23 (tramo 11): sólo en las piezas nuevas.
+  'firma-posicion',
+  'orden-lectura',
+  'jerarquia-rol',
+  'cta-aire'
 ]
 
 // Límites de las zonas de sujeto ignoradas: cada una ≤ 10 % del lienzo y todas juntas ≤ 15 %. Una zona del tamaño del
@@ -102,7 +107,8 @@ const nota = z
     width: z.number().finite().positive().max(1).optional(),
     x: z.union([fraccion, z.literal('columna')]).optional(),
     y: fraccion.optional(),
-    gapAfterClosure: z.number().finite().optional()
+    // Nunca negativo (tramo 11; auditoría de diseño, hallazgo 2): con −420 la nota subía por encima del titular.
+    gapAfterClosure: z.number().finite().min(0).optional()
   })
   .strict()
 
@@ -228,8 +234,12 @@ export const esquemaPieza = z
     // La altura de una firma externa se declara en `signatureY`, que es lo que lee `firmar.mjs`.
     firma: z.object({ modo: z.enum(['sin-firma', 'externa']), razon, aprobadoPor: aprobado.optional(), plate: shaPlate.optional() }).strict().optional(),
     excepciones: z.array(excepcion).optional(),
-    scrimTop: z.object({ opacity: fraccion, to: fraccion, color: hex.optional() }).strict().optional(),
-    scrimBottom: z.object({ opacity: fraccion, from: fraccion }).strict().optional(),
+    // SIN VELO (decisión del operador, 2026-09-23): el lecho oscuro sale del prompt, nunca de una sombra pintada encima
+    // de la foto. Ninguna pieza aprobada lo usaba.
+    scrimTop: z.any().refine(() => false, 'el velo no se usa: el lecho donde va el texto se genera desde el prompt (`pnpm foto:prompt` con `reservas: ["zona-texto"]`)').optional(),
+    scrimBottom: z.any().refine(() => false, 'el velo no se usa: el lecho donde va la firma o el texto se genera desde el prompt').optional(),
+    // Informativo: el canon lo decide el registro (`canon-anterior.json`), y un plan sólo puede declarar el vigente.
+    canon: z.literal('2026-09-23').optional(),
     hud: z.object({ lit: z.number().int().min(0).max(5), current: z.number().int().min(1).max(5).nullable().optional() }).strict().optional(),
     gesture: z.object({ text: texto, size: positivo, x: fraccion, y: fraccion, color: hex.optional(), rotate: z.number().finite().optional() }).strict().optional(),
     footer: z.object({ text: texto, size: positivo, y: fraccion }).strict().optional(),

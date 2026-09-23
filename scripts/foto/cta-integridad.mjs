@@ -68,6 +68,25 @@ export const estable = v =>
 
 export const huellaPieza = pieza => sha(estable(pieza))
 
+// ── Canon por pieza (tramo 11; decisiones del operador del 2026-09-23) ────────────────────────────────────────────
+// Las piezas APROBADAS al corte siguen con las reglas de entonces (canon 2026-09-22); todo lo demás nace con el canon
+// vigente. Una pieza aprobada se reconoce por su huella —su definición en el plan SIN la ruta del plate, más el sha256
+// del plate—, no por un campo que el plan pueda omitir: así nadie esquiva el canon nuevo, y una pieza aprobada que se
+// edita pasa a ser nueva. El registro es una foto del corte (`canon-anterior.json`): no se regenera.
+export const CANON_ANTERIOR = '2026-09-22'
+export const CANON_VIGENTE = '2026-09-23'
+export const REGISTRO_CANON = 'scripts/foto/canon-anterior.json'
+export const huellaSinPlate = pieza => sha(estable({ ...pieza, plate: undefined }))
+
+const registros = new Map()
+
+// `registro`: otra ruta del registro, sólo para las pruebas unitarias.
+export function canonDe(pieza, plateSha, registro = path.join(REPO, REGISTRO_CANON)) {
+  if (!registros.has(registro)) registros.set(registro, new Set(JSON.parse(fs.readFileSync(registro, 'utf8')).piezas.map(x => `${x.plate}:${x.pieza}`)))
+
+  return registros.get(registro).has(`${plateSha}:${huellaSinPlate(pieza)}`) ? CANON_ANTERIOR : CANON_VIGENTE
+}
+
 // Huella del COMANDO: su código y el de sus dependencias locales, más las versiones de los paquetes que deciden la
 // geometría y el color. Si cambia, la pieza se compuso con otras reglas. El compositor se hashea desde el archivo que
 // CORRE (`compositor`), no desde la ruta canónica: así una copia o un mutante del comando no se hace pasar por él.
@@ -80,6 +99,8 @@ const DEPENDENCIAS = [
   'scripts/foto/cta-integridad.mjs',
   'scripts/foto/cta-invariantes.mjs',
   'scripts/foto/svg-texto.mjs',
+  // El registro del canon decide qué reglas aplica el compositor: si cambia, cambian las piezas (tramo 11).
+  'scripts/foto/canon-anterior.json',
   'scripts/creative/layout-compiler/axis-advertising.mjs',
   'scripts/creative/layout-compiler/compiler.mjs',
   'scripts/creative/layout-compiler/contract.mjs'

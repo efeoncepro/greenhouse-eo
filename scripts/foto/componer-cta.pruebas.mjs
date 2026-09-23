@@ -77,15 +77,16 @@ const pieza = k => {
   return { ...structuredClone(p), plate: path.resolve(path.dirname(plan), p.plate) }
 }
 
-// La misma pieza, ajustada al canon del tramo 4: zona segura de AXIS, CTA en la columna y firma de 20 % del lado corto
-// en una Y que se lea (`logo.y: "auto"`). Es lo que un plan nuevo declara para pasar el gate.
+// La misma pieza, ajustada al canon: zona segura de AXIS, CTA en la columna y firma de 20 % del lado corto (25 % en los
+// horizontales, canon 2026-09-23) en una Y que se lea (`logo.y: "auto"`). Es lo que un plan nuevo declara para pasar el
+// gate. Al cambiar, la pieza deja de ser la aprobada: se juzga con el canon vigente.
 const canon = k => {
   const p = pieza(k)
 
   p.safeArea = 'axis'
   p.cta.x = 'columna'
   if (p.note) p.note.x = 'columna'
-  p.logo = { ...(p.logo ?? {}), width: 0.2, x: 0.5, y: 'auto' }
+  p.logo = { ...(p.logo ?? {}), width: /169$/.test(k) ? 0.25 : 0.2, x: 0.5, y: 'auto' }
 
   return p
 }
@@ -480,6 +481,7 @@ const PRUEBAS = [
       // Tramo 9: la firma automática respeta las zonas `protect` (la primera versión las leía con otra forma y las
       // ignoraba). Se protege el lugar donde cayó la firma en la pieza canónica: tiene que ir a otra Y.
       let respetaProtect = false
+      let cuartoInferior = false
       let detalleProtect = 'sin la pieza canónica'
 
       if (enCanon.ok) {
@@ -499,7 +501,11 @@ const PRUEBAS = [
             const nuevo = Lp.maquetacion.elementos.find(e => e.id === 'logo')?.box
             const [x0, y0, x1, y1] = zona.map((v, i) => v * (i % 2 ? Lp.canvas.height : Lp.canvas.width))
 
-            respetaProtect = Boolean(nuevo) && rp.qa[0].firma?.encontrada === true && !(nuevo.left < x1 && nuevo.right > x0 && nuevo.top < y1 && nuevo.bottom > y0)
+            // Tramo 11: con el pie protegido y el sujeto ocupando el resto del cuarto inferior, en el canon nuevo la firma puede
+            // no encontrar lugar (y el gate la bloquea al pie); lo que no puede es tapar la zona protegida ni subir.
+            respetaProtect = Boolean(nuevo) && !(nuevo.left < x1 && nuevo.right > x0 && nuevo.top < y1 && nuevo.bottom > y0)
+            // Tramo 11: en el canon nuevo la búsqueda sólo recorre el cuarto inferior (antes subía a media pieza).
+            cuartoInferior = Boolean(nuevo) && nuevo.top >= 0.75 * Lp.canvas.height - 0.5
             detalleProtect = `firma en ${nuevo ? Math.round(nuevo.top) : '—'} px, zona protegida ${Math.round(y0)}–${Math.round(y1)} px`
           } else detalleProtect = rp.error
         }
@@ -524,11 +530,16 @@ const PRUEBAS = [
 
       // Tramo 7: una excepción «reserva-editorial» cambia el veredicto del gate, nunca cuánto crece la pieza (antes crecía
       // ×1,251 en vez de ×1,236). Oráculo: la misma escala con y sin la excepción.
+      // Tramo 11: las dos en el canon vigente (declararlo cambia la huella) para que la ÚNICA diferencia sea la excepción.
+      const v03Nueva = pieza('v03_fue')
       const v03Exc = pieza('v03_fue')
 
+      v03Nueva.canon = '2026-09-23'
+      v03Exc.canon = '2026-09-23'
+
       v03Exc.excepciones = [{ regla: 'reserva-editorial', razon: 'prueba: la reserva se revisa aparte', aprobadoPor: 'suite-pruebas', plate: sha(fs.readFileSync(v03Exc.plate)), hasta: 5000 }]
-      const conExc = await componer('P06-reserva-excepcion', [v03Exc])
-      const reservaSinEfecto = conExc.ok && v03.ok && conExc.qa[0].escala === v03.qa[0].escala
+      const [conExc, sinExc] = await Promise.all([componer('P06-reserva-excepcion', [v03Exc]), componer('P06-reserva-sin-excepcion', [v03Nueva])])
+      const reservaSinEfecto = conExc.ok && sinExc.ok && conExc.qa[0].escala === sinExc.qa[0].escala
       const protegeZona = !tapaZona.ok && /zona protegida/.test(tapaZona.error)
       const firmaRechazada = !firmaSobre.ok && /choca con «logo»|«logo» choca/.test(firmaSobre.error)
       const externaRechazada = !externaSobre.ok && /choca con «firma-externa»|«firma-externa» choca/.test(externaSobre.error)
@@ -547,6 +558,22 @@ const PRUEBAS = [
       }
 
       const choqueRechazado = !choca.ok && /tapa «nota»/.test(choca.error)
+      // Tramo 11 (canon 2026-09-23): una pieza NUEVA sin `safeArea` usa la zona de AXIS; el 16:9 nuevo crece con esa zona
+      // (el marco del CTA que no se pinta ya no lo frena).
+      const sinZona = canon('b2_916')
+
+      delete sinZona.safeArea
+      const [rSinZona, rCrece] = await Promise.all([componer('P06-zona-por-defecto', [sinZona]), componer('P06-crece-169', [canon('mo1_169')])])
+      let zonaPorDefecto = false
+
+      if (rSinZona.ok) {
+        const Lz = leer(rSinZona.dir, 'b2-primero-el-numero-916-layout.json')
+        const z = rSinZona.qa[0].zonaSegura
+
+        zonaPorDefecto = rSinZona.qa[0].canon === '2026-09-23' && Lz.elements.filter(e => TEXTO.has(e.id)).every(e => e.box.left >= z.x0 * Lz.canvas.width - 0.5 && e.box.top >= z.y0 * Lz.canvas.height - 0.5)
+      }
+
+      const creceConZona = rCrece.ok && rCrece.qa[0].escala > 1.2
       // Tramo 10: una selección sobre un OBJETO de la foto no tapa ninguna voz —ni con el marco, ni con el cursor o la
       // etiqueta— (auditorías de arquitectura y de diseño, hallazgo 1: las manijas cruzaban el titular con el gate en 0).
       const sobreObjeto = canon('b2_916')
@@ -563,7 +590,7 @@ const PRUEBAS = [
         margen = Math.min(...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.left)) >= izquierda.safeArea.x0 * L.canvas.width - 0.5
       }
 
-      return { ok: objetoRechazado && dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva && zonaAxis && enColumna && firmaAuto && zonaFrena && externaRechazada && respetaArriba && firmaEnBanda && reservaSinEfecto && respetaProtect, detalle: `selección sobre un objeto que tapa el texto rechazada: ${objetoRechazado}${objetoRechazado ? '' : ` (${objeto.error ?? 'compuso'})`} · la firma automática respeta las zonas protect: ${respetaProtect} (${detalleProtect}) · crecer no usa la excepción de la reserva: ${reservaSinEfecto}${conExc.ok ? '' : ` (${conExc.error})`} · la firma automática nunca sube por encima del contenido (KV-06-169): ${firmaEnBanda} (${detalleBanda}) · con "axis" el texto arranca dentro de la zona por arriba: ${respetaArriba}${arriba.ok ? '' : ` (${arriba.error})`} · firma externa sobre el texto rechazada: ${externaRechazada} · crecimiento frenado por la zona declarada: ${zonaFrena} (${detalleZona}) · zona de AXIS con safeArea "axis": ${zonaAxis}${enCanon.ok ? '' : ` (${enCanon.error})`} · CTA y descriptor en la columna: ${enColumna} · firma automática 20 % legible dentro de la zona: ${firmaAuto} · ${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
+      return { ok: zonaPorDefecto && creceConZona && cuartoInferior && objetoRechazado && dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva && zonaAxis && enColumna && firmaAuto && zonaFrena && externaRechazada && respetaArriba && firmaEnBanda && reservaSinEfecto && respetaProtect, detalle: `zona AXIS por defecto en una pieza nueva: ${zonaPorDefecto}${rSinZona.ok ? '' : ` (${rSinZona.error})`} · el 16:9 nuevo crece con la zona AXIS: ${creceConZona} (×${rCrece.ok ? rCrece.qa[0].escala : rCrece.error}) · la firma automática del canon nuevo queda en el cuarto inferior: ${cuartoInferior} · selección sobre un objeto que tapa el texto rechazada: ${objetoRechazado}${objetoRechazado ? '' : ` (${objeto.error ?? 'compuso'})`} · la firma automática respeta las zonas protect: ${respetaProtect} (${detalleProtect}) · crecer no usa la excepción de la reserva: ${reservaSinEfecto}${conExc.ok ? '' : ` (${conExc.error})`} · la firma automática nunca sube por encima del contenido (KV-06-169): ${firmaEnBanda} (${detalleBanda}) · con "axis" el texto arranca dentro de la zona por arriba: ${respetaArriba}${arriba.ok ? '' : ` (${arriba.error})`} · firma externa sobre el texto rechazada: ${externaRechazada} · crecimiento frenado por la zona declarada: ${zonaFrena} (${detalleZona}) · zona de AXIS con safeArea "axis": ${zonaAxis}${enCanon.ok ? '' : ` (${enCanon.error})`} · CTA y descriptor en la columna: ${enColumna} · firma automática 20 % legible dentro de la zona: ${firmaAuto} · ${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
     }
   },
   {
@@ -637,6 +664,7 @@ const PRUEBAS = [
       const escala = base()
       const lejano = base()
       const firmaFuera = base()
+      const conVelo = base()
 
       // En `cta.text` (Poppins, que no tiene U+202F): la entrada de p1 va en Bricolage, que sí lo tiene y lo dibuja bien.
       espacioFino.cta.text = 'Hablemos\u202Fya'
@@ -650,6 +678,7 @@ const PRUEBAS = [
       delete firmaFuera.logo
       firmaFuera.firma = { modo: 'externa', razon: 'prueba: la firma la pone firmar.mjs' }
       firmaFuera.signatureY = 0.995
+      conVelo.scrimTop = { opacity: 0.8, to: 0.42, color: '#050818' }
 
       const casos = [
         ['falta cta.fontSize', [sinFont], [], /falta `cta\.fontSize`/],
@@ -681,7 +710,8 @@ const PRUEBAS = [
         ['campo interno en la raíz', [interno], [], /`ctaVarianteResuelta`: campo interno del compositor/],
         ['escala del cursor sin techo', [escala], [], /`cta\.cursorScale` debe ser ≤ 2/],
         ['final que se aleja de lo medido', [lejano], [], /reduce demasiado la pieza/],
-        ['firma externa fuera de la imagen', [firmaFuera], [], /firma-externa .* cae fuera de la imagen/]
+        ['firma externa fuera de la imagen', [firmaFuera], [], /firma-externa .* cae fuera de la imagen/],
+        ['velo (el lecho sale del prompt)', [conVelo], [], /`scrimTop`: el velo no se usa/]
       ]
 
       const rs = await Promise.all(casos.map(([, piezas, ids], i) => componer(`P07-${i}`, piezas, ids)))
@@ -1184,11 +1214,6 @@ const PRUEBAS = [
       for (const k of ['fontSize', 'descriptorSize', 'paddingX', 'paddingY', 'radius', 'descriptorGap', 'gapAfterNote']) vieja.cta[k] = px(vieja.cta[k])
       const crecida = await componer('P10-trazo-real', [vieja])
       const gCrecida = crecida.ok ? await gate(crecida.planPath) : { code: -1, salida: crecida.error }
-      // La misma, con un velo que oscurece la parte de arriba: el descriptor pasa sólo gracias a él y el gate lo muestra.
-      const conVelo = structuredClone(vieja)
-
-      conVelo.scrimTop = { opacity: 0.8, to: 0.42, color: '#050818' }
-      const velo = await componer('P10-velo', [conVelo])
       // Tramo 8: el tamaño ENTREGADO es el del plan. Una pieza con `final` más chico que el máster compone y pasa; si el PNG entregado
       // mide otra cosa (se reemplaza por uno del plate, re-firmando su huella) el gate la rechaza.
       const conFinal = canon('b2_916')
@@ -1216,7 +1241,6 @@ const PRUEBAS = [
 
       grande.cta.fontSize = 58
       const ctaGrande = await componer('P10-cta-grande', [grande])
-      const gVelo = velo.ok ? await gate(velo.planPath) : { code: -1, salida: velo.error }
 
       const sinAcento = await componer('P10-sin-acento', [pieza('ref_169')])
       const gSinAcento = await gate(sinAcento.planPath)
@@ -1339,6 +1363,44 @@ const PRUEBAS = [
       const [gHud, gAutoCanon, gCierre, gOtroPlate] = await Promise.all([rHud, rAutoCanon, rCierre, rOtroPlate].map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
       let gAcentoForjado = { code: -1, salida: 'no compuso' }
 
+      // ── Tramo 11 · canon 2026-09-23 (piezas nuevas) ──
+      const c11Nueva = () => canon('b2_916')
+      const c11FirmaArriba = c11Nueva()
+      const c11FirmaGigante = c11Nueva()
+      const c11Desordenada = c11Nueva()
+      const c11RolAlto = c11Nueva()
+      const c11SinAire = c11Nueva()
+      const c11ExternaNueva = c11Nueva()
+      const c11ExternaAprobada = c11Nueva()
+
+      c11FirmaArriba.logo = { width: 0.2, x: 0.5, y: 0.1 }
+      c11FirmaGigante.logo = { width: 0.45, x: 0.5, y: 'auto' }
+      Object.assign(c11Desordenada, { top: 0.3, note: { ...c11Desordenada.note, y: 0.14, gapAfterClosure: undefined } })
+      Object.assign(c11RolAlto, { dominantSize: 60, textGrowth: false })
+      Object.assign(c11SinAire.cta, { paddingX: 0, paddingY: 0 })
+      delete c11ExternaNueva.logo
+      c11ExternaNueva.firma = { modo: 'externa', razon: 'prueba: la firma la pone firmar.mjs' }
+      c11ExternaNueva.signatureY = 0.8
+      delete c11ExternaAprobada.logo
+      c11ExternaAprobada.firma = { modo: 'externa', razon: 'prueba: la firma la pone firmar.mjs', aprobadoPor: 'suite-pruebas', plate: plateB2 }
+      c11ExternaAprobada.signatureY = 0.8
+      const c11CanonNuevo = [['P10-firma-arriba', c11FirmaArriba], ['P10-firma-gigante', c11FirmaGigante], ['P10-c11Desordenada', c11Desordenada], ['P10-rol-alto', c11RolAlto], ['P10-sin-aire', c11SinAire], ['P10-externa-c11Nueva', c11ExternaNueva], ['P10-externa-aprobada', c11ExternaAprobada], ['P10-legado', pieza('fue_916')]]
+      const c11RsCanon = await Promise.all(c11CanonNuevo.map(([n, p]) => componer(n, [p])))
+      const [c11GFirmaArriba, c11GFirmaGigante, c11GDesordenada, c11GRolAlto, c11GSinAire, c11GExternaNueva, c11GExternaAprobada, c11GLegado] = await Promise.all(c11RsCanon.map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
+      const c11RLegadoCanon = c11RsCanon.at(-1)
+      // El QA no puede declararse de otro canon: el gate lo recalcula del registro.
+      let c11GCanonForjado = { code: -1, salida: 'no compuso' }
+
+      if (bueno.ok) {
+        const d = copiarBueno('P10-canon-forjado')
+        const qaF = path.join(d, 'out', 'qa-piezas.json')
+        const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
+
+        q.find(x => x.id === 'b2-primero-el-numero-916').canon = '2026-09-22'
+        fs.writeFileSync(qaF, JSON.stringify(q))
+        c11GCanonForjado = await gate(path.join(d, 'piezas.json'))
+      }
+
       if (rAutoCanon.ok) {
         const qaF = path.join(rAutoCanon.dir, 'out', 'qa-piezas.json')
         const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
@@ -1361,6 +1423,14 @@ const PRUEBAS = [
         'acento verificado sobre la variante resuelta': gAcentoForjado.code === 1 && /no es un acento/.test(gAcentoForjado.salida),
         'rechaza cierre por defecto mayor que el dominante': gCierre.code === 1 && /no es la voz mayor: .*cierre 74 px/.test(gCierre.salida),
         'rechaza aprobación de otro plate': gOtroPlate.code === 1 && /concepto REDUCIDO se aprobó para otro plate/.test(gOtroPlate.salida),
+        'rechaza firma arriba del contenido (canon nuevo)': c11GFirmaArriba.code === 1 && /la firma queda por encima del final del contenido/.test(c11GFirmaArriba.salida),
+        'rechaza firma gigante (canon nuevo)': c11GFirmaGigante.code === 1 && /canon: hasta 35 %/.test(c11GFirmaGigante.salida),
+        'rechaza orden de lectura alterado (canon nuevo)': c11GDesordenada.code === 1 && /el orden de lectura no es el del canon/.test(c11GDesordenada.salida),
+        'rechaza jerarquía por rol (canon nuevo)': c11GRolAlto.code === 1 && /la jerarquía por rol no se sostiene .*CTA 40 px/.test(c11GRolAlto.salida),
+        'rechaza botón sin aire (canon nuevo)': c11GSinAire.code === 1 && /el botón tiene poco aire/.test(c11GSinAire.salida),
+        'firma externa del canon nuevo exige aprobación': c11GExternaNueva.code === 1 && /firma EXTERNA .* sin aprobador del registro/.test(c11GExternaNueva.salida) && /firma EXTERNA .* \(aprobó suite-pruebas\)/.test(c11GExternaAprobada.salida),
+        'la pieza aprobada sigue con su canon': c11RLegadoCanon.ok && c11RLegadoCanon.qa[0].canon === '2026-09-22' && !/firma EXTERNA|orden de lectura|jerarquía por rol/.test(c11GLegado.salida),
+        'rechaza QA con otro canon': c11GCanonForjado.code === 1 && /el QA dice canon 2026-09-22 y la pieza es del canon 2026-09-23/.test(c11GCanonForjado.salida),
         'el QA queda en qa-<plan>.json': qaPorPlan && bueno.ok && fs.existsSync(path.join(bueno.dir, 'out/qa-piezas.json')),
         'rechaza pieza sin firma declarada': gSinFirma.code !== 0 && /no declara firma/.test(gSinFirma.salida),
         'acepta la firma externa declarada y la mide': rExterna.ok && !/no declara firma/.test(gExterna.salida) && typeof rExterna.qa[0].contraste.firmaExterna === 'number',
@@ -1406,7 +1476,6 @@ const PRUEBAS = [
         'el QA del CTA grande se mide con 4,5:1': ctaGrande.ok && ctaGrande.qa[0].accesibilidad.voces.cta.cssPx >= 18.66 && ctaGrande.qa[0].accesibilidad.voces.cta.umbralWcag === 4.5 && (ctaGrande.qa[0].accesibilidad.voces.cta.glifo?.umbralWcag ?? 4.5) === 4.5,
         'rechaza dominante que no es la voz mayor': gDominante.code === 1 && /no es la voz mayor/.test(gDominante.salida),
         'placement no afloja': gEscritorio.code === 1 && /«entrada»/.test(gEscritorio.salida),
-        'muestra la voz que pasa sólo gracias al velo': /sólo gracias al velo/.test(gVelo.salida),
         'el tamaño entregado es el del plan': gFinal.code === 0,
         'rechaza PNG de otro tamaño': gOtroTamano.code === 1 && /mide \d+×\d+ y el plan pide 1080×1920/.test(gOtroTamano.salida),
         'avisa corchetes bajo 1 CSS px': /los corchetes del CTA miden/.test(gSinAcento.salida),

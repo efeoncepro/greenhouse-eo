@@ -33,7 +33,7 @@ import { ORDEN as ORDEN_VARIANTES, elegirVariante } from './cta-variantes.mjs'
 import { validarPiezaEsquema } from './cta-esquema.mjs'
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
 import { desescaparXml } from './svg-texto.mjs'
-import { escribirAtomico, huellaComando, huellaPieza, rutaQa, sha, tomarBloqueo, versionPaquete } from './cta-integridad.mjs'
+import { CANON_VIGENTE, canonDe, escribirAtomico, huellaComando, huellaPieza, rutaQa, sha, tomarBloqueo, versionPaquete } from './cta-integridad.mjs'
 
 // ADAPTACIÓN del compositor de «Nivel de búsqueda» (GTA VI) a FOTOGRAFÍA de marca y multiformato.
 // Original: ai-generations/2026-09-19_nivel-de-busqueda/componer-v2.mjs (jerarquía por voces, richBlock,
@@ -917,12 +917,14 @@ function trazoLogo(rgb, logo, left, top) {
 // tope y encontraba «su» Y por encima del titular (KV-06-169): la firma dejaba de ser firma. Parte del pie histórico y
 // sube; en cada Y exige, con alguna de las dos tintas oficiales, ≥ 4,5:1 en la caja Y en el trazo; no toca al sujeto
 // (con holgura) ni una zona `protect`. Devuelve la Y y la tinta que la cumple, o `y: null` con la banda que recorrió.
-async function buscarYFirma(s, bare, mask, zona, ocupados, protegidas = []) {
+// `techoMinimo` (px): en el canon 2026-09-23 la firma sólo va en el cuarto inferior de la pieza; con el pie ocupado por una
+// zona `protect`, antes quedaba a media pieza, justo bajo el descriptor (auditoría de diseño, N1).
+async function buscarYFirma(s, bare, mask, zona, ocupados, protegidas = [], techoMinimo = 0) {
   const pie = cajaLogo({ ...s, logo: { ...s.logo, y: undefined } })
   const alto = pie.bottom - pie.top
   const holgura = Math.round(Math.min(W, H) * 0.02)
   const paso = Math.max(4, Math.round(H * 0.005))
-  const techo = Math.max(Math.ceil(zona.y0 * H), ...ocupados.map(o => Math.ceil(o.bottom + holgura)))
+  const techo = Math.max(Math.ceil(zona.y0 * H), techoMinimo, ...ocupados.map(o => Math.ceil(o.bottom + holgura)))
   const piso = Math.min(pie.top, Math.floor(zona.y1 * H - alto))
   const banda = [+(techo / H).toFixed(4), +((piso + alto) / H).toFixed(4)]
 
@@ -991,6 +993,11 @@ async function composePiece(s, opts = {}) {
   const meta = await sharp(plate).metadata()
 
   W = meta.width; H = meta.height; M = Math.round(W * 0.07)
+  // CANON 2026-09-23 (tramo 11): en una pieza NUEVA la zona declarada es la de AXIS si el plan no declara otra. Las
+  // aprobadas (registro del canon anterior) componen exactamente como antes.
+  const nuevo = opts.canon === CANON_VIGENTE
+
+  if (nuevo && s.safeArea == null) s.safeArea = 'axis'
   // Ancho en pantalla de referencia: un teléfono (390 CSS px). `placement.anchoCssPx` (con razón) sólo puede ENDURECER:
   // una pantalla más chica achica el texto y exige más; una más grande no afloja nada, porque la misma pieza también
   // se ve en un teléfono. Antes `placement: 1600` bajaba WCAG de 4,5 a 3:1 en todas las voces y adelgazaba el borde,
@@ -1025,18 +1032,6 @@ async function composePiece(s, opts = {}) {
   const INK = DARK ? C.inkOnLight : '#ffffff'
   const SOFT = DARK ? C.mutedOnLight : C.softOnDark
   const INK_L = DARK ? lum(0, 40, 77) : 1
-
-  if (s.scrimTop) {
-    defs += `<linearGradient id="st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.scrimTop.color ?? (DARK ? '#ffffff' : '#050818')}" stop-opacity="${s.scrimTop.opacity}"/><stop offset="1" stop-color="#050818" stop-opacity="0"/></linearGradient>`
-    under += `<rect x="0" y="0" width="${W}" height="${s.scrimTop.to * H}" fill="url(#st)"/>`
-  }
-
-  if (s.scrimBottom) {
-    const y0 = s.scrimBottom.from * H
-
-    defs += `<linearGradient id="sb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#050818" stop-opacity="0"/><stop offset="1" stop-color="#050818" stop-opacity="${s.scrimBottom.opacity}"/></linearGradient>`
-    under += `<rect x="0" y="${y0}" width="${W}" height="${H - y0}" fill="url(#sb)"/>`
-  }
 
   if (s.hud) { const hudEl = hud({ lit: s.hud.lit, current: s.hud.current ?? null });
 
@@ -1446,8 +1441,10 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
   // crecimiento no puede sacar nada de ella; a tamaño original, lo que ya esté afuera se avisa.
   const zona = zonaDeclarada && { left: zonaDeclarada.x0 * W - 0.5, top: zonaDeclarada.y0 * H - 0.5, right: zonaDeclarada.x1 * W + 0.5, bottom: zonaDeclarada.y1 * H + 0.5 }
 
+  // En el canon nuevo, el marco de la selección del CTA que NO se pinta (contorno y relleno sin marco) no frena el
+  // crecimiento: no está en la pieza. Con la zona AXIS por defecto, frenaba el 16:9 en ×1 (medido: ×1,6 sin él).
   const fueraDeZona = zona
-    ? [...checks.filter(c => GUARD_IDS.has(c.id)), ...visibles].filter(({ box }) => box && (box.left < zona.left || box.right > zona.right || box.top < zona.top || box.bottom > zona.bottom)).map(b => b.id)
+    ? [...checks.filter(c => GUARD_IDS.has(c.id)), ...visibles.filter(v => !nuevo || v.id !== 'cta-seleccion' || ctaMarcoPintado)].filter(({ box }) => box && (box.left < zona.left || box.right > zona.right || box.top < zona.top || box.bottom > zona.bottom)).map(b => b.id)
     : []
 
   const resuelta = ctaVariante && ctaVarianteTokens ? { elegida: ctaVariante.elegida, tokens: ctaVarianteTokens, qa: ctaVariante } : null
@@ -1528,7 +1525,7 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
       // `protect` es `[{ box: [x0, y0, x1, y1], reason }]` (fracciones), igual que en la guarda del texto. La primera
       // versión lo leía como `{ x0, … }`: con un plan válido daba NaN y la búsqueda nunca evitaba esas zonas.
       const protect = (s.protect ?? []).map(z => ({ left: z.box[0] * W, top: z.box[1] * H, right: z.box[2] * W, bottom: z.box[3] * H }))
-      const r = await buscarYFirma(s, bare, opts.mask, zonaFirma(s, W, H), ocupados, protect)
+      const r = await buscarYFirma(s, bare, opts.mask, zonaFirma(s, W, H), ocupados, protect, nuevo ? Math.ceil(H * PISO_FIRMA) : 0)
 
       buscada = r.y
       banda = r.banda
@@ -1671,23 +1668,6 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
     accesibilidad.voces[v.id] = m && { ...m, metodo: v.sobreColor ? 'color' : v.limite ? 'limite' : 'pixel' }
   }
 
-  // El VELO (`scrimTop`/`scrimBottom`) oscurece la foto para que el texto se lea. Si una voz pasa SÓLO gracias a él, el
-  // QA lo registra y el gate lo muestra: es una decisión de diseño que alguien mira, no un pase que nadie ve
-  // (auditoría de diseño, N5; tramo 7). Se mide la misma voz sobre la foto sin el velo ni los fondos del plan.
-  if (s.scrimTop || s.scrimBottom) {
-    const { data: sinVeloRgb } = await sharp(await sharp(baseBuf).composite(layers).png().toBuffer()).removeAlpha().raw().toBuffer({ resolveWithObject: true })
-    const rescatadas = []
-
-    for (const v of voces.filter(v => !v.limite && !v.sobreColor)) {
-      const con = accesibilidad.voces[v.id]
-      const sin = medirVoz({ rgb: sinVeloRgb, ancho: W, alto: H, caja: v.box, tinta: hexARgb(v.tinta), cssPx: tamanoEnPantalla(v.px, W, ANCHO), peso: v.peso, lineas: v.lineas, ...(v.pisoTexto ? { umbral: v.pisoTexto } : {}) })
-
-      if (con?.cumpleWcag && sin && !sin.cumpleWcag) rescatadas.push({ voz: v.id, sinVelo: sin.wcag, conVelo: con.wcag })
-    }
-
-    if (rescatadas.length) accesibilidad.rescate = { por: ['scrimTop', 'scrimBottom'].filter(k => s[k]), voces: rescatadas }
-  }
-
   // Una voz que no se pudo medir NO pasa por no tener dato (su caja no tiene píxeles dentro del lienzo). Antes el
   // nulo se filtraba y la voz desaparecía del veredicto en silencio.
   const sinMedir = Object.entries(accesibilidad.voces).filter(([, m]) => !m).map(([id]) => id)
@@ -1758,7 +1738,7 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
   // El texto alternativo entregado también lleva huella (tramo 10; auditorías de arquitectura, hallazgo 8, y de diseño,
   // N11): reemplazarlo por «Imagen decorativa.» daba 0, también con `--reproducir`.
   const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson), alt: sha(`${accesibilidad.altText}\n`) }
-  const registro = { id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
+  const registro = { id: s.id, canon: opts.canon, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
 
   for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
   qa.push(registro)
@@ -1788,6 +1768,9 @@ function registrarQa(registro) {
 // lo que tenía a tamaño original (con techo de exigencia 4,5). Sin máscara no se crece: la ausencia de
 // prueba no es permiso.
 const GROW_CAP = 1.6
+// Canon 2026-09-23: la firma automática sólo se busca en el cuarto inferior de la pieza (las aprobadas la tienen en
+// 0,82–0,92 del alto).
+const PISO_FIRMA = 0.75
 const CONTRAST_FLOOR = 4.5
 const MARGEN_CRECER = 1.1
 
@@ -1811,9 +1794,9 @@ function maskForPiece(mask, s, canvasW, canvasH) {
 }
 
 // Una prueba de tamaño que se sale del lienzo descarta ese factor; cualquier otro error sigue siendo un error.
-async function probar(s, mask, varianteResuelta = null) {
+async function probar(s, mask, extra = {}) {
   try {
-    return await composePiece(s, { dry: true, mask, varianteResuelta })
+    return await composePiece(s, { dry: true, mask, ...extra })
   } catch (e) {
     if (e instanceof LienzoError) return { ok: false, hits: [] }
     throw e
@@ -1862,22 +1845,23 @@ for (let s0 of trabajo) {
   // que el crecimiento lo cambie (medido 2026-09-22: 40 piezas aprobadas cambiarían de tamaño al recomponer).
   // `variant: "auto"` se resuelve UNA vez, a tamaño original, y queda fija mientras el texto crece: si se volviera a
   // decidir en cada prueba de tamaño, el crecimiento compararía contrastes de variantes distintas.
-  let varianteResuelta = null
+  // El canon de la pieza: el de su definición en el PLAN (la de `--variantes` es la base, sin sufijo) y su plate.
+  const extra = { canon: canonDe(SLIDES.find(x => x.id === (VARIANTES ? s0.id.replace(/--(text|outline|solid)$/, '') : s0.id)), plateSha), varianteResuelta: null }
 
   if (s0.cta?.variant === 'auto') {
-    const r = await probar(scaleSpec(s0, 1, pw), mask)
+    const r = await probar(scaleSpec(s0, 1, pw), mask, extra)
 
-    varianteResuelta = r.resuelta ?? null
+    extra.varianteResuelta = r.resuelta ?? null
   }
 
   if (s0.textGrowth !== false && (pw > ph || ph / pw > 1.5) && fill > 1.01) {
     if (mask) {
-      const base = await probar(scaleSpec(s0, 1, pw), mask, varianteResuelta)
+      const base = await probar(scaleSpec(s0, 1, pw), mask, extra)
 
       const ok = async f => {
         if (!base.ok) return false
 
-        const r = await probar(scaleSpec(s0, f, pw), mask, varianteResuelta)
+        const r = await probar(scaleSpec(s0, f, pw), mask, extra)
 
         if (!r.ok) return false
 
@@ -1913,7 +1897,7 @@ for (let s0 of trabajo) {
     }
   }
 
-  await composePiece(scaleSpec(s0, factor, pw), { mask, factor, plateSha, huellaPieza: huellaBase, varianteResuelta })
+  await composePiece(scaleSpec(s0, factor, pw), { mask, factor, plateSha, huellaPieza: huellaBase, ...extra })
 }
 
 // Hoja comparativa: las tres variantes a 390 px con lo que dice la medición de cada una.

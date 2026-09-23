@@ -254,24 +254,30 @@ qué hace y por qué, en simple: [documentación funcional](../../../docs/docume
 **Checklist de un plan nuevo que tiene que pasar el gate.** Parte de la plantilla de §19.4 del contrato —una pieza que
 la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no armes el plan de cero.
 
+0. **Canon 2026-09-23.** Una pieza nueva —o una aprobada que editas— se juzga con el canon vigente; las aprobadas al
+   corte (registro `scripts/foto/canon-anterior.json`, por la huella de su plate y su definición) siguen con las reglas
+   de antes. No se elige: el gate lo recalcula del registro. Lo que agrega el canon nuevo va marcado abajo con «nuevo».
 1. **Zona segura de AXIS:** `safeArea: "axis"` (feed —4:5, 1:1 y 16:9—: 7,5 % a los lados y 6 % arriba y abajo; story
-   —9:16—: 10 % y 13 %). Es el piso: el texto arranca dentro, también por arriba, y una zona `{ x0, y0, x1, y1 }`
-   declarada sólo la estrecha.
+   —9:16—: 10 % y 13 %); en una pieza nueva es el valor por defecto. Es el piso: el texto arranca dentro, también por
+   arriba, y una zona `{ x0, y0, x1, y1 }` declarada sólo la estrecha.
 2. **Columna:** `align: "left"` con `cta.x: "columna"` (y `note.x: "columna"` si hay nota), para que botón, nota y
    descriptor arranquen en la columna del texto. «columna» existe sólo con alineación a la izquierda: con
    `align: "center"` el plan se rechaza, y el CTA de un bloque centrado lleva una fracción o `cta.align: "center"`.
 3. **Concepto y jerarquía:** `lead` (entrada), `dominant` y `after` (cierre); sin entrada o sin cierre, sólo con
    `conceptoReducido` aprobado. El dominante mide ≥ 3× la entrada **y es la voz mayor**: ninguna otra —entrada, cierre,
    nota, CTA, descriptor— mide más que él. Declara `leadSize` y `afterSize` (sin ellos salen a 70 y 74 px) y, como el
-   compositor achica el dominante cuando no cabe en `dominantMax`, lee `ratioDominanteEntrada` en el QA.
+   compositor achica el dominante cuando no cabe en `dominantMax`, lee `ratioDominanteEntrada` en el QA. **Nuevo:**
+   ninguna voz pasa de 0,6× el titular y el descriptor es menor que el CTA (`jerarquia-rol`), y el orden de lectura es
+   entrada → titular → cierre → nota → CTA → descriptor (`orden-lectura`; `note.gapAfterClosure` nunca negativo).
 4. **Firma declarada siempre**, de una de tres formas:
-   - `logo: { width: 0.2, x: 0.5, y: "auto" }`, la recomendada (la tinta, blanca o navy, la elige la medición salvo que
-     fijes `variant`). `width` es fracción del lado corto. `y: "auto"` busca sólo en la **banda del pie**, debajo de
+   - `logo: { width: 0.2, x: 0.5, y: "auto" }`, la recomendada (`width: 0.25` en un formato horizontal nuevo; la tinta,
+     blanca o navy, la elige la medición salvo que fijes `variant`). `width` es fracción del lado corto. `y: "auto"` busca sólo en la **banda del pie**, debajo de
      todo lo compuesto, una Y con ≥ 4,5:1 en la caja y en el trazo del logo, lejos del sujeto; si no la encuentra lo
      avisa, la firma queda al pie y el gate la mide: abre la banda (acorta o sube el texto), fija `logo.y` o cambia el
-     plate. Un `logo.y` numérico es el **borde superior**, y con él el gate no verifica que la firma quede debajo del
-     contenido: eso lo cuidas tú. La búsqueda esquiva las zonas `protect`
-     (`[{ box, reason }]`), igual que el texto.
+     plate. Un `logo.y` numérico es el **borde superior**. La búsqueda esquiva las zonas `protect`
+     (`[{ box, reason }]`), igual que el texto. **Nuevo:** la firma —automática o fija— va debajo de todo el contenido,
+     en el cuarto inferior (desde el 75 % del alto) y fuera de `protect` (`firma-posicion`); la búsqueda automática sólo
+     recorre ese cuarto y, si no hay lugar, no sube: avisa, y el gate la bloquea al pie.
    - `firma: { modo: "externa", razon }` si otra herramienta firma después (v03–v07: `firmar.mjs` →
      `firma-placement.mjs`). El compositor no la dibuja: reserva su caja (20 % del lado corto, centrada) y mide su
      contraste como esa herramienta. **Declara su centro vertical dentro de la zona de AXIS** (la Y máxima por formato
@@ -281,15 +287,17 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
      que ser la firma que se dibuja. `signatureY` sin `firma` también declara firma externa; `signatureSafeArea` (`{ x0, y0, x1, y1 }`)
      sólo estrecha la zona de la firma. **Certifica antes de firmar:** `firmar.mjs` reescribe `out/<id>.png` y desde
      ahí ni el gate ni `--reproducir` lo reconocen. Guarda la salida y el código del gate antes de firmar.
-   - `firma: { modo: "sin-firma", razon, aprobadoPor }`, sólo con aprobador del registro.
+     **Nuevo:** en una pieza nueva la firma externa es una salida aprobada (`aprobadoPor` y `plate`), porque el PNG que
+     certifica el gate no la lleva: prefiere `logo`.
+   - `firma: { modo: "sin-firma", razon, aprobadoPor, plate }`, sólo con aprobador del registro.
 
    Con logo o con firma externa el canon es el mismo: ≥ 20 % del lado corto, ≥ 4,5:1, fuera del sujeto y dentro de la
-   zona de AXIS.
-   **[pendiente]** En 16:9 ese 20 % deja la firma en 11 % del ancho (≈ 44 px en un teléfono, contra 78 px en 4:5); la
-   opción recomendada, sin aprobar, es 25 % en horizontales. Hasta que el operador decida, rige el 20 %.
+   zona de AXIS. **Nuevo:** ≥ 25 % del lado corto en los formatos horizontales y ≤ 35 % en todos (`firma-tamano`;
+   decisión del operador, 2026-09-23: en 16:9 el 20 % dejaba la firma en ≈ 44 px en un teléfono).
 5. **CTA:** `variant: "auto"` + `prominencia` (ver arriba) o una variante fija con `cta.variantReason`. El acento es
    obligatorio: `surfaceToken` (contorno y relleno) o `inkToken` (texto) sólo aceptan `accentSurface`, `growthOnDark` o
    `accentInkOnLight`, y omitirlo resuelve lima. Si el acento no alcanza, se regenera el plate: el color no se apaga.
+   **Nuevo:** en contorno y relleno, padding ≥ 0,5× (horizontal) y 0,25× (vertical) el cuerpo del CTA (`cta-aire`).
 6. **`altText`:** describe la escena —quién, qué hace, dónde, con qué luz— sin transcribir el copy (ni entre comillas
    ni en frases de dos palabras o más). El texto de la imagen lo agrega el compositor en `out/<id>.alt.txt` y en el QA,
    en orden de lectura, y **anuncia siempre el rol del CTA** («Llamado a la acción: «…»», nunca «Botón»: en una imagen
@@ -371,8 +379,6 @@ ninguna selección tapa una voz que no sea su destino), el tamaño entregado y l
 las huellas ni una firma automática por encima del contenido.
 
 **Avisos que se miran** (no bloquean, pero tampoco son ruido):
-- **Una voz que pasa sólo gracias al velo** (`scrimTop`/`scrimBottom`), medida sobre la foto sin él. En fotografía de
-  marca Efeonce el velo ya es un DON'T: el gate avisa y la regla la cumples tú, regenerando el plate.
 - **Variante del CTA elegida sin margen:** `auto` no encontró ninguna con margen (×1,1) y dejó la que más separa. Pasa
   por poco y puede no alcanzar en otra pantalla o con compresión: prueba otra tinta, otro acento u otro plate.
 - **Corchetes del CTA de texto bajo 1 CSS px o bajo 3:1:** el trazo de AXIS mide ≈ 0,69 CSS px en un teléfono en todos
@@ -416,12 +422,17 @@ gate la imprime con su razón y quién la aprobó.
 - `placement: { anchoCssPx, razon }` **sólo endurece**: el ancho efectivo es el menor entre 390 CSS px y el declarado.
   Nunca sirve para aflojar una medición.
 
-**Pendientes del operador** (no los decidas tú; si tu pieza depende de uno, pregunta): la firma en 16:9 (arriba); la
-firma externa sin Y, centrada en 0,935 y fuera de la zona de AXIS; el margen por defecto del compositor, 7 %, frente a
-AXIS (mientras tanto, `safeArea: "axis"` en todo plan nuevo); la firma de las tres stories de v07 en la franja que Reels
-tapa (centro en 0,90; la zona de AXIS termina en 0,87); si el velo que rescata una voz se permite o pide aprobación; si
-la variante sin margen pasa a bloqueo; el piso de legibilidad por rol; y el grosor de los corchetes AXIS. Detalle: §18
-del [compositor de CTA](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
+**Sin velo:** `scrimTop` y `scrimBottom` no existen (el esquema los rechaza). El lecho donde va el texto o la firma
+sale del prompt; si la toma no lo trae, se regenera.
+
+**Decidido el 2026-09-23:** canon nuevo sólo hacia adelante (ninguna imagen ya hecha se regenera; unas pocas de prueba,
+sí); firma de 25 % en horizontales; firma dentro de AXIS en las piezas nuevas (en las existentes se sube sólo donde el
+lecho ya cubre la nueva posición); zona AXIS por defecto; sin velo.
+
+**Pendientes del operador** (no los decidas tú; si tu pieza depende de uno, pregunta): si la variante sin margen pasa a
+bloqueo; el piso de legibilidad por rol (en discusión: la única referencia externa es el mínimo de 11 pt de Apple para
+iPhone); y el grosor de los corchetes AXIS. Detalle: §18 del
+[compositor de CTA](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
 
 ## Jerarquía por voces: receta probada en carrusel (2026-09-19)
 

@@ -5,7 +5,7 @@ import path from 'node:path'
 import { spawn } from 'node:child_process'
 import test from 'node:test'
 
-import { MARCA_SUITE, REPO, RUTA_MODULO, dentroDelRepo, marcaDeSuite, tomarBloqueo } from './cta-integridad.mjs'
+import { CANON_ANTERIOR, CANON_VIGENTE, MARCA_SUITE, REPO, RUTA_MODULO, canonDe, dentroDelRepo, huellaSinPlate, marcaDeSuite, tomarBloqueo } from './cta-integridad.mjs'
 
 const carpeta = () => fs.mkdtempSync(path.join(os.tmpdir(), 'foto-bloqueo-'))
 
@@ -118,4 +118,19 @@ test('La marca de la suite vale sólo con el valor que exporta la suite, en la c
     else process.env.FOTO_SUITE_NONCE = antes
     fs.rmSync(dir, { recursive: true, force: true })
   }
+})
+
+test('El canon de una pieza lo decide su huella en el registro, no un campo del plan', () => {
+  const dir = carpeta()
+  const registro = path.join(dir, 'canon-anterior.json')
+  const aprobada = { id: 'kv-01', plate: 'plates/kv.png', dominant: 'Titular', dominantSize: 140, cta: { text: 'Hablemos' } }
+  const plate = 'b'.repeat(64)
+
+  fs.writeFileSync(registro, JSON.stringify({ piezas: [{ id: aprobada.id, plate, pieza: huellaSinPlate(aprobada) }] }))
+  assert.equal(canonDe(aprobada, plate, registro), CANON_ANTERIOR, 'la aprobada sigue con su canon')
+  assert.equal(canonDe({ ...aprobada, plate: '/otra/ruta/kv.png' }, plate, registro), CANON_ANTERIOR, 'la ruta del plate no cuenta: una copia sigue siendo la aprobada')
+  assert.equal(canonDe({ ...aprobada, dominantSize: 150 }, plate, registro), CANON_VIGENTE, 'editada, es una pieza nueva')
+  assert.equal(canonDe(aprobada, 'c'.repeat(64), registro), CANON_VIGENTE, 'con otro plate, es una pieza nueva')
+  assert.equal(canonDe({ ...aprobada, canon: '2026-09-22' }, plate, registro), CANON_VIGENTE, 'declarar el canon anterior no la vuelve aprobada')
+  fs.rmSync(dir, { recursive: true, force: true })
 })

@@ -253,6 +253,18 @@ con `textGrowth: false`. Ninguna excepción hace crecer más una pieza.
 > Detalle técnico: búsqueda del factor al final de [`componer-cta.mjs`](../../../scripts/foto/componer-cta.mjs)
 > (`GROW_CAP = 1.6`, `MARGEN_CRECER = 1.1`); contrato §13, §14 y §18 (tramos 2, 3 y 7).
 
+## Dos cánones: las piezas aprobadas y las nuevas
+
+Desde el 2026-09-23 conviven dos juegos de reglas. Las **132 piezas aprobadas** hasta ese día siguen con las reglas de
+antes y componen exactamente igual: están en un registro (`scripts/foto/canon-anterior.json`) que las reconoce por la
+huella de su foto y de su definición en el plan. **Toda pieza nueva —o una aprobada que se edita— sigue el canon
+2026-09-23**, que agrega: la zona segura de AXIS por defecto, la firma de 25 % en los horizontales y siempre en el
+cuarto inferior, el orden de lectura, la jerarquía por rol y el aire mínimo del botón. Nadie elige el canon: el gate lo
+recalcula del registro. Ninguna imagen ya hecha se regenera por este cambio.
+
+> Detalle técnico: `canonDe` en [`cta-integridad.mjs`](../../../scripts/foto/cta-integridad.mjs); contrato §18
+> (tramo 11).
+
 ## La zona segura
 
 Es el área donde el texto no queda bajo la interfaz de la plataforma (botones, nombre de la cuenta, barra de
@@ -265,9 +277,10 @@ respuesta). Los valores salen del contrato de diseño AXIS:
 
 - **La zona de AXIS es el piso.** El plan puede estrecharla con su propia zona, nunca ampliarla. Texto, CTA, selección
   y firma fuera de ella bloquean el gate, salvo excepción auditada.
-- **El margen por defecto del compositor es 7 %**, menor que el de AXIS. Por eso un plan nuevo declara
-  `safeArea: "axis"`: así el texto arranca dentro de la zona por el costado y también por arriba. Cambiar ese margen
-  por defecto es una decisión pendiente del operador.
+- **En una pieza nueva, la zona de AXIS es la de por defecto**: el texto arranca dentro por el costado y también por
+  arriba sin declararla. Las aprobadas conservan el margen de 7 % con que se hicieron.
+- **El texto crece dentro de la zona:** en una pieza nueva, el marco del CTA que no se pinta ya no frena el crecimiento
+  (el 16:9 pasa de ×1 a ×1,6).
 - **La firma se mide contra su propia franja**: la zona de AXIS estrechada por la franja que el plan declara para la
   firma (`signatureSafeArea`), no contra la zona del texto.
 
@@ -280,13 +293,16 @@ Toda pieza declara cómo se firma. Hay tres modos:
 
 | Modo | Cómo se declara | Quién pone la firma |
 |---|---|---|
-| Logo | `logo: { width: 0.2, x: 0.5, y: "auto" }` | El compositor |
-| Externa | `firma: { modo: "externa", razon }` (o `signatureY`, la forma que usan los planes v05–v07) | Otra herramienta, después del compositor |
-| Sin firma | `firma: { modo: "sin-firma", razon, aprobadoPor }` | Nadie; exige un aprobador del registro |
+| Logo | `logo: { width: 0.2, x: 0.5, y: "auto" }` (`0.25` en un horizontal nuevo) | El compositor |
+| Externa | `firma: { modo: "externa", razon }` (o `signatureY`, la forma que usan los planes v05–v07); en una pieza nueva, con aprobador y plate | Otra herramienta, después del compositor |
+| Sin firma | `firma: { modo: "sin-firma", razon, aprobadoPor, plate }` | Nadie; exige un aprobador del registro |
 
 Reglas del canon, que el gate hace cumplir:
 
-- **Tamaño:** al menos el 20 % del lado corto de la imagen.
+- **Tamaño:** al menos el 20 % del lado corto de la imagen; en una pieza nueva, 25 % en los formatos horizontales y
+  como máximo 35 % en todos.
+- **Lugar** (piezas nuevas): debajo de todo el contenido, en el cuarto inferior de la pieza y fuera de las zonas
+  protegidas.
 - **Contraste:** al menos 4,5:1 contra su fondo. En el logo se mide la caja y también el **trazo** (el 1 % de píxeles
   más débiles del logotipo, igual que en las voces).
 - **Nunca sobre el sujeto.**
@@ -306,7 +322,8 @@ todavía no existe cuando se certifica.
 Lo que se certifica en ese caso es **la pieza sin firma y el lugar donde irá**. Las herramientas de firma de v03–v07
 reemplazan `out/<id>.png` por la versión firmada, así que la certificación se hace antes de firmar.
 
-**Pendiente de decisión — la firma en 16:9.** Medido en una misma campaña, en 16:9 la firma ocupa entre 7,3 % y 7,9 %
+**Decidido el 2026-09-23 — la firma en 16:9:** 25 % del lado corto en las piezas nuevas; las ya hechas no se
+regeneran. El dato que llevó a la decisión: medido en una misma campaña, en 16:9 la firma ocupa entre 7,3 % y 7,9 %
 del ancho del cuadro, contra 20 % en 4:5 y 9:16 (18 % en 1:1). En el feed de un teléfono mide 31 px contra 78 px en el
 4:5: dos veces y media más chica. Hay dos causas. Las piezas 16:9 de CMP-002 y del registro C se hicieron con 13–14 % del
 lado corto, bajo el canon (el gate ya lo bloquea y se corrigen al recomponer). Y aun con el canon, el 20 % del lado corto
@@ -369,8 +386,6 @@ Estos casos no bloquean, pero el gate los muestra para que alguien los mire:
 
 - APCA o daltonismo bajos en voces que no son el CTA.
 - Texto de menos de 9 px CSS en el teléfono. El piso de legibilidad por rol está pendiente de decisión.
-- Una voz que pasa sólo gracias al **velo** (`scrimTop` o `scrimBottom`: la foto se oscurece para que el texto se lea).
-  Se mide sobre la foto sin velo.
 - Una variante del CTA elegida **sin margen**: pasa por poco y puede no alcanzar en otra pantalla o con compresión.
 - Los **corchetes** del CTA de texto: el trazo que dibuja AXIS mide cerca de 0,69 px CSS en un teléfono en todos los
   formatos. Es un valor del contrato AXIS; cambiarlo es decisión del operador.
@@ -584,6 +599,7 @@ los que el gate daba verde sobre una pieza mala. Cada hallazgo se cerró en un t
 | 7 · Umbrales que no se aflojan | `placement` sólo endurece, CTA a 4,5:1 siempre, dominante mayor, excepciones con plate, `hasta` y aprobador registrado |
 | 8 · Entradas y bordes | Rangos, entidades inválidas, ids que difieren en mayúsculas, plate ilegible, columna sólo a la izquierda, texto alternativo, corchetes medidos, tamaño entregado |
 | 9 · Proceso | Bloqueo sin carreras que Ctrl-C suelta, aviso entre planes, suite que limpia sus temporales, veredicto del gate en la regresión, huella con fuentes y logos, mutantes contra una corrida base y canarios |
+| 11 · Canon 2026-09-23 | Registro de las piezas aprobadas; en las nuevas, zona AXIS por defecto, firma de 25 % en horizontales y en el cuarto inferior, orden de lectura, jerarquía por rol, aire del botón y firma externa aprobada; sin velo |
 | 10 · Integridad (tras la tercera certificación) | Selección sobre un objeto dentro de las guardas, zona de la firma validada y firma dentro de la imagen, aprobador de pruebas sólo en la suite, sin estado interno en el plan, HUD/url/pie no certificables, espacios Unicode, huella del texto alternativo y reproducción que compara todo lo entregado, comando ajeno que no certifica, piso de `final`, jerarquía con tamaños resueltos, aprobaciones atadas al plate |
 
 Entre los tramos 5 y 6 se sumaron la medición de la firma externa, el bloqueo de APCA y daltonismo en el CTA y la zona
@@ -600,7 +616,11 @@ Entre los tramos 5 y 6 se sumaron la medición de la firma externa, el bloqueo d
   bloquear, el piso de legibilidad por rol y el grosor de los corchetes de AXIS. El
   [manual](../../manual-de-uso/creative/compositor-piezas-cta.md#decisiones-pendientes-que-te-afectan) las detalla.
 
-**Decisiones ya tomadas (2026-09-23):** APCA y daltonismo bloquean sólo en el CTA; las piezas aprobadas que el canon
+**El velo ya no existe** (2026-09-23): la sombra que se pintaba encima de la foto para que un texto se leyera se
+rechaza al validar el plan. El lugar oscuro donde va el texto o la firma sale del prompt de la foto.
+
+**Decisiones ya tomadas (2026-09-23):** canon nuevo sólo hacia adelante; firma de 25 % en horizontales, abajo y dentro de
+AXIS; zona AXIS por defecto; sin velo; APCA y daltonismo bloquean sólo en el CTA; las piezas aprobadas que el canon
 reprueba se dejan como están y se corrigen al recomponer; los planes v03–v07 declaran su firma externa; el gesto
 manuscrito queda fuera de alcance.
 

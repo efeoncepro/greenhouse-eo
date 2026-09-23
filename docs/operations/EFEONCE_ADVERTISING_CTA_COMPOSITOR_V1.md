@@ -1053,6 +1053,45 @@ idénticos—, y 3 piezas omitidas porque su plate vive en OneDrive y el archivo
 firma en el pie y con tamaño máximo, velo, tamaño mínimo) y el banco de pruebas propio (piezas de prueba versionadas,
 mutantes por aserción, regresión que juzga cada versión con su gate). Después, la cuarta certificación.
 
+### Tramo 11 — canon 2026-09-23, sólo hacia adelante (cerrado salvo el piso de legibilidad)
+
+**Cómo se decide el canon de una pieza.** `scripts/foto/canon-anterior.json` es una foto, al corte del 2026-09-23, de las
+132 piezas con CTA aprobadas: cada una por el sha256 de su plate y la huella de su definición en el plan **sin la ruta
+del plate** (una copia en otra carpeta sigue siendo la aprobada). Esas siguen con las reglas de antes y componen
+exactamente igual; **toda otra pieza —nueva o editada— se juzga con el canon vigente**. No depende de un campo que el
+plan pueda omitir: `canon` en el plan es sólo informativo y únicamente acepta `"2026-09-23"`. El compositor registra el
+canon en el QA y el gate lo recalcula del registro; si no calza, falla. El registro no se regenera: agregarle piezas es
+decisión del operador, con commit. Entra en la huella del comando.
+
+**Lo que cambia en una pieza nueva:**
+
+| Regla | Qué pide | Calibración (62 piezas aprobadas únicas de la regresión) | Exceptuable |
+|---|---|---|---|
+| Zona por defecto | Sin `safeArea`, la de AXIS; el marco del CTA que no se pinta no frena el crecimiento (el 16:9 crece ×1,6 donde antes quedaba en ×1) | — | — |
+| Tamaño de la firma | ≥ 25 % del lado corto en los horizontales, ≥ 20 % en los demás, ≤ 35 % | aprobadas: 13–20 % | `firma-tamano` (`hasta`) |
+| Posición de la firma | Debajo de todo el contenido, en el cuarto inferior (desde el 75 % del alto) y fuera de `protect`; `logo.y: "auto"` sólo busca ahí | aprobadas: desde el 82 % | `firma-posicion` (`hasta`: fracción del alto) |
+| Firma externa | Salida aprobada (`aprobadoPor` y `plate`): el PNG certificado no la lleva | — | — |
+| Orden de lectura | entrada → titular → cierre → nota → CTA → descriptor, de arriba abajo | ninguna alterada | `orden-lectura` |
+| Jerarquía por rol | ninguna voz pasa de 0,6× el titular (con los tamaños resueltos); el descriptor, menor que el CTA | máx. 0,44× y 0,79× | `jerarquia-rol` (`hasta`) |
+| Aire del botón | contorno y relleno: padding ≥ 0,5× y 0,25× el cuerpo del CTA | mín. 0,6× y 0,35× | `cta-aire` |
+
+**Para todas las piezas:** el velo (`scrimTop`/`scrimBottom`) dejó de existir —el esquema lo rechaza; el lecho sale del
+prompt— y `note.gapAfterClosure` no puede ser negativo. Ninguna pieza aprobada usaba ninguno de los dos.
+
+**Evidencia:** unitarias 14 de 14 (canon por huella con un registro de prueba, velo, canon declarado, gap negativo,
+reglas exceptuables); P01 y P03–P10 en verde, con los casos nuevos del canon en P06 (zona por defecto, el 16:9 crece
+×1,6, firma en el cuarto inferior) y P10 (firma arriba y gigante, orden, jerarquía por rol, aire, firma externa sin y con
+aprobación, pieza aprobada con su canon, QA con otro canon); P02: las 114 piezas aprobadas que componen salen idénticas
+—layout, píxeles, avisos y veredicto— y sólo suman la clave `canon` al QA (🔵), las 18 que abortaban abortan igual, y 3
+quedaron sin verificar por el plate de OneDrive que no responde; mutantes del tramo 14 de 14 y canarios 2 de 2. Dos
+mutantes viejos se reapuntaron al código nuevo: `t6-firma-sube-sin-tope` (con la firma de 25 %, KV-06-169 ya no
+encuentra lugar legible y no sube; la banda la vigila la pieza con el pie protegido) y el del velo, que se retiró con el
+velo.
+
+**Pendiente de este tramo:** el piso de legibilidad por rol (pendiente 6), a la espera de la decisión del operador; y
+subir la firma de las piezas existentes que la tienen fuera de AXIS donde el lecho ya cubre la nueva posición (decisión
+del operador): se prepara la lista y se muestra antes de tocar las carpetas de campaña.
+
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
 | Pilar | Al auditar | Meta | Al cerrar los tramos 1–5 | Qué lo sostiene |
@@ -1125,7 +1164,7 @@ Nada de esto cambia una pieza aprobada.
 
 **Pendientes** (sin respuesta; lo implementado mientras tanto va entre paréntesis):
 
-1. **Firma en 16:9.** Medido en la misma campaña: en 16:9 la firma ocupa 7,3–7,9 % del ancho del cuadro, contra 20 % en
+1. ~~**Firma en 16:9**~~ → resuelta el 2026-09-23: 25 % del lado corto en las piezas nuevas (tramo 11). Medido en la misma campaña: en 16:9 la firma ocupa 7,3–7,9 % del ancho del cuadro, contra 20 % en
    4:5 y 9:16 (18 % en 1:1); en el feed de un teléfono (390 px de ancho) mide 31 px contra 78 px en el 4:5, 2,5 veces
    más chica. Dos causas: las piezas 16:9 de CMP-002 y del registro C se hicieron con 13–14 % del lado corto (bajo el
    canon; el gate ya lo bloquea y se corrigen al recomponer), y aun en el canon —20 % del lado corto— la firma 16:9
@@ -1133,15 +1172,13 @@ Nada de esto cambia una pieza aprobada.
    formatos horizontales (≈ 14 % del ancho y 55 px en el teléfono; iguala la relación firma/titular del 4:5) y 20 % en
    los verticales y cuadrados. Si se aprueba, cambian el gate, el compositor y `firma-placement.mjs`. *(Hoy el gate
    exige 20 % del lado corto en todos los formatos.)*
-2. **Margen por defecto del compositor** (7 %) frente a AXIS (7,5 % en feed, 10 % en story). Recomendación: mantener
+2. ~~**Margen por defecto del compositor**~~ → resuelta el 2026-09-23: AXIS por defecto en las piezas nuevas (tramo 11). Margen por defecto (7 %) frente a AXIS (7,5 % en feed, 10 % en story). Recomendación: mantener
    el 7 % y exigir `safeArea: "axis"` en los planes nuevos. *(Con `safeArea: "axis"` el texto ya arranca dentro de la
    zona también por arriba, commit `4cb6dd154`.)*
 3. **Las tres stories de v07 ponen la firma en la franja inferior que Reels tapa** (centro en 0,90; AXIS termina en
    0,87), como reconoce su LEEME: ¿se aprueban como excepción `zona-segura` con tu nombre, o la firma se sube al
    recomponer?
-4. **Velo que rescata una voz** (`scrimTop`/`scrimBottom`). El canon dice que no se agrega scrim —se regenera el plate
-   (§10)—, pero el compositor acepta `scrimTop`/`scrimBottom` y el gate sólo avisa cuando una voz pasa gracias al velo
-   (`accesibilidad.rescate`, medido sobre la foto sin él). ¿Se permite por defecto (hoy avisa) o necesita aprobación?
+4. ~~**Velo que rescata una voz**~~ → resuelta el 2026-09-23: sin velo (tramo 11).
 5. **Variante del CTA elegida sin margen:** ¿aviso (hoy, `ctaVariante.sinMargen`) o bloqueo?
 6. **Piso de legibilidad por rol** (texto bajo 9 CSS px en el teléfono; hoy aviso). En discusión con el operador el
    2026-09-23, con la única referencia externa verificada: Apple fija 11 pt como mínimo de texto en iPhone (17 por
@@ -1322,12 +1359,18 @@ que no actúan sin `label`. Cópiala a tu carpeta, cambia `id`, `plate`, copy y 
 | `textGrowth: false` | Congela la pieza a su tamaño declarado; sirve para recomponer un set aprobado sin que crezca |
 | `signatureSafeArea: { x0, y0, x1, y1 }` | La franja de la firma: la firma se mide contra AXIS estrechada por ella, no contra la zona del texto |
 | `placement: { "anchoCssPx", "razon" }` | Dónde se publica si no es un teléfono. **Sólo endurece:** se mide con el menor entre 390 CSS px y el declarado (§19.8) |
-| `scrimTop` · `scrimBottom` | Velo que oscurece la foto. El canon dice que no se agrega scrim —se regenera el plate (§10)—; el compositor lo acepta y el gate avisa cuando una voz pasa sólo gracias a él. Es la decisión pendiente 4 |
+| ~~`scrimTop` · `scrimBottom`~~ | **No existen** desde el tramo 11: el esquema los rechaza. El lecho donde va el texto o la firma se genera desde el prompt (`pnpm foto:prompt` con `reservas: ["zona-texto"]`) |
+| `canon: "2026-09-23"` | Informativo: el canon lo decide el registro de las aprobadas; declararlo no cambia nada y sólo acepta el vigente |
 | `firma` · `excepciones` · `conceptoReducido` | Salidas del canon con razón y aprobador: §19.6 y §19.7 |
 
 Un plan puede usar `null` para decir «no hay» (`label: null`, `after: null`): se trata como ausente. Un campo que no
 existe dentro de un objeto propio (`cta`, `note`, `logo`, `firma`…) es un error; en la raíz del plan sólo se avisa,
 porque ahí conviven metadatos de otras herramientas.
+
+**Canon 2026-09-23.** Esta plantilla es una pieza nueva (no está en el registro de las aprobadas): se juzga con el canon
+vigente y lo cumple —firma en el cuarto inferior, orden de lectura, jerarquía por rol y aire del botón (§18, tramo 11)—.
+En un formato horizontal, la firma va con `"width": 0.25`. `safeArea: "axis"` ya es el valor por defecto en una pieza
+nueva; declararlo no cambia nada.
 
 **Qué está verificado:** la suite certifica esta pieza con código 0 tal como está arriba, salvo `altText` y
 `variantReason`, que no cambian un píxel ni una regla que bloquee. Con otro plate u otro copy, la certificación es la
@@ -1363,9 +1406,9 @@ El gate exige que toda pieza declare su firma.
 
 | Forma | En el plan | Qué hace el compositor | Qué exige el gate |
 |---|---|---|---|
-| **Logo automático** (la recomendada) | `"logo": { "width": 0.2, "x": 0.5, "y": "auto" }` | Busca, desde el pie hacia arriba, la primera Y **dentro de la banda del pie** —debajo de todo lo compuesto, con holgura, y dentro de la zona de la firma— donde el logotipo mide ≥ 4,5:1 en su caja **y** en su trazo con alguna de las dos tintas oficiales, sin tocar al sujeto; dibuja la tinta que cumplió | ≥ 4,5:1 en la caja y en el trazo, ≥ 20 % del lado corto, fuera del sujeto, dentro de su zona y debajo de todo el contenido |
-| **Logo en una Y fija** | `"logo": { "width": 0.2, "x": 0.5, "y": 0.84 }` (borde superior, fracción del alto) | Lo dibuja ahí; con `variant: "auto"` (por defecto) elige la tinta midiendo donde va: `negative` (blanca) o `color` (navy) | Lo mismo, salvo «debajo del contenido» |
-| **Firma externa** | `"firma": { "modo": "externa", "razon": "La firma la pone firmar.mjs después del compositor" }, "signatureY": 0.85` | No la dibuja: reserva su caja (20 % del lado corto o `ancho`, centrada, `y` = centro vertical; 0,935 si no la declaras) para que nada caiga encima, y mide su contraste como la herramienta que firma: el peor píxel de la caja con la mejor de las dos tintas | ≥ 4,5:1, tamaño, sujeto y zona, igual que el logo |
+| **Logo automático** (la recomendada) | `"logo": { "width": 0.2, "x": 0.5, "y": "auto" }` (`0.25` en los horizontales de una pieza nueva) | Busca, desde el pie hacia arriba, la primera Y **dentro de la banda del pie** —debajo de todo lo compuesto, con holgura, dentro de la zona de la firma y, en una pieza nueva, en el cuarto inferior— donde el logotipo mide ≥ 4,5:1 en su caja **y** en su trazo con alguna de las dos tintas oficiales, sin tocar al sujeto ni una zona `protect`; dibuja la tinta que cumplió | ≥ 4,5:1 en la caja y en el trazo, ≥ 20 % del lado corto (25 % en los horizontales nuevos; como máximo 35 %), fuera del sujeto, dentro de su zona y debajo de todo el contenido |
+| **Logo en una Y fija** | `"logo": { "width": 0.2, "x": 0.5, "y": 0.84 }` (borde superior, fracción del alto) | Lo dibuja ahí; con `variant: "auto"` (por defecto) elige la tinta midiendo donde va: `negative` (blanca) o `color` (navy) | Lo mismo; en una pieza nueva, también debajo del contenido, en el cuarto inferior y fuera de `protect` (`firma-posicion`) |
+| **Firma externa** | `"firma": { "modo": "externa", "razon": "La firma la pone firmar.mjs después del compositor" }, "signatureY": 0.85` | No la dibuja: reserva su caja (20 % del lado corto, centrada, `signatureY` = centro vertical; 0,935 si no la declaras) para que nada caiga encima, y mide su contraste como la herramienta que firma: el peor píxel de la caja con la mejor de las dos tintas | ≥ 4,5:1, tamaño, sujeto y zona, igual que el logo. En una pieza nueva, además, `aprobadoPor` y `plate`: el PNG que certifica el gate no lleva la firma |
 | **Sin firma** | `"firma": { "modo": "sin-firma", "razon": "…", "aprobadoPor": "julio-reyes" }` | Nada | Un aprobador del registro, que dé la razón; el gate la imprime |
 
 `signatureY` sin `firma` también declara una firma externa (la forma que ya usan v05–v07). En la firma sin firma, el
@@ -1381,6 +1424,9 @@ los tamaños de plate habituales:
 | 1:1 | 0,94 | 0,91 | 0,89 |
 | 16:9 | 0,94 | 0,91 | 0,89 |
 | 9:16 | 0,87 | 0,85 | 0,84 |
+| 16:9, pieza nueva (firma de 25 %) | 0,94 | — | 0,88 |
+
+En una pieza nueva la firma arranca, además, desde el 75 % del alto (el cuarto inferior).
 
 🔴 **Sin `y`, la firma externa queda centrada en 0,935: fuera de la zona de AXIS en los cuatro formatos** (su borde
 inferior baja a 0,95–0,96 del alto), y el gate la reprueba como «fuera de la zona segura… firma-externa». Declara `y`.
@@ -1442,6 +1488,10 @@ Copiarlo sólo vale si el operador re-aprueba la excepción para ese plate.
 | `acento-cta` | CTA sin acento (p. ej. con Gigi en cuadro) | no se mide: sin `hasta` |
 | `cta-perceptual` | CTA bajo APCA o, con daltonismo, bajo 4,5:1 | no se mide: sin `hasta` |
 | `concepto-completo` | Pieza sin entrada o sin cierre | no se mide: sin `hasta` (la forma canónica es `conceptoReducido`) |
+| `firma-posicion` | Canon nuevo: firma arriba del contenido, fuera del cuarto inferior o sobre `protect` | fracción mínima del alto donde arranca (p. ej. `0.7`) |
+| `orden-lectura` | Canon nuevo: voces fuera del orden entrada → titular → cierre → nota → CTA → descriptor | no se mide: sin `hasta` |
+| `jerarquia-rol` | Canon nuevo: una voz sobre 0,6× el titular, o el descriptor ≥ el CTA | razón máxima aprobada (p. ej. `0.65`) |
+| `cta-aire` | Canon nuevo: padding del botón bajo 0,5× y 0,25× el cuerpo del CTA | no se mide: sin `hasta` |
 | — | Texto bajo 9 CSS px en el teléfono | hoy sólo avisa (pendiente 6) y no hay excepción: `legibilidad` no está en el esquema y un plan que la declara se rechaza |
 
 Una excepción **vale** sólo si se cumplen las tres condiciones del tramo 7:
@@ -1489,9 +1539,14 @@ aprobador ni copia `suite-pruebas` a un plan real: si falta la aprobación, preg
 - **Maquetación:** la reserva editorial (`reserva-editorial`) y las invariantes recalculadas sobre el layout: nada se
   encima y ninguna selección tapa una voz que no es su destino; una selección sobre un objeto de la foto no tapa
   ninguna.
+- **Canon 2026-09-23, sólo en piezas nuevas** (§18, tramo 11): firma de 25 % en los horizontales y hasta 35 %
+  (`firma-tamano`); firma debajo del contenido, en el cuarto inferior y fuera de `protect` (`firma-posicion`); firma
+  externa aprobada; orden de lectura (`orden-lectura`); jerarquía por rol (`jerarquia-rol`); aire del botón
+  (`cta-aire`); y un QA cuyo canon no calza con el registro.
 
 **Rechaza al validar** (el compositor, antes de componer): un espacio o carácter que la fuente de su voz no tiene, un
-texto sin nada que dibujar, `signatureSafeArea` incompleta, un campo interno del compositor en el plan, escalas de la
+texto sin nada que dibujar, `signatureSafeArea` incompleta, el velo (`scrimTop`/`scrimBottom`), una nota con
+`gapAfterClosure` negativo, un campo interno del compositor en el plan, escalas de la
 selección sobre su techo, un `final` bajo el 85 % del máster o bajo 780 px, y una firma que cae fuera de la imagen.
 
 **No certificable** (código 3): gesto, tarjeta, HUD, url y cierre inferior —ninguna guarda los mide—, una pieza de otra
@@ -1499,7 +1554,6 @@ versión del comando o con máscara de una caché ajena, y un `--comando` que no
 
 **Avisa** (`⚠`, no bloquea; alguien lo mira):
 
-- una voz que pasa sólo gracias al velo, medida sobre la foto sin él (el velo sale en el tramo 11);
 - la variante del CTA elegida sin margen (pendiente 5);
 - `placement` declarado;
 - texto de menos de 9 CSS px en el teléfono (pendiente 6);

@@ -257,7 +257,7 @@ El gate imprime tres tipos de línea:
 
 - `✗ <id>: …` bloquea. Cada mensaje dice qué falló y, casi siempre, qué hacer. Busca el mensaje en
   [Problemas comunes](#problemas-comunes).
-- `⚠ <id>: …` avisa y no bloquea: una excepción aprobada, un velo que rescata una voz, un texto chico en el teléfono,
+- `⚠ <id>: …` avisa y no bloquea: una excepción aprobada, un texto chico en el teléfono,
   una variante sin margen, la alternativa sin escena. Míralos y decide.
 - `⊘` y la lista de causas: el gate no puede probar la pieza. Ve al paso 7 o recompón.
 
@@ -266,7 +266,8 @@ imprime el comando exacto cuando la huella no calza), vuelves a mirar la pieza y
 
 Correcciones típicas, en orden de preferencia: acortar el copy, mover el bloque (`top`, `align`), cambiar la tinta o el
 acento, dejar que `variant: "auto"` elija el tratamiento y, si el plate no deja espacio o contraste, regenerar el plate.
-No agregues velo para rescatar una voz ni cambies de tratamiento para esquivar la medición.
+No cambies de tratamiento para esquivar la medición. El velo no existe: si el texto no se lee, se mueve o se regenera
+el plate con el lecho oscuro en la toma.
 
 ### Paso 7 · Certifica por reproducción
 
@@ -476,15 +477,15 @@ El operador todavía no decide estos puntos. Mientras tanto, rige lo que dice la
 
 | # | Pendiente | Hoy |
 |---|---|---|
-| 1 | Tamaño de la firma en 16:9 | 20 % del lado corto en todos los formatos: es lo que exige el gate |
-| 2 | Margen por defecto del compositor (7 %) frente a AXIS (7,5 % feed, 10 % story) | Declara `safeArea: "axis"` en todo plan nuevo |
-| 3 | Firma de las tres stories de v07 en la franja que Reels tapa | El gate las marca fuera de la zona segura; no inventes la excepción ni muevas la firma sin decisión |
-| 4 | Velo (`scrimTop`/`scrimBottom`) que rescata una voz: ¿permitido o con aprobación? | Aviso |
+| 1 | ~~Tamaño de la firma en 16:9~~ | **Decidido:** 25 % del lado corto en las piezas nuevas; las hechas no se regeneran |
+| 2 | ~~Margen por defecto del compositor~~ | **Decidido:** en una pieza nueva la zona de AXIS es la de por defecto |
+| 3 | Firma de las tres stories de v07 en la franja que Reels tapa | **Decidido:** se sube sólo donde el lecho de la foto ya cubre la nueva posición; si no, queda como está (nada se regenera) |
+| 4 | ~~Velo~~ | **Decidido:** no existe; el lecho sale del prompt |
 | 5 | Variante del CTA elegida sin margen: ¿aviso o bloqueo? | Aviso |
 | 6 | Piso de legibilidad por rol | Aviso bajo 9 px CSS en el teléfono |
 | 7 | Grosor de los corchetes de AXIS (cerca de 0,69 px CSS en el teléfono) | Aviso; cambiarlo es cambiar el contrato AXIS |
 
-**1 · La firma en 16:9.** Medido en una misma campaña: en 16:9 la firma ocupa entre 7,3 % y 7,9 % del ancho del cuadro,
+**1 · La firma en 16:9 (decidido el 2026-09-23: 25 % en las piezas nuevas).** Medido en una misma campaña: en 16:9 la firma ocupa entre 7,3 % y 7,9 % del ancho del cuadro,
 contra 20 % en 4:5 y 9:16 (18 % en 1:1). En el feed de un teléfono (390 px de ancho) mide 31 px contra 78 px en el 4:5:
 dos veces y media más chica. Tiene dos causas. Las piezas 16:9 de CMP-002 y del registro C se hicieron con 13–14 % del
 lado corto, bajo el canon: el gate ya lo bloquea y se corrigen al recomponer. Y aun dentro del canon, el 20 % del lado
@@ -512,8 +513,8 @@ zona de AXIS termina en 0,87), como reconoce el propio LEEME del set. Está por 
 - No edites el plan, el plate ni el PNG después de componer: rompe las huellas. Recompón.
 - No firmes con la herramienta externa antes de certificar.
 - No cambies de tratamiento del CTA para esquivar la medición ni apagues el acento: regenera el plate.
-- No agregues velo para rescatar una voz: el gate lo muestra como aviso y la solución es mover el texto o regenerar el
-  plate.
+- No declares `scrimTop` ni `scrimBottom`: el velo no existe y el plan se rechaza. La solución es mover el texto o
+  regenerar el plate con el lecho en la toma.
 - No uses `subjectGuard.ignore` para tapar a una persona real ni infles `subjectProtection` para que una pieza pase.
 - No repitas ids entre planes de la misma carpeta.
 - No encadenes el gate detrás de `| tail` o `| grep` cuando necesitas su veredicto: el código de salida sería el del

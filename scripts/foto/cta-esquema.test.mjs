@@ -48,3 +48,20 @@ test('Las aprobaciones que apagan una medición aceptan el sha del plate', () =>
   assert.deepEqual(errores({ ...base(), conceptoReducido: { razon: 'una sola frase de recordación', aprobadoPor: 'julio-reyes', plate } }), [])
   assert.ok(errores({ ...base(), conceptoReducido: { razon: 'una sola frase de recordación', aprobadoPor: 'julio-reyes', plate: 'no-es-un-sha' } }).some(e => /sha256 del plate/.test(e)))
 })
+
+test('Sin velo: scrimTop y scrimBottom se rechazan (el lecho sale del prompt)', () => {
+  assert.ok(errores({ ...base(), scrimTop: { opacity: 0.8, to: 0.4 } }).some(e => /`scrimTop`: el velo no se usa/.test(e)))
+  assert.ok(errores({ ...base(), scrimBottom: { opacity: 0.9, from: 0.7 } }).some(e => /`scrimBottom`: el velo no se usa/.test(e)))
+})
+
+test('El canon declarado sólo puede ser el vigente, y la nota nunca sube con un gap negativo', () => {
+  assert.deepEqual(errores({ ...base(), canon: '2026-09-23' }), [])
+  assert.ok(errores({ ...base(), canon: '2026-09-22' }).length > 0)
+  assert.ok(errores({ ...base(), note: { text: 'Nota', gapAfterClosure: -420 } }).some(e => /`note\.gapAfterClosure` debe ser ≥ 0/.test(e)))
+})
+
+test('Las reglas del canon nuevo se pueden exceptuar con aprobación', () => {
+  for (const regla of ['firma-posicion', 'orden-lectura', 'jerarquia-rol', 'cta-aire']) {
+    assert.deepEqual(errores({ ...base(), excepciones: [{ regla, razon: 'prueba: decisión de diseño revisada', aprobadoPor: 'julio-reyes', plate: 'a'.repeat(64) }] }), [], regla)
+  }
+})
