@@ -30,7 +30,7 @@ memoria reutilizada.
 | ✅ **Bresler** — **+180% de tráfico orgánico** *(dato duro)* | 🔴 Es **SEO**, no creativo |
 | ✅ **Berel** — cliente real | 🔴 Sin caso creativo formalizado |
 | ✅ **Informe AI Visibility de SKY** — público, con URL *(overall 73,3 · citation quality 90,9)* | 🔴 Prueba **visibilidad**, no que sepamos **diseñar** |
-| ✅ **Borradores de caso en Notion** *(workspace "Tareas")*: Ghamadent, Eusari/Menoplay, SSilva *(sólo anonimizado)*, Touch Latam, Grupo Norte, Grupo Security | 🔴 **Borradores internos no verificados** — mayormente performance/CRM/ecommerce, no creativo de marca. **Confirmar autorización y fuente antes de citar** |
+| ✅ **Caso Travel Sale · Sky Airline** *(Notion `MET-1530`, aprobado, mar-2026)*: 4 mercados + Brasil, 178 piezas (66 de Efeonce), −21–25% tiempo de campaña, 27 piezas (9 videos) actualizadas en 10 min | 🔴 Métricas de **eficiencia de producción**, no de negocio del cliente; citarlo fuera exige autorización escrita |
 | — | 🔴 **Casos creativos con métrica de NEGOCIO verificable + autorización escrita confirmada: NINGUNO todavía.** *(SKY prueba delivery, no resultado de negocio.)* |
 
 > ### Un mockup lindo en un deck NO es un caso.

@@ -83,10 +83,10 @@ en la misma empresa hacen la cuenta más resistente que dos servicios al mismo e
    −25% tiempo de producción). Lo que falta es el equivalente del Blog: hoy tenemos la foto (~13.000 keywords,
    ~40.000 visitas/mes, 0% de citabilidad propia, páginas cerca del top 3). Si se congela ahora, en 6 meses hay un
    caso de **resultados de negocio**, no sólo de entrega.
-2. **Convertir el inventario de casos en un catálogo verificado.** Además de SKY hay casos en borrador en Notion
-   (Ghamadent, Eusari, SSilva anonimizado, Touch Latam, Grupo Norte, Grupo Security). Hay que verificarlos
-   (autorización y fuente de métricas) y llevarlos al mismo estándar publicado. Inventario en
-   [`docs/context/01_quienes-somos.md`](../../../context/01_quienes-somos.md) §«Experiencia LATAM comprobada».
+2. **Llevar el caso creativo a la venta.** El caso **Travel Sale · Sky Airline** (Notion `MET-1530`, aprobado) ya
+   está documentado con PDF/one-pager, blog y video: 4 mercados + Brasil, 178 piezas (66 de Efeonce), −21–25% de
+   tiempo de campaña y cambios de precio en 27 piezas en 10 minutos. Usarlo en cada propuesta creativa, previa
+   autorización escrita de SKY para citarlo.
 3. **Evidencia primero en toda licitación.** Grader, Radiografía y benchmark ya son activos del flujo: usarlos en
    Brightcell y en las siguientes.
 4. **Buscar el tercer comprador dentro de SKY.** El patrón funcionó dos veces. Content Lead y Social Care siguen

@@ -229,8 +229,7 @@ validación es **2026-03-10**, anterior a **RpA v2 (TASK-916)**.
    publicado en `experiencia.efeoncepro.com` con métricas de entrega.)* Falta: verificar la autorización escrita
    para citarlo fuera del wrapper, fijar el alcance de claims/assets/screenshots/URLs/pricing y sumar, si existe,
    evidencia de negocio del cliente *(no hay baseline del día 0)*. → `templates/caso-estudio.md`.
-   Otros borradores de caso *(Ghamadent, Eusari, SSilva anonimizado, Touch Latam, Grupo Norte, Grupo Security)*
-   viven en Notion: **borradores internos no verificados; confirmar autorización y fuente antes de citar.**
+   Caso de referencia detallado: caso documentado **Travel Sale · Sky Airline** (Notion `MET-1530`, aprobado; marzo 2026): 4 mercados + Brasil, 178 piezas (66 de Efeonce), −21–25% de tiempo total de campaña (producción −24–26%, adaptación −30–40%) y cambios de precio en 27 piezas —incluidos 9 videos— en 10 minutos; tiene PDF/one-pager, blog y video de YouTube asociados.
 3. 🎯 **Empezar a usar el RpA en la venta.** Está medido, es bueno, y nadie más lo tiene.
 
 ---
