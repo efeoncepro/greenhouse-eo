@@ -1,6 +1,6 @@
 // `pnpm foto:accesibilidad <piezas.json>` — reporte de accesibilidad y contraste de un plan ya compuesto.
 //
-// Lee `out/qa.json` (la medición la hace el compositor sobre el píxel real, con scripts/foto/accesibilidad.mjs) y
+// Lee el QA del plan, `out/qa-<plan>.json` (o el `out/qa.json` del formato anterior; la medición la hace el compositor sobre el píxel real, con scripts/foto/accesibilidad.mjs) y
 // escribe en `out/accesibilidad/`:
 //   · reporte.md                 una tabla por pieza y por voz: WCAG 2.2 AA según el tamaño EN PANTALLA, APCA,
 //                                área bajo el umbral, daltonismo y el texto alternativo
@@ -14,6 +14,7 @@ import path from 'node:path'
 import sharp from 'sharp'
 
 import { MATRICES_DALTONISMO, UMBRALES } from './accesibilidad.mjs'
+import { rutaQa } from './cta-integridad.mjs'
 
 const plan = process.argv[2]
 
@@ -23,7 +24,7 @@ if (!plan) {
 }
 
 const dir = path.dirname(path.resolve(plan))
-const qaPath = path.join(dir, 'out', 'qa.json')
+const qaPath = [rutaQa(path.join(dir, 'out'), plan), path.join(dir, 'out', 'qa.json')].find(f => fs.existsSync(f)) ?? rutaQa(path.join(dir, 'out'), plan)
 
 if (!fs.existsSync(qaPath)) {
   console.error(`✗ no existe ${qaPath}: corre \`pnpm foto:componer:cta ${plan}\` primero.`)

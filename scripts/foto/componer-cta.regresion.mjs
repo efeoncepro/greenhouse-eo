@@ -151,10 +151,21 @@ async function componer(compositor, dir, pieza) {
   return {
     estado: 'compone',
     layout: JSON.parse(fs.readFileSync(path.join(out, `${pieza.id}-layout.json`), 'utf8')),
-    qa: JSON.parse(fs.readFileSync(path.join(out, 'qa.json'), 'utf8'))[0],
+    // El QA es POR PLAN desde 2026-09-23 (`qa-<plan>.json`); una referencia anterior escribe `qa.json`. Las huellas
+    // no se comparan: la del comando difiere por construcción y la del PNG ya la juzga la comparación de píxeles.
+    qa: sinHuellas(JSON.parse(fs.readFileSync([path.join(out, 'qa-piezas.json'), path.join(out, 'qa.json')].find(f => fs.existsSync(f)), 'utf8'))[0]),
     png,
     pngSha: sha(fs.readFileSync(png))
   }
+}
+
+const sinHuellas = r => {
+  if (!r || typeof r !== 'object') return r
+  const resto = { ...r }
+
+  delete resto.huellas
+
+  return resto
 }
 
 function diferencias(a, b, ruta = '', out = []) {

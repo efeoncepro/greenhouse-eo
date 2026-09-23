@@ -18,7 +18,6 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { createRequire } from 'node:module'
-import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 
 import sharp from 'sharp'
@@ -30,7 +29,9 @@ import { renderCollaborationSelection } from '../../scripts/creative/layout-comp
 import { compositeLuminosity } from '../../scripts/creative/layout-compiler/compiler.mjs'
 
 import { UMBRALES, hexARgb, medirContraColor, medirVoz, tamanoEnPantalla, textoAlternativo } from './accesibilidad.mjs'
-import { ORDEN as ORDEN_VARIANTES, PROMINENCIA, elegirVariante } from './cta-variantes.mjs'
+import { ORDEN as ORDEN_VARIANTES, elegirVariante } from './cta-variantes.mjs'
+import { validarPiezaEsquema } from './cta-esquema.mjs'
+import { escribirAtomico, huellaComando, huellaPieza, rutaQa, sha, tomarBloqueo, versionPaquete } from './cta-integridad.mjs'
 
 // ADAPTACIÓN del compositor de «Nivel de búsqueda» (GTA VI) a FOTOGRAFÍA de marca y multiformato.
 // Original: ai-generations/2026-09-19_nivel-de-busqueda/componer-v2.mjs (jerarquía por voces, richBlock,
@@ -489,6 +490,9 @@ Canon: docs/operations/brand-photography/EFEONCE_PHOTO_TEXT_SPACE_AND_FORMATS_V1
 }
 
 const SLIDES = JSON.parse(fs.readFileSync(PLAN, 'utf8'))
+// Huella de cada pieza TAL COMO ESTÁ EN EL PLAN (JSON crudo, antes de cualquier normalización): el gate la recalcula
+// del mismo archivo y, si no coincide, el plan cambió después de componer.
+const HUELLAS_PLAN = new Map((Array.isArray(SLIDES) ? SLIDES : []).filter(p => p && typeof p === 'object').map(p => [p.id, huellaPieza(JSON.parse(JSON.stringify(p)))]))
 const PLAN_DIR = path.dirname(path.resolve(PLAN))
 // `--variantes`: compone cada pieza en sus TRES tratamientos (texto · contorno · relleno) en out/variantes/, con una
 // hoja comparativa por pieza. Existe porque dos de tres agentes terminaron usando una sola variante: no veían las
@@ -506,17 +510,6 @@ const qa = []
 // outside canvas»). Ahora el plan se valida entero primero: cada error nombra pieza y campo, y los campos que el
 // comando no lee se avisan. Los metadatos que usan OTRAS herramientas están declarados abajo para no avisar.
 // ════════════════════════════════════════════════════════════════════════════════════════════════
-const CAMPOS = new Set([
-  // composición: este comando los lee
-  'id', 'plate', 'align', 'centerX', 'top', 'textWidth', 'ink', 'scrimTop', 'scrimBottom', 'hud',
-  'label', 'labelSize', 'labelGap', 'labelStar', 'lead', 'leadFamily', 'leadFill', 'leadSize', 'leadGap',
-  'dominant', 'dominantSize', 'dominantMax', 'dominantTracking', 'after', 'afterFamily', 'afterFill', 'afterSize', 'afterGap',
-  'selection', 'gesture', 'footer', 'note', 'card', 'cta', 'logo', 'url', 'final',
-  'subjectProtection', 'subjectGuard', 'safeArea', 'textGrowth',
-  // metadatos de otras herramientas (firma, validadores de zona segura, trazabilidad editorial): acá no se leen
-  'altText', 'styleReason', 'editorialReserve', 'productionNote', 'copyFormula', 'placementLimitation', 'signatureY', 'signatureSafeArea'
-])
-
 function validarPlan(plan) {
   const errores = []
   const avisos = []
@@ -526,7 +519,6 @@ function validarPlan(plan) {
   const ids = plan.map(p => p?.id)
   const repetidos = [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))]
   const faltan = only.filter(id => !ids.includes(id))
-  const num = v => typeof v === 'number' && Number.isFinite(v)
 
   if (repetidos.length) errores.push(`ids repetidos (uno sobrescribiría al otro en out/): ${repetidos.join(', ')}`)
   if (faltan.length) errores.push(`no están en el plan: ${faltan.join(', ')}`)
@@ -534,43 +526,29 @@ function validarPlan(plan) {
   for (const p of plan.filter(x => !only.length || only.includes(x?.id))) {
     const e = m => errores.push(`${p?.id ?? '(sin id)'}: ${m}`)
 
-    if (typeof p?.id !== 'string' || !p.id) { e('falta `id`'); continue }
-    const desconocidos = Object.keys(p).filter(k => !CAMPOS.has(k))
-
-    if (desconocidos.length) avisos.push(`${p.id}: campos que este comando no lee — ${desconocidos.join(', ')}`)
-    if (typeof p.plate !== 'string' || !fs.existsSync(path.resolve(PLAN_DIR, p.plate))) e(`no existe el plate \`${p.plate}\``)
+    if (!p || typeof p !== 'object') { e('la pieza no es un objeto'); continue }
     if (!p.dominant && !p.label && !p.lead) { e('pieza muda (sin texto): este comando compone piezas con CTA — usa `pnpm foto:componer`'); continue }
-    if (typeof p.dominant !== 'string' || !p.dominant.trim()) e('falta `dominant` (el titular)')
-    if (!num(p.dominantSize)) e('falta `dominantSize` numérico')
     if (!p.cta || typeof p.cta !== 'object') { e('falta `cta`: este comando es para piezas con CTA — sin CTA usa `pnpm foto:componer`'); continue }
-    const c = p.cta
 
-    for (const k of ['text', 'descriptor']) if (typeof c[k] !== 'string' || !c[k].trim()) e(`falta \`cta.${k}\``)
-    if (!['solid', 'outline', 'text', 'auto'].includes(c.variant)) e(`\`cta.variant\` debe ser solid, outline, text o auto (vino ${JSON.stringify(c.variant)})`)
+    // Tipos, rangos, enums y campos desconocidos: el esquema declarativo (scripts/foto/cta-esquema.mjs).
+    const r = validarPiezaEsquema(p)
 
-    if (c.seleccion != null) {
-      if (!['open-brackets', 'four-corners', 'eight-handles', 'ninguno'].includes(marcoCta(c))) e(`\`cta.seleccion.marco\` debe ser open-brackets, four-corners, eight-handles o ninguno (vino ${JSON.stringify(c.seleccion.marco)})`)
+    r.errores.forEach(e)
+    r.avisos.forEach(a => avisos.push(`${p.id}: ${a}`))
+    if (r.errores.length) continue
 
+    if (!fs.existsSync(path.resolve(PLAN_DIR, p.plate))) e(`no existe el plate \`${p.plate}\``)
+
+    if (p.cta.seleccion != null) {
       try {
-        resolveCollaborationSelectionIntent(intencionSeleccionCta(c))
+        resolveCollaborationSelectionIntent(intencionSeleccionCta(p.cta))
       } catch (err) {
         e(`\`cta.seleccion\` no cumple el contrato AXIS de selección: ${String(err.message).split('\n')[0]}`)
       }
     }
 
-    if (c.prominencia != null && !PROMINENCIA[c.prominencia]) e(`\`cta.prominencia\` debe ser discreta, delimitada o destacada (vino ${JSON.stringify(c.prominencia)})`)
-    if (c.variant !== 'auto' && !String(c.variantReason ?? '').trim()) sinMotivo.push(p.id)
-    for (const k of ['fontSize', 'descriptorSize', 'paddingX', 'paddingY', 'gapAfterNote']) if (!num(c[k])) e(`falta \`cta.${k}\` numérico`)
-    if (c.align !== 'center' && !num(c.x)) e('falta `cta.x` numérico (o `cta.align: "center"`)')
-    for (const k of ['surfaceToken', 'inkToken']) if (c[k] != null && !C[c[k]]) e(`\`cta.${k}: ${c[k]}\` no existe en los tokens AXIS de publicidad`)
     if (p.gesture && !gutt) e(`declara \`gesture\` y la fuente Guttery no está en ${GUTTERY}: el gesto se perdería en silencio`)
-    if (p.safeArea && !['x0', 'y0', 'x1', 'y1'].every(k => num(p.safeArea[k]))) e('`safeArea` necesita x0, y0, x1 e y1 numéricos (fracciones del lienzo)')
-
-    for (const z of p.subjectGuard?.ignore ?? []) {
-      if (!Array.isArray(z?.box) || z.box.length !== 4 || !z.box.every(num) || typeof z.reason !== 'string' || z.reason.trim().length < 10) {
-        e('cada zona de `subjectGuard.ignore` necesita `box: [x0, y0, x1, y1]` (fracciones) y `reason` (≥ 10 caracteres)')
-      }
-    }
+    if (p.cta.variant !== 'auto' && !String(p.cta.variantReason ?? '').trim()) sinMotivo.push(p.id)
   }
 
   // El canon pide registrar el estilo del CTA y su motivo; sin motivo, la variante se copia del plan anterior.
@@ -588,8 +566,16 @@ if (validacion.errores.length) throw new Error(`plan inválido — ${validacion.
 
 fs.mkdirSync(`${OUT}/preview-390`, { recursive: true })
 
-// Un QA de una corrida ANTERIOR no puede sobrevivir a una corrida que falla: el gate lo leería como vigente.
-fs.rmSync(`${OUT}/qa${only.length ? '-parcial' : ''}.json`, { force: true })
+// Dos composiciones en la misma carpeta no pueden correr a la vez: se mezclaban (auditoría 2026-09-23, 7 de 8 corridas).
+tomarBloqueo(`${PLAN_DIR}/out`)
+
+// QA POR PLAN, con huellas. Una corrida completa borra el registro anterior (una corrida que falla no deja números
+// viejos); una parcial lo conserva y FUSIONA sus piezas al final.
+const QA_FILE = rutaQa(OUT, PLAN)
+// La huella se toma del archivo que CORRE: un mutante o una copia del comando se delatan en el gate.
+const HUELLA_COMANDO = huellaComando({ compositor: fileURLToPath(import.meta.url) })
+
+if (!only.length) fs.rmSync(QA_FILE, { force: true })
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════
 // 🔴 GUARDA DE SUJETO EN 2D [operador, 2026-09-22]
@@ -606,29 +592,45 @@ fs.rmSync(`${OUT}/qa${only.length ? '-parcial' : ''}.json`, { force: true })
 // a la persona con todo su pelo aunque se funda con el fondo. Se calcula una vez por plate y se
 // cachea por SHA-256 del plate, así que regenerar el plate la invalida sola.
 // ════════════════════════════════════════════════════════════════════════════════════════════════
-const MASK_CACHE = repo('node_modules/.cache/foto-sujeto')
+// `FOTO_MASCARAS_DIR` aísla la caché (las pruebas la envenenan a propósito sin tocar la compartida).
+const MASK_CACHE = process.env.FOTO_MASCARAS_DIR ? path.resolve(process.env.FOTO_MASCARAS_DIR) : repo('node_modules/.cache/foto-sujeto')
 const GUARD_IDS = new Set(['etiqueta', 'entrada', 'dominante', 'cierre-frase', 'cierre-inferior', 'nota', 'cta', 'descriptor'])
+
+// La entrada de caché sólo vale si sus METADATOS calzan: sha del plate, modelo y versión del segmentador, tamaño y sha
+// de la propia máscara. Una máscara corrupta, truncada, de otro tamaño o de otra versión se regenera sola; antes una
+// máscara en negro u 8×8 pasaba como `segmentacion` y el gate daba verde con el texto sobre el pelo (auditoría).
+const VERSION_SEGMENTACION = versionPaquete('@imgly/background-removal-node')
 
 async function subjectMask(platePath) {
   const bytes = fs.readFileSync(platePath)
-  const sha = createHash('sha256').update(bytes).digest('hex')
-  const cached = path.join(MASK_CACHE, `${sha}.png`)
-  let alphaPng
+  const plateSha = sha(bytes)
+  const cached = path.join(MASK_CACHE, `${plateSha}.png`)
+  const metaRuta = path.join(MASK_CACHE, `${plateSha}.json`)
+  const { width: pw, height: ph } = await sharp(bytes).metadata()
+  let alphaPng = null
 
-  if (fs.existsSync(cached)) alphaPng = fs.readFileSync(cached)
-  else {
+  try {
+    const m = JSON.parse(fs.readFileSync(metaRuta, 'utf8'))
+    const png = fs.readFileSync(cached)
+
+    if (m.plateSha === plateSha && m.modelo === 'medium' && m.version === VERSION_SEGMENTACION && m.ancho === pw && m.alto === ph && m.mascaraSha === sha(png)) alphaPng = png
+  } catch {
+    alphaPng = null
+  }
+
+  if (!alphaPng) {
     try {
       const mime = /\.jpe?g$/i.test(platePath) ? 'image/jpeg' : (/\.webp$/i.test(platePath) ? 'image/webp' : 'image/png')
       const blob = await removeBackground(new Blob([new Uint8Array(bytes)], { type: mime }), { model: 'medium', output: { format: 'image/png', quality: 1 } })
 
       alphaPng = await sharp(Buffer.from(await blob.arrayBuffer())).ensureAlpha().extractChannel(3).png().toBuffer()
-      fs.mkdirSync(MASK_CACHE, { recursive: true })
-      const tmp = `${cached}.${process.pid}.tmp`
+      const info = await sharp(alphaPng).metadata()
 
-      fs.writeFileSync(tmp, alphaPng)
-      fs.renameSync(tmp, cached)
+      if (info.width !== pw || info.height !== ph) throw new Error(`la segmentación devolvió ${info.width}×${info.height} para un plate de ${pw}×${ph}`)
+      escribirAtomico(cached, alphaPng)
+      escribirAtomico(metaRuta, JSON.stringify({ plateSha, modelo: 'medium', version: VERSION_SEGMENTACION, ancho: pw, alto: ph, mascaraSha: sha(alphaPng) }))
     } catch (e) {
-      // Sin máscara no se inventa protección: la pieza se compone sin agrandar y sin guarda 2D, y se avisa.
+      // Sin máscara no se inventa protección: la pieza se compone sin agrandar y el gate la rechaza (`sin-mascara`).
       console.warn(`  ⚠ no se pudo segmentar ${path.basename(platePath)}: ${e.message}`)
 
       return null
@@ -642,7 +644,7 @@ async function subjectMask(platePath) {
 
   if (info.channels !== 1) throw new Error(`máscara de sujeto con ${info.channels} canales; se esperaba 1`)
 
-  return { data, W: info.width, H: info.height }
+  return { data, W: info.width, H: info.height, plateSha }
 }
 
 // Dos reglas con dos distancias (fracción del lado corto, medida como distancia REAL al borde de la caja,
@@ -726,6 +728,10 @@ function scaleSpec(s0, f, canvasW) {
 }
 
 async function composePiece(s, opts = {}) {
+  // Salidas de la pieza: se escriben JUNTAS al final, sólo si la pieza pasó todos los chequeos y no es una prueba de
+  // tamaño. Antes el SVG de controles y la evidencia se escribían en cada prueba del crecimiento, y el PNG antes de
+  // los chequeos finales: una pieza que fallaba dejaba archivos nuevos al lado de un QA viejo (auditoría 2026-09-23).
+  const salidas = []
   const guard = []
   const visibles = []
   // Líneas tal como quedaron compuestas, por voz: el QA las registra para que los cortes se puedan VERIFICAR
@@ -991,7 +997,10 @@ return k.ink.right - k.ink.left }))
   if (s.cta) {
     let c=s.cta;
     const cy=y+c.gapAfterNote, padX=c.paddingX, padY=c.paddingY;
-    let cx=W*c.x;
+    // `cta.x: "columna"`: el CTA arranca en la columna del texto (el mismo x que las voces), en vez de una fracción
+    // medida a mano que deja el botón 11–21 px corrido de la columna (auditoría 2026-09-23, hallazgo 9).
+    const xCta=cc=>(cc.x==='columna'?x:W*cc.x);
+    let cx=xCta(c);
 
     // `variant: "auto"`: el autor declara la intención del canon (`prominencia`: discreta | delimitada | destacada →
     // texto | contorno | relleno) y la medición sobre la escena decide si la permite; si no, se escala a la variante
@@ -1012,7 +1021,7 @@ return k.ink.right - k.ink.left }))
       c={...c,variant:e.elegida,...tokens};
       ctaVariante={prominencia:s.cta.prominencia??'delimitada',elegida:e.elegida,escalo:e.escalo,motivo:e.motivo,...(e.sinMargen?{sinMargen:true}:{})};
       ctaVarianteTokens=tokens;
-      cx=W*c.x;
+      cx=xCta(c);
     }
 
     const solid=c.variant==='solid', outline=c.variant==='outline';
@@ -1103,11 +1112,11 @@ return k.ink.right - k.ink.left }))
 
     if(/<text/.test(ctaOverlay))throw new Error(`${s.id}: el overlay del CTA quedó con <text> — se pintaría con una fuente del sistema`);
     body+=cr.underlay+ctaOverlay;
-    fs.writeFileSync(`${OUT}/${s.id}-controls.svg`,`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${cr.overlay}</svg>`);
-    fs.writeFileSync(`${OUT}/${s.id}-cta-evidence.json`,JSON.stringify({intent:ci,manifest:cm,geometry:cr.evidence,textBounds:t.box,descriptorBounds:descriptor.box,surface:b,variant:c.variant,colors:{surface:surfaceColor,ink},solidTextContrast:solid?(Math.max(hexLum(surfaceColor),hexLum(ink))+.05)/(Math.min(hexLum(surfaceColor),hexLum(ink))+.05):null},null,2));
+    salidas.push([`${s.id}-controls.svg`,`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${cr.overlay}</svg>`]);
+    salidas.push([`${s.id}-cta-evidence.json`,JSON.stringify({intent:ci,manifest:cm,geometry:cr.evidence,textBounds:t.box,descriptorBounds:descriptor.box,surface:b,variant:c.variant,colors:{surface:surfaceColor,ink},solidTextContrast:solid?(Math.max(hexLum(surfaceColor),hexLum(ink))+.05)/(Math.min(hexLum(surfaceColor),hexLum(ink))+.05):null},null,2)]);
   }
 
-  fs.writeFileSync(`${OUT}/${s.id}-layout.json`,JSON.stringify({canvas:{width:W,height:H},subjectProtection:s.subjectProtection,elements:checks.map(({id,box})=>({id,box})),typography:{lead:s.leadSize,dominant:domSize,closure:s.afterSize,benefit:s.note?.size,cta:s.cta.fontSize,descriptor:s.cta.descriptorSize},selection:selEvidence},null,2));
+  salidas.push([`${s.id}-layout.json`,JSON.stringify({canvas:{width:W,height:H},subjectProtection:s.subjectProtection,elements:checks.map(({id,box})=>({id,box})),typography:{lead:s.leadSize,dominant:domSize,closure:s.afterSize,benefit:s.note?.size,cta:s.cta.fontSize,descriptor:s.cta.descriptorSize},selection:selEvidence},null,2)]);
   const descriptorBox=checks.find(c=>c.id==='descriptor').box;
 
   // Ningún cursor ni etiqueta de selección tapa una voz de texto que no es su destino (hallado 2026-09-22: un
@@ -1180,7 +1189,7 @@ return k.ink.right - k.ink.left }))
 
   const top = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${defs}</defs>${body}${cardEl ? cardEl.svg.split('\n').slice(1).join('\n') : ''}${selection}</svg>`)
 
-  fs.writeFileSync(`${OUT}/${s.id}-overlay.svg`,top);
+  salidas.push([`${s.id}-overlay.svg`, top])
   const topLayers = [{ input: top, left: 0, top: 0 }]
 
   let firmaSobreSujeto = null
@@ -1240,8 +1249,9 @@ return k.ink.right - k.ink.left }))
 
   const out = s.final ? sharp(master).resize({ width: s.final[0], height: s.final[1] }) : sharp(master)
 
-  await out.png().toFile(`${OUT}/${s.id}.png`)
-  await sharp(master).resize({ width: 390 }).png().toFile(`${OUT}/preview-390/${s.id}.png`)
+  const pngFinal = await out.png().toBuffer()
+
+  salidas.push([`${s.id}.png`, pngFinal], [`preview-390/${s.id}.png`, await sharp(master).resize({ width: 390 }).png().toBuffer()])
 
   const contraste = {}
 
@@ -1275,14 +1285,19 @@ return k.ink.right - k.ink.left }))
         })
   }
 
-  const medidas = Object.values(accesibilidad.voces).filter(Boolean)
+  // Una voz que no se pudo medir NO pasa por no tener dato (su caja no tiene píxeles dentro del lienzo). Antes el
+  // nulo se filtraba y la voz desaparecía del veredicto en silencio.
+  const sinMedir = Object.entries(accesibilidad.voces).filter(([, m]) => !m).map(([id]) => id)
+
+  if (sinMedir.length) throw new Error(`${s.id}: no se pudo medir ${sinMedir.map(v => `«${v}»`).join(', ')} — su caja no tiene píxeles dentro del lienzo`)
+  const medidas = Object.values(accesibilidad.voces)
 
   accesibilidad.cumpleWcag = medidas.every(m => m.cumpleWcag)
   accesibilidad.cumpleApca = medidas.filter(m => m.cumpleApca != null).every(m => m.cumpleApca)
   accesibilidad.cumpleDaltonismo = medidas.filter(m => m.daltonismo).every(m => m.cumpleDaltonismo)
   accesibilidad.altText = textoAlternativo(s)
   accesibilidad.altTextEscena = Boolean(String(s.altText ?? '').trim())
-  fs.writeFileSync(`${OUT}/${s.id}.alt.txt`, `${accesibilidad.altText}\n`)
+  salidas.push([`${s.id}.alt.txt`, `${accesibilidad.altText}\n`])
 
   // Gap de tinta real entre tramos (no leading): top(siguiente) − bottom(anterior)
   const gaps = []
@@ -1304,7 +1319,29 @@ return k.ink.right - k.ink.left }))
     )
   }
 
-  qa.push({ id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}) })
+  const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal) }
+  const registro = { id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), huellas }
+
+  for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
+  qa.push(registro)
+  registrarQa(registro)
+}
+
+// El QA se escribe pieza por pieza, DESPUÉS de sus archivos: en ningún momento el registro apunta a un PNG que no es el
+// suyo. Una corrida completa arrancó con el registro vacío; una parcial FUSIONA sus piezas con las que ya estaban.
+// Sólo quedan piezas que siguen en el plan.
+function registrarQa(registro) {
+  let previo = []
+
+  try {
+    previo = JSON.parse(fs.readFileSync(QA_FILE, 'utf8'))
+  } catch {
+    previo = []
+  }
+
+  const vigentes = (Array.isArray(previo) ? previo : []).filter(r => r?.id !== registro.id && (VARIANTES || HUELLAS_PLAN.has(r?.id)))
+
+  escribirAtomico(QA_FILE, JSON.stringify([...vigentes, registro], null, 2))
 }
 
 // Driver: decide el factor de escala MIDIENDO, no estimando. Sólo formatos donde el texto se pierde en el
@@ -1364,6 +1401,8 @@ const trabajo = SLIDES.filter(x => !only.length || only.includes(x.id)).flatMap(
 for (let s0 of trabajo) {
   const plate0 = path.resolve(PLAN_DIR, s0.plate)
   const { width: pw, height: ph } = await sharp(plate0).metadata()
+  const plateSha = sha(fs.readFileSync(plate0))
+  const huellaBase = HUELLAS_PLAN.get(VARIANTES ? s0.id.replace(/--(text|outline|solid)$/, '') : s0.id) ?? null
   const mask = maskForPiece(await subjectMask(plate0), s0, pw, ph)
 
   if (!mask) console.warn(`  ⚠ ${s0.id}: la segmentación del sujeto no corrió — sólo protege \`subjectProtection\` si está declarada.`)
@@ -1417,10 +1456,8 @@ for (let s0 of trabajo) {
     }
   }
 
-  await composePiece(scaleSpec(s0, factor, pw), { mask, factor })
+  await composePiece(scaleSpec(s0, factor, pw), { mask, factor, plateSha, huellaPieza: huellaBase })
 }
-
-fs.writeFileSync(`${OUT}/qa${only.length ? '-parcial' : ''}.json`, JSON.stringify(qa, null, 2))
 
 // Hoja comparativa: las tres variantes a 390 px con lo que dice la medición de cada una.
 if (VARIANTES) {

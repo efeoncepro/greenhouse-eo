@@ -113,7 +113,7 @@ Gigi en pose héroe en lugar de con megáfono, y sólo se habría visto en la sa
 
 ```bash
 pnpm foto:componer:cta <plan.json>   # compone
-pnpm foto:cta:gate     <plan.json>   # verifica los mínimos — van en pareja y en ese orden
+pnpm foto:cta:gate     <plan.json>   # verifica los mínimos contra las huellas del QA del plan
 ```
 
 🔴 **NO copiar el compositor a la carpeta de corrida.** Vivía duplicado en **cinco** copias ya divergentes, y

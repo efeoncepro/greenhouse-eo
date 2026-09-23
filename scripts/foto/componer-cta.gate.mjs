@@ -7,25 +7,36 @@
 import { readFileSync, existsSync, statSync } from 'node:fs'
 import path from 'node:path'
 
+import { huellaComando, huellaPieza, rutaQa, sha } from './cta-integridad.mjs'
+
 const plan = process.argv[2]
 
 if (!plan) { console.error('uso: pnpm foto:cta:gate <plan.json>'); process.exit(2) }
 
 const dir = path.dirname(path.resolve(plan))
-const qaPath = path.join(dir, 'out', 'qa.json')
+const qaPlan = rutaQa(path.join(dir, 'out'), plan)
+const qaLegado = path.join(dir, 'out', 'qa.json')
 
-if (!existsSync(qaPath)) { console.error(`✗ no existe ${qaPath}. Corre \`pnpm foto:componer:cta ${plan}\` primero.`); process.exit(1) }
+// QA POR PLAN, con huellas [2026-09-23]. El formato anterior (`out/qa.json` compartido por todos los planes de la
+// carpeta, sin huellas) se sigue leyendo para no dejar a nadie sin gate, pero NO certifica: no hay cómo probar que
+// sus números describen este plan, este plate y este PNG.
+const legado = !existsSync(qaPlan)
+const qaPath = legado ? qaLegado : qaPlan
 
-// 🔴 Una salida más vieja que el plan NO es la salida del plan [2026-09-22, CMP-002].
-// El compositor aborta a mitad de corrida cuando una pieza viola `subjectProtection`, y deja el
-// `qa.json` de la corrida ANTERIOR intacto. El gate lo leía y daba verde sobre números que ya no
-// describían el plan: vio pasar el set completo mientras el compositor estaba en rojo.
-if (statSync(qaPath).mtimeMs < statSync(path.resolve(plan)).mtimeMs) {
-  console.error(
-    `✗ ${qaPath} es anterior al plan: la última composición no terminó o no se corrió. ` +
-      `Corre \`pnpm foto:componer:cta ${plan}\` y resuelve su error antes del gate.`
-  )
-  process.exit(1)
+if (!existsSync(qaPath)) { console.error(`✗ no existe ${qaPlan}. Corre \`pnpm foto:componer:cta ${plan}\` primero.`); process.exit(1) }
+
+if (legado) {
+  console.warn(`⚠ ${qaLegado} es del formato anterior (compartido y sin huellas): este gate no puede certificarlo. Recompón con \`pnpm foto:componer:cta ${plan}\` para certificar.`)
+
+  // 🔴 Una salida más vieja que el plan NO es la salida del plan [2026-09-22, CMP-002]. Sólo en el formato anterior:
+  // el actual lo decide con huellas del contenido, que no dependen de la fecha de un archivo.
+  if (statSync(qaPath).mtimeMs < statSync(path.resolve(plan)).mtimeMs) {
+    console.error(
+      `✗ ${qaPath} es anterior al plan: la última composición no terminó o no se corrió. ` +
+        `Corre \`pnpm foto:componer:cta ${plan}\` y resuelve su error antes del gate.`
+    )
+    process.exit(1)
+  }
 }
 
 const piezas = JSON.parse(readFileSync(path.resolve(plan), 'utf8'))
@@ -42,6 +53,42 @@ if (sinQa.length) {
   process.exitCode = 1
 }
 
+// 🔴 HUELLAS: el QA vale sólo para el plan, el plate y el PNG que lo produjeron [auditoría 2026-09-23]. Antes decidía
+// una fecha de archivo, y el gate certificó en verde piezas de otro plan, un QA viejo tras cambiar el plate y salidas
+// empalmadas por dos composiciones simultáneas. Cada huella se RECALCULA acá: si no coincide, el QA describe otra cosa.
+if (!legado) {
+  const comando = huellaComando()
+
+  for (const p of piezas.filter(p => p.cta)) {
+    const h = qa.find(r => r.id === p.id)?.huellas
+
+    if (!h) continue
+    const fallas = []
+
+    if (h.pieza !== huellaPieza(p)) fallas.push('el plan de la pieza cambió después de componer')
+    const plate = path.resolve(dir, p.plate)
+
+    if (!existsSync(plate)) fallas.push(`no existe el plate \`${p.plate}\``)
+    else if (h.plate !== sha(readFileSync(plate))) fallas.push('el plate cambió después de componer')
+    const png = path.join(dir, 'out', `${p.id}.png`)
+
+    if (!existsSync(png)) fallas.push(`falta \`out/${p.id}.png\``)
+    else if (h.png !== sha(readFileSync(png))) fallas.push(`\`out/${p.id}.png\` no es el PNG que registró la composición`)
+
+    if (fallas.length) {
+      console.error(`✗ ${p.id}: ${fallas.join(' · ')}. Recompón con \`pnpm foto:componer:cta ${plan} ${p.id}\`.`)
+      process.exitCode = 1
+    } else if (h.compositor !== comando) {
+      console.warn(`⚠ ${p.id}: se compuso con otra versión del comando. Recompón para certificarla con la vigente.`)
+    }
+  }
+
+  for (const r of qa.filter(x => conCta.has(x.id) && !x.huellas)) {
+    console.error(`✗ ${r.id}: el QA no trae huellas — no hay cómo probar que describe esta pieza. Recompón.`)
+    process.exitCode = 1
+  }
+}
+
 // 🔴 La protección del sujeto se DECLARA en cada pieza, aunque sea para decir que no hay sujeto
 // [2026-09-22, CMP-002]. La guarda existía en el compositor (`subjectProtection` → el descriptor no
 // baja de `top - minClearance`) pero sólo actuaba si la pieza la declaraba, y ninguna lo hacía: el
@@ -55,7 +102,18 @@ if (sinQa.length) {
 // siendo válida (y es la única protección si la segmentación no corrió: `sin-mascara`).
 for (const p of piezas.filter(p => p.cta)) {
   const sp = p.subjectProtection
-  const segmentada = qa.find(r => r.id === p.id)?.guardaSujeto === 'segmentacion'
+  const guarda = qa.find(r => r.id === p.id)?.guardaSujeto
+  const segmentada = guarda === 'segmentacion'
+
+  // 🔴 Sin máscara no hay certificación [auditoría 2026-09-23]. Un `subjectProtection` declarado a mano protege una
+  // franja horizontal, no la silueta: la auditoría compuso texto sobre el pelo con esa franja en verde. Si la
+  // segmentación no corrió, se recompone cuando corra; no se certifica con la declaración.
+  if (!legado && guarda === 'sin-mascara') {
+    console.error(`✗ ${p.id}: la segmentación del sujeto no corrió (\`guardaSujeto: sin-mascara\`). Sin máscara no se certifica: recompón cuando la segmentación esté disponible.`)
+    process.exitCode = 1
+    continue
+  }
+
   const declarada = segmentada || sp === false || (sp && typeof sp.top === 'number' && typeof sp.minClearance === 'number')
 
   if (!declarada) {
@@ -162,7 +220,14 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   }
 
   for (const [voz, m] of Object.entries(a.voces)) {
-    if (m && !m.cumpleWcag) {
+    // La ausencia ES el fallo: una voz sin medición no pasa por no tener dato.
+    if (!m) {
+      console.error(`✗ ${r.id}: «${voz}» no tiene medición de accesibilidad. Una voz sin medir no pasa.`)
+      fallos++
+      continue
+    }
+
+    if (!m.cumpleWcag) {
       console.error(`✗ ${r.id}: «${voz}» mide ${m.wcag}:1 y necesita ${m.umbralWcag}:1 (WCAG 2.2 AA${m.cssPx == null ? ', límite no textual' : `, ${m.cssPx} px en pantalla`}).`)
       fallos++
     }

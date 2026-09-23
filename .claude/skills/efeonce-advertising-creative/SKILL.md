@@ -51,10 +51,12 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
      `cursor-required`: la salida es cursor a 0,9 + cierre corto;
    - **la vista del personaje puesta en la raíz de la ficha se ignora en silencio** y resuelve la pose por
      defecto: verificar la ruta `--image` que imprime el comando antes de gastar;
-   - **el CTA se compone con `pnpm foto:componer:cta` y se verifica con `pnpm foto:cta:gate`**, en pareja
-     y en ese orden. **Nunca copiar el compositor a la carpeta de corrida** (vivió en cinco copias
-     divergentes). El gate **exige** `contraste.cta`: antes, la variante sólida pasaba porque el dato no
-     existía, no porque cumpliera;
+   - **el CTA se compone con `pnpm foto:componer:cta` y se verifica con `pnpm foto:cta:gate`**. **Nunca copiar
+     el compositor a la carpeta de corrida** (vivió en cinco copias divergentes). El gate **exige**
+     `contraste.cta`: antes, la variante sólida pasaba porque el dato no existía, no porque cumpliera. Desde el
+     2026-09-23 cada plan tiene su QA (`out/qa-<plan>.json`) con **huellas** del plan, del plate, del comando y
+     del PNG, que el gate recalcula: ya no hace falta correrlos «en pareja», y un QA que no describe lo que hay
+     en disco falla;
    - **un beneficio por pieza**: el grupo beneficio → CTA → descriptor no se reutiliza entre ejecuciones;
    - 🎯 **la metáfora entra POR el objeto del oficio, no al lado de él.** Prueba: quítale el objeto; si la
      escena sigue funcionando igual, estaba al lado.
@@ -205,8 +207,10 @@ contraste y protección de sujeto, no completitud del concepto ni geometría del
   16:9 y 9:16; 4:5 y 1:1 no crecen. El crecimiento se detiene cuando lo MIDE: ninguna caja a menos de 3,5 % del
   sujeto **segmentado** y ninguna voz perdiendo contraste. Ver §13–§14 del mismo canon.
 - **El texto nunca tapa a nadie, y no se declara a mano.** `pnpm foto:componer:cta` segmenta el plate (modelo
-  local) y aborta si una caja toca al sujeto (1,2 % del lado corto), en 2D. `qa.json` registra
-  `guardaSujeto: segmentacion`, y el gate lo acepta como protección. Sin máscara, el texto no crece. Caso
+  local) y aborta si una caja toca al sujeto (1,2 % del lado corto), en 2D. El QA registra
+  `guardaSujeto: segmentacion`, y el gate lo acepta como protección. **Sin máscara, el gate no certifica**
+  (`sin-mascara` bloquea desde el 2026-09-23); `subjectGuard.ignore` exige razón y `aprobadoPor`, con máximo 10 %
+  del lienzo por zona y 15 % en total. Caso
   fuente: las piezas de v07 crecieron ×1,6 sobre las personas cuando el tope dependía de un
   `subjectProtection` que no estaba declarado. §14.
 - **Ningún cambio al compositor se prueba a ojo.** `pnpm foto:componer:cta:regresion` compone todas las piezas
@@ -221,10 +225,10 @@ contraste y protección de sujeto, no completitud del concepto ni geometría del
 - **La variante del CTA se elige mirando, no copiando el plan anterior.** `--variantes` compone las tres lado a
   lado; `variant: "auto"` + `prominencia` (discreta/delimitada/destacada) respeta la intención y sólo escala si la
   escena no la permite, también con daltonismo. Registra `variantReason`. §17.
-- **Certificación adversarial del compositor (2026-09-23): NO CERTIFICA todavía.** 10/10 pruebas en verde, pero dos
-  auditores encontraron caminos donde el gate aprueba piezas malas (QA sin huellas, guarda de sujeto desactivable,
-  contraste medido en la caja y no en el glifo, texto diminuto en 16:9, firma sin contrato). Plan en cinco tramos en
-  §18: no presentes el gate como garantía total hasta cerrarlos.
+- **Certificación adversarial del compositor (2026-09-23): se cierra en cinco tramos (§18).** Tramo 1 (integridad)
+  cerrado: QA por plan con huellas, escritura atómica, bloqueo por carpeta, caché de máscaras verificada, esquema
+  declarativo y guarda de sujeto no desactivable. Lo que falta (contraste en el glifo, texto diminuto en 16:9,
+  firma sin contrato) está en §18: no presentes el gate como garantía total hasta cerrarlos.
 - **Un bloque centrado no se ancla lejos del centro.** Con `align: 'center'` y `|centerX − 0,5| > 0,15`, el
   compositor aborta: si el aire está a un costado, el bloque se alinea a ese costado (`align: 'left'`). Operador
   sobre 03-referencia-916: «se vería mejor alineada a la izquierda por la posición». §14.

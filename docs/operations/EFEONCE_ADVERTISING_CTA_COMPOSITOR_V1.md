@@ -48,7 +48,7 @@ qué variante era.
 ## 3. El gate: `pnpm foto:cta:gate <plan.json>`
 
 ```bash
-pnpm foto:componer:cta <plan.json>   # compone y emite out/qa.json
+pnpm foto:componer:cta <plan.json>   # compone y emite out/qa-<plan>.json (con huellas)
 pnpm foto:cta:gate     <plan.json>   # verifica los mínimos
 ```
 
@@ -61,9 +61,10 @@ cuando la firma queda sobre el sujeto (`firmaSobreSujeto`) y cuando la pieza dec
 (`zonasIgnoradas`, con su razón). El compositor, por su lado, **borra el `qa.json` anterior al empezar**: una
 corrida que falla ya no deja números viejos que el gate pueda leer como vigentes.
 
-⚠️ **Los dos comandos van en pareja y en ese orden.** Todos los planes de una misma carpeta escriben el mismo
-`out/qa.json`: si compones el plan A y luego corres el gate del plan B, el gate lee el QA de A y reporta
-**0 piezas** en vez de fallar. **Componer y verificar el mismo plan, seguido.**
+~~⚠️ Los dos comandos van en pareja y en ese orden~~ — **cerrado el 2026-09-23 (§18, tramo 1).** Cada plan tiene
+su QA (`out/qa-<plan>.json`) y cada pieza del QA lleva **huellas** del plan, del plate, del comando y del PNG; el gate
+las recalcula. Componer el plan B ya no invalida ni suplanta al A, y una corrida parcial fusiona sus piezas con las
+que ya estaban. El `out/qa.json` del formato anterior se sigue leyendo, pero el gate avisa que **no lo certifica**.
 
 ## 4. Retrocompatibilidad
 
@@ -104,7 +105,7 @@ las corridas haya sido incorporado ni que el gate cubra todo el contrato creativ
 | `signatureY` de v06 | No consumido. Es centro en el firmador archivado; convertir a `logo.y = centro - altoLogo/(2*altoCanvas)` |
 | `safeArea`, `signatureSafeArea`, `editorialReserve` | Metadatos de corrida, no guards implementados por este comando |
 | `subjectProtection` | Comprueba borde inferior del descriptor; no toda la envolvente de cursor, titular o personaje. **Declaración obligatoria desde 2026-09-22**: el gate falla si una pieza con CTA no la declara. `{top, minClearance}` en px del plate cuando hay persona bajo el bloque; `false` cuando no la hay. Se mide en el plate, no en la composición |
-| Render parcial por IDs | Emite `qa-parcial.json`; el gate lee `qa.json`. Para la pareja de comandos usar un plan completo en carpeta exclusiva |
+| Render parcial por IDs | Desde 2026-09-23 fusiona sus piezas en `qa-<plan>.json` (el resto se conserva). Antes emitía `qa-parcial.json` aparte |
 | Descriptor/cursor sin CTA | No inferir soporte opcional: el camino de layout accede a `s.cta` y al descriptor. El help heredado no demuestra soporte de pieza muda |
 
 **Prueba de migración:** el render de cuatro piezas termina, pero el gate rechaza «Sé la referencia»:
@@ -650,6 +651,33 @@ contraste sí frena.
 | 3 · Esquema e invariantes | 4 completo y 5 | una sola fuente de verdad del plan y de la geometría válida, compartida por búsqueda, composición y gate |
 | 4 · Canon hecho regla | 6, 7, 8, 9, 10 y 15 | convierte en bloqueo lo que el canon ya dice (firma, zonas, concepto) y agrega lo que falta en AXIS |
 | 5 · Harness y pruebas | 13 y 16 | cobertura y puntuación de mutantes: que la red de seguridad no tenga agujeros |
+
+### Estado de los tramos
+
+**Tramo 1 · Integridad — cerrado (2026-09-23).**
+
+- **QA por plan con huellas.** `out/qa-<plan>.json`; cada pieza registra `huellas: { pieza, plate, compositor, png }`
+  (sha256). El gate las recalcula: plan, plate o PNG distintos = **falla**; comando distinto = aviso («recompón para
+  certificar con la versión vigente»). La fecha de un archivo ya no decide nada. El `out/qa.json` anterior se lee con
+  un aviso de que **no certifica**.
+- **Escritura atómica y al final.** Los archivos de una pieza (PNG, vista a 390, layout, overlay, controles,
+  evidencia y alternativa) se escriben juntos, en temporal + renombrado, sólo si la pieza pasó todo; el QA se
+  registra después de sus archivos. Una pieza que aborta no deja nada. Las pruebas de tamaño no escriben.
+- **Bloqueo por carpeta.** Dos composiciones en la misma `out/` ya no se mezclan: la segunda se rechaza nombrando el
+  proceso que la ocupa. Un bloqueo de un proceso muerto se toma.
+- **Caché de máscaras verificada.** Cada máscara lleva `<sha>.json` con sha del plate, modelo, versión del
+  segmentador, dimensiones y sha de la máscara; si algo no calza se regenera sola (la segmentación es determinista:
+  regenerar da los mismos bytes, medido en tres plates). `FOTO_MASCARAS_DIR` aísla la caché.
+- **Esquema declarativo** (`scripts/foto/cta-esquema.mjs`, zod): tipos, rangos, enums, hex, fracciones, `id` con
+  patrón (sin rutas), `null` = ausente, campos desconocidos avisados. `subjectGuard.ignore` exige `reason` (≥ 10
+  caracteres) y `aprobadoPor`, con **máximo 10 % del lienzo por zona y 15 % en total**: la guarda ya no se apaga entera.
+- **La ausencia es el fallo, también aquí.** El gate bloquea `guardaSujeto: sin-mascara` (una franja declarada a mano
+  no protege la silueta) y una voz sin medición; el compositor aborta si una voz no se puede medir.
+- **Pruebas:** P03 suma caché envenenada y «sin archivos tras abortar»; P07 suma `id` con ruta, guarda apagada,
+  zona sin aprobador y `null`; P10 suma corrida parcial, dos planes en una carpeta, fecha sola, plan/PNG/plate
+  cambiados, sin máscara, medición ausente, QA sin huellas, formato anterior y composición concurrente. **Nueve
+  mutantes** (sin bloqueo, caché confiada, escribe antes, QA compartido, parcial que pisa, sin esquema, gate sin
+  huellas, gate que acepta sin máscara, gate que ignora el nulo): **las nueve los detecta alguna prueba**.
 
 ### Cuatro pilares (hoy → al cerrar los tramos)
 

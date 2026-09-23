@@ -1,4 +1,4 @@
-// `pnpm foto:componer:cta:pruebas [--ref <git-ref>] [--solo P01,P07] [--compositor <archivo>]` — 10 pruebas de punta a punta del compositor
+// `pnpm foto:componer:cta:pruebas [--ref <git-ref>] [--solo P01,P07] [--compositor <archivo>] [--gate <archivo>]` — 10 pruebas de punta a punta del compositor
 // de piezas con CTA, sobre piezas REALES del repo y sobre variantes rotas a propósito.
 //
 //   P01 determinismo · P02 no regresión (harness completo) · P03 guarda de sujeto · P04 crecer respira (medición
@@ -25,7 +25,8 @@ const args0 = process.argv.slice(2)
 // scripts/foto/.componer-cta@<nombre>.regresion.mjs, ignorado por git): una prueba que no falla ante un mutante que
 // rompe lo que ella cuida no está probando nada. La regresión (P02) usa ese mismo archivo como candidato.
 const COMPOSITOR = path.resolve(ROOT, args0.includes('--compositor') ? args0[args0.indexOf('--compositor') + 1] : 'scripts/foto/componer-cta.mjs')
-const GATE = path.join(ROOT, 'scripts/foto/componer-cta.gate.mjs')
+// `--gate <archivo>`: lo mismo para el gate — un gate mutante que deja de verificar algo debe hacer fallar a P10.
+const GATE = path.resolve(ROOT, args0.includes('--gate') ? args0[args0.indexOf('--gate') + 1] : 'scripts/foto/componer-cta.gate.mjs')
 const REGRESION = path.join(ROOT, 'scripts/foto/componer-cta.regresion.mjs')
 const REPORTE_A11Y = path.join(ROOT, 'scripts/foto/accesibilidad-reporte.mjs')
 const MASCARAS = path.join(ROOT, 'node_modules/.cache/foto-sujeto')
@@ -66,7 +67,7 @@ const pieza = k => {
   return { ...structuredClone(p), plate: path.resolve(path.dirname(plan), p.plate) }
 }
 
-async function componer(nombre, piezas, ids = []) {
+async function componer(nombre, piezas, ids = [], env = {}) {
   const dir = path.join(TMP, nombre)
   const planPath = path.join(dir, 'piezas.json')
 
@@ -74,8 +75,9 @@ async function componer(nombre, piezas, ids = []) {
   fs.writeFileSync(planPath, JSON.stringify(piezas, null, 2))
 
   try {
-    const r = await run(process.execPath, [COMPOSITOR, planPath, ...ids], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 })
-    const qaFile = path.join(dir, 'out', ids.length ? 'qa-parcial.json' : 'qa.json')
+    const r = await run(process.execPath, [COMPOSITOR, planPath, ...ids], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6, env: { ...process.env, ...env } })
+    // QA por plan (`qa-<plan>.json`) desde 2026-09-23: una corrida parcial lo fusiona con el que ya había.
+    const qaFile = path.join(dir, 'out', 'qa-piezas.json')
 
     return { ok: true, dir, planPath, salida: r.stdout + r.stderr, qa: JSON.parse(fs.readFileSync(qaFile, 'utf8')) }
   } catch (e) {
@@ -182,9 +184,25 @@ const PRUEBAS = [
       encima.top = 0.3
       const [kv07, movida, sana] = await Promise.all([componer('P03-kv07', [pieza('kv07_916')]), componer('P03-encima', [encima]), componer('P03-sana', [pieza('rec_916')])])
       const tapa = r => !r.ok && /tapa al sujeto/.test(r.error)
-      const ok = tapa(kv07) && tapa(movida) && sana.ok
 
-      return { ok, detalle: `KV-07-916 aborta: ${tapa(kv07)} (${kv07.error?.slice(0, 90)}) · texto movido sobre la persona aborta: ${tapa(movida)} (${movida.error?.slice(0, 90)}) · original compone: ${sana.ok}` }
+      // Una pieza que aborta no deja archivos suyos (antes quedaban el layout, el SVG de controles y la evidencia).
+      const rastro = fs.existsSync(path.join(movida.dir, 'out')) ? fs.readdirSync(path.join(movida.dir, 'out'), { recursive: true }).filter(f => String(f).includes(encima.id)) : []
+
+      // Caché envenenada: una máscara en negro del MISMO tamaño en una caché aislada. El compositor debe verificar la
+      // huella de la entrada, regenerarla y abortar igual; confiar en la caché dejaría el texto sobre la persona.
+      const cacheAislada = path.join(TMP, 'P03-cache')
+      const shaPlate = sha(fs.readFileSync(encima.plate))
+
+      fs.mkdirSync(cacheAislada, { recursive: true })
+      for (const ext of ['png', 'json']) if (fs.existsSync(path.join(MASCARAS, `${shaPlate}.${ext}`))) fs.copyFileSync(path.join(MASCARAS, `${shaPlate}.${ext}`), path.join(cacheAislada, `${shaPlate}.${ext}`))
+      const { width: mw, height: mh } = await sharp(encima.plate).metadata()
+
+      fs.writeFileSync(path.join(cacheAislada, `${shaPlate}.png`), await sharp({ create: { width: mw, height: mh, channels: 3, background: '#000' } }).extractChannel(0).png().toBuffer())
+      const envenenada = await componer('P03-envenenada', [encima], [], { FOTO_MASCARAS_DIR: cacheAislada })
+
+      const ok = tapa(kv07) && tapa(movida) && sana.ok && !rastro.length && tapa(envenenada)
+
+      return { ok, detalle: `KV-07-916 aborta: ${tapa(kv07)} (${kv07.error?.slice(0, 90)}) · texto movido sobre la persona aborta: ${tapa(movida)} (${movida.error?.slice(0, 90)}) · sin archivos tras abortar: ${!rastro.length}${rastro.length ? ` (${rastro.join(', ')})` : ''} · con la caché envenenada también aborta: ${tapa(envenenada)} · original compone: ${sana.ok}` }
     }
   },
   {
@@ -322,18 +340,33 @@ const PRUEBAS = [
       extra.colorFondo = '#000'
       ancla.cta.seleccion = { cursores: [{ id: 'ia', kind: 'collaborator', anchor: 'end-center', label: 'IA', who: 'role' }] }
       Object.assign(prom.cta, { variant: 'auto', prominencia: 'enorme' })
+      // Tramo 1 de la certificación (2026-09-23): el id es parte de rutas de archivo; una guarda no se apaga entera
+      // ni sin nombre de quien lo aprobó; un nulo no es un valor.
+      const idMalo = base()
+      const ignorarTodo = base()
+      const sinAprobador = base()
+      const nulo = base()
+
+      idMalo.id = '../fuera'
+      ignorarTodo.subjectGuard = { ignore: [{ box: [0, 0, 1, 1], reason: 'no hay sujeto en esta foto', aprobadoPor: 'prueba' }] }
+      sinAprobador.subjectGuard = { ignore: [{ box: [0, 0, 0.05, 0.05], reason: 'afiche del fondo detectado' }] }
+      nulo.cta.fontSize = null
 
       const casos = [
         ['falta cta.fontSize', [sinFont], [], /falta `cta\.fontSize`/],
         ['ids repetidos', [base(), base()], [], /ids repetidos/],
         ['id pedido inexistente', [base()], ['no-existe'], /no están en el plan: no-existe/],
-        ['token de color inexistente', [token], [], /no existe en los tokens/],
+        ['token de color inexistente', [token], [], /`cta\.surfaceToken` debe ser uno de/],
         ['final con otra proporción', [final], [], /no tiene la proporción/],
         ['pieza muda', [muda], [], /pieza muda/],
         ['plate inexistente', [plate], [], /no existe el plate/],
         ['zona ignorada sin razón', [ignorar], [], /reason/],
         ['colaborador anclado fuera de una esquina (regla AXIS)', [ancla], [], /collaborator-anchor-not-corner/],
-        ['prominencia inexistente', [prom], [], /prominencia/]
+        ['prominencia inexistente', [prom], [], /prominencia/],
+        ['id con ruta (../)', [idMalo], [], /`id`: sólo letras/],
+        ['guarda de sujeto apagada entera', [ignorarTodo], [], /una guarda no se apaga entera/],
+        ['zona ignorada sin quien la aprobó', [sinAprobador], [], /aprobadoPor/],
+        ['campo obligatorio en null', [nulo], [], /falta `cta\.fontSize`/]
       ]
 
       const rs = await Promise.all(casos.map(([, piezas, ids], i) => componer(`P07-${i}`, piezas, ids)))
@@ -358,7 +391,7 @@ const PRUEBAS = [
       const fuentes = []
 
       if (harness) {
-        for (const r of JSON.parse(fs.readFileSync(harness, 'utf8')).resultados.filter(x => x.cand === 'compone')) fuentes.push([r.id, JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/out/qa.json'), 'utf8'))[0]])
+        for (const r of JSON.parse(fs.readFileSync(harness, 'utf8')).resultados.filter(x => x.cand === 'compone')) fuentes.push([r.id, JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/out/qa-piezas.json'), 'utf8'))[0]])
       } else {
         for (const c of Object.values(crecidas)) fuentes.push([c.id, c.qa])
       }
@@ -380,7 +413,7 @@ const PRUEBAS = [
 
       if (harness) {
         for (const r of JSON.parse(fs.readFileSync(harness, 'utf8')).resultados.filter(x => x.cand === 'compone')) {
-          fuentes.push([r.id, JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/out/qa.json'), 'utf8'))[0], JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/piezas.json'), 'utf8'))[0]])
+          fuentes.push([r.id, JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/out/qa-piezas.json'), 'utf8'))[0], JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/piezas.json'), 'utf8'))[0]])
         }
       }
 
@@ -425,18 +458,94 @@ const PRUEBAS = [
       const bueno = await componer('P10-bueno', [pieza('b2_916'), pieza('b2_169')])
       const gBueno = bueno.ok ? await gate(bueno.planPath) : { code: -1, salida: bueno.error }
 
-      // QA incompleto: se quita una fila (el QA queda más nuevo que el plan).
+      // Corrida parcial: recompone una pieza y el QA conserva la otra (antes iba a un `qa-parcial.json` aparte).
+      const parcial = bueno.ok ? await run(process.execPath, [COMPOSITOR, bueno.planPath, 'b2-primero-el-numero-916'], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 }).then(() => true, () => false) : false
+      const gParcial = parcial ? await gate(bueno.planPath) : { code: -1, salida: 'la corrida parcial no compuso' }
+
+      // Dos planes en la MISMA carpeta: cada uno con su QA; componer el segundo no invalida al primero.
+      const dirDos = path.join(TMP, 'P10-dos-planes')
+
+      fs.mkdirSync(dirDos, { recursive: true })
+      fs.writeFileSync(path.join(dirDos, 'piezas-a.json'), JSON.stringify([pieza('b2_916')], null, 2))
+      fs.writeFileSync(path.join(dirDos, 'piezas-b.json'), JSON.stringify([pieza('b2_169')], null, 2))
+      const dos = await ['piezas-a.json', 'piezas-b.json'].reduce((cadena, f) => cadena.then(ok => ok && run(process.execPath, [COMPOSITOR, path.join(dirDos, f)], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 }).then(() => true, () => false)), Promise.resolve(true))
+      const [gDosA, gDosB] = dos ? [await gate(path.join(dirDos, 'piezas-a.json')), await gate(path.join(dirDos, 'piezas-b.json'))] : [{ code: -1 }, { code: -1 }]
+
+      // QA incompleto: se quita una fila.
       const incompleto = await componer('P10-incompleto', [pieza('b2_916'), pieza('b2_169')])
 
-      if (incompleto.ok) fs.writeFileSync(path.join(incompleto.dir, 'out/qa.json'), JSON.stringify(incompleto.qa.slice(0, 1)))
+      if (incompleto.ok) fs.writeFileSync(path.join(incompleto.dir, 'out/qa-piezas.json'), JSON.stringify(incompleto.qa.slice(0, 1)))
       const gIncompleto = await gate(incompleto.planPath)
 
-      // QA viejo: el plan se toca después de componer.
-      const viejo = await componer('P10-viejo', [pieza('b2_916')])
+      // HUELLAS (tramo 1, 2026-09-23): el QA vale sólo para el plan, el plate y el PNG que lo produjeron. Se prueba sobre
+      // UNA composición, alterando una cosa por vez y restaurándola antes de la siguiente.
+      const h = await componer('P10-huellas', [pieza('b2_916')])
+      const idH = 'b2-primero-el-numero-916'
+      const archivo = rel => path.join(h.dir, rel)
+
+      const conCambio = async (rel, cambiar) => {
+        const original = fs.readFileSync(archivo(rel))
+
+        cambiar(archivo(rel), original)
+        const g = await gate(h.planPath)
+
+        fs.writeFileSync(archivo(rel), original)
+
+        return g
+      }
+
       const futuro = new Date(Date.now() + 60e3)
 
-      fs.utimesSync(viejo.planPath, futuro, futuro)
-      const gViejo = await gate(viejo.planPath)
+      fs.utimesSync(h.planPath, futuro, futuro)
+      // La FECHA ya no decide: tocar el plan sin cambiar su contenido no invalida el QA.
+      const gFecha = await gate(h.planPath)
+
+      const gPlan = await conCambio('piezas.json', (f, o) => {
+        const plan = JSON.parse(o)
+
+        plan[0].cta.variantReason = 'cambio posterior a la composición'
+        fs.writeFileSync(f, JSON.stringify(plan, null, 2))
+      })
+
+      const gPng = await conCambio(`out/${idH}.png`, f => fs.copyFileSync(archivo(`out/preview-390/${idH}.png`), f))
+
+      const editarQa = cambio => conCambio('out/qa-piezas.json', (f, o) => {
+        const q = JSON.parse(o)
+
+        cambio(q[0])
+        fs.writeFileSync(f, JSON.stringify(q))
+      })
+
+      const gSinMascara = await editarQa(r => { r.guardaSujeto = 'sin-mascara' })
+      const gNulo = await editarQa(r => { r.accesibilidad.voces.cta = null })
+      const gSinHuellas = await editarQa(r => { delete r.huellas })
+
+      fs.renameSync(archivo('out/qa-piezas.json'), archivo('out/qa.json'))
+      const gLegado = await gate(h.planPath)
+
+      fs.renameSync(archivo('out/qa.json'), archivo('out/qa-piezas.json'))
+
+      // Plate cambiado: una copia del plate, compuesta y alterada después (el real no se toca).
+      const conPlate = pieza('b2_916')
+      const dirPlate = path.join(TMP, 'P10-plate-origen')
+
+      fs.mkdirSync(dirPlate, { recursive: true })
+      const copia = path.join(dirPlate, `plate${path.extname(conPlate.plate)}`)
+
+      fs.copyFileSync(conPlate.plate, copia)
+      conPlate.plate = copia
+      const plateC = await componer('P10-plate', [conPlate])
+
+      fs.writeFileSync(copia, await sharp(fs.readFileSync(copia)).modulate({ brightness: 1.02 }).toBuffer())
+      const gPlate = plateC.ok ? await gate(plateC.planPath) : { code: -1, salida: plateC.error }
+
+      // Dos composiciones en la MISMA carpeta a la vez: una se rechaza (antes se empalmaban, 7 de 8 corridas).
+      const dirC = path.join(TMP, 'P10-concurrente')
+
+      fs.mkdirSync(dirC, { recursive: true })
+      fs.writeFileSync(path.join(dirC, 'piezas.json'), JSON.stringify([pieza('b2_916')], null, 2))
+      const correr = () => run(process.execPath, [COMPOSITOR, path.join(dirC, 'piezas.json')], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 }).then(() => 'ok', e => String(e.stderr ?? '') + String(e.stdout ?? ''))
+      const concurrentes = await Promise.all([correr(), correr()])
 
       const sinAcento = await componer('P10-sin-acento', [pieza('ref_169')])
       const gSinAcento = await gate(sinAcento.planPath)
@@ -471,7 +580,17 @@ const PRUEBAS = [
         '--variantes arma la hoja de las tres': hoja,
         'auto elige y deja el motivo': Boolean(eleccion?.elegida && eleccion.motivo),
         'rechaza QA incompleto': gIncompleto.code !== 0 && /sin QA/.test(gIncompleto.salida),
-        'rechaza QA viejo': gViejo.code !== 0 && /anterior al plan/.test(gViejo.salida),
+        'la corrida parcial conserva el resto': gParcial.code === 0,
+        'dos planes en una carpeta no se pisan': gDosA.code === 0 && gDosB.code === 0,
+        'la fecha sola no invalida': h.ok && gFecha.code === 0,
+        'rechaza plan cambiado': gPlan.code !== 0 && /el plan de la pieza cambió/.test(gPlan.salida),
+        'rechaza PNG ajeno': gPng.code !== 0 && /no es el PNG que registró/.test(gPng.salida),
+        'rechaza plate cambiado': gPlate.code !== 0 && /el plate cambió/.test(gPlate.salida),
+        'rechaza sin máscara': gSinMascara.code !== 0 && /segmentación del sujeto no corrió/.test(gSinMascara.salida),
+        'rechaza medición ausente': gNulo.code !== 0 && /no tiene medición/.test(gNulo.salida),
+        'rechaza QA sin huellas': gSinHuellas.code !== 0 && /no trae huellas/.test(gSinHuellas.salida),
+        'avisa formato anterior': /no puede certificarlo/.test(gLegado.salida),
+        'rechaza composición concurrente': concurrentes.filter(x => x === 'ok').length === 1 && concurrentes.some(x => /otra composición usa/.test(x)),
         'rechaza CTA sin acento': gSinAcento.code !== 0 && /no es un acento/.test(gSinAcento.salida),
         'rechaza voz bajo WCAG': gBajo.code !== 0 && /entrada.*WCAG 2\.2 AA/.test(gBajo.salida),
         'avisa firma sobre sujeto': /firma queda sobre el sujeto/.test(gFirma.salida)
