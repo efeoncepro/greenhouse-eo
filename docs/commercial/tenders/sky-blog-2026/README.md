@@ -8,7 +8,7 @@
 >
 > | | Vigente |
 > |---|---|
-> | **Condiciones finales** | **CLP 3.000.000 netos/mes + IVA** (CLP 3.570.000 con IVA) · **24 meses** → TCV **CLP 72.000.000 neto**. Capacidad gobernada para 45–50 contenidos/mes (nuevos + refreshes), newsletter mensual incluida (hasta 10 contenidos), Notion/Content Hub como hub editorial, WordPress como superficie de publicación, addons aparte, **sin precio unitario por artículo**. |
+> | **Condiciones finales** | **CLP 3.000.000 netos/mes + IVA** (CLP 3.570.000 con IVA) · **24 meses, vigente hasta 2028** (inicio 2026-11-01) → TCV **CLP 72.000.000 neto**. Capacidad gobernada para 45–50 contenidos/mes (nuevos + refreshes), newsletter mensual incluida (hasta 10 contenidos), Notion/Content Hub como hub editorial, WordPress como superficie de publicación, addons aparte, **sin precio unitario por artículo**. |
 > | **Formalización** | **Adenda al contrato vigente con Marketing** (no contrato nuevo). Coordinador en SKY: **Slauko Davor Balaic Guerrero**. |
 > | **Comprador en SKY** | **Equipo de Marca.** Contraparte principal: **Natalia Ortiz Cáceres** (Coordinadora de Comunicación al Pasajero) y su equipo. Gerente de Marketing: Nicolá Lamiaux. Es un equipo comprador distinto del de Performance, que compra la Agencia Creativa. |
 > | **Transición** | Durante **octubre 2026** (Natalia comparte antecedentes). **Kickoff de transición: lunes 2026-09-28, 11:00.** |

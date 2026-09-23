@@ -111,8 +111,8 @@ tiempo** que alguien lo prometa. Y el día del onboarding, el cliente abre el me
 
 🎯 **Ojo — SÍ tenemos trabajo creativo vigente:** **SKY** tiene los service modules **`agencia_creativa` +
 `globe`** activos, con un squad nombrado *(Daniela Ferreira como Creative Operations Lead + Melkin Hernández
-y Andrés Carlosama como Senior Visual Designers)*, que atiende al **equipo de Performance** de SKY desde
-**ago-2025** y sigue vigente al 2026-09-23.
+y Andrés Carlosama como Senior Visual Designers)*, que atiende al **equipo de Performance** de SKY desde **ago-2025**; cumplido el primer año,
+**el contrato se renovó por un año más**.
 
 🔴 **Pero no tenemos un CASO** — porque un caso exige **métrica verificable** + relación sana +
 **autorización escrita**, y **la métrica no existe** *(ver G)*.

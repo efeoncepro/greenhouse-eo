@@ -24,7 +24,7 @@ memoria reutilizada.
 | Lo que tenemos | Lo que NO tenemos |
 |---|---|
 | ✅ **SKY — Blog SEO/AEO** — licitación Wherex **adjudicada 2026-09-23**, **TCV CLP 72M neto / 24 meses** *(equipo de Marca; la cifra de 124,8M era de la oferta original, superseded)* | 🔴 Es trabajo de **contenido/SEO**, no de creatividad de marca |
-| ✅ **SKY — Agencia Creativa** — retainer vigente ~1 año con el **equipo de Performance** *(caso creativo autorizado para nombrar)* | 🔴 Aún sin paquete de caso con métrica de negocio formalizado |
+| ✅ **SKY — Agencia Creativa** — retainer desde ago-2025 con el **equipo de Performance**, **renovado por un año más** *(caso creativo autorizado para nombrar)* | 🔴 Aún sin paquete de caso con métrica de negocio formalizado |
 | ✅ **Bresler** — **+180% de tráfico orgánico** *(dato duro)* | 🔴 Es **SEO**, no creativo |
 | ✅ **Berel** — cliente real | 🔴 Sin caso creativo formalizado |
 | ✅ **Informe AI Visibility de SKY** — público, con URL *(overall 73,3 · citation quality 90,9)* | 🔴 Prueba **visibilidad**, no que sepamos **diseñar** |

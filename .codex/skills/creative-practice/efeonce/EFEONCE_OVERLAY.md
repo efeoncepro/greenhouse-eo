@@ -126,7 +126,7 @@ tenemos — y está sin tocar.** → `modules/13_PROSPECCION.md` §5.
 >
 > | | Qué es | ¿De quién es? |
 > |---|---|---|
-> | 🎯 **SKY — Agencia Creativa** | ✅ **CLIENTE CREATIVO VIGENTE.** Service modules **`agencia_creativa` + `globe`** activos. Squad: **Daniela Ferreira** *(Creative Operations Lead / directora de arte)* + **Melkin Hernández** y **Andrés Carlosama** *(Senior Visual Designers)*. Atiende al **equipo de Performance** de SKY. Proyecto iniciado ago-2025, **vigente al 2026-09-23 (~1 año)** | 🎯 **ESTA práctica** |
+> | 🎯 **SKY — Agencia Creativa** | ✅ **CLIENTE CREATIVO VIGENTE.** Service modules **`agencia_creativa` + `globe`** activos. Squad: **Daniela Ferreira** *(Creative Operations Lead / directora de arte)* + **Melkin Hernández** y **Andrés Carlosama** *(Senior Visual Designers)*. Atiende al **equipo de Performance** de SKY. Proyecto iniciado ago-2025; primer año cumplido y **contrato renovado por un año más** | 🎯 **ESTA práctica** |
 > | **SKY — Blog SEO/AEO (Wherex)** | 🔴 **Servicio de SEO/CONTENIDO.** **Adjudicado 2026-09-23** para el **equipo de Marca** de SKY *(otro comprador)*: CLP 3,0M neto/mes · 24 meses · inicio 2026-11-01. *(Oferta original 5,2M · piso 4,6M · loaded 2,26M = histórica / superseded.)* | 🔴 **`seo-aeo-practice` — NO es de acá** |
 >
 > 🔴 **Los CLP 5,2M, el loaded de 2,26M, el piso de 4,6M y los bugs de precio (ad-hoc, plan dominado,
