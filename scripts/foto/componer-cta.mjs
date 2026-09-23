@@ -421,6 +421,60 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   const meta = await sharp(plate).metadata()
 
   W = meta.width; H = meta.height; M = Math.round(W * 0.07)
+
+  // 🔴 ESCALA TIPOGRÁFICA EN FORMATO HORIZONTAL [operador, 2026-09-22]
+  // En 16:9 la composición de texto se veía perdida en el cuadro. La causa NO es el tamaño de fuente
+  // respecto a su columna, sino que la columna es angosta frente a un lienzo muy ancho:
+  //     4:5   1152 × textWidth 0.84 = 968 px de columna
+  //     16:9  2048 × textWidth 0.44 = 901 px de columna   ← casi la misma, en un lienzo el doble de ancho
+  // Por eso escalar por ancho de LIENZO es un error: multiplica los px por 1,78 contra una columna que
+  // no creció, el dominante topa en `dominantMax`, la entrada sí crece y la jerarquía se aplana
+  // (medido: el ratio dominante/entrada cayó a 2,3 — bajo el mínimo de 3).
+  // Lo que sí sobra es espacio DENTRO de la columna: el dominante llegaba a 0,32 del ancho con su
+  // límite en 0,44. Así que el bloque se escala hasta que el dominante LLENE su `dominantMax`, y como
+  // el factor se aplica a todas las voces por igual, el ratio de jerarquía se conserva intacto.
+  // Sólo aplica a lienzos HORIZONTALES (W > H): 4:5 y 9:16 quedan idénticos, byte por byte.
+  const TYPE_FILL_CAP = 1.6   // tope duro: por encima de esto el bloque deja de ser un titular y es una pancarta
+
+  if (W > H && s.dominant && s.dominantMax && typeof s.dominantSize === 'number') {
+    const domFont0 = fontFor(R.ideaImpact, DOMINANT_WIDTH)
+
+    const widest0 = Math.max(...s.dominant.replace(/\*\*|\[\[|\]\]/g, '').split('|').map(t => {
+      const k = shape(t.trim(), domFont0, s.dominantSize, s.dominantTracking ?? em(R.ideaImpact.tracking))
+
+      return k.ink.right - k.ink.left
+    }))
+
+    const fill = widest0 > 0 ? (s.dominantMax * W) / widest0 : 1
+
+    // 🔴 El bloque crece en ALTO junto con el texto, y abajo lo espera `subjectProtection`. El tope por
+    // espacio evita que la escala empuje el descriptor sobre el sujeto: se estima el alto del bloque
+    // sumando las voces por un factor de leading+gaps, y se limita el crecimiento a lo que quepa.
+    // Es una HEURÍSTICA declarada, no una medición: la guarda del compositor sigue siendo el verificador
+    // real y aborta si la estimación se queda corta — preferimos abortar que publicar texto sobre la cara.
+    let capAlto = Infinity
+
+    if (s.subjectProtection) {
+      const libre = (s.subjectProtection.top - (s.subjectProtection.minClearance ?? 24)) - (s.top ?? 0.05) * H
+
+      const voces = [s.leadSize, s.dominantSize * 1.2, s.afterSize, s.note?.size, s.cta?.fontSize, s.cta?.descriptorSize]
+        .reduce((a, v) => a + (typeof v === 'number' ? v : 0), 0)
+
+      const altoEstimado = voces * 1.6
+
+      if (altoEstimado > 0 && libre > 0) capAlto = libre / altoEstimado
+    }
+
+    if (fill > 1.01 && capAlto > 1.01) {
+      const f = Math.min(fill, TYPE_FILL_CAP, capAlto)
+      const px = v => (typeof v === 'number' ? Math.round(v * f) : v)
+
+      for (const k of ['leadSize', 'dominantSize', 'afterSize', 'labelSize']) s[k] = px(s[k])
+      if (s.note) for (const k of ['size', 'gapAfterClosure']) s.note[k] = px(s.note[k])
+      if (s.cta) for (const k of ['fontSize', 'descriptorSize', 'paddingX', 'paddingY', 'radius', 'descriptorGap', 'gapAfterNote']) s.cta[k] = px(s.cta[k])
+    }
+  }
+
   let defs = ''
   let under = ''
   let body = ''

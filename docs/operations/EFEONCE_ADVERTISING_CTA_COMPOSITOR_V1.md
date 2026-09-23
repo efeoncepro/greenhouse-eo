@@ -302,3 +302,43 @@ ahora la guarda los frena: si se reabren, se ajusta la pieza, no el `top`.
 
 **Si recompones un plan anterior:** el descriptor bajará ~10 px. Revisa la guarda y la pieza a ojo.
 
+
+## 13. Escala tipográfica en formato horizontal — el texto llena su columna
+
+**Pedido del operador, 2026-09-22:** en 16:9 la composición de texto se veía perdida en el cuadro.
+
+🔴 **La causa NO era el tamaño de fuente respecto a su columna.** Medido:
+
+| formato | lienzo | `textWidth` | columna |
+|---|---|---|---|
+| 4:5 | 1152 | 0,84 | **968 px** |
+| 16:9 | 2048 | 0,44 | **901 px** |
+
+**La columna es casi la misma; lo que cambia es el lienzo.** El texto se ve chico porque ocupa el 44% de un
+cuadro muy ancho, no porque la fuente sea pequeña para su caja.
+
+⚠️ **Por eso el primer intento —escalar por ancho de LIENZO— estaba mal y los números lo mostraron:** multiplica
+los px por 1,78 contra una columna que no creció, el dominante topa en `dominantMax`, la entrada sí crece y
+**la jerarquía se aplana** (el ratio dominante/entrada cayó a **2,3**, bajo el mínimo de 3).
+
+✅ **Lo que sí sobra es espacio DENTRO de la columna**: el dominante llegaba a 0,32 del ancho con su límite en
+0,44. El compositor escala el bloque **hasta que el dominante llene su `dominantMax`**, y aplica el mismo factor
+a todas las voces, paddings y gaps absolutos — **así el ratio de jerarquía queda intacto** (medido: 4,0 en TOFU
+16:9, 3,5 en MOFU y BOFU).
+
+**Alcance: sólo lienzos horizontales (`W > H`).** 4:5 y 9:16 quedan idénticos porque la condición es falsa —
+verificado pieza por pieza: sus ratios no se movieron ni una décima.
+
+**Dos topes, y sólo uno es una medición:**
+
+| Tope | Qué es |
+|---|---|
+| `TYPE_FILL_CAP = 1.6` | límite duro: por encima el titular deja de serlo y es una pancarta |
+| **tope por espacio** | 🔴 **heurística declarada, no medición**: estima el alto del bloque (suma de voces × 1,6) y limita el crecimiento a lo que quepa sobre `subjectProtection` |
+
+🔴 **El tope por espacio existe porque el bloque crece en ALTO junto con el texto y abajo lo espera el sujeto.**
+La estimación puede quedarse corta: cuando eso pasa, **la guarda del compositor aborta**, que es el
+comportamiento correcto — preferimos abortar que publicar texto sobre la cara. La guarda sigue siendo el
+verificador real; la heurística sólo evita el abort en el caso común.
+
+**Es escalable:** un formato horizontal nuevo escala solo, sin tocar un plan.

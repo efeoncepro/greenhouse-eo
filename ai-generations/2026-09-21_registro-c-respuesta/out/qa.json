@@ -35,23 +35,23 @@
     ],
     "ratioDominanteEntrada": 3.5,
     "contraste": {
-      "entrada": 19.2,
-      "dominante": 19.12,
-      "cierre-frase": 19.3,
-      "nota": 19.31,
-      "cta": 10.67,
-      "descriptor": 19.6,
+      "entrada": 19.16,
+      "dominante": 19.16,
+      "cierre-frase": 19.31,
+      "nota": 19.44,
+      "cta": 10.74,
+      "descriptor": 19.71,
       "logo": 19.35
     },
     "gapsTinta": [
       {
         "entre": "entrada→dominante",
-        "px": 13,
+        "px": 15,
         "ratioDominante": 0.116
       },
       {
         "entre": "dominante→cierre",
-        "px": 13,
+        "px": 15,
         "ratioDominante": 0.116
       }
     ],
