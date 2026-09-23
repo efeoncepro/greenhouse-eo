@@ -495,4 +495,18 @@ Para recomponer un set aprobado **sin** que crezca: `"textGrowth": false` en cad
 | **Tamaños por defecto materializados antes de escalar** | una voz sin tamaño declarado no crecía con el resto (hoy ningún plan depende de eso) |
 | **Nota centrada con su bloque** | en un bloque centrado, la nota encadenada quedaba alineada a la izquierda |
 | **Caché de máscaras escrita atómicamente · rutas desde la raíz del repo · overlay del CTA sin `<text>` · mensajes con el id de la pieza · ayuda con el nombre real del comando** | robustez de base |
+| **La variante automática de la firma se mide donde va la firma** | se medía al pie aunque la pieza declarara `logo.y`: la decisión miraba otro fondo |
+| **Contraste en el peor caso según la tinta** | se medía siempre contra lo más claro del fondo (p98). Para tinta clara es el peor caso; para tinta **oscura** es el mejor, y el número salía optimista. Se detectó mirando la pieza: con la firma medida en su posición real, b2-916 pasaba al logo azul con «4,56» y a la vista casi desaparecía sobre el negro. Ahora: el mínimo entre p98 y p2. Con tinta blanca o clara el número es idéntico |
+
+🔴 **Lección de método:** la segunda corrección no la encontró el harness, que sólo compara versiones: la encontró
+**mirar el antes y después**. El harness dice QUÉ cambia; si el cambio es mejor lo decide la imagen, no el número.
+
+### Pendiente de aprobación del operador: cortes de línea
+
+Propuesta en `scripts/foto/.componer-cta@propuesta.regresion.mjs` (fuera de git; se prueba con
+`--candidato`). Si el corte voraz deja una palabra sola en la última línea (**viuda**: «…cada / mes.») o termina
+una línea en artículo, preposición o conjunción («…el / mismo día.», «…fuentes de / la respuesta»), prueba un
+ancho menor que conserve **el mismo número de líneas**: el alto del bloque no cambia y ninguna guarda se mueve.
+Medido con el harness: **cambia 7 piezas únicas** —4 de CMP-001 (b2 en 16:9 y 9:16, mo2 y mo3 en 16:9), 04-elegida-169 de
+Codex y KV-01-169 y KV-06-169 de CMP-002—, todas sólo en el corte; cero cambios de estado.
 

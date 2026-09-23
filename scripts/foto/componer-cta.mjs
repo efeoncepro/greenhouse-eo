@@ -376,9 +376,15 @@ const contrastUnder = async (buf, box, inkL = 1) => {
 
   for (let i = 0; i < data.length; i += 3) ls.push(lum(data[i], data[i + 1], data[i + 2]))
   ls.sort((a, b) => a - b)
-  const bg = ls[Math.floor(ls.length * 0.98)]
 
-  return Math.round(((Math.max(inkL, bg) + 0.05) / (Math.min(inkL, bg) + 0.05)) * 100) / 100
+  // Peor caso según la tinta: una clara se pierde contra lo más claro del fondo (p98), una oscura contra lo más
+  // oscuro (p2). Medir siempre contra lo más claro dejaba optimista a la tinta oscura: con la firma medida en su
+  // posición real, b2-916 elegía el logo azul (4,56 «medido») y a la vista casi desaparecía sobre el negro.
+  // Con tinta blanca o clara el número no cambia (verificado con la regresión: 86 de 86 piezas iguales).
+  const ratio = bg => (Math.max(inkL, bg) + 0.05) / (Math.min(inkL, bg) + 0.05)
+  const peor = Math.min(ratio(ls[Math.floor(ls.length * 0.98)]), ratio(ls[Math.floor(ls.length * 0.02)]))
+
+  return Math.round(peor * 100) / 100
 }
 
 const measureLabel = (label, size) => shape(label, pop[700], size).advance
@@ -997,7 +1003,8 @@ return k.ink.right - k.ink.left }))
       const lwTmp = Math.round(s.logo.width <= 1 ? s.logo.width * Math.min(W, H) : s.logo.width)
       const lhTmp = Math.round(lwTmp * 196.68 / 837.07)
       const lxTmp = Math.round((s.logo.x != null ? s.logo.x * W : W / 2) - lwTmp / 2)
-      const lyTmp = Math.round(H - M * 0.85 - lhTmp)
+      // Se mide DONDE va la firma: antes se medía al pie aunque la pieza declarara `logo.y`.
+      const lyTmp = typeof s.logo.y === 'number' ? Math.round(s.logo.y * H) : Math.round(H - M * 0.85 - lhTmp)
       const cNeg = await contrastUnder(bare, { left: lxTmp, right: lxTmp + lwTmp, top: lyTmp, bottom: lyTmp + lhTmp }, 1)
       const cCol = await contrastUnder(bare, { left: lxTmp, right: lxTmp + lwTmp, top: lyTmp, bottom: lyTmp + lhTmp }, lum(2, 60, 112))
 
