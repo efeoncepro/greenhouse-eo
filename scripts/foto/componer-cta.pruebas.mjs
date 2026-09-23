@@ -1,4 +1,4 @@
-// `pnpm foto:componer:cta:pruebas [--ref <git-ref>] [--solo P01,P07]` — 10 pruebas de punta a punta del compositor
+// `pnpm foto:componer:cta:pruebas [--ref <git-ref>] [--solo P01,P07] [--compositor <archivo>]` — 10 pruebas de punta a punta del compositor
 // de piezas con CTA, sobre piezas REALES del repo y sobre variantes rotas a propósito.
 //
 //   P01 determinismo · P02 no regresión (harness completo) · P03 guarda de sujeto · P04 crecer respira (medición
@@ -20,7 +20,11 @@ import sharp from 'sharp'
 
 const run = promisify(execFile)
 const ROOT = fileURLToPath(new URL('../../', import.meta.url))
-const COMPOSITOR = path.join(ROOT, 'scripts/foto/componer-cta.mjs')
+const args0 = process.argv.slice(2)
+// `--compositor <archivo>` corre las pruebas contra OTRA versión (p. ej. un mutante en
+// scripts/foto/.componer-cta@<nombre>.regresion.mjs, ignorado por git): una prueba que no falla ante un mutante que
+// rompe lo que ella cuida no está probando nada. La regresión (P02) usa ese mismo archivo como candidato.
+const COMPOSITOR = path.resolve(ROOT, args0.includes('--compositor') ? args0[args0.indexOf('--compositor') + 1] : 'scripts/foto/componer-cta.mjs')
 const GATE = path.join(ROOT, 'scripts/foto/componer-cta.gate.mjs')
 const REGRESION = path.join(ROOT, 'scripts/foto/componer-cta.regresion.mjs')
 const REPORTE_A11Y = path.join(ROOT, 'scripts/foto/accesibilidad-reporte.mjs')
@@ -156,7 +160,7 @@ const PRUEBAS = [
     id: 'P02', nombre: `No regresión: todas las piezas con CTA del repo contra ${REF}`,
     async correr() {
       try {
-        const r = await run(process.execPath, [REGRESION, '--ref', REF], { cwd: ROOT, timeout: 60 * 60e3, maxBuffer: 64e6 })
+        const r = await run(process.execPath, [REGRESION, '--ref', REF, '--candidato', COMPOSITOR], { cwd: ROOT, timeout: 60 * 60e3, maxBuffer: 64e6 })
 
         harness = r.stdout.match(/Reporte: (\S+)/)?.[1]
 
