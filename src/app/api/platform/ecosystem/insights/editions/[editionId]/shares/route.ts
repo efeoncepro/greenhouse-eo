@@ -1,6 +1,7 @@
 import { runEcosystemCommandRoute } from '@/lib/api-platform/core/commands'
 import { runEcosystemReadRoute } from '@/lib/api-platform/core/ecosystem-auth'
-import { createEcosystemInsightSharePayload, listEcosystemInsightSharesPayload } from '@/lib/api-platform/resources/ecosystem-insights'
+import { createEcosystemInsightSharePayload } from '@/lib/api-platform/resources/ecosystem-insights'
+import { listEcosystemInsightSharesPayload } from '@/lib/api-platform/resources/ecosystem-insights-read'
 
 export const dynamic = 'force-dynamic'
 

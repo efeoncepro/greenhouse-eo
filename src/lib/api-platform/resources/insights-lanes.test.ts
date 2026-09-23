@@ -38,7 +38,7 @@ describe('app lane — derivación del sujeto', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('cliente: la org es la del tenant; un organizationId ajeno en query no la sobreescribe (el dominio lo niega)', async () => {
-    const { getAppInsightsCatalog } = await import('./app-insights')
+    const { getAppInsightsCatalog } = await import('./app-insights-read')
     const context = { tenant: { userId: 'u', tenantType: 'client', roleCodes: ['client_manager'], primaryRoleCode: 'client_manager', routeGroups: ['client'], authorizedViews: [], projectScopes: [], campaignScopes: [], organizationId: 'org-a' } } as never
 
     await getAppInsightsCatalog({ context, request: req('https://x/api?organizationId=org-b') })
@@ -48,7 +48,8 @@ describe('app lane — derivación del sujeto', () => {
   })
 
   it('interno: organizationId es obligatorio (400) y viaja como target con actorOrganizationId null', async () => {
-    const { createAppInsightEdition, getAppInsightsCatalog } = await import('./app-insights')
+    const { createAppInsightEdition } = await import('./app-insights')
+    const { getAppInsightsCatalog } = await import('./app-insights-read')
     const context = { tenant: { userId: 'u', tenantType: 'efeonce_internal', roleCodes: ['efeonce_account'], primaryRoleCode: 'efeonce_account', routeGroups: ['internal'], authorizedViews: [], projectScopes: [], campaignScopes: [] } } as never
 
     await expect(getAppInsightsCatalog({ context, request: req('https://x/api') })).rejects.toMatchObject({ errorCode: 'bad_request' })
@@ -76,7 +77,8 @@ describe('ecosystem lane — derivación del sujeto máquina', () => {
   const ctx = (binding: Record<string, unknown>) => ({ consumer: { publicId: 'cons-1' }, binding: { organizationId: null, greenhouseScopeType: 'internal', ...binding } }) as never
 
   it('binding org-scoped: lee como cliente de esa org, otra org es 404 y crear es scope_not_allowed', async () => {
-    const { createEcosystemInsightEditionPayload, getEcosystemInsightsCatalogPayload } = await import('./ecosystem-insights')
+    const { createEcosystemInsightEditionPayload } = await import('./ecosystem-insights')
+    const { getEcosystemInsightsCatalogPayload } = await import('./ecosystem-insights-read')
     const context = ctx({ organizationId: 'org-a', greenhouseScopeType: 'organization' })
 
     await getEcosystemInsightsCatalogPayload({ context, request: req('https://x/api') })
@@ -87,7 +89,8 @@ describe('ecosystem lane — derivación del sujeto máquina', () => {
   })
 
   it('binding internal: organizationId requerido, escribe como actor de sistema interno; scope no interno sin org es scope_not_allowed', async () => {
-    const { createEcosystemInsightEditionPayload, getEcosystemInsightsCatalogPayload } = await import('./ecosystem-insights')
+    const { createEcosystemInsightEditionPayload } = await import('./ecosystem-insights')
+    const { getEcosystemInsightsCatalogPayload } = await import('./ecosystem-insights-read')
 
     await expect(getEcosystemInsightsCatalogPayload({ context: ctx({}), request: req('https://x/api') })).rejects.toMatchObject({ errorCode: 'bad_request' })
     await expect(getEcosystemInsightsCatalogPayload({ context: ctx({ greenhouseScopeType: 'space' }), request: req('https://x/api') })).rejects.toMatchObject({ errorCode: 'scope_not_allowed' })
@@ -99,7 +102,8 @@ describe('ecosystem lane — derivación del sujeto máquina', () => {
   })
 
   it('render (TASK-1846): binding org-scoped no encola (scope_not_allowed) pero lista sus runs; binding interno encola y recibe 202', async () => {
-    const { listEcosystemInsightRenderRunsPayload, requestEcosystemInsightRenderPayload } = await import('./ecosystem-insights')
+    const { requestEcosystemInsightRenderPayload } = await import('./ecosystem-insights')
+    const { listEcosystemInsightRenderRunsPayload } = await import('./ecosystem-insights-read')
     const orgScoped = ctx({ organizationId: 'org-a', greenhouseScopeType: 'organization' })
 
     await expect(requestEcosystemInsightRenderPayload({ context: orgScoped, request: req('https://x/api'), body: {}, editionId: 'insed-1' })).rejects.toMatchObject({ errorCode: 'scope_not_allowed' })
