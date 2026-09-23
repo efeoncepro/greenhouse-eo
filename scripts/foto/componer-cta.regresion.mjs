@@ -1,4 +1,4 @@
-// `pnpm foto:componer:cta:regresion [--ref <git-ref>] [--candidato <archivo>] [--solo <texto>] [--jobs <n>]`
+// `pnpm foto:componer:cta:regresion [--ref <git-ref>] [--candidato <archivo>] [--solo <texto>] [--jobs <n>] [--conservar]`
 //
 // Red de seguridad del compositor de CTA. Compone TODAS las piezas de TODOS los planes con CTA del repo con dos
 // versiones del compositor —la de referencia (`--ref`, HEAD por defecto) y la candidata (`--candidato`, el
@@ -42,6 +42,9 @@ const REF = opt('--ref', 'HEAD')
 const CANDIDATO = path.resolve(ROOT, opt('--candidato', 'scripts/foto/componer-cta.mjs'))
 const SOLO = opt('--solo', null)
 const JOBS = Number(opt('--jobs', Math.max(2, Math.min(6, os.cpus().length - 2))))
+// Por defecto se borran las carpetas de las piezas IGUALES al terminar: cada corrida completa dejaba ~535 MB en el
+// temporal y diez corridas llevaron el disco al 97 % (2026-09-22). `--conservar` las guarda todas.
+const CONSERVAR = args.includes('--conservar')
 const TOL_PX = 0.05
 const sha = bytes => createHash('sha256').update(bytes).digest('hex')
 
@@ -77,6 +80,20 @@ walk(path.join(ROOT, 'ai-generations'))
 
 const casos = new Map()
 const plateSha = new Map()
+const omitidas = []
+
+// Un plate que no se puede leer (p. ej. un archivo de iCloud/OneDrive evictado con el disco lleno: ETIMEDOUT) se
+// reintenta y, si sigue fallando, la pieza queda OMITIDA con su causa. Antes tumbaba la corrida entera; y una pieza
+// omitida nunca cuenta como verde.
+function leerPlate(plate) {
+  for (let intento = 1; intento <= 3; intento++) {
+    try {
+      return fs.readFileSync(plate)
+    } catch (e) {
+      if (intento === 3) throw e
+    }
+  }
+}
 
 for (const plan of planes.sort()) {
   let piezas
@@ -92,7 +109,16 @@ for (const plan of planes.sort()) {
     const plate = path.resolve(path.dirname(plan), p.plate)
 
     if (!fs.existsSync(plate)) continue
-    if (!plateSha.has(plate)) plateSha.set(plate, sha(fs.readFileSync(plate)))
+
+    if (!plateSha.has(plate)) {
+      try {
+        plateSha.set(plate, sha(leerPlate(plate)))
+      } catch (e) {
+        omitidas.push(`${rel}#${p.id}: no se pudo leer el plate (${e.code ?? e.message})`)
+        continue
+      }
+    }
+
     const pieza = { ...p, plate }
     const clave = sha(JSON.stringify({ ...p, plate: plateSha.get(plate) })).slice(0, 16)
 
@@ -253,6 +279,11 @@ for (const t of orden) {
   }
 }
 
-console.log(`\nReporte: ${path.join(TMP, 'reporte.json')}`)
+if (omitidas.length) console.log(`\n⛔ Piezas OMITIDAS — no se verificaron, así que la corrida no puede dar verde (${omitidas.length}):\n${omitidas.map(o => `  · ${o}`).join('\n')}`)
+
+// Limpieza: se conservan sólo las piezas con diferencias (son la evidencia a mirar) y el reporte.
+if (!CONSERVAR) for (const r of resultados.filter(x => x.tipo === 'igual' || x.tipo === 'qa-nuevo')) fs.rmSync(r.dir, { recursive: true, force: true })
+
+console.log(`\nReporte: ${path.join(TMP, 'reporte.json')}${CONSERVAR ? '' : ' (se borraron las carpetas de las piezas iguales; --conservar las guarda)'}`)
 // Claves nuevas en el QA no dañan nada: informan, no fallan. Todo lo demás es una diferencia a aprobar mirando.
-process.exitCode = resultados.every(r => r.tipo === 'igual' || r.tipo === 'qa-nuevo') ? 0 : 1
+process.exitCode = omitidas.length === 0 && resultados.every(r => r.tipo === 'igual' || r.tipo === 'qa-nuevo') ? 0 : 1

@@ -160,7 +160,8 @@ const PRUEBAS = [
     id: 'P02', nombre: `No regresión: todas las piezas con CTA del repo contra ${REF}`,
     async correr() {
       try {
-        const r = await run(process.execPath, [REGRESION, '--ref', REF, '--candidato', COMPOSITOR], { cwd: ROOT, timeout: 60 * 60e3, maxBuffer: 64e6 })
+        // `--conservar`: P08 y P09 leen las 86 piezas que deja la regresión; la suite borra esa carpeta al final.
+        const r = await run(process.execPath, [REGRESION, '--ref', REF, '--candidato', COMPOSITOR, '--conservar'], { cwd: ROOT, timeout: 60 * 60e3, maxBuffer: 64e6 })
 
         harness = r.stdout.match(/Reporte: (\S+)/)?.[1]
 
@@ -462,6 +463,9 @@ const md = [
 ].join('\n')
 
 fs.writeFileSync(path.join(TMP, 'reporte.json'), JSON.stringify({ ref: REF, tmp: TMP, resultados }, null, 2))
+
+// La carpeta de la regresión pesa ~535 MB: se borra salvo que se pida conservarla.
+if (harness && !args.includes('--conservar')) fs.rmSync(path.dirname(harness), { recursive: true, force: true })
 fs.writeFileSync(path.join(TMP, 'reporte.md'), `${md}\n`)
 console.log(`\n${resultados.filter(r => r.ok).length} de ${resultados.length} pasan · ${path.join(TMP, 'reporte.md')}`)
 process.exitCode = resultados.every(r => r.ok) ? 0 : 1
