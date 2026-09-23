@@ -48,7 +48,9 @@ const sha = bytes => createHash('sha256').update(bytes).digest('hex')
 // 1 · El compositor de referencia se extrae de git JUNTO al canónico: sus imports relativos y la caché de
 //     máscaras dependen de vivir en scripts/foto/. El archivo es temporal y está en .gitignore.
 const refSha = execFileSync('git', ['rev-parse', '--short', REF], { cwd: ROOT, encoding: 'utf8' }).trim()
-const REF_FILE = path.join(ROOT, `scripts/foto/.componer-cta@${refSha}.regresion.mjs`)
+// Único por PROCESO: dos regresiones en paralelo contra la misma versión escribían y borraban el MISMO archivo, y la
+// que terminaba primero dejaba a la otra componiendo contra un archivo que ya no existía.
+const REF_FILE = path.join(ROOT, `scripts/foto/.componer-cta@${refSha}-${process.pid}.regresion.mjs`)
 
 fs.writeFileSync(REF_FILE, execFileSync('git', ['show', `${REF}:scripts/foto/componer-cta.mjs`], { cwd: ROOT }))
 
