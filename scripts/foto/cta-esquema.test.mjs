@@ -110,3 +110,23 @@ test('Entidades sin punto y coma con la lista oficial de HTML5, y el CTA en la c
   assert.ok(errores({ ...base(), cta: ctaSinX }).some(e => /falta `cta\.x`: en un bloque alineado a la izquierda usa `cta\.x: "columna"`/.test(e)))
   assert.ok(errores({ ...base(), align: 'center', cta: ctaSinX }).some(e => /en un bloque centrado usa `cta\.align: "center"`/.test(e)))
 })
+
+test('Se valida lo que se dibuja: invisibles, marcado vacío, la barra en la etiqueta de un cursor y el alternativo (tramo 16)', () => {
+  // Octava, R1b: un invisible o un marcado vacío partían la entidad en el plan y el compositor la volvía a unir.
+  const conInvisible = errores({ ...base(), cta: { ...base().cta, text: 'Agenda tu caf&\u200Beacute hoy' } })
+
+  assert.ok(conInvisible.some(e => /`cta\.text` trae la entidad «&eacute» sin punto y coma/.test(e)))
+  assert.ok(conInvisible.some(e => /`cta\.text` trae un carácter invisible \(U\+200B\)/.test(e)))
+  assert.ok(errores({ ...base(), lead: 'Lo mostr&****oacute' }).some(e => /`lead` trae la entidad «&oacute» sin punto y coma/.test(e)))
+  assert.ok(errores({ ...base(), after: 'Cada a&[[]]ntilde;o' }).some(e => /`after` trae la entidad «&ntilde;»/.test(e)))
+  assert.deepEqual(errores({ ...base(), lead: 'Es R&|D' }), [], 'la barra corta la línea: no une una entidad')
+  // Octava, P1: la etiqueta de un cursor va en una sola línea.
+  const cursor = label => ({ ...base(), cta: { ...base().cta, seleccion: { cursores: [{ id: 'eq', kind: 'collaborator', anchor: 'bottom-end', label, who: 'department' }] } } })
+
+  assert.ok(errores(cursor('Tu|marca')).some(e => /`cta\.seleccion\.cursores\.0\.label` trae `\|`: la etiqueta de un cursor va en una sola línea/.test(e)))
+  assert.ok(errores(cursor('Tu\nmarca')).some(e => /la etiqueta de un cursor va en una sola línea/.test(e)))
+  assert.deepEqual(errores(cursor('Tu marca')), [])
+  // Octava, A5: el alternativo pasa por las mismas reglas de entidades.
+  assert.ok(errores({ ...base(), altText: 'Gr&aacuteficos' }).some(e => /`altText` trae la entidad «&aacute»/.test(e)))
+  assert.deepEqual(errores({ ...base(), altText: 'Q&A con R&D' }), [])
+})

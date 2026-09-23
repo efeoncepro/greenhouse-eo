@@ -28,7 +28,7 @@ import { AXIS_COLLABORATION_SELECTION_SPEC, resolveCollaborationSelectionIntent 
 import { renderCollaborationSelection } from '../../scripts/creative/layout-compiler/axis-advertising.mjs'
 import { compositeLuminosity } from '../../scripts/creative/layout-compiler/compiler.mjs'
 
-import { ANCHO_PANTALLA, DPR_REFERENCIA, UMBRALES, hexARgb, medicionImposible, medirAnillo, medirContraColor, medirGlifos, medirVoz, tamanoEnPantalla, textoAlternativo, umbralWcag } from './accesibilidad.mjs'
+import { ANCHO_PANTALLA, DPR_REFERENCIA, TECHO_CANTO, UMBRALES, hexARgb, medicionImposible, pendienteBajoCaja, medirAnillo, medirContraColor, medirGlifos, medirVoz, tamanoEnPantalla, textoAlternativo, umbralWcag } from './accesibilidad.mjs'
 import { ORDEN as ORDEN_VARIANTES, elegirVariante } from './cta-variantes.mjs'
 import { validarPiezaEsquema } from './cta-esquema.mjs'
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
@@ -919,7 +919,9 @@ function trazoLogo(rgb, logo, left, top) {
 // (con holgura) ni una zona `protect`. Devuelve la Y y la tinta que la cumple, o `y: null` con la banda que recorrió.
 // `techoMinimo` (px): en el canon 2026-09-23 la firma sólo va en el cuarto inferior de la pieza; con el pie ocupado por una
 // zona `protect`, antes quedaba a media pieza, justo bajo el descriptor (auditoría de diseño, N1).
-async function buscarYFirma(s, bare, mask, zona, ocupados, protegidas = [], techoMinimo = 0) {
+// `evitarCanto` (tramo 16; octava, diseño F1): en una pieza nueva, la firma no se apoya sobre un escalón de luz —el canto
+// del lecho—; con `logo.y: "auto"` la búsqueda lo ponía justo ahí («Que te elijan», plate original).
+async function buscarYFirma(s, bare, mask, zona, ocupados, protegidas = [], techoMinimo = 0, evitarCanto = false) {
   const pie = cajaLogo({ ...s, logo: { ...s.logo, y: undefined } })
   const alto = pie.bottom - pie.top
   const holgura = Math.round(Math.min(W, H) * 0.02)
@@ -938,6 +940,7 @@ async function buscarYFirma(s, bare, mask, zona, ocupados, protegidas = [], tech
 
     if (ocupados.some(o => toca(caja, o, holgura)) || protegidas.some(z => toca(caja, z, 0))) continue
     if (mask && guardHits(mask, [{ id: 'firma', box: caja }], W, H, CLEAR_TOUCH).length) continue
+    if (evitarCanto && pendienteBajoCaja(rgb, W, H, caja) > TECHO_CANTO) continue
 
     for (const t of tintas) {
       const enCaja = await contrastUnder(bare, caja, t.variante === 'color' ? lum(2, 60, 112) : 1)
@@ -1025,6 +1028,10 @@ async function composePiece(s, opts = {}) {
   // Piso: el 85 % del ancho del máster (las piezas del repo reducen hasta el 86 %) y 780 px, la densidad 2× de un teléfono
   // de 390 CSS px. Medir sobre el PNG entregado queda registrado como deuda.
   const pisoFinal = Math.max(780, Math.ceil(W * 0.85))
+
+  // Sin `final`, lo entregado es el plate: el mismo piso de 780 px (tramo 16; octava, arquitectura B1: un plate de 432×768
+  // certificaba). Las aprobadas entregan 1080 px o más.
+  if (!s.final && W < 780) throw new Error(`${s.id}: el plate mide ${W}×${H} y se entrega así: queda bajo 780 px de ancho, la densidad 2× de un teléfono de 390 CSS px. Usa un plate más grande`)
 
   if (s.final && s.final[0] < pisoFinal) throw new Error(`${s.id}: \`final\` ${s.final.join('×')} reduce demasiado la pieza: la accesibilidad se mide en el máster de ${W} px y lo entregado se alejaría de lo medido (piso: ${pisoFinal} px de ancho)`)
 
@@ -1585,7 +1592,7 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
       // `protect` es `[{ box: [x0, y0, x1, y1], reason }]` (fracciones), igual que en la guarda del texto. La primera
       // versión lo leía como `{ x0, … }`: con un plan válido daba NaN y la búsqueda nunca evitaba esas zonas.
       const protect = (s.protect ?? []).map(z => ({ left: z.box[0] * W, top: z.box[1] * H, right: z.box[2] * W, bottom: z.box[3] * H }))
-      const r = await buscarYFirma(s, bare, opts.mask, zonaFirma(s, W, H), ocupados, protect, nuevo ? Math.ceil(H * PISO_FIRMA) : 0)
+      const r = await buscarYFirma(s, bare, opts.mask, zonaFirma(s, W, H), ocupados, protect, nuevo ? Math.ceil(H * PISO_FIRMA) : 0, nuevo)
 
       buscada = r.y
       banda = r.banda
@@ -1818,7 +1825,9 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
   // El texto alternativo entregado también lleva huella (tramo 10; auditorías de arquitectura, hallazgo 8, y de diseño,
   // N11): reemplazarlo por «Imagen decorativa.» daba 0, también con `--reproducir`.
   const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson), alt: sha(`${accesibilidad.altText}\n`) }
-  const registro = { id: s.id, canon: opts.canon, ...(marcoSobreVoz.length ? { marcoSobreVoz } : {}), dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(s.selection?.box && opts.mask ? { seleccionSujeto: fraccionSujeto(opts.mask, s.selection.box) } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
+  // Pendiente de luz bajo la firma real (tramo 16; octava, F1): el gate la juzga.
+  const firmaCanto = firmaReal.length ? +Math.max(...firmaReal.map(f => pendienteBajoCaja(bareRgb, W, H, f.box))).toFixed(2) : null
+  const registro = { id: s.id, canon: opts.canon, firmaCanto, ...(marcoSobreVoz.length ? { marcoSobreVoz } : {}), dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(s.selection?.box && opts.mask ? { seleccionSujeto: fraccionSujeto(opts.mask, s.selection.box) } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
 
   for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
   qa.push(registro)

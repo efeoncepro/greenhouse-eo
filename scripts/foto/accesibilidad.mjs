@@ -392,3 +392,54 @@ export function textoAlternativo(pieza) {
 
   return [escena, texto && `Texto en la imagen: ${texto}`].filter(Boolean).join('. ').replace(/\.\./g, '.')
 }
+
+// Pendiente de luz bajo una caja (tramo 16; octava certificación, diseño F1): la media de luminancia por fila (Rec. 709
+// sobre sRGB, 0–255) a lo ancho de la caja, desde un 10 % de su alto por arriba hasta un 10 % por abajo, suavizada en 5
+// filas. Devuelve el mayor salto entre filas contiguas normalizado al lado corto (× lado corto / 100), para que no dependa
+// de la resolución. Un canto —el borde iluminado de un lecho, el de una mesa— es un escalón: la luz sube de golpe.
+// Calibrado el 2026-09-23 sobre 86 firmas aprobadas: la firma sobre el canto de «Que te elijan» mide 23,3 y la misma firma
+// dentro del lecho, 6,0; de las aprobadas pasa 85 de 86 (la mayor, KV-02-916, 14,9). KV-06-916 (29,3) es el mismo defecto.
+export const TECHO_CANTO = 18.5
+
+export function pendienteBajoCaja(rgb, ancho, alto, caja, canales = 3) {
+  const alt = caja.bottom - caja.top
+  const y0 = Math.max(0, Math.floor(caja.top - alt * 0.1))
+  const y1 = Math.min(alto - 1, Math.ceil(caja.bottom + alt * 0.1))
+  const x0 = Math.max(0, Math.floor(caja.left))
+  const x1 = Math.min(ancho, Math.ceil(caja.right))
+
+  if (y1 - y0 < 3 || x1 - x0 < 1) return 0
+  const medias = []
+
+  for (let y = y0; y <= y1; y++) {
+    let s = 0
+
+    for (let x = x0; x < x1; x++) {
+      const i = (y * ancho + x) * canales
+
+      s += 0.2126 * rgb[i] + 0.7152 * rgb[i + 1] + 0.0722 * rgb[i + 2]
+    }
+
+    medias.push(s / (x1 - x0))
+  }
+
+  const suave = medias.map((_, i) => {
+    let s = 0
+    let n = 0
+
+    for (let k = -2; k <= 2; k++) {
+      if (medias[i + k] !== undefined) {
+        s += medias[i + k]
+        n++
+      }
+    }
+
+    return s / n
+  })
+
+  let max = 0
+
+  for (let i = 1; i < suave.length; i++) max = Math.max(max, Math.abs(suave[i] - suave[i - 1]))
+
+  return (max * Math.min(ancho, alto)) / 100
+}

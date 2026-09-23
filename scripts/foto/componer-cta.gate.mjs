@@ -15,7 +15,7 @@ import { axisAdvertising } from '@efeoncepro/axis-tokens'
 
 import { CANON_ANTERIOR, CANON_VIGENTE, COMPOSITOR, REPO, canonDe, dentroDelRepo, estable, huellaComando, huellaPieza, marcaDeSuite, registroCanonAlterado, rutaQa, rutaReal, sha } from './cta-integridad.mjs'
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
-import { copiaEnEscena } from './accesibilidad.mjs'
+import { TECHO_CANTO, copiaEnEscena } from './accesibilidad.mjs'
 
 // Ancho y alto de un PNG, leídos de su cabecera (IHDR): el gate verifica el tamaño ENTREGADO sin decodificar la imagen.
 const dimensionesPng = b => (b.length >= 24 && b.readUInt32BE(12) === 0x49484452 ? [b.readUInt32BE(16), b.readUInt32BE(20)] : null)
@@ -649,6 +649,12 @@ const TECHO_BOTON_AREA = { solid: 0.7, outline: 1, text: 0.45 }
 // Texto, botón y firma no se tocan (tramo 15; séptima, diseño N1): la misma holgura que ya separa una selección de lo que no
 // es su destino, 0,4 % del lado corto, medida sobre lo DIBUJADO. Lo aprobado: 0,69 % como mínimo; ninguna lo incumple.
 const HOLGURA_PRINCIPALES = 0.004
+// Y un piso tipográfico entre dos voces (tramo 16; octava, diseño N1): con 0,4 % del lado corto las voces quedaban a
+// 1,6 CSS px en un teléfono y se leían como un solo párrafo. Entre dos textos, o un texto y el botón, al menos un cuarto del
+// cuerpo menor del par (0,25 em). Lo aprobado: 0,267 em como mínimo (CMP-002 KV, el cierre bajo el titular); ninguna lo
+// incumple. Bajo el piso de 0,4 % las voces se tocan: eso no se exceptúa.
+const HOLGURA_EM = 0.25
+const CUERPO_DE = { etiqueta: 'label', entrada: 'lead', dominante: 'dominant', 'cierre-frase': 'closure', nota: 'benefit', cta: 'cta', 'cta-boton': 'cta', descriptor: 'descriptor' }
 // En una pieza nueva, CTA, descriptor, nota y etiqueta arrancan en la columna del texto (tramo 15; séptima, diseño N2), con la
 // tolerancia del eje centrado. 30 aprobadas se corren hasta 27 px (cta.x 0,08 en la familia KV; CTA de texto con fracción):
 // siguen con el aviso, porque son del canon anterior.
@@ -810,7 +816,8 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   if (Array.isArray(L.maquetacion?.elementos)) {
     const lado = Math.min(L.canvas.width, L.canvas.height)
     const piso = lado * HOLGURA_PRINCIPALES
-    const medioTrazo = varianteDibujada === 'outline' ? Math.max(2, Math.ceil(L.canvas.width / (r.anchoPantalla ?? 390))) / 2 : 0
+    // El relleno también tiene trazo (2 px): la mitad, 1 px, sale por fuera (tramo 16; octava, N1).
+    const medioTrazo = varianteDibujada === 'outline' ? Math.max(2, Math.ceil(L.canvas.width / (r.anchoPantalla ?? 390))) / 2 : varianteDibujada === 'solid' ? 1 : 0
 
     const dibujados = L.maquetacion.elementos
       .filter(e => ['texto', 'cta', 'firma'].includes(e.tipo) && !(e.id === 'cta-boton' && varianteDibujada === 'text'))
@@ -825,11 +832,20 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
         if (a.dentroDe === b.id || b.dentroDe === a.id) continue
         const separacion = Math.max(b.box.left - a.box.right, a.box.left - b.box.right, b.box.top - a.box.bottom, a.box.top - b.box.bottom)
 
-        if (separacion < piso) pegados.push([a.id, b.id, separacion])
+        const cuerpo = Math.min(tipografia[CUERPO_DE[a.id]] ?? Infinity, tipografia[CUERPO_DE[b.id]] ?? Infinity)
+        const pisoPar = Number.isFinite(cuerpo) ? Math.max(piso, cuerpo * HOLGURA_EM) : piso
+
+        if (separacion < pisoPar) pegados.push([a.id, b.id, separacion, pisoPar])
       }
     }
 
-    if (pegados.length && bloquea(p, 'holgura', `texto, botón y firma no se tocan: ${pegados.map(([a, b, s]) => `«${a}» y «${b}» a ${s.toFixed(1)} px`).join(' · ')} (piso: ${piso.toFixed(1)} px, el 0,4 % del lado corto; el botón de contorno cuenta medio trazo por fuera). Sube \`leadGap\`, \`afterGap\`, \`note.gapAfterClosure\` o \`cta.gapAfterNote\``, { valor: +Math.min(...pegados.map(([, , s]) => s)).toFixed(1), sentido: 'min' })) fallos++
+    // Bajo el 0,4 % del lado corto se tocan: no hay excepción que lo cubra.
+    const tocan = pegados.filter(([, , s]) => s < piso)
+
+    if (tocan.length) {
+      console.error(`✗ ${r.id}: texto, botón y firma se tocan: ${tocan.map(([a, b, s]) => `«${a}» y «${b}» a ${s.toFixed(1)} px`).join(' · ')} (bajo ${piso.toFixed(1)} px, el 0,4 % del lado corto, no se exceptúa)`)
+      fallos++
+    } else if (pegados.length && bloquea(p, 'holgura', `texto, botón y firma sin aire: ${pegados.map(([a, b, s, m]) => `«${a}» y «${b}» a ${s.toFixed(1)} px (piso ${m.toFixed(1)} px)`).join(' · ')} (el piso es 0,25 em del cuerpo menor del par y nunca menos que el 0,4 % del lado corto; el botón cuenta su trazo por fuera). Sube \`leadGap\`, \`afterGap\`, \`note.gapAfterClosure\` o \`cta.gapAfterNote\``, { valor: +Math.min(...pegados.map(([, , s]) => s)).toFixed(1), sentido: 'min' })) fallos++
   }
 
   // Bloque CENTRADO (todas las piezas; tramo 12, auditoría de diseño de la cuarta certificación, N4): cada voz, el botón y
@@ -851,6 +867,30 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   // Descriptor separado de su botón (quinta, N1; sexta, H2): se mide lo DIBUJADO —del borde inferior del botón (o del texto
   // del CTA, si no hay botón) al descriptor— y no el `descriptorGap` declarado: para esquivar un cursor o su etiqueta el
   // descriptor bajaba hasta 3,9× el cuerpo del CTA. Desde el botón y no desde el texto: el relleno ya tiene su regla.
+  // La firma no se apoya sobre un canto (tramo 16; octava, diseño F1): el compositor mide la pendiente de luz bajo la firma
+  // real y la deja en el QA (`firmaCanto`). En una pieza nueva bloquea, exceptuable con aprobador; en las aprobadas avisa.
+  if (typeof r.firmaCanto === 'number' && r.firmaCanto > TECHO_CANTO) {
+    const msg = `la firma cae sobre un canto: la luz bajo su caja sube de golpe (${r.firmaCanto}, normalizada; techo ${TECHO_CANTO}). Llévala a la materia calma del lecho o rehaz el plate con el lecho más alto`
+
+    if (!nuevo) console.warn(`⚠ ${r.id}: ${msg}.`)
+    else if (bloquea(p, 'firma-canto', msg, { valor: r.firmaCanto, sentido: 'max' })) fallos++
+  } else if (nuevo && (p.logo || p.firma?.modo === 'externa') && typeof r.firmaCanto !== 'number') noCertificable.push(`${r.id}: el QA no trae la pendiente de luz bajo la firma (\`firmaCanto\`): recompón con el comando vigente`)
+
+  // Ritmo (tramo 16; octava, diseño N1): «Separación entre bloques conceptuales mayor que entre miembros relacionados del grupo
+  // de acción» (Tres voces + acción, jerarquía 2). El grupo de acción es la nota (el beneficio), el CTA y el descriptor, sobre lo
+  // dibujado. Sólo en piezas nuevas: 43 de las 114 aprobadas lo invierten.
+  if (nuevo && Array.isArray(L.maquetacion?.elementos)) {
+    const concepto = el('cierre-frase') ?? el('dominante')
+    const accion = [el('nota'), varianteDibujada === 'text' ? el('cta') : el('cta-boton'), el('descriptor')].filter(Boolean)
+
+    if (concepto && accion.length >= 2) {
+      const entre = accion[0].top - concepto.bottom
+      const dentro = Math.max(...accion.slice(1).map((b, i) => b.top - accion[i].bottom))
+
+      if (entre <= dentro && bloquea(p, 'ritmo', `el ritmo está invertido: entre el concepto y la acción hay ${entre.toFixed(1)} px y dentro de la acción ${dentro.toFixed(1)} px; el canon pide más aire entre los bloques que dentro del grupo de acción. Sube \`note.gapAfterClosure\` (o \`cta.gapAfterNote\` si no hay nota)`, { valor: +(entre / dentro).toFixed(2), sentido: 'min' })) fallos++
+    }
+  }
+
   // En un CTA de texto no hay botón dibujado: se mide desde el texto (tramo 15; séptima, arquitectura N4: se medía la caja del
   // relleno, que no se dibuja, y un descriptor a 2,25× pasaba como 1,45×).
   const baseD = varianteDibujada === 'text' ? el('cta') : el('cta-boton') ?? el('cta')

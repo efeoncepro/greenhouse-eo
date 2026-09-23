@@ -49,7 +49,10 @@ export const REGLAS_EXCEPTUABLES = [
   'mascara-vacia',
   // Tramo 15 (séptima certificación): `holgura` en todas; `cta-columna` sólo en las piezas nuevas.
   'holgura',
-  'cta-columna'
+  'cta-columna',
+  // Tramo 16 (octava certificación): sólo en las piezas nuevas.
+  'firma-canto',
+  'ritmo'
 ]
 
 // Límites de las zonas de sujeto ignoradas: cada una ≤ 10 % del lienzo y todas juntas ≤ 15 %. Una zona del tamaño del
@@ -382,6 +385,20 @@ function reglasCruzadas(p) {
 
   const textos = [['lead', p?.lead], ['dominant', p?.dominant], ['after', p?.after], ['label', p?.label], ['note.text', p?.note?.text], ['cta.text', p?.cta?.text], ['cta.descriptor', p?.cta?.descriptor], ['footer.text', p?.footer?.text], ...(p?.selection?.cursors ?? []).map((k, i) => [`selection.cursors.${i}.label`, k?.label]), ...(p?.cta?.seleccion?.cursores ?? []).map((k, i) => [`cta.seleccion.cursores.${i}.label`, k?.label])].filter(([, t]) => typeof t === 'string')
 
+  // Lo que el compositor DIBUJA (tramo 16; octava certificación, arquitectura R1b): sin marcado donde se interpreta, el corte
+  // `|` como un espacio (es un salto de línea) y sin caracteres invisibles. Un `****` vacío o un U+200B partían la entidad
+  // en el plan y el compositor la volvía a unir: `caf&​eacute` se dibujaba «caf&eacute».
+  const CON_MARCADO = ['lead', 'dominant', 'after', 'note.text', 'footer.text']
+  const esEtiquetaDeCursor = campo => /^(selection\.cursors|cta\.seleccion\.cursores)\.\d+\.label$/.test(campo)
+
+  const dibujado = (campo, t) => {
+    let d = t.replace(/\p{Default_Ignorable_Code_Point}/gu, '')
+
+    if (CON_MARCADO.includes(campo)) d = d.replace(/\*\*|\[\[|\]\]/g, '')
+
+    return esEtiquetaDeCursor(campo) ? d : d.replace(/\|/g, ' ')
+  }
+
   for (const [campo, t] of textos) {
     // Tramo 12 (cuarta certificación): `**` y `[[ ]]` sólo se interpretan en entrada, titular, cierre, nota y pie; en el
     // CTA, el descriptor y las etiquetas se dibujaban literales. Una entidad (`&amp;`) se dibujaba tal cual en cualquier voz,
@@ -389,15 +406,32 @@ function reglasCruzadas(p) {
     if (/\*\*|\[\[|\]\]/.test(t) && !['lead', 'dominant', 'after', 'note.text', 'footer.text'].includes(campo)) e.push(`\`${campo}\` no admite \`**\` ni \`[[ ]]\`: se dibujarían literales (sólo entrada, titular, cierre, nota y pie los interpretan)`)
     // El nombre de una entidad puede llevar dígitos (`&sup2;`, `&frac12;`): con `[a-z]+` pasaban y se dibujaban literales
     // (tramo 13; auditoría de arquitectura de la quinta certificación, N3).
-    const ent = t.match(/&(#\d+|#x[0-9a-f]+|[a-z][a-z0-9]*);/i)
+    const d = dibujado(campo, t)
+    const ent = d.match(/&(#\d+|#x[0-9a-f]+|[a-z][a-z0-9]*);/i)
 
     if (ent) e.push(`\`${campo}\` trae la entidad «${ent[0]}»: escribe el carácter; la entidad se dibujaría literal`)
     // Sin punto y coma también (tramo 14; sexta certificación, Y7): `&#178`, `&amp` o `&sup2` se dibujaban literales. Desde el
     // tramo 15 (séptima, R1), con la lista oficial de HTML5 y el prefijo más largo: `&eacute` o `&ntilde` también.
-    const entSin = entidadSinPuntoYComa(t)
+    const entSin = entidadSinPuntoYComa(d)
 
     if (!ent && entSin) e.push(`\`${campo}\` trae la entidad «${entSin}» sin punto y coma: escribe el carácter; se dibujaría literal`)
-    if (/[\n\r\t]/.test(t)) e.push(`\`${campo}\` trae un salto de línea o una tabulación: se dibujaría como un cuadro vacío; para cortar la línea usa \`|\``)
+    if (/[\n\r\t]/.test(t)) e.push(`\`${campo}\` trae un salto de línea o una tabulación: se dibujaría como un cuadro vacío; ${esEtiquetaDeCursor(campo) ? 'la etiqueta de un cursor va en una sola línea' : 'para cortar la línea usa `|`'}`)
+    // La etiqueta de un cursor se dibuja en una sola pieza: `|` salía tal cual y el alternativo decía otra cosa (octava, P1).
+    if (esEtiquetaDeCursor(campo) && t.includes('|')) e.push(`\`${campo}\` trae \`|\`: la etiqueta de un cursor va en una sola línea y la barra se dibujaría tal cual`)
+    // Un carácter invisible no se ve y parte palabras o entidades (octava, R1b). Si el texto no tiene nada visible, lo dice
+    // el compositor («no tiene nada que dibujar»).
+    const invisible = t.match(/\p{Default_Ignorable_Code_Point}/u)
+
+    if (invisible && d.trim()) e.push(`\`${campo}\` trae un carácter invisible (U+${invisible[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}): no se ve y puede partir una palabra o una entidad; bórralo`)
+  }
+
+  // El texto alternativo no se dibuja, pero lo leen un lector de pantalla y un navegador: una entidad sin «;» se decodifica
+  // allí y en la imagen no (tramo 16; octava, arquitectura A5).
+  if (typeof p?.altText === 'string') {
+    const alt = p.altText.replace(/\p{Default_Ignorable_Code_Point}/gu, '')
+    const entAlt = alt.match(/&(#\d+|#x[0-9a-f]+|[a-z][a-z0-9]*);/i)?.[0] ?? entidadSinPuntoYComa(alt)
+
+    if (entAlt) e.push(`\`altText\` trae la entidad «${entAlt}»: escribe el carácter`)
   }
 
   for (const [campo, t] of [['lead', p?.lead], ['dominant', p?.dominant], ['after', p?.after], ['label', p?.label], ['note.text', p?.note?.text], ['cta.text', p?.cta?.text], ['cta.descriptor', p?.cta?.descriptor], ['footer.text', p?.footer?.text], ['card.header', p?.card?.header], ['card.body', p?.card?.body], ['gesture.text', p?.gesture?.text], ['altText', p?.altText]]) {

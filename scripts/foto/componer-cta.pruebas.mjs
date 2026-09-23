@@ -99,7 +99,8 @@ const canonLegible169 = k => {
 
   delete p.note
   Object.assign(p, { textGrowth: false, leadSize: 48, dominantSize: 160, dominantMax: 0.5, textWidth: 0.5, afterSize: 48 })
-  Object.assign(p.cta, { fontSize: 60, descriptorSize: 48, paddingX: 39, paddingY: 22, descriptorGap: 24 })
+  // Ritmo del canon (tramo 16): el concepto y la acción, con más aire que el botón y su descriptor (43 px en este lienzo).
+  Object.assign(p.cta, { fontSize: 60, descriptorSize: 48, paddingX: 39, paddingY: 22, descriptorGap: 24, gapAfterNote: 56 })
 
   return p
 }
@@ -761,6 +762,16 @@ const PRUEBAS = [
       entidadTilde.cta.text = 'Agenda tu caf&eacute hoy'
       delete ctaCentrado.cta.x
       ctaCentrado.cta.align = 'center'
+      // Tramo 16 (octava): un invisible que parte una entidad, la barra en la etiqueta de un cursor y un plate chico sin `final`.
+      const entidadPartida = base()
+      const barraEtiqueta = base()
+      const plateChico = base()
+
+      entidadPartida.cta.text = 'Agenda tu caf&\u200Beacute hoy'
+      barraEtiqueta.cta.seleccion = { cursores: [{ id: 'eq', kind: 'collaborator', anchor: 'bottom-end', label: 'Tu|marca', who: 'department' }] }
+      plateChico.plate = path.join(TMP, 'P07-plates', 'chico.png')
+      delete plateChico.final
+      await sharp(base().plate).resize(432, 768, { fit: 'fill' }).removeAlpha().png().toFile(plateChico.plate)
 
       const casos = [
         ['falta cta.fontSize', [sinFont], [], /falta `cta\.fontSize`/],
@@ -805,7 +816,10 @@ const PRUEBAS = [
         ['plate SVG que enlaza la foto', [conSvg], [], /es svg: usa una imagen raster/],
         ['entidad sin punto y coma', [entidadSinPunto], [], /`lead` trae la entidad «&amp» sin punto y coma/],
         ['tilde escrita como entidad sin punto y coma', [entidadTilde], [], /`cta\.text` trae la entidad «&eacute» sin punto y coma/],
-        ['CTA centrado en un bloque a la izquierda', [ctaCentrado], [], /`cta\.align: "center"` en un bloque alineado a la izquierda/]
+        ['CTA centrado en un bloque a la izquierda', [ctaCentrado], [], /`cta\.align: "center"` en un bloque alineado a la izquierda/],
+        ['entidad partida por un carácter invisible', [entidadPartida], [], /`cta\.text` trae la entidad «&eacute» sin punto y coma/],
+        ['barra en la etiqueta de un cursor', [barraEtiqueta], [], /`cta\.seleccion\.cursores\.0\.label` trae `\|`/],
+        ['plate bajo 780 px sin final', [plateChico], [], /el plate mide 432×768 y se entrega así/]
       ]
 
       const rs = await Promise.all(casos.map(([, piezas, ids], i) => componer(`P07-${i}`, piezas, ids)))
@@ -1639,7 +1653,7 @@ const PRUEBAS = [
       // Con 0 el cierre y la nota se solapan y ya aborta el compositor; con 2 px se tocan sin solaparse, que es lo que pasaba.
       c15Pegadas.note.gapAfterClosure = 2
       c15Pegadas.cta.gapAfterNote = 0
-      Object.assign(c15Trazo.cta, { variant: 'outline', gapAfterNote: 5.3 })
+      Object.assign(c15Trazo.cta, { variant: 'outline', gapAfterNote: 9.3 })
       // Diseño N2: el CTA en una fracción lejos de la columna, en una pieza nueva.
       c15Columna.cta.x = 0.25
       // Diseño H3: losa de relleno. Pasa el techo de CTA/titular; sólo la frena el techo del área del relleno.
@@ -1655,7 +1669,8 @@ const PRUEBAS = [
       if (c15Rs[1].ok) {
         const Lt = leer(c15Rs[1].dir, 'b2-primero-el-numero-916-layout.json')
         const cajas = Object.fromEntries(Lt.maquetacion.elementos.map(e => [e.id, e.box]))
-        const piso = Math.min(Lt.canvas.width, Lt.canvas.height) * 0.004
+        // Desde el tramo 16 el piso del par nota–botón es 0,25 em del cuerpo menor (y nunca menos que el 0,4 % del lado corto).
+        const piso = Math.max(Math.min(Lt.canvas.width, Lt.canvas.height) * 0.004, Math.min(Lt.typography.benefit, Lt.typography.cta) * 0.25)
         const medio = Math.max(2, Math.ceil(Lt.canvas.width / 390)) / 2
         const hueco = cajas['cta-boton'].top - cajas.nota.bottom
 
@@ -1689,6 +1704,60 @@ const PRUEBAS = [
       } finally {
         fs.rmSync(dirY1, { recursive: true, force: true })
         fs.rmSync(copiaY1, { force: true })
+      }
+
+      // ── Tramo 16 · octava certificación ──
+      const c16CasiPegadas = canon('b2_916')
+      const c16Relleno = canon('b2_916')
+      const c16Ritmo = canon('b2_916')
+      const c16TextoGrande = canon('b2_916')
+      const c16TextoColumna = canon('b2_916')
+      const c16TextoHolgura = canon('b2_916')
+      const c16Canto = canon('b2_916')
+
+      // Diseño N1: voces sobre el 0,4 % del lado corto pero bajo 0,25 em: se leen como un solo párrafo.
+      Object.assign(c16CasiPegadas, { leadGap: 0.036, afterGap: 0.036 })
+      // El relleno cuenta 1 px de trazo por fuera: la nota a 9 px del botón queda a 8, bajo 0,25 em de la nota (8,5 px).
+      Object.assign(c16Relleno.cta, { variant: 'solid', gapAfterNote: 9 })
+      // Ritmo invertido: poco aire entre el concepto y la acción, mucho dentro de la acción.
+      c16Ritmo.note.gapAfterClosure = 12
+      c16Ritmo.cta.gapAfterNote = 60
+      // CTA de texto (arquitectura T1): el techo de área mide su texto; en la columna no se corre por su caja; la holgura no
+      // cuenta la caja, que no se dibuja.
+      Object.assign(c16TextoGrande.cta, { variant: 'text', text: 'Agenda tu diagnóstico de visibilidad hoy', fontSize: 60 })
+      Object.assign(c16TextoColumna.cta, { variant: 'text' })
+      // Sin marco: los corchetes rodean la caja y, a 2 px de la nota, la tapan (y ya aborta el compositor).
+      Object.assign(c16TextoHolgura.cta, { variant: 'text', paddingY: 30, gapAfterNote: 2, seleccion: { marco: 'ninguno' } })
+      // Diseño F1: un plate con un escalón de luz justo donde la búsqueda automática pondría la firma.
+      c16Canto.plate = path.join(TMP, 'P10-plates', 'escalon.png')
+      const escalonY = Math.round(altoB2 * 0.86)
+
+      await sharp({ create: { width: anchoB2, height: altoB2, channels: 3, background: '#12141a' } }).composite([{ input: { create: { width: anchoB2, height: altoB2 - escalonY, channels: 3, background: '#46484e' } }, left: 0, top: escalonY }]).png().toFile(c16Canto.plate)
+      const c16Rs = await Promise.all([['P10-casi-pegadas', c16CasiPegadas], ['P10-relleno-trazo', c16Relleno], ['P10-ritmo', c16Ritmo], ['P10-texto-grande', c16TextoGrande], ['P10-texto-columna', c16TextoColumna], ['P10-texto-holgura', c16TextoHolgura], ['P10-canto', c16Canto]].map(([n, pz]) => componer(n, [pz])))
+      const [gC16CasiPegadas, gC16Relleno, gC16Ritmo, gC16TextoGrande, gC16TextoColumna, gC16TextoHolgura] = await Promise.all(c16Rs.slice(0, 6).map(x => (x.ok ? gate(x.planPath) : { code: -1, salida: x.error })))
+      let rellenoEnVentana = false
+
+      if (c16Rs[1].ok) {
+        const Lr = leer(c16Rs[1].dir, 'b2-primero-el-numero-916-layout.json')
+        const cj = Object.fromEntries(Lr.maquetacion.elementos.map(e => [e.id, e.box]))
+        const pisoPar = Math.max(Math.min(Lr.canvas.width, Lr.canvas.height) * 0.004, Math.min(Lr.typography.benefit, Lr.typography.cta) * 0.25)
+        const hueco = cj['cta-boton'].top - cj.nota.bottom
+
+        rellenoEnVentana = hueco >= pisoPar && hueco - 1 < pisoPar
+      }
+
+      // La búsqueda automática no deja la firma sobre el escalón: el QA registra una pendiente bajo el techo.
+      const cantoEvitado = c16Rs[6].ok && typeof c16Rs[6].qa[0].firmaCanto === 'number' && c16Rs[6].qa[0].firmaCanto <= 18.5
+      // Un canto en el QA de una pieza nueva: el gate lo bloquea (el QA se forja después de juzgar la pieza tal cual).
+      let gC16CantoForjado = { code: -1, salida: 'no compuso' }
+
+      if (c16Rs[4].ok) {
+        const qaF = path.join(c16Rs[4].dir, 'out', 'qa-piezas.json')
+        const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
+
+        q[0].firmaCanto = 25
+        fs.writeFileSync(qaF, JSON.stringify(q))
+        gC16CantoForjado = await gate(c16Rs[4].planPath)
       }
 
       const r = {
@@ -1732,7 +1801,15 @@ const PRUEBAS = [
         'la etiqueta arranca en la columna': etiquetaEnColumna,
         'rechaza borde del botón sobre el texto': !rC14Borde.ok && /el borde del botón toca el texto del CTA/.test(rC14Borde.error ?? ''),
         'rechaza máscara vacía': gC14Vacia.code === 1 && /la máscara no marca ningún sujeto/.test(gC14Vacia.salida),
-        'rechaza voces pegadas': gC15Pegadas.code === 1 && /texto, botón y firma no se tocan: «entrada» y «dominante» a 0\.0 px/.test(gC15Pegadas.salida),
+        'rechaza voces pegadas': gC15Pegadas.code === 1 && /texto, botón y firma se tocan: «entrada» y «dominante» a 0\.0 px/.test(gC15Pegadas.salida),
+        'rechaza voces casi pegadas (0,25 em)': gC16CasiPegadas.code === 1 && /texto, botón y firma sin aire: .*«entrada» y «dominante» a [\d.]+ px \(piso 9\.0 px\)/.test(gC16CasiPegadas.salida),
+        'el relleno cuenta su trazo': rellenoEnVentana && gC16Relleno.code === 1 && /«nota» y «cta-boton» a [\d.]+ px \(piso 8\.5 px\)/.test(gC16Relleno.salida),
+        'rechaza ritmo invertido (canon nuevo)': gC16Ritmo.code === 1 && /el ritmo está invertido/.test(gC16Ritmo.salida),
+        'el techo de un CTA de texto mide su texto': gC16TextoGrande.code === 1 && /para un CTA de texto, 0\.45× el área/.test(gC16TextoGrande.salida),
+        'un CTA de texto en la columna no se corre por su caja': c16Rs[4].ok && !/fuera de la columna/.test(gC16TextoColumna.salida),
+        'la holgura no cuenta la caja de un CTA de texto': c16Rs[5].ok && !/«nota» y «cta-boton»/.test(gC16TextoHolgura.salida),
+        'la firma automática evita el canto (canon nuevo)': cantoEvitado,
+        'rechaza firma sobre el canto (canon nuevo)': gC16CantoForjado.code === 1 && /la firma cae sobre un canto/.test(gC16CantoForjado.salida),
         'el borde del contorno cuenta medio trazo': trazoEnVentana && gC15Trazo.code === 1 && /«nota» y «cta-boton» a/.test(gC15Trazo.salida),
         'rechaza CTA fuera de la columna (canon nuevo)': gC15Columna.code === 1 && /el CTA arranca \d+ px .*fuera de la columna del texto/.test(gC15Columna.salida),
         'rechaza losa de relleno por área': gC15Losa.code === 1 && /el CTA compite con el titular: .*para un CTA de relleno, 0\.7× el área/.test(gC15Losa.salida),

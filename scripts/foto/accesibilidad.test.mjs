@@ -17,7 +17,7 @@ import {
   textoAlternativo,
   umbralApca,
   umbralWcag
-} from './accesibilidad.mjs'
+, TECHO_CANTO, pendienteBajoCaja } from './accesibilidad.mjs'
 
 const cerca = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg}: ${a} vs ${b}`)
 const wcag = (a, b) => razonWcag(luminanciaWcag(hexARgb(a)), luminanciaWcag(hexARgb(b)))
@@ -169,4 +169,23 @@ test('Una medición imposible se reconoce: más contraste del que da su tinta, o
   assert.equal(medicionImposible({ tinta: '#cfe4fa', tintasExtra: ['#ffffff'], medidas: [20.27] }), null)
   assert.match(medicionImposible({ tinta: '#ffffff', medidas: [20.27], umbral: 4.5, umbralEsperado: 3 }), /umbral 4\.5:1 para una voz que por su tamaño exige 3:1/)
   assert.equal(medicionImposible({ tinta: '#ffffff', medidas: [], umbral: null, umbralEsperado: 3 }), null, 'sin medición de trazo no hay umbral que comparar')
+})
+
+test('La pendiente de luz bajo la firma separa un canto de un degradado (tramo 16)', () => {
+  // Un lienzo de 400 × 1000 px (la pendiente se normaliza al lado corto): oscuro arriba y gris abajo con el escalón bajo la
+  // caja de la firma; y el mismo con un degradado suave de 70 niveles en todo el alto.
+  const lienzo = valor => {
+    const rgb = new Uint8Array(400 * 1000 * 3)
+
+    for (let y = 0; y < 1000; y++) rgb.fill(Math.round(valor(y)), y * 400 * 3, (y + 1) * 400 * 3)
+
+    return rgb
+  }
+
+  const caja = { left: 50, right: 350, top: 480, bottom: 530 }
+  const escalon = pendienteBajoCaja(lienzo(y => (y < 505 ? 20 : 90)), 400, 1000, caja)
+  const degradado = pendienteBajoCaja(lienzo(y => 20 + y * 0.07), 400, 1000, caja)
+
+  assert.ok(escalon > TECHO_CANTO, `el escalón mide ${escalon}`)
+  assert.ok(degradado < TECHO_CANTO, `el degradado mide ${degradado}`)
 })

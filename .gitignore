@@ -92,6 +92,8 @@ src/assets/iconify-icons/generated-icons.css
 # Keep manifests, prompts, scripts and docs in git; publish approved web assets
 # to the runtime/CDN or external artifact storage.
 /ai-generations/**/*.png
+# Temporales de la suite del compositor de CTA (prueba del origen heredado, tramo 15): se borran al terminar.
+/ai-generations/.cta-prueba-*/
 /ai-generations/**/*.jpg
 /ai-generations/**/*.jpeg
 /ai-generations/**/*.webp
