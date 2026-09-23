@@ -268,3 +268,8 @@ brief no tiene, **el brief se actualiza primero con el operador**; no se improvi
 ⚠️ **Y un umbral que el governor no define:** la definición de «reunión calificada» la fija **quien opera el
 pipeline**, no un agente — en CMP-001 quedó en **`opportunity`**, no en `salesqualifiedlead`. De ella depende
 el guardrail, y sin guardrail se apaga la pieza que baja volumen **a propósito** y mejor protege el pipeline.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+Comprobar que el manifiesto y todas sus vistas estén sincronizados, con fecha/checksum en el Markdown MCP. Mantener canon transversal en operations, decisiones de campaña en CDR y copy/artefactos en OneDrive. No cerrar publicación por tener archivos, un ID o una respuesta 2xx.

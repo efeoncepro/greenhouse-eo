@@ -436,7 +436,7 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   // Sólo aplica a lienzos HORIZONTALES (W > H): 4:5 y 9:16 quedan idénticos, byte por byte.
   const TYPE_FILL_CAP = 1.6   // tope duro: por encima de esto el bloque deja de ser un titular y es una pancarta
 
-  if (W > H && s.dominant && s.dominantMax && typeof s.dominantSize === 'number') {
+  if ((W > H || H / W > 1.5) && s.dominant && s.dominantMax && typeof s.dominantSize === 'number') {
     const domFont0 = fontFor(R.ideaImpact, DOMINANT_WIDTH)
 
     const widest0 = Math.max(...s.dominant.replace(/\*\*|\[\[|\]\]/g, '').split('|').map(t => {
@@ -460,7 +460,7 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
       const voces = [s.leadSize, s.dominantSize * 1.2, s.afterSize, s.note?.size, s.cta?.fontSize, s.cta?.descriptorSize]
         .reduce((a, v) => a + (typeof v === 'number' ? v : 0), 0)
 
-      const altoEstimado = voces * 1.6
+      const altoEstimado = voces * 2.0
 
       if (altoEstimado > 0 && libre > 0) capAlto = libre / altoEstimado
     }

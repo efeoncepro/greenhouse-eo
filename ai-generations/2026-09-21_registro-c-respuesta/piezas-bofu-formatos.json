@@ -1,7 +1,7 @@
 [
   {
     "align": "left",
-    "top": 0.145,
+    "top": 0.165,
     "textWidth": 0.84,
     "leadFamily": "bricolage",
     "leadFill": "#ffffff",
@@ -23,12 +23,12 @@
       "y": 0.82
     },
     "id": "b2-primero-el-numero-916",
-    "plate": "plates/b2-primero-el-numero-916-plate.png",
+    "plate": "plates/b2-primero-el-numero-916-v2-plate.png",
     "lead": "El tablero ya te mostró el problema.",
     "dominant": "Cerrarlo es otra cosa.",
     "after": "Eso es lo que **operamos**.",
     "subjectProtection": {
-      "top": 773,
+      "top": 920,
       "minClearance": 24
     },
     "cta": {

@@ -165,3 +165,22 @@ Evidencia del 2026-09-13 (no estado vivo):
 
 Las dos campañas conservan activos, copy y manifiestos separados. Día de Muertos verifica reutilización
 del método y aceptación de PNG; no cambia la dirección creativa ni los entregables de Fiestas Patrias.
+
+
+## Menciones y reutilización de videos paid en orgánico
+
+Caso: [CMP-001, lanzamiento del grader](../../../../docs/operations/social/2026-09-22-cmp-001-campaign-brief-handoff.md).
+El mismo MP4 puede usarse en orgánico y paid, pero sus permisos, destino, copy y estados son independientes.
+Conservar el ratio pedido; REEL con un MP4 4:5 no se documenta como un master 9:16.
+
+- LinkedIn: resolver primero el URN de organización y nombre exacto. La sintaxis documentada por Metricool es
+  `@[urn:li:organization:ID|Nombre]`; Efeonce se verificó como `@[urn:li:organization:20503593|Efeonce]`.
+- Instagram: la mención usa el handle, `@efeoncepro`, no el nombre de presentación.
+- Fuente oficial, revisada 22/09/2026: https://help.metricool.com/mention-and-tag-other-accounts-9jqzi.
+  La sintaxis documentada y preservada en readback no acredita por sí sola el enlace en el post publicado.
+- Copy aprobado: preservar literalmente salvo cambios pedidos; registrar URL exacta, no añadir UTMs en silencio.
+  Un URL en caption no prueba un enlace clicable en Instagram ni autoriza cambiar la bio.
+- Mantener registro único con IDs y UUID, cuenta, horario local/UTC, copy, media, portada y estado. Un borrador
+  previo en el navegador no debe publicarse además del post ya programado. No copiar correos, tokens ni cookies.
+- Si expira GCP para el transporte canónico, usar el runner de `greenhouse-gcloud-auth-playwright`, verificar
+  CLI + ADC y luego HTTP/MIME del archivo. No modificar IAM ni reemplazar por credenciales de otra identidad.

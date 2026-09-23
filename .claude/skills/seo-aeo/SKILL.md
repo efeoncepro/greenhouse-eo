@@ -360,3 +360,13 @@ En campañas, separar mención, cita de URL, exactitud/atribución, recomendaci�
 conversión. Fuente preferida es aspiración, no posición garantizada. Auditar contenido+técnica+entidad/autoridad
 según la brecha; no prometer más citas por publicar más. La campaña gobierna el siguiente paso: diagnóstico
 para entrada, demostración/evaluación para MOFU, alcance/conversación para BOFU cuando corresponda.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+Revisar correspondencia entre claim, diagnóstico y destino antes de entregar copy de pauta. Aparición, cita, representación, preferencia y oportunidad son hechos distintos; no convertir estudios ajenos en lift prometido. Los datos del manifiesto no certifican el servicio ni su atribución.
+
+
+## Lanzamiento del grader y programación aprobada
+
+Para copy de lanzamiento del grader, cargar [framework BeX](efeonce/EFEONCE_AGENTIC_READINESS_FRAMEWORK.md) y [producto](efeonce/AI_VISIBILITY_GRADER.md). Explicar muestra de respuestas, señales públicas y prioridades; separar percepción y operabilidad. No presentar monitoreo recurrente o auditoría completa como incluido en un diagnóstico gratuito, ni inferioridad de competidores sin verificación actual. Caso: [CMP-001](../../../docs/operations/social/2026-09-22-cmp-001-campaign-brief-handoff.md).

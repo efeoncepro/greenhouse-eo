@@ -311,9 +311,36 @@ prompt desde una ficha de toma; formato, % del lecho y límite de sujetos salen 
 La **capa de composición gráfica** sobre la foto (tipografía, jerarquía, cursores) **no está aprobada** y su canon es
 `efeonce-advertising-creative`, no los ejemplos de la carpeta de fotografía.
 
+🔴 **Tres trampas medidas el 2026-09-22 (CMP-001) que el validador da por buenas.** Detalle, frases exactas y
+casos en la regla auto-load `.claude/rules/brand-photography.md`:
+
+- **Una criatura de partner CÁLIDA decide la temperatura de toda la pieza.** Con Clawd (naranja) en cuadro y la
+  escena callada sobre temperatura, el modelo armoniza la iluminación hacia tungsteno ámbar y la pieza envejece
+  a estética ochentera — lo contrario de un servicio que habla de motores de respuesta. Las reservas pasaron
+  5/5. Si la criatura es cálida, el frío del cuadro se declara y el cálido se niega por su nombre; con Codex
+  (azul) el problema no aparece.
+- **El lecho de la firma lo mata el REFLEJO, no la luz directa.** Un plinto de aluminio claro dejó la firma en
+  3,55:1 con el LED ya apantallado y el suelo en sombra; cambiar sólo el material a negro mate la llevó a
+  19,69:1, sin tocar luz ni encuadre.
+- **Dos reservas que fallan juntas suelen tener UNA causa**: buscar la superficie clara antes de tocar la luz.
+
 ## Adaptaciones Paid Media
 
 Cuando el brief sea Paid Media multiformato, aplicar la matriz del canon **Tres voces + acción**: 4:5, 1:1, 9:16 y 16:9 por concepto, salvo exclusión explícita. Resolver reservas y foto nativas para cada ratio, conservar identidad/manos/pantallas al editar y pasar QA individual. No convertir un recorte o un resize en evidencia de composición validada. El QA local 1:1 no cambia el estado global de validación del catálogo.
+
+🔴 **En horizontal el texto se ve perdido, y la causa NO es el tamaño de fuente respecto de su columna**
+[medido 2026-09-22, CMP-001]: 4:5 da **968 px** de columna y 16:9 da **901 px** — casi la misma columna en un
+lienzo del doble de ancho, así que el bloque ocupa poco del cuadro, no poco de su caja. **Escalar por ancho de
+LIENZO aplana la jerarquía** (el ratio dominante/entrada cayó a 2,3, bajo el mínimo de 3). La dirección correcta
+es llenar la columna: el compositor escala el bloque hasta que el dominante llene su `dominantMax`, sólo cuando
+`W > H`, y 4:5 y 9:16 quedan idénticos. §13 de
+[compositor de CTA](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
+
+🔴 **«Sobra texto» se resuelve acortando cada voz, nunca eliminando una.** Dirigir una pieza a «dominante +
+puente + CTA» rompe el concepto —entrada · titular · remate— y **el gate igual la da por verde**: mide contraste
+y protección de sujeto, no completitud. Al restituir la entrada, releer el ratio dominante/entrada: puede bajar
+solo, porque el compositor achica el dominante cuando no cabe en `dominantMax`. §El concepto completo no es
+opcional en [Tres voces + acción](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md).
 
 ## Paid Media: zonas seguras y handoff completo
 
@@ -338,3 +365,8 @@ La ficha por pieza declara referencias reales por vista, identidad, prenda, espa
 aprobadas comparables antes de producir. Conservar plate, prompt íntegro, copy/layout editable, capas y receta en
 canal. Para firma 9:16, elevar ligeramente el lecho si hace falta para alojarla dentro de materia y zona segura,
 sin subirla al centro ni agrandar excesivamente el primer plano; verificar cada placement.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+La entrega final para pauta usa la estructura común, sin carpetas por agente. Mantener bytes e identidad de los exports al moverlos; conservar receta en tres capas y mapa de rutas. Las referencias adjuntas reales necesitan disponibilidad/hash, aunque el checker general termine correctamente.

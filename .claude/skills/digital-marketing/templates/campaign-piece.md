@@ -140,3 +140,7 @@ No guardar credenciales ni URLs temporales con secretos.
 
 Aprobación creativa [persona/fecha/evidencia], autorización paid [separada], publicación [ID o no publicada].
 Decisión final, reparos y siguiente paso: [ ].
+
+## Handoff de pauta para personas y agentes
+
+Al entregar paid media, aplicar `campaign-paid-manifest.md` (OneDrive: `MANIFIESTO-PAUTA.md`). El JSON concentra inventario, copy externo, audiencias y configuraciones; catálogo, CSV y Markdown MCP se generan juntos. Las recetas se conservan en Recursos; la ejecución real se registra aparte con IDs y lectura de estado.

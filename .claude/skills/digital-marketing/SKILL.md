@@ -286,3 +286,43 @@ El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la
 Usar los templates versionados `templates/campaign-brief.md`, `campaign-assets.md` y `campaign-piece.md`;
 sus copias operativas viven en OneDrive `2. Campañas/_templates/`. Distinguir canal, placement, medio y ratio;
 presupuesto, fechas y metas pendientes no se inventan. Cada export tiene fila estable en ASSETS y receta en canal.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+El manifiesto posee assets, copy_profiles, audiences, ads y flight. Definir objetivo/placement, targeting y exclusiones, país/presupuesto y estado de autorización; el catálogo, CSV y handoff MD se generan juntos. Programar sólo el subconjunto seleccionado, no todas las alternativas.
+
+
+## Lanzamiento del grader y programación aprobada
+
+La programación orgánica de un video de campaña no activa pauta ni aprueba inversión. Separar copy/destino del lanzamiento y ledger de ejecución del plan paid; ver [contrato manifiesto, §6](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md#6-lanzamientos-orgánicos-derivados-de-assets-paid).
+
+## Plan de medios de un always-on — qué rota, cuándo y con qué objetivo
+
+Canon: [media plan CMP-001](../../../docs/campaigns/CMP-001-MEDIA-PLAN-Q4-2026.md) (reparto, rotación, estructura de
+campañas) · [CDR-007](../../../docs/campaigns/decisions/CDR-007-cmp001-bofu-conversion-a-landing.md) (destino,
+objetivo de conversión y evento). Medido planificando CMP-001, 2026-09-22.
+
+- 🔴 **El reparto por etapa cambia en el tiempo; no es una tabla fija.** En el mes 1 de un always-on **no existe
+  audiencia de retargeting todavía**: asignar 25% a BOFU desde el día uno quema presupuesto en un pool que aún no
+  se construyó. CMP-001 planifica **70/30/0** (TOFU/MOFU/BOFU) el mes 1 y **45/35/20** el mes 2, cuando el pool ya
+  sostiene las etapas bajas.
+- 🔴 **La rotación de un always-on es de ÁNGULO, no de formato.** Su modo de falla principal es la **fatiga
+  creativa**, no el mensaje: una variante de formato o de copy menor no la resuelve, **sólo la retrasa**. Rota el
+  ángulo (otro dato, otra escena) y **produce las piezas de reemplazo ANTES de que el rendimiento caiga**, no
+  después.
+- 🔴 **Una campaña no mezcla objetivos de puja:** con dos objetivos entrega al más barato y deja de alimentar el
+  embudo. Estructura: **una campaña por etapa × objetivo**. Corolario medido: dos líneas de servicio cuyos eventos
+  de conversión **no valen lo mismo** —un lead comercial contra una reunión agendada— no pueden ser la misma
+  campaña; contarlos juntos hace que el optimizador persiga el más barato. **El evento de conversión se define POR
+  LÍNEA**, no para la campaña.
+- 🔴 **La promesa del ad y la de la landing tienen que coincidir.** Si el ad promete un panel y la página ofrece
+  contratar un servicio, la conversión cae por **incoherencia de mensaje**, no por creatividad. El copy de la etapa
+  se escribe **después** de saber qué acción ofrece la página; lo que funcionó acá fue tomar el mensaje de una
+  sección de la propia landing.
+- **Antes de pautar, verifica el destino en un navegador real, no con `curl`** (esas páginas montan formulario y
+  agendamiento por JavaScript): (a) que la URL sea **canónica de sí misma** — pautar a una página cuyo `canonical`
+  apunta a otra no rompe la conversión, pero contradice la señal y parte la atribución del propio servicio que se
+  vende; (b) que ofrezca **una acción de mayor compromiso que la etapa anterior**. Si ofrece dos de etapas
+  distintas y cierra con la de arriba del embudo, muchas veces no falta la acción: **falta dirigir a ella**, y se
+  resuelve nombrándola en el CTA del anuncio, sin tocar la página.

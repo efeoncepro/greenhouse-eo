@@ -310,3 +310,46 @@ El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la
 Conservar copy literal por imagen y plataforma, headline, botón nativo, CTA y descriptor en ficha editable.
 Mantener promesa, exclusiones y vocabulario del brief; adaptar expresión al canal sin inventar resultados.
 Identificar qué hook es propuesta, aprobado o descartado; no usar copy de archivo FINAL contra una decisión más nueva.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+Entregar primary_text, titular, descripción opcional, CTA nativo y destino por canal en copy_profiles. Preservar copy literal, conteos y variantes; el texto externo complementa el arte. No editar manualmente HTML/CSV/MD ni incorporar claims o VOC inventados.
+
+
+## Lanzamiento del grader y programación aprobada
+
+Al programar copy aprobado, conservar voz de cada speaker y texto literal; sólo modificar menciones/destino cuando el operador lo autorice. Sintaxis por red y readback: [entrega Metricool](../social-media-studio/references/video-delivery-metricool.md). Las formulaciones BeX se apoyan en SEO/AEO; percepción y operabilidad son ejes distintos, y preferencia es aspiración, no garantía.
+
+## Craft del dominante en un ad (medido en CMP-001, 2026-09-22)
+
+Canon: [CDR-005 · el embudo se ordena por momento y por acción encadenada](../../../docs/campaigns/decisions/CDR-005-cmp001-embudo-momento-y-accion.md).
+Cuatro reglas del titular publicitario que la teoría de headlines no cubre.
+
+🔴 **Un dato sin referente no es un dato.** «−68%», «+91%», «+35%» sueltos no informan: el lector no sabe si
+es tráfico, ventas o presupuesto. La forma es **magnitud + DE QUÉ** en el dominante **+ EN QUÉ CONDICIÓN** en
+el puente — «−68% en tus clics pagados» / «Cuando Google pone su respuesta arriba, antes de tus anuncios».
+Cada pieza de una serie necesita **su propio referente**: mismo referente con signo opuesto (clics pagados
+−68% / +91%) se lee como contradicción, y eso sólo aparece leyendo la serie junta.
+
+🔴 **Un ad CREA INTERÉS; no maneja objeciones** (§5b — el mismo error de forma medido dos veces). Una práctica
+de venta tiene respuestas honestas a objeciones que construyen confianza **en una conversación**, cuando el
+prospecto ya tiene interés y pregunta si le inflas el caso. Convertidas en titular **minimizan la categoría y
+regalan la venta**: «Te decimos que no.» se lee en un feed como «no te vamos a atender»; «1% del tráfico viene
+de la IA» —verdadero y verificado— le dice al prospecto que el problema que le vendes no importa. **En el ad va
+el dato que abre los ojos; en la reunión va el que matiza:** un ad tiene un segundo y ninguna pregunta previa,
+nadie objetó todavía, así que no hay nada que desactivar. ✅ Prueba antes de aprobar un dominante: *¿este número
+le da MÁS urgencia al lector, o se la quita?* Si se la quita, por verdadero que sea, no va.
+
+🔴 **El tamaño del momento manda sobre su urgencia** (§6). No construyas un ad sobre un momento que le ocurre a
+poca gente, por urgente que sea para quien lo vive: «Migras en enero» paga impresiones a una audiencia que casi
+no existe. ✅ Prueba: *¿cuánta gente de mi segmento está en este momento HOY?* Si el ángulo exige una condición
+agendada (migración, rebrand, lanzamiento), sirve para outbound o nurture, **no para paid**.
+
+🔴 **Audita la serie, no sólo la pieza.** Siete dominantes seguidos salieron todos como negación («No fuiste
+tú», «No te leyó», «Sin tu nombre», «No te citan»): cada uno correcto, juntos el mismo golpe repetido. El tic de
+construcción no se ve pieza por pieza — se ve leyendo la tanda completa de corrido.
+
+**Continuidad** (§1–2): el embudo es una cadena donde la acción de cada etapa **usa** lo que entregó la
+anterior; si pide algo que no necesita el resultado previo, no está en el embudo. Y «mismo mundo, otro ángulo»
+**no es «misma escena»**: repetir la escena es refrito.

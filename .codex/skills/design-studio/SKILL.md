@@ -1,6 +1,43 @@
 ---
 name: design-studio
-description: Dirige arte y diseño gráfico enterprise con IA y humanos. Use for conceptos visuales, Key Visuals, campañas, posters, banners, imagen de marketing, layout y finishing, auditoría de diseño, selección de herramientas y Studio Credits visuales; delega la generación runtime a greenhouse-ai-image-generator.
+description: >-
+  Skill experta de DIRECCIÓN DE ARTE y DISEÑO GRÁFICO al estado del arte 2026 — el
+  "estudio" que audita un Key Visual, define el sistema visual, crea imágenes para
+  marketing y dirige la producción con IA y/o humanos. Dos manos: (1) conocimiento
+  profundo de la disciplina (fundamentos visuales — composición/grilla/gestalt/
+  jerarquía/color/contraste, tipografía como imagen, Key Visual systems, dirección
+  de arte y mood, tendencias visuales vigentes, craft de imagen IA por herramienta),
+  y (2) capacidad de ejecución (audita KV con rúbrica, arma brief/mood, elige la
+  herramienta o secuencia de herramientas desde un portafolio enterprise gobernado — Seedream 5 Lite/Pro / GPT Image 2 /
+  Nano Banana / Midjourney / Ideogram / Firefly / Flux / Higgsfield / Magnific —,
+  produce/dirige y hace handoff humano), cerrando el loop
+  idear→dirigir→producir→auditar→iterar. COMPLEMENTARIA pero DISTINTA de
+  greenhouse-ai-image-generator: esa GENERA el pixel (la mano, atada al runtime
+  Greenhouse); design-studio DIRIGE el arte (concepto, sistema visual, Key Visual,
+  auditoría) y decide qué mano/herramienta. Para un asset que entra a la UI, dirige
+  y DELEGA la producción canónica a greenhouse-ai-image-generator (DESIGN.md/AXIS/
+  transparencia). Delega a greenhouse-ai-image-generator (producción de assets UI),
+  a greenhouse-digital-brand-asset-designer (logos reales de terceros), a
+  typography-design (craft fino de tipo), a dataviz-design (charts), a
+  modern-ui/product-design-loop/greenhouse-ux (pantalla/layout/interacción del
+  producto), a motion-design (implementar animación/identidad kinética), a
+  social-media-studio (formato/algoritmo por red que consume el KV), a
+  digital-marketing (estrategia creativa de campaña) y a efeonce-agency (doctrina
+  de marca). Incluye overlay Efeonce (brand SSOT, AXIS, ilustraciones propietarias)
+  y capa de delivery para clientes Globe. Triggers: "diseño", "diseñar", "imagen de
+  marketing", "key visual", "KV", "auditar diseño", "auditar key visual", "dirección
+  de arte", "art direction", "concepto visual", "sistema visual", "identidad visual",
+  "mood board", "moodboard", "referencias visuales", "composición", "paleta", "color",
+  "diseño gráfico", "poster", "afiche", "banner", "hero", "ilustración", "campaña
+  visual", "creatividad visual", "genera una imagen", "prompt de imagen", "Nano
+  Banana", "Midjourney", "Ideogram", "Firefly", "Flux", "Magnific", "upscale",
+  "textura", "gradiente", "duotono", "crítica de diseño", "design critique",
+  "completar el visual de la UI", "arte para la UI", "infografía editorial",
+  "diagrama SVG", "SVG a WebP", "layout design", "finishing", "acabado premium".
+  Para infografías determinísticas con copy/datos
+  exactos dirige composición y carga el método canónico de `content-marketing-studio`.
+user-invocable: true
+argument-hint: "[tarea o pregunta — ej: 'audita este key visual', 'diseña una imagen para la campaña del grader', 'dame un concepto visual para Glitch', 'dirige el arte del hero de /aeo-2', 'mood board para SKY']"
 ---
 
 # Design Studio — Dirección de arte + diseño gráfico 2026
@@ -158,21 +195,6 @@ validada contra overlays y recortes reales de cada plataforma. Ver la auditoría
 - **Handoff humano**: cuando el craft final lo hace una persona (retoque, ilustración
   propietaria, print), entrega spec + referencias en vez de forzar IA.
 
-### Assets extraíbles dentro de una slide
-
-Cuando el visual se usará dentro de una propuesta, decide explícitamente entre
-**asset extraíble** y **full-bleed** antes de producirlo. Para un asset extraíble,
-dirige una sola tesis visual —no una escena que intente ser la slide completa—, deja
-zonas de respiración para el copy y entrega una pieza que pueda moverse, recortarse y
-reutilizarse en el template. La slide y sus textos, métricas, logos exactos y mockups
-finales se componen de forma determinística.
-
-Evita el “AI slop”: personajes genéricos rodeados de iconos, collages de tarjetas o
-dashboards ilegibles sin una función narrativa. En una propuesta SEO/AEO, cada mockup
-debe avanzar la historia: **AEO Grader diagnostica**, **X-Ray demuestra recuperabilidad**
-y **Greenhouse muestra la operación mensual**. Si una imagen no cumple una función en
-esa secuencia, no se incorpora por decoración.
-
 > **Regla dura (director, no dictador).** design-studio **decide el arte y elige la mano**,
 > pero **no reinventa la producción**: para assets de UI delega en `greenhouse-ai-image-generator`;
 > para logos reales, en `greenhouse-digital-brand-asset-designer`. Un primitive/mano por tarea,
@@ -190,8 +212,6 @@ esa secuencia, no se incorpora por decoración.
 - **NUNCA** uses IA que confunda con foto real sin criterio de disclosure cuando aplique, ni
   ilustraciones propietarias de Efeonce como si fueran stock. Ver `efeonce/EFEONCE_OVERLAY.md`.
 - **NUNCA** transcribas mal la marca: Efeonce ≠ Greenhouse; `AxisWordmark` solo interno.
-- **NUNCA** apruebes un asset con alpha sucio, halo de matting o pérdida de detalles
-  blancos en iconos/logos; revísalo a tamaño original y sobre el fondo real de la slide.
 
 ## 6. Doctrina 2026 (lo que hay que creer este año)
 
@@ -283,9 +303,44 @@ WB sin grade, catálogo de tomas y checklist QA. **NUNCA** anclar la serie en la
 El [documento maestro](../../../docs/operations/brand-photography/EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) conserva el
 contrato completo; la producción del pixel sigue en `greenhouse-ai-image-generator`.
 
+La toma se prepara y se valida con tres comandos, **nunca concatenando bloques a mano**: `pnpm foto:doctor` (¿esta
+máquina puede generar? seis chequeos que ejercitan la cadena, sin costo), `pnpm foto:prompt <ficha.json>` (arma el
+prompt desde una ficha de toma; formato, % del lecho y límite de sujetos salen de UNA tabla) y
+`pnpm foto:validar <plate.png>` (mide las **seis** reservas sobre el plate limpio). Canon de las reservas:
+[reserva de espacio en el plate](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md).
+La **capa de composición gráfica** sobre la foto (tipografía, jerarquía, cursores) **no está aprobada** y su canon es
+`efeonce-advertising-creative`, no los ejemplos de la carpeta de fotografía.
+
+🔴 **Tres trampas medidas el 2026-09-22 (CMP-001) que el validador da por buenas.** Detalle, frases exactas y
+casos en la regla auto-load `.claude/rules/brand-photography.md`:
+
+- **Una criatura de partner CÁLIDA decide la temperatura de toda la pieza.** Con Clawd (naranja) en cuadro y la
+  escena callada sobre temperatura, el modelo armoniza la iluminación hacia tungsteno ámbar y la pieza envejece
+  a estética ochentera — lo contrario de un servicio que habla de motores de respuesta. Las reservas pasaron
+  5/5. Si la criatura es cálida, el frío del cuadro se declara y el cálido se niega por su nombre; con Codex
+  (azul) el problema no aparece.
+- **El lecho de la firma lo mata el REFLEJO, no la luz directa.** Un plinto de aluminio claro dejó la firma en
+  3,55:1 con el LED ya apantallado y el suelo en sombra; cambiar sólo el material a negro mate la llevó a
+  19,69:1, sin tocar luz ni encuadre.
+- **Dos reservas que fallan juntas suelen tener UNA causa**: buscar la superficie clara antes de tocar la luz.
+
 ## Adaptaciones Paid Media
 
 Cuando el brief sea Paid Media multiformato, aplicar la matriz del canon **Tres voces + acción**: 4:5, 1:1, 9:16 y 16:9 por concepto, salvo exclusión explícita. Resolver reservas y foto nativas para cada ratio, conservar identidad/manos/pantallas al editar y pasar QA individual. No convertir un recorte o un resize en evidencia de composición validada. El QA local 1:1 no cambia el estado global de validación del catálogo.
+
+🔴 **En horizontal el texto se ve perdido, y la causa NO es el tamaño de fuente respecto de su columna**
+[medido 2026-09-22, CMP-001]: 4:5 da **968 px** de columna y 16:9 da **901 px** — casi la misma columna en un
+lienzo del doble de ancho, así que el bloque ocupa poco del cuadro, no poco de su caja. **Escalar por ancho de
+LIENZO aplana la jerarquía** (el ratio dominante/entrada cayó a 2,3, bajo el mínimo de 3). La dirección correcta
+es llenar la columna: el compositor escala el bloque hasta que el dominante llene su `dominantMax`, sólo cuando
+`W > H`, y 4:5 y 9:16 quedan idénticos. §13 de
+[compositor de CTA](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
+
+🔴 **«Sobra texto» se resuelve acortando cada voz, nunca eliminando una.** Dirigir una pieza a «dominante +
+puente + CTA» rompe el concepto —entrada · titular · remate— y **el gate igual la da por verde**: mide contraste
+y protección de sujeto, no completitud. Al restituir la entrada, releer el ratio dominante/entrada: puede bajar
+solo, porque el compositor achica el dominante cuando no cabe en `dominantMax`. §El concepto completo no es
+opcional en [Tres voces + acción](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md).
 
 ## Paid Media: zonas seguras y handoff completo
 
@@ -310,3 +365,8 @@ La ficha por pieza declara referencias reales por vista, identidad, prenda, espa
 aprobadas comparables antes de producir. Conservar plate, prompt íntegro, copy/layout editable, capas y receta en
 canal. Para firma 9:16, elevar ligeramente el lecho si hace falta para alojarla dentro de materia y zona segura,
 sin subirla al centro ni agrandar excesivamente el primer plano; verificar cada placement.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+La entrega final para pauta usa la estructura común, sin carpetas por agente. Mantener bytes e identidad de los exports al moverlos; conservar receta en tres capas y mapa de rutas. Las referencias adjuntas reales necesitan disponibilidad/hash, aunque el checker general termine correctamente.

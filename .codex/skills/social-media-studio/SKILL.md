@@ -329,6 +329,31 @@ conservar pilotos y separar final creativo de tráfico/publicación y de resulta
 
 Aplicar el [método completo SEO/AEO](../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md): cuatro ratios por KV salvo exclusión, foto y copy recompuestos, archivo local en Recursos/Pilotos/Finales y matriz por versión. Distinguir foto/reserva, safe zone de UI y criterio editorial de firma. No certificar Reels por una máscara local; registrar la excepción de firma al pie y verificar el placement real. No convertir PNG 9:16 en Video Ad por nombre. El lecho físico no debe crecer para reemplazar una zona de interfaz. Prompts, referencias, edición, embudo y comandos acompañan cada export.
 
+## Dominante de un ad: crea interés, no maneja objeciones
+
+Canon: [CDR-005 · el embudo se ordena por momento y por acción encadenada](../../../docs/campaigns/decisions/CDR-005-cmp001-embudo-momento-y-accion.md);
+el craft verbal completo lo tiene `copywriting` → «Craft del dominante en un ad».
+
+🔴 **Un ad crea interés; no maneja objeciones** (§5b, el mismo error medido dos veces en CMP-001). Las
+respuestas honestas que construyen confianza **en una conversación de venta** —cuando el prospecto ya tiene
+interés y pregunta si le inflas el caso— puestas como titular en un feed **minimizan la categoría y regalan la
+venta**. En el ad va el dato que abre los ojos; en la reunión, el que matiza. ✅ Prueba antes de aprobar un
+dominante: *¿este número le da más urgencia al lector, o se la quita?* Si se la quita, por verdadero que sea,
+no va.
+
+🔴 **Un dato sin referente no es un dato.** Un porcentaje suelto no dice si es tráfico, ventas o presupuesto:
+magnitud + **de qué** en el dominante, **en qué condición** en el puente. En una tanda, cada pieza necesita su
+propio referente — mismo referente con signo opuesto se lee como contradicción.
+
+🔴 **El tamaño del momento manda sobre su urgencia** (§6). Un momento que le ocurre a poca gente paga
+impresiones a una audiencia que casi no existe, por urgente que sea para quien lo vive. ✅ Prueba: *¿cuánta
+gente del segmento está en ese momento hoy?* Si exige una condición agendada, sirve para outbound o nurture,
+no para paid.
+
+**Revisar la tanda, no sólo la pieza:** un tic de construcción —siete dominantes seguidos escritos como
+negación— sólo se ve leyendo la serie completa de corrido, nunca pieza por pieza. Y en continuidad, «mismo
+mundo, otro ángulo» **no es «misma escena»**: repetir la escena es refrito (§1–2).
+
 ## Campañas — el brief manda
 
 🔴 **Si la pieza pertenece a una campaña, lee su `BRIEF.md` ANTES de producir.** Vive en OneDrive
@@ -352,3 +377,13 @@ El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la
 Derivar piezas desde el brief vigente sin trasladar permisos entre orgánico y paid. Medio/placement/ratio se
 verifican por plataforma; cada archivo vive en canal y se indexa con versión y fecha. Programado/publicado se
 reportan con evidencia propia, no por existir en Finales. No crear hook rate temporal para estáticos.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+Distinguir programación orgánica de paid: descubrir capacidad real del MCP antes de operar. El ad usa su copy_id/canal/placement y URL con UTM; no convertir copy pagado en post orgánico, ni duplicar anuncios al reintentar sin lectura de estado.
+
+
+## Lanzamiento del grader y programación aprobada
+
+Para programar lanzamientos con menciones y videos reutilizados de paid, aplicar [video-delivery-metricool](references/video-delivery-metricool.md). Conservar texto aprobado, identidad por red, destino y readback por ID; PENDING no significa publicado.

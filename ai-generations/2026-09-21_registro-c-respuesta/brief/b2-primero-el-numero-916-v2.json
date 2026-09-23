@@ -1,0 +1,17 @@
+{
+  "id": "b2-primero-el-numero-916-v2",
+  "formato": "9:16",
+  "impacto": true,
+  "palanca": "manos",
+  "escena": "SCENE (a working desk in a dark studio, seen at a low three-quarter angle from just above the surface): only HANDS and forearms are in frame — no face anywhere, not even blurred in the background, no shoulders, no body. Two hands have taken hold of both edges of a modern thin-bezel desktop monitor on a slim stand and are turning it MID-MOTION towards the camera — caught halfway through the turn, the screen still angled away, not yet facing front, with a faint real motion blur on the fingertips. The gesture is unmistakable: someone handing over the screen so the other person can read it. The screen glows clean blue-white from within and shows a dense panel of rows and small bars, its content physically unreadable because the screen is still turned at a steep angle and catches a soft reflection. Sleeves pushed up mid-forearm on a plain dark long-sleeve; skin is real with visible pores, knuckle creases and fine hair, warm and healthy, no rings, no watch, no jewellery. The desk is bare brushed matte black: no paper, no printed matter of any kind, no notebooks, no mugs, no plants, no cables in shot. Behind the desk everything falls to unlit black — no window, no second screen. The monitor is the ONLY light source in the frame; it sits LOW in the image and its light, spill and every reflection stay BELOW the middle of the frame, while the upper third is an unbroken field of ink-blue darkness. COLOUR: cool and contemporary — ink-blue blacks, the screen a clean blue-white, the desk near black and matte, the skin the only warm thing in the frame; no tungsten, no amber, no golden spill, no retro glow. Fine dust hangs in the light. 50mm lens at f/2.8. COMPOSITION FOR A TALL VERTICAL FRAME: everything described above sits in the BOTTOM THIRD of the image — the monitor's top edge stays BELOW 62% of the frame height and the hands below it. The entire UPPER 60% is empty unlit air — an unbroken field of ink-blue darkness with no object, no hand, no light patch and no reflection in it.",
+  "reservas": {
+    "texto": {
+      "muro": "the empty unlit darkness above the desk, unbroken",
+      "tinta": "blanca"
+    }
+  },
+  "lecho": {
+    "objeto": "the near edge of the matte black desk in the immediate foreground, so close to the lens it dissolves into a soft abstract blur, running unbroken across the whole width of the frame",
+    "tono": "brushed matte black desk surface in complete shadow, receiving no light from the monitor, near black with only a faint matte grain"
+  }
+}

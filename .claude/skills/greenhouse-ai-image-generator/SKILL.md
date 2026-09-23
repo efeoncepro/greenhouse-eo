@@ -992,3 +992,8 @@ El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la
 Para una imagen de campaña, consumir ficha, prompt compilado y referencias canónicas del brief vigente.
 Guardar prompt íntegro, motor real, referencias/hashes, intentos y cadena de ediciones en canal; no confundir
 prompt preparado con ejecución. Texto, firma y CTA editables se componen según canon, con QA de export.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+El motor consume prompt resuelto y referencias verificadas; guardar receta/motor en Recursos. El manifiesto identifica el export final por ID/ruta/hash. Catálogo y copy exterior no habilitan regenerar un arte aprobado ni tratar un placeholder como archivo descargado.

@@ -280,3 +280,8 @@ El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la
 La ficha de campaña añade duración, primeros fotogramas, ritmo, audio/subtítulos y cierre; se conserva el
 medio real exportado. Un PNG 9:16 no es video. Definir hook/hold con fuente de plataforma, versiones y muestras;
 no extrapolar atención de referencias a performance. Storyboard y receta viven con el asset en canal.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+Registrar MP4, ratio, duración y evidencia del archivo final. No ofrecer master estático como video ni asumir formatos no producidos. El copy exterior del video tiene perfil propio; audio/preview/safe zones se verifican por placement.

@@ -122,6 +122,35 @@ no el titular.
 quita, por verdadero que sea, no va en el ad. «48% de las búsquedas ya trae respuesta» y «1% del tráfico viene
 de la IA» son los dos verificados y los dos honestos; sólo uno de los dos vende.
 
+### 5c. 🔴 Un dato sin referente no es un dato
+
+**Medido el 2026-09-22.** Se escribieron dominantes como «−68%», «+91%» y «+35%», y el operador los rechazó con
+una pregunta que los desarma: ***«+91% de qué? −68% de qué?»***. Un porcentaje sin decir **de qué cosa** y **en
+qué condición** no es información: el lector no puede saber si habla de tráfico, de ventas o de presupuesto, así
+que no significa nada y no mueve a nadie.
+
+✅ **La forma completa reparte el dato en dos voces:**
+
+| Voz | Qué lleva | Ejemplo real corregido |
+|---|---|---|
+| **titular** | magnitud + **de qué** | **−68% en tus clics pagados.** |
+| **puente** | **en qué condición** | Cuando Google pone su respuesta arriba, antes de tus anuncios. |
+
+🔴 **Y hay un segundo error que sólo se ve leyendo la serie junta, nunca la pieza aislada:** dos piezas de la
+misma tanda usaban **el mismo referente con signo opuesto** —clics pagados −68% y +91%—, así que la serie se
+contradecía sola. **Cada pieza de una serie necesita su propio referente**; en la corrección quedaron pagados,
+orgánicos y precio, uno por pieza.
+
+### 5d. Audita la serie, no sólo la pieza
+
+Siete dominantes seguidos eran **todos negaciones** —«No fuiste tú», «No te leyó», «Sin tu nombre», «No es un
+canal nuevo», «No te citan», «No tienes que creernos», «Te decimos que no»—. Cada uno pasa solo; leídos de
+corrido suenan al mismo golpe repetido y ninguno dice nada concreto del negocio de quien lee.
+
+**Ningún gate ve esto y ninguna revisión pieza por pieza tampoco.** Antes de cerrar una tanda, leer **todos los
+dominantes seguidos, en una lista**: los tics de construcción —misma figura retórica, misma estructura, mismo
+signo— sólo aparecen ahí.
+
 ### 6. Supuestos de segmento: el tamaño del momento manda
 
 🔴 **Un ad no se construye sobre un momento que le ocurre a poca gente**, por urgente que sea ese momento para

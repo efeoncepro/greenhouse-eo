@@ -17,3 +17,7 @@ Por cada export vincular ficha/copy editable/plate/prompt íntegro/referencias+h
 ## Publicación y resultados
 
 ID plataforma, URL, versión exacta, fecha, autorización, retiro/sustitución y vínculo a medición. No inventar publicación porque export está en Finales.
+
+## Handoff de pauta para personas y agentes
+
+Al entregar paid media, aplicar `campaign-paid-manifest.md` (OneDrive: `MANIFIESTO-PAUTA.md`). El JSON concentra inventario, copy externo, audiencias y configuraciones; catálogo, CSV y Markdown MCP se generan juntos. Las recetas se conservan en Recursos; la ejecución real se registra aparte con IDs y lectura de estado.

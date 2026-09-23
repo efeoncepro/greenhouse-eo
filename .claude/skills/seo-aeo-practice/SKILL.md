@@ -334,6 +334,43 @@ Canon (no repetir acá): ADR `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD
 
 ---
 
+## 4e. 🔴 Nuestras propias landings de conversión — se auditan con navegador, no con `curl`
+
+Las páginas con las que se vende esta práctica (`/aeo-2/`, `/servicios/aeo/`, `/servicios/posicionamiento-seo/`)
+**montan sus formularios y su agendamiento por JavaScript**: el HTML inicial no los contiene. Auditadas con `curl`
+el 2026-09-22, la conclusión fue **falsa en dos frentes** —*«no hay formularios HubSpot»* y *«no hay acción de
+mayor compromiso»*—; con navegador aparecieron el **Growth Form** de cada una y el enlace a **HubSpot Meetings**.
+
+🔴 **Auditar una landing de conversión exige un navegador real.** Es la misma familia que la regla dura 10: una
+conclusión que se ve verificada, que nadie observó, y que el cliente va a repetir con tu nombre encima.
+
+🎯 **Y el dato que sólo apareció así: las dos líneas NO convierten con lo mismo.**
+
+| Línea | Qué pide su formulario | Qué es realmente |
+|---|---|---|
+| **AEO** | marca, sitio, **competidor principal** | alimenta un **diagnóstico** — es oferta de TOFU |
+| **SEO** | **contexto, rol y consentimiento** | un **lead comercial** |
+
+Tres reglas al mandar tráfico —pagado u orgánico— a una landing de la práctica:
+
+1. 🔴 **Verifica el `canonical` del destino ANTES de pautar.** `/servicios/aeo/` declaraba `canonical → /aeo-2/`:
+   pautar ahí manda tráfico pagado a una página que **le dice a Google que la buena es otra**. No rompe la
+   conversión, pero contradice la señal y **parte el reporting del propio servicio que estamos vendiendo.**
+   🎯 Es un hallazgo de SEO en la página con la que vendemos SEO.
+2. 🔴 **Cada etapa del embudo pide MÁS compromiso que la anterior.** Una landing puede ofrecer **dos**
+   conversiones de etapas distintas —diagnóstico gratis (TOFU) y agenda discovery (BOFU)— y **cerrar la página
+   con la de TOFU**. Un anuncio de etapa baja que aterriza sin dirigir cae en la oferta que el usuario **ya
+   pasó**. ✅ No siempre falta la acción: a veces **falta dirigir a ella**, y se resuelve nombrándola en el CTA
+   del anuncio *(`Agenda tu discovery`)* **sin tocar la página**.
+3. 🔴 **La promesa del ad y la de la landing tienen que ser la misma**, o la conversión cae por **incoherencia de
+   mensaje**, no por creatividad. El copy se escribe **después** de saber qué acción ofrece la página. ✅ Lo que
+   funcionó: **tomar el mensaje de una sección de la propia landing.**
+
+**Canon:** `docs/campaigns/decisions/CDR-007-cmp001-bofu-conversion-a-landing.md` (destinos verificados en vivo,
+bloqueos B1/B2 y su delta) · `docs/campaigns/CMP-001-MEDIA-PLAN-Q4-2026.md` (estructura de campañas y medición).
+
+---
+
 ## 5. Antes de responder cualquier cosa
 
 1. ¿Vas a decir un precio? → **cotizador primero.** `modules/04_PRICING.md`.
@@ -345,6 +382,8 @@ Canon (no repetir acá): ADR `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD
 5. ¿Es una decisión de método de venta genérica? → **es de `commercial-expert`**, no de acá.
 6. ¿Vas a citar tráfico estimado? → **versión de fórmula + as-of + aviso del corte 2026-11-01** (§4d). Con
    `truncated=true`, es un piso.
+7. ¿Vas a mandar tráfico —pagado u orgánico— a una landing de la práctica? → **§4e**: navegador real (no
+   `curl`), `canonical` propio, y **la acción que ofrece la página define el CTA del anuncio**.
 
 ## Continuidad de campañas CMP
 

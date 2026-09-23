@@ -92,6 +92,8 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
 
 **Límite verificado del checker:** `foto:assets:check` tolera archivos ausentes para CI y comprueba sólo rutas de catálogo. Antes de generar, verificar también disponibilidad/lectura del archivo que se adjunta al motor y comparar su SHA-256 con la entrada del lock. Esto incluye copias OneDrive; exit 0 no basta para validarlas. No regenerar el lock para legitimar una diferencia sin revisión de la referencia.
 
+**Entrega para humanos y agentes:** seguir `EFEONCE_CAMPAIGN_REGISTRY_V1.md` §Entrega de pauta compartida. Un manifiesto operativo genera catálogo visual y CSV; Finales organiza por campaña/tipo/ratio, con titulares legibles e IDs estables. Recetas y versiones en Recursos, nunca entregas separadas por agente.
+
 ### Motor de IA: cómo elegir (as-of 2026-09-16)
 
 Guía canónica: `docs/architecture/GREENHOUSE_AI_MEDIA_MODEL_SELECTION_GUIDE_V1.md`. Detalle de imagen en `greenhouse-ai-image-generator` §Elegir modelo y de video en
@@ -172,6 +174,36 @@ casos, no nuevos tokens AXIS. Entregar copy/parámetros/compositor editables y c
 **Color a demanda:** lima no es obligatorio; naranja, teal u otro autorizado según composición. Elegir tinta,
 contorno y relleno por separado: CTA/descriptor ≥4,5:1; borde/silueta y controles significativos ≥3:1. Medir
 el fondo real desfavorable, no sólo paleta o p98; documentar color resuelto y prueba. Ver método en el canon.
+
+### Lo que el gate NO mide — cuatro trampas medidas en CMP-001 (2026-09-22)
+
+Las cuatro salieron de componer ads reales y **ninguna** hace fallar `pnpm foto:cta:gate`: el gate mide
+contraste y protección de sujeto, no completitud del concepto ni geometría del grupo de acción.
+
+- 🔴 **El concepto completo no es opcional.** Concepto = **entrada · titular · remate**; grupo de acción =
+  **beneficio · CTA · descriptor**. Nueve piezas se compusieron y pasaron el gate con sólo titular +
+  beneficio + CTA + descriptor: el compositor resuelve la entrada con `if (s.lead)`, así que su ausencia no
+  es un error para él, y **una pieza incompleta sale verde**. Ante un «excesivo texto» se **acorta cada voz**,
+  nunca se elimina una. Corolario medido: restituir la entrada puede **bajar** el ratio dominante/entrada sin
+  que nada avise, porque el compositor achica el dominante solo cuando no cabe en `dominantMax` (caso `mo3`:
+  cayó a 2,9, bajo el mínimo de 3; acortar el dominante a tres palabras lo devolvió a 3,7). Lee el
+  `ratioDominanteEntrada` del QA después de restituir. Canon: [Tres voces + acción §El concepto completo no es
+  opcional](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md).
+- 🔴 **El cursor del CTA tapa el descriptor cuando el botón es corto.** El solape es **geométrico, no de
+  luminancia**: el gate lo deja pasar y sólo se ve mirando la pieza. Un botón de **19 caracteres o más** deja
+  al cursor fuera de un descriptor de hasta 30; si el botón tiene que ser corto por punch, acorta el
+  descriptor en la misma proporción. Desde el 22/09 el compositor baja el descriptor cuando detecta el solape
+  y la regla de largo queda como criterio de ritmo, no como protección. Casos y tabla:
+  [compositor de CTA §8](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
+- **El CTA expresa el DESTINO de la etapa, no el ángulo de la pieza.** Varias piezas de la misma etapa del
+  embudo convergen en **una sola acción** y lo que cambia entre ellas es el fraseo. Si dos piezas de la misma
+  etapa llevan a destinos distintos, la etapa está partida en dos campañas. Ver §9 del mismo canon.
+- **Escala tipográfica en horizontal.** En 16:9 el texto se veía perdido, pero la causa **no** es el tamaño de
+  fuente respecto de su columna: medido, 4:5 da **968 px** de columna y 16:9 da **901 px** — casi la misma
+  columna en un lienzo del doble de ancho. 🔴 **Escalar por ancho de LIENZO es un error**: aplana la jerarquía
+  (el ratio cayó a 2,3). El compositor escala el bloque hasta que el dominante **llene** su `dominantMax`, y
+  sólo en lienzos horizontales (`W > H`): 4:5 y 9:16 quedan idénticos. Su tope por espacio es una **heurística
+  declarada, no una medición**; el verificador real sigue siendo la guarda que aborta. Ver §13 del mismo canon.
 
 ## Jerarquía por voces: receta probada en carrusel (2026-09-19)
 
@@ -394,3 +426,8 @@ El pensamiento vive en `Alineación/2. Campañas/CMP-###_…`; los assets, en la
 Antes del prompt releer brief y decisiones vigentes: un archivo llamado FINAL puede conservar copy descartado.
 Registrar job, tensión, prueba, copy literal, CTA/destino y una palanca por ficha. La aprobación de dirección no
 aprueba todos los renders; QA editorial, preview de placement y autorización paid se registran separados.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+Finales presenta títulos legibles, IDs estables y tipo/ratio. Recetas, versiones y QA van a Recursos; el manifiesto enlaza ambos. Separar texto en arte del copy externo; preview por placement antes de cargar, sin equiparar ratio a elegibilidad.

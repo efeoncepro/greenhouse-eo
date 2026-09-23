@@ -326,8 +326,28 @@ los px por 1,78 contra una columna que no creció, el dominante topa en `dominan
 a todas las voces, paddings y gaps absolutos — **así el ratio de jerarquía queda intacto** (medido: 4,0 en TOFU
 16:9, 3,5 en MOFU y BOFU).
 
-**Alcance: sólo lienzos horizontales (`W > H`).** 4:5 y 9:16 quedan idénticos porque la condición es falsa —
-verificado pieza por pieza: sus ratios no se movieron ni una décima.
+**Alcance: lienzos horizontales (`W > H`) y verticales altos (`H/W > 1,5`, o sea 9:16).** El 4:5 queda idéntico
+porque la condición es falsa — verificado pieza por pieza: sus ratios no se movieron ni una décima.
+
+**Por qué 9:16 entró después, y con qué evidencia.** Al medir cuánto llena el dominante su `dominantMax` por
+formato apareció que **9:16 ya llenaba igual que 4:5** (93% · 80% · 102%, los mismos números, porque comparten
+ancho de lienzo y copy) — o sea que ahí el texto **no estaba chico respecto a su columna**, sino respecto a un
+lienzo muy alto. Aplicar el mecanismo igual valió la pena porque **actúa sólo sobre lo que no llena**: de las
+tres piezas 9:16 medidas, una subió de **74% a 97%**, otra ya estaba al 97% y no se movió, y la tercera quedó
+igual porque **el tope por espacio la frenó**. Es el comportamiento correcto: el mecanismo no infla lo que ya
+está bien.
+
+**Probado también contra planes de otras campañas** (`aeo-final-safe-v07`, 16 piezas, 8 de ellas en formato):
+componen las 16, gates verdes, ratios entre 3,0 y 4,5 y llenados de 92 a 102%. Dos pilotos (`cta-p1-v02`,
+`cta-p2`) abortan, pero **abortaban igual con el compositor anterior** — su causa es el cambio del descriptor
+de §12, no esta escala. ⚠️ **Se verificó ejecutando el compositor viejo sobre los mismos planes**, no
+asumiéndolo: tres piezas 16:9 de esa campaña tienen el dominante en dos líneas y la primera hipótesis fue que
+esta escala las había partido; correr la versión anterior mostró que **ya estaban así**. Un margen de
+seguridad que se había añadido por esa hipótesis se retiró al comprobarla falsa.
+
+🔴 **La lección de método, que vale más que el número:** la pregunta «¿este texto está chico?» no se responde a
+ojo ni comparando formatos — se responde midiendo **cuánto llena el dominante su propio tope**. Ese porcentaje
+distingue el caso real (16:9 al 32%) del caso donde no hay nada que hacer (9:16 al 97%).
 
 **Dos topes, y sólo uno es una medición:**
 

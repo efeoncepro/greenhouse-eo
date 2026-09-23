@@ -70,3 +70,26 @@ Brief, piloto, revisión, adaptaciones, QA, aprobación, vuelo, lectura/cierre c
 ## 13. Handoff y decisiones
 
 Índice de assets por ruta; changelog breve; historial de versiones/descartes; qué puede modificar el siguiente agente; qué requiere decisión y por qué. Cierre: resultado real, evidencia, aprendizaje y siguiente acción. No mover a aprobada/en vuelo por completar este documento.
+
+---
+
+## Buying group *(sección obligatoria en B2B)*
+
+Modelar el grupo de compra por cuenta, sin número fijo de stakeholders ni roles excluyentes. La pieza prioriza un interlocutor y le permite compartir un argumento útil.
+
+> 🎯 **El trabajo del ad no es convencer al comité: es ARMAR AL CAMPEÓN**, que lleva el argumento a una
+> reunión donde no estamos. Por eso una pieza se juzga también por si **se puede repetir de memoria y
+> reenviar sin contexto**.
+
+Modelar como mínimo: **campeón** (arma el caso) · **sponsor económico** (aprueba) · **owner técnico**
+(viabilidad y accesos) · **owner de datos** (si la evidencia vale) · 🔴 **bloqueadores** —procurement, legal,
+security— que **pueden detener todo sin sponsorear nada** · **incumbente**, cuya influencia y autoridad se verifican.
+
+Procurement, Legal y Security pueden condicionar la decisión: identificar sus requisitos de alcance, datos y terceros. No sustituir esa revisión con claims de confianza genéricos.
+
+**Y una tabla de asignación pieza → rol.** 🔴 **Una pieza sin rol asignado no se produce:** si no puedes
+nombrar a quién le habla, le habla a «el cliente», y una pieza para todos no mueve a nadie.
+
+## Handoff de pauta para personas y agentes
+
+Al entregar paid media, aplicar `campaign-paid-manifest.md` (OneDrive: `MANIFIESTO-PAUTA.md`). El JSON concentra inventario, copy externo, audiencias y configuraciones; catálogo, CSV y Markdown MCP se generan juntos. Las recetas se conservan en Recursos; la ejecución real se registra aparte con IDs y lectura de estado.

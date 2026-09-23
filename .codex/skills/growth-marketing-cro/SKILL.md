@@ -341,3 +341,8 @@ El plan de campaña distingue clicks, consultas recibidas, diagnóstico entregad
 realizada, encaje y oportunidad. Cada KPI declara denominador/fuente/ventana; utm_content en URL no prueba
 persistencia en booking. Verificar el recorrido y sus dependencias antes de gasto; sin causalidad automática
 entre citación IA e ingresos. Hipótesis de experimento no es resultado.
+
+## Manifiesto de pauta y continuidad MCP
+
+Canon: [manifiesto compartido y handoff MCP](../../../docs/operations/EFEONCE_PAID_MEDIA_MANIFEST_AND_MCP_HANDOFF_V1.md).
+Conservar denominadores, conversiones reales, deduplicación y atribución hasta CRM; hipótesis A/B no es resultado. No inferir conversión del click, audiencia construida de una definición ni gasto aprobado de un presupuesto sugerido. Ejecución MCP y lectura del estado viven separadas del plan.

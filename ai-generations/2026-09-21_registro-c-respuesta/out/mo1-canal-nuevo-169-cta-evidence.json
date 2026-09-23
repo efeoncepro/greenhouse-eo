@@ -77,14 +77,14 @@
         "direction": "north-west",
         "anchor": "end-center",
         "hotspot": {
-          "x": 935.172,
-          "y": 552.667
+          "x": 786.282,
+          "y": 398.176
         },
         "bounds": {
-          "left": 932.1,
-          "top": 549.595,
-          "right": 1037.897,
-          "bottom": 658.506
+          "left": 783.21,
+          "top": 395.104,
+          "right": 889.007,
+          "bottom": 504.015
         },
         "touchesTarget": true
       }
@@ -94,22 +94,22 @@
     "withinCanvas": true
   },
   "textBounds": {
-    "left": 180.36,
-    "right": 881.788,
-    "top": 530.7749999999999,
-    "bottom": 574.5589999999999
+    "left": 173.36,
+    "right": 739.8980000000001,
+    "top": 380.494,
+    "bottom": 415.85800000000006
   },
   "descriptorBounds": {
     "left": 143.36,
-    "right": 688.1480000000001,
-    "top": 635.895,
-    "bottom": 673.672
+    "right": 585.0799999999999,
+    "top": 467.194,
+    "bottom": 497.824
   },
   "surface": {
     "left": 143.36,
-    "top": 508.7749999999999,
-    "right": 918.788,
-    "bottom": 596.5589999999999
+    "top": 363.494,
+    "right": 769.8980000000001,
+    "bottom": 432.85800000000006
   },
   "variant": "outline",
   "colors": {
