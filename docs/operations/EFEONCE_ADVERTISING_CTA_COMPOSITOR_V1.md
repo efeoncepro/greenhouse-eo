@@ -721,8 +721,8 @@ contraste sí frena.
 | 12 · Cuarta certificación | cerrado | `5c8f81342` |
 | 13 · Quinta certificación | cerrado | `41c16b439` |
 | 14 · Sexta certificación | cerrado | `00732f136` |
-| 15 · Séptima certificación | en curso | — |
-| Octava certificación | siguiente paso, al cerrar el tramo 15 | — |
+| 15 · Séptima certificación | cerrado | ver `git log` («tramo 15») |
+| Octava certificación | en curso | — |
 
 Los tramos 1–5 cierran la primera certificación; la segunda (NO CERTIFICA) abrió los tramos 6–9, y el gesto manuscrito
 quedó fuera de alcance. La tercera abrió los tramos 10 y 11 y, desde la cuarta, cada certificación abre el suyo (12 a
@@ -1304,30 +1304,43 @@ color (nada sobre un cierre blanco; sobre celeste, el remate blanco mide 1,30:1 
 estrella (aviso falso de 41 px fuera de la columna a la izquierda; centrada, `eje-centrado` la bloquea a 21 px aunque
 el grupo está centrado, y en dos líneas el bloqueo es correcto pero el consejo no aplica).
 
-### Tramo 15 — séptima certificación (en curso)
+### Tramo 15 — séptima certificación (cerrado)
 
-**En curso: nada de esto está implementado todavía.** El plan cubre los cuatro 🟠 y dos 🟡 de arquitectura que tocan
-las mismas reglas, y empieza cuando termine la corrida completa de mutantes que está en marcha:
+Cierra los cuatro 🟠 de la séptima y dos 🟡 de arquitectura que tocan las mismas reglas. Cada umbral sale del canon, y lo
+aprobado sólo muestra quién lo incumple (regla dura de esta sección): se midió sobre las 114 piezas aprobadas que componen
+con el compositor vigente, sin componer nada nuevo.
 
-- **Entidades (arquitectura, R1):** validar contra la lista completa de HTML5 —los 106 nombres de
-  `character-entities-legacy` 3.0.0, verificada contra el decodificador de `entities` 4.5.0 en modo legado—: un «&»
-  seguido del nombre legado **más largo** que empiece ahí se rechaza (`&notin` sin «;» se lee «¬in»), y «R&D», «AT&T» y
-  «Q&A» siguen siendo texto. Con prueba y mutante con `eacute` y `ntilde`.
-- **Holgura entre voces (diseño, N1):** exigir una holgura mínima entre texto, botón y firma, medida sobre lo dibujado
-  —el botón con medio trazo cuando es contorno— y calibrada contra las 114 aprobadas que componen con el compositor
-  actual.
-- **Columna (diseño, N2):** que el esquema rechace `cta.align: "center"` en un bloque a la izquierda y que el mensaje
-  por `cta.x` faltante dependa de la alineación del bloque; en las piezas nuevas, CTA, descriptor, nota y etiqueta
-  fuera de la columna pasan a bloquear (hoy sólo avisan).
-- **Losa (diseño, H3):** un techo de área por variante dibujada —el del relleno, más bajo que el del contorno—, con la
-  variante que resolvió el compositor (`auto` puede dibujar relleno).
-- **CTA de texto (arquitectura, N4, 🟡):** que `descriptor-distancia` y `cta-tamano` midan el texto del CTA y no la
-  caja del relleno, que no se dibuja.
-- **Prueba del origen heredado (arquitectura, N7, 🟡):** darle prueba y mutante al arreglo de Y1 del tramo 14, como
-  exige la regla dura de esta sección.
+- **Entidades (arquitectura, R1).** `cta-esquema.mjs` valida contra la lista completa de HTML5 (`ENTIDADES_LEGADO`: los
+  106 nombres que un navegador decodifica sin «;», verificados contra `character-entities-legacy` 3.0.0 y el decodificador
+  de `entities` 4.5.0). Un «&» seguido del nombre legado **más largo** que empiece ahí se rechaza, como lo lee un
+  navegador: `&eacute`, `&ntilde`, `&ordm`, y `&nothing` se lee «&not». Los nombres tipográficos que ningún navegador
+  acepta sin «;» (`ndash`, `hellip`, `euro`…) se rechazan igual, en una lista aparte y declarada como tal. «R&D»,
+  «AT&T», «Q&A», «H&M» y «S&P» siguen siendo texto.
+- **Holgura (diseño, N1): regla `holgura`, todas las piezas.** Texto, botón y firma no se tocan, con la misma holgura que
+  ya separa una selección de lo que no es su destino: 0,4 % del lado corto, medida sobre lo DIBUJADO —el botón de contorno
+  cuenta medio trazo por fuera; un CTA de texto no tiene botón—. La composición no cambia: la búsqueda del tamaño y las
+  invariantes siguen igual, y el gate lo verifica. Aprobadas: la más justa queda a 0,69 % (CMP-002, el cierre a 8–10 px
+  del titular); ninguna incumple.
+- **Columna (diseño, N2).** El esquema rechaza `cta.align: "center"` en un bloque alineado a la izquierda, y el mensaje
+  por `cta.x` faltante depende de la alineación del bloque. En una pieza NUEVA, el CTA, el descriptor, la nota o la
+  etiqueta a más de 4 px de la columna bloquean (`cta-columna`), midiendo lo dibujado: el texto en un CTA de texto, y la
+  etiqueta con estrella no se mide. Canon: «SIEMPRE `cta.x: "columna"` en un plan nuevo», con la tolerancia del eje
+  centrado. 30 aprobadas se corren hasta 27 px (la familia KV con `cta.x: 0.08` y CTA de texto con fracción): conservan
+  el aviso de siempre, con el mismo texto.
+- **Losa (diseño, H3).** El techo del área del botón depende de la variante DIBUJADA, la que resolvió el compositor:
+  relleno 0,7× el área del titular, contorno 1× y, en un CTA de texto, la caja de su texto 0,45×. Canon: el titular es la
+  voz dominante y un relleno pesa toda su área. Aprobadas: relleno ≤ 0,57, contorno ≤ 0,77, texto ≤ 0,29; ninguna incumple.
+  La losa de la auditoría (0,98×) ya no pasa.
+- **CTA de texto (arquitectura, N4, 🟡).** `descriptor-distancia` y `cta-tamano` miden el texto del CTA cuando no hay
+  botón dibujado; antes medían la caja del relleno, que no se dibuja.
+- **Origen heredado (arquitectura, N7, 🟡).** P10 reproduce la forja de la sexta —un plan del repo con un `.origen`
+  forjado hacia la suite, el nonce en el entorno y `--reproducir --comando <otro compositor>`— y exige 3; su mutante
+  devuelve el origen heredado.
 
-Como todo tramo, tiene que salir con la regresión sin diferencias no declaradas, las 10 pruebas en verde y un mutante
-por guarda nueva que alguna prueba detecte por la razón esperada. Después, la octava certificación.
+Pruebas: P07 suma la tilde sin punto y coma y el CTA centrado en un bloque a la izquierda; P10, voces pegadas, el borde
+del contorno que sólo el medio trazo cierra (la prueba verifica que el caso cae en esa ventana), el CTA fuera de la
+columna, la losa de relleno, el CTA de texto y el origen heredado; `cta-esquema.test.mjs`, las entidades y la columna.
+Resultado: 10 de 10 contra el commit del tramo (P02: 132 de 132 idénticas); regresión contra el tramo 14, 129 de 132 idénticas y 3 diferencias DECLARADAS, sólo de mensaje (⚪): las piezas de `cta-p1`, que abortan igual en las dos versiones por plan incompleto, reciben el mensaje de `cta.x` faltante según su bloque; mutantes 10 de 10 del tramo y 2 de 2 canarios; unitarias, 49.
 
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
@@ -1756,12 +1769,14 @@ Copiarlo sólo vale si el operador re-aprueba la excepción para ese plate.
 | `tracking-titular` | Canon nuevo: tracking del titular fuera de −0,035…0,02 em | no se mide: sin `hasta` |
 | `legibilidad` | Canon nuevo: texto bajo el piso en un teléfono de 390 CSS px (CTA 11 px, las demás voces 9) | CSS px mínimos aprobados (p. ej. `8.5`) |
 | `cta-relleno` | Padding del botón sobre 1,2× y 0,8× el cuerpo del CTA (botón-losa) | veces el techo, 1 = el techo (p. ej. `1.4`) |
-| `descriptor-distancia` | El descriptor dibujado a más de 1,5× el cuerpo del CTA del borde inferior del botón (tramo 14; antes, `descriptorGap` declarado) | razón máxima aprobada (p. ej. `1.8`) |
+| `descriptor-distancia` | El descriptor dibujado a más de 1,5× el cuerpo del CTA del borde inferior del botón, o de su texto si el CTA es de texto (tramos 14 y 15; antes, `descriptorGap` declarado) | razón máxima aprobada (p. ej. `1.8`) |
 | `cta-cuerpo` | CTA bajo 0,9× la voz de cuerpo mayor (entrada, cierre o nota) | razón mínima aprobada (p. ej. `0.8`) |
 | `paleta-voces` | Entrada o cierre con una tinta fuera de la paleta de AXIS para el cuerpo | no se mide: sin `hasta` |
 | `seleccion-objeto` | Una selección sobre un objeto con menos de 1 % de sujeto en su caja (`protect` no cuenta) | fracción mínima aprobada (p. ej. `0.005`) |
-| `cta-tamano` | El CTA sobre 0,5× el titular o el botón sobre el área del titular | veces el techo, 1 = el techo (p. ej. `1.3`) |
+| `cta-tamano` | El CTA sobre 0,5× el titular, o el botón sobre su techo de área según la variante dibujada: relleno 0,7×, contorno 1×, la caja del texto de un CTA de texto 0,45× (tramos 14 y 15) | veces el techo, 1 = el techo (p. ej. `1.3`) |
 | `mascara-vacia` | Una máscara que no marca ningún sujeto (una foto sin persona ni objeto protagonista) | no se mide: sin `hasta` |
+| `holgura` | Texto, botón y firma a menos de 0,4 % del lado corto; el botón de contorno cuenta medio trazo por fuera (tramo 15) | px mínimos aprobados (p. ej. `3.5`) |
+| `cta-columna` | Canon nuevo: el CTA, el descriptor, la nota o la etiqueta a más de 4 px de la columna del texto (tramo 15) | px máximos aprobados (p. ej. `12`) |
 
 Una excepción **vale** sólo si se cumplen las tres condiciones del tramo 7:
 
@@ -1813,13 +1828,15 @@ aprobador ni copia `suite-pruebas` a un plan real: si falta la aprobación, preg
   de `protect` (`firma-posicion`); firma externa aprobada; orden de lectura (`orden-lectura`); jerarquía por rol
   (`jerarquia-rol`); aire del botón (`cta-aire`); tracking del titular (`tracking-titular`); el marco de la selección
   del titular y el del CTA cuando se pinta, dentro de las invariantes; el piso de legibilidad en el teléfono
-  (`legibilidad`, tramo 13); y un QA cuyo canon no calza con el registro.
+  (`legibilidad`, tramo 13); el CTA, el descriptor, la nota y la etiqueta en la columna del texto (±4 px, `cta-columna`,
+  tramo 15); y un QA cuyo canon no calza con el registro.
 - **Todas las piezas:** un cursor o una etiqueta de selección no tapan ningún texto, ni el de su destino; en un bloque
   centrado, cada voz, el botón y el descriptor en el eje (±4 px, `eje-centrado`). Desde el tramo 13: botón-losa
   (`cta-relleno`), descriptor lejos de su botón (`descriptor-distancia`), CTA menor que el cuerpo (`cta-cuerpo`), tinta
   del cuerpo fuera de la paleta (`paleta-voces`) y selección sobre nada (`seleccion-objeto`). Desde el tramo 14: CTA que
   compite con el titular (`cta-tamano`) y máscara vacía (`mascara-vacia`); en las piezas nuevas, la selección sobre un
-  objeto es una salida aprobada (`razon`, `aprobadoPor` y `plate` en `selection`).
+  objeto es una salida aprobada (`razon`, `aprobadoPor` y `plate` en `selection`). Desde el tramo 15: texto, botón y firma
+  que se tocan (`holgura`), y el techo de área de `cta-tamano` según la variante dibujada.
 
 **Rechaza al validar** (el compositor, antes de componer): un espacio o carácter que la fuente de su voz no tiene, un
 texto sin nada que dibujar, `signatureSafeArea` incompleta, el velo (`scrimTop`/`scrimBottom`), una nota con
@@ -1828,7 +1845,9 @@ en el nombre, como `&sup2;`), un salto de línea o una tabulación, `placement` 
 transparencia (en cualquier profundidad y con cualquier canal), un campo interno del compositor en el plan, escalas de la
 selección sobre su techo, un `final` bajo el 85 % del máster o bajo 780 px, y una firma que cae fuera de la imagen. Desde
 el tramo 14 también: un plate que no es raster (un SVG que enlaza la foto dejaba la segmentación ciega), una entidad sin
-punto y coma, `cta.cursorScale` sobre 1,2 y una escala de la selección bajo 1.
+punto y coma, `cta.cursorScale` sobre 1,2 y una escala de la selección bajo 1. Desde el tramo 15, la entidad sin punto y
+coma se valida con la lista oficial de HTML5 —las tildes también: `&eacute`, `&ntilde`— y se rechaza `cta.align:
+"center"` en un bloque alineado a la izquierda.
 
 **Aborta al componer** (tramos 13 y 14): la esquina redondeada del botón que entra en el texto del CTA (el mensaje da el
 radio máximo para ese relleno), el borde del botón que toca las letras, una medición imposible —más contraste del que sus
@@ -1953,7 +1972,10 @@ el 6 y 12 de 12 los del 7; el tramo 8 sumó ocho y el 9, la corrida base, los ca
 | `✗ no existe …/out/qa-<plan>.json` · `✗ 0 piezas evaluadas…` · `✗ piezas del plan sin QA…` | No se compuso el plan, o no entero | Componer el plan completo y resolver sus errores antes del gate |
 | `✗ <id>: el botón es una losa: padding …` | El relleno del botón pasa 1,2× y 0,8× el cuerpo del CTA (tramo 13) | Bajar `paddingX`/`paddingY`; lo aprobado va de 0,6× a 0,8× y de 0,35× a 0,47× el cuerpo |
 | `✗ <id>: el descriptor queda lejos de su botón…` | El descriptor dibujado queda a más de 1,5× el cuerpo del CTA del botón: un `descriptorGap` grande, o un cursor o su etiqueta que lo empujan hacia abajo (tramo 14) | Bajar `descriptorGap`, o cambiar la esquina del cursor del CTA; lo aprobado va de 0,57× a 1,14× |
-| `✗ <id>: el CTA compite con el titular: …` | El CTA pasa 0,5× el titular o el botón pasa su área (tramo 14) | Bajar `cta.fontSize` o el relleno; lo aprobado va de 0,20× a 0,44× y de 0,17× a 0,77× |
+| `✗ <id>: el CTA compite con el titular: …` | El CTA pasa 0,5× el titular o el botón pasa su techo de área: relleno 0,7×, contorno 1×, la caja del texto de un CTA de texto 0,45× (tramos 14 y 15) | Bajar `cta.fontSize` o el relleno; lo aprobado va de 0,20× a 0,44×, y el área hasta 0,57× en relleno y 0,77× en contorno |
+| `✗ <id>: texto, botón y firma no se tocan: …` | Dos voces, el botón o la firma a menos de 0,4 % del lado corto; el botón de contorno cuenta medio trazo por fuera (tramo 15) | Subir `leadGap`, `afterGap`, `note.gapAfterClosure` o `cta.gapAfterNote`; lo aprobado queda a 0,69 % o más |
+| `✗ <id>: el CTA arranca N px … fuera de la columna del texto (tolerancia: 4 px)` | Pieza nueva con el CTA, el descriptor, la nota o la etiqueta fuera de la columna (tramo 15) | `cta.x: "columna"` y `note.x: "columna"`; en un bloque centrado, `cta.align: "center"` |
+| `` `cta.align: "center"` en un bloque alineado a la izquierda… `` | El esquema lo rechaza: dejaba el botón fuera de la columna (tramo 15) | `cta.x: "columna"` |
 | `✗ <id>: el CTA (N px) es menor que el cuerpo: …` | El CTA mide menos de 0,9× la voz de cuerpo mayor (tramo 13) | Subir `cta.fontSize` o bajar esa voz |
 | `✗ <id>: tinta fuera de la paleta de AXIS para el cuerpo: …` | `leadFill` o `afterFill` fuera de la paleta del cuerpo (tramo 13) | Sobre fondo oscuro `#ffffff` o `#cfe4fa`; sobre claro `#00284d` o `#6d6777`. El acento va en el titular y el CTA |
 | `✗ <id>: la selección no encierra nada: …` | La caja de la selección cae sobre una zona sin sujeto (tramo 13); `protect` no cuenta (tramo 14) | Poner `selection.box` sobre el objeto que nombra; si la segmentación no lo marca, excepción `seleccion-objeto` aprobada |

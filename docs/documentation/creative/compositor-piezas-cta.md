@@ -1,7 +1,7 @@
 # Compositor de piezas con CTA — Composición y certificación
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-23 por Claude
 > **Ultima actualizacion:** 2026-09-23 por Claude
 > **Documentacion tecnica:** [Compositor de CTA — comando canónico](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) (§14 guarda de sujeto · §15 red de seguridad · §16 accesibilidad · §17 variantes · §18 certificación y tramos)
@@ -647,8 +647,10 @@ Entre los tramos 5 y 6 se sumaron la medición de la firma externa, el bloqueo d
   en una pieza aprobada. Los cuatro: textos y botón que se pueden pegar hasta tocarse (el borde del botón llega a pisar
   las letras), un CTA que puede quedar fuera de la columna del texto, un botón relleno que puede crecer hasta volverse
   una losa, y letras con tilde escritas como código sin punto y coma (`&eacute`) que se dibujaban tal cual. El **tramo
-  15, en curso**, los aborda; después viene una octava. La certificación se da por cerrada con cero hallazgos graves y
-  medios.
+  15 los cerró**: texto, botón y firma ya no se pueden tocar, en las piezas nuevas el CTA arranca en la columna, el
+  botón relleno tiene un techo de tamaño más bajo que el de contorno, y las tildes escritas como código se rechazan.
+  Ninguna pieza aprobada cambió. La **octava certificación** está en curso. La certificación se da por cerrada con
+  cero hallazgos graves y medios.
 - Decidir la **reserva de texto de los plates 16:9** de piezas con CTA: con el piso de legibilidad el texto necesita cerca
   del 57 % del ancho y la receta de toma pide 42 %.
 - Marcar cada guarda en el código con un mutante por marca.
@@ -666,7 +668,7 @@ manuscrito queda fuera de alcance; la firma de las stories finales de v07 se mov
 legibilidad en las piezas nuevas es de 11 px CSS para el CTA y 9 para las demás voces.
 
 > Detalle técnico: contrato §18 (hallazgos consolidados, estado de los tramos, cada certificación con su tramo —la
-> última, la séptima, con el tramo 15 en curso— y decisiones pendientes).
+> última, la séptima, y el tramo 15 que la cerró— y decisiones pendientes).
 
 ## Lo que el gate no ve
 

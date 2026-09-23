@@ -1,9 +1,9 @@
 # Compositor de piezas con CTA — Manual de uso
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-23 por Claude
-> **Ultima actualizacion:** 2026-09-23 por Claude
+> **Ultima actualizacion:** 2026-09-23 por Claude — (1.3) tramo 15: holgura entre texto, botón y firma; CTA en la columna en las piezas nuevas; techo de área por variante; tildes sin punto y coma; la tabla de excepciones suma `legibilidad`, `holgura` y `cta-columna`
 > **Modulo:** Creative · piezas publicitarias y sociales con CTA sobre fotografía
 > **Ruta en portal:** no aplica — son comandos locales del repositorio (`pnpm foto:*`)
 > **Documentacion relacionada:** [Documentación funcional](../../documentation/creative/compositor-piezas-cta.md) · [Contrato técnico](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) · [Tres voces + acción](../../operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md) · [Producir una foto de marca](../marketing/fotografia-de-marca-efeonce.md)
@@ -438,7 +438,10 @@ problema que se arregla acortando el copy o regenerando el plate.
 | `acento-cta` | no | — | — |
 | `cta-perceptual` | no | — | — |
 | `concepto-completo` | no | — | — |
-| — | — | No hay excepción `legibilidad`: el texto bajo 9 px CSS sólo avisa, y un plan que la declara se rechaza | — |
+| `legibilidad` | sí | CSS px mínimos aprobados (por ejemplo, 8.5); sólo en piezas nuevas | bajar de `hasta` |
+| `holgura` | sí | px mínimos aprobados entre texto, botón y firma | bajar de `hasta` |
+| `cta-columna` | sí | px máximos fuera de la columna; sólo en piezas nuevas | pasar de `hasta` |
+| — | — | La lista completa, con la unidad de cada regla, está en §19.7 del documento técnico | — |
 
 Si el plate se regenera, la excepción deja de valer hasta que se vuelva a aprobar con la huella nueva.
 
@@ -540,7 +543,9 @@ con `dominantMax` y `textWidth` 0,5, y sin nota.
 |---|---|---|
 | `` plan inválido — <id>: falta `cta.fontSize` `` (u otro campo) | Falta un campo obligatorio o su tipo no corresponde | Completa el campo que nombra el mensaje |
 | `` `<campo>` debe ser ≥ … `` o `≤ …` | Un valor fuera de rango (por ejemplo `dominantTracking`, o un lado de `final` bajo 320) | Ajusta el valor al rango |
-| `` falta `cta.x` (una fracción, "columna", o `cta.align: "center"`) `` | El CTA no dice dónde arranca | `"x": "columna"` con el bloque a la izquierda |
+| `` falta `cta.x`: en un bloque alineado a la izquierda usa `cta.x: "columna"` `` | El CTA no dice dónde arranca | `"x": "columna"` con el bloque a la izquierda |
+| `falta la posición del CTA: en un bloque centrado usa \`cta.align: "center"\`` | Bloque centrado sin la posición del CTA | `"align": "center"` dentro de `cta` |
+| `` `cta.align: "center"` en un bloque alineado a la izquierda `` | El botón quedaría fuera de la columna del texto | `"x": "columna"` en `cta` |
 | `«columna» es la columna del texto alineado a la izquierda` | `"columna"` en un bloque centrado | Alinea a la izquierda, o usa una fracción o `cta.align: "center"` |
 | `` la nota necesita `note.gapAfterClosure` (encadenada) o `note.y` `` | Nota sin posición | Agrega uno de los dos |
 | `ids repetidos` / `ids que sólo difieren en mayúsculas` | Dos piezas escribirían el mismo archivo | Renombra una |
@@ -572,7 +577,7 @@ con `dominantMax` y `textWidth` 0,5, y sin nota.
 | `tiene transparencia: aplánalo sobre su fondo` | El plate tiene alfa, también en 16 bits o en gris | Exporta el plate sin transparencia |
 | `es svg: usa una imagen raster` | El plate no es PNG, JPEG, WebP, AVIF ni TIFF | Exporta la foto como imagen |
 | `el borde del botón toca el texto del CTA` | El relleno del botón es menor que medio trazo del contorno | Sube `paddingX` y `paddingY` |
-| `trae la entidad «&amp» sin punto y coma` | Una entidad HTML sin su punto y coma | Escribe el carácter |
+| `trae la entidad «&amp» sin punto y coma` (o `«&eacute»`, `«&ntilde»`…) | Una entidad HTML sin su punto y coma; desde el tramo 15 también las tildes | Escribe el carácter: é, ñ, º |
 | `voces repetidas` | Un defecto del comando | Avisa al responsable del comando con la salida completa |
 
 ### Al certificar
@@ -618,7 +623,9 @@ con `dominantMax` y `textWidth` 0,5, y sin nota.
 | `⊘ … lleva gesto manuscrito` / `lleva tarjeta` | Elementos que ninguna guarda mide | No se certifica hoy; quita el elemento si necesitas la certificación |
 | `el botón es una losa: padding …` | El relleno del botón pasa 1,2 y 0,8 veces el tamaño de su letra | Baja `paddingX` y `paddingY`; lo aprobado va de 0,6 a 0,8 y de 0,35 a 0,47 veces |
 | `el descriptor queda lejos de su botón` | El descriptor dibujado queda a más de 1,5 veces la letra del CTA del botón: un `descriptorGap` grande o un cursor que lo empuja | Baja `descriptorGap` o cambia la esquina del cursor del CTA |
-| `el CTA compite con el titular` | El CTA pasa la mitad del titular o el botón pasa su área | Baja `cta.fontSize` o el relleno |
+| `el CTA compite con el titular` | El CTA pasa la mitad del titular, o el botón pasa su techo de área: relleno 0,7 veces la del titular, contorno 1 vez, y en un CTA de texto la caja del texto 0,45 | Baja `cta.fontSize` o el relleno |
+| `texto, botón y firma no se tocan` | Dos voces, el botón o la firma quedan a menos de 0,4 % del lado corto (el borde del botón de contorno cuenta) | Sube `leadGap`, `afterGap`, `note.gapAfterClosure` o `cta.gapAfterNote` |
+| `… fuera de la columna del texto (tolerancia: 4 px)` | En una pieza nueva, el CTA, el descriptor, la nota o la etiqueta no arrancan en la columna | `"x": "columna"` en `cta` y en `note` |
 | `selección sobre un OBJETO … sin aprobador del registro` | En una pieza nueva la selección sobre un objeto se aprueba | Pide la aprobación y declara `razon`, `aprobadoPor` y `plate` en `selection` |
 | `la máscara no marca ningún sujeto` | La segmentación no encontró a nadie en la foto | Si hay sujeto, `--reproducir`; si la foto no tiene protagonista, pide la excepción `mascara-vacia` |
 | `el CTA (N px) es menor que el cuerpo` | El CTA mide menos de 0,9 veces la entrada, el cierre o la nota | Sube `cta.fontSize` o baja esa voz |
