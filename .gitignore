@@ -143,3 +143,6 @@ public/growth-cta/BUILDINFO.json
 
 # Bank statements and loan contracts are sensitive source files (TASK finance recon 2026-09): never versioned
 data/bank/
+
+# Compositor de referencia extraído de git por `pnpm foto:componer:cta:regresion` (temporal)
+scripts/foto/.componer-cta@*.regresion.mjs

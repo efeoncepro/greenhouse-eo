@@ -380,7 +380,8 @@
     "foto:assets:lock": "node scripts/foto/assets-lock.mjs",
     "foto:assets:check": "node scripts/foto/assets-lock.mjs --check",
     "foto:componer:cta": "node scripts/foto/componer-cta.mjs",
-    "foto:cta:gate": "node scripts/foto/componer-cta.gate.mjs"
+    "foto:cta:gate": "node scripts/foto/componer-cta.gate.mjs",
+    "foto:componer:cta:regresion": "node scripts/foto/componer-cta.regresion.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,mts,js,jsx}": [

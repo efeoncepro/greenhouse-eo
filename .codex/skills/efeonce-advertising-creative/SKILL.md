@@ -209,6 +209,11 @@ contraste y protección de sujeto, no completitud del concepto ni geometría del
   `guardaSujeto: segmentacion`, y el gate lo acepta como protección. Sin máscara, el texto no crece. Caso
   fuente: las piezas de v07 crecieron ×1,6 sobre las personas cuando el tope dependía de un
   `subjectProtection` que no estaba declarado. §14.
+- **Ningún cambio al compositor se prueba a ojo.** `pnpm foto:componer:cta:regresion` compone todas las piezas
+  con CTA del repo con HEAD y con tu versión y compara estado, layout, QA y el PNG al píxel. Es determinista:
+  un cambio que no debería alterar nada sale sin diferencias. Para recomponer un set aprobado sin que el texto
+  crezca: `"textGrowth": false`. Si un plan está mal escrito, el comando ahora falla antes de componer y nombra la
+  pieza y el campo. §15.
 - **Un bloque centrado no se ancla lejos del centro.** Con `align: 'center'` y `|centerX − 0,5| > 0,15`, el
   compositor aborta: si el aire está a un costado, el bloque se alinea a ese costado (`align: 'left'`). Operador
   sobre 03-referencia-916: «se vería mejor alineada a la izquierda por la posición». §14.

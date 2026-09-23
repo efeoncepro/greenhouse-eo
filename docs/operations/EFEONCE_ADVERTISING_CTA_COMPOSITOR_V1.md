@@ -55,6 +55,12 @@ pnpm foto:cta:gate     <plan.json>   # verifica los mínimos
 🎯 **Lo que lo hace distinto de un gate normal: EXIGE la clave.** Si `contraste.cta` falta, **falla**. Un gate
 que sólo valida las claves presentes no puede detectar una ausencia — y la ausencia era exactamente el bug.
 
+**Delta 2026-09-22 (noche):** el gate además **falla si una pieza del plan no está en el QA** (no se compuso:
+antes pasaba en verde por omisión) y **avisa, sin fallar,** cuando la firma mide menos de 3:1 contra su fondo,
+cuando la firma queda sobre el sujeto (`firmaSobreSujeto`) y cuando la pieza declara zonas de sujeto ignoradas
+(`zonasIgnoradas`, con su razón). El compositor, por su lado, **borra el `qa.json` anterior al empezar**: una
+corrida que falla ya no deja números viejos que el gate pueda leer como vigentes.
+
 ⚠️ **Los dos comandos van en pareja y en ese orden.** Todos los planes de una misma carpeta escriben el mismo
 `out/qa.json`: si compones el plan A y luego corres el gate del plan B, el gate lee el QA de A y reporta
 **0 piezas** en vez de fallar. **Componer y verificar el mismo plan, seguido.**
@@ -439,4 +445,54 @@ repo: la regla sólo atrapa esa pieza, en las cinco versiones donde aparece.
 no crece (×1). A la derecha está la proyección clara y abajo la cabeza de ella. Las dos guardas frenan
 correctamente: para tener más texto hace falta un plate con más reserva
 (`EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md`), no un compositor más permisivo.
+
+## 15. Un plan mal escrito falla antes de componer, y ningún cambio al comando se prueba a ojo
+
+**Pedido del operador, 2026-09-22:** «piensa en qué más mejorarías al comando, analízalo bien y asegúrate de que
+no se dañe, porque hoy funciona y funciona bien».
+
+### La red de seguridad: `pnpm foto:componer:cta:regresion`
+
+Compone **todas las piezas de todos los planes con CTA del repo** (104 piezas únicas de 30 planes al
+2026-09-22) con dos versiones del compositor —`--ref` (HEAD por defecto) y `--candidato` (el archivo del árbol
+de trabajo por defecto)— y compara pieza por pieza: estado (compone o aborta, y con qué mensaje), cada caja del
+layout, el QA y el **sha256 del PNG final**. Cada pieza corre sola en una copia de su plan dentro de un
+directorio temporal: **las carpetas aprobadas no se tocan**.
+
+```bash
+pnpm foto:componer:cta:regresion                              # HEAD contra tu árbol de trabajo
+pnpm foto:componer:cta:regresion --ref 8dcc449b3              # contra cualquier versión anterior
+pnpm foto:componer:cta:regresion --candidato <archivo.mjs>    # probar una propuesta sin tocar el canónico
+pnpm foto:componer:cta:regresion --solo cmp002                # sólo los planes cuya ruta contiene el texto
+```
+
+Categorías del reporte: 🔴 cambia el estado · 🟠 cambia el layout o el QA · 🟡 sólo cambian píxeles ·
+⚪ cambia el mensaje de error · 🔵 el QA suma claves (informativo). Sale con 1 ante cualquier diferencia salvo
+la 🔵. **Regla: antes de commitear un cambio al compositor, correr el harness.** Si el cambio no debería alterar
+nada, tiene que salir sin 🔴🟠🟡. Si altera algo, el reporte dice qué piezas y cuánto, y eso se aprueba mirando.
+
+**Es determinista:** dos corridas del mismo código dan 104 de 104 iguales, PNG incluido. Una diferencia es
+siempre del código, nunca ruido.
+
+**Lo que midió el primer uso** (`--ref 8dcc449b3`, el compositor de antes de la escala): los cambios del
+2026-09-22 mueven **40 piezas aprobadas** si se recomponen (12 de CMP-001, pedidas; 21 de los sets AEO de
+Codex; **7 de CMP-002**) y hacen abortar 6 (cuatro copias de 03-referencia-916 por el eje corrido, KV-07-916
+con el descriptor sobre la cabeza de la persona —verificado a resolución completa— y una pieza MOFU descartada).
+Para recomponer un set aprobado **sin** que crezca: `"textGrowth": false` en cada pieza.
+
+### Blindajes del comando (verificados con el harness: 86 de 86 piezas que componen salen idénticas al píxel)
+
+| Blindaje | Qué evita |
+|---|---|
+| **Validación del plan antes de componer** | un campo numérico faltante producía coordenadas NaN y un error lejano sin pieza ni campo («CTA selection outside canvas»); ahora: «plan inválido — c-boton-lima: falta cta.fontSize numérico · …» |
+| **Aviso de campos que el comando no lee** | así se perdió `centerX` en silencio. Los metadatos de otras herramientas (`altText`, `signatureY`, `signatureSafeArea`, `placementLimitation`…) están declarados y no avisan |
+| **Ids repetidos · ids pedidos que no existen · plate inexistente · pieza muda · token de color inexistente · gesto sin la fuente Guttery · `final` con otra proporción que el plate** | errores claros antes de tocar un píxel; `final` con otra proporción **recortaba** la pieza |
+| **`LienzoError`** | una prueba de tamaño que empujaba el CTA fuera del lienzo tumbaba el comando entero; ahora descarta ese factor |
+| **Zona segura declarada (`safeArea`)** | el crecimiento no saca nada de ella; lo que ya esté afuera a ×1 se avisa; un bloque alineado a la izquierda arranca en `max(7 %, safeArea.x0)` — en 9:16 de Codex la zona empieza en 8 % |
+| **`textGrowth: false`** | congela una pieza aprobada a su tamaño declarado al recomponer |
+| **`subjectGuard.ignore: [{ box, reason }]`** | salida auditada para un falso positivo de la segmentación (un afiche del fondo): apaga SÓLO esa zona, con razón de ≥ 10 caracteres, y queda en el QA. Nunca se apaga la guarda entera |
+| **Firma sobre el sujeto → aviso + `firmaSobreSujeto` en el QA** | medido: KV-01-916 (CMP-002) con la firma sobre la cadera de la persona, KV-02-169 rozando la silueta, mo3-no-creernos-916 sobre el pedestal. Aviso, no bloqueo: decidirlo es del operador |
+| **Tamaños por defecto materializados antes de escalar** | una voz sin tamaño declarado no crecía con el resto (hoy ningún plan depende de eso) |
+| **Nota centrada con su bloque** | en un bloque centrado, la nota encadenada quedaba alineada a la izquierda |
+| **Caché de máscaras escrita atómicamente · rutas desde la raíz del repo · overlay del CTA sin `<text>` · mensajes con el id de la pieza · ayuda con el nombre real del comando** | robustez de base |
 

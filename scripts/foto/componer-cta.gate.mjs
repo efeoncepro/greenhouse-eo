@@ -32,6 +32,16 @@ const piezas = JSON.parse(readFileSync(path.resolve(plan), 'utf8'))
 const qa = JSON.parse(readFileSync(qaPath, 'utf8'))
 const conCta = new Set(piezas.filter(p => p.cta).map(p => p.id))
 
+// 🔴 Una pieza del plan que NO está en el QA no pasó: no se compuso [2026-09-22]. El loop de abajo sólo recorre
+// lo que el QA trae, así que una pieza ausente salía en verde por omisión — el mismo bug class que este archivo
+// vino a cerrar («la ausencia ES el fallo»), a nivel de pieza.
+const sinQa = [...conCta].filter(id => !qa.some(r => r.id === id))
+
+if (sinQa.length) {
+  console.error(`✗ piezas del plan sin QA (no se compusieron): ${sinQa.join(', ')}. Corre \`pnpm foto:componer:cta ${plan}\` completo.`)
+  process.exitCode = 1
+}
+
 // 🔴 La protección del sujeto se DECLARA en cada pieza, aunque sea para decir que no hay sujeto
 // [2026-09-22, CMP-002]. La guarda existía en el compositor (`subjectProtection` → el descriptor no
 // baja de `top - minClearance`) pero sólo actuaba si la pieza la declaraba, y ninguna lo hacía: el
@@ -134,6 +144,17 @@ for (const r of qa) {
 }
 
 const n = qa.filter(r => conCta.has(r.id)).length
+
+// Avisos (no fallan): se leen antes de aprobar, porque el número solo no alcanza para decidir.
+for (const r of qa.filter(x => conCta.has(x.id))) {
+  // La firma es un logotipo: la norma de contraste no la exige, pero una firma que no se lee no firma.
+  if (typeof r.contraste?.logo === 'number' && r.contraste.logo < 3) {
+    console.warn(`⚠ ${r.id}: la firma mide ${r.contraste.logo}:1 contra su fondo — mira si se lee o muévela (\`logo.y\`).`)
+  }
+
+  if (r.firmaSobreSujeto) console.warn(`⚠ ${r.id}: la firma queda sobre el sujeto (${r.firmaSobreSujeto} px de su silueta).`)
+  for (const z of r.zonasIgnoradas ?? []) console.warn(`⚠ ${r.id}: zona del sujeto ignorada [${z.box.join(', ')}] — ${z.reason}`)
+}
 
 // 🔴 Cero piezas evaluadas NO es un pase [reportado por «Ads con lenguaje fotográfico Efeonce»].
 // El loop recorre el `qa.json` de la ÚLTIMA corrida del compositor: si el plan que se pasa no es el
