@@ -9,6 +9,9 @@
 > 260k · el plan dominado)* vienen de la LICITACIÓN DEL BLOG, que es un servicio de SEO/CONTENIDO — NO de
 > creatividad.** Su dueño es **`seo-aeo-practice/modules/04_PRICING.md`**.
 >
+> **Actualización 2026-09-23:** esas cifras son de la **oferta original** y quedaron **superseded** — el blog se
+> adjudicó a CLP 3,0M neto/mes, 24 meses, sin precio unitario por artículo *(dueño: `seo-aeo-practice`)*.
+>
 > **Se usan acá SOLO como demostración de la aritmética** *(la fórmula del piso, el buffer, el margen de
 > negociación y los errores de estructura son idénticos en cualquier práctica)*.
 >
@@ -66,7 +69,8 @@ recibió un pedido de **"descuento por IA"**. La IA comprime el entregable **3-4
 
 ### 🔴 Y la pieza suelta tampoco
 
-🩸 **Ya cometimos este error, y está vivo:** la oferta económica de SKY publica **"artículo adicional: CLP
+🩸 **Ya cometimos este error:** la oferta económica **original** del blog de SKY publicaba *(las condiciones
+adjudicadas el 2026-09-23 ya van sin precio unitario)* **"artículo adicional: CLP
 260.000"**. Desde ese día, **SKY puede dividir cualquier propuesta nuestra por 260.000** y preguntarnos por qué
 el plan de 8 artículos no cuesta 2,08M.
 
@@ -247,7 +251,7 @@ Se dimensiona el squad **para la ventana del proyecto** y se aplica la misma fó
 en 12 meses. **Un proyecto no es "un mes de retainer".** Si lo cobras como si lo fuera, pierdes plata.
 
 ### (c) Ad-hoc / trabajo fuera del plan
-🩸 **BUG VIVO:** hoy el ad-hoc de SKY (**CLP 260.000/artículo**) es **más barato que el marginal del plan
+🩸 **BUG (oferta original del blog SKY, superseded 2026-09-23):** el ad-hoc (**CLP 260.000/artículo**) era **más barato que el marginal del plan
 ampliado (CLP 425.000)**. **Estamos premiando salirse del plan** y regalándole al cliente el incentivo de
 romper la planificación — que es justo lo que destruye la capacidad.
 

@@ -11,10 +11,14 @@ SKY Airline será la primera cuenta candidata para el `Managed Creative Producti
 
 La fuente de verdad de Creative Practice identifica a SKY como **cliente creativo vigente**, con los módulos
 `agencia_creativa` + `globe`, un squad creativo activo y una relación de trabajo de aproximadamente un año. El piloto
-debe ampliar ese servicio existente, no inventar una nueva relación comercial.
+debe ampliar ese servicio existente, no inventar una nueva relación comercial. El servicio creativo atiende al **equipo
+de Performance** de SKY; squad: Daniela Ferreira (Creative Operations Lead / directora de arte), Andrés Carlosama y
+Melkin Hernández (Senior Visual Designers).
 
 La carpeta [`sky-blog-2026/`](../../commercial/tenders/sky-blog-2026/) corresponde a la licitación de blog/Wherex:
-SEO/contenido, no adjudicada. Queda explícitamente fuera de este piloto.
+SEO/contenido. **Actualización 2026-09-23:** fue adjudicada a Efeonce como un segundo servicio, para el **equipo de
+Marca** de SKY (otro comprador), con dueño `seo-aeo-practice` e inicio 2026-11-01. Sigue explícitamente fuera de este
+piloto: no se mezclan alcance, margen ni equipo entre ambos servicios.
 
 ## Workflow inicial propuesto — SKY Agencia Creativa
 

@@ -119,7 +119,7 @@ For each workstream, declare exactly one **Accountable** (the lane owner) and th
 
 Pre-baked squads speed up proposals. Each is a default role mix + dedication ranges; tune to the scope.
 
-- **Content/SEO Pod** — Account Lead · Content/SEO Lead · SEO/AEO Specialist · Editor · Copywriter · Visual Designer · AV Producer · Social Strategist · Data/Analytics. ~2 FTE. *(The SKY blog archetype.)*
+- **Content/SEO Pod** — Account Lead · Content/SEO Lead · SEO/AEO Specialist · Editor · Copywriter · Visual Designer · AV Producer · Social Strategist · Data/Analytics. ~2 FTE. *(The SKY blog **proposal** archetype, 2026-07. The blog was awarded 2026-09-23 with a different configuration; the confirmed operating team starts with an SEO Writer and is still being hired — do not reuse the proposal squad as SKY's real roster, and do not assume the SKY creative squad staffs the blog.)*
 - **Creative Pod** — Account Lead · Creative Ops Lead · Senior Designers · AV Producer · Copywriter. Brand/creative execution at volume.
 - **Growth/Performance Pod** — Account Lead · Growth Strategist · Media Planner/Buyer · Analyst · CRO/Landing · Martech. Paid + conversion.
 - **Full-Funnel Pod** — a composed pod spanning Strategy + Content + Media + Data under one Account Lead, for integrated retainers.

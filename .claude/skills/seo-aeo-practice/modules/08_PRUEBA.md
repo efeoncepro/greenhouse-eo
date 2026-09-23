@@ -80,7 +80,7 @@ Si te citan, recuperas el 91%.                       ← esto sí se mide en tu 
 ## 5. Cómo construir el primer caso citable (la acción de mayor ROI de la práctica)
 
 🔴 **Hoy: cero.** Sin caso, **el precio y el Grader están haciendo el trabajo de la prueba** — y por eso
-**un error de aritmética en una oferta nos cuesta más de lo normal** *(y tenemos uno vivo en SKY)*.
+**un error de aritmética en una oferta nos cuesta más de lo normal** *(lo tuvimos en la oferta original de SKY; la adjudicada el 2026-09-23 ya no lo tiene)*.
 
 ### Las tres condiciones (heredadas de la práctica HubSpot)
 

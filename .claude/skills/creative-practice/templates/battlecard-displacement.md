@@ -66,7 +66,7 @@ están retirando. **Tener equipo interno no es una excepción: es lo normal.**
 ✅ **Costos ocultos:** software **USD 1.200–2.400/año** por persona.
 
 🎯 **El cierre aritmético:** *"Nuestro squad completo cuesta menos que UNA sola persona senior adentro."*
-*(Caso SKY: 9 roles, 2,2 FTE, CLP 5,2M/mes.)*
+*(Oferta original del blog SKY: 9 roles, 2,2 FTE, CLP 5,2M/mes — superseded; adjudicado a CLP 3,0M neto/mes.)*
 
 ⚠️ [VERIFICAR: loaded cost de un director de arte senior **en Chile**, con cargas. Los números de arriba son
 **EE.UU.** — válidos para el ICP Globe *(equipos de marketing enterprise internacionales)*. **No mezcles

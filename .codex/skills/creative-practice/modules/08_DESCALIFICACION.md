@@ -56,7 +56,7 @@ y va a ver nuestro nombre al lado.** Vender accountability medida a un cliente s
 **El piso de 45% de margen bruto está aprobado por el dueño (2026-07-13). No es una guía.**
 
 Y hay un agravante 🩸: `ESTADO_ACTUAL.md` § 3 tiene un **hallazgo abierto** — si el loaded cost del squad
-está calculado sobre **sueldo bruto** y no sobre **costo empresa**, el precio de lista de SKY (**CLP 5,2M/mes**)
+está calculado sobre **sueldo bruto** y no sobre **costo empresa**, el precio de lista de la oferta original del blog de SKY (**CLP 5,2M/mes**, superseded)
 **estaría prácticamente EN el piso, no holgadamente arriba.**
 
 > 🩸 **Traducción: el "margen de negociación" que crees tener puede no existir.**

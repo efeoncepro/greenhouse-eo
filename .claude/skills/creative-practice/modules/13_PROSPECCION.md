@@ -41,7 +41,7 @@
 
 🎯 **El comparable que hace que el precio funcione:** ✅ **un solo art director in-house en US cuesta
 USD 7.500–13.300/mes loaded.** ✅ **Un equipo creativo in-house chico (3 personas, DTC) cuesta
-USD 20.000–30.000/mes loaded.** **Nuestro squad SKY completo — 9 roles, 2,2 FTE — se vende a CLP 5,2M/mes.**
+USD 20.000–30.000/mes loaded.** **Nuestro squad SKY completo — 9 roles, 2,2 FTE — se ofertó a CLP 5,2M/mes** *(oferta original del blog, superseded)*.
 🔴 **Si el prospecto no tiene esa estructura de costos en la cabeza, no es nuestro ICP: es el ICP del
 freelancer.**
 

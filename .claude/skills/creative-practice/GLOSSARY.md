@@ -21,13 +21,13 @@ que el cliente te transfiere.** Si quiere el buffer más bajo, **que baje el rie
 equipo.**
 
 **Margen de negociación** — `precio de lista − piso`. **Se calcula ANTES de entrar a la reunión, nunca
-durante.** *(En SKY: CLP 598.000, no los 1,3M que se creían.)*
+durante.** *(En la oferta original del blog SKY: CLP 598.000, no los 1,3M que se creían.)*
 
 **Precio de lista** — el precio con el que sales. Anclado al **valor** y al **comparable correcto** *(no a la
 agencia de la esquina — ver `Comparable`)*.
 
 **Dominado** *(un plan)* — cuando un plan mayor **cuesta más** que el plan menor + los ad-hoc equivalentes.
-🩸 *Le pasa a SKY hoy: el ampliado cuesta CLP 660.000 más que base + 4 ad-hoc.* **Un analista de compras lo ve
+🩸 *Le pasó a la oferta original del blog SKY (superseded 2026-09-23): el ampliado costaba CLP 660.000 más que base + 4 ad-hoc.* **Un analista de compras lo ve
 en 30 segundos, y lo que concluye no es "qué error" sino "¿en qué más me inflan?".**
 
 **Comparable** — contra qué precio te está midiendo el cliente **de verdad.** 🔴 **No es la agencia digital

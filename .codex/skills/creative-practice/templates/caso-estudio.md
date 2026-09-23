@@ -244,7 +244,7 @@ muestra.**
 
 **Y los filtros de honestidad:**
 
-- [ ] 🔴 ¿Estoy insinuando **trabajo creativo donde hubo SEO**? *(SKY y Bresler son casos de **contenido/SEO**.
+- [ ] 🔴 ¿Estoy insinuando **trabajo creativo donde hubo SEO**? *(El **Blog** de SKY y Bresler son casos de **contenido/SEO**; la Agencia Creativa de SKY es otro servicio.
       El comité va a preguntar *"¿qué campaña le hicieron?"* — y ese silencio cuesta la cuenta.)*
 - [ ] 🔴 ¿Hay algún **mockup presentándose como caso**?
 - [ ] 🔴 ¿Estoy **apilando credenciales de fuentes distintas**? *("120+ empresas" + "80% de renovación" +

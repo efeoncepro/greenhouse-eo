@@ -73,6 +73,8 @@ Profundizar cuentas donde ya se demostró valor. Cada mes acumula historial en l
 
 **Sky Airlines** — retainer $6.9M/mes (ganado por licitación, 125 días). +127% tráfico orgánico vs. LATAM. Oportunidad inmediata: Content Lead ($18M) + Social Care ($21.6M) → llevaría Sky a $46.5M/mes. Hitos producto: demo Greenhouse en vivo → login activo + Content Calendar en Verk → Feedback Review desde Greenhouse → "Tu año con Efeonce" generado desde datos de Greenhouse + Verk + analytics.
 
+> **Actualización 2026-09-23:** Sky sumó una segunda línea: el **Blog SEO/AEO** (licitación privada vía Wherex, adjudicada el 2026-09-23; CLP 3.000.000 netos/mes + IVA × 24 meses; inicio 2026-11-01), comprado por el **equipo de Marca**, distinto del equipo de Performance que compra la Agencia Creativa.
+
 **Grupo Réditos** (Medellín, holding multisectorial, 10.000+ empleados) — deal CRM $115.3M perdido (5 mar), relación viva con Tibisay. Ruta: consultoría + branding → CRM a filial Gana → expansión a Credintegral, Loticolombia. Hitos: demo Kortex como diferenciador → login Greenhouse + Kortex desplegó schema → multi-tenant (cada filial con espacio en Greenhouse + portal Kortex).
 
 **Grupo Aguas Andinas** — ANAM cerrado ($8.400 USD), Francisco Quintrequeo contacto transversal para EcoRiles e Hidrogística. Ruta: CRM a las filiales → caso consolidado 3 filiales → nivel holding. Hitos: onboarding ANAM a Greenhouse → demo con datos reales ANAM + Kortex deployment consistente → Pulse Dashboard mostrando salud de las 3 filiales.

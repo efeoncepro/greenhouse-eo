@@ -160,7 +160,8 @@ Te digo cuáles."* → `modules/09_DISPLACEMENT.md`. **Nombrar al competidor bar
 
 ### 🔴 La trampa del renglón chileno
 
-**El squad SKY completo — 9 roles, 2,2 FTE — se vende a CLP 5,2M/mes.** Un vendedor mirando la tabla de
+*(Cifra de la **oferta original** del blog — superseded: el blog se adjudicó el 2026-09-23 a CLP 3,0M neto/mes con otra configuración. Úsala sólo como ilustración de la aritmética, no como precio vigente.)*
+**El squad SKY completo — 9 roles, 2,2 FTE — se ofertó a CLP 5,2M/mes.** Un vendedor mirando la tabla de
 arriba concluye: *"estamos carísimos, somos el techo del mercado"*. **Y se auto-descuenta hasta romper el
 piso** *(que hoy es **CLP 4,6M** — el margen de negociación real es de **CLP 598.000**, no de 1,3M)*.
 

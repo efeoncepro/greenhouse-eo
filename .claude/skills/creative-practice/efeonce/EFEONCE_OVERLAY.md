@@ -126,15 +126,22 @@ tenemos — y está sin tocar.** → `modules/13_PROSPECCION.md` §5.
 >
 > | | Qué es | ¿De quién es? |
 > |---|---|---|
-> | 🎯 **SKY — Agencia Creativa** | ✅ **CLIENTE CREATIVO VIGENTE.** Service modules **`agencia_creativa` + `globe`** activos. Squad: **Daniela Ferreira** *(Creative Operations Lead / directora de arte)* + **Melkin Hernández** y **Andrés Carlosama** *(Senior Visual Designers)*. Proyecto ago-2025 → jul-2026 | 🎯 **ESTA práctica** |
-> | **SKY — Blog (Wherex)** | 🔴 **Licitación de SEO/CONTENIDO.** Oferta en curso, no adjudicada. CLP 5,2M/mes · piso 4,6M · loaded 2,26M | 🔴 **`seo-aeo-practice` — NO es de acá** |
+> | 🎯 **SKY — Agencia Creativa** | ✅ **CLIENTE CREATIVO VIGENTE.** Service modules **`agencia_creativa` + `globe`** activos. Squad: **Daniela Ferreira** *(Creative Operations Lead / directora de arte)* + **Melkin Hernández** y **Andrés Carlosama** *(Senior Visual Designers)*. Atiende al **equipo de Performance** de SKY. Proyecto iniciado ago-2025, **vigente al 2026-09-23 (~1 año)** | 🎯 **ESTA práctica** |
+> | **SKY — Blog SEO/AEO (Wherex)** | 🔴 **Servicio de SEO/CONTENIDO.** **Adjudicado 2026-09-23** para el **equipo de Marca** de SKY *(otro comprador)*: CLP 3,0M neto/mes · 24 meses · inicio 2026-11-01. *(Oferta original 5,2M · piso 4,6M · loaded 2,26M = histórica / superseded.)* | 🔴 **`seo-aeo-practice` — NO es de acá** |
 >
 > 🔴 **Los CLP 5,2M, el loaded de 2,26M, el piso de 4,6M y los bugs de precio (ad-hoc, plan dominado,
 > precio unitario) son de la LICITACIÓN DE SEO.** Su dueño es **`seo-aeo-practice/modules/04_PRICING.md`**
 > — así lo declara el propio squad blueprint. **NO son el caso económico de la práctica creativa.**
 >
-> *(El squad del blog incluye roles creativos —diseñador, audiovisual, social— porque un servicio de
-> contenido necesita imágenes y video. **Eso no lo convierte en un servicio creativo.**)*
+> *(El squad de la **propuesta** del blog incluía roles creativos —diseñador, audiovisual, social— porque un
+> servicio de contenido necesita imágenes y video. **Eso no lo convierte en un servicio creativo.**)*
+>
+> **Actualización 2026-09-23:** el blog se **ganó** — es un **segundo servicio para otro equipo de SKY**
+> *(Marca; la Agencia Creativa atiende a Performance)*. El equipo operativo del blog es **Valentina Hoyos**
+> *(Redactora SEO)* más contratación en curso; el mapeo de squad del deck era de la propuesta. 🔴 **No
+> afirmes que el squad creativo atiende el blog** *(no confirmado)* **y no mezcles márgenes ni alcance entre
+> los dos servicios.** 🎯 La historia de expansión *(relación ancla → retainer creativo → segundo servicio
+> comprado por otro equipo)* es prueba de cuenta, no prueba creativa.
 >
 > **Wrapper de experiencia vivo:** `https://experiencia.efeoncepro.com` es el primer **Efeonce Wrapper**
 > anual para un cliente, creado para SKY por su primer año con Efeonce. Sirve como memoria/retención y
@@ -171,6 +178,9 @@ tenemos — y está sin tocar.** → `modules/13_PROSPECCION.md` §5.
 
 1. **La dedicación REAL de cada uno.** *(Si no están al 100% en SKY, el costo baja y el margen mejora.
    Si están al 100% y además cubren otras cuentas, hay sobre-asignación.)* → `greenhouse-ico` / capacity.
+   **Actualización 2026-09-23 (cualitativa):** SKY es la **cuenta principal** del squad; también atiende
+   otras cuentas *(p. ej. Grupo Berel)* con **dedicación mucho menor**. Falta el porcentaje medido —
+   **no se estima**.
 2. 🩸 **Qué incluye `loaded_monthly_cost_usd`** en `sellable-roles-store`: **¿bruto o costo empresa?**
    ¿Incluye herramientas? ¿Descuenta la utilización real? → **`greenhouse-finance-accounting-operator`.**
 

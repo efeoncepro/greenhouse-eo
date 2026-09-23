@@ -10,12 +10,12 @@
 | Término | Qué es | Por qué importa |
 |---|---|---|
 | **Loaded cost** | El costo real de un rol: nómina + cargas + herramientas + overhead, prorrateado por % de dedicación | 🔴 **Sin esto no hay precio.** Sale del squad blueprint |
-| **Squad blueprint** | El diseño del pod que se asigna a un cliente: roles, seniority, % dedicación, mapeo a nómina | **El insumo del piso.** *(Existe para SKY. NO para Berel)* |
+| **Squad blueprint** | El diseño del pod que se asigna a un cliente: roles, seniority, % dedicación, mapeo a nómina | **El insumo del piso.** *(Existe para la oferta original de SKY. NO para Berel)* |
 | **Margen bruto** *(delivery margin)* | `(precio − loaded cost) / precio` | 🔴 **Piso aprobado: 45%.** Target: 55-60%. Mercado: 50%+ sano, **bajo 40% el delivery está roto** |
 | **Margen neto** | Lo que queda después de overhead, ventas, admin e impuestos | **Promedio de agencia: ~13%.** Por eso 45% bruto es el filo |
 | **Piso** | El precio mínimo: `costo / (1 − margen mínimo)` | 🔴 **Se COMPUTA, no se siente** |
 | **Métrica de valor** | La unidad sobre la que cobras *(artículo, hora, mercado, superficie)* | 🔴 **Hoy cobramos por artículo — la cosa que la IA está abaratando** |
-| **Plan dominado** | Un plan que cuesta más que comprar lo mismo por partes | 🩸 **SKY: el ampliado (6,9M) cuesta más que base + 4 ad-hoc (6,24M)** |
+| **Plan dominado** | Un plan que cuesta más que comprar lo mismo por partes | 🩸 **SKY, oferta original: el ampliado (6,9M) costaba más que base + 4 ad-hoc (6,24M)** *(corregido en la adjudicada, 2026-09-23)* |
 | **Full absorption costing** | Modelo que carga TODO el overhead al costo del servicio | El modelo existe en el repo. **No se aplicó al piso** |
 | **Cotizador** | El motor cost-plus de Greenhouse (`src/lib/finance/pricing/`) | ✅ Existe, Full API Parity. **Se usó UNA vez** |
 

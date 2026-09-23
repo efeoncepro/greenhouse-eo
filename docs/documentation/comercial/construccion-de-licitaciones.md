@@ -1,9 +1,9 @@
 # Construcción de Licitaciones — Método Efeonce
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-07-11 por Claude (con Julio Reyes)
-> **Última actualización:** 2026-09-17 por Claude
+> **Última actualización:** 2026-09-23 por Claude
 > **Documentación técnica / método canónico:** skill `greenhouse-public-private-tenders` → `bid-construction-playbook.md`
 
 ## Para qué sirve este documento
@@ -134,6 +134,8 @@ Este método es **vivo**: cada vez que armamos o mejoramos una licitación, se a
 ## Primer caso de referencia
 
 El primer caso completo con este método fue la licitación de **SKY Airline — Producción de Contenido Blog** (plataforma Wherex, julio 2026): se leyeron las bases, se validó admisibilidad, se eligieron los diferenciadores (caso Berel, SEO + AEO, portal, metodología Surround Discovery, WordPress + partner de Automattic), se analizó el blog real con Semrush y el AI Visibility Grader, se benchmarkeó a la competencia (JetSMART, LATAM, Flybondi), se definió la cadencia con las áreas de contenido y SEO, se diseñó un squad de ~2,2 personas dedicadas, se calculó el precio sobre el costo real del equipo, y se redactó la propuesta con un pase de estilo. La propuesta incrusta el informe de visibilidad IA en vivo, la escalera Be X con los valores reales de SKY y la Radiografía AEO como muestra viva de trabajo. Los archivos viven en la carpeta comercial de esa licitación.
+
+**Resultado (2026-09-23):** SKY adjudicó el servicio a Efeonce; fue finalista entre unas 15 propuestas. Las condiciones finales no fueron las de la primera oferta: se ajustaron **por alcance, no por descuento**, a una capacidad gobernada de contenidos al mes con precio mensual fijo, a 24 meses y sin precio unitario por artículo. Los motivos del cierre refuerzan el método: la relación previa con la cuenta, una propuesta planteada como operación del canal (no como fábrica de artículos), **evidencia verificable** (informe del grader, Radiografía AEO con un artículo real y comparación competitiva) y un equipo, SLA y penalidades concretos.
 
 Este caso dejó dos aprendizajes que ya son parte del método: **medir antes de afirmar** (una versión previa dijo "SKY casi no aparece en la IA" por inferencia técnica; el grader real lo desmintió —SKY sí es reconocida y citada— y afirmar un negativo falso en una propuesta es grave), y **si la herramienta sale incompleta, se arregla la herramienta, no el informe del cliente** (así el resto de clientes no hereda el mismo hueco).
 

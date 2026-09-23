@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentación técnica / arquitectura
 > **Versión:** 1.0
 > **Creado:** 2026-07-14 por Claude (TASK-1410)
-> **Última actualización:** 2026-07-14
+> **Última actualización:** 2026-09-23
 > **Owner:** Growth / Think · Comercial (es una herramienta de venta)
 > **Task:** [`TASK-1410`](../tasks/complete/TASK-1410-aeo-article-xray.md)
 > **Repo del runtime:** `efeonce-think` (NO `greenhouse-eo`)
@@ -16,7 +16,7 @@
 
 Una **muestra de trabajo reutilizable**. Recorre en cuatro pantallas un artículo de blog real —escrito de cero para el cliente— y **expone la capa técnica que lo hace citable por motores de respuesta**, junto con la evidencia de por qué ese artículo existe.
 
-**El motor es reutilizable: el cliente es un payload, no código.** Primer caso: la licitación SKY (blog, vía Wherex, 2026).
+**El motor es reutilizable: el cliente es un payload, no código.** Primer caso: la licitación SKY (blog, vía Wherex, 2026), **adjudicada a Efeonce el 2026-09-23**; la muestra fue parte de la evidencia verificable que explica el cierre.
 
 ## 🔴 No es un anexo de un bid: es una CAPACIDAD con DOS trabajos
 

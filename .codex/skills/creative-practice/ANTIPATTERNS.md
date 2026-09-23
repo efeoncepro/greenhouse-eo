@@ -18,11 +18,17 @@
 > 15/07/2026 y aún no se sube**, con **2 años en CLP, sin reajuste y costos en USD.**
 > 🔴 **Un error de piso en un contrato sin reajuste no se corrige después: se paga 24 meses.**
 >
+> **Actualización 2026-09-23:** esa licitación **se adjudicó** — a **CLP 3,0M neto/mes, 24 meses, capacidad
+> gobernada y sin precio unitario por artículo** *(margen validado internamente por el operador)*. Las cifras
+> de A–C son de la **oferta original** y quedan como registro histórico del error, no como condiciones vigentes.
+>
 > 🩸 **Los bugs que SÍ son de esta práctica son F, G e I** — y son peores.
 
 ### 🩸 A. Publicamos un precio unitario, y le dimos al cliente la calculadora
 
-**Qué pasó:** la oferta económica de SKY publica **"artículo adicional: CLP 260.000"**.
+**Qué pasó:** la oferta económica **original** del blog de SKY publicaba **"artículo adicional: CLP 260.000"**.
+*(Actualización 2026-09-23: las condiciones adjudicadas ya van **sin precio unitario por artículo**; el riesgo
+de que el comprador haya visto la cifra original sigue siendo la lección.)*
 ⚠️ **Y agrava:** SKY **ya es cliente** *(performance)*. **Le estamos enseñando a comprarnos por unidad a una
 cuenta con la que queremos expandir durante años.**
 
@@ -105,7 +111,8 @@ tiempo** que alguien lo prometa. Y el día del onboarding, el cliente abre el me
 
 🎯 **Ojo — SÍ tenemos trabajo creativo vigente:** **SKY** tiene los service modules **`agencia_creativa` +
 `globe`** activos, con un squad nombrado *(Daniela Ferreira como Creative Operations Lead + Melkin Hernández
-y Andrés Carlosama como Senior Visual Designers)* y un proyecto que corre **ago-2025 → jul-2026.**
+y Andrés Carlosama como Senior Visual Designers)*, que atiende al **equipo de Performance** de SKY desde
+**ago-2025** y sigue vigente al 2026-09-23.
 
 🔴 **Pero no tenemos un CASO** — porque un caso exige **métrica verificable** + relación sana +
 **autorización escrita**, y **la métrica no existe** *(ver G)*.

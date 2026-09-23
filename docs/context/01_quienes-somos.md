@@ -84,7 +84,7 @@ Los 4 pilares operativos de ICO (stack real): **Brand Intelligence Hub** (Notion
 
 | Cliente | País | Resultado | Nota |
 |---|---|---|---|
-| **Sky Airlines** | Chile | +127% tráfico orgánico vs. LATAM Airlines (mercado asimétrico). Cuenta ancla desde 2023. | Modelo de expansión validado: licitación privada → retainer → expansión por trato directo. |
+| **Sky Airlines** | Chile | +127% tráfico orgánico vs. LATAM Airlines (mercado asimétrico). Cuenta ancla desde 2023. Hoy con **dos servicios y dos equipos compradores distintos**: **Agencia Creativa** para el equipo de Performance (~1 año; squad Daniela Ferreira · Andrés Carlosama · Melkin Hernández, que también atiende otras cuentas como Berel con mucha menos dedicación) y **Blog SEO/AEO** para el equipo de Marca (licitación privada vía Wherex adjudicada el 2026-09-23; inicio 2026-11-01). | Modelo de expansión validado: licitación privada → retainer → expansión. El Blog SEO/AEO es la segunda línea ganada dentro de la misma cuenta (otra área compradora, formalizada como adenda al contrato vigente). |
 | **Bresler** | Chile | +180% ventas digitales. | Integración de estrategia creativa con performance. |
 | **Pinturas Berel** | México | Retainer SEO + AEO mensual adjudicado vía licitación (#5234 wherEX, may-2026). | Cuenta ancla en México. Valida la oferta AEO. Cierre directo Efeonce — sin co-selling HubSpot. |
 | **SSilva Activos Inmobiliarios** | Chile | Reestructuración CRM: Marketing Hub Professional + 35 asientos de Sales. | ⚠️ **Solo citable ANONIMIZADO** ("una inmobiliaria del Cono Sur"). Relación fracturada (2026); **nunca con nombre ni testimonio firmado** — no controlamos la referencia. Ver `06`. |

@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Versión:** 1.0
 > **Creado:** 2026-07-14 por Claude (TASK-1410)
-> **Última actualización:** 2026-07-14
+> **Última actualización:** 2026-09-23
 > **Documentación técnica:** [Radiografía AEO — Arquitectura](radiografia-aeo-architecture.md)
 > **Manual comercial:** [Usar la Radiografía AEO en venta y educación](../manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md)
 > **Repo del runtime:** `efeonce-think` (**NO** `greenhouse-eo`)
@@ -35,7 +35,7 @@ Muestra, en cuatro pantallas: **el hueco** que encontramos en su espacio de bús
 
 ## El caso vivo hoy
 
-**SKY — licitación de blog (Wherex, 2026):**
+**SKY — licitación de blog (Wherex, 2026; adjudicada a Efeonce el 2026-09-23):**
 
 ```
 https://think.efeoncepro.com/muestras/sky-carretera-austral-861c18cc0e37

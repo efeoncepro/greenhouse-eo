@@ -224,13 +224,13 @@ Si el método cambia (nueva fase, nueva skill en la orquesta, nueva regla), actu
 
 ## Caso de referencia (primera destilación)
 
-Primer caso end-to-end que produjo este playbook: **SKY Airline — Producción de Contenido Blog** (Wherex, jul-2026; cliente existente de Efeonce en otra área). Ejercitó las 10 fases + la Fase 4-bis + la Fase 4-ter:
+Primer caso end-to-end que produjo este playbook: **SKY Airline — Producción de Contenido Blog** (Wherex, jul-2026; cliente existente de Efeonce en otra área — la agencia creativa que atiende al equipo de Performance; el blog lo compra el equipo de Marca). **✅ Adjudicada a Efeonce el 2026-09-23** (finalista entre ~15 propuestas; HubSpot deal `62535094842`, Cierre ganado). Condiciones finales: **CLP 3.000.000 netos/mes + IVA · 24 meses · TCV CLP 72.000.000** · capacidad gobernada 45–50 contenidos/mes · newsletter incluida · addons aparte · **sin precio unitario por artículo**; formalizada como **adenda al contrato vigente con Marketing**; inicio del servicio 2026-11-01. 🔴 Los precios de la oferta original (5,2M · 8 artículos · TCV 124,8M; BAFO 4,3M; piso 5,0M) son **historia de la negociación, superseded**. Ejercitó las 10 fases + la Fase 4-bis + la Fase 4-ter:
 
 - **Bases → admisibilidad → fit → diferenciadores** (Berel como caso SEO+AEO por Wherex, portal Greenhouse, Surround Discovery, WordPress + partner de Automattic).
 - **Alcance (Fase 4):** `content-marketing-studio` + `seo-aeo` (cadencia pillar/cluster); **análisis del activo real** con Semrush (~13,5K keywords, ~40K visitas/mes, near-miss como Antofagasta 110K en pos 12) + **AI Visibility Grader real** (2 runs de 5 motores) + **benchmark de competencia** (JetSMART rival directo mismos destinos; LATAM lidera la conversación en IA; nadie ganó la carrera AEO).
 - **Fase 4-bis (presentación del diagnóstico):** bullets duros (claridad de marca 100, **blog = 0 citas en 35 respuestas**, ownership 20 con LATAM 16 / JetSMART 9) + **informe público en vivo** incrustado + **escalera Be X con valores reales** (Ser encontrada 40 · Ser legible 70 · Ser correcta 37 · Ser accionable 8 · Ser intrínseca 76).
 - **Fase 4-ter (demostración):** Radiografía AEO viva como muestra de ejecución: artículo real, capa de máquina y atomización derivados de un hueco medido.
-- **Squad (`client-squad-design`, ≈2,2 FTE) → pricing sobre loaded cost real de nómina → redacción + pase `copywriting` → económica → export.**
+- **Squad (`client-squad-design`, ≈2,2 FTE) → pricing sobre loaded cost real de nómina → redacción + pase `copywriting` → económica → export.** *(El squad del deck era el de la PROPUESTA. El equipo operativo confirmado del blog es Valentina Hoyos — Redactora SEO — y el operador contratará más equipo; no presentar al squad creativo como equipo del blog.)*
 
 **Lecciones que este caso grabó en el método (aplican a toda licitación futura):**
 
@@ -238,5 +238,6 @@ Primer caso end-to-end que produjo este playbook: **SKY Airline — Producción 
 2. **Si el instrumento sale parcial, arregla EL SISTEMA, no el informe.** Cuando el diagnóstico salió incompleto, el reflejo correcto no fue "maquillar el informe de este cliente" sino auditar el grader (parió `ISSUE-120` + `TASK-1390`: clasificador de fuentes, matching same-site, visibilidad de la degradación de prosa, backoff). Ajustar solo el informe habría dejado el gap oculto para los demás clientes.
 3. **El informe completo lo arma el worker, no la mano.** Ver Fase 4-bis (regla de operación): `POST /score`/publish manual congela un informe sin tono ni categoría.
 4. **Dos lentes del Be X no se contradicen** (Fase 4-bis): al cliente va la percepción medida; la técnica es munición interna.
+5. **(2026-09-23, al ganar) Se gana por alcance y evidencia, no por descuento.** Ante un presupuesto declarado (~USD 3.000/mes) se rediseñó el Core como capacidad gobernada sin precio unitario, en vez de bajar la misma caja; y se validó el cost-to-serve antes de aceptar. Lo que pesó: relación de cuenta ancla, propuesta como operación de canal (no fábrica de artículos), evidencia verificable (Grader publicado, Radiografía AEO con artículo real, panel competitivo), squad real con SLA/penalidades aceptadas y un comparable vivo (Berel, también por Wherex).
 
 Artefactos en la carpeta comercial de la licitación (borrador, oferta técnica + HTML con la escalera Be X, oferta económica, squad blueprint, diagnóstico interno). Cómo operar el grader: memoria `reference_ai_visibility_grader_how_to_run` + `docs/manual-de-uso/growth/ai-visibility-grader-smoke.md`.

@@ -118,7 +118,9 @@ melkin, valentina` → `assets/squad/squad-<nombre>.png`); nombre desconocido �
 ## Delta 2026-07-15 — prueba social reusable (muro de logos + testimonios) · 🏆 primera oferta enviada programáticamente
 
 **🏆 Hito:** la oferta **SKY Airline** (blog, plataforma **Wherex**) se compuso y **ENVIÓ** end-to-end con
-el composer — la primera licitación de Efeonce hecha de forma programática. Dos plantillas nuevas
+el composer — la primera licitación de Efeonce hecha de forma programática. *(Estado 2026-09-23: **adjudicada** a
+Efeonce, con condiciones finales ajustadas por alcance — CLP 3,0M netos/mes × 24; ver
+[`sky-blog-2026/README.md`](../../commercial/tenders/sky-blog-2026/README.md).)* Dos plantillas nuevas
 domain-free, con gate, en el cluster de prueba social del cierre (`berel → clientes → testimonios → seguro`):
 
 1. **`ClientLogosFull`** (contentType `client-logos`): muro de logos de clientes **a color** en panel

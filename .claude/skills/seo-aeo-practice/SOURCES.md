@@ -106,9 +106,10 @@ probablemente haya que construirlo con `research-benchmark-operator` + entrevist
 
 | Dato | Valor | Fuente |
 |---|---|---|
-| **SKY — precio** | CLP 5.200.000 base · 6.900.000 ampliado · **260.000 ad-hoc** | `sky-blog-2026/oferta-economica.md` |
-| **SKY — loaded cost** | **CLP 2.260.000/mes** (2,2 FTE) | `sky-blog-2026/squad-blueprint-INTERNO.md` |
-| **SKY — piso** | CLP 3.900.000 (**42% de margen**) | idem |
+| ✅ **SKY — condiciones ADJUDICADAS (2026-09-23)** | **CLP 3.000.000 netos/mes + IVA · 24 meses · TCV CLP 72.000.000 neto** · capacidad gobernada 45–50 contenidos/mes · newsletter incluida · addons aparte · sin precio unitario por artículo · inicio 2026-11-01 | Correo de adjudicación Wherex (2026-09-23) + HubSpot deal `62535094842` (Cierre ganado) |
+| ~~SKY — precio~~ *(oferta original, superseded)* | CLP 5.200.000 base · 6.900.000 ampliado · **260.000 ad-hoc** | `sky-blog-2026/oferta-economica.md` |
+| ~~SKY — loaded cost~~ *(pod de la oferta original)* | **CLP 2.260.000/mes** (2,2 FTE) | `sky-blog-2026/squad-blueprint-INTERNO.md` |
+| ~~SKY — piso~~ *(oferta original)* | CLP 3.900.000 (**42% de margen**) | idem |
 | **SKY — tráfico del blog** | ~40.390/mes · ~13.510 keywords *(Semrush, as-of 2026-07-11)* | `benchmark-competencia-INTERNO.md` |
 | 🎯 **Nadie ganó el AEO en el peer set de SKY** | Ni SKY, ni JetSMART, ni Flybondi tienen la capa AEO | idem — **es la ventana de first-mover** |
 | **Berel — precio** | **52.000 MXN/mes** | Operador, 2026-07-13 |
