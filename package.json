@@ -14,7 +14,7 @@
     ]
   },
   "scripts": {
-    "local:check": "pnpm nul-byte-gate && pnpm skills:mirrors && pnpm mcp:manifest:check && pnpm mcp:skills:check && pnpm lint && NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
+    "local:check": "pnpm nul-byte-gate && pnpm skills:mirrors && pnpm mcp:manifest:check && pnpm mcp:skills:check && pnpm vercel:reachability-gate && pnpm lint && NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
     "local:check:full": "pnpm local:check && pnpm test && pnpm build",
     "local:check:ui": "pnpm local:check && pnpm design:lint && pnpm design-contract:lint && pnpm ui:code-lint --changed && pnpm build",
@@ -143,6 +143,10 @@
     "worker:build-contract-gate": "node scripts/ci/worker-build-contract-gate.mjs",
     "worker:deploy-path-gate": "node scripts/ci/worker-deploy-path-coverage-gate.mjs",
     "worker:build-contract-gate:test": "node --test scripts/ci/__tests__/worker-build-contract-gate.test.mjs",
+    "vercel:reachability-gate": "node scripts/ci/vercel-function-reachability-gate.mjs",
+    "vercel:reachability-gate:test": "node --test scripts/ci/vercel-function-reachability-gate.test.mjs",
+    "vercel:function-size-gate": "node scripts/ci/vercel-function-size-gate.mjs",
+    "vercel:function-size-gate:test": "node --test scripts/ci/vercel-function-size-gate.test.mjs",
     "auth-server:brand-assets:generate": "npx tsx scripts/auth-server/generate-brand-assets.ts",
     "auth-server:dev-ui": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/dev-ui-server.ts",
     "auth-server:oauth-store:smoke": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/oauth-store-smoke.ts",
