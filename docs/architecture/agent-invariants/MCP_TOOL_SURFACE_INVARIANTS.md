@@ -280,7 +280,9 @@ LANZA. **NUNCA** editar `skill-catalog.generated.json` a mano; **NUNCA** reintro
 `outputFileTracingIncludes` para los manuales. La lectura de filesystem vive SÓLO en
 `skill-catalog-fs.ts` (generador + tests): Turbopack analiza estáticamente las lecturas de `fs` con
 rutas dinámicas y, al no resolverlas, incluye el proyecto ENTERO en la función aunque el código no
-corra en runtime — **NUNCA** importar ese módulo desde nada alcanzable por una ruta. El smoke del runbook MCP sigue comparando la
+corra en runtime — **NUNCA** importar ese módulo desde nada alcanzable por una ruta (desde ISSUE-177, 2026-09-22, lo hace
+cumplir `pnpm vercel:reachability-gate`: `skill-catalog-fs.ts` está en su denylist y toda ruta de runtime variable nueva
+alcanzable por una ruta lo pone en rojo; ver `OPS_RELIABILITY_AGENT_INVARIANTS.md` §Tamaño de las funciones de Vercel). El smoke del runbook MCP sigue comparando la
 **cuenta EXACTA** del catálogo, nunca `≥ 1`.
 
 **SIEMPRE** que una tool nueva comprometa presupuesto, entra al `appliesTo` de

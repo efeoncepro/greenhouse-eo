@@ -42,8 +42,10 @@
 - **2026-09-22 · Un import de VALOR desde el barrel del composer rompe la función de Vercel.** Síntoma: staging
   falló el deploy con una función de 441 MB (límite 250 MB). `report-mapper.ts` corre en Vercel (encola) e importaba
   `paginateFlow` desde `@/lib/artifact-composer`, que arrastra Playwright, pdf-lib y los catálogos. `pnpm build` local
-  no lo detecta. Regla: código que corre en Vercel importa del composer sólo TIPOS o deep-imports de módulos puros
-  (`@/lib/artifact-composer/paginate`); el catálogo viaja como string (`INSIGHT_RENDER_CATALOG_BY_OUTPUT`).
+  no lo detecta. Regla: código que corre en Vercel importa del composer sólo TIPOS (barrel) o VALORES de la entrada
+  liviana `@/lib/artifact-composer/pure` (paginate, chart-geometry, bar-figure, manifest-hash); el catálogo viaja como
+  string (`INSIGHT_RENDER_CATALOG_BY_OUTPUT`). Desde ISSUE-177 lo hace cumplir la regla ESLint
+  `greenhouse/no-worker-only-module-in-vercel-code` y el gate `pnpm vercel:reachability-gate`.
 - **2026-09-22 · Un capítulo sin afirmaciones se narra, no se rechaza.** Mi guarda del mapper A4 rechazaba el
   capítulo vacío y contradecía la filosofía de narrar lo que falta. Ahora el titular es el título del capítulo y el
   cuerpo dice que la sección no registró hallazgos en el período.

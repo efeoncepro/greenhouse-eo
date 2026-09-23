@@ -4,7 +4,8 @@
 
 Efeonce Insights nace con las dos lanes gobernadas antes que su UI (parity-first, como TASK-1631): App
 `/api/platform/app/insights/**` y Ecosystem `/api/platform/ecosystem/insights/**`, adapters delgados
-(`src/lib/api-platform/resources/app-insights.ts`, `ecosystem-insights.ts`) sobre los commands y readers de
+(`src/lib/api-platform/resources/app-insights.ts`, `ecosystem-insights.ts` para comandos y `*-insights-read.ts` para
+lectura, separados desde ISSUE-177 para que una ruta de lectura no cargue commands ni render) sobre los commands y readers de
 `src/lib/efeonce-insights/**`. Lo que decide la forma:
 
 - **Una tabla de errores para las dos lanes** (`insights-errors.ts`): el `InsightsError` del dominio se traduce una

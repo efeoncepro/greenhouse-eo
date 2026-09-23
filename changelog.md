@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-22 — ISSUE-177 resuelto: ninguna función de Vercel vuelve a cargar el motor de PDF
+
+Tres deploys de staging cayeron en tres semanas por funciones de Vercel de más de 250 MB (397, 434 y 441 MB),
+siempre con el gate local en verde. Desde ahora:
+
+- la entrada liviana `@/lib/artifact-composer/pure` y la regla ESLint `greenhouse/no-worker-only-module-in-vercel-code`
+  impiden importar como valor el motor de composición (Playwright, pdf-lib, catálogos) desde `src/`;
+- `pnpm vercel:reachability-gate` (pre-push y CI, ~2 s, sin build) recorre el grafo de imports de las 1.519 entradas
+  del App Router y falla ante la denylist o una ruta de runtime variable nueva;
+- `pnpm vercel:function-size-gate` mide el tamaño trazado de cada función tras el build de CI (falla sobre 200 MB);
+- las rutas de lectura de Insights ya no cargan comandos ni render.
+
+Reglas en `OPS_RELIABILITY_AGENT_INVARIANTS.md` §Tamaño de las funciones de Vercel.
+
 ## 2026-09-22 — Efeonce Insights: informe A4 y deck nuevo en staging, probados con datos reales
 
 TASK-1847 en staging (`develop` hasta `21c991999`), sin producción. El canary con Berel (SEO+AEO) y Sky (ICO), en
@@ -660,13 +674,3 @@ referente de inspiración para Efeonce/clientes, calendario editorial por marca 
 identificados como superficies distintas. Cruce corregido con las cinco líneas: Influencer, Marketing,
 Pódcast y demás vínculos profesionales, con prioridad y evidencia separadas. Social Media Studio y Notion Platform incorporan el contrato
 espejado; manual, funcional y protocolo enlazan la fuente. Fechas propuestas sin crear ni programar piezas.
-
-## 2026-09-13 — Metodología completa de Fiestas Patrias y programación con portadas
-
-[Bitácora del caso](docs/operations/social/2026-09-13-fiestas-patrias-production-method.md), manual y descripción
-funcional: dirección gastronómica/cultural, tipografía por tinta, storytelling, Seedance + post exacta,
-cueca preservada, adaptación nativa 9:16, portadas, entrega y readback Metricool. Skills de Design,
-Typography, Copy, Brand, Motion, Audio y Social actualizadas en ambos agentes, conservando overlays propios.
-Fiestas Patrias18/09 (LinkedIn11:00, Instagram19:00) y Día de Muertos02/11 (11:00/18:00), horaChile:
-programadas con video/copy/portada; publicación efectiva pendiente. Aprobación posterior supera el estado
-histórico de candidato de las entradas previas. No cambia runtime ni habilita proveedores de Globe.

@@ -584,7 +584,9 @@ Puertos `InsightOutputsPort` (TASK-1846) e `InsightSharePort` (TASK-1848) declar
 falla cerrado (`not_ready`) hasta que el render valide outputs**.
 
 **Superficies:** lanes `app` y `ecosystem` con la misma tabla de errores
-(`src/lib/api-platform/resources/{app-insights,ecosystem-insights,insights-errors}.ts`). Rutas
+(`src/lib/api-platform/resources/{app-insights,ecosystem-insights,insights-errors}.ts`; desde ISSUE-177 cada lane separa
+lectura —`*-insights-read.ts`, que nunca carga commands ni render— de comandos —`*-insights.ts`, que importa el barrel
+de commands y así conecta el puerto de outputs— con helpers en `*-insights-scope.ts`). Rutas
 `platform/app/insights/{catalog, reports, reports/[id], editions, editions/[id], editions/[id]/{issue,revise,withdraw,recover}}`
 y `platform/ecosystem/insights/{catalog, reports, reports/[id], editions, editions/[id], editions/[id]/{revise,recover}}`
 (ecosystem NO emite ni retira; exige `externalScopeType`/`externalScopeId` + `organizationId` para bindings

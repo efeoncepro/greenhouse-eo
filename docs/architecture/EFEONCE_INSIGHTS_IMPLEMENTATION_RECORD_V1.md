@@ -328,7 +328,8 @@ Fuente: `contracts/request.ts`, `commands/validate-request.ts`, `window.ts`.
 `{ data: { report, edition, idempotent, generation }, status }` donde `generation` es
 `{ outcome: 'ready_for_review' | 'failed', failedPhase, failureCode } | null` (`null` en replay
 idempotente o `deferGeneration`). `status` es `202` para una edición nueva y `200` cuando
-`idempotent: true` (`resources/app-insights.ts` línea 140, `ecosystem-insights.ts` línea 283); ambos
+`idempotent: true` (`createAppInsightEdition` en `resources/app-insights.ts` y su par en `ecosystem-insights.ts`; se
+citan por nombre porque la separación lectura/comandos de ISSUE-177 movió las líneas); ambos
 runners honran `result.status` (`core/app-auth.ts` línea 344, `core/commands.ts` línea 55).
 
 > Verificado 2026-09-15 23:30Z contra staging: un replay resuelto por la idempotencia de dominio (misma
