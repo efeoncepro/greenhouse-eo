@@ -547,6 +547,12 @@ function validarPlan(plan) {
   const faltan = only.filter(id => !ids.includes(id))
 
   if (repetidos.length) errores.push(`ids repetidos (uno sobrescribiría al otro en out/): ${repetidos.join(', ')}`)
+  // En macOS y Windows `KV-01` y `kv-01` son el mismo archivo: dos ids que sólo difieren en mayúsculas se pisan en disco
+  // (tramo 8; auditoría de arquitectura, hallazgo 4).
+  const minusculas = ids.map(id => String(id ?? '').toLowerCase())
+  const casi = [...new Set(ids.filter((id, i) => minusculas.indexOf(minusculas[i]) !== i && !repetidos.includes(id)))]
+
+  if (casi.length) errores.push(`ids que sólo difieren en mayúsculas (en macOS y Windows son el mismo archivo): ${casi.join(', ')}`)
   if (faltan.length) errores.push(`no están en el plan: ${faltan.join(', ')}`)
 
   for (const p of plan.filter(x => !only.length || only.includes(x?.id))) {
@@ -947,6 +953,7 @@ async function composePiece(s, opts = {}) {
   let ctaBorde = null
   let ctaBoton = null
   let ctaMarco = null
+  let corchetes = null
   // El marco de la selección del CTA sólo existe en la pieza si se PINTA (corchetes o velo); en contorno y relleno
   // no se dibuja, y su caja no puede reprobar la zona segura.
   let ctaMarcoPintado = false
@@ -1292,6 +1299,12 @@ return k.ink.right - k.ink.left }))
 
     ctaMarco=cr.bounds;
     ctaMarcoPintado=marcoCta(c)!=='ninguno'||cm.selection.overlayOpacity>0;
+
+    // Corchetes del CTA de texto (tramo 8; auditoría de diseño, N10): el trazo que AXIS dibuja (22 % del manejador, que
+    // es el 0,8 % del ancho) medido como se ve en un teléfono, y su contraste contra la escena en las cuatro esquinas.
+    if(marcoCta(c)==='open-brackets'){const hs=Math.max(7,W*0.008),g=hs*0.22,arm=Math.min(cr.bounds.right-cr.bounds.left,cr.bounds.bottom-cr.bounds.top)*0.12;const bb=cr.bounds;
+
+corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.right-arm,bb.top],[bb.left,bb.bottom-arm],[bb.right-arm,bb.bottom-arm]].map(([x0,y0])=>({left:x0-g,top:y0-g,right:x0+arm+g,bottom:y0+arm+g}))};}
 
     // 🔴 Descriptor bajo el GRUPO, no bajo el botón [2026-09-22, operador: «el texto debajo del CTA está
     // muy pegado»]. Antes se medía `descriptorGap` desde el borde del botón, pero los corchetes se dibujan
@@ -1655,6 +1668,14 @@ return k.ink.right - k.ink.left }))
   accesibilidad.cumpleApca = medidas.filter(m => m.cumpleApca != null).every(m => m.cumpleApca)
   accesibilidad.cumpleDaltonismo = medidas.filter(m => m.daltonismo).every(m => m.cumpleDaltonismo)
   accesibilidad.cumpleTrazo = medidas.filter(m => m.glifo).every(m => m.glifo.cumpleWcag) && medidas.filter(m => m.anillo).every(m => m.anillo.cumpleWcag)
+
+  // Corchetes: el peor contraste de las cuatro esquinas (tinta del marco AXIS #a6cdf5 contra la escena, 3:1 de límite).
+  if (corchetes) {
+    const medidas = corchetes.esquinas.map(b => medirVoz({ rgb: bareRgb, ancho: W, alto: H, caja: b, tinta: hexARgb('#a6cdf5'), umbral: UMBRALES.essentialBoundaryContrast, apca: false })).filter(Boolean)
+
+    accesibilidad.corchetes = { grosorCssPx: corchetes.grosorCssPx, wcag: medidas.length ? Math.min(...medidas.map(m => m.wcag)) : null, umbralWcag: UMBRALES.essentialBoundaryContrast }
+  }
+
   accesibilidad.altText = textoAlternativo(s)
   accesibilidad.altTextEscena = Boolean(String(s.altText ?? '').trim())
   salidas.push([`${s.id}.alt.txt`, `${accesibilidad.altText}\n`])
@@ -1758,6 +1779,16 @@ function especVariante(s0, v) {
 }
 
 const trabajo = SLIDES.filter(x => !only.length || only.includes(x.id)).flatMap(s0 => (VARIANTES ? ORDEN_VARIANTES.map(v => especVariante(s0, v)) : [s0]))
+
+// Un plate que no se puede leer se nombra con su pieza ANTES de componer nada (tramo 8; auditoría de arquitectura,
+// hallazgo 14): antes salía «Input file contains unsupported image format» sin decir de qué pieza.
+for (const s0 of trabajo) {
+  try {
+    await sharp(path.resolve(PLAN_DIR, s0.plate)).stats()
+  } catch (e) {
+    throw new Error(`${s0.id}: el plate \`${s0.plate}\` no es una imagen legible (${e.message})`)
+  }
+}
 
 for (let s0 of trabajo) {
   const plate0 = path.resolve(PLAN_DIR, s0.plate)

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
+  copiaEnEscena,
   esTextoGrande,
   hexARgb,
   lcApca,
@@ -140,3 +141,20 @@ test('medirContraColor: tinta sobre relleno plano y límites no textuales', () =
   assert.equal(borde.cssPx, null)
 })
 
+test('Texto alternativo: el rol del CTA se anuncia siempre, se compara por palabras completas y suma tarjeta y firma', () => {
+  const pieza = {
+    altText: 'Un letrero verde que dice «Pide el diagnóstico».',
+    dominant: 'Ver',
+    card: { header: 'Nota', body: 'Hola' },
+    logo: { width: 0.2 },
+    cta: { text: 'Pide el diagnóstico' }
+  }
+
+  const alt = textoAlternativo(pieza)
+
+  assert.match(alt, /Llamado a la acción: «Pide el diagnóstico»/, 'el rol del CTA no se pierde aunque la escena cite su texto')
+  assert.match(alt, /«Ver»/, '«Ver» no está dicho en «verde»')
+  assert.match(alt, /«Nota» «Hola»/)
+  assert.match(alt, /Firma: logotipo de Efeonce/)
+  assert.deepEqual(copiaEnEscena(pieza), ['Pide el diagnóstico'])
+})

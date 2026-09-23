@@ -315,23 +315,57 @@ const plano = t => String(t ?? '').replace(/\*\*|\[\[|\]\]/g, '').replace(/\s*\|
 // Tramo 4 (auditoría 2026-09-23, hallazgo 15): «Llamado a la acción» y no «Botón» —en una imagen no hay un control
 // que se pueda activar, y anunciarlo confunde a quien usa lector de pantalla—; suma el gesto manuscrito y las
 // etiquetas de los cursores (también son texto visible), y no repite lo que la descripción de la escena ya dice.
+// Palabras sin tildes ni mayúsculas, para comparar frases enteras (tramo 8; auditoría de diseño, N11).
+const palabras = t => plano(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').match(/[\p{L}\p{N}]+/gu) ?? []
+
+const contieneFrase = (texto, frase) => {
+  const e = palabras(texto)
+  const f = palabras(frase)
+
+  if (!f.length || f.length > e.length) return false
+
+  for (let i = 0; i + f.length <= e.length; i++) if (f.every((w, j) => e[i + j] === w)) return true
+
+  return false
+}
+
+// Lo que la descripción de la escena CITA entre comillas («…», “…”, "…"). La escena «ya dice» una voz sólo si la cita:
+// una palabra suelta que coincide no cuenta (antes «Ver» se daba por dicho en «verde», y «¡mira!» en «una mujer mira»).
+const citas = escena => [...String(escena ?? '').matchAll(/«([^»]+)»|“([^”]+)”|"([^"]+)"/g)].map(m => m[1] ?? m[2] ?? m[3])
+
+// Las voces que la descripción de la escena (`altText`) transcribe —citadas, o frases de dos palabras o más—: el gate lo
+// avisa, porque la escena se describe y el texto de la imagen se transcribe aparte.
+export const copiaEnEscena = pieza => {
+  const escena = plano(pieza.altText)
+
+  if (!escena) return []
+
+  return [pieza.lead, pieza.dominant, pieza.after, pieza.note?.text, pieza.cta?.text]
+    .map(plano)
+    .filter(v => v && (citas(escena).some(c => contieneFrase(c, v)) || (palabras(v).length >= 2 && contieneFrase(escena, v))))
+}
+
 export function textoAlternativo(pieza) {
   const escena = plano(pieza.altText)
-  const yaDicho = t => Boolean(escena) && escena.toLowerCase().includes(t.toLowerCase())
+  const yaDicho = t => citas(escena).some(c => contieneFrase(c, t))
 
-  const voces = [pieza.label, pieza.lead, pieza.dominant, pieza.after, pieza.note?.text, pieza.card?.body, pieza.footer?.text, pieza.gesture?.text]
+  const voces = [pieza.label, pieza.lead, pieza.dominant, pieza.after, pieza.note?.text, pieza.card?.header, pieza.card?.body, pieza.footer?.text, pieza.gesture?.text]
     .map(plano)
     .filter(v => v && !yaDicho(v))
 
   const accion = pieza.cta ? [plano(pieza.cta.text), plano(pieza.cta.descriptor)] : []
 
+  // El ROL del CTA se anuncia SIEMPRE, aunque la escena mencione sus palabras: dice qué hace ese texto, no sólo qué dice
+  // (en v07 las 15 piezas perdían el rol porque su `altText` citaba el CTA).
   const cta = pieza.cta
-    ? [accion[0] && !yaDicho(accion[0]) && `Llamado a la acción: «${accion[0]}»`, accion[1] && !yaDicho(accion[1]) && accion[1]].filter(Boolean)
+    ? [accion[0] && `Llamado a la acción: «${accion[0]}»`, accion[1] && !yaDicho(accion[1]) && accion[1]].filter(Boolean)
     : []
 
   const etiquetas = [...(pieza.selection?.cursors ?? []), ...(pieza.cta?.seleccion?.cursores ?? [])].map(k => plano(k?.label)).filter(Boolean)
   const seleccion = etiquetas.length ? [`Cursores de colaboración: ${etiquetas.map(e => `«${e}»`).join(', ')}`] : []
-  const texto = [...voces.map(v => `«${v}»`), ...cta, ...seleccion].join(' ')
+  // La firma es texto en la imagen: el logotipo de Efeonce (salvo que la pieza no lleve firma).
+  const firma = pieza.logo || pieza.firma?.modo === 'externa' || (pieza.firma == null && typeof pieza.signatureY === 'number') ? ['Firma: logotipo de Efeonce'] : []
+  const texto = [...voces.map(v => `«${v}»`), ...cta, ...seleccion, ...firma].join(' ')
 
   return [escena, texto && `Texto en la imagen: ${texto}`].filter(Boolean).join('. ').replace(/\.\./g, '.')
 }

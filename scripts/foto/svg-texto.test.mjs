@@ -11,3 +11,8 @@ test('Decodifica las entidades de XML que escapa el renderer AXIS', () => {
 test('No decodifica dos veces: &amp;lt; es el texto literal «&lt;»', () => {
   assert.equal(desescaparXml('&amp;lt;'), '&lt;')
 })
+
+test('Una entidad fuera de Unicode no revienta: sale U+FFFD y la validación la nombra', () => {
+  assert.equal(desescaparXml('a &#99999999; b'), 'a \ufffd b')
+  assert.equal(desescaparXml('&#xD800;'), '\ufffd')
+})

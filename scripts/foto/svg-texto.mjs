@@ -6,9 +6,13 @@
 // FINAL para no decodificar dos veces (`&amp;lt;` es el texto literal «&lt;»).
 const NOMBRADAS = { lt: '<', gt: '>', quot: '"', apos: "'" }
 
+// Un código fuera de Unicode no revienta con un RangeError sin nombre (auditoría de arquitectura, hallazgo 4): sale como
+// U+FFFD, y la validación del plan lo rechaza nombrando pieza y campo antes de componer.
+const desdeCodigo = cp => (Number.isFinite(cp) && cp <= 0x10ffff && !(cp >= 0xd800 && cp <= 0xdfff) ? String.fromCodePoint(cp) : '\ufffd')
+
 export const desescaparXml = t =>
   String(t)
     .replace(/&(lt|gt|quot|apos);/g, (_, e) => NOMBRADAS[e])
-    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/&#(\d+);/g, (_, n) => desdeCodigo(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => desdeCodigo(parseInt(n, 16)))
     .replaceAll('&amp;', '&')

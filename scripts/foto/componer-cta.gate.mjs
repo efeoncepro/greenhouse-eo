@@ -12,6 +12,10 @@ import { fileURLToPath } from 'node:url'
 
 import { COMPOSITOR, REPO, huellaComando, huellaPieza, rutaQa, sha } from './cta-integridad.mjs'
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
+import { copiaEnEscena } from './accesibilidad.mjs'
+
+// Ancho y alto de un PNG, leídos de su cabecera (IHDR): el gate verifica el tamaño ENTREGADO sin decodificar la imagen.
+const dimensionesPng = b => (b.length >= 24 && b.readUInt32BE(12) === 0x49484452 ? [b.readUInt32BE(16), b.readUInt32BE(20)] : null)
 
 // EXCEPCIONES AUDITADAS (tramo 4): una regla del canon puede exceptuarse en UNA pieza, declarando `excepciones:
 // [{ regla, razon, aprobadoPor }]` en el plan. La excepción no apaga la medición: el gate la imprime con su razón y
@@ -216,10 +220,18 @@ if (!legado) {
     if (!existsSync(plate)) fallas.push(`no existe el plate \`${p.plate}\``)
     else if (h.plate !== sha(readFileSync(plate))) fallas.push('el plate cambió después de componer')
     const png = path.join(dir, 'out', `${p.id}.png`)
+    const layout = path.join(dir, 'out', `${p.id}-layout.json`)
 
     if (!existsSync(png)) fallas.push(`falta \`out/${p.id}.png\``)
     else if (h.png !== sha(readFileSync(png))) fallas.push(`\`out/${p.id}.png\` no es el PNG que registró la composición`)
-    const layout = path.join(dir, 'out', `${p.id}-layout.json`)
+    else {
+      // El tamaño ENTREGADO (tramo 8; auditoría de arquitectura, N6): el `final` del plan o, sin él, el del plate.
+      const dims = dimensionesPng(readFileSync(png))
+      const esperado = p.final ?? (existsSync(layout) ? [JSON.parse(readFileSync(layout, 'utf8')).canvas.width, JSON.parse(readFileSync(layout, 'utf8')).canvas.height] : null)
+
+      if (!dims) fallas.push(`\`out/${p.id}.png\` no es un PNG legible`)
+      else if (esperado && (dims[0] !== esperado[0] || dims[1] !== esperado[1])) fallas.push(`\`out/${p.id}.png\` mide ${dims.join('×')} y el plan pide ${esperado.join('×')}`)
+    }
 
     // Tramo 3: el layout también lleva huella, porque el gate recalcula las invariantes de maquetación sobre él.
     if (!h.layout) fallas.push('el QA no trae la huella del layout (versión anterior del comando)')
@@ -473,6 +485,12 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   if (dalt.length) console.warn(`⚠ ${r.id}: bajo el umbral con daltonismo — ${dalt.join(' · ')}`)
   if (chicas.length) console.warn(`⚠ ${r.id}: menos de ${LEGIBLE_PX} px en pantalla (${r.anchoPantalla ?? 390} CSS px de ancho) — ${chicas.join(' · ')}. Si la pieza no va a un teléfono, declara \`placement: { anchoCssPx, razon }\` (decisión pendiente: piso por rol).`)
   if (!a.altTextEscena) console.warn(`⚠ ${r.id}: el texto alternativo trae el texto de la imagen pero no describe la escena — agrega \`altText\` al plan.`)
+  const copia = copiaEnEscena(piezas.find(x => x.id === r.id))
+
+  if (copia.length) console.warn(`⚠ ${r.id}: la descripción de la escena (\`altText\`) transcribe el copy (${copia.map(c => `«${c}»`).join(', ')}): la escena se describe y el texto de la imagen se transcribe aparte.`)
+  // Corchetes del CTA de texto (tramo 8): el trazo que dibuja AXIS mide menos de 1 CSS px en un teléfono. Aviso: su
+  // grosor es un valor del contrato AXIS, y cambiarlo es decisión del operador.
+  if (a.corchetes && (a.corchetes.grosorCssPx < 1 || (a.corchetes.wcag != null && a.corchetes.wcag < a.corchetes.umbralWcag))) console.warn(`⚠ ${r.id}: los corchetes del CTA miden ${a.corchetes.grosorCssPx} CSS px en el teléfono y ${a.corchetes.wcag ?? '—'}:1 contra la escena (piso: 1 CSS px y ${a.corchetes.umbralWcag}:1).`)
   // Lo que pasa «por poco» o gracias a una ayuda se MUESTRA (tramo 7): son decisiones de diseño que alguien mira.
   if (a.rescate) console.warn(`⚠ ${r.id}: ${a.rescate.voces.map(v => `«${v.voz}» ${v.sinVelo}:1 → ${v.conVelo}:1`).join(' · ')} pasa(n) sólo gracias al velo (${a.rescate.por.join(', ')}): la foto se oscurece para leerse.`)
   if (r.ctaVariante?.sinMargen) console.warn(`⚠ ${r.id}: la variante del CTA se eligió SIN margen (${r.ctaVariante.motivo}): pasa por poco; en otra pantalla o con compresión puede no alcanzar.`)
@@ -521,7 +539,7 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   if (!r.zonaSegura) {
     console.error(`✗ ${r.id}: el QA no trae la zona segura verificada (versión anterior del comando). Recompón.`)
     fallos++
-  } else if (r.fueraDeZona?.length && bloquea(p, 'zona-segura', `fuera de la zona segura ${r.zonaSegura.perfil} de AXIS: ${r.fueraDeZona.join(', ')}. ${r.fueraDeZona.some(id => /^(logo|url|firma-externa)$/.test(id)) ? 'La firma se mide contra la zona de AXIS estrechada por su franja (\`signatureSafeArea\`), no contra la del texto. ' : ''}Declara \`safeArea: "axis"\` (o una zona más estrecha) para ubicar el texto dentro, y \`cta.x: "columna"\``, { valor: desbordeZona(r), sentido: 'max' })) fallos++
+  } else if (r.fueraDeZona?.length && bloquea(p, 'zona-segura', `fuera de la zona segura ${r.zonaSegura.perfil} de AXIS: ${r.fueraDeZona.join(', ')}. ${r.fueraDeZona.some(id => /^(logo|url|firma-externa)$/.test(id)) ? 'La firma se mide contra la zona de AXIS estrechada por su franja (\`signatureSafeArea\`), no contra la del texto. ' : ''}${p.safeArea === 'axis' ? 'La zona ya es la de AXIS: acorta el texto, baja su tamaño o sube el bloque' : 'Declara \`safeArea: "axis"\` (o una zona más estrecha) para ubicar el texto dentro'}${p.cta?.x === 'columna' || p.align === 'center' ? '' : ', y \`cta.x: "columna"\`'}`, { valor: desbordeZona(r), sentido: 'max' })) fallos++
 
   // Firma: declarada siempre; contraste y tamaño del canon; nunca sobre el sujeto.
   const externa = !p.logo && (p.firma?.modo === 'externa' || (p.firma == null && typeof p.signatureY === 'number'))

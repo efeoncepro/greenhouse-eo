@@ -556,6 +556,24 @@ const PRUEBAS = [
 
       emoji.cta.text = 'Hablemos 🚀'
       hebreo.lead = 'שלום a todos'
+      // Tramo 8: rangos, entidades fuera de Unicode, ids que sólo difieren en mayúsculas, plate ilegible y columna en un
+      // bloque centrado (auditoría de arquitectura, hallazgos 4, 14, N6 y N10).
+      const tracking = base()
+      const diminuto = base()
+      const entidad = base()
+      const mayus = base()
+      const ilegible = base()
+      const centrada = base()
+
+      tracking.dominantTracking = -0.45
+      diminuto.final = [8, 10]
+      entidad.lead = 'Hola &#99999999; mundo'
+      mayus.id = mayus.id.toUpperCase()
+      fs.mkdirSync(path.join(TMP, 'P07-plates'), { recursive: true })
+      ilegible.plate = path.join(TMP, 'P07-plates', 'roto.png')
+      fs.writeFileSync(ilegible.plate, 'esto no es una imagen')
+      centrada.align = 'center'
+      centrada.cta.x = 'columna'
 
       const casos = [
         ['falta cta.fontSize', [sinFont], [], /falta `cta\.fontSize`/],
@@ -573,7 +591,13 @@ const PRUEBAS = [
         ['zona ignorada sin quien la aprobó', [sinAprobador], [], /aprobadoPor/],
         ['campo obligatorio en null', [nulo], [], /falta `cta\.fontSize`/],
         ['emoji que la fuente no tiene', [emoji], [], /`cta\.text` usa caracteres que su fuente no tiene.*U\+1F680/],
-        ['hebreo que la fuente no tiene', [hebreo], [], /`lead` usa caracteres que su fuente no tiene/]
+        ['hebreo que la fuente no tiene', [hebreo], [], /`lead` usa caracteres que su fuente no tiene/],
+        ['tracking del dominante fuera de rango', [tracking], [], /`dominantTracking` debe ser ≥ -0\.08/],
+        ['final diminuto', [diminuto], [], /`final\.0` debe ser ≥ 320/],
+        ['entidad fuera de Unicode', [entidad], [], /`lead` trae una entidad que no es un carácter Unicode: &#99999999;/],
+        ['ids que sólo difieren en mayúsculas', [base(), mayus], [], /sólo difieren en mayúsculas/],
+        ['plate ilegible, con su pieza', [ilegible], [], /p1-cta-contorno: el plate .* no es una imagen legible/],
+        ['columna en un bloque centrado', [centrada], [], /«columna» es la columna del texto alineado a la izquierda/]
       ]
 
       const rs = await Promise.all(casos.map(([, piezas, ids], i) => componer(`P07-${i}`, piezas, ids)))
@@ -635,6 +659,7 @@ const PRUEBAS = [
       const fallas = []
       const incompletas = []
       const conBoton = []
+      const sinRol = []
       let avisos = 0
 
       for (const [id, q, p] of fuentes) {
@@ -653,7 +678,9 @@ const PRUEBAS = [
         const faltan = [p.lead, p.dominant, p.after, p.note?.text, p.cta?.text, p.cta?.descriptor].map(plano).filter(t => t && !alt.includes(t.toLowerCase()))
 
         if (faltan.length) incompletas.push(`${id}: ${faltan.join(' / ')}`)
-        if (/Botón:/.test(a.altText) || (p.cta && !/Llamado a la acción/.test(a.altText) && !a.altText.includes(plano(p.cta.text)))) conBoton.push(id)
+        if (/Botón:/.test(a.altText)) conBoton.push(id)
+        // Tramo 8: el rol del CTA se anuncia SIEMPRE, aunque la escena cite su texto (en v07 lo perdían las 15 piezas).
+        if (p.cta && !/Llamado a la acción/.test(a.altText)) sinRol.push(id)
       }
 
       // Hallazgos del TRAZO en las piezas del repo: se reportan, no hacen fallar la prueba — son de las piezas, no del
@@ -742,8 +769,8 @@ const PRUEBAS = [
       }
 
       return {
-        ok: fuentes.length > 0 && !fallas.length && !incompletas.length && !conBoton.length && reporte && evid.ok && vocesOraculo > 0 && !desacuerdos.length && bordes > 0 && !delgados.length && unitarias,
-        detalle: `${fuentes.length} piezas · voces bajo WCAG AA: ${fallas.length}${fallas.length ? ` (${fallas.slice(0, 4).join(', ')})` : ''} · alternativas incompletas: ${incompletas.length}${incompletas.length ? ` (${incompletas.slice(0, 3).join('; ')})` : ''} · anuncian «Botón»: ${conBoton.length} · avisos APCA/daltonismo: ${avisos} · reporte y vistas de daltonismo: ${reporte} · oráculo del trazo: ${evid.ok ? `${vocesOraculo} voces, ${desacuerdos.length} desacuerdos${desacuerdos.length ? ` (${desacuerdos.slice(0, 3).join('; ')})` : ''}` : `no compuso (${evid.error})`} · bordes ≥ 1 CSS px: ${bordes - delgados.length}/${bordes}${delgados.length ? ` (${delgados.join(', ')})` : ''} · unitarias: ${unitarias} · piezas del repo con trazo bajo umbral: ${trazos.length}`,
+        ok: fuentes.length > 0 && !fallas.length && !incompletas.length && !conBoton.length && !sinRol.length && reporte && evid.ok && vocesOraculo > 0 && !desacuerdos.length && bordes > 0 && !delgados.length && unitarias,
+        detalle: `${fuentes.length} piezas · voces bajo WCAG AA: ${fallas.length}${fallas.length ? ` (${fallas.slice(0, 4).join(', ')})` : ''} · alternativas incompletas: ${incompletas.length}${incompletas.length ? ` (${incompletas.slice(0, 3).join('; ')})` : ''} · anuncian «Botón»: ${conBoton.length} · sin el rol del CTA: ${sinRol.length}${sinRol.length ? ` (${sinRol.slice(0, 3).join(', ')})` : ''} · avisos APCA/daltonismo: ${avisos} · reporte y vistas de daltonismo: ${reporte} · oráculo del trazo: ${evid.ok ? `${vocesOraculo} voces, ${desacuerdos.length} desacuerdos${desacuerdos.length ? ` (${desacuerdos.slice(0, 3).join('; ')})` : ''}` : `no compuso (${evid.error})`} · bordes ≥ 1 CSS px: ${bordes - delgados.length}/${bordes}${delgados.length ? ` (${delgados.join(', ')})` : ''} · unitarias: ${unitarias} · piezas del repo con trazo bajo umbral: ${trazos.length}`,
         evidencia: plan && path.join(dirReporte, 'out/accesibilidad/reporte.md')
       }
     }
@@ -1060,6 +1087,27 @@ const PRUEBAS = [
 
       conVelo.scrimTop = { opacity: 0.8, to: 0.42, color: '#050818' }
       const velo = await componer('P10-velo', [conVelo])
+      // Tramo 8: el tamaño ENTREGADO es el del plan. Una pieza con `final` a la mitad compone y pasa; si el PNG entregado
+      // mide otra cosa (se reemplaza por uno del plate, re-firmando su huella) el gate la rechaza.
+      const conFinal = canon('b2_916')
+
+      conFinal.final = [576, 1024]
+      const rFinal = await componer('P10-final', [conFinal])
+      const gFinal = rFinal.ok ? await gate(rFinal.planPath) : { code: -1, salida: rFinal.error }
+      let gOtroTamano = { code: -1, salida: 'no compuso' }
+
+      if (rFinal.ok) {
+        const png = path.join(rFinal.dir, 'out', `${conFinal.id}.png`)
+        const qaF = path.join(rFinal.dir, 'out', 'qa-piezas.json')
+        const otro = await sharp(conFinal.plate).png().toBuffer()
+        const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
+
+        q[0].huellas.png = sha(otro)
+        fs.writeFileSync(png, otro)
+        fs.writeFileSync(qaF, JSON.stringify(q))
+        gOtroTamano = await gate(rFinal.planPath)
+      }
+
       // Un CTA de 58 px en 1080: ≈ 21 CSS px en negrita, «texto grande» para WCAG (3:1). El canon del CTA exige 4,5:1.
       const grande = canon('b2_916')
 
@@ -1143,6 +1191,9 @@ const PRUEBAS = [
         'rechaza dominante que no es la voz mayor': gDominante.code === 1 && /no es la voz mayor/.test(gDominante.salida),
         'placement no afloja': gEscritorio.code === 1 && /«entrada»/.test(gEscritorio.salida),
         'muestra la voz que pasa sólo gracias al velo': /sólo gracias al velo/.test(gVelo.salida),
+        'el tamaño entregado es el del plan': gFinal.code === 0,
+        'rechaza PNG de otro tamaño': gOtroTamano.code === 1 && /mide \d+×\d+ y el plan pide 576×1024/.test(gOtroTamano.salida),
+        'avisa corchetes bajo 1 CSS px': /los corchetes del CTA miden/.test(gSinAcento.salida),
         'rechaza composición concurrente': concurrentes.filter(x => x === 'ok').length === 1 && concurrentes.some(x => /otra composición usa/.test(x)),
         'rechaza CTA sin acento': gSinAcento.code !== 0 && /no es un acento/.test(gSinAcento.salida),
         'rechaza voz bajo WCAG': gBajo.code !== 0 && /entrada.*WCAG 2\.2 AA/.test(gBajo.salida),

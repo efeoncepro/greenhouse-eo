@@ -162,7 +162,9 @@ export const esquemaPieza = z
     dominant: texto,
     dominantSize: positivo,
     dominantMax: z.number().finite().positive().max(1).optional(),
-    dominantTracking: z.number().finite().optional(),
+    // Rango (tramo 8; auditoría de arquitectura, N6): AXIS usa −0,035 a 0,08 em y los planes del repo, −0,07 a 0,05
+    // (medido 2026-09-23). −0,45 dejaba el titular con las letras encimadas y el gate en 0.
+    dominantTracking: z.number().finite().min(-0.08).max(0.12).optional(),
     after: texto.optional(),
     afterFamily: z.enum(['poppins', 'bricolage']).optional(),
     afterFill: hex.optional(),
@@ -172,7 +174,8 @@ export const esquemaPieza = z
     note: nota.optional(),
     cta,
     logo: logo.optional(),
-    final: z.tuple([z.number().int().positive(), z.number().int().positive()]).optional(),
+    // Piso y techo (tramo 8): `final: [9, 16]` entregaba un PNG de 9×16 px con el gate en 0.
+    final: z.tuple([z.number().int().min(320).max(8192), z.number().int().min(320).max(8192)]).optional(),
     // `"axis"`: usar como zona DECLARADA la de AXIS para el formato (feed 7,5 %/6 %, story 10 %/13 %). La que se
     // verifica es siempre la de AXIS como piso: una zona declarada sólo puede estrecharla.
     safeArea: z
@@ -269,8 +272,29 @@ const sinNulos = v => (v && typeof v === 'object' && !Array.isArray(v) ? Object.
 // Reglas ENTRE campos, que se informan siempre: zod corre los refinamientos de un objeto sólo si el objeto ya es
 // válido, y un plan con otros errores escondía éstos hasta la segunda pasada (visto en la regresión del 2026-09-23:
 // el piloto `cta-p1` dejó de avisar que le faltaba `cta.x`).
+// Una entidad numérica que no es un carácter Unicode (fuera de U+10FFFF, o una mitad de par sustituto).
+const ENTIDAD = /&#(x[0-9a-f]+|\d+);/gi
+
+const entidadesInvalidas = t => [...String(t ?? '').matchAll(ENTIDAD)].filter(([, n]) => {
+  const cp = n[0].toLowerCase() === 'x' ? parseInt(n.slice(1), 16) : Number(n)
+
+  return !Number.isFinite(cp) || cp > 0x10ffff || (cp >= 0xd800 && cp <= 0xdfff)
+}).map(m => m[0])
+
 function reglasCruzadas(p) {
   const e = []
+  const columna = [p?.cta?.x === 'columna' && '`cta.x`', p?.note?.x === 'columna' && '`note.x`'].filter(Boolean)
+
+  // «columna» es la columna del texto alineado a la izquierda (tramo 8; auditoría de arquitectura, N10): en un bloque
+  // centrado el CTA arrancaba en el eje y el gate salía con 0.
+  if (columna.length && p?.align === 'center') e.push(`${columna.join(' y ')}: «columna» es la columna del texto alineado a la izquierda; en un bloque centrado usa una fracción del ancho`)
+
+  for (const [campo, t] of [['lead', p?.lead], ['dominant', p?.dominant], ['after', p?.after], ['label', p?.label], ['note.text', p?.note?.text], ['cta.text', p?.cta?.text], ['cta.descriptor', p?.cta?.descriptor], ['footer.text', p?.footer?.text], ['card.header', p?.card?.header], ['card.body', p?.card?.body], ['gesture.text', p?.gesture?.text], ['altText', p?.altText]]) {
+    const malas = entidadesInvalidas(t)
+
+    if (malas.length) e.push(`\`${campo}\` trae una entidad que no es un carácter Unicode: ${malas.join(', ')}`)
+  }
+
   const c = p?.cta
 
   if (c && typeof c === 'object' && c.align !== 'center' && c.x == null) e.push('falta `cta.x` (una fracción, "columna", o `cta.align: "center"`)')
