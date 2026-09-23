@@ -1,0 +1,269 @@
+[
+  {
+    "id": "02",
+    "title": "Sin tu nombre",
+    "kind": "mascot",
+    "ref_files": [
+      "pose-gesto.png",
+      "pose-reposo.png"
+    ],
+    "extra_refs": "Images 3 and 4 are the same droplet character in the exact poses it must hit: image 3 with the cone raised, image 4 at rest with the cone held level.",
+    "set": "a small rainbow-gradient vinyl droplet character with a closed-eyes smile sits on a keyboard in front of a large monitor, holding up a small cream-coloured cone in one little hand. The monitor shows a single glowing rounded card with one thin glowing line beneath it. Dark desk, dark background. The character never changes size or position in frame; only its arm, the cone and a slight sway move.",
+    "performance_intro": "the character is pleased with itself; its closed-eyes smile never changes. It performs the same small routine it performs every day, and it never checks the result on the screen:",
+    "beats": [
+      "0.0–1.0s   At rest, the cone held level (pose of image 4).",
+      "1.0–3.0s   It raises the cone toward the monitor (pose of image 3). From the wide end of the cone, three soft rings of pale blue light ripple out and drift into the screen.",
+      "3.0–4.5s   On the glowing card, three short soft bars of light fill in one after another, like three entries appearing in a list. Below them sits a fourth slot marked only by the thin glowing line — it stays EMPTY.",
+      "4.5–6.0s   It gives a second small lift of the cone; one more ring drifts into the screen. The three bars brighten slightly. The fourth slot is still empty.",
+      "6.0–13.0s  It holds the cone raised and sways almost imperceptibly, eyes still closed in its contented smile. Nothing new arrives on the screen.",
+      "13.0–15.0s The bars fade off the card and it lowers the cone back to the exact rest pose of the first frame, ready to do the same thing again tomorrow."
+    ],
+    "performance_outro": "Its body stays planted on the keyboard; the gestures are small and contained. The bars are blurred light shapes, never readable letters.",
+    "payoff": "THE EMPTY FOURTH SLOT stays empty for all fifteen seconds: nothing ever fills it. That missing entry is the point of the piece — the category gets filled in, your name does not.",
+    "graphic": [
+      "1.0s   The thin white line \"Anuncia tu categoría todos los días.\" fades in at the top.",
+      "2.0s   The huge bold white headline \"Sin tu nombre.\" SLAMS in hard — a fast punch-in scale from 104% to 100% with no bounce. It is by far the largest, heaviest text in the frame.",
+      "3.0s   The line \"Y nadie lo corrige.\" fades in directly below the headline, with the word \"corrige\" in bold.",
+      "4.0s   The line \"Mira qué responde por tu categoría.\" fades in.",
+      "5.0s   The lime-green bold text link \"Pide el diagnóstico\" fades in with the small white line \"Diagnóstico SEO + AEO\" under it, and four thin white corner brackets draw themselves around the pair.",
+      "6.0s   A white arrow cursor glides in from the right, stops just beside the link and clicks: the lime text brightens once."
+    ],
+    "layout": {
+      "9x16": "The whole text block is LEFT-ALIGNED, starting 7% in from the left edge and about 16% down from the top, and ends by about 45% of the frame height. The headline spans roughly the same share of the frame width as in image 1 (about 58%).",
+      "4x5": "The whole text block is LEFT-ALIGNED, starting 7% in from the left edge and about 7% down from the top, and occupies the upper 40% of the frame. The headline spans about 62% of the frame width."
+    },
+    "layout_common": [
+      "The headline is by far the largest element in the picture — several times taller than any other line. Do NOT render it small or centred.",
+      "The line above it and the lines below it are each roughly one fifth of the headline's height.",
+      "The four corner brackets hug the link and its descriptor tightly; the white arrow cursor sits just outside their right edge."
+    ],
+    "foley": [
+      "a soft plastic creak at ~1.0s as it lifts the cone",
+      "a soft airy whoosh as each ring of light leaves the cone, at ~1.5s and ~4.8s",
+      "three tiny glassy blips as the three bars fill in, at ~3.0s, ~3.5s and ~4.0s",
+      "a soft settle at ~13.0s as it returns to rest"
+    ]
+  },
+  {
+    "id": "03",
+    "title": "No te leyó",
+    "kind": "mascot",
+    "ref_files": [
+      "pose-gesto.png",
+      "pose-reposo.png"
+    ],
+    "extra_refs": "Images 3 and 4 are the same block character in the exact poses it must hit: image 3 with one arm raised and two floating blocks above its head, image 4 at rest.",
+    "set": "a small terracotta-coloured character built from square pixel blocks stands on top of a CLOSED silver laptop resting on a dark desk; behind it a large monitor shows a single glowing rounded card with one thin glowing line beneath it. Dark background. The character never changes size or position in frame; only its arms, the floating blocks and one foot move. The whole frame is cool and contemporary, lit by the blue-white glow of the monitor: nothing is warm, amber, orange or golden in the light — no tungsten, no retro glow; the only warm colour is the character's own terracotta material.",
+    "performance_intro": "the character is confident and brisk, like someone who already knows the answer without checking. It never opens anything:",
+    "beats": [
+      "0.0–1.0s   At rest on the closed laptop, arms at its sides (pose of image 4).",
+      "1.0–3.0s   It raises one blocky arm in a quick, sure gesture and two small floating blocks pop up above its head, like an exclamation mark (pose of image 3).",
+      "3.0–5.0s   On the monitor, the glowing card fills in one steady, confident sweep from top to bottom with neat rows of soft light bars, as if a complete description were written without hesitation.",
+      "5.0–6.0s   It taps one foot twice on the closed laptop lid. The lid stays firmly SHUT.",
+      "6.0–13.0s  It holds still, arm lowered, completely satisfied. The filled card glows steadily. The laptop stays closed.",
+      "13.0–15.0s The rows of light fade off the card, the floating blocks settle back down, and it returns to the exact rest pose of the first frame — to describe it the same way again tomorrow."
+    ],
+    "performance_outro": "The blocks move as rigid blocks: they never melt, stretch or blend. The rows on the card are blurred light shapes, never readable letters.",
+    "payoff": "THE LAPTOP UNDER ITS FEET NEVER OPENS: not a crack, not a glow from inside, for all fifteen seconds. The closed lid is the point of the piece — it described you without reading you.",
+    "graphic": [
+      "1.0s   The thin white line \"Te describe con seguridad.\" fades in at the top.",
+      "2.0s   The huge bold white headline \"No te leyó.\" SLAMS in hard — a fast punch-in scale from 104% to 100% with no bounce. It is by far the largest, heaviest text in the frame.",
+      "3.0s   The line \"Y responde igual todos los días.\" fades in directly below the headline, with \"todos los días\" in bold.",
+      "4.0s   The line \"Mira con qué te describe.\" fades in.",
+      "5.0s   A solid lime-green rounded button reading \"Pide el diagnóstico\" in dark text fades in with the small white line \"Diagnóstico SEO + AEO\" under it, and four thin white corner brackets draw themselves around the pair.",
+      "6.0s   A white arrow cursor glides in from the right, stops at the button's right edge and clicks: the button brightens once."
+    ],
+    "layout": {
+      "9x16": "The whole text block is LEFT-ALIGNED, starting 7% in from the left edge and about 16% down from the top, and ends by about 45% of the frame height. The headline spans roughly the same share of the frame width as in image 1 (about 48%).",
+      "4x5": "The whole text block is LEFT-ALIGNED, starting 7% in from the left edge and about 7% down from the top, and occupies the upper 40% of the frame. The headline spans about 50% of the frame width."
+    },
+    "layout_common": [
+      "The headline is by far the largest element in the picture — several times taller than any other line. Do NOT render it small or centred.",
+      "The line above it and the lines below it are each roughly one fifth of the headline's height.",
+      "The four corner brackets hug the button and its descriptor tightly; the white arrow cursor sits just outside their right edge."
+    ],
+    "foley": [
+      "a light clack of plastic blocks at ~1.0s as its arm goes up",
+      "a tiny pop at ~1.5s as the floating blocks appear",
+      "a soft continuous shimmer from 3.0s to 5.0s as the card fills",
+      "two small dull taps on an aluminium lid at ~5.2s and ~5.5s",
+      "a soft settle of blocks at ~13.5s"
+    ]
+  },
+  {
+    "id": "04",
+    "title": "¿Sales tú?",
+    "kind": "mascot",
+    "ref_files": [
+      "pose-gesto.png",
+      "pose-reposo.png"
+    ],
+    "extra_refs": "Images 3 and 4 are the same blue cloud character in the exact poses it must hit: image 3 with one arm raised, image 4 at rest.",
+    "set": "a small blue cloud-shaped vinyl character with a dark screen for a face stands on a desk beside a large monitor, in warm afternoon window light with plants and a city view. The monitor shows an answer screen: rows of text-like bars, two small photo thumbnails side by side, and a third slot outlined with a dashed border holding a small plus sign. The character never changes size or position in frame; only its arm, a slight turn and its screen-face move.",
+    "performance_intro": "the character is detached and procedural, never triumphant. Its screen-face shows the neutral prompt glyphs throughout and never turns into smiling or arched eyes:",
+    "beats": [
+      "0.0–1.0s   At rest beside the monitor, arms down, turned three-quarters toward the screen (pose of image 4).",
+      "1.0–3.0s   It raises one short arm toward the screen in a small, matter-of-fact presenting gesture (pose of image 3). The first thumbnail brightens and lifts very slightly, as if selected; a moment later the second does the same.",
+      "3.0–4.5s   Its screen-face turns briefly toward the third, dashed slot. The dashed border blinks once, softly, like a slot waiting to be filled.",
+      "4.5–6.0s   It turns back away from the empty slot, unbothered, and lowers its arm.",
+      "6.0–13.0s  It holds still. Two thumbnails stay lit; the third slot stays empty with its dashed border and plus sign.",
+      "13.0–15.0s The two thumbnails dim back to their first-frame state and the character settles into the exact rest pose of the first frame."
+    ],
+    "performance_outro": "The gestures are small, contained and bureaucratic. The bars on the screen are blurred light shapes, never readable letters, and the thumbnails keep the same images throughout.",
+    "payoff": "THE DASHED THIRD SLOT stays EMPTY for all fifteen seconds: nothing ever appears in it. That empty place among the sources is the point of the piece.",
+    "graphic": [
+      "1.0s   The small white line \"La IA responde.\" fades in, centred at the top.",
+      "2.0s   The huge bold headline \"¿Sales tú?\" SLAMS in hard — a fast punch-in scale from 104% to 100% with no bounce — white, with only the word \"tú\" in vivid orange.",
+      "3.5s   A rounded orange OUTLINE button reading \"Pide el diagnóstico\" in orange text fades in, with the small white line \"SEO + AEO\" under it, and four thin white corner brackets draw themselves around the pair.",
+      "5.0s   A white arrow cursor glides in from the right, stops at the button's right edge and clicks: the orange outline pulses once, brightly."
+    ],
+    "layout": {
+      "9x16": "The whole text block is CENTRED, starting about 16% down from the top and ending by about 30% of the frame height, with the same proportions as in image 1.",
+      "4x5": "The whole text block is CENTRED in the upper 25% of the frame, starting about 7% down from the top. The headline spans about 31% of the frame width.",
+      "1x1": "The whole text block is CENTRED in the upper 25% of the square, starting about 4% down from the top, with the same proportions as in image 1."
+    },
+    "layout_common": [
+      "The headline is by far the largest element in the picture — several times taller than the line above it. Do NOT render it small.",
+      "Only the highlighted word of the headline is orange; everything else in it is white.",
+      "The four corner brackets hug the button and its descriptor; the white arrow cursor sits just outside their right edge."
+    ],
+    "foley": [
+      "a light airy whoosh at ~1.0s as the arm goes up",
+      "two soft glassy ticks as the thumbnails light, at ~1.5s and ~2.3s",
+      "a tiny hollow blink at ~3.5s on the dashed slot",
+      "a small descending swipe at ~4.8s as the arm comes down",
+      "a soft settle at ~13.0s"
+    ]
+  },
+  {
+    "id": "05",
+    "title": "¿Te reconoces?",
+    "kind": "person",
+    "ref_files": [
+      "identidad-persona.png",
+      "nexa-perfil.png"
+    ],
+    "extra_refs": "Image 3 is a close crop of the same woman in this set: keep her identity, hair, clothing and build exactly as shown there. Image 4 is her approved profile portrait and is a reference for her FACE AND HAIR ONLY — ignore the grey top she wears in it: in this video she wears the navy polo of images 1 and 3, never grey.",
+    "set": "a woman with long dark wavy hair in a navy polo stands in a warm-lit modern office, holding a tablet that shows a contemporary glass office tower. Beside her, a large wall display shows an answer screen with a photo of an old, run-down warehouse. She stays in the same place in frame; only her head, eyes, arms and the tablet move. Her navy polo is only ever seen from the side or back: no emblem, badge or lettering on her clothing ever becomes visible or legible.",
+    "performance_intro": "her movements are small, natural and unhurried — a person quietly noticing a mismatch. Her face stays mostly turned away from the camera, as in image 1; we see her in three-quarter profile, never a frontal close-up:",
+    "beats": [
+      "0.0–1.0s   She looks down at the tablet in her hands.",
+      "1.0–3.0s   She lifts her eyes from the tablet to the wall display and pauses.",
+      "3.0–5.0s   She raises the tablet slightly and turns it toward the wall display, so the glass tower on the tablet and the old warehouse on the display are seen together in the same frame.",
+      "5.0–6.0s   Her head tilts very slightly: the smallest beat of doubt.",
+      "6.0–13.0s  She holds still, comparing the two images; only a slow breath and a single slow blink show she is alive.",
+      "13.0–15.0s She lowers the tablet back to the exact position of the first frame and looks down at it again."
+    ],
+    "performance_outro": "The images on the tablet and on the display never change, never morph and never swap: the tower stays a tower, the warehouse stays a warehouse. The text-like lines on the display are blurred light shapes, never readable letters.",
+    "payoff": "THE TWO PICTURES NEVER MATCH: her real building on the tablet and the old warehouse on the display stay exactly as they are for all fifteen seconds. That mismatch is the point of the piece.",
+    "graphic": [
+      "1.0s   The small white line \"La IA describe tu negocio.\" fades in, centred at the top.",
+      "2.0s   The huge bold headline \"¿Te reconoces?\" SLAMS in hard — a fast punch-in scale from 104% to 100% with no bounce — white, with only the word \"reconoces\" in vivid orange.",
+      "3.5s   A solid orange rounded button reading \"Pide el diagnóstico\" in dark text fades in, with the small white line \"SEO + AEO\" under it, and four thin white corner brackets draw themselves around the pair.",
+      "5.0s   A white arrow cursor glides in from the right, stops at the button's right edge and clicks: the button brightens once."
+    ],
+    "layout": {
+      "9x16": "The whole text block is CENTRED, starting about 16% down from the top and ending by about 30% of the frame height, with the same proportions as in image 1.",
+      "4x5": "The whole text block is CENTRED in the upper 25% of the frame, starting about 7% down from the top. The headline spans about 46% of the frame width.",
+      "1x1": "The whole text block is CENTRED in the upper 25% of the square, starting about 4% down from the top, with the same proportions as in image 1."
+    },
+    "layout_common": [
+      "The headline is by far the largest element in the picture — several times taller than the line above it. Do NOT render it small.",
+      "Only the highlighted word of the headline is orange; everything else in it is white.",
+      "The four corner brackets hug the button and its descriptor; the white arrow cursor sits just outside their right edge."
+    ],
+    "foley": [
+      "a faint fabric rustle at ~1.0s as she lifts her eyes",
+      "a soft handling sound of the tablet at ~3.0s as she raises it",
+      "a soft handling sound at ~13.0s as she lowers it"
+    ]
+  },
+  {
+    "id": "06",
+    "title": "Sé la referencia",
+    "kind": "person",
+    "ref_files": [
+      "identidad-persona.png",
+      "nexa-perfil.png"
+    ],
+    "extra_refs": "Image 3 is a close crop of the same woman in this set: keep her identity, hair, clothing and build exactly as shown there. Image 4 is her approved profile portrait and is a reference for her FACE AND HAIR ONLY — ignore the grey top she wears in it: in this video she wears the navy polo of images 1 and 3, never grey.",
+    "set": "a woman with long dark wavy hair in a navy polo and beige trousers stands before a raw concrete wall, holding a tablet at her side. A small projector on the floor casts an answer page onto the wall: a list of sources with small landscape thumbnails and one LARGE highlighted source card in vivid blue with a coastal landscape photo. She stays in the same place in frame; only her head, eyes and arms move. The faint fan of the small projector is part of the room tone. Her navy polo is only ever seen from the side or back: no emblem, badge or lettering on her clothing ever becomes visible or legible.",
+    "performance_intro": "her movements are small, calm and quietly confident. She is seen from behind in three-quarter profile, as in image 1, never a frontal close-up:",
+    "beats": [
+      "0.0–1.0s   The projected page shows the list with every source the same small size — the large blue card is not there yet — and she looks down at her tablet.",
+      "1.0–3.5s   One row of the list grows smoothly, in a single continuous motion, into the large blue highlighted card with the coastal photo, exactly as in image 1; the rows below make room for it.",
+      "3.5–5.0s   She lifts her gaze from the tablet up to the large card.",
+      "5.0–6.0s   A soft, even glow passes once across the blue card.",
+      "6.0–13.0s  She holds still, looking up at it; the projection stays steady, with only the faint flicker of real projector light.",
+      "13.0–15.0s The large card shrinks smoothly back into its small row, the list returns to the first-frame state and she looks back down at her tablet."
+    ],
+    "performance_outro": "The photos in the list keep the same images throughout. The text-like lines are blurred light shapes, never readable letters. The projector light stays soft and realistic on the concrete texture.",
+    "payoff": "ONE SOURCE BECOMES THE REFERENCE: the growth of that single row into the large highlighted card is the point of the piece, and it must read clearly with the sound off.",
+    "graphic": [
+      "1.0s   The small white line \"En la respuesta de la IA,\" fades in, centred at the top.",
+      "2.0s   The huge bold headline \"Sé la referencia.\" SLAMS in hard — a fast punch-in scale from 104% to 100% with no bounce — white, with only the word \"referencia\" in vivid orange.",
+      "3.5s   The bold white text link \"Pide el diagnóstico\" fades in with the small white line \"SEO + AEO\" under it, and four thin white corner brackets draw themselves around the pair.",
+      "5.0s   A white arrow cursor glides in from the right, stops just beside the link and clicks: the text brightens once."
+    ],
+    "layout": {
+      "9x16": "The whole text block is CENTRED, starting about 16% down from the top and ending by about 30% of the frame height, with the same proportions as in image 1.",
+      "4x5": "The whole text block is CENTRED in the upper 25% of the frame, starting about 7% down from the top. The headline spans about 50% of the frame width.",
+      "1x1": "The whole text block is CENTRED in the upper 25% of the square, starting about 4% down from the top, with the same proportions as in image 1."
+    },
+    "layout_common": [
+      "The headline is by far the largest element in the picture — several times taller than the line above it. Do NOT render it small.",
+      "Only the highlighted word of the headline is orange; everything else in it is white.",
+      "The four corner brackets hug the link and its descriptor; the white arrow cursor sits just outside their right edge."
+    ],
+    "foley": [
+      "a soft airy swell from ~1.0s to ~3.5s as the card grows",
+      "a faint fabric rustle at ~3.5s as she lifts her head",
+      "a soft airy settle at ~13.0s as the card shrinks back"
+    ]
+  },
+  {
+    "id": "07",
+    "title": "Que te elijan",
+    "kind": "mascot",
+    "ref_files": [
+      "pose-gesto.png",
+      "pose-reposo.png"
+    ],
+    "extra_refs": "Images 3 and 4 are the same blue cloud character: image 3 shows the happy arched eyes it makes for one brief moment, image 4 its neutral resting face.",
+    "set": "close on a tablet on a stand on a warm-lit desk. The tablet shows an answer screen with three source cards in a row with landscape thumbnails; one card has a glowing blue outline. A small blue cloud-shaped vinyl character with a dark screen for a face sits on the far edge of the tablet, watching. One hand enters from the right with the index finger extended. The character stays seated in the same place; only its screen-face changes.",
+    "performance_intro": "the hand moves slowly and deliberately, the way a person considers before choosing. The character stays seated and still except for its screen-face:",
+    "beats": [
+      "0.0–1.0s   The index finger hovers above the cards, not touching; the character shows its neutral face (image 4).",
+      "1.0–2.5s   The finger drifts slowly over the first card, then the next, hesitating.",
+      "2.5–3.5s   It settles above the card with the glowing blue outline.",
+      "3.5–4.0s   It taps that card once, lightly: the card brightens and lifts very slightly off the screen, clearly chosen.",
+      "4.0–6.0s   The character's screen-face shows happy arched eyes for a moment (face of image 3), then returns to its neutral glyphs.",
+      "6.0–13.0s  The finger rests just above the screen; the chosen card stays lit. Nothing else moves.",
+      "13.0–15.0s The hand withdraws slowly to its first-frame position and the card returns to its first-frame state."
+    ],
+    "performance_outro": "One hand only, with five correctly formed fingers; the finger never passes through the glass. The thumbnails keep the same images throughout and the text-like lines are blurred light shapes, never readable letters.",
+    "payoff": "THE CHOICE: the single, deliberate tap on the highlighted card is the point of the piece, and it must read clearly with the sound off.",
+    "graphic": [
+      "1.0s   The small white line \"En las respuestas de la IA,\" fades in, centred at the top.",
+      "2.0s   The huge bold headline \"Que te elijan.\" SLAMS in hard — a fast punch-in scale from 104% to 100% with no bounce — white, with only the word \"elijan\" in vivid orange.",
+      "3.5s   A solid orange rounded button reading \"Pide el diagnóstico\" in dark text fades in, with the small white line \"SEO + AEO\" under it, and four thin white corner brackets draw themselves around the pair.",
+      "5.0s   A white arrow cursor glides in from the right, stops at the button's right edge and clicks: the button brightens once."
+    ],
+    "layout": {
+      "9x16": "The whole text block is CENTRED, starting about 16% down from the top and ending by about 30% of the frame height, with the same proportions as in image 1.",
+      "4x5": "The whole text block is CENTRED in the upper 25% of the frame, starting about 7% down from the top. The headline spans about 40% of the frame width.",
+      "1x1": "The whole text block is CENTRED in the upper 25% of the square, starting about 4% down from the top, with the same proportions as in image 1."
+    },
+    "layout_common": [
+      "The headline is by far the largest element in the picture — several times taller than the line above it. Do NOT render it small.",
+      "Only the highlighted word of the headline is orange; everything else in it is white.",
+      "The four corner brackets hug the button and its descriptor; the white arrow cursor sits just outside their right edge."
+    ],
+    "foley": [
+      "a faint air movement at ~1.0s as the hand moves",
+      "a soft glassy tap at ~3.6s as the finger touches the screen",
+      "a tiny bright blip at ~3.8s as the card lifts",
+      "a faint air movement at ~13.0s as the hand withdraws"
+    ]
+  }
+]

@@ -1,0 +1,52 @@
+A 15-second seamless loop for a vertical 9:16 social ad. THIS PIECE IS EFFECTIVELY SILENT: there is no dialogue and no score. The only sounds are the faint tone of an empty room and a few small physical noises made by things that move on screen.
+
+Image 1 is the EXACT target look of the finished frame — its typography, its text hierarchy, its corner brackets and its cursor are the reference to reproduce faithfully. Image 2 is the clean set. Images 3 and 4 are the same droplet character in the exact poses it must hit: image 3 with the cone raised, image 4 at rest with the cone held level.
+
+THE SET (from image 2, locked): a small rainbow-gradient vinyl droplet character with a closed-eyes smile sits on a keyboard in front of a large monitor, holding up a small cream-coloured cone in one little hand. The monitor shows a single glowing rounded card with one thin glowing line beneath it. Dark desk, dark background. The character never changes size or position in frame; only its arm, the cone and a slight sway move. The camera is LOCKED OFF for the whole shot: no pan, no tilt, no zoom, no dolly.
+
+THE PERFORMANCE — the character is pleased with itself; its closed-eyes smile never changes. It performs the same small routine it performs every day, and it never checks the result on the screen:
+- 0.0–1.0s   At rest, the cone held level (pose of image 4).
+- 1.0–3.0s   It raises the cone toward the monitor (pose of image 3). From the wide end of the cone, three soft rings of pale blue light ripple out and drift into the screen.
+- 3.0–4.5s   On the glowing card, three short soft bars of light fill in one after another, like three entries appearing in a list. Below them sits a fourth slot marked only by the thin glowing line — it stays EMPTY.
+- 4.5–6.0s   It gives a second small lift of the cone; one more ring drifts into the screen. The three bars brighten slightly. The fourth slot is still empty.
+- 6.0–13.0s  It holds the cone raised and sways almost imperceptibly, eyes still closed in its contented smile. Nothing new arrives on the screen.
+- 13.0–15.0s The bars fade off the card and it lowers the cone back to the exact rest pose of the first frame, ready to do the same thing again tomorrow.
+Its body stays planted on the keyboard; the gestures are small and contained. The bars are blurred light shapes, never readable letters.
+
+THE EMPTY FOURTH SLOT stays empty for all fifteen seconds: nothing ever fills it. That missing entry is the point of the piece — the category gets filled in, your name does not.
+
+THE GRAPHIC LAYER — reproduce the typography, weights, sizes, colours and positions exactly as in image 1. The shape of this sequence matters more than any single timing: the elements arrive at a steady pace, then the FULLY COMPOSED frame is HELD FOR A LONG TIME so it can be read as a whole, and only then does it fade out SLOWLY. Once an element appears it never moves or leaves until the final fade.
+1. 1.0s   The thin white line "Anuncia tu categoría todos los días." fades in at the top.
+2. 2.0s   The huge bold white headline "Sin tu nombre." SLAMS in hard — a fast punch-in scale from 104% to 100% with no bounce. It is by far the largest, heaviest text in the frame.
+3. 3.0s   The line "Y nadie lo corrige." fades in directly below the headline, with the word "corrige" in bold.
+4. 4.0s   The line "Mira qué responde por tu categoría." fades in.
+5. 5.0s   The lime-green bold text link "Pide el diagnóstico" fades in with the small white line "Diagnóstico SEO + AEO" under it, and four thin white corner brackets draw themselves around the pair.
+6. 6.0s   A white arrow cursor glides in from the right, stops just beside the link and clicks: the lime text brightens once.
+7. 7.5–13.0s  🔴 THE LONG HOLD. The complete composition — every line of text, the button, the corner brackets and the cursor — stays FULLY VISIBLE and PERFECTLY STILL for five and a half seconds. Nothing appears, nothing moves, nothing changes in the graphic layer. This is the reading window and it is the most important part of the sequence: do not shorten it, do not animate anything in the graphic layer during it.
+8. 13.0–14.3s  A SLOW, GENTLE fade out: over more than a full second every graphic element dissolves together and gradually — never a cut, never a fast wipe.
+9. 14.3–15.0s The frame is COMPLETELY CLEAN and identical to the very first frame. Do NOT leave any text on screen at the end.
+
+TEXT SIZE AND LAYOUT — match image 1 exactly, do not shrink it:
+- The whole text block is LEFT-ALIGNED, starting 7% in from the left edge and about 16% down from the top, and ends by about 45% of the frame height. The headline spans roughly the same share of the frame width as in image 1 (about 58%).
+- The headline is by far the largest element in the picture — several times taller than any other line. Do NOT render it small or centred.
+- The line above it and the lines below it are each roughly one fifth of the headline's height.
+- The four corner brackets hug the link and its descriptor tightly; the white arrow cursor sits just outside their right edge.
+Text is crisp, perfectly legible, correctly spelled Spanish with its accents, never warped and never handwritten.
+
+THE LOWER BAND — the strip across the bottom of the frame stays exactly as in image 1: dark, calm and EMPTY. Do not draw any wordmark, emblem, signature, watermark or lettering there, at any moment. A brand signature is added later in editing and needs that space clear.
+
+SOUNDTRACK — there is no score in this video at all: no fanfare, no orchestra, no brass, no strings, no melody, no instrumental bed of any kind. And there is NO dialogue track: no voice, no gibberish, no babbling, no crowd, no whispering — not one syllable in any language is uttered at any point by anyone.
+
+Under everything, a barely audible room tone — the faint air of a quiet room — so the silence sounds like a real room and never like a broken audio file.
+
+On top of that room tone, ONLY these discrete sounds, each landing exactly on its action and each surrounded by silence:
+- a soft plastic creak at ~1.0s as it lifts the cone;
+- a soft airy whoosh as each ring of light leaves the cone, at ~1.5s and ~4.8s;
+- three tiny glassy blips as the three bars fill in, at ~3.0s, ~3.5s and ~4.0s;
+- a soft settle at ~13.0s as it returns to rest;
+- a delicate high tick each time a line of text appears;
+- a crisp mouse click when the cursor presses the button.
+
+The physical actions are the most present sounds in the mix; the interface ticks are noticeably quieter. During the long hold (7.5–13.0s) there is NO sound at all beyond the room tone. All sounds are crisp, short, dry and light: no reverb tails, no comedy honks, no slide whistles, no boings, no slapstick. The loop is continuous: the room tone carries seamlessly from the last frame back into the first, with no gap, no fade and no ending sting.
+
+Photographic, real physical vinyl object on a real set: subtle sensor grain, true depth of field with the foreground edge soft, real practical light falloff into darkness. Not a cartoon, not a 3D render.
