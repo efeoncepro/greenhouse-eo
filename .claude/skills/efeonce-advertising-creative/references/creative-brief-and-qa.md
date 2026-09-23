@@ -185,17 +185,19 @@ la firma («Firma: logotipo de Efeonce»). Revisa que el `altText` describa la e
 
 | Aviso | Qué mirar |
 |---|---|
-| Una voz pasa sólo gracias al velo (`scrimTop`/`scrimBottom`, medido sobre la foto sin él) | La foto se oscurece para leerse. En fotografía de marca propia es el DON’T del punto 10 aunque el gate sólo avise. Si el velo se permite por defecto o pide aprobación está pendiente de decisión del operador |
+| Una voz que sólo se lee oscureciendo la foto (el velo) | Decidido: sin velo. `scrimTop` y `scrimBottom` no existen desde el tramo 11 (el esquema los rechaza); el lecho donde va el texto o la firma sale del prompt (`pnpm foto:prompt` con `reservas`). Si una voz no se lee, se rehace el plate |
 | Variante del CTA elegida **sin margen** | Pasa por poco: en otra pantalla o con compresión puede no alcanzar. Compárala con `--variantes`. Aviso o bloqueo: pendiente de decisión del operador |
 | Corchetes del CTA de texto bajo 1 CSS px o bajo 3:1 | El trazo que dibuja AXIS mide ≈ 0,69 CSS px en un teléfono, en todos los formatos: mira si el CTA se sigue leyendo como destino. Cambiar ese grosor es cambiar el contrato AXIS, y lo decide el operador |
 | El `altText` transcribe el copy | La escena se describe; el texto de la imagen ya lo transcribe el compositor. Corrige el plan |
 
-También avisan, y se miran igual: falta de `altText`, texto bajo 9 CSS px en el teléfono (el piso por rol está
-pendiente), APCA o daltonismo en voces que no son el CTA, `placement` declarado, máscara que no marca sujeto, CTA o
-descriptor corridos de la columna y poco aire sobre los corchetes.
+También avisan, y se miran igual: falta de `altText`, APCA o daltonismo en voces que no son el CTA, `placement`
+declarado y poco aire sobre los corchetes; y, sólo en las piezas del canon anterior, texto bajo 9 CSS px en el
+teléfono, CTA o descriptor corridos de la columna y la firma sobre un canto (en una pieza nueva bloquean:
+`legibilidad`, `cta-columna` y `firma-canto`). La máscara que no marca sujeto ya no avisa: bloquea (`mascara-vacia`).
 
 **Lo que ninguna guarda mide:** identidad, dedos y orientación de la tablet; tamaño del lecho y cierre visual de la
-firma; el marco y los controles de la selección fuera del CTA; el gesto manuscrito y la tarjeta. Revisar el lecho y
+firma (desde el tramo 16 se mide si la firma cae sobre un canto del lecho, no si se ve bien apoyada); el marco y los
+controles de la selección fuera del CTA; el gesto manuscrito y la tarjeta. Revisar el lecho y
 la firma como composición única: un logo bajo con media imagen tapada sigue siendo REWORK aunque el gate dé 0.
 
 Incluir en el handoff concepto/embudo, archivos literales, referencias/hashes, comandos reproducibles y la salida del

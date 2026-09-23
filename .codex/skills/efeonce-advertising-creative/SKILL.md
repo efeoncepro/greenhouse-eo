@@ -182,7 +182,8 @@ el fondo real desfavorable, no sólo paleta o p98; documentar color resuelto y p
 Salieron de componer ads reales **cuando el gate medía sólo contraste y protección de sujeto**. Desde el 2026-09-23
 también bloquea el concepto incompleto, la jerarquía y los choques de maquetación
 ([Componer y certificar](#componer-y-certificar-una-pieza-con-cta)); el destino del CTA, la escala en horizontal y el
-ritmo se siguen revisando mirando la pieza.
+ritmo se siguen revisando mirando la pieza (del ritmo, el gate mide desde el tramo 16 sólo el salto del concepto a la
+acción, en las piezas nuevas).
 
 - 🔴 **El concepto completo no es opcional.** Concepto = **entrada · titular · remate**; grupo de acción =
   **beneficio · CTA · descriptor**. Nueve piezas se compusieron y pasaron el gate con sólo titular +
@@ -280,10 +281,13 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    no compite con el titular: ≤ 0,5× el titular y botón ≤ el área del titular (`cta-tamano`). **Nuevo:** en el teléfono
    (390 CSS px) el CTA mide ≥ 11 px y las demás voces ≥ 9 (`legibilidad`); los nombres de los cursores quedan fuera
    (decisión del operador). En 16:9 eso pide mucho más texto: en un lienzo de 2048, entrada, cierre y descriptor de 48 px,
-   CTA de 60 y titular de 160, sin nota; y el plate tiene que dejarle cerca del 57 % izquierdo (hoy `foto:prompt` reserva
-   42 %: pendiente de decisión).
-   **Copy:** `|` corta la línea (nunca `\n`); `**negrita**` y `[[acento]]` sólo en entrada, titular, cierre, nota y pie;
-   escribe los caracteres, no entidades (`&`, no `&amp;`; tampoco `&sup2;`). El compositor rechaza lo demás.
+   CTA de 60 y titular de 160, sin nota y con `cta.gapAfterNote` 56 por el ritmo (tramo 16); y el plate tiene que
+   dejarle cerca del 57 % izquierdo (hoy `foto:prompt` reserva 42 %: pendiente de decisión).
+   **Copy:** `|` corta la línea (nunca `\n`), salvo en la etiqueta de un cursor: va en una sola línea y ahí `|` se
+   rechaza; `**negrita**` y `[[acento]]` sólo en entrada, titular, cierre, nota y pie; escribe los caracteres, no
+   entidades (`&`, no `&amp;`; tampoco `&sup2;` ni `&eacute`), tampoco en `altText`; y ningún carácter invisible (U+200B
+   y los demás Default_Ignorable). **Tramo 16:** el esquema valida el texto como se DIBUJA —sin marcado y con `|` como
+   espacio—, así que un invisible o un `****` ya no parten una entidad. El compositor rechaza lo demás.
 4. **Firma declarada siempre**, de una de tres formas:
    - `logo: { width: 0.2, x: 0.5, y: "auto" }`, la recomendada (`width: 0.25` en un formato horizontal nuevo; la tinta,
      blanca o navy, la elige la medición salvo que fijes `variant`). `width` es fracción del lado corto. `y: "auto"` busca sólo en la **banda del pie**, debajo de
@@ -316,6 +320,12 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    canto iluminado y medía 6,53:1. Altura real del lecho contra la caja, método si no alcanza y lo que no funcionó:
    regla auto-load `.claude/rules/brand-photography.md` y el delta 2026-09-23 de la
    [reserva de espacio en el plate](../../../docs/operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md#delta-2026-09-23--el-lecho-se-valida-contra-la-caja-de-la-firma).
+   **Tramo 16 — ya tiene guarda:** el compositor mide la pendiente de luz bajo la firma real (`firmaCanto` en el QA: luma
+   media por fila, de 10 % del alto de la caja por encima a 10 % por debajo, normalizada al lado corto) y el gate
+   bloquea sobre **18,5** en una pieza nueva (`firma-canto`, exceptuable sólo con aprobador); en una nueva, además,
+   `y: "auto"` descarta esas alturas. En las aprobadas avisa: KV-06-916 (CMP-002) mide 29,3 y queda como decisión del
+   operador. Calibrado: el canto de «Que te elijan» 23,3; con el lecho subido, 6,0; pasan 85 de 86 firmas aprobadas. La
+   guarda no reemplaza mirarla al 100 %.
 5. **CTA:** `variant: "auto"` + `prominencia` (ver arriba) o una variante fija con `cta.variantReason`. El acento es
    obligatorio: `surfaceToken` (contorno y relleno) o `inkToken` (texto) sólo aceptan `accentSurface`, `growthOnDark` o
    `accentInkOnLight`, y omitirlo resuelve lima. Si el acento no alcanza, se regenera el plate: el color no se apaga.
@@ -339,8 +349,10 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
 8. **Escena y tamaño:** `protect: [{ box: [x0, y0, x1, y1], reason }]` (fracciones del lienzo) para lo que el texto no
    puede tapar aunque no sea una persona; `editorialReserve: { maxRight, maxBottom }` (px) si el plan reserva área;
    `final: [ancho, alto]` si el PNG no mide lo mismo que el plate (misma proporción; al menos el 85 % del ancho del
-   máster y 780 px, porque la accesibilidad se mide en el máster; el gate verifica el tamaño entregado). Ojo con los nombres: `protect` y `subjectGuard.ignore` usan `reason`; `excepciones`, `firma`,
-   `conceptoReducido` y `placement` usan `razon` (≥ 10 caracteres).
+   máster y 780 px, porque la accesibilidad se mide en el máster; el gate verifica el tamaño entregado). Sin `final` se
+   entrega el plate, que también necesita 780 px de ancho: si no, la pieza aborta (tramo 16). Ojo con los nombres:
+   `protect` y `subjectGuard.ignore` usan `reason`; `excepciones`, `firma`, `conceptoReducido` y `placement` usan
+   `razon` (≥ 10 caracteres).
 9. **Sin `gesture`, `card`, `hud`, `url` ni `footer`** si la pieza tiene que salir certificada: ninguna guarda los mide
    y salen con 3.
 
@@ -356,10 +368,12 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    recompone esas piezas y las fusiona. Un plan mal escrito falla antes de componer, nombrando pieza y campo (campo
    desconocido, rango como `dominantTracking` −0,08…0,12 em, entidad que no es un carácter Unicode, ids que sólo
    difieren en mayúsculas, glifo que la fuente no tiene —también un espacio que no es el común, como U+202F o U+3000—,
-   texto sin nada que dibujar, `signatureSafeArea` incompleta, un campo interno del compositor como
+   texto sin nada que dibujar, carácter invisible, `|` en la etiqueta de un cursor, entidad en `altText`,
+   `signatureSafeArea` incompleta, un campo interno del compositor como
    `ctaVarianteResuelta`, escalas de la selección sobre su techo, `final` bajo su piso, firma fuera de la imagen,
    plate ilegible). Si una pieza aborta —texto sobre el sujeto o
-   sobre una zona `protect`, choque de maquetación—, la corrida se detiene y el mensaje dice qué mover; lo que no se
+   sobre una zona `protect`, choque de maquetación, plate de menos de 780 px de ancho sin `final`—, la corrida se
+   detiene y el mensaje dice qué mover; lo que no se
    compuso sale como falla en el gate. Dos avisos previos que no se ignoran:
    - **otro plan de la misma carpeta registra ese id** (otro `out/qa-*.json`): al recomponerlo, su PNG deja de ser el
      que certificó ese plan y su gate falla hasta que lo recompongas. Decide antes de seguir (en `aeo-cta-v04`, dos
@@ -367,7 +381,8 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    - **otra composición usa la carpeta**: el bloqueo `out/.componer.lock` se reclama sin carreras y Ctrl-C lo suelta.
      Espera a que termine y no lo borres a mano. Para probar, copia plan y plate a una carpeta temporal: nunca compongas
      en la carpeta de otra sesión.
-4. Mira `out/preview-390/` y la pieza completa: el gate no ve ritmo, escena ni destino del CTA.
+4. Mira `out/preview-390/` y la pieza completa: el gate no ve escena ni destino del CTA, y del ritmo sólo mide el salto
+   del concepto a la acción (piezas nuevas).
 5. `pnpm foto:cta:gate <plan>` y lee el código (tabla). Es la verificación rápida: confía en el QA, cuyas huellas
    (plan, plate, PNG, layout, texto alternativo y comando) recalcula. No edites plan, plate, PNG ni `.alt.txt` después
    de componer: se rompen las huellas; se recompone.
@@ -406,10 +421,20 @@ texto normal 4,5:1, grande 3:1), medido sobre el **trazo** (el 1 % peor de los p
 caja; si falla, mueve el texto, protege la zona con `protect` o regenera el plate. El **CTA exige 4,5:1 a cualquier
 tamaño**, nunca el umbral de texto grande, y además **APCA y daltonismo** en su texto, borde y relleno; en las demás
 voces, APCA y daltonismo avisan. Bordes y rellenos del CTA ≥ 3:1, y el borde del contorno ≥ 1 CSS px y ≥ 3:1 como se
-ve en un teléfono (390 px × DPR 2). También bloquean las invariantes de maquetación (texto, botón y firma no se tocan;
-ninguna selección tapa una voz que no sea su destino), el tamaño entregado y la falta de máscara del sujeto
-(`sin-mascara`). Salvo APCA y daltonismo del CTA (`cta-perceptual`), nada de este párrafo admite excepción, y tampoco
-las huellas ni una firma automática por encima del contenido.
+ve en un teléfono (390 px × DPR 2). También bloquean las invariantes de maquetación (texto, botón y firma no se tocan:
+a menos del 0,4 % del lado corto, medido sobre lo dibujado; ninguna selección tapa una voz que no sea su destino), el
+tamaño entregado y la falta de máscara del sujeto (`sin-mascara`). Salvo APCA y daltonismo del CTA (`cta-perceptual`),
+nada de este párrafo admite excepción, y tampoco las huellas ni una firma automática por encima del contenido.
+
+**Aire y ritmo (tramo 16).** «No se tocan» es exacto en dos niveles. Bajo el 0,4 % del lado corto se TOCAN: nunca se
+exceptúa. Entre dos voces, o una voz y el botón, además hace falta **0,25 em del cuerpo menor del par** (lo aprobado
+entre voces mide 0,267 em como mínimo; con la firma, que no tiene cuerpo, cuenta el de la otra voz), y ese piso sí se
+exceptúa, con aprobador (`holgura`, en todas las piezas). El botón cuenta su trazo por fuera: medio trazo en contorno,
+1 px en relleno. En una pieza nueva, además, **ritmo** (`ritmo`): del concepto (cierre, o titular si no hay cierre) a
+la acción hay más aire que el mayor hueco dentro del grupo de acción (nota → CTA → descriptor), como pide Tres voces +
+acción (jerarquía, regla 2); 43 de 114 aprobadas lo invierten y siguen con las reglas del 2026-09-22. El descriptor va
+bajo la selección del CTA (≈ 0,7 % del ancho bajo el botón; en contorno y relleno no se pinta) y a ≥ 0,6× su cuerpo:
+`note.gapAfterClosure` (o `cta.gapAfterNote` sin nota) tiene que ganarle a ese hueco.
 
 **Avisos que se miran** (no bloquean, pero tampoco son ruido):
 - **Variante del CTA elegida sin margen:** `auto` no encontró ninguna con margen (×1,1) y dejó la que más separa. Pasa
@@ -418,7 +443,8 @@ las huellas ni una firma automática por encima del contenido.
   los formatos. Es un valor del contrato AXIS: no lo engroses por tu cuenta.
 - Texto bajo 9 CSS px en el teléfono, en una pieza del canon anterior (en una nueva bloquea: `legibilidad`) · `altText`
   ausente o que transcribe el copy · APCA o daltonismo fuera del CTA · `placement` declarado · CTA, descriptor, nota o
-  etiqueta fuera de la columna · poco aire sobre los corchetes · cada excepción y salida aprobada. (Una máscara que no
+  etiqueta fuera de la columna y firma sobre un canto, en una pieza del canon anterior (en una nueva bloquean:
+  `cta-columna` y `firma-canto`) · poco aire sobre los corchetes · cada excepción y salida aprobada. (Una máscara que no
   marca ningún sujeto ya no avisa: bloquea, `mascara-vacia`.)
 
 **Excepciones y salidas con aprobador.** Una excepción exceptúa **una regla en una pieza** y no apaga la medición: el
@@ -431,9 +457,10 @@ gate la imprime con su razón y quién la aprobó.
 
 - **Reglas:** `zona-segura`, `firma-contraste`, `firma-tamano`, `firma-sobre-sujeto`, `acento-cta`,
   `concepto-completo`, `jerarquia`, `reserva-editorial`, `cta-perceptual`, `dominante-mayor`, `eje-centrado`,
-  `cta-relleno`, `descriptor-distancia`, `cta-cuerpo`, `paleta-voces`, `seleccion-objeto`, `cta-tamano` y
-  `mascara-vacia`; en las piezas nuevas también `firma-posicion`, `orden-lectura`, `jerarquia-rol`, `cta-aire`,
-  `tracking-titular` y `legibilidad`. La lista vigente es `REGLAS_EXCEPTUABLES` en `scripts/foto/cta-esquema.mjs`.
+  `cta-relleno`, `descriptor-distancia`, `cta-cuerpo`, `paleta-voces`, `seleccion-objeto`, `cta-tamano`,
+  `mascara-vacia` y `holgura` (sólo el piso de 0,25 em: tocarse no se exceptúa); en las piezas nuevas también
+  `firma-posicion`, `orden-lectura`, `jerarquia-rol`, `cta-aire`, `tracking-titular`, `legibilidad`, `cta-columna`,
+  `firma-canto` y `ritmo`. La lista vigente es `REGLAS_EXCEPTUABLES` en `scripts/foto/cta-esquema.mjs`.
 - **`aprobadoPor`:** un `id` de `scripts/foto/aprobadores.json` (hoy `julio-reyes`; `suite-pruebas` vale sólo en los
   planes de la suite: ruta real fuera del repo y su marca `.suite-pruebas`). Sumar a alguien lo decide el operador, con
   commit; con el registro editado sin commit, una pieza que usa una aprobación no se certifica.
@@ -443,8 +470,10 @@ gate la imprime con su razón y quién la aprobó.
 - **`hasta`**, obligatorio cuando la regla se mide con un número: px máximos fuera de la zona (`zona-segura`), fuera
   de la reserva (`reserva-editorial`) o de silueta bajo la firma (`firma-sobre-sujeto`); contraste mínimo
   (`firma-contraste`); fracción mínima del lado corto (`firma-tamano`: `0.14`, no `14`); ratio mínimo (`jerarquia`,
-  `dominante-mayor`). `acento-cta`, `concepto-completo` y `cta-perceptual` no lo llevan. Si no sabes la medida, el
-  gate la imprime al rechazar la excepción.
+  `dominante-mayor`); px mínimos del par (`holgura`); px máximos fuera de la columna (`cta-columna`); pendiente
+  normalizada máxima (`firma-canto`); cociente mínimo entre el aire concepto → acción y el mayor aire dentro de la
+  acción (`ritmo`). `acento-cta`, `concepto-completo` y `cta-perceptual` no lo llevan. Si no sabes la medida, el gate
+  la imprime al rechazar la excepción.
 - Una excepción que no vale no apaga nada: la regla bloquea y el gate dice por qué. Ninguna cambia cuánto crece la
   pieza.
 - `firma: { modo: "sin-firma", … }`, `conceptoReducido: { razon, aprobadoPor }` y `subjectGuard.ignore: [{ box, reason,
@@ -466,8 +495,9 @@ sí); firma de 25 % en horizontales; firma dentro de AXIS en las piezas nuevas (
 lecho ya cubre la nueva posición); zona AXIS por defecto; sin velo.
 
 **Pendientes del operador** (no los decidas tú; si tu pieza depende de uno, pregunta): si la variante sin margen pasa a
-bloqueo; el grosor de los corchetes AXIS; y la reserva de texto de los plates 16:9 de piezas con CTA (hoy 42 %; el piso
-de legibilidad pide cerca de 57 %). El piso de legibilidad ya está decidido: CTA 11 CSS px y las demás voces 9 en las
+bloqueo; el grosor de los corchetes AXIS; la reserva de texto de los plates 16:9 de piezas con CTA (hoy 42 %; el piso
+de legibilidad pide cerca de 57 %); y la firma de KV-06-916 (CMP-002), aprobada sobre el canto de una mesa: corregir su
+lecho o dejarla con el aviso. El piso de legibilidad ya está decidido: CTA 11 CSS px y las demás voces 9 en las
 piezas nuevas, con los nombres de los cursores fuera. Detalle: §18 del
 [compositor de CTA](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
 

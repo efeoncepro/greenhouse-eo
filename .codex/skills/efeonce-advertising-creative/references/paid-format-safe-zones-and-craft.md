@@ -132,6 +132,7 @@ se desploma. **Medir el elemento que se va a dibujar, no una idealización del m
 | Fuera del sujeto | contra la máscara de segmentación | `firma-sobre-sujeto` |
 | Dentro de **su** zona | la de AXIS (§1) estrechada por `signatureSafeArea` —la franja que el plan declara para la firma—, **no** la del texto | `zona-segura` |
 | La automática, debajo de todo lo compuesto | recalculado sobre el layout | no se exceptúa: es un error del compositor |
+| Fuera del **canto** del lecho (piezas nuevas; tramo 16) | pendiente de luz bajo la caja real (`firmaCanto` en el QA, normalizada al lado corto) ≤ 18,5; en las aprobadas, aviso | `firma-canto` |
 
 ⚠️ **En horizontales, «lado corto» no es «ancho»: es el alto.** En 4:5, 1:1 y 9:16 el 20% del lado corto es el 20%
 del ancho; en 16:9, no (abajo).
@@ -141,7 +142,8 @@ del ancho; en 16:9, no (abajo).
 - **Automática** — `logo: { width: 0.2, x: 0.5, y: "auto" }`. Busca desde el pie hacia arriba, **sólo en la banda del
   pie**: entre lo último compuesto (más una holgura del 2% del lado corto) y el borde inferior de la zona de la firma.
   En cada altura prueba las dos tintas oficiales y toma la primera con ≥ 4,5:1 en la caja y en el trazo que no toque
-  al sujeto ni una zona `protect`; `logo.variant: "auto"` dibuja esa tinta. Si no hay, la firma queda al pie, el
+  al sujeto ni una zona `protect`; `logo.variant: "auto"` dibuja esa tinta. En una pieza nueva descarta, además, las
+  alturas sobre un canto del lecho (tramo 16). Si no hay, la firma queda al pie, el
   compositor avisa con la banda que recorrió y el gate la mide ahí. Salidas: acortar o subir el texto para abrir la
   banda, un `logo.y` explícito o un plate con el lecho más oscuro o más claro.
 - **Externa** — la pone otra herramienta después del compositor (en v03–v07, `firmar.mjs` → `firma-placement.mjs`).

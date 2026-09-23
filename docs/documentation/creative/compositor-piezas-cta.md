@@ -1,7 +1,7 @@
 # Compositor de piezas con CTA — Composición y certificación
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-23 por Claude
 > **Ultima actualizacion:** 2026-09-23 por Claude
 > **Documentacion tecnica:** [Compositor de CTA — comando canónico](../../operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) (§14 guarda de sujeto · §15 red de seguridad · §16 accesibilidad · §17 variantes · §18 certificación y tramos)
@@ -100,9 +100,10 @@ Reglas que el gate hace cumplir:
   el titular.
 
 Dentro del texto se pueden usar tres marcas: `**negrita**` sube el peso dentro de la misma familia, `[[acento]]` pinta
-la palabra en el naranja de Efeonce y una barra vertical (`|`) fuerza un salto de línea. El compositor además evita las
-**viudas** (una palabra sola en la última línea) y las líneas que terminan en artículo, preposición o conjunción, sin
-cambiar el número de líneas del bloque.
+la palabra en el naranja de Efeonce y una barra vertical (`|`) fuerza un salto de línea, salvo en la etiqueta de un
+cursor, que se dibuja en una sola línea: ahí la barra saldría tal cual, así que el plan se rechaza. El compositor además
+evita las **viudas** (una palabra sola en la última línea) y las líneas que terminan en artículo, preposición o
+conjunción, sin cambiar el número de líneas del bloque.
 
 Las familias tipográficas siguen la regla Tres voces + acción: **Bricolage** instala la idea (el titular y, si el plan
 lo pide, la entrada o el cierre), **Poppins** estructura y actúa (CTA, descriptor, nota) y **Guttery** queda para el gesto
@@ -120,6 +121,8 @@ Estas protecciones no dependen de que el plan las declare:
 | El texto no tapa a nadie | Segmenta la foto y aborta si una voz, el CTA o un cursor toca a la persona o al protagonista |
 | Un plan mal escrito falla antes | Revisa tipos, rangos y combinaciones antes de componer; el error nombra la pieza y el campo |
 | Letras que la fuente no tiene | Un emoji o una letra hebrea salían como cuadros vacíos; ahora el plan falla nombrando el campo y el carácter |
+| El texto se revisa como se dibuja | Las reglas del plan miran el texto tal como va a salir: sin el marcado, con la barra como salto de línea y sin caracteres invisibles. Un carácter invisible, como el espacio de ancho cero, se rechaza: partía una palabra o una entidad (`&eacute`) que después se dibujaba tal cual |
+| Un plate con resolución suficiente | Sin tamaño `final`, lo que se entrega es el plate: si mide menos de 780 px de ancho (la densidad 2× de un teléfono de 390 px), la pieza aborta |
 | Nada a medias | Una pieza que aborta no deja archivos nuevos ni un registro que apunte a otra imagen |
 | Sin mezclas | Dos composiciones no pueden usar la misma carpeta a la vez. Si interrumpes una con Ctrl-C, la carpeta queda libre |
 | Aviso entre planes | Si otro plan de la misma carpeta ya registra un id que vas a componer, avisa antes de empezar |
@@ -132,7 +135,7 @@ certificado el otro, y el gate del otro plan empieza a fallar hasta que se recom
 
 > Detalle técnico: validación con el esquema declarativo [`scripts/foto/cta-esquema.mjs`](../../../scripts/foto/cta-esquema.mjs)
 > y cobertura de glifos en el compositor; bloqueo por carpeta `tomarBloqueo` en
-> [`cta-integridad.mjs`](../../../scripts/foto/cta-integridad.mjs); contrato §15 y §18 (tramos 1, 3, 8 y 9).
+> [`cta-integridad.mjs`](../../../scripts/foto/cta-integridad.mjs); contrato §15 y §18 (tramos 1, 3, 8, 9 y 16).
 
 ## Los veredictos: certificado, falla y no certificable
 
@@ -259,7 +262,8 @@ Desde el 2026-09-23 conviven dos juegos de reglas. Las **132 piezas aprobadas** 
 antes y componen exactamente igual: están en un registro (`scripts/foto/canon-anterior.json`) que las reconoce por la
 huella de su foto y de su definición en el plan. **Toda pieza nueva —o una aprobada que se edita— sigue el canon
 2026-09-23**, que agrega: la zona segura de AXIS por defecto, la firma de 25 % en los horizontales y siempre en el
-cuarto inferior, el orden de lectura, la jerarquía por rol y el aire mínimo del botón. Nadie elige el canon: el gate lo
+cuarto inferior, el orden de lectura, la jerarquía por rol y el aire mínimo del botón; desde el tramo 16, también el
+ritmo entre el concepto y la acción y la firma fuera del canto del lecho. Nadie elige el canon: el gate lo
 recalcula del registro. Ninguna imagen ya hecha se regenera por este cambio. Si el operador ordena retocar una pieza
 aprobada sin pasarla a las reglas nuevas —el 2026-09-23 se subió la firma de las cuatro stories finales de v07 para
 dejarla dentro de AXIS—, el registro se actualiza con esa pieza y anota qué cambió y quién lo decidió.
@@ -308,10 +312,11 @@ Reglas del canon, que el gate hace cumplir:
 - **Contraste:** al menos 4,5:1 contra su fondo. En el logo se mide la caja y también el **trazo** (el 1 % de píxeles
   más débiles del logotipo, igual que en las voces).
 - **Nunca sobre el sujeto.**
+- **Nunca sobre el canto del lecho** (desde el tramo 16; ver [abajo](#la-firma-y-el-canto-del-lecho)).
 - **Búsqueda automática** (`y: "auto"`): busca, desde el pie hacia arriba y **sólo en la banda del pie** —debajo de todo
   lo compuesto—, la primera altura que cumpla contraste en la caja y en el trazo, lejos del sujeto y sin chocar con
-  nada. Si no encuentra, la firma queda al pie y el gate la mide ahí. Antes subía sin tope y llegó a dejar la firma
-  encima del titular.
+  nada; en una pieza nueva descarta, además, las alturas sobre un canto. Si no encuentra, la firma queda al pie y el
+  gate la mide ahí. Antes subía sin tope y llegó a dejar la firma encima del titular.
 - **Tinta automática** (`logo.variant: "auto"`): elige el logo blanco o el navy midiendo el fondo donde va la firma.
 
 **Firma externa.** En los sets v03–v07 la firma la pone otra herramienta después de componer. El compositor no la
@@ -329,14 +334,42 @@ regeneran. El dato que llevó a la decisión: medido en una misma campaña, en 1
 del ancho del cuadro, contra 20 % en 4:5 y 9:16 (18 % en 1:1). En el feed de un teléfono mide 31 px contra 78 px en el
 4:5: dos veces y media más chica. Hay dos causas. Las piezas 16:9 de CMP-002 y del registro C se hicieron con 13–14 % del
 lado corto, bajo el canon (el gate ya lo bloquea y se corrigen al recomponer). Y aun con el canon, el 20 % del lado corto
-en 16:9 es 11 % del ancho y 44 px en el teléfono. La opción recomendada, que el operador todavía no decide, es 25 % del
+en 16:9 es 11 % del ancho y 44 px en el teléfono. Por eso se aprobó 25 % del
 lado corto en formatos horizontales (cerca de 14 % del ancho y 55 px en el teléfono, la misma relación firma/titular del
-4:5) y 20 % en verticales y cuadrados. Si se aprueba, cambian el gate, el compositor y la herramienta de firma externa.
+4:5) y 20 % en verticales y cuadrados; el gate lo exige en las piezas nuevas (`firma-tamano`).
 
 > Detalle técnico: `cajaLogo`, `buscarYFirma`, `cajaFirmaExterna` y `contrasteFirmaExterna` en
 > [`componer-cta.mjs`](../../../scripts/foto/componer-cta.mjs); reglas de firma en
 > [`componer-cta.gate.mjs`](../../../scripts/foto/componer-cta.gate.mjs); contrato §6 y §18 (tramos 4 y 6, y seguimiento
 > de la firma externa).
+
+### La firma y el canto del lecho
+
+El lecho es el primer plano desenfocado donde se apoya la firma. Su borde superior, el **canto**, puede recibir luz: si
+la caja de la firma lo cruza, parte del logo queda sobre la franja iluminada y parte sobre la sombra. El contraste no lo
+detecta —en «Que te elijan» la firma sobre el canto medía 6,53:1 y el operador la rechazó—, así que desde el tramo 16 se
+mide aparte. El compositor recorre la foto fila por fila bajo la caja de la firma, desde un 10 % de su alto por encima
+hasta un 10 % por debajo, y registra el mayor salto de luz entre filas vecinas, ajustado al tamaño de la imagen
+(`firmaCanto` en el registro). Un canto es un escalón: la luz sube de golpe.
+
+| Caso | Medida |
+|---|---|
+| La firma de «Que te elijan» sobre el canto | 23,3 |
+| La misma firma con el lecho subido | 6,0 |
+| Las firmas aprobadas que pasan (85 de 86) | 14,9 como máximo |
+| **Techo** | **18,5** |
+
+- En una pieza nueva, `logo.y: "auto"` descarta las alturas sobre el techo y el gate **bloquea** la firma que lo pasa
+  (regla `firma-canto`, exceptuable sólo con aprobador). Si no queda lugar calmo, el plate se rehace con el lecho más
+  alto: no se parcha al componer.
+- En una pieza aprobada sólo **avisa**. Una la pasa: **KV-06-916** (CMP-002, story), con el logo montado en el canto
+  superior de una mesa (29,3). Qué hacer con ella es decisión del operador: corregir el lecho como en «Que te elijan» o
+  dejarla con el aviso.
+
+> Detalle técnico: `pendienteBajoCaja` y `TECHO_CANTO` en [`accesibilidad.mjs`](../../../scripts/foto/accesibilidad.mjs);
+> `buscarYFirma` en [`componer-cta.mjs`](../../../scripts/foto/componer-cta.mjs); regla `firma-canto` en
+> [`componer-cta.gate.mjs`](../../../scripts/foto/componer-cta.gate.mjs); contrato §18 (octava certificación y tramo 16);
+> el lecho, en la [reserva de espacio](../../operations/brand-photography/EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md).
 
 ## Accesibilidad
 
@@ -355,7 +388,8 @@ quedaban bajo 9 px en pantalla, con un mínimo de 3,8 px.
 mide al menos **11 px CSS** en el teléfono —el mínimo de Apple para texto— y las demás voces **9**. Es un piso, no un
 tamaño fijo: la jerarquía se mantiene y sólo crecen los textos que estaban debajo. En 16:9 obliga a un texto bastante más
 grande o a menos texto: una receta que pasa en un lienzo de 2048 px es entrada, cierre y descriptor de 48 px, CTA de 60 y
-titular de 160, sin nota. Las piezas aprobadas conservan el aviso de siempre. Los nombres de los cursores de una
+titular de 160, sin nota y con más aire entre el cierre y el botón (`cta.gapAfterNote` 56) para cumplir el ritmo. Las
+piezas aprobadas conservan el aviso de siempre. Los nombres de los cursores de una
 selección quedan fuera del piso (decisión del operador): son parte gráfica del recurso multiplayer y su texto va en el
 alternativo; tienen su propio piso para no achicarse más que en las piezas aprobadas.
 
@@ -450,8 +484,9 @@ conservan porque sin ellos el CTA queda huérfano. El cursor se conserva en los 
 
 **La columna.** Con el bloque alineado a la izquierda, `cta.x: "columna"` hace que el botón (o el texto del CTA)
 arranque en la misma columna que las voces, y el descriptor lo sigue; `note.x: "columna"` hace lo mismo con la nota. En
-un bloque centrado «columna» no tiene sentido y el plan se rechaza. El gate avisa si el CTA o el descriptor quedan
-corridos más de 4 px de la columna.
+un bloque centrado «columna» no tiene sentido y el plan se rechaza, y en un bloque a la izquierda se rechaza el CTA
+centrado (`cta.align: "center"`). En una pieza nueva, si el CTA, el descriptor, la nota o la etiqueta quedan corridos más
+de 4 px de la columna, el gate bloquea (`cta-columna`); en las aprobadas, avisa.
 
 **La selección no tapa texto.** Ningún cursor, etiqueta ni marco de selección, del titular o del CTA, puede quedar sobre
 otra voz.
@@ -481,6 +516,8 @@ Reglas:
   por dicho en «verde» y «¡mira!» en «una mujer mira».
 - Suma todo lo que es texto en la imagen: el encabezado de la tarjeta, el gesto, las etiquetas de los cursores y la
   firma.
+- La descripción de la escena se escribe con los caracteres, no con entidades HTML (`&aacute;`, `&amp;`, con o sin punto
+  y coma): un plan que las trae se rechaza (tramo 16).
 
 > Detalle técnico: `textoAlternativo` y `copiaEnEscena` en [`accesibilidad.mjs`](../../../scripts/foto/accesibilidad.mjs);
 > contrato §16 y §18 (tramos 4 y 8).
@@ -508,6 +545,35 @@ Ninguna de las 132 piezas aprobadas incumple estos límites: se calibraron con e
 
 > Detalle técnico: contrato §18 (quinta certificación y tramo 13) y §19.8.
 
+## Aire entre las voces y ritmo
+
+La octava auditoría encontró voces que ya no se tocaban, pero quedaban casi pegadas. Desde el tramo 16:
+
+- **Nada se toca.** Dos voces, una voz y el botón, o la firma, no pueden quedar a menos del 0,4 % del lado corto, y eso
+  no tiene excepción. Se mide lo dibujado: el botón de contorno cuenta la mitad de su trazo por fuera, y el de relleno,
+  1 px.
+- **Y entre las voces hay aire.** Entre dos textos, o un texto y el botón, queda al menos la cuarta parte de la letra
+  más chica del par (0,25 em; con la firma, que no tiene letra, cuenta la de la otra voz). El 0,4 % solo no alcanzaba:
+  en un teléfono son 1,56 px CSS en 9:16 y 0,88 en 16:9, y las voces se leían como un solo párrafo. Entre las voces
+  aprobadas, el par más justo mide 0,267 em, y ninguna pieza aprobada cambió de veredicto. Rige en todas las piezas y se
+  exceptúa sólo con aprobador (`holgura`).
+- **Más aire entre la idea y la acción que dentro de la acción** (sólo piezas nuevas). Es la regla de ritmo de Tres
+  voces + acción: la separación entre bloques conceptuales es mayor que entre los miembros del grupo de acción. El gate
+  compara el aire del concepto (el cierre, o el titular si no hay cierre) a la acción (la nota, o el CTA si no hay nota)
+  con el mayor aire dentro del grupo (nota, CTA y descriptor); si es igual o menor, bloquea (`ritmo`, exceptuable con
+  aprobador). 43 de las 114 aprobadas que componen con el comando vigente lo invierten: siguen con las reglas del
+  2026-09-22. La calibración propuso exigir 1,2 veces; se aplica la letra del canon, «mayor que».
+
+Un detalle práctico: el aire entre el botón y su descriptor es mayor que `descriptorGap`, porque el descriptor se ubica
+bajo la selección del CTA —que baja cerca de 0,7 % del ancho por debajo del botón, aunque en contorno y relleno no se
+pinte— y nunca a menos de 0,6 veces su propio cuerpo. En la receta 16:9 de 2048 px ese aire mide cerca de 43 px, y por
+eso la receta lleva `cta.gapAfterNote` 56.
+
+> Detalle técnico: `HOLGURA_EM`, `CUERPO_DE` y la regla `ritmo` en
+> [`componer-cta.gate.mjs`](../../../scripts/foto/componer-cta.gate.mjs); la regla de ritmo en
+> [Tres voces + acción](../../operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md) (§Jerarquía, ritmo y protección,
+> regla 2); contrato §18 (octava certificación y tramo 16), §19.7 y §19.8.
+
 ## Excepciones: cuando una regla no aplica, con nombre y apellido
 
 Hay casos legítimos en que una regla del canon no aplica a una pieza. Para eso existen las **excepciones auditadas**:
@@ -528,11 +594,16 @@ Reglas que se pueden exceptuar:
 | `jerarquia` | Dominante bajo tres veces la entrada |
 | `dominante-mayor` | Otra voz más grande que el titular |
 | `reserva-editorial` | Texto fuera de la reserva editorial del plan |
-| — | El piso de legibilidad por rol todavía sólo avisa: no hay excepción `legibilidad` (un plan que la declara se rechaza) |
+| `legibilidad` | En una pieza nueva, una voz bajo el piso de legibilidad en el teléfono |
+| `holgura` | Dos voces, o una voz y el botón o la firma, con menos aire que 0,25 em de la letra más chica del par (tocarse no se exceptúa) |
+| `cta-columna` | En una pieza nueva, el CTA, el descriptor, la nota o la etiqueta fuera de la columna del texto |
+| `firma-canto` | En una pieza nueva, la firma sobre el canto del lecho |
+| `ritmo` | En una pieza nueva, menos aire entre el concepto y la acción que dentro del grupo de acción |
+| — | La lista completa, con lo que va en `hasta` en cada regla, está en el [manual](../../manual-de-uso/creative/compositor-piezas-cta.md#cómo-pedir-y-declarar-una-excepción) y en §19.7 del contrato |
 
 **Lo que nunca se exceptúa:** WCAG de cada voz y de su trazo, el CTA o el descriptor bajo 4,5:1, el relleno bajo 3:1,
-el borde del CTA en el teléfono, las huellas, la falta de silueta, una firma automática por encima del contenido y los
-choques de maquetación.
+el borde del CTA en el teléfono, las huellas, la falta de silueta, una firma automática por encima del contenido, los
+choques de maquetación y las voces, el botón o la firma que se tocan (a menos del 0,4 % del lado corto).
 
 Una excepción **vale sólo si**:
 
@@ -583,7 +654,7 @@ carpetas temporales:
 
 Las pruebas que miden no usan el código que prueban: P04 recalcula la distancia al sujeto desde la máscara, P08 trae
 su propio criterio de cortes y P09 recalcula el trazo con aritmética propia. Una prueba que se verifica a sí misma no
-prueba nada. Al terminar borran sus temporales y dejan sólo el reporte. Estado: 10 de 10 al cerrar el tramo 7.
+prueba nada. Al terminar borran sus temporales y dejan sólo el reporte. Estado: 10 de 10 al cerrar el tramo 16.
 
 ### Regresión contra la versión anterior
 
@@ -608,7 +679,9 @@ el arnés tiene que reconocerlos como «falla por otra razón»; si los da por d
 registradas: 48 de 48 al cerrar el tramo 6, 12 de 12 del tramo 7 y 8 de 8 del tramo 8. Se midieron con el arnés
 anterior, que el tramo 9 endureció justamente porque podía sobrestimar. Con el arnés nuevo, al cerrar el tramo 9: 75 de
 77 en la corrida completa más los dos canarios bien clasificados; los dos restantes los clasificaba mal el propio
-criterio nuevo, se ajustó y, junto con los dos mutantes de los últimos arreglos, dieron 6 de 6.
+criterio nuevo, se ajustó y, junto con los dos mutantes de los últimos arreglos, dieron 6 de 6. Al cerrar el tramo 16,
+sus mutantes (15 nuevos y 4 reajustados porque cambiaron las líneas que rompen) dieron 19 de 19, con los dos canarios
+bien clasificados; la corrida completa de ese tramo está en curso.
 
 > Detalle técnico: [`componer-cta.pruebas.mjs`](../../../scripts/foto/componer-cta.pruebas.mjs),
 > [`componer-cta.regresion.mjs`](../../../scripts/foto/componer-cta.regresion.mjs) (referencia hermética en
@@ -637,6 +710,8 @@ los que el gate daba verde sobre una pieza mala. Cada hallazgo se cerró en un t
 | 14 · Sexta certificación | Cierre en `[[ ]]` blanco, descriptor medido en lo dibujado, CTA que compite con el titular, selección aprobada en las piezas nuevas y sin contar `protect`, etiqueta en la columna, plates sólo raster, máscara vacía, borde del botón sobre las letras, entidades sin punto y coma y techo y piso de las escalas de los cursores |
 | 13 · Quinta certificación | Esquina del botón, botón-losa, descriptor lejos, CTA menor que el cuerpo, tinta del cuerpo fuera de la paleta, selección sobre nada, transparencia en cualquier profundidad, entidades con dígitos, medición imposible que aborta y piso de legibilidad en las piezas nuevas |
 | 10 · Integridad (tras la tercera certificación) | Selección sobre un objeto dentro de las guardas, zona de la firma validada y firma dentro de la imagen, aprobador de pruebas sólo en la suite, sin estado interno en el plan, HUD/url/pie no certificables, espacios Unicode, huella del texto alternativo y reproducción que compara todo lo entregado, comando ajeno que no certifica, piso de `final`, jerarquía con tamaños resueltos, aprobaciones atadas al plate |
+| 15 · Séptima certificación | Texto, botón y firma que no se tocan, CTA en la columna en las piezas nuevas, techo de área del botón según su tratamiento y tildes escritas como código |
+| 16 · Octava certificación | Aire mínimo entre las voces (0,25 em) con el trazo del relleno, ritmo entre concepto y acción en las piezas nuevas, firma fuera del canto del lecho, texto revisado como se dibuja (invisibles, barra en los cursores, entidades en el alternativo) y plate de al menos 780 px |
 
 Entre los tramos 5 y 6 se sumaron la medición de la firma externa, el bloqueo de APCA y daltonismo en el CTA y la zona
 `"axis"` también por arriba.
@@ -649,13 +724,25 @@ Entre los tramos 5 y 6 se sumaron la medición de la firma externa, el bloqueo d
   una losa, y letras con tilde escritas como código sin punto y coma (`&eacute`) que se dibujaban tal cual. El **tramo
   15 los cerró**: texto, botón y firma ya no se pueden tocar, en las piezas nuevas el CTA arranca en la columna, el
   botón relleno tiene un techo de tamaño más bajo que el de contorno, y las tildes escritas como código se rechazan.
-  Ninguna pieza aprobada cambió. La **octava certificación** está en curso. La certificación se da por cerrada con
-  cero hallazgos graves y medios.
+  Ninguna pieza aprobada cambió.
+- La **octava certificación** (2026-09-23) también dio NO CERTIFICA: ningún hallazgo grave y cuatro medios, ninguno
+  bloquea una pieza aprobada. Los cuatro: voces que ya no se tocaban pero quedaban casi pegadas (y un ritmo invertido,
+  con más aire dentro de la acción que antes de ella); la firma puesta por la búsqueda automática sobre el canto del
+  lecho, el mismo defecto que el operador rechazó en «Que te elijan»; la barra `|`, que en la etiqueta de un cursor se
+  dibujaba tal cual; y entidades como `&eacute` que se colaban partidas por un carácter invisible o un marcado vacío. El
+  patrón común: la regla revisaba lo que el plan declara y el compositor dibujaba otra cosa. El **tramo 16 los cerró**
+  midiendo todo como se dibuja: aire mínimo de 0,25 em, ritmo en las piezas nuevas, canto bajo la firma, texto sin
+  invisibles, alternativo sin entidades y plate de al menos 780 px. Ninguna pieza aprobada cambió de píxeles,
+  maquetación ni veredicto: el registro sólo suma la medida `firmaCanto`. La **novena certificación** está en curso. La
+  certificación se da por cerrada con cero hallazgos graves y medios.
+- Queda deuda menor (🟡 y 🟢) que no impide cerrar: por ejemplo, el gate todavía no exige que el compositor sea el del
+  último commit (un compositor editado sin commit todavía certifica), y algunos techos del CTA y del descriptor son más
+  holgados que lo aprobado. El detalle está en §18 del contrato.
 - Decidir la **reserva de texto de los plates 16:9** de piezas con CTA: con el piso de legibilidad el texto necesita cerca
   del 57 % del ancho y la receta de toma pide 42 %.
 - Marcar cada guarda en el código con un mutante por marca.
-- Las **decisiones pendientes del operador**: si una variante sin margen debe bloquear y el grosor de los corchetes de
-  AXIS. El
+- Las **decisiones pendientes del operador**: si una variante sin margen debe bloquear, el grosor de los corchetes de
+  AXIS y qué hacer con la firma de KV-06-916. El
   [manual](../../manual-de-uso/creative/compositor-piezas-cta.md#decisiones-pendientes-que-te-afectan) las detalla.
 
 **El velo ya no existe** (2026-09-23): la sombra que se pintaba encima de la foto para que un texto se leyera se
@@ -668,13 +755,14 @@ manuscrito queda fuera de alcance; la firma de las stories finales de v07 se mov
 legibilidad en las piezas nuevas es de 11 px CSS para el CTA y 9 para las demás voces.
 
 > Detalle técnico: contrato §18 (hallazgos consolidados, estado de los tramos, cada certificación con su tramo —la
-> última, la séptima, y el tramo 15 que la cerró— y decisiones pendientes).
+> última, la octava, y el tramo 16 que la cerró— y decisiones pendientes).
 
 ## Lo que el gate no ve
 
 El gate mide reglas; no mira la pieza como una persona. Quedan fuera:
 
-- identidad de las personas, dedos, orientación de una tablet, tamaño del lecho y cierre visual de la firma;
+- identidad de las personas, dedos, orientación de una tablet, tamaño del lecho y cierre visual de la firma (desde el
+  tramo 16 mide si la firma cae sobre un canto del lecho, pero no si se ve bien apoyada);
 - el gesto manuscrito y la tarjeta (por eso esas piezas salen con 3);
 - la firma que pone otra herramienta después: se certifica su lugar y su fondo, no la imagen firmada;
 - si la pieza funciona: un contraste aprobado no demuestra conversión ni reemplaza la revisión creativa.

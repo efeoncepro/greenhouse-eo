@@ -463,6 +463,17 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   en la materia desenfocada del lecho»; lo vio el operador. Se miró el número, no el pie al 100 %. Con la firma dentro
   de la materia (no se movió: se subió el lecho), el mismo logo mide **11,58:1**. Es el complemento de «si la banda
   falla, mide el logo» (arriba): un logo que pasa tampoco dice dónde cae su caja.
+  **Desde el tramo 16 hay guarda mecánica** (`pnpm foto:componer:cta` y su gate): el compositor mide la pendiente de luz
+  bajo la caja real de la firma —luma media por fila, desde el 10 % del alto de la caja por encima hasta el 10 % por
+  debajo, suavizada en 5 filas; el mayor salto entre filas, normalizado al lado corto— y la deja en el QA como
+  `firmaCanto`. **Techo 18,5.** En una pieza NUEVA, `logo.y: "auto"` descarta las alturas sobre el techo y el gate
+  bloquea (`firma-canto`, exceptuable sólo con aprobador); en una APROBADA sólo avisa. Calibrado: la firma de «Que te
+  elijan» sobre el canto mide 23,3 y con el lecho subido, 6,0; pasan 85 de 86 firmas aprobadas. **La que no pasa tiene
+  el mismo defecto: KV-06-916** (CMP-002 HubSpot, story 1152×2048,
+  `ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json`): el logo quedó montado en el canto superior de
+  una mesa —la mitad de arriba de «efeonce» sobre la franja iluminada, la de abajo sobre el frente oscuro—, 29,3.
+  **Decisión pendiente del operador:** corregir su lecho con el método de abajo (es una pieza aprobada) o dejarla con
+  el aviso. La guarda mide un escalón de luz, no si la firma se ve bien apoyada: se sigue mirando al 100 %.
 - 🔴 **La altura del lecho se MIDE en el plate contra la caja de la firma: la brief no la garantiza**
   **[medido 2026-09-23]**. La brief de ese plate pedía el borde superior del primer plano en y≈79–80 % («lowest
   fifth») y una zona calma en 82–85 % para la firma; el plate generado dejó el canto en ≈83–84 %, y nadie lo midió
@@ -566,7 +577,8 @@ una señal de que se eligió por conveniencia.**
 
 `pnpm foto:validar` sobre el plate limpio y **mirar la imagen al 100%**: identidad contra la referencia **de la identidad que elegiste**, emblema
 letra por letra, y que no haya texto ni marcas de terceros; en la pieza firmada, que la caja de la firma caiga dentro de
-la materia calma del lecho y no sobre su canto. Un contraste que pasa no prueba que la pieza esté bien.
+la materia calma del lecho y no sobre su canto (el compositor lo mide como `firmaCanto`, pero se mira igual). Un
+contraste que pasa no prueba que la pieza esté bien.
 
 
 🔴 **ANTES de generar una pieza con un asset de marca —ropa corporativa, lanyard, merch, logo 3D,

@@ -248,3 +248,19 @@ caso agrega que la verificación se repite al mover la firma y que la altura del
 
 > **Regla que queda:** la reserva del lecho se valida contra la caja real de la firma, no contra un porcentaje ni
 > contra la brief, y se vuelve a validar cada vez que la firma cambia de posición.
+
+## Delta 2026-09-23 (tramo 16) — materia calma bajo la banda de la firma, y el compositor mide el canto
+
+El lecho de la firma tiene que dejar **materia calma en toda la banda de la firma**: bajo su caja y un poco por encima
+y por debajo, sin un escalón de luz que la cruce. Desde el tramo 16 del
+[compositor de CTA](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) eso se mide: `pnpm foto:componer:cta` registra en el QA
+la pendiente de luz bajo la caja real de la firma (`firmaCanto`: luma media por fila, desde el 10 % del alto de la caja
+por encima hasta el 10 % por debajo, normalizada al lado corto), y sobre **18,5** el gate **bloquea en las piezas
+nuevas** (regla `firma-canto`, exceptuable sólo con aprobador); en una pieza nueva, además, `logo.y: "auto"` descarta
+las alturas sobre el canto. En las aprobadas sólo avisa. Calibración: la firma de «Que te elijan» sobre el canto mide
+23,3 y con el lecho subido, 6,0; pasan 85 de 86 firmas aprobadas. La que no, KV-06-916 de CMP-002 (29,3), tiene el logo
+sobre el canto de una mesa y queda como decisión del operador.
+
+> **Regla que queda:** la toma deja el canto del lecho por encima de la banda de la firma. Si el plate no lo cumple, en
+> una pieza nueva se rehace (§2, regla 6); subir el primer plano de un plate ya generado es un arreglo sólo para piezas
+> aprobadas.
