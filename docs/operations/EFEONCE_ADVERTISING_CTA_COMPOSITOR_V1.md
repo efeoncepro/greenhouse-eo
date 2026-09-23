@@ -769,6 +769,25 @@ medición, el gate la imprime con su razón y quién la aprobó. Reglas exceptua
   —compositor, gate, arnés y módulos puros— y exige que alguna prueba falle **por la razón esperada**.
 - Regresión hermética contra 38d465e89: 104 de 104 iguales (el tramo 5 no toca el compositor); el manifiesto de cobertura quedó con 205 piezas (104 únicas) y 84 piezas con CTA no tienen plate en esta máquina. **Puntuación de mutantes: 35 de 35 detectados por la razón esperada** (9 del tramo 1, 7 del 2, 6 del 3, 8 del 4 y 5 del 5). La primera pasada dio 33 de 35 y enseñó dos cosas: el piso del trazo había dejado de tener pieza de prueba (desde el tramo 3 a 01-fuera-916 la frena su reserva; P05 suma la misma pieza sin reserva) y un mutante del QA compartido se detectaba por un error de la prueba, no por su razón (P10 suma «el QA queda en qa-<plan>.json»).
 
+**Seguimiento (2026-09-23) · La firma que pone otra herramienta.** Los sets v03–v07 firman DESPUÉS del compositor
+(`firmar.mjs` → `firma-placement.mjs`): el compositor no dibujaba esa firma, la regresión no la veía y nada impedía que un
+cambio pusiera texto donde después iba a caer. Ahora:
+
+- El plan la declara con `firma: { modo: "externa", razon, y?, ancho? }` —o con `signatureY`, la forma que ya usan
+  v05–v07— y el compositor **reserva su caja** con la misma geometría que esa herramienta: 20 % del lado corto, centrada,
+  `y` como centro vertical (0,935 por defecto). Entra en las invariantes (nada cae encima; el crecimiento la respeta) y en
+  el QA: contraste medido como lo mide esa herramienta (peor píxel de la caja, la mejor de las dos tintas oficiales),
+  tamaño y si cae sobre el sujeto. El gate le aplica el mismo contrato que al logo.
+- **Corrección del tramo 4:** la firma se mide contra la zona de AXIS estrechada por `signatureSafeArea` (la franja que
+  el plan declara para la firma), no contra la `safeArea` del texto. Antes, una firma en su franja salía «fuera de zona»
+  por compararla con la zona del texto (v06).
+- Medido en los nueve 9:16 de v05–v07 que declaran `signatureY`: **ningún píxel cambia**; contraste de 7,56 a 19,39:1;
+  **v05/02-reconoces-916 cae sobre la persona** (245 px de su silueta); **v07 cae en la franja inferior que Reels tapa**
+  (0,887–0,913 del alto contra 0,87 de AXIS), como reconoce su propio LEEME; v06 queda dentro.
+- Queda para decidir: los otros formatos de esos sets (16:9, 4:5, 1:1) no declaran la altura de su firma —`firmar.mjs`
+  usa 0,935 por defecto— y el gate los marca «sin firma declarada» hasta que el plan declare `firma: { modo:
+  "externa", … }`. No se tocaron los planes aprobados.
+
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
 | Pilar | Al auditar | Meta | Al cerrar (2026-09-23) | Qué lo sostiene |

@@ -234,7 +234,9 @@ contraste y protección de sujeto, no completitud del concepto ni geometría del
   las tres veces, `cta.x: "columna"`, texto alternativo sin «Botón») con **excepciones auditadas**; y arnés y pruebas
   (referencia hermética, cobertura, avisos comparados, `pnpm foto:componer:cta:mutantes`). **Un plan nuevo que quiera
   pasar el gate declara** `safeArea: "axis"`, `cta.x: "columna"` y `logo: { width: 0.2, y: "auto" }`, más `lead` y
-  `after`.
+  `after`. Si la firma la pone otra herramienta después (`firmar.mjs`), el plan declara `firma: { modo:
+  "externa", razon, y }`: el compositor reserva su caja y el gate le exige el mismo contrato (4,5:1, 20 %, fuera del
+  sujeto y dentro de la zona de AXIS estrechada por `signatureSafeArea`).
 - **Un bloque centrado no se ancla lejos del centro.** Con `align: 'center'` y `|centerX − 0,5| > 0,15`, el
   compositor aborta: si el aire está a un costado, el bloque se alinea a ese costado (`align: 'left'`). Operador
   sobre 03-referencia-916: «se vería mejor alineada a la izquierda por la posición». §14.

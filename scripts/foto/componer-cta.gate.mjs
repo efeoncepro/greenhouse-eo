@@ -308,8 +308,17 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   }
 
   const medidas = Object.entries(a.voces).filter(([, m]) => m)
-  const apca = medidas.filter(([, m]) => m.cumpleApca === false).map(([v, m]) => `${v} Lc ${Math.abs(m.apca)}/${m.umbralApca}`)
-  const dalt = medidas.filter(([, m]) => m.cumpleDaltonismo === false).map(([v, m]) => `${v} (P ${m.daltonismo.protan} · D ${m.daltonismo.deutan} · T ${m.daltonismo.tritan})`)
+  // APCA y daltonismo BLOQUEAN en el CTA —texto, borde o relleno— (decisión del operador, 2026-09-23): la acción tiene que
+  // leerse también con la visión y la pantalla peores. En las demás voces siguen avisando.
+  const DEL_CTA = new Set(['cta', 'cta-borde', 'cta-relleno'])
+
+  const ctaPerceptual = medidas
+    .filter(([v, m]) => DEL_CTA.has(v) && (m.cumpleApca === false || m.cumpleDaltonismo === false))
+    .map(([v, m]) => [m.cumpleApca === false && `${v} APCA Lc ${Math.abs(m.apca)}/${m.umbralApca}`, m.cumpleDaltonismo === false && `${v} con daltonismo P ${m.daltonismo.protan} · D ${m.daltonismo.deutan} · T ${m.daltonismo.tritan} (necesita ${m.umbralWcag}:1)`].filter(Boolean).join(' · '))
+
+  if (!legado && ctaPerceptual.length && bloquea(piezas.find(x => x.id === r.id), 'cta-perceptual', `el CTA no alcanza el piso perceptual — ${ctaPerceptual.join(' · ')}. Prueba \`variant: "auto"\`, otra tinta u otro acento`)) fallos++
+  const apca = medidas.filter(([v, m]) => !DEL_CTA.has(v) && m.cumpleApca === false).map(([v, m]) => `${v} Lc ${Math.abs(m.apca)}/${m.umbralApca}`)
+  const dalt = medidas.filter(([v, m]) => !DEL_CTA.has(v) && m.cumpleDaltonismo === false).map(([v, m]) => `${v} (P ${m.daltonismo.protan} · D ${m.daltonismo.deutan} · T ${m.daltonismo.tritan})`)
   const chicas = medidas.filter(([, m]) => m.cssPx != null && m.cssPx < LEGIBLE_PX).map(([v, m]) => `${v} ${m.cssPx} px`)
 
   if (apca.length) console.warn(`⚠ ${r.id}: bajo APCA Bronze — ${apca.join(' · ')}`)
@@ -339,12 +348,25 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   if (!r.zonaSegura) {
     console.error(`✗ ${r.id}: el QA no trae la zona segura verificada (versión anterior del comando). Recompón.`)
     fallos++
-  } else if (r.fueraDeZona?.length && bloquea(p, 'zona-segura', `fuera de la zona segura ${r.zonaSegura.perfil} de AXIS: ${r.fueraDeZona.join(', ')}. Declara \`safeArea: "axis"\` (o una zona más estrecha) para ubicar el texto dentro, y \`cta.x: "columna"\``)) fallos++
+  } else if (r.fueraDeZona?.length && bloquea(p, 'zona-segura', `fuera de la zona segura ${r.zonaSegura.perfil} de AXIS: ${r.fueraDeZona.join(', ')}. ${r.fueraDeZona.some(id => /^(logo|url|firma-externa)$/.test(id)) ? 'La firma se mide contra la zona de AXIS estrechada por su franja (\`signatureSafeArea\`), no contra la del texto. ' : ''}Declara \`safeArea: "axis"\` (o una zona más estrecha) para ubicar el texto dentro, y \`cta.x: "columna"\``)) fallos++
 
   // Firma: declarada siempre; contraste y tamaño del canon; nunca sobre el sujeto.
-  if (!p.logo && !p.firma) {
+  const externa = !p.logo && (p.firma?.modo === 'externa' || (p.firma == null && typeof p.signatureY === 'number'))
+
+  if (!p.logo && !p.firma && !externa) {
     console.error(`✗ ${r.id}: la pieza no declara firma — \`logo\`, o \`firma: { modo: "externa" | "sin-firma", razon }\` si la firma la pone otra herramienta o no lleva.`)
     fallos++
+  }
+
+  // Firma externa (la pone otra herramienta): contraste medido por el compositor sobre la pieza sin firma, con la
+  // misma regla que esa herramienta; tamaño y sujeto, igual que el logo.
+  if (externa) {
+    const c = r.contraste?.firmaExterna
+    const ancho = r.firma?.anchoLadoCorto
+
+    if (typeof c !== 'number') { console.error(`✗ ${r.id}: la firma externa no tiene medición de contraste (versión anterior del comando). Recompón.`); fallos++ } else if (c < FIRMA_MIN_CONTRASTE && bloquea(p, 'firma-contraste', `donde va la firma externa, la mejor tinta mide ${c}:1 (canon: ≥ ${FIRMA_MIN_CONTRASTE}:1)`)) fallos++
+    if (typeof ancho === 'number' && ancho < FIRMA_ANCHO_LADO_CORTO - 0.005 && bloquea(p, 'firma-tamano', `la firma externa mide ${(ancho * 100).toFixed(1)} % del lado corto (canon: ${FIRMA_ANCHO_LADO_CORTO * 100} %)`)) fallos++
+    if (r.firmaSobreSujeto && bloquea(p, 'firma-sobre-sujeto', `la firma externa cae sobre el sujeto (${r.firmaSobreSujeto} px de su silueta)`)) fallos++
   }
 
   if (p.logo) {

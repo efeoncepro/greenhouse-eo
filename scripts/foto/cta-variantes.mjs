@@ -34,6 +34,9 @@ export function coloresDe(variante, { acento, tintaDeclarada, tintaSobreRelleno 
   return { tinta: acento }
 }
 
+// APCA relativo a su piso (Lc / umbral), para comparar márgenes: desde el 2026-09-23 el gate BLOQUEA el CTA bajo APCA.
+const apcaRelativo = m => (m?.umbralApca ? Math.abs(m.apca) / m.umbralApca : Infinity)
+
 // Franja de 6 px por fuera de la caja: el fondo contra el que se lee un borde o un relleno.
 const franja = (b, g = 6) => [
   { left: b.left - g, right: b.right + g, top: b.top - g, bottom: b.top },
@@ -52,13 +55,14 @@ export function evaluarVariante(variante, { rgb, ancho, alto, caja, cssPx, color
     const bordes = franja(caja).map(b => medir(b, colores.relleno, { umbral: limite, apca: false, daltonismo: true })).filter(Boolean)
     const separacion = Math.min(...bordes.map(m => m.wcag))
     const separacionDalt = Math.min(...bordes.map(peorDaltonismo))
-    const viable = texto.wcag >= umbral && peorDaltonismo(texto) >= umbral && separacion >= limite * MARGEN && separacionDalt >= limite
-    const margen = Math.min(texto.wcag / umbral, peorDaltonismo(texto) / umbral, separacion / limite, separacionDalt / limite)
+    const viable = texto.wcag >= umbral && texto.cumpleApca !== false && peorDaltonismo(texto) >= umbral && separacion >= limite * MARGEN && separacionDalt >= limite
+    const margen = Math.min(texto.wcag / umbral, apcaRelativo(texto), peorDaltonismo(texto) / umbral, separacion / limite, separacionDalt / limite)
 
     // El motivo nombra la condición que falló: antes decía siempre «se funde con la escena», también cuando lo que
     // caía era la tinta sobre el relleno (medido 2026-09-23: naranja con protanopía, 5,76:1 de separación y el texto
     // del botón bajo 4,5:1).
     const falla = texto.wcag < umbral ? `la tinta sobre el relleno mide ${texto.wcag}:1 (< ${umbral}:1)`
+      : texto.cumpleApca === false ? `la tinta sobre el relleno no alcanza APCA (Lc ${Math.abs(texto.apca)} < ${texto.umbralApca})`
       : peorDaltonismo(texto) < umbral ? `con daltonismo la tinta sobre el relleno cae a ${+peorDaltonismo(texto).toFixed(2)}:1 (< ${umbral}:1)`
         : separacion < limite * MARGEN ? `el relleno se funde con la escena (${separacion}:1 < ${+(limite * MARGEN).toFixed(2)}:1)`
           : `con daltonismo el relleno se funde con la escena (${+separacionDalt.toFixed(2)}:1 < ${limite}:1)`
@@ -70,17 +74,17 @@ export function evaluarVariante(variante, { rgb, ancho, alto, caja, cssPx, color
   const textoDalt = peorDaltonismo(texto)
 
   if (variante === 'text') {
-    const viable = texto.wcag >= umbral * MARGEN && texto.pctBajoUmbral === 0 && textoDalt >= umbral
-    const margen = Math.min(texto.wcag / umbral, textoDalt / umbral)
+    const viable = texto.wcag >= umbral * MARGEN && texto.pctBajoUmbral === 0 && textoDalt >= umbral && texto.cumpleApca !== false
+    const margen = Math.min(texto.wcag / umbral, textoDalt / umbral, apcaRelativo(texto))
 
-    return { variante, viable, margen: +margen.toFixed(3), texto: texto.wcag, daltonismo: textoDalt, motivo: viable ? `el fondo permite distinguirla: tinta ${texto.wcag}:1 (${textoDalt}:1 con daltonismo) y ningún píxel bajo ${umbral}:1` : textoDalt < umbral && texto.wcag >= umbral * MARGEN ? `con daltonismo la tinta cae a ${textoDalt}:1 (< ${umbral}:1)` : `el fondo no la sostiene sola (${texto.wcag}:1, ${texto.pctBajoUmbral} % del área bajo ${umbral}:1)` }
+    return { variante, viable, margen: +margen.toFixed(3), texto: texto.wcag, daltonismo: textoDalt, motivo: viable ? `el fondo permite distinguirla: tinta ${texto.wcag}:1 (${textoDalt}:1 con daltonismo) y ningún píxel bajo ${umbral}:1` : textoDalt < umbral && texto.wcag >= umbral * MARGEN ? `con daltonismo la tinta cae a ${textoDalt}:1 (< ${umbral}:1)` : texto.cumpleApca === false && texto.wcag >= umbral * MARGEN && texto.pctBajoUmbral === 0 ? `la tinta no alcanza APCA (Lc ${Math.abs(texto.apca)} < ${texto.umbralApca})` : `el fondo no la sostiene sola (${texto.wcag}:1, ${texto.pctBajoUmbral} % del área bajo ${umbral}:1)` }
   }
 
   const bordes = franja(caja).map(b => medir(b, colores.borde, { umbral: limite, apca: false, daltonismo: true })).filter(Boolean)
   const borde = Math.min(...bordes.map(m => m.wcag))
   const bordeDalt = Math.min(...bordes.map(peorDaltonismo))
-  const viable = texto.wcag >= umbral * MARGEN && texto.pctBajoUmbral === 0 && textoDalt >= umbral && borde >= limite * MARGEN && bordeDalt >= limite
-  const margen = Math.min(texto.wcag / umbral, textoDalt / umbral, borde / limite, bordeDalt / limite)
+  const viable = texto.wcag >= umbral * MARGEN && texto.pctBajoUmbral === 0 && textoDalt >= umbral && texto.cumpleApca !== false && borde >= limite * MARGEN && bordeDalt >= limite
+  const margen = Math.min(texto.wcag / umbral, textoDalt / umbral, apcaRelativo(texto), borde / limite, bordeDalt / limite)
 
   return { variante, viable, margen: +margen.toFixed(3), texto: texto.wcag, borde, daltonismo: Math.min(textoDalt, bordeDalt), motivo: viable ? `tinta ${texto.wcag}:1 y borde ${borde}:1 contra la escena (con daltonismo ≥ ${+Math.min(textoDalt, bordeDalt).toFixed(2)}:1)` : `no delimita con seguridad (tinta ${texto.wcag}:1, borde ${borde}:1, daltonismo ${+Math.min(textoDalt, bordeDalt).toFixed(2)}:1)` }
 }

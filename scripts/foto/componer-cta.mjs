@@ -783,6 +783,16 @@ function zonaEfectiva(s, W, H) {
   return d ? { perfil: axis.perfil, x0: Math.max(axis.x0, d.x0), y0: Math.max(axis.y0, d.y0), x1: Math.min(axis.x1, d.x1), y1: Math.min(axis.y1, d.y1) } : axis
 }
 
+// La zona de la FIRMA no es la del texto: los planes declaran `safeArea` para texto, botón y selección, y
+// `signatureSafeArea` para la franja de la firma (v05–v07: texto hasta 0,65 del alto, firma entre 0,85 y 0,97). La firma se
+// mide contra la zona de AXIS, estrechada por `signatureSafeArea` si el plan la declara. Antes se medía contra la del texto.
+function zonaFirma(s, W, H) {
+  const axis = zonaAxis(W, H)
+  const d = s.signatureSafeArea && typeof s.signatureSafeArea.x0 === 'number' ? s.signatureSafeArea : null
+
+  return d ? { perfil: axis.perfil, x0: Math.max(axis.x0, d.x0), y0: Math.max(axis.y0, d.y0), x1: Math.min(axis.x1, d.x1), y1: Math.min(axis.y1, d.y1), declarada: true } : { ...axis, declarada: false }
+}
+
 const exceptuada = (s, regla) => (s.excepciones ?? []).some(e => e.regla === regla)
 
 // Caja del logo con la fórmula del dibujo: ancho fracción del lado corto (o px), centro en `logo.x`, borde superior en
@@ -796,6 +806,42 @@ function cajaLogo(s) {
   const ly = typeof s.logo.y === 'number' ? Math.round(s.logo.y * H) : Math.round(H - M * 0.85 - lh)
 
   return { left: lx, top: ly, right: lx + lw, bottom: ly + lh }
+}
+
+// Firma que pone OTRA herramienta después del compositor (en los sets v03–v07, `firmar.mjs` → firma-placement.mjs).
+// El compositor no la dibuja, pero sabe dónde va a caer —misma geometría que esa herramienta: ancho 20 % del lado corto,
+// centrada en horizontal, centro vertical en `signatureY` (0,935 por defecto)— y la reserva: nada puede caer ahí, el
+// crecimiento la respeta y el gate la mide. Se declara con `firma: { modo: "externa", razon, y?, ancho? }`, o con
+// `signatureY` en los planes que ya lo usan.
+const firmaExternaDeclarada = s => !s.logo && (s.firma?.modo === 'externa' || (s.firma == null && typeof s.signatureY === 'number'))
+
+function cajaFirmaExterna(s) {
+  const ancho = Math.round(Math.min(W, H) * (s.firma?.ancho ?? 0.2))
+  const alto = Math.round(ancho * ASPECTO_LOGO)
+  const left = Math.round((W - ancho) / 2)
+  const top = Math.round((s.firma?.y ?? s.signatureY ?? 0.935) * H - alto / 2)
+
+  return { left, top, right: left + ancho, bottom: top + alto }
+}
+
+// El contraste de la firma externa, medido como lo mide esa herramienta (peor píxel de la caja, la mejor de las dos
+// tintas oficiales): así el gate puede exigir el mismo 4,5:1 antes de que la firma exista.
+async function contrasteFirmaExterna(buf, caja) {
+  const { data } = await sharp(buf).extract({ left: Math.max(0, caja.left), top: Math.max(0, caja.top), width: Math.max(1, Math.min(W, caja.right) - Math.max(0, caja.left)), height: Math.max(1, Math.min(H, caja.bottom) - Math.max(0, caja.top)) }).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+  let min = Infinity
+  let max = -Infinity
+
+  for (let i = 0; i < data.length; i += 3) {
+    const l = lum(data[i], data[i + 1], data[i + 2])
+
+    if (l < min) min = l
+    if (l > max) max = l
+  }
+
+  const blanca = 1.05 / (max + 0.05)
+  const navy = (min + 0.05) / (lum(2, 60, 112) + 0.05)
+
+  return { contraste: +Math.max(blanca, navy).toFixed(2), variante: blanca >= navy ? 'negative' : 'color' }
 }
 
 let aspectoUrl = null
@@ -932,7 +978,9 @@ async function composePiece(s, opts = {}) {
   const zonaDeclarada = s.safeArea === 'axis' ? zonaAxis(W, H) : s.safeArea
   const MX = Math.max(M, (zonaDeclarada?.x0 ?? 0) * W)
   const x = s.align === 'center' ? AXIS_X : MX
-  let y = (s.top ?? 0.05) * H
+  // Con `safeArea: "axis"` el texto también arranca dentro de la zona por arriba: si el `top` del plan queda sobre el borde
+  // superior de la zona, baja hasta él. Sólo con "axis": las piezas aprobadas con otra zona no se mueven.
+  let y = (s.safeArea === 'axis' ? Math.max(s.top ?? 0.05, zonaDeclarada.y0) : (s.top ?? 0.05)) * H
 
   // 1 · etiqueta
   if (s.label) {
@@ -1266,6 +1314,7 @@ return k.ink.right - k.ink.left }))
 
   const firmaPrevista = [
     ...(s.logo && s.logo.y !== 'auto' ? [{ id: 'logo', box: cajaLogo(s) }] : []),
+    ...(firmaExternaDeclarada(s) ? [{ id: 'firma-externa', box: cajaFirmaExterna(s) }] : []),
     ...(s.url ? [{ id: 'url', box: await cajaUrl(s) }] : [])
   ]
 
@@ -1416,8 +1465,22 @@ return k.ink.right - k.ink.left }))
     checks.push({ id: 'url', box: { left, right: left + uw, top: topU, bottom: topU + uh }, skipContrast: true })
   }
 
+  const contraste = {}
+
   // Con la firma y la url REALES (su tamaño sale del SVG rasterizado), las invariantes se verifican otra vez.
-  const firmaReal = checks.filter(c => c.id === 'logo' || c.id === 'url').map(c => ({ id: c.id, box: c.box }))
+  const firmaReal = [...checks.filter(c => c.id === 'logo' || c.id === 'url').map(c => ({ id: c.id, box: c.box })), ...(firmaExternaDeclarada(s) ? [{ id: 'firma-externa', box: cajaFirmaExterna(s) }] : [])]
+
+  // Firma externa: el mismo contrato que el logo (contraste, tamaño, sujeto), medido sobre la pieza sin firma.
+  if (firmaExternaDeclarada(s)) {
+    const caja = cajaFirmaExterna(s)
+    const medida = await contrasteFirmaExterna(master, caja)
+    const sobre = opts.mask ? guardHits(opts.mask, [{ id: 'firma', box: caja }], W, H, 0) : []
+
+    contraste.firmaExterna = medida.contraste
+    firmaQa = { externa: true, anchoLadoCorto: +((caja.right - caja.left) / Math.min(W, H)).toFixed(3), y: +(((caja.top + caja.bottom) / 2) / H).toFixed(4), variante: medida.variante }
+    if (sobre.length) firmaSobreSujeto = sobre[0].px
+  }
+
   const elementosFinales = elementosMaquetacion(firmaReal)
   const maquetacionFinal = invariantesMaquetacion({ ancho: W, alto: H, elementos: elementosFinales })
   const reservaFinal = fueraDeReserva({ elementos: elementosFinales, reserva: s.editorialReserve })
@@ -1427,7 +1490,11 @@ return k.ink.right - k.ink.left }))
   // Zona segura VERIFICADA (tramo 4): la de AXIS como piso, con texto, botón, selección y firma. Aviso aquí; el gate
   // la bloquea (salvo excepción auditada).
   const ZE = zonaEfectiva(s, W, H)
-  const fueraDeZonaFinal = [...new Set([...elementosFinales.filter(e => e.tipo !== 'acento'), ...visibles.filter(v => v.id !== 'cta-seleccion' || ctaMarcoPintado)].filter(e => e.box && (e.box.left < ZE.x0 * W - 0.5 || e.box.right > ZE.x1 * W + 0.5 || e.box.top < ZE.y0 * H - 0.5 || e.box.bottom > ZE.y1 * H + 0.5)).map(e => e.id))]
+  const ZF = zonaFirma(s, W, H)
+  const fueraDe = (b, z) => b.left < z.x0 * W - 0.5 || b.right > z.x1 * W + 0.5 || b.top < z.y0 * H - 0.5 || b.bottom > z.y1 * H + 0.5
+
+  // Un solo recorrido, en el orden de la maquetación: cada elemento contra SU zona (la firma, contra la de la firma).
+  const fueraDeZonaFinal = [...new Set([...elementosFinales.filter(e => e.tipo !== 'acento'), ...visibles.filter(v => v.id !== 'cta-seleccion' || ctaMarcoPintado)].filter(e => e.box && fueraDe(e.box, e.tipo === 'firma' ? ZF : ZE)).map(e => e.id))]
 
   if (fueraDeZonaFinal.length) console.warn(`  ⚠ ${s.id}: fuera de la zona segura ${ZE.perfil} de AXIS: ${fueraDeZonaFinal.join(', ')}`)
   // El layout se escribe con la firma incluida y con los elementos que el gate vuelve a verificar.
@@ -1439,8 +1506,6 @@ return k.ink.right - k.ink.left }))
   const pngFinal = await out.png().toBuffer()
 
   salidas.push([`${s.id}.png`, pngFinal], [`preview-390/${s.id}.png`, await sharp(master).resize({ width: 390 }).png().toBuffer()])
-
-  const contraste = {}
 
   for (const c of checks) {
     if (c.box.left < 0 || c.box.right > W || c.box.top < 0 || c.box.bottom > H) throw new Error(`${s.id}: ${c.id} fuera del lienzo`)
@@ -1535,7 +1600,7 @@ return k.ink.right - k.ink.left }))
   }
 
   const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson) }
-  const registro = { id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
+  const registro = { id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
 
   for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
   qa.push(registro)

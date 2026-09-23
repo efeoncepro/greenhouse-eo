@@ -59,6 +59,10 @@ export const CATALOGO = [
   { nombre: 'gate-t4-sin-excepciones', objetivo: 'gate', cambios: [['  const e = exceptuada(p, regla)\n', '  const e = null\n']], pruebas: 'P10', espera: /acepta la excepción auditada y la imprime ✗/ },
   { nombre: 'gate-t4-sin-zona', objetivo: 'gate', cambios: [['  } else if (r.fueraDeZona?.length && bloquea(', '  } else if (false && bloquea(']], pruebas: 'P10', espera: /rechaza texto fuera de la zona de AXIS ✗/ },
   { nombre: 't4-alt-anuncia-boton', objetivo: 'modulo', modulo: 'accesibilidad.mjs', prueba: 'accesibilidad.test.mjs', cambios: [['`Llamado a la acción: «${accion[0]}»`', '`Botón: «${accion[0]}»`']], espera: /Texto alternativo/ },
+  // ── Firma externa (seguimiento del 2026-09-23: la firma la pone otra herramienta después del compositor)
+  { nombre: 'fx-compositor-ignora-firma-externa', objetivo: 'compositor', cambios: [["    ...(firmaExternaDeclarada(s) ? [{ id: 'firma-externa', box: cajaFirmaExterna(s) }] : []),\n", ''], ["...(firmaExternaDeclarada(s) ? [{ id: 'firma-externa', box: cajaFirmaExterna(s) }] : [])]", ']']], pruebas: 'P06', espera: /firma externa sobre el texto rechazada: false/ },
+  { nombre: 'gate-sin-contrato-firma-externa', objetivo: 'gate', cambios: [['  if (externa) {', '  if (false) {']], pruebas: 'P10', espera: /mide el contrato de la firma externa ✗/ },
+  { nombre: 'gate-no-reconoce-firma-externa', objetivo: 'gate', cambios: [["  const externa = !p.logo && (p.firma?.modo === 'externa' || (p.firma == null && typeof p.signatureY === 'number'))", '  const externa = false']], pruebas: 'P10', espera: /acepta signatureY como firma externa ✗|mide el contrato de la firma externa ✗/ },
   // ── Tramo 5 · Arnés y pruebas
   { nombre: 't5-crecer-ignora-zona', objetivo: 'compositor', cambios: [['if (opts.dry && (violaDeclarada || hits.length || fuera || fueraDeZona.length || ', 'if (opts.dry && (violaDeclarada || hits.length || fuera || ']], pruebas: 'P06', espera: /crecimiento frenado por la zona declarada: false/ },
   { nombre: 'reg-vacio-verde', objetivo: 'regresion', cambios: [['if (!casos.size) {', 'if (false) {']], pruebas: 'P02', rapido: true, espera: /vacío falla ✗/ },

@@ -20,6 +20,7 @@ export const ID_VALIDO = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
 // entera en silencio: la excepción queda en el QA y el gate la muestra.
 export const REGLAS_EXCEPTUABLES = [
   'zona-segura',
+  'cta-perceptual',
   'firma-contraste',
   'firma-tamano',
   'firma-sobre-sujeto',
@@ -211,7 +212,10 @@ export const esquemaPieza = z
     textGrowth: z.boolean().optional(),
     placement: z.object({ anchoCssPx: positivo, razon }).strict().optional(),
     conceptoReducido: z.object({ razon }).strict().optional(),
-    firma: z.object({ modo: z.enum(['sin-firma', 'externa']), razon }).strict().optional(),
+    // `firma`: la pone otra herramienta (`externa`, p. ej. firmar.mjs) o la pieza no lleva (`sin-firma`). En la externa,
+    // `y` es el CENTRO vertical (fracción del alto, como `signatureY`) y `ancho` la fracción del lado corto (20 % por
+    // defecto): el compositor reserva esa caja para que nada caiga donde después va la firma.
+    firma: z.object({ modo: z.enum(['sin-firma', 'externa']), razon, y: fraccion.optional(), ancho: z.number().finite().positive().max(1).optional() }).strict().optional(),
     excepciones: z.array(excepcion).optional(),
     scrimTop: z.object({ opacity: fraccion, to: fraccion, color: hex.optional() }).strict().optional(),
     scrimBottom: z.object({ opacity: fraccion, from: fraccion }).strict().optional(),

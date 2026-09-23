@@ -93,6 +93,15 @@ test('La tinta del CTA de TEXTO nunca se degrada: sin acento no hay CTA', () => 
   assert.ok(r.evaluadas.filter(e => e.variante === 'text').every(e => !e.degradada))
 })
 
+test('APCA también decide: una tinta que pasa WCAG con margen pero no APCA no es viable', () => {
+  // Tinta gris muy oscura sobre un gris medio a 12 CSS px: WCAG ~5,5:1 (pasa con el margen de 1,1) y APCA Lc ~47 (< 60).
+  const grisMedio = escena(() => [160, 160, 160])
+  const e = evaluarVariante('text', { rgb: grisMedio, ancho, alto, caja, cssPx: 12, colores: { tinta: '#2a2a2a' } })
+
+  assert.equal(e.viable, false, e.motivo)
+  assert.match(e.motivo, /APCA/)
+})
+
 test('Sin margen en ninguna: queda la que MÁS separa, no siempre el relleno', () => {
   // Rayas blanco/negro finas: nada alcanza con margen. La elección es la de mayor margen medido, sea cual sea.
   const r = elegirVariante({ prominencia: 'discreta', rgb: rayada, ancho, alto, caja, cssPx: 12, tokens: { ...tokens, tintaSegura: C.inkOnDark } })
