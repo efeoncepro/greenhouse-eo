@@ -201,9 +201,17 @@ contraste y protección de sujeto, no completitud del concepto ni geometría del
 - **Escala tipográfica en horizontal.** En 16:9 el texto se veía perdido, pero la causa **no** es el tamaño de
   fuente respecto de su columna: medido, 4:5 da **968 px** de columna y 16:9 da **901 px** — casi la misma
   columna en un lienzo del doble de ancho. 🔴 **Escalar por ancho de LIENZO es un error**: aplana la jerarquía
-  (el ratio cayó a 2,3). El compositor escala el bloque hasta que el dominante **llene** su `dominantMax`, y
-  sólo en lienzos horizontales (`W > H`): 4:5 y 9:16 quedan idénticos. Su tope por espacio es una **heurística
-  declarada, no una medición**; el verificador real sigue siendo la guarda que aborta. Ver §13 del mismo canon.
+  (el ratio cayó a 2,3). El compositor escala el bloque hasta que el dominante **llene** su `dominantMax`, en
+  16:9 y 9:16; 4:5 y 1:1 no crecen. El crecimiento se detiene cuando lo MIDE: ninguna caja a menos de 3,5 % del
+  sujeto **segmentado** y ninguna voz perdiendo contraste. Ver §13–§14 del mismo canon.
+- **El texto nunca tapa a nadie, y no se declara a mano.** `pnpm foto:componer:cta` segmenta el plate (modelo
+  local) y aborta si una caja toca al sujeto (1,2 % del lado corto), en 2D. `qa.json` registra
+  `guardaSujeto: segmentacion`, y el gate lo acepta como protección. Sin máscara, el texto no crece. Caso
+  fuente: las piezas de v07 crecieron ×1,6 sobre las personas cuando el tope dependía de un
+  `subjectProtection` que no estaba declarado. §14.
+- **Un bloque centrado no se ancla lejos del centro.** Con `align: 'center'` y `|centerX − 0,5| > 0,15`, el
+  compositor aborta: si el aire está a un costado, el bloque se alinea a ese costado (`align: 'left'`). Operador
+  sobre 03-referencia-916: «se vería mejor alineada a la izquierda por la posición». §14.
 
 ## Jerarquía por voces: receta probada en carrusel (2026-09-19)
 

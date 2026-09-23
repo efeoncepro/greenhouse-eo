@@ -17,8 +17,11 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { createRequire } from 'node:module'
+import { createHash } from 'node:crypto'
+import { fileURLToPath } from 'node:url'
 
 import sharp from 'sharp'
+import { removeBackground } from '@imgly/background-removal-node'
 import { axisAdvertising } from '@efeoncepro/axis-tokens'
 import { resolveCollaborationSelectionIntent } from '@efeoncepro/axis-ui-contracts'
 
@@ -416,64 +419,136 @@ const qa = []
 
 fs.mkdirSync(`${PLAN_DIR}/out/preview-390`, { recursive: true })
 
-for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
+// ════════════════════════════════════════════════════════════════════════════════════════════════
+// 🔴 GUARDA DE SUJETO EN 2D [operador, 2026-09-22]
+// El texto NUNCA tapa al sujeto — personas, criaturas, manos, objetos del oficio —, crezca o no.
+//
+// Por qué no alcanzaba lo que había: `subjectProtection` es un número DECLARADO a mano y sólo
+// VERTICAL (compara el fondo del descriptor con un `top`). Si una pieza no lo trae —las 16 de
+// aeo-final-safe-v07 no lo traen— no protege nada; si el sujeto está AL COSTADO del texto, tampoco.
+// Y medir ese `top` por brillo o por borde falla justo en el caso peligroso: pelo oscuro sobre la
+// banda oscura del canon (KV-02: brillo 735, borde 498, cabeza real en 465).
+//
+// La máscara sale de SEGMENTACIÓN semántica local (@imgly, el mismo motor de `pnpm ai:image:rmbg`):
+// reconoce al sujeto por lo que ES, no por su luminancia. En KV-02 da 451 — del lado seguro — y marca
+// a la persona con todo su pelo aunque se funda con el fondo. Se calcula una vez por plate y se
+// cachea por SHA-256 del plate, así que regenerar el plate la invalida sola.
+// ════════════════════════════════════════════════════════════════════════════════════════════════
+const MASK_CACHE = fileURLToPath(new URL('../../node_modules/.cache/foto-sujeto', import.meta.url))
+const GUARD_IDS = new Set(['etiqueta', 'entrada', 'dominante', 'cierre-frase', 'cierre-inferior', 'nota', 'cta', 'descriptor'])
+
+async function subjectMask(platePath) {
+  const bytes = fs.readFileSync(platePath)
+  const sha = createHash('sha256').update(bytes).digest('hex')
+  const cached = path.join(MASK_CACHE, `${sha}.png`)
+  let alphaPng
+
+  if (fs.existsSync(cached)) alphaPng = fs.readFileSync(cached)
+  else {
+    try {
+      const mime = /\.jpe?g$/i.test(platePath) ? 'image/jpeg' : (/\.webp$/i.test(platePath) ? 'image/webp' : 'image/png')
+      const blob = await removeBackground(new Blob([new Uint8Array(bytes)], { type: mime }), { model: 'medium', output: { format: 'image/png', quality: 1 } })
+
+      alphaPng = await sharp(Buffer.from(await blob.arrayBuffer())).ensureAlpha().extractChannel(3).png().toBuffer()
+      fs.mkdirSync(MASK_CACHE, { recursive: true })
+      fs.writeFileSync(cached, alphaPng)
+    } catch (e) {
+      // Sin máscara no se inventa protección: la pieza se compone sin agrandar y sin guarda 2D, y se avisa.
+      console.warn(`  ⚠ no se pudo segmentar ${path.basename(platePath)}: ${e.message}`)
+
+      return null
+    }
+  }
+
+  // extractChannel(0) OBLIGATORIO: un PNG de un canal puede volver con 3 o 4 canales al leerlo, y entonces
+  // `data[y * W + x]` indexa píxeles equivocados — medido: marcaba 19.794 px de sujeto bajo un texto que estaba
+  // a 250 px de la persona. Se verifica el número de canales para que el error no vuelva en silencio.
+  const { data, info } = await sharp(alphaPng).extractChannel(0).raw().toBuffer({ resolveWithObject: true })
+
+  if (info.channels !== 1) throw new Error(`máscara de sujeto con ${info.channels} canales; se esperaba 1`)
+
+  return { data, W: info.width, H: info.height }
+}
+
+// Dos reglas con dos distancias (fracción del lado corto, medida como distancia REAL al borde de la caja,
+// no como rectángulo inflado — el rectángulo castiga las esquinas un 41 % de más):
+//   · NO TAPAR (error duro, cualquier tamaño): 1,2 %. Un texto que toca al sujeto no sale nunca.
+//   · CRECER (sólo la búsqueda del tamaño): 3,5 %. Calibrado contra 30 piezas aprobadas (v07 de Codex y
+//     CMP-001): la más justa deja 4,08 %. Con 1,2 % el descriptor de 04-elegida-916 crecía hasta rozar la
+//     cabeza de Clawd — no tapar no basta, tiene que respirar. Si a tamaño original ya está más cerca que
+//     esto, la pieza no crece: la composición aprobada se respeta y no se empeora.
+// Tolerancia de ruido: 8 px de máscara (un grumo de ~3×3). Con 24 px una caja chica tragaba un contacto real
+// (22 px de la cabeza de Clawd dentro del aire de «SEO + AEO»).
+const CLEAR_TOUCH = 0.012
+const CLEAR_GROW = 0.035
+const MASK_NOISE_PX = 8
+
+function guardHits(mask, boxes, canvasW, canvasH, clearFrac = CLEAR_TOUCH) {
+  const sx = mask.W / canvasW, sy = mask.H / canvasH
+  const clear = Math.min(canvasW, canvasH) * clearFrac
+  const hits = []
+
+  for (const { id, box } of boxes) {
+    if (!box) continue
+    const x0 = Math.max(0, Math.floor((box.left - clear) * sx)), x1 = Math.min(mask.W, Math.ceil((box.right + clear) * sx))
+    const y0 = Math.max(0, Math.floor((box.top - clear) * sy)), y1 = Math.min(mask.H, Math.ceil((box.bottom + clear) * sy))
+    let px = 0
+
+    for (let y = y0; y < y1; y++) {
+      const Y = (y + 0.5) / sy
+      const dy = Math.max(box.top - Y, 0, Y - box.bottom)
+
+      for (let x = x0; x < x1; x++) {
+        if (mask.data[y * mask.W + x] <= 127) continue
+        const X = (x + 0.5) / sx
+
+        if (Math.hypot(Math.max(box.left - X, 0, X - box.right), dy) <= clear) px++
+      }
+    }
+
+    if (px > MASK_NOISE_PX) hits.push({ id, px })
+  }
+
+  return hits
+}
+
+// Cuánto podría crecer el bloque para que el dominante llene su `dominantMax` (ver §13 del contrato).
+function fillFactor(s, canvasW) {
+  if (!s.dominant || !s.dominantMax || typeof s.dominantSize !== 'number') return 1
+  const f0 = fontFor(R.ideaImpact, DOMINANT_WIDTH)
+
+  const widest = Math.max(...s.dominant.replace(/\*\*|\[\[|\]\]/g, '').split('|').map(t => {
+    const k = shape(t.trim(), f0, s.dominantSize, s.dominantTracking ?? em(R.ideaImpact.tracking))
+
+    return k.ink.right - k.ink.left
+  }))
+
+  return widest > 0 ? (s.dominantMax * canvasW) / widest : 1
+}
+
+// Aplica un factor a todo lo tipográfico en px; los gaps que ya son fracción del dominante escalan solos.
+function scaleSpec(s0, f) {
+  const s = structuredClone(s0)
+
+  if (f === 1) return s
+  const px = v => (typeof v === 'number' ? Math.round(v * f) : v)
+
+  for (const k of ['leadSize', 'dominantSize', 'afterSize', 'labelSize']) s[k] = px(s[k])
+  if (s.note) for (const k of ['size', 'gapAfterClosure']) s.note[k] = px(s.note[k])
+  if (s.cta) for (const k of ['fontSize', 'descriptorSize', 'paddingX', 'paddingY', 'radius', 'descriptorGap', 'gapAfterNote']) s.cta[k] = px(s.cta[k])
+
+  return s
+}
+
+async function composePiece(s, opts = {}) {
+  const guard = []
   const plate = path.resolve(PLAN_DIR, s.plate)
   const meta = await sharp(plate).metadata()
 
   W = meta.width; H = meta.height; M = Math.round(W * 0.07)
 
-  // 🔴 ESCALA TIPOGRÁFICA EN FORMATO HORIZONTAL [operador, 2026-09-22]
-  // En 16:9 la composición de texto se veía perdida en el cuadro. La causa NO es el tamaño de fuente
-  // respecto a su columna, sino que la columna es angosta frente a un lienzo muy ancho:
-  //     4:5   1152 × textWidth 0.84 = 968 px de columna
-  //     16:9  2048 × textWidth 0.44 = 901 px de columna   ← casi la misma, en un lienzo el doble de ancho
-  // Por eso escalar por ancho de LIENZO es un error: multiplica los px por 1,78 contra una columna que
-  // no creció, el dominante topa en `dominantMax`, la entrada sí crece y la jerarquía se aplana
-  // (medido: el ratio dominante/entrada cayó a 2,3 — bajo el mínimo de 3).
-  // Lo que sí sobra es espacio DENTRO de la columna: el dominante llegaba a 0,32 del ancho con su
-  // límite en 0,44. Así que el bloque se escala hasta que el dominante LLENE su `dominantMax`, y como
-  // el factor se aplica a todas las voces por igual, el ratio de jerarquía se conserva intacto.
-  // Sólo aplica a lienzos HORIZONTALES (W > H): 4:5 y 9:16 quedan idénticos, byte por byte.
-  const TYPE_FILL_CAP = 1.6   // tope duro: por encima de esto el bloque deja de ser un titular y es una pancarta
-
-  if ((W > H || H / W > 1.5) && s.dominant && s.dominantMax && typeof s.dominantSize === 'number') {
-    const domFont0 = fontFor(R.ideaImpact, DOMINANT_WIDTH)
-
-    const widest0 = Math.max(...s.dominant.replace(/\*\*|\[\[|\]\]/g, '').split('|').map(t => {
-      const k = shape(t.trim(), domFont0, s.dominantSize, s.dominantTracking ?? em(R.ideaImpact.tracking))
-
-      return k.ink.right - k.ink.left
-    }))
-
-    const fill = widest0 > 0 ? (s.dominantMax * W) / widest0 : 1
-
-    // 🔴 El bloque crece en ALTO junto con el texto, y abajo lo espera `subjectProtection`. El tope por
-    // espacio evita que la escala empuje el descriptor sobre el sujeto: se estima el alto del bloque
-    // sumando las voces por un factor de leading+gaps, y se limita el crecimiento a lo que quepa.
-    // Es una HEURÍSTICA declarada, no una medición: la guarda del compositor sigue siendo el verificador
-    // real y aborta si la estimación se queda corta — preferimos abortar que publicar texto sobre la cara.
-    let capAlto = Infinity
-
-    if (s.subjectProtection) {
-      const libre = (s.subjectProtection.top - (s.subjectProtection.minClearance ?? 24)) - (s.top ?? 0.05) * H
-
-      const voces = [s.leadSize, s.dominantSize * 1.2, s.afterSize, s.note?.size, s.cta?.fontSize, s.cta?.descriptorSize]
-        .reduce((a, v) => a + (typeof v === 'number' ? v : 0), 0)
-
-      const altoEstimado = voces * 2.0
-
-      if (altoEstimado > 0 && libre > 0) capAlto = libre / altoEstimado
-    }
-
-    if (fill > 1.01 && capAlto > 1.01) {
-      const f = Math.min(fill, TYPE_FILL_CAP, capAlto)
-      const px = v => (typeof v === 'number' ? Math.round(v * f) : v)
-
-      for (const k of ['leadSize', 'dominantSize', 'afterSize', 'labelSize']) s[k] = px(s[k])
-      if (s.note) for (const k of ['size', 'gapAfterClosure']) s.note[k] = px(s.note[k])
-      if (s.cta) for (const k of ['fontSize', 'descriptorSize', 'paddingX', 'paddingY', 'radius', 'descriptorGap', 'gapAfterNote']) s.cta[k] = px(s.cta[k])
-    }
-  }
+  // La escala tipográfica ya NO se decide aquí con una heurística de alto: la decide el driver del final
+  // probando factores y midiendo colisiones reales contra la máscara del sujeto (ver GUARDA DE SUJETO).
 
   let defs = ''
   let under = ''
@@ -510,7 +585,23 @@ for (const s of SLIDES.filter(x => !only.length || only.includes(x.id))) {
   // logo y a la firma web.
   const muda = !s.dominant && !s.label && !s.lead
 
-  const x = s.align === 'center' ? W / 2 : M
+  // `centerX` (fracción del ancho) mueve el eje de un bloque centrado fuera del centro del lienzo: en 9:16
+  // el aire libre casi nunca está al medio. Lo usan piezas aprobadas (v07 de Codex, 0,29–0,60); ignorarlo en
+  // silencio ponía el CTA sobre una proyección clara (contraste 1,47 contra 15,14 del original).
+  const AXIS_X = W * (s.centerX ?? 0.5)
+
+  // Un bloque CENTRADO sobre un eje corrido se lee como un error: queda pegado a un borde, con aire desigual a
+  // cada lado, y el ojo no encuentra el eje (03-referencia-916 de v07: eje 0,29, operador 2026-09-22 — «ahí se
+  // vería mejor alineada a la izquierda por la posición»). Si el aire libre está a un costado, el bloque se
+  // alinea a ESE costado, no se centra ahí.
+  if (s.align === 'center' && Math.abs((s.centerX ?? 0.5) - 0.5) > 0.15) {
+    throw new Error(
+      `${s.id}: bloque centrado sobre un eje corrido (centerX ${s.centerX}). Un bloque centrado se ancla al centro ` +
+        "del lienzo (±0,15); si el aire libre está a un costado, usa `align: 'left'` (y `cta.align: 'left'`) sin `centerX`."
+    )
+  }
+
+  const x = s.align === 'center' ? AXIS_X : M
   let y = (s.top ?? 0.05) * H
 
   // 1 · etiqueta
@@ -611,6 +702,7 @@ return k.ink.right - k.ink.left }))
     selection = labelToPaths(rendered.overlay)
     if (/<text/.test(selection)) throw new Error(`${s.id}: quedó <text>`)
     selEvidence = { selection: rendered.evidence.selection, cursores: rendered.evidence.cursorEvidence.map(c => ({ id: c.id, labelBounds: c.labelBounds })) }
+    if (!onObject) for (const c of rendered.evidence.cursorEvidence) { guard.push({ id: `cursor-${c.id}`, box: c.bounds }, { id: `etiqueta-${c.id}`, box: c.labelBounds }) }
   }
 
   body += dom.svg
@@ -666,7 +758,7 @@ return k.ink.right - k.ink.left }))
   if (s.card) {
     if (!s.card.allowGtaCard) throw new Error(`${s.id}: la tarjeta de vidrio con línea naranja fue puntual del post de GTA VI; usa "note" (texto limpio) o declara card.allowGtaCard`)
     const cw = W * (s.card.width ?? 0.74)
-    const cx = s.card.align === 'right' ? W - M - cw : s.align === 'center' ? (W - cw) / 2 : M
+    const cx = s.card.align === 'right' ? W - M - cw : s.align === 'center' ? AXIS_X - cw / 2 : M
 
     cardEl = card({ header: s.card.header, body: s.card.body, x: cx, bottom: s.card.bottom * H, width: cw })
   }
@@ -686,7 +778,7 @@ return k.ink.right - k.ink.left }))
     const ink=C[c.inkToken] ?? (c.variant==='solid' ? C.inkOnLight : C.growthOnDark);
     const hexLum=h=>lum(...h.match(/[a-f\d]{2}/gi).map(x=>parseInt(x,16)));
 
-    if(c.align==='center')cx=(W-shape(c.text,pop[700],c.fontSize).advance-padX*2)/2;
+    if(c.align==='center')cx=AXIS_X-(shape(c.text,pop[700],c.fontSize).advance+padX*2)/2;
     const t=block({text:c.text,font:pop[700],size:c.fontSize,tracking:0,leading:1.2,x:cx+padX,topY:cy+padY,maxWidth:W*.65,fill:ink});
     const b={left:cx,top:cy,right:t.box.right+padX,bottom:t.box.bottom+padY};
 
@@ -715,7 +807,7 @@ return k.ink.right - k.ink.left }))
     // bajo la flecha: el choque que antes sólo se veía mirando la pieza ya no puede ocurrir.
     const descGap=Math.max(c.descriptorGap??0,Math.round(c.descriptorSize*0.6));
     const cursorBox=cr.evidence.cursorEvidence.find(k=>k.id==='usuario')?.bounds;
-    const descAt=topY=>block({text:c.descriptor,font:pop[400],size:c.descriptorSize,tracking:0,leading:1.2,x:c.align==='center'?W/2:cx,topY,maxWidth:W*.7,fill:'#ffffff',align:c.align});
+    const descAt=topY=>block({text:c.descriptor,font:pop[400],size:c.descriptorSize,tracking:0,leading:1.2,x:c.align==='center'?AXIS_X:cx,topY,maxWidth:W*.7,fill:'#ffffff',align:c.align});
     let descriptor=descAt(cr.bounds.bottom+descGap);
 
     if(cursorBox&&descriptor.box.left<cursorBox.right&&descriptor.box.right>cursorBox.left&&descriptor.box.top<cursorBox.bottom+descGap)
@@ -724,6 +816,8 @@ return k.ink.right - k.ink.left }))
     body+=descriptor.svg;checks.push({id:'descriptor',box:descriptor.box,inkL:1});
 
     if(!cr.evidence.withinCanvas)throw Error('CTA selection outside canvas');
+    guard.push({ id: 'cta-grupo', box: { left: b.left - 14, top: b.top - 14, right: b.right + 14, bottom: b.bottom + 14 } });
+    for (const cc of cr.evidence.cursorEvidence) guard.push({ id: `cursor-cta`, box: cc.bounds });
     body+=cr.underlay+labelToPaths(cr.overlay);
     fs.writeFileSync(`${PLAN_DIR}/out/${s.id}-controls.svg`,`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${cr.overlay}</svg>`);
     fs.writeFileSync(`${PLAN_DIR}/out/${s.id}-cta-evidence.json`,JSON.stringify({intent:ci,manifest:cm,geometry:cr.evidence,textBounds:t.box,descriptorBounds:descriptor.box,surface:b,variant:c.variant,colors:{surface:surfaceColor,ink},solidTextContrast:solid?(Math.max(hexLum(surfaceColor),hexLum(ink))+.05)/(Math.min(hexLum(surfaceColor),hexLum(ink))+.05):null},null,2));
@@ -732,7 +826,14 @@ return k.ink.right - k.ink.left }))
   fs.writeFileSync(`${PLAN_DIR}/out/${s.id}-layout.json`,JSON.stringify({canvas:{width:W,height:H},subjectProtection:s.subjectProtection,elements:checks.map(({id,box})=>({id,box})),typography:{lead:s.leadSize,dominant:domSize,closure:s.afterSize,benefit:s.note?.size,cta:s.cta.fontSize,descriptor:s.cta.descriptorSize},selection:selEvidence},null,2));
   const descriptorBox=checks.find(c=>c.id==='descriptor').box;
 
-  if(s.subjectProtection && descriptorBox.bottom>s.subjectProtection.top-s.subjectProtection.minClearance)throw Error('Descriptor violates subject clearance');
+  const violaDeclarada = Boolean(s.subjectProtection && descriptorBox.bottom > s.subjectProtection.top - s.subjectProtection.minClearance)
+  const hits = opts.mask ? guardHits(opts.mask, [...checks.filter(c => GUARD_IDS.has(c.id)).map(c => ({ id: c.id, box: c.box })), ...guard], W, H, opts.dry ? CLEAR_GROW : CLEAR_TOUCH) : []
+
+  const fuera = checks.some(c => c.box.left < 0 || c.box.right > W || c.box.top < 0 || c.box.bottom > H)
+
+  if (opts.dry && (violaDeclarada || hits.length || fuera)) return { ok: false, hits }
+  if (violaDeclarada) throw Error('Descriptor violates subject clearance')
+  if (hits.length) throw Error(`${s.id}: el texto tapa al sujeto — ${hits.map(h => `${h.id} (${h.px} px)`).join(', ')}. Sube el \`top\`, acorta el copy o regenera el plate con más reserva.`)
   const base = sharp(plate)
   const baseBuf = await base.png().toBuffer()
 
@@ -751,6 +852,16 @@ return k.ink.right - k.ink.left }))
 
   const underSvg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${defs}</defs>${under}${cardEl ? cardEl.svg.split('\n')[0] : ''}</svg>`)
   const bare = await sharp(baseBuf).composite([...layers, { input: underSvg, left: 0, top: 0 }]).png().toBuffer()
+
+  // En la búsqueda del tamaño (dry) se mide el contraste de cada voz sobre el píxel real: crecer mueve las
+  // cajas y puede dejar una voz sobre una zona clara (medido: «SEO + AEO» bajó sobre un monitor, 2,98).
+  if (opts.dry) {
+    const contraste = {}
+
+    for (const c of checks) if (!c.skipContrast) contraste[c.id] = await contrastUnder(bare, c.box, c.inkL ?? 1)
+
+    return { ok: true, hits, contraste }
+  }
 
   const top = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${defs}</defs>${body}${cardEl ? cardEl.svg.split('\n').slice(1).join('\n') : ''}${selection}</svg>`)
 
@@ -840,7 +951,56 @@ return k.ink.right - k.ink.left }))
     )
   }
 
-  qa.push({ id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence })
+  qa.push({ id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara' })
+}
+
+// Driver: decide el factor de escala MIDIENDO, no estimando. Sólo formatos donde el texto se pierde en el
+// lienzo (horizontal y vertical alto); 4:5 nunca crece. Busca el mayor factor ≤ 1,6 que cumpla DOS cosas:
+// (1) ninguna caja protegida toca al sujeto; (2) ninguna voz pierde legibilidad — su contraste no baja de
+// lo que tenía a tamaño original (con techo de exigencia 4,5). Sin máscara no se crece: la ausencia de
+// prueba no es permiso.
+const GROW_CAP = 1.6
+const CONTRAST_FLOOR = 4.5
+
+for (const s0 of SLIDES.filter(x => !only.length || only.includes(x.id))) {
+  const plate0 = path.resolve(PLAN_DIR, s0.plate)
+  const mask = await subjectMask(plate0)
+
+  if (!mask) console.warn(`  ⚠ ${s0.id}: la segmentación del sujeto no corrió — sólo protege \`subjectProtection\` si está declarada.`)
+  const { width: pw, height: ph } = await sharp(plate0).metadata()
+  const fill = fillFactor(s0, pw)
+  let factor = 1
+
+  if ((pw > ph || ph / pw > 1.5) && fill > 1.01) {
+    if (mask) {
+      const base = await composePiece(scaleSpec(s0, 1), { dry: true, mask })
+
+      const ok = async f => {
+        if (!base.ok) return false
+
+        const r = await composePiece(scaleSpec(s0, f), { dry: true, mask })
+
+        if (!r.ok) return false
+
+        return Object.entries(base.contraste ?? {}).every(([k, v]) => (r.contraste[k] ?? 0) >= Math.min(v, CONTRAST_FLOOR) - 0.05)
+      }
+
+      const hi0 = Math.min(fill, GROW_CAP)
+
+      if (await ok(hi0)) factor = hi0
+      else if (await ok(1.02)) {
+        let lo = 1.02, hi = hi0
+
+        for (let i = 0; i < 6; i++) { const m = (lo + hi) / 2;
+
+ if (await ok(m)) lo = m; else hi = m }
+
+        factor = lo
+      }
+    }
+  }
+
+  await composePiece(scaleSpec(s0, factor), { mask, factor })
 }
 
 fs.writeFileSync(`${PLAN_DIR}/out/qa${only.length ? '-parcial' : ''}.json`, JSON.stringify(qa, null, 2))

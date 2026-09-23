@@ -38,13 +38,21 @@ const conCta = new Set(piezas.filter(p => p.cta).map(p => p.id))
 // CTA del KV-01 quedó encima de la cabeza de Nexa con el gate verde. Un mecanismo opcional que nadie
 // declara es un mecanismo apagado. `false` es una declaración válida: dice «debajo del texto no hay
 // persona», y queda escrito para quien revise.
+//
+// Delta 2026-09-22: el compositor ahora SEGMENTA al sujeto (máscara semántica local, `@imgly/background-removal-node`)
+// y aborta si una caja de texto lo toca, en dos dimensiones y sin que nadie mida nada. Esa evidencia queda en
+// `qa.json` como `guardaSujeto: 'segmentacion'` y cumple esta regla por sí sola. La declaración a mano sigue
+// siendo válida (y es la única protección si la segmentación no corrió: `sin-mascara`).
 for (const p of piezas.filter(p => p.cta)) {
   const sp = p.subjectProtection
-  const declarada = sp === false || (sp && typeof sp.top === 'number' && typeof sp.minClearance === 'number')
+  const segmentada = qa.find(r => r.id === p.id)?.guardaSujeto === 'segmentacion'
+  const declarada = segmentada || sp === false || (sp && typeof sp.top === 'number' && typeof sp.minClearance === 'number')
 
   if (!declarada) {
     console.error(
-      `✗ ${p.id}: falta \`subjectProtection\`. Declara { "top": <px>, "minClearance": 24 } si hay una persona ` +
+      `✗ ${p.id}: el sujeto no quedó protegido — la segmentación no corrió (\`guardaSujeto: sin-mascara\`) y falta \`subjectProtection\`. ` +
+        'Revisa por qué no hubo máscara (el compositor lo avisa en la corrida) o declara ' +
+        '{ "top": <px>, "minClearance": 24 } si hay una persona ' +
         'bajo el bloque de texto, o `false` si no la hay. El `top` se mide en el plate, dentro de la huella REAL ' +
         'del texto (min left…max right de `out/<id>-layout.json`), no en el ancho completo, y mirando la ' +
         'silueta: umbral de luminancia no sirve con pelo oscuro sobre fondo oscuro. Método y trampas medidas: ' +

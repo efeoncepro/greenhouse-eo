@@ -234,6 +234,12 @@ medición: eso apaga el color. Es la misma regla que el canon fotográfico aplic
 
 ## 11. Cómo medir `subjectProtection`
 
+> **Delta 2026-09-22 (noche) — ya no hace falta medirlo a mano.** El compositor segmenta al sujeto y lo
+> protege solo, en dos dimensiones (§14). Lo que sigue queda como **respaldo**: es la única protección cuando
+> la segmentación no corre (`guardaSujeto: sin-mascara` en `qa.json`), y documenta por qué los métodos por
+> brillo y por borde no alcanzaban — la tabla final de esta sección es exactamente lo que la segmentación
+> resolvió.
+
 Desde el 22/09/2026 el gate exige declarar la guarda en toda pieza con CTA (§7, Delta CMP-002). El número
 que se declara es **la primera fila del sujeto en el plate**, y hay tres maneras medidas de equivocarse. Las
 tres salieron el mismo día, de dos sesiones.
@@ -349,16 +355,88 @@ seguridad que se había añadido por esa hipótesis se retiró al comprobarla fa
 ojo ni comparando formatos — se responde midiendo **cuánto llena el dominante su propio tope**. Ese porcentaje
 distingue el caso real (16:9 al 32%) del caso donde no hay nada que hacer (9:16 al 97%).
 
-**Dos topes, y sólo uno es una medición:**
+**Los topes del crecimiento — hoy los tres son mediciones (§14):**
 
 | Tope | Qué es |
 |---|---|
-| `TYPE_FILL_CAP = 1.6` | límite duro: por encima el titular deja de serlo y es una pancarta |
-| **tope por espacio** | 🔴 **heurística declarada, no medición**: estima el alto del bloque (suma de voces × 1,6) y limita el crecimiento a lo que quepa sobre `subjectProtection` |
+| `GROW_CAP = 1.6` | límite duro: por encima el titular deja de serlo y es una pancarta |
+| **sujeto** | el mayor factor con el que ninguna caja de texto, CTA o cursor queda a menos de 3,5 % del lado corto de la silueta segmentada |
+| **contraste** | ninguna voz baja del contraste que tenía a tamaño original (con exigencia máxima 4,5) |
 
-🔴 **El tope por espacio existe porque el bloque crece en ALTO junto con el texto y abajo lo espera el sujeto.**
-La estimación puede quedarse corta: cuando eso pasa, **la guarda del compositor aborta**, que es el
-comportamiento correcto — preferimos abortar que publicar texto sobre la cara. La guarda sigue siendo el
-verificador real; la heurística sólo evita el abort en el caso común.
+> ⚠️ **Corrección 2026-09-22 (noche).** La primera versión de esta sección usaba un «tope por espacio»
+> heurístico sobre `subjectProtection`, y cuando la pieza no la declaraba el tope quedaba en infinito. Las
+> piezas de `aeo-final-safe-v07` no la declaraban: crecieron ×1,6 **sobre las personas** y el operador lo vio
+> antes que cualquier gate. La afirmación de arriba —«componen las 16, gates verdes»— era cierta y no
+> significaba nada: ningún gate miraba si el texto tapaba a alguien. El fail-safe corrige eso de raíz: **sin
+> máscara de sujeto no se crece**.
 
 **Es escalable:** un formato horizontal nuevo escala solo, sin tocar un plan.
+
+## 14. Guarda de sujeto por segmentación — el texto no tapa a nadie, sin declarar nada
+
+**Pedido del operador, 2026-09-22:** «tapan parte de la imagen donde hay personas… esto hay que resolverlo
+incluso en el papá de forma robusta. Incluso en el pnpm». Se resolvió en `pnpm foto:componer:cta`, no en las
+piezas.
+
+**Cómo funciona.** Antes de componer, el compositor segmenta el plate con
+`@imgly/background-removal-node` (modelo `medium`, **local y gratis**, el mismo de `scripts/ai/remove-bg.ts`).
+La máscara se cachea por sha256 del plate en `node_modules/.cache/foto-sujeto/`: el segundo uso es
+instantáneo. Después cuenta los píxeles de sujeto que caen dentro del aire de cada caja protegida: entrada,
+dominante, cierre, nota, CTA, descriptor, el grupo completo del CTA con su cursor y los cursores de selección.
+
+**Por qué segmentación y no brillo ni bordes** (medido en CMP-002 KV-02, primera fila real de la cabeza = 465):
+
+| Método | `top` que da |
+|---|---|
+| umbral de brillo | 735 — 270 px tarde: deja pasar texto sobre la cabeza |
+| σ de borde por fila | 498 |
+| **segmentación** | **451** — el único que ve pelo oscuro sobre muro oscuro |
+
+**Dos reglas, dos distancias** (fracción del lado corto, distancia real al borde de la caja):
+
+| Regla | Distancia | Cuándo |
+|---|---|---|
+| **No tapar** | 1,2 % | siempre, a cualquier tamaño: si una caja toca al sujeto, la pieza **aborta** con el nombre de la caja |
+| **Crecer respirando** | 3,5 % | sólo en la búsqueda del tamaño: el texto crece mientras mantenga este aire |
+
+El 3,5 % se calibró contra las 30 piezas aprobadas de v07 y CMP-001. La más justa, 03-referencia-11, deja
+4,08 %. Con 1,2 % la guarda «pasaba» con «SEO + AEO» rozando la cabeza de Clawd en 04-elegida-916: no tapar
+no basta, el texto tiene que respirar. Una pieza aprobada que ya queda más cerca que 3,5 % a tamaño original
+**no crece**: se respeta, no se empeora. Tolerancia de ruido: 8 px de máscara. Con 24, una caja chica se
+tragaba 22 px reales de la cabeza de Clawd.
+
+**El crecimiento también cuida la legibilidad.** Al crecer, las cajas bajan y pueden caer sobre una zona clara
+(medido: «SEO + AEO» de 01-fuera-916 cayó sobre un monitor, contraste 2,98). La búsqueda del tamaño mide el
+contraste de cada voz sobre el píxel y rechaza el factor si alguna baja de lo que tenía a ×1 (exigencia
+máxima 4,5). Con la regla: ×1,48 y contraste 4,89.
+
+**Evidencia en el QA.** Cada pieza escribe `escala` (el factor elegido) y `guardaSujeto` (`segmentacion` o
+`sin-mascara`). `pnpm foto:cta:gate` acepta `segmentacion` como protección del sujeto. Declarar
+`subjectProtection` a mano (§11) sigue valiendo y es el respaldo cuando la segmentación no corre. **Sin máscara
+el texto no crece**: la ausencia de prueba no es permiso.
+
+**Qué SÍ cuenta como sujeto.** El modelo separa primer plano de fondo: personas, mascotas y personajes (Clawd,
+Codex, Gigi) y también **el objeto que sostienen o protagonizan** (tablet, monitor en mano, pedestal). Es la
+lectura conservadora correcta para una pieza de pauta: lo que la foto muestra como protagonista no se tapa.
+
+### `centerX` — el eje de un bloque centrado fuera del centro
+
+Las piezas de v07 declaran `centerX` (0,29–0,60) y la copia de corrida de Codex lo soportaba; el compositor
+canónico **lo ignoraba en silencio**. A tamaño original, 03-referencia-916 salía con el CTA sobre una
+proyección clara: contraste 1,47 contra 15,14 del original. Ahora `centerX` mueve el eje del bloque, del CTA,
+del descriptor y de la tarjeta. Verificado: a ×1 las 16 piezas de v07 reproducen el layout de Codex caja por
+caja. La única diferencia es el descriptor, a propósito (§12).
+
+### Un bloque centrado no se ancla lejos del centro
+
+**Operador, 2026-09-22, sobre 03-referencia-916:** «está centrada y ahí se vería mejor alineada a la izquierda
+por la posición». Un bloque centrado sobre un eje en 0,29 queda pegado a un borde, con aire desigual a cada
+lado, y el ojo no encuentra el eje. El compositor **aborta** cuando `align: 'center'` y
+`|centerX − 0,5| > 0,15`, y pide `align: 'left'` (con `cta.align: 'left'`). Se barrieron los 54 planes del
+repo: la regla sólo atrapa esa pieza, en las cinco versiones donde aparece.
+
+**Límite honesto de ese plate:** alineada a la izquierda y con CTA sólido, 03-referencia-916 se lee bien, pero
+no crece (×1). A la derecha está la proyección clara y abajo la cabeza de ella. Las dos guardas frenan
+correctamente: para tener más texto hace falta un plate con más reserva
+(`EFEONCE_PHOTO_PLATE_SPACE_RESERVATION_V1.md`), no un compositor más permisivo.
+
