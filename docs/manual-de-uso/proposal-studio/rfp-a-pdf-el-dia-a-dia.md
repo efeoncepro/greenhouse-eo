@@ -406,6 +406,8 @@ Estos **sí se reintentan**. El sistema lo hace solo (hasta agotar los intentos)
 
 Esta corrida es real. Ocurrió el **2026-07-12**, con la propuesta técnica de verdad de SKY Airline (Gestión del blog 2026, vía Wherex). Es el mejor ejemplo vivo del sistema porque **atravesó el camino gobernado completo, sin ningún atajo** — y produjo el PDF que el operador tuvo en las manos. (La licitación terminó **adjudicada a Efeonce el 2026-09-23**.)
 
+> 🏆 **Hito 2026-09-23:** SKY Blog (Wherex) es la **primera licitación ganada** con el flujo agéntico de licitaciones —método de `greenhouse-public-private-tenders` + Artifact Composer, operado por el operador con un agente— y en una **cuenta de talla enterprise** (SKY Airline). No todo el mérito es del flujo (pesaron la relación, la ronda 2 y la negociación humana), pero es la primera validación en el mercado de lo construido.
+
 El script que la ejecuta está en el repo y se puede leer: `scripts/commercial/_sanity-sky-render-pipeline.ts`.
 
 ### Los 5 pasos, y lo que devolvió cada uno

@@ -350,6 +350,8 @@ cambia el estado de Berel:** el panel no corrió a Berel.
 > `62535094842` → **Cierre ganado**, CLP 72.000.000. Formalización por **adenda al contrato vigente con
 > Marketing**; kickoff de transición 2026-09-28; **inicio del servicio 2026-11-01**. Contraparte: **Natalia Ortiz
 > Cáceres** (equipo de Marca); **Nicolá Lamiaux** *(sin «s»)* es el gerente de Marketing.
+>
+> 🏆 **Hito 2026-09-23:** SKY Blog (Wherex) es la **primera licitación ganada** con el flujo agéntico de licitaciones —método de `greenhouse-public-private-tenders` + Artifact Composer, operado por el operador con un agente— y en una **cuenta de talla enterprise** (SKY Airline). No todo el mérito es del flujo (pesaron la relación, la ronda 2 y la negociación humana), pero es la primera validación en el mercado de lo construido. Para esta práctica, además, es la prueba de que el Grader y la Radiografía AEO venden dentro de una oferta formal.
 
 **Por qué ganamos — y es el patrón que la práctica repite:**
 

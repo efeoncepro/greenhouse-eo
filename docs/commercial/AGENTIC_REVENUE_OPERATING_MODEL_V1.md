@@ -27,6 +27,8 @@ humana accountable. La decisión de staffing es:
 La distinción gobernante es **función antes que headcount**: cada responsabilidad necesita owner, SLA y capacidad,
 pero no toda responsabilidad requiere una persona nueva.
 
+> 🏆 **Hito 2026-09-23:** SKY Blog (Wherex) es la **primera licitación ganada** con el flujo agéntico de licitaciones —método de `greenhouse-public-private-tenders` + Artifact Composer, operado por el operador con un agente— y en una **cuenta de talla enterprise** (SKY Airline). No todo el mérito es del flujo (pesaron la relación, la ronda 2 y la negociación humana), pero es la primera validación en el mercado de lo construido.
+
 ## 2. Frontera con Go-to-Market
 
 Este modelo forma parte de la operación del GTM, no sustituye la estrategia:

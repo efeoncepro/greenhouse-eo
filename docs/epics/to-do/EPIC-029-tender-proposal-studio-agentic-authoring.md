@@ -13,6 +13,10 @@
 - Branch: `epic/EPIC-029-tender-proposal-studio-agentic-authoring`
 - GitHub Issue: `n/a`
 
+## Delta 2026-09-23 — primera licitación ganada con el Studio
+
+🏆 **Hito 2026-09-23:** SKY Blog (Wherex) es la **primera licitación ganada** con el flujo agéntico de licitaciones —método de `greenhouse-public-private-tenders` + Artifact Composer, operado por el operador con un agente— y en una **cuenta de talla enterprise** (SKY Airline). No todo el mérito es del flujo (pesaron la relación, la ronda 2 y la negociación humana), pero es la primera validación en el mercado de lo construido. Es la evidencia de mercado que justifica seguir invirtiendo en esta épica. Detalle: [`sky-blog-2026/README.md`](../../commercial/tenders/sky-blog-2026/README.md).
+
 ## Summary
 
 Coordina el programa del **Tender Proposal Studio**: la plataforma agéntica con la que Efeonce construye propuestas comerciales (licitación pública, RFP privado o venta directa) dentro de Greenhouse, con el método `bid-construction-playbook` como spec funcional y el caso SKY como primer vertical real. La foundation ya está shipped (aggregate `Proposal` + composer domain-free + render pipeline gobernado + versionado/portal + Nexa actions + **motor de chapter-authors servicio-agnóstico**); este epic agrupa lo construido y ordena lo que falta: la superficie de parity del chapter-author (Nexa/MCP), los authors productivos por servicio, los otros dos nodos de juicio de `§5-ter` (orquestador + verifier) y la F1 canónica (análisis + admisibilidad del RFP).

@@ -30,6 +30,8 @@ description: >-
 
 ---
 
+> 🏆 **Hito 2026-09-23:** SKY Blog (Wherex) es la **primera licitación ganada** con el flujo agéntico de licitaciones —método de `greenhouse-public-private-tenders` + Artifact Composer, operado por el operador con un agente— y en una **cuenta de talla enterprise** (SKY Airline). No todo el mérito es del flujo (pesaron la relación, la ronda 2 y la negociación humana), pero es la primera validación en el mercado de lo construido. El deck de esa oferta se compuso con el método de esta skill y el Artifact Composer.
+
 ## Pie institucional de decks Efeonce
 
 Cuando se solicite la contraportada institucional, reutiliza `BackCoverFull` del Artifact Composer. Su bloque de redes y contacto pertenece a esa composición oficial de cierre; no se replica como pie en las otras láminas.

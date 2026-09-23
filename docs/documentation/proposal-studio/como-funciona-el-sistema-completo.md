@@ -1,10 +1,12 @@
 # Proposal Studio — cómo funciona el sistema completo
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-07-12 por Claude
-> **Ultima actualizacion:** 2026-07-12 por Claude
+> **Ultima actualizacion:** 2026-09-23 por Claude — hito: primera licitación ganada con el Studio (SKY Blog)
 > **Documentacion tecnica:** [GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_TENDER_PROPOSAL_STUDIO_ARCHITECTURE_V1.md) · [GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md](../../architecture/GREENHOUSE_ARTIFACT_COMPOSER_PLATFORM_DECISION_V1.md) · [COMMERCIAL_TENDERS_AGENT_INVARIANTS.md](../../architecture/agent-invariants/COMMERCIAL_TENDERS_AGENT_INVARIANTS.md)
+
+> 🏆 **Hito 2026-09-23:** SKY Blog (Wherex) es la **primera licitación ganada** con el flujo agéntico de licitaciones —método de `greenhouse-public-private-tenders` + Artifact Composer, operado por el operador con un agente— y en una **cuenta de talla enterprise** (SKY Airline). No todo el mérito es del flujo (pesaron la relación, la ronda 2 y la negociación humana), pero es la primera validación en el mercado de lo construido.
 
 ## El recorrido, contado como historia
 
