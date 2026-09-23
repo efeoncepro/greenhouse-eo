@@ -67,14 +67,22 @@
   },
   {
     "id": "04-elegida-916",
-    "plate": "plates/04-elegida-916.png",
-    "plateSHA256": "af747aa7a04d052fa8df3dcc3a72f30cee3c6d6d4b6778f1e5534994c501f7be",
+    "plate": "plates/04-elegida-916-lecho.png",
+    "plateSHA256": "e49c32ecd6505ea67328fe4f015050c58dce7b9e82b7d2dce268c97b5b74330c",
     "engine": "image_gen integrado",
     "prompt": "brief/04-elegida-916.prompt.txt",
     "reference": "origen-v06/plates/04-elegida-916.png",
     "referenceSHA256": "ae8324fe3518c5dbf95c82e68cb00e09319d17c8d41d95cc4fa302351346c44e",
     "parentProvenance": "origen-v06/PROVENANCE.json",
-    "newGeneration": true
+    "newGeneration": true,
+    "derivedFrom": {
+      "plate": "plates/04-elegida-916.png",
+      "plateSHA256": "af747aa7a04d052fa8df3dcc3a72f30cee3c6d6d4b6778f1e5534994c501f7be",
+      "fecha": "2026-09-23",
+      "metodo": "Primer plano (lecho y apoyabrazos) subido 60 px del plate (69 px en la pieza) como una capa rígida, como con la cámara un poco más baja; el corte sigue el borde del propio objeto, con 10 px de fundido. Sin IA y sin deformar su forma.",
+      "script": "../2026-09-23_v07-lecho-04-elegida/subir-primer-plano-v4.cjs",
+      "aprobadoPor": "operador"
+    }
   },
   {
     "id": "04-elegida-169",

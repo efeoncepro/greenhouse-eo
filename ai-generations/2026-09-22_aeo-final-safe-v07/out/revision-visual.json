@@ -30,5 +30,20 @@
     "finding": "La firma queda dentro de la zona story de AXIS (borde inferior 1670 px, límite 1670,4). En 02, 03 y 04 se apoya en la materia desenfocada del lecho; en 01 queda en el borde superior del lecho, sobre su transición. Contraste 10,86 · 15,46 · 5,60 (navy) · 6,53:1. Las 12 piezas no verticales no cambian (idénticas byte a byte).",
     "supersedes": "signatureCenter y la parte de «finding» que describe la firma; el resto de esta revisión sigue vigente.",
     "limits": "Sigue fuera de la guarda conservadora de Reels (65 % del alto): en Reels la interfaz inferior puede cubrirla. No se validó en vivo ni se publicó."
+  },
+  "revisionLecho20260923": {
+    "method": "Pie de la story a 100 % y la pieza completa a tamaño de teléfono, antes y ahora; contraste medido por firma-placement.mjs.",
+    "reviewed": [
+      "04-elegida-916"
+    ],
+    "decision": "Operador 2026-09-23: la firma de 04 quedaba sobre el canto del lecho; se sube el lecho. Aprobó la tercera propuesta.",
+    "finding": "Corrige revisionFirma20260923 en 04: ahí se dijo que la firma se apoyaba en la materia del lecho, pero quedaba sobre su canto iluminado, junto al apoyabrazos. Con el primer plano subido, la firma queda dentro de la materia desenfocada y el canto pasa por encima. Contraste 6,53 → 11,58:1. Las otras 15 piezas son idénticas byte a byte.",
+    "method2": "Primer plano (lecho y apoyabrazos) subido 60 px del plate (69 px en la pieza) como una capa rígida, como con la cámara un poco más baja; el corte sigue el borde del propio objeto, con 10 px de fundido. Sin IA y sin deformar su forma.",
+    "script": "../2026-09-23_v07-lecho-04-elegida/subir-primer-plano-v4.cjs",
+    "descartado": [
+      "Regenerar la franja inferior con IA (máscara): panel oscuro de borde recto, como un velo.",
+      "Levantar sólo el centro del lecho: montículo forzado (rechazado por el operador).",
+      "Recorte del apoyabrazos por brillo: quedaba como fantasma."
+    ]
   }
 }

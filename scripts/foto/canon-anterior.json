@@ -19,6 +19,18 @@
         "03-referencia-916": "9cb3a287b0176fb8c78a31406adeb17c13a423ec8d3798b2fec77db5124138bc",
         "04-elegida-916": "5766ba0dd66293bbf58d2911a4a3a202903d7e64ac41d696fc6e98b0daa0d91d"
       }
+    },
+    {
+      "fecha": "2026-09-23",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
+      "piezas": [
+        "04-elegida-916"
+      ],
+      "cambio": "Plate con el primer plano subido para que la firma quede dentro del lecho y no sobre su canto (lo detectó el operador). Primer plano (lecho y apoyabrazos) subido 60 px del plate (69 px en la pieza) como una capa rígida, como con la cámara un poco más baja; el corte sigue el borde del propio objeto, con 10 px de fundido. Sin IA y sin deformar su forma. Ruta: plates/04-elegida-916.png → plates/04-elegida-916-lecho.png. La definición de la pieza no cambia (misma huella); cambia el sha256 del plate.",
+      "decision": "Operador, 2026-09-23: aprobó esta versión («Si, ahí si quedó bien») tras rechazar dos propuestas por forzadas. Como en la enmienda de la firma, la pieza sigue con el canon 2026-09-22.",
+      "platesAnteriores": {
+        "04-elegida-916": "af747aa7a04d052fa8df3dcc3a72f30cee3c6d6d4b6778f1e5534994c501f7be"
+      }
     }
   ],
   "piezas": [
@@ -595,7 +607,7 @@
     {
       "id": "04-elegida-916",
       "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
-      "plate": "af747aa7a04d052fa8df3dcc3a72f30cee3c6d6d4b6778f1e5534994c501f7be",
+      "plate": "e49c32ecd6505ea67328fe4f015050c58dce7b9e82b7d2dce268c97b5b74330c",
       "pieza": "d13948be96a988690868fd4bbb781e715df9ab1a1e0df25460034e63661b6d89"
     },
     {

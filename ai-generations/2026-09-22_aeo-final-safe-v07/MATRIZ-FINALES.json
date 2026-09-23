@@ -164,8 +164,8 @@
       1920
     ],
     "export": "out/04-elegida-916.png",
-    "exportSHA256": "249076ffe6d279cb395a3f92c60e7e83b29e5269d786f489960a244145691a93",
-    "plateSHA256": "af747aa7a04d052fa8df3dcc3a72f30cee3c6d6d4b6778f1e5534994c501f7be",
+    "exportSHA256": "564d5872b1c083b03d3fd43237ac6a337b0258e484fb72badecc198509ad7164",
+    "plateSHA256": "e49c32ecd6505ea67328fe4f015050c58dce7b9e82b7d2dce268c97b5b74330c",
     "status": "Final creativo corregido según instrucción; sin publicación",
     "faseEmbudo": "MOFU — intención de diagnóstico",
     "concepto": "04-elegida",
@@ -175,11 +175,21 @@
     "editorialBoundsPass": true,
     "signatureInsideReelsGuard": false,
     "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta.",
-    "signatureContrast": 6.534341110528097,
+    "signatureContrast": 11.583045045118833,
     "signatureY": 0.8565,
     "unchangedFromV06": false,
-    "visualReview": "Export y recortes del pie a tamaño de teléfono (2026-09-23). Firma movida dentro de la zona story de AXIS (borde inferior 1670 px, límite 1670,4); se apoya en la materia desenfocada del lecho, y en 01 en su borde superior. No validación live de placement.",
-    "signatureInsideAxis": true
+    "visualReview": "Pie a 100 % y pieza completa a tamaño de teléfono, antes y ahora (2026-09-23). El operador vio que la firma quedaba sobre el canto iluminado del lecho; se subió el primer plano completo (lecho y apoyabrazos) y la firma queda dentro de la materia desenfocada, con el canto por encima. Aprobado por el operador. No validación live de placement.",
+    "signatureInsideAxis": true,
+    "plateOriginalSHA256": "af747aa7a04d052fa8df3dcc3a72f30cee3c6d6d4b6778f1e5534994c501f7be",
+    "plate": "plates/04-elegida-916-lecho.png",
+    "lechoEditado": {
+      "fecha": "2026-09-23",
+      "metodo": "Primer plano (lecho y apoyabrazos) subido 60 px del plate (69 px en la pieza) como capa rígida, como con la cámara un poco más baja; corte por el borde del propio objeto, 10 px de fundido. Sin IA y sin deformar su forma.",
+      "script": "../2026-09-23_v07-lecho-04-elegida/subir-primer-plano-v4.cjs",
+      "contrasteAntes": 6.534341110528097,
+      "aprobadoPor": "operador",
+      "oneDrive": "CMP001-07 reemplazada (la anterior, respaldada)"
+    }
   },
   {
     "id": "04-elegida-169",

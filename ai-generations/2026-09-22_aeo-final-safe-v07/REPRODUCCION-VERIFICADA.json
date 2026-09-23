@@ -7,7 +7,7 @@
   "editorialCompositionPass": true,
   "platformPreviewVerified": false,
   "signatureReelsGuardPass": false,
-  "scope": "QA editorial específico; firma de las stories dentro de AXIS desde el 2026-09-23, posible oclusión de UI de Reels declarada",
+  "scope": "QA editorial específico; firma de las stories dentro de AXIS desde el 2026-09-23, posible oclusión de UI de Reels declarada; lecho de 04-elegida-916 subido el 2026-09-23 (aprobado por el operador), plate plates/04-elegida-916-lecho.png",
   "results": [
     {
       "id": "01-fuera-916",
@@ -53,7 +53,7 @@
     },
     {
       "id": "04-elegida-916",
-      "sha256": "249076ffe6d279cb395a3f92c60e7e83b29e5269d786f489960a244145691a93",
+      "sha256": "564d5872b1c083b03d3fd43237ac6a337b0258e484fb72badecc198509ad7164",
       "reproducedByteIdentical": true,
       "unchangedFromV06": false,
       "signatureInsideAxis": true

@@ -1,0 +1,9 @@
+Inpainting edit of the lower part of a real editorial photograph (this image is a crop of the bottom third of a vertical photo). Only the transparent area of the mask may change: everything below 40% of the image height.
+
+In the photo, the near foreground is a soft, extremely out-of-focus deep charcoal object (the housing of the equipment closest to the lens) that crosses the bottom of the frame. Today its upper edge, with a bright rim of light, sits at about 56% of the image height.
+
+Raise that same near foreground so its soft upper edge sits at about 49-50% of the image height across the full width, and dim its rim: at most a faint, soft sheen, never a bright line. From 54% of the image height down to the bottom edge it must read as one calm, even, deep charcoal surface, with the same material, tone and very soft optical defocus as now and only subtle natural tonal variation: NO highlights, NO reflections, NO chrome, NO objects, NO hard edges. That calm area will later carry a small white logo.
+
+Between 40% and the new edge keep the scene exactly as it is: the wooden desk edge, the dark space under it and the blurred chrome chair armrest at right. Where the raised foreground overlaps the armrest or the desk it simply occludes them, as a closer object would.
+
+Match the existing color, grain, light direction and blur exactly so the edit is invisible. No text, no logo, no watermark. Not a black rectangle, not a gradient band, not a scrim, not a vignette.
