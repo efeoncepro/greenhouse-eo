@@ -722,6 +722,30 @@ contraste sí frena.
   causa principal (el orden cambiaba el mensaje de P03).
 - Regresión contra e68d28885: 18 iguales (las que ya abortaban), 78 sólo suman claves con los píxeles idénticos, y 8 crecen menos porque ahora respetan su reserva editorial (01-fuera y 04-elegida de v03, v05–v07 y la auditoría: ×1,10→×1,05, ×1,25→×1,24, ×1,12→×1,04, ×1,42→×1,29). **Ninguna pieza cambia de estado.** Seis piezas 1:1 de v04–v07 quedan 2–6 px fuera de la reserva que declaran a su tamaño original: esas reservas se midieron antes de que el descriptor se separara del grupo del CTA (§12), y el gate ahora las marca (se resuelve corrigiendo la reserva o con excepción auditada).
 
+**Tramo 4 · El canon hecho regla — cerrado (2026-09-23).** Lo que el canon ya decía y nadie verificaba. Bloquea en
+el gate, salvo **excepción auditada** (`excepciones: [{ regla, razon, aprobadoPor }]`): la excepción no apaga la
+medición, el gate la imprime con su razón y quién la aprobó. Reglas exceptuables: `zona-segura`, `firma-contraste`,
+`firma-tamano`, `firma-sobre-sujeto`, `acento-cta` (p. ej. Gigi, decisión pendiente 4), `concepto-completo`,
+`jerarquia`, `legibilidad`, `reserva-editorial`.
+
+- **Zona segura de AXIS** (`axisAdvertising.safeArea`): feed 7,5 % × 6 % (4:5, 1:1, 16:9) y story 10 % × 13 % (9:16)
+  es el **piso**; una zona declarada sólo la estrecha. Texto, botón, selección y firma fuera = falla. El compositor
+  **no mueve** el texto de las piezas existentes (moverlo desalineaba el CTA con `cta.x` numérico); para cumplir, el
+  plan declara `safeArea: "axis"` (o una zona más estrecha) y el texto se ubica dentro; `note.x: "columna"` lleva también la nota.
+- **Firma con contrato:** `logo` o `firma: { modo: "externa" | "sin-firma", razon }`; contraste ≥ 4,5:1, **20 % del
+  lado corto** y nunca sobre el sujeto. `logo.y: "auto"` busca, desde el pie hacia arriba, la primera Y que cumpla
+  contraste, zona segura, sujeto y choques; si no la hay, queda al pie y el gate la mide.
+- **Concepto completo:** entrada, dominante y cierre que remata, o `conceptoReducido: { razon }`; la regla de las tres
+  veces (dominante ≥ 3× la entrada) pasa de aviso a bloqueo.
+- **Columna:** `cta.x: "columna"` pone el botón —o el texto, en la variante de texto— en la columna de las voces, y el
+  descriptor la sigue. El gate avisa cuando el CTA o el descriptor quedan corridos más de 4 px, y cuando sobre los
+  corchetes del CTA de texto queda menos de media altura del CTA.
+- **Tamaño en pantalla:** `placement: { anchoCssPx, razon }` declara dónde se publica la pieza si no es un teléfono;
+  el piso legible por rol sigue en aviso hasta la decisión pendiente 1.
+- **Texto alternativo:** «Llamado a la acción» en vez de «Botón» (la imagen no tiene un control que activar); suma el
+  gesto manuscrito y las etiquetas de los cursores; no repite lo que la descripción de la escena ya dice.
+- Regresión (referencia hermética) contra 4d36b01c3: **ningún píxel cambia**; el texto alternativo cambia en las 86 piezas («Llamado a la acción») y el layout suma `columna`, `ctaMarco` y `zonaSegura`. Con las reglas nuevas **ninguna de las 86 piezas del repo pasa el gate completo**: zona segura 77 (el margen del compositor es 7 % y AXIS pide 7,5 % en feed y 10 % en story), concepto sin cierre 40 (las piezas AEO), firma sin declarar 37 (v03–v07 firman con otra herramienta), firma bajo 20 % 19 (CMP-002 y los 16:9 de registro-c), reserva editorial 6, acento 7 (ya fallaba antes), firma sobre el sujeto 3, firma bajo 4,5:1 1 y regla de las tres veces 1. Son decisiones del operador —recomponer con `safeArea: "axis"` y `cta.x`/`note.x: "columna"`, declarar `firma`, o excepciones auditadas—; ninguna pieza se tocó.
+
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
 | Pilar | Hoy | Meta | Qué lo sube |

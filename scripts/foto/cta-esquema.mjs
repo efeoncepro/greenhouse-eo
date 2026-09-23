@@ -95,7 +95,7 @@ const nota = z
     text: texto,
     size: positivo.optional(),
     width: z.number().finite().positive().max(1).optional(),
-    x: fraccion.optional(),
+    x: z.union([fraccion, z.literal('columna')]).optional(),
     y: fraccion.optional(),
     gapAfterClosure: z.number().finite().optional()
   })
@@ -168,10 +168,16 @@ export const esquemaPieza = z
     cta,
     logo: logo.optional(),
     final: z.tuple([z.number().int().positive(), z.number().int().positive()]).optional(),
+    // `"axis"`: usar como zona DECLARADA la de AXIS para el formato (feed 7,5 %/6 %, story 10 %/13 %). La que se
+    // verifica es siempre la de AXIS como piso: una zona declarada sólo puede estrecharla.
     safeArea: z
-      .object({ x0: fraccion, y0: fraccion, x1: fraccion, y1: fraccion, profile: z.string().optional(), status: z.string().optional() })
-      .strict()
-      .refine(a => a.x0 < a.x1 && a.y0 < a.y1, 'la zona segura necesita x0 < x1 e y0 < y1')
+      .union([
+        z.literal('axis'),
+        z
+          .object({ x0: fraccion, y0: fraccion, x1: fraccion, y1: fraccion, profile: z.string().optional(), status: z.string().optional() })
+          .strict()
+          .refine(a => a.x0 < a.x1 && a.y0 < a.y1, 'la zona segura necesita x0 < x1 e y0 < y1')
+      ])
       .optional(),
     subjectProtection: z.union([z.literal(false), z.object({ top: noNegativo, minClearance: noNegativo, source: z.string().optional() }).strict()]).optional(),
     subjectGuard: z

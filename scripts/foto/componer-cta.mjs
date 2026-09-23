@@ -762,6 +762,29 @@ function scaleSpec(s0, f, canvasW) {
   return s
 }
 
+// Zona segura de AXIS para el formato (`axisAdvertising.safeArea`: feed 7,5 % × 6 %, story 10 % × 13 %). Tramo 4
+// (auditoría 2026-09-23, hallazgo 8): nunca se leía, y sin declarar una zona el texto quedaba a 3–5 % del borde en
+// 4:5 y 1:1, bajo la interfaz de la plataforma. El formato alto (9:16) es story; el resto, feed.
+function zonaAxis(W, H) {
+  const perfil = H / W >= 1.7 ? 'story' : 'feed'
+  const z = axisAdvertising.safeArea[perfil]
+  const pct = v => Number.parseFloat(v) / 100
+
+  return { perfil, x0: pct(z.inline), y0: pct(z.block), x1: 1 - pct(z.inline), y1: 1 - pct(z.block) }
+}
+
+// La zona que se VERIFICA: la de AXIS como piso; el plan sólo puede estrecharla. La que UBICA el texto sigue siendo
+// la declarada (`safeArea`, o `"axis"` para usar la de AXIS): así ninguna pieza ya aprobada se mueve al recomponer, y
+// la que no cumple la reprueba el gate con su medición.
+function zonaEfectiva(s, W, H) {
+  const axis = zonaAxis(W, H)
+  const d = s.safeArea === 'axis' ? axis : s.safeArea
+
+  return d ? { perfil: axis.perfil, x0: Math.max(axis.x0, d.x0), y0: Math.max(axis.y0, d.y0), x1: Math.min(axis.x1, d.x1), y1: Math.min(axis.y1, d.y1) } : axis
+}
+
+const exceptuada = (s, regla) => (s.excepciones ?? []).some(e => e.regla === regla)
+
 // Caja del logo con la fórmula del dibujo: ancho fracción del lado corto (o px), centro en `logo.x`, borde superior en
 // `logo.y` o al pie. La usan la elección de variante, las invariantes y el dibujo.
 const ASPECTO_LOGO = 196.68 / 837.07
@@ -776,6 +799,28 @@ function cajaLogo(s) {
 }
 
 let aspectoUrl = null
+
+// Busca una Y para la firma (ver `logo.y: "auto"`). Paso de 0,5 % del alto; contraste con la tinta que mejor se lea.
+async function buscarYFirma(s, bare, mask, zona, ocupados) {
+  const pie = cajaLogo({ ...s, logo: { ...s.logo, y: undefined } })
+  const alto = pie.bottom - pie.top
+  const holgura = Math.round(Math.min(W, H) * 0.02)
+  const paso = Math.max(4, Math.round(H * 0.005))
+
+  if (pie.left < zona.x0 * W - 0.5 || pie.right > zona.x1 * W + 0.5) return null
+
+  for (let top = Math.min(pie.top, Math.floor(zona.y1 * H - alto)); top >= Math.ceil(zona.y0 * H); top -= paso) {
+    const caja = { left: pie.left, right: pie.right, top, bottom: top + alto }
+
+    if (ocupados.some(o => caja.left < o.right + holgura && caja.right > o.left - holgura && caja.top < o.bottom + holgura && caja.bottom > o.top - holgura)) continue
+    if (mask && guardHits(mask, [{ id: 'firma', box: caja }], W, H, 0).length) continue
+    const c = Math.max(await contrastUnder(bare, caja, 1), await contrastUnder(bare, caja, lum(2, 60, 112)))
+
+    if (c >= UMBRALES.normalTextContrast) return top / H
+  }
+
+  return null
+}
 
 async function cajaUrl(s) {
   if (aspectoUrl == null) {
@@ -808,12 +853,20 @@ async function composePiece(s, opts = {}) {
   const elementosSeleccion = []
   let ctaBorde = null
   let ctaBoton = null
+  let ctaMarco = null
+  // El marco de la selección del CTA sólo existe en la pieza si se PINTA (corchetes o velo); en contorno y relleno
+  // no se dibuja, y su caja no puede reprobar la zona segura.
+  let ctaMarcoPintado = false
+  let firmaQa = null
   let ctaVariante = null
   let ctaVarianteTokens = null
   const plate = path.resolve(PLAN_DIR, s.plate)
   const meta = await sharp(plate).metadata()
 
   W = meta.width; H = meta.height; M = Math.round(W * 0.07)
+  // Ancho en pantalla de referencia: un teléfono (390 CSS px), salvo que la pieza declare otro lugar de publicación
+  // (`placement.anchoCssPx`, con razón; tramo 4, hallazgo 6).
+  const ANCHO = s.placement?.anchoCssPx ?? ANCHO_PANTALLA
 
   // `final` reescala el máster. Con otra proporción, `resize` RECORTA por defecto — y lo recortado puede ser texto.
   if (s.final && Math.abs(s.final[0] / s.final[1] - W / H) / (W / H) > 0.01) {
@@ -876,7 +929,8 @@ async function composePiece(s, opts = {}) {
 
   // El margen izquierdo nunca queda fuera de la zona segura declarada: en 9:16 la de Meta arranca en 8 % y el
   // margen del comando es 7 % — un bloque alineado a la izquierda quedaba 1 % bajo la UI de la plataforma.
-  const MX = Math.max(M, (s.safeArea?.x0 ?? 0) * W)
+  const zonaDeclarada = s.safeArea === 'axis' ? zonaAxis(W, H) : s.safeArea
+  const MX = Math.max(M, (zonaDeclarada?.x0 ?? 0) * W)
   const x = s.align === 'center' ? AXIS_X : MX
   let y = (s.top ?? 0.05) * H
 
@@ -1036,7 +1090,9 @@ return k.ink.right - k.ink.left }))
     // En un bloque centrado que encadena la nota bajo el cierre, la nota se centra con él: alineada a la
     // izquierda sobre un eje centrado se lee como un error. La nota ubicada a mano (`x`/`y`) queda como está.
     const notaCentrada = s.align === 'center' && s.note.x == null && s.note.gapAfterClosure != null
-    const nt = richBlock({ text: s.note.text, fonts: POP, size: s.note.size ?? Math.round(W * 0.026), tracking: 0, leading: 1.5, x: s.note.x != null ? s.note.x * W : (notaCentrada ? AXIS_X : MX), topY: s.note.gapAfterClosure != null ? y+s.note.gapAfterClosure : s.note.y * H, maxWidth: W * (s.note.width ?? 0.34), fill: SOFT, accentFill: INK, align: notaCentrada ? 'center' : 'left' })
+    // `note.x: "columna"`: la nota arranca en la columna de las voces (tramo 4), como `cta.x`.
+    const xNota = s.note.x === 'columna' ? MX : s.note.x != null ? s.note.x * W : (notaCentrada ? AXIS_X : MX)
+    const nt = richBlock({ text: s.note.text, fonts: POP, size: s.note.size ?? Math.round(W * 0.026), tracking: 0, leading: 1.5, x: xNota, topY: s.note.gapAfterClosure != null ? y+s.note.gapAfterClosure : s.note.y * H, maxWidth: W * (s.note.width ?? 0.34), fill: SOFT, accentFill: INK, align: notaCentrada ? 'center' : 'left' })
 
     body += nt.svg
     lineas.nota = nt.lines
@@ -1064,7 +1120,7 @@ return k.ink.right - k.ink.left }))
     const cy=y+c.gapAfterNote, padX=c.paddingX, padY=c.paddingY;
     // `cta.x: "columna"`: el CTA arranca en la columna del texto (el mismo x que las voces), en vez de una fracción
     // medida a mano que deja el botón 11–21 px corrido de la columna (auditoría 2026-09-23, hallazgo 9).
-    const xCta=cc=>(cc.x==='columna'?x:W*cc.x);
+    const xCta=cc=>(cc.x==='columna'?(cc.variant==='text'?x-cc.paddingX:x):W*cc.x);
     let cx=xCta(c);
 
     // `variant: "auto"`: el autor declara la intención del canon (`prominencia`: discreta | delimitada | destacada →
@@ -1080,7 +1136,7 @@ return k.ink.right - k.ink.left }))
       const caja={left:cx,top:cy,right:t0.box.right+padX,bottom:t0.box.bottom+padY};
       const escena=await sharp(plate).removeAlpha().raw().toBuffer();
       const acento=c.surfaceToken??'growthOnDark';
-      const e=elegirVariante({prominencia:c.prominencia??'delimitada',rgb:escena,ancho:W,alto:H,caja,cssPx:tamanoEnPantalla(c.fontSize,W),tokens:{acento:C[acento],tintaDeclarada:c.inkToken?C[c.inkToken]:null,tintaSobreRelleno:C.inkOnLight,tintaSegura:C.inkOnDark}});
+      const e=elegirVariante({prominencia:c.prominencia??'delimitada',rgb:escena,ancho:W,alto:H,caja,cssPx:tamanoEnPantalla(c.fontSize,W,ANCHO),tokens:{acento:C[acento],tintaDeclarada:c.inkToken?C[c.inkToken]:null,tintaSobreRelleno:C.inkOnLight,tintaSegura:C.inkOnDark}});
       const tokens=e.elegida==='solid'?{surfaceToken:acento,inkToken:'inkOnLight'}:e.elegida==='outline'?{surfaceToken:acento,inkToken:e.degradada?'inkOnDark':(c.inkToken??acento)}:{surfaceToken:acento,inkToken:acento};
 
       c={...c,variant:e.elegida,...tokens};
@@ -1097,6 +1153,8 @@ return k.ink.right - k.ink.left }))
     const ink=C[c.inkToken] ?? (c.variant==='solid' ? C.inkOnLight : C.growthOnDark);
     const hexLum=h=>lum(...h.match(/[a-f\d]{2}/gi).map(x=>parseInt(x,16)));
 
+    // La columna se resuelve con la variante YA decidida: en `text` es el texto el que va a la columna (tramo 4).
+    cx=xCta(c);
     if(c.align==='center')cx=AXIS_X-(shape(c.text,pop[700],c.fontSize).advance+padX*2)/2;
     const t=block({text:c.text,font:pop[700],size:c.fontSize,tracking:0,leading:1.2,x:cx+padX,topY:cy+padY,maxWidth:W*.65,fill:ink});
     const b={left:cx,top:cy,right:t.box.right+padX,bottom:t.box.bottom+padY};
@@ -1106,7 +1164,7 @@ return k.ink.right - k.ink.left }))
     // El borde del contorno mide al menos 1 CSS px en un teléfono (390 px de ancho): 2 px fijos en un lienzo de 1920
     // eran 0,4 CSS px y se mezclaban con la escena (auditoría 2026-09-23, hallazgo 12). El relleno conserva su trazo
     // de 2 px: ahí separa el relleno, no la línea.
-    const grosorBorde=outline?Math.max(2,Math.ceil(W/ANCHO_PANTALLA)):2;
+    const grosorBorde=outline?Math.max(2,Math.ceil(W/ANCHO)):2;
 
     if(outline)ctaBorde={box:b,L:hexLum(surfaceColor),radio:c.radius??0,grosor:grosorBorde};
     if(solid||outline)body+=`<rect x="${b.left}" y="${b.top}" width="${b.right-b.left}" height="${b.bottom-b.top}" rx="${c.radius}" fill="${solid?surfaceColor:'none'}" stroke="${surfaceColor}" stroke-width="${grosorBorde}"/>`;
@@ -1135,6 +1193,9 @@ return k.ink.right - k.ink.left }))
     const coloresCta=Object.fromEntries((sel.cursores??[]).filter(k=>k.color).map(k=>[k.id,k.color]));
     const cr=renderCollaborationSelection({manifest:cm,targetBounds:b,canvas:{width:W,height:H},measureLabel,presentation:{localCursorScale:c.cursorScale,collaboratorScale:sel.escala??1.8,participantColors:coloresCta,frame:marcoCta(c)!=='ninguno'}});
 
+    ctaMarco=cr.bounds;
+    ctaMarcoPintado=marcoCta(c)!=='ninguno'||cm.selection.overlayOpacity>0;
+
     // 🔴 Descriptor bajo el GRUPO, no bajo el botón [2026-09-22, operador: «el texto debajo del CTA está
     // muy pegado»]. Antes se medía `descriptorGap` desde el borde del botón, pero los corchetes se dibujan
     // ~8 px por fuera de ese borde: con el gap de 14 que usaban los planes, entre el corchete y el texto
@@ -1145,7 +1206,7 @@ return k.ink.right - k.ink.left }))
     const descGap=Math.max(c.descriptorGap??0,Math.round(c.descriptorSize*0.6));
     // El descriptor esquiva CUALQUIER cursor o etiqueta de la selección del CTA que caiga sobre él en el eje X.
     const obstaculos=cr.evidence.cursorEvidence.flatMap(k=>[k.bounds,k.labelBounds].filter(Boolean));
-    const descAt=topY=>block({text:c.descriptor,font:pop[400],size:c.descriptorSize,tracking:0,leading:1.2,x:c.align==='center'?AXIS_X:cx,topY,maxWidth:W*.7,fill:'#ffffff',align:c.align});
+    const descAt=topY=>block({text:c.descriptor,font:pop[400],size:c.descriptorSize,tracking:0,leading:1.2,x:c.align==='center'?AXIS_X:(c.x==='columna'?x:cx),topY,maxWidth:W*.7,fill:'#ffffff',align:c.align});
     let descriptor=descAt(cr.bounds.bottom+descGap);
 
     for(let paso=0;paso<obstaculos.length;paso++){
@@ -1204,12 +1265,12 @@ return k.ink.right - k.ink.left }))
   ]
 
   const firmaPrevista = [
-    ...(s.logo ? [{ id: 'logo', box: cajaLogo(s) }] : []),
+    ...(s.logo && s.logo.y !== 'auto' ? [{ id: 'logo', box: cajaLogo(s) }] : []),
     ...(s.url ? [{ id: 'url', box: await cajaUrl(s) }] : [])
   ]
 
   const maquetacion = invariantesMaquetacion({ ancho: W, alto: H, elementos: elementosMaquetacion(firmaPrevista) })
-  const reservaRota = fueraDeReserva({ elementos: elementosMaquetacion(firmaPrevista), reserva: s.editorialReserve })
+  const reservaRota = fueraDeReserva({ elementos: elementosMaquetacion(firmaPrevista), reserva: exceptuada(s, 'reserva-editorial') ? null : s.editorialReserve })
 
   const violaDeclarada = Boolean(s.subjectProtection && descriptorBox.bottom > s.subjectProtection.top - s.subjectProtection.minClearance)
   const hits = opts.mask ? guardHits(opts.mask, [...checks.filter(c => GUARD_IDS.has(c.id)).map(c => ({ id: c.id, box: c.box })), ...guard], W, H, opts.dry ? CLEAR_GROW : CLEAR_TOUCH, opts.dry ? 0 : MASK_NOISE_PX) : []
@@ -1218,7 +1279,7 @@ return k.ink.right - k.ink.left }))
 
   // Zona segura DECLARADA (`safeArea`, fracciones): la UI de la plataforma tapa lo que quede afuera. El
   // crecimiento no puede sacar nada de ella; a tamaño original, lo que ya esté afuera se avisa.
-  const zona = s.safeArea && { left: s.safeArea.x0 * W - 0.5, top: s.safeArea.y0 * H - 0.5, right: s.safeArea.x1 * W + 0.5, bottom: s.safeArea.y1 * H + 0.5 }
+  const zona = zonaDeclarada && { left: zonaDeclarada.x0 * W - 0.5, top: zonaDeclarada.y0 * H - 0.5, right: zonaDeclarada.x1 * W + 0.5, bottom: zonaDeclarada.y1 * H + 0.5 }
 
   const fueraDeZona = zona
     ? [...checks.filter(c => GUARD_IDS.has(c.id)), ...visibles].filter(({ box }) => box && (box.left < zona.left || box.right > zona.right || box.top < zona.top || box.bottom > zona.bottom)).map(b => b.id)
@@ -1237,7 +1298,7 @@ return k.ink.right - k.ink.left }))
 
   if (opts.dry && (violaDeclarada || hits.length || fuera || fueraDeZona.length || protegidas.length || maquetacion.length || reservaRota.length)) return { ok: false, hits, resuelta }
   if (protegidas.length) throw Error(`${s.id}: el texto tapa una zona protegida — ${[...new Set(protegidas)].join(', ')}. Mueve el texto o acota la zona.`)
-  if (fueraDeZona.length) console.warn(`  ⚠ ${s.id}: fuera de la zona segura declarada${s.safeArea.profile ? ` (${s.safeArea.profile})` : ''}: ${[...new Set(fueraDeZona)].join(', ')}`)
+  if (fueraDeZona.length) console.warn(`  ⚠ ${s.id}: fuera de la zona segura declarada${zonaDeclarada.profile ? ` (${zonaDeclarada.profile})` : ''}: ${[...new Set(fueraDeZona)].join(', ')}`)
   if (violaDeclarada) throw Error(`${s.id}: el descriptor invade \`subjectProtection\` (baja hasta ${Math.round(descriptorBox.bottom)} px; el límite es ${s.subjectProtection.top - s.subjectProtection.minClearance})`)
   if (hits.length) throw Error(`${s.id}: el texto tapa al sujeto — ${hits.map(h => `${h.id} (${h.px} px)`).join(', ')}. Sube el \`top\`, acorta el copy o regenera el plate con más reserva.`)
   if (maquetacion.length) throw new LienzoError(`${s.id}: la maquetación no cumple — ${[...new Set(maquetacion)].join(' · ')}. Cambia la esquina del colaborador, el ancla del cursor o la posición de la firma.`)
@@ -1260,7 +1321,7 @@ return k.ink.right - k.ink.left }))
   // Capa de TEXTO sola (RGBA): el cuerpo tal como se pinta, sin plate ni selección. Contra el fondo sin texto (`bare`)
   // da el contraste de cada TRAZO (auditoría 2026-09-23, hallazgo 3: la caja promediaba el aire entre letras).
   const capaTexto = async () => (await sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${defs}</defs>${body}</svg>`)).ensureAlpha().raw().toBuffer({ resolveWithObject: true })).data
-  const medirTrazos = (fondoRgb, texto) => Object.fromEntries(voces.filter(v => !v.limite && !v.sobreColor).map(v => [v.id, medirGlifos({ rgb: fondoRgb, texto, ancho: W, alto: H, caja: v.box, cssPx: tamanoEnPantalla(v.px, W), peso: v.peso })]))
+  const medirTrazos = (fondoRgb, texto) => Object.fromEntries(voces.filter(v => !v.limite && !v.sobreColor).map(v => [v.id, medirGlifos({ rgb: fondoRgb, texto, ancho: W, alto: H, caja: v.box, cssPx: tamanoEnPantalla(v.px, W, ANCHO), peso: v.peso })]))
   const underSvg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${defs}</defs>${under}${cardEl ? cardEl.svg.split('\n')[0] : ''}</svg>`)
   const bare = await sharp(baseBuf).composite([...layers, { input: underSvg, left: 0, top: 0 }]).png().toBuffer()
 
@@ -1291,6 +1352,18 @@ return k.ink.right - k.ink.left }))
   let firmaSobreSujeto = null
 
   if (s.logo) {
+    // `logo.y: "auto"` (tramo 4, hallazgo 7): desde el pie hacia arriba, la primera Y donde la firma mide ≥ 4,5:1, queda
+    // dentro de la zona segura, no toca al sujeto y no choca con nada. Si no la hay, queda al pie y el gate la mide.
+    let buscada
+
+    if (s.logo.y === 'auto') {
+      const ocupados = [...elementosMaquetacion([]).filter(e => e.tipo !== 'acento').map(e => e.box), ...visibles.map(v => v.box).filter(Boolean)]
+
+      buscada = await buscarYFirma(s, bare, opts.mask, zonaEfectiva(s, W, H), ocupados)
+      if (buscada == null) console.warn(`  ⚠ ${s.id}: \`logo.y: "auto"\` no encontró una Y que cumpla: la firma queda al pie y el gate la mide.`)
+      s.logo = { ...s.logo, y: buscada ?? undefined }
+    }
+
     // Variante automática por contraste medido en la zona real del logo (salvo que la pieza la declare).
     if (!s.logo.variant || s.logo.variant === 'auto') {
       const { left: lxTmp, top: lyTmp, right: rxTmp, bottom: byTmp } = cajaLogo(s)
@@ -1312,6 +1385,7 @@ return k.ink.right - k.ink.left }))
     const ly = typeof s.logo.y === 'number' ? Math.round(s.logo.y * H) : Math.round(H - M * 0.85 - lh)
 
     topLayers.push({ input: lb, left: lx, top: ly })
+    firmaQa = { anchoLadoCorto: +(lw / Math.min(W, H)).toFixed(3), y: +(ly / H).toFixed(4), ...(buscada !== undefined ? { auto: true, encontrada: buscada != null } : {}) }
     checks.push({ id: 'logo', box: { left: lx, right: lx + lw, top: ly, bottom: ly + lh }, inkL: s.logo.variant === 'color' ? lum(2, 60, 112) : 1 })
 
     // La firma sobre el sujeto se AVISA, no aborta: hay piezas aprobadas así (medido 2026-09-22: KV-01-916 con la
@@ -1350,8 +1424,14 @@ return k.ink.right - k.ink.left }))
 
   if (maquetacionFinal.length) throw new LienzoError(`${s.id}: la maquetación no cumple — ${[...new Set(maquetacionFinal)].join(' · ')}. Cambia la esquina del colaborador, el ancla del cursor o la posición de la firma.`)
   if (reservaFinal.length) console.warn(`  ⚠ ${s.id}: ${reservaFinal.join(' · ')} (el gate lo bloquea salvo excepción «reserva-editorial»).`)
+  // Zona segura VERIFICADA (tramo 4): la de AXIS como piso, con texto, botón, selección y firma. Aviso aquí; el gate
+  // la bloquea (salvo excepción auditada).
+  const ZE = zonaEfectiva(s, W, H)
+  const fueraDeZonaFinal = [...new Set([...elementosFinales.filter(e => e.tipo !== 'acento'), ...visibles.filter(v => v.id !== 'cta-seleccion' || ctaMarcoPintado)].filter(e => e.box && (e.box.left < ZE.x0 * W - 0.5 || e.box.right > ZE.x1 * W + 0.5 || e.box.top < ZE.y0 * H - 0.5 || e.box.bottom > ZE.y1 * H + 0.5)).map(e => e.id))]
+
+  if (fueraDeZonaFinal.length) console.warn(`  ⚠ ${s.id}: fuera de la zona segura ${ZE.perfil} de AXIS: ${fueraDeZonaFinal.join(', ')}`)
   // El layout se escribe con la firma incluida y con los elementos que el gate vuelve a verificar.
-  const layoutJson = JSON.stringify({ canvas: { width: W, height: H }, subjectProtection: s.subjectProtection, elements: checks.map(({ id, box }) => ({ id, box })), typography: { lead: s.leadSize, dominant: domSize, closure: s.afterSize, benefit: s.note?.size, cta: s.cta.fontSize, descriptor: s.cta.descriptorSize }, selection: selEvidence, maquetacion: { elementos: elementosFinales } }, null, 2)
+  const layoutJson = JSON.stringify({ canvas: { width: W, height: H }, subjectProtection: s.subjectProtection, elements: checks.map(({ id, box }) => ({ id, box })), typography: { lead: s.leadSize, dominant: domSize, closure: s.afterSize, benefit: s.note?.size, cta: s.cta.fontSize, descriptor: s.cta.descriptorSize }, selection: selEvidence, maquetacion: { elementos: elementosFinales }, columna: s.align === 'center' ? null : x, ctaMarco, zonaSegura: { ...ZE } }, null, 2)
 
   salidas.push([`${s.id}-layout.json`, layoutJson])
   const out = s.final ? sharp(master).resize({ width: s.final[0], height: s.final[1] }) : sharp(master)
@@ -1385,10 +1465,10 @@ return k.ink.right - k.ink.left }))
 
   for (const v of voces) {
     const m = v.sobreColor
-      ? medirContraColor({ tinta: hexARgb(v.tinta), fondo: hexARgb(v.sobreColor), cssPx: tamanoEnPantalla(v.px, W), peso: v.peso, lineas: v.lineas })
+      ? medirContraColor({ tinta: hexARgb(v.tinta), fondo: hexARgb(v.sobreColor), cssPx: tamanoEnPantalla(v.px, W, ANCHO), peso: v.peso, lineas: v.lineas })
       : medirVoz({
           rgb: bareRgb, ancho: W, alto: H, caja: v.box, tinta: hexARgb(v.tinta), daltonismo: Boolean(v.daltonismo),
-          ...(v.limite ? { umbral: UMBRALES.essentialBoundaryContrast, apca: false } : { cssPx: tamanoEnPantalla(v.px, W), peso: v.peso, lineas: v.lineas })
+          ...(v.limite ? { umbral: UMBRALES.essentialBoundaryContrast, apca: false } : { cssPx: tamanoEnPantalla(v.px, W, ANCHO), peso: v.peso, lineas: v.lineas })
         })
 
     // `metodo` le dice al gate qué medición exigir: sobre el píxel (y su trazo), contra un color plano, o un límite.
@@ -1414,7 +1494,7 @@ return k.ink.right - k.ink.left }))
 
   // El BORDE del contorno como se ve en un teléfono: la pieza reducida a 390 CSS px × DPR 2 (tramo 2).
   if (ctaBorde && accesibilidad.voces['cta-borde']) {
-    const k = (ANCHO_PANTALLA * DPR_REFERENCIA) / W
+    const k = (ANCHO * DPR_REFERENCIA) / W
     const [fin, fon] = await Promise.all([master, bare].map(b => sharp(b).resize({ width: Math.round(W * k) }).removeAlpha().raw().toBuffer({ resolveWithObject: true })))
     const esc = b => ({ left: b.left * k, top: b.top * k, right: b.right * k, bottom: b.bottom * k })
     const anillo = medirAnillo({ final: fin.data, fondo: fon.data, ancho: fin.info.width, alto: fin.info.height, caja: esc(ctaBorde.box), radio: ctaBorde.radio * k, grosor: ctaBorde.grosor * k })
@@ -1455,7 +1535,7 @@ return k.ink.right - k.ink.left }))
   }
 
   const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson) }
-  const registro = { id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), huellas }
+  const registro = { id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
 
   for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
   qa.push(registro)

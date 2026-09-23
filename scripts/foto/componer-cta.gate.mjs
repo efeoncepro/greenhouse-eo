@@ -10,6 +10,25 @@ import path from 'node:path'
 import { huellaComando, huellaPieza, rutaQa, sha } from './cta-integridad.mjs'
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
 
+// EXCEPCIONES AUDITADAS (tramo 4): una regla del canon puede exceptuarse en UNA pieza, declarando `excepciones:
+// [{ regla, razon, aprobadoPor }]` en el plan. La excepción no apaga la medición: el gate la imprime con su razón y
+// quién la aprobó, para que quien revise la vea. Sin excepción, la regla bloquea.
+const exceptuada = (p, regla) => (p.excepciones ?? []).find(e => e.regla === regla)
+
+const bloquea = (p, regla, mensaje) => {
+  const e = exceptuada(p, regla)
+
+  if (e) {
+    console.warn(`⚠ ${p.id}: ${mensaje} — excepción auditada «${regla}»: ${e.razon} (aprobó ${e.aprobadoPor}).`)
+
+    return false
+  }
+
+  console.error(`✗ ${p.id}: ${mensaje}`)
+
+  return true
+}
+
 const plan = process.argv[2]
 
 if (!plan) { console.error('uso: pnpm foto:cta:gate <plan.json>'); process.exit(2) }
@@ -201,15 +220,14 @@ for (const r of qa) {
   const campo = esText ? 'inkToken' : 'surfaceToken'
   const token = pieza.cta[campo]
 
-  if (token && !ACENTOS.has(token)) {
-    console.error(
-      `✗ ${r.id}: \`${campo}: ${token}\` no es un acento (${[...ACENTOS].join(' · ')}). ` +
-        (esText
-          ? 'En la variante `text` el acento lo porta la TINTA: no hay superficie que lo sostenga.'
-          : 'En `solid`/`outline` el acento lo porta la superficie; lo que se degrada por contraste es la tinta.') +
-        ' Si el acento no alcanza el mínimo, se regenera el plate — no se apaga el color.'
-    ); fallos++
-  }
+  if (token && !ACENTOS.has(token) && bloquea(
+    pieza, 'acento-cta',
+    `\`${campo}: ${token}\` no es un acento (${[...ACENTOS].join(' · ')}). ` +
+      (esText
+        ? 'En la variante `text` el acento lo porta la TINTA: no hay superficie que lo sostenga.'
+        : 'En `solid`/`outline` el acento lo porta la superficie; lo que se degrada por contraste es la tinta.') +
+      ' Si el acento no alcanza el mínimo, se regenera el plate — no se apaga el color.'
+  )) fallos++
 
   // Sólo el relleno puede despegarse o fundirse con el plate; es la medición que faltaba del todo.
   if (solid) {
@@ -226,8 +244,7 @@ for (const r of qa) {
 const n = qa.filter(r => conCta.has(r.id)).length
 
 for (const [id, reserva] of reservasRotas) {
-  console.error(`✗ ${id}: fuera de la reserva editorial — ${reserva.join(' · ')}. Acota el texto o corrige la reserva del plan.`)
-  fallos++
+  if (bloquea(piezas.find(x => x.id === id), 'reserva-editorial', `fuera de la reserva editorial — ${reserva.join(' · ')}. Acota el texto o corrige la reserva del plan`)) fallos++
 }
 
 // ── Accesibilidad sobre el píxel (medida por el compositor con scripts/foto/accesibilidad.mjs) ─────────────
@@ -297,19 +314,71 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
 
   if (apca.length) console.warn(`⚠ ${r.id}: bajo APCA Bronze — ${apca.join(' · ')}`)
   if (dalt.length) console.warn(`⚠ ${r.id}: bajo el umbral con daltonismo — ${dalt.join(' · ')}`)
-  if (chicas.length) console.warn(`⚠ ${r.id}: menos de ${LEGIBLE_PX} px en un teléfono (390 px de ancho) — ${chicas.join(' · ')}`)
+  if (chicas.length) console.warn(`⚠ ${r.id}: menos de ${LEGIBLE_PX} px en pantalla (${r.anchoPantalla ?? 390} CSS px de ancho) — ${chicas.join(' · ')}. Si la pieza no va a un teléfono, declara \`placement: { anchoCssPx, razon }\` (decisión pendiente: piso por rol).`)
   if (!a.altTextEscena) console.warn(`⚠ ${r.id}: el texto alternativo trae el texto de la imagen pero no describe la escena — agrega \`altText\` al plan.`)
 }
 
-// Avisos (no fallan): se leen antes de aprobar, porque el número solo no alcanza para decidir.
+// ── EL CANON HECHO REGLA (tramo 4; auditoría 2026-09-23, hallazgos 6, 7, 8, 9 y 10) ─────────────────────────
+// Lo que el canon ya pedía y nadie verificaba: zona segura de AXIS, contrato de la firma, concepto completo y la regla
+// de las tres veces. Bloquean, salvo excepción auditada. Las del formato anterior del QA quedan como avisos.
+const FIRMA_MIN_CONTRASTE = 4.5
+const FIRMA_ANCHO_LADO_CORTO = 0.2
+
 for (const r of qa.filter(x => conCta.has(x.id))) {
-  // La firma es un logotipo: la norma de contraste no la exige, pero una firma que no se lee no firma.
-  if (typeof r.contraste?.logo === 'number' && r.contraste.logo < 3) {
-    console.warn(`⚠ ${r.id}: la firma mide ${r.contraste.logo}:1 contra su fondo — mira si se lee o muévela (\`logo.y\`).`)
+  const p = piezas.find(x => x.id === r.id)
+
+  for (const z of r.zonasIgnoradas ?? []) console.warn(`⚠ ${r.id}: zona del sujeto ignorada [${z.box.join(', ')}] — ${z.reason} (aprobó ${z.aprobadoPor ?? '—'})`)
+
+  if (legado) {
+    if (typeof r.contraste?.logo === 'number' && r.contraste.logo < 3) console.warn(`⚠ ${r.id}: la firma mide ${r.contraste.logo}:1 contra su fondo.`)
+    if (r.firmaSobreSujeto) console.warn(`⚠ ${r.id}: la firma queda sobre el sujeto (${r.firmaSobreSujeto} px de su silueta).`)
+    continue
   }
 
-  if (r.firmaSobreSujeto) console.warn(`⚠ ${r.id}: la firma queda sobre el sujeto (${r.firmaSobreSujeto} px de su silueta).`)
-  for (const z of r.zonasIgnoradas ?? []) console.warn(`⚠ ${r.id}: zona del sujeto ignorada [${z.box.join(', ')}] — ${z.reason}`)
+  // Zona segura: la de AXIS como piso (feed 7,5 % × 6 %, story 10 % × 13 %).
+  if (!r.zonaSegura) {
+    console.error(`✗ ${r.id}: el QA no trae la zona segura verificada (versión anterior del comando). Recompón.`)
+    fallos++
+  } else if (r.fueraDeZona?.length && bloquea(p, 'zona-segura', `fuera de la zona segura ${r.zonaSegura.perfil} de AXIS: ${r.fueraDeZona.join(', ')}. Declara \`safeArea: "axis"\` (o una zona más estrecha) para ubicar el texto dentro, y \`cta.x: "columna"\``)) fallos++
+
+  // Firma: declarada siempre; contraste y tamaño del canon; nunca sobre el sujeto.
+  if (!p.logo && !p.firma) {
+    console.error(`✗ ${r.id}: la pieza no declara firma — \`logo\`, o \`firma: { modo: "externa" | "sin-firma", razon }\` si la firma la pone otra herramienta o no lleva.`)
+    fallos++
+  }
+
+  if (p.logo) {
+    const c = r.contraste?.logo
+    const ancho = r.firma?.anchoLadoCorto
+
+    if (typeof c !== 'number') { console.error(`✗ ${r.id}: la firma no tiene medición de contraste.`); fallos++ } else if (c < FIRMA_MIN_CONTRASTE && bloquea(p, 'firma-contraste', `la firma mide ${c}:1 contra su fondo (canon: ≥ ${FIRMA_MIN_CONTRASTE}:1). Prueba \`logo.y: "auto"\``)) fallos++
+    if (typeof ancho !== 'number') { console.error(`✗ ${r.id}: el QA no trae el tamaño de la firma. Recompón.`); fallos++ } else if (ancho < FIRMA_ANCHO_LADO_CORTO - 0.005 && bloquea(p, 'firma-tamano', `la firma mide ${(ancho * 100).toFixed(1)} % del lado corto (canon: ${FIRMA_ANCHO_LADO_CORTO * 100} %)`)) fallos++
+    if (r.firmaSobreSujeto && bloquea(p, 'firma-sobre-sujeto', `la firma queda sobre el sujeto (${r.firmaSobreSujeto} px de su silueta)`)) fallos++
+  }
+
+  // Concepto: entrada, dominante y un cierre que remata (o `conceptoReducido` con razón); regla de las tres veces.
+  if ((!p.lead || !p.after) && !p.conceptoReducido && bloquea(p, 'concepto-completo', `falta ${!p.lead ? 'la entrada' : 'el cierre que remata'}: el canon pide entrada, dominante y cierre (o \`conceptoReducido: { razon }\`)`)) fallos++
+  if (typeof r.ratioDominanteEntrada === 'number' && r.ratioDominanteEntrada < 3 && bloquea(p, 'jerarquia', `el dominante mide ${r.ratioDominanteEntrada}× la entrada (regla de las tres veces: ≥ 3×)`)) fallos++
+
+  // Columna (aviso): en un bloque alineado a la izquierda, botón y descriptor arrancan en la columna del texto.
+  const L = JSON.parse(readFileSync(path.join(dir, 'out', `${r.id}-layout.json`), 'utf8'))
+  const el = id => L.maquetacion?.elementos?.find(e => e.id === id)?.box
+
+  if (typeof L.columna === 'number') {
+    const boton = p.cta.variant === 'text' ? el('cta') : el('cta-boton')
+    const desc = el('descriptor')
+    const corrido = [boton && Math.abs(boton.left - L.columna) > 4 && `el CTA arranca ${Math.round(boton.left - L.columna)} px`, desc && Math.abs(desc.left - L.columna) > 4 && `el descriptor arranca ${Math.round(desc.left - L.columna)} px`].filter(Boolean)
+
+    if (corrido.length) console.warn(`⚠ ${r.id}: ${corrido.join(' y ')} fuera de la columna del texto. Usa \`cta.x: "columna"\`.`)
+  }
+
+  // Aire sobre los corchetes del CTA de texto (aviso): al menos media altura del CTA hasta la voz de arriba.
+  if (p.cta.variant === 'text' && L.ctaMarco) {
+    const arriba = Math.max(...(L.maquetacion?.elementos ?? []).filter(e => e.tipo === 'texto' && e.box.bottom <= L.ctaMarco.top + 1).map(e => e.box.bottom))
+    const aire = L.ctaMarco.top - arriba
+
+    if (Number.isFinite(aire) && aire < 0.5 * (L.typography?.cta ?? 0)) console.warn(`⚠ ${r.id}: sobre los corchetes del CTA quedan ${Math.round(aire)} px de aire (piso: media altura del CTA).`)
+  }
 }
 
 // 🔴 Cero piezas evaluadas NO es un pase [reportado por «Ads con lenguaje fotográfico Efeonce»].

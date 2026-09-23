@@ -311,15 +311,27 @@ export function medirAnillo({ final, fondo, ancho, alto, caja, radio = 0, grosor
 // visible, en orden de lectura, además de la descripción de la escena si el plan la trae.
 const plano = t => String(t ?? '').replace(/\*\*|\[\[|\]\]/g, '').replace(/\s*\|\s*/g, ' ').replace(/\s+/g, ' ').trim()
 
+//
+// Tramo 4 (auditoría 2026-09-23, hallazgo 15): «Llamado a la acción» y no «Botón» —en una imagen no hay un control
+// que se pueda activar, y anunciarlo confunde a quien usa lector de pantalla—; suma el gesto manuscrito y las
+// etiquetas de los cursores (también son texto visible), y no repite lo que la descripción de la escena ya dice.
 export function textoAlternativo(pieza) {
   const escena = plano(pieza.altText)
+  const yaDicho = t => Boolean(escena) && escena.toLowerCase().includes(t.toLowerCase())
 
-  const voces = [pieza.label, pieza.lead, pieza.dominant, pieza.after, pieza.note?.text, pieza.card?.body, pieza.footer?.text]
+  const voces = [pieza.label, pieza.lead, pieza.dominant, pieza.after, pieza.note?.text, pieza.card?.body, pieza.footer?.text, pieza.gesture?.text]
     .map(plano)
-    .filter(Boolean)
+    .filter(v => v && !yaDicho(v))
 
-  const cta = pieza.cta ? [`Botón: «${plano(pieza.cta.text)}»`, plano(pieza.cta.descriptor)].filter(Boolean) : []
-  const texto = [...voces.map(v => `«${v}»`), ...cta].join(' ')
+  const accion = pieza.cta ? [plano(pieza.cta.text), plano(pieza.cta.descriptor)] : []
+
+  const cta = pieza.cta
+    ? [accion[0] && !yaDicho(accion[0]) && `Llamado a la acción: «${accion[0]}»`, accion[1] && !yaDicho(accion[1]) && accion[1]].filter(Boolean)
+    : []
+
+  const etiquetas = [...(pieza.selection?.cursors ?? []), ...(pieza.cta?.seleccion?.cursores ?? [])].map(k => plano(k?.label)).filter(Boolean)
+  const seleccion = etiquetas.length ? [`Cursores de colaboración: ${etiquetas.map(e => `«${e}»`).join(', ')}`] : []
+  const texto = [...voces.map(v => `«${v}»`), ...cta, ...seleccion].join(' ')
 
   return [escena, texto && `Texto en la imagen: ${texto}`].filter(Boolean).join('. ').replace(/\.\./g, '.')
 }

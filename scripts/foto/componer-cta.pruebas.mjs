@@ -68,6 +68,19 @@ const pieza = k => {
   return { ...structuredClone(p), plate: path.resolve(path.dirname(plan), p.plate) }
 }
 
+// La misma pieza, ajustada al canon del tramo 4: zona segura de AXIS, CTA en la columna y firma de 20 % del lado corto
+// en una Y que se lea (`logo.y: "auto"`). Es lo que un plan nuevo declara para pasar el gate.
+const canon = k => {
+  const p = pieza(k)
+
+  p.safeArea = 'axis'
+  p.cta.x = 'columna'
+  if (p.note) p.note.x = 'columna'
+  p.logo = { ...(p.logo ?? {}), width: 0.2, x: 0.5, y: 'auto' }
+
+  return p
+}
+
 async function componer(nombre, piezas, ids = [], env = {}) {
   const dir = path.join(TMP, nombre)
   const planPath = path.join(dir, 'piezas.json')
@@ -321,6 +334,30 @@ const PRUEBAS = [
       reservaChica.textGrowth = false
       reservaChica.editorialReserve = { maxBottom: 200, maxRight: 900 }
 
+      const enCanon = await componer('P06-canon', [canon('b2_916')])
+      let zonaAxis = false
+      let enColumna = false
+      let firmaAuto = false
+
+      if (enCanon.ok) {
+        const p = canon('b2_916')
+        const L = leer(enCanon.dir, `${p.id}-layout.json`)
+        const q = enCanon.qa[0]
+        const W = L.canvas.width, H = L.canvas.height
+        // Medición propia: story de AXIS = 10 % a los lados y 13 % arriba y abajo.
+        const dentro = b => b.left >= 0.1 * W - 0.5 && b.right <= 0.9 * W + 0.5 && b.top >= 0.13 * H - 0.5 && b.bottom <= 0.87 * H + 0.5
+        const cajas = L.maquetacion.elementos.filter(e => e.tipo !== 'acento')
+
+        zonaAxis = cajas.length > 0 && cajas.every(e => dentro(e.box))
+        const boton = cajas.find(e => e.id === 'cta-boton')?.box
+        const desc = cajas.find(e => e.id === 'descriptor')?.box
+
+        enColumna = Boolean(boton && desc) && Math.abs(boton.left - L.columna) <= 1 && Math.abs(desc.left - L.columna) <= 1
+        const logo = cajas.find(e => e.id === 'logo')?.box
+
+        firmaAuto = q.firma?.auto === true && q.firma.encontrada === true && Boolean(logo) && dentro(logo) && q.contraste.logo >= 4.5 && Math.abs(q.firma.anchoLadoCorto - 0.2) <= 0.005
+      }
+
       const [original, alineada, choca, cabe, tapaZona, firmaSobre, fueraReserva, v03] = await Promise.all([componer('P06-eje', [pieza('ref_916')]), componer('P06-izquierda', [izquierda]), componer('P06-choque', [conIA('top-end')]), componer('P06-cabe', [conIA('bottom-end')]), componer('P06-protect', [protegida]), componer('P06-firma', [firmaEncima]), componer('P06-reserva', [reservaChica]), componer('P06-v03', [pieza('v03_fue')])])
       const protegeZona = !tapaZona.ok && /zona protegida/.test(tapaZona.error)
       const firmaRechazada = !firmaSobre.ok && /choca con «logo»|«logo» choca/.test(firmaSobre.error)
@@ -348,7 +385,7 @@ const PRUEBAS = [
         margen = Math.min(...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.left)) >= izquierda.safeArea.x0 * L.canvas.width - 0.5
       }
 
-      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva, detalle: `${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
+      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva && zonaAxis && enColumna && firmaAuto, detalle: `zona de AXIS con safeArea "axis": ${zonaAxis}${enCanon.ok ? '' : ` (${enCanon.error})`} · CTA y descriptor en la columna: ${enColumna} · firma automática 20 % legible dentro de la zona: ${firmaAuto} · ${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
     }
   },
   {
@@ -471,6 +508,7 @@ const PRUEBAS = [
 
       const fallas = []
       const incompletas = []
+      const conBoton = []
       let avisos = 0
 
       for (const [id, q, p] of fuentes) {
@@ -486,6 +524,7 @@ const PRUEBAS = [
         const faltan = [p.lead, p.dominant, p.after, p.note?.text, p.cta?.text, p.cta?.descriptor].map(plano).filter(t => t && !a.altText.includes(t))
 
         if (faltan.length) incompletas.push(`${id}: ${faltan.join(' / ')}`)
+        if (/Botón:/.test(a.altText) || (p.cta && !/Llamado a la acción/.test(a.altText) && !a.altText.includes(plano(p.cta.text)))) conBoton.push(id)
       }
 
       // Hallazgos del TRAZO en las piezas del repo: se reportan, no hacen fallar la prueba — son de las piezas, no del
@@ -574,8 +613,8 @@ const PRUEBAS = [
       }
 
       return {
-        ok: fuentes.length > 0 && !fallas.length && !incompletas.length && reporte && evid.ok && vocesOraculo > 0 && !desacuerdos.length && bordes > 0 && !delgados.length && unitarias,
-        detalle: `${fuentes.length} piezas · voces bajo WCAG AA: ${fallas.length}${fallas.length ? ` (${fallas.slice(0, 4).join(', ')})` : ''} · alternativas incompletas: ${incompletas.length}${incompletas.length ? ` (${incompletas.slice(0, 3).join('; ')})` : ''} · avisos APCA/daltonismo: ${avisos} · reporte y vistas de daltonismo: ${reporte} · oráculo del trazo: ${evid.ok ? `${vocesOraculo} voces, ${desacuerdos.length} desacuerdos${desacuerdos.length ? ` (${desacuerdos.slice(0, 3).join('; ')})` : ''}` : `no compuso (${evid.error})`} · bordes ≥ 1 CSS px: ${bordes - delgados.length}/${bordes}${delgados.length ? ` (${delgados.join(', ')})` : ''} · unitarias: ${unitarias} · piezas del repo con trazo bajo umbral: ${trazos.length}`,
+        ok: fuentes.length > 0 && !fallas.length && !incompletas.length && !conBoton.length && reporte && evid.ok && vocesOraculo > 0 && !desacuerdos.length && bordes > 0 && !delgados.length && unitarias,
+        detalle: `${fuentes.length} piezas · voces bajo WCAG AA: ${fallas.length}${fallas.length ? ` (${fallas.slice(0, 4).join(', ')})` : ''} · alternativas incompletas: ${incompletas.length}${incompletas.length ? ` (${incompletas.slice(0, 3).join('; ')})` : ''} · anuncian «Botón»: ${conBoton.length} · avisos APCA/daltonismo: ${avisos} · reporte y vistas de daltonismo: ${reporte} · oráculo del trazo: ${evid.ok ? `${vocesOraculo} voces, ${desacuerdos.length} desacuerdos${desacuerdos.length ? ` (${desacuerdos.slice(0, 3).join('; ')})` : ''}` : `no compuso (${evid.error})`} · bordes ≥ 1 CSS px: ${bordes - delgados.length}/${bordes}${delgados.length ? ` (${delgados.join(', ')})` : ''} · unitarias: ${unitarias} · piezas del repo con trazo bajo umbral: ${trazos.length}`,
         evidencia: plan && path.join(dirReporte, 'out/accesibilidad/reporte.md')
       }
     }
@@ -583,7 +622,7 @@ const PRUEBAS = [
   {
     id: 'P10', nombre: 'Gate: aprueba lo bueno y rechaza QA incompleto, viejo, CTA sin acento y voz bajo WCAG',
     async correr() {
-      const bueno = await componer('P10-bueno', [pieza('b2_916'), pieza('b2_169')])
+      const bueno = await componer('P10-bueno', [canon('b2_916'), canon('b2_169')])
       const gBueno = bueno.ok ? await gate(bueno.planPath) : { code: -1, salida: bueno.error }
 
       // Corrida parcial: recompone una pieza y el QA conserva la otra (antes iba a un `qa-parcial.json` aparte).
@@ -594,8 +633,8 @@ const PRUEBAS = [
       const dirDos = path.join(TMP, 'P10-dos-planes')
 
       fs.mkdirSync(dirDos, { recursive: true })
-      fs.writeFileSync(path.join(dirDos, 'piezas-a.json'), JSON.stringify([pieza('b2_916')], null, 2))
-      fs.writeFileSync(path.join(dirDos, 'piezas-b.json'), JSON.stringify([pieza('b2_169')], null, 2))
+      fs.writeFileSync(path.join(dirDos, 'piezas-a.json'), JSON.stringify([canon('b2_916')], null, 2))
+      fs.writeFileSync(path.join(dirDos, 'piezas-b.json'), JSON.stringify([canon('b2_169')], null, 2))
       const dos = await ['piezas-a.json', 'piezas-b.json'].reduce((cadena, f) => cadena.then(ok => ok && run(process.execPath, [COMPOSITOR, path.join(dirDos, f)], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 }).then(() => true, () => false)), Promise.resolve(true))
       const [gDosA, gDosB] = dos ? [await gate(path.join(dirDos, 'piezas-a.json')), await gate(path.join(dirDos, 'piezas-b.json'))] : [{ code: -1 }, { code: -1 }]
 
@@ -607,7 +646,7 @@ const PRUEBAS = [
 
       // HUELLAS (tramo 1, 2026-09-23): el QA vale sólo para el plan, el plate y el PNG que lo produjeron. Se prueba sobre
       // UNA composición, alterando una cosa por vez y restaurándola antes de la siguiente.
-      const h = await componer('P10-huellas', [pieza('b2_916')])
+      const h = await componer('P10-huellas', [canon('b2_916')])
       const idH = 'b2-primero-el-numero-916'
       const archivo = rel => path.join(h.dir, rel)
 
@@ -709,6 +748,23 @@ const PRUEBAS = [
       const correr = () => run(process.execPath, [COMPOSITOR, path.join(dirC, 'piezas.json')], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 }).then(() => 'ok', e => String(e.stderr ?? '') + String(e.stdout ?? ''))
       const concurrentes = await Promise.all([correr(), correr()])
 
+      // Tramo 4: el canon hecho regla, con excepción auditada.
+      const sinFirma = canon('b2_916')
+      const firmaChica = canon('b2_916')
+      const firmaChicaAuditada = canon('b2_916')
+      const sinCierre = canon('b2_916')
+      const reducida = canon('b2_916')
+
+      delete sinFirma.logo
+      firmaChica.logo.width = 0.1
+      firmaChicaAuditada.logo.width = 0.1
+      firmaChicaAuditada.excepciones = [{ regla: 'firma-tamano', razon: 'prueba: la marca del partner manda en esta pieza', aprobadoPor: 'prueba' }]
+      delete sinCierre.after
+      delete reducida.after
+      reducida.conceptoReducido = { razon: 'prueba: pieza de recordación de una sola frase' }
+      const rs4 = await Promise.all([['P10-sin-firma', sinFirma], ['P10-firma-chica', firmaChica], ['P10-firma-auditada', firmaChicaAuditada], ['P10-sin-cierre', sinCierre], ['P10-reducida', reducida], ['P10-fuera-zona', pieza('b2_916')]].map(([n, p]) => componer(n, [p])))
+      const [gSinFirma, gFirmaChica, gFirmaAuditada, gSinCierre, gReducida, gFueraZona] = await Promise.all(rs4.map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
+
       // 01-fuera-916 al tamaño al que la hacía crecer el compositor anterior (×1.48, medido el 2026-09-23 en P04 sobre
       // 27eb6bc08): la caja de sus voces pasa y el trazo, no (hallazgo 3). El gate tiene que rechazarla.
       const vieja = pieza('fue_916')
@@ -754,6 +810,12 @@ const PRUEBAS = [
 
       const r = {
         'aprueba el plan bueno': gBueno.code === 0,
+        'rechaza pieza sin firma declarada': gSinFirma.code !== 0 && /no declara firma/.test(gSinFirma.salida),
+        'rechaza firma bajo el 20 % del lado corto': gFirmaChica.code !== 0 && /del lado corto/.test(gFirmaChica.salida),
+        'acepta la excepción auditada y la imprime': gFirmaAuditada.code === 0 && /excepción auditada «firma-tamano»/.test(gFirmaAuditada.salida),
+        'rechaza concepto sin cierre': gSinCierre.code !== 0 && /cierre que remata/.test(gSinCierre.salida),
+        'acepta conceptoReducido con razón': !/cierre que remata/.test(gReducida.salida),
+        'rechaza texto fuera de la zona de AXIS': gFueraZona.code !== 0 && /zona segura story de AXIS/.test(gFueraZona.salida),
         '--variantes arma la hoja de las tres': hoja,
         'auto elige y deja el motivo': Boolean(eleccion?.elegida && eleccion.motivo),
         'rechaza QA incompleto': gIncompleto.code !== 0 && /sin QA/.test(gIncompleto.salida),

@@ -92,8 +92,24 @@ test('Texto alternativo: toda voz visible, sin marcas de estilo, en orden de lec
     cta: { text: 'Pide el diagnóstico', descriptor: 'SEO + AEO' }
   })
 
-  assert.equal(alt, 'Una mujer mira una proyección. Texto en la imagen: «En la respuesta de la IA,» «Sé la referencia.» «Eso es lo que operamos.» Botón: «Pide el diagnóstico» SEO + AEO')
+  assert.equal(alt, 'Una mujer mira una proyección. Texto en la imagen: «En la respuesta de la IA,» «Sé la referencia.» «Eso es lo que operamos.» Llamado a la acción: «Pide el diagnóstico» SEO + AEO')
   assert.doesNotMatch(alt, /\*\*|\[\[|\]\]/)
+})
+
+test('Texto alternativo: no anuncia un botón, suma gesto y cursores, y no repite lo que la escena ya dice', () => {
+  const alt = textoAlternativo({
+    altText: 'Una mujer mira una proyección que dice «Sé la referencia.»',
+    dominant: 'Sé la [[referencia]].',
+    gesture: { text: '¡mira!' },
+    selection: { cursors: [{ id: 'ia', label: 'IA' }] },
+    cta: { text: 'Pide el diagnóstico', descriptor: 'SEO + AEO', seleccion: { cursores: [{ id: 'tu', label: 'Tú' }] } }
+  })
+
+  assert.doesNotMatch(alt, /Botón/)
+  assert.match(alt, /Llamado a la acción: «Pide el diagnóstico»/)
+  assert.match(alt, /«¡mira!»/)
+  assert.match(alt, /Cursores de colaboración: «IA», «Tú»/)
+  assert.equal(alt.match(/Sé la referencia/g).length, 1, 'no se repite lo que la escena ya dice')
 })
 
 test('medirContraColor: tinta sobre relleno plano y límites no textuales', () => {
