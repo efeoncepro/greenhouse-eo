@@ -145,8 +145,10 @@ tenemos — y está sin tocar.** → `modules/13_PROSPECCION.md` §5.
 >
 > **Wrapper de experiencia vivo:** `https://experiencia.efeoncepro.com` es el primer **Efeonce Wrapper**
 > anual para un cliente, creado para SKY por su primer año con Efeonce. Sirve como memoria/retención y
-> prueba de dirección para `"Tu año con Efeonce"`; NO convierte automáticamente a SKY en caso público
-> citable sin autorización escrita.
+> prueba de dirección para `"Tu año con Efeonce"`. **Actualización 2026-09-23: ahí está PUBLICADO el caso
+> creativo de SKY** con métricas de entrega *(+2.000 piezas · 39 campañas · 88% on-time · 0,12 ajustes/pieza ·
+> 5 mercados · −25% tiempo de producción)*. Son métricas de **delivery, no de negocio**, sin baseline del día 0;
+> citarlo **fuera del wrapper** exige autorización escrita que aún no está verificada.
 
 ### 🎯 EL CASO ECONÓMICO DE REFERENCIA DE LA PRÁCTICA — SKY Agencia Creativa
 
@@ -223,10 +225,12 @@ validación es **2026-03-10**, anterior a **RpA v2 (TASK-916)**.
 
 1. 🩸 **Documentar la economía del engagement creativo de SKY** *(→ `greenhouse-finance-accounting-operator`)*.
    **Es el bug real de esta práctica** *(`ANTIPATTERNS.md` I)*.
-2. 🎯 **Formalizar a SKY como el primer caso creativo citable** — un año de relación, squad nombrado, **telemetría
-   real** y autorización declarada para nombrarlo como caso de éxito. Falta armar el paquete de caso con alcance de
-   claims, métricas, assets, screenshots, nombres, URLs y pricing. El wrapper `experiencia.efeoncepro.com` ayuda a
-   contar la memoria del año, pero no sustituye los gates de evidencia específicos. → `templates/caso-estudio.md`.
+2. 🎯 **Llevar el caso SKY del wrapper a la venta** — *(Actualización 2026-09-23: el caso creativo ya está
+   publicado en `experiencia.efeoncepro.com` con métricas de entrega.)* Falta: verificar la autorización escrita
+   para citarlo fuera del wrapper, fijar el alcance de claims/assets/screenshots/URLs/pricing y sumar, si existe,
+   evidencia de negocio del cliente *(no hay baseline del día 0)*. → `templates/caso-estudio.md`.
+   Otros borradores de caso *(Ghamadent, Eusari, SSilva anonimizado, Touch Latam, Grupo Norte, Grupo Security)*
+   viven en Notion: **borradores internos no verificados; confirmar autorización y fuente antes de citar.**
 3. 🎯 **Empezar a usar el RpA en la venta.** Está medido, es bueno, y nadie más lo tiene.
 
 ---
@@ -237,7 +241,7 @@ validación es **2026-03-10**, anterior a **RpA v2 (TASK-916)**.
 |---|---|---|
 | **1** | 🩸 **Confirmar el loaded cost con finance** | **Sin esto, no sabemos si podemos descontar.** Todo lo demás depende de este número |
 | **2** | 🩸 **Arreglar la estructura de precios** *(ad-hoc, plan dominado, precio unitario)* | Es un error visible que **destruye credibilidad** con cualquier analista de compras |
-| **3** | 🩸 **Empezar a construir casos** *(el día 1, con autorización en el contrato)* | **Cero casos creativos citables.** Cada engagement que cierra sin caso es munición perdida para siempre |
+| **3** | 🩸 **Empezar a construir casos** *(el día 1, con autorización en el contrato)* | **Un solo caso creativo publicado (SKY, de delivery, 2026-09-23) y ninguno de negocio.** Cada engagement que cierra sin caso es munición perdida para siempre |
 | **4** | 🎯 **Construir la cuña creativa** *(el diagnóstico de operación creativa)* | El Grader abre puertas de **visibilidad**, no de **creatividad**. → `modules/06_CUNA.md` |
 | **5** | 🩸 **Medir nuestro baseline de OTD/FTR/RpA** | **Sin baseline, cualquier SLA que firmemos es una apuesta** |
 | **6** | 🎯 **Activar el cross-sell creativo a las cuentas vivas** | El pipeline más caliente que tenemos, sin tocar |

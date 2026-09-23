@@ -27,6 +27,8 @@
 >
 > 🏆 **Hito 2026-09-23 — primera licitación GANADA con el flujo agéntico de licitaciones.** La propuesta SKY Blog (Wherex) se construyó con el método de la skill `greenhouse-public-private-tenders` (bases → admisibilidad → diagnóstico → oferta) y se compuso con el **Artifact Composer**: deck desde catálogo, oferta técnica y económica y Excel generados desde fuente versionada, y evidencia viva (AI Visibility Grader y Radiografía AEO). La operó el operador junto a un agente. La adjudicación **no se atribuye sólo al flujo**: pesaron la relación existente con SKY, las reuniones de ronda 2, la negociación humana y el ajuste económico por alcance. Pero es la **primera validación en el mercado** de lo construido: una oferta producida con este flujo compitió contra ~15 propuestas y ganó, y lo hizo en una **cuenta de talla enterprise** (SKY Airline, aerolínea), no en un piloto menor.
 
+> 📘 **Análisis completo (qué hicimos bien, qué mejorar, riesgos y qué replicar):** [`ANALISIS-ADJUDICACION-Y-PATRON-DE-CUENTA-INTERNO.md`](ANALISIS-ADJUDICACION-Y-PATRON-DE-CUENTA-INTERNO.md) — interno, nunca va a SKY.
+>
 > **Superseded:** las cifras de la oferta original (CLP 5,2M/mes, 8 artículos, TCV 124,8M, BAFO 4,3M,
 > piso 5,0M) **no son las condiciones vigentes**.
 

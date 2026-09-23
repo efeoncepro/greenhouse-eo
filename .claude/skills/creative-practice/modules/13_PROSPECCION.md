@@ -87,7 +87,7 @@ freelancer.**
 | **Licitaciones** *(Wherex / Mercado Público)* | ✅ **Presupuesto confirmado.** *(Ahí nació SKY)* | 🔴 Requiere el motor: → **`greenhouse-public-private-tenders`** |
 | **Eventos / comunidad creativa** | ⚠️ **Lento pero real** | Es donde está el creative lead in-house |
 | 🔴 **Cold email genérico "somos una agencia creativa"** | 🔴 **Cero.** | **Hay 10.000 diciendo lo mismo. Es ruido** |
-| 🔴 **Portafolio / reel como gancho de entrada** | 🔴 **Cero.** | **Todos tienen uno.** Y ✅ **nosotros no tenemos casos creativos citables** *(`ESTADO_ACTUAL` § 6)* — **abrir por ahí es abrir por nuestra debilidad** |
+| 🔴 **Portafolio / reel como gancho de entrada** | 🔴 **Cero.** | **Todos tienen uno.** Y ✅ **nuestro portafolio creativo es delgado** *(un caso publicado —SKY, métricas de entrega, 2026-09-23— y ninguno con resultado de negocio; `ESTADO_ACTUAL` § 6)* — **abrir por ahí es abrir por nuestra debilidad** |
 | 🔴 **Ranking de agencias / premios** | 🔴 **No es un canal para nosotros** | ✅ El ranking CL *(Barómetro La Vulca, 967 profesionales)* **es de recall, no de postulación.** **No salir no es un problema de propuesta: es de notoriedad** |
 
 ---
@@ -190,7 +190,7 @@ el piso del ciclo, pero NO es nuestra tasa medida.**]
 
 1. 🔴 **Nunca abras con "somos una agencia creativa".** Hay 10.000. **Abre con el diagnóstico.**
 2. 🎯 **No busques al que no tiene equipo. Busca al que tiene equipo y no da abasto.** *(✅ 82% ya tiene in-house.)*
-3. 🔴 **Nunca abras con el portafolio.** Es nuestra debilidad *(cero casos creativos citables)* **y es el
+3. 🔴 **Nunca abras con el portafolio.** Es nuestra debilidad *(un solo caso creativo publicado, de delivery, no de negocio)* **y es el
    terreno donde todos empatan.**
 4. 🎯 **La señal más caliente: creative lead nuevo sin equipo alrededor.** Autoridad + dolor + sin manos.
 5. 🎯 **Dale el comparable correcto antes que procurement le dé el equivocado.** *(Art director in-house:

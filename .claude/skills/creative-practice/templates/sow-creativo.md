@@ -126,7 +126,8 @@ aprobación adicional}}.
 
 > 🔴 **ESTA CLÁUSULA NO SE OMITE.**
 > Pedirla después es pedir un **favor**. Pedirla acá es una **cláusula estándar que nadie discute.**
-> **Y sin ella no hay casos — que es exactamente donde estamos hoy: cero.**
+> **Y sin ella el caso no sale del cliente.** *(Actualización 2026-09-23: el caso SKY se publicó en el wrapper
+> `experiencia.efeoncepro.com`, pero citarlo fuera de él exige autorización escrita que aún no está verificada.)*
 > *(🩸 `ANTIPATTERNS.md` F)*
 
 ---

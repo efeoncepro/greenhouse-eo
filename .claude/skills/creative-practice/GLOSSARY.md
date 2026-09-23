@@ -132,7 +132,8 @@ ningún reporte: simplemente el margen nunca llega.**
 
 **Autorización de portafolio** — el derecho a mostrar el trabajo. 🔴 **Se pide EN EL CONTRATO, no un año
 después.** Después es un **favor**; en el contrato es una **cláusula que nadie discute.**
-*(Y sin ella: cero casos. Que es exactamente donde estamos.)*
+*(Y sin ella el caso no sale del cliente. Actualización 2026-09-23: el caso SKY está publicado en su wrapper,
+`experiencia.efeoncepro.com`; citarlo fuera exige autorización escrita aún no verificada.)*
 
 ---
 

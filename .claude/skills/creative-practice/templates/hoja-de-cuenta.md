@@ -127,7 +127,7 @@ unitario.** *(Y ahí ya perdiste.)*
 ## 5 · 🎯 El diagnóstico que le vamos a llevar *(la cuña — sin esto no se toca la puerta)*
 
 > 🔴 **Nunca abras con "somos una agencia creativa".** Hay 10.000. **Y nunca abras con el portafolio:** es
-> nuestra debilidad *(cero casos creativos citables)* **y es el terreno donde todos empatan.**
+> nuestra debilidad *(un solo caso creativo publicado —SKY, métricas de entrega— y ninguno con resultado de negocio)* **y es el terreno donde todos empatan.**
 > 🎯 **Lo único que abre un correo es decirle algo que él no sabía sobre su propio negocio.**
 
 | | |
