@@ -33,7 +33,10 @@ export const REGLAS_EXCEPTUABLES = [
   'firma-posicion',
   'orden-lectura',
   'jerarquia-rol',
-  'cta-aire'
+  'cta-aire',
+  // Tramo 12
+  'eje-centrado',
+  'tracking-titular'
 ]
 
 // Límites de las zonas de sujeto ignoradas: cada una ≤ 10 % del lienzo y todas juntas ≤ 15 %. Una zona del tamaño del
@@ -223,7 +226,9 @@ export const esquemaPieza = z
       .array(z.object({ box: caja, reason: razon }).strict().refine(z0 => z0.box[0] < z0.box[2] && z0.box[1] < z0.box[3], 'la zona necesita x0 < x1 e y0 < y1'))
       .optional(),
     textGrowth: z.boolean().optional(),
-    placement: z.object({ anchoCssPx: positivo, razon }).strict().optional(),
+    // Piso de 320 CSS px, el ancho de referencia del reflujo de WCAG (tramo 12; auditoría de arquitectura de la cuarta
+    // certificación, N1): con 15 el borde del contorno medía 77 px y el CTA desaparecía, con el gate en 0.
+    placement: z.object({ anchoCssPx: z.number().finite().min(320).max(8192), razon }).strict().optional(),
     // Las aprobaciones que apagan una medición —concepto reducido, pieza sin firma, zona del sujeto ignorada— nombran el
     // plate para el que se aprobaron, como las excepciones: con un plate regenerado, la zona ignorada seguía apagando la
     // guarda sin re-aprobación (tramo 10; auditoría de arquitectura, hallazgo 16). El gate lo exige.
@@ -312,7 +317,23 @@ function reglasCruzadas(p) {
 
   // «columna» es la columna del texto alineado a la izquierda (tramo 8; auditoría de arquitectura, N10): en un bloque
   // centrado el CTA arrancaba en el eje y el gate salía con 0.
-  if (columna.length && p?.align === 'center') e.push(`${columna.join(' y ')}: «columna» es la columna del texto alineado a la izquierda; en un bloque centrado usa una fracción del ancho`)
+  // En un bloque centrado el CTA va con `cta.align: "center"` y la nota sin `x` (se centra sola). Antes el mensaje pedía
+  // «una fracción del ancho», y seguirlo dejaba nota y CTA colgando del eje con el gate en 0 (tramo 12; auditoría de diseño
+  // de la cuarta certificación, N4).
+  if (columna.length && p?.align === 'center') e.push(`${columna.join(' y ')}: «columna» es la columna del texto alineado a la izquierda; en un bloque centrado el CTA va con \`cta.align: "center"\` y la nota sin \`x\` (se centra sola)`)
+
+  const textos = [['lead', p?.lead], ['dominant', p?.dominant], ['after', p?.after], ['label', p?.label], ['note.text', p?.note?.text], ['cta.text', p?.cta?.text], ['cta.descriptor', p?.cta?.descriptor], ['footer.text', p?.footer?.text], ...(p?.selection?.cursors ?? []).map((k, i) => [`selection.cursors.${i}.label`, k?.label]), ...(p?.cta?.seleccion?.cursores ?? []).map((k, i) => [`cta.seleccion.cursores.${i}.label`, k?.label])].filter(([, t]) => typeof t === 'string')
+
+  for (const [campo, t] of textos) {
+    // Tramo 12 (cuarta certificación): `**` y `[[ ]]` sólo se interpretan en entrada, titular, cierre, nota y pie; en el
+    // CTA, el descriptor y las etiquetas se dibujaban literales. Una entidad (`&amp;`) se dibujaba tal cual en cualquier voz,
+    // y un salto de línea `\n` salía como un cuadro con «?» (el corte de línea es `|`).
+    if (/\*\*|\[\[|\]\]/.test(t) && !['lead', 'dominant', 'after', 'note.text', 'footer.text'].includes(campo)) e.push(`\`${campo}\` no admite \`**\` ni \`[[ ]]\`: se dibujarían literales (sólo entrada, titular, cierre, nota y pie los interpretan)`)
+    const ent = t.match(/&(#\d+|#x[0-9a-f]+|[a-z]+);/i)
+
+    if (ent) e.push(`\`${campo}\` trae la entidad «${ent[0]}»: escribe el carácter; la entidad se dibujaría literal`)
+    if (/[\n\r\t]/.test(t)) e.push(`\`${campo}\` trae un salto de línea o una tabulación: se dibujaría como un cuadro vacío; para cortar la línea usa \`|\``)
+  }
 
   for (const [campo, t] of [['lead', p?.lead], ['dominant', p?.dominant], ['after', p?.after], ['label', p?.label], ['note.text', p?.note?.text], ['cta.text', p?.cta?.text], ['cta.descriptor', p?.cta?.descriptor], ['footer.text', p?.footer?.text], ['card.header', p?.card?.header], ['card.body', p?.card?.body], ['gesture.text', p?.gesture?.text], ['altText', p?.altText]]) {
     const malas = entidadesInvalidas(t)

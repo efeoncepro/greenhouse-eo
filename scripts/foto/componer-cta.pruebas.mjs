@@ -420,7 +420,11 @@ const PRUEBAS = [
 
       const enCanon = await componer('P06-canon', [canon('b2_916')])
       // Con "axis" el texto también arranca dentro de la zona por arriba: p1-cta-contorno declara top 0,05 y feed pide 6 %.
-      const arriba = await componer('P06-axis-arriba', [canon('p1_45')])
+      // Tramo 12: sin su selección del titular, cuyo marco tapa la entrada en el canon nuevo (se prueba aparte).
+      const p1SinSeleccion = canon('p1_45')
+
+      delete p1SinSeleccion.selection
+      const arriba = await componer('P06-axis-arriba', [p1SinSeleccion])
       let respetaArriba = false
 
       if (arriba.ok) {
@@ -574,6 +578,23 @@ const PRUEBAS = [
       }
 
       const creceConZona = rCrece.ok && rCrece.qa[0].escala > 1.2
+
+      // Tramo 12 (cuarta certificación, N1): el marco de la selección del titular y los corchetes del CTA entran en las
+      // invariantes del canon nuevo; un cursor no tapa las letras de su destino; la columna deja lugar a los corchetes; y en
+      // una pieza aprobada el marco que tapa una voz se avisa (no se mueve nada aprobado).
+      const conCursorLocal = canon('b2_916')
+      const corchetesSobreNota = canon('b2_916')
+      const ctaTexto = canon('b2_916')
+
+      conCursorLocal.selection = { variant: 'eight-handles', padding: 'standard', cursors: [{ id: 'yo', kind: 'local', anchor: 'top-start' }] }
+      Object.assign(corchetesSobreNota.cta, { variant: 'text', gapAfterNote: 0 })
+      Object.assign(ctaTexto.cta, { variant: 'text' })
+      const [rMarcoP1, rCursorLocal, rCorchetes, rCtaTexto, rP1Legado] = await Promise.all([componer('P06-marco-titular', [canon('p1_45')]), componer('P06-cursor-local', [conCursorLocal]), componer('P06-corchetes-nota', [corchetesSobreNota]), componer('P06-cta-texto', [ctaTexto]), componer('P06-p1-legado', [pieza('p1_45')])])
+      const marcoTitularRechazado = !rMarcoP1.ok && /marco de la selección del titular tapa «/.test(rMarcoP1.error)
+      const cursorRechazado = !rCursorLocal.ok && /cursor «yo» tapa «dominante»/.test(rCursorLocal.error)
+      const corchetesRechazados = !rCorchetes.ok && /marco de la selección del CTA tapa «nota»/.test(rCorchetes.error)
+      const reservaCorchetes = rCtaTexto.ok && !(rCtaTexto.qa[0].fueraDeZona ?? []).some(id => /seleccion|cursor|marco/.test(id))
+      const legadoAvisa = rP1Legado.ok && rP1Legado.qa[0].canon === '2026-09-22' && /marco de la selección del titular tapa «/.test(rP1Legado.salida) && (rP1Legado.qa[0].marcoSobreVoz ?? []).length > 0
       // Tramo 10: una selección sobre un OBJETO de la foto no tapa ninguna voz —ni con el marco, ni con el cursor o la
       // etiqueta— (auditorías de arquitectura y de diseño, hallazgo 1: las manijas cruzaban el titular con el gate en 0).
       const sobreObjeto = canon('b2_916')
@@ -590,7 +611,7 @@ const PRUEBAS = [
         margen = Math.min(...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.left)) >= izquierda.safeArea.x0 * L.canvas.width - 0.5
       }
 
-      return { ok: zonaPorDefecto && creceConZona && cuartoInferior && objetoRechazado && dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva && zonaAxis && enColumna && firmaAuto && zonaFrena && externaRechazada && respetaArriba && firmaEnBanda && reservaSinEfecto && respetaProtect, detalle: `zona AXIS por defecto en una pieza nueva: ${zonaPorDefecto}${rSinZona.ok ? '' : ` (${rSinZona.error})`} · el 16:9 nuevo crece con la zona AXIS: ${creceConZona} (×${rCrece.ok ? rCrece.qa[0].escala : rCrece.error}) · la firma automática del canon nuevo queda en el cuarto inferior: ${cuartoInferior} · selección sobre un objeto que tapa el texto rechazada: ${objetoRechazado}${objetoRechazado ? '' : ` (${objeto.error ?? 'compuso'})`} · la firma automática respeta las zonas protect: ${respetaProtect} (${detalleProtect}) · crecer no usa la excepción de la reserva: ${reservaSinEfecto}${conExc.ok ? '' : ` (${conExc.error})`} · la firma automática nunca sube por encima del contenido (KV-06-169): ${firmaEnBanda} (${detalleBanda}) · con "axis" el texto arranca dentro de la zona por arriba: ${respetaArriba}${arriba.ok ? '' : ` (${arriba.error})`} · firma externa sobre el texto rechazada: ${externaRechazada} · crecimiento frenado por la zona declarada: ${zonaFrena} (${detalleZona}) · zona de AXIS con safeArea "axis": ${zonaAxis}${enCanon.ok ? '' : ` (${enCanon.error})`} · CTA y descriptor en la columna: ${enColumna} · firma automática 20 % legible dentro de la zona: ${firmaAuto} · ${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
+      return { ok: marcoTitularRechazado && cursorRechazado && corchetesRechazados && reservaCorchetes && legadoAvisa && zonaPorDefecto && creceConZona && cuartoInferior && objetoRechazado && dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva && zonaAxis && enColumna && firmaAuto && zonaFrena && externaRechazada && respetaArriba && firmaEnBanda && reservaSinEfecto && respetaProtect, detalle: `marco de la selección del titular sobre el texto rechazado: ${marcoTitularRechazado}${marcoTitularRechazado ? '' : ` (${rMarcoP1.error ?? 'compuso'})`} · cursor sobre el titular rechazado: ${cursorRechazado}${cursorRechazado ? '' : ` (${rCursorLocal.error ?? 'compuso'})`} · corchetes del CTA de texto sobre la nota rechazados: ${corchetesRechazados}${corchetesRechazados ? '' : ` (${rCorchetes.error ?? 'compuso'})`} · la columna deja lugar a los corchetes del CTA de texto: ${reservaCorchetes}${rCtaTexto.ok ? ` (fuera de zona: ${(rCtaTexto.qa[0].fueraDeZona ?? []).join(', ') || 'nada'})` : ` (${rCtaTexto.error})`} · la pieza aprobada con el marco sobre una voz compone y avisa: ${legadoAvisa} · zona AXIS por defecto en una pieza nueva: ${zonaPorDefecto}${rSinZona.ok ? '' : ` (${rSinZona.error})`} · el 16:9 nuevo crece con la zona AXIS: ${creceConZona} (×${rCrece.ok ? rCrece.qa[0].escala : rCrece.error}) · la firma automática del canon nuevo queda en el cuarto inferior: ${cuartoInferior} · selección sobre un objeto que tapa el texto rechazada: ${objetoRechazado}${objetoRechazado ? '' : ` (${objeto.error ?? 'compuso'})`} · la firma automática respeta las zonas protect: ${respetaProtect} (${detalleProtect}) · crecer no usa la excepción de la reserva: ${reservaSinEfecto}${conExc.ok ? '' : ` (${conExc.error})`} · la firma automática nunca sube por encima del contenido (KV-06-169): ${firmaEnBanda} (${detalleBanda}) · con "axis" el texto arranca dentro de la zona por arriba: ${respetaArriba}${arriba.ok ? '' : ` (${arriba.error})`} · firma externa sobre el texto rechazada: ${externaRechazada} · crecimiento frenado por la zona declarada: ${zonaFrena} (${detalleZona}) · zona de AXIS con safeArea "axis": ${zonaAxis}${enCanon.ok ? '' : ` (${enCanon.error})`} · CTA y descriptor en la columna: ${enColumna} · firma automática 20 % legible dentro de la zona: ${firmaAuto} · ${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
     }
   },
   {
@@ -616,6 +637,7 @@ const PRUEBAS = [
       plate.plate = path.join(ROOT, 'no/existe.png')
       ignorar.subjectGuard = { ignore: [{ box: [0, 0, 0.1, 0.1] }] }
       extra.colorFondo = '#000'
+      delete extra.selection
       ancla.cta.seleccion = { cursores: [{ id: 'ia', kind: 'collaborator', anchor: 'end-center', label: 'IA', who: 'role' }] }
       Object.assign(prom.cta, { variant: 'auto', prominencia: 'enorme' })
       // Tramo 1 de la certificación (2026-09-23): el id es parte de rutas de archivo; una guarda no se apaga entera
@@ -679,6 +701,20 @@ const PRUEBAS = [
       firmaFuera.firma = { modo: 'externa', razon: 'prueba: la firma la pone firmar.mjs' }
       firmaFuera.signatureY = 0.995
       conVelo.scrimTop = { opacity: 0.8, to: 0.42, color: '#050818' }
+      // Tramo 12 (cuarta certificación): marcado donde se dibujaría literal, entidades, saltos de línea, `placement` chico
+      // y un plate con transparencia.
+      const marcado = base()
+      const entidadLiteral = base()
+      const salto = base()
+      const pantallaChica = base()
+      const conAlfa = base()
+
+      marcado.cta.text = 'Agenda tu **discovery**'
+      entidadLiteral.lead = 'Marketing &amp; ventas'
+      salto.dominant = 'Uno\ndos'
+      pantallaChica.placement = { anchoCssPx: 15, razon: 'prueba: una pantalla diminuta' }
+      conAlfa.plate = path.join(TMP, 'P07-plates', 'con-alfa.png')
+      await sharp(base().plate).ensureAlpha(0.5).png().toFile(conAlfa.plate)
 
       const casos = [
         ['falta cta.fontSize', [sinFont], [], /falta `cta\.fontSize`/],
@@ -711,7 +747,12 @@ const PRUEBAS = [
         ['escala del cursor sin techo', [escala], [], /`cta\.cursorScale` debe ser ≤ 2/],
         ['final que se aleja de lo medido', [lejano], [], /reduce demasiado la pieza/],
         ['firma externa fuera de la imagen', [firmaFuera], [], /firma-externa .* cae fuera de la imagen/],
-        ['velo (el lecho sale del prompt)', [conVelo], [], /`scrimTop`: el velo no se usa/]
+        ['velo (el lecho sale del prompt)', [conVelo], [], /`scrimTop`: el velo no se usa/],
+        ['marcado en el CTA', [marcado], [], /`cta\.text` no admite `\*\*`/],
+        ['entidad que se dibujaría literal', [entidadLiteral], [], /`lead` trae la entidad «&amp;»/],
+        ['salto de línea que sale como cuadro', [salto], [], /`dominant` trae un salto de línea/],
+        ['placement bajo 320 CSS px', [pantallaChica], [], /`placement\.anchoCssPx` debe ser ≥ 320/],
+        ['plate con transparencia', [conAlfa], [], /tiene transparencia/]
       ]
 
       const rs = await Promise.all(casos.map(([, piezas, ids], i) => componer(`P07-${i}`, piezas, ids)))
@@ -1248,6 +1289,7 @@ const PRUEBAS = [
       const oscura = pieza('p1_45')
 
       oscura.leadFill = '#333333'
+      delete oscura.selection
       const bajo = await componer('P10-wcag', [oscura])
       const gBajo = await gate(bajo.planPath)
 
@@ -1401,6 +1443,28 @@ const PRUEBAS = [
         c11GCanonForjado = await gate(path.join(d, 'piezas.json'))
       }
 
+      // ── Tramo 12 · cuarta certificación ──
+      const c12Centrada = canon('b2_916')
+      const c12Tracking = canon('b2_916')
+      const c12Pegada = canon('b2_916')
+
+      Object.assign(c12Centrada, { align: 'center' })
+      Object.assign(c12Centrada.cta, { x: 0.5 })
+      delete c12Centrada.note.x
+      c12Tracking.dominantTracking = -0.07
+      // La firma, con `logo.y` fija, a 2 px del final del contenido: se mide el contenido de la MISMA pieza sin crecer.
+      const c12Base = canon('b2_916')
+
+      c12Base.textGrowth = false
+      c12Pegada.textGrowth = false
+      const rC12Base = await componer('P10-pegada-base', [c12Base])
+      const Lb = rC12Base.ok ? leer(rC12Base.dir, 'b2-primero-el-numero-916-layout.json') : null
+      const c12Contenido = Lb ? Math.max(...Lb.maquetacion.elementos.filter(e => e.tipo !== 'firma' && e.tipo !== 'acento').map(e => e.box.bottom)) : 0
+
+      c12Pegada.logo = { width: 0.2, x: 0.5, y: Lb ? +((c12Contenido + 2) / Lb.canvas.height).toFixed(4) : 0.5 }
+      const c12Rs = await Promise.all([['P10-centrada-fuera-eje', c12Centrada], ['P10-tracking', c12Tracking], ['P10-firma-pegada', c12Pegada]].map(([n, p]) => componer(n, [p])))
+      const [gC12Centrada, gC12Tracking, gC12Pegada] = await Promise.all(c12Rs.map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
+
       if (rAutoCanon.ok) {
         const qaF = path.join(rAutoCanon.dir, 'out', 'qa-piezas.json')
         const q = JSON.parse(fs.readFileSync(qaF, 'utf8'))
@@ -1431,6 +1495,9 @@ const PRUEBAS = [
         'firma externa del canon nuevo exige aprobación': c11GExternaNueva.code === 1 && /firma EXTERNA .* sin aprobador del registro/.test(c11GExternaNueva.salida) && /firma EXTERNA .* \(aprobó suite-pruebas\)/.test(c11GExternaAprobada.salida),
         'la pieza aprobada sigue con su canon': c11RLegadoCanon.ok && c11RLegadoCanon.qa[0].canon === '2026-09-22' && !/firma EXTERNA|orden de lectura|jerarquía por rol/.test(c11GLegado.salida),
         'rechaza QA con otro canon': c11GCanonForjado.code === 1 && /el QA dice canon 2026-09-22 y la pieza es del canon 2026-09-23/.test(c11GCanonForjado.salida),
+        'rechaza bloque centrado fuera del eje': gC12Centrada.code === 1 && /en un bloque centrado, fuera del eje/.test(gC12Centrada.salida),
+        'rechaza tracking del titular fuera de rango (canon nuevo)': gC12Tracking.code === 1 && /el tracking del titular \(-0\.07 em\)/.test(gC12Tracking.salida),
+        'rechaza firma pegada al contenido (canon nuevo)': gC12Pegada.code === 1 && /queda pegada al contenido/.test(gC12Pegada.salida),
         'el QA queda en qa-<plan>.json': qaPorPlan && bueno.ok && fs.existsSync(path.join(bueno.dir, 'out/qa-piezas.json')),
         'rechaza pieza sin firma declarada': gSinFirma.code !== 0 && /no declara firma/.test(gSinFirma.salida),
         'acepta la firma externa declarada y la mide': rExterna.ok && !/no declara firma/.test(gExterna.salida) && typeof rExterna.qa[0].contraste.firmaExterna === 'number',

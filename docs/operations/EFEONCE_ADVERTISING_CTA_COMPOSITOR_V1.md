@@ -1089,8 +1089,50 @@ encuentra lugar legible y no sube; la banda la vigila la pieza con el pie proteg
 velo.
 
 **Pendiente de este tramo:** el piso de legibilidad por rol (pendiente 6), a la espera de la decisión del operador; y
-subir la firma de las piezas existentes que la tienen fuera de AXIS donde el lecho ya cubre la nueva posición (decisión
-del operador): se prepara la lista y se muestra antes de tocar las carpetas de campaña.
+subir la firma de las piezas existentes que la tienen fuera de AXIS donde el lecho ya cubre la nueva posición (aprobado
+por el operador: 46 de 47 piezas; KV-06 no alcanza 4,5:1 y queda como está). Se hace después del tramo 12, con el
+compositor final, para recomponer una sola vez.
+
+### Cuarta certificación (2026-09-23): dos auditores, NO CERTIFICA
+
+Los dos auditores reprodujeron los 🔴/🟠 de la tercera y los dan por **cerrados** (selección sobre un objeto,
+`signatureSafeArea`, aprobador de la suite, estado interno, HUD/url/pie, espacios Unicode, huellas del texto alternativo
+y del QA, `--comando`, orden de lectura, jerarquía y firma del canon nuevo). Encontraron, nuevos:
+
+| Severidad | Hallazgo (auditor) | Uso real |
+|---|---|---|
+| 🔴 | El **marco** de la selección del titular —y el del CTA cuando se pinta— no entraba en las invariantes: con los gaps de piezas reales tachaba la entrada y el cierre; el cursor local tapaba la «C» del titular (los dos) | 22 definiciones; una pieza aprobada (`p1-atril-busqueda-16x9-cta`) ya lo muestra |
+| 🔴 | `placement` sin piso: con 15 CSS px el borde del contorno medía 77 px y el CTA desaparecía (arquitectura) | ninguna |
+| 🟠 | `**`, `[[ ]]` y entidades se dibujaban literales en el CTA, el descriptor y la etiqueta (diseño) | ninguna |
+| 🟠 | `dominantTracking` dentro del rango del esquema fundía letras del titular (diseño) | 2 aprobadas (−0,07 y 0,05) |
+| 🟠 | En un bloque centrado nadie verificaba el eje, y el mensaje del esquema llevaba al defecto (diseño) | 51 centradas, ninguna fuera del eje |
+| 🟠 | `\n` se dibujaba como un cuadro con «?» (arquitectura) | ninguna |
+| 🟠 | Un plate con transparencia se medía contra el color bajo el alfa y se entregaba con alfa (arquitectura) | ninguno |
+
+### Tramo 12 — cuarta certificación (cerrado)
+
+- **Marcos de selección:** el del titular (con media manija por fuera) y el del CTA cuando se pinta entran en las
+  invariantes, en la guarda del sujeto y en `protect` **en las piezas nuevas**; en una aprobada se miden y se **avisan**
+  (`marcoSobreVoz` en el QA; nada aprobado se mueve). Un cursor o una etiqueta no tapan ningún texto, ni el de su
+  destino (todas las piezas: ninguna aprobada lo hace).
+- **Canon nuevo:** la columna deja lugar a lo que se dibuja a su izquierda —los corchetes del CTA de texto y el marco
+  de la selección del titular— y descuenta ese lugar del ancho del texto; antes esos estilos nunca cabían en la zona de
+  AXIS. `auto` sólo reserva si su prominencia es discreta (nunca termina en texto con otra).
+- **Validación (todas):** `placement.anchoCssPx` ≥ 320; `**`/`[[ ]]` sólo en entrada, titular, cierre, nota y pie;
+  ninguna entidad (se escribe el carácter); ningún salto de línea ni tabulación (el corte es `|`); un plate con
+  transparencia se rechaza.
+- **Gate:** eje del bloque centrado ±4 px en todas (`eje-centrado`); tracking del titular −0,035…0,02 em en las nuevas
+  (`tracking-titular`); la firma de una pieza nueva queda al menos a 2 % del lado corto del contenido; `centerX` 0,35 y
+  0,65 ya no se rechazan por coma flotante.
+- **Deudas baratas cerradas:** el registro del canon se compara con el commit (como el de aprobadores); sin historial,
+  una aprobación no se certifica; el aprobador de la suite exige que también el plan juzgado esté fuera del repo; la nota
+  entra en el aviso de la columna.
+
+**Deuda 🟡/🟢 que queda registrada** (no bloquea según la regla de término): aire mínimo entre voces; firma sobre un
+objeto no protegido; CTA sólido medido contra su color; CTA de texto que se confunde con el copy; dos cursores locales;
+etiquetas de cursor fuera del orden de lectura y la jerarquía; `logo` junto a una firma externa (3 aprobadas lo
+declaran); `.reclamo` huérfano; aviso de columna con la variante declarada; suite y regresión dependientes de plates de
+campaña; mutantes por nombre de prueba; regresión juzgada con el gate del árbol de trabajo; medición en el máster.
 
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
@@ -1363,6 +1405,9 @@ que no actúan sin `label`. Cópiala a tu carpeta, cambia `id`, `plate`, copy y 
 | `canon: "2026-09-23"` | Informativo: el canon lo decide el registro de las aprobadas; declararlo no cambia nada y sólo acepta el vigente |
 | `firma` · `excepciones` · `conceptoReducido` | Salidas del canon con razón y aprobador: §19.6 y §19.7 |
 
+**Cómo se escribe el copy:** `|` corta la línea (nunca `\n`); `**negrita**` y `[[acento]]` sólo en entrada, titular,
+cierre, nota y pie; los caracteres se escriben tal cual (`&`, no `&amp;`). El compositor rechaza lo demás al validar.
+
 Un plan puede usar `null` para decir «no hay» (`label: null`, `after: null`): se trata como ausente. Un campo que no
 existe dentro de un objeto propio (`cta`, `note`, `logo`, `firma`…) es un error; en la raíz del plan sólo se avisa,
 porque ahí conviven metadatos de otras herramientas.
@@ -1492,6 +1537,8 @@ Copiarlo sólo vale si el operador re-aprueba la excepción para ese plate.
 | `orden-lectura` | Canon nuevo: voces fuera del orden entrada → titular → cierre → nota → CTA → descriptor | no se mide: sin `hasta` |
 | `jerarquia-rol` | Canon nuevo: una voz sobre 0,6× el titular, o el descriptor ≥ el CTA | razón máxima aprobada (p. ej. `0.65`) |
 | `cta-aire` | Canon nuevo: padding del botón bajo 0,5× y 0,25× el cuerpo del CTA | no se mide: sin `hasta` |
+| `eje-centrado` | Una voz, el botón o el descriptor de un bloque centrado a más de 4 px del eje | no se mide: sin `hasta` |
+| `tracking-titular` | Canon nuevo: tracking del titular fuera de −0,035…0,02 em | no se mide: sin `hasta` |
 | — | Texto bajo 9 CSS px en el teléfono | hoy sólo avisa (pendiente 6) y no hay excepción: `legibilidad` no está en el esquema y un plan que la declara se rechaza |
 
 Una excepción **vale** sólo si se cumplen las tres condiciones del tramo 7:
@@ -1539,20 +1586,26 @@ aprobador ni copia `suite-pruebas` a un plan real: si falta la aprobación, preg
 - **Maquetación:** la reserva editorial (`reserva-editorial`) y las invariantes recalculadas sobre el layout: nada se
   encima y ninguna selección tapa una voz que no es su destino; una selección sobre un objeto de la foto no tapa
   ninguna.
-- **Canon 2026-09-23, sólo en piezas nuevas** (§18, tramo 11): firma de 25 % en los horizontales y hasta 35 %
-  (`firma-tamano`); firma debajo del contenido, en el cuarto inferior y fuera de `protect` (`firma-posicion`); firma
-  externa aprobada; orden de lectura (`orden-lectura`); jerarquía por rol (`jerarquia-rol`); aire del botón
-  (`cta-aire`); y un QA cuyo canon no calza con el registro.
+- **Canon 2026-09-23, sólo en piezas nuevas** (§18, tramos 11 y 12): firma de 25 % en los horizontales y hasta 35 %
+  (`firma-tamano`); firma debajo del contenido —con al menos 2 % del lado corto de aire—, en el cuarto inferior y fuera
+  de `protect` (`firma-posicion`); firma externa aprobada; orden de lectura (`orden-lectura`); jerarquía por rol
+  (`jerarquia-rol`); aire del botón (`cta-aire`); tracking del titular (`tracking-titular`); el marco de la selección
+  del titular y el del CTA cuando se pinta, dentro de las invariantes; y un QA cuyo canon no calza con el registro.
+- **Todas las piezas:** un cursor o una etiqueta de selección no tapan ningún texto, ni el de su destino; en un bloque
+  centrado, cada voz, el botón y el descriptor en el eje (±4 px, `eje-centrado`).
 
 **Rechaza al validar** (el compositor, antes de componer): un espacio o carácter que la fuente de su voz no tiene, un
 texto sin nada que dibujar, `signatureSafeArea` incompleta, el velo (`scrimTop`/`scrimBottom`), una nota con
-`gapAfterClosure` negativo, un campo interno del compositor en el plan, escalas de la
+`gapAfterClosure` negativo, `**`/`[[ ]]` fuera de entrada, titular, cierre, nota y pie, una entidad, un salto de línea
+o una tabulación, `placement` bajo 320 CSS px, un plate con transparencia, un campo interno del compositor en el plan, escalas de la
 selección sobre su techo, un `final` bajo el 85 % del máster o bajo 780 px, y una firma que cae fuera de la imagen.
 
 **No certificable** (código 3): gesto, tarjeta, HUD, url y cierre inferior —ninguna guarda los mide—, una pieza de otra
 versión del comando o con máscara de una caché ajena, y un `--comando` que no es el compositor del repo.
 
 **Avisa** (`⚠`, no bloquea; alguien lo mira):
+
+- en una pieza del canon anterior, el marco de una selección que tapa otra voz (`marcoSobreVoz`; en una nueva bloquea);
 
 - la variante del CTA elegida sin margen (pendiente 5);
 - `placement` declarado;

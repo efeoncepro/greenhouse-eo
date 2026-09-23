@@ -7,6 +7,7 @@
 // contenido —su definición en el plan, el plate, el comando y el PNG— y el gate las RECALCULA: ninguna fecha decide.
 import fs from 'node:fs'
 import path from 'node:path'
+import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 
@@ -79,6 +80,23 @@ export const REGISTRO_CANON = 'scripts/foto/canon-anterior.json'
 export const huellaSinPlate = pieza => sha(estable({ ...pieza, plate: undefined }))
 
 const registros = new Map()
+
+// El registro del canon se lee del árbol de trabajo: una pieza nueva agregada sin commit se juzgaba con el canon anterior
+// (tramo 12; auditoría de arquitectura de la cuarta certificación). El gate no certifica con un registro que difiere del
+// commit vigente (o que no se puede comparar).
+let alteradoCanon
+
+export function registroCanonAlterado() {
+  if (alteradoCanon !== undefined) return alteradoCanon
+
+  try {
+    alteradoCanon = execFileSync('git', ['show', `HEAD:${REGISTRO_CANON}`], { cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64e6 }) !== fs.readFileSync(path.join(REPO, REGISTRO_CANON), 'utf8')
+  } catch {
+    alteradoCanon = true
+  }
+
+  return alteradoCanon
+}
 
 // `registro`: otra ruta del registro, sólo para las pruebas unitarias.
 export function canonDe(pieza, plateSha, registro = path.join(REPO, REGISTRO_CANON)) {

@@ -11,7 +11,7 @@ import { execFileSync, spawnSync } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 
-import { CANON_ANTERIOR, CANON_VIGENTE, COMPOSITOR, REPO, canonDe, dentroDelRepo, estable, huellaComando, huellaPieza, marcaDeSuite, rutaQa, rutaReal, sha } from './cta-integridad.mjs'
+import { CANON_ANTERIOR, CANON_VIGENTE, COMPOSITOR, REPO, canonDe, dentroDelRepo, estable, huellaComando, huellaPieza, marcaDeSuite, registroCanonAlterado, rutaQa, rutaReal, sha } from './cta-integridad.mjs'
 import { fueraDeReserva, invariantesMaquetacion } from './cta-invariantes.mjs'
 import { copiaEnEscena } from './accesibilidad.mjs'
 
@@ -38,7 +38,8 @@ const registroAlterado = (() => {
   try {
     return execFileSync('git', ['show', 'HEAD:scripts/foto/aprobadores.json'], { cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }) !== TEXTO_APROBADORES
   } catch {
-    return false
+    // Sin historial con qué comparar (una copia del repo sin git) no hay cómo saber si el registro es el del commit.
+    return true
   }
 })()
 
@@ -48,7 +49,9 @@ const registroAlterado = (() => {
 const deLaSuite = () => {
   const origen = ORIGEN ?? path.resolve(plan)
 
-  return !dentroDelRepo(origen) && marcaDeSuite(path.dirname(origen))
+  // También el plan que se juzga, no sólo el origen declarado: con `.origen` y los valores de entorno forjados a mano, un
+  // plan del repo pasaba por uno de la suite (tramo 12; auditoría de arquitectura de la cuarta certificación).
+  return !dentroDelRepo(origen) && !dentroDelRepo(path.resolve(plan)) && marcaDeSuite(path.dirname(origen))
 }
 
 // `null` si el aprobador vale; si no, por qué. Un aprobador `soloPruebas` vale únicamente en los planes de la suite.
@@ -621,6 +624,7 @@ const FIRMA_ANCHO_MAX = 0.35
 const PISO_FIRMA = 0.75 // la firma arranca en el cuarto inferior
 const TOPE_ROL = 0.6 // ninguna voz pasa de 0,6× el titular
 const AIRE_CTA = { x: 0.5, y: 0.25 } // padding mínimo del botón, en cuerpos del CTA
+const TRACKING_TITULAR = [-0.035, 0.02] // em; AXIS `ideaImpact` usa −0,035
 
 // Cuánto se sale de su zona lo que se sale (px del lienzo, el peor elemento): la medida que una excepción «zona-segura»
 // tiene que cubrir con `hasta`. Un elemento que el layout no trae no se puede acotar (sin medir).
@@ -664,6 +668,11 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   else if (r.canon !== canonPieza) { console.error(`✗ ${r.id}: el QA dice canon ${r.canon} y la pieza es del canon ${canonPieza} (su huella ${canonPieza === CANON_ANTERIOR ? 'está' : 'no está'} en scripts/foto/canon-anterior.json). Recompón.`); fallos++ }
 
   const nuevo = canonPieza === CANON_VIGENTE
+
+  // Una pieza juzgada con el canon ANTERIOR no se certifica con un registro que difiere del commit (tramo 12).
+  if (!nuevo && registroCanonAlterado()) noCertificable.push(`${r.id}: el registro del canon (scripts/foto/canon-anterior.json) tiene cambios sin commit: una pieza del canon anterior no se certifica con un registro que no está en el historial`)
+  // El marco de una selección que tapa otra voz en una pieza aprobada: se muestra (en una nueva, bloquea).
+  if (r.marcoSobreVoz?.length) console.warn(`⚠ ${r.id}: ${r.marcoSobreVoz.join(' · ')} (pieza del canon anterior: queda como está; en una pieza nueva bloquea).`)
   const lienzo = JSON.parse(readFileSync(path.join(dir, 'out', `${r.id}-layout.json`), 'utf8')).canvas
   const minFirma = nuevo && lienzo.width > lienzo.height * 1.2 ? FIRMA_ANCHO_HORIZONTAL : FIRMA_ANCHO_LADO_CORTO
 
@@ -739,9 +748,20 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
   if (typeof L.columna === 'number') {
     const boton = p.cta.variant === 'text' ? el('cta') : el('cta-boton')
     const desc = el('descriptor')
-    const corrido = [boton && Math.abs(boton.left - L.columna) > 4 && `el CTA arranca ${Math.round(boton.left - L.columna)} px`, desc && Math.abs(desc.left - L.columna) > 4 && `el descriptor arranca ${Math.round(desc.left - L.columna)} px`].filter(Boolean)
+    const nota = el('nota')
+    const corrido = [boton && Math.abs(boton.left - L.columna) > 4 && `el CTA arranca ${Math.round(boton.left - L.columna)} px`, desc && Math.abs(desc.left - L.columna) > 4 && `el descriptor arranca ${Math.round(desc.left - L.columna)} px`, nota && Math.abs(nota.left - L.columna) > 4 && `la nota arranca ${Math.round(nota.left - L.columna)} px`].filter(Boolean)
 
-    if (corrido.length) console.warn(`⚠ ${r.id}: ${corrido.join(' y ')} fuera de la columna del texto. Usa \`cta.x: "columna"\`.`)
+    if (corrido.length) console.warn(`⚠ ${r.id}: ${corrido.join(' y ')} fuera de la columna del texto. Usa \`cta.x: "columna"\` (y \`note.x: "columna"\`).`)
+  }
+
+  // Bloque CENTRADO (todas las piezas; tramo 12, auditoría de diseño de la cuarta certificación, N4): cada voz, el botón y
+  // el descriptor, centrados en el eje del bloque (±4 px). Nadie lo verificaba y el mensaje de error del esquema llevaba al
+  // defecto. Medido en las 51 piezas centradas aprobadas: ninguna se sale.
+  if (p.align === 'center') {
+    const eje = (p.centerX ?? 0.5) * L.canvas.width
+    const fuera = ['etiqueta', 'entrada', 'dominante', 'cierre-frase', 'nota', 'cta-boton', 'descriptor'].map(id => [id, el(id)]).filter(([, b]) => b && Math.abs((b.left + b.right) / 2 - eje) > 4).map(([id, b]) => `«${id}» a ${Math.round((b.left + b.right) / 2 - eje)} px`)
+
+    if (fuera.length && bloquea(p, 'eje-centrado', `en un bloque centrado, fuera del eje: ${fuera.join(' · ')}. Usa \`cta.align: "center"\` y la nota sin \`x\``)) fallos++
   }
 
   // Aire sobre los corchetes del CTA de texto (aviso): al menos media altura del CTA hasta la voz de arriba.
@@ -766,6 +786,9 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
 
       const razones = [
         b.top < contenidoAbajo - 0.5 && `queda por encima del final del contenido (arranca en ${Math.round(b.top)} px; el contenido termina en ${Math.round(contenidoAbajo)} px)`,
+        // Tramo 12 (auditoría de diseño de la cuarta certificación): con `logo.y` fija quedaba a 2 px del descriptor. La misma
+        // holgura que usa la búsqueda automática: 2 % del lado corto.
+        b.top >= contenidoAbajo - 0.5 && b.top < contenidoAbajo + Math.min(cw, ch) * 0.02 - 0.5 && `queda pegada al contenido (${Math.round(b.top - contenidoAbajo)} px; canon: al menos ${Math.round(Math.min(cw, ch) * 0.02)} px)`,
         b.top < ch * PISO_FIRMA - 0.5 && `arranca en el ${Math.round((b.top / ch) * 100)} % del alto (canon: en el cuarto inferior, desde el ${PISO_FIRMA * 100} %)`,
         ...(p.protect ?? []).filter(z => b.left < z.box[2] * cw && b.right > z.box[0] * cw && b.top < z.box[3] * ch && b.bottom > z.box[1] * ch).map(z => `tapa la zona protegida «${z.reason}»`)
       ].filter(Boolean)
@@ -793,6 +816,11 @@ for (const r of qa.filter(x => conCta.has(x.id))) {
     const peorRol = ROLES.length ? Math.max(...ROLES.map(k => t[k] / t.dominant)) : 0
 
     if (sobreTope.length && bloquea(p, 'jerarquia-rol', `la jerarquía por rol no se sostiene (cada voz ≤ ${TOPE_ROL}× el titular; el descriptor, menor que el CTA): ${sobreTope.join(' · ')}`, { valor: +peorRol.toFixed(2), sentido: 'max' })) fallos++
+
+    // Tracking del titular (auditoría de diseño de la cuarta certificación, N3): dentro del rango del esquema, −0,05 ya
+    // juntaba letras, −0,07 las fundía («Cerrarlo» → «Cerarlo») y +0,12 borraba el espacio. Rango de AXIS para el impacto,
+    // con un poco de aire: −0,035…0,02 em. Las dos piezas aprobadas fuera de él (−0,07 y 0,05) siguen con su canon.
+    if (typeof p.dominantTracking === 'number' && (p.dominantTracking < TRACKING_TITULAR[0] || p.dominantTracking > TRACKING_TITULAR[1]) && bloquea(p, 'tracking-titular', `el tracking del titular (${p.dominantTracking} em) está fuera de ${TRACKING_TITULAR[0]}…${TRACKING_TITULAR[1]} em: junta o separa las letras hasta que se leen otras palabras`)) fallos++
 
     // Aire del botón (auditoría de diseño, hallazgo 8): con padding 0 el borde cortaba las letras.
     const variante = r.ctaVariante?.elegida ?? p.cta.variant

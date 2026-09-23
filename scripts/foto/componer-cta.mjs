@@ -23,7 +23,7 @@ import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
 import { removeBackground } from '@imgly/background-removal-node'
 import { axisAdvertising } from '@efeoncepro/axis-tokens'
-import { resolveCollaborationSelectionIntent } from '@efeoncepro/axis-ui-contracts'
+import { AXIS_COLLABORATION_SELECTION_SPEC, resolveCollaborationSelectionIntent } from '@efeoncepro/axis-ui-contracts'
 
 import { renderCollaborationSelection } from '../../scripts/creative/layout-compiler/axis-advertising.mjs'
 import { compositeLuminosity } from '../../scripts/creative/layout-compiler/compiler.mjs'
@@ -517,7 +517,7 @@ const POPS = [pop[400], pop[700]]
 // Sólo el espacio común (U+0020) y el salto de línea se dibujan sin glifo. Cualquier otro espacio —U+3000, U+202F, que es
 // habitual en copy tipográfico y en texto generado por IA— sale como un cuadro vacío si la fuente no lo tiene: antes se
 // descartaba con `\s` ANTES de revisar la cobertura (tramo 10; auditoría de arquitectura, hallazgo 7).
-const sinGlifo = (texto, fuentes) => [...new Set([...String(texto ?? '').replace(/\*\*|\[\[|\]\]|\|/g, '')].filter(ch => ch !== ' ' && ch !== '\n').filter(ch => fuentes.some(f => !f.hasGlyphForCodePoint(ch.codePointAt(0)))))]
+const sinGlifo = (texto, fuentes) => [...new Set([...String(texto ?? '').replace(/\*\*|\[\[|\]\]|\|/g, '')].filter(ch => ch !== ' ').filter(ch => fuentes.some(f => !f.hasGlyphForCodePoint(ch.codePointAt(0)))))]
 // Un texto sin nada que dibujar (sólo espacios o caracteres invisibles, como U+200B) no es una voz: abortaba más tarde con
 // un error que culpaba a la selección del CTA (tramo 10; auditoría de arquitectura, residuo 17).
 const sinTinta = texto => !/[^\s\u200B-\u200D\u2060\uFEFF\u00AD]/u.test(String(texto ?? '').replace(/\*\*|\[\[|\]\]|\|/g, ''))
@@ -964,6 +964,14 @@ async function cajaUrl(s) {
   return { left, top, right: left + uw, bottom: top + Math.round(uw * aspectoUrl) }
 }
 
+// El marco de una selección con media manija por fuera de su línea (las manijas miden 0,8 % del ancho, mínimo 7 px, y se
+// centran sobre la línea): la caja que de verdad ocupa el marco dibujado.
+const conManija = b => {
+  const m = Math.max(7, W * 0.008) / 2
+
+  return { left: b.left - m, top: b.top - m, right: b.right + m, bottom: b.bottom + m }
+}
+
 async function composePiece(s, opts = {}) {
   // Salidas de la pieza: se escriben JUNTAS al final, sólo si la pieza pasó todos los chequeos y no es una prueba de
   // tamaño. Antes el SVG de controles y la evidencia se escribían en cada prueba del crecimiento, y el PNG antes de
@@ -979,6 +987,9 @@ async function composePiece(s, opts = {}) {
   // Borde del CTA con contorno: la búsqueda del tamaño lo mide como límite (P05). Y la elección de variante en `auto`.
   // Cursores, etiquetas y marcos de TODA selección, con su destino: ninguno puede tapar otra voz de texto.
   const elementosSeleccion = []
+  // Marcos de selección (titular y CTA pintado): en el canon nuevo entran en las invariantes, la guarda del sujeto y `protect`;
+  // en una pieza aprobada se miden y se AVISAN (no se mueve nada aprobado).
+  const marcos = []
   let ctaBorde = null
   let ctaBoton = null
   let ctaMarco = null
@@ -1052,7 +1063,7 @@ async function composePiece(s, opts = {}) {
   // cada lado, y el ojo no encuentra el eje (03-referencia-916 de v07: eje 0,29, operador 2026-09-22 — «ahí se
   // vería mejor alineada a la izquierda por la posición»). Si el aire libre está a un costado, el bloque se
   // alinea a ESE costado, no se centra ahí.
-  if (s.align === 'center' && Math.abs((s.centerX ?? 0.5) - 0.5) > 0.15) {
+  if (s.align === 'center' && Math.abs((s.centerX ?? 0.5) - 0.5) > 0.15 + 1e-9) {
     throw new Error(
       `${s.id}: bloque centrado sobre un eje corrido (centerX ${s.centerX}). Un bloque centrado se ancla al centro ` +
         "del lienzo (±0,15); si el aire libre está a un costado, usa `align: 'left'` (y `cta.align: 'left'`) sin `centerX`."
@@ -1062,7 +1073,22 @@ async function composePiece(s, opts = {}) {
   // El margen izquierdo nunca queda fuera de la zona segura declarada: en 9:16 la de Meta arranca en 8 % y el
   // margen del comando es 7 % — un bloque alineado a la izquierda quedaba 1 % bajo la UI de la plataforma.
   const zonaDeclarada = s.safeArea === 'axis' ? zonaAxis(W, H) : s.safeArea
-  const MX = Math.max(M, (zonaDeclarada?.x0 ?? 0) * W)
+  // CANON NUEVO (tramo 12; auditorías de la cuarta certificación): en un bloque a la izquierda, la columna deja lugar a lo que
+  // se dibuja a su izquierda —los corchetes del CTA de texto (su padding más el de la selección) y el marco de la selección
+  // del titular—; si no, esos estilos nunca cabían en la zona de AXIS. Media manija por fuera de la línea del marco.
+  const manija = Math.max(7, W * 0.008) / 2
+  const aireSel = pad => (AXIS_COLLABORATION_SELECTION_SPEC.paddingRatios[pad ?? 'standard']?.inline ?? 0.012) * W + manija
+
+  const reservaMarcos = nuevo && s.align !== 'center'
+    ? Math.max(
+        s.selection && !Array.isArray(s.selection.box) ? aireSel(s.selection.padding) : 0,
+        // Corchetes sólo en el CTA de texto; `auto` termina en texto únicamente con prominencia discreta (nunca degrada).
+        s.cta && (s.cta.variant === 'text' || (s.cta.variant === 'auto' && (s.cta.prominencia ?? 'delimitada') === 'discreta')) && (s.cta.seleccion?.marco ?? 'open-brackets') !== 'ninguno' ? s.cta.paddingX + aireSel(s.cta.seleccion?.padding) : 0,
+        s.cta && s.cta.seleccion?.marco && s.cta.seleccion.marco !== 'ninguno' ? aireSel(s.cta.seleccion?.padding) : 0
+      )
+    : 0
+
+  const MX = Math.max(M, (zonaDeclarada?.x0 ?? 0) * W) + reservaMarcos
   const x = s.align === 'center' ? AXIS_X : MX
   // Con `safeArea: "axis"` el texto también arranca dentro de la zona por arriba: si el `top` del plan queda sobre el borde
   // superior de la zona, baja hasta él. Sólo con "axis": las piezas aprobadas con otra zona no se mueven.
@@ -1096,7 +1122,7 @@ async function composePiece(s, opts = {}) {
     // cielo violeta. Sobre FOTOGRAFÍA DE MARCA el fondo es neutro-cálido por contrato de colorimetría, y
     // ahí ese pastel azul pelea con la luz de la escena en vez de acompañarla: la jerarquía sobre foto se
     // construye con escala, peso y familia, y el color lo pone la fotografía.
-    const le = richBlock({ text: s.lead, fonts: leadPoppins ? POP : BRIC(lr, lr.width, 760), size: s.leadSize ?? 70, tracking: leadPoppins ? em(R.structureCopy.tracking) : em(lr.tracking), leading: leadPoppins ? 1.5 : lr.lineHeight, x, topY: y, maxWidth: W * (s.textWidth ?? 0.8), fill: s.leadFill ?? SOFT, accentFill: INK, align: s.align })
+    const le = richBlock({ text: s.lead, fonts: leadPoppins ? POP : BRIC(lr, lr.width, 760), size: s.leadSize ?? 70, tracking: leadPoppins ? em(R.structureCopy.tracking) : em(lr.tracking), leading: leadPoppins ? 1.5 : lr.lineHeight, x, topY: y, maxWidth: W * (s.textWidth ?? 0.8) - reservaMarcos, fill: s.leadFill ?? SOFT, accentFill: INK, align: s.align })
 
     body += le.svg
     lineas.entrada = le.lines
@@ -1117,11 +1143,13 @@ async function composePiece(s, opts = {}) {
 
 return k.ink.right - k.ink.left }))
 
-  if (s.dominantMax && widest > s.dominantMax * W) domSize = domSize * (s.dominantMax * W) / widest
+  // La reserva de los marcos (canon nuevo) corre la columna a la derecha: se descuenta del ancho, para que el borde derecho
+  // del texto no se mueva (0 en las piezas del canon anterior).
+  if (s.dominantMax && widest > s.dominantMax * W - reservaMarcos) domSize = domSize * (s.dominantMax * W - reservaMarcos) / widest
 
   const dom = muda
     ? { svg: '', box: { left: 0, right: 0, top: 0, bottom: 0 }, accentBoxes: [] }
-    : richBlock({ text: s.dominant, fonts: { base: domFont, bold: domFont }, size: domSize, tracking: s.dominantTracking ?? em(ir.tracking), leading: ir.lineHeight, x, topY: y, maxWidth: W * 0.9, fill: INK, align: s.align })
+    : richBlock({ text: s.dominant, fonts: { base: domFont, bold: domFont }, size: domSize, tracking: s.dominantTracking ?? em(ir.tracking), leading: ir.lineHeight, x, topY: y, maxWidth: W * 0.9 - reservaMarcos, fill: INK, align: s.align })
 
   if (!muda) {
     checks.push({ id: 'dominante', box: dom.box, inkL: INK_L })
@@ -1178,6 +1206,9 @@ return k.ink.right - k.ink.left }))
     else for (const c of rendered.evidence.cursorEvidence) guard.push({ id: `cursor-${c.id}`, box: c.bounds }, ...(c.labelBounds ? [{ id: `etiqueta-${c.id}`, box: c.labelBounds }] : []))
     visibles.push({ id: 'seleccion', box: rendered.bounds }, ...rendered.evidence.cursorEvidence.flatMap(c => [{ id: `cursor-${c.id}`, box: c.bounds }, { id: `etiqueta-${c.id}`, box: c.labelBounds }]))
     if (!onObject) elementosSeleccion.push(...rendered.evidence.cursorEvidence.flatMap(c => [{ id: `cursor «${c.label ?? c.id}»`, box: c.bounds, destino: 'dominante' }, ...(c.labelBounds ? [{ id: `etiqueta «${c.label}»`, box: c.labelBounds, destino: 'dominante' }] : [])]))
+    // El MARCO de la selección del titular, con media manija por fuera de su línea (tramo 12; auditorías de la cuarta
+    // certificación, N1: con los gaps de piezas reales tachaba la entrada y el cierre con el gate en 0).
+    if (!onObject) marcos.push({ id: 'marco de la selección del titular', box: conManija(rendered.bounds), destino: 'dominante' })
     // Sobre un objeto, el destino es el objeto: el marco, los cursores y las etiquetas no tapan NINGUNA voz, botón ni firma.
     else elementosSeleccion.push({ id: 'marco de la selección sobre el objeto', box: rendered.bounds, destino: 'objeto' }, ...rendered.evidence.cursorEvidence.flatMap(c => [{ id: `cursor «${c.label ?? c.id}» sobre el objeto`, box: c.bounds, destino: 'objeto' }, ...(c.labelBounds ? [{ id: `etiqueta «${c.label}» sobre el objeto`, box: c.labelBounds, destino: 'objeto' }] : [])]))
   }
@@ -1189,7 +1220,7 @@ return k.ink.right - k.ink.left }))
   if (s.after) {
     const ar = R.ideaMedium
     const afterPoppins = (s.afterFamily ?? 'poppins') === 'poppins'
-    const af = richBlock({ text: s.after, fonts: afterPoppins ? POP : BRIC(ar, ar.width, 800), size: s.afterSize ?? 74, tracking: afterPoppins ? em(R.structureCopy.tracking) : em(ar.tracking), leading: afterPoppins ? 1.5 : ar.lineHeight, x, topY: y + Math.round((s.afterGap ?? 0.09) * domSize), maxWidth: W * (s.textWidth ?? 0.8), fill: s.afterFill ?? INK, align: s.align })
+    const af = richBlock({ text: s.after, fonts: afterPoppins ? POP : BRIC(ar, ar.width, 800), size: s.afterSize ?? 74, tracking: afterPoppins ? em(R.structureCopy.tracking) : em(ar.tracking), leading: afterPoppins ? 1.5 : ar.lineHeight, x, topY: y + Math.round((s.afterGap ?? 0.09) * domSize), maxWidth: W * (s.textWidth ?? 0.8) - reservaMarcos, fill: s.afterFill ?? INK, align: s.align })
 
     af.accentBoxes.forEach((b, i) => checks.push({ id: `cierre-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
     af.accentBoxes.forEach((b, i) => voces.push({ id: `cierre-acento-${i}`, box: b, tinta: ACCENT, peso: afterPoppins ? 700 : ar.weight, px: s.afterSize ?? 74, lineas: 1, daltonismo: true }))
@@ -1232,7 +1263,7 @@ return k.ink.right - k.ink.left }))
     const notaCentrada = s.align === 'center' && s.note.x == null && s.note.gapAfterClosure != null
     // `note.x: "columna"`: la nota arranca en la columna de las voces (tramo 4), como `cta.x`.
     const xNota = s.note.x === 'columna' ? MX : s.note.x != null ? s.note.x * W : (notaCentrada ? AXIS_X : MX)
-    const nt = richBlock({ text: s.note.text, fonts: POP, size: s.note.size ?? Math.round(W * 0.026), tracking: 0, leading: 1.5, x: xNota, topY: s.note.gapAfterClosure != null ? y+s.note.gapAfterClosure : s.note.y * H, maxWidth: W * (s.note.width ?? 0.34), fill: SOFT, accentFill: INK, align: notaCentrada ? 'center' : 'left' })
+    const nt = richBlock({ text: s.note.text, fonts: POP, size: s.note.size ?? Math.round(W * 0.026), tracking: 0, leading: 1.5, x: xNota, topY: s.note.gapAfterClosure != null ? y+s.note.gapAfterClosure : s.note.y * H, maxWidth: W * (s.note.width ?? 0.34) - reservaMarcos, fill: SOFT, accentFill: INK, align: notaCentrada ? 'center' : 'left' })
 
     body += nt.svg
     lineas.nota = nt.lines
@@ -1386,6 +1417,9 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
 
     guard.push({ id: 'cta-grupo', box: { left: b.left - 14, top: b.top - 14, right: b.right + 14, bottom: b.bottom + 14 } });
     elementosSeleccion.push(...cr.evidence.cursorEvidence.flatMap(k => [{ id: `cursor «${k.label ?? k.id}» del CTA`, box: k.bounds, destino: 'cta' }, ...(k.labelBounds ? [{ id: `etiqueta «${k.label}» del CTA`, box: k.labelBounds, destino: 'cta' }] : [])]));
+    // El marco del CTA cuando se PINTA (corchetes del CTA de texto o un marco declarado): con `gapAfterNote` 0 los corchetes
+    // quedaban sobre la nota (tramo 12; auditorías de la cuarta certificación, N1).
+    if (ctaMarcoPintado) marcos.push({ id: 'marco de la selección del CTA', box: conManija(cr.bounds), destino: 'cta' });
 
     for (const cc of cr.evidence.cursorEvidence) {
       guard.push({ id: `cursor-cta`, box: cc.bounds });
@@ -1402,6 +1436,11 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
   }
 
   const descriptorBox=checks.find(c=>c.id==='descriptor').box;
+
+  if (nuevo) {
+    elementosSeleccion.push(...marcos)
+    for (const m of marcos) guard.push({ id: m.id, box: m.box })
+  }
 
   // INVARIANTES DE MAQUETACIÓN (tramo 3): una sola función —cta-invariantes.mjs— para la búsqueda del tamaño, la
   // composición final y el gate. Cajas no degeneradas; texto, botón y firma sin tocarse; ninguna selección sobre una
@@ -1610,6 +1649,10 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
 
   const elementosFinales = elementosMaquetacion(firmaReal)
   const maquetacionFinal = invariantesMaquetacion({ ancho: W, alto: H, elementos: elementosFinales })
+  // En una pieza aprobada, un marco que tapa otra voz se avisa y queda en el QA (el gate lo muestra).
+  const marcoSobreVoz = nuevo ? [] : invariantesMaquetacion({ ancho: W, alto: H, elementos: [...elementosFinales, ...marcos.map(m => ({ ...m, tipo: 'seleccion', destino: m.destino === 'cta' ? 'cta-boton' : m.destino }))] }).filter(f => /^marco de la selección/.test(f))
+
+  if (marcoSobreVoz.length) console.warn(`  ⚠ ${s.id}: ${marcoSobreVoz.join(' · ')} (pieza del canon anterior: se avisa; en una pieza nueva bloquea).`)
   const reservaFinal = fueraDeReserva({ elementos: elementosFinales, reserva: s.editorialReserve })
 
   if (maquetacionFinal.length) throw new LienzoError(`${s.id}: la maquetación no cumple — ${[...new Set(maquetacionFinal)].join(' · ')}. Cambia la esquina del colaborador, el ancla del cursor o la posición de la firma.`)
@@ -1738,7 +1781,7 @@ corchetes={grosorCssPx:+(g*ANCHO/W).toFixed(2),esquinas:[[bb.left,bb.top],[bb.ri
   // El texto alternativo entregado también lleva huella (tramo 10; auditorías de arquitectura, hallazgo 8, y de diseño,
   // N11): reemplazarlo por «Imagen decorativa.» daba 0, también con `--reproducir`.
   const huellas = { pieza: opts.huellaPieza ?? null, plate: opts.plateSha ?? null, compositor: HUELLA_COMANDO, png: sha(pngFinal), layout: sha(layoutJson), alt: sha(`${accesibilidad.altText}\n`) }
-  const registro = { id: s.id, canon: opts.canon, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
+  const registro = { id: s.id, canon: opts.canon, ...(marcoSobreVoz.length ? { marcoSobreVoz } : {}), dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, accesibilidad, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(opts.mask ? { mascara: { origen: opts.mask.origen, sha: opts.mask.sha, cobertura: opts.mask.cobertura } } : {}), ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}), ...(ctaVariante ? { ctaVariante } : {}), maquetacion: maquetacionFinal, ...(reservaFinal.length ? { fueraDeReserva: reservaFinal } : {}), zonaSegura: ZE, zonaFirma: ZF, fueraDeZona: fueraDeZonaFinal, anchoPantalla: ANCHO, ...(firmaQa ? { firma: firmaQa } : {}), huellas }
 
   for (const [rel, datos] of salidas) escribirAtomico(`${OUT}/${rel}`, datos)
   qa.push(registro)
@@ -1823,11 +1866,17 @@ const trabajo = SLIDES.filter(x => !only.length || only.includes(x.id)).flatMap(
 // Un plate que no se puede leer se nombra con su pieza ANTES de componer nada (tramo 8; auditoría de arquitectura,
 // hallazgo 14): antes salía «Input file contains unsupported image format» sin decir de qué pieza.
 for (const s0 of trabajo) {
+  let st
+
   try {
-    await sharp(path.resolve(PLAN_DIR, s0.plate)).stats()
+    st = await sharp(path.resolve(PLAN_DIR, s0.plate)).stats()
   } catch (e) {
     throw new Error(`${s0.id}: el plate \`${s0.plate}\` no es una imagen legible (${e.message})`)
   }
+
+  // Un plate con transparencia se medía contra el color guardado bajo el alfa y se entregaba con alfa: sobre fondo blanco
+  // el texto blanco desaparecía y el QA decía 21:1 (tramo 12; auditoría de arquitectura de la cuarta certificación, N4).
+  if (st.channels.length === 4 && st.channels[3].min < 255) throw new Error(`${s0.id}: el plate \`${s0.plate}\` tiene transparencia: aplánalo sobre su fondo antes de componer (el contraste se mediría contra un color que no se ve)`)
 }
 
 for (let s0 of trabajo) {

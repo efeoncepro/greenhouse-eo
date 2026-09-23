@@ -599,6 +599,7 @@ los que el gate daba verde sobre una pieza mala. Cada hallazgo se cerró en un t
 | 7 · Umbrales que no se aflojan | `placement` sólo endurece, CTA a 4,5:1 siempre, dominante mayor, excepciones con plate, `hasta` y aprobador registrado |
 | 8 · Entradas y bordes | Rangos, entidades inválidas, ids que difieren en mayúsculas, plate ilegible, columna sólo a la izquierda, texto alternativo, corchetes medidos, tamaño entregado |
 | 9 · Proceso | Bloqueo sin carreras que Ctrl-C suelta, aviso entre planes, suite que limpia sus temporales, veredicto del gate en la regresión, huella con fuentes y logos, mutantes contra una corrida base y canarios |
+| 12 · Cuarta certificación | Marcos de selección dentro de las reglas (y avisados en las aprobadas), cursores que no tapan texto, columna con lugar para los corchetes, eje de los bloques centrados, tracking del titular, `placement` con piso, marcado, entidades y saltos de línea rechazados, plates con transparencia rechazados |
 | 11 · Canon 2026-09-23 | Registro de las piezas aprobadas; en las nuevas, zona AXIS por defecto, firma de 25 % en horizontales y en el cuarto inferior, orden de lectura, jerarquía por rol, aire del botón y firma externa aprobada; sin velo |
 | 10 · Integridad (tras la tercera certificación) | Selección sobre un objeto dentro de las guardas, zona de la firma validada y firma dentro de la imagen, aprobador de pruebas sólo en la suite, sin estado interno en el plan, HUD/url/pie no certificables, espacios Unicode, huella del texto alternativo y reproducción que compara todo lo entregado, comando ajeno que no certifica, piso de `final`, jerarquía con tamaños resueltos, aprobaciones atadas al plate |
 
@@ -607,7 +608,8 @@ Entre los tramos 5 y 6 se sumaron la medición de la firma externa, el bloqueo d
 
 **Lo que falta:**
 
-- La **tercera certificación** (2026-09-23) dio NO CERTIFICA en los dos auditores. El tramo 10 cerró lo de integridad;
+- La **cuarta certificación** (2026-09-23) también dio NO CERTIFICA, con hallazgos nuevos que cerró el tramo 12;
+  sigue una quinta. La tercera también había dado NO CERTIFICA en los dos auditores. El tramo 10 cerró lo de integridad;
   faltan el tramo 11 (canon nuevo: orden de lectura, jerarquía por rol, firma en el pie, velo, tamaño mínimo) y el 12
   (banco de pruebas propio), y después una cuarta certificación. Se da por cerrada con cero hallazgos graves y medios.
 - Marcar cada guarda en el código con un mutante por marca.

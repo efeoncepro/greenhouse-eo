@@ -513,6 +513,8 @@ zona de AXIS termina en 0,87), como reconoce el propio LEEME del set. Está por 
 - No edites el plan, el plate ni el PNG después de componer: rompe las huellas. Recompón.
 - No firmes con la herramienta externa antes de certificar.
 - No cambies de tratamiento del CTA para esquivar la medición ni apagues el acento: regenera el plate.
+- No escribas `\n` para cortar una línea (usa `|`), ni entidades como `&amp;` (escribe `&`), ni `**`/`[[ ]]` en el CTA,
+  el descriptor o la etiqueta: el plan se rechaza porque se dibujarían literales.
 - No declares `scrimTop` ni `scrimBottom`: el velo no existe y el plan se rechaza. La solución es mover el texto o
   regenerar el plate con el lecho en la toma.
 - No uses `subjectGuard.ignore` para tapar a una persona real ni infles `subjectProtection` para que una pieza pase.

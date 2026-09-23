@@ -44,10 +44,15 @@ export function invariantesMaquetacion({ ancho, alto, elementos, holgura = Math.
     }
   }
 
-  // Una selección (marco, cursor o etiqueta) no tapa ninguna voz, botón ni firma que no sea su destino.
+  // Una selección no tapa ninguna voz, botón ni firma que no sea su destino. El MARCO envuelve a su destino por construcción;
+  // un CURSOR o una ETIQUETA no tapan ningún texto, ni siquiera el de su destino: apuntan al marco, no a las letras (tramo 12;
+  // auditoría de diseño de la cuarta certificación, N1: el cursor local tapaba la «C» del titular y se leía «errarlo»).
+  // La parte se deduce del id (`cursor «…»`, `etiqueta «…»`, `marco …`) para no cambiar el layout de las piezas aprobadas.
   for (const s of elementos.filter(e => e.tipo === 'seleccion')) {
+    const puntero = /^(cursor|etiqueta) /.test(s.id)
+
     for (const p of principales) {
-      if (p.id === s.destino || p.dentroDe === s.destino) continue
+      if ((p.id === s.destino || p.dentroDe === s.destino) && !(puntero && p.tipo === 'texto')) continue
       if (choca(s.box, p.box, holgura)) fallas.push(`${s.id} tapa «${p.id}»`)
     }
   }

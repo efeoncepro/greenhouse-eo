@@ -47,3 +47,14 @@ test('La reserva editorial acota lo dibujado, no la firma', () => {
   assert.ok(r.some(f => /baja hasta y=560/.test(f)))
   assert.ok(!r.some(f => /1766/.test(f)))
 })
+
+test('Un cursor o una etiqueta no tapan el texto de su destino; el marco sí lo envuelve (tramo 12)', () => {
+  const dominante = { id: 'dominante', tipo: 'texto', box: { left: 100, top: 100, right: 900, bottom: 220 } }
+  const entrada = { id: 'entrada', tipo: 'texto', box: { left: 100, top: 40, right: 600, bottom: 80 } }
+  const marco = { id: 'marco de la selección del titular', tipo: 'seleccion', destino: 'dominante', box: { left: 90, top: 90, right: 910, bottom: 230 } }
+  const cursor = { id: 'cursor «yo»', tipo: 'seleccion', destino: 'dominante', box: { left: 95, top: 95, right: 140, bottom: 150 } }
+
+  assert.deepEqual(invariantesMaquetacion({ ancho: 1000, alto: 1000, elementos: [dominante, entrada, marco] }), [], 'el marco envuelve a su destino')
+  assert.ok(invariantesMaquetacion({ ancho: 1000, alto: 1000, elementos: [dominante, entrada, cursor] }).some(f => /cursor «yo» tapa «dominante»/.test(f)), 'el cursor no tapa las letras de su destino')
+  assert.ok(invariantesMaquetacion({ ancho: 1000, alto: 1000, elementos: [dominante, { ...entrada, box: { left: 100, top: 40, right: 600, bottom: 95 } }, marco] }).some(f => /marco de la selección del titular tapa «entrada»/.test(f)), 'el marco no tapa otra voz')
+})

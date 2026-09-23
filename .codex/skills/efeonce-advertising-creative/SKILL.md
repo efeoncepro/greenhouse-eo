@@ -269,6 +269,11 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    compositor achica el dominante cuando no cabe en `dominantMax`, lee `ratioDominanteEntrada` en el QA. **Nuevo:**
    ninguna voz pasa de 0,6× el titular y el descriptor es menor que el CTA (`jerarquia-rol`), y el orden de lectura es
    entrada → titular → cierre → nota → CTA → descriptor (`orden-lectura`; `note.gapAfterClosure` nunca negativo).
+   **Nuevo:** tracking del titular entre −0,035 y 0,02 em (`tracking-titular`): más allá funde o separa las letras.
+   En un bloque centrado —pieza nueva o aprobada— cada voz, el botón y el descriptor van en el eje (±4 px,
+   `eje-centrado`): usa `cta.align: "center"` y la nota sin `x`.
+   **Copy:** `|` corta la línea (nunca `\n`); `**negrita**` y `[[acento]]` sólo en entrada, titular, cierre, nota y pie;
+   escribe los caracteres, no entidades (`&`, no `&amp;`). El compositor rechaza lo demás.
 4. **Firma declarada siempre**, de una de tres formas:
    - `logo: { width: 0.2, x: 0.5, y: "auto" }`, la recomendada (`width: 0.25` en un formato horizontal nuevo; la tinta,
      blanca o navy, la elige la medición salvo que fijes `variant`). `width` es fracción del lado corto. `y: "auto"` busca sólo en la **banda del pie**, debajo de
@@ -298,17 +303,21 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
    obligatorio: `surfaceToken` (contorno y relleno) o `inkToken` (texto) sólo aceptan `accentSurface`, `growthOnDark` o
    `accentInkOnLight`, y omitirlo resuelve lima. Si el acento no alcanza, se regenera el plate: el color no se apaga.
    **Nuevo:** en contorno y relleno, padding ≥ 0,5× (horizontal) y 0,25× (vertical) el cuerpo del CTA (`cta-aire`).
-6. **`altText`:** describe la escena —quién, qué hace, dónde, con qué luz— sin transcribir el copy (ni entre comillas
+6. **Selección:** el marco de la selección del titular y el del CTA cuando se pinta no tapan otra voz, y ningún cursor ni
+   etiqueta tapa texto, ni el de su destino. En una pieza nueva bloquea (y la columna deja sola el lugar de los corchetes
+   del CTA de texto y del marco del titular); en una aprobada se avisa. `placement`, si lo declaras, desde 320 CSS px.
+   Un plate con transparencia se rechaza: aplánalo.
+7. **`altText`:** describe la escena —quién, qué hace, dónde, con qué luz— sin transcribir el copy (ni entre comillas
    ni en frases de dos palabras o más). El texto de la imagen lo agrega el compositor en `out/<id>.alt.txt` y en el QA,
    en orden de lectura, y **anuncia siempre el rol del CTA** («Llamado a la acción: «…»», nunca «Botón»: en una imagen
    no hay control), con las etiquetas de los cursores y «Firma: logotipo de Efeonce». El gate sólo avisa si falta la
    escena o si `altText` transcribe el copy.
-7. **Escena y tamaño:** `protect: [{ box: [x0, y0, x1, y1], reason }]` (fracciones del lienzo) para lo que el texto no
+8. **Escena y tamaño:** `protect: [{ box: [x0, y0, x1, y1], reason }]` (fracciones del lienzo) para lo que el texto no
    puede tapar aunque no sea una persona; `editorialReserve: { maxRight, maxBottom }` (px) si el plan reserva área;
    `final: [ancho, alto]` si el PNG no mide lo mismo que el plate (misma proporción; al menos el 85 % del ancho del
    máster y 780 px, porque la accesibilidad se mide en el máster; el gate verifica el tamaño entregado). Ojo con los nombres: `protect` y `subjectGuard.ignore` usan `reason`; `excepciones`, `firma`,
    `conceptoReducido` y `placement` usan `razon` (≥ 10 caracteres).
-8. **Sin `gesture`, `card`, `hud`, `url` ni `footer`** si la pieza tiene que salir certificada: ninguna guarda los mide
+9. **Sin `gesture`, `card`, `hud`, `url` ni `footer`** si la pieza tiene que salir certificada: ninguna guarda los mide
    y salen con 3.
 
 **Flujo.** Corre cada comando sin tubería (`| tail`, `| grep`): el código de salida sería el del último comando.
