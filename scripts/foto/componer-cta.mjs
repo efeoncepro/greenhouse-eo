@@ -182,25 +182,62 @@ const parseRich = text =>
     return out
   })
 
+// Palabras cortas que no cierran línea en tipografía editorial en español.
+const CIERRE_DEBIL = new Set(['a', 'al', 'con', 'de', 'del', 'e', 'el', 'en', 'la', 'las', 'lo', 'los', 'mi', 'mis', 'ni', 'o', 'para', 'por', 'que', 'se', 'sin', 'su', 'sus', 'tu', 'tus', 'u', 'un', 'una', 'unas', 'unos', 'y'])
+const palabraPlana = word => word.map(seg => seg.text).join('').toLowerCase().replace(/[^\p{L}]/gu, '')
+
+const defectosDeCorte = lines => {
+  if (lines.length < 2) return 0
+  const viuda = lines.at(-1).length === 1 && lines.flat().length >= 3 ? 1 : 0
+
+  return viuda + lines.slice(0, -1).filter(l => CIERRE_DEBIL.has(palabraPlana(l.at(-1)))).length
+}
+
 const richBlock = ({ text, fonts, size, tracking = 0, leading, x, topY, maxWidth = W, fill, accentFill = ACCENT, align = 'left' }) => {
   const segW = seg => shape(seg.text, seg.bold ? fonts.bold : fonts.base, size, tracking)
   const wordWidth = word => word.reduce((a, seg) => a + segW(seg).advance, 0)
   const space = shape('a a', fonts.base, size).advance - shape('aa', fonts.base, size).advance
   const lines = []
 
-  for (const chunk of parseRich(text)) {
+  const wrapChunk = (chunk, limit) => {
+    const out = []
     let line = []
     let width = 0
 
     for (const word of chunk) {
       const ww = wordWidth(word)
 
-      if (line.length && width + space + ww > maxWidth) { lines.push(line); line = []; width = 0 }
+      if (line.length && width + space + ww > limit) { out.push(line); line = []; width = 0 }
       width += (line.length ? space : 0) + ww
       line.push(word)
     }
 
-    if (line.length) lines.push(line)
+    if (line.length) out.push(line)
+
+    return out
+  }
+
+  // Viudas y cortes en palabra corta [2026-09-22]: «…cada / mes.», «…el / mismo día.», «…todos los / meses.»
+  // salían en piezas aprobadas. Si el corte voraz deja una palabra sola al final o termina una línea en
+  // artículo, preposición o conjunción, se prueba un ancho menor que conserve el MISMO número de líneas —
+  // el alto del bloque no cambia, así que ninguna guarda se mueve. Si no hay alternativa, queda como estaba.
+  for (const chunk of parseRich(text)) {
+    let best = wrapChunk(chunk, maxWidth)
+
+    if (defectosDeCorte(best)) {
+      for (let k = 0.98; k >= 0.6; k -= 0.02) {
+        const alt = wrapChunk(chunk, maxWidth * k)
+
+        if (alt.length !== best.length) break
+
+        if (defectosDeCorte(alt) < defectosDeCorte(best)) {
+          best = alt
+          if (!defectosDeCorte(best)) break
+        }
+      }
+    }
+
+    lines.push(...best)
   }
 
   let svg = ''
@@ -644,6 +681,9 @@ function scaleSpec(s0, f, canvasW) {
 async function composePiece(s, opts = {}) {
   const guard = []
   const visibles = []
+  // Líneas tal como quedaron compuestas, por voz: el QA las registra para que los cortes se puedan VERIFICAR
+  // (viudas, cortes en palabra corta) sin mirar la imagen.
+  const lineas = {}
   const plate = path.resolve(PLAN_DIR, s.plate)
   const meta = await sharp(plate).metadata()
 
@@ -744,6 +784,7 @@ async function composePiece(s, opts = {}) {
     const le = richBlock({ text: s.lead, fonts: leadPoppins ? POP : BRIC(lr, lr.width, 760), size: s.leadSize ?? 70, tracking: leadPoppins ? em(R.structureCopy.tracking) : em(lr.tracking), leading: leadPoppins ? 1.5 : lr.lineHeight, x, topY: y, maxWidth: W * (s.textWidth ?? 0.8), fill: s.leadFill ?? SOFT, accentFill: INK, align: s.align })
 
     body += le.svg
+    lineas.entrada = le.lines
     checks.push({ id: 'entrada', box: le.box, inkL: INK_L }); tramos.push(['entrada', le.box, s.leadSize ?? 70])
     y = le.box.bottom + Math.round((s.leadGap ?? 0.09) * (s.dominantSize ?? 160))
   }
@@ -828,6 +869,7 @@ return k.ink.right - k.ink.left }))
     af.accentBoxes.forEach((b, i) => checks.push({ id: `cierre-acento-${i}`, box: b, inkL: lum(255, 101, 0) }))
 
     body += af.svg
+    lineas.cierre = af.lines
     checks.push({ id: 'cierre-frase', box: af.box, inkL: s.afterFill ? undefined : INK_L }); tramos.push(['cierre', af.box, s.afterSize ?? 74])
     y = af.box.bottom
   }
@@ -863,6 +905,7 @@ return k.ink.right - k.ink.left }))
     const nt = richBlock({ text: s.note.text, fonts: POP, size: s.note.size ?? Math.round(W * 0.026), tracking: 0, leading: 1.5, x: s.note.x != null ? s.note.x * W : (notaCentrada ? AXIS_X : MX), topY: s.note.gapAfterClosure != null ? y+s.note.gapAfterClosure : s.note.y * H, maxWidth: W * (s.note.width ?? 0.34), fill: SOFT, accentFill: INK, align: notaCentrada ? 'center' : 'left' })
 
     body += nt.svg
+    lineas.nota = nt.lines
     checks.push({ id: 'nota', box: nt.box, inkL: INK_L }); y=nt.box.bottom
   }
 
@@ -928,6 +971,7 @@ return k.ink.right - k.ink.left }))
       descriptor=descAt(cursorBox.bottom+descGap);
 
     body+=descriptor.svg;checks.push({id:'descriptor',box:descriptor.box,inkL:1});
+    lineas.cta=t.lines;lineas.descriptor=descriptor.lines;
 
     if(!cr.evidence.withinCanvas)throw new LienzoError(`${s.id}: la selección del CTA se sale del lienzo`);
     guard.push({ id: 'cta-grupo', box: { left: b.left - 14, top: b.top - 14, right: b.right + 14, bottom: b.bottom + 14 } });
@@ -1091,7 +1135,7 @@ return k.ink.right - k.ink.left }))
     )
   }
 
-  qa.push({ id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}) })
+  qa.push({ id: s.id, dominante: dom.lines, ratioDominanteEntrada: ratio, contraste, gapsTinta: gaps, seleccion: selEvidence, escala: opts.factor ?? 1, lineas, guardaSujeto: opts.mask ? 'segmentacion' : 'sin-mascara', ...(s.subjectGuard?.ignore?.length ? { zonasIgnoradas: s.subjectGuard.ignore } : {}), ...(firmaSobreSujeto ? { firmaSobreSujeto } : {}) })
 }
 
 // Driver: decide el factor de escala MIDIENDO, no estimando. Sólo formatos donde el texto se pierde en el

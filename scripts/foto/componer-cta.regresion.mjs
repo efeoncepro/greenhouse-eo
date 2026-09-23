@@ -230,6 +230,15 @@ for (const t of orden) {
   const lista = cuenta(t)
 
   if (!lista.length) continue
+
+  // Las claves nuevas del QA se resumen: listar 76 piezas idénticas tapa las diferencias que sí importan.
+  if (t === 'qa-nuevo') {
+    const claves = [...new Set(lista.flatMap(r => r.qaNuevo.map(d => d.split(':')[0].replace(/^qa\./, '').split('.')[0])))]
+
+    console.log(`\n🔵 El QA suma claves en ${lista.length} piezas que no cambian: ${claves.join(', ')}`)
+    continue
+  }
+
   console.log(`\n${{ estado: '🔴 Cambia el ESTADO', layout: '🟠 Cambia el LAYOUT o el QA', pixeles: '🟡 Sólo cambian PÍXELES', mensaje: '⚪ Cambia el mensaje de error', 'qa-nuevo': '🔵 El QA suma claves (la pieza no cambia)' }[t]} (${lista.length})`)
 
   for (const r of lista) {
