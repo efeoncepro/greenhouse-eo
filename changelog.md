@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-23 — Compositor de piezas con CTA: nueve tramos de certificación adversarial
+
+`pnpm foto:componer:cta` y `pnpm foto:cta:gate`, auditados dos veces por dos subagentes adversariales (diseño y
+arquitectura) y robustecidos sin cambiar ninguna pieza aprobada (regresión: 132 de 132 idénticas):
+
+- el gate distingue falla (1) de **no certificable (3)** y certifica por reproducción (`--reproducir`);
+- contraste sobre el trazo; CTA a 4,5:1 siempre, con APCA y daltonismo bloqueantes; `placement` sólo endurece;
+  el dominante es la voz mayor;
+- excepciones con aprobador del registro (`scripts/foto/aprobadores.json`), sha256 del plate y tope (`hasta`);
+- firma automática sólo en la banda del pie; firma externa declarada y leída de `signatureY` (v03–v07 la declaran);
+- entradas con errores que nombran pieza y campo; texto alternativo con el rol del CTA siempre;
+- proceso: bloqueo sin carreras, regresión que compara el veredicto del gate, mutantes contra corrida base y canarios.
+
+Docs: [contrato §18–§19](docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md), funcional y manual en `creative/`,
+skill `efeonce-advertising-creative`. Pendiente: tercera certificación y decisiones del operador (firma en 16:9, margen,
+firma de las stories de v07).
+
 ## 2026-09-22 — ISSUE-177 resuelto: ninguna función de Vercel vuelve a cargar el motor de PDF
 
 Tres deploys de staging cayeron en tres semanas por funciones de Vercel de más de 250 MB (397, 434 y 441 MB),
@@ -666,11 +683,3 @@ localizados para reuso. Sin nuevas generaciones, publicación, cambio de runtime
 Complemento: [inventario completo de Marketing con Manzanitas](docs/operations/social/MARKETING_CON_MANZANITAS_BRAND_RESOURCE_LIBRARY.md):
 nueve SVG verificados, cuatro logos y cinco símbolos, colores/viewBox y rutas exactas; enlaces en
 Design/Social de ambos agentes, manual y descripción funcional. Sin modificar los originales.
-
-## 2026-09-13 — Referente de seasonalities Metricool separado del calendario editorial
-
-[Revisión de 407 eventos y oportunidades por mercado](docs/audits/social/2026-09-13-seasonality-reference-opportunities.md):
-referente de inspiración para Efeonce/clientes, calendario editorial por marca y planner Metricool
-identificados como superficies distintas. Cruce corregido con las cinco líneas: Influencer, Marketing,
-Pódcast y demás vínculos profesionales, con prioridad y evidencia separadas. Social Media Studio y Notion Platform incorporan el contrato
-espejado; manual, funcional y protocolo enlazan la fuente. Fechas propuestas sin crear ni programar piezas.
