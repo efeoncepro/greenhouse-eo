@@ -8,7 +8,7 @@
       1920
     ],
     "export": "out/01-fuera-916.png",
-    "exportSHA256": "a7276ceb92e4b8c641f430983377878d5186200dbccc15b47103526793fcfa0e",
+    "exportSHA256": "7a01d0d116f7c5231bde36c00930e61fcf574751969d76835b2376a4c1f39848",
     "plateSHA256": "e321a6c2b0f3ec325a37dbb3eab28b17fd395dd68f43593f14a8d77ec2658702",
     "status": "Final creativo corregido según instrucción; sin publicación",
     "faseEmbudo": "TOFU — reconocimiento del problema",
@@ -18,11 +18,12 @@
     "contrastPass": true,
     "editorialBoundsPass": true,
     "signatureInsideReelsGuard": false,
-    "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta.",
-    "signatureContrast": 16.879012411320748,
-    "signatureY": 0.9,
+    "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta.",
+    "signatureContrast": 10.860757613900093,
+    "signatureY": 0.8565,
     "unchangedFromV06": false,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y recortes del pie a tamaño de teléfono (2026-09-23). Firma movida dentro de la zona story de AXIS (borde inferior 1670 px, límite 1670,4); se apoya en la materia desenfocada del lecho, y en 01 en su borde superior. No validación live de placement.",
+    "signatureInsideAxis": true
   },
   {
     "id": "01-fuera-169",
@@ -47,7 +48,8 @@
     "signatureContrast": 19.34164761614972,
     "signatureY": 0.935,
     "unchangedFromV06": true,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement.",
+    "signatureInsideAxis": false
   },
   {
     "id": "02-reconoces-916",
@@ -58,7 +60,7 @@
       1920
     ],
     "export": "out/02-reconoces-916.png",
-    "exportSHA256": "7d87d488868529406c22b1d022bf57fbda6263e1292e84333c777c8416c4f35b",
+    "exportSHA256": "8a18f835eecc2452735aecdb86e374a1111d32fc6df73c75e9481b0c48e435b5",
     "plateSHA256": "3eca7df3ef7214a9c326f1a42a848a72d4023eeac271a9086bb64d0f90b7005f",
     "status": "Final creativo corregido según instrucción; sin publicación",
     "faseEmbudo": "TOFU — reconocimiento del riesgo",
@@ -68,11 +70,12 @@
     "contrastPass": true,
     "editorialBoundsPass": true,
     "signatureInsideReelsGuard": false,
-    "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta.",
-    "signatureContrast": 17.88899007514901,
-    "signatureY": 0.9,
+    "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta.",
+    "signatureContrast": 15.46386789484898,
+    "signatureY": 0.8565,
     "unchangedFromV06": false,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y recortes del pie a tamaño de teléfono (2026-09-23). Firma movida dentro de la zona story de AXIS (borde inferior 1670 px, límite 1670,4); se apoya en la materia desenfocada del lecho, y en 01 en su borde superior. No validación live de placement.",
+    "signatureInsideAxis": true
   },
   {
     "id": "02-reconoces-169",
@@ -97,7 +100,8 @@
     "signatureContrast": 10.490749548915973,
     "signatureY": 0.935,
     "unchangedFromV06": true,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement.",
+    "signatureInsideAxis": false
   },
   {
     "id": "03-referencia-916",
@@ -108,7 +112,7 @@
       1920
     ],
     "export": "out/03-referencia-916.png",
-    "exportSHA256": "3f78effc5b035c561ab674e63d469947c5931a257b83f2406b0d38cea4948450",
+    "exportSHA256": "a9e42fc514e0956d1a551141f64478c12802505bb0094becc83ad3649b9afc7e",
     "plateSHA256": "d190fe79a40925d60ff755216ebdfc432ebb6cd57eb802e2d5077a6702868872",
     "status": "Final creativo corregido según instrucción; sin publicación",
     "faseEmbudo": "MOFU — consideración de solución",
@@ -118,11 +122,12 @@
     "contrastPass": true,
     "editorialBoundsPass": true,
     "signatureInsideReelsGuard": false,
-    "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta.",
-    "signatureContrast": 5.486024265599667,
-    "signatureY": 0.9,
+    "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta.",
+    "signatureContrast": 5.60381698709857,
+    "signatureY": 0.8565,
     "unchangedFromV06": false,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y recortes del pie a tamaño de teléfono (2026-09-23). Firma movida dentro de la zona story de AXIS (borde inferior 1670 px, límite 1670,4); se apoya en la materia desenfocada del lecho, y en 01 en su borde superior. No validación live de placement.",
+    "signatureInsideAxis": true
   },
   {
     "id": "03-referencia-169",
@@ -147,7 +152,8 @@
     "signatureContrast": 7.74126238793938,
     "signatureY": 0.935,
     "unchangedFromV06": true,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement.",
+    "signatureInsideAxis": false
   },
   {
     "id": "04-elegida-916",
@@ -158,7 +164,7 @@
       1920
     ],
     "export": "out/04-elegida-916.png",
-    "exportSHA256": "392989fed75ae82897c319907f7aef2fd00f3861bec837efbf9d7d58a84c7f9f",
+    "exportSHA256": "249076ffe6d279cb395a3f92c60e7e83b29e5269d786f489960a244145691a93",
     "plateSHA256": "af747aa7a04d052fa8df3dcc3a72f30cee3c6d6d4b6778f1e5534994c501f7be",
     "status": "Final creativo corregido según instrucción; sin publicación",
     "faseEmbudo": "MOFU — intención de diagnóstico",
@@ -168,11 +174,12 @@
     "contrastPass": true,
     "editorialBoundsPass": true,
     "signatureInsideReelsGuard": false,
-    "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta.",
-    "signatureContrast": 12.614554292864392,
-    "signatureY": 0.9,
+    "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta.",
+    "signatureContrast": 6.534341110528097,
+    "signatureY": 0.8565,
     "unchangedFromV06": false,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y recortes del pie a tamaño de teléfono (2026-09-23). Firma movida dentro de la zona story de AXIS (borde inferior 1670 px, límite 1670,4); se apoya en la materia desenfocada del lecho, y en 01 en su borde superior. No validación live de placement.",
+    "signatureInsideAxis": true
   },
   {
     "id": "04-elegida-169",
@@ -197,7 +204,8 @@
     "signatureContrast": 17.768542397610478,
     "signatureY": 0.935,
     "unchangedFromV06": true,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement.",
+    "signatureInsideAxis": false
   },
   {
     "id": "01-fuera-45",
@@ -222,7 +230,8 @@
     "signatureContrast": 19.24507547312759,
     "signatureY": 0.935,
     "unchangedFromV06": true,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement.",
+    "signatureInsideAxis": false
   },
   {
     "id": "01-fuera-11",
@@ -247,7 +256,8 @@
     "signatureContrast": 19.387179831133732,
     "signatureY": 0.935,
     "unchangedFromV06": true,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement.",
+    "signatureInsideAxis": false
   },
   {
     "id": "02-reconoces-45",
@@ -272,7 +282,8 @@
     "signatureContrast": 17.78664411795214,
     "signatureY": 0.935,
     "unchangedFromV06": true,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement.",
+    "signatureInsideAxis": false
   },
   {
     "id": "02-reconoces-11",
@@ -297,7 +308,8 @@
     "signatureContrast": 18.504227599798664,
     "signatureY": 0.935,
     "unchangedFromV06": true,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement.",
+    "signatureInsideAxis": false
   },
   {
     "id": "03-referencia-45",
@@ -322,7 +334,8 @@
     "signatureContrast": 5.516317447118737,
     "signatureY": 0.935,
     "unchangedFromV06": true,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement.",
+    "signatureInsideAxis": false
   },
   {
     "id": "03-referencia-11",
@@ -347,7 +360,8 @@
     "signatureContrast": 7.346868369924454,
     "signatureY": 0.935,
     "unchangedFromV06": true,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement.",
+    "signatureInsideAxis": false
   },
   {
     "id": "04-elegida-45",
@@ -372,7 +386,8 @@
     "signatureContrast": 18.177359375574497,
     "signatureY": 0.935,
     "unchangedFromV06": true,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement.",
+    "signatureInsideAxis": false
   },
   {
     "id": "04-elegida-11",
@@ -397,6 +412,7 @@
     "signatureContrast": 18.3284064828274,
     "signatureY": 0.935,
     "unchangedFromV06": true,
-    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement."
+    "visualReview": "Export y preview 390. Lecho reducido a franja inferior; firma completa dentro de la materia desenfocada, separada del borde de transición. No validación live de placement.",
+    "signatureInsideAxis": false
   }
 ]

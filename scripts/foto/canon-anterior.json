@@ -1,6 +1,26 @@
 {
   "nota": "Piezas con CTA aprobadas al corte del canon 2026-09-23: siguen con las reglas del canon 2026-09-22. Cada una se reconoce por el sha256 de su plate y la huella de su definición en el plan sin la ruta del plate (una pieza editada deja de estar aquí y nace con el canon vigente). Es una foto del corte: NO se regenera ni se le agregan piezas nuevas; hacerlo es decisión del operador, con commit.",
   "corte": "2026-09-23",
+  "enmiendas": [
+    {
+      "fecha": "2026-09-23",
+      "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
+      "piezas": [
+        "01-fuera-916",
+        "02-reconoces-916",
+        "03-referencia-916",
+        "04-elegida-916"
+      ],
+      "cambio": "Firma de las cuatro stories finales de v07 movida dentro de la zona segura de AXIS (signatureY 0,9 → 0,8565; signatureSafeArea y 0,85–0,97 → 0,80–0,87; placementLimitation reescrita). El resto de cada pieza no cambia; las huellas se reemplazan, no se agregan: la versión anterior ya no existe en el repo.",
+      "decision": "Operador, 2026-09-23: mover la firma sólo en las stories finales de v07; el canon nuevo rige hacia adelante y estas piezas siguen con el canon 2026-09-22.",
+      "huellasAnteriores": {
+        "01-fuera-916": "33ee1d5dfed73397a24e74a4e0e48cbb6d0c84ea06119b1f943e4ea945e90162",
+        "02-reconoces-916": "c32173686f65c6e3fe3b6a88ddaee647c841e0ec60cb1ae321f7d630e42914ff",
+        "03-referencia-916": "9cb3a287b0176fb8c78a31406adeb17c13a423ec8d3798b2fec77db5124138bc",
+        "04-elegida-916": "5766ba0dd66293bbf58d2911a4a3a202903d7e64ac41d696fc6e98b0daa0d91d"
+      }
+    }
+  ],
   "piezas": [
     {
       "id": "b2-primero-el-numero-169",
@@ -558,25 +578,25 @@
       "id": "01-fuera-916",
       "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
       "plate": "e321a6c2b0f3ec325a37dbb3eab28b17fd395dd68f43593f14a8d77ec2658702",
-      "pieza": "33ee1d5dfed73397a24e74a4e0e48cbb6d0c84ea06119b1f943e4ea945e90162"
+      "pieza": "cd88f7fe677aae86705b0689b2779e61713be498a11245194d1a78439cc2ec80"
     },
     {
       "id": "02-reconoces-916",
       "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
       "plate": "3eca7df3ef7214a9c326f1a42a848a72d4023eeac271a9086bb64d0f90b7005f",
-      "pieza": "c32173686f65c6e3fe3b6a88ddaee647c841e0ec60cb1ae321f7d630e42914ff"
+      "pieza": "1bd856b8f8a2d911634fcf68420ece2ed1d40ae11c57a85f90fa854b9ae70ab4"
     },
     {
       "id": "03-referencia-916",
       "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
       "plate": "d190fe79a40925d60ff755216ebdfc432ebb6cd57eb802e2d5077a6702868872",
-      "pieza": "9cb3a287b0176fb8c78a31406adeb17c13a423ec8d3798b2fec77db5124138bc"
+      "pieza": "017ee0398b9c0d7b1a5d21246e583920396a95049851f3fcef36e2b09cec2ef2"
     },
     {
       "id": "04-elegida-916",
       "plan": "ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json",
       "plate": "af747aa7a04d052fa8df3dcc3a72f30cee3c6d6d4b6778f1e5534994c501f7be",
-      "pieza": "5766ba0dd66293bbf58d2911a4a3a202903d7e64ac41d696fc6e98b0daa0d91d"
+      "pieza": "d13948be96a988690868fd4bbb781e715df9ab1a1e0df25460034e63661b6d89"
     },
     {
       "id": "KV-01-11",

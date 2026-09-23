@@ -260,7 +260,9 @@ antes y componen exactamente igual: están en un registro (`scripts/foto/canon-a
 huella de su foto y de su definición en el plan. **Toda pieza nueva —o una aprobada que se edita— sigue el canon
 2026-09-23**, que agrega: la zona segura de AXIS por defecto, la firma de 25 % en los horizontales y siempre en el
 cuarto inferior, el orden de lectura, la jerarquía por rol y el aire mínimo del botón. Nadie elige el canon: el gate lo
-recalcula del registro. Ninguna imagen ya hecha se regenera por este cambio.
+recalcula del registro. Ninguna imagen ya hecha se regenera por este cambio. Si el operador ordena retocar una pieza
+aprobada sin pasarla a las reglas nuevas —el 2026-09-23 se subió la firma de las cuatro stories finales de v07 para
+dejarla dentro de AXIS—, el registro se actualiza con esa pieza y anota qué cambió y quién lo decidió.
 
 > Detalle técnico: `canonDe` en [`cta-integridad.mjs`](../../../scripts/foto/cta-integridad.mjs); contrato §18
 > (tramo 11).

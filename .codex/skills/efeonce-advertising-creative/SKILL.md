@@ -257,6 +257,8 @@ la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no ar
 0. **Canon 2026-09-23.** Una pieza nueva —o una aprobada que editas— se juzga con el canon vigente; las aprobadas al
    corte (registro `scripts/foto/canon-anterior.json`, por la huella de su plate y su definición) siguen con las reglas
    de antes. No se elige: el gate lo recalcula del registro. Lo que agrega el canon nuevo va marcado abajo con «nuevo».
+   Si el operador ordena retocar una aprobada sin cambiarla de canon, su huella se reemplaza en el registro y se anota
+   en `enmiendas`, con commit; nunca agregues una pieza al registro por tu cuenta.
 1. **Zona segura de AXIS:** `safeArea: "axis"` (feed —4:5, 1:1 y 16:9—: 7,5 % a los lados y 6 % arriba y abajo; story
    —9:16—: 10 % y 13 %); en una pieza nueva es el valor por defecto. Es el piso: el texto arranca dentro, también por
    arriba, y una zona `{ x0, y0, x1, y1 }` declarada sólo la estrecha.

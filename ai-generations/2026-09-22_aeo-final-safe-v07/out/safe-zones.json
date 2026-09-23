@@ -18,9 +18,9 @@
       },
       "signatureBoundsExport": {
         "left": 432,
-        "top": 1703,
+        "top": 1619,
         "right": 648,
-        "bottom": 1754
+        "bottom": 1670
       },
       "safeExport": {
         "left": 87,
@@ -28,15 +28,15 @@
         "right": 950,
         "bottom": 1248
       },
-      "signatureContrast": 16.879012411320748,
+      "signatureContrast": 10.860757613900093,
       "signatureEditorialBounds": {
         "left": 87,
-        "top": 1632,
+        "top": 1536,
         "right": 950,
-        "bottom": 1862
+        "bottom": 1670
       },
       "signatureInsideReelsGuard": false,
-      "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta.",
+      "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta.",
       "pass": true,
       "preview": "local exclusion mask; not a live app screenshot"
     },
@@ -96,9 +96,9 @@
       },
       "signatureBoundsExport": {
         "left": 432,
-        "top": 1703,
+        "top": 1619,
         "right": 648,
-        "bottom": 1754
+        "bottom": 1670
       },
       "safeExport": {
         "left": 87,
@@ -106,15 +106,15 @@
         "right": 950,
         "bottom": 1248
       },
-      "signatureContrast": 17.88899007514901,
+      "signatureContrast": 15.46386789484898,
       "signatureEditorialBounds": {
         "left": 87,
-        "top": 1632,
+        "top": 1536,
         "right": 950,
-        "bottom": 1862
+        "bottom": 1670
       },
       "signatureInsideReelsGuard": false,
-      "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta.",
+      "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta.",
       "pass": true,
       "preview": "local exclusion mask; not a live app screenshot"
     },
@@ -174,9 +174,9 @@
       },
       "signatureBoundsExport": {
         "left": 432,
-        "top": 1703,
+        "top": 1619,
         "right": 648,
-        "bottom": 1754
+        "bottom": 1670
       },
       "safeExport": {
         "left": 87,
@@ -184,15 +184,15 @@
         "right": 950,
         "bottom": 1248
       },
-      "signatureContrast": 5.486024265599667,
+      "signatureContrast": 5.60381698709857,
       "signatureEditorialBounds": {
         "left": 87,
-        "top": 1632,
+        "top": 1536,
         "right": 950,
-        "bottom": 1862
+        "bottom": 1670
       },
       "signatureInsideReelsGuard": false,
-      "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta.",
+      "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta.",
       "pass": true,
       "preview": "local exclusion mask; not a live app screenshot"
     },
@@ -252,9 +252,9 @@
       },
       "signatureBoundsExport": {
         "left": 432,
-        "top": 1703,
+        "top": 1619,
         "right": 648,
-        "bottom": 1754
+        "bottom": 1670
       },
       "safeExport": {
         "left": 87,
@@ -262,15 +262,15 @@
         "right": 950,
         "bottom": 1248
       },
-      "signatureContrast": 12.614554292864392,
+      "signatureContrast": 6.534341110528097,
       "signatureEditorialBounds": {
         "left": 87,
-        "top": 1632,
+        "top": 1536,
         "right": 950,
-        "bottom": 1862
+        "bottom": 1670
       },
       "signatureInsideReelsGuard": false,
-      "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta.",
+      "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta.",
       "pass": true,
       "preview": "local exclusion mask; not a live app screenshot"
     },

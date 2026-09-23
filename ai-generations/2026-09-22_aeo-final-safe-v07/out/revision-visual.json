@@ -10,5 +10,25 @@
   "signatureCenter": 0.9,
   "anatomyAndScreens": "Tablet hacia quien la consulta, manos en agarre natural; dedo y reflejo coherentes en elección.",
   "changeToCTA": "01-fuera-916: tinta blanca dentro de contorno naranja tras fallo de naranja 4,22:1.",
-  "limits": "La firma puede ser tapada por UI del placement; no se validó live ni se publicó."
+  "limits": "La firma puede ser tapada por UI del placement; no se validó live ni se publicó.",
+  "revisionFirma20260923": {
+    "method": "Revisión visual del export a 1080×1920 y de recortes del pie a tamaño de teléfono (antes/ahora), más el contraste que mide firma-placement.mjs.",
+    "reviewed": [
+      "01-fuera-916",
+      "02-reconoces-916",
+      "03-referencia-916",
+      "04-elegida-916"
+    ],
+    "decision": "Operador 2026-09-23: firma dentro de la zona segura de AXIS en las stories finales de v07; el resto de la pieza no cambia.",
+    "signatureCenter": 0.8565,
+    "signatureBox": {
+      "left": 432,
+      "top": 1619,
+      "right": 648,
+      "bottom": 1670
+    },
+    "finding": "La firma queda dentro de la zona story de AXIS (borde inferior 1670 px, límite 1670,4). En 02, 03 y 04 se apoya en la materia desenfocada del lecho; en 01 queda en el borde superior del lecho, sobre su transición. Contraste 10,86 · 15,46 · 5,60 (navy) · 6,53:1. Las 12 piezas no verticales no cambian (idénticas byte a byte).",
+    "supersedes": "signatureCenter y la parte de «finding» que describe la firma; el resto de esta revisión sigue vigente.",
+    "limits": "Sigue fuera de la guarda conservadora de Reels (65 % del alto): en Reels la interfaz inferior puede cubrirla. No se validó en vivo ni se publicó."
+  }
 }

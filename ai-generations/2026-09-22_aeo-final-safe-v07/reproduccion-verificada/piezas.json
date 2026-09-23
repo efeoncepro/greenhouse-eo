@@ -1,7 +1,7 @@
 [
   {
     "id": "01-fuera-916",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/01-fuera-916.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/01-fuera-916.png",
     "align": "center",
     "top": 0.165,
     "textWidth": 0.74,
@@ -52,7 +52,7 @@
     "styleReason": "Contorno naranja con tinta blanca: el nuevo muro dejó el texto naranja en 4,22:1; conservar contorno y subir contraste de lectura.",
     "altText": "La IA responde. ¿Sales tú? Codex junto a una pantalla con fuentes. Pide el diagnóstico SEO + AEO.",
     "centerX": 0.6,
-    "signatureY": 0.9,
+    "signatureY": 0.8565,
     "safeArea": {
       "x0": 0.08,
       "y0": 0.16,
@@ -62,17 +62,17 @@
       "status": "internal conservative guardrail, verify placement preview before trafficking"
     },
     "signatureSafeArea": {
-      "profile": "physical-foreground-editorial-v2",
+      "profile": "physical-foreground-axis-story-v3",
       "x0": 0.08,
       "x1": 0.88,
-      "y0": 0.85,
-      "y1": 0.97
+      "y0": 0.8,
+      "y1": 0.87
     },
-    "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta."
+    "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta."
   },
   {
     "id": "01-fuera-169",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/01-fuera-169.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/01-fuera-169.png",
     "align": "left",
     "top": 0.115,
     "textWidth": 0.3,
@@ -129,11 +129,15 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
     "id": "02-reconoces-916",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/02-reconoces-916.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/02-reconoces-916.png",
     "align": "center",
     "top": 0.165,
     "textWidth": 0.74,
@@ -184,7 +188,7 @@
     "styleReason": "Relleno naranja: diagnóstico separado del interrogante; tinta navy contrastada.",
     "altText": "La IA describe tu negocio. ¿Te reconoces? Nexa compara una imagen en su tableta con la respuesta de una pantalla. Pide el diagnóstico SEO + AEO.",
     "centerX": 0.48,
-    "signatureY": 0.9,
+    "signatureY": 0.8565,
     "safeArea": {
       "x0": 0.08,
       "y0": 0.16,
@@ -194,17 +198,17 @@
       "status": "internal conservative guardrail, verify placement preview before trafficking"
     },
     "signatureSafeArea": {
-      "profile": "physical-foreground-editorial-v2",
+      "profile": "physical-foreground-axis-story-v3",
       "x0": 0.08,
       "x1": 0.88,
-      "y0": 0.85,
-      "y1": 0.97
+      "y0": 0.8,
+      "y1": 0.87
     },
-    "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta."
+    "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta."
   },
   {
     "id": "02-reconoces-169",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/02-reconoces-169.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/02-reconoces-169.png",
     "align": "left",
     "top": 0.115,
     "textWidth": 0.3,
@@ -261,11 +265,15 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
     "id": "03-referencia-916",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/03-referencia-916.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/03-referencia-916.png",
     "align": "center",
     "top": 0.165,
     "textWidth": 0.49,
@@ -316,7 +324,7 @@
     "styleReason": "Texto blanco: el naranja cae bajo 4.5:1 en puntos del muro; mantiene la acción discreta sin añadir otra superficie.",
     "altText": "En la respuesta de la IA, sé la referencia. Nexa observa una fuente destacada en una proyección. Pide el diagnóstico SEO + AEO.",
     "centerX": 0.29,
-    "signatureY": 0.9,
+    "signatureY": 0.8565,
     "safeArea": {
       "x0": 0.08,
       "y0": 0.16,
@@ -326,17 +334,17 @@
       "status": "internal conservative guardrail, verify placement preview before trafficking"
     },
     "signatureSafeArea": {
-      "profile": "physical-foreground-editorial-v2",
+      "profile": "physical-foreground-axis-story-v3",
       "x0": 0.08,
       "x1": 0.88,
-      "y0": 0.85,
-      "y1": 0.97
+      "y0": 0.8,
+      "y1": 0.87
     },
-    "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta."
+    "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta."
   },
   {
     "id": "03-referencia-169",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/03-referencia-169.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/03-referencia-169.png",
     "align": "left",
     "top": 0.115,
     "textWidth": 0.3,
@@ -393,11 +401,15 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
     "id": "04-elegida-916",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/04-elegida-916.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/04-elegida-916.png",
     "align": "center",
     "top": 0.165,
     "textWidth": 0.74,
@@ -448,7 +460,7 @@
     "styleReason": "Relleno naranja: vincula la elección de fuente con una acción explícita.",
     "altText": "Que te elijan entre las fuentes de la respuesta de la IA. Una mano selecciona una fuente digital junto a Codex. Pide el diagnóstico SEO + AEO.",
     "centerX": 0.44,
-    "signatureY": 0.9,
+    "signatureY": 0.8565,
     "safeArea": {
       "x0": 0.08,
       "y0": 0.16,
@@ -458,17 +470,17 @@
       "status": "internal conservative guardrail, verify placement preview before trafficking"
     },
     "signatureSafeArea": {
-      "profile": "physical-foreground-editorial-v2",
+      "profile": "physical-foreground-axis-story-v3",
       "x0": 0.08,
       "x1": 0.88,
-      "y0": 0.85,
-      "y1": 0.97
+      "y0": 0.8,
+      "y1": 0.87
     },
-    "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta."
+    "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta."
   },
   {
     "id": "04-elegida-169",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/04-elegida-169.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/04-elegida-169.png",
     "align": "left",
     "top": 0.115,
     "textWidth": 0.3,
@@ -525,11 +537,15 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
     "id": "01-fuera-45",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/01-fuera-45.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/01-fuera-45.png",
     "align": "center",
     "top": 0.038,
     "textWidth": 0.8,
@@ -587,11 +603,15 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
     "id": "01-fuera-11",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/01-fuera-11.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/01-fuera-11.png",
     "align": "center",
     "top": 0.032,
     "textWidth": 0.8,
@@ -649,11 +669,15 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
     "id": "02-reconoces-45",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/02-reconoces-45.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/02-reconoces-45.png",
     "align": "center",
     "top": 0.038,
     "textWidth": 0.8,
@@ -711,11 +735,15 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
     "id": "02-reconoces-11",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/02-reconoces-11.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/02-reconoces-11.png",
     "align": "center",
     "top": 0.032,
     "textWidth": 0.8,
@@ -773,11 +801,15 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
     "id": "03-referencia-45",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/03-referencia-45.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/03-referencia-45.png",
     "align": "center",
     "top": 0.038,
     "textWidth": 0.8,
@@ -835,11 +867,15 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
     "id": "03-referencia-11",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/03-referencia-11.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/03-referencia-11.png",
     "align": "center",
     "top": 0.032,
     "textWidth": 0.8,
@@ -897,11 +933,15 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
     "id": "04-elegida-45",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/04-elegida-45.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/04-elegida-45.png",
     "align": "center",
     "top": 0.038,
     "textWidth": 0.8,
@@ -959,11 +999,15 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   },
   {
     "id": "04-elegida-11",
-    "plate": "/Users/jreye/Library/CloudStorage/OneDrive-EfeonceGroupSpA/Alineación/5. Contenidos/15. Paid Media/03. Finales/2026-09-22_SEO-AEO_fuente-preferida/v07-Codex-lecho-proporcionado/02. Editables/plates/04-elegida-11.png",
+    "plate": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-09-22_aeo-final-safe-v07/plates/04-elegida-11.png",
     "align": "center",
     "top": 0.032,
     "textWidth": 0.8,
@@ -1021,6 +1065,10 @@
       "y1": 0.975,
       "profile": "feed-editorial-inset-v1",
       "status": "internal editorial inset, not official platform UI coordinates"
+    },
+    "firma": {
+      "modo": "externa",
+      "razon": "La firma la pone firmar.mjs después del compositor, con firma-placement.mjs: 20 % del lado corto, centrada, centro vertical en signatureY o 0,935 del alto, tinta blanca o navy según el contraste."
     }
   }
 ]

@@ -1061,7 +1061,10 @@ del plate** (una copia en otra carpeta sigue siendo la aprobada). Esas siguen co
 exactamente igual; **toda otra pieza —nueva o editada— se juzga con el canon vigente**. No depende de un campo que el
 plan pueda omitir: `canon` en el plan es sólo informativo y únicamente acepta `"2026-09-23"`. El compositor registra el
 canon en el QA y el gate lo recalcula del registro; si no calza, falla. El registro no se regenera: agregarle piezas es
-decisión del operador, con commit. Entra en la huella del comando.
+decisión del operador, con commit. Entra en la huella del comando. **Enmiendas:** si el operador ordena retocar una pieza
+aprobada sin pasarla al canon nuevo, su huella se REEMPLAZA en el registro (no se agrega: la versión anterior deja de
+existir) y el cambio queda en `enmiendas` —fecha, plan, piezas, qué cambió, decisión y huellas anteriores—, con commit.
+Caso: 2026-09-23, la firma de las cuatro stories finales de v07 movida dentro de la zona story de AXIS.
 
 **Lo que cambia en una pieza nueva:**
 

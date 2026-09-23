@@ -52,7 +52,7 @@
     "styleReason": "Contorno naranja con tinta blanca: el nuevo muro dejó el texto naranja en 4,22:1; conservar contorno y subir contraste de lectura.",
     "altText": "La IA responde. ¿Sales tú? Codex junto a una pantalla con fuentes. Pide el diagnóstico SEO + AEO.",
     "centerX": 0.6,
-    "signatureY": 0.9,
+    "signatureY": 0.8565,
     "safeArea": {
       "x0": 0.08,
       "y0": 0.16,
@@ -62,13 +62,13 @@
       "status": "internal conservative guardrail, verify placement preview before trafficking"
     },
     "signatureSafeArea": {
-      "profile": "physical-foreground-editorial-v2",
+      "profile": "physical-foreground-axis-story-v3",
       "x0": 0.08,
       "x1": 0.88,
-      "y0": 0.85,
-      "y1": 0.97
+      "y0": 0.8,
+      "y1": 0.87
     },
-    "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta."
+    "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta."
   },
   {
     "id": "01-fuera-169",
@@ -188,7 +188,7 @@
     "styleReason": "Relleno naranja: diagnóstico separado del interrogante; tinta navy contrastada.",
     "altText": "La IA describe tu negocio. ¿Te reconoces? Nexa compara una imagen en su tableta con la respuesta de una pantalla. Pide el diagnóstico SEO + AEO.",
     "centerX": 0.48,
-    "signatureY": 0.9,
+    "signatureY": 0.8565,
     "safeArea": {
       "x0": 0.08,
       "y0": 0.16,
@@ -198,13 +198,13 @@
       "status": "internal conservative guardrail, verify placement preview before trafficking"
     },
     "signatureSafeArea": {
-      "profile": "physical-foreground-editorial-v2",
+      "profile": "physical-foreground-axis-story-v3",
       "x0": 0.08,
       "x1": 0.88,
-      "y0": 0.85,
-      "y1": 0.97
+      "y0": 0.8,
+      "y1": 0.87
     },
-    "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta."
+    "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta."
   },
   {
     "id": "02-reconoces-169",
@@ -324,7 +324,7 @@
     "styleReason": "Texto blanco: el naranja cae bajo 4.5:1 en puntos del muro; mantiene la acción discreta sin añadir otra superficie.",
     "altText": "En la respuesta de la IA, sé la referencia. Nexa observa una fuente destacada en una proyección. Pide el diagnóstico SEO + AEO.",
     "centerX": 0.29,
-    "signatureY": 0.9,
+    "signatureY": 0.8565,
     "safeArea": {
       "x0": 0.08,
       "y0": 0.16,
@@ -334,13 +334,13 @@
       "status": "internal conservative guardrail, verify placement preview before trafficking"
     },
     "signatureSafeArea": {
-      "profile": "physical-foreground-editorial-v2",
+      "profile": "physical-foreground-axis-story-v3",
       "x0": 0.08,
       "x1": 0.88,
-      "y0": 0.85,
-      "y1": 0.97
+      "y0": 0.8,
+      "y1": 0.87
     },
-    "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta."
+    "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta."
   },
   {
     "id": "03-referencia-169",
@@ -460,7 +460,7 @@
     "styleReason": "Relleno naranja: vincula la elección de fuente con una acción explícita.",
     "altText": "Que te elijan entre las fuentes de la respuesta de la IA. Una mano selecciona una fuente digital junto a Codex. Pide el diagnóstico SEO + AEO.",
     "centerX": 0.44,
-    "signatureY": 0.9,
+    "signatureY": 0.8565,
     "safeArea": {
       "x0": 0.08,
       "y0": 0.16,
@@ -470,13 +470,13 @@
       "status": "internal conservative guardrail, verify placement preview before trafficking"
     },
     "signatureSafeArea": {
-      "profile": "physical-foreground-editorial-v2",
+      "profile": "physical-foreground-axis-story-v3",
       "x0": 0.08,
       "x1": 0.88,
-      "y0": 0.85,
-      "y1": 0.97
+      "y0": 0.8,
+      "y1": 0.87
     },
-    "placementLimitation": "Firma dentro del lecho físico inferior. Su franja editorial no es una safe zone de UI; posible oclusión por controles/caption. Verificar placement antes de pauta."
+    "placementLimitation": "Firma sobre el lecho físico inferior, dentro de la zona segura de AXIS para story (borde inferior al 87 % del alto; movida el 2026-09-23 por decisión del operador). Queda fuera de la guarda conservadora de Reels (65 %): en Reels la interfaz inferior puede cubrirla. Verificar placement antes de pauta."
   },
   {
     "id": "04-elegida-169",
