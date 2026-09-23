@@ -15,8 +15,21 @@ staging (el deploy de `develop` falla); el mismo commit habría bloqueado un rel
 ## Síntoma
 
 `pnpm local:check`, el pre-push hook, `pnpm test` y `pnpm build` local pasan en verde. El deploy de Vercel falla
-recién al empaquetar las funciones, porque una supera el límite de 250 MB sin comprimir (441 MB en el caso de
-2026-09-22). Mientras tanto `develop` queda sin deploy para todas las sesiones que empujan encima.
+recién al empaquetar las funciones, porque una supera el límite de 250 MB sin comprimir. Mientras tanto `develop`
+queda sin deploy para todas las sesiones que empujan encima.
+
+Log del build del 2026-09-22 (`vercel inspect --logs`):
+
+```text
+The Vercel Function "api/platform/app/insights/catalog" is 441.09mb uncompressed which exceeds the maximum
+uncompressed size limit of 250mb.
+```
+
+Es la **misma función** que falló el 2026-09-16 (434 MB). No es casualidad: todas las rutas
+`src/app/api/platform/app/insights/**` importan `src/lib/api-platform/resources/app-insights.ts`, que importa todos los
+commands de `@/lib/efeonce-insights/commands` —incluido el render—. Por eso cualquier import pesado dentro del render
+entra en TODAS las funciones de Insights; `catalog` es la primera que Vercel reporta antes de cortar el build
+(inferencia: el log sólo nombra una función).
 
 ## Causa raíz
 
@@ -44,7 +57,10 @@ reporta (y consume ~30 GB de RAM, por eso casi nunca se corre); la única prueba
 Mitigación aplicada (2026-09-22): `report-mapper.ts` usa el deep-import `@/lib/artifact-composer/paginate` (módulo puro,
 sin imports). La lección quedó en `.claude/skills/efeonce-insights/references/lessons.md`.
 
-Pendiente, dos capas independientes:
+**No es solución** `VERCEL_SUPPORT_LARGE_FUNCTIONS=1`, que el propio log sugiere: sube el límite y deja funciones de
+más de 400 MB (arranque en frío lento) sin corregir la causa, y la próxima regresión ya no la ve nadie.
+
+Pendiente, dos capas independientes (más una de diseño):
 
 1. **Frontera de imports (barata, local):** una regla `no-restricted-imports` que prohíba importar **valores** desde
    `@/lib/artifact-composer` (con `allowTypeImports`) en código alcanzable desde rutas de Vercel. Los deep-imports de
@@ -53,6 +69,10 @@ Pendiente, dos capas independientes:
 2. **Gate de tamaño trazado (CI):** leer los `*.nft.json` que produce el build de Next y sumar el tamaño de los archivos
    trazados por función; fallar por sobre un umbral con margen (por ejemplo 200 MB) e imprimir las dependencias más
    grandes de la función culpable. Esto cubre también la causa del 2026-09-02, que ninguna regla de imports ve.
+
+3. **Grafo de imports de la capa de recursos (diseño):** que una ruta de lectura (`catalog`) no cargue los commands de
+   escritura ni el render. Hoy un módulo de recursos único los reúne a todos; separar lectura, comandos y render
+   acota el daño de cualquier import pesado a la ruta que lo necesita.
 
 Si la solución requiere tocar CI y reglas de lint compartidas, derivarla a una TASK.
 
