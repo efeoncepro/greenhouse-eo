@@ -66,7 +66,7 @@ hacia adentro y el suelo declarado en sombra: lo que contaminaba era el **reflej
 piso**, justo bajo la firma centrada. Cambiar sólo el MATERIAL del plinto —a acero negro mate, no
 reflectante— llevó la firma a **19,69:1** sin tocar luz ni encuadre. ⚠️ **`foto:validar` medía 3,03 y 3,86
 en dos pasadas sin decir por qué**; el número que importa lo da `foto:componer:cta`, que mide bajo la caja
-real de la firma. **Regla: cuando el lecho falle y la luz ya esté fuera de él, sospecha de una superficie
+real de la firma y sobre el trazo del logo (el gate exige ≥ 4,5:1 en ambos). **Regla: cuando el lecho falle y la luz ya esté fuera de él, sospecha de una superficie
 CLARA cerca — el reflejo llega donde la luz no.**
 
 ✅ **Y el mismo fix apaga el tinte azul de las sombras** **[medido 2026-09-22 en los 9:16 de la misma serie]**.
@@ -168,9 +168,28 @@ pnpm foto:doctor                    # ¿puede esta máquina generar? seis cheque
 pnpm foto:prompt <ficha.json>       # arma el prompt desde la ficha
 pnpm foto:validar <plate.png>       # mide las seis reservas sobre el plate limpio
 pnpm foto:componer <piezas.json>    # la CAPA GRÁFICA encima: voces, selección AXIS, firma y QA
+pnpm foto:componer:cta <plan.json>  # pieza CON CTA: compone y emite su QA con huellas (out/qa-<plan>.json)
+pnpm foto:cta:gate <plan.json>      # la certifica: 0 certificado · 1 falla · 2 uso · 3 NO certificable (no es pase)
 pnpm foto:emblema <plate.png>       # amplía el bordado para mirarlo al 100% (no decide: quita la excusa)
 pnpm foto:lanyard --nombre … --cargo … --foto …   # arma el lanyard determinístico; el modelo sólo lo termina
 ```
+
+**Piezas con CTA: `foto:componer:cta` + `foto:cta:gate`.** Contrato:
+[`EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md`](../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) (§16–§18);
+oficio y receta del plan en la skill `efeonce-advertising-creative`. Lo que un agente no puede saltarse:
+
+- **Sólo la salida 0 certifica. Un 3 («no certificable») NUNCA es un pase:** se resuelve recomponiendo o con
+  `pnpm foto:cta:gate <plan> --reproducir`; una pieza con gesto manuscrito o tarjeta no se certifica.
+- **Plan nuevo:** `safeArea: "axis"` · `cta.x: "columna"` (sólo con alineación a la izquierda) · firma declarada
+  (`logo: { width: 0.2, x: 0.5, y: "auto" }` o `firma: { modo: "externa", razon }`) · `lead` y `after` · `altText`
+  que describe la escena sin transcribir el copy (el texto alternativo completo lo escribe el compositor).
+- **Excepciones:** una regla en una pieza, con `aprobadoPor` de `scripts/foto/aprobadores.json`, `plate` (sha256) y
+  `hasta` si la regla se mide. **Nunca inventes un aprobador** ni copies el de la suite. `placement` sólo endurece.
+- **Si tocas el compositor o el gate:** regresión (`pnpm foto:componer:cta:regresion`), pruebas
+  (`pnpm foto:componer:cta:pruebas`) y, por cada guarda nueva, un mutante que alguna prueba detecte
+  (`pnpm foto:componer:cta:mutantes`). Cambiar fuentes o logos cambia la huella del comando: las piezas ya compuestas
+  salen con 3 hasta recomponerlas. Nunca compongas en la carpeta de otra sesión para «probar»: usa una copia temporal
+  (dos composiciones en la misma `out/` no se mezclan: la segunda se rechaza).
 
 🔴 **Para un AD con titular, los valores por formato ya están medidos — no los redescubras.**
 [`RECETA-POR-FORMATO.json`](../../ai-generations/2026-09-21_ads-brand-visibility/RECETA-POR-FORMATO.json)
@@ -179,7 +198,8 @@ trae `top`, `textWidth`, tamaños de las tres voces, gaps, anclas de cursores y 
 medidas están en el [método de producción](../../docs/operations/social/2026-09-21-ads-brand-visibility-production-method.md).
 🔴 **La regla de las tres veces:** el **dominante mide al menos 3× la entrada**, o la jerarquía se aplana
 —medido en cuatro versiones de la misma pieza: a 2,8× el operador la rechazó, a 4,0× la aprobó—. Ya está
-cableada en `foto:componer`, que imprime el ratio y avisa bajo 3×. Es condición **necesaria, no
+cableada en `foto:componer`, que imprime el ratio y avisa bajo 3×; en `foto:cta:gate` **bloquea**, igual que un
+dominante que no es la voz mayor (sólo se exceptúa con excepción auditada `jerarquia`). Es condición **necesaria, no
 suficiente**.
 
 Tres que muerden siempre: el **dominante va en 1–3 palabras con un CIERRE que remata** (meter la frase
@@ -194,11 +214,12 @@ en `bottom-end`** — en `top-end` su etiqueta cae sobre la entrada y se come el
 | Qué lleva | Sólo foto + firma | Titular, copy, cursores, selección |
 | Para qué | **Descanso visual**: relaja el feed | Dice algo concreto |
 | Reserva | No necesita | **Obligatoria, declarada en la toma** |
-| Cómo | `foto:prompt` → `foto:validar` | `foto:prompt` con `reservas` → `foto:validar --zona-texto` → `foto:componer` |
-| Estado | **aprobada** | **capa SIN aprobar** (2026-09-19) |
+| Cómo | `foto:prompt` → `foto:validar` | `foto:prompt` con `reservas` → `foto:validar --zona-texto` → `foto:componer` (con CTA: `foto:componer:cta` → `foto:cta:gate`) |
+| Estado | **aprobada** | **capa SIN aprobar** (2026-09-19); el CTA funcional sí está aprobado ([Tres voces + acción](../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md), 2026-09-22) |
 
 **NUNCA escribas un compositor nuevo.** `foto:componer` es el de «Nivel de búsqueda» con su gramática de voces
-intacta; escribir otro ya se intentó y el operador rechazó las piezas enteras.
+intacta; escribir otro ya se intentó y el operador rechazó las piezas enteras. Con CTA, el canónico es
+`foto:componer:cta`: copiarlo a una carpeta de corrida reintroduce las copias que divergen (contrato §5).
 
 **NUNCA armes un prompt de foto de marca concatenando bloques a mano.** Es la vía por la que «Vertical 4:5.»
 vivió dentro del bloque de realismo compartido sin que nadie lo viera. El comando resuelve desde tablas:
@@ -418,9 +439,19 @@ vivió dentro del bloque de realismo compartido sin que nadie lo viera. El coman
   invitado cruzando el borde inferior, desenfocado y fuera del alcance de la llave y del rim, dio **banda 0,34 ✓ y
   lecho 8,32 ✓ en la misma pieza** (`G-podcast-v5.png`). El lecho no es «la superficie de abajo»: es **un objeto
   del oficio puesto ahí a propósito y sacado de la luz**.
-- **Nunca un scrim.** Si el contraste no da, se **regenera** el plate; no se oscurece en post.
+- **Nunca un scrim.** Si el contraste no da, se **regenera** el plate; no se oscurece en post. El compositor CTA
+  acepta `scrimTop`/`scrimBottom` y hoy el gate sólo **avisa** cuando una voz pasa gracias al velo (decisión pendiente
+  del operador): esta regla no la hace cumplir el gate, la cumples tú.
 - **El plate nace sin logo ni texto.** La firma es el SVG oficial compuesto después, **20% del lado corto del lienzo**
-  (decisión del operador 2026-09-20), contraste ≥ 4,5:1 medido.
+  (decisión del operador 2026-09-20), contraste ≥ 4,5:1 medido. En una pieza con CTA, `foto:cta:gate` lo exige —en la
+  caja y, si el logo lo dibuja el compositor, también en su trazo; fuera del sujeto y dentro de la zona de AXIS— y la
+  firma se declara siempre:
+  `logo.y: "auto"` busca una Y legible sólo en la banda del pie, debajo de todo lo compuesto; `firma: { modo:
+  "externa", razon }` si la pone otra herramienta; `sin-firma`, sólo con aprobador del registro.
+  **[pendiente]** Tamaño en 16:9 (medido 2026-09-23): las piezas 16:9 de CMP-002 y del registro C, hechas al 13–14 %,
+  dan una firma de 31 px en un teléfono contra 78 px en 4:5, y aun al 20 % quedaría en ≈ 44 px. Opción recomendada,
+  sin aprobar: 25 % del lado corto en horizontales y 20 % en verticales y cuadrados. Hasta que el operador decida,
+  rige el 20 %.
 - 🔴 **En un plate limpio, no sugieras criaturas ni siquiera de refilón** **[medido 2026-09-21]**. La frase «*as if
   something small were there asking her a question*» hizo que el modelo **materializara un robot blanco flotando**.
   Si la criatura se compone después, la mirada se describe como **geometría** y el vacío se **declara**: «*the air

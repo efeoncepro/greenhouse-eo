@@ -51,12 +51,12 @@ una orquestadora: no duplica valores tipográficos ni reemplaza las skills de of
      `cursor-required`: la salida es cursor a 0,9 + cierre corto;
    - **la vista del personaje puesta en la raíz de la ficha se ignora en silencio** y resuelve la pose por
      defecto: verificar la ruta `--image` que imprime el comando antes de gastar;
-   - **el CTA se compone con `pnpm foto:componer:cta` y se verifica con `pnpm foto:cta:gate`**. **Nunca copiar
+   - **el CTA se compone con `pnpm foto:componer:cta` y se certifica con `pnpm foto:cta:gate`**: checklist del plan,
+     flujo y códigos de salida en [Componer y certificar](#componer-y-certificar-una-pieza-con-cta). **Nunca copiar
      el compositor a la carpeta de corrida** (vivió en cinco copias divergentes). El gate **exige**
-     `contraste.cta`: antes, la variante sólida pasaba porque el dato no existía, no porque cumpliera. Desde el
-     2026-09-23 cada plan tiene su QA (`out/qa-<plan>.json`) con **huellas** del plan, del plate, del comando y
-     del PNG, que el gate recalcula: ya no hace falta correrlos «en pareja», y un QA que no describe lo que hay
-     en disco falla;
+     `contraste.cta`: antes, la variante sólida pasaba porque el dato no existía, no porque cumpliera. Cada plan tiene
+     su QA (`out/qa-<plan>.json`) con **huellas** del plan, del plate, del PNG, del layout y del comando, que el gate
+     recalcula: un QA que no describe lo que hay en disco falla;
    - **un beneficio por pieza**: el grupo beneficio → CTA → descriptor no se reutiliza entre ejecuciones;
    - 🎯 **la metáfora entra POR el objeto del oficio, no al lado de él.** Prueba: quítale el objeto; si la
      escena sigue funcionando igual, estaba al lado.
@@ -177,25 +177,30 @@ casos, no nuevos tokens AXIS. Entregar copy/parámetros/compositor editables y c
 contorno y relleno por separado: CTA/descriptor ≥4,5:1; borde/silueta y controles significativos ≥3:1. Medir
 el fondo real desfavorable, no sólo paleta o p98; documentar color resuelto y prueba. Ver método en el canon.
 
-### Lo que el gate NO mide — cuatro trampas medidas en CMP-001 (2026-09-22)
+### Trampas medidas al componer ads con CTA (CMP-001, 2026-09-22)
 
-Las cuatro salieron de componer ads reales y **ninguna** hace fallar `pnpm foto:cta:gate`: el gate mide
-contraste y protección de sujeto, no completitud del concepto ni geometría del grupo de acción.
+Salieron de componer ads reales **cuando el gate medía sólo contraste y protección de sujeto**. Desde el 2026-09-23
+también bloquea el concepto incompleto, la jerarquía y los choques de maquetación
+([Componer y certificar](#componer-y-certificar-una-pieza-con-cta)); el destino del CTA, la escala en horizontal y el
+ritmo se siguen revisando mirando la pieza.
 
 - 🔴 **El concepto completo no es opcional.** Concepto = **entrada · titular · remate**; grupo de acción =
   **beneficio · CTA · descriptor**. Nueve piezas se compusieron y pasaron el gate con sólo titular +
-  beneficio + CTA + descriptor: el compositor resuelve la entrada con `if (s.lead)`, así que su ausencia no
-  es un error para él, y **una pieza incompleta sale verde**. Ante un «excesivo texto» se **acorta cada voz**,
-  nunca se elimina una. Corolario medido: restituir la entrada puede **bajar** el ratio dominante/entrada sin
-  que nada avise, porque el compositor achica el dominante solo cuando no cabe en `dominantMax` (caso `mo3`:
-  cayó a 2,9, bajo el mínimo de 3; acortar el dominante a tres palabras lo devolvió a 3,7). Lee el
-  `ratioDominanteEntrada` del QA después de restituir. Canon: [Tres voces + acción §El concepto completo no es
+  beneficio + CTA + descriptor: el compositor resuelve la entrada con `if (s.lead)` y su ausencia no es un error
+  para él. Desde el 2026-09-23 el gate la bloquea (`concepto-completo`, salvo `conceptoReducido` con aprobador).
+  Ante un «excesivo texto» se **acorta cada voz**, nunca se elimina una. Corolario medido: restituir la entrada
+  puede **bajar** el ratio dominante/entrada, porque el compositor achica el dominante solo cuando no cabe en
+  `dominantMax` (caso `mo3`: cayó a 2,9, bajo el mínimo de 3; acortar el dominante a tres palabras lo devolvió a
+  3,7). El gate lo bloquea como `jerarquia`: lee el `ratioDominanteEntrada` del QA después de restituir. Canon:
+  [Tres voces + acción §El concepto completo no es
   opcional](../../../docs/operations/EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md).
-- 🔴 **El cursor del CTA tapa el descriptor cuando el botón es corto.** El solape es **geométrico, no de
-  luminancia**: el gate lo deja pasar y sólo se ve mirando la pieza. Un botón de **19 caracteres o más** deja
-  al cursor fuera de un descriptor de hasta 30; si el botón tiene que ser corto por punch, acorta el
-  descriptor en la misma proporción. Desde el 22/09 el compositor baja el descriptor cuando detecta el solape
-  y la regla de largo queda como criterio de ritmo, no como protección. Casos y tabla:
+- 🔴 **El cursor del CTA tapaba el descriptor cuando el botón era corto.** El solape es **geométrico, no de
+  luminancia**, y el gate de entonces lo dejaba pasar. Desde el 22/09 el compositor baja el descriptor cuando
+  detecta el solape, y desde el 23/09 las invariantes de maquetación (una sola función para la búsqueda del tamaño,
+  la composición y el gate) no dejan que una selección —marco, cursor o etiqueta— tape una voz que no sea su
+  destino: la composición aborta y el gate lo bloquea. La regla de largo queda como criterio de ritmo: un botón de
+  **19 caracteres o más** deja al cursor fuera de un descriptor de hasta 30; si el botón tiene que ser corto por
+  punch, acorta el descriptor en la misma proporción. Casos y tabla:
   [compositor de CTA §8](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
 - **El CTA expresa el DESTINO de la etapa, no el ángulo de la pieza.** Varias piezas de la misma etapa del
   embudo convergen en **una sola acción** y lo que cambia entre ellas es el fraseo. Si dos piezas de la misma
@@ -209,47 +214,205 @@ contraste y protección de sujeto, no completitud del concepto ni geometría del
 - **El texto nunca tapa a nadie, y no se declara a mano.** `pnpm foto:componer:cta` segmenta el plate (modelo
   local) y aborta si una caja toca al sujeto (1,2 % del lado corto), en 2D. El QA registra
   `guardaSujeto: segmentacion`, y el gate lo acepta como protección. **Sin máscara, el gate no certifica**
-  (`sin-mascara` bloquea desde el 2026-09-23); `subjectGuard.ignore` exige razón y `aprobadoPor`, con máximo 10 %
-  del lienzo por zona y 15 % en total. Caso
+  (`sin-mascara` bloquea desde el 2026-09-23); `subjectGuard.ignore` exige `reason` y un `aprobadoPor` del registro
+  de aprobadores, con máximo 10 % del lienzo por zona y 15 % en total. Caso
   fuente: las piezas de v07 crecieron ×1,6 sobre las personas cuando el tope dependía de un
   `subjectProtection` que no estaba declarado. §14.
-- **Ningún cambio al compositor se prueba a ojo.** `pnpm foto:componer:cta:regresion` compone todas las piezas
-  con CTA del repo con HEAD y con tu versión y compara estado, layout, QA y el PNG al píxel. Es determinista:
-  un cambio que no debería alterar nada sale sin diferencias. Para recomponer un set aprobado sin que el texto
-  crezca: `"textGrowth": false`. Si un plan está mal escrito, el comando ahora falla antes de componer y nombra la
-  pieza y el campo. §15.
+- **Ningún cambio al compositor ni al gate se prueba a ojo.** `pnpm foto:componer:cta:regresion` compone todas las
+  piezas con CTA del repo con la referencia (`--ref`, HEAD por defecto, extraída hermética de git con sus
+  dependencias) y con tu versión, y compara estado, layout, QA, avisos, el PNG al píxel y el **veredicto del gate**
+  («⛔ Cambia el VEREDICTO del gate»); cualquier diferencia sale con 1. Es determinista: un cambio que no debería
+  alterar nada sale sin diferencias. Falla también con 0 casos, sin el manifiesto de cobertura
+  (`scripts/foto/componer-cta.cobertura.json`) o si falta una pieza de él, y avisa cuando cambiaron fuentes, logos o
+  paquetes desde la referencia: esa diferencia no la ve, así que esas piezas se comparan a ojo. Completan la red
+  `pnpm foto:componer:cta:pruebas` (10 pruebas de punta a punta; borra sus temporales salvo el reporte, y
+  `--conservar` los guarda) y `pnpm foto:componer:cta:mutantes`, que rompe cada guarda a propósito, la compara con
+  una corrida sin mutante y la cuenta como detectada sólo si cambia la verificación esperada; dos mutantes canario
+  ponen a prueba al propio arnés. **Una guarda nueva nace con un mutante que alguna prueba detecte** (y se corre la
+  puntuación de las viejas). Para recomponer un set aprobado sin que el texto crezca: `"textGrowth": false`. §15
+  y §18.
 - **CTA: corchetes sólo en el de texto** (operador, 2026-09-23). Contorno y relleno van sin marco —su rectángulo ya
   delimita la acción—; el de texto conserva los corchetes porque sin rectángulo queda huérfano. El cursor va en los
   tres. El CTA es un destino seleccionable del contrato AXIS (`cta.seleccion`: 8 anclas, colaboradores con etiqueta
   en las esquinas); ningún cursor ni etiqueta puede tapar otra voz. §17.
 - **La variante del CTA se elige mirando, no copiando el plan anterior.** `--variantes` compone las tres lado a
   lado; `variant: "auto"` + `prominencia` (discreta/delimitada/destacada) respeta la intención y sólo escala si la
-  escena no la permite, también con daltonismo. Registra `variantReason`. §17.
-- **Certificación adversarial del compositor (2026-09-23): los cinco tramos cerrados (§18).** Integridad (QA por
-  plan con huellas, escritura atómica, bloqueo, caché verificada, esquema, guarda no desactivable); contraste real
-  (medido en el **trazo**, crecer con margen ×1,1, `protect`, borde ≥ 1 CSS px en el teléfono, `auto` degrada la
-  tinta del contorno antes del relleno); esquema e invariantes (cobertura de glifos, entidades, una sola función de
-  invariantes para búsqueda, composición y gate, reserva editorial); **el canon hecho regla** (zona segura de AXIS
-  como piso —declara `safeArea: "axis"`—, firma de 20 % y ≥ 4,5:1 con `logo.y: "auto"`, concepto completo, regla de
-  las tres veces, `cta.x: "columna"`, texto alternativo sin «Botón») con **excepciones auditadas**; y arnés y pruebas
-  (referencia hermética, cobertura, avisos comparados, `pnpm foto:componer:cta:mutantes`). **Un plan nuevo que quiera
-  pasar el gate declara** `safeArea: "axis"`, `cta.x: "columna"` y `logo: { width: 0.2, y: "auto" }`, más `lead` y
-  `after`. Si la firma la pone otra herramienta después (`firmar.mjs`), el plan declara `firma: { modo:
-  "externa", razon, y }`: el compositor reserva su caja y el gate le exige el mismo contrato (4,5:1, 20 %, fuera del
-  sujeto y dentro de la zona de AXIS estrechada por `signatureSafeArea`).
-- **El gate distingue falla de «no certificable» (tramo 6, §18).** Sale con **3** —no con 0— si el QA es del formato
-  anterior, si la pieza se compuso con otra versión del comando, si la máscara del sujeto salió de una caché ajena o si
-  la pieza lleva gesto manuscrito o tarjeta (nadie los mide). **3 no es un pase**: recompón, o certifica con
-  `pnpm foto:cta:gate <plan> --reproducir`, que recompone en un temporal con el comando vigente y segmentación nueva y
-  exige que lo entregado sea idéntico byte a byte. `logo.y: "auto"` busca sólo en la banda del pie y mide el trazo del
-  logo; si no encuentra lugar, la firma queda al pie y el gate decide.
-- **Excepciones y salidas con aprobador registrado (tramo 7).** `aprobadoPor` sale de `scripts/foto/aprobadores.json`;
-  una excepción nombra el `plate` (sha256) y, si la regla se mide con un número, `hasta`. `sin-firma` y
-  `conceptoReducido` también llevan `aprobadoPor`. `placement` sólo endurece, el CTA exige 4,5:1 a cualquier tamaño y
-  el dominante tiene que ser la voz mayor. **Nunca inventes un aprobador**: si falta, pregunta al operador.
+  escena no la permite, midiendo 4,5:1 a cualquier tamaño, APCA y daltonismo; su motivo queda en el QA
+  (`ctaVariante`). Una variante fija declara el suyo en `cta.variantReason`. §17.
 - **Un bloque centrado no se ancla lejos del centro.** Con `align: 'center'` y `|centerX − 0,5| > 0,15`, el
   compositor aborta: si el aire está a un costado, el bloque se alinea a ese costado (`align: 'left'`). Operador
   sobre 03-referencia-916: «se vería mejor alineada a la izquierda por la posición». §14.
+
+### Componer y certificar una pieza con CTA
+
+`pnpm foto:componer:cta` compone; `pnpm foto:cta:gate` **certifica** que lo que hay en disco es lo que se compuso y que
+cumple el canon. Certificar la pieza no la aprueba ni autoriza publicarla. Contrato técnico, plantilla verificada y
+estado de la certificación: [compositor de CTA §15–§19](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md);
+paso a paso, excepciones y problemas comunes: [manual de uso](../../../docs/manual-de-uso/creative/compositor-piezas-cta.md);
+qué hace y por qué, en simple: [documentación funcional](../../../docs/documentation/creative/compositor-piezas-cta.md).
+
+**Checklist de un plan nuevo que tiene que pasar el gate.** Parte de la plantilla de §19.4 del contrato —una pieza que
+la suite certifica con código 0— y cambia `id`, `plate`, copy y escena; no armes el plan de cero.
+
+1. **Zona segura de AXIS:** `safeArea: "axis"` (feed —4:5, 1:1 y 16:9—: 7,5 % a los lados y 6 % arriba y abajo; story
+   —9:16—: 10 % y 13 %). Es el piso: el texto arranca dentro, también por arriba, y una zona `{ x0, y0, x1, y1 }`
+   declarada sólo la estrecha.
+2. **Columna:** `align: "left"` con `cta.x: "columna"` (y `note.x: "columna"` si hay nota), para que botón, nota y
+   descriptor arranquen en la columna del texto. «columna» existe sólo con alineación a la izquierda: con
+   `align: "center"` el plan se rechaza, y el CTA de un bloque centrado lleva una fracción o `cta.align: "center"`.
+3. **Concepto y jerarquía:** `lead` (entrada), `dominant` y `after` (cierre); sin entrada o sin cierre, sólo con
+   `conceptoReducido` aprobado. El dominante mide ≥ 3× la entrada **y es la voz mayor**: ninguna otra —entrada, cierre,
+   nota, CTA, descriptor— mide más que él. Declara `leadSize` y `afterSize` (sin ellos salen a 70 y 74 px) y, como el
+   compositor achica el dominante cuando no cabe en `dominantMax`, lee `ratioDominanteEntrada` en el QA.
+4. **Firma declarada siempre**, de una de tres formas:
+   - `logo: { width: 0.2, x: 0.5, y: "auto" }`, la recomendada (la tinta, blanca o navy, la elige la medición salvo que
+     fijes `variant`). `width` es fracción del lado corto. `y: "auto"` busca sólo en la **banda del pie**, debajo de
+     todo lo compuesto, una Y con ≥ 4,5:1 en la caja y en el trazo del logo, lejos del sujeto; si no la encuentra lo
+     avisa, la firma queda al pie y el gate la mide: abre la banda (acorta o sube el texto), fija `logo.y` o cambia el
+     plate. Un `logo.y` numérico es el **borde superior**, y con él el gate no verifica que la firma quede debajo del
+     contenido: eso lo cuidas tú. La búsqueda esquiva las zonas `protect`
+     (`[{ box, reason }]`), igual que el texto.
+   - `firma: { modo: "externa", razon }` si otra herramienta firma después (v03–v07: `firmar.mjs` →
+     `firma-placement.mjs`). El compositor no la dibuja: reserva su caja (20 % del lado corto, centrada) y mide su
+     contraste como esa herramienta. **Declara su centro vertical dentro de la zona de AXIS** (la Y máxima por formato
+     está en §19.6 del contrato): sin Y queda en 0,935, fuera de la zona, y qué hacer con ese defecto es decisión
+     pendiente del operador. Con `firmar.mjs`, la Y va en `signatureY`, que es la que esa herramienta lee (el esquema
+     ya no acepta `firma.y` ni `firma.ancho`), y el ancho queda en 20 %: la caja que se mide tiene
+     que ser la firma que se dibuja. `signatureY` sin `firma` también declara firma externa; `signatureSafeArea` (`{ x0, y0, x1, y1 }`)
+     sólo estrecha la zona de la firma. **Certifica antes de firmar:** `firmar.mjs` reescribe `out/<id>.png` y desde
+     ahí ni el gate ni `--reproducir` lo reconocen. Guarda la salida y el código del gate antes de firmar.
+   - `firma: { modo: "sin-firma", razon, aprobadoPor }`, sólo con aprobador del registro.
+
+   Con logo o con firma externa el canon es el mismo: ≥ 20 % del lado corto, ≥ 4,5:1, fuera del sujeto y dentro de la
+   zona de AXIS.
+   **[pendiente]** En 16:9 ese 20 % deja la firma en 11 % del ancho (≈ 44 px en un teléfono, contra 78 px en 4:5); la
+   opción recomendada, sin aprobar, es 25 % en horizontales. Hasta que el operador decida, rige el 20 %.
+5. **CTA:** `variant: "auto"` + `prominencia` (ver arriba) o una variante fija con `cta.variantReason`. El acento es
+   obligatorio: `surfaceToken` (contorno y relleno) o `inkToken` (texto) sólo aceptan `accentSurface`, `growthOnDark` o
+   `accentInkOnLight`, y omitirlo resuelve lima. Si el acento no alcanza, se regenera el plate: el color no se apaga.
+6. **`altText`:** describe la escena —quién, qué hace, dónde, con qué luz— sin transcribir el copy (ni entre comillas
+   ni en frases de dos palabras o más). El texto de la imagen lo agrega el compositor en `out/<id>.alt.txt` y en el QA,
+   en orden de lectura, y **anuncia siempre el rol del CTA** («Llamado a la acción: «…»», nunca «Botón»: en una imagen
+   no hay control), con las etiquetas de los cursores y «Firma: logotipo de Efeonce». El gate sólo avisa si falta la
+   escena o si `altText` transcribe el copy.
+7. **Escena y tamaño:** `protect: [{ box: [x0, y0, x1, y1], reason }]` (fracciones del lienzo) para lo que el texto no
+   puede tapar aunque no sea una persona; `editorialReserve: { maxRight, maxBottom }` (px) si el plan reserva área;
+   `final: [ancho, alto]` si el PNG no mide lo mismo que el plate (320–8192 px por lado; el gate verifica el tamaño
+   entregado). Ojo con los nombres: `protect` y `subjectGuard.ignore` usan `reason`; `excepciones`, `firma`,
+   `conceptoReducido` y `placement` usan `razon` (≥ 10 caracteres).
+8. **Sin `gesture` ni `card`** si la pieza tiene que salir certificada (ver el código 3).
+
+**Flujo.** Corre cada comando sin tubería (`| tail`, `| grep`): el código de salida sería el del último comando.
+
+1. El plate reserva su zona de texto desde la toma: `pnpm foto:prompt <ficha.json>` con `reservas: ["zona-texto"]` y
+   `pnpm foto:validar <plate.png> --zona-texto`.
+2. Opcional: `pnpm foto:componer:cta <plan> --variantes` pone las tres variantes del CTA lado a lado, a 390 px y con su
+   medición, en `out/variantes/`. No toca el QA ni las salidas del plan.
+3. `pnpm foto:componer:cta <plan> [id...]` escribe en `<carpeta del plan>/out/` `<id>.png`, `<id>-layout.json`,
+   `<id>.alt.txt`, `<id>-overlay.svg`, `<id>-cta-evidence.json`, `preview-390/<id>.png` y el QA **del plan**,
+   `out/qa-<plan>.json`, con huellas del plan, el plate, el PNG, el layout y el comando. Sin ids rehace ese QA; con ids
+   recompone esas piezas y las fusiona. Un plan mal escrito falla antes de componer, nombrando pieza y campo (campo
+   desconocido, rango como `dominantTracking` −0,08…0,12 em, entidad que no es un carácter Unicode, ids que sólo
+   difieren en mayúsculas, glifo que la fuente no tiene, plate ilegible). Si una pieza aborta —texto sobre el sujeto o
+   sobre una zona `protect`, choque de maquetación—, la corrida se detiene y el mensaje dice qué mover; lo que no se
+   compuso sale como falla en el gate. Dos avisos previos que no se ignoran:
+   - **otro plan de la misma carpeta registra ese id** (otro `out/qa-*.json`): al recomponerlo, su PNG deja de ser el
+     que certificó ese plan y su gate falla hasta que lo recompongas. Decide antes de seguir (en `aeo-cta-v04`, dos
+     planes comparten 8 ids);
+   - **otra composición usa la carpeta**: el bloqueo `out/.componer.lock` se reclama sin carreras y Ctrl-C lo suelta.
+     Espera a que termine y no lo borres a mano. Para probar, copia plan y plate a una carpeta temporal: nunca compongas
+     en la carpeta de otra sesión.
+4. Mira `out/preview-390/` y la pieza completa: el gate no ve ritmo, escena ni destino del CTA.
+5. `pnpm foto:cta:gate <plan>` y lee el código (tabla). No edites plan, plate ni PNG después de componer: se rompen las
+   huellas; se recompone.
+6. `pnpm foto:cta:gate <plan> --reproducir`: **la certificación que no se falsifica** y la que se corre antes de
+   entregar. Recompone el plan entero en un temporal con el comando vigente y segmentación nueva, exige que cada
+   `out/<id>.png` y `out/<id>-layout.json` sea idéntico byte a byte al reproducido y da el veredicto del gate sobre el QA
+   reproducido (0, 1 o 3), sin tocar tu `out/`. Si algo difiere, la pieza cambió con el comando: recompón y vuelve a
+   mirarla.
+7. `pnpm foto:accesibilidad <plan>` escribe `out/accesibilidad/reporte.md` (por pieza y voz: WCAG según el tamaño en el
+   teléfono, APCA, área bajo el umbral, daltonismo y texto alternativo) y `<id>-daltonismo.png` (la pieza a 390 px con
+   protanopía, deuteranopía y tritanopía). **No aprueba nada**: es para mirar.
+
+| Código | Qué dice | Qué haces |
+|---|---|---|
+| 0 | `✓ … certificadas`: huellas del plan, el plate, el PNG, el layout y el comando vigente, y todas las reglas | Mira igual los `⚠` |
+| 1 | `✗`: una regla falla, falta el QA de una pieza o una huella no calza (plan, plate, PNG o layout cambiaron después de componer) | Corrige el plan o recompón. Las huellas cortan antes que las reglas del canon: tras arreglarlas, corre el gate de nuevo |
+| 2 | Uso incorrecto (falta el plan) | — |
+| 3 | `⊘ NO CERTIFICABLE`: nada falla en lo que pudo verificar, pero no puede probar lo que certificaría | **Nunca es un pase.** Resuélvelo por su causa |
+
+Causas del 3 (si además hay un `✗`, sale 1):
+- **QA del formato anterior** (`out/qa.json` compartido, sin huellas ni medición del trazo) → recompón.
+- **Otra versión del comando** → recompón, o `--reproducir` si el vigente produce el mismo PNG. La huella del comando
+  incluye su código y sus módulos, las versiones de sus paquetes, las fuentes (Bricolage, Poppins; Guttery no), los
+  logos y el SVG de la firma web: actualizar cualquiera deja en 3 las piezas compuestas antes.
+- **Máscara del sujeto de una caché ajena** (`FOTO_MASCARAS_DIR`) → `--reproducir`, que segmenta de nuevo.
+- **`gesture` o `card`:** ninguna guarda los mide, y ni recomponer ni reproducir lo resuelve. El gesto manuscrito está
+  fuera de alcance por decisión del operador (2026-09-23): si la pieza tiene que certificarse, no lo lleva; si el gesto
+  es parte del concepto, la pieza se reporta como **no certificable**, con esas palabras.
+
+Reporta el veredicto tal como sale —0 certificada, 1 no pasa, 3 no certificable—, nunca «casi pasa» ni «verde salvo…».
+
+**Qué bloquea, además del checklist.** WCAG 2.2 AA por voz según su tamaño **en el teléfono** (390 CSS px de ancho:
+texto normal 4,5:1, grande 3:1), medido sobre el **trazo** (el 1 % peor de los píxeles del glifo), no sólo sobre la
+caja; si falla, mueve el texto, protege la zona con `protect` o regenera el plate. El **CTA exige 4,5:1 a cualquier
+tamaño**, nunca el umbral de texto grande, y además **APCA y daltonismo** en su texto, borde y relleno; en las demás
+voces, APCA y daltonismo avisan. Bordes y rellenos del CTA ≥ 3:1, y el borde del contorno ≥ 1 CSS px y ≥ 3:1 como se
+ve en un teléfono (390 px × DPR 2). También bloquean las invariantes de maquetación (texto, botón y firma no se tocan;
+ninguna selección tapa una voz que no sea su destino), el tamaño entregado y la falta de máscara del sujeto
+(`sin-mascara`). Salvo APCA y daltonismo del CTA (`cta-perceptual`), nada de este párrafo admite excepción, y tampoco
+las huellas ni una firma automática por encima del contenido.
+
+**Avisos que se miran** (no bloquean, pero tampoco son ruido):
+- **Una voz que pasa sólo gracias al velo** (`scrimTop`/`scrimBottom`), medida sobre la foto sin él. En fotografía de
+  marca Efeonce el velo ya es un DON'T: el gate avisa y la regla la cumples tú, regenerando el plate.
+- **Variante del CTA elegida sin margen:** `auto` no encontró ninguna con margen (×1,1) y dejó la que más separa. Pasa
+  por poco y puede no alcanzar en otra pantalla o con compresión: prueba otra tinta, otro acento u otro plate.
+- **Corchetes del CTA de texto bajo 1 CSS px o bajo 3:1:** el trazo de AXIS mide ≈ 0,69 CSS px en un teléfono en todos
+  los formatos. Es un valor del contrato AXIS: no lo engroses por tu cuenta.
+- Texto bajo 9 CSS px en el teléfono · `altText` ausente o que transcribe el copy · APCA o daltonismo fuera del CTA ·
+  máscara que no marca ningún sujeto (si la foto tiene protagonista, `--reproducir`) · `placement` declarado · CTA o
+  descriptor fuera de la columna · poco aire sobre los corchetes · cada excepción y salida aprobada.
+
+**Excepciones y salidas con aprobador.** Una excepción exceptúa **una regla en una pieza** y no apaga la medición: el
+gate la imprime con su razón y quién la aprobó.
+
+```json
+"excepciones": [{ "regla": "zona-segura", "razon": "<por qué, al menos 10 caracteres>",
+  "aprobadoPor": "<id del registro, de quien la aprobó>", "plate": "<sha256 del plate>", "hasta": 12 }]
+```
+
+- **Reglas:** `zona-segura`, `firma-contraste`, `firma-tamano`, `firma-sobre-sujeto`, `acento-cta`,
+  `concepto-completo`, `jerarquia`, `reserva-editorial`, `cta-perceptual` y `dominante-mayor`. (`legibilidad` figura
+  en el esquema, pero hoy no tiene efecto —el texto bajo 9 px sólo avisa—: no la declares.)
+- **`aprobadoPor`:** un `id` de `scripts/foto/aprobadores.json` (hoy `julio-reyes`; `suite-pruebas` vale sólo para los
+  temporales de la suite, fuera del repo). Sumar a alguien lo decide el operador, con commit.
+- **`plate`:** el sha256 del plate aprobado (`shasum -a 256 <plate>`; el gate también lo imprime). Un plate regenerado
+  se vuelve a aprobar.
+- **`hasta`**, obligatorio cuando la regla se mide con un número: px máximos fuera de la zona (`zona-segura`), fuera
+  de la reserva (`reserva-editorial`) o de silueta bajo la firma (`firma-sobre-sujeto`); contraste mínimo
+  (`firma-contraste`); fracción mínima del lado corto (`firma-tamano`: `0.14`, no `14`); ratio mínimo (`jerarquia`,
+  `dominante-mayor`). `acento-cta`, `concepto-completo` y `cta-perceptual` no lo llevan. Si no sabes la medida, el
+  gate la imprime al rechazar la excepción.
+- Una excepción que no vale no apaga nada: la regla bloquea y el gate dice por qué. Ninguna cambia cuánto crece la
+  pieza.
+- `firma: { modo: "sin-firma", … }`, `conceptoReducido: { razon, aprobadoPor }` y `subjectGuard.ignore: [{ box, reason,
+  aprobadoPor }]` (≤ 10 % del lienzo por zona y 15 % en total; sólo falsos positivos, nunca una persona real) también
+  exigen aprobador del registro.
+- 🔴 **NUNCA inventes un aprobador**, ni copies `suite-pruebas` a un plan real, ni escribas el id de alguien que no
+  aprobó esa pieza. Tú preparas la excepción —regla, razón, sha del plate y `hasta` medido— y se la presentas al
+  operador con la pieza; `aprobadoPor` se escribe cuando él la aprueba. Si falta, pregunta y espera.
+- Las piezas aprobadas que el canon hoy reprueba se dejan como están y se corrigen al recomponer: no las pongas en verde
+  a punta de excepciones.
+- `placement: { anchoCssPx, razon }` **sólo endurece**: el ancho efectivo es el menor entre 390 CSS px y el declarado.
+  Nunca sirve para aflojar una medición.
+
+**Pendientes del operador** (no los decidas tú; si tu pieza depende de uno, pregunta): la firma en 16:9 (arriba); la
+firma externa sin Y, centrada en 0,935 y fuera de la zona de AXIS; el margen por defecto del compositor, 7 %, frente a
+AXIS (mientras tanto, `safeArea: "axis"` en todo plan nuevo); la firma de las tres stories de v07 en la franja que Reels
+tapa (centro en 0,90; la zona de AXIS termina en 0,87); si el velo que rescata una voz se permite o pide aprobación; si
+la variante sin margen pasa a bloqueo; el piso de legibilidad por rol; y el grosor de los corchetes AXIS. Detalle: §18
+del [compositor de CTA](../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
 
 ## Jerarquía por voces: receta probada en carrusel (2026-09-19)
 
@@ -330,7 +493,8 @@ La jerarquía también vive dentro de la línea. El compositor de referencia exp
   [lenguaje fotográfico](../design-studio/references/efeonce-photographic-language.md): antes de generar, abre
   imágenes aprobadas comparables y registra los portadores reales del azul activo y del acento naranja **o** lima
   en la ficha; después comprueba su presencia en el plate. La firma sobre el lecho desenfocado usa el SVG oficial
-  **compuesto** (20% del ancho por decisión del operador 2026-09-20, contraste ≥ 4,5:1 medido), **nunca generado**.
+  **compuesto** (20 % del lado corto por decisión del operador 2026-09-20 —en 4:5 y 9:16 es el ancho; en 16:9 no, y
+  su tamaño en 16:9 está pendiente—, contraste ≥ 4,5:1 medido), **nunca generado**.
 - **La frontera con la toma (2026-09-20).** Lo que la **foto** debe reservar son **seis reservas** —zona de texto,
   objeto para enmarcar, lecho de la firma, aire para cursores, campo profundo al margen y **lecho por formato**
   (**[medido]**: 4:5 **18%** · 9:16 **22%** · 16:9 **16%** · 1:1 **18%**, este último *sin validar*)— y **no se piden

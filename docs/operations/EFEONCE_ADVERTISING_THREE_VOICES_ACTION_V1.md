@@ -18,10 +18,10 @@ Aplica a la capa gráfica de ads, incluidos ads sobre fotografía de marca. El c
 
 Ninguno es el ganador universal ni tiene un lift demostrado. No asignarlos automáticamente por embudo, plataforma o audiencia. Registrar el estilo y el motivo en el plan; si se comparan, mantener iguales foto, copy, geometría, destino y condiciones de medios.
 
-**Cómo se elige en la práctica (2026-09-23).** Medido en el repo: dos de tres agentes terminaron usando un solo tratamiento, porque nada les mostraba los otros sobre la foto real ni les pedía el motivo, y porque el gate exigía más a unos que a otros. Ahora: `pnpm foto:componer:cta <plan> --variantes` compone los tres lado a lado con su medición; `cta.variant: "auto"` con `cta.prominencia` (`discreta` → texto · `delimitada` → contorno · `destacada` → relleno) respeta la intención y sólo **escala** a un tratamiento que separa más cuando la escena no permite leer el pedido, también con daltonismo; y el comando avisa si una pieza elige tratamiento sin `cta.variantReason`. Detalle: `EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md` §17.
+**Cómo se elige en la práctica (2026-09-23).** Medido en el repo: dos de tres agentes terminaron usando un solo tratamiento, porque nada les mostraba los otros sobre la foto real ni les pedía el motivo, y porque el gate exigía más a unos que a otros. Ahora: `pnpm foto:componer:cta <plan> --variantes` compone los tres lado a lado con su medición; `cta.variant: "auto"` con `cta.prominencia` (`discreta` → texto · `delimitada` → contorno · `destacada` → relleno) respeta la intención y sólo **escala** a un tratamiento que separa más cuando la escena no permite leer el pedido —con 4,5:1 aunque el CTA sea grande, y también con APCA y daltonismo—; y el comando avisa si una pieza elige tratamiento sin `cta.variantReason`. Detalle: `EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md` §17.
 
 - Contorno/relleno: rectángulo mínimo con esquinas redondeadas, ajustado al texto y su padding. Texto: sin superficie ni borde de botón. Ninguno usa sombras, biseles, brillo ni badges decorativos.
-- **Corchetes sólo en el tratamiento de texto** (decisión del operador, 2026-09-23). En **contorno y relleno** el rectángulo ya delimita la acción: los corchetes no cumplían ninguna función y se quitan. En **texto** se conservan, porque sin rectángulo el CTA «queda huérfano». El **cursor** se conserva en los tres. Un marco distinto se pide a propósito con `cta.seleccion.marco` (p. ej. para mostrar un colaborador seleccionando el CTA).
+- **Corchetes sólo en el tratamiento de texto** (decisión del operador, 2026-09-23). En **contorno y relleno** el rectángulo ya delimita la acción: los corchetes no cumplían ninguna función y se quitan. En **texto** se conservan, porque sin rectángulo el CTA «queda huérfano». El **cursor** se conserva en los tres. Un marco distinto se pide a propósito con `cta.seleccion.marco` (p. ej. para mostrar un colaborador seleccionando el CTA). El gate **avisa** (no bloquea) que el trazo de los corchetes AXIS mide ≈ 0,69 CSS px en un teléfono, bajo 1 CSS px: es un valor del contrato AXIS y cambiarlo es decisión pendiente del operador; no lo cambies por tu cuenta.
 - **Color a demanda, accesibilidad obligatoria.** Lima no es un default universal: elegir naranja, teal u otro color autorizado coherente con la pieza. Resolver desde la paleta/contrato de marca; si el token no está expuesto, documentar su fuente autorizada, no inventar un token. Texto, borde y relleno se eligen por separado: la tinta puede ser clara u oscura y no tiene que repetir el acento. Registrar roles, valores resueltos y razón; los pilotos lima/navy no fijan la paleta del sistema.
 - Beneficio → acción → descriptor forman un grupo. El descriptor identifica oferta/servicio, no repite el botón. No inventar «gratis», urgencia, garantías o cifras para agregar un chip.
 - Una acción principal, breve y específica; la landing debe permitir realizar lo prometido. En una imagen estática el botón representado no es un control independiente del enlace/CTA nativo del anuncio.
@@ -39,11 +39,11 @@ Ninguno es el ganador universal ni tiene un lift demostrado. No asignarlos autom
 
 Regla del operador, 2026-09-22: armonía con la pieza **y** contraste comprobado. Un ad naranja no recibe un CTA verde por plantilla. Elegir el acento por composición y después la tinta por contraste; no asumir que naranja/blanco, teal/blanco o cualquier par de marca pasa.
 
-- Texto del CTA y descriptor: **≥4,5:1**. Para el CTA se mantiene este piso incluso si es grande; no usar la excepción de texto grande para rescatar una combinación débil.
-- Contorno/silueta necesarios para distinguir la acción y controles/cursor que comuniquen significado: **≥3:1** contra colores adyacentes. La política interna también comprueba el perímetro del relleno contra la foto.
+- Texto del CTA y descriptor: **≥4,5:1**. Para el CTA se mantiene este piso incluso si es grande; no usar la excepción de texto grande para rescatar una combinación débil. **Desde el 2026-09-23, APCA y daltonismo también bloquean en el CTA** (decisión del operador), exceptuables sólo como `cta-perceptual` con aprobador del registro; en las demás voces sólo avisan.
+- Contorno/silueta necesarios para distinguir la acción y controles/cursor que comuniquen significado: **≥3:1** contra colores adyacentes. La política interna también comprueba el perímetro del relleno contra la foto. El gate mide el borde del contorno como se ve en un teléfono (390 CSS px con DPR 2): al menos 1 CSS px de grosor y ≥3:1.
 - En texto/contorno, medir tinta contra la fotografía; en relleno, tinta contra superficie y superficie/borde contra fotografía. Medir además descriptor y controles. No aceptar sólo el color teórico de la paleta.
-- Sobre fondos variables, revisar las zonas más desfavorables bajo la tinta. El percentil98 del compositor es diagnóstico, **no sustituye el mínimo** para declarar el CTA accesible; si falla, cambiar tinta/superficie, posición o estilo. No redondear un fallo hacia arriba ni añadir scrim.
-- Usar colores fuente y fondo, evitando medir antialiasing como si fuera el color principal; complementar con inspección del export reducido, grosor, tamaño y comprensión sin depender sólo del matiz. Preparar texto alternativo para publicación cuando la superficie lo permita.
+- Sobre fondos variables, revisar las zonas más desfavorables bajo la tinta. El percentil98 de la caja es diagnóstico, **no sustituye el mínimo** para declarar el CTA accesible: el gate exige que el 1 % peor de los píxeles del trazo de cada voz alcance su umbral contra su propio fondo. Si falla, cambiar tinta/superficie, posición o estilo. No redondear un fallo hacia arriba ni añadir scrim: el gate sólo **avisa** cuando una voz pasa gracias al velo (`scrimTop`/`scrimBottom`), así que esta regla la haces cumplir tú (decisión pendiente del operador).
+- Usar colores fuente y fondo, evitando medir antialiasing como si fuera el color principal; complementar con inspección del export reducido, grosor, tamaño y comprensión sin depender sólo del matiz. Preparar texto alternativo para publicación cuando la superficie lo permita: el compositor lo escribe en `out/<id>.alt.txt` con la descripción de la escena (`altText` del plan) y todo el texto visible en orden de lectura, anuncia siempre el rol del CTA («Llamado a la acción: «…»», nunca «Botón»: en una imagen no hay control) y suma cursores y firma. `altText` describe la escena sin transcribir el copy; si lo transcribe, el gate avisa.
 - Registrar ratios, método, formato y evidencia. Contraste aprobado no equivale a certificación integral de accesibilidad ni a eficacia de conversión.
 
 Fuentes primarias consultadas 2026-09-22: [WCAG 2.2, contraste de texto e imágenes de texto](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html) y [contraste no textual](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html). Los mínimos internos específicos del CTA se explicitan arriba; la firma conserva además su contrato de marca.
@@ -67,7 +67,7 @@ Canon de aplicación creativa: este documento, cargado desde `efeonce-advertisin
 **`pnpm foto:componer:cta` + `pnpm foto:cta:gate`**, con las cinco copias de corrida consolidadas y el hueco
 de medición del relleno cerrado. Canon: [`EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md`](EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
 
-El compositor canónico de CTA reutiliza el renderer AXIS. Sus campos efectivamente soportados y límites se verifican en el contrato técnico, §7; no asumir que campos posteriores como `centerX` o `signatureY` migran por nombre. Los runners archivados conservan reproducción histórica, no autoridad para nuevas copias.
+El compositor canónico de CTA reutiliza el renderer AXIS. Sus campos soportados y límites se verifican en el contrato técnico: §7 (auditoría del 22/09) y §18 (certificación del 23/09). No asumir que un campo migra por nombre: hoy el comando lee `centerX` (desde la noche del 22/09; aborta un bloque centrado a más de 0,15 del centro) y `signatureY` (desde el 23/09: declara firma externa y reserva su caja con `y` como centro vertical), pero `logo.y` numérico es el borde superior de la firma, no su centro. Los runners archivados conservan reproducción histórica, no autoridad para nuevas copias.
 
 ## Evidencia del caso, no presets globales
 
@@ -103,6 +103,8 @@ registrada para que Claude/Codex puedan reproducirla. Los números describen est
 | 9:16 | 1080×1920 | Vertical; comprobar además obstrucciones del placement. |
 | 16:9 | 1920×1080 | Horizontal; redistribuir escena y bloque gráfico. |
 
+**Tamaño de la firma en 16:9 — decisión pendiente del operador** (medido el 2026-09-23). Al 20 % del lado corto que fija el canon, la firma 16:9 ocupa ≈ 11 % del ancho y ≈ 44 px en el feed de un teléfono (390 px de ancho), contra 78 px en 4:5. Las piezas 16:9 de CMP-002 y del registro C, hechas al 13–14 % del lado corto, quedan en 7,3–7,9 % del ancho y 31 px; el gate ya las bloquea y se corrigen al recomponer. Opción recomendada, sin aprobar: 25 % del lado corto en formatos horizontales (≈ 14 % del ancho, 55 px en el teléfono) y 20 % en verticales y cuadrados; si se aprueba, cambian el gate, el compositor y `firma-placement.mjs`. Mientras no se decida, rige el 20 % y el gate lo exige.
+
 La adaptación exige foto nativa y composición editable por ratio: no estirar, recortar personajes/manos/pantallas, añadir bandas ni reducir el maestro automáticamente. Reusar el plate sólo si ya corresponde al ratio; para fotografía Efeonce, construir la ficha con `foto:prompt` y editar la referencia corregida para conservar identidad. Comparar cada salida completa y al tamaño de consumo, incluyendo jerarquía, reserva editorial, puntero completo, lecho/firma y contraste mínimo. Una aprobación en 9:16 no valida 4:5 ni 1:1.
 
 El índice de entrega cruza **concepto × ratio × versión × estado de QA** y liga export, fuente editable, prompt/referencia y evidencia. Un ratio faltante se informa como pendiente; nunca se cuenta el set como completo. La validación de estas piezas cuadradas no promueve por sí sola la tabla fotográfica global 1:1, todavía marcada `sinValidar`.
@@ -123,7 +125,8 @@ reservas ni promover el catálogo1:1. Mover elementos exige nueva medición.
 
 ## Gate y continuidad entre agentes
 
-- Declarar `cta.variant: text | outline | solid`, copy, destino, beneficio/descriptor opcionales, estilo/motivo y rol de cada voz.
+- Declarar `cta.variant: text | outline | solid` con su motivo en `cta.variantReason`, o `auto` con `cta.prominencia` (`discreta | delimitada | destacada`); copy, destino, beneficio/descriptor opcionales y rol de cada voz.
+- Certificar con `pnpm foto:cta:gate <plan>`: sólo la salida **0** certifica; `1` falla, `2` uso y **`3` no certificable, que no es un pase** (recomponer o `--reproducir`; una pieza con gesto manuscrito o tarjeta no se certifica). Plan nuevo: `safeArea: "axis"`, `cta.x: "columna"` con alineación a la izquierda, firma declarada (`logo` con `y: "auto"`, o `firma: { modo: "externa", razon }`), `lead` y `after`, `altText` de la escena. Excepciones sólo con `aprobadoPor` del registro `scripts/foto/aprobadores.json`, `plate` y, si la regla se mide, `hasta`; nunca inventar un aprobador. `placement` sólo endurece. Detalle: contrato §18.
 - Entregar textos y parámetros editables, fuentes/ejes reales, compositor y dependencias, plate y prompts de origen, SVG/capas cuando existan, intent/manifest y evidencia de contraste/espaciados.
 - Revisar maestro y tamaño de consumo de **cada formato**, sin choques de tinta, etiquetas o cursor con personaje/firma. Registrar revisión y límites.
 - Guardar pruebas en Pilotos; sólo aprobación explícita de pieza habilita su clasificación como Final. Publicar exige autorización separada.
@@ -183,13 +186,17 @@ Caso histórico v06: `ai-generations/2026-09-22_aeo-final-safe-v06/`, sustituido
 promovió, sus límites y cómo reproducirlo. Los prompts IA conservan trazabilidad; reproducir el gráfico
 es determinista, regenerar fotografía no garantiza los mismos píxeles.
 
+**Con el gate del 2026-09-23:** los planes v03–v07 declaran su firma externa, pero ninguna pieza se recompuso. Las
+que el canon ahora reprueba —zona segura, cierre del concepto, firma— se dejan como están y se corrigen al
+recomponer (decisión del operador). Un PASS de estas corridas no equivale a la salida 0 del gate vigente.
+
 ## Continuidad integral de la campaña
 
 El [método SEO/AEO](social/2026-09-22-seo-aeo-paid-media-production-method.md) conecta dirección creativa, registro C, identidad/kits, prompts compilados, anatomía/pantallas, composición, formatos, embudo y archivo. La corrección de firma no termina moviendo el SVG: si el lecho nació para una firma alta, reducir su extensión física y devolver área a la escena; no dejar media imagen vacía. Validar el conjunto antes de promover.
 
 ## Corrección de lecho y firma v07
 
-La v06 también fue corregida: había bajado el logo pero conservaba un primer plano que ocultaba casi media foto. La v07 edita las cuatro tomas 9:16 para recuperar escena y limitar el lecho al tramo inferior. **Ubicar el SVG dentro de la materia ya desenfocada, con aire bajo su transición; nunca por encima o montado en el canto.** La referencia de Claude orienta el cierre, no impone un Y universal. En estos plates la última revisión sitúa el centro al 90%; eso no acredita safe zone de plataforma. Medir contraste allí y declarar oclusión posible antes de pauta. Las coordenadas de §v06 son historia del caso, no receta a heredar.
+La v06 también fue corregida: había bajado el logo pero conservaba un primer plano que ocultaba casi media foto. La v07 edita las cuatro tomas 9:16 para recuperar escena y limitar el lecho al tramo inferior. **Ubicar el SVG dentro de la materia ya desenfocada, con aire bajo su transición; nunca por encima o montado en el canto.** La referencia de Claude orienta el cierre, no impone un Y universal. En estos plates la última revisión sitúa el centro al 90%; eso no acredita safe zone de plataforma. Medir contraste allí y declarar oclusión posible antes de pauta. Con la firma declarada como externa (`signatureY`), el gate la mide contra la zona de AXIS estrechada por `signatureSafeArea`: las tres stories de v07 que hoy componen quedan fuera (centro en 0,90; AXIS termina en 0,87). **Pendiente del operador:** aprobarlas como excepción `zona-segura` con su nombre o subir la firma al recomponer. Las coordenadas de §v06 son historia del caso, no receta a heredar.
 
 **Criterio vigente para nuevas adaptaciones 9:16 (operador):** si bajar la firma la saca de la zona segura y
 subirla mucho destruye el cierre, elevar ligeramente el inicio del lecho para alojarla dentro de su materia y
@@ -197,15 +204,16 @@ de la zona segura, con aire, manteniéndola visualmente al pie. No convertir el 
 No agrandar de nuevo el lecho hasta comprimir la escena. Verificar ambos límites sobre el export y el preview
 del placement; esta instrucción no afirma que los exports históricos ya hayan sido recompuestos.
 
-## 🔴 El concepto completo no es opcional — y el compositor no lo verifica
+## 🔴 El concepto completo no es opcional — el gate lo verifica desde el 2026-09-23
 
 **Medido el 2026-09-22 en CMP-001.** Nueve piezas de MOFU y BOFU se compusieron y pasaron el gate con
 **sólo titular + beneficio + CTA + descriptor**: sin **entrada** y sin **remate**. El operador lo detectó
 mirando las piezas, no ninguna herramienta.
 
-**Por qué nada lo atrapó:** `componer-cta.mjs` resuelve la entrada y el remate con `if (s.lead)` y
-`if (s.after)`, así que su ausencia no es un error para el compositor — simplemente no los dibuja. El gate
-mide contraste y protección de sujeto, no completitud del concepto. **Una pieza incompleta sale verde.**
+**Por qué nada lo atrapó el 22/09:** `componer-cta.mjs` resuelve la entrada y el remate con `if (s.lead)` y
+`if (s.after)`, así que su ausencia no es un error para el compositor — simplemente no los dibuja. El gate de
+entonces medía contraste y protección de sujeto, no completitud del concepto, y una pieza incompleta salía verde.
+**Cerrado el 2026-09-23** (contrato §18, tramo 4): el gate bloquea la pieza sin entrada o sin cierre.
 
 🔴 **De dónde vino el error, que es lo que importa:** ante un «excesivo texto» del operador, el agente
 ofreció en una pregunta la opción «dominante + puente + CTA» y el operador la eligió. **La opción no era
@@ -217,11 +225,14 @@ voces del concepto.
 
 1. **Cuenta las voces.** Concepto = entrada · titular · remate. Acción = beneficio · CTA · descriptor
    (beneficio y descriptor sólo cuando aportan información; entrada y remate **no** son de ese grupo).
-2. **Lee el `ratioDominanteEntrada` del QA.** Restituir la entrada puede bajarlo sin que nada avise: el
-   compositor **achica el dominante solo** cuando no cabe en `dominantMax`, y ahí la jerarquía se aplana.
-   Medido en `mo3`: con el dominante de cuatro palabras el ratio cayó a **2,9** —bajo el mínimo de 3×, y a
-   2,8 el operador ya había rechazado una pieza—; acortarlo a tres palabras lo devolvió a **3,7**.
+2. **Lee el `ratioDominanteEntrada` del QA.** Restituir la entrada puede bajarlo: el compositor **achica el
+   dominante solo** cuando no cabe en `dominantMax`, y ahí la jerarquía se aplana. Medido en `mo3`: con el
+   dominante de cuatro palabras el ratio cayó a **2,9** —bajo el mínimo de 3×, y a 2,8 el operador ya había
+   rechazado una pieza—; acortarlo a tres palabras lo devolvió a **3,7**. Hoy el gate bloquea bajo 3× y cuando
+   el dominante no es la voz mayor. El remedio medido es acortar el dominante; una excepción `jerarquia` exige
+   aprobador del registro.
 
-**Propuesta de mecanismo (no implementada):** el gate podría exigir `lead` y `after` no vacíos salvo que la
-pieza declare explícitamente `conceptoReducido` con su razón, igual que hoy exige `surfaceToken` y
-`subjectProtection`.
+**Mecanismo implementado (2026-09-23):** el gate exige `lead` y `after` salvo que la pieza declare
+`conceptoReducido: { razon, aprobadoPor }`, con `aprobadoPor` del registro `scripts/foto/aprobadores.json`. La regla
+de las tres veces y la del dominante como voz mayor también bloquean; sólo se exceptúan con excepción auditada
+(`jerarquia` y `dominante-mayor`).

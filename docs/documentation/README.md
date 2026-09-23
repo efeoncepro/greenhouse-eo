@@ -22,6 +22,10 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Reglas publicitarias para agentes](creative/reglas-publicitarias-para-agentes.md) — activación común de
   Codex/Claude para posts, stories, reels, covers, banners, brochure y motion con contrato AXIS, tipografía real,
   contraste, gate DO/DON'T y estados separados de publicación.
+- [Compositor de piezas con CTA](creative/compositor-piezas-cta.md) — qué compone y qué certifica
+  `pnpm foto:componer:cta` + `pnpm foto:cta:gate`: veredictos certificado/falla/no certificable, huellas, guarda de
+  sujeto por segmentación, zona segura AXIS, firma, WCAG 2.2 AA sobre el trazo a 390 px, APCA y daltonismo en el CTA,
+  excepciones con aprobador, texto alternativo y cómo se prueba el propio comando.
 - [Producción visual social para reportes](social/visual-report-social-production.md) — contrato funcional para
   convertir reportes reales en posts de Instagram legibles, trazables y reutilizables.
 - [Creator Influence & Content](media-distribution/creator-influence-content.md) — reglas funcionales para separar

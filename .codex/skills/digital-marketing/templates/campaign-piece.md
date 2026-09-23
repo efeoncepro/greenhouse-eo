@@ -28,9 +28,9 @@ Campos opcionales pueden ser no aplica; no llenar voces para decorar. Registrar 
 
 Plataforma/placement/medio: [ ] · Ratio/dimensiones: [ ].
 Registro: [ ] · Palanca dominante: [ ] · Sujeto/acción/objeto digital: [ ].
-Luz/material/color: [ ] · Fondo/lecho: [ ] · Firma: [ ].
+Luz/material/color: [ ] · Fondo/lecho: [ ] · Firma: [`logo` con `y: "auto"` / externa + razón / sin-firma + aprobador del registro].
 Reservas titulares/apoyo/CTA/cursor/safe area: [referencia y fecha].
-CTA estilo/tinta/superficie: [ ] · Cursor local/multiplayer y función: [ ].
+CTA variante (`text`/`outline`/`solid` + motivo, o `auto` + `prominencia`)/tinta/superficie: [ ] · Cursor local/multiplayer y función: [ ].
 Qué cambia respecto del master y por qué: [ ].
 
 ## Recursos y derechos
@@ -100,9 +100,17 @@ Se verifica sobre el **archivo**, no sobre la vía. **Da igual cómo se produjo.
 | Reservas del formato | `pnpm foto:validar <plate>` |
 | Identidad **copiada**, no redibujada | comparación contra la referencia del kit |
 | Ni una letra ni un número en utilería | inspección |
-| Dominante **≥3×** la entrada | reportado al componer |
-| CTA ≥4,5:1 · superficie ≥3:1 | `pnpm foto:cta:gate <plan>` |
-| Safe zones del placement | ver canon de formatos |
+| Concepto completo (entrada, dominante, cierre) · dominante **≥3×** la entrada y voz mayor | `pnpm foto:cta:gate <plan>` lo bloquea; sin CTA, reportado al componer |
+| CTA ≥4,5:1 a cualquier tamaño, con APCA y daltonismo · borde/relleno ≥3:1 · firma ≥4,5:1 y 20 % del lado corto (16:9: tamaño pendiente de decisión del operador; hoy rige 20 %) | `pnpm foto:cta:gate <plan>` con salida **0** (`3` = no certificable: no es pase) |
+| Zona segura de AXIS | el mismo gate, con `safeArea: "axis"` en el plan |
+| Texto alternativo: escena + todo el texto, con el rol del CTA | `out/<id>.alt.txt`, lo escribe el compositor |
+| Safe zones del placement | preview del placement (el gate no las mide); ver canon de formatos |
+
+**Plan con CTA que deba pasar el gate** (contrato `docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md`, §18):
+`safeArea: "axis"` · `cta.x: "columna"` (sólo con alineación a la izquierda) · firma declarada · `lead` y `after` (o
+`conceptoReducido` con aprobador) · `altText` que describa la escena sin transcribir el copy. Excepción: `regla`,
+`razon`, `aprobadoPor` de `scripts/foto/aprobadores.json`, `plate` (sha256) y `hasta` si la regla se mide; **nunca
+inventar un aprobador**. `placement` sólo endurece la medición.
 
 ### Capa 3 · VÍA DE PRODUCCIÓN — **ésta sí varía. Declarar cuál se usó**
 
@@ -133,6 +141,8 @@ No guardar credenciales ni URLs temporales con secretos.
 | Identidad/manos/pantallas | | pendiente | |
 | Jerarquía/aire a 390 px y 100% | | pendiente | |
 | Contraste mínimo local por elemento | | pendiente | |
+| Gate CTA: código de salida (sólo 0 certifica) y excepciones con aprobador | | pendiente | |
+| Texto alternativo listo para la plataforma | | pendiente | |
 | Firma dentro del lecho + zona segura | | pendiente | |
 | Preview placement con interfaz | | pendiente | |
 | Derechos/aprobación/medios | | pendiente | |

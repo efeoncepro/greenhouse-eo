@@ -35,6 +35,7 @@ editables y reproducción. Registrar color de tinta/borde/relleno según pieza (
 descriptor ≥4,5:1, borde/controles ≥3:1 y mínimo local, no sólo p98. **Sin excepción de aprobación
 visual para un CTA que falle estos mínimos**; el criterio flexible de otros niveles del punto8 no lo reemplaza. Un único local hacia CTA si se usa selección; no duplicarlo en titular. El relleno
 funcional del CTA es excepción acotada a la prohibición de paneles en foto, no permiso para tarjetas o scrims.
+En piezas del compositor, estos mínimos los verifica el gate: ver [gate del compositor de CTA](#gate-del-compositor-de-cta).
 
 ## Ficha tipográfica
 
@@ -67,6 +68,9 @@ necesitan gritar a la vez, el problema es de jerarquía, no de tamaño.
    luminancia del fondo bajo la tinta (conservadora: pesca luces puntuales). Si un nivel queda bajo el umbral y aun
    así lo apruebas porque se lee, registra la **revisión visual a 390 px** junto al número; sin esa nota es REWORK.
    Guarda el resultado por lámina (p. ej. `out-v2/qa.json` en «Nivel de búsqueda», 2026-09-19).
+   **En piezas del compositor de CTA esa salida no existe:** el gate mide cada voz en la caja y en el trazo, y una voz
+   bajo WCAG 2.2 AA bloquea sin excepción posible. La revisión a 390 px se registra igual, pero no aprueba un número
+   bajo el umbral ([gate del compositor](#gate-del-compositor-de-cta)).
 9. **Tarjetas de notificación / paneles UI.** 🔴 **En fotografía de marca propia Efeonce NO se usan** (decisión del
    operador 2026-09-19: la tarjeta con línea naranja fue puntual del post de GTA VI). El dato va como texto limpio
    (Poppins) sobre una zona clara de la propia foto. En ilustración/HUD de género, si la pieza usa una tarjeta tipo
@@ -123,8 +127,77 @@ Por defecto: cada concepto ×4:5/1:1/9:16/16:9; exclusiones sólo con brief expl
 
 Registrar placement/tipo de medio, perfil y fuente de safe area, bounds de texto/cursor/firma, máscara QA separada y revisión de escena. No basta contraste. Handoff: concepto, audiencia, fase de embudo, hipótesis, CTA/destino, KPI, prompts/referencias, editables, comandos, hashes, autorización y limitaciones. Aplicar el canon Tres voces + acción.
 
-## Gate de continuidad y cobertura real
+## Gate del compositor de CTA
 
-Antes de aceptar `foto:cta:gate`, comprobar que QA contiene exactamente una fila por ID del plan, con claves numéricas finitas y descriptor/superficie cuando apliquen. La auditoría del 2026-09-23 detectó exit 0 con QA vacío, IDs ajenos o de otro plan; desde el tramo 1 (§18) el QA es por plan y el gate recalcula huellas de plan, plate y PNG, pero un aviso de «formato anterior» sigue sin certificar nada. El compositor usa p98 para fondo y no verifica toda la envolvente. [Compatibilidad y límites](../../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#7-auditoría-de-compatibilidad-y-alcance--22092026).
+Para piezas compuestas con `pnpm foto:componer:cta`. Los campos del plan y el porqué de cada regla viven en
+`SKILL.md` (§Tres voces + acción) y en el
+[contrato del compositor](../../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) §16–§18; acá va
+sólo lo que registra quien revisa. El gate certifica la pieza, no la campaña: no autoriza publicar. Desde la
+certificación del 2026-09-23 el gate hace por sí mismo lo que antes se comprobaba a mano —QA vacío, ajeno o de otro plan,
+piezas ausentes, mediciones nulas—; lo que la
+[auditoría del 22/09](../../../../docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md#7-auditoría-de-compatibilidad-y-alcance--22092026)
+pedía revisar y sigue sin guarda está abajo, en «Lo que se mira a ojo».
 
-Revisar el lecho y la firma como composición única: logo bajo con media imagen tapada sigue siendo REWORK. Incluir en el handoff concepto/embudo, archivos literales, referencias/hashes y comandos reproducibles. El [método completo](../../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md) reúne los casos y la secuencia vigente.
+### El código de salida
+
+| Código | Significa | Qué registrar y hacer |
+|---|---|---|
+| **0** | Certificado: huellas del plan, el plate, el PNG, el layout y el comando vigente; todas las reglas del canon | PASS técnico. Revisar igual los ⚠ y la pieza |
+| **1** | Falla: una regla incumplida, o el plan, el plate, el PNG o el layout cambiaron después de componer | REWORK: leer cada ✗, corregir el plan o recomponer. Con fallas y algo no certificable a la vez, sale 1 |
+| **2** | Uso incorrecto (sin plan) | Corregir el comando |
+| **3** | **No certificable**, ni pase ni falla: QA del formato anterior, pieza compuesta con otra versión del comando, máscara leída de una caché ajena al repo, o pieza con gesto manuscrito o tarjeta | Recomponer o `pnpm foto:cta:gate <plan> --reproducir`. **Nunca registrarlo como PASS.** El gesto manuscrito está fuera de alcance por decisión del operador: con gesto, 3 es el techo |
+
+`--reproducir` recompone el plan en un temporal con el comando vigente y una segmentación nueva, exige que cada PNG
+y layout entregado sea idéntico byte a byte al reproducido y da el veredicto sobre ese QA: es la certificación que no
+se falsifica. Conserva la salida del gate junto a la versión revisada.
+
+### Qué respalda un 0
+
+- **Integridad:** huellas recalculadas; el PNG entregado mide el `final` del plan o, sin él, el del plate; ninguna
+  pieza del plan falta en el QA; sin máscara del sujeto no se certifica.
+- **Accesibilidad por voz:** WCAG 2.2 AA según el tamaño en pantalla (390 CSS px de ancho; `placement` sólo lo
+  endurece), en la caja **y en el trazo**: el 1 % peor de los píxeles de glifo contra su fondo. No admite excepción.
+- **Límites del CTA:** relleno y borde ≥ 3:1; el borde del contorno, ≥ 1 CSS px y ≥ 3:1 como se ve en un teléfono
+  (390 px × DPR 2).
+- **El CTA:** ≥ 4,5:1 a cualquier tamaño (uno medido como «texto grande» no pasa) y, además, APCA y daltonismo en
+  texto, borde y relleno; sólo esto último se exceptúa, como `cta-perceptual`. Acento obligatorio en su portador
+  (excepción: `acento-cta`).
+- **Jerarquía:** concepto completo (o `conceptoReducido` con aprobador), dominante ≥ 3× la entrada y **el dominante
+  como voz mayor**.
+- **Firma:** declarada, ≥ 20 % del lado corto, ≥ 4,5:1 (en la caja y en el trazo; la externa, en el peor píxel de su
+  caja), fuera del sujeto y dentro de su zona; la automática, debajo de todo el contenido. Por formato, con el caso
+  pendiente del 16:9:
+  [safe zones y firma §2c](paid-format-safe-zones-and-craft.md#2c-la-firma-en-cada-formato-el-contrato-del-gate).
+- **Maquetación:** zona segura de AXIS como piso, reserva editorial, nada encimado y ninguna selección sobre otra voz.
+
+Un ⚠ de excepción auditada o de salida aprobada (`sin-firma`, `conceptoReducido`, zona del sujeto ignorada) no es un
+PASS limpio: regístralo con la regla, la razón y quién aprobó. Una excepción vale sólo con un aprobador de
+`scripts/foto/aprobadores.json`, el `plate` (sha256) y, si la regla se mide, `hasta`; las salidas aprobadas exigen el
+mismo registro de aprobadores. Nunca inventes un aprobador: si falta, pregunta al operador.
+
+### Lo que se mira a ojo
+
+**Texto alternativo.** Lo escribe el compositor (`out/<id>.alt.txt` y QA): la escena del `altText` más todo el
+texto visible en orden de lectura, con el rol del CTA siempre anunciado («Llamado a la acción: «…»», nunca «Botón») y
+la firma («Firma: logotipo de Efeonce»). Revisa que el `altText` describa la escena sin transcribir el copy.
+
+**Avisos (⚠).** No bloquean; cada uno se mira en la pieza y queda en el registro:
+
+| Aviso | Qué mirar |
+|---|---|
+| Una voz pasa sólo gracias al velo (`scrimTop`/`scrimBottom`, medido sobre la foto sin él) | La foto se oscurece para leerse. En fotografía de marca propia es el DON’T del punto 10 aunque el gate sólo avise. Si el velo se permite por defecto o pide aprobación está pendiente de decisión del operador |
+| Variante del CTA elegida **sin margen** | Pasa por poco: en otra pantalla o con compresión puede no alcanzar. Compárala con `--variantes`. Aviso o bloqueo: pendiente de decisión del operador |
+| Corchetes del CTA de texto bajo 1 CSS px o bajo 3:1 | El trazo que dibuja AXIS mide ≈ 0,69 CSS px en un teléfono, en todos los formatos: mira si el CTA se sigue leyendo como destino. Cambiar ese grosor es cambiar el contrato AXIS, y lo decide el operador |
+| El `altText` transcribe el copy | La escena se describe; el texto de la imagen ya lo transcribe el compositor. Corrige el plan |
+
+También avisan, y se miran igual: falta de `altText`, texto bajo 9 CSS px en el teléfono (el piso por rol está
+pendiente), APCA o daltonismo en voces que no son el CTA, `placement` declarado, máscara que no marca sujeto, CTA o
+descriptor corridos de la columna y poco aire sobre los corchetes.
+
+**Lo que ninguna guarda mide:** identidad, dedos y orientación de la tablet; tamaño del lecho y cierre visual de la
+firma; el marco y los controles de la selección fuera del CTA; el gesto manuscrito y la tarjeta. Revisar el lecho y
+la firma como composición única: un logo bajo con media imagen tapada sigue siendo REWORK aunque el gate dé 0.
+
+Incluir en el handoff concepto/embudo, archivos literales, referencias/hashes, comandos reproducibles y la salida del
+gate. El [método completo](../../../../docs/operations/social/2026-09-22-seo-aeo-paid-media-production-method.md)
+reúne los casos y la secuencia vigente.

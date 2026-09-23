@@ -3,6 +3,9 @@
 **Estado al 22/09/2026:** cuatro conceptos, dieciséis piezas; corrección v07 del lecho y firma, sin pauta ni resultados de
 campaña. Este documento reúne decisiones y evidencia de la sesión; los contratos dueños siguen enlazados.
 No convierte coordenadas del caso en tokens globales ni una aceptación visual en eficacia comercial.
+**Delta 23/09/2026:** §5 y §6 se actualizaron con el gate que certifica el compositor CTA (códigos de salida,
+firma, zona segura, concepto y trazo). Ninguna pieza de esta campaña se recompuso: las aprobadas que el canon ahora
+reprueba se dejan como están y se corrigen al recomponer (decisión del operador).
 
 ## 1. Mapa de autoridad
 
@@ -89,12 +92,17 @@ No todas las redes admiten cada ratio como el mismo medio. LinkedIn video 9:16 n
 Bricolage instala la idea, Poppins estructura y CTA, Guttery aporta un gesto opcional. Diferenciar roles
 por escala, peso, tinta y espacio; tres voces no exige tres fuentes ni llenar todas las casillas. Resolver
 valores desde AXIS y conservar archivo/ejes reales. Medir caja de tinta, cortes, leading y tracking.
-La regla de dominante ≥3× entrada es una guía interna con excepción explícita por formato, no un pase automático.
+La regla de dominante ≥3× entrada es necesaria, no suficiente: no es un pase automático. Desde el 23/09
+`foto:cta:gate` la bloquea —igual que un dominante que no es la voz mayor— y sólo se exceptúa con excepción
+auditada (`jerarquia`) y aprobador del registro.
 
 El CTA admite texto, contorno o relleno a demanda. Naranja, teal u otro acento autorizado se elige según la
 escena; lima no es universal. Medir tinta/escena o tinta/relleno según variante, borde/relleno contra foto,
-descriptor y controles. CTA/descriptor ≥4,5:1, contorno/controles ≥3:1, firma ≥4,5:1. El p98 es diagnóstico:
-**no equivale al mínimo local ni rescata un fallo**. Ver el método completo en Tres voces + acción.
+descriptor y controles. CTA/descriptor ≥4,5:1 —el CTA aunque sea grande, y desde el 23/09 con APCA y daltonismo
+bloqueantes—, contorno/controles ≥3:1, firma ≥4,5:1. El p98 es diagnóstico: **no equivale al mínimo local ni
+rescata un fallo**; el gate mide el 1 % peor del trazo de cada voz, y la firma en su caja (con el trazo del logo
+cuando lo dibuja el compositor; la firma externa de estas corridas, en el peor píxel de su caja). Ver el método
+completo en Tres voces + acción.
 
 Un único cursor local hacia la acción cuando se use selección; multiplayer sólo si cuenta algo. Usar
 intent y renderer AXIS. «Standalone» no significa que exista un modo sin caja en el renderer. Proteger
@@ -106,30 +114,51 @@ rechazó por flotar casi al centro. La v06 siguió la referencia de Claude al 83
 la ventana conservadora declarada. La firma queda fuera del guardrail inferior de Reels: registrar posible
 solapamiento y revisar el placement real, sin ocultarlo detrás de un PASS editorial. No agregar scrims.
 
+**Delta 23/09 — la firma en el gate.** Los planes v03–v07 declaran su firma externa (`firma: { modo: "externa",
+razon }` en 60 piezas, commit `dc95887ec`, con paquetes de origen y reproducciones intactos; los 9:16 de v05–v07 ya
+la declaraban con `signatureY`) y el gate les aplica el contrato de la firma: ≥4,5:1, 20 % del lado corto, fuera del sujeto y dentro de la
+zona de AXIS estrechada por `signatureSafeArea`. Las tres stories de v07 que hoy componen quedan fuera de esa zona
+(centro en 0,90; AXIS termina en 0,87): aprobarlas como excepción `zona-segura` con el nombre del operador o subir la
+firma al recomponer es **decisión pendiente**. También está pendiente el tamaño en 16:9: al 20 % del lado corto la
+firma quedaría en ≈ 44 px en un teléfono, contra 78 px en 4:5 (opción recomendada, sin aprobar: 25 % en
+horizontales); detalle en [Tres voces + acción](../EFEONCE_ADVERTISING_THREE_VOICES_ACTION_V1.md#cobertura-de-formatos-para-paid-media).
+Y «no agregar scrims» no lo hace cumplir el gate: si una voz pasa sólo gracias al velo, hoy avisa y no bloquea.
+
 ## 6. Comandos actuales y reproducción histórica
 
 Para producción **nueva**, desde el repositorio:
 
 ```sh
-pnpm foto:componer:cta <directorio-exclusivo/piezas.json>
-pnpm foto:cta:gate <directorio-exclusivo/piezas.json>
+pnpm foto:componer:cta <directorio-exclusivo/piezas.json>                # compone; QA por plan (out/qa-<plan>.json) con huellas
+pnpm foto:cta:gate <directorio-exclusivo/piezas.json>                    # certifica: sólo la salida 0 es certificado
+pnpm foto:cta:gate <directorio-exclusivo/piezas.json> --reproducir       # certifica recomponiendo con el comando vigente
 ```
 
-El compositor canónico incorporó colores por pieza, variantes CTA y `logo.y`/`logo.variant`. Su auditoría
-actual y los límites de cobertura, contraste y migración están en el [contrato técnico](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
-No copiar otro compositor de corrida. Separar planes en directorios distintos; generar QA y verificar
-IDs/cantidad/claves antes de interpretar la salida del gate. El gate CTA no reemplaza QA visual, firma,
-controles, contraste mínimo ni preview del placement.
+El compositor canónico incorporó colores por pieza, variantes CTA y `logo.y`/`logo.variant` y, desde el 23/09, un
+QA por plan atado por huellas (plan, plate, PNG, layout y comando), la zona segura de AXIS, el contrato de la firma y
+del concepto, y el contraste medido sobre el trazo. Su auditoría, límites y decisiones pendientes están en el
+[contrato técnico](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) (§7 y §18). No copiar otro compositor de corrida.
+Separar planes en directorios distintos: dos composiciones en la misma carpeta no se mezclan (la segunda se rechaza
+por el bloqueo de `out/`), y si otro plan de la carpeta ya registró un id que vas a componer, el compositor avisa
+antes de componer, porque ese PNG deja de ser el que certificó el otro plan.
+
+El gate responde con un código: `0` certificado · `1` falla · `2` uso · **`3` no certificable, que no es un pase**
+(QA del formato anterior, otra versión del comando o máscara de una caché ajena: recomponer o `--reproducir`; una
+pieza con gesto manuscrito o tarjeta no se certifica). Aun con 0, el gate no reemplaza el QA visual —identidad,
+manos, pantallas, cierre de la firma— ni el preview del placement.
 
 **Reproducir exactamente v06 es otro modo:** ejecutar `recomponer.cjs` desde `02. Editables` de su paquete
 OneDrive, con dependencias verificadas y plates archivados. Sus scripts son evidencia congelada, no base
-para nuevas campañas. No migrar a ciegas: `centerX` no está implementado por el comando canónico auditado;
-`signatureY` es centro en v06, pero `logo.y` es borde superior en el canónico. El compositor no consume
-los validadores externos `safeArea`, `signatureSafeArea` o `editorialReserve` del caso.
+para nuevas campañas. No migrar a ciegas. El comando ya lee `centerX` (desde la noche del 22/09; aborta un bloque
+centrado a más de 0,15 del centro) y, desde el 23/09, `signatureY` y `firma: { modo: "externa" }` —reserva la caja
+de la firma externa con `y` como centro vertical—, y usa `safeArea`, `signatureSafeArea` y `editorialReserve` como
+guardas; pero `logo.y` numérico sigue siendo el borde superior de la firma, no su centro.
 
-La prueba de migración con cuatro piezas reprodujo tres variantes CTA; «Sé la referencia» se desplazó al
-centro y falló contraste (CTA 1,5:1; descriptor 1,7:1). Los finales v06 **no fueron reemplazados** por esa
-prueba. Una migración debe mantener el mismo render y pasar QA antes de sustituir la receta archivada.
+La prueba de migración del 22/09 con cuatro piezas reprodujo tres variantes CTA; «Sé la referencia»
+(03-referencia-916) se desplazó al centro y falló contraste (CTA 1,5:1; descriptor 1,7:1) porque el comando de
+entonces ignoraba `centerX`. Hoy lo lee, y esa pieza aborta hasta alinearla a la izquierda (contrato §14). Los
+finales v06 **no fueron reemplazados** por esa prueba. Una migración debe mantener el mismo render y pasar QA antes
+de sustituir la receta archivada.
 
 ## 7. Archivo, embudo y continuidad entre Claude/Codex
 
@@ -142,8 +171,9 @@ Usar la raíz local OneDrive `Alineación/5. Contenidos/15. Paid Media`:
 
 Cada paquete incluye export limpio; plate; copy y parámetros editables; SVG/capas; ficha y prompts exactos;
 referencias y hashes; cadena de ediciones; motor; comandos/versiones/dependencias; concepto, palanca, audiencia,
-fase principal/secundaria, hipótesis, CTA/destino, KPI/UTMs; evidencia de contraste/espaciado/safe areas;
-contactos y previews; aprobación, limitaciones y checksum. Un SVG de letras trazadas se modifica desde el
+fase principal/secundaria, hipótesis, CTA/destino, KPI/UTMs; evidencia de contraste/espaciado/safe areas —en
+piezas con CTA, el QA del plan (`out/qa-<plan>.json`), el código de salida del gate y el texto alternativo
+(`out/<id>.alt.txt`)—; contactos y previews; aprobación, limitaciones y checksum. Un SVG de letras trazadas se modifica desde el
 copy JSON y se regenera; no basta entregar un PNG o un texto de prompt resumido.
 
 La v06 archivó 16 exports reconstruidos byte por byte. La v07 conserva doce PNG sin cambios y reemplaza los cuatro verticales tras corregir el lecho; su matriz registra la verificación propia.

@@ -75,6 +75,45 @@ El grupo de acción conserva jerarquía, espacios y reserva de sujeto/firma; un 
 se use selección, colaboradores sólo con significado. La superficie rellena es una excepción funcional acotada,
 no permiso para tarjetas HUD o scrims. No cambia ownership, contratos AXIS ni autorización de publicación.
 
+## Piezas con CTA: compositor y gate canónicos — 2026-09-23
+
+Toda pieza con CTA sobre fotografía se compone con `pnpm foto:componer:cta <plan.json>` y se certifica con
+`pnpm foto:cta:gate <plan.json>`: cubren la composición, la medición y el gate técnico de los pasos 5–7 del
+contrato de abajo (el plate se genera antes). El detalle vive en el
+[contrato del compositor](EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) —§3 gate, §16 accesibilidad, §17 variantes,
+§18 certificación— y en la skill `efeonce-advertising-creative`. Aquí queda sólo lo que un agente no puede ignorar:
+
+- **Sólo la salida 0 certifica.** `0` certificado · `1` falla (una regla del canon, o huellas que no calzan porque
+  el plan, el plate, el PNG o el layout cambiaron después de componer: leer los `✗`) · `2` uso · **`3` no
+  certificable**, que no es un pase ni una falla: el gate no puede probar lo que certificaría (QA del formato
+  anterior, otra versión del comando, máscara del sujeto de una caché ajena). Se resuelve recomponiendo o con
+  `pnpm foto:cta:gate <plan.json> --reproducir`, que recompone en un temporal con el comando vigente y exige PNG y
+  layout idénticos byte a byte. Una pieza con gesto manuscrito o tarjeta sale siempre con 3: el gesto quedó fuera de
+  alcance (decisión del operador, 2026-09-23). El `PASS` del paso 7 exige 0; un 3 nunca se informa como verde.
+- **Plan nuevo que deba pasar el gate:** `safeArea: "axis"` (el margen por defecto del compositor, 7 %, queda bajo
+  el de AXIS); `cta.x: "columna"`, sólo con alineación a la izquierda —con `align: "center"` el plan se rechaza—;
+  firma declarada: `logo: { width: 0.2, x: 0.5, y: "auto" }` o, si la pone otra herramienta,
+  `firma: { modo: "externa", razon }`; `lead` y `after`; y `altText` que describa la escena sin transcribir el copy.
+- **Umbrales que no se aflojan:** el CTA exige 4,5:1 a cualquier tamaño y, sólo en el CTA, APCA y daltonismo
+  bloquean (exceptuables como `cta-perceptual`). Cada voz se mide con WCAG 2.2 AA según su tamaño en un teléfono de
+  390 CSS px, sobre el trazo y no sólo sobre la caja. `placement` sólo endurece la medición; nunca la afloja.
+- **Excepciones auditadas:** una regla en una pieza, con `aprobadoPor` del registro `scripts/foto/aprobadores.json`,
+  `plate` (sha256 del plate aprobado) y `hasta` cuando la regla se mide con un número. `firma: { modo: "sin-firma" }`,
+  `conceptoReducido` y las zonas ignoradas del sujeto (`subjectGuard.ignore`) también exigen un `aprobadoPor` del
+  registro. **Un agente nunca inventa un aprobador** ni copia el de la suite de pruebas: si falta, pregunta al
+  operador.
+- **El texto alternativo lo escribe el compositor** (`out/<id>.alt.txt`): la escena más todo el texto visible en
+  orden de lectura, con el rol del CTA siempre anunciado («Llamado a la acción: «…»», nunca «Botón»). Se publica
+  donde la plataforma lo permita.
+- **Lo que el gate no decide:** identidad, anatomía, cierre visual de la firma, la revisión al 100 % y a 390 px y el
+  preview del placement. Certifica la pieza, no la campaña, y no autoriza publicar. Tampoco hace cumplir «nunca un
+  scrim»: si una voz pasa sólo gracias al velo (`scrimTop`/`scrimBottom`), hoy **avisa** y no bloquea (decisión
+  pendiente del operador). No uses el velo para rescatar contraste.
+- **Pendiente del operador — firma en 16:9.** Medido el 2026-09-23: en las piezas 16:9 de CMP-002 y del registro C
+  (hechas al 13–14 % del lado corto, bajo el canon) la firma mide 31 px en un teléfono, contra 78 px en 4:5; aun al
+  20 % del canon quedaría en ≈ 11 % del ancho y ≈ 44 px. Opción recomendada, sin aprobar: 25 % del lado corto en
+  horizontales y 20 % en verticales y cuadrados. Mientras no se decida, rige el 20 % y el gate lo exige.
+
 ## Contrato de ejecución
 
 1. Resolver marca, objetivo, soporte, dimensiones/duración, audiencia, copy literal, CTA, activos, derechos y
@@ -215,7 +254,8 @@ fuga, release Greenhouse y readback del front door; no ocurre por publicar esta 
 
 - `pnpm skills:mirrors` prueba paridad de bundles; no prueba criterio visual.
 - El validador de skills prueba frontmatter y estructura.
-- La revisión de una pieza usa el gate del brief, capturas/tamaño final y contraste medido.
+- La revisión de una pieza usa el gate del brief, capturas/tamaño final y contraste medido; si la pieza lleva CTA,
+  además `pnpm foto:cta:gate` con salida 0 (ver «Piezas con CTA»).
 - La promoción del contrato AXIS de `trial` a `stable` exige segundo consumidor real y comparación visual
   cross-runtime.
 - Commit, push, release AXIS, release Greenhouse y publicación de una pieza son actos separados.
@@ -225,11 +265,11 @@ Descripción funcional: [reglas publicitarias para agentes](../documentation/cre
 
 ## Safe areas y paquete final
 
-Aplicar el canon Tres voces + acción, §Zonas seguras: placement y medio explícitos; texto/CTA/cursor protegidos; firma al pie con límites de UI declarados, sin inflar el lecho. Export limpio más máscara QA separada. Entregar concepto, audiencia, fase de embudo, hipótesis, CTA/destino, KPI, prompts/referencias, editables, comandos/dependencias y hashes. El operador autorizó promover la campaña SEO/AEO ajustada a Finales; conservar Pilotos. Final creativo no equivale a publicación ni a validación live del placement.
+Aplicar el canon Tres voces + acción, §Zonas seguras: placement y medio explícitos; texto/CTA/cursor protegidos; firma al pie con límites de UI declarados, sin inflar el lecho. La zona segura de AXIS (feed: 7,5 % a los lados y 6 % arriba y abajo; story: 10 % y 13 %) es el piso que mide el gate; la del placement real se revisa aparte, en su preview. Export limpio más máscara QA separada. Entregar concepto, audiencia, fase de embudo, hipótesis, CTA/destino, KPI, prompts/referencias, editables, comandos/dependencias y hashes. El operador autorizó promover la campaña SEO/AEO ajustada a Finales; conservar Pilotos. Final creativo no equivale a publicación ni a validación live del placement.
 
 ## Método completo y compatibilidad verificada
 
-Consultar el [método SEO/AEO](social/2026-09-22-seo-aeo-paid-media-production-method.md) para dirección, registro, referencias, prompts, composición, lecho proporcionado, formatos, embudo y archivo local. El [compositor CTA](EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) es la ruta de trabajo nuevo; revisar §7 antes de migrar una corrida. Los runners históricos conservan reproducción exacta, no sustituyen el canon. QA vacío o sólo p98 no certifican contraste ni cobertura.
+Consultar el [método SEO/AEO](social/2026-09-22-seo-aeo-paid-media-production-method.md) para dirección, registro, referencias, prompts, composición, lecho proporcionado, formatos, embudo y archivo local. El [compositor CTA](EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md) es la ruta de trabajo nuevo; revisar su §7 (auditoría del 22/09) y su §18 (certificación del 23/09) antes de migrar una corrida. Los runners históricos conservan reproducción exacta, no sustituyen el canon. QA vacío o sólo p98 no certifican contraste ni cobertura, y el gate ya lo hace cumplir: una pieza ausente del QA o una voz sin medición falla, un QA del formato anterior sale con 3 y el contraste se mide sobre el trazo, no sólo con el p98 de la caja.
 
 ## Brief, assets y continuidad de campaña
 

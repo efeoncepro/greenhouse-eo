@@ -1,9 +1,9 @@
 # Fotografía de marca Efeonce — índice
 
 > **Tipo de documento:** Índice operativo de carpeta
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-19 por Claude
-> **Última actualización:** 2026-09-20
+> **Última actualización:** 2026-09-23
 > **Documentación relacionada:** [Lenguaje fotográfico V1](./EFEONCE_PHOTOGRAPHIC_LANGUAGE_V1.md) · [Bitácora del caso](../social/2026-09-19-efeonce-photographic-language-production-method.md) · [Corrida de evidencia](../../../ai-generations/2026-09-19_lenguaje-fotografico-efeonce/README.md)
 
 Esta carpeta guarda el **Lenguaje Fotográfico de la marca propia de Efeonce**, aprobado por el operador (Julio
@@ -23,6 +23,8 @@ pnpm foto:prompt --ficha-ejemplo          # plantilla de ficha de toma
 pnpm foto:prompt <ficha.json> --batch <out.json>   # arma el prompt; el formato sale de UNA tabla
 pnpm foto:validar <plate.png>             # valida las seis reservas sobre el plate limpio
 pnpm foto:componer <piezas.json>          # la CAPA GRÁFICA encima: voces, selección AXIS, firma y QA
+pnpm foto:componer:cta <plan.json>        # pieza CON CTA: compone y emite su QA con huellas (out/qa-<plan>.json)
+pnpm foto:cta:gate <plan.json>            # la certifica: sólo la salida 0 certifica; 3 = no certificable, no es pase
 pnpm foto:lanyard --nombre "<N>" --cargo "<C>" --foto <r.png>   # arma el lanyard PIEZA POR PIEZA
 ```
 
@@ -163,4 +165,4 @@ corresponde, y si el kit trae **prueba en persona**, ésa es el punto de partida
 
 ## Ads: proporción del lecho y continuidad
 
-El lecho debe sostener la firma sin quitar protagonismo a la escena. La sesión SEO/AEO rechazó primero una firma alta y después el primer plano excesivo que seguía tapando casi media foto. Corregir juntos el encuadre físico y el SVG, conservar materia/desenfoque óptico y no imponer el porcentaje de un caso a todo el catálogo. [Método completo](../social/2026-09-22-seo-aeo-paid-media-production-method.md): ficha/prompt compilado, referencias, anatomía, composición, formatos, embudo y handoff. [Compositor CTA vigente y límites](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md).
+El lecho debe sostener la firma sin quitar protagonismo a la escena. La sesión SEO/AEO rechazó primero una firma alta y después el primer plano excesivo que seguía tapando casi media foto. Corregir juntos el encuadre físico y el SVG, conservar materia/desenfoque óptico y no imponer el porcentaje de un caso a todo el catálogo. [Método completo](../social/2026-09-22-seo-aeo-paid-media-production-method.md): ficha/prompt compilado, referencias, anatomía, composición, formatos, embudo y handoff. [Compositor CTA vigente y límites](../EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md). Desde el 2026-09-23, la firma de una pieza con CTA la verifica `pnpm foto:cta:gate` (el contrato de la firma está en el §18 de ese documento): sólo su salida 0 certifica, y ni con 0 reemplaza mirar el cierre al pie.

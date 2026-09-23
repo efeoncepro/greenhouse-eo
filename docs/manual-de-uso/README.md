@@ -18,6 +18,9 @@ La diferencia con otras capas de documentacion:
 - [Usar reglas publicitarias con Codex y Claude](creative/usar-reglas-publicitarias-con-agentes.md) — prompts,
   entregables, ficha tipográfica y revisión para crear/corregir publicidad y social con texto sin confundir
   producción, aprobación y publicación.
+- [Compositor de piezas con CTA — manual de uso](creative/compositor-piezas-cta.md) — plan mínimo con lo que exige
+  el gate, componer, certificar (también con `--reproducir`), reporte de accesibilidad, códigos 0/1/2/3, excepciones con
+  sha256 del plate y `hasta`, firma externa, decisiones pendientes y problemas comunes (mensaje → causa → solución).
 - [Producir una foto de marca Efeonce](marketing/fotografia-de-marca-efeonce.md) — ficha de toma, bloques de
   prompt, `pnpm ai:image`, medición del primer plano y del color, curación de pantallas, firma con logo y QA del
   lenguaje fotográfico aprobado el 2026-09-19.
