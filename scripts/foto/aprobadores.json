@@ -1,0 +1,16 @@
+{
+  "_doc": "Quién puede aprobar una excepción del canon, una zona del sujeto ignorada o una salida sin medir (sin firma, concepto reducido) en el compositor de piezas con CTA. El gate rechaza cualquier `aprobadoPor` que no esté aquí. Agregar a alguien es decisión del operador y va con commit. Ver docs/operations/EFEONCE_ADVERTISING_CTA_COMPOSITOR_V1.md §18.",
+  "aprobadores": [
+    {
+      "id": "julio-reyes",
+      "nombre": "Julio Reyes",
+      "rol": "Operador de marca y del compositor"
+    },
+    {
+      "id": "suite-pruebas",
+      "nombre": "Suite de pruebas del compositor",
+      "rol": "Sólo para planes fuera del repo (los temporales de las pruebas)",
+      "soloPruebas": true
+    }
+  ]
+}

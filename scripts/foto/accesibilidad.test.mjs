@@ -112,6 +112,14 @@ test('Texto alternativo: no anuncia un botón, suma gesto y cursores, y no repit
   assert.equal(alt.match(/Sé la referencia/g).length, 1, 'no se repite lo que la escena ya dice')
 })
 
+test('medirContraColor: el umbral puede fijarse (el CTA exige 4,5:1 aunque sea grande)', () => {
+  const m = medirContraColor({ tinta: [255, 255, 255], fondo: [131, 131, 131], cssPx: 40, peso: 700, umbral: 4.5 })
+
+  assert.equal(m.umbralWcag, 4.5)
+  assert.equal(m.cumpleWcag, false)
+  assert.equal(medirContraColor({ tinta: [255, 255, 255], fondo: [131, 131, 131], cssPx: 40, peso: 700 }).umbralWcag, 3)
+})
+
 test('medirContraColor: tinta sobre relleno plano y límites no textuales', () => {
   const cta = medirContraColor({ tinta: hexARgb('#000000'), fondo: hexARgb('#ffffff'), cssPx: 14, peso: 700 })
 

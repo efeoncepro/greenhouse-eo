@@ -800,8 +800,6 @@ function zonaFirma(s, W, H) {
   return d ? { perfil: axis.perfil, x0: Math.max(axis.x0, d.x0), y0: Math.max(axis.y0, d.y0), x1: Math.min(axis.x1, d.x1), y1: Math.min(axis.y1, d.y1), declarada: true } : { ...axis, declarada: false }
 }
 
-const exceptuada = (s, regla) => (s.excepciones ?? []).some(e => e.regla === regla)
-
 // Caja del logo con la fórmula del dibujo: ancho fracción del lado corto (o px), centro en `logo.x`, borde superior en
 // `logo.y` o al pie. La usan la elección de variante, las invariantes y el dibujo.
 const ASPECTO_LOGO = 196.68 / 837.07
@@ -959,9 +957,11 @@ async function composePiece(s, opts = {}) {
   const meta = await sharp(plate).metadata()
 
   W = meta.width; H = meta.height; M = Math.round(W * 0.07)
-  // Ancho en pantalla de referencia: un teléfono (390 CSS px), salvo que la pieza declare otro lugar de publicación
-  // (`placement.anchoCssPx`, con razón; tramo 4, hallazgo 6).
-  const ANCHO = s.placement?.anchoCssPx ?? ANCHO_PANTALLA
+  // Ancho en pantalla de referencia: un teléfono (390 CSS px). `placement.anchoCssPx` (con razón) sólo puede ENDURECER:
+  // una pantalla más chica achica el texto y exige más; una más grande no afloja nada, porque la misma pieza también
+  // se ve en un teléfono. Antes `placement: 1600` bajaba WCAG de 4,5 a 3:1 en todas las voces y adelgazaba el borde,
+  // sin aprobador y sin que el gate lo mencionara (auditorías de diseño N3 y de arquitectura N3, tramo 7).
+  const ANCHO = Math.min(ANCHO_PANTALLA, s.placement?.anchoCssPx ?? ANCHO_PANTALLA)
 
   // `final` reescala el máster. Con otra proporción, `resize` RECORTA por defecto — y lo recortado puede ser texto.
   if (s.final && Math.abs(s.final[0] / s.final[1] - W / H) / (W / H) > 0.01) {
@@ -1317,7 +1317,7 @@ return k.ink.right - k.ink.left }))
     lineas.cta=t.lines;lineas.descriptor=descriptor.lines;
     // CTA: en `solid` la tinta se mide contra su relleno; en las otras, contra la escena. El relleno y el BORDE del
     // contorno son límites no textuales (WCAG 1.4.11, 3:1): el borde del contorno no se medía antes.
-    voces.push({id:'cta',box:t.box,tinta:ink,peso:700,px:c.fontSize,lineas:t.lines.length,daltonismo:true,...(solid?{sobreColor:surfaceColor}:{})});
+    voces.push({id:'cta',box:t.box,tinta:ink,peso:700,px:c.fontSize,lineas:t.lines.length,daltonismo:true,pisoTexto:UMBRALES.normalTextContrast,...(solid?{sobreColor:surfaceColor}:{})});
     if(solid||outline)voces.push({id:solid?'cta-relleno':'cta-borde',box:b,tinta:surfaceColor,limite:true,daltonismo:true});
     voces.push({id:'descriptor',box:descriptor.box,tinta:'#ffffff',peso:400,px:c.descriptorSize,lineas:descriptor.lines.length});
 
@@ -1368,7 +1368,9 @@ return k.ink.right - k.ink.left }))
   ]
 
   const maquetacion = invariantesMaquetacion({ ancho: W, alto: H, elementos: elementosMaquetacion(firmaPrevista) })
-  const reservaRota = fueraDeReserva({ elementos: elementosMaquetacion(firmaPrevista), reserva: exceptuada(s, 'reserva-editorial') ? null : s.editorialReserve })
+  // La búsqueda del tamaño respeta SIEMPRE la reserva: una excepción cambia el veredicto del gate sobre la pieza, nunca
+  // cuánto crece (antes una excepción «reserva-editorial» la hacía crecer ×1,251 en vez de ×1,236; tramo 7).
+  const reservaRota = fueraDeReserva({ elementos: elementosMaquetacion(firmaPrevista), reserva: s.editorialReserve })
 
   const violaDeclarada = Boolean(s.subjectProtection && descriptorBox.bottom > s.subjectProtection.top - s.subjectProtection.minClearance)
   const hits = opts.mask ? guardHits(opts.mask, [...checks.filter(c => GUARD_IDS.has(c.id)).map(c => ({ id: c.id, box: c.box })), ...guard], W, H, opts.dry ? CLEAR_GROW : CLEAR_TOUCH, opts.dry ? 0 : MASK_NOISE_PX) : []
@@ -1419,7 +1421,8 @@ return k.ink.right - k.ink.left }))
   // Capa de TEXTO sola (RGBA): el cuerpo tal como se pinta, sin plate ni selección. Contra el fondo sin texto (`bare`)
   // da el contraste de cada TRAZO (auditoría 2026-09-23, hallazgo 3: la caja promediaba el aire entre letras).
   const capaTexto = async () => (await sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${defs}</defs>${body}</svg>`)).ensureAlpha().raw().toBuffer({ resolveWithObject: true })).data
-  const medirTrazos = (fondoRgb, texto) => Object.fromEntries(voces.filter(v => !v.limite && !v.sobreColor).map(v => [v.id, medirGlifos({ rgb: fondoRgb, texto, ancho: W, alto: H, caja: v.box, cssPx: tamanoEnPantalla(v.px, W, ANCHO), peso: v.peso })]))
+  // `pisoTexto`: la voz exige ese umbral aunque su tamaño la haga «texto grande» (el CTA: 4,5:1 siempre, tramo 7).
+  const medirTrazos = (fondoRgb, texto) => Object.fromEntries(voces.filter(v => !v.limite && !v.sobreColor).map(v => [v.id, medirGlifos({ rgb: fondoRgb, texto, ancho: W, alto: H, caja: v.box, cssPx: tamanoEnPantalla(v.px, W, ANCHO), peso: v.peso, ...(v.pisoTexto ? { umbral: v.pisoTexto } : {}) })]))
   const underSvg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${defs}</defs>${under}${cardEl ? cardEl.svg.split('\n')[0] : ''}</svg>`)
   const bare = await sharp(baseBuf).composite([...layers, { input: underSvg, left: 0, top: 0 }]).png().toBuffer()
 
@@ -1590,14 +1593,31 @@ return k.ink.right - k.ink.left }))
 
   for (const v of voces) {
     const m = v.sobreColor
-      ? medirContraColor({ tinta: hexARgb(v.tinta), fondo: hexARgb(v.sobreColor), cssPx: tamanoEnPantalla(v.px, W, ANCHO), peso: v.peso, lineas: v.lineas })
+      ? medirContraColor({ tinta: hexARgb(v.tinta), fondo: hexARgb(v.sobreColor), cssPx: tamanoEnPantalla(v.px, W, ANCHO), peso: v.peso, lineas: v.lineas, ...(v.pisoTexto ? { umbral: v.pisoTexto } : {}) })
       : medirVoz({
           rgb: bareRgb, ancho: W, alto: H, caja: v.box, tinta: hexARgb(v.tinta), daltonismo: Boolean(v.daltonismo),
-          ...(v.limite ? { umbral: UMBRALES.essentialBoundaryContrast, apca: false } : { cssPx: tamanoEnPantalla(v.px, W, ANCHO), peso: v.peso, lineas: v.lineas })
+          ...(v.limite ? { umbral: UMBRALES.essentialBoundaryContrast, apca: false } : { cssPx: tamanoEnPantalla(v.px, W, ANCHO), peso: v.peso, lineas: v.lineas, ...(v.pisoTexto ? { umbral: v.pisoTexto } : {}) })
         })
 
     // `metodo` le dice al gate qué medición exigir: sobre el píxel (y su trazo), contra un color plano, o un límite.
     accesibilidad.voces[v.id] = m && { ...m, metodo: v.sobreColor ? 'color' : v.limite ? 'limite' : 'pixel' }
+  }
+
+  // El VELO (`scrimTop`/`scrimBottom`) oscurece la foto para que el texto se lea. Si una voz pasa SÓLO gracias a él, el
+  // QA lo registra y el gate lo muestra: es una decisión de diseño que alguien mira, no un pase que nadie ve
+  // (auditoría de diseño, N5; tramo 7). Se mide la misma voz sobre la foto sin el velo ni los fondos del plan.
+  if (s.scrimTop || s.scrimBottom) {
+    const { data: sinVeloRgb } = await sharp(await sharp(baseBuf).composite(layers).png().toBuffer()).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+    const rescatadas = []
+
+    for (const v of voces.filter(v => !v.limite && !v.sobreColor)) {
+      const con = accesibilidad.voces[v.id]
+      const sin = medirVoz({ rgb: sinVeloRgb, ancho: W, alto: H, caja: v.box, tinta: hexARgb(v.tinta), cssPx: tamanoEnPantalla(v.px, W, ANCHO), peso: v.peso, lineas: v.lineas, ...(v.pisoTexto ? { umbral: v.pisoTexto } : {}) })
+
+      if (con?.cumpleWcag && sin && !sin.cumpleWcag) rescatadas.push({ voz: v.id, sinVelo: sin.wcag, conVelo: con.wcag })
+    }
+
+    if (rescatadas.length) accesibilidad.rescate = { por: ['scrimTop', 'scrimBottom'].filter(k => s[k]), voces: rescatadas }
   }
 
   // Una voz que no se pudo medir NO pasa por no tener dato (su caja no tiene píxeles dentro del lienzo). Antes el

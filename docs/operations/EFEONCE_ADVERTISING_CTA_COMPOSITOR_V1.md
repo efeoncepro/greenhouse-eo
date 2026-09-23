@@ -821,6 +821,26 @@ manuscrito quedó fuera de alcance por decisión del operador (2026-09-23); todo
   firma automática sobre el contenido y trazo de la firma bajo 4,5:1 rechazados). **Mutantes: 48 de 48** detectados por
   la razón esperada (10 nuevos).
 
+**Tramo 7 · Umbrales que no se aflojan; excepciones con tope, plate y aprobador.**
+
+- **`placement` sólo endurece.** El ancho de pantalla efectivo es el menor entre 390 CSS px y el declarado: una pantalla
+  más grande ya no baja WCAG de 4,5 a 3:1 ni adelgaza el borde (la misma pieza también se ve en un teléfono). El gate
+  lo muestra.
+- **El CTA exige 4,5:1 a cualquier tamaño** (canon: CTA y descriptor ≥ 4,5:1): al medir la voz, su trazo y al elegir la
+  variante `auto`. El gate no le cree al umbral del QA: un CTA medido como «texto grande» no pasa.
+- **El dominante es la voz mayor** (regla nueva, exceptuable como `dominante-mayor`): antes sólo se comparaba con la
+  entrada. Medido: 0 de 216 layouts del repo la incumplen.
+- **Excepciones auditadas de verdad:** `aprobadoPor` tiene que estar en `scripts/foto/aprobadores.json` (hoy: el
+  operador; el aprobador de la suite vale sólo para planes fuera del repo, también al certificar por reproducción);
+  `plate` nombra el sha256 del plate aprobado (un plate regenerado se re-aprueba); y cuando la regla se mide con un
+  número, `hasta` declara el valor aprobado —contraste o tamaño mínimos, px máximos de desborde o de sujeto—. Una
+  excepción que no vale no apaga nada: la regla bloquea y el gate dice por qué.
+- **Salidas sin medir con aprobador:** `firma: { modo: "sin-firma" }` y `conceptoReducido` exigen `aprobadoPor` del
+  registro, y el gate las imprime. Las zonas del sujeto ignoradas, también.
+- **Ninguna excepción entra en la búsqueda del tamaño:** una excepción `reserva-editorial` ya no hace crecer más la pieza.
+- **Se muestra lo que pasa por poco o con ayuda:** voces que pasan sólo gracias al velo (`scrimTop`/`scrimBottom`, medido
+  sobre la foto sin él) y variantes de CTA elegidas sin margen. Siguen como aviso: si bloquean es decisión del operador.
+
 ### Cuatro pilares (hoy → al cerrar los tramos)
 
 | Pilar | Al auditar | Meta | Al cerrar (2026-09-23) | Qué lo sostiene |

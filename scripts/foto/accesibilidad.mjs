@@ -186,8 +186,8 @@ export function medirVoz({ rgb, ancho, alto, caja, tinta, cssPx = null, peso = 4
 
 // Texto sobre un COLOR PLANO (p. ej. el CTA sólido: tinta sobre su relleno). El fondo no varía, así que el peor
 // caso es el único caso.
-export function medirContraColor({ tinta, fondo, cssPx, peso = 400, lineas = 1 }) {
-  const umbral = umbralWcag(cssPx, peso)
+export function medirContraColor({ tinta, fondo, cssPx, peso = 400, lineas = 1, umbral: umbralFijo = null }) {
+  const umbral = umbralFijo ?? umbralWcag(cssPx, peso)
   const wcag = razonWcag(luminanciaWcag(tinta), luminanciaWcag(fondo))
   const apca = lcApca(luminanciaApca(tinta), luminanciaApca(fondo))
   const minApca = umbralApca(cssPx, lineas)

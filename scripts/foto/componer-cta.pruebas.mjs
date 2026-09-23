@@ -476,6 +476,14 @@ const PRUEBAS = [
       }
 
       const [original, alineada, choca, cabe, tapaZona, firmaSobre, fueraReserva, v03, externaSobre] = await Promise.all([componer('P06-eje', [pieza('ref_916')]), componer('P06-izquierda', [izquierda]), componer('P06-choque', [conIA('top-end')]), componer('P06-cabe', [conIA('bottom-end')]), componer('P06-protect', [protegida]), componer('P06-firma', [firmaEncima]), componer('P06-reserva', [reservaChica]), componer('P06-v03', [pieza('v03_fue')]), componer('P06-firma-externa', [externaEncima])])
+
+      // Tramo 7: una excepción «reserva-editorial» cambia el veredicto del gate, nunca cuánto crece la pieza (antes crecía
+      // ×1,251 en vez de ×1,236). Oráculo: la misma escala con y sin la excepción.
+      const v03Exc = pieza('v03_fue')
+
+      v03Exc.excepciones = [{ regla: 'reserva-editorial', razon: 'prueba: la reserva se revisa aparte', aprobadoPor: 'suite-pruebas', plate: sha(fs.readFileSync(v03Exc.plate)), hasta: 5000 }]
+      const conExc = await componer('P06-reserva-excepcion', [v03Exc])
+      const reservaSinEfecto = conExc.ok && v03.ok && conExc.qa[0].escala === v03.qa[0].escala
       const protegeZona = !tapaZona.ok && /zona protegida/.test(tapaZona.error)
       const firmaRechazada = !firmaSobre.ok && /choca con «logo»|«logo» choca/.test(firmaSobre.error)
       const externaRechazada = !externaSobre.ok && /choca con «firma-externa»|«firma-externa» choca/.test(externaSobre.error)
@@ -503,7 +511,7 @@ const PRUEBAS = [
         margen = Math.min(...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.left)) >= izquierda.safeArea.x0 * L.canvas.width - 0.5
       }
 
-      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva && zonaAxis && enColumna && firmaAuto && zonaFrena && externaRechazada && respetaArriba && firmaEnBanda, detalle: `la firma automática nunca sube por encima del contenido (KV-06-169): ${firmaEnBanda} (${detalleBanda}) · con "axis" el texto arranca dentro de la zona por arriba: ${respetaArriba}${arriba.ok ? '' : ` (${arriba.error})`} · firma externa sobre el texto rechazada: ${externaRechazada} · crecimiento frenado por la zona declarada: ${zonaFrena} (${detalleZona}) · zona de AXIS con safeArea "axis": ${zonaAxis}${enCanon.ok ? '' : ` (${enCanon.error})`} · CTA y descriptor en la columna: ${enColumna} · firma automática 20 % legible dentro de la zona: ${firmaAuto} · ${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
+      return { ok: dentro && ejeRechazado && alineada.ok && margen && choqueRechazado && cabe.ok && protegeZona && firmaRechazada && reservaRechazada && dentroReserva && zonaAxis && enColumna && firmaAuto && zonaFrena && externaRechazada && respetaArriba && firmaEnBanda && reservaSinEfecto, detalle: `crecer no usa la excepción de la reserva: ${reservaSinEfecto}${conExc.ok ? '' : ` (${conExc.error})`} · la firma automática nunca sube por encima del contenido (KV-06-169): ${firmaEnBanda} (${detalleBanda}) · con "axis" el texto arranca dentro de la zona por arriba: ${respetaArriba}${arriba.ok ? '' : ` (${arriba.error})`} · firma externa sobre el texto rechazada: ${externaRechazada} · crecimiento frenado por la zona declarada: ${zonaFrena} (${detalleZona}) · zona de AXIS con safeArea "axis": ${zonaAxis}${enCanon.ok ? '' : ` (${enCanon.error})`} · CTA y descriptor en la columna: ${enColumna} · firma automática 20 % legible dentro de la zona: ${firmaAuto} · ${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen} · colaborador sobre la nota rechazado: ${choqueRechazado} · en otra esquina compone: ${cabe.ok} · texto sobre zona protegida rechazado: ${protegeZona} · firma sobre el texto rechazada: ${firmaRechazada} · texto fuera de la reserva editorial rechazado: ${reservaRechazada} · v03 01-fuera-916 compone dentro de su reserva: ${dentroReserva}${v03.ok ? '' : ` (${v03.error})`}` }
     }
   },
   {
@@ -858,6 +866,29 @@ const PRUEBAS = [
       // TRAMO 6 · «no certificable» no es un pase (auditoría de arquitectura, N1, N2 y N4): sale con 3, no con 0.
       const gComando = await editarQa(r => { r.huellas.compositor = 'otra-version-del-comando' })
       const gTrazoFirma = await editarQa(r => { Object.assign(r.firma.trazo, { wcag: 2.2, cumpleWcag: false, pctBajoUmbral: 12 }) })
+      // El CTA medido como «texto grande» (3:1) no pasa: el gate no le cree al umbral que trae el QA (tramo 7).
+      const gCtaGrande = await editarQa(r => { Object.assign(r.accesibilidad.voces.cta, { umbralWcag: 3, wcag: 3.8, cumpleWcag: true }) })
+      // Un cierre más grande que el dominante: se cambia la tipografía del layout y se re-firma su huella.
+      let gDominante = { code: -1, salida: 'falta el layout' }
+
+      if (fs.existsSync(archivo(`out/${idH}-layout.json`)) && qaPorPlan) {
+        const rutaL = archivo(`out/${idH}-layout.json`)
+        const rutaQ = archivo('out/qa-piezas.json')
+        const [lOrig, qOrig] = [fs.readFileSync(rutaL), fs.readFileSync(rutaQ)]
+        const L = JSON.parse(lOrig)
+
+        L.typography.closure = L.typography.dominant + 12
+        const nuevo = JSON.stringify(L, null, 2)
+        const q = JSON.parse(qOrig)
+
+        q[0].huellas.layout = sha(Buffer.from(nuevo))
+        fs.writeFileSync(rutaL, nuevo)
+        fs.writeFileSync(rutaQ, JSON.stringify(q))
+        gDominante = await gate(h.planPath)
+        fs.writeFileSync(rutaL, lOrig)
+        fs.writeFileSync(rutaQ, qOrig)
+      }
+
       // La firma automática por encima del contenido: se sube la caja del logo en el layout y se re-firma su huella, para
       // que el gate llegue a la regla (si no, lo frena la huella del layout, que es otra guarda).
       let gFirmaArriba = { code: -1, salida: 'falta el layout' }
@@ -955,10 +986,33 @@ const PRUEBAS = [
       delete sinFirma.logo
       firmaChica.logo.width = 0.1
       firmaChicaAuditada.logo.width = 0.1
-      firmaChicaAuditada.excepciones = [{ regla: 'firma-tamano', razon: 'prueba: la marca del partner manda en esta pieza', aprobadoPor: 'prueba' }]
+      // Tramo 7: la excepción nombra un aprobador del registro, el sha del plate y el tope que aprueba (`hasta`).
+      const plateB2 = sha(fs.readFileSync(firmaChicaAuditada.plate))
+      const excepcionFirma = extra => [{ regla: 'firma-tamano', razon: 'prueba: la marca del partner manda en esta pieza', aprobadoPor: 'suite-pruebas', plate: plateB2, hasta: 0.09, ...extra }]
+
+      firmaChicaAuditada.excepciones = excepcionFirma({})
+
+      const [excAjeno, excOtroPlate, excSinTope, excFueraTope] = [{ aprobadoPor: 'abc' }, { plate: '0'.repeat(64) }, { hasta: undefined }, { hasta: 0.15 }].map(extra => {
+        const p = canon('b2_916')
+
+        p.logo.width = 0.1
+        p.excepciones = excepcionFirma(extra).map(e => JSON.parse(JSON.stringify(e)))
+
+        return p
+      })
+
+      // Salida sin medir (pieza sin firma) sin aprobador; placement de escritorio con una entrada que falla en el teléfono.
+      const sinFirmaSinAprob = canon('b2_916')
+
+      delete sinFirmaSinAprob.logo
+      sinFirmaSinAprob.firma = { modo: 'sin-firma', razon: 'prueba: el cliente pidió la pieza sin marca' }
+      const escritorio = canon('b2_916')
+
+      escritorio.leadFill = '#707070'
+      escritorio.placement = { anchoCssPx: 1600, razon: 'prueba: se publica en el sitio de escritorio' }
       delete sinCierre.after
       delete reducida.after
-      reducida.conceptoReducido = { razon: 'prueba: pieza de recordación de una sola frase' }
+      reducida.conceptoReducido = { razon: 'prueba: pieza de recordación de una sola frase', aprobadoPor: 'suite-pruebas' }
       // Firma externa declarada (la pone otra herramienta): el gate la acepta como declaración y mide su contrato.
       const externa = canon('b2_916')
 
@@ -984,8 +1038,8 @@ const PRUEBAS = [
         gExternaMala = await gate(rExterna.planPath)
       }
 
-      const rs4 = await Promise.all([['P10-sin-firma', sinFirma], ['P10-firma-chica', firmaChica], ['P10-firma-auditada', firmaChicaAuditada], ['P10-sin-cierre', sinCierre], ['P10-reducida', reducida], ['P10-fuera-zona', pieza('b2_916')]].map(([n, p]) => componer(n, [p])))
-      const [gSinFirma, gFirmaChica, gFirmaAuditada, gSinCierre, gReducida, gFueraZona] = await Promise.all(rs4.map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
+      const rs4 = await Promise.all([['P10-sin-firma', sinFirma], ['P10-firma-chica', firmaChica], ['P10-firma-auditada', firmaChicaAuditada], ['P10-sin-cierre', sinCierre], ['P10-reducida', reducida], ['P10-fuera-zona', pieza('b2_916')], ['P10-exc-ajeno', excAjeno], ['P10-exc-otro-plate', excOtroPlate], ['P10-exc-sin-tope', excSinTope], ['P10-exc-fuera-tope', excFueraTope], ['P10-sin-firma-sin-aprob', sinFirmaSinAprob], ['P10-escritorio', escritorio]].map(([n, p]) => componer(n, [p])))
+      const [gSinFirma, gFirmaChica, gFirmaAuditada, gSinCierre, gReducida, gFueraZona, gExcAjeno, gExcOtroPlate, gExcSinTope, gExcFueraTope, gSinFirmaSinAprob, gEscritorio] = await Promise.all(rs4.map(r => (r.ok ? gate(r.planPath) : { code: -1, salida: r.error })))
 
       // 01-fuera-916 al tamaño al que la hacía crecer el compositor anterior (×1.48, medido el 2026-09-23 en P04 sobre
       // 27eb6bc08): la caja de sus voces pasa y el trazo, no (hallazgo 3). El gate tiene que rechazarla.
@@ -1001,6 +1055,17 @@ const PRUEBAS = [
       for (const k of ['fontSize', 'descriptorSize', 'paddingX', 'paddingY', 'radius', 'descriptorGap', 'gapAfterNote']) vieja.cta[k] = px(vieja.cta[k])
       const crecida = await componer('P10-trazo-real', [vieja])
       const gCrecida = crecida.ok ? await gate(crecida.planPath) : { code: -1, salida: crecida.error }
+      // La misma, con un velo que oscurece la parte de arriba: el descriptor pasa sólo gracias a él y el gate lo muestra.
+      const conVelo = structuredClone(vieja)
+
+      conVelo.scrimTop = { opacity: 0.8, to: 0.42, color: '#050818' }
+      const velo = await componer('P10-velo', [conVelo])
+      // Un CTA de 58 px en 1080: ≈ 21 CSS px en negrita, «texto grande» para WCAG (3:1). El canon del CTA exige 4,5:1.
+      const grande = canon('b2_916')
+
+      grande.cta.fontSize = 58
+      const ctaGrande = await componer('P10-cta-grande', [grande])
+      const gVelo = velo.ok ? await gate(velo.planPath) : { code: -1, salida: velo.error }
 
       const sinAcento = await componer('P10-sin-acento', [pieza('ref_169')])
       const gSinAcento = await gate(sinAcento.planPath)
@@ -1040,7 +1105,7 @@ const PRUEBAS = [
         'rechaza firma bajo el 20 % del lado corto': gFirmaChica.code !== 0 && /del lado corto/.test(gFirmaChica.salida),
         'acepta la excepción auditada y la imprime': gFirmaAuditada.code === 0 && /excepción auditada «firma-tamano»/.test(gFirmaAuditada.salida),
         'rechaza concepto sin cierre': gSinCierre.code !== 0 && /cierre que remata/.test(gSinCierre.salida),
-        'acepta conceptoReducido con razón': !/cierre que remata/.test(gReducida.salida),
+        'acepta conceptoReducido con razón y aprobador': !/cierre que remata/.test(gReducida.salida) && /concepto REDUCIDO — .*aprobó suite-pruebas/.test(gReducida.salida),
         'rechaza texto fuera de la zona de AXIS': gFueraZona.code !== 0 && /zona segura story de AXIS/.test(gFueraZona.salida),
         '--variantes arma la hoja de las tres': hoja,
         'auto elige y deja el motivo': Boolean(eleccion?.elegida && eleccion.motivo),
@@ -1068,6 +1133,16 @@ const PRUEBAS = [
         '--reproducir rechaza lo que el comando no produce': gReproduceMal.code === 1 && /no es lo que produce el comando vigente/.test(gReproduceMal.salida),
         'rechaza firma automática por encima del contenido': gFirmaArriba.code === 1 && /por encima del contenido/.test(gFirmaArriba.salida),
         'rechaza trazo de la firma bajo 4,5:1': gTrazoFirma.code === 1 && /trazo de la firma/.test(gTrazoFirma.salida),
+        'rechaza excepción de aprobador no registrado': gExcAjeno.code === 1 && /no está en el registro de aprobadores/.test(gExcAjeno.salida),
+        'rechaza excepción aprobada para otro plate': gExcOtroPlate.code === 1 && /se aprobó para otro plate/.test(gExcOtroPlate.salida),
+        'rechaza excepción sin tope': gExcSinTope.code === 1 && /no declara `hasta`/.test(gExcSinTope.salida),
+        'rechaza excepción que no cubre la medida': gExcFueraTope.code === 1 && /va más allá de lo aprobado/.test(gExcFueraTope.salida),
+        'rechaza sin-firma sin aprobador': gSinFirmaSinAprob.code === 1 && /pieza SIN firma sin aprobador del registro/.test(gSinFirmaSinAprob.salida),
+        'CTA siempre ≥ 4,5:1': gCtaGrande.code === 1 && /el CTA exige 4\.5:1/.test(gCtaGrande.salida),
+        'el QA del CTA grande se mide con 4,5:1': ctaGrande.ok && ctaGrande.qa[0].accesibilidad.voces.cta.cssPx >= 18.66 && ctaGrande.qa[0].accesibilidad.voces.cta.umbralWcag === 4.5 && (ctaGrande.qa[0].accesibilidad.voces.cta.glifo?.umbralWcag ?? 4.5) === 4.5,
+        'rechaza dominante que no es la voz mayor': gDominante.code === 1 && /no es la voz mayor/.test(gDominante.salida),
+        'placement no afloja': gEscritorio.code === 1 && /«entrada»/.test(gEscritorio.salida),
+        'muestra la voz que pasa sólo gracias al velo': /sólo gracias al velo/.test(gVelo.salida),
         'rechaza composición concurrente': concurrentes.filter(x => x === 'ok').length === 1 && concurrentes.some(x => /otra composición usa/.test(x)),
         'rechaza CTA sin acento': gSinAcento.code !== 0 && /no es un acento/.test(gSinAcento.salida),
         'rechaza voz bajo WCAG': gBajo.code !== 0 && /entrada.*WCAG 2\.2 AA/.test(gBajo.salida),

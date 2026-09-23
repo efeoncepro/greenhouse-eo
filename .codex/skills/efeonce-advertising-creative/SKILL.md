@@ -243,6 +243,10 @@ contraste y protección de sujeto, no completitud del concepto ni geometría del
   `pnpm foto:cta:gate <plan> --reproducir`, que recompone en un temporal con el comando vigente y segmentación nueva y
   exige que lo entregado sea idéntico byte a byte. `logo.y: "auto"` busca sólo en la banda del pie y mide el trazo del
   logo; si no encuentra lugar, la firma queda al pie y el gate decide.
+- **Excepciones y salidas con aprobador registrado (tramo 7).** `aprobadoPor` sale de `scripts/foto/aprobadores.json`;
+  una excepción nombra el `plate` (sha256) y, si la regla se mide con un número, `hasta`. `sin-firma` y
+  `conceptoReducido` también llevan `aprobadoPor`. `placement` sólo endurece, el CTA exige 4,5:1 a cualquier tamaño y
+  el dominante tiene que ser la voz mayor. **Nunca inventes un aprobador**: si falta, pregunta al operador.
 - **Un bloque centrado no se ancla lejos del centro.** Con `align: 'center'` y `|centerX − 0,5| > 0,15`, el
   compositor aborta: si el aire está a un costado, el bloque se alinea a ese costado (`align: 'left'`). Operador
   sobre 03-referencia-916: «se vería mejor alineada a la izquierda por la posición». §14.

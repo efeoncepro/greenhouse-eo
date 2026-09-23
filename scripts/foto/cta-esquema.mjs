@@ -28,7 +28,9 @@ export const REGLAS_EXCEPTUABLES = [
   'concepto-completo',
   'jerarquia',
   'legibilidad',
-  'reserva-editorial'
+  'reserva-editorial',
+  'cta-perceptual',
+  'dominante-mayor'
 ]
 
 // Límites de las zonas de sujeto ignoradas: cada una ≤ 10 % del lienzo y todas juntas ≤ 15 %. Una zona del tamaño del
@@ -46,7 +48,9 @@ const razon = z.string().trim().min(10, 'la razón necesita al menos 10 caracter
 const aprobado = z.string().trim().min(3, 'nombra quién aprobó')
 const caja = z.tuple([fraccion, fraccion, fraccion, fraccion])
 
-const excepcion = z.object({ regla: z.enum(REGLAS_EXCEPTUABLES), razon, aprobadoPor: aprobado }).strict()
+// `plate`: sha256 del plate para el que se aprobó (un plate regenerado se vuelve a aprobar). `hasta`: el valor que se
+// aprueba cuando la regla se mide con un número (el gate lo exige ahí). Tramo 7; auditoría de arquitectura, N7.
+const excepcion = z.object({ regla: z.enum(REGLAS_EXCEPTUABLES), razon, aprobadoPor: aprobado, plate: z.string().regex(/^[0-9a-f]{64}$/, 'el sha256 del plate, 64 hex').optional(), hasta: z.number().finite().optional() }).strict()
 
 const cursorCta = z
   .object({
@@ -211,11 +215,11 @@ export const esquemaPieza = z
       .optional(),
     textGrowth: z.boolean().optional(),
     placement: z.object({ anchoCssPx: positivo, razon }).strict().optional(),
-    conceptoReducido: z.object({ razon }).strict().optional(),
+    conceptoReducido: z.object({ razon, aprobadoPor: aprobado.optional() }).strict().optional(),
     // `firma`: la pone otra herramienta (`externa`, p. ej. firmar.mjs) o la pieza no lleva (`sin-firma`). En la externa,
     // `y` es el CENTRO vertical (fracción del alto, como `signatureY`) y `ancho` la fracción del lado corto (20 % por
     // defecto): el compositor reserva esa caja para que nada caiga donde después va la firma.
-    firma: z.object({ modo: z.enum(['sin-firma', 'externa']), razon, y: fraccion.optional(), ancho: z.number().finite().positive().max(1).optional() }).strict().optional(),
+    firma: z.object({ modo: z.enum(['sin-firma', 'externa']), razon, aprobadoPor: aprobado.optional(), y: fraccion.optional(), ancho: z.number().finite().positive().max(1).optional() }).strict().optional(),
     excepciones: z.array(excepcion).optional(),
     scrimTop: z.object({ opacity: fraccion, to: fraccion, color: hex.optional() }).strict().optional(),
     scrimBottom: z.object({ opacity: fraccion, from: fraccion }).strict().optional(),

@@ -113,3 +113,12 @@ test('Sin margen en ninguna: queda la que MÁS separa, no siempre el relleno', (
   }
 })
 
+test('El CTA grande también exige 4,5:1 (canon), aunque WCAG aceptaría 3:1 por su tamaño', () => {
+  // Blanco sobre gris #838383: 3,79:1. A 40 CSS px en negrita es «texto grande» (WCAG 3:1) y antes la variante `text`
+  // era viable; el canon del CTA pide 4,5:1 a cualquier tamaño (auditoría de diseño N6, tramo 7).
+  const gris = escena(() => [131, 131, 131])
+  const e = evaluarVariante('text', { rgb: gris, ancho, alto, caja, cssPx: 40, colores: { tinta: '#ffffff' } })
+
+  assert.equal(e.viable, false)
+  assert.match(e.motivo, /4\.5:1/)
+})

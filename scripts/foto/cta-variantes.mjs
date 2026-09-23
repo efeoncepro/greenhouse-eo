@@ -13,7 +13,7 @@
 // y prohíbe asignarlas por embudo, plataforma o audiencia. Por eso `auto` no adivina la intención: el autor declara
 // `prominencia` (discreta | delimitada | destacada) y la medición sólo decide si la escena la permite. Si no la
 // permite, se escala a la variante que separa más —nunca a una menos visible— y el motivo queda en el QA.
-import { UMBRALES, hexARgb, medirContraColor, medirVoz, umbralWcag } from './accesibilidad.mjs'
+import { UMBRALES, hexARgb, medirContraColor, medirVoz } from './accesibilidad.mjs'
 
 export const ORDEN = ['text', 'outline', 'solid']
 export const PROMINENCIA = { discreta: 'text', delimitada: 'outline', destacada: 'solid' }
@@ -46,12 +46,14 @@ const franja = (b, g = 6) => [
 ]
 
 export function evaluarVariante(variante, { rgb, ancho, alto, caja, cssPx, colores }) {
-  const umbral = umbralWcag(cssPx, 700)
+  // El CTA exige 4,5:1 SIEMPRE (canon: CTA y descriptor ≥ 4,5:1), también cuando su tamaño en pantalla lo haría «texto
+  // grande» y WCAG aceptaría 3:1. Auditoría de diseño N6: un CTA grande se elegía con 3:1.
+  const umbral = UMBRALES.normalTextContrast
   const limite = UMBRALES.essentialBoundaryContrast
   const medir = (box, tinta, opts) => medirVoz({ rgb, ancho, alto, caja: box, tinta: hexARgb(tinta), ...opts })
 
   if (variante === 'solid') {
-    const texto = medirContraColor({ tinta: hexARgb(colores.tinta), fondo: hexARgb(colores.relleno), cssPx, peso: 700 })
+    const texto = medirContraColor({ tinta: hexARgb(colores.tinta), fondo: hexARgb(colores.relleno), cssPx, peso: 700, umbral })
     const bordes = franja(caja).map(b => medir(b, colores.relleno, { umbral: limite, apca: false, daltonismo: true })).filter(Boolean)
     const separacion = Math.min(...bordes.map(m => m.wcag))
     const separacionDalt = Math.min(...bordes.map(peorDaltonismo))
@@ -70,7 +72,7 @@ export function evaluarVariante(variante, { rgb, ancho, alto, caja, cssPx, color
     return { variante, viable, margen: +margen.toFixed(3), texto: texto.wcag, separacion, motivo: viable ? `relleno ${separacion}:1 contra la escena y tinta ${texto.wcag}:1 sobre el relleno` : falla }
   }
 
-  const texto = medir(caja, colores.tinta, { cssPx, peso: 700, daltonismo: true })
+  const texto = medir(caja, colores.tinta, { cssPx, peso: 700, daltonismo: true, umbral })
   const textoDalt = peorDaltonismo(texto)
 
   if (variante === 'text') {
