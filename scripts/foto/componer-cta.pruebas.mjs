@@ -1,0 +1,463 @@
+// `pnpm foto:componer:cta:pruebas [--ref <git-ref>] [--solo P01,P07]` — 10 pruebas de punta a punta del compositor
+// de piezas con CTA, sobre piezas REALES del repo y sobre variantes rotas a propósito.
+//
+//   P01 determinismo · P02 no regresión (harness completo) · P03 guarda de sujeto · P04 crecer respira (medición
+//   independiente) · P05 crecer no degrada contraste · P06 zona segura y eje · P07 validación del plan · P08 cortes
+//   de línea · P09 accesibilidad y contraste · P10 gate
+//
+// Nada se compone en las carpetas reales: todo corre en un directorio temporal. Las pruebas que MIDEN no usan el
+// código que prueban (P04 recalcula la distancia al sujeto desde la máscara, P08 trae su propio oráculo de cortes):
+// una prueba que se verifica a sí misma no prueba nada. Deja reporte.json, reporte.md y la evidencia en disco.
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import { execFile } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { fileURLToPath } from 'node:url'
+import { promisify } from 'node:util'
+
+import sharp from 'sharp'
+
+const run = promisify(execFile)
+const ROOT = fileURLToPath(new URL('../../', import.meta.url))
+const COMPOSITOR = path.join(ROOT, 'scripts/foto/componer-cta.mjs')
+const GATE = path.join(ROOT, 'scripts/foto/componer-cta.gate.mjs')
+const REGRESION = path.join(ROOT, 'scripts/foto/componer-cta.regresion.mjs')
+const REPORTE_A11Y = path.join(ROOT, 'scripts/foto/accesibilidad-reporte.mjs')
+const MASCARAS = path.join(ROOT, 'node_modules/.cache/foto-sujeto')
+const args = process.argv.slice(2)
+const opt = (n, d) => (args.includes(n) ? args[args.indexOf(n) + 1] : d)
+const REF = opt('--ref', 'HEAD')
+const SOLO = opt('--solo', null)?.split(',')
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'foto-pruebas-'))
+const sha = b => createHash('sha256').update(b).digest('hex')
+
+// ── Piezas reales del repo ──────────────────────────────────────────────────────────────────────────
+const CMP001 = 'ai-generations/2026-09-21_registro-c-respuesta'
+const V07 = 'ai-generations/2026-09-22_aeo-final-safe-v07/piezas.json'
+const CMP002 = 'ai-generations/2026-09-22_cmp002-hubspot/composicion-formatos/piezas-formatos.json'
+
+const FIX = {
+  mo2_916: [`${CMP001}/piezas-mofu-formatos.json`, 'mo2-no-te-citan-916'],
+  mo1_169: [`${CMP001}/piezas-mofu-formatos.json`, 'mo1-canal-nuevo-169'],
+  mo3_916: [`${CMP001}/piezas-mofu-formatos.json`, 'mo3-no-creernos-916'],
+  b2_916: [`${CMP001}/piezas-bofu-formatos.json`, 'b2-primero-el-numero-916'],
+  b2_169: [`${CMP001}/piezas-bofu-formatos.json`, 'b2-primero-el-numero-169'],
+  p1_45: [`${CMP001}/piezas-cta.json`, 'p1-cta-contorno'],
+  rec_916: [V07, '02-reconoces-916'],
+  ele_169: [V07, '04-elegida-169'],
+  ref_916: [V07, '03-referencia-916'],
+  ref_169: [V07, '03-referencia-169'],
+  kv07_916: [CMP002, 'KV-07-916']
+}
+
+const pieza = k => {
+  const [rel, id] = FIX[k]
+  const plan = path.join(ROOT, rel)
+  const p = JSON.parse(fs.readFileSync(plan, 'utf8')).find(x => x.id === id)
+
+  if (!p) throw new Error(`fixture ${k}: no existe ${id} en ${rel}`)
+
+  return { ...structuredClone(p), plate: path.resolve(path.dirname(plan), p.plate) }
+}
+
+async function componer(nombre, piezas, ids = []) {
+  const dir = path.join(TMP, nombre)
+  const planPath = path.join(dir, 'piezas.json')
+
+  fs.mkdirSync(dir, { recursive: true })
+  fs.writeFileSync(planPath, JSON.stringify(piezas, null, 2))
+
+  try {
+    const r = await run(process.execPath, [COMPOSITOR, planPath, ...ids], { cwd: ROOT, timeout: 20 * 60e3, maxBuffer: 64e6 })
+    const qaFile = path.join(dir, 'out', ids.length ? 'qa-parcial.json' : 'qa.json')
+
+    return { ok: true, dir, planPath, salida: r.stdout + r.stderr, qa: JSON.parse(fs.readFileSync(qaFile, 'utf8')) }
+  } catch (e) {
+    const texto = String(e.stderr ?? '') + String(e.stdout ?? '')
+
+    return { ok: false, dir, planPath, salida: texto, error: (texto.match(/Error: ([^\n]+)/) ?? [null, String(e.message).split('\n')[0]])[1] }
+  }
+}
+
+async function gate(planPath) {
+  try {
+    const r = await run(process.execPath, [GATE, planPath], { cwd: ROOT, maxBuffer: 16e6 })
+
+    return { code: 0, salida: r.stdout + r.stderr }
+  } catch (e) {
+    return { code: e.code ?? 1, salida: String(e.stdout ?? '') + String(e.stderr ?? '') }
+  }
+}
+
+const leerMascara = async plate => {
+  const f = path.join(MASCARAS, `${sha(fs.readFileSync(plate))}.png`)
+  const { data, info } = await sharp(f).extractChannel(0).raw().toBuffer({ resolveWithObject: true })
+
+  return { data, W: info.width, H: info.height }
+}
+
+// Distancia euclidiana mínima de una caja a la silueta (px del lienzo). Oráculo independiente del compositor.
+function distanciaAlSujeto(m, caja, canvasW, canvasH, radio) {
+  const sx = m.W / canvasW, sy = m.H / canvasH
+  let min = Infinity
+
+  for (let y = Math.max(0, Math.floor((caja.top - radio) * sy)); y < Math.min(m.H, Math.ceil((caja.bottom + radio) * sy)); y++) {
+    for (let x = Math.max(0, Math.floor((caja.left - radio) * sx)); x < Math.min(m.W, Math.ceil((caja.right + radio) * sx)); x++) {
+      if (m.data[y * m.W + x] <= 127) continue
+      const X = (x + 0.5) / sx, Y = (y + 0.5) / sy
+      const d = Math.hypot(Math.max(caja.left - X, 0, X - caja.right), Math.max(caja.top - Y, 0, Y - caja.bottom))
+
+      if (d < min) min = d
+    }
+  }
+
+  return min
+}
+
+const TEXTO = new Set(['etiqueta', 'entrada', 'dominante', 'cierre-frase', 'nota', 'cta', 'descriptor'])
+const leer = (dir, f) => JSON.parse(fs.readFileSync(path.join(dir, 'out', f), 'utf8'))
+
+// Oráculo de cortes, independiente del compositor: palabras cortas que no cierran línea en español.
+const DEBILES = new Set(['a', 'al', 'con', 'de', 'del', 'e', 'el', 'en', 'la', 'las', 'lo', 'los', 'mi', 'mis', 'ni', 'o', 'para', 'por', 'que', 'se', 'sin', 'su', 'sus', 'tu', 'tus', 'u', 'un', 'una', 'unas', 'unos', 'y'])
+const palabras = l => l.split(/\s+/).filter(Boolean)
+const limpia = w => w.toLowerCase().replace(/[^\p{L}]/gu, '')
+
+const defectosCorte = lineas => {
+  const d = []
+
+  if (lineas.length < 2) return d
+  lineas.slice(0, -1).forEach((l, i) => { if (DEBILES.has(limpia(palabras(l).at(-1)))) d.push(`línea ${i + 1} termina en «${palabras(l).at(-1)}»`) })
+  if (palabras(lineas.at(-1)).length === 1 && lineas.flatMap(palabras).length >= 3) d.push(`viuda: «${lineas.at(-1)}»`)
+
+  return d
+}
+
+const plano = t => String(t ?? '').replace(/\*\*|\[\[|\]\]/g, '').replace(/\s*\|\s*/g, ' ').replace(/\s+/g, ' ').trim()
+
+// ── Las 10 pruebas ─────────────────────────────────────────────────────────────────────────────────
+let harness = null
+const crecidas = {}
+
+const PRUEBAS = [
+  {
+    id: 'P01', nombre: 'Determinismo: la misma pieza compuesta dos veces es idéntica al píxel',
+    async correr() {
+      const [a, b] = await Promise.all([componer('P01-a', [pieza('mo2_916')]), componer('P01-b', [pieza('mo2_916')])])
+
+      if (!a.ok || !b.ok) return { ok: false, detalle: `no compuso: ${a.error ?? b.error}` }
+      const png = d => sha(fs.readFileSync(path.join(d, 'out', 'mo2-no-te-citan-916.png')))
+      const iguales = { png: png(a.dir) === png(b.dir), layout: JSON.stringify(leer(a.dir, 'mo2-no-te-citan-916-layout.json')) === JSON.stringify(leer(b.dir, 'mo2-no-te-citan-916-layout.json')), qa: JSON.stringify(a.qa) === JSON.stringify(b.qa) }
+
+      return { ok: Object.values(iguales).every(Boolean), detalle: `png ${iguales.png} · layout ${iguales.layout} · qa ${iguales.qa} (sha ${png(a.dir).slice(0, 12)})` }
+    }
+  },
+  {
+    id: 'P02', nombre: `No regresión: todas las piezas con CTA del repo contra ${REF}`,
+    async correr() {
+      try {
+        const r = await run(process.execPath, [REGRESION, '--ref', REF], { cwd: ROOT, timeout: 60 * 60e3, maxBuffer: 64e6 })
+
+        harness = r.stdout.match(/Reporte: (\S+)/)?.[1]
+
+        return { ok: true, detalle: r.stdout.split('\n').filter(l => /^Iguales|^🔵/.test(l)).join(' · '), evidencia: harness }
+      } catch (e) {
+        harness = String(e.stdout).match(/Reporte: (\S+)/)?.[1]
+
+        return { ok: false, detalle: String(e.stdout).split('\n').filter(l => /^Iguales|^🔴|^🟠|^🟡|^⚪/.test(l)).join(' · '), evidencia: harness }
+      }
+    }
+  },
+  {
+    id: 'P03', nombre: 'Guarda de sujeto: el texto nunca toca a una persona',
+    async correr() {
+      const encima = pieza('rec_916')
+
+      encima.top = 0.3
+      const [kv07, movida, sana] = await Promise.all([componer('P03-kv07', [pieza('kv07_916')]), componer('P03-encima', [encima]), componer('P03-sana', [pieza('rec_916')])])
+      const tapa = r => !r.ok && /tapa al sujeto/.test(r.error)
+      const ok = tapa(kv07) && tapa(movida) && sana.ok
+
+      return { ok, detalle: `KV-07-916 aborta: ${tapa(kv07)} (${kv07.error?.slice(0, 90)}) · texto movido sobre la persona aborta: ${tapa(movida)} (${movida.error?.slice(0, 90)}) · original compone: ${sana.ok}` }
+    }
+  },
+  {
+    id: 'P04', nombre: 'Crecer respira: el texto crecido queda a ≥ 3,5 % del sujeto (medición independiente)',
+    async correr() {
+      const claves = ['mo2_916', 'mo1_169', 'rec_916', 'ele_169']
+      const rs = await Promise.all(claves.map(k => componer(`P04-${k}`, [pieza(k)])))
+      const filas = []
+      let ok = true
+
+      for (const [i, r] of rs.entries()) {
+        if (!r.ok) { ok = false; filas.push(`${claves[i]} no compuso: ${r.error}`); continue }
+        const p = pieza(claves[i])
+        const q = r.qa[0]
+        const L = leer(r.dir, `${p.id}-layout.json`)
+        const E = leer(r.dir, `${p.id}-cta-evidence.json`)
+        const W = L.canvas.width, H = L.canvas.height
+        const m = await leerMascara(p.plate)
+        const cajas = [...L.elements.filter(e => TEXTO.has(e.id)), { id: 'boton', box: E.surface }]
+        const d = Math.min(...cajas.map(c => distanciaAlSujeto(m, c.box, W, H, Math.min(W, H) * 0.1)))
+        const exigido = Math.min(W, H) * 0.035 - 1
+
+        crecidas[claves[i]] = { dir: r.dir, id: p.id, qa: q }
+        const bien = q.escala <= 1 || d >= exigido
+
+        ok &&= bien
+        filas.push(`${p.id} ×${q.escala.toFixed(2)} → ${Number.isFinite(d) ? `${((d / Math.min(W, H)) * 100).toFixed(2)} %` : 'sin sujeto cerca'} ${bien ? '✓' : '✗'}`)
+      }
+
+      return { ok, detalle: filas.join(' · ') }
+    }
+  },
+  {
+    id: 'P05', nombre: 'Crecer no degrada el contraste de ninguna voz',
+    async correr() {
+      const filas = []
+      let ok = true
+
+      for (const [k, c] of Object.entries(crecidas)) {
+        const fija = { ...pieza(k), textGrowth: false }
+        const r = await componer(`P05-${k}`, [fija])
+
+        if (!r.ok) { ok = false; filas.push(`${k} fija no compuso: ${r.error}`); continue }
+        const base = r.qa[0].contraste
+        // Techo por tipo (contrato AXIS): texto 4,5:1; un LÍMITE no textual —el relleno del CTA contra la escena— 3:1.
+        const techo = v => (/superficie|relleno|borde/.test(v) ? 3 : 4.5)
+        const peores = Object.entries(base).filter(([v, x]) => (c.qa.contraste[v] ?? 0) < Math.min(x, techo(v)) - 0.05)
+        const fijaEsUno = r.qa[0].escala === 1
+
+        ok &&= !peores.length && fijaEsUno
+        filas.push(`${c.id} ×${c.qa.escala.toFixed(2)}: ${peores.length ? `✗ ${peores.map(([v, x]) => `${v} ${x}→${c.qa.contraste[v]}`).join(', ')}` : '✓'}${fijaEsUno ? '' : ' (textGrowth:false no congeló)'}`)
+      }
+
+      if (!Object.keys(crecidas).length) return { ok: false, detalle: 'depende de P04' }
+
+      return { ok, detalle: filas.join(' · ') }
+    }
+  },
+  {
+    id: 'P06', nombre: 'Zona segura declarada y eje del bloque',
+    async correr() {
+      const rec = crecidas.rec_916
+      let dentro = false
+      let detalleA = 'depende de P04'
+
+      if (rec) {
+        const p = pieza('rec_916')
+        const L = leer(rec.dir, `${p.id}-layout.json`)
+        const E = leer(rec.dir, `${p.id}-cta-evidence.json`)
+        const W = L.canvas.width, H = L.canvas.height, a = p.safeArea
+        const cajas = [...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box), E.surface, ...E.geometry.cursorEvidence.map(c => c.bounds)]
+        const fuera = cajas.filter(b => b.left < a.x0 * W - 0.5 || b.right > a.x1 * W + 0.5 || b.top < a.y0 * H - 0.5 || b.bottom > a.y1 * H + 0.5)
+
+        dentro = !fuera.length
+        detalleA = `02-reconoces-916 ×${rec.qa.escala.toFixed(2)} dentro de su safeArea: ${dentro}`
+      }
+
+      const izquierda = pieza('ref_916')
+
+      Object.assign(izquierda, { align: 'left' })
+      delete izquierda.centerX
+      Object.assign(izquierda.cta, { align: 'left', x: 0.08 })
+      const [original, alineada] = await Promise.all([componer('P06-eje', [pieza('ref_916')]), componer('P06-izquierda', [izquierda])])
+      const ejeRechazado = !original.ok && /eje corrido/.test(original.error)
+      let margen = false
+
+      if (alineada.ok) {
+        const L = leer(alineada.dir, '03-referencia-916-layout.json')
+
+        margen = Math.min(...L.elements.filter(e => TEXTO.has(e.id)).map(e => e.box.left)) >= izquierda.safeArea.x0 * L.canvas.width - 0.5
+      }
+
+      return { ok: dentro && ejeRechazado && alineada.ok && margen, detalle: `${detalleA} · centrado en eje 0,29 rechazado: ${ejeRechazado} · alineado a la izquierda compone: ${alineada.ok} y arranca dentro del 8 %: ${margen}` }
+    }
+  },
+  {
+    id: 'P07', nombre: 'Validación: un plan mal escrito falla ANTES de componer, nombrando pieza y campo',
+    async correr() {
+      const base = () => pieza('p1_45')
+      const sinFont = base();
+
+ delete sinFont.cta.fontSize
+      const token = base();
+
+ token.cta.surfaceToken = 'accentSurfce'
+      const final = base();
+
+ final.final = [1080, 1080]
+      const muda = base();
+
+ delete muda.dominant; delete muda.lead; delete muda.label
+      const plate = base();
+
+ plate.plate = path.join(ROOT, 'no/existe.png')
+      const ignorar = base();
+
+ ignorar.subjectGuard = { ignore: [{ box: [0, 0, 0.1, 0.1] }] }
+      const extra = base();
+
+ extra.colorFondo = '#000'
+
+      const casos = [
+        ['falta cta.fontSize', [sinFont], [], /falta `cta\.fontSize`/],
+        ['ids repetidos', [base(), base()], [], /ids repetidos/],
+        ['id pedido inexistente', [base()], ['no-existe'], /no están en el plan: no-existe/],
+        ['token de color inexistente', [token], [], /no existe en los tokens/],
+        ['final con otra proporción', [final], [], /no tiene la proporción/],
+        ['pieza muda', [muda], [], /pieza muda/],
+        ['plate inexistente', [plate], [], /no existe el plate/],
+        ['zona ignorada sin razón', [ignorar], [], /reason/]
+      ]
+
+      const rs = await Promise.all(casos.map(([, piezas, ids], i) => componer(`P07-${i}`, piezas, ids)))
+
+      const filas = casos.map(([n, , , re], i) => {
+        const r = rs[i]
+        const sinPng = !fs.existsSync(path.join(r.dir, 'out', 'p1-cta-contorno.png'))
+        const bien = !r.ok && re.test(r.error) && sinPng
+
+        return { n, bien, error: r.error }
+      })
+
+      const aviso = await componer('P07-aviso', [extra])
+      const avisa = aviso.ok && /campos que este comando no lee — colorFondo/.test(aviso.salida)
+
+      return { ok: filas.every(f => f.bien) && avisa, detalle: `${filas.map(f => `${f.n} ${f.bien ? '✓' : `✗ (${f.error})`}`).join(' · ')} · campo desconocido avisa y compone: ${avisa}` }
+    }
+  },
+  {
+    id: 'P08', nombre: 'Cortes de línea: sin viudas ni líneas que terminan en palabra corta',
+    async correr() {
+      const fuentes = []
+
+      if (harness) {
+        for (const r of JSON.parse(fs.readFileSync(harness, 'utf8')).resultados.filter(x => x.cand === 'compone')) fuentes.push([r.id, JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/out/qa.json'), 'utf8'))[0]])
+      } else {
+        for (const c of Object.values(crecidas)) fuentes.push([c.id, c.qa])
+      }
+
+      const malos = []
+
+      for (const [id, q] of fuentes) {
+        for (const voz of ['entrada', 'cierre', 'nota']) for (const d of defectosCorte(q.lineas?.[voz] ?? [])) malos.push(`${id} ${voz}: ${d}`)
+      }
+
+      return { ok: !malos.length, detalle: `${fuentes.length} piezas revisadas · ${malos.length} defectos${malos.length ? `: ${malos.slice(0, 6).join(' · ')}` : ''}` }
+    }
+  },
+  {
+    id: 'P09', nombre: 'Accesibilidad y contraste: WCAG 2.2 AA por voz, límites del CTA, alternativa completa',
+    async correr() {
+      const fuentes = []
+
+      if (harness) {
+        for (const r of JSON.parse(fs.readFileSync(harness, 'utf8')).resultados.filter(x => x.cand === 'compone')) {
+          fuentes.push([r.id, JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/out/qa.json'), 'utf8'))[0], JSON.parse(fs.readFileSync(path.join(r.dir, 'cand/piezas.json'), 'utf8'))[0]])
+        }
+      }
+
+      const fallas = []
+      const incompletas = []
+      let avisos = 0
+
+      for (const [id, q, p] of fuentes) {
+        const a = q.accesibilidad
+
+        if (!a) { fallas.push(`${id} sin medición`); continue }
+
+        for (const [v, m] of Object.entries(a.voces)) {
+          if (m && !m.cumpleWcag) fallas.push(`${id}:${v} ${m.wcag}<${m.umbralWcag}`)
+          if (m && (m.cumpleApca === false || m.cumpleDaltonismo === false)) avisos++
+        }
+
+        const faltan = [p.lead, p.dominant, p.after, p.note?.text, p.cta?.text, p.cta?.descriptor].map(plano).filter(t => t && !a.altText.includes(t))
+
+        if (faltan.length) incompletas.push(`${id}: ${faltan.join(' / ')}`)
+      }
+
+      // Y la herramienta de reporte corre sobre un plan compuesto y deja las vistas de daltonismo.
+      const plan = crecidas.mo2_916 && path.join(crecidas.mo2_916.dir, 'piezas.json')
+      let reporte = false
+
+      if (plan) {
+        await run(process.execPath, [REPORTE_A11Y, plan], { cwd: ROOT })
+        reporte = fs.existsSync(path.join(crecidas.mo2_916.dir, 'out/accesibilidad/reporte.md')) && fs.existsSync(path.join(crecidas.mo2_916.dir, 'out/accesibilidad/mo2-no-te-citan-916-daltonismo.png'))
+      }
+
+      return {
+        ok: fuentes.length > 0 && !fallas.length && !incompletas.length && reporte,
+        detalle: `${fuentes.length} piezas · voces bajo WCAG AA: ${fallas.length}${fallas.length ? ` (${fallas.slice(0, 4).join(', ')})` : ''} · alternativas incompletas: ${incompletas.length}${incompletas.length ? ` (${incompletas.slice(0, 3).join('; ')})` : ''} · avisos APCA/daltonismo: ${avisos} · reporte y vistas de daltonismo: ${reporte}`,
+        evidencia: plan && path.join(crecidas.mo2_916.dir, 'out/accesibilidad/reporte.md')
+      }
+    }
+  },
+  {
+    id: 'P10', nombre: 'Gate: aprueba lo bueno y rechaza QA incompleto, viejo, CTA sin acento y voz bajo WCAG',
+    async correr() {
+      const bueno = await componer('P10-bueno', [pieza('b2_916'), pieza('b2_169')])
+      const gBueno = bueno.ok ? await gate(bueno.planPath) : { code: -1, salida: bueno.error }
+
+      // QA incompleto: se quita una fila (el QA queda más nuevo que el plan).
+      const incompleto = await componer('P10-incompleto', [pieza('b2_916'), pieza('b2_169')])
+
+      if (incompleto.ok) fs.writeFileSync(path.join(incompleto.dir, 'out/qa.json'), JSON.stringify(incompleto.qa.slice(0, 1)))
+      const gIncompleto = await gate(incompleto.planPath)
+
+      // QA viejo: el plan se toca después de componer.
+      const viejo = await componer('P10-viejo', [pieza('b2_916')])
+      const futuro = new Date(Date.now() + 60e3)
+
+      fs.utimesSync(viejo.planPath, futuro, futuro)
+      const gViejo = await gate(viejo.planPath)
+
+      const sinAcento = await componer('P10-sin-acento', [pieza('ref_169')])
+      const gSinAcento = await gate(sinAcento.planPath)
+
+      const oscura = pieza('p1_45')
+
+      oscura.leadFill = '#333333'
+      const bajo = await componer('P10-wcag', [oscura])
+      const gBajo = await gate(bajo.planPath)
+
+      const firma = await componer('P10-firma', [pieza('mo3_916')])
+      const gFirma = await gate(firma.planPath)
+
+      const r = {
+        'aprueba el plan bueno': gBueno.code === 0,
+        'rechaza QA incompleto': gIncompleto.code !== 0 && /sin QA/.test(gIncompleto.salida),
+        'rechaza QA viejo': gViejo.code !== 0 && /anterior al plan/.test(gViejo.salida),
+        'rechaza CTA sin acento': gSinAcento.code !== 0 && /no es un acento/.test(gSinAcento.salida),
+        'rechaza voz bajo WCAG': gBajo.code !== 0 && /entrada.*WCAG 2\.2 AA/.test(gBajo.salida),
+        'avisa firma sobre sujeto': /firma queda sobre el sujeto/.test(gFirma.salida)
+      }
+
+      return { ok: Object.values(r).every(Boolean), detalle: Object.entries(r).map(([k, v]) => `${k} ${v ? '✓' : '✗'}`).join(' · ') }
+    }
+  }
+]
+
+// ── Ejecución y reporte ──────────────────────────────────────────────────────────────────────────────
+console.log(`Pruebas del compositor de CTA · ${TMP}`)
+const resultados = []
+
+for (const p of PRUEBAS.filter(x => !SOLO || SOLO.includes(x.id))) {
+  const t0 = Date.now()
+  let r
+
+  try { r = await p.correr() } catch (e) { r = { ok: false, detalle: `error de la prueba: ${e.message}` } }
+  resultados.push({ id: p.id, nombre: p.nombre, ...r, segundos: Math.round((Date.now() - t0) / 1000) })
+  console.log(`${r.ok ? '✓' : '✗'} ${p.id} ${p.nombre} (${Math.round((Date.now() - t0) / 1000)} s)\n    ${r.detalle}`)
+}
+
+const md = [
+  '# Pruebas del compositor de CTA', '', `Referencia de regresión: \`${REF}\` · directorio: \`${TMP}\``, '',
+  '| # | prueba | resultado | detalle |', '|---|---|---|---|',
+  ...resultados.map(r => `| ${r.id} | ${r.nombre} | ${r.ok ? '✓ pasa' : '✗ falla'} | ${String(r.detalle).replace(/\|/g, '/')} |`)
+].join('\n')
+
+fs.writeFileSync(path.join(TMP, 'reporte.json'), JSON.stringify({ ref: REF, tmp: TMP, resultados }, null, 2))
+fs.writeFileSync(path.join(TMP, 'reporte.md'), `${md}\n`)
+console.log(`\n${resultados.filter(r => r.ok).length} de ${resultados.length} pasan · ${path.join(TMP, 'reporte.md')}`)
+process.exitCode = resultados.every(r => r.ok) ? 0 : 1
