@@ -1,5 +1,7 @@
 # Handoff activo
 
+SKY: CDR-009.
+
 **Ads (22/09):** [CMP-001](docs/operations/social/2026-09-22-cmp-001-campaign-brief-handoff.md): seis pilotos definidos; roles, receta portable y hashes; 25 exports existentes, sin pauta.
 
 **Paid visual:** [playbook](.codex/skills/efeonce-advertising-creative/references/paid-visual-attention-playbook.md); sin resultados paid.

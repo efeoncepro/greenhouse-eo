@@ -53,6 +53,8 @@ La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels,
 
 ## 1. Cómo se usa esta skill (router)
 
+Para continuar **CMP-003 SKY**, leer primero [CDR-009](../../../docs/campaigns/decisions/CDR-009-cmp003-programacion-organica-octubre-2026.md): video/portada/copies ya programados en IG Efeonce y ambos LinkedIn para el 13, 15 y 16 de octubre de 2026. Fechas, cuentas, IDs y readback en ese registro; no duplicar desde planes de producción históricos.
+
 Para fotohistorias, globos y PDF social, cargar
 [dialogue-carousel-and-document-delivery.md](references/dialogue-carousel-and-document-delivery.md).
 Para Nexa, cargar el inventario enlazado en efeonce/ONEDRIVE_DELIVERY.md antes de generar.

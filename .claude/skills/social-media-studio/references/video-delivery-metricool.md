@@ -184,3 +184,17 @@ Conservar el ratio pedido; REEL con un MP4 4:5 no se documenta como un master 9:
   previo en el navegador no debe publicarse además del post ya programado. No copiar correos, tokens ni cookies.
 - Si expira GCP para el transporte canónico, usar el runner de `greenhouse-gcloud-auth-playwright`, verificar
   CLI + ADC y luego HTTP/MIME del archivo. No modificar IAM ni reemplazar por credenciales de otra identidad.
+
+## Caso CMP-003 SKY · corte de programación 2026-09-24
+
+Registro de campaña: [CDR-009](../../../../docs/campaigns/decisions/CDR-009-cmp003-programacion-organica-octubre-2026.md).
+**Ya programado; no recrear:** IG Efeonce 13-oct-2026 16:00; LinkedIn Efeonce 15-oct 11:00;
+LinkedIn Julio 16-oct 11:00, America/Santiago. IDs/UUID, cuentas y evidencia pertenecen al CDR.
+Video V17 de 29,5 s/1080×1920 + portada V4 PNG con flecha SKY verde + copy específico por canal.
+Readback del 24-sep: tres PENDING, autoPublish=true, draft=false; MP4/PNG re-alojados con SHA-256
+idénticos a las entregas aprobadas. El jueves corporativo evita una colisión real del viernes;
+no se movió la publicación ajena. PENDING no equivale a publicado; releer antes de actuar.
+
+Al retomar una campaña ya aprobada, partir del registro de programación y su paquete exacto,
+no de una preview ni de un plan antiguo. En SKY, la corrección de voz programada es «mi equipo
+Efeonce» para Julio y primera persona plural para los canales institucionales.
