@@ -188,6 +188,10 @@ Cierra el loop **idear → storyboard → animatic → producir → editar → f
   por esta vía. **Ninguna generación real verificada** hasta recargar créditos de API (guía §5.8).
 - **Producir (humano)**: After Effects (mograph/compositing), Blender/C4D (3D), Nuke/Fusion
   (compositing/VFX), Mocha (tracking), Houdini (FX/simulaciones) — handoff con spec (`modules/11`).
+  **Blender también se opera desde el agente** vía el puente MCP local `higgsfield-use-blender` (instalado y
+  conectado 2026-09-24; workflows `/Scene-Builder`, `/Exploded-view`, `/Destruction-Studio`, `/Cartoon-shaders`,
+  proyecto `.blend` editable). After Effects/Premiere/Resolve no están instalados: sus workflows del bundle
+  siguen siendo handoff humano. Estado y trampas: skill `higgsfield-provider`.
 - **Editar + finalizar**: montaje, sonido, color grade, render, entrega (`modules/06`, `07`, `08`, `10`).
 - **Profusionar una campaña motion**: desde un clean shot aprobado, construir 15/10/6 como tres argumentos
   editoriales con copy/logo exactos y audio medido (`workflows/single-shot-to-deterministic-campaign-hero.md`).

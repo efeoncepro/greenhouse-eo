@@ -16,7 +16,8 @@ generar o publicar sin revisión.
 - Virality Predictor como señal de revisión, nunca como promesa de rendimiento;
 - SDK TypeScript/Python para integración server-side;
 - skills como patrones de composición agentic;
-- MCP local para After Effects/Blender cuando el carril local sea aprobado.
+- puentes MCP locales para Blender, Illustrator y Photoshop, ya instalados y conectados en la Mac del operador
+  (2026-09-24); el de After Effects se instala cuando la aplicación exista en esa máquina.
 
 ## Qué significa “disponible”
 
@@ -28,6 +29,10 @@ Hay cuatro estados distintos:
 4. **Promovido:** reader live, canary, derechos, costes, governance y readback permiten usar la ruta.
 
 La revisión actual deja Higgsfield en los estados 1 y parcialmente 2. No afirma 3 ni 4.
+
+Aparte de esos cuatro estados de la ruta en Globe, hay un **carril local de operador** que sí está operativo: los
+puentes MCP de Blender, Illustrator y Photoshop y la CLI con sesión. Ese carril produce archivos editables en la
+máquina del operador y no implica que Globe tenga la ruta integrada ni promovida.
 
 ## Responsabilidades
 

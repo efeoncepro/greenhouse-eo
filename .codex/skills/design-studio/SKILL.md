@@ -190,7 +190,11 @@ validada contra overlays y recortes reales de cada plataforma. Ver la auditoría
 - **Dirigir**: brief + mood board + selección de herramienta por tarea (`modules/06`, `08`).
 - **Producir**: la herramienta o secuencia correcta para cada trabajo — **UI de Greenhouse →**
   `greenhouse-ai-image-generator`; **marketing/concept →** Nano Banana / Midjourney /
-  Ideogram / Adobe Firefly / Higgsfield / Magnific (upscale) vía sus MCP/skills;
+  Ideogram / Adobe Firefly / Higgsfield / Magnific (upscale) vía sus MCP/skills; **Photoshop e Illustrator
+  nativos** desde el agente vía los puentes MCP locales `higgsfield-use-photoshop` / `higgsfield-use-illustrator`
+  (instalados 2026-09-24: capas, Smart Objects, texto y máscaras editables, exportación PNG/PSD; `/Vectorize` para
+  vector real en `.ai`; `/Image-fixer` sólo en su ruta segura — sin Healing/Generative Fill; estado en
+  `higgsfield-provider`);
   **campaña híbrida Seedream/GPT/Gemini Omni →** cargar `modules/12_HYBRID_IMAGE_CAMPAIGN_PRODUCTION.md` y
   relevar por contrato `brand/channel→diverge→develop→anchor→organize→extend→animate→compose/post→prepress→release`;
   **set estático premium con layout controlado →** cargar `modules/13_LAYOUT_DESIGN_AND_FINISHING.md`, completar

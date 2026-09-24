@@ -125,6 +125,7 @@ siguen sin verificar. Para operar, lee el manual antes del POST y usa el interac
 | ¿Cómo dirijo la pieza? ¿Qué plano, qué luz, qué copy? | `design-studio` · `motion-design-studio` · `audio-studio` · `social-media-studio` |
 | ¿Cómo produzco el asset de UI con el runtime? | `greenhouse-ai-image-generator` |
 | ¿Qué `routeId` expone Globe y está promovido? | `greenhouse-globe-model-fleet` |
+| ¿Qué puentes MCP locales (Blender/Illustrator/Photoshop), CLI `higgsfield` y sesión están vivos en la Mac del operador? | `higgsfield-provider` §Estado local verificado (2026-09-24) |
 | ¿Puedo usar comercialmente lo que salió? | `greenhouse-ai-creative-rights-governance` |
 
 **Las skills de oficio son consumidoras.** Si una de ellas trae su propio criterio de selección y

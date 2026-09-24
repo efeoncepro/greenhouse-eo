@@ -29,7 +29,7 @@ social (tareas 744–755) y gráficos 739/740 antes del 25/09. Septiembre: 12 ar
 clasificado en la skill y Notion. Sin masters: artes intactos, sin publicación. «Berel Squad» no visible en la cuenta de Julio;
 cobertura limitada al share.
 
-**16–17/09:** Higgsfield API con créditos. Previa 18: verificar · readback KV 21/09 y 23/09.
+**16–17/09:** Higgsfield API con créditos. Previa 18: verificar · readback KV 21/09 y 23/09 · 24/09 `higgsfield-provider`.
 
 **GTA VI:** posts 22 y 25/09 ([bitácora](docs/operations/social/2026-09-19-nivel-de-busqueda-gta6-trendjack-production-method.md)).
 

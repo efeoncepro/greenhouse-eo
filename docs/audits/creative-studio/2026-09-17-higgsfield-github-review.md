@@ -4,6 +4,13 @@
 **Tipo:** revisión estática de repositorios públicos y documentación primaria
 **Estado:** evidencia histórica; revalidar antes de ejecutar o contratar
 
+**Delta 2026-09-24:** el tooling local que esta revisión describe como «After Effects/Blender» se distribuye hoy como
+paquetes npm por aplicación (`fnf-blender-mcp`, `@higgsfield_org/illustrator-mcp`, `@higgsfield_org/photoshop-mcp`,
+`fnf-after-effects-mcp`). Los de Blender, Illustrator y Photoshop quedaron instalados y verificados en la Mac del
+operador, y la CLI pasó de 0.2.1 a 1.1.26 con sesión. El punto 5 de la recomendación queda ejecutado para esas tres
+aplicaciones; After Effects sigue pendiente de la app. Estado vigente: skill `higgsfield-provider` §«Estado local
+verificado» y [runbook](../../operations/creative-studio/HIGGSFIELD_PROVIDER_RUNBOOK_V1.md).
+
 ## Conclusión
 
 Higgsfield ofrece un conjunto aprovechable de integración: API, CLI, SDKs, skills para agentes y MCPs locales para

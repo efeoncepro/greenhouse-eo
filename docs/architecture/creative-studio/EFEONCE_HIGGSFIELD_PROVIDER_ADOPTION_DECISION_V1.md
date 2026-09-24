@@ -4,6 +4,22 @@
 **Fecha:** 2026-09-17
 **Ámbito:** Efeonce Globe / Creative Studio / producción generativa / proveedores externos / agentes
 
+## Delta 2026-09-24 — puentes locales instalados y CLI con sesión
+
+- Los puentes MCP locales de **Blender, Illustrator y Photoshop** quedaron instalados, registrados
+  (`claude mcp add --scope user`) y verificados en la Mac del operador (`fnf-blender-mcp` 0.2.2,
+  `@higgsfield_org/illustrator-mcp` 0.1.2, `@higgsfield_org/photoshop-mcp` 0.1.2, bajo `~/.higgsfield/`). After
+  Effects, Premiere, TouchDesigner y DaVinci Resolve no están instalados: sus workflows no corren aunque el paquete
+  exista en npm (`fnf-after-effects-mcp` 0.1.3). La superficie 3 ya no se limita a «After Effects y Blender»: hoy
+  cubre Blender y las dos aplicaciones de Adobe verificadas.
+- La CLI `higgsfield` se actualizó a 1.1.26 (la 0.2.1 ya no podía iniciar sesión) y tiene sesión con
+  `mkt@efeoncepro.com`, workspace `Private`; tras el login es obligatorio `higgsfield workspace set <id>`.
+- Nada de esto cambia el estado de la decisión: sigue `provider-supported / no Globe route`, los gates de adopción
+  del Producer siguen pendientes y el carril local es de operador, out-of-band, nunca runtime. Inventario,
+  catálogo de operaciones y trampas medidas: skill `higgsfield-provider` §«Estado local verificado» +
+  [runbook](../../operations/creative-studio/HIGGSFIELD_PROVIDER_RUNBOOK_V1.md) §«Puentes MCP locales» y
+  §«CLI `higgsfield`».
+
 ## Decisión
 
 Efeonce puede usar Higgsfield como proveedor externo de generación y como fuente de patrones de tooling para

@@ -17,7 +17,7 @@
 | **Idear / dirigir** | esta skill (`../modules/`) + `templates/` | concepto, storyboard, animatic, shotlist |
 | **Keyframes / stills** | `greenhouse-ai-image-generator` / `design-studio` | frames de inicio/fin para image-to-video |
 | **Producir video IA** | **Higgsfield** (MCP) + `higgsfield-*` skills; Runway/Seedance/Veo/Kling/Omni | generar/animar tomas con control de cámara + personaje |
-| **Producir craft humano** | After Effects (mograph), Blender/C4D (3D), Houdini (FX) | tipo kinética, 3D, VFX de precisión — handoff con spec |
+| **Producir craft humano** | After Effects (mograph), Blender/C4D (3D), Houdini (FX) | tipo kinética, 3D, VFX de precisión — handoff con spec. Blender también se opera desde el agente vía el puente MCP local `higgsfield-use-blender` (2026-09-24); After Effects/Premiere/Resolve no están instalados → handoff humano. Estado en `higgsfield-provider` |
 | **VFX / compositing** | Nuke / Fusion (Resolve) / After Effects; **Mocha** (tracking); **Wonder/Flow Studio** (mocap); **Runway** / **Beeble** (AI-VFX) | keying, roto, matchmove, integración CGI, cleanup (`../modules/11`) |
 | **Editar / montar** | DaVinci Resolve / Premiere; FFmpeg/Python para conform y rescate local | corte, montaje, ritmo (`../modules/06`) |
 | **Sonido** | Audio Studio; DAW, ElevenLabs directo/UI o conectores verificados, FFmpeg/Python | música y SFX separados sobre eventos reales; VO sólo si el brief la pide (`../modules/07`) |

@@ -41,6 +41,10 @@ Higgsfield queda en `provider-supported / no Globe route`: API, SDKs, CLI, skill
 disponibles para evaluación, pero no prueban adapter, binding, readiness, coste, derechos, canary ni disponibilidad
 del Producer. No crear una fila `available` hasta cerrar la tupla exacta de ruta y su evidencia. El detalle de los
 repositorios y riesgos está en la [auditoría](../../audits/creative-studio/2026-09-17-higgsfield-github-review.md).
+**Delta 2026-09-24:** los puentes MCP locales de Blender, Illustrator y Photoshop y la CLI `higgsfield` 1.1.26 (con
+sesión) están instalados y verificados en la Mac del operador; es un carril de operador out-of-band que no crea ruta
+Globe ni cambia este estado. Detalle: [runbook](HIGGSFIELD_PROVIDER_RUNBOOK_V1.md) §«Puentes MCP locales» y skill
+`higgsfield-provider` §«Estado local verificado».
 
 Backbone = `PRODUCER_ROUTE_CATALOG` (`packages/domain/src/producer-catalog.ts`, runtime observado `v1.7.0`; este
 ledger conserva referencias históricas `v1.3.0`). El nombre público

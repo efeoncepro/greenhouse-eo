@@ -72,7 +72,7 @@ disponibilidad.
 | Estado | Imagen | Video |
 |---|---|---|
 | **Disponible en CLI** (out-of-band, gasta) | `pnpm ai:image`: GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare (`xhigh`/`max` sólo en 2.5). `pnpm ai:fal`: Seedream 5 Pro, Pro edit, Pro layerize, Lite, Lite edit | `pnpm ai:fal`: Seedance 2.5 y 2.0 (base/fast/mini/us), Minimax H3 (base/Max/Max Turbo/camera; LoRA y entrenadores sin verificar; Director no operable), Flux 3 (12), Wan 3.0 y Prime. `pnpm ai:omni`: Cloud Gemini Omni 1.1 Flash, seis modos probados a 360p/16:9/3 s (extend 6 s acumulados) |
-| **Directo, sin CLI** | Nano Banana 2 (default del runtime `google-gemini-image`); Nano Banana Pro disponible en Vertex **sin superficie**; Recraft V4.1 SVG vía Higgsfield CLI (**sin sesión** 2026-09-16) | Veo 3.1 (Vertex) |
+| **Directo, sin CLI** | Nano Banana 2 (default del runtime `google-gemini-image`); Nano Banana Pro disponible en Vertex **sin superficie**; Recraft V4.1 SVG vía Higgsfield CLI (con sesión desde 2026-09-24; SVG real **sin corrida**; estado en `higgsfield-provider`) | Veo 3.1 (Vertex) |
 | **Evaluado, no conectado** | Grok Imagine imagen v2.0, Qwen Image 3, Flux.2 Pro, Kling imagen O3, Recraft por fal (23 endpoints) | Kling 3 (O3/V3), Grok Imagine video, Wan 2.7 (edición), HappyHorse 1.1, PixVerse V6 |
 | **Workbench watch** | Midjourney, Ideogram, Adobe Firefly, Magnific (upscale) | Higgsfield (Seedance 2.5 `omni_reference`, Kling, Soul ID), Runway |
 

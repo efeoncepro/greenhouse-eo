@@ -97,7 +97,7 @@ ranking fechado · **[decisión]** del operador · **sin dato** = no existe evid
 | OpenAI directo | `pnpm ai:image` (out-of-band) · runtime `generateImage` provider `openai-image` (default del producto) | GPT Image 2 (default del CLI), GPT Image 2.5 Sunburst y Flare |
 | Google directo (Vertex, `global`) | **sólo** runtime `generateImage` provider `google-gemini-image`; **no hay CLI** | Nano Banana 2 (`gemini-3.1-flash-image`, default); Nano Banana Pro (`gemini-3-pro-image`) disponible pero **sin superficie** |
 | Google Cloud directo (Interactions, `global`) | `pnpm ai:omni` (tooling local, fuera de Globe) | Gemini Omni 1.1 Flash `gemini-omni-1.1-flash-preview`: texto, imagen, cuadros inicial/final, referencias, edición y extensión de video |
-| Higgsfield CLI (out-of-band) | `higgsfield` | Recraft V4.1, **vectores SVG reales**. Estado 2026-09-16: `Not authenticated` → sin vía hasta que una persona corra `higgsfield auth login` |
+| Higgsfield CLI (out-of-band) | `higgsfield` | Recraft V4.1, **vectores SVG reales**. Estado 2026-09-24: CLI 1.1.26 con sesión y workspace fijado (`higgsfield auth login` + `workspace set`); la generación de un SVG real sigue **sin corrida**. Carril independiente del MCP remoto y de `pnpm ai:fal --capability hf-*`; estado y trampas en `higgsfield-provider` §Estado local verificado |
 | fal.ai (out-of-band, NUNCA runtime) | `pnpm ai:fal` | Seedream 5 Pro/Lite/edit/layerize (imagen); Seedance, Minimax H3, Flux 3, Wan 3.0 (video) |
 | Higgsfield API (out-of-band, NUNCA runtime) | `pnpm ai:fal --capability hf-*` | SOUL 2/Cinema, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Grok Image 2.0, Recraft 4.1 (SVG **sin confirmar**: `model_type: vector` de la app, sin probar por API); video Kling/PixVerse/LTX/Happy Horse y otra vía para Seedance/Wan/H3. `--estimate` cotiza exacto sin cobrar. Estado 2026-09-16: 44/44 cotizan, **0 generaciones reales** (cuenta de API sin créditos). Guía §5.8 |
 
@@ -107,7 +107,7 @@ usa Cloud; la identidad Developer API `gemini-omni-1.1-flash` no es intercambiab
 
 ### Árbol de decisión — imagen
 
-1. **¿Necesitas vector real (SVG)?** → Recraft V4.1 vía Higgsfield. GPT Image y Seedream son **raster siempre**.
+1. **¿Necesitas vector real (SVG)?** → Recraft V4.1 vía Higgsfield (CLI con sesión desde 2026-09-24, SVG real aún sin corrida) o `/Vectorize` en Illustrator vía el puente MCP local `higgsfield-use-illustrator` (`ai_get_skill illustrator-vector-art`; estado en `higgsfield-provider`). GPT Image y Seedream son **raster siempre**.
 2. **¿La pieza lleva copy, logo, CTA, precio o legal finales?** → el modelo entrega **sólo el clean plate**;
    texto y marca se componen de forma determinística. Esto no cambia con ningún modelo.
 3. **¿Edición donde la precisión manda, zona protegida con máscara o entregable final?** →
@@ -816,7 +816,7 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   Para video a video con personas, Flux 3 o Wan 3.0. Costo: la fórmula de tokens de fal
   (`alto × ancho × segundos × 24 / 1024`) calzó con lo medido dentro de ~5 %; lo que subestimaba ~2× era la
   equivalencia de OpenArt (corregido 2026-09-16).
-- **Pendientes:** LoRA de H3 (postergada por decisión del operador) y Recraft sin vía operativa (Higgsfield CLI sin sesión).
+- **Pendientes:** LoRA de H3 (postergada por decisión del operador) y Recraft V4.1 vía Higgsfield CLI: sesión resuelta el 2026-09-24 (CLI 1.1.26), la generación de un SVG real sigue sin corrida.
 - **Retome (request_id):** el CLI imprime el `request_id` apenas fal encola. Si el polling local vence (HTTP 408)
   el trabajo **sigue corriendo y cobrando** en fal: no relances; usa el comando de retome que imprime el CLI
   (verificado: mismo archivo byte a byte; alcance de la verificación: el retome se probó en real con `h3turbo-t2v` y con un Seedance 2.5 r2v que superó la espera anterior; Seedream y Flux 3 usan el mismo código (`awaitFalRequest`) pero no tienen corrida propia de retome.) La cola se direcciona por APP (dos primeros segmentos del slug), no por

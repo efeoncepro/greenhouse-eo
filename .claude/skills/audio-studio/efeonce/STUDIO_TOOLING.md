@@ -33,6 +33,8 @@
 
 `generate_audio`, `create_voice`, `create_voice_from_confirmed_audio`, `list_voices`, `dubbing`,
 `voice_change`, `enhanceSpeechPoll` — útil cuando ya produces video en Higgsfield (audio+video en un pipeline).
+La CLI `higgsfield` (con sesión desde 2026-09-24) lista `dubbing` y `voice_change` entre sus workflows cloud como
+carril independiente del MCP; estado en `higgsfield-provider` §Estado local verificado.
 
 ## Seed Audio 1.0 (ByteDance, vía Volcano Ark / agregadores)
 

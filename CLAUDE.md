@@ -1027,7 +1027,7 @@ Estos CLIs están autenticados localmente. Cuando una task toca su dominio, **ú
 
 **Regla operativa**: cuando un agente diagnostica un incidente y la causa raíz vive en una de estas plataformas, debe **ejecutar el fix con el CLI** (con guardrails y verificación), no documentar pasos manuales. Si el fix es destructivo (eliminar app registration, drop database, force-push) sí confirma con el usuario primero.
 
-**MCP creativos (solo sesiones Claude):** conectores `claude.ai` de edición/diseño de assets (Adobe, Figma, Higgsfield, Magnific…), session-scoped y solo-Claude, **out-of-band** (NUNCA a runtime; imágenes runtime = `src/lib/ai/image-generator.ts`). Inventario + reglas: **AGENTS.md → §0**.
+**MCP creativos (solo sesiones Claude):** conectores `claude.ai` de edición/diseño de assets (Adobe, Figma, Higgsfield, Magnific…), session-scoped y solo-Claude, **out-of-band** (NUNCA a runtime; imágenes runtime = `src/lib/ai/image-generator.ts`). Inventario + reglas: fila «Higgsfield» del router de dominios en **AGENTS.md** + skill `higgsfield-provider` §«Estado local verificado» (puentes MCP locales Blender/Illustrator/Photoshop conectados 2026-09-24; los slash del bundle viven en `get_preset_instructions`, no en `get_workflow_instructions`).
 
 ### Auth resilience — invariantes (TASK-742)
 

@@ -30,6 +30,7 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 - [TASK-1455 Globe brand shell QA — 2026-07-19](platform/TASK-1455_GLOBE_BRAND_SHELL_QA_2026-07-19.md)
 - [Higgsfield y Magnific — auditoría de UI y workflow — 2026-08-04](competitive-ui/COMPETITIVE_UI_AUDIT_HIGGSFIELD_MAGNIFIC_2026-08-04.md)
 - [Globe frente a Higgsfield y Magnific — benchmark comparativo — 2026-08-05](competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
+- [Higgsfield — GitHub y superficies de integración — 2026-09-17](creative-studio/2026-09-17-higgsfield-github-review.md) — nueve repos oficiales: API, CLI, SDKs, skills y MCP local; Delta 2026-09-24: puentes locales de Blender/Illustrator/Photoshop instalados y verificados, CLI 1.1.26 con sesión.
 - [Hiring — quality assurance de selección y capacidad — 2026-07-30](hiring/GREENHOUSE_HIRING_QUALITY_ASSURANCE_AUDIT_2026-07-30.md)
 - [Hiring — estado real del dominio vs. su contabilidad documental — 2026-08-26](hiring/GREENHOUSE_HIRING_DOMAIN_STATE_AUDIT_2026-08-26.md) — el dominio está más avanzado que sus docs; la cuenta de commits no mide despliegue (squash); un flag ON en prod hace 41 días dado por OFF
 - [Hiring — vocabulario de etapas del pipeline — 2026-08-22](hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md) — 30 hallazgos, verificación adversarial completa; 17 particiones del mismo enum; el enum no tiene ADR

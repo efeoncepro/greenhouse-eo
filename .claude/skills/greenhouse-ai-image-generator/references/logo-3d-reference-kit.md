@@ -274,7 +274,9 @@ blender -b --factory-startup --python blender/render_logo.py -- blender/grande-n
 node blender/postproceso.mjs render/grande-navy kit/grande-navy <hoja.png>
 ```
 
-Render local en Blender (Cycles, Metal), sin costo de API. Entrega a OneDrive según
+Render local en Blender (Cycles, Metal), sin costo de API. Desde 2026-09-24 el agente también puede abrir, guardar y
+rendir escenas por el puente MCP local `higgsfield-use-blender` (`bl_open_project` / `bl_save_project` / `bl_render`);
+el kit sigue siendo la ruta determinista por script. Estado en `higgsfield-provider`. Entrega a OneDrive según
 [`social-media-studio/efeonce/ONEDRIVE_DELIVERY.md`](../../social-media-studio/efeonce/ONEDRIVE_DELIVERY.md).
 
 

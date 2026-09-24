@@ -26,7 +26,7 @@
 - **¿Es imagen de marketing/marca (KV, hero, poster, social)?** → elige el modelo por tarea
   (matriz en `SOURCES.md`): volumen GCP → Gemini 3.1 Flash Lite Image; contexto/multirreferencia →
   Gemini 3.1 Flash Image; acabado premium → Gemini 3 Pro Image; texto conceptual → Ideogram;
-  vector escalable → Recraft (vía Higgsfield, hoy sin sesión); realismo/cámara → FLUX.2; edición precisa,
+  vector escalable → Recraft (vía Higgsfield CLI, con sesión desde 2026-09-24, SVG real sin corrida) o `/Vectorize` en Illustrator vía el puente MCP local `higgsfield-use-illustrator`; realismo/cámara → FLUX.2; edición precisa,
   máscara o pieza final → GPT Image 2.5 Sunburst; generación cotidiana → GPT Image 2.5 Flare; Batch → GPT Image 2
   (los tres con `pnpm ai:image --model`);
   divergencia barata → Seedream 5 Lite; material/color/atmósfera o región semántica → Seedream 5 Pro
@@ -74,6 +74,10 @@ fuera del router hasta registrar endpoint/modelo exacto, términos, residencia/r
 
 - **Higgsfield**: `generate_image` / `generate_video` / `generate_audio`, `models_explore(recommend)`,
   `upscale_*`, `outpaint_image`, `reframe`, `remove_background`, `virality_predictor`, avatares/UGC.
+- **Puentes MCP locales Higgsfield** (`higgsfield-use-photoshop` / `higgsfield-use-illustrator` / `higgsfield-use-blender`,
+  instalados y conectados 2026-09-24): operan la app instalada en la Mac del operador, no generan; After Effects,
+  Premiere, Resolve y TouchDesigner no están instalados. Catálogo real, límites y trampas en `higgsfield-provider`
+  §Estado local verificado.
 - **Adobe (Firefly)**: generación/edición (crop, adjust, remove-bg, vectorize, expand); su aptitud comercial
   depende de términos e indemnidad revisados para el endpoint y cliente, no de una etiqueta genérica.
 - **Magnific**: upscale/enhance de alta calidad (requiere auth del server — reverificar).

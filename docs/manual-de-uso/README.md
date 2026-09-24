@@ -13,7 +13,8 @@ La diferencia con otras capas de documentacion:
 ### Social y Creative Studio
 
 - [Usar Higgsfield con Creative Studio](creative-studio/higgsfield-provider.md) — preparación, derechos, coste,
-  ejecución, readback, governance y límites del MCP local After Effects/Blender.
+  ejecución, readback, governance, puentes MCP locales (Blender, Illustrator y Photoshop instalados y conectados
+  desde el 2026-09-24; After Effects requiere la app) y CLI `higgsfield` con sesión.
 
 - [Usar reglas publicitarias con Codex y Claude](creative/usar-reglas-publicitarias-con-agentes.md) — prompts,
   entregables, ficha tipográfica y revisión para crear/corregir publicidad y social con texto sin confundir
